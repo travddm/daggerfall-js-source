@@ -152,7 +152,7 @@ test('SD9c THE DIAL AND THE LIGHT, the shader RUN: the Hour\'s twelve marks on t
   }
   const deep = TURNING_DIAL_R - TURNING_MARK_M * 1.5;
   assert.ok(lum(at(0, polar(deep, d), { t })) > lum(at(0, polar(deep, d + TAU / TURNING_MARKS), { t })) + 0.3, 'the Hour\'s own mark the longer');
-  const d3 = turningDialAngle(t + 3), on3 = d - (d3 - d);     // AUDIT SD II (L2 F13
+  const d3 = turningDialAngle(t + 3), on3 = d - (d3 - d);   // AUDIT SD II (L2 F13
   assert.ok(lum(at(0, polar(markR, d3), { t: t + 3 })) > 0.5 && lum(at(0, polar(markR, on3), { t: t + 3 })) < 0.3, 'it turned back, not on');
   // the light at the feet, breathing
   const feet = [0.02, 0.02];

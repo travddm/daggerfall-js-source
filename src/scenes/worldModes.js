@@ -7234,7 +7234,7 @@ export function createWorldModes(host) {
   async function buyHomeAt(bd, price) {
     const homes = host.onlineHomes;
     if (!homes) return;
-    if (host.wildNoHouse?.()) return;     // PVPDUNGEONS
+    if (host.wildNoHouse?.()) return;   // PVPDUNGEONS
     // WD3 (AUDIT WD3 O1/O2): a home is a building key, which names a building only in its town's layout - none is bought
     // before the room's layouts of the homes' towns are heard, and a claim refused for its town's layout hears them again
     if (host.homeTownsMissing?.()) { townTalk?.say?.(accountRefusalText('home-towns')); return; }   // AUDIT WD3 B1: a town mod's pack did not load here
@@ -9043,7 +9043,7 @@ export function createWorldModes(host) {
       _insidePartyRestExempt = false;   // TAVERN-REST1/GUILD-REST1: cleared on the same transition as the tavern latch above
       placeInstance = place?.instance ?? null;   // INSTANCES: the room this dungeon is entered as
       dungeonLoc = dfLocation;
-      host.profDungeonEntered?.(ctx);     // PROF2: the day's veins on this dungeon's walls (23)
+      host.profDungeonEntered?.(ctx);   // PROF2: the day's veins on this dungeon's walls (23)
       standCrownHall(ctx, dfLocation).catch(() => {});   // CROWN-HALL: the throne room's pieces, about its ruler
       standArenaWall(ctx, dfLocation).catch(() => {});   // ARENA5: the Hall of Champions' plaque wall, about its Keeper
       player.collider = ctx.collider;
@@ -9722,7 +9722,7 @@ export function createWorldModes(host) {
       // whole active-enemy database, which is the pool itself.
       if (interiorFoes && interiorCtx) {
         ensureInteriorNet();   // QUEST-PARTY phase 3b: a session that opened after the door (a save loaded indoors)
-        interiorFoes.update(foeDt, player.pos, cam.pos, _interiorSenses());     // WINFOE1: a window no longer zeroes the foes' clock - world.js's line
+        interiorFoes.update(foeDt, player.pos, cam.pos, _interiorSenses());   // WINFOE1: a window no longer zeroes the foes' clock - world.js's line
         // AUDIT 63 F42: EnemyMotor.OpenDoors, the step that follows
         // ObstacleCheck inside the same Move (EnemyMotor.cs:1424-1442).
         if (!overlayHeld) openInteriorDoors(interiorFoes.foes);
@@ -9968,7 +9968,7 @@ export function createWorldModes(host) {
       if (isSdRealm(dungeonLoc)) host.drawSdSky?.({ proj, view, eye: mwv.eye });   // SD5b: the Hour's sky - after its islands, before its flats (PERF2's law)
       dungeonCtx.flatAnims.tick(dt);   // FA1
       renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), player.pos));   // TACT4: a foe's wind-up on the ground
-      renderer.drawFoeTelegraphs?.(techniqueMarksNow());     // TECH1: and the player's own marks, after the foes'
+      renderer.drawFoeTelegraphs?.(techniqueMarksNow());   // TECH1: and the player's own marks, after the foes'
       if (isGateArena(dungeonLoc)) host.drawGateBodies?.(canvas, proj, view, mwv.eye, dt);   // MWNPC10: the court's creatures in their bodies (their batches ride extraBillboards)
       if (windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) dungeonCtx.drawWindowBodies?.(canvas, { proj, view, eye: cam.pos });   // AUDIT MW-NPC C6, FB1015 LOOT-BODY: under a window drawFoes' last bodies, frozen
       dungeonCtx.bloodMarks?.draw?.(camRight, UP_Y);   // BLOOD1a: the dungeon's own marks, on this host's pass   // BLOOD1b: and its chunks, on this host's own basis
@@ -10212,7 +10212,7 @@ export function createWorldModes(host) {
     // the same reason the exterior hosts put it above their own draw:
     // a body standing in its own blood is over it, not under it.
     renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), player.pos));   // TACT4: a foe's wind-up on the ground
-    renderer.drawFoeTelegraphs?.(techniqueMarksNow());     // TECH1: and the player's own marks, after the foes'
+    renderer.drawFoeTelegraphs?.(techniqueMarksNow());   // TECH1: and the player's own marks, after the foes'
     interiorBloodMarks.draw(camRight, UP_Y);
     renderer.drawBillboards([...interiorCtx.billboardBatches, ...(host.extraBillboards?.() ?? [])], camRight, UP_Y);   // ONLINE1: the peers on the interior's own pass
     const livingInside = host.livingBillboards?.() ?? [];   // LW8: the residents the day has in this building
@@ -12108,7 +12108,7 @@ export function createWorldModes(host) {
     // ONLINE1: what the host needs to name the room - the mounted dungeon's
     // location, the interior's building; null in the exterior
     // ARENA4: the floor's instance standing a relay's bout is that bout's room (`arena:b<id>`)
-    roomIdentity: () => (mode === 'dungeon' ? (isGateArena(dungeonLoc) ? { kind: 'gate', day: dungeonLoc.gate } : isSdRealm(dungeonLoc) ? { kind: 'sd', s: dungeonLoc.sdRealm, o: dungeonLoc.sdOwner } : isArenaFloor(dungeonLoc) && dungeonLoc.arenaBout ? { kind: 'arena', o: dungeonLoc.arenaBout } : { kind: 'dungeon', mapId: dungeonLoc?.mapTableData?.mapId ?? null, regionIndex: dungeonLoc?.regionIndex ?? -1, name: dungeonLoc?.name ?? '', size: builtDungeonSize(dungeonLoc), instance: placeInstance })     // WB3b: the court's room is its gate's own; SD-ONLINE: a dungeon's room is its layout's (the size it was BUILT at); HOLD-SHARED: Privateer's Hold keys its shared room as every dungeon does (HOLD-SOLO's `solo` reverted)
+    roomIdentity: () => (mode === 'dungeon' ? (isGateArena(dungeonLoc) ? { kind: 'gate', day: dungeonLoc.gate } : isSdRealm(dungeonLoc) ? { kind: 'sd', s: dungeonLoc.sdRealm, o: dungeonLoc.sdOwner } : isArenaFloor(dungeonLoc) && dungeonLoc.arenaBout ? { kind: 'arena', o: dungeonLoc.arenaBout } : { kind: 'dungeon', mapId: dungeonLoc?.mapTableData?.mapId ?? null, regionIndex: dungeonLoc?.regionIndex ?? -1, name: dungeonLoc?.name ?? '', size: builtDungeonSize(dungeonLoc), instance: placeInstance })   // WB3b: the court's room is its gate's own; SD-ONLINE: a dungeon's room is its layout's (the size it was BUILT at); HOLD-SHARED: Privateer's Hold keys its shared room as every dungeon does (HOLD-SOLO's `solo` reverted)
       : mode === 'interior' ? { kind: 'interior', buildingKey: interiorBuilding?.buildingKey ?? 0, layout: _visitLayout, instance: placeInstance, ...(interiorCabin ? { boatUid: interiorCabin.uid } : {}), ...(_intShared?.owned ? { private: true, privateRoom: privateVisitRoom } : {}) } : null),   // personal interiors share presence in an owner-specific room, never world memory/loot
     get dungeonLocation() { return dungeonLoc; },   // B2: playerInside's dungeon arm
     /** X7: the Identify SPELL's window (Identify.cs:71-76 pushes the

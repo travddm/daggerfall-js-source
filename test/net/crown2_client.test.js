@@ -31,7 +31,7 @@ test('CROWN2 THE POLITICS\' ROWS: sworn either way with its break; a fealty brea
   assert.deepEqual(politicsRows({ pacts: [{ with: SH, state: 'offered', until: 16, mine: false }] }), [{ text: 'The Silver Hand <SH> offers your guild a Pact of non-aggression, until week 16.', act: 'pact-accept', alt: 'pact-decline', tag: 'SH' }]);
   assert.deepEqual(politicsRows(null), []);
   assert.equal(politicsRows({ fealty: [f('sworn', true)], pacts: [{ with: EO, state: 'offered', until: 8, mine: true }] }).length, 2, 'fealty first, then Pacts');
-  assert.deepEqual({ ...POLITICS_ACTS }, { 'fealty-accept': 'Accept', 'fealty-withdraw': 'Withdraw', 'fealty-break': 'Break fealty', 'pact-accept': 'Sign', 'pact-withdraw': 'Withdraw', 'pact-break': 'Break the Pact', 'fealty-decline': 'Decline', 'pact-decline': 'Decline' });     // AUDIT-SEATS (
+  assert.deepEqual({ ...POLITICS_ACTS }, { 'fealty-accept': 'Accept', 'fealty-withdraw': 'Withdraw', 'fealty-break': 'Break fealty', 'pact-accept': 'Sign', 'pact-withdraw': 'Withdraw', 'pact-break': 'Break the Pact', 'fealty-decline': 'Decline', 'pact-decline': 'Decline' });   // AUDIT-SEATS (
   assert.equal(pactBrokenText(SH, DG), 'The Silver Hand <SH> has broken its Pact of non-aggression with Daggers <DG>.');
   assert.equal(seatBattleLine({ kind: 'siege', guild: SH, against: EO }), 'The Silver Hand <SH> has won a Right of Siege against Ebon Oath <EO> this week.');
   assert.match(battleAnnouncement({ kind: 'tourney', startsAt: 0, attackerGuild: SH, defenderGuild: EO }, 'Anticlere'), /^The Silver Hand <SH> and Ebon Oath <EO> meet/);

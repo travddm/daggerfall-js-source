@@ -73,7 +73,7 @@ test('the blind spot is exactly fourteen modules, each with a reason', () => {
   for (const f of Object.keys(NOT_IMPORTABLE)) {
     assert.ok(files.includes(f), `${f} is on the exclusion list and no longer exists`);
   }
-  assert.equal(Object.keys(NOT_IMPORTABLE).length, 14);     // Elite Gates removed: the Spire's lab gone (
+  assert.equal(Object.keys(NOT_IMPORTABLE).length, 14);   // Elite Gates removed: the Spire's lab gone (
   // The three that matter are the hosts: they carry the most edits and
   // the least coverage, which is exactly the combination that produced
   // the boot failure. Recorded here so the next reader sees the cost.

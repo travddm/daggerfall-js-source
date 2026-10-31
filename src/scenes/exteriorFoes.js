@@ -1129,7 +1129,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       weight: () => enemyWeightClassicUnits(isClass, f.gender, mobileWeight, f.entity?.items),
     }, { audio, hitEffects, shake: fromPlayer && !peer && !striker ? shake : null, rolls });   // AUDIT TELL H6: my own blow's kick alone
     if (_tell === 'hold') return;
-    if (knockDir && !f.entity?.staffBoss && weaponKnockbackApplies(f.ai.knockbackSpeed, isClass, mobileWeight)) {     // BOSS-UNSHAKEN: a staff event's mini boss takes no shove and no Hurt
+    if (knockDir && !f.entity?.staffBoss && weaponKnockbackApplies(f.ai.knockbackSpeed, isClass, mobileWeight)) {   // BOSS-UNSHAKEN: a staff event's mini boss takes no shove and no Hurt
       // EW1: the foe's own kit is half of DFU's weight
       const w = enemyWeightClassicUnits(isClass, f.gender, mobileWeight, f.entity?.items);
       f.ai.knockbackSpeed = weaponKnockbackSpeed(damage, w) * (_tell === 'stagger' ? TELL.STAGGER_KNOCK : 1);
@@ -1477,7 +1477,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     if (!f?.yielded || f.dead) return false;
     const at = [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]];
     if (id === 'kill') {
-      renownFoeStruck(f);     // AUDIT: the execution is my blow - a kneel past RENOWN_ASSIST_MS paid nothing
+      renownFoeStruck(f);   // AUDIT: the execution is my blow - a kneel past RENOWN_ASSIST_MS paid nothing
       const ev = beginExecution(playerEntity, f, { now: Date.now(), rolls });
       audio?.play3d?.(SOUND.SwingLowPitch, at, 1, { maxDistance: 16 });
       shake?.(1.4);
@@ -2555,7 +2555,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       if (!onWatch && f.entity?.champion) r.cp = championIndex(f.entity.champion);   // LOOT7: its trait rides to every puppet, which stands as the same champion
       if (f._grant && !f._grant._dead) r.gr = [f._grant.g, f._grantI];   // GRANT3: its grant and its member - the frame's `gs` carries the grant (GRANT4: a watchman's too)
       if (onWatch && typeof f.livingFrom?.id === 'string' && LIVING_ID_RE.test(f.livingFrom.id)) r.lr = f.livingFrom.id;   // WATCH-FIX: the living world's resident he stands for - a reader takes them off its street while he stands
-      if (!onWatch && f.entity?.revenant) Object.assign(r, feudWire(f.entity.revenant));     // RVN13 (25): its adaptations, its weakness, its last stand (AUDIT FEUD: an heir's too - the name's own gate)
+      if (!onWatch && f.entity?.revenant) Object.assign(r, feudWire(f.entity.revenant));   // RVN13 (25): its adaptations, its weakness, its last stand (AUDIT FEUD: an heir's too - the name's own gate)
       if (!onWatch && f.retinueOf != null) { const m = foes.find((x) => !x.dead && !x.puppet && x.entity?.revenant?.id === f.retinueOf); if (m) r.rt = m.seq; }   // RVN13: a follower's master, for its name
       if (!onWatch && !f.dead && _sharedFoe(f)) { const n = fightN(f); if (n > 1) r.n = n; }   // AUDIT PSCALE1: how many fight it - every reader weighs its hits by the owner's count
       if (!onWatch && f.dead && typeof f._trapBy === 'string') { r.j = f._trapBy; r.q = f._trapQ | 0; }
@@ -2892,7 +2892,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     if (r.bv !== undefined && hasBossTrait(f.entity, 'warded')) { if (f.entity.bossWardShown > 0 && r.bv === 0) say?.(bossWardBrokeLine(foeTitle(f.entity, enemyDisplayName(f.mobileType)) ?? '')); f.entity.bossWardShown = r.bv / 100; }   // AUDIT WORLD-EVENTS L2-7: its ward as its owner holds it - drawn, and its break said, here too
     f._pupYield = r.yd === 1;   // REVENANT-FATE: its owner's revenant kneels...
     f._pupExec = r.ex === 1 ? (f._pupExec ?? Date.now()) : null;   // ...or burns away, from the record that said so
-    f._pupSpare = r.sp === 1 ? (f._pupSpare ?? Date.now()) : null;     // AUDIT: ...or rises sworn into its portal
+    f._pupSpare = r.sp === 1 ? (f._pupSpare ?? Date.now()) : null;   // AUDIT: ...or rises sworn into its portal
     const rev = typeof r.nm === 'string' && r.nm && (!!f.entity.revenant || markedOf(f.puppet, isRevenantPuppet) < PEER_REVENANT_PUPPETS_MAX);   // FOE-FORGE: no more of them than a character keeps and swears
     if (rev && f.entity.revenant?.name !== r.nm) { f.entity.revenant = { id: null, name: r.nm, rank: 0 }; f._feudWire = null; }   // REVENANT-WIRE: called what its owner calls it
     // RVN13 (25): its owner's adaptations, weakness and second phase - stood again only when they change;
@@ -3056,7 +3056,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     const dmg = Number(data.dmg);
     if (f?.dead && data.cs === 1 && foes.includes(f)) { const s = hitSpellOf(data); return !!s && !!f.corpsePrefab?.struck(s.spell, s.level, null); }   // DEX5b: a copy's missile on my foe's prefab body (its bundle, the body's own entity)   // QUEST-PARTY: a quest's foe takes a peer's blow only from the party it rides to - any peer's word used to land on one it could not even see
     if (!f || f.dead || !Number.isFinite(dmg) || dmg < 0 || (dmg > PEER_HIT_DMG_MAX && !f.entity?.staffBoss)) return false;   // BOSS-BIG-HIT: a staff event's mini boss takes a blow past the bound at the bound (below) - every other foe refuses it whole
-    const blow = Math.min(PEER_HIT_DMG_MAX, dmg);     // BOSS-BIG-HIT: a peer's spell of tens of thousands on the mini boss lands as 10,000 - it was thrown away
+    const blow = Math.min(PEER_HIT_DMG_MAX, dmg);   // BOSS-BIG-HIT: a peer's spell of tens of thousands on the mini boss lands as 10,000 - it was thrown away
     // AUDIT CC-E1: ANOTHER's foe mauled my companion where it stands - the blow lands here, where he is real: the foe's
     // blow, not a player's (the knock-out arm his death), and he turns on the striker's puppet
     if (data.fb === 1) {
@@ -3260,7 +3260,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     if (items !== undefined) f.entity.items = items;
     if (_pupIndex.get(origin) === f) _pupIndex.delete(origin);
     f.puppet = null; f._pupMine = false; f._pup = null; f.seq = _nextSeq++;   // the owner's streamed state goes with the owner
-    f._pupYield = false; f._pupExec = null; f._pupSpare = null;     // AUDIT: its owner's judgement too - it stands as itself
+    f._pupYield = false; f._pupExec = null; f._pupSpare = null;   // AUDIT: its owner's judgement too - it stands as itself
     // A streamed copy has no decision driver. Its new owner must resume casting from the existing spell state.
     if (!f.caster && f.entity?.spells?.length) {
       f.caster = new EnemyCaster(f.entity, rolls);

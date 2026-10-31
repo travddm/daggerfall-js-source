@@ -83,7 +83,7 @@ test('AUDIT 62 F1: the bake carries vertex heights, and a hydrated stacked mesh 
 });
 
 test('AUDIT 62 F3: the nav cache key is versioned past the fixes and carries its anchor', () => {
-  assert.equal(NAV_BAKE_VERSION, 4);     // 3: DUNGEON-SEAMS - the collider's corners moved under the same key's inputs; 4: the soup bake's cell, agent, floors and anchors - every earlier bake was coarse and sealed
+  assert.equal(NAV_BAKE_VERSION, 4);   // 3: DUNGEON-SEAMS - the collider's corners moved under the same key's inputs; 4: the soup bake's cell, agent, floors and anchors - every earlier bake was coarse and sealed
   const base = { key: 'loc', tris: 10, minY: -5, maxY: 3, agent: AGENT };
   assert.match(navCacheKey(base), /^nav:v4:/);
   const door = navCacheKey({ ...base, anchor: [1, 0, 1] }), pocket = navCacheKey({ ...base, anchor: [40, -6, 40] });

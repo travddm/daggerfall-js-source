@@ -65,7 +65,7 @@ test('LW3 a traveller\'s trip: each cycle (its length the job\'s, scaled by the 
   let made = 0, none = 0;
   for (const home of towns.slice(20, 50)) {
     for (const res of world.rosterOf(home)) {
-      if (ROAD_JOBS.includes(res.job)) continue;     // LW9:
+      if (ROAD_JOBS.includes(res.job)) continue;   // LW9:
       if (!(TRIP_CHANCE[res.job] > 0)) { assert.equal(ownTrip(res, home, 5, world, O()), null, `${res.job} travels with a merchant, never alone`); continue; }
       for (let k = 40; k < 46; k++) {
         const trip = ownTrip(res, home, k, world, O());
@@ -291,7 +291,7 @@ test('LW3 the town and the roads: a traveller away is geared at home, walks out 
   assert.equal(body.archive, classLookOf(adventurer).archive);
   assert.ok(armed.includes(adventurer.id));
   body.moving = false;
-  assert.ok(body.update(0.1, [0, 1.6, 0], false).record > 4, 'the class sprite\'s own idle, not the outfit\'s');     // LW-TALK:
+  assert.ok(body.update(0.1, [0, 1.6, 0], false).record > 4, 'the class sprite\'s own idle, not the outfit\'s');   // LW-TALK:
 });
 
 test('LW3 the road\'s bodies: an armed traveller in their class\'s sprite (its archive by their sex), the rest in their own outfit; each a talk target in the street\'s shape; a body gone from the list is freed, and clear() frees them all; under the Overworld faded by distance to the bands\' own far edge (mutants: the sex, the free, the fade)', () => {

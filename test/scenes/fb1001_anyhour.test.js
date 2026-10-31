@@ -135,7 +135,7 @@ test('ANY-HOUR: the words keep no hours - the Fishing-Net\'s line, the Fishing p
   assert.doesNotMatch(PROFESSION_TOOL_HOW[FT.FishingNet]('E'), /daylight|07:00|17:59/);
   assert.match(PROFESSION_TOOL_HOW[FT.FishingNet]('E'), /^Fishing is done in water: stand or swim in it, or be at sea, until its acts show, then press E \(or use the Fishing-Net\)\.$/);   // PROF-MENU: its acts - the list, or the prompt
   assert.doesNotMatch(FISHING_HOW, /daylight|07:00|17:59/);
-  assert.match(FISHING_HOW, /or aboard a ship, at any hour\./);     // VOICE1 (
+  assert.match(FISHING_HOW, /or aboard a ship, at any hour\./);   // VOICE1 (
   assert.deepEqual([...NET_WHERE], ['inside', 'town'], 'the ground\'s words: inside and a settlement - never the hour');
   assert.deepEqual(Object.keys(NET_WHERE_WORDS), ['inside', 'town']);
 });

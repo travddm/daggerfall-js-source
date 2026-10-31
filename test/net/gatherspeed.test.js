@@ -254,7 +254,7 @@ function rig() {
     assert.equal(host.press(), true);
     for (let i = 0; i < 8 && host.acting(); i++) { input = { held: false, attack: true, choice: false }; host.tick(MINE_ACT.swingS + 0.01); input = { held: false, attack: false, choice: false }; host.tick(0.01); }
     assert.equal(host.acting(), false, 'the act played to its end');
-    host.tick(MINE_ACT.swingS);     // GATHER-FEEL (
+    host.tick(MINE_ACT.swingS);   // GATHER-FEEL (
   };
   return { host, book, said, entry, gate, clock, storage, centers, work };
 }

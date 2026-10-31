@@ -571,7 +571,7 @@ function ledgerHost({ online, clockMin = M0, ms = T0 } = {}) {
     online: d.online, _spawnLedger: d._spawnLedger, _spawnClock: () => d.clockMin, bandNowMs: () => d.ms, raidNowMs: () => d.ms, isCellRoom,   // AUDIT SPAWN-REBIRTH F1: what is owed waits for a cell
     BAND_LIFE_MS, RAIDER_LIFE_MS, bandLifeOf, raiderLifeOf, _bandSpent: d._bandSpent, _bandChase: d._bandChase, _bandPeer: d._bandPeer,
     tvRaid: d.tvRaid, tvDng: d.tvDng, performance: { now: () => d.t },
-    locationIndex: d.locationIndex = new Map(),     // SD2b (
+    locationIndex: d.locationIndex = new Map(),   // SD2b (
   };
   const names = Object.keys(scope);
   const h = new Function(...names, `${W.slice(a, b + 4)}

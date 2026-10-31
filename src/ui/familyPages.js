@@ -37,7 +37,7 @@ import { capturePointer } from './pointerCapture.js';   // RPT1026-CLIENT: a pad
 
 export const FAMILY_PAGE_SECTIONS = Object.freeze([
   Object.freeze(['tree', 'Family Tree']), Object.freeze(['house', 'The House']), Object.freeze(['hall', 'Hall of Ancestors']),
-  Object.freeze(['guide', 'How it works']),     // PLAIN-UI: the whole of it, in words
+  Object.freeze(['guide', 'How it works']),   // PLAIN-UI: the whole of it, in words
 ]);
 export const FAMILY_STYLE_ID = 'family-pages-css';
 /** AUDIT PLAIN-UI U8: the tree's way to How it works. */

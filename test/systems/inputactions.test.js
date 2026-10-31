@@ -77,13 +77,13 @@ test('I1: the Actions enum, verbatim names and order (:324-384)', () => {
     'Professions',   // CLASSIC-PAGES: the Professions and Stores pages on either skin, appended after HELM-KEYS' two
     'LegacyFamily',   // LEGACY3: Project Legacy's Family tab, appended after CLASSIC-PAGES'
     'ModeWheel',   // MODE-WHEEL: the interaction-mode wheel, held - appended after LEGACY3's
-    'WeaponTechnique',     // TECH1: the weapon's technique - appended
-    'Spyglass',     // SPYGLASS: the captain's glass - appended
-    'SaddlePanel',     // UI-CALM: the saddle panel's key - appended
-    'ShipHold',     // CARGO-ANYWHERE: the ship's hold, from anywhere - appended (
-    'ShotCycle',     // SHOT-KINDS: the guns' load - appended (
-    'PartyPing',     // PARTY-PING: a look's point for the party - appended (
-    'Decorate',     // the decorator, unbound - a player gives it a key; appended last (
+    'WeaponTechnique',   // TECH1: the weapon's technique - appended
+    'Spyglass',   // SPYGLASS: the captain's glass - appended
+    'SaddlePanel',   // UI-CALM: the saddle panel's key - appended
+    'ShipHold',   // CARGO-ANYWHERE: the ship's hold, from anywhere - appended (
+    'ShotCycle',   // SHOT-KINDS: the guns' load - appended (
+    'PartyPing',   // PARTY-PING: a look's point for the party - appended (
+    'Decorate',   // the decorator, unbound - a player gives it a key; appended last (
   ]);
   // ActionNameToEnum's sentinel: unknown parses to Unknown, and
   // Unknown itself is NOT a bindable action.
@@ -147,7 +147,7 @@ test('I1: ResetDefaults\' table, every row (:979-1032)', () => {
     'KeyB=ShoulderSwitch', 'NumpadAdd=AutoPerspective',
     'KeyK=FollowPaths',
     'Comma=HorseMount', 'Period=HorseSummon', 'F2=SaddlePanel',   // UI-CALM: the saddle panel (F2: Slash is the decorator's grid)
-    'F4=ShipHold',     // CARGO-ANYWHERE: the ship's hold (F4: F1 and F3 are the browser's)
+    'F4=ShipHold',   // CARGO-ANYWHERE: the ship's hold (F4: F1 and F3 are the browser's)
     // CSA-D: the mod's C and Period are Crouch's and the summon's, so the helm's two ship on free keys under the
     // right hand (the Port-Ledger's Come Sail Away row).
     'Quote=BoatDisembark', 'Semicolon=BoatToggleLight',
@@ -180,10 +180,10 @@ test('I1: ResetDefaults\' table, every row (:979-1032)', () => {
   // DebugOverlay ships unbound, a developer's key. CSA-D: two more appended, both bound; CSA-E four more, all bound;
   // CSA-G three more, all bound. PROF1: and the act choice, appended and bound (the up arrow). HELM-KEYS: less sail on
   // the down arrow; more sail owns no key - it SHARES the up arrow with the act choice (DEFAULT_SHARES).
-  assert.equal(DEFAULT_BINDINGS.length, 79);     // PARTY-PING: Mouse2 leaves AutoRun and the ping takes it, auto-run gains F3 (net +1); CARGO-ANYWHERE: plus the hold's (F4)
+  assert.equal(DEFAULT_BINDINGS.length, 79);   // PARTY-PING: Mouse2 leaves AutoRun and the ping takes it, auto-run gains F3 (net +1); CARGO-ANYWHERE: plus the hold's (F4)
   assert.equal(bound.size, 79, 'no action is defaulted twice');   // PARTY-PING: the ping's own
   // TV1: one more appended after them, and unbound - the travel view's door is the map's.
-  assert.equal(ACTIONS.length, 95);     // Decorate appended, unbound (
+  assert.equal(ACTIONS.length, 95);   // Decorate appended, unbound (
   assert.deepEqual(ACTIONS.filter((a) => !bound.has(a)), ['ToggleConsole', 'Slide', 'StealMode', 'GrabMode', 'InfoMode', 'TalkMode', 'Sneak', 'QuickSwap', 'DebugOverlay', 'TravelView', 'WalkMode', 'BoatSailUp', 'Professions', 'Spyglass', 'ShotCycle', 'Decorate'], 'the fourteen without an owned key, named - more sail\'s, the Professions key\'s and the glass\'s are default shares; MODE-WHEEL: the four modes and Sneak; Decorate ships unbound');
   assert.deepEqual(DEFAULT_SHARES, [['ArrowUp', 'BoatSailUp', 'ActChoice'], ['ArrowDown', 'Professions', 'BoatSailDown'], ['KeyK', 'Spyglass', 'FollowPaths']], 'HELM-KEYS: the default shares - onto their partners\' own keys; CLASSIC-PAGES: the Professions key beside less sail; SPYGLASS: the glass beside the road\'s follow');
   const codes = DEFAULT_BINDINGS.map(([c]) => c);
@@ -229,7 +229,7 @@ test('I1: the two clears - by action walks all its codes, by code takes one (:80
 test('I1: a FULL reset clears primary and the removed list but NOT secondary (:956-960)', () => {
   const s = createBindings();
   resetDefaults(s);
-  assert.equal(s.primary.size, 79);     // PARTY-PING: plus the ping's Mouse2 and auto-run's F3, minus the old Mouse2 (net +1); CARGO-ANYWHERE: plus the hold's F4 (
+  assert.equal(s.primary.size, 79);   // PARTY-PING: plus the ping's Mouse2 and auto-run's F3, minus the old Mouse2 (net +1); CARGO-ANYWHERE: plus the hold's F4 (
   // a secondary binding on a code no default uses SURVIVES the reset;
   // one on a default's code is stolen back by SetBinding's alt-removal.
   // QUICK-LOOT B4: this was KeyP, chosen because no default used it -

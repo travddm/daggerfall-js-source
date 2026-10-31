@@ -54,9 +54,9 @@ test('EG-H2 THE BURNING COURT AND THE HOUR, UNCHANGED (section 24): rule by rule
   // `isGateArena(dfLocation)`, `_sdRealm` arm), and what the law decides now
   const before = {
     court: { save: [true, COURT_TEXT.noSave], rest: [true, COURT_TEXT.noRest], automap: [true, COURT_TEXT.noMap], mark: [true, COURT_TEXT.noMark, 'mid'], recall: [false], companions: true, regen: true,
-      levitate: false, resurrect: false, death: 'castOut', unstuck: ['refused', COURT_TEXT.noUnstuck], portalStone: true },     // EVENT-RULES (
+      levitate: false, resurrect: false, death: 'castOut', unstuck: ['refused', COURT_TEXT.noUnstuck], portalStone: true },   // EVENT-RULES (
     hour: { save: [true, SD_REALM_TEXT.noSave], rest: [true, SD_REALM_TEXT.noRest], automap: [true, SD_REALM_TEXT.noMap], mark: [true, SD_REALM_TEXT.noMark, 'hour'], recall: [true, SD_REALM_TEXT.noRecall, 'hour'], companions: true, regen: true,
-      levitate: true, resurrect: false, death: 'final', unstuck: ['wayHome'], portalStone: true },     // EVENT-RULES (
+      levitate: true, resurrect: false, death: 'final', unstuck: ['wayHome'], portalStone: true },   // EVENT-RULES (
   };
   for (const [lv, d] of Object.entries(before)) {
     for (const r of ['save', 'rest']) assert.deepEqual([madeLevelRule(lv, r) === 'refused', madeLevelSays(lv, r)], d[r], `${lv} ${r}`);

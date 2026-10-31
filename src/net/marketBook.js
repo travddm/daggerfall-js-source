@@ -254,7 +254,7 @@ export function createMarketBook({ door, storage = null, character, now = () => 
       if (g !== gen) return null;
       const r = heard(a);
       const e = { at: now(), data: r?.ok ? r.data : hit?.data ?? null, error: r?.ok ? null : (r?.error ?? 'server'), stale: !r?.ok && !!hit?.data };
-      cache.delete(key); cache.set(key, e);     // MEM-AUDIT: the newest last - a minute's reads past the cap go oldest first
+      cache.delete(key); cache.set(key, e);   // MEM-AUDIT: the newest last - a minute's reads past the cap go oldest first
       if (cache.size > MARKET_CACHE_KEPT) cache.delete(cache.keys().next().value);
       return { ok: !!r?.ok, data: e.data, error: e.error, stale: e.stale };
     })();

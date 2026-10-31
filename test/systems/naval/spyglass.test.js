@@ -153,7 +153,7 @@ test('SPYGLASS at sea, the eye: a hull with her colours unread wears no tag and 
   assert.deepEqual([near.known, far.known], [KNOW.colours, KNOW.hull]);
   assert.deepEqual(s.host.tags().map((t) => t.id), [near.id], 'the unknown hull wears no tag');
   assert.equal(tagOf(s, near).name, near.ship.names.name);
-  assert.equal(s.host.hudModel().target, null, 'her on the look, not made out: no card');     // GLASS-SPOT (
+  assert.equal(s.host.hudModel().target, null, 'her on the look, not made out: no card');   // GLASS-SPOT (
   far.known = KNOW.colours;
   const told = s.host.hudModel().target;
   assert.equal(told.id, far.id, 'her on the look');
@@ -264,7 +264,7 @@ test('SPYGLASS false colours at sea: a wary pirate under a merchantman\'s colour
 });
 
 test('SPYGLASS the world: the Spyglass action appended, a port row in Come Sail Away\'s group, shared onto K beside the road\'s follow; the touch corner\'s and the pad\'s to choose; the glass\'s frame - raised aboard alone, down under a window, the travel view, a laid broadside; the lens narrowed at the frame\'s three, the look slowed, the wheel its magnification; the road\'s follow never read aboard (mutants: each seam)', () => {
-  assert.equal(ACTIONS.at(-6), 'Spyglass');     // SHOT-KINDS: and the guns' load   //
+  assert.equal(ACTIONS.at(-6), 'Spyglass');   // SHOT-KINDS: and the guns' load   //
   assert.ok(PORT_ACTIONS.includes('Spyglass'));
   assert.ok(DEFAULT_SHARES.some(([c, a, p]) => c === 'KeyK' && a === 'Spyglass' && p === 'FollowPaths'));
   assert.ok(!DEFAULT_BINDINGS.some(([, a]) => a === 'Spyglass'), 'it owns no key - a share');

@@ -176,7 +176,7 @@ test('SERPENT1 strike: each shape meets a ship by her bow, her middle or her ste
   assert.equal(shipPoints(CARRACK).length, 3);
   // the hurt: her whole's share and points on top - alike for a rowboat and a carrack
   const h = shipHurt(SERPENT_ATTACK_TABLE.breach, CARRACK);
-  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });     // AUDIT SERPENT T1's numbers (
+  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });   // AUDIT SERPENT T1's numbers (
   assert.ok(close(shipHurt(SERPENT_ATTACK_TABLE.breach, ROWBOAT).hull / ROWBOAT.maxHull, (0.07 * 120 + 8) / 120, 0.01));
   assert.deepEqual(crushHurt(CARRACK), shipHurt(CRUSH, CARRACK));
 });

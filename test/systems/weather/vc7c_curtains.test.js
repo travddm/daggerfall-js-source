@@ -242,9 +242,9 @@ test('VC7c: THE SLAB\'S START CUTS THE VEIL - before it in front of everything, 
   // the march: the back goes in before the first LIT sample past it, or behind everything; the front last of all
   const main = MARCH_FS.slice(MARCH_FS.indexOf('void main() {', MARCH_FS.indexOf('vec4 cirrus(')));
   assert.ok(main.includes('curtains(cam, dir, t0, front, back, tBack);') && main.includes('bool veiled = back.a >= 1.0;'), 'cut where the slab begins');
-  const lit0 = main.indexOf('    if (!veiled && tBack <= t) { col += T * back.rgb; T *= back.a; veiled = true; }');     // SLAB-SPAN; SKY-ARC; AUDIT PRECIP SKY-5 (
+  const lit0 = main.indexOf('    if (!veiled && tBack <= t) { col += T * back.rgb; T *= back.a; veiled = true; }');   // SLAB-SPAN; SKY-ARC; AUDIT PRECIP SKY-5 (
   assert.ok(lit0 > main.indexOf('if (strode) { t -= coarse;') && lit0 < main.indexOf('float tau = lightDepth(p);'), 'at a lit sample, after a stride is backed out - only a lit sample has an order to keep');
-  const after = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');     // AUDIT PRECIP SKY-5 (
+  const after = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');   // AUDIT PRECIP SKY-5 (
   assert.ok(after > lit0 && after < main.indexOf('vec4 ice = cirrus(cam, dir);'), 'behind every lit sample, and under the slab\'s own aerial perspective (SLAB-SPAN: the last span\'s)');
   const exits = main.match(/outColor = [^;]*;/g);
   // AUDIT PRECIP SKY-1 (

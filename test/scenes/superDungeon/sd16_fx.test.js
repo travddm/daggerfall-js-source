@@ -174,7 +174,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
   const g = rig({ ph: 3 }); g.fx.frame();
   g.s.cx = { i: 41, m: 50, c: [[6, 0, 50]] }; g.step();
   g.s.cx = null; g.step();
-  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');     // AUDIT SD III (V10
+  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');   // AUDIT SD III (V10
   // the slip, once
   const sl = rig(); sl.fx.frame();
   sl.s.h = sl.s.m * SD_SLIP_FRAC - 1; sl.step(); sl.step();
@@ -184,7 +184,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
 });
 
 test('SD16 ITS FALL: a burst out of its chest, the arena flashed white-gold and shaken; a column of brass as its body sinks; the way home\'s pale light where the way home rises, as it rises; nothing more of the fight; forgotten as the Hour is left', () => {
-  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);     // AUDIT SD III (V4
+  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);   // AUDIT SD III (V4
   r.s.rem = { x: 11.3, z: 11.3, yw: 0, mv: null, atk: null };   // against a pillar (SD_PILLAR_R on the diagonal)
   r.s.fell = { at: r.at() + 5, top: [], n: 1 };
   r.step(10);

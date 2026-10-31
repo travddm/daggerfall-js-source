@@ -50,7 +50,7 @@ const HARDCODED = {
   'src/formats/cifRciFile.js': 2,
   'src/formats/hmiFile.js': 17,
   'src/formats/imgFile.js': 1,
-  'src/formats/mapsTables.js': 25,     // WW-R: +3, the provinces' region names (PROVINCE_REGION_NAMES - High Rock, Sumurset Isle, Black Marsh the two-word ones): the canonical English a region's name is, which the locale's regionNames list translates past the Bay's 62 as on it (systems/textManager.js getLocalizedRegionName)
+  'src/formats/mapsTables.js': 25,   // WW-R: +3, the provinces' region names (PROVINCE_REGION_NAMES - High Rock, Sumurset Isle, Black Marsh the two-word ones): the canonical English a region's name is, which the locale's regionNames list translates past the Bay's 62 as on it (systems/textManager.js getLocalizedRegionName)
   'src/formats/morrowind/mwAnim.js': 11,
   'src/formats/morrowind/mwFaceMatch.js': 6,
   'src/formats/morrowind/mwFirstPerson.js': 75,
@@ -301,7 +301,7 @@ const HARDCODED = {
   'src/systems/banking.js': 20,
   'src/systems/betterAmbience.js': 42,
   'src/systems/booksData.js': 85,
-  'src/systems/bounty/bountyBoard.js': 41,     // QUARRY-WORLD: the beasts' words through t() (bounty.foes.*)
+  'src/systems/bounty/bountyBoard.js': 41,   // QUARRY-WORLD: the beasts' words through t() (bounty.foes.*)
   'src/systems/bounty/bountyReward.js': 2,
   'src/systems/breachBook.js': 1,
   'src/systems/buildingLocks.js': 1,
@@ -347,7 +347,7 @@ const HARDCODED = {
   'src/systems/equip.js': 3,
   'src/systems/eventTimers.js': 44,   // Elite Gates removed: -6
   'src/systems/faction/factionStanding.js': 3,
-  'src/systems/faction/provinceFactions.js': 1,     // PROVINCE-COURTS: Cyrodiil's ruler, Uriel Septim VII - a proper name, Daggerfall's own Emperor (TEXT.RSC), a faction's name and its key
+  'src/systems/faction/provinceFactions.js': 1,   // PROVINCE-COURTS: Cyrodiil's ruler, Uriel Septim VII - a proper name, Daggerfall's own Emperor (TEXT.RSC), a faction's name and its key
   'src/systems/features.js': 128,   // RPT1026-CLIENT: the mod's 'Camera Shake.maxShake' on its tile - a mod's settings key the scan reads as words, as its three neighbours on the list are
   'src/systems/fleet.js': 10,
   'src/systems/fletching.js': 1,
@@ -479,7 +479,7 @@ const HARDCODED = {
   'src/systems/sigil/sigil.js': 8,
   'src/systems/sigil/sigilBroker.js': 8,
   'src/systems/sigil/sigilSetPowers.js': 21,   // Elite Gates removed: -3
-  'src/systems/sigil/sigilSets.js': 117,     // Elite Gates removed: -9   //
+  'src/systems/sigil/sigilSets.js': 117,   // Elite Gates removed: -9   //
   'src/systems/smithItems.js': 26,
   'src/systems/snowfall.js': 12,
   'src/systems/snowfallRuntime.js': 10,
@@ -508,7 +508,7 @@ const HARDCODED = {
   'src/systems/travel/travelOptionsText.js': 30,
   'src/systems/travel/travelPace.js': 5,
   'src/systems/travel/travelPathMode.js': 3,
-  'src/systems/travel/travelViewFilters.js': 7,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (MAP-PLAYERS: +1, the Players switch's tip)
+  'src/systems/travel/travelViewFilters.js': 7,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (MAP-PLAYERS: +1, the Players switch's tip)
   'src/systems/tutorialCatalogue.js': 209,   // RPT1026-QUESTS BOUNTY-WAY: +1, the bounties page rewritten - its old words held "return", which the scan reads as code, so they were never counted; the catalogue is English, as every page's
   'src/systems/uiSkin.js': 1,
   'src/systems/upkeep/upkeepItemRows.js': 2,
@@ -573,8 +573,8 @@ const HARDCODED = {
   'src/ui/enhanced/enhancedFrame.js': 2,
   'src/ui/enhanced/enhancedHelm.js': 16,
   'src/ui/enhanced/enhancedHotbar.js': 13,
-  'src/ui/enhanced/enhancedHud.js': 9,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: +3, the two tiles' names and their cell's class)
-  'src/ui/enhanced/enhancedInventory.js': 91,     // CHAT-POST: +3 Link/Post/Linked strings on the pack card; HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (BELT-LANTERN: +5, the lantern slot's acts)
+  'src/ui/enhanced/enhancedHud.js': 9,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: +3, the two tiles' names and their cell's class)
+  'src/ui/enhanced/enhancedInventory.js': 91,   // CHAT-POST: +3 Link/Post/Linked strings on the pack card; HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (BELT-LANTERN: +5, the lantern slot's acts)
   'src/ui/enhanced/enhancedLevelingChoice.js': 6,
   'src/ui/enhanced/enhancedMenu.js': 52,   // AUDIT MEM-AUDIT G5: -2, the Graphics preset's name and note routed (with its effect, its Custom and its four labels). QUEST-AUDIT III SHELF-WORDS: -5, the shelf's buttons and lines through t(). AUDIT COLLECTIONS-II: -2, the empty Holdings rail's words, gone with the rail that is never empty now. AUDIT EG V (c, L7-10): the Spire's three accessibility rows routed; UI-CALM's doors at the merge of main. REALM-COPY: -1, the copy's slot name moved to systems/realmCopyMark.js
   'src/ui/enhanced/enhancedMerchantPanel.js': 1,
@@ -604,7 +604,7 @@ const HARDCODED = {
   'src/ui/gate/gateMarksView.js': 18,
   'src/ui/gate/gateTitleCard.js': 1,
   'src/ui/grimoireDress.js': 13,
-  'src/ui/growth/growthStage.js': 1,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (GROWTH-BOOK)
+  'src/ui/growth/growthStage.js': 1,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (GROWTH-BOOK)
   'src/ui/guildServiceWindow.js': 1,
   'src/ui/guildServiceWindows.js': 8,
   'src/ui/hallOfRecords.js': 4,
@@ -614,10 +614,10 @@ const HARDCODED = {
   'src/ui/hitNumbers.js': 1,
   'src/ui/holdingsPages.js': 59,
   'src/ui/howManyField.js': 1,
-  'src/ui/hud/hudAdvance.js': 8,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: ADV_WORDS, the tiles' hover card)
+  'src/ui/hud/hudAdvance.js': 8,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: ADV_WORDS, the tiles' hover card)
   'src/ui/hud/hudLayout.js': 28,
   'src/ui/hud/hudStatus.js': 1,
-  'src/ui/hud/statusTips.js': 53,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (STATUS-TIPS: what each status tile says under the pointer)
+  'src/ui/hud/statusTips.js': 53,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (STATUS-TIPS: what each status tile says under the pointer)
   'src/ui/ink/inkDungeonGL.js': 1,
   'src/ui/ink/inkDungeonSolid.js': 6,
   'src/ui/input.js': 2,
@@ -644,7 +644,7 @@ const HARDCODED = {
   'src/ui/naval/navalPlunderWindow.js': 19,
   'src/ui/naval/navalYardWindow.js': 67,
   'src/ui/noticeWindow.js': 99,
-  'src/ui/oreMapTip.js': 2,     // WW-C1 (WW-C): Cyrodiil's line and the richest ores held back, its English - main's DEEP-OPEN routed the card's other lines through the text core (TESA x MAIN, the merge: 2 measured)
+  'src/ui/oreMapTip.js': 2,   // WW-C1 (WW-C): Cyrodiil's line and the richest ores held back, its English - main's DEEP-OPEN routed the card's other lines through the text core (TESA x MAIN, the merge: 2 measured)
   'src/ui/padGlyphsHD.js': 15,
   'src/ui/pageWindow.js': 4,
   'src/ui/partyMapMarks.js': 3,

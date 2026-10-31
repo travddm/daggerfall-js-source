@@ -67,7 +67,7 @@ test('SD3 the wire: the frame\'s one kind each way, projected; the record\'s law
   assert.equal(relaySupportsSd(RELAY_VERSION), true);
   assert.equal(relaySupportsSd('world174'), false, 'LEGACY7\'s relay closes the socket on `sd`');
   for (const v of [undefined, null, '', 'world', 'world17x', 'acct172', 172]) assert.equal(relaySupportsSd(v), false, String(v));
-  assert.deepEqual([...SD_KINDS], ['found', 'pz', 'in', 'hit', 'ehit', 'xhit', 'spent', 'vt', 'rz']);     // AUDIT WORLD-EVENTS L1-1 (
+  assert.deepEqual([...SD_KINDS], ['found', 'pz', 'in', 'hit', 'ehit', 'xhit', 'spent', 'vt', 'rz']);   // AUDIT WORLD-EVENTS L1-1 (
   assert.deepEqual([...SD_OUT_KINDS], ['ev', 'pz', 'st', 'mv', 'atk', 'hp', 'ph', 'ec', 'cx', 'cxh', 'cxb', 'stun', 'fell', 'lost', 'no', 'rcpt', 'bd', 'ln']);
   assert.deepEqual(validSdIn({ k: 'found', s: 3, px: PX, py: PY, junk: 1 }), { k: 'found', s: 3, px: PX, py: PY }, 'projected');
   for (const bad of [{ k: 'found', s: 0, px: 1, py: 1 }, { k: 'found', s: 1e9, px: 1, py: 1 }, { k: 'found', s: 1.5, px: 1, py: 1 }, { k: 'found', s: 1, px: 1000, py: 1 }, { k: 'found', s: 1, px: 1, py: 500 }, { k: 'found', s: 1, px: -1, py: 1 }, { k: 'ev', s: 1, px: 1, py: 1 }, null, 'found']) assert.equal(validSdIn(bad), null, JSON.stringify(bad));
@@ -213,7 +213,7 @@ test('SD3 the find: the cell believes its own socket\'s pose near the claimed pi
     assert.equal((await doorTell({ s: 9, px: PX })).status, 400, 'a body the hub will never take');
     // a hub that refuses a find FOR GOOD (a 4xx) is not told it again: the cell lets it go
     W.world.ROOMS.get = (id) => (id === SOCIAL_ROOM ? { fetch: async () => new Response('bad', { status: 400 }) } : get(id));
-    W.set(Date.now() + 10 * 60_000);     // AUDIT SD II (
+    W.set(Date.now() + 10 * 60_000);   // AUDIT SD II (
     const cy = cell.connect(); await cell.hello(cy, 'peer-cy', doorPose(12), { name: 'Cy' });
     await cell.raw(cy, JSON.stringify({ t: 'sd', k: 'found', s: rec.s + 1, px: PX, py: PY }));
     assert.equal(cell.store.get(SD_FOUND_KEY), undefined, 'refused for good: let go');
@@ -255,7 +255,7 @@ test('SD3 the realm: the Worker mints `sd:<s>` only for the slot the hub\'s reco
     const realm = W.world.room(sdTestKey(rec.s));
     const a = realm.connect(); await realm.hello(a, 'peer-a', null, { name: 'Ann' });
     assert.equal(a.closed, null, 'a newcomer while found');
-    assert.deepEqual(realm.store.get(SD_REALM_KEY), { s: rec.s, in: ['acct-peer-a'], gu: ['acct-peer-a'], dead: [], down: [], raised: [] });     // AUDIT WORLD-EVENTS L1-1 (
+    assert.deepEqual(realm.store.get(SD_REALM_KEY), { s: rec.s, in: ['acct-peer-a'], gu: ['acct-peer-a'], dead: [], down: [], raised: [] });   // AUDIT WORLD-EVENTS L1-1 (
     const a2 = realm.connect(); await realm.hello(a2, 'peer-a2', null, { name: 'Ann', tokenSub: 'acct-peer-a' });
     assert.equal(a.closed?.reason, 'replaced', 'one seat an account');
     // the boss falls: the record says fell (the realm's own slice says it in SD8 - here, the hub's record moved)

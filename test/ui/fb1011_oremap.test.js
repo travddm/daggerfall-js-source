@@ -74,7 +74,7 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
 });
 
 test('ORE-MAP: the world host hands the held map the card online, asks a pixel\'s witnessed state once and after the pointer rests, through the gathering host - which stands again a pixel of its own whose state the answer moved - and the Mining page says where to look (mutants: the card offline; asked every hover; the ask past the host; the stood pixel left on its old word)', async () => {
-  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);     // VOICE1 (
+  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);   // VOICE1 (
   // the gathering host's ask: a pixel it stands, answered as changed, is stood again
   const WOODS = CLIMATES.Woodlands, PX = 405, PY = 150, DAY = 20500;
   const law = veins({ x: PX, y: PY, day: DAY, climate: WOODS, region: GLENUMBRA, confirmed: false });

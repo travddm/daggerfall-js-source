@@ -95,7 +95,7 @@ test('RENOWN-CHAR the track: a CHARACTER\'s again - two characters\' reports kee
   const db = d1();
   const P = await player(db);
   let r = await reportRenownXp({ db, nowS: T0 }, P, { character: 'char-aaaa', xp: 1000, name: 'Mara' });
-  assert.deepEqual(r, { character: 'char-aaaa', xp: 1000, level: renownForXp(1000), credited: 1000, rose: true, room: 14000 }, 'the answer names its character');     // SCALE4h (
+  assert.deepEqual(r, { character: 'char-aaaa', xp: 1000, level: renownForXp(1000), credited: 1000, rose: true, room: 14000 }, 'the answer names its character');   // SCALE4h (
   r = await reportRenownXp({ db, nowS: T0 + 1 }, P, { character: 'char-bbbb', xp: 500, name: 'Tam' });
   assert.deepEqual([r.character, r.xp, r.credited], ['char-bbbb', 500, 500], 'the second character\'s report starts its OWN total - never onto the first\'s');
   assert.deepEqual(await renownTrackOf({ db }, P.id, 'char-aaaa'), { xp: 1000, level: renownForXp(1000) });

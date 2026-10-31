@@ -78,7 +78,7 @@ test('SD9b THE CLAIM: an `h1` the relay signed, naming the claiming account, is 
   const db = d1();
   const A = await member(db), B = await member(db);
   const { priv, pubKey } = await relayPair();
-  const ctx = { db, nowS: T0 + 60, subtle, rand: rolling(seedFor(false, false)) };     // AUDIT SD III (R4
+  const ctx = { db, nowS: T0 + 60, subtle, rand: rolling(seedFor(false, false)) };   // AUDIT SD III (R4
   const r7 = await hour(A.id, 7, priv);
   assert.deepEqual(await claimSd(ctx, A, r7, pubKey), { recorded: true, slot: 7, title: false, aura: false, titleNew: false, auraNew: false, broken: 1 });
   assert.deepEqual(await claimSd(ctx, A, r7, pubKey), { recorded: false, why: 'claimed', broken: 1 }, 'once, whatever happens to it');
@@ -168,7 +168,7 @@ test('SD9b THE WORKER: /v1/sd/claim behind a session and never open - the sessio
   const { call } = await stand({ gateKey: pub });
   const me = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
   const them = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
-  const r = await hour(me.id, 7, priv, { c: seedFor(false, false) });     // AUDIT SD III (R4
+  const r = await hour(me.id, 7, priv, { c: seedFor(false, false) });   // AUDIT SD III (R4
   assert.deepEqual((await call('POST', '/v1/sd/claim', { receipt: r }, me.secret)).body, { recorded: false, why: 'guest', broken: 0 });
   assert.equal((await call('POST', '/v1/auth/register', { handle: 'HourBreaker1', password: 'correct horse battery', ...ACCEPTED }, me.secret)).status, 200);
   assert.equal((await call('POST', '/v1/sd/claim', { receipt: r })).status, 401, 'a stranger claims nothing');

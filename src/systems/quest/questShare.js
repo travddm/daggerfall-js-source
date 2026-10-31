@@ -448,7 +448,7 @@ export const SHARE_REFUSAL_TEXT = Object.freeze({
   get tooLarge() { return t('quest.share.tooLarge', 'This quest is too complex to share.'); },
   get mainQuest() { return t('quest.share.mainQuest', 'The main quest cannot be shared.'); },
   // AUDIT QUESTLINES REWARD-2: the sender's word for a questline's step (world.js reads this table by the reason)
-  get questline() { return t('quest.share.questline', 'A questline is your own road. Its steps cannot be shared.'); },     // AUDIT QUESTLINES VOICE-QL: two sentences, no dash aside (rule 5)
+  get questline() { return t('quest.share.questline', 'A questline is your own road. Its steps cannot be shared.'); },   // AUDIT QUESTLINES VOICE-QL: two sentences, no dash aside (rule 5)
   // DISC22-F: the fragments below are said to the RECEIVER, after "... but you" (scenes/world.js) - second person
   get active() { return t('quest.share.active', 'already have this quest.'); },
   get done() { return t('quest.share.done', 'have already done this quest.'); },

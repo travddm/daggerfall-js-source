@@ -270,11 +270,11 @@ test('LW-TALK on the street: a circle\'s talk waits for its people to gather - f
     const two = { k: 'two' }, of2 = (id) => (id === 'h' || id === 'i' ? two : undefined);
     assert.deepEqual([4.5, 6].map((at) => [...keepUnits([{ res: g, d: 2 }, { res: h, d: at }, { res: i, d: at + 1 }], of2, 2)].map((r) => r.id).sort().join('')), ['hi', 'g'],
       'a circle within the ring of one alone before them; beyond it, after');
-    assert.match(rd('src/systems/livingWorld/livingTown.js'), /const keep = keepUnits\(wanted, \(id\) => this\._inCircle\.get\(id\)\?\.circle \?\? this\._inStir\.get\(id\)\?\.pair, this\.maxPopulation\);/, 'the census keeps by it');     // LW-STIR:
+    assert.match(rd('src/systems/livingWorld/livingTown.js'), /const keep = keepUnits\(wanted, \(id\) => this\._inCircle\.get\(id\)\?\.circle \?\? this\._inStir\.get\(id\)\?\.pair, this\.maxPopulation\);/, 'the census keeps by it');   // LW-STIR:
   }
   // stepped past them (no arrival), out of the player's sight: their rows to the nearer
   {
-    const s = makeTown(closeTown(), CLOSE, 100 * DAY_MIN + 19.5 * 60);     // LW-SPREAD:
+    const s = makeTown(closeTown(), CLOSE, 100 * DAY_MIN + 19.5 * 60);   // LW-SPREAD:
     s.town.maxPopulation = 8;
     run(s, 0.5);
     const was = new Set(s.town.pool.filter((r) => r.visible && r.res).map((r) => r.res.id));

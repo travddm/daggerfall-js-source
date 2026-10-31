@@ -149,7 +149,7 @@ test('REALM P2.2b: a refusal moves nothing - a purse that cannot pay, a house an
     if (!raced) { raced = true; assert.equal((await realmPut(A.io, A.char, { lease: A.lease, seq: 2 }, '{"goldPieces":1000,"mid":1}')).ok, true); }
     return realBatch(list);
   };
-  const r = await A.homes.claim({ mapId: MAP, buildingKey: KEY + 1, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) });     // HOME-PRICE (
+  const r = await A.homes.claim({ mapId: MAP, buildingKey: KEY + 1, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) });   // HOME-PRICE (
   assert.deepEqual([r.error, r.seq], ['seq', 2]);
   assert.equal(env.DB._raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE building_key = ?').get(KEY + 1).n, 0, 'no house without its payment');
 });
@@ -157,7 +157,7 @@ test('REALM P2.2b: a refusal moves nothing - a purse that cannot pay, a house an
 test('REALM P2.2b: a realm character\'s decor moves the record\'s gold with the piece - placed, grown, shrunk, a station made, removed; a free write names no record; a paid one without it is refused', async () => {
   const { player, record } = await stand();
   const A = await player('Aldric', { goldPieces: 300_000, items: [], bankAccounts: bank(REGION, 0) });
-  assert.equal((await A.homes.claim({ mapId: MAP, buildingKey: KEY, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) })).ok, true);     // HOME-PRICE (
+  assert.equal((await A.homes.claim({ mapId: MAP, buildingKey: KEY, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) })).ok, true);   // HOME-PRICE (
   const where = { mapId: MAP, buildingKey: KEY, character: A.char };
   let seq = 2;
   const gold = async () => (await record(A)).save.goldPieces;
@@ -213,7 +213,7 @@ test('REALM P2.2b end to end: onlineHomes buys and sells for a realm character -
   assert.equal((await record(A)).save.bankAccounts[REGION].accountGold, homeSaleRefund(42_000));
   // a refused buy gives the price back
   const B = await player('Bran', { goldPieces: 50_000, items: [] });
-  await B.homes.claim({ mapId: MAP, buildingKey: KEY + 5, region: 0, character: B.char, price: HOME_PRICE_MIN, realm: B.at(1) });     // HOME-PRICE (
+  await B.homes.claim({ mapId: MAP, buildingKey: KEY + 5, region: 0, character: B.char, price: HOME_PRICE_MIN, realm: B.at(1) });   // HOME-PRICE (
   const taken = await buyOnlineHome(homes, {
     mapId: MAP, buildingKey: KEY + 5, region: REGION, price: HOME_PRICE_MIN,
     afford: (n) => n <= entity.goldPieces, pay: (n) => { entity.goldPieces -= n; }, refund: (n) => { entity.goldPieces += n; }, realm: { act },

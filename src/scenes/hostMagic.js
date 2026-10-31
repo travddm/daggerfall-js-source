@@ -193,7 +193,7 @@ export function createPlayerMagic({
   // :2130 - every release path), before the ready is cleared. An
   // ABORT raises neither - AbortReadySpell (:361-365) is silent,
   // which is precisely why the machine latches instead of polling.
-  lairHere = null,       // RVN7 (18.1): where a revenant's deed is done here, for its lair (systems/playerDoor.js)
+  lairHere = null,     // RVN7 (18.1): where a revenant's deed is done here, for its lair (systems/playerDoor.js)
   isPuppet = null,     // AUDIT FEUD 2: the host's word on a foe another client runs (a dungeon room's carries no `puppet`)
   trapToOwner = spellToFoeOwner,   // RPT1026-FIGHTS (TRAP-TO-OWNER): (foe, spell, level) => bool - a cast's Soul Trap to the player who runs the foe
   onNewReadySpell = null,

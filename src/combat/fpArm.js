@@ -2628,7 +2628,7 @@ export async function buildFpArm({
   vampire = false,   // MWNPC14: a vampire's face - the race's vampire head
   flies = false,   // AUDIT MW-NPC II K5: a creature body that must fly (its CREA record's Flies flag)
   npcFace = null,   // MWNPC17: an NPC's head and hair, each walked off its seed ({ head, hair } - characters/wardrobe.js npcFaceOf): no portrait to match
-  ownHeads = false,     // MW-HEADS2: a player's body - the local player's (weaponRig.js armBuildOptsOf) and a peer's (net/peer/peerBodies.js playerBuildOpts) - wears the port's own heads; every other the data's
+  ownHeads = false,   // MW-HEADS2: a player's body - the local player's (weaponRig.js armBuildOptsOf) and a peer's (net/peer/peerBodies.js playerBuildOpts) - wears the port's own heads; every other the data's
   offWeapon = null,   // TWO-HANDS AUDIT 2: a pair's left-hand weapon, bound in the build on both rigs - the rig's own rebuilds hand the one it holds (setOffWeapon records it)
 } = {}) {
   if (creature) return buildCreatureBody({ creature, flies, deps });   // MWNPC9
@@ -5108,7 +5108,7 @@ export function createFpArm() {
     get frames() { return frames; },
 
     async build(opts) {
-      opts = drawnOpts(opts);     // APPEARANCES: the hands hold what their pieces are drawn as
+      opts = drawnOpts(opts);   // APPEARANCES: the hands hold what their pieces are drawn as
       // AUDIT MW-TORCH F6: A BUILD THAT ARRIVES MID-BUILD IS QUEUED, the
       // law PX25/PX26 gave the worn table and the hand. autoBuildArms's
       // door is reached by a load landing while the last load's build

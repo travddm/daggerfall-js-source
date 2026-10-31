@@ -157,5 +157,5 @@ test('WB9e the court throws them: each landing its bursts at its own moment (his
   assert.deepEqual(calls.slice(-3).map((c) => c[0]), ['enable', 'depthMask', 'disable'], 'the state put back');
   assert.equal(calls.filter((c) => c[0] === 'drawArrays' && c[1] === 0).length, FX_BURSTS_MAX, 'a draw of points a burst');
   assert.equal(calls.find((c) => c[0] === 'drawArrays' && c[1] === 0)[3], Math.round(FX_SPARKS * FX_KINDS.slam.share));
-  assert.ok(COURTS.length === 6 && ATTACK_BY_ID.length === 19);     // WB14b: the portents' floors in the one table; WB14a: the new arsenal's six
+  assert.ok(COURTS.length === 6 && ATTACK_BY_ID.length === 19);   // WB14b: the portents' floors in the one table; WB14a: the new arsenal's six
 });

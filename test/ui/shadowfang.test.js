@@ -143,7 +143,7 @@ test('SHADOW-FANG grant: SirMcMobdon alone holds it, case-folded, title and glyp
   assert.equal(titleWorn(row('SirMcMobdon', { title: 'shadowfang' }), env), 'shadowfang');
   assert.equal(equipRefusal('shadowfang', row('SirMcMobdon'), env), null, 'theirs to wear');
   assert.equal(equipRefusal('apostle', row('SirMcMobdon'), env), 'not-held');
-  assert.deepEqual(wardrobeOf(row('sirmcmobdon', { title: 'shadowfang' }), env, nowS), { titles: ['developer', 'shadowfang'], title: 'shadowfang', glyphs: ['dev', 'shadowfang'], auras: ['shadowcloak', 'seraphwings'], aura: null, insignia: [], icons: [], icon: null });     // STAFF-PANEL1 (
+  assert.deepEqual(wardrobeOf(row('sirmcmobdon', { title: 'shadowfang' }), env, nowS), { titles: ['developer', 'shadowfang'], title: 'shadowfang', glyphs: ['dev', 'shadowfang'], auras: ['shadowcloak', 'seraphwings'], aura: null, insignia: [], icons: [], icon: null });   // STAFF-PANEL1 (
   for (const h of ['Dutchess', 'SquidKamer', 'Lattymoy', 'Stranger']) {
     assert.ok(!titlesHeld(row(h), env).includes('shadowfang'), `${h} does not hold it`);
     assert.ok(!glyphsOf(row(h), env, nowS).includes('shadowfang'));

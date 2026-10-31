@@ -251,7 +251,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `+${v.frost} frost resistance, +${v.endurance} Endurance`,
         (v) => `+${v.frost} frost resist, +${v.endurance} Endurance`),
       tier(4, 'constrict', 'Constrict', { stack: [3, 8] },
-        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,     // AUDIT 625 P3
+        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,   // AUDIT 625 P3
         (v) => `+${v.stack}% per hit on a foe, up to ${COIL_STACKS}`),
       tier(6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] },
         (v) => `When a hit drops you below ${Math.round(SHED_BELOW * 100)}% health, you shed your skin and heal ${v.heal}% of your health. Recovers in ${v.recover} s`,

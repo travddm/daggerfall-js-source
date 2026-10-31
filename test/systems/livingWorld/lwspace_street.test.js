@@ -416,7 +416,7 @@ test('LW-SPACE the game\'s own cities (ARENA2): Ripmarket, Wayrest and Daggerfal
   const all = cities();
   for (const name of ['Ripmarket', 'Wayrest', 'Daggerfall']) {
     const h = hostTown(/** @type {any} */ (all.find((c) => c.name === name)));
-    for (const hour of [13, 19]) {     // LW-SPREAD:
+    for (const hour of [13, 19]) {   // LW-SPREAD:
       const m = streetAt(h, hour, 20);
       assert.ok(m.seen > 20, `${name} at ${hour}:00: a street in view (${m.seen.toFixed(1)})`);
       assert.ok(m.share < 0.04, `${name} at ${hour}:00: ${(100 * m.share).toFixed(1)}% of the body-frames inside another`);

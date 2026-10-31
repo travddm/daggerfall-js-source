@@ -274,7 +274,7 @@ test('AUDIT 31 H2, R1, U8: the Guild tab reads the guild Stores at each look, pe
   const doc = { ...document, createElement: (t) => Object.assign(document.createElement(t), { dataset: {} }) };
   doc.head.dataset ??= {}; doc.body.dataset ??= {};
   const panel = createSocialPanel({ social: new SocialState({ acct: 'acct-a' }), guild: book, doc, win: { addEventListener() {}, removeEventListener() {} }, overlay: () => false, touch: false });
-  panel.openGuild('stores');     // GUILD2 (
+  panel.openGuild('stores');   // GUILD2 (
   await ticks(6); panel.render(); await ticks(6); panel.render();
   assert.match(panel.root.textContent, /The guild Stores cannot be read now/);
   const btn = (label) => byClass(panel.root, 'dfsocial-btn').find((b) => b.textContent.startsWith(label));
@@ -282,7 +282,7 @@ test('AUDIT 31 H2, R1, U8: the Guild tab reads the guild Stores at each look, pe
   btn('Try again').click();
   await ticks(6); panel.render(); await ticks(6); panel.render();
   assert.match(panel.root.textContent, /120 Oak Logs20 of them yours/);
-  const units = () => byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');     // GUILD-UX (
+  const units = () => byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (
   const type = (v) => { const u = units(); u.value = v; u.dispatch('input', {}); };
   type('21');
   assert.equal(btn('Take out').disabled, true, 'past their own 20');

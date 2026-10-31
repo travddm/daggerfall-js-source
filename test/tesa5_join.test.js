@@ -51,7 +51,7 @@ test('TESA5 the crossings: a Bay road within JOIN_DEPTH of an edge, one crossing
     ...Array.from({ length: 41 }, (_, i) => [400 + i, 1]),   // a road along the edge, 400-440: its middle
     [500, 8],                                             // too deep
     [700, 0, DIR.N | DIR.S, 'tracks'],                    // a track: never a crossing
-    [800, 1], [811, 1],                                     // 11 apart: one run (
+    [800, 1], [811, 1],                                   // 11 apart: one run (
     [823, 1],                                             // 12 past 811: its own
     [600, 497],                                           // the south edge
     [3, 100],                                             // the west edge

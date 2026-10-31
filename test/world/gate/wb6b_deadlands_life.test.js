@@ -264,7 +264,7 @@ test('WB6b the thunder: every strike the sky draws is heard once, late by its di
 test('WB6b the air\'s driver: the beds set every frame (the wind breathing on the clock, the sea\'s roar, a loop at each brazier), the events between two frames played once from their stand-ins with the ear\'s offset held (`far`), a gap past AIR_BACKLOG_S playing nothing; stop silences every loop it set and nothing when it set none; a later boot\'s air silences the old one\'s as it is made (mutants: stop leaving a bed looping; the backlog played; an event unheld; the old air outliving its host)', () => {
   const log = [];
   const engine = {
-    setBed: (...a) => log.push(['setBed', ...a]),     // AUDIT SD III (A3
+    setBed: (...a) => log.push(['setBed', ...a]),   // AUDIT SD III (A3
     setBed3d: (...a) => log.push(['setBed3d', ...a]),
     play3d: (...a) => log.push(['play3d', ...a]),
   };
@@ -350,6 +350,6 @@ test('WB6b the seams, by source: the world host keeps the Deadlands\' clock on t
   assert.ok(clock > 0 && clock < shards && shards < begin, 'the shards moved before the frame\'s draws, which the shadows record');
   assert.match(wm, /const _cl = courtLighting\(deadlandsFlash\(_deadS\)\);/);
   const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /\n      if \(!isGateArena\(dfLocation\)(?: && !isArenaFloor\(dfLocation\))?(?: && !_sdRealm)?(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/, 'no drip, no door, no bird in the Deadlands');     // KETCH (
+  assert.match(dc, /\n      if \(!isGateArena\(dfLocation\)(?: && !isArenaFloor\(dfLocation\))?(?: && !_sdRealm)?(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/, 'no drip, no door, no bird in the Deadlands');   // KETCH (
   assert.ok(GATE_BLOCK_SIDE > 0);
 });

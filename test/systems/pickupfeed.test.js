@@ -525,7 +525,7 @@ test('PICKUP-FEED: the sheet is the skin\'s - the pixel face, the plaque\'s veil
   assert.match(css, /\.pickfeed-card\[data-rarity\] \.pickfeed-name \{ color: var\(--rar\); \}/, 'the name in its tier');
   assert.match(css, /scale\(var\(--hud-scale, 1\)\)/, 'the HUD\'s scale');
   assert.match(css, /\.pickfeed \{[^}]*z-index: 4;/, 'the HUD\'s own layer - every window stands over it');
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.pickfeed-card, \.pickfeed-count, \.pickfeed-name, \.pickfeed-plus, \.haul-fill \{ animation: none !important; transition: none !important; \} \}/);     // HAUL-CARDS (
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.pickfeed-card, \.pickfeed-count, \.pickfeed-name, \.pickfeed-plus, \.haul-fill \{ animation: none !important; transition: none !important; \} \}/);   // HAUL-CARDS (
   assert.match(css, /\.pickfeed-card\.pf-over \{ display: none; \}/);
 });
 

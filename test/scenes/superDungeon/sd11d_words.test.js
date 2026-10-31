@@ -148,8 +148,8 @@ test('SD11d THE HOSTS SAY THROUGH THE VOICE, from the world host\'s own text: it
   assert.match(W, /sdSay: \(t, rank\) => sdSay\(t, rank\),/, 'handed to the mode machine');
   const WM = read('src/scenes/worldModes.js'), D = read('src/scenes/dungeonContext.js');
   assert.match(WM, /sdSay: \(t, rank\) => host\.sdSay\?\.\(t, rank\) \?\? false,/);
-  assert.match(D, /const sdSayHere = \(t\) => \{ if \(!opts\.sdSay\?\.\(t\)\) setMidScreenText\(t\); \};/);     // AUDIT SD-THROUGH (
-  assert.match(D, /onTurn: \(i, a\) => !!opts\.sdTurn\?\.\(i, a\), say: sdSayHere/, 'the hall\'s lines, the label\'s own where no voice answers');     // SD-THROUGH (
+  assert.match(D, /const sdSayHere = \(t\) => \{ if \(!opts\.sdSay\?\.\(t\)\) setMidScreenText\(t\); \};/);   // AUDIT SD-THROUGH (
+  assert.match(D, /onTurn: \(i, a\) => !!opts\.sdTurn\?\.\(i, a\), say: sdSayHere/, 'the hall\'s lines, the label\'s own where no voice answers');   // SD-THROUGH (
   assert.match(D, /if \(!opts\.sdSay\?\.\(word \?\? SD_NO_RIFT\)\) setMidScreenText\(word \?\? SD_NO_RIFT\);/, 'the Rift\'s word');
   // the voice's frame, run from its own text: in the Hour it frames; leaving lets go what waits, once
   const log = [];
@@ -158,7 +158,7 @@ test('SD11d THE HOSTS SAY THROUGH THE VOICE, from the world host\'s own text: it
   frame(); frame();
   assert.deepEqual(log, ['frame', 'frame'], 'in the Hour: framed');
   slot = null; frame(); frame();
-  assert.deepEqual(log, ['frame', 'frame', 'leave', 'frame', 'frame'], 'out: let go once');     // AUDIT SD III (H5
+  assert.deepEqual(log, ['frame', 'frame', 'leave', 'frame', 'frame'], 'out: let go once');   // AUDIT SD III (H5
 });
 
 // ── the bar (L6 F1, F6, F10) ───────────────────────────────────────────
@@ -185,7 +185,7 @@ test('SD11d THE ECHO\'S CLOCK AND THE RETURN (L6 F6, F10): a fallen Echo counts 
   const ec = (dn) => [{ h: 0, m: 5000, up: 0, dn, atk: null, x: 0, z: 0 }, { h: 2250, m: 5000, up: 0, dn: 0, atk: null, x: 0, z: 0 }];
   const a = remnantBarModel(fight({ ph: 2, ec: ec(NOW - 3000) }), NOW);
   assert.equal(a.callout.text, SD_BAR_TEXT.rises(0, 12));
-  assert.equal(a.callout.text, 'Gold rises - 12s');     // AUDIT SD III (T5
+  assert.equal(a.callout.text, 'Gold rises - 12s');   // AUDIT SD III (T5
   assert.equal(a.host, 'Gold rises in 12s - Silver 45%');
   assert.equal(a.hostNear, false);
   const b = remnantBarModel(fight({ ph: 2, ec: ec(NOW - SD_ECHO_PAIR_MS + SD_ECHO_RISE_NEAR_MS - 1) }), NOW);
@@ -337,7 +337,7 @@ test('SD11d THE FADE COUNTED (L6 F5): a Hollow unbeaten closes at its `until` an
   assert.equal(sdFadeDue(9000, 30_000), 10_000, 'a frame late: the mark reached, once');
   assert.equal(sdFadeDue(0), null);
   assert.equal(sdFadeReadout(60_000, { hour: true }), 'The Hour closes in 1:00.');
-  assert.equal(sdFadeReadout(30_000), 'The Abyss Dungeon fades in 0:30.');     // AUDIT SD III (T15
+  assert.equal(sdFadeReadout(30_000), 'The Abyss Dungeon fades in 0:30.');   // AUDIT SD III (T15
   const x = host();
   const r = sdRise(sdFirst(T0 - 3 * H), T0 - 10 * M, 0);
   x.h.heard({ k: 'ev', ...r }); x.h.frame();
@@ -381,7 +381,7 @@ test('SD11d THE FIGHT\'S LINES NEAR ITS ARENA (L6 F15), run from the world host\
   assert.ok(linkSay && blowsSay, 'the two doors');
   const e2 = { sdNearArena: near, sdSay: (t, rank, key) => said.push([t, rank, key]), SD_VOICE_RANK };
   const L = evalIn(linkSay, e2), B = evalIn(blowsSay, e2);
-  const db = SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS);     // AUDIT SD III (T14
+  const db = SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS);   // AUDIT SD III (T14
   L(db); B(SD_BLOWS_TEXT.reset(5), false, SD_HEARTS_KEY);
   assert.deepEqual(said, [[db, 0, undefined], [SD_BLOWS_TEXT.reset(5), 0, SD_HEARTS_KEY]]);
   pos = realmToDungeon(0, 4.6, 190);   // the Crumble
@@ -523,11 +523,11 @@ test('SD11d WB13B\'S WORDS OVER THE ARC (L6 F21): no dash aside in a line (" - "
     if (/\b[A-Z]{3,}\b/.test(s)) bad.push(`${where}: shouted - ${s}`);
   }
   assert.deepEqual(bad, []);
-  assert.equal(SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), 'The Dragon Break! Fell Gold and Silver within 15 seconds of each other.');     // AUDIT SD III (T14
+  assert.equal(SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), 'The Dragon Break! Fell Gold and Silver within 15 seconds of each other.');   // AUDIT SD III (T14
   assert.equal(SD_FIGHT_TEXT.stunned, 'The Reset breaks! Strike now!');
   assert.equal(SD_BLOWS_TEXT.reset(5), 'The Reset! Break all 5 Hearts!');
   assert.equal(SD_HALL_TEXT.concord, 'The Concord! A bridge of light opens.');
-  assert.equal(sdCollapseLine(SD_COLLAPSE_MS, { first: true }), 'The Hour is broken. The Abyss Dungeon collapses in 3:00.');     // AUDIT SD III (T15
+  assert.equal(sdCollapseLine(SD_COLLAPSE_MS, { first: true }), 'The Hour is broken. The Abyss Dungeon collapses in 3:00.');   // AUDIT SD III (T15
 });
 
 // ── the sounds and the shaders (L6 F23; the veil's and the telegraphs' pows) ──

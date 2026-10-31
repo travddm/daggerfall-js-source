@@ -40,7 +40,7 @@ test('AUDIT SHIP-LIFE B2: A HARBOUR\'S MOORED SHIPS ARE THE HARBOUR\'S TO DROP -
   at([0, 0, -2150]); w.run(1);
   at([0, 0, -150]); w.run(2);
   assert.equal(moored(w).length, n, 'there still');
-  at([0, 0, -150 - HARBOUR_LEAVE - 600]); w.run(1 + SHIP_FADE_S);     // SHIP-FADE
+  at([0, 0, -150 - HARBOUR_LEAVE - 600]); w.run(1 + SHIP_FADE_S);   // SHIP-FADE
   assert.equal(moored(w).length, 0, 'gone past HARBOUR_LEAVE');
   at([0, 0, -150]); w.run(1);
   assert.equal(moored(w).length, n, 'and stood again');

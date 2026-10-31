@@ -271,7 +271,7 @@ test('GOLD-MARKET tab: My listings - a gold listing\'s price in gold; the List f
   cur.value = 'gold';
   cur.onchange();
   assert.deepEqual(matOptions(), ['Iron Ore (8)'], 'gold: own and gold\'s - Mithril bought with Drakes lists for none');
-  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);     // AUDIT 657 B9 (
+  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);   // AUDIT 657 B9 (
   const list = t.buttons().find((b) => b.textContent === 'List');
   assert.equal(list.disabled, false, 'no Drakes fee asked');
   await list.onclick();

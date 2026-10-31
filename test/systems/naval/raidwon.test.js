@@ -130,7 +130,7 @@ test('RAID-WON the hosts: the naval host ends a raid its throw-back won - after 
   assert.match(win, /endBoarding\(\);\n\s*wonRaid\(b\.quest\);[^\n]*\n\s*deps\.mid\?\.\(`The boarders are thrown back, but/, 'a legend\'s first wave');   // PIN MOVED (VOICE2, in PLAIN-SWEEP's words): no dash aside (Voice.md rule 5)
   assert.match(win, /entry\.ship\.boarded = false;\n\s*endBoarding\(\);\n\s*wonRaid\(b\.quest\);[^\n]*\n\s*return;\n\s*\}\n\s*$/, 'thrown back');
   const W = hostText('src/scenes/world.js');
-  assert.match(W, /endRaid: \(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n\s*if \(!quest \|\| !questBridge\) return;\n\s*if \(won\) \{ raidAshore\.won\(quest\); return; \}[^\n]*\n\s*if \(crew\) raidAshore\.crew\(quest\);/);     // AUDIT FB1019 D2 (
+  assert.match(W, /endRaid: \(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n\s*if \(!quest \|\| !questBridge\) return;\n\s*if \(won\) \{ raidAshore\.won\(quest\); return; \}[^\n]*\n\s*if \(crew\) raidAshore\.crew\(quest\);/);   // AUDIT FB1019 D2 (
 });
 
 /**

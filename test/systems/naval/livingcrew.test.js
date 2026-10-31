@@ -389,9 +389,9 @@ test('LIVING CREW THE WORDS: a bubble a line over his head at the HUD\'s scale -
 });
 
 test('LIVING CREW THE WORLD by source: the crews stepped before the people are drawn, their sprites among them; the words after the bars; every clear stands them down; the fight\'s end brings my hands home; a grapple\'s side each crew\'s own, her other ship by the host\'s door; me never walked through; a room\'s boat seeded by whose and which; the boarding\'s doors (mutants: each unwired)', () => {
-  assert.match(WORLD, /navalCrewFrame\(gamePaused\(\) \? 0 : foeDt\);[^\n]*\n\s+livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\), \.\.\.navalCrew\.batches\(\)\);/);     // AUDIT NAV2 F53
-  assert.match(WORLD, /navalCrewBars\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewLines\(proj, view, mwv\.eye, dt\);/);     // FIELD BUGS 2026-10-02b
-  assert.match(WORLD, /navalFlames\.clear\(\); navalCrew\.clear\(\);[^\n]*drawCrewLines\(\[\]\); lowerGlass\(\); \};/);     // AUDIT CAPTAIN'S SEA S1
+  assert.match(WORLD, /navalCrewFrame\(gamePaused\(\) \? 0 : foeDt\);[^\n]*\n\s+livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\), \.\.\.navalCrew\.batches\(\)\);/);   // AUDIT NAV2 F53
+  assert.match(WORLD, /navalCrewBars\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewLines\(proj, view, mwv\.eye, dt\);/);   // FIELD BUGS 2026-10-02b
+  assert.match(WORLD, /navalFlames\.clear\(\); navalCrew\.clear\(\);[^\n]*drawCrewLines\(\[\]\); lowerGlass\(\); \};/);   // AUDIT CAPTAIN'S SEA S1
   assert.match(WORLD, /if \(_crewBoarding && !b\) for \(const boat of csa\.boats\) navalCrew\.reset\(boat\);/);
   assert.match(WORLD, /const other = grapple \? \(key === grapple\.shipId \? grapple\.boat : key === grapple\.boat \? naval\.boatOf\(grapple\.shipId\) : null\) : null;/);
   assert.match(WORLD, /_crewCtx\.muster = _crewThem\[0\] >= 0 \? 1 : -1;/);

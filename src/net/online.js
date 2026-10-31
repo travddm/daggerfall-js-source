@@ -795,7 +795,7 @@ export class OnlineSession {
     this.wdunSeaOk = false;       // SEA-VAULTS: the hub reads a vault of the deep's key (relaySupportsWdunSea) - an older one closes the socket on it
     this.wdunWorldOk = false;     // WW-C2: the hub reads a hall of Cyrodiil's key (relaySupportsWdunWorld) - an older one closes the socket on it
     this.onWdun = null;           // PVPDUNGEONS: (word) => void - the hub's word on the zone's halls (wire.js validWdunOut)
-    this.wildCollectOk = false;     // MAC: the relay that welcomed this socket signs a killer's collect of a piece in escrow (relaySupportsWildCollect)
+    this.wildCollectOk = false;   // MAC: the relay that welcomed this socket signs a killer's collect of a piece in escrow (relaySupportsWildCollect)
     this.wildOk = false;          // WILD1: the relay that welcomed this socket routes wild frames and, INT9, referees the zone (relaySupportsWildRef) - an older one CLOSES the socket on one, so nothing of the open zone is sent through it
     this.loneOk = false;          // LONE-SLEEP: the relay that welcomed my own cell's socket is one a lone session may go quiet to (loneSupported)
     this.seaPvpOk = false;        // SHIP-PVP: the relay that welcomed this socket referees the open sea's guns (relaySupportsSeaPvp) - an older one closes the socket on their kinds
@@ -1052,7 +1052,7 @@ export class OnlineSession {
       this.seaPvpOk = !!h.seaPvpOk;   // SHIP-PVP: and the open sea's guns'
       this.foeInventoryOk = !!h.foeInventoryOk;
       this.wildOk = !!h.wildOk;   // INT9 (AUDIT): the zone's word went with neither socket
-      this.wildCollectOk = !!h.wildCollectOk;     // MAC: nor the collect's
+      this.wildCollectOk = !!h.wildCollectOk;   // MAC: nor the collect's
       this.bossOk = !!h.bossOk;   // AUDIT INT15: nor the count's - a body's word goes by the socket it leaves on
       // AUDIT ONLINE 3 F3: nor the look's - the cell stepped down to a halo kept no `lookOk`, so _flushLook never told it
       // a change again (it handed my old coat to everyone it introduced me to), and the cell crossed into kept the old one's
@@ -3459,7 +3459,7 @@ export class OnlineSession {
       if (primary) this.seaPvpOk = relaySupportsSeaPvp(relayV);   // SHIP-PVP: and one that referees the open sea's guns
       else { const h = this._halo.get(room); if (h) h.seaPvpOk = relaySupportsSeaPvp(relayV); }   // SHIP-PVP: a halo says for itself
       if (primary) this.loneOk = loneSupported(relayV);   // LONE-SLEEP: a relay whose every pose reader was read for a lone player's quiet (net/loneSleep.js LONE_RELAY_MIN)
-      if (primary) this.wildCollectOk = relaySupportsWildCollect(relayV);     // MAC: a relay that signs a killer's collect
+      if (primary) this.wildCollectOk = relaySupportsWildCollect(relayV);   // MAC: a relay that signs a killer's collect
       else { const h = this._halo.get(room); if (h) h.wildCollectOk = relaySupportsWildCollect(relayV); }
       if (this._wildZone === 1 && primary && this.wildOk) { this._sayZone(this._ws, 1); this._wildZoneAt = this._now(); }   // INT9: my cell's socket welcomed while I stand in the zone hears so (AUDIT INT9: a halo never)
       if (primary) { this.wdunOk = relaySupportsWdun(relayV); this.wdunGiantsOk = relaySupportsWdunGiants(relayV); this.wdunSeaOk = relaySupportsWdunSea(relayV); this.wdunWorldOk = relaySupportsWdunWorld(relayV); }   // PVPDUNGEONS; ZONE-GIANTS; SEA-VAULTS; WW-C2
@@ -3498,7 +3498,7 @@ export class OnlineSession {
       if (primary) { this.homeOk = relaySupportsHome(relayV); this._hmAt = -Infinity; this._flushHome(now); }   // QUEST-HOME: the hub's own word - and a held home order goes now
       if (primary) this.parkOk = relaySupportsPark(relayV);   // HCC-PARK: the same law for the park frame
       if (primary) this.caravanOk = relaySupportsCaravan(relayV);   // WAGONS2-VISIT: and for a caravan's room
-      if (primary) this.instanceOk = relaySupportsInstances(relayV);     // INSTANCES: and for an instance's
+      if (primary) this.instanceOk = relaySupportsInstances(relayV);   // INSTANCES: and for an instance's
       if (primary) this.guildInstanceOk = relaySupportsGuildInstances(relayV);   // DOMAIN2: and for a guild's - a castle's (Domains.md 6)
       if (primary) this.lookOk = relaySupportsLook(relayV);   // PROFILE2
       else { const h = this._halo.get(room); if (h) h.lookOk = relaySupportsLook(relayV); }   // PROFILE2: a halo says for itself (AUDIT ONLINE 3, the second read: under its own line, no longer the party lead's `else`)

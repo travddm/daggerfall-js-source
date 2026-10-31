@@ -68,7 +68,7 @@ export const DECOR_KINDS = Object.freeze({
   bed: 'Beds', storage: 'Storage', shelf: 'Shelves', furniture: 'Furniture', door: 'Doors',   // HOME-DOORS
   light: 'Lights', clothing: 'Clothing', boxes: 'Boxes and bottles', arms: 'Arms and armor',
   books: 'Books and scrolls', misc: 'Odds and ends', treasure: 'Treasure', decor: 'Decorations',
-  people: 'Vendors',     // HOME-VENDOR: the people Daggerfall stands in its rooms - a home's trader is one of them, made the vendor station
+  people: 'Vendors',   // HOME-VENDOR: the people Daggerfall stands in its rooms - a home's trader is one of them, made the vendor station
   dungeon: 'Dungeon furniture',   // DECOR-DUNGEON: what Daggerfall stands in its dungeons and nowhere in a house - a throne, a cage, a coffin, a statue
   outdoor: 'Outdoors',   // DECOR-OUTDOOR: what Daggerfall stands in its streets and nowhere inside - a fence, a well, a fountain, a cart
   nature: 'Trees and plants',   // DECOR-OUTDOOR: the climate's own nature - a yard's own climate's

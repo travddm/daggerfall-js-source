@@ -218,7 +218,7 @@ test('LW-PERF the town\'s frames: each frame\'s searching held to its cells - AR
 });
 
 test('LW-PERF the arrival\'s window: in ARRIVAL_SHOW_S of the way in the street is stood as the day has it - a resident found then comes on where the player sees; after it, one whose walk came late comes on only unseen (beyond POP_VISIBLE_RANGE or behind the view) or out of a door (mutants: the window, its length)', () => {
-  const minute = 100 * DAY_MIN + 8 * 60, at = [300, 0, 300];     // LW-SPREAD:
+  const minute = 100 * DAY_MIN + 8 * 60, at = [300, 0, 300];   // LW-SPREAD:
   const { town, clock } = townAt(8, minute);
   const was = new Map();
   let inViewInWindow = 0, after = 0;
@@ -322,7 +322,7 @@ function refTownTrips(town, t, world, o) {
   const tripOf = (res, k) => { const trip = memoTrip(res, town, k, world, o); if (trip === undefined) pending = true; return trip ?? null; };
   const trips = [];
   for (const res of roster) {
-    if (!((TRIP_CHANCE[res.job] ?? ROAD_TRIP_CHANCE[res.job]) > 0)) continue;     // LW9:
+    if (!((TRIP_CHANCE[res.job] ?? ROAD_TRIP_CHANCE[res.job]) > 0)) continue;   // LW9:
     const cyc = cycleOf(res, day, scale);
     for (const k of [cyc.k - 1, cyc.k]) {
       const holder = world.holderOf ? world.holderOf(res, k) : res;

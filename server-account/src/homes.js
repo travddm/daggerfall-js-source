@@ -52,7 +52,7 @@ import { payFromSave, creditSave } from '../../src/net/realm/realmGoldLaw.js';  
 import {
   HOME_CAP, HOME_ENTRY_DEFAULT, HOME_CLAIMS_MAX, HOME_CLAIMS_WINDOW_S, HOME_TOWN_MAX, HOME_LAYOUTS_MAX,
   HOME_KEYS_MAX,   // FIELD BUGS 2026-10-14 QUEST-HOME: the homes the layouts read names by building
-  homeMoved,     // QUEST-HOME: what an act moved, signed for every page online
+  homeMoved,   // QUEST-HOME: what an act moved, signed for every page online
   homeMapIdOk, homeBuildingKeyOk, homeRegionOk, homePriceOk, homeEntryOk, homeSaleRefund, homeLookOf, homeLayoutOk, homeLayoutsMatch,
   homeInArenaCell, RENT_ANCHOR_MOVED,   // ARENA4b: the arena's cell, and a tenancy's point the move carries
   homeDeedOf,   // FIELD BUGS 2026-10-04d KNIGHT-HOUSE: the deed a record holds to a building, as the door reads it

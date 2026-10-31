@@ -152,7 +152,7 @@ test('ECOTONE1: the GLSL is the JS - the hash bit for bit, the lattice noise and
     let blended = 0;
     const corners = [[0, 160, 0, 160], [660, PIXEL, 0, 160], [0, 160, 660, PIXEL], [660, PIXEL, 660, PIXEL]];
     for (const [x, z] of [...points(200), ...corners.flatMap(([x0, x1, z0, z1]) => points(80, x0, x1, z0, z1))]) {
-      const w = fns.ecoWeights([x, z]);     // AUDIT PRECIP GROUND-6 (
+      const w = fns.ecoWeights([x, z]);   // AUDIT PRECIP GROUND-6 (
       assert.ok(Math.abs(w[0] + w[1] + w[2] + w[3] - 1) < 1e-9, 'the shares sum to one');
       const got = fns.ecotone([0, 0, 0], w, [0.5, 0.5, 2], [0.01, 0], [0, 0.01]);
       const want = bySlot(ecotoneShares(PX, PY, x, z));

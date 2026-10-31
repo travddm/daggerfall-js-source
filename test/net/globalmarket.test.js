@@ -152,6 +152,6 @@ test('GLOBAL-MARKET tab: an order of another region says where it stands and wha
   rows = [];
   await tab.load(true);
   node = tab.body();
-  assert.match(text(), /No buy orders right now\./);     // BOARD-UI (
+  assert.match(text(), /No buy orders right now\./);   // BOARD-UI (
   assert.match(text(), /on every board\)\. Sellers outside Daggerfall pay the courier\./);
 });

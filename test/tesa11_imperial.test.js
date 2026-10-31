@@ -140,7 +140,7 @@ test('TESA11 the pixel law over six hundred and twenty-five (PIN MOVED, IC-GRAND
   const w = 320, h = 200, land = new Uint8Array(w * h).fill(1), province = new Uint8Array(w * h).fill(9);
   for (let y = 0; y < h; y++) for (let x = 0; x < 172; x++) province[y * w + x] = 3;
   setTamrielTrace({ w, h, land, province });
-  const first = 2077;     // the first Bay pixel whose centre is column 172's: (2077.5 + 589) / 15.5 = 172.03 (
+  const first = 2077;   // the first Bay pixel whose centre is column 172's: (2077.5 + 589) / 15.5 = 172.03 (
   assert.deepEqual([Math.floor((first - 1 + 0.5 + 589) / 15.5), Math.floor((first + 0.5 + 589) / 15.5)], [171, 172]);
   assert.deepEqual(capitalPixel(IC), { px: first + hs, py: 658 }, 'its west slice on the land\'s first pixel');   // PIN MOVED (IC-GRAND): twelve slices west of its centre (TS5's three)
   assert.deepEqual(capitalPixel({ ...IC, span: 1 }), { px: first, py: 658 }, 'one pixel: the first');

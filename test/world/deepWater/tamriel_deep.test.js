@@ -204,7 +204,7 @@ test('TAMRIEL-DEEP (ARENA2): on the player\'s own picture the Topal Bay is carve
   b.prepare(2441, 1500);
   assert.equal(b.sampleDistanceMeters(2441, 1500, 0.5, 0.5), BAKE_DISTANCE_CAP * BAKE_DISTANCE_SCALE_METERS);
   assert.ok(all(2160, 720) && all(2300, 1000), 'Lake Rumare\'s ring and the Niben');
-  assert.ok(all(2069, 676), 'the Waterfront canal');     // under IC-GRAND's twenty-five (NIBEN-SEA)
+  assert.ok(all(2069, 676), 'the Waterfront canal');   // under IC-GRAND's twenty-five (NIBEN-SEA)
   assert.ok(none(1216, 224), 'Hammerfell\'s lake');
   assert.ok(!all(2441, 1441) && !none(2441, 1441), 'the coast\'s pixel part sea');
   assert.ok(TAMRIEL_CELL_PX >= 16);

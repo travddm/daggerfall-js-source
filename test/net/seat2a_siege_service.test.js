@@ -97,7 +97,7 @@ test('SEAT2a part three THE PASS AND THE FIELD: from ten minutes before the star
   assert.deepEqual({ ...r.body, pass: !!r.body.pass }, { side: 'defend', week: W + 1, key: ANTICLERE.key, startsAt: START, endsAt: START + 1800, window: START + 7200, pass: true });
   const v = await verifyOrder(r.body.pass, s.svc.identityPublic, { subtle, nowS: s.getNow(), kind: 'siege' });
   assert.ok(v.ok, v.why);
-  assert.deepEqual({ ...v.claims, i: 0, e: 0 }, { o: 'siege', s: d1.id, sk: ANTICLERE.key, sw: W + 1, sd: 'defend', st: 'palace', sn: 'siege', sb: START, se: START + 7200, sf: F, sx: [0, -1, 0, 0, 0], i: 0, e: 0 });     // SEAT2b part two (b) (
+  assert.deepEqual({ ...v.claims, i: 0, e: 0 }, { o: 'siege', s: d1.id, sk: ANTICLERE.key, sw: W + 1, sd: 'defend', st: 'palace', sn: 'siege', sb: START, se: START + 7200, sf: F, sx: [0, -1, 0, 0, 0], i: 0, e: 0 });   // SEAT2b part two (b) (
   assert.equal(s.battle().field, JSON.stringify(F), 'settled on the battle');
   const late = await s.pass(a1, F2);
   assert.deepEqual((await verifyOrder(late.body.pass, s.svc.identityPublic, { subtle, nowS: s.getNow(), kind: 'siege' })).claims.sf, F, 'settled once: a later field changes nothing');

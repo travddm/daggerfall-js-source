@@ -1389,7 +1389,7 @@ export function validFoeRecord(r) {
   // LOOT7 (the Loot arc): `cp` a CHAMPION's trait - its index in systems/champions.js CHAMPION_TRAITS (this file names
   // none of them: the relay reads it), absent for a foe that is none; the reader stands its puppet as the same champion
   if (r.cp !== undefined) { if (!Number.isInteger(r.cp) || r.cp < 0 || r.cp > CHAMPION_TRAIT_MAX) return null; out.cp = r.cp; }
-  if (r.gr !== undefined) { if (!Array.isArray(r.gr) || r.gr.length !== 2 || !Number.isSafeInteger(r.gr[0]) || r.gr[0] < 0 || r.gr[0] > 0x7fffffff || !Number.isInteger(r.gr[1]) || r.gr[1] < 0 || r.gr[1] > 23) return null; out.gr = [r.gr[0], r.gr[1]]; }     // GRANT3: its grant's number and its member - the frame's `gs` holds the grant
+  if (r.gr !== undefined) { if (!Array.isArray(r.gr) || r.gr.length !== 2 || !Number.isSafeInteger(r.gr[0]) || r.gr[0] < 0 || r.gr[0] > 0x7fffffff || !Number.isInteger(r.gr[1]) || r.gr[1] < 0 || r.gr[1] > 23) return null; out.gr = [r.gr[0], r.gr[1]]; }   // GRANT3: its grant's number and its member - the frame's `gs` holds the grant
   // GREATER-GIANT: `gg` the zone's Greater Giant this foe is (its index, 0..7 - systems/wild/wildGiants.js), absent for any other -
   // every puppet stands it at its size and its name, and a client that sees one never stands a copy of its own
   if (r.gg !== undefined) { if (!Number.isInteger(r.gg) || r.gg < 0 || r.gg > 7) return null; out.gg = r.gg; }
@@ -2073,7 +2073,7 @@ export function validLookItem(it) {
   const out = { templateIndex, group: it.group, equipSlot };
   for (const k of ['material', 'dye', 'variant']) { const v = uint(it[k], 4095); if (v != null) out[k] = v; }
   if (lookGlowOk({ ...out, glow: it.glow })) out.glow = it.glow;   // WEAPON-GLOW1: a weapon's in a hand, read off the clamped slot
-  const ap = validWireAppearance(out, it.ap);     // APPEARANCES: the look it is drawn in, a look of its kind - OMITTED when none, `class`'s law; a relay before this one drops it, and the piece is seen in its own
+  const ap = validWireAppearance(out, it.ap);   // APPEARANCES: the look it is drawn in, a look of its kind - OMITTED when none, `class`'s law; a relay before this one drops it, and the piece is seen in its own
   if (ap) out.ap = ap;
   return out;
 }
@@ -2349,7 +2349,7 @@ export function parseClient(text, { hasHello = false } = {}) {
     const o = validOwIn(m);
     return o ? { t: 'ow', ...o } : { error: 'bad ow' };
   }
-  if (m.t === 'grant') {     // GRANT2: a spawn grant asked - its fields carried, the cell's _grantFrame judges them (net/grantLaw.js validGrantAsk: this file is that one's import, so it is read there)
+  if (m.t === 'grant') {   // GRANT2: a spawn grant asked - its fields carried, the cell's _grantFrame judges them (net/grantLaw.js validGrantAsk: this file is that one's import, so it is read there)
     if (!hasHello) return { error: 'grant before hello' };
     const g = { t: 'grant' };
     for (const f of GRANT_ASK_FIELDS) if (m[f] !== undefined) g[f] = m[f];   // GRANT3: every ask's fields (validGrantAsk reads the ones its `k` names)
@@ -4830,7 +4830,7 @@ export function validWildOut(m) {
     case 'rm': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && intIn(m.n, 1, WILD_STACK_MAX) ? { k: 'rm', r, i: m.i, n: m.n } : null;
     case 'got': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && m.it && typeof m.it === 'object' && !Array.isArray(m.it) ? { k: 'got', r, i: m.i, it: m.it } : null;
     case 'no': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) ? { k: 'no', r, i: m.i } : null;
-    case 'cr': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && typeof m.cr === 'string' && m.cr.length > 0 && m.cr.length <= WILD_COLLECT_MAX ? { k: 'cr', r, i: m.i, cr: m.cr } : null;     // MAC: a killer's collect
+    case 'cr': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && typeof m.cr === 'string' && m.cr.length > 0 && m.cr.length <= WILD_COLLECT_MAX ? { k: 'cr', r, i: m.i, cr: m.cr } : null;   // MAC: a killer's collect
     default: return { k: 'gone', r };
   }
 }

@@ -120,7 +120,7 @@ test('SD-ONELIFE THE RIFT\'S WORD: a slot whose Hour this player died in is refu
 test('SD-ONELIFE THE PAGE, from the world host\'s own text: the slot of the Hour I die in kept on the device (its own key, the last few, once each), the Rift asked with it, a friend\'s Resurrect raising me in the Hour only inside its realm\'s window (SD-REZ - the slot let go when it does), and the death\'s words say it is for good (mutants: the death unkept; kept in the session alone; the Rift blind to it; a Resurrect past the window; the slot kept at a rise; a rise past the window letting it go)', () => {
   const store = new Map();
   const appStorage = () => ({ getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) });
-  const make = (key) => sdSlotsKept(key, () => null, appStorage);     // AUDIT SD III (H1
+  const make = (key) => sdSlotsKept(key, () => null, appStorage);   // AUDIT SD III (H1
   const fallen = make(SD_FALLEN_KEY);
   fallen.add(7); fallen.add(7);
   assert.equal(fallen.has(7), true);

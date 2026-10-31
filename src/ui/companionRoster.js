@@ -311,7 +311,7 @@ function row(el, r, { now, rerender, meter, here, kindName, stars }) {
   if (state === 'with') {
     const body = here?.(r.id);
     const hm = body?.maxHealth ?? r.companion?.maxHealth ?? null, h = body?.health ?? r.companion?.health ?? hm;
-    if (hm > 0 && typeof meter === 'function') {     // AUDIT: the green of the bar over its head, with its numbers (a tone the kit has)
+    if (hm > 0 && typeof meter === 'function') {   // AUDIT: the green of the bar over its head, with its numbers (a tone the kit has)
       const hp = el('div', 'cmp-hp');
       hp.append(meter(Math.max(0, Math.round(h)), Math.round(hm), 'verdigris'), el('span', 'cmp-hpn', `${Math.max(0, Math.round(h))} / ${Math.round(hm)}`));
       text.append(hp);
@@ -325,7 +325,7 @@ function row(el, r, { now, rerender, meter, here, kindName, stars }) {
   if (_notice?.id === r.id) text.append(el('span', 'cmp-why', _notice.text));
   const acts = el('div', 'cmp-acts');
   if (_confirm === r.id) {
-    const n = (r.companion?.items?.length ?? 0) + gearItems(r.companion?.gear).length;     // AUDIT: its pack comes back to the player's - say so; AUDIT RVN G6: and its kit
+    const n = (r.companion?.items?.length ?? 0) + gearItems(r.companion?.gear).length;   // AUDIT: its pack comes back to the player's - say so; AUDIT RVN G6: and its kit
     text.append(el('span', 'cmp-confirm', `Release ${r.name}? It is freed from its oath and leaves you for good${n ? `, giving back what it carries (${n === 1 ? 'one item' : `${n} items`})` : ''}.`));
     const yes = el('button', 'act warn', 'Release');
     yes.onclick = () => { _confirm = null; _notice = null; releaseRevenant(r.id); rerender(); };
@@ -425,7 +425,7 @@ export function drawCompanionsPage(detail, rerender, { el, divider, meter = null
   if (!withYou.length && !away.length) {
     detail.append(el('p', 'px-note', 'No revenant is sworn to you. Defeat one of your revenants and it will yield. Spare it, and it is yours.'));
   }
-  const n = retinue().length;     // AUDIT: the release's advice only where it is the way on
+  const n = retinue().length;   // AUDIT: the release's advice only where it is the way on
   if (n) detail.append(el('p', 'cmp-foot', `Sworn to you: ${n} of ${REVENANT_RETINUE_MAX}.${n >= REVENANT_RETINUE_MAX ? ' Release one to make room for another.' : ''}`));
 }
 /** A visit's asks forgotten (an armed Release, a refusal's words) - the pause menu's every mount (AUDIT 2026-10-02:

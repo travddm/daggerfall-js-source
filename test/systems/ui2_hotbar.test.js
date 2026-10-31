@@ -292,7 +292,7 @@ test('UI2 AUDIT UI B5: the diamond\'s cells are fitted again when the HUD\'s sca
   const { setPref, getPref } = await import('../../src/systems/uiPrefs.js');
   const was = getPref('hudScale');
   const style = getPref('quickbarStyle');
-  setPref('quickbarStyle', 'quickbar');     // HB-LYCFREE: the hotbar is the default now; these cells are the diamond's (
+  setPref('quickbarStyle', 'quickbar');   // HB-LYCFREE: the hotbar is the default now; these cells are the diamond's (
   try {
     HB.clearQuickslots();
     const sword = createWeapon(120, 3);

@@ -1015,7 +1015,7 @@ export function createPixelBuild(host) {
       for (const m of place.models) {
         const gpu = await getGpuMesh(m.modelId);
         if (!gpu) continue;   // a model ARCH3D does not carry stands empty in DFU (no mesh, no collider)
-        const cpu = wodRockUvs(cpuModels.get(m.modelId), m.matrix, m.modelId);     // FB1001-WODROCK: a piece stretched 4x or more draws its planes unfolded at its pebble's own texel density (world/worldOfDaggerfall/wodRockUv.js) - new UVs only, its positions and indices the model's own arrays; a camp or a house is the same object
+        const cpu = wodRockUvs(cpuModels.get(m.modelId), m.matrix, m.modelId);   // FB1001-WODROCK: a piece stretched 4x or more draws its planes unfolded at its pebble's own texel density (world/worldOfDaggerfall/wodRockUv.js) - new UVs only, its positions and indices the model's own arrays; a camp or a house is the same object
         const box = transformedAabb(archAabb(m.modelId, cpu.positions), m.matrix);
         // WOD-BUSH: the
         // layouts' shrub stands on the DRAWN ground. The mod stands every object on the site's average plus the
@@ -1023,7 +1023,7 @@ export function createPixelBuild(host) {
         // it is eased toward it (flattenForLocation), and the shrubs ring the site in that band, at heights the
         // author read off the ground of the one place they were laid out. They hung over ground falling away (DFU's
         // too). Its mesh's foot goes to the lowest ground under the middle of its footprint, collider and all.
-        if (isWodShrub(m.modelId, stood[m.pick]?.name)) {     // ROCK-SUNK: the rock fields build their outcrops of the same model - boulders scaled 5.6 to 95, set into the piles on purpose - and standing those on their lowest corner raised shards hundreds of metres into the sky round Hadus; a Rocks or Mountains site keeps the mod's height (world/worldOfDaggerfall/wodLocationObjects.js isWodShrub)
+        if (isWodShrub(m.modelId, stood[m.pick]?.name)) {   // ROCK-SUNK: the rock fields build their outcrops of the same model - boulders scaled 5.6 to 95, set into the piles on purpose - and standing those on their lowest corner raised shards hundreds of metres into the sky round Hadus; a Rocks or Mountains site keeps the mod's height (world/worldOfDaggerfall/wodLocationObjects.js isWodShrub)
           const dy = lowestGroundUnder(samples, box) - box[1];
           m.matrix[13] += dy; box[1] += dy; box[4] += dy;
         }

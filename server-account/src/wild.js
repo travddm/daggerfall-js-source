@@ -158,7 +158,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   const had = await ctx.db.prepare('SELECT player, killer, items, kept, burnt, wi, wm, oi, wg, tk FROM wild_falls WHERE r = ?1').bind(r).first();
   if (had) {
     if (had.player !== fallen) return { error: 'not-yours' };
-    const escrow = await ctx.db.prepare('SELECT * FROM wild_escrow WHERE r = ?1').bind(r).first();     // MAC: its escrow, as the first asking made it
+    const escrow = await ctx.db.prepare('SELECT * FROM wild_escrow WHERE r = ?1').bind(r).first();   // MAC: its escrow, as the first asking made it
     const read = (/** @type {any} */ t, /** @type {any} */ none) => { try { return JSON.parse(t) ?? none; } catch { return none; } };
     const list = (/** @type {any} */ t) => { const v = read(t, []); return Array.isArray(v) ? v : []; };
     // AUDIT INT9: the fallen's own tab asking again (its first answer lost) is told where its record stands - the act's
@@ -220,7 +220,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   // same - its fallen taking it back from its own remains holds it as a copy too, worn but never traded.
   const dropped = [];
   const records = drop.records.map((/** @type {any} */ rec, /** @type {number} */ i) => {
-    if (escrowed && i === 0) return rec;     // MAC: the escrowed piece is no new piece - the same one, the service's until it ends
+    if (escrowed && i === 0) return rec;   // MAC: the escrowed piece is no new piece - the same one, the service's until it ends
     const key = ledgerKeyOf(drop.taken[i]);
     if (key == null) return rec;
     dropped.push(key);

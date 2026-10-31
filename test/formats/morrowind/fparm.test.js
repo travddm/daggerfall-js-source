@@ -625,7 +625,7 @@ test('MW-D9f: the rig gates the step on ready() and the draw on active()', () =>
 
   // ready() must not require the mesh, or the deadlock comes straight back.
   const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,     // MW-D39: the jump slot counts here too
+  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too
     'ready() is update()\'s own requirements - no mesh term, no camera term (MW-D26 widened the clip term)');
 });
 
@@ -3134,7 +3134,7 @@ test('AUDIT 36 F2: an INSTANT self-cast animates - the cast latches its own stan
   // ROAD-E6 folded the four release arms' identical tail into one
   // `done` closure - RaiseOnCastReadySpell (:2129) still runs BEFORE
   // `readySpell = null` (:2135), which is the ordering F2 rests on.
-  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,     // FIX-F: lastSpell (:2136) before the raise (:2137)
+  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,   // FIX-F: lastSpell (:2136) before the raise (:2137)
     'the cast callback must fire while the spell is still readied');
 });
 

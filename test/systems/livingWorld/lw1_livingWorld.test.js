@@ -50,7 +50,7 @@ test('LW1 census: the travellers a town keeps by its size and its port (merchant
     [{ merchant: 3, mercenary: 2, adventurer: 2, sailor: 3, pilgrim: 2, courier: 1, pedlar: 3 }, 8],
     [{ merchant: 5, mercenary: 4, adventurer: 4, sailor: 0, pilgrim: 2, courier: 2, pedlar: 6 }, 20],
     [{ merchant: 5, mercenary: 6, adventurer: 6, sailor: 6, pilgrim: 2, courier: 2, pedlar: 6 }, 24],
-  ]);     // WATCH-DAY:
+  ]);   // WATCH-DAY:
 });
 
 test('LW1 census: a resident is a DFU townsperson drawn once - the climate\'s people for the billboard, one of the four outfits of their sex, the talk portrait PERSON_FACE_RECORDS[race][sex][outfit] + 0..23, the region\'s name bank; the watch rides GUARD_TEXTURE, male, outfit 0; the armed carry their job\'s class; ids are the town\'s and the slot\'s; the same for every reader and DFRandom\'s stream put back as it stood (mutants: a re-roll per call, the guard\'s sex, the face law, the stream left moved)', () => {
@@ -59,7 +59,7 @@ test('LW1 census: a resident is a DFU townsperson drawn once - the climate\'s pe
   assert.deepEqual(roster.map((r) => `${r.id}:${r.job}`), ['L777.t0:merchant', 'L777.t1:merchant', 'L777.t2:merchant', 'L777.t3:mercenary', 'L777.t4:mercenary',
     'L777.t5:adventurer', 'L777.t6:adventurer', 'L777.t7:sailor', 'L777.t8:sailor', 'L777.t9:sailor', 'L777.t10:pilgrim', 'L777.t11:pilgrim', 'L777.t12:courier',
     'L777.t13:pedlar', 'L777.t14:pedlar', 'L777.t15:pedlar',
-    'L777.t16:pedlar', 'L777.t17:pedlar', 'L777.t18:pilgrim', 'L777.t19:courier']);     // LW9:
+    'L777.t16:pedlar', 'L777.t17:pedlar', 'L777.t18:pilgrim', 'L777.t19:courier']);   // LW9:
   assert.deepEqual(travellerRoster(town).map((r) => r.name), roster.map((r) => r.name), 'the same people for every reader');
   assert.notDeepEqual(travellerRoster({ ...town, mapId: 778 }).map((r) => r.name), roster.map((r) => r.name), 'another town, other people');
   for (const r of roster) {
@@ -315,7 +315,7 @@ test('LW1 favourites: a resident keeps to the same two social spots, tavern, tem
 test('LW1 meetings: the residents at a spot for the WHOLE of a round pair off in an order drawn from the spot, the round and their ids - two by two, the odd three together, one alone none; a circle\'s script (LW-TALK: an exchange\'s, lwtalk_town.test.js) a line every CREW_LINE_S of the clock, its opener first, then the other, then quiet; the circles stand about the spot, CIRCLE_APART apart, facing in (mutants: a late arrival counted, the trio, the beat, the speaker\'s turn)', () => {
   const who = (i, job = 'keeper') => ({ id: `L1.${i}`, name: `Name${i} Sur`, job });
   const roundMin = ROUND_S * 0.2;
-  const { start, end } = spotRound('sq', 1000 * roundMin, roundMin);     // LW-TALK:
+  const { start, end } = spotRound('sq', 1000 * roundMin, roundMin);   // LW-TALK:
   const t = start + 1;
   const present = [0, 1, 2, 3, 4].map((i) => ({ who: who(i), t0: start - 5, t1: end + 2 * roundMin }));
   present.push({ who: who(9), t0: start + 1, t1: end + 2 * roundMin });   // came mid-round: waits for the next
@@ -368,7 +368,7 @@ test('LW1 lines: a token is filled from where and when it is said and a missing 
 test('LW1 regards: a stranger reads 0; a word counts once a day, a blow and a crime cost, help and a life saved earn; friend at FRIEND_AT, enemy at ENEMY_AT, hostile at HOSTILE_AT; a regard eases toward zero EASE_PER_DAY a day unseen and never across it; the save\'s record round-trips and a bad one reads as nobody known; the vendor is LivingWorld (mutants: talk counted twice, the ease crossing zero, a bad record kept)', () => {
   assert.equal(LIVING_WORLD_VENDOR, 'LivingWorld');
   assert.deepEqual([FRIEND_AT, ENEMY_AT, HOSTILE_AT, EASE_PER_DAY], [40, -40, -70, 0.5]);
-  assert.deepEqual(EVENTS, { talk: 3, polite: 1, gift: 8, helped: 20, saved: 35, struck: -45, crime: -15, slain: -75, insulted: -6, poached: -4, compliment: 2, embrace: 3, kiss: 4 });     // LW7: one of their own slain turns them hostile
+  assert.deepEqual(EVENTS, { talk: 3, polite: 1, gift: 8, helped: 20, saved: 35, struck: -45, crime: -15, slain: -75, insulted: -6, poached: -4, compliment: 2, embrace: 3, kiss: 4 });   // LW7: one of their own slain turns them hostile
   const rel = createRelations();
   assert.equal(rel.regard('L1.0', 10), 0);
   assert.equal(rel.known('L1.0'), false);

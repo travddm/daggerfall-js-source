@@ -97,7 +97,7 @@ test('ELITE: loot - +20% item drop chance and +20% rarity odds, caps unchanged',
   const dc = await src(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
   assert.equal((dc.match(/spawnEnemyLoot\(entity, e\.mobileType, basics, D\.playerEntity, \{ \.\.\.eliteLootOpts\(e\), where: 'dungeon' \}\)/g) ?? []).length, 2, 'both foe branches');
   assert.match(dc, /itemChanceScale: ELITE_LOOT_DROP_MULT/, 'the treasure piles drop more');
-  assert.match(dc, /qualityMult: _superTier \? SUPER_LOOT_QUALITY_MULT : elite \? ELITE_LOOT_QUALITY_MULT : 1/, 'and roll better');     // SD4a (
+  assert.match(dc, /qualityMult: _superTier \? SUPER_LOOT_QUALITY_MULT : elite \? ELITE_LOOT_QUALITY_MULT : 1/, 'and roll better');   // SD4a (
   const hc = await src(new URL('../../src/scenes/hostCombat.js', import.meta.url), 'utf8');
   assert.match(hc, /\* lootDropMult;/);
   assert.match(hc, /qualityMult: lootQualityMult/);

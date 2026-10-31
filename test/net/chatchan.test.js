@@ -447,7 +447,7 @@ test('CHAT-CHAN panel: each tab says who it reaches (and the region\'s name), th
   assert.equal(tabs[1].title, `Wayrest - ${CHAT_TABS[1].hint}`);
   assert.equal(input.placeholder, 'Say something - Wayrest', 'the place a moving channel is');
   log.select('world');
-  assert.equal(tabs[5].style.display, 'none', 'CHAT-P: the Party tab is off the bar outside a party');     // CHAT-LANG: the Language tab stands before it; CHAT-TRADE: and the Trade and LFG tabs (
+  assert.equal(tabs[5].style.display, 'none', 'CHAT-P: the Party tab is off the bar outside a party');   // CHAT-LANG: the Language tab stands before it; CHAT-TRADE: and the Trade and LFG tabs (
   log.setShown('party', true);
   panel.render({});
   assert.equal(tabs[5].style.display, '', 'and on it inside one');

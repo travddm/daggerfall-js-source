@@ -229,7 +229,7 @@ test('SD6c THE SET: stood once - the hall, a hand on each dial, the bridge hidde
   assert.equal(r.draws.length, STOOD, 'the hall, six hands, six gears, six bezels, the banners, six rings, the hub, the flash, the band, the plates, the bridge');
   const bridge = r.draws[r.draws.length - 1];
   assert.ok(bridge.object.matrix.every((v) => v === 0) && bridge.hidden === true, 'the bridge hidden');   // AUDIT SD II (L2 F11): and says so - no draw
-  assert.deepEqual(r.floors, [['sd:hall', hallFloorTris().length + hallSolidTris().length]]);     // AUDIT SD II (L2 F2
+  assert.deepEqual(r.floors, [['sd:hall', hallFloorTris().length + hallSolidTris().length]]);   // AUDIT SD II (L2 F2
   // the first word: where the stones ARE
   const st0 = [3, 11, 5, 0, 7, 9];
   r.hall.frame(0.016, atStone(0), { k: 'pz', s: 1, st: st0, f: 4, lit: 2, ok: false });
@@ -336,16 +336,16 @@ function worldHall({ slot = 4, at = [0, 0, SD_ORRERY.z], health = 80, max = 100 
   const env = {
     modes: { sdRealmSlot: () => slot }, player: { pos: realmToDungeon(...at) }, playerEntity,
     hurtPlayer: (e, n, o) => { log.push(['hurt', n, !!o?.bypassShield]); e.health -= n; }, flashPlayerDamage: (n) => log.push(['flash', n]),
-    setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), sdDungeonToRealm: dungeonToRealm, inOrreryHall, SD_FRAY_LASH, SD_HALL_TEXT,     // AUDIT SD II (SD11d
+    setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), sdDungeonToRealm: dungeonToRealm, inOrreryHall, SD_FRAY_LASH, SD_HALL_TEXT,   // AUDIT SD II (SD11d
     sdHallNamed, sdSnapLine, peerName: (id) => ({ 'peer-x': 'Xan' })[id] ?? null,
-    online: { id: 'peer-me' }, SD_TURN_WAIT_LINE: 'wait',     // AUDIT SD II (
+    online: { id: 'peer-me' }, SD_TURN_WAIT_LINE: 'wait',   // AUDIT SD II (
   };
   const body = `let _sdHall = null;\n${fn('sdHallHeard')}\n${line(/ {2}const sdHallWord = [^\n]*\n/)}${line(/ {2}const sdConcordHere = [^\n]*\n/)}return { sdHallHeard, sdHallWord, sdConcordHere };`;
   return { ...new Function(...Object.keys(env), body)(...Object.values(env)), log, playerEntity };
 }
 
 test('SD6c the world host\'s hall, run from its own text: the realm\'s word kept for the realm I stand in; the snap lashes me in the hall a quarter of my health, no shield taking it, and says so; outside the hall it only says so; the Concord widens the edge (mutants: the lash on everyone; the lash shielded; another realm\'s word taken)', () => {
-  const word = { k: 'pz', s: 4, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 1, ok: false, i: 0, a: 1, id: 'peer-x', q: 9, x: 1, ls: ['peer-me'] };     // AUDIT SD II (
+  const word = { k: 'pz', s: 4, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 1, ok: false, i: 0, a: 1, id: 'peer-x', q: 9, x: 1, ls: ['peer-me'] };   // AUDIT SD II (
   const inHall = worldHall();
   inHall.sdHallHeard(word);
   assert.deepEqual(inHall.log, [['hurt', 25, true], ['flash', 25], ['said', SD_HALL_TEXT.snapLashes(SD_HALL_TEXT.you, 0)]]);

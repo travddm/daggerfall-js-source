@@ -440,7 +440,7 @@ test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a rev
   const guilds = tutorialById('guilds');
   assert.deepEqual([guilds.title, guilds.trigger, guilds.body], ['Guilds', 'When you first visit a guild.',
     ['Join a guild for its services and its work. Do that work and practice the skills it teaches to rise in rank.', 'You may join one temple, one knightly order, and as many guilds as will have you.']]);
-  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);     // VOICE1 (
+  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);   // VOICE1 (
   const ch = tutorialById('chapters');
   assert.deepEqual([ch.group, ch.title], ['online', 'Guild Chapters']);
   assert.deepEqual(ch.body, ['Online, quests raise your standing with each guild by at most 15 a real day (days start at midnight UTC). Any more is added on later days.',

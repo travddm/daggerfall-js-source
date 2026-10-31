@@ -581,7 +581,7 @@ export const FEATURES = Object.freeze([
     control: Object.freeze({
       store: 'prefs', key: 'enhancedLighting', initial: true, online: 'player',
       also: Object.freeze([Object.freeze({ store: 'prefs', key: 'steadyShadows', initial: true, online: 'player' }), Object.freeze({ store: 'prefs', key: 'shadowDebug', initial: false, online: 'player' }), Object.freeze({ store: 'prefs', key: 'calmEye', initial: false, online: 'player' })]),   // FLICKER-FIX: shadowDebug prints the console log (render/shadowPass.js _debugLog); STEADY-BALANCE: calmEye, the slow eye on its own chip
-      parts: Object.freeze([Object.freeze({ key: 'enhancedLighting', label: 'Lighting' }), Object.freeze({ key: 'steadyShadows', label: 'Steady shadows' }), Object.freeze({ key: 'calmEye', label: 'Calmer eye' }), Object.freeze({ key: 'shadowDebug', label: 'Shadow debug log' })]),     // CACHE-COPY: CACHE-OFF's "Shadow cache (faster, may flicker)" part is gone - the cache is on, and its blink was its copy's, a draw now (render/shadowPass.js _blitSlot)
+      parts: Object.freeze([Object.freeze({ key: 'enhancedLighting', label: 'Lighting' }), Object.freeze({ key: 'steadyShadows', label: 'Steady shadows' }), Object.freeze({ key: 'calmEye', label: 'Calmer eye' }), Object.freeze({ key: 'shadowDebug', label: 'Shadow debug log' })]),   // CACHE-COPY: CACHE-OFF's "Shadow cache (faster, may flicker)" part is gone - the cache is on, and its blink was its copy's, a draw now (render/shadowPass.js _blitSlot)
     }),
   }),
   // IIL1-T: Improved Interior
@@ -617,7 +617,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.grass.effect', 'The amount takes effect when the world next loads; the style at once.'); },
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'grassDensity', initial: 1, online: 'player', tiers: Object.freeze([tier(1, () => t('features.grass.full', 'Full')), tier(0.5, () => t('features.grass.half', 'Half')), tier(0.25, () => t('features.grass.quarter', 'Quarter')), tier(0, OFF)]),     // PERF1: a fraction of the lab's 1.2 million blades; a dial, the player's online; GRASS-ON: Full by default again, where AUDIT MEADOW1 had it Off
+      store: 'prefs', key: 'grassDensity', initial: 1, online: 'player', tiers: Object.freeze([tier(1, () => t('features.grass.full', 'Full')), tier(0.5, () => t('features.grass.half', 'Half')), tier(0.25, () => t('features.grass.quarter', 'Quarter')), tier(0, OFF)]),   // PERF1: a fraction of the lab's 1.2 million blades; a dial, the player's online; GRASS-ON: Full by default again, where AUDIT MEADOW1 had it Off
       also: Object.freeze([Object.freeze({ store: 'prefs', key: 'grassStyle', initial: 'meadow', online: 'player' })]),   // GRASS-PX: a uniform in the one grass program, so it flips live; MEADOW1: the meadow the default
       parts: Object.freeze([Object.freeze({ key: 'grassStyle', get label() { return t('features.grass.style', 'Style'); },
         tiers: Object.freeze([tier('meadow', () => t('features.grass.style.meadow', 'Meadow')), tier('pixel', () => t('features.grass.style.pixel', 'Pixel')), tier('smooth', () => t('features.grass.style.smooth', 'Smooth'))]) })]),
@@ -824,7 +824,7 @@ export const FEATURES = Object.freeze([
       + 'indoors, a coin clink in the enhanced inventory, hands and boots on stone when you climb, the tools when you '
       + 'gather, a horse that snorts and breathes, its hooves changing with the ground, the sea under a deck with its '
       + 'bells and its own music at the helm, surf on the shore, the wild by region and hour, and a town\'s street, '
-      + 'smithies and taverns.'); },     // AUDIT SOUNDSCAPE P1: under FT15's 450 - the rest is 's
+      + 'smithies and taverns.'); },   // AUDIT SOUNDSCAPE P1: under FT15's 450 - the rest is 's
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'soundEnhancements', initial: true, online: 'player' }),   // ES1: systems/enhancedSounds.js enhancedSoundsOn; windAudio.js windSoundOn rides it

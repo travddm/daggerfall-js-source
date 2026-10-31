@@ -60,7 +60,7 @@ test('PREF1: a value equal to the default is NOT written - the shelf holds overr
   assert.equal(shelf().lootRarity, undefined, 'no default rides along');
   // the pure half
   assert.deepEqual(P.overridesOf({ ...P.PREF_DEFAULTS, skin: 'classic', open: { 'a:b': true } }),
-    { skin: 'classic', open: { 'a:b': true }, _rev: 2 });     // HB-LYCFREE: rev 2 (
+    { skin: 'classic', open: { 'a:b': true }, _rev: 2 });   // HB-LYCFREE: rev 2 (
 });
 
 test('PREF1: reading is unchanged - an override beats the default, and a stored false beats a true default', () => {
@@ -91,7 +91,7 @@ test('PREF1: an UNSTAMPED shelf adopts the new default once - and never again', 
   assert.equal(P.getPref('worldDungeonSizes'), true, 'and a key the port did NOT change its mind about is left alone');
 
   P.setPref('showFps', false);                       // any save stamps the shelf
-  assert.equal(shelf()._rev, 2, 'the shelf is stamped');     // HB-LYCFREE: rev 2 (
+  assert.equal(shelf()._rev, 2, 'the shelf is stamped');   // HB-LYCFREE: rev 2 (
   P.setPref('lootRarity', false);                    // NOW the player really chooses
   reload();
   assert.equal(P.getPref('lootRarity'), false, 'the adoption does not run a second time over a real choice');

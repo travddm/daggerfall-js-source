@@ -203,7 +203,7 @@ test('PROF5b tab: Auctions - each Masterwork\'s standing bid, bids and end, wher
   buttons().find((b) => b.getAttribute('data-kind') === 'auction').onclick();
   const tiles = () => [...root.querySelectorAll('.packpick')[0].querySelectorAll('button')];
   assert.deepEqual(tiles().map((b) => b.querySelectorAll('.packpick-name')[0].textContent), ['Silverthorn\'s Mithril Longsword']);
-  assert.match(text(), new RegExp(`Runs ${AUCTION_S / 3600} hours on every board; each bid beats the last by 5%, and a bid in the last 2 minutes adds 2 minutes\\.`));     // AUDIT 657 B9 (
+  assert.match(text(), new RegExp(`Runs ${AUCTION_S / 3600} hours on every board; each bid beats the last by 5%, and a bid in the last 2 minutes adds 2 minutes\\.`));   // AUDIT 657 B9 (
   assert.equal(buttons().find((b) => b.textContent === 'List').disabled, true, 'nothing chosen yet');
   tiles()[0].onclick();
   await buttons().find((b) => b.textContent === 'List').onclick();

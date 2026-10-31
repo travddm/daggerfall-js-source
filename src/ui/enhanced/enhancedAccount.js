@@ -545,7 +545,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   /** PATREON-LINK: BACK FROM THE BROWSER, the account is read again - a link that landed, or a pledge that moved, is on
    *  the card the player comes back to. One listener a card, gone on the first focus after the card is. */
   const win = doc.defaultView;
-  let off = () => {};     // MEM-AUDIT: the card's owner lets it go when it draws the next - a repaint makes a card a render
+  let off = () => {};   // MEM-AUDIT: the card's owner lets it go when it draws the next - a repaint makes a card a render
   if (win && typeof win.addEventListener === 'function') {
     const onFocus = () => {
       if (!root.isConnected) { win.removeEventListener('focus', onFocus); return; }

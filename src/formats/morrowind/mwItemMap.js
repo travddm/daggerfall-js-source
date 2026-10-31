@@ -564,7 +564,7 @@ export function dfWornEquipment(slots, EQUIP_SLOTS, ARMOR_ENUM_) {
 export function dfWornArmor(slots, EQUIP_SLOTS, ARMOR_ENUM) {
   const worn = [];
   const take = (piece) => {
-    const item = drawnPiece(piece);     // APPEARANCES: a piece wearing a look dresses the body as the look - the player's and every peer's
+    const item = drawnPiece(piece);   // APPEARANCES: a piece wearing a look dresses the body as the look - the player's and every peer's
     if (item && typeof item.templateIndex === 'number' && armorRowOf(item.templateIndex)) {   // MW-ASSIGN: a mod's pieces are worn too
       worn.push({ templateIndex: item.templateIndex, material: item.material ?? 0 });
     }

@@ -37,8 +37,8 @@ test('SD5a the frame: the Threshold at the made block\'s middle, the walk, the O
   assert.deepEqual(SD_ORRERY, { x: 0, z: 42, r: 18 });
   assert.equal(SD_ORRERY.z - SD_ORRERY.r, 24, 'z 24');
   assert.equal(SD_ORRERY.z + SD_ORRERY.r, 60, 'to z 60');
-  assert.deepEqual(SD_STEPS, { z0: 60, z1: 220 });     // SD7a (
-  assert.deepEqual(SD_ARENA, { x: 0, z: 246, r: 26 });     // SD7a (
+  assert.deepEqual(SD_STEPS, { z0: 60, z1: 220 });   // SD7a (
+  assert.deepEqual(SD_ARENA, { x: 0, z: 246, r: 26 });   // SD7a (
   assert.ok(SD_ARENA.z - SD_ARENA.r >= SD_STEPS.z1 && SD_ARENA.z + SD_ARENA.r <= 272, 'the arena within z 220-272');
   assert.ok(SD_WALK.z0 < SD_THRESHOLD.r && SD_WALK.z1 > SD_ORRERY.z - SD_ORRERY.r, 'the walk reaches into both floors');
   assert.deepEqual(realmToDungeon(1, 2, 3), [26.6, 2, 28.6]);
@@ -89,7 +89,7 @@ test('SD5a the empty block: its start marker on the Threshold a step ahead of it
 test('SD5a the Hour\'s mesh: its five records and its lamps\' glow, of its own archive, 32-bit indices; the floors\' tops at y 0, the dial over the Orrery\'s hall, the arena\'s plates over the arena, the pillars standing, the islands\' lips under their rims and the roots hanging into the void (mutants: the dial off the hall; no lip)', () => {
   const m = buildRealmModel();
   assert.ok(m.indices instanceof Uint32Array, 'the renderer\'s one index type (WBX1)');
-  assert.deepEqual(m.subMeshes.map((s) => s.textureRecord), [SD_REALM_FLOOR_RECORD, SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD, SD_REALM_DIAL_RECORD, SD_REALM_ARENA_RECORD, SD_HALL_GLOW_RECORD.brass, SD_REALM_COBBLE_RECORD, SD_REALM_EDGE_RECORD, SD_REALM_PILLAR_RECORD]);     // AUDIT SD II (L2 F14
+  assert.deepEqual(m.subMeshes.map((s) => s.textureRecord), [SD_REALM_FLOOR_RECORD, SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD, SD_REALM_DIAL_RECORD, SD_REALM_ARENA_RECORD, SD_HALL_GLOW_RECORD.brass, SD_REALM_COBBLE_RECORD, SD_REALM_EDGE_RECORD, SD_REALM_PILLAR_RECORD]);   // AUDIT SD II (L2 F14
   assert.ok(m.subMeshes.every((s) => s.textureArchive === SD_REALM_ARCHIVE && s.primitiveCount > 0));
   assert.ok(m.positions.every(Number.isFinite) && m.normals.every(Number.isFinite) && m.uvs.every(Number.isFinite));
   const verts = (rec) => { const s = m.subMeshes.find((x) => x.textureRecord === rec); const out = []; for (let i = s.startIndex; i < s.startIndex + s.primitiveCount * 3; i++) out.push(dungeonToRealm(m.positions[i * 3], m.positions[i * 3 + 1], m.positions[i * 3 + 2])); return out; };
@@ -166,9 +166,9 @@ test('SD5a the lamps and the light: the Threshold\'s four and the hall\'s and th
 
 test('SD5a the art: five textures made in code, the same every boot - the floor, brass, the roots, the Hour-dial over the whole hall and the arena\'s cracked brass; brass glows a little of its own (mutants: the dial\'s twelfth unlit)', () => {
   const art = realmArt();
-  assert.deepEqual(art.map(([r]) => r), [0, 1, 2, 3, 4, 31, 32, 56, 80, 81]);     // SD-LOOK (
+  assert.deepEqual(art.map(([r]) => r), [0, 1, 2, 3, 4, 31, 32, 56, 80, 81]);   // SD-LOOK (
   for (const [r, a] of art) {
-    const S = r === 3 ? SD_DIAL_SIZE : r === 32 ? 8 : r === 81 ? 32 : SD_ART_SIZE, H = r === 2 ? SD_ROOT_ART_H : S;     // SD-LOOK (
+    const S = r === 3 ? SD_DIAL_SIZE : r === 32 ? 8 : r === 81 ? 32 : SD_ART_SIZE, H = r === 2 ? SD_ROOT_ART_H : S;   // SD-LOOK (
     assert.equal(a.albedo.width, S); assert.equal(a.emission.width, S);
     assert.equal(a.albedo.colors.length, S * H * 4);
   }
@@ -202,11 +202,11 @@ test('SD5a the dungeon host by source: the Hour\'s refusals beside the court\'s 
   assert.match(D, /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}/);
   assert.match(D, /savingPrevented: \(\) => madeLevelRule\(_made, 'save'\) === 'refused' \|\| isArenaFloor\(dfLocation\),/);
   for (const [rule, word] of [['automap', SD_REALM_TEXT.noMap], ['rest', SD_REALM_TEXT.noRest], ['save', SD_REALM_TEXT.noSave]]) assert.deepEqual([madeLevelRule('hour', rule), madeLevelSays('hour', rule)], [rule === 'automap' ? 'off' : 'refused', word], rule);
-  assert.match(D, /if \(!isGateArena\(dfLocation\) && !isArenaFloor\(dfLocation\) && !_sdRealm(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/);     // EG-ROAR (
+  assert.match(D, /if \(!isGateArena\(dfLocation\) && !isArenaFloor\(dfLocation\) && !_sdRealm(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/);   // EG-ROAR (
   assert.match(D, /let automapRec = madeLevelRule\(_made, 'automap'\) === 'off' \|\| isArenaFloor\(dfLocation\) \? detachedAutomapRecord\(\)/);
   assert.match(D, /cold: _superTier \|\| _sdRealm,/);
-  assert.match(D, /: _sdRealm \? createSdEnd\(\{ renderer, audio, riftTo: SD_REALM_TEXT\.wayBack, onRift: \(\) => opts\.sdWayBack\?\.\(\), onReturn: \(\) => opts\.sdWayHome\?\.\(\), retTitle: SD_HOME_TEXT\.title, retTo: SD_HOME_TEXT\.to, clock: sdEndClock \}\) : null;/);     // SD10: and its way home (
-  assert.match(D, /if \(_sdRealm\) \{ sdEnd\.stand\(\{ rift: \{ at: realmToDungeon\(0, 0, SD_WAY_BACK_Z\), size: SD_WAY_BACK_SIZE \}, retAt: null, dynamicDraws, hollow: true, probe: SD_THRESHOLD_RIM \}\); return; \}/);     // SD-LOOK S6 (
+  assert.match(D, /: _sdRealm \? createSdEnd\(\{ renderer, audio, riftTo: SD_REALM_TEXT\.wayBack, onRift: \(\) => opts\.sdWayBack\?\.\(\), onReturn: \(\) => opts\.sdWayHome\?\.\(\), retTitle: SD_HOME_TEXT\.title, retTo: SD_HOME_TEXT\.to, clock: sdEndClock \}\) : null;/);   // SD10: and its way home (
+  assert.match(D, /if \(_sdRealm\) \{ sdEnd\.stand\(\{ rift: \{ at: realmToDungeon\(0, 0, SD_WAY_BACK_Z\), size: SD_WAY_BACK_SIZE \}, retAt: null, dynamicDraws, hollow: true, probe: SD_THRESHOLD_RIM \}\); return; \}/);   // SD-LOOK S6 (
   assert.match(D, /sdRiftLanding\(\) \{\n\s+if \(!_superTier \|\| !sdEnd\) return null;\n\s+if \(!_sdEndAsked\) \{ _sdEndAsked = true; standSdEnd\(\); \}\n\s+return _sdLanding \? \[_sdLanding\[0\], _sdLanding\[1\], _sdLanding\[2\]\] : null;/);
   assert.ok(SD_WAY_BACK_Z < 0 && Math.abs(SD_WAY_BACK_Z) < SD_THRESHOLD.r && SD_WAY_BACK_SIZE < 2 * SD_THRESHOLD.r, 'at the Threshold\'s back, on it');
   assert.deepEqual(SD_REALM_TEXT, {
@@ -214,7 +214,7 @@ test('SD5a the dungeon host by source: the Hour\'s refusals beside the court\'s 
     noMap: 'You cannot map the Shattered Hour.', noMark: 'You cannot set a Mark in the Shattered Hour.',
     noRecall: 'Nothing answers a Recall in the Shattered Hour.', lost: 'The way to the Shattered Hour is lost.',
     died: 'The Shattered Hour casts you out. You wake before the Abyss Dungeon\'s door.',   // PIN MOVED (SD-BACK, 2026-10-28): no longer for good - its Rift takes you back to your own Hour; AUDIT SD II (L6 F4, PIN MOVED): a death in the Hour is the Hour's; SD-ONELIFE (PIN MOVED): and final; AUDIT SD III (T15, PIN MOVED): the player's word for it, Abyss Dungeon
-    noCompanions: 'Your companions cannot follow you through the Rift.',     // SD-ALONE (
+    noCompanions: 'Your companions cannot follow you through the Rift.',   // SD-ALONE (
   });
 });
 
@@ -224,13 +224,13 @@ test('SD5a the mode machine by source: into the Hour from the open world (its ma
   assert.match(W, /const hit = \{ dfLocation, blocksFile: sdRealmBlocks\(blocks\), sdRealm: r\.s, sdHollow: r\.hollow \?\? null, [^\n]*group: sdRoomKey\(r\.s, r\.owner\), door: null, dfBlock: null, recordIndex: -1 \};\n\s+return gatedTransition\(\(live\) => dungeonTransition\(hit, \[\], true, live\)\);/);
   assert.equal(sdRoomKey(7, '0123456789abcdef'), 'sd:7.0123456789abcdef');
   assert.match(W, /if \(hit\.gateArena\) gateStand\.standCourt\(ctx, hit\.gateArena\.day\);[^\n]*\n\s+if \(hit\.sdRealm != null\) standSdRealm\(ctx\);/);   // WB14b: the court stood by scenes/gate/gateStand.js, its night's
-  assert.match(W, /for \(const \[rec, art\] of realmArt\(\)\) \{ renderer\.uploadTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.albedo\); renderer\.uploadEmissionTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.emission, \{ white: true \}\); \}[^\n]*\n\s+_realmMesh = renderer\.createMesh\(buildRealmModel\(\)\);/);     // AUDIT SD II (L2 F3
+  assert.match(W, /for \(const \[rec, art\] of realmArt\(\)\) \{ renderer\.uploadTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.albedo\); renderer\.uploadEmissionTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.emission, \{ white: true \}\); \}[^\n]*\n\s+_realmMesh = renderer\.createMesh\(buildRealmModel\(\)\);/);   // AUDIT SD II (L2 F3
   assert.match(W, /ctx\.collider\.addMesh\(REALM_BUCKET, tris, idx, identity\(\)\);/);
   assert.match(W, /sdHollow: hit\.sdHollow \?\? null,/);
-  assert.match(W, /dungeonEntranceLanding\(dungeonReturn\.sdHollow \? host\.sdHollowDoors\?\.\(dungeonReturn\.sdHollow\) \?\? \[\] : dungeonReturn\.candidates\.map\(\(e\) => e\.door\)\) \?\? dungeonReturn\.from \?\? null\);/);     // SD-LAND (
+  assert.match(W, /dungeonEntranceLanding\(dungeonReturn\.sdHollow \? host\.sdHollowDoors\?\.\(dungeonReturn\.sdHollow\) \?\? \[\] : dungeonReturn\.candidates\.map\(\(e\) => e\.door\)\) \?\? dungeonReturn\.from \?\? null\);/);   // SD-LAND (
   assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ const _rl = realmLighting\(\); const _rt = dungeonTrilight\(!!renderer\.lightingLane, _rl\.tri, _hourTri\); renderer\.setLighting\(courtEquatorOf\(_rt\), 0, undefined, _rt\); renderer\.setMoonlight\(_rl\.key\); \}/);
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ applyFog\(renderer, dungeonFog\(!!renderer\.lightingLane, SD_REALM_FOG, _hourFog\), _hourFogColor\); renderer\.setSceneGrade\?\.\(SD_HOUR_GRADE\); \}/);     // SD-LOOK (
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ const _hour = realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\); renderer\.setPointLights\(_hour\.data, null, _hour\.colors\); \}/);     // SD9e: the spoils' light before the lamps, as the court's (
+  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ applyFog\(renderer, dungeonFog\(!!renderer\.lightingLane, SD_REALM_FOG, _hourFog\), _hourFogColor\); renderer\.setSceneGrade\?\.\(SD_HOUR_GRADE\); \}/);   // SD-LOOK (
+  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ const _hour = realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\); renderer\.setPointLights\(_hour\.data, null, _hour\.colors\); \}/);   // SD9e: the spoils' light before the lamps, as the court's (
   assert.match(W, /isGateArena\(dungeonLoc\) \? \{ kind: 'gate', day: dungeonLoc\.gate \} : isSdRealm\(dungeonLoc\) \? \{ kind: 'sd', s: dungeonLoc\.sdRealm, o: dungeonLoc\.sdOwner \} :/);
   assert.match(W, /sdRealmSlot: \(\) => \(mode === 'dungeon' && isSdRealm\(dungeonLoc\) \? dungeonLoc\.sdRealm : null\),/);
   assert.match(W, /\n\s+enterSdRealm,[^\n]*\n\s+stepThroughFire,/);
@@ -254,12 +254,12 @@ function worldSteps({ hollow = { s: 7, key: HOLLOW.key, site: { px: 303, py: 202
   };
   const sdHost = { hollow: () => hollow };
   const env = {
-    sdHost, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, SD_REALM_TEXT, isSdRealm, _sdEntered: new Set(), _sdFallen: new Set(),     // AUDIT SD: the slots gone through (
+    sdHost, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, SD_REALM_TEXT, isSdRealm, _sdEntered: new Set(), _sdFallen: new Set(),   // AUDIT SD: the slots gone through (
     sdRiftOf: () => ({ word }), setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async (x, y) => log.push(['pixel', x, y]),
-    sdSay: (t) => log.push(['said', t]),     // AUDIT SD II (SD11d
+    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d
     sdVeilCentre: () => null,   // SD-LOOK S5: where the Hour's veil closes (the screen's middle here)
-    standBeforeHollowDoor: (k) => { log.push(['door', k]); return true; },     // AUDIT SD IV (F40
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },     // SD-PARTY (
+    standBeforeHollowDoor: (k) => { log.push(['door', k]); return true; },   // AUDIT SD IV (F40
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (
   };
   const body = `${fn('sdEnterRealm')}\n${fn('sdWayBack')}\nreturn { sdEnterRealm, sdWayBack };`;
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -271,7 +271,7 @@ test('SD5a the world host\'s steps, run from its own text: through the Rift - un
   assert.equal(a.sdEnterRealm(7), true);
   assert.deepEqual(a.log, [], 'nothing before the veil has closed');
   assert.equal(await a.run(), true);
-  assert.deepEqual(a.log, ['out', ['pixel', 303, 202], ['door', HOLLOW.key], ['realm', 7, HOLLOW.key, 'Daggerfall']]);     // AUDIT SD IV (F40
+  assert.deepEqual(a.log, ['out', ['pixel', 303, 202], ['door', HOLLOW.key], ['realm', 7, HOLLOW.key, 'Daggerfall']]);   // AUDIT SD IV (F40
   assert.equal(worldSteps().sdEnterRealm(8), false, 'another slot\'s Rift is no door of this Hollow\'s');
   const shut = worldSteps({ word: SD_NO_CLOSED });
   shut.sdEnterRealm(7);
@@ -302,17 +302,17 @@ test('SD5a the world host by source: the Rift\'s door; the doors out of the Hour
   const w = read('src/scenes/world.js');
   assert.match(w, /enter: \(\) => sdEnterRealm\(s\) \};/);
   assert.match(w, /sdWayBack: \(\) => sdWayBack\(\),/);
-  assert.match(w, /const sdHollowDoorsOf = \(h\) => buildingDoors\.filter\(\(d\) => d\.pixelKey === h\?\.key && d\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\)\.map\(shiftedDoor\);/);     // AUDIT SD IV (F40
-  assert.match(w, /sdHollowDoors: \(h\) => sdHollowDoorsOf\(h\),/);     // SD-SKY (
+  assert.match(w, /const sdHollowDoorsOf = \(h\) => buildingDoors\.filter\(\(d\) => d\.pixelKey === h\?\.key && d\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\)\.map\(shiftedDoor\);/);   // AUDIT SD IV (F40
+  assert.match(w, /sdHollowDoors: \(h\) => sdHollowDoorsOf\(h\),/);   // SD-SKY (
   assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'sd'\) key = sdRoomKey\(modes\?\.roomIdentity\?\.\(\)\?\.s, modes\?\.roomIdentity\?\.\(\)\?\.o\);/);
-  assert.match(w, /if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);     // AUDIT SD II (SD11d
+  assert.match(w, /if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);   // AUDIT SD II (SD11d
   assert.match(w, /if \(madeRuleHere\('recall'\) === 'refused'\) \{ madeSay\('recall'\); return; \}/);
   assert.match(w, /function madeSay\(rule\) \{ const t = madeSaysHere\(rule\); if \(madeRuleHere\('says'\) === 'hour'\) sdSay\(t\); else setMidScreenText\(t\); \}/);
   assert.deepEqual([madeLevelRule('hour', 'says'), madeLevelRule('hour', 'mark'), madeLevelSays('hour', 'mark'), madeLevelRule('hour', 'recall'), madeLevelSays('hour', 'recall')], ['hour', 'refused', SD_REALM_TEXT.noMark, 'refused', SD_REALM_TEXT.noRecall]);
   assert.ok(w.indexOf("madeRuleHere('recall')") > w.indexOf('async function recallToAnchor()') && w.indexOf("madeRuleHere('recall')") < w.indexOf('const anchor = playerEntity.anchorPosition;'), 'before the anchor is read');
   assert.match(w, /\n\s+setCourtRules\(madeRuleHere\('regen'\) === 'held'\);/);
   assert.equal(madeLevelRule('hour', 'regen'), 'held');
-  assert.match(w, /if \(!player\.arena && modes\?\.sdRealmSlot\?\.\(\) != null\) player\.arena = sdArenaHeld\(\) \? _realmArenaHeld : sdConcordHere\(\) \? _realmArenaBridged : _realmArena;/);     // SD6c (
+  assert.match(w, /if \(!player\.arena && modes\?\.sdRealmSlot\?\.\(\) != null\) player\.arena = sdArenaHeld\(\) \? _realmArenaHeld : sdConcordHere\(\) \? _realmArenaBridged : _realmArena;/);   // SD6c (
   assert.match(w, /inside: \(loc\) => \(modes\?\.mode \?\? 'exterior'\) === 'dungeon' && \(modes\?\.dungeonLocation\?\.sdSlot === loc\?\.sdSlot \|\| modes\?\.dungeonLocation\?\.sdRealm === loc\?\.sdSlot\),/);
   // a room that will not have me: out before the Hollow's door with the relay's own words, once
   assert.match(w, /const sdFrame = \(\) => \{ try \{ sdHost\?\.frame\(\); \} catch \(e\) \{[^\n]*\} sdRealmFrame\(\); sdAloneFrame\(\); sdFightFrame\(\); sdBodyFrame\(\); sdVoiceFrame\(\); \};/);

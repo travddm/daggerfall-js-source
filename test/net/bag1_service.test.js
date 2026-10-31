@@ -285,7 +285,7 @@ test('BAG1 service (AUDIT2 S1): a carried harvest\'s row is kept thirty days, no
   const rowsOf = (carry) => Number(s.raw.prepare('SELECT COUNT(*) AS n FROM node_harvests WHERE player = ? AND carry = ?').get(mac.id, carry).n);
   try {
     Date.now = () => (NOON + 3 * DAY) * 1000;
-    await runCron(s.env, { cron: CRON_HOUR, nowS: NOON + 3 * DAY });     // the sweep
+    await runCron(s.env, { cron: CRON_HOUR, nowS: NOON + 3 * DAY });   // the sweep
     assert.deepEqual([rowsOf(1), rowsOf(0)], [1, 0], 'the Stores harvest swept, the carried one kept');
     const again = await s.call('/v1/prof/harvest', body, mac.secret);
     assert.deepEqual([again.body.repeat, again.body.carry, again.body.qty], [true, true, r.body.qty], 'asked again three days on: answered, so its items are minted');

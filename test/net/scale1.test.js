@@ -59,7 +59,7 @@ test('SCALE1 A: a session resolved within SESSION_TOUCH_S of its last touch writ
   // and the window starts again from the touch
   assert.ok(await resolveSession({ db, subtle, nowS: NOW + SESSION_TOUCH_S + 5 }, made.secret));
   assert.equal(tally.updates, 2);
-  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');     // SCALE4h (
+  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');   // SCALE4h (
 });
 
 test('SCALE1 A: a stale touch that fails never fails the request it rode in on (AUDIT-ACC F10, kept)', async () => {

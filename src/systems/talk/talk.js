@@ -300,7 +300,7 @@ export function getReactionToPlayer(faction, player) {
   const sgroup = faction.sgroup;
   if (sgroup >= 0 && sgroup < player.reactionMods.length) reaction += player.reactionMods[sgroup];
   if (sgroup >= 0 && sgroup < player.sGroupReputations.length) reaction += player.sGroupReputations[sgroup];
-  reaction += dressTempleBonus(faction, player);     // DRESS1: a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
+  reaction += dressTempleBonus(faction, player);   // DRESS1: a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
   return reaction;
 }
 

@@ -217,8 +217,8 @@ test('PROF2b the seams by source: the professions\' book sends a harvest\'s Watc
   assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);
   assert.match(w, /motherlodeBook\?\.tick\(\{ sense: profBook\.track\('mining'\)\.specs\?\.\[100\] === 'motherlode-sense' \}\)/);
   assert.match(w, /mineKind\(\{ book: profBook, lodes: motherlodeBook, marks: marksBook \}\)/);
-  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);     // AUDIT SILVER-WAYS D7 (
-  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);     // LODE-MARK (
+  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);   // AUDIT SILVER-WAYS D7 (
+  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);   // LODE-MARK (
   assert.match(src('src/scenes/gatherHost.js'), /restandAt\(px, py\) \{ restandAt\(px, py\); \},/);
   assert.doesNotMatch(src('src/ui/professions/profPages.js'), /PROF2b/, 'no card waits on the Motherlodes');
   for (const e of ['motherlode-closed', 'motherlode-watch', 'motherlode-found', 'motherlode-full']) assert.ok(REFUSALS[e], e);

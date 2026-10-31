@@ -483,7 +483,7 @@ function prune() {
 function trimLiving(keep) {
   const living = huntingRevenants();
   if (living.length > REVENANT_MAX) {
-    const drop = living.filter((x) => x !== keep && !x.out && !x.took?.length).sort((x, y) => x.rank - y.rank || x.born - y.born)[0];     // RVN8: never one holding a piece of mine   // AUDIT: never one standing in the world   // UNQUIET: never the Dread (AUDIT UNQUIET: not among those that hunt - `living` holds none)
+    const drop = living.filter((x) => x !== keep && !x.out && !x.took?.length).sort((x, y) => x.rank - y.rank || x.born - y.born)[0];   // RVN8: never one holding a piece of mine   // AUDIT: never one standing in the world   // UNQUIET: never the Dread (AUDIT UNQUIET: not among those that hunt - `living` holds none)
     if (drop) bury(drop);
   }
 }
@@ -503,7 +503,7 @@ export function revenantCandidate(entity, rec = null) {
   if (!entity || !revenantOn()) return false;
   if (revenantHeld()) return false;   // RENOWN-GATE: held - none made, none runs (a flight that could make no revenant would only rob a kill), no ledger kept
   if (entity.retinueOf != null) return false;   // RVN6 (Feud-Arc.md 17): a band's follower is its master's, never one itself
-  if (entity.wildFoe || entity.wildGiant) return false;     // PVPDUNGEONS
+  if (entity.wildFoe || entity.wildGiant) return false;   // PVPDUNGEONS
   if (entity.bout) return false;   // AUDIT ARENA-LADDER 2: a fighter on the sand is its bout's - an elite champion never flees it as a revenant, nor becomes one
   const special = !!entity.revenant || !!entity.eliteFoe || (typeof entity.champion === 'string' && !!entity.champion);
   if (!special) return false;
@@ -647,7 +647,7 @@ function armDeathCheck(entity) {
     _blowKiller = null;
     if (!(entity.health <= 0) || !killer || killer.isPlayer || !(killer.health > 0)) return;   // a foe I slew is no revenant - a fall after the fight names nobody dead
     const rec = playerDoor()?.foes?.()?.find((x) => x?.entity === killer) ?? null;
-    if (rec && (rec.yielded || rec.executing || rec.sparing)) return;     // AUDIT: a beaten one kneeling claims no kill
+    if (rec && (rec.yielded || rec.executing || rec.sparing)) return;   // AUDIT: a beaten one kneeling claims no kill
     clearPlayerHarm();   // answered: a second death (a Resurrect's, a fall) is not this foe's again
     revenantDeed(entity, killer, 'slew', { mobileType: rec?.mobileType ?? killer.mobileType, gender: rec?.gender ?? 'male', rec, archive: rec?.archive ?? rec?.mobileArchive ?? null });
   });

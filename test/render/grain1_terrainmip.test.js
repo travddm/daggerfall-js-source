@@ -141,7 +141,7 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   // the hosts: both call the re-apply at their world load, AFTER the tile-array guard
   for (const host of ['src/scenes/groundSets.js', 'src/scenes/exterior.js']) {
     const h = read(host);
-    const guard = Math.max(h.indexOf('if (!renderer.tileArrays.has(groundArchive)) {'), h.indexOf('if (!renderer.tileArrays.has(key)) {'));     // AUDIT PRECIP GROUND-2 (
+    const guard = Math.max(h.indexOf('if (!renderer.tileArrays.has(groundArchive)) {'), h.indexOf('if (!renderer.tileArrays.has(key)) {'));   // AUDIT PRECIP GROUND-2 (
     const apply = h.indexOf('renderer.applyGroundSharpness();', guard);
     assert.ok(guard > 0 && apply > guard && apply - guard < 1200, `${host}: the tier is re-applied right after the guard, cached or not`);
   }

@@ -423,7 +423,7 @@ test('CSA-K: the host - my place aboard rides my foes frame as `ab` (a changed w
   const scope = {
     online: { status: 'open', room: 'world:3,12', isHost: () => false, sendFoes: (f) => { sent.push(f); return true; } },
     isCellRoom: (r) => /^world:/.test(r), isWorldRoom: () => false, FOES_MS: 200, FOES_FULL_MS: 2000, _foesSentAt: -Infinity, _foesFullAt: -Infinity, modes: { mode: 'exterior' },
-    _foesQuiet: quietFoesGate(),     // SCALE2c (
+    _foesQuiet: quietFoesGate(),   // SCALE2c (
     exteriorFoes: { foesFrame: (full, force) => (full || force ? { n: 1, k: 'world:3,12', full: full ? 1 : 0, f: [] } : null) },
     _hccDirty: false, camps: { wireRecords: () => [] }, hcc: { wireRecord: () => null }, duelRingWord: () => {}, campToWire: (p) => p,
     portalWord: () => {},   // PORTAL1: no portal standing on this deck

@@ -291,7 +291,7 @@ test('ONE-SEAT, the host: the World link claims, the tab claims the browser\'s s
   assert.match(take, /online\?\.resume\(\);/);
   assert.match(take, /link\.resume\(\{ claim: room === SOCIAL_ROOM \}\);\n\s*if \(room\) link\.join\(channelLinkRoom\(room\)\);/, 'the hub\'s link claims the seat back (PIN MOVED, SCALE5c: a channel\'s link on its own shard)');
   assert.match(take, /seatLock\?\.claim\(\);/, 'and the browser\'s other tabs are told');
-  assert.match(w, /earning: \(\) => !!online && !seatOut\(\) && _renownCapHour !== renownHour\(\),/, 'a tab out of the seat earns no Renown');     // SCALE4h (
+  assert.match(w, /earning: \(\) => !!online && !seatOut\(\) && _renownCapHour !== renownHour\(\),/, 'a tab out of the seat earns no Renown');   // SCALE4h (
   assert.match(w, /here: seatOut\(\) \? \{ label: PLAY_HERE_LABEL, run: takeSeat \} : null,/, 'the way back, drawn');
   assert.match(w, /const chatRegionFrame = \(now\) => \{\n\s*if \(seatOut\(\)\) return;/, 'no region said while out');
   assert.ok(SEAT_NOTICE.includes(PLAY_HERE_LABEL) && SEAT_MID_TEXT.length < 60);

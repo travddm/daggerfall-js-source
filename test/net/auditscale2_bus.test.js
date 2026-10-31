@@ -455,8 +455,8 @@ test('AUDIT SCALE II D-7 D-8: the bus greets a ShardSocket once (a hello said ag
   assert.equal(H.HUB_WHO_MS, 15_000);
   assert.equal(H.HUB_FRAME_MAX, 64 * 1024);
   assert.equal(H.HUB_POLL_MS, 20_000);   // HUB-PULL
-  assert.equal(H.HUB_OUTBOX_MAX, 1024);     // HUB-PULL audit:
-  assert.equal(H.HUB_OUTBOX_BYTES, 2 * 1024 * 1024);     // HUB-PULL audit:
+  assert.equal(H.HUB_OUTBOX_MAX, 1024);   // HUB-PULL audit:
+  assert.equal(H.HUB_OUTBOX_BYTES, 2 * 1024 * 1024);   // HUB-PULL audit:
   assert.ok(H.HUB_OUTBOX_MAX * H.HUB_BATCH_MS >= H.HUB_POLL_MS + ROOM_CALL_MS, 'a delivery every batch, kept as long as a poll may be out');
   assert.ok(H.HUB_SHARDS * H.HUB_OUTBOX_BYTES <= 32 * 1024 * 1024, 'the bus\'s outboxes, every shard stalled, a quarter of 128 MB at most');
   await world(async ({ bus, link, settle }) => {

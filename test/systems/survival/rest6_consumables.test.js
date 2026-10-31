@@ -51,7 +51,7 @@ test('REST6 a release ahead: online no source mints one while the switch is shut
     assert.equal(restItemsAvailable(false), true);
     assert.deepEqual(restItemsStock('GeneralStore', 10, () => 0.99, { online: true }), [], 'online: an empty shelf');
     const shelf = restItemsStock('GeneralStore', 10, () => 0.99, { online: false });
-    assert.deepEqual([...new Set(shelf.map((i) => i.templateIndex))], [REST_ITEM.EmberJar, REST_ITEM.Firewood, REST_ITEM.Tonic]);     // AUDIT REST II H14 (
+    assert.deepEqual([...new Set(shelf.map((i) => i.templateIndex))], [REST_ITEM.EmberJar, REST_ITEM.Firewood, REST_ITEM.Tonic]);   // AUDIT REST II H14 (
     assert.deepEqual([...new Set(restItemsStock('Alchemist', 10, () => 0.99, { online: false }).map((i) => i.templateIndex))], [REST_ITEM.Tonic, REST_ITEM.Salts, REST_ITEM.Draught, REST_ITEM.Candle]);
     assert.deepEqual(restItemsStock('Armorer', 10, () => 0.99, { online: false }), []);
     assert.deepEqual(rollRestLoot([], REST_FOE_CHANCES, () => 0, { online: true }), [], 'online: no foe drops one');
@@ -243,7 +243,7 @@ test('REST6 the cards: each item\'s lines under its name and weight', () => {
   assert.deepEqual(tok(REST_ITEM.Bedroll).slice(2), ['10 nights left', 'A rough night\'s sleep anywhere you could camp.']);
   assert.deepEqual(tok(REST_ITEM.Candle).slice(2), ['3 uses left', 'Meditate by it to restore 50% of your magicka.']);
   assert.equal(tok(REST_ITEM.Draught)[0], 'Sleeping Draught');
-  assert.deepEqual(restItemLines(createRestItem(REST_ITEM.Firewood)), ['Adds 3 nights of fuel to a Campfire.']);     // AUDIT REST II H13 (
+  assert.deepEqual(restItemLines(createRestItem(REST_ITEM.Firewood)), ['Adds 3 nights of fuel to a Campfire.']);   // AUDIT REST II H13 (
   const c = createRestItem(REST_ITEM.Candle); const l = [c];
   assert.equal(spendCharge(c, l), false); assert.equal(c.currentCondition, 2);
 });

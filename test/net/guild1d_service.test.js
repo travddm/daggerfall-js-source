@@ -85,7 +85,7 @@ test('GUILD1d a hall BOUGHT: the guildmaster\'s, from what realm records paid in
   assert.equal((await svc.seatHome(other, { mapId: 7, buildingKey: 302, region: 17, price: 5000 })).status, 200);
   assert.equal((await buy(gm, { buildingKey: 302 })).body.error, 'home-taken');
   // short: the treasury, then the part of it realm records paid in
-  assert.equal((await buy(gm, { buildingKey: 303, price: HOME_PRICE_MAX })).body.error, 'guild-treasury-short');     // HOME-PRICE (
+  assert.equal((await buy(gm, { buildingKey: 303, price: HOME_PRICE_MAX })).body.error, 'guild-treasury-short');   // HOME-PRICE (
   raw.prepare('UPDATE guilds SET realm_gold = 1000').run();
   assert.equal((await buy(gm, { buildingKey: 303 })).body.error, 'guild-treasury-old', 'gold no record paid in buys no hall');
   // AUDIT HOME-PRICE D4: a hall's price is a home's, held to the online range on the service - a build asking Daggerfall's

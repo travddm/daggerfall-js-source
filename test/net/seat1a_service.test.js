@@ -37,7 +37,7 @@ test('SEAT1a three witnesses a week old confirm a seat byte for byte; a younger 
   assert.equal((await witness(b)).body.counted, true);
   assert.deepEqual((await list(a)).seats, [], 'two agree: not yet');
   assert.equal((await witness(c)).body.counted, true);
-  assert.deepEqual((await list(a)).seats, [{ ...ANTICLERE, state: 'confirmed', holder: null, battle: null }]);     // SEAT1c (
+  assert.deepEqual((await list(a)).seats, [{ ...ANTICLERE, state: 'confirmed', holder: null, battle: null }]);   // SEAT1c (
   assert.deepEqual((await list(a)).me, { witness: true, developer: false });
   assert.equal((await list(young)).me.witness, false);
   // the first answer stands: a witness's second, different report changes nothing

@@ -50,7 +50,7 @@ function run(t, seconds) {
 }
 
 test('LW7 the regards keep the deeds: a hand\'s death (HAND_KINDS - `slain` by the player, `died` at their side) a turn with its minute, whether it was seen and the name (to HAND_NAME_MAX), once, kept to TURNS_MAX and through the save as [key, t, seen, who] - a record of the old kinds alone written as LW4 wrote it; one of their own slain turns a stranger HOSTILE; each tone of word counts once a day (mutants: the minute unasked, a turn twice, the name, the seen, the record, the cap, the tone\'s day)', () => {
-  assert.deepEqual([...HAND_KINDS], ['slain', 'died', 'killed']);     // WATCH-FIX:
+  assert.deepEqual([...HAND_KINDS], ['slain', 'died', 'killed']);   // WATCH-FIX:
   assert.equal(EVENTS.slain, -75);
   assert.ok(EVENTS.slain <= HOSTILE_AT, 'one of their own slain: hostile from nothing');
   const rel = createRelations();

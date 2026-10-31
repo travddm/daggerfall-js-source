@@ -161,8 +161,8 @@ export const MARKS_KINDS = Object.freeze({
   'patron-escrow': 'move',    // CHAP7a: a guild's bid for a chapter's patronage, from its treasury, held until the Season it bids for opens
   patron: 'burn',             // CHAP7a: the winning bid, burnt at the Turning that opens its Season (Chapters-Arc 8, CALL 6)
   'patron-return': 'move',    // CHAP7a: a losing bid, home to its guild at that Turning - burnt where the guild is gone or full
-  star: 'mint',                 // STAR7: a fallen star's receipt, counted
-  castle: 'burn',               // DOMAIN2: a castle's price, from the buying guild's treasury (6)
+  star: 'mint',               // STAR7: a fallen star's receipt, counted
+  castle: 'burn',             // DOMAIN2: a castle's price, from the buying guild's treasury (6)
   'castle-sale': 'mint',      // DOMAIN2: 85% of it home, the castle given up while its region is held
   'castle-lost': 'mint',      // DOMAIN2: half of it home, the castle gone with its region
   'domain-fold': 'mint',      // DOMAIN3: a Charter folded into its region's at the region law's first Turning, its claim fee home (seatTurning.js)

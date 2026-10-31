@@ -312,7 +312,7 @@ test('PROF8 answers: the goods\' line the kind\'s (the species named), and a tro
   // the host hooks read them
   const gh = src('src/scenes/gatherHost.js');
   assert.match(gh, /hud\.toast\(k\?\.storesLine \? k\.storesLine\(d\) : storesLine\(d\), \{ keep: true \}\);/);
-  assert.match(gh, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);     // HAUL-CARDS (
+  assert.match(gh, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);   // HAUL-CARDS (
   assert.match(gh, /if \(!n \|\| n\.kind === 'body' \|\| n\.kind === 'haul'\) return;/);
 });
 

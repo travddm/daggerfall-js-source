@@ -15,7 +15,7 @@ const rd = (p) => hostText(p);
 
 test('WW2: the one motion bag - every field the rig reads, from a player at rest and one walking; the real motor at rest says standing with a speed setting that is never zero', () => {
   const rest = motionBagOf({ moveForward: 0, moveStrafe: 0, isRunning: false, moveSpeed: 0, grounded: true, jumping: false, swimming: false, levitating: false, crouching: false, riding: false, standing: true, speed: 4.43 });
-  assert.deepEqual(rest, { forward: 0, strafe: 0, running: false, speed: 0, grounded: true, jumping: false, swimming: false, levitating: false, crouching: false, riding: false, standing: true, speedField: 4.43, climbing: false, bobTimer: null, sneaking: false, freeze: 0, onExteriorWater: false, height: 0, yaw: NaN, travel: null, bodyYaw: null, bodyYawOff: 0, carriedYaw: 0 });     // EOTB-IL: the four fields the sprite reads ride the one bag
+  assert.deepEqual(rest, { forward: 0, strafe: 0, running: false, speed: 0, grounded: true, jumping: false, swimming: false, levitating: false, crouching: false, riding: false, standing: true, speedField: 4.43, climbing: false, bobTimer: null, sneaking: false, freeze: 0, onExteriorWater: false, height: 0, yaw: NaN, travel: null, bodyYaw: null, bodyYawOff: 0, carriedYaw: 0 });   // EOTB-IL: the four fields the sprite reads ride the one bag
   const walk = motionBagOf({ moveForward: 1, moveStrafe: 0, isRunning: true, moveSpeed: 6.2, grounded: true, crouching: true, riding: false, standing: false, speed: 8.86 });
   assert.equal(walk.standing, false); assert.equal(walk.running, true); assert.equal(walk.crouching, true); assert.equal(walk.speedField, 8.86);
   const bare = motionBagOf({});

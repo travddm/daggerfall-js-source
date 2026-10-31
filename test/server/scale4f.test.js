@@ -168,7 +168,7 @@ test('SCALE4f the request\'s point carries D1\'s rows written, its wait, its row
     const serve = async (req, env) => { await env.DB.prepare('SELECT replica FROM t').all(); await env.DB.prepare('UPDATE t SET a = 1').run(); clock.t += 2; return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } }); };
     await measured(new Request('https://accounts.invalid/v1/heartbeat', { method: 'POST' }), { DB: fakeD1(clock), METRICS: { writeDataPoint: (p) => points.push(p) } }, serve);
     assert.equal(points.length, 1);
-    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');     // SCALE4h (
+    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');   // SCALE4h (
     assert.deepEqual(points[0].indexes, ['/v1/heartbeat']);
   } finally { Date.now = () => T0 * 1000; }
 });

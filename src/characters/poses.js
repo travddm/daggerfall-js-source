@@ -74,7 +74,7 @@ export const POSES = {
   // game's job. Locked through the gait like 2H.
   rangedAim: {
     lean: 0.05,
-    twist: 0.65,      // BLADED archer, CORRECT form: bow shoulder forward, draw shoulder back. FORM IS A CONSTRAINT, NOT AN OUTCOME - a reach-optimizing twist sweep once inverted the stance (draw shoulder led by 0.24); with the seat frame-fixed, positive twist reaches the nock at 0.011.
+    twist: 0.65,    // BLADED archer, CORRECT form: bow shoulder forward, draw shoulder back. FORM IS A CONSTRAINT, NOT AN OUTCOME - a reach-optimizing twist sweep once inverted the stance (draw shoulder led by 0.24); with the seat frame-fixed, positive twist reaches the nock at 0.011.
     gaitArm: 0,
     gaitElbow: 0,
     runElbow: 0,

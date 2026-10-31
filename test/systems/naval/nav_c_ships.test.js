@@ -208,13 +208,13 @@ test('NAV-C a captain at sea: with no enemy she cruises for a waypoint on open w
   assert.equal(b.guns.ready('starboard'), false, 'reloading');
   assert.equal(b.guns.ready('port'), true);
   // the same player far out of reach: no volley, she closes
-  const f = createSeaShip({ id: 'f', seed: 7, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });     // SEA-EASE (
+  const f = createSeaShip({ id: 'f', seed: 7, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });   // SEA-EASE (
   const fo = stepCaptain(f, world({ contacts: [player([600, 0, 0])] }));
   assert.equal(f.mode, 'engage');
   assert.equal(fo.volleys.length, 0);
   assert.ok(600 < ENGAGE_RANGE && 600 > broadsideReach(f, 0));
   // past ENGAGE_RANGE she does not see a fight
-  const g = createSeaShip({ id: 'g', seed: 8, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });     // SEA-EASE (
+  const g = createSeaShip({ id: 'g', seed: 8, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });   // SEA-EASE (
   stepCaptain(g, world({ contacts: [player([ENGAGE_RANGE + 10, 0, 0])] }));
   assert.equal(g.mode, 'cruise');
   assert.ok(BEAR_DEG > 0 && batteryReach(g, 'stern', 0) === 0, 'a barrel battery has no reach of its own');

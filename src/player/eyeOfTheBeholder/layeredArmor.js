@@ -63,7 +63,7 @@ const CHAIN = new Set([0x0100, 0x0103]);
 
 /** One slot's look: 'l' leather (or nothing worn), 'c' chain, 'p0'..'p6' plate in METALS[n]. */
 export function pieceCode(piece) {
-  const m = drawnPiece(piece)?.material;     // APPEARANCES: a piece wearing a look is drawn as the look - my body's and every peer walker's
+  const m = drawnPiece(piece)?.material;   // APPEARANCES: a piece wearing a look is drawn as the look - my body's and every peer walker's
   if (!Number.isInteger(m)) return 'l';
   if (CHAIN.has(m)) return 'c';
   if (m >= 0x0200) return `p${Math.max(0, METALS.indexOf(PLATE_METAL[m] ?? 'steel'))}`;

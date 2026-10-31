@@ -29,7 +29,7 @@ test('QL2 the block: what to do as the state opened it - done, failed, optional,
   const doc = fakePage();
   const ql = {
     tier: 3,
-    gear: true,     // AUDIT QUESTLINES UI-4 (
+    gear: true,   // AUDIT QUESTLINES UI-4 (
     objectives: [
       { id: 'a', text: 'Find the ring', state: 'done' },
       { id: 'b', text: 'Return it to the Guild', state: 'open', any: 'end' },

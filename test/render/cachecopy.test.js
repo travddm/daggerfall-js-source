@@ -184,7 +184,7 @@ test('CACHE-COPY: the copy binds its empty vertex array through the renderer\'s 
         assert.notEqual(s.vao, sp._copyVao, `frame ${f}: a replay draw on the copy's array - the tracker skipped its bind`);
       },
     });
-    assert.ok(copies >= 2 && draws > 0, `frame ${f}: two lamps copied and the man drawn over them (${copies} copies, ${draws} draws)`);     // PERF-FACE (
+    assert.ok(copies >= 2 && draws > 0, `frame ${f}: two lamps copied and the man drawn over them (${copies} copies, ${draws} draws)`);   // PERF-FACE (
   }
   assert.ok(man.vao, 'the man has an array of his own');
 });

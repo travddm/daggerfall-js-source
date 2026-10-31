@@ -74,13 +74,13 @@ export function cssRgba(rgba) {
 export const TITLE_TEXT = Object.freeze({
   founder: 'Founder',
   developer: 'Developer',
-  dungeonmaster: 'Dungeon Master',     // TITLE-N
+  dungeonmaster: 'Dungeon Master',   // TITLE-N
   disciple: 'Disciple',              // TITLE-N: the Patreon tiers, lowest first
   apostle: 'Apostle',
   hierophant: 'Hierophant',
-  shadowfang: 'Shadow Fang',           // SHADOW-FANG: SirMcMobdon's own
-  gatebreaker: 'Gatebreaker',          // WB9g: the Sigil Broker's, bought
-  herald: 'Herald',                    // HERALD: the Patreon tier between Disciple and Hierophant
+  shadowfang: 'Shadow Fang',         // SHADOW-FANG: SirMcMobdon's own
+  gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
+  herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
   // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
   // (townSeatLaw.js seatTitleText: "Warden of Anticlere"), and these words alone where it does not
   warden: 'Warden',
@@ -88,19 +88,19 @@ export const TITLE_TEXT = Object.freeze({
   crowned: 'Crowned',
   keeper: 'Keeper',
   champion: 'Champion',
-  grandchampion: 'Grand Champion',     // ARENA4
+  grandchampion: 'Grand Champion',   // ARENA4
   arenachampion: 'Arena Champion',   // ARENA4: "Being the #1 pvp arena player comes with it's own temporary title/glyph"
-  hourbreaker: 'Hourbreaker',          // SD9b: one Brass Remnant's kill in four grants it
+  hourbreaker: 'Hourbreaker',        // SD9b: one Brass Remnant's kill in four grants it
   hoursfirst: "Hour's First",       // HOURS-FIRST (2026-10-08, Mac: "a title named Hour's First"): the first group to break an Abyss Dungeon, by name
   // CHAP4c: a chapter's seats' - worded off their claim (npcChapterLaw.js chapterTitleText,
   // "Master of the Fighters Guild, Anticlere"); these where the claim names no chapter this client knows
   chaptermaster: 'Chapter Master',
-  chapterofficer: 'Chapter Councillor',     // GUILD3a: a chapter's rank 8 sits on its council - "Officer" is a player guild's rank
+  chapterofficer: 'Chapter Councillor',   // GUILD3a: a chapter's rank 8 sits on its council - "Officer" is a player guild's rank
   formermaster: 'Former Master',
   highmaster: 'High Master',      // CHAP6e: a Master's in its chapter's Ascendancy - GUILD3e: while its chapter stands Ascendant
   seasonmaster: 'Season Master',  // CHAP6e: a Season's Master's, kept for good
-  ilovelamp: 'I Love Lamp',         // LAMP-KEEPER II: a lamp keeper spoken to
-  coilbreaker: 'Coilbreaker',       // SERPENT5: one dealing ship's serpent kill in twenty grants it
+  ilovelamp: 'I Love Lamp',       // LAMP-KEEPER II: a lamp keeper spoken to
+  coilbreaker: 'Coilbreaker',     // SERPENT5: one dealing ship's serpent kill in twenty grants it
   // QL12: THE QUESTLINES' FOUR, a title a line, in the lines'
   // order (net/questlineClaims.js QL_TITLES) - paid by the account service on the line's last witnessed step, held for good
   doorwarden: 'Doorwarden',                // the Burning Doors

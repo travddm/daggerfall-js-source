@@ -91,7 +91,7 @@ test('FAR-SEA1: every ring shader - classic, the lane, the classic-shadow lane -
   // cover - the ground's alone off the woods (vFlora 0)
   order(classicFs, ['float sun = ringSun();', 'vec3 lit = mix(vColor * (uAmbient + uSunColor * (sun * diff) + uMoonColor * (uMoonScale * mdiff)), vCanopy * floraLight(uAmbient, uSunColor, sun, uMoonColor, uMoonScale) * floraGrain(vWorld.xz), vFlora);',
     'float sea = vSea * uSeaLook;', 'if (sea > 0.0) lit = mix(lit, ringSea(uAmbient, uSunColor, uMoonColor, sun), sea);',
-    'outColor = vec4(mix(lit, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, summitHold(uHazeHold, vDist)))), 1.0);'], 'classic');     // BANTHA1: the jungle's haze over the horizon's
+    'outColor = vec4(mix(lit, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, summitHold(uHazeHold, vDist)))), 1.0);'], 'classic');   // BANTHA1: the jungle's haze over the horizon's
   // the lane: its ground through the tonemap into display space, the sea in the water's own space from the light as given
   for (const [name, text] of [['lane', EL_FAR_RING_FS], ['classic shadows', classicShadowLane().farRingFs]]) {
     order(text, ['float sun = ringSun();', 'vec3 shown = elEncode(elTonemapRGB(lit * ex));', 'float sea = vSea * uSeaLook;',
@@ -124,7 +124,7 @@ test('FAR-SEA1: the ring\'s sea is a water pixel at the sea\'s own height - not 
   const W = 40, H = 40;
   const bytes = new Uint8Array(W * H).fill(0);
   bytes[20 * W + 20] = 60;   // an island
-  bytes[20 * W + 24] = 2;      // shallows (a water byte, still at the sea's clamp)
+  bytes[20 * W + 24] = 2;    // shallows (a water byte, still at the sea's clamp)
   // The ring's vertex stands the kernel's ground at its pixel's centre (ringGroundAt): the island's byte stands at its node,
   // the corner of pixels (20..21, 20..21), and the kernel's slope off it stands all four over the sea - (21, 20) beside it
   // is the island's shore, as the streamed ground's

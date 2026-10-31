@@ -1386,7 +1386,7 @@ function drawMarks(marks, vw, vh, dpr, feet = null) {
       g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.lineWidth = 1; g.strokeStyle = C.bountyRim; g.fill(); g.stroke();
     } else if (look === 'gather') {   // GATHER-OW: a profession's group in its colour - OW-GLYPHS: by its work's glyph
       gatherGlyph(g, x, y, (m.kind ?? '').split(' ')[1] ?? '', color);
-    } else if (look === 'stranger') {     // STRANGER-HELM: a great helm - its fill the stranger's red, the dots' black edge, the eye slit and the breaths cut dark
+    } else if (look === 'stranger') {   // STRANGER-HELM: a great helm - its fill the stranger's red, the dots' black edge, the eye slit and the breaths cut dark
       strangerHelm(g, x, y);
     } else if (look === 'camp') {   // OW6: a camp - a tent's peak, not a band's dot
       g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x + 6, y + 5); g.lineTo(x - 6, y + 5); g.closePath(); g.fill(); g.stroke();

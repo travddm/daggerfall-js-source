@@ -34,7 +34,7 @@ const flush = async (n = 8) => { for (let i = 0; i < n; i++) await tick(); };
 test('WAGONS1 THE KINDS: three, their names, capacities, values, hitches and seats as the law says (the Small Cart DFU\'s 750 kg at its template\'s 150) - a pack drives its best wagon, and a cart item unmarked is the Small Cart (mutants: a rank flipped, a capacity moved, the mark unread)', () => {
   assert.deepEqual(WAGON_KIND_ORDER, ['cart', 'openWagon', 'caravan']);
   assert.deepEqual(WAGON_KIND_ORDER.map((k) => [WAGON_KINDS[k].name, WAGON_KINDS[k].kg, WAGON_KINDS[k].value, WAGON_KINDS[k].hitch, WAGON_KINDS[k].seats, WAGON_KINDS[k].enterable, WAGON_KINDS[k].rank]),
-    [['Small Cart', 750, 150, 3.8, 0, false, 0], ['Open Wagon', 1500, 9000, 7.1, 4, false, 1], ['Caravan', 2000, 25000, 7.7, 0, true, 2]]);     // WAGON-PRICE: 900 and 2500 ten times over
+    [['Small Cart', 750, 150, 3.8, 0, false, 0], ['Open Wagon', 1500, 9000, 7.1, 4, false, 1], ['Caravan', 2000, 25000, 7.7, 0, true, 2]]);   // WAGON-PRICE: 900 and 2500 ten times over
   assert.deepEqual(WAGON_KIND_ORDER.map((k) => WAGON_KINDS[k].floor), [150, 900, 2500], 'WAGON-PRICE: each floor the price it was first shelved at');
   assert.equal(SMALL_CART_KG, 750); assert.equal(WAGON_KG_LIMIT, SMALL_CART_KG, 'itemTransfer.js reads the one 750');
   const cart = newWagonItem('cart'), open = newWagonItem('openWagon'), caravan = newWagonItem('caravan');

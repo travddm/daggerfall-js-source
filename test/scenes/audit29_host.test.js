@@ -195,7 +195,7 @@ test('AUDIT 29 C4: a kept harvest answered through the pump says its rank\'s ris
     const drawnBefore = centers();
     assert.equal(t.host.press(), true);
     for (let i = 0; i < 8 && t.host.acting(); i++) { t.setInput({ attack: true }); t.host.tick(MINE_ACT.swingS + 0.01); t.setInput({}); t.host.tick(0.01); }
-    t.host.tick(MINE_ACT.swingS);     // GATHER-FEEL (
+    t.host.tick(MINE_ACT.swingS);   // GATHER-FEEL (
     for (let i = 0; i < 6; i++) await tick();
     assert.equal(t.book.pendingHarvests, 1, 'kept - its first ask unanswered');
     assert.ok(!t.said.some((x) => /Mining 24 -> 25/.test(x)));

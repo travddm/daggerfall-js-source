@@ -186,7 +186,7 @@ export function remainsOf(v) {
   if (!v || typeof v !== 'object' || typeof v.r !== 'string' || !Array.isArray(v.items) || !Array.isArray(v.p) || v.p.length !== 3 || !Number.isFinite(v.at)) return null;
   return { r: v.r, gi: typeof v.gi === 'string' && v.gi ? v.gi : null, os: typeof v.os === 'string' ? v.os : null, oid: typeof v.oid === 'string' ? v.oid : null, nm: typeof v.nm === 'string' ? v.nm : '', p: [Number(v.p[0]) || 0, Number(v.p[1]) || 0, Number(v.p[2]) || 0], at: v.at, lastAt: Number.isFinite(v.lastAt) ? v.lastAt : v.at, open: v.open === true, items: v.items.map((it) => (it && typeof it === 'object' ? it : null)),   // INT9 (AUDIT): the guild kept too - a woken room let the fallen's guildmates take
     wh: typeof v.wh === 'string' ? v.wh : null, wn: Number.isSafeInteger(v.wn) ? v.wn : 0, wk: typeof v.wk === 'string' ? v.wk : null, wi: Number.isSafeInteger(v.wi) ? v.wi : -1, ok: v.ok === true,   // INT9
-    we: v.we === true, wc: typeof v.wc === 'string' && v.wc ? v.wc : null };     // MAC: the escrow's word and its collect, kept through a restart
+    we: v.we === true, wc: typeof v.wc === 'string' && v.wc ? v.wc : null };   // MAC: the escrow's word and its collect, kept through a restart
 }
 
 

@@ -114,7 +114,7 @@ test('LW-FIX1 a table\'s talk is never re-dealt mid-script - LW-TALK: PIN MOVED 
   r.layer.frame(0.016, [0, 0, -4.6], 0, [0, 1.6, -4.6]);
   // a third sits down at their table mid-exchange: the pair talk it out
   r.st.inside = [RES(1), RES(2), RES(3)];
-  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);     // AUDIT LW-ROOMS:
+  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);   // AUDIT LW-ROOMS:
   // row (the room's walk deals the pair's table a place in that row, square to the look, where the eye's own rounding saw it)
   assert.equal(r.layer.stood().filter((x) => x.table === a.table).length, 3, 'the third at their table');
   const ctx = { weather: null, hour: 20, news: null, room: 'tavern' };

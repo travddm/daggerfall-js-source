@@ -163,7 +163,7 @@ test('AUDIT REALM2 S1: a customs character\'s first save carries no more than th
     ['no JSON', 'not a save'],
   ]) assert.deepEqual(Object.values(typeof save === 'string' ? await s.put(c.id, save, P.secret, { lease: c.lease, seq: 1 }) : await first(save)), [403, { error: 'customs-allowance' }], why);
   assert.equal(s.env.SAVES._map.size, 0);
-  assert.deepEqual(Object.values(await first({ name: 'Legacy', level: 3, goldPieces: allowance })), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }], 'the copy customs capped');     // INT2 (
+  assert.deepEqual(Object.values(await first({ name: 'Legacy', level: 3, goldPieces: allowance })), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }], 'the copy customs capped');   // INT2 (
   // a customs asked with no level is held to a first level's allowance
   const origin2 = 'offline-legacy-04';
   s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin2);
@@ -266,7 +266,7 @@ test('AUDIT REALM2 S3: every realm act whose batch COMMITS and then throws keeps
     assert.ok(s.saveStands(R.id), `${path}: the save the row names stands`);
     assert.equal((await s.load(R.id, P.secret)).seq, at.seq + 1);
   };
-  await lost('/v1/homes/claim', { ...house, character: R.id, price: HOME_PRICE_MIN });     // HOME-PRICE (
+  await lost('/v1/homes/claim', { ...house, character: R.id, price: HOME_PRICE_MIN });   // HOME-PRICE (
   await lost('/v1/homes/decor/place', { mapId: 7, buildingKey: 9, character: R.id, piece: { id: 'p1', model: 41000, flat: null, pos: [0, 0, 0], rot: [0, 0, 0], scale: 1, light: null, storage: false, paid: 40 } });
   await lost('/v1/homes/release', { mapId: 7, buildingKey: 9 });
   await lost('/v1/guilds/found', { character: R.id, name: 'Lost Answers', tag: 'LOST' });
@@ -285,8 +285,8 @@ test('AUDIT REALM2 S4: an offer is its record BOTH ways - a record carrying what
   const wire = validLootItem(dagger);
   assert.ok(recordIsOffered(JSON.parse(JSON.stringify(dagger)), wire), 'an honest record is its wire projection');
   assert.ok(recordIsOffered({ ...dagger, equipSlot: null, questItem: false, stackCount: 3, value: 1 }, wire), 'its count, its price and the receiver\'s marks aside');
-  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);     // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's
-  const minimal = validLootItem({ templateIndex: 113, group: 'Weapons', material: 9 });     // INT1 (
+  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's
+  const minimal = validLootItem({ templateIndex: 113, group: 'Weapons', material: 9 });   // INT1 (
   for (const [why, rec] of [
     ['a worn edge', { ...dagger, currentCondition: 1 }],
     ['an enchantment nobody was shown', { ...dagger, enchantments: [{ type: 9, param: 0 }] }],
