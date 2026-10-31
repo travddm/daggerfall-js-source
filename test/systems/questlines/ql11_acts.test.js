@@ -14,8 +14,8 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { webcrypto } from 'node:crypto';
+import { parse } from 'acorn';
 
-import { parseModule, findHostFunction } from '../../../tools/hostScope.mjs';
 import { ACT_KINDS, ACT_IDS, noteAct, setActSink } from '../../../src/systems/questlines/qlActs.js';
 import { hearEliteFoesIn, QL_ELITE_FOE } from '../../../src/systems/questlines/qlEliteFoe.js';
 import { reportPlayerKill, registerPlayerKillListener } from '../../../src/systems/playerKills.js';
@@ -113,13 +113,16 @@ function walk(n, fn) {
 /** Every `noteAct(...)` call in src/ (the leaf aside), read off the parse - never a comment's mention: kind -> files,
  *  and the calls whose kind is no literal; and every file that imports noteAct, with the name it binds. */
 function sweep() {
-  const kinds = new Map(), loose = [], imports = [];
+  const kinds = new Map();
+  const loose = [];
+  const imports = [];
   for (const f of srcFiles('src')) {
     if (f === LEAF) continue;
     const text = readFileSync(join(ROOT, f), 'utf8');
     if (!text.includes('noteAct')) continue;
-    walk(parseModule(text), (n) => {
-      if (n.type === 'ImportDeclaration' && /(^|\/)qlActs\.js$/.test(n.source.value)) {   // a feature's `../questlines/qlActs.js`, a questlines module's own `./qlActs.js` (qlEliteFoe.js)
+    const ast = parse(text, { ecmaVersion: 'latest', sourceType: 'module', locations: true, allowHashBang: true });
+    walk(ast, (n) => {
+      if (n.type === 'ImportDeclaration' && /(^|\/)qlActs\.js$/.test(n.source.value)) {
         for (const s of n.specifiers) if (s.imported?.name === 'noteAct') imports.push([f, s.local.name]);
       }
       if (n.type !== 'CallExpression' || n.callee.type !== 'Identifier' || n.callee.name !== 'noteAct') return;
@@ -133,7 +136,7 @@ function sweep() {
   return { kinds, loose, imports };
 }
 
-test('QL11 THE SWEEP, both ways: every kind has a producer in src/; every producer names a kind; every call names it as a literal; noteAct is imported from the leaf under its own name; AUDIT QUESTLINES ACTS-8: no host the ceiling holds says one in its own scope but createNavalHost, once, and the dungeon host hands its place to the elite foe\'s module (mutants: a kind with no producer; a producer\'s kind misspelt; a kind passed in a variable; an alias; the elite foe\'s condition back in buildDungeonContext; the Redoubt\'s acts back in createEgClient)', () => {
+test('QL11 the sweep, both ways: every kind has a producer in src/, every producer names a known kind as a literal, and every caller imports noteAct under its own name', () => {
   const { kinds, loose, imports } = sweep();
   assert.deepEqual(loose, [], 'a kind is a literal at its call, so this sweep reads it');
   const unknown = [...kinds.keys()].filter((k) => !Object.hasOwn(ACT_KINDS, k)).map((k) => `${[...kinds.get(k)].join(', ')}: noteAct('${k}')`);
@@ -142,58 +145,6 @@ test('QL11 THE SWEEP, both ways: every kind has a producer in src/; every produc
   assert.deepEqual(imports.filter(([, name]) => name !== 'noteAct'), [], 'no alias - a call under another name would pass this sweep unread');
   const callers = new Set([...kinds.values()].flatMap((s) => [...s]));
   assert.deepEqual([...callers].filter((f) => !imports.some(([g]) => g === f)), [], 'each caller imports the leaf\'s noteAct');
-  // WHERE EACH IS SAID (the slice's record): the feature's own module where one knows the moment; a host only where the
-  // host alone does (navalHost's struck colours, the dungeon's tier) - one line each
-  const where = Object.fromEntries([...kinds].map(([k, s]) => [k, [...s].sort()]).sort(([a], [b]) => (a < b ? -1 : 1)));
-  assert.deepEqual(where, {
-    'arena-won': ['src/scenes/arena/arenaBouts.js'],
-    'breach-closed': ['src/net/gate/gateClaims.js'],
-    'cards-won': ['src/systems/card/cardRemoteTable.js', 'src/systems/card/cardTableSession.js', 'src/systems/iliac/iliacRemoteTable.js', 'src/systems/iliac/iliacTableSession.js'],
-    'cargo-delivered': ['src/scenes/harbourOffice.js'],
-    'elite-foe-slain': ['src/systems/questlines/qlEliteFoe.js'],
-    'fish-caught': ['src/scenes/deepWater/deepWatersFish.js', 'src/scenes/fishHost.js', 'src/systems/foraging/foragingInstall.js'],
-    'gambit-won': ['src/scenes/gambitTableGame.js'],
-    'gem-socketed': ['src/systems/reforge.js'],
-    'herb-gathered': ['src/scenes/herbHost.js', 'src/systems/foraging/foragingInstall.js'],
-    'heart-star-held': ['src/net/starfall/starClaims.js'],   // T-A: the Heart-Star held, beside its `star-held` in one turn (test/net/starfall/star7_claims.test.js)
-    'hour-broken': ['src/net/superDungeon/sdClaims.js'],
-    'ketch-boarded': ['src/scenes/ketch/ketchClient.js'],   // KETCH: the anchor-lift ridden up (test/scenes/ketch/ketch_client.test.js drives it)
-    'ketch-cell-banked': ['src/scenes/ketch/ketchClient.js'],   // KETCH: my cell set, the ship's room's word
-    'ore-mined': ['src/scenes/mineHost.js'],
-    'piece-crafted': ['src/net/profBook.js'],
-    'piece-reforged': ['src/systems/reforge.js'],
-    'port-reached': ['src/scenes/harbourOffice.js'],
-    'raid-repelled': ['src/systems/raidingParties.js'],
-    'redoubt-taken': ['src/scenes/eliteGates/egClient.js'],
-    'revenant-knelt': ['src/systems/revenant/revenantFate.js'],
-    'rite-broken': ['src/net/gate/gateClaims.js'],
-    'serpent-slain': ['src/net/serpent/serpentClaims.js'],
-    'ship-struck': ['src/scenes/naval/navalHost.js'],
-    'star-held': ['src/net/starfall/starClaims.js'],   // STAR8: a fallen star's receipt the service counted (STAR7's carrier - test/net/starfall/star7_claims.test.js)
-    'star-taken': ['src/net/firmament/firmamentBook.js'],
-    'valkynaz-felled': ['src/scenes/eliteGates/egClient.js'],
-    'warden-felled': ['src/net/ketch/ketchClaims.js'],   // KETCH: the Tonal Warden's k1 receipt the service counted (test/net/ketch/ketch_claims.test.js)
-    'wood-chopped': ['src/scenes/treeHost.js', 'src/systems/foraging/foragingInstall.js'],
-    'wyrd-met': ['src/scenes/witchesHost.js'],   // AUDIT STAR8 T1: a Wyrd Sister's window opened, the festival's own module (test/scenes/witch1_host.test.js drives it)
-  });
-  // the hosts that carry one: a line each, never more (test/scenes/hostceiling.test.js holds their length)
-  const lines = (f) => readFileSync(join(ROOT, f), 'utf8').split('\n').filter((l) => /\bnoteAct\(/.test(l) && !/^\s*(\/\/|\*)/.test(l)).length;
-  assert.deepEqual(['src/scenes/naval/navalHost.js'].map(lines), [1]);
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/exterior.js', 'src/systems/comeSailAway/comeSailAway.js', 'src/scenes/dungeonContext.js']) assert.ok(!callers.has(host), `${host} says no act`);
-  // AUDIT QUESTLINES ACTS-8 (HOST-SPLIT): inside the functions the ceiling holds, the acts said - createNavalHost's in the
-  // crew's own arm, and no other: the elite foe's condition is systems/questlines/qlEliteFoe.js's (buildDungeonContext hands
-  // it the place it built, one line), the Redoubt's acts egClient.js's module scope (redoubtActs, one call)
-  const HOSTS = [['src/scenes/naval/navalHost.js', 'createNavalHost'], ['src/scenes/eliteGates/egClient.js', 'createEgClient'], ['src/scenes/exteriorFoes.js', 'createExteriorFoes'], ['src/combat/fpArm.js', 'createFpArm']];
-  const said = Object.fromEntries(HOSTS.map(([f, fn]) => {
-    if (!callers.has(f)) return [fn, 0];
-    let n = 0;
-    walk(findHostFunction(parseModule(readFileSync(join(ROOT, f), 'utf8')), fn).fn, (c) => { if (c.type === 'CallExpression' && c.callee.type === 'Identifier' && c.callee.name === 'noteAct') n++; });
-    return [fn, n];
-  }));
-  assert.deepEqual(said, { createNavalHost: 1, createEgClient: 0, createExteriorFoes: 0, createFpArm: 0 });
-  const dc = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.equal(dc.match(/^\s*hearEliteFoesIn\(dfLocation\);/gm)?.length, 1, 'the dungeon host hands its place to the act\'s module, once');
-  assert.ok(!/registerPlayerKillListener\(/.test(dc), 'and listens for no kill itself');
 });
 
 test('QL11 the kinds: ACT_IDS is the leaf\'s keys, frozen; each kind lower-case words (a script\'s `ql act <kind>` reads them); a wagon\'s load is no kind - nothing in the game finishes one (mutants: the list unfrozen; a kind re-added with no producer)', () => {

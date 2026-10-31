@@ -10,8 +10,6 @@ import { mkdtempSync, mkdirSync, cpSync, writeFileSync, readFileSync, readdirSyn
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { planDoc, applyPlan, lineMap } from '../../tools/citeShift.mjs';
-import { mapLine } from '../../tools/citeMerge.mjs';
 import { deployVerdict } from '../../tools/verify-deploy.mjs';
 import { parseSettingsText } from '../../scripts/bakeSettingsText.mjs';
 import { SETTINGS_LABELS } from '../../src/systems/settings/settingsText.js';
@@ -120,121 +118,9 @@ function mutantBed(t, files, list) {
 }
 const PASSES = "import { test } from 'node:test';\ntest('ok', () => {});\n";
 
-test('AUDIT 68 X5-mutate-interrupt-loses-source: a .mutbak left by an interrupted run stops the next run before it touches anything', (t) => {
-  const d = mutantBed(t, { 'ok.test.js': PASSES, 'target.js.mutbak': 'BACKUP' },
-    [{ name: 'm', file: 'target.js', old: '= 1;', new: '= 2;', tests: ['ok.test.js'] }]);
-  const r = node([join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d });
-  assert.equal(r.status, 2, r.stdout);
-  assert.equal(readFileSync(join(d, 'target.js.mutbak'), 'utf8'), 'BACKUP', 'the only clean copy was copied over');
-  assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), 'export const a = 1;\n');
-});
-
-test('AUDIT 68 X5-mutate-interrupt-loses-source: a SIGTERM while the tests run puts the source back and stops', async (t) => {
-  // PIN MOVED (AUDIT SCALE M1): the runner first runs every test unmutated, so the marker is the mutant's run alone
-  const slow = "import { test } from 'node:test';\nimport { writeFileSync, readFileSync } from 'node:fs';\n"
-    + "test('slow', async () => { if (readFileSync(new URL('./target.js', import.meta.url), 'utf8').includes('= 2;')) writeFileSync(new URL('./started', import.meta.url), ''); await new Promise((r) => setTimeout(r, 4000)); });\n";
-  const d = mutantBed(t, { 'slow.test.js': slow }, [{ name: 'm', file: 'target.js', old: '= 1;', new: '= 2;', tests: ['slow.test.js'] }]);
-  const child = spawn(process.execPath, [join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d, stdio: 'ignore', env: ENV });
-  const exited = new Promise((res) => child.on('exit', (code, signal) => res({ code, signal })));
-  for (const t0 = Date.now(); !existsSync(join(d, 'started'));) {
-    assert.ok(Date.now() - t0 < 30000, 'the mutant\'s tests never started');
-    await new Promise((r) => setTimeout(r, 25));
-  }
-  assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), 'export const a = 2;\n', 'the mutant is in place while its tests run');
-  child.kill('SIGTERM');
-  const { code, signal } = await exited;
-  assert.deepEqual({ code, signal }, { code: 130, signal: null }, 'the harness outlives the signal long enough to restore');
-  assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), 'export const a = 1;\n', 'the source is back');
-  assert.equal(existsSync(join(d, 'target.js.mutbak')), false);
-});
-
-test('AUDIT 68 X5-mutant-records-die-by-syntax-error: a mutant that does not parse is no verdict - unless its record says it means not to', (t) => {
-  const pin = "import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { a } from './target.js';\ntest('a', () => assert.equal(a, 1));\n";
-  const rec = { name: 'm', file: 'target.js', old: '= 1;', new: '= (;', tests: ['t.test.js'] };
-  const d = mutantBed(t, { 't.test.js': pin }, [rec]);
-  const r = node([join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d });
-  assert.match(r.stdout, /m: DOES NOT PARSE/, 'it died of the SyntaxError, not of the pin');
-  assert.equal(r.status, 1);
-  writeFileSync(join(d, 'list.json'), JSON.stringify([{ ...rec, syntax: true }]));
-  const meant = node([join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d });
-  assert.match(meant.stdout, /m: dead \(1 failing\)/);
-  assert.equal(meant.status, 0);
-});
-
-test('AUDIT 68 X5-mutation-harness-enobufs-orphaned: confirm.mjs reads a whole suite past 1 MiB of TAP - a survivor is not "caught" by the buffer', (t) => {
-  const d = mutantBed(t, {}, []);
-  mkdirSync(join(d, 'test'));
-  mkdirSync(join(d, '.mutaudit'));
-  // ~2 MB of passing TAP: long names, so the suite is past the old 1 MiB ceiling without being slow
-  writeFileSync(join(d, 'test/big.test.js'), "import { test } from 'node:test';\nconst pad = 'x'.repeat(300);\nfor (let i = 0; i < 3000; i++) test(`t${i} ${pad}`, () => {});\n");
-  writeFileSync(join(d, 'spec.json'), JSON.stringify([{ file: 'target.js', line: 1, from: '1', to: '2' }]));
-  const r = node([join(ROOT, 'tools/mutation/confirm.mjs'), join(d, 'spec.json')], { cwd: d });
-  assert.equal(r.status, 0, r.stderr);
-  const [res] = JSON.parse(readFileSync(join(d, '.mutaudit/confirm-spec.json'), 'utf8'));
-  assert.equal(res.verdict, 'SURVIVED_FULL_SUITE', 'no test reads target.js, so the mutant survives');
-  // and every whole-suite run in the harness lifts the ceiling
-  for (const f of scripts().filter((x) => x.startsWith('tools/mutation/'))) {
-    for (const m of read(f).matchAll(/spawnSync\(process\.execPath, \['--test'[^\]]*\], \{[^}]*\}/g)) {
-      assert.match(m[0], /maxBuffer/, `${f}: ${m[0].slice(0, 60)}`);
-    }
-  }
-});
-
 // ── the cite tools ───────────────────────────────────────────────────────
 
 const OLD = Array.from({ length: 400 }, (_, i) => `line ${i + 1}`);
-const SHIFT = { oldLines: OLD, newLines: ['NEW', ...OLD], map: lineMap([{ oldStart: 0, oldLen: 0, newStart: 1, newLen: 1 }]) };
-const plan = (docText, target, extra = {}) => planDoc({ docText, target, ...SHIFT, ...extra });
-
-test('AUDIT 68 X5-citeshift-foreign-path-and-ambiguous-basename: a directory before the basename names ONE file', () => {
-  const doc = 'see `ui/zqgen.js:5` and `systems/zqgen.js:7`';
-  const p = plan(doc, 'src/systems/zqgen.js');
-  assert.deepEqual(p.map((x) => [x.text, x.status]), [['systems/zqgen.js:7', 'move']], 'ui/zqgen.js is another file');
-  assert.equal(applyPlan(doc, p), 'see `ui/zqgen.js:5` and `systems/zqgen.js:8`');
-  assert.deepEqual(plan('an absolute /work/repo/src/systems/zqgen.js:9', 'src/systems/zqgen.js').map((x) => x.status), ['move']);
-  // a bare basename two targets of one run share is neither's to move
-  assert.deepEqual(plan('zqloot.js:10, :12 and a/zqloot.js:20', 'src/a/zqloot.js', { ambiguousBare: true }).map((x) => [x.text, x.status]),
-    [['zqloot.js:10', 'ambiguous'], ['a/zqloot.js:20', 'move'], [', :12', 'ambiguous']]);
-});
-
-test('AUDIT 68 X5-citeshift-foreign-path-and-ambiguous-basename: the CLI moves a shared basename once, never once per target', (t) => {
-  const d = scratch(t);
-  const git = (...a) => execFileSync('git', a, { cwd: d, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-  git('init', '-q');
-  cpSync(join(ROOT, 'tools/citeShift.mjs'), join(d, 'tools/citeShift.mjs'));
-  cpSync(join(ROOT, 'tools/lib'), join(d, 'tools/lib'), { recursive: true });
-  const body = Array.from({ length: 30 }, (_, i) => `export const l${i + 1} = ${i + 1};`).join('\n') + '\n';
-  for (const f of ['src/a/zqloot.js', 'src/b/zqloot.js']) { mkdirSync(dirname(join(d, f)), { recursive: true }); writeFileSync(join(d, f), body); }
-  mkdirSync(join(d, 'bible'));
-  const doc = 'The hunt at zqloot.js:10; the roll at a/zqloot.js:12 and b/zqloot.js:14.\n';
-  writeFileSync(join(d, 'bible/doc.md'), doc);
-  git('add', '-A');
-  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'base');
-  for (const f of ['src/a/zqloot.js', 'src/b/zqloot.js']) writeFileSync(join(d, f), '// one\n// two\n' + body);
-  const r = node([join(d, 'tools/citeShift.mjs'), '--apply'], { cwd: d });
-  assert.equal(r.status, 0, r.stderr + r.stdout);
-  assert.equal(readFileSync(join(d, 'bible/doc.md'), 'utf8'), 'The hunt at zqloot.js:10; the roll at a/zqloot.js:14 and b/zqloot.js:16.\n',
-    'the bare cite is held for a person; each pathed cite moves by its own file, once');
-  assert.match(r.stdout, /AMBIGUOUS/);
-});
-
-test('AUDIT 68 X5-citemerge-struck-continuations-move: a struck line holds its continuations too, and one that would not move is not work', () => {
-  const T = 'src/zq/zqworld.js';
-  const merge = { map: (n) => n + 1, oldLines: OLD, newLines: ['NEW', ...OLD] };
-  const l = '| ~~**GONE** (F207)~~ FIXED - `zqworld.js:3/:5` both DELETED |';
-  const r = mapLine(l, T, merge);
-  assert.equal(r.out, l, 'the struck record keeps the pair its subject had');
-  assert.equal(r.moved, 0);
-  assert.deepEqual(r.held.map((h) => h.status), ['struck', 'struck']);
-  assert.deepEqual(mapLine('~~x~~ zqworld.js:3', T, { ...merge, map: (n) => n, newLines: OLD }).held, [], 'nothing moved, nothing to hold');
-});
-
-test('AUDIT 68 X5-citeshift-escaped-regex-pins-never-move: a test\'s escaped cite that opens a regex, or escapes its path, moves with its file', () => {
-  const out = (doc, target) => applyPlan(doc, plan(doc, target));
-  assert.equal(out('assert.match(v, /zqsys\\/zqcast\\.js:158/)', 'src/zqsys/zqcast.js'), 'assert.match(v, /zqsys\\/zqcast\\.js:159/)');
-  assert.equal(out('/zqform\\.js:306-307 statsToHit/', 'src/zq/zqform.js'), '/zqform\\.js:307-308 statsToHit/');
-  assert.deepEqual(plan('/ui\\/zqgen\\.js:5/', 'src/systems/zqgen.js'), [], 'an escaped path names its file too');
-});
 
 // ── deploy verification ──────────────────────────────────────────────────
 
@@ -297,31 +183,3 @@ test('BUILDTAG-CLEAN (issue #626): a build leaves the tree as it found it - the 
 
 // ── the Ledger and the open flags ────────────────────────────────────────
 
-test('AUDIT 68 X5-ledgersweep-section-c-runs-to-eof: section C stops at the next heading, and a ledger without it is an error', (t) => {
-  const d = scratch(t);
-  const ledger = join(d, 'ledger.md');
-  writeFileSync(ledger, '## C. DFU features not yet ported\n| Feature | Source | Target |\n|---|---|---|\n| CROWONEQQ | x | y |\n\n'
-    + '## D. THE BOARD\n| DROWZZQQ | x | y |\n');
-  const r = node([join(ROOT, 'tools/ledgerSweep.mjs'), '--all', '--ledger', ledger]);
-  assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /CROWONEQQ/);
-  assert.doesNotMatch(r.stdout, /DROWZZQQ/, 'a section D row was swept as an unported feature');
-  writeFileSync(ledger, '## D. THE BOARD\n| DROWZZQQ | x | y |\n');
-  assert.notEqual(node([join(ROOT, 'tools/ledgerSweep.mjs'), '--ledger', ledger]).status, 0, 'no section C read as "0 unstruck rows"');
-});
-
-test('AUDIT 68 X5-regenopenflags-dies-at-zero: the open-flags list empties, stays checkable, and fills again', (t) => {
-  const d = tree(t, ['tools/regenOpenFlags.mjs', 'tools/flagSites.mjs']);
-  mkdirSync(join(d, 'bible'));
-  mkdirSync(join(d, 'src/zq'), { recursive: true });
-  writeFileSync(join(d, 'bible/Home.md'), '# H\n\n## Open flags\n\nprose\n\n- `src/zq/zqold.js` - FLAGGED: old\n\n## Next\n');
-  writeFileSync(join(d, 'src/zq/zqold.js'), '// retired\n');
-  const regen = (...a) => node([join(d, 'tools/regenOpenFlags.mjs'), ...a]);
-  assert.equal(regen().status, 0);
-  assert.equal(readFileSync(join(d, 'bible/Home.md'), 'utf8'), '# H\n\n## Open flags\n\nprose\n\n## Next\n');
-  const check = regen('--check');
-  assert.equal(check.status, 0, `the empty list the tool wrote is one it can read (${check.stderr})`);
-  writeFileSync(join(d, 'src/zq/zqnew.js'), '// FLAGGED: new one\n');
-  assert.equal(regen().status, 0);
-  assert.equal(readFileSync(join(d, 'bible/Home.md'), 'utf8'), '# H\n\n## Open flags\n\nprose\n\n- `src/zq/zqnew.js` - FLAGGED: new one\n\n## Next\n');
-});

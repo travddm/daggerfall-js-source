@@ -17,7 +17,6 @@
     "test:times": "node tools/testTimes.mjs",
     "types": "tsc -p tsconfig.json",
     "check": "npm run lint && npm run types && npm test && npm run build",
-    "cites": "node tools/citeAnchor.mjs",
     "prebuild": "node scripts/buildTag.mjs",
     "postbuild": "git checkout -- src/buildTag.js",
     "probes": "node tools/enhancedMenuProbe.mjs && node tools/featureRailProbe.mjs",
