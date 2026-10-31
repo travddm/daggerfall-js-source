@@ -16,6 +16,15 @@ const MIDDLE_WEIGHTS = [-1, 9, 9, -1];
 
 const clampSample = (index) => Math.max(0, Math.min(LAST_SAMPLE, index));
 
+/** One column of the 4 x 4 read, its four samples weighted along z. A function of its own, not a closure: the height
+ *  laws ask the cut once a read, so the grass placer pays it once a blade. */
+function columnSum(heightmapData, column, zBefore, z0, stride, zAfter) {
+  return MIDDLE_WEIGHTS[0] * heightmapData[column + zBefore]
+    + MIDDLE_WEIGHTS[1] * heightmapData[column + z0]
+    + MIDDLE_WEIGHTS[2] * heightmapData[column + z0 + stride]
+    + MIDDLE_WEIGHTS[3] * heightmapData[column + zAfter];
+}
+
 /** Whether quad (qx, qz) of a pixel's grid at `stride` is cut south-east to north-west, (x+1, z) to (x, z+1), rather
  *  than south-west to north-east, (x, z) to (x+1, z+1). Decided from the pixel's own samples alone (data[x * 129 + z],
  *  clamped at its edge), so every reader that holds them decides the same cut; the bed's carve and the snow do not move
@@ -34,15 +43,14 @@ export function quadCutsSeNw(heightmapData, qx, qz, stride = 1) {
   // The south-west to north-east midpoint lies `saddle / 4` above the corners' mean, the other one as far below it.
   const saddle = h00 + h11 - h10 - h01;
   if (saddle === 0) return false;
-  let centreTimes256 = 0;
-  for (let i = 0; i < 4; i++) {
-    const column = clampSample(x0 + (i - 1) * stride) * HEIGHTMAP_DIMENSION;
-    let rowSum = 0;
-    for (let j = 0; j < 4; j++) {
-      rowSum += MIDDLE_WEIGHTS[j] * heightmapData[column + clampSample(z0 + (j - 1) * stride)];
-    }
-    centreTimes256 += MIDDLE_WEIGHTS[i] * rowSum;
-  }
+  const zBefore = clampSample(z0 - stride);
+  const zAfter = clampSample(z0 + 2 * stride);
+  const columnBefore = clampSample(x0 - stride) * HEIGHTMAP_DIMENSION;
+  const columnAfter = clampSample(x0 + 2 * stride) * HEIGHTMAP_DIMENSION;
+  const centreTimes256 = MIDDLE_WEIGHTS[0] * columnSum(heightmapData, columnBefore, zBefore, z0, stride, zAfter)
+    + MIDDLE_WEIGHTS[1] * columnSum(heightmapData, column0, zBefore, z0, stride, zAfter)
+    + MIDDLE_WEIGHTS[2] * columnSum(heightmapData, column1, zBefore, z0, stride, zAfter)
+    + MIDDLE_WEIGHTS[3] * columnSum(heightmapData, columnAfter, zBefore, z0, stride, zAfter);
   const centreOverMean = centreTimes256 / 256 - (h00 + h10 + h01 + h11) / 4;
   return centreOverMean * saddle < 0;
 }

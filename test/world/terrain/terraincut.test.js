@@ -17,6 +17,9 @@ import { WATER_DRAW_MASK_TABLE } from '../../../src/world/water/waterCorners.js'
 import { buildPixelWaterIndices } from '../../../src/render/waterSurface.js';
 import { clippedTerrainIndices } from '../../../src/world/deepWater/deepWaterCap.js';
 import { groundAlong } from '../../../src/scenes/ghostfenceBuild.js';
+import { generatePixelTerrain } from '../../../src/world/terrain/terrainGen.js';
+import { WoodsFile } from '../../../src/formats/woodsFile.js';
+import { syntheticWoodsBytes } from '../../landformWorld.mjs';
 
 const H = HEIGHTMAP_DIMENSION;
 const CELL = TERRAIN_SIZE / (H - 1);
@@ -228,5 +231,14 @@ test('TERRAIN-CUT: the water\'s sheet, the coast\'s clip and the fence\'s ground
     }
     assert.ok(lo <= fineLo + 1e-9 && lo > fineLo - 2e-2, `lowest along (${ax}, ${az})-(${bx}, ${bz}): ${lo} against ${fineLo}`);
     assert.ok(hi >= fineHi - 1e-9 && hi < fineHi + 2e-2, `highest along it: ${hi} against ${fineHi}`);
+  }
+});
+
+test('TERRAIN-CUT: the kernel publishes the triangles of the samples it publishes, near and far', () => {
+  const woods = new WoodsFile();
+  assert.equal(woods.load(syntheticWoodsBytes()), true);
+  for (const stride of [1, 4]) {
+    const out = generatePixelTerrain({ woods, px: 300, py: 180, stride, tilemap: new Uint8Array(128 * 128), hasLocation: false, climateType: 0 });
+    assert.deepEqual(out.indices, buildTerrainIndices(stride, out.samples), `stride ${stride}: the build's index set is its samples' cut`);
   }
 });
