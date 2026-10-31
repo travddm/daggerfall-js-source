@@ -1,5 +1,5 @@
 // @ts-check
-// SD9e (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS REMNANT'S SPOILS -
+// SD9e: THE BRASS REMNANT'S SPOILS -
 // what one fighter's share of the Last Moment pays, rolled from the relay's receipt. The gate's spoils' and the serpent's
 // hoard's twin (systems/gate/gateSpoils.js, systems/serpent/serpentSpoils.js).
 //
@@ -90,7 +90,7 @@ export function rollSdSpoils(seed, level) {
   // their draws are still taken, so every spoils after them is what it was for its seed
   rolls();
   rolls();
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the sockets' passes over the pieces, then the Remnant's two
+  // GEM1/GEM2: the sockets' passes over the pieces, then the Remnant's two
   // gems, LAST of all
   socketPass(pieces.map((p) => p.item), rolls);
   weaponSocketPass(pieces.map((p) => p.item), rolls);

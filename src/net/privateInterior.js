@@ -5,8 +5,7 @@ const PREFIX = /^owned:([a-f0-9]{32})\.([a-f0-9]{16})$/;
 const ROOM = /^owned:([a-f0-9]{32})\.([a-f0-9]{16}):(0|[1-9]\d{0,9})\.(0|[1-9]\d{0,9})$/;
 const BOAT_ROOM = /^owned:([a-f0-9]{32})\.([a-f0-9]{16}):boat\.([1-9]\d{0,15})$/;
 const identity = (v) => typeof v === 'string' && /^[A-Za-z0-9_-]{4,64}$/.test(v);
-// WAGONS2-VISIT (2026-10-09, Mac: "People should be able to use the interior just like houses, like crafting and such";
-// who comes in, "Like an online home"): A CARAVAN'S OWN ROOM - `caravan:<k>`, `k` its owner's park key (net/wire.js
+// WAGONS2-VISIT: A CARAVAN'S OWN ROOM - `caravan:<k>`, `k` its owner's park key (net/wire.js
 // parkKeyOf: the account the token verified and the character, hashed - PARK_KEY_RE's 24 hex, pinned equal by
 // test/systems/wagons2_visit.test.js), the key the cell's record of the parked caravan already carries. Its owner stands in it
 // inside their caravan and a visitor joins it by the record, so both stand in one room, in MapsFile's frame (the room

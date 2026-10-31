@@ -90,7 +90,7 @@ export const FIXED_DT = 1 / 60;
 export const ODOMETER_MAX_SPEED = 60;
 export const MAX_FRAME_DT = 0.25;
 
-/** WW2 (Mac: "the bob movement plays even when idle"): THE ONE MOTION BAG every host hands the weapon rig and the
+/** WW2: THE ONE MOTION BAG every host hands the weapon rig and the
  *  dungeon's foe pass. It was written out longhand at five sites, and the world-hosted dungeon lane's copy stopped
  *  four fields short - no `standing`, so the Bob's idle gate (`FPSWeaponClone`'s IsStandingStill) never fired and the
  *  rig fell back to a speed ratio of 1: the WALKING stride played at rest, ten times the idle's size and speed (a
@@ -126,7 +126,7 @@ export function motionBagOf(player) {
     carriedYaw: Number.isFinite(player.carriedYaw) ? player.carriedYaw : 0,
   };
 }
-/** CLIMB5 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md): THE CLIMB ON THE WIRE - `cl` 1 hanging from a
+/** CLIMB5 (the Enhanced Climbing arc): THE CLIMB ON THE WIRE - `cl` 1 hanging from a
  *  lip, 2 climbing a face (the classic climb too), 3 a move in flight (a mantle, a vault, a lower, a leap, a corner);
  *  `cw` the way the body faces on it (climbFacing - the wall, or the move's way), radians to the millirad. Empty off the
  *  wall: the wire omits both, and a pose on the ground keeps the bytes it always had. */
@@ -174,7 +174,7 @@ export const SLOWFALL_VELOCITY = SLOWFALL_SPEED * UNITY_FIXED_DT;   // 2.1 m/s
 export const FALL_DAMAGE_THRESHOLD = 5.0;   // AcrobatMotor fallingDamageThreshold (= PlayerHealth's threshold)
 export const FALL_HP_PER_METRE = 5;         // PlayerHealth.ApplyPlayerFallDamage HPPerMetre
 export const GRAVITY = 20.0;
-/** TELL6e (bible/12-Enhanced-AI/Feud-Arc.md 8.2): a blow's push decays at this (m/s/s)... */
+/** TELL6e (8.2): a blow's push decays at this (m/s/s)... */
 export const BLOW_PUSH_DECAY = 12;
 /** ...and never carries the body over a drop of more than this (m). */
 export const BLOW_PUSH_EDGE = 2;
@@ -632,7 +632,7 @@ export class PlayerMotor {
     this.standingHeightAdjustment = 0;
     // A6 (PlayerHeightChanger.controllerSink, :78): the sunk capsule.
     // toggleSink (:76) is the EDGE tracker DecideHeightAction reads.
-    // DW-D (2026-09-25): two flags again. They were one because vanilla
+    // DW-D: two flags again. They were one because vanilla
     // DFU moves them together (the decision arms the action and the
     // action flips the capsule the same frame), and Iliac Puddle No More
     // writes the ACTION from outside - HeightAction = DoUnsinking for a
@@ -659,7 +659,7 @@ export class PlayerMotor {
     // Teleport action arms; FixedUpdate's block below spends it.
     this.freezeMotor = 0;
     this.techFlight = false;   // TECH1: a technique's leap or dash in the air (techniqueLaunch) - the Jump spell's air control does not steer it
-    // TELL6e (bible/12-Enhanced-AI/Feud-Arc.md 8.2): what a telegraphed blow's landing does to the body - the port's own,
+    // TELL6e (8.2): what a telegraphed blow's landing does to the body - the port's own,
     // set only by systems/blowEffects.js (the Enhanced AI switch's): a push (m/s, decaying), a rattle (a share of the
     // walk for a while), a knockdown (no move, the eye down and up again)
     this._pushX = 0; this._pushZ = 0;
@@ -746,7 +746,7 @@ export class PlayerMotor {
   /** TELL6e: is the body down (a knockdown)? */
   isDown() { return this._downLeft > 0; }
   /**
-   * TECH1 (bible/05-Combat/Weapon-Techniques.md): A TECHNIQUE'S FLIGHT - a leap or a dash a weapon's technique makes
+   * TECH1: A TECHNIQUE'S FLIGHT - a leap or a dash a weapon's technique makes
    * (combat/techniques.js): `dir` the horizontal unit it flies along, `along` metres a second along it, `up` metres a
    * second up. The body flies as a jump flies - the airborne arm keeps the momentum, the collider stops it on what it
    * meets, gravity brings it down, the fall counts from the launch (or, launched mid-fall, from where that fall began:
@@ -795,7 +795,7 @@ export class PlayerMotor {
     this._pushX *= nv / v; this._pushZ *= nv / v;
   }
 
-  /** SEA-RISE (2026-09-27): drop both latches, as a held MoveBackwards does (InputManager.cs:1851's clear, and
+  /** SEA-RISE: drop both latches, as a held MoveBackwards does (InputManager.cs:1851's clear, and
    *  PlayerSpeedChanger.cs:96-99's on the press). The online respawn's - the port's own teleport: a player raised
    *  from death came up still running, back into the water that drowned them. */
   stopAutorun() {
@@ -883,7 +883,7 @@ export class PlayerMotor {
    *  teleport would sweep the camera through the world for one frame;
    *  snapping is the honest picture. Recenters never reach this guard
    *  because offsetOrigin shifts both ends of the span. */
-  /** TV-SMOOTH (2026-10-12, Mac with a video: "the overworld traveling at high speed looks stuttery on the character"):
+  /** TV-SMOOTH:
    *  THE SNAP GUARD SCALES WITH THE STEP. Under an accelerated journey the step is FIXED_DT x the clock (TO1, update's
    *  `step`), and one step of a body walking at x100 is 8 to 17 m - every step past SNAP_SPAN, so every span read as a
    *  placement and the picture snapped to the raw feet: the body, the Overworld's camera and its ring moved only when a
@@ -946,7 +946,7 @@ export class PlayerMotor {
     return [q[0] + dx * a, feetY, q[2] + dz * a];
   }
 
-  /** DISC18 (2026-09-24, Mac: "my characterless [character's legs] are in the ground"): THE BODY'S FEET - EV1's span lerp alone,
+  /** DISC18: THE BODY'S FEET - EV1's span lerp alone,
    *  WITHOUT MAC1's low-pass. feetAt hands a camera the height the eye rides, low-passed over STEP_SMOOTH_TAU so a
    *  rung or a facet does not pop the view, and the hosts handed that same height to the third-person BODY. A
    *  low-pass trails a climb by the climb's vertical speed times its time constant: walking up a 30-degree hill the
@@ -1141,7 +1141,7 @@ export class PlayerMotor {
   }
 
   /** FALL-KEPT (FIELD BUGS 2026-09-30; the report: "you can negate all fall damage by saving while falling right
-   *  before you hit ground. once you load your save, you will land safely"; Mac: "Dont worry abour DFU"): A SAVE
+   *  before you hit ground. once you load your save, you will land safely"): A SAVE
    *  CARRIES THE FALL. DFU keeps the position, the yaw, the pitch and the crouch (SerializablePlayer.cs:204-226) and
    *  its load cancels the movement, so a fall saved a metre from the ground loaded a metre from the ground, from rest,
    *  and billed one metre. The fall is kept as how far above the feet it began, which rides the feet through the
@@ -1195,8 +1195,7 @@ export class PlayerMotor {
     if (Number.isFinite(fall.velY)) this.velY = Math.min(FALL_CARRY_MAX_SPEED, Math.max(-FALL_CARRY_MAX_SPEED, fall.velY));
   }
 
-  /** DUEL1: THE RING'S WALL, as the body meets it. Mac: "a surrounding transparent holographic wall that keeps them
-   *  from going outside of the duel space". Not a mesh in the collider - the collider is shared, and a wall there would
+  /** DUEL1: THE RING'S WALL, as the body meets it.. Not a mesh in the collider - the collider is shared, and a wall there would
    *  stop arrows, foes, the camera and the activation rays, and could be climbed or levitated over - but a clamp on the
    *  ground: the feet kept within the radius less the capsule's own, and whatever of the airborne momentum points out
    *  of the ring taken away (a jump at the wall stops at it; along it, it carries on). Height is never touched, so a
@@ -1691,7 +1690,7 @@ export class PlayerMotor {
     this._bodyYawOff = Math.abs(off) < 1e-3 ? null : off;
   }
 
-  /** MAC1 (Mac, 2026-09-10: "Fix Jittery hills and stairs"). The step
+  /** MAC1. The step
    *  ladder (collider.js) lifts the feet a whole rung in ONE physics
    *  step and the snap drops them a whole tread, where Unity's
    *  controller slides the same rung across several fixed updates; the
@@ -1725,9 +1724,7 @@ export class PlayerMotor {
    *  side collision flags; the probe asks the same physical question
    *  against our collider.
    *
-   *  DISC21 (2026-09-24, "you can climb up walls a bit but you fall
-   *  right back down as you reach the top instead of getting over the
-   *  edge"): THE SIDES FLAG IS THE WHOLE CAPSULE'S, DOWN TO ITS FEET.
+   *  DISC21: THE SIDES FLAG IS THE WHOLE CAPSULE'S, DOWN TO ITS FEET.
    *  The probe sampled only 0.4h and 0.8h above the feet, so the wall
    *  went "untouched" while the bottom 0.72 m of the body still hugged
    *  it: :396 (`!touchingSides`) stopped the climb with the feet 0.72 m
@@ -1924,7 +1921,7 @@ export class PlayerMotor {
    *      held vaulted, INSTEAD of the jump; no lip and the jump below goes as
    *      ever. The Jump a move spent is not pressed again until it is let go
    *      (AUDIT CLIMB1 F7);
-   *    - JUMP HELD IN THE AIR (Mac: "Jump is the grab"): a lip coming into
+   *    - JUMP HELD IN THE AIR: a lip coming into
    *      reach while rising or falling is caught - if the fall so far is one
    *      the Climbing skill holds (F6: "Skill scales it") and the grip is not
    *      spent. CLIMB2: a lip at the chest or higher is HELD - the body hangs
@@ -2191,7 +2188,7 @@ export class PlayerMotor {
    *  starts a free climb. No roll: the grip is what runs out. */
   _freeStart(dt, input, yaw, pk) {
     if (!(input.forward > 0) || !(this.grounded || this.swimming || this.sunk)) { this._fcStart = null; return false; }
-    // CLIMB-NODE (FIELD BUGS 2026-10-01, Mac: "Hold it at nodes"): a profession's node under the look - its prompt up -
+    // CLIMB-NODE (FIELD BUGS 2026-10-01): a profession's node under the look - its prompt up -
     // or an act playing holds the start, and its count begins again when it lets go: a vein stands at its rock's foot,
     // and walking into the rock to reach it climbed it. A jump's grab and a mantle are a jump's, and are not held.
     if (pk.hold?.()) { this._fcStart = null; return false; }
@@ -2366,7 +2363,7 @@ export class PlayerMotor {
     if (!hold) { this._wallEnd(); return false; }
     const jump = input.jump && !this._pkJumpLatch;
     // CLIMB3: a fresh Jump with Back held ejects off the wall, with Left or Right leaps along it. AUDIT CLIMB-FIELD J1
-    // (Mac: "You cant jump from a wall"): no hold that way, the press was spent and the hands held on - it pushes off
+    // : no hold that way, the press was spent and the hands held on - it pushes off
     if (jump && (vert < 0 || side)) {
       this._pkJumpLatch = true;
       return this._pkLeapFrom(dt, vert < 0 ? 'back' : 'side', Math.sign(side)) || this._pkLeapFrom(dt, 'back', 0) || true;
@@ -2639,8 +2636,7 @@ export class PlayerMotor {
     w.gap = c.dist - CAPSULE_RADIUS;   // HUG-TOUCH: how far the face stands off the body (_fcMove's press)
     if (c.key !== w.key) { w.key = c.key; w.carrier = c.key != null ? (this.collider.bucketPose?.(c.key) ?? null) : null; }
     // CLIMB3: a fresh Jump on the free climb leaps - Back off the wall, Left or Right along it, else up it (Mac's
-    // "Parkour leap"; until now Jump on a free climb did nothing). AUDIT CLIMB-FIELD J1 (Mac: "You cant jump from a
-    // wall"): Jump up the wall climbs onto a top in reach first, as Forward does; and a press with no hold that way
+    // "Parkour leap"; until now Jump on a free climb did nothing). AUDIT CLIMB-FIELD J1: Jump up the wall climbs onto a top in reach first, as Forward does; and a press with no hold that way
     // pushes off the wall - it was spent, and the climber hung on
     if (inputs.jumpPressed) {
       this._pkJumpLatch = true;
@@ -3291,7 +3287,7 @@ export class PlayerMotor {
     // this gate at it makes UpdateSpeed verbatim and closes the <=1-frame
     // gap where a dungeon exit onto open water carries the latch before
     // DoSinking has armed the sink.
-    // DW-D (2026-09-25): THE SWAP, because the two stopped moving in
+    // DW-D: THE SWAP, because the two stopped moving in
     // lockstep. Iliac Puddle No More forges PlayerEnterExit.IsPlayerSwimming
     // for its sea and unsinks the capsule of a swimmer whose head is clear
     // of the surface (KeepSurfaceCameraUnsunk) - so `sunk` goes false
@@ -3394,7 +3390,7 @@ export class PlayerMotor {
     // HandleJumpInput while the player wades a record-0 tile and
     // refuses the leap; the port granted the full JUMP_SPEED * boost.
     // (The paralysis clause is covered host-side by the zeroed bag.)
-    // JUMP-SLOW (FIELD BUGS 2026-10-11b, Mac: "Give the jump back"; a departure, Port-Ledger A): DFU's IsSlowFalling
+    // JUMP-SLOW (FIELD BUGS 2026-10-11b,; a departure, Port-Ledger A): DFU's IsSlowFalling
     // clause of this cancel (AcrobatMotor.cs:68) is dropped - the rise is the jump's, and the spell's 2.1 m/s takes the
     // descent from the apex (ApplyGravity below). Still ground-gated (0.1 s): no jump from the air, so no climbing on air.
     // THE FORGIVENESS (above): the buffer - a fresh press in the air, landed within it, fires on the landing; the

@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME1 (2026-09-25) — AN ONLINE HOME: ONE OWNER A BUILDING, SERVER-WIDE.
+// HOME1 — AN ONLINE HOME: ONE OWNER A BUILDING, SERVER-WIDE.
 //
-// Mac: "allowing online players to purchase housing in any location";
 // asked: "Housing is exclusive. World is super large. Can revisit later
 // if needed"; a home is bought "At its front door"; a house bought
 // offline "Stay[s] offline only"; who walks in, "Owner chooses".
@@ -20,8 +19,7 @@
 // the relay signs over a head, never the character's.
 // ═══════════════════════════════════════════════════════════════════
 
-/** How many town homes one character may hold IN A REGION (PLOT1's homesteads will count apart). HOUSES-3 (2026-10-27,
- *  the owner: "Up the house ownership limit to 3 houses per region"): online the cap was a character's three homes in all,
+/** How many town homes one character may hold IN A REGION (PLOT1's homesteads will count apart). HOUSES-3: online the cap was a character's three homes in all,
  *  and a region's; the bank's deeds (systems/banking.js, Daggerfall's one house a region) hold three a region by the same
  *  number. A departure from Daggerfall's DaggerfallBankManager (one house a region; Port-Ledger A). */
 export const HOME_CAP = 3;
@@ -30,7 +28,7 @@ export const HOME_CAP = 3;
 export const HOME_ENTRIES = Object.freeze(['private', 'party', 'public', 'guild']);
 /** A home bought is its owner's alone until they say otherwise. */
 export const HOME_ENTRY_DEFAULT = 'private';
-// ═══ HOME-PRICE (2026-10-04) — WHAT A HOME COSTS ONLINE ════════════════════════════════════════════════════════════
+// ═══ HOME-PRICE — WHAT A HOME COSTS ONLINE ════════════════════════════════════════════════════════════
 //
 // The ask: "We need to make house pricing make sense online"; offered three ways, the choice was to price a house "by
 // what you get (its footprint, scaled by town size) inside a fixed range the server enforces". Daggerfall prices a
@@ -75,7 +73,7 @@ export const HOME_CLAIMS_MAX = 20;
 export const HOME_CLAIMS_WINDOW_S = 3600;
 /** The most homes one town's answer lists (a town has a few hundred buildings; the widest, Daggerfall's, 316). */
 export const HOME_TOWN_MAX = 512;
-/** The politic regions, 0..61 - WW7-5 (bible/03-World/World-Wide.md WW7-5): and the provinces' past the Bay, 62..70
+/** The politic regions, 0..61 - WW7-5 (WW7-5): and the provinces' past the Bay, 62..70
  *  (formats/mapsTables.js REGION_NAMES; the homes table keeps no CHECK). */
 export const HOME_REGION_MAX = 70;
 /** A building key's widest value: (blockX<<16)+(blockY<<8)+record inside an 8x8 town, and 0 spelt 1<<24. */
@@ -149,10 +147,9 @@ export function homeMayEnter(home, { partyNames = [], nowS = Math.floor(Date.now
   return false;
 }
 
-// ═══ WD3 (2026-10-01) — THE LAYOUT A HOME'S TOWN WAS BOUGHT IN ═══════════
+// ═══ WD3 — THE LAYOUT A HOME'S TOWN WAS BOUGHT IN ═══════════
 //
-// Mac: "ensure this doesn't conflict or regress anything (For example
-// housing customization)". Beautiful Villages and Beautiful Cities lay
+// . Beautiful Villages and Beautiful Cities lay
 // Daggerfall's towns out again, and a home is a building KEY - which names
 // a building only in one layout of its town. Online the two mods are the
 // room's (systems/online/onlineLane.js ONLINE_ROOM_MOD_KEYS), and every home
@@ -174,7 +171,7 @@ export const HOME_LAYOUTS_MAX = 20000;
  *  towns' own bound. A home past it is known where its town is asked, as every home was before. */
 export const HOME_KEYS_MAX = 3 * HOME_LAYOUTS_MAX;
 /**
- * FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both"): WHAT AN ACT MOVED, for every page online - town
+ * FIELD BUGS 2026-10-14 QUEST-HOME: WHAT AN ACT MOVED, for every page online - town
  * `mapId`'s buildings `on` homes now and `off` homes no more, as one act's answer says it (`moved`). The route signs it
  * into a home order (server-account/src/index.js homeOrdersOf), which the acting client carries to the hub and the hub fans to everyone, so
  * a page that read every town's homes at its boot (homeLayouts) hears a house bought after it - a quest's residence is
@@ -209,9 +206,9 @@ export function homeLayoutsMatch(a, b) {
   return x.size === y.size && [...x].every((m) => y.has(m));
 }
 
-// ═══ ARENA4b (2026-10-03) — THE HOMES THE ARENA DISPLACED, MOVED ONLINE ══
+// ═══ ARENA4b — THE HOMES THE ARENA DISPLACED, MOVED ONLINE ══
 //
-// Mac (ARENA1): "Move them to a new house". The Arena of Daggerfall
+// . The Arena of Daggerfall
 // stands in Daggerfall's cell (4,3) in every layout of the city
 // (world/arena/arenaCity.js), so no building has a key there: an online home
 // keyed there names nothing. The OWNER'S CLIENT picks its new house by
@@ -237,7 +234,7 @@ export const homeInArenaCell = (mapId, key) => mapId === HOME_ARENA_MAP_ID && ho
  *  nobody once its days run out (an offer of the same number writes a point again - rent.js offerRoom). */
 export const RENT_ANCHOR_MOVED = 'null';
 
-// ═══ HOME-RENT (2026-09-30) — A ROOM OF A HOME, RENTED TO ANOTHER PLAYER ══
+// ═══ HOME-RENT — A ROOM OF A HOME, RENTED TO ANOTHER PLAYER ══
 //
 // Asked: "For houses with multiple rooms, the owner can choose to rent out
 // to other players and adjust the price as needed". An owner OFFERS a room
@@ -299,7 +296,7 @@ export function rentUntil(nowS, until, days) {
 /** Whole days (rounded up) a tenancy ending `until` has left at `nowS` - 0 once it ran out. */
 export const rentDaysLeft = (until, nowS) => (Number.isSafeInteger(until) && until > nowS ? Math.ceil((until - nowS) / RENT_DAY_S) : 0);
 
-// ═══ HOME-LOOK (2026-09-30) — AN ONLINE HOME'S OUTSIDE, AS ITS OWNER PAINTS IT ══
+// ═══ HOME-LOOK — AN ONLINE HOME'S OUTSIDE, AS ITS OWNER PAINTS IT ══
 //
 // Asked: "The introduction of exterior customization. The ability to choose
 // the texture for the roof, walls, door, windows, etc". A house's outside

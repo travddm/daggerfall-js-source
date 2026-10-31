@@ -1,6 +1,5 @@
 // @ts-check
-// SCALE5b (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE5b): THE RELAY'S SETTINGS, AT RUN TIME. The line the
+// SCALE5b: THE RELAY'S SETTINGS, AT RUN TIME. The line the
 // boss fights' count runs by (BOSS_BODY, INT11-INT14) and the Discord roles the herald pings (GATE_DISCORD_ROLE,
 // SERPENT_DISCORD_ROLE, SD_DISCORD_ROLE - and, HERALD-CARDS, the threads it posts to) were the Worker's vars alone, and a var changed is a Worker redeployed: every
 // player online dropped, a reconnect wave and its mints, to move one number. A developer now sets each in the hub
@@ -21,15 +20,15 @@ export const RELAY_CFG_VARS = Object.freeze({
   gateThread: 'GATE_DISCORD_THREAD',
   serpentThread: 'SERPENT_DISCORD_THREAD',
   sdThread: 'SD_DISCORD_THREAD',
-  groundGate: 'GROUND_GATE',   // GROUND-GATE (bible/01-Overview/bugs/Field-Bugs-2026-10-17f.md): 'on' refuses a ground room's hello from a build on an older ground (net/wire.js GROUND_LAW) - off until the site serves the build that says it, since the relay deploys first
-  grantMode: 'GRANT_MODE',   // GRANT2 (bible/11-Multiplayer/Spawn-Grants.md section 12): the spawn grants' law - 'measure' (and unset: net/grantLaw.js grantModeOf), 'enforce' (GRANT6), 'off'
+  groundGate: 'GROUND_GATE',     // GROUND-GATE: 'on' refuses a ground room's hello from a build on an older ground (net/wire.js GROUND_LAW) - off until the site serves the build that says it, since the relay deploys first
+  grantMode: 'GRANT_MODE',     // GRANT2: the spawn grants' law - 'measure' (and unset: net/grantLaw.js grantModeOf), 'enforce' (GRANT6), 'off'
   grantRoll: 'GRANT_ROLL',   // GRANT8 (Spawn-Grants.md section 16): 'on' - an encounter's grant rolls its species from its seed (`encr`); off unset
   grantStrip: 'GRANT_STRIP',   // GRANT9 (Spawn-Grants.md section 16): 'on' - the relay drops a record its grant does not stand (FOE-BOUNDS, section 19: and one no builder could give); off unset
   grantDoor: 'GRANT_DOOR',   // GRANT-DOOR (Spawn-Grants.md section 20): 'on' - a foes room refuses a build whose hello says no spawn grants (net/wire.js GRANT_HELLO_LAW); off unset, and off until the site serves the build that says it, since the relay deploys first
   cellSeed: 'CELL_SEED',   // COST-2 part two (net/cellTree.js cellSeedOf): the level the cell directory seeds its tree at, 1 to 4 - off unset (the tree fixed at L0), and off until the site serves the build that says `cv`, since the relay deploys first; off again is the way back
   leaseDoor: 'LEASE_DOOR',   // LEASE1 (net/roomLease.js): 'on' - a lease room refuses a hello that does not hand on its hub's lease, and hears a bound socket in nothing but its ping while it holds no live lease; off unset, and off until the site serves the build that says it, since the relay deploys first
-  lootDoor: 'LOOT_DOOR',   // LOOT-DOOR (AUDIT HORIZONTAL B7, bible/06-Systems/Professions-Arc.md 57.8): 'on' - a loot room refuses a build whose hello reads less loot than the relay's law (net/wire.js LOOT_HELLO_LAW); off unset, and off until the site serves the build that says it, since the relay deploys first
-  sdCollapse: 'SD_COLLAPSE',   // SD-PARTY (bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): 'on' - the first party to break an Abyss Dungeon's Hour collapses it for everyone (the law before SD-PARTY); off unset - each party's win closes its own Hour, and the Hollow stands until it fades
+  lootDoor: 'LOOT_DOOR',     // LOOT-DOOR (AUDIT HORIZONTAL B7, 57.8): 'on' - a loot room refuses a build whose hello reads less loot than the relay's law (net/wire.js LOOT_HELLO_LAW); off unset, and off until the site serves the build that says it, since the relay deploys first
+  sdCollapse: 'SD_COLLAPSE',     // SD-PARTY (SD-PARTY): 'on' - the first party to break an Abyss Dungeon's Hour collapses it for everyone (the law before SD-PARTY); off unset - each party's win closes its own Hour, and the Hollow stands until it fades
 });
 /** The settings a developer may set. */
 export const RELAY_CFG_KEYS = Object.freeze(Object.keys(RELAY_CFG_VARS));

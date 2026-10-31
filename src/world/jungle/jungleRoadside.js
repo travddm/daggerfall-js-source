@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// JUNGLE-ROADSIDE (2026-10-23, the owner, through Mac, with pine.obj, pine-1.obj and pine2.obj: "These trees are meant
-// for the jungle biome and roadside. Making it more like a jungle with the vines stringing across the roads", and to have
-// them "sunk into the ground so they dont float") - THE ROADSIDE PAIRS, READ. bible/03-World/Bantha-Jungle.md, The
+// JUNGLE-ROADSIDE - THE ROADSIDE PAIRS, READ., The
 // roadside pairs, is the design and the record; 01-Overview/audits/Audit-Jungle-Roadside.md its audit.
 //
 // Each of the owner's three files is a PAIR: the mahogany and a second tree of the jungle's own (a kapok they leant over
@@ -328,7 +326,7 @@ export function highestDrawn(heightmapData, corners) {
  *     and the road anywhere under the pair (across its band, along it as far as anything hangs over it) keeps it under
  *     UNDER_TOP (highestDrawn, both);
  *   - no trunk of a pair it already stood is within `clear`.
- * SUNK, NEVER FLOATING (the owner: "sunk into the ground so they dont float"): the pair is one rigid thing - its lianas
+ * SUNK, NEVER FLOATING: the pair is one rigid thing - its lianas
  * hang from both crowns - so it stands at the LOWEST drawn ground beneath either foot (lowestDrawn, exact) less `sink`:
  * nowhere under its feet is the ground lower than its own, and the uphill tree's roots go into the slope. Answers
  * `[{ kind, js, turn, ax, az, y, trees: [{ species, record, x, z, y }] }]`, pixel-local - `y` where the pair stands (its

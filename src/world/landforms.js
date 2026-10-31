@@ -1,8 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// LANDFORM1-3 (2026-10-06, Mac, with a picture of the Iliac Bay's
-// heightmap: "Can we adjust the heightmap to be more of this? and allow
-// roads to carve through terrian and caverns without breaking anything
-// and rivers to actually have depth, not just lying flat on land").
+// LANDFORM1-3.
 // THE PORT'S OWN TERRAIN, behind the Features row `landforms`
 // (scenes/shared.js landformsOn) - off on the classic skin, where the
 // ground is DFU's to the bit.
@@ -39,8 +36,7 @@
 // that term is lifted: the large heightmap's hills and the ground noise
 // keep DFU's scale, so the massifs grow and the footing under a walker
 // is the footing DFU gives (a lifted ground noise is 25-metre spikes).
-// THE LIFT FADES BESIDE THE SEA (AUDIT LANDFORMS II I1, Mac: "Is it too
-// steep?", then "Go ahead"). The lift steepens a slope by up to 2.8
+// THE LIFT FADES BESIDE THE SEA (AUDIT LANDFORMS II I1,, then "Go ahead"). The lift steepens a slope by up to 2.8
 // times, most where the land already rises fastest, and nowhere does it
 // rise faster than out of the sea: Menevia's plateau (bytes of 75 a pixel
 // from the sea) stood its rim at 70 degrees, a road down it dropped a
@@ -89,13 +85,10 @@
 // (MAC2's law: the swim is where the surface is drawn), so nothing about
 // water changes but where it lies. A river is cut wherever it is painted
 // and nowhere else - the network's `water`, the mod's own switch. Online
-// that switch is the room's (2026-10-06, Mac: "Yes rivers should be
-// online" - onlineLane.js ONLINE_ROOM_MOD_KEYS): a river cut into the
+// that switch is the room's: a river cut into the
 // land is ground, and a room stands on one ground.
 //
-// LANDFORM4 - A TOWN STANDS IN ITS LAND (2026-10-07, Mac, of a town
-// walled in by its own levelling: "I dont care about DFU. I want
-// detailed generation, rolling hills, varied terrian"). DFU levels a
+// LANDFORM4 - A TOWN STANDS IN ITS LAND. DFU levels a
 // location to its pixel's mean and ramps back to raw ground by the
 // pixel's edge, so the whole rise between the town and the land round it
 // is taken inside one pixel - and with the lift, that rise stood as a
@@ -107,7 +100,7 @@
 // level is its pixel's mean over a coarse grid (siteLevel), so DFU's own
 // blend after the kernel - still run, still the location's - finds the
 // pixel already all but level and moves little.
-// BAY-LEFT-GROUND (2026-10-26, the audit "no system left behind in the Bay", D1): AND PAST THE BAY. The table is MAPS.BSA's
+// BAY-LEFT-GROUND: AND PAST THE BAY. The table is MAPS.BSA's
 // 1000 x 500, so no town past the Bay was a site, and every one of them stood in its own levelling wall (a median 39 m,
 // p90 104 m from its pixel's edge to its level, against the Bay's 7.6 m and 37.7 m). The places past the Bay every
 // client stands alike (world/pastBayRows.js pastBaySites - TESA12's cities, towns and villages, and the capitals levelled
@@ -184,7 +177,7 @@ export const LANDFORM_DIALS = Object.freeze({
   // land's own height over the knee (at most 0.9 of it); `region` the region field's wavelength, `warp` how far the
   // shapes' domain is pushed about (over `warpScale`), and the rolling octaves' wavelengths and weights (samples).
   hills: Object.freeze({ uplandAt: 700, coast: 1.25, region: 2400, warp: 80, warpScale: 520, scales: Object.freeze([300, 125, 50]), weights: Object.freeze([1, 0.36, 0.1]) }),
-  // LANDFORM8 (WOD-PEAKS, 2026-10-09, the owner: "can you place more rounded not SUPER HUGE mountains?"): a mountain
+  // LANDFORM8 (WOD-PEAKS, 2026-10-09): a mountain
   // land's `peaks` - rounded mountains standing on its hills where World of Daggerfall's faceted spires stood
   // (modSettings.js world-of-daggerfall `Mountains`, now off): one to a `cell` (samples) of the cells `fill` holds,
   // each a bell (a cosine from its summit to its foot - round on top, easing out at the foot, never a crease) of its
@@ -192,8 +185,7 @@ export const LANDFORM_DIALS = Object.freeze({
   // `high` (kernel units) at most on the high ground - 200 m in the mountains, 140 m in the mountain woods - and lower
   // on the low ground by the land's own `upland`; where two meet the taller stands. Centred as the hills are (PEAK_MEAN),
   // so the land's average height stays DFU's, lifted; at most some 30 degrees on a bell's flank.
-  // MOUNTAINS-SHARP (2026-10-14, the owner: "Mountains shape (Dragontail/Wrothgarian). More pointy, less rounded (sharp),
-  // more height"): the mountain land's own - the Dragontail and the Wrothgarian Mountains are CLIMATE.PAK's Mountain -
+  // MOUNTAINS-SHARP: the mountain land's own - the Dragontail and the Wrothgarian Mountains are CLIMATE.PAK's Mountain -
   // stand `sharp` peaks, (1 - q)^2 from summit to foot (a point on top, flanks that steepen toward it, easing out at
   // the foot), twice as tall (400 m), on ridges 1.4 times as tall (`high` 112); the mountain woods keep their bells.
   // LANDFORM6: THE LAND WEARS ITS CLIMATE - each climate's hills: `low`/`high` their height (kernel units, either side of

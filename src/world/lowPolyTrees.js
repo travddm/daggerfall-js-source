@@ -1,8 +1,6 @@
 // @ts-check
-// LPT1 (2026-10-05, the owner: "Next mod to integrate is this ... Its important we make this compatible with seasons
-// of daggerfall, ensure performance doesnt take a hit and draw distance can remain the same. A true visual overhaul with
-// no performance loss"): LOW POLY TREES 5 (SquidKamer - Kamer), 253 prefabs that stand a 3D tree where a nature flat
-// of archives 500-511 stood. bible/07-Rendering/Low-Poly-Trees.md is the design and the record.
+// LPT1: LOW POLY TREES 5 (SquidKamer - Kamer), 253 prefabs that stand a 3D tree where a nature flat
+// of archives 500-511 stood. is the design and the record.
 //
 // THIS MODULE IS PURE (no GL, no fetch): the vendored data's shape (tools/lowPolyTreesExtract.mjs writes it), the
 // atlases rebuilt from the player's own pictures, the far picture of each tree, DFU's per-tree draw (scale and turn)
@@ -380,8 +378,7 @@ export const LPT_IMPOSTOR_MIN = 24;
 export const LPT_IMPOSTOR_MAX = 256;
 /** The light the far picture is drawn under: the sky's, from straight above. BB_VS lights a 3D tree's faces by the same
  *  law (0.72 + 0.28 n.l) under this same light, crossfaded to the sun's own by day - so the two agree where they hand
- *  over at night and nearly by day (AUDIT LPT A2). FLORA-GROUND (FIELD BUGS 2026-10-27, the owner: "reflective flora can
- *  be seen ... in first person"; the coordinator: "the material matte at its root"): it was [0, 0.6, -0.8], from the
+ *  over at night and nearly by day (AUDIT LPT A2). FLORA-GROUND (FIELD BUGS 2026-10-27,; the coordinator: "the material matte at its root"): it was [0, 0.6, -0.8], from the
  *  viewer's side and above, and the 3D tree took it TURNED TO FACE THE EYE - a light no lamp casts, that followed the
  *  player round every tree, bush and stump: the faces toward them lit whole, the faces away at half, the shine moving
  *  over the crown as they walked (whole by night, a share of it at dusk, at dawn and under a storm's dim sun). A matte

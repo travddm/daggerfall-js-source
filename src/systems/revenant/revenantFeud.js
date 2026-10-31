@@ -1,6 +1,5 @@
 // @ts-check
-// FEUD, Part B - RVN (bible/12-Enhanced-AI/Feud-Arc.md sections 12-26; Mac, 2026-10-04: "I want to improve the revenant
-// system to be more complex, less easy to accomplish and more detailed", then "Go" on every call): A REVENANT WITH A
+// FEUD, Part B - RVN (;, then "Go" on every call): A REVENANT WITH A
 // MEMORY. systems/revenant/revenant.js keeps the record and its deeds; this sibling keeps what FEUD adds to it - every RVN number
 // in one place, the law of every new field (its validator, and the value an older record derives from its id), the
 // scars a fight leaves (the ledger is systems/feudLedger.js, a leaf), and the draws a revenant is born with: its
@@ -51,7 +50,7 @@ export const ADAPT = Object.freeze({
 });
 /** RVN3: from this rank its will must be broken; this many staggers break it - FEUD BALANCE (Feud-Arc.md OPEN 22, Mac,
  *  2026-10-05): one, and a perfect dodge of its blow counts as one (the duel harness: two came one rank-3 fight in nine).
- *  UNQUIET (bible/06-Systems/Revenants.md section 46; the owner: "harder"): from rank 2 - it was 3; a rank-1 revenant's
+ *  UNQUIET (): from rank 2 - it was 3; a rank-1 revenant's
  *  flight (FLIGHT-FIRST's young line) is the only one left without a will. */
 export const WILL_RANK = 2;
 export const WILL_STAGGERS = 1;

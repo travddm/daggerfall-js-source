@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL-RELIEF (2026-10-24, bible/03-World/Tamriel.md TAMRIEL-RELIEF; the owner, with a heightmap of the whole continent:
-// "Heres the entire tamriel height map btw", then "This is the heightmap. Use it") - THE CONTINENT'S OWN RELIEF: the
+// TAMRIEL-RELIEF - THE CONTINENT'S OWN RELIEF: the
 // owner's heightmap laid on the trace of Daggerfall's own map (tools/bakeTamrielRelief.mjs - its land fitted and warped
 // onto the trace's, its brightness made WOODS' bytes by the Bay's own ranks), a height a cell, two cells a picture unit
 // (tamrielReliefData.js). PURE over the trace: the terrain worker and the roads worker hold the same module.

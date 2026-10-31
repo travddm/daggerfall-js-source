@@ -1,7 +1,5 @@
-// GUIDE1 - THE QUEST LENS (2026-09-29, Mac: "How can we set the
-// foundation and improve the quest system substantially? Like really
-// modernize it, make it more accessible"). The foundation of the Quest
-// Guide arc (bible/06-Systems/Quest-Guide-Arc.md): every modern quest
+// GUIDE1 - THE QUEST LENS. The foundation of the Quest
+// Guide arc: every modern quest
 // face the arc builds - the tracker, the notices, the map's marks, the
 // accessible journal - draws from this, and from nothing else.
 //
@@ -150,7 +148,7 @@ function quietly(quest, fn) {
 }
 
 /**
- * QL1 (bible/06-Systems/Questlines-Arc.md section 2.2): A SHEET'S LINE, READ QUIETLY - an objective's, a branch's or an
+ * QL1: A SHEET'S LINE, READ QUIETLY - an objective's, a branch's or an
  * outcome's words in DFU's own macros (`_house_` a resource's name, `__house_` its building, `___house_` its town), expanded
  * over the quest's resources exactly as a message's tokens are (questMacros.js expandQuestMessage) and with nothing moved
  * (the quiet read's law above). `key` (`<QUEST>.<kind>.<id>` - qlLayer.js sheetTextKey, AUDIT QUESTLINES LAW-10) finds a
@@ -474,7 +472,7 @@ export class QuestLens {
         // GUIDE4: the target's words, said here once a look, so a face the HUD draws (the tracker) reads them off
         // the view and never imports the lens - the HUD's import graph stays off the quest machine (GUIDE3).
         words: targetWords(latest.target),
-        // QL2 (bible/06-Systems/Questlines-Arc.md section 6): a stamped quest's objective now - the first still to do -
+        // QL2: a stamped quest's objective now - the first still to do -
         // for the tracker's card, and the ones done, for the herald's news; null and none for DFU's quest
         objective: currentObjective(walk.get(String(r.id))?.ql),
         objectivesDone: (walk.get(String(r.id))?.ql?.objectives ?? []).filter((o) => o.state === 'done').map((o) => ({ id: o.id, text: o.text })),

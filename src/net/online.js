@@ -2,10 +2,7 @@
 import { validStaffEventIn, validStaffEventOut, relaySupportsStaffEvents } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT
 import { relaySupportsFoeInventory } from './wire.js';
 import { loneStep, loneWake, loneAhead, loneSupported, aloneOf, LONE_HOLD, LONE_SAY } from './loneSleep.js';   // LONE-SLEEP: a lone session's pose at LONE_POSE_MS
-// ONLINE1 (2026-09-12, Mac: "the basic bones of multiplayer. The goal is
-// being able to see others in the world while allowing you to bring
-// over one of your own save file ... All I care about is being able to
-// see and traverse with other players"): THE SESSION.
+// ONLINE1: THE SESSION.
 //
 // THE SHAPE. Every player runs their own world from their own save;
 // presence is shared (ONLINE1), words (CHAT1), a world room's memory
@@ -35,7 +32,7 @@ import { loneStep, loneWake, loneAhead, loneSupported, aloneOf, LONE_HOLD, LONE_
 // converts: the host hands the pose in its room's frame and takes the
 // peers back in it.
 //
-// AUDIT ONLINE (2026-09-12, the deep audit before the merge) rewrote the
+// AUDIT ONLINE rewrote the
 // clock (B1: the hosts fed the rAF clock into Date.now() stamps - every
 // peer stood frozen at its first pose, the timeout never fired and a
 // dropped socket never reconnected), the silence law (B3/B11/B14: a peer
@@ -48,8 +45,7 @@ import { loneStep, loneWake, loneAhead, loneSupported, aloneOf, LONE_HOLD, LONE_
 // and the room key (B10: a location's map id, never a slug that could
 // collide or a '-1.x' fallback that pooled the unknown).
 //
-// CHAT1 (2026-09-12, Mac: "the live chat in enhanced format ... one
-// world tab with the ability to add more tabs at a later time"): a
+// CHAT1: a
 // session opened with `presence: false` is a CHANNEL's - it says hello
 // with no pose, sends no pose, heartbeats with a ping the relay's
 // runtime answers in its sleep, and carries chat lines both ways:
@@ -57,15 +53,14 @@ import { loneStep, loneWake, loneAhead, loneSupported, aloneOf, LONE_HOLD, LONE_
 // shows them). One such session per tab; the World tab's room is
 // CHAT_WORLD_ROOM. The presence session can carry chat too (a place
 // room relays a line as far as a pose) - the local tab, when it comes.
-// AUDIT CHAT (2026-09-12): a channel session refuses a pose outright
+// AUDIT CHAT: a channel session refuses a pose outright
 // (D3); sendChat runs the relay's own chat gate first, so a line the
 // relay would drop is refused here and the field keeps it (A8/B2); a
 // terminal close is stamped, and rejoin() is the one door back for a
 // session that never changes rooms (A6/B6) or was left by the page's
 // goodbye (B4); statusLine takes its label (B5).
 //
-// WORLD1 (2026-09-12, Mac: "The world is the server ... True
-// persistence"): the room's HOST - the relay's word, in the welcome
+// WORLD1: the room's HOST - the relay's word, in the welcome
 // and in a host frame - and the room's MEMORY: a welcome may carry
 // the world the room keeps (onWorld), and the host publishes its own
 // through sendWorld (the host of a world room alone; the relay ignores
@@ -76,7 +71,7 @@ import { validStaffTeleportIn, validStaffTeleportOut, staffTeleportSupported } f
 import { validFollowOut, whereNoteDue, followSupported } from './staffFollow.js';   // STAFF-PANEL5-FOLLOW: the hub's word to a spectator, and the where note's pace
 import { validRelayCfgIn, validRelayCfgOut, relayCfgSupported } from './relayCfg.js';
 import { relaySupportsSeatLive, seatAskDue, seatStreams } from './seatLive.js';   // FIELD BUGS 2026-10-18d SEAT-LIVE: a dungeon room's seat is a live socket's
-import { relaySupportsGrant, relaySupportsGrantStats, relaySupportsStarGrant, grantModeOf, validGrantAsk, validGrantOut, grantGate } from './grantLaw.js';   // GRANT2: the spawn grants' asks (bible/11-Multiplayer/Spawn-Grants.md section 12)   // SCALE5b: the relay's settings, a developer's
+import { relaySupportsGrant, relaySupportsGrantStats, relaySupportsStarGrant, grantModeOf, validGrantAsk, validGrantOut, grantGate } from './grantLaw.js';     // GRANT2: the spawn grants' asks // SCALE5b: the relay's settings, a developer's
 import { coversCell, nodeOfCells, isCoarseNode } from './cellTree.js';   // COST-2 (b): what a socket covers - the one law both ends read
 import { hubHopOf, isChannelShard, channelOf, hubShardsSupported, HUB_FIND_MAX, HUB_FIND_Q_MAX, HUB_GUILD_WHO_MS, HUB_GUILD_WHO_MAX, HUB_WHO_MS } from './hubShards.js';   // SCALE5c: the hub, sixteen ways
 import { CHAT_ROSTER_MAX } from './wire.js';   // SCALE5c: the World tab's list while the hub is small
@@ -87,7 +82,7 @@ export const HUB_FIND_ASK_MS = 1500;
 /** CHAT-FIND-HUB: a query that still stands in the box is asked again once its answer is this old (who is online moves). */
 export const HUB_FIND_FRESH_MS = 15_000;
 import { isLayered, LAYERS_MAX } from './wire.js';   // SCALE5d: a crowded place's layers
-import { instanceRoomOf, relaySupportsInstances, relaySupportsGuildInstances } from './instanceRoom.js';   // INSTANCES: a place's instance room (bible/11-Multiplayer/Instances.md)
+import { instanceRoomOf, relaySupportsInstances, relaySupportsGuildInstances } from './instanceRoom.js';     // INSTANCES: a place's instance room
 import { layoutRoomKey } from '../world/interior/interiorShared.js';   // WD3 (AUDIT WD3 B3): an interior's room is its layout's
 import { tabStorage } from '../systems/appStorage.js';   // the tab's own storage - the seam, never the browser's own (a PIN)
 import { STAMP_RE } from './safety/chatStamp.js';   // SAFE2: a line's stamp, carried as the relay said it
@@ -123,7 +118,7 @@ import { t } from '../systems/textManager.js';   // L10N4: the HUD line's words 
 import { relaySupportsWorldWide } from './wire.js';   // AUDIT RELEASE R2: a relay that reads a pixel past the Bay in a staff destination, an arch's site and a headstone's row
 import { MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y } from '../formats/mapsTables.js';   // AUDIT RELEASE R2: the Bay's own map, all an older relay reads
 
-/** AUDIT RELEASE R2 (bible/01-Overview/audits/Audit-Release-R2.md): is a pixel on the Bay's own map - all a relay before the
+/** AUDIT RELEASE R2: is a pixel on the Bay's own map - all a relay before the
  *  world-wide one (relaySupportsWorldWide) reads in a staff destination, an Elite arch's site or a headstone's row; it
  *  closes the socket on a word that names one past it. @param {any} x @param {any} y */
 export const bayMapPixel = (x, y) => Number.isInteger(x) && Number.isInteger(y) && x >= 0 && x < MAX_MAP_PIXEL_X && y >= 0 && y < MAX_MAP_PIXEL_Y;
@@ -132,7 +127,7 @@ export { WORLD_CELL, RANGE_PIXELS, worldRoom };
 
 /** Poses a second, at most, when the pose moved. */
 export const POSE_HZ = 10;
-/** SLAM3 (2026-09-16, Mac: the 30th-anniversary slam): the floor the crowded rate falls to. Below this a walk reads
+/** SLAM3: the floor the crowded rate falls to. Below this a walk reads
  *  as a series of hops however well it is eased. */
 export const POSE_HZ_MIN = 4;
 /** GUILD1c: the client's spacing of guild frames down one socket, ms - wider than the relay's own gate (GUILD_ORDER_HZ_MAX,
@@ -171,8 +166,7 @@ export function tokenHidden(tok) {
 
 export const GAP_MIN_MS = 50;
 export const GAP_MAX_MS = 1000;
-/** HALO-THIN (2026-10-10, the owner: "For you when you are near a player ... Theres 10 position updates every time.
- *  Multiply it by the times the player is near you and its an insane bottleneck"): A HALO HEARS WHERE I AM, NOT EVERY
+/** HALO-THIN: A HALO HEARS WHERE I AM, NOT EVERY
  *  STEP. My pose went down my cell's socket AND every halo's at the full rate (sendPose), and a listener holding two,
  *  three or four of those rooms heard each pose once per room it shares - two copies astride a cell's edge, four at its
  *  corner, every one of them parsed, gated and dropped as a copy (NET-SMOOTH 2, SCALE2b's `ts`), and every one fanned by
@@ -249,8 +243,7 @@ export const WILD_GHOST_MS = 150_000;
 /** INT9 (AUDIT): how often my word that I stand in the zone is said again on my cell's socket while it stands - a relay
  *  object that restarted forgot it (and with it every fight there), and the next word makes the fighter again. */
 export const WILD_ZONE_KEEP_MS = 15_000;
-/** RUN-IN-PLACE (2026-10-06, Mac: "theres a lot of player desync online, including players appearing to run in
- *  place"): how long a peer drawn standing still may go on reading as moving. A body walks off its drawn pose's `mv`
+/** RUN-IN-PLACE: how long a peer drawn standing still may go on reading as moving. A body walks off its drawn pose's `mv`
  *  (net/peer/peerClimb.js peerMoving, every on-foot renderer and the footsteps), and the play-out (`tick`) stands a peer at
  *  the end of its path whenever the next pose is late - a sender's hitch, a tab put in the background, a reconnect, a
  *  stall on the line - with the last pose's `mv` still on it: the body ran and stepped in place, for as long as
@@ -263,7 +256,7 @@ export const SHOWN_MOVE_HOLD_MS = 250;
  *  AUDIT SAFE CLIENT-2: nor because the account is banned ('banned') - the service will mint it nothing until the ban
  *  ends, and asking again every few seconds was a refused mint and a refused hello a room, for the ban's length. */
 export const tokenRetryable = (/** @type {string|null|undefined} */ why) => typeof why === 'string' && why !== 'no-session' && why !== 'auth' && why !== 'banned';
-/** AUDIT SAFE RELAY-2 (2026-10-17): THE RELAY'S WORD ON MY OWN CHAT, a second - `law`, `banned`, `muted` and `slowed`, on a
+/** AUDIT SAFE RELAY-2: THE RELAY'S WORD ON MY OWN CHAT, a second - `law`, `banned`, `muted` and `slowed`, on a
  *  bucket of their own. They rode the chat lines' inbound bucket (CHAT-G's), so a channel running at its budget dropped
  *  the very frame that said I was muted or banned, or carried the order to my other rooms. Derived, never a literal: an
  *  order a second at the relay's meter (MUTE_HZ_MAX) is two frames (its `law` and its word - `banned` or `muted`), and the
@@ -359,8 +352,7 @@ export function roomKeyFor({ host, mode, mapId = null, regionIndex = -1, locatio
  *  every caller and every pin that knows it as the session's keeps working. */
 export { poseChanged };
 
-// ONCRASH1 (2026-09-15, Mac: "reports of player browser crashing when
-// online"): the short arc, in ONE STEP. This was two `while` loops, and
+// ONCRASH1: the short arc, in ONE STEP. This was two `while` loops, and
 // the angle they wrapped is a PEER'S YAW - a number this session takes
 // from the relay and checked only for being finite. At a large one,
 // `d - 2 * Math.PI === d` in doubles and the loop never falls: the tab
@@ -414,8 +406,7 @@ const groundDist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
  *  or null (an older relay stamps none, and a wedding then waits on one that does). */
 const scOf = (m) => (typeof m?.sc === 'string' && REALM_CHARACTER_RE.test(m.sc) ? m.sc : null);
 
-// ═══ NET-SMOOTH (2026-10-04, Mac: "Sometimes other players rubberband, I want to continue to improve performance and
-// future proof for larger amounts of players") ════════════════════════════════════════════════════════════════════
+// ═══ NET-SMOOTH ════════════════════════════════════════════════════════════════════
 //
 // FOUR CAUSES OF A PEER DRAWN JUMPING BACK OR DASHING, all of them here, none needing the relay:
 //   1. THE SNAP IN THE WRONG UNITS. The scene frame's snap (SNAP_SCENE_UNITS, 30 - metres in a dungeon) was taken for
@@ -565,7 +556,7 @@ export const peerSecret = (storage = tabStorage()) => keptToken(storage, 'dagger
  * stamp inside is the handed-in clock's (the page's steadyNow unless
  * told otherwise - AUDIT ONLINE 3 F2); nothing outside passes a time in.
  */
-/** ONE-SEAT (Mac: "the player can only have one character only at a time"): the line a superseded session says - another
+/** ONE-SEAT: the line a superseded session says - another
  *  tab or window of this player went online (or this tab's own id was taken), so this one is out of every room. */
 export const SEAT_TEXT = 'online in another tab, window or device, so this one is offline';
 /** L10N4: SEAT_TEXT as the player reads it, read when it is said. */
@@ -676,7 +667,7 @@ export class OnlineSession {
     this.onGuildGone = null;   // GUILD1c: () => void - a room took my guild off (a removal, a disbanding, my own leave's echo): the host looks again
     this._gdSock = new WeakMap();   // GUILD1c: per SOCKET - its own welcome's word on the guild frames, and its own gate (GUILD_ORDER_HZ_MAX)
     this._gdHeld = [];         // GUILD1c: the guild orders this page carries - [{ frame, until, sent: WeakSet }], a removal first
-    // FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both"): a home that moved, said to every page online - the
+    // FIELD BUGS 2026-10-14 QUEST-HOME: a home that moved, said to every page online - the
     // home orders this page carries to the hub ([{ frame, until, n, at }]), whether the hub that welcomed my socket knows
     // the frame (relaySupportsHome), when the last went down it, the inbound gate, and the host's ear for the hub's words
     this._hmHeld = [];
@@ -726,15 +717,15 @@ export class OnlineSession {
     this.onWelcomed = null;       // AUDIT SAFE CLIENT-8: () => void - my room's socket was welcomed (a reconnect's too): what the page reads of the account at a start is read again
     this.banOk = false;           // AUDIT SAFE RELAY-3: the relay that welcomed this socket knows the `ban` frame (relaySupportsBan) - an older one CLOSES the socket on it
     this.courtWatchOk = false;    // AUDIT PLAN-1000 G3: the relay that welcomed this socket says `me` when it seats a fighter (relaySupportsCourtWatch) - before it a full court refuses
-    /** AUDIT SAFE CLIENT-2 (2026-10-17): MY ACCOUNT IS BANNED - STICKY, as `superseded` is: no join, rejoin or retry until
+    /** AUDIT SAFE CLIENT-2: MY ACCOUNT IS BANNED - STICKY, as `superseded` is: no join, rejoin or retry until
      *  `unbar()` (the relay's word that the ban was lifted) or a reload. The page latches every room it holds
      *  (scenes/chatSafetyHost.js) when the relay says `banned`; a socket the relay closes 1008 'banned' latches its own. */
     this.barred = false;
-    /** AUDIT SAFE CLIENT-7 (2026-10-17): whether the player hears an account - (sub) => boolean, the host's from the block
+    /** AUDIT SAFE CLIENT-7: whether the player hears an account - (sub) => boolean, the host's from the block
      *  list (scenes/chatSafetyHost.js; RPT1026-SECNET: asked `null` for a sender whose account nobody named); null hears everyone. A trade, a duel, a wedding, a card or a page asked of me by an
      *  account I blocked never lands, as its chat line never does (net/chat.js ChatLog.hears). */
     this.hears = null;
-    /** AUDIT SAFE CLIENT-13 (2026-10-17): whether a chat line may go - (line) => boolean, the host's code of conduct's gate
+    /** AUDIT SAFE CLIENT-13: whether a chat line may go - (line) => boolean, the host's code of conduct's gate
      *  (scenes/chatSafetyHost.js); null lets every line go. The panel asks before a typed line ever reaches here; this is
      *  the gate for every other door a line has (CHAT-POST's item, posted from the pack, went straight to sendChat). */
     this.mayChat = null;
@@ -804,7 +795,7 @@ export class OnlineSession {
     this.wdunSeaOk = false;       // SEA-VAULTS: the hub reads a vault of the deep's key (relaySupportsWdunSea) - an older one closes the socket on it
     this.wdunWorldOk = false;     // WW-C2: the hub reads a hall of Cyrodiil's key (relaySupportsWdunWorld) - an older one closes the socket on it
     this.onWdun = null;           // PVPDUNGEONS: (word) => void - the hub's word on the zone's halls (wire.js validWdunOut)
-    this.wildCollectOk = false;   // MAC (2026-10-14, the two-phase handoff): the relay that welcomed this socket signs a killer's collect of a piece in escrow (relaySupportsWildCollect)
+    this.wildCollectOk = false;     // MAC: the relay that welcomed this socket signs a killer's collect of a piece in escrow (relaySupportsWildCollect)
     this.wildOk = false;          // WILD1: the relay that welcomed this socket routes wild frames and, INT9, referees the zone (relaySupportsWildRef) - an older one CLOSES the socket on one, so nothing of the open zone is sent through it
     this.loneOk = false;          // LONE-SLEEP: the relay that welcomed my own cell's socket is one a lone session may go quiet to (loneSupported)
     this.seaPvpOk = false;        // SHIP-PVP: the relay that welcomed this socket referees the open sea's guns (relaySupportsSeaPvp) - an older one closes the socket on their kinds
@@ -1061,7 +1052,7 @@ export class OnlineSession {
       this.seaPvpOk = !!h.seaPvpOk;   // SHIP-PVP: and the open sea's guns'
       this.foeInventoryOk = !!h.foeInventoryOk;
       this.wildOk = !!h.wildOk;   // INT9 (AUDIT): the zone's word went with neither socket
-      this.wildCollectOk = !!h.wildCollectOk;   // MAC (2026-10-14): nor the collect's
+      this.wildCollectOk = !!h.wildCollectOk;     // MAC: nor the collect's
       this.bossOk = !!h.bossOk;   // AUDIT INT15: nor the count's - a body's word goes by the socket it leaves on
       // AUDIT ONLINE 3 F3: nor the look's - the cell stepped down to a halo kept no `lookOk`, so _flushLook never told it
       // a change again (it handed my old coat to everyone it introduced me to), and the cell crossed into kept the old one's
@@ -1112,7 +1103,7 @@ export class OnlineSession {
     this.claim = !!claim;
   }
 
-  /** AUDIT SAFE CLIENT-2 (2026-10-17): MY ACCOUNT IS BANNED - every room left, and nothing joins, rejoins or retries until
+  /** AUDIT SAFE CLIENT-2: MY ACCOUNT IS BANNED - every room left, and nothing joins, rejoins or retries until
    *  `unbar()` or a reload (`barred`). ONE-SEAT's `supersede` shape: the page's latch, said once on every room it holds. */
   bar() {
     this.leave();
@@ -1541,7 +1532,7 @@ export class OnlineSession {
     for (const ws of socks) { try { ws.send(s); this.stats.sent++; } catch { /* the close will say; its reconnect's hello carries the look */ } }
   }
 
-  /** AURA-LIVE (2026-10-05, Mac: "Ensure other players can see all auras"): MY BADGE AGAIN, MID-SESSION - an aura worn
+  /** AURA-LIVE: MY BADGE AGAIN, MID-SESSION - an aura worn
    *  or taken off on the account card or at the Broker. The relay reads a badge (the aura, the title, the glyphs) off
    *  the TOKEN alone, and a token rides a hello, so every room I was already in kept drawing the old one until I
    *  changed area. Each open socket says hello again, on a fresh token, through a NEW socket of the same id - which the
@@ -1621,8 +1612,7 @@ export class OnlineSession {
     // OWN1: in a world room a blow on a peer's OWN foe (marked `own`) names its owner as a cell's does - through a relay that routes it
     const owned = !cell && data.own === 1;
     if (owned ? (!this.ownOk || !isWorldRoom(this.room) || !hitOwnerOf(data) || hitOwnerOf(data) === this.id || !this.peers.has(hitOwnerOf(data))) : cell ? (!hitOwnerOf(data) || hitOwnerOf(data) === this.id || !this.peers.has(hitOwnerOf(data))) : (this.isHost() || !this.host || !isWorldRoom(this.room))) return false;
-    // AUDIT FOES FOE3 (2026-09-15, Mac relaying players: "certain enemies cant be
-    // damaged"): THE PRIMARY SOCKET IS NOT THE ONLY WAY OUT, AND THIS ASKED FOR IT
+    // AUDIT FOES FOE3: THE PRIMARY SOCKET IS NOT THE ONLY WAY OUT, AND THIS ASKED FOR IT
     // FIRST. A cell's blow is routed below, over the owner's own cell, mine, or any
     // HALO - and this line vetoed the frame before that loop could pick one. So while
     // my own cell's socket was down (reconnecting, a room at SOCKETS_MAX, the RTT of
@@ -1816,7 +1806,7 @@ export class OnlineSession {
     return h?.status === 'open' ? h.ws : null;
   }
 
-  /** MAC (2026-10-14, the two-phase handoff): whether the relay holding `room` (mine, or a halo's) signs a killer's collect
+  /** MAC: whether the relay holding `room` (mine, or a halo's) signs a killer's collect
    *  of a piece in escrow - a fall's drop asks the service to escrow its killer's piece only for such a room. */
   wildCollectAt(room) {
     if (room == null) return false;
@@ -2171,7 +2161,7 @@ export class OnlineSession {
    * GRAVE-PARTY G3, owGraveGate: the relay's, so an honest word is never the one it drops).
    * @param {'sp'|'dg'|'gr'} k @param {unknown[]} payload @returns {Array<string|number[]>}
    */
-  /** GRANT-DOOR (bible/11-Multiplayer/Spawn-Grants.md section 20): a peer the relay vouched stands on grants (its foes
+  /** GRANT-DOOR: a peer the relay vouched stands on grants (its foes
    *  frame's `g`) - held to them from here (scenes/grantHost.js). Bounded: the oldest forgotten past SOCKETS_MAX's worth. */
   _grantSender(id) {
     if (this.grantSenders.has(id)) return;
@@ -2179,7 +2169,7 @@ export class OnlineSession {
     if (this.grantSenders.size > 4 * SOCKETS_MAX) this.grantSenders.delete(this.grantSenders.values().next().value);
   }
   /**
-   * GRANT2 (bible/11-Multiplayer/Spawn-Grants.md section 12): A SPAWN GRANT ASKED of my own cell - `{ k: 'mint', id, kind,
+   * GRANT2: A SPAWN GRANT ASKED of my own cell - `{ k: 'mint', id, kind,
    * n }` (net/grantLaw.js validGrantAsk), while its welcome said a law that is not off, on the relay's own per-socket
    * bucket (grantGate: the relay drops what passes it, so an honest ask is never the one it drops). Answers whether it
    * went; the answer comes back by `onGrant`.
@@ -2480,7 +2470,7 @@ export class OnlineSession {
     ws.onerror = () => { const room = this._roomOf(ws); if (room === this.room && room != null) { if (!this._statusAtError.has(ws)) this._statusAtError.set(ws, this.status); this.status = 'error'; this.error = t('net.online.socketError', 'socket error'); } };   // AUDIT SCALE II C-2: what it stood at, kept for the `close` that follows
   }
 
-  /** SLAM2 (2026-09-16, Mac: Daggerfall's 30th, a streamer's server slam): THE RETRY IS JITTERED.
+  /** SLAM2: THE RETRY IS JITTERED.
    *
    *  A room admits HELLO_HZ_MAX hellos a second and refuses the rest with CLOSE_BUSY, which is correct - but every
    *  client refused in the same instant then waited the SAME `_backoff` and came back in the same instant, so the
@@ -2539,7 +2529,7 @@ export class OnlineSession {
     if (tok) this.mintToken?.unopened?.(room, tok);
   }
 
-  /** SD-HELLO (2026-10-08, the Discord, of a live Abyss Dungeon: "portal keep teleporting me out of dungeon"): A SOCKET
+  /** SD-HELLO: A SOCKET
    *  SAYS ITS HELLO, THEN NOTHING UNTIL ITS ROOM WELCOMES IT. The relay names a socket at the END of its hello, and a
    *  room's hello may wait on another object before that - a Hollow's realm asks the hub for its record
    *  (server/src/index.js _sdAdmit) - while a Durable Object takes the socket's next frame whenever a fetch is out. The
@@ -2916,7 +2906,7 @@ export class OnlineSession {
     return went;
   }
 
-  /** CHAT-FIT (2026-09-22, Mac: "Glyphs should also show on chat names in the chat itself"): THE BADGE A NAME
+  /** CHAT-FIT: THE BADGE A NAME
    *  WEARS, BY ID - mine (the service's word, adopted above), a peer's in the room, or a peer's this session was
    *  introduced to and has since lost: the chat keeps two hundred lines and the room keeps people only while they
    *  stand in it, so a line said ten minutes ago by someone who left is still signed. Null for a stranger - a line
@@ -2933,8 +2923,7 @@ export class OnlineSession {
     return p ? { title: p.title ?? null, glyphs: Array.isArray(p.glyphs) ? p.glyphs : [], gt: p.gt ?? null, ...(p.house ? { house: p.house } : {}) } : null;
   }
 
-  /** RED1: THE SERVER'S OWN LINE OUT. Mac: "a red text system (kind of
-   *  like warframe) where I can message chat as the server."
+  /** RED1: THE SERVER'S OWN LINE OUT.
    *
    *  THIS SIDE DOES NOT ASK WHETHER IT MAY. Whether this socket can
    *  speak as the server is a question about the token's signature and
@@ -3020,7 +3009,7 @@ export class OnlineSession {
 
   /** LEASE1 (net/roomLease.js): my hub's lease, kept for this session's lease rooms - its own and each halo's. Nothing goes
    *  now: each lease room's socket hands it just ahead of the next frame it sends there (`_leased`), so a room where I do
-   *  nothing is woken by nothing (mob's load check, 07:57Z: "if we affected server performasnce" - every room a player
+   *  nothing is woken by nothing (- every room a player
    *  stood idle in was woken every LEASE_MS). KEPT WHEREVER I STAND (a review of the PR: one that came while I stood in a
    *  dungeon's floor, a gate or my home, or before this socket's welcome, was thrown away, and the next lease room heard
    *  nothing of me until the hub's next) - `_leased` hands it on only in a lease room of a relay that knows the frame.
@@ -3076,8 +3065,7 @@ export class OnlineSession {
     this._boxAsks.delete(t);   // CHAT-FIND-HUB: a /find of the box's own query - its answer is said as a line
     return !!t && this._send({ t: 'find', q: t });
   }
-  /** CHAT-FIND-HUB (2026-10-15, Mac: "player search isnt working properly. Even in world tab I try to search for someone
-   *  and they can't be found cause it only shows like 25 ppl out of 600"): THE SEARCH BOX ASKS THE HUB. Past
+  /** CHAT-FIND-HUB: THE SEARCH BOX ASKS THE HUB. Past
    *  CHAT_ROSTER_MAX online the hub lets `hubOnline` go (sendHubWho) and this link knows its own shard alone, so the box -
    *  which filters what this client knows (CHAT-FIND-ALL) - found nobody on the other fifteen. Asked of the hub's own
    *  search (`find`, /find's) while the box holds a query and this link knows fewer than are online: once a query moves,
@@ -3224,7 +3212,7 @@ export class OnlineSession {
     return true;
   }
 
-  /** PARTY-MAP (2026-09-30, Discord: "share map data between party members"): SHARED CARTOGRAPHY's send - the
+  /** PARTY-MAP: SHARED CARTOGRAPHY's send - the
    *  automap rows I revealed in dungeon `k` since my last send (systems/party/partyMap.js gathers them), to the hub, which
    *  fans them to my party alone. A background batch, never a click: AMAP_SEND_MS is the client's floor beside the
    *  hub's own cooldown at half of it (amapShareGate), and a relay that does not know the frame is never sent one. */
@@ -3255,8 +3243,7 @@ export class OnlineSession {
     return true;
   }
 
-  /** ONCRASH1 (2026-09-15, Mac: "reports of player browser crashing when
-   *  online"): THE HANDLER'S THROW IS CONTAINED HERE, AND SAID.
+  /** ONCRASH1: THE HANDLER'S THROW IS CONTAINED HERE, AND SAID.
    *
    *  `_receive` runs inside the WebSocket's `onmessage`, and the handlers
    *  it calls are not small: `onFoes` stands and steps puppets, `onWorld`
@@ -3472,7 +3459,7 @@ export class OnlineSession {
       if (primary) this.seaPvpOk = relaySupportsSeaPvp(relayV);   // SHIP-PVP: and one that referees the open sea's guns
       else { const h = this._halo.get(room); if (h) h.seaPvpOk = relaySupportsSeaPvp(relayV); }   // SHIP-PVP: a halo says for itself
       if (primary) this.loneOk = loneSupported(relayV);   // LONE-SLEEP: a relay whose every pose reader was read for a lone player's quiet (net/loneSleep.js LONE_RELAY_MIN)
-      if (primary) this.wildCollectOk = relaySupportsWildCollect(relayV);   // MAC (2026-10-14): a relay that signs a killer's collect
+      if (primary) this.wildCollectOk = relaySupportsWildCollect(relayV);     // MAC: a relay that signs a killer's collect
       else { const h = this._halo.get(room); if (h) h.wildCollectOk = relaySupportsWildCollect(relayV); }
       if (this._wildZone === 1 && primary && this.wildOk) { this._sayZone(this._ws, 1); this._wildZoneAt = this._now(); }   // INT9: my cell's socket welcomed while I stand in the zone hears so (AUDIT INT9: a halo never)
       if (primary) { this.wdunOk = relaySupportsWdun(relayV); this.wdunGiantsOk = relaySupportsWdunGiants(relayV); this.wdunSeaOk = relaySupportsWdunSea(relayV); this.wdunWorldOk = relaySupportsWdunWorld(relayV); }   // PVPDUNGEONS; ZONE-GIANTS; SEA-VAULTS; WW-C2
@@ -3511,7 +3498,7 @@ export class OnlineSession {
       if (primary) { this.homeOk = relaySupportsHome(relayV); this._hmAt = -Infinity; this._flushHome(now); }   // QUEST-HOME: the hub's own word - and a held home order goes now
       if (primary) this.parkOk = relaySupportsPark(relayV);   // HCC-PARK: the same law for the park frame
       if (primary) this.caravanOk = relaySupportsCaravan(relayV);   // WAGONS2-VISIT: and for a caravan's room
-      if (primary) this.instanceOk = relaySupportsInstances(relayV);   // INSTANCES: and for an instance's (bible/11-Multiplayer/Instances.md)
+      if (primary) this.instanceOk = relaySupportsInstances(relayV);     // INSTANCES: and for an instance's
       if (primary) this.guildInstanceOk = relaySupportsGuildInstances(relayV);   // DOMAIN2: and for a guild's - a castle's (Domains.md 6)
       if (primary) this.lookOk = relaySupportsLook(relayV);   // PROFILE2
       else { const h = this._halo.get(room); if (h) h.lookOk = relaySupportsLook(relayV); }   // PROFILE2: a halo says for itself (AUDIT ONLINE 3, the second read: under its own line, no longer the party lead's `else`)
@@ -3583,8 +3570,7 @@ export class OnlineSession {
       }
       for (const o of owIn) this._deliver('ow', () => this.onOverworld?.(o, room));   // OW6L: my own cell's ledger, after its clock
       if (m.world && typeof m.world === 'object' && !Array.isArray(m.world)) this._deliver('world', () => this.onWorld?.(m.world));
-      // SKEW1 (2026-09-16, Mac: "when the relay deploys/server restarts, there are 2 strings of messages that happen
-      // outside of the chat box"): SLAM13 A5 compared `v` with this client's RELAY_VERSION here and put a warning on
+      // SKEW1: SLAM13 A5 compared `v` with this client's RELAY_VERSION here and put a warning on
       // `statusLine` - which the HUD draws top-left for the presence session AND under the chat box for the chat
       // link: two lines, outside the chat, for every player. And the skew it named is the ORDINARY state of a deploy:
       // the relay's drift-deploy landed world75 at 15:00:10 and the client build at 15:02:37, so every reconnect in
@@ -3656,7 +3642,7 @@ export class OnlineSession {
       if (m.data !== undefined) {
         this._directedIn(m, now, 'wild', this._inWildBuckets, wildInGate, WILD_IN_HZ_MAX, (d) => { const v = validWildData(d); return v && wildDirected(v) ? v : null; }, (id, d) => this.onWild?.(id, d, subOf(m)));
       } else {
-        // HALO-REMAINS (2026-10-09, the owner: "i died in the pvp zone again and still my pile isnt there"): a HALO's
+        // HALO-REMAINS: a HALO's
         // room word too, with its room. The relay says a room's remains at a socket's hello alone, and walking back to
         // them a player hello's their cell AS A HALO first (from the cell beside it) - the words were dropped here, and
         // the crossing PROMOTES that socket without a new hello, so they were never said again: the pile never stood
@@ -3915,7 +3901,7 @@ export class OnlineSession {
       // relay composed from its own routing, one of the wire's own, or none
       // EMOTE1: `me` - the relay says the line is an ACTION, and only `true` is one
       // SAFE2: and `sg`, the relay's stamp on the line - carried, never read here: a report hands it to the account service
-      // AUDIT SAFE CLIENT-6 (2026-10-17): and on a stamped line, `raw` - the words EXACTLY as the relay signed them. They are
+      // AUDIT SAFE CLIENT-6: and on a stamped line, `raw` - the words EXACTLY as the relay signed them. They are
       // sanitizeChat's already (the relay runs it, wire.js parseClient), and it is not idempotent: "n fuck-i-g" is signed
       // "n ****-i-g" and a second pass here reads "* ****-*-*", so the report carried words the stamp never covered and
       // the service refused it whole (report-unwitnessed). The log draws `text`; a report carries `raw` (net/chat.js) - never
@@ -3987,7 +3973,7 @@ export class OnlineSession {
       // is mine alone - the relay and the service hold me to it whatever it shows. On the relay's word's own bucket; my hub's
       // next lease asked at once, so every room I hold learns it from my hand as soon as theirs.
       if (!Number.isSafeInteger(m.until) || m.until < 0 || !this._lawIn(room, now)) return;
-      // STAFF-FREEZE-ASK (mob, 2026-10-23: "froze a player he still moves"): asked as soon as the hub's meter takes it - the
+      // STAFF-FREEZE-ASK: asked as soon as the hub's meter takes it - the
       // hub hears one lease frame a socket in LEASE_FRAME_MIN_MS, so an ask sooner after the last was dropped, and every
       // other room heard the freeze only at the next ask, LEASE_MS on (the player walked on for them until then)
       if (isSocialRoom(room)) { this.staffOk = true; this._leaseOnce = true; this._leaseAskAt = Math.max(now, this._leaseAskAt + LEASE_FRAME_MIN_MS + LEASE_ASK_SLACK_MS) - LEASE_MS; }

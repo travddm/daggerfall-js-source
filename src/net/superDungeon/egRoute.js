@@ -1,6 +1,6 @@
 // @ts-check
-// THE ASCENT (LAW 9, 2026-10-16, Mac: "Something that isnt just a straight line from point A to point B";
-// bible/11-Multiplayer/Elite-Gates-Ascent.md section 1): THE ROUTE - the law's one measure of progress through a hall.
+// THE ASCENT (LAW 9, 2026-10-16,;
+// ): THE ROUTE - the law's one measure of progress through a hall.
 //
 //   The arc measured a company's progress through a hall by z: every hall ran along +z from its arrival plate to its door,
 //   so the toll's road still ahead, THE FAIR TRAIL's furthest point (`far`) and its cast-back's "back", the Divers' next

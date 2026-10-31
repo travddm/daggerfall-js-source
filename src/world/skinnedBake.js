@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): A SKINNED MESH, BAKED - Unity's SkinnedMeshRenderer.BakeMesh
+// CSA-B: A SKINNED MESH, BAKED - Unity's SkinnedMeshRenderer.BakeMesh
 // and Mesh.RecalculateNormals, the two calls Come Sail Away's FixDeformations
 // makes every tenth of a second on each sail (FixDeformations.cs LateUpdate):
 //

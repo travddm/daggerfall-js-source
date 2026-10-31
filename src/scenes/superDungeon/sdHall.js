@@ -1,5 +1,5 @@
 // @ts-check
-// SD6c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 8): THE ORRERY'S HALL ON THE
+// SD6c: THE ORRERY'S HALL ON THE
 // PAGE - the dungeon host's set for the Shattered Hour's puzzle, as scenes/superDungeon/sdEnd.js is for its Rift. The realm judges
 // every turn (SD6b); this stands the hall and shows what the realm says of it.
 //
@@ -17,7 +17,7 @@
 //     inside its gear's settling, never after the Concord; the plaque names the stone, its sign, its hour and the way the
 //     handle turns it - after the Concord, that it holds (AUDIT SD IV, T8: it offered the turn the press refused). A Ledger plaque's riddle shows on its plaque as the ray finds it, and is said when it is pressed.
 //
-// SD-LOOK S10 (2026-10-09; bible/11-Multiplayer/Super-Dungeons-Look.md section 7): THE ORRERY OF ENDINGS SEEN - every part
+// SD-LOOK S10: THE ORRERY OF ENDINGS SEEN - every part
 // a dynamic draw that turns carries `noShadow`, and every frame makes nothing:
 //   CROWN GEARS - one mesh, six draws, each turned 2:1 with its own stone's shown hour (crownGearMatrix): it moves exactly when
 //     its hand moves, so a partner's gear moves with that partner's hand and with nothing else.

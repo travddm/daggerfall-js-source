@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): A UNITY PREFAB, INSTANTIATED - the node tree a mod's C#
+// CSA-B: A UNITY PREFAB, INSTANTIATED - the node tree a mod's C#
 // walks by name.
 //
 // Come Sail Away builds each boat by instancing a prefab (DFU's
@@ -42,8 +42,7 @@ const _rotScratch = new Float32Array(16);   // lossyScaleOf's rotation, read at 
  *  which (setParent, and so setParentKeepWorld and every instance built) and to which components a node carries
  *  (addComponent); never by a move, a turn or a switch on or off. What is kept of a tree's shape (world/
  *  prefabColliders.js's index of its colliders, a boat's plan and her Animators) stands while the stamp does.
- *  BOAT-STAMP (2026-10-21, a player's profile: the boats' pool 11% of the frame, rendererModelKey 2.6% - every boat's
- *  key made again most frames): EACH TREE ITS OWN. The stamp was ONE count for every tree in the game, so a boat built
+ *  BOAT-STAMP: EACH TREE ITS OWN. The stamp was ONE count for every tree in the game, so a boat built
  *  anywhere - a sea hull streaming in, a peer's boat, a fitting stood - made every boat's plan, bones, still chains,
  *  Animators and colliders again the next frame. It is kept on a tree's top node (`_treeStamp`) and bumped there: a node
  *  hung elsewhere bumps the tree it left and the one it joined, a component added its own tree. Every bump is a fresh

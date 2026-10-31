@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (bible/03-World/Bantha-Jungle.md): WHERE THE JUNGLE IS - how far a point stands inside Bantha, as one
+// BANTHA1: WHERE THE JUNGLE IS - how far a point stands inside Bantha, as one
 // continuous field the layout (on the terrain worker) and the haze (on the main thread) both read, so the trees thin and
 // the air clears at the same border.
 //
-// BANTHA2 (2026-10-19, the owner: "The area is red in bantha and should be the jungle biome"): Bantha is the area the
+// BANTHA2: Bantha is the area the
 // owner painted on the Hammerfell shore (world/jungle/banthaArea.js, a set of map pixels, 819.2 m square), where BANTHA1
 // stood the jungle on Glenpoint's political region - either way an edge that is a staircase of pixel edges. Here:
 //   - THE FIELD. Each pixel near the area carries its SIGNED DISTANCE from the area's edge - from its centre to the
@@ -18,7 +18,7 @@
 //     and the haze's (world/jungle/jungleHaze.js JUNGLE_HAZE.edge: the haze drifts out past the trees and thickens further
 //     in) - each a smoothstep of the one depth.
 // A job to the terrain worker carries the pixel's 3x3 of distances (jungleNine) - nine numbers, nothing else crosses.
-// TESA-BIOME (2026-10-24, bible/03-World/Tamriel-Biomes.md): AND PAST THE BAY. Cyrodiil is the jungle's too - its zones'
+// TESA-BIOME: AND PAST THE BAY. Cyrodiil is the jungle's too - its zones'
 // `jungle` (world/tamriel/tamrielBiomes.js) - so a field may read the pixels off the Bay's map through `beyond`: their
 // sides and distances kept in maps (the continent is 6,000 x 3,750 pixels, and the stream reads a few thousand of them),
 // the Bay's in its typed arrays as before, and every pixel of the Bay answered to the bit as without it.

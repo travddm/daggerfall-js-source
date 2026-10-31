@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1d (2026-09-25) — WHERE A NEW PIECE WILL STAND.
+// DECOR1d — WHERE A NEW PIECE WILL STAND.
 //
 // Mac: placing is done from "free cam mode"; decor is "Gold per
 // placement", priced "By size". The placement tool's own state - the

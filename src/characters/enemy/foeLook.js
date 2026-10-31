@@ -1,4 +1,4 @@
-// DEX2 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 6) - THE MOBILE'S RENDERER, SetupDemoEnemy.cs:129-151:
+// DEX2 - THE MOBILE'S RENDERER, SetupDemoEnemy.cs:129-151:
 // a Spectral enemy wears the ghost shader (its cutoff 0.1, its alpha blended - render/renderer.js ghostShaded), and a row's
 // NoShadow casts none. The port drew the ghost by the classic ghosts' archives (TextureFile.isSpectralArchive), which a
 // mod's spectral enemy - drawn from an archive of its own - never matched; the row's behaviour is DFU's test, and the

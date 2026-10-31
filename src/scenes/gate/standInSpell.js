@@ -3,7 +3,7 @@
 // huge number, and his bar never moved): A HARMFUL SPELL OF MINE ON A BODY THE RELAY RUNS - the court's Warden, his
 // crystals and his host (WB4b, WB9c, WB11c); in the Shattered Hour the Brass Remnant, its Echoes and its Hearts (SD8c);
 // every lord, add and struck object of an Elite Breach's hall (EG-PLAY, through the host seam); my opponent on a relay's
-// sand (ARENA4b). HOST-SPLIT (bible/01-Overview/Host-Split.md): out of buildDungeonContext, which kept this one door four
+// sand (ARENA4b). HOST-SPLIT: out of buildDungeonContext, which kept this one door four
 // times over (spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival) - and the host wires it where they stood.
 //
 // THE DOOR. The spell's harmful families (combat/duelCombat.js duelSpellOf) land on the body's stand-in
@@ -17,7 +17,7 @@
 // what the foe could lose - AUDIT SCHOOLS L1 M6). It said the claim whole, and a Disintegrate's claim is its target's whole
 // (STAND_IN_WHOLE; 1e9 until this fix, which no wire carried): a number rose that nothing landed.
 //
-// FIELD BUGS 2026-10-19f BOSS-DOT (the owner, 2026-10-19: "Carry DoTs"): ITS LASTING HARM IS CARRIED. The stand-in forgot
+// FIELD BUGS 2026-10-19f BOSS-DOT: ITS LASTING HARM IS CARRIED. The stand-in forgot
 // every lasting family the moment the count was done, so a Continuous Damage spell landed its cast's round alone (a level-20
 // Burn - 10 a round for 25 rounds, 8 of each through his save at even dice: 8 of its 200; the other 24 rounds gone) - WB4b's
 // comment, never a decision; WBX7 carried the Soul Trap alone. A
@@ -221,7 +221,7 @@ export function createStandInSpell(host) {
     // pacifyImmune) and said so - the rest of the spell lands as it would; alone, the refusal is what met him
     const sways = spellSways(sp) && !!boss.entity.pacifyImmune;
     if (sways && now() - swayToldAt >= BOSS_SWAY_TELL_MS) { swayToldAt = now(); say(BOSS_SWAY_TEXT(boss.entity.name)); }
-    // WBX7 (2026-09-26, Swololo on Discord: "soul trap didnt seem to work"): A SOUL TRAP ON HIM. The trap is laid on his
+    // WBX7: A SOUL TRAP ON HIM. The trap is laid on his
     // stand-in by the one door every spell lands through (applySpell - its rounds, its chance frozen at the cast by my
     // level, his save against a new trap, "Trap active."), and handed to the court, which keeps it on the fight's clock:
     // he is the relay's to kill, so the kill's roll is the court's, at his fall (scenes/gate/gateCourt.js). The stand-in

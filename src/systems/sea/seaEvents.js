@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-EVENTS (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Eltheric
-// Ocean's events on the shared clock; bible/03-World/Eltheric-Ocean.md SEA-EVENTS) - THE SEA'S CLOCK OF EVENTS: where the
+// SEA-EVENTS - THE SEA'S CLOCK OF EVENTS: where the
 // Aether Storm blows and where the treasure fleet sails, at a moment of the relay's clock (online every client's alike;
 // offline this machine's own).
 //

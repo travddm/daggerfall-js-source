@@ -1,5 +1,5 @@
 // @ts-check
-// STAR7 (2026-10-20): STARGLASS'S ROW, A LEAF - the Weir Key's law (systems/eliteGates/weirKeyRow.js, KEY-LAW): the item law
+// STAR7: STARGLASS'S ROW, A LEAF - the Weir Key's law (systems/eliteGates/weirKeyRow.js, KEY-LAW): the item law
 // (systems/item/itemLaw.js) runs on the account service, which loads none of the game, so a template whose home pulls the
 // texture door in is read beside the registry from a leaf (lawTemplate) - never a template no honest client mints there.
 // starglass.js lays its name and picture over this row and registers it. It imports nothing.

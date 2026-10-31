@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// URBANIZER U3 (bible/03-World/Urban-Fabric.md section 5) - A TOWN'S FABRIC MADE: one model of the town's own over its
+// URBANIZER U3 - A TOWN'S FABRIC MADE: one model of the town's own over its
 // blocks (world/urban/townFabric.js plans it), in the location's metres (x east, z north, its ground y 0):
 //   - its MAIN STREETS laid in the style's setts (URBAN_KINDS.setts) between kerbs, its PAVEMENTS of flags FABRIC_PAVE_Y
 //     over them, each kerb's face where a pavement meets anything but a house;

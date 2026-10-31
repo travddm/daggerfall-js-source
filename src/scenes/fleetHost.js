@@ -1,5 +1,5 @@
 // @ts-check
-// THE FLEET'S HOST HALF (HOLDINGS, 2026-10-03 - bible/03-World/Holdings.md). The Fleet page (ui/fleetPage.js) reads a
+// THE FLEET'S HOST HALF (HOLDINGS, 2026-10-03). The Fleet page (ui/fleetPage.js) reads a
 // model and asks acts; this builds the one and carries out the other over the world host's runtimes - Come Sail Away's
 // boats (the mod's own laws: SummonBoat, LayUpBoat, StartPlacing over the Fleet's book), the sea fight's state of each
 // (scenes/naval/navalHost.js fleetStatus, repairAway, refitBoat, the yard, the berths), and the ledger (systems/fleet.js).
@@ -116,7 +116,7 @@ export function createFleetHost(deps) {
     const loan = loanOwed(rec, deps.accounts?.());
     const sailing = !!r?.isSailing?.();
     const apart = !!deps.veilApart?.(rec, at.boat ?? null);   // AUDIT CAPTAIN'S SEA P5: never across the Veil
-    // AUDIT FOE-KEEPS E3 (the owner, 2026-10-24, asked: "Refuse on the open sea"): since FOE-KEEPS a death to a foe there
+    // AUDIT FOE-KEEPS E3: since FOE-KEEPS a death to a foe there
     // costs a tenth and rises at the nearest freeport, so a Summon after it was the sea's free hop for captain, ship and
     // hold past the waters where another captain takes a third of a boarded hold. No Fleet order moves a ship into, out
     // of or about the open sea while it is a PvP zone (`where().sea` - online, its relay refereeing): the player's waters
@@ -331,7 +331,7 @@ export function createFleetHost(deps) {
       return said(out.ok, out.text);
     }
     if (verb === 'hold') {
-      // CARGO-ANYWHERE (bible/03-World/Naval-Refit.md): her hold, wherever she lies - here, away, laid up or packed - and
+      // CARGO-ANYWHERE: her hold, wherever she lies - here, away, laid up or packed - and
       // in a fight too; a Rowboat carries none (holdDoor.js HULL_HOLDS)
       if (!holdsCargo(rec.hull)) return said(false, t('naval.hold.rowboat', 'Rowboats have no hold.'));
       if (!deps.openHold) return said(false, t('naval.hold.noSea', 'Come Sail Away is not running.'));

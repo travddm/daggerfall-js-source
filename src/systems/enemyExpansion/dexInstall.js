@@ -1,4 +1,4 @@
-// DEX1 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
+// DEX1 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
 // Kab), THE INSTALL: what BestiaryMod.Start does at the game's load (BestiaryMod.cs:172-197), once, after Roleplay &
 // Realism's own install - DFU runs every mod's Init (RR's Awake writes its enemy appearance) before this MonoBehaviour's
 // Start, so the rows this edits are the rows those left.

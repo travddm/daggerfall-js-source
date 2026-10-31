@@ -1,8 +1,8 @@
 // @ts-check
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"; then "Btw I want to do all 4. We're going balls deep with this"):
+// WB12d:
 // THE FAITHFUL'S RITE - the law every client and the relay share with no word sent: where a breach's faithful work
 // their rite (off the gate's own spot and facing - net/gate/gateLaw.js), who stands there, when the rite holds, and how many
-// may break it. Design: bible/11-Multiplayer/World-Bosses.md section 19 D.
+// may break it. Design: D.
 //
 // PURE and imported by the relay: an edit here is an edit to the relay's law (test/net/relayversion.test.js).
 //
@@ -106,8 +106,7 @@ export function riteFaithfulOf(day) {
   return out;
 }
 
-// ── BROKER-CAGE (2026-10-02, Mac: "she should be present at the site in a jailed gate, and the gate opens after all the
-// enemies are cleared") ── the Sigil Broker is the faithful's prisoner, caged at their circle (scenes/sigilBrokerPool.js).
+// ── BROKER-CAGE ── the Sigil Broker is the faithful's prisoner, caged at their circle (scenes/sigilBrokerPool.js).
 // The cage opens when EVERY ONE of the day's faithful has fallen - the Summoner and each of Dagon's Faithful - inside the
 // rite's window: a player who saw them all fall says so in the rite's word (`c`), the relay's cell keeps it beside the
 // broken rite, and the hub says it to everyone (net/wire.js validRiteOut `cl`). Not cleared by the opening, she stays

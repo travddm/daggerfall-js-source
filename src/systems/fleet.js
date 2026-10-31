@@ -1,10 +1,5 @@
 // @ts-check
-// THE FLEET (HOLDINGS, 2026-10-03 - bible/03-World/Holdings.md; Mac: "You can also do this with ships instead of relying
-// on a deed item ... Ships show their values, current health, and option to repair if theres crew (even if youre away)
-// ... Introducing the new ship upgrade system. Allowing you to improve capacity, speed, health, damage, etc. This can
-// utilize foraging items used within the world. Loaned ships shouldnt be able to be upgraded until the loan is paid off.
-// This also introduces the ability to change your ship name for others to see ... Ship deeds can now be replaced in
-// favor of the new enhanced plus UI tabs on the pause menu").
+// THE FLEET (HOLDINGS, 2026-10-03).
 //
 // THE LEDGER - every ship the player holds title to, by her number (the UID her deed placed her by, Come Sail Away's
 // own; systems/comeSailAway/comeSailAway.js GetPlacedBoatWithUID): her hull and rig, her worth, the name her captain gave her, her
@@ -69,7 +64,7 @@ export const MATERIALS = Object.freeze({
   timber: Object.freeze({ label: 'Timber', hint: 'Wood Bundles (gathered with a Wood-Axe), planks or logs', templates: Object.freeze([1604, 645, 646, 647, 648, 649, 650, 651, 635, 636, 637, 638, 639, 640, 641]) }),
   iron: Object.freeze({ label: 'Iron', hint: 'Iron from an alchemist, or iron and steel ingots', templates: Object.freeze([71, 620, 621]) }),
   pitch: Object.freeze({ label: 'Pitch', hint: 'Pine Branches for their resin, or Resin itself', templates: Object.freeze([14, 653]) }),
-  // REFIT-ORES (2026-10-17, bible/03-World/Naval-Refit.md REFIT-ORES): the metals of DFU's ladder past iron - each its
+  // REFIT-ORES: the metals of DFU's ladder past iron - each its
   // forge's ingot (net/professionLaw.js 621-629; the Warforged Steel ingot, 630, counts as Ebony), or a weapon or a piece
   // of plate of that metal melted down (`metal`: DFU's WeaponMaterialTypes, and ArmorMaterialTypes' plate over it) - never
   // one worn, a quest's, or enchanted (`meltable`)
@@ -116,8 +111,7 @@ export const UPGRADE_LINES = Object.freeze([
 /** The shipwright's own three tiers - timber, iron and pitch. */
 export const BASE_TIERS = 3;
 /**
- * REFIT-ORES (2026-10-17, the owner: "making improvements to the ship upgrade system" - a player's ask: "levels unlock
- * upgrading with ores from steel to Ebony and beyond"; bible/03-World/Naval-Refit.md REFIT-ORES): PAST THE THIRD TIER, A
+ * REFIT-ORES: PAST THE THIRD TIER, A
  * TIER A METAL - DFU's ladder from Steel to Daedric, each a captain's level to reach (systems/naval/captainTree.js levelOf:
  * earned at sea), its gold for a Small Ship, its metal's count; each also asks her line's first material at the third
  * tier's count. An ore tier betters her by ORE_PER of a shipwright's tier.
@@ -236,7 +230,7 @@ export function takeMaterials(lists, kind, n) {
 }
 
 // ── THE BANK'S CLAIM ─────────────────────────────────────────────────────────────────────────────────────────────────
-// SHIP-CREDIT WITHDRAWN (2026-10-08, Mac: "Remove ship buying loan from the bank"): no counter sells a boat on the bank's
+// SHIP-CREDIT WITHDRAWN: no counter sells a boat on the bank's
 // credit any more, so no purchase stamps a claim. A ship bought on it before carries hers in the save (`credit`, read
 // back by restoreFleetSaveData) and keeps it - no refit while it stands - until that bank is owed nothing.
 /**
@@ -375,7 +369,7 @@ export function renameShip(uid, raw) {
   if (v.ok) { r.name = v.name; if (!r.name) r.plaque = false; }   // SHIP-PLAQUE: a name taken off takes her board with it
   return v;
 }
-/** SHIP-COLOURS (bible/03-World/Naval-Refit.md): her flag set - systems/naval/shipFlag.js shipFlagOf's, or null (none:
+/** SHIP-COLOURS: her flag set - systems/naval/shipFlag.js shipFlagOf's, or null (none:
  *  she flies the mod's pennant). Answers whether she has it now. */
 export function setShipColours(uid, raw) {
   const r = _ships.get(uid);
@@ -385,7 +379,7 @@ export function setShipColours(uid, raw) {
   r.colours = f;
   return true;
 }
-/** SHIP-LIVERY (bible/03-World/Naval-Refit.md): her paint set - systems/naval/shipLivery.js liveryOf's, the parts her hull
+/** SHIP-LIVERY: her paint set - systems/naval/shipLivery.js liveryOf's, the parts her hull
  *  does not take made none - or null (as built). Answers whether she has it now. */
 export function setShipLivery(uid, raw) {
   const r = _ships.get(uid);
@@ -403,7 +397,7 @@ export function setShipCabin(uid, paint) {
   r.cabin = paint;
   return true;
 }
-/** SHIP-PLAQUE (bible/03-World/Naval-Refit.md): her name shown on her bows, or not - her captain's choice, a named ship's
+/** SHIP-PLAQUE: her name shown on her bows, or not - her captain's choice, a named ship's
  *  alone (an unnamed one has none to show). Answers whether it is as asked now. */
 export function setShipPlaque(uid, on) {
   const r = _ships.get(uid);
@@ -411,7 +405,7 @@ export function setShipPlaque(uid, on) {
   r.plaque = on;
   return true;
 }
-/** DECK-PROPS (bible/03-World/Naval-Refit.md): her deck's fittings set - systems/naval/deckFittings.js fittingsOf's (a
+/** DECK-PROPS: her deck's fittings set - systems/naval/deckFittings.js fittingsOf's (a
  *  fitting it refuses left out). Answers whether she has them now. */
 export function setShipFittings(uid, raw) {
   const r = _ships.get(uid);

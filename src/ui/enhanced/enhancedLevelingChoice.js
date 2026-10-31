@@ -1,5 +1,4 @@
-// LEVEL-PLUS (2026-09-30, Mac: "Overhaul the oblivion/daggerfall selector for leveling mode. Give it the enhanced
-// ui plus theme.") - THE LEVELING QUESTION'S ENHANCED PLUS FACE.
+// LEVEL-PLUS - THE LEVELING QUESTION'S ENHANCED PLUS FACE.
 //
 // The question itself - its options, its cursor, its one answer - stays ui/levelingChoice.js's LevelingChoiceScreen,
 // the window every chargen host already holds in its one overlay slot. This is only its FACE on the Enhanced Plus

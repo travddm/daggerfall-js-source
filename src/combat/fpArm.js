@@ -13,7 +13,7 @@
 // equip / wind-up / release / follow / unequip sections of the weapon's
 // own long group as the game asks for them. The scope boundary this note
 // used to draw has moved; what is still outside it is in the STATUS
-// block in bible/02-Formats/Morrowind-Rules.md, which is the one list.
+// block in, which is the one list.
 //
 // HOW IT DRAWS, and why this needs no renderer change at all: the port
 // has ALREADY shipped a first-person pass. renderCharacterSprite
@@ -113,8 +113,7 @@ import { skinLayout, skinSamePieces, packSkinStream, writeSkinPalette, restreamM
 import { pageParam } from '../systems/pageQuery.js';   // MWNPC1: the GPU skin's bisect door
 import { t } from '../systems/textManager.js';   // L10N4: AUDIT MW-FOLK1's note in the player's language
 
-// MW-LOAD (2026-09-08, Mac: "improve the load time when Morrowind assets
-// are enabled"): THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
+// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
 // ONE READER.
 //
 // Every boot used to pull each stored .bsa out of IndexedDB as one whole
@@ -232,7 +231,7 @@ async function preloadArmTextures(pieces, archives, gen = null) {
 const mwNow = () => (typeof performance !== 'undefined' && performance && typeof performance.now === 'function'
   ? performance.now() : Date.now());
 
-/** WEREWOLF1 (2026-09-26, Mac: "it's the 3d model" - "it needs to be imported if its not"): THE WEREWOLF'S TWO
+/** WEREWOLF1: THE WEREWOLF'S TWO
  *  SKELETONS, files/settings-default.cfg [Models] wolfskin and wolfskin1st. They ship with Bloodmoon, so a player
  *  with Bloodmoon.bsa attached has them; without it the build refuses at the skeleton, and the transformed player
  *  stands as Eye Of The Beholder's lycanthrope and the classic claws, as before. */
@@ -415,7 +414,7 @@ export function clipCompletion(state) {
 }
 
 /**
- * TWO-HANDS FIELD (Mac, of a pair in third person: "Both arms swing the same direction"): A STRIDE'S OTHER HALF - clip
+ * TWO-HANDS FIELD: A STRIDE'S OTHER HALF - clip
  * `state`'s time half its repeating window on from `time` (its group's loop keys in `keys`, else the group's own start
  * to stop), or null with no window. One loop of a movement group is one whole stride - the hip sways once a loop
  * (systems/lanternSwing.js, `stride`) - so the right arm there is where the left arm swings now.
@@ -523,10 +522,7 @@ export function spriteBoxUnion(a, b) {
 
 /** files/settings-default.cfg: `first person field of view = 60.0`. */
 export const FP_FIELD_OF_VIEW = Math.PI / 3;
-/** MAC-R1 (2026-09-17, Mac: "Morrowind weapons that go above the screen
- *  show their blade clipped off") and DISC13-C (2026-09-23, Ilvi: "When
- *  I'm walking with torch it looks torn down. Half of it just
- *  dissapeared"): THE FRAME IS WHAT THE SCREEN SHOWS OF THE LENS'S GRID.
+/** MAC-R1 and DISC13-C: THE FRAME IS WHAT THE SCREEN SHOWS OF THE LENS'S GRID.
  *
  *  The Weapon Widget's channels (its bob, inertia and step - weaponRig.js's
  *  `setScreenTransform`) move the arm as they move the classic sprite. The
@@ -596,8 +592,7 @@ export function frustum(left, right, bottom, top, near, far) {
 
 // IG6 (Mac's final call, 2026-08-31): NO tilt constants. The IG5 tilt
 // (an under-rotated draw lens) came out INVERTED on the played screen
-// and Mac closed the question: "just make it where it follows the
-// screen. Just like classic daggerfall." So the shipped mode is the
+// and So the shipped mode is the
 // pure glue - neck at aim 1, offset zeroed, lens taking the whole look
 // - whose image is INVARIANT under pitch: the arms are fixed to the
 // screen exactly the way drawFpsWeapon's classic sprite is.
@@ -644,8 +639,7 @@ export function armReach(eye, unionBounds) {
  * drawCharacter issues drawArrays (renderer.js:"gl.drawArrays(gl.TRIANGLES, 0, mesh.count)"). The MW readers hand
  * back indexed triangles, so the indices are expanded here.
  *
- * MW-SMOOTH (2026-10-09, Mac: "Can we also enable smooth shading for the
- * morrowind models?"): A PIECE'S OWN NORMALS, when its mesh authored them.
+ * MW-SMOOTH: A PIECE'S OWN NORMALS, when its mesh authored them.
  * The reference lights every NIF by the per-vertex normals the file
  * carries and never makes any (Morrowind-Rules.md, "[C] Vertex/normal/
  * colour arrays are set from array EMPTINESS ... and OpenMW generates
@@ -675,7 +669,7 @@ export function packFpArm(pieces, out = null) {
   for (const p of pieces) tris += (p.indices ? p.indices.length : 0) / 3;
   const buf = out && out.packed && out.packed.length === tris * 3 * FP_FLOATS
     ? out.packed : new Float32Array(tris * 3 * FP_FLOATS);
-  // PERF-RIG1 (2026-09-21): THE FRAME PATH MINTS NOTHING PER VERTEX. This
+  // PERF-RIG1: THE FRAME PATH MINTS NOTHING PER VERTEX. This
   // ran every frame for the arm, the body and every peer's body, and per
   // CORNER it built `[a, b, c]` to index, and took an `[r, g, b]` from
   // diffuseAt and another from emissiveAt - three arrays a corner, some
@@ -782,13 +776,12 @@ function sameRanges(out, pieces) {
   return k === r.length;
 }
 
-/** PR-BOW1 (2026-09-24, player report: "Equipping a bow enlarges your
- *  character"): each range's own box over its piece's POSED positions,
+/** PR-BOW1: each range's own box over its piece's POSED positions,
  *  refolded at every upload and kept ON the range - its owner: a range
  *  lives and dies with the mesh it indexes, and the same range objects
  *  come back pack after pack (sameRanges), so a frame mints nothing.
  *
- *  PR-BOW1b (2026-09-24): AND NO SECOND WALK. PR-BOW1 folded these by
+ *  PR-BOW1b: AND NO SECOND WALK. PR-BOW1 folded these by
  *  walking every posed vertex again, per body per posed frame, right
  *  after poseAssembly had walked every one of them for the assembly's
  *  bounds - the repeated walk AUDIT MWBODY A4 removed once already. The
@@ -840,7 +833,7 @@ export function visibleRangeBounds(ranges, out, skip = null) {
   return out;
 }
 
-/** PR-BOW1b (2026-09-24): THE PORTRAIT'S WINDOW - what figure() frames.
+/** PR-BOW1b: THE PORTRAIT'S WINDOW - what figure() frames.
  *  It framed a box over EVERY piece and then hid the unlit torch, the
  *  arrow off the string and the empty holster twin, so gear it does not
  *  show still moved the frame; and its width was the box's azimuth-safe
@@ -918,7 +911,7 @@ parseNifOnce.parses = 0;
 export const nifParseCount = () => parseNifOnce.parses;
 
 /**
- * MWNPC3 (2026-10-09, the MW-NPC arc's third slice, bible/04-Characters/Morrowind-NPCs.md section 8): ONE COPY OF A
+ * MWNPC3: ONE COPY OF A
  * MESH'S BYTES, FOR EVERY BODY. Every build copied each part's bytes out of its archive (`.slice()`) and parsed the
  * copy - a fresh copy a build, so parseNifOnce's memo (keyed by the bytes) never met the same mesh twice, and every
  * body re-parsed every mesh it wore: the player's on each equip, each peer's, and a crowd of NPCs wearing the same
@@ -1566,8 +1559,7 @@ export function torchPartPaths({ torch = false, allLights, has = null }) {
 }
 
 /** MW-D51: THE HELD TORCH, resolveWeaponParts' twin for Slot_CarriedLeft.
- *  Mac: "Morrowind model needs a torch to hold when a torch is
- *  equipped." Daggerfall's lit light is PlayerEntity.LightSource (the
+ *  Daggerfall's lit light is PlayerEntity.LightSource (the
  *  Torch item, lit by use - and Handheld Torches' hand law stows it
  *  when no hand is free); Morrowind's is the carried-left slot, whose
  *  LIGH record is instanced under "Shield Bone" exactly as a shield is
@@ -1578,8 +1570,7 @@ export function torchPartPaths({ torch = false, allLights, has = null }) {
  *  a fixture without the bone). */
 export const TORCH_BONE = 'Shield Bone';
 /**
- * MWT1 (2026-09-17, Mac: the Morrowind model's torch "is positioned
- * incorrectly") - THE ATTITUDE A HELD LIGHT IS GIVEN, AND ONLY A LIGHT.
+ * MWT1 - THE ATTITUDE A HELD LIGHT IS GIVEN, AND ONLY A LIGHT.
  *
  * The bone was right and the rotation was missing. `SceneUtil::attach`
  * puts ONE PositionAttitudeTransform between the actor's bone and the
@@ -1619,8 +1610,7 @@ export function resolveTorchPart({ torch = false, allLights, find, skeletonBytes
 }
 
 /**
- * HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at the waist instead of having to be held"
- * ... "Let it be a separate animated item on movement"): THE LANTERN AT THE WAIST, on the third-person body.
+ * HT-WAIST: THE LANTERN AT THE WAIST, on the third-person body.
  *
  * Handheld Torches' port-own `Handling.LanternsAtWaist` hangs a lit lantern at the waist instead of the hand
  * (systems/playerTorch.js lanternAtWaist is the one question). Morrowind has no lantern on a belt either - its
@@ -1673,7 +1663,7 @@ export function resolveHipLanternPart({ hipLight = false, allLights, find, skele
   return { parts, hipInfo, notes };
 }
 /**
- * HT-WAIST-SIZE (2026-10-20, Mac: "the lantern attached to the waist in absolutely gigantic on the morrowind model"):
+ * HT-WAIST-SIZE:
  * THE SCALE A LANTERN'S MESH HANGS AT, from its own height (rig units, mwFirstPerson.js hangAnchor's) - a belt
  * lantern's, systems/lanternSwing.js HIP_LANTERN_HEIGHT, the height Eye Of The Beholder's picture hangs at. Morrowind
  * hangs no lantern on a belt: its carriable lanterns are lights made to hang in a street or be held up in a hand, and
@@ -1737,7 +1727,7 @@ function sayNoArrow(notes) {
   console.warn(`[mw] the bow carries no arrow - ${why}`);
 }
 
-/** TWO-HANDS (bible/05-Combat/Two-Hands.md): the node the LEFT hand's weapon hangs on - Morrowind's own, the bow's
+/** TWO-HANDS: the node the LEFT hand's weapon hangs on - Morrowind's own, the bow's
  *  (WEAPON_ATTACH_BONE's MarksmanBow row). Rule 13 mirrors every part on a node whose name holds "Left" (attach.cpp's
  *  substring test - the bow is "the sword's own mesh with X negated", Morrowind-Rules.md section 8), so a sword hung
  *  here is the right hand's sword in the mirror, which is what a second hand holds. */
@@ -1746,8 +1736,7 @@ export const OFF_WEAPON_BONE = weaponAttachBone(MW_WEAPON_TYPE.MarksmanBow);
  * TWO-HANDS AUDIT: THE PAIR'S GUARD ON THE BODY, sized as the sprite lane sizes it (handsLaw.js GUARD) - a share of the
  * arms' own picture, taken as the angle at the eye (FP_FIELD_OF_VIEW's height) and carried to the shoulder by the arm's
  * own proportions at rest (pairGuardDip). A hand that holds a blade drops GUARD.LOWER of THAT BLADE'S OWN height on the
- * picture (TWO-HANDS AUDIT 2: the sprite lane lowers a pair's weapon by LOWER of its drawn height - Mac: "the other weapon
- * in hand should lower slightly" - and the fists' nine pixels, which the first cut gave the 3D pair, "did not read" on a
+ * picture (TWO-HANDS AUDIT 2: the sprite lane lowers a pair's weapon by LOWER of its drawn height - and the fists' nine pixels, which the first cut gave the 3D pair, "did not read" on a
  * weapon; guardLensDrop, measured once per bound blade); a hand that holds none, the fists' GUARD.DOWN design pixels of
  * DFU's 200-high surface (combat/climbHands.js NATIVE_H) - GUARD_LENS_DROP. No number about any skeleton or weapon: each
  * angle is read off the rig and the blade it holds.
@@ -2283,7 +2272,7 @@ async function buildTpBody({
 }
 
 /**
- * MWNPC9 (bible/04-Characters/Morrowind-NPCs.md section 14b): A CREATURE'S BODY, BUILT. The CREA record by id (the
+ * MWNPC9: A CREATURE'S BODY, BUILT. The CREA record by id (the
  * last master that carries it wins - the load order), its model through rule 18's actor path (the "x" variant when
  * its .kf is there), assembled as its own skeleton and body (formats/morrowind/mwFirstPerson.js assembleCreature), textured as a
  * body is, and animated from its sources - xbase_anim first for a Bipedal one, then its own (creatureanimation.cpp).
@@ -2433,8 +2422,7 @@ async function faceMatchOf({ race, female, faceIndex, werewolf = false, npcFace 
 }
 
 
-// PORTRAIT3D (2026-10-15, the owner, of the faces: "can we do the other races with 3d portraits also?", then "#2 is
-// exactly I wanted. Which also affects the talk window for npcs"; of what it left out: "Stop half assing this"): THE
+// PORTRAIT3D: THE
 // FACE IS A PICTURE OF THE MORROWIND HEAD - the head the body wears, as the body wears it. With Morrowind's data
 // attached, a face Daggerfall paints - the player's portrait, an NPC's in the talk window - is the head, the hair and
 // what is worn on them, assembled on the body's own skeleton through the body's own doors: the face (faceMatchOf - the
@@ -2497,8 +2485,7 @@ export function headFrame(bounds, { air = 1.08, aspect = 1 } = {}) {
 
 /** PORTRAIT3D: the model a portrait's assembly is drawn under - figure()'s own at yaw 0, x negated, in metres, Z-up
  *  stood Y-up, AND TURNED TO FACE THE EYE: figure()'s +180 (drawThird's), which stands the body's front on +Z where
- *  headFrame's eye is. PORTRAIT3D-FACE (2026-10-15, a player's screenshot via the owner - a Nord's card on the online
- *  characters page showing only his hair): the first cut took the transform and left the turn, so every portrait was
+ *  headFrame's eye is. PORTRAIT3D-FACE: the first cut took the transform and left the turn, so every portrait was
  *  of the back of the head. */
 export const headPortraitModel = () => multiply(trs(0, 0, 0, 0, 180, 0, -1 / MW_UNITS_PER_METER, 1 / MW_UNITS_PER_METER, 1 / MW_UNITS_PER_METER), NIF_TO_PASS);
 
@@ -2641,7 +2628,7 @@ export async function buildFpArm({
   vampire = false,   // MWNPC14: a vampire's face - the race's vampire head
   flies = false,   // AUDIT MW-NPC II K5: a creature body that must fly (its CREA record's Flies flag)
   npcFace = null,   // MWNPC17: an NPC's head and hair, each walked off its seed ({ head, hair } - characters/wardrobe.js npcFaceOf): no portrait to match
-  ownHeads = false,   // MW-HEADS2 (the owner: "only the player Britons should recieve the new heads, not npcs"): a player's body - the local player's (weaponRig.js armBuildOptsOf) and a peer's (net/peer/peerBodies.js playerBuildOpts) - wears the port's own heads; every other the data's
+  ownHeads = false,     // MW-HEADS2: a player's body - the local player's (weaponRig.js armBuildOptsOf) and a peer's (net/peer/peerBodies.js playerBuildOpts) - wears the port's own heads; every other the data's
   offWeapon = null,   // TWO-HANDS AUDIT 2: a pair's left-hand weapon, bound in the build on both rigs - the rig's own rebuilds hand the one it holds (setOffWeapon records it)
 } = {}) {
   if (creature) return buildCreatureBody({ creature, flies, deps });   // MWNPC9
@@ -3331,7 +3318,7 @@ export function esmDiagnosis(names, parts, race) {
 }
 
 /**
- * IG4/IG5 (2026-08-31, Mac). A DECLARED DIVERGENCE, and it is the
+ * IG4/IG5. A DECLARED DIVERGENCE, and it is the
  * OWNER'S. The reference DESIGNS the arms to trail the look -
  * rotateFactor is 0.75 at rest (npcanimation.cpp:719), so a quarter of
  * every glance moves the arms AGAINST it, and the first-person offset
@@ -3623,7 +3610,7 @@ export function createFpArm() {
   // BlendMask_All: Priority_Torch on the LEFT ARM (character.cpp's
   // `mAnimation->play("torch", Priority_Torch, BlendMask_LeftArm, ...)`),
   // so the right arm keeps swinging while the left holds the light up.
-  // MWNPC4 (bible/04-Characters/Morrowind-NPCs.md section 9): THE REACTIONS - the hit recoil and the death
+  // MWNPC4: THE REACTIONS - the hit recoil and the death
   // (character.cpp refreshHitRecoilAnims, playRandomDeath/playDeath). Both play on BlendMask_All
   // (`playBlendedAnimation(mCurrentHit, priority, MWRender::BlendMask_All, ...)`, and playDeath's own), so they join the
   // winner ladder EXACTLY - the "third animation" the two-slot note above foresaw needs no per-bone vector, because
@@ -3637,7 +3624,7 @@ export function createFpArm() {
   let posedGroup = null;        // MWNPC4: the frame's winner, by name - on the card
   let dead = false;              // MWNPC4: died - the reference stops refreshing a dead actor's states (character.cpp:"For dead actors, refreshCurrentAnims is no longer called")
   let torchLit = false;
-  // WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): the held weapon's glow - `{ look, code, level, ramp }`
+  // WEAPON-GLOW1: the held weapon's glow - `{ look, code, level, ramp }`
   // (systems/weaponGlow.js meshGlow, or glowFromWord for a peer's body) - laid on the mesh each draw; the renderer lights
   // the weapon's own ranges with it (renderer.js _drawWeaponGlow). Null draws none. AUDIT WEAPON-GLOW NET-1: the spec is
   // the weapon's it was asked of (`glowKey`, its fpWeaponKey with the quiver aside), and it is laid on the mesh only
@@ -3662,7 +3649,7 @@ export function createFpArm() {
   let hipLit = false;
   let pendingHipLight = null;    // the lantern that arrived mid-build (MAC-S1's law, MW-D51's queue)
   const hipLantern = createHipLantern();
-  // BODY-MOTION (characters/bodyMotion/bodyMotion.js; bible/04-Characters/Body-Motion.md): THE THIRD-PERSON BODY'S OWN
+  // BODY-MOTION (characters/bodyMotion/bodyMotion.js): THE THIRD-PERSON BODY'S OWN
   // MOTION - its gait, its carry and a blow's body - one per rig, stepped below after the clips and laid on the pose
   // through poseAssembly's `motion` slot; the clips still decide every group, and it steps aside where they own the body
   const motion = createBodyMotion();
@@ -3690,7 +3677,7 @@ export function createFpArm() {
   const climbLaw = new ClimbPose();
   let climbLast = null;
   let climbHands = false;
-  // TWO-HANDS (bible/05-Combat/Two-Hands.md): THE SECOND HAND. How the hands are held - the rig's word every frame
+  // TWO-HANDS: THE SECOND HAND. How the hands are held - the rig's word every frame
   // (setHands: combat/twoHands/handsLaw.js HANDS_MODE, and the hand that leads) - the hand of the blow in flight, the left
   // hand's weapon (setOffWeapon: its key, a request queued behind a build), the carry each rig's mirror eases its
   // compositions by (combat/twoHands/mirrorRig.js), which fist each hand-to-hand clip throws (measured once a clip), and the run.
@@ -4433,7 +4420,7 @@ export function createFpArm() {
    */
   function mirrorFor(rigKey, r, dt) {
     const req = { carry: { key: 'none', dt, tau: POSE.LIMB_TAU, state: mirrorCarry[rigKey] }, dip: null };
-    // TWO-HANDS FIELD (Mac: "No left arm"): the first-person arms mirror across the PICTURE - the eye's own middle - not
+    // TWO-HANDS FIELD: the first-person arms mirror across the PICTURE - the eye's own middle - not
     // the chest the clip posed (mirrorRig.js pictureMirrorArm): the lens is the camera node, moved fpOffset across
     if (rigKey === 'first' && r && r.cameraRef != null) req.plane = { ref: r.cameraRef, dx: fpOffset[0] };
     // SPELL-HAND (combat/twoHands/spellHandArm.js): a spell in the free hand beside the weapon - one arm in the other's stance
@@ -4458,7 +4445,7 @@ export function createFpArm() {
         req.limbs = { L: idle ? { clip: idle, side: 'R', mirror: true } : { pose: null, side: 'R', mirror: true } };
         req.carry.key = 'dual:R';
       } else {
-        // TWO-HANDS FIELD (Mac: "Both arms swing the same direction"): on the move the left arm is the right's mirror
+        // TWO-HANDS FIELD: on the move the left arm is the right's mirror
         // HALF A STRIDE ON (strideOpposite) - the arms swing against each other as the clip's own two do, each blade
         // still carried as the right carries its own. The frame's own right arm, mirrored, swung both arms together
         const stride = strideOpposite();
@@ -4478,8 +4465,7 @@ export function createFpArm() {
     return req;
   }
   /**
-   * TWO-HANDS AUDIT: THE PAIR'S GUARD (Mac: "When attacking with a weapon, the other weapon in hand should lower
-   * slightly") - the sprite lane's law on the body: while one hand of a pair strikes, the OTHER arm is lowered, its weight
+   * TWO-HANDS AUDIT: THE PAIR'S GUARD - the sprite lane's law on the body: while one hand of a pair strikes, the OTHER arm is lowered, its weight
    * eased in fast and out slower (handsLaw.js guardStep: GUARD.IN_TAU, GUARD.OUT_TAU), one weight a hand, stepped once a
    * frame. Stepped whatever the composition, so an arm lowered as its pair is put away rises on the same law.
    */
@@ -4490,8 +4476,7 @@ export function createFpArm() {
     }
   }
   /**
-   * TWO-HANDS SPREAD (Mac: "For the morrowind first person, when duel wielding can we spread out the arms a bit more
-   * sense it can make the weapons overlap"): the angle the pair's arms are turned out (mirrorRig.js's `spread`), stepped
+   * TWO-HANDS SPREAD: the angle the pair's arms are turned out (mirrorRig.js's `spread`), stepped
    * once a frame in either view (pairSpreadStep), so a view switch finds it where it stands (A VIEW SWITCH CARRIES
    * NOTHING) - its blades measured the first frame a pair is held and again only when one is bound anew (spreadMeasure,
    * pairBladeMeasure: a body that never holds a pair never pays). The first person lays it; third person's body holds its
@@ -5054,8 +5039,7 @@ export function createFpArm() {
   }
 
   /**
-   * MAC-S1 (Mac: "Shields sometimes do not show up in the morrowind
-   * paperdoll"): THE COALESCED TABLE AND HAND GO THE MOMENT THE RIG IS
+   * MAC-S1: THE COALESCED TABLE AND HAND GO THE MOMENT THE RIG IS
    * FREE, WHICHEVER PATH FREED IT - the one home for the flush, so a
    * third door that takes `busy` cannot forget half of it.
    *
@@ -5124,7 +5108,7 @@ export function createFpArm() {
     get frames() { return frames; },
 
     async build(opts) {
-      opts = drawnOpts(opts);   // APPEARANCES (bible/04-Characters/Wardrobe.md): the hands hold what their pieces are drawn as
+      opts = drawnOpts(opts);     // APPEARANCES: the hands hold what their pieces are drawn as
       // AUDIT MW-TORCH F6: A BUILD THAT ARRIVES MID-BUILD IS QUEUED, the
       // law PX25/PX26 gave the worn table and the hand. autoBuildArms's
       // door is reached by a load landing while the last load's build
@@ -5383,7 +5367,7 @@ export function createFpArm() {
       return this.build({ ...lastBuildOpts, werewolf: want, skin: wantSkin });
     },
     /**
-     * PORTRAIT3D (the owner: "Do this" - the curse's face): THE FACE FOLLOWS THE CURSE. A vampire's body wears the
+     * PORTRAIT3D (- the curse's face): THE FACE FOLLOWS THE CURSE. A vampire's body wears the
      * race's vampire head (MWNPC14, getVampireHead), the cure gives the face back - setWerewolf's law: one boolean
      * compare against the last build's opts, a change one build; asked mid-build, a queued build takes it, else it
      * waits for the build in flight.
@@ -5766,7 +5750,7 @@ export function createFpArm() {
       return projectPaperCorners(held.piece.positions, lastFrame, lastFrame.rect);
     },
 
-    /** TWO-HANDS (bible/05-Combat/Two-Hands.md): how the hands are held this frame - 'single', 'fists' or 'dual'
+    /** TWO-HANDS: how the hands are held this frame - 'single', 'fists' or 'dual'
      *  (combat/twoHands/handsLaw.js HANDS_MODE) - and the hand that leads. The rig says so every frame; two writes. */
     setHands({ mode = 'single', lead = 'R' } = {}) {
       handsMode = mode === 'fists' || mode === 'dual' ? mode : 'single';
@@ -6225,7 +6209,7 @@ export function createFpArm() {
      *  await and no dynamic import - a promise per frame in a rAF body
      *  is a stutter you cannot profile out.
      *
-     *  PEER-CADENCE (2026-09-22): `pose: false` steps the CLOCKS and
+     *  PEER-CADENCE: `pose: false` steps the CLOCKS and
      *  not the SKIN - the four-slot machine advances, the movement
      *  refresh reads the camera, the keys fire - and the third-person
      *  frame stops short of poseAssembly, the mesh upload and the
@@ -6711,8 +6695,7 @@ export function createFpArm() {
      *  or a spell out (Actor.getStance), else swimming (Actor.isSwimming, the frame's motion bag) - or null. */
     shoulderStance: () => (spellReady || !sheathed ? 'combat' : camera?.()?.move?.swimming ? 'swimming' : null),
     /**
-     * BEAST-SELF (2026-09-26, Mac: "You dont see your self transform less your in paperdoll style (morrowind models
-     * need their vampire/werewolf forms)"): STAND ASIDE. Morrowind's data holds no beast for a Daggerfall lycanthrope,
+     * BEAST-SELF: STAND ASIDE. Morrowind's data holds no beast for a Daggerfall lycanthrope,
      * so while the player is transformed the arm and the body draw nothing and the wheel has no body to cross into:
      * the first person is the classic claws (the weapon rig's own draw), the third Eye Of The Beholder's lycanthrope
      * (player/mwView.js's other lane) - what the transformed player without Morrowind data sees, and what everyone
@@ -6797,8 +6780,7 @@ export function createFpArm() {
       // AUDIT MWBODY A4: the POSED assembly's own bounds (poseAssembly sets
       // them every step) - the per-piece table walked every vertex again
       // per frame, and per body once the peers stood in the same pass.
-      // PR-BOW1 (2026-09-24, player report: "Equipping a bow enlarges
-      // your character"): and only over what the pass DRAWS - the ranges
+      // PR-BOW1: and only over what the pass DRAWS - the ranges
       // rule 57 left shown, off the per-range boxes the upload folded
       // (visibleRangeBounds). A sheathed blade, the holster twin, an
       // arrow off the string and an unlit torch are hidden, not removed,
@@ -6928,7 +6910,7 @@ export function createFpArm() {
       return img;
     },
 
-    /** MW-MOUNT (Mac: "Morrowind models if activated should show" - the
+    /** MW-MOUNT (- the
      *  house's hung weapons and displayed armour): A DISPLAYED ITEM'S
      *  MORROWIND PICTURE. The icon's own record (the one item map:
      *  weapon type + material, armour template + material - so a
@@ -7052,7 +7034,7 @@ export function createFpArm() {
       // 0 face -Z in pass space, and the eye below sits on +Z.
       const yawDeg = (yaw * 180 / Math.PI) + 180;
       const model = multiply(trs(0, 0, 0, 0, yawDeg, 0, -u * rs.weight, u * rs.height, u * rs.weight), NIF_TO_PASS);
-      // PR-BOW1b (2026-09-24): FRAMED ON WHAT IT DRAWS, AT THE BODY'S
+      // PR-BOW1b: FRAMED ON WHAT IT DRAWS, AT THE BODY'S
       // SCALE - after the flags above, off the per-range boxes the upload
       // just folded (portraitWindow). It framed meshBounds over EVERY
       // piece, the hidden ones included (AUDIT 68 had moved it off

@@ -24,7 +24,7 @@ import { lightList, packLight, adoptLight } from '../../render/lightId.js';   //
 export const LIGHTS_ARCHIVE = 210;
 export const CITY_LIGHT_RANGE = 18;
 /**
- * LA-LIGHTS2 (2026-09-27, Mac: "look for flickering issues"): THE CAP FADES, IT DOES NOT CUT. The lane lights the
+ * LA-LIGHTS2: THE CAP FADES, IT DOES NOT CUT. The lane lights the
  * nearest EL_MAX_LIGHTS (48) of a town's lanterns, and a town at night holds more (the probe's night street: all 48
  * taken, every frame). Each step the player took changed which lanterns made the cut, and the one that left went dark
  * at once wherever it lit - a pool of light on a far street switching off, another switching on. A lantern's share of
@@ -39,7 +39,7 @@ export const LIGHT_CAP_FADE = 16;
 export function capFadeColors(lit, lead, pos, cap, color, fade = LIGHT_CAP_FADE) {
   return capFade(lit, lead, pos, cap, color, 0, fade);
 }
-/** LA-AUDIT A5 (2026-09-27, the audit before LA's merge; lens A measured it): THE DUNGEON'S CAP FADES TOO. A level
+/** LA-AUDIT A5: THE DUNGEON'S CAP FADES TOO. A level
  *  holds more torches than the lane's 48 (Scourg Barrow's cap cut at 128 of 297 in range, Privateer's Hold at 38 of
  *  71), and each one the walk brought in popped on at full strength - 138 joins in a 20-second walk, the first left out
  *  34 to 72 units off. capFadeColors for a set whose lights carry their OWN colours (the world host's dungeon pairs:
@@ -61,11 +61,11 @@ function capFade(lit, lead, pos, cap, color, stride, fade) {
   }
   return out;
 }
-/** LA-LIGHTS1 (2026-09-27): the CityLightAnimator slot a pixel's FIRST lantern flickers on (its j-th: this plus j,
+/** LA-LIGHTS1: the CityLightAnimator slot a pixel's FIRST lantern flickers on (its j-th: this plus j,
  *  modulo the animator's length) - named by the pixel, so each lantern keeps its own flicker whatever else is built
  *  around it (world.js refills its pool in `built`'s order, which a stream-out reshuffles). */
 export const lanternSlot = (px, py) => (Math.imul(px | 0, 73856093) ^ Math.imul(py | 0, 19349663)) >>> 0;
-/** LA-AUDIT F2 (2026-09-27; lens F found the fill unpinned - LA-LIGHTS1's test ran its own copy): THE STREET'S LANTERN
+/** LA-AUDIT F2: THE STREET'S LANTERN
  *  POOL, REFILLED (world.js's PERF-LIGHTS pool). Each built pixel's lanterns go into `pool` from 0 under the pixel's
  *  live translation, and each takes the range of its own animator slot - its pixel's lanternSlot plus its place in the
  *  pixel's list (LA-LIGHTS1). `ranges` grows with the pool (a town holds more than its first 64), and is handed back.
@@ -192,7 +192,7 @@ const _selIdx = [];
 export function nearestLights(lights, pos, max = 16, range = CITY_LIGHT_RANGE, colorOf = null, xzRange = 0, n = -1) {
   const perLight = typeof range !== 'number' ? range : null;
   const xz2 = xzRange > 0 ? xzRange * xzRange : 0;
-  // PERF-LIGHTS (2026-09-19): how many of `lights` are live. The world
+  // PERF-LIGHTS: how many of `lights` are live. The world
   // host refills a POOL of light objects rather than minting one per
   // lantern per frame (a town at night is hundreds of them, sixty times a
   // second, in a frame that is already script-bound), so its array is

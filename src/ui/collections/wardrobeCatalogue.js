@@ -1,7 +1,5 @@
 // @ts-check
-// COLLECTIONS-II (2026-10-22, the owner: "with the introduction of a lot of titles, auras, profile icons, etc I think its
-// time we introduce these elements to the collections tab, along with telling how they are found, even if they arent
-// currently able to be obtained"; bible/10-UI/Collections.md): THE WARDROBE CATALOGUE - every thing an account's
+// COLLECTIONS-II: THE WARDROBE CATALOGUE - every thing an account's
 // wardrobe can hold (the account card's word for them: ui/enhanced/enhancedAccount.js wardrobe), held or not: each
 // title, aura, profile icon and glyph of the vocabulary both ends share (net/identityToken.js TITLES, AURAS, ICONS,
 // GLYPHS), with where it comes from, whether it can be had now, and how.

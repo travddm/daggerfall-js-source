@@ -1,9 +1,9 @@
-// ORL1 (2026-09-17): THE VIRTUE LEVEL-UP SCREEN - OblivionRemaster-
+// ORL1: THE VIRTUE LEVEL-UP SCREEN - OblivionRemaster-
 // LikeLeveling's own level-up window (player.lua:245-622), on the
 // port's canvas.
 //
 // ── WHY THIS IS A TEXT SCREEN AND NOT A NATIVE WINDOW ─────────────
-// THE NATIVE-WINDOW RULE (bible/Home.md) says every drawn element of
+// THE NATIVE-WINDOW RULE says every drawn element of
 // a native window - rect, font, colour, scale, alignment - must cite
 // its DFU source before it ships, and that an element whose value is
 // unknown does not draw. This window HAS no DFU source: it is a

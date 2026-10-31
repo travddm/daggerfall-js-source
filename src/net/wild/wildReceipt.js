@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): A FALL IN THE OPEN ZONE, SIGNED BY THE RELAY THAT REFEREED IT.
+// INT9: A FALL IN THE OPEN ZONE, SIGNED BY THE RELAY THAT REFEREED IT.
 //
 //     f1.<base64url({ f, c, k, r, w, wt?, m?, kc?, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         f the fallen's account   c its realm character ('' - none signed)   k the killer's account   r the remains' id
@@ -24,7 +23,7 @@
 //
 // PURE, and all three ends import it.
 //
-// MAC'S DECISION (2026-10-14, "Yes, build it" - the two-phase handoff): THE KILLER'S COLLECT, SIGNED BY THE ROOM THAT
+// MAC'S DECISION: THE KILLER'S COLLECT, SIGNED BY THE ROOM THAT
 // HOLDS THE REMAINS. The fallen loses the worn piece only once the killer has it: the service holds it in escrow at the
 // fall (server-account/src/wild.js), and the killer's take of it in the room is no record handed over - the room signs
 // the collect, and the killer's tab carries it to the service, which commits the piece to the killer's record once:
@@ -140,7 +139,7 @@ function readAs(/** @type {string} */ V, /** @type {(c: any) => boolean} */ vali
 /** VERIFY - the account service's half, the other receipts' rungs: `{ ok: true, claims }` or `{ ok: false, why }`. */
 export const verifyWildReceipt = (/** @type {unknown} */ r, /** @type {CryptoKey} */ publicKey, /** @type {{ subtle: SubtleCrypto, nowS: number, skewS?: number }} */ o) => verifyAs(WILD_RECEIPT_V, wildReceiptValid, r, publicKey, o);
 
-/** MAC (2026-10-14): everything a well-formed collect's claims must be. */
+/** MAC: everything a well-formed collect's claims must be. */
 export function wildCollectValid(/** @type {any} */ c) {
   if (!c || typeof c !== 'object' || Array.isArray(c)) return false;
   if (COLLECT_FOREIGN.some((f) => c[f] !== undefined)) return false;
@@ -161,8 +160,7 @@ export const readWildCollect = (/** @type {unknown} */ r) => readAs(WILD_COLLECT
 /** VERIFY A COLLECT - the account service's half. */
 export const verifyWildCollect = (/** @type {unknown} */ r, /** @type {CryptoKey} */ publicKey, /** @type {{ subtle: SubtleCrypto, nowS: number, skewS?: number }} */ o) => verifyAs(WILD_COLLECT_V, wildCollectValid, r, publicKey, o);
 
-// ═══ SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - broadsides
-// between captains in the open sea; bible/03-World/Eltheric-Ocean.md SHIP-PVP): A SHIP WRECKED AT ANOTHER CAPTAIN'S GUNS,
+// ═══ SHIP-PVP: A SHIP WRECKED AT ANOTHER CAPTAIN'S GUNS,
 // SIGNED BY THE RELAY THAT REFEREED IT (net/sea/seaRef.js). The relay holds each captain's ship's bar in the open sea and
 // calls the wreck; its killer has SEA_REF.boardMs to come alongside and board her (`b` 1: her hold's share is the
 // killer's prize); then the relay signs it and hands it to both, and the account service takes the prize off the wrecked

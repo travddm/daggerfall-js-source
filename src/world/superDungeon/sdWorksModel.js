@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE WORKS -
+// SD-LOOK S11: THE WORKS -
 // the broken clock's own works, turning far below the islands in the haze: four enormous brass gears 40-80 m across,
 // 240-280 m down under the course's middle, meshed in two pairs on two layers (the upper pair's driver on the lower
 // pair's follower's axle, as a clock's train is built), neighbours turning opposite ways on the escapement's tick

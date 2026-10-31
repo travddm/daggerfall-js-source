@@ -1,5 +1,5 @@
 // @ts-check
-// MWBODY1 (2026-09-12, Mac: "knock out the deferred morrowind model"):
+// MWBODY1:
 // THE OTHERS, IN THE MORROWIND BODY. ONLINE1's brief - "if using
 // enhanced, you would see the other person's Morrowind sprite" - was
 // deferred because the rig was read as a singleton. It is not: the
@@ -28,7 +28,7 @@
 // seconds and holds a GPU mesh, so past the cap the rest stand as
 // dolls. Builds run one at a time.
 //
-// AUDIT MWBODY (2026-09-12, the audit before the merge) added the
+// AUDIT MWBODY added the
 // LINGER (a peer leaving the drawable set - out of range, silent, a
 // room change - keeps its body BODY_LINGER_MS before it is released,
 // or a peer flickering at an edge rebuilt its body every flicker and
@@ -39,8 +39,7 @@
 // sprint), and the run bit from the wire in place of a speed guess
 // that sat under every walk.
 //
-// WB9h (2026-09-30, Mac: "Further improve the morrowind model performance
-// as it's unplayable with so many players around"): A CROWD.
+// WB9h: A CROWD.
 // tools/peerCrowdProbe.mjs stood forty players milling round the eye for
 // thirty seconds: 81 bodies BUILT - the first eight, then one torn down
 // and another built every few hundred milliseconds as the nearest eight
@@ -147,8 +146,7 @@ export const SWAP_MARGIN = 1.25;
 export const BODY_REBUILD_MS = 10000;
 /** A strike the rig refused (an equip in flight, a shot still releasing) is asked again this many frames, then dropped (AUDIT WORLD C3). */
 export const PENDING_FRAMES = 60;
-/** MW-PACE1 (Mac: "Morrowind attack animations don't scale with attack speed/multiple attacks when attack speed is
- *  high"): A PEER'S BLOW, PACED BY ITS OWN GAPS. The wire carries a swing's count and kind, not the sender's Speed - but
+/** MW-PACE1: A PEER'S BLOW, PACED BY ITS OWN GAPS. The wire carries a swing's count and kind, not the sender's Speed - but
  *  a held button keeps swinging (WeaponSwingMode 2), and the sender's machine starts each blow the frame after the last
  *  is done, so the gap between two counts IS the sender's blow. A burst's shortest gap paces its blows (a pause in a
  *  fight only lengthens a gap), its hit two fifths in (the machine's HIT_FRAME_MELEE of MELEE_NUM_FRAMES); a gap past
@@ -167,7 +165,7 @@ export const peerBlow = (pace) => (pace == null ? null
   : { seconds: pace, hitAt: (pace * HIT_FRAME_MELEE) / MELEE_NUM_FRAMES.StrikeDown });
 /** The drawn yaw eases toward the pose's at this rate (a second) - a turn the rig can see every frame, not one that stops between poses. */
 export const YAW_EASE = 12;
-/** PEER-CADENCE (2026-09-22, Mac: "look for ways to improve online performance"): how many frames apart a body's
+/** PEER-CADENCE: how many frames apart a body's
  *  SKIN is re-posed, by its distance from the eye (scene units, metres; the camera that draws it, through its lens -
  *  cadenceD2, HORSE-VIEW's audit) - `[within, every]`, the first row that
  *  holds. The clips advance every frame regardless (the rig's `pose: false`); what waits is poseAssembly, the mesh
@@ -236,7 +234,7 @@ export const cadenceD2 = (at, eye, lens = 1) => ((at[0] - eye[0]) ** 2 + (at[2] 
 /** DISC12: the weapon in the hand the peer USES - the look carries both hands, the pose's `lh` says which one is
  *  drawn (WeaponManager.ApplyWeapon :741-755: the other hand is never on screen). */
 const _stubSlots = new WeakMap();   // MW-CROWD: a look's stand-in's slots, once a look - a look is replaced, never mutated (lookKey's law)
-/** AUDIT HORIZONTAL E1 (bible/04-Characters/Wardrobe.md section 6): WHAT A HAND HOLDS, as its body draws it - the weapon's
+/** AUDIT HORIZONTAL E1: WHAT A HAND HOLDS, as its body draws it - the weapon's
  *  template, metal, hand and the look it wears. A peer re-dressing the weapon in hand (or taking up its twin in another
  *  metal) is a new weapon to the body; the template and the hand alone kept the old one, and its glow went out. */
 export const heldWeaponKey = (/** @type {any} */ it) => (it ? `${it.templateIndex}|${it.material ?? ''}|${it.equipSlot}|${appearanceSig(it)}` : '');
@@ -343,7 +341,7 @@ export function peerBuildOpts(look, shown = null, glyphs = null) {
   };
 }
 
-/** MW-HEADS2 (the owner: "only the player Britons should recieve the new heads, not npcs"): ANOTHER PLAYER'S BUILD -
+/** MW-HEADS2: ANOTHER PLAYER'S BUILD -
  *  peerBuildOpts, and the port's own heads, as the local player's body wears them (combat/weapon/weaponRig.js
  *  armBuildOptsOf). The peers' PeerBodies takes it (scenes/world.js); the people's lanes take peerBuildOpts, the data's
  *  heads. */
@@ -628,7 +626,7 @@ export class PeerBodies {
     }
     want.length = n;
     if (this._wantSince.size) for (const [id, s] of this._wantSince) if (s.frame !== this._frame) this._wantSince.delete(id);   // WB9h: one that stopped wanting starts again
-    // AUDIT PARTY8 (2026-09-23): A PARTY MATE BEFORE A STRANGER. The rigs were nearest-first alone, so with seven
+    // AUDIT PARTY8: A PARTY MATE BEFORE A STRANGER. The rigs were nearest-first alone, so with seven
     // companions and one stranger nearer than the farthest of them, the stranger took the eighth body and a party
     // mate stood as a paper doll. `priority` (the host's own `social.isPartyPeer`) sorts a mate first, and a mate
     // may take a stranger's slot outright; a stranger never takes a mate's.
@@ -841,7 +839,7 @@ export class PeerBodies {
     } catch (e) { this._fail(b, `update threw: ${e?.message ?? e}`); }
   }
 
-  /** MAC7 #1 (Mac: "no weapons"): the weapon and the swing, off the wire's own bits - the rig's weapon drawn while
+  /** MAC7 #1: the weapon and the swing, off the wire's own bits - the rig's weapon drawn while
    *  the sender's is (setSheathed, the player's own rig's door), a swing once per count and never the count the body
    *  was born with (a late joiner does not replay an old blow), and release() every frame as weaponRig gives its own
    *  rig - a wind-up that is not held lets go on the next frame.
@@ -875,7 +873,7 @@ export class PeerBodies {
     // when the rig took it (a swap refused mid-swap was never retried, and the wrong nock stood until a rebuild)
     const am = shown.am ? 1 : 0;
     if (b.weapon && b.ammo !== am && (b.rig.upperBodyReady?.() ?? true) && b.rig.setWeapon?.(b.weapon, { hasAmmo: !!am }) !== false) b.ammo = am;
-    // WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): the weapon in their hand glows as its owner's card says (the look's
+    // WEAPON-GLOW1: the weapon in their hand glows as its owner's card says (the look's
     // `glow`, net/wire.js LOOK_GLOW_RE) - off the look NOW (a weapon identified or socketed is a new look, the same
     // template in the same hand), when MY switch shows glows; a gatherer's tool, a wolf's claws and a creature carry none
     const heldNow = hands ? (hands.dual ? hands.right : peerWeaponOf(look, shown)) : null;
@@ -888,7 +886,7 @@ export class PeerBodies {
     b.rig.setOffWeaponGlow?.(offNow && weaponGlowOn() ? glowFromWord(offNow.glow) : null, offNow);
     b.rig.setSpellHand?.(!!hands?.spellHand);   // AUDIT SPELL-HAND L4-2: told before the stance, as the local rig tells its own
     b.rig.readySpell?.(!b.wolf && !!shown.sr);   // WEREWOLF1: a werewolf casts nothing (setWerewolf clears the spell stance)
-    // HT-WAIST-NET (2026-09-24): THE LANTERN AT THE WAIST, off the pose's `hl` - the rig's own door, the local body's
+    // HT-WAIST-NET: THE LANTERN AT THE WAIST, off the pose's `hl` - the rig's own door, the local body's
     // (weaponRig hands the player's the same boolean every frame): the fast path one compare, the first lit binds the
     // lantern at this body's pelvis once, a light arriving mid-build is queued. It swings off this body's own camera
     // (peerCamera's `move` and eased yaw, the walk clip's phase), as the local one swings off the motor's. No held
@@ -1000,8 +998,7 @@ export class PeerBodies {
     return this._drawBodies(canvas, proj, view, eye, false, flashOf);
   }
 
-  /** INVIS-LOOK (2026-09-27, Mac: "Give invisibility the same invisibility we give enemies in enhanced AI. That
-   *  transparent look"): THE CONCEALED BODIES, TRANSLUCENT - ECV1's look, the one a concealed foe's sprite takes (the
+  /** INVIS-LOOK: THE CONCEALED BODIES, TRANSLUCENT - ECV1's look, the one a concealed foe's sprite takes (the
    *  shimmer and ripple, a shade's dark silhouette), through the sprite box's own quad. Blended with no depth write,
    *  so a host calls it AFTER its opaque world (the level, the flats, the foes), and it draws with this frame's camera
    *  - the one `draw` was handed. Nothing before the body pass has drawn this frame: nothing. */

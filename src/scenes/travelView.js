@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV1 - THE TRAVEL VIEW, THE HOST'S HALF (bible/06-Systems/Travel-View.md).
+// TV1 - THE TRAVEL VIEW, THE HOST'S HALF.
 //
-// Mac (2026-09-27): "When opening the map, there should be a toggle to go
-// to the overworld style map." The held map's foot row carries the door
+// The held map's foot row carries the door
 // (ui/heldMap.js, "Overworld"); the Controls page carries an unbound
 // action for a player who wants a key from play (TravelView).
 //
@@ -92,7 +91,7 @@ export const TV_HEARTBEAT_MS = 600;
 /** The movement actions whose press turns the traveller toward the view's heading. */
 export const TV_MOVE_ACTIONS = Object.freeze(['MoveForwards', 'MoveBackwards', 'MoveLeft', 'MoveRight']);
 
-/** TV1: THE DOOR UP - its words on the held map's foot row (ui/heldMap.js) and, ETHER-OW (2026-10-13), on the Eltheric
+/** TV1: THE DOOR UP - its words on the held map's foot row (ui/heldMap.js) and, ETHER-OW, on the Eltheric
  *  Ocean's chart (ui/etherChartWindow.js), the map's answer past the Veil - and its key on either: O. */
 export const TRAVEL_VIEW_BUTTON = 'Overworld (O)';
 /** The view's own lines - the refusals the door says, and the readout's place line. */
@@ -137,7 +136,7 @@ export const TRAVEL_VIEW_TEXT = Object.freeze({
   wilderness: (region) => (region ? `The wilds of ${region}` : 'The wilds'),
 });
 
-/** SHIP-SAIL (2026-09-28): the rows of the passage the Overworld offers where the walk is refused and the map's ship
+/** SHIP-SAIL: the rows of the passage the Overworld offers where the walk is refused and the map's ship
  *  passage sails - the question, the fare's own row (partyTravelLaw.fareText, the party's prompts' words), the days
  *  the map would count (MERGE with LIVED1: online too - they pass on the traveller's own clock, `own`, as the enhanced
  *  map's "N days of your time" says; OL2's "none online, where the arrival is now" is superseded), and the popup's
@@ -158,11 +157,10 @@ export function travelTripLine({ name = '', share = 0, spot = false, sea = false
 }
 
 /**
- * TV-WASD (2026-09-28, Mac: "Also need to add the ability to travel faster with WASD"): THE KEYS TRAVEL. Under the view
+ * TV-WASD: THE KEYS TRAVEL. Under the view
  * the movement keys walked the traveller at walking pace (TV1) - a crawl from 260 m up, beside a click's journey at
  * Travel Options' x10. While the view is up and no journey drives, a held movement key runs the world's clock at the
- * travel speed, which TV2's governor then holds to what the land raises, as it holds a journey. RATE-LAW (2026-10-04,
- * Mac: "Roads now travel at x100 and non roads at x60"): that speed is the ground's, as a journey's is - the road's
+ * travel speed, which TV2's governor then holds to what the land raises, as it holds a journey. RATE-LAW: that speed is the ground's, as a journey's is - the road's
  * rate on a road or a track (`onRoad`, the traveller's feet on the network's lanes), the open rate anywhere else
  * (systems/timeScale.js travelRateOf); it was the Travel Options panel's spinner. The clock and not the legs, as a
  * journey's: offline the calendar runs with the walk (the road costs its hours), online the body alone (TO-ONLINE).
@@ -251,13 +249,13 @@ export const ROUTE_DOT_KEEP = Object.freeze([0.8, 2.2]);
 /** The finest doubling of ROUTE_DOT_M that stands `px` apart where the ground is `perM` px a metre. */
 const dotStep = (perM, px) => ROUTE_DOT_M * 2 ** Math.max(0, Math.ceil(Math.log2(px / (perM * ROUTE_DOT_M))));
 /**
- * OW-DOTS-GROUND (2026-10-12, Mac with a video: "the dotted lines dont look still"): THE ROUTE'S DOTS ARE POINTS ON THE
+ * OW-DOTS-GROUND: THE ROUTE'S DOTS ARE POINTS ON THE
  * LAND. A dash pattern lives on the screen: laid along the projected path, it slid whenever the picture's lengths
  * changed - the camera's perspective stretches every piece as it follows the traveller, so no offset could hold it. Here
  * each dot is a place on the route in the world, at a whole multiple of a spacing measured back along the route from the
  * journey's end (ground metres, x and z), and projected like any mark: it stays where it lies while the traveller walks
  * over it.
- * OW-DOTS-EVEN (Mac: "the dot spacing is still a bit weird make it more consistent"): ONE SPACING ON THE GROUND for the
+ * OW-DOTS-EVEN: ONE SPACING ON THE GROUND for the
  * whole line - the doubling of ROUTE_DOT_M that stands ROUTE_DOT_PX apart at the traveller's feet, kept (`keep`, the
  * caller's memo) while it stays within ROUTE_DOT_KEEP of it - so the dots are evenly spaced on the land and close in
  * toward the horizon only as the land itself does, as a road's posts would. (A spacing picked piece by piece doubled at
@@ -410,7 +408,7 @@ export function createTravelView(deps) {
       const key = deps.hud?.pickAt?.(e.clientX, e.clientY) ?? null;
       if (key) deps.onMark?.(key, e); else deps.onPick?.(e.clientX, e.clientY, e);   // OW-ATTACK: the press with the mark (an enemy's single click is the ground's)
     }
-    // WAYPOINTS (2026-10-06, the player: "with right mouseclick context menu"): a RIGHT press that never moved is the
+    // WAYPOINTS: a RIGHT press that never moved is the
     // waypoint menu's - on a mark (a flag: its own menu) or on the land (add one there). A right DRAG still orbits.
     if (p && p.id === e.pointerId && !p.moved && p.button === 2 && state === 'up' && e.type !== 'pointercancel') {
       const key = deps.hud?.pickAt?.(e.clientX, e.clientY) ?? null;

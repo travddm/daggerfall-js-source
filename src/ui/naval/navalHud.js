@@ -1,6 +1,5 @@
 // @ts-check
-// NAV-F (2026-09-28, Mac: "All UI elements should follow enhanced plus UI ... extremely detailed, authentic and easy to
-// use") - THE HELM'S READOUT: what a captain needs at a glance while the guns are served, in the stone-and-brass kit.
+// NAV-F - THE HELM'S READOUT: what a captain needs at a glance while the guns are served, in the stone-and-brass kit.
 // A READOUT, NOT A WINDOW (the gate bar's law, ui/gate/gateBossBar.js): no overlay, no pause, no keys of its own - one node
 // made on the first word and UPDATED, NOT REBUILT, hidden with the HUD and under every window.
 //
@@ -61,7 +60,7 @@ export const cardTopPx = (scale, foe = 0) => 18 + 28 * scale + 12 + foe * scale;
 export const NAVAL_CARD_GAP = 8;
 /** The card's width at scale 1 (the sheet's .dfnaval-card `width`), and its most: 86% of the screen. */
 export const NAVAL_CARD_W = 400;
-/** HUD-HELM (2026-10-15, Mac: the sea's target card "anchored to its bar so it moves with it"): where the card's centre
+/** HUD-HELM: where the card's centre
  *  stands under the helm panel's bar (`helm` its rect) - the bar's own centre, wherever HUD-MOVE put it, held so the card
  *  at its scale (`kc`) stays on a screen `W` wide. Pure. */
 export function cardCentreUnder(helm, W, kc) {
@@ -88,7 +87,7 @@ export const CARD_HIT_S = 0.24;
 /** AUDIT NAV1 (the presentation, #14): a ship's tag - its hull bar's width, and its fade with her distance: whole to
  *  TAG_FADE_FROM metres, TAG_FADE_TO of it at the tags' reach (the host's NAVAL_TAG_RANGE, the world's to hand). */
 export const NAVAL_TAG_BAR_W = 44;
-/** SHIPMATES (2026-09-29, Mac: "Ally crew member's should have green health bars above their head"): the player's own
+/** SHIPMATES: the player's own
  *  crew's health over their heads (drawCrewBars) - the party's green (net/social.js PARTY_GREEN_CSS), a bar a crewman,
  *  whole to CREW_FADE_FROM metres, TAG_FADE_TO of it at CREW_BAR_RANGE (the tags' own fade over the crew's reach - the
  *  ships' starts at 150 m, past every bar). */
@@ -114,14 +113,14 @@ export function crewBarPoint(feet, height, collider) {
   return [feet[0], Number.isFinite(up) ? Math.max(from, Math.min(want, from + up - CREW_BAR_UNDER_CEILING)) : want, feet[2]];
 }
 export const CREW_FADE_FROM = 15;
-/** LIVING CREW (2026-09-29, Mac: "talk with each other, blurb, sing chantys"): the lines over the crew's heads
+/** LIVING CREW: the lines over the crew's heads
  *  (drawCrewLines) - whole to CREW_SAY_FADE_FROM metres, TAG_FADE_TO of it at CREW_SAY_RANGE, the CREW_SAY_MAX nearest,
  *  each no wider than CREW_SAY_W - a word, a talk's line, a chanty's verse (the brass of the song) or a shout. */
 export const CREW_SAY_RANGE = 32;
 export const CREW_SAY_FADE_FROM = 12;
 export const CREW_SAY_MAX = 6;
 export const CREW_SAY_W = 190;
-/** FIELD BUGS 2026-10-02 CREW-SAY (Mac: "your crew mates speaking sometimes seems like gibberish"): THE WORDS NEVER OVER
+/** FIELD BUGS 2026-10-02 CREW-SAY: THE WORDS NEVER OVER
  *  EACH OTHER. Every bubble stood on its own head with nothing between them, at 0.62 of an opaque ground, the farther
  *  painted OVER the nearer: the chorus - every hand at once, each copy behind its own name, so each wrapped at its own
  *  words - stood up to six deep; a talk's two lines stood side by side over two hands side by side; and a bubble's foot,
@@ -155,7 +154,7 @@ export const crewSayMemory = () => ({ seq: 0, bubbles: new Map() });
  * hand's own, said before his line; `who` the speaker, one key a hand). Answers the CREW_SAY_MAX nearest lines to draw,
  * nearest first, each `{ x, y, text, kind, distance, lift }` - `text` with its speaker's name when he says it alone,
  * `lift` the px it stands over its own place.
- * FIELD BUGS 2026-10-02b CREW-SAY's audit (Mac: "Audit this"):
+ * FIELD BUGS 2026-10-02b CREW-SAY's audit:
  *   - only a line SUNG or SHOUTED by several at once is laid once (the chorus, a battle's cry) - two hands' talk is each
  *     his own, by his name, though the words are the same (two pairs at one old yarn stood as one bubble, by no name);
  *   - with `memory` (crewSayMemory) a stack stands in the order its lines were first said, the nearest first among
@@ -1018,7 +1017,7 @@ let tagHeld = new Set();
 export function tagState(t) {
   return t.state === 'afloat' && !t.boarded ? '' : cardState(t, null, '').text;
 }
-/** SHIP-TAGS (2026-10-02, Mac: "Improve the enemy and friendly UI substationally"): a tag's second line within
+/** SHIP-TAGS: a tag's second line within
  *  TAG_DETAIL_M of the eye - her class (a crown's ship by her crown) and where she is bound - and none past it, where a
  *  name and a bar are what can be read. */
 export const TAG_DETAIL_M = 400;
@@ -1028,7 +1027,7 @@ export function tagLine(t) {
 }
 /** A tag's opacity by her distance: whole to `from` (TAG_FADE_FROM), TAG_FADE_TO at the tags' `reach`. */
 export const tagAlpha = (d, reach, from = TAG_FADE_FROM) => 1 - (1 - TAG_FADE_TO) * Math.max(0, Math.min(1, ((d ?? 0) - from) / Math.max(1, reach - from)));
-/** SHIP-CLUTTER (2026-10-02, Discord: "The sea screen shows an overabundance of ship text on the high seas"): every
+/** SHIP-CLUTTER: every
  *  tag stood on its own spar with nothing between them, and each within TAG_DETAIL_M read its second line - off a
  *  harbour five ships' names and five "Wayrest Navy Cutter - patrolling off Joyous Light of Akatosh" ran through each
  *  other into one smear. `layoutNavalTags` now lays them:
@@ -1128,7 +1127,7 @@ export function drawNavalTags(points, { covered = false, doc = globalThis.docume
 }
 
 /** SHIPMATES: the player's own crew's bars (the constants beside the ships' tags, whose sheet they share). COMPANION-KIT
- *  (2026-10-01, Mac: "improved detailed health bar with buffs and their name"): a companion's point carries `name`, `hp`
+ *  a companion's point carries `name`, `hp`
  *  and `hpMax` and `fx` (partyBuffs.js composePartyFx's - his live effects) - his bar is wider, his name and health over
  *  it and his effects' icons under it (the spell's icon, its first letters while the sheet is on its way).
  *  AUDIT WK-U8: `fxPicture(i, { box, dpr })` is an effect's picture fitted to its tile (`{ src, w, h, smooth }` or null) -

@@ -1,7 +1,5 @@
 // @ts-check
-// STAR4-STAR6 (2026-10-20, the owner: "something coming from the sky and crashing into the ground, where people need to
-// defend the objective in a wave based format with a boss topping off the encounter at the end", and "multiple encounters
-// spread throughout the region, not just one"): THE STARFALL IN THE WORLD. Design: bible/11-Multiplayer/Starfall.md.
+// STAR4-STAR6: THE STARFALL IN THE WORLD. Design:.
 //
 // WHILE THE WITCHES' FESTIVAL RUNS (net/starfall/starfallLaw.js starfallRuns - the festival's own calendar, net/festivalLaw.js;
 // and after its close while a star it saw land still stands - starfallStands) a coven's rite pulls three stars a night down into its region's wilds (systems/starfall/starfallSites.js -
@@ -24,7 +22,7 @@
 // compass and the timers row (systems/starfall/starfallClient.js). Every word through t() (systems/starfall/starWords.js).
 //
 // The host (scenes/world.js bootWorld) constructs it once and calls it; it owns its state and its frame (HOST-SPLIT,
-// bible/01-Overview/Host-Split.md - the shape of scenes/fishHost.js). Not a DFU member. Ledger A (STARFALL).
+// the shape of scenes/fishHost.js). Not a DFU member. Ledger A (STARFALL).
 import {
   starfallRuns, starInWindow, starNightAt, starTimes, starStreakBearing, starCircleSize, STAR_WORD_MS, STAR_ORPHAN_MS,
   STAR_CIRCLE_AT, STAR_LOW_LIGHT, STAR_LIGHT, starLostAt, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, STAR_LOST_DARK,
@@ -66,7 +64,7 @@ import { findGateSite } from '../../systems/gate/gateSite.js';
 import { thunderOf, thunderSourceAt, THUNDER_SOURCE_M } from '../../systems/distantStorms.js';
 import { renownStruckAt } from '../../net/renownTracker.js';
 import { setMidScreenText } from '../../ui/midScreenText.js';
-import { eventNotice } from '../../systems/eventNotices.js';   // EVENTS1 (bible/10-UI/Event-Board.md): the region's lines and the hold, in the event board's news
+import { eventNotice } from '../../systems/eventNotices.js';     // EVENTS1: the region's lines and the hold, in the event board's news
 import { drawGateBossBar } from '../../ui/gate/gateBossBar.js';
 import { drawStarTracker, destroyStarTracker } from '../../ui/starfall/starTracker.js';
 import { createStarRewards } from './starRewards.js';
@@ -337,7 +335,7 @@ export function createStarfallHost(host) {
     const col = collider?.(), late = lateSolidsOf(col);
     if (!col?.addMesh || !late || !S.stone || !S.mat) return;
     if (S.colliderGen === S.stoneGen && sameMatrix(S.colliderAt, S.mat)) return;
-    // STAR-TUNE (the owner: "The dirt mound where the star is crashed can be walked through"): THE CRATER IS SOLID - its
+    // STAR-TUNE: THE CRATER IS SOLID - its
     // floor, its rim of thrown earth and the stones on it with the stone (`S.stone`, ensureMesh); and a LATE solid
     // (player/lateSolid.js, ROCK-CLEAR's gate): a crater built round a body standing on its rim is withheld until the
     // body is clear of it, never closed on it. Moved (a floating origin's recentre), it is put back where it is held

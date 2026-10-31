@@ -1,6 +1,6 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): WHERE SETHRAKUL RISES - the client's half of
-// the site, over the world's own data. Design: bible/11-Multiplayer/Sea-Serpent.md section 3.
+// SERPENT1: WHERE SETHRAKUL RISES - the client's half of
+// the site, over the world's own data. Design:
 //
 // IT HUNTS THE PACKET LANES. Its waters are always on one of the world's packet lanes (WW7-12, below - the Bay's
 // (systems/naval/seaLanes.js, made from the map files every client holds), the ones past it and across its edge): a lane
@@ -16,8 +16,7 @@
 // PURE: the lanes, a lane's way and the open law are handed in (scenes/naval/worldLanes.js's `all`, `way` and `open`
 // through scenes/world.js - the packets' own), so the pins drive it over a made sea. Not a DFU member. Ledger A (SERPENT1).
 //
-// WW7-12 (2026-10-26, bible/03-World/World-Wide.md WW7-12; the owner on the serpent staying on the Bay's lanes: "Fucking
-// do it"): THE WORLD'S LANES. Its lanes are every lane of the world now (scenes/naval/worldLanes.js `all`: the Bay's, the
+// WW7-12: THE WORLD'S LANES. Its lanes are every lane of the world now (scenes/naval/worldLanes.js `all`: the Bay's, the
 // ones past it, the ones across its edge - one list in one order on every game that stands the land past the Bay, once
 // its picture and its fit stand: `whole`), the open law the world's lane water (`open`). A game without them (the land
 // past the Bay off, or its picture still coming) cannot roll the site: it takes the HUB'S word of where the accounts that

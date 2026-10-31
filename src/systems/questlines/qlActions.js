@@ -1,5 +1,5 @@
 // @ts-check
-// QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE QUESTLINES' ACTIONS - six lines a quest script may say
+// QL4: THE QUESTLINES' ACTIONS - six lines a quest script may say
 // that DFU's machine does not know, registered by the quest bridge beside DFU's 82 (scenes/quest/questBridge.js), as
 // Jagget's four are (systems/quest/questActionsExtension.js, FORAGE1). Not DFU members; Port-Ledger A (QL4).
 //

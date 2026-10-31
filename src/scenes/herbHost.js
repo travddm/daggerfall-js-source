@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Life skills will utilize things like tree
-// chopping, picking up ingredients, fishing, etc. Active player
-// involvement and actual UI integration for life skills") - HERBALISM IN
-// THE STREAMING WORLD (bible/06-Systems/Professions-Arc.md 5, 6, 8, 22;
+// PROF1 - HERBALISM IN
+// THE STREAMING WORLD (5, 6, 8, 22;
 // FORAGE0 14). PROF2 made the host every gathering profession's
 // (scenes/gatherHost.js - one prompt, one act, one book); this is
 // Herbalism's KIND in it:
@@ -166,7 +164,7 @@ export function herbKind({ book }) {
       const only = tool === FT.Sickle ? 'herbs' : tool === FT.Basket ? 'food' : null;
       return planOf(p, { entity, info, rank }, only ? only === 'food' : false, !!only);
     },
-    /** PROF-MENU (2026-10-01, Mac: "use the same menu the loot menu uses"): THE PATCH'S TWO HARVESTS AS THE MENU'S ROWS -
+    /** PROF-MENU: THE PATCH'S TWO HARVESTS AS THE MENU'S ROWS -
      *  its herbs and its food (the act choice key's toggle, retired), each its own refusal; gathered whole, its one row. */
     rows(p, ctx) {
       const herbs = planOf(p, ctx, false, true), food = planOf(p, ctx, true, true);

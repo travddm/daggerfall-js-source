@@ -31,10 +31,9 @@ export function getMeleeWeaponAnimTime(liveSpeed, ctx = null) {
   return (3 * (115 - liveSpeed)) / CLASSIC_FRAME_UPDATE;   // seconds per anim frame
 }
 
-// ── SWING-LAW (2026-09-28, Mac: "swing speed is insane", then "Do whatever is the most detailed. I dont care about
-// departure, especially if we can do it better"): THE PLAYER'S SWING IS THE PORT'S OWN LAW. ──────────────────────────
+// ── SWING-LAW: THE PLAYER'S SWING IS THE PORT'S OWN LAW. ──────────────────────────
 // DFU's line, `3 * (115 - Speed) / 980` a frame, is a hyperbola in the swing RATE: a second a swing at Speed 50, a
-// quarter of one at 100 - four swings a second. DISC28-D (2026-09-28) gave the rig the player's live Speed, which it had
+// quarter of one at 100 - four swings a second. DISC28-D gave the rig the player's live Speed, which it had
 // never read (every player had swung at 50), and a lycanthrope's +40 Speed put anyone with a base of 60 or more on the
 // cap. The law below keeps Speed meaning something and bounds it, and reads the weapon in the hand:
 //   time a frame = DFU's frame at Speed 50 x TEMPO(Speed) x HEFT(weight, Strength) x HANDLING(weapon, hands),
@@ -87,7 +86,7 @@ export const SWING_HANDLING = Object.freeze({
   16: 0.9,              // Werecreature - the beast's claws
 });
 export const SWING_TWO_HANDED = 1.06;
-/** BAL10 (bible/05-Combat/Balance-Arc.md section 16; the owner chose "Short blades swing faster"): EVERY SHORT BLADE HANDLES
+/** BAL10 (; the owner chose "Short blades swing faster"): EVERY SHORT BLADE HANDLES
  *  AS A DAGGER. The table keys DFU's WeaponTypes - the SPRITE a weapon is drawn with - and DFU draws the Tanto, the
  *  Shortsword and the Wakizashi as long blades, so only the Dagger came round quickly: the family that fights by speed was
  *  the slowest per second of the six (a Shortsword 8.7 a second to a Longsword's 12.6 at Strength 80, Speed 70). A weapon
@@ -102,7 +101,7 @@ export const SWING_FRAME_MAX = 0.4;
 export function swingFrameSeconds(speed, { heft = 1, handling = 1 } = {}) {
   return Math.max(SWING_FRAME_MIN, Math.min(SWING_FRAME_MAX, SWING_BASE_FRAME * swingTempo(speed) * heft * handling));
 }
-// ── MARTIAL2 (bible/05-Combat/Martial-Specialisations.md section 4): THE SWING'S PACE ───────────────────────────────
+// ── MARTIAL2: THE SWING'S PACE ───────────────────────────────
 // A Short Blade mastered past 100 swings faster (systems/weaponMastery.js), and three martial paths quicken a swing for a
 // while (systems/martialPowers.js) - as CAST-SPEED's rate quickens a cast (systems/castSpeed.js). NAMED modifiers, each
 // `fn(ctx, w) -> percent` (`w` the swing reader's answer where the frame's law has read it already, else null - a
@@ -177,7 +176,7 @@ export const MELEE_NUM_FRAMES = { Idle: 1, StrikeDown: 5, StrikeDownLeft: 5, Str
 // FPSWeapon.cs verbatim hit frames: damage lands when
 // currentFrame == GetHitFrame().
 export const HIT_FRAME_MELEE = 2;
-// GATHER-FEEL (2026-10-13): the share of a melee strike its blow lands at - the hit frame of the strike's five. A
+// GATHER-FEEL: the share of a melee strike its blow lands at - the hit frame of the strike's five. A
 // gathering act's tool swings DFU's strike (scenes/treeHost.js axeHandFrame, scenes/mineHost.js pickHandFrame), so its
 // blow lands there too (systems/chopAct.js, mineAct.js `landsIn`).
 export const MELEE_HIT_SHARE = HIT_FRAME_MELEE / MELEE_NUM_FRAMES.StrikeDown;
@@ -266,8 +265,7 @@ export function machineCancelBowDraw(m, liveSpeed = 50) {
 }
 
 /**
- * MW-PACE1 (2026-10-07, Mac: "Morrowind attack animations don't scale with attack speed/multiple attacks when attack
- * speed is high"): THE BLOW'S CLOCK, SAID AHEAD OF TIME - when the strike this machine has just begun lands its hit,
+ * MW-PACE1: THE BLOW'S CLOCK, SAID AHEAD OF TIME - when the strike this machine has just begun lands its hit,
  * and when it is done, in seconds from its first frame. The Morrowind arm is a picture of this machine (rule 24's note,
  * Morrowind-Rules.md: the hit frame is FPSWeapon's, not the .kf's), and a picture paced by the WEAP record's own speed
  * drew one blow while the machine struck two - the second refused, the hit landing mid-wind-up. The caller that starts

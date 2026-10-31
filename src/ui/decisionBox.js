@@ -1,5 +1,5 @@
 // @ts-check
-// REST-WARN2 (2026-10-08, the owner: "those are not enhanced plus ui button and window"): A YES / NO DECISION AS DFU'S
+// REST-WARN2: A YES / NO DECISION AS DFU'S
 // MESSAGE BOX - its rows and its YesNo buttons laid out by ui/messageBox.js and drawn through drawMessageBox, which
 // under the enhanced skin hands a box with buttons to the Plus decision dialog (ui/enhanced/enhancedDialog.js, DLG1: the stone-
 // and-brass kit the guild, the bank and the travel map's own warnings wear) and on the classic skin draws DFU's

@@ -97,7 +97,7 @@
 //    the chrome's own hover clock - which already returned the rested
 //    rect and was being thrown away here - drives them.
 //
-// ROAD-E E3 CLOSED THE LAST FLAG ON THIS HEADER (2026-09-02):
+// ROAD-E E3 CLOSED THE LAST FLAG ON THIS HEADER:
 //  - map_revealbuildings / map_hidebuildings (:1796-1830) are
 //    REGISTERED now, on the real ConsoleCommandsDatabase
 //    (systems/consoleCommands.js - Wenzil.Console's own, which is what
@@ -289,7 +289,7 @@ export function buildExteriorLayout(gridW, gridH, blocks, mode, colours) {
       for (let x = 0; x < BLOCK_PX; x++) {
         let byte = data[y * BLOCK_PX + x];
         if (removeGroundFlats && byte === 0xfb) byte = 0;   // the copy-side strip (BlocksFile.cs:434-440; never in place here)
-        // IC-TOWNMAP (the owner: "Curious how the town map will look"): a capital's closed cell (world/tamrielCapitals.js
+        // IC-TOWNMAP: a capital's closed cell (world/tamrielCapitals.js
         // CAPITAL_CLOSED_BYTE - a wall, a tower, a court the walkers may not cross) is in no quarter and no show-all byte, so
         // the ladder below gave it the debug red (255, 0, 254) and painted the Imperial City's tower and palace solid magenta;
         // it paints nothing, as the held map's sheet paints it. No Daggerfall block writes it (every RMB's grid: 0..24, 117, 250, 251)

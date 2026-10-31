@@ -1,6 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md): THE LOCKPICK - the thing a lock is picked with. Template 584 (lockpickRow.js - the leaf
+// LOCKPICK: THE LOCKPICK - the thing a lock is picked with. Template 584 (lockpickRow.js - the leaf
 // the item law reads headless), miscellany, stacked, traded freely.
 //
 // A LOCK NEEDS ONE (Lockpicking.md section 2): picking a lock in Steal mode - a building's front door, a dungeon's door, a

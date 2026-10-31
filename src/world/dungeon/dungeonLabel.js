@@ -1,8 +1,8 @@
 // @ts-check
-// TIER1 (2026-10-05; bible/11-Multiplayer/Super-Dungeons.md section 12): WHAT A SURFACE SAYS OF A DUNGEON ONLINE - its
+// TIER1: WHAT A SURFACE SAYS OF A DUNGEON ONLINE - its
 // tier (systems/dungeon/dungeonTier.js, the leaf) and its size.
 //
-// THE SIZE (SD-ONLINE, Mac: "Large, medium and small should all play into account online"): online every dungeon has
+// THE SIZE (SD-ONLINE): online every dungeon has
 // the world's own size (world/smallerDungeons.js onlineDungeonSize), and a player choosing which mouth to walk into
 // wants to know it. The word is the BUILT dungeon's, by its block count - DFU's small plus is five blocks, the medium
 // size eight - so a dungeon no bigger than five reads Small whatever the world drew for it, and a main-story keep

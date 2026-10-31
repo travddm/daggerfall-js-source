@@ -1,5 +1,5 @@
 // @ts-check
-// LW4 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVES - who holds a traveller's place in their town, cycle by
+// LW4: THE LIVES - who holds a traveller's place in their town, cycle by
 // cycle. The road kills (trouble.js); a traveller slain is slain for good, their place stands empty while the town
 // mourns, and a newcomer takes it - a new name, a new face, a new trade's record - and the town's talk remembers the one
 // who went. Pure, like the rest of the living world (LW0 decision 2): no save holds who died, so every reader's world

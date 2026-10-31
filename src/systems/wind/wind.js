@@ -1,8 +1,5 @@
 // WIND1 - THE WIND IS ITS OWN THING.
 //
-// Mac: "wind should be something different from the weather. Imagine a
-// time-lapse, seeing a storm rolling in as the wind kicks up, and the
-// front rolling away as the wind kicks down."
 //
 // Daggerfall has no wind. DFU's WeatherManager carries no such number;
 // the enhanced sky gave each weather ROW a fixed vector, so every sunny
@@ -94,7 +91,7 @@ function mulberryDraw(a) {
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
-/** FLOW2 (2026-09-26): `seededRng(seed)()` - a seed's first draw, the same bits - without making a generator for one
+/** FLOW2: `seededRng(seed)()` - a seed's first draw, the same bits - without making a generator for one
  *  number (the weather map's value noise asks twelve of them a wind reading). */
 export const seededFirst = (seed) => mulberryDraw(((seed >>> 0) + 0x6D2B79F5) >>> 0);
 

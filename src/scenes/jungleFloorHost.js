@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA2 (2026-10-19, the owner, with their "Jungle Preview": "At the ground level, the image shows the flora abundence
-// that should be present in the jungle"): THE JUNGLE'S FLOOR - a module the world host wires (HOST-SPLIT, bible/01-
-// Overview/Host-Split.md: scenes/fishHost.js is the shape), never grown into bootWorld. bible/03-World/Bantha-Jungle.md
+// BANTHA2: THE JUNGLE'S FLOOR - a module the world host wires (HOST-SPLIT, bible/01-
+// Overview/Host-Split.md: scenes/fishHost.js is the shape), never grown into bootWorld.
 // "The floor" is the record.
 //
 // BANTHA1's floor storey stands the rainforest's cover as flats, half a tile's chance a 6.4 m tile - a plant every 80

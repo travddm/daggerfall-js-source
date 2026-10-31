@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RUMARE-WATER (2026-10-26, bible/03-World/Tamriel.md RUMARE-WATER; a departure from DFU's BlendLocationTerrain) - A
+// RUMARE-WATER - A
 // CAPITAL AT THE SEA: ITS WATER THE SEA'S OWN, ITS LAND A FREEBOARD OVER IT. AUDIT TESA II C2 flattened a shore capital's
 // every slice to the sea's floor (SCALED_OCEAN_ELEVATION, the sampler's clamp) so its harbour's water stood at the sea's
 // height - and its streets with it, every sample of them the sea's. Every reader that asks heights of the water then

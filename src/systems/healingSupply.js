@@ -1,6 +1,5 @@
 // @ts-check
-// POTION-COMMON (2026-10-01, the field: "make health potions more common"; the economy arc - bible/06-Systems/
-// Economy-Arc.md: "Potions are the solo answer to healing, so they are easy to come by"). A Potion of Healing was a
+// POTION-COMMON. A Potion of Healing was a
 // twentieth of DFU's random potion (CreateRandomPotion, loot.js - kept as it is) and so came in 0.15% of looting foes and
 // 0.2% of J-O piles, and no shop stocked one of its own: a ranked temple member could buy one, and an alchemist's random
 // few under Roleplay & Realism: Items' alchemistPotions (at twice the price) were one in twenty such. It has three
@@ -15,22 +14,19 @@
 //    count by the shop's quality and drawn from no roll, so the shelf's own rolls - DFU's, pinned - are the same rolls
 //    as before. Online, half price like every potion (shopStock.js ESSENTIALS-HALF).
 //
-// MAGICKA-COMMON (LOOT-EASE, 2026-10-05, Mac: "majicka potions should be more common loot drops, same with health
-// pots"): the Potion of Restore Power (potions.js: Heal Spell Points, 5 + 4 a level; price 75) was the same twentieth
+// MAGICKA-COMMON (LOOT-EASE, 2026-10-05): the Potion of Restore Power (potions.js: Heal Spell Points, 5 + 4 a level; price 75) was the same twentieth
 // of the random potion the healing potion had been - 0.15% of looting foes (before PLAIN-LOOT halved even that) and
 // 0.2% of J-O piles. It rides the healing potion's two loot doors, a little less often (MAGICKA_ENEMY_CHANCE,
 // MAGICKA_PILE_CHANCE: a caster's need, not everyone's), drawn after it; and the healing potion's own two chances are
 // raised (6 -> 10 a foe, 12 -> 18 a pile). The counter is unchanged.
 //
-// RENOWN-LOOT (2026-10-05, Mac: "tie it to renoun level"; systems/renownLoot.js): those raises - and the Restore
+// RENOWN-LOOT: those raises - and the Restore
 // Power potion's own two chances, whose step starts from none - are LOOT-EASE's buff, and online they come by the
 // roller's Renown: half of each at Renown 1, all at Renown 20, half again at Renown 40 (a foe's healing potion 3, 4
 // and 5 in 100; its Restore Power 1, 2 and 3 - POT-THIN's, below). Offline, the numbers below. `healingSupplyChances` is
 // the one read.
 //
-// POT-THIN (2026-10-21, the Discord's #feature-feedback, "Crafting seems unrewarding": "I collect so many potions from
-// enemy drops that I never need to make potions... who needs to buy pots when you find them everywhere?"; the owner:
-// "I definitely want to decrease pot drops"; bible/06-Systems/Professions-Arc.md section 48): THE FLOOD TURNED DOWN. A
+// POT-THIN: THE FLOOD TURNED DOWN. A
 // looting foe at Renown 20 carried 19 potions in 100 (this file's 10 and 6, DFU's random 3); it carries 9 in 100 now -
 // the healing potion 4 and Restore Power 2 (AUDIT CRAFT-WRITS E8: an expected count, the chance of at least one some
 // 8.7 in 100) - so the brewer's bottle is the steady supply and the

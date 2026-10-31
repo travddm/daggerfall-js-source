@@ -2,9 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // EVENT1 — THE DREAD: OBLIVION'S SKY OVER DAGGERFALL, FOR A LIVE EVENT.
 //
-// Mac (2026-09-25): "I wanna do a fun live event for the server ... turn
-// the skies of Daggerfall into a detailed oblivion styled dread in prep
-// for the world bosses. Red lightning and such."
 //
 // A dev stages it (`/event dread`, the relay's `stage` frame - net/wire.js
 // LIVE_EVENTS), every player online sees it, and it ends when a dev ends

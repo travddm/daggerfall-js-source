@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW15 (2026-10-09, bible/06-Systems/Living-World-II.md "LW15"): THE PATRONS, DRAWN - the client's half of the sale the
+// LW15: THE PATRONS, DRAWN - the client's half of the sale the
 // service decides (net/patronLaw.js). The service names a SEED and a MINUTE, never a person; here the seed is DEALT to
 // one of the town's own residents (`patronOf` - its households, never the watch or a visitor: every reader deals the
 // same one, the census being pure), who walks to the trader's house at that minute, goes in, and comes out again

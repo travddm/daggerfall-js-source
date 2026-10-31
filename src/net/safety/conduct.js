@@ -1,5 +1,5 @@
 // @ts-check
-// SAFE7 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 8): THE CODE OF CONDUCT -
+// SAFE7: THE CODE OF CONDUCT -
 // the rules every player agrees to before their first line, and the rules the reviewer (server-account/src/modAi.js)
 // reads every line against. ONE TEXT FOR BOTH: the reviewer's prompt is built from these same lines in English, so a
 // player is never held to a rule they were not shown, and a rule changed here changes for both at once.

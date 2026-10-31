@@ -1,4 +1,4 @@
-// OVH2 (2026-09-24, Mac: "Our first overhaul option will be the file attached") - THE UI PACKS: art that re-dresses
+// OVH2 - THE UI PACKS: art that re-dresses
 // the classic screens, the way Daggerfall Unity's loose-file injection does (TextureReplacement.cs).
 //
 // GrimoireUI 1.2 (LordSquacquerone, Nexus Daggerfall Unity mod 1222) is a LOOSE-FILE pack: no .dfmod, just the

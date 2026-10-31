@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN2 (2026-10-24, the owner: "Allowing the purchase of the actual
-// castle in major cities (cyrodil excluded), using the instancing system";
-// asked, "One owner per castle", "Silver", "Region holder buys it") - THE
-// CASTLE'S LAW, one home for every end (bible/11-Multiplayer/Domains.md
+// DOMAIN2 - THE
+// CASTLE'S LAW, one home for every end (
 // section 6).
 //
 // A CASTLE IS ITS REGION'S (Domains law 3). A crown's region keeps one -
@@ -33,8 +31,7 @@ export const CASTLE_PRICE = 120_000;
 /** The share of the price that comes home when the Guildmaster gives the castle up while the region is held - a hall's
  *  (homeLaw.js HOME_SALE_SHARE). */
 export const CASTLE_SALE_SHARE = HOME_SALE_SHARE;
-/** The share that comes home when the region's Charter leaves the guild and takes the castle with it (the owner: "the
- *  old owner is refunded part of the price"). */
+/** The share that comes home when the region's Charter leaves the guild and takes the castle with it. */
 export const CASTLE_LOST_SHARE = 0.5;
 /** Who may do what with a castle: the Guildmaster buys and gives it up; any member walks in (the relay's `guild` arm). */
 export const CASTLE_POWERS = Object.freeze({ buy: Object.freeze([GUILD_RANK_MASTER]), sell: Object.freeze([GUILD_RANK_MASTER]) });
@@ -45,7 +42,7 @@ export const castleRegionOk = (r) => Number.isSafeInteger(r) && Object.prototype
 /** AUDIT DOMAINS R2: is `key` (a crown seat's, as the registry confirmed it) a castle the relay admits a guild to - a crown
  *  city's own dungeon (net/instanceRoom.js CASTLE_MAP_IDS)? A castle sold at any other would be a room no member enters. */
 export const castleKeyOk = (key) => CASTLE_MAP_IDS.includes(key);
-/** AUDIT TESA III E2-2 (bible/01-Overview/audits/Audit-Tesa-III-E2.md): THE CITY A REGION'S CASTLE STANDS IN - its crown's
+/** AUDIT TESA III E2-2: THE CITY A REGION'S CASTLE STANDS IN - its crown's
  *  seat (net/kingdomLaw.js kingdomSeatName): Daggerfall, Wayrest and Sentinel the Bay's (their regions' own names), and past
  *  the Bay the province's capital - Solitude, Mournhold, Alinor, Falinesti, Torval, Helstrom - where the Guild window named
  *  the province itself: "Castle Skyrim", its door "in Sumurset Isle". Null for a region that keeps none. */

@@ -1,4 +1,4 @@
-// SOFTCAP3 (2026-09-29): MASTER SKILLS - the climb past 100.
+// SOFTCAP3: MASTER SKILLS - the climb past 100.
 //
 // A LEAF (it imports nothing), read by skills.js, advancement.js and the
 // softcap's enemy law, so none of them grows a cycle.
@@ -12,8 +12,7 @@
 //   - dangerous dungeons answer with tougher foes (skillSoftcap.js combatEdge).
 // Below 100 nothing is different either way.
 //
-// WHO DECIDES (Mac, 2026-09-29: "no opt-in or opt-out ... only in offline
-// mode there should be opt in and out"):
+// WHO DECIDES:
 //   ONLINE  - always in force; nobody switches it. The first time a primary
 //             skill is mastered, a box EXPLAINS it once, with an OK button.
 //   OFFLINE - the player's switch (entity.masterSkills), off by default: the
@@ -22,12 +21,9 @@
 //             they spawned, so switching on under unscaled foes would be a free
 //             lunch; the host's gate says so (setMasterSkillsGate).
 //
-// SPECIALISING (Mac, 2026-09-29: "lets do 2/2/1 - when a skill reaches 100 the player gets to choose ... this
-// decision can not be undone"). Master Skills lets EVERY skill reach 100 (the 95 lock is lifted), but only the
+// SPECIALISING. Master Skills lets EVERY skill reach 100 (the 95 lock is lifted), but only the
 // skills a character MASTERS may pass it: all 3 primary, 2 of the 3 major, 1 of the 6 minor - six in all
-// (MASTERY_SLOTS). MASTER-THREE (2026-10-26, Discord #feature-feedback "Let us master all three primary skills": "1
-// minor, 2 major, 3 primary master skills ... helps alleviate the issue of trying to cram in two mastered weapon
-// skills"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md) gave the primaries their third; it was 2/2/1 before.
+// (MASTERY_SLOTS). MASTER-THREE gave the primaries their third; it was 2/2/1 before.
 // A character who chose two primaries keeps them and gains the third slot. Miscellaneous skills never pass 100. The choice is offered the first quiet pass after a skill
 // reaches 100 while its group has a slot (and any time after from the skill screen), says how many that group
 // allows and how many remain, and is PERMANENT (entity.masteredSkills, saved). A skill not mastered simply stays at

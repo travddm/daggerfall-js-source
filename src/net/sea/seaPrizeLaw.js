@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - a captain's hold
-// as a prize; bible/03-World/Eltheric-Ocean.md SHIP-PVP) - A WRECK'S PRIZE, the law both ends read: the service takes it
+// SHIP-PVP - A WRECK'S PRIZE, the law both ends read: the service takes it
 // off the wrecked captain's judged record (server-account/src/seaWreck.js) and the wrecked captain's game takes the same
 // pieces out of her hold (scenes/seaWreckHost.js) by the places this answers.
 //

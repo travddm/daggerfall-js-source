@@ -9,7 +9,7 @@
 // borders are where the politic bytes change hands between two land
 // pixels; the roads and tracks are Hazelnut's vendored arrays traced
 // into chains (traceChains - the port's own generated network on the Bay
-// is never drawn on a map, bible/03-World/Roads.md, and the `source` field
+// is never drawn on a map,, and the `source` field
 // TO1 put on the network object is what tells them apart; TESA13: past the
 // Bay Arena's network is the only road, and ui/tamrielInk.js draws it
 // through pathChains and strokePaths here); the marks are
@@ -88,8 +88,6 @@ export const PEN = Object.freeze({
 /**
  * EM7 — THE FOUR QUARTERS, IN THIS HAND.
  *
- * Mac (2026-09-21): "keep our own version of the colored buildings that
- * classic uses".
  *
  * Classic sorts a town's pixels into four groups and paints each in a
  * flat, saturated colour - the temple's tan, the shop's blue, the
@@ -147,7 +145,7 @@ export const quarterInk = (c, mix = QUARTER_INK_MIX) => rgba(mixRgb([c.r, c.g, c
 /**
  * MAP-KEY - A PLACE IN ITS CLASSIC DOT'S HUE, IN THIS HAND.
  *
- * Jigglehimmer (2026-09-29, #suggestions): "cemeteries were red dots,
+ * Jigglehimmer: "cemeteries were red dots,
  * and dungeons were orange dots" - and on this sheet every glyph was the
  * one brown pen, so a new dungeon's hollow triangle had to be hovered to
  * be told from anything else. EM7's reading again: the classic colour is
@@ -177,9 +175,7 @@ export const quarterInk = (c, mix = QUARTER_INK_MIX) => rgba(mixRgb([c.r, c.g, c
 export const MARK_INK_MIX = 0.58;
 /** @param {{r:number,g:number,b:number}} c */
 export const markInk = (c) => quarterInk(c, MARK_INK_MIX);
-/** MAP-FIELD6 (2026-09-19, Mac: "Some of the glyphs are hard to read. I
- *  want to make everything more readable, without clutter and keeping
- *  the same design").
+/** MAP-FIELD6.
  *
  *  The trouble was never CONTRAST. The ink sits at luma 43 on parchment
  *  at 172, which is as strong a difference as print. It was that the
@@ -513,7 +509,7 @@ export function borderChains({ width, height, regionAt, isLand }) {
  * host hands carries `source: 'basic-roads'` when it was read off
  * vendor/roads-hazelnut (world/roadsProducer.js loadModRoads); the
  * port's own generated network on the Bay carries no such word and is
- * never inked (bible/03-World/Roads.md). Chains are pixel CENTRES, so a
+ * never inked. Chains are pixel CENTRES, so a
  * road meets a town's mark rather than its corner.
  */
 export function roadChains(net, width, height) {
@@ -695,7 +691,7 @@ export function clampView(view, { mapW, mapH, paperW, paperH, pan = null, prev =
   // blank on a side (at 0.5: the paper's middle stays over the drawn box), wherever the sheet's own box would let
   // it go - except that the view that centres the player (pan.me) is always allowed, so Me can put you in the middle.
   if (pan) {
-    // ME-PAN fix (Mac: "the map bumps on borders"): NEVER A SNAP. A view already past the border (a turn left it
+    // ME-PAN fix: NEVER A SNAP. A view already past the border (a turn left it
     // there, or the zoom did) is not pulled back - it may only come back in, or stay; so the border stops a drag
     // outward and nothing else. The previous view's own offset widens the range for that.
     // Measured by the paper's MIDDLE, so the previous view counts at any zoom: a zoom about the pointer moves the
@@ -1141,7 +1137,7 @@ export function paintInkMarks(ctx, model, view, opts) {
   // restricts ship travel to ports (the classic page's ports button
   // shows under the same condition, TravelOptionsMapWindow.cs:148)
   const shown = BAND_MARKS[band] ?? BAND_MARKS.near;
-  // REGION-LINES (2026-10-25, the owner: "daggerfall's clustered icons need to be fixed amd standardized across tamriel"):
+  // REGION-LINES:
   // out on the continent the Bay inks no mark of its own - its capitals stand with every other province's, in the
   // continent's layer (ui/tamrielInk.js bayCapitals) - and none of the ports' anchors, the carriage wheels, the hubs' and
   // the seats' rings that piled into a smudge where the Bay is a hand's width; the player's own mark stays (below)
@@ -1168,7 +1164,7 @@ export function paintInkMarks(ctx, model, view, opts) {
   for (const [m, x, y] of inked) {
     paintGlyph(ctx, m.kind, x, y, false, opts.inks?.[m.kind] ?? (m.kind === 'hall' ? HALL_INK : undefined));   // MAP-KEY: in its classic dot's hue, where there is a palette (PVPDUNGEONS: a hall its own)
   }
-  // PORT-MAP (2026-10-04, Mac: "Also ports don't show on my map"): a port's anchor at EVERY band - beside its mark where
+  // PORT-MAP: a port's anchor at EVERY band - beside its mark where
   // the band inks the place, ON the place where it does not (far inks the cities alone, and the map opens far) - so the
   // ports the quays stand at read from the first look. MAP2 drew them at mid and near only.
   for (const [beside, x, y] of harbours) paintHarbour(ctx, x, y, beside);
@@ -1343,7 +1339,7 @@ export function paintInkOverlay(ctx, view, opts) {
   }
 }
 /**
- * OWS1 (2026-09-28, the player's ask: "being able to see other players sailing in the overworld"): A TRAVELLER AT SEA,
+ * OWS1: A TRAVELLER AT SEA,
  * INKED AS A SHIP - a hull under a sail in the pen the caller set, where the ring would stand (the Overworld's own
  * ship mark, ui/travel/travelViewHud.js drawShipMark, in ink): the traveller's name hangs under it as under the ring.
  * @param {CanvasRenderingContext2D} ctx
@@ -1358,7 +1354,7 @@ export function inkShip(ctx, x, y) {
 }
 
 /**
- * WB1 (Mac: "a large area would be shown on the map"): THE OMEN'S RING - the area an Oblivion Gate will open in, a
+ * WB1: THE OMEN'S RING - the area an Oblivion Gate will open in, a
  * wash of fire inside a ring that breathes, and its words over its top (ui/gate/gateMapMark.js, the mark's law). The
  * ring's radius is in MAP pixels, so it is the same patch of land at every zoom; a floor of ten paper pixels keeps it
  * findable when the whole bay is on the sheet.
@@ -1399,7 +1395,7 @@ const REVENANT_INK = Object.freeze({ ring: REVENANT_RING_CSS, fill: REVENANT_FIL
 const LODE_INK = Object.freeze({ ring: LODE_RING_CSS, fill: LODE_FILL_CSS });
 const POI_INK = Object.freeze({ ring: POI_RING_CSS, fill: POI_FILL_CSS });   // POI-2
 /**
- * BOUNTY1 (Mac: "board quests can be a green circle", then black - green is the party's): a held bounty's pixel - a dark wash inside a black ring, the
+ * BOUNTY1 (, then black - green is the party's): a held bounty's pixel - a dark wash inside a black ring, the
  * beasts' name over its top. The radius is in MAP pixels with a floor of eight paper pixels, as the gate's ring is.
  * @param {CanvasRenderingContext2D} ctx @param {{ox:number, oy:number, scale:number}} view
  * @param {{cx:number, cy:number, r:number, label?:string}} b @param {number} [pulse] 0..1
@@ -1544,7 +1540,7 @@ function anchorPath(ctx, ax, ay) {
   ctx.arc(ax, ay + 0.5, 3, Math.PI * 0.15, Math.PI * 0.85);
 }
 
-/** HUB1 (Mac: "a color coded circle indicator ... for distinguishing"): a region's hub sits in a coloured circle
+/** HUB1: a region's hub sits in a coloured circle
  *  under its glyph - BLUE, or PURPLE for one of the three kingdoms' capitals. Neither colour is one the sheet already
  *  speaks in: the selection's ring is gold, the player's mark red, the party's green, Travel Options' mark yellow. */
 export const HUB_CIRCLE = Object.freeze({

@@ -1,8 +1,8 @@
 // @ts-check
-// BOW-AIM (FIELD BUGS 2026-10-26c, feature-feedback via Mac: "Bow, while being drawn, is pointed upwards too much";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md) - THE THIRD-PERSON BODY AIMS A RANGED WEAPON WHERE ITS OWNER LOOKS.
+// BOW-AIM (FIELD BUGS 2026-10-26c, feature-feedback via;
+// ) - THE THIRD-PERSON BODY AIMS A RANGED WEAPON WHERE ITS OWNER LOOKS.
 //
-// The reference's law, ported whole (bible/02-Formats/Morrowind-Rules.md, the three [C] rules from "The ranged aim pitch
+// The reference's law, ported whole (, the three [C] rules from "The ranged aim pitch
 // is TWO RotateControllers"): in third person (VM_Normal) "bip01 spine1" and "bip01 spine2" each carry a
 // RotateController (addControllers), and every frame both are given HALF of the actor's pitch times the pitch factor
 // about -X, in the actor root's space (configureControllers - both weaponanimation.cpp:175-211; the controller itself,

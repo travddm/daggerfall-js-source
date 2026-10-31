@@ -1,8 +1,5 @@
 // @ts-check
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss. For example, the oblivion gates. Abyss dungeons, elite breaches, etc"; asked whether the floor's leftovers
-// should go to the mailbox in place of the pack, or the mailbox stand behind the pack as a safety net: "Mail the
-// leftovers"; asked whether a Reliquary death throws away should be mailed too: "No, keep the risk"): THE LOST AND
+// LOST-SPOILS: THE LOST AND
 // FOUND - ITS LAW, the one file the service (server-account/src/lostSpoils.js) and the client (net/lostSpoils.js,
 // scenes/spoilsPool.js) both read. The words a piece is written with are the service's (lostSpoils.js LOST_WORDS): the
 // service writes them, and the client reads them off the box.

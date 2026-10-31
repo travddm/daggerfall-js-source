@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1e — THE ACCOUNT SCREEN'S FLOW, WITH NO SCREEN IN IT.
 //
-// Mac (2026-09-21): "Should we go ahead and build the account creation
-// screen" - "Yes, please be detailed".
+// "Yes, please be detailed".
 //
 // THE SPLIT IS THE PROJECT'S OWN, not an invention: `ChargenFlow` does
 // the wizard's thinking and `enhancedChargen.js` draws it, and
@@ -375,8 +374,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * ACC3c — WEAR ONE, OR NONE. Mac: "Players can tap the account icon
-   * to equip 1 feature along with signing out."
+   * ACC3c — WEAR ONE, OR NONE.
    *
    * IT ASKS; IT DOES NOT DECIDE. The grant is derived at the service
    * (a founder cutoff, a config list) and can lapse between this card
@@ -416,7 +414,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * GLYPH-WEAR (2026-10-02, Mac: "can we make it where players can also equip/unequip their glyphs") - PRESS A GLYPH
+   * GLYPH-WEAR - PRESS A GLYPH
    * TO TAKE IT OFF, PRESS IT AGAIN TO PUT IT BACK. Paint alone: the service still signs every glyph that is true, so
    * what a glyph grants (/red, /dm, /mute, the staff commands) stays. It asks, as the title does; the answer replaces
    * the wardrobe. Others see it from the next hello, as a title.
@@ -454,8 +452,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   /** WITCH1: the icon a wardrobe answer says is worn (null for the face), or undefined from a service before acct162. */
   function iconStated(d) { return Array.isArray(d?.icons) ? (d.icon ?? null) : undefined; }
   /**
-   * WB9g - WEAR ONE AURA, OR NONE: `equip`'s law at the feet (Mac: "an animated burning ground aura that circles the
-   * ground where your character stands"). It asks; the service decides what is held; the answer replaces the wardrobe;
+   * WB9g - WEAR ONE AURA, OR NONE: `equip`'s law at the feet. It asks; the service decides what is held; the answer replaces the wardrobe;
    * pressing the one worn takes it off. The stored session learns it (net/accountClient.js adoptIdentity), so the fire
    * at the player's own feet lights or goes out at once - and the room's at once (AURA-LIVE: world.js auraFrame - online.js rehello).
    */
@@ -480,7 +477,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * WITCH1 (bible/06-Systems/Witches-Festival.md) - WEAR ONE PROFILE ICON, OR NONE: the aura's law, in the portrait well.
+   * WITCH1 - WEAR ONE PROFILE ICON, OR NONE: the aura's law, in the portrait well.
    * It asks; the service decides what is held; the answer replaces the wardrobe; pressing the one worn takes it off (the
    * character's face again). The stored session learns it (adoptIdentity), so the corner mark and the card show it at
    * once; another player's Inspect card from the next hello, as a title.
@@ -506,8 +503,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-   * name or character name for ingame use") - WHICH NAME THE ROOM READS: the account's, or the character's being played.
+   * NAME-AS - WHICH NAME THE ROOM READS: the account's, or the character's being played.
    * It asks, as a wear does; the service keeps the choice and every later mint signs it - a character's name only where it
    * can be worn, the mint saying why where it cannot (the game says it once: scenes/world.js adoptIssued). Pressing the
    * one already chosen asks nothing. A choice the service took STAMPS the stored session (`nameAsAt`, forward only), and

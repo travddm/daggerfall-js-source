@@ -1,5 +1,5 @@
 // @ts-check
-// WORLD-AIR (2026-10-24): A TOWN'S TWO BEDS, out of the player's own people (DAGGER.SND AmbientPeople1-10 - the arena's
+// WORLD-AIR: A TOWN'S TWO BEDS, out of the player's own people (DAGGER.SND AmbientPeople1-10 - the arena's
 // voices, systems/arena/arenaSound.js PEOPLE_RECORDS): the MURMUR, their voices layered round the loop (arenaSound.js
 // synthBed, its own seed) with its top eased off - a square heard, not a crowd at the ear - and the TAVERN, another crowd
 // of them through a door, darker and levelled under it. Nothing of Daggerfall's is shipped: the voices are read off the

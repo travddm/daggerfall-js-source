@@ -1,5 +1,5 @@
 // @ts-check
-// PACE-DIALS (2026-10-06): THE STEPPERS - Speed and Near enemies, each on the ladder 5, 10, 20, 30, 40, 60, 100 (x100 on
+// PACE-DIALS: THE STEPPERS - Speed and Near enemies, each on the ladder 5, 10, 20, 30, 40, 60, 100 (x100 on
 // a road alone; systems/travel/travelPace.js holds the rule). One builder for every place they stand: the Overworld's block,
 // journey or none (ui/travel/travelViewHud.js), the enhanced journey bar away from the Overworld (ui/enhanced/enhancedTravelControl.js),
 // and THE PACE BOX - a small box of its own for every other skin (the classic strip, GrimoireUI) while a journey runs,

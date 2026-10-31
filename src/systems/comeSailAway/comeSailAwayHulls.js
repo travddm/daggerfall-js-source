@@ -7,7 +7,7 @@ export const HULL_NAMES = Object.freeze(['Rowboat', 'Large Boat', 'Small Ship', 
 export const HULL_PRICES = Object.freeze([4000, 8000, 100000, 200000, 150000]);
 export const HULL_WEIGHTS = Object.freeze([30, 120, 2400, 48000, 240000]);
 export const VARIANT_NAMES = Object.freeze(['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']);
-/** SHIP-PACK (2026-10-01, the review before the merge: "Allow larger ships to be picked up, just like smaller vessels"):
+/** SHIP-PACK:
  *  what a hull's parts weigh packed - the table's, and never more than the Large Boat's. The three ships' rows (2,400 to
  *  240,000 kg) were never an item's in the mod, whose ships were never packed: in the pack they would hold the bearer
  *  under the water, sink any boat she sailed ("You're going to need a bigger boat") and take nothing more aboard.

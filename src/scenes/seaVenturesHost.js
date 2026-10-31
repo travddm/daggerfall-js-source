@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA VENTURES (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Eltheric
-// Ocean's reasons to venture; bible/03-World/Eltheric-Ocean.md SEA-VAULTS and the sections after it) - THE SEA'S WIRING in
+// SEA VENTURES - THE SEA'S WIRING in
 // the streaming world: what the world host (scenes/world.js) asks of the sea's ventures, in a module of its own (HOST-SPLIT:
 // fishHost.js's shape - the host wires, this holds).
 //

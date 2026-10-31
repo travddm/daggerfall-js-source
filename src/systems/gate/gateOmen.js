@@ -1,6 +1,6 @@
 // @ts-check
-// WB1 (2026-09-25): THE OMEN - what the clock's gate says to one player: the chat's lines, the map's ring, the
-// compass's mark. Design: bible/11-Multiplayer/World-Bosses.md sections 1-2.
+// WB1: THE OMEN - what the clock's gate says to one player: the chat's lines, the map's ring, the
+// compass's mark. Design:
 //
 // ONE CALL A FRAME from the online frame (scenes/world.js `gateFrame`, beside the chat's and the duel's - before the
 // dead return, so the omen still speaks to a player on the death screen), and reads for the maps and the HUD.
@@ -23,7 +23,7 @@ import { GATE_TOWN_MAX_PX } from './gateSite.js';
 import { t } from '../textManager.js';   // GATE-COURTS: a court's kill in the player's language (L10N4)
 import { RITE_OMEN_LINE, cageStands } from '../../net/gate/gateRite.js';   // BROKER-CAGE: the Broker's cage, omen to midnight
 
-// TIME1 (bible/06-Systems/Online-Time-Arc.md section 7): THE GATE SAYS REAL TIMES ALONE. Its schedule is the EVENT
+// TIME1: THE GATE SAYS REAL TIMES ALONE. Its schedule is the EVENT
 // clock's (net/gate/gateLaw.js, unchanged: a gate every two real hours, its phases the same real minutes), and the sky the
 // player sees turns at its own rate, so the event clock's game time ("opens there at 20:00") would contradict the
 // clock in front of them. The three lines that named a time say this machine's local time alone, in WB12's words
@@ -47,7 +47,7 @@ export const gateSceneXZ = (standing, t) => [t[0] + standing.spot[0], t[2] + sta
 export const riteOmenLine = () => RITE_OMEN_LINE;
 
 // ═══ WBX8: THE SKY BURNS ═════════════════════════════════════════════════════════════════════════════════════════
-// Mac (2026-09-26): "Improve the sky effect to be more like the /event dread command" - "When I say sky effect, I mean
+// "When I say sky effect, I mean
 // daggerfall, not the inside". The omen has always SAID it - "The sky burns over the wilds near ..." - and the sky over
 // the site never did: the gate's only mark on it was its beacon. Now the sky over a gate wears the live event's dread
 // (world/dreadSky.js: the crimson grade on the sky, its fog and the light the land stands in, the storm's deck) with
@@ -117,7 +117,7 @@ export const courtFellLine = ({ near, boss, top, c = 0 }) => {
 };
 
 /**
- * EVENT-TIP (2026-09-28, Mac: "I also want to add a tooltip to the map for these type of events"): THE GATE'S CARD on
+ * EVENT-TIP: THE GATE'S CARD on
  * the held map (ui/eventMapMarks.js) - what it is, where, when it next moves (opens, seals, collapses: the countdown's
  * own words), and who holds it, or that he fell. WB8c: and while he stands, the marks he comes under tonight (net/gate/gateLaw.js
  * gateModsOf - "The Rime-Wrought - Colossal, Echoing"). Pure.

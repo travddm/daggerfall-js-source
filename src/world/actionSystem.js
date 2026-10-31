@@ -229,7 +229,7 @@ export const hasActionCollision = (o) => !!o && COLLISION_TRIGGER_FLAGS.includes
  *  and DaggerfallActionCollision hears only OnControllerColliderHit, which a CharacterController never raises for a
  *  trigger: in DFU a flat's action fires on a click or a blow, never a walk. The port hears an effect's and a moving
  *  flat's box on a walk (AUDIT PRE-MERGE 0929, a departure named in Port-Ledger A); a RELAY's never - a flat Teleport,
- *  Activate or DoorText walked under fires nothing. FLAT-RELAY (2026-10-05c) had made 41 relay flats walk-ins for a
+ *  Activate or DoorText walked under fires nothing. FLAT-RELAY had made 41 relay flats walk-ins for a
  *  Collision03 flat Teleport the corpus does not hold: Edworyan Laboratory's six hanging roots, at head height in the
  *  online build's first block, each sent the body back to the entrance. */
 export const walkHears = (o) => hasActionCollision(o) && !(o.isFlat === true && o.kind === 'relay');
@@ -507,7 +507,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     // ActivateLockUnlock sound on success
     this.onLockpickTally = null;
     this.onLockpickResult = null;
-    // LOCKPICK (bible/06-Systems/Lockpicking.md): onLockpickAttempt(o) - a host that plays the lock's tumblers
+    // LOCKPICK: onLockpickAttempt(o) - a host that plays the lock's tumblers
     // (scenes/lockpickHost.js) takes the attempt from the roll below, and answers its opened lock through lockpicked(o)
     this.onLockpickAttempt = null;
     // WAVE D: onFlatMoved(o) - a MOVE-flag FLAT reached a new pose.
@@ -780,7 +780,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
       index: action.index,
       axisRaw: action.axisRaw,
       // FIELD BUGS 2026-10-05c (FLAT-RELAY): a relay keeps its flat's mark, as addEffect's and addMoveFlat's objects do.
-      // FLAT-WALK (2026-10-21d): the mark is what keeps a flat relay off the walk - `walkHears`; a click or a blow fires it
+      // FLAT-WALK: the mark is what keeps a flat relay off the walk - `walkHears`; a click or a blow fires it
       isFlat: action.isFlat === true,
       activationCount: 0,
       state: 'start',
@@ -874,7 +874,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     this._early.set(rec.key, rec);
   }
 
-  /** HOME-DOORS (2026-09-30): a door taken back out - one an owner hung in a doorway (scenes/decor/decorRoom.js), moved or
+  /** HOME-DOORS: a door taken back out - one an owner hung in a doorway (scenes/decor/decorRoom.js), moved or
    *  removed. Not a DFU member (Daggerfall's doors are never taken down): the object, its place in the chain graph and
    *  its collider bucket go, open or shut. Answers whether there was one. */
   removeDoor(key) {

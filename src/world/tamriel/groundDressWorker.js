@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "Its cost, off the page's thread"): A ZONE'S DRESS ON ITS OWN CORE, while
+// TESA-LANDS (, "Its cost, off the page's thread"): A ZONE'S DRESS ON ITS OWN CORE, while
 // the page draws (world/tamriel/groundDressClient.js the page's side). In: {t: 'dress', id, layers, dress, exposure} - a
 // set's layers as drawn, a zone's dress, the pack's exposure. Out: {t: 'dressed', id, layers} with the colours' buffers
 // moved, or {t: 'error', id, message} (the page dresses it itself). Pure modules only - a worker has no DOM.

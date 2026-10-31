@@ -1,5 +1,5 @@
 // BETTER AMBIENCE 0.1.4 (Joshua Steinhauer / joshcamas), THE MOD, 1:1
-// (BA1, 2026-09-16, Mac: "Next mod to integrate 1:1 ensuring compatibility").
+// (BA1, 2026-09-16).
 //
 // "Adds camera shaking, better footsteps, and dungeon fog + reverb." Six
 // modules, sixteen sources - every one of them carried INSIDE the shipped
@@ -515,7 +515,7 @@ export function createBetterAmbience({ audio = defaultAudio, settings = readBett
 
   // ReverbMod.Update: on the inside-dungeon edge, UpdateReverbZone
   function updateReverb(inDungeon) {
-    // EG-ZH (bible/11-Multiplayer/Elite-Gates.md section 11.9): A HELD ZONE IS ITS HOLDER'S - the Spire's halls hold the
+    // EG-ZH: A HELD ZONE IS ITS HOLDER'S - the Spire's halls hold the
     // reverb (audio.holdReverb) and this component yields, its cache forgotten: the zone it last set is gone, so the first
     // frame after the release asserts its wish again
     if (audio.reverbHeld?.() != null) { reverbOn = null; return; }
@@ -526,7 +526,7 @@ export function createBetterAmbience({ audio = defaultAudio, settings = readBett
   }
   // InteriorAmbientSoundSource: Start adds the source (2D in a building, 3D at the exit), Update follows the weather
   function stopRain() { if (rainLoop) { rainLoop.stop?.(); rainLoop = null; } rainWeather = null; }
-  // DISC11 (Mac: "ITS LOUDER ON THE INSIDE COMPARED TO THE OUTSIDE"): THE MOD'S RAIN IS THE STREET'S RAIN, HEARD
+  // DISC11: THE MOD'S RAIN IS THE STREET'S RAIN, HEARD
   // FROM INSIDE. InteriorAmbientSoundSource plays AmbientRaining.wav at the AudioSource's own volume, 1 - whatever
   // falls outside. The street's loop plays DAGGER.SND's rain at the front's level (a light shower 0.15), so a tavern
   // under a drizzle played a full downpour through its walls, in a louder recording. The mod's source now takes the
@@ -606,7 +606,7 @@ export function createBetterAmbience({ audio = defaultAudio, settings = readBett
     },
     onStartGame() { syncSettings(); owe(); },
     onLoad() { syncSettings(); owe(); },
-    // BA-CRASH1 (2026-09-20, Mac's screenshot: "Cannot read properties of null (reading 'exitPos')" in frame): THE KIND
+    // BA-CRASH1: THE KIND
     // GOES WITH THE PLACE. `stopRain` stops the loop and forgets the weather it was started for, but `rainKind` kept
     // the OLD place's answer - 'exit' from the dungeon just left - through the four wait frames until settle4()
     // recomputed it. In those frames `frame()` saw a kind, a weather that differed (null after stopRain), and asked

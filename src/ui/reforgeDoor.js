@@ -1,5 +1,5 @@
 // @ts-check
-// LOOT9 (2026-10-01, the Loot arc - bible/06-Systems/Loot-Arc.md section 11): THE REFORGE'S DOOR - the one place a host
+// LOOT9: THE REFORGE'S DOOR - the one place a host
 // opens the Reforge's window through, the Broker's door's shape (ui/brokerDoor.js): the window (ui/reforgeWindow.js) a
 // lazy chunk mounted through the one home (ui/enhanced/enhancedChunk.js), in a host of its own, wrapped in the generic overlay
 // shape every host's frame already drives - `done` once it is shut, `dispose` to shut it, the keyboard and the pointer

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and do it
-// properly"): THE ITEM LAW. One answer to one question - COULD AN HONEST CLIENT OF THIS PORT HAVE MINTED THIS ITEM? -
+// INT1: THE ITEM LAW. One answer to one question - COULD AN HONEST CLIENT OF THIS PORT HAVE MINTED THIS ITEM? -
 // asked by both ends: the account service of every item in a realm character's checkpoint, a listing, a trade and a
 // vault deposit (server-account/src/judge.js), and the client of every item a peer hands it (systems/loot/loot.js
 // validLootItem, through setItemLaw - the law registers itself there, so loot.js owes it no import and the cycle the
@@ -117,7 +116,7 @@ import '../naval/treasureCharts.js';   // CAPT-CHARTS: the treasure chart
  *  a bow Hourlock is a finding to ask again. KETCH moved it to 13: the Gilded rung's Ketch pair (systems/gilded.js -
  *  Volendrung's Echo, a gilded Dwarven Thunderlock, and the Ketchmaster's Word, a gilded Dwarven Pistolet) are lawful from
  *  it on, so a finding a law of 12 made against either is a finding to ask again. AFFIX-LINES and REFORGE-REPLACE moved it
- *  to 14 (2026-10-25): the Reforge's count (`reforges`, systems/loot/lootRarity.js reforgeCount) is a mark of the tiers
+ *  to 14: the Reforge's count (`reforges`, systems/loot/lootRarity.js reforgeCount) is a mark of the tiers
  *  the Reforge takes alone - on a Legendary no Exalted, or a piece of no tier, a finding from it on (a law of 13 knew no
  *  such field). Nothing a law of 13 found is lawful now. MASTER-ART left it at 14: a Master's work (net/masterLaw.js) is a
  *  shape no earlier law met honestly - none was made before the service that makes it, whose judge is this law - so no
@@ -333,7 +332,7 @@ function tierFindings(/** @type {any} */ item) {
   // no kind repeated (a kind with params: no param repeated)
   const seen = new Set(own.map((a) => (AFFIX_KINDS[a?.id]?.params ? `${a.id}:${a.param}` : a?.id)));
   if (seen.size !== own.length) out.push('affixes');
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): A TECHNIQUE LINE - one at most, of the piece's own family (kindParams,
+  // TECH1: A TECHNIQUE LINE - one at most, of the piece's own family (kindParams,
   // above, already refused another family's), and the piece's LAST own line: the door's technique pass is its last draw,
   // so the Exalted's line and a curse's stand before it, and only a set gem's comes after. It is no number and no proc:
   // the counts below are the other lines'.
@@ -530,7 +529,7 @@ function artifactFindings(/** @type {any} */ item, /** @type {any[]} */ found) {
  *  - an offline character's, come into the realm through customs. The classic item maker's own law is not this tree's,
  *  so the law takes the piece as it stands, and the realm keeps it the character's: no route of the service hands it to
  *  another player (realm.js prepareRealmRecord, realmTrade.js - 'piece-legacy'; RESTORE's word for what customs brings,
- *  Mac: "Keep all, can't sell"). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
+ *  ). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
 export const classicPiece = (/** @type {any} */ item) => !!item && typeof item === 'object' && item.artifact !== true && item.magic !== true
   && Array.isArray(item.enchantments) && classicSlots(item.enchantments);
 

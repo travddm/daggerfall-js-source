@@ -1,15 +1,12 @@
 // @ts-check
-// NAV-H (2026-09-28, Mac: "enhance the newly integrated ships by adding proper naval combat with a huge reference to
-// assassins creed black flag. Being able to aim and fire when viewing from the side. Along with this, I want to
-// introduce actual sailing ships to the world that players can encounter and pillage, which should also directly
-// enhance and integrate into the pirate quest system. ... directly integrate into online mode.") - THE NAVAL HOST:
+// NAV-H - THE NAVAL HOST:
 // the sea fight, stood in the streaming world. It owns the ships of the Iliac Bay (systems/naval/navalAI.js) on Come
 // Sail Away's own hulls (scenes/comeSailAway/comeSailAwayPool.js `spawnSeaNow` - drawn, baked and lit as the player's boats), the
 // guns of the player's boat and their aim, the shots and what they strike, the smoke and the spray, boarding and
 // repelling boarders, the law, its record in the save, and its word to the other players in a cell.
 //
 // THE WORLD HOST IS ITS ONE HOST. The sea is the streaming world's (the exterior): a building or a dungeon has no
-// broadside, and the other three hosts own no sea - THE FOUR HOSTS RULE, named in bible/03-World/Naval-Combat.md.
+// broadside, and the other three hosts own no sea - THE FOUR HOSTS RULE, named in.
 // Every seam it reaches is in `deps` (below), so the whole of it runs in Node under the tests.
 //
 // deps = {
@@ -142,7 +139,7 @@ export const NAVAL_SAVE_VENDOR = 'NavalCombat';
 /** The save record's shape version. */
 export const NAVAL_SAVE_VERSION = 1;
 /**
- * TOUGHER-SHIPS (2026-10-03): a saved boat's record with her hurts on her hull's whole now - her hull and canvas each the
+ * TOUGHER-SHIPS: a saved boat's record with her hurts on her hull's whole now - her hull and canvas each the
  * share of the whole they were saved against: her record's own `maxHull` and `maxSail`, or - a record from before the
  * hulls were toughened, which says neither - her hull's first build's (navalShips.js firstBuildOf); and her part-spent
  * store's `credit` (work points, a hull point a point) by her hull's. A boat saved whole loads whole, never at the share
@@ -198,14 +195,12 @@ export const HARBOUR_LEAVE = 2600;
 export const HARBOUR_ROLL = Object.freeze([2, 4]);
 export const HARBOUR_NAVY = 0.25;
 export const HARBOUR_SALT = 0x4a7b;
-/** SHIP-FADE (2026-10-02, Mac: "Ships should just disappear into the void. If theyre going out to open sea, they should
- *  fade away"): the seconds a ship takes to come into the world (every ship stood) and to leave it - one let go by her
+/** SHIP-FADE: the seconds a ship takes to come into the world (every ship stood) and to leave it - one let go by her
  *  range (the director's, a raider sailing on, a harbour left behind, a lane's packet sailing out of sight, a peer's
  *  ship out of their word), never one sunk, taken or handed over: she dissolves as she sails on, and is gone when she
  *  has. One of mine fired on as she fades comes about and stays (she fights). */
 export const SHIP_FADE_S = 4;
-/** SEA-LANES (2026-10-02, Mac: "ships should be more persistant and actively engage with multiple docks and multiple
- *  pathways around daggerfall"): a lane's packet within LINER_STAND_M of the player is stood (systems/naval/seaLanes.js,
+/** SEA-LANES: a lane's packet within LINER_STAND_M of the player is stood (systems/naval/seaLanes.js,
  *  the world's feed), and let go past LINER_DROP_M; at most LINERS_MAX under way by the Ships at sea (few, some, many) -
  *  one lying in a harbour I know stands while a berth is free, as the harbour's own do. */
 export const LINER_STAND_M = 1200;
@@ -255,9 +250,7 @@ export const BLAST_SHAKE = 3.2;
  *  re-exported: BOAT-FAR moved them and the law's step (farLifeStep) to scenes/comeSailAway/farLife.js, which the Come
  *  Sail Away pool and the peers' boats read as poseShip does. */
 export { NEAR_LIFE_M, FAR_LIFE_EVERY };
-/** NAV-FAR-AI (2026-10-12, a player's live client walking the coast: the captains of the sea's ships were 12% of the
- *  main thread and some 29% of what it allocated - every ship of mine, every frame, the adopted ones hundreds of km off
- *  among them): A FAR CAPTAIN KEEPS HER WATCH EVERY FAR_LIFE_EVERY FRAMES, on the time she missed (never more than
+/** NAV-FAR-AI: A FAR CAPTAIN KEEPS HER WATCH EVERY FAR_LIFE_EVERY FRAMES, on the time she missed (never more than
  *  FRAME_STEP_S at once, the sea's own step) - past FAR_WATCH_M of the eye, where she stands no hull to be seen
  *  (PEER_HULL_FAR_M), afloat and in no fight (hers, or one that targets her), nor lashed to a prize. Her damage, her
  *  fires and her sinking keep every frame's clock. */
@@ -288,8 +281,7 @@ export function watchesFar(e, eye, fought) {
  *  has closed (test/systems/naval/peerhullrange.test.js); the ships this is for were 80-700 km off, so the frame's saving is the same. */
 export const PEER_HULL_NEAR_M = 5000;
 export const PEER_HULL_FAR_M = 5500;
-/** OWN-HULL-RANGE (2026-10-12, a player's live client travelling the overworld: 14 hulls 9-727 km off, 90 -> 37 FPS
- *  while they stood - their sails baked, their particles drawn, their rigging stepped every frame): MY OWN SEA'S SHIP FAR
+/** OWN-HULL-RANGE: MY OWN SEA'S SHIP FAR
  *  OFF STANDS NO HULL EITHER. A ship with no owner is this tab's - the traffic, the raiders, the packets, a port's moored
  *  ships, a bounty's quarry, the legends - and every ship a peer leaves behind (releaseOwner adopts them wherever they
  *  lie, so PEER-HULL-RANGE's 80-700 km came back as mine). Her record sails, fights, burns and sinks as ever (the
@@ -405,8 +397,7 @@ export const SWIM_REACH = Object.freeze([0.6, 1.2, 0.6]);
 /** The collector a swimmer's cask is hauled by (never a boat's). */
 export const SWIMMER = 'me:swim';
 /**
- * SEA-PEACE (2026-09-29, the player: "People shouldnt get attacked if not on a ship, some ships should be passive, not
- * all should be hostile. Enemy AI and Friendly AI should engage in their own encounters naturally"). THE SEA'S GUNS ARE
+ * SEA-PEACE. THE SEA'S GUNS ARE
  * FOR THOSE ABOARD (`aboardShip`: at a helm, on a boat of mine, on a sea ship's deck): off every ship - ashore, on a
  * quay, in the water - no captain takes the player (the contacts had that) and NOTHING ELSE DID EITHER: the time scale,
  * a rest, a journey (OW6's threats), the shipwright, the mending's quiet and the lookout's "Sail ho!" each asked a
@@ -421,7 +412,7 @@ export const PRIZE_COST = 0.5;
 export const NEWS_RANGE = 1200;
 export const GUNFIRE_KEEP = 24;
 /**
- * SEA-EASE (2026-10-01, Mac: "Friendly AI should help the player in combat") - THE RELIEF AND THE STRAY. A lawful
+ * SEA-EASE - THE RELIEF AND THE STRAY. A lawful
  * player is in DISTRESS (`distressAt`) while a pirate I stand fights them - engaged on them or coming alongside - and no
  * crown's ship that does not hunt them sails within RELIEF_NEAR_M of them: the director rolls a navy ship for them
  * (navalDirector.js THE RELIEF) and her course is laid for where they were, kept until her lookout has a fight (the
@@ -628,8 +619,8 @@ const isMine = (id) => typeof id === 'string' && id.startsWith(`${MY_BOAT}:`);
 /** A shot a sea ship fired - never a player's own (mine, or a peer's `peer:`). */
 const shipShot = (shooter) => !(typeof shooter === 'string' && (shooter.startsWith('peer:') || isMine(shooter)));
 /**
- * SERPENT4 (2026-10-11)'s BUMPERS ARE GONE (HULL-PASS, 2026-10-26, Discord #feature-feedback "Boat Player Collision": "too
- * many people out there bumping into each other ruining their shots"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md).
+ * SERPENT4 's BUMPERS ARE GONE (HULL-PASS, 2026-10-26, Discord #feature-feedback "Boat Player Collision": "too
+ * many people out there bumping into each other ruining their shots").
  * In the sea serpent's waters every other player's ship at her helm was met BUMPER_M (10 m) out and mine pushed off it
  * at up to 30 m/s - the players' answer then to hulls phasing through each other. Another player's hull no longer meets
  * my helm outside a PvP zone (scenes/comeSailAway/peerHulls.js), and the serpent's waters are never one, so there is
@@ -645,7 +636,7 @@ const arcTo = (l, t) => Array.from({ length: 18 }, (_, j) => shotPosition(l.p0, 
 const watersFolk = (w) => ({ regionIndex: w.region ?? 17, bank: shipNameBank(w.region ?? 17, w.area ?? -1) });
 /** WW3: a ship's names by her waters' people - her region's on the Bay, and past it the name bank of the area she is
  *  named in (`area`: a packet's her home port's, another's the waters here). AUDIT TESA II K7: built here, beside
- *  watersFolk, so the host's scope keeps only the call (the hosts do not grow, bible/01-Overview/Host-Split.md). */
+ *  watersFolk, so the host's scope keeps only the call (the hosts do not grow). */
 const watersShipNames = (cls, seed, region, crown, area) => shipNames(cls, seed, { regionIndex: region, crown, bank: shipNameBank(region, area) });
 /** WW3: the area a launched ship's names are drawn in - her spec's (a packet's her home port's; WW7-8: a peer's word's, the
  *  stander's own), a ship of a named region none (her region's people), else the waters here. WW7-8: kept on her entry and
@@ -719,7 +710,7 @@ export function createNavalHost(deps) {
   /** AUDIT CC-A5: nobody of hers ashore (never mutated). */
   const NO_HANDS_AWAY = new Set();
   let companions = createCompanions(null, deps.packedItems ?? null);   // CREW-COMPANIONS: the party ashore (crewCompanions.js), saved beside the crews - COMPANION-KIT: their packs through the save's item codec
-  /** HOLDINGS (bible/03-World/Holdings.md): her build as her refits make it - her Hull refit's share on her hull's and
+  /** HOLDINGS: her build as her refits make it - her Hull refit's share on her hull's and
    *  her canvas's whole (`deps.refit`, the Fleet's ledger by her number; a boat with none, her hull's own). AUDIT 2: a
    *  share under 1 read too - CAPTAIN-TREE's keystones' prices (Boarders Away's hull) cost her here as Come Sail Away
    *  charges her way's. */
@@ -754,14 +745,12 @@ export function createNavalHost(deps) {
   const csa = () => deps.csa?.() ?? null;
   const sailing = () => !!csa()?.isSailing?.();
   const myBoat = () => (sailing() ? csa().state.CurrentBoat : null);
-  /** AUDIT CAPTAIN'S SEA C1: THE NAMES OF A BOAT OF MINE'S HANDS ASHORE WITH ME - none while I sail (AUDIT CC-A5, Mac: "Back
-   *  on deck while sailing"). Her posts' worth (crewStep), the hand who answers for her (`mateOf`), her card and her deck
+  /** AUDIT CAPTAIN'S SEA C1: THE NAMES OF A BOAT OF MINE'S HANDS ASHORE WITH ME - none while I sail (AUDIT CC-A5). Her posts' worth (crewStep), the hand who answers for her (`mateOf`), her card and her deck
    *  (`awayOf`) read this one set: the party's raw roll left a companion's post worth nothing while he stood it at sea. */
   const ashoreNames = (boat) => (boat?.uid && companions.party.length && !sailing() ? companions.awayOf(boat.uid) : NO_HANDS_AWAY);
   /** The boats of mine that stand in the world (the shots' targets, the flotsam's collectors). */
   const myBoats = () => (csa()?.state?.AllBoats ?? []).filter((b) => b.GameObject?.activeSelf);
-  /** BERTH-HIDDEN (2026-10-04 - found chasing Mac's "its two ships clipped inside of eachother", which was the cabin's,
-   *  world.js CABIN-HULL): every boat of mine placed outdoors,
+  /** BERTH-HIDDEN: every boat of mine placed outdoors,
    *  shown or not - what a berth asks of. Come Sail Away hides a boat more than a map pixel off and every one while I am
    *  indoors, and she lies where she lay all the same (FIELD-CSA1: she rides the origin in sight or not); read by the
    *  shown ones alone, a ship made fast at a quay was a free berth from the harbour roll's 1,200 m, and the port moored
@@ -1183,8 +1172,7 @@ export function createNavalHost(deps) {
   }
   const nameOf = (e) => e.ship.names?.name ?? withArticle(classLine(e.ship.cls, e.ship.names?.crown));
 
-  // ── SPYGLASS (2026-10-11, the owner: "Removing observable names from ships and instead implementing a spyglass option
-  // where you can aim and view to observe other ships, their allegiance, cargo, etc."): WHAT I KNOW OF EACH SHIP
+  // ── SPYGLASS: WHAT I KNOW OF EACH SHIP
   // (systems/naval/shipKnowledge.js) - her hull at any range; her colours and name by the naked eye close, a Lookout's
   // call, the glass held on her, or her own acts; her guns, hands and hold through the glass close, or once she strikes.
   // Kept on her entry while she is in my sea; never on the wire (each player's own eye).
@@ -1350,7 +1338,7 @@ export function createNavalHost(deps) {
     glassHeld += Math.max(0, dt);
     return glassCardOf(best);
   }
-  // ── CAPT-BOARD (bible/03-World/Captains-Sea.md): THE SITES - a held contract's waters (harbourBoard.js contractSites,
+  // ── CAPT-BOARD: THE SITES - a held contract's waters (harbourBoard.js contractSites,
   // the world's `captain.sites`): a bounty's quarry stood when I sail within SITE_REACH_PX map pixels of her waters, a
   // wreck's casks floated there; again if the sea let her go, or her casks sank, before the contract was done. And a
   // delivery's port: a boat of mine lying to its quay is the berth the contract asks after.
@@ -2209,7 +2197,7 @@ export function createNavalHost(deps) {
     }
     return d;
   }
-  /** SEA-TRAFFIC (Mac: "players arent seeing boats"): whether I launch the sea's traffic - the lowest id among the players
+  /** SEA-TRAFFIC: whether I launch the sea's traffic - the lowest id among the players
    *  ON THE WATER near me (the share's greedy election, its hysteresis), for only a player on it launches any. Among every
    *  player near, a lower id ashore in the port town was elected and launched nothing, and the one sailing out met an
    *  empty sea. */
@@ -2471,7 +2459,7 @@ export function createNavalHost(deps) {
       retire(e);   // SHIP-FADE: she sails on out of sight
     }
     for (const e of sea.values()) if (!e.owner && e.raider && !plan.drop.includes(e.raider.id)) { e.handOn = null; e.retiring = false; }   // SHIP-FADE: back in range as she faded - she stays
-    // ETHER-OW (2026-10-13): past the Veil the raiders are born on the Eltheric Ocean too (world.js tvRaidOpen), and a
+    // ETHER-OW: past the Veil the raiders are born on the Eltheric Ocean too (world.js tvRaidOpen), and a
     // ship launched there is the sea's own (launch: its names, its colours, no crown's law) - her class drawn the band's
     // levels over the captain's own, as every class the director draws there is (navalDirector.js ctx.ether)
     const w = where();
@@ -2608,7 +2596,7 @@ export function createNavalHost(deps) {
    *  quay point 19.6 m from her hull) and stood the hunt, a bounty's trail and a band's chase down. F60: a hull whose
    *  root stands past her own reach of the feet (her stem, her stern and her beam, and DECK_REACH_M) is never asked - her
    *  box was built for every boat and every sea ship on every call (3.34 us and 11 KB: each step's hostileNear, the
-   *  threats, playerAfloat each frame). GALLEON (2026-10-01): DECK_REACH_M (by her rail, past her deck's inset edge) for
+   *  threats, playerAfloat each frame). GALLEON: DECK_REACH_M (by her rail, past her deck's inset edge) for
    *  feet within DECK_STEP of her main deck or over it (mainLevel - DECK_STEP, on every hull); under that a floor of hers
    *  within the body's own reach - the new galleon's gun deck lies 1.08 m over the sea, and a metre's reach of it stood
    *  a swimmer or a quay against her side aboard. AUDIT GN-D3: that reach the capsule's own radius (motor.js
@@ -2893,7 +2881,7 @@ export function createNavalHost(deps) {
    *  - a ship laid up a port away took goods in and sold them out where she never sailed). */
   function openYard(boat, { quay = false } = {}) { const m = yardModel(boat); m.atQuay = !!quay; return !!deps.openYard?.(m); }
 
-  // ── HOLDINGS: a ship of mine as the Fleet page reads her and works her, wherever she lies (bible/03-World/Holdings.md) ─
+  // ── HOLDINGS: a ship of mine as the Fleet page reads her and works her, wherever she lies ─
   // `boat` is a boat of mine standing in the world (shown or not), or a laid-up ship's stand-in - `{ uid, hull, crewed,
   // Cargo: { Items } }`, her hold the laid-up one (scenes/fleetHost.js) - so her state is the one her number keeps here.
   /** Her state as the page draws it: her hull, canvas and crew against her whole, a wreck, a fire, her stores. */
@@ -2905,7 +2893,7 @@ export function createNavalHost(deps) {
       fire: d.fire > 0, stores: deps.stores?.count?.(boat) ?? 0, inFight: !!st.inFight, morale: boat.crewed ? st.crew.morale : null, barrels: st.guns.barrels, wants: wantsRepair(d) };
   }
   /**
-   * HOLDINGS: REPAIRS MADE AWAY (Mac: "option to repair if theres crew (even if youre away)") - what QUICK-REPAIRS'
+   * HOLDINGS: REPAIRS MADE AWAY - what QUICK-REPAIRS'
    * hands do over the quiet, done at once where she lies: her hull and canvas mended free to FIELD_MEND_CAP of each
    * whole (the free mending's own reach), the rest paid out of her carpenter's stores by seaRepair's law (her hull first,
    * her spare work spent first, then a store STORE_POINTS of work at a time), her fires put out and a wreck refloated. A
@@ -3270,7 +3258,7 @@ export function createNavalHost(deps) {
 
   /** The aim put down without a shot - a window opened over it, the helm was left: the release owes nothing. */
   function cancelAim() { aiming = false; aim = null; }
-  /** GUN-HOLD (2026-09-29, Mac: "shooting cannons should have attack canceling") - HOLD FIRE: the laid broadside put
+  /** GUN-HOLD - HOLD FIRE: the laid broadside put
    *  down unfired on purpose, by Activate while the guns are laid - the bow's own cancel (playerWeapon.js cancelHeld:
    *  Activate held un-draws a drawn bow). The release then owes nothing; the guns stay loaded. */
   function holdFire() {
@@ -3542,7 +3530,7 @@ export function createNavalHost(deps) {
     }
   }
 
-  /** RAID-WON (bible/01-Overview/bugs/Field-Bugs-2026-10-19.md): a raid this throw-back won ends with it - its living foes
+  /** RAID-WON: a raid this throw-back won ends with it - its living foes
    *  withdrawn, its `_ally_` among them, and its quest ended as its own `end quest` ends one (world.js endRaid's `won`,
    *  scenes/raidAshore.js) - never left running with its crew on my deck, counted as enemies near. Its uid stays mine until
    *  the quest ends (raidEnded): a Leave Ship or a wave its grace ticks still run is the sea fight's, never a voyage's. */
@@ -3592,7 +3580,7 @@ export function createNavalHost(deps) {
     // the prize: her hold drawn once (whoever opens it again finds what is left), the boat that took her
     entry.prize = { hold: holdOf(entry.ship.cls, entry.ship.seed, (key, tier) => deps.hold?.(key, tier + (entry.deep ? DEEP_TIER : 0) + etherTier(entry)) ?? []), boat: b.boat ?? nearestBoat(entry.ship.pos), peerOrigin: b.peerOrigin ?? null, chosen: null, fate: null };   // CAPT-WATERS: a deep ship's hold the richer
     entry.prize.drawn = drawnPlunder(entry.prize.hold);   // AUDIT CAPTAIN'S SEA L12: her own, counted once each as they leave her
-    // STOLEN-GOODS AUDIT (2026-10-16, S4): A LAWFUL SHIP'S HOLD IS HER OWNER'S GOODS. Her boarding is Piracy (chargePlayer
+    // STOLEN-GOODS AUDIT: A LAWFUL SHIP'S HOLD IS HER OWNER'S GOODS. Her boarding is Piracy (chargePlayer
     // above: navalLaw.js lawOf's 'board'), so what she carried is taken from someone else's keeping - marked as her hold
     // is drawn, so every way out of it carries the mark (Take all into the captor's hold or the pack, Open her hold, the
     // crew's stow when the sea goes). A pirate's hold is a lawful prize (her end is rewarded), and past the Veil no crown's
@@ -3618,7 +3606,7 @@ export function createNavalHost(deps) {
     return { taken: all.length - left.length, left: left.length, where: boat ? 'hold' : 'pack' };
   }
   /**
-   * KEEP-PLUNDER (2026-09-30, Mac: ship ownership "less punishing" - "Keep boats & cargo"): the sea is never a save's,
+   * KEEP-PLUNDER: the sea is never a save's,
    * and a transition or a fast travel empties it (clear) - a prize whose hold was not yet emptied and the casks of the
    * ships I sank went with it. Before it goes, my crew stows them: a prize's hold into the boat that took her (her
    * captor gone from the world: the helm's boat, else the pack as far as it carries - takeInto), a cask of mine into
@@ -3778,9 +3766,7 @@ export function createNavalHost(deps) {
   }
 
   /**
-   * SHIP-CLAIM (2026-10-01, Mac: "provide more accessibility options to acquiring" ships - and of the choices put to
-   * him, "Claim captured prizes - Keep a ship you take by boarding as your own boat, instead of scuttling her or casting
-   * her adrift"). HER THIRD FATE: CLAIMED, SHE IS MY BOAT - Come Sail Away's own, as a bought one is.
+   * SHIP-CLAIM. HER THIRD FATE: CLAIMED, SHE IS MY BOAT - Come Sail Away's own, as a bought one is.
    * - OFFERED (`claimable`) for a prize I stand - one another stands is theirs to settle (online, only my own) - and
    *   never a voyage raid's (its window's one way on is Sail on: leaveShipGate's model offers none), only where Come Sail
    *   Away can place her: its runtime's LaunchFromDeed and the host's mint and pack (none with the mod off).
@@ -4141,7 +4127,7 @@ export function createNavalHost(deps) {
     return null;
   }
   const atBerth = (ship) => !!berthOf(ship);
-  /** HOLDINGS (bible/03-World/Holdings.md): the berth a ship of mine is brought round to from the Fleet page - of the
+  /** HOLDINGS: the berth a ship of mine is brought round to from the Fleet page - of the
    *  harbours I know, the free one (berthFree's, and no boat of mine lying at it) nearest the player: its place on the
    *  sea's top and her bow along it. Null: no harbour known here, or every berth taken. QUAYS: her place alongside its
    *  quay for her own hull (`hull`; shipLife.js alongside) - she is brought round made fast at it. */
@@ -4309,7 +4295,7 @@ export function createNavalHost(deps) {
     if (k && k !== gangwaySaid) deps.say?.(g.way === 'aboard' ? `The gangway${g.name ? ` to the ${g.name}` : ''} - Activate to go aboard.` : 'The gangway. Activate to step ashore.', 3);
     gangwaySaid = k;
   }
-  // ── PASSAGE (2026-10-19; bible/03-World/Passage.md): a harbour's own friendly ship, booked from her quay - the sea's half
+  // ── PASSAGE: a harbour's own friendly ship, booked from her quay - the sea's half
   // in scenes/naval/passageBerths.js (AUDIT PASSAGE D-M1: out of this scope), the voyage scenes/naval/passageHost.js's ──
   const { passageShip, passageHint, charter, charterSailed, goneSeed, goneSaid, hearGone } = createPassageBerths({ sea, harbours, enabled: () => enabled, boarding: () => boarding, myBoat, csa, stanceOf, drop, adopt, retire, departedOf, day: () => where().day ?? 0, hullBox }, deps);
   // FISH-BOATS (scenes/naval/fishingFleet.js): each harbour's fishing boats, at anchor or on their ground by the day's light
@@ -4608,7 +4594,7 @@ export function createNavalHost(deps) {
     }
     for (const b of myBoats()) list.push({ ship: null, movable: false, pos: b.GameObject.position, yaw: yawOfRot(b.GameObject.rotation), hull: b.hull });
     if (list.length < 2) return;
-    // NAV-COST (2026-10-12): a hull on the flat made once a pass (again once it is shoved), and two whose centres stand
+    // NAV-COST: a hull on the flat made once a pass (again once it is shoved), and two whose centres stand
     // farther apart than twice their reaches never measured - every pair of the sea's was, every frame, two new flats
     // each, and nearly all of them hundreds of km apart. hullOverlap's answer for them is null: a hull's half extent
     // along any axis is under its half length and half width together, and one of A's own axes holds at least 1/sqrt 2
@@ -4834,7 +4820,7 @@ export function createNavalHost(deps) {
     e.mastTop = Number.isFinite(top) ? sp.lift + top : reach;
     return e.mastTop;
   }
-  /** SHIP-STANCE (2026-10-02, Mac: "Friendly ships should have green Healthbars unless provoked"): how a ship of the
+  /** SHIP-STANCE: how a ship of the
    *  sea stands to me - `hostile` (navalAI.js hostile: she would take me, a crown hunts me, or I provoked her), else
    *  `friendly` while she flies a lawful flag (a merchantman, a crown's ship) and sails; a pirate not after me now is
    *  neither - an enemy's red still. */
@@ -5006,7 +4992,7 @@ export function createNavalHost(deps) {
   /** The ship the target card reads: while a broadside is laid, the one its guns strike (AUDIT NAV1: a broadside's
    *  zone lies forward of the look - the galley's helm laid square on a sloop 14.7 degrees off the crosshair showed no
    *  card); else the one the look is on (within 900 m, within 6 degrees of its bearing or its box).
-   *  GLASS-SPOT (2026-10-11, the owner: "You can spot ships before you even decide to use the spyglass"): ONLY A SHIP
+   *  GLASS-SPOT: ONLY A SHIP
    *  MADE OUT. The look's card named every hull within 900 m it passed over - "Unknown two-master", her range - so a ship
    *  was spotted, and ranged, at a glance, at night and in the fog as well; a hull not yet made out (shipKnowledge.js
    *  KNOW.hull) gives no card, under the look or the laid guns: she is a sail on the sea till the eye, a Lookout, the
@@ -5314,7 +5300,7 @@ export function createNavalHost(deps) {
     /** CREW-COMPANIONS: a boat of mine's roster places ashore - her deck stands without them (navalCrew.js `away`). */
     awayOf(boat) {
       // AUDIT CC-A5: none away is an EMPTY set, never null - null left the last hand home off her deck for good; and
-      // while I sail, every hand of mine is aboard (Mac: "Back on deck while sailing")
+      // while I sail, every hand of mine is aboard
       const names = ashoreNames(boat);   // AUDIT CAPTAIN'S SEA C1: the one set
       if (!names.size) return NO_HANDS_AWAY;
       const hands = myBoatState(boat)?.crew.hands ?? [];

@@ -1,5 +1,5 @@
 // @ts-check
-// GALLEON (2026-10-01): THE MESH BENCH - what world/ships/galleonModel.js and world/ships/galleonRig.js build the new galleon's
+// GALLEON: THE MESH BENCH - what world/ships/galleonModel.js and world/ships/galleonRig.js build the new galleon's
 // parts on. Pure: points, faces and numbers in; the CSA geometry shape out (systems/comeSailAway/comeSailAwayModels.js
 // decodeMeshGeometry's: positions, normals, uvs, 32-bit indices, sub-meshes by texture, a box), with each sub-mesh's
 // texture as a renderer slot (`{ archive, record }`).

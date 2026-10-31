@@ -1,5 +1,5 @@
 // @ts-check
-// SHIP-CREW (2026-09-30, Mac: "Let's do #1" - named crew with morale, and deck orders the crew follow) - THE PLAYER'S
+// SHIP-CREW - THE PLAYER'S
 // OWN CREW AS PEOPLE: who they are, how their spirits stand, and what they were last told to do. Pure: the host
 // (scenes/naval/navalHost.js) keeps one per boat of the player's, steps it and tells it what happened; the save keeps it
 // (`snapshot` / `restore`). DECLARED - Daggerfall has no ships, and Come Sail Away's crew is a count.
@@ -11,7 +11,7 @@
 // remembers the FIGHTS won and the BOARDINGS stood with this ship. A hand the guns take (the roster shorter) FALLS,
 // named - the last to join first, her First Mate last; a hand hired joins with a new name.
 //
-// THEIR SPIRITS (Mac: "Gentle" - no wages, no desertion). MORALE 0-100, MORALE_START a new crew's. A win, a prize, a
+// THEIR SPIRITS (- no wages, no desertion). MORALE 0-100, MORALE_START a new crew's. A win, a prize, a
 // hold filled and a round of grog raise it; a hand lost and a wreck lower it; the sea wears it down a point every
 // SEA_DECAY_S away from port, and a port lifts it a point every PORT_RISE_S, as far as PORT_CAP. It NUDGES: the guns'
 // reload (`reloadScaleOf`, MORALE_RELOAD either way), the mending (`mendScaleOf`, MORALE_MEND either way), a boarding's
@@ -22,8 +22,7 @@
 // more hand to a boarding; the crew at the rail), repairs (the carpenter's stores spent - navalYard.js seaRepair), and
 // stand down (their own work again). An order stands until another is given, or the work it was is done.
 //
-// CAPT-CREW (2026-10-11, the owner: "make the decisions and completely make this as detailed as possible, providing depth
-// without overcomplicating systems" - bible/03-World/Captains-Sea.md) - A HAND'S SERVICE, AND WHAT HIS POST IS WORTH. Every
+// CAPT-CREW - A HAND'S SERVICE, AND WHAT HIS POST IS WORTH. Every
 // hand already counted the fights won and the boardings stood with her; now they count. His SERVICE (`serviceOf`) is his
 // fights and twice his boardings, and it ranks him (VETERANCY): Green, Seasoned, Veteran, Old Salt. A POST is worth
 // something now, and more in a seasoned hand (POST_WORTH, `crewWorth`): her Gunner quickens the guns' reload, her
@@ -78,8 +77,7 @@ export const ROLES = Object.freeze(['Bosun', 'Gunner', 'Carpenter', 'Lookout', '
 export const LOOKOUT_ROLE = 'Lookout';
 /** The role of the hand who answers for her (the roster's first, dealt; HOLDINGS: given). */
 export const FIRST_MATE = 'First Mate';
-/** HOLDINGS (bible/03-World/Holdings.md, Mac: "Named crew companions should be able to be assigned to certain roles, and
- *  be positioned accordingly to their role"): the posts a captain gives her hands - her First Mate and the roles dealt.
+/** HOLDINGS (): the posts a captain gives her hands - her First Mate and the roles dealt.
  *  A Bard keeps his calling until given another, and is given it back; one First Mate to a ship. */
 export const CREW_ROLES = Object.freeze([FIRST_MATE, ...ROLES]);
 

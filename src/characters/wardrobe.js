@@ -1,6 +1,5 @@
 // @ts-check
-// MWNPC17 (2026-10-11, Mac: "We also need to hone in on what NPCs get what type of clothing/armor. General NPCs should
-// have a procedural system where barely any 2 NPCs look alike" - bible/04-Characters/Morrowind-NPCs.md section 25):
+// MWNPC17:
 // THE WARDROBE. Every person the lanes stand in a Morrowind body was dressed by a fixed outfit: a walker by one of four
 // per sprite (folkBodies.js FOLK_OUTFITS), a standing person by one per faction (peopleBodies.js PEOPLE_WARDROBE), the
 // faction's knights all in the same steel - and the item map resolved each garment by its TYPE and its dye alone

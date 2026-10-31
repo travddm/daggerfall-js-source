@@ -30,7 +30,7 @@
 
 export const POSES = {
   // 1H melee ready, LEFT-handed, v4 - matched to Mac's grip reference
-  // (2026-07-05): the LOW READY. Weapon arm HANGS with a soft elbow
+  // the LOW READY. Weapon arm HANGS with a soft elbow
   // (the baked sword grip does the work - blade rides up-forward
   // ~47deg on its own; the mesh's wide axis lives in the swing plane
   // so the flat already faces sideways - no roll). Off arm relaxed. Easy right-lead
@@ -74,7 +74,7 @@ export const POSES = {
   // game's job. Locked through the gait like 2H.
   rangedAim: {
     lean: 0.05,
-    twist: 0.65,    // BLADED archer, CORRECT form: bow shoulder forward, draw shoulder back. FORM IS A CONSTRAINT, NOT AN OUTCOME - a reach-optimizing twist sweep once inverted the stance (draw shoulder led by 0.24; Mac: "the left arm looks so off"); with the seat frame-fixed, positive twist reaches the nock at 0.011.
+    twist: 0.65,      // BLADED archer, CORRECT form: bow shoulder forward, draw shoulder back. FORM IS A CONSTRAINT, NOT AN OUTCOME - a reach-optimizing twist sweep once inverted the stance (draw shoulder led by 0.24); with the seat frame-fixed, positive twist reaches the nock at 0.011.
     gaitArm: 0,
     gaitElbow: 0,
     runElbow: 0,

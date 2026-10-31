@@ -1,4 +1,4 @@
-// IT1 (2026-10-04): IMMERSIVE TRAVEL'S CARRIAGES, AT WHICHEVER GATE THE TOWN STANDS.
+// IT1: IMMERSIVE TRAVEL'S CARRIAGES, AT WHICHEVER GATE THE TOWN STANDS.
 //
 // The mod's whole world edit is four of Daggerfall's city-gate blocks, WALLAA08-11, each with records appended: a
 // carriage (model 41214) and its team or a cart (41207, 41209, 41109), the horses (TEXTURE.201), a hay or a crate

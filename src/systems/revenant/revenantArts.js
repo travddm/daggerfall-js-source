@@ -1,6 +1,5 @@
 // @ts-check
-// RVN-ARTS (2026-10-17, the owner: "Give revenants the chance to have unique telegraphed abilities, magic abilities like
-// healing or other buffs, etc (Must be balanced)") - A REVENANT'S ART. One revenant in ARTS_CHANCE is born with an art,
+// RVN-ARTS - A REVENANT'S ART. One revenant in ARTS_CHANCE is born with an art,
 // drawn on its id from its family's pool (revenantFeud.js signatureFamily - a blade, a beast, a brute, or the casters and
 // the rest), so it is the same on every read, every load and every client, and an older record has the one its id draws.
 // Every art has two halves: what it does to the player while it hunts them, and what it does for them once it is sworn.

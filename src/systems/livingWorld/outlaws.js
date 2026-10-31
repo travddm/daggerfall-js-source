@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW12 (2026-10-09, bible/06-Systems/Living-World-II.md "LW12"): THE OUTLAWS - the road's trouble with a face and a
+// LW12: THE OUTLAWS - the road's trouble with a face and a
 // home. The climate's tables already roll human bandits (mobileFactions.js FACTIONS.BANDIT); nothing remembered them.
 // Pure, like the trips they fall on (LW0 decision 2): a band, its hideout, its name, its people and its generations
 // are functions of the world's own data (a region's towns, the roads between them), a seed and the clock - every

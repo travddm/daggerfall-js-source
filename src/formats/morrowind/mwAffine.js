@@ -1,4 +1,4 @@
-// AUDIT 68 S11-affine-dup (2026-09-24): THE AFFINE, ONE HOME.
+// AUDIT 68 S11-affine-dup: THE AFFINE, ONE HOME.
 //
 // {a: Float32Array(9) row-major rotation*scale, t: [x, y, z]} is the shape
 // the skin (mwSkin.js), the particle systems (mwParticles.js) and the rig's

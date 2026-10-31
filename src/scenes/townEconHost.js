@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-ECON (bible/06-Systems/Town-Economy-Arc.md) - THE TOWN ECONOMY AS THE WORLD HOST WIRES IT (HOST-SPLIT: the
+// TOWN-ECON - THE TOWN ECONOMY AS THE WORLD HOST WIRES IT (HOST-SPLIT: the
 // module the host wires, src/scenes/fishHost.js's shape - constructed once, the host's own scope does not grow).
 //
 // TE1's reading (systems/town/townEcon.js: a town's Prosperity, its counters' factor, its card) and TE2's book
@@ -42,7 +42,7 @@ export function createTownEconHost({ locAt = () => null, portLanes = () => null,
   const towns = door !== undefined ? door : reading.online() ? accountTowns({ fetch: (u, i) => globalThis.fetch(u, i), storage }) : null;
   const book = towns ? createTownEconBook({ door: towns, storage, me: towns.me, isTownPixel: (x, y) => isEconTown(locAt(x, y)?.locationType), relayNowS: () => (clockHeard() ? Math.floor(reading.nowMs() / 1000) : null), turnMs: dayTurnMs() }) : null;   // DAY-TURN
   /** SEA-TRADE: a port's sea lanes by its map pixel, counted once the map's lanes stand (a lane at each of its two ports).
-   *  WW7-10 (bible/03-World/World-Wide.md): the world's lanes (scenes/naval/worldLanes.js `all`), counted again whenever
+   *  WW7-10: the world's lanes (scenes/naval/worldLanes.js `all`), counted again whenever
    *  they move (the lanes past the Bay are made again as the world's ports do); a Bay port's are the Bay's alone - a lane
    *  across the edge is no Bay port's, so its economy is every client's whatever land it stands - and a port past the Bay's
    *  every lane it runs, past the Bay and across its edge. */

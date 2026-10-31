@@ -1,5 +1,5 @@
 // @ts-check
-// EG-FULL, LAYER TWO (2026-10-11, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md sections 10.3-10.5):
+// EG-FULL, LAYER TWO:
 // THE SPANS' LAW - where every piece of a span stands at a moment of the shared clock, and THE TIMED SOLVER that lets the
 // generator lay only courses a player can cross. One law for the relay's hall spec (net/eliteGates/egLaw.js asks the solver while it
 // lays a hall) and every screen (scenes/eliteGates/egSpan.js moves the pieces by it, scenes/eliteGates/egFight.js draws their tells by it).
@@ -26,18 +26,18 @@
 // EG-FULL, LAYER THREE (section 11): the fragments' own pieces (a Moon branch under its beams, a rolling Drum, a Bone
 // bridge, a Sinking flight), proofs road by road (THE FORK), the real gap after each run, and THE MEDIAN (egRoadCross).
 //
-// EG-ZC (2026-10-12, Mac: "I said I want everything"; sections 10.5 and 11.2): THE COOLING SLAG - a crossing whose crusts
+// EG-ZC: THE COOLING SLAG - a crossing whose crusts
 // stand only after a spill, two spouts pouring in turn (egSlagState, egSlagLane), each landing on a crust held through its
 // crossing and each crust left onto still ground; and THE SHAFTS' bound, a shaft crossed inside EG_SHAFT_MAX_S.
 //
-// EG-H3 (2026-10-12; sections 10.1 and 29, EG4): THE PLATFORM CLOCK, ONE HOME - the Unmoored Steps' stepAt, beatStands,
+// EG-H3: THE PLATFORM CLOCK, ONE HOME - the Unmoored Steps' stepAt, beatStands,
 // beatBlinks and beatWarned moved here whole on the two laws the Spire's pieces move by (egDriftDx, egBeatAt), with the
 // Beat's and the Crumble's numbers; world/superDungeon/sdSteps.js re-exports them, so the Hour and the Spire keep one clock. And THE
 // COURSE AS DATA: courseOf lays a course record (`{ steps, checkpoints, end }`, the Steps' uniform step) from a spec -
 // the Hour's is world/superDungeon/sdSteps.js courseOf(SD_COURSE_SPEC), byte for byte the course it froze at import.
 //
-// THE ASCENT (LAW 9, 2026-10-16, Mac: "Something that isnt just a straight line from point A to point B";
-// bible/11-Multiplayer/Elite-Gates-Ascent.md section 6): THE PROOFS OVER THE ROUTE. A hall of THE ASCENT's law is a way
+// THE ASCENT (LAW 9, 2026-10-16,;
+// ): THE PROOFS OVER THE ROUTE. A hall of THE ASCENT's law is a way
 // (`spec.route` - net/superDungeon/egRoute.js) whose courses stand along it, each along +z where it stands: a road's crossing is its
 // links' times along its path (net/superDungeon/egRouteProof.js - a walk at the run, a stair at the motor's pace on a slope, a climb at the
 // climbing motor's pace and its mantle within the grip, a Drop its fall) and each `span` link's by THE TIMED SOLVER on its own
@@ -117,7 +117,7 @@ export const EG_SINK_WAIT_MAX = 2;
 export const EG_SINK_ON_S = 1;
 /** The pieces that fall under a foot (the Crumble's law): their depth crossed before the delay, no wait upon them. */
 export const EG_CRUMBLE_KINDS = Object.freeze(['crumble', 'bone']);
-/** EG-ZC (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 11.2) - THE COOLING SLAG,
+/** EG-ZC - THE COOLING SLAG,
  *  the Forge Gut's signature and its ONE HOME (net/eliteGates/egFragLaw.js EG_HAZARDS.slag says these numbers): a spill is a lane of
  *  magma 4 m wide, told EG_SLAG_TELL_S, molten EG_SLAG_MOLTEN_S, then a crust that stands EG_SLAG_CRUST_S, every
  *  EG_SLAG_CYCLE_S - the way across exists only after a spill. A `slag` step is a crossing poured by EG_SLAG_SPOUTS spouts
@@ -488,7 +488,7 @@ export const egPendAt = (s, t) => pendAt(s, t, Math.sin);
  *  relay's bundle does not carry the motor). */
 export const EG_PEND_BODY_H = 1.8;
 /**
- * Is a body at (x, z), its feet at `y` and `h` tall, inside a Pendulum's weight at `t`? EG-PERFECT (2026-10-18): THE TOUCH IS
+ * Is a body at (x, z), its feet at `y` and `h` tall, inside a Pendulum's weight at `t`? EG-PERFECT: THE TOUCH IS
  * THE DRAWN WEIGHT'S - the body's height (its feet to `h` over them) meeting the weight's as the screen draws it, the step's top
  * to 2 x EG_PEND_HALF over it (scenes/eliteGates/egSpan.js egPendModel's block). It judged feet from 0.6 m under the step to 2.2 m
  * over it: a jump that cleared the drawn weight by a metre was cast back, and a head in it from below never was. The plan's
@@ -973,7 +973,7 @@ export function egForgeLineClear(spec, f, B = LAW_SPAN_BUILD) {
   return true;
 }
 
-// ── AUDIT EG III (2026-10-13, lane 1 #7 / lane 3 #10; Elite-Gates.md section 15): SPIREBRIDGE'S PLANK ────────────────
+// ── AUDIT EG III: SPIREBRIDGE'S PLANK ────────────────
 // The Fellowship's Mastery: "once a span, a gold bridge over the next gap for the company, for 6 s". The room picks the gap
 // (net/eliteGates/egVestige.js egSpirebridge) and says it (`ebridge`, its gap's number in egSpanPairs' chain); every screen stands the
 // plank this law lays over it (scenes/eliteGates/egSpan.js), and the relay's fair trail counts it as ground while it stands

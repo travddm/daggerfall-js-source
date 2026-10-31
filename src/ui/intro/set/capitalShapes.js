@@ -1,5 +1,5 @@
 // @ts-check
-// INTRO4's SET (the merge of main into TESA, 2026-10-27; bible/10-UI/UI-Arc.md INTRO4): THE CITY THE FILM WAS SHOT ON,
+// INTRO4's SET (the merge of main into TESA, 2026-10-27; INTRO4): THE CITY THE FILM WAS SHOT ON,
 // KEPT AS SHOT. INTRO4 took world/capitalShapes.js byte for byte from TESA (#1184 at 4d8200b01, the Imperial City at seven
 // pixels a side) and tuned the film to it - its camera path, its fog and lake, the Colosseum it dives past. TESA's
 // IC-GRAND has since grown the game's city to twenty-five pixels (its wall 6,900 m out where it was 1,950) and retired
@@ -7,7 +7,7 @@
 // Unchanged but for this header, its imports' paths and its exports, listed at the end (the names stay the module's
 // own: test/systems/talk/audit24_onehome.test.js counts declarations, and this set's are the film's, not the game's).
 // Re-shooting the film on the grand city is its own slice. Its pictures' archive number is the game's (below).
-// TESA10 (bible/03-World/Arena-Provinces.md TESA10) - THE CAPITALS' SHAPES: the pictures' pseudo-archive and the shapes
+// TESA10 (TESA10) - THE CAPITALS' SHAPES: the pictures' pseudo-archive and the shapes
 // every capital's landmarks are built of (world/capitalModels.js the Imperial City's, world/capitalSolitude.js
 // Solitude's), in metres, y up, on the port's MeshBuilder (world/detStandIns.js). No game data.
 import { DOOR_TYPE } from '../../../world/meshReader.js';   // WW7-4: a castle's door

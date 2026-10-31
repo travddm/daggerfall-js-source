@@ -1,4 +1,4 @@
-// WD1 (2026-09-25): A VENDORED WORLD-DATA PATCH, LAID BACK ON THE
+// WD1: A VENDORED WORLD-DATA PATCH, LAID BACK ON THE
 // PLAYER'S CLASSIC BLOCK.
 //
 // The file a mod ships (a whole block, or a whole building record, as

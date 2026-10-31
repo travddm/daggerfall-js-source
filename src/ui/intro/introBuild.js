@@ -1,4 +1,4 @@
-// INTRO4 (bible/10-UI/UI-Arc.md INTRO4) - THE FILM'S BUILD, ASKED FOR: the city and the continent from the intro's worker
+// INTRO4 (INTRO4) - THE FILM'S BUILD, ASKED FOR: the city and the continent from the intro's worker
 // (introBuildWorker.js), or - no Worker, a factory that throws, a worker that errors or dies - the same two builds on
 // this thread, one after the other with the page let breathe between them. Either way the answer is the same arrays,
 // and `city` always resolves before `field`. `new Worker(new URL(...))` stays in exactly that spelling for Vite; the

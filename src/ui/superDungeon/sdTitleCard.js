@@ -1,9 +1,9 @@
 // @ts-check
-// SD15 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD15):
+// SD15:
 // THE HOUR'S CARD - the fight's turns large over the upper middle of the screen (scenes/superDungeon/sdArenaRead.js createSdBeats:
 // its wake, the Dragon Break, the Last Moment, the Hour's last minute, its fall), as the Warden's card shows his
 // (ui/gate/gateTitleCard.js, WB13e) - but the Hour's own: brass and the Mantella's light, where his burns in Dagon's red
-// (Mac, of the Hour: "not oblivion, something different"). The same readout's law: one node made on the first beat
+// . The same readout's law: one node made on the first beat
 // and updated, never rebuilt; hidden, never removed; hidden with the HUD. Its model is the Warden's own pure one
 // (`titleCardModel`). Not a DFU member. Ledger A (SUPER-DUNGEONS).
 import { injectEnhancedFonts } from '../enhanced/enhancedStyle.js';

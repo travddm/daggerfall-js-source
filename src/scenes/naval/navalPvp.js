@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SHIP-PVP) - THE NAVAL HOST'S SEAMS FOR THE OPEN SEA'S GUNS: what the referee's words need of the ships
+// SHIP-PVP - THE NAVAL HOST'S SEAMS FOR THE OPEN SEA'S GUNS: what the referee's words need of the ships
 // the naval host stands (scenes/naval/navalHost.js) - my ship as the referee is told of her, its word laid on her, her
 // wreck, a peer's boat where she lies, a prize out of her hold - and the guns' module attached (scenes/naval/
 // seaBroadsides.js, the sea's host's). HOST-SPLIT: built once by createNavalHost over its own internals, never grown there.

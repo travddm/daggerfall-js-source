@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS3 (2026-10-10, Mac: "Proper animated rope mechanics that connect the horses to the wagon"; asked, "Traces and
-// reins"): THE HARNESS'S ROPES - pure. Each rope is a chain of ROPE.points points stepped by Verlet integration: gravity
+// WAGONS3: THE HARNESS'S ROPES - pure. Each rope is a chain of ROPE.points points stepped by Verlet integration: gravity
 // pulls each loose point, its last step carries on (damped), and ROPE.iterations passes hold every link at its length
 // with both ends pinned where the scene says they are this frame - so a rope sags under its own weight, swings when the
 // wagon turns or jolts, and settles when it stands. Its length is its ends' span times its `slack` (a trace hangs a
@@ -53,8 +52,7 @@ export function layRope(rope, a, b) {
  * ROPE.maxStep, at most ROPE.maxSteps of them - a longer frame's rest is dropped, not caught up), `scale` the drawn
  * scale (the Overworld's grown rig: its gravity and its leap grow with it, so a grown rope hangs as the small one does).
  */
-/** PERF-ROPE (2026-10-12, an allocation profile of a player's live client walking the overworld's coast: the moving
- *  teams' harnesses were some 7% of what the page allocated, ~1 ms a frame): A ROPE STEPS IN PLACE - its ends kept in
+/** PERF-ROPE: A ROPE STEPS IN PLACE - its ends kept in
  *  its own arrays, each sub-step's ends in one pair for every rope, and a length as a root of its squares (Math.hypot
  *  of three boxed its every answer, ten iterations of eight links a sub-step). The rope is the one it was, to within
  *  a float's rounding (test/systems/wagon/perfrope.test.js holds it to the old law). */

@@ -1,6 +1,6 @@
 // @ts-check
 // THE TWO-PHASE HANDOFF (PVP-ESCROW; MAC'S DECISION, 2026-10-14: "the fallen must lose the worn piece only once the
-// killer actually has it" - bible/11-Multiplayer/Wild-Zone.md section 4): server-account/src/wild.js holds the killer's
+// killer actually has it"): server-account/src/wild.js holds the killer's
 // piece in ESCROW from the fall. Both sides of it on this page - my pieces held, asked back once my killer can no longer
 // collect them, and my collects carried to the service - moved out of bootWorld as they stood (HOST-SPLIT, FIELD BUGS
 // 2026-10-15c: the merge of main beside the 2026-10-14 roll-up had put bootWorld 55 code lines past its ceiling).

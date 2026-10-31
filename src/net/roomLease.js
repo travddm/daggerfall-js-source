@@ -1,6 +1,5 @@
 // @ts-check
-// LEASE1 (2026-10-22, mob of the staff panel's freeze: "this need addressed"; design doc "DFO Staff Panel: design",
-// "Holding against a modded game: room leases"): A ROOM HEARS THE HUB'S WORD ON EVERY SOCKET, NOT THE GAME'S. A mute,
+// LEASE1: A ROOM HEARS THE HUB'S WORD ON EVERY SOCKET, NOT THE GAME'S. A mute,
 // a ban and (with the staff panel) a freeze land on the hub - the law door posts there (server/src/index.js lawDoor) -
 // and every other room hears one only when the player's own game carries it (`{t:'law'}`, scenes/chatSafetyHost.js).
 // A room reads a token only at hello, so a changed game that carries nothing kept talking in Trade, LFG, a language's
@@ -60,7 +59,7 @@ export const relaySupportsLease = (v) => Number(/^world(\d+)$/.exec(String(v ?? 
 /** A room a lease binds: EVERY ROOM BUT THE HUB'S (and its shards), which hands leases out - a channel (Trade, LFG, a
  *  language's, a region's and its shards), a cell or world room, and every place a player acts in besides: a home, a
  *  caravan, a boat, a siege or a Royal Tourney, an arena's hall and floors, a gate's court, an Elite Breach, a Super
- *  dungeon's realm (STAFF-PANEL5-FREEZE-FIX, mob: "freeze they can only talk to staff while frozen" - a review found a
+ *  dungeon's realm (STAFF-PANEL5-FREEZE-FIX, - a review found a
  *  frozen player free in each of these, which no lease reached). A room's kind added later is bound from its first day. */
 export const leaseRoom = (key) => typeof key === 'string' && !isSocialRoom(key);
 

@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAG1 (2026-10-03) — THE MATERIALS BAG AND WHAT A CHARACTER CARRIES:
+// BAG1 — THE MATERIALS BAG AND WHAT A CHARACTER CARRIES:
 // the shapes and bounds BOTH ends read (bible/06-Systems/Materials-
 // Bag.md). The account service counts (server-account/src/
 // professions.js); the client holds the items (systems/materialsBag.js).
 // Pure: no clock, no DOM, no network.
 //
-// Asked (2026-10-03, from LostMyLeg's suggestion on the Discord):
+// Asked:
 // "implement a crafting mats bag that gets handled like the cart in an
 // extra slot. It shouldnt carry unlimited weight but quite a lot";
 // "make the bag available in every general store for like 500g";
@@ -69,7 +69,7 @@ export const BAG_ROW = Object.freeze({
 export const isBagItem = (item) => item?.templateIndex === BAG_TEMPLATE && item?.group === 'UselessItems2';
 /** Whether a list (the pack) holds one - DFU's HasCart, for the bag: owning one is holding one. */
 export const hasBag = (items) => Array.isArray(items) && items.some(isBagItem);
-/** ONE-BAG (2026-10-04, Mac: "you shouldnt be able to hold multiple gathering bags"): whether any of `lists` - the pack, a
+/** ONE-BAG: whether any of `lists` - the pack, a
  *  trade's basket, the wagon - holds a Materials Bag other than `item` (the one being taken, which may sit in one of them). */
 export const holdsOtherBag = (lists, item = null) => (lists ?? []).some((l) => Array.isArray(l) && l.some((x) => x !== item && isBagItem(x)));
 
@@ -99,8 +99,7 @@ export const CLAMP_ORDER = Object.freeze(['gold', 'bought', 'own']);
  *  not hold (`looseOrder`). */
 export const DEPOSIT_ORDERS = Object.freeze({ all: CLAMP_ORDER, spend: Object.freeze(['bought', 'own']), work: Object.freeze(['bought', 'own']) });
 export const depositOrderOk = (o) => typeof o === 'string' && Object.hasOwn(DEPOSIT_ORDERS, o);
-/** BAG-CRAFT (FIELD BUGS 2026-10-09d, Mac: "I just want players to also be able to craft from their inventory, not just
- *  the store"): whether a deposit by `o` may move units the carried count does not hold - a looted Red Rose, a log
+/** BAG-CRAFT (FIELD BUGS 2026-10-09d): whether a deposit by `o` may move units the carried count does not hold - a looted Red Rose, a log
  *  withdrawn before the bag, a stack traded from a friend - up to what the client says it holds past the count. A
  *  station's alone (a craft, a brew, a smelt, a temper): a writ, the market and the Stores page's Put in still move only
  *  what the service handed out. */

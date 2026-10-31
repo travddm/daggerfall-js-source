@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT-BANNER (2026-10-09, Mac: "a popup for when you obtain something of rarity including weapons, armor, the new
-// cards, etc - something akin to a destiny loot popup notification"; bible/10-UI/Loot-Banner.md) - A BANNER AT THE
+// LOOT-BANNER - A BANNER AT THE
 // RIGHT EDGE FOR EVERY RARE-OR-BETTER THING THAT ARRIVES IN THE PLAYER'S KEEPING.
 //
 // Mac's four answers: Rare and up (Common and Magic keep the small pickup feed under the crosshair); every way a piece
@@ -24,8 +23,7 @@
 // the Broker's - it stands hidden and nothing ages, so a piece bought or taken there is announced when the window goes.
 // A piece no longer held when its turn comes (a zone remains the room gave to another) never stands.
 //
-// HONOUR-BANNER (2026-10-14, Mac: "The title/aura in the abyss dungeon should also have a loot popup", and the lamp's
-// "ensure there is a loot popup for obtaining the title"): A TITLE OR AN AURA GRANTED stands as a banner too - pushed by
+// HONOUR-BANNER: A TITLE OR AN AURA GRANTED stands as a banner too - pushed by
 // its grant's own door (`announceHonour`: net/superDungeon/sdClaims.js's Hour, systems/lampKeeper.js's lamp), not read off the pack,
 // since there is no piece to read. Its word in the title's own paint (ui/playerBadge.js titlePaint - an aura in the
 // title's family it wears, AURA_PAINT), its edge and light in the title's colour, a big banner with the fanfare; it is

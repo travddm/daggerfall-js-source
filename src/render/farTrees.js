@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-TREES (2026-10-26, the owner: "on top of distant view, no flora/trees show ... No band aids for any of this"; the
-// coordinator: the billboard band from the game's own tree art, the tree line at the grid's edge gone;
-// bible/06-Systems/Travel-View.md FAR-TREES): THE BAND - THE NEAR TREES CARRIED PAST THE STREAMED GRID.
+// FAR-TREES: THE BAND - THE NEAR TREES CARRIED PAST THE STREAMED GRID.
 //
 // WHAT IT IS. The streamed grid stands every Tree of its pixels (world/terrain/terrainNature.js layoutNature; past its
 // two nearest rings only the tall flats draw, world/flatDistance.js - every Tree), out to its edge, and past it stood the
@@ -21,7 +19,7 @@
 // and half the moon, half the sun under the clouds' shadow), hazed as the far ring is. A tree under a pixel is drawn by its
 // share of one (a hash against its area), so a far wood keeps its coverage, never a blot of one-pixel points.
 //
-// THE SKYLINE (HORIZON-TREES, 2026-10-27; KPbICA through the owner: "Strange projections above the horizon line"; bible/
+// THE SKYLINE (HORIZON-TREES, 2026-10-27; KPbICA through; bible/
 // 03-World/Tamriel.md RELIEF-PEAKS Cause 7). The far pass has no depth among its layers - the painter's order puts its
 // hills in front of one another, and the band is drawn last - so a band tree behind a nearer hill of the middle ring stood
 // over that hill's skyline. The middle ring's own heights (render/midRing.js, the drawn ground) ride to the band as a
@@ -96,7 +94,7 @@ export const TREES_UNIT = 13;
  *  FLORA-GROUND, below). */
 export const TREE_STRIDE = 16;
 /**
- * FLORA-GROUND (FIELD BUGS 2026-10-27, the owner: "floating flora ... can be seen off the ground in first person"): A
+ * FLORA-GROUND (FIELD BUGS 2026-10-27): A
  * BUILT PIXEL'S BAND TREES STAND DOWN THE FRAME IT IS BUILT. The band's pixels were read at each pixel the traveller
  * crossed, so a pixel of the grid the stream built after that read kept its band trees until the next crossing - after a
  * load or a teleport, the whole grid's. The band is drawn at the far plane, so the built ground and its flats covered a

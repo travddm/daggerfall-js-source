@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; bible/06-Systems/Firmament.md) - THIS DEVICE'S FIRMAMENT: the character's tree and purses as the
+// FIRM1 - THIS DEVICE'S FIRMAMENT: the character's tree and purses as the
 // account service last said them (server-account/src/firmament.js), and the one change on its way. The law both ends
 // read is net/firmament/firmamentLaw.js.
 //

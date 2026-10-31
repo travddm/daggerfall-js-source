@@ -2,8 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC4 — TIME PLAYED, and why the CLIENT only knocks.
 //
-// Mac (2026-09-22): "Lets add an account registered date and time
-// played to the icon profile."
 //
 // ═══ THE SERVICE'S CLOCK MEASURES IT, NOT THIS ONE ═════════════════
 //

@@ -1,6 +1,4 @@
-// LV1 - LAND VIEW DISTANCE, ENHANCED (2026-09-12). Mac: "I wanna push
-// the draw distance as far as we can push it while keeping performance
-// perfect."
+// LV1 - LAND VIEW DISTANCE, ENHANCED.
 //
 // WHAT THE DISTANCE IS. StreamingWorld.TerrainDistance (StreamingWorld.cs:
 // 55-56, [Range(1,4)], default 3) is the Chebyshev radius in map pixels
@@ -24,7 +22,7 @@
 // grid's radius and the fog's scale - agree, and the tests can pin it
 // without a world.
 //
-// FT2 (2026-09-14, the Features arc): ONE ROW FOR BOTH LANES. Two
+// FT2: ONE ROW FOR BOTH LANES. Two
 // controls sat in two panes - the Enhanced category's Land view distance
 // over the pref, Video's Land View Distance over DFU's key - for the one
 // radius, and a player who set one could not see it had not moved the

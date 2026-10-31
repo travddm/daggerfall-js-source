@@ -1,4 +1,4 @@
-// THE PIXEL GROUND (PX1, Mac's call 2026-08-27: "this is it"). The
+// THE PIXEL GROUND (PX1). The
 // Bayer-dithered night sky behind the enhanced menu's pixel face - a
 // vertical gradient quantized to a six-step ramp through 4x4 Bayer
 // thresholds, two fog blobs mixed the same way, stars scattered on a
@@ -25,7 +25,7 @@ const SCALE = 4;     // one art pixel = 4 css pixels before DPR
 const OVER = 1.5;    // the canvas overdraws 150% so the drift never shows an edge
 
 const hx = (s) => [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)];
-// MEM-AUDIT (2026-10-23): the steps as bytes once - a draw split the strings again at every pixel, a new array each, and
+// MEM-AUDIT: the steps as bytes once - a draw split the strings again at every pixel, a new array each, and
 // the menus redraw the sky eight times a second (62 ms a draw at 1080p in node, 132 at 1440p: over the 125 ms tick)
 const RAMP_RGB = RAMP.map(hx);
 /** MEM-AUDIT: a canvas's ImageData, kept while its size holds - every byte of it is written again each draw. */

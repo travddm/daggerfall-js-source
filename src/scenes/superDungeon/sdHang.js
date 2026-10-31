@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE HANG AND
+// SD-LOOK S11: THE HANG AND
 // THE WORKS ON THE PAGE - the dungeon host's set for what hangs under and around the Hour's islands, as scenes/superDungeon/sdHall.js is
 // for the Orrery's hall. Nothing here is law (no collider, no floor, no clamp - the islands' law is world/superDungeon/sdRealm.js's);
 // every draw carries `noShadow` - the roots and the far islands cast nothing into the lamps' cubes, and nothing that turns

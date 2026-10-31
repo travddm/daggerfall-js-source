@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1d (2026-09-25) — THE DECORATOR, AS THE ROOM'S HOST RUNS IT.
+// DECOR1d — THE DECORATOR, AS THE ROOM'S HOST RUNS IT.
 //
-// Mac: "A UI element that can be clicked to open the decorate panel.
-// Allows free cam mode for placement and an intuitive scrolling menu
-// with filters"; decor "Gold per placement", priced "By size"; online
+// decor "Gold per placement", priced "By size"; online
 // and offline ("kept in the save"). This is the part that joins them:
 // the button stands where the player may decorate, the panel lists the
 // catalogue the scan reads out of the game's own blocks, and a piece
@@ -68,7 +66,7 @@
 // and the ghost is the picture itself, hanging where it will hang. No
 // surface in reach, nothing to hang it on.
 //
-// HOME-DOORS (2026-09-30) - A DOOR IN A DOORWAY. A catalogue door
+// HOME-DOORS - A DOOR IN A DOORWAY. A catalogue door
 // (systems/decor/decorDoorways.js) is never set down where the eye meets a
 // surface: the house's doorways are found (the room finder's links,
 // looked across), every free one is MARKED on the decal pass - green,
@@ -131,7 +129,7 @@ export const DECOR_EYE_REACH = 12;
 export const DECOR_FLOAT_AT = 3;
 /** The preview's turn, degrees a second. */
 export const DECOR_PREVIEW_SPIN = 30;
-/** MENU-ORDER (bible/10-UI/Menu-Order.md): A MODEL'S OWN PICTURE IN ITS TILE - the side of the square of the game canvas
+/** MENU-ORDER: A MODEL'S OWN PICTURE IN ITS TILE - the side of the square of the game canvas
  *  one is drawn in (px, the canvas's own; the grid's tile shows it at 76), how many the frame draws, how long an ask waits
  *  on a model that never comes before its tile keeps the kind's glyph, the turn and the look down it is seen at (a
  *  quarter's view from a little above, as a piece is met in a room). */
@@ -291,8 +289,7 @@ function flyKeep(collider, from, at, skip) {
 const inSkin = (q, b) => [0, 1, 2].every((i) => q[i] >= b[i] - DECOR_FLY_SKIN && q[i] <= b[i + 3] + DECOR_FLY_SKIN);
 
 /**
- * DECOR-SHELL (2026-09-26, a player over the house: "They are there / But its model disappearing / Placing models is
- * different then the ones after"): THE EYE STAYS IN THE ROOM. The free camera flew through walls, floor and ceiling -
+ * DECOR-SHELL: THE EYE STAYS IN THE ROOM. The free camera flew through walls, floor and ceiling -
  * nothing but the leash held it - and the room's faces are one-sided, so from outside the room it was an open
  * dollhouse: a piece set on the ceiling's top or behind a wall looked placed in the room from up there, and was gone
  * from the body's own eye, still listed, still solid, still named through the ceiling. A step from `from` to `to` is
@@ -441,7 +438,7 @@ export function createDecorTool(deps) {
   let spin = 0;
   let named = false;
   let listening = false;
-  // DECOR-ROOMS (2026-09-27, Discord: "For a house with multiple connects, add room switching tabs"): the house's rooms,
+  // DECOR-ROOMS: the house's rooms,
   // found in the room's own collider a few rays a frame while the panel is up (systems/decor/decorRooms.js) - found again for
   // another interior - and the one the owner chose (null: the one the eye stands in)
   /** @type {any} */ let rooms = null;
@@ -1993,8 +1990,7 @@ export function createDecorTool(deps) {
   }
 
   /**
-   * DECOR-TURN (2026-10-06, Mac: "adding the ability to rotate objects on the ground" - a placed piece turned where it
-   * stands, never picked up): A PLACED PIECE TURNED BY `deg` about its upright - a hung one spun on its wall, as its
+   * DECOR-TURN: A PLACED PIECE TURNED BY `deg` about its upright - a hung one spun on its wall, as its
    * placing turns it (systems/decor/decorPlacer.js) - free, its place else as it stands. A door is turned by its doorway (its
    * Move), never here. A yard's piece turned onto the house, a road or another's ground - or one standing higher than a
    * yard's may - is refused as its placing would be (whyNotHere). AUDIT Y1: it turns at once, as the press is made, and

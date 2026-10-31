@@ -1,6 +1,5 @@
 // @ts-check
-// CAPT-CHARTS (2026-10-11, the owner: "giving a reason to players to experience it"; bible/03-World/Captains-Sea.md
-// CAPT-CHARTS) - TREASURE CHARTS: a pirate's papers sometimes hold a chart to a cache sunk off the Bay's coast. Read (the
+// CAPT-CHARTS - TREASURE CHARTS: a pirate's papers sometimes hold a chart to a cache sunk off the Bay's coast. Read (the
 // item used), it is marked on the captain's own charts - a cache CHART_PX map pixels off one of the Bay's ports, in open
 // water, the same cache for the same chart on every client - and the chart is spent; sailed to, the cache floats up
 // beside the ship (the naval host's sites, as a contract's wreck's casks do) and hauled aboard it pays CACHE_GOLD and

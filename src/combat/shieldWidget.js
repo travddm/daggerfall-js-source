@@ -1,5 +1,5 @@
 // @ts-check
-// SW1 (2026-09-19, Mac: "This is the next mod I want to integrate 1:1"):
+// SW1:
 // SHIELD WIDGET 1.6 by RedRoryOTheGlen - ported 1:1.
 //
 // The sibling of WW1 (combat/weapon/weaponWidget.js), by the same author and
@@ -14,7 +14,7 @@
 // `ShieldWidget.cs` its manifest names is not in the bundle, so it was
 // read off the IL method by method with a disassembler written for it.
 // The record, with every method against its home here, is
-// bible/05-Combat/Shield-Widget.md. IL offsets in the notes below cite
+// . IL offsets in the notes below cite
 // that reading.
 //
 // THE SPRITES. 600 of them - four archives (112360 Buckler, 112361
@@ -229,8 +229,7 @@ const nonZero2 = (a) => a[0] !== 0 || a[1] !== 0;
 const clamp = (v, lo, hi) => (v < lo ? lo : (v > hi ? hi : v));
 const rectEq = (a, b) => a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 
-// SHIELD-OUT (2026-09-27, SlipperyPeasant on Discord: "My shield is fully repaired and looks as such inside, but once
-// I'm out in the open world it visually appears as if its broken"): THE MOD HAS ONE COMPONENT, THE PORT ONE PER RIG.
+// SHIELD-OUT: THE MOD HAS ONE COMPONENT, THE PORT ONE PER RIG.
 // Every host builds its own weapon rig and only the host on screen steps it, so a widget sat out every frame another
 // host stepped - the street's through a whole visit to a smith - and resumed on the sprite it last read: its template
 // key had not moved, and only a DOWNWARD crossing (hitShield) repoints the sheet, so a shield repaired indoors stood

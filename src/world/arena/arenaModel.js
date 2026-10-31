@@ -1,8 +1,8 @@
 // @ts-check
-// ARENA1 (2026-10-02): THE COLOSSEUM, MODEL 864102 - Kamer's "Daggerfall Arena" 1.0, read back off the files
+// ARENA1: THE COLOSSEUM, MODEL 864102 - Kamer's "Daggerfall Arena" 1.0, read back off the files
 // tools/daggerfallArenaExtract.mjs wrote (vendor/daggerfall-arena/Models/), and rebuilt into the port's model shape.
 //
-// Mac, 2026-10-02: "The new arena. This is to be a centerpoint that fits in the middle of Daggerfall city." The
+// The
 // prefab is one mesh in DFU's own model space (metres, +Y up, left-handed, Unity's winding - world/meshReader.js
 // mints every classic model in that frame, so the bundle's numbers are used as they stand), its 23 submeshes wearing
 // the classic pictures DFU's RuntimeMaterials puts on them (ApplyClimate 0: no climate, no season), and a

@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC2 — THE CLOUD SAVE, CLIENT SIDE.
 //
-// Mac: "Go in order. Take your time." Step 4 of the arc's build order,
+// Step 4 of the arc's build order,
 // the half that runs in the browser.
 //
 // ═══ IT IS A THIRD DESTINATION FOR A CARRIER THAT ALREADY WORKS ════

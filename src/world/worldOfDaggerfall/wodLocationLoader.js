@@ -29,7 +29,6 @@
 //                      terrainY * 6.4 + pos.z), tile-local.
 //
 // Two readings are taken on purpose and recorded in
-// bible/03-World/World-Of-Daggerfall.md:
 //   - The C# math is float (Mathf / float fields); the flatten below
 //     runs every step through Math.fround so the samples it writes are
 //     the samples DFU's SetHeights received.
@@ -201,7 +200,7 @@ export class LocationSession {
  *   rect:{x:number,y:number,width:number,height:number}}>}
  */
 export function pickLocations(tile, session, getPrefab, pathsPoint = null, siteClear = null) {
-  // FLOW2 (2026-09-26, Mac: "is there a way to really ensure we have a faster workflow with the same standards?"): the
+  // FLOW2: the
   // list is walked on the tile's own pixel alone - every decision the scan below makes, not its 228k-entry pass a tile
   const idx = typeof session.pixelIndex === 'function' ? session.pixelIndex() : null;
   const p = idx ? pixelSlot(tile.mapPixelX, tile.mapPixelY) : -1;
@@ -260,7 +259,7 @@ export function pickLocationsScan(tile, session, getPrefab, pathsPoint = null, s
 /**
  * The loop's state for one tile (FLOW2: the scan's and the walk's).
  *
- * FIELD BUGS 2026-10-18f WOD-SEA-TEST (Mac: "Yes fix WOD"; `01-Overview/Port-Ledger.md` section A): THE SEA ARM ASKS
+ * FIELD BUGS 2026-10-18f WOD-SEA-TEST (; `01-Overview/Port-Ledger.md` section A): THE SEA ARM ASKS
  * THE PIXEL'S OWN REGION. The mod reads `mapRegionIndex` (:117), which GetMapPixelData fills from the pixel's LOCATION
  * alone - and a pixel with one has already left at :103 - so in DFU the arm never fired, and every site its lists name
  * on the sea stood there: rocks off Tlactrn Manor in open water (æther), the rocks ships met (FIELD BUGS 2026-10-02). The
@@ -286,7 +285,7 @@ function considerInstance(st, session, i, t) {
   if ((tx + prefab.height > 128 || ty + prefab.width > 128)) return;
   if ((tx + prefab.height > 127 || ty + prefab.width > 127)) return;
   const rect = { x: tx, y: ty, width: prefab.width, height: prefab.height };
-  // ROADS-CLEAR (2026-09-25, Mac: "Camps, mountains from WOD, shouldnt be placed on roads"): the mod asks only
+  // ROADS-CLEAR: the mod asks only
   // this pixel's byte (:146-151), and a site's pieces reach into the next pixel's road - the port asks the site
   if (st.siteClear && !st.siteClear(session.prefab[i], prefab, rect)) return;
   // :175-230 - types 0 and 2 run the identical smoothing arm and set
@@ -345,7 +344,7 @@ export function flattenForLocation(samples, rect, hDim = HEIGHTMAP_DIMENSION) {
 }
 
 /**
- * FIELD BUGS 2026-10-02b SEA-LEVEL (a departure - Mac: "your ship can get stuck at sea in place"; "Controls for the
+ * FIELD BUGS 2026-10-02b SEA-LEVEL (a departure; "Controls for the
  * player vessel are currently broken, including not being able to lower sails"): THE FLATTEN NEVER RAISES THE SEA
  * past SEA_RAMP samples of the site's own ground. The arm lerps EVERY sample from row 1 to 127 toward the site's mean,
  * and it runs after the tiles are read (OnPromoteTerrainData) - so a site a few metres over the sea lifted its whole

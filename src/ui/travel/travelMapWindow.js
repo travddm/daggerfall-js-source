@@ -569,8 +569,7 @@ export class TravelMapWindow {
     // the mountains' zone - Cyrodiil lies past the Bay, on no page of this map (the held map's continent draws it)
     this._dotsDirty = true;
     this._identifyDirty = true;
-    // SOC6 (Mac: "Party members should be able to be seen on the world
-    // map, regardless of their location"): the party's last drawn
+    // SOC6: the party's last drawn
     // signature and the seconds left until this window asks the host
     // again. The classic page has no per-frame overlay to hang a marker
     // on, so a member IS a dot in the dots buffer - and a buffer is
@@ -791,8 +790,7 @@ export class TravelMapWindow {
         this._dotsBuf[offset] = colors[index] ?? 0;
       }
     }
-    // SOC6 (Mac: "Party members should be able to be seen on the world
-    // map, regardless of their location"): THE PARTY, LAST - over the
+    // SOC6: THE PARTY, LAST - over the
     // roads and over the location dots, because a member standing in a
     // town is the thing the player opened the map to find, and a town
     // is on the page whether or not anyone is standing in it.

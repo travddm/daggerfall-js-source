@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// UI3 (2026-09-27) - THE STATUS WIDGET.
+// UI3 - THE STATUS WIDGET.
 //
-// Mac: "move buffs/debuffs/etc to their own widget space somewhere on
-// the side of the screen, where it doesn't interact with other UI
-// elements, and use square icons with glyphs for each effect (climates
-// and calories included)". The effects were TEXT chips in one row at
+// . The effects were TEXT chips in one row at
 // the foot of the HUD - a spell's name and rounds, a set power's, a
 // felt need's word - under the vitals and the Renown row, so the foot
 // was crowded and the bar had no room for its numbers. They leave it
@@ -38,8 +35,7 @@
 //     waiting, a disease once its incubation is over and by the name
 //     its own message gives it (diseases.js DISEASE_NAMES), an
 //     infection never (DFU says nothing of one until the dream);
-//     DISEASE-UNWELL (FIELD BUGS 2026-10-19f, the owner: "Unnamed
-//     'Unwell' tile"): and while a disease incubates, one tile of no
+//     DISEASE-UNWELL (FIELD BUGS 2026-10-19f): and while a disease incubates, one tile of no
 //     name, "Unwell", on the disease's own spore - where DFU says
 //     nothing, and the rest's and the journey's warnings already said
 //     "diseased".
@@ -189,14 +185,14 @@ export const STATUS_GLYPHS = Object.freeze({
     '.kkaaaaaaaaaakk.', '..kaaaakkaaack..', '..kkaaaaaaackk..', '...kkaaaaackk...',
     '....kakaakck....', '....kaaaccck....', '....kkkkkkkk....', '................',
   ] }),
-  // TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 8.2, 11): two drops of blood - a sweep's BLEED, its own icon on both skins
+  // TELL9 (8.2, 11): two drops of blood - a sweep's BLEED, its own icon on both skins
   bleed: Object.freeze({ pal: { a: '#c8202a', b: '#ff7a6a', c: '#7a0e14' }, rows: [
     '....kkkk........', '....kaak........', '...kkaakk.......', '...kaaaak.......',
     '..kkbaaakk......', '..kbaaaaak......', '.kkbaaaaakk.....', '.kbaaaaaaak.....',
     '.kbaaaaaaak.kkk.', '.kbaaaaaackkkakk', '.kaaaaaaackkaaak', '.kkaaaaacckkaaak',
     '..kkaaacckkkbaak', '...kkkkkkk.kacck', '...........kkkkk', '................',
   ] }),
-  // SKILL-READY (2026-10-20, Dudey: "a symbol ... left of the renown bar when skills are ready to level up"): an arrow
+  // SKILL-READY: an arrow
   // up in the level's gold - the skills a rest or a journey would raise (ui/hud/hudAdvance.js)
   skillup: Object.freeze({ pal: { a: '#ffd24a', b: '#fff6c8', c: '#c8902a' }, rows: [
     '................', '......kkkk......', '.....kkbckk.....', '....kkbbackk....',
@@ -204,8 +200,7 @@ export const STATUS_GLYPHS = Object.freeze({
     '.kkkkbbaacckkkk.', '....kbbaacck....', '....kbbaacck....', '....kbbaacck....',
     '....kbbaacck....', '....kcccccck....', '....kkkkkkkk....', '................',
   ] }),
-  // FIRM-STARS (2026-10-20, Dudey: "a symbol ... on the right of the renown bar" while the Firmament has stars not yet
-  // placed): a five-point star in the night sky's silver-blue (ui/hud/hudAdvance.js)
+  // FIRM-STARS: a five-point star in the night sky's silver-blue (ui/hud/hudAdvance.js)
   firmstar: Object.freeze({ pal: { a: '#bcd4ff', b: '#ffffff', c: '#6f8fd0' }, rows: [
     '......kkk.......', '.....kkbkk......', '.....kbbak......', '....kkbbakk.....',
     'kkkkkbbbaakkkkk.', 'kbbbbbbbaaaaaak.', 'kkbbbbbbaaaaakk.', '.kkaaaabaccckk..',
@@ -318,7 +313,7 @@ export function afflictionRows(entity) {
     }
   }
   if (poisoned) out.unshift({ key: 'poison', name: 'Poisoned', glyph: 'poison' });
-  // TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 8.2): a sweep's BLEED (systems/blowEffects.js) - its ticks left at its foot,
+  // TELL9 (8.2): a sweep's BLEED (systems/blowEffects.js) - its ticks left at its foot,
   // the last blinking, as a spell's rounds
   const bleed = entity?.bleed;
   if (bleed && bleed.left > 0) out.push({ key: 'bleed', name: 'Bleeding', glyph: 'bleed', foot: String(bleed.left), blink: bleed.left < 2 });
@@ -357,7 +352,7 @@ export function statusTiles({ spells = [], powers = [], afflictions = [], needs 
   const tile = (t) => out.push({ foot: null, blink: false, item: false, recovering: false, spell: null, glyph: null, set: null, bundle: null, endable: false, say: null, cost: false, ...t });
   // WILD1: the open zone first - where the player stands is the first thing a glance should say there
   if (zone) tile({ key: 'wild', kind: 'danger', name: String(zone.name ?? ''), glyph: 'wild', foot: zone.foot ?? null });
-  // EVENT-RULES (2026-10-25, the owner: a world event's rules shown, never silent): the made level's own, first - its
+  // EVENT-RULES: the made level's own, first - its
   // regeneration's pause at its foot while it runs
   if (rules) tile({ key: 'rules', kind: 'warn', name: String(rules.name ?? ''), glyph: 'rules', foot: rules.foot ?? null, level: String(rules.level ?? '') });
   if (mentor) tile({ key: 'mentor', kind: 'buff', name: String(mentor.name ?? ''), glyph: 'mentor', foot: mentor.foot ?? null });   // MENTOR2: mentoring, or a mentor beside me

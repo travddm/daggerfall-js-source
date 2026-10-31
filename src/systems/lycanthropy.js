@@ -263,7 +263,7 @@ export function lycanthropyMagicRound(entity, { nowMinutes = 0, clockMinutes = n
   // a forced change already reads the beast; the port's fold is
   // per-round, so the order inside the round is what keeps silver
   // from lagging the change by a round.
-  // TIME2 (Mac, 2026-10-01: "werewolf forms last insanely long"; bible/06-Systems/Online-Time-Arc.md 6.1): ONLINE THE
+  // TIME2 (; 6.1): ONLINE THE
   // FULL MOON IS A NIGHT. The change is forced while the full moon is UP - from the dusk of a full-moon date to the next
   // dawn, on the sky (`moonNight`, which the round runner raises when a host hands the sky: the online lane) - thirty
   // real minutes at the sky's TimeScale 24, not a whole day no rest can shorten. At dawn the lock ends; changing back
@@ -318,7 +318,7 @@ export function lycanthropyMagicRound(entity, { nowMinutes = 0, clockMinutes = n
 export const currentMaxHealth = (entity) =>
   Math.min(entity?.maxHealth ?? 0, (entity?.maxHealthLimiter ?? Infinity) + renownHpOf(entity));   // AUDIT RENOWN1 GAME-4: the online layer rides above the limiter
 
-/** BAL6 (bible/05-Combat/Balance-Arc.md section 12; asked, "Beast-only bonuses"): A DEPARTURE - THE ADVANTAGES ARE THE
+/** BAL6 (; asked, "Beast-only bonuses"): A DEPARTURE - THE ADVANTAGES ARE THE
  *  BEAST'S. DFU's ConstantEffect writes the +40 on four stats and +30 on seven skills every frame in BOTH forms, so a
  *  lycanthrope with a sword in hand, a shield, potions and talk struck at x1.8-2.9 a plain character's damage a second
  *  (the claws added x1.1-1.5 on top) and changing was never the trade it reads as. In beast form they stand whole; in
@@ -437,8 +437,7 @@ export const racialSuppressCrime = (entity) => isTransformedNow(entity);
 export const racialSuppressPopulationSpawns = (entity) => isTransformedNow(entity);
 
 /**
- * WERE-FRIGHT (2026-09-29, Mac: "being a werewolf has a different interaction with guards ... you cannot surrender,
- * but instead a chance to frighten"): THE BEAST'S ANSWER TO THE WATCH. The port's own - neither classic nor DFU has a
+ * WERE-FRIGHT: THE BEAST'S ANSWER TO THE WATCH. The port's own - neither classic nor DFU has a
  * beast that frightens the guards off, and there a transformed lycanthrope with a crime on record is asked to
  * surrender like anyone. Here it cannot surrender; it roars (scenes/arrestFlow.js carries the box). The chance is
  * Mac's pick of the three offered: the beast's level against the level of the guard who halted it - 50%, five points

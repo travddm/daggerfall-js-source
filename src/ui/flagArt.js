@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-COLOURS (2026-10-17, the owner: "Finally, a fully customizable flag with the option to use your guild insignia";
-// bible/03-World/Naval-Refit.md SHIP-COLOURS) - A SHIP'S FLAG, DRAWN. The port's own art, in the heraldry's own hand
+// SHIP-COLOURS - A SHIP'S FLAG, DRAWN. The port's own art, in the heraldry's own hand
 // (ui/heraldryArt.js - its divisions, its forty devices and their holes, painted as a guild's banner paints them), so a
 // guild's arms flown at a masthead are the arms on its hall's door.
 //

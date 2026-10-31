@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-E (2026-09-28) - THE SEA FIGHT'S SOUNDS, at run time: the ten clips tools/navalSfx.mjs synthesises (public/sfx/
+// NAV-E - THE SEA FIGHT'S SOUNDS, at run time: the ten clips tools/navalSfx.mjs synthesises (public/sfx/
 // naval-*.wav, provenance in public/sfx/SOURCES.md) registered on the audio bus under string keys - the door a mod's
 // WAV already uses (audio.registerSound, MW-D40) - and the
 // distances every sound the naval host plays is heard over. DAGGER.SND's own (the splashes, the ship's bell that

@@ -7,7 +7,7 @@
 // [Video] beside twenty-four keys about shadow map resolution. So the
 // screen needs its own taxonomy, and this file is it.
 //
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SCREEN, ONE
+// ORG2: ONE SCREEN, ONE
 // MAP. Settings (DFU's 171 keys in seven categories) and the Features home (the port's own rows and the mods, 96 tiles
 // in seven groups of their own) were two doors over one subject - the grass was under Features > Sight while the field
 // of view was under Settings > Video, and a player wanting "the graphics" opened both. Now one map places EVERYTHING:

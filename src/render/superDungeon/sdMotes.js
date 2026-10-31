@@ -1,6 +1,5 @@
 // @ts-check
-// SD14c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7 and section 16's SD14c;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MOTES - the air of the Shattered Hour made
+// SD14c: THE HOUR'S MOTES - the air of the Shattered Hour made
 // visible. The Deadlands' air carries 896 (render/deadlands.js lifeVertices: embers off the sea and its braziers, ash
 // falling); the Hour carried none. Four kinds, SD_MOTES_TOTAL of them, each a point drawn after the realm's solid
 // geometry, depth-tested and never written, added onto the frame in the Hour's own colours and its fog:

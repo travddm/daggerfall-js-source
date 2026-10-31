@@ -1,6 +1,6 @@
 // @ts-check
-// STAR2 (2026-10-20): WHERE A NIGHT'S STARS FALL - three pixels in the wilds of the night's coven's region, the client's to
-// find over the world's own data, every client finding the same. Design: bible/11-Multiplayer/Starfall.md section 2.
+// STAR2: WHERE A NIGHT'S STARS FALL - three pixels in the wilds of the night's coven's region, the client's to
+// find over the world's own data, every client finding the same. Design:
 //
 // THE GROUND IS THE GATE'S. A star falls on a pixel the Oblivion Gate's scan finds suitable (systems/gate/gateSite.js
 // gateScanner - land, no location on it or its eight neighbours, 2 to 4 pixels from a town a traveller can fast travel
@@ -88,7 +88,7 @@ function theatrePixels(scan) {
 }
 
 /**
- * WW5 (bible/03-World/World-Wide.md WW5): A PROVINCE'S NIGHT - the stars of theatre `lane`'s coven (systems/starfall/
+ * WW5 (WW5): A PROVINCE'S NIGHT - the stars of theatre `lane`'s coven (systems/starfall/
  * starfallCovens.js covensOfLane), drawn by findStarSites' own law over the province's own ground: the gate's suitable
  * pixels of its theatre (systems/gate/theatreGateSite.js scanTheatreGate - the registry's places, TESA's, the land's own
  * water, no place on a pixel or its eight neighbours, two to four pixels from a town) - the province is the coven's land,

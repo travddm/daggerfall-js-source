@@ -1,6 +1,5 @@
 // @ts-check
-// NPC-MARKS (2026-10-21, the owner: "For morrowind models, vendors and quests npcs are hard to find due to everyone looking
-// the same. Could we make a bobbing icon above their character for morrowind specifically?"): THE MARK OVER A HEAD - one
+// NPC-MARKS: THE MARK OVER A HEAD - one
 // small pixel-art icon bobbing over each standing person in a Morrowind body whom a click would take somewhere other
 // than talk: a quest's person (a gold "!"), a merchant (a gold coin) and a guild's servant (a blue gem). What a person IS
 // is scenes/npcMarksHost.js's law; this file draws the icons it hands over.
@@ -14,7 +13,7 @@
 // phase of its own; under reduced motion it holds still. No fog: a mark is a cue for the player's eye, and the lane it
 // rides stands no body past a street's width.
 //
-// AUDIT NPC-MARKS (bible/04-Characters/Morrowind-NPCs.md section 31): the right axis is the billboards' own (`camRight`,
+// AUDIT NPC-MARKS: the right axis is the billboards' own (`camRight`,
 // the HANDEDNESS mirror - mat4.js mirrorProjectionX - flips the view's first row on the screen); the quad stands on its
 // point rather than round it, so a far mark drawn large never sinks into the head; MARK_MIN_RAD keeps two screen pixels a
 // cell (at twelve, a far icon's cells came out one and two pixels wide and shimmered as it bobbed); and nothing is bound

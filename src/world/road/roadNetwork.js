@@ -1,8 +1,6 @@
 // ROADS 1: THE NETWORK IS OURS.
 //
-// Mac, 2026-09-01: "recreate it using it as a resource and avoiding the
-// legal stuff altogether... be as faithful as possible without crossing
-// the line." The resource is Hazelnut's Basic Roads (MIT code; hand-
+// The resource is Hazelnut's Basic Roads (MIT code; hand-
 // authored path data of unstated license). THE LINE: its DESIGN is free
 // to learn from and is credited here as prior art; its DATA - which
 // pixels carry a road and where each leaves - is authored work and none
@@ -473,7 +471,7 @@ export function route(from, to, opts) {
 }
 
 /**
- * ROADS 5 (Mac, first real-data look: "the roads are extremely jagged"):
+ * ROADS 5:
  * THE STATE IS THE CELL AND THE HEADING. Plain A* on an 8-connected grid
  * draws a 1-in-10 slope as nine E steps and one NE, over and over, and
  * the painter turns every one of those changes into a 135-degree kink

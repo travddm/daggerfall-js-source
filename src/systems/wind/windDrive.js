@@ -1,6 +1,4 @@
-// WIND3 (2026-09-14, Mac: "World space wisps that indicate the direction
-// of wind and wind audio without being too loud or overbearing; tree and
-// flora sprite movement with wind") - THE WIND IN EVERY CONSUMER'S UNITS,
+// WIND3 - THE WIND IN EVERY CONSUMER'S UNITS,
 // ONE HOME.
 //
 // WIND1 made the wind a state of its own and WM2b gave every consumer
@@ -78,7 +76,7 @@ export function windDrive(sky, tsec, dt = 0) {
 
 /** The wind with nothing in it - what a consumer takes when its switch is
  *  off, so it winds down through the same path it winds up. */
-/** AUDIT MEADOW1 (2026-10-06, the GPU lens of Mac's "audit everything"): THE GUST WAVE IS CARRIED ACROSS THE FLOATING
+/** AUDIT MEADOW1: THE GUST WAVE IS CARRIED ACROSS THE FLOATING
  *  ORIGIN. The grass's gust (render/labGrass.js LAB_GRASS_VS) and the flats' (render/renderer.js BB_VS) are one wave,
  *  sin(clock x GUST_RATE - along x GUST_K + its own phase), `along` a root's SCENE position down the wind - and every
  *  map pixel crossed moves the scene by the shift, so every blade, tuft and tree took a new place on the wave in one
@@ -121,7 +119,7 @@ export function floraSwayOn(search = globalThis.location?.search ?? '') {
   return isEnhanced() && !!getPref('floraSway') && !swayDisabled(search);
 }
 
-/** PERF-SUN (2026-09-19): the `?sway=off` door, READ ONCE.
+/** PERF-SUN: the `?sway=off` door, READ ONCE.
  *
  *  `floraSwayOn` is called once a frame by each exterior host, and it was
  *  minting a URLSearchParams and parsing the query string every time to
@@ -130,7 +128,7 @@ export function floraSwayOn(search = globalThis.location?.search ?? '') {
  *  and only the URL door is cached. Tiny, and it is the kind of thing that
  *  is only ever tiny one call site at a time.
  *
- *  AUDIT PERF-URL A4 (2026-09-29): the cache is the page's one parse now (systems/pageQuery.js, keyed on the search
+ *  AUDIT PERF-URL A4: the cache is the page's one parse now (systems/pageQuery.js, keyed on the search
  *  string exactly as this door's own memo was). PERF-URL left this door its private copy of the shape, and the home's
  *  "ONE HOME" said otherwise; with no state of its own, AUDIT F1's temporal-dead-zone law is pageQuery.js's to keep. */
 export function swayDisabled(search = globalThis.location?.search ?? '') {

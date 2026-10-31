@@ -1,5 +1,5 @@
 // @ts-check
-// START2 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md section 8): THE WORLD'S STARTS - where a new character's
+// START2: THE WORLD'S STARTS - where a new character's
 // story begins, in the open world's host (src/scenes/fishHost.js is the shape: a module the host wires, owning its state).
 //
 // The boot of a new game stands the classic start first (world.js's U31 start cell, Privateer's Hold, the character
@@ -15,7 +15,7 @@
 // `then(questName)` is the host's own OnStartGame (world.js questInitAtGameStart: the quests, the welcome tour) - run
 // once the character stands where their story begins, so its first popup is read there.
 //
-// THE WRIT (PASSAGE, bible/03-World/Passage.md "The writ"): a start's commission, opened, carries the Crown's writ of
+// THE WRIT (PASSAGE, "The writ"): a start's commission, opened, carries the Crown's writ of
 // passage to the city of Daggerfall - a friendly master at any harbour sails its bearer there for nothing (`writ`).
 import { BAY_START, HAND_START_QUEST, MAIN_QUEST_OPENER, STARTS, carriesWrit, isStartQuestName, startByKey, startSiteId } from '../systems/starts/starts.js';
 import { gameStartQuests } from './quest/questBridge.js';   // AUDIT STARTS W5: a story never begun, begun at its load
@@ -67,7 +67,7 @@ export function createStartsHost(host) {
   const { params, pastBay, quests, teleport, landReady, talk, machine, ready = () => true, landWaitMs = START_LAND_WAIT_MS } = host;
   let chosen = null;
   /** AUDIT STARTS W2: online the Imperial Province is the open zone (systems/wild/cyrodiilZone.js, WW-C2), and every
-   *  dungeon in it is sealed but the day's halls (bible/11-Multiplayer/Wild-Zone.md) - a start there wakes in a dungeon
+   *  dungeon in it is sealed but the day's halls - a start there wakes in a dungeon
    *  the character could never enter again once the realm's page reloads online. A character born online is not
    *  offered it; offline the province is no zone, and the start stands. */
   const zoneShut = (start) => params.has('online') && !!start?.province && start.province === PROVINCE_OF_ID[CYRODIIL_THEATRE];

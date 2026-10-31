@@ -1,8 +1,8 @@
 // @ts-check
-// STAR6 (2026-10-20): THE FALLEN STAR'S TRACKER - a plate over the world for a player within STAR_HUD_M of a star: its
+// STAR6: THE FALLEN STAR'S TRACKER - a plate over the world for a player within STAR_HUD_M of a star: its
 // name (a Heart-Star its own), the town it fell near, the coven come for it, how it stands (the gathering, a wave of
 // four, the master by name, held, lost), its light as a bar and the time to its deadline. Design:
-// bible/11-Multiplayer/Starfall.md section 8. Its reading is the law's (systems/starfall/starfallClient.js
+// Its reading is the law's (systems/starfall/starfallClient.js
 // starTrackerModel); this is the node.
 //
 // MADE ONCE AND UPDATED, never rebuilt: each part written only when what it says changes. DRESSED IN EVERY SKIN, as the gate's bar is - a fight is read whatever skin is worn: under

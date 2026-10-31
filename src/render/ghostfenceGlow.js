@@ -1,5 +1,5 @@
 // @ts-check
-// GHOSTFENCE (bible/03-World/Red-Mountain.md, The Ghostfence): the fence's ghost-light - its curtain shimmering between
+// GHOSTFENCE (, The Ghostfence): the fence's ghost-light - its curtain shimmering between
 // the pylons and a halo about each orb - drawn by the far ring after the volcano's fire, in its two lenses (the world's
 // near, its own past the world's far plane), the cone hiding it where no depth stands (redMountainFire.js `hidden`). It stands on the
 // ground each layer draws: a built pixel's own feet (noteFenceFeet, the pixel build's), the middle ring's kernel eased as

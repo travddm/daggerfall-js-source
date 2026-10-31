@@ -1,7 +1,5 @@
 // @ts-check
-// WAGONS2 (2026-10-09, Mac: "5. Exterior and interior texture customization of the wagons"; asked, "Free, any time" -
-// the outside picked on the Stable card, the caravan's inside in the decorator's paint tab, as the online homes' paint
-// already is, and seen by other players): THE WAGONS' PAINT - THE LAW.
+// WAGONS2: THE WAGONS' PAINT - THE LAW.
 //
 // A wagon's paint is its own, so it rides the wagon item (systems/wagon/wagonKinds.js - a template-93 item, its `wagonKind`
 // beside it): `wagonLook` is `{ o, w, f, c }`, each an index into a list below - `o` the outside paint (every kind), and

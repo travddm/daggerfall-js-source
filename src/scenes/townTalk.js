@@ -145,7 +145,7 @@ export function rayPersonDistance(camPos, fwd, feet) {
   return t / fl * Math.hypot(fwd[0], fwd[1], fwd[2]);
 }
 
-export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, regionIndex, nameBank = null, onCrime = null, topics = null, palette = null, rolls = Math.random, talkEngine = null, onBuildingList = null, otherOverlayActive = null, otherHudCovered = null, keysLive = null, questBuildingSource = null, livingTalk = null, livingTone = null, legacyTopics = null }) {   // LW2: `livingTalk` the living world's doors - { refuses(person) -> text|null, talked(person), caught(person) } (bible/06-Systems/Living-World.md); LEGACY-HOME: `kin(person, talk)` true when one of the player's line took the activation (`talk` the conversation, should they ask for it); LW7: `livingTone(person, taste)` a question's tone, as they took it (TONE-TASTE)   // AUDIT ENH-NOTICE3 C2: `otherHudCovered` is the mode host's previousWindow-chain answer (modes.hudCovered), for the toasts   // AUDIT 63 F49: PlayerGPS.DiscoverBuilding's quest name-override seam ({ currentMapID, isBuildingQuestResource }), null in a host with no topic tree
+export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, regionIndex, nameBank = null, onCrime = null, topics = null, palette = null, rolls = Math.random, talkEngine = null, onBuildingList = null, otherOverlayActive = null, otherHudCovered = null, keysLive = null, questBuildingSource = null, livingTalk = null, livingTone = null, legacyTopics = null }) {     // LW2: `livingTalk` the living world's doors - { refuses(person) -> text|null, talked(person), caught(person) }; LEGACY-HOME: `kin(person, talk)` true when one of the player's line took the activation (`talk` the conversation, should they ask for it); LW7: `livingTone(person, taste)` a question's tone, as they took it (TONE-TASTE)   // AUDIT ENH-NOTICE3 C2: `otherHudCovered` is the mode host's previousWindow-chain answer (modes.hudCovered), for the toasts   // AUDIT 63 F49: PlayerGPS.DiscoverBuilding's quest name-override seam ({ currentMapID, isBuildingQuestResource }), null in a host with no topic tree
   // RP1 - THE REGION IS READ LIVE, NOT CAPTURED AT BOOT.
   //
   // This took a plain number, and the world host had no choice but to
@@ -240,7 +240,7 @@ export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, reg
   // three times. The locals below are the pre-engine fallbacks, used
   // only when no talkEngine is mounted (no game data, no window).
   //
-  // AUDIT-TALK (2026-09-15) named the one host that actually runs on
+  // AUDIT-TALK named the one host that actually runs on
   // them, because the arc never had: `scenes/exterior.js` mounts
   // createTownTalk with FIVE seams and no `talkEngine` at all, so in
   // that host there is no npcSession, no answerPipeline, no topic tree
@@ -339,7 +339,7 @@ export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, reg
       },
     };
   }
-  /** IC-PROPS (bible/03-World/Arena-Provinces.md IC-PROPS): A BUILDING'S NAME IN THE TOWN IT STANDS IN - the directory's row
+  /** IC-PROPS (IC-PROPS): A BUILDING'S NAME IN THE TOWN IT STANDS IN - the directory's row
    *  where that town is the talk's own (its topics', the player's pixel's), else BuildingNames' law over that town's own
    *  names (`place` a DFLocation: a neighbouring slice of the Imperial City, a town across a pixel's edge) - so a door's
    *  plaque and its shop name the door's own building, never the player's town's building under the same key. `data` the
@@ -369,7 +369,7 @@ export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, reg
       // (the host's `yards`, the location's frame) as rows beside its buildings - the Where-is page, the compass, the
       // knowledge roll and the map's mark all read a place from this one list (systems/merchantYards.js yardDirectoryRows)
       directory.push(...yardDirectoryRows(topics.yards));
-      // SHIPYARDS-FOUND (Mac: "Everything should show on the map/overworld and be able to be asked by NPCs"): a port town's
+      // SHIPYARDS-FOUND: a port town's
       // shipyard, its crew hall, its lighthouse and its docks (the host's `ports`, the location's frame), rows as the
       // yards' are (systems/portPlaces.js portDirectoryRows)
       directory.push(...portDirectoryRows(topics.ports));
@@ -460,7 +460,7 @@ export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, reg
     // the readout's own two keys reach it through routeAction's yield
     // and its own toggle, not through here.
     if (overlay && talkPaused()) {
-      // CG2 (Mac: "unable to type in your name"): a key typed into a DOM
+      // CG2: a key typed into a DOM
       // text field - the enhanced wizard's name boxes stand over the
       // canvas as real <input>s - is the FIELD's. This rung used to
       // preventDefault every key under an overlay, so the browser never
@@ -1025,7 +1025,7 @@ export function createTownTalk({ renderer, canvas, fetchBytes, playerEntity, reg
         tone: () => tone,
         setTone: (t2) => { tone = t2; },
         npcName,   // AUDIT 18 F5: the NPC's OWN name, not the People faction
-        // PLAIN-UI (bible/10-UI/Plain-Words.md): a living resident's regard of the player, for the enhanced panel's badge -
+        // PLAIN-UI: a living resident's regard of the player, for the enhanced panel's badge -
         // null for anyone else (the classic face draws DFU's TALK01I0 and nothing it has no rect for)
         regard: () => (_toneTarget ? livingTalk?.regard?.(_toneTarget) ?? null : null),
         // AUDIT 63 F5: OnPop's `PlayerEntity.Notebook.AddNote(

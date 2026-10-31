@@ -3,9 +3,8 @@
 // REALM P1.2 — THE REALM'S CHARACTERS, CLIENT SIDE: the calls, and the
 // playing tab's session - its lease, its sequence and its checkpoints.
 //
-// Mac: "A true separation while allowing people to still play offline";
 // decision 1, "Account service". The service's half is
-// server-account/src/realm.js; the plan is bible/06-Systems/Realm-Arc.md
+// server-account/src/realm.js; the plan is
 // section 2.
 //
 // ═══ THE SERVICE IS THE TRUTH, SO THE SESSION FOLLOWS ITS WORD ════════
@@ -84,7 +83,7 @@ async function realmAsk(io, path, { method = 'GET', json = null, raw = null, hea
   if (pass) headers[SESSION_PASS_HEADER] = pass;
   if (json) headers['content-type'] = 'application/json';
   if (raw != null) headers['content-type'] = 'application/octet-stream';
-  // AUDIT SCALE II A-2 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): A WRITE FORGETS THE PAGE'S
+  // AUDIT SCALE II A-2: A WRITE FORGETS THE PAGE'S
   // D1 BOOKMARK, before it is sent and once it is answered (net/accountClient.js D1_BOOKMARK_READS: a join, a create, a
   // checkpoint answer no bookmark, so the next read after one - the account view, the heartbeat - must start at the
   // primary, never at a position from before it)
@@ -259,7 +258,7 @@ export function idleKeyOf(text, summary = null) {
   return JSON.stringify([rest, summary]);
 }
 
-/** RESCUE-PACK (2026-09-30, Mac: "Do it"): A LONG LIFE'S COPY RIDES PACKED. The copy was the save's text, and a save
+/** RESCUE-PACK: A LONG LIFE'S COPY RIDES PACKED. The copy was the save's text, and a save
  *  big enough to need REALM-GZIP's packing on the wire (past 4 MiB) will not fit a browser's storage (5-10 MB an origin)
  *  - so the players with the most to lose kept no copy there. A save past REALM_UNSENT_PACK_OVER characters is kept
  *  gzipped (REALM-GZIP's own codec), as base64 under `REALM_UNSENT_PACKED`, which no JSON text begins with. Packing is
@@ -597,7 +596,7 @@ export function createRealmSession({
     lost = error;
     try { onLost(error); } catch (e) { console.warn('[realm] the lost handler failed', e); }
   };
-  // INT3 (bible/06-Systems/Integrity-Arc.md): THE JUDGE'S HOLD, as the last landed checkpoint said it - null for none,
+  // INT3: THE JUDGE'S HOLD, as the last landed checkpoint said it - null for none,
   // undefined before any answer said (a service from before the judge says nothing). `session.onTradeHeld(prev, now,
   // why)` is told each time it moves - `why` the first thing the law found (`{ code, t }`, its template), when the law
   // holds it (AUDIT INT: an honest player held over a piece was never told which); the answer a checkpoint's callers get

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA14 (bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY'S OWN WORKER.
+// TESA14 (TESA14) - THE ROADS PAST THE BAY'S OWN WORKER.
 //
 // A region's network is seconds of work - its places rolled (the countryside's plateau is a terrain kernel's mean) and
 // a thousand-odd A* runs - so it is built here, off the terrain worker whose jobs stream the ground under the player,

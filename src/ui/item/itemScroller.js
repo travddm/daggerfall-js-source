@@ -252,7 +252,7 @@ export function drawCellBackground(renderer, m, rect, slot, colour) {
   return true;
 }
 
-/** DISC22-D (2026-09-24, kurkku: "Steel light flail sprite doesn't show up"): THE RECORD'S DECODE, BEFORE ITS UPLOAD -
+/** DISC22-D: THE RECORD'S DECODE, BEFORE ITS UPLOAD -
  *  GetItemImage's TryImportTexture(archive, record, 0, item.dyeColor) (ItemHelper.cs:458), which DFU makes at the
  *  moment it draws. AUDIT-DW F1 made it an OPTIONAL hook on the host's icons object, and none of the seven scenes that
  *  build that object ever passed it: a lazy replacement (Roleplay Realism Items' 514-526, Diverse Weapons' 233/234)

@@ -1,10 +1,9 @@
 // @ts-check
-// LEFAY1 (2026-10-08, asked: "In the middle of gothway garden, I want to build and implement a monument to Julian LeFay,
-// one of the creators of daggerfall, with the ability of people to interact and throw flowers on it"): THE MONUMENT TO
+// LEFAY1: THE MONUMENT TO
 // JULIAN LEFAY, ITS LAW - where it stands outside Privateer's Hold, what it is made of, what its plaque says, and where
 // a flower thrown at it comes to rest. Pure: no renderer, no GL, no clock (scenes/lefayMonumentHost.js stands it).
 //
-// WHERE (HOLD-MONUMENT, 2026-10-14, Mac: "Move julian monument to outside of privateers hold"; LEFAY1 stood it in the
+// WHERE (HOLD-MONUMENT, 2026-10-14,; LEFAY1 stood it in the
 // middle of Gothway Garden): outside Privateer's Hold - the Daggerfall region's dungeon every new character climbs out
 // of, its exterior the one 1x1 block CUSTAA30.RMB - in every read of it, Daggerfall's own layout or a pack's. The
 // location's own navgrid says what is open (world/city/cityNavigation.js: DFU's CityNavigation carve, every automap byte a

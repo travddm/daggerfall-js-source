@@ -1,7 +1,5 @@
 // @ts-check
-// LOOT-GATE (2026-10-25, Dudey: two streamers found Legendaries at level 1 and 2 and never used another weapon; "early
-// game 1-8/9/10ish swap out between blue gear, then at roughly 10/11ish you start finding yellow gear rarely and then
-// legendaries get a small increase of chance to drop").
+// LOOT-GATE.
 //
 // THE ROLLER'S LEVEL SCALES THE TOP OF THE LADDER. Every rarity roll read its source alone - a Crypt's pile is tier 9
 // whoever opens it - so a level 1 character met a Legendary in about one Crypt in three. Now the Rare and Legendary

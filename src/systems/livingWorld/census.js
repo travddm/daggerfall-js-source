@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE CENSUS - who lives in a town, minted from the town itself.
+// LW1: THE CENSUS - who lives in a town, minted from the town itself.
 //
 // TWO ROLLS, BECAUSE TWO READERS. A traveller is read from far off - the roads near the player, a town a caravan is
 // bound for, the dungeon an adventurer dives - where nothing but the MAPS row is at hand; so a town's TRAVELLERS
@@ -39,7 +39,7 @@ export const JOBS = Object.freeze({
   labourer: 'labourer', farmer: 'farmer', fisher: 'fisher', crafter: 'crafter', homemaker: 'homemaker', beggar: 'beggar',
   merchant: 'merchant', mercenary: 'mercenary', adventurer: 'adventurer', sailor: 'sailor', pilgrim: 'pilgrim',
   courier: 'courier', pedlar: 'pedlar',
-  // LW9 (bible/06-Systems/Living-World-II.md): the road's new traffic
+  // LW9: the road's new traffic
   carter: 'carter', hunter: 'hunter', patrol: 'patrol', noble: 'noble', retainer: 'retainer', minstrel: 'minstrel',
 });
 /** The jobs that travel (trips.js): the traveller roster's own. */

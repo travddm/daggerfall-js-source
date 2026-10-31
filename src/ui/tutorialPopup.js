@@ -1,4 +1,4 @@
-// TUT1 (2026-10-11): THE TUTORIAL POPUP - a page of systems/tutorialCatalogue.js on the live host's slot, the first
+// TUT1: THE TUTORIAL POPUP - a page of systems/tutorialCatalogue.js on the live host's slot, the first
 // time the player reaches the system it explains.
 //
 // THE DOOR IS THE MESSAGE BOX'S. A tutorial page is a DaggerfallUI.MessageBox in every way that matters: it is

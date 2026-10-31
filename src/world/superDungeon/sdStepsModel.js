@@ -1,5 +1,5 @@
 // @ts-check
-// SD7b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS, MADE -
+// SD7b: THE UNMOORED STEPS, MADE -
 // the meshes the course's steps are and the triangles they stand in the collider as, and the checkpoints B and C. Pure:
 // the scene (scenes/superDungeon/sdSteps.js) uploads them, stands each step where the law (world/superDungeon/sdSteps.js) puts it, and moves it.
 //
@@ -10,7 +10,7 @@
 //   THE CHECKPOINTS B and C - islands as the first step is (A, world/superDungeon/sdHall.js), at their heights.
 //   THE BREATH'S STREAKS (AUDIT SD II) - brass light blowing across the Crumble, the Warp's breath seen (buildBreathModel).
 //
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 8): EVERY STEP SHOWS WHAT IT WILL DO NEXT.
+// SD-LOOK S9: EVERY STEP SHOWS WHAT IT WILL DO NEXT.
 // Nothing here is larger than the law: every step's mesh stands inside its collider's box (stepBox, stepTris untouched).
 //   THE STEPS bevelled, one atlas a kind (world/superDungeon/sdStepsArt.js) - a chamfer round the top and the foot, the gold line under
 //     the rim, about 36 triangles, one draw; a riser's face set back SD_RACK.out so its rack of eleven brass teeth (like

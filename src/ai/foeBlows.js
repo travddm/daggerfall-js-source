@@ -1,6 +1,5 @@
 // @ts-check
-// TACT4 - TELEGRAPHED BLOWS (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Introducing new attack patterns
-// and smaller telegraphed attacks (like our world boss) but not overdoing it"; his calls: one or two, tier-based -
+// TACT4 - TELEGRAPHED BLOWS (;; his calls: one or two, tier-based -
 // level 10 and up, or an elite foe; since TELL7 a champion and a revenant too).
 //
 // The world boss's language at a foe's scale: a short wind-up with its shape drawn on the ground where it will land,
@@ -95,7 +94,7 @@ export function blowPhase(b, now) {
 const _live = new Map();
 export function liveBlows() { return _live; }
 export function setLiveBlow(ai, b) { if (b) _live.set(ai, b); else _live.delete(ai); }
-/** AUDIT TELL (bible/12-Enhanced-AI/Feud-Arc.md 3.2, built at last): a wind-up its poise broke SHATTERS - its mark a
+/** AUDIT TELL (3.2, built at last): a wind-up its poise broke SHATTERS - its mark a
  *  white, cracked flash going out over BLOW_SHATTER, never a landing's look (which is white-hot and whole). */
 export const BLOW_SHATTER = 0.25;
 /** The shattering marks: `{ blow, at }`, drawn until BLOW_SHATTER past `at`. */

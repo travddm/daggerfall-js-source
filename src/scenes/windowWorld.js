@@ -14,8 +14,7 @@
 // beside the paralysed player all that time - a shelter. And the dungeon's foes are ONE simulation a room (WORLD2): the
 // room's host steps them for everyone, so its window froze every foe its party fought, which went on taking their blows
 // (the host's damage door answers a peer's hit off the network, window or not) - a party member killed them freely. Above
-// ground none of this held since WINFOE1 (2026-09-17, Mac: "enemies should still be able to do damage - a window
-// (inventory, status, quest) no longer zeroes their clock; only your own input/camera pause"); the dungeon was the pool
+// ground none of this held since WINFOE1; the dungeon was the pool
 // it never reached.
 //
 // THE LAW. Online - the shared clock on - a window holds no dungeon while the player lives under it: the frame runs (the

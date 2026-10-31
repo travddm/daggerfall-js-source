@@ -1,10 +1,9 @@
 // @ts-check
-// NAV-C (2026-09-28, Mac: "introduce actual sailing ships to the world that players can encounter and pillage") -
+// NAV-C -
 // THE CAPTAINS: how a ship of the Iliac Bay sails, keeps off the rocks and off other hulls, and fights. The port's own;
 // pure - the host hands the wind, a water test and what else is at sea, and gets the ship moved and its volleys back.
 //
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag") rebuilt the seamanship on what the movement
+// AUDIT NAV1 rebuilt the seamanship on what the movement
 // audit measured: ships that stalled head to wind for minutes, spun like tops in a tenth of their own length, sailed
 // through each other and over thin spits, and could never force, hold or chase a fight at half the player's speed.
 //
@@ -54,8 +53,7 @@
 // waters has reached NAVY_HUNTS (NAV-D) or they have fired on it or on a lawful ship it saw; a merchant fights no
 // one and fires back only at who fired on it. `hostile(a, b)` is that table; `provoke` records a blow.
 //
-// SEA-PEACE (2026-09-29, the player: "some ships should be passive, not all should be hostile. Enemy AI and Friendly
-// AI should engage in their own encounters naturally") - A CAPTAIN'S TEMPER (`temperOf`), drawn off her seed so every
+// SEA-PEACE - A CAPTAIN'S TEMPER (`temperOf`), drawn off her seed so every
 // client in a room reads the same one: a merchant is PEACEFUL, a navy DUTIFUL (the table above), and a pirate BOLD -
 // she takes anything her trade takes, as every pirate did - or, all but BOLD_SHARE of them (never the flagship, nor
 // Warm Ashes' raiders, whom the host makes bold), WARY: she takes only a prize she outguns - her FIGHTING POWER
@@ -67,13 +65,13 @@
 // her (navalHost.js takePrize). THE GUNS ARE HEARD: a navy with no enemy in sight answers gunfire within HEAR_GUNS_M
 // of her fired in the last HEAR_S (`world.gunfire`), and sails for it until its fight is in her own lookout.
 //
-// SHIP-WATCH (2026-10-01, Mac: "I also want to keep improving the AI") - BY NIGHT (`world.night`) her lookout sees a
+// SHIP-WATCH - BY NIGHT (`world.night`) her lookout sees a
 // contact only as far as its lanterns show it (shipWatch.js nightSight: a lit one NIGHT_LIT_SIGHT, a dark one
 // NIGHT_DARK_SIGHT - `c.lit`), and a threat to run from no farther: a pirate running dark comes up on a merchantman
 // unseen, and a player who douses their lanterns slips past a pirate at a cable's length. The guns are heard as ever,
 // and a ship that fired in the last GUNS_SEEN_S is seen by her flashes as a lit one is.
 //
-// SEA-EASE (2026-10-01, Mac: "Friendly AI should help the player in combat") - A CROWN'S SHIP STANDS BY A LAWFUL PLAYER.
+// SEA-EASE - A CROWN'S SHIP STANDS BY A LAWFUL PLAYER.
 // Of the pirates in her lookout, one fighting a player she does not hunt (`standsBy`: in her fight or coming alongside
 // them) is hers first - chosen as if AID_PRIORITY nearer than she is - so the cutter that comes up on a fight takes the
 // pirate on the player's quarter, not the one a mile off; the director sends her (navalDirector.js THE RELIEF) and the
@@ -185,7 +183,7 @@ export const GRAPPLE_RANGE = 28;
 export const GRAPPLE_GAP = 12;
 export const GRAPPLE_HULL = 0.35;
 export const GRAPPLE_STILL = 1.2;
-/** SEA-EASE (Mac: "The sea is too dangerous right now"): a boat lying still is grappled after a quarter of a minute, not
+/** SEA-EASE: a boat lying still is grappled after a quarter of a minute, not
  *  five seconds - a captain who stops to look about is not boarded for it. */
 export const GRAPPLE_STILL_S = 15;
 export const GRAPPLE_CREW = 6;
@@ -229,7 +227,7 @@ export const PROVOKED_S = 300;
  *  gunners' skill a player's boat is sized up at (a class's `skill` is her own); and how far and how long a navy hears
  *  gunfire (m, s). */
 export const TEMPERS = Object.freeze({ peaceful: 'peaceful', dutiful: 'dutiful', bold: 'bold', wary: 'wary' });
-/** SEA-EASE (Mac: "The sea is too dangerous right now"): a quarter of the pirates bold (two in five were). */
+/** SEA-EASE: a quarter of the pirates bold (two in five were). */
 export const BOLD_SHARE = 0.25;
 export const WARY_ODDS = 1.25;
 export const PLAYER_GUN_SKILL = 0.6;
@@ -471,7 +469,7 @@ export function temperOf(cls, seed, { bold = BOLD_SHARE } = {}) {
  * @typedef {Readonly<{ hull: number, hullHp: number, hullShare: number, crewShare: number, crew: number, strikes: boolean,
  *   skill: number, range: number, turn: number, crewed: boolean, tactic: string, player: boolean }>} FighterMeasure */
 /**
- * SEA-PEACE: a ship's FIGHTING POWER - AUDIT NAV2 F25 (Mac: "Model crew losses"): no longer one number (her weight of
+ * SEA-PEACE: a ship's FIGHTING POWER - AUDIT NAV2 F25: no longer one number (her weight of
  * metal times the hull she has left, which counted a hull's hurt a salvo only, so a sloop - whose swivels take two men a
  * ball, and a ship with no hands strikes - was fifteen times weaker than the cutter she beat 6 duels in 8, and a war
  * galley that could not lay a gun on her stronger still) but HER MEASURE, what one ship is sized against another by
@@ -856,7 +854,7 @@ export function stepCaptain(ship, world) {
     const held = c.id === ship.target && (ship.mode === 'engage' || ship.mode === 'board');
     const lit = !!c.lit || !!flashed?.has(c.id);
     const see = nightSight(sight, { night: !!world.night, lit });   // SHIP-WATCH: by night, by her lanterns (or her guns)
-    // NAV-COST (2026-10-12): her sight asked FIRST - `hostile` (a wary pirate sizing a quarry up: shipPower, fightingPower)
+    // NAV-COST: her sight asked FIRST - `hostile` (a wary pirate sizing a quarry up: shipPower, fightingPower)
     // was asked of every ship in the sea, every frame, for each of mine, and nearly all of them hundreds of km off. Both
     // halves read nothing they change, so the answer is the one it was.
     if (dist < (held ? see * DISENGAGE : see) && hostile(ship, c, world) && !((ship.spare.get(c.id) ?? -Infinity) > ship.clock)) {
@@ -906,8 +904,7 @@ export function stepCaptain(ship, world) {
     } else { ship.mode = 'engage'; ship.berthSide = 0; plan = engageCourse(ship, enemy, enemyD, world, isWater); }
   } else if (prize && ship.damage.crew > 0 && ship.cls.faction !== 'merchant') {
     // SEA-PEACE: the end of her fight - alongside the ship that struck to her, to take her: she has surrendered, so any
-    // men to send will do (GRAPPLE_CREW is for carrying a deck that fights - a player's). AUDIT NAV2 F30 (Mac: "No, they
-    // sail on"): a merchantman takes no prize - navies and pirates do
+    // men to send will do (GRAPPLE_CREW is for carrying a deck that fights - a player's). AUDIT NAV2 F30: a merchantman takes no prize - navies and pirates do
     ship.mode = 'board';
     ship.target = prize.id;
     plan = boardCourse(ship, prize, world.wind, isWater);
@@ -970,7 +967,7 @@ export const GRAPE_KEEP = 1.5;
 /** SHOT-KINDS: the load groups a captain loads (the barrels carry none). */
 const CAPTAIN_GROUPS = Object.freeze(['starboard', 'bow']);
 /**
- * SHOT-KINDS (bible/03-World/Naval-Refit.md) - A CAPTAIN'S LOADS. Every captain fights her bores' own loads (navalShips.js
+ * SHOT-KINDS - A CAPTAIN'S LOADS. Every captain fights her bores' own loads (navalShips.js
  * GUNS: round shot, her chasers' chain), but a PIRATE who means to board loads her broadsides and her chasers with GRAPE
  * the moment she decides to (mode `board` - the guns drawn and loaded again while she closes, navalGunnery.js
  * SHOT_SWITCH): Black Flag's boarders sweep the deck they will take, and grape (shotKinds.js SHOT.grape: a fifth of a
@@ -1428,7 +1425,7 @@ function boardCourse(ship, enemy, wind, isWater) {
   const still = Math.hypot(v[0], v[2]) < GRAPPLE_STILL;
   const sweeps = still && d <= SWEEP_RANGE ? Math.min(SWEEP_WAY, pace) : 0;
   if (wp) return { want: headingTo(ship.pos, wp), goal: wp, sails, sweeps, sailable: sweeps > 0 };
-  // GALLEON (2026-10-01): THE LAST LEG INTO A SOUNDED BERTH - the berth open and the straight leg to it sounded clear
+  // GALLEON: THE LAST LEG INTO A SOUNDED BERTH - the berth open and the straight leg to it sounded clear
   // (routeTo: no way round wanted), within her lookout's reach of it, she comes in on it as a moored ship berths
   // (shipLife.js), never swung off it by the lookout's LOOKAHEAD_MIN past the berth: the new galleon's narrower hull lies
   // closer in to the boat she boards, and the land 31 m beyond a prize held her off the grapple's reach for good
@@ -1443,7 +1440,7 @@ function boardCourse(ship, enemy, wind, isWater) {
 export const __boardCourse = boardCourse;
 
 /** AUDIT NAV2 F22: whether she can lie at a berth - her stem, middle and stern there, on her keel line and her outer
- *  side (the hull she berths by along `f`, her side of it `side` along `r`), all on water. GALLEON (2026-10-01): her
+ *  side (the hull she berths by along `f`, her side of it `side` along `r`), all on water. GALLEON: her
  *  outer side SCAN_MARGIN out, as every leg to it is sounded (legClear) - the new galleon's narrower hull fitted a berth
  *  0.4 m off a spit that no leg could sound its way into, and she gave the boarding up. */
 function berthOpen(ship, berth, f, r, side, isWater) {

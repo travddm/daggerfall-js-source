@@ -122,8 +122,7 @@ export const GUILDS = Object.freeze({
     name: 'FightersGuild',
     guildGroup: GUILD_GROUPS.FightersGuild,
     factionId: GUILD_FACTION_IDS.FightersGuild,
-    // FGH2H (2026-09-24, Mac: "change the fighter guild requirements where it
-    // allows bare handed"): HandToHand joins DFU's seven (FightersGuild.cs's
+    // FGH2H: HandToHand joins DFU's seven (FightersGuild.cs's
     // guildSkills) and Giantish stays - a DEPARTURE, rowed in the Port-Ledger
     // (this file), in both lanes. Added, never swapped: the rank law counts
     // skills past a bar, so one more only lets a fist-fighter in and turns no
@@ -305,7 +304,7 @@ export function updateRank(memberships, guild, entity, store, now, ctx = null) {
   const m = membershipOf(memberships, guild);
   if (!m) return null;
   const today = daySinceZero(now);
-  // PROMO-NOW (FIELD BUGS 2026-10-15; Mac, asked: "No wait"): online (`ctx.promoteWhenEarned`, the host's) a PROMOTION
+  // PROMO-NOW (FIELD BUGS 2026-10-15): online (`ctx.promoteWhenEarned`, the host's) a PROMOTION
   // does not wait the 28 days - the review promotes the moment the member qualifies. The Roll's paced reputation already
   // paces the ranks (ten a rank, at most 15 a day). Demotion, probation and expulsion keep DFU's wait.
   const waited = !(today < m.lastRankChange + DAYS_BETWEEN_RANK_CHANGES);   // DFU's own test, negated: an unread stamp opens it

@@ -1,5 +1,5 @@
 // @ts-check
-// LW3 (2026-10-04, bible/06-Systems/Living-World.md): THE WAYS - the road a town's travellers walk to another town, the
+// LW3: THE WAYS - the road a town's travellers walk to another town, the
 // Travel Options planner's own (`systems/travel/travelRoute.js planRoute`) on the roads the world draws. The living world's
 // planner is HERE, not in the host: the host's one construction seam (TO-ROADS, test/systems/travel/fb0929d_toroads.test.js) is the
 // player's journey's, and a traveller's way is none of the player's settings.
@@ -11,8 +11,7 @@
 // when Basic Roads is on, the port's own generated one when it is off). A different network is a different road: the
 // book is cleared when the network it planned on changes, and the host's trips with it (`generation`).
 //
-// A FEW A FRAME (LW3), AND MORE WHILE THE ASKING IS CHEAP (PERF-WAYS1, 2026-10-09, Mac: "I want to continue working to
-// increase performance across the board, especially for online"; bible/07-Rendering/Performance-Online.md). A pair not
+// A FEW A FRAME (LW3), AND MORE WHILE THE ASKING IS CHEAP (PERF-WAYS1, 2026-10-09,). A pair not
 // yet asked answers undefined and the trips wait on it; `frame()` renews the asking: WAYS_PER_FRAME new pairs at the
 // least, then more while the frame's asking has taken under WAYS_MS_PER_FRAME, and never past WAYS_MAX_PER_FRAME (a
 // coarse clock can read a pair as nothing). The waiting was the dear part, not the asking: measured in the real game
@@ -37,7 +36,7 @@ export const WAYS_MS_PER_FRAME = 2;
 export const WAYS_MAX_PER_FRAME = 32;
 
 /**
- * WW7-7 (bible/03-World/World-Wide.md): A PAIR PAST THE BAY is its own planner's (`beyond` - systems/livingWorld/beyondWays.js
+ * WW7-7: A PAIR PAST THE BAY is its own planner's (`beyond` - systems/livingWorld/beyondWays.js
  * createBeyondWays: the one planner on a window of the world's grid, the roads past the Bay its roads), kept by the build
  * of the roads past the Bay it was asked on (`beyond.epoch()` - 0 before the first: undefined, it waits, as a pair unasked
  * does; WW7-9: the planner itself waits while the land under the pair's window is still being laid): the roads laid again,

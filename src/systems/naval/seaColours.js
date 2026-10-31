@@ -1,6 +1,5 @@
 // @ts-check
-// SEA-COLOURS (2026-10-17, the owner: "enemies and merchants should have their own unique liveries, flags hosted, etc";
-// bible/03-World/Naval-Refit.md SEA-COLOURS) - EVERY SHIP OF THE SEA IN HER OWN COLOURS: her paint (SHIP-LIVERY's law,
+// SEA-COLOURS - EVERY SHIP OF THE SEA IN HER OWN COLOURS: her paint (SHIP-LIVERY's law,
 // systems/naval/shipLivery.js) and a flag of cloth at her masthead (SHIP-COLOURS' law, systems/naval/shipFlag.js), as the
 // player's own ships wear and fly them - where the sea's ships sailed as built under the mod's pennant, tinted by their
 // faction alone (navalShips.js NAVAL_FACTIONS `flag`). The port's own: Daggerfall has no sea. Pure.

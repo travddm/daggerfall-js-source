@@ -1,5 +1,5 @@
 // @ts-check
-// TESA8 (2026-10-12, the owner: "Populating the world with its own dungeons"; bible/03-World/Arena-Provinces.md TESA8) -
+// TESA8 -
 // THE LAIRS PAST THE BAY: labyrinths, keeps, ruins and graveyards as thick on the ground as the Bay's, each laid
 // out of Daggerfall's own dungeon blocks in a plan of its own - never a copy of a Bay dungeon's. Pure: the world host
 // (scenes/world.js `_locationToBuild`) asks it of a pixel past the Bay that Arena's places and the countryside (TESA7,

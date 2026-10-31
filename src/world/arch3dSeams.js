@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DUNGEON-SEAMS (2026-09-26, a player, relayed by Mac: "if you look
-// around stairs and curved cellings in dungeons, you can spot holes
-// leading into void, sometimes you can even see other rooms through
-// those holes") - THE HOLES IN DAGGERFALL'S OWN MODELS, CLOSED.
+// DUNGEON-SEAMS - THE HOLES IN DAGGERFALL'S OWN MODELS, CLOSED.
 //
 // The holes are the data's, not the port's: Arch3dFile reads ARCH3D
 // byte for byte as DFU does (the parity harness, AUDIT 18; DFU's own

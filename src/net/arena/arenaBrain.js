@@ -1,13 +1,12 @@
 // @ts-check
-// ARENA4 (2026-10-02, Mac: "Players can choose to watch AI fights, player fights, join a team (red and blue) and climb
-// esclating tiers of opponents, or choose to matchmake for a real opponent to take on in real time"): ONE BOUT ON THE
+// ARENA4: ONE BOUT ON THE
 // RELAY - the bout law (systems/arena/arenaBout.js, the same law every screen runs) on the relay's clock, its referee (PVP-REF,
 // Seats-Arc 6.1, built here: the relay holds every fighter's vitality and believes as much of a blow as its reach, its
 // rate, its weapon and its bucket allow) and, on the ladder, its AI fighters - the gate's `gateBrain` pattern on the
 // floor's flat ground, no pathing: each walks straight at its nearest foe, telegraphs its blow and lands it if the foe is
-// still in reach. Design: bible/11-Multiplayer/Arena.md "7. Online". ARENA4b: and THE HOUR'S EXHIBITION (Arena.md 2 -
+// still in reach. Design: "7. Online". ARENA4b: and THE HOUR'S EXHIBITION (Arena.md 2 -
 // "the relay runs it, every client sees one bout"): two of those fighters against each other, the hour's pair
-// (net/arena/arenaExhibition.js exhibitionFor), nobody on the sand but them and everybody in the stands. ARENA6 (2026-10-03):
+// (net/arena/arenaExhibition.js exhibitionFor), nobody on the sand but them and everybody in the stands. ARENA6:
 // AND A PRIVATE SESSION (`arena:p<code>`) - its host, its members and its recent results as plain data the room keeps
 // beside its bout (`openSession` ... `sessionWord`), and its bouts the casual players' bout with every fighter equally
 // whole (`openBout`'s `equal`), told to no hall (`priv`).

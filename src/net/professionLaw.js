@@ -1,13 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!"; "Life skills will utilize things
-// like tree chopping, picking up ingredients, fishing, etc. Active player
-// involvement and actual UI integration for life skills") - THE
+// PROF1 - THE
 // PROFESSIONS' LAW: the ten (the thirteen until CRAFT3 merged eight crafts
 // into five), their ranks and XP, the tiers, the
 // specialisations, the day (no cap since CAP-OFF), the Stores, Herbalism's
 // two acts, the materials the Stores hold, and the Court writs. The record is
-// bible/06-Systems/Professions-Arc.md (PROF0) 3, 5, 7, 11 and 22.
+// (PROF0) 3, 5, 7, 11 and 22.
 //
 // ONLINE ONLY. Daggerfall has no crafting skill and its three makers use
 // none (PROF0 law 1); a profession is a Ledger A departure, online's
@@ -35,7 +33,7 @@ import { GEM_IDS, GEM_ROW_GRADES, GEM_NAMES, gemId, gemGrade, gemTemplateOf, gra
 // ─── THE TEN (PROF0 3.1; CRAFT3, Professions-Arc 41.6) ───────────────
 
 /** Every profession - every TRACK a character holds - in the Professions tab's order: the five that gather, then the
- *  five that craft (CRAFT3, Mac: "Lets do it" - Smithing with Jewelcrafting, Building of Carpentry and Masonry,
+ *  five that craft (CRAFT3, - Smithing with Jewelcrafting, Building of Carpentry and Masonry,
  *  Outfitting, Provisioning of Alchemy and Cooking, Enchanting; the eight crafts until then). */
 export const PROFESSIONS = Object.freeze([
   Object.freeze({ id: 'mining', name: 'Mining', kind: 'gathering' }),
@@ -118,7 +116,7 @@ export function harvestXp(tier, rank, clean) {
   if (tier < topTierOf(rank) - 2) xp = Math.floor(xp / 4);
   return xp;
 }
-/** HERB-XP (2026-10-01 part four - Mac: "XP follows your rank"): a herb is picked at the highest tier the rank opens, as
+/** HERB-XP: a herb is picked at the highest tier the rank opens, as
  *  a haul is worked (haulTier). Herbs stop at tier 3, and harvestXp quarters a tier more than two below the rank's, so
  *  past rank 70 every herb was worth a quarter (3, 11 and 16 XP) and 70 to 100 took 107 full days. The herb's own tier
  *  still opens it (tierOpen) and is the harvest's; the Basket's food keeps its tier. */
@@ -133,8 +131,7 @@ export const JOURNEYMAN_RANK = 50;
 
 /** The ranks a choice opens at. */
 export const SPEC_RANKS = Object.freeze([50, 100]);
-/** A change of mind: 1,000 Marks burnt. PERK-TRIAL (2026-10-24, the owner's pick of the Discord's "The time limit of a
- *  profession's perks changing"): the new one takes effect AT ONCE, and the week is a lock after it - the track's next paid
+/** A change of mind: 1,000 Marks burnt. PERK-TRIAL: the new one takes effect AT ONCE, and the week is a lock after it - the track's next paid
  *  change waits `days` from this one (Professions-Arc PERK-TRIAL). Before it, the new one waited the week, the old standing. */
 export const RESPEC = Object.freeze({ marks: 1000, days: 7 });
 /** PERK-TRIAL: A CHOICE'S TRIAL - for this long (s) after a rank's choice is made (its first, or a paid change), changing
@@ -286,7 +283,7 @@ export function specsAt(row, nowS) {   // CRAFT3: a merged craft's track stands 
 
 // ─── THE DAY, THE STORES, THE RATE (PROF0 6, 7, 20) ──────────────────
 
-// CAP-OFF (2026-10-07, Mac: "Remove the cap on life skills"): NO DAY'S CAP. A gathering profession gave a character 60
+// CAP-OFF: NO DAY'S CAP. A gathering profession gave a character 60
 // harvests a UTC day and an account 120 (AUDIT 29 A3), Fishing 40 hauls an account and Hunting 30 hides; none is counted
 // now. A day is bounded by the world - each node once a character a UTC day (PROF0 6), the travel between them - and by
 // the hour's writes (PROF_OPS_MAX). Two bounds stand, asked by Mac, because they bound a modified client's claim and no
@@ -295,13 +292,13 @@ export function specsAt(row, nowS) {   // CRAFT3: a merged craft's track stands 
 /** AUDIT 29 A5: the veins an account may work a UTC day in dungeons nobody has vouched for - one dungeon's most. A
  *  dungeon's id is the client's word, and an unconfirmed dungeon's least (Silver, tier 3, at any hour) was worth more
  *  than any unconfirmed pixel; a confirmed dungeon is bounded by its own veins (1-4 a day, each once a character).
- *  DEEP-OPEN (Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): such a dungeon draws its whole deep table now
+ *  DEEP-OPEN (Professions-Arc.md section 53): such a dungeon draws its whole deep table now
  *  (nodeLaw.js dungeonVein - all but the climate's own Moonstone), and these four are the whole of the bound - the trade
  *  the owner accepted: a modified client that invents dungeon ids mines four full-table deep veins a day, no more. */
 export const DEEP_UNCONFIRMED_PER_DAY = 4;
 /** The Stores hold at most this many of any one material, own and bought together. */
 export const STORES_MAX = 5000;
-/** GATHER-SPEED (2026-10-11): WHETHER A NODE'S HARVEST IS GONE FROM THE WORLD - the book's word (net/profBook.js
+/** GATHER-SPEED: WHETHER A NODE'S HARVEST IS GONE FROM THE WORLD - the book's word (net/profBook.js
  *  `gone`: taken today, or being counted), so a node goes the moment its act ends, never a round trip after it. A book
  *  that says no such word answers by `taken`, as before. */
 export const goneIn = (book, key, kind) => (typeof book?.gone === 'function' ? book.gone(key, kind) : book.taken(key, kind));
@@ -461,8 +458,7 @@ export const GEM_DFU_PRICES = Object.freeze({ ruby: 250, emerald: 425, sapphire:
  *  425, Sapphire 375, Diamond 500, Jade 10, Turquoise 50, Malachite 25, Amber 100). The Pearl is Fishing's (PEARL, PROF8). */
 export const GEMS = Object.freeze(GEM_IDS.map((kind, k) => dfu(`gem:${kind}`, 'gems', gemTierOfPrice(GEM_DFU_PRICES[kind]), 'Gems', k)));
 /**
- * CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids" - accept every
- * grade at the jeweller): THE GRADED GEMS AS MATERIALS. The port's thirty-two rows (Gem-Sockets 4, GEM2: a Chipped, a
+ * CLOTH-GEMS: THE GRADED GEMS AS MATERIALS. The port's thirty-two rows (Gem-Sockets 4, GEM2: a Chipped, a
  * Flawed, a Flawless and a Perfect of each kind, templates 1900-1931) are pack-only socket loot - no harvest, no counter
  * and no smelt makes one - and each grade has a material key now, `gem:<gemId>` ('gem:flawless-ruby'), in DFU's Gems
  * group on its own row, its tier its graded price's band as a gem's is (gradedGemPrice, gemTierOfPrice), its name the
@@ -477,7 +473,7 @@ export const GRADED_GEMS = Object.freeze(GEM_ROW_GRADES.flatMap((grade) => GEM_I
   name: GEM_NAMES[gemId(kind, grade)],
 }))));
 /**
- * DAEDRIC-SMELT (Professions-Arc.md section 53; the owner: "the heart may come FROM LOOT OR THE GATE"): DFU'S DAEDRA'S
+ * DAEDRIC-SMELT (Professions-Arc.md section 53): DFU'S DAEDRA'S
  * HEART as the Stores keep it - its own ingredient (CreatureIngredients1 53, 500 gold: itemTemplates.json), at its price's
  * tier as a body's part is (6) - the Daedric Ingot's heart (PROF0 4.1). No door of the service counts one: no body is
  * skinned of it and no counter sells it. It enters the Stores only as a station's loose unit (bagLaw.js looseOrder - the
@@ -563,7 +559,7 @@ const MOB = Object.freeze({
   Dragonling: 34, DragonlingAlternate: 40, Dreugh: 41,
 });
 /** FIELD BUGS 2026-10-20h DEX-HIDES: Daggerfall Enemy Expansion's animals by their own ids (its MonsterBase.mdb.csv ID
- *  column - bible/04-Characters/Enemy-Expansion.md section 5), the nine rows of Animal affinity among its fifty. The
+ *  column), the nine rows of Animal affinity among its fifty. The
  *  classic ten skin every classic Animal row, and so do these: a DEX Bat, Wolf or Mudcrab carries its own id, never a
  *  MobileTypes value, and was no body the knife knew. The Hell Hound (264) is a daedra and the Lizard Men and the Troll
  *  are people - no hide, as no classic daedra or person gives one. */
@@ -705,7 +701,7 @@ export const SCHOOL_HAULS_DAY = 40;
 /** The finds, a haul each (5.2): at sea, on ground the witnesses confirmed, a Pearl 1 in 50 (a Pearl Diver's x3, a
  *  Deep-Sea's x2) and a Slaughterfish 1 in 100 (a Deep-Sea's x2); a trophy 1 in 200 anywhere. */
 export const FISH_CHANCE = Object.freeze({ pearl: 1 / 50, slaughterfish: 1 / 100, trophy: 1 / 200, pearlDiver: 3, deepSea: 2 });
-/** XP FOLLOWS THE RANK (Mac, 2026-09-30: "XP follows your rank"): a haul is worked at the highest tier the rank opens.
+/** XP FOLLOWS THE RANK: a haul is worked at the highest tier the rank opens.
  *  Raw Fish is tier 1, and a tier more than two below the rank's is quartered (harvestXp), so a haul worked at its
  *  catch's tier would have held Fishing at a Novice's pace for good; at the rank's own tier it climbs as the others do. */
 export const haulTier = (rank) => topTierOf(rank);
@@ -813,7 +809,7 @@ export const WEAVERS_STOCK = Object.freeze([
  *  (REAGENTS' `value`), straight into the Stores, bought, never own: a Marks sink, never a purse-gold purchase. Without it
  *  the brewing act could make none of the twenty potions. */
 export const APOTHECARY_STOCK = Object.freeze(REAGENTS.map((r) => Object.freeze({ key: r.key, marks: /** @type {number} */ (r.value), counter: 'apothecaries' })));
-/** AUDIT 32 S1 (Mac, 2026-09-30: "Whatever you think is best"): THE GOODS A COUNTER SELLS WITHOUT END that S1 judges - 4.5's
+/** AUDIT 32 S1: THE GOODS A COUNTER SELLS WITHOUT END that S1 judges - 4.5's
  *  Linen and Wool, and the Apothecaries' sixteen, never gathered. A recipe made wholly of them earns its craft's XP, and its
  *  first-craft bonus only where its units are the character's own (recipeLaw firstCraftPays) - CLOTH-GEMS: the loom makes
  *  Linen and Wool of the world's goods now (WEAVE_RECIPES, SPIN_RECIPES), and S1 judges the units, never the material:
@@ -1059,8 +1055,7 @@ export const SAW_RECIPES = Object.freeze(LOGS.map((l) => recipe(`saw:${woodOf(l.
 export const CURE_RECIPES = Object.freeze(HIDES.filter((h) => h.cures).sort((a, b) => a.tier - b.tier || Number(a === BEAR_HIDE) - Number(b === BEAR_HIDE)).map((h) => recipe(`cure:${h.key.slice('hide:'.length)}`, /** @type {string} */ (h.cures), [[h.key, 2]],
   { station: 'loom', more: Object.freeze({ profession: 'hunting', spec: 'tanner', per: 2, rank: 50 }), xp: null })));
 /**
- * CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids" and, of Linen and
- * Wool, craft them - Professions-Arc 4.5, 50): THE CLOTH THE LOOM MAKES. Daggerfall grows no flax and keeps no sheep, so
+ * CLOTH-GEMS: THE CLOTH THE LOOM MAKES. Daggerfall grows no flax and keeps no sheep, so
  * its own goods stand in, each Hunting's or Herbalism's already (a Ledger A departure - Daggerfall weaves nothing):
  * - LINEN is woven from ROOT TENDRILS (`LINEN_FIBRE`, DFU's template 12 - the one fibrous plant of both of DFU's plant
  *   groups, so a recipe a land, the arrows' Twigs' law), a common herb of the MountainWoods, the HauntedWoodlands and the
@@ -1110,7 +1105,7 @@ export const MASON_RECIPES = Object.freeze([
 export const TRANSMUTE_LADDER = Object.freeze(['metal:tin', 'metal:copper', 'metal:silver', 'metal:gold', 'metal:platinum']);
 /** The Transmuter - Alchemy's choice at 100 - the one door to a transmutation (`spec`, smeltAtForge's `prof-transmuter`). */
 export const TRANSMUTER = Object.freeze({ profession: 'alchemy', rank: 100, id: 'transmuter' });
-/** Two of a metal a transmutation takes, and the Mercury that turns them (4.1) - AUDIT PROF12 E3 (Mac: "2 + Mercury -> 1"):
+/** Two of a metal a transmutation takes, and the Mercury that turns them (4.1) - AUDIT PROF12 E3:
  *  Mac's choice, 2026-10-03, over 3.3's three - a Mercury and two of a metal make one of the next. */
 export const TRANSMUTE_IN = 2;
 export const TRANSMUTE_MERCURY = 1;
@@ -1269,8 +1264,7 @@ export const WRIT_UNITS = Object.freeze({
 });
 /** A writ's pay: units x the material's Marks value x 1.2. */
 export const writPay = (units, value) => (units * value * 6) / 5;
-/** A writ's Renown XP: 25 x tier x units / 10 at the full rate - MERGE 2 (main's RENOWN-ACCOUNT, Mac: "reducing the
- *  accumulation of renown from resources a bit"): at renown.js RENOWN_RATE_PCT, three quarters, taken by its one door
+/** A writ's Renown XP: 25 x tier x units / 10 at the full rate - MERGE 2 (main's RENOWN-ACCOUNT): at renown.js RENOWN_RATE_PCT, three quarters, taken by its one door
  *  (renownRate, floored to a whole XP), as every other source's is. A tier-2 writ of 30 units, 150 at the full rate,
  *  pays 112. */
 export const writRenown = (tier, units) => renownRate((25 * tier * units) / 10);

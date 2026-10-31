@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11, Mac: "A new highly detailed shipmaster vendor and crew recruitment station within it. All
-// detailed functions including ship upgrading should be present here, along with ship buying, etc."; asked, Mac chose
+// SHIPYARDS (2026-10-11,; asked, Mac chose
 // "Shipyard only - the shipyard sells every hull (Rowboat to Carrack/galleon) and buys them back; Come Sail Away's
 // random shelf deeds/parts are retired"): THE SHIPMASTER'S TRADE - THE LAW.
 //

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// NOTICE1 (2026-09-28) — THIS DEVICE'S NOTICE BOARDS: each town's board as the account service last said it, read
+// NOTICE1 — THIS DEVICE'S NOTICE BOARDS: each town's board as the account service last said it, read
 // through a minute's cache (PROF0 19: "a slow service shows the last good board"), what this device has already read
 // of it (the count over the board is what it has not), and a note pinned, taken down or reported. The service keeps
 // every note (server-account/src/board.js); the law both ends read is src/net/boardLaw.js.

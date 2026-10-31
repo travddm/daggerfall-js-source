@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MARKS1 (2026-09-28, Mac: "New currency"; "Continue! Remember, this is
-// your baby"; "continue") — MARKS, THE SERVER'S CURRENCY: what a Mark is
+// MARKS1 — MARKS, THE SERVER'S CURRENCY: what a Mark is
 // worth, where one comes from, where it goes, and every bound both ends
-// read. The record is bible/06-Systems/Professions-Arc.md 10.5 (PROF0).
+// read. The record is 10.5 (PROF0).
 //
 // WHY A SECOND CURRENCY. Online gold is the save's ("The GOLD is the
 // client's, the economy being the save's" - GUILD1), so anything paid in
@@ -17,9 +16,7 @@
 // have had. There is no route, function or table here that turns gold
 // into Marks, and the pins hold that.
 //
-// SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in
-// more forms of interactions like foraging and different activities,
-// also needs to be sometimes lootable"). TWO FAUCETS ARE BOUNDED, NOT
+// SILVER-FINDS. TWO FAUCETS ARE BOUNDED, NOT
 // WITNESSED: a gathering's find, the service's own dice inside a harvest
 // it already counts and caps (`gather`), and a loot find - a body, a
 // treasure pile, a searched coffin or chest - whose amount is the
@@ -47,7 +44,7 @@ export const MARK_WORTH_GOLD = 10;
  *   gate      - an Oblivion Gate receipt the relay signed and the service counted (WB5b): 50 (100 under a Daedric
  *               Incursion, SEAT0 9.3 - the second half at the Turning, seatIncursion.js). SILVER-WAYS: under the day's
  *               COMBAT cap (MARKS_COMBAT) with the raids', no longer two a day of its own.
- *   raid      - SILVER-WAYS (2026-10-03, Mac: "Do it"): a town defended - a raid's receipt the relay signed at its
+ *   raid      - SILVER-WAYS: a town defended - a raid's receipt the relay signed at its
  *               cleanse (RAID3/RAID4) and the service counted once a (raid, account): 30, under the COMBAT cap.
  *   writ      - a Court writ's pay (PROF1 - BUILT, server-account/src/professions.js): its units x the material's
  *               value x 1.2, 3 an account a UTC day.
@@ -56,17 +53,17 @@ export const MARK_WORTH_GOLD = 10;
  *               it - each a character `tenureS` in the guild - have claimed the same raid or gate: 25, `perDay` a guild a
  *               UTC day.
  *   motherlode - a Motherlode find (PROF2b): 10, one an account a UTC day.
- *   serpent   - SERPENT-SET (2026-10-05): a sea serpent slain - its receipt the relay signed at the kill (SERPENT1, `l1`)
+ *   serpent   - SERPENT-SET: a sea serpent slain - its receipt the relay signed at the kill (SERPENT1, `l1`)
  *               and the service counted once a (day, account): 40, a ship that stood `stood` of it (the serpent's own
  *               Renown law), under the COMBAT cap.
  *   gather    - SILVER-FINDS: a harvest's find - the service's dice, `chance` of a counted harvest (any of the five acts:
  *               an herb patch, a vein, a tree, a body, a net), `amount` its range, at most `perDay` an account a UTC day.
  *   find      - SILVER-FINDS: a loot find - a body, a treasure pile or a searched thing (`chance` the device's roll, each
  *               kind's own), `amount` the service's dice, at most `perDay` an account a UTC day.
- *   star      - STAR7 (2026-10-20; bible/11-Multiplayer/Starfall.md section 6): a fallen star held - its `j1` receipt the relay
+ *   star      - STAR7: a fallen star held - its `j1` receipt the relay
  *               signed at its master's fall and the service counted once a (star, account): 30, a raid's worth (a fight
  *               about as long), under the COMBAT cap.
- *   craftWrit - CRAFT-WRITS (2026-10-22; bible/06-Systems/Professions-Arc.md section 49): a crafting writ filled - goods the
+ *   craftWrit - CRAFT-WRITS: a crafting writ filled - goods the
  *               service saw made (a character's own brews, its own crafted pieces) taken out of its realm record: the
  *               writ's own pay (craftWritLaw.js, at most CRAFT_WRIT_PAY_MAX), 3 an account a UTC day, beside the Court's.
  */
@@ -164,8 +161,8 @@ export const MARKS_KINDS = Object.freeze({
   'patron-escrow': 'move',    // CHAP7a: a guild's bid for a chapter's patronage, from its treasury, held until the Season it bids for opens
   patron: 'burn',             // CHAP7a: the winning bid, burnt at the Turning that opens its Season (Chapters-Arc 8, CALL 6)
   'patron-return': 'move',    // CHAP7a: a losing bid, home to its guild at that Turning - burnt where the guild is gone or full
-  star: 'mint',               // STAR7: a fallen star's receipt, counted (bible/11-Multiplayer/Starfall.md section 6)
-  castle: 'burn',             // DOMAIN2: a castle's price, from the buying guild's treasury (bible/11-Multiplayer/Domains.md 6)
+  star: 'mint',                 // STAR7: a fallen star's receipt, counted
+  castle: 'burn',               // DOMAIN2: a castle's price, from the buying guild's treasury (6)
   'castle-sale': 'mint',      // DOMAIN2: 85% of it home, the castle given up while its region is held
   'castle-lost': 'mint',      // DOMAIN2: half of it home, the castle gone with its region
   'domain-fold': 'mint',      // DOMAIN3: a Charter folded into its region's at the region law's first Turning, its claim fee home (seatTurning.js)

@@ -1,5 +1,5 @@
 // @ts-check
-// WW1 (2026-10-24, bible/03-World/World-Wide.md): THE BAY'S PROVIDER - the game's own MAPS.BSA rows as the registry's
+// WW1: THE BAY'S PROVIDER - the game's own MAPS.BSA rows as the registry's
 // places (world/worldWide/worldPlaces.js). The rows are HUB1's: the base rows of each region, never a world-data mod's
 // addition (it stands on one client and not another - systems/region/regionHubs.js), so every client's registry holds
 // the same Bay. Each row's pixel is its own longitude and latitude (MapsFile.LongitudeLatitudeToMapPixel), its area its

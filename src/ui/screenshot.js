@@ -1,4 +1,4 @@
-// KB1 (2026-09-23, Mac: "Build 2, hide 2" - the DFU actions bound and read by nothing): THE PRINTSCREEN ACTION.
+// KB1: THE PRINTSCREEN ACTION.
 //
 // DFU binds PrintScreen to F8 (InputManager.cs:1030) and reads it nowhere - GameManager's TakeScreenshot is
 // commented out (:946-953). The port shipped the same dead row, so F8 did nothing. This is the key made to do what
@@ -15,8 +15,7 @@
 // THE FRAME, NOT THE BUFFER'S LEFTOVERS. The renderer's context does not preserve its drawing buffer, so reading the
 // canvas from inside a key event gets a cleared buffer: the canvas is readable only in the task that drew it.
 //
-// SHOT1 (2026-10-07, a player's gallery: "Wayrest" and "Daggerfall" kept FULLY BLACK, a battle at Dak'fron kept
-// whole): THE SHOT RIDES THE HOST'S FRAME FOOT, NOT A FRAME OF ITS OWN. KB1 queued the read on a requestAnimationFrame
+// SHOT1: THE SHOT RIDES THE HOST'S FRAME FOOT, NOT A FRAME OF ITS OWN. KB1 queued the read on a requestAnimationFrame
 // of its own, on the reasoning that it ran after the host's callback in the same browser frame. Two things the host
 // does broke that: (1) FPS-CAP1's HELD FRAME - `frameCapSkip` re-arms and returns, drawing nothing, so on a fast scene
 // under a Frame Rate Cap (a town on a 120 Hz screen, every other browser frame held at a 60 cap) the shot's callback read a
@@ -30,7 +29,7 @@
 
 import { getPref } from '../systems/uiPrefs.js';   // LOAD1: the download's switch - already on the entry's graph (main.js reads it), so it adds no file there
 
-// LOAD1 (2026-10-05): THE SHOT IS KEPT, TOO. The same PNG goes to the gallery (systems/shotGallery.js) - a JPEG in
+// LOAD1: THE SHOT IS KEPT, TOO. The same PNG goes to the gallery (systems/shotGallery.js) - a JPEG in
 // this browser's own IndexedDB, never the repository (Port-Doctrine: a render of game data is game data) - where the
 // loading screens stand on it and the menu's Screenshots pane shows it. The download stays, on the player's own
 // switch (`shotDownload`, the pane's). The gallery is a DOOR, never a static import: this file is on the entry's

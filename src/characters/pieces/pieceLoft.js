@@ -126,7 +126,7 @@ export const GRIP_Y = 0.90;          // grip point inside the fist (pre-HSCALE)
 // THE SEAT (Mac's reference photo, 2026-07-05): a sword is NOT held
 // collinear with the forearm - the handle crosses the palm, so with
 // the arm hanging the blade sweeps UP-FORWARD and the pommel sits low
-// behind the fist. Mac: swd pitch +45deg baked (2026-07-05) - the
+// behind the fist. Mac: swd pitch +45deg baked - the
 // near-horizontal point-forward carry, family-wide.
 export const SEAT_PITCH = -2.40 + Math.PI / 4;
 // The CLAYMORE-STANDARD two-hand grip block: stations at 0.90 (grip, the

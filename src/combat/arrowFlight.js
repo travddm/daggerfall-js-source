@@ -42,15 +42,15 @@ import { monsterVolume } from '../systems/monsterVolume.js';   // MONSTER-VOL: a
 
 export const ARROW_MODEL_ID = 99800;
 
-// ---- STUCK-ARROWS (bible/05-Combat/Arrow-Supply.md) ---------------------------------------------------------------
-// Mac, 2026-10-11: "allow arrows to stick in walls/ground wherever shot and be retrieved". DFU's law for a shaft that
+// ---- STUCK-ARROWS ---------------------------------------------------------------
+// . DFU's law for a shaft that
 // meets geometry is LOST (DaggerfallMissile.DoCollision destroys it); the port's departure keeps the PLAYER's: it stays
 // where it struck, drawn as the 99800 shaft along its flight, and is a container of one Arrow in the host's own
 // dropped-loot pool - so the press, quick loot, the plaque and Detect Treasure that every host already runs over its
 // piles take it back, and no host learns a new key. The pile is `drawn: false` (this module draws it, the DW-E5 door),
 // `unsaved` (it outlives no scene: WOD5's LoadID-0 container), and takes nothing put on it (WILD1's `noStore`).
 
-/** STUCK-ARROWS (Mac: "Allow arrows to sometimes be retrieved from enemies"): the share of the player's real shafts that
+/** STUCK-ARROWS: the share of the player's real shafts that
  *  survive striking a foe and lodge in its pack (playerArrowHitFoe) - DFU's BowDamage keeps every one. */
 export const ARROW_LODGE_CHANCE = 0.5;
 /** The pool's mark on a stuck shaft's pile (seedPile's `owner`). */
@@ -422,7 +422,7 @@ export function playerArrowHitFoe(m, foe, {
     rolls, onInflictPoison, say,
     unaware: foeUnaware(foe),   // SET2: a shaft at a foe that had not noticed me - Nightfall Strike's "arrows too"
   });
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): a technique's shaft (a Volley's, a Piercing Shot's) weighs the formula's
+  // TECH1: a technique's shaft (a Volley's, a Piercing Shot's) weighs the formula's
   // number by the technique - never on a player's body (its shaft passes them by in flight; a door that hands one here
   // anyway gets the plain number)
   const dmg = m.technique && !playerBody(foe) ? scaleBlowDamage(rolled, blowMult(m.technique, foe)) : rolled;
@@ -446,7 +446,7 @@ export function playerArrowHitFoe(m, foe, {
   // BEFORE the arrow is added back (BowDamage's own order).
   onAttackFromPlayer?.(foe, dmg);   // AUDIT WORLD6b-iii(e) C2: with what landed - a pool that diverts a zero blow to a puppet's owner sends none when the damage already went
   // BowDamage (DaggerfallMissile.cs:679-687) adds the arrow back to whatever it struck because an arrow SURVIVES being
-  // shot. STUCK-ARROWS (bible/05-Combat/Arrow-Supply.md): and a CONJURED shaft is never added (WeaponManager.cs:554-559's
+  // shot. STUCK-ARROWS: and a CONJURED shaft is never added (WeaponManager.cs:554-559's
   // isArrowSummoned - it vanishes), and a real one survives the strike ARROW_LODGE_CHANCE of the time - the roll last, on
   // the blow's own stream, so every roll above is drawn as it was
   if (foe.entity?.items && !m.summoned && rolls() < ARROW_LODGE_CHANCE) {

@@ -1,5 +1,5 @@
 // @ts-check
-// GUILD1d (2026-09-30, Mac: "Lets do this"): A GUILD'S BANNERS, DRAWN (bible/11-Multiplayer/Seats-Arc.md 3.4: "the
+// GUILD1d: A GUILD'S BANNERS, DRAWN (3.4: "the
 // port's own cloth quad, 1 wide by 3 tall (in DFU's scale, a man's height and a half), its field the holder's first
 // colour, a border in the second, the device centred; it sways on the weather's wind").
 //

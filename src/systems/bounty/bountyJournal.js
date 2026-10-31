@@ -1,5 +1,5 @@
 // @ts-check
-// BOUNTY1 (2026-09-28, Mac: "i also dont see the bounty in my questlog means i cant abandon it?"): A BOUNTY IN THE
+// BOUNTY1: A BOUNTY IN THE
 // QUEST LOG, AND ITS TWO PRESSES THERE.
 //
 // A held bounty rides the quest log every journal face reads (scenes/quest/questBridge.js questLog, wrapped by the world

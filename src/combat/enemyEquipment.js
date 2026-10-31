@@ -302,7 +302,7 @@ export function equipmentItems(eq) {
   // AUDIT 58: ItemBuilder.CreateArmor mints a condition with the piece
   // (items-5); these records had none, so a struck foe's cuirass had
   // nothing to bill even once its equip table existed.
-  // MAC-N1 (Mac: "Weapon and Armorsmiths dont want to pay for loot"):
+  // MAC-N1:
   // and CreateArmor runs SetItem FIRST (ItemBuilder.cs:301 ->
   // DaggerfallUnityItem.cs:555/:563 - the name and the VALUE), which
   // these records also had none of. A weapon off the same corpse

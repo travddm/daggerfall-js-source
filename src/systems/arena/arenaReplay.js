@@ -1,5 +1,5 @@
 // @ts-check
-// ARENA5 (2026-10-03): YOUR LADDER REPLAY - bible/11-Multiplayer/Arena.md "2. The fights", the table's Spectate row:
+// ARENA5: YOUR LADDER REPLAY "2. The fights", the table's Spectate row:
 // offline, "exhibitions, your ladder replay". The last REPLAY_KEEP ladder bouts this save fought, recorded small into the
 // save's arena record (systems/save/save.js `arena.replays`), and one of them played back on the floor's instance as a watched
 // bout. Pure: a recording grown by the bout driver (scenes/arena/arenaBouts.js, beside its own law), a record out, a record in,

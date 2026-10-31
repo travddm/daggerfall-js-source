@@ -1,5 +1,5 @@
 // @ts-check
-// SCHOOLS3 (2026-10-13, bible/06-Systems/Arcane-Specialisations.md section 6): THE SIGNATURE SPELLS' RECORDS.
+// SCHOOLS3: THE SIGNATURE SPELLS' RECORDS.
 //
 // Each path's signature spell is a ready-made record in the classic SPELLS.STD shape - the spell maker's own builder
 // (spellMaker.js buildCustomSpell: three slots, the maker's defaults under what the path names), with the path it belongs

@@ -75,7 +75,7 @@ export const CANNOT_CARRY_TEXT = 'You cannot carry any more stuff.';
 export const cannotHoldText = () => localizedText('cannotHoldAnymore', CANNOT_HOLD_TEXT);
 export const cannotCarryText = () => localizedText('cannotCarryAnymore', CANNOT_CARRY_TEXT);
 
-/** KEEP-SPELLBOOK (2026-10-08, the owner: "a player dropped his spellbook apparently"): the port's own - DFU lets the
+/** KEEP-SPELLBOOK: the port's own - DFU lets the
  *  spellbook go like any MiscItems piece. The character's spellbook (MiscItems 132, not a quest's) leaves the pack for
  *  nowhere but the character's own wagon: never the ground, a pile, a body, a chest, a companion's pack, or a
  *  counter's sale (ui/native/nativeTrade.js, ui/enhanced/enhancedTrade.js). A death in the zone already keeps it
@@ -106,7 +106,7 @@ export const REFUSAL = Object.freeze({
   /** BAG1: the Materials Bag leaves the pack only empty - the cart's own rule (tradeModes.js), said here because a bag
    *  dropped, chested or carted with materials in it would strand them in a list nobody owns. */
   bagLoaded: { reason: 'bagLoaded', text: BAG_WORDS.notEmpty },
-  /** ONE-BAG (2026-10-04, Mac: "you shouldnt be able to hold multiple gathering bags"): one Materials Bag to a character -
+  /** ONE-BAG: one Materials Bag to a character -
    *  a second is never taken into the pack, bought into a basket or carried off a shelf. */
   secondBag: { reason: 'secondBag', text: BAG_WORDS.second },
   /** QUEST-AUDIT III SHELF-TWIN: a quest item is never taken while a copy of it is already kept (holdsQuestTwin). */
@@ -221,8 +221,7 @@ export function questTransferRefused(item, { fromLocal, toWagon = false, getQues
   if (!item?.questItem) return false;
   const quest = getQuest?.(item.questUID) ?? null;
   const questItem = quest?.getItem?.(item.questSymbol) ?? null;
-  // QUEST-SHELF-DROP (2026-10-13, the lead dev: "when a player abandoned a quest he cant throw away the questitem for
-  // it"): A QUEST SET ASIDE HOLDS NO ITEM - its item may leave the pack (the ground, a chest, the wagon), and nothing is
+  // QUEST-SHELF-DROP: A QUEST SET ASIDE HOLDS NO ITEM - its item may leave the pack (the ground, a chest, the wagon), and nothing is
   // written to the quest, which is not running. Reclaimed, an item it had in the pack is handed back if it is gone
   // (machine.js reclaimQuest). NEVER TO A COUNTER (`trade`): a shop would buy an item reclaiming hands back again; and
   // never one the quest made permanent - that one outlives the quest, and a second copy would too.
@@ -250,7 +249,7 @@ export function questTransferRefused(item, { fromLocal, toWagon = false, getQues
  *  verbatim ("Your wagon could only hold {0} gold pieces."), formatted
  *  with wagonCanHold at DaggerfallInventoryWindow.cs:1303. */
 export const wagonFullGoldText = (n) => formatText(localizedText('wagonFullGold', 'Your wagon could only hold {0} gold pieces.'), n);
-/** COMPANION-WEIGHT (2026-10-01): a storage with its own limit - a companion's pack (inventorySession storeCapacityOf) -
+/** COMPANION-WEIGHT: a storage with its own limit - a companion's pack (inventorySession storeCapacityOf) -
  *  refuses in its own words, the port's: DFU has no companion to name. */
 export const packFullText = (name) => `${name || 'Your companion'} cannot carry any more.`;
 export const packFullGoldText = (name, n) => `${name || 'Your companion'} could only carry ${n} gold pieces.`;
@@ -344,7 +343,7 @@ export function planStore(item, {
 } = {}) {
   if (!item) return { ok: false, refusal: REFUSAL.missing };
   if (bagLoaded && isBagItem(item)) return { ok: false, refusal: REFUSAL.bagLoaded };   // BAG1
-  // HOUSE-DROP (2026-09-27): the ground itself refuses - the window hands the host's word (inventorySession
+  // HOUSE-DROP: the ground itself refuses - the window hands the host's word (inventorySession
   // groundRefusalOf) only when the destination IS the ground, so a wagon, a chest and a trade are untouched
   if (groundRefusal) return { ok: false, refusal: { reason: 'ground', text: groundRefusal } };
   // AUDIT PVP-EASE L2-1 (the owner chose "Combat lock"): storage no zone death takes refuses a fighter fresh from a fight -

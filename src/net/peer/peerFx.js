@@ -1,5 +1,5 @@
 // @ts-check
-// PEERFX1 (2026-09-26): WHAT A BLOW LOOKS AND SOUNDS LIKE, FOR THE PLAYERS WHO SEE IT.
+// PEERFX1: WHAT A BLOW LOOKS AND SOUNDS LIKE, FOR THE PLAYERS WHO SEE IT.
 //
 // The player: "when you hit the enemy give the same feedback for players you see when they hit an enemy with melee
 // and ranged (bows), not magic. Also give the other players you see a sound when they get hit, like you do when you

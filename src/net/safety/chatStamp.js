@@ -1,12 +1,11 @@
 // @ts-check
-// SAFE2 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system" - the chat
-// safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 3): THE LINE'S WITNESS.
+// SAFE2: THE LINE'S WITNESS.
 //
 // A report is only as good as its evidence, and a player's own chat log is the player's word: a client can write any
 // line it likes into its log and "report" it. So the relay - the one party that SAW the line, because it relayed it -
 // signs every chat line it fans out, with the key it already signs its receipts with (GATE_SIGNING_KEY, gateReceipt.js):
 //
-//     sg = base64url(Ed25519( "chat-stamp1\n" + JSON.stringify([tab, sub, name, at, text]) ))
+//     sg = base64url(Ed25519("chat-stamp1\n" + JSON.stringify([tab, sub, name, at, text]) ))
 //         tab  the chat tab the line is heard on (stampTabOf: world, region, lang, trade, lfg, party, guild, local)
 //         sub  the speaker's verified account (the token's `s`)   name the name the relay said beside it
 //         at   the relay's clock, ms   text the line as the relay relayed it (sanitizeChat's, its words starred)

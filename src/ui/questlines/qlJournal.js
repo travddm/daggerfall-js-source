@@ -1,5 +1,5 @@
 // @ts-check
-// QL2 (bible/06-Systems/Questlines-Arc.md section 6, decision 10): THE QUESTS TAB'S QUESTLINE PARTS - one home for the
+// QL2 (decision 10): THE QUESTS TAB'S QUESTLINE PARTS - one home for the
 // two faces that draw quests (the pause window's Quests tab, ui/enhanced/enhancedMenu.js pauseQuests; the chronicle
 // the L key opens, ui/enhanced/enhancedChronicle.js), so they cannot disagree:
 //
@@ -16,7 +16,7 @@
 //     them, the promotions as the rungs, the ones finished struck and the flagship ones marked (qlLadders.js).
 //
 // A window redesigned on purpose (SCOPE1): it cites this record, not DFU - the classic skin keeps DFU's logbook
-// (ui/quest/questJournal.js). Plain words (bible/10-UI/Plain-Words.md): every heading says what it is, a press explains
+// (ui/quest/questJournal.js). Plain words: every heading says what it is, a press explains
 // what a hover would, every number is read off the constant that enforces it (qlRewards.js TIER_FLOORS).
 import { t } from '../../systems/textManager.js';
 import { TIER_FLOORS, REWARD_CHOICES } from '../../systems/questlines/qlRewards.js';

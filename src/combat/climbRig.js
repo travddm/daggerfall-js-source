@@ -1,6 +1,4 @@
-// CLIMB6 - THE MORROWIND BODY ON THE WALL, THE SKELETON'S HALF (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md;
-// Mac: "Definitely want you to use the morrowind model to get correct animations for everything. Be as detailed as
-// possible").
+// CLIMB6 - THE MORROWIND BODY ON THE WALL, THE SKELETON'S HALF (the Enhanced Climbing arc;
 //
 // Morrowind has no climbing animation: on a wall the body played the jump's in-air clip and the arms hung where the clip
 // left them. This module poses the rig's own bones onto the climb - the hands ON the lip, the feet ON the wall - by
@@ -211,7 +209,7 @@ function refresh(skeleton, pose, mats, bones, ref) {
  * four float32 matrices through a parent frame that carries every turn above it; unsquared, the skew compounds about
  * fourfold a level down a chain of turns - a deep climb (the body moved and swung, the spine bent, the shoulders drawn,
  * both arms, both legs, the look) left its rotations 2.65e-3 from orthonormal and its hands up to 3e-3 units off their
- * holds. Squared, it stays at float32's own rounding however deep the chain (bible/04-Characters/Body-Motion.md).
+ * holds. Squared, it stays at float32's own rounding however deep the chain.
  */
 export function orthonormal(m) {
   let x = [m[0], m[3], m[6]], y = [m[1], m[4], m[7]];

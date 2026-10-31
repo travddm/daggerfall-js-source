@@ -9,7 +9,7 @@
 //   Books ride the quality ladder ((q+3)/5, the >=4 step-down, +1);
 //   general stores always shelve a Horse and a Small Cart; clothing
 //   swaps to the player's gender; Furniture/UselessItems1 skip.
-//   MERCHANT-YARDS (2026-10-10): the horse and the cart no longer -
+//   MERCHANT-YARDS: the horse and the cart no longer -
 //   the town's Stable and Wagon Yard sell them (systems/merchantYards.js).
 // - THE COST LAW (verbatim): clamp value to >=1, apply the regional
 //   price adjustment (value*adj/1000, floor 1), then
@@ -35,7 +35,7 @@
 // had SHIPPED and the header still swore they had not - the MagicItems
 // stock (F130) and the Alchemist's 25% recipe roll (F129), both live
 // below. A pend list that names closed work is worse than no list:
-// bible/Home.md pins these lines mechanically, so the false clause was
+// pins these lines mechanically, so the false clause was
 // certified, and it is what kept the ungated MagicItems arm (F104)
 // from being read as the bug it was.
 
@@ -118,7 +118,7 @@ export function shopAmmoStack(buildingType, quality, max) {
 }
 
 /**
- * SHOP-ARROWS (2026-10-11, Mac: "Buff the shop's stock of arrows"; bible/05-Combat/Arrow-Supply.md): A QUIVER ON THE
+ * SHOP-ARROWS: A QUIVER ON THE
  * COUNTER. DFU's stock law shelves arrows as any weapon - a Weapons-chance draw a shelf, rarity 1, one stack of
  * Range(1, 21) (enemyEquipment.js createWeapon's arrow arm) - so a Weapon Smith's counter held twenty arrows at most, 70%
  * of the time, and a General Store's one day in five. Now every shop that sells weapons also carries a quiver on its
@@ -129,7 +129,7 @@ export function shopAmmoStack(buildingType, quality, max) {
 export const SHOP_ARROWS_MAX = 100;
 export const shopArrowStack = (buildingType, quality) => shopAmmoStack(buildingType, quality, SHOP_ARROWS_MAX);
 /**
- * ENDLESS-ARROWS (2026-10-23, the owner: "give general stores always arrows for each player to buy they cant exhaust"): A
+ * ENDLESS-ARROWS: A
  * GENERAL STORE'S QUIVER NEVER EMPTIES. Its counter shelf carries a full quiver (GENERAL_STORE_ARROWS, whatever the
  * shop's quality - SHOP-ARROWS' 14 to 29 was a General Store's) from no roll, and every purchase that takes arrows off it
  * puts back what it took, up to the whole (restockEndless), offline and online alike - unlike ENDLESS-STOCK's bag,
@@ -188,7 +188,7 @@ export const shopBuysItem = (buildingType, item) => (SHOP_BUYS_GROUPS[buildingTy
   // AUDIT CAPTAIN'S SEA B2: no shop buys the exchange's goods - the exchange alone deals in them (a General Store paid more for a
   // tusk of ivory than the quay where it is made asked: a money loop without a voyage)
   && !goodOfTemplate(item.templateIndex)
-  // SHIPYARDS (2026-10-11, Mac: "Shipyard only"): nor a boat's parts or deed - a port town's shipyard buys a ship back
+  // SHIPYARDS: nor a boat's parts or deed - a port town's shipyard buys a ship back
   // (systems/shipyards.js), as the Stable and the Wagon Yard took the horse and the cart (Come Sail Away's rows are on no
   // shelf now - comeSailAwayItems.js)
   && item.templateIndex !== BOAT_PARTS_TEMPLATE && item.templateIndex !== BOAT_DEED_TEMPLATE
@@ -294,16 +294,14 @@ export const createStockedDate = (date) => ((date?.year ?? 0) * 1000) + dayOfYea
 /** PlayerActivate's own comparison (:882, :911), spelled once so the
  *  three activation arms in the host cannot drift apart. */
 export const needsRestock = (container, today) => (container?.stockedDate ?? 0) < today;
-/** UXB1-O (2026-09-25, the UX backlog: "flag objects with generated loot ... 'your character' would know which ones
- *  have open lids"): this character has looked at THIS stock - opened (`openedOn`, stamped with the stock's own day
+/** UXB1-O: this character has looked at THIS stock - opened (`openedOn`, stamped with the stock's own day
  *  when the window opens) and neither rolled again since nor due to be. The day's restock closes the lid again, as it
  *  refills the drawer: a searched container is only ever the stock the player saw. */
 export const stockSearched = (container, today) => Number.isFinite(container?.openedOn) && container.openedOn > 0
   && container.openedOn === container.stockedDate && !needsRestock(container, today);
 
-/** ENDLESS-STOCK (2026-10-04, Mac: "I want the gathering bag to be unlimited purchases in stores. It shouldnt run out,
- *  same with campfires"): the rows a shop never sells out of - the Materials Bag and the Campfire. ENDLESS PROVISIONS
- *  (2026-10-04, Mac: "rations should be available in stores where it makes sense and unlimited as well"): and Rations. */
+/** ENDLESS-STOCK: the rows a shop never sells out of - the Materials Bag and the Campfire. ENDLESS PROVISIONS
+ *  and Rations. */
 const isRations = (item) => isSurvivalItem(item) && item.templateIndex === SURVIVAL_TEMPLATE.Rations;
 export const isEndlessStock = (item) => isBagItem(item) || (isSurvivalItem(item) && isCampfireKit(item)) || isRations(item) || isLockpick(item);   // LOCKPICK: and the counter's picks
 /** ENDLESS-STOCK: a purchase's endless rows put back on the shelf they were bought from - a fresh one for each (neither
@@ -367,18 +365,16 @@ export function stockShopShelf({ buildingType, quality }, playerEntity = {}, { r
     // alchemists never stocked a recipe, the main legitimate way to
     // buy one.
     randomlyAddPotionRecipe(25, items, rolls);
-    // RARE-REAGENTS (2026-10-08, the owner: "please add Unicorn horn, Basilisk eye and a Pearl. I couldn't find any of
-    // those on any Alchemist shop"): the stock law's rarity gate and its roll (chance x 5 x (21 - rarity) / 100) left these
+    // RARE-REAGENTS: the stock law's rarity gate and its roll (chance x 5 x (21 - rarity) / 100) left these
     // three on next to no shelf in the Bay. The counter's shelf (shelfIndex 0 - each shelf model is stocked whole, so one
     // shelf, never one a shelf) always carries one of each, minted as every row is and priced by the shop's own cost law.
     if (shelfIndex === 0) for (const r of ALCHEMIST_ALWAYS) add({ ...r });
   }
   if (buildingType === BUILDING_TYPES.GeneralStore) {
-    // MERCHANT-YARDS (2026-10-10, asked: "Transport merchants hold all carts and wagons. The stable holds horses. No
-    // longer in general shop"): DFU's `items.AddItem(Horse)` and `items.AddItem(Small_cart)` are gone from here, and the
+    // MERCHANT-YARDS: DFU's `items.AddItem(Horse)` and `items.AddItem(Small_cart)` are gone from here, and the
     // two wagons WAGONS1 shelved beside the cart with them - the Stable sells the horse and the Wagon Yard the cart and
     // the wagons (systems/merchantYards.js yardStock), every city and town standing both. A departure from DFU.
-    // BAG1 (bible/06-Systems/Materials-Bag.md): THE MATERIALS BAG at every General Store (beside the cart, until
+    // BAG1: THE MATERIALS BAG at every General Store (beside the cart, until
     // MERCHANT-YARDS took the cart to the Wagon Yard) - online alone, where the professions are (nothing offline gathers
     // into it), and by name.
     // BAG-SHELF (FIELD BUGS 2026-10-04, "nobody can find material bags in store"): on EVERY shelf, whoever stocks it, as
@@ -464,7 +460,6 @@ export function stockShopShelf({ buildingType, quality }, playerEntity = {}, { r
         // where loot arrows and conjured arrows arrive at zero, and
         // the two stacks could not merge in the pack.
         //
-        // PIN MOVED DELIBERATELY (AUDIT 17e F14): that note read
         // "CreateWeapon's arrow branch takes NO material roll", which
         // is true of the BRANCH and false of this SITE. C# evaluates
         // RandomMaterial before it enters CreateWeapon, so the shelf
@@ -537,7 +532,7 @@ export function stockShopShelf({ buildingType, quality }, playerEntity = {}, { r
   // every tier, Climates & Calories Off and offline too - after DFU's draws, from no roll. Online a purchase stands them
   // again (restockEndless); offline they sell out until the day's restock, as the rest of the shelf does (ENDLESS-STOCK F4)
   if (shelfIndex === 0 && (buildingType === BUILDING_TYPES.GeneralStore || buildingType === BUILDING_TYPES.PawnShop)) ensureEndlessProvisions(items);
-  // LOCKPICK (bible/06-Systems/Lockpicking.md section 2): and a stack of lockpicks - a lock needs one - from no roll, so DFU's
+  // LOCKPICK: and a stack of lockpicks - a lock needs one - from no roll, so DFU's
   // draws above stand as they were; online a purchase stands it whole again (restockEndless), offline it sells out until the
   // day's restock
   if (shelfIndex === 0 && (buildingType === BUILDING_TYPES.GeneralStore || buildingType === BUILDING_TYPES.PawnShop)) ensureEndlessLockpicks(items);
@@ -545,7 +540,7 @@ export function stockShopShelf({ buildingType, quality }, playerEntity = {}, { r
   // as the shelf mints its own (CreateWeapon's arrow arm, its stack roll answered by a constant), so the two are one stack
   // ENDLESS-ARROWS: a General Store's a full quiver at any quality (merged into DFU's drawn arrows as SHOP-ARROWS' is)
   if (shelfIndex === 0) { const n = endlessArrowsAt(buildingType) ? GENERAL_STORE_ARROWS : shopArrowStack(buildingType, quality); if (n > 0) add({ ...createWeapon(ARROW_TEMPLATE, 0, () => 0), stackCount: n }); }
-  // POTION-COMMON (2026-10-01, the field: "make health potions more common"): an alchemist's and a general store's day of
+  // POTION-COMMON: an alchemist's and a general store's day of
   // Potions of Healing (healingSupply.js) - at the shelf's end and from no roll, so DFU's own draws above are the same.
   // AUDIT ECON P1: on the shop's FIRST shelf alone, the one its counter sells from (worldModes.js openMerchantSell) -
   // every shelf model is its own container, stocked whole, so a shop of five shelves stocked five days' worth
@@ -693,7 +688,7 @@ export function stockHouseContainer({ buildingType, record }, playerEntity = {},
 /** RandomizeInitialRegionalPrices (:2040-2047): one region's opening index, 750..1250, off one roll. ECON1: one home
  *  for the player's lazy draw and the world's epoch draw. */
 export const initialRegionPrice = (roll01) => 750 + Math.floor(roll01 * 501);
-// ECON1 (2026-09-17): THE WORLD'S PRICE SOURCE. Under the shared clock the region's index is the world's - a pure
+// ECON1: THE WORLD'S PRICE SOURCE. Under the shared clock the region's index is the world's - a pure
 // function of the world's day (worldTick.worldRegionPrice) - and every consumer of this seam reads it instead of the
 // player's own walk. Installed and removed by setSharedClock; null offline, and then the player's own state answers
 // as DFU's does. The player's `regionPrices` are never written while the source stands: the save keeps its own
@@ -859,13 +854,13 @@ export function calculateCost(baseValue, shopQuality, priceAdjustment = 1000, co
   return cost;
 }
 
-/** REALM P0.4 (2026-09-28, bible/06-Systems/Realm-Arc.md "Vendor spread"): ONLINE A SHOP PAYS AT MOST HALF WHAT IT
+/** REALM P0.4: ONLINE A SHOP PAYS AT MOST HALF WHAT IT
  *  ASKS for the same piece. DFU's haggle can turn a counter's spread upside down - a quality-1 shop pays 125/256 of the
  *  cost to a seller with Mercantile 2 and asks 124/256 of a buyer - so buying a piece and selling it back made gold,
  *  and the regions' price walk paid a carrier. Offline, DFU's haggle stands. */
 export const ONLINE_SALE_SHARE = 0.5;
 
-/** ESSENTIALS-HALF (2026-09-30, Discord: "things are way too expensive rn for money to be nerfed so heavily... cut the cost of most essential items by half"):
+/** ESSENTIALS-HALF:
  *  ONLINE, AN ESSENTIAL COSTS HALF. REALM P0.4, MERC-RISE and MERC-CAP cut what a player EARNS online (the sale's half,
  *  the pile's gold divided by level) and left what they PAY where DFU put it, so a bed, a meal, a cure, a fare and a
  *  potion ate a far bigger share of a far smaller purse. The essentials - a tavern room and its food and drink
@@ -1118,7 +1113,7 @@ export function stockSoulGems({ quality = 0, gameMinutes = 0 } = {}, { soulPoint
   return stockGuildMagicItems({ quality, gameMinutes, sellsSoulGems: true, onlySoulGems: true }, { soulPointsOf });
 }
 
-/** GUILD-SHELF (2026-09-27, Discord: "Potion seller restock instantly"): ONE SHELF A DAY. The shelf a guild's Buy
+/** GUILD-SHELF: ONE SHELF A DAY. The shelf a guild's Buy
  *  service shows is `store[service]` while it was minted today (the day is stockDayIndex's, the one the stock is seeded
  *  from), and a fresh `mint()` otherwise - which it then becomes. The trade window buys out of that same array, so what
  *  was bought stays gone until the day turns. DFU mints on every open (below), which never runs out; the departure and

@@ -1,6 +1,5 @@
 // @ts-check
-// LEGACY7 part two (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9; Mac: "online integration with permadeath
-// (Bloodline) or non-permadeath (Enduring)"): A HOUSE NAME ONLINE - the law both ends share. The account service reads
+// LEGACY7 part two: A HOUSE NAME ONLINE - the law both ends share. The account service reads
 // the house off the realm character's line (server-account/src/realm.js realmMintFacts, by legacy.js houseOn) and signs
 // it into the identity token beside the guild's tag (identityToken.js claimsValid): `hn` the house, `hc` the member's
 // given name, `hb` 1 for a Bloodline, `hg` the generation's numeral when two of the house have borne that name. The relay

@@ -1,6 +1,5 @@
 // @ts-check
-// PORTRAIT3D (2026-10-15, the owner: "can we do the other races with 3d portraits also?", then "#2 is exactly I wanted.
-// Which also affects the talk window for npcs"): WHO WEARS A MORROWIND HEAD AS THEIR FACE, AND THE PICTURE OF IT.
+// PORTRAIT3D: WHO WEARS A MORROWIND HEAD AS THEIR FACE, AND THE PICTURE OF IT.
 //
 // combat/fpArm.js headPortrait takes the picture; this is the doors' side of it - who is asked, by which gate:
 //   THE PLAYER (and anyone shaped like one: a save's identity, the chargen grid's ten portraits) - whenever Morrowind's

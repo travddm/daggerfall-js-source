@@ -93,8 +93,7 @@ export class Item extends QuestResource {
    *  STACK COUNT, everything else `GetLongName` (:304-307), which is
    *  `ResolveItemLongName(item, false)`.
    *
-   *  MAC-D (2026-09-17, Mac: "I was given a quest to find a book, but
-   *  the book's name was just *Book*"). This line used to return
+   *  MAC-D. This line used to return
    *  `it.name` - the raw field, which for a book is the TEMPLATE's
    *  name - under a note that said: "ResolveItemLongName's
    *  material/condition prefix half is the inventory arc's label

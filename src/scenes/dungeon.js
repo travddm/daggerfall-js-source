@@ -155,7 +155,7 @@ export async function bootDungeon(canvas, renderer, params, status) {
       // (a crouched death). Late-bound like pose - the motor is built
       // below, after this context; null falls to standing defaults.
       motorState: () => (_motorRef ? { eyeLevel: _motorRef.eye[1] - _motorRef.pos[1], capsule: _motorRef.height, fallFrom: _motorRef.falling ? _motorRef.fallStart : null } : null),   // AUDIT SD III (D1): the fall under way, for the walked trail
-      // TECH1 (bible/05-Combat/Weapon-Techniques.md): the weapon technique's door - this host's motor (late-bound, as the pose
+      // TECH1: the weapon technique's door - this host's motor (late-bound, as the pose
       // is) and its view turned on a foe; the context lands its own shafts and drains its own fatigue
       technique: { motor: () => _motorRef, face: (p, from) => { if (!_poseCam || !_motorRef || !Array.isArray(p)) return; const o = Array.isArray(from) ? from : _motorRef.pos; _poseCam.yaw = Math.atan2(p[0] - o[0], p[2] - o[2]); } },   // AUDIT TECH1: from where the body lands
       placePlayer: placeLoadedPlayer,   // DIAL-LOAD: the host's load law, for every load the context runs - not routeKey's alone
@@ -645,7 +645,7 @@ export async function bootDungeon(canvas, renderer, params, status) {
     };
     window.__actions = () => JSON.stringify(
       [...ctx.actions.objects.values()].map((o) => ({ key: o.key, state: o.state, t: Number(o.t.toFixed(3)), pos: [o.matrix[12], o.matrix[13], o.matrix[14]].map((v) => Number(v.toFixed(2))) })));
-    // Combat probes (2026-08-13 audit): the live-play smoke reads
+    // Combat probes: the live-play smoke reads
     // vitals + the foe roster to verify the frame-loop combat path.
     window.__hp = () => JSON.stringify({ health: playerEntity.health, maxHealth: playerEntity.maxHealth });
     // U26: the dungeon's overlay, for the native-inventory probe. The
@@ -671,7 +671,7 @@ export async function bootDungeon(canvas, renderer, params, status) {
     window.__automapCommand = (name) => ctx.automapCommand?.(name) ?? 'Automap instance not found';
     window.__toggleInventory = () => { ctx.toggleInventory(); return window.__overlay(); };
     window.__piles = () => JSON.stringify(ctx.dropped?.().map((p) => ({ n: p.items.length, flat: !!p.batch })) ?? []);
-    // The fist repro (2026-08-18): the entity + the rig's two combat
+    // The fist repro: the entity + the rig's two combat
     // entries, so a probe can strip the worn weapon and swing bare.
     window.__playerEntity = playerEntity;
     window.__combat = { toggleSheath: ctx.toggleSheath, clickAttack: ctx.playerClickAttack, applySpellToPlayer: ctx.applySpellToPlayer };   // S24
@@ -1142,7 +1142,7 @@ export async function bootDungeon(canvas, renderer, params, status) {
     noteLocalPlayer(player.pos, [Math.sin(cam.yaw), 0, Math.cos(cam.yaw)]);   // TACT2: where I stand and face
     tickTactics(foeFrameDt(ctx.uiOverlayActive ? 0 : dt));   // AUDIT TACT D10/A3: the brain's clock is the foes' own step; AUDIT TELL H1: held under the window that holds them (the return below, above drawFoes)
     renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), player.pos));   // TACT4: a foe's wind-up on the ground
-    renderer.drawFoeTelegraphs?.(techniqueMarksNow());   // TECH1: and the player's own marks, after the foes' (bible/05-Combat/Weapon-Techniques.md)
+    renderer.drawFoeTelegraphs?.(techniqueMarksNow());     // TECH1: and the player's own marks, after the foes'
     ctx.bloodMarks?.draw?.(camRight, UP_Y);   // BLOOD1 AUDIT 3: the context's ring, drawn by THIS host beside the level's flats and under them - it used to ride drawFoes' gate, so a cleared level drew no blood at all
     if (ctx.uiOverlayActive) ctx.drawWindowBodies?.(canvas, { proj, view, eye: cam.pos });   // AUDIT MW-NPC C6, FB1015 LOOT-BODY: under a window drawFoes' last bodies, frozen
     renderer.drawBillboards([...ctx.billboardBatches, ...ctx.campBatches(), ...ctx.torchBatches()], camRight, UP_Y);   // HT1: the dropped torches on the same pass

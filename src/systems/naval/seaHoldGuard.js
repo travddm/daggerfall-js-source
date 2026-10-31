@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT SEA VENTURES B3 (2026-10-22, the owner: "Audit this and ensure perfection"; bible/03-World/Eltheric-Ocean.md
-// SHIP-PVP) - A WRECKED SHIP'S HOLD, SHUT WHILE HER WRECK MAY BE BOARDED. The prize is read off her record as it stands
+// AUDIT SEA VENTURES B3 - A WRECKED SHIP'S HOLD, SHUT WHILE HER WRECK MAY BE BOARDED. The prize is read off her record as it stands
 // when her wreck is carried (server-account/src/seaWreck.js); the hold opens from anywhere (CARGO-ANYWHERE, scenes/
 // holdDoor.js), so in the boarding window an honest page emptied it into the pack, or packed or laid up the boat, and a
 // boarded wreck took nothing. From the referee's wreck of her (scenes/naval/navalPvp.js `wreck`) until her own carry lands

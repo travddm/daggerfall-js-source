@@ -2,7 +2,7 @@
 // modules and the transform they feed - the parts of Weapon Widget 1.6
 // that are arithmetic rather than component.
 //
-// WW-LAB (2026-09-19). They were inline in combat/weapon/weaponWidget.js and
+// WW-LAB. They were inline in combat/weapon/weaponWidget.js and
 // the arithmetic is UNTOUCHED - every line here is the line that was
 // there, in the order it was in; the component imports them back and
 // calls them where it used to do the work itself.
@@ -76,7 +76,7 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // ---- THE THREE MOVEMENT MODULES, AND THE RECT THEY MOVE ----
 //
-// WW-LAB (2026-09-19): Offset, Bob and Inertia, and GetWeaponRect's
+// WW-LAB: Offset, Bob and Inertia, and GetWeaponRect's
 // transform, lifted OUT of lateUpdate as pure functions. The
 // arithmetic is untouched - every line below is the line that was
 // inline, in the order it was in - and the component calls these where

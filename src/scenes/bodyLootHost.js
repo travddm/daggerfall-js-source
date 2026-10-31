@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT (2026-10-17; test-harness/outdoor-loot/DESIGN.md section 3 and 7, DESIGN-REVIEW D-1/D-1a/R-1/R-2): THE FOE-BODY
+// OUTDOOR-LOOT: THE FOE-BODY
 // BLOCK of the encounter pool (scenes/exteriorFoes.js createExteriorFoes) - the street's and a building's, one pool.
 // HOST-SPLIT: the pool WIRES this (`createBodyLoot(handles)`, constructed once) and the block owns the state and the frame; the
 // wire it speaks is net/bodyLoot.js, the claimer's half of the law is systems/loot/claimLedger.js.

@@ -1,7 +1,7 @@
 // @ts-check
-// QL1 (2026-10-19, the owner: "modernize the questing system to be more in line with the mainline games"): THE
+// QL1: THE
 // QUESTLINES' LAW - the switch, the stamp a quest carries for life, and the reading of a quest's objective sheet over
-// the state its machine holds. Design: bible/06-Systems/Questlines-Arc.md (decisions 1, 2, 6, 7; section 2).
+// the state its machine holds. Design: (decisions 1, 2, 6, 7; section 2).
 //
 // ONE MACHINE, A LAYER OVER IT (decision 2). Nothing here runs a quest: the machine is DFU's (systems/quest/machine.js)
 // and never learns of this file. A sheet NAMES state the machine already keeps - a task set, an item carried, a clock

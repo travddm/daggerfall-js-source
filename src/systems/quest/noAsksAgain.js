@@ -2,8 +2,7 @@
 // NO-ASKS-AGAIN (FIELD BUGS 2026-10-13e, "Cant complete quest 'the lost child'": "I found the child in the dungeon,
 // interacted with it, accidentally said 'no' when it asked me to get it, and now i cant interact with it at all. Tried
 // restarting the game, didnt help."): A NO THAT LEADS NOWHERE ASKS AGAIN, ON THE NEXT CLICK. Not a DFU member - a
-// departure (Port-Ledger A, NO-ASKS-AGAIN), under the owner's standing rule for a player's soft-lock: "I dont care about
-// DFU. We're our own thing now" (bible/01-Overview/bugs/Field-Bugs-2026-09-30b.md).
+// departure (Port-Ledger A, NO-ASKS-AGAIN), under .
 //
 // WHAT IT DEPARTS FROM. K0C00Y05 (The Lost Child): `_S.07_ task: clicked npc _child_` / `prompt 1017 yes _S.09_ no
 // _no_`, and `variable _no_`, which nothing reads. Prompt.cs asks once - `allowRearm = false` in its constructor and
@@ -36,7 +35,7 @@
 // re-armed, the demand would come back the next tick, every tick, until a Yes gave the courier's goods away. A `when`
 // asks again as fast. So the asking must be a click: in the shipped corpus that is The Lost Child alone.
 //
-// THE NO THAT CLEARS ITS ASKING (QUEST-AUDIT III, the owner: "fix any and all outstanding issues" - the call FIELD BUGS
+// THE NO THAT CLEARS ITS ASKING (QUEST-AUDIT III, - the call FIELD BUGS
 // 2026-10-13e left him). C0C00Y10 (Holy Orders): the healer's `_S.10_ task: clicked npc _healer_ say 1013` / `prompt
 // 1014 yes _S.11_ no _no_`, and `_no_ task: clear _S.10_` - the author meant the healer to ask again, and Prompt.cs's
 // allowRearm (false) leaves the prompt complete through the clear: every later click says 1013 and asks nothing, and the

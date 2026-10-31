@@ -82,7 +82,7 @@ export function standLooseFoe({ collider, feet, yawRad, fovDegrees, foes, spawn 
   let spot = null;
   for (let i = 0; i < attempts && !spot; i++) {
     spot = placeFoeFreely(env, { minDistance, maxDistance, lineOfSightCheck });
-    if (spot && open && !raidSpotOpen(collider, spot)) spot = null;   // PACK-OPEN (mob: "make sure they dont spawn in houses"): a spot in a building is another attempt
+    if (spot && open && !raidSpotOpen(collider, spot)) spot = null;     // PACK-OPEN: a spot in a building is another attempt
   }
   if (!spot) return null;
   // FinalizeFoe (FoeSpawner.cs:210-226): a FLYING foe lifts 1.5 from
@@ -183,9 +183,9 @@ export function createEnchantCtx({
     // gate, the affinity/curse place gates). Both read seams the mode
     // machine registers, so they route by LIVE mode in every host.
     inSunlight: () => playerInSunlight(),
-    // FB1024 (2026-10-24, #bug-reports): RegensHealth's InDarkness arm asks
+    // FB1024: RegensHealth's InDarkness arm asks
     // inDarkness, and no ctx answered it - Regens Health: In Darkness healed
-    // nothing, anywhere, ever (bible/01-Overview/bugs/Field-Bugs-2026-10-24.md).
+    // nothing, anywhere, ever.
     inDarkness: () => playerInDarkness(),
     inHolyPlace: () => playerInHolyPlace(),
     applySpellToSelf: (record, _entity, item) => magic.castByItemSelf(record, item),   // D9: bundle.CastByItem (CastWhenUsed.cs:136)
@@ -214,7 +214,7 @@ export function createEnchantCtx({
       if (target?.spareGear) { bossSpell?.(record, target); return; }
       const f = foes().find((x) => !x.dead && x.entity === target);
       if (!f) return;
-      // STRIKE-SHARED (2026-09-29, Mac: "Do #1"): the player's strike on a foe ANOTHER player runs goes to that player,
+      // STRIKE-SHARED: the player's strike on a foe ANOTHER player runs goes to that player,
       // whole - landed on this machine's copy it was overwritten by the runner's next frame, and every effect but the
       // damage (which crossed as a blow) did nothing. A spell the wire cannot carry lands here as before.
       if (attacker === playerEntity && spellToOwner?.(f, record, playerEntity.level ?? 1)) return;

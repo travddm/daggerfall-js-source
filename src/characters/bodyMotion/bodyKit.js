@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE BODY, MEASURED. Everything the walking, carrying
+// BODY-MOTION - THE BODY, MEASURED. Everything the walking, carrying
 // and striking laws know about a skeleton is read here, once per skeleton, off its REST pose - the joints' own places,
 // never a bone axis: each leg's and each arm's length, the hips' and the shoulders' widths, how high the ankle stands
 // over the sole, the bone that carries the thighs (retail's thighs hang from "Bip01 Spine", not the pelvis), the trunk's

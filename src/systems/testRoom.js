@@ -1,6 +1,4 @@
-// THE TEST ROOM (TR1, 2026-08-31, Mac's ask: "a menu option that leads
-// to a sort of test environment where I can pick a prebuilt character
-// and loot armor, weapons, etc").
+// THE TEST ROOM (TR1, 2026-08-31).
 //
 // ONE HOME for everything the room is made of: the prebuilt characters,
 // the armory they walk in with, and the seeding that turns a preset
@@ -64,8 +62,7 @@ export const TEST_PRESETS = Object.freeze([
 
 export const testPresetById = (id) => TEST_PRESETS.find((p) => p.id === id) ?? null;
 
-/** TSR4 (2026-09-03, Mac: "an option that spawns you into the outside
- *  world with a mount to test"). The ride is a SPAWN, not a character:
+/** TSR4. The ride is a SPAWN, not a character:
  *  the baseline preset, a horse already in the pack, the landing at the
  *  location's EDGE (the fast-travel arrival law - outside the walls,
  *  facing in), and the mode set through the one transport door. The
@@ -87,7 +84,7 @@ export const TEST_LOOT = Object.freeze({
   blurb: 'The Nord Warrior with a Magic and a Rare of ten base items and every Legendary, all identified. Also one unidentified Rare and Legendary (how the top tiers look on the floor), one Exalted Legendary and the full Ruhn\'s Regalia. Turns Loot rarity on.',
 });
 
-/** FIELD BUGS 2026-09-29 (the sea) #5 (the Discord, through Mac: "Add a ship combat test menu option"): THE SEA
+/** FIELD BUGS 2026-09-29 (the sea) #5 (the Discord, through): THE SEA
  *  BATTLE. A spawn, as the ride is: the baseline preset landed on the open Bay south of Daggerfall - the map pixel
  *  FIELD-CSA2 proved floats a Small Ship (test/systems/comeSailAway/field_csa2.test.js) - put at the helm of an armed Small Ship of their
  *  own there, and a pirate brig launched on open water to stand in and engage (the naval host's own spawn door). Come
@@ -185,8 +182,7 @@ export function testGearRows(gender) {
   for (const [t, label] of clothes) {
     rows.push({ kind: 'clothing', label, templateIndex: t, group: female ? 'WomensClothing' : 'MensClothing' });
   }
-  // EB3 (Mac, 2026-09-12: "For testing in the test character
-  // inventories. Give them books."): a shelf's worth, by the classic
+  // EB3: a shelf's worth, by the classic
   // mapping's ids, so the reader - and the enhanced book over it - can
   // be opened from the pack without a shelf or a shop. A short one, a
   // long one, a title page in the large face, and one with a poem.
@@ -266,8 +262,7 @@ export const TEST_LOOT_BASES = Object.freeze([
  *  fitting base here mints on its own group's first template). Pure
  *  over `rolls`; turns the switch on. Returns what it added.
  *
- *  LR6 (2026-09-15, Mac: "when I open the loot test character, nothing
- *  on the character has rarity in the inventory"): THE SHOWCASE WAS
+ *  LR6: THE SHOWCASE WAS
  *  HIDING WHAT IT SHOWCASES, and it was DFU's own law doing it. A Rare
  *  and a Legendary carry a real DFU enchantment, so `itemIsIdentified`
  *  reads them as UNIDENTIFIED - and an unidentified item gives up its
@@ -319,13 +314,13 @@ export function seedTestLoot(entity, rolls = Math.random) {
   // like on the floor, before the Mages Guild has been paid.
   put(applyRarity(base(TEST_LOOT_BASES[0]), 'rare', rolls), { identified: false });
   if (LEGENDARIES.length) put(legendaryItem(LEGENDARIES[0]), { identified: false });
-  // LOOT2 (bible/06-Systems/Loot-Arc.md section 4): and one Exalted, known - its fourth pip and its extra line's band
+  // LOOT2: and one Exalted, known - its fourth pip and its extra line's band
   if (LEGENDARIES.length) { const ex = legendaryItem(LEGENDARIES[0]); exaltLegendary(ex, rolls); put(ex); }
-  // LOOT14/LOOT15 (bible/06-Systems/Loot-II-Arc.md sections 6 and 7): THE WARDROBE - a Magic and a Rare of each of its
+  // LOOT14/LOOT15: THE WARDROBE - a Magic and a Rare of each of its
   // bases, then each of the wardrobe's Legendaries on its first garment - after every draw the room made before
   for (const t of TEST_WARDROBE_BASES) for (const tier of ['magic', 'rare']) put(applyRarity(testGarment(t), tier, rolls));
   for (const rec of WARDROBE_LEGENDARIES) put(applyRarity(testGarment(rec.templates[0]), 'legendary', () => 0, [rec]));
-  // LOOT16 (bible/06-Systems/Loot-II-Arc.md section 8): a cursed Rare and a cursed Legendary, known - the temple's
+  // LOOT16: a cursed Rare and a cursed Legendary, known - the temple's
   // lifting tried at once - after every draw the room made before
   { const r = applyRarity(base(TEST_LOOT_BASES[0]), 'rare', rolls); cursePiece(r, rolls); put(r); }
   if (LEGENDARIES.length) { const l = legendaryItem(LEGENDARIES[0]); cursePiece(l, rolls); put(l); }
@@ -335,17 +330,17 @@ export function seedTestLoot(entity, rolls = Math.random) {
   // LOOT21 (section 13): the two Ayleid stones, found at the deepest sources - here to be used
   put(welkyndStone());
   put(varlaStone());
-  // GILDED2 (bible/06-Systems/Gilded.md section 7): the gate's Dragonfire Oath and the serpent's Sunken Sovereign, minted
+  // GILDED2: the gate's Dragonfire Oath and the serpent's Sunken Sovereign, minted
   // whole as their bosses drop them - no draw taken, so every draw after them is what it was
   for (const r of GILDED_RECORDS) put(mintGilded(r));
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md): a Rare long bow with its size's three wells, empty, and four graded gems
+  // GEM1/GEM2: a Rare long bow with its size's three wells, empty, and four graded gems
   // to set in them from the pack's card - after every draw the room made before
   { const b = applyRarity(base(TEST_LOOT_BASES[3]), 'rare', rolls); b.sockets = Array(socketMax(b)).fill(SOCKET_EMPTY); put(b); }
   for (const id of TEST_GEMS) put(/** @type {any} */ (mintGem(id)));
   // TRUE-CURSE (01-Overview/bugs/Field-Bugs-2026-10-10.md): a damned Legendary weapon, known - its bite at every blow tried,
   // and the temple's refusal; after every draw the room made before
   { const d = LEGENDARIES.find((rec) => rec.group === 'Weapons'); if (d) { const it = legendaryItem(d); cursePiece(it, rolls, { damned: true }); put(it); } }
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): THE TECHNIQUES - one Rare a technique, on a piece of its family (a Long
+  // TECH1: THE TECHNIQUES - one Rare a technique, on a piece of its family (a Long
   // Bow's two, a Longsword's, a Dagger's, a Battle Axe's, a Mace's, the Gauntlets' for the bare hand), its line at the
   // band's middle, so every one can be tried on its key; after every draw the room made before
   for (const id of TECHNIQUE_IDS) {
@@ -355,7 +350,7 @@ export function seedTestLoot(entity, rolls = Math.random) {
     const it = applyRarity(testItemOf(piece), 'rare', rolls);
     if (addTechniqueLine(it, () => 0.5, { id })) put(it);
   }
-  // BAL9c (bible/05-Combat/Balance-Arc.md section 15): THE ARCANE THREE, each on the first base its record fits (the
+  // BAL9c: THE ARCANE THREE, each on the first base its record fits (the
   // Amulet, the Ring, the Longsword) - chosen, not rolled, after every draw the room made before
   for (const rec of ARCANE_LEGENDARIES) put(legendaryItem(rec));
   return added;
@@ -365,7 +360,7 @@ export const TEST_WARDROBE_BASES = Object.freeze([155, 195]);
 const testGarment = (templateIndex) => mintCondition({ group: templateIndex >= 182 ? 'WomensClothing' : 'MensClothing', templateIndex,
   name: templateByIndex(templateIndex)?.name ?? 'Garment', flags: 0, variant: 0 });
 
-/** SPELLFX1 (2026-09-23): THE SORCERESS GETS MISSILES. The Mage set she
+/** SPELLFX1: THE SORCERESS GETS MISSILES. The Mage set she
  *  starts with has nothing that flies, and the co-op spell work needs
  *  two things to throw at a friend in the test room: a FIREBALL (the
  *  hostile missile - a peer must see it fly and it must pass through
@@ -400,7 +395,7 @@ export function testMissileSpells(spellsByIndex = null) {
 }
 export function addTestMissileSpells(entity, spellsByIndex = null) {
   entity.spells ??= [];
-  // RESURRECT1 (2026-09-23): and a Resurrection, to raise a fallen party mate in the test room
+  // RESURRECT1: and a Resurrection, to raise a fallen party mate in the test room
   for (const sp of [...testMissileSpells(spellsByIndex), resurrectionSpell()]) {
     if (!entity.spells.some((k) => k === sp || (k?.index === sp.index && k?.name === sp.name))) entity.spells.push(sp);
   }

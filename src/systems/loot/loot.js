@@ -336,8 +336,7 @@ function magicItemBase(magicItem, playerLevel, gender, rolls) {
 
 /** HELD-BASE (FIELD BUGS 2026-10-18f, SuperDaddy: "appears on things you can't equip like wands"): POWERS THAT WORK
  *  WORN - a piece has a live row that does not work off the body (enchantments.js worksUnworn: no Used payload).
- *  MAGIC.DEF's own: Cast When Held, Absorbs Spells and Enhances Skill. AUDIT FB1018f L1-4 (decided, Mac: "Stop with the
- *  decisions for me"): ANY such row - a piece with a Used cast and a worn power takes a base a slot takes, which loses
+ *  MAGIC.DEF's own: Cast When Held, Absorbs Spells and Enhances Skill. AUDIT FB1018f L1-4 (decided): ANY such row - a piece with a Used cast and a worn power takes a base a slot takes, which loses
  *  neither half (the cast works from any base); every regular MAGIC.DEF row is one power, so no draw moves. */
 export const powersNeedWearing = (rows) => rows.some((r) => !worksUnworn(r));
 /** HELD-BASE: the draws a held power's base takes before the stream is called dead - the soul trap's bound
@@ -627,7 +626,7 @@ function clampLootValue(v, depth) {
  *  below covers every declared field's kind, not the arrays alone. */
 export const LOOT_ARRAY_FIELDS = Object.freeze(itemFieldsOfKind('array'));
 
-/** INT1 (the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE ITEM LAW, registered by its home
+/** INT1 (the INTEGRITY arc): THE ITEM LAW, registered by its home
  *  (systems/item/itemLaw.js setItemLaw at its import) - the findings on a record, empty for one an honest client could have
  *  minted. A registration, not an import: the law reads the loot graph whole (the records, the spoils, the Broker), and
  *  this module sits under it. Until a host imports the law, the wire checks the shapes alone, as it always did. */
@@ -703,7 +702,7 @@ function wireLootItem(v) {
   return out;
 }
 
-/** AUDIT SETS M2 (2026-09-28): what a player hears opening a container whose room word THIS build cannot read - a
+/** AUDIT SETS M2: what a player hears opening a container whose room word THIS build cannot read - a
  *  newer game's item in it (a raid set piece before RAID4b): it is not opened, claimed or closed over here. */
 export const LOOT_NEWER_TEXT = 'Something in here is from a newer version of the game. Reload to open it.';
 /** AUDIT ONLINE2 F4: a body's pile a peer granted that this build cannot read - handed back to its owner. */
@@ -887,7 +886,7 @@ export function addEnemyLootExtras(items, basics, rolls = Math.random, { quarter
 const _enemyLootExtras = new Map();
 export function registerEnemyLootExtra(name, fn) { if (typeof fn === 'function') _enemyLootExtras.set(name, fn); else _enemyLootExtras.delete(name); }
 
-/** REALM P0.4 (2026-09-28, bible/06-Systems/Realm-Arc.md "Pile gold divided by level"): ONLINE A PILE'S GOLD IS NOT
+/** REALM P0.4: ONLINE A PILE'S GOLD IS NOT
  *  THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
  *  times a level-1 one's in the same pile, and the hour's respawn (WORLD8) paid it again. Unleveled Loot's own arm
  *  divides it back (unleveledLoot.js unleveledGoldLootPiles), and DFU never calls it; online the division runs for

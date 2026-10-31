@@ -1,7 +1,6 @@
 // @ts-check
-// SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own equipment
-// rewards"): THE SERPENT'S HOARD, AS BOTH ENDS READ IT - the hoard is rolled on the device (systems/serpent/serpentSpoils.js) and
-// the account service counts what it paid (server-account/src/serpents.js). Design: bible/11-Multiplayer/Sea-Serpent.md
+// SERPENT-SET: THE SERPENT'S HOARD, AS BOTH ENDS READ IT - the hoard is rolled on the device (systems/serpent/serpentSpoils.js) and
+// the account service counts what it paid (server-account/src/serpents.js). Design:
 // section 8.
 //
 // ITS OWN FILE, NEVER net/serpent/serpentLaw.js: the relay bundles that one (it runs the serpent's fight), and RELAY_VERSION

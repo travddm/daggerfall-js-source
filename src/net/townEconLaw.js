@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-ECON (2026-10-16, bible/06-Systems/Town-Economy-Arc.md; Mac: "give every city and village a dynamic economy
-// system, where even players can affect the influence. Allowing players to hover over towns and see an economy tooltip
-// along with guild control"): THE TOWN ECONOMY'S LAW - one Prosperity a town, 0 to 100, and what it does to the town's
+// TOWN-ECON: THE TOWN ECONOMY'S LAW - one Prosperity a town, 0 to 100, and what it does to the town's
 // counters and its card.
 //
 //  - A TOWN is a MAPS location of type TownCity, TownHamlet or TownVillage (formats/mapsFile.js LOCATION_TYPES 0-2),
@@ -12,7 +10,7 @@
 //    phased by its pixel - a player away a month reads what one who stayed reads), its seat's Standing and Edict, and a
 //    raid at its gates. THE PLAYERS' SHARE (TE2, the account service's count of witnessed acts - the law's lines below,
 //    read by both ends) is an argument, bounded here to TOWN_PLAYERS_MAX.
-//  - THE PRICE (TE0 decision 4 - Mac: "Wider swings, ±25%+", an exception to the Economy arc's law 5, bounded): what a
+//  - THE PRICE (TE0 decision 4, an exception to the Economy arc's law 5, bounded): what a
 //    counter ASKS moves by up to TOWN_PRICE_SWING each way; what it PAYS falls by the same share away from the middle,
 //    either way, and never rises - AUDIT TOWN-ECON LAW-1: a Booming town's counter never pays more than it asks, so the
 //    essentials' half (shopStock.js ESSENTIALS-HALF) breaks even there as it does at the region's price; with a seat's
@@ -62,7 +60,7 @@ export const TOWN_BANDS = Object.freeze([
   /** @type {readonly [string, number]} */ (Object.freeze(['Steady', 35])), /** @type {readonly [string, number]} */ (Object.freeze(['Struggling', 15])),
   /** @type {readonly [string, number]} */ (Object.freeze(['Destitute', 0])),
 ]);
-/** How far a town moves what its counters ask, each way (Mac: "Wider swings, ±25%+"). */
+/** How far a town moves what its counters ask, each way. */
 export const TOWN_PRICE_SWING = 0.25;
 /** The deepest a counter's asking factor goes, a town's and a seat's together: a seat's own deepest, a crown's loved
  *  member on Market Day (townSeatLaw.js seatShopFactor: MEMBER_DISCOUNT.crown 0.15, LOVED_DISCOUNT 0.05,
@@ -134,7 +132,7 @@ export const TOWN_SALE_MODES = Object.freeze(['Sell', 'SellMagic']);
  * A COUNTER'S FACTOR in the town, for `mode` (the trade window's: Buy, Repair, Sell, SellMagic) - what it asks, the
  * town's asking factor times the seat's (`seatFactor`, townSeatLaw.js seatShopFactor, 1 for none), never below
  * TOWN_FACTOR_FLOOR; what it pays, the town's paying factor, never above what it asks THIS player; any other mode 1.
- * SEAT-LOOP (Town-Economy-Arc 7.5, Mac: "Close it"): a seat's discount - its holder's members', Market Day's - lowered
+ * SEAT-LOOP (Town-Economy-Arc 7.5): a seat's discount - its holder's members', Market Day's - lowered
  * what a counter asked while what it paid stood, so an essential (half its price online) bought and sold back paid
  * (five firewood, 13 in and 15 out on Market Day); what it pays falls with what it asks.
  * @param {number} p @param {string} mode @param {number} [seatFactor]
@@ -224,7 +222,7 @@ export function townReportOf(raw) {
   if (ok(px, 999) && ok(py, 499)) {
     if (!ok(location, 9999) || townPixelIdOf(map) !== py * 1000 + px) return null;
   } else {
-    // WW7-5 (bible/03-World/World-Wide.md WW7-5): A TOWN PAST THE BAY - the world's grid, a place of the port's own (its
+    // WW7-5 (WW7-5): A TOWN PAST THE BAY - the world's grid, a place of the port's own (its
     // map id no MAPS row's), its location's index its own negative (world/arenaLocations.js arenaLocationIndex and the rest)
     const grid = (v) => Number.isSafeInteger(v) && Math.abs(v) < SEAT_PIXEL_SPAN;
     if (!grid(px) || !grid(py) || townPixelIdOf(map) < TOWN_PLACE_ID_MIN || !Number.isSafeInteger(location) || location >= 0 || location < -0x7fffffff) return null;
@@ -232,7 +230,7 @@ export function townReportOf(raw) {
   return { map, px, py, region, location };
 }
 /**
- * BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 23 - E4): THE STAFF AUDIT'S ORDER
+ * BAY-LEFT-SEA: THE STAFF AUDIT'S ORDER
  * (server-account/src/townEcon.js auditTowns, `/town audit [page]`) - a region's confirmed towns TOWN_AUDIT_PAGE a page:
  * the Bay's by their location's index, as they always were; a province's (WW7-5: their indices their own negatives, so
  * `ORDER BY location` listed the countryside's farthest hamlets first and the capitals never) its capitals' slices first

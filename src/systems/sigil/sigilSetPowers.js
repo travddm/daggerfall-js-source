@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SET3 (2026-09-26) — WHAT THE SETS DO.
+// SET3 — WHAT THE SETS DO.
 //
 // The law (systems/sigil/sigilSets.js) says which tiers are awake and every
 // number in them; this file does what each tier says, through the seams
 // SET2 opened - registered here at import, each a no-op for anyone but
 // MY entity with the set worn and awake (online, my Renown known, no
-// duel). Design and numbers: bible/11-Multiplayer/Sigil-Sets.md.
+// duel). Design and numbers:.
 //
 //   the 2-piece stat tiers     an entity FOLD (RF1): armour a part,
 //                              attributes, skills, a resistance -
@@ -30,7 +30,7 @@
 //   Waters of Oblivion         a player's CAST COST modifier
 //   Eye of Mora                an ABSORPTION chance
 //
-// RAID4b (2026-09-28) - THE RAIDING PARTIES' OWN SETS, through the same seams (bible/03-World/Raiding-Parties.md, "The
+// RAID4b - THE RAIDING PARTIES' OWN SETS, through the same seams (, "The
 // rewards (RAID4)"; the numbers in Sigil-Sets.md section 6b):
 //   Oath of the Watch,         the FOLD
 //   Keen-Eyed, Thick-Skinned
@@ -39,15 +39,15 @@
 //   Run Them Down, No Escape   the BLOW (a foe under half health; the marked foe); No Escape's mark is the KILL's
 //   Hold the Line, Iron Hide   the DAMAGE modifier (under half health; the ward's points); Iron Hide's ward the KILL's
 //
-// SERPENT-SET (2026-10-05) - THE OLD COIL'S OWN, Sethrakul's Coilscale (Sigil-Sets.md section 6c), through the same seams:
+// SERPENT-SET - THE OLD COIL'S OWN, Sethrakul's Coilscale (Sigil-Sets.md section 6c), through the same seams:
 //   Sea-Scale                  the FOLD
 //   Constrict                  the STRIKE listener tightens the coil (a weapon blow that LANDED on a foe, a bow's too);
 //                              the BLOW reads its stacks at the coiled foe; the KILL of that foe ends it - AUDIT 625 P3
-//                              (Mac: "A coil per foe"): every foe its own coil
+// : every foe its own coil
 //   Shed Skin                  the HURT listener: a foe's blow that takes me under its line heals me
 //                              (systems/playerHeal.js, the loot's own heal)
 //
-// SD9d (2026-10-07) - THE BRASS OF NUMIDIUM, the Brass Remnant's own (bible/11-Multiplayer/Super-Dungeons.md section 11),
+// SD9d - THE BRASS OF NUMIDIUM, the Brass Remnant's own,
 // through the same seams:
 //   Dwemer Brass               the FOLD (magic and shock resistance)
 //   Gearward                   the DAMAGE modifier: while the gear is wound, a foe's BLOW (the door's mark - never a
@@ -55,10 +55,10 @@
 //   The Hour Turns             a DEATH SAVE (Unbroken's door, tried after it): the killing blow leaves me at 1, and the
 //                              HURT listener heals its share as the door says so (the loot's own heal)
 //
-// WITCH1 (2026-10-20) - THE WYRD'S RAIMENT, the Witches' Festival's own (bible/06-Systems/Witches-Festival.md), through the
+// WITCH1 - THE WYRD'S RAIMENT, the Witches' Festival's own, through the
 // same seams: Wyrd-Sight the FOLD, Tallow-Ward the BLOW, Soul Harvest the KILL listener.
 //
-// STAR7 (2026-10-20) - THE STARSPUN WEAVE, the Starfall's own (bible/11-Multiplayer/Starfall.md section 6), through the same
+// STAR7 - THE STARSPUN WEAVE, the Starfall's own, through the same
 // seams:
 //   Spinner's Thread           the FOLD (poison resistance and Agility)
 //   Bound in Silk              the STRIKE listener lays a strand on the foe my weapon blow LANDED on (each foe its own
@@ -71,7 +71,7 @@
 //                              leaves me standing at 1 from does wake it, as it wakes Shed Skin: the guard is no death
 //                              save, and hiding at 1 is what the Veil is for (AUDIT STAR S3)
 //
-// SEA-SET (2026-10-22) - THE ELTHERIC TIDEMAIL, the deep sea's own (bible/11-Multiplayer/Sigil-Sets.md section 6h), through the
+// SEA-SET - THE ELTHERIC TIDEMAIL, the deep sea's own, through the
 // same seams and one of its own:
 //   Stormwrack                 the FOLD (shock resistance and Speed)
 //   Undertow                   the BLOW: its share whole while I stand in the open Eltheric Ocean (the zone's live flag on
@@ -208,7 +208,7 @@ export const rampageStacks = (now = _now()) => (now < _s.rampageUntil ? _s.rampa
  *  has run out. */
 export const bloodStacks = (now = _now()) => (now < _s.bloodUntil ? _s.blood : 0);
 export const markedFoe = (now = _now()) => (now < _s.markUntil && !(_s.marked?.health <= 0) ? _s.marked : null);   // AUDIT SETS L1: a mark on a body is none (a peer's kill of it reaches no setKill of mine)
-/** SERPENT-SET, AUDIT 625 P3 (Mac: "A coil per foe"): A FOE'S OWN COIL - its stacks now, none once its window has run
+/** SERPENT-SET, AUDIT 625 P3: A FOE'S OWN COIL - its stacks now, none once its window has run
  *  out, or over a body (a peer's kill of it reaches no setKill of mine: the mark's own law). One coil once, moved to
  *  whichever foe a blow landed on last, so a swing that met two foes - a crowd's, a sweep's - unwound it on each in
  *  turn and never built it; every foe holds its own now, each its stacks and its window. */
@@ -296,7 +296,7 @@ export function setStrike(attacker, target, damage, weapon, info = null) {
 }
 /** SERPENT-SET, CONSTRICT: a weapon blow of mine that LANDED on a foe tightens the coil on it - a stack more, up to
  *  COIL_STACKS, its window renewed to COIL_SECONDS; a blow that lands on another foe starts that foe's own coil, and the
- *  first keeps its own (AUDIT 625 P3, Mac: "A coil per foe"). Never on a player (a duel: the sets sleep), and only while
+ *  first keeps its own (AUDIT 625 P3). Never on a player (a duel: the sets sleep), and only while
  *  the tier is awake on me. */
 function coiled(attacker, target) {
   if (!target || target.isPlayer || !tierOf(attacker, 'coilscale', 1)) return;
@@ -396,7 +396,7 @@ function landedBlow() {
   return b && _now() - b.at <= BLOW_WINDOW_S ? b : null;
 }
 /** Spite of the Spurned: the foe that struck me takes its share of what its blow took from me - never its last point
- *  (BAL5, bible/05-Combat/Balance-Arc.md section 11: the kill is mine to take, never the Spite's). */
+ *  (BAL5,: the kill is mine to take, never the Spite's). */
 function spite(entity, blow, took) {
   const v = tierOf(entity, 'malacath', 1);
   if (!v || !(took > 0)) return;
@@ -490,7 +490,7 @@ function setDoorOpen(entity) {
   _pendingBoss = _now() - _bossBlowAt <= BLOW_WINDOW_S;
   _bossBlowAt = -Infinity;
 }
-/** LOOT4 (the Loot arc, bible/06-Systems/Loot-Arc.md section 6): THE BLOW THIS HURT CARRIES - the foe's blow the door
+/** LOOT4 (the Loot arc): THE BLOW THIS HURT CARRIES - the foe's blow the door
  *  took as it opened (`{ attacker }`), or null: a fall, a poison's round, a spell. Read by a damage modifier asked before
  *  the hurt lands (the loot's ward, hex and evasion answer a foe's BLOW and nothing else), so the one law of what a blow
  *  is - the struck tail's mark, taken by the door as it opens - is this file's alone. */

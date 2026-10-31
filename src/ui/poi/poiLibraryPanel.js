@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-4b (2026-10-14) - THE LIBRARY: THE MODELS EVERY BUILDER KEEPS, BROWSED, PLACED AND KEPT.
+// POI-4b - THE LIBRARY: THE MODELS EVERY BUILDER KEEPS, BROWSED, PLACED AND KEPT.
 //
-// Mac: "the ability to import models ... a tool my developers can use without having to access the codebase"
-// (bible/06-Systems/POI-Editor-Arc.md POI-4b). Two dialogs over the POI editor's panel (ui/poi/poiEditorPanel.js):
+// (POI-4b). Two dialogs over the POI editor's panel (ui/poi/poiEditorPanel.js):
 //
 //   - THE LIBRARY (the bar's Library): every entry on the shelf, newest change first - its picture, its name, its tags,
 //     who made it, its parts and triangles - searched by any words of its name, tags or maker, or mine alone. PLACE

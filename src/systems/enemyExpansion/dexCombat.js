@@ -1,4 +1,4 @@
-// DEX4b (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 9) - DAGGERFALL ENEMY EXPANSION'S COMBAT HOOKS, the
+// DEX4b - DAGGERFALL ENEMY EXPANSION'S COMBAT HOOKS, the
 // FormulaHelper overrides its Start registers (BestiaryMod.cs:182-190) and its OnLootSpawned handler's forced gender:
 //   - OnMonsterHit (:1449-1585): DFU's own switch become a chain - each of DFU's nine arms taken where the attacker is
 //     its classic monster OR its row's `OnHit` names the arm's number, in DFU's order - and four arms of the mod's own

@@ -1,5 +1,5 @@
 // @ts-check
-// MERCHANT-YARDS (2026-10-10): WHERE A TOWN'S TWO YARDS STAND - the Stable and the Wagon Yard (systems/merchantYards.js)
+// MERCHANT-YARDS: WHERE A TOWN'S TWO YARDS STAND - the Stable and the Wagon Yard (systems/merchantYards.js)
 // on the town's own open ground, read off its layout alone, so every client stands each on one spot.
 //
 // THE GROUND: the town's navgrid (world/city/cityNavigation.js, DFU's CityNavigation carve - every automap byte a building,
@@ -17,9 +17,7 @@
 // row, then the lower column, then the lower turn. The Stable is placed first, then the Wagon Yard on what is left,
 // YARD_GAP_M clear of it.
 //
-// IC-PROPS (2026-10-27, the owner: "Random placements on the wagon/other vendors all over the Imperial city", then "the
-// issues I mentioned for the imperial city for stables/doors/etc are a world wide issue. They have no logical
-// placements"; bible/03-World/Merchant-Yards.md IC-PROPS): EACH KIND WHERE IT BELONGS, ON THE TOWN'S OWN OPEN GROUND. Every
+// IC-PROPS: EACH KIND WHERE IT BELONGS, ON THE TOWN'S OWN OPEN GROUND. Every
 // yard stood nearest the middle of the town's grid on any open cell its road law did not know for a way: measured over
 // 270 towns, a third of the Bay's stables in a house's garden and a fifth across a street, eight in ten in the town's
 // inner half; past the Bay, four city-states in five stood theirs on the open land the outline leaves, wherever it lay;
@@ -42,8 +40,7 @@
 //
 // Pure: no renderer, no GL, no clock. Not a DFU member. Ledger A (MERCHANT-YARDS).
 //
-// IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
-// Arena-Provinces.md IC-STUTTER): EVERY PASS A STEP AT A TIME. A city of eight blocks a side is a grid of 512 by 512 cells,
+// IC-STUTTER: EVERY PASS A STEP AT A TIME. A city of eight blocks a side is a grid of 512 by 512 cells,
 // and every near slice of the Imperial City is one: its measures (two thousand placed models' boxes), its ground and its
 // yards' search (four turns over every cell, a yard a pass) ran in one task of the pixel's build, 0.2-0.4 s of the page's
 // thread on each - at x60 several a second. Each pass is a generator (`...Steps`) that yields between blocks and between
@@ -391,7 +388,7 @@ export function yardSitesOf(loc, measures = {}) {
   return g ? yardSitesOn(g) : [];
 }
 /**
- * SHIPYARDS (2026-10-11): A LAID-OUT TOWN'S PLACING GROUND - its navgrid carved on the enhanced lane's water table, its
+ * SHIPYARDS: A LAID-OUT TOWN'S PLACING GROUND - its navgrid carved on the enhanced lane's water table, its
  * blocks' measures over it (yardGround's) - or null for a layout with no blocks. The one ground a town's yards are placed
  * on (yardSitesOf), and the port's two after them (world/portSites.js portSitesOn: on what the yards left). Pure.
  * @param {{width: number, height: number, blocks: any[]}} loc @param {Parameters<typeof yardGround>[1]} [measures]

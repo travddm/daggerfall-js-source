@@ -1,5 +1,4 @@
-// HAZE1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be on
-// by default and integrate into our enhanced environments seamlessly") - HEAT HAZE 1.0.1 (demifiend000, vendored at
+// HAZE1 - HEAT HAZE 1.0.1 (demifiend000, vendored at
 // vendor/heat-haze/), ported off its assembly: HeatHazeEligibility whole, and HeatHazeMod's state - its settings, the
 // ring's place and scale, the strength's ease and the noise it bends the view by. Pure: the host hands it the frame
 // (render/heatHaze.js draws what it answers).
@@ -14,7 +13,7 @@
 //   - the ring follows the player: its axis the player's x and z, its middle 1.5 m over the capsule's foot, read while
 //     grounded (UpdateRingTransform); scaled to FullStrengthDistance across and RingHeight tall.
 //
-// ENHANCED ENVIRONMENTS (Mac: "integrate into our enhanced environments"): the haze is the enhanced lane's, as the
+// ENHANCED ENVIRONMENTS: the haze is the enhanced lane's, as the
 // port's other outdoor looks are - the hosts build the renderer only under it (sky.enhanced), the mod's own switch
 // (MOD_SETTINGS 'heat-haze' Enabled, on by default - MO1) and `?haze=off` the kill door beside it.
 

@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-SHAPES TS3 (2026-10-25, the owner: "IC should be round, give other
-// towns unique shapes. Its time to move away from perfect squares"; shown
-// both ways, the mixed one: "#1 but players cant own a home yet outside the
-// bay?"; bible/03-World/Town-Shapes.md TS3) - A TOWN PAST THE BAY LAID AS ITS
+// TOWN-SHAPES TS3 - A TOWN PAST THE BAY LAID AS ITS
 // OWN OUTLINE OF BLOCKS.
 //
 // DFU's reference: a town is its MAPS.BSA row's whole rectangle of blocks
@@ -57,7 +54,7 @@ const OPEN_TILE = 63;
 /** @typedef {{ reach: number, depth: readonly number[], lobes: readonly number[], noise: number, noiseCell: number, min: number, turns: number }} OutlineMeasures */
 /** @type {Readonly<OutlineMeasures>} */
 export const TOWN_OUTLINE = Object.freeze({ reach: 0.98, depth: Object.freeze([0.14, 0.24]), lobes: Object.freeze([3, 5]), noise: 0.08, noiseCell: 9, min: 3, turns: 8 });
-/** TS5 (the owner: "with the outskirt locations being circular also"): a ROUND town's - the Imperial City's outskirts
+/** TS5: a ROUND town's - the Imperial City's outskirts
  *  (world/imperialCity.js IMPERIAL_OUTSKIRTS) - no lobe and no noise, its rim within a ring of its grid: a three by three
  *  leaves its corners out. */
 /** @type {Readonly<OutlineMeasures>} */
@@ -291,7 +288,7 @@ export function townOutlineBlockJson() {
 /** TS7: Daggerfall's own twelve wall blocks (WALLAA00-11) - a ring of them, and only them, is a ring the Bay's edit takes. */
 const CLASSIC_WALL = /^WALLAA(0\d|1[01])\.RMB$/i;
 /**
- * TS7 (2026-10-25, the owner: "Do all the open items" - the Bay's cities walled on their outline): A BAY CITY READ - the
+ * TS7: A BAY CITY READ - the
  * port's edit of a location as the door reads it (formats/worldData/worldDataReplacement.js registerLocationEdit, after
  * the Arena's). A grid whose border is Daggerfall's wall ring and nothing else (every one of the Bay's 410 walled cities,
  * measured) has its ring cells open (TOWN_OUTLINE_BLOCK) but its south-west corner, its wall's carrier (townWallBlockName);

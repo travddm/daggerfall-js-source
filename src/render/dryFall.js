@@ -1,5 +1,5 @@
 // @ts-check
-// ASHFALL1 (bible/07-Rendering/Weather-Arc.md E): THE DRY FALLS the rain program never draws (world/weather.js
+// ASHFALL1 (E): THE DRY FALLS the rain program never draws (world/weather.js
 // isDryFall) - WEATHER2d's sand (the wisps in SAND_LOOK) and the ash: grey flakes tumbling down a box that follows the
 // eye and wraps, and a few embers kindled white-hot, reddening out and ADDED to the frame so they glow. Both take the
 // front's intensity as their count's share and the ONE wind's travel as their drift; every rate is whole cycles and every

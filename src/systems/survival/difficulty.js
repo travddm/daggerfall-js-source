@@ -1,14 +1,9 @@
-// SURV-TIERS (2026-09-23, Mac: "adding a new tab to climates and calories
-// thats on by default. Something that introduces mechanics, leaves some out
-// and is overall not a punished experience for players", then "Off, Casual,
-// Hard" and "I want this to be a smart and thorough difficulty design. No
-// band aids") - THE TIERS, AS DATA.
+// SURV-TIERS - THE TIERS, AS DATA.
 //
 // ONE KEY, FOUR ANSWERS. The survival pref (survival/switch.js) was a
 // boolean; it is a tier now: OFF (the classic game), BOONS (SURV-BOONS,
 // 2026-10-12: the rewards-only tier - its rules are at the end of this
-// note - THE DEFAULT since BOONS-DEFAULT, 2026-10-13, Mac: "make boons
-// the default"), CASUAL (the default until then) and HARD (the arc as
+// note - THE DEFAULT since BOONS-DEFAULT, 2026-10-13), CASUAL (the default until then) and HARD (the arc as
 // SURV1-7 built it).
 // SURV-TIERS made the first three. Every law that can charge the
 // player reads its tier's RULES from this table, handed in by the host's
@@ -67,10 +62,7 @@
 // window, a cooked meal feeds more than a raw one and a fresh one more than
 // a spoiled one, a fed hour gives stamina back.
 //
-// SURV-BOONS (2026-10-12, the owner: "a completely different version. Instead
-// of punishing players for not tending, we instead provides boons to those
-// who upkeep. Much like [Valheim]. Players would still be able to switch
-// between CAC versions") - THE FOURTH TIER, BOONS. Not Casual turned down
+// SURV-BOONS - THE FOURTH TIER, BOONS. Not Casual turned down
 // again: Casual and Hard ask what a need left unmet COSTS; Boons asks what
 // a need met EARNS. Its rules, written out:
 //
@@ -106,7 +98,7 @@
 export const SURVIVAL_OFF = 'off';
 /** The tiers in the Features bar's order. */
 export const SURVIVAL_TIER_IDS = Object.freeze([SURVIVAL_OFF, 'boons', 'casual', 'hard']);   // SURV-BOONS: the gentlest first after Off
-export const SURVIVAL_DEFAULT = 'boons';   // BOONS-DEFAULT (2026-10-13, Mac: "make boons the default") - Casual until then
+export const SURVIVAL_DEFAULT = 'boons';     // BOONS-DEFAULT - Casual until then
 
 /** AUDIT SURV-TIERS: what each tier is STORED as on the prefs shelf -
  *  the values the Features row's segments write (systems/features.js

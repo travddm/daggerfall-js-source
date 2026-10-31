@@ -1,5 +1,4 @@
-// CRUX1 (2026-09-22, a player through Mac: "the final dungeon mission
-// is unbeatable"): THE QUEST VIDEOS PLAY ONE AFTER ANOTHER. DFU's
+// CRUX1: THE QUEST VIDEOS PLAY ONE AFTER ANOTHER. DFU's
 // PlayVideo pushes a DaggerfallVidPlayerWindow onto the UI stack
 // (PlayVideo.cs:78-82 through DaggerfallUI.PushWindow), and a window
 // pushed while another stands shows when the first pops - so two

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// URBANIZER U2 (2026-10-26; KPbICA's spec, forwarded by the owner; bible/03-World/Urban-Fabric.md section 3) - THE TOWNS'
+// URBANIZER U2 - THE TOWNS'
 // OWN PICTURES: cut stone, brick courses and timber framing over plaster for the port's own buildings (the capitals'
 // landmarks past the Bay - world/capitalSolitude.js and its kin), and each province's paving, kerbs, cobbles and walls
 // for its towns' streets and yards (world/urban/townFabricModel.js).

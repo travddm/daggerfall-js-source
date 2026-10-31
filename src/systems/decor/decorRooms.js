@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR-ROOMS (2026-09-27, Discord: "For a house with multiple
-// connects, add room switching tabs").
+// DECOR-ROOMS.
 //
 // A HOUSE OF SEVERAL ROOMS, FOUND IN ITS OWN WALLS. Daggerfall builds a
 // building's interior as one scene and names no rooms in it, and the

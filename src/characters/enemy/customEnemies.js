@@ -1,4 +1,4 @@
-// DEX1 (bible/04-Characters/Enemy-Expansion.md) - AN ENEMY PAST MobileTypes: WHAT A MOD REGISTERS SO DFU CALLS IT ONE.
+// DEX1 - AN ENEMY PAST MobileTypes: WHAT A MOD REGISTERS SO DFU CALLS IT ONE.
 //
 // Daggerfall Unity's enemies are MobileTypes 0-42 and 128-146, and any other id is an enemy exactly when a mod has
 // registered a career for it: SetupDemoEnemy.ApplyEnemySettings (:160-185) makes 0-42 a monster and 128-146 a class,

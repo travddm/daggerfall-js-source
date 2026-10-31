@@ -1,7 +1,4 @@
-// ORL1 (2026-09-17, Mac: "So I've been analyzing morrowind mods to
-// integrate and the first one I'd like to add is this. On new game, I
-// want the player to receive a notification on which leveling system
-// they would like to use") - OBLIVION-REMASTER-LIKE LEVELING 0.5.3,
+// ORL1 - OBLIVION-REMASTER-LIKE LEVELING 0.5.3,
 // ported 1:1 from the author's own Lua (vendor/oblivion-remaster-leveling/).
 //
 // THE FIRST MORROWIND MOD IN THIS TREE. Every other vendored mod is a
@@ -118,8 +115,7 @@ export function levelingSettings(r = null) {
   });
 }
 
-/** LEVEL-ONLINE (2026-09-30), REVERSED BY LEVEL-ONLINE-2 (2026-10-06, Mac: "Oblivion should be locked. Currently
- *  players are forced into oblivion"): THE ONE LAW for the system a NEW character is born with. Online, Oblivion's
+/** LEVEL-ONLINE, REVERSED BY LEVEL-ONLINE-2: THE ONE LAW for the system a NEW character is born with. Online, Oblivion's
  *  leveling is not offered - a character made (or imported from a classic save) on the online page levels the
  *  Daggerfall way whatever was asked for; offline the request stands. It is applied where a character is BORN
  *  (finishChargen, the `?class=` skip, the classic-save import) and never where one is LOADED - an existing ONLINE

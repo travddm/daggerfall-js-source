@@ -1,10 +1,9 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "a large boss arena with an oversized enemy with telegraphed attacks (like wind ups, etc)"):
+// WB4:
 // THE FIGHT IN THE COURT, ON THIS SCREEN - the boss's body where the relay says he stands, doing what it says he is
 // doing, three times a Daedra Lord's size; his glow; the telegraph of the attack he is winding up; his voice at the
 // word, at the landing, at a phase and at his fall; the bar over the screen; and THE PLAYER'S OWN SIDE of every attack -
 // the landing tested against this player's feet, and the blow taken through the host's own door. Design:
-// bible/11-Multiplayer/World-Bosses.md section 5.
 //
 // ONE SOURCE: the court's link (net/gate/gateLink.js - the relay's words, folded). Nothing here is sent: a strike's verdict
 // is this machine's own (co-op's law - "an enemy's strike on a client is applied by that client", net/gate/gateStrike.js),
@@ -76,7 +75,7 @@ export const COURT_STRIKE_TEXT = Object.freeze({
   burning: 'burning ground',
 });
 /** WBX5: THE TURN OF A PHASE, as he leaps into the court's heart - each phase by its name (net/gate/gateBrain.js PHASE_NAMES)
- *  and what it asks. WB13e (2026-10-01, Mac: "AAA grade polish"): a title card (ui/gate/gateTitleCard.js) - its numeral, its
+ *  and what it asks. WB13e: a title card (ui/gate/gateTitleCard.js) - its numeral, its
  *  name, and its one order under it until he lands (WB9b/c: the turn crosses to the next court); nothing said beside it. */
 export const PHASE_NUMERALS = Object.freeze(['I', 'II', 'III']);
 export const courtPhaseOrder = (n) => (n === 2 ? t('gate.phase.follow2', 'Follow him over the walkway.') : n === 3 ? t('gate.phase.follow3', 'Follow him to the last court.') : null);   // AUDIT WB14 (TEXT-9): in the player's language, as the Sundering's are
@@ -132,8 +131,7 @@ export const WRATH_LIGHT_RANGE = 60;
 /** WB13e: the court's light white at his fall and at the Wrath's landing (scenes/eliteGates/egLordFall.js: a breach lord's fall too). */
 export const WHITE = Object.freeze([1, 0.96, 0.9]);
 const WRATH_RED = Object.freeze([1, 0.08, 0.04]);
-/** WB9c (2026-09-30, Mac: "a detailed wipe mechanic on the final phase that should require players to destroy oblivion
- *  crystaline formations ... which then stuns his wipe mechanic"): DAGON'S RECKONING, said - its call (how many crystals
+/** WB9c: DAGON'S RECKONING, said - its call (how many crystals
  *  there are to break), each crystal broken (by whom, and how many stand), and the Reckoning broken (he is stunned). */
 export const COURT_RECKON_TEXT = Object.freeze({
   call: (n) => `Dagon's Reckoning! Shatter all ${n} crystals!`,   // WB13b: the bar counts it down
@@ -226,7 +224,7 @@ export const screenBearing = (dir, yaw) => (Math.atan2(dir[0] * Math.cos(yaw) - 
 /** AUDIT WB14 (SCREEN-7): how far ahead the Wheel's peril looks down its blades' turn. */
 export const WHEEL_PERIL_MS = 1000;
 /**
- * WB13a (2026-10-01, Mac: "hone in telegraphs"): A BLOW STILL TO COME ON MY FEET - in first person at sword reach the
+ * WB13a: A BLOW STILL TO COME ON MY FEET - in first person at sword reach the
  * ground under me is out of sight (his Cleave's shape is none of the frame). The one landing soonest of his blow in
  * flight (never the whole floor's: no step escapes the Wrath or the Reckoning) and his host's: its name, its wind-up's
  * share `t`, `now` in its last TELEGRAPH_NOW_MS, its line's colour, and the nearest way out as the screen turns it
@@ -268,8 +266,7 @@ export function orderPeril(o, yaw = null) {
   return { name: o.name, t: o.t, now: !!o.now, color: o.color ?? TELEGRAPH_EDGE, order: o.order, arrow: dir && Number.isFinite(yaw) ? screenBearing(dir, /** @type {number} */ (yaw)) : null };
 }
 
-/** GATE-HEAL (2026-10-01, Mac: "Can we add a line on the damage round up showing the amount healed?" - each challenger's;
- *  "Like for healers" - allies only): what my mates' spells healed in me goes to the relay at most this often (a word for
+/** GATE-HEAL: what my mates' spells healed in me goes to the relay at most this often (a word for
  *  every caster since the last). */
 export const HEAL_SEND_MS = 1000;
 
@@ -329,7 +326,7 @@ export function createGateCourt({
   myId = () => null, pull = () => {}, pullDecay = 0,   // WB14a: my peer id (the marked blows name it), my body's push (the Chains' reel) and its decay
   wantBodies = undefined, makeBodies = null,   // MWNPC10: the body lane's seams (a test's own)
 }) {
-  // MWNPC10 (bible/04-Characters/Morrowind-NPCs.md section 15a): HIM AND HIS HOST IN THEIR MORROWIND BODIES, on a lane of
+  // MWNPC10: HIM AND HIS HOST IN THEIR MORROWIND BODIES, on a lane of
   // the court's own (drawBodies) - the host's billboard pass draws after it
   /** COURT-WATCH: whether I watch this court (net/gate/gateLink.js `watching` - it was full when I asked) - its fight
    *  heard and drawn, mine never: no blow of mine sent, none of his landed on me. */
@@ -364,7 +361,7 @@ export function createGateCourt({
    *  met starved my blows); a second frame on a body already met is a blow of its own. `who` the body: 'b' him, `x<c>`
    *  a crystal, `a<i>` one of his host. */
   const blowMet = new Set();
-  // GATE-HEAL: WHAT MY MATES HEALED IN ME - allies only (Mac: "Like for healers"): owed to each caster, by peer id, since
+  // GATE-HEAL: WHAT MY MATES HEALED IN ME - allies only: owed to each caster, by peer id, since
   // my last word to the relay, and when that word went. My own spells, potions and items are no one's.
   let healSentAt = -Infinity;
   const healOwed = new Map();
@@ -538,8 +535,7 @@ export function createGateCourt({
 
   /** WBX2: THE PORTAL HOME - PORTAL_AFTER_MS into his fall it stands where he fell and rises; its door is laid into the
    *  court's exit doors once (the ray, the plaque's name and the PRESS - the court's one door), and the
-   *  rising is said once. SS3 (2026-09-27, a player through Mac, "Oblivion gate exit on touch prevents looting": "I was
-   *  close to the guy when he died, got zoned out by touching the gate before I could pick up loot"): it is never WALKED
+   *  rising is said once. SS3: it is never WALKED
    *  through. It stands where he fell - where his spoils leave him and land - so a player going for them stepped through
    *  its fire and out of the court with the floor still full (gathered into the pack on the way out, never seen fall). */
   function portalFrame(s, t, dt) {
@@ -569,7 +565,7 @@ export function createGateCourt({
     if (inCourt && held === null) setPeerSoundScope(peersDown);
     else if (!inCourt && held === peersDown) setPeerSoundScope(null);
   }
-  /** GATE-MIX (2026-10-20, the owner: "the game hitches"): THE PASSES MADE BEFORE THEY ARE WANTED. His landings' sparks,
+  /** GATE-MIX: THE PASSES MADE BEFORE THEY ARE WANTED. His landings' sparks,
    *  the Reckoning's crystals and the way home's fire were each compiled in the frame that first drew them - the first
    *  landing of the fight, the first Reckoning, his fall - and a compile is a frame's hitch. Now each is made as I stand
    *  in the court, one a frame (the step's veil is over the screen for the first of them), so the fight never waits on
@@ -589,8 +585,7 @@ export function createGateCourt({
     if (all) warmed = warmDoors.length;
   }
 
-  /** GATE-FBX (2026-10-09, Mac: "remove the portal that players walk through on the inside and just use a portal that
-   *  opens and closes. Like at the end of the fight"): THE WAY IN - the gate's own fire at the bridge's foot, where WB3b's
+  /** GATE-FBX: THE WAY IN - the gate's own fire at the bridge's foot, where WB3b's
    *  membrane stood: whole as I step out of it, held WAY_IN_HOLD_MS from then and closing behind me (world/gate/gateArena.js
    *  wayInStep) - AUDIT GATE-FBX C4: from my arrival (courtWatch), however late the fight's first word comes; a word that
    *  comes after the hold finds it shut. Opened again for another stepping out of it (stepsIn). No door: it does not
@@ -1113,13 +1108,13 @@ export function createGateCourt({
       const F = flameOf(s), pF = alive && F ? perilAt(F, t, profileOf(F), fp[0] - COURT_CENTRE[0], fp[2] - COURT_CENTRE[2], yaw()) : null;
       const onMe = peril && pF ? (pF.now && !peril.now ? pF : peril) : peril ?? pF;
       drawGateBossBar(bossBarModel(s, t, bossOf(s), onMe?.name ?? null, { flame: F, flameMine: !!F && !!fp && flameCourtMine(F, t, fp) }), { hidden: hudHidden() || veiled() });
-      // WB9a (Mac: "Allow people to see the modifers/trial as a popup before it starts"): THE MARKS' CARD as I step in -
+      // WB9a: THE MARKS' CARD as I step in -
       // his aspect and his trials, each with its sign, its line and how to meet it, while he stands to be read
       // (net/gate/gateBrain.js OPENING_MS); gone once he has fallen, and never over the step's fire
       if (marksAt !== null && s.fell) marksAt = null;
       drawGateMarksCard(marksAt !== null ? marksCardModel(s.md, bossOf(s), { mode: 'arrive', since: marksAt, now: t, pt: s.pt }) : null, { hidden: hudHidden() || veiled() });
       drawGateTitleCard(titleCardModel(beat, t), { hidden: hudHidden() || veiled() });   // WB13e: his wake, a phase's turn, his fall
-      // GATE-UX (Mac: "a detailed damage chart after the boss kill, showing and ranking everyone's damage"): THE DAMAGE
+      // GATE-UX: THE DAMAGE
       // CHART once he has fallen - the relay's own count of every challenger's part, to the side, never over the step's fire
       if (s.fell && chartAt === null) chartAt = t;
       drawGateDamageChart(chartAt !== null ? damageChartModel(s.fell, { boss: bossOf(s).name, me: me(), since: chartAt, now: t }) : null, { hidden: hudHidden() || veiled() });

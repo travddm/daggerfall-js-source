@@ -1,6 +1,6 @@
 // @ts-check
-// THE ASCENT (LAW 9, 2026-10-16, Mac: "Something that isnt just a straight line from point A to point B";
-// bible/11-Multiplayer/Elite-Gates-Ascent.md section 6): THE ROUTE'S PROOFS - THE LINKS' LAW.
+// THE ASCENT (LAW 9, 2026-10-16,;
+// ): THE ROUTE'S PROOFS - THE LINKS' LAW.
 //
 //   THE TIMED SOLVER (net/superDungeon/egSpanLaw.js) proved a hall by z: every hall was one course along +z, so a road's crossing was its
 //   course's pairs, each waited for in turn, and the still ground between them run. LAW 9's hall is a way (`spec.route` -

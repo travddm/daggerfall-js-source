@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac: "ensure it matches the love we gave the other new ship model we implemented"): THE NEW LARGE
+// SHIPS-2: THE NEW LARGE
 // BOAT'S RIG - her seven sail plans over Mac's one mast and his bowsprit, in the boat's frame (world/ships/largeBoatModel.js
 // says where every measurement comes from).
 //

@@ -1,7 +1,7 @@
 // @ts-check
-// CRAFT-HALL (2026-10-26): what a crafter needs to see while working - a track's progress bar, which first-time bonuses
+// CRAFT-HALL: what a crafter needs to see while working - a track's progress bar, which first-time bonuses
 // are spent or still owed, and what raises each track. Pure functions over the professions book's state; profPages.js
-// draws them. bible/06-Systems/Professions-Arc.md section 56.
+// draws them.
 import {
   PROFESSIONS, xpForRank, PROF_RANK_MAX, trackOf, topTierOf, harvestXp, HARVEST_XP_PER_TIER, smeltXp, herbXpTier, haulTier,
   WORK_RECIPES, workOpen, HIDES, tierOpen, craftLimitOf,

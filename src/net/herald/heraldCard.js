@@ -1,6 +1,5 @@
 // @ts-check
-// HERALD-CARDS (2026-10-22, the owner: "I want to overhaul our discord world event notification system to be more
-// organized"): THE HERALDS' ONE CARD. Three heralds post to the world events' Discord channel - the gate's
+// HERALD-CARDS: THE HERALDS' ONE CARD. Three heralds post to the world events' Discord channel - the gate's
 // (net/gate/gateHerald.js: the omen, the kill, the broken rite), the serpent's (net/serpent/serpentHerald.js) and the
 // Abyss Dungeon's (net/superDungeon/sdHerald.js) - and each wrote its own post: one
 // paragraph of plain text, the headline in bold, the times and the place and the names inside the sentence. Fourteen

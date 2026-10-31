@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac: "ensure it matches the love we gave the other new ship model we implemented"): THE NEW
+// SHIPS-2: THE NEW
 // CARRACK'S RIG - her yards, her five sails and her rope, over Mac's three masts and his bowsprit, in the boat's frame
 // (world/ships/carrackModel.js says where every measurement comes from).
 //

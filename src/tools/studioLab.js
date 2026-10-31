@@ -1,4 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md): THE STUDIO PAGE (studio.html) - every slot the port paints
+// STUDIO1: THE STUDIO PAGE (studio.html) - every slot the port paints
 // itself (systems/studioArt/studioSlots.js), drawn as the game wears it today, each with its template to download under
 // the name the studio reads, and beside it the studio's own picture where an artist has drawn one (the listing the dev
 // server and the build serve - scripts/studioArtIndex.mjs). No game data: these are the port's own numbers.

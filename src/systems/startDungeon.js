@@ -3,7 +3,7 @@
 // custom start cell moves it with the start. PH1 (worldModes.js, the online death's in-place respawn) asks it here;
 // world.js's D-ONLINE2 respawn and its ONLINE-UNDERGROUND-LOAD1 load read the same two keys inline (pinned there by
 // text). HOLD-SOLO (FIELD BUGS 2026-10-07b) took the shipped cell's dungeon out of the shared world; HOLD-SHARED
-// (2026-10-12) put it back, and nothing here keys a room. HOLD-ONCE (2026-10-12) asks isPrivateersHold, below: the Hold
+// put it back, and nothing here keys a room. HOLD-ONCE asks isPrivateersHold, below: the Hold
 // itself by its map id, never the configured cell.
 import { getInt } from './settings/settings.js';
 import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';

@@ -1,5 +1,5 @@
 // @ts-check
-// MW-SPELLFX1 (2026-10-07): A MORROWIND EFFECT'S STREAMS ON THE GPU.
+// MW-SPELLFX1: A MORROWIND EFFECT'S STREAMS ON THE GPU.
 //
 // formats/morrowind/mwVfx.js answers an effect's frame as packed streams in the particle program's own format; this holds the
 // GL side of ONE running effect: a renderer particle effect per stream (render/renderer.js createParticleEffect),

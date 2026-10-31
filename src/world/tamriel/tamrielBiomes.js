@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA-BIOME (2026-10-24, bible/03-World/Tamriel-Biomes.md) - THE BIOMES PAST THE BAY: each province's land as its own
+// TESA-BIOME - THE BIOMES PAST THE BAY: each province's land as its own
 // lore's country, in zones.
 //
 // The owner: "Each region recieves its own biome. Cyrodil receives the unique jungle biome we developed. Every biome must
@@ -11,10 +11,9 @@
 // the lore is what this table follows (the page's sources, each zone's named there). A province is three to nine ZONES:
 //   - its CLIMATE, CLIMATE.PAK's value its ground is laid on (the textures, the nature flats, the countryside's and the
 //     lairs' rates, the DFU weather table rolled at the player's pixel);
-//   - its JUNGLE: the Bantha jungle's law (world/jungle/, bible/03-World/Bantha-Jungle.md) stands on it - Cyrodiil's ring
+//   - its JUNGLE: the Bantha jungle's law (world/jungle/) stands on it - Cyrodiil's ring
 //     of rain forest round the Nibenay Valley's grassland (PGE1), its Colovian uplands (the owner's call) and Blackwood;
-//   - its CANOPY: the jungle's crowns closed over the sky (VALENWOOD-CANOPY, the owner: "i want valenwood to have no sky
-//     like the trees will cover it up") - Valenwood's forest, Grahtwood, Malabal Tor and Greenshade: its graht-oaks stand
+//   - its CANOPY: the jungle's crowns closed over the sky (VALENWOOD-CANOPY) - Valenwood's forest, Grahtwood, Malabal Tor and Greenshade: its graht-oaks stand
 //     over the jungle and close the sky with their crowns (GRAHT1 - world/jungle/grahtOaks.js, scenes/grahtHost.js), the
 //     light under them the canopy's (world/jungle/jungleCanopy.js); Reaper's March, where the forest gives way to the
 //     plains, keeps its sky;

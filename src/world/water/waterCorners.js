@@ -44,8 +44,7 @@ export const SHORE_FAMILIES = Object.freeze([
 export const SHALLOW_WHOLE = Object.freeze([8, 23, 33, 34, 35, 36]);
 
 /**
- * WATER-DRAW1 (2026-09-19, Mac with a screenshot: "some textures not
- * taking the water tile"): THE DRAW AND THE FEET ARE NOT THE SAME
+ * WATER-DRAW1: THE DRAW AND THE FEET ARE NOT THE SAME
  * QUESTION, and this file had been answering both with one list.
  *
  * The screenshot is a town pond. Every tile in it shimmers except one,
@@ -91,10 +90,7 @@ export const SHALLOW_WHOLE = Object.freeze([8, 23, 33, 34, 35, 36]);
 export const SHALLOW_DRAWN = Object.freeze([9]);
 
 /**
- * WATER-DRAW2 (2026-10-07, Mac with a winter town's screenshot - a pond
- * of WATER-NEXT's water and in it two flat blue squares round white
- * islands: "Is there a reason these fucking patches still remain after
- * our most recent water changes?"): THE TABLE NEVER KNEW THREE KINDS OF
+ * WATER-DRAW2: THE TABLE NEVER KNEW THREE KINDS OF
  * WATER ART, AND EVERY WATER LAW SINCE ASKS IT.
  *
  * The squares are records 4 and 19 - water round an island of dirt and

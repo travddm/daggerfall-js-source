@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW-GATES-EVERYWHERE (A2b, 2026-10-26, the owner: "Every single thing here needs to be addressed. No exceptions.";
-// bible/03-World/World-Wide.md WW-GATES-EVERYWHERE): WHERE A GATE'S KILL COUNTS, AS THIS CLIENT PUTS IT - the region its
+// WW-GATES-EVERYWHERE (A2b, 2026-10-26,;
+// WW-GATES-EVERYWHERE): WHERE A GATE'S KILL COUNTS, AS THIS CLIENT PUTS IT - the region its
 // claim names to the account service (server-account/src/seatInfluence.js creditGate, net/townSeatLaw.js gateRegionOk:
 // a Bay region for the Bay's lane, its own province's alone for a lane past it), the seats' and the chapters' word.
 //

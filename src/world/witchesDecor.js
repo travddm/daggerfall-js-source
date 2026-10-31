@@ -1,6 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, the owner: "We should decorate each town with its own lore appropriate decorations"; bible/06-
-// Systems/Witches-Festival.md): THE TOWNS DRESSED FOR THE WITCHES' FESTIVAL, each in its own people's way, and a Wyrd
+// WITCH1: THE TOWNS DRESSED FOR THE WITCHES' FESTIVAL, each in its own people's way, and a Wyrd
 // Sister at a tavern's door wherever one side of it is clear.
 //
 // THE KITS, by a town's climate and its region's people (formats/mapsTables.js REGION_RACES):

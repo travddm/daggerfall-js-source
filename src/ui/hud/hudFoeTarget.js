@@ -29,7 +29,7 @@ let _foe = null;
 let _left = 0;
 /** TELL9: seconds since the player last struck a foe (markFoeStruck) - a threat yields to a foe struck this recently. */
 let _sinceStruck = Infinity;
-/** TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 11.1): a foe that winds up at me takes the bar unless I struck another in
+/** TELL9 (11.1): a foe that winds up at me takes the bar unless I struck another in
  *  the last THREAT_YIELD_S seconds. */
 export const THREAT_YIELD_S = 2;
 /** TELL9: the poise track's reader - `(foe) => { state, fill, word } | null` - registered by the host that knows the
@@ -52,7 +52,7 @@ export function markFoeStruck(foe, { fromPlayer = true } = {}) {
   _sinceStruck = 0;   // TELL9: a threat yields to it for THREAT_YIELD_S
 }
 
-/** STAND-IN-BAR (AUDIT KETCH II, 2026-10-26, the owner: "the additional enemies dont have health bars"): A BODY THE RELAY
+/** STAND-IN-BAR (AUDIT KETCH II, 2026-10-26): A BODY THE RELAY
  *  KEEPS THE HEALTH OF - an event's host: the gate's legion, the Hour's Echoes
  *  (world/gate/gateBoss.js hostStandIn) - is struck through the dungeon host's landOnHost, which never marked it, so none of
  *  them ever had the bar; and its stand-in's own health is a count nothing empties (STAND_IN_WHOLE). A blow on one that

@@ -1,5 +1,5 @@
 // @ts-check
-// BOUNTY1 (2026-09-28): THE BOUNTY BOARD IN THE WORLD - the ledger held, the packs stood and counted, the purse paid.
+// BOUNTY1: THE BOUNTY BOARD IN THE WORLD - the ledger held, the packs stood and counted, the purse paid.
 //
 // The law is systems/bounty/bountyBoard.js (what a board posts, what it pays) and systems/bounty/bountyReward.js (the piece); the
 // windows are ui/bounty/bountyWindow.js through ui/bounty/bountyDoor.js. This file is the host's half, and it reaches the world only
@@ -54,8 +54,7 @@ export function bountyDungeonPixel(modes, travelPixel) {
 export const BOUNTY_TICK_S = 0.5;
 /** After a pack failed to stand (no ground under the anchor), how long before the next try, seconds. */
 export const BOUNTY_RETRY_S = 4;
-/** BOUNTY-TRAIL (Mac, 2026-09-28: "if its 6 to 8 monster you gotta kill, can you make 2 groups out of it and give
- *  another clue where the group is when the first group is killed?"): an open-ground pack this big or bigger is TWO
+/** BOUNTY-TRAIL: an open-ground pack this big or bigger is TWO
  *  groups - the first half (rounded up) where the hunt begins, the rest at a spot of their own on the same pixel,
  *  stood once the first is dead and the hunter has followed the clue close. Which group stands is read off the kills
  *  alone, so a load, a party mate's machine and the wire need nothing new. A dungeon's pack (2-4) is never split. */
@@ -187,7 +186,7 @@ export function createBountyHost(deps) {
     restoreSaveData: (rec) => reset(rec),
   });
 
-  // ── the journal (Mac: "i also dont see the bounty in my questlog means i cant abandon it?") ──
+  // ── the journal ──
   setBountyJournal({
     abandon: (id) => (hunt.isMark(id) ? hunt.drop(id) : drop(id)).ok,   // HUNTERS-MARK: a named mark's from its own module
     share: (id) => share(id).ok,
@@ -325,7 +324,7 @@ export function createBountyHost(deps) {
     row.shared = true;
     const p = postingOf(id);
     if (p) deps.say(`You shared the bounty on the ${p.foes} with your party.`);
-    // BOUNTY-TIER (Mac: "he prob gets a notifiaction that the one he wants to share to is too low level"): name every
+    // BOUNTY-TIER: name every
     // mate whose tier shuts them out - from their pose's level (a mate on an older client, with none, is not named)
     const shut = [];
     for (const m of s.mates ?? []) {
@@ -369,7 +368,7 @@ export function createBountyHost(deps) {
     const item = mintBountyItem(posting.level, { rolls });
     addGoldPieces(entity, posting.gold);
     if (Array.isArray(entity?.items)) addItem(entity.items, item);
-    // REP4 (Mac: "Earn it + faster drift" - regional contracts): the board's region thinks better of the hunter who
+    // REP4 (- regional contracts): the board's region thinks better of the hunter who
     // cleared its road - two points of its law (standing.js rewardContract), said by the law's own notice
     const region = deps.regionAt?.(posting.town.px, posting.town.py);
     if (Number.isInteger(region) && region >= 0 && entity) rewardContract(entity, region);

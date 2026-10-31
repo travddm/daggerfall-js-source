@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW10 (2026-10-09, bible/06-Systems/Living-World-II.md "LW10"): THE ROAD'S TEAMS, SEEN - the horses and the wagons of
+// LW10: THE ROAD'S TEAMS, SEEN - the horses and the wagons of
 // the living world's parties (systems/livingWorld/wagons.js: where each stands), drawn with Horse Cart and Cargo's own
 // pieces (Living World II decision 4): the wagon classic model 41214 in its five parts with its cargo by tier (the pool's
 // `presentation.drawWagon` - ONE MEMBER, ONE EXPORT), the horse the mod's eight-way billboard off its own art (the pool's
@@ -15,7 +15,7 @@
 // `clear()` destroys every one and takes down every box (the roads' own clear: indoors, a mode's change, the teardown).
 // The meshes are the pool's, held for the session (the pool's own law).
 //
-// HORSE-VIEW II (2026-10-21, bible/07-Rendering/Performance-Priority.md): on the Morrowind lane a stranger's 3D horse
+// HORSE-VIEW II: on the Morrowind lane a stranger's 3D horse
 // steps its gait every frame and is posed as the Horse Cart pool's are (world/horseView.js poseWhereSeen) - in the last
 // body pass's view (draw3d's camera, one frame behind), on the peers' bodies' cadence by how far it looks from that
 // camera; one skipped out of the view is caught up by the draw as the view swings onto it (`fresh`), and one that moves

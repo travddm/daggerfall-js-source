@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S7 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE ARENA WATCHES THE REMNANT - what the
+// SD-LOOK S7: THE ARENA WATCHES THE REMNANT - what the
 // arena shows of where the Remnant stands, pure over the page's fight state (net/superDungeon/sdFightLink.js) and the relay's clock,
 // so every page draws the same:
 //

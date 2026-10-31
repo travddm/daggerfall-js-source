@@ -1,6 +1,6 @@
 // @ts-check
-// SEAT2a part four (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): A SIEGE AS
-// THIS CLIENT FIGHTS IT (bible/11-Multiplayer/Seats-Arc.md 6.2-6.8, 19) - entered from the board's Seat tab while the
+// SEAT2a part four: A SIEGE AS
+// THIS CLIENT FIGHTS IT (6.2-6.8, 19) - entered from the board's Seat tab while the
 // battle's door is open: the field this game derived from the town (systems/siegeField.js) sent for a pass (the service
 // settles the field on an attacker's and a defender's agreeing - until then it asks again, said in words), then the
 // battle's own room joined (`siege:<key>:<week>`, a fresh pass on every hello - net/online.js mintSiegePass), `in` said
@@ -12,7 +12,7 @@
 // The world is handed in (`online`, the book's two calls, the HUD, the clock, `movePlayer`), so the pins drive it with
 // fakes. Not a DFU member. Ledger A (EVERY PALACE A SEAT's row).
 //
-// AUDIT-SEATS (2026-10-01): C1 - A BATTLE IS LEFT: by the player (the HUD's Leave, the result card's Close, the chat's
+// AUDIT-SEATS: C1 - A BATTLE IS LEFT: by the player (the HUD's Leave, the result card's Close, the chat's
 // `/leave` - scenes/world.js), when the player has been away from the seat's town BATTLE_AWAY_MS (`here`), when the
 // battle's socket is closed for good, and at the window's close; the HUD is drawn only while the player stands in the
 // battle's room (a building's room is not the field). C2 - the one mint slot (net/online.js mintSiegePass) is cleared

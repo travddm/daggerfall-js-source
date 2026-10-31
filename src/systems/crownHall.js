@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CROWN-HALL (2026-10-02, Mac: "Build that next" - the crown's hall
-// after SEAT-HALL's palace): A CROWN'S CASTLE AS ITS HOLDER'S HALL
-// (bible/11-Multiplayer/Seats-Arc.md 7.2: "Crown: the castle is the
+// CROWN-HALL: A CROWN'S CASTLE AS ITS HOLDER'S HALL
+// (7.2: "Crown: the castle is the
 // hall - its throne room carries the holder's banners, the roster board
 // and the Stores chest, and no decor").
 //

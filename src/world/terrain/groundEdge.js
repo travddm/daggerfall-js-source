@@ -1,6 +1,5 @@
 // @ts-check
-// COAST-LOOK (2026-10-28, the owner: "Coastlines arent texture blended properly. They have hard edges" - "Both edges";
-// bible/07-Rendering/Water-Arc.md COAST-LOOK, a departure: Port-Ledger A). A marching-squares transition tile (water-dirt,
+// COAST-LOOK. A marching-squares transition tile (water-dirt,
 // dirt-grass, grass-stone and the river painter's shore twins) is drawn as its two kinds' base records, the second
 // kind's share the bilinear of its corners moved by a wander and drawn across a soft rim: one line across every seam.
 // The water's sheet and silt take the same line, and Deep Waters' cut follows a wandering line inside the clipped tiles

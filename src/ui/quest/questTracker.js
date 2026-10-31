@@ -1,7 +1,4 @@
-// GUIDE4 (2026-09-29, Mac: "How can we set the foundation and improve the
-// quest system substantially? Like really modernize it, make it more
-// accessible", then, of the Quest Guide arc: "This is your baby. Take
-// your time"): THE TRACKER - the quest you follow, on the HUD.
+// GUIDE4: THE TRACKER - the quest you follow, on the HUD.
 //
 // WHAT DFU HAS. Nothing on the HUD about quests. The logbook holds every
 // word, but what a quest wants now, where, and by when is a window away -
@@ -124,8 +121,7 @@ export class QuestTracker {
     const byId = (id) => (id == null ? null : this.views.find((v) => v.id === id) ?? null);
     return byId(this.pinned) ?? byId(this.follow) ?? latestOf(this.views);
   }
-  /** TRACK-ONLY (2026-10-08, the owner: "When you dont track a quest it should never appear on the screen! right now when
-   *  i dont track the main quest it still is shown tracked."): the quest ON SCREEN - the card, the compass's mark, the
+  /** TRACK-ONLY: the quest ON SCREEN - the card, the compass's mark, the
    *  map's filled diamond - is the TRACKED one and nothing else. The journal still opens on `tracked()`'s quest. */
   shown() {
     return this.pinned == null ? null : (this.views.find((v) => v.id === this.pinned) ?? null);

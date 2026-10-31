@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md) - THE OPEN ZONE ON THE WORLD MAP.
+// WILD1 - THE OPEN ZONE ON THE WORLD MAP.
 //
 // The owner: "make sure the high risk area is marked with a highquality fog of war on the world map and red lines
 // around it". So the Wrothgarian Mountains wear two things on the held map's world sheet (ui/heldMap.js):
@@ -226,7 +226,7 @@ export function paintWildKeyChip(ctx, { dpr = 1, size = 14 } = {}) {
 // Both are the overlay's (ui/heldMap.js paintOverlay): redrawn at the window's FX_HZ only while something moves, over the
 // kept layer, so neither costs the sheet's static ink a repaint.
 
-// THE CROWS (the owner: "use the first ones we had thats enough"): three small black birds circling a hall a body lies
+// THE CROWS: three small black birds circling a hall a body lies
 // in, each three dark pixels - a body and two wings that beat up and down - on its own place round the circle.
 /** A hall's flock: `halls` `[{ x, y, key }]` (the ones a body lies in), circling over each hall's mark. */
 export function paintWildCrows(ctx, view, halls, { t = 0, paperW = Infinity, paperH = Infinity } = {}) {
@@ -250,13 +250,11 @@ export function paintWildCrows(ctx, view, halls, { t = 0, paperW = Infinity, pap
   ctx.restore();
 }
 
-// ZONE-GIANTS (2026-10-08, the owner: "always spawn 2 giants per tier and make em show on the map where they wander
-// around", then: "show the giants as skulls high quality pixel ones please and dont use the same method those circly
-// around them look cheap"): each giant a pixel SKULL where it walks - an outlined bone dome lit from the upper left,
+// ZONE-GIANTS: each giant a pixel SKULL where it walks - an outlined bone dome lit from the upper left,
 // shaded down its right side, deep sockets with an ember in each, the nasal hollow and a row of teeth - with a soft drop
 // shadow under it and no halo. A giant that stands in my own world now has its embers burning bright and breathing.
 // Paper pixels, whole ones (crisp at any zoom): one per sprite pixel on the world map, two once the map is close.
-const SKULL = [   // GIANT-SKULL2 (the owner: "make the skulls a bit smaller"): eleven by ten
+const SKULL = [     // GIANT-SKULL2: eleven by ten
   '...OOOOO...',
   '.OOWWWBBOO.',
   'OWWWBBBBBSO',
@@ -308,7 +306,7 @@ export function paintWildGiants(ctx, view, giants, { paperW = Infinity, paperH =
   ctx.restore();
 }
 
-// HALL-LOCK MARK (2026-10-08, the owner: "It should also show locked dungeons for you with a tiny lock symbol next to it"):
+// HALL-LOCK MARK:
 // a tiny padlock at the upper right of each hall whose hour's lock holds for ME - its shackle an arch, its body a dark
 // block with a light keyhole, a parchment halo round both so it reads over any ink. Paper pixels, the glyphs' own size.
 export function paintWildLocks(ctx, view, halls, { paperW = Infinity, paperH = Infinity } = {}) {

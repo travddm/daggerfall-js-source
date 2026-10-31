@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW2 (2026-10-24, bible/03-World/World-Wide.md WW2): WHERE A THEATRE'S GATE STANDS - the gate's site law
+// WW2: WHERE A THEATRE'S GATE STANDS - the gate's site law
 // (systems/gate/gateSite.js, WB1's) over a theatre past the Bay, read off the world's registry of places
 // (world/worldWide/worldPlaces.js) instead of MAPS.BSA's rows.
 //

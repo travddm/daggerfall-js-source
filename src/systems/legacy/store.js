@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY1 (bible/06-Systems/Legacy-Arc.md section 3): WHERE A FAMILY LIVES, and THE BIRTH'S HANDOFF.
+// LEGACY1: WHERE A FAMILY LIVES, and THE BIRTH'S HANDOFF.
 //
 // Offline a family is its own record in app storage (`dagger.legacy.family.<id>`) - it outlives any one save, so a
 // member's save deleted takes nothing of the line with it - and a copy rides every member's save (`modData`), the

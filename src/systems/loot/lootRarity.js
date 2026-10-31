@@ -1,9 +1,6 @@
-// LR1-LR3 (2026-09-14, Mac: "building on unleveled loot. My goal is to
-// transform things into a diablo style system with rarity ... Make
-// this the most detailed and best that it can be"): LOOT RARITY - the
+// LR1-LR3: LOOT RARITY - the
 // port's own item ladder over Daggerfall's loot. ENHANCED, the port's
-// departure from DFU's rules, ON by default (LR5, 2026-09-15, Mac: "I
-// want to mod on by default" - it shipped off beside the enhanced AI,
+// departure from DFU's rules, ON by default (LR5, 2026-09-15, - it shipped off beside the enhanced AI,
 // and Mac's call is that the ladder is the port's own game rather than
 // something a player has to go and ask for) and on for everyone online
 // (OL1). Off, not one field is written and not one read moves: DFU's
@@ -23,9 +20,7 @@
 //                rolled - a boss's own set (systems/aetheric.js), and
 //                the Sigil Broker's
 //   artifact   - DFU's artifacts, untouched
-//   gilded     - GILDED1 (2026-10-07, Mac: "a new rarity above
-//                atheric ... the most rare and gilded item in the
-//                entire game"): the top of the ladder, over the
+//   gilded     - GILDED1: the top of the ladder, over the
 //                artifacts, never rolled - fixed records, each a
 //                world boss's rarest spoil (systems/gilded.js)
 //
@@ -149,8 +144,7 @@ export function rarityEligible(item) {
 }
 
 // ── LOOT14: the wardrobe ────────────────────────────────────────────
-// The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 6; Mac: "I notice that clothing doesn't have a lot of rarity
-// options with.our loot system?"). A garment - DFU's men's and women's clothing, every template a slot takes - rolls
+// The Loot arc II (). A garment - DFU's men's and women's clothing, every template a slot takes - rolls
 // the ladder like any piece, on a POOL OF ITS OWN: its four slots are worn under armour, so the combat pool would have
 // added four lines of fight to every character. The wardrobe's lines answer the dress's own two jobs - DRESS1's standing
 // (clothingStanding.js) and Climates & Calories' warmth (survival/temperature.js) - and the street's skills and
@@ -210,7 +204,7 @@ export function corpseSource(basics, entityLevel = 1, mobileType = null) {
 export const pileSource = (tier, boss = false) => ({ kind: 'pile', tier: Math.max(0, tier | 0), boss });
 
 // ── LOOT6: signature drops ──────────────────────────────────────────
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 8): each Legendary record is FOUND AMONG a family of the foe table,
+// The Loot arc: each Legendary record is FOUND AMONG a family of the foe table,
 // and a source of that family - a corpse of one of its foes, a pile in a dungeon kind of its - weighs its own records
 // SIGNATURE_WEIGHT to one in the record's pick. WHETHER a Legendary drops is the source's tier alone (LR1's law); the
 // family steers WHICH. One roll a pick, as the pick it replaces took, so no seeded mint draws more.
@@ -290,7 +284,7 @@ export const RARITY_WEIGHTS = Object.freeze({
   legendary: Object.freeze({ base: 1,   perTier: 1.2, cap: 45 }),
 });
 export const SOURCE_MULT = Object.freeze({ corpse: 1, pile: 1.3, boss: 2.5 });
-/** LOOT13 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 5): LUCK IS A NUDGE, NEVER THE SOURCE. Luck was a
+/** LOOT13 (the Loot arc II): LUCK IS A NUDGE, NEVER THE SOURCE. Luck was a
  *  flat 2 per mille a point over 50 ADDED to every threshold - a fair nudge on Magic's hundred and more, and the whole
  *  of Legendary's one to forty-five: a rat at Luck 65 (one "of the Gods" line, two "of Fortune") dropped a Legendary 15
  *  times as often as at 50, more often than a tier-8 corpse; a plain humanoid sat at its cap from Luck 55; and at Luck
@@ -334,7 +328,7 @@ export function rarityChances({ kind = 'corpse', tier = 0, boss = false, luck = 
   return { magic, rare: rareG, legendary: Math.min(rareG, legendary * legendaryGate(lv)) };
 }
 
-/** LOOT5 (bible/06-Systems/Loot-Arc.md sections 7 and 10): THE FINDERS - named functions answering a multiplier on the
+/** LOOT5: THE FINDERS - named functions answering a multiplier on the
  *  Legendary threshold at the host door (rollLootRarity): Foxglove's power (systems/loot/lootPowers.js), the drought
  *  (LOOT8). Their product; a finder that throws or answers nonsense is 1. */
 const _finders = new Map();
@@ -419,7 +413,7 @@ export function rollUniqueFinds(source, rolls = Math.random) {
   return out;
 }
 
-/** LOOT21 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 13): THE LATE FINDS - a find registered `late`
+/** LOOT21 (the Loot arc II): THE LATE FINDS - a find registered `late`
  *  rolls here, the door's very last draws (after the sockets' pass), not in rollUniqueFinds' place before the door's last
  *  pass: the arc's law 9 - a find added after a seed was cut moves none of the draws that seed already made. The
  *  Ayleid stones (systems/ayleidStones.js) are its finds. Answers the items to add. */
@@ -473,7 +467,7 @@ export const AFFIX_RANGES = Object.freeze({
   resist: Object.freeze({ magic: [10, 20], rare: [20, 35], legendary: [35, 50] }),   // on the saving throw against one element
   skill:  Object.freeze({ magic: [5, 10],  rare: [10, 20], legendary: [20, 30] }),   // on one skill
   weight: Object.freeze({ magic: [10, 20], rare: [20, 35], legendary: [35, 50] }),   // % carrying capacity
-  // LOOT4 (bible/06-Systems/Loot-Arc.md section 6): the five that DO something - systems/loot/lootPowers.js does it
+  // LOOT4: the five that DO something - systems/loot/lootPowers.js does it
   elemental: Object.freeze({ magic: [1, 3], rare: [3, 6], legendary: [6, 10] }),     // that much of its element a weapon blow
   leech:     Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),     // % of a landed weapon blow, healed
   thorns:    Object.freeze({ magic: [1, 3], rare: [3, 6], legendary: [6, 10] }),     // back to a foe whose blow lands on you
@@ -568,7 +562,7 @@ export const AFFIX_KINDS = Object.freeze({
   elemental: Object.freeze({ slot: 'prefix', groups: Object.freeze(['Weapons']), params: PROC_ELEMENTS, proc: true,
     word: (band, p) => ELEMENTAL_PREFIX[p][band], label: (a) => `+${a.value} ${cap(a.param)} damage` }),
   leech:  Object.freeze({ slot: 'suffix', groups: Object.freeze(['Weapons']), params: null, proc: true,
-    // FIELD BUGS 2026-10-14 LEECH-HAND (Mac: "Keep per-hand"): the line says whose blows it heals on - an off-hand weapon's
+    // FIELD BUGS 2026-10-14 LEECH-HAND: the line says whose blows it heals on - an off-hand weapon's
     // leech rides its own blows alone (lootPowers.js lootStrike), and a player read it as dead until they switched hands
     word: (band) => LEECH_SUFFIX[band], label: (a) => `${a.value}% life leech on this weapon's own blows` }),
   thorns: Object.freeze({ slot: 'prefix', groups: Object.freeze(['Armor']), params: null, proc: true,
@@ -577,7 +571,7 @@ export const AFFIX_KINDS = Object.freeze({
     word: (band) => FOCUS_PREFIX[band], label: (a) => `-${a.value}% spell cost` }),
   slayer: Object.freeze({ slot: 'suffix', groups: Object.freeze(['Weapons']), params: SLAYER_FOES, proc: true,
     word: (band, p) => SLAYER_SUFFIX[p][band], label: (a) => `+${a.value}% damage vs ${SLAYER_NOUN[a.param]}` }),
-  // LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): THE WARDROBE'S OWN THREE, after every kind before
+  // LOOT14 (the Loot arc II): THE WARDROBE'S OWN THREE, after every kind before
   // them so no other piece's draw moves - a garment's standing with a social group (DRESS1's channel), its warmth
   // (Climates & Calories' clothing warmth) and its weatherproofing (the weather's soaking); with the skills and
   // Personality above, the whole of a garment's pool
@@ -587,7 +581,7 @@ export const AFFIX_KINDS = Object.freeze({
     word: (band) => WARMTH_PREFIX[band], label: (a) => `+${a.value} warmth` }),
   dry:    Object.freeze({ slot: 'prefix', groups: CLOTHING_GROUPS, params: null, survival: true,
     word: (band) => DRY_PREFIX[band], label: (a) => `${a.value}% weatherproof` }),
-  // CAST-SPEED (2026-10-08, Mac: "have casting speed a new rarity affix"): A LINE THAT DOES SOMETHING, after every kind
+  // CAST-SPEED: A LINE THAT DOES SOMETHING, after every kind
   // before it so the numbers' pass draws as it did - the casting hands run that much faster (systems/castSpeed.js,
   // summed and capped by systems/loot/lootPowers.js). Jewellery's and a weapon's, so a caster who may wear no armour still
   // finds it. THE LAST PASS MOVED ALL THE SAME (CAST-SPEED-PINS, 2026-10-08): a jewel's proc pool was EMPTY before this
@@ -595,8 +589,7 @@ export const AFFIX_KINDS = Object.freeze({
   // pool one wider. A seeded hoard holding such a piece rolls on from a moved stream (the serpent hoard pins moved).
   castSpeed: Object.freeze({ slot: 'suffix', groups: Object.freeze(['Jewellery', 'Weapons']), params: null, proc: true,
     word: (band) => CAST_SPEED_SUFFIX[band], label: (a) => `+${a.value}% casting speed` }),
-  // BAL9c (2026-10-12, the owner: "introduce some new magic/mage perks to the rarity loot pool ... still dont make it
-  // overpowered"; bible/05-Combat/Balance-Arc.md section 15): THE CASTER'S TWO LINES, after every kind before them so
+  // BAL9c: THE CASTER'S TWO LINES, after every kind before them so
   // the numbers' pass draws as it did. The ladder paid a blade in damage, procs and powers and a caster only in price
   // and tempo (focus, castSpeed): POTENCY is a damage spell's landing, more (jewellery's and a weapon's, castSpeed's
   // groups - systems/spell/spellPower.js, summed and capped by systems/loot/lootPowers.js); WELLSPRING is the caster's leech - a
@@ -606,7 +599,7 @@ export const AFFIX_KINDS = Object.freeze({
     word: (band) => POTENCY_PREFIX[band], label: (a) => `+${a.value}% spell damage` }),
   wellspring: Object.freeze({ slot: 'suffix', groups: Object.freeze(['Jewellery']), params: null, proc: true,
     word: (band) => WELLSPRING_SUFFIX[band], label: (a) => `${a.value}% magicka on a kill` }),
-  // TECH1 (2026-10-10, bible/05-Combat/Weapon-Techniques.md): A WEAPON'S TECHNIQUE - what the WeaponTechnique key does
+  // TECH1: A WEAPON'S TECHNIQUE - what the WeaponTechnique key does
   // with the weapon in hand (combat/techniques.js): its param the technique (combat/technique/techniqueRoster.js, the piece's own
   // family alone - kindParams), its value the power over the technique's own multiplier. APPENDED LAST and drawn in no
   // pool any other line is drawn from - it is not among AFFIX_IDS, the pools' kinds (rollAffixes, the proc line, the
@@ -643,8 +636,7 @@ export function kindParams(id, item) {
 
 const rangeInt = (min, max, rolls) => min + Math.floor(rolls() * (max + 1 - min));
 const pick = (list, rolls) => list[Math.floor(rolls() * list.length)];
-/** AFFIX-LINES (2026-10-25, a player - SaberGGaming: carrying capacity on four Rare pieces in five; the owner: "No band
- *  aids"; bible/06-Systems/Loot-Rarity.md, the affix law): A NUMBER LINE IS DRAWN OVER LINES, NOT KINDS. A pool of kinds,
+/** AFFIX-LINES: A NUMBER LINE IS DRAWN OVER LINES, NOT KINDS. A pool of kinds,
  *  each weighed by the lines it may still give the piece (`linesOf` - a kind with params its free params, a kind
  *  without its one): carrying capacity is one line and the attributes eight, so it is drawn an eighth as often as they
  *  are together, where an even draw over the kinds drew it as often as all eight. ONE ROLL, as `pick` took (LOOT1's
@@ -677,7 +669,7 @@ export const drawWeight = (id, item, held = [], lean = armorLean(item)) => {
   return AFFIX_KINDS[id]?.proc ? Math.min(1, n) : n * (lean?.kinds[id] ?? 1);   // ARMOR-LEAN: a family's weight on a number kind
 };
 
-/** LOOT1 (the Loot arc, bible/06-Systems/Loot-Arc.md - AUDIT-LR's second note: "a warhammer can roll +20 Impish ... a
+/** LOOT1 (the Loot arc, - AUDIT-LR's second note: "a warhammer can roll +20 Impish ... a
  *  weighting toward the group's own combat skills would be a tuning slice"): A SKILL AFFIX LEANS TO THE ITEM'S OWN
  *  SKILLS. A weapon's to the hand that swings it - half the time its own weapon skill, then the strike's kin (Critical
  *  Strike, Backstabbing, Dodging); a piece of armour's to the body (the seven ways of fighting and the five of moving);
@@ -694,7 +686,7 @@ const BODY_KIN = Object.freeze([S.ShortBlade, S.LongBlade, S.HandToHand, S.Axe, 
 const MIND_KIN = Object.freeze([...MAGIC_SKILLS, S.Etiquette, S.Streetwise, S.Mercantile, S.Lockpicking, S.Pickpocket,
   S.Stealth, S.Medical]);
 /** JEWEL-KIN (2026-10-26, Discord #feature-feedback "jewelcrafting, roll chances not equal (h2h, critical)": "i crafted
- *  around 100 rare rings ... and h2h or critical not roll on them"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md):
+ *  around 100 rare rings ... and h2h or critical not roll on them"):
  *  JEWELLERY'S LEAN IS THE MIND'S THIRTEEN AND THE BARE HAND'S TWO - Hand-to-Hand and Critical Strike. Hand-to-Hand is
  *  no weapon's own and leaned on armour's twelve alone, Critical Strike on a weapon's strike and armour's (AUDIT FB1026d
  *  II D5); on a ring each was one of the open share's thirty-five, about 0.43% of its skill lines against a mind skill's
@@ -706,8 +698,7 @@ const JEWEL_KIN = Object.freeze([...MIND_KIN, S.HandToHand, S.CriticalStrike]);
 const STREET_KIN = Object.freeze([S.Etiquette, S.Streetwise, S.Mercantile, S.Stealth, S.Pickpocket, S.Lockpicking, S.Medical]);
 const FEET_KIN = Object.freeze([S.Running, S.Jumping, S.Climbing, S.Swimming, S.Stealth]);
 // ── ARMOR-LEAN: each armour family rolls its own kind of lines ────────
-/** ARMOR-LEAN (2026-10-26, a player: "can we make differences regarding stat distribution for all types when stats are
- *  rolled on them"): LEATHER, CHAIN AND PLATE DRAW DIFFERENT LINES. The bands (AFFIX_RANGES) are every piece's - a Rare
+/** ARMOR-LEAN: LEATHER, CHAIN AND PLATE DRAW DIFFERENT LINES. The bands (AFFIX_RANGES) are every piece's - a Rare
  *  is a Rare - but WHICH lines a piece of armour rolls leans to its family:
  *   - LEATHER, the light hide: the first line is its armour a third of the time (not half), carrying capacity and the
  *     attributes come up more, and those lean to Agility and Speed (Luck a little); its resistances to Poison and Frost.
@@ -776,7 +767,7 @@ export function skillKin(item, { fists = true } = {}) {
   if (isGarment(item)) return { own: null, kin: garmentOnFeet(item) ? FEET_KIN : STREET_KIN };   // LOOT14
   return { own: null, kin: Object.freeze([]) };
 }
-/** LOOT14 (bible/06-Systems/Loot-II-Arc.md section 6): A GARMENT'S STANDING LEANS TO ITS DRESS - DRESS1's class
+/** LOOT14: A GARMENT'S STANDING LEANS TO ITS DRESS - DRESS1's class
  *  (clothingStanding.js dressClassOf): fine wear to the Nobility or the Merchants, common wear to the Commoners, a
  *  priest's robes to the Scholars, half the time; else any free group. ONE roll, as `pick` takes, its place in [0, 1)
  *  choosing the step and the group within it (LOOT1's own law, pickSkill). */
@@ -918,7 +909,7 @@ export const RARE_FLAVOURS = Object.freeze({
     { type: T.CastWhenStrikes, param: 53 },   // Hand of Sleep
     { type: T.CastWhenStrikes, param: 52 },   // Vampiric Touch
     { type: T.CastWhenStrikes, param: 33 },   // Wildfire
-    // BAL7 (bible/05-Combat/Balance-Arc.md section 13): RETIRED, as BAL5 retired Troll's Blood. Vampiric Effect when
+    // BAL7: RETIRED, as BAL5 retired Troll's Blood. Vampiric Effect when
     // strikes heals the wearer every point the blow deals (enchantments.js, DFU's own payload) - DFU prices it at 1,000
     // of an item maker's points; one random Rare blade took the plain level-20 build in a Dragon's Den from 1.1 kills
     // before it fell to 50 and counting. A piece that drew it keeps it, the item maker still sells it, and Gortwog's
@@ -934,7 +925,7 @@ export const RARE_FLAVOURS = Object.freeze({
     { type: T.CastWhenHeld, param: 37 },      // Slowfalling
     { type: T.CastWhenHeld, param: 41 },      // Water Walking
     { type: T.CastWhenHeld, param: 42 },      // Water Breathing
-    // BAL5 (bible/05-Combat/Balance-Arc.md section 11): RETIRED. A held Regenerate heals every magic round for as long
+    // BAL5: RETIRED. A held Regenerate heals every magic round for as long
     // as the piece is worn - DFU prices it at 920 of an item maker's points and wears the piece out for it (CastWhenHeld's
     // 1 in 4 rounds, and no smith mends a magic piece); the port mends one by default (DISC22-A), so a random Rare handed
     // out regeneration that never ended, and with it a fight won by standing still
@@ -957,7 +948,7 @@ export const RARE_FLAVOURS = Object.freeze({
     { type: T.ImprovesTalents, param: 2 },    // Adrenaline Rush
     { type: T.GoodRepWith, param: 1 },        // Merchants
   ]),
-  // LOOT14 (bible/06-Systems/Loot-II-Arc.md section 6): a garment holds the street - DFU's own catalogue, so a Rare
+  // LOOT14: a garment holds the street - DFU's own catalogue, so a Rare
   // garment still drops unidentified. Never Cast When Held: DFU bills a held spell's casting cost in condition at the
   // first equip (LR4's watch item 9) and cloth carries 70 to 300 - Slowfalling's 240 broke a Formal Cloak (120) the
   // moment it was worn; never Increased Weight Allowance (a garment carries no capacity) or FeatherWeight (dead on a drop)
@@ -1010,7 +1001,7 @@ export const LEGENDARIES = Object.freeze([
     affixes: [{ id: 'stat', param: 'intelligence', value: 15 }, { id: 'stat', param: 'willpower', value: 12 }, { id: 'resist', param: 'shock', value: 40 }],
     enchantment: { type: T.ExtraSpellPts, param: 8 },   // Near Daedra
     lore: 'One of the rings the Mages Guild does not admit to having made.' },
-  // ── LOOT3 (the Loot arc, bible/06-Systems/Loot-Arc.md section 5): TWENTY MORE - every weapon family, every armour
+  // ── LOOT3 (the Loot arc): TWENTY MORE - every weapon family, every armour
   // place and every kind of jewellery a record of its own, named in the lore of the Bay and never an artifact's name.
   // Each keeps LR2's law: three or more lines in the Legendary band of kinds its group may carry, ONE DFU catalogue
   // enchantment priced by DFU's own table (never an item-maker-only payload; a held spell a cheap one, since DFU bills
@@ -1096,7 +1087,7 @@ export const LEGENDARIES = Object.freeze([
     enchantment: { type: T.ExtraSpellPts, param: 9 },   // Near Humanoids
     lore: 'Briar-bound and hagraven-blessed, taken off a Reach chieftain who had no more use for it.' },
 ]);
-/** LOOT15 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 7): THE WARDROBE'S SIX - Legendary garments, each on
+/** LOOT15 (the Loot arc II): THE WARDROBE'S SIX - Legendary garments, each on
  *  its garments of either cut (`group` the wardrobe's, `templates` both cuts'), three or more lines of the Legendary band
  *  from the wardrobe's own pool, one DFU catalogue enchantment priced by DFU's table (never a held spell - cloth's
  *  condition - nor an item-maker-only payload), where it is FOUND (LOOT6) and its POWER carried on the record (powerOf
@@ -1147,7 +1138,7 @@ export const WARDROBE_LEGENDARIES = Object.freeze([
       brief: '+25 Stealth while hooded', text: 'While its hood is up, you have +25 Stealth' }),
     lore: 'Made for a Daggerfall cutpurse who was never once seen. Nobody can say what she looked like - only that the cowl was gray.' }),
 ]);
-/** BAL9c (2026-10-12; bible/05-Combat/Balance-Arc.md section 15): THE ARCANE THREE - a caster's Legendaries, the first
+/** BAL9c: THE ARCANE THREE - a caster's Legendaries, the first
  *  whose powers reach a spell's damage, its throw and its magicka (systems/spell/spellPower.js, systems/loot/lootPowers.js). LOOT3's
  *  law: three lines of the Legendary band of kinds its group carries, ONE DFU catalogue enchantment priced by DFU's table
  *  (never a held spell's condition bill), a base it lands on, a line of lore; found among the casters (LOOT6) with its
@@ -1177,7 +1168,7 @@ export const ARCANE_LEGENDARIES = Object.freeze([
     lore: 'The first Archmage carried a blade, his apprentices said, so that no one would think to look at his hands.' }),
 ]);
 export const legendaryById = (id) => allLegendaries().find((l) => l.id === id) ?? null;
-/** LOOT5 (the Loot arc, bible/06-Systems/Loot-Arc.md section 7): EVERY LEGENDARY A POWER. Each record names one: its
+/** LOOT5 (the Loot arc): EVERY LEGENDARY A POWER. Each record names one: its
  *  name, its BRIEF (the card's row - CARD-FIT's 32 characters at most), its sentence, its `kind` (what systems/
  *  lootPowers.js does with it) and its numbers, fixed - a Legendary does not grow. Keyed by the record's id, so the
  *  records keep LR2's own shape; a mod's record may carry its own `power` (powerOf reads both). */
@@ -1216,7 +1207,7 @@ export const LEGENDARY_POWERS = Object.freeze({
     brief: 'Heal 20% when low (60s)', text: 'When a hit drops you below 33% health, you heal 20% of your health. Recovers in 60 s' }),
   'wayrest-treads': Object.freeze({ name: "Courier's Haste", kind: 'haste', speed: 20, rounds: 2, recover: 10,
     brief: 'Kills: +20 Speed (2 rounds)', text: 'Each kill gives you +20 Speed for 2 rounds. Recovers in 10 s' }),
-  // BAL7 (bible/05-Combat/Balance-Arc.md section 13): the second blow lands for half - it was the whole blow again on
+  // BAL7: the second blow lands for half - it was the whole blow again on
   // every landed fist, the kit's 74 a swing at 3.2x the plain monk's and 4.3-5.5x the plain sword's
   'gauntlets-of-the-rose': Object.freeze({ name: 'Open Hand', kind: 'fists', share: 50,
     brief: 'Fists hit again for 50%', text: 'Each bare-handed hit strikes again for 50% of its damage' }),
@@ -1255,7 +1246,7 @@ export function registerGildedRecords(api) { _gilded = api && typeof api.powerOf
 export const powerOf = (id) => (typeof id === 'string' ? (LEGENDARY_POWERS[id] ?? legendaryById(id)?.power ?? _gilded?.powerOf(id) ?? null) : null);
 /** The power's line on a card and a tooltip: its name and its brief. */
 export const powerLine = (p) => (p?.name && p?.brief ? `${p.name}: ${p.brief}${p.survival && !survivalOn() ? SURVIVAL_OFF_NOTE : ''}` : '');   // LOOT15: a survival power says its reader is off
-/** LOOT10 (bible/06-Systems/Loot-Arc.md section 12): A RARE'S IMPRINT - the power of a Legendary of its own group,
+/** LOOT10: A RARE'S IMPRINT - the power of a Legendary of its own group,
  *  taken at the Reforge (systems/loot/lootCodex.js imprintPiece; lootPowers.js wornPowers reads it as the Legendary's own).
  *  Its card's line: "Imprint: Silent Death (of Nightwhisper) - ..."; '' for none. */
 export function imprintLine(item) {
@@ -1440,7 +1431,7 @@ export function repairRarityBases(items) {
 /** AUDIT FB1018f L1-1: THE BASES repairRarityBases MOVES FROM, by group - the group's templates no slot takes (the Wand;
  *  pinned against the table, fb1018f_heldbase.test.js). */
 export const RARITY_HOMED_FROM = Object.freeze({ Jewellery: Object.freeze([140]) });
-/** AUDIT FB1018f L1-1 (decided, Mac: "Stop with the decisions for me"): WHETHER A LEDGER PRINT MOVED AS A LOAD'S REPAIR
+/** AUDIT FB1018f L1-1 (decided): WHETHER A LEDGER PRINT MOVED AS A LOAD'S REPAIR
  *  MOVES IT - `was` and `now` prints (`template:material`, server-account/src/judge.js ledgerPrintOf); true when `now`
  *  is `was`'s base gone home (RARITY_HOMED_FROM to RARITY_HOME), its material kept. The realm ledger takes it as the same
  *  piece (ledger.js ledgerStep): a rolled Wand the service held through RARITY-WEAR - a guild vault's, a market's - comes
@@ -1498,8 +1489,7 @@ function rareFlavour(list, rolls, fits = null) {
 export const RARE_ENCHANT_WORTH = 600;
 /** LOOT14: a garment's Rare enchantment is worth half (GARMENT_WORTH_SHARE). */
 export const rareEnchantWorth = (item) => Math.round(RARE_ENCHANT_WORTH * (isGarment(item) ? GARMENT_WORTH_SHARE : 1));
-/** CRAFT-WORTH (2026-10-11, the exploit audit; Economy-Arc principle 5, "What an NPC pays for a crafted piece is capped,
- *  or smithing prints gold"): THE WORTH A CRAFTED PIECE'S QUALITY ROLLED ONTO IT - a Superior's Magic tier, a Masterwork's
+/** CRAFT-WORTH: THE WORTH A CRAFTED PIECE'S QUALITY ROLLED ONTO IT - a Superior's Magic tier, a Masterwork's
  *  Rare (smithItems.js mintPiece, through applyRarity above: its affixes' worth and a Rare's flavour's). That worth is the
  *  piece's POWER, never a counter's price: a Masterwork staff of three pine planks sold for ~1,280 gold where the plain
  *  staff fetches 6, every time, at a shop whose gold never runs out (~79k gold an hour of chopping and sawing at margin
@@ -1555,11 +1545,11 @@ export function rollLootRarity(items, sourceIn, { rolls = Math.random, luck = 50
   items.push(...rollFinalFinds({ ...source, luck }, rolls));   // the final finds - the door's last draw, after the technique's
   return items;
 }
-/** GEM2 (bible/06-Systems/Gem-Sockets.md section 4): THE WORLD'S GEM FIND - registered by systems/gems.js, which owns the
+/** GEM2: THE WORLD'S GEM FIND - registered by systems/gems.js, which owns the
  *  graded rows and imports this file (so this one cannot import it). `fn(source, rolls) -> items`. */
 let _gemFind = null;
 export function registerGemFind(fn) { _gemFind = typeof fn === 'function' ? fn : null; }
-/** LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): THE WARDROBE'S PASS - every eligible garment of
+/** LOOT14 (the Loot arc II): THE WARDROBE'S PASS - every eligible garment of
  *  a list a door is laddering, at the door's own source, then its own last pass (a garment's Legendary may be Exalted),
  *  AFTER every draw the door made before (the arc's law 9: a seeded door's earlier pieces stay its seed's). A garment the
  *  door has already marked (a unique find) is passed by. Answers the garments it laddered. */
@@ -1575,7 +1565,7 @@ export function wardrobePass(items, source, { rolls = Math.random, luck = 50, fi
   lastPass(dressed, rolls);
   return dressed;
 }
-/** LOOT2 (bible/06-Systems/Loot-Arc.md section 4): A DOOR'S LAST PASS over the pieces it just laddered - LOOT4: each
+/** LOOT2: A DOOR'S LAST PASS over the pieces it just laddered - LOOT4: each
  *  Magic's and Rare's chance at a line that does something, then each Legendary's one-in-ten Exalted - taken after
  *  every draw the door already makes, so a seeded door's earlier pieces are still its seed's (SET6's law: the gate's
  *  spoils, a town's thanks). The commoner draw first: an Exalted never moves a proc line's roll. CRAFT-PROCS (FIELD BUGS
@@ -1588,7 +1578,7 @@ export function lastPass(pieces, rolls = Math.random, { on = lootRarityOn() } = 
 }
 
 // ── LOOT4: a line that does something ───────────────────────────────
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 6). LR1's six kinds are numbers a wearer carries; five more DO
+// The Loot arc. LR1's six kinds are numbers a wearer carries; five more DO
 // something (systems/loot/lootPowers.js: a weapon's sear, leech and slayer's edge, armour's thorns, jewellery's focus).
 // A Magic piece one time in five, a Rare a bit over one time in three, takes ONE such line in its door's last pass:
 // a kind its group may carry, from its tier's band. It never names the piece (nameAround), so the name its number
@@ -1632,7 +1622,7 @@ function withLine(affixes, line) {
 }
 
 // ── TECH1: a weapon's technique ─────────────────────────────────────
-// bible/05-Combat/Weapon-Techniques.md. A Magic, Rare or Legendary weapon - or the Gauntlets, for the bare hand - minted
+// . A Magic, Rare or Legendary weapon - or the Gauntlets, for the bare hand - minted
 // at a loot door takes, one time in TECHNIQUE_PER_MILLE, ONE technique line: a technique of its own family, its power
 // from its tier's band. The roll is the door's LAST draw (Loot-II law 9 - every draw the door made before it, the card's
 // and the late finds' among them, is still its seed's), and a piece that can carry no technique takes no draw at all.
@@ -1683,7 +1673,7 @@ export function techniquePass(pieces, rolls = Math.random) {
 export const techniqueDetail = (a) => (isTechniqueAffix(a) && validAffix(a) ? techniqueBrief(a.param, a.value) : '');
 
 // ── LOOT2: the roll seen, and the Exalted ──────────────────────────
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 4). A rolled line says the band it was rolled in, so two swords
+// The Loot arc. A rolled line says the band it was rolled in, so two swords
 // are compared by how WELL they rolled, not only by what; a Rare whose every line stands at its band's top says so; and
 // a Legendary minted at a source is, one time in ten, EXALTED - one more line, of a kind its record does not carry,
 // from the top half of the Legendary band. The record stays what a player learns (its name, its lore, its lines); the
@@ -1781,7 +1771,7 @@ export function rollExalted(item, rolls = Math.random, on = lootRarityOn()) {
   return exaltLegendary(item, rolls);
 }
 // ── LOOT16: a cursed find ───────────────────────────────────────────
-/** LOOT16 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 8): A CURSED FIND - one Rare or Legendary in this
+/** LOOT16 (the Loot arc II): A CURSED FIND - one Rare or Legendary in this
  *  many that a body or a pile mints (rollLootRarity's door, a foe's kit) takes a curse in the door's last breath: a line
  *  more, its reward, and a drawback. Never an Exalted (its own extra line is its find's), and never a piece no door
  *  mints - a made one, the Broker's, the spoils, a quest's. */
@@ -1929,14 +1919,14 @@ export function curseLine(item) {
   return param && param !== 'None' ? `${enchantmentName(key)}: ${param}` : enchantmentName(key);
 }
 // ── LOOT20: sockets ─────────────────────────────────────────────────
-/** LOOT20 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 12): A SOCKET - a Rare (this many in a thousand) or a
+/** LOOT20 (the Loot arc II): A SOCKET - a Rare (this many in a thousand) or a
  *  Legendary a body or a pile mints may carry one, empty, on a weapon, a piece of armour or a jewel: never a garment,
  *  whose wardrobe pool keeps the fight off the clothes (LOOT14). A gem set in it (systems/reforge.js setGemPiece) gives
  *  its LINE beside the piece's own - one more line in `affixes`, marked with its gem (`gem`), so every reader of a line
  *  reads it (the fold, a weapon's procs and damage, LOOT12's cap, the card's compare) - and no roll made it: it has no
  *  band, is never reforged or honed, and never names the piece (the gems' lines are last, after the lines that name a
  *  Rare). Unset, the gem shatters.
- *  GEM1 (bible/06-Systems/Gem-Sockets.md section 3): A SOCKET LIST. `sockets` - one to three values, each 'empty' or
+ *  GEM1: A SOCKET LIST. `sockets` - one to three values, each 'empty' or
  *  the gem set in it, a declared item field - where LOOT20 wrote one string (`socket`): a weapon holds as many as its
  *  size (socketMax), and the weapons' own pass (weaponSocketPass) gives the rest. LOOT20's string is still READ wherever
  *  a socket is read (socketsOf) - a save, a room's memory, a listing written before - and the first write makes it the
@@ -2073,7 +2063,7 @@ function layGemLines(item) {
 /** SET A GEM IN A PIECE'S EMPTY SOCKET, in place - socket `at`, or the first empty one: its line after the piece's own,
  *  the socket named, the price by the line's worth. Answers the line, or null (no such empty socket, no such gem;
  *  nothing changed). */
-/** AUDIT GEM (bible/06-Systems/Gem-Sockets.md section 9): A SET GEM IS WORTH ITS OWN PRICE ON ITS PIECE - what the stone
+/** AUDIT GEM: A SET GEM IS WORTH ITS OWN PRICE ON ITS PIECE - what the stone
  *  sold for loose, never its line's worth. LOOT20 priced the line (`affixesWorth`), which was a 100-gold setting's
  *  business; free setting, three sockets and law 6 made it a faucet - a 10-gold Jade lifted its piece by its +360 of
  *  Willpower, three Jades by 1,080 though they read one Rare line. */
@@ -2130,7 +2120,7 @@ export function socketLine(item) {
   const n = emptySockets(item);
   return n === 1 ? 'Socket: empty' : n > 1 ? `Sockets: ${n} empty` : null;
 }
-/** GEM1 (bible/06-Systems/Gem-Sockets.md law 6): A PIECE'S GEMS GIVE AT MOST ONE RARE LINE OF A KIND - the gems' lines
+/** GEM1 (law 6): A PIECE'S GEMS GIVE AT MOST ONE RARE LINE OF A KIND - the gems' lines
  *  of one kind and param, together, read no more than the top of that kind's Rare band. */
 export const gemPieceCap = (id) => AFFIX_RANGES[id]?.rare[1] ?? 0;
 /** A PIECE'S LINES AS THE READERS READ THEM: its own whole, and each gem's line holding what is left of its kind's cap,
@@ -2154,8 +2144,7 @@ export function gemCapLine(item) {
   const held = (Array.isArray(item?.affixes) ? item.affixes : []).find((a, i) => a?.gem != null && read[i] !== a);
   return held ? `Gems: ${affixLabel({ id: held.id, ...(held.param != null ? { param: held.param } : {}), value: gemPieceCap(held.id) })} at most` : null;
 }
-/** REFORGE-REPLACE (2026-10-25, a player - SaberGGaming; the owner's decision: "Replace, price rises"; bible/06-Systems/
- *  Loot-Arc.md section 11): THE KINDS A REFORGE MAY PUT IN A LINE'S PLACE - its group's, a line that DOES something
+/** REFORGE-REPLACE: THE KINDS A REFORGE MAY PUT IN A LINE'S PLACE - its group's, a line that DOES something
  *  (LOOT4) for one and a number for a number (a technique for a technique, TECH1 - the pools hold none), NEVER the
  *  line's own kind (a reforge always replaces the line - the same kind back was a value rolled again, which the hone
  *  sells), and never a kind (nor, for a kind with params, a param) another of the piece's own lines carries. Any name
@@ -2172,7 +2161,7 @@ function reforgePool(item, index) {
   });
   return { ids, others, freeParams };
 }
-/** LOOT9 (bible/06-Systems/Loot-Arc.md section 11): THE LINES THE REFORGE MAY TAKE - every line of a Magic or Rare
+/** LOOT9: THE LINES THE REFORGE MAY TAKE - every line of a Magic or Rare
  *  piece; an Exalted Legendary's own extra line (its last - exaltLegendary appends it) and never a record's. REFORGE-
  *  REPLACE: any of them, however often the piece was reforged (the one-line lock is gone - an old piece's `reforged`
  *  mark is a reforge counted, reforgeCount), and never a line nothing else can take the place of (reforgePool: a
@@ -2207,7 +2196,7 @@ export function reforgeAffix(item, index, rolls = Math.random) {
   const tier = item.rarity;
   const old = item.affixes[index];
   const { ids: pool, others, freeParams } = reforgePool(item, index);
-  // PRESS-FLAT (2026-10-28, the owner: "no lean at all", "it need to reroll as well"): a reforge's kind and param are
+  // PRESS-FLAT: a reforge's kind and param are
   // drawn with no lean - no skill to the item's own, no armour family's weight, no garment's dress
   const id = pickByLines(pool, (k) => drawWeight(k, item, others, null), rolls);
   const k = AFFIX_KINDS[id];
@@ -2223,7 +2212,7 @@ export function reforgeAffix(item, index, rolls = Math.random) {
   return line;
 }
 // ── LOOT17: the hone ────────────────────────────────────────────────
-/** LOOT17 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 9): THE LINES A HONE MAY TAKE - on a piece the
+/** LOOT17 (the Loot arc II): THE LINES A HONE MAY TAKE - on a piece the
  *  Reforge takes (a Magic or Rare piece, an Exalted Legendary), every line a roll made (`affixBand`: a Legendary's record
  *  lines are its signature, fixed) that stands under its band's top. Indices into `affixes`; none for anything else. */
 export function honeableLines(item) {
@@ -2246,11 +2235,10 @@ export function honeAffix(item, index, rolls = Math.random) {
   item.value = was + affixesWorth([line], item) - affixesWorth([old], item);
   return line;
 }
-/** LOOT7 (bible/06-Systems/Loot-Arc.md section 9): what a CHAMPION's corpse source is over a plain foe's - its Legendary
+/** LOOT7: what a CHAMPION's corpse source is over a plain foe's - its Legendary
  *  threshold two tiers more and a quarter again (`tier`, `quality`), its Magic and Rare at half (`ladder`, CHAMP-LOOT). */
 export const CHAMPION_SOURCE = Object.freeze({ tier: 2, quality: 1.25, ladder: 0.5 });
-/** CHAMP-LOOT (2026-10-03, Mac: "champions should have half the rates what elite drop the legendary rate are good
- *  already", then "no more champion guaranteed rare"): a champion's own pieces roll Magic and Rare at half a plain foe's
+/** CHAMP-LOOT: a champion's own pieces roll Magic and Rare at half a plain foe's
  *  thresholds (`ladder`), its Legendary threshold the one LOOT7 gave it (`tier`, `quality`); nothing is forced onto its
  *  body. */
 /** CHAMP-LOOT: a champion's corpse source over its plain one - the one home both the door and the tests read. */
@@ -2282,13 +2270,13 @@ export function rollCorpseLoot(entity, basics, { rolls = Math.random, luck = 50,
   if (loot.length > carried) (entity.items ??= []).push(...loot.slice(carried));   // LOOT7-CHECK CORPSE-FIND: the find onto the body
   return entity.items;
 }
-/** SIGIL1 (Mac: "weapons obtained through online play recieve a sort of sigil power"; "Magic and up, found online";
+/** SIGIL1 (; "Magic and up, found online";
  *  "Chance at the drop, then grows"): THE WIN. Every Magic, Rare or Legendary WEAPON of a list just won - a corpse's
  *  when its foe dies, a treasure pile's when it is minted - rolls its sigil once, in a session that plays online:
  *  about one in five, more with more `fighters` (systems/sigil/sigil.js rollSigil; PSCALE1's count, read at the death).
  *  Never ammunition, an artifact, a quest's item, or a weapon that already carries one. Offline, nothing. Answers
  *  how many were marked.
- *  SET4 (Sigil Sets, bible/11-Multiplayer/Sigil-Sets.md section 4 - Mac: sets "come from any source, just like
+ *  SET4 (Sigil Sets, - Mac: sets "come from any source, just like
  *  weapons"): the name is SIGIL1's; the door is every sigil's now. AFTER every weapon's own rolls - so SIGIL1's draws
  *  stay the ones they were - a fresh weapon sigil joins a set of the world one time in three, and every Magic-or-better
  *  piece of ARMOUR and every SHIELD rolls a set sigil by the same chance law (systems/sigil/sigilSets.js rollSetSigil),
@@ -2375,7 +2363,7 @@ export function affixFold(entity) {
   for (const [el, v] of Object.entries(rolledResist)) mods.resist[el] = (mods.resist[el] ?? 0) + rolledCounts(v, mods.resist[el] ?? 0);
   return mods;
 }
-/** LOOT12 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 4): HONEST RESISTANCE. A resistance line adds its
+/** LOOT12 (the Loot arc II): HONEST RESISTANCE. A resistance line adds its
  *  points to the saving throw's 50, and 100 there is immunity before Willpower is read (spellcast.js savingThrow) - so
  *  two Rares of one element at +25 made a body immune to it, every cast, and the line said "+25%". The ladder's ROLLED
  *  lines (a Magic's, a Rare's, a Legendary's - an Exalted's extra line among them) count together to RESIST_CAP an
@@ -2404,7 +2392,7 @@ export function rolledResistOf(entity, element) {
   const { rolled, own } = resistSplit(wornItems(entity).filter(identified), element);
   return { worn: rolled, counts: rolledCounts(rolled, own) };
 }
-/** LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): A PIECE'S LINES AGAINST WHAT IT WOULD REPLACE
+/** LOOT18 (the Loot arc II): A PIECE'S LINES AGAINST WHAT IT WOULD REPLACE
  *  (`replaces`, the worn pieces a wear would take off - ui/armourCard.js wearComparison's). For each kind and param its
  *  lines carry (a gem's line summed with its own - AUDIT LOOT II A5), the sum, the same summed over them, and the
  *  difference (`delta`, null for a kind they lack: new); then each they carry and it does not (`lost`, its label at

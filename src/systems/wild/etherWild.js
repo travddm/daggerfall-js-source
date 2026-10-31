@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ETHER-WILD (2026-10-21) - THE OPEN SEA: THE ELTHERIC OCEAN AN OPEN PVP ZONE (bible/03-World/Eltheric-Ocean.md ETHER-WILD;
-// bible/11-Multiplayer/Wild-Zone.md section 24).
+// ETHER-WILD - THE OPEN SEA: THE ELTHERIC OCEAN AN OPEN PVP ZONE (ETHER-WILD;
 //
 // The owner: "The etheric ocean is some amazing content we havent touched in awhile. I want there to be more of a reason
 // to venture into this zone. ... id also like to implement open pvp for this zone specifficaly and implement some of the

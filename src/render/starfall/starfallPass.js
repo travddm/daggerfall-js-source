@@ -1,6 +1,6 @@
 // @ts-check
-// STAR4 (2026-10-20): THE STARFALL IN THE SKY, DRAWN - the omen's new star, the fall's streak, the landing's flash and
-// its ring of shock over the ground, and the star's beacon while it stands. Design: bible/11-Multiplayer/Starfall.md
+// STAR4: THE STARFALL IN THE SKY, DRAWN - the omen's new star, the fall's streak, the landing's flash and
+// its ring of shock over the ground, and the star's beacon while it stands. Design:
 // section 3. One foreign pass after the world's, ADDED onto the frame (ONE, ONE), depth tested, no depth written - the
 // gate's beacon's law (render/gate/gatePass.js): its column is the gate's own, its shaders and geometry exported there
 // and built again here under this pass's program (render/superDungeon/sdOmenPass.js's way - the gate's bytes untouched),

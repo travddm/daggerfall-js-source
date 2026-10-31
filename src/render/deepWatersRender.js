@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-C (2026-09-25): ILIAC PUDDLE NO MORE'S TWO PASSES. The mod ships
+// DW-C: ILIAC PUDDLE NO MORE'S TWO PASSES. The mod ships
 // its own shaders (jet082's 1.2.2 bundle, GLCore programs read back to
 // GLSL) and this pass is them, term for term:
 //

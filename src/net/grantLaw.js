@@ -1,5 +1,5 @@
 // @ts-check
-// GRANT1 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md sections 4 and 7): THE SPAWN
+// GRANT1: THE SPAWN
 // GRANT'S LAW, PURE - what the relay signs when a foe that rides to another player is made, and what every reader checks.
 // GRANT2 (section 12) wires the asks: the client's (net/online.js sendGrant, scenes/grantHost.js) and the relay's
 // (server/src/index.js _grantFrame), measured (net/grantMeasure.js). The reader's check is GRANT3's.
@@ -327,7 +327,7 @@ export const grantPixelReadBack = (g, world) => world || (intIn(g?.p?.[0], 0, 99
  *  is granted and what the gate would refuse is counted (GRANT2 to GRANT5); `enforce` - the gate refuses (GRANT6). */
 export const GRANT_MODES = Object.freeze(['off', 'measure', 'enforce']);
 /** The mode a setting names: `off` and `enforce` exactly, anything else `measure` - the law measures from its deploy
- *  (Mac, 2026-10-18: "Measure on deploy"), and a setting nobody wrote is that. Pure. @param {unknown} v */
+ * , and a setting nobody wrote is that. Pure. @param {unknown} v */
 export const grantModeOf = (v) => (v === 'off' || v === 'enforce' ? v : 'measure');
 
 /** The most a client's ask number may be - it names the answer that comes back, nothing more. */
@@ -451,7 +451,7 @@ export function grantBucketIdle(k, b, nowMs) {
   return b.tokens + ((nowMs - b.at) / 1000) * law.rate >= law.cap;
 }
 
-// ── AUDIT TESA III E2-1: A CELL'S GATE OUTLIVES ITS SLEEP (bible/01-Overview/audits/Audit-Tesa-III-E2.md) ─────────────
+// ── AUDIT TESA III E2-1: A CELL'S GATE OUTLIVES ITS SLEEP ─────────────
 // GRANT-SLEEP (section 22) left nothing pending to hold a quiet cell awake, and the gate - each account's bucket per kind,
 // the live grants that count against the ceiling, the counter, the sockets that stood on a grant - lived in the object's
 // memory alone: ten silent seconds and a hibernation handed every account a full bucket and the cell an empty ceiling,

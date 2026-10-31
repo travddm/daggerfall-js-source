@@ -1,5 +1,4 @@
-// HT-WAIST (2026-09-24, Mac: "Let it be a separate animated item on movement with eye of the Beholder sprites
-// also"): THE LANTERN AT THE WAIST SWINGS AS YOU MOVE - one law, two bodies.
+// HT-WAIST: THE LANTERN AT THE WAIST SWINGS AS YOU MOVE - one law, two bodies.
 //
 // A lantern hung at the hip is a pendulum on a moving pivot. Neither Daggerfall nor Handheld Torches has one to
 // port (the mod's lantern is a first-person hand sprite; DFU has no lantern on any body), so this is the port's
@@ -43,7 +42,7 @@ export const LANTERN_SWING = Object.freeze({
   maxDt: 0.25,
 });
 
-/** HT-WAIST-SIZE (2026-10-20, Mac: "the lantern attached to the waist in absolutely gigantic on the morrowind model"):
+/** HT-WAIST-SIZE:
  *  A LANTERN AT THE WAIST STANDS THIS TALL (metres, ring to foot) on either body - Eye Of The Beholder's picture
  *  (player/eyeOfTheBeholder/eotbLantern.js HIP_LANTERN_SPRITE) and the Morrowind body's mesh, scaled to it about its hook
  *  (combat/fpArm.js hipLanternSize). One height, so the two bodies never hang two sizes of lantern. */
@@ -117,7 +116,7 @@ export function lanternSwingMatrix(s, out = new Float32Array(9)) {
 
 /**
  * HT-WAIST: THE LANTERN AT THE MORROWIND BODY'S WAIST - the swing and last frame's heading, one per body (combat/fpArm.js
- * keeps one per rig; BODY-MOTION moved it here from the rig's own scope, bible/04-Characters/Body-Motion.md). `step` takes
+ * keeps one per rig; BODY-MOTION moved it here from the rig's own scope). `step` takes
  * the motor's bag the movement slot already reads (`cam.move`: the input axes and the applied speed), the heading's
  * turn, and the walking body's stride phase (0..1 - the body motion's gait while it walks the legs, else the walk
  * clip's; null standing) - and writes the hang's attitude into `rot` for the pose that follows. At rest it settles plumb.

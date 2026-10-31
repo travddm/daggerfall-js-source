@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-LANES (2026-10-02, Mac: "ships should be more persistant and actively engage with multiple docks and multiple
-// pathways around daggerfall") - THE BAY'S PACKETS. The sea's traffic was the director's alone: ships stood on a ring
+// SEA-LANES - THE BAY'S PACKETS. The sea's traffic was the director's alone: ships stood on a ring
 // about the player, crossing their waters on a slant, going about an errand only to a harbour the player had stood by,
 // and let go out of sight for good - a ship seen leaving a port was never the ship met at the next, and none was ever
 // on her way between two. The packets are ships of the Bay itself, between its ports:
@@ -61,7 +60,7 @@ export const LANE_LINEAGE = 24;
 const M_PER_NATIVE = 819.2 / NATIVE_PIXEL;
 
 /** The water's way between two map pixels, 8 neighbours with no corner cut past land, or null (none within LANE_SEARCH,
- *  or longer than LANE_PATH_PX). `water(px, py)` the lane's own - WW3 (bible/03-World/World-Wide.md): on the world's
+ *  or longer than LANE_PATH_PX). `water(px, py)` the lane's own - WW3: on the world's
  *  grid, keyed by the world's key (world/worldWide/worldGrid.js), so a lane past the Bay's map is walked as the Bay's
  *  are; a Bay lane's water is the Bay's alone (scenes/naval/worldLanes.js), so its way is the one it always was. */
 export function lanePixels(from, to, water) {

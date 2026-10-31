@@ -1,5 +1,4 @@
-// SNOWFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be
-// on by default and integrate into our enhanced environments seamlessly") - SNOWFALL 1.0.5 (demifiend000's Dynamic
+// SNOWFALL1 - SNOWFALL 1.0.5 (demifiend000's Dynamic
 // Snow, vendored at vendor/snowfall/), ported off its assembly: the law the snow lies by, pure. The runtime that stands
 // it round the player is systems/snowfallRuntime.js (DynamicSnowController, MidDetailSnowRing, StreamedSnowBlanket-
 // Prototype, FarTrackMask) and the surface it draws is render/snowfallSurface.js (the mod's shader).
@@ -1024,7 +1023,7 @@ export const roadCorners = (west, east) => ((east & 5) | (west & 0x50)) & 255;
  */
 export function predictRoadTile(x, y, flags, corners, ground, road, rect) {
   if (x < 0 || x >= 128 || y < 0 || y >= 128 || ground < 0 || ground > 3) return -1;
-  // PERF-SNOW1 (2026-10-10): the classifier's `paint` is a module function over the tile it is handed (roadPaint), not a
+  // PERF-SNOW1: the classifier's `paint` is a module function over the tile it is handed (roadPaint), not a
   // closure minted on every one of the up to six predictions a painted tile's classification asks - the same calls, in
   // the same order, each answering what the closure did (the tile it would leave, or ROAD_UNPAINTED where it refused)
   let tile = -1, t;
@@ -1091,7 +1090,7 @@ export function markAuthoredBlock(authored, ground, originX, originZ) {
 }
 
 /** BasicRoadsTerrain: one pixel's painted tiles, each road record classified as the network's road or track.
- *  BAY-LEFT-GROUND (bible/03-World/Landforms.md, the snow's part; departure from BasicRoadsTerrain.TryCreate): a network
+ *  BAY-LEFT-GROUND (, the snow's part; departure from BasicRoadsTerrain.TryCreate): a network
  *  that says its own `kindAt(x, z, tile)` classifies by it - past the Bay the roads are TESA's (world/arenaRoads.js),
  *  drawn as curves (world/road/roadCurves.js, VOYAGER2), whose tiles no Basic Roads arm predicts; the painter's own word
  *  is read there instead (scenes/snowfallHost.js snowfallNetworkBeyond). An authored tile is still none. */

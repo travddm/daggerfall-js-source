@@ -1,10 +1,10 @@
-// SHADOW-FANG (2026-09-26): WHAT IS TRUE OF THIS DEVICE'S OWN PLAYER, offline as well as on. The relay reads a
+// SHADOW-FANG: WHAT IS TRUE OF THIS DEVICE'S OWN PLAYER, offline as well as on. The relay reads a
 // player's glyphs off the signed token for everybody else; for the player's own screen the account service's last
 // word is kept on the stored session (net/accountClient.js adoptIdentity - a token's glyphs, a wardrobe's), and read
 // here. A local read of a cosmetic: what it dresses (the werewolf's skin) only this player sees.
-// WB9g (2026-09-30): and the aura this player wears at their feet (ownAura) - the same stored word, the same reading.
-// NAME-AS (2026-10-12): and when this device last chose the name its player wears online (ownNameAsAt) - the same.
-// WITCH1 (2026-10-20): and the profile icon this player wears (ownIcon) - the same.
+// WB9g: and the aura this player wears at their feet (ownAura) - the same stored word, the same reading.
+// NAME-AS: and when this device last chose the name its player wears online (ownNameAsAt) - the same.
+// WITCH1: and the profile icon this player wears (ownIcon) - the same.
 import { storedSession, SESSION_KEY } from '../net/accountClient.js';
 import { appStorage } from './appStorage.js';
 import { werewolfSkinOf } from '../characters/werewolfSkin.js';

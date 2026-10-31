@@ -87,7 +87,7 @@ import { SITE_TYPES } from '../../systems/quest/place.js';   // QUEST-HOME: a bu
 import { QuestLens } from '../../ui/quest/questLens.js';   // GUIDE1: the modern faces' one read-only picture of this machine
 import { questHerald, heraldOn } from '../../ui/quest/questHerald.js';   // GUIDE3: the news the lens sees, told
 import { questTracker, followOn } from '../../ui/quest/questTracker.js';   // GUIDE4: the quest the HUD follows (GUIDE5: the card's or the marks')
-import { createQuestlines } from '../../systems/questlines/qlLayer.js';   // QL1: the questlines' layer over this machine (bible/06-Systems/Questlines-Arc.md)
+import { createQuestlines } from '../../systems/questlines/qlLayer.js';     // QL1: the questlines' layer over this machine
 import { questlineActionTemplates } from '../../systems/questlines/qlActions.js';   // QL4: ask, outcome, ql act, ql paid, ql name - registered here, every host's machine
 import { BAY_START_QUEST, isStartQuestName } from '../../systems/starts/starts.js';   // START1: the quest a new character starts in the Iliac Bay
 import { setActSink } from '../../systems/questlines/qlActs.js';   // QL11: the features' acts, heard by this bridge's layer
@@ -168,7 +168,7 @@ export function tokensToRows(tokens) {
   return rows;
 }
 
-/** QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE QUESTLINES' `ask` AS A BOX CHAIN, one home for every
+/** QL4: THE QUESTLINES' `ask` AS A BOX CHAIN, one home for every
  *  host's quest box (THE ONE CONSTRUCTION SEAM - world.js and exterior.js each hand it to their own showQuestBox): the
  *  question's message, then a pick among the choices' own words. The pick cannot be dismissed without an answer -
  *  Escape shows the question again - as PromptMulti's box cannot (PromptMulti.cs:87-88, AllowCancel false). The
@@ -189,22 +189,21 @@ export function choiceBoxes(q, message, choices, respond) {
 }
 
 /** The host's door for the questlines' `ask`: the chain above, handed to that host's own quest box. HOST-SPLIT
- *  (bible/01-Overview/Host-Split.md): built here, so world.js's bootWorld and exterior.js's bootExterior each wire it in one
+ * : built here, so world.js's bootWorld and exterior.js's bootExterior each wire it in one
  *  entry - `showChoice: choiceDoor(showQuestBox)` - never an arrow of their own (bootWorld met its ceiling at the merge). */
 export const choiceDoor = (showQuestBox) => (q, message, choices, respond) => showQuestBox(choiceBoxes(q, message, choices, respond));
 
 /** StartGameBehaviour.cs:445-447 - the two quests a new character
  *  always starts, in this order. DFU's second is _BRISIEN, the main quest's first.
  *
- *  TUT1 (2026-10-11, Mac: "replace the current DFU tutorial with our own custom tutorial"): DFU's first is _TUTOR__,
+ *  TUT1: DFU's first is _TUTOR__,
  *  and it is no longer started - DFO's own tutorial (systems/tutorials.js, ui/tutorialPopup.js) stands where its pages
  *  stood. What _TUTOR__ did besides its pages is kept: every way out of it, finished or declined, ran its `_no_`
  *  task, `start quest 977 977` - the curse on the old capital's streets, a world quest (questFoeHost.js WORLD_QUESTS) -
  *  so S0000977 starts here, in the tutorial's place, as a player who said No to its first page started it. Port-Ledger
  *  section A.
  *
- *  START1 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md; Mac: "allow for the main quest to be started on the
- *  player's watch"): _BRISIEN is no longer started here either - it put the main quest on its clock from the first
+ *  START1: _BRISIEN is no longer started here either - it put the main quest on its clock from the first
  *  tick. The Bay's start quest stands in its place (systems/starts/starts.js BAY_START_QUEST): its commission, opened
  *  when the player chooses, starts _BRISIEN in the city of Daggerfall. Port-Ledger section A. */
 export const GAME_START_QUESTS = Object.freeze(['S0000977', BAY_START_QUEST]);
@@ -385,7 +384,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
   const machine = new QuestMachine({
     world: ctx.world ?? null,
     nowSeconds: () => ctx.classicSeconds?.() ?? 0,
-    // TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): the sky, the event clock and the session's raises beside the
+    // TIME3 (6.3): the sky, the event clock and the session's raises beside the
     // character's clock above - null where a host names none (the machine falls back to the one clock)
     skySeconds: () => ctx.skySeconds?.() ?? null,
     worldSeconds: () => ctx.worldSeconds?.() ?? null,
@@ -437,7 +436,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
     releaseQuestItem: (uid, item) => ctx.releaseQuestItem?.(uid, item),
     makeHeldQuestItemsPermanent: (uid, sym) => ctx.makeHeldQuestItemsPermanent?.(uid, sym),
     offerReward: (q, item) => ctx.offerReward?.(q, item),
-    // QL1/QL3 (bible/06-Systems/Questlines-Arc.md): the layer's two answers to the machine - a starting quest's stamp and
+    // QL1/QL3: the layer's two answers to the machine - a starting quest's stamp and
     // a paying quest's reward. Late-bound: the layer is made below, over this machine and its lists.
     questlinesStamp: (q) => questlines?.stamp(q) ?? null,
     questReward: (q, item, resource) => questlines?.reward(q, item, resource) ?? null,
@@ -495,7 +494,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
     // WITCH1: and a quest done is a Witches' Festival find (systems/festival/festivalClient.js - nothing while it is not live)
     onQuestEnded: (q) => { questlines?.runner?.dropped?.(q); festivalQuestEnded(q); ctx.onQuestEnded?.(q); },
   });
-  // QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): the questlines' six actions, after DFU's 82 - here, so every
+  // QL4: the questlines' six actions, after DFU's 82 - here, so every
   // host's machine has them before a save or a script that says them is read (a first-match scan; none of DFU's claims
   // these lines - test/systems/questlines/ql4_actions.test.js).
   for (const template of questlineActionTemplates()) machine.registerAction(template);
@@ -537,7 +536,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
     sharedClock: () => !!ctx.sharedClock?.(),   // REPUTE-GATE: online, two Mages Guild quests wait for their headers' standing
   });
 
-  // QL1 (bible/06-Systems/Questlines-Arc.md decision 2): THE QUESTLINES' LAYER, made here once over this machine and its
+  // QL1 (decision 2): THE QUESTLINES' LAYER, made here once over this machine and its
   // lists (THE ONE CONSTRUCTION SEAM - every host with quests holds this bridge). It never runs a quest; it reads them.
   // Its host doors are closures over ctx, so this file stays the one place the bridge's contract is read from.
   // QL12: the account service's door for the endgame lines (questlineHost.js) - a host's own (a test's fake, or null
@@ -734,7 +733,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
       // _createFinishedQuest). The quest lens reads it to say how a
       // quest it was showing ended.
       const ended = [];
-      // QUEST-SHELF (2026-10-08): the quests set aside - walked as the running ones are, their clocks as they stopped
+      // QUEST-SHELF: the quests set aside - walked as the running ones are, their clocks as they stopped
       // (frozen: no time counts while one is away), for the journal's Abandoned list and its Reclaim
       const shelved = [];
       const unlogged = [];   // QL2: stamped quests whose objectives stand before their first journal entry; ABANDON-ALWAYS: and any holding its questor's door
@@ -774,7 +773,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
         if (!messages.length) continue;
         let clockSeconds = null;
         const clocks = [];   // AUDIT GUIDE H1: each counting clock by name - the lens counts only one the journal names
-        // REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12): online a DELAY is no time left to
+        // REST8: online a DELAY is no time left to
         // show - it lands on the short wait (quest/clock.js waitsShort) - so the walk skips it, and no surface it feeds
         // counts a letter down; a DEADLINE keeps its "Time remains", its rail line and the herald's urgency, in played
         // time. TIMEFREE's walk skipped every clock online.
@@ -808,8 +807,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
     },
 
     /**
-     * JOURNAL-CLEAN (2026-09-30, Discord: "Should there be a way to clean both finished and unfinished quests from
-     * your journal for a cleaner look?"): the enhanced journal's four tidy-ups, one home - every host that hands its
+     * JOURNAL-CLEAN: the enhanced journal's four tidy-ups, one home - every host that hands its
      * pause window `questLog` hands `journalClean` beside it (world.js, worldModes.js through world.js's host,
      * exterior.js, dungeonContext.js). Removing an archived entry and clearing the archive act on the notebook's
      * filed entries (the classic logbook's right-click remove, ui/quest/questJournal.js removeEntry, is the same store);
@@ -831,7 +829,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
       hide: (id) => notebook?.hideQuest(id) ?? false,
       unhide: (id) => notebook?.unhideQuest(id) ?? false,
       /**
-       * QUEST-SHELF (2026-10-08, Mac: "All quests should be able to be abandoned and reclaimed"): ABANDON - the quest
+       * QUEST-SHELF: ABANDON - the quest
        * set aside, kept (machine.js shelveQuest; its words, shelfRefusalText). Beside the journal's tidy-ups, so every host
        * that hands its pause window `journalClean` hands these too. Refused for a raid the world runs (WA_RAID_QUESTS - the
        * sea's own, ended by its fight) and for one that is not running. Answers `{ ok, reason?, text }`.
@@ -872,7 +870,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
         const r = machine.startStoryAgain(questName);
         return { ok: r.ok, reason: r.reason, uid: r.quest?.uid, text: r.ok ? t('quest.story.againDone', '{name} begins again from its first step. The main story can go on.', { name: questTitle(r.quest.questName) || r.quest.displayName || r.quest.questName }) : restartRefusalText(r.reason) };
       },
-      /** QL3 (bible/06-Systems/Questlines-Arc.md section 5.2): the rewards waiting to be chosen, and the take - beside the
+      /** QL3: the rewards waiting to be chosen, and the take - beside the
        *  journal's tidy-ups, so every host that hands its pause window `journalClean` hands these too (the four hosts,
        *  through the one door). */
       // AUDIT QUESTLINES UI-19: a waiting reward is named in the language of the page that draws it - the quest's title as
@@ -981,7 +979,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
 
     /** The scene mount (Q4-iii's walk) over the host's adapter. */
     mountScene(adapter, siteType, buildingKey = 0) {
-      // QUEST-HOME (Mac, 2026-10-15: "Close both"): the player stands in this building - every quest's site here is
+      // QUEST-HOME: the player stands in this building - every quest's site here is
       // reached, and never chosen again should it become a player's home (QuestMachine.noteSiteReached)
       if (siteType === SITE_TYPES.Building) machine.noteSiteReached(adapter.currentMapId?.() ?? 0, buildingKey);
       // IC-INTERIORS (systems/quest/castMarkers.js): a made building's sites hold its markers as its cast stands them - laid
@@ -997,7 +995,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
       return relayBuiltDungeon(machine, location, { carriesQuestItem: (item) => ctx.carriesQuestItem?.(item) ?? false }, mapId);
     },
 
-    /** QREPAIR (Mac: "Add a quest refresh option to settings" - "Repair active quests"): the one pass
+    /** QREPAIR (- "Repair active quests"): the one pass
      *  (systems/quest/questRepair.js) over this machine and this host's seams. Answers the report; `text` is the line
      *  the Settings row shows. */
     repair() {

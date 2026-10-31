@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10c (bible/03-World/Arena-Provinces.md TESA10c) - TORVAL'S LANDMARKS: the port's own models of the city's
+// TESA10c (TESA10c) - TORVAL'S LANDMARKS: the port's own models of the city's
 // signatures (world/capitalPlans.js TORVAL says where each stands) - the Mane's Palace under its great dome with its four
 // minarets, the Temple of the Two Moons on its terraces with Masser's dome and Secunda's, the quay on Topal Bay, the
 // sandstone walls with their domed towers - in metres, drawn as the map reads (+z south), every model's origin Torval's

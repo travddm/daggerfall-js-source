@@ -1,5 +1,5 @@
 // @ts-check
-// REVENANT-PAGE (2026-10-02, Mac: "Definitely finish this with love. Any new UI elements need to be enhanced UI plus"):
+// REVENANT-PAGE:
 // THE REVENANTS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js pauseHoldings; HOLDINGS moved it off
 // the Stats rail, 2026-10-03) - every foe that has earned
 // the character's name (systems/revenant/revenant.js), the living first, strongest first: its portrait in a sunk well with its
@@ -111,11 +111,11 @@ export function deedWords(r) {
 }
 const DEED_WORDS = Object.freeze({
   slew: 'killed you', fled: 'escaped', returned: 'came back', fell: 'fell', yielded: 'yielded', executed: 'executed', spared: 'spared', released: 'released',
-  // RVN1 (bible/12-Enhanced-AI/Feud-Arc.md section 26): the deeds FEUD adds, worded with the union
+  // RVN1: the deeds FEUD adds, worded with the union
   felled: 'felled your companion', routed: 'routed you', festered: 'grew bolder', deserted: 'deserted you', betrayed: 'betrayed you', laststand: 'made its last stand',
   ascended: 'became the Dread',   // UNQUIET (Revenants.md section 46)
 });
-/** A deed in words - RVN10 (bible/12-Enhanced-AI/Feud-Arc.md 21.1): a felling by the companion's name it keeps. */
+/** A deed in words - RVN10 (21.1): a felling by the companion's name it keeps. */
 export const historyWords = (d) => (d?.deed === 'felled' && typeof d.ally === 'string' && d.ally ? `felled ${d.ally}` : d?.deed === 'fled' && d.unbroken === true ? 'escaped unbroken' : DEED_WORDS[d?.deed] ?? String(d?.deed ?? ''));   // RVN12b (24.1): an escape unbroken
 /** RVN1 (section 12; RVN12 completes the page): what a scar says - the way it was hurt, or what it learned of the fight. */
 const SCAR_WORDS = Object.freeze({
@@ -129,7 +129,7 @@ export const ADAPT_NAMES = Object.freeze({
   fireproof: 'Fireproof', rimebound: 'Rimebound', grounded: 'Grounded', venomBlooded: 'Venom-blooded', spellScarred: 'Spell-scarred',
   silverScarred: 'Silver-scarred', steadfast: 'Steadfast', patient: 'Patient', watchful: 'Watchful', relentless: 'Relentless', nightStalker: 'Night-stalker',
 });
-/** RVN12b (bible/12-Enhanced-AI/Feud-Arc.md 24.1): what each adaptation does to me, in a chip's words (13.2's table). */
+/** RVN12b (24.1): what each adaptation does to me, in a chip's words (13.2's table). */
 export const ADAPT_EFFECTS = Object.freeze({
   mailed: 'your blades bite less', braced: 'your blunt blows bite less; it stands firmer', hewnHard: 'your axes bite less',
   unflinching: 'your fists bite less', arrowWise: 'your arrows bite less; it closes fast', fireproof: 'it shrugs off fire',
@@ -361,7 +361,7 @@ export function drawRevenantsPage(detail, rerender, { el, divider, player = null
       ? t('rvn.unq.page.howHeld', 'From Renown {renown}, an elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you.', { renown: REVENANT_MIN_RENOWN })
       : t('rvn.unq.page.how', 'An elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you.');
     detail.append(el('p', 'px-note', revenantOn()
-      ? `${lead} ${how}`   // AUDIT (2026-10-02): the sworn and the fallen below are revenants too; RENOWN-GATE: and when they begin
+      ? `${lead} ${how}`     // AUDIT: the sworn and the fallen below are revenants too; RENOWN-GATE: and when they begin
       : 'Revenants need Loot rarity, which is off.'));
   } else {
     const list = el('div', 'rvn-list');

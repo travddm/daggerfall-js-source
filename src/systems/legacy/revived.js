@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// REVIVE (2026-10-14) - A DEATH TAKEN BACK.
+// REVIVE - A DEATH TAKEN BACK.
 //
 // Mac, of TheHalfinStream's Enduring elder, who died of her years in Castle Wayrest on 2026-10-13 while the remains
 // bug (FIELD BUGS 2026-10-13d REMAINS-STAND) hid what she lay with: "I want to roll back this specific account", then
@@ -17,7 +17,7 @@
 //
 // Pure, and the service's as much as the client's (server-account/src/legacy.js imports it): one law, two doors.
 //
-// REZ-BLOODLINE AUDIT R1 (2026-10-16): A PARTY'S RESURRECT TAKES A DEATH BACK THE SAME WAY. Online the death door writes
+// REZ-BLOODLINE AUDIT R1: A PARTY'S RESURRECT TAKES A DEATH BACK THE SAME WAY. Online the death door writes
 // a fall at once - the line's record and the realm's tombstone, so no killed tab and no second device escapes it - and a
 // Resurrect inside the hold's window unwrites it with this stamp (scenes/legacyHost.js takeBack; legacy.js realmRaise
 // stamps the realm's copy).

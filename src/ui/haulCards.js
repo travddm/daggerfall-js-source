@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HAUL-CARDS (2026-10-03, Mac: "Im wondering with popups for obtaining
-// silver and harvest items. We need a better enhanced plus UI element for
-// when people gather these items"; the mockup: "Dude this is sick") -
+// HAUL-CARDS -
 // WHAT A GATHER, A STRIKE OR A CLAIM GAVE, AS THE PICKUP FEED'S CARDS
 // (ui/pickupFeed.js showHaul), ON THE ENHANCED SKIN.
 //

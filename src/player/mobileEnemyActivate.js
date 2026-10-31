@@ -105,8 +105,7 @@ export function activateMobileEnemy(foe, distance, mode, player, {
   openLiving = null,   // LW14: (foe) => a company's choices (the living world's door), whether one was opened
 } = {}) {
   if (!foe || foe.dead) return false;
-  // REVENANT-FATE (2026-10-02, Mac: "Players should have the option to kill or spare"; "the choice popup should reuse
-  // the loot menu"): a beaten revenant on its knees is reached as a body is - at the treasure's reach, the HUD's one
+  // REVENANT-FATE: a beaten revenant on its knees is reached as a body is - at the treasure's reach, the HUD's one
   // refusal past it - and opens its fate's window; a peer's (a puppet's) is its owner's choice
   if (foe.yielded && !foe.puppet && openFate) {
     if (!(distance <= TREASURE_ACTIVATION_DISTANCE)) { midScreen?.(tooFarAwayText()); return true; }   // the treasure's reach, as his pack's (WK-P6)
@@ -114,7 +113,7 @@ export function activateMobileEnemy(foe, distance, mode, player, {
     return true;
   }
   const entity = foe.entity ?? null;
-  // COMPANION-KIT (2026-10-01, Mac: companions "act as storage"): my companion activated opens his pack - Steal from him
+  // COMPANION-KIT: my companion activated opens his pack - Steal from him
   // is the shipmate's silent break below
   if (mode !== 'steal' && openCompanion && foe.companion != null && foe.shipmate === true && !String(foe.companion).startsWith('peer:')) {
     // AUDIT WK-P6: HIS PACK IS STORAGE, AND STORAGE IS REACHED. This arm runs at the ray's reach (RAY_DISTANCE, 76.8 -
@@ -238,8 +237,7 @@ export function tryMobileEnemyActivate(eye, dir, foes, collider, reach, mode, pl
 }
 
 /**
- * TACT3d (Mac, 2026-10-02: "Players can grief others with guards by
- * bringing them into interiors and blocking doorways" - fixed in every
+ * TACT3d (- fixed in every
  * version, always on). A foe that is NOT hostile to the player - a
  * watchman at peace, a companion, a quest's waiting NPC - standing
  * between the crosshair and a door within the door's own reach no

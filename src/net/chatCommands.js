@@ -1,5 +1,5 @@
 // @ts-check
-// CHAT-CHAN (2026-09-23, the community arc): THE CHAT'S SLASH COMMANDS - one grammar, pure, DOM-free.
+// CHAT-CHAN: THE CHAT'S SLASH COMMANDS - one grammar, pure, DOM-free.
 //
 // Before this slice the host's onSend (scenes/world.js) tested a handful of commands by regex and sent EVERYTHING else
 // to the room, so a mistyped `/pary hi` was said to everyone online, literally. Now a line that starts with `/` is a
@@ -9,7 +9,7 @@
 //   /party /p <text>        your party                 /local /l /say /s     those near enough to hear you
 //   /guild /gu <text>       your guild (GUILD1c)
 //   /lc <text>              your language channel (CHAT-LANG)   /lang [code|off]  choose it; alone, the list
-//   /ooc <text>             a Local aside out of character - the line wrapped in (( ))
+//   /ooc <text>             a Local aside out of character - the line wrapped in (())
 //   /rp <text>              a line of roleplay on the active tab - wrapped in *asterisks*, drawn green and leaning (CHAT-RP)
 //   /trade /tr <text>       the Trade channel      /lfg <text>  the LFG channel (CHAT-TRADE) - each joined by choice:
 //   /join <trade|lfg>       on the bar and in the channel      /leave <trade|lfg>  off it (a bare /leave is a battle's)
@@ -52,12 +52,12 @@ export const JOIN_CHANNELS = Object.freeze(['trade', 'lfg']);
 /** CHAT-TRADE: a /join or /leave that names none of them - through the text core (AUDIT CHAT-TRADE A4). */
 export const badJoinText = (name) => t('net.chat.badJoin', '/{cmd} takes trade or lfg: /{cmd} trade.', { cmd: name });
 /**
- * EMOTE1 (2026-09-23, Addison Knox: "Emotes, be it emojis or additional animations"): THE GESTURES. Each is an ACTION
+ * EMOTE1: THE GESTURES. Each is an ACTION
  * line said on the Local tab - a gesture is the body's, and the bodies near enough to see it are the ones Local
  * reaches - in the third person the chat draws it in ("Bran waves."), with a name after the command making it a
  * gesture AT someone ("/wave Ann" - "Bran waves at Ann."). Words only: the port's bodies have no clip to play for a
  * wave or a bow (the Morrowind rig's base animations are the idles, the moves, the attacks, the casts, a knockdown and
- * the deaths - bible/06-Systems/Community-Arc.md EMOTE1), and a gesture drawn with the wrong one would be a lie.
+ * the deaths EMOTE1), and a gesture drawn with the wrong one would be a lie.
  */
 export const EMOTES = Object.freeze({
   wave: ['waves.', 'waves at {t}.'],
@@ -196,8 +196,7 @@ export function parseEventCommand(text) {
   if (words.length > 2 || !LIVE_EVENTS.includes(name) || (sw !== 'on' && sw !== 'off')) return { error: `Usage: /event <${LIVE_EVENTS.join('|')}> [on|off], or /event off.` };
   return { kind: sw === 'on' ? name : '' };
 }
-/** CHAT-HELP (2026-09-23, Mac: "a non-intrusive greeting message that says something along the lines of (use /help
- *  for commands)"): the line the chat greets the player with each time they go online - theirs alone, never counted
+/** CHAT-HELP: the line the chat greets the player with each time they go online - theirs alone, never counted
  *  unread (net/chat.js push's `quiet`), so /help is found without being announced. */
 export const CHAT_GREETING_TEXT = 'Welcome! Type /help for chat commands.';
 /** CHAT-TRADE: a list whose rows may be READ WHEN THEY ARE READ - a function row is a getter (the text core's

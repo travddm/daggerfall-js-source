@@ -1,11 +1,6 @@
 // @ts-check
-// STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use / need to be scalable by amount of
-// enemy and customizable by type of enemys / need to have a hidden meter that killing enemys build up into a mini boss /
-// mini boss need to be a single enlarges version of the mob spawns / instead of the blue elite glow lets make the mini
-// boss have a yellow glow / needs to be bale to select a town or area for these events"; and "need to be able to scal
-// amount for the meter as well", "show the meter to staff", "should allow all of the monster in the game", "also let
-// staff pick the miniboss"): A STAFF EVENT'S LAW - the one copy the account service, the relay and the game read.
-// Design: bible/11-Multiplayer/Staff-Events.md.
+// STAFF-EVENT: A STAFF EVENT'S LAW - the one copy the account service, the relay and the game read.
+// Design:.
 //
 // AN EVENT is staged by an Admin on the Staff Panel: a place (a town - a region and its location - or an AREA, any map
 // pixel), the monsters it brings (any kinds, mixed evenly), how many in all, the kills that fill its hidden meter, and
@@ -44,11 +39,11 @@ export const STAFF_EVENT_METER_MAX = 500;
 export const STAFF_BOSS_SIZE_MIN = 150;
 export const STAFF_BOSS_SIZE_MAX = 300;
 export const STAFF_BOSS_SIZE_DEFAULT = 200;
-/** The mini boss's health, times its kind's (mob 2026-10-24 21:17Z: "needs the mini bosses health on the start panel"). */
+/** The mini boss's health, times its kind's. */
 export const STAFF_BOSS_HEALTH_MIN = 1;
 export const STAFF_BOSS_HEALTH_MAX = 100;
 export const STAFF_BOSS_HEALTH_DEFAULT = 10;
-/** BOSS-HP (mob 2026-10-25 02:47Z: "need be able to eneter a exact amount of healt for mini bosses"): the mini boss's
+/** BOSS-HP: the mini boss's
  *  health as a number staff type (`hp`), in place of the times-its-kind's above; 0 is the times. */
 export const STAFF_BOSS_HP_MAX = 1000000;
 /** The longest an event may be set to run, ms (a day; "only when I end it" is 0). */
@@ -74,7 +69,7 @@ export const STAFF_EVENT_PRESENT_MS = 15000;
 export const STAFF_EVENT_TELL_MS = 3000;
 /** How long a ledger is kept past its event's end, ms. */
 export const STAFF_EVENT_KEEP_MS = 10 * 60 * 1000;
-/** THE REWARD (mob 2026-10-24: "something like dagons leaderboard", "but not his ghear"): at the mini boss's first fall
+/** THE REWARD (, "but not his ghear"): at the mini boss's first fall
  *  every account that EARNED it is handed a receipt of its own (staffEventReceipt.js) and the place is told the board.
  *  Earned: this many kills on the meter, or standing in the place for half the event's run (a healer's way, the gate's). */
 export const STAFF_EVENT_EARN_KILLS = 3;
@@ -84,7 +79,7 @@ export const STAFF_EVENT_BOARD_MAX = 10;
 export const STAFF_EVENT_STAND_TICK_MS = 4000;
 
 const intIn = (/** @type {unknown} */ v, /** @type {number} */ lo, /** @type {number} */ hi) => Number.isSafeInteger(v) && /** @type {number} */ (v) >= lo && /** @type {number} */ (v) <= hi;
-/** AUDIT RELEASE R2-7 (bible/01-Overview/audits/Audit-Release-R2.md; the owner: "Take care of exclusions and gaps"): AN
+/** AUDIT RELEASE R2-7 (): AN
  *  EVENT'S PIXEL IS THE WORLD'S - within the wire's WORLD_PIXEL_BOUND either side of the Bay's corner (net/wire.js; held
  *  equal here by its pin, since this file imports nothing), so an AREA's event stands past the Bay as on it. */
 export const STAFF_EVENT_PIXEL_BOUND = 8192;
@@ -132,7 +127,7 @@ export function validStaffEvent(e) {
   return { id: e.id, rg: e.rg, loc: e.loc, px: e.px, py: e.py, nm: clean(e.nm, STAFF_EVENT_PLACE_MAX), ct: isAreaEvent(e) ? 0 : bit(e.ct), mt, n: e.n, m: e.m, b: e.b, bs: e.bs, bh: e.bh ?? STAFF_BOSS_HEALTH_DEFAULT, hp: e.hp ?? 0, at: e.at, ue: e.ue, eb: bit(e.eb), fb: e.fb ?? 0, by: clean(e.by, STAFF_EVENT_BY_MAX) };
 }
 /**
- * EVENT-FAULT (mob 2026-10-25: "service refused", "toop of event menu says the refusal"): the first field validStaffEvent
+ * EVENT-FAULT (, "toop of event menu says the refusal"): the first field validStaffEvent
  * refuses, by name - the panel says which - or null for an event it takes.
  * @param {any} e @returns {string|null}
  */
@@ -231,7 +226,7 @@ export const staffEventCap = (led, nowMs) => STAFF_EVENT_KILLS_BURST + Math.floo
 
 /**
  * A boss called: the meter full (the count at `e.m`), or staff's hand (`e.fb` past the calls the ledger took). A boss
- * already standing is not called by the meter; BOSS-AGAIN (mob 2026-10-25: "boss seems to not spawn every time"): the
+ * already standing is not called by the meter; BOSS-AGAIN: the
  * meter calls one more each time it fills again - every `e.m` kills - once the last has fallen. Each call is the next
  * `fc`. Answers whether it moved.
  * @param {StaffEventLedger} led @param {StaffEvent} e
@@ -301,7 +296,7 @@ export function staffEventEarned(led) {
   const fell = led.fellAt ?? led.first;
   const half = Math.max(0, fell - led.first) / 2;
   const rows = Object.entries(led.a)
-    .filter(([acct, r]) => !acct.startsWith('id:') && (r.h ?? 0) >= STAFF_EVENT_EARN_KILLS)   // REWARD-KILLS (mob 2026-10-25: "im getting drops even tho i barlky particpate"; card "Kills only (3+)"): a stand alone earns nothing
+    .filter(([acct, r]) => !acct.startsWith('id:') && (r.h ?? 0) >= STAFF_EVENT_EARN_KILLS)     // REWARD-KILLS (; card "Kills only (3+)"): a stand alone earns nothing
     .sort(([a, x], [b, y]) => (y.h ?? 0) - (x.h ?? 0) || Number(b === led.kb) - Number(a === led.kb) || (y.t ?? 0) - (x.t ?? 0) || (a < b ? -1 : 1));
   return rows.map(([acct, rec], i) => ({ acct, rec, rank: i < STAFF_EVENT_BOARD_MAX ? i + 1 : 0 }));
 }

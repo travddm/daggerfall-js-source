@@ -1,8 +1,5 @@
 // @ts-check
-// GROWTH1 (2026-10-17, the owner: "instead of having ascend in one place and the firmament trees in another (including
-// the new naval tree), I want to give the firmament, level up page, and specializations its own tab within the pause
-// menu"; asked: "Growth", the skies "drawn in the tab", the old doors moved, the classic skin let in; bible/10-UI/
-// Growth.md) - THE GROWTH TAB of the pause window (ui/enhanced/enhancedMenu.js PAUSE_TABS): one rail for how a character
+// GROWTH1 - THE GROWTH TAB of the pause window (ui/enhanced/enhancedMenu.js PAUSE_TABS): one rail for how a character
 // grows -
 //   Level            the Ascension (ui/enhanced/enhancedLevelUp.js) drawn in the pane: a level owed spent here, else
 //                    the view of its stars (ASCEND-ANYTIME's) - was the Stats page's Ascend button and F5's level-up
@@ -97,8 +94,7 @@ export function drawGrowthTab(body, ctx) {
   const secs = growthSections(ctx);
   if (!secs.some(([id]) => id === sec)) sec = secs[0][0];
   const due = growthDue(ctx);
-  // GROWTH-BOOK (2026-10-20, Dudey: "it looks very messy changing its sizes all the time ... structure it better so it
-  // doesnt change the window each time you click an option in the growth tab"): one window size for every page
+  // GROWTH-BOOK: one window size for every page
   // (enhancedMenu.js pauseWindow's px-win-growth), the rail always the journal's left column (the Grimoire's left page),
   // and each page the same bones - its title, its line, then its stage or its text
   const wrap = el('div', 'px-journal gr-book');

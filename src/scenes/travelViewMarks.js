@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -74,7 +74,7 @@ export function createTravelViewMarks(host) {
     for (const p of travelViewPlaces()) {
       if (p.key === endKey) continue;
       const tier = params.has('online') ? tierPhrase(dungeonTierLabel(p.summary.loc)) : '';   // TIER1: a dungeon's tier and size under its name, online
-      // OW-DUNGEON-DOT (2026-10-13, field: "some dungeons appear on the Overworld map as towns"): a found dungeon within the
+      // OW-DUNGEON-DOT: a found dungeon within the
       // grid wears TV2's plate (travelViewDungeons leaves it to this list), and every plate here was kind 'place' - a
       // town's brass dot, and the Towns switch's count. Its kind says so now: the dungeons' arch, the Dungeons switch.
       const isDungeon = TV_DUNGEON_TYPES.has(p.summary.loc?.mapTableData?.locationType);
@@ -118,7 +118,7 @@ export function createTravelViewMarks(host) {
       const chasing = _bandChase.has(b.id), p = bandPlace(b, bms);
       marks.push({ key: `band:${b.id}`, at: tvSceneKept(b, p.x, p.z, 2), label: chasing ? `${WILD_MARK} ${bandLabel(mk.name, mk.mobileTypes.length)}` : bandLabel(mk.name, mk.mobileTypes.length), kind: chasing ? 'band chase' : 'band', edge: chasing, pick: true });   // OW6: the band's OWN number, the same for every player (a party it meets brings more - PSCALE1 - where it stands); WILD-ALERT: a chase is a band that noticed me - its mark
     }
-    // OW6 (2026-09-29, the player: "If a camp is spawned, it should show in the overworld"): THE CAMPS - every group
+    // OW6: THE CAMPS - every group
     // standing about, a camp, a pack or a band stood: mine, and each peer's by the tags their frames carry
     // (world/campShared.js) - one mark where its living members stand, with its kind and its number; gone with its last
     const wildCamps = wildCampKeys();   // WILD-ALERT: a camp a member of which has noticed me wears the mark
@@ -127,7 +127,7 @@ export function createTravelViewMarks(host) {
     // Stable and Wagon Yard standing about me, its name over its ground and its signboard's emblem (scenes/merchantYardsHost.js
     // overworldMarks) - with the towns on the Towns switch
     for (const m of host.merchantYards?.overworldMarks() ?? []) marks.push(m);
-    // SHIPYARDS-FOUND (Mac: "Everything should show on the map/overworld"): each port town's shipyard and lighthouse
+    // SHIPYARDS-FOUND: each port town's shipyard and lighthouse
     // standing about me (scenes/portHost.js overworldMarks), and its docks over the first quay laid (scenes/quayPool.js)
     for (const m of host.portHost?.overworldMarks() ?? []) marks.push(m);
     for (const m of host.quays?.overworldMarks() ?? []) marks.push(m);
@@ -148,7 +148,7 @@ export function createTravelViewMarks(host) {
       marks.push({ key: `bounty:${b.id}`, at: tvSceneKept(h, x, z, TV_PLACE_LIFT), label: `Bounty: ${b.label}`, sub: farDistanceText(km), kind: 'bounty', edge: true, pick: true });   // BOUNTY-SNAP: pressable, on its ring alone (ui/travel/travelViewHud.js pickBox)
     }
     for (const id of [..._tvBountyHold.keys()]) if (!bountyIds.has(id)) _tvBountyHold.delete(id);   // a bounty over lets its point go
-    // OW-QUEST (2026-10-19, the owner, of the Overworld's gaps: "1. Do it"): WHERE THE QUESTS POINT - the held map's own
+    // OW-QUEST: WHERE THE QUESTS POINT - the held map's own
     // marks (ui/quest/questMarks.js questMapMarks: every active quest whose place is on the player's map, two quests at one
     // place one mark), each at its PLACE's middle (AUDIT OW-REVISITED L5-1: the place's own rect, as its plate and the
     // journey's end stand - the pixel's middle stood a hundred metres off the main quest's eight off-middle dungeons; the
@@ -204,7 +204,7 @@ export function createTravelViewMarks(host) {
       }
       for (const k of [..._tvLodeHold.keys()]) if (!keep.has(k)) _tvLodeHold.delete(k);   // a Motherlode gone lets its point go
     }
-    // WAYPOINTS (2026-10-06): THE FLAGS - every waypoint the switches show, a small flag in its colour where it lies; a
+    // WAYPOINTS: THE FLAGS - every waypoint the switches show, a small flag in its colour where it lies; a
     // FOLLOWED one held at the screen's edge with its distance, as a bounty is (the rest only where they are in view).
     // A click on one is a walk to it; a right-click its menu (onTravelViewContext)
     {
@@ -229,7 +229,7 @@ export function createTravelViewMarks(host) {
       const km = place ? (Math.hypot(e.x - here.x, e.z - here.z) / 32768) * PIXEL_KM : NaN;
       marks.push({ key: 'dest', at: tvSceneKept(e, e.x, e.z, place ? TV_PLACE_LIFT : 0), label: e.label, kind: e.kind, edge: true, ...(place ? { pick: true, sub: farDistanceText(km) } : {}) });
     }
-    // OVERWORLD NAMES (2026-09-28, Mac: "Full, like in play"): THE PLAYERS DRAWN HERE - within the pose range, their
+    // OVERWORLD NAMES: THE PLAYERS DRAWN HERE - within the pose range, their
     // bodies standing - marked as the region's travellers are, over their heads, NAMED AS THEY ARE IN PLAY (the title
     // above, the Renown, the name, the guild's tag, the glyphs; my party's in its green). From the view's eye the names
     // over their heads were past NAME_RANGE (60 m) - the eye stands 40-780 m back (the height over the tilt's tangent;
@@ -247,8 +247,7 @@ export function createTravelViewMarks(host) {
     for (const d of host.online?.drawable?.() ?? []) {
       if (!d?.shown || _hiddenPeers.has(d.id) || _veils.has(d.id)) continue;
       const f = host.onlineToScene(_peerMapPoses.get(d.id) ?? d.shown);
-      // WILD3 (the owner: "when other players are near you they are counted as enemies bright red and its called stranger
-      // when you near them Like 600m away"): in the open zone a stranger within WILD_STRANGER_M stands as an enemy
+      // WILD3: in the open zone a stranger within WILD_STRANGER_M stands as an enemy
       if (_wildStrangerIds.has(d.id)) {
         near.add(d.id);
         marks.push({ key: `peer:${d.id}`, at: [f[0], f[1] + TV_PEER_HEAD_M, f[2]], label: WILD_TEXT.stranger, kind: 'stranger', edge: true });

@@ -1,6 +1,6 @@
 // @ts-check
-// TESA4 (2026-10-12, the owner: "Continue"; bible/03-World/Arena-Provinces.md TESA4) - THE ROADS PAST THE BAY'S LAYER.
-// TESA14 (2026-10-24, "Full Daggerfall network") moved the network itself to world/tamrielRoads.js: the port's own road
+// TESA4 - THE ROADS PAST THE BAY'S LAYER.
+// TESA14 moved the network itself to world/tamrielRoads.js: the port's own road
 // law (world/road/roadNetwork.js buildRoadNetwork, ROADS 1-21) at the Bay's own scale over every place past the Bay, a region
 // at a time on the roads' own worker. TESA4's window - a cell of five Bay pixels, its ground read at its centre, the
 // network drawn back centre to centre - is retired with it; this module keeps what the kernels and the verge read.
@@ -14,7 +14,7 @@
 // road node of the network a little past the edge (its GATE) and the straight run from the Bay's road out to it. The
 // run's Bay pixels are the layer's `join` - the one part of it a Bay pixel reads.
 //
-// Nothing of Arena ships or crosses the wire (bible/01-Overview/Port-Doctrine.md): each player's roads are laid from
+// Nothing of Arena ships or crosses the wire: each player's roads are laid from
 // their own Daggerfall files, the same for every player.
 import { DIR_DELTA, MAP_W, MAP_H } from './road/roadNetwork.js';
 import { setRoadsPastTable } from './road/pathData.js';   // BAY-LEFT-MAPS: Travel Options' reads past the table are this layer's
@@ -23,7 +23,7 @@ import { inBay } from './tamriel/tamrielFrame.js';
 /** TESA5: how deep inside its edge a Bay road may lie and still be joined, Bay pixels. */
 export const JOIN_DEPTH = 8;
 /** TESA5: how far apart along an edge two crossings stand at least - a road nearer the last one is the same crossing.
- *  ROAD-GAPS (2026-10-26, the owner: "Take care of exclusions and gaps"; `06-Systems/Travel-View.md` ROAD-GAPS): 12, where it
+ *  ROAD-GAPS: 12, where it
  *  was 60 - the Bay brings eighteen roads to its north, south and east edges (a road along the edge one), and seven
  *  crossings stood for them: the rest ended at the edge with the land going on past it, and a journey off the Bay walked
  *  the field from their ends to the nearest crossing's road. Two roads ten kilometres apart are two crossings now:
@@ -192,7 +192,7 @@ export function arenaRoadTilePixels(tx, ty) {
 export const layerByte = (layer, kind, x, y) => layer?.[kind]?.get(beyondKey(x, y)) ?? 0;
 /** The installed layer's byte at a Bay pixel. */
 export const arenaRoadByte = (kind, x, y) => layerByte(_layer, kind, x, y);
-// BAY-LEFT-MAPS (bible/06-Systems/Travel-Options.md BAY-LEFT-MAPS): past the Bay's table, Basic Roads' path data reads this
+// BAY-LEFT-MAPS (BAY-LEFT-MAPS): past the Bay's table, Basic Roads' path data reads this
 // layer - handed in as the module loads, so pathData.js need not import it (the account Worker bundles pathData.js).
 setRoadsPastTable(arenaRoadByte);
 /** Its corner byte at a Bay pixel, as the mod's (world/road/roadPainter.js pathCorners): the east neighbour's SW|NW bits and

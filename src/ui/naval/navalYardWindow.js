@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT NAV1 (2026-09-29, the helm - Mac: "This task is to be extremely detailed, authentic and easy to use") - THE
+// AUDIT NAV1 - THE
 // SHIPWRIGHT'S WINDOW: a port's yard, at the helm lying to his quay (scenes/naval/navalHost.js yardHere). The helm audit's
 // first finding was that none stood - a hurt boat stayed hurt, a wreck a wreck. Black Flag's harbour master, in
 // Daggerfall's words and the stone-and-brass kit: what she wants, what each costs, and the presses that pay for it.
@@ -15,7 +15,7 @@
 // sail, maxSail, crew, maxCrew, barrels, wrecked, barrelsAboard? }, offer() -> navalYard.js yardOffer's, buy(id) ->
 // { ok, id, n, cost, whole, short? }, buyAll() -> { ok, cost, bought, whole }, prices, hasBarrels? }.
 //
-// CAPT-BOARD (2026-10-11, bible/03-World/Captains-Sea.md): THE HARBOURMASTER'S TAB beside the shipwright's, where the
+// CAPT-BOARD: THE HARBOURMASTER'S TAB beside the shipwright's, where the
 // world hands an `office()` (scenes/harbourOffice.js model): the port and the captain's rank with its crown, today's
 // board - each contract's words, purse, term and the crown's regard it is worth, and its Take - the contracts held, how
 // far each has come and its term left, and Give up; the letters a rank buys (a letter of marque, the Admiralty's
@@ -24,7 +24,7 @@
 // CAPT-TRADE: THE EXCHANGE'S TAB, where the world hands an `exchange()` (scenes/harbourOffice.js exchange): each good
 // the port deals in - what it is to the port (made here, wanted here), its price to buy and to sell today, how many more
 // the exchange deals in, what the boat at the quay carries of it - and Buy 1, Buy 10, Sell 1, Sell all. CREW-TRADE
-// (bible/03-World/Captains-Sea.md CREW-TRADE): a crewed ship's CREW first - whether the port has sailors to spare or is
+// (CREW-TRADE): a crewed ship's CREW first - whether the port has sailors to spare or is
 // short of them, a man's two prices, her crew aboard against her whole - its presses signing men on to her and off her.
 import { closeOnOutsideTap } from '../enhanced/enhancedOverlays.js';
 import { overlayAction } from '../input.js';

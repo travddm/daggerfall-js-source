@@ -1,5 +1,5 @@
 // @ts-check
-// OW-CHASE-RANGE (2026-10-19, the owner: "4. Fix it"; bible/06-Systems/Travel-View.md OW-CHASE-RANGE): THE REGION'S CHASE
+// OW-CHASE-RANGE: THE REGION'S CHASE
 // WORDS HEARD - the streaming host's half of systems/travel/regionChase.js. A traveller's chases ride beside their region
 // mark (`bd` the bands', `sr` the raiders'); each is heard through the host's own hearing (`bandHear`, `seaRaidHear` - the
 // cell's word's, a fresh cell word for the same id preferred), standing TRAV_BAND_HOLD_MS, and (AUDIT OW-REVISITED):
@@ -8,7 +8,7 @@
 //   - a welcome's row is heard with its age gone from its word, one older than the word stands never heard (L4-2);
 //   - nothing is heard of a traveller my map hides (`hidden` - L4-3: WILD1's open zone, where a stranger's mark is drawn
 //     to no one, and a chase word beside it drew where they rode).
-// HOST-SPLIT (bible/01-Overview/Host-Split.md): the hearing grew past three lines with the audit's fixes, so it lives here
+// HOST-SPLIT: the hearing grew past three lines with the audit's fixes, so it lives here
 // and `bootWorld` wires it. The streaming host constructs it (scenes/world.js) - the one host with the region's
 // travellers; scenes/exterior.js, scenes/worldModes.js and scenes/dungeonContext.js hear no region.
 import { regionChaseHeard, regionChaseWithdraw, TRAV_BAND_HOLD_MS } from '../systems/travel/regionChase.js';

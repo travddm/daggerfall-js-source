@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MARKS1 (2026-09-28) — THIS DEVICE'S MARKS: the balance as the account
+// MARKS1 — THIS DEVICE'S MARKS: the balance as the account
 // service last said it, the Bank's sale carried to its end, and a guild's
 // Marks moved. The service keeps every Mark (server-account/src/marks.js);
 // this is what a client may do with them, and the law is
@@ -30,7 +30,7 @@
 // guild move keeps its id until an answer comes, so a press after a lost
 // answer is the same move, never a second.
 //
-// SILVER-FINDS (2026-10-05): A LOOT FIND - the device rolled it
+// SILVER-FINDS: A LOOT FIND - the device rolled it
 // (systems/silverFinds.js), the service strikes what its own dice say
 // under the day's count. Each find carries its own id too, asked again
 // with it while the network or the service falters; one never answered

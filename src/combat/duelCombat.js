@@ -1,9 +1,9 @@
 // @ts-check
-// DUEL1 (2026-09-24, Mac: duels "traps both players" in a ring, and asked - "Yes: weapons, bows, spells"): THE BLOW
+// DUEL1: THE BLOW
 // BETWEEN TWO PLAYERS. Pure over the game's own formula - no scene, no socket - so the pins drive a strike without a
 // browser.
 //
-// THE STRIKER'S HALF ALONE (INT8, INT9, INT10 - bible/06-Systems/Integrity-Arc.md 5). Every blow and spell between
+// THE STRIKER'S HALF ALONE (INT8, INT9, INT10 5). Every blow and spell between
 // players - a duel's, a siege's and its works', a Royal Tourney's, the open zone's - is counted on the STRIKER's machine
 // and sent as a number, which the relay's referee clips (net/duel/duelRef.js, siegeRef.js, wildRef.js); no defender's
 // machine resolves anything, and nothing of the defender's sheet - its armour, Dodging, attributes, live effects -
@@ -173,7 +173,7 @@ export function duelStandIn(striker = null) {
 export function resolveDuelStrike(d, target, { rolls = Math.random, backFacing = false } = {}) {
   const { stub, weapon } = duelStub(d.a, d.w ?? null);
   const swing = SWING_MODS[d.sw ?? (d.by === 'arrow' ? 'StrikeDown' : '')] ?? { damage: 0, toHit: 0 };
-  // TWO-HANDS (AUDIT, bible/05-Combat/Two-Hands.md): an OFF-HAND swing between players carries the off hand's terms, as
+  // TWO-HANDS (AUDIT): an OFF-HAND swing between players carries the off hand's terms, as
   // PlayerWeapon.resolveHit's does against a foe - its to-hit by the sheet's Agility, its share of the damage and its weight
   const off = d.by === 'melee' && d.off === true;
   const dmg = calculateAttackDamage(stub, target, {

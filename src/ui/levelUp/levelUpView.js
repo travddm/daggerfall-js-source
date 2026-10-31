@@ -1,9 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // LV1 — THE ASCENSION: what the enhanced level-up window KNOWS.
 //
-// Mac, 2026-09-18: "We're going to be working on the next enhanced UI
-// window... Our gold standard is a replication of the skyrim level up
-// UI in our own constellation vision."
 //
 // ── WHAT WAS THERE BEFORE ─────────────────────────────────────────
 // Nothing of the enhanced skin. `ui/charSheetDoor.js` has forked on
@@ -13,7 +10,7 @@
 // `ui/enhanced/enhancedCharSheet.js`'s own header said so in as many words
 // ("THE LEVEL-UP SCREEN stays classic... Not this door's business").
 // That sentence is retired by this slice, where it stood, per
-// bible/Home.md's RETIRING A FLAG DELETES THE SENTENCE.
+// 's RETIRING A FLAG DELETES THE SENTENCE.
 //
 // ── WHY A CONSTELLATION, AND WHY IT IS NOT SKYRIM'S ───────────────
 // Skyrim's level-up screen is a sky: your skills are stars, and the
@@ -130,7 +127,7 @@ export const attributeLabel = (k) => (Object.hasOwn(ATTRIBUTE_NAME, k) ? ATTRIBU
  * all" and this window is behind that promise, so these are the port's
  * own words - as ui/settings/settingsCopy.js's are.
  *
- * AUDIT GROWTH LANE5-1 (the owner: "no AI like text, over explanations, or weird descriptions"): each a getter, so a
+ * AUDIT GROWTH LANE5-1: each a getter, so a
  * line is read in the player's language when it is drawn, and each said plainly - what raising the attribute does,
  * in the game's own terms, with no figure of speech in the way.
  */

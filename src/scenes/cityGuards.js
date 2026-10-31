@@ -58,7 +58,7 @@ import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_RADIUS, CAPSULE_HEIGH
 import { findLowestOuterInteriorDoor } from '../player/enterExit.js';   // ROAD-B: DaggerfallInterior.FindLowestOuterInteriorDoor
 import { coverDistance } from '../ai/cover.js';   // TACT1: a witness does not see through a tree
 import { blowConnects, blowScaled } from '../ai/foeBlows.js';   // TACT4
-import { foeGlint } from '../ai/tactics.js';   // TELL2: a wind-up's glint (bible/12-Enhanced-AI/Feud-Arc.md section 4.2)
+import { foeGlint } from '../ai/tactics.js';     // TELL2: a wind-up's glint
 import { SOUND } from '../systems/soundClips.js';
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F217
@@ -126,7 +126,7 @@ export const MAX_ACTIVE_GUARD_SPAWNS = 5;
 /** WERE-FRIGHT: how long a watchman frightened off by a beast runs before he is gone (frighten, below) - long
  *  enough to be seen running, some twenty-odd metres at the watch's pace. The port's own number. */
 export const FRIGHTENED_RUN_SECONDS = 5;
-/** WATCH-LEAVES (bible/01-Overview/bugs/Field-Bugs-2026-10-12e.md): one leg of a stood-down defender's walk off - aimed
+/** WATCH-LEAVES: one leg of a stood-down defender's walk off - aimed
  *  away from where the player stands as it begins, and aimed afresh from where they stand at its end. The port's own
  *  number: short enough that a player who moves is walked away from, not followed. */
 export const DEFENDER_LEAVE_LEG_SECONDS = 3;
@@ -205,7 +205,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
   // The two STREET pools pass nothing and keep the `() => false`
   // fallback, which is right for them.
   isActionDoor = null,
-  // HALT-ONE (2026-10-05, Mac: "reduce the HALT noise"): the living watch's lane - () => true where the town is the
+  // HALT-ONE: the living watch's lane - () => true where the town is the
   // living world's (scenes/world.js, scenes/worldModes.js: livingWorldOn). The watch then CALLS AS ONE
   // (characters/enemy/enemySounds.js WatchVoice): one Halt as it first comes for the player, then at most one every
   // HALT_GAP_S from the whole watch while it is after him; never a defender's, a pacified, running or walking-away
@@ -334,7 +334,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
       // equipment), the kit put on, the trio off this host's stream,
       // the port's roll (a guard is a class enemy - its entity level is
       // its tier).
-      // ZONE-WATCH (2026-10-08, the owner: "Guards in the cities are 10x times as strong"): the zone's watch - its health
+      // ZONE-WATCH: the zone's watch - its health
       // and every blow it lands (formulas.js calculateAttackDamage's damageScale) ten times
       { const k = Number(guardScale?.() ?? 1); if (k > 1) { entity.maxHealth = Math.max(1, Math.round((entity.maxHealth || 1) * k)); entity.health = entity.maxHealth; entity.healthMult = (entity.healthMult ?? 1) * k; entity.damageScale = (Number.isFinite(entity.damageScale) && entity.damageScale > 0 ? entity.damageScale : 1) * k; entity.zoneWatch = true; } }
       spawnEnemyLoot(entity, GUARD_MOBILE_TYPE, basics, playerEntity, { rolls: rand });
@@ -615,8 +615,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
   }
 
   /**
-   * WERE-FRIGHT (2026-09-29, Mac: the beast "cannot surrender, but instead a chance to frighten"; frightened, the
-   * guards "flee, crime dropped"): THE WATCH FRIGHTENED OFF. scenes/arrestFlow.js rolls the beast's roar and, when it
+   * WERE-FRIGHT: THE WATCH FRIGHTENED OFF. scenes/arrestFlow.js rolls the beast's roar and, when it
    * works, forgets the crime and calls this: every watchman of the crime runs from the player (EnemyAI.flee) for
    * FRIGHTENED_RUN_SECONDS and is then the walk-away (update). The watch still on its way - the witnesses' 5-10 second
    * countdown - is called off with it. A defender is not the crime's watch and holds his post. A fleer no longer
@@ -983,8 +982,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
       // drew a fresh squad every countdown: seventy items off one
       // centaur in two minutes, with no crime.
       else if (g.defender && !fromPlayer) g.entity.items = [];
-      // UL1: OnEnemyDeath (:139). AUDIT VC6 (2026-09-18, chasing a test
-      // that failed one run in eight): the handlers ROLL - SURV2's puts
+      // UL1: OnEnemyDeath (:139). AUDIT VC6: the handlers ROLL - SURV2's puts
       // the body's food on it - and this seam handed them neither a
       // stream nor a luck, so the drop fell to Math.random and read the
       // player's luck as 50 while `spawnEnemyLoot` three lines up was
@@ -1050,7 +1048,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
     // through the shared gate anyway (AUDIT 24 wave 38): the pool
     // should not be the place that remembers which arm applies to it.
     const guardWeight = ENEMY_BASICS[GUARD_MOBILE_TYPE]?.weight ?? 0;
-    // TELL1 (bible/12-Enhanced-AI/Feud-Arc.md section 3): a watchman WINDING UP holds through the blow - no shove, no
+    // TELL1: a watchman WINDING UP holds through the blow - no shove, no
     // Hurt - and the blow weighs on his poise; past it the wind-up breaks and he is staggered, the breaking blow's shove
     // half again as hard. Not winding up, this answers null and DFU's knockback stands (hostCombat.windupDoor's one law)
     const _tell = (g.ai?._tac?.state !== 'windup' && g.ai?._tac?.state !== 'overreach') ? null : windupDoor(g, damage, {   // only a watchman winding up (TELL4: or overreached) builds the blow's bag
@@ -1102,9 +1100,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
     // active crime returns to None (court release, fast travel, the
     // location-rect exit).
     //
-    // GUARD1 (2026-09-15, relayed by Mac: "after a while of chasing me
-    // around the villages they disappeared. And then i was free to go
-    // on a killing spree"). THE FOURTH TERM WAS MISSING. DFU's
+    // GUARD1. THE FOURTH TERM WAS MISSING. DFU's
     // condition is FOUR clauses, and this carried three:
     //
     //     entityType == EnemyClass && careerIndex == Knight_CityWatch
@@ -1135,7 +1131,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
     // own flag, set the instant the surrender is accepted and cleared
     // on every court exit) covers exactly that window, so the watch
     // despawns for its length rather than only at the door. JAIL-HIT
-    // (2026-09-27): offline too - the watch keeps WINFOE1's clock under
+    // offline too - the watch keeps WINFOE1's clock under
     // the court's windows, where DFU's pushed windows stop it, so it
     // walks away for the trial in both modes (arrestFlow's inCourt).
     // DISC19-F: a CRIME turns the town's defenders into that watch
@@ -1395,7 +1391,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
     // have acted - the encounter pool's order (exteriorFoes.js
     // batches(), read after its update has driven every foe).
     const out = [];
-    // MWNPC6 (bible/04-Characters/Morrowind-NPCs.md section 11): THE WATCH IN ITS BODIES - the encounter pool's law
+    // MWNPC6: THE WATCH IN ITS BODIES - the encounter pool's law
     // (section 10c) on its own lane and its own caps (WATCH_BODY_TIERS): every watchman offered dressed as his
     // billboard, by his pool id (his wire number comes late); the dead from the kill until the corpse is collected;
     // drawBodies syncs, marks the cast-only and draws
@@ -1471,7 +1467,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
   /** MWNPC6: the concealed watchmen's bodies, translucent - after the host's opaque world. */
   function drawVeiledBodies() { _npcLane?.drawVeiled(); }
 
-  /** RAID-GUARDS (2026-09-29, Mac: "Raids shouldnt let you damage the guards"): THE GUARDS THE PLAYER'S BLOWS PASS
+  /** RAID-GUARDS: THE GUARDS THE PLAYER'S BLOWS PASS
    *  BY. A defender - DISC19-F's watch fighting beside the player, a raid's own among them - under friendly
    *  protection (FB0929), and while a raid is on in this town WHATEVER the setting. The swing and the riding charge
    *  (world.js rrRiding) ask this one question, as the player's spells, shafts and torches have always passed a
@@ -1487,7 +1483,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
    *  where one swing or a riding trample is Assault and turns him into a watchman on the spot; and ANY crime turns
    *  every defender into the crime watch the next frame (update's enlist), which is how one stray swing in a raid
    *  became a squad to kill and a Halt to pay. While a raid is on here the player's blows pass such a guard by, as
-   *  they pass a defender (Mac: "Raids shouldnt let you damage the guards") - and a townsperson too (Mac, on 29g's
+   *  they pass a defender - and a townsperson too (Mac, on 29g's
    *  first draft: "Spare townspeople in raid"): no Murder, the squad still the player's. No raid, DFU's rule.
    *  PROTECT-FIGHT (FIELD BUGS 2026-09-30, "Protect bystanders needs to work again - lost rep for no reason"): AND UNDER
    *  THE PROTECTION, IN A FIGHT. The setting the menu calls Protect Bystanders is DFU's MeleeAttackFriendlyProtection,

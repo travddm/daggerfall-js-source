@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// NOTICE1 (2026-09-28, Mac: "The new notice board should be a physical object that houses quests, the player auction
-// house, etc"; "Go") — THE NOTICE BOARD'S LAW, ONE HOME FOR BOTH ENDS: what a board is, what a player's note is, who
+// NOTICE1 — THE NOTICE BOARD'S LAW, ONE HOME FOR BOTH ENDS: what a board is, what a player's note is, who
 // may pin one and how many, and the words and bounds the account service (server-account/src/board.js) and the
-// client's window (ui/noticeWindow.js) both read. The record is bible/06-Systems/Professions-Arc.md 10.1 and 10.6
+// client's window (ui/noticeWindow.js) both read. The record is 10.1 and 10.6
 // (PROF0), and 10.7 as built.
 //
 // A BOARD IS ITS TOWN'S. Every rumour board of a town (BOUNTY1 took the other half, systems/bounty/bountyBoard.js
@@ -122,7 +121,7 @@ export function noteReplySubject(subject) {
 }
 
 /**
- * GUILD1e (2026-09-30, Mac: "Finish the seats"; Seats-Arc 8.2: "the hall carries ... a private guild board (the board's
+ * GUILD1e (2026-09-30,; Seats-Arc 8.2: "the hall carries ... a private guild board (the board's
  * Guilds tab, members only)"; PROF0 10.1's Guilds tab: "a guild's own notes, members only"). A GUILD'S NOTES are the
  * guild's, not a town's: read on the Guilds tab of any Notice Board and at the board standing in the guild's hall, by
  * its members alone. A note is a letter pinned up, as a town's is (noteWords, no button - a guild's members answer one

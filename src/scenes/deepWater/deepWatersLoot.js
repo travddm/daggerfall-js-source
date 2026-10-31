@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E5 (2026-09-26): ILIAC PUDDLE NO MORE'S SUNKEN LOOT IN THE STREAMED
+// DW-E5: ILIAC PUDDLE NO MORE'S SUNKEN LOOT IN THE STREAMED
 // WORLD (jet082, 1.2.2) - UnderwaterLootSpawner.cs's pulse over the
 // port's world. The laws are world/underwater/underwaterLoot.js; what a pile, a
 // batch of rubble and a guard ARE in the world is the host's.

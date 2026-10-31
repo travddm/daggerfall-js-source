@@ -1,9 +1,6 @@
 // @ts-check
-// TECH1 (2026-10-10, the owner: "detailed weapon skill affixes for each weapon type ... a bow could roll with an attack
-// that allows you to aim and place a telegraph that shoots a volley of arrows, or a sword attack that allows you to leap
-// and attack your opponent ... This would have its own keybinding"; "This is your baby. I want you to be as detailed as
-// possible and take your time. No exceptions"): THE TECHNIQUE KEY - what a press of WeaponTechnique does with the weapon
-// in hand. Design and laws: bible/05-Combat/Weapon-Techniques.md.
+// TECH1: THE TECHNIQUE KEY - what a press of WeaponTechnique does with the weapon
+// in hand. Design and laws:.
 //
 // ONE RUNNER, EVERY HOST. Every host builds a weapon rig (combat/weapon/weaponRig.js - exterior.js, world.js, worldModes.js'
 // interior arm, dungeonContext.js), and the rig that owns the frame steps THIS module, as it steps the one pair of
@@ -46,7 +43,7 @@ import { blowSchedule } from '../characters/weaponStates.js';
 import { ARROW_FLIGHT_SPEED } from '../systems/spellcast.js';   // BAL-ARCHERY: a volley's shafts fly at the arrow's speed, the one constant (spellcast.js)
 import { WEAPON_REACH, friendlyProtected } from './playerWeapon.js';
 import { playerBody, bodyRadius, tellTechniqueUsed } from './technique/techniqueBlow.js';
-import { techniqueCue, resetTechniqueFx, TECH_FX } from './technique/techniqueFx.js';   // TECH-FX: what each moment looks, moves and sounds like (bible/05-Combat/Weapon-Techniques.md THE FEEL)
+import { techniqueCue, resetTechniqueFx, TECH_FX } from './technique/techniqueFx.js';     // TECH-FX: what each moment looks, moves and sounds like (THE FEEL)
 
 /** The registry action (systems/inputActions.js) - the roster's (TECH-CARD: the leaf, so the card names the key). */
 export { TECHNIQUE_ACTION };
@@ -139,7 +136,7 @@ export function techniqueInHand(entity, pw) {
   _handMemo = { item, line, id: line.param, value: line.value, known, hand };
   return hand;
 }
-/** MARTIAL3 (bible/05-Combat/Martial-Specialisations.md section 6): THE SIGNATURE IN HAND - with no line on the piece, my
+/** MARTIAL3: THE SIGNATURE IN HAND - with no line on the piece, my
  *  held martial path's signature, when the weapon in hand is one of its pair's families (the bare hand Hand-to-Hand's,
  *  whatever gloves are worn; the beast's claws none - "the beast knows no technique"). The owner: "Technique key, when
  *  free" - a line on the weapon wins. Its `value` is none (a signature is its base, as a line's power is its own),

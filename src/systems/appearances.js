@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): A CHARACTER'S LOOKS AND THE WARDROBE'S ACTS. Every look the
+// APPEARANCES: A CHARACTER'S LOOKS AND THE WARDROBE'S ACTS. Every look the
 // character holds is remembered on it (`entity.appearances`, keys of net/appearanceLaw.js, in the save); at a Clothing
 // Store, an Armorer or a Weaponsmith a worn piece takes any collected look of its kind for gold, or its own back for
 // nothing. The look is the piece's `appearance` field - the wearer's mark, stripped when the piece changes hands

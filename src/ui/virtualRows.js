@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// VIRT (2026-10-16) — A LONG LIST DRAWS THE ROWS ON SCREEN, NOT ALL OF THEM.
+// VIRT — A LONG LIST DRAWS THE ROWS ON SCREEN, NOT ALL OF THEM.
 //
 // The enhanced pack rebuilds its DOM on every repaint (ui/domRepaint.js says why that is the shape), and a list
 // rebuilt whole costs what the list HOLDS, not what the player can SEE: a wagon of 700 pieces built 700 rows on every
@@ -13,7 +13,7 @@
 // be measured - no layout (node, a pane not shown), or every drawn row on one line - is drawn whole, which is what
 // every list was before.
 //
-// AUDIT TRADE-VIRT (2026-10-20, the owner: "ensure this is perfect and fidelity isnt lost"): EVERY ROW ITS OWN HEIGHT.
+// AUDIT TRADE-VIRT: EVERY ROW ITS OWN HEIGHT.
 // The window took ONE pitch off the first two lines drawn and sized every spacer as though each line were that tall -
 // and a trade's rows are not: a book's title wraps to a second line (68 px against 52), a phone's weapons run 52, 64
 // and 82. A list whose first row was tall scrolled into blank stretches the window thought were drawn (the whole list,

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF7 (2026-09-29, Mac: "Do it") - HUNTING'S ACT, the Skinning Knife at
+// PROF7 - HUNTING'S ACT, the Skinning Knife at
 // a body the player's own blow felled, as a machine the host feeds a
-// frame at a time (bible/06-Systems/Professions-Arc.md 5.2, 29; FORAGE0
+// frame at a time (5.2, 29; FORAGE0
 // 14.4). Pure: the host hands in the frame's time, whether E is held
 // (`held` - the use key, as the Sickle's steady hand holds it: attack held
 // would be the weapon's, and DFU's swing modes hold the look still under

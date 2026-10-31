@@ -1,18 +1,17 @@
 // @ts-check
-// AUDIT 68 S17-gl-program-dup (2026-09-24): ONE COMPILE AND LINK. The
+// AUDIT 68 S17-gl-program-dup: ONE COMPILE AND LINK. The
 // renderer and eleven foreign passes (the sky, the rain, the wisps, the
 // clouds and their noise, the far ring, the bolts, Dynamic Skies, the grass,
 // the enhanced sky) each wrote the same createShader / compile / check /
 // attach / link / check out by hand, and had drifted only in their error
 // prefixes. A leaf with no imports.
 
-// SHADER-STALL (2026-10-20, a player via the owner: "Gate shader initialization: 11.43-second stall", "Node-outline
-// shader initialization: 5.65-second stall" - "ive stripped out like 5 diffrent shader and i dont lag oon load up"):
+// SHADER-STALL:
 // THE BUILD THAT WAITS. PERF-COMPILE1's one sync point is still a wait: the LINK_STATUS read holds the page's thread
 // until the GPU process has compiled and linked the program - and everything queued ahead of it - and a driver's
 // compiler (D3D11's above all) takes seconds over a pass's shaders. A pass built in play froze the game for its
 // compile: a gate's fire the first frame one stands, the nodes' glint the first node lit, the sea's programs at
-// idle (9.7 s of one task in the real game's boot here, bible/07-Rendering/Performance-Priority.md SHADER-STALL).
+// idle (9.7 s of one task in the real game's boot here, SHADER-STALL).
 // KHR_parallel_shader_compile - every Chromium on a GPU has it, ANGLE compiling on threads of its own - lets the page
 // ASK whether a program is done without waiting (COMPLETION_STATUS_KHR). `startPrograms` starts a pass's programs and
 // answers that question; `buildProgram` takes the started program for the same sources instead of compiling its own,
@@ -70,7 +69,7 @@ export function startPrograms(gl, pairs) {
   };
 }
 
-/** AUDIT SHADER-STALL (2026-10-20): the programs `pairs` names that were started and never taken, let go - their
+/** AUDIT SHADER-STALL: the programs `pairs` names that were started and never taken, let go - their
  *  stages and the program deleted. A pass whose build threw leaves the rest of its list started for no build (the first
  *  program's fault thrown, its sibling linked and kept for good); its door lets them go.
  *  @param {any} gl @param {ReadonlyArray<readonly [string, string]>} pairs */
@@ -115,7 +114,7 @@ export function compiledPass(gl, programs, make, fail = () => {}) {
  *  given, `${label} shader: ` or `${label} link: `. SHADER-STALL: a program
  *  `startPrograms` started for the same sources is taken instead of compiled. */
 export function buildProgram(gl, vsSrc, fsSrc, label = '') {
-  // PERF-COMPILE1 (2026-10-10, stutter): ONE SYNC POINT, NOT THREE. A status query is a round trip that waits for the
+  // PERF-COMPILE1: ONE SYNC POINT, NOT THREE. A status query is a round trip that waits for the
   // driver to finish - asked after each compile, it made the vertex stage finish before the fragment stage was even
   // handed over, and the link wait a third. Both stages go in, the link goes in, and the one LINK_STATUS read waits
   // once; the drivers that compile in parallel (ANGLE's worker threads) overlap the stages. A failure still throws the

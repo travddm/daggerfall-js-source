@@ -299,7 +299,7 @@ export function levelUpSkillSum(entity) {
  *  reworded this sentence off the flag grep's marker: it is a
  *  RETIREMENT RECORD, and tools/flagSites.mjs deliberately does not
  *  try to read tense, so a past-tense mention of the token kept
- *  listing a closed departure on bible/Home.md's open list.)
+ *  listing a closed departure on 's open list.)
  *
  *  D9: improvedAthleticism (+0.1, AcrobatMotor.cs:15) now ships too.
  *  It is an ImprovesTalents ENCHANTMENT (ImprovesTalents.cs:75-88 ->

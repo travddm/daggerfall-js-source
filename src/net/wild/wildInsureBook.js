@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD-INSURE (2026-10-26, the owner: "being able to insure gear on death"; asked, "Kept, policy spent" at "20% of worth")
-// - THE CHARACTER'S POLICIES, AS THIS GAME HOLDS THEM (bible/11-Multiplayer/Wild-Zone.md section 4b).
+// WILD-INSURE
+// - THE CHARACTER'S POLICIES, AS THIS GAME HOLDS THEM.
 //
 // The account service keeps the policies (server-account/src/wildInsure.js) and spends them (wild.js wildFall); this book
 // is the game's read of them and its door to write one. A policy is written as a realm act (systems/realmSaves.js

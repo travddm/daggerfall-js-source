@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// VERGE1's BAND, ONE HOME FOR BOTH THREADS (JUNGLE-ROADSIDE, 2026-10-23; bible/03-World/Roads.md VERGE1): the band Basic
+// VERGE1's BAND, ONE HOME FOR BOTH THREADS (JUNGLE-ROADSIDE, 2026-10-23; VERGE1): the band Basic
 // Roads paints a road or a track as - two tiles wide about the line from a map pixel's centre to the edge or corner its
 // compass bit names - and the room a point has beside it, measured as a disc to a segment. Moved here whole out of
 // world/road/roadVerge.js, which re-exports it; it reads the network by Basic Roads' own port (world/road/pathData.js

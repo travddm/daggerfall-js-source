@@ -20,7 +20,7 @@ export const WRIST_JUNCTION_Y = 0.9875;
 // forearm (~0.013 disconnect at Mac's -40).
 export const ARM_X = 0.235;
 
-// REST HAND ROLL (Mac: "hand roll -40" in the viewer tuner) - baked
+// REST HAND ROLL (in the viewer tuner) - baked
 // into the rig so it holds through poses and gaits, not just the idle
 // tuner. Same semantics the slider applied: -40/100 * pi, mirrored
 // (left +, right -), rolled about the forearm axis.

@@ -1,6 +1,4 @@
-// DISC22-C (2026-09-24, Satranath on Discord: "no hotbar or quickloot on grimoire either, i think i will stick with the
-// enhanced ui"; Mac, with a parchment image: "The screenshot of the parchment is a spritesheet to be used for the loot
-// menu (grimoire UI)") - QUICK LOOT ON THE CLASSIC SKINS.
+// DISC22-C - QUICK LOOT ON THE CLASSIC SKINS.
 //
 // The quick-loot law (ui/worldPlaque.js worldHoverFrame -> systems/quickLoot.js) never had DOM in it; what kept it
 // off the classic skins was the one gate over the whole resolve, because the plaque it drew on is the enhanced skin's

@@ -1,7 +1,5 @@
 // @ts-check
-// IC-PROPS (2026-10-27, the owner: "Random placements on the wagon/other vendors all over the Imperial city", then "the
-// issues I mentioned for the imperial city for stables/doors/etc are a world wide issue. They have no logical placements";
-// bible/03-World/Arena-Provinces.md IC-PROPS, bible/03-World/Merchant-Yards.md IC-PROPS) - THE IMPERIAL CITY'S YARDS, AT
+// IC-PROPS - THE IMPERIAL CITY'S YARDS, AT
 // ITS GATES.
 //
 // Every one of the city's 625 slices is a city of Daggerfall's kind (world/tamrielCapitals.js synthesizeCapitalLocation -

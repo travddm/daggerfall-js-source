@@ -1,7 +1,6 @@
 // THE ARMOUR MORROWIND DOES NOT HAVE.
 //
-// MW-BRIG1 (2026-09-29, Mac: "This is for the morrowind model. The steel
-// brigantine"). A leaf: mwItemMap.js asks it, and nothing it imports may
+// MW-BRIG1. A leaf: mwItemMap.js asks it, and nothing it imports may
 // reach back.
 //
 // A worn Daggerfall piece reaches the Morrowind body through the player's
@@ -25,8 +24,7 @@
 //
 // ═══ MW-STEEL1: THE STEEL PLATE ═══════════════════════════════════
 //
-// (2026-10-06, Mac: "These 2 files are for the armor replacement of the
-// morrowind steel armor with a varient to toggle the helmet type".) A
+// A
 // whole set: Daggerfall's seven classic pieces in STEEL wear Mac's plate
 // instead of retail's steel_* records - Steel only, Mac's answer, so Silver
 // and Elven (which wear Morrowind's steel because Morrowind has no silver
@@ -34,29 +32,26 @@
 // brigandine. The helm comes two ways, closed (a visor and a plume) and
 // open (a nasal helm, the face showing): `styles`, picked by the Steel
 // Helm switch (systems/features.js, pref `mwSteelHelm`; closed by default,
-// Mac's answer). bible/04-Characters/Steel-Plate.md is the record.
+// Mac's answer). is the record.
 //
-// MW-STEEL4 (2026-10-07, Mac: "You do it properly"): the plate's meshes
+// MW-STEEL4: the plate's meshes
 // ship SKINNED, as retail's armour does - weighted to Morrowind's own
 // bones in its bind at bake time (tools/bakeSteelPlate.mjs) - so a steel
 // piece here is the parts it fills and nothing else, and the binder takes
 // it on the very path it takes a retail ARMO's BODY meshes. The runtime fit
 // and skin solve MW-STEEL1-3 carried (`fit`, `solvePose`, a part's own
 // `skinFrom`) are gone with it.
-// MW-BRIG4 (2026-10-09, Mac: "Also for the integrated brigadine chest piece, we need each of these textures
-// implemented", nine paintings; asked which metal wears which, he took the map offered - one per metal): EVERY METAL
+// MW-BRIG4: EVERY METAL
 // OF THE BRIGANDINE JERKIN wears the brigandine now, each in its own painting - the one mesh, baked once per metal
 // with that metal's texture (tools/bakeBrigandine.mjs). Steel keeps MW-BRIG1's red.
 //
 // ═══ MW-FIT1: WHAT THE PLATE COVERS ════════════════════════════════
 //
-// (2026-10-09, a player's report Mac passed on, over the paperdoll in both sets: "the upper arm is still visible with
-// the steel armor", "the ebony armor gets the same issue", "the helmet elevation is too much", "the coif has to cover
-// the neck".) A PAULDRON IS A SLEEVE: both sets' pauldrons close round the upper arm from the shoulder to the elbow,
+// A PAULDRON IS A SLEEVE: both sets' pauldrons close round the upper arm from the shoulder to the elbow,
 // where the gauntlet's cuff takes over (measured on the bind - every ray out of the upper arm's bone line meets the
 // pauldron), so each hides its upper arm as a gauntlet hides its forearm - and the skin that came up through the steel
 // is not drawn. A CLOSED HELM IS THE HEAD: a retail helmet that fills the head's slot is the closed helm, and no head
-// is drawn under it (bible/02-Formats/Morrowind-Rules.md, "A helmet force-deletes hair before its own parts are
+// is drawn under it (, "A helmet force-deletes hair before its own parts are
 // added"); the steel plate's closed helm and the ebony helm hide it, and stand where Mac fitted them on the body, the
 // coif hung to the collar (tools/bakeSteelPlate.mjs HELM_LIFT is the open helm's alone). The open helm shows the face,
 // so it keeps the head.
@@ -148,7 +143,7 @@ const brigandine = (metal) => Object.freeze({
   parts: Object.freeze([Object.freeze({ part: 'cuirass', model: `brigandine_${metal.toLowerCase()}.nif` })]),
 });
 
-/** MW-EBONY1 (2026-10-09, Mac: "The ebony armor set and its textures"; asked, Ebony only): Mac's ebony plate,
+/** MW-EBONY1: Mac's ebony plate,
  *  Daggerfall's seven classic pieces in Ebony (tools/bakeEbonyPlate.mjs bakes the meshes, skinned as the steel plate's
  *  are). Each piece fills the slots its steel twin fills and hides what it hides - the breastplate the cuirass and its
  *  plates the skirt, each gauntlet its hand over the wrist and forearm, each pauldron its pauldron over the upper arm,

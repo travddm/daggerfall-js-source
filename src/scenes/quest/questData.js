@@ -14,7 +14,7 @@
 import { loadQuestTables } from '../../systems/quest/tables.js';
 import { applyForageFix } from '../../systems/foraging/foragingLaw.js';   // FORAGE-FIX: Foraging's quest and list patches, applied as they are read
 import { applyQuestPatches, QUEST_PATCHES } from '../../systems/quest/questPatches.js';   // SHAM-TRAIL: the port's patches over DFU's own quests, applied as they are read
-import { questlineLines } from '../../systems/questlines/qlPatches.js';   // QL4: a flagship quest's branch, patched in while the questlines' switch is on (bible/06-Systems/Questlines-Arc.md 2.3)
+import { questlineLines } from '../../systems/questlines/qlPatches.js';     // QL4: a flagship quest's branch, patched in while the questlines' switch is on (2.3)
 
 const tableFiles = import.meta.glob('../../../vendor/dfu-quests/Tables/*.txt', { query: '?raw', import: 'default' });
 const questFiles = import.meta.glob('../../../vendor/dfu-quests/Quests/*.txt', { query: '?raw', import: 'default' });
@@ -71,7 +71,7 @@ export async function loadQuestPack() {
     await Promise.all(Object.entries(modQuestFiles).map(async ([path, load]) => {
       const name = baseName(path);
       const text = stripBom(await load());
-      // FORAGE-FIX (bible/06-Systems/Foraging.md 12): Foraging's quest and list patches (Q7-Q9, Q13) over the author's
+      // FORAGE-FIX (12): Foraging's quest and list patches (Q7-Q9, Q13) over the author's
       // own text - never an edit of it. A patch that no longer finds its line is a changed file: it warns and the
       // author's text loads as shipped, so one mod's patch can never take the whole pack (and the scene) down with it.
       let patched = text;

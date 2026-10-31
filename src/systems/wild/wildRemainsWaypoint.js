@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD-WAYPOINT (2026-10-09, the owner: "when i die ... [my pile] also should be visible on the overworld map and has a
-// waypoint"). MY REMAINS, A FLAG I FOLLOW.
+// WILD-WAYPOINT. MY REMAINS, A FLAG I FOLLOW.
 //
 // A death in the open zone leaves my bag's things on the ground for WILD_REMAINS_MS (net/wild/wildRemains.js), and the held
 // map rang them (ui/wild/wildMapInk.js) - the Overworld knew nothing of them, and nothing pointed the way back. Now the death

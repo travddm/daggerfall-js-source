@@ -1,6 +1,5 @@
 // @ts-check
-// IC-GRAND (2026-10-26, the owner: "Each district needs to be distinct with more varying layouts. Its time we also develop
-// proper city-like scapes with parkouring opprotunities"; bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL
+// IC-GRAND - THE IMPERIAL
 // CITY'S STREETS AND BUILDINGS: the fabric of its districts, the port's own, between its landmarks and Daggerfall's blocks.
 //
 // DFU's reference: a city is its MAPS.BSA row's grid of RMB blocks, each block's buildings and streets its own author's
@@ -71,8 +70,7 @@ export const LEDGE_Y = 2.6;
 /** A flat roof's parapet - under a vault's height (PARKOUR_VAULT_MAX), over a knee's. */
 export const PARAPET = 0.9;
 /**
- * IC-STAIRS (the owner's field report, 2026-10-27, item 4: "Minecraft looking staircases in Imperial city need to be
- * completely redesigned") - A WAY UP'S STAIR, metres: the most a riser rises (`rise`: a step the motor takes without a
+ * IC-STAIRS - A WAY UP'S STAIR, metres: the most a riser rises (`rise`: a step the motor takes without a
  * thought - player/motor.js STEP_OFFSET's 0.5 m less than half - and the proportion of a built stair, 2 R + G within
  * Blondel's 0.60-0.66 m), a tread's going (`tread`), the clear width between the wall and the parapet (`width`), the
  * parapet's thickness (`wall`) and its height over the steps' nosings (`rail`, a flat roof's PARAPET's), the most risers

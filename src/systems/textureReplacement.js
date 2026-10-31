@@ -206,7 +206,7 @@ export function addVendorTextures(entries) {
     if (!Number.isFinite(e?.archive) || !Number.isFinite(e?.record) || (typeof e.load !== 'function' && typeof e.build !== 'function')) continue;
     const map = e.map ?? 'Albedo';   // RRI1: a mod's helmet mask registers under TextureMap.Mask
     const key = textureKey(e.archive, e.record, e.frame ?? 0, map, e.dye ?? null);
-    // STUDIO1 (bible/07-Rendering/Studio-Art.md): THE STUDIO'S PICTURE HOLDS ITS KEY, whichever registers first, and keeps
+    // STUDIO1: THE STUDIO'S PICTURE HOLDS ITS KEY, whichever registers first, and keeps
     // what it covers (`under`): the art registered before it, or after it (a ship's painted stand-in registers when her
     // pool loads, long after the boot's install). What the archive IS comes from that art - a stand-in, a place on the
     // doll, decoded only when asked (`lazy`) - and its picture stands in for the studio's that will not load, and gives
@@ -227,7 +227,7 @@ export function addVendorTextures(entries) {
   return n;
 }
 export const vendorTextureCount = () => _vendor.size;
-/** CAPITAL-TREES (bible/03-World/Arena-Provinces.md CAPITAL-TREES): A PICTURE REGISTERED AS A FLAT CUT BY ITS ALPHA -
+/** CAPITAL-TREES (CAPITAL-TREES): A PICTURE REGISTERED AS A FLAT CUT BY ITS ALPHA -
  *  `addVendorTextures([{ ..., cutout: true }])`, the capitals' trees' leaf sprays (world/capitalShapes.js
  *  CAPITAL_CUT_RECORDS). The upload door asks it (scenes/dataPipeline.js uploadRecord), so a model wearing the picture
  *  draws its texels under half alpha as holes (render/renderer.js uploadTexture `{ cutout: true }`, RW1) whoever uploads
@@ -271,7 +271,7 @@ export function clearVendorTextures() { _vendor.clear(); tierChanged(); }   // A
  *  is what sends the pipeline down the stand-in branch instead of
  *  fetching TEXTURE.###.
  *
- *  SURV-TENT (2026-09-19): this used to answer true if ANY record of
+ *  SURV-TENT: this used to answer true if ANY record of
  *  the archive was vendored, which was harmless only while every
  *  vendored file happened to be of the first kind. Registering one
  *  record of a REAL archive - the tent's 50_7-0 - would have sent
@@ -289,7 +289,7 @@ export function vendorRecordCount(archive) {
   for (const e of _vendor.values()) if (e.standIn && e.archive === Number(archive)) n = Math.max(n, e.record + 1);
   return n;
 }
-/** DEX2 (bible/04-Characters/Enemy-Expansion.md section 6): THE FRAMES OF A STAND-IN'S RECORD, off the registry - frame 0
+/** DEX2: THE FRAMES OF A STAND-IN'S RECORD, off the registry - frame 0
  *  to the first one no entry names, as DFU imports a custom archive's frames (TextureReplacement.GetMobileBillboardMaterial
  *  takes each record's frames until one is missing). At least one: a record is its frame 0. The stand-in answered 1 for
  *  every record, which no vendored art had needed until a mod's enemies walked - a mobile drawn from a stand-in never
@@ -315,7 +315,7 @@ export function vendorFrameCount(archive, record) {
 /** A TextureFile stand-in for a vendor-only archive: sizes from the
  *  decoded PNGs, a bitmap the swap arm never reads.
  *
- *  SURV-ART (2026-09-19, Mac: "the sprites aren't showing at all") -
+ *  SURV-ART -
  *  IT MUST ANSWER `recordCount` AND `getSize`. Every icon door in the
  *  port gates on `record < tex.recordCount` before it uploads
  *  (ui/item/itemScroller.js, ui/native/nativeInventory.js, ui/paperDoll.js, and
@@ -425,8 +425,7 @@ export function vendorTextureStandIn(archive) {
     getFrameCount: (record) => vendorFrameCount(archive, record),   // DEX2: a record's own frames (a mobile's walk), never one for all
     getWidth: (record) => size(record).width,
     getHeight: (record) => size(record).height,
-    // FIELD-GUN4 (Mac, from play: "The paperdoll doesn't equip the
-    // texture"). This used to answer `data: null` under the comment
+    // FIELD-GUN4. This used to answer `data: null` under the comment
     // "a bitmap the swap arm never reads" - true of every door that
     // existed when SURV-ART wrote it, because the mod's art is never
     // WORN. The paper doll is the one door that reads the bitmap
@@ -485,7 +484,7 @@ let _bundle = new Map();
 // (the game engine, the browser itself) untouched on a 16 GB machine, and
 // a genuinely low-memory device is no worse off than before - it scales
 // the same way, just twice as generously.
-// IOS-BUDGET (issue #1040, 2026-10-19; `bible/01-Overview/bugs/Field-Bugs-2026-10-20-ios-budget.md`): WebKit never
+// IOS-BUDGET (issue #1040, 2026-10-19; ` `): WebKit never
 // reports navigator.deviceMemory, so every browser on an iPhone or iPad took the "no report" arm and was read as an
 // 8 GB machine - a 1536 MB budget for the mod pictures alone, on a tab iOS kills at 2 GB (ActiveHard 2048 MB, the
 // player's device log: 100 MB at Play, 1492 MB twenty-five seconds later, killed five seconds after that). A browser

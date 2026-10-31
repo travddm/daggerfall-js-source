@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The ground"): THE GROUND'S DRESS - a zone's own colours laid over the
+// TESA-LANDS (, "The ground"): THE GROUND'S DRESS - a zone's own colours laid over the
 // ground set the game draws (the classic records, or the pack worn over them), keeping the set's grain, its tiles' shapes
 // and its transitions. A texel's class (DFU's four bases and the town's paving) is read off THIS set's solid records,
 // softly where a transition blends them; a dressed class is a gradient map of the zone's ramp at the texel's own light.
@@ -13,7 +13,7 @@ export const CLASS_RECORDS = Object.freeze([0, 1, 2, 3, 46]);
 /** Records the town's paving is painted in, and the only classes their texels are of (46 the paving whole, 47 a dirt
  *  edge on it, 55 a grass edge - world/terrain/terrainTiles.js's road records, render/labGrass.js grassRecordsOf's). */
 export const PAVED_RECORDS = Object.freeze({ 46: Object.freeze([4]), 47: Object.freeze([1, 4]), 55: Object.freeze([2, 4]) });
-/** THE DIALS (one place) - why each stands where it does: bible/03-World/Tamriel-Lands.md, "The ground". */
+/** THE DIALS (one place) - why each stands where it does:, "The ground". */
 export const DRESS_DIALS = Object.freeze({
   contrast: 1,   // a texel's luminance over its class's mean, to this power, is its luminance over the ramp's middle
   reach: Object.freeze([0.55, 1.6]),   // past the ramp's ends its end colour, scaled on within these

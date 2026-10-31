@@ -1,5 +1,5 @@
 // @ts-check
-// QL1/QL3 (bible/06-Systems/Questlines-Arc.md decisions 2 and 8, sections 2 and 5): THE LAYER - made once by the quest
+// QL1/QL3 (decisions 2 and 8, sections 2 and 5): THE LAYER - made once by the quest
 // bridge (scenes/quest/questBridge.js createQuestBridge, THE ONE CONSTRUCTION SEAM: every host that has quests holds the
 // bridge, so no host builds a layer of its own). It answers the machine's two questions - a starting quest's stamp
 // (deps.questlinesStamp), a paying quest's gold (deps.questReward) - and the bridge's three: what moved this tick

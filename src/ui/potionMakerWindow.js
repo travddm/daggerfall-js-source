@@ -21,7 +21,7 @@
 // slot cap, the wagon fallback and the break. This file is the panel,
 // the two lists and the picker.
 //
-// POTION-DOOR (2026-10-25, bible/06-Systems/Professions-Arc.md 52): the window asks its host's door before it mixes
+// POTION-DOOR: the window asks its host's door before it mixes
 // (hooks.brew, scenes/potionMakerHost.js) - online at an alchemy station a mix DFU's law accepts is the profession's brew,
 // asked of the service and said by its answer, and the grid holds the Stores' ingredients (hooks.storeItems) beside the
 // carried ones. Everything else here is DFU's maker as M2 built it; offline the host hands no door.

@@ -1,10 +1,8 @@
 // @ts-check
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - THE RECIPE LAW: Smithing's recipes, the quality they are made at, the
-// XP they give and the heat they are struck in. Design: bible/06-Systems/Professions-Arc.md 9.1-9.4 (the record) and
-// 24 (PROF3 as built); the name is section 14's ("recipeLaw.js (to be written, with PROF3)"). PROF4 (2026-09-28, Mac:
-// "Continue"; section 25): Carpentry's recipes beside them - the staves, bows, arrows, furniture, the Basket and the
-// Ram Kit - and the plane they are drawn with; a recipe names its profession. PROF7 (2026-09-29, Mac: "Do it"; section
-// 29): Outfitting's - the leather armour, DFU's clothing in its four cloths and its dyes, the rugs, tapestries and skins,
+// PROF3 - THE RECIPE LAW: Smithing's recipes, the quality they are made at, the
+// XP they give and the heat they are struck in. Design: 9.1-9.4 (the record) and
+// 24 (PROF3 as built); the name is section 14's ("recipeLaw.js (to be written, with PROF3)"). PROF4: Carpentry's recipes beside them - the staves, bows, arrows, furniture, the Basket and the
+// Ram Kit - and the plane they are drawn with; a recipe names its profession. PROF7: Outfitting's - the leather armour, DFU's clothing in its four cloths and its dyes, the rugs, tapestries and skins,
 // the Fishing-Net - and the stitch they are sewn with; the Skinning Knife at the anvil; the Harpy-feathered arrows.
 // PROF11 (Professions-Arc 3.2, 3.3, 9.3, 9.4): Masonry's - the Sculptor's four stone pieces for DECOR, the chisel the
 // mason's bench strikes with, and the bench's XP (its cut and its mix are the forge's works' shape: professionLaw
@@ -104,17 +102,17 @@ const TOOL_TIER = Object.freeze({ spade: 2 });
 export const KIT_PRODUCT = product('kit', 'Repair Kit', 'kit', 692, 1, [[LEATHER, 1]]);
 export const REPAIR_KIT_TEMPLATE = 692;
 /** What a kit gives back (PROF0 9.3): a quarter of an item's condition, once. */
-/** REPAIR-EASE (2026-09-30, Mac: "Add repair items you can find by looting"): a FIELD Repair Kit - found in dungeon
+/** REPAIR-EASE: a FIELD Repair Kit - found in dungeon
  *  piles and on foes that carry loot, never crafted - mends any metal's weapon or armour, by less than a smith's kit. */
 export const FIELD_KIT_REPAIR = 0.15;
 export const KIT_REPAIR = 0.25;
-/** KIT-CEILING (2026-10-01, the economy arc - bible/06-Systems/Economy-Arc.md: field repair stays partial): no kit, a
+/** KIT-CEILING: no kit, a
  *  field kit or a smith's, mends a piece past three quarters of its condition - the overhaul's normal band (a blade at
- *  61-75% strikes at its own damage); the sharp edge above it is a smith's work. BAL1 (bible/05-Combat/Balance-Arc.md
+ *  61-75% strikes at its own damage); the sharp edge above it is a smith's work. BAL1 (
  *  section 3): that edge stands only with the overhaul's own wear module on - with it off (the port's default) a piece
  *  over 75% strikes and reduces at its own value too, and the reach past the ceiling buys durability alone. */
 export const KIT_CEILING = 0.75;
-/** CRAFT5 (bible/06-Systems/Professions-Arc.md 41.8): A SUPERIOR OR MASTERWORK Repair Kit - a smith's best - mends up to
+/** CRAFT5 (41.8): A SUPERIOR OR MASTERWORK Repair Kit - a smith's best - mends up to
  *  nine tenths of a piece's condition (41.2, DECIDED); every other kit (a field kit, a smith's below Superior, a kit made
  *  before kits took a quality) the three quarters above. */
 export const KIT_CEILING_HIGH = 0.9;
@@ -735,7 +733,7 @@ export function craftXp(tier, rank) {
   return tier < topTierOf(rank) - 2 ? Math.floor(xp / 4) : xp;
 }
 /**
- * AUDIT 32 S1 (Mac: "Whatever you think is best"): THE RECIPES S1 JUDGES - those made wholly of the goods a counter sells
+ * AUDIT 32 S1: THE RECIPES S1 JUDGES - those made wholly of the goods a counter sells
  * without end (professionLaw COUNTER_ONLY: the Weavers' Linen and Wool). 3.2's +500 rewards a recipe learnt from the
  * world's goods; the counter's supply has no end, and its 152 recipes (144 garments, the rugs and tapestries, the
  * Fishing-Net) bought a fresh character Outfitting 87 for 811 Marks and no hide. A boot (a bolt and a Cured Leather) and
@@ -748,13 +746,12 @@ export const counterMade = (r) => !!r && r.inputs.length > 0 && r.inputs.every((
  *  with silver (server-account/src/professions.js `prof_silver_cloth`, migration 0177). */
 export const JUDGED_CLOTH = Object.freeze([...new Set(RECIPES.filter(counterMade).flatMap((r) => r.inputs.map((i) => i.key)))]);
 /**
- * AUDIT 32 S1 (CLOTH-GEMS, 2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids"):
+ * AUDIT 32 S1 (CLOTH-GEMS, 2026-10-25; the player SaberGGaming's "Profession oversights"):
  * whether a craft's first lays on its XP (FIRST-BUDGET: firstCraftXp, its share) - every recipe's, and one S1 judges
  * (counterMade) only where `own`. Linen and Wool were the counter's alone, so S1 withheld the 500 from every recipe of them
  * and 152 of the loom's 332 first-make keys could never pay; the loom weaves and spins them now (professionLaw
  * WEAVE_RECIPES, SPIN_RECIPES).
- * WOVEN-PAYS (FIELD BUGS 2026-10-26b; fogs, "First time XP bonus from the Loom still isn't working"; the owner: "Woven
- * cloth pays" - any cloth the character wove or spun pays its first, whatever its goods; only cloth bought with silver
+ * WOVEN-PAYS (FIELD BUGS 2026-10-26b; fogs, "First time XP bonus from the Loom still isn't working"; - any cloth the character wove or spun pays its first, whatever its goods; only cloth bought with silver
  * stays walled): `own` is NO BOLT THE CRAFT USES COUNTS AS BOUGHT WITH SILVER. A unit's origin cannot say it: `bought` is
  * also the loom's own cloth of bought goods (smeltOrigin) and a guildmate's cloth out of the guild Stores, and `loose` is
  * also a Weavers' bolt set down and picked up again (AUDIT WOVEN-PAYS A1, A2, B2). So the service COUNTS the bolts of
@@ -767,10 +764,10 @@ export const JUDGED_CLOTH = Object.freeze([...new Set(RECIPES.filter(counterMade
  */
 export const firstCraftPays = (r, own = false) => !!r && (!counterMade(r) || own === true);
 /**
- * CRAFT2 (Professions-Arc 41.2, Mac: "Lets do it"): WHAT A FIRST CRAFT IS COUNTED BY - its PATTERN AT ITS TIER
+ * CRAFT2 (Professions-Arc 41.2): WHAT A FIRST CRAFT IS COUNTED BY - its PATTERN AT ITS TIER
  * (`longsword@6`): the first Adamantium, Ebony, Orcish or Warforged Longsword is the first of tier 6, whichever is made, and
  * a track climbs by making what is wanted, not by walking the matrix of a piece and its every material. It was each
- * recipe's own id; it holds both its exceptions: AUDIT PROF-541 J7 (Mac, 2026-10-03: "Once per piece and base") - a
+ * recipe's own id; it holds both its exceptions: AUDIT PROF-541 J7 - a
  * jewel's base is its tier (Silver 1, Gold 3, Platinum 5), so `ring@3` is `ring:gold` whichever gem is set first - and
  * AUDIT PROF-541 R2-S7 - a dish's two herbs' ways are one dish at one tier (`stew@1`). The Wand's two woods share tier 6:
  * one first now, not two. Null for no recipe. AUDIT 32 S1 stands beside it (firstCraftPays): FACT, pinned - no pattern at
@@ -796,7 +793,7 @@ export const firstCraftKin = (r) => (!r ? [] : Object.freeze([...(KIN.get(firstC
  */
 export const brewFirstPays = (potion) => !!potion && !potion.ingredients.every((t) => ingredientKeys(t).every((k) => COUNTER_ONLY.includes(k)));
 /**
- * FIRST-BUDGET (SaberGGaming's report, 2026-10-25: Provisioning is slow; the owner: "No band aids"), RETUNED (the owner,
+ * FIRST-BUDGET (SaberGGaming's report, 2026-10-25: Provisioning is slow), RETUNED (the owner,
  * asked: "Match Smithing's pace"): A FIRST-MAKE PAYS ITS TRACK'S SHARE, SET SO EVERY CRAFTING TRACK REACHES MASTER IN THE
  * CRAFTS SMITHING TAKES. Every first-make paid a flat 500 (3.2's "+500 the first time a recipe is made"), every track
  * alike, and a track's whole climb leans on them - but the tracks' pools differ tenfold: Smithing's 221 first-makes,
@@ -948,7 +945,7 @@ export const chiselMarkS = (rank, band = 1) => (rank >= PROF_RANK_MAX ? CHISEL_A
 // ─── PROF11: THE BENCH'S XP (PROF0 3.2) ─────────────────────────────
 
 /**
- * Masonry's tier for a work's XP, at a rank. DECIDED - XP FOLLOWS THE RANK (Mac, PROF8: "XP follows your rank"): the
+ * Masonry's tier for a work's XP, at a rank. DECIDED - XP FOLLOWS THE RANK: the
  * bench's stone sits on tiers 1-2 and nothing higher (4.5), so at the craft's own tier a quarter falls on it from rank 40
  * (Cut Stone) and 55 (Mortar) and Masonry could never climb to its Sculptor or its Fortifier (100); worked at the rank's
  * own tier, as a haul is, it climbs as every other craft does. The recipe's tier still gates its rank (workOpen).
@@ -1022,7 +1019,7 @@ export function makerName(name) {
   n = n.trim();
   return n.length ? n : null;
 }
-/** TEXT-F1 (2026-10-07, Mac: "Any human input elements need filtering"): A MARK AS IT MAY BE SIGNED AND SHOWN - makerName's,
+/** TEXT-F1: A MARK AS IT MAY BE SIGNED AND SHOWN - makerName's,
  *  and none whose words the filter catches (net/nameFilter.js textCaught): a character's name is the player's own
  *  typing, and the mark carries it to every holder of the piece, every shelf and every market. Null for none - the piece
  *  is made, unmarked. makerName stays the SHAPE law (decorLaw.js reads it to tell a forged mark from a true one). */

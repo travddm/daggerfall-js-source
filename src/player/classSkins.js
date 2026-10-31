@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // SKIN2 — DAGGERFALL'S OWN CLASSES, AS SKINS.
 //
-// Mac (2026-09-25), with an archive of redrawn Daggerfall class sprites
+// Mac, with an archive of redrawn Daggerfall class sprites
 // (ExistingClasses: the acrobat, assassin, burglar, bounty hunter, dark
 // acolyte, Dark Brotherhood, healer, monk, nightblade, pirate and
 // sorcerer, most in both sexes, and a vanilla adventurer): "Implement
@@ -50,7 +50,7 @@ export const CLASS_SKINS = Object.freeze(manifest.skins.map((s) => Object.freeze
 })));
 
 /**
- * ACRO-SHORT (2026-09-27, Discord: "acrobat sprite is super short on certain angles"). A class record's XML scale -
+ * ACRO-SHORT. A class record's XML scale -
  * the part `TextureReplacement.SetBillboardScale` (TextureReplacement.cs:663-675) plays for a DFU billboard whose
  * pack carries an XML beside the picture. The pack carries none (a loose-file pack), so a record drawn at another
  * scale than its group is sized as drawn: the female acrobat's front three-quarter idle (`1524_16-0.png`) is a whole

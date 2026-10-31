@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-2 (2026-10-14) - A MESH SEEN THROUGH: THE RENDERER'S TRANSLUCENT DRAW, AND A TEXTURE'S OWN SAMPLING.
+// POI-2 - A MESH SEEN THROUGH: THE RENDERER'S TRANSLUCENT DRAW, AND A TEXTURE'S OWN SAMPLING.
 //
-// The POI editor's materials (bible/06-Systems/POI-Editor-Arc.md; src/poi/poiLaw.js) promise what an imported glTF
+// The POI editor's materials (; src/poi/poiLaw.js) promise what an imported glTF
 // carries - alpha BLEND, wrap per axis (repeat, clamp, mirror), the filter (nearest, linear) - and the renderer had
 // none of them for a mesh: INCIDENT 2026-09-04's law is that the mesh shader clips nothing and writes alpha 1, and every
 // world texture is REPEAT/NEAREST. So both are added here as the renderer's own, opt-in, every other draw unchanged:

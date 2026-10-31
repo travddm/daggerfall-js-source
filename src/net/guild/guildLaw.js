@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1 (2026-09-25) — A GUILD: WHO FOUNDS ONE, WHO BELONGS, WHAT EACH
+// GUILD1 — A GUILD: WHO FOUNDS ONE, WHO BELONGS, WHAT EACH
 // RANK MAY DO, AND WHAT THE TREASURY HOLDS.
 //
-// Mac, of the holdings: "future ownership for online guilds"; asked,
+// asked,
 // founding a guild takes "Gold and Renown", a guild is joined "Per
 // character", its ranks are "Four, renamed by the guildmaster", and
 // the treasury is the "Guildmaster only" to take from - any member may
@@ -46,7 +46,7 @@ export const GUILD_POWERS = Object.freeze({
   remove: Object.freeze([0, 1]),
   promote: Object.freeze([0, 1]),
   deposit: Object.freeze([0, 1, 2, 3]),
-  withdraw: Object.freeze([0]),        // Mac: "Guildmaster only"
+  withdraw: Object.freeze([0]),
   renameRanks: Object.freeze([0]),
   handOver: Object.freeze([0]),
   disband: Object.freeze([0]),
@@ -116,12 +116,12 @@ export function guildRankNamesOf(raw) {
   return ok && new Set(out.map((n) => n.toLowerCase())).size === out.length ? out : null;
 }
 
-// ─── GUILD2a (2026-10-03): A NEW NAME, FOR A PRICE ─────────────────────────────────────────────────────────────────
+// ─── GUILD2a: A NEW NAME, FOR A PRICE ─────────────────────────────────────────────────────────────────
 // Asked: "A way to change your guild name for a price." The guildmaster renames the guild - its name, its tag, or both -
 // paying from the treasury: gold the guild's realm characters put in (the part a hall is bought with, HALL-GOLD), a sink a
 // guild chooses (Economy-Arc: "a sink that scales with wealth is a prestige one a player chooses"). Never sooner than
 // GUILD_RENAME_COOLDOWN_S after the last, so a name is not a costume changed by the hour; the old one is free at once for
-// any founder. bible/11-Multiplayer/Guild-Overhaul.md.
+// any founder..
 
 /** What a rename costs, in gold from the treasury - two and a half foundings. */
 export const GUILD_RENAME_GOLD = 25_000;

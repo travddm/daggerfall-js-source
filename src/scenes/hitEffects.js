@@ -296,8 +296,7 @@ export function createHitEffects({
      *  flat batches and is not carried. */
     showMissEffect: (kind, pos, { archive = BLOOD_ARCHIVE, record = 2, fps = 20, scale = 2 } = {}) => spawn(record, pos, null, { archive, fps, scale }),
     /**
-     * FIELD-GUN14 (Mac: "The projectile that shoots out should be an
-     * orb, not an arrow") - A FLAT THAT FLIES.
+     * FIELD-GUN14 - A FLAT THAT FLIES.
      *
      * Every other entry in this pool is a one-shot that plays where it
      * was born and ends on its own animation. A projectile does

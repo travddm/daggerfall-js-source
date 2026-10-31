@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-LOOK (2026-10-27, KPbICA on the DFO Online Discord, forwarded by the owner: "Texture blending for road tiles and
-// surroundings"; bible/03-World/Roads.md ROAD-LOOK) - A ROAD'S EDGE BLENDS INTO ITS GROUND.
+// ROAD-LOOK - A ROAD'S EDGE BLENDS INTO ITS GROUND.
 //
 // Daggerfall draws its ground a tile at a time: each of a pixel's 128 x 128 tiles is one record of the ground's archive,
 // sampled NEAREST to its square's edge (DFU's TilemapTextureArray, the port's terrain programs - render/renderer.js

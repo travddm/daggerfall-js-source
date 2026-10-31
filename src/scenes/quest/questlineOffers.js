@@ -1,8 +1,5 @@
 // @ts-check
-// QL-OFFERED (2026-10-25, Lord Rumpkin, "too many quests": "every town I enter there is some courier ramming
-// quest letters into my hand ... Random quests like that should be picked up in the tavern, or notice board"; the owner:
-// "No band aids", and his decision: A QUESTLINE IS TAKEN, NEVER SENT - bible/06-Systems/Questlines-Arc.md section 4, THE
-// RUNNER). THE QUESTLINES' OFFERS: where a line on offer (systems/questlines/qlLineRunner.js - its gate holds, it is not
+// QL-OFFERED. THE QUESTLINES' OFFERS: where a line on offer (systems/questlines/qlLineRunner.js - its gate holds, it is not
 // begun) is posted, and the take that begins it. Made by the bridge over its layer (scenes/quest/questBridge.js - THE ONE
 // CONSTRUCTION SEAM, every host's), so no host carries a line of it.
 //

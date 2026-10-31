@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT21 (2026-10-07) — THE AYLEID STONES.
+// LOOT21 — THE AYLEID STONES.
 //
-// The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 13; Mac:
+// The Loot arc II (; Mac:
 // "what could we do to make it even more amazing, while also balancing
 // everyrhing?", then "Lets go all in"). Two things DFU's roll cannot
 // make, found at the deepest sources through the unique-find registry

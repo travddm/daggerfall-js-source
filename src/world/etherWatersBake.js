@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ETHER-DEEP (2026-10-12, the owner: "the area below water is very shallow and has no depth"; bible/03-World/
-// Eltheric-Ocean.md ETHER-DEEP) - THE ELTHERIC OCEAN'S COASTLINE, BAKED BY THE BAY'S OWN LAW. Iliac Puddle No More
+// ETHER-DEEP - THE ELTHERIC OCEAN'S COASTLINE, BAKED BY THE BAY'S OWN LAW. Iliac Puddle No More
 // carves its sea against a distance bake of the map (deepWatersBake.js), and its map was the Bay's 1000 x 500: past the
 // Veil nothing was carved, so the sea's floor was the kernel's clamp at OceanElevation - the drawn water over ground a
 // stride under it - and every query the swim asked of an Eltheric pixel read the Bay's clamped corner (ETHER-HOLD held

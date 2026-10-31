@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): THE SHOP POPUPS' OWN ROWS, one door - the Portal Stone's
+// APPEARANCES: THE SHOP POPUPS' OWN ROWS, one door - the Portal Stone's
 // (PORTAL1: every shop's keeper, its counter scenes/portalCounter.js) and the Wardrobe's (a Clothing Store's, an
 // Armorer's or a Weaponsmith's keeper, scenes/wardrobeCounter.js) - as the hooks both popups take (the port's rows under
 // DFU's art, ui/merchant/merchantServiceWindow.js shopRowRect; the Enhanced Plus panel's presses). In a building and

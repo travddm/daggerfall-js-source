@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10/TESA11 (bible/03-World/Arena-Provinces.md) - THE CAPITALS' MAP IDS, alone: their lane and the test of one, with no
+// TESA10/TESA11 - THE CAPITALS' MAP IDS, alone: their lane and the test of one, with no
 // import, so a reader that keys by a map id (systems/banking.js's deeds, AUDIT RELEASE R2-9) asks it without the
 // capitals' plans. world/tamrielCapitals.js re-exports both.
 

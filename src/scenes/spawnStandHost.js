@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -20,7 +20,7 @@ export function createSpawnStand(host) {
     try {
       { const _wm = cyrodiilMask(); if (_wm && wildInside(_wm, px, py)) return zoneHalls.standOf(_wm, px, py); }   // BOOT-TDZ2: the stand over the mask just read, never the session's (declared far below this build)   // PVPDUNGEONS: the spawner is excluded in the zone - only the tier rules stand halls there (the day's hall on this pixel, or nothing)
       if (!spawnsDungeon(_spawnSalt, px, py) || maps.getClimateIndex(px, py) === CLIMATES.Ocean || !_spawnGround(px, py)) return null;
-      // SPAWN-ROADS (2026-09-25, Mac: "Anyway to have things avoid being on a road?"): no ruin on a pixel a road,
+      // SPAWN-ROADS: no ruin on a pixel a road,
       // track, river or stream crosses (spawnedDungeons.js pathFreePixel). Online the network is the room's (the
       // lane forces Basic Roads, onlineLane.js ONLINE_ROOM_MOD_KEYS), so every client asks the same bytes. Asked
       // BEFORE the network lands, the answer is PROVISIONAL: the ruin stands for now and its key is kept, and the
@@ -73,7 +73,7 @@ export function createSpawnStand(host) {
     }
     return loc || spawnedDungeonAt(px, py);
   }
-  /** SPAWN-WORLD (2026-10-26, the audit NO SYSTEM LEFT BEHIND IN THE BAY A3): WHAT THE SPAWNER STANDS ON A PIXEL PAST THE
+  /** SPAWN-WORLD: WHAT THE SPAWNER STANDS ON A PIXEL PAST THE
    *  BAY that no place takes - the Bay's own law: the spawn the index holds, unless its clocks have run out with nobody in
    *  it (out of the index, the pixel empty - the row kept, AUDIT OW5b D2), else what spawnedDungeonAt stands. One stood
    *  before its region's roads landed (TESA14: a region's layer at a time) that a road crosses now is taken back as the

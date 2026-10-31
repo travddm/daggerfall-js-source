@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1 (2026-09-25) — THE CATALOGUE: EVERYTHING DAGGERFALL FURNISHES.
+// DECOR1 — THE CATALOGUE: EVERYTHING DAGGERFALL FURNISHES.
 //
-// Mac, asked what the decorator's catalogue holds: "Everything
-// Daggerfall furnishes" - every piece of furniture and decor Daggerfall
+// every piece of furniture and decor Daggerfall
 // itself places inside its buildings, found in the game data, browsed
 // with a turning preview, named where the game names them; and the
 // panel "an intuitive scrolling menu with filters".
@@ -12,7 +11,7 @@
 // interior's PROP models - the object type Daggerfall lays out as a
 // room's furniture (world/interior/interiorLayout.js PROP_MODEL_TYPE) - and its
 // flats, the editor's markers (TEXTURE.199) excepted. DECOR-DUNGEON
-// (FIELD BUGS 2026-10-05b, the owner: "a lot of missing decor items",
+// (FIELD BUGS 2026-10-05b,,
 // asked which, the dungeons' furnishings among them): and its dungeon
 // blocks (RDB) - every model of the furniture families that stands
 // there doing nothing (no action, no door) and every flat that is not
@@ -23,7 +22,7 @@
 // building's outside flats - with the climate's own NATURE set whole;
 // these stand in a yard alone, and the nature a yard is offered is its
 // own climate's (a yard's trees turn with its town's season). HOME-DOORS
-// (2026-09-30): and its DOORS - the five models AddActionDoors hangs
+// and its DOORS - the five models AddActionDoors hangs
 // between a building's rooms, a door placed hanging in a doorway
 // (systems/decor/decorDoorways.js). A piece is in the
 // catalogue because Daggerfall put it in a room; nothing is invented.
@@ -69,7 +68,7 @@ export const DECOR_KINDS = Object.freeze({
   bed: 'Beds', storage: 'Storage', shelf: 'Shelves', furniture: 'Furniture', door: 'Doors',   // HOME-DOORS
   light: 'Lights', clothing: 'Clothing', boxes: 'Boxes and bottles', arms: 'Arms and armor',
   books: 'Books and scrolls', misc: 'Odds and ends', treasure: 'Treasure', decor: 'Decorations',
-  people: 'Vendors',   // HOME-VENDOR (Mac: "People category sounds wrong call it vendors"): the people Daggerfall stands in its rooms - a home's trader is one of them, made the vendor station
+  people: 'Vendors',     // HOME-VENDOR: the people Daggerfall stands in its rooms - a home's trader is one of them, made the vendor station
   dungeon: 'Dungeon furniture',   // DECOR-DUNGEON: what Daggerfall stands in its dungeons and nowhere in a house - a throne, a cage, a coffin, a statue
   outdoor: 'Outdoors',   // DECOR-OUTDOOR: what Daggerfall stands in its streets and nowhere inside - a fence, a well, a fountain, a cart
   nature: 'Trees and plants',   // DECOR-OUTDOOR: the climate's own nature - a yard's own climate's
@@ -342,7 +341,7 @@ export function decorCatalogue(collected) {
 }
 
 /**
- * GUILD1e (2026-09-30, Mac: "Finish the seats"; Seats-Arc 8.2: "the hall carries ... a private guild board"): THE HALL'S
+ * GUILD1e: THE HALL'S
  * BOARD - Daggerfall's own board (rmbLayout.js BULLETIN_BOARD_MODEL_ID, a town's), offered in a guild's hall alone
  * (`hall`), never in a home or a yard: a town's board stands outdoors, and nothing of Daggerfall's rooms carries one, so
  * it is the one piece the catalogue holds that no room placed. Pressed in the hall, it opens the guild's own notes

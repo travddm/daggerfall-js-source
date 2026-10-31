@@ -1,9 +1,9 @@
 // @ts-check
-// TACT4 - A FOE'S TELEGRAPH ON THE GROUND (bible/12-Enhanced-AI/Tactics-Arc.md): the world boss's floor telegraph
+// TACT4 - A FOE'S TELEGRAPH ON THE GROUND: the world boss's floor telegraph
 // (render/gate/gateTelegraph.js) at a foe's scale - one flat quad at the foe's feet, the shape the fragment's question
 // against ai/foeBlows.js inBlow (the pins hold `blowField` to it point for point, and the shader's text to it): a dim
 // outline at once, filling outward as the wind-up runs, a bright flash at the landing. Depth-tested and never
-// depth-written, lifted and offset off the ground (SNOW-TELL: and over the deep snow). TELL2 (bible/12-Enhanced-AI/Feud-Arc.md 4.4): drawn in the boss's
+// depth-written, lifted and offset off the ground (SNOW-TELL: and over the deep snow). TELL2 (4.4): drawn in the boss's
 // readable line (render/telegraphStyle.js), premultiplied over the frame (ONE, ONE_MINUS_SRC_ALPHA) - it was added on
 // (ONE, ONE), which could only brighten; TELL3: an iron blow's second rim and hatch; TELL5: a cut feint fades dashed;
 // TELL9: the player's telegraph contrast (a part of the Enhanced AI row) bolder over all of it.
@@ -13,7 +13,7 @@ import { BLOW, TELL_NOW } from '../ai/blowShapes.js';   // the leaf - the brain 
 import { TELEGRAPH_STYLE_GLSL } from './telegraphStyle.js';   // TELL2: the boss's readable line, at a foe's scale (a leaf)
 import { getPref } from '../systems/uiPrefs.js';   // TELL9: the telegraph contrast, the player's own
 
-/** TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 11.3): the player's telegraph contrast - thicker lines, a white keyline, a
+/** TELL9 (11.3): the player's telegraph contrast - thicker lines, a white keyline, a
  *  pattern for every guard. Read each draw: the switch flips the next frame. */
 export const telegraphContrastOn = () => getPref('telegraphContrast') === true;
 
@@ -27,7 +27,7 @@ export const quadHalf = (kind, ahead = null) => (Number.isFinite(ahead) && (kind
 /** The quad's half-extent about the foe's feet - every shape fits (TELL6: the charge's lane is the longest). */
 export const BLOW_QUAD_HALF = Math.max(...Object.values(REACH)) + 0.3;
 
-/** TECH1 (bible/05-Combat/Weapon-Techniques.md): THE PLAYER'S OWN MARK (combat/techniques.js techniqueMarks - `technique`
+/** TECH1: THE PLAYER'S OWN MARK (combat/techniques.js techniqueMarks - `technique`
  *  on the record): drawn by this pass in the player's colour, each at ITS OWN size - a Volley's disc, a leap's landing, a
  *  shot's lane, a dash's - where a foe's blow reads its kind's fixed numbers (BLOW). The shader's `uP` for it (the lane's
  *  length and half-width; the disc's radius and its point along the yaw), and its quad's half-extent. */
@@ -38,7 +38,7 @@ export function techniqueUniform(b) {
 }
 export const techniqueQuadHalf = (b) => (b.kind === 'lunge' || b.kind === 'charge' ? (b.len ?? 0) + (b.halfW ?? 0) : b.kind === 'aimed' ? (b.ahead ?? 0) + (b.halfW ?? 0) : (b.ahead ?? 0) + (b.r ?? 0)) + 0.6;
 export const BLOW_LIFT = 0.06;
-/** SNOW-TELL (2026-10-11, from play: "Can't see any boss ground attack overlays with heavy snow"): how far over its
+/** SNOW-TELL: how far over its
  *  fitted ground a mark lies - BLOW_LIFT, and over the frame's deep snow (render/snowfallGlsl.js snowSurfaceRise, the
  *  renderer's `_snowRise`) when it drew any. The blow is fitted to the bare ground (ai/foeBlows.js fitBlowToGround: the
  *  colliders know no snow), and the snow - up to 0.8 m of it in the wild, drawn before the ground and depth-written -

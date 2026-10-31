@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PORTAL1 (2026-10-04, the owner: "So with the removal of fast travel, I want to implement a new item available at all
-// shops, this should cost weykar shards (from dismantling gear with rarity). These should always be readily available.
-// When using this item, it opens a portal allowing you to traverse to anywhere on the map. This is a one use item that
-// stays open for a short time, allowing multiple players to traverse"): THE PORTAL STONE.
+// PORTAL1: THE PORTAL STONE.
 //
 //   - THE STONE (systems/gate/gateSpoils.js, template 572 beside the Welkynd Shard's 571): bound, stacking with its own kind.
 //   - THE COUNTER: every shop's keeper (shopStock.js isShop - the nine kinds) sells them for PORTAL_STONE_SHARDS Welkynd

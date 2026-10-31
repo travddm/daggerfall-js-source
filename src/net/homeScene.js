@@ -1,5 +1,5 @@
 // @ts-check
-// HOME-POUR (FIELD BUGS 2026-10-25d, bible/01-Overview/bugs/Field-Bugs-2026-10-25d.md): THE SCENE AN ONLINE HOME'S THINGS
+// HOME-POUR (FIELD BUGS 2026-10-25d): THE SCENE AN ONLINE HOME'S THINGS
 // ARE KEPT UNDER in its owner's save - its own, never the building's (systems/online/onlineHomes.js, "AN ONLINE HOME KEEPS
 // ITS OWN SCENE"). One home for both ends: the client reads and writes it, and the account service writes a chest's goods
 // back into it (server-account/src/decorAccess.js moveChest). A leaf of its own, outside net/homeLaw.js, which the relay's

@@ -1,4 +1,4 @@
-// L10N2 (2026-09-27, Mac: "for as many languages as we possibly can and do this right"): A FACE THAT GROWS - DFU's
+// L10N2: A FACE THAT GROWS - DFU's
 // dynamic SDF font asset. DaggerfallFont builds a replacement face with TMP_FontAsset.CreateFontAsset(font, 45, 6,
 // SDFAA, 4096, 4096, AtlasPopulationMode.Dynamic) and asks it for a glyph the first time a label needs one:
 // HasSDFGlyph (DaggerfallFont.cs:424-435) falls to TryAddCharacter (:801-830), and a code the font cannot give is

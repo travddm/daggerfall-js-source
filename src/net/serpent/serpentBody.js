@@ -1,9 +1,8 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE SERPENT'S BODY AS LAW - where every part of
+// SERPENT1: THE SERPENT'S BODY AS LAW - where every part of
 // Sethrakul is at a moment of the relay's clock, how high it rides the sea, and which of it a ball can strike. The relay's
 // brain (net/serpent/serpentBrain.js) judges a blow by it; the client draws it, aims at it and builds its hit boxes by it - one
 // law, both ends, so a ball that strikes a coil on one screen strikes the coil the relay sees. Design:
-// bible/11-Multiplayer/Sea-Serpent.md section 4.
 //
 // THE FRAME. Metres in the site's frame: the site (systems/serpent/serpentSite.js - a point on a packet lane) at the origin,
 // x east and z north (the native frame's axes, SERPENT_NATIVE_PER_M to the metre), y up from the sea's top. A facing is
@@ -33,8 +32,7 @@ export const SEG_LEN = 7;
 export const BODY_LEN = SEG_N * SEG_LEN;
 /** The head's length (the jaws to the back of the skull), metres - segment 0 is the head. */
 export const HEAD_LEN = 9;
-/** SERPENT4 (2026-10-11, the players: "and make it huge", "It could be bigger too as hitting with slow projectiles + lag
- *  is a challenge"): ITS GIRTH, its first build's times this - the great coils 12 m through where they were under 8, the
+/** SERPENT4: ITS GIRTH, its first build's times this - the great coils 12 m through where they were under 8, the
  *  skull a carrack's beam - so it looms over every deck and a ball flown a wire's time late still meets its hide (every
  *  segment's box is its radius square: segmentBox). Its length and its path are as they were: every swim, coil and attack
  *  shape is laid as before. */
@@ -234,7 +232,7 @@ export const COIL_TURN = 0.92;
 /** Adrift (m/s): its throes, and its head going round a coil's ring - the brain's own (serpentBrain.js re-exports it). */
 export const DRIFT_V = 3;
 /**
- * AUDIT SHIPS B6 (2026-10-06): THE COIL TURNS WITH ITS HEAD - the bearing from her its head is at `t`: the bearing it began
+ * AUDIT SHIPS B6: THE COIL TURNS WITH ITS HEAD - the bearing from her its head is at `t`: the bearing it began
  * at (`th`), gone round counter-clockwise at DRIFT_V on COIL_R since it wound on (the brain's own swim round its ring),
  * held where it was let go (`off`). Drawn at `th` alone, the coil lay still while its head went round its ring - 190
  * degrees by a full coil's end - and the body slid across the ring as it let go.
@@ -267,7 +265,7 @@ export function coilPoint(c, s, th = c.th) {
   return { x: ex + Math.cos(a) * rest, y: -1 - rest * 0.4, z: ez - Math.sin(a) * rest };
 }
 /** How much of the body the coil holds at `t` (0..1): wound on from its `at`, off from its `off` (its breaking, its
- *  crush or its slipping - 0 while it holds) - null coil, none. AUDIT SHIPS D2 (2026-10-06): wound on from `w` when it
+ *  crush or its slipping - 0 while it holds) - null coil, none. AUDIT SHIPS D2: wound on from `w` when it
  *  says one - the moment every screen holds its word (the relay winds it at the beat after its landing, and says it
  *  SERPENT_SAY_AHEAD_MS on): eased from its landing, which no screen had heard of yet, a screen 150 ms behind snapped
  *  its head 2 m up as the word came. Its clock (`at` - its hold, its turn round her, its end) is its landing's still. */

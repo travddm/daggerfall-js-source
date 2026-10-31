@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD2 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md section 6) - THE ZONE'S RINGS ON THE MAPS, AND ITS OWN MAP.
+// WILD2 - THE ZONE'S RINGS ON THE MAPS, AND ITS OWN MAP.
 //
 // The owner: "give the zone 4 levels from the outerside to the inside ... this needs to be also shown on the world map
 // when clicking on this zone it opens its own extremely well made map same layout as the worldmap only wrothgarian
@@ -101,7 +101,7 @@ export function smoothChain(chain, n = 3) {
 }
 
 /**
- * SMOOTHZONE (the owner: "the zone how it is cut out right now smooth it better"): a ring's or the edge's contour as a
+ * SMOOTHZONE: a ring's or the edge's contour as a
  * pen would draw it, not a pixel's staircase - the chain resampled to a fine, even step, relaxed (each point drawn toward
  * its neighbours' middle, which rounds every stair), then corner-cut. Closed chains only; anything shorter is kept.
  */
@@ -213,8 +213,7 @@ export function paintWildRings(ctx, view, ink, { paperW, paperH, far = false }) 
     ctx.strokeStyle = RING_INK[r - 1].line; ctx.lineWidth = Math.max(0.8, Math.min(2, view.scale * 0.2)); ctx.stroke();
   }
   ctx.setLineDash([]);
-  // PVPDUNGEONS (the owner: "The 25%,50,75,100% marker shown on the world map when not clicking on the zone have to be
-  // removed"): the rings' lines alone here - the zone map and its legend name each ring and its bonus
+  // PVPDUNGEONS: the rings' lines alone here - the zone map and its legend name each ring and its bonus
   ctx.restore();
 }
 
@@ -228,8 +227,7 @@ export function paintZoneMapStatic(ctx, view, ink, { paperW, paperH, places = []
   if (!ink || !view) return;
   ctx.save();
   if (part === 'under') {
-    // ZONEINK2 (the owner: "The tier colors when zoomed in on the zone map are overwriting the map too much make it look
-    // waaaay more high quality and take care of the performance"): the tiers are a WASH, not paint - a light watercolour
+    // ZONEINK2: the tiers are a WASH, not paint - a light watercolour
     // tint per tier, laid with `multiply` so the sheet's own relief, roads and grain read straight through it, each tier a
     // touch deeper toward the heart with a soft shade inside its border. All of it is drawn ONCE a mask into a canvas of
     // its own (tierWash); a frame is one drawImage and the tiers' thin lines.
@@ -265,7 +263,7 @@ export function paintZoneMapStatic(ctx, view, ink, { paperW, paperH, places = []
   // the plaques' room first (paintZoneMapPlaques stands them at the anchors), so no name runs under one
   const taken = [];   // ZONEINK2: the rings' plaques are gone from the zone map (its legend names each ring)
   const townish = (k) => k === 'city' || k === 'village' || k === 'hamlet';
-  // ZONEINK2 (the owner: "dont show all location names from the beginning when you zoom in"): the names come in with the
+  // ZONEINK2: the names come in with the
   // zoom - the cities at the zone's own fit, the towns from half again, every other place from twice it
   const shownAt = (k) => (k === 'city' ? 0 : townish(k) ? ZONE_NAMES_TOWNS : ZONE_NAMES_ALL);
   const vis = places.filter((p) => zoom >= shownAt(p.kind));
@@ -319,7 +317,7 @@ export const ZONE_NAMES_ALL = 2.2;
 /** ZONEINK2: each tier's wash, a light pigment laid with `multiply` (white leaves the sheet as it is) - aged ochre, amber,
  *  madder, and a muted wine at the heart - and the deeper shade inside its border. */
 export const TIER_WASH = Object.freeze([
-  // TIER-SWATCH (the owner: "the tiered colors in the legend look way too similiar"): four pigments apart from each
+  // TIER-SWATCH: four pigments apart from each
   // other on the map and in the legend alike - sand, amber, madder rose and plum, each deeper than the last
   Object.freeze({ fill: [250, 238, 200], shade: [214, 188, 122] }),
   Object.freeze({ fill: [250, 212, 156], shade: [214, 150, 84] }),
@@ -450,7 +448,7 @@ export function buildZoneLegend(doc, { ring = 0, laws = true, onBack = null, nam
   for (let r = 1; r <= WILD_RINGS; r++) {
     const li = el('li', `hmwild-ring${r === ring ? ' mine' : ''}`);
     const sw = el('span', 'hmwild-sw');
-    // TIER-SWATCH (2026-10-08, the owner: "change the tier colors accordingly to the map in the legend"): the swatch is
+    // TIER-SWATCH: the swatch is
     // the tier AS THE MAP SHOWS IT - its wash laid with multiply on the parchment, its border the shade inside its edge
     const sw2 = tierSwatch(r);
     sw.style.background = sw2.fill;
@@ -462,8 +460,7 @@ export function buildZoneLegend(doc, { ring = 0, laws = true, onBack = null, nam
     list.append(li);
   }
   root.append(list);
-  // LEGEND-FIT (the owner: "now i have to scroll down in the legend for begin journy make it so that i dont have to do
-  // that"): the laws scroll in their own box, the buttons stand in a foot that is always in view - Begin journey first
+  // LEGEND-FIT: the laws scroll in their own box, the buttons stand in a foot that is always in view - Begin journey first
   const rules = el('ul', `hmwild-rules${canBegin ? ' trip' : ''}`);
   for (const line of zoneRules(laws)) rules.append(el('li', null, line));
   root.append(rules);

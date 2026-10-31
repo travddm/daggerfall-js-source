@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW16 (2026-10-09, bible/06-Systems/Living-World-II.md "LW16"): THE WORD TRAVELS - what happens in one town is heard in
+// LW16: THE WORD TRAVELS - what happens in one town is heard in
 // the next. Pure: a town's own news and the visits of these days in, never a clock or a scene.
 //
 //  - THE WORD CARRIED (`carriedNews`): a party come in from a town about tells what its own town knew when it set out -

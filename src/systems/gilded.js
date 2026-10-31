@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GILDED1 (2026-10-07) - THE GILDED RUNG. Design and record: bible/06-Systems/Gilded.md.
+// GILDED1 - THE GILDED RUNG. Design and record:.
 //
 // ═══ GILDED ════════════════════════════════════════════════════════
 //
@@ -19,25 +19,21 @@
 //
 // ═══ GILDED2: THE WORLD'S TWO ═══════════════════════════════════════
 //
-// GILDED2 (2026-10-15, Mac: "With the introduction of elite dungeons
-// soon. I want to enhance the rewards for each world activety. We need to
-// add a rare gilded weapon to the oblivion gates. A gilded weapon to the
-// serpent"): each record is the last roll of a world boss's spoils - THE
+// GILDED2: each record is the last roll of a world boss's spoils - THE
 // DRAGONFIRE OATH off the gate's Warden (systems/gate/gateSpoils.js), THE
 // SUNKEN SOVEREIGN off the Old Coil's hoard for a ship that dealt
 // (systems/serpent/serpentSpoils.js). DFU weapons both, minted by the game's
 // own CreateWeapon (combat/enemyEquipment.js createWeapon). Each a STATIC
 // ROLL, its lines the Legendary band's top, and its power the one thing
 // nothing else has (DRAGONFIRE, UNDERTOW below; systems/loot/lootPowers.js
-// does them). Measured: bible/06-Systems/Gilded.md section 7.
+// does them). Measured:
 //
-// ═══ GILDED-RARER (2026-10-24) ══════════════════
+// ═══ GILDED-RARER ══════════════════
 //
 // The owner: "Reduce the drop rate of gilded weapons across the board".
 // The Dragonfire Oath one Warden in two hundred and fifty (was a hundred:
 // a gate opens every two hours), the Sunken Sovereign one dealing ship's
 // hoard in two hundred and fifty (was a hundred: a serpent every four).
-// bible/06-Systems/Gilded.md section 10.
 // ═══════════════════════════════════════════════════════════════════
 
 import { WEAPON_MATERIALS, WEAPONS } from '../characters/weapons.js';

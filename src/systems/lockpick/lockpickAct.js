@@ -1,6 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md): THE TUMBLERS, as a machine the lock's window feeds a frame at a time - pure, the
+// LOCKPICK: THE TUMBLERS, as a machine the lock's window feeds a frame at a time - pure, the
 // gathering acts' shape (systems/herbAct.js): the window hands in the frame's time and the player's presses; the machine
 // answers where every pin stands and what each press did.
 //

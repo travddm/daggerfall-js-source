@@ -35,10 +35,9 @@
 // relative link "would open nothing there".)
 // ═══════════════════════════════════════════════════════════════════
 
-/** The Terms of Service a new account agrees to - its Last Updated date. SAFE7 (2026-10-17,
- *  bible/11-Multiplayer/Chat-Safety-Arc.md): a new version - the conduct section names hate by what it attacks and the
+/** The Terms of Service a new account agrees to - its Last Updated date. SAFE7: a new version - the conduct section names hate by what it attacks and the
  *  in-game Code of Conduct as part of the Terms, a change in substance, so a new date.
- *  BR5 (2026-10-11): the operator's name became DFO Online in both
+ *  BR5: the operator's name became DFO Online in both
  *  documents and nothing else did - the same project and the same terms
  *  under its new name, so the same version, the words re-hashed
  *  (test/ui/enhanced/terms1.test.js). A new version would refuse every account an
@@ -47,7 +46,7 @@
 export const TERMS_VERSION = '2026-10-17';
 
 /** The Privacy Policy a new account agrees to - its Last Updated date (BR5,
- *  as the Terms). SAFE5 (2026-10-17): a new version - stamped messages and reports, the automated review of public chat
+ *  as the Terms). SAFE5: a new version - stamped messages and reports, the automated review of public chat
  *  by a third-party AI provider, the block list and the moderation record, and how long each is kept. */
 export const PRIVACY_VERSION = '2026-10-17';
 

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-FOLLOW (2026-10-27, the owner: "Also, city gates do not line up with the roads"; bible/03-World/Town-Shapes.md
-// ROAD-FOLLOW) - A CAPITAL'S APPROACHES: the road on from where the roads past the Bay end, at its span's edge, to its own
+// ROAD-FOLLOW - A CAPITAL'S APPROACHES: the road on from where the roads past the Bay end, at its span's edge, to its own
 // gate in its wall.
 //
 // The roads come to a capital at its gate pixel (world/tamrielCapitals.js capitalGates) and stop at its span's edge: the

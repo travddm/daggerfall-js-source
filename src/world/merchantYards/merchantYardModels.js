@@ -1,5 +1,5 @@
 // @ts-check
-// MERCHANT-YARDS (2026-10-10): WHAT A TOWN'S TWO YARDS ARE MADE OF - the port's own geometry, in each yard's own frame
+// MERCHANT-YARDS: WHAT A TOWN'S TWO YARDS ARE MADE OF - the port's own geometry, in each yard's own frame
 // (y up from its ground, its front - its gate's side, the street's - along +z, x across), worn in the port's own art
 // (world/merchantYards/merchantYardArt.js, YARD_ARCHIVE). Every face is wound outward (the world pass culls the back), and the
 // collider is the same triangles. Nothing of Daggerfall's is read.
@@ -15,7 +15,7 @@
 // of planks, a barrel; and on the apron a SIGNPOST, its arm over the street, the signboard hung from it. A Small Cart,
 // an Open Wagon and a Caravan stand drawn up in the gravel and the wagonwright at the gate (the host's - `points`).
 //
-// CARP-YARD (2026-10-12): THE JOINERY (YARD_FOOT.carpenter, 14 m by 12): a low post-and-rail fence round a sawdust
+// CARP-YARD: THE JOINERY (YARD_FOOT.carpenter, 14 m by 12): a low post-and-rail fence round a sawdust
 // floor, a GATE ARCH at its front with the JOINERY board hung from its beam; across its back a shingled workshop, open to
 // the yard - THE WORKBENCH in its middle (Carpentry's station: legs, a top, a shelf under it, a vise at its front corner,
 // a plane, a mallet and offcuts on it) under a tool board on the back wall (a hand saw, a hammer, a square, three
@@ -25,7 +25,7 @@
 // carpenter's work on show - a table with a chair at each end, and a bench. The carpenter stands inside the gate (the
 // host's - `points`).
 //
-// SHIPYARDS (2026-10-11): the face kit below is the port's too - world/shipyardModel.js and world/lighthouseModel.js
+// SHIPYARDS: the face kit below is the port's too - world/shipyardModel.js and world/lighthouseModel.js
 // build with it (YARD_MESH_KIT, at this file's end), under the port's own pictures (world/portArt.js).
 //
 // Pure: no renderer, no GL, no clock. Not a DFU member. Ledger A (MERCHANT-YARDS).
@@ -473,7 +473,7 @@ export const yardPoints = (kind) => (kind === 'transport'
   : kind === 'carpenter' ? { keeper: CARPENTER_YARD.keeper, horses: [], wagons: [], bench: benchBoxOf() }
     : { keeper: STABLE_YARD.keeper, horses: STABLE_YARD.horses, wagons: [], bench: null });
 
-/** SHIPYARDS (2026-10-11): THE YARDS' FACE KIT, ONE DOOR - world/shipyardModel.js and world/lighthouseModel.js build the
+/** SHIPYARDS: THE YARDS' FACE KIT, ONE DOOR - world/shipyardModel.js and world/lighthouseModel.js build the
  *  port's places with it (the faces, a face's UVs, a hexahedron, a box, a post, a fence run, a floor, a lean-to, a
  *  signboard, a wheel, a drum, and assemble under an archive). One object, so no helper's name is declared twice across
  *  the port's modules (test/systems/talk/audit24_onehome.test.js). */

@@ -327,10 +327,7 @@ export const DF_STRIKE_TO_MW_ATTACK = Object.freeze({
 });
 
 /**
- * MS1 - THE BACKHAND (Mac, 2026-09-12: "classic Daggerfall has a swing
- * animation for left and right while Morrowind only has the animation
- * that swings right to left. Could we insert a mirrored swing so you're
- * able to swing all directions?" - and, of a mirror that changed hands,
+ * MS1 - THE BACKHAND (- and, of a mirror that changed hands,
  * "There must be a way to keep it correctly in the correct hand.").
  *
  * Morrowind's slash is ONE motion: the weapon hand sweeps from the
@@ -1500,7 +1497,7 @@ export function dfWeaponToMw(item, weaponsTable) {
   return MOD_WEAPON_TO_MW[idx] ?? MW_WEAPON_TYPE.None;   // MW-ASSIGN: a mod's weapon of a classic shape
 }
 
-/** MW-ASSIGN (2026-09-27, Discord: "Some sprites not assigned morrowind skin"): THE WEAPONS A MOD ADDS, by template -
+/** MW-ASSIGN: THE WEAPONS A MOD ADDS, by template -
  *  Roleplay & Realism Items' Archer's Axe (ItemArchersAxe: one-handed, either hand) and Light Flail (ItemLightFlail: a
  *  flail, as the classic one maps). Outside DFU's frozen WEAPONS, so the walk above never met them: in Morrowind first
  *  person they drew EMPTY HANDS, and their icon and a wall's mount stood as the classic picture. */
@@ -1980,7 +1977,7 @@ export function meshBounds(shapes) {
   return { minX, minY, minZ, maxX, maxY, maxZ };
 }
 
-/** PR-BOW1b (2026-09-24): meshBounds' fold, PIECE BY PIECE - poseAssembly's
+/** PR-BOW1b: meshBounds' fold, PIECE BY PIECE - poseAssembly's
  *  one walk of the posed vertices. Each piece's own box is written onto the
  *  piece (`p.box`: one object the piece owns, living and dying with it and
  *  rewritten every pose, so a frame mints nothing), and the union is
@@ -2165,7 +2162,7 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
       notes.push(`bones: ${src.name}: ${err.message}`);
     }
   }
-  // TWO-HANDS AUDIT (bible/05-Combat/Two-Hands.md): THE LEFT HAND'S WEAPON BONE, asked for by the player's two rigs
+  // TWO-HANDS AUDIT: THE LEFT HAND'S WEAPON BONE, asked for by the player's two rigs
   // (`offWeaponBone`). A skeleton without a "Weapon Bone Left" - every retail one - takes one made by the mirror from
   // its own Weapon Bone (combat/twoHands/mirrorRig.js offWeaponBoneAddon), through the addons' own door and after them (an
   // addon that brings one is the skeleton's), before any part binds and before the mirror's plan is first read. A bow
@@ -2201,7 +2198,7 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
 }
 
 /**
- * MWNPC9 (bible/04-Characters/Morrowind-NPCs.md section 14): A CREATURE, ASSEMBLED. Its model is its skeleton and its
+ * MWNPC9: A CREATURE, ASSEMBLED. Its model is its skeleton and its
  * body at once (one parse: the skeleton's refs ARE the shapes' parent refs), bound by mwCharacter.js
  * bindCreatureModel - the skinned shapes by their bones, each rigid shape riding its own node through the inverse of
  * that node's rest. The pieces are the arm's own shape (slot 'creature'), so the pose, the GPU skin, the upload and the
@@ -2436,8 +2433,7 @@ export function bindPartsInto(assembly, parts) {
             // attitude, no mirror of its own: whatever the arrow ends
             // up wearing, it wears because its PARENT wears it.
             //
-            // MW-D44 (Mac: "the arrow placement in the hand is not
-            // 1:1" - and he was right): SO IT TAKES THE WEAPON'S
+            // MW-D44 (- and he was right): SO IT TAKES THE WEAPON'S
             // OFFSET, THOUGH NEVER ITS OWN. MW-D34 read half the
             // reference correctly and stopped one level too high. That
             // `parent` is getArrowBone(), the ArrowBone node INSIDE the
@@ -2679,7 +2675,7 @@ export const rotNegX = (rad) => {
  * i.e. `rotate` is a turn in the OBJECT ROOT's frame, laid on the node's world orientation as the animation left it -
  * the node's world becomes `rotate * world`, its translation untouched.
  *
- * BOW-AIM (bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md): THAT LINE IS OSG's, AND OSG MULTIPLIES ROW VECTORS. Its
+ * BOW-AIM: THAT LINE IS OSG's, AND OSG MULTIPLIES ROW VECTORS. Its
  * matrices (and the quaternion product, `q1 * q2` = q1 then q2) are the transposes of this port's: here a world is
  * `parent * local` and a point is `M v` (mwNifMesh.js composeTransform). Written in this port's convention the line is
  *
@@ -2734,7 +2730,7 @@ export function applyFirstPersonNeck(skeleton, pose, rootRef, skelMats, pitch, a
 }
 
 /**
- * BOW-AIM (bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md): RotateController's rotation alone on node `ref`
+ * BOW-AIM: RotateController's rotation alone on node `ref`
  * (rootSpaceTurn; applyFirstPersonNeck's law with no offset) - `rotate`, a 3x3 in the OBJECT ROOT's space, laid on the
  * node's world rotation as the pose now stands it. Answers false where the skeleton has no such node.
  */
@@ -2796,7 +2792,7 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // MIRROR-BIND: an arm mirrored across the picture is mirrored by the binds of the skins it wears (mirrorBindsOf)
   if (mirror?.plane && mirror.plane.binds === undefined) mirror.plane.binds = mirrorBindsOf(assembly);
   const pose = fns.poseSkeleton(skeleton, tracks, sampleTrack, time, { accumRoot });
-  // TWO-HANDS (bible/05-Combat/Two-Hands.md): THE SECOND HAND - an arm, or the whole body, as the mirror of another
+  // TWO-HANDS: THE SECOND HAND - an arm, or the whole body, as the mirror of another
   // (combat/twoHands/mirrorRig.js), straight over the clip's pose and under every law that follows it (the neck's look, the
   // climb's hands): a left-hand blow, a second weapon held up. An arm read from ANOTHER clip (`clip`: the idle under a
   // blow) is posed here, on this skeleton, at that clip's own time.
@@ -2863,7 +2859,7 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   return assembly;
 }
 
-/** MIRROR-BIND (bible/05-Combat/Two-Hands.md): the skins an assembly's picture mirror is read by - the skeleton file's own
+/** MIRROR-BIND: the skins an assembly's picture mirror is read by - the skeleton file's own
  *  (`skinBinds`, kept at assembly) and its skinned pieces' (combat/twoHands/mirrorRig.js mirrorBindSources) - read once
  *  for each set of pieces it holds. */
 function mirrorBindsOf(assembly) {
@@ -3134,7 +3130,7 @@ export function placeAtBone(positions, at, mirror, out = new Float32Array(positi
 }
 
 /**
- * MW-SMOOTH (2026-10-09, Mac: "Can we also enable smooth shading for the morrowind models?"): A RIGID PART'S NORMALS,
+ * MW-SMOOTH: A RIGID PART'S NORMALS,
  * PLACED AS ITS VERTICES ARE (placeAtBone) - mirrored with them (rule 13's X negated: a reflection takes a normal to
  * the reflected surface's normal, so no flip follows) and turned by the bone. Rule 14's offset is a translation and
  * leaves a normal alone. Renormalised, so a bone's uniform scale does not dim the light.

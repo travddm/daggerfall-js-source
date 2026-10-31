@@ -15,7 +15,7 @@
 // reach. The SECRETS tier adds the one thing no plaque names - a wall or a door that only a chain moves (a mover no
 // trigger of its own reaches, at rest where it started) - in its own colour, opt-in, because that is new knowledge.
 //
-// AUDIT DELVE (bible/01-Overview/audits/Audit-Delve.md): the round is one pure law (senseRound - the press's finds and the
+// AUDIT DELVE: the round is one pure law (senseRound - the press's finds and the
 // secrets merged, nearest first, one card a thing, the echo's found marks before them all); a secret is read off the
 // action system's own TRIGGER_GATE; the four kinds differ in FORM as well as colour (SENSE_FORM - a protan or deutan eye
 // could not tell a lever's glow from a chest's); and the budget and the pardon are the glow's and the pick's own.

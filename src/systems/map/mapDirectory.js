@@ -59,7 +59,7 @@ export function buildMapDict(maps) {
   return mapDict;
 }
 
-/** WW3 (bible/03-World/World-Wide.md WW3): a map pixel of the Bay's map, whose MapsFile pixel id is its own - off it
+/** WW3 (WW3): a map pixel of the Bay's map, whose MapsFile pixel id is its own - off it
  *  `y * 1000 + x` names ANOTHER pixel's id ((1003, 10) is (3, 11)'s, (-2, 10) is (998, 9)'s), and a ship past the Bay
  *  was told it lay by a Bay port. DFU asks the directory of its own map alone; the port asks it of the world's. */
 const onMap = (x, y) => Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < MAP_W && y < MAP_H;

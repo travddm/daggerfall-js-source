@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE'S ENCOUNTER PULSE AND ITS FISH
+// DW-E3: ILIAC PUDDLE NO MORE'S ENCOUNTER PULSE AND ITS FISH
 // SPAWNER (jet082, 1.2.2) - UnderwaterEncounterPulse.cs and the host half
 // of UnderwaterPassiveFishSpawner.cs, over the port's pixels. The laws a
 // fish lives and is placed by are world/passiveFish.js; what a fish IS in

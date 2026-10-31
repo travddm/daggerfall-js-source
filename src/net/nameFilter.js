@@ -1,6 +1,5 @@
 // @ts-check
-// NAME-F1 (2026-09-16, Mac: "a proper censoring system for players
-// choosing their online name. Im seeing a lot of names like 'Cum'").
+// NAME-F1.
 //
 // ═══ THE PROBLEM THIS IS, AND THE ONE IT IS NOT ═══════════════════
 //
@@ -43,8 +42,7 @@
 // name is not a chat line: it is permanent, it hangs over a player's head
 // in the world, and it is read by everyone who never chose to talk to
 // them. A line scrolls away - so NAME-F1 left `sanitizeChat` untouched.
-// TEXT-F1 (2026-10-07, Mac: "Any human input elements need filtering,
-// including notes") reads a player's WORDS too - see `maskText` at the
+// TEXT-F1 reads a player's WORDS too - see `maskText` at the
 // foot of this file, and why a sentence is starred where a name is
 // refused.
 //
@@ -161,13 +159,13 @@ export const SLURS = Object.freeze([
  *  social-engineering tool, not an insult. */
 export const IMPERSONATION = Object.freeze(['admin', 'moderator', 'mod', 'staf', 'sistem', 'ofical', 'server']);
 
-/** TEXT-F1 (2026-10-07): THE WORDS NO WORD HIDES INNOCENTLY - read ANYWHERE inside a word, where the lists above are read
+/** TEXT-F1: THE WORDS NO WORD HIDES INNOCENTLY - read ANYWHERE inside a word, where the lists above are read
  *  standing alone (stage 2, so `cumberland` keeps its `cum`). Two English words hold one innocently (AUDIT 657 T1:
  *  INNOCENT, below, reads them out first); for the rest a boundary was only ever the way past: `motherfucker` and
  *  `xXfaggotlordXx` stood beside no padding and passed. Each list its kind, as LISTS reads them; written normalised. */
 export const ANYWHERE = Object.freeze([
   Object.freeze({ kind: 'slur', words: Object.freeze(['faggot', 'nigga', 'nigger']) }),
-  // NAME-WORDS (2026-10-19, Mac: "Not sure how the filter didnt catch this", over the handle PROSTITUTE_STRANGLER):
+  // NAME-WORDS:
   // stage 1 drops the underscore, and in `prostitutestrangler` each word stands beside the other, never padding - so here,
   // read anywhere, as `motherfucker` is
   Object.freeze({ kind: 'crude', words: Object.freeze(['cocksuck', 'fuck', 'prostitute', 'strangler']) }),
@@ -324,8 +322,7 @@ export function entryVerdict(...candidates) {
 
 // ═══ TEXT-F1: A PLAYER'S WORDS ═════════════════════════════════════
 //
-// Mac (2026-10-07): "Any human input elements need filtering, including
-// notes." A name is one word, read whole. A SENTENCE read whole hides
+// A name is one word, read whole. A SENTENCE read whole hides
 // every word in it: stage 1 drops the spaces, so `you are an ass` is
 // `youareanass` and `ass` stands alone nowhere. So a line is read WORD
 // BY WORD - each word through the same two readings and the same lists

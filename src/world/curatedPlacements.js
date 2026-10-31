@@ -1,5 +1,5 @@
 // @ts-check
-// FIELD BUGS 2026-10-09e - HILL-HOUSE (bible/01-Overview/bugs/Field-Bugs-2026-10-09e.md; the Discord's "Missing quest location
+// FIELD BUGS 2026-10-09e - HILL-HOUSE (; the Discord's "Missing quest location
 // house - An Item On Loan": "The residence I'm supposed to go to is either missing or under a hill"): A BUILDING THE
 // PACK'S OWN HILLS BURY, STOOD ON CLEAR GROUND OF ITS BLOCK.
 //

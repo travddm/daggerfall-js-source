@@ -1,5 +1,5 @@
 // @ts-check
-// MERCHANT-YARDS (2026-10-10): THE YARDS' OWN ART, MADE AT BOOT - every picture the Stable and the Wagon Yard wear
+// MERCHANT-YARDS: THE YARDS' OWN ART, MADE AT BOOT - every picture the Stable and the Wagon Yard wear
 // (world/merchantYards/merchantYardModels.js) is the port's, made here from noise and drawn shapes the moment a host asks
 // (world/lefayArt.js's and world/gate/gateArt.js's law: pictures of the port's own under a pseudo-archive far above any
 // classic one, no renderer and no GL in this file - pixels and numbers). Nothing of Daggerfall's is read.
@@ -14,7 +14,7 @@
 //   iron    - brackets and tyres: dark iron, a little rust.
 //   the two SIGNBOARDS - a dark-stained board, a painted cream border, an emblem in iron and paint (the Stable's
 //   horseshoe, its opening up for luck; the Wagon Yard's wheel) and the yard's word in painted capitals beside it.
-//   CARP-YARD (2026-10-12): the joinery's - its board a hand saw and JOINERY; its floor SHAVINGS (pale sawdust, curls
+//   CARP-YARD: the joinery's - its board a hand saw and JOINERY; its floor SHAVINGS (pale sawdust, curls
 //   and chips in it - not the port's sawdust, world/portArt.js, whose record is its own), its logs' BARK (dark furrowed
 //   bark, its furrows along u) and their END GRAIN (rings about the picture's middle, a check across them).
 //
@@ -424,7 +424,7 @@ export const yardArt = () => [
   [YARD_REC.bark, yardBarkArt()],
 ];
 
-/** SHIPYARDS (2026-10-11): THE YARDS' PAINTING TOOLS, ONE DOOR - world/portArt.js paints the port's pictures with them
+/** SHIPYARDS: THE YARDS' PAINTING TOOLS, ONE DOOR - world/portArt.js paints the port's pictures with them
  *  (its seeded rng, its noise, an image, a pixel put and got, a mix, the iron's two tones, the signboard and its word).
  *  One object, so no helper's name is declared twice across the port's modules (test/systems/talk/audit24_onehome.test.js). */
 export const YARD_ART_KIT = Object.freeze({ rng, noiseField, image, put, get, mix, IRON_DARK, IRON_LIGHT, board, paintWord });

@@ -1,5 +1,5 @@
 // @ts-check
-// ARENA3 (2026-10-02): THE ARENA WINDOW'S DOOR - the one place a host opens the Arena window through, the Reforge's door's
+// ARENA3: THE ARENA WINDOW'S DOOR - the one place a host opens the Arena window through, the Reforge's door's
 // shape (ui/reforgeDoor.js): the window (ui/arena/arenaWindow.js) a lazy chunk mounted through the one home
 // (ui/enhanced/enhancedChunk.js), in a host of its own, wrapped in the generic overlay shape every host's frame already drives -
 // `done` once it is shut, `dispose` to shut it, the keyboard and the pointer the window's own; registered with the

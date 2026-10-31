@@ -96,7 +96,7 @@ import {
 } from '../paperDoll.js';
 import {
   equipItem, unequipSlot, equipTableOf, isEquipped,
-  isForbiddenEquip, isBrokenItem, getEquipSlot, bodyPartForSlot,   // getEquipSlot - Mac (2026-09-18): Wear only where a slot would take it; bodyPartForSlot - AC-COMPARE: GetBodyPartForEquipSlot, the part a worn panel stands for}
+  isForbiddenEquip, isBrokenItem, getEquipSlot, bodyPartForSlot,     // getEquipSlot - Mac: Wear only where a slot would take it; bodyPartForSlot - AC-COMPARE: GetBodyPartForEquipSlot, the part a worn panel stands for}
   swapHands, canSwapHands,   // SWAP-HANDS
 } from '../../systems/equip.js';
 import { armourBadge, armourPlaque, compareBlock, lineCompareBlock, wearComparison } from '../armourCard.js';   // AC-COMPARE: the doll's numbers on the map, the overall figure, the card's comparison
@@ -320,8 +320,7 @@ export function equippedModel(entity = {}) {
     x: at.x,
     y: at.y,
   })).sort((a, b) => a.y - b.y || a.x - b.x);
-  // HT5 (2026-09-15, Mac: "the torch doesnt appear slotted in
-  // inventory"): THE HELD LIGHT IS A ROW, and it is the only row here
+  // HT5: THE HELD LIGHT IS A ROW, and it is the only row here
   // that is not one of DFU's slots.
   //
   // A light source HAS no equip slot - getEquipSlot answers None for
@@ -441,8 +440,7 @@ export function itemLine(item, identity = undefined) {
     condition: (item.maxCondition ?? 0) > 0 && !isSurvivalItem(item) ? conditionPercentage(item) : null,
     word: (item.maxCondition ?? 0) > 0 && !isSurvivalItem(item) ? conditionWord(item) : null,
     material: parts.material || null,
-    // MAC-M1 (Mac: "Damage values arent showing on weapon tool tips.
-    // Also, not sure if armor has values either"): THE TWO NUMBERS A
+    // MAC-M1: THE TWO NUMBERS A
     // PLAYER PICKS A WEAPON BY. `weaponDamageString` and
     // `armourModString` have existed since U25 with exactly one reader
     // between them - the CLASSIC popup's macro pass - and this skin's
@@ -454,8 +452,7 @@ export function itemLine(item, identity = undefined) {
     damage: itemDamageLine(item),
     armour: itemArmourLine(item),
     armorType: itemArmorTypeLine(item),   // ARMOR-TYPE: Leather, Chain or Plate (systems/item/itemInfo.js) - null for anything not armour
-    // MAC-M2 (Mac: "The Tooltip of weapons should also show if the
-    // weapon is 1h or 2h"): the same shape as the two above - the
+    // MAC-M2: the same shape as the two above - the
     // ANSWER is systems/itemInfo's, off the port's one GetItemHands, so
     // the card cannot tell a player a claymore is one-handed while the
     // equip table is emptying both their hands for it.
@@ -511,7 +508,7 @@ export function linePictureUrl(line, { scale = 2, onReady = null } = {}) {
   return null;
 }
 
-/** UI1 (bible/10-UI/Slots-Hotbar-Status.md): THE LINE'S PICTURE FITTED TO A SLOT'S BOX - `box` CSS pixels a side
+/** UI1: THE LINE'S PICTURE FITTED TO A SLOT'S BOX - `box` CSS pixels a side
  *  (ui/iconFit.js SLOT_BOX), made at the screen's own device size: `{ src, w, h, smooth }`, or null while it is made
  *  (`onReady` fires when it lands) and for an item with no picture. The door above at scale 1 is its source, so the
  *  record, its dye and the cart's model are asked exactly as before; every enhanced list draws through this now. */
@@ -523,8 +520,7 @@ export function linePicture(line, { box, onReady = null, snap = true } = /** @ty
 }
 
 /**
- * HT2 (Mac: "so you cant equip the torch in your offhand, you can only
- * drop it on the ground") - THE PRIMARY ACT ON A LOCAL ITEM, decided
+ * HT2 - THE PRIMARY ACT ON A LOCAL ITEM, decided
  * once, performed by the view.
  *
  * A LIGHT SOURCE HAS NO EQUIP SLOT. `getEquipSlot` answers None for
@@ -562,7 +558,7 @@ export function localPrimaryAct(item, entity = null) {
       ? { kind: 'douse', label: 'Douse' }
       : { kind: 'light', label: 'Light' };
   }
-  // Mac (2026-09-18, off the audit's review shots): "Hide wear for non wearables" - a waterskin, a raw meat, a
+  // a waterskin, a raw meat, a
   // gem offered WEAR. The equip table's own answer decides: no slot would take it, no verb. A throwaway table
   // answers when no entity is at hand (the slot rules are the item's, not the wearer's).
   if (getEquipSlot(entity ?? {}, item) === EQUIP_SLOTS.None) return null;
@@ -669,7 +665,7 @@ let notice = null;
 /** BATCH-SALVAGE: the pieces chosen to break while the pack chooses (a Set of the pack's own items), else null - the
  *  pack is not choosing. */
 let salvageSel = null;
-/** GEM3 (bible/06-Systems/Gem-Sockets.md section 5): the pack's own piece's wells - the empty well whose chooser is open
+/** GEM3: the pack's own piece's wells - the empty well whose chooser is open
  *  and the set well whose Shatter waits (`{ item, at }`), and the gem whose "Set in..." targets are shown. Each is the
  *  one piece's: a pick of another piece reads none of them. */
 let wellOpen = null, wellAsk = null, gemTargets = null, wellPick = null;   // AUDIT GEM: `wellPick` the selection these belong to
@@ -695,8 +691,7 @@ let remote = null;
 /** WAGON-FILTER: what the player's own store (the wagon, their storage, the bag) is showing - a category and a search,
  *  ui/storeFilter.js. Fresh at every open, so a pane never opens on a filter the player has forgotten setting. */
 let storeFilter = freshStoreFilter();
-/* PX20b (Mac: "when looting items, only open the loot tooltip, not the
-   entire inventory window"). DFU opens the whole parchment because DFU
+/* PX20b. DFU opens the whole parchment because DFU
    has ONE window and both lists live in it; PX19c already split the
    remote into its own smaller frame, which makes a lighter answer
    possible: opening a CONTAINER shows that frame alone. Everything
@@ -841,8 +836,7 @@ function refreshFigure() {
 /** Wearing something, through the ONE chain. A refusal is REPORTED -
  *  the classic window pops TEXT.RSC for the same two cases, and a
  *  press that silently does nothing is what the anti-lie law forbids. */
-/** INV1 (2026-09-15, Mac: "Add the ability to click and drag items to
- *  equip or reorganize in inventory").
+/** INV1.
  *
  *  THE DRAG PERFORMS THE ACT THE CARD ALREADY OFFERS. It does not grow
  *  a second rule for what a drop means: `localPrimaryAct` decides, the
@@ -856,7 +850,7 @@ function refreshFigure() {
  *  save carries. It never crosses a side - a drag out of a loot pile is
  *  a TAKE, which is a click, and mixing the two would make a slip a
  *  transfer. */
-/** AUDIT INV2 (2026-09-15, Mac: "I want it to be perfect") - THE DRAG IS
+/** AUDIT INV2 - THE DRAG IS
  *  THE PANE'S, NOT THE ROW'S, AND IT ENDS WHATEVER HAPPENS.
  *
  *  INV1 and INV2 hung the whole gesture off the originating row: its own
@@ -986,8 +980,7 @@ function stowIntent(item) {
   if (plan.ok) return { kind: 'stow', label: STOW_LABEL[remote.kind] };
   return plan.refusal?.text ? { kind: 'stow', label: null, speaks: true } : { kind: 'nope', label: null };
 }
-/** HAND-DRAG (2026-10-08, the owner: "dragging and dropping the left hand weapon to the right hand one or when empty
- *  should be possible in the inventory"): A HAND'S OWN PANEL AS A TARGET. A piece held in one hand, released on the
+/** HAND-DRAG: A HAND'S OWN PANEL AS A TARGET. A piece held in one hand, released on the
  *  other hand's panel, moves there - into the empty hand, or trading places with what that hand holds - wherever the
  *  hand law lets it (systems/equip.js canSwapHands: a shield keeps the left, a two-hander the right). A weapon carried
  *  out of the pack onto a hand's panel is put in THAT hand. Null off the hand panels. */
@@ -1032,8 +1025,7 @@ function beltIntent(item, over, source) {
   return isLanternItem(item) && item.beltLantern !== true ? { kind: 'belt', label: 'Hang at belt' } : { kind: 'nope', label: null };
 }
 function dropIntent(item, over, fromItem, source = 'local') {
-  // MAC-M2 (2026-09-16, Mac: "Hold to drag enhanced functionality
-  // doesn't work when trying to take items off your character"): A DRAG
+  // MAC-M2: A DRAG
   // THAT STARTED ON THE BODY HAS ONE DESTINATION, AND IT IS THE PACK.
   //
   // It is INV1's own law read in the other direction: the drop performs
@@ -1204,8 +1196,7 @@ function dragStop(commit) {
  *  than one Manhattan sum, and `.draglock` does NOT take the pan back
  *  for the gesture in flight - `onDragHold` does. */
 const TOUCH_HOLD_MS = 320;
-/** INV3 (2026-09-17, Mac: "Hold to drag functionality in inventory
- *  sometimes doesnt work"): AND THE AXIS THAT CANNOT SCROLL IS NOT
+/** INV3: AND THE AXIS THAT CANNOT SCROLL IS NOT
  *  EVIDENCE OF A SCROLL.
  *
  *  A1 was right about the law and wrong about the measurement. It asked
@@ -1329,8 +1320,7 @@ function dragFrom(row, item, source = 'local') {
     // from it; `x`/`y` is where the finger is NOW and the ghost arms on it.
     drag = { id: e.pointerId, item, row, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY, moved: false, want: null, touch, hold: null, source };
     if (touch) drag.hold = setTimeout(dragArm, TOUCH_HOLD_MS);
-    // MAC-R4 (2026-09-17, Mac: "Hold to drag in the enhanced inventory
-    // sometimes doesn't work properly"): A TOUCH POINTER CAPTURES THE ROW
+    // MAC-R4: A TOUCH POINTER CAPTURES THE ROW
     // IT LANDS ON, IMPLICITLY, and a captured row that a repaint detaches
     // raises `lostpointercapture` - which INV2 read as "the pointer taken
     // back" and ended the session. `render()` runs on things a hold
@@ -1399,7 +1389,7 @@ function dropOnBody(item) {
   use(item, null);
 }
 
-/** DBLEQUIP (2026-09-26, the players: "Double click to equip/unequip"): A SECOND CLICK ON THE SAME PIECE, QUICKLY, PUTS
+/** DBLEQUIP: A SECOND CLICK ON THE SAME PIECE, QUICKLY, PUTS
  *  IT ON OR TAKES IT OFF - the body's own act (dropOnBody: Wear, Take off, a light lit or put out), never a USE, so a
  *  quick finger drinks no potion; a piece nothing would wear stays two picks. One click still only picks (the worn
  *  panels' mis-click law stands: a single click never undresses). Timed by hand, as the shop's rows are
@@ -1820,8 +1810,7 @@ function take(item) {
     cb?.(taken);
     return;
   }
-  // PX28 (Mac: "when looting, there's a 2nd popup when you take
-  // something, there shouldn't be"): looting just takes - no card
+  // PX28: looting just takes - no card
   // pops over the frame you are reading. PX24/AUDIT 35 (Mac: the same
   // when looting containers, bodies, etc.): the pack-open flow used to
   // keep the TAKEN item selected in the bag, which raised the tooltip
@@ -2130,8 +2119,7 @@ function dollPanel(url) {
  *  drawn), the anatomy down the center, marks and crystals in the
  *  off-body bottom row. Keyed by label + occurrence, in worn.rows'
  *  own y-then-x order, so the first Bracer is the right-side one. */
-/** PX19e (Mac: "instead of a thousand equipment slots, a smart
- *  system with minimal slots"): ELEVEN FAMILIES, TWENTY-SEVEN SLOTS.
+/** PX19e: ELEVEN FAMILIES, TWENTY-SEVEN SLOTS.
  *  The data keeps DFU's 27 - equip.js, equippedModel and every law
  *  are untouched - but the MAP shows the reference's own count:
  *  eleven large panels, each a slot FAMILY. CHEST holds the armour
@@ -2144,13 +2132,11 @@ function dollPanel(url) {
  *  reach. The composition is the reference's: helm crowned, neck
  *  and rings on the right flank, the big chest center spanning two
  *  rows, weapons flanking low, feet grounding it. */
-/** PX19g (Mac: "stop making incremental improvements and actually
- *  look"): THE CHARACTER REGION COMPOSED. The doll is not decoration
+/** PX19g: THE CHARACTER REGION COMPOSED. The doll is not decoration
  *  slapped behind a grid - it OWNS the center column, framed, with a
  *  home whether or not its art can draw (an empty frame reads
  *  Avatar, so the composition never collapses to a pile of tiles).
- *  PX20a (Mac: "spread out and organize the center ... enlarge the
- *  paper sprite"): the doll's cell was three of five rows in the
+ *  PX20a: the doll's cell was three of five rows in the
  *  middle column - LANDSCAPE, and a paperdoll is a standing figure.
  *  HEAD and CHEST moved to the flanks, so the doll takes the WHOLE
  *  centre column, six rows tall, and the sprite is portrait at last.
@@ -2162,7 +2148,7 @@ function dollPanel(url) {
  *      Cloaks  [DOLL]   L-Hand
  *      Chest   [DOLL]   Legs
  *      Arms    [DOLL]   Feet
- *      Hands   [DOLL]   Travel      */
+ *      Hands   [DOLL]   Travel */
 /** PLUS9 (Discord, 2026-09-25 - a player's sketch over the pack): UNDER ENHANCED PLUS THREE FAMILIES SPLIT IN TWO.
  *  The families were one panel per body part, so the shirt hid under the cuirass, the trousers under the greaves and
  *  one pauldron under the other - a tap-to-cycle away, and a player cannot see at a glance what they are wearing.
@@ -2175,7 +2161,7 @@ function dollPanel(url) {
  *  panel and a tap-to-cycle, and Hands hid four jewellery slots under the gloves. Under Plus the twelve accessory
  *  slots stand in a row of labelled pairs under the doll (accessoryShelf), where the Mount / Cart strip was - and
  *  Mount | Cart moves up into the grid as one split cell, in a place the three accessory panels left. The grid is
- *  five rows, not six, so every panel is taller. PLUS-DEAD (2026-09-26): the one table, since plain Enhanced went. */
+ *  five rows, not six, so every panel is taller. PLUS-DEAD: the one table, since plain Enhanced went. */
 const WORN_FAMILIES = Object.freeze([
   { id: 'head', label: 'Head', area: '1 / 1', slots: ['Head'] },
   { id: 'cloaks', label: 'Cloaks', area: '2 / 1', slots: ['Cloak'] },
@@ -2199,16 +2185,14 @@ const WORN_FAMILIES = Object.freeze([
 const SHELF_GROUPS = Object.freeze([
   { label: 'Amulets', slot: 'Amulet' }, { label: 'Rings', slot: 'Ring' }, { label: 'Bracelets', slot: 'Bracelet' },
   { label: 'Bracers', slot: 'Bracer' }, { label: 'Marks', slot: 'Mark' }, { label: 'Crystals', slot: 'Crystal' },
-  // BELT-LANTERN (Dudey: "an lantern only slot ... in the row for enhanced plus and ... in dfo grimoire in the middle under
-  // crystals"): one socket, a lantern hung at the belt (systems/beltLantern.js) - after the Crystals in Plus's row, under
+  // BELT-LANTERN: one socket, a lantern hung at the belt (systems/beltLantern.js) - after the Crystals in Plus's row, under
   // them in the Grimoire's column (the same shelf, each dress's own flow)
   { label: 'Lantern', lantern: true },
   { label: 'Other', slot: 'Unnamed', hiddenEmpty: true },
 ]);
 const DOLL_AREA = '1 / 2 / span 5 / auto';
 function equippedList() {
-  // PX20c (Mac: "move the name outside of the space and to the top
-  // bar, remove the slots filled subtext... utilize the entire area").
+  // PX20c.
   // PX19h put the character's NAME over the map as a plate, and PX19g
   // put a count under it; between them they took ~50px off the top of
   // the region for two things that are not the region. The name is a
@@ -2360,8 +2344,7 @@ function wornPanel(fam, byLabel, area) {
   // none); a bare panel is a hood down. "Cloaks · hood up" beside the family word was wider than a panel's text line
   // (72px on the desk), and a "Hood down" plate covered the word on a 360px phone.
   if (hoodUp(top.item)) b.append(el('span', 'wornhood', 'Hood'));
-  // MAC-M2 (Mac: "hold to drag ... doesn't work when trying to take
-  // items off your character"): A FILLED PANEL DRAGS, on the same hold
+  // MAC-M2: A FILLED PANEL DRAGS, on the same hold
   // and the same threshold a pack row takes. INV1 attached `dragFrom`
   // to the LIST's rows alone and made the body a drop TARGET, so the
   // gesture only ever ran one way: a press on the doll started no
@@ -2406,8 +2389,7 @@ function wornPanel(fam, byLabel, area) {
   return b;
 }
 
-/** PX21a (Mac: "we need to find a way to fit in the mounts/wagon in
- *  the inventory"). A horse and a cart are ItemGroups.Transportation,
+/** PX21a. A horse and a cart are ItemGroups.Transportation,
  *  and filterByTab has no arm for them - they fall through into the
  *  fourth tab with the shirts, which is DFU's own behaviour and is why
  *  a player who buys a horse cannot find it. They are not WORN and not
@@ -2647,8 +2629,7 @@ function placeBeside(node, anchor, x, y) {
   if (top + r.height > vh - 8) top = vh - r.height - 8;
   node.style.left = `${Math.max(8, left)}px`; node.style.top = `${Math.max(8, top)}px`;
 }
-/** CARD-FIT (2026-09-28, Discord - Cruor: "New sigil items descriptor is a bit long! ... all the buttons on it's pop-up
- *  card are.. off the screen, because it's got a bit much on it!"): THE CARD FITS ITS WINDOW. A set piece's card stood
+/** CARD-FIT: THE CARD FITS ITS WINDOW. A set piece's card stood
  *  1,000 px tall in the pack's 660 px window, placed from the window's top, and every button under its foot was below
  *  the screen - at 1920x1080 as at a phone (tools/cardFitProbe.mjs, before). Its height is capped at `room` (the
  *  window's, or a phone sheet's share of the screen); it sheds what a glance can spare a step at a time (CARD_FITS -
@@ -2696,7 +2677,7 @@ function showTip(item, from, row) {
   placeBeside(tipEl, row);
   tipRow = row;
 }
-/** SHOP-HOVER (2026-10-08, the owner: "hovering over items in all shops shows the same it does in your inventory"): THE
+/** SHOP-HOVER: THE
  *  PACK'S HOVER CARD for a window that is not the pack - the shop counter's both lists. `ctx` is that window's own
  *  `{ entity, getQuest }`, held for the card's build (and its late picture's) and never left behind; `side` 'local' for
  *  the player's own piece (it says Worn), 'shop' for the shelf's. The same card, the same comparison against what is worn. */
@@ -2716,8 +2697,7 @@ export function showItemHover(item, ctx, row, side = 'shop', { asked = false } =
   document.body.append(tipEl);
   fitTip(tipEl);
   placeBeside(tipEl, row);
-  // SHOP-SIDES (2026-10-08, the owner: "tooltip of hovering on item in your inventory should be on the left side of shop
-  // window and what the shop has on the right"): the card stands OUTSIDE the window - the player's own piece to its left,
+  // SHOP-SIDES: the card stands OUTSIDE the window - the player's own piece to its left,
   // the shelf's to its right - never over either list. A screen too narrow for the side it wants takes the other, then
   // the old place beside the row.
   const win = row.closest?.('.trade-win, .px-win');
@@ -2760,14 +2740,13 @@ function openMenu(item, from, x, y) {
   placeBeside(menuEl, null, x, y);
   const away = (e) => { if (!menuEl?.contains(e.target)) closeMenu(); };
   const key = (e) => { if (e.key === 'Escape') { e.stopPropagation(); closeMenu(); } };
-  // MEM-AUDIT (2026-10-23): the listeners are THIS menu's, as the dismantle's question's are (AUDIT SS) - a second menu
+  // MEM-AUDIT: the listeners are THIS menu's, as the dismantle's question's are (AUDIT SS) - a second menu
   // opened before the first's timer ran laid the first's pair, which nothing could remove, and its key ate every Escape
   const timer = setTimeout(() => { if (!menuEl) return; document.addEventListener('pointerdown', away, true); document.addEventListener('keydown', key, true); }, 0);
   menuOff = () => { clearTimeout(timer); document.removeEventListener('pointerdown', away, true); document.removeEventListener('keydown', key, true); };
 }
 
-/** RARITY-UI + SIGIL-UI (2026-09-26, Mac: "Rarity needs to be more noticable in the UI with the icon borders being
- *  color coded"; "sigil weapons need a visible indicator"): what an item's FRAME wears - its tier (the sheet colours
+/** RARITY-UI + SIGIL-UI: what an item's FRAME wears - its tier (the sheet colours
  *  the icon's border and sets the tier's pips by it; Common wears nothing) and, for a weapon that carries a sigil,
  *  the rune in the tile's corner. One helper for every place this pack draws an item (the pack's rows, the loot
  *  list, the worn panels, the shelf's sockets), so no frame can forget one of the two. */
@@ -2783,8 +2762,7 @@ export function markItemFrame(node, item) {
   return node;
 }
 
-/** WEAR-UI (2026-09-26, the players: "can you give us durability bars inside the inventory also? same way they are
- *  visible on hotbar, so we dont need to mouse-over that much, especially us loot goblins"): THE HOTBAR'S WEAR BAR ON
+/** WEAR-UI: THE HOTBAR'S WEAR BAR ON
  *  EVERY PICTURE OF A PIECE THAT WEARS - the pack's tiles, the loot window's rows, the worn panels and sockets, the
  *  shop's shelf. The pieces are the ones use wears down: a weapon, armour (a shield is armour) and a light, whose
  *  condition is what is left to burn - the hotbar's own two kinds and the armour beside them. Never ammunition (an
@@ -2878,7 +2856,7 @@ function itemRow(item, from = 'local') {
     // BATCH-SALVAGE: while the pack chooses, a pack row's press ticks it or takes the tick off - ahead of Shift, the
     // double click's wear and the pick, so no press of the choosing wears, stows or drops a piece
     if (choosing) { chooseSalvage(item); return; }
-    // SHIFT-STOW (2026-10-04, Mac: "shift click to deposit items (like materials) needs to be a thing"): Shift on a pack
+    // SHIFT-STOW: Shift on a pack
     // row puts the WHOLE stack into the player's own store showing beside it - the wagon, their storage, the bag - in one
     // press, through the same ladder as the card's Stow (stow: the lock, the bound law, the bag's materials-only, the
     // 750 kg, the companion's back). Ahead of the double click, so a quick second deposit never wears the piece; the
@@ -2904,9 +2882,7 @@ function itemRow(item, from = 'local') {
     // which is why this sits behind `from === 'remote'` rather than in
     // the pick itself.
     if (from === 'remote') sendQuestItemClick(item, deps.getQuest ?? null);
-    // IG7 (Mac: "opening a container or body and clicking to loot an
-    // item - the item isn't picked up properly and the tooltip
-    // remains"): a LOOT-SIDE click TAKES, immediately. DFU's remote
+    // IG7: a LOOT-SIDE click TAKES, immediately. DFU's remote
     // list transfers on the click itself
     // (DaggerfallInventoryWindow.RemoteItemListScroller_OnItemClick's
     // remove arm); this skin's pick-then-Take card made the first
@@ -2989,7 +2965,7 @@ function fateCol() {
     el,
     trophyTile: (row, item) => {
       markItemFrame(row, item); row.append(tileWithWear(itemLine(item, deps.entity), row, SLOT_BOX.loot));
-      // AUDIT (2026-10-02): its card on the hover, as a looted weapon's - its powers read before the choice, not after
+      // AUDIT: its card on the hover, as a looted weapon's - its powers read before the choice, not after
       row.onmouseenter = () => { if (getPref('plusItemHover') !== false) showTip(item, 'remote', row); };
       row.onmouseleave = hideTip;
     },
@@ -3055,8 +3031,7 @@ function remoteCol() {
     };
     acts.append(fromVault);
   }
-  // MAC-M2 B (2026-09-16, Mac: "Remove the gold and pack buttons from
-  // the looting menu"): THE LOOT WINDOW IS FOR TAKING, and its bar
+  // MAC-M2 B: THE LOOT WINDOW IS FOR TAKING, and its bar
   // carries the wagon and nothing else.
   //
   // Neither button is DFU's in this frame. DFU has ONE parchment, so its
@@ -3073,8 +3048,7 @@ function remoteCol() {
   // and opens it, with the gold button and its field on the pack's own
   // footer (AUDIT GOLD-DROP 4: GOLD-DROP's move, below).
   //
-  // GOLD-DROP (2026-09-26, a player: "Can't drop gold at all", "Cant put
-  // gold in containers"): AND THE GOLD BUTTON LIVES ON THE PACK NOW, where
+  // GOLD-DROP: AND THE GOLD BUTTON LIVES ON THE PACK NOW, where
   // DFU keeps it (the player's own panel, :47). Here it only ever rode
   // this bar, and this frame is built for the ground only once something
   // lies on it (PX19c) - so a pack opened on F6 over bare ground had no
@@ -3086,8 +3060,7 @@ function remoteCol() {
   // reward tray, for the same reason (render says it).
   head.append(acts);
   col.append(head);
-  // PX21e (Mac: "in the tooltip for looting, it makes you scroll which
-  // should not be a thing at all"): THE LIST IS ITS OWN BOX. The rows
+  // PX21e: THE LIST IS ITS OWN BOX. The rows
   // sat directly in the column beside the head and the WHOLE WINDOW
   // carried overflow-y - so a pile past the cap scrolled the title and
   // the buttons away with it, which is the part that reads as broken.
@@ -3142,7 +3115,7 @@ function fillRemoteList(list, filtering = STORE_FILTER_KINDS.has(remote.kind) &&
 }
 
 /**
- * WAGON-FILTER (2026-10-04, Mac: "The wagon needs a filter option"): the search and the category menu over the
+ * WAGON-FILTER: the search and the category menu over the
  * player's own store, in ONE row (AUDIT WAGON-FILTER C1 - the store's list is what the frame is for). Both refill the
  * rows in place: the field is never rebuilt under the caret, the menu keeps its focus, and a card open on a pack item
  * stays open. Back in the field clears it, then leaves it.
@@ -3288,8 +3261,7 @@ function listCol() {
 // that behaviour written deliberately - the detail rises when an item
 // is picked and closes back down - rather than borrowed by accident.
 /**
- * QS2 - THE SLOT BUTTONS (2026-09-17, Mac: consumables are assigned "in the
- * enhanced menu through the tooltip to slot 1/2").
+ * QS2 - THE SLOT BUTTONS.
  *
  * The KIND decides which buttons exist, and the model decides what a kind is:
  * `isQuickConsumable` (a potion or a drug - the two arms of `useItem` that
@@ -3339,8 +3311,7 @@ function quickslotActs(item) {
   return [];
 }
 
-/** TRADE-INFO (2026-09-27, Discord - Tabitha: "Show enchantment stats in the inventory and trade - Enhanced+ doesn't
- *  show enchants"): WHAT AN ITEM'S MAGIC IS, in words - the tier with its affixes and enchantments (lootRarity
+/** TRADE-INFO: WHAT AN ITEM'S MAGIC IS, in words - the tier with its affixes and enchantments (lootRarity
  *  rarityLines, which names a rolled item's), and for an enchanted item the tier list does not name - DFU's own magic
  *  items and the item maker's carry no `rarity`, and with the tiers off it names none - DFU's Info box powers (itemPowers magicPowersLines, the classic
  *  popup's own words; "powers unknown" until it is identified). The card and the trade window read this one list. */
@@ -3381,7 +3352,7 @@ export function itemChatLabel(item, d = deps) {
   return line.stack ? `${name} x${line.stack}` : name;
 }
 
-/** CHAT-POST (2026-09-27, Discord - Tabitha: "Link in chat / Post in chat"; "random magic items' details in chat"):
+/** CHAT-POST:
  *  AN ITEM AS ONE CHAT LINE - its label in brackets (itemChatLabel). The record rides beside the words on the wire
  *  (net/wire.js validChatItem); a client that hears it draws a coloured [Name] and the pack's hover card. The brief
  *  stats stay in the text for an older relay that drops the record, cut at a whole word to CHAT_MAX. */
@@ -3400,7 +3371,7 @@ export function itemChatText(item, d = deps) {
   return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), label.length + 2)).replace(/[\s·]+$/, '')}...`;
 }
 
-/** GEM3 (bible/06-Systems/Gem-Sockets.md section 5): WHO SETS A GEM - the player, as the presses read them (the pack
+/** GEM3: WHO SETS A GEM - the player, as the presses read them (the pack
  *  and the entity whose fold a worn piece's gem moves). */
 const gemWho = () => (deps.entity && Array.isArray(deps.entity.items) ? deps.entity : { items: deps.items?.() ?? [] });
 /** The pack's loose gems as the chooser lists them - `{ id, count }`, DFU's eight then the graded, the held alone. */
@@ -3591,7 +3562,7 @@ function itemActs(picked, side, { qty = true } = {}) {
       const max = (picked.stackCount ?? 1) > 1 ? splitMax(picked, 'store') : 0;
       if (qty && max > 1) acts.append(qtyField(picked, max));   // DISC25-F
     }
-    // WILD-INSURE (2026-10-26, net/wild/wildInsureBook.js): a policy on this piece, written from its own card - online, for a
+    // WILD-INSURE: a policy on this piece, written from its own card - online, for a
     // piece the realm tracks and a kill in the zone could take; pressed inside the zone, the book says why not
     const ins = wildInsureBook();
     if (ins?.offers(picked)) {
@@ -3616,7 +3587,7 @@ function itemActs(picked, side, { qty = true } = {}) {
   // appeared only for items this screen believed were usable would be
   // this screen making a judgement the law already makes. DFU offers
   // it on the REMOTE list too (:2048-2051), so this pane does.
-  // Mac (2026-09-18): ...WAS. "Same for use for non-usables" - the law's own predicate (useItem.js usableItem)
+  // Mac: ...WAS. "Same for use for non-usables" - the law's own predicate (useItem.js usableItem)
   // says which items an arm would do something with; a sword or a gem gets no Use button.
   // HOOD-SAID (FIELD BUGS 2026-09-30, "Vampire hood on cloaks dont show hood is up or down"): A WORN CLOAK OR ROBE
   // RAISES AND LOWERS ITS HOOD - the light's Light / Douse, for a hood. Use stood here for it and was NextVariant, a
@@ -3655,7 +3626,7 @@ function itemActs(picked, side, { qty = true } = {}) {
   // ghost from the moment it was made. The remote side gets none; take it
   // first, then slot it.
   if (side === 'local') for (const b of quickslotActs(picked)) acts.append(b);
-  // GEM3 (bible/06-Systems/Gem-Sockets.md section 3): A LOOSE GEM'S "SET IN..." - pressed, the pieces with an empty socket,
+  // GEM3: A LOOSE GEM'S "SET IN..." - pressed, the pieces with an empty socket,
   // a press each that sets the gem in the first empty one (systems/reforge.js setGemPiece); the card stays up
   if (side === 'local' && lootRarityOn() && gemKindOf(picked) && !picked.questItem && gemHomes().length) {   // AUDIT GEM: law 3 - with the ladder off there is no setting to offer
     const open = gemTargets === picked;
@@ -3685,14 +3656,14 @@ function itemActs(picked, side, { qty = true } = {}) {
     k.onclick = () => { toggleLocked(picked); lockLiftsJunk(picked); notice = null; render(); };   // LOOT18: locked, its junk mark lifted
     acts.append(k);
   }
-  // LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): JUNK, beside the lock - gear in the pack, not
+  // LOOT18 (the Loot arc II): JUNK, beside the lock - gear in the pack, not
   // worn; a shop's Sell junk puts every such piece on its counter, and quick loot's take-all leaves one where it lies
   if (side === 'local' && !line.equipped && junkable(picked)) {
     const j = el('button', 'act', isJunk(picked) ? 'Not junk' : 'Junk');
     j.onclick = () => { toggleJunk(picked); notice = null; render(); };
     acts.append(j);
   }
-  // SS5 (Mac: "The ability to dismantle in the inventory and recieve back sigil stones", the Broker's wares alone): a
+  // SS5 (, the Broker's wares alone): a
   // ware in the pack is DISMANTLED for a share of its price (systems/sigil/sigilBroker.js), asked first - it is gone for good.
   // A worn one is taken off first (its primary act, beside this); a locked one says why when pressed, as its Drop does.
   if (side === 'local' && !line.equipped && dismantleStones(picked) > 0) {
@@ -3735,7 +3706,7 @@ export function itemInfoBoxes(item, d = deps) {
   const rows = d?.rows;
   if (!rows) return [[{ text: 'No item description available.', center: true }]];
   const boxes = [itemInfoRows(item, rows, { name: questLetterName(item, d.getQuest ?? null) })];
-  { const look = lookLine(item); if (look) boxes.push([{ text: look, center: true }]); }   // APPEARANCES: a look worn over it said - the pack's picture is the piece's own (bible/04-Characters/Wardrobe.md)
+  { const look = lookLine(item); if (look) boxes.push([{ text: look, center: true }]); }     // APPEARANCES: a look worn over it said - the pack's picture is the piece's own
   if (isPotionRecipe(item)) {
     const names = potionRecipeIngredientNames(item) ?? [];
     if (names.length) boxes.push(names.map((text) => ({ text, center: true })));
@@ -3860,7 +3831,7 @@ function askSalvage(item) {
   const laid = setTimeout(() => { document.addEventListener('pointerdown', outside, true); document.addEventListener('keydown', keys, true); }, 0);
   dismantleOff = () => { clearTimeout(laid); document.removeEventListener('pointerdown', outside, true); document.removeEventListener('keydown', keys, true); };
 }
-/** BATCH-SALVAGE (2026-10-19, the owner: "We need to add the ability to batch salvage in the inventory"): THE PACK
+/** BATCH-SALVAGE: THE PACK
  *  CHOOSES WHAT TO BREAK. The header's button puts a tick on every pack row's press instead of its card; the foot under
  *  the list counts the pieces chosen and their shards, sweeps in every Magic, Rare or junk piece that would break (never
  *  a Legendary - each one is chosen by hand), and its Salvage asks once for them all (the one question's slot, the single
@@ -4131,10 +4102,9 @@ function walletSheet(w) {
   }
   return box;
 }
-/** WALLET-WEIGHT (2026-10-19, from play: "Are these supposed to be weighing us down even in the wallet? ... it might be
- *  prudent to list the total weight of the wallet up top as the wallet's weight"): the weight a pack row and a card say
+/** WALLET-WEIGHT: the weight a pack row and a card say
  *  for a piece - the wallet's is its own (none) and what it holds, the pieces that left the pages for its sheet still
- *  weighing what they always did (bible/06-Systems/Wallet.md WALLET-WEIGHT). The carry weight counts each piece once,
+ *  weighing what they always did (WALLET-WEIGHT). The carry weight counts each piece once,
  *  where it lies; this is the saying alone. */
 const shownKg = (item, line) => line.weight + (model?.wallet && item === model.wallet.item ? model.wallet.weight : 0);
 /** WALLET1: a held piece's way back to the wallet's sheet. */
@@ -4251,12 +4221,12 @@ function render() {
     dropLists();   // VIRT: the old DOM's windows and waiting tiles go with it
     _tiles.clear();
     host.innerHTML = '';
-    // PX16b (Mac: "really study the reference"): the reference's
+    // PX16b: the reference's
     // ground is THE GAME - two translucent columns on the left third,
     // the world showing through the right. So no sky here: the paused
     // frame is the ground (the pause door's law, one window over) and
     // every column carries its own scrim.
-    // PX19k (Mac: "why does the UI refresh every time you click"):
+    // PX19k:
     // every click re-renders the window - that is the one-way render
     // law and it is fine - but the ENTRANCE was keyed inside render,
     // so the 220ms fade + rise + depth-of-field REPLAYED on every
@@ -4337,7 +4307,7 @@ function render() {
     // it. The PAIR LAW survives the furniture: same remoteModel, same
     // remoteCol, same take/stow arms - only the wall between them
     // moved.
-    // PX19f (Mac: "you are ignoring the entire UI panel"): THE WHOLE
+    // PX19f: THE WHOLE
     // ANATOMY, not one organ. The reference's skeleton adopted:
     // CHARACTER REGION LEFT (the worn families with the doll - the
     // big area), DETAILS RIGHT (the plaque column, where the concept
@@ -4495,14 +4465,14 @@ function render() {
       if (e.target.closest('.packtip') || e.target.closest('button, input, .goldfield')) return;
       picked = null; goldEntry = null; render();
     });
-    // CART-FIT (2026-09-27, Discord: "My resolution is 1366 x 768 ... I still can't see all the items"): the pack and a
+    // CART-FIT: the pack and a
     // side window beside it (the wagon, the player's own storage) share ONE viewport - each was clamped to it alone,
     // so side by side they wanted 1738 px and the side window ran off the right edge (enhancedStyle.js .paired)
     if (packOpen && loot) shell.classList.add('paired');
     if (packOpen) shell.append(win);
     if (loot) shell.append(loot);
     host.append(shell);
-    // OT1 (Mac: "tapping outside of any UI closes the UI"): a tap on the
+    // OT1: a tap on the
     // ground beside the pack and the loot column closes the pack - the
     // same exit the Close button takes, so the close law (the drop, the
     // equip cue) runs as it always does.
@@ -4533,10 +4503,7 @@ function restoreStoreFilterFocus(kept) {
 // ── THE KEYBOARD ─────────────────────────────────────────────────
 // ESCAPE AND THE INVENTORY KEY, the two the classic window closes on.
 //
-// MAC-C (2026-09-17, Mac: "you can exit out of the F6 menu (inventory)
-// by pressing F6 again, but you cannot do the same for the F5 one
-// (char sheet)" + "it would be extra cool if you could like, be on the
-// F5 page, press F6 and then go straight from char sheet to inv.").
+// MAC-C.
 //
 // This line used to read `e.key !== 'F6'` - the DFU DEFAULT spelled as
 // a literal, which is I2's and FIX-F's bug twice over: a player who
@@ -4599,8 +4566,7 @@ function onKey(e) {
     e.preventDefault();
     e.stopPropagation();
     if (e.repeat) return;   // AUDIT KB1: a held key's repeat is swallowed, not an open-shut flicker
-    // JAN1 (2026-09-18, Janome: "got this while toggling between F5 and F6 menus" - CRASH `openCharSheet is not a
-    // function`): THE HOOK IS READ BEFORE ANYTHING CLOSES - the file's own law at the close arm above - because
+    // JAN1: THE HOOK IS READ BEFORE ANYTHING CLOSES - the file's own law at the close arm above - because
     // `onExit` unmounts, and the unmount clears `deps` to `{}` before this line ran on it.
     const openCharSheet = deps.openCharSheet;
     onExit();                 // the pack's own close law runs FIRST...
@@ -4622,8 +4588,7 @@ function releaseLock() {
 export function mountEnhancedInventory(hostEl, d = {}) {
   injectEnhancedStyle();
   injectEnhancedFonts();
-  // JAN2 (2026-09-21, a player's CRASH "can't access property
-  // querySelector, l is null"): this module is ONE pane - `host`,
+  // JAN2: this module is ONE pane - `host`,
   // `deps` and the view state are singletons - and the door mounts a
   // fresh element on every push. A second mount over a live one left
   // the first pane ORPHANED on screen, still clickable, and the newer
@@ -4652,7 +4617,7 @@ export function mountEnhancedInventory(hostEl, d = {}) {
   storeFilter = freshStoreFilter();   // WAGON-FILTER
   // PX20b: a LOOT target opens its own frame alone; every other way in
   // (F6, the world's inventory door) opens the pack as it always did.
-  // SHIP-STORE (2026-09-26, Mac: "No ui to put items in storage on boat - problem for enhanced and enhanced +"):
+  // SHIP-STORE:
   // ...and so does the player's OWN STORAGE - the ship's chest, an owned house's cupboards, a placed storage piece
   // (`loot.storage`, the host's word). MAC-M2 B made a loot session take-only ("the loot window is for taking") and
   // left the pack no way back, which is right for a body or a stranger's shelf - and made every storage the player

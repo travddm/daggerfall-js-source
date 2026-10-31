@@ -1,7 +1,5 @@
 // @ts-check
-// DISC21-A (2026-09-24, Satranath on Discord: "Started a new character this morning with an ebony dagger. when I try
-// to equip it, it says it's broken and cannot be worn. tried to get an NPC to repair it and they say it isn't
-// damaged") - A WEARABLE THAT NEVER HAD ITS CONDITION MINTED, MINTED ON LOAD.
+// DISC21-A - A WEARABLE THAT NEVER HAD ITS CONDITION MINTED, MINTED ON LOAD.
 //
 // THE BUG (systems/biography.js mintItem, fixed there): the biography questions' IT items were built by hand with no
 // condition at all, where DFU's CreateWeapon / CreateArmor / `new DaggerfallUnityItem` mint it. Roleplay & Realism's
@@ -17,7 +15,7 @@
 //  - anything else, whole.
 // Idempotent: a minted item is never touched again.
 //
-// WEAPON-POOL (2026-10-06, Mac: "keep the material disparity, but unify all the weapons types condition stat") - A
+// WEAPON-POOL - A
 // WEAPON MINTED ON ITS ROW'S POOL, MOVED TO THE ONE POOL ON LOAD. Every weapon type wears from one pool now
 // (characters/weapons.js WEAPON_CONDITION_POOL), and a piece carried in a save was minted on its row's: an iron dagger
 // at 50, a long bow at 100. THE FINGERPRINT is the old mint's own number - a row's hitPoints through the material

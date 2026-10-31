@@ -63,8 +63,7 @@ export const setMusicMuted = (v) => { musicMuted = Boolean(v); };
 
 export const musicGain = () => (musicMuted ? 0 : MUSIC_GAIN * getFloat('Controls', 'MusicVolume', 0, 1));
 
-/** DISC20-B (2026-09-24, Mac: "Sometimes when music tracks switch, its very abrupt instead of seamlessly fading in
- *  between tracks"): THE FADER - a gain between a player's song and its master that only the transitions write. The
+/** DISC20-B: THE FADER - a gain between a player's song and its master that only the transitions write. The
  *  master is the VOLUME (MusicVolume and the video mute), with three writers that would each undo a ramp (see above);
  *  the fader is the fade alone, so neither cancels the other. A ramp starts from wherever the fader stands, so a fade
  *  turned round half way turns round where it is; a zero length sets it at once. */
@@ -77,21 +76,21 @@ export function rampFader(ctx, fader, level, seconds) {
   g.linearRampToValueAtTime(level, now + seconds);
 }
 
-/** THE SETTING ALONE, no synth trim (2026-08-27, Mac: "fix it also").
+/** THE SETTING ALONE, no synth trim.
  *  MUSIC_GAIN exists because the FM bank's raw oscillators sum hot and
  *  the classic songs are mixed under it; a REPLACEMENT is a mastered
  *  file with its own headroom, and under the trim a user's music pack
  *  played at a fifth of itself (0.22 x the 0.5 default). */
 export const trackGain = () => (musicMuted ? 0 : getFloat('Controls', 'MusicVolume', 0, 1));
 
-/** WBX9 (2026-09-26, Mac: "The music needs to be louder and more intense"): A SONG'S OWN LEVEL - a song may carry
+/** WBX9: A SONG'S OWN LEVEL - a song may carry
  *  `level`, how far over the player's own it is played (systems/gate/gateScore.js: the boss fight's score, over the dungeon
  *  tracks it stands in for). One gain between the channels and the fader, set as the song starts; every song MIDI.BSA
  *  holds carries none and plays at exactly 1, as it always has. Clamped to (0, SONG_LEVEL_MAX]. Pure. */
 export const SONG_LEVEL_MAX = 4;
 export const songLevel = (song) => (Number.isFinite(song?.level) && song.level > 0 ? Math.min(SONG_LEVEL_MAX, song.level) : 1);
 
-/** WB10a (2026-09-30, Mac: "make it more loud, just feel like its too quite"): A SONG'S OWN PRESS - a song may carry
+/** WB10a: A SONG'S OWN PRESS - a song may carry
  *  `press`, a compressor it is played through, and how far its output is carried after it (`out`). The level alone
  *  had gone as far as it could: WBX9's score stood a decibel under the clip at the highest MusicVolume, its drums'
  *  peaks 15 dB over its body, so a louder song had to be a PRESSED one - its peaks held down and the whole of it raised
@@ -120,8 +119,7 @@ export function songPress(song) {
   if (!(out.out > 0)) out.out = PRESS_RANGE.out[2];
   return out;
 }
-/** EG-ROAR (2026-10-18, Mac: "the music and ambience of the elite breach needs to be insanely better. Its way too
- *  tame"): A SONG'S OWN VOICES - a made song may carry `voices`, its channels' instruments past the FM bank's one
+/** EG-ROAR: A SONG'S OWN VOICES - a made song may carry `voices`, its channels' instruments past the FM bank's one
  *  oscillator pair a note (gmSynth.js fmSpec's fields, each held to its range, over the program's own), and `kit`, its
  *  drums past percussionSpec's one sine or band of noise a hit. A voice may be a UNISON (`unison` copies, `cents` apart
  *  either side of the note - an ensemble, where one pair is one player) with a SUB (`sub`, a sine an octave under at that
@@ -240,7 +238,7 @@ export const LOOP_LEAD_SECONDS = 0.02;
  * landed exactly on a window boundary, which at 480 PPQN is every beat.
  */
 export function eventsInWindow(events, fromTick, toTick) {
-  // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): the window's first event found by
+  // OW-HITCH: the window's first event found by
   // halving - the events are tick-ordered - where every pump walked the song from its first event (a long cue late in
   // its play: thousands of events a pump, a pump every few frames, in the real game's journey profile). The same events.
   let lo = 0, hi = events.length;
@@ -274,7 +272,7 @@ export function applyChannelEvents(state, events) {
 /**
  * CC64 SUSTAIN PEDAL - the per-channel intervals the pedal is DOWN.
  *
- * AUDIT (2026-08-25): 593 pedal events across the archive were being
+ * AUDIT: 593 pedal events across the archive were being
  * dropped, so every note released on its own duration and nothing ever
  * rang on. It is the only ignored controller that changes what you
  * hear: CC123/CC121 matter to a MIDI device that must be told to stop,
@@ -470,7 +468,7 @@ export class SongPlayer {
   /** DISC20-B: ramp the fader to `level` over `seconds` (see rampFader). */
   fadeTo(level, seconds) { rampFader(this.ctx, this._fader, level, seconds); }
 
-  /** The MusicVolume setting moved (2026-08-27): follow it now, not at
+  /** The MusicVolume setting moved: follow it now, not at
    *  the next song. A short ramp, so a slider drag is not a zipper. */
   resyncGain() {
     if (!this._master) return;
@@ -757,7 +755,7 @@ export class SongPlayer {
       ? [this._connect(sides[0], Math.max(-1, (ch.pan ?? 0) - own.spread), e.channel), this._connect(sides[1], Math.min(1, (ch.pan ?? 0) + own.spread), e.channel)]
       : [this._connect(gain, ch.pan, e.channel)];
     for (const o of oscs) o.stop(end + 0.02);
-    // INTRO3d (2026-10-24, the owner: "Intro music is broken"): A FINISHED NOTE LETS GO. Chromium does not disable a
+    // INTRO3d: A FINISHED NOTE LETS GO. Chromium does not disable a
     // chain whose nodes take more than one input (a bow's low-pass a side, the bite into both), so every finished
     // INTRO3c note stayed on its channel and was pulled every quantum - 440 dead filters and 520 dead panners by 40 s,
     // the theme 6 s behind its film. Its outputs leave the channel and the shared sines leave it as it ends.
@@ -771,7 +769,7 @@ export class SongPlayer {
     });
   }
 
-  /** INTRO3c (2026-10-24, the owner: "I dont like the high pitch whine ... Its not natural"): THE VIBRATO - a sine at the
+  /** INTRO3c: THE VIBRATO - a sine at the
    *  voice's `vibRate` (5.5 Hz unnamed), `vibrato` cents deep, summed into the pair's detune (the carrier's and the
    *  modulator's, so the spectrum moves whole; a bowed copy's one sawtooth); copy `u` of `n` runs 6% faster a step than the one before it, so an
    *  ensemble's vibratos drift in and out of each other as players' do; the depth sets in from nothing over the attack
@@ -1035,7 +1033,7 @@ export class SongPlayer {
  * volume and one "is something playing" answer. That sharing is the
  * part worth keeping, and it is why this lives beside SongPlayer
  * rather than in the replacement module. THE LEVEL LAW SPLIT ON
- * 2026-08-27 (Mac: "fix it also"): MUSIC_GAIN is the FM bank's trim -
+ * 2026-08-27: MUSIC_GAIN is the FM bank's trim -
  * raw oscillators sum hot - and a user's replacement is a MASTERED file
  * with its own headroom, so it played at a fifth of itself under the
  * trim. This player reads `trackGain()` now - Controls/MusicVolume

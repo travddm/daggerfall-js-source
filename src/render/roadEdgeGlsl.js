@@ -1,5 +1,5 @@
 // @ts-check
-// ROAD-LOOK (2026-10-27, KPbICA through the owner: "Texture blending for road tiles and surroundings") - A ROAD'S EDGE
+// ROAD-LOOK - A ROAD'S EDGE
 // BLENDS INTO ITS GROUND, in both terrain programs (renderer.js TERRAIN_FS and the lane's EL_TERRAIN_FS), right after
 // the fragment's own tile is sampled. world/road/roadEdge.js is the law and the reason; this is its twin in GLSL, term
 // for term - the same hash, the same lattice, the same dials (read from ROAD_EDGE, never restated) - and

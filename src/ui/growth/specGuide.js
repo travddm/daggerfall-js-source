@@ -1,6 +1,5 @@
 // @ts-check
-// GROWTH2 (2026-10-17, the owner: "properly give the specialization its own UI for ease of player use and proper
-// descriptions instead of keeping players guessing"; bible/10-UI/Growth.md section 5) - THE SPECIALISATIONS GUIDE, the
+// GROWTH2 - THE SPECIALISATIONS GUIDE, the
 // Growth tab's page (ui/growth/growthTab.js). Every path of both families - the arcane (systems/arcanePaths.js, a pair of
 // the six schools) and the martial (systems/martialPaths.js, a pair of the six weapon skills) - with what opens it,
 // measured on this character (each skill's value, mastered or not, its career group's slots), what it does (its passive,

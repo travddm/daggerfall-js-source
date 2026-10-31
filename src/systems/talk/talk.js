@@ -28,7 +28,7 @@ import { SOCIAL_GROUP_COUNT, FACTION_TYPES, SOCIAL_GROUPS, GUILD_GROUPS } from '
 import { racialSuppressCrime } from '../lycanthropy.js';   // V4: SuppressCrime's inline gate (court.js imports this module)
 import { CRIMES } from '../crimes.js';   // GUARD1: the enum's leaf home - reachable from BOTH sides of the court/talk cycle
 import { tallyCrimeGuildRequirements } from '../crimeGuilds.js';   // CG2: a leaf, so this module can reach it
-import { dressTempleBonus } from '../clothingStanding.js';   // DRESS1 (2026-09-30, Discord): the temple half of the clothing reaction, a leaf
+import { dressTempleBonus } from '../clothingStanding.js';     // DRESS1: the temple half of the clothing reaction, a leaf
 import { calculatePickpocketingChance, dice100 } from '../../combat/formulas.js';
 import { skillValue, tallySkill, SKILLS } from '../skills.js';
 import { addGoldPieces } from '../inventory.js';   // E4: the pinched purse lands in the counter
@@ -300,7 +300,7 @@ export function getReactionToPlayer(faction, player) {
   const sgroup = faction.sgroup;
   if (sgroup >= 0 && sgroup < player.reactionMods.length) reaction += player.reactionMods[sgroup];
   if (sgroup >= 0 && sgroup < player.sGroupReputations.length) reaction += player.sGroupReputations[sgroup];
-  reaction += dressTempleBonus(faction, player);   // DRESS1 (2026-09-30, Discord "temple-specific robes with a positive buff for that temple faction"): a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
+  reaction += dressTempleBonus(faction, player);     // DRESS1: a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
   return reaction;
 }
 

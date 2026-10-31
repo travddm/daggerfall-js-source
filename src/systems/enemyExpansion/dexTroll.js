@@ -1,5 +1,4 @@
-// DEX5 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 11; Mac, 2026-10-19: "I want to implement this as our
-// next mod 1:1") - THE TROLL THAT GETS BACK UP. Daggerfall Enemy Expansion ships a prefab for the Troll's corpse picture
+// DEX5 - THE TROLL THAT GETS BACK UP. Daggerfall Enemy Expansion ships a prefab for the Troll's corpse picture
 // (`1618_20`, its components in vendor/daggerfall-enemy-expansion/Prefabs/), which DFU stands in the corpse's place
 // (scenes/corpseMarker.js registerCorpsePrefab, the port's door for it). What the prefab is, read off its own scripts:
 //   - NO LOOT (BestiaryTrollCorpseBillboard.PostParentedSetup, :252-292): the loot container's DaggerfallLoot and its

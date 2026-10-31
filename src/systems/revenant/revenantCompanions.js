@@ -1,7 +1,5 @@
 // @ts-check
-// REVENANT-COMPANION (2026-10-02, Mac: "Spare should allow you to free the enemy, which then adds them as a companion,
-// which you could keep send them away or keep them with you. Reuse the crew companion system. Companion slots should
-// still be limited") - THE SWORN. A revenant the player spares is sworn to the player for good: it hunts nobody, and it
+// REVENANT-COMPANION - THE SWORN. A revenant the player spares is sworn to the player for good: it hunts nobody, and it
 // walks at the player's side - or waits, sent away, until it is called.
 //
 //  - ONE LAYER: the crew's (scenes/crewAshore.js) stands them, places them, brings them along through every door, keeps
@@ -15,15 +13,15 @@
 //    one before sparing another.
 //  - KNOCKED OUT it is carried off to rest, as a hand is carried aboard: REVENANT_REST_MIN of the character's minutes,
 //    then it waits, fit again, to be called.
-//  - RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.1): ITS LOYALTY (the record's `companion.loyalty`, 0-100) moves with how
+//  - RVN11 (22.1): ITS LOYALTY (the record's `companion.loyalty`, 0-100) moves with how
 //    it is kept - a fight won at the player's side, a day with the player, a call after its rest; a day sent away, a
 //    fall, a second sending-away in a day, one of its own kind executed in its sight. Devoted (90 and up), it strikes
 //    harder and warns of a blow from behind.
-//  - RVN-STARS (bible/06-Systems/Revenants.md section 44): ITS STARS (systems/revenant/revenantStars.js) - its level earned
+//  - RVN-STARS: ITS STARS (systems/revenant/revenantStars.js) - its level earned
 //    here (a fight won at my side, swornFightWon; an errand home, once an errand, returnFromErrand), its sky set from the
 //    page (setSwornStars - never abroad), and read where its numbers are: its health and blows (applySwornStrength), its
 //    loyalty's losses and its rests (each site below).
-import { wildHere, zoneWord, wildStoreRefusal } from '../wild/wildZone.js';   // PVPDUNGEONS (the owner: "Only 1 revenant allowed to summon in the zone")
+import { wildHere, zoneWord, wildStoreRefusal } from '../wild/wildZone.js';     // PVPDUNGEONS
 // PVPDUNGEONS: how many sworn revenants may stand at the player's side in the open zone - COMPANION-DROP: and which ones
 // (wildSwornAtSide), so the zone stands the ones whose packs drop; the drop's law reads the same leaf (wildLeaf.js - no
 // imports, so standing a revenant never pulls the drop law's graph, the item law among it, into a client's)
@@ -33,7 +31,7 @@ import { swornRevenants, revenantCompanionUpdate, revenantRecord, setSwornLeftLi
 import { registerCompanionCount, companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';
 import { addItem, addGoldPieces, isGoldPieces } from '../inventory.js';   // a released one's pack, handed back
 import { LOYALTY, DEVOTED, movedLoyalty, isDevoted, sameKin, BETRAY, mayBetray } from './revenantFeud.js';
-import { registerPlayerHurtListener } from '../../characters/playerEntity.js';   // RVN11c: the hurt that leaves me under a quarter   // RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.1): its loyalty
+import { registerPlayerHurtListener } from '../../characters/playerEntity.js';     // RVN11c: the hurt that leaves me under a quarter   // RVN11 (22.1): its loyalty
 import { MINUTES_PER_DAY } from '../gameDate.js';   // RVN11: "twice in a day"
 import { ownMinutes, raisedMinutes, sharedClockOn, trustedWorldMinutes, sharedClockHeardMark } from '../worldTick.js';   // AUDIT RVN F1: an errand on the lived step; OFFLINE-ROAD: online, on the world's
 import { applySwornGear, gearKeyOf, gearRefusal, gearItems, isGearKey } from './revenantGear.js';   // RVN-GEAR: its kit
@@ -51,7 +49,7 @@ export const REVENANT_RETINUE_MAX = 6;
 /** How long a sworn one knocked out rests before it can be called again - the character's minutes (8 hours). */
 export const REVENANT_REST_MIN = 8 * 60;
 /** A SWORN ONE'S RANK, over the body its place stands for it: health and blows a rank (applySwornStrength). UNQUIET
- *  (bible/06-Systems/Revenants.md section 46): its own - a hostile revenant's grew heavier ("harder", revenant.js
+ * : its own - a hostile revenant's grew heavier ("harder", revenant.js
  *  REVENANT_HEALTH_PER_RANK 0.4, REVENANT_DAMAGE_PER_RANK 0.15) and a sworn one's stays as it was, the companions' balance
  *  (RVN-STARS section 44's measure) untouched. */
 export const SWORN_HEALTH_PER_RANK = 0.25;
@@ -86,7 +84,7 @@ export const revenantsAway = () => swornRevenants().filter((r) => stateOf(r) !==
 /** THE SWORN AT THE PLAYER'S SIDE - every one walking with them, and in the open zone the ones it stands
  *  (wildLeaf.js wildSwornAtSide: the first WILD_REVENANTS_MAX - PVPDUNGEONS; the rest wait outside it). COMPANION-DROP
  *  (FIELD BUGS 2026-10-19f) had a death there drop their packs and kits, and so kept them at my side; STORE-KEEPS
- *  (2026-10-26) made every pack storage no death takes, and a sworn one comes and goes in the zone as anywhere. */
+ *  made every pack storage no death takes, and a sworn one comes and goes in the zone as anywhere. */
 export const swornAtYourSide = () => (wildHere() ? wildSwornAtSide(revenantsWithYou()) : revenantsWithYou());
 registerCompanionCount('revenant', () => revenantsWithYou().length);
 
@@ -95,7 +93,7 @@ export const retinueHasRoom = () => swornRevenants().length < REVENANT_RETINUE_M
 /** Where a newly spared one goes: at the player's side while a slot is free, else away. */
 export const swornPlace = () => (companionsWithYou() < COMPANION_SLOTS ? 'with' : 'away');
 
-/** AUDIT (2026-10-02): when a resting one is fit - never more than a rest away. The record outlives a load, and an older
+/** AUDIT: when a resting one is fit - never more than a rest away. The record outlives a load, and an older
  *  save's clock stands earlier than the minute the fall was stamped on: its eight hours read as days. */
 export function restUntil(r, now) {
   let until = r?.companion?.until ?? 0;
@@ -111,7 +109,7 @@ export function restUntil(r, now) {
   }
   return until;
 }
-/** AUDIT (2026-10-02): a sworn one's body held back a moment (wall ms) - the kneeling one still gathering into its portal
+/** AUDIT: a sworn one's body held back a moment (wall ms) - the kneeling one still gathering into its portal
  *  as the oath is given: the layer stood the companion beside it, two of it for the oath's length. */
 const _heldUntil = new Map();
 /** RVN-ERRAND: the words an errand owes - said at the party's next frame (the menu shut: the layer runs no frame under a
@@ -133,7 +131,7 @@ export function _setErrandMonotonicForTests(fn = null) { _monotonic = typeof fn 
 export const errandWorldNow = () => errandWorldMinute(trustedWorldMinutes(), sharedClockHeardMark(), _monotonic());
 export function holdSworn(id, ms) { if (id) _heldUntil.set(id, Date.now() + ms); }
 const held = (id) => { const t = _heldUntil.get(id); if (t == null) return false; if (Date.now() < t) return true; _heldUntil.delete(id); return false; };
-/** AUDIT (2026-10-02): a member is one stand's - a fall, a sending-away, a release or a load ends it, and its carried
+/** AUDIT: a member is one stand's - a fall, a sending-away, a release or a load ends it, and its carried
  *  spells with it (the layer keeps those on the member: the crew's hands come ashore new each time, a sworn one did not,
  *  so a poison it wore when it fell stood with it again eight hours later). */
 export function forgetSwornMember(id = null) { if (id == null) { _members.clear(); _heldUntil.clear(); _errandWords.length = 0; _levelLines.length = 0; _wonLevel.clear(); _errandClock = null; _errandOwed = 0; forgetSwornArt(); } else _members.delete(id); }   // RVN-ERRAND: a load forgets the words owed, and the clock's last reading (AUDIT RVN F1)
@@ -182,7 +180,7 @@ export function releaseRevenant(id) {
   const r = revenantRecord(_player, id);
   if (!r?.sworn) return null;
   if (stateOf(r) === 'errand') return null;   // RVN-ERRAND: abroad - recalled first, its oath given back to its face
-  // AUDIT (2026-10-02): ITS PACK IS HANDED BACK - the release closed the record with whatever the player had stored in
+  // AUDIT: ITS PACK IS HANDED BACK - the release closed the record with whatever the player had stored in
   // it, gone for good. Into the player's own pack, every item (the crew's hand-off stows a pack in the hold the same way)
   const items = [...(r.companion?.items ?? []), ...gearItems(r.companion?.gear)];   // RVN-GEAR: and its kit
   const out = revenantCompanionUpdate(_player, id, () => 'release');
@@ -198,7 +196,7 @@ function handBack(items) {
   _player.items ??= [];
   for (const it of items) { if (isGoldPieces(it)) addGoldPieces(_player, it.stackCount ?? 1); else addItem(_player.items, it); }
 }
-// ── RVN-ERRAND (bible/06-Systems/Revenants.md section 42): a sworn one abroad ──────────────
+// ── RVN-ERRAND: a sworn one abroad ──────────────
 const sayErrand = (ev) => { try { revenantSay(ev, popupMessage); } catch { /* a word is nobody's failure */ } };
 /** How many of the sworn are abroad now. */
 export const revenantsAbroad = () => swornRevenants().filter((r) => stateOf(r) === 'errand');
@@ -305,7 +303,7 @@ export function chargeErrands(now, { own = ownMinutes(), raised = raisedMinutes(
 /** Where one abroad is, in the page's words. */
 export const abroadWords = (r, now) => (stateOf(r) === 'errand' ? errandWords(r.companion.errand, now, sharedClockOn()) : null);   // AUDIT FB1021 L3-5: online in real time
 
-// ── RVN-GEAR (bible/06-Systems/Revenants.md section 40): its kit, from the player's pack and back ──────────────
+// ── RVN-GEAR: its kit, from the player's pack and back ──────────────
 /** The player's pieces a sworn one might wear (the page's list): in the pack, unworn by the player, of a slot it has. */
 export function giftablePieces(player = _player) {
   const worn = new Set(player ? equipTableOf(player).filter(Boolean) : []);
@@ -346,7 +344,7 @@ export function takeSwornGear(id, key) {
   return back;
 }
 
-// ── RVN-STARS (bible/06-Systems/Revenants.md section 44): its sky, set from the page ──────────────
+// ── RVN-STARS: its sky, set from the page ──────────────
 /** Why its sky may not change now - abroad (its sky is set at my side, as its kit is), or no longer sworn - or null. */
 export function swornStarsRefusal(r) {
   if (!r?.sworn) return t('rvn.sworn.gone', 'It is no longer sworn to you.');
@@ -475,7 +473,7 @@ export function revenantParty({ onWake = null } = {}) {
     packOf(id) { const r = revenantRecord(_player, id); return r?.sworn ? (r.companion.items ??= []) : null; },
   };
 }
-// ── RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.1): loyalty's moves from a fight ──────────────
+// ── RVN11 (22.1): loyalty's moves from a fight ──────────────
 /** A sworn one's FIGHT, frame by frame on its body (`rec`, the layer's): begun when it takes a target, WON on the frame
  *  it stands with none standing and the last it fought is down (a target that walked off, or one still standing, is no
  *  win; a target held after its death is none). Answers true on that frame. */
@@ -523,7 +521,7 @@ export function swornWitness(mobileType) {
 export const devotedWithYou = () => revenantsWithYou().find((r) => isDevoted(r.companion?.loyalty) && swornBodyOf(r.id)?.health > 0) ?? null;
 // RVN11b (Feud-Arc.md 22.2): a deserter's member forgotten - its carried spells are no next oath's
 setSwornLeftListener((id) => forgetSwornMember(id));
-/** RVN11c (bible/12-Enhanced-AI/Feud-Arc.md 22.3): THE BETRAYAL'S MOMENT - a hurt that leaves me (alive) under
+/** RVN11c (22.3): THE BETRAYAL'S MOMENT - a hurt that leaves me (alive) under
  *  BETRAY.HEALTH: the first sworn one at my side that may betray (mayBetray) and whose body stands here turns - its record
  *  first (systems/revenant/revenant.js revenantBetrays), then the host told ('betray'), which stands it hostile where it stood. One
  *  a hurt. */

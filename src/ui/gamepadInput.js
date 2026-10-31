@@ -1,4 +1,4 @@
-// GP1 - THE GAMEPAD POLLER (2026-09-11). The DOM half of the joystick
+// GP1 - THE GAMEPAD POLLER. The DOM half of the joystick
 // layer: reads the browser's Gamepad API once a frame and speaks the
 // desktop input language to the host, as ui/touch/touch.js does for a
 // finger - so no host learns a third vocabulary.
@@ -187,7 +187,7 @@ export function attachGamepad(canvas, hooks = {}, { getPads = null, dispatch = s
   let paneCapturing = () => false;   // the controls pane's capture (ui/enhanced/enhancedControls.js captureArmed), loaded lazily - no import ring
   import('./enhanced/enhancedControls.js').then((m) => { if (typeof m.captureArmed === 'function') paneCapturing = m.captureArmed; }).catch(() => {});
   const capturing = () => paneCapturing() || plusBindCapturing();   // PADPLUS10: and the Plus bindings window's
-  // PADMOUSE (Mac: "when i activate it i cant move the mousepointer and it often doesnt even appear"): freeing the
+  // PADMOUSE: freeing the
   // mouse from the pad lets go of the pointer lock, and the browser answers that with a trusted mousemove carrying a
   // jump - read as a hand on the mouse, it took the pad's pointer away the moment it was asked for. A real mouse now
   // has to travel a few pixels, and nothing counts for a moment after the lock changes.
@@ -636,7 +636,7 @@ export function attachGamepad(canvas, hooks = {}, { getPads = null, dispatch = s
     // d-pad tap (Rest, the quest log, ...) could open a window before usingController ever went true, so the real
     // mouse never got hidden (padHideMouse below reads usingController) and the window came up under the OS pointer
     // instead of the pad's own, stick-driven one.
-    // PADMOUSE (Mac: "back to keyboard ... it starts to flash and swaps a lot between crossbar and hotbar"): the
+    // PADMOUSE: the
     // pad family was set back on EVERY frame without a key or a mouse move - so a keypress gave the diamond for one
     // frame and the pad took it back the next, and every keystroke flashed the bar. The glyphs (and the crossbar)
     // now follow `usingController` alone, and the pad only takes the hands back on a real ACT: a button newly

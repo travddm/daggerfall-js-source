@@ -1,15 +1,12 @@
 // @ts-check
-// NAV-D (2026-09-28, Mac: "actual sailing ships to the world that players can encounter and pillage, which should
-// also directly enhance and integrate into the pirate quest system") - BOARDING: taking a ship with the sword, and
+// NAV-D - BOARDING: taking a ship with the sword, and
 // throwing boarders off your own. The port's own; pure - the phases, the berth, the musters and the reckoning. The
 // host stands the foes, moves the player, opens the windows and runs the quests.
 //
 // WHEN YOU BOARD HER. A ship that has struck her colours (navalDamage.js STRUCK_AT) lies within BOARD_RANGE of your
 // helm: Activate (the key the prompt names) throws the grapples. She is hauled ALONGSIDE over GRAPPLE_S - swung
 // parallel to your hull on the side she lies, BERTH_GAP of water between the two planks (`berthPose`) - and you go
-// over her rail onto her deck. BOARD-MAGNET (2026-10-26, the owner: "remove the ship ramming feature as its broken and
-// instead with a ship is damaged enough, a prompt to board should show within range and properly magnitize to the
-// other ship"): the grapples are thrown at any way - the prompt stands whenever she is in reach, never a heave-to
+// over her rail onto her deck. BOARD-MAGNET: the grapples are thrown at any way - the prompt stands whenever she is in reach, never a heave-to
 // first - and the haul DRAWS HER TO THE SHIP AS IT LIES EACH FRAME (`haul`, `drawHaul`, over `berthHull`'s own beams,
 // widths and middles), out to her berth's lane and along it, kept clear of your hull, while your way comes off under
 // `haulBrake`: she meets you where you come to rest, side by side, never where you were when the lines went over, and
@@ -66,7 +63,7 @@ export const MUSTERS = Object.freeze({
 });
 /** The hands a crewed ship of the player's sends: Warm Ashes' `_ally_` (Foe _ally_ is Warrior). */
 export const HAND = MOBILE.Warrior;
-/** RAID-WON (bible/01-Overview/bugs/Field-Bugs-2026-10-19.md): the raids' own crew - their `_ally_` Foe, by the inner name
+/** RAID-WON: the raids' own crew - their `_ally_` Foe, by the inner name
  *  the machine keys a symbol by (quest/symbol.js getInnerSymbolName): the hands a raid stands in my crew's place. */
 export const RAID_CREW = 'ally';
 

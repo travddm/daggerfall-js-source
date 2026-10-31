@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCHOOLS3/4 (2026-10-13) — WHAT THE PATHS DO. bible/06-Systems/Arcane-Specialisations.md section 5.
+// SCHOOLS3/4 — WHAT THE PATHS DO.
 //
 // The law (systems/arcanePaths.js) says which path a mage chose and when it is AWAKE; this file does what each path's
 // passive and its signature spell's RIDER say, through the seams the Sigil Sets and the loot opened - registered here at
@@ -53,7 +53,7 @@ import { healthShare } from '../combat/healthShare.js';   // FIELD BUGS 2026-10-
 import { hudText } from './notify.js';
 import { t } from './textManager.js';
 import { regenShare } from './courtRules.js';   // AUDIT WORLD-EVENTS L1-3: the Warden's Steadfast is a natural regeneration - a made level holds it
-// MENTOR2 (bible/06-Systems/Mentor-Mode.md): every number here acts at the mentor's power scale (1 outside mentoring) -
+// MENTOR2: every number here acts at the mentor's power scale (1 outside mentoring) -
 // a percent, a chance, a heal, a rider's share; a window's seconds and a recovery stay whole.
 import { mentorPowerScale, mentorScaled } from './mentorMode.js';   // MENTOR2: the paths at the mentor's share
 

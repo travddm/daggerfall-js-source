@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") — A GUILD'S BANNERS AT ITS
-// HALL'S DOOR (bible/11-Multiplayer/Seats-Arc.md 3.4: "two flanking the
+// GUILD1d — A GUILD'S BANNERS AT ITS
+// HALL'S DOOR (3.4: "two flanking the
 // palace's door (the building record's position and facing)" - a
 // seat's anchor, and the hall's first: SEAT1a's town anchors take the
 // same measure).

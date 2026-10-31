@@ -1,6 +1,5 @@
 // @ts-check
-// LOOT-STACK (2026-09-23, the community arc - Janome on Discord: "a toggle key to switch between the inventories of
-// enemies stacked on top of each other"): THE PILE OF BODIES, AND ONE LOOT WINDOW OVER ALL OF IT.
+// LOOT-STACK: THE PILE OF BODIES, AND ONE LOOT WINDOW OVER ALL OF IT.
 //
 // Three foes cut down in one doorway leave three bodies in one place, and DFU's one ray (PlayerActivate.cs:314) has
 // one hit: the NEAREST body. The two behind it could be reached only by emptying the one in front - and a body left
@@ -15,7 +14,7 @@
 //   - THE PICK IS THE NEAREST, always. The ray answers the front body exactly as DFU's does, and everything that
 //     races the pile - the player's own drops, a torch, a door, a person, a foe (player/activationRace.js) - races it
 //     as it always did. The pick only NOTES the stack it stood, for the window to read.
-//   - THE WINDOW HOLDS THE PILE (Mac, 2026-09-23: "that solution is better than a keybind"). A press on the front
+//   - THE WINDOW HOLDS THE PILE. A press on the front
 //     body opens its loot window with a TAB for each body in the stack that still holds something, and a tab opens
 //     that body's window in its place, through the host's own corpse door - so each body keeps everything its own
 //     open and close carry (the empty body's refusal, the room's claim and word, the emptied flat). The first slice

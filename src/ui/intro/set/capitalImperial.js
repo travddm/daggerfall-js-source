@@ -1,5 +1,5 @@
 // @ts-check
-// INTRO4's SET (the merge of main into TESA, 2026-10-27; bible/10-UI/UI-Arc.md INTRO4): THE CITY THE FILM WAS SHOT ON,
+// INTRO4's SET (the merge of main into TESA, 2026-10-27; INTRO4): THE CITY THE FILM WAS SHOT ON,
 // KEPT AS SHOT. INTRO4 took world/capitalImperial.js byte for byte from TESA (#1184 at 4d8200b01, the Imperial City at seven
 // pixels a side) and tuned the film to it - its camera path, its fog and lake, the Colosseum it dives past. TESA's
 // IC-GRAND has since grown the game's city to twenty-five pixels (its wall 6,900 m out where it was 1,950) and retired
@@ -7,7 +7,7 @@
 // Unchanged but for this header, its imports' paths and its exports, listed at the end (the names stay the module's
 // own: test/systems/talk/audit24_onehome.test.js counts declarations, and this set's are the film's, not the game's).
 // Re-shooting the film on the grand city is its own slice.
-// TESA11 (bible/03-World/Arena-Provinces.md TESA11) - THE IMPERIAL CITY'S LANDMARKS: the port's own models of the city's
+// TESA11 (TESA11) - THE IMPERIAL CITY'S LANDMARKS: the port's own models of the city's
 // canon (world/imperialCity.js IMPERIAL says where each stands) - the White-Gold Tower, 680 m to its spire, on Green
 // Emperor Way among the emperors' tombs inside the palace wall; the city wall round the six districts, a tower every ten
 // degrees, its four gates and (TESA-LORE) its six watch towers where the district walls meet it; the walls between the

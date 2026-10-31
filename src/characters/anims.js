@@ -121,7 +121,7 @@ export const REACTIONS = {
 // EYE), and every sweep crosses the frame in its strike's direction.
 // Deltas start/end 0 so the viewmodel frame is exact at both ends.
 
-// ON ICE (2026-08-17, Mac): the FP voxel sweeps are parked with the
+// ON ICE: the FP voxel sweeps are parked with the
 // viewmodel (see characterSprite.js); PlayerWeapon.pose() and the
 // units pins stay green for the thaw.
 export const ATTACKS_FP = {
@@ -294,7 +294,7 @@ export const ATTACKS_2H = {
 };
 
 export const ATTACKS_1H = {
-  // ACTION REDESIGN (v4, Mac: "stiff, not action oriented"): the
+  // ACTION REDESIGN (v4): the
   // missing piece was ROOT MOTION - every clip fired from a statue
   // bolted to the floor. Clips now carry `rootX/rootY/rootZ` tracks:
   // whole-body translation (torso, head, arms, legs, the held sword,

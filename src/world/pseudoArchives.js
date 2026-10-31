@@ -1,6 +1,5 @@
 // @ts-check
-// EG-G2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md sections 11.6 and 25.1 - EG1's
-// registry): THE ONE REGISTRY OF PSEUDO-ARCHIVES - every texture archive the port answers that is not one of
+// EG-G2: THE ONE REGISTRY OF PSEUDO-ARCHIVES - every texture archive the port answers that is not one of
 // Daggerfall's own TEXTURE.000-511, in one place, so a new one is picked against all the others and never on top of one.
 //
 // A picture is kept by its archive and its record (renderer.uploadTexture(archive, record, ...)), so two owners that

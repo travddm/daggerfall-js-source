@@ -177,7 +177,7 @@ export function blankEffectSettings() {
   return s;
 }
 
-/** ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): THE PORT'S OWN - a crafted Spell
+/** ABSORB-NERF: THE PORT'S OWN - a crafted Spell
  *  Absorption (effect key '20,255') stops its chanceBase at 50, the same 50% absorption.js caps the live chance at.
  *  Every other effect and field keeps SPINNER_RANGES as it stands. */
 export const SPELL_ABSORPTION_KEY = '20,255';
@@ -220,7 +220,7 @@ export function stepSetting(settings, field, delta, effectKey = null) {
   return applyPairRules(next, field);
 }
 
-/** HOLD-STEP (2026-09-27, Tabitha on Discord: "add a field to type in the value"): a value TYPED into a spinner, by
+/** HOLD-STEP: a value TYPED into a spinner, by
  *  the step's own law - clamped to the spinner's range, then the pair rule. Never DFU's (its spinners only step); the
  *  enhanced port's field. Answers the new settings object. */
 export function setSetting(settings, field, value, effectKey = null) {

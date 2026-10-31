@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - THE GATHERING PROFESSIONS IN THE
+// PROF2 - THE GATHERING PROFESSIONS IN THE
 // STREAMING WORLD, one shell for every kind of node (bible/06-Systems/
 // Professions-Arc.md 5, 6, 8, 22, 23; FORAGE0 14). PROF1 built it as
 // Herbalism's own host; every gathering profession needs the same shell,
@@ -21,8 +21,7 @@
 //   stood again at the UTC day's turn, when the service says a pixel's
 //   state, or when a node is taken whole (gone for the day, PROF0 5.3).
 //   THE TARGET. The node in reach nearest the look, of any kind.
-//   THE MENU (PROF-MENU, 2026-10-01, Mac: "They should use the same menu
-//   the loot menu uses and not an interaction button"). The target is the
+//   THE MENU (PROF-MENU, 2026-10-01). The target is the
 //   loot plaque's own list under the crosshair (ui/worldPlaque.js
 //   'actions'): the node named, its acts the rows - a patch's herbs and
 //   its Basket, a body's knife and its search - a refused one with its
@@ -98,8 +97,7 @@ export const NODE_MARK_M = 150;
 export const NODE_MARK_MAX = 16;
 /** NODE-MARKS: a node's glow footprint about its base where its kind names none - metres across (`w`) and up (`h`). */
 export const NODE_MARK_SIZE = Object.freeze({ w: 1.8, h: 1.3 });
-/** GATHER-OW (2026-10-02, Mac: "allow them to appear in the overworld without being overwhelming, maybe a glyph marker
- *  showing where a group of them are"): the Overworld marks each profession's group on a stood pixel - its nodes not
+/** GATHER-OW: the Overworld marks each profession's group on a stood pixel - its nodes not
  *  yet worked today - within this many metres of the player, the nearest GROUP_MAX of them, the list read again at most
  *  every GROUP_REFRESH_MS. */
 export const GROUP_M = 3000;
@@ -162,7 +160,7 @@ export function needLine(plan, rankOf) {
 }
 
 /**
- * GATHER-SAID (the PROF7 merge, 2026-09-30, Mac: "had reports of people not getting materials when using a profession"):
+ * GATHER-SAID (the PROF7 merge, 2026-09-30):
  * A HARVEST'S GOODS IN ONE LINE - the Stores' own, a gem (PROF2) and a second find (PROF4's Resin, PROF7's butchery) beside
  * them: "+1 Bear Hide, a Big Tooth and 2 Raw Meat to your Stores". Each was a line of its own, and with the XP and a rank's
  * rise an answer said five into the four the toasts hold (PROF0 8) - the Stores' line, the oldest, went first.
@@ -887,7 +885,7 @@ export function createGatherHost(deps) {
       // hold of it (`held`); no kind named one, and no carried harvest ever cut the count to the pack
       ...(actMaterial(a) ? { material: actMaterial(a) } : {}),
     }).then((r) => answered(a, r, before), () => {});
-    // GATHER-SPEED (2026-10-11, Mac: "look at gathering minigame performance and how the server affects it/slows down"):
+    // GATHER-SPEED:
     // THE NODE GOES WITH THE ACT. The book counts the harvest from the ask (net/profBook.js `gone`: taken, or being
     // counted), so the patch, the vein and the tree went a whole round trip after the act that took them - the fall
     // waited on the service. Fallen and stood again now, once; the answer stands it again only where it was refused
@@ -1354,8 +1352,7 @@ export function createGatherHost(deps) {
       return out;
     },
     /**
-     * NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass. The node itself
-     * should also stand out with a detailed slight glow"): THE NODES STANDING NEAR `pos` - underground the dungeon's,
+     * NODE-MARKS: THE NODES STANDING NEAR `pos` - underground the dungeon's,
      * above ground the stood pixels', and the loose ones (Hunting's bodies) where they lie - each its kind's mark says
      * stands within its reach: `{ key, profession, at: [x, y, z] its base in the scene, w, h, d, reach }`, `d` its
      * distance on the ground, nearest first, at most NODE_MARK_MAX - and (AUDIT NODE-GLINT) `quiet` the node an act works,

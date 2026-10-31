@@ -1,6 +1,6 @@
 // @ts-check
-// CROWN1 part two, the client (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): A ROYAL TOURNEY AS THIS
-// CLIENT FIGHTS IT (bible/11-Multiplayer/Seats-Arc.md 7.6) - entered from a crown's Seat tab while its Edict rules: the
+// CROWN1 part two, the client: A ROYAL TOURNEY AS THIS
+// CLIENT FIGHTS IT (7.6) - entered from a crown's Seat tab while its Edict rules: the
 // ring's centre this game derived from the town (systems/siegeField.js royalRingWire, the crown's Palace square) sent for
 // a pass (the service settles the ring once two contenders' agree - until then it asks again), then the tourney's own
 // room joined (`royal:<key>:<week>`, a fresh pass on every hello - net/online.js mintSiegePass), `in` said once a socket
@@ -12,7 +12,7 @@
 //
 // The world is handed in, so the pins drive it with fakes. Not a DFU member. Ledger A (EVERY PALACE A SEAT's row).
 //
-// AUDIT-SEATS (2026-10-01): C1 - the tourney is LEFT as a siege is (net/siege/siegeSession.js): by the player (the HUD's Leave,
+// AUDIT-SEATS: C1 - the tourney is LEFT as a siege is (net/siege/siegeSession.js): by the player (the HUD's Leave,
 // the chat's `/leave`), once away from the crown's city BATTLE_AWAY_MS, when its socket closes for good, and at the
 // week's end - a player who pressed "Watch the Royal Tourney" on a Monday no longer stands in its room all week, the
 // city's peers and its Watch gone; the HUD drawn only in its room. C2 - the one mint slot cleared only while it is this

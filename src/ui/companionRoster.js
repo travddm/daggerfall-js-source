@@ -1,7 +1,5 @@
 // @ts-check
-// COMPANION-ROSTER (2026-10-02, Mac: "Spare should allow you to free the enemy, which then adds them as a companion,
-// which you could keep send them away or keep them with you ... Companion slots should still be limited and will need a
-// new enhanced plus UI feature") - THE COMPANIONS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
+// COMPANION-ROSTER - THE COMPANIONS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
 // pauseHoldings - HOLDINGS moved it off the Stats rail, 2026-10-03), beside the Revenants page.
 //
 //  - THE SLOTS: a strip of COMPANION_SLOTS wells (systems/companionSlots.js) - each filled one shows who stands in it (a
@@ -12,9 +10,9 @@
 //  - AWAY: each sworn one waiting, or recovering from a fall (how long yet) - CALL (it steps through a portal to the
 //    player's side; refused, and saying why, while the slots are full or it is still hurt) and RELEASE.
 //  - The retinue's own bound (REVENANT_RETINUE_MAX), and how one is gained, at its foot.
-//  - RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.4): each sworn one's LOYALTY - a bar under its health, and its word
+//  - RVN11 (22.4): each sworn one's LOYALTY - a bar under its health, and its word
 //    (Devoted, Loyal, Wavering, Restless).
-//  - RVN-GEAR (bible/06-Systems/Revenants.md section 40): ITS KIT - GEAR opens a sheet: a well a slot (what it wears,
+//  - RVN-GEAR: ITS KIT - GEAR opens a sheet: a well a slot (what it wears,
 //    TAKE BACK), and the pieces of the player's pack it could wear (GIVE - refused, and saying why, past its rank).
 //  - RVN-ARTS (section 41): its art, for the player, in a line.
 //  - RVN-ERRAND (section 42): MISSION opens a sheet - a venture, and Tamriel's nine provinces with their days, their
@@ -32,7 +30,7 @@ import { retinue, revenantsWithYou, revenantsAway, callRevenant, callRefusal, se
 import { companionsWithYou, companionRoster, COMPANION_SLOTS } from '../systems/companionSlots.js';
 import { revenantPortrait, revenantRankNumeral } from '../systems/revenant/revenant.js';
 import { PERSONALITIES } from '../systems/revenant/revenantPersonality.js';
-import { loyaltyLabel } from '../systems/revenant/revenantFeud.js';   // RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.4): its loyalty's word
+import { loyaltyLabel } from '../systems/revenant/revenantFeud.js';     // RVN11 (22.4): its loyalty's word
 import { ownMinutes, sharedClockOn } from '../systems/worldTick.js';
 import { requestFittedIcon, fittedImg } from './textureCanvas.js';
 import { giftablePieces, giveSwornGear, takeSwornGear, sendOnErrand, recallFromErrand, errandRefusal, abroadWords } from '../systems/revenant/revenantCompanions.js';   // RVN-GEAR, RVN-ERRAND
@@ -153,7 +151,7 @@ export function restWords(until, now) {
   return h <= 1 ? 'Recovering. Back within the hour' : `Recovering - ${h} hours`;
 }
 
-/** RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.4): its loyalty - a bar (the kit's bone tone) and its word, the number on
+/** RVN11 (22.4): its loyalty - a bar (the kit's bone tone) and its word, the number on
  *  the bar's title; nothing for a record without one. */
 export function loyaltyRow(el, r, meter) {
   const v = r?.companion?.loyalty;
@@ -306,14 +304,14 @@ function row(el, r, { now, rerender, meter, here, kindName, stars }) {
   head.append(el('span', `cmp-state${state === 'with' ? '' : ` is-${state}`}`, state === 'with' ? 'At your side' : state === 'resting' ? 'Recovering' : state === 'errand' ? t('rvn.errand.abroad', 'Abroad') : 'Away'));   // RVN-ERRAND
   text.append(head);
   const P = PERSONALITIES[r.personality];
-  // AUDIT (2026-10-02): its chip says who it is - the blurb is a foe's ("...your death included"), never an ally's row's
+  // AUDIT: its chip says who it is - the blurb is a foe's ("...your death included"), never an ally's row's
   const sub = el('span', 'cmp-sub', [`Rank ${revenantRankNumeral(r.rank)}`, kindName?.(r.mobileType) ?? null].filter(Boolean).join(' · '));
   if (P) sub.insertBefore(el('span', 'cmp-mood', P.label), sub.firstChild ?? null);
   text.append(sub);
   if (state === 'with') {
     const body = here?.(r.id);
     const hm = body?.maxHealth ?? r.companion?.maxHealth ?? null, h = body?.health ?? r.companion?.health ?? hm;
-    if (hm > 0 && typeof meter === 'function') {   // AUDIT (2026-10-02): the green of the bar over its head, with its numbers (a tone the kit has)
+    if (hm > 0 && typeof meter === 'function') {     // AUDIT: the green of the bar over its head, with its numbers (a tone the kit has)
       const hp = el('div', 'cmp-hp');
       hp.append(meter(Math.max(0, Math.round(h)), Math.round(hm), 'verdigris'), el('span', 'cmp-hpn', `${Math.max(0, Math.round(h))} / ${Math.round(hm)}`));
       text.append(hp);
@@ -327,7 +325,7 @@ function row(el, r, { now, rerender, meter, here, kindName, stars }) {
   if (_notice?.id === r.id) text.append(el('span', 'cmp-why', _notice.text));
   const acts = el('div', 'cmp-acts');
   if (_confirm === r.id) {
-    const n = (r.companion?.items?.length ?? 0) + gearItems(r.companion?.gear).length;   // AUDIT (2026-10-02): its pack comes back to the player's - say so; AUDIT RVN G6: and its kit
+    const n = (r.companion?.items?.length ?? 0) + gearItems(r.companion?.gear).length;     // AUDIT: its pack comes back to the player's - say so; AUDIT RVN G6: and its kit
     text.append(el('span', 'cmp-confirm', `Release ${r.name}? It is freed from its oath and leaves you for good${n ? `, giving back what it carries (${n === 1 ? 'one item' : `${n} items`})` : ''}.`));
     const yes = el('button', 'act warn', 'Release');
     yes.onclick = () => { _confirm = null; _notice = null; releaseRevenant(r.id); rerender(); };
@@ -427,7 +425,7 @@ export function drawCompanionsPage(detail, rerender, { el, divider, meter = null
   if (!withYou.length && !away.length) {
     detail.append(el('p', 'px-note', 'No revenant is sworn to you. Defeat one of your revenants and it will yield. Spare it, and it is yours.'));
   }
-  const n = retinue().length;   // AUDIT (2026-10-02): the release's advice only where it is the way on
+  const n = retinue().length;     // AUDIT: the release's advice only where it is the way on
   if (n) detail.append(el('p', 'cmp-foot', `Sworn to you: ${n} of ${REVENANT_RETINUE_MAX}.${n >= REVENANT_RETINUE_MAX ? ' Release one to make room for another.' : ''}`));
 }
 /** A visit's asks forgotten (an armed Release, a refusal's words) - the pause menu's every mount (AUDIT 2026-10-02:

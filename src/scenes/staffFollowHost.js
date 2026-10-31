@@ -1,7 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow - What staff see: "The view is
-// from the player's own eyes ... It stays locked on them everywhere ... It only lets go when staff press Unlock, or click
-// another player's nameplate") - THE HOST'S HALF OF A FOLLOW, out of bootWorld (HOST-SPLIT). The follow itself is
+// STAFF-PANEL5-FOLLOW - THE HOST'S HALF OF A FOLLOW, out of bootWorld (HOST-SPLIT). The follow itself is
 // net/staffHook.js; this is what the scene does with it: while it is locked the host's own room is left (the staff
 // member's body is in no room), the place the target's note names is entered the way a staff /tp enters it (the
 // "spectator enter" - the TP host's prepare, never placed), and after the motor the camera sits at the target's eyes
@@ -15,8 +13,7 @@ import { playerEntity } from '../characters/playerEntity.js';   // STAFF-UNSEEN:
 import { RIDE_EYE_HEIGHT, CAPSULE_HEIGHT } from '../player/motor.js';
 import { createStaffPilotHost } from './staffPilotHost.js';   // STAFF-PILOT: Play as boss   // a peer's eye, as the peers' bodies stand it (world.js: a rider's the saddle's)
 
-/** FOLLOW-FRAME (2026-10-24, mob, following a player into a dungeon: "u end up in the bottom left corner" "of the
- *  daggerfall map"): A POSE IS COPIED ONLY INTO ITS OWN FRAME. A dungeon's pose is its own scene's metres, a cell's is
+/** FOLLOW-FRAME: A POSE IS COPIED ONLY INTO ITS OWN FRAME. A dungeon's pose is its own scene's metres, a cell's is
  *  MapsFile's (world.js onlineToScene, set from the mode the staff member stands in) - so a dungeon pose read while the
  *  staff scene was still the open air (their place not entered: refused, or still loading) put the camera a few metres
  *  from the world's origin, the map's south-west corner. The camera is the target's only while the scene is the kind
@@ -33,7 +30,7 @@ export const followInFrame = (d, m) => !d || KIND_MODE[/** @type {keyof typeof K
 /** `where()` names the place the staff member stands in (its mode and map pixel): let go, the body the camera carried
  *  stands where the target stood, so the host stays out of every room until it is somewhere else (a door, fast travel,
  *  a teleport, or a walk off that map pixel) - it never reappears beside the player it watched. FOLLOW-HIDDEN-REJOIN
- *  (2026-10-24, mob: "when i change form invis all players dont load", after a follow): a game that is hidden (`hidden()`,
+ *  a game that is hidden (`hidden()`,
  *  its last token's `hd`) has no body anyone sees, so it parks nowhere and joins where it stands at once.
  *  @param {{ hook: any, prepare: (d: any) => Promise<any>, mode: () => string, where: () => string, toScene: (p: any) => number[] | null, eyeHeight: (p: any) => number, hidden?: () => boolean, now?: () => number }} deps */
 export function createStaffFollowHost({ hook, prepare, mode, where, toScene, eyeHeight, hidden = () => false, now = () => performance.now() }) {
@@ -88,7 +85,7 @@ export function createStaffFollowHost({ hook, prepare, mode, where, toScene, eye
 }
 
 /**
- * STAFF-HIDE-TOGGLE (2026-10-23, mob: "i cant talk in chat?", "need hide to be a toggle"): THE GAME'S OWN LINKS REMADE ON A
+ * STAFF-HIDE-TOGGLE: THE GAME'S OWN LINKS REMADE ON A
  * FRESH TOKEN, at the Staff Panel's `relink` (net/staffHook.js) - Hide me or Show myself just pressed. The account service
  * mints hidden or shown by the switch at each mint (server-account/src/staffHidden.js hiddenToken), so the held token is let
  * go (`minter.forget`, a mint still on its way with it) and every room the game holds is left and opened again: the
@@ -108,8 +105,7 @@ export function relinkGame(minter, main, links) {
 }
 
 /** THE PAGE'S FOLLOW, made once by the host (scenes/world.js): the panel's door on this window, the hook behind it and
- *  the host's half above - so bootWorld wires one object. `follow(sub)` is a /tp's follow-on (mob, 06:01Z: "tp should
- *  auto follow form thier view"), taken only where a Staff Panel has spoken on this page: with none, no token comes.
+ *  the host's half above - so bootWorld wires one object. `follow(sub)` is a /tp's follow-on, taken only where a Staff Panel has spoken on this page: with none, no token comes.
  *  `relink` the door's STAFF-HIDE-TOGGLE word (relinkGame, over the host's minter and links).
  *  @param {{ main: () => any, prepare: (d: any) => Promise<any>, mode: () => string, pixel: () => { x: number, y: number }, toScene: (p: any) => number[] | null, relink?: () => void, win?: any, Session?: any, entity?: any, maps?: () => any }} deps */
 export function staffFollowOnPage({ main, prepare, mode, pixel, toScene, relink = undefined, win = globalThis.window, Session = undefined, entity = playerEntity, maps = keptMaps }) {
@@ -132,7 +128,7 @@ export function staffFollowOnPage({ main, prepare, mode, pixel, toScene, relink 
   const bar = createStaffFollowBar({ doc: win?.document, onUnlock: () => hook.unlock(), onHide: press });
   // STAFF-PILOT: Play as boss - a hidden game is shown first (its frames, the boss's among them, reach no one hidden)
   const pilot = createStaffPilotHost({ post: door.post, win, entity, hidden: () => hiddenNow, showMe: () => press(false) });
-  // STAFF-UNSEEN (mob: "staff in overworld and flat need to stay in it and not have mobs pull them out"; the card's pick
+  // STAFF-UNSEEN (; the card's pick
   // "Monsters ignore hidden staff"): hidden, the game's player is no one to a foe (scenes/shared.js sensesContext's
   // `playerUnseen`) - and no foe near keeps the Overworld down or brings it down (world.js, the travel view's `danger`)
   const unseen = () => { if (entity) entity.staffHidden = (hiddenNow || pilot.piloting()) && !!main(); };   // STAFF-PILOT: and while I steer my event's boss
@@ -140,15 +136,14 @@ export function staffFollowOnPage({ main, prepare, mode, pixel, toScene, relink 
   return {
     hook, map, frame: () => { watch(); map.tick(); const out = host.frame(); barFrame(); pilot.frame(); unseen(); return out; }, eye: (/** @type {any} */ player, /** @type {any} */ cam) => { pilot.eye(cam); return host.eye(player, cam); }, locked: () => hook.locked(),
     follow: (/** @type {unknown} */ sub, /** @type {any} */ hint = null) => door.panel() && hook.follow(sub, hint),   // FOLLOW-GROUND-HINT: a ground pick's room
-    // STAFF-VIEW1 (mob: "np player esp in staff panel?"): what the staff view reads (scenes/staffViewHost.js) - whether a
+    // STAFF-VIEW1: what the staff view reads (scenes/staffViewHost.js) - whether a
     // panel spoke here, the followed room's players, the game's own session, its frame and mode, and the panel's tags
     panel: door.panel, peers: hook.peers, main, toScene, mode, tags: door.tags, askTags: door.askTags,
     /** FOLLOW-BODIES: the players the scene draws - while a follow is locked the game has left its own room, so the
      *  players around the target (net/staffHook.js `others`), else the game's own room's. */
     drawable: () => (hook.locked() ? hook.others() : main()?.drawable?.() ?? []),
     pixel,   // STAFF-FLATMAP: where the staff member stands, the flat map's first region
-    /** FOLLOW-INDOORS (mob, 2026-10-24, following a player into a dungeon: "dont lock to them in dungeon but tped
-     *  inside"): the open air's frame takes the follow's camera after its motor (world.js), but a dungeon's or a
+    /** FOLLOW-INDOORS: the open air's frame takes the follow's camera after its motor (world.js), but a dungeon's or a
      *  building's frame is the modes host's (scenes/worldModes.js frame), which never asked - the enter put the body at
      *  the door and the camera stayed there, the bar saying "finding them" for ever. The modes host takes the one body's
      *  climb camera after its own motor step, so the climb camera it is handed is this one: the follow's eye first, then

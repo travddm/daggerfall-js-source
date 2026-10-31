@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// URBANIZER U3 (2026-10-26; KPbICA's spec, forwarded by the owner: "Inner yards and backyards", "Wide main streets with
-// pathways, alleys, side streets, dead ends"; bible/03-World/Urban-Fabric.md section 4) - A TOWN'S FABRIC: its streets in
+// URBANIZER U3 - A TOWN'S FABRIC: its streets in
 // their order, its yards and its dead ends, read off its own blocks.
 //
 // Daggerfall lays a town as a grid of its RMB blocks (DFU's DaggerfallLocation.LayoutLocation), each block its houses and

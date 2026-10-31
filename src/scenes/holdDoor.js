@@ -1,6 +1,5 @@
 // @ts-check
-// CARGO-ANYWHERE (2026-10-17, the owner: "Cargo should be able to be accessed at any time. Currently it cannot be";
-// bible/03-World/Naval-Refit.md CARGO-ANYWHERE) - THE HOLD'S DOOR: a ship of the player's opened from wherever they are.
+// CARGO-ANYWHERE - THE HOLD'S DOOR: a ship of the player's opened from wherever they are.
 //
 // Come Sail Away opens a hold one way: a press on the boat's cargo box (trigger 112402), within the mod's 3.2 m of it
 // (comeSailAway.js OpenBoatCargo -> OpenCargo -> the host's openCargo). BOAT-MENU's "Open storage" row presses that same

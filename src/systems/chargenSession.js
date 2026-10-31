@@ -378,9 +378,7 @@ export async function createChargenFlow(fetchBytes, { rolls = Math.random } = {}
 /** START2: `startChoice` - `{ open(start), why(start) }`, a host that stands the land past the Bay asks where the story begins
  *  (ui/startChoice.js): the world host alone; every other host's new character wakes where its boot put them. */
 export function createChargenWindow(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
-  // ORL1: ...AND THE LEVELING CHOICE RIDES THIS DOOR (Mac: "On new
-  // game, I want the player to receive a notification on which leveling
-  // system they would like to use").
+  // ORL1: ...AND THE LEVELING CHOICE RIDES THIS DOOR.
   //
   // THE FOUR HOSTS RULE, answered here rather than three times over.
   // Three hosts run a new game and all three build their wizard
@@ -439,13 +437,13 @@ function withLevelingChoice(flow, { onDone, onCancel, hudScale = 2, startChoice 
   // Daggerfall's the answer - so the player reads which system they are getting before the world, rather than finding
   // out at their first level. Offline with the mod off, nothing changed: no question, Daggerfall's law.
   const online = isOnlinePage();
-  // LEGACY2 (bible/06-Systems/Legacy-Arc.md section 6): ...AND PROJECT LEGACY'S QUESTION AFTER IT - the family's model,
+  // LEGACY2: ...AND PROJECT LEGACY'S QUESTION AFTER IT - the family's model,
   // Bloodline or Enduring, asked of the character who founds a house (legacyModelScreen). The same door, the same one
   // overlay slot: the questions are STAGES of one window, put in turn, each answered once; the answers ride the result.
   const asks = [];
   if (oblivionLevelingEnabled() || online) asks.push((answer) => new LevelingChoiceScreen((id) => answer({ levelingSystem: id }), { online }));
   if (legacyOn()) asks.push((answer) => legacyModelScreen((model) => answer({ legacyModel: model })));
-  // START2 (bible/06-Systems/Alternate-Starts-Arc.md section 7): ...AND, LAST, WHERE THE STORY BEGINS - put by a host that
+  // START2: ...AND, LAST, WHERE THE STORY BEGINS - put by a host that
   // can stand a start past the Bay (`startChoice`), once one is open there (one start open is no choice); the new
   // character's race read off the wizard's answer, its homeland chosen first. The answer rides the result as `startKey`.
   if (startChoice && STARTS.some((s) => s !== BAY_START && startChoice.open(s))) {

@@ -1,4 +1,4 @@
-// L10N3f (2026-09-28): DFU'S TEXT DATABASES, READ FROM A TRANSLATION PACK. Beside its string tables DFU keeps a few
+// L10N3f: DFU'S TEXT DATABASES, READ FROM A TRANSLATION PACK. Beside its string tables DFU keeps a few
 // words in Table-format text files under StreamingAssets/Text - `schema: *key,text`, one `key, text` row a line, '-'
 // comments (Utility/Table.cs) - and TextManager reads every one of them at startup, a database by its file name
 // (EnumerateTextDatabases, TextManager.cs:690-720):

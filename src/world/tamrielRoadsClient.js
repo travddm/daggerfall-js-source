@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA14 (bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY, ASKED FOR A REGION AT A TIME.
+// TESA14 (TESA14) - THE ROADS PAST THE BAY, ASKED FOR A REGION AT A TIME.
 //
 // The host hands the build's inputs and the regions to build, nearest the player first; this keeps WORKERS of the roads'
 // own worker (world/tamrielRoadsWorker.js) busy, one region each, and answers each region's layer as it lands. A region

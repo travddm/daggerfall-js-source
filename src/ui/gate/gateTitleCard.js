@@ -1,8 +1,8 @@
 // @ts-check
-// WB13e (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE FIGHT'S BEATS,
+// WB13e: THE FIGHT'S BEATS,
 // LARGE - a card over the upper middle of the screen for the moments a fight turns on: his wake (his name, his epithet
 // under it, as he first moves), a phase's turn ("II", "The Burning Court", its one order under it until he lands) and his
-// fall ("Felled" under his name, over his spoils). Design: bible/11-Multiplayer/World-Bosses.md section 20, WB13e.
+// fall ("Felled" under his name, over his spoils). Design: WB13e.
 //
 // A READOUT, NOT A WINDOW (the gate banner's law, ui/gate/gateBanner.js): no click, no overlay stack, one node made on the
 // first word and UPDATED, NOT REBUILT - each part written only when it changes - hidden (never removed) when there is

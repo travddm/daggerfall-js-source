@@ -1,6 +1,5 @@
 // @ts-check
-// LIGHT-ID (2026-10-14, Mac: "Engine fix (Recommended)" - FIELD BUGS 2026-10-13e AOE-PERF's follow-up, the boss's lights'
-// shadows): A LIGHT IS SOMEBODY'S LIGHT. Design and record: bible/07-Rendering/Enhanced-Lighting-Arc.md LIGHT-ID.
+// LIGHT-ID: A LIGHT IS SOMEBODY'S LIGHT. Design and record: LIGHT-ID.
 //
 // The frame's light list was a place and a range a light - four floats - so the shadow pass could tell one light from
 // another only by WHERE it stood (SC1's sticky slots, DISC15's lo slots). A light that moved (the gate boss's glow at his

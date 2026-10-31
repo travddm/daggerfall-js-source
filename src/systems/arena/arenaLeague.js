@@ -1,7 +1,5 @@
 // @ts-check
-// ARENA3 (2026-10-02, Mac: "join a team (red and blue) and climb esclating tiers of opponents"; "Joining a team comes
-// with it's own enhanced UI where you can view your ranking and even player leaderboards"; "Being a top rank PvE fighter
-// comes with it's own title"): THE BANNERS AND THEIR SEASON, offline. Design: bible/11-Multiplayer/Arena.md "3. The
+// ARENA3: THE BANNERS AND THEIR SEASON, offline. Design: "3. The
 // teams", "5. The Arena window", "6. Titles and the laurel".
 //
 // TWO COMPANIES - the Red Banner and the Blue Banner. Joining is at their recruiters at the gate, free; CHANGING COSTS A

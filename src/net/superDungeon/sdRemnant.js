@@ -1,5 +1,5 @@
 // @ts-check
-// SD8a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S LAW -
+// SD8a: THE BRASS REMNANT'S LAW -
 // the Last Moment's fight, as the gate's Warden's is (net/gate/gateBrain.js): pure (the moment and a [0,1) source handed in,
 // no I/O), the relay's to run (SD8b) and every screen's to read. What the Warp kept of the Numidium: a brass colossus four
 // times a man's height, its chest an open cage about a heart of shattered soul-gem light - the Mantella's echo.

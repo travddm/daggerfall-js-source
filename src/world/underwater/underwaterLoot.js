@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E5 (2026-09-26): ILIAC PUDDLE NO MORE'S SUNKEN LOOT - the laws
+// DW-E5: ILIAC PUDDLE NO MORE'S SUNKEN LOOT - the laws
 // UnderwaterLootSpawner.cs places it by, as pure functions (jet082,
 // 1.2.2): the pulse's two rolls (a treasure cluster, the stray piles),
 // the spot a pile may lie on (DeepWaterWorld.TryPickFogAheadPoint, the

@@ -1,6 +1,5 @@
 // @ts-check
-// GRANT2-GRANT4 (2026-10-18, Mac: "Lets build the plan", "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections
-// 12-16): THE GRANTS' HOST - a module the host wires (HOST-SPLIT; scenes/fishHost.js is the shape), the owner's half and
+// GRANT2-GRANT4: THE GRANTS' HOST - a module the host wires (HOST-SPLIT; scenes/fishHost.js is the shape), the owner's half and
 // the reader's of every spawn grant this client holds or hears. The pools (scenes/exteriorFoes.js - the street's and a
 // building's - and the dungeon's own lane, scenes/dungeonContext.js) ask it; world.js makes one, hands it to their nets
 // (`grants`) and its session's answers (`online.onGrant`).

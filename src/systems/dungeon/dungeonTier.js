@@ -1,6 +1,5 @@
 // @ts-check
-// TIER1 (2026-10-05, Mac: "Along with this change will be a simplier addition, visible showing dungeons difficulty as
-// Regular, Elite or Super"; bible/11-Multiplayer/Super-Dungeons.md section 12): A DUNGEON'S TIER, IN ONE WORD.
+// TIER1: A DUNGEON'S TIER, IN ONE WORD.
 //
 // ONE LAW for every surface that names a dungeon: 'super' for a Hollow (the Super dungeon - its location says so,
 // `superTier`), 'elite' for an Elite spawn (`elite`, world/spawnedDungeons.js synthesizeDungeonLocation), 'regular'
@@ -18,7 +17,7 @@
 /** The three tiers, easiest first. */
 export const DUNGEON_TIERS = Object.freeze(['regular', 'elite', 'super']);
 /** Each tier's words - the plaque's title, the map's label, the entry line. */
-export const DUNGEON_TIER_TEXT = Object.freeze({ regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME (2026-10-07, Mac: "lets rename Super Dungeons to Abyss Dungeons (Keep the code in tact, this is for player facing putposes)"): the tier the code calls `super` is the player's Abyss Dungeon
+export const DUNGEON_TIER_TEXT = Object.freeze({ regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });     // ABYSS-NAME: the tier the code calls `super` is the player's Abyss Dungeon
 /** The three sizes' words (world/dungeon/dungeonLabel.js reads which, off the built dungeon's block count). */
 export const DUNGEON_SIZE_TEXT = Object.freeze({ small: 'Small', medium: 'Medium', large: 'Large' });
 

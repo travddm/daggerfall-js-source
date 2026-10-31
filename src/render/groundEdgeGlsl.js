@@ -1,5 +1,5 @@
 // @ts-check
-// COAST-LOOK (2026-10-28, the owner: "Coastlines arent texture blended properly. They have hard edges" - "Both edges"):
+// COAST-LOOK:
 // world/terrain/groundEdge.js's GLSL twin, term for term (its table, its dials, ROAD-LOOK's lattice noise), for both
 // terrain programs, the water's sheet and the silt; test/render/coastlook.test.js runs it through test/glsl.mjs against
 // the JS. `uGroundEdge` is the switch (renderer.js `coastEdges`): 0 draws every tile as DFU does.

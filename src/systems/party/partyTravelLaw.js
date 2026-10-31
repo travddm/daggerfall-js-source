@@ -1,6 +1,5 @@
 // @ts-check
-// THE PARTY TRAVEL LAW (PARTY-TRAVEL, 2026-09-25, Mac: "Implementing a prompt for online to travel to party leader and
-// the option for party members to ready up and travel together") - the pure half of scenes/world.js's party journey,
+// THE PARTY TRAVEL LAW (PARTY-TRAVEL, 2026-09-25) - the pure half of scenes/world.js's party journey,
 // written as a law from the first line so its pins RUN it (AUDIT PARTY-REST's lesson: the rest mechanic's rules were
 // closures over world.js pinned by regexes, and thirteen of fourteen mutants survived them).
 //

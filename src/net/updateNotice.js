@@ -1,7 +1,5 @@
 // @ts-check
-// SRV-N (2026-09-17, Mac: "One thing I want to add is a server restart
-// notice whenever we push server updates. Like a notice that pushes in
-// the chat window").
+// SRV-N.
 //
 // ═══ "SERVER" IS TWO THINGS, AND ONLY ONE OF THEM IS THE SERVER ═══
 //

@@ -1,5 +1,5 @@
 // @ts-check
-// EG-H2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 24, slice EG7): THE
+// EG-H2: THE
 // MADE LEVEL'S RULES - one law for the made levels the world host stands a player in: the Burning Court (an Oblivion
 // Gate's arena, world/gate/gateArena.js) and the Shattered Hour (world/superDungeon/sdRealm.js). Each rule's door asked
 // the level itself (`gateArenaDay`, `sdRealmSlot`, `isGateArena`, `_sdRealm`), so a new made level grew a new copy of
@@ -52,7 +52,7 @@ export const madeLevelOf = (loc) => (isGateArena(loc) ? 'court' : isSdRealm(loc)
  *   runLeap       'refused'  - EG-PERFECT: the enhanced climb's RUNNING LEAP (player/motor.js _pkMayLeap - CLIMB3's leap at an
  *                              edge and its late press) refused, so a running Jump at an edge is the plain jump the courses
  *                              were proven with; the wall run, the mantle, the vault and the free climb are kept
- *   resurrect     'refused'  - a party member's Resurrect (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed" - no
+ *   resurrect     'refused'  - a party member's Resurrect (EVENT-RULES, 2026-10-25, - no
  *                              level refuses it now; the key stays for a level that will)
  *   avoidDeath    'refused'  - Stendarr's AvoidDeath (GuildManager.AvoidDeath)
  *   death         'castOut' | 'final' | 'fall' - what a death is: cast out before the gate, final for the Hollow, a fall
@@ -66,7 +66,7 @@ const NONE_IS_ZERO = new Set(['jumpBuffer', 'latePress']);
 /** A level's row: every rule named, null (or 0 for a duration) where the level leaves the game as it is. */
 const row = (o) => Object.freeze(Object.fromEntries(MADE_LEVEL_RULE_KEYS.map((k) => [k, o[k] ?? (NONE_IS_ZERO.has(k) ? 0 : null)])));
 /** WHAT EACH MADE LEVEL TURNS OFF (section 24's table, as the doors read it).
- *  EG-PERFECT (2026-10-18, Mac: "Traversing between sections should present a challenge, platforming should be detailed"):
+ *  EG-PERFECT:
  *  THE RUNNING LEAP REFUSED on the made levels whose ways are proven gap by gap - the Spire's spans (section 10.5, THE TIMED
  *  SOLVER) and the Shattered Hour's Unmoored Steps (SD7b) are both proven with THE SPAN BUILD's PLAIN running jump, and the
  *  enhanced climb is forced on online (systems/features.js `enhanced-climbing`, scenes/shared.js parkourSwitchOn): a running
@@ -76,8 +76,7 @@ const row = (o) => Object.freeze(Object.fromEntries(MADE_LEVEL_RULE_KEYS.map((k)
  *  own record, and its online page forces the same lane), so both rows refuse it; the court has no course. The wall run, the
  *  mantle, the vault and the free climb stay on. THE AUDIT: the Hour gives no late press (DFU's motor's own), so its refused
  *  late Jump past an edge is nothing at all - as DFU's; the Spire's is its own forgiveness, the plain jump.
- *  EVENT-RULES (2026-10-25, the owner, on "a lot of people are unhappy with the world event restrictions including the
- *  regen not working"): every level HOLDS regeneration now ('held' - half, and none for 5 s after a hurt), where it had
+ *  EVENT-RULES: every level HOLDS regeneration now ('held' - half, and none for 5 s after a hurt), where it had
  *  turned it off and said nothing; and none refuses a party member's Resurrect - the Hour's one life is the relay's to
  *  keep until the fallen gives it up (Super-Dungeons.md SD-ONELIFE, EVENT-RULES). The rest stands, said on the HUD's
  *  made-level tile (ui/hud/statusTips.js madeRulesTile). */

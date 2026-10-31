@@ -1,5 +1,5 @@
 // @ts-check
-// WB2 (2026-09-25): THE GATE'S OWN ART, MADE AT BOOT - the port draws no Oblivion in ARENA2, so the gate's stone is
+// WB2: THE GATE'S OWN ART, MADE AT BOOT - the port draws no Oblivion in ARENA2, so the gate's stone is
 // made here from noise the moment a host asks (combat/blood/bloodArt.js's law: an atlas of the port's own under a
 // pseudo-archive far above any classic one, no renderer and no GL in this file - pixels and numbers).
 //

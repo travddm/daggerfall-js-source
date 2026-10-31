@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL2 (2026-10-08, bible/03-World/Tamriel.md) - THE GROUND BEYOND THE BAY: the land mass, streamed.
+// TAMRIEL2 - THE GROUND BEYOND THE BAY: the land mass, streamed.
 //
-// Mac: "Lets worry about this later and only implement the land mass." The towns, the dungeons, the regions and the
+// The towns, the dungeons, the regions and the
 // roads wait; the GROUND does not. Daggerfall's streamed world grows every tile from two bytes a map pixel - WOODS.WLD's
 // height and CLIMATE.PAK's climate - through DFU's own kernel (world/terrain/terrainSampler.js, world/terrain/terrainGen.js), and that
 // kernel asks for them through three reads: getHeightMapValue, getHeightMapValuesRange1Dim and
@@ -21,7 +21,7 @@
 // THE HEIGHT LAW is the raster's (world/tamriel/tamrielRaster.js reads it from here, one home): the sea's byte is 0; land starts
 // at SHORE_BYTE and rises with distance from the coast to INLAND_BYTE over PLAIN_REACH picture units; a range lifts its
 // band toward SNOW_BYTE by its gain; a lattice hash of ±2 keeps a plain from reading as a contour. Pure, deterministic,
-// cached a pixel (the stream asks the same few hundred pixels many times). TAMRIEL-RELIEF (2026-10-24): where the trace
+// cached a pixel (the stream asks the same few hundred pixels many times). TAMRIEL-RELIEF: where the trace
 // stands, the land's height is the owner's heightmap instead (world/tamriel/tamrielRelief.js) - eased in from SHORE_BYTE
 // over RELIEF_COAST_REACH, the lattice hash on it - and the authored ranges are the law only without a trace.
 // ═══════════════════════════════════════════════════════════════════
@@ -180,7 +180,7 @@ export function largeOfByte(b) {
  *  each cell the law of the small byte at its own place - a pixel's cells stand about its byte's node (the pixel's
  *  south-east corner) a third of a pixel apart, so a cell's byte is the small term there, the bytes about the node read by
  *  the kernel's own cubic - where it was BREATHTAKER3's swell about 4.5. Deterministic in the pixel, kept. TAMRIEL-DEEP
- *  (bible/03-World/Deep-Waters.md): none at sea, as WOODS.WLD's own sea carries none (0 over 406 of 411 sampled Bay sea
+ * : none at sea, as WOODS.WLD's own sea carries none (0 over 406 of 411 sampled Bay sea
  *  pixels, 1 the most) - detail there lifted the seabed past the Bay into the beach line's reach
  *  (world/deepWater/deepWatersBake.js classifyPixel). RUMARE-WATER: none on the basin's span about the Imperial City, eased
  *  back over its ramp (world/rumareWaters.js rumareBasin), as its bytes are let down to the shore - the city at the sea
@@ -297,7 +297,7 @@ export function groundAirClimateIndex(bayClimateIndex) {
 }
 
 /**
- * THE AIR A BODY FEELS (TESA-LANDS' audit, the owner: "Definitely fix any bugs you encounter"): a pixel's climate as the
+ * THE AIR A BODY FEELS (TESA-LANDS' audit): a pixel's climate as the
  * survival law reads it (systems/survival/temperature.js CLIMATE_TEMP) - past the Bay a zone's `air` where it names one
  * (groundAirClimateIndex's law), else `climate` (the hosts' map's answer). It read the ground's: the Ashlands' Mountains
  * (-40) under the Dak'fron's Desert2 air (+50) froze a character to death on a summer's walk.
@@ -307,7 +307,7 @@ export function feltClimateIndex(x, y, climate) {
   return (inBay(x, y) ? null : tamrielBiomeAt(x, y)?.air) ?? climate;
 }
 
-/** WW-R (bible/03-World/World-Wide.md WW-R): THE POLITIC MAP PAST THE BAY - a province's land its region's politic
+/** WW-R (WW-R): THE POLITIC MAP PAST THE BAY - a province's land its region's politic
  *  (128 + its region, formats/mapsTables.js regionOfTheatre: MapsFile.getRegionIndexAt reads the province's region off
  *  it, as it reads a Bay region off POLITIC.PAK), the sea about it the PAK's own answer off its map (no region's); the
  *  Bay to the byte. @param {(x: number, y: number) => number} bayPoliticIndex */

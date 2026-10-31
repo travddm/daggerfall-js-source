@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF1 (2026-09-28, Mac: "So for developer, dungeon master and the shadow fang titles I want to add teleport, debug,
-// and other admin commands"; Mac chose the groups: TELEPORT (self) and DEBUG, no time or weather, nothing that acts on
+// STAFF1 (2026-09-28,; Mac chose the groups: TELEPORT (self) and DEBUG, no time or weather, nothing that acts on
 // another player): THE STAFF'S CHAT COMMANDS - one grammar, pure, DOM-free (net/chatCommands.js's way).
 //
 //   /tp <place>          to a town, dungeon or other named place, anywhere in the Iliac Bay (its best match)

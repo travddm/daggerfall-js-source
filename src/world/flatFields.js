@@ -1,4 +1,4 @@
-// WD3 (2026-10-01): A MODEL ID THAT IS A FIELD OF FLATS.
+// WD3: A MODEL ID THAT IS A FIELD OF FLATS.
 //
 // The RMB Resource Pack's crop prefabs (53211-53214) carry no mesh: each is a component, RMBCropBillboardBatch, that
 // sows a rectangle of Daggerfall's own crop billboards round the spot the block places it - a grid `range` metres on a

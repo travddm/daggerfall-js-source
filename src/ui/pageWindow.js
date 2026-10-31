@@ -1,4 +1,4 @@
-// JOURNAL1 (2026-09-23, the community arc - Addison Knox: "Player journals ... shared in-world for storytelling"): THE
+// JOURNAL1: THE
 // PAGE ANOTHER PLAYER HELD OUT - a card in the middle of the screen, opened from the F-menu's "Read their page" row
 // when I turn to them. Nothing opens it on its own: a page held out WAITS (net/journalPage.js PageOffers), because a
 // window that opened over my game whenever somebody near me pressed a button would be theirs to open, not mine.

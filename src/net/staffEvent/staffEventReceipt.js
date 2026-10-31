@@ -1,8 +1,7 @@
 // @ts-check
-// STAFF-EVENT THE REWARD (2026-10-24, mob: "what should we do for the mini bosses drop for loot?", "something like dagons
-// leaderboard", "but not his ghear", "build that base", "but we will tweak the drop table"): A STAFF EVENT'S RECEIPT -
+// STAFF-EVENT THE REWARD: A STAFF EVENT'S RECEIPT -
 // the relay's signature on one fighter's reward at the mini boss's first fall, a town raid's receipt's twin
-// (net/raid/raidReceipt.js). Design: bible/11-Multiplayer/Staff-Events.md section 9.
+// (net/raid/raidReceipt.js). Design:
 //
 //     e1.<base64url({ v, s, c, r, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         v the event's id   s the account (the identity token's sub)

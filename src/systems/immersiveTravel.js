@@ -1,5 +1,4 @@
-// IT1 (2026-10-04, the owner: "Actually lets let this be the next mod we integrate 1:1", after asking how instant
-// travel could come back online "as an option but with a cost"): IMMERSIVE TRAVEL 1.5, by kkgobkk - "Implements
+// IT1: IMMERSIVE TRAVEL 1.5, by kkgobkk - "Implements
 // diegetic fast-travel by adding carriages outside of city gates." (vendor/immersive-travel/README.md).
 //
 // THE MOD, WHOLE. A carriage, two horses and a driver stand outside the gate of every walled city (its four

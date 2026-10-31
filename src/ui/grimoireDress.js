@@ -61,7 +61,7 @@ export const GRIMOIRE_VITALS = Object.freeze({ upright: 'Upright vials', row: 'V
  *  GrimoireUI spellbook?"): the spellbook as the dress's book (the desk's painted book, like every other) or as
  *  GrimoireUI's own spellbook picture (SPBK00I0), every press of the enhanced book written on it. */
 export const GRIMOIRE_SPELLBOOKS = Object.freeze({ book: 'DFO book', pack: 'GrimoireUI\'s own' });
-/** DIAL-PACK (2026-10-12, Mac: "add the old Tab selector as optional to the overhaul option"): the Tab dial's doors in
+/** DIAL-PACK: the Tab dial's doors in
  *  Daggerfall's own art (the face and the HUD bar's icons - ui/dialClassicArt.js, the default) or the pack's paintings
  *  (GRIM4's helm, book, chest and map). */
 export const GRIMOIRE_DIALS = Object.freeze({ classic: 'Daggerfall icons', pack: 'Grimoire paintings' });
@@ -162,7 +162,7 @@ export function inkColour(c) {
   const sat = Math.max(0.55, Math.min(0.85, s));
   return hsla(h, sat, readableL(h, sat, 0.25), a);                              // a hue (a rarity, a gain, a loss): its ink
 }
-/** INK-READ (2026-10-12, Mac: "make sure the fonts are readable the grey ones arent"): the lightness a hue's ink may have
+/** INK-READ: the lightness a hue's ink may have
  *  and still read at 4.5:1 on the pages' darkest tan (relative luminance 0.43): `want` or darker, a hundredth at a time
  *  - an amber at 24% stood at 3.96:1 (the credits' "by ...", the settings' heads), a teal at 25% at 3.3:1. */
 const INK_LUMA_MAX = 0.055;
@@ -221,7 +221,7 @@ export function lineColour(c, shadow = false) {
   return hsla(30, 0.38, 0.42, a);
 }
 const COLOUR_TOKEN = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|\b(?:white|black)\b/g;
-/** INK-VARS (2026-10-11, the Social panel on the page: "those fonts need to be made readable"): THE COLOURS A SHEET
+/** INK-VARS: THE COLOURS A SHEET
  *  NAMES FOR ITSELF. A var the enhanced root does not hold (the Arena window's `--mute`, the stat card's `--sf-dim`) is
  *  read as the one colour the sheets define it as - learned off every sheet before it is inked (learnSheetVars). A
  *  name defined as two different colours (a rarity's `--rar`, a hotbar slot's `--hb-acc`: one per kind) is the
@@ -437,8 +437,7 @@ export function rollUpGrimoireScroll(node, doc, from = null) {
   if (reducedMotion(doc)) return;
   // A WHOLE OVERLAY TAKEN OFF THE PAGE (the rest window's host, fixed over the screen): its likeness is the overlay
   // itself, put back as it was for the beat - the scroll keeps every rule its shell gave it (its size, its writing), so
-  // it rolls up exactly as it stood instead of a lookalike that jumped first (Dudey: "it still doesnt close properly like
-  // a scroll")
+  // it rolls up exactly as it stood instead of a lookalike that jumped first
   if (from === doc.body && !node.matches?.(UNROLL_SEL) && node.style?.position === 'fixed') {
     const inner = [...(node.querySelectorAll?.(UNROLL_SEL) ?? [])];
     if (inner.length) {
@@ -704,10 +703,10 @@ const longUp = (kind, empty = false, u = 'gq') => { const e = empty ? 'Empty' : 
   return `${v(`vial${kind}UpFoot${e}`)} 0 0 / ${px(VIAL_FOOT, u)} 100% no-repeat,
   ${v(`vial${kind}UpHead${e}`)} ${empty ? '100%' : `calc(100cqw - ${px(VIAL_CUT.tubeFrom, u)})`} 0 / ${px(VIAL_CUT.tubeFrom, u)} 100% no-repeat,
   ${v(`vial${kind}UpBody${e}`)} ${px(VIAL_FOOT, u)} 0 / calc(${W} - ${px(VIAL_CUT.tubeFrom + VIAL_FOOT, u)}) 100% no-repeat`; };
-/** THE PACK'S RULE under a heading (GRIM3, Dudey: "what are those pointed lines under the journy the realm"): the
+/** THE PACK'S RULE under a heading (GRIM3): the
  *  spellbook's own hand-drawn ink stroke (ui/grimoireArt.js rule), its dotted ends kept at the pack's pixels and its
  *  stroke run along between them. */
-// UI-CALM (2026-10-14, a player: "dotted line everywhere"): the stroke's dotted ends went with every dotted rule - a
+// UI-CALM: the stroke's dotted ends went with every dotted rule - a
 // heading is ruled by one plain line of the page's brown ink, and every rule that was dotted is drawn whole
 const RULE_UNDER = 'border-bottom: 2px solid rgba(92,56,24,0.5) !important; border-image: none !important;';
 /** One of the pack's own pixels (a third of the game's), for a picture laid at the pack's own size. */
@@ -732,13 +731,12 @@ ${q('.px-fill.blood')} { background: ${tube('Health')}, #8a1c18 !important; }
 ${q('.px-fill.verdigris')} { background: ${tube('Magicka')}, #2f5fb4 !important; }
 ${q('.px-meter:has(> .px-fill.thin)')} { height: ${px(3, 'gq')} !important; background: rgba(40,22,8,0.55) !important; box-shadow: 0 0 0 ${px(1, 'gq')} ${T.outline} !important; }
 ${q('.px-fill.thin')} { background: linear-gradient(180deg, #fff0a0 0 ${px(1, 'gq')}, ${T.goldLeaf} ${px(1, 'gq')} ${px(2, 'gq')}, #9a7420 ${px(2, 'gq')}) !important; }
-/* MASTERY-INK (2026-10-20, Dudey: "dont use those thick green bars for mastery make them red and the same thickness as
-   the yellow ones"): a mastered skill's climb past 100 is the thin bar's groove in red, not a Fatigue vial */
+/* MASTERY-INK: a mastered skill's climb past 100 is the thin bar's groove in red, not a Fatigue vial */
 ${q('.px-meter.px-over')} { height: ${px(3, 'gq')} !important; background: rgba(40,22,8,0.55) !important; box-shadow: 0 0 0 ${px(1, 'gq')} ${T.outline} !important; }
 ${q('.px-fill.px-overfill')} { background: linear-gradient(180deg, #e8705c 0 ${px(1, 'gq')}, ${T.redHi} ${px(1, 'gq')} ${px(2, 'gq')}, ${T.redDeep} ${px(2, 'gq')}) !important; }
 ${q('.px-meter.px-over .px-tick')} { display: none; }
 ${q('.px-skillmeter')} { gap: ${px(2, 'gq')} !important; }
-/* GRIM4 (Dudey: "the bars in the ascend and status screen also do not look like the player health/stam/mana bars"): a
+/* GRIM4: a
    vital's row is the HUD's own vial; GRIM5 ("the vial bars are toooshort in the stat screen"): drawn out to the row's
    length - the vial's own head (cork and lit shoulder), its glass, and its own foot at the far end, each at the HUD's
    pixels (ui/grimoireArt.js VIAL_CUT). The track is a size container, so the liquid lays the foot at the TRACK's end
@@ -778,7 +776,7 @@ const TAB_ON_CSS = `background: #c8a874 !important; ${TAB_EDGE}
   text-decoration: underline solid ${T.red} !important; text-decoration-thickness: ${px(1, 'gk')} !important; text-underline-offset: 0.22em !important;`;
 /** A closed tab under the pointer lifts a shade - its name stays ink: red is the open tab's alone. */
 const TAB_HOVER = `color: #120a04 !important; filter: brightness(1.14);`;
-/** GRIM3: THE SCROLLBAR - quiet (Dudey: "the scrollbar looks out of place and needs to be less appearing"): three of the
+/** GRIM3: THE SCROLLBAR - quiet: three of the
  *  game's pixels wide, no track to speak of but a faint ruled line down the page, the thumb a half-clear stroke of the
  *  page's own ink that firms up under the pointer and goes red as it is dragged; on wood a pale stroke instead. */
 const SB_INK = 'rgba(74,44,18,0.38)', SB_INK_HI = 'rgba(74,44,18,0.68)', SB_RED = 'rgba(142,26,16,0.78)';
@@ -796,8 +794,7 @@ ${G} ::-webkit-scrollbar-thumb:active { background: ${SB_RED}; }
 ${G} ${SB_WOOD}::-webkit-scrollbar-track { background: linear-gradient(90deg, transparent 0 ${px(1)}, rgba(232,207,152,0.1) ${px(1)} ${px(2)}, transparent ${px(2)}); }
 ${G} ${SB_WOOD}::-webkit-scrollbar-thumb { background: ${SB_PALE}; }
 ${G} ${SB_WOOD}::-webkit-scrollbar-thumb:hover { background: ${SB_PALE_HI}; }
-/* THE SETTINGS IN THE BOOK - compact (Dudey: "the filers and the search function in the settings take so much place
-   there isnt much left for seeing the rest"): the categories in tight rows, and the search, the filters, All off and
+/* THE SETTINGS IN THE BOOK - compact: the categories in tight rows, and the search, the filters, All off and
    Reset on one slim strip (two at most) - the page is for the settings. A touch screen keeps its thumb-sized targets. */
 @media (any-pointer: fine) {
   ${G} .px-journal .subrail { padding: ${px(1)} ${px(1)} ${px(2)} !important; gap: 0 ${px(1)} !important; }
@@ -813,7 +810,7 @@ ${G} ${SB_WOOD}::-webkit-scrollbar-thumb:hover { background: ${SB_PALE_HI}; }
 }
 /* A BAR THAT STAYS PUT while the rest scrolls under it (the settings' search and filters, the pool's head, a review's
    head, the controls' head) keeps a ground of its own - the page's paper on a page, the desk's wood on the desk - or
-   the rows scroll visibly through it (Dudey: "the settings menu isnt working correctly") */
+   the rows scroll visibly through it */
 ${G} :is(.opt-tools, .poolbar, .reviewhead, .ctl-head) { background: ${WOOD(0.34)} !important; box-shadow: 0 ${px(1)} 0 rgba(0,0,0,0.35) !important; }
 ${G} :is([data-grim="ink"], .px-journal) :is(.opt-tools, .poolbar, .reviewhead, .ctl-head) {
   background: linear-gradient(180deg, #ddc28e, #d6b982) !important; border-bottom: ${px(1)} solid rgba(74,44,18,0.45) !important;
@@ -890,7 +887,7 @@ ${G} [data-grim-on="wood"]:hover, ${G} [data-grim-on="wood"]:focus-visible { col
   outline: none; }   /* UI-CALM: no dotted rule under a word the pointer is on - the light and the ground say it */
 ${G} [data-grim-on]:active:not(:disabled) { translate: 1px 1px; }
 ${G} [data-grim-on]:disabled, ${G} [data-grim-on][disabled] { opacity: 0.45; text-decoration: none; background: none !important; translate: none; }
-/* INK-DISABLED (2026-10-11): a press on a PAGE that cannot be pressed is written in the softer ink, solid - at 45% the
+/* INK-DISABLED: a press on a PAGE that cannot be pressed is written in the softer ink, solid - at 45% the
    brown on the tan scroll stood under 2:1, and the reason written beside its word (a friend's "offline", "no username",
    what a guild's name still needs) went with it. The softer ink still reads as the dead press beside the live one. */
 ${G} [data-grim-on="page"]:is(:disabled, [disabled]) { opacity: 1 !important; color: ${T.inkSoft} !important; text-decoration: none !important; cursor: default; }
@@ -952,7 +949,7 @@ ${at(R.well)} { background-color: rgba(22,13,6,0.9); color: ${T.cream};
 /* a FIELD is a strip of fresh page in a dark frame, written in ink */
 ${at(R.input)} { background: ${T.cream}; color: ${T.ink}; text-shadow: none; caret-color: ${T.red};
   border-color: ${T.outline} ${T.woodLit} ${T.goldLeaf} ${T.woodMid}; }
-/* INK-FIELDS (2026-10-11: the guild's name and the map's Find a place typed in cream and in yellow on the cream): a field
+/* INK-FIELDS: a field
    is a WOODEN surface to the ink (its role says so) and its own sheet's light word - and, focused, the map's yellow - was
    re-said for the wood, which outweighs the plain rule above. What is typed in a field is ink, whatever is focused; the
    chat's own field said this first (below) and every field says it now. */
@@ -961,8 +958,7 @@ ${at(R.input)}, ${at(R.input, ':focus')} { color: ${T.ink} !important; -webkit-t
 ${at(R.input, '::placeholder')} { color: ${T.inkFaint} !important; -webkit-text-fill-color: ${T.inkFaint} !important; opacity: 1; }
 ${at(R.input, ':focus')} { border-color: ${T.red} ${T.goldLeaf} ${T.goldLeaf} ${T.red}; outline: none; }
 
-/* BANDS - a window's name and the shelf its presses stand on: a plank of the desk across the page. GRIM3 (Dudey: "the
-   wooden bars in the inventory look cheap"): a real plank - the desk's grain at the grid's pixels in a black outline,
+/* BANDS - a window's name and the shelf its presses stand on: a plank of the desk across the page. GRIM3: a real plank - the desk's grain at the grid's pixels in a black outline,
    its top edge lit and its foot shaded a pixel each - laid on the page inside its torn edge,
    never a strip of texture run on under it */
 /* a band whose own sheet gives it no room (the shop's "On the shelf") gets a plank's worth, so no word sits on its line */
@@ -982,7 +978,7 @@ ${at(R.tabs, ':hover:not(.on)')}, ${at(R.tabs, ':focus-visible:not(.on)')} { ${T
 ${at(R.rule)} { border-bottom-color: rgba(92,56,24,0.4); box-shadow: none; }
 ${at(R.ruleTop)} { border-top-color: rgba(92,56,24,0.4); box-shadow: none; }
 ${at(R.listRow)} { border-bottom-color: rgba(92,56,24,0.35); border-bottom-style: solid; background-image: none; box-shadow: none; }
-/* NO-BAR (2026-10-12, Mac: the Reforge's rows "have those lines"): a row under the pointer or chosen is not marked with a
+/* NO-BAR: a row under the pointer or chosen is not marked with a
    red bar down its edge - the page is washed under it, a shade deeper when it is the chosen one, as a finger on a page */
 ${at(R.listRow, ':hover')}, ${at(R.listRow, ':focus-visible')} { box-shadow: none; background-color: rgba(142,26,16,0.07); }
 ${at(R.listRow, '.on')} { box-shadow: none; background-color: rgba(142,26,16,0.13); }
@@ -990,7 +986,7 @@ ${at(R.qrow, '.on')} { box-shadow: none; background: rgba(142,26,16,0.13); }
 ${at(R.wing)} { background: linear-gradient(180deg, rgba(60,34,14,0.75) 0 1px, transparent 1px); }
 ${G} .px-divider::before, ${G} .px-divider::after { background: rgba(60,34,14,0.6); }
 ${G} .px-sigil, ${G} .px-divider i { color: ${T.red}; }
-/* NO-LINES (2026-10-11, a player: "those weird lines everywhere, those are not needed"): a page of the pack is not ruled
+/* NO-LINES: a page of the pack is not ruled
    off line by line. The thin separators under a row, over a row and under a heading, the wings and the dashes either
    side of a section's name are gone; what tells two rows apart is their spacing, as on the pack's own pages. */
 ${at([...R.rule, ...R.listRow, ...R.headerRule])} { border-bottom-color: transparent !important; box-shadow: none; }
@@ -1023,8 +1019,7 @@ ${G} .px-mhead { border-bottom: 0; padding-bottom: 8px !important; margin-bottom
 ${G} .px-mname { color: ${T.red} !important; text-shadow: none !important; }
 ${G} .px-mcount { color: ${T.inkSoft} !important; }
 ${G} .px-pips, ${G} .px-pip.on { color: ${T.goldLeaf} !important; text-shadow: 0 1px 0 ${T.outline} !important; }
-/* THE REFORGE ON THE PAGE (2026-10-12, Mac: "make sure the fonts are readable the grey ones arent. plus make it look
-   better"): a row reads as the pack's own price lists do - what it is in the book's red when it is a family to scry
+/* THE REFORGE ON THE PAGE: a row reads as the pack's own price lists do - what it is in the book's red when it is a family to scry
    (an item keeps its rarity's ink), what it is for in ink beneath, its price in ink beside, and the press written in
    red when it can be pressed; a press that cannot says why in the softer ink, leaning, never faded. */
 ${G} .reforge-shell .broker-offer .broker-price { color: ${T.ink} !important; text-shadow: none !important; opacity: 1 !important; }
@@ -1035,7 +1030,7 @@ ${G} .reforge-shell .broker-buy[data-grim-on="page"]:is(:disabled, [disabled]) {
 ${G} .reforge-shell .broker-offer { padding-top: 8px !important; padding-bottom: 8px !important; }
 ${G} body .reforge-shell .reforge-tabs .act.reforge-tab.on[data-grim-on]:not(:hover):not(:focus-visible) { color: #7a170c !important; text-decoration: underline solid #7a170c !important; text-underline-offset: 0.22em; }   /* the open page's word, 4.7:1 and underlined */
 
-/* THE NOTICE - GRIM3 (Dudey: "the notification box is unreadable"): a note on the tan scroll is written in the pack's
+/* THE NOTICE - GRIM3: a note on the tan scroll is written in the pack's
    brown ink and nothing else - Plus's hard dark shadow under each word, re-said in ink, doubled every letter - at the
    face's own size, its line a whole pixel of the grid, the red rule down its edge */
 ${G} .notice:not(.notice-toast) { border: ${px(1)} solid rgba(48,26,10,0.85) !important; border-left: ${px(2)} solid ${T.red} !important; border-right: 0 !important;
@@ -1111,8 +1106,7 @@ ${G} .hud-foe .hud-chunk { display: none !important; }
    thickness") */
 ${G} .hud-foe.blade .hud-foeblade { display: none !important; }
 ${G} .hud-foe.blade .hud-foetrack { display: block !important; }
-/* GRIM3: WHAT A BAR LOSES DRAINS AWAY IN THE GLASS (Dudey, on the fuse it replaced: "we need a different fitting effect
-   thats not too much"): what a blow, a spell or a sprint took stays a moment as the vial's own liquid gone dark - the
+/* GRIM3: WHAT A BAR LOSES DRAINS AWAY IN THE GLASS: what a blow, a spell or a sprint took stays a moment as the vial's own liquid gone dark - the
    same glass, the same tube, darkened and dulled - and drains back to the liquid at the game's own pace (the held strip
    the bar always kept, enhancedHud.js lossTick). No flame, no spark: a vial losing what it held. */
 ${G} .hud-vital .hud-ghost, ${G} .hud-foe .hud-foetrack .hud-ghost { opacity: 1; border-radius: 0; z-index: -1; display: block;
@@ -1134,7 +1128,7 @@ ${G} .hud-renowntrack .hud-fill { background: linear-gradient(180deg, #f6dc7a 0 
 ${G} .hud-renownnum { color: ${T.ink}; text-shadow: 0 1px 0 rgba(255,240,200,0.5); }
 ${G} .hud-renownbox { color: ${T.yellow}; text-shadow: ${WORD_ON_WOOD}; }
 
-/* THE COMPASS - GRIM3 (Dudey: "the compas needs to look more like a compass not like a board with NSWE in it"; "its
+/* THE COMPASS - GRIM3 (; "its
    HUGE!!! turning it around would also make more sense"): the pack's own compass - its gilded dome in its wooden box
    (COMPBOX) over its parchment strip (COMPASS: N, E, S, W and the ticks between, drawn by the pack) - on the game's own
    grid (ui/grimoireArt.js compBox, compass), two and a half screen pixels to each of its own (--gcm: "still a bit too
@@ -1145,7 +1139,7 @@ ${G} .hud-renownbox { color: ${T.yellow}; text-shadow: ${WORD_ON_WOOD}; }
 ${G} .hud-top { top: 0 !important; }
 ${G} .hud-compass { --gcm: calc(var(--gq, 2px) * 1.25); width: calc(69 * var(--gcm)); height: calc(17 * var(--gcm)); background: none; border: 0; box-shadow: none;
   filter: drop-shadow(${px(1, 'gq')} ${px(1, 'gq')} 0 rgba(0,0,0,0.55)); }
-/* GRIM4 (Dudey: "The compass looks blurry make better readable"): the box and the strip are the pack's own pictures at
+/* GRIM4: the box and the strip are the pack's own pictures at
    ITS resolution - three of its pixels to one of the game's - drawn smooth at the compass's size, never the game-grid
    cut stretched pixel for pixel by two and a half (which smeared every letter): N, E, S and W keep the pack's own
    strokes. */
@@ -1155,7 +1149,7 @@ ${G} .hud-compass .hud-strip { left: calc(2 * var(--gcm)); right: calc(2 * var(-
   background: url("${grimoireImg('COMPASS')}") no-repeat #bc8941;
   background-size: calc(322 * var(--gcm)) calc(14 * var(--gcm));
   background-position: calc((32.5 - 32.83 - var(--hud-heading, 0) * 257) * var(--gcm)) calc(4 * var(--gcm)); }
-/* TURN1 (Dudey: "let the players rotate the compass with alt + u"): unlocked, the compass carries a turn-over press
+/* TURN1: unlocked, the compass carries a turn-over press
    beside its X; turned, the box stands the way the pack painted it - the dome up, the needle under it - and the strip's
    letters rise to meet the needle. */
 ${G} #hud-layout-handles i[data-hm-handle="turn"] { display: block; }
@@ -1164,7 +1158,7 @@ ${G} .hud-compass[data-hm-turn] .hud-strip { top: var(--gcm); bottom: calc(2 * v
   background-position-y: calc(0.5 * var(--gcm)); }
 ${G} .hud-compass .hud-point { visibility: hidden; }
 ${G} .hud-needle { display: none; }
-/* GRIM-MARKS (2026-10-13, field video: "what are those colored edges, the blue and greenish ones"): the strip's marks
+/* GRIM-MARKS: the strip's marks
    (ui/enhanced/enhancedHud.js - Detect, the party, the professions' nodes, a ship, a boat, the gate, the quest) are laid by
    left: 0..100% OF THE COMPASS BOX and stood on its foot. Here the box is the wooden frame, the parchment two --gcm in
    from each side and one up from the foot, and the frame (::after, z 3) sits over all of it - so every mark ON the strip
@@ -1209,7 +1203,7 @@ ${G} .hb { --gem-rim: linear-gradient(135deg, #f0d276 0%, ${T.goldLeaf} 30%, #8a
 ${G} .hb.hb-gem .hb-slot { border-image: none; box-shadow: none;
   background: linear-gradient(135deg, rgba(58,36,20,0.95) 0%, rgba(30,18,8,0.92) 60%, rgba(18,10,4,0.9) 100%); }
 
-/* THE DIAL - GRIM4 (Dudey: "instead of words give this fitting symbols, all in the style of grimoire"): each door of the
+/* THE DIAL - GRIM4: each door of the
    Tab dial is a piece of the pack's own painting (ui/grimoireArt.js DIAL_ICONS) - the Empire's helm for Skills, the
    spellmaker's spellbook for Magic, the map of Tamriel for Map, the Save Game chest for Items - standing at the same
    distance from the knot on all four sides, the rule from each reaching the same breath short of it. The word stays
@@ -1226,10 +1220,9 @@ ${G} .px-dial .px-arm[data-grim-icon]:is(.on, :hover, :focus-visible) .px-c {
   filter: drop-shadow(0 0 1px ${T.yellow}) drop-shadow(0 0 5px rgba(244,224,76,0.5)) drop-shadow(2px 3px 0 rgba(0,0,0,0.55)); }
 ${Object.keys(DIAL_ICONS).map((k) => { const [w, h] = dialIconSize(k); return `${G} .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(${w}px * var(--dial-k)); height: calc(${h}px * var(--dial-k));
   background-image: var(${artVar(dialArtName(k))}, none);${DIAL_ICONS[k].cells ? ' image-rendering: pixelated;' : ''} }`; }).join('\n')}
-/* DIAL-CLASSIC (ui/dialClassicArt.js; Mac: "the arena2 files look for those symbols ... make the icons fit to each other
-   sizewise"): in game the doors wear Daggerfall's own - the player's face, the HUD bar's star, sack and scroll, each at
+/* DIAL-CLASSIC (ui/dialClassicArt.js): in game the doors wear Daggerfall's own - the player's face, the HUD bar's star, sack and scroll, each at
    a whole number of screen pixels to its own, the four the same height; the pack's paintings (above) are each door's
-   until its own is read. DIAL-PACK (Mac: "add the old Tab selector as optional"): the card's 'Tab dial' row keeps the
+   until its own is read. DIAL-PACK: the card's 'Tab dial' row keeps the
    pack's paintings instead (GRIMOIRE_DIALS 'pack'). */
 ${Object.keys(DIAL_ICONS).map((k) => { const [w, h] = dialIconSize(k); return `${DIAL_CLASSIC} .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(var(--dial-classic-w-${k}, ${w}px) * var(--dial-k)); height: calc(var(--dial-classic-h-${k}, ${h}px) * var(--dial-k));
   background-image: var(--dial-classic-${k}, var(${artVar(dialArtName(k))}, none)); }`; }).join('\n')}
@@ -1248,8 +1241,7 @@ ${G} .px-dial .px-arm.px-w[data-grim-icon]::before { left: calc(100% + 8px); rig
 ${G} .px-dial .px-arm.px-e[data-grim-icon]::before { right: calc(100% + 8px); left: auto; top: 50%; height: 2px; width: calc(var(--dial-r) - 46px); transform: translateY(-50%); }
 @media (max-width: 480px) { ${G} .px-dial .px-rose { --dial-k: 0.72; --dial-r: clamp(56px, calc(43vw - 90px), 110px); } }
 
-/* THE FOE'S VIAL AND THE BOSS'S - GRIM4 (Dudey: "The lifebar of the enemy and the boss are not looking like the lifebar
-   of the player"): the very vial your own health stands in - the pack's whole red vial, cork, glass, its light and its
+/* THE FOE'S VIAL AND THE BOSS'S - GRIM4: the very vial your own health stands in - the pack's whole red vial, cork, glass, its light and its
    bubbles, at its own pixels (ui/grimoireArt.js vialHealth), laid on its side - never a length of tube repeated. The
    foe's is your vial's size exactly (as long as the compass is wide); a boss's the same vial at the game's full scale,
    the bigger glass for the bigger foe. What a blow took drains in the glass, darkened, as yours does. */
@@ -1281,7 +1273,7 @@ ${G} .wb-boss-name { color: ${T.yellow}; letter-spacing: 0.02em; text-transform:
   text-shadow: -1px 0 0 #120804, 1px 0 0 #120804, 0 -1px 0 #120804, 0 1px 0 #120804, 1px 2px 0 rgba(0,0,0,0.6); }
 @media (prefers-reduced-motion: no-preference) { ${G} .wb-boss-bar.low .wb-boss-track { animation: grim-vlow 0.9s steps(1, end) infinite; } }
 
-/* THE REVENANT'S CARD - GRIM4 (Dudey: "the revenant window isnt readable"): a card on the tan scroll is written in the
+/* THE REVENANT'S CARD - GRIM4: a card on the tan scroll is written in the
    pack's ink, flat - the stack's hard dark shadow (meant for words over the world) under every letter doubled each one
    on the paper. Its name in ink over the dotted rule, what it is in red, its rank and kind in the softer ink, what it
    says in ink; the two chips stay lettered on their wood. */
@@ -1293,12 +1285,12 @@ ${G} .rvncard .rvncard-say { color: ${T.ink} !important; line-height: 20px; }
 ${G} .rvncard .rvncard-body { color: ${T.inkSoft} !important; line-height: 20px; }
 ${G} .rvncard .rvncard-mood { line-height: 18px; vertical-align: 0; }
 
-/* HOW MANY - GRIM5 (Dudey: "the "of 5" my inner monk is killing me xD its not in the middle next ot the how many box"): the
+/* HOW MANY - GRIM5 (of 5" my inner monk is killing me xD its not in the middle next ot the how many box"): the
    question's three parts on one line, each centred on the field - a word's own margin (a note's, re-said) never lifts
    one of them off it */
 ${G} .qtyfield { align-items: center; }
 ${G} .qtyfield > span { margin: 0 !important; padding: 0 !important; line-height: 20px; align-self: center; }
-/* THE PACK'S FOOT - GRIM5 (Dudey: "The gold counter is also a bit misplaced"): the purse's word and figure stand on
+/* THE PACK'S FOOT - GRIM5: the purse's word and figure stand on
    the plank's middle line as the carry weight's do - never on the Drop press's baseline, which lifted them - and the
    carry's bar is a bar: the skill's thin gold groove at a length of its own, never squeezed to a sliver */
 ${G} .pack-shell .packgold { align-items: center; }
@@ -1315,11 +1307,10 @@ ${G} .pack-shell .packcarry .px-fill.blood { background: linear-gradient(180deg,
    The front door's settings jumped when a group was pressed: Plus's ground canvas (hidden under the dress, but still
    1200 pixels tall in a 960-pixel frame) let the press scroll the whole menu up - it is out of the page here. */
 ${G} .px-ground { display: none !important; }
-/* the held map's Find me press goes ON THE DUNGEON'S SHEET (Dudey: "remove the find me button in dungeon 3d handdrawn map")
-   - and stays on the world's and the town's, left of Close (FINDME-SHEET, Mac: "the worldmap is also missing the find me
-   button next to close"): the rule took it off every sheet, the world map's with the dungeon's */
+/* the held map's Find me press goes ON THE DUNGEON'S SHEET
+   - and stays on the world's and the town's, left of Close (FINDME-SHEET): the rule took it off every sheet, the world map's with the dungeon's */
 ${G} .hmroot[data-hm-sheet="automap"] .hmfindme { display: none !important; }
-/* THE PACK'S DOLL (Dudey: "box fonts leaving the box ... this cant happening"): a slot's word and a piece's name are
+/* THE PACK'S DOLL: a slot's word and a piece's name are
    written INSIDE the shelf box - kept off its frame by the frame's own width - wrapping between words, never run over
    the wood or cut at the edge */
 ${G} .pack-shell .equipped .wornrow { padding: ${px(5, 'gq')} ${px(5, 'gq')} ${px(7, 'gq')} ${px(6, 'gq')} !important; overflow: hidden; }
@@ -1327,13 +1318,13 @@ ${G} .pack-shell .equipped .wornrow .worntext { min-width: 0; max-width: 100%; }
 ${G} .pack-shell .equipped .wornrow :is(.wornslot, .wornname) { white-space: normal !important; overflow-wrap: break-word; max-width: 100%;
   line-height: 16px; letter-spacing: 0 !important; }
 ${G} .pack-shell .equipped .wornpair > .wornrow :is(.wornslot, .wornname) { text-align: center; }
-/* THE CHAT, on its page (Dudey: "The chat fonts when i type in it are white ... same for reading names"): what you type
+/* THE CHAT, on its page: what you type
    is ink on the field; a name keeps its colour, deepened to read on the paper (a plain one is ink); the times, the tags
    and the roster's head the softer ink; a herald's line the blue ink */
 ${G} body .dfchat-input { color: ${T.ink} !important; -webkit-text-fill-color: ${T.ink} !important; caret-color: ${T.red}; text-shadow: none !important; }
 ${G} body .dfchat-input::placeholder { color: ${T.inkFaint} !important; -webkit-text-fill-color: ${T.inkFaint} !important; }
 ${G} .dfchat-box :is(.dfchat-name, .dfchat-who-name) { text-shadow: none !important; }
-/* NAME-INK (2026-10-11, Mac: "the color was the problem not the font"): a name deepened to three tenths was the ink its
+/* NAME-INK: a name deepened to three tenths was the ink its
    words are written in, and a speaker read as part of the line. A name is in a colour of its own on the page (ui/
    chatColours.js NAME_COLOURS, each 4.5:1 or better on the page): a stranger's the page's red, my own a brown gold, a
    party member's green and a friend's blue - social's two colours (set on the element) each deepened by hand, not by a
@@ -1356,8 +1347,7 @@ ${pipRules(`${G} body .dfchat[data-colours="on"] .dfchat-peek`, 'light', true)}
 ${G} .dfchat-box .dfchat-line.ping { background: ${PING_COLOURS.wash.dark} !important; box-shadow: inset 3px 0 0 ${PING_COLOURS.bar.dark} !important; }
 ${G} .dfchat-box .dfchat-mention { color: ${PING_COLOURS.mention.dark} !important; text-decoration: underline solid ${PING_COLOURS.bar.dark}; text-underline-offset: 0.18em; }
 ${G} .dfchat-peek .dfchat-mention { color: ${PING_COLOURS.mention.light} !important; }
-/* THE UNREAD COUNT ON A TAB'S PLATE (2026-10-11, Mac: "make the 5 shown in the channel not cover whatever it is the 5
-   is also not really well placed"): Plus's dot is a 7px disc with its number drawn at no size, and on the plate the
+/* THE UNREAD COUNT ON A TAB'S PLATE: Plus's dot is a 7px disc with its number drawn at no size, and on the plate the
    face's own size came back - the number stood over the dot, above the word's line and against the plate's edge. On the
    page it is a wax seal: the book's red disc, the number in cream at the middle of it, beside the word on its line and
    clear of it; a tab holding a line that names me, the mention's gold with the number in ink. */
@@ -1369,7 +1359,7 @@ ${G} body .dfchat-box .dfchat-tab .dfchat-badge:not(:empty) { display: inline-fl
 ${G} body .dfchat-box .dfchat-tab.pinged .dfchat-badge:not(:empty) { background: #e2ad42 !important; color: ${T.ink} !important; -webkit-text-fill-color: ${T.ink} !important;
   box-shadow: 0 0 0 1px rgba(60,30,4,0.7), inset 0 1px 0 rgba(255,240,190,0.6) !important; }
 ${G} .dfchat-badge.ping { background: ${PING_COLOURS.bar.dark} !important; }
-/* THE SOCIAL PANEL, on its scroll (2026-10-11: "those fonts need to be made readable"): a name keeps the colour its
+/* THE SOCIAL PANEL, on its scroll: a name keeps the colour its
    standing earns (a friend's blue, a party's green - set on the element, which no sheet's ink can re-say) deepened to
    read on the tan as the chat's names are - half as bright stood at 2.3:1 on the scroll, three tenths stands near 4:1 -
    and a plain name, a subject, a letter's own words are ink. INK-VARS reads the rest (its greys, its bone) as ink. */
@@ -1379,7 +1369,7 @@ ${G} .dfsocial .dfsocial-letter.read .dfsocial-name { color: ${T.inkSoft} !impor
 ${G} .dfchat-box :is(.dfchat-time, .dfchat-tag, .dfchat-whohead, .dfchat-who-more, .dfchat-who-tag) { color: ${T.inkSoft} !important; text-shadow: none !important; }
 ${G} .dfchat-box .dfchat-line.system .dfchat-text { color: #163a6a !important; text-shadow: none !important; }   /* CHAT-COLOURS: 5:1 on the cream page's darkest (the herald's #1f4f8e stood at 3.6) */
 ${G} .dfchat-box :is(.dfchat-time, .dfchat-tag) { color: #4f3218 !important; }   /* ...and a line's time and tag 5:1 too, on the mention's wash as well */
-/* ...and with the box shut (Dudey: "make sure the blue event text is readable when the chat box is not open"), the lines
+/* ...and with the box shut, the lines
    that stand over the world wear the HUD's hard outline, every one - a herald's blue among them */
 ${G} .dfchat-peek, ${G} .dfchat-peek * {
   text-shadow: -1px 0 0 #120804, 1px 0 0 #120804, 0 -1px 0 #120804, 0 1px 0 #120804, 1px 2px 0 rgba(0,0,0,0.6) !important; }
@@ -1388,14 +1378,14 @@ ${G} .dfchat-peek .dfchat-line.system .dfchat-text { color: #9cc8ff !important; 
 ${G} .dfchat-box .dfchat-line.rp .dfchat-text { color: ${RP_COLOURS.dark} !important; text-shadow: none !important; font-style: italic; }
 ${G} .dfchat-peek .dfchat-line.rp .dfchat-text { color: ${RP_COLOURS.light} !important; }
 
-/* THE OVERWORLD'S FILTERS - GRIM4 (Dudey: "the numbers next to the filters are hardly readable"): a count is written in
+/* THE OVERWORLD'S FILTERS - GRIM4: a count is written in
    ink at the face's own size, as its word is, on the same line; the block is wide enough that no word is cut, and the
    waypoints' hint wraps on its page instead of running off it. */
 ${G} .tview-side { width: 316px; }
 ${G} .tview-filter .tview-fnum { font-size: 16px !important; line-height: 20px; color: ${T.inkSoft} !important; text-shadow: none !important; opacity: 1; }
 ${G} .tview-filter.on .tview-fnum { color: ${T.ink} !important; }
 ${G} .tview-filter.tview-wp-pick { white-space: normal; overflow: visible; text-overflow: clip; line-height: 20px; }
-/* THE PACE STEPS (Dudey: "the + next to the speed multiplayers is too close to the boxes"): the minus and the plus are
+/* THE PACE STEPS: the minus and the plus are
    drawn, not lettered - a glyph sits wherever its face put it in its cell - each a bar of ink at the grid's pixels,
    centred in its own step, the two steps the same breath either side of the number's well; red under the pointer */
 ${G} :is(.tview-pace-row, .travelpanel-pace-row, .pbox-pace-row) { grid-template-columns: 1fr 24px 66px 24px; column-gap: 6px; }
@@ -1412,7 +1402,7 @@ ${G} :is(.tview-pace-num, .travelpanel-pace-num, .pbox-pace-num) + :is(.tview-pa
    way its death screen writes "Welcome Adventurer" */
 ${G} .notice.notice-toast, ${G} .lv-note.lv-note-skill .lv-note-title, ${G} .lv-note.lv-note-skill .lv-note-sub, ${G} .hud-modeword {
   color: ${T.yellow}; text-shadow: -1px 0 0 ${T.outline}, 1px 0 0 ${T.outline}, 0 -1px 0 ${T.outline}, 0 1px 0 ${T.outline}, 2px 2px 0 rgba(0,0,0,0.6); }
-/* LEVEL-INK (2026-10-20, Dudey: "when leveling up the black fonts are hard to read"): the level strip's plates (a level
+/* LEVEL-INK: the level strip's plates (a level
    risen or awaited, a Renown risen, a quest's word) are scraps of the page, so they are written in the page's full ink -
    the title in the pack's red, the line under it in the darkest ink (the key keeps its wooden box and its light word) -
    never the gold, the faint ink or a shadow the stone skins give them; and a hand big enough to read over a fight */
@@ -1425,8 +1415,7 @@ ${G} .hud-cross { filter: sepia(0.6) saturate(1.4); }
 /* the crosshair's world plaque - a scrap of page held over the world, never a slab */
 ${G} .wplaque, ${G} .wplaque-stats { background: ${v('page')} 0 0 / 355px auto repeat, rgba(227,201,149,0.92); color: ${T.ink};
   border-color: rgba(92,56,24,0.8) rgba(60,34,14,0.85) rgba(48,26,10,0.9) rgba(80,48,20,0.8); box-shadow: 0 0 0 1px ${T.outline}, 3px 4px 10px rgba(0,0,0,0.45); }
-/* THE PACK'S STATS PAGE AND ITS PLAQUES (Dudey: "the stat button is hard to read in inventory and the statpage is also
-   hard to read and the armor shown is also hard to read"): what is written straight on the paper is in ink - the
+/* THE PACK'S STATS PAGE AND ITS PLAQUES: what is written straight on the paper is in ink - the
    page's head, its "against a level" and its rules line - and the doll's two plaques (the flip to Stats / Paperdoll and
    the overall Armour) are scraps of page with dark letters, never faint words over the painting */
 ${G} .sf-head h3 { color: ${T.red} !important; text-shadow: none !important; }
@@ -1459,7 +1448,7 @@ ${G} .worntemp-total[data-side="hot"] .v { color: ${TEMP_INK.hot} !important; }
 ${G} .worntemp-total[data-level="warn"] { border-color: ${TEMP_INK.warn} !important; }
 ${G} .worntemp-total[data-level="danger"] { border-color: ${T.red} !important; }
 ${G} .worntemp-total[data-level="danger"]::after { color: ${T.red}; background: ${T.cream}; border-color: ${T.red}; text-shadow: none; }
-/* ...and written on it in ink (Dudey, of the quick loot: "no one can read that" - the HUD's pale outlined letters were
+/* ...and written on it in ink (- the HUD's pale outlined letters were
    left on the paper): every word dark and flat, the lit row in red, a tier's colour deepened to read on paper */
 ${G} :is(.wplaque, .wplaque-stats), ${G} :is(.wplaque, .wplaque-stats) * { color: ${T.ink} !important; text-shadow: none !important; -webkit-text-stroke: 0 !important; }
 ${G} :is(.wplaque-sub, .wplaque-count, .wplaque-keys, .wplaque-statkey, .wplaque-more, .wplaque-empty, .wplaque-renown) { color: ${T.inkSoft} !important; }
@@ -1473,13 +1462,12 @@ ${G} .wplaque-row[data-rarity="legendary"] > span:first-child { color: #9a4210 !
 ${G} .wplaque-row[data-rarity="aetheric"] > span:first-child { color: #1d6a86 !important; }
 ${G} .wplaque-row[data-rarity="artifact"] > span:first-child { color: #5e2a96 !important; }
 ${G} .wplaque-row[data-rarity="gilded"] > span:first-child { color: #a3122e !important; }
-/* LOOT-MARKS (2026-10-12, a player's video: "seeing rarity in the quickloot is quite hard"): on the page the Rare, the
+/* LOOT-MARKS: on the page the Rare, the
    Legendary and the Gilded were three browns - each rolled row now carries its tier's own bright gem, edged in ink, and
    a wash of its ink tone under it (ui/lootTierMarks.js); the lit row keeps its red bar beside the wash. */
 ${tierMarkCss({ scope: G, wash: (k) => RARITY_INK[k], washAlpha: 0.3, edge: T.outline, bang: true })}
 
-/* INK-TONES (2026-10-10, a player: "make the fonts better visible ... the blue and Mora's Mantle ones ... don't make them
-   totally different"): a rarity's, a set's and the sigil's words are drawn in their OWN colour - a CSS variable
+/* INK-TONES: a rarity's, a set's and the sigil's words are drawn in their OWN colour - a CSS variable
    (--rar, --set, --sigil), which the ink cannot re-say - so on the page they stayed Plus's pale glow, made for black
    stone. On paper each is that same colour deepened into the ink: the tier's tone as the loot plaque already writes
    it, a set's own colour mixed down with the ink (so every set keeps its hue), the sigil's teal likewise. */
@@ -1540,7 +1528,7 @@ ${meterCss(['.lv-sky', '.lv-foot'])}
      to give, then the chosen attribute between its - and its +, the way the pack's own chargen sets a value between
      its two arrows */
   ${G} .lv-stage { grid-column: 2; grid-row: 2 / 4; display: flex; flex-direction: column; margin-top: ${pxs(4 + BOOK_SLICE.top)}; padding: ${pxs(1)} ${pxs(BOOK_SLICE.gutter - 6)} 0 ${pxs(BOOK_SLICE.outer - 3)}; align-items: stretch; z-index: 1; min-height: 0; }
-  /* GRIM5 (Dudey: "put the points left under the last number of the attributes not too close"): the points stand on the
+  /* GRIM5: the points stand on the
      ledger's own columns - the box in the figures' column, its right edge on theirs, its word before it - a line's breath
      under the last attribute */
   ${G} .lv-plate { grid-column: 2; grid-row: 4; justify-self: stretch; align-self: end; z-index: 1; margin: 16px 0 0; font-size: 16px;
@@ -1574,7 +1562,7 @@ ${meterCss(['.lv-sky', '.lv-foot'])}
     padding-bottom: 6px; margin-bottom: 8px; ${RULE_UNDER} }
   ${G} .lv-ribbon { flex: 1 1 auto; min-height: 0; display: grid !important; grid-template-columns: 1fr; grid-auto-rows: min-content; align-content: space-evenly;
     column-gap: 22px; overflow-x: hidden !important; overflow-y: auto !important; mask-image: none !important; -webkit-mask-image: none !important; padding: 0 !important; }
-  /* GRIM4 (Dudey: "make sure theres not so much space left on the book pages when using different resolutions"): a long
+  /* GRIM4: a long
      list (15 skills and more) is the same ledger as a short one - one column, its lines spread down the whole page,
      never packed at the top of it - at the face's small size; where the page is tall enough for every line at the
      large size it is written large, and only where it is too short for one column does it take two (the page is a
@@ -1601,8 +1589,7 @@ ${meterCss(['.lv-sky', '.lv-foot'])}
 ${G} .lv-lines { display: none; }
 ${G} .lv-figure { width: 100% !important; height: auto !important; aspect-ratio: auto !important; max-height: none !important;
   display: flex; flex-direction: column; justify-content: flex-start; gap: 0; }
-/* GRIM3 (Dudey: "the spaces between the atributes can be a bit bigger ... them empty space where the left stat points
-   are in is a bit much"): on the open book the eight lines share the page down to the points, each its own airy line */
+/* GRIM3: on the open book the eight lines share the page down to the points, each its own airy line */
 @media (min-width: 1000px) and (min-height: 620px) {
   ${G} .lv-stage > .lv-figure { flex: 1 1 auto; min-height: 0; display: grid !important; grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto repeat(8, minmax(0, 1fr)); align-content: stretch; justify-content: stretch; }
@@ -1625,7 +1612,7 @@ ${G} .lv-star.full .lv-val { color: ${T.inkFaint} !important; }
 ${G} .lv-star.boosted:not(.full) .lv-val { color: #1f3a8a !important; }
 ${G} .lv-star.lowered:not(.full) .lv-val { color: #8a3a0a !important; }
 /* the right-hand page: the bonus points, the choice and its gloss */
-/* GRIM5 (Dudey: "make sure that the points left in the box are centralized"): the figure's ink in the box's very middle -
+/* GRIM5: the figure's ink in the box's very middle -
    the face sets a digit high in its line and leaves its spacing at the right, so the box pads it down and across */
 ${G} .lv-count { font-size: 32px !important; line-height: 32px; padding: 7px 10px 3px 12px; display: block !important;
   width: auto !important; height: auto !important; min-width: 0; box-sizing: border-box; text-align: right !important; text-indent: 0 !important; letter-spacing: 0 !important;
@@ -1674,13 +1661,12 @@ export function rosterCss() {
    own chooser writes "Would you like to:" - no stack of presses down the middle of the screen. */
 ${G} .px-home:not(.px-over):not(.lv-sky):not(.px-title) { --gbw: ${px(320, 'gd')}; --gbh: ${px(200, 'gd')};
   --gbx: calc((100vw - var(--gbw)) / 2); --gby: calc((100vh - var(--gbh)) / 2); background: #120a05; }
-/* GRIM6 (Dudey: "the background around the book looks too pixelated washed out"): the desk is the pack's own painting at
+/* GRIM6: the desk is the pack's own painting at
    ITS resolution, drawn smooth, never the game-grid cut blown up pixel by pixel; it stands where GRIM3 set it.
    GRIM3: the desk is Daggerfall's 320 x 200 picture, whole - the candle, the inkwell, the quill - at the biggest whole
    number of screen pixels to each of its own it fits at (--gd: ui/grimoireArt.js deskScale - DESK-FILL: now the exact fit, the whole desk as big as the screen holds it), centred, its edges
    falling away into the dark room round it; never scaled by a part of a pixel, never smoothed, and worked on its own
-   grid (grimoireArt.js clarify) so the grain, the brass and the paper read crisp (Dudey: "the main screen background
-   looks like i have not glasses on") */
+   grid (grimoireArt.js clarify) so the grain, the brass and the paper read crisp */
 /* DESK-HD: the detailed desk (ui/grimoireArt.js grimoireDeskUrl), its room's dark edges already in it - so no
    vignette is laid over it again; the pack's BIOG00I0 stands under it, seen only if the painting cannot load */
 ${G} .px-home:not(.px-over):not(.lv-sky):not(.px-title)::before { content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -1750,8 +1736,7 @@ ${G} .px-home:not(.px-over):not(.lv-sky) .px-menu .doorbtn .px-c { display: none
 /* UI-CALM: the shell's rail - Offline's word a small head in the page's red over its four, never read as a door */
 ${G} .rail .railgroup { margin: 18px 24px 2px; font-family: ${GRIMOIRE_STACK}; font-size: 16px; letter-spacing: 0.04em; text-transform: none;
   color: ${T.redDeep}; border-bottom: 1px solid rgba(43,26,12,0.25); padding-bottom: 2px; }   /* AUDIT UICALM-FIRM1 L3 M8: the deep red, whole - its 0.85 of the red read at 3.4:1 */
-/* UI-CALM II (2026-10-14, a player: "cheap letters, overlapping, dotted lines everywhere, the highlighting of words is
-   bad, the summary board looks cut off"): THE WALK IN THE PACK'S OWN HAND. A question's answers are leaves of the
+/* UI-CALM II: THE WALK IN THE PACK'S OWN HAND. A question's answers are leaves of the
    pack's parchment in its frame, the word in ink and the chosen one in its red with a red line inside the frame -
    never a yellow word on the bare desk with a rule under it; a press in the bar is a plate, its word cream, the way on
    in the yellow; the map's names are parchment tags, the chosen one red; no word on the walk wears a rule under it or a
@@ -1869,7 +1854,7 @@ ${G} .px-home.px-title:not(.px-over) .px-menu:not([data-level="top"]) .doorbtn {
   ${G} .pack-shell .equipped { grid-area: doll; min-height: 0; padding: 10px; background: ${v('stone')} 0 0 / 310px auto repeat, #6b6b68;
     border: 2px solid; border-color: ${T.outline} ${T.woodLit} ${T.goldLeaf} ${T.woodMid};
     box-shadow: 0 0 0 3px ${T.wood}, 0 0 0 4px ${T.outline}, inset 3px 4px 10px rgba(0,0,0,0.45); }
-  /* PACK-ROOM (2026-10-10): the worn map is held to its column (STATS-OVERLAP), and there the figure - as wide as it is
+  /* PACK-ROOM: the worn map is held to its column (STATS-OVERLAP), and there the figure - as wide as it is
      tall allows - left each flank ~80px, a pair's names broken a letter at a time ("Mo/un/t"). The goods give 40px
      back and the figure stands at most 210px wide: each flank about twice what it was, its names whole words. */
   ${G} .pack-shell .wornmap-doll.hasart { max-width: 210px; }
@@ -1888,7 +1873,7 @@ ${G} .px-home.px-title:not(.px-over) .px-menu:not([data-level="top"]) .doorbtn {
   ${G} .pack-shell .packlists { grid-area: list; min-height: 0; padding: 8px; background: rgba(14,8,3,0.55);
     border: 2px solid; border-color: ${T.outline} ${T.woodLit} ${T.woodLit} ${T.woodMid}; box-shadow: inset 2px 3px 8px rgba(0,0,0,0.55); }
   ${G} .pack-shell .charcol > :not(.equipped):not(.wornshelf), ${G} .pack-shell .pack-dock > :not(.packcats):not(.packlists) { grid-column: 2 / 4; }
-  /* SET-ROW (2026-10-11, Mac: "this shouldnt happen the inventory box next to the paperdoll shouldnt get smaller aswell"):
+  /* SET-ROW:
      the worn sets' lines stood in a row of their own across the doll AND the goods, and the goods' box gave up their
      height. They are the doll's: a row under the doll alone, the goods' box running down beside them to the band */
   ${G} .pack-shell .pack:has(> .pack-main .setstrip, .setstrip) { grid-template-rows: auto minmax(0, 1fr) auto;
@@ -1899,7 +1884,7 @@ ${G} .px-home.px-title:not(.px-over) .px-menu:not([data-level="top"]) .doorbtn {
    is the pack's open book laid on its desk: the list on the left-hand page, the page it opens on the right, the spine
    between them - and the presses on a page are WRITTEN on it, the way the pack's spellbook writes Delete, Up, Sort and
    Down along its foot, the one it is for in red.
-   GRIM3 (Dudey: "the book is in a window thats in a window"; "keep the style ... POLISH it"): the book lies on the desk
+   GRIM3 (; "keep the style ... POLISH it"): the book lies on the desk
    board, as the pack's Biography book lies on its desk - no torn page under it, no leather slab round it, and no strip
    of board between the tabs and the book: the plates stand on the book's own top edge. The board is
    the desk's wood in a hard bevel; the tabs are the pack's own tab plates across its top; the book is the pack's own
@@ -1917,13 +1902,12 @@ ${G} .px-journal > .px-qrail { ${bookPage('left')} flex: 0 0 auto; width: 31%; m
   padding: ${px(1)} 0 ${px(1)} ${px(1)}; border-right-width: ${px(BG - 7)}; }
 ${G} .px-journal > .px-qdetail { ${bookPage('right')} flex: 1 1 0; min-width: 0; min-height: 0; overflow-y: auto; overflow-x: hidden; box-shadow: none;
   padding: ${px(2)} calc(${px(2)} + ${px(BG - BO)}) ${px(1)} ${px(2)}; }
-/* PAGE-CENTRE (2026-10-12, a player: "on the pause menu, the elements on the right-hand menu seem to be skewed very far to
-   the right instead of centered on the page"): the right-hand page's 9-slice gives its gutter edge BG of the pack's
+/* PAGE-CENTRE: the right-hand page's 9-slice gives its gutter edge BG of the pack's
    pixels and its outer edge BO, so what was written on it stood the gutter's width in from the spine and a hair from the
    page's edge. The outer side takes the difference as padding: the writing stands as far from the edge as from the
    spine, in the middle of the page. */
 ${G} .px-journal .px-qrow { color: ${T.ink}; min-width: 0; }
-/* a page scrolls down, never across (Dudey: "the spellbook has 2 scrollbars"): a long name wraps, its cost keeps its place */
+/* a page scrolls down, never across: a long name wraps, its cost keeps its place */
 ${G} .px-journal .px-qrail .px-qrow { overflow-wrap: anywhere; } ${G} .px-journal .px-qrail .sb-cost { flex: 0 0 auto; padding-left: ${px(2)}; }
 ${G} .px-journal .px-qrow.on { color: ${T.red}; background: rgba(142,26,16,0.1); }
 /* the tabs: the pack's plates in a row across the top of the board */
@@ -2006,8 +1990,7 @@ ${G} .grim-rod.l { border-image: ${v('rodL')} 15 0 fill / ${px(15)} 0 stretch; l
 ${G} .grim-rod.r { border-image: ${v('rodR')} 15 0 fill / ${px(15)} 0 stretch; right: calc(-1 * ${px(13)}); animation-name: grim-rod-r; }
 /* the rods ride the clip's own edges: both are moved the same way (left / right, inset - one style pass), never one on
    the compositor and the other on the page, which drift apart while the game draws its frame and left the parchment
-   showing outside the rods, or the scroll snapping shut (Dudey: "the resting window is also not closing the scroll
-   correctly") */
+   showing outside the rods, or the scroll snapping shut */
 @keyframes grim-rod-l { 0% { left: calc(50% - ${px(15)}); } 96% { opacity: 1; } 100% { left: calc(-1 * ${px(13)}); opacity: 0; } }
 @keyframes grim-rod-r { 0% { right: calc(50% - ${px(15)}); } 96% { opacity: 1; } 100% { right: calc(-1 * ${px(13)}); opacity: 0; } }
 ${G} .rest-win .card, ${G} .dlg-win .card { background: none !important; border-color: transparent !important; box-shadow: none !important; outline: none; }
@@ -2024,7 +2007,7 @@ ${G} :is(.port-win.size-narrow, .sb-ask > .card) [data-grim-on]:not([data-grim-e
 ${G} .rest-win > .px-body, ${G} .dlg-win > .px-body { background: none; border-color: transparent; box-shadow: none; }
 ${G} .rest-win h2 { color: ${T.ink} !important; text-shadow: none !important; text-align: center; font-size: 32px !important; line-height: 34px;
   padding-bottom: 4px; margin-bottom: 2px; ${RULE_UNDER} }
-/* the rest scroll is a short question, not a window (Dudey: "the resting window is pretty big") */
+/* the rest scroll is a short question, not a window */
 ${G} .rest-win { max-width: min(92vw, 420px) !important; }
 ${G} .rest-win .card { padding: 6px 10px !important; }
 ${G} .rest-win h2::first-letter { color: ${T.red}; }
@@ -2078,7 +2061,7 @@ ${SB} .sb-top .act:hover, ${SB} .sb-top .act:focus-visible { background: rgba(25
 ${SB} > .px-win > .px-body { position: absolute !important; inset: 0 !important; padding: 0 !important; margin: 0 !important; overflow: visible !important;
   background: none !important; border: 0 !important; display: block !important; pointer-events: none; }
 /* the body lies over the whole picture to place its pieces: it lets a press through (to the EXIT under it), and only
-   the list and the page's own pieces take one (Dudey: "the exit button of the og grimoire spellbook isnt working") */
+   the list and the page's own pieces take one */
 ${SB} .px-journal { pointer-events: none; }
 ${SB} .px-journal > .px-qrail { pointer-events: auto; }
 ${SB} .px-journal { position: static !important; display: block !important; height: 100%; background: none !important; border: 0 !important; padding: 0 !important; filter: none !important; }
@@ -2161,7 +2144,7 @@ ${G} .wb-boss-fill { transition: none !important; }
    glass and its own foot at the track's end (longVial), so the bar is the vial at ANY length: the editor's length handle
    draws more glass, never a stretched picture or a liquid that stops short of its own glass. Its width is the editor's
    own measure (min(280px, 40vw)), so a first pull on the handle never jumps. */
-/* BAR-SCREEN (2026-10-11: 22 and 33 pixels "too thick", 11 "too thin" - "please remember ppl have different resolutions"):
+/* BAR-SCREEN:
    THE TWO BARS ARE THE SCREEN'S SIZE, NOT A PIXEL COUNT. The foe's glass is 1.75% of the screen's height (16px on a
    917-pixel-high view, 19 on 1080, 25 on 1440, 38 on 2160; never under 13), the boss's 1.4 times it, and each is as
    long as its thickness allows (the foe's 17.5 of them, under 40% of the width; the boss's 20.5, under 88%). The vial is
@@ -2225,8 +2208,7 @@ ${G} .wb-boss-callout-line { max-width: 60%; margin: 1px auto 0; }
 ${at(R.tile, '[aria-pressed="true"]')} { color: #fff27a !important; outline: 2px solid ${T.goldLeaf} !important; outline-offset: -3px;
   text-decoration: underline solid rgba(255,242,122,0.6); text-underline-offset: 0.22em; }
 
-/* SETTING-SCROLL (2026-10-11, Mac: "when you click on a mod or something to see its descriptions in the menu it in the same
-   window show the description outside in a scroll like you would hover or click an item in the inventory" - "ingame it
+/* SETTING-SCROLL (2026-10-11, - "ingame it
    should show a scroll outside on the right of the window (outside of the book)"): A SETTING'S WORDS ARE A SCROLL BESIDE
    THE BOOK. The pause book's settings page raised its description as a sheet from the page's foot, over the very rows it
    described, its Close a stray word on the paper. Here it is the item scroll the pack's shelves hold out (THE ITEM
@@ -2278,8 +2260,7 @@ ${G} .shell .detail > :is(.dcard, .card) .status { color: ${T.inkSoft} !importan
 ${G} .shell .detail > :is(.dcard, .card) code { display: inline-block; background: none !important; color: ${T.inkSoft} !important; border: 0 !important; outline: none !important;
   box-shadow: none !important; padding: ${px(1)} 0 0 !important; border-top: 2px solid rgba(92,56,24,0.45) !important; text-shadow: none !important; }
 
-/* SETTINGS-SCROLL (2026-10-11, a video of the book's Settings: "when scrolling up and down the text is overlapped and
-   hidden except for a small section"): THE KEYS' HEAD STICKS AS ONE LINE. In the book the settings scroll is a short
+/* SETTINGS-SCROLL: THE KEYS' HEAD STICKS AS ONE LINE. In the book the settings scroll is a short
    window (301 pixels of a 648-high screen), the search bar sticks over it (91 in the pack's lettering) and the Controls
    head stuck under that at 163 - its sentence in the pack's 16-pixel face, three lines on the page's measure - so the
    rows scrolled through 47 pixels. The sentence is the intro's own law, said in the card above it (enhancedControls.js

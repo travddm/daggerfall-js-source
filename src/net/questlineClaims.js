@@ -1,6 +1,5 @@
 // @ts-check
-// QL12 (2026-10-19, the owner: "New questlines tying into and introduced the oblivion gates, abyss dungeons, elite
-// dungeons and elite breaches"; bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' CLAIMS - what the
+// QL12: THE QUESTLINES' CLAIMS - what the
 // account service pays a questline, and what it must hold first. Shared by both ends: the client's line registry
 // (systems/questlines/qlLines.js) names its witnessed steps here, and the service's claim (server-account/src/
 // questlines.js) pays by it. PURE: no clock, no store.
@@ -26,7 +25,7 @@
 /** What a step's witness reads - one receipt table and its test each (server-account/src/questlines.js QL_WITNESS_SQL).
  *  `rite` Dagon's faithful's rite broken (a rite's own receipt, or a fighter's that broke it: two embers);
  *  `breach` a Dagon's Breach closed (a kill, never the rite alone); `hour` the Brass Remnant broken; `serpent` the Sea Serpent slain; STAR8: `star` a fallen star held (the Starfall -
- *  bible/11-Multiplayer/Starfall.md section 6), `stars3` three of them. */
+ *  ), `stars3` three of them. */
 export const QL_WITNESS_KINDS = Object.freeze(['rite', 'breach', 'hour', 'serpent', 'star', 'stars3']);
 
 /** The questlines the service pays, by id: how many steps; which are witnessed and by what; the title and the step that
@@ -36,7 +35,7 @@ export const QL_SERVICE_LINES = Object.freeze({
   covensHoard: Object.freeze({ steps: 3, witness: Object.freeze({}), title: 'covenbane', titleAt: 2, after: 'burningDoors' }),
   hourThatWasNot: Object.freeze({ steps: 2, witness: Object.freeze({ 1: 'hour' }), title: 'hourwitness', titleAt: 1 }),
   oldCoil: Object.freeze({ steps: 3, witness: Object.freeze({ 2: 'serpent' }), title: 'satakalwitness', titleAt: 2 }),
-  // STAR8 (bible/11-Multiplayer/Starfall.md section 7): the Thirteenth of Frostfall - its first star and three more, the
+  // STAR8: the Thirteenth of Frostfall - its first star and three more, the
   // Starwarden on the three, its last witnessed step (the Burning Doors' law: the last step, the spindle's fate, is the
   // client's choice, and nothing is paid on the client's word)
   thirteenthFrostfall: Object.freeze({ steps: 4, witness: Object.freeze({ 0: 'star', 2: 'stars3' }), title: 'starwarden', titleAt: 2 }),

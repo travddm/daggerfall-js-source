@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GRAHT1 (bible/03-World/Graht-Oaks.md; the owner, 2026-10-25: "Vardenfell needs proper super tall low poly tree sprites
-// with branchs/leaves that expand to cover the sky. The current simple skybox method is very low quality and band
-// aided") - THE GRAHT-OAK, MADE: Valenwood's giant tree as the port's own low-poly geometry - no file, no picture of
+// GRAHT1 () - THE GRAHT-OAK, MADE: Valenwood's giant tree as the port's own low-poly geometry - no file, no picture of
 // anyone's, every vertex a function of its variant's seed. PURE (world/ and nothing else): the host
 // (scenes/grahtHost.js) uploads what this makes, the tests measure it, the law (world/jungle/grahtOaks.js) holds the
 // measures the terrain worker stands it by.

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FB1001-WODROCK (2026-10-01, the field: "MASSIVE buggy mountain at 823, 399 - insane"; Mac: "Retexture them to be as
-// detailed as possible") - A STRETCHED WORLD OF DAGGERFALL PIECE KEEPS ITS PEBBLE'S TEXEL DENSITY.
+// FB1001-WODROCK - A STRETCHED WORLD OF DAGGERFALL PIECE KEEPS ITS PEBBLE'S TEXEL DENSITY.
 //
 // World of Daggerfall's Rocks and Mountains layouts build their outcrops and massifs out of ARCH3D's pebbles - models
 // 60610 and 60711-60720 (0.7 to 5.5 m, 20 to 65 triangles, texture 141.2 or 41.0) - scaled by 200 to 5,800 on an
@@ -46,7 +45,7 @@ export const WOD_ROCK_STRETCH_MIN = 4;
  *  pebble is unfolded from any real stretch (WOD_ROCK_PEBBLE_MIN), and every rock face of an outcrop agrees. */
 export const WOD_ROCK_MODELS = new Set([60610, 60711, 60712, 60713, 60714, 60715, 60716, 60717, 60718, 60719, 60720, 41719]);
 export const WOD_ROCK_PEBBLE_MIN = 1.05;
-/** ROCK-CAP (AUDIT part five; Mac: "Cap at ~8 m a repeat"): a rock pebble's face tiles no finer than one repeat per 8 m
+/** ROCK-CAP (AUDIT part five): a rock pebble's face tiles no finer than one repeat per 8 m
  *  in any direction (8 texels a metre for the 64x64 rock). At the pebble's own density (12 to 150 texels a metre) model
  *  art, mipped with no anisotropy, read as rock within some 10 m, a regular lattice at 30 to 100 m and its mean colour
  *  from 300 m - and a spire is seen from hundreds of metres; at this cap its rock reads out to about a kilometre at

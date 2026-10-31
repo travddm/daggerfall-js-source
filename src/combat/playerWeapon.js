@@ -290,7 +290,7 @@ export class PlayerWeapon {
     this.holdingShield = false;
     this.currentRightHandWeapon = null;
     this.currentLeftHandWeapon = null;
-    // TWO-HANDS (bible/05-Combat/Two-Hands.md): how the hands are held (combat/twoHands/handsLaw.js HANDS_MODE - DFU's one used
+    // TWO-HANDS: how the hands are held (combat/twoHands/handsLaw.js HANDS_MODE - DFU's one used
     // hand, both fists, or a pair), the strike in flight ({ hand, flurry, off } - strikeHandOf's answer as it began), and the
     // last strike's hand and the machine time it ended, which the next one alternates from. `usingRightHand` keeps
     // DFU's meaning and its saves: with both hands up it is the LEAD - the hand an exchange opens with.
@@ -302,7 +302,7 @@ export class PlayerWeapon {
     this._burdenCarry = 0;   // AUDIT 2: the fraction of a tick the off hand's last blow owed its burden, paid on its next (handsLaw.js offHandHold)
     this.sheathed = true;   // classic starts sheathed; Z readies (WeaponManager.Sheathed)
     this.lastDrawMs = 0;   // PCO1: the last bow shot's weaponAnimTime (_bowAnimTimeMs)
-    // TECH1 (bible/05-Combat/Weapon-Techniques.md): the swing in flight is a technique's - its blow (combat/technique/techniqueBlow.js:
+    // TECH1: the swing in flight is a technique's - its blow (combat/technique/techniqueBlow.js:
     // the reach, the arc, the weight), set as the technique starts the swing and taken down once the machine is idle again
     // (combat/techniques.js), so every pool the ONE swing is offered to reads the same blow. Null for every other swing.
     this.techniqueBlow = null;
@@ -343,8 +343,7 @@ export class PlayerWeapon {
   }
 
   /**
-   * MW-HAND (2026-09-26, Mac: "Weapons when swapped into left hand dont work showing fists - id say remove the ability
-   * when in morrowind since its not visible"; asked, "Never on an empty hand"): THE MORROWIND LANE'S DEPARTURE. DFU
+   * MW-HAND: THE MORROWIND LANE'S DEPARTURE. DFU
    * lets the hand in use be an empty one - H to a bare left hand is how a classic player fights with fists, and the
    * sprite shows which hand is up. The Morrowind arm draws one weapon and no second hand, so there a weapon in the
    * hand not in use was a weapon that would not show, over fists. In that lane (the rig calls this only while the arm
@@ -661,7 +660,7 @@ export class PlayerWeapon {
     return [this._gx, this._gy];
   }
 
-  /** TECH1 (bible/05-Combat/Weapon-Techniques.md): A TECHNIQUE'S STRIKE - the machine's own strike `strike` begun for a
+  /** TECH1: A TECHNIQUE'S STRIKE - the machine's own strike `strike` begun for a
    *  weapon's technique (combat/techniques.js), by the same machineAttack a click takes; a bow's loose writes its draw
    *  time as the click's does (PCO1). True when it began - never mid-swing or in a bow's recovery. */
   techniqueStrike(strike) {
@@ -826,7 +825,7 @@ export class PlayerWeapon {
  *  onto chanceToHitMod, damage INTO the damage call (before the
  *  skeletal rules and the <1 floor) - not post-hoc. Backstab rides
  *  its own: chance onto chanceToHitMod, x3 roll AFTER the damage. */
-/** SET2 (Nocturnal's Shroud's Nightfall Strike, bible/11-Multiplayer/Sigil-Sets.md): has this foe NOT noticed the
+/** SET2 (Nocturnal's Shroud's Nightfall Strike): has this foe NOT noticed the
  *  player - its AI's own `detected` (characters/enemy/enemyMotor.js: sight, earshot and stealth, vetoed by the illusion
  *  effects) is false. Read where the foe RECORD is in hand (the swing here, the arrow in arrowFlight.js): the formula is
  *  handed the entity, which knows nothing of its AI. A PUPPET (a foe another player's machine runs) is never unaware

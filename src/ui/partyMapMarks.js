@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SOC6 (2026-09-16, Mac: "Party members should be able to be seen on
-// the world map, regardless of their location") - THE PARTY'S MARKS.
+// SOC6 - THE PARTY'S MARKS.
 //
 // ONE reading of the host's `party` dep, shared by BOTH maps.
 //
@@ -75,7 +74,7 @@ export const PARTY_OFFLINE_CSS = hex(PARTY_OFFLINE_DOT_RGB);
 /** What a legend calls the mark, said once so both maps and the tests agree. */
 export const PARTY_LEGEND_TEXT = 'Party member';
 
-/** TV3 (bible/06-Systems/Travel-View.md): THE REGION'S TRAVELLERS on the map - the travel view's own verdigris, a
+/** TV3: THE REGION'S TRAVELLERS on the map - the travel view's own verdigris, a
  *  smaller ring than a party member's (they are strangers, and a party member's mark must stay the one that reads
  *  first), and the legend's word. */
 export const TRAVELLER_MARK_CSS = '#4e7f72';
@@ -94,7 +93,7 @@ export function readTravellerMarks(travellers, size = BAY) {
 }
 /** A map's size as the box readers take it - the Bay's corner at the origin (MapsFile's frame unless a probe says otherwise). */
 const boxOfSize = (size) => ({ x0: 0, y0: 0, w: size?.width ?? BAY.width, h: size?.height ?? BAY.height });
-/** BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): the travellers over a BOX of map pixels (`box` {x0, y0, w, h} - the held
+/** BAY-LEFT-MAPS: the travellers over a BOX of map pixels (`box` {x0, y0, w, h} - the held
  *  map's sheet: the continent's frame while it is shown, world/tamriel/tamrielFrame.js tamrielFrameInBay; the Bay's own
  *  rectangle else), as the bounties are read (ui/bounty/bountyMapMark.js readBountyMarksIn). The held map read them against
  *  the Bay's 1000 x 500, so a rider past the Bay was never drawn - the Overworld drew them. The Bay's own box is
@@ -140,7 +139,7 @@ export function readPartyMarks(party, size = BAY) {
 }
 
 /**
- * BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): the party over a BOX of map pixels (`box` {x0, y0, w, h} - the held map's
+ * BAY-LEFT-MAPS: the party over a BOX of map pixels (`box` {x0, y0, w, h} - the held map's
  * sheet: the continent's frame while it is shown, the Bay's own rectangle else), as the bounties are read
  * (ui/bounty/bountyMapMark.js readBountyMarksIn). SOC6's promise is "regardless of their location", and the held map read
  * them against the Bay's 1000 x 500: a member past the Bay was no mark. The Bay's own box is readPartyMarks', to the pixel.
@@ -207,8 +206,7 @@ export function partyMarksKey(marks) {
 }
 
 /**
- * DISC23-A (2026-09-24, Starempire42 on Discord: "It would be really nice to be able to see your party members on the
- * town and dungeon maps. This would make it much easier to figure out where everyone is and find each other") - THE
+ * DISC23-A - THE
  * PARTY ON THE PLANS.
  *
  * The bay reads a member's TRAVEL PIXEL (readPartyMarks above), which is the whole of what the hub relays - and a
@@ -239,8 +237,7 @@ export function readPartyBodies(party) {
 }
 
 /**
- * COMPASS-PARTY (2026-09-27, Discord - Ashley: "being able to see where party members are on compass? - just lil green
- * marks that point in that direction"; Satranath: "Party members show up on the map but not compass"): THE POINTS THE
+ * COMPASS-PARTY: THE POINTS THE
  * COMPASS MARKS, in the scene's own XZ - the frame the Detect markers are measured in (ui/hud/hud.js compassMarkerLerp).
  *
  * A mate whose BODY this client draws is marked where it stands (`bodies`, the plans' own dep - readPartyBodies). The

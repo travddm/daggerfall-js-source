@@ -1,7 +1,6 @@
 // @ts-check
-// SD1 (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time." ... "The Super dungeon collapses when the feat is done."): THE SUPER DUNGEON'S
-// LAW - its slot, its record's life, where it rises, its name, its room. Design: bible/11-Multiplayer/Super-Dungeons.md
+// SD1: THE SUPER DUNGEON'S
+// LAW - its slot, its record's life, where it rises, its name, its room. Design:
 // sections 2-4.
 //
 // THE RECORD IS THE HUB'S. One Super dungeon stands at a time, so the world channel (`chat:world`, the room every
@@ -25,8 +24,7 @@ export { SD_PHASES, SD_REGION_COUNT, SD_SLOT_MAX, SD_FIGHTERS_MAX, validSdRecord
 
 // ═══ WW5: A HOLLOW IN EVERY THEATRE ═══════════════════════════════════
 //
-// (bible/03-World/World-Wide.md WW5, the owner's call taken: "Every single thing here needs to be addressed. No
-// exceptions.") One Hollow stands at a time IN EACH THEATRE that keeps one (net/wire.js SITE_EVENT_LANES - the Bay's, the
+// (WW5) One Hollow stands at a time IN EACH THEATRE that keeps one (net/wire.js SITE_EVENT_LANES - the Bay's, the
 // eight provinces'; Cyrodiil's open zone none): a LANE a theatre, each its own director's record, its own census, its own
 // rest. A slot names its lane (lane `t`'s are t * SD_LANE_SPAN + 1, + 2 ...: the Bay's the 1, 2, 3 they always were), so
 // a slot is still one Hollow's whole identity everywhere it is read.
@@ -52,7 +50,7 @@ export const SD_FIRST_RISE_MS = 10 * 60 * 1000;
 export const SD_FADE_GRACE_MS = 15_000;
 /** A region needs this many distinct verified accounts in it for the census to choose it. */
 export const SD_CENSUS_MIN = 2;
-/** SD-SEA (FIELD BUGS 2026-10-20b, bible/01-Overview/bugs/Field-Bugs-2026-10-20b.md): THE REGIONS NO HOLLOW CAN RISE IN -
+/** SD-SEA (FIELD BUGS 2026-10-20b): THE REGIONS NO HOLLOW CAN RISE IN -
  *  those MAPS.BSA gives no city, town or village to rise by (systems/superDungeon/sdSite.js sdCities finds none), by index,
  *  which the census never chooses. 31 is the sea's: formats/mapsFile.js getRegionIndexAt reads politic 64 - every water
  *  pixel of the Bay and the ocean, PlayerGPS.cs's own law - as High Rock sea coast, so every player aboard a ship stands
@@ -119,8 +117,7 @@ export function sdFind(rec, now, name) {
   return /** @type {SdRecord} */ ({ ...rec, ph: 'found', foundAt: now, fb: sanitizeName(name) });
 }
 
-/** SD-THROUGH (2026-10-21, the owner: "When someone finds and enters the portal. I want a portal to show up for anyone in
- *  the dungeon and anyone entering that automatically leads them there."): the first soul through its Rift - stamped
+/** SD-THROUGH: the first soul through its Rift - stamped
  *  once, at `now`, while it is found and its boss stands (its realm's first admission, told to the hub). From then on
  *  every client in its Hollow, and every one entering it, stands the Way Through beside them
  *  (world/superDungeon/sdDungeon.js sdThroughStands). */
@@ -235,7 +232,7 @@ export function sdNameOf(s, city = '') {
 
 // ═══ THE ROOM ═════════════════════════════════════════════════════════
 //
-// SD-PARTY (2026-10-28, the owner: "we need to make this a party instance"): ONE room per slot AND party, `sd:<s>.<owner>`,
+// SD-PARTY: ONE room per slot AND party, `sd:<s>.<owner>`,
 // the owner the party's account digest (net/instanceRoom.js instanceOwnerOf); its door the owner,
 // staff and the owner's party (server/src/sdCopy.js). SD-SOLO ("if no one is in a party allow them to be put into a 8
 // player instance"): owner `p<n>`, a shared Hour of SD_PUB_SEATS, the next opened when it is full or won.
@@ -263,7 +260,7 @@ export const sdOwnerOfRoom = (key) => SD_ROOM.exec(String(key ?? ''))?.[2] ?? nu
 /** The Bay's own name in a line, its one home (sdWhere's, and the herald's rise - net/superDungeon/sdHerald.js). */
 export const SD_BAY_NAME = 'the Iliac Bay';
 export const sdWhere = (near, region = '', province = '') => (near ? `near ${near}` : region ? `in the ${region} region` : province ? 'in ' + province : 'near ' + SD_BAY_NAME);   // WW5: a province's Hollow is in its province (`province` - its name)
-export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;   // ABYSS-NAME (Mac: "lets rename Super Dungeons to Abyss Dungeons"): the player's word; the code's stays `super`
+export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;     // ABYSS-NAME: the player's word; the code's stays `super`
 /** AUDIT SD II (L6 F20): a Hollow's name inside a sentence - its article small ("in the Brass Hollow"), as the Orrery's
  *  stones store theirs (net/superDungeon/sdBrain.js). */
 export const sdNameIn = (name) => String(name ?? '').replace(/^The /, 'the ');
@@ -276,11 +273,10 @@ export const SD_NO_RIFT = 'The Rift will not take you yet.';
 export const SD_NO_CLOSED = 'The Hour has closed.';
 /** And the realm's seats every one taken (SD_FIGHTERS_MAX accounts have entered it). */
 export const SD_NO_FULL = 'The Hour is full.';
-/** SD-ONELIFE (2026-10-07, Mac: "A death within the rift casts you out and youre unable to re enter. You get one life to
- *  prove your worth"): the Hour refuses an account that died in it - one life a Hollow. */
+/** SD-ONELIFE: the Hour refuses an account that died in it - one life a Hollow. */
 export const SD_NO_FALLEN = 'The Hour will not take you back.';
 /**
- * SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed" in the Hour and the Spire): ONE LIFE, UNLESS A
+ * SD-REZ (EVENT-RULES, 2026-10-25, in the Hour and the Spire): ONE LIFE, UNLESS A
  * FRIEND CALLS IT BACK. A death in the Hour no longer marks its account dead at once: the realm keeps it DOWN (`down`,
  * `[sub, at, x?, z?]` - where it fell, the realm's metres, when its dying pose said) for SD_REZ_MS. AUDIT WORLD-EVENTS L1-1:
  * THE RAISE IS THE REALM'S TO RECORD - a living fighter of the realm casting Resurrect at the body says so to the realm

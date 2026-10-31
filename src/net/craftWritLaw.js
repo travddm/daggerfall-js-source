@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CRAFT-WRITS (2026-10-22, the Discord's #feature-feedback, TheBard, "Crafting seems unrewarding": "crafting writs
-// instead of only gathering writs. Something like; potions of restore power needed by the mages guild. The reward can
-// be crafting xp, silver, and rep"; the owner: "Why dont you actually build this instead of handing me a small fix?"):
+// CRAFT-WRITS:
 // THE GUILDS' ASKS OF A CRAFTER. Every writ the board posted asked a gathered MATERIAL from the Stores (PROF0 11); a
 // crafting writ asks what a crafter MAKES - potions, dishes, Repair Kits - and pays for the making. The record is
-// bible/06-Systems/Professions-Arc.md section 49.
 //
 // THE SHAPE. An ACCOUNT is asked three a UTC day (`k:<day>:<the character that read first>:<slot>`), drawn by the service
 // from the account's own dice the first time any of its realm characters reads a board that day, within its best
@@ -26,8 +23,7 @@
 //    account's still (a sold one is its buyer's), never bought back with gold (products.bought_with 'gold' with loose 0 -
 //    AUDIT CRAFT-WRITS T2: a piece of goods bought for silver is its maker's all the same), on no listing, road or home,
 //    and in the record's pack loose; their rows go with them.
-//  - ANY-GOODS (FIELD BUGS 2026-10-26, the owner: "Crafting writs should work with even store bought ingredients. I hate
-//    this"): WHATEVER THE GOODS. A brew or a piece made of goods from the pack - looted, or bought with gold at a shop
+//  - ANY-GOODS (FIELD BUGS 2026-10-26): WHATEVER THE GOODS. A brew or a piece made of goods from the pack - looted, or bought with gold at a shop
 //    (AUDIT BAG-CRAFT A1's loose units) - fills a writ as one of gathered or silver-bought goods does: the make is the
 //    service's act, and what it was made of no longer asked. Before, migration 0145's `witnessed` and the gold wall kept
 //    them out, and the card said "0 brewed by you" over a brew that had paid its XP.

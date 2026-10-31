@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP6c (2026-10-09, Mac: "continue"; bible/11-Multiplayer/Chapters-Arc.md 7 and 9) — A CHAPTER'S SEASON IN WORDS:
+// CHAP6c — A CHAPTER'S SEASON IN WORDS:
 // the lines the board, the hall's roll and the backing say of a chapter's Season's event (net/npcChapterLaw.js
 // chapterSeasonOf reads it off the sheet or the board), and the names of its candidates.
 //
@@ -36,7 +36,7 @@ const listed = (/** @type {string[]} */ n) => (n.length < 2 ? n.join('') : `${n.
 /**
  * THE SEASON'S LINES of chapter `faction` of `region` as `c` says it (the sheet's chapter or the board's line): the
  * event's, the doctrine holding, its halls shut - each a sentence, none for Calm. A Schism names its two and their
- * doctrines; a Succession its three, or its heir once named. GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md): five
+ * doctrines; a Succession its three, or its heir once named. GUILD3e: five
  * events - a Decline and an Ascendancy are the Failing and Ascendant bands' now, said on the chapter's band line.
  * @param {number} faction @param {number} region @param {any} c
  */

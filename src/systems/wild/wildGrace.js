@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ZONE-GRACE (2026-10-26, the owner: "making the experience more palatable while retaining its punishment"; asked,
-// "Entry/rise grace") - SAFE PASSAGE, AS THIS GAME HEARS IT (bible/11-Multiplayer/Wild-Zone.md section 3b).
+// ZONE-GRACE - SAFE PASSAGE, AS THIS GAME HEARS IT.
 //
 // The relay's referee keeps it (net/wild/wildRef.js WILD_GRACE: sixty seconds after entering the zone or rising from a
 // fall, no player's blow lands; one's own blow on a player ends it) and says it (`wref` `grace` - net/wire.js

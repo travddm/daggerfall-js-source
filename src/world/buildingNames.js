@@ -18,7 +18,7 @@ import { localizedText, localizedTable, localizedTextList, t } from '../systems/
 import { getLocalizedFactionName } from '../systems/textManager.js';   // L10N3e: a guild hall's and a temple's faction names, as shown
 import { isOnlinePage } from '../systems/online/onlineLane.js';   // EMPIRE-BANK: online, every bank is the Empire's
 
-/** EMPIRE-BANK (2026-09-27, Discord: "For online mode, the bank of daggerfall becomes the bank of the empire"): what an
+/** EMPIRE-BANK: what an
  *  online page's banks are "of" - every one of them, whatever region it stands in ("The Bank of the Empire"). A
  *  departure (Port-Ledger A); offline a bank is Daggerfall's "The Bank of <region>". */
 export const EMPIRE_BANK_OF = 'the Empire';
@@ -40,8 +40,7 @@ export const BUILDING_TYPES = Object.freeze({
   AnyShop: 0xfffd, AnyHouse: 0xfffe, AllValid: 0xffff,
 });
 
-/** PROF-FOUND (2026-10-12, Mac: "Ensure all the professions new stores are flagged on the town map and you can ask NPCs
- *  where they are"; bible/06-Systems/Professions-Arc.md 42, Ledger A): THE SHOPS CLASSIC NEVER OPENED AND THE PORT DID -
+/** PROF-FOUND: THE SHOPS CLASSIC NEVER OPENED AND THE PORT DID -
  *  the Furniture Store, the furnisher's counter (DECOR2b) and Carpentry's workbench (PROF4), the one station shop a
  *  player could neither see nor ask after. DFU keeps its type off the Where-is page (TalkManager
  *  CheckBuildingTypeInSkipList) and groups its automap byte with the houses (ExteriorAutomap.cs:1482-1541); the port
@@ -84,7 +83,7 @@ export const libraryStoresB = () => localizedTextList('LibraryStoresB', ['Librar
 // MacroHelper.GetRulerTitle: twelve explicit cases, then `default: "Lord"`.
 // 11 is written out even though it equals the default - the table is a
 // transcription of the switch, and 'Lady' is reachable only via case 12.
-// PROVINCE-COURTS (bible/03-World/World-Wide.md): the port's own titles after DFU's twelve, for the provinces' rulers past
+// PROVINCE-COURTS: the port's own titles after DFU's twelve, for the provinces' rulers past
 // the Bay (systems/faction/provinceFactions.js RULER) - the same law, odd a man's and even a woman's ((ruler + 1) % 2).
 export const RULER_TITLES = localizedTable({ 1: ['King', 'King'], 2: ['Queen', 'Queen'], 3: ['Duke', 'Duke'], 4: ['Duchess', 'Duchess'], 5: ['Marquis', 'Marquis'], 6: ['Marquise', 'Marquise'], 7: ['Count', 'Count'], 8: ['Countess', 'Countess'], 9: ['Baron', 'Baron'], 10: ['Baroness', 'Baroness'], 11: ['Lord', 'Lord'], 12: ['Lady', 'Lady'],
   13: () => t('faction.ruler.highKing', 'High King'), 14: () => t('faction.ruler.highQueen', 'High Queen'), 15: () => t('faction.ruler.emperor', 'Emperor'), 16: () => t('faction.ruler.empress', 'Empress') });

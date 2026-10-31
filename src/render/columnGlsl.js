@@ -1,5 +1,5 @@
 // @ts-check
-// DW-F (2026-09-26): THE WATER COLUMN'S SHARE, ONE HOME. Iliac Puddle No
+// DW-F: THE WATER COLUMN'S SHARE, ONE HOME. Iliac Puddle No
 // More's TransparentWaterSurfaceTop reads Unity's camera depth texture for
 // the column behind the surface - alpha = a + (1 - a) min(behind / vision,
 // 1) - and the port's world pass has no depth texture to read, so the sum

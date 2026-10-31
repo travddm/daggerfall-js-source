@@ -1,5 +1,5 @@
 // @ts-check
-// GALLEON (2026-10-01, Mac: "we will need to give this a proper texture"): THE NEW GALLEON'S OWN ART, MADE AT THE LOAD.
+// GALLEON: THE NEW GALLEON'S OWN ART, MADE AT THE LOAD.
 //
 // Mac's export names two pictures (Wood.png and floorboards.png) and carries neither, and a ship wears more than two
 // woods. So she is painted here, from noise, as the boats' preload asks for her archive (AUDIT GN2-PF3: it was her first
@@ -25,7 +25,7 @@
 // beams over it, the spars' grain and their iron hoops, the guns' iron, rope, gilt, the hatches' gratings, the ports'
 // throats - but for three pictures each worn once over a whole face: a sail's canvas, a gunport shutter's red, a door.
 //
-// GALLEON-2 (2026-10-02, Mac: "textures should be 64x64"): EVERY PICTURE IS 64 x 64, Daggerfall's own texture's size.
+// GALLEON-2: EVERY PICTURE IS 64 x 64, Daggerfall's own texture's size.
 // The tiling ones were that or smaller; the smaller are painted at 64 now - the spar's, the iron's and the gilt's tiles
 // doubled with their pictures, so over a face and along a spar their texel is the size it was (round a prism it halved:
 // a prism wraps its picture once round), the rope's tile left as it was (64 texels round it now, where it had 16). The
@@ -42,7 +42,7 @@ import { dfLook, lookSeed } from '../dfLook.js';
 
 /** The galleon's pseudo-archive: past the gate's 38101, the court's 38111 and the spoils' 38121. */
 export const GALLEON_ARCHIVE = 38131;
-/** Every picture's size, square (GALLEON-2, Mac: "textures should be 64x64"). */
+/** Every picture's size, square (GALLEON-2). */
 export const GALLEON_TEX_SIZE = 64;
 /** The records, by what wears them. A livery's slices top down (`BANDS`): hullSide0 her rail's, hullSide3 her keel's. */
 export const TEX = Object.freeze({
@@ -487,7 +487,7 @@ export function galleonArt() {
   ].sort((x, y) => x[0] - y[0]);
 }
 
-/** DF-LOOK, DF-ART II and III kept (Mac: "windows should always be see through"; then, of the ships' stern windows,
+/** DF-LOOK, DF-ART II and III kept (; then, of the ships' stern windows,
  *  "See-through by day, lit at night"): a window record's NIGHT TWIN is this far past it - the same painted window, its
  *  glass whole, its glow its emission - the record a ship's gallery is drawn as while the lanterns are lit
  *  (scenes/comeSailAway/comeSailAwayPool.js NIGHT_REMAP). By day the record itself is drawn, its glass a hole (`cutGlass`), and the

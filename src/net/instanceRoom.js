@@ -1,7 +1,5 @@
 // @ts-check
-// INSTANCES (2026-10-15, Mac: "Instead of one room for houses, dungeons, etc - for quests and other uses, including
-// future work, lets implement an instanced system ... The player approaches, should be met with an enhanced UI popup that
-// lets them select public or instanced (if applicable)"; bible/11-Multiplayer/Instances.md): AN INSTANCE IS A WORLD ROOM
+// INSTANCES: AN INSTANCE IS A WORLD ROOM
 // OF ITS OWN. The public room of a dungeon or a building (net/online.js roomKeyFor - `dungeon:m<mapId>`,
 // `interior:m<mapId>.<key>`) with an owner and an epoch after it:
 //
@@ -11,7 +9,7 @@
 //   never a hello field (instanceAdmits).
 // - `epoch`, 8 hex: what opened the room - a quest's own, minted at random the first time its instance opens and kept
 //   in the quest's save (systems/instancePlaces.js questInstanceEpoch), or Privateer's Hold's, the character's digest
-//   (holdEpochOf). Mac, of what an instance remembers: "Kept per owner, 30-min respawn" and "Kept until quest ends" - a
+//   (holdEpochOf). and "Kept until quest ends" - a
 //   quest that ends takes its epoch with it, so no later quest keys its room (a uid would: quest.js nextUid restarts past
 //   the uids a save still holds), and the room's memory is forgotten INSTANCE_TTL_MS (net/wire.js) after it last drained.
 //
@@ -22,9 +20,9 @@
 //
 // It is a WORLD room (net/wire.js WORLD_ROOM admits it): the host's simulation, its acts, its loot, its memory and
 // RESPAWN-30's half-hour, exactly as a public room's. Who comes in is the relay's to say: its owner, staff, or a member
-// of the owner's party, which the hub answers (partyHoldsOwner). Mac: "You and your party".
+// of.
 //
-// DOMAIN2 (bible/11-Multiplayer/Domains.md section 6): A GUILD'S CASTLE IS AN INSTANCE OWNED BY A GUILD - its owner the
+// DOMAIN2: A GUILD'S CASTLE IS AN INSTANCE OWNED BY A GUILD - its owner the
 // guild's digest (instanceGuildOwnerOf, a hash domain of its own, so no account's digest is ever a guild's), its epoch the
 // one the account service minted when the castle was bought. The relay admits a socket whose verified token names that
 // guild (`guild`), and no guest: the owner chose one owner a castle.
@@ -46,7 +44,7 @@ export const relaySupportsGuildInstances = (v) => { const m = /^world(\d+)$/.exe
  *  MAIN_STORY_DUNGEON_IDS, measured on the freeware's MAPS.BSA). The `guild` arm admits these alone: it admitted any room
  *  a guild's digest owned, so a modified client opened its whole guild a private copy of any dungeon or building. */
 export const BAY_CASTLE_MAP_IDS = Object.freeze([6634853, 630439035, 1291010263]);
-/** WW7-4 (bible/04-World/World-Wide.md WW7-4): AND EACH PROVINCE'S CAPITAL'S CASTLE but Cyrodiil's (Domains.md section 6: the
+/** WW7-4 (WW7-4): AND EACH PROVINCE'S CAPITAL'S CASTLE but Cyrodiil's (Domains.md section 6: the
  *  Imperial City never - the White-Gold Tower's halls stand open to all) - its centre's map id, the crown seat's key
  *  (world/tamrielCapitals.js capitalPlaceId(k, 0): its lane 0x341, 0x80000, its ordinal k; Solitude 1 .. Helstrom 6). */
 export const PROVINCE_CASTLE_MAP_IDS = Object.freeze([1, 2, 3, 4, 5, 6].map((k) => ((0x341 << 20) | 0x80000 | k) >>> 0));

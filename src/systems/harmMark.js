@@ -1,5 +1,5 @@
 // @ts-check
-// REVENANT-HARM (2026-10-02): WHO LAST HARMED THE PLAYER, when no blow says it. A killing BLOW names its foe (the struck
+// REVENANT-HARM: WHO LAST HARMED THE PLAYER, when no blow says it. A killing BLOW names its foe (the struck
 // seam, systems/sigil/sigilSetPowers.js's landed blow); a spell's burn, a lingering effect's round and a poison's tick reach
 // the player's hurt with nobody on them. So each leaves its foe here as it lands:
 //   - a spell landing on the player (scenes/hostMagic.js applySpellToPlayer - a missile, a blast, a touch);
@@ -7,7 +7,7 @@
 //   - any foe's blow that reaches the player (the struck seam) - a poisoned weapon's dose rides that blow, and its ticks
 //     come later, so this mark lasts longest.
 // systems/revenant/revenant.js reads it when a hurt with no blow takes the player's last health. A LEAF: it imports nothing.
-// RVN10 (bible/12-Enhanced-AI/Feud-Arc.md 21.2): and THE FIGHT - each foe's harm opens a fight with the player, or carries
+// RVN10 (21.2): and THE FIGHT - each foe's harm opens a fight with the player, or carries
 // its fight on (a harm within HARM_FIGHT_MS of its last); and the last hurt that left the player under half its health.
 // A foe I run from is ROUTED when its fight saw that hurt (systems/revenant/revenant.js revenantRoutable).
 
@@ -48,7 +48,7 @@ export function endPlayerFights() { _fights = new WeakMap(); _lowAt = null; }
 export function playerHarmMark(now = Date.now()) {
   return _mark && now <= _mark.until ? _mark.entity : null;
 }
-/** AUDIT (2026-10-02): the mark forgotten - a load, a new game, a death already answered, or (`entity` given) that foe
+/** AUDIT: the mark forgotten - a load, a new game, a death already answered, or (`entity` given) that foe
  *  judged (a beaten revenant kneels: its harm is no one's death now). */
 export function clearPlayerHarm(entity = null) {
   if (!entity || _mark?.entity === entity) _mark = null;

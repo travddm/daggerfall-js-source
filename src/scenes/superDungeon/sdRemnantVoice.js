@@ -1,6 +1,5 @@
 // @ts-check
-// SD14a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD14a;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BRASS REMNANT'S VOICE - its body and its Echoes
+// SD14a: THE BRASS REMNANT'S VOICE - its body and its Echoes
 // heard. The Warden speaks in 48 cues (world/gate/gateBoss.js BOSS_CUES); the Remnant had its blows' wind-ups and landings
 // and its fall's thud (scenes/superDungeon/sdRemnantBlows.js SD_BLOW_CUES) and nothing of its body: no step, no wake, no turn of its
 // phases, no Echo rising or broken, no stun, no loss. Here, read off the fight this page holds each frame:

@@ -1,5 +1,5 @@
 // @ts-check
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.2): THE OBJECTIVE SHEETS - one a quest, data the port writes, filed
+// QL1: THE OBJECTIVE SHEETS - one a quest, data the port writes, filed
 // by family (sheets/<family>.json), and the law that checks a sheet against the shape and against its own script.
 //
 // A SHEET NAMES ONLY WHAT ITS SCRIPT HAS (section 2.5) - the law that checks it is the tools' (tools/qlSheetLaw.mjs

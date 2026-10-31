@@ -132,7 +132,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
         return t;
       })();
       texturePromises.set(archive, asked);
-      // BUILD-RETRY (bible/06-Systems/Travel-View.md LOAD-OWED): A READ THAT FAILED IS NO ANSWER. The rejection stood
+      // BUILD-RETRY (LOAD-OWED): A READ THAT FAILED IS NO ANSWER. The rejection stood
       // here as the archive's answer for the page, so one failed read - a dropped fetch, an IndexedDB read that failed
       // and fell through to a server without the file - failed every later ask for the archive without reading again:
       // every pixel of that climate, every town wearing that picture, threw for the rest of the session. A failed ask
@@ -217,7 +217,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
     // replacement decoded after a classic dyed upload must still land.
     const dyed = mips === false && !swap && dyeTarget != null && dye != null && dye !== '';
     const variant = mips === false ? (swap && token ? `#ui_${token}` : dyed ? `#ui_dye${dye}_${dyeTarget}` : '#ui') : undefined;
-    // INCIDENT (2026-09-04, the see-through lines in dungeon walls): a
+    // INCIDENT: a
     // MODEL texture is opaque. DaggerfallMesh.cs:141/:169 fetch a mesh's
     // material through MaterialReader.GetMaterial(archive, record) whose
     // alphaIndex defaults to -1 (MaterialReader.cs:352) - no cutout

@@ -1,5 +1,5 @@
 // @ts-check
-// GHOSTFENCE (bible/03-World/Red-Mountain.md, The Ghostfence): the Tribunal's barrier round Red Mountain - a ring of
+// GHOSTFENCE (, The Ghostfence): the Tribunal's barrier round Red Mountain - a ring of
 // pylons at the summit cone's foot, its one gate Ghostgate in the south (UESP: the Ghostfence and Ghostgate, 3E 417).
 // One law read by the countryside's roll, the lairs', the roads' worker, the pixel build and the far views. Pure, and
 // one float in every engine (AUDIT LANDFORMS III A8): its directions are redMountain.js dirOf's series.

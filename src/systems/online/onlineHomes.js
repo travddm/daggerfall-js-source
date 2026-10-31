@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME1 (2026-09-25) — THE ONLINE HOMES, AS THIS CLIENT KNOWS THEM.
+// HOME1 — THE ONLINE HOMES, AS THIS CLIENT KNOWS THEM.
 //
-// Mac: "allowing online players to purchase housing in any location";
 // asked: "Housing is exclusive"; a home is bought "At its front door"
 // ("Click any unowned house's door and buy it there. Works in every
 // town, including hamlets with no bank."); a house bought offline
@@ -19,7 +18,7 @@
 //
 // Online, a building the list names is that player's home: to its
 // owner their own (storage, a bed, a door open at any hour) - ACCOUNT-
-// HOMES (2026-10-06): to every character of the owner's account, since a
+// HOMES: to every character of the owner's account, since a
 // home is its account's - to every other player a house that opens as
 // its owner says. A building the
 // list does NOT name stands under Daggerfall's own law - and that
@@ -68,7 +67,7 @@ export const HOME_TOWN_TTL_MS = 60_000;
 /** After an unanswered ask, how long before the next - a service that is down is not asked at every door. */
 export const HOME_RETRY_MS = 10_000;
 /**
- * HOMES-SHED (2026-10-13, the account database overloaded from 14:11 UTC): A FAILED ASK BACKS OFF, YARD-SHED's law
+ * HOMES-SHED: A FAILED ASK BACKS OFF, YARD-SHED's law
  * (scenes/homeYards.js yardRetryMs) on the service's busiest route - 88,079 asks of a town's homes in the outage's hour.
  * A town unanswered was asked again every HOME_RETRY_MS while a fresh answer waits HOME_TOWN_TTL_MS, so a database too
  * slow to answer was asked six times as often as one that answered. Now each failure in a row doubles the wait, to
@@ -86,8 +85,7 @@ export const HOME_ENTRY_WORDS = Object.freeze({ private: 'Only me', party: 'My p
 
 /**
  * WHETHER A BUILDING CAN BE A HOME AT ALL: Daggerfall's own for-sale houses and every house type it has - House1-4
- * (the residences GetHousesForSale tops its list up from) and, HOME2 (Mac: "We need to ensure any house can be
- * bought"; asked, "Also widen what counts as a house (House5/House6 too)"), House5 and House6, which RMBLayout.
+ * (the residences GetHousesForSale tops its list up from) and, HOME2 (; asked, "Also widen what counts as a house (House5/House6 too)"), House5 and House6, which RMBLayout.
  * IsResidence leaves out - never a House2 that belongs to a faction, which Daggerfall's lock law keeps for that
  * guild's members alone (buildingLocks.js; the Thieves Guild's and the Dark Brotherhood's): a guild's hideout sold
  * to one player would shut the guild out.
@@ -122,7 +120,7 @@ export function homeSceneOf(name) {
 }
 
 /**
- * ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound"): THE HOMES THIS SAVE
+ * ACCOUNT-HOMES: THE HOMES THIS SAVE
  * KEEPS THINGS IN THAT ITS ACCOUNT HOLDS NO MORE. Every character of an account keeps its own things in a home under
  * the home's scene in its OWN save (homeSceneName) - and any of them may sell the home, or the character that bought it
  * be deleted (server-account/src/realm.js deleteRealm), while this one is away. So once the account's homes are read
@@ -189,7 +187,7 @@ export function homeDoorAnswer(home, { partyNames = [], questSite = false } = {}
 }
 
 /**
- * HOME-OFFER (2026-09-26, Mac: "Enhanced plus cant buy house"): WHAT A PRESS ON A HOUSE'S DOOR ASKS FIRST, if
+ * HOME-OFFER: WHAT A PRESS ON A HOUSE'S DOOR ASKS FIRST, if
  * anything. HOME1 put the offer and the owner's menu behind Info mode alone, and nothing on the enhanced skins says
  * so - the mode word is drawn, not pressed, and the default is Grab - so a player told by the bank that "a home is
  * bought at its own front door" pressed the door and walked in, on Enhanced and Enhanced Plus alike. The offer asks
@@ -228,8 +226,7 @@ export const homeDoorTitle = (home, questName = null) => {
  * can be your home ... Buy it?") at every door in town. A house whose door has verbs to list is named with DFU's own
  * word for one (Internal_Strings 50, "Residence"): its plaque stands, "Go in" lit, and the quest's residence - named
  * "The <surname> Residence" and never for sale - reads apart from the rest.
- * IC-PROPS (2026-10-27, the owner: "Some doors in Imperial city can be entered but dont show the tooltip", then "a world
- * wide issue"): DFU names EVERY residence so - PlayerGPS.GetBaseBuildingDiscoveryData (PlayerGPS.cs:1306-1309) gives a
+ * IC-PROPS: DFU names EVERY residence so - PlayerGPS.GetBaseBuildingDiscoveryData (PlayerGPS.cs:1306-1309) gives a
  * House1-4 the localized "residence" as its discovered name, and World Tooltips prints "To" and that name over every
  * discovered building's door (Modded_HUDTooltipWindow.cs:719-728) - so the port's nameless house, offline and wherever it
  * lists no verbs, was the one building door a player could walk through with no plaque: 6,325 of the 8,295 building
@@ -270,7 +267,7 @@ export const homeOfferLines = (price) => ['This house can be your home.', `It co
 export const HOME_BOUGHT_LINE = 'This house is your home now. Only you can enter it until you say otherwise.';
 export const homeShortLine = (price) => `You need ${gold(price)} gold, in your purse and ${EMPIRE_ACCOUNT_WORDS} together.`;
 /**
- * HOME2 (Mac: "We need to ensure any house can be bought"; offered the door's offer on any click but Steal, with "our
+ * HOME2 (; offered the door's offer on any click but Steal, with "our
  * tooltip implementation"): THE DOOR'S VERBS ON THE PLAQUE. HOME1 offered a house only to a click in Info mode, a
  * window every other mode never opened - so a player who clicked a door in the mode they walk in (Grab, Talk) walked
  * in, and no house could be bought that way. The door's tooltip (World Tooltips' plaque) now lists what the door
@@ -318,7 +315,7 @@ export function homeVisitorRows(home, door, nowS = Math.floor(Date.now() / 1000)
   if (!home.rent || home.mine) return offer.length ? offer : null;
   return [...(door === 'enter' ? [{ id: HOME_VERB.enter, label: 'Go in' }] : []), { id: HOME_VERB.rent, label: rentRowLabel(home.rent.from) }, ...offer];
 }
-// ═══ HOME-VOTE (2026-10-10) - THE TOWN'S WORD ON A PLAYER'S HOUSE, AT ITS DOOR ═════════════════════════════════════════
+// ═══ HOME-VOTE - THE TOWN'S WORD ON A PLAYER'S HOUSE, AT ITS DOOR ═════════════════════════════════════════
 // The owner: "a house voting system within vicinity of player houses. If the house votes run negative, the exterior
 // decorations/interior decorations should not be shown to other players" (net/homeVoteLaw.js). A vote is cast standing
 // at the house - its door's plaque lists "Vote up" and "Vote down" under whatever else the door does (worldModes.js),
@@ -385,7 +382,7 @@ export function homeHallBuyRow(price, guild, armed = false) {
  *  lets me set (setHallEntry: the rank alone), never `keeper` (a realm character's too). The row's gate and the press's
  *  (worldModes.js) are this one. */
 export const hallEntryTurnable = (home) => !!home?.hall && !!home.hallEntry;
-/** GUILD-HALL-SALE (2026-10-06, asked: "Guild houses should be able to be sold, like regular houses"): WHETHER I MAY SELL
+/** GUILD-HALL-SALE: WHETHER I MAY SELL
  *  A HALL AT ITS DOOR - one whose sale the service lets me make (`hallSell`: sellHall's rank, its guildmaster's). The
  *  row's gate and the press's (worldModes.js) are this one. */
 export const hallSellable = (home) => !!home?.hall && home.hallSell === true;
@@ -466,14 +463,13 @@ export const HOME_BANK_LINES = Object.freeze(['Online, a home is bought', 'at it
 
 /**
  * THE CLIENT'S REGISTRY over `api` (net/accountClient.js accountHomes: every answer `{ ok, data }` or
- * `{ ok: false, error }`, never a throw). `character()` is the character playing - ACCOUNT-HOMES (2026-10-06, asked:
- * "House ownership should be account bound, not character bound"): a home is its ACCOUNT's (`mine`), and so every
+ * `{ ok: false, error }`, never a throw). `character()` is the character playing - ACCOUNT-HOMES: a home is its ACCOUNT's (`mine`), and so every
  * character of it owns it (`own`), whichever bought it (`character`, the row's) - a deed the realm gave stays its
  * knight's (KNIGHT-HOUSE). Answers `{ ensure, waitFor, known, homeAt, claim,
  * release, setEntry, version }` - and (QUEST-HOME) `hearEveryTown`/`homeStands`, the boot's word on every town's
  * homes, and `hearHome`, the hub's word that one moved since; `version` moves on every change a door would show.
  * LEGACY7 part five: `onWrote(mapId, buildingKey)` told of each change of mine (a claim, a release, an entry) - the
- * line's houses read again. QUEST-HOME (Mac, 2026-10-15: "Close both"): `onHomes()` told whenever the registry learns of
+ * line's houses read again. QUEST-HOME: `onHomes()` told whenever the registry learns of
  * a building that is a home (the boot's read, a hub word, a town's answer) - a quest site not yet reached in one is
  * chosen again (scenes/world.js).
  * @param {{ api: any, character?: () => (string|null), now?: () => number, ttlMs?: number, onWrote?: ((mapId: number, buildingKey: number) => void) | null, onHomes?: (() => void) | null }} opts
@@ -626,7 +622,7 @@ export function createOnlineHomes({ api, character = () => null, now = () => Dat
     return true;
   }
   /**
-   * QUEST-HOME (Mac, 2026-10-15: "Close both"): THE HUB'S WORD THAT HOMES MOVED SINCE THE BOOT'S READ - each `{m, u, d}`
+   * QUEST-HOME: THE HUB'S WORD THAT HOMES MOVED SINCE THE BOOT'S READ - each `{m, u, d}`
    * (net/wire.js validHomeWord, in the order the hub heard them): town `m`'s buildings `u` homes now, `d` homes no more.
    * Kept beside the boot's read; a town this page has asked is asked again (its door says whose, and a home gone is gone
    * from it at once). Answers whether any building became a home.
@@ -939,9 +935,9 @@ async function sellOut(homes, { mapId, buildingKey, credit, realm }) {
   return { ok: true, refund, decorBack };
 }
 
-// ═══ ARENA4b (2026-10-03) - A HOME THE ARENA DISPLACED, MOVED BY ITS OWNER'S CLIENT ════════════════════════════════
+// ═══ ARENA4b - A HOME THE ARENA DISPLACED, MOVED BY ITS OWNER'S CLIENT ════════════════════════════════
 //
-// Mac (ARENA1): "Move them to a new house". Online, the account service carries the home's row to the new key
+// . Online, the account service carries the home's row to the new key
 // (server-account/src/homes.js arenaMoveHome); this is the client's half, the offline move's own steps (world.js
 // moveArenaDeed) for a home the service keeps. Online, in Daggerfall, once the homes' towns stand in their layouts:
 //   1. the moves this character made and never read (an answer lost, the page gone before the letter) - the old scene

@@ -1,5 +1,4 @@
-// RAID1 (2026-09-27, Mac: "World event mod was specially built for us", and, asked whether to port it offline with
-// its bugs fixed, "Yes") - WORLD EVENTS - RAIDING PARTIES 1.1 (Kamer): "Selects Random Cities/Hamlets/Towns for Raids
+// RAID1 - WORLD EVENTS - RAIDING PARTIES 1.1 (Kamer): "Selects Random Cities/Hamlets/Towns for Raids
 // from enemies." The mod's one script, TownRaids, ported off its IL
 // (vendor/world-events-raiding-parties/il/World_Events_Raiding_Parties.il.txt, tools/ilDump.py's offsets):
 //
@@ -51,7 +50,7 @@
 //      seconds and the ten stay for a spawn that never lands.
 //  11. "The orc attack", where the mod wrote "the orcs attack".
 //
-// Mac's "4" (2026-09-27): a region is raided about once every four real hours. DFU's clock runs a game day in two
+// Mac's "4": a region is raided about once every four real hours. DFU's clock runs a game day in two
 // (WorldTime.TimeScale 12), so a day rolls half a raid for each region the roll can pick - the mod's own 23 a day is
 // 3.8 real hours at 44 such regions. RAID_REGION_REAL_HOURS is the one constant.
 //
@@ -70,7 +69,7 @@
 // cleanses a town, and the hub's word closes a raid on every machine in the Bay (a cleanse said in its region, never
 // a withdrawal). RAID2's words still elect the runner; offline, and at a relay before it, nothing here changes.
 //
-// RAID5, THE RAID'S KIND (systems/raidKinds.js, the owner: "rework town raids to bring them up to par with other world events"):
+// RAID5, THE RAID'S KIND (systems/raidKinds.js):
 // each raid the day rolls is a classic raid, an ASSAULT (waves in packs, a breather between, the party's leader alone at
 // the last - an elite with two boss traits), a SIEGE OF THE STANDARD (a Standard-Bearer of the watch holds the square;
 // the raiders march on him) or an EXODUS (refugees walk the streets to the square; the raiders hunt them) - read off
@@ -133,7 +132,7 @@ export const MOD_DAILY_RAIDS = 23;
 /** `Random.Range(15, 26)` [IL_0dae]: the raider deaths that cleanse a town. */
 export const RAID_KILLS_MIN = 15;
 export const RAID_KILLS_MAX_EXCLUSIVE = 26;
-/** The caps [IL_0730, IL_06fa] - Mac, 2026-09-27, on 25 and 8: "Keep". */
+/** The caps [IL_0730, IL_06fa]. */
 export const MAX_RAID_ENEMIES = 25;
 export const MAX_RAID_DEFENDERS = 8;
 /** ScheduleNextSpawn / ScheduleNextDefender [IL_0828, IL_0852]: `Random.Range(1f, 10f)`, and `8f` for an orc raid's raiders. */
@@ -238,7 +237,7 @@ export function raidRegions(maps, pickerData) {
 }
 
 /**
- * WW6 (bible/03-World/World-Wide.md WW6): SELECTRAIDS' LISTS PAST THE BAY - a lane's towns (its theatre's): the world's
+ * WW6 (WW6): SELECTRAIDS' LISTS PAST THE BAY - a lane's towns (its theatre's): the world's
  * registry's LISTED places there (world/worldWide/worldPlaces.js inTheatre - TESA's capitals, cities, towns and villages,
  * every client standing the land the same) of the types SelectRaids takes (RAID_TOWN_TYPES), a capital one town (its
  * centre: `street` WW7-11's law, scenes/livingWorld/livingIndex.js capitalStreet), each keyed by its OWN location index
@@ -424,7 +423,7 @@ const allRaids = () => { const s = staffRaids(); return s.length ? [...state.rai
  *   removeFoe(foe)            Object.Destroy - gone, no corpse
  *   outOfSight(foe)           fix 6's test for a routed raider
  *   reputation()              {player, store} for GrantReputation
- *   say(line, id)             DaggerfallUI.AddHUDText - EVENTS1 (bible/10-UI/Event-Board.md, Ledger A): the event
+ *   say(line, id)             DaggerfallUI.AddHUDText - EVENTS1 (, Ledger A): the event
  *                             board's news by default (systems/eventNotices.js), where the mod's line had stood on the
  *                             HUD's line (filed in the journal - and still, by the door's log); the board off, the
  *                             HUD's line again (hudText). `id` the raid's (`raid:<raidKey>`, AUDIT EVENTS1 A1)
@@ -709,7 +708,7 @@ export function raidFrame(dt = 0) {
     expire(now, home);
     for (const r of state.raids) routRaid(r);
     state.lastSelectedDay = day;
-    state.raids = raidsForDay(day, regions).filter((r) => !isWildRegion(r.regionIndex));   // PVPDUNGEONS (the owner: "Do not spawn world events in the PVP zone!"): every client drops the zone's towns from the day's roll alike
+    state.raids = raidsForDay(day, regions).filter((r) => !isWildRegion(r.regionIndex));     // PVPDUNGEONS: every client drops the zone's towns from the day's roll alike
     cancelPending();
     scheduleNextSpawn(-1);
     scheduleNextDefender();
@@ -1257,14 +1256,11 @@ export const STAFF_RAID_TYPE = 9;   // no party of the mod's (0-2), and never th
 export const STAFF_SPAWN_INTERVAL_MIN_S = 0.5;
 export const STAFF_SPAWN_INTERVAL_MAX_S = 2;
 /**
- * STAFF-EVENT PACKS (2026-10-25, mob: "when we do a raid spawn they need to be spread all over not a SINGLE SPAWN POINT
- * ... SHOULD DO PACK SPAWNING", "3-5 per pack of the monster chosen trhis need to feel like a take over", "and packs
- * quickly to the 25 cap", "it can be pack of any of the selected monsterts"): a staff event stands its monsters in PACKS of
+ * STAFF-EVENT PACKS: a staff event stands its monsters in PACKS of
  * STAFF_PACK_MIN to STAFF_PACK_MAX, each one any of staff's kinds -
  * a leader anywhere around me (any bearing, STAFF_PACK_FAR_MIN to STAFF_PACK_FAR_MAX off, in front of me too), its pack
  * within STAFF_PACK_NEAR of it, STAFF_PACK_STEP_S apart - and the next pack after a gap paced so the event stands its
- * MAX_RAID_ENEMIES in STAFF_PACK_FILL_MIN_S to STAFF_PACK_FILL_MAX_S (mob 2026-10-25: "make it take 120-45 secdon for a
- * pack to full hit 25", then "20-45" - the event's own pace, rolled once, each gap its pack's share of it). A leader with no spot that far is tried nearer (a narrow street) - never lost. A
+ * MAX_RAID_ENEMIES in STAFF_PACK_FILL_MIN_S to STAFF_PACK_FILL_MAX_S (, then "20-45" - the event's own pace, rolled once, each gap its pack's share of it). A leader with no spot that far is tried nearer (a narrow street) - never lost. A
  * town raid keeps the mod's one foe at a time just out of view.
  */
 export const STAFF_PACK_MIN = 3;
@@ -1273,7 +1269,7 @@ export const STAFF_PACK_FAR_MIN = 20;
 export const STAFF_PACK_FAR_MAX = 60;
 export const STAFF_PACK_NEAR = 6;
 export const STAFF_PACK_STEP_S = 0.15;
-// PACK-FAST (mob 2026-10-26: "wayy slowwwwwww", "needt to be x3"): three times the pace - 20-45 s was 7-15 s.
+// PACK-FAST (, "needt to be x3"): three times the pace - 20-45 s was 7-15 s.
 export const STAFF_PACK_FILL_MIN_S = 7;
 export const STAFF_PACK_FILL_MAX_S = 15;
 /** A pack's gap after it: its share of the event's pace (`paceS`). The first pack comes at once, so the cap stands when
@@ -1283,7 +1279,7 @@ export const staffPackGapS = (paceS, size) => paceS * size / (MAX_RAID_ENEMIES -
 const packWaitS = (paceS, size) => Math.max(STAFF_PACK_STEP_S, staffPackGapS(paceS, size) - STAFF_PACK_STEP_S * (size - 1));
 /** The event's pace, rolled once: a last pack of STAFF_PACK_MAX stands the cap at its least, of one at its most. @param {() => number} roll */
 export const staffPackPaceS = (roll) => rangeFloat(STAFF_PACK_FILL_MIN_S * (MAX_RAID_ENEMIES - 1) / (MAX_RAID_ENEMIES - STAFF_PACK_MAX), STAFF_PACK_FILL_MAX_S, roll);
-/** PACK-EVERY (mob 2026-10-26: "make sure we spawn a pack on every player in town"): whether a peer's `feet` stand in
+/** PACK-EVERY: whether a peer's `feet` stand in
  *  my event's place - the town's rect where I am in one (`inRect`, the host's test of a foe's feet), or, out of any town
  *  (a staff AREA event: systems/staffEvents.js staffRaidHere), my own map pixel `me`. Out of a town the rect answered no
  *  one, and every pack, the scale and the boss went to me. @param {number[]|null} feet @param {((f: any) => boolean)|null} inRect
@@ -1294,7 +1290,7 @@ export function peerInEventPlace(feet, inRect, world, me) {
   const wc = world.worldCoords(feet), at = worldCoordToMapPixel(wc.x, wc.z);
   return at.x === me.x && at.y === me.y;
 }
-/** PACK-STALL (mob 2026-10-26: "town was not spawning enemy on every player"): a pack whose leader found no spot this
+/** PACK-STALL: a pack whose leader found no spot this
  *  many times about its player goes to the next player in turn. It was tried about the same player for ever, and while
  *  it tried, no pack stood anywhere - for anyone. */
 export const STAFF_PACK_LEADER_TRIES = 3;
@@ -1318,7 +1314,7 @@ function staffPackStep(raid, standing) {
   return 'raider';
 }
 /**
- * PACK-SCALE (2026-10-25, mob: "they arnt spawn ing quick enough", card "Scale with players in town"): an event's packs
+ * PACK-SCALE: an event's packs
  * by the players in its place (me counted) - one alone as ever (MAX_RAID_ENEMIES standing, the event's pace); each more
  * player STAFF_PACK_CAP_PER more standing, to STAFF_PACK_CAP_MAX, and the pace a quarter quicker, to twice. Pure.
  * @param {number} players @returns {{ cap: number, speed: number }}
@@ -1332,7 +1328,7 @@ export const STAFF_PACK_CAP_MAX = 40;
 /** PACK-SCALE: the more standing each player past the first brings. */
 export const STAFF_PACK_CAP_PER = 5;
 /**
- * PACK-SPREAD (mob 2026-10-25: "make sure we spread spawn all over the citys player not just the bottom left", "evenly
+ * PACK-SPREAD (, "evenly
  * swap them between all player in a city"): each pack goes to the next player in the town in turn - me, then each peer
  * standing in its rect, by id - and is led from around that player's feet. Answers the feet, or null for my own.
  */
@@ -1342,8 +1338,7 @@ function staffPackPlayer() {
   return all[_packTurn++ % all.length][1];
 }
 /**
- * BOSS-SPOT (2026-10-25, mob: "spawn it on the highest lvl player in the town or area", "or largewst groupoing"; card:
- * "Biggest group, ties by level"): the player a mini boss stands beside - the one with the most players within
+ * BOSS-SPOT: the player a mini boss stands beside - the one with the most players within
  * STAFF_BOSS_GROUP_M of them (themselves counted), a tie to the group whose highest level is higher, then the lower id.
  * Pure. @param {[string, number[], number][]} players `[id, feet, level]` @returns {[string, number[], number]|null}
  */
@@ -1366,7 +1361,7 @@ function staffBossPlace() {
   const at = staffBossSpot(host().peerFeetInTown?.() ?? []);
   return at && at[0] !== me ? { near: at[1] } : undefined;
 }
-/** BOSS-RETRY (mob 2026-10-26: "mini boss sometimes doent spawn"): the boss's tries in a row that found no spot. A miss
+/** BOSS-RETRY: the boss's tries in a row that found no spot. A miss
  *  used to clear the field's wait, so the boss waited for the whole field again (up to STAFF_BOSS_CLEAR_MAX_MS) and
  *  tried the same group's spot - which missed again. Now the wait holds, and past STAFF_PACK_LEADER_TRIES misses it
  *  stands about me. */
@@ -1394,7 +1389,7 @@ function staffClearLong(raid, t) {
 export const STAFF_BOSS_CLEAR_MAX_MS = 120000;
 /** BOSS-CLEAR: is every monster of it that stood at the boss's call dead or gone - mine and the puppets of another's (a
  *  boss aside)? The field is taken once, at the first ask (`clearWait`); a pack stood since never holds the boss
- *  (BOSS-CLEAR-CALL, mob 2026-10-25: "no only the mini boss need to wait for everything to be dead"). @param {any} raid @param {any} h */
+ *  (BOSS-CLEAR-CALL). @param {any} raid @param {any} h */
 function staffFieldClear(raid, h) {
   const key = raidKey(raid);
   const pups = h.raidPuppets?.() ?? [];
@@ -1431,7 +1426,7 @@ function staffPlaceName(r) {
 const staffTownOf = (r) => (r.locationIndex === STAFF_EVENT_AREA ? null : townOfRaid(r));
 const kindName = (t) => enemyDisplayName(t) ?? 'monster';
 /** Is a staff event's place a city? The panel's word (`ct`, off the game's map), or a town of my own map. Anything else
- *  is said as an area (mob 2026-10-24: "make sure to add that it is a city ... and make sure to say its an area if it not"). */
+ *  is said as an area. */
 const staffCity = (r) => r.locationIndex !== STAFF_EVENT_AREA && (r.staff?.ct === 1 || !!staffTownOf(r));
 export const staffAttackLine = (r) => (staffCity(r)
   ? t('staffEvent.attackCity', 'The city of {place} is under attack!', { place: staffPlaceName(r) })

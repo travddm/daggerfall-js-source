@@ -1,5 +1,4 @@
-// WW1 (2026-09-14, Mac: "This is our next mod I want to add 1:1 while
-// also having it work with morrowind's first person view"): WEAPON
+// WW1: WEAPON
 // WIDGET 1.6 by RedRoryOTheGlen - FPSWeaponClone, ported 1:1.
 //
 // The mod is one MonoBehaviour, FPSWeaponClone, that runs BESIDE DFU's
@@ -16,7 +15,7 @@
 // The script ships only as a compiled DLL (42,496 bytes); the
 // `FPSWeaponClone.cs` its manifest names is not in the bundle, so it
 // was read off the IL method by method (the record, with every method
-// against its home here, is bible/05-Combat/Weapon-Widget.md). IL
+// against its home here, is). IL
 // offsets in the notes below cite that reading.
 //
 // THE SHAPE HERE. createWeaponWidget() is the component; the rig
@@ -189,7 +188,7 @@ export function createWeaponWidget({
     // IL 0x3528: `GetItemHands() == 2` - and 2 is ItemHands.BOTH in DFU's
     // own enum (None, Either, Both, LeftOnly, RightOnly), not the port's
     // LeftOnly; the mod's source is `SpecificWeapon.GetItemHands() ==
-    // ItemHands.Both` (FPSWeaponClone.cs:2378). 3ARMS (2026-09-22) found
+    // ItemHands.Both` (FPSWeaponClone.cs:2378). 3ARMS found
     // the same misread in Handheld Torches; the three mirrors below fire
     // on a two-hander now, as the mod's switches say.
     if (getItemHands(w.specificWeapon) !== ITEM_HANDS.Both) return false;
@@ -436,7 +435,7 @@ export function createWeaponWidget({
     w.animatingCancel = true;
     const recover = w.s.swingRecoveryOverride && recoveryOverride();
     // the recovery, while the ORIGINAL is still attacking: in reverse on a hit or the override, else the setting's pose.
-    // F1 (2026-09-17, Mac: "when thrusting with a weapon, it can be glitchy"): the reverse runs ONCE. It sat inside the
+    // F1: the reverse runs ONCE. It sat inside the
     // attacking loop unlatched, and with Recovery = Last Frame the frame it left at 0 was set back to the last frame and
     // reversed again, every lap, until the original's swing ended - a thrust (the one strike that recovers in reverse
     // under the shipped VanillaRecoveryOverride) flickering backwards over and over.
@@ -656,7 +655,7 @@ export function createWeaponWidget({
     // (the mod's field starts false, so DFU hears the clip once at every load - a boot artefact, not carried)
     if (w.lastSheathed === null) w.lastSheathed = c.sheathed;
     if (c.sheathed !== w.lastSheathed) { if (c.sheathed) playSheatheSound(); w.lastSheathed = c.sheathed; }
-    // TWO-HANDS (bible/05-Combat/Two-Hands.md): A HAND OF A PAIR is drawn as DFU draws any right hand - never flipped
+    // TWO-HANDS: A HAND OF A PAIR is drawn as DFU draws any right hand - never flipped
     // here: the rig mirrors the one on the left of the screen whole (draw's `mirror`), every state, so a left hand is a
     // right hand in the mirror rather than DFU's three-state flip of one sprite. Ambidexterity's law is the one used hand's.
     if (c.pairHand) {
@@ -737,8 +736,7 @@ export function createWeaponWidget({
       w.armsPosition = [w.armsPosition[0] + i.delta[0], w.armsPosition[1] + i.delta[1]];   // DISC14-C: the arms lag the look as the sprite does
     }
     // DoubleScaleTextures (0x2248-0x22b1): the doubled idle sits half its size in, so its corner stays where the classic one was.
-    // DW-CLIP (2026-09-23, a player on Discord: with the Diverse Weapons preset on "you dont see some weapons all the
-    // time when idling only a small snippet of them"): the half-size shift is the DOUBLED box's - it moves a box that
+    // DW-CLIP: the half-size shift is the DOUBLED box's - it moves a box that
     // UpdateWeapon made twice the classic frame so the doubled `w_` repaint lands where the classic one stood. Under
     // TrueTextureSize the box is the painting's own size and is not doubled (the preset's idles are full-canvas
     // paintings, the war axe's 317x200 IS the screen), and with no `w_` hit at all it is the classic box; shifting

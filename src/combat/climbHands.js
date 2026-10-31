@@ -1,9 +1,5 @@
 // @ts-check
-// CLIMB-HANDS (2026-10-02, Mac: "Here are two textures for the first person view (not morrowind)" - the raised fist
-// "needs to be mirrored, thumbs inside so we can utilize 2 arms ... for hanging on a ledge, climbing, etc"; the reaching
-// arm "for when you're climbing and look around for a place to jump to" - "whenever you look away from the wall your
-// climbing or ledge you are hanging from", "mirrored", and "Definitely animate the arms for when you are climbing, or
-// shifting left to right climbing/on a ledge"). THE CLASSIC LANE'S HANDS ON THE WALL. Design: bible/03-World/Parkour-Arc.md
+// CLIMB-HANDS. THE CLASSIC LANE'S HANDS ON THE WALL. Design:
 // (CLIMB-HANDS, AUDIT CLIMB-HANDS).
 //
 // CLIMB4 lowered the classic sprite out of the screen for the climb (WeaponManager's climbing return) and left the screen
@@ -32,11 +28,8 @@
 //   - THE GRIP FAILING: the hands tremble on the stone, harder the lower the grip (the feel's noise, the pose's rate).
 //   - LOOKING AWAY: turned off the wall's face, the hand on the side looked to lets go of the stone and becomes the
 //     reaching arm, up from that side of the screen and open toward the middle of the view, the way the eye looks - the
-//     right arm looked right, the left looked left (Mac, 2026-10-13: "The single arm out is also inverted for both
-//     directions"); the other hand stays on the stone (Mac, 2026-10-02: "For look right/left dont use the hand aiming
-//     straight up. Only use the angled arm" - turned that far, the wall it holds is out of the view).
-// THE HANDS ON THE WALL, NOT ON THE SCREEN (Mac, 2026-10-13: "the hands should stay on whatever your climbing and not
-// rotate with the screen. The only one that should rotate with the screen is the single arm out"): every place above is
+//     right arm looked right, the left looked left; the other hand stays on the stone (- turned that far, the wall it holds is out of the view).
+// THE HANDS ON THE WALL, NOT ON THE SCREEN: every place above is
 // the picture with the view square to the body's facing on the climb and level; the fists are pinned there through the
 // world's own lens (`climbLens`, `pinToView`), so turning the view carries them across the screen with the stone they
 // hold, and looking up takes them down it. Up the view they go only as far as the sleeve's slack (the paintings' arms end
@@ -72,11 +65,10 @@ export const REACH_ART = Object.freeze({ file: 'art/climb-reach.png', w: 183, h:
 export const HANDS = Object.freeze({
   GRIP_H: 150,             // a fist's drawn height
   GRIP_APART: 93,          // each fist's centre from the screen's middle - the 3D body's wrists on the lip (POSE.HANDS_APART,
-                           // FACE_BACK less WRIST_OUT ahead) through DFU's own lens on this surface (Mac, 2026-10-13: "The
-                           // sprite hands should be spread out more" - at 52 the two fists' boxes met in the middle)
+                           // FACE_BACK less WRIST_OUT ahead) through DFU's own lens on this surface (- at 52 the two fists' boxes met in the middle)
   GRIP_AT: 0.35,           // the grip: the point of a fist held on the wall, its share of the drawn height down from the top
   BOTTOM_SLACK: 34,        // the sleeve under the screen's bottom edge at rest: no lift may exceed it
-  REACH_W: 190,            // the reaching arm's drawn width, anchored at its own side of the screen (Mac: "it needs to sit on the
+  REACH_W: 190,              // the reaching arm's drawn width, anchored at its own side of the screen (Mac: "it needs to sit on the
                            // left/right side of the screen respectively"; then "they need to be the originasl size" - 150 shrank it)
   REACH_X_IN: 4,           // the reaching arm's box in from its edge
   REACH_SLACK: 16,         // the reaching arm's sleeve under the bottom edge

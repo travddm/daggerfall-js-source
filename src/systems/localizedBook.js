@@ -1,4 +1,4 @@
-// L10N3f (2026-09-28): A BOOK IN A TRANSLATION'S OWN WORDS - LocalizedBook.cs (MIT, Daggerfall Workshop). A translation
+// L10N3f: A BOOK IN A TRANSLATION'S OWN WORDS - LocalizedBook.cs (MIT, Daggerfall Workshop). A translation
 // keeps its books beside the classic ones: `Text/Books/BOK00042-LOC.txt`, a header of keywords and then the book's
 // text in the string importer's markup ([/center], [/font=N] ...). DFU reads the -LOC file first wherever it reads a
 // book, and the classic BOK file only where there is none:

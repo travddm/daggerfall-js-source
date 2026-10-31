@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-SEASON (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the sea's
-// seasonal boards for the deepest voyage and the legends ended; bible/03-World/Eltheric-Ocean.md SEA-SEASON) - THE
+// SEA-SEASON - THE
 // SEASON'S LAW, both ends'.
 //
 // A SEASON is the realm's (net/arena/arenaLaw.js arenaSeasonOf - eight weeks of wall time from a Monday, the arena's and

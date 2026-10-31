@@ -1,8 +1,5 @@
 // @ts-check
-// GALLEON (2026-10-01, Mac: "So this model is to replace the current ingame gallon model. The doors/hatches should
-// open and close and we will need to give this a proper texture, along with a wheel at the helm, the sails and ropes,
-// and ensuring cannon fire shoots from the cannon holes properly. I really need you to go all in and make this
-// something special"): THE NEW GALLEON - Mac's ship, built as Come Sail Away builds a hull.
+// GALLEON: THE NEW GALLEON - Mac's ship, built as Come Sail Away builds a hull.
 //
 // Come Sail Away's hull 2 (the Small Ship, the mod's `Galleon`) is a prefab the C# instances and walks BY NAME
 // (systems/comeSailAway/comeSailAwayBoat.js GetBoatTransforms): its MeshCollider the boat's frame, its DrivePosition the helm, its

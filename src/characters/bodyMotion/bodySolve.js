@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE SOLVE. A whole body's request laid on the skeleton
+// BODY-MOTION - THE SOLVE. A whole body's request laid on the skeleton
 // over the clip's pose, in the order a body is built from the ground up:
 //   1. THE HIPS turned to the body-frame turn asked (the pelvis and the bone that carries the thighs, together - the
 //      rest's own build between them kept), then the body moved so the hips' middle stands where it was asked;

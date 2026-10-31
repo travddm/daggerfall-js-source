@@ -319,8 +319,7 @@ export { hotbarInForce };
  * happened; the HUD's count says the rest.
  */
 /**
- * DISC21-C (2026-09-24, Scratchie on Discord: "Just started the game, equipped a weapon, it shows up in the '2' slot,
- * but when I press it the game says 'nothing is in that slot' and I can't attack anything"): WHAT AN EMPTY PRESS SAYS
+ * DISC21-C: WHAT AN EMPTY PRESS SAYS
  * TO A PLAYER WHO WANTS THEIR WEAPON. The weapon was in the diamond's MAIN cell, whose chip is ReadyWeapon's key - Z,
  * which in the skin's pixel face reads as a 2 - and a new character's weapon starts sheathed, as classic's does
  * (WeaponManager.Sheathed). So the player pressed 2, the bottom consumable slot, empty on a new character, and was told
@@ -530,7 +529,7 @@ function swapQuickslotNow({ entity = null, say = null, rows = null, hand = null 
 }
 
 /**
- * QS4 (Mac: "The 4th quickslot doesnt have a keybind") - THE OFF-HAND
+ * QS4 - THE OFF-HAND
  * CELL'S OWN PRESS.
  *
  * Three of the diamond's four corners named a key and the fourth did
@@ -552,10 +551,7 @@ function swapQuickslotNow({ entity = null, say = null, rows = null, hand = null 
  */
 export function offHandQuickslot(opts = {}) { return (_performed = offHandQuickslotNow(opts)); }   // AUDIT CONTRIB H3: what the press did, for the hotbar's flash
 function offHandQuickslotNow({ entity = null, say = null, toggleLight = null, switchHand = null } = {}) {
-  // MAC-R3 (2026-09-17, Mac: "Tapping the equip hand in the quickbar
-  // doesn't switch to your other weapon in hand (still bound to H). Even
-  // if a torch isn't equipped a message still shows up that you can't
-  // light the torch"): THE PRESS IS WHAT THE CELL SHOWS, in full. The
+  // MAC-R3: THE PRESS IS WHAT THE CELL SHOWS, in full. The
   // cell is the OFF HAND's readout (quickslotView: a lit light, else the
   // shield, else the weapon on the left hand, else the swap, else empty)
   // and QS4 gave its press ONE act - the light's toggle - so a cell
@@ -585,10 +581,6 @@ function offHandQuickslotNow({ entity = null, say = null, toggleLight = null, sw
 
 // ── QS6: THE SPELL SLOT, AND THE HOLD THAT PICKS WHAT IS IN A SLOT ──
 //
-// Mac, 2026-09-17: "for slot 3, I want to change it to be for spells.
-// So you should be able to hold the keybind to switch between
-// applicable spells, and then press the keybind to equip. Same for 2/3.
-// Pressing the keybind, if not equipped, should equip the slot."
 //
 // TWO THINGS, and they are separable. The first is a SPELL SLOT: the
 // third key readies a spell instead of swapping a weapon. The second is
@@ -618,7 +610,7 @@ const bookOf = (entity) => (Array.isArray(entity?.spells) ? entity.spells : []);
 /** A spell this slot can hold: one with the numeric index that is the
  *  port's name for it. Everything the book can contain has one. */
 const keyedSpell = (sp) => !!sp && typeof sp === 'object' && Number.isFinite(sp.index);
-/** HB-LYCFREE (2026-09-30, Mac: "Lycanthropy costs to cast from hotbar when it shouldnt"): the books' own law - the
+/** HB-LYCFREE: the books' own law - the
  *  curse's spell readies with DFU's noSpellPointCost (DaggerfallSpellBookWindow: `Tag == lycanthropySpellTag`), so
  *  from the slot and the bar as from the book it costs nothing. */
 const freeReady = (sp) => ({ free: sp?.tag === LYCANTHROPY_SPELL_TAG });
@@ -647,8 +639,7 @@ export function resolveSpellQuickslot(entity) {
 }
 
 /**
- * THE SPELL SLOT'S PRESS. Mac: "Pressing the keybind, if not equipped,
- * should equip the slot."
+ * THE SPELL SLOT'S PRESS.
  *
  * `magic` is the host's ONE cast engine (scenes/hostMagic.js) and every
  * law about readying is its own: the silence gate, the spell-point
@@ -996,7 +987,7 @@ export const HOTBAR_KINDS = Object.freeze(['consumable', 'weapon', 'light', 'shi
  *  The order matters: a torch is not a weapon and a potion is not a
  *  light, but a lit torch that is ALSO equippable must read as a light.
  *
- *  UI2 (2026-09-27, Mac: "you should be able to slot spells and different items"): ANY ITEM GOES ON THE BAR, and a
+ *  UI2: ANY ITEM GOES ON THE BAR, and a
  *  press is the pack's own primary act on it (ui/enhanced/enhancedInventory.js localPrimaryAct, the PAD's quick act): a piece
  *  a slot of the body takes - armour, clothing, jewellery, a gem's crystal - is WORN, put on or taken off when it is
  *  on; everything else is USED, the pack's Use - a book read, a map read, the spellbook opened, food eaten, a tent

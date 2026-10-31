@@ -1,4 +1,4 @@
-// OW-FORECAST (2026-10-19, the owner: "I like this idea, but do it right"; bible/06-Systems/Travel-View.md OW-FORECAST):
+// OW-FORECAST:
 // THE OVERWORLD'S FORECAST - the streaming host's half of systems/weather/owForecast.js. It reads the world weather map
 // (weatherMap.js weatherAt / forecastAt, through the host's own ground law) at the host's weather minute (the one the
 // sky is sampled at - sampleWeatherField's), the traveller's place AT THEIR HEIGHT (AUDIT OW-REVISITED L3-4: the sky's

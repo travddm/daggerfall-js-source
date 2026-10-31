@@ -304,8 +304,6 @@ export function parseCareerData(career, list) {
 // ---- MAC-G: THE LIST, READ BACK OFF A FINISHED CAREER
 // (DaggerfallCharacterSheetWindow.GetClassSpecials, :459-762) ----
 //
-// Mac: "the enhanced stat page on the pause menu doesn't have any
-// listing for character advantages/disadvantages."
 //
 // He is right, and so was DFU before him: the classic sheet's HISTORY
 // button pops GetClassSpecials' message box BEFORE the history window

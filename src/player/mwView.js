@@ -3,7 +3,7 @@
 // re-deriving the lockstep four times (MW-D15's lesson: the camera dep
 // drifted per host until it had one home).
 //
-// EOTB4 (2026-09-15): THIS SEAM NOW SERVES TWO BODIES. Mac, on why the
+// EOTB4: THIS SEAM NOW SERVES TWO BODIES. Mac, on why the
 // port carries a second third-person system: "This is moreso for those
 // who opt out of using morrowind." So the wheel is ONE LADDER and the
 // question it asks is "which body can answer" -
@@ -82,7 +82,7 @@ export function setEotbBodyReady(fn) { eotbBodyReady = typeof fn === 'function' 
  */
 let eotbCartYields = () => false;
 /**
- * BEAST-SELF (2026-09-26): the Morrowind arm and body STAND ASIDE while the player is a transformed lycanthrope
+ * BEAST-SELF: the Morrowind arm and body STAND ASIDE while the player is a transformed lycanthrope
  * with no Morrowind beast standing (combat/fpArm.js setStandIn: a wereboar, or - SHADOW-FANG, at the merge -
  * Bloodmoon's wolf refused or still building; a standing wolf keeps this lane), so this lane's other side, Eye Of
  * The Beholder's, takes the body as it does for a player with no Morrowind data. At that edge the view carries over
@@ -145,7 +145,7 @@ let pendingClicks = 0;
  * mode (setViewMode + force refresh, npcanimation.cpp:295-317 /
  * character.cpp:2798), and answers the frame's eye (camera.cpp:160-209).
  *
- * BENCH-CAM (2026-10-10): `pivotFloor` - a world height the third-person camera's pivot (the sprite camera's head
+ * BENCH-CAM: `pivotFloor` - a world height the third-person camera's pivot (the sprite camera's head
  * origin, the Morrowind camera's focal) stands at least at: the host's word while I drive from a wagon's bench
  * (scenes/horseCartPool.js cameraFloor - over the wagon's roof), null everywhere else. First person never reads it.
  *
@@ -154,7 +154,7 @@ let pendingClicks = 0;
 export function mwViewFrame({ fpEye, feet, yaw, pitch, heightScale = null, raycast = null, spherecast = null, eyeOverride = null, seaReach = 0, pivotFloor = null, ...state }) {
   standInEdge({ fpEye, feet, yaw, pitch });   // BEAST-SELF: the view carried across the arm's stand-aside
   benchSeated = !!state.seated;   // WAGONS3: the host's word that the player drives from a wagon's bench, either lane
-  // FLAGGED: Eye Of The Beholder has no sitting art - on that lane the driver's sprite stands on the bench's footboard, still (bible/06-Systems/Wagons.md WAGONS3).
+  // FLAGGED: Eye Of The Beholder has no sitting art - on that lane the driver's sprite stands on the bench's footboard, still (WAGONS3).
   // FIELD BUGS 2026-09-29 (the sea) #3: the helm's reach (player/seaZoom.js; 0 off it) to both cameras, every frame -
   // the host's word for the hull sailed, and off the helm a distance past either's own far end comes back to it
   mwCamera.setSeaReach(seaReach);
@@ -273,9 +273,7 @@ export function mwViewWheel(deltaY) {
 export function mwViewPendingClicks() { return pendingClicks; }
 
 /**
- * MAP-POV (2026-09-20, Mac: "If you're in 3rd person and decide to use
- * the map, it should transition you to first person and then open the
- * map. Both for the morrowind/non morrowind"): INTO THE HEAD NOW, for
+ * MAP-POV: INTO THE HEAD NOW, for
  * whichever body answers. The map is read in first person - the held
  * map's hands lane needs the first-person arm (AUDIT-MAP2: the
  * third-person body holds nothing), and from third person the window
@@ -300,7 +298,7 @@ export function mwViewFirstPerson() {
 }
 
 /**
- * VIEW-TOGGLE (2026-09-28, Mac: "add a force first person/third person toggle"): ONE PRESS, THE OTHER VIEW - for
+ * VIEW-TOGGLE: ONE PRESS, THE OTHER VIEW - for
  * whichever body answers, beside the wheel (EOTB's own `Camera.TogglePerspective` key, IL_1230-IL_124d, which the port
  * had left inert for the wheel - Mac's call, now reversed for a key of the player's choosing). The EOTB lane takes the
  * mod's own ToggleOffset; the Morrowind lane goes out by the restore door the travel view's hold uses and in by
@@ -324,7 +322,7 @@ export function mwViewCanTogglePerspective() {
 }
 
 /**
- * TV1 (2026-09-27, bible/06-Systems/Travel-View.md): THE BODY OUT OF THE HEAD FOR THE TRAVEL VIEW, AND BACK. The
+ * TV1: THE BODY OUT OF THE HEAD FOR THE TRAVEL VIEW, AND BACK. The
  * view's eye stands hundreds of metres over the traveller, and the traveller is what it looks at - so whichever body
  * can answer is held in third person for the view's length (the EOTB sprite by its own ToggleOffset, the Morrowind
  * rig by the restore door and its view mode), and handed back to whatever it was when the view lets go. A body that
@@ -361,7 +359,7 @@ export function mwViewHoldThird(on) {
   return true;
 }
 /**
- * SPYGLASS (2026-10-11, the owner: "a spyglass option where you can aim and view to observe other ships"): THE BODY INTO
+ * SPYGLASS: THE BODY INTO
  * THE HEAD FOR THE GLASS, AND BACK. A glass is put to the eye - so while it is up whichever body answers is held in first
  * person (MAP-POV's door, mwViewFirstPerson), and handed back to the third person it stood in when it comes down. The
  * travel view's hold wins (it holds the body out of the head; the glass is never up under it). Answers whether the view
@@ -406,8 +404,7 @@ function mwIntoHead() {
   return true;
 }
 
-// RIDE-POV (2026-09-20, Mac: "When riding the horse with the morrowind
-// model, you should be exempt from using 3rd person"): THE MORROWIND BODY
+// RIDE-POV: THE MORROWIND BODY
 // HAS NO SADDLE. The sprite body rides (EOTB's own saddle states); the
 // Morrowind third-person body has no riding animation and would stand
 // through the horse, so while the host says `riding` the Morrowind lane
@@ -419,9 +416,7 @@ function mwIntoHead() {
 // yet); astride the 3D horse (`saddled`) the body has a saddle to show, and the head is not held.
 let mounted = false;
 
-// COATS3D (2026-10-11, the owner: "These are to be applied to horses for people using morrowind with the character
-// properly rigged when riding"; asked, "Yes, unlock it" for third person in the saddle, and "The 3D horse" for first
-// person): THE MORROWIND BODY HAS A SADDLE NOW. On a horse (the host's `horse` - its look; the cart is not one) the
+// COATS3D: THE MORROWIND BODY HAS A SADDLE NOW. On a horse (the host's `horse` - its look; the cart is not one) the
 // view keeps the player's own 3D horse (world/horseRig.js): stepped each frame at the ground the body covers, under
 // the body's feet with its seat over them, and its seat handed to the body as `saddle` (the hosts' camera(), through
 // mwViewSaddle) - so the body sits astride it (player/seatPose.js saddleRigInput). Third person draws the two in one
@@ -495,8 +490,7 @@ export function mwViewDrawSaddle(canvas) {
   return horseRig.drawFirstPerson(ownHorse, canvas, lastCamera);
 }
 
-// WAGONS3 (2026-10-10, Mac: "Using a wagon doesnt allow you to zoom out into 3rd person when mounted"; "sit on the wagon
-// itself, the ledge its built for"): THE DRIVER ON THE BENCH IS NOT IN THE SADDLE. A host whose player drives a wagon
+// WAGONS3: THE DRIVER ON THE BENCH IS NOT IN THE SADDLE. A host whose player drives a wagon
 // from its bench (scenes/horseCartPool.js driverSeat - the Open Wagon's and the Caravan's) hands the frame `seated` and
 // `riding` false: the body sits on the bench (player/seatPose.js, the CARDS2b seat) and the team pulls in front of it,
 // so RIDE-POV's rule - no saddle to show - does not hold it in the head, and the wheel takes it out as it does on foot.
@@ -598,8 +592,7 @@ export function mwViewHides() {
   // TV1: under the travel view the camera is hundreds of metres up - no first-person hand, horse or weapon belongs on it
   if (heldThird) return { weapon: true, horse: true, spellHands: true };
   const hides = eotbLane() ? eotbBody.hides() : { weapon: false, horse: false, spellHands: false };
-  // HORSE-POV (2026-10-12, the owner: "when using the morrowind models for the horse, the 2d sprite is still painted on
-  // the screen, especially in third person"): the riding sprite is the view from the saddle. The Morrowind body in third
+  // HORSE-POV: the riding sprite is the view from the saddle. The Morrowind body in third
   // person is seen from behind - its horse, when it sits one, stands in the world in 3D (fpArm.js drawThird's `horse`) -
   // so no first-person horse is on the screen. mwViewDrawSaddle answers false out of first person, and the sprite read
   // that as its turn.
@@ -642,7 +635,7 @@ export function mwViewBodyBones(names) {
  *  null: another lane, or no sprite drawn. */
 let spriteFigure = null;
 export function mwViewSpriteFigure() { return eotbLane() ? spriteFigure : null; }
-/** SPRITE-FACE (2026-10-05): the sprite lane's body's facing as drawn this frame - { yaw, turn }: the way its picture
+/** SPRITE-FACE: the sprite lane's body's facing as drawn this frame - { yaw, turn }: the way its picture
  *  faces and the way the body turns (player/eyeOfTheBeholder/eotbBody.js facing()) - or null: another lane, no sprite drawn, first person.
  *  An aura on the sprite hangs on `yaw`, never on the walk's facing the picture lags (world.js auraFrame, drawAuras). */
 let spriteFacing = null;

@@ -1,8 +1,7 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// PVP-REF (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges"; "Continue") - THE REFEREED BLOW AND STEP
-// (bible/11-Multiplayer/Seats-Arc.md 6.1).
+// PVP-REF - THE REFEREED BLOW AND STEP
+// (6.1).
 //
 // FACT: no server sees a blow between players today - a duel's blow is
 // the defender's to judge, on its own machine (DUEL1). A siege cannot be
@@ -70,7 +69,7 @@ export const SIEGE_BLOWS_HZ = 4;
  *  its own (DECIDED here: 6.1 clamped a heal's size and named no rate, and at the frame gate's 8 a second an unbounded heal
  *  is 320 a second - a fighter nobody can fell; the referee has no unbounded verb). */
 export const SIEGE_CASTS = Object.freeze({ max: 3, windowMs: 5000, damageMax: 60, healMax: 40 });
-/** BAL8 (bible/05-Combat/Balance-Arc.md section 14): ONE CEILING FOR EVERY STRIKER. INT10 bounded a caster at 3 casts of
+/** BAL8: ONE CEILING FOR EVERY STRIKER. INT10 bounded a caster at 3 casts of
  *  60 in 5 s - 180, 36 a second - and a striker with a blade or a bare hand at nothing past 4 blows a second and one blow's
  *  bucket, which no measured blow came near (the highest of 40,000 was 54): a kitted monk's 45.8 a second felled a
  *  fighter in 8.3 s, where the mage's ceiling takes 10.6. Every harm a fighter deals - blows and casts together, so a
@@ -102,7 +101,7 @@ export const SIEGE_WEAPONS = Object.freeze({
   Short_Bow: 129, Long_Bow: 130,
 });
 /** FormulaHelper.CalculateWeaponMaxDamage, by template (characters/weapons.js MAX_DAMAGE, pinned equal) - the bows one
- *  higher, BAL-ARCHERY's (bible/05-Combat/Balance-Arc.md section 18). */
+ *  higher, BAL-ARCHERY's. */
 export const SIEGE_WEAPON_MAX = Object.freeze({
   113: 6, 114: 8, 115: 8, 116: 8, 117: 10, 118: 12, 119: 12, 120: 16, 121: 16, 122: 18, 123: 21, 124: 12, 125: 14,
   126: 18, 127: 12, 128: 16, 129: 17, 130: 19,   // BAL-ARCHERY: the bows' tops one past FormulaHelper's
@@ -135,7 +134,7 @@ export function siegeBlowMax(w, m, wa = null) {
   return Math.max(0, (armsOk(wa) ? Math.min(reach, wa[0]) : reach) + SIEGE_BONUS_MAX) * SIEGE_CRIT_MAX;
 }
 
-// ─── INT7: THE ARMS SIGNED (bible/06-Systems/Integrity-Arc.md, lane 2) ───
+// ─── INT7: THE ARMS SIGNED (, lane 2) ───
 
 /** A weapon's REACH: its top (SIEGE_WEAPON_MAX) plus its material's modifier (Iron's -1 to
  *  Daedric's 6) - the one number both referees' caps grow with (arenaLaw.js arenaBlowCap's table is this one, pinned
@@ -321,8 +320,7 @@ export function siegeRise(f, now) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges"; "Continue") - THE BATTLEFIELD (Seats-Arc 6.2, 6.5, 6.7, 6.8):
+// SEAT2a - THE BATTLEFIELD (Seats-Arc 6.2, 6.5, 6.7, 6.8):
 // the banners and the Throne, the clock, the no-shows, the result and who
 // earned Honours. Pure, as the referee above: every `now` an argument.
 // ═════════════════════════════════════════════════════════════════════
@@ -443,8 +441,7 @@ function presentAt(fighters, point, ground = null) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up
-// 482") - THE WORKS IN BATTLE (Seats-Arc 6.2, 7.5): the Walls' faster
+// SEAT2b part two (b) - THE WORKS IN BATTLE (Seats-Arc 6.2, 7.5): the Walls' faster
 // wave, the Gatehouse that bars the Throne, the Rams that batter it. The
 // numbers are net/fortLaw.js's (GATEHOUSE, RAM, WALLS_WAVE_*), COPIED here
 // and pinned EQUAL by test: this leaf imports nothing. The pass carries the
@@ -590,8 +587,7 @@ export function siegeBreach(b) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up
-// 482") - THE RELAY'S OWN FIGHTERS (Seats-Arc 6.1, 7.5, 7.7): the
+// SEAT2b part two (c) - THE RELAY'S OWN FIGHTERS (Seats-Arc 6.1, 7.5, 7.7): the
 // Barracks' town guards fighting for the holder (2, 4, 6 a tier) and a
 // revolt's Rebel Captain and his 12 rebels at the palace door - "the gate's
 // brain with adds" (World-Bosses.md 17: a body the relay owns, walking at
@@ -948,8 +944,7 @@ export function siegeNextBeat(b, now) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue";
-// "Hurry up") - THE ROYAL TOURNEY (Seats-Arc 7.6): "a duel ladder all week
+// CROWN1 part two - THE ROYAL TOURNEY (Seats-Arc 7.6): "a duel ladder all week
 // in the crown's city, at the castle's entrance square: DUEL1's ring, but
 // every blow refereed by PVP-REF in a siege:-shaped room - a
 // defender-resolved duel cannot award a title - the relay keeping the

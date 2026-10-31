@@ -1,6 +1,5 @@
 // @ts-check
-// DECK-PROPS (2026-10-17, the owner: "Allowing prop placement on the ship itself"; bible/03-World/Naval-Refit.md
-// DECK-PROPS) - THE PLAN OF HER DECK: her open deck from above (systems/naval/navalDeck.js - her walkable cells, her
+// DECK-PROPS - THE PLAN OF HER DECK: her open deck from above (systems/naval/navalDeck.js - her walkable cells, her
 // bow up), her fittings on it (systems/naval/deckFittings.js), and the fittings to set there. Opened from the Fleet
 // page's Deck (scenes/deckPlanDoor.js, through the sea's window door), over the world.
 //

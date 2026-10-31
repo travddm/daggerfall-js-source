@@ -1,7 +1,5 @@
 // @ts-check
-// CREW-TRADE (2026-10-23, the owner: "add crew as a resource that can be sold and traded"; asked, the owner chose "Exchange
-// good only" - crew bought and sold at the port exchange straight into and out of the ship at the quay, priced per port
-// like the other goods - a headcount, and a price that varies by port; bible/03-World/Captains-Sea.md CREW-TRADE) - THE
+// CREW-TRADE - THE
 // CREW AT THE EXCHANGE, her side of it. The row is the exchange's (tradeGoods.js CREW, exchangeOf's `crew`: a port's stand
 // to sailors, the day's drift, the spread, the day's stock); here, what the exchange pays for a man at most, how many men
 // may leave her and how many more she takes, and the words.

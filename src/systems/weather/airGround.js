@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT PRECIP (2026-10-19, the owner: "Audit this and ensure perfection. No band aids") - THE LAW'S MAP FOR THE AIR: what
+// AUDIT PRECIP - THE LAW'S MAP FOR THE AIR: what
 // systems/weather/airTemperature.js reads its climates and the ground's heights off, composed once as the world mounts.
-// bible/07-Rendering/Biome-Precipitation.md is the record.
+// is the record.
 //
 // The air read the Bay's 1000 x 500 pixels and held every read to its edge (AIR-1): the continent past it read the
 // edge's pixel, and the Eltheric Ocean - two thousand rows north of the Bay, its latitude unbounded - fell as snow every

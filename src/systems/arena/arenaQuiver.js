@@ -1,7 +1,7 @@
 // @ts-check
 // ARENA-ARROWS (FIELD BUGS 2026-10-04e, Discord: "Arrows are not refunded, which causes problems"): THE QUIVER COMES
 // BACK FULL FROM THE SAND. A bout's healers put the fighter back as they found them - health, fatigue and magicka (the
-// duel's own heal, bible/11-Multiplayer/Arena.md "2. The fights") - but nothing put back what the bow spent. An arrow
+// duel's own heal, "2. The fights") - but nothing put back what the bow spent. An arrow
 // that strikes a foe is lodged in its pack (combat/arrowFlight.js) and looted from the corpse in any other fight; a bout
 // fighter is stood with no pack, never dies (the yield floor: no corpse, no loot) and is taken away at the verdict, and a
 // player's opponent is a remote body - so every arrow loosed on the sand was gone for good, and a ladder emptied a

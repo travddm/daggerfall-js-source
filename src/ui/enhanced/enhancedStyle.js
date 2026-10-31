@@ -118,7 +118,7 @@ export const fontsUrl = (families) =>
  *  own claim. */
 export const ENHANCED_FONTS_URL = fontsUrl([FONT_DISPLAY, FONT_DATA, FONT_PIXEL_BRAND, FONT_PIXEL_DATA]);
 
-/* ENH-NOTICE3 (2026-09-21): the popup column's numbers - HUD_TEXT_TOP_PX
+/* ENH-NOTICE3: the popup column's numbers - HUD_TEXT_TOP_PX
    (96, under the compass block), HUD_TEXT_ROW_PX (20, the slide's row),
    HUD_TEXT_TOP_NARROW_PX (AUDIT FONT F9) and the two chat-peek offsets
    (AUDIT FONT F7, computed off the chat sheet's own line box) - left
@@ -137,7 +137,7 @@ ${ENHANCED_TOKENS}
    that: its tabs wore no picture */
 ${DFICON_CSS}
 
-/* ── FONT3: THE GAME SPEAKS ONE FACE (2026-10-02, Mac: "we need to ensure everything recieves our enhanced font").
+/* ── FONT3: THE GAME SPEAKS ONE FACE.
    The page's own face was --data, Barlow Semi Condensed - the LAUNCHER's - and --display, Cormorant, the menu's
    face before PX1 made the menu pixel. PX1 and FONT1 set the pixel stack on each surface's root, so every surface
    whose root they did not reach, and every rule under a root that named --data or --display again (the Features
@@ -250,7 +250,7 @@ select, input, textarea { font: inherit; }
 .card.slot .meta { margin-bottom: 10px; }
 .card h3 { font-family: var(--display); font-weight: 400; font-size: 22px; margin: 0 0 4px; }
 .card .meta { color: var(--dim); font-size: 13px; margin: 0 0 16px; }
-/* UXB1-E (2026-09-25, the UX backlog): the online rules, offline - what
+/* UXB1-E: the online rules, offline - what
    differs as name, now, arrow, then; the room's value in brass. */
 .svsync-list { list-style: none; margin: 0 0 16px; padding: 0; }
 .svsync-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 8px; align-items: baseline;
@@ -265,8 +265,6 @@ select, input, textarea { font: inherit; }
 .stats dd { margin: 0; font-variant-numeric: tabular-nums; }
 
 /* ── TILE1: THE SAVE TILE (ui/saveTile.js) ─────────────────────────
-   Mac: "a detailed tile based design for your saves... showing your
-   portrait and character information".
 
    A GRID RATHER THAN A LIST. Three panes listed the same slots as full
    width cards, so four saves filled a screen and a player scrolled to
@@ -503,7 +501,7 @@ select, input, textarea { font: inherit; }
    never the ini string - \`4\` reads Beautiful, \`True\` reads On.
    (settingsLaw.formatValue owns that, and this borrows it whole.) */
 .ctl { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
-/* AUDIT UI (2026-08-27): A ROW'S VALUE BUTTON. It was sized INLINE in
+/* AUDIT UI: A ROW'S VALUE BUTTON. It was sized INLINE in
    three places - b.style.minHeight = '38px' - and an inline style is
    unreachable by a media query, so the coarse-pointer rule below could
    not raise it however it was written. The size lives in the sheet
@@ -587,7 +585,7 @@ select, input, textarea { font: inherit; }
    the in-game prototype follows and for the same reason. The
    settings sub-rail becomes a horizontal scroller and the help
    becomes a sheet, because one column is one column. */
-/* AUDIT UI (2026-08-27): A THUMB IS NOT A SCREEN WIDTH. Every 44px rule
+/* AUDIT UI: A THUMB IS NOT A SCREEN WIDTH. Every 44px rule
    in this sheet hangs off max-width 860px, which is a PROXY - and it
    fails on the very device the proxy stands in for. Measured on an iPad
    in landscape: 1080px wide, pointer:coarse true, touch true, and the
@@ -666,9 +664,7 @@ select, input, textarea { font: inherit; }
   }
 }
 
-/* SHORT-TOUCH (2026-09-27, Discord - players on an AYN Thor and an Android phone: "I can login, get to the main
-   screen but I'm unable to select online, load game, anything"; "I luckily have a tiny, tiny space under the title I
-   can use to scroll but it's quite annoying"). A SHORT LANDSCAPE TOUCH SCREEN KEEPS THE TWO COLUMNS. The rule above
+/* SHORT-TOUCH. A SHORT LANDSCAPE TOUCH SCREEN KEEPS THE TWO COLUMNS. The rule above
    stacks the brand, the pane and the rail in one column - right for a phone held upright, where height is plenty.
    Held sideways it is not: 411 px tall, the brand's logo spans the screen's width and stands about 250 px, the
    wrapped rail takes two rows, and the pane between them - where every button that continues, loads or joins a game
@@ -676,8 +672,7 @@ select, input, textarea { font: inherit; }
    the sliver of it was the "tiny space" that scrolled. Where height is the constraint and width is not, the desk's
    two columns come back - the rail down the side, the pane the whole height - with the thumb's 44 px rows. Not the
    wizard: its rail is a readout and its phone strip is its own (below).
-   TALL-TOUCH (2026-10-13, Discord #bug-reports, on an ASUS ROG Xbox Ally X: "it's impossible to configure the game
-   settings because of a huge game logo that won't minimize or go away"). NOT ONLY A SHORT ONE: ANY LANDSCAPE SCREEN.
+   TALL-TOUCH. NOT ONLY A SHORT ONE: ANY LANDSCAPE SCREEN.
    The stack sizes the logo by the screen's WIDTH (59.5% of it, at BR5's 1.63:1; BR6's 43.4% is that height), so held sideways it stands at
    least half the height at any size - 1280x720 (a 1080p handheld at Windows' 150%) drew it ~470 px of 720 and left
    the Settings pane a strip. The 560 px ceiling caught the AYN Thor and missed the Ally. So every landscape screen
@@ -917,8 +912,7 @@ select, input, textarea { font: inherit; }
 .itemrow { touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .pack-shell img { -webkit-user-drag: none; }   /* HB1b: an icon is never the browser's to drag - the pane's drag starts on it at once */   /* MAC-R4: no iOS long-press callout over a hold */
 body.draglock .itemrow, body.draglock .packlists { touch-action: none; }
-/* MAC-M2 (Mac: "hold to drag ... doesn't work when trying to take items
-   off your character"): THE BODY'S PANELS TAKE THE SAME GESTURE, so
+/* MAC-M2: THE BODY'S PANELS TAKE THE SAME GESTURE, so
    they take the same two rules - a hold must not also long-press-select
    the slot name out from under the finger, and a second finger must not
    pan the body out from under a live drag (INV3: which is all
@@ -930,7 +924,7 @@ body.draglock .wornrow, body.draglock .wornmap { touch-action: none; }
 /* MAC-M2: and the other direction lights the DOCK - carrying a worn
    piece into the pack is one target, the way the map is one. */
 .pack-dock.dragover { outline: 2px solid var(--brass); outline-offset: -2px; }
-/* INV2 (Mac: "a detailed click and drag that literally drags the icon"):
+/* INV2:
    THE GHOST. The item's own tile under the pointer, with the act a
    release would perform written beneath it.
 
@@ -1242,8 +1236,7 @@ ${badgeCss()}
 .card h3 .acctrenown:empty { display: none; }   /* AUDIT RENOWN1 UI-8: an empty box is never drawn, whatever the script above it does */
 
 /* ═══ PROFILE-MENU: THE SIGNED-IN CARD IS A PROFILE ════════════════
-   (2026-10-07, Mac: "organize and detail the player profile (the top
-   right icon section)".) ui/enhanced/enhancedAccount.js draws it in the order a
+   ui/enhanced/enhancedAccount.js draws it in the order a
    player reads one - WHO (the plate), WHAT THEY HAVE DONE (the record,
    the characters), WHAT THEY WEAR, THE ACCOUNT - each a section under a
    head of its own. Paint here; under Plus the record's tiles play the
@@ -2167,8 +2160,7 @@ ${badgeCss()}
 .ctl-notice { margin: 10px 0 0; font-size: 13px; color: var(--dim); }
 .ctl-notice.bad { color: var(--blood); }
 .ctl-group h3 { margin-bottom: 2px; }
-/* TORCH-BIND (2026-09-22, a player: "Keybind changes do not stick?" - they
-   had not found Continue, 53 rows above): the head card with Continue stays
+/* TORCH-BIND: the head card with Continue stays
    in view while the list scrolls, and a second Continue closes the list.
    (The button reads Confirm since UXB1-B.) */
 .ctl-head { position: sticky; top: 0; z-index: 2; }
@@ -2281,7 +2273,7 @@ ${badgeCss()}
 .px-qverdict { text-align: center; color: #9c937d; font-size: 14px; letter-spacing: 0.2em;
   text-transform: uppercase; margin: -6px 0 12px; text-shadow: 2px 2px 0 rgba(0,0,0,0.7); }
 .px-qverdict.won { color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
-/* QL2 (bible/06-Systems/Questlines-Arc.md section 6): a stamped quest's objectives, choices and outcome, and a reward
+/* QL2: a stamped quest's objectives, choices and outcome, and a reward
    waiting (ui/questlines/qlJournal.js) - the journal's own type and ink, the loot ladder's colours */
 .px-qobj { margin: 0 0 6px; }
 .px-qobj-list { list-style: none; margin: 0 0 10px; padding: 0; }
@@ -2435,7 +2427,7 @@ ${badgeCss()}
   color: rgb(243,239,44); border-color: var(--brass);
   text-shadow: 2px 2px 0 rgb(93,77,12); }
 
-/* ── TITLE-DOOR (2026-10-27, the owner: "we use the intro title screen as the landing pad itself") ──
+/* ── TITLE-DOOR ──
    The boot door's face on the film's held title (enhancedMenu.js onTitle, ui/intro/introScreen.js land): the host is
    see-through there - the film stands under it at 11 - and the home has no ground of its own. The doors stand in a row in
    the band between the mark and the foot, where Tap to continue stood: the band starts at the film's --intro-doors-top
@@ -2485,7 +2477,7 @@ ${badgeCss()}
    own face rather than a new one, because two corner buttons that
    look unrelated read as two different kinds of thing. */
 .px-profile {
-  /* PROFILE1 (Mac: "more like a profile icon less like a button"): NO BOX.
+  /* PROFILE1: NO BOX.
      The portrait is the mark and the caption sits beside it on the
      picture, the way a name sits beside a face - a bordered rectangle
      in the corner read as one more menu button. */
@@ -2565,7 +2557,7 @@ ${badgeCss()}
 .px-profile:hover .px-profilename, .px-profile:focus-visible .px-profilename {
   color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
 
-/* ── SUPPORT1: THE ASKS (Mac, 2026-10-05: "add the patron/kofi ingame on the main menu as 2 icons") ──────────────────
+/* ── SUPPORT1: THE ASKS ──────────────────
    The door's TOP-LEFT corner, the one it had free - and the only home a pair of icons has at every size without
    standing on something a player presses: the foot's centre runs under the last row of the menu on a 768px screen (the
    PX8 shape), and a phone's foot is full (the build, and Screenshots over About). Patreon's mark and Ko-fi's mug,
@@ -2613,7 +2605,7 @@ ${SUPPORT_MARKS_CSS}
 .px-win.px-acctwin .px-body { padding: 22px 26px 24px; }
 
 /* ═══ ONE AXIS ════════════════════════════════════════════════════
-   Mac: "Nothing is centered". It was true and it read as rushed - a
+   . It was true and it read as rushed - a
    left-aligned tag over a left-aligned heading over left-aligned
    buttons, with a Close centred underneath them. The window is
    symmetrical about one line now, contents included. */
@@ -2670,8 +2662,7 @@ ${SUPPORT_MARKS_CSS}
 .px-win.px-acctwin .card.acct.acctin .acctwearrow { justify-content: flex-start; }
 .px-win.px-acctwin .card.acct.acctin .acts { padding-top: 14px; border-top: 1px solid var(--iron); }
 
-/* DISC23-B2 (Mac: "a choosable skin system in the menu player profile
-   system itself"): THE SKIN, under the account on the same axis. No box
+/* DISC23-B2: THE SKIN, under the account on the same axis. No box
    of its own (the window is the frame, as above), a rule between the
    two so they read as two things. A tile is the SPRITE, front on and
    standing, point-sampled as every sprite in the world is, with its
@@ -2679,8 +2670,7 @@ ${SUPPORT_MARKS_CSS}
    title does, so "on" reads the same way on both halves of the card. */
 .px-win.px-acctwin .card.skincard { border: 0; background: none; padding: 18px 0 0; margin: 18px 0 0;
   border-top: 1px solid var(--iron); text-align: center; }
-/* SKIN2 (Mac: "2 single panels for unmounted/mount that can be opened
-   to view available skins"): each panel is closed to its worn skin - the
+/* SKIN2: each panel is closed to its worn skin - the
    picture, the panel's name over the skin's - as one wide press, and
    opens under itself to the grid; the open one takes the brass edge. */
 .card .skinpanel { margin: 10px 0 0; border: 1px solid var(--iron); border-radius: 2px; background: rgba(0,0,0,0.2); }
@@ -2708,8 +2698,7 @@ ${SUPPORT_MARKS_CSS}
   background: rgba(192,138,62,0.12); }
 .card button.skintile:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
 .card .skinart { height: 72px; width: auto; image-rendering: pixelated; pointer-events: none; }
-/* LAYERED-GEAR (the owner: "a proper toggle in the account profile for
-   players to either equip skins or use this integration"): Look, two
+/* LAYERED-GEAR: Look, two
    presses side by side over the panels - the chosen one in brass. */
 .card .skinmode { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; flex-wrap: wrap; }
 .card .skinmode .fieldlabel { margin: 0; }
@@ -2731,16 +2720,14 @@ ${SUPPORT_MARKS_CSS}
   color: rgb(243,239,44); border-color: var(--brass);
   text-shadow: 2px 2px 0 rgb(93,77,12); }
 
-/* PROFILE2 (Mac: "make the profile icon visible somehow on the pause
-   menu"): over the game the mark is a size smaller, so it stands in the
+/* PROFILE2: over the game the mark is a size smaller, so it stands in the
    scrim above the pause window (74dvh tall, centred) rather than over
    its tabs; and its window is centred - there is no wordmark to sit
    under, which is what the door's deep top padding is for. */
 .px-over .px-profile { top: 10px; right: 12px; }
 .px-over .px-portrait { width: 48px; height: 48px; }
 .px-over .px-acctstage { padding: 24px 16px; grid-template-rows: 1fr; align-items: center; }
-/* TIMERS1 (Mac: "a new unique UI element for reset times ... an enhanced plus button on the pause menu next to the
-   profile icon"): THE HOURGLASS, beside the profile mark (ui/enhanced/enhancedTimers.js placeBeside measures the mark - its
+/* TIMERS1: THE HOURGLASS, beside the profile mark (ui/enhanced/enhancedTimers.js placeBeside measures the mark - its
    width is its caption's; 300px off the edge stands in until it has), and its window in the pause window's frame. */
 .px-timersmark { position: absolute; top: 12px; right: 300px; z-index: 4; display: flex; align-items: center; gap: 8px;
   min-height: 44px; padding: 0 6px; background: none; border: 0; cursor: pointer; color: #d8cfae;
@@ -2827,8 +2814,7 @@ ${SUPPORT_MARKS_CSS}
   .px-win.px-timerswin { height: calc(100dvh - 20px); }
   .px-timerswin .tm-lead { display: none; }
 }
-/* SERVER-POST (Mac: "an ingame server mailbox that goes next to the hourglass in the pause menu. It should show
-   notifications whenever players have a message"): THE MAILBOX - an envelope beside the hourglass (ui/enhanced/enhancedPost.js;
+/* SERVER-POST: THE MAILBOX - an envelope beside the hourglass (ui/enhanced/enhancedPost.js;
    placed as the hourglass is, beside it - 360px off the edge stands in until it is measured), a count on it while
    anything waits, and its window in the pause window's frame on the hourglass's own stage (.px-timersstage). */
 .px-postmark { position: absolute; top: 12px; right: 360px; z-index: 4; display: flex; align-items: center;
@@ -2883,7 +2869,7 @@ ${SUPPORT_MARKS_CSS}
 :root[data-plus-theme="stone"] .px-postwin [data-rarity="artifact"] { color: #dcbaf9; }
 :root[data-plus-theme="stone"] .px-postwin [data-rarity="gilded"] { color: #ffb1b7; }
 :root[data-plus-theme="stone"] .px-postwin { --dim: #e2dccd; --brass: #ffd98a; text-shadow: 1px 1px 0 rgba(5,6,8,0.85); }
-/* PRIVATE-REPORT (2026-10-17): the mailbox window's report form and the readers' inbox (ui/enhanced/enhancedReport.js) - the
+/* PRIVATE-REPORT: the mailbox window's report form and the readers' inbox (ui/enhanced/enhancedReport.js) - the
    post's own rows, buttons and dim words, and the account card's field (label.field) for its title and its words. */
 .px-postwin .pm-doors { justify-content: flex-start; flex-wrap: wrap; margin-top: 14px; }
 .px-postwin .pr-pane { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
@@ -2921,8 +2907,7 @@ ${SUPPORT_MARKS_CSS}
   .px-postwin .pm-item { flex-direction: column; align-items: stretch; }
 }
 @media (max-height: 560px) { .px-win.px-postwin { max-height: calc(100dvh - 20px); } }   /* AUDIT SERVER-POST: a short screen's window, as the timers' */
-/* SEASON-BOOK (the owner: "a new pause menu icon, like we did for the timers and mail. A condensed place to see season
-   related content and descriptions"): THE LAUREL - a wreath beside the envelope (ui/enhanced/enhancedSeason.js; placed as
+/* SEASON-BOOK: THE LAUREL - a wreath beside the envelope (ui/enhanced/enhancedSeason.js; placed as
    the envelope is - 420px off the edge stands in until it is measured), and its window on the hourglass's own stage
    (.px-timersstage): a section a clock - its title and countdown, its rows a name, the player's standing and a line on it. */
 .px-seasonmark { position: absolute; top: 12px; right: 420px; z-index: 4; display: flex; align-items: center;
@@ -3004,7 +2989,7 @@ ${SUPPORT_MARKS_CSS}
   /* Keep the ordinary pause panel above the clock; its body remains the scroller. */
   .px-over > .px-stage:not(.px-acctstage):not(.px-timersstage) > .px-win { max-height: calc(100dvh - max(7dvh, 64px) - 64px); }
 }
-/* DOOR-FIT (2026-10-05, Mac: "Fix these now", of SUPPORT1's finding): THE FRONT DOOR NEVER CUTS ITSELF OFF. Its stage
+/* DOOR-FIT: THE FRONT DOOR NEVER CUTS ITSELF OFF. Its stage
    centred by justify-content and scrolled only under PX8's 560px, a threshold set before the door grew to eight rows,
    so a desktop window from 561 to about 690px tall (the eight-row door's own height) ran off BOTH ends of the screen
    with nothing to scroll - the wordmark's top, and under about 620px the whole last row (1366x568, 1280x568). At every width the phone rule does not
@@ -3064,7 +3049,7 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
   .px-over .px-stage:not(.px-acctstage):not(.px-timersstage) { padding-top: max(7dvh, 64px); }
 }
 
-/* ── PX8: THE SHELL WEARS THE PIXELS (Mac: "Settings next") ─────
+/* ── PX8: THE SHELL WEARS THE PIXELS ─────
    The section shell - side rail, pane, and above all the settings
    three-pane screen - repainted into the pixel idiom. EVERY RULE
    HERE IS PAINT: scoped under .shell (the menu's root alone; the
@@ -3134,8 +3119,7 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
    carries a cost beside each name (the classic's row is "cost - name",
    and a column reads better than a prefix), and the effects are the
    words the classic prints, one to a line under their own divider. */
-/* PX29 (Mac: "the new chronicle UI appears on the lefthand side when it
-   should be centered"): AND SO DID THE SPELLBOOK. .px-home is
+/* PX29: AND SO DID THE SPELLBOOK. .px-home is
    position:fixed inset:0 with no flex of its own - the pause face
    centres its window by putting it in a .px-stage, and these two
    windows never got one, so both sat hard against the top-left. 260px
@@ -3192,7 +3176,7 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
 .talk-who h2 { font: inherit; font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 2px 2px 0 rgba(0,0,0,0.8); }
 .talk-named { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-/* PLAIN-UI (bible/10-UI/Plain-Words.md): a living resident's regard under their name - the standing, a bar from -100 to
+/* PLAIN-UI: a living resident's regard under their name - the standing, a bar from -100 to
    +100 with its middle marked, and the number; the standing's colour on the name and the mark */
 .talk-regard { display: flex; align-items: center; align-self: flex-start; gap: 8px; font: inherit; font-size: 14px; letter-spacing: 0.06em;
   cursor: pointer; background: none; border: 0; padding: 2px 0; min-height: 24px; text-align: left; }
@@ -3349,16 +3333,15 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
   border-radius: 2px; font-family: var(--data); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
 .travelpanel-act:hover { background: rgba(78,127,114,0.35); border-color: var(--verdigris); }
 .travelpanel-exit:hover { background: rgba(140,58,50,0.45); border-color: var(--blood); }
-/* TV1 (bible/06-Systems/Travel-View.md): THE TRAVEL VIEW'S READOUT - a HUD, never a window (ui/travel/travelViewHud.js).
+/* TV1: THE TRAVEL VIEW'S READOUT - a HUD, never a window (ui/travel/travelViewHud.js).
    Under the travel panel (z 4 < its 5): the panel's bar owns the top while a journey runs, this bar the foot. The
    traveller's mark is anchored at its centre on the projected feet; a mark's label hangs under its dot. */
 .tview { position: fixed; inset: 0; z-index: 4; pointer-events: none;
   font-family: var(--data); color: var(--bone); transition: opacity 120ms linear; }
 .tview-you { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
-/* TV-SMOOTH (2026-10-12, Mac: "the circle and the line where he walks to can be visually improved"): the ring sits on
+/* TV-SMOOTH: the ring sits on
    the ground - a dark rim under the brass so it reads on snow and sand alike, a faint glow pooled inside it, and one
-   soft ring breathing out of it (still for a player who asks the system for less motion); 26 x 16 (Mac: "make the
-   circle around the player a bit smaller"). Its box is its border's too
+   soft ring breathing out of it (still for a player who asks the system for less motion); 26 x 16. Its box is its border's too
    (border-box): centred ON the feet, where the old content box sat 2 px right of and below them. */
 .tview-ring { position: absolute; left: -13px; top: -8px; width: 26px; height: 16px; border-radius: 50%; box-sizing: border-box;
   border: 2px solid var(--brass);
@@ -3377,8 +3360,8 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
    TV2's route line stays an SVG under it (a dark casing, the brass line dashed over it). */
 .tview-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .tview-route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-/* OW-DOTS (Mac: "give the travel to lines a more dotted approach"): the way is a trail of gold DOTS, each on its own
-   dark rim. OW-DOTS-GROUND (Mac: "the dotted lines dont look still"): each dot is a point on the land the view projects
+/* OW-DOTS: the way is a trail of gold DOTS, each on its own
+   dark rim. OW-DOTS-GROUND: each dot is a point on the land the view projects
    (scenes/travelView.js routeGroundDots), drawn as a zero-length stroke whose round caps make it a dot - the rim the
    casing's wider cap under it - so they stand where they lie while the traveller walks over them. */
 .tview-route-casing { fill: none; stroke: rgba(0,0,0,0.6); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
@@ -3386,8 +3369,7 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
 @media (prefers-reduced-motion: reduce) { .tview-ring::after { animation: none; } }
 .tview-trip { font-size: 11.5px; color: var(--brass); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tview-sky { font-size: 11.5px; color: var(--bone); opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* OW-FORECAST: the weather ahead, under the journey */
-/* OW-BLOCK (2026-09-29, the player: "the whole bar in the top is too much ... a light weight block menu ... as much free
-   screen as possible", "put the overworld block to the right"): THE OVERWORLD'S BLOCK - one compact column in the bottom-right corner,
+/* OW-BLOCK: THE OVERWORLD'S BLOCK - one compact column in the bottom-right corner,
    top to bottom: where (the compass beside it), the journey or none, the path and the map, the filters, the way back.
    AUDIT DEEP2 E1/E13's law holds: its foot is MEASURED clear of whatever stands under it (travelViewHud.js
    measureFurniture writes it; 18px is where it starts) and it takes its own clicks. On a touch screen the corner is the
@@ -3495,9 +3477,9 @@ html.plus-pad-prompts-visible .px-over > .px-stage.px-timersstage > .px-win { ma
 @media (pointer: coarse) { .tview-filters { max-height: 38vh; overflow-y: auto; overscroll-behavior: contain; } }
 @media (max-width: 520px) { .tview-bar { right: 10px; width: calc(100vw - 20px); } }
 @media (prefers-reduced-motion: reduce) { .tview-filter, .tview-fdot { transition: none; } }
-/* PACE-DIALS (2026-10-06): the travel speed dials in the Overworld's block - journey or none */
+/* PACE-DIALS: the travel speed dials in the Overworld's block - journey or none */
 ${paceControlsCss('tview')}
-/* FILTERS-LEFT (2026-10-06, the player: "move the filters for the overworld to the left bottom side"): THE FILTERS' OWN
+/* FILTERS-LEFT: THE FILTERS' OWN
    BLOCK in the bottom-left corner - the right's journey block's stone; its foot MEASURED clear of what stands under it
    (travelViewHud.js measureFurniture, as the right's block is); its head folds it away. */
 .tview-side { position: absolute; left: calc(8px + env(safe-area-inset-left, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); pointer-events: auto; box-sizing: border-box;
@@ -3511,7 +3493,7 @@ ${paceControlsCss('tview')}
 .tview-side-fold { font-size: 12px; letter-spacing: 0; }
 .tview-side > .tview-filters { border-top: 1px solid rgba(192,138,62,0.2); overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
 .tview-side.folded > .tview-filters { display: none; }
-/* WAYPOINTS (2026-10-06): the kinds' switches (each dot its flags' default colour), the follow dropdown, the followed list */
+/* WAYPOINTS: the kinds' switches (each dot its flags' default colour), the follow dropdown, the followed list */
 .tview-fdot-wp-personal { background: #e0473a; } .tview-fdot-wp-party { background: #5cc464; } .tview-fdot-wp-guild { background: #b072e8; }
 .tview-wp-pick { grid-column: 1 / -1; }
 .tview-wp-pick:disabled { cursor: default; }
@@ -3588,7 +3570,7 @@ ${paceControlsCss('tview')}
 .hud-foe { display: none; flex-direction: column; align-items: center; gap: 4px; }
 .hud-foe.on { display: flex; }
 .hud-foename { font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; }
-/* BOSS-TRAITS (bible/05-Combat/Boss-Traits.md): a hard foe's traits under its name, and its ward - a pale blue sheen over
+/* BOSS-TRAITS: a hard foe's traits under its name, and its ward - a pale blue sheen over
    its health from the left, its share of the whole */
 .hud-foetraits { display: none; margin-top: -3px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #a9c8ff; }
 .hud-foe.traited .hud-foetraits { display: block; }
@@ -3609,7 +3591,7 @@ ${paceControlsCss('tview')}
 .hud-bladeempty, .hud-bladefull { position: absolute; inset: 0; display: block;
   background-position: center; background-size: 100% 100%; background-repeat: no-repeat; }
 .hud-bladeempty { opacity: 0.72; }   /* FOEBAR1b: the drained bar lets the world through, as the friend's picture does */
-/* TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 11.1): THE POISE TRACK under the foe's health - its wind-up read. Empty
+/* TELL9 (11.1): THE POISE TRACK under the foe's health - its wind-up read. Empty
    outside one; amber, filling toward its poise; red and HATCHED for iron (never by colour alone); a white flash at a
    break, "Staggered"; "Open" through an overreach. AUDIT TELL U3: the word stands centred UNDER the track (beside it, it
    ran past the bar's right under a narrow screen's quest card), and the card clears it (the --qt-clear rules below).
@@ -3660,8 +3642,7 @@ ${paceControlsCss('tview')}
    wears (ui/nameLayer.js .dfname-renown) in this HUD's square 2px frame, a thin bar in the box's own gold with what
    is earned and not yet answered faint after the fill, and the numbers. Online only: \`.on\` while the page knows my
    level; \`.nobar\` while it knows the level and not yet the total (a service before acct13), the box alone.
-   RENOWN-BAR (2026-09-26, Mac: "center the bar properly", then "keep the other bar and remove the xp. Just have it
-   visible in the player profile"): no numbers on the HUD - the box and the thin bar; the numbers are the profile
+   RENOWN-BAR: no numbers on the HUD - the box and the thin bar; the numbers are the profile
    menu's Renown row - and the row is THREE COLUMNS, the box, the bar and an empty column the box's width, so the
    bar's middle is the row's, which is the vitals' (tools/renownBarProbe.mjs measures it). 36px is the box's own
    width (1.6em of 13px, 5px of padding and a 2px frame a side), and the box stretches to it. */
@@ -3752,7 +3733,7 @@ ${paceControlsCss('tview')}
    it rather than standing on it; the HUD toggles the class off the same
    pref the stick reads. */
 .hud-quick.stickclear { left: calc(156px + env(safe-area-inset-left, 0px)); }
-/* RENOWN4b (Mac: "ensure the new xp bar doesnt overlap anything"): THE RENOWN ROW LIFTS THE LINE THIS BLOCK RIDES.
+/* RENOWN4b: THE RENOWN ROW LIFTS THE LINE THIS BLOCK RIDES.
    The block's bottom is the vitals' top line and two pixels (22 + 32 x scale, above) - and the Renown row stands
    UNDER the vitals, its 22px and the column's 10px gap, so while it is lit the vitals stand 32 x scale higher and the
    block goes up with them. Without it the bars reached the block's column on a 1024px screen at scale 1 (on a 1280px
@@ -3829,9 +3810,7 @@ ${paceControlsCss('tview')}
    the inventory tile's own reasoning, at the HUD's size. */
 .hud-qicon { display: block; max-width: 44px; max-height: 44px; image-rendering: pixelated; }
 .hud-qinit { font-size: 13px; letter-spacing: 0.08em; color: #a89f88; }
-/* QS5 - THE DURABILITY IS THE CELL'S OWN LOWER EDGES (Mac: "a better
-   design for durability instead of the line sitting inside with the
-   sprite"). A strip under the art was a second object competing with
+/* QS5 - THE DURABILITY IS THE CELL'S OWN LOWER EDGES. A strip under the art was a second object competing with
    the picture in an 84px cell; the diamond already draws the two lines
    the gauge needs. The stroke is inside the rhombus, because the cell
    is clipped to it and a stroke on the boundary would lose its outer
@@ -4153,7 +4132,7 @@ ${paceControlsCss('tview')}
   border-top: 2px solid rgba(125,116,96,0.35); background: rgba(10,12,17,0.4); }
 .trade-shell .trade-cost { flex: 1 1 auto; color: var(--brass); font-size: 13px;
   font-variant-numeric: tabular-nums; align-self: center; }
-/* MENU-ORDER (2026-10-12): the footer's two figures, each under its own name; the theft set apart from the sale */
+/* MENU-ORDER: the footer's two figures, each under its own name; the theft set apart from the sale */
 .trade-shell .trade-cost { display: flex; flex-wrap: wrap; gap: 4px 26px; }
 .trade-shell .trade-fig { display: flex; flex-direction: column; gap: 1px; }
 .trade-shell .trade-fig small { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
@@ -4207,7 +4186,7 @@ ${paceControlsCss('tview')}
   overflow-wrap: break-word; }
 .trade-shell .trade-detail-info .trade-quote { margin: 4px 0 0; font-size: 13px;
   color: var(--brass); font-variant-numeric: tabular-nums; }
-/* UXB1-K (2026-09-25, the UX backlog): the repair counter's clock - each
+/* UXB1-K: the repair counter's clock - each
    job's countdown at the row's end, where the weight sits, in the brass a
    finished job wears and the dim of one still on the bench; and the hour
    and day it is ready on the strip. */
@@ -4250,7 +4229,7 @@ ${paceControlsCss('tview')}
 /* AUDIT ENH-NOTICE3 B1: with the words on the notice panel the click-catcher is THE SCREEN, not the window's rectangle - DFU's ClickAnywhereToClose takes the press anywhere, and the panel stands at the right edge, outside a centred window. */
 .tavern-shell .sb-ask.sb-screen { position: fixed; inset: 0; }
 .tavern-shell .px-win { width: min(460px, 92vw); height: auto; max-height: min(560px, 82dvh); }
-/* PARTY-REST DROP (2026-09-22): the enhanced rest window (ui/enhanced/enhancedRest.js) - a small centred dialog in the
+/* PARTY-REST DROP: the enhanced rest window (ui/enhanced/enhancedRest.js) - a small centred dialog in the
    tavern panel's own size class, never the generic .px-win default (min(920px,94vw) x min(620px,74dvh) - most of
    the screen, pinned top-left, the same missing-shell bug the tavern and merchant panels shipped with); the hours
    field big and centred, not the gold field's small left-aligned one; the vitals line under the meter (REST-VITALS1). */
@@ -4613,14 +4592,14 @@ ${paceControlsCss('tview')}
 /* The action bar's Back/Cancel is the shell's own .act, already
    repainted; the bar just loses its old hairline for the 2px rule. */
 .wizard .actionbar { border-top: 2px solid rgba(125,116,96,0.35); background: transparent; }
-/* PX13b (Mac: "the main background is still the old basic ui"): the
+/* PX13b: the
    stage ground was .stagebody's var(--iron) - the SAME gap-paint
    trick PX10b found on the settings .panes, one file later. Off, and
    the walk floats on the sky like every other face; the class list
    keeps the shell's 0.38 breath and the dcard its own bordered card. */
 .wizard .stagebody { background: transparent; }
 
-/* ── UXB1 (2026-09-25, the UX backlog) - THE WIZARD'S ADDITIONS ──
+/* ── UXB1 - THE WIZARD'S ADDITIONS ──
    G: an attribute's line, beside the stats and under the builder's
    attributes. I: the difficulty dagger - DFU's track on its side, the
    band Create allows, the dagger where daggerY puts it. H: the class
@@ -4846,7 +4825,7 @@ ${paceControlsCss('tview')}
 #enhanced-hitnums { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
 .hitnum { position: absolute; left: 50%; top: 42%;
   transform: translate(calc(-50% + var(--dx, 0px)), 0);
-  /* HN1b (Mac, from a three-face comparison: "the middle") - the numbers
+  /* HN1b - the numbers
      are set in the enhanced skin's own face, Pixelify Sans, unsmoothed
      like every other pixel glyph on the HUD. Cormorant was the serif
      odd one out; Jacquard 12 crits were unmistakable and unreadable in
@@ -4863,7 +4842,7 @@ ${paceControlsCss('tview')}
 .hitnum-heal { top: 50%; color: #8fe27f; text-shadow: 2px 2px 0 rgba(0,40,0,0.9), 0 0 8px rgba(120,220,100,0.35); }
 .hitnum-tag { display: block; font-size: calc(12px * var(--hud-scale, 1)); font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
   text-align: center; color: #f1c04f; margin-top: -2px; }
-/* TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 11.2): a word alone - a door's word with no number to join ("Holds" on a spell's
+/* TELL9 (11.2): a word alone - a door's word with no number to join ("Holds" on a spell's
    landing), and a perfect dodge's "Perfect", bright, a little under the reticle where no blow of mine rises */
 .hitnum-word { font-size: calc(16px * var(--hud-scale, 1)); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f1c04f; }
 .hitnum-perfect { top: 50%; font-size: calc(24px * var(--hud-scale, 1)); font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
@@ -4990,7 +4969,7 @@ ${paceControlsCss('tview')}
   justify-content: center; width: 64px; height: 64px; padding: 0; cursor: pointer;
   background: rgba(10,12,17,0.6); border: 2px solid rgba(125,116,96,0.35);
   color: #a89f88; font-family: inherit; text-shadow: 2px 2px 0 rgba(0,0,0,0.85); }
-/* UI1 (bible/10-UI/Slots-Hotbar-Status.md): THE SLOT IS THE FRAME. 64px (it was 56) round a 52px room the picture is
+/* UI1: THE SLOT IS THE FRAME. 64px (it was 56) round a 52px room the picture is
    fitted into (ui/iconFit.js SLOT_BOX.grid - the room less two pixels a side) - a room, not a box: the tier's border
    is the slot's own (the Plus sheet's ITEM_FRAME_CSS). A phone's slot is 56 round a 44px room, so a 390px screen keeps
    six a row. */
@@ -5188,8 +5167,7 @@ ${paceControlsCss('tview')}
      around the plaque - the CARD is the frame, the wrapper is
      nothing. */
   background: transparent; padding: 0; border: 0;
-  /* PX21f (Mac: "the tooltip that pops up when you click on an item
-     has scrolling"): AND NO OVERFLOW. .packcol is a COLUMN's rule -
+  /* PX21f: AND NO OVERFLOW. .packcol is a COLUMN's rule -
      slate ground, padding, and overflow:auto - and PX19j turned off
      the first two on this element without noticing the third. A
      tooltip is not a scroll box: it is as tall as what it says. The
@@ -5204,8 +5182,7 @@ ${paceControlsCss('tview')}
    text, and glass there reads as the dock bleeding through the
    plaque. */
 .pack-shell .packtip.packdetail .card { background: rgba(10,12,17,0.96); }   /* (0,4,0): the base card rule ties at (0,3,0) later in the sheet - the same tie the tip's position rule already paid */
-/* CARD-FIT (2026-09-28, Discord - Cruor: "all the buttons on it's pop-up card are.. off the screen, because it's got
-   a bit much on it!"): THE CARD IS A COLUMN AND ITS BUTTONS ARE ALWAYS ON SCREEN. Its words are .card-body and its
+/* CARD-FIT: THE CARD IS A COLUMN AND ITS BUTTONS ARE ALWAYS ON SCREEN. Its words are .card-body and its
    buttons are .acts UNDER the body, never inside it; the placement caps the card at its window (enhancedInventory.js
    fitCard writes max-height, the phone sheet's share of the screen), sheds the picture's size and then the picture, and
    past that the BODY scrolls - the buttons stay where they are. A set piece's card stood 1,000 px tall in a 660 px
@@ -5267,8 +5244,7 @@ ${paceControlsCss('tview')}
    never scrolls. The doll owns the center: a framed panel spanning
    rows 2-4, art inside when it can draw, a quiet Avatar plaque when
    it cannot. */
-/* PX20a (Mac: "spread out and organize the center now that we have
-   more space"): PX19i freed the whole width when the details became a
+/* PX20a: PX19i freed the whole width when the details became a
    tooltip, and the map kept the 380px it was given when it had a third
    of the window - a 1036px area with 330px of dead air down each side.
    The map is now SIZED TO ITS SPACE: wider, with the centre column
@@ -5286,7 +5262,7 @@ ${paceControlsCss('tview')}
   grid-template-rows: repeat(6, minmax(44px, 1fr));
   gap: 12px; width: min(960px, 100%); height: 100%; margin: 0 auto;
   align-content: stretch; }
-/* PX20a (Mac: "enlarge the paper sprite and remove the background"):
+/* PX20a:
    the sprite stands on the window's own glass. PX19g framed it because
    an empty frame reads Avatar and the composition never collapses -
    that reasoning holds only when there is NO ART, so the frame is now
@@ -5300,7 +5276,7 @@ ${paceControlsCss('tview')}
 .pack-shell .wornmap-doll.noart { border: 2px solid rgba(125,116,96,0.45);
   background: rgba(0,0,0,0.35); outline: 2px solid rgba(125,116,96,0.25);
   outline-offset: 3px; overflow: hidden; }
-/* PX20c (Mac: "ensure the paperdoll's slot is a perfect fit"): the
+/* PX20c: the
    cell was whatever the grid's centre column happened to be, so the
    sprite sat inside it with air down both sides - object-fit letterbox,
    which is a fit only in the sense that nothing overflows. The cell now
@@ -5443,8 +5419,7 @@ ${paceControlsCss('tview')}
    the same frame language one size down; absent entirely when the
    ground is bare. */
 .pack-shell { grid-auto-flow: column; gap: 18px; }
-/* PX21e (Mac: "in the tooltip for looting, it makes you scroll which
-   should not be a thing at all"): THE WINDOW DOES NOT SCROLL. It
+/* PX21e: THE WINDOW DOES NOT SCROLL. It
    carried overflow-y ITSELF, so a pile past the cap scrolled its own
    title and buttons out of sight - which is the part that reads as
    broken. The frame is fixed furniture now; only the LIST inside it
@@ -5461,8 +5436,7 @@ ${paceControlsCss('tview')}
   display: flex; flex-direction: column; overflow: visible;
   background: rgba(10,12,17,0.72); border: 2px solid #7d7460; padding-bottom: 8px; }
 .loot-win.wide { width: min(680px, 94vw); }
-/* CART-FIT (2026-09-27, Discord: "My resolution is 1366 x 768. I tried setting the HUD to %50, but I still can't see
-   all the items"). The pack beside a side window - the wagon, the player's own storage - clamped each frame to the
+/* CART-FIT. The pack beside a side window - the wagon, the player's own storage - clamped each frame to the
    viewport ALONE: min(1040px, 95vw) and min(680px, 94vw) side by side want 1040 + 18 + 680 = 1738 px, and the host
    clips (inventoryDoor.js, overflow hidden), so at 1366 or 1280 wide the wagon's list stood off the right edge, out of
    reach. PAIRED, the two share the width: the side window is one 340 px column (its list scrolls when it outgrows the
@@ -5488,15 +5462,14 @@ ${paceControlsCss('tview')}
   border-bottom: 2px solid rgba(125,116,96,0.3); }
 
 /* ── PX21b: THE LOOT WINDOW READS ───────────────────────────────
-   Mac: "give it a solid redesign with readability". The loot list
+   . The loot list
    inherited the DOCK's 56px tile grid - anonymous squares with the
    name behind a clip-path - which is right for a bag you already know
    and wrong for a chest you have never opened: the whole question a
    container asks is WHAT IS IN IT. So in this window the rows are
    ROWS: the icon, the name, its material and word beneath, the weight
    on the right, one per line, at a size a player reads at a glance. */
-/* PX21d (Mac: "center all the elements at the top in the loot
-   window"): the head inherited the base sheet's space-between row -
+/* PX21d: the head inherited the base sheet's space-between row -
    the title and the meta left, the buttons pushed right - which is a
    COLUMN's header, made when the remote was a column beside the pack.
    In a 340px window of its own it reads as two things that fell to
@@ -5533,14 +5506,14 @@ ${paceControlsCss('tview')}
 .piletab.on { color: rgb(243,239,44); border-color: var(--brass); cursor: default; }
 .piletabname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .piletabn { color: #d8cfae; font-variant-numeric: tabular-nums; }
-/* WAGON-FILTER (2026-10-04, Mac: "The wagon needs a filter option"): the player's own store - the wagon, their
+/* WAGON-FILTER: the player's own store - the wagon, their
    storage, the Materials Bag - carries a search and a category menu between the head and the rows, in ONE row of
    fixed furniture (PX21e: the rows scroll, never the frame). AUDIT WAGON-FILTER C1: the first cut's wrapping chips and
    hint stood 202-236 px tall and left a phone on its side 1 px of list; one row is 44 px. The menu wears the search's
    dress, the brass on focus. */
 .storefilter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 10px; flex: 0 0 auto;
   border-bottom: 2px solid rgba(125,116,96,0.3); }
-/* FILTER-FIT (2026-10-17): the menus keep their whole words. Where they do not fit beside the search - a container
+/* FILTER-FIT: the menus keep their whole words. Where they do not fit beside the search - a container
    of a few rows draws one column, a narrow window - they move under it together and share that row; on one row the
    search takes the room left over. */
 .storemenus { display: flex; gap: 6px; flex: 1 1 auto; min-width: 0; }
@@ -5620,7 +5593,7 @@ ${paceControlsCss('tview')}
   font-size: 0.85em; line-height: 1.3; vertical-align: 1px; font-variant-numeric: tabular-nums;
   color: #f2c46b; background: rgba(14, 16, 19, 0.6); border: 1px solid rgba(242, 196, 107, 0.8); border-radius: 2px; }
 .wplaque-sub { font-size: 12px; line-height: 1.4; text-align: center; color: #9c937d; }
-/* UXB1-N (2026-09-25, the UX backlog): somebody else's container - its
+/* UXB1-N: somebody else's container - its
    title in the ember a warning wears, its "Private property" line under
    it in a quieter ember - so it never reads as the shop's own stock. */
 .wplaque.tone-private .wplaque-title { color: #e0875a; }
@@ -5662,7 +5635,7 @@ ${paceControlsCss('tview')}
    shadow and takes no room). */
 .wplaque-row.sel { background: rgba(125,116,96,0.28); box-shadow: inset 2px 0 0 var(--brass);
   margin: 0 calc(-1 * var(--wp-pad-x)); padding: 0 var(--wp-pad-x); }
-/* LOOT-MARKS (2026-10-12, a player's video: "seeing rarity in the quickloot is quite hard"): a rolled row's tier as a
+/* LOOT-MARKS: a rolled row's tier as a
    gem of its own colour before the name and a wash of it under the row (ui/lootTierMarks.js); the lit row keeps its
    brass band under the wash, its bar beside it. */
 ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', selGround: 'rgba(125,116,96,0.28)' })}
@@ -5825,8 +5798,7 @@ ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', sel
   text-shadow: 2px 2px 0 rgba(0,0,0,0.7); }
 @media (prefers-reduced-motion: reduce) { .px-setwrap .detail { transition: none; } }
 
-/* ── PX10b: THE ROWS SHED THE OLD CHROME (Mac: "it's the old ui
-   backdrop") ── the base .row/.step/.val rules are the OLD sheet's -
+/* ── PX10b: THE ROWS SHED THE OLD CHROME ── the base .row/.step/.val rules are the OLD sheet's -
    slate hover fills, 1px iron hairlines, brass inset - and PX8's
    repaint was scoped to .shell, which the pause window is not in.
    Same repaint, scoped here; the 44px target pseudo-element and every
@@ -5993,7 +5965,7 @@ ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', sel
   .hmroot.hmcardup .hmkey { display: none; }
 }
 
-/* ── FT14: ONE ROOF (2026-09-15) ───────────────────────────────
+/* ── FT14: ONE ROOF ───────────────────────────────
    The features home stops being a list. Twenty-eight tiles in a
    grid, grouped by what they change, with a rail that reads out
    the one you point at.
@@ -6021,7 +5993,7 @@ ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', sel
    alone. A CHOICE (no Off segment) keeps the grey block: it has no
    off to be red about. A forced switch keeps its fill - the brass
    edge and the "online" tag say it is forced. */
-/* ── ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SETTINGS
+/* ── ORG2: ONE SETTINGS
    SCREEN ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
    The Features home's tiles are ROWS of the one screen now: the name, the labels and the note's first sentence on the
    left, the bar on the right - the settings list's own shape - and the drawer under both. The bar keeps every law it
@@ -6138,8 +6110,7 @@ ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', sel
 .px-setwrap .opt-tools { padding: 8px 4px; }
 .opt-note { padding: 8px 18px; font-size: 12.5px; color: var(--dim); }
 
-/* -- FT16 (2026-09-15, Mac: "make the new feature UI elements have the
-   same transparent design as the list we used to have") -----------
+/* -- FT16 -----------
    Every component family on this screen has two paints: the base tokens above, and a .shell override for PX11, where
    the boot door stands on the live sky and every painted panel colour comes off (.shell .pane, .shell .list, .shell
    .row - transparent grounds, low-alpha scrims, and 2px rules in the brass line rather than 1px iron). The pause window
@@ -6161,8 +6132,7 @@ ${tierMarkCss({ wash: (k) => TIER_MARKS[k], washAlpha: 0.2, edge: '#0b0805', sel
 .shell .sec-head { border-bottom: 2px solid rgba(125,116,96,0.3); }
 .shell .sec-head h3 { color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
 
-/* ── OVH1: THE OVERHAULS (2026-09-24, Mac: "3 large panels ... directional arrows allowing you to switch being
-   different feature sets") ─────────────────────────────────────────────────────────────────────────────────────
+/* ── OVH1: THE OVERHAULS ─────────────────────────────────────────────────────────────────────────────────────
    Three tall cards side by side - a look for the world, one for its sounds, one for its screens - each a carousel of
    whole choices. The picture is the choice's own where it has one (a UI pack's art); otherwise an emblem in the
    display face. The left edge keeps the Features law: verdigris for the look in use, iron for one being browsed,
@@ -6338,9 +6308,7 @@ button.lv-note.lv-clickable:hover, button.lv-note.lv-clickable:focus-visible {
    (NOTICE_SLIDE_MS - keep the two in step, and keep the out-curve
    plain: a back-loaded bezier left the panel half-way out when the
    node was taken, measured in the headless browser). */
-/* NOTICE-FIT (2026-09-22, kurkku: "I think we also need the sizing of
-   the boxes to properly adjust for the text instead of always being
-   wide"): THE PANEL IS AS WIDE AS WHAT IT SAYS. This carried a FIXED
+/* NOTICE-FIT: THE PANEL IS AS WIDE AS WHAT IT SAYS. This carried a FIXED
    \`width\`, so "You are healthy." and a four-paragraph quest box were
    the same slab - and at the right edge, where the panel is read
    against the world behind it, the empty half is the thing the eye
@@ -6359,11 +6327,10 @@ button.lv-note.lv-clickable:hover, button.lv-note.lv-clickable:focus-visible {
   transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 200ms ease-out;
 }
 .notice.notice-in { transform: translateX(0); opacity: 1; }
-/* OW-NOTICES (2026-09-29, the player: "the notifications on the right side go into the box"): under the Overworld its
+/* OW-NOTICES: under the Overworld its
    block stands at the right edge (ui/travel/travelViewHud.js publishBlock) - the stack stands clear of it: at the foot, its own
    foot over the block's top and growing upward; on a touch screen (the block at the top) from under the block down. */
-/* OW-NOFLASH (2026-09-29, the player: "when i click to move out of not moving somewhere the old topscreen travel screen
-   popsup for a fraction of a seconds"): a journey's bar is built at the top of the screen and docked into the block on
+/* OW-NOFLASH: a journey's bar is built at the top of the screen and docked into the block on
    the view's next frame - while the block stands, the bar is never seen anywhere but docked in it. */
 :root[data-tview-block] #enhanced-travel > .travelpanel-bar, :root[data-tview-block] #enhanced-travel > .travelpanel-msg { visibility: hidden; }
 :root[data-tview-block="foot"] .notice-stack { top: auto; transform: none;
@@ -6838,7 +6805,7 @@ export function injectEnhancedStyle(doc = document) {
   el.textContent = ENHANCED_CSS;
   doc.head.append(el);
   // PLUS1: ENHANCED PLUS is this sheet with the refresh laid over it - a second sheet, after this one, so its rules
-  // win by order - and the window motion with it. PLUS-ONLY (2026-09-26): plain Enhanced is retired, so every enhanced
+  // win by order - and the window motion with it. PLUS-ONLY: plain Enhanced is retired, so every enhanced
   // page lays it (isEnhancedPlus answers what isEnhanced does); the guard keeps a classic page's import sheet-free.
   if (isEnhancedPlus() && !doc.getElementById(PLUS_STYLE_ID)) {
     const plus = doc.createElement('style');

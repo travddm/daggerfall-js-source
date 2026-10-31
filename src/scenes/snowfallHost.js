@@ -1,11 +1,10 @@
-// SNOWFALL1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments
-// seamlessly") - SNOWFALL IN A HOST: the one runtime both exterior hosts (scenes/world.js, scenes/exterior.js) build -
+// SNOWFALL1 - SNOWFALL IN A HOST: the one runtime both exterior hosts (scenes/world.js, scenes/exterior.js) build -
 // the mod's law (systems/snowfall.js), its controller (systems/snowfallRuntime.js), its surface on the GPU (render/
 // snowfallSurface.js, drawn through the renderer's snow program), its save record and its console command
 // (snow_status). A host hands it the ground it stands (`ground`, below) and calls `frame` once a frame, outdoors and in;
 // it draws the snow with the opaque world, after the ground (`draw`), and carries it across the floating origin.
 //
-// THE FOUR HOSTS RULE (bible/Home.md): world.js and exterior.js build it; worldModes.js (the interiors) and
+// THE FOUR HOSTS RULE: world.js and exterior.js build it; worldModes.js (the interiors) and
 // dungeonContext.js (the dungeons) do not - indoors and underground the host's own frame calls `frame` with
 // `inside: true`, which is all the mod does there (DynamicSnowController.Update: the surfaces hidden, the snowpack and
 // the refill still kept by the clock).

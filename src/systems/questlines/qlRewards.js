@@ -1,6 +1,6 @@
 // @ts-check
-// QL3 (2026-10-19, the owner: "Overhauling quest rewards to be more meaningful with gear, currencies, etc"): WHAT AN
-// OUTCOME PAYS - the client's half (bible/06-Systems/Questlines-Arc.md section 5.2). The service's half - silver, embers,
+// QL3: WHAT AN
+// OUTCOME PAYS - the client's half. The service's half - silver, embers,
 // titles - is paid only against what the service witnessed (section 5.3, server-account/src/questlines.js);
 // nothing here mints an account currency (decision 8).
 //

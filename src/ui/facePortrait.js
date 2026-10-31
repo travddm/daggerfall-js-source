@@ -2,8 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // TILE1 — THE CHARACTER'S FACE, IN ONE HOME.
 //
-// Mac (2026-09-22), on what the save tiles must show: "Basically
-// showing your portrait and character information."
 //
 // A face is ten records in the race-and-gender FACE CIF and an index
 // on the character (`systems/races.js` FACES_PER_RACE, and the save
@@ -179,8 +177,7 @@ export async function loadFace(who, { scale = 2, copy = false } = {}) {
  *  identities in one process would otherwise see the first one's. */
 export function _resetFacesForTests() { cache.clear(); heads.clear(); palettePromise = null; }
 
-// PORTRAIT3D (2026-10-15, the owner: "can we do the other races with 3d portraits also?", then "#2 is exactly I
-// wanted"): A FACE IS THE MORROWIND HEAD IT WEARS. With Morrowind's data attached and the game's renderer handed in
+// PORTRAIT3D: A FACE IS THE MORROWIND HEAD IT WEARS. With Morrowind's data attached and the game's renderer handed in
 // (main.js -> render/portraitRenderer.js), each portrait is drawn as the head and hair the player's body wears for it
 // (characters/headPortraits.js playerHeadImage: the curated table, the measured match, the walk) - on a canvas the
 // classic record's own size, so every well that held the record holds the head unstretched. Cached per face and data

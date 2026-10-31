@@ -1,7 +1,5 @@
 // @ts-check
-// SD2b (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time. On discovery, Super dungeons have a a beginning and an end."; bible/11-Multiplayer/
-// Super-Dungeons.md sections 2-4): THE HOLLOW IN THE WORLD - the world host's half of the Super dungeon. The hub's record
+// SD2b: THE HOLLOW IN THE WORLD - the world host's half of the Super dungeon. The hub's record
 // (net/superDungeon/sdLaw.js, said by net/online.js onSd) comes in; the Hollow it names is found over this client's own map files
 // (systems/superDungeon/sdSite.js - the city, the site by the gate's own scan, the template, the clone), the same on every client;
 // it stands in the location index at its pixel while the record's phase says it stands, and the host builds it there as
@@ -27,7 +25,7 @@ export const SD_LINE_WAIT_MS = 30_000;
  *  exit is taken the frame after it is asked, so only one a death dropped is still waiting. */
 export const SD_CAST_OUT_AGAIN_MS = 2000;
 
-/** SD10 (2026-10-07, section 11's collapse): THE COLLAPSE'S READOUTS - whoever stands in the Hollow or its Hour while it
+/** SD10: THE COLLAPSE'S READOUTS - whoever stands in the Hollow or its Hour while it
  *  collapses is told how long is left: at the fall (or the first frame they are inside during it), then as each of these
  *  is left, ms - each once a slot, never one already passed. */
 export const SD_COLLAPSE_WARN_MS = Object.freeze([60_000, 30_000, 10_000]);

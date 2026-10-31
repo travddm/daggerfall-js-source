@@ -1,5 +1,4 @@
-// MW-BRIG2 (2026-09-29, Mac on MW-BRIG1: "The texture was great, you just somehow moved the geometry in the
-// process"): A WORN MODEL SKINNED FROM THE BODY UNDER IT.
+// MW-BRIG2: A WORN MODEL SKINNED FROM THE BODY UNDER IT.
 //
 // MW-BRIG1 hung the steel brigandine RIGID on the skeleton's "Chest" and "Groin" nodes and took each node's REST
 // transform back out (restPoseInverse). The body it was fitted to does not move that way. A retail body part is
@@ -21,8 +20,7 @@
 // the rigid path applies (rules 13 and 14) as the inverse bind, so a garment over it rides that bone exactly as the
 // part does.
 //
-// MW-BRIG3 (2026-09-29, Mac on MW-BRIG2: "completely broke the morrowind torso" - "it's placed lower where the torso
-// should be", worn only, on a male body): THE DEFECT WAS WHERE IT SAT, BOTH TIMES. The skinning above holds the
+// MW-BRIG3: THE DEFECT WAS WHERE IT SAT, BOTH TIMES. The skinning above holds the
 // garment to the body in every pose, and it holds it exactly as far from the body as it started - so a garment that
 // starts too LOW stays too low, and it hides the chest skin it was meant to cover (the cuirass slot shadows it), which
 // leaves the upper torso empty under the neck. Both MW-BRIG1 and MW-BRIG2 took the height from the modeller's scene

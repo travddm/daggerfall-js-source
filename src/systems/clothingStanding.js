@@ -1,8 +1,4 @@
-// DRESS1 (2026-09-30, Discord: "Add positive and negative reputation
-// buffs for clothing items... common clothes would provide a positive
-// reputation buff with the Commoner faction but a negative one with
-// the Noble faction. A next step would be ... temple-specific robes
-// with a positive buff for that temple faction."): DRESS FOR THE PART.
+// DRESS1: DRESS FOR THE PART.
 //
 // A port feature, NOT classic - Daggerfall and DFU have no clothing
 // reaction at all. What you WEAR in the five clothing slots now tints
@@ -98,7 +94,7 @@ export const DRESS_EFFECT = Object.freeze({
   [DRESS_CLASS.Religious]: Object.freeze({ groups: Object.freeze([0, 0, 1, 0, 0]), temple: 3 }),
 });
 export const DRESS_CAP = 10;
-/** LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): THE WARDROBE'S STANDING - a garment's `standing`
+/** LOOT14 (the Loot arc II): THE WARDROBE'S STANDING - a garment's `standing`
  *  lines and a Legendary's Royal Bearing, summed by the loot ladder's fold onto `entity._mods.standing` (read here as a
  *  field, so this stays a leaf; empty with the ladder off) - held to its own cap a group, BESIDE the dress's: a fine
  *  outfit already at the dress's +10 with the Nobility still feels a Courtier's line. */

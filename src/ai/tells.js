@@ -1,6 +1,5 @@
 // @ts-check
-// TELL1 - POISE AND THE STAGGER (bible/12-Enhanced-AI/Feud-Arc.md section 3; Mac, 2026-10-04: "player's can easily stun
-// these enemies and breath more depth into it", then "Go" on every call of the arc).
+// TELL1 - POISE AND THE STAGGER (;, then "Go" on every call of the arc).
 //
 // Before this, one landed hit of anything cancelled any telegraphed wind-up for free: every damaging weapon hit writes
 // DFU's knockback (floored at 15 classic units, three times the hurt threshold) and the brain broke the wind-up on any
@@ -218,7 +217,7 @@ export function punishSeconds(kind, guard = 'poise', perfect = false) {
   return (base + (guard === 'iron' ? TELL.PUNISH_IRON : 0)) * (perfect ? TELL.PERFECT_WINDOW : 1);
 }
 
-// ── TELL5: PATTERNS (bible/12-Enhanced-AI/Feud-Arc.md section 7) ─────────────────────────────────────────────────
+// ── TELL5: PATTERNS ─────────────────────────────────────────────────
 /** An elite: the ELITE FOES gold or an Elite Dungeon's - the leaf's (ai/blowShapes.js, beside the whole set it decides),
  *  handed on. */
 export { isElite };
@@ -272,7 +271,7 @@ export function trackYaw(yaw, want, dt) {
   return yaw + Math.max(-max, Math.min(max, d));
 }
 
-// ── TELL7: THE TIER AND THE COOLDOWNS (bible/12-Enhanced-AI/Feud-Arc.md section 9) ───────────────────────────────────
+// ── TELL7: THE TIER AND THE COOLDOWNS ───────────────────────────────────
 /** TELL7: an elite, a champion or a revenant (any rank) - who throws its family's whole set of shapes: the leaf's
  *  (ai/blowShapes.js, where the whole set is), handed on. */
 export { wholeSet };

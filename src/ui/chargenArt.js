@@ -490,7 +490,7 @@ export async function loadFaceSet(raceKey, gender) {
   finally { _facePending = null; }
 }
 
-/** PORTRAIT3D (2026-10-15, the owner: "#2 is exactly I wanted"): with Morrowind's data attached, each of the ten faces
+/** PORTRAIT3D: with Morrowind's data attached, each of the ten faces
  *  becomes the Morrowind head the player's body would wear for it (characters/headPortraits.js playerHeadImage), drawn
  *  in the record's own place at the record's own size - its picture that shape at four times its pixels. The records
  *  stand until each head lands, and for good where none is drawn; a set no longer shown takes nothing. */

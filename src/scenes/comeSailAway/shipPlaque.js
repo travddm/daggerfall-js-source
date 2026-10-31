@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-PLAQUE (2026-10-17, the owner: "the ability to have a name plaque on the ship itself for those who want to show
-// off their ship name"; bible/03-World/Naval-Refit.md SHIP-PLAQUE) - HER NAME ON HER BOWS: a board of dark wood with her
+// SHIP-PLAQUE - HER NAME ON HER BOWS: a board of dark wood with her
 // name cut in gilt in Daggerfall's own lettering (FONT0003, the shops' face), laid on each bow below her rail where her
 // captain chooses to show it (the Fleet's `plaque`), seen by every player (the boats' word `p`). The port's own:
 // Daggerfall has no sea.

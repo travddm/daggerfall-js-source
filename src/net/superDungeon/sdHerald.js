@@ -1,5 +1,5 @@
 // @ts-check
-// SD-HERALD (2026-10-09, the owner: "We need to add discord integration to abyss dungeons"): THE ABYSS DUNGEON'S HERALD -
+// SD-HERALD: THE ABYSS DUNGEON'S HERALD -
 // what the relay's hub posts to the world events' Discord channel for a Hollow, and when: DISCORD-GATES' law
 // (net/gate/gateHerald.js) and the serpent's (net/serpent/serpentHerald.js), given to the Abyss Dungeon. Four posts, one for each of a
 // Hollow's moments, read off the hub's own record (net/superDungeon/sdLaw.js - the director's):
@@ -28,7 +28,7 @@
 //   end. A moment that is no longer so is let go unposted (a Discord down through it, a herald given its webhook late).
 // - SAFE TO POST: gateHerald.js's law - the one role named in `allowed_mentions`, and a name held to letters, digits,
 //   spaces and a little punctuation (heraldName).
-// - HERALD-CARDS (2026-10-22): each post is a card (net/herald/heraldCard.js) - the family The Abyss Dungeon, in its
+// - HERALD-CARDS: each post is a card (net/herald/heraldCard.js) - the family The Abyss Dungeon, in its
 //   ring's brass, the moment's title and its facts as fields.
 //
 // Not a DFU member: Daggerfall has no other players and no Discord. Ledger A (SD-HERALD).
@@ -46,7 +46,7 @@ import { REGION_NAMES, BAY_REGION_COUNT, PROVINCE_REGION_NAMES } from '../../for
  *  Hollow is named by its province (sdProvinceName - "in Skyrim"), never "in the Skyrim region". */
 export const sdRegionName = (r) => (Number.isSafeInteger(r) && r >= 0 && r < BAY_REGION_COUNT ? REGION_NAMES[r] : '');
 
-/** WW5 (bible/03-World/World-Wide.md WW5): THE PROVINCE A SLOT'S HOLLOW STANDS IN - its lane's (net/superDungeon/sdLaw.js
+/** WW5 (WW5): THE PROVINCE A SLOT'S HOLLOW STANDS IN - its lane's (net/superDungeon/sdLaw.js
  *  sdLaneOf: a province's lane is its theatre), named as the map names it (formats/mapsTables.js PROVINCE_REGION_NAMES);
  *  '' for the Bay's - whose posts say the Bay, as they always did. */
 export const sdProvinceName = (s) => { const lane = Number.isSafeInteger(s) ? sdLaneOf(s) : 0; return lane > 0 ? PROVINCE_REGION_NAMES[lane - 1] ?? '' : ''; };

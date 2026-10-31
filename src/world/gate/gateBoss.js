@@ -1,8 +1,8 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "a large boss arena with an oversized enemy with telegraphed attacks (like wind ups, etc)"):
+// WB4:
 // THE BOSS AS HE IS SEEN AND HEARD - where he stands and what he is doing at a moment of the relay's clock, the frame
 // of Daggerfall's own sprite that shows it, the glow on him and the words of his voice. Design:
-// bible/11-Multiplayer/World-Bosses.md section 5 ("On him: the sprite holds its attack frame's first half through the
+// ("On him: the sprite holds its attack frame's first half through the
 // wind-up, glows the attack's colour, and his voice gives the wind-up's cue; at the landing the attack frames play out").
 //
 // PURE. The court's state (net/gate/gateLink.js, the relay's words folded) and a clock in; a pose, a light, a cue out. The
@@ -36,7 +36,7 @@ import { fxBurstOf } from '../../render/gate/gateFx.js';   // WB13d: a landing w
  *  size he stands (BOSS_H is the body the blows are measured against - three Daedra Lords tall). */
 export const BOSS_LOOKS = Object.freeze({ ruhn: Object.freeze({ mobile: 31, scale: 3 }) });
 export const bossLookOf = (id) => BOSS_LOOKS[id] ?? BOSS_LOOKS.ruhn;
-/** WB14d (bible/11-Multiplayer/Breach-Portents.md section 5): HIS FLAME, SEEN - his aspect's Atronach (the Fire, the Ice,
+/** WB14d: HIS FLAME, SEEN - his aspect's Atronach (the Fire, the Ice,
  *  the Iron under the storm, the Flesh under the venom - the Sapper's own sprites, enemyBasics.js 35-38) at his own scale,
  *  its profile's size three quarters of his: a second body across the fire, never his own sprite twice. */
 export const FLAME_LOOKS = Object.freeze({ burning: 35, rime: 38, storm: 36, venom: 37 });
@@ -105,7 +105,7 @@ export function bossStandIn(look, name, share = null) {
   e.name = name;
   e.spareGear = true;   // WBX6: a blow on him wears no weapon (combat/formulas.js damageEquipment)
   e.mobileType ??= look.mobile;   // WBX7: a soul trap reads the target's mobile (systems/effects.js) - his is a Daedra Lord's, no humanoid
-  // WB8a (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified"): NEVER SWAYED. No path reached him
+  // WB8a: NEVER SWAYED. No path reached him
   // before this, but only by accident - he is in no foe pool, so the language roll never met him, and his spell door
   // took harmful families alone - and a Pacify Daedra on a Daedra Lord's stand-in matches. Now it is his own word: the
   // language seam (scenes/hostCombat.js), the Pacify/Charm arm (systems/effects.js) and the flag's door
@@ -161,7 +161,7 @@ export const FLINCH_MS = 450;
 export const STUN_ANIM_SPEED = 3;
 /** The fall: the hurt frames played slowly this long, and then he is gone (WB5's spoils spill at the fall). */
 export const FALL_MS = 2400;
-/** WB13d (2026-10-01, Mac: "AAA grade polish"): HIS FIRE IS CAST, NOT SWUNG - the Daedra Lord's own spell frames
+/** WB13d: HIS FIRE IS CAST, NOT SWUNG - the Daedra Lord's own spell frames
  *  (characters/enemy/enemyBasics.js spellAnimFrames, [1, 1, 3, 3]): his attack's frame CAST_RAISE_FRAME held through a fire's
  *  wind-up, CAST_LOOSE_FRAME as it is loosed. His blade and his weight keep the swing (frames 0, 1, then 2-4). */
 export const CAST_RAISE_FRAME = 1;
@@ -179,7 +179,7 @@ export const GATE_FLASH_SHARE = 0.003;
 export const gateHitFlash = (mineAt, courtAt, now) => Math.max(hitFlashStrength((now - mineAt) / 1000), GATE_FLASH_COURT * hitFlashStrength((now - courtAt) / 1000));
 /** WB13d: a landing's light stands this high over the floor it lands on. */
 export const LANDING_LIGHT_Y = 0.6;
-/** WB13e (2026-10-01, Mac: "AAA grade polish"): HIS FALL, AN EVENT - his body meets the floor THUD_AT_MS into it, then
+/** WB13e: HIS FALL, AN EVENT - his body meets the floor THUD_AT_MS into it, then
  *  sinks FALL_SINK_M into the stone over the rest of FALL_MS, in a column of embers, and leaves his corpse there at
  *  CORPSE_SCALE (his mobile's own, characters/enemy/enemyBasics.js corpseTexture). */
 export const FALL_SINK_M = 1.5;
@@ -349,7 +349,7 @@ export const GLOW_RANGE = Object.freeze({ ember: 7, windup: 12, landing: 18 });
  * stands higher) and in his aspect's colours. WB13d: the landing's flare on the floor where it lands, LANDING_LIGHT_Y
  * over it - at his feet for his own; a landing that falls away from him (its burst carries its own light,
  * render/gate/gateFx.js FX_KINDS) leaves his ember.
- * LIGHT-ID (2026-10-14): `out`, a kept record, is refilled in place and answered (the court's own - his glow is ONE light
+ * LIGHT-ID: `out`, a kept record, is refilled in place and answered (the court's own - his glow is ONE light
  * that follows him, and the shadow pass knows it moved by the record: render/lightId.js); none, a new record.
  */
 export function bossGlow(s, now, out = null) {
@@ -487,7 +487,7 @@ export const BOSS_CUES = Object.freeze({
   }),
   roar: voice(B.barkSound, 0.5, 1.8),
   fall: voice(B.barkSound, 0.4, 1.8),
-  // WB7 (Mac: "Proper boss audio during the boss fight"): HIS BODY. A stride's weight on the stone as he walks and
+  // WB7: HIS BODY. A stride's weight on the stone as he walks and
   // charges; a growl now and then while he is not striking; a grunt when he is hurt; the ground's shock under his
   // heavy landings; thunder over his roar when a phase turns; and his body meeting the floor, a moment into his fall.
   // The clips are Daggerfall's own - a body's fall and the storm's roll, pitched down for his size.
@@ -509,7 +509,7 @@ export const BOSS_CUES = Object.freeze({
   // WB13e: a Meteor or a Leap aimed where I stand, at its word - the parry's ring, high and sharp, at my feet
   sting: Object.freeze({ clip: CRYSTAL_CLIPS.hit, pitch: 2.2, volume: 1.3, reach: 20, at: 'point' }),
 });
-/** GATE-MIX (2026-10-20, the owner: "the game hitches, audio becomes super loud and even distorts"): A CUE AT ITS
+/** GATE-MIX: A CUE AT ITS
  *  TARGETS, THINNED. A cue `at: 'targets'` played one copy at every target - a Hellfire on five players was five of the
  *  fire's full-scale cast in one frame, ten in his third phase (its second volley within 3 m of the first), and over a
  *  reach of 40 to 80 m with a linear fall every copy near a group came in at nearly its whole level, so the copies
@@ -581,7 +581,6 @@ export const THUD_AT_MS = 1500;
 
 // ═══ WB11c: HIS HOST, SEEN AND HEARD ═══════════════════════════════════════════════════════════════════════════
 //
-// (2026-10-01, Mac: "1. All three ... 4. Trial rotation" - the Legion-Lord's host; bible World-Bosses.md section 17.)
 // The relay knows bodies (net/gate/gateBrain.js HOST_KINDS); WHO each one is, by his aspect, is the screen's: Daggerfall's
 // own sprites at their own size, on their own tables - an Imp for every Harrier; the Atronach of his element for a
 // Sapper; for a Ward-Bearer the Daedra nearest it (the Seducer in her winged form for the storm - her change is not

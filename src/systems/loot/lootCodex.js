@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT10 (2026-10-01) — THE CODEX, AND THE IMPRINT.
+// LOOT10 — THE CODEX, AND THE IMPRINT.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 12; Mac: "Do you
-// wanna turn this into an arc and do all of the above?" - "Legendary
+// The Loot arc (; - "Legendary
 // codex: a collection log of every Legendary you've found ... a reason to
 // keep hunting"). Every Legendary record - and every Aetheric piece - the
 // character has TAKEN is in its CODEX, with the day it was first found.
@@ -32,7 +31,7 @@
 // It rides the character's save (a mod record). OFF IS DFU EXACTLY: no
 // find is said, no imprint is made, and an imprint sleeps.
 //
-// GILDED1 (2026-10-07): and the GILDED rung's records (systems/gilded.js) -
+// GILDED1: and the GILDED rung's records (systems/gilded.js) -
 // the rarest find in the game is said as the rest are ("The Dragonfire
 // Oath - a Gilded piece! It joins your codex.") and listed at the page's
 // head, over the Legendaries,

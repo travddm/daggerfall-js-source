@@ -70,7 +70,7 @@ export const weightMultipliersByMaterial = Object.freeze([4, 5, 4, 4, 3, 4, 4, 2
 export const valueMultipliersByMaterial = Object.freeze([1, 2, 4, 8, 16, 32, 64, 128, 256, 512]);
 export const conditionMultipliersByMaterial = Object.freeze([4, 6, 6, 8, 12, 16, 20, 24, 28, 32]);
 
-/** WEAPON-POOL (2026-10-06, Mac: "keep the material disparity, but unify all the weapons types condition stat"):
+/** WEAPON-POOL:
  *  EVERY WEAPON TYPE WEARS FROM ONE POOL - the Warhammer's 1,600, the deepest in Daggerfall's table, so no type has
  *  less than it had - and its material multiplies it as it always has (the ladder above: x1 iron to x8 Daedric).
  *  Daggerfall's rows run from 50 (Dagger, Tanto, Short Bow) to 1,600, and every condition cost is flat: a

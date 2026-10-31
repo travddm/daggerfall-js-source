@@ -1,4 +1,4 @@
-// DEX3 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 7) - DAGGERFALL ENEMY EXPANSION'S ENCOUNTER TABLES AS
+// DEX3 - DAGGERFALL ENEMY EXPANSION'S ENCOUNTER TABLES AS
 // IT PICKS THEM (BestiaryMod.cs:1728-1871), on the port's encounter table door (characters/encounterTableDoor.js):
 //   - A DUNGEON'S (SelectDungeonTable, :1728-1753): on PlayerEnterExit.OnPreTransition into it (:1768-1782 - a door and
 //     a load alike, PlayerEnterExit.cs:914 and :975), one of its type's tables and one of the water's, each by

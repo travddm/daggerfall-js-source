@@ -227,14 +227,14 @@ export function buyItemPrice(item, { quality = 0, priceAdjustment = 1000, holida
   const price = calculateCost(itemValueOf(item), quality, priceAdjustment) * (item.stackCount ?? 1);   // JAN1: the one value read
   const holiday = buyHolidayHalvesPrice(item, { holidayId, guildFactionId });
   const held = holiday ? Math.trunc(price / 2) : price;
-  // ESSENTIALS-HALF (2026-09-30, Discord: "cut the cost of most essential items by half"): online a POTION costs half
+  // ESSENTIALS-HALF: online a POTION costs half
   // (shopStock.js essentialPrice, rounded up - its law against buying to sell back), at every counter's Buy. AUDIT
   // ESSENTIALS F1: never on top of a holiday's own half - the sale cap reads the full price, so a quarter bought on
   // Merchants Festival sold back for half; the two halves do not stack
   return (isPotion(item) || isCampfireKit(item) || isFirewood(item)) && !holiday ? essentialPrice(held, { online }) : held;   // AUDIT REST: REST2's Campfire and Firewood arm
 }
 
-/** SELL-AS-FOUND (AUDIT ECON O1, 2026-10-01) AND MEND-THIRD (2026-10-19): ONLINE A COUNTER PAYS FOR A FOUND PIECE AT
+/** SELL-AS-FOUND (AUDIT ECON O1, 2026-10-01) AND MEND-THIRD: ONLINE A COUNTER PAYS FOR A FOUND PIECE AT
  *  THE CONDITION THE WORLD HANDED IT OVER AT, AND A THIRD OF WHAT ITS OWNER'S OWN MENDS PUT PAST IT.
  *  Roleplay & Realism: Items' condition prices are the room's (onlineLane.js), and its rolls hand pieces over worn - a
  *  pile's and a body's at 20-75%, a poorer shelf's at 25-100% (rriRealism.js) - so a sale climbs with a repair. At
@@ -251,9 +251,9 @@ export function buyItemPrice(item, { quality = 0, priceAdjustment = 1000, holida
  *  before this - sells at its own condition, repaired or not. Offline, the mod's prices stand. Bible:
  *  06-Systems/Economy-Arc.md, MEND-THIRD. */
 export function saleConditionPercentage(item, { online = isOnlinePage() } = {}) {
-  // WAGON-TIERS (2026-10-15, Mac: "Yes, same tiers"): a wagon's condition is its wear, and its wear prices it only where
+  // WAGON-TIERS: a wagon's condition is its wear, and its wear prices it only where
   // the seller's wagon upkeep tier says so (Hard). On Boons - and Off - a counter buys it as DFU's plain wagon, which
-  // never wore: whole (bible/06-Systems/Wagon-Upkeep.md, The tiers)
+  // never wore: whole (, The tiers)
   if (wagonSoldWhole(item, wagonUpkeepRules())) return 100;
   if (!online) return conditionPercentage(item);
   return foundSalePercentage(item);
@@ -266,7 +266,7 @@ export function saleConditionPercentage(item, { online = isOnlinePage() } = {}) 
  *  (worldModes.js commitTrade's Buy arm and the keyed list's doBuy - every shop's shelf, a guild's, a caravan's on the
  *  road); the mark rides the save, the item law and the market's listing, and a stack keeps it through a merge (either
  *  part's) and a split (inventory.js addItem, splitStack). Offline nothing is written. Answers how many it marked.
- *  STOLEN-GOODS AUDIT (2026-10-16, S3): and on either lane A PIECE BOUGHT AT A COUNTER IS THE BUYER'S, HONESTLY - its theft
+ *  STOLEN-GOODS AUDIT: and on either lane A PIECE BOUGHT AT A COUNTER IS THE BUYER'S, HONESTLY - its theft
  *  mark (systems/stolenGoods.js) cleared before a stack's merge takes it. No shelf piece is stolen by construction (a sold
  *  one never reaches a shelf - landSold), yet a peer's word for a shelf could carry one (an older build's sale, a hostile
  *  client - world/interior/interiorShared.js applyInteriorLoot strips it too), and a piece stolen elsewhere and left on a shut
@@ -299,7 +299,7 @@ export function markCounterBought(items, { online = isOnlinePage(), price = null
   return lot.length;
 }
 
-/** CRAFT-WORTH (2026-10-11): THE VALUE A COUNTER PAYS A PIECE ON - its own (itemValueOf), less what a crafted piece's
+/** CRAFT-WORTH: THE VALUE A COUNTER PAYS A PIECE ON - its own (itemValueOf), less what a crafted piece's
  *  quality rolled onto it (lootRarity.js craftedRarityWorth): a counter pays for a crafted piece what it pays for the
  *  plain piece its recipe makes, never for its Magic or Rare lines. Every selling arm reads it - the trade windows'
  *  Sell and SellMagic, and the keyed shelf's (scenes/worldModes.js sellPrice). AUDIT CRAFT-WORTH: the roll comes off a
@@ -311,7 +311,7 @@ export function counterValueOf(item) {
   return daedricSaleValue(item, rolled > 0 ? Math.max(1, v - rolled) : v);
 }
 
-/** DAEDRIC-SALE (2026-10-26, a player: "tune down daedric selling price by 50%"): A COUNTER PAYS HALF FOR DAEDRIC GEAR.
+/** DAEDRIC-SALE: A COUNTER PAYS HALF FOR DAEDRIC GEAR.
  *  Daedric's value ladder is 512x a weapon's or plate piece's base (characters/weapons.js valueMultipliersByMaterial),
  *  twice Orcish, so one Daedric cuirass sold for more than a run's gold. Halved HERE, at the one value every selling arm
  *  reads (Sell, SellMagic, the keyed shelf; LAW-3's marks), so a sale cannot be priced around it - and only the SELLING
@@ -447,8 +447,7 @@ export const MIN_PRICE_PER_PIECE = 1;
  *  says so.
  *
  *  FB0929 - A PURCHASE IS NEVER FREE (Port-Ledger A; lumin on Discord,
- *  relayed by Mac: "There should be a hard minimum of 1 gold for
- *  anything"). CalculateTradePrice's buying `amount` (FormulaHelper.cs
+ *  relayed by). CalculateTradePrice's buying `amount` (FormulaHelper.cs
  *  :2000) is the cost times 66/256 to 256/256, truncated, and
  *  CalculateCost floors a piece at 2 (1 after a holiday's halving) - so
  *  a piece at that floor (a candle, the General Store's parchment worth

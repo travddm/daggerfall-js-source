@@ -1,5 +1,5 @@
 // @ts-check
-// STAR7 (2026-10-20): STARGLASS'S OWN PICTURE - a sliver of the fallen star's glass, painted here in code under a
+// STAR7: STARGLASS'S OWN PICTURE - a sliver of the fallen star's glass, painted here in code under a
 // pseudo-archive of its own (world/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): the
 // stone's own glass ramp and its violet vein (world/starfall/starArt.js STAR_RAMPS), lit from the top-left through the
 // ordered dither, a dark violet outline, its ground clear. Nothing ships and nothing is read from the player's data

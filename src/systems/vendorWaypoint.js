@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VENDOR (net/vendorLaw.js) - THE TRADER'S WAYPOINT (Mac: "you should be able to set a waypoint where the trader is
-// you want to buy from"). One waypoint at a time: the trader's house - its town's map id, the building's key there, whose
+// HOME-VENDOR (net/vendorLaw.js) - THE TRADER'S WAYPOINT. One waypoint at a time: the trader's house - its town's map id, the building's key there, whose
 // it is and the town's name. Setting it puts its own gold coin on both world maps (ui/vendor/vendorMapMark.js -
 // apart from the map's one yellow mark, which stays the player's), the house is named on the town map (scenes/world.js townHomes), and the compass
 // points at the town until the player stands in it. Cleared by hand, or on walking into the house.

@@ -10,7 +10,7 @@
 import { t } from '../systems/textManager.js';   // L10N4: the mark's alt text in the player's language
 
 export const BRAND_LOGO_URL = new URL('../assets/branding/dfo-online.png', import.meta.url).href;
-// LOGO-CENTRE (Mac, 2026-10-26: "The main logo is off center"): the file is cut to its paint, and the dragon's wing
+// LOGO-CENTRE: the file is cut to its paint, and the dragon's wing
 // and tail reach far left of the letters, so a box centred on the page put the WORDMARK right of centre - at 1280 x 720
 // the Online scroll sat about 100 px right of the Tap to continue box under it. The letters at mid-height (the D's bowl
 // at x 265 to the O's outline at 1212, of 1232) centre 10% of the width right of the file's; every surface that centres

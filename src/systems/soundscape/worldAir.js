@@ -1,6 +1,6 @@
 // @ts-check
-// WORLD-AIR (2026-10-24, the owner: "... and whatever else we could improve"): THE OPEN WORLD'S AIR, past what Daggerfall
-// plays. Design: bible/08-Audio/Audio.md SOUNDSCAPE.
+// WORLD-AIR: THE OPEN WORLD'S AIR, past what Daggerfall
+// plays. Design: SOUNDSCAPE.
 //
 // DFU's exterior ambience is WeatherManager.SetAmbientEffects' four presets (systems/ambientEffects.js
 // presetForExterior): rain, a storm, a sunny day's two birds, a clear night's crickets - the same in the Alik'r as in a

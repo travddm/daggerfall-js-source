@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld. Can you please fix this properly")
-// - THE GROUND SETS OF THE STREAMING WORLD, a module the world host wires (HOST-SPLIT, bible/01-Overview/Host-Split.md:
+// OW-HITCH
+// - THE GROUND SETS OF THE STREAMING WORLD, a module the world host wires (HOST-SPLIT,:
 // scenes/fishHost.js is the shape) - moved here whole from bootWorld (R9's one home of a ground archive's tile set, for
 // the build and ECOTONE1's neighbours alike), with what it does now said in it.
 //
@@ -18,7 +18,7 @@
 //     again (the upload's breaths are where a second could have started);
 //   - the classic puddles are marked once a set: the grass's own mask (`groundPuddles`) is the one the layers were
 //     marked with, where it had been marked a second time from the same records.
-// What it makes is what it made; TESA-LANDS' `lands:<zone>:<archive>` key dresses it (bible/03-World/Tamriel-Lands.md).
+// What it makes is what it made; TESA-LANDS' `lands:<zone>:<archive>` key dresses it.
 // ═══════════════════════════════════════════════════════════════════
 import { dfmodGroundLayers } from '../systems/dfmodTextures.js';   // GROUND1: an attached mod's terrain tile set
 import { grassRecordsOf, floorRecordsOf, tileMeanColour } from '../render/labGrass.js';

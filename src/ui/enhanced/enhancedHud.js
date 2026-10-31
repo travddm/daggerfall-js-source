@@ -130,7 +130,7 @@ import { noteFirstUse } from '../../systems/tutorials.js';   // TUT1: the first 
 import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's violet, its compass mark's
 
 /**
- * PX30c (Mac: "is there anyway I can adjust the sizing?"): THE HUD'S
+ * PX30c: THE HUD'S
  * SCALE, as a setting rather than a constant.
  *
  * NAMED `enhancedHudScale`, not `hudScale`: the classic HUD already
@@ -262,7 +262,7 @@ function drawDetectMarkers(detected, playerXZ, heading01) {
   }
 }
 
-// WB1 (2026-09-25): THE OBLIVION GATE'S MARK - one diamond in the gate's own colour (ui/gate/gateMapMark.js GATE_RING_CSS),
+// WB1: THE OBLIVION GATE'S MARK - one diamond in the gate's own colour (ui/gate/gateMapMark.js GATE_RING_CSS),
 // riding the Detect markers' bearing law (compassMarkerLerp, clamp and all), so a gate behind the player stands at the
 // strip's end on the side to turn toward. The host hands it only while the player is inside the omen's ring and the
 // gate stands (scenes/world.js gateCompassMark); otherwise it is hidden, never removed - the updated-not-rebuilt law.
@@ -391,8 +391,7 @@ function drawWayOutMark(way, playerXZ, heading01) {
   if (node.style.left !== l) node.style.left = l;
 }
 
-// COMPASS-PARTY (2026-09-27, Discord - Ashley: "being able to see where party members are on compass? - just lil green
-// marks that point in that direction"): THE PARTY ON THE STRIP - the Detect markers' triangle, a pixel wider, and their
+// COMPASS-PARTY: THE PARTY ON THE STRIP - the Detect markers' triangle, a pixel wider, and their
 // bearing law (compassMarkerLerp, clamp and all), in the party's one green. Pooled and hidden, never removed.
 const partyMarkCss = (colour = PARTY_GREEN_CSS) => 'position:absolute;bottom:0;width:0;height:0;margin-left:-4px;'
   + 'border-left:4px solid transparent;border-right:4px solid transparent;'
@@ -451,7 +450,7 @@ function drawShipMarks(ships, playerXZ, heading01) {
   }
 }
 
-// BOAT-MARK (2026-10-01, "I want to build a compass icon that tracks your boat"): MY BOATS ON THE STRIP - a little boat
+// BOAT-MARK: MY BOATS ON THE STRIP - a little boat
 // (ui/boatMarks.js BOAT_GLYPH_URL: a sail over a hull in the boats' teal, edged dark) on the strip's middle where the
 // quest's and the gate's diamonds stand, by the same bearing law (compassMarkerLerp, clamp and all): a boat behind
 // stands at the strip's end on the side to turn toward. `points` scene XZ (ui/boatMarks.js boatCompassPoints). Pooled
@@ -636,7 +635,7 @@ function build(doc) {
     return m;
   });
   compass.append(strip, el('i', 'hud-needle'));
-  // TEMP-UI (2026-10-12, the owner: "add a temperature widget to the UI"): THE TEMPERATURE PLATE, at the compass's right
+  // TEMP-UI: THE TEMPERATURE PLATE, at the compass's right
   // end - where the eye already goes for where you are, and the one place at the top that stands clear of the quest card
   // (92px down the right edge), the status widget (the left edge) and the foe's bar (under the compass's middle). Its
   // glyph says the way the reading runs (a snowflake, the sun, a thermometer for comfortable), then the number, the
@@ -660,8 +659,7 @@ function build(doc) {
   tempScale.append(tempMark);
   temp.append(tempGlyph, tempNum, tempWord, tempScale);
   temp.style.display = 'none';
-  // UI-CALM (2026-10-14, a player: "I like the temperature indicator, but it would fit better in the bottom-left
-  // corner"): the plate stands in the CORNER now - the caption's first word, beside the mode's (below: `cap`), where the
+  // UI-CALM: the plate stands in the CORNER now - the caption's first word, beside the mode's (below: `cap`), where the
   // status widget's needs already stand - no longer off the compass's end across the sky. Its own piece still
   // (ui/hud/hudLayout.js HUD_PIECES 'temp', inside the quick block), and it says no more than it must: comfortable, the glyph
   // and the number; felt or costing, its word and its scale too.
@@ -678,7 +676,7 @@ function build(doc) {
   const foeGhost = el('i', 'hud-ghost');
   const foeChunks = [el('i', 'hud-chunk'), el('i', 'hud-chunk')];
   foeTrack.append(foeGhost, ...foeChunks); armChunks(foeChunks);
-  // FOEBAR1 (2026-09-17, Mac, from a friend's two pictures): THE BLADE -
+  // FOEBAR1: THE BLADE -
   // an alternate face for the same readout. Two pictures under the one
   // track: the dark twin-bladed shape with the skull hub is the empty
   // bar, the red one is the fill, and the fill is CLIPPED from both tips
@@ -691,13 +689,13 @@ function build(doc) {
   foeBladeEmpty.style.backgroundImage = `url("${BLADE_EMPTY_URL}")`;
   foeBladeFull.style.backgroundImage = `url("${BLADE_FULL_URL}")`;
   foeBlade.append(foeBladeEmpty, foeBladeFull);
-  // TELL9 (bible/12-Enhanced-AI/Feud-Arc.md 11.1): THE POISE TRACK under the health - a foe's wind-up read: empty, amber
+  // TELL9 (11.1): THE POISE TRACK under the health - a foe's wind-up read: empty, amber
   // and filling toward its poise, red and hatched "Iron", a white flash "Staggered", "Open"; none for a foe with no brain
   const foePoise = el('div', 'hud-foepoise');
   const foePoiseFill = el('i', 'hud-poisefill');
   const foePoiseWord = el('span', 'hud-poiseword');
   foePoise.append(foePoiseFill, foePoiseWord);
-  // BOSS-TRAITS (bible/05-Combat/Boss-Traits.md): a hard foe's traits under its name, and its ward over its health
+  // BOSS-TRAITS: a hard foe's traits under its name, and its ward over its health
   const foeTraits = el('div', 'hud-foetraits');
   const foeWard = el('i', 'hud-foeward');
   foeTrack.append(foeWard);
@@ -737,8 +735,7 @@ function build(doc) {
   grip.append(gripLabel, gripTrack);
   bottom.append(grip);
   const bars = el('div', 'hud-bars');
-  // PX30c (Mac: "for the status bars, can we use percentages and
-  // organize them within the bar itself"): THE NUMBER GOES INSIDE.
+  // PX30c: THE NUMBER GOES INSIDE.
   // A figure beside a bar is a second thing to look at; a percentage
   // ON the bar is the bar saying what it means. The label rides in
   // there too, so each bar names itself rather than relying on a
@@ -770,14 +767,12 @@ function build(doc) {
   const health = vital('health', 'Health');
   const fatigue = vital('fatigue', 'Fatigue');
   bottom.append(bars);
-  // RENOWN4 (Mac: "why is there no way to view my renown ingame?" and "Plus XP bar"): MY RENOWN, under the vitals and
+  // RENOWN4 (and "Plus XP bar"): MY RENOWN, under the vitals and
   // as wide as them - the box every name wears, the bar to the next level with what is earned and not yet answered
   // faint after the fill, and the numbers. Online only: the row draws only while ui/hud/hudRenown.js has one.
-  // RENOWN-BAR (2026-09-26, Mac: "remove the xp amount ... then center the bar properly", and then "keep the other bar
-  // and remove the xp. Just have it visible in the player profile"): the row is the box, the bar and an empty column the
+  // RENOWN-BAR: the row is the box, the bar and an empty column the
   // box's width (the sheet's grid), so the bar's middle is the vitals'.
-  // UI3 (2026-09-27, Mac: the effects to a widget of their own, "which then gives more space for the XP bar and being
-  // able to fit the XP amounts inside"): THE XP GOES IN THE BAR - the foot's status row is gone, so the bar is the
+  // UI3: THE XP GOES IN THE BAR - the foot's status row is gone, so the bar is the
   // vitals' own height and says its numbers the way they say theirs, inside it ("5,420 / 13,800 XP"; "Highest" at the
   // cap). The row keeps its 22px, which the quickslot block's lifts count.
   const renown = el('div', 'hud-renown');
@@ -858,8 +853,7 @@ function build(doc) {
     icon.alt = '';
     const init = el('span', 'hud-qinit');
     body.append(icon, init);
-    // QS5 (Mac: "We need a better design for durability instead of the
-    // line sitting inside with the sprite"): THE CELL'S OWN LOWER EDGES
+    // QS5: THE CELL'S OWN LOWER EDGES
     // ARE THE GAUGE. A bar under the art was a second object in a cell
     // 84px wide, and it stole the room the sprite wanted; the diamond
     // already draws two lines under the picture - its own bottom-left
@@ -969,8 +963,7 @@ function build(doc) {
   cells.off.cell.addEventListener('pointerdown', tap(() => {
     if (offKind === 'swap') liveOpts.quickSwap?.(); else liveOpts.quickOffHand?.();
   }));
-  // MAC-R3 (Mac: "Tapping the equip hand in the quickbar doesn't switch to
-  // your other weapon in hand (still bound to H)"): the MAIN cell is the
+  // MAC-R3: the MAIN cell is the
   // weapon in hand, and a hand cell's own act is the other hand - DFU's
   // SwitchHand. It does not hold: what is in the hand is not a list.
   cells.main.cell.addEventListener('pointerdown', tap(() => { liveOpts.quickSwitchHand?.(); }));
@@ -1195,7 +1188,7 @@ export function drawEnhancedHud(vitals, heading01, dt = 0, opts = {}) {
     const o = t.fade < 1 ? String(t.fade.toFixed(2)) : '';
     if (parts.foe.style.opacity !== o) parts.foe.style.opacity = o;
     // TELL9 (11.1): the poise track - its state a class (the sheet's colour, the hatch, the flash), its fill, its word
-    // POISE-QUIET (2026-10-06, the player: "the block under the monsters hp must go"): an EMPTY track (no wind-up, no
+    // POISE-QUIET: an EMPTY track (no wind-up, no
     // iron, no stagger, no opening) is not drawn - the bar stands alone until the foe's poise has something to say
     const p = t.poise && t.poise.state && t.poise.state !== 'empty' ? t.poise : null;
     const pk = p ? p.state : '';
@@ -1216,7 +1209,7 @@ export function drawEnhancedHud(vitals, heading01, dt = 0, opts = {}) {
 
   // THE VITALS. maxFatigue is the (Str+End)x64 ceiling the classic
   // bars already use; this reads the same snapshot drawHud composed.
-  // PX30d (Mac: "the stamina percentage is a super large percentage"):
+  // PX30d:
   // FATIGUE HAS NO FIELD, IT HAS A LAW. DFU stores fatigue x64 and
   // computes the ceiling as (Strength + Endurance) x 64 - there is no
   // `maxFatigue` on the entity at all, so `vitals.maxFatigue || 1`
@@ -1227,7 +1220,7 @@ export function drawEnhancedHud(vitals, heading01, dt = 0, opts = {}) {
   // and my branch returns BEFORE that snapshot is built, so it was
   // reading the raw entity while the classic read the law. The same
   // law, from the same module, is the fix.
-  // DUEL-BAR (FIELD BUGS 2026-10-19f; the owner: "Bar shows duel vitality"): the health is drawHud's (`opts.health`,
+  // DUEL-BAR (FIELD BUGS 2026-10-19f): the health is drawHud's (`opts.health`,
   // ui/hud/hudVitals.js hudHealth) - a duel's referee's vitality while one is live, else the save's. Turned to the other
   // source, the bar's held loss and its last reading start afresh: the turn is no wound to break off and no heal to float
   // (the save's heal under a duel is the save's, never shown as the duel's).
@@ -1258,8 +1251,7 @@ export function drawEnhancedHud(vitals, heading01, dt = 0, opts = {}) {
     if (last[`${key}Low`] !== low) { last[`${key}Low`] = low; part.wrap.classList.toggle('low', low); }
   }
 
-  // UI-CALM (2026-10-14, a player: "Not everything needs to be visible constantly. Show information when it's
-  // relevant."): THE VITALS REST WHEN THEY HAVE NOTHING TO SAY - all three full (a magicka of none counts full), no foe
+  // UI-CALM: THE VITALS REST WHEN THEY HAVE NOTHING TO SAY - all three full (a magicka of none counts full), no foe
   // in the target bar, for VITALS_REST_S seconds: the bars fade away, and the first point lost, spent or still to
   // regain brings them back at once. Skyrim's own law, and Daggerfall's world kept clear of a readout it does not need.
   // The player's choice (`hudCalm`, the Calm HUD row); never while the HUD is being arranged (its editor shows it).
@@ -1561,7 +1553,7 @@ function setPowerLine(tile) {
 }
 /** STATUS-TIPS: the card a tile's cell asks for. */
 const statTipOf = (cell) => statusTip(cell._tip, last.statEntity, { endHint: END_SPELL_HINT, setLine: setPowerLine });
-/** STATUS-TIPS (Dudey: "make every other icon of debuffs, buffs, hunger etc hoverable"): every tile takes the pointer
+/** STATUS-TIPS: every tile takes the pointer
  *  while the mouse is freed (the widget's `ending` state, BUFF-END's) and says what it is in the pack's hover card. */
 function bindStatTips(stat) {
   const off = bindHudTips(stat, (target) => {
@@ -1777,7 +1769,7 @@ function drawSpellChip(view, tag) {
   const pic = sp?.spell && !sp.spell.noIcon ? spellIconPicture(sp.spell.icon, { box: SPELL_CHIP_BOX, dpr: clampDpr(screenDpr() * (last.scale ?? 1)), onReady: () => { last.qspell = null; } }) : null;
   if (pic) { showFitted(chip.icon, pic); chip.icon.style.display = ''; } else { chip.icon.removeAttribute('src'); chip.icon.style.display = 'none'; }
   chip.chip.classList.toggle('on', !!sp);
-  // HOTSLOT (2026-09-22): an EMPTY slot is a socket, as the diamond's
+  // HOTSLOT: an EMPTY slot is a socket, as the diamond's
   // cells are (departure 4) - drawn dim with its key, so the key is
   // seen and, on a phone, the first tap has a chip to land on (the
   // tap fills it from the book: spellQuickslotPress). Hidden, the slot
@@ -1809,7 +1801,7 @@ let _zone = null;
 export function setHudZone(fn) { _zone = typeof fn === 'function' ? fn : null; }
 const zoneTile = () => { try { return _zone?.() ?? null; } catch { return null; } };
 const setPowerChips = (vitals) => { try { return _setChips?.(vitals) ?? []; } catch { return []; } };
-/** TECH1 (bible/05-Combat/Weapon-Techniques.md): the host's word on the weapon's technique - its chip, after the set powers'
+/** TECH1: the host's word on the weapon's technique - its chip, after the set powers'
  *  (combat/techniques.js techniqueHudChips, read off the rig that owns the frame). */
 let _techChips = null;
 export function setHudTechniqueChips(fn) { _techChips = typeof fn === 'function' ? fn : null; }
@@ -1922,7 +1914,7 @@ export function destroyEnhancedHud() {
 
 export { compassScroll };
 
-// NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass"): THE PROFESSIONS' NODES
+// NODE-MARKS: THE PROFESSIONS' NODES
 // ON THE STRIP - the party's triangle, by the same bearing law, each in its profession's colour (ui/nodeMarks.js
 // nodeMarkCss) at its own opacity, the nearer brighter; `points` NodeCompassPoints, the nearest last so it stands over
 // the rest. Pooled and hidden, never removed. AUDIT NODE-MARKS: in a layer of their own just over the tape and the

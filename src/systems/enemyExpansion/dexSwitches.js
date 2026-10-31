@@ -1,4 +1,4 @@
-// MUDEX1 (2026-10-20, Mac: "We need to make everything compatible. No if ands or vutts", then "Approve MUDEX") - WHICH
+// MUDEX1 - WHICH
 // ENEMY MODS ARE LOADED FOR THE GAME, for the leaves that cannot import an install. Daggerfall Enemy Expansion's switch,
 // and MUDEX's: Ralzar's "Meaner Unleveled Daggerfall Enemy Expansion" (vendor/mudex), the form of Meaner Monsters its
 // author made for a game with DEX in it. Meaner Monsters' own Init finds DEX by its GUID and asks the player to make

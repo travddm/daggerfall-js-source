@@ -180,8 +180,7 @@ export function drawText(renderer, font, text, x, y, scale = 1, color = [1, 1, 1
     }
     return cx - x;   // SHADOW-FANG (AUDIT A3): the drawn advance, as the bitmap arm answers it
   }
-  // PERF-ON (2026-09-15, Mac: "the more people that are online, the
-  // worse fps becomes"): ONE DRAW A STRING, not one a glyph.
+  // PERF-ON: ONE DRAW A STRING, not one a glyph.
   //
   // `drawScreenQuad` is a full GL state setup - eight uniforms, a
   // texture bind and a draw - so this loop cost about ten GL calls a

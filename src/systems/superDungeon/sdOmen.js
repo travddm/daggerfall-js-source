@@ -1,6 +1,5 @@
 // @ts-check
-// SD2c (2026-10-06, the Super Dungeons arc - Mac: "Super dungeons are random finds on the world map"; bible/11-Multiplayer/
-// Super-Dungeons.md section 4): THE HOLLOW SEEN AND HEARD OF - what the world shows one player of a Super dungeon.
+// SD2c: THE HOLLOW SEEN AND HEARD OF - what the world shows one player of a Super dungeon.
 //
 // BEFORE IT IS FOUND IT IS A FIND: no ring, no compass mark, no row - a column of brass-gold light over its pixel, seen
 // from SD_OMEN_PX map pixels round (the gate's beacon pass, its colours its own: render/superDungeon/sdOmenPass.js), and a word in
@@ -81,7 +80,7 @@ export function sdNoticeCard(mark, cityName) {
   return { subject: 'Abyss Dungeon', body: words ? `${where} ${words[0].toUpperCase()}${words.slice(1)}.` : where };
 }
 
-// ── SD19: THE HOLLOW'S PRESENCE (2026-10-07, Mac: "The detail needs to exceed that of the oblivion gates") ────────────
+// ── SD19: THE HOLLOW'S PRESENCE ────────────
 // The gate's sky burns over its region, a banner counts it down at its fire, and the chat speaks of it eight ways
 // (systems/gate/gateOmen.js); the Hollow had its column alone, three lines and a row once found. Now:
 //   THE BRASS AIR: the land's haze and light lean to brass near a standing Hollow (the taverns have always said so - "the

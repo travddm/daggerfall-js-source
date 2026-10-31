@@ -1,5 +1,5 @@
 // @ts-check
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md): THE ITEM KINDS A DEATH IN THE ZONE
+// INT9: THE ITEM KINDS A DEATH IN THE ZONE
 // READS, A LEAF. The template indices DaggerfallUnityItem's predicates name (ItemEnums.cs) and the two predicates the
 // zone's drop law asks (systems/wild/wildDropLaw.js) - their home since INT9, so the account Worker bundles them without the
 // use handler's whole graph (systems/useItem.js re-exports every one). Imports nothing.

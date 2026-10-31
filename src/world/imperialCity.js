@@ -1,12 +1,9 @@
 // @ts-check
-// TESA11 (2026-10-13, the owner: "the imperial city needs to be much larger and be split into distinct districts with the
-// tower very large. The entire city also needs to be lore accurate to daggerfall"; asked, "3x3 pixels" and "Canon layout,
-// DF era"; bible/03-World/Arena-Provinces.md TESA11) - THE IMPERIAL CITY OVER SEVERAL PIXELS. Daggerfall's engine stands
+// TESA11 - THE IMPERIAL CITY OVER SEVERAL PIXELS. Daggerfall's engine stands
 // one location on a pixel, eight blocks a side at most; the city stands on `IMPERIAL_SPAN` a side, each pixel's eight-by-
 // eight slice of one plan its own location, named for its district (`imperialSliceName`), and every slice flattened to
 // the centre's ground (world/terrain/terrainGen.js flattenAt) so they meet level. TS5 stood it on seven pixels; IC-GRAND
-// (2026-10-26, the owner: "Imperial city needs to be larger. Im thinking 10km", then "Lets do 20km";
-// bible/03-World/Arena-Provinces.md IC-GRAND) on twenty-five: 20.48 km across.
+// on twenty-five: 20.48 km across.
 //
 // THE LAYOUT IS THE CITY'S CANON - the wheel the later games mapped, in Daggerfall's day (3E 405, the reign of Uriel
 // Septim VII): City Isle in Lake Rumare; at its heart the Imperial Palace in the White-Gold Tower on Green Emperor Way,
@@ -33,8 +30,7 @@
 // No landmark stands over a block of Daggerfall's (AUDIT-TESA A6-3's law, pinned on every vertex - the arena's, now).
 import { hash32, BLOCK_M } from './blockHash.js';   // RUMARE-WATER: the leaf, so the workers reading the plan (world/rumareWaters.js) reach world/ alone
 
-/** Pixels a side, and the plan's cells a side (eight a pixel) - its anchor the middle grid point. TS5 (the owner: "7x7
- *  pixels"): seven; IC-GRAND (the owner: "Lets do 20km"): twenty-five, 20.48 km - an odd span keeps a centre pixel, the
+/** Pixels a side, and the plan's cells a side (eight a pixel) - its anchor the middle grid point. TS5: seven; IC-GRAND: twenty-five, 20.48 km - an odd span keeps a centre pixel, the
  *  tower's, and the plan's anchor that pixel's middle (24 would be 19.66 km, its middle a pixel corner). */
 export const IMPERIAL_SPAN = 25;
 export const IMPERIAL_CELLS = 8 * IMPERIAL_SPAN;
@@ -44,12 +40,10 @@ const SALT = 0x1c11;
 
 /** THE CITY'S MEASURES, metres from its middle (x east, z south; a bearing clockwise from north). IC-GRAND: the wheel at
  *  twenty-five pixels - the city wall 6.9 km out (TS5's 1950), the palace wall 2.3 km, the isle 7.9 km, Lake Rumare's far
- *  shore 10 km; the walls thicker and (the team's spec, forwarded by the owner: "Walls should be higher. Like 35-40
- *  meters") 38 m tall; the White Tower slim (the same spec: "500m+ height, like 150-200m diameter in the foundation and
+ *  shore 10 km; the walls thicker and (the team's spec, forwarded by) 38 m tall; the White Tower slim (the same spec: "500m+ height, like 150-200m diameter in the foundation and
  *  like 60-70m diameter in the shaft"); the Temple of the One and the compounds larger, the arena Daggerfall's own. */
 export const IMPERIAL = Object.freeze({
-  /** The White-Gold Tower. IC-GRAND, the owner (2026-10-26): "the imperial city tower model needs to be much larger and
-   *  taller like this with the surrounding gate have large pillars like the image shows" - over the team's spec (a shaft
+  /** The White-Gold Tower. IC-GRAND, - over the team's spec (a shaft
    *  60-70 m across, 500 m and more: 760 m) and TESA11's octagon: ROUND (`sides` faces), TS5's 1360 m to its gilt spire's
    *  tip; out of the palace's rotunda (`plinthR` round - 320 m across - and `plinthH` high, under its low dome `domeH`, an
    *  arcade of `arches` round its wall and `domes` little domes on its rim); its shaft 144 m across at its foot and 108 m
@@ -96,7 +90,7 @@ export const IMPERIAL = Object.freeze({
   /** City Isle's shore round the city wall, and Lake Rumare's far shore round the isle (the land past it its own). */
   isle: 7900,
   lake: 10000,   // AUDIT TESA II C1 at IC-GRAND's scale: its far shore and the bridge's landing short of the rim's inner edge (10,169.6 m: the plan's half less CAPITAL_RIM_M) and inside the city's own blocks (10,137.6 m: AUDIT-TESA A6-3, none in the land's)
-  /** RUMARE-WATER (bible/03-World/Tamriel.md RUMARE-WATER): the Waterfront's mouth - the lake south through its far shore
+  /** RUMARE-WATER (RUMARE-WATER): the Waterfront's mouth - the lake south through its far shore
    *  to the span's edge, `mouth` metres either side of the city's middle line: the Waterfront canal's three pixels
    *  (world/tamriel/tamrielGeography.js WATERFRONT_CANAL's `half` and a half, pinned equal), so the lake meets it. */
   mouth: 1228.8,
@@ -130,7 +124,7 @@ export const IMPERIAL_SECTORS = Object.freeze(/** @type {Array<readonly [string,
   ['Market District', 0], ['Arena District', 60], ['Arboretum', 120],
   ['Temple District', 180], ['Talos Plaza District', 240], ['Elven Gardens District', 300],
 ].map((e) => Object.freeze(e))));
-/** TS5 (the owner: "with the outskirt locations being circular also"): how far from the city's centre pixel, Bay pixels, a
+/** TS5: how far from the city's centre pixel, Bay pixels, a
  *  town past the Bay is of its outskirts - laid round (world/townOutline.js ROUND_OUTLINE): the city's own, and as far
  *  again on every side. */
 export const IMPERIAL_OUTSKIRTS = 2 * IMPERIAL_SPAN;
@@ -465,7 +459,7 @@ function landShare(x0, z0, I = IMPERIAL) {
 /** One cell of the plan: 'L' the lake, 'O' (TS5) open ground past it, the arena's (IC-GRAND), or an own block's code. Pure in
  *  its row and column. IC-GRAND: a cell of the lake a landmark crosses - Talos Bridge, the Waterfront's piers - an own
  *  block, so a slice of open lake the bridge runs over has a carrier for its part (and its own laws the deck's footprint
- *  over the water). IC-PROPS (2026-10-27, the owner: "Old daggerfall city layout placements are in imperial city"): no
+ *  over the water). IC-PROPS: no
  *  cell is one of Daggerfall's city blocks any more - 671 of them stood among the city's own (each district's trade along
  *  its avenue, round its heart and scattered: a Daggerfall town's square of houses, garden walls, hedges and props dropped
  *  into the grand plan); every district's trade - its shops, temples, guild halls, banks and libraries - is the fabric's
@@ -723,8 +717,7 @@ export const imperialFarPartId = (id) => _farPart.get(id) ?? id;
  * radius r0 at y0 to r1 at y1, marble or gold, its top closed where `cap`): the rotunda, its dome, the shaft in bands of
  * two tiers each ringed by a gilt band, the gallery, the crown and the spire. One list for the far ring's silhouette
  * (world/imperialImpostor.js) and a far view's model (world/capitalImperial.js buildImperialTowerLod), so the stream
- * taking the tower over from the horizon changes nothing of its shape (the owner, 2026-10-26: "Weird pop in issues in
- * the city when moving").
+ * taking the tower over from the horizon changes nothing of its shape.
  * @param {any} [T]
  */
 export function imperialTowerLod(T = IMPERIAL.tower) {

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RENOWN1 (2026-09-24) — RENOWN: online's own level, kept beside
+// RENOWN1 — RENOWN: online's own level, kept beside
 // Daggerfall's and never in its place.
 //
 // Mac, bringing a friend's MMORPG pillars ("The Hybrid Leveling System
@@ -10,21 +10,17 @@
 // answered: the online health and magicka go "On top" of Daggerfall's,
 // the curve is a long "Grind", and offline play earns "No" XP - "Plus
 // having their level appear on the left side of character name and
-// profile main menu + ingame profile". Then Mac named it: "Lets
-// officially call this Renown" - it was built as the Adventuring Level,
+// profile main menu + ingame profile". Then - it was built as the Adventuring Level,
 // and every name in the code, on the wire and on screen says Renown.
 // A player's Renown is a level ("Renown 12" in words), and beside a
-// name it is the number alone, in a box (Mac: "Just have it read 12
-// inside a box").
+// name it is the number alone, in a box.
 //
 // ═══ WHAT IT IS, AND WHAT IT NEVER TOUCHES ═════════════════════════
 //
 // A TRACK PER CHARACTER, kept by the account service
 // (server-account/src/renownTracks.js) and never in the save. RENOWN1
-// kept a track a character; RENOWN-ACCOUNT (2026-09-28, Mac: "can you
-// make sure renown is account based and not character based?") made it
-// the account's for a day; RENOWN-CHAR (2026-09-29, Mac: "Can we make
-// renown per character again") gave each character its own back -
+// kept a track a character; RENOWN-ACCOUNT made it
+// the account's for a day; RENOWN-CHAR gave each character its own back -
 // migration 0035: each track at what it held when Renown became the
 // account's, plus everything the account earned while it was (Mac's
 // choice, "Own + recent gains"), and a realm character with no track yet
@@ -136,8 +132,7 @@ export function renownProgress(xp) {
  * A QUEST is worth what its giver scaled it to: Daggerfall sizes a quest
  * to the character's own level, so the XP does too.
  *
- * RENOWN3 (2026-09-25, Mac: "a high level character shouldnt blow through
- * online levels"): BOTH ARE READ AGAINST THE CHARACTER'S RENOWN (the account's
+ * RENOWN3: BOTH ARE READ AGAINST THE CHARACTER'S RENOWN (the account's
  * while RENOWN-ACCOUNT stood, the character's again since RENOWN-CHAR). A career foe stands at the character's own
  * Daggerfall level, and a quest is sized to it, so a character that
  * levelled offline fought level-30 foes from its first minute online -
@@ -154,8 +149,7 @@ export function renownProgress(xp) {
  * at RENOWN-ACCOUNT's rate; at RENOWN3's full rate they were 59 and 398,
  * and 111 and 1,365.)
  *
- * RENOWN-ACCOUNT (2026-09-28, Mac: "reducing the accumulation of renown
- * from resources a bit. Want some more oomph to the grind"): EVERY SOURCE
+ * RENOWN-ACCOUNT: EVERY SOURCE
  * PAYS RENOWN_RATE_PCT - three quarters - of what it paid. The rate is
  * taken in ONE place, `renownRate`, floored to a whole XP there and nowhere
  * else, so the client, the service and the relay agree to the unit
@@ -205,15 +199,14 @@ export const renownKillXp = (foeLevel, renown = null) => renownRate(RENOWN_KILL_
  *  at the rate (RENOWN-ACCOUNT): 75 and 30 a level. */
 export const renownQuestXp = (characterLevel, renown = null) => renownRate(RENOWN_QUEST_XP_BASE + RENOWN_QUEST_XP_PER_LEVEL * Math.min(clampInt(characterLevel, 1, RENOWN_QUEST_LEVEL_MAX), renownCeiling(renown)));
 
-/** RAID4 (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
- *  armor sets"): A TOWN DEFENDED - a raid's cleanse the relay signed for this account (net/raid/raidReceipt.js) - is worth
+/** RAID4: A TOWN DEFENDED - a raid's cleanse the relay signed for this account (net/raid/raidReceipt.js) - is worth
  *  RENOWN_RAID_QUESTS quests at the ladder's top quest level, read no higher than the Renown allows (RENOWN3's
  *  ceiling), at the quests' rate (RENOWN-ACCOUNT): Renown 1 takes 585, Renown 10 1,395, Renown 27 and up 2,925 (780,
  *  1,860 and 3,900 at the full rate). The account service credits it once a raid an account, to the Renown of the character that fought it,
  *  charged to the account's hour as a report is (AUDIT RAID R5, server-account/src/raids.js). */
 export const RENOWN_RAID_QUESTS = 3;
 export const renownRaidXp = (renown = null) => RENOWN_RAID_QUESTS * renownQuestXp(RENOWN_QUEST_LEVEL_MAX, renown);
-/** SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): A SERPENT SLAIN - Sethrakul's kill the relay
+/** SERPENT1: A SERPENT SLAIN - Sethrakul's kill the relay
  *  signed for this account (net/serpent/serpentReceipt.js) - is worth RENOWN_SERPENT_QUESTS quests at the ladder's top quest
  *  level, read no higher than the Renown allows, at the quests' rate: twice a town defended, for the Bay's rarest fight
  *  (one every four real hours). Credited once a serpent an account, to the character that fought it, charged to the
@@ -278,7 +271,7 @@ export const RENOWN_NAME_MAX = 32;
 /** How often the client sends what it has earned - while its answer would say something the page cannot (SCALE4h,
  *  net/renownTracker.js renownReportSoon: a rise, the hour's bound, a total or a room not yet said). */
 export const RENOWN_REPORT_MS = 60_000;
-/** SCALE4h (2026-10-11, the plan's "10k writes"; bible/11-Multiplayer/Scale-Arc.md SCALE4h): HOW OFTEN IT GOES
+/** SCALE4h: HOW OFTEN IT GOES
  *  OTHERWISE. A fighter's report every minute was half the statements and half the rows a fighting player-hour wrote to
  *  the one primary (tools/hotWritesBench.mjs), and most of its answers said nothing the page did not know: the bar draws
  *  what is earned and not yet answered (ui/hud/hudRenown.js, the ghost), so the answer only moves the ghost into the fill. */
@@ -292,8 +285,7 @@ export const renownRidOf = (rid) => (typeof rid === 'string' && RENOWN_RID_RE.te
 
 /* ═══ THE WORDS ═══════════════════════════════════════════════════════ */
 
-/** The level as it sits left of a name - the number alone, which every face puts in a box (Mac: "Just have it read
- *  12 inside a box"): "12". Null for none. */
+/** The level as it sits left of a name - the number alone, which every face puts in a box: "12". Null for none. */
 export function renownText(level) {
   if (!Number.isSafeInteger(level) || level < 1 || level > RENOWN_MAX) return null;
   return String(level);

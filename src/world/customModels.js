@@ -1,4 +1,4 @@
-// DS1 (2026-09-25): MODELS NO ARCH3D CARRIES - the port's door for them.
+// DS1: MODELS NO ARCH3D CARRIES - the port's door for them.
 //
 // DFU asks MeshReplacement.ImportCustomGameobject before it reads a
 // model out of ARCH3D.BSA, which is how a mod stands a model Daggerfall
@@ -16,7 +16,7 @@
 // (`emptyModel`).
 
 const _models = new Map();   // id -> { build, isOn, cached, climateFree, needs, buildSliced }
-/** IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND): MODEL FAMILIES - a run of ids answered by one law, built when first
+/** IC-GRAND (IC-GRAND): MODEL FAMILIES - a run of ids answered by one law, built when first
  *  asked and kept a bounded number at a time (an LRU, `keep`), so a city of forty thousand cells registers no model up
  *  front and holds only the ones near it: `{ owns(id), build(id, ctx), keep, climateFree, solid }`. A family is asked
  *  after the ids registered one by one. `solid: false` - a model no collider files (scenes/pixelBuild.js isSolidModel: a
@@ -68,7 +68,7 @@ export const NO_CLIMATE_REMAP = new Map();
 export const customModelNeeds = (id) => _models.get(Number(id))?.needs ?? [];
 export function unregisterCustomModel(id) { _models.delete(Number(id)); _aliases.delete(Number(id)); }
 
-// WD3 (2026-10-01): A MODEL THAT IS A CLASSIC ONE WITH OTHER PICTURES ON IT. Beautiful Villages' and Beautiful Cities'
+// WD3: A MODEL THAT IS A CLASSIC ONE WITH OTHER PICTURES ON IT. Beautiful Villages' and Beautiful Cities'
 // eighteen beds (42069-42086) are Daggerfall's own three beds (41000-41002) under blankets of six colours; the bundle's
 // meshes are copies of the ARCH3D records, which the port never carries. An ALIAS names the classic model to read out
 // of the player's ARCH3D and the textures to swap on it - `remap`, `"<archive>_<record>"` -> [archive, record] - so the
@@ -101,7 +101,7 @@ export function customModelFor(id, ctx = null) {
   return (m.cached ??= m.build(ctx));
 }
 export const hasCustomModel = (id) => (_models.has(Number(id)) ? !!_models.get(Number(id))?.isOn() : !!familyOf(Number(id)));
-/** IC-STUTTER (bible/03-World/Arena-Provinces.md IC-STUTTER): whether customModelFor(id) answers without building - a
+/** IC-STUTTER (IC-STUTTER): whether customModelFor(id) answers without building - a
  *  registered model built once (or off), a family's kept. @param {number} id */
 export function customModelReady(id) {
   const m = _models.get(Number(id));

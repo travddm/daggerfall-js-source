@@ -1,6 +1,5 @@
 // @ts-check
-// IMPACTFX (2026-10-05, the player: "give the impacts a fitting sound ... make sure the spell impact sound suit the
-// game"): A LANDING SPELL, HEARD. DFU gives a missile no impact clip (its sound is its cast's), so each look gets one
+// IMPACTFX: A LANDING SPELL, HEARD. DFU gives a missile no impact clip (its sound is its cast's), so each look gets one
 // made at runtime the way the arena's crowd is (systems/arena/arenaSound.js): out of the player's OWN archive
 // (`audio.samplesOf`) layered with a little synthesis, at DAGGER.SND's own 11025 Hz and folded to 8 bits, so it sits
 // beside the classic clips rather than over them. Registered once (`audio.registerSamples`) and played positionally.
@@ -10,7 +9,7 @@
 //   poison  SplashSmallLow (334) pitched down, a wet squelch, bubbles and an acid sizzle
 //   shock   StormLightningShort (348): a hard crack, then an electric buzz that stutters out in small crackles
 //   magic   a resonant thoom and a shimmer over the magic cast, pitched down
-//   heal    HEAL-FILE (2026-10-05, the player: "here the perfect heal sound make it softer and smoother"): THE PLAYER'S
+//   heal    HEAL-FILE: THE PLAYER'S
 //           OWN HEAL SOUND, public/sfx/spell-heal.wav - their 02_Heal_02 softened (its top tilted down 4.5 dB from
 //           4.5 kHz and rolled off over 9 kHz, a soft bloom under it, its flicker evened out, a long fade) and kept at
 //           22050 Hz 16-bit, NOT the 11025 Hz 8-bit bake: 84% of it lives over 5 kHz, which that bake would delete.

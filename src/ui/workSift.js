@@ -1,11 +1,9 @@
 // @ts-check
-// BOARD-SIFT (2026-10-21, feature-feedback: "Definitely need sorting/filtering functions for work writs considering
-// there are thousands of them and you have to scroll through them all to find what you want"; "The notice board in
-// general needs some TLC. The writs especially."): THE WORK TAB'S WRITS SIFTED - every card of the region's work (the
+// BOARD-SIFT: THE WORK TAB'S WRITS SIFTED - every card of the region's work (the
 // Court's writs and the chapters', guild and seat writs, guild contracts, commissions) under one bar: what kind, a
 // search of its words (the material, the guild, the crafter or the piece), "Only what I can fill", and an order (ending
 // soonest, most silver, A to Z). The work still open stands before the work done, and the grid draws a page of it at a
-// time, "Show 40 more" under the last (bible/06-Systems/Professions-Arc.md 10.13).
+// time, "Show 40 more" under the last (10.13).
 //
 // The window (ui/noticeWindow.js) hands each card in as an ENTRY - its kind, whether it is open and fillable now, its
 // silver, its end, its name and its words, and the card itself to draw (`card`), made only for the cards shown. What
@@ -13,7 +11,7 @@
 // guildWritMost). The filter and the order are the professions book's for the session (`state.workSift`), so the
 // window a stray tap closed opens on them again.
 //
-// AUDIT BOARD-SIFT (2026-10-22, the owner: "Audit this"): the bar's own controls redraw the results alone (`refresh`,
+// AUDIT BOARD-SIFT: the bar's own controls redraw the results alone (`refresh`,
 // the window's) - never the bar, so the field typed in is never taken from under the keys; a word composed (an IME's, a
 // phone keyboard's) is read once it is whole (`typedField`, and the window's paint waits on it); the kinds' counts are
 // those the search and "Only what I can fill" leave, in the player's language's numbers.

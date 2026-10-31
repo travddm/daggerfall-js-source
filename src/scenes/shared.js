@@ -7,7 +7,7 @@
 
 import { stepAsideLoading, syncLoading } from '../ui/loadingScreen.js';   // LOAD1: a full-screen film's hold takes the loading screen aside; a claimed loop lets its hold go
 import { DFPalette } from '../formats/dfPalette.js';
-import '../systems/item/itemLaw.js';   // INT1 (bible/06-Systems/Integrity-Arc.md): the item law, installed on the wire's door (systems/loot/loot.js setItemLaw) in every host
+import '../systems/item/itemLaw.js';     // INT1: the item law, installed on the wire's door (systems/loot/loot.js setItemLaw) in every host
 import { NetRandom } from '../formats/netRuntime.js';   // HAZE1: System.Random's one port (the stars' generator)
 import { swingHeld } from '../ui/input.js';   // FIX-F: the swing button through the registry
 import { ImgFile } from '../formats/imgFile.js';
@@ -220,7 +220,7 @@ export function skyFrameForWeatherTime(minuteOfDay, showNightSky = true) {
 // (R2/R4 demo compatibility); otherwise the world clock decides.
 export function createSkyController(gl, params) {
   const sky = new SkyRenderer(gl);
-  // ES1 (2026-08-27, Mac's call): under the ENHANCED skin the sky is the
+  // ES1: under the ENHANCED skin the sky is the
   // port's own procedural dome - sun, moons on DFU's phases, stars,
   // clouds, weather - and the classic panorama pass is never built for.
   // `?sky=classic` keeps the painted sky under the enhanced skin (a
@@ -255,8 +255,7 @@ export function createSkyController(gl, params) {
   // pass that nothing marks, and needs no mark: the renderer's EV6
   // program/VAO shadows reset at every beginFrame, and no renderer entry
   // point runs between this construction and the first).
-  // DS2 (2026-09-08, Mac: "the procedural sky mod doesn't apply our
-  // enhanced clouds"): THE CLOUDS RIDE THE LANE, NOT THE DOME. They are
+  // DS2: THE CLOUDS RIDE THE LANE, NOT THE DOME. They are
   // built whenever the enhanced lane has a sky - the port's dome or the
   // mod's skybox - and under the mod its two textured cloud sheets stand
   // down the way the dome's decks do (cloudsExternal), so one field of
@@ -269,8 +268,7 @@ export function createSkyController(gl, params) {
   if (clouds) clouds.testCellSpec = params.get('cloudcell');   // WEATHER2c: `?cloudcell=<weather>[,<ahead>[,<radius>]]` - one static cell, for the eye and the probe
   const dynamicSky = dynamicOn ? new DynamicSkiesRenderer(gl) : null;
   if (clouds && dynamicSky) dynamicSky.cloudsExternal = true;
-  // PS3 (Mac: "there's these progressing circles in the sky when I want it
-  // to be a smooth sky transition"): the mod's own REDUCE_COLOR quantizes
+  // PS3: the mod's own REDUCE_COLOR quantizes
   // with a bare ceil and no dither, so the sky's iso-luminance contours -
   // rings around the sun - come out as hard bands that walk as the sun
   // moves. The port gives it ES1e's ordered dither; `?bands=raw` is the
@@ -281,7 +279,7 @@ export function createSkyController(gl, params) {
   let dreadW = 0;   // EVENT1: the live event's weight this frame (setDread) - 0 is no event, and nothing below changes
   let dreadGlow = 0;   // EVENT1: and the red strikes' glow in the cloud deck this frame (the composite's flash, beside the storm's)
   // VALENWOOD-CANOPY (world/jungle/jungleCanopy.js canopyLeaves): the leaves over a closed canopy, [rgb, weight] - the
-  // water's mirror (`leaved`). GRAHT1 (bible/03-World/Graht-Oaks.md): the sky itself is the graht-oaks' to close - their
+  // water's mirror (`leaved`). GRAHT1: the sky itself is the graht-oaks' to close - their
   // crowns stand in the world, and no ceiling is drawn over any sky
   const canopyLeaves = new Float32Array(4);
   /** EVENT1: a reflected sky ({zenith, horizon}) under the dread - the water mirrors the sky it is under, on either lane. */
@@ -346,7 +344,7 @@ export function createSkyController(gl, params) {
   // immediate neighbours and the night/day toggle.
   const PANORAMA_CACHE_MAX = 4;
   const panoramas = new Map();
-  // MEM-AUDIT (2026-10-23): AND THE SKY FILES THEMSELVES, the two last asked. Each SKY??.DAT is 7.8 MB, a sky index is a
+  // MEM-AUDIT: AND THE SKY FILES THEMSELVES, the two last asked. Each SKY??.DAT is 7.8 MB, a sky index is a
   // climate's sky and its season or weather, and the parsed files and their bytes stood for the session - up to 248 MB
   // past the heap. One asked again is read again: the same bytes, the same panorama.
   const SKY_FILES_KEPT = 2;
@@ -393,7 +391,6 @@ export function createSkyController(gl, params) {
       } catch {
         // The mobile lean diet excludes the 247MB sky set - a missing
         // SKY??.DAT degrades to the gradient, never to a crash
-        // (2026-08-14; full desktop sets never hit this).
         console.warn(`${name} unavailable - gradient sky fallback`);
         skyMissing.add(skyIndex);
       }
@@ -447,7 +444,7 @@ export function createSkyController(gl, params) {
       brassW = Math.max(0, Math.min(1, Number(w) || 0));
       for (const r of [sky, enhancedSky, dynamicSky, clouds]) if (r) r.brass = brassW;
     },
-    /** BANTHA1 (bible/03-World/Bantha-Jungle.md): the jungle's haze over the sky this frame - [r, g, b, depth], its colour
+    /** BANTHA1: the jungle's haze over the sky this frame - [r, g, b, depth], its colour
      *  and its optical depth straight up from the eye (world/jungle/jungleHaze.js hazeSkyUniform; render/hazeGlsl.js
      *  uHazeSky) - every pass that draws the sky closes into it toward the horizon, as the ground does; null or a depth
      *  of 0 is exactly the sky there was. */
@@ -493,7 +490,7 @@ export function createSkyController(gl, params) {
     /** DS1: the pixel-snow replacement (InitSnow) when the mod's switch
      *  is on: the two viewport-fraction sizes and the PixelSnow texture. */
     pixelSnow: dynamic?.pixelSnow ? { ...dynamic.pixelSnow, textureUrl: dynamicSkiesTextureUrl('PixelSnow') } : null,
-    /** GR3 (Mac: "the wind still isn't working ingame"): THE CLOUD
+    /** GR3: THE CLOUD
      *  SHADOW DECK, off the dome. EE5 publishes `cloudShadow` on the
      *  EnhancedSkyRenderer - cover, softness, WIND, time - "from the
      *  same state the dome is drawn from, so no host can feed them
@@ -608,7 +605,7 @@ export function createSkyController(gl, params) {
         // rain and the wind's voice are the weather's as they were
         const skyWord = dreadW > 0 ? DREAD_SKY_WORD : systemWordOf(weatherName);   // AUDIT PRECIP FALL-2: the deck is its system's - a storm falling as snow is a storm's sky (and the mod's preset, its strikes)
         const want = weatherRow(skyWord);
-        // CLK1 (2026-09-08, Mac: "in sync with the world clock"): ONE
+        // CLK1: ONE
         // CLOCK. The presentation walks on GAME MINUTES - the host's
         // classicMinutes, the number the sun, the moons, the stars and
         // the wind model already read - not on the wall's seconds it
@@ -759,7 +756,7 @@ export function createSkyController(gl, params) {
         });
       }
     },
-    /** KETCH-LOOK KL1 (bible/11-Multiplayer/Sky-Ketch-Look.md section 14): THE SKY'S CLOCK OFF THE STREET. A made level
+    /** KETCH-LOOK KL1: THE SKY'S CLOCK OFF THE STREET. A made level
      *  that draws the world's sky (the Arena's floor - the dungeon arm's `host.drawSky`, through
      *  `draw`'s clocks) runs no exterior frame, so its sky stood at the minute the player left the street while the hour
      *  turned under it (online, twelve game hours a real one). The last `use` again on the clocks now - its sky index, its night sky, its weather as the street last
@@ -882,7 +879,7 @@ export function realForestsOn(search) {
   const row = onlineForcedPref('realForests', search) ?? getPref('realForests');
   return !!row && (isOnlinePage(search) || isEnhanced(search));
 }
-/** BANTHA1 (bible/03-World/Bantha-Jungle.md): THE JUNGLE'S SWITCH - the Features row (`banthaJungle`) on the enhanced
+/** BANTHA1: THE JUNGLE'S SWITCH - the Features row (`banthaJungle`) on the enhanced
  *  skin, and on for everyone online whatever their skin: the jungle's trees are where Logging's trees stand in Bantha (the
  *  owner's area, BANTHA2 - world/jungle/banthaArea.js), and the room agrees on its ground (realForestsOn's shape).
  *  `?jungle=off` the kill door, offline. The world host reads it once, at its mount (a flip reaches the next world). Off -
@@ -918,11 +915,11 @@ export function tamrielLandOn(search) {
   return !!getPref('tamrielLand') && (isOnlinePage(search) || isEnhanced(search));
 }
 
-/** TESA-LANDS (bible/03-World/Tamriel-Lands.md): THE LANDS PAST THE BAY'S SWITCH - its home systems/landsSwitch.js (the
+/** TESA-LANDS: THE LANDS PAST THE BAY'S SWITCH - its home systems/landsSwitch.js (the
  *  far views read it too, and import no scene). */
 export { tamrielLandsOn } from '../systems/landsSwitch.js';
 
-/** ETHER-SEA (bible/03-World/Eltheric-Ocean.md): THE ELTHERIC OCEAN STANDS - its ground streamed in the world's far box
+/** ETHER-SEA: THE ELTHERIC OCEAN STANDS - its ground streamed in the world's far box
  *  (world/ethericSea.js), its places, its ships and its way home through the Veil - in every game. AUDIT CAPTAIN'S SEA
  *  G2: a save made past the Veil threw on its load under the classic skin, where the sea did not stand; it stands there
  *  now, and its captain sails home. `?ether=off` the kill door (a save past the Veil then lands at the way home). No
@@ -945,7 +942,7 @@ export function tamrielTraceOn(search) {
   return pageParam('tamrieltrace', search) !== 'off' || isOnlinePage(search);
 }
 
-/** TESA1 (bible/03-World/Arena-Provinces.md): THE PLACES' KILL DOOR - `?arenaplaces=off` stands none of the cities, towns
+/** TESA1: THE PLACES' KILL DOOR - `?arenaplaces=off` stands none of the cities, towns
  *  and villages past the Bay (TESA12: the port's own, world/tamrielPlaces.js), and the ink draws TAMRIEL1's cities. No
  *  Features row: the places are the land's own. Offline alone, as the countryside's (AUDIT-TESA A7-8): online the land is
  *  the room's. */
@@ -953,7 +950,7 @@ export function arenaPlacesOn(search) {
   return pageParam('arenaplaces', search) !== 'off' || isOnlinePage(search);
 }
 
-/** TESA7 (bible/03-World/Arena-Provinces.md): THE COUNTRYSIDE'S KILL DOOR - `?country=off` stands no hamlet, farm, inn,
+/** TESA7: THE COUNTRYSIDE'S KILL DOOR - `?country=off` stands no hamlet, farm, inn,
  *  temple or shrine past the Bay; Arena's places stand as ever. No Features row: the countryside is the land's own.
  *  AUDIT-TESA A7-8: offline alone - online the land is the room's (forestsOn's law), and one player's door shut would
  *  stand none of the places, quest sites and names the others stand. */
@@ -961,7 +958,7 @@ export function countrysideOn(search) {
   return pageParam('country', search) !== 'off' || isOnlinePage(search);
 }
 
-/** TESA10 (bible/03-World/Arena-Provinces.md): THE CAPITALS' KILL DOOR - `?capitals=off` stands no capital the port
+/** TESA10: THE CAPITALS' KILL DOOR - `?capitals=off` stands no capital the port
  *  builds; Arena's place of its name stands as any of Arena's places. No Features row: the capitals are the land's own.
  *  AUDIT-TESA A7-8: offline alone, as the countryside's. */
 export function capitalsOn(search) {
@@ -998,9 +995,9 @@ export const FOREST_HIDDEN_LOCATION_TYPES = Object.freeze(new Set([4, 7, 9, 10, 
  *  CLIMB2: the body's Fatigue over its most (the grip's time), the pack's
  *  weight over what it can carry (the reach), and the Climbing tally the free
  *  climb takes at the classic climb's cadence (climbingDeps' own). */
-/** CLIMB-NODE (FIELD BUGS 2026-10-01, Mac: "Hold it at nodes"): `hold` - whether the free climb's walk-in start is held
+/** CLIMB-NODE (FIELD BUGS 2026-10-01): `hold` - whether the free climb's walk-in start is held
  *  (the world host's: a profession's node under the look, or an act playing - player/motor.js _freeStart). */
-/** EG-PERFECT (2026-10-18; bible/11-Multiplayer/Elite-Gates.md section 10.5): `leap` - whether the running leap may fly here
+/** EG-PERFECT: `leap` - whether the running leap may fly here
  *  (player/motor.js _pkMayLeap, the leap at an edge and its late press): the made level's law (systems/madeLevel.js `runLeap`)
  *  refuses it on the Hour's Steps, whose every gap is proven with the plain jump. One home for the four
  *  hosts' motors (THE ONE CONSTRUCTION SEAM): the world host's made level answers, every other host's none. */
@@ -1371,7 +1368,7 @@ export function applyFallLanding(entity, distance, { hurt = null, sound = null, 
   // -1 the streaming world reports off terrain (indoors, dungeons).
   if (inOutdoorWater) return;
   if (distance > FALL_DAMAGE_THRESHOLD) {
-    const dmg = playerFallDamage(entity, distance);   // LOOT15 (bible/06-Systems/Loot-II-Arc.md section 7): the bill, the Long Road off it
+    const dmg = playerFallDamage(entity, distance);     // LOOT15: the bill, the Long Road off it
     // AUDIT 21 (hosts lane, F6): the no-`hurt` arm went through the ONE
     // damage door now, so a fatal fall outdoors or in a building raises the
     // death screen instead of leaving you walking around at 0 HP.
@@ -1612,7 +1609,7 @@ export function raisePlayerSkills(entity, { say = () => {}, onLevelUp = null, ro
       () => { say(setMasterSkills(entity, true).text); audio.playOneShot(SOUND.ArenaFanfareLevelUp, 1); },
       () => say(MASTER_SKILLS_DECLINED_TEXT));
   } else {
-    // SCHOOLS1 (bible/06-Systems/Arcane-Specialisations.md section 3): THE SPECIALISATION - two schools mastered and no
+    // SCHOOLS1: THE SPECIALISATION - two schools mastered and no
     // path yet, on a pass that put no other box up (a mastery's own choice comes first): asked ONCE a character,
     // decided by Yes (given up only for gold - SPEC-RESET, systems/specReset.js); No leaves it to the skill screen, which
     // offers every open path.
@@ -1630,7 +1627,7 @@ export function raisePlayerSkills(entity, { say = () => {}, onLevelUp = null, ro
           () => say(isEnhanced() ? pathDeclinedGrowthText() : pathDeclinedText()));
       }
     } else {
-      // MARTIAL1 (bible/05-Combat/Martial-Specialisations.md section 3): THE MARTIAL SPECIALISATION - two weapon skills
+      // MARTIAL1: THE MARTIAL SPECIALISATION - two weapon skills
       // mastered and none chosen, the arcane path's own law on a pass that put no other box up: ONE open asked about,
       // SEVERAL named and sent to the skill screen
       const martial = ask && !windowed ? nextMartialChoice(entity) : null;
@@ -1947,7 +1944,7 @@ export function sensesContext(entity, gameMinutes, { movingLessThanHalfSpeed = t
  *  ONE home: dungeonContext kept a second copy whose comment said the
  *  port had no source for the flag, which had stopped being true. */
 export function fatigueLossMultiplierFor(entity) {
-  // LOOT15 (bible/06-Systems/Loot-II-Arc.md section 7): the Pilgrim's Sandals' Long Road - the loot ladder's fold's
+  // LOOT15: the Pilgrim's Sandals' Long Road - the loot ladder's fold's
   // `fatigueLess` (entity._mods; empty with the ladder off), at most WARDROBE_FATIGUE_MOST off, laid over the career's
   // and the tart's below (still the one home: the helper is this function's alone, PROF9's lines as they stood)
   return careerTartFatigueLoss(entity) * (1 - Math.min(WARDROBE_FATIGUE_MOST, Math.max(0, Number(entity?._mods?.fatigueLess) || 0)) / 100);
@@ -2008,8 +2005,7 @@ function careerTartFatigueLoss(entity) {
  *
  *  NEVER TRAPS: a missing or undecodable video costs the video, not
  *  the return to the menu. */
-// FIX-E (2026-09-08, Mac: "when dying and returning to the main menu,
-// the game bugs and you're unable to make selections"): THE KILL CAME
+// FIX-E: THE KILL CAME
 // BEFORE THE NAVIGATION, WITH NOTHING IN BETWEEN THAT HAD TO END. This
 // seam claimed the frame first - the host loop dead from that instant,
 // its keydown ladder still attached and eating every key under the
@@ -2023,7 +2019,7 @@ function careerTartFatigueLoss(entity) {
 // which the host survives; the return in a `finally`, so every path out
 // navigates; and a watchdog, so "never settles" is a bounded wait.
 export const DEATH_VIDEO_WATCHDOG_MS = 30000;   // ANIM0012 runs well under this; a video that has not ended by then is not going to
-// DEATH1 (2026-09-15, Mac: "Black screen after death and pressing enter"):
+// DEATH1:
 // THE HOLD CAME BEFORE THERE WAS ANYTHING TO DRAW. holdFrame stops the
 // host drawing, and it was taken FIRST - then two dynamic imports and an
 // archive read of ANIM0012.VID ran before the video painted its first
@@ -2396,8 +2392,7 @@ export function createMusicDirector({ fm = null, play = null, stop = null, playi
  *           'modal'  - a mode host owns it; do nothing, and DO NOT LOOK
  *           'look'   - nobody is swinging; the drag is a look
  *
- *  MAC-O4 (Mac, 2026-09-16 follow-up: "still can't look while attacking
- *  in Click / Click or Hold"). WeaponSwingMode was a term this function
+ *  MAC-O4. WeaponSwingMode was a term this function
  *  never asked, so a held swing button ALWAYS ate the drag, in every
  *  mode. That is right for Gesture (0) - the drag over the held button
  *  IS the swing, tracked in playerWeapon.gesture()'s dx/dy trail - but
@@ -2493,15 +2488,13 @@ export function createRestDeps(entity, opts = {}) {
   let _place = REST_KIND.Rough;  // AUDIT SURV-TIERS: WHERE the running rest is, read at the open in every tier (see setResting)
   let _rules = null;             // SURV-TIERS: the running rest's tier rules (survival/difficulty.js), read at the open - null with the arc off
   let _roughHours = 0;           // rested hours paid at the rough rate - the stiff morning follows them
-  // PARTY-REST10 (2026-09-21, per-request: confirmed by testing - health frozen for 10 straight simulated
-  // hours under Rough, not merely "sometimes rounds down"): see systems/survival/rest.js's own `restHour` doc
+  // PARTY-REST10: see systems/survival/rest.js's own `restHour` doc
   // comment for the full explanation. This is the PERSISTENT carry `restHour` now accepts - one per running
   // rest, reset the moment a NEW rest opens (a fresh sleep owes nothing to whatever the last one banked), so
   // the fractional point Math.trunc would otherwise discard every single hour instead accumulates toward the
   // next one.
   let _roughCarry = { health: 0, fatigue: 0, magicka: 0 };
-  // PARTY-REST4b (2026-09-21, per-request: "only the leader heals up hp not the members" - the REAL bug behind
-  // PARTY-REST4's own fix, found on closer inspection): `setResting` below is ONE closure, made ONCE right here,
+  // PARTY-REST4b: `setResting` below is ONE closure, made ONCE right here,
   // reading only the `restKind` local this call's own destructure bound - never a property looked up off
   // whatever object it happens to be attached to. `partyRestMirrorDeps` (world.js) was spreading a `restKind`
   // KEY onto a COPY of this returned object, but the copy's `setResting` is the exact same function reference as
@@ -2611,7 +2604,7 @@ export function createRestDeps(entity, opts = {}) {
     // the last stage of the walk. Flatten here, once, for every host.
     endLines: (id) => plainLines(rest.endLines?.(id)),
   };
-  // REST1 (bible/06-Systems/Rest-Arc.md): THE ACT ONLINE, composed here beside the window's deps so the four hosts
+  // REST1: THE ACT ONLINE, composed here beside the window's deps so the four hosts
   // share one law (systems/rest/restAct.js). `restAct` answers the plan the window opens on - null offline, where the
   // window is DFU's own; `restNight` runs the night through THIS bag (the timed rest's own session, its sub-ticks,
   // quest ticks, hourly checks and vitals, in one call), stamps it, tops the yield up and spends a rented room's

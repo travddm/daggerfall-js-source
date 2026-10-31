@@ -1,4 +1,4 @@
-// VE4 (2026-10-05, Mac: "Put it in the codebase") - VANILLA ENHANCED SHIPS WITH THE PORT.
+// VE4 - VANILLA ENHANCED SHIPS WITH THE PORT.
 //
 // carademono's Vanilla Enhanced is Daggerfall's own textures remastered, and Port-Doctrine's A RENDER OF GAME DATA IS
 // GAME DATA kept it the player's to attach (VE3). Mac approved carrying it (Port-Doctrine records the exception), so
@@ -16,15 +16,14 @@
 // so `layers` answers the array from those files. Masked Roads' 403 array is 57 deep and Daggerfall Unity refuses it;
 // it is indexed with its depth and no slices, and the door's own depth law refuses it here too.
 //
-// AUDIT VE (Mac, 2026-10-05: "Ensure this is on by default. And performance isn't affected"):
+// AUDIT VE:
 //   - THE BASE IS ON BY DEFAULT (`ON_BY_DEFAULT`), as a mod in DFU's Mods folder is; its add-ons stay off until picked on
 //     the Texture Overhaul card. The player's own choice either way is kept (dfmodTextures.js DFMOD_SHIPPED_PREF).
 //   - THE DECODE IS A WORKER'S (P1, systems/vanillaEnhanced/vanillaEnhancedDecodeWorker.js): the fetch, the readback and the texture
 //     detail's fit run off the main thread, as an attached bundle's decode does in its own worker. A browser with no
 //     OffscreenCanvas in a worker, or node, decodes on this thread - the same pixels.
 //
-// ALIKR1 / SNOWFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These
-// should be on by default and integrate into our enhanced environments seamlessly."): TWO MORE PACKS SHIP THROUGH THIS
+// ALIKR1 / SNOWFALL1: TWO MORE PACKS SHIP THROUGH THIS
 // DOOR, ON BY DEFAULT - Sands of the Alik'r's desert ground (public/art/sands-of-the-alikr/, a loose pack in DFU) and
 // Snowfall's packaged winter ground (public/art/snowfall/, three archives the mod's bundle carries). Port-Doctrine
 // carries both as its second exception. They are the door's mods as Vanilla Enhanced's are - one load order, one walk,
@@ -45,7 +44,7 @@ export const VE_PACK_SOURCE = Object.freeze({ repo: pack.Source, commit: pack.Co
 /** The shipped mods, as the index lists them: `{ key, dir, index, slices }`. */
 export const VE_PACK_MODS = Object.freeze(pack.Mods.map((m) => Object.freeze({ ...m })));
 
-/** AUDIT VE: the shipped mods on until the player chooses otherwise - the Base (Mac: "Ensure this is on by default"). */
+/** AUDIT VE: the shipped mods on until the player chooses otherwise - the Base. */
 export const ON_BY_DEFAULT = Object.freeze(new Set(['base']));
 
 const fetchBytes = async (url) => {
@@ -154,8 +153,7 @@ export function vePackClient(mod) {
   };
 }
 
-/** ALIKR1 / SNOWFALL1: the environment packs - each `{ key, dir, index, root }`, on by default (Mac: "These should be
- *  on by default"). */
+/** ALIKR1 / SNOWFALL1: the environment packs - each `{ key, dir, index, root }`, on by default. */
 export const ENVIRONMENT_PACK_MODS = Object.freeze([sandsPack, snowfallPack].flatMap((p) => p.Mods.map((m) => Object.freeze({ ...m, root: p.Root }))));
 const SHIPPED = Object.freeze([
   ...VE_PACK_MODS.map((m) => Object.freeze({ key: m.key, index: m.index, open: () => vePackClient(m), on: ON_BY_DEFAULT.has(m.dir) })),

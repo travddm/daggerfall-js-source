@@ -1,4 +1,4 @@
-// SNOWFALL1 (2026-10-08): THE SNOW, STOOD ROUND THE PLAYER - DynamicSnowController, MidDetailSnowRing, StreamedSnow-
+// SNOWFALL1: THE SNOW, STOOD ROUND THE PLAYER - DynamicSnowController, MidDetailSnowRing, StreamedSnow-
 // BlanketPrototype, FarTrackMask, SnowContextData and BlanketSurfaceSamples, ported off the assembly over the law in
 // systems/snowfall.js. GL-free: it keeps the meshes and the masks as arrays and says what changed; render/snowfall-
 // Surface.js uploads and draws them, and scenes/snowfallHost.js hands it the frame and the world.
@@ -998,7 +998,7 @@ export class SnowfallRuntime {
     // Overworld journey under the travel view, kept every pixel the world destroyed meanwhile
     if (!B.active) {
       if (was) { B.queue.length = 0; B.queued.clear(); }
-      // MEM-AUDIT (2026-10-23): AND ITS OVERLAYS ARE PRUNED STILL. The prune below ran only while the tier was active, so
+      // MEM-AUDIT: AND ITS OVERLAYS ARE PRUNED STILL. The prune below ran only while the tier was active, so
       // an indoors or a journey under the travel view kept every overlay of the last ring - and each its tile, and the
       // tile its map pixel's whole entry, long after the world destroyed it. The same prune, on the same schedule: a tile
       // still standing keeps its overlay for the door or the view coming down, as before

@@ -284,8 +284,7 @@ export function equipItem(entity, item) {
 
 export const isEquipped = (item) => item.equipSlot != null;
 
-/** SWAP-HANDS (2026-10-08, the owner: "the game should also let you swap out left and right hand in the inventory (right
- *  now you have to put both in the inventory again and requip it)"): the pieces in the two hands change hands - each by
+/** SWAP-HANDS: the pieces in the two hands change hands - each by
  *  the hand law the equip table itself keeps (characters/equipTable.js getItemHands): a piece held in EITHER hand may go
  *  to the other, a shield (LeftOnly) never leaves the left, a right-only or two-handed weapon never the right. One held
  *  piece that may change hands crosses to the empty one. Answers `{ ok: true }` or `{ ok: false, why }` - words for the
@@ -382,7 +381,7 @@ export function seedStartingEquipment(entity) {
   // SURV2: a new character sets out with provisions - two sacks of
   // rations, a full waterskin, the road's cloak and shoes, worn camping
   // gear and a full Campfire (survival/items.js startingProvisions; the
-  // mod's own start, plus the port's fire). Every tier with the arc on - Boons, Casual and Hard - never Off, by decision (Mac, 2026-09-23: "No, not off.. theres no reason to have it in off" - SURV-KIT, withdrawn). AUDIT C&C I7: it said a fire kit with two lights left (REST2 made it a full Campfire) and "Casual and Hard alone" (Boons has the kit).
+  // mod's own start, plus the port's fire). Every tier with the arc on - Boons, Casual and Hard - never Off, by decision (- SURV-KIT, withdrawn). AUDIT C&C I7: it said a fire kit with two lights left (REST2 made it a full Campfire) and "Casual and Hard alone" (Boons has the kit).
   if (survivalOn()) for (const it of startingProvisions(entity)) entity.items.push(it);
 }
 
@@ -508,11 +507,10 @@ export const bodyPartForSlot = (slot) => SLOT_BODY_PART.get(slot) ?? -1;
 const PLURAL_BREAK_TEMPLATES = new Set([103, 104, 108]);   // Armor.Gauntlets, Greaves, Boots
 
 /** THE SCALE ON A BLOW'S WEAR - 1, Daggerfall Unity's own. BALANCE1
- *  (2026-09-27) set it to 0.6 because the default game wore gear through
+ *  set it to 0.6 because the default game wore gear through
  *  the combat overhaul's wear module (~2.8x DFU on a weapon per landed
  *  hit, ~15x on armour) and Roleplay Realism's equipDamage (armour x5).
- *  WEAR-VANILLA (2026-10-01, the repair triage: "Disable the modded
- *  feature that increases durability loss. Vanilla values work fine")
+ *  WEAR-VANILLA
  *  turned those modules off by default (modSettings.js) and this back to
  *  1, so a blow wears what DFU's DamageEquipment says. The seam stays on
  *  every blow's path - DFU's, the two mods' (a player may still turn them
@@ -525,8 +523,7 @@ let _wearScale = CONDITION_WEAR_SCALE;
  *  No argument puts the port's scale back. */
 export function _wearScaleForTests(scale = CONDITION_WEAR_SCALE) { _wearScale = scale; }
 
-/** WEAR-TWICE (2026-10-02, the field, of the economy triage: "maybe we overdid it too much. Good changes all around but
- *  I still want there to be some challenge"; asked which lever, "Faster wear"): THE PORT'S OWN WEAR IS TWICE DFU'S. A
+/** WEAR-TWICE: THE PORT'S OWN WEAR IS TWICE DFU'S. A
  *  blow's DamageEquipment amount - (10 x damage + 50) / 100, the 20% floor roll's 1 included - is doubled where DFU's
  *  member wears gear (formulas.js damageEquipment: the overhaul's core and DFU's own) and on a duel's blade
  *  (scenes/world.js). At DFU's own rate (WEAR-VANILLA) a steel longsword lost about 6.5% of itself to a hundred swings
@@ -534,7 +531,7 @@ export function _wearScaleForTests(scale = CONDITION_WEAR_SCALE) { _wearScale = 
  *  is capacity, supplies and wear, never price", 06-Systems/Economy-Arc.md). The mods' own wear modules, which a
  *  player may turn on offline, keep their own amounts; repairs keep REPAIR-RATE's third. A whole number, so it draws
  *  no roll. A departure (Ledger A, WEAR-TWICE).
- *  WEAR-ONE (2026-10-02, Mac: "we need to buff gear durability because its really bad"; asked how much, "Daggerfall's
+ *  WEAR-ONE (2026-10-02,; asked how much, "Daggerfall's
  *  rate (1x)"): TWICE WAS TOO MUCH - a 50-point dagger or bow broke in about 25 landed blows, and every blow cost at
  *  least 2 (the doubling came after the 20% floor roll's 1). The multiple is 1 again: DFU's own amount. The seam stays,
  *  so a later tuning is one number. [SUPERSEDES WEAR-TWICE's 2.] */

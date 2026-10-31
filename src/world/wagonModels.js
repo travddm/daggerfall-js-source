@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac, sending his three wagons: "1. Is a replacement model for the current cart ingame 2. Theres
-// an open wagon ... 3. Is a closed wagon varient"): THE THREE WAGONS, BUILT FOR THE CART'S PRESENTATION.
+// WAGONS1: THE THREE WAGONS, BUILT FOR THE CART'S PRESENTATION.
 //
 // Mac's models (src/assets/wagons/*.json, baked by tools/bakeWagons.mjs - each in its wagon's frame: metres, +x its
 // right, +y up, +z the way it is pulled, the origin on the ground under its rear wheels' centres) built here into the
@@ -78,7 +77,7 @@ export const CART_REST_PITCH_DEG = (() => {
 
 /** The turn that stands the cart level (cartLevel's). */
 const CART_LEVEL = quatAngleAxis(-CART_REST_PITCH_DEG, [1, 0, 0]);
-/** WAGON-UV (2026-10-10, from play: "The small cart is really off angle"): A POINT OF THE CART TURNED LEVEL - about its
+/** WAGON-UV: A POINT OF THE CART TURNED LEVEL - about its
  *  axle (`about` its height; 0 turns a direction), by its rest's fall undone (fromLevel's turn the other way), in the
  *  bake's frame before the lift. The cart's pictures are laid on these: laid planar on the faces as Mac drew them -
  *  tipped 10.1 degrees on the axle - its boards ran level with the GROUND, so on the box they stood 10 degrees off its
@@ -90,7 +89,7 @@ export function cartLevel(p, about = MEASURED.cart.axleY) {
   return [r[0], r[1] + about, r[2]];
 }
 
-/** WAGON-UV (2026-10-10, from play: "the windows on the wagon arent centered properly"): A CARAVAN SIDE'S u, laid from
+/** WAGON-UV: A CARAVAN SIDE'S u, laid from
  *  the body's middle - its livery's (BANDS.caravanSide) and its room's walls' (world/caravanRoomModel.js, so the glass
  *  still meets). planarUv ran it from the rear axle (z 0), and the two windows - one a tile (`tile`, 2.9 m) - stood
  *  0.3 m from the body's front end and 1.7 m from its rear. Here the body's middle is half a tile past a window's
@@ -175,7 +174,7 @@ function lifted(g, dy = -LIFT) {
 
 /** The pole a four-wheeler is drawn by (it has no shafts): from its front axle forward to where the horse stands
  *  (`hitch` m ahead of the rear axle, the kind's), a doubletree across its end and the hounds braced back to the axle.
- *  WAGONS3 (Mac: "requiring 2 horses"): a PAIR's pole - run on between the two horses to their collars (`TEAM.poleTip`
+ *  WAGONS3: a PAIR's pole - run on between the two horses to their collars (`TEAM.poleTip`
  *  past the hitch) with the neck yoke across its tip, and the doubletree across it behind their hocks, a singletree at
  *  each end where that horse's traces meet it (`TEAM.tree`). */
 function poleGeometry(bench, kind) {
@@ -190,8 +189,7 @@ function poleGeometry(bench, kind) {
 }
 
 /**
- * WAGONS3 (2026-10-10, Mac: "requiring 2 horses to use" and "Proper animated rope mechanics that connect the horses to
- * the wagon"): THE TEAM, measured on the horse the pool draws (scenes/horseCartPool.js - the mod's billboard, 121 x 94
+ * WAGONS3: THE TEAM, measured on the horse the pool draws (scenes/horseCartPool.js - the mod's billboard, 121 x 94
  * pixels at the global scale: 3.03 m long, 2.35 m high, its body HORSE_BOX_SIZE's 2.6 m) in a horse's own frame (metres:
  * +x its right, +y up, +z the way it faces, the origin on the ground under its middle). A pair stands `side` either side
  * of the pole; each horse's two TRACES run from its `collar` (either side of its chest) back to the ends of its
@@ -217,7 +215,7 @@ export const teamSidesOf = (kind) => (WAGON_KINDS[kind]?.horses === 2 ? [-TEAM.s
  *  the hips). Null for a kind with no bench - the Small Cart's driver rides its horse, the mod's own way. The seat a
  *  pool stands is this one (buildBakedWagonParts `driver`), drawn under the cart's tilt as a back seat is (none tilts:
  *  the cart has none). */
-// FLAGGED: the Small Cart has no bench (Mac's choice) - its driver rides its horse the mod's way, and RIDE-POV keeps the Morrowind body in the head on it (bible/06-Systems/Wagons.md WAGONS3).
+// FLAGGED: the Small Cart has no bench (Mac's choice) - its driver rides its horse the mod's way, and RIDE-POV keeps the Morrowind body in the head on it (WAGONS3).
 export function driverSeatFor(kind) {
   const b = MEASURED[kind]?.bench;
   if (!b) return null;
@@ -226,7 +224,7 @@ export function driverSeatFor(kind) {
 /** WAGONS3: the reins' hands over the seated feet - a hand's breadth over the lap (SEATED_HIP_HEIGHT), not a card
  *  table's SEAT_TOP_DEFAULT. */
 export const DRIVER_HANDS_TOP = SEATED_HIP_HEIGHT + 0.11;
-/** BENCH-CAM (2026-10-10, from play: "this is what i see when i use my carriage" - the camera in the driver's head):
+/** BENCH-CAM:
  *  how far over a bench wagon's top (its `shell`, the body's box) the third-person camera's pivot stands while its
  *  driver sits the bench - the caravan's room and the open wagon's tilt both stand higher than the seated head, so a
  *  camera turning about the head met the wagon a hand's breadth behind it whichever way it looked. */
@@ -254,7 +252,7 @@ const rollRadius = (part, pivot) => { let lo = Infinity; for (let i = 1; i < par
 export const BOGIE_ROLES = Object.freeze(['axleFront']);
 
 /**
- * WAGONS2 (2026-10-09, Mac: "Real wheel movement"): THE LOCK - how far a four-wheeler's front axle may turn on its
+ * WAGONS2: THE LOCK - how far a four-wheeler's front axle may turn on its
  * kingpin (degrees, either way) before a front wheel's rim cuts into what stands beside it. Measured off the bake (its
  * ground frame, before the lift): each front wheel a disc of its roll radius about its pivot, its inner face at its
  * innermost x; each static part beside it (narrower than that face, its foot below the wheel's top) a wall at its
@@ -332,7 +330,7 @@ export function wagonGeometry(bake) {
 
 /** The bounds of every point a wagon's geometry has (its statics and its wheels in place) - the parked wagon's
  *  collider (DeployedWagonVisual's BoxCollider over the model's bounds). WAGONS2: its bogie as it stands straight.
- *  WAGONS3 (Mac: "Spawning the wagon can trap you under the wagon"): its front axle, never its pole - a pair's pole runs
+ *  WAGONS3: its front axle, never its pole - a pair's pole runs
  *  on between the two horses to their collars, and a box to its tip stood round the team and the player beside it. */
 function boundsOf(geo) {
   const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
@@ -390,7 +388,7 @@ export function doorFor(kind) {
 }
 
 /**
- * WAGONS3 (2026-10-10, Mac: "All the wagons/carts are oversized in the overworld"): A DRIVEN RIG'S GROW UNDER THE
+ * WAGONS3: A DRIVEN RIG'S GROW UNDER THE
  * OVERWORLD. OW-BIG grows the traveller `g` times (player/travelCamera.js tvOwnGrow - 10 at the view's own height) so a
  * body reads from hundreds of metres up, and WAGON-HITCH grew a driven wagon with its rider by the same `g`: a horse and
  * rider read 30 m long, and the wagons behind them 60, 95 and 100 m - longer than the towns they drove past. A rig is

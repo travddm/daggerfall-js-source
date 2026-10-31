@@ -1,11 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAL11 (2026-10-17) — THE HERO'S THREAT: past level 10 and Renown 15 the foes answer the hero.
+// BAL11 — THE HERO'S THREAT: past level 10 and Renown 15 the foes answer the hero.
 //
 // The field report (the Discord, LostMyLeg, 2026-10-17): "with all the systems we have in place the game gets too
 // easy pretty early, i would say starting around character level 10/renown 15ish ... they prob need like 4x-6x more
 // damage and 2x-3x more hp ... Those multipliers should also count to every type of mobs elite etc ... early game is
-// fine". Mac handed it over to be calculated rather than guessed (bible/05-Combat/Balance-Arc.md section 17).
+// fine". Mac handed it over to be calculated rather than guessed.
 //
 // THE MEASUREMENT (section 17.2): a stated player at every level against DFU's own encounter band at that level, through
 // the real overhaul blow both ways, with the online layer (Renown's health, the Firmament's blow and guard channels at

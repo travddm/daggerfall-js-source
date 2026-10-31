@@ -1,5 +1,4 @@
-// L10N1 (2026-09-27, the request: "a proper localization/translation integration for our game ... for as many
-// languages as we possibly can and do this right"). DAGGERFALL UNITY'S TEXT CORE, AND THE PORT'S LOCALES ON TOP OF IT.
+// L10N1. DAGGERFALL UNITY'S TEXT CORE, AND THE PORT'S LOCALES ON TOP OF IT.
 //
 // What DFU has, ported 1:1 (the doctrine's translation rule):
 //   - TextManager.cs - the ten string-table collections, GetLocalizedText (the runtime collection, then the default

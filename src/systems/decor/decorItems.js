@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR2a (2026-09-25) — YOUR OWN THINGS IN A ROOM.
+// DECOR2a — YOUR OWN THINGS IN A ROOM.
 //
-// Mac, on what decor is: "rare misc artifacts and other items in the
-// world can also be placed"; asked, placing one is "Free and can be
+// asked, placing one is "Free and can be
 // picked back up", and a home, house or ship sold with them standing
 // gives them "Back to pack". So an item of the player's own - a gem, a
 // painting, a statue, a candle, an artifact - leaves the pack, stands
@@ -20,13 +19,12 @@
 //
 // Weapons and armour are not stood: they are MOUNTED (DECOR2c).
 //
-// DECOR2c (2026-09-25) — THE MOUNTS. Mac: "a way to display your
-// weapons"; asked, "Mounted": a weapon (arrows aside) or a shield hangs
+// DECOR2c — THE MOUNTS.; asked, "Mounted": a weapon (arrows aside) or a shield hangs
 // FLAT against the wall it is set on, as its detailed pack picture -
 // the list's own, the owner's body's (net/decorLaw.js decorIsMount;
 // scenes/decor/decorRoom.js hangs it). Free, and back to the pack whole when
 // taken down, as every own thing is. Its dye is read off its numbers,
-// so every client wears it the same. ARMOR-MOUNT (2026-09-26): any
+// so every client wears it the same. ARMOR-MOUNT: any
 // piece of armour hangs so too, not the shields alone.
 // ═══════════════════════════════════════════════════════════════════
 
@@ -76,7 +74,7 @@ export function decorDescriptorOf(item) {
   const a = item.artifact ? ((bits & 1) ? bits >> 1 : DECOR_ARTIFACT_UNKNOWN) : null;
   // HUNTERS-MARK: a trophy's beast rides its message too, so a visitor hangs and names the same beast
   const p = (item.group === 'Paintings' || item.group === 'Books' || item.templateIndex === TROPHY_TEMPLATE) && Number.isSafeInteger(item.message) ? item.message : null;
-  // PROF4 (bible/06-Systems/Professions-Arc.md 25): a crafted piece's provenance, and its mark where its name carries
+  // PROF4 (25): a crafted piece's provenance, and its mark where its name carries
   // one - online the service writes the mark from its own row, whatever this sends
   const pv = typeof item.provenance === 'string' && PROVENANCE_RE.test(item.provenance) ? item.provenance : null;
   const mk = pv && (item.marked === true || item.quality === MASTERWORK) ? makerMark(item.maker) : null;   // TEXT-F1: a mark the filter lets stand
@@ -196,6 +194,6 @@ export function decorOwnEntry(item, index, identity = undefined) {
   };
 }
 
-/** What a sale says of the owner's own things that stood in the room - back in the pack (Mac: "Back to pack"). */
+/** What a sale says of). */
 export const decorOwnBackLine = (n) => (n === 1 ? 'One of your things that stood in it came back to your pack.'
   : `${n} of your things that stood in it came back to your pack.`);

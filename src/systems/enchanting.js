@@ -115,7 +115,7 @@ export const armorEnchantmentMultiplier = (material) =>
  *  for WEAPONS and ARMOR; everything else (a ring, a robe) takes its
  *  template's base points untouched, because the multiplier stays 0.
  *  The FloorToInt is the quirk - see the header.
- *  PROF10 (bible/06-Systems/Professions-Arc.md 9.3, 36): a CRAFTED
+ *  PROF10 (9.3, 36): a CRAFTED
  *  piece of jewellery carries its own base - the item's own
  *  `enchantmentPoints` (DFU's item field, itemFields.js), its template's
  *  and the share its metal and its gem add (net/recipeLaw.js
@@ -147,7 +147,7 @@ export function enchantmentRowCost(e) {
  *  item law reads a row so (itemLaw.js isMakerRow), and the temple's lift never takes one (lootCurse.js liftCurse). */
 export const makerLaid = (e) => e?.enchantCost !== undefined;
 /**
- * MAKER-RARE (FIELD BUGS 2026-10-26, the owner: "You cant enchant masterwork/rare armor"): A RARE THE ITEM MAKER TAKES.
+ * MAKER-RARE (FIELD BUGS 2026-10-26): A RARE THE ITEM MAKER TAKES.
  * A Rare - a loot door's, or a Masterwork's (smithItems.js mintPiece) - carries one of DFU's catalogue enchantments as
  * its flavour (lootRarity.js applyRarity) and a cursed one its drawback beside it (cursePiece), so DFU's refusal of an
  * enchanted item (AddFilteredItem :419-422) left every Rare out of every tab; J2 had opened the door for a crafted
@@ -173,7 +173,7 @@ export function rareKeeps(item) {
  * THE ENCHANTMENTS A PIECE KEEPS in the item maker. DFU's maker refuses any enchanted item (AddFilteredItem :415-443);
  * two doors take one with what it carries, each row kept at the head of its list, counted in the guard and the
  * filters, never taken off:
- * - AUDIT PROF10 J2 (DECIDED, Mac: "Item maker can add to it" - bible/06-Systems/Professions-Arc.md 36): a crafted piece
+ * - AUDIT PROF10 J2 (DECIDED,  36): a crafted piece
  *   of jewellery (craftedJewelRecipe), every row costed as the maker costs a row (the catalogue's - never a cost the item
  *   says of itself) against its budget - its Rare roll was drawn among those its points hold (J4).
  * - MAKER-RARE: an identified Rare (rareKeeps), the rows its ladder rolled costing none of its points, the maker's own
@@ -310,7 +310,7 @@ export function enchantDecision(item, powers = [], sideEffects = [], { gold = 0,
   // AUDIT PROF10 J2: a kept piece's enchantments count against its points (GetTotalEnchantmentCost's own walk - a Rare's own
   // at nothing, MAKER-RARE), and cost no gold - they are on it already
   const cost = totalEnchantmentCost(powers, sideEffects) + enchantmentListCost(keptEnchantments(item) ?? []);
-  // PROF12 (bible/06-Systems/Professions-Arc.md 9.3: "Enchanting (DFU's item maker, unchanged): cost -10% at Journeyman,
+  // PROF12 (9.3: "Enchanting (DFU's item maker, unchanged): cost -10% at Journeyman,
   // -20% at Master (Efficient -5% more)"): online, the enchanter's gold with the rank's share off (net/alchemyLaw.js
   // enchantGold) - none offline and none asked, DFU's own ladder whole
   const goldCost = enchantGold(totalGoldCost(powers), discountPct);

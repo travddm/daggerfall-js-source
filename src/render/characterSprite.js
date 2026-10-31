@@ -52,15 +52,14 @@ export function drawCharacterSprite(renderer, canvas, rig, rigMat, proj, view, e
  * (the voxel rigs measure Y-up rig bounds; the Morrowind body measures
  * its Z-up assembly and maps axes before calling).
  */
-/** MW-D43b (Mac: "3rd person is still pixelated"): `pixel` defaults to
+/** MW-D43b: `pixel` defaults to
  *  CHAR_PIXEL, which is the SPRITE standard and stays the law for every
  *  Daggerfall character drawn through here. The Morrowind third-person
  *  body is not one - it is the same mesh the first-person arm is, and
  *  MW-D43 already gave that its own dial while missing this pass, which
  *  is the OTHER half of the same picture and the half Mac was looking
  *  at when he said it was still wrong. */
-/** PR-BOW1 (2026-09-24, player report: "Equipping a bow enlarges your
- *  character"): `anchor`, optional - the point the picture is OF. The
+/** PR-BOW1: `anchor`, optional - the point the picture is OF. The
  *  ortho image is true world size, so where the quad stands sets the
  *  figure's size on screen, and it stood at the box's CENTRE - which gear
  *  moves. Weapon Sheathing's iron longsword runs y 2.9..59.5 out from its
@@ -94,7 +93,7 @@ export function bodyFxPad(fx) {
  *  them all. */
 export function drawRigSpriteBox(renderer, canvas, mesh, rigMat, { center, halfW: boxW, halfH: boxH, anchor = null, hitFlash = 0, conceal = null, up = null, fx = null, also = null, glowLook = null }, proj, view, eye, pixel = CHAR_PIXEL) {   // WEAPON-GLOW1: `glowLook` the held weapon's glow, whose outline needs room
   const aim = anchor && Math.hypot(anchor[0] - eye[0], anchor[1] - eye[1], anchor[2] - eye[2]) > 1e-6 ? anchor : center;   // PR-BOW1: the ray the picture is taken along
-  // BODY-FLAT (2026-10-23, a player: "The billboard look still has the same issue"; asked, a true flat sprite): THE
+  // BODY-FLAT: THE
   // BILLBOARD LOOK IS A CLASSIC FLAT. Its card was upright with the picture taken down the PITCHED ray, so the eye
   // foreshortened the body twice - cos(pitch) of its height, and up close, where the ray to a body's middle points nearly
   // straight down, a body squashed to a sliver. A Daggerfall flat is a picture drawn level, stood upright: the picture is
@@ -108,8 +107,7 @@ export function drawRigSpriteBox(renderer, canvas, mesh, rigMat, { center, halfW
   const lvl = Math.hypot(dx, dz);
   const dist = flat ? lvl : Math.max(0.5, Math.hypot(dx, dy, dz));
   const camDir = flat && !(lvl > 1e-6) ? levelHeading(view) : [dx / dist, dy / dist, dz / dist];
-  // MWHEAD1 (2026-09-25, Mac: "The morrowind's model's head gets cut off in third person view" - the top sliced flat,
-  // the same at every zoom): THE WINDOW IS THE BOX AS THE PICTURE SEES IT. The picture is an ortho along camDir, and
+  // MWHEAD1: THE WINDOW IS THE BOX AS THE PICTURE SEES IT. The picture is an ortho along camDir, and
   // camDir is PITCHED - the third-person eye sits at the head (mwCamera FOCAL_HEIGHT) and looks down the ray to the
   // body's middle. Tilted by p, a box point `v` above the centre and `h` further along the view draws at picture height
   // v cos p + h sin p, so the box's far top corner stands above `halfH` whenever h sin p > halfH (1 - cos p). The
@@ -125,14 +123,13 @@ export function drawRigSpriteBox(renderer, canvas, mesh, rigMat, { center, halfW
   let halfH = boxH * Math.sqrt(1 - tilt * tilt) + halfW * tilt;
   const rl = Math.hypot(camDir[0], camDir[2]) || 1;
   const right = [-camDir[2] / rl, 0, camDir[0] / rl];   // horizontal billboard right (classic Y-only rotation)
-  // BODY-LEAN (2026-10-12, the owner: "when using morrowind models, depending on your camera position other sprites can
-  // shrink or grow, same goes for the horse"): THE QUAD LEANS BY THE PICTURE'S OWN UP. The picture is taken down the
+  // BODY-LEAN: THE QUAD LEANS BY THE PICTURE'S OWN UP. The picture is taken down the
   // pitched ray, so it is already the body as the eye sees it; pasted on an UPRIGHT quad, the same eye foreshortened it a
   // second time - every body and 3D horse stood cos(pitch) of its height: 0.97 from a level third-person eye, 0.64 from
   // a camera 50 degrees above it, 0.34 at 70, so a body grew and shrank as the camera rose and fell or walked up to it.
   // Leaned by lookAt's own y for the ray, the quad stands square to it and the body draws its true size from any eye.
   // The travel view's lean (AUDIT OW4 J6) is the view's own, the flats' with it, and stands where it is handed.
-  // BODY-CARD (2026-10-14, the owner: "Reimplement the billboard morrowind look as a toggle"): the Billboard Look
+  // BODY-CARD: the Billboard Look
   // (features.js mw-billboard-look, off by default) stands the card upright again, as before BODY-LEAN - the flats' way;
   // BODY-FLAT, above, takes its picture level.
   const qUp = up ?? (flat ? WORLD_UP : pictureUp(camDir));   // AUDIT OW4 J6: the quad's vertical
@@ -182,8 +179,7 @@ export function drawRigSpriteBox(renderer, canvas, mesh, rigMat, { center, halfW
   return { center: at, halfW, halfH, pw, ph };
 }
 
-/** MW-DETAIL (2026-10-22, a player's report: "morrowind 3d models are always pixelated ... this should probably be
- *  optional"): THE MORROWIND MODELS' TEXEL, in screen pixels - the viewer's own (features.js mw-model-detail,
+/** MW-DETAIL: THE MORROWIND MODELS' TEXEL, in screen pixels - the viewer's own (features.js mw-model-detail,
  *  `mwModelDetail`). Pixelated, the default, is MW_ARM_PIXEL, the owner's look; Sharp is one pixel. Read where each
  *  Morrowind picture is sized - a body and a 3D horse (drawBodyPicture), the first-person arm (combat/fpArm.js) and the
  *  rider's horse in first person (world/horseRig.js) - so it lands at once. */
@@ -197,8 +193,7 @@ const WINDOW_DEPTH = Object.freeze({ window: true });
 const CROP_PV = new Float32Array(16);
 const CROP_CORNERS = new Float64Array(24);
 /**
- * BODY-CROP (2026-10-22, a player's report: "when the player's camera gets too close to a morrowind 3d character model,
- * the model starts to stretch in weird ways and it gets shorter"): THE PICTURE IS THE MAIN CAMERA'S OWN, CROPPED TO THE
+ * BODY-CROP: THE PICTURE IS THE MAIN CAMERA'S OWN, CROPPED TO THE
  * BODY. drawRigSpriteBox's picture is an ortho down the eye's ray to the anchor, laid on one quad square to that ray -
  * true while the body is small against its distance, wrong up close. From the third-person eye a metre behind a 1.8 m
  * body (FOCAL_HEIGHT, a 60-degree lens) the ray pitches 41 degrees, the quad's top leans away and its foot toward the
@@ -323,7 +318,7 @@ export function drawBodyPicture(renderer, canvas, mesh, rigMat, box, proj, view,
 }
 
 /**
- * BODY-DEPTH (2026-10-15, the owner: "The models also clip through geometry"): WHERE A PICTURE'S TEXELS STAND. Every
+ * BODY-DEPTH: WHERE A PICTURE'S TEXELS STAND. Every
  * body is a picture composited as one quad, and the quad was depth-tested as itself - a flat card through the body's
  * middle: a corpse lying toward the eye had its near half under the floor's depth and was cut off by it, and a body at a
  * wall was cut where the card crossed the wall, whatever the body itself was doing. The picture is an ortho down `dir`
@@ -381,7 +376,7 @@ export function landAnchor(center, anchor, dir, right, quadUp = WORLD_UP) {
  * fixed RT (both shrink together so the overlay never squashes;
  * pixel size grows slightly past ~3.5k-wide displays).
  */
-// ON ICE (2026-08-17, Mac): the voxel FP viewmodel is parked in
+// ON ICE: the voxel FP viewmodel is parked in
 // favor of the TRUE classic method (combat/fpsWeapon.js, WEAPON*.CIF
 // per FPSWeapon). No consumer; kept whole with its probe
 // (tools/fpProbe.mjs) and pins for a reversible thaw.

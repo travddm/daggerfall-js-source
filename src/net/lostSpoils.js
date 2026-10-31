@@ -1,6 +1,5 @@
 // @ts-check
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss"; asked, "Mail the leftovers"): THE LOST AND FOUND, AS THIS CLIENT SEES IT - the one route a floor's
+// LOST-SPOILS: THE LOST AND FOUND, AS THIS CLIENT SEES IT - the one route a floor's
 // leftovers are sent by, and the door the spoils pools are handed (scenes/spoilsPool.js `mail`): the gate's court and the
 // Hour's pool (the Brass Remnant's arena and a breach's Redoubts). The law is net/lostLaw.js; the service's half,
 // server-account/src/lostSpoils.js.

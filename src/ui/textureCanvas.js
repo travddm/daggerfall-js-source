@@ -225,7 +225,7 @@ export function requestIcon(archive, record, { scale = 2, onReady = null, dye = 
 // ── UI1: THE PICTURE FITTED TO ITS SLOT ──────────────────────────
 //
 // requestIcon draws a record at a whole-number scale, and the sheet then SHRANK what it drew into a 30px cap: a
-// longsword's 176px canvas at 30, a gem's 22 at 22 in a 56px slot (bible/10-UI/Slots-Hotbar-Status.md UI0). This is
+// longsword's 176px canvas at 30, a gem's 22 at 22 in a 56px slot (UI0). This is
 // the door a slot asks instead: the picture at its own size (scale 1, through the door above - its vendored arm, its
 // replacement by the dye, its classic record with the mask stripped - or a model's bake), fitted to the slot's BOX by
 // the law in ui/iconFit.js and made at exactly the device size it is drawn at (bitmapCanvas.js fitCanvas), so the
@@ -238,7 +238,7 @@ let _fittedGen = '';           // AUDIT VIRT: the attached-mod set the kept pict
 /** AUDIT UI A4: how many fitted pictures are kept - every zoom and every HUD scale is a new set, and a picture that never
  *  comes held its waiters for good. Past this the one asked for LEAST RECENTLY goes, and its waiters with it (a picture
  *  on screen keeps its source; asked again, it is made again).
- *  VIRT (2026-10-16): 600 was under one long store's pictures at the pack's box and the loot window's together (312
+ *  VIRT: 600 was under one long store's pictures at the pack's box and the loot window's together (312
  *  kinds, 624 pictures, measured), so a pass down it made every picture again. 2000 now, and a hit goes to the back of
  *  the line - what a screen keeps asking for is what stays. */
 export const FIT_CACHE_MAX = 2000;
@@ -369,8 +369,7 @@ export function showFitted(img, pic) {
 /** Test seam, and the door a host would use to warm a list up front.
  *  Resolves to the data URL or null - never throws.
  *
- *  DECOR-MODFLATS (2026-09-27, Discord: "Above #49 decorations stopped working. Most sprites decorations are invisable
- *  above this number"): IT WAITS FOR THE PICTURE, landed or missed. It waited for the classic archive's read and four
+ *  DECOR-MODFLATS: IT WAITS FOR THE PICTURE, landed or missed. It waited for the classic archive's read and four
  *  turns after it - time enough for a classic record, whose drawing is synchronous once the file is read, and for a
  *  replacement already decoded. A MOD's picture (Detailed Ships' 1210 and 1230, the port's DET stand-ins past 10000)
  *  has no classic file, whose read fails at once, and decodes in its own time - so the answer was read before it

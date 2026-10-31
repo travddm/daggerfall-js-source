@@ -1,6 +1,5 @@
 // @ts-check
-// SEASON-BOOK (2026-10-22, the owner: "I think we need a new pause menu icon, like we did for the timers and mail. A
-// condensed place to see season related content and descriptions"; bible/10-UI/UI-Arc.md SEASON-BOOK) - THE SEASON'S
+// SEASON-BOOK - THE SEASON'S
 // LAW FOR THE PAUSE FACE'S LAUREL: what the season window shows, built from what the world host already holds. Pure: the
 // clock, the seats' word and each board's last answer in, the window's sections out (ui/enhanced/enhancedSeason.js draws
 // them).

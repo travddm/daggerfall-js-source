@@ -1,5 +1,5 @@
 // @ts-check
-// LW3 (2026-10-04, bible/06-Systems/Living-World.md): THE ROADS - where a town's travellers go, when, by which way, and
+// LW3: THE ROADS - where a town's travellers go, when, by which way, and
 // where on it they are at any minute of the sky's clock. Pure, like the rest of the living world (LW0 decision 2): the
 // towns near (the MAPS rows the host hands, the game's own rows alone so every client reads the same), the way (the
 // Travel Options planner's on Hazelnut's roads - `systems/travel/travelRoute.js planRoute` - asked through the host, cached
@@ -55,7 +55,7 @@ export const TRIP_RANGE_PX = Object.freeze({ merchant: [3, 14], adventurer: [3, 
 export const STAY_DAYS = Object.freeze({ merchant: [1, 2], adventurer: [1, 1], pilgrim: [1, 2], courier: [0, 1], pedlar: [0, 1] });
 /** The most sellswords a merchant hires for the road. */
 export const HIRE_MAX = 3;
-/** LW9 (bible/06-Systems/Living-World-II.md): THE ROAD'S NEW TRAFFIC's own tables, beside the first's - each job's pace,
+/** LW9: THE ROAD'S NEW TRAFFIC's own tables, beside the first's - each job's pace,
  *  cycle (days), chance a cycle, reach (map pixels) and stay (days). A patrol's and a noble's people ride with their
  *  leader (`leaderOf`) as a sellsword rides with its merchant, and keep no tables of their own. */
 export const ROAD_PACE = Object.freeze({ carter: 0.8, hunter: 1, patrol: 1, noble: 0.85, retainer: 0.85, minstrel: 0.95 });
@@ -89,7 +89,7 @@ export const PATROL_COVER_DAYS = 2;
 export const PATROL_RISK = 0.5;
 /** The farthest a traveller's home can be from a town and still be read for visitors or the roads (map pixels). */
 export const TRIP_REACH_PX = 18;
-/** OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): the key a host keeps a
+/** OW-HITCH: the key a host keeps a
  *  `townsNear(px, py, r)` answer by - a number, one a pixel and a reach (any reach, and any pixel of the world's grid:
  *  WW1, world/worldWide/worldGrid.js worldPixelKey - the first key held half a map past the Bay's 1000 x 500 and two
  *  pixels of the land past it shared one),
@@ -109,7 +109,7 @@ export const DIVE_MIN = Object.freeze([240, 600]);
 export const SEA_CHANCE = Object.freeze({ merchant: 0.4, pilgrim: 0.3, courier: 0.35, pedlar: 0.2, adventurer: 0.15 });
 export const SEA_PACE_X = 3;
 export const SEA_TIDE_H = Object.freeze([6, 9]);
-/** WW7-11 (bible/03-World/World-Wide.md; the owner, 2026-10-26, on passages past the Bay being rare: "Make them longer"):
+/** WW7-11 ():
  *  THE LONGEST PASSAGE a traveller books, in the calendar's days - the longest way a lane of the world is let have (a
  *  crossing lane's, scenes/naval/worldLanes.js CROSS_LANE_PATH_PX: 1,216 map pixels, 996 km) out and back at SEA_PACE_X,
  *  with the longest stay and the turn-round (seaTrip's span). A FAR lane's passage (past the Bay or across its edge -
@@ -155,7 +155,7 @@ export const DRY_STEP_N = 80;
  *   adventurer's dives). LW5b: the Bay's lanes from a port town (naval/seaLanes.js: the far port, the lane's length in
  *   metres; none for a town with no harbour; undefined while the map is unread). LW-DRY: whether the ground at a native
  *   point is dry (`nativeDry` over world/dryGround.js - the height map's own, every client's alike); unasked, all is dry).
- *   WW7-7 (bible/03-World/World-Wide.md): whether a town's trips WAIT (`waiting` - a town past the Bay while the roads past
+ *   WW7-7: whether a town's trips WAIT (`waiting` - a town past the Bay while the roads past
  *   the Bay are still being laid: none of its trips is the one every client will walk yet, so each answers undefined, as
  *   one waiting on a way does), and the world's GENERATION (`generation` - its towns near move with it: the choices kept
  *   off them are made again); WW7-11: whether the land past the Bay stands (`longPassages` - its far lanes'
@@ -241,7 +241,7 @@ export function nativeDry(dry) {
 const stopsOf = new WeakMap();
 
 /**
- * LW-DRY (field, 2026-10-05, Mac: "NPCs will get stuck over bodies of water"): A STOP ON DRY GROUND. A way is the
+ * LW-DRY (field, 2026-10-05): A STOP ON DRY GROUND. A way is the
  * planner's straight legs between its pixels' centres, and the planner's water is a whole pixel's: by a coast a leg
  * runs over the sea's edge, and where night or trouble stopped a party there it camped, fought and lay fallen in the
  * water. The first place at or past `s` along `way`, going `dir` (+1 on the way out, -1 on the way home), within
@@ -420,7 +420,7 @@ export function leaderOf(res, roster) {
   return null;
 }
 
-/** TOWN-ECON TE3 (bible/06-Systems/Town-Economy-Arc.md 5): a Booming town holds a second market day a week,
+/** TOWN-ECON TE3 (5): a Booming town holds a second market day a week,
  *  MARKET_BOOM_DAY after its own; a Destitute town holds its own one week in MARKET_DESTITUTE_WEEKS. AUDIT TOWN-ECON 2
  *  LIV-14: a carter never misses a Destitute town's market because the online window is exactly fourteen sky days
  *  (paceScale at TimeScale 24) - a longer fortnight, or a shorter window, would leave a cycle without one. */
@@ -646,14 +646,13 @@ export function ownTrip(res, home, k, world, o) {
   return null;
 }
 
-/** TRIP-PICKS (2026-10-12, a profile of a player's live client from launch into the world: the first world frame froze
- *  2.7 s and the frames after it 2.8 s more, the Living World planning its roads' day): A TRAVELLER'S ROAD CHOICES FROM
+/** TRIP-PICKS: A TRAVELLER'S ROAD CHOICES FROM
  *  ITS TOWN - the towns in its job's ring it may go to (`roadBound`), each one's weight, in the order `pickWeighted` reads
  *  a `{ mapId: weight }` object (its keys' own), and the towns the farther first (then the lower map id). The same for
  *  every traveller of the job and every cycle (the trip world's towns are the map's), so kept by the world, the town and
  *  the job: made again for each trip, it was a filter of the towns near, their weights, a walk of the weights' keys and a
  *  sort by distance, every traveller of every town the roads asked, in one frozen frame. Null: no town in reach.
- *  AUDIT TRIP-PICKS (2026-10-20): KEPT AS THE HOST'S OTHER LIVING WORLD MEMORIES ARE, BOUNDED - ROAD_CHOICES_KEPT towns'
+ *  AUDIT TRIP-PICKS: KEPT AS THE HOST'S OTHER LIVING WORLD MEMORIES ARE, BOUNDED - ROAD_CHOICES_KEPT towns'
  *  worth, the longest unasked let go first (a town's choices are pure: asked again, made again the same). Unbounded, a
  *  session that roamed the Bay held every town's: 21.6 KB a town and job, 200 MB at the map's whole (the audit's
  *  measure). Each is leaner too: a town's distance is asked of the town (roadOrder), not kept in a map beside it.
@@ -743,7 +742,7 @@ export function roadOrder(rng, home, job, world) {
 /** LW5b: the way of a trip with no road under it - a passage by sea. */
 const noWay = () => ({ pts: [], cum: [0], len: 0, kinds: [] });
 
-/** HOLY-DAYS (2026-10-11, a profile of a player's live client entering the world): A TOWN'S TEMPLES IN A PILGRIM'S
+/** HOLY-DAYS: A TOWN'S TEMPLES IN A PILGRIM'S
  *  REACH, the nearer first (then the lower map id) - the same for every pilgrim of the town and every cycle (the trip
  *  world's towns and their temples are the map's), so kept by the world and the town: made again for each pilgrim, it was
  *  a filter and a sort of the towns near a pilgrim, every pilgrim of every town the roads asked, in one frozen frame.

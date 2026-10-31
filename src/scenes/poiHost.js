@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-2 (2026-10-14) - THE APPROVED POIS, STANDING IN THE STREAMED WORLD.
+// POI-2 - THE APPROVED POIS, STANDING IN THE STREAMED WORLD.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... even placement onto our actual map"; "I need to be able to
-// approve changes" (bible/06-Systems/POI-Editor-Arc.md). The exterior host's pool on the runtime pools' shape
+// "I need to be able to
+// approve changes". The exterior host's pool on the runtime pools' shape
 // (scenes/lefayMonumentHost.js, scenes/merchantYardsHost.js): every POI the feed (poi/poiFeed.js) stands on a pixel the
 // streamer has BUILT is loaded (its meshes and pictures by their hashes), stood on its ground, collided, lit, drawn - the
 // opaque with the world, the translucent after it, back to front - and taken down when its pixel goes, its revision
@@ -36,7 +36,7 @@
 // modelled again as stand work - drawn meanwhile through what makes up the difference, and not at all while that would
 // mirror it (its faces wound for the other hand).
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (made beside the LeFay monument; framed, drawn in the world
+// THE FOUR HOSTS: scenes/world.js - WIRED (made beside the LeFay monument; framed, drawn in the world
 // pass, the translucent after the water and the world's depth-writing flats (AUDIT POI R4), its lights in the scene's
 // selection, its marks on the travel map, taken down at a re-anchor, a load and a change of mode).
 // scenes/worldModes.js - its interiors stand no street; a POI is outdoors, and nothing here reaches them.

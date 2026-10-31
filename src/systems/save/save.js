@@ -103,7 +103,7 @@ const ENTITY_FIELDS = [
   // pool that did not survive the save would be re-rolled by a save
   // and a load, which is the same exploit through a slower door.
   'readyToLevelUp', 'pendingLevel', 'pendingBonusPool', 'chargenDone',
-  // ORL1 (2026-09-17): WHICH LEVELING SYSTEM THIS CHARACTER LEVELS BY,
+  // ORL1: WHICH LEVELING SYSTEM THIS CHARACTER LEVELS BY,
   // and the mod's bar. `levelingSystem` is answered ONCE, at chargen,
   // and is a property of the CHARACTER rather than of the install -
   // which is why it rides here and not in modSettings beside the mod's
@@ -180,7 +180,7 @@ const ENTITY_FIELDS = [
   // LEGACY4: Project Legacy's blessings - an ancestor laid to rest, their best skill on the one who laid them
   // (systems/legacy/heirloom.js legacyFold). A save older than this field restores undefined: no blessing.
   'legacyBlessings',
-  // APPEARANCES (bible/04-Characters/Wardrobe.md): every look the character has held (systems/appearances.js), keys of
+  // APPEARANCES: every look the character has held (systems/appearances.js), keys of
   // net/appearanceLaw.js. A save older than this field restores undefined: none yet, and the first frame collects the pack.
   'appearances',
 ];
@@ -315,7 +315,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // stands on ground drawn at this terrain scale. A save without the stamp was written on the prefab's 1.5, and the
   // world host re-stands its heights on today's ground as it lands them (world.js restandHeight). Additive: SAVE_VERSION
   // does not move, and an older build ignores the field.
-  // BAY-LEFT-GROUND (bible/03-World/Landforms.md, D5): and the law of their frame (`groundFrame`, terrainSampler.js
+  // BAY-LEFT-GROUND (, D5): and the law of their frame (`groundFrame`, terrainSampler.js
   // GROUND_FRAME_LAW) - DFU's frame past the Bay too; a save without it stood the shaped ground there. Additive, as the scale's.
   const snap = { v: SAVE_VERSION, position, pose, classicMinutes, readiedSpellIndex, world, locationKey, quest, talk, interior, dungeon, travelMap, escortingFaces, quickslots, spawns, smallerDungeonsState, modData, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW };
   // LIVED1: `classicMinutes` is the CHARACTER's clock - the hosts hand their own (worldTick.ownMinutes): offline the
@@ -680,7 +680,7 @@ const LEGACY_VENDOR = 'ProjectLegacy';
 const listsOf = (/** @type {any[]} */ ...ls) => ls.filter(Array.isArray);
 const arrayOf = (/** @type {any} */ x) => (Array.isArray(x) ? x : []);
 /**
- * ITEM-WALK A (2026-10-07, Mac: "Do them now within this PR"): EVERY OTHER LIST OF ITEMS A SAVE HOLDS - the lists
+ * ITEM-WALK A: EVERY OTHER LIST OF ITEMS A SAVE HOLDS - the lists
  * customs never reads, because no one's wealth lies in them (net/realm/realmGoldLaw.js stashedItemLists reads the rest):
  * in each cached scene, the owner's own things set out in a room (DECOR2a `decorOwn`, one item a piece) and a guild's
  * day's Buy shelves (GUILD-SHELF `guildShelves`); a living foe's kit and a guard's, in the world bag and in a
@@ -723,7 +723,7 @@ function heldItemLists(snap) {
 export const savedItemLists = (snap, own = snap) => [...listsOf(own?.items, own?.wagonItems, own?.bagItems, own?.furnishings, own?.otherItems), ...stashedItemLists(snap), ...heldItemLists(snap)];
 
 /**
- * ITEM-WALK (2026-10-07, Mac: "Do them now within this PR"): THE LOAD'S ITEM REPAIRS, ONE RUNNER - each one-time repair a
+ * ITEM-WALK: THE LOAD'S ITEM REPAIRS, ONE RUNNER - each one-time repair a
  * load makes to the items it reads, over every list in `repairLists`, in place. The load runs it over every list the
  * save holds (savedItemLists); Project Legacy over what leaves the line's record by no load - a bequest as it is paid,
  * a fallen member's remains as they open (scenes/legacyHost.js). Each repair leaves a piece it has made right as it
@@ -968,7 +968,7 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   const strayFaces = foldStrayFaces(strayLists, strayRooms);   // WITCH1: and the festival's Soul Cakes and Hearth Offerings, the same law
   if (strayFaces) console.info(`[save] KEY-FACE: ${strayFaces} festival face(s) outside the pack folded away - the account holds them`);
   entity.rentedRooms = (snap.rentedRooms ?? []).map((r) => ({ ...r }));   // U39: the rented rooms (pre-U39 saves restore empty)
-  // JAN1 (2026-09-18, Janome: CRASH `region 17 is outside the 0 bank accounts`, a softlock at the bank): a pre-B1 save
+  // JAN1: a pre-B1 save
   // restored an EMPTY table, which is truthy, so worldModes' `??= createBankAccounts` never minted one and every bank
   // reader threw by DFU's own ValidateRegion law. No accounts saved is no accounts opened: the full table, as a new game.
   entity.bankAccounts = snap.bankAccounts?.length ? padRegionTable(snap.bankAccounts.map((a) => ({ ...a })), blankAccount) : createBankAccounts();   // B1; WW-R: a save's 62 padded to the provinces' regions
@@ -1209,8 +1209,6 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   //
   // ═══ MAC-L4: A RESTORE MAY NOT DESTROY WHAT IT CANNOT READ ═════
   //
-  // Mac, 2026-09-16 (bigdaddywetwet): "something causes spells to
-  // disappear from the spellbook."
   //
   // This walk ended in `.filter(Boolean)`, and that is where they went.
   // A STOCK spell travels as a bare SPELLS.STD INDEX - a number - and
@@ -1334,7 +1332,7 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   }
   // AUDIT 39: the three extras above ride back out too - a save from
   // before they were carried reads the same null/0 they used to.
-  // TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): the quest block on the character's clock - an online save taken
+  // TIME3 (6.3): the quest block on the character's clock - an online save taken
   // before TIME3 kept its countdowns on the world's, and they move onto the character's once, by the distance at the
   // save (quest/questStamps.js questBlockOnOwnClock); a TIME3 save and any offline one are there already.
   return { position: snap.position, pose: snap.pose ?? null, classicMinutes: snap.classicMinutes, readiedSpellIndex: snap.readiedSpellIndex, world: snap.world ?? null, locationKey: snap.locationKey ?? null, quest: questBlockOnOwnClock(snap) ?? null, talk: snap.talk ?? null, interior: snap.interior ?? null, dungeon: snap.dungeon ?? null, travelMap: snap.travelMap ?? null, escortingFaces: snap.escortingFaces ?? null, quickslots: snap.quickslots ?? null, spawns: snap.spawns ?? null, smallerDungeonsState: snap.smallerDungeonsState ?? 0, modData: snap.modData ?? null, terrainScale: snap.terrainScale ?? null, groundFrame: snap.groundFrame ?? null };   // TERRAIN-SCALE1: null - written before the stamp, on the prefab's 1.5; BAY-LEFT-GROUND: null - before the frame's law moved

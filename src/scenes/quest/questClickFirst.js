@@ -1,6 +1,4 @@
-// QUEST-WORDS-FIRST (2026-10-20, Dudey: "when youve completed a quest that when you click the npc the quest complete message
-// with its reward afterwards pops up and then you see the dialog options... cause right now you get the complete quest
-// message plus reward when you press exit in the dialog options which is weird and wrong").
+// QUEST-WORDS-FIRST.
 //
 // WHY IT CAME LAST. A click on a quest's Person only marks it clicked (machine.setLastNPCClicked); its ClickedNpc trigger
 // runs on the machine's next tick, and the talk window opened in the same click pauses the world, so the tick - and the

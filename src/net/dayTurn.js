@@ -1,6 +1,5 @@
 // @ts-check
-// DAY-TURN (2026-10-22, the owner: "The servers are on fire right now. We need to do something"; bible/01-Overview/bugs/
-// Field-Bugs-2026-10-22.md DAY-TURN): A PAGE'S DAY TURNS AT ITS OWN MOMENT PAST MIDNIGHT.
+// DAY-TURN: A PAGE'S DAY TURNS AT ITS OWN MOMENT PAST MIDNIGHT.
 //
 // The books that keep a UTC day's answer - a profession's state, the ground's pixels and the dungeons (net/profBook.js),
 // a town's hall, its economy and its seat witnessed once a day (npcHallBook.js, townEconBook.js, townSeatBook.js) - each

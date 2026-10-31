@@ -6,7 +6,7 @@
 // its surface is unchanged and it is still the enum's front door),
 // weaponWidget.js and shieldWidget.js.
 //
-// WW-LAB (2026-09-19): it is a LEAF. An enum of three integers had been
+// WW-LAB: it is a LEAF. An enum of three integers had been
 // living in a module that reaches the CIF reader, the inventory, the dye
 // tables and - through nativePanel's HUD - the Morrowind arms and a
 // vendored mod's mesh folder, so importing three integers cost four

@@ -41,8 +41,7 @@ import { dice100 } from '../../combat/formulas.js';   // PT1: Dice100 has ONE ho
 import { CLASSIC_UPDATE_INTERVAL } from '../weaponStates.js';   // single source (GameManager.cs:42)
 import { CAPSULE_HEIGHT, CAPSULE_RADIUS, DF_WALK_BASE } from '../../player/motor.js';           // single source
 export { CLASSIC_UPDATE_INTERVAL };
-/** FOE-CATCHUP (2026-09-26, SquidKamer: "you drop to 1 fps for a few seconds and get jumped by everyone"; Mac, asked:
- *  "Yes, add the cap"): THE MOST GAME TIME A FOE'S BODY CATCHES UP IN ONE FRAME. update() below steps at FIXED_DT for
+/** FOE-CATCHUP: THE MOST GAME TIME A FOE'S BODY CATCHES UP IN ONE FRAME. update() below steps at FIXED_DT for
  *  whatever the frame hands it (up to MAX_FRAME_DT, and the world host's own 0.1 clamp): six steps a foe at 10 fps.
  *  A foe's step is the port's dearest work - the path check's capsule casts, the sight rays - so under a crowd one
  *  hitch made the next frame dearer, and that one dearer still: a few slow frames snowballed into seconds near 1 fps.
@@ -59,8 +58,7 @@ const FLEE_AIM = 10;
 export const FOLLOW_STOP = 3;
 export const FOLLOW_SLACK = 1.5;
 export const FOLLOW_LEASH = 20;
-/** COMPANION-TRAIL (FIELD BUGS 2026-10-04b, Mac: "Companion pathing is really rough. They're also walking towards to
- *  the wall, next to the exit that leads to outside"): a follower with no clear line to its leader walks the LEADER'S
+/** COMPANION-TRAIL (FIELD BUGS 2026-10-04b): a follower with no clear line to its leader walks the LEADER'S
  *  OWN TRAIL (`follow.trail`, the crumbs crewAshore.js drops where the player walked) - the newest crumb it can see,
  *  looked for every FOLLOW_SIGHT_S with at most FOLLOW_SIGHT_TRIES casts, the next crumb once it is within
  *  FOLLOW_CRUMB_REACH. The street, a building and a dungeon without the pathing motor have no baked route, and straight at
@@ -588,7 +586,7 @@ export class EnemyAI {
    *  GlobalScale`, re-derived on every pass rather than captured. A
    *  READ, not a field, so nothing can freeze it back. */
   get speed() { return enemyMoveSpeed(this._liveSpeed() + this._edgeSpeed()); }
-  /** RVN2 (bible/12-Enhanced-AI/Feud-Arc.md 13.2): an Arrow-wise revenant's Speed while its target is far (its stand's
+  /** RVN2 (13.2): an Arrow-wise revenant's Speed while its target is far (its stand's
    *  `revenant.edge`, systems/revenant/revenantFeud.js ADAPT) - none for any other body. */
   _edgeSpeed() {
     const e = this.vitals?.()?.revenant?.edge;
@@ -686,8 +684,7 @@ export class EnemyAI {
     // AUDIT WORLD3 C3: unarmed - a puppet's bare senses call, an unarmed pool - the senses ARE the local player's, so
     // both latches follow from here (a puppet never reaches _step or the classic block).
     if (!this._armedTargeting) { this._distLocal = this._dist; this.targetIsLocalPlayer = true; }
-    // STAFF-UNSEEN (2026-10-24, mob: "staff in overworld and flat need to stay in it and not have mobs pull them out"; the
-    // card's pick "Monsters ignore hidden staff"): a departure from DFU - a staff member hidden from players is no one to
+    // STAFF-UNSEEN: a departure from DFU - a staff member hidden from players is no one to
     // a foe either. Never seen, never heard, never stealth-detected, and the blind pursuit given up at once (no
     // giveUpTimer to spend, so no TakeAction); a seer sees no more of them than anyone does
     if (senses?.playerUnseen && this.targetIsLocalPlayer) { this.inSight = false; this.detected = false; this.giveUpTimer = 0; return; }
@@ -1685,7 +1682,7 @@ export class EnemyAI {
   }
 
   /**
-   * WERE-FRIGHT (2026-09-29, the port's own - no DFU motor ever runs FROM anything): FRIGHTENED OFF. For `seconds`
+   * WERE-FRIGHT: FRIGHTENED OFF. For `seconds`
    * the foe drops its target and runs from `fromFeet`, by the pursuit's own laws turned round: per
    * classic tick it turns (TurnToTarget's 20 degrees) in place until it is inside the 5.625 degree move gate of the
    * way away, and only then runs, at its own move speed, through the same capsule, obstacle and ledge probes and
@@ -1868,7 +1865,7 @@ export class EnemyAI {
   }
 
   /**
-   * ARENA-FIX 8 (2026-10-02, the port's own - DFU's arena is a mod's, and no DFU motor walks to a point it was told):
+   * ARENA-FIX 8:
    * A WALK TO A MARK. A bout's fighter walks in from its gate to its mark on the sand (scenes/arena/arenaBouts.js walkIn) by
    * the pursuit's own laws - the classic turn in place inside the 5.625 degree move gate, the same capsule, obstacle,
    * ledge and detour probes and gravity (`_walkStep`) - at `pace` of its move speed. It decides and senses nothing on
@@ -1939,7 +1936,7 @@ export class EnemyAI {
     // no CanAct/flyerFalls write. Folding the pause into `knocked`
     // carries all four, in DFU's own order.
     const knocked = this.knockbackSpeed > 0 && !paused;
-    // TELL1 (bible/12-Enhanced-AI/Feud-Arc.md 3.2): STAGGERED - its wind-up broken by a blow past its poise - it can do
+    // TELL1 (3.2): STAGGERED - its wind-up broken by a blow past its poise - it can do
     // nothing, as a knock: CanAct false, standing, its Hurt held by the host. The port's own beat (no DFU motor has
     // one), so it exists only with the Enhanced AI switch on, which alone stands a wind-up to break.
     const staggered = this.staggerUntil > 0 && tacticsNow() < this.staggerUntil;

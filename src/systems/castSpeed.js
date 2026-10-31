@@ -1,6 +1,4 @@
-// CAST-SPEED (2026-10-08, Mac on a Discord post, "Morrowind magic anims nerf you": "I think we nerf the animation of
-// the regular sprite spellcasting to fall in line with the morrowind model. Also have casting speed a new rarity affix
-// along with scaling with speed"). THE PORT'S OWN LAW. Daggerfall's hands step on a fixed clock
+// CAST-SPEED. THE PORT'S OWN LAW. Daggerfall's hands step on a fixed clock
 // (FPSSpellCasting.animSpeed) and Morrowind's spellcast group plays at speed 1; here both lanes run at ONE RATE - the
 // caster's live Speed, and the casting speed the loot they wear carries (lootRarity.js's castSpeed line, summed and
 // capped by systems/loot/lootPowers.js). combat/weapon/weaponRig.js castSpellAnim reads it once a cast, and hands it to both the

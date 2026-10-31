@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-FLORA (2026-10-26, the owner: "on top of distant view, no flora/trees show. Its just a plain green flat texture.
-// No band aids for any of this"; bible/06-Systems/Travel-View.md FAR-FLORA): THE WOODS PAST THE STREAMED GRID, BY THE
+// FAR-FLORA: THE WOODS PAST THE STREAMED GRID, BY THE
 // NEAR LAW. The streamed grid stands its trees one tile at a time (world/terrain/terrainNature.js layoutNature: FOREST1's
 // field and chances, or DFU's own scatter with the Real forests switch off); past its edge the middle ring and the far
 // views stood the bare ground in one climate tint, so the woods ended in a line 4.5 km out. This module is the same law
@@ -138,7 +137,7 @@ const COS_STEEP = Math.cos(FLORA.steep * Math.PI / 180);
  *  land (FLORA.woodShare; TESA-LANDS a zone's own, its `woods`) on grass, read through the same law. Pure. */
 export const expectedTrees = (spec, byte) => (spec?.lands && (spec.treeShare > 0 || spec.coverShare > 0) ? landsTrees(spec.lands, spec.lands.woods, 0, 1, 0) : treesPerTile(FLORA.woodShare, 0, 1, 0, spec, byte));
 
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The far views"): A ZONE'S WOODS AFAR. A sample's packed wood is FOREST1's,
+// TESA-LANDS (, "The far views"): A ZONE'S WOODS AFAR. A sample's packed wood is FOREST1's,
 // so a zone's is its EXPECTATION GIVEN it (woodOf): the field's distribution (FOREST_QUANTILES) read at 4,096 quantiles,
 // the zone's wood averaged in bins of FOREST1's.
 

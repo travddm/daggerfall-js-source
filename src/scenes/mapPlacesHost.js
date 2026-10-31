@@ -1,10 +1,9 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 //
-// BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/06-Systems/Travel-View.md BAY-LEFT-MAPS) grew it, after the move: a place past the Bay by its summary
+// BAY-LEFT-MAPS grew it, after the move: a place past the Bay by its summary
 // where it was found, or where a quest names it (`named`), whether or not its pixel has built (tvPlaceSummary - the index
 // holds one only once it has; its location stood the first time a journey reads it, pendingSummary); TV5's settlements a
 // near query (tvFarSettlements) where they were a snapshot of the index at the view's first ask; the junction map's dots
@@ -58,8 +57,7 @@ export function createMapPlaces(host) {
     const loc = p ? locationIndex.get(`${p.px},${p.py}`) : null;
     return (loc?.mapTableData?.mapId ?? -1) >>> 0 === key ? loc : null;
   };
-  // ETHER-OW (2026-10-13, the owner: "Also allow the player to zoom out into the overworld like in the Iliac Bay for easy
-  // travel"): THE ISLES' PLACES ON THE OVERWORLD. Past the Veil no place is a row of the Bay's dictionary - an isle's town
+  // ETHER-OW: THE ISLES' PLACES ON THE OVERWORLD. Past the Veil no place is a row of the Bay's dictionary - an isle's town
   // or ruin is its own (world/etherPlaces.js), the index's once its pixel has built, else its clone, marked and never
   // stood (etherPlaceClone). KNOWN as the Eltheric knows a place: its isle on the captain's charts (etherHost.js `sight`
   // within three pixels, a harbourmaster's chart, a corsair's papers - the chart's own isles), or the place found.
@@ -77,7 +75,7 @@ export function createMapPlaces(host) {
       const loc = tvEtherPlace(px, py);
       return loc && tvEtherKnown(loc) ? { pixel: { x: px, y: py }, name: loc.name, mapId: loc.mapTableData.mapId, regionIndex: loc.regionIndex, locationIndex: loc.locationIndex, loc } : null;
     }
-    // HALL-JOURNEY (2026-10-08, the owner: "when i want to travel there with begin journey nothing happens"): a zone hall
+    // HALL-JOURNEY: a zone hall
     // is no row of the map's dictionary (it is spawned, by the day) - it is its own summary, always known, so the
     // Overworld walks to its door as to any place's
     const hall = wildHallAt(wildActiveNow(), px, py) ? wildHallStand(px, py) : null;

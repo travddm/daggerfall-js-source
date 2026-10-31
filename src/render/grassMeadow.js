@@ -1,10 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MEADOW1 (2026-10-06, Mac: "These are 4 textures I want to blend into our
-// grass system, all with varying sizes so its not monotonous everywhere";
-// then "This texture will fold in alongside these but specifically is a
-// bush, so it should be of different sizes. And instead of billboarding,
-// these should have a sort of low poly look to them, like the trees").
+// MEADOW1.
 //
 // THE MEADOW IS THE OWNER'S ART, STOOD UP AS THE TREES ARE. Five sprites he
 // drew - a tall green tuft, the same tuft cut short, a tuft of flowers, a
@@ -82,7 +78,7 @@ export const MEADOW_BLADES_PER_TUFT = 3;
  * a tuft's drawn height is about three quarters of its cell, so 4/3 stands the tall tuft as tall as the lab's blade;
  * the bush stands at 2.25 - half a metre to a metre and a half of bush over the lab's height law. `stiff` is the
  * share of its own standing lean a card takes: a bush is woody, and stands a third as crooked as grass. `sway` is its
- * share of the WIND's lean (AUDIT MEADOW1, Mac: "have the wind sway effect the new foilage, like it does the trees"):
+ * share of the WIND's lean (AUDIT MEADOW1):
  * the trees' own shares (systems/wind/windDrive.js floraSwayOf) - the grass sways whole, as a tall flora record does, and
  * the bush six tenths, as the world's bushes and shrubs do.
  */
@@ -217,8 +213,7 @@ export const MEADOW_SEED = 64;
 export const MEADOW_SLOPE_FLOOR = 0.3;
 
 /** the lab's own wind law (LAB_GRASS_VS): the lean a metre a second of wind gives a blade's top, over its height, and
- *  the most of it a gust adds (push = |wind| x (0.6 + gust x 0.45), gust 0..1). SWAY-SOFT (2026-10-21, Mac: "make the
- *  grass sway more subtle"): 0.055 and 0.55 + 0.75 before - the top leans under half as far at a full gust, and the
+ *  the most of it a gust adds (push = |wind| x (0.6 + gust x 0.45), gust 0..1). SWAY-SOFT: 0.055 and 0.55 + 0.75 before - the top leans under half as far at a full gust, and the
  *  gust pulses 1.75x over the steady push where it pulsed 2.4x */
 export const LAB_LEAN_PER_PUSH = 0.032;
 export const LAB_GUST_MAX = 0.6 + 0.45;

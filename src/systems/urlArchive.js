@@ -2,7 +2,7 @@
 // layer speaks, over files that ship WITH THE BUILD instead of coming
 // out of a player's .bsa.
 //
-// FIELD-GUN-MW2 (2026-09-20): MOVED HERE FROM `weaponSheathing.js`,
+// FIELD-GUN-MW2: MOVED HERE FROM `weaponSheathing.js`,
 // body unchanged, and re-exported from there so that not one caller
 // had to move. It was written for WS1's seventy-one vendored scabbards
 // and now also carries the port's OWN Morrowind assets

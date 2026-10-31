@@ -1,6 +1,5 @@
 // @ts-check
-// TIMERS1 (2026-10-02, Mac: "we need to create a new unique UI element for reset times like the Sunday wars, oblivion
-// gates, town raids, and anything else so the player can keep track of when things are and watch countdowns").
+// TIMERS1.
 //
 // THE SCHEDULE, AS ROWS. Every shared moment of the online world is already a pure function of the relay's clock in
 // its own law - the gate's day (net/gate/gateLaw.js), the seat week's Reckoning and Turning (net/townSeatLaw.js), a game
@@ -15,7 +14,7 @@
 //   at     the moment the countdown runs to (ms, relay clock): the start of a coming row, the end of a live one
 //   until  a live row's end; null on a coming row
 //
-// TIMERS2 (2026-10-22, the owner: "organize the timer system in the pause menu"): THE ROWS IN GROUPS. One list sorted by
+// TIMERS2: THE ROWS IN GROUPS. One list sorted by
 // time put a gate beside a raid beside the UTC day, sixteen rows deep on a busy evening; the window now lays them out by
 // what they are (TIMER_GROUPS: the world's events, the raids, the seats and their battles, the resets),
 // each group in the list's own order, and a player can show one group alone (ui/enhanced/enhancedTimers.js).
@@ -62,7 +61,7 @@ const capital = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 export const gateEventId = (n) => (Number.isSafeInteger(n) && n >= 0 ? `gate:${n}` : null);
 
 /**
- * WW5 (bible/03-World/World-Wide.md WW5): EVERY PROVINCE'S HOLLOW (`sd.lanes` - scenes/superDungeon/sdLanes.js timers), each
+ * WW5 (WW5): EVERY PROVINCE'S HOLLOW (`sd.lanes` - scenes/superDungeon/sdLanes.js timers), each
  * its own lane's record, in the Bay's rows' shape: found or collapsing, news to every screen, by its city (else its
  * province); its next rise its own province's players' alone (`mine` - the theatre I stand in): eight coming with no place
  * would bury the Bay's. Its words the player's language's, the province by the region list's own name.
@@ -116,7 +115,7 @@ export function eventTimerRows(src) {
   else gateRows(t, phase, place);
   // ...and the gate after it, once this one is under way
   if (phase !== 'quiet') coming(gateEventId(t.day + GATE_EVERY_DAYS), 'gate', 'Next Dagon\'s Breach opens', gateTimes(t.day + GATE_EVERY_DAYS).openAt);
-  // WW2 (bible/03-World/World-Wide.md): AND EVERY LANE'S PAST THE BAY that has found its site (`gates` - the host's), from
+  // WW2: AND EVERY LANE'S PAST THE BAY that has found its site (`gates` - the host's), from
   // its omen to its collapse, named where it stands - a province's gate has no row before its omen (nine of them coming,
   // each with no place to go, would bury the Bay's)
   for (const g of src?.gates ?? []) {
@@ -126,8 +125,7 @@ export function eventTimerRows(src) {
   }
 
   // ── THE SEA SERPENT (serpentLaw: every other game day at the dawn watch - every four real hours: the bells, the
-  // rising, its dive) ── SERPENT-TIMERS (2026-10-04, the owner: "This needs to happen" -
-  // the serpent was the one shared event the window did not count). Where it lies is said from its bells on, as the
+  // rising, its dive) ── SERPENT-TIMERS. Where it lies is said from its bells on, as the
   // chat says it; the next serpent's rising stands beside it once this one is under way.
   const s = serpentAt(now);
   const sPhase = serpentPhase(s, now, src?.serpent?.fellAt?.(s.day) ?? null);
@@ -135,7 +133,7 @@ export function eventTimerRows(src) {
   const off = src?.serpent?.place ? `Off ${src.serpent.place}` : null;
   if (sPhase === 'quiet') coming(`serpent:${s.day}`, 'serpent', `${sName} rises`, s.riseAt, null, 'The harbor bells ring 15 minutes before');
   else if (sPhase === 'omen') coming(`serpent:${s.day}`, 'serpent', `${sName} rises`, s.riseAt, off, 'The harbor bells are ringing. Its waters are circled on your map');
-  // SERPENT4 (2026-10-11): its waters stand open until it dives - one row from its rising to its dive, the storm's breaking
+  // SERPENT4: its waters stand open until it dives - one row from its rising to its dive, the storm's breaking
   // no instant a ship sails against
   else if (sPhase === 'rising' || sPhase === 'hunt' || sPhase === 'late') live(`serpent:${s.day}`, 'serpent', `${sName} hunts`, s.soundAt, off, 'It dives when this runs out. Sail out to join the hunt');
   if (sPhase !== 'quiet') {
@@ -143,7 +141,7 @@ export function eventTimerRows(src) {
     coming(`serpent:${nextDay}`, 'serpent', 'Next sea serpent rises', serpentTimes(nextDay).riseAt);
   }
 
-  // ── THE SUPER DUNGEON (net/superDungeon/sdLaw.js: the hub's one record) ── SD2c (bible/11-Multiplayer/Super-Dungeons.md section
+  // ── THE SUPER DUNGEON (net/superDungeon/sdLaw.js: the hub's one record) ── SD2c (section
   // 4): a row once it is FOUND - news, by the finder's word - and none before (a Hollow that has only risen is a find:
   // its omen in the sky and a word in its city's taverns, never a countdown that says one stands); its fading unbeaten
   // while it stands, its collapse after the kill. Where it stands is the host's (`place`, its city), and its name.
@@ -156,7 +154,7 @@ export function eventTimerRows(src) {
   else if (sdNow === 'fell') { live(`sd:${sdRec.s}`, 'super', `${sdName} collapses`, sdRec.fellAt + SD_COLLAPSE_MS, sdWhere, 'Its Hour is broken. It collapses when this runs out'); rows[rows.length - 1].shut = true; }   // AUDIT EVENTS1 A6
   // SD19: the next one's rise, once this one is gone - never where (a Hollow risen is a find), only not before when
   else if (sdNow === 'gone' && Number.isFinite(sdRec?.next) && sdRec.next > now) coming(`sd:${(sdRec.s ?? 0) + 1}`, 'super', 'An Abyss Dungeon rises', sdRec.next, null, 'Not before this. Watch the Bay for its brass omen');
-  // WW5 (bible/03-World/World-Wide.md WW5): AND EVERY PROVINCE'S HOLLOW (sdLaneRows)
+  // WW5 (WW5): AND EVERY PROVINCE'S HOLLOW (sdLaneRows)
   sdLaneRows(src, now, live, coming, rows);
 
   // ── THE STARFALL (net/starfall/starfallLaw.js: three stars a night while the Witches' Festival runs) ── STAR6 (bible/11-Multiplayer/

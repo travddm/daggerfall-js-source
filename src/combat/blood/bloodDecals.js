@@ -7,7 +7,7 @@
 // mark left behind. This is that: a fixed ring of oriented quads laid
 // on whatever surface the blood met, recycled oldest-first.
 //
-// THE REFERENCE AND THE LINE (bible/05-Combat/Blood-Arc.md). The feel
+// THE REFERENCE AND THE LINE. The feel
 // is measured off DaggerBlood 1.0.6a (Excoriated), which the port has
 // NO permission to integrate: none of its code and none of its
 // thirteen textures are here, and nothing in this file is a

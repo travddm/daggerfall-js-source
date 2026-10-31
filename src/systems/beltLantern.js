@@ -1,5 +1,4 @@
-// BELT-LANTERN (2026-10-20, Dudey: "can we add an lantern only slot in the inventroy here in the row for enhanced plus and
-// here in dfo grimoire in the middle under crystals") - THE LANTERN'S OWN SLOT: a lantern hung at the belt.
+// BELT-LANTERN - THE LANTERN'S OWN SLOT: a lantern hung at the belt.
 //
 // No new equip slot: DFU has none for a light, and the light in hand stays PlayerEntity.LightSource (HT5's law,
 // ui/enhanced/enhancedInventory.js LIGHT_SLOT). What the slot holds is a MARK on the lantern itself - `beltLantern: true` on

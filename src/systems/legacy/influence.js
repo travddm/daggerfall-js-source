@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY6 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 10; Mac: "World Influence"): WHAT THE WORLD REMEMBERS OF
+// LEGACY6: WHAT THE WORLD REMEMBERS OF
 // THE HOUSE - the law, pure. The host (scenes/legacyHost.js) writes a member's standing as they are saved, hands a share
 // of it to the child born of them, and keeps the house's news; the Living World's towns tell it (livingTown.js
 // familyNews, lines.js KIN_NEWS).

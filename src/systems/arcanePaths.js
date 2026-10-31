@@ -1,9 +1,7 @@
 // @ts-check
-// SCHOOLS (2026-10-13) - ARCANE SPECIALISATIONS: A MAGE IS THE SCHOOLS THEY MASTER. bible/06-Systems/Arcane-Specialisations.md
+// SCHOOLS - ARCANE SPECIALISATIONS: A MAGE IS THE SCHOOLS THEY MASTER.
 //
-// The Patreon chat, through the owner: "One thing I've found with making mage characters recently, is that they all kind
-// of end up the same ... specialisation based on the two master skills you pick ... Restoration and Mysticism could be the
-// requirements for a Necromancer sub-class for instance, giving access to some spicy new spells." Asked, the owner chose:
+// The Patreon chat, through Asked, the owner chose:
 // the pair CHOSEN ONCE among the schools mastered, permanent as a mastery is; each pair a signature spell, a passive, and
 // every school paying past 100 in its own way; nothing below 100 changed; all of it at once.
 //
@@ -53,7 +51,7 @@ const HEAL_HEALTH = (...p) => slot(10, 8, ...p);
  *  bought copy carries its index, so the band never moves (pinned literal, -46101..-46115). */
 export const SIGNATURE_INDEX_BASE = -46100;
 
-/** SPEC-RESET (bible/10-UI/Growth.md section 10): the gold that gives up one family's path - an arcane one or a martial
+/** SPEC-RESET: the gold that gives up one family's path - an arcane one or a martial
  *  one (systems/specReset.js pays it). Its home is here, where the Worker-bundled laws' choice boxes can name it:
  *  specReset.js reaches court.js, which the Worker must never bundle. */
 export const SPEC_RESET_GOLD = 200000;
@@ -322,7 +320,7 @@ export function choosePath(entity, id) {
 export const PATH_DECLINED_TEXT = 'You can choose a specialization later in your skill screen.';
 /** The No's line, in the player's language. */
 export const pathDeclinedText = () => t('schools.declined', PATH_DECLINED_TEXT);
-/** GROWTH4 (bible/10-UI/Growth.md section 7): the No's line where the enhanced pause window stands - its Growth tab is
+/** GROWTH4: the No's line where the enhanced pause window stands - its Growth tab is
  *  where every path is read and chosen (the classic skin's stays the skill screen's: its S row opens the same guide). */
 export const PATH_DECLINED_GROWTH_TEXT = 'You can choose a specialization later on the Growth tab of the pause menu.';
 export const pathDeclinedGrowthText = () => t('schools.declinedGrowth', PATH_DECLINED_GROWTH_TEXT);

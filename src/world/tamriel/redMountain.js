@@ -1,6 +1,5 @@
 // @ts-check
-// RED-MOUNTAIN (bible/03-World/Red-Mountain.md; the owner: "An absolute massive volcano true to lore that towers in the
-// distance"): the volcano at Vvardenfell's heart, a law of world position the kernel stands on the land past the Bay
+// RED-MOUNTAIN (): the volcano at Vvardenfell's heart, a law of world position the kernel stands on the land past the Bay
 // (world/landforms.js landAt). A stratovolcano's cone over the relief's summit (tamrielBiomes.js heartsAnchor), its crater
 // one flat floor, gullies down its flanks, three foyada from breaches in its rim. Pure and one float in every engine (no
 // Math.cos, Math.exp, Math.atan2 or `**`): the terrain worker reads it too. World samples (6.4 m) and kernel units (1.25 m).

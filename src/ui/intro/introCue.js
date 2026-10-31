@@ -2,8 +2,7 @@
 // tools/introAudioCheck.mjs reproduces these landmarks from the shipped MP3.
 // There is no capture correction or arbitrary lead.
 //
-// INTRO2b (Mac, 2026-09-18: "the logo needs to drop with the beat that
-// happens around the 19 second mark"). The first cut landed on 20.533333s,
+// INTRO2b. The first cut landed on 20.533333s,
 // which is only the loudest FRAME inside a hand-picked 20.35-20.7s window -
 // it is not a local maximum of the onset curve at all, and the ear hears no
 // attack there. The beat Mac means is the real one: decoded sample 230016,
@@ -16,9 +15,7 @@
 // arrangement. Its cloud break is still 11.712s; its 19s beat moved one
 // analysis hop earlier than the old master's, and the cue moved with it.
 //
-// INTRO4 (2026-10-26, the owner: "Overhaul the main intro sequence to be more in line with the elder scrolls game
-// oblivion and still zoom out into the entire map of tamriel. Utilize the imperial city we have built for this. I want
-// this to be as detailed as possible"; bible/10-UI/UI-Arc.md INTRO4). THE FILM IS LONGER, ON THE SAME RECORDING. Its
+// INTRO4. THE FILM IS LONGER, ON THE SAME RECORDING. Its
 // bars measured off the decoded master (tools/introAudioCheck.mjs, the same flux): 1.888 s a bar from the 19 s beat,
 // phrases of eight - so the film cuts on the recording's own downbeats. Pre-dawn over Lake Rumare under the credits; the
 // mist breaks on 11.712 and the camera cranes over Talos Bridge's gate and up the White-Gold Tower; on the 19 s beat it
@@ -80,8 +77,7 @@ export function introNarrationOpacity(line, time) {
   return between(time, line.start, line.up) * (1 - between(time, line.out, line.end));
 }
 
-/** INTRO2c (Mac: "I want the logo to fly in from the screen, not from the top
- * of the screen. If that makes sense. Needs to feel powerful, not goofy").
+/** INTRO2c.
  *
  * The mark no longer drops in from above. It comes out of the DEPTH of the
  * shot, dead centre on the camera axis, and stops on the beat.

@@ -1,5 +1,5 @@
 // @ts-check
-// LEVEL-45 (2026-10-26, the owner: "Also bring the level cap to 45"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md):
+// LEVEL-45:
 // THE CHARACTER'S LEVEL STOPS AT 45. A LEAF, read by advancement.js (Daggerfall's sum) and oblivionLeveling.js (the
 // virtue bar), which import each other's neighbours, so neither grows a cycle.
 //

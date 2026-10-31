@@ -1,5 +1,4 @@
-// BAL9 (2026-10-12, the owner: "I think destruction needs a buff. A lot of players saying its lack luster";
-// bible/05-Combat/Balance-Arc.md section 15). A PLAYER'S SPELL POWER - what a Destruction spell's damage is worth past
+// BAL9. A PLAYER'S SPELL POWER - what a Destruction spell's damage is worth past
 // Daggerfall's own magnitude. DFU rolls a damage spell's magnitude off the caster's LEVEL alone (EntityEffect.
 // GetMagnitude); the school's skill prices the spell and moves nothing else. Two things here are the port's:
 //
@@ -20,7 +19,7 @@
 // player: a refereed fight's stand-in is a player (combat/duelCombat.js duelStub), so the duel, the siege, the Wild Zone
 // and the arena stand exactly where BAL8 left them; a foe's spell is its own (BAL3 keeps the place off a foe's spells).
 //
-// SCHOOLS2 (bible/06-Systems/Arcane-Specialisations.md section 4; the owner chose "each mastered school also pays past
+// SCHOOLS2 (; the owner chose "each mastered school also pays past
 // 100 in its own way, not just in price" - BAL9's open "other schools" call): THE SAME LAW FOR EVERY SCHOOL. schoolPotency
 // reads any school's climb (Destruction's by default, BAL9b's own); systems/effects.js lands each school's in its own
 // dimension - Restoration's heals, Alteration's Shield, Illusion's concealments and Thaumaturgy's wards on MYSELF

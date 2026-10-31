@@ -116,7 +116,7 @@ export function projectToScreen(p, w, h, proj, view, rect = null, behind = false
   const nx = (pv[0] * x + pv[4] * y + pv[8] * z + pv[12]) / cw;
   const ny = (pv[1] * x + pv[5] * y + pv[9] * z + pv[13]) / cw;
   const r = worldRectPx(rect, w, h);
-  // NAME1 (2026-09-16): `depth` is the clip w this projection already
+  // NAME1: `depth` is the clip w this projection already
   // divided by - the view-space depth for every perspective lens the
   // port builds (world/mat4.js perspective + mirrorProjectionX). It is
   // handed back rather than re-derived because a screen SIZE is the one
@@ -128,7 +128,7 @@ export function projectToScreen(p, w, h, proj, view, rect = null, behind = false
 }
 
 /**
- * PERF-TV-PROJ (2026-10-23): ONE FRAME'S PROJECTION, TAKEN ONCE. The travel
+ * PERF-TV-PROJ: ONE FRAME'S PROJECTION, TAKEN ONCE. The travel
  * view projects every mark, every route dot and the pieces between them
  * each frame - thousands of points. Asked per point, the canvas's
  * clientWidth/clientHeight (four Blink reads a point) and proj x view (a

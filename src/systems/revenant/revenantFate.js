@@ -1,8 +1,5 @@
 // @ts-check
-// REVENANT-FATE (2026-10-02, Mac: "Players should have the option to kill or spare. Killing should show a unique
-// animation where you destroy your foe, which drops a unique weapon random rarity weapon specific to the enemy, with
-// their name included in the weapon name. Spare should allow you to free the enemy, which then adds them as a
-// companion"; "the choice popup should reuse the loot menu").
+// REVENANT-FATE.
 //
 // BEATEN, A REVENANT YIELDS. The blow that would kill one of the player's revenants instead leaves it at the edge of
 // death, on its knees - its fight done, untouchable, its plea said in its own voice (REVENANT-VOICE) - and its fate
@@ -28,8 +25,8 @@ import { retinueHasRoom, swornPlace, REVENANT_RETINUE_MAX, setRetinuePlayer, hol
 import { companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';
 import { enemyDisplayName } from '../../characters/enemy/enemyBasics.js';
 import { DISSOLVE_EMBER, DISSOLVE_ARCANE } from '../dissolve.js';
-import { clearPlayerHarm } from '../harmMark.js';   // AUDIT (2026-10-02): a beaten one's harm is no one's death
-import { willMatters, willBroken, LAST_STAND_RANK, LAST_STAND_ROAR, PHASE_TWO, lastStandHealth, phaseTwo } from './revenantFeud.js';   // RVN3: the will (bible/12-Enhanced-AI/Feud-Arc.md 14.2); RVN4: the last stand (15)
+import { clearPlayerHarm } from '../harmMark.js';     // AUDIT: a beaten one's harm is no one's death
+import { willMatters, willBroken, LAST_STAND_RANK, LAST_STAND_ROAR, PHASE_TWO, lastStandHealth, phaseTwo } from './revenantFeud.js';     // RVN3: the will (14.2); RVN4: the last stand (15)
 import { endCraft, DREAD, dreadStandHealth } from './revenantUnquiet.js';   // UNQUIET (Revenants.md section 46): a flight's craft put down; the Dread's two stands
 import { t } from '../textManager.js';   // AUDIT UNQUIET: the slip's words through the text core
 import { noteAct } from '../questlines/qlActs.js';   // QL11: the features' acts, heard by the running quests
@@ -59,14 +56,14 @@ export function revenantMayYield(f) {
  *  peer's, at the door that holds the record - a revenant is never handed over (REVENANT-HEIR), so that door is its
  *  owner's. Anyone else's - a party member's kill forwarded as `z`, their strike spell landed here, a foe's spell, a
  *  companion's, a round that names nobody - is a killing blow like any other: it stands, tears away or kneels, and
- *  the choice is the owner's (bible/06-Systems/Revenants.md section 15). RVN-OWN-KNEEL (FIELD BUGS 2026-10-17g;
+ *  the choice is the owner's. RVN-OWN-KNEEL (FIELD BUGS 2026-10-17g;
  *  Discord: "Disintegrate just outright kills your rev with no option to hire"): the owner's own kneels it too - past
  *  the stand and the will, never past the kill-or-spare; a host with no fates (`exterior.js`) lets it die as before. */
 export function ownersWholeKill(whole, { fromPlayer = false, peer = false } = {}) {
   return !!whole && !!fromPlayer && !peer;
 }
 
-/** RVN4 (bible/12-Enhanced-AI/Feud-Arc.md 15.1): IS ITS LAST STAND DUE - one of my own revenants (never a puppet, a
+/** RVN4 (15.1): IS ITS LAST STAND DUE - one of my own revenants (never a puppet, a
  *  companion, one held by its fate) of rank LAST_STAND_RANK and up, not stood in this stand yet? UNQUIET (Revenants.md
  *  section 46): the Dread stands DREAD.STANDS times (`f._lastStood` set at its last). */
 export function revenantLastStandDue(f) {
@@ -152,7 +149,7 @@ export function beginYield(player, f, { now = Date.now(), rolls = Math.random } 
  *  'slip' when it has waited too long or the player walked off, else null. */
 export function yieldStep(f, feet, dtMs = 0) {
   if (!f?.yielded) return null;
-  // AUDIT (2026-10-02): its choice open on the screen (the host's word: the window not yet done) - the foes' clock runs
+  // AUDIT: its choice open on the screen (the host's word: the window not yet done) - the foes' clock runs
   // under a window (WINFOE1), its wait does not; nor does the walk-away, the player stands at the window
   const j = f.yielded.judging;
   if (typeof j === 'function' ? j() : j) return null;
@@ -199,10 +196,10 @@ export function finishExecution(player, f) {
   swornWitness(f.mobileType ?? f.entity?.mobileType);   // RVN11 (Feud-Arc.md 22.1): one of its own kind executed in a sworn one's sight, -15
   const items = [...(Array.isArray(f.entity?.items) ? f.entity.items : []), ...(f.trophy ? [f.trophy] : [])];
   f.trophy = null;
-  if (f.entity) f.entity.items = [];   // AUDIT (2026-10-02): handed to the pile - never a save's dead record's to carry twice
+  if (f.entity) f.entity.items = [];     // AUDIT: handed to the pile - never a save's dead record's to carry twice
   return items;
 }
-/** AUDIT (2026-10-02): HELD BY ITS FATE - kneeling, burning, gathering into its portal, or a companion stepping out
+/** AUDIT: HELD BY ITS FATE - kneeling, burning, gathering into its portal, or a companion stepping out
  *  through one: no swing's, no spell's, nobody's target (characters/enemy/enemyTargets.js reads the same four). */
 export const fateHeld = (f) => !!(f && (f.yielded || f.executing || f.sparing || f.leaving));
 /** The held taken out of a list in place (a swing's candidates) - answers the list. */
@@ -222,7 +219,7 @@ export function beginSpare(player, f, { now = Date.now(), rolls = Math.random } 
   const back = revenantHandBack(player, r, f.entity);   // RVN8 (Feud-Arc.md 19): what it took of mine, handed back at the oath
   f.yielded = null;
   f.sparing = { at: now };
-  if (state === 'with') holdSworn(r.id, SPARING_MS);   // AUDIT (2026-10-02): its companion steps out once the kneeling one is through
+  if (state === 'with') holdSworn(r.id, SPARING_MS);     // AUDIT: its companion steps out once the kneeling one is through
   const body = (state === 'with'
     ? `Sworn to you. ${r.given} walks at your side now.`
     : `Sworn to you. Your companions are full, so ${r.given} waits until you call it.`)

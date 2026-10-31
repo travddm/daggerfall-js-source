@@ -1,6 +1,5 @@
 // @ts-check
-// WB9g (2026-09-30, Mac: "a new addition (the aura), an animated burning ground aura that circles the ground where your
-// character stands. These items should be expensive and sought after"): DAGON'S FIRE, DRAWN - the Sigil Broker's aura,
+// WB9g: DAGON'S FIRE, DRAWN - the Sigil Broker's aura,
 // burning on the ground about the feet of whoever wears it: a ring of fire that chases itself round, tongues of flame
 // licking up out of it, embers circling in it and a glow in the stone inside it. Design: bible/11-Multiplayer/
 // World-Bosses.md section 14 (WB9g); the aura's law (who wears one, signed into the token) is net/insignia.js.
@@ -22,10 +21,7 @@
 // wall's height; each look is that source compiled with `uAura` a constant (auraPrograms), so a program holds only
 // its own look's code.
 //
-// SHADOW-CLOAK (2026-10-04, Mac, for SirMcMobdon: "A holo shadow cloak with red accents. Extremely detailed"; then "less
-// digital, adjust hood since it's at a weird orientation, not as tall, more cape like, change the floating elements to
-// be more emblem like", "For the emblems have it use that user's glyph", "when the user transforms into a werewolf have
-// this rip apart with fragments floating around"): THE HOLO SHADOW CLOAK, the fourth look - a CAPE ON THE BODY in the
+// SHADOW-CLOAK: THE HOLO SHADOW CLOAK, the fourth look - a CAPE ON THE BODY in the
 // Shadow Fang's black and crimson, its hood up:
 //   - THE WALL is its own mesh (auraCloakGrid), shaped in the vertex half round the wearer's facing (`uYaw`): hung from
 //     the shoulders, clasped at the throat, open below it, flaring and trailing longest down the back, the hood round
@@ -37,13 +33,12 @@
 //   - THE GROUND: a pool of shadow under it.
 //   - TORN when its wearer turns beast (`uTorn`, auraBeastStep): it splits and goes, and the third draw's cards past
 //     the emblems are its shreds, floating round the beast.
-//   - IT MOVES WITH THE BODY (Mac: "Tie the cape to animations"): the pose off the body's posed bones as it was drawn
+//   - IT MOVES WITH THE BODY: the pose off the body's posed bones as it was drawn
 //     (auraCapePose: `uCapeS` the shoulders, `uCapeH` the head, `uKneeL`/`uKneeR` the knees - fpArm.thirdBones mine,
 //     peerBodies.bonesOf a peer's), and a swing off how the wearer moves (auraMotionStep, a damped spring: `uSwing`).
 // Every rate whole over the clock (cloakRatesWhole). The pass draws its wearers farthest first (AUDIT).
 //
-// SERAPH-WINGS (2026-10-05, Mac: "I want to build an aura for the developers ... Golden Angel wings that flow", from a
-// painted angel whose wings are long ribbons of light): THE SERAPH WINGS, the fifth look - WINGS OF LIGHT on the body:
+// SERAPH-WINGS: THE SERAPH WINGS, the fifth look - WINGS OF LIGHT on the body:
 //   - THE WINGS are their own mesh (auraWingsGrid): WING_PLUMES primaries and WING_COVERTS short coverts a side, each a
 //     broad strand and two fine ones - ribbons of WING_SEGS segments out of the upper back, turned to the eye. Waves and
 //     a flutter run out along each so they FLOW; the fan breathes, and beats every eight seconds (wingBeat). Gold,
@@ -55,9 +50,7 @@
 //     facing; AUDIT 3), or the rest pose (a rider's over the saddle, AURA_SADDLE_M); closed when sunk to the neck. Swung
 //     as the cape is (auraMotionStep: `uSwing`); unfurling from the root as they kindle. Every rate whole over the clock
 //     (wingRatesWhole).
-//   - WINGS-FIT (2026-10-05, Mac: "the wings should sit farther back on the eye of the beholder skin ... clips on certain
-//     rotational directions", "the aura itself is WAY too bright. It really needs to match this and the slimness of the
-//     wings", "way to long, too large and overbearing", the same painted angel): a sprite is a FLAT card standing at its
+//   - WINGS-FIT: a sprite is a FLAT card standing at its
 //     feet, square to the eye, so a wing rooted a hand behind its axis stood inside the body's outline and nearer the
 //     eye than the card whenever it was seen from a side or a three-quarter, and was laid over the body there, cut off
 //     where it passed through the card. A sprite's wings root WING_SPRITE_BACK further back (the pose's
@@ -66,7 +59,7 @@
 //     as broad; twelve plumes a side, not fifteen; about six tenths as long; each strand's light about half; the
 //     backlight smaller and faint; the pool and the light on the world dimmer.
 //
-// SD9c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE TURNING HOUR, the
+// SD9c: THE TURNING HOUR, the
 // seventh look - the Brass Remnant's aura, "a slow wheel of brass gears and gold light about the wearer", granted one
 // kill in eight on its first write (server-account/src/sds.js). Added whole, in the Hourbreaker's own
 // colours (ui/playerBadge.js HOUR_*):
@@ -94,7 +87,7 @@ export const AURA_LIFT_M = 0.05;
 /** The cylinder's steps round (its strip's resolution). */
 export const AURA_STEPS = 48;
 /** The most auras one frame draws, and the farthest one is drawn from the eye (m) - past it a ring is a few pixels.
- *  AUDIT 3 (2026-10-05, Mac: "Ensure other players can see all auras"): 32 - a crowd at a hub's fountain is more than
+ *  AUDIT 3: 32 - a crowd at a hub's fountain is more than
  *  sixteen, and the seventeenth wearer within reach was drawn by nobody; a wearer is four draws at most. */
 export const AURA_DRAW_MAX = 32;
 export const AURA_RANGE_M = 90;
@@ -247,7 +240,7 @@ export const WING_CARDS = WING_MOTES + 1;
 export const wingRatesWhole = () => [...Object.values(WING_HZ), WING_FLOW.rate, WING_FLOW.fray].every((hz) => Number.isInteger(Math.round(hz * AURA_CLOCK_PERIOD * 1e6) / 1e6))
   && WING_MOTE_LIFE.every((l) => Number.isInteger(AURA_CLOCK_PERIOD / l));
 
-// SD9c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE TURNING HOUR - the
+// SD9c: THE TURNING HOUR - the
 // Brass Remnant's aura, "a slow wheel of brass gears and gold light about the wearer", one kill in eight on its first
 // write (server-account/src/sds.js). The pass's seventh look, added whole:
 export const TURNING_R = 0.7;             // the wheel's rim, where its teeth stand, m
@@ -271,7 +264,7 @@ export const TURNING_STEP_S = 0.25;
 export const turningRatesWhole = () => Object.values(TURNING_HZ).every((r) => r > 0 && Number.isInteger(Math.round(r * AURA_CLOCK_PERIOD * 1e6) / 1e6));
 /** The Hourbreaker's own colours (ui/playerBadge.js HOUR_*): the Remnant's brass, its bar's gold, the light of its heart. */
 export const TURNING_RGB = Object.freeze({ brass: Object.freeze(HOUR_BRASS.slice(0, 3)), gold: Object.freeze(HOUR_GOLD.slice(0, 3)), light: Object.freeze(HOUR_LIGHT.slice(0, 3)) });
-/** HOURS-FIRST (2026-10-08, Mac: "a unique different version of the aura"): THE FIRST HOUR - Hour's First's own, The
+/** HOURS-FIRST: THE FIRST HOUR - Hour's First's own, The
  *  Turning Hour's wheel and dial (every measure and rate above) cast again in the first dawn's colours (ui/playerBadge.js
  *  HOUR_DAWN, HOUR_PEARL, HOUR_SUN: rose gold where the brass was, pearl where the gold was, the dawn's white where the
  *  light was), and three things the Remnant's has not: its dial turns FORWARD - the Hour's hands, that ran back, set
@@ -307,7 +300,7 @@ export function turningWheelAngle(t) {
  *  growing; it fell, and the dial turned clockwise, forward. */
 export const turningDialAngle = (t) => Math.PI * 2 * TURNING_HZ.dial * t;
 
-// SERPENT5 (2026-10-15; bible/11-Multiplayer/Sea-Serpent.md section 17): THE MAELSTROM - the Old Coil's aura, the
+// SERPENT5: THE MAELSTROM - the Old Coil's aura, the
 // whirlpool Sethrakul raises about a ship, drawn about the wearer's feet; one dealing ship's serpent kill in fifty on its
 // first write (server-account/src/serpents.js). The pass's ninth look, added whole as the wheel is:
 //   - THE GROUND: a pool of the sea's light, dark in its eye; MAELSTROM_ARMS arms of foam wound in to the eye, turning
@@ -357,7 +350,7 @@ export function maelstromDropAt(m, t) {
   const f = (x) => x - Math.floor(x);
   return { u: f(h1 + maelstromSpin(t) / (Math.PI * 2)), life: f((t / Math.round(1 / MAELSTROM_HZ.drop)) * (1 + (m % 3)) + h2) };
 }
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): WITCHFIRE's measures - a coven's green fire round the feet,
+// WITCH1: WITCHFIRE's measures - a coven's green fire round the feet,
 // tallow candles burning in its ring, and the violet motes the night's sorcery sends up off it.
 export const WITCHFIRE_R = 0.78;          // the ring the fire burns on, m
 export const WITCH_CANDLES = 7;           // the candles standing in it
@@ -1418,7 +1411,7 @@ export function auraTorso(L, R, spine, neck, head, out) {
 
 /** SERAPH-WINGS: THE EYE OF THE BEHOLDER FIGURE - a sprite body has no bones, so what stands for them is read off the frame
  *  it is drawn in: its base over the feet and its metres a pixel (eotbBody figure(), peerRiders figureOf).
- *  AUDIT 3 (2026-10-05): BY THE PIXEL, NOT BY THE FRAME'S HEIGHT. A frame is as tall as what it holds - a sword up, a
+ *  AUDIT 3: BY THE PIXEL, NOT BY THE FRAME'S HEIGHT. A frame is as tall as what it holds - a sword up, a
  *  staff, a hand raised to cast (to 174 px) - and the shoulders at 0.8 of it hung the cloak and the wings 0.3 - 1 m over
  *  the head whenever a weapon was out, jumping as it was drawn or sheathed. The sets' own shoulders stand 78 - 88 px
  *  over the frame's foot whatever it holds (measured off the frames' alpha: Idle 88, IdleMelee 80, IdleSpell 84,
@@ -1441,8 +1434,7 @@ export function auraSpriteBones(fig) {
     'bip01 l calf': null, 'bip01 r calf': null, sunk: at(EOTB_FIGURE.shoulder) < CLOAK_SHOULDER_Y * 0.4, wingBack: WING_SPRITE_BACK * m / EOTB_FIGURE.mpp,
   };
 }
-/** A peer's sprite figure as the pose `auraCapeStep` takes - at the wearer's own feet - or null. SPRITE-FACE (2026-10-05,
- *  Mac: "The sprite rotation on character input is a little finicky and make the aura misallign"): FACING AS ITS PICTURE
+/** A peer's sprite figure as the pose `auraCapeStep` takes - at the wearer's own feet - or null. SPRITE-FACE: FACING AS ITS PICTURE
  *  DOES - `face` the sprite layer's { yaw, turn } (net/peer/peerRiders.js faceOf): hung on the picture's facing, its eight-way
  *  view, where the pose's own facing runs up to half a view off it; swung by the pose's (`turn`). A sprite with a face and
  *  no figure (a rider's, the horse's picture) is faced and hung from the rest pose; neither, null. Pure. */
@@ -1558,7 +1550,7 @@ export function auraBeastStep(w, beast, t) {
   return w;
 }
 
-/** AURA-SPLIT (#1143, bible/07-Rendering/Performance-Priority.md): every look's kind, once each. */
+/** AURA-SPLIT (#1143): every look's kind, once each. */
 export const AURA_KINDS = Object.freeze([...new Set(Object.values(AURA_LOOK).map((l) => l.kind))]);
 /** AURA-SPLIT: the uniforms a look's program is handed (`uAura` is its constant, not one of them). */
 const AURA_UNIFORMS = Object.freeze(['uVP', 'uKind', 'uAt', 'uGroundR', 'uRingR', 'uFlameH', 'uLift', 'uTime', 'uSeed', 'uKindle', 'uFogMode', 'uFogDensity', 'uFogRange', 'uCamPos', 'uFocus', 'uJungleHaze', 'uYaw', 'uSide', 'uTorn', 'uSwing', 'uCapeS', 'uCapeH', 'uKneeL', 'uKneeR', 'uTorsoU', 'uTorsoF', 'uWingBack']);

@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT SHADER-STALL (2026-10-20, the owner: "I need you to audit this and ensure this is perfect and fidelity isnt
-// lost"; bible/07-Rendering/Performance-Priority.md SHADER-STALL, the audit): THE PASSES PLAY MEETS, STARTED AT THE
+// AUDIT SHADER-STALL: THE PASSES PLAY MEETS, STARTED AT THE
 // BOOT'S IDLE. SHADER-STALL built a pass in play once the driver said its compile was done - no frame frozen on it -
 // and a pass first wanted inside its compile was simply late: a gate's fire, the court's way in, the node's ring by
 // the compile's time, where before the screen had frozen and every drawn frame showed them. The audit's law: a pass the game is

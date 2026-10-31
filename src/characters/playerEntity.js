@@ -129,7 +129,7 @@ export function presentPlayerDeath(entity = playerEntity) {
   return true;
 }
 
-// AUDIT LEGACY (2026-10-05): THE DEATH'S LISTENERS - DFU's `PlayerEntity.OnDeath` event, which mods subscribe to (Project
+// AUDIT LEGACY: THE DEATH'S LISTENERS - DFU's `PlayerEntity.OnDeath` event, which mods subscribe to (Project
 // Legacy's HandlePlayerDeath did). The presenter is ONE host's screen; a listener is a system that must know the death
 // THE MOMENT IT IS DECIDED, before any screen, mode exit or reload can intervene - Project Legacy records a permadeath
 // and pays Arkay's toll here (scenes/legacyHost.js onDeath), so an F11 under the screen or a closed tab cannot undo it.
@@ -167,7 +167,7 @@ export function setAvoidDeathHook(fn) {
 
 /** THE damage door. Every path that can take player health goes through here.
  *  Returns true when this blow killed. */
-/** EG-ZR (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 15 - Shieldweaver: "your Shield spell soaks +20 / 35 /
+/** EG-ZR (2026-10-12, - Shieldweaver: "your Shield spell soaks +20 / 35 /
  *  50%", applied by "client (`hurtPlayer`'s pool)"): THE SHIELD POOL'S SOAK MODIFIERS, a named registry as the damage
  *  modifiers below are (registerShieldSoakMod) - `fn(entity, entry) -> multiplier`, how much damage one point of that live
  *  Shield entry's pool soaks (1 Daggerfall's; above 1 a pool that holds longer). With none registered, or every one
@@ -259,7 +259,7 @@ export const staffFly = () => _staff.fly;
  *  the typer's own and is not warded. A ward that throws wards nothing. */
 let _levitateWard = null;
 export function registerLevitateWard(fn) { _levitateWard = typeof fn === 'function' ? fn : null; }
-/** EG-H2 (bible/11-Multiplayer/Elite-Gates.md section 10.7): ONE WARD. The Spire's ward is OR'd into the one
+/** EG-H2: ONE WARD. The Spire's ward is OR'd into the one
  *  registration (scenes/world.js - the made level's law, systems/madeLevel.js `levitate`, beside the siege's room), as
  *  the page asks; EG-PLAY's second seam beside it (registerSpireLevitateWard) is retired. */
 export const levitateWarded = () => { try { return !!_levitateWard?.(); } catch { return false; } };
@@ -281,7 +281,7 @@ export function registerDuelFell(fn) { _duelFell = typeof fn === 'function' ? fn
 export const duelSpare = (entity) => { _duelFell?.(entity); };
 
 // ── SET2: THE PORT'S OWN SAY OVER A BLOW ON THE PLAYER ──────────────
-// Sigil sets (bible/11-Multiplayer/Sigil-Sets.md) have three things to say about damage the player takes, and this is
+// Sigil sets have three things to say about damage the player takes, and this is
 // the ONE door every source comes through (a foe's blow, a spell, a fall, a poison's round), so they are said here, each
 // a named registry like the entity folds' (a name re-registered replaces, `null` removes):
 //   - a DAMAGE MODIFIER: `fn(entity, dmg) -> dmg`, over the damage before the shield pool (Malacath's Unbroken halves);
@@ -390,7 +390,7 @@ export function presentHeardDeath(entity) {
 }
 
 /**
- * DUEL1: `spare` - A DUEL'S BLOW NEVER KILLS. Mac: "Loser drops to 1HP". A blow that would take a live player to zero
+ * DUEL1: `spare` - A DUEL'S BLOW NEVER KILLS.. A blow that would take a live player to zero
  * leaves them at ONE instead, and `spare(entity)` is told (the duel's law: the side that falls says so and has lost);
  * the avoid-death hook and the death presenter are never reached, because nobody died. Only the duel's own doors pass
  * it (a strike resolved from the opponent, the opponent's spell and its damage over time); anything else - a wolf in
@@ -430,8 +430,7 @@ export function hurtPlayer(entity, dmg, { bypassShield = false, spare = null } =
     try { spare(entity); } catch { /* the duel's word is not the blow's problem */ }
     return false;
   }
-  // FULL-GUARD (FIELD BUGS 2026-10-11b, YeetMaster64: "I get one hit killed several times a day"; Mac: "No kill from full
-  // health"): a foe's one blow never takes a player at full health to dead - it leaves them at 1, told as what it took,
+  // FULL-GUARD (FIELD BUGS 2026-10-11b, YeetMaster64: "I get one hit killed several times a day"): a foe's one blow never takes a player at full health to dead - it leaves them at 1, told as what it took,
   // and no death save is spent on it. A blow is the struck tail's mark (setFoeBlowProbe): a fall, a poison's round, a
   // spell, a trap or a world boss's strike is none, and the next blow at 1 kills as it always has.
   if (portSays && wasAlive && entity.health - dmg < 1 && entity.health >= (entity.maxHealth ?? Infinity) && _foeBlow()) {

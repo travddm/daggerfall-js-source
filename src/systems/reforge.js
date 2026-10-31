@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT9 (2026-10-01) — SALVAGE, AND THE REFORGE.
+// LOOT9 — SALVAGE, AND THE REFORGE.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 11; Mac: "Do you
-// wanna turn this into an arc and do all of the above?" - "Salvage and
+// The Loot arc (; - "Salvage and
 // reroll: break unwanted Magic+ items into a crafting material ... spend
 // it at the Mages Guild to reroll one affix"). Three things, each a law
 // here and a face elsewhere:
@@ -20,15 +19,15 @@
 //   - THE REFORGE: one line of a known Magic or Rare piece - or an
 //     Exalted Legendary's own extra line - REPLACED by a line of another
 //     kind (lootRarity.js reforgeAffix), for shards and gold. REFORGE-
-//     REPLACE (2026-10-25, the owner: "Replace, price rises"): any line,
+//     REPLACE: any line,
 //     as often as the purse allows, the price doubling with every reforge
 //     the piece has taken (reforgePrice, as the hone's does).
-//   - LOOT17 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 9):
+//   - LOOT17 (the Loot arc II):
 //     THE HONE - a line taken up its own band, never lower (lootRarity.js
 //     honeAffix), the price doubling with every hone on the piece.
 //   - LOOT20 (section 12): THE SOCKETS - a gem from the pack set in a
 //     piece's empty socket (lootRarity.js setGem), and unset, the gem
-//     shattering. GEM1 (bible/06-Systems/Gem-Sockets.md section 3): free,
+//     shattering. GEM1: free,
 //     in any of a piece's sockets, worn or not - and the Reforge's own
 //     press, the EXTRACTION: the gem out whole, for gold by its grade.
 //
@@ -104,7 +103,7 @@ export function salvagePiece(item, { items }) {
   addItem(items, welkyndShards(shards));
   return { ok: true, shards };
 }
-/** BATCH-SALVAGE (2026-10-19, the owner: "We need to add the ability to batch salvage in the inventory"): MANY PIECES
+/** BATCH-SALVAGE: MANY PIECES
  *  AT ONCE, on a pack - each through salvagePiece, in the order given, so every piece answers to the one law and a
  *  refusal costs only its own piece. A piece refused since it was chosen (worn, locked or gone) is kept and named.
  *  Answers `{ count, shards, refused: [{ item, reason }] }`. Not a DFU member: Daggerfall has no salvage (Loot-Arc.md). */
@@ -222,7 +221,7 @@ export function honePiece(item, index, player, rolls = Math.random) {
   return { ok: true, line, price };
 }
 // ── LOOT-GATE: the Imbue ───────────────────────────────────────────
-// LOOT-GATE (2026-10-25, Dudey: "we need a gold sink"; "without my level", "15k gold is gate enough"): a press at the
+// LOOT-GATE: a press at the
 // Mages Guild's Reforge that raises a piece one tier at a flat price, at any level: plain to Magic, Magic to Rare. Never
 // to Legendary - a Legendary is found, never bought. Its lines are rolled fresh, as a found one's are; a technique line
 // stays, last. The piece is marked `imbued`, and a counter pays for the piece it was (lootRarity.js
@@ -305,7 +304,7 @@ export function imbuePiece(item, player, rolls = Math.random) {
 }
 
 // ── LOOT20: the sockets ──────────────────────────────────────────────
-/** GEM1 (bible/06-Systems/Gem-Sockets.md section 3): SETTING IS FREE - the gem is the price, in the pack or at the
+/** GEM1: SETTING IS FREE - the gem is the price, in the pack or at the
  *  Reforge alike (LOOT20 charged the guild's 100 gold, when the guild was the only door). What the Reforge alone does is
  *  EXTRACT: a set gem out whole, for gold by its grade. */
 export const EXTRACT_PRICE = Object.freeze({ chipped: 50, flawed: 100, plain: 200, flawless: 400, perfect: 800 });

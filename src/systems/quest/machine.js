@@ -502,8 +502,7 @@ export class QuestMachine {
     // resync or a fresh receipt of the same name is refused, so a partner who is behind can neither drag a
     // finished quest back into play nor pay its rewards a second time.
     this.finishedSharedQuestNames = new Set();
-    // DISC22-F (2026-09-24, Skibbster: "Unable to share quests with players if you've previously completed the same
-    // quest"): the finished shared COPIES, by their share identity (Quest.shareId, stamped the first time a quest is
+    // DISC22-F: the finished shared COPIES, by their share identity (Quest.shareId, stamped the first time a quest is
     // shared and carried in its envelope). A2's guard is against one copy paying twice - a partner who is behind
     // re-sending THAT quest - and a name cannot tell that copy from a new one: a repeatable quest done under a share
     // refused every later share of the same name as "done". The name set stays for an envelope from a client that
@@ -764,7 +763,7 @@ export class QuestMachine {
   scheduleQuestByName(questName, factionId = 0, opts = {}) {
     const lines = this.deps.getQuestSourceLines?.(questName);
     if (!lines) { console.warn(`[quest] no source for quest ${questName}`); return null; }
-    // CRUX1 (2026-09-22): UNDER ParseQuest's CATCH, as the lists arm is
+    // CRUX1: UNDER ParseQuest's CATCH, as the lists arm is
     // (parseQuestForLists above, AUDIT 24). This is the `start quest`
     // action's door (StartQuest.cs:58-72 -> QuestMachine.StartQuest ->
     // ParseQuest, whose try/catch at :670-687 answers null), and it had
@@ -806,11 +805,11 @@ export class QuestMachine {
     quest.start();
     adoptLinkedDungeonSize(quest, this);   // AUDIT DELVE E5: where the medium size is either side, the size its markers know
     this.deps.addQuestTopics?.(quest);
-    // QL1 (bible/06-Systems/Questlines-Arc.md decision 1): THE STAMP, at the one door every new quest starts through - a
+    // QL1 (decision 1): THE STAMP, at the one door every new quest starts through - a
     // scheduled one, a list's, a start's, a restart's. A quest that already carries one (none does here: a shared copy
     // and a load restore theirs, and never pass this door) keeps it. The layer answers (scenes/quest/questBridge.js).
     if (quest.ql == null) quest.ql = this.deps.questlinesStamp?.(quest) ?? null;
-    // QUEST-UID1 (2026-09-24, found tracing "two letters from the queen"): `quests.Add(quest.UID, quest)` (:725) is a
+    // QUEST-UID1: `quests.Add(quest.UID, quest)` (:725) is a
     // Dictionary.Add - a UID already on the live table THROWS, and the quest standing there stays. `set` replaced it
     // in silence, so a quest minted before a load and started after it (the offer popup a quickload runs under - see
     // the bridge's restore) overwrote whatever restored quest had drawn the same number: a quest that vanished with
@@ -1767,7 +1766,7 @@ export class QuestMachine {
   /** AUDIT DROPS A1: the receiver's OWN parse of a quest by name - the reference an incoming envelope's shape is
    *  held against (systems/quest/questShare.js shapeMismatch) and the source of its Item resources' items. Not
    *  scheduled, not started; null when this machine has no source for the name or the parse fails.
-   *  SHARE-COPY (2026-09-26, "Shared Quest did not match copy"): HEADLESS. This parse ran over the receiver's own
+   *  SHARE-COPY: HEADLESS. This parse ran over the receiver's own
    *  world, so the SCRIPT's shape depended on where the receiver stood: a `local` Place throws in the wilderness
    *  or in a town without that building, and the receiver was told they "do not know this quest". The shape is
    *  the script's; the world's half (the sites, the NPCs, the homes) comes from the sender's envelope, as a save
@@ -1883,7 +1882,7 @@ export class QuestMachine {
   }
 
   /**
-   * QUEST-SHELF (2026-10-08, Mac: "All quests should be able to be abandoned and reclaimed"): ABANDON - THE QUEST SET
+   * QUEST-SHELF: ABANDON - THE QUEST SET
    * ASIDE, KEPT WHOLE. Never a tombstone: its items stay in the pack (the load's orphan sweep keeps a quest it still
    * holds), its topics and journal stay its own, its clocks stop where they stand. It stops running (tick, clicks,
    * actions), its questor's door opens (isLastNPCClickedAnActiveQuestor - a guild offers work again), a named NPC it
@@ -1970,8 +1969,7 @@ export class QuestMachine {
   }
 
   /**
-   * QUEST-RESET (2026-10-13, LostMyLeg on Discord: the Dust of Restful Death's mummy "wont spawn in the dungeon choosen
-   * by the quest ... the queststate itself is borked. We prob need to add an option that can fully reset a quest"):
+   * QUEST-RESET:
    * RESTART - the quest thrown away and started again from its own script, as `start quest` starts it. The new copy is
    * parsed FIRST, while the old one still holds its sites, so its Places choose afresh away from the ones the old copy
    * broke in; a copy that will not parse here (no source, no site of its kind left) leaves the old one as it was. Then
@@ -2116,7 +2114,7 @@ export class QuestMachine {
   /** Dispose resources then task actions (Quest.cs Dispose order,
    *  AUDIT quest-P5), mark tombstoned (site-link scrub rides Q3). */
   tombstoneQuest(quest, { ended = false } = {}) {
-    // QL1 (bible/06-Systems/Questlines-Arc.md section 2.3): a quest a system ENDS in its own place - the werewolf's cure
+    // QL1: a quest a system ENDS in its own place - the werewolf's cure
     // closes $CUREWER (racialQuests.js endLycanthropyQuests, DFU's own tombstone, EndLycanthropyQuests) - settles its
     // questlines outcome as its own `end quest` would (quest.js endQuest), first, while its tasks still stand
     if (ended && !quest.questComplete && !quest.questTombstoned) quest.hooks?.questEnding?.(quest);
@@ -2267,7 +2265,7 @@ export class QuestMachine {
   }
 
   /**
-   * FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both"): EVERY BUILDING SITE NOT YET REACHED THAT IS A
+   * FIELD BUGS 2026-10-14 QUEST-HOME: EVERY BUILDING SITE NOT YET REACHED THAT IS A
    * PLAYER'S HOME NOW, CHOSEN AGAIN in its own town (Place.repickHomedSite), its site links following and the host told
    * (`world.questSiteMoved(quest, place, was)` - the town map's mark and the talk's discovery move with it). Asked
    * whenever the page learns of homes (the world host, its homesLearned: the boot's read of every town, the hub's word that one moved, a

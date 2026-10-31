@@ -1,4 +1,4 @@
-// FPS-CAP1 (2026-09-25, Mac: "Add FPS limiter to settings") - THE FRAME
+// FPS-CAP1 - THE FRAME
 // RATE CAP. DFU's `Video/TargetFrameRate` had sat in the store since the
 // settings screen shipped, labelled "Frame Rate Cap" and read by nothing.
 // This is its consumer: StartGameBehaviour.ApplyStartSettings' two lines,
@@ -13,7 +13,7 @@
 // reason (systems/settings/settings.js UNAVAILABLE). Read DFU's way, the cap
 // could never do anything. So it holds frames BACK from the screen's
 // rate, which is the only thing a page can do - it never runs faster.
-// FPS-VSYNC (2026-09-28): EXCEPT IN THE DESKTOP APP WITH VSYNC OFF. The
+// FPS-VSYNC: EXCEPT IN THE DESKTOP APP WITH VSYNC OFF. The
 // shell lifts Chromium's wait at launch (app/lib/frameRate.cjs), rAF
 // then runs past the screen, and the cap is what holds the frames -
 // DFU's targetFrameRate, through THE PACER below, not this gate alone

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (bible/03-World/Bantha-Jungle.md; the owner: "populate the area in a dense jungle like format ... insanely
-// detailed and not hurt performance") - THE JUNGLE'S LAYOUT: where the jungle's trees stand, in four storeys.
+// BANTHA1 () - THE JUNGLE'S LAYOUT: where the jungle's trees stand, in four storeys.
 //
 // The pixel's own layout (world/terrain/terrainNature.js layoutNature - DFU's scatter or Real forests, and the
 // ecotone's border) is laid first; then each tile the jungle owns is laid again by the jungle's own law and the
@@ -10,8 +9,7 @@
 // its edge as stands that grow and join, never a line.
 //
 //   - THE CANOPY. The land is cut into cells JUNGLE.cell tiles square (12.8 m), and every other cell is a canopy SITE -
-//     a quincunx on the world's lattice (SPREAD, 2026-10-19, the owner: "Lets spread out on the distance between
-//     trees": a canopy tree every cell stood 12.8 m from the next and as near as 5 m), so the canopy's trunks stand
+//     a quincunx on the world's lattice (SPREAD, 2026-10-19,: a canopy tree every cell stood 12.8 m from the next and as near as 5 m), so the canopy's trunks stand
 //     18 m apart and never nearer than 9 m, and the owner's crowns, 16-19 m across, still meet overhead. A site stands
 //     one canopy tree somewhere in its middle (JUNGLE.inset) - JUNGLE.canopy of the sites where the jungle is whole -
 //     unless it falls in a GLADE: a second reading of the forests' own field (FOREST1 forestCover, offset so a glade is
@@ -32,7 +30,7 @@
 //     JUNGLE.grove.cell tiles - so a slope of figs gives way to a stand of mahoganies), the ground's height above the
 //     beach (banyans and figs crowd the low wet ground, kapoks and mahoganies the high), and light (the flame tree takes
 //     the glades' edges).
-//   - GRAHT1 (bible/03-World/Graht-Oaks.md): THE GRAHT-OAKS, where the canopy's zones close it (Valenwood's forest - the
+//   - GRAHT1: THE GRAHT-OAKS, where the canopy's zones close it (Valenwood's forest - the
 //     job's `canopy`, the canopy field's 3x3): stood first, the storey over everything (world/jungle/grahtOaks.js
 //     grahtSites), and every storey under them and every roadside pair keeps off their feet, the floor off their trunks.
 //

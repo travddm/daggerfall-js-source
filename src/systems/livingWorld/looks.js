@@ -1,6 +1,5 @@
 // @ts-check
-// LW-LOOKS (2026-10-06, bible/06-Systems/Living-World.md "LW-LOOKS"; Mac: NPCs should "even utilize different sprite
-// forms not just the basic npc sprites" - and, asked how, "Class looks + still flats"): WHAT A RESIDENT LOOKS LIKE.
+// LW-LOOKS: WHAT A RESIDENT LOOKS LIKE.
 //
 // THE CLASS THEY WALK THE TOWN IN (`townClassOf`). LW0 decision 5 put a class's eight-way sprite on one going out to
 // fight (LW3's armed walk) and every one else in a townsperson's outfit; now those whose calling is a class's walk the

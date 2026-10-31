@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -37,7 +37,7 @@ export function createWildDropHost(host) {
       session: realmSession,
       checkpoint: () => wildDeathCheckpoint(),
       needsAnswer: true,
-      call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),   // MAC (2026-10-14): my killer's piece into escrow where its room signs the collect; COMPANION-DROP (AUDIT FB1019f B2) and LETTERS-TENTH: the words my game applies (systems/wild/wildDeath.js wildFallWords - STORE-KEEPS retired CART-AWAY's wagon word)
+      call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),     // MAC: my killer's piece into escrow where its room signs the collect; COMPANION-DROP (AUDIT FB1019f B2) and LETTERS-TENTH: the words my game applies (systems/wild/wildDeath.js wildFallWords - STORE-KEEPS retired CART-AWAY's wagon word)
       apply: (a) => wildDropTaken(a?.data ?? null, body, lay),
     }).catch((e) => console.warn('[wild] the drop failed', e?.message ?? e));
   };
@@ -51,7 +51,7 @@ export function createWildDropHost(host) {
     const n = Array.isArray(d.items) ? d.items.length : 0;
     const dd = wildDeath();
     const claimed = d.wi === 0 && out.length && d.took?.[0] ? itemLongName(out[0]) : null;
-    // MAC (2026-10-14, the two-phase handoff): the piece my killer claimed is in the service's escrow until they collect it
+    // MAC: the piece my killer claimed is in the service's escrow until they collect it
     const held = d.wi === 0 && !!d.escrow?.r;
     const insured = wildInsure?.spent(d.insured) ?? 0;   // WILD-INSURE: the keys my policies kept, spent
     if (dd) setWildDeath({ killer: dd.killer, kill: true, dropped: d.order ? n : 0, claimed, held, burnt: d.burnt ? n : 0, letters: out, insured, shield: d.shield === true });   // BURNT-SAID (FIELD BUGS 2026-10-18b): a held record's drop said, and the letters by their worth

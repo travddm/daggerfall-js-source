@@ -1,6 +1,5 @@
 // @ts-check
-// TESA7 (2026-10-12, the owner: "Populating the world with unique and smaller towns, farms, etc"; bible/03-World/
-// Arena-Provinces.md TESA7) - THE COUNTRYSIDE PAST THE BAY: the hamlets, villages, farms, homes, inns, temples and shrines
+// TESA7 - THE COUNTRYSIDE PAST THE BAY: the hamlets, villages, farms, homes, inns, temples and shrines
 // that stand between Arena's places, as thick on the ground as the Bay's own. Pure: the world host (scenes/world.js
 // `_locationToBuild`) asks it of a pixel past the Bay that Arena's places leave free, as the pixel builds, and stands the
 // answer in its index.

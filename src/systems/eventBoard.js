@@ -1,8 +1,6 @@
 // @ts-check
-// EVENTS1 (2026-10-23, the owner, over the Discord threads "Make announcements for Fallen Stars and Town Raids" and
-// "Things are starting to get worse": "On the topic of event notifications. Instead of stuffing these in the chat menu,
-// there must be a less obstructive and more detailed way to handle them"): THE EVENT BOARD'S LAW.
-// Design: bible/10-UI/Event-Board.md; its audit, bible/01-Overview/audits/Audit-Event-Board.md.
+// EVENTS1: THE EVENT BOARD'S LAW.
+// Design:; its audit,.
 //
 // WHAT WAS WRONG. Every shared event spoke in sentences on the chat's every tab (net/chat.js pushAll), between the
 // players' own lines, and said each thing once: a reader who missed the line had the Timers window under the pause
@@ -19,14 +17,13 @@
 // omen, the star's hold, a raid's cleansing - ride that news as its notes (systems/eventNotices.js, the one door)
 // instead of the chat.
 //
-// AUDIT EVENTS1 (bible/01-Overview/audits/Audit-Event-Board.md): a line comes with its event's id where its kind has
+// AUDIT EVENTS1: a line comes with its event's id where its kind has
 // more than one event at a time (a star, a raid), and is shown with that event or alone - never with another's (A1); a
 // row carries the moment it came onto the board by its own law (`since`), so what stood before the board first read the
 // world is no news however late the source filled in (A5); an event no one can join is left out (A6); the gate's, the
 // serpent's and the Abyss Dungeon's rows are said in the player's language (W3), and a raid's party too (W2).
 //
-// EVENTS2 (2026-10-24, the players on Discord: "Allow us to filter which events we want to show up in the event
-// tracker", "I don't want all this crap cluttering up my interface"; the owner: "No band aids"): EACH KIND THE PLAYER'S
+// EVENTS2: EACH KIND THE PLAYER'S
 // OWN. The kinds have one home (systems/features.js EVENT_KINDS, the Event board row's chips) and every list here is
 // derived from it. A kind turned off is dropped BEFORE the cut - its rows free their places on the plate and "N more"
 // never counts it - while the announcements' memory still reads every kind, so a kind turned back on mid-event

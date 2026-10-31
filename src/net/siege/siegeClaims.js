@@ -1,5 +1,5 @@
 // @ts-check
-// SEAT2a part four (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE SIEGE
+// SEAT2a part four: THE SIEGE
 // RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE - the gate's claims' twin (net/gate/gateClaims.js). A fighter's `s1`
 // receipt (net/siege/siegeReceipt.js), handed by the relay at the battle's end, is the battle's result for the service and the
 // fighter's own Honours claim; it is kept on the device (SIEGE_CLAIMS_KEY) and offered (`/v1/seats/siege/claim`,
@@ -112,7 +112,7 @@ export function royalClaimSettles(r) {
 /** THE BOUTS' CARRIER - createSiegeClaims's, over `t1` receipts (`/v1/seats/royal/claim`). */
 export const createRoyalClaims = (o) => createSiegeClaims({ ...o, storeKey: ROYAL_CLAIMS_KEY, read: readRoyalReceipt, settles: royalClaimSettles, max: ROYAL_CLAIMS_MAX });
 
-// ─── INT8: A DUEL'S BOUTS (bible/06-Systems/Integrity-Arc.md lane 2) ────────────────────────────────────────────────
+// ─── INT8: A DUEL'S BOUTS (lane 2) ────────────────────────────────────────────────
 /** The device's duel receipts not yet settled with the account service. */
 export const DUEL_CLAIMS_KEY = 'int8.duelClaims';
 /** The most it keeps - an evening of bouts won and lost. */

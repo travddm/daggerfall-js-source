@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT SD II (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's SD11d): THE
+// AUDIT SD II: THE
 // HOUR'S VOICE - every line the arc says over the middle of the screen, paced. DFU's label (ui/midScreenText.js) holds one
 // line, and each write replaced the last: at the kill three lines took it within 1.2 s (the fall, the collapse's first
 // readout, the spoils) and the arc's climax was never read; the second Echo's fall stood 250 ms under the Last Moment's;

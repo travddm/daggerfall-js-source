@@ -1,10 +1,8 @@
 // @ts-check
-// DF-LOOK (2026-10-15, Mac: "we recently took away custom textures for certain models. Is there any way to revert those
-// changes and instead make those textures more daggerfall-esq"; asked, every model DF-ART dressed - the ships, the wagons
-// and the caravan, the yards and the port, the LeFay monument, the town's hangings - and the look, "Palette + grain"):
+// DF-LOOK:
 // THE PORT'S OWN PAINTED PICTURES, IN DAGGERFALL'S OWN COLOURS.
 //
-// DF-ART (bible/01-Overview/DF-Art.md) had those models wear Daggerfall's records in place of their painted art. DF-LOOK
+// DF-ART had those models wear Daggerfall's records in place of their painted art. DF-LOOK
 // gives them their painted art back - every livery, board, emblem and charge - and lays Daggerfall's look over it at
 // the upload: each texel GRAINED (its light jittered, half by the texel and half by its 2 x 2 block - the clumped grain
 // a classic wall carries where the painted noise ran smooth) and then SNAPPED to the nearest colour of the player's own
@@ -18,7 +16,7 @@
 // a tiling picture's grain has no seam, and a picture's alpha is never touched (a cut-out keeps its holes).
 
 /** How far a texel's light is jittered either way, in 0-255 steps of each channel: measured against TEXTURE.050, .054
- *  and .067, whose texels step 3-15 in light from their neighbours (bible/01-Overview/DF-Art.md, DF-LOOK). Half of it is
+ *  and .067, whose texels step 3-15 in light from their neighbours (, DF-LOOK). Half of it is
  *  the texel's own and half its 2 x 2 block's - a classic wall's grain comes in clumps, not single texels. */
 export const DF_GRAIN = 10;
 

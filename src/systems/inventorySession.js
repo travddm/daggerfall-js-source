@@ -197,8 +197,7 @@ export function remoteTarget(deps = {}, state = {}) {
 // handlers (:2104-2146) and OnPop's icon arm (:689-712) are law here.
 // ═══════════════════════════════════════════════════════════════════
 
-/** HOUSE-DROP (2026-09-27, Mac relaying reports: "In houses, players can drop items and the owner cannot see them";
- *  asked, "Block visitor drops"): the host's word against a drop, asked only when the destination IS the ground - the
+/** HOUSE-DROP: the host's word against a drop, asked only when the destination IS the ground - the
  *  session's dropped list, or a pile the player dropped before (DaggerfallLoot.playerOwned) - never a wagon, a chest, a
  *  corpse or a merchant. Null: the ground takes it. */
 export function groundRefusalOf(deps = {}, state = {}) {
@@ -216,7 +215,7 @@ export function storeRefusalOf(deps = {}, state = {}) {
   return deps.storeRefusal ? deps.storeRefusal() ?? null : wildStoreRefusal();
 }
 
-/** COMPANION-WEIGHT (2026-10-01): the destination's own weight limit when it is a storage with one - a companion's pack
+/** COMPANION-WEIGHT: the destination's own weight limit when it is a storage with one - a companion's pack
  *  carries what a person of his strength can (the host's `loot.capacity`) - asked only when the remote list IS that
  *  storage, never the wagon (WagonCanHoldAmount's own 750), the ground or a choose-one list. Null: no limit.
  *  `{ kg, name }` - the limit, and whose it is for the refusal's words. */

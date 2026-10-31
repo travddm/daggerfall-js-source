@@ -113,7 +113,7 @@ export class DeathScreen {
     // goes - a box pushed while it is up waits beneath (ui/windowStack.js
     // holdsTop), so the rise's replace takes THIS window, not the box.
     this.holdsTop = true;
-    // DUPE-LOAD (2026-10-11): the ONE window a quickload is pressed from under (its "F11 load" hint, FIX-E) - the world
+    // DUPE-LOAD: the ONE window a quickload is pressed from under (its "F11 load" hint, FIX-E) - the world
     // host's arm and routeKey's both ask this, and every other window keeps its keys, as DFU's HUD takes no QuickLoad
     // under a window. A load from under the pack, a loot window or a counter restored the save while the window still
     // held what it had taken off the old one, and its close handed it back: a drop doubled the purse every load.
@@ -129,12 +129,12 @@ export class DeathScreen {
     // AUDIT 28 B5: a host whose death never respawns online (the fixed city, the standalone dungeon) says so - its
     // screen counts no online respawn down and shows no loss it will never take
     this.online = online ?? isOnlinePage();
-    // BAL4 (bible/05-Combat/Balance-Arc.md section 6): AN OFFLINE DEATH PROJECT LEGACY WILL RAISE IS A RESPAWN TOO. The
+    // BAL4: AN OFFLINE DEATH PROJECT LEGACY WILL RAISE IS A RESPAWN TOO. The
     // host whose reset asks Legacy first hands `rises` (the outcome is decided before this screen goes up - Legacy's
     // onDeath runs first, playerEntity.js hearDeath); the fixed city and the standalone dungeon hand none, and never
     // rise. Read once, here: the screen says Rise where it said End the journey, and states the respawn's loss.
     this.rises = !this.online && !!rises?.();
-    // DEATH-PENALTY (Mac: "and it should be shown in the death screen"): the gold the respawn will take,
+    // DEATH-PENALTY: the gold the respawn will take,
     // read HERE, once - and STATED (systems/deathPenalty.js stateDeathLoss): the respawn takes exactly this, capped
     // at the purse, whatever the purse did while the player lay dead (AUDIT 28 B5: a mate's bounty clear pays the
     // dead too, and the respawn took its share of the bigger purse). A death with no respawn (the run ends) takes none.

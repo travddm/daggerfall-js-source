@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD-INSURE (2026-10-26, the owner: "Overhauling the open PvP to be a bit more palatable, being able to insure gear on
-// death ... while retaining its punishment"; asked, "Kept, policy spent" at "20% of worth") - A POLICY ON A PIECE OF GEAR,
-// THE LAW (bible/11-Multiplayer/Wild-Zone.md section 4b). A leaf the account Worker bundles
+// WILD-INSURE - A POLICY ON A PIECE OF GEAR,
+// THE LAW. A leaf the account Worker bundles
 // (server-account/src/wildInsure.js writes a policy, server-account/src/wild.js spends it): one law at both ends.
 //
 //  - WHAT MAY BE INSURED: a piece the ledger follows (systems/item/itemIds.js ledgerKeyOf - Magic tier and up, a DFU magic
@@ -32,7 +31,7 @@ import { ITEM_UID_RE, PROVENANCE_RE, itemWorth } from '../item/itemLaw.js';
 import { TEMPLATES } from '../item/itemKinds.js';
 import { wildCanLose } from './wildDropLaw.js';
 
-/** The premium is a piece's worth over this, rounded up - a fifth (the owner: "20% of worth"). A divisor, as the zone's
+/** The premium is a piece's worth over this, rounded up - a fifth. A divisor, as the zone's
  *  gold share is one (wildDropLaw.js WILD_GOLD_DIVISOR): `w / 5` is exact for every whole worth. */
 export const WILD_INSURE_DIVISOR = 5;
 /** Seconds after it is written that a policy is in force - past WILD_REF.pickMs and the fall's signing after it

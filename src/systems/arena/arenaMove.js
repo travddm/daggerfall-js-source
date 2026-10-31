@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): A HOUSE THE ARENA TOOK, MOVED - ONCE, OFFLINE. Mac, 2026-10-02: "Move them to a new house."
+// ARENA1: A HOUSE THE ARENA TOOK, MOVED - ONCE, OFFLINE.
 //
 // GEMSAL03 (Daggerfall's cell 4,3) stood fifteen houses and a house of the Academics; the arena's block stands none
 // (world/arena/arenaCity.js). A deed whose building key names a building of that cell names nothing now, so at the first
@@ -28,7 +28,7 @@
 // left / 20 s) of condition) - where ARENA2 had let it burn out. A camp is no house's.
 //
 // Online homes are the account service's (ARENA4): the service moves each home row in one migration - see
-// bible/11-Multiplayer/Arena.md "ARENA1 record". [ARENA4b: the owner's CLIENT picks the new house - `arenaHomeFor`, this
+// "ARENA1 record". [ARENA4b: the owner's CLIENT picks the new house - `arenaHomeFor`, this
 // file's own pick over the buildings an online home may be - since the service holds no town's records; the service
 // carries the row (server-account/src/homes.js arenaMoveHome) and the client empties the old scene by `emptyArenaScene`
 // (systems/online/onlineHomes.js moveArenaHomes).] Every other record keyed to the cell (a rented room, a repair

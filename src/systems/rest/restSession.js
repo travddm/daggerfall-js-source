@@ -31,17 +31,13 @@
 // pend towns" - by porting CanRest (:542-599) whole, and the merge
 // below is the union of what each of them got right.
 
-// RESTX1 (2026-09-15, Mac: "for online I want to change the rest
-// mechanic to not use any time. Basically rest just becomes the way to
-// regain") made an online REST resolve in ONE FRAME - the whole hourly
+// RESTX1 made an online REST resolve in ONE FRAME - the whole hourly
 // ladder run inside a single tick(), no minutes passed, no host clock
 // jump, no encounter roll - and left LOITER pacing off the shared
 // world clock at DFU's TimeScale (an hour of loiter was five real
 // minutes of watching a counter).
 //
-// RESTX2 (2026-09-17, Mac, "BetterResting": monsters should still be
-// able to interrupt an online wait, and the hours-remaining counter
-// should visibly tick down rather than jump straight to its answer)
+// RESTX2
 // RETIRES BOTH SPECIAL CASES. ONE LAW FOR EVERY MODE, ONLINE OR OFF:
 // the window's own real-time timer (REST_WAIT_PER_HOUR /
 // LOITER_WAIT_PER_HOUR real seconds a simulated hour) paces every
@@ -55,7 +51,7 @@
 //   - the shared WORLD clock is untouched: `worldTick.setWorldMinutes`
 //     still refuses every local write while it stands (:834-838), so
 //     this is pacing only, not time made or taken from anyone else's
-//     sky. [LIVED1 (2026-09-29): the minutes are the CHARACTER's own -
+//     sky. [LIVED1: the minutes are the CHARACTER's own -
 //     the host's advance moves their clock (worldTick.advanceOwnMinutes
 //     through the ticker), so every hour rolls against a distinct minute
 //     that stays theirs after the rest. SUPERSEDES the session-local
@@ -65,13 +61,12 @@
 //     cross-player-visible state; ticking it against a locally
 //     simulated minute would desync this player's quests from everyone
 //     else's. Offline the quest tick rides the sub-tick as DFU has it.
-//     [TIME3 (2026-10-01, bible/06-Systems/Online-Time-Arc.md 6.3): it
+//     [TIME3: it
 //     does now, online as offline. A quest's countdowns run on the
 //     character's own clock, which the rest moves, and a party's shared
 //     copy runs on its holder's (quest/machine.js updateSharedQuest), so
 //     a rest spends this player's quest days and no one else's.
-//     SUPERSEDES the stand-down above.] [QCLOCK-WORLD (2026-10-02,
-//     Online-Time-Arc.md 6.3c): the quests still tick under the rest,
+//     SUPERSEDES the stand-down above.] [QCLOCK-WORLD: the quests still tick under the rest,
 //     but online a countdown charges a raise nothing - a rest spends no
 //     quest days; offline it does, as DFU.]
 // AUDIT RESTX F1's full-health guard on the Medical tally went with
@@ -600,9 +595,7 @@ export class RestSession {
     // enemies-nearby text, exactly like the hourly check below.
     if (this._abortEnemySpawn) {
       this._abortEnemySpawn = false;
-      // PARTY-REST5 (2026-09-21, per-request: "when the initiator spawns mobs only he gets taken out of the rest
-      // not the follower... the ones who not initiate need to also stop resting when an enemy appears for the
-      // initiator"): an optional dep, called ONLY on a real enemy break, never on an ordinary wake/healed/cancel
+      // PARTY-REST5: an optional dep, called ONLY on a real enemy break, never on an ordinary wake/healed/cancel
       // finish - a follower's own mirror deps never supplies this hook, so nothing happens for the follower
       // locally; a host that DOES supply it (world.js's `outdoorRestDeps`/the interior and dungeon equivalents)
       // uses it to stamp a broadcast timestamp a follower's own mirror tick compares against (world.js's
@@ -611,8 +604,7 @@ export class RestSession {
       return { textId: REST_TEXT.enemiesNearby, enemyBroke: true, died: false };
     }
 
-    // PARTY-REST19 (2026-09-22, per-request: "An non initiator MUST cancel the rest for all if he cancels
-    // the ongoing resting"): an optional dep, checked every tick like the enemy-abort latch above, so it
+    // PARTY-REST19: an optional dep, checked every tick like the enemy-abort latch above, so it
     // takes effect the same frame a follower's own Stop click is pressed rather than waiting up to an hour.
     // `endEarly()` (not a raw textId object) reuses this session's own mode-aware choice of message - a
     // FullRest already healed still reports healed, a Loiter reports loiterDone, exactly as if THIS player
@@ -659,7 +651,7 @@ export class RestSession {
       // It is the SESSION's law and not a host's: DFU calls the
       // machine directly here, bypassing QuestMachine.Update's
       // real-time pacing, so the port must call the unpaced door too.
-      // TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): online too. A quest's countdowns run on the character's own
+      // TIME3 (6.3): online too. A quest's countdowns run on the character's own
       // clock, and a rest's hours are theirs (LIVED1) - raised, so a quest charges them whole (quest/clock.js): a
       // three-day wait is a 72-hour rest, about half a minute, as in DFU. [SUPERSEDES RESTX2's stand-down online, which
       // WORLD7 kept while a quest clock charged played time alone.] [QCLOCK-WORLD: the quests still tick here, but online

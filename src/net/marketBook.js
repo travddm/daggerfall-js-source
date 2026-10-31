@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET'S BOOK: what the
+// PROF5 - THE MARKET'S BOOK: what the
 // Market tab reads and every act it asks (server-account/src/market.js,
-// bible/06-Systems/Professions-Arc.md 26).
+// 26).
 //
 // THE BOARD'S SHAPE (net/noticeBook.js): a minute's cache of every read -
 // a refusal too - a slow service showing the last good view, marked stale;
@@ -39,7 +39,7 @@ import { walletReserve } from './realm/realmGoldLaw.js';   // MARKET-AUDIT: a re
 
 export const MARKET_KEPT_KEY = 'prof5.kept';
 export const MARKET_CACHE_MS = 60_000;
-/** MEM-AUDIT (2026-10-23): how many reads the cache keeps - one a query (a page, a sort, a filter), each a whole view, and it
+/** MEM-AUDIT: how many reads the cache keeps - one a query (a page, a sort, a filter), each a whole view, and it
  *  was cleared only by an act; past their minute they are the stale answer to a failed read, so the oldest go, not the old. */
 export const MARKET_CACHE_KEPT = 256;   // AUDIT MEM-AUDIT U3: a long browse's views (64 dropped a view the player came back to after 70 pages)
 export const MARKET_TRIES = 3;
@@ -75,7 +75,7 @@ export const PIECE_GONE = Object.freeze(['market-listed', 'market-uncollected', 
 export const PIECE_KEPT_ERROR = 'piece-kept';
 
 /**
- * INT19 (2026-10-17, the INTEGRITY arc's lane 1 - bible/06-Systems/Integrity-Arc.md section 7): A CRAFTED PIECE HANDED ON
+ * INT19: A CRAFTED PIECE HANDED ON
  * THROUGH THE REALM ACT (systems/realmSaves.js realmGoldAct) - listed, auctioned, or filled to a commission. The service
  * takes the piece out of the character's realm record by its provenance (server-account/src/craftedPiece.js), so the save
  * is checkpointed first and held; the piece leaves the save (`piece.take()`) only inside the hold, as the service is first
@@ -254,7 +254,7 @@ export function createMarketBook({ door, storage = null, character, now = () => 
       if (g !== gen) return null;
       const r = heard(a);
       const e = { at: now(), data: r?.ok ? r.data : hit?.data ?? null, error: r?.ok ? null : (r?.error ?? 'server'), stale: !r?.ok && !!hit?.data };
-      cache.delete(key); cache.set(key, e);   // MEM-AUDIT (2026-10-23): the newest last - a minute's reads past the cap go oldest first
+      cache.delete(key); cache.set(key, e);     // MEM-AUDIT: the newest last - a minute's reads past the cap go oldest first
       if (cache.size > MARKET_CACHE_KEPT) cache.delete(cache.keys().next().value);
       return { ok: !!r?.ok, data: e.data, error: e.error, stale: e.stale };
     })();

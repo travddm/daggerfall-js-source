@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1e — THE ACCOUNT SERVICE, AS THE CLIENT SEES IT.
 //
-// Mac (2026-09-21), asked whether to build the account creation screen
+// Mac, asked whether to build the account creation screen
 // before ACC1d: "Yes, please be detailed".
 //
 // One home for three things the screen must not each own a copy of:
@@ -411,7 +411,7 @@ const REFUSAL_WORDS = {
   'marks-bank-cap': () => t('account.refusal.marksBankCap', 'The Bank buys at most {perDay} silver from you a day.', { perDay: MARKS_BANK.perDay }),
   'marks-full': () => t('account.refusal.marksFull', 'An account holds at most {max, number} silver.', { max: MARKS_MAX }),
   'guild-marks-short': () => t('account.refusal.guildMarksShort', 'The treasury does not hold that much silver.'),
-  // DOMAIN2 (bible/11-Multiplayer/Domains.md 6): a castle - none in that region, its crown not the guild's, another guild's, none of the guild's to give up
+  // DOMAIN2 (6): a castle - none in that region, its crown not the guild's, another guild's, none of the guild's to give up
   'castle-none': () => t('account.refusal.castleNone', "No castle stands in that region for a guild to keep. Only a crown's city keeps one - Daggerfall, Wayrest, Sentinel and each province's capital but the Imperial City."),   // AUDIT TESA III E2-2: WW7-4's castles past the Bay
   'castle-not-held': () => t('account.refusal.castleNotHeld', "Your guild does not hold that region's crown, so its castle is not yours to buy."),
   'castle-taken': () => t('account.refusal.castleTaken', 'That castle belongs to another guild.'),
@@ -490,7 +490,7 @@ const REFUSAL_WORDS = {
   'prof-late': () => t('account.refusal.profLate', 'That gathering arrived too late to count.'),
   'prof-night': () => t('account.refusal.profNight', 'You need daylight to gather.'),   // ANY-HOUR: the service says it no more - kept for one not yet redeployed
   'prof-rank': () => t('account.refusal.profRank', 'Your craft is not yet skilled enough for that.'),
-  // CAP-OFF (2026-10-07): the day's cap's four - this one, `prof-account-cap`, `prof-hunt-cap` and `prof-fish-cap` - the
+  // CAP-OFF: the day's cap's four - this one, `prof-account-cap`, `prof-hunt-cap` and `prof-fish-cap` - the
   // service says no more; kept, without the numbers it no longer holds, for one not yet redeployed
   'prof-cap': () => t('account.refusal.profCap', 'You have gathered all a day allows.'),
   // AUDIT 29
@@ -556,7 +556,7 @@ const REFUSAL_WORDS = {
   'writ-taken': () => t('account.refusal.writTaken', 'Someone else has already filled that writ.'),
   'writ-expired': () => t('account.refusal.writExpired', 'That writ has run out.'),
   'writ-cap': () => t('account.refusal.writCap', 'You have filled {max} writs today, the most a day allows.', { max: COURT_WRITS_PER_DAY }),   // CHAP2a: the Court's and the halls' one allowance
-  // CRAFT-WRITS (bible/06-Systems/Professions-Arc.md section 49): a crafting writ's own refusals
+  // CRAFT-WRITS: a crafting writ's own refusals
   'craft-writ-cap': () => t('account.refusal.craftWritCap', 'You have filled {max} crafting writs today, the most a day allows.', { max: MARKS_FAUCETS.craftWrit.perDay }),
   'craft-writ-filled': () => t('account.refusal.craftWritFilled', 'You have already filled this crafting writ.'),   // AUDIT CRAFT-WRITS S4
   'craft-unbrewed': () => t('account.refusal.craftUnbrewed', 'You have not brewed enough of that potion yourself. Bottles you found or bought do not count - brew them at an alchemy station.'),
@@ -675,7 +675,7 @@ const REFUSAL_WORDS = {
   'hall-item': () => t('account.refusal.hallItem', 'A guild hall can only hold furniture from the catalog. Your own things stay with you.'),
   'hall-yard': () => t('account.refusal.hallYard', 'A palace\'s grounds cannot be furnished, only its Charter Room.'),   // GUILD-YARD: a guild hall's yard is its keepers'; a palace's grounds stand none
   'bad-heraldry': () => t('account.refusal.badHeraldry', 'Those arms are not allowed. Use a field and a border of different colors (Ash only as the border), one device that stands out from the field, and for a divided field a second color unlike the first and the border.'),   // AUDIT2 GUILD2 G5: GUILD2c's divisions and device colour
-  // GUILD2a (bible/11-Multiplayer/Guild-Overhaul.md): a new name for a price (server-account/src/guilds.js renameGuild)
+  // GUILD2a: a new name for a price (server-account/src/guilds.js renameGuild)
   'guild-rename-same': () => t('account.refusal.guildRenameSame', 'That is already the guild\'s name and tag.'),
   'guild-name-word': () => t('account.refusal.guildNameWord', 'A guild\'s name and tag cannot contain a word that is not allowed in names.'),
   'guild-rank-word': () => t('account.refusal.guildRankWord', 'A rank\'s name cannot contain a word that is not allowed in names.'),   // TEXT-F1
@@ -726,9 +726,9 @@ const REFUSAL_WORDS = {
   'no-realm-character': () => t('account.refusal.noRealmCharacter', 'That online character is not on this account.'),
   lease: () => t('account.refusal.lease', 'This character is now being played in another tab or on another device.'),
   seq: () => t('account.refusal.seq', 'This character was saved from somewhere else in the meantime. Rejoin to carry on.'),
-  // CUSTOMS-CARRY (2026-09-29): the census is every trace the realm has from before it began (migration 0022) - said as
+  // CUSTOMS-CARRY: the census is every trace the realm has from before it began (migration 0022) - said as
   // what counts, since "played online" read false to a player who had and never killed there
-  // CUSTOMS-PASS (2026-09-29): and the one way past it, a developer's pass - named for the case it exists for, a character
+  // CUSTOMS-PASS: and the one way past it, a developer's pass - named for the case it exists for, a character
   // played online on an older version of the game after the realm opened (which the relay admitted until REALM-DOOR)
   // CUSTOMS-ELSEWHERE (FIELD BUGS 2026-09-30): counted, but on the account it went online with
   'customs-other-account': () => t('account.refusal.customsOtherAccount', 'This character belongs to another account, the one you played it online with. Sign in with that account to bring it in.'),
@@ -817,13 +817,13 @@ const REFUSAL_WORDS = {
   'crew-taken': () => t('account.refusal.crewTaken', 'That sailor has signed on elsewhere.'),
   'crew-many': () => t('account.refusal.crewMany', 'You have signed on as many sailors as one day allows. Come back tomorrow.'),
   'sea-held': () => t('account.refusal.seaHeld', 'Bounties, prizes or hold goods are waiting for this character at a freeport. Collect them before the character is deleted.'),   // AUDIT SEA VENTURES B4
-  // INT3/INT4 (bible/06-Systems/Integrity-Arc.md): the judge's own (server-account/src/realm.js holdRefusal,
+  // INT3/INT4: the judge's own (server-account/src/realm.js holdRefusal,
   // prepareRealmRecord)
   // RPT1026-MARKET HOLD-SAID (private reports 2026-10-26): the hold's own notice as the session stands - why, and what it
   // freezes - and with none heard yet, what a hold freezes: a harvest's and a craft's refusal too, which "trading" never said
   'trade-held': () => tradeHeldSaid() ?? t('account.refusal.tradeHeld', 'This character\'s trading, gathering and crafting are frozen. The notice shown when it froze says why, and until when.'),   // AUDIT AUTO-HOLD: no review comes - a hold lifts on its own, or with the piece
   'record-unjudged': () => t('account.refusal.recordUnjudged', 'The realm has not checked this character\'s latest save yet. Play a moment and try again.'),
-  // INT16-INT17 (bible/06-Systems/Integrity-Arc.md section 7): a progression claim's seat, and the play that pays for it
+  // INT16-INT17: a progression claim's seat, and the play that pays for it
   // (server-account/src/progress.js)
   'progress-seat': () => t('account.refusal.progressSeat', 'Only the realm character you are playing earns that, and it is now open on another device. Open it here again to keep earning.'),
   'lineage-law': () => t('account.refusal.lineageLaw', 'The realm refused that copy of your family record because it breaks the family\'s rules. The realm keeps its own copy.'),   // INT18 (server-account/src/legacy.js putLineage)
@@ -833,7 +833,7 @@ const REFUSAL_WORDS = {
   'piece-legacy': () => t('account.refusal.pieceLegacy', 'That came into the realm from a classic save through customs. It stays yours, and the realm does not trade it.'),
   'service-moved': () => t('account.refusal.serviceMoved', 'That character\'s record changed after its last clean save, so it cannot be rolled back.'),   // INT6: staff's
   'no-clean': () => t('account.refusal.noClean', 'That character has no save the realm judged clean to roll back to.'),   // INT6: the review's rollback (tools/realmReview.mjs)
-  // FIRM1 (bible/06-Systems/Firmament.md): the Firmament's own (server-account/src/firmament.js)
+  // FIRM1: the Firmament's own (server-account/src/firmament.js)
   'firm-closed': () => t('account.refusal.firmClosed', 'The Firmament isn\'t available to you right now.'),
   'ql-closed': () => t('account.refusal.qlClosed', 'The questlines\' rewards are not available to you right now.'),   // QL12: QUESTLINES_OPEN shut (AUDIT QUESTLINES VOICE-QL: "are not", the voice's plain word - Voice.md)
   'ql-body': () => t('account.refusal.qlBody', 'That questline step could not be claimed.'),   // QL12: a claim the shared law refuses
@@ -854,7 +854,7 @@ const REFUSAL_WORDS = {
   'mend-not-negative': () => t('account.refusal.mendNotNegative', 'That character\'s gold is not below zero, so nothing was mended. Check that it is the right character.'),   // PURSE-MEND: the review's mend (tools/realmReview.mjs)
   'mend-moved': () => t('account.refusal.mendMoved', 'That character\'s gold has changed since its findings were read, so nothing was mended. Read the findings again and try again.'),   // PURSE-MEND: played since, or the wrong character
   'repair-ticket': () => t('account.refusal.repairTicket', 'That ticket is already used for another fix on this character, so nothing was done. Use a new ticket.'),   // PURSE-MEND: a ticket names one act, a repair or a mend
-  // SAFE1-SAFE7 (bible/11-Multiplayer/Chat-Safety-Arc.md): the chat's safety - a block, a report, the code of conduct, a ban
+  // SAFE1-SAFE7: the chat's safety - a block, a report, the code of conduct, a ban
   'block-self': () => t('account.refusal.blockSelf', 'You cannot block yourself.'),
   'blocks-full': () => t('account.refusal.blocksFull', 'Your block list is full. Unblock someone first.'),
   'conduct-stale': () => t('account.refusal.conductStale', 'The Code of Conduct has changed. Read it again.'),
@@ -896,7 +896,7 @@ const REFUSAL_WORDS = {
   'hunt-tier': () => t('account.refusal.huntTier', 'That bounty is not for your level.'),
   'hunt-rung': () => t('account.refusal.huntRung', 'Named beasts are posted to Stalkers and above.'),
 };
-/** AUDIT SAFE CLIENT-2 (2026-10-17): THE SERVICE'S LAST WORD ON A BAN - `{ until, reason }` off the newest `banned`
+/** AUDIT SAFE CLIENT-2: THE SERVICE'S LAST WORD ON A BAN - `{ until, reason }` off the newest `banned`
  *  refusal any door answered (`call`), or null. The service refuses a banned account on every door but signing out
  *  (login and recovery included, 403 `{ error: 'banned', until, reason }`), and the screens that show a refusal show its
  *  word alone (`accountRefusalText(r.error)` - ui/accountFlow.js); kept here, the word 'banned' reads as the ban itself.
@@ -909,7 +909,7 @@ export const REFUSALS = /** @type {Readonly<Record<string, string>>} */ (localiz
  *  a player staring at `handle-frobnicated` has been told nothing. */
 export const accountRefusalText = (error) => REFUSALS[error] ?? REFUSALS.server;
 
-/** NAME-AS (2026-10-12): WHY MY CHARACTER'S NAME STOOD ASIDE, in words - a sentence for each reason the mint can give
+/** NAME-AS: WHY MY CHARACTER'S NAME STOOD ASIDE, in words - a sentence for each reason the mint can give
  *  (server-account/src/accounts.js wornNameRefusal, and wornNameOf's `taken`). The filter's names the word it caught where
  *  the mint says one (nameWhyText - NAME-F: a refusal names it, so a player whose real name was caught can say so). */
 export const NAME_WHY_TEXT = Object.freeze({
@@ -947,15 +947,14 @@ export const handleShapeOk = (handle) => typeof handle === 'string' && HANDLE_RE
  * @param {object|null} [body]  POST body, or null for a GET
  * @returns {Promise<{ok: boolean, data?: any, error?: string, status?: number, unknown?: boolean}>}
  */
-/** SCALE4g (2026-10-10, Mac: "really future proof our archetecture"; bible/11-Multiplayer/Scale-Arc.md SCALE4g): THE
+/** SCALE4g: THE
  *  PAGE'S D1 BOOKMARK - the newest position in the account database any answer to this session has said it saw. Sent
  *  back on every call (`x-d1-bookmark`), so a read route the service answers off a read replica answers no older than
  *  everything this tab has seen and written there. It belongs to the session secret it was earned under: a sign-in, a
  *  new guest or another account starts with none (the service then starts at the primary), so a session made a moment
  *  ago is never looked for on a replica that has not heard of it yet. Kept in memory only - a new page starts fresh. */
 export const D1_BOOKMARK_RE = /^[0-9A-Za-z][0-9A-Za-z-]{0,159}$/;
-/** AUDIT SCALE II A-2/A-6/C-7 (2026-10-11, the audit of SCALE4d-SCALE5d; Mac: "Lets do an audit on everything. Ensure
- *  perfection"): THE SERVICE'S BOOKMARK READS - the routes it answers on a D1 session started from the bookmark a call
+/** AUDIT SCALE II A-2/A-6/C-7: THE SERVICE'S BOOKMARK READS - the routes it answers on a D1 session started from the bookmark a call
  *  carries, by route and method (server-account/src/service.js REPLICA_ROUTES, which a pin holds this equal to). Only
  *  these carry the page's bookmark, and only their answers move it.
  *  EVERY OTHER CALL FORGETS IT, before it is sent and again when it is answered: a bookmark is a position the tab has SEEN,
@@ -976,7 +975,7 @@ export const D1_BOOKMARK_READS = new Map([
   ['/v1/realm', 'GET'],
   ['/v1/prof/state', 'POST'],
   ['/v1/prof/motherlodes', 'POST'],
-  // DISPLAY-REPLICA (2026-10-13; server-account/src/service.js REPLICA_ROUTES): and the display reads
+  // DISPLAY-REPLICA: and the display reads
   ['/v1/homes/town', 'POST'],
   ['/v1/homes/mine', 'POST'],
   ['/v1/homes/rooms', 'POST'],
@@ -1010,7 +1009,7 @@ export function noteD1Bookmark(/** @type {string|null} */ secret, /** @type {unk
  *  (systems/realmSaves.js realmAsk, systems/cloudSaves.js ask). */
 export function forgetD1Bookmark() { _d1Mark = { secret: null, mark: null }; _d1Era += 1; }
 
-/** SESSION-SIGN (server-account/src/sessionPass.js; bible/11-Multiplayer/Scale-Arc.md SESSION-SIGN): THE SESSION'S PASS -
+/** SESSION-SIGN (server-account/src/sessionPass.js; SESSION-SIGN): THE SESSION'S PASS -
  *  who the service's lookup found, signed for five minutes and bound to the secret it was minted for, which a hot route
  *  believes without asking the database. The page keeps the one an answer last handed it, with that secret, and sends it
  *  with that secret's calls alone - so a service from before SESSION-SIGN, whose preflight lets no such header through,
@@ -1051,7 +1050,7 @@ const busyAgain = (/** @type {number} */ sentAt) => sentAt >= _busy.until;
 /** QUEST-HOME: the page's ears for a home that moved (onHomeOrders). */
 const _homeOrderEars = new Set();
 /**
- * FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both"): THE PAGE'S EAR FOR A HOME THAT MOVED. An answer of
+ * FIELD BUGS 2026-10-14 QUEST-HOME: THE PAGE'S EAR FOR A HOME THAT MOVED. An answer of
  * the service's that says a home was bought, held or given up carries its signed orders (`homeOrders`,
  * server-account/src/index.js homeOrdersOf) - and each is handed to every ear here, whichever book made the act (a
  * door's claim, a bank's deed sold, a guild's hall, an arena move, a character deleted), to be carried to the hub, whose
@@ -1111,7 +1110,7 @@ export async function call({ fetch, base = DEFAULT_ACCOUNT_SERVICE, secret = nul
     // button. Every arm of this function returns the same shape.
     forgetD1Bookmark();   // AUDIT SCALE II A-6: a call that could not be made - a preflight refusing the header among them
     if (!passKeptThrough(e)) forgetSessionPass();   // SESSION-SIGN: the same, for the pass's - but a timeout's (E7)
-    // SLOW-SHED (bible/11-Multiplayer/Scale-Arc.md SLOW-SHED): A READ THE SERVICE WAS TOO SLOW TO ANSWER IS ITS OVERLOAD'S
+    // SLOW-SHED (SLOW-SHED): A READ THE SERVICE WAS TOO SLOW TO ANSWER IS ITS OVERLOAD'S
     // WORD - its reads stand back as an overload answer stands them back. In the 18:05 overload the database answered
     // slowly and refused almost nothing: each tab's read timed out, was `offline` to the gate, and was asked again, and
     // the region's traders were asked four times as often. A write, a sign-in or an act that times out holds nothing.
@@ -1237,8 +1236,7 @@ export const setEmail = (io, email) => call(io, '/v1/account/email', { email: em
 export const logout = (io, all = false) => call(io, '/v1/auth/logout', { all });
 
 /** ACC3c: WEAR ONE OF THE TITLES THIS ACCOUNT HOLDS, or none.
- *  Mac: "tap the account icon to equip 1 feature along with signing
- *  out." `null` takes it off and is always allowed.
+ *  `null` takes it off and is always allowed.
  *
  *  THIS SIDE DOES NOT GET TO SAY WHAT IS HELD. It asks; the service
  *  derives the grant and refuses `not-held`. A client that decided for
@@ -1251,11 +1249,11 @@ export const equipAura = (io, aura) => call(io, '/v1/account/aura', { aura: aura
 /** WITCH1: wear one profile icon, or none (null: the character's face) - the wardrobe after the write. The service refuses
  *  `not-held` for an icon this account does not hold. */
 export const equipIcon = (io, icon) => call(io, '/v1/account/icon', { icon: icon ?? null });
-/** GLYPH-WEAR (2026-10-02, Mac: "players can also equip/unequip their glyphs"): show one glyph (`on` true) or hide it -
+/** GLYPH-WEAR: show one glyph (`on` true) or hide it -
  *  the wardrobe after the write (`glyphs` still all that is true, `glyphsOff` the ones taken off). The service refuses
  *  `not-held` for a glyph that is not true of this account. */
 export const equipGlyph = (io, glyph, on) => call(io, '/v1/account/glyph', { glyph, on: !!on });
-/** NAME-AS (2026-10-12, Mac: "toggle to use their account name or character name for ingame use"): which name the room
+/** NAME-AS: which name the room
  *  reads - 'account' or 'character' (server-account/src/accounts.js NAME_AS) - `{ ok, nameAs }`, the choice the row now
  *  holds. It asks; the service keeps it, and every later mint signs it (a character's name where it can be worn). */
 export const chooseNameAs = (io, as) => call(io, '/v1/account/name', { as });
@@ -1282,7 +1280,7 @@ export const beatPlay = (io) => call(io, '/v1/account/played', {});
  *  `{ ok, target, name, until, order }`. */
 export const muteAccount = (io, target, minutes) => call(io, '/v1/mod/mute', { target, minutes });
 
-/** SAFE1 (bible/11-Multiplayer/Chat-Safety-Arc.md): MY BLOCK LIST - `{ ok, blocks: [{ sub, name, at }] }`, and the same
+/** SAFE1: MY BLOCK LIST - `{ ok, blocks: [{ sub, name, at }] }`, and the same
  *  answered by a block or an unblock. */
 export const safetyBlocks = (io) => call(io, '/v1/safety/blocks', {});
 export const safetyBlock = (io, target) => call(io, '/v1/safety/block', { target });
@@ -1298,7 +1296,7 @@ export const safetyConduct = (io, v) => call(io, '/v1/safety/conduct', { v });
 export const modBan = (io, who, days, reason = '') => call(io, '/v1/mod/ban', { ...who, days, ...(reason ? { reason } : {}) });
 export const modUnban = (io, who) => call(io, '/v1/mod/unban', { ...who });
 export const modStrikes = (io, who) => call(io, '/v1/mod/strikes', { ...who });
-/** AUDIT SAFE DOC-4 (2026-10-17): THE REPORTS' QUEUE, READ IN THE GAME - a moderator's (`not-moderator` for anyone else).
+/** AUDIT SAFE DOC-4: THE REPORTS' QUEUE, READ IN THE GAME - a moderator's (`not-moderator` for anyone else).
  *  `modCases` the open cases, the most reporters who count first (`{ ok, cases: [{ id, target, name, reports, credible,
  *  reasons, ai, auto, openedAt, updatedAt }] }`); `modCase` one account's open case, its lines, reasons, notes and the
  *  reviewer's verdict with the line it flagged (`no-case` when none is open); `modDismiss` closes it with no action -
@@ -1348,8 +1346,7 @@ export function keepSession(storage, { id, name, kind, sessionId, secret, glyphs
 /**
  * ═══ NAME-ADOPT: THE CLIENT LEARNS WHO IT IS FROM THE SERVICE ══════
  *
- * Mac (2026-09-22), the first hour the arc was live: "The top right
- * corner button doesnt update with name" and "Ingame your name shows
+ * and "Ingame your name shows
  * for other people but you still see your character name in the chat
  * menu".
  *
@@ -1370,33 +1367,33 @@ export function keepSession(storage, { id, name, kind, sessionId, secret, glyphs
  * it corrects the name and kind of a session that already exists, so
  * an answer arriving after a sign-out cannot resurrect one.
  *
- * SHADOW-FANG (2026-09-26): AND THE GLYPHS, when the answer states them - what is TRUE of this account (a token's
+ * SHADOW-FANG: AND THE GLYPHS, when the answer states them - what is TRUE of this account (a token's
  * `glyphs`, a wardrobe's). The relay reads a player's glyphs off the signature for everybody else; this device keeps
  * the service's last word for its own player, so what dresses them on their own screen (their werewolf's skin,
  * characters/werewolfSkin.js) is there offline too. Strings only, a bounded list; a list that did not change is not
  * written.
  *
- * AUDIT B4 (2026-09-26): AND ONLY INTO THE SESSION THAT ASKED. `secret` is
+ * AUDIT B4: AND ONLY INTO THE SESSION THAT ASKED. `secret` is
  * the credential the answer was asked with; a session signed out and
  * another signed in while it was in flight is not the one it describes -
  * adopted, one account's name and glyphs landed on another's device (and
  * dressed its werewolf in a skin it does not hold).
  *
- * WB9g (2026-09-30): AND THE AURA WORN (`aura`, null for none), when the answer states it - a token's, a wardrobe's
+ * WB9g: AND THE AURA WORN (`aura`, null for none), when the answer states it - a token's, a wardrobe's
  * after any wear (the account card's, the Broker's) - so this device's own player sees the fire at their feet the moment
  * any door changes it (systems/ownGlyphs.js ownAura). The room sees it from their next hello, off the signature.
  *
- * GLYPH-WEAR (2026-10-02): LESS THE GLYPHS TAKEN OFF (`glyphsOff`), when the answer states them - what dresses my own
+ * GLYPH-WEAR: LESS THE GLYPHS TAKEN OFF (`glyphsOff`), when the answer states them - what dresses my own
  * player on my own screen is what the room is shown, so a Shadow Fang hidden is a wolf in no skin here as it is there.
  *
- * NAME-AS (2026-10-12): `name` HERE IS THE ACCOUNT'S. The stored session is the account's picture (the profile mark reads
+ * NAME-AS: `name` HERE IS THE ACCOUNT'S. The stored session is the account's picture (the profile mark reads
  * its name as the account's), and since NAME-AS the room may read a character's name instead - so the minter hands this
  * door the answer's `accountName` and the live sessions its `name` (accountTokenMinter, below). And `nameAsAt`: the
  * moment the service took a choice of name made on this device (ui/accountFlow.js chooseName), stamped and never
  * guessed - the world host says hello again when it moves (scenes/world.js nameAsFrame), so the room reads the new name
  * now. Only ever forward: an older stamp is no news.
  *
- * WITCH1 (2026-10-20): AND THE PROFILE ICON WORN (`icon`, null for the character's face), by the aura's law - the
+ * WITCH1: AND THE PROFILE ICON WORN (`icon`, null for the character's face), by the aura's law - the
  * profile mark and the account card read it here (systems/ownGlyphs.js ownIcon).
  *
  * @param {any} storage
@@ -1429,15 +1426,14 @@ export function forgetSession(storage) {
   try { storage?.removeItem?.(SESSION_KEY); return true; } catch { return false; }
 }
 
-/** SCALE2 (2026-09-30, the scaling audit): how long a minted token is handed to OTHER rooms before a fresh one is
+/** SCALE2: how long a minted token is handed to OTHER rooms before a fresh one is
  *  minted. A relay room spends a token once - in THAT room (server/src/index.js `_spent`, one set a room) - so the one
  *  token may open the cell, its halos, the hub and the region channel of one connect. A minute covers a connect's
  *  burst (and a deploy's reconnect wave) and keeps what the token signs - the level, the title, the guild - no older
  *  than that in any room it opens; the token itself lives MAX_TTL_S (five minutes). */
 export const TOKEN_REUSE_MS = 60_000;
 
-/** STORM-SHED (2026-10-06 evening, the account service overloaded a second time - "D1 DB is overloaded"; decorations
- *  missing): A FAILED MINT HOLDS THE PAGE'S NEXT ONE OFF. A room whose hello the relay refused for want of a token asks
+/** STORM-SHED: A FAILED MINT HOLDS THE PAGE'S NEXT ONE OFF. A room whose hello the relay refused for want of a token asks
  *  again within BACKOFF_MAX_MS (net/online.js) - right for a busy room, ruinous for a busy service: every room of every
  *  tab (the cell, its halos, the hub, the region channel) minted afresh every few seconds while the service failed, and
  *  a mint is a dozen statements. A reconnect wave at 20:10 was 3,658 mints in five minutes where 470 is the pace, most of
@@ -1447,7 +1443,7 @@ export const TOKEN_REUSE_MS = 60_000;
 export const MINT_COOL_MS = 2_000;
 export const MINT_COOL_MAX_MS = 60_000;
 
-/** AUDIT SCALE II L4a (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): A PLACE IN THE SIGN-IN LINE
+/** AUDIT SCALE II L4a: A PLACE IN THE SIGN-IN LINE
  *  IS NOT A FAILURE. ADMIT-LINE answers a mint it holds back 503 `queue` with the place and the wait before asking again
  *  (server-account/src/admit.js), and the minter read it as any failure: MINT_COOL_MS doubling to MINT_COOL_MAX_MS. A
  *  player whose turn came mid-cool waited up to a minute past it, and a cool doubled past ADMIT_KEEP_MS lost the place
@@ -1550,7 +1546,7 @@ export const lineHoldMs = (/** @type {unknown} */ wait, rand = Math.random) => {
  * player: TOKEN-WAIT) between the door and the hello, the player invisible to the party on both sides of it. The host
  * says a place change is coming and when the next room's socket will ask (`minter.ahead(room, withinMs)` -
  * scenes/doorTokenHost.js, each door its own margin), and a mint goes then only when the token held could not open that
- * room by then: none held, spent there, or its reuse minute out within `withinMs`. AUDIT (2026-10-16, A2): the margin was
+ * room by then: none held, spent there, or its reuse minute out within `withinMs`. AUDIT: the margin was
  * one 20 s (TOKEN_AHEAD_MS) at every door, though the next socket asks within a frame or a build: a door with the held
  * token 40-60 s old minted though that token would still have opened the room - twice the mints at a 40-55 s door gap.
  * `minter.holds(room)` says whether a room would be handed one now, nothing on the wire.
@@ -1653,10 +1649,10 @@ export function accountTokenMinter({ fetch, storage, onIssued = null, character 
       start(session, named);
       return true;
     },
-    /** AUDIT SAFE CLIENT-2 (2026-10-17): THE HELD TOKEN LET GO - the relay said this account is banned
+    /** AUDIT SAFE CLIENT-2: THE HELD TOKEN LET GO - the relay said this account is banned
      *  (scenes/chatSafetyHost.js), and a token minted a moment before the ban opened every room a rejoin asked within
      *  TOKEN_REUSE_MS. The next room mints, and the service refuses it.
-     *  STAFF-HIDE-TOGGLE (2026-10-23, mob: "need hide to be a toggle"): and Hide me or Show myself pressed
+     *  STAFF-HIDE-TOGGLE: and Hide me or Show myself pressed
      *  (scenes/staffFollowHost.js relinkGame) - a token signed before the press would open a room as the game was, so it
      *  goes, and so does any mint still on its way (`forgets`): the next room asks the service, which reads the switch as
      *  it stands now. */
@@ -1698,11 +1694,11 @@ export function accountTokenMinter({ fetch, storage, onIssued = null, character 
           ...(typeof answer.data.accountName === 'string' && answer.data.accountName ? { accountName: answer.data.accountName } : {}),
           ...(answer.data.nameAs === 'account' || answer.data.nameAs === 'character' ? { nameAs: answer.data.nameAs } : {}),
           ...(typeof answer.data.nameWhy === 'string' && answer.data.nameWhy ? { nameWhy: answer.data.nameWhy, ...(typeof answer.data.nameWord === 'string' ? { nameWord: answer.data.nameWord } : {}) } : {}),
-          // AUDIT SAFE CLIENT-1 (2026-10-17): SAFE7's word - whether this account has agreed to the code of conduct as it
+          // AUDIT SAFE CLIENT-1: SAFE7's word - whether this account has agreed to the code of conduct as it
           // stands. Built field by field, `who` dropped it, so the code's card never stood for anyone: every first line
           // went unread-code. Absent from a service before acct150, which says nothing (heard as yes - chatSafetyHost adopt)
           ...('conduct' in answer.data ? { conduct: answer.data.conduct === true } : {}),
-          // STAFF-CHAT-RED (mob, 2026-10-23: "give me a option next to chat to chat as /red or myself at all times"): the
+          // STAFF-CHAT-RED: the
           // service's word that this token is a hidden staff member's (server-account/src/staffHidden.js hiddenToken,
           // `hidden: 1`), so the chat's switch knows Me says nothing to players (net/chatVoice.js) - absent for everyone else
           ...(answer.data.hidden === 1 ? { hidden: true } : {}) };
@@ -1793,13 +1789,13 @@ export function accountStaffChat({ fetch, storage }) {
  *  `{ n, realm, room }` (a death to a foe: the tab's nonce - refused `foe` since FOE-KEEPS, never asked by this game) - `room` where the remains will lie (AUDIT INT9: the order names
  *  it). Answers `{ r, order, items, kept, took, gold, wi, burnt?, realm? }`. */
 export const wildFallAsk = (io, body) => call(io, '/v1/wild/fall', body);
-/** MAC (2026-10-14, the two-phase handoff - server-account/src/wild.js): the killer's collect of its piece in escrow
+/** MAC: the killer's collect of its piece in escrow
  *  (`{ receipt, realm }` - the room's `g1`, the killer's record's `at`), the fallen's taking it back (`{ r, realm }`), and
  *  the fallen character's pieces still held (`{ character }`). */
 export const wildCollectAsk = (io, body) => call(io, '/v1/wild/collect', body);
 export const wildReclaimAsk = (io, body) => call(io, '/v1/wild/reclaim', body);
 export const wildEscrowsAsk = (io, body) => call(io, '/v1/wild/escrows', body);
-/** WILD-INSURE (2026-10-26 - server-account/src/wildInsure.js): policies written on pieces of gear (`{ realm, keys, region }`
+/** WILD-INSURE: policies written on pieces of gear (`{ realm, keys, region }`
  *  - the record's `at`, the pieces' ledger keys, the bank the shortfall is paid from) - answers `{ policies, gold, realm }` -
  *  and the character's policies in force (`{ character }`) - answers `{ policies }`. */
 export const wildInsureAsk = (io, body) => call(io, '/v1/wild/insure', body);
@@ -1907,7 +1903,7 @@ export function accountSds({ fetch, storage }) {
 }
 
 
-/** LAMP-KEEPER II (2026-10-14): THE LAMP'S TITLE (server-account/src/lamp.js) through the one door - `claim()` a lamp
+/** LAMP-KEEPER II: THE LAMP'S TITLE (server-account/src/lamp.js) through the one door - `claim()` a lamp
  *  keeper spoken to, `{ ok, data: { granted, why? } }`; no session is `no-session`, never a throw. */
 export function accountLamp({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
   const post = waitedPost({ fetch, storage }, waitMs);
@@ -1918,7 +1914,7 @@ export function accountLamp({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
   };
 }
 
-/** QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' CLAIM (server-account/src/
+/** QL12: THE QUESTLINES' CLAIM (server-account/src/
  *  questlines.js) through the one door - `claim({ line, step, phase, choice? })` a questline's step opened or ended,
  *  `{ ok, data: { opened?, witnessed?, title?, why? } }`; no session is `no-session`, never a
  *  throw. `guest()` whether the signed-in account is a guest's. */
@@ -1932,7 +1928,7 @@ export function accountQuestlines({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS
 }
 
 /**
- * WITCH1 (bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL (server-account/src/festival.js) through the one
+ * WITCH1: THE WITCHES' FESTIVAL (server-account/src/festival.js) through the one
  * door - the account's cakes and what they bought, a find, a sale by its request id, a town's Hearth Offerings and the
  * four moves on one. Every answer is `call`'s shape, waited for ACCOUNT_ACT_WAIT_MS at most; no session is `no-session`,
  * never a throw.
@@ -2100,11 +2096,11 @@ export function accountGuilds({ fetch, storage }) {
     hallBuy: ({ character, mapId, buildingKey, region, price, layout = null }) => post('/v1/guilds/hall/buy', { character, mapId, buildingKey, region, price, layout: layout || null }),
     hallSell: (character, at = null) => post('/v1/guilds/hall/sell', { character, ...(at ? { mapId: at.mapId, buildingKey: at.buildingKey } : {}) }),   // GUILD-HALL-SALE: at its door, the door's building
     hallEntry: (character, entry) => post('/v1/guilds/hall/entry', { character, entry }),
-    // DOMAIN2 (bible/11-Multiplayer/Domains.md 6): the region's castle, bought and given up by the Guildmaster
+    // DOMAIN2 (6): the region's castle, bought and given up by the Guildmaster
     castleBuy: (character, region, rid) => post('/v1/guilds/castle/buy', { character, region, rid }),
     castleSell: (character, region, rid) => post('/v1/guilds/castle/sell', { character, region, rid }),
     heraldry: (character, heraldry, rid = null) => post('/v1/guilds/heraldry', { character, heraldry, ...(rid ? { rid } : {}) }),
-    // GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): a new name for a price; the vault - read, a piece put in and taken
+    // GUILD2: a new name for a price; the vault - read, a piece put in and taken
     // out on the realm record where it stands (`realm`), the guildmaster's grants
     rename: (character, name, tag) => post('/v1/guilds/rename', { character, ...(name ? { name } : {}), ...(tag ? { tag } : {}) }),
     vault: (character) => post('/v1/guilds/vault', { character }),
@@ -2174,7 +2170,7 @@ export function accountRoll({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
 }
 
 /**
- * TOWN-ECON TE2 (bible/06-Systems/Town-Economy-Arc.md section 4): THE TOWNS' ECONOMY (server-account/src/townEcon.js)
+ * TOWN-ECON TE2: THE TOWNS' ECONOMY (server-account/src/townEcon.js)
  * through the one door - every town's players' share read, the town this client stands in witnessed, the Watch's ticks
  * walked in a town claimed (net/townEconBook.js). Every answer is `call`'s shape; each is waited for ACCOUNT_ACT_WAIT_MS
  * at most.
@@ -2256,7 +2252,7 @@ export function accountSeats({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
     // SEAT2b: a seat's works read; a project begun (`port`: DFU names the town a port - a Harbour's ask)
     forts: (key) => post('/v1/seats/forts', { key }),
     fortFund: (character, key, work, rid, port = false) => post('/v1/seats/fort/fund', { character, key, work, rid, ...(port ? { port: true } : {}) }),
-    // DOMAIN1 (bible/11-Multiplayer/Domains.md 5): where this character's guild gives in a region, and a gift made
+    // DOMAIN1 (5): where this character's guild gives in a region, and a gift made
     gifts: (character, region) => post('/v1/seats/gifts', { character, region }),
     give: (character, region, material, units, rid) => post('/v1/seats/give', { character, region, material, units, rid }),
     fealty: (character, tag, as) => post('/v1/seats/fealty', { character, tag, as }),

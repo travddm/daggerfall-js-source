@@ -1,9 +1,7 @@
 // @ts-check
-// HULL-PASS (2026-10-26, Discord #feature-feedback "Boat Player Collision": "Player boat collision needs to be off outside
-// of PVP zone or just during the Sethrakul fight - too many people out there bumping into each other ruining their
-// shots"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): ANOTHER PLAYER'S SHIP IS NO ROCK TO MY HELM OUTSIDE A PVP ZONE.
+// HULL-PASS: ANOTHER PLAYER'S SHIP IS NO ROCK TO MY HELM OUTSIDE A PVP ZONE.
 //
-// FIELD BUGS 2026-10-01b (Mac: "Players aren't colliding with other players' boats and can't stand on board") stood every
+// FIELD BUGS 2026-10-01b stood every
 // peer's ship in my collider as my own boats stand (world.js csaSyncColliders), and so her hull met my helm's sweep as a
 // rock (Come Sail Away's CheckCollision: the way into her cancelled, the turn toward her refused) - at sea, in a harbour,
 // and in Sethrakul's waters, where a dozen ships close on one serpent and every shot was lined up against a neighbour's

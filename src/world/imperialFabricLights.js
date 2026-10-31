@@ -1,6 +1,5 @@
 // @ts-check
-// BLD (2026-10-26, the owner, having walked the Imperial City: "... and no lighting sources like the original layouts";
-// bible/03-World/Arena-Provinces.md IC-GRAND, BLD) - THE FABRIC'S LIGHTS, as Daggerfall's own blocks carry theirs.
+// BLD - THE FABRIC'S LIGHTS, as Daggerfall's own blocks carry theirs.
 //
 // DFU's reference: a city block's lights are its LIGHT FLATS - misc flats of TEXTURE.210 (RMBLayout AddLights/AddLight;
 // world/city/cityLights.js, one point light a flat, the [City] prefab's range 18 and white), drawn as billboards and lit

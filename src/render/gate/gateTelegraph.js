@@ -1,6 +1,6 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "an oversized enemy with telegraphed attacks (like wind ups, etc)"): THE TELEGRAPH - every
-// attack's shape drawn on the court's floor where it will land. Design: bible/11-Multiplayer/World-Bosses.md section 5
+// WB4: THE TELEGRAPH - every
+// attack's shape drawn on the court's floor where it will land. Design:
 // ("On the ground: every shape is drawn where it will land - a dim outline at once, filling toward the edge as the
 // wind-up runs, bright at the landing").
 //
@@ -14,8 +14,8 @@
 // court wrote (a body standing on it hides it), fogged as the ground is. A polygon offset keeps it off the floor it
 // lies on.
 //
-// WB13a (2026-10-01, Mac: "hone in telegraphs"): THE TELEGRAPH, HONED - read in Chromium at a fighter's eye and from
-// above, at every moment of every wind-up (bible/11-Multiplayer/World-Bosses.md section 20):
+// WB13a: THE TELEGRAPH, HONED - read in Chromium at a fighter's eye and from
+// above, at every moment of every wind-up:
 //   - ONE LINE, whole from the first frame and the brightest thing in the shape, in ONE DANGER EDGE (Dagon's crimson for
 //     his own blows); the element lives in the fill and its grain. Its width from the edge's own screen derivative, a
 //     dark keyline outside it. No fuse burning it down, no false edge inside it.
@@ -30,7 +30,7 @@
 // keyline and wave reach as far as the pixel is large - but his mark (telegraphMarkReach) and a path or a tether
 // (telegraphStrip) draw nothing past their own ground at any pixel's size, and theirs are that ground: an AoE frame at a
 // fighter's eye rasterised 3.4 screens of this pass, 2.1 now (tools/fb1013ePerfProbe.mjs). The fragment stage is the one
-// it was, byte for byte (bible/07-Rendering/Performance-Rig.md AOE-PERF).
+// it was, byte for byte (AOE-PERF).
 //
 // Not a DFU member. Ledger A (WB).
 import { FOG_FACTOR_GLSL } from '../labGrass.js';
@@ -43,8 +43,7 @@ import { attackColor } from '../../world/gate/gateBoss.js';
 export const TELEGRAPH_KIND = Object.freeze({ cone: 0, disc: 1, discs: 2, lane: 3, ring: 4, all: 5, spokes: 6, mark: 7, wedges: 8 });   // WB14a: the Unmaking's wedges
 /** The most lanes one spokes lays (the shader's loop bound). */
 export const TELEGRAPH_SPOKES_MAX = 8;
-/** WBX4 (2026-09-26, Swololo on Discord: "its hard to see where boss is and where he is facing, maybe he should have a
- *  circle under him"): HIS MARK on the floor, always - a ring about his feet a little wider than his body, and a chevron
+/** WBX4: HIS MARK on the floor, always - a ring about his feet a little wider than his body, and a chevron
  *  before it pointing where he faces: its ring's radius, the chevron's length and its half-width at the ring. */
 export const BOSS_MARK_R = BOSS_R + 0.35;
 export const BOSS_MARK_CHEVRON_LEN = 1.6;
@@ -85,7 +84,7 @@ export const telegraphLineW = (h) => Math.max(1, Math.min(TELEGRAPH_LINE_W_MAX, 
  *  second (the phase is hz * uSince and uT grows with uSince, so the beat is 1.5 + 3 (hz - 1.5): hz = 1.5 + 0.5 uT^2). */
 export const TELEGRAPH_THROB_MAX_HZ = 3;
 /**
- * WB9e (2026-09-30, Mac: "further improve his telegraphs"): EACH SHAPE WEARS ITS ELEMENT - the fill's grain by what
+ * WB9e: EACH SHAPE WEARS ITS ELEMENT - the fill's grain by what
  * lands (`uStyle`): his weight's cracks (the blade, the slam, the charge, the leaps), fire's flicker, frost's facets,
  * the storm's crackle, venom's bubbles, and Dagon's own for the Wrath and the Reckoning.
  */

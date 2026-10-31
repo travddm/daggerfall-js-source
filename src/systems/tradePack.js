@@ -1,4 +1,4 @@
-// TRADE1 (2026-09-21): THE PACK, AS THE TRADE SEES IT. net/tradeSession.js is pure - it never touches an item - and this
+// TRADE1: THE PACK, AS THE TRADE SEES IT. net/tradeSession.js is pure - it never touches an item - and this
 // is the ONE place a trade reaches the player's real inventory: what may be offered, how an offer is written for the
 // wire, how the peer's records are minted here, how goods are taken out (reserved) and put back, and whether a lot fits.
 //

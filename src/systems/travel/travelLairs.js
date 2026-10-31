@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TVD-WORLD (2026-10-27, bible/06-Systems/Travel-View.md TVD-WORLD; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 29, C4;
-// the owner: "Every single thing here needs to be addressed. No exceptions.") - THE LAIRS ABOUT THE TRAVELLER PAST THE
+// TVD-WORLD - THE LAIRS ABOUT THE TRAVELLER PAST THE
 // BAY, as TV6's dungeons read them.
 //
 // TV6 (systems/travel/travelDungeons.js) stands every dungeon within the far range on the Overworld - a found one a plate

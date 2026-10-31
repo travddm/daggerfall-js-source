@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT WW F7 (2026-10-24, bible/03-World/World-Wide.md WW3): THE LIVING WORLD'S LANES - how many packets ply a lane,
+// AUDIT WW F7: THE LIVING WORLD'S LANES - how many packets ply a lane,
 // a port town's lanes by sea and a port's berths (its packets and its sailors), the books LW5 and LW5b kept in the
 // world host's own scope; out of it (HOST-SPLIT: the host wires it).
 //

@@ -1,6 +1,5 @@
 // @ts-check
-// CHAP5a (2026-10-09, Mac: "Continue"; bible/11-Multiplayer/Chapters-Arc.md 9: "The hall's roll: the seats' holders,
-// named on a board inside each hall"): THE HALL'S ROLL AS A BOOK. A DFU guild hall has no board; its bookshelf is the
+// CHAP5a: THE HALL'S ROLL AS A BOOK. A DFU guild hall has no board; its bookshelf is the
 // hall's own reading, so the roll is the shelf's first book - the chapter's state, its Master, its officers, off the
 // chapter sheet (net/npcChapterLaw.js chapterRollTitle, chapterRollLines) - laid out as the book reader's own tokens, as
 // the palace's Hall of Records is (ui/hallOfRecords.js), and handed to the reader's one door. Pure: the roll is handed in.

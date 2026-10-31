@@ -1,6 +1,5 @@
 // @ts-check
-// WINDFALL1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments
-// seamlessly") - WINDFALL's VERTEX WIND, the law the flora sway by while the mod is on. Windfall swaps DFU's two
+// WINDFALL1 - WINDFALL's VERTEX WIND, the law the flora sway by while the mod is on. Windfall swaps DFU's two
 // billboard-batch shaders on every nature batch (500..511) for its own (Windfall/BillboardBatch, read back from the
 // DXBC at vendor/windfall/shaders/BillboardBatch.glsl, pass 0's vertex shader), which add one offset to the quad's two
 // top corners (the bottom ones stand):

@@ -1,6 +1,5 @@
 // @ts-check
-// REVENANT-TROPHY (2026-10-02, Mac: "Killing should show a unique animation where you destroy your foe, which drops a
-// unique weapon random rarity weapon specific to the enemy, with their name included in the weapon name").
+// REVENANT-TROPHY.
 //
 // WHAT IT DROPS. One weapon, its own:
 //  - SPECIFIC TO IT: the weapon it fought with when it carried one (a person's best blade), else the one its kind

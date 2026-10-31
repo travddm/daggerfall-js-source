@@ -1,7 +1,7 @@
 // @ts-check
-// AUDIT DEX (2026-10-20, bible/01-Overview/audits/Audit-DEX.md D11; HOST-SPLIT, bible/01-Overview/Host-Split.md): THE
+// AUDIT DEX: THE
 // HOSTS' REACH FOR A MOD'S CORPSE PREFAB (scenes/corpseMarker.js createCorpsePrefabs - DEX5,
-// bible/04-Characters/Enemy-Expansion.md section 11), out of buildDungeonContext and createExteriorFoes, which wire it.
+// ), out of buildDungeonContext and createExteriorFoes, which wire it.
 // What a body's prefab asks of its host - stand a new foe where it lay, take the body away, stand its ash, send a copy's
 // missile to the runner - and what the audit found the hosts owed it:
 //   - THE RISE STANDS FIRST (D8): the new foe is asked for, and only once it stands is the body taken - a stand refused

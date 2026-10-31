@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MID-RING (2026-10-26, the owner: "Currently tiles visibly load in with distance"; bible/06-Systems/Travel-View.md
-// MID-RING): A PIXEL THE STREAM HAS JUST BUILT EASES OUT OF THE MIDDLE RING'S TINT.
+// MID-RING: A PIXEL THE STREAM HAS JUST BUILT EASES OUT OF THE MIDDLE RING'S TINT.
 //
 // The pixel's ground stood as the middle ring a frame before - the kernel's own shape in the far ring's tint
 // (render/midRing.js) - and the stream's build laid the ground's own tiles over it at once: the shape held, the colour

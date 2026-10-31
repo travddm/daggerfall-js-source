@@ -1,6 +1,5 @@
 // @ts-check
-// SIGIL-UI (2026-09-26, Mac: "sigil weapons need a visible indicator within the info section, something that makes it
-// stand out, along with progress as you use it"): THE SIGIL, DRAWN.
+// SIGIL-UI: THE SIGIL, DRAWN.
 //
 // SIGIL1 told a sigil in words - three lines in the card's tier list, the same colour as the affixes above them, so
 // the rarest mark a weapon can carry read like one more "+6 Strength". This is its own block under the tier list:
@@ -11,7 +10,7 @@
 // all take it from here, and a tile that holds a sigil weapon wears the rune in its corner (data-sigil, the sheet's
 // own rule), so the pack says which weapons carry one before a card is opened.
 //
-// CARD-FIT (2026-09-28, Discord - Cruor: "New sigil items descriptor is a bit long!"): TWO DRESSES. The CARD's block
+// CARD-FIT: TWO DRESSES. The CARD's block
 // (the default) is two rows - the rune, the stage and the numbers toward the next one; then the five stages as ONE
 // bar, the one it is growing into filled as far as it has drunk (the five gems and the bar under them were two rows
 // saying one thing) - and a weapon's blow in one line, the Renown's hold when it holds it. The explanations (what a

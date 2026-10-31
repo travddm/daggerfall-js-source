@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SPAWN-WORLD / PITS-WORLD (2026-10-26, bible/03-World/World-Wide.md WORLD-LANES; the owner, after the audit NO SYSTEM LEFT
-// BEHIND IN THE BAY: "Every single thing here needs to be addressed. No exceptions.") - THE WORLD'S LANES OF MAP IDS.
+// SPAWN-WORLD / PITS-WORLD - THE WORLD'S LANES OF MAP IDS.
 //
 // DFU's law names a place by its map pixel: a MapId's low 20 bits are MapsFile.getMapPixelID's `y * 1000 + x`
 // (formats/mapsFile.js), unique on the Bay's 1000 x 500 and nowhere else - past the Bay two pixels a thousand apart share

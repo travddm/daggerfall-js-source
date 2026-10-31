@@ -1,5 +1,5 @@
 // @ts-check
-// INT11-INT13 (2026-10-10, the INTEGRITY arc's lane 3 - bible/06-Systems/Integrity-Arc.md section 6): THE BOSS'S BLOWS
+// INT11-INT13: THE BOSS'S BLOWS
 // JUDGED WHERE THE CLIENT CANNOT SKIP THEM - each fight's own test of where a blow lands (net/gate/gateStrike.js,
 // net/superDungeon/sdStrike.js's geometry in net/superDungeon/sdRemnant.js, systems/serpent/serpentStrike.js), run on the relay against the poses it
 // already holds, at its beat. What each answers is the share the relay's count of the struck fighter takes

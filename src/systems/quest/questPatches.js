@@ -66,7 +66,7 @@ export function entryLines(text, width = ENTRY_WIDTH) {
  *  nearest town's (place.js NEAR-SITE): Glaghton Court's duel is at Moriribia's inn, and the journal sent the player to
  *  Glaghton Court. The inn's own town (`___inn_`) is the questor's wherever the inn is in it, so DFU's words stand there. */
 export const QUEST_PATCHES = Object.freeze({
-  // _BRISIEN (the main quest's opener), START1 (bible/06-Systems/Alternate-Starts-Arc.md section 4): its start-up's
+  // _BRISIEN (the main quest's opener), START1: its start-up's
   // `say 1025` is the classic start's waking - "You wake and look around the room ... Once free of the cave, you can
   // begin the Emperor's quest" - shown the moment DFU's StartGameBehaviour started it on a new character. No new
   // character starts it now: a start's commission does, in the city of Daggerfall, days or months after the cave

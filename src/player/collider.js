@@ -37,8 +37,7 @@ const CELL = 2;
  *  bucket's `wide` list, and found through the bucket's tree over them (OW-WOD-LAG, below). The fine walks are
  *  untouched: a bucket with no wide triangle pays nothing, and the same triangles are found either way. */
 const FINE_CELLS_MAX = 64;
-/** PERF-EXT25 (2026-09-25, the players: "fps issues in the exterior but fine in the interior", "me too my
- *  friend.. don't know why. I got a RX6600"): A CELL'S KEY IS A NUMBER. Every triangle a streamed pixel files, and
+/** PERF-EXT25: A CELL'S KEY IS A NUMBER. Every triangle a streamed pixel files, and
  *  every cell a query reads, minted a template string - `${gx},${gz}` - to hash, look up and drop: on a synthetic
  *  city pixel (300,000 triangles) the insert was ~1 s of main thread across the build and its garbage the GC's.
  *  (gx + 2^20) * 2^21 + (gz + 2^20) is exact in a double and one-to-one for |g| < 2^20 cells - two million units
@@ -77,7 +76,7 @@ const BOX_SKIN = 1e-3;
  *  bucket's own vertices made (BOX_SKIN covers the rounding of that arithmetic). Written as a free function rather
  *  than inline so the one reject is the same reject for every walk that later wants it.
  *  @returns {boolean} true when the box must be walked */
-/** PERF-COL1 (2026-09-21, "guards kill the framerate"): THE SPHERE'S BROAD PHASE. Does a sphere of radius `r` at
+/** PERF-COL1: THE SPHERE'S BROAD PHASE. Does a sphere of radius `r` at
  *  (lx, ly, lz) - BUCKET-LOCAL, the translation already taken off - touch this bucket's box at all? The bounds
  *  enclose every triangle in the bucket exactly (addMesh keeps them per vertex), so a triangle can only come within
  *  `r` of the centre when the centre's own box overlaps the bucket's: a miss here CANNOT hide a contact, and the
@@ -96,8 +95,7 @@ export function sphereTouchesBox(lx, ly, lz, r, min, max) {
  *  bucket per sample, which at nine samples a capsule and up to five capsules a step was hundreds of Sets a frame
  *  per body, most of them for buckets nowhere near it. */
 const VISITED = new Set();
-/** FB0930-FOE-RAYS (2026-09-30, player report: "requestAnimationFrame handler took <N>ms" by the hundred in a
- *  dungeon, CPU at 100%, 500 violations in Privateer's Hold and 40 once every foe was dead): the ray's visited mark
+/** FB0930-FOE-RAYS: the ray's visited mark
  *  is a STAMP per triangle, not a Set. Every foe casts rays every fixed step - its sight line, and the obstacle probe's
  *  capsule casts (27 rays each, up to eleven of them a step for a foe wedged against a wall while it hunts a detour)
  *  - and each ray had cleared and filled a Set, a hash and an insert per triangle met. The stamp is one integer
@@ -145,8 +143,7 @@ const RAY_Y_SLACK = 1e-3;
  *  law: each triangle is asked once per bucket, at the centre as it stands when its turn comes). */
 const SPHERE_Y_SLACK = 1e-3;
 
-/** FB0930-FRAME (2026-09-30, a player's performance trace in a dungeon: 151 ms frames, 76% of them the foes' obstacle
- *  probes - _findDetour's sweep, 27 rays a capsule cast): THE BUCKETS' OWN BROAD PHASE. Every action door, lever and
+/** FB0930-FRAME: THE BUCKETS' OWN BROAD PHASE. Every action door, lever and
  *  moving platform is a bucket of its own (actionSystem.addDoor/addAction), and every ray and every sphere walked
  *  EVERY bucket to ask its box - a Map entry, the translation closure and a slab test per bucket per ray. In the
  *  trace the box test alone (segmentHitsBox, 488 ms self) and the default translation closure (127 ms) outweighed the
@@ -170,7 +167,7 @@ const BROAD_QUERY_MAX = 256;
  *  gathered before they are gathered again - the box test is asked at each bucket's turn with the centre as it
  *  stands, so the gathered box is grown by this much and re-asked past it. */
 const BROAD_PAD = 1;
-/** PERF-COL2 (2026-10-10, the owner: "prob caused by ... render range"): A BUCKET TOO WIDE FOR THE FINE CELLS is filed
+/** PERF-COL2: A BUCKET TOO WIDE FOR THE FINE CELLS is filed
  *  on cells of this size instead of being asked by every query - a streamed pixel's bucket (its town's models, its World
  *  of Daggerfall rocks) spans the pixel, 819 units, a hundred fine cells a side; on these, four or five. */
 const BROAD_COARSE_CELL = 256;
@@ -291,7 +288,7 @@ function framesMoved(broad) {
   return false;
 }
 
-/** OW-WOD-LAG (2026-09-29, Mac: "When near mountains from WOD, the game lags insane"): THE WIDE TRIANGLES IN A TREE.
+/** OW-WOD-LAG: THE WIDE TRIANGLES IN A TREE.
  *  AUDIT BRANCH (WoD) B1 filed them on a 64-unit XZ grid, so a query near a World of Daggerfall massif - rocks scaled by
  *  hundreds and thousands, stacked over one another - took every face whose footprint covered the column it stood in,
  *  above it and below it alike: 150 to 1,700 of them a sphere on a stand-in rock (the lag investigation's bench, the
@@ -607,7 +604,7 @@ function turnedBox(bucket, t, R, out) {
  *  from its own origin is met up to this much of its distance from where the turned box puts it. */
 const MOVER_TURN_EPS = 1e-4;
 /**
- * SEA-DROPS (2026-10-23, the owner: "while at sea players encounter on and off persistent frame drops"): WHETHER A
+ * SEA-DROPS: WHETHER A
  * MOVER'S BUCKET, AS IT STANDS NOW, CAN REACH A QUERY WHOSE WORLD BOX IS [x0, x1] x [z0, z1].
  *
  * A boat's buckets move and turn (AUDIT NAV1 #12, the world host's csaSyncColliders), so none is filed by place and
@@ -826,8 +823,7 @@ export class Collider {
   }
 
   /**
-   * DISC16-A (2026-09-24, Mac: "I notice my character is sunken into the
-   * ground on hills"): WHERE A CAPSULE'S FEET REST ON THE TERRAIN FLOOR.
+   * DISC16-A: WHERE A CAPSULE'S FEET REST ON THE TERRAIN FLOOR.
    * DFU's body is Unity's CharacterController, a capsule, and on a slope a
    * capsule rests on its rounded bottom: the sphere's centre stands r / cos
    * of the grade over the ground beneath it, so its lowest point, the feet,
@@ -845,7 +841,7 @@ export class Collider {
     const r = CAPSULE_RADIUS;
     const hx0 = this.heightAt(x - r, z), hx1 = this.heightAt(x + r, z), hz0 = this.heightAt(x, z - r), hz1 = this.heightAt(x, z + r);
     if (!(Number.isFinite(hx0) && Number.isFinite(hx1) && Number.isFinite(hz0) && Number.isFinite(hz1))) return h;
-    // DW-D (2026-09-25): THE GRADE IS A SLOPE'S, NEVER A STEP'S. The carved
+    // DW-D: THE GRADE IS A SLOPE'S, NEVER A STEP'S. The carved
     // sea (Iliac Puddle No More) lays its seafloor under the heightfield, so
     // at a carved cell's edge the floor STEPS from the sea's bed to the shore
     // (the floor's walls stand in the step), and the centred difference read
@@ -1170,7 +1166,7 @@ export class Collider {
   }
 
   /**
-   * MAC-BUG W5 (Mac, 2026-09-20: "blood doesn't work outside") - THE
+   * MAC-BUG W5 - THE
    * SAME RAY, PLUS THE GROUND.
    *
    * `raycastHit` walks BUCKETS ALONE: triangles, registered by
@@ -1432,8 +1428,8 @@ export class Collider {
   }
 
   /**
-   * FIELD BUGS 2026-10-02 ROCK-FREE (Mac: "ships get stuck in the world of daggerfall ocean rocks"), and its audit
-   * (2026-10-02b, Mac: "Audit this"): A HULL'S SWEEP, MET AS UNITY MEETS IT - Come Sail Away's CheckCollision through
+   * FIELD BUGS 2026-10-02 ROCK-FREE, and its audit
+   * A HULL'S SWEEP, MET AS UNITY MEETS IT - Come Sail Away's CheckCollision through
    * the world's host (scenes/world.js csaSphereCastAll), in place of `sphereCastAll` above. That one is Unity's
    * SphereCastAll over a bucket as ONE collider cast as nine rays, and a static bucket is a pixel's whole ground - every
    * World of Daggerfall rock of it in one: a ledge under her answered the zero point for the whole pixel and hid the
@@ -1610,8 +1606,7 @@ export class Collider {
     // passes through - the ray's own filter, for the decorator's flying
     // eye (scenes/decor/decorTool.js flyClip), which looks through a piece
     // being moved. Null (every body) is the resolve exactly as it was.
-    // SH1 (2026-09-12, Mac: "you can immediately walk over things (like
-    // interior tables, tree trunks, etc)"): `standCeil` is the highest
+    // SH1: `standCeil` is the highest
     // world y a contact may sit at and still be GROUND - the entry feet
     // plus stepOffset, the step-up ladder's own law. A contact above it
     // whose normal leans up (a tabletop's edge, a trunk's root flare, a
@@ -1629,7 +1624,7 @@ export class Collider {
     // point and the way into it from the centre - asked once the walk is done whether the body stands there
     let liftY = -Infinity, liftX = 0, liftZ = 0, intoX = 0, intoZ = 0;
     const c0x = center[0], c0y = center[1], c0z = center[2];
-    // PERF-COL1 (2026-09-21, SquidKam: "Guards kill the framerate"): THE
+    // PERF-COL1: THE
     // BROAD PHASE THE RAY HAD AND THE SPHERE DID NOT. This walked EVERY
     // bucket for EVERY sample - nine string keys, nine Map lookups and a
     // fresh Set per bucket - whether or not the bucket was anywhere near
@@ -1732,8 +1727,7 @@ export class Collider {
           // so this fires only on geometry the body is truly inside.
           const wallAbove = (dy > 0 && center[1] - dy > standCeil)
             || (midBody && dy > 0 && dy / d >= GROUND_NY);
-          // PH1 (2026-09-14, Mac: "it's possible to randomly walk into
-          // the floor in dungeons and get stuck in the ground"): A FLOOR
+          // PH1: A FLOOR
           // IS ONE-WAY FOR THE LOWER SPHERE. The push-out is along
           // centre-minus-closest, so once the lower sphere's centre had
           // crossed a floor's plane (a mover's mesh advancing past it in
@@ -1886,9 +1880,7 @@ export class Collider {
     const axis = Math.max(0, height - 2 * CAPSULE_RADIUS);
     const low = [feet[0], feet[1] + CAPSULE_RADIUS, feet[2]];
     const high = [feet[0], feet[1] + CAPSULE_RADIUS + axis, feet[2]];
-    // COL1 (2026-09-15, Mac: "3d Geometry has no collison. For example,
-    // in the first dungeon the table legs do have collison but the table
-    // top doesnt"): THE BODY WAS SAMPLED AT TWO POINTS AND HAD A HOLE.
+    // COL1: THE BODY WAS SAMPLED AT TWO POINTS AND HAD A HOLE.
     //
     // A capsule is a sphere SWEPT along a segment; this resolves it as
     // two spheres at the segment's ends, which is only the same shape
@@ -1937,8 +1929,7 @@ export class Collider {
     const middles = Math.max(0, Math.ceil(axis / span) - 1);
     while (MID_SCRATCH.length < middles) MID_SCRATCH.push([0, 0, 0]);
     const mid = MID_SCRATCH;
-    // SQUEEZE1 (2026-09-26, Ashley on the Discord: a quest giant "disappearing after a basically random amount of time
-    // entering the dungeon"): A BODY TALLER THAN ITS ROOM STAYS ON ITS FLOOR. The head's plain push below is the last
+    // SQUEEZE1: A BODY TALLER THAN ITS ROOM STAYS ON ITS FLOOR. The head's plain push below is the last
     // word of every pass, so a body taller than the gap between a floor and a ceiling - a giant's 3.4 m capsule stood
     // at a marker under a 3 m ceiling - was pushed down by its head each pass and dragged its lower sphere after it,
     // under the floor, and fell out of the level. A doorway's lintel stops such a body (a wall, pushed sideways),
@@ -1988,7 +1979,7 @@ export class Collider {
       // centre rose past a low ceiling's plane stood on the ceiling's top face (the collider reads no face's facing), and
       // the report's own giant walked off a ledge and on through the air under a flat ceiling. A wall to it, as a
       // mid-body contact is (COL1).
-      // AUDIT CLIMB-FIELD W2 (Mac: "hitting the top of an angled roof at a certain angle can get your character stuck"):
+      // AUDIT CLIMB-FIELD W2:
       // and the PLAYER's head never grounds either. A contact under the head sphere's centre is the capsule's cylinder -
       // never its foot - and COL1 F8's law for the middles is the head's too: an eave's knife edge at the chest, met by
       // a jump or a fall beside it, sits in the chain's waist between the middle and the head, and the head's half of it
@@ -1999,7 +1990,7 @@ export class Collider {
       low[0] = high[0];
       low[2] = high[2];
       low[1] = high[1] - axis;
-      // PERF-CLIMB (the Enhanced Climbing arc's dense-mesh limit, bible/03-World/Parkour-Arc.md): A PASS THAT MOVED
+      // PERF-CLIMB (the Enhanced Climbing arc's dense-mesh limit): A PASS THAT MOVED
       // NOTHING IS THE LAST. Its centres are all derived from `low` (the middles and the head off it), and nothing else
       // it reads changes between passes - so a pass that ends where it began, to the bit, would be run again exactly,
       // pushing nothing and ORing the same flags into `out`. Stopping there is the same answer, cheaper: a body in the
@@ -2302,7 +2293,7 @@ export class Collider {
     // swimming) is the one caller that drives a grounded capsule down
     // every step. So: when the down pass slid, come down only as far as
     // the capsule goes without being pushed (bisected), x/z untouched.
-    // AUDIT CLIMB-FIELD W1 (Mac: "hitting the top of an angled roof at a certain angle can get your character stuck"):
+    // AUDIT CLIMB-FIELD W1:
     // A STOP IS WHERE THE BODY STANDS. The bisect refuses every descent the resolve pushes, and a body already leaning
     // on a face too steep to stand on (past the slope limit: a 71-degree roof over a wall's top, a wall walk's 76-degree
     // parapet over its floor) is pushed by that face at ANY descent - so it came down nothing, stood on nothing (the
@@ -2335,8 +2326,7 @@ export class Collider {
     // descent in one frame - rise 200ms, "fall" 33ms, the launch-era
     // snap-down bug. Walking down stairs keeps the snap and is
     // bit-identical either way.
-    // PH2 (2026-09-14, Mac: "running up/down stairs makes the screen
-    // really jitter"): the snap used to drop the WHOLE capsule
+    // PH2: the snap used to drop the WHOLE capsule
     // STEP_OFFSET and resolve it there - and on a staircase that point
     // is inside the stair's mass, so the resolve ejected the probe up
     // and BACK along the riser (measured: feet z 8.19 -> probe z 9.43)
@@ -2380,8 +2370,7 @@ export class Collider {
       }
     }
 
-    // MAC3 (2026-09-11, Mac: "when moving down hills, the camera
-    // hitches badly"): the snap above probes MESHES, and the terrain
+    // MAC3: the snap above probes MESHES, and the terrain
     // floor beneath everything was only a floor - a capsule walking
     // down a heightmap slope left it on every step the slope fell
     // faster than a fresh fall, fell for a dozen, landed hard and left

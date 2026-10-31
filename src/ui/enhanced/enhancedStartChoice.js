@@ -1,4 +1,4 @@
-// START2 (bible/06-Systems/Alternate-Starts-Arc.md section 7) - THE START-CHOICE PAGE'S ENHANCED PLUS FACE.
+// START2 - THE START-CHOICE PAGE'S ENHANCED PLUS FACE.
 //
 // The question itself - its starts, its cursor, its one answer - stays ui/startChoice.js's StartChoiceScreen. This is
 // its FACE on the Enhanced Plus skin, in the leveling question's own shell (ui/enhanced/enhancedLevelingChoice.js: the

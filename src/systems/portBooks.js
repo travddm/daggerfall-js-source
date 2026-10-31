@@ -1,10 +1,10 @@
 // @ts-check
-// WB12c (2026-10-01, Mac: "shops, libraries and the first breach" for the book): THE PORT'S OWN BOOKS - books the
+// WB12c: THE PORT'S OWN BOOKS - books the
 // classic table never had, written into the BOK format's own bytes (formats/bookFile.js) so the reader, the raum-book
 // face, the item's title and its price read them as they read a classic book. The classic table baked from DFU
 // (systems/booksData.js) is never touched: a port book's id is above every classic one, its low byte no classic
 // book's (the filename law reads the low byte - BOK%05d.TXT), and the one door (ui/bookDoor.js) reads it here before
-// it asks for a file. Design: bible/11-Multiplayer/World-Bosses.md section 19 C; the text is its appendix.
+// it asks for a file. Design: C; the text is its appendix.
 //
 // Not a DFU member. Ledger A (WB).
 import { RSC } from '../formats/textRsc.js';

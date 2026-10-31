@@ -1,8 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // LV2 — THE RISING: the enhanced skin's level-up notification.
 //
-// Mac, 2026-09-19: "Next up, I want to implement a new element. The
-// enhanced level up notification" - and, asked what it should do about
+// and, asked what it should do about
 // the window: "Notify, then you choose", over all three events (the
 // level, the skill raises under it, and a mastery).
 //
@@ -31,9 +30,7 @@
 // `sheetModel` and has never read `readyToLevelUp`. Since this window
 // cannot close itself without spending, every close is something else
 // taking the slot - and the dial is exactly where a player reaches
-// next. Mac found it the only way it could be found: "when you close
-// the levelup screen without adding stat points you cant open it
-// again." The hosts' arms ask `levelOwed` now and the sentence above
+// next. The hosts' arms ask `levelOwed` now and the sentence above
 // says only what was checked.
 //
 // THE CLASSIC SKIN IS UNTOUCHED, byte for byte: it says its line and
@@ -436,7 +433,7 @@ function rehome(doc, node) {
 }
 
 function rowNode(doc, r) {
-  // LV3 (Dudey, 2026-09-19: "a button to open the levelup screen again once closed"): THE LEVEL'S ROW IS A BUTTON
+  // LV3: THE LEVEL'S ROW IS A BUTTON
   // when there is a key to press - the same key the row already names, sent through ui/levelUp/levelUpOpener.js, so it
   // opens the window exactly as the sheet key does in every host. Without a binding it stays a plain line: a
   // button that presses nothing is a drawn door. It takes clicks only where the game hands the player a cursor
@@ -500,7 +497,7 @@ export const skillsImprovable = (e = playerEntity) => countReadyToImprove(e, { n
 
 export function drawLevelNotices({ owed = levelOwed(), improvable = undefined, hidden = false, now = nowMs(), doc = (typeof document === 'undefined' ? null : document) } = {}) {
   if (!doc || !isEnhanced()) return null;
-  // SKILL-READY (2026-10-20, Dudey: "dont use this annoying message bar for this anymore"): the skills a rest would raise
+  // SKILL-READY: the skills a rest would raise
   // are a tile beside the Renown bar now (ui/hud/hudAdvance.js, which counts them with skillsImprovable); the strip says
   // their line only for a caller that hands a count in
   const rows = hidden ? [] : levelNotices.frame(now, { owed, improvable: improvable ?? 0 });

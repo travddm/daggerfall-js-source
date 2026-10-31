@@ -1,5 +1,5 @@
 // @ts-check
-// TITLE-DOOR (2026-10-27, bible/10-UI/UI-Arc.md TITLE-DOOR): THE PAGE'S MARK WHILE THE FILM'S TITLE STANDS UNDER THE MENU.
+// TITLE-DOOR: THE PAGE'S MARK WHILE THE FILM'S TITLE STANDS UNDER THE MENU.
 // The film (introScreen.js) writes it when its title lands and takes it away when it is let go; the menu
 // (ui/enhanced/enhancedMenu.js renderHome) reads it, and draws its home over the film instead of its own sky. One small
 // module so the menu - which a running game mounts too - never imports the film to ask.

@@ -1,7 +1,4 @@
-// NUDE-FLATS (2026-09-27, Field-Bugs-2026-09-26b report 7, Twoddle:
-// "'show Nudity' off still has a few nude characters around, i dont know
-// all the areas but temples of kynareth is one. This can be an issue for
-// people wanting to stream.")
+// NUDE-FLATS
 //
 // ChildGuard/PlayerNudity - "Show Nudity" - gated the paperdoll's censor
 // welds and the adult quests, which are DFU's only two readers of it
@@ -32,8 +29,7 @@
 // Read when a scene is built, like every other flat decision: flipping
 // the setting redraws the next scene, not the one standing.
 //
-// NUDE-HOSTS (2026-10-05, the owner: "Even with nudity turned off.
-// Players can see and have access to nude vendors"). The table was asked
+// NUDE-HOSTS. The table was asked
 // by the five hosts that stood people on the day it shipped, and by no
 // host made after: the decorator's Vendors (HOME-VENDOR - every person
 // Daggerfall stands in a room, the nude ones among them, offered, placed

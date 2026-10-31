@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S ITEM ROWS, A LEAF - the Soul Cake and
+// WITCH1: THE WITCHES' FESTIVAL'S ITEM ROWS, A LEAF - the Soul Cake and
 // the Hearth Offering, as the item law reads them headless (systems/item/itemLaw.js LAW_ONLY - the account service loads
 // none of soulCake.js's home, which lays their names and pictures over these rows and registers them: the Weir Key's
 // lesson, KEY-LAW). It imports nothing.

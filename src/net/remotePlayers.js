@@ -1,7 +1,5 @@
 // @ts-check
-// ONLINE1 (2026-09-12): THE OTHERS, DRAWN. Mac: "if using classic, you'd
-// see the other user's paperdoll; if using enhanced, you would see the
-// other person's Morrowind sprite" - and, of a client without the
+// ONLINE1: THE OTHERS, DRAWN. - and, of a client without the
 // Morrowind data, "acceptable" that it sees the paperdoll instead. This
 // iteration draws every peer as their PAPERDOLL: the same composite the
 // inventory shows, minus its panel background, cropped to the figure and
@@ -145,8 +143,7 @@ export const PEER_HEIGHT = CAPSULE_HEIGHT;
 /** Names farther than this, in scene units, are not drawn. */
 export const NAME_RANGE = 60;
 
-// ── NAME1 (2026-09-16, Mac: "Player names clip and cut off the top of the sprite head and additionally grow in size
-// the further away + are able to be seen through walls") ─────────────────────────────────────────────────────────
+// ── NAME1 ─────────────────────────────────────────────────────────
 //
 // THREE FAULTS, ONE ROOT: the label was drawn at a CONSTANT pixel size with its TOP-LEFT on the head point and no
 // sight test at all. So it hung DOWN over the skull (the clip), it kept its pixel size while the sprite shrank with
@@ -353,7 +350,7 @@ export function createSightCache({ now = () => Date.now(), every = NAME_SIGHT_MS
 
 /** The most distinct dolls kept on the GPU that NOBODY IS WEARING; past it the least recently drawn is released
  *  (AUDIT ONLINE C7).
- *  SLAM7 (2026-09-16, AUDIT SLAM): "that nobody is wearing" is the whole correction. This counted every ready doll,
+ *  SLAM7: "that nobody is wearing" is the whole correction. This counted every ready doll,
  *  so once more than this many distinct looks stood in view the sweep released one that was ON SCREEN - whose batch
  *  it destroyed, which the next frame composed again, which released another. Measured over 40 frames with 199
  *  looks in view: 5,464 composes where 199 would do, 2,496 billboards destroyed, and only ever 64 peers drawn - a
@@ -361,8 +358,7 @@ export function createSightCache({ now = () => Date.now(), every = NAME_SIGHT_MS
 export const DOLLS_MAX = 64;
 /** A doll that failed to compose is not retried before this (AUDIT ONLINE C5). */
 export const DOLL_RETRY_MS = 5000;
-/** A class-enemy SPRITE build that failed is not retried before this. Kept far shorter than DOLL_RETRY_MS (2026-09-23,
- *  "always show all players as animated sprites"): the paperdoll fallback here is meant to be the rare, brief
+/** A class-enemy SPRITE build that failed is not retried before this. Kept far shorter than DOLL_RETRY_MS: the paperdoll fallback here is meant to be the rare, brief
  *  exception - a texture genuinely not there yet, deps not wired, a slow connection - not something a peer sits in
  *  for 5+ seconds at a stretch while a sprite would otherwise be one attempt away. A short retry means a transient
  *  failure (a texture load racing the network, or landing the very frame after this peer's build was requested)
@@ -492,8 +488,7 @@ export function alphaBounds(rgba, w, h) {
 }
 
 /** A sub-rectangle of an RGBA buffer, copied out. `bottomUp` writes
- *  the rows in reverse (OD1, 2026-09-12, Mac: "Paperdoll is upside down
- *  when viewing other players in multiplayer"): the compositor's
+ *  the rows in reverse (OD1, 2026-09-12): the compositor's
  *  buffer is a UI image, row 0 at the top, while the billboard shader
  *  samples GL's bottom-up texel order (render/renderer.js's header and
  *  its vUV note - "the quad top samples v = 1"). Every other billboard
@@ -528,7 +523,7 @@ export const ridingLoopName = (id) => `peerRide:${id}`;
 export const PEER_RIDE_STALE_MS = 1000;
 
 /**
- * CARDS2c (2026-10-08, bible/11-Multiplayer/Tavern-Cards.md section 34; Mac: "Lets build every inch of this"): THE SPRITE
+ * CARDS2c: THE SPRITE
  * LANE SEATED. Eye Of The Beholder's walkers and the paperdoll have no sitting art, so a peer seated at a card table
  * (the pose's `st`, CARDS2b's table top) stood at the seat. A sprite cannot bend; it SINKS - its feet lowered by the
  * seat's own hip drop (player/seatPose.js SEAT_HIP_DROP, the Morrowind body's), so its hips stand where the seated rig's
@@ -734,7 +729,7 @@ export class RemotePlayers {
    *  `mobileType`/`gender` changing (a peer's class - or, mid-look, their sex - changed) tears down and rebuilds:
    *  a MobileUnit is built FOR one type/gender pair, and does not re-type itself the way a foe's async retypeFoe can.
    *
-   *  BUGFIX (2026-09-20, "sprites on, still see a stiff paperdoll"): `have` is a PENDING PROMISE for every frame the
+   *  BUGFIX: `have` is a PENDING PROMISE for every frame the
    *  build has not landed on yet - `_buildMobile` is async and its result is stored in `this._mobiles` the moment it
    *  is CALLED, not when it resolves (see below). A bare Promise carries none of the bundle's own fields, so
    *  `have.mobileType` read off it was always `undefined` and never matched the requested `mobileType` - every frame
@@ -770,8 +765,7 @@ export class RemotePlayers {
   }
 
   /**
-   * PERF-PEERS1 (2026-10-10, Mac: "its still stuttering very slightly when looking to west where a lot of players are
-   * but far away"): A CLASS SPRITE'S PICTURES, UPLOADED AT IDLE. A peer drawn as its class's sprite (no Morrowind
+   * PERF-PEERS1: A CLASS SPRITE'S PICTURES, UPLOADED AT IDLE. A peer drawn as its class's sprite (no Morrowind
    * assets) shows one of eight directional records and its frame, and each (record, frame) was uploaded the first time
    * a frame needed it (_syncMobilePeer) - a decode and a texture upload inside the frame. Turning toward a crowd turns
    * every one of them onto a direction not yet seen, so the uploads landed together, on the frames of the turn. Once a
@@ -804,7 +798,7 @@ export class RemotePlayers {
     const { deps } = this;
     const basics = ENEMY_BASICS[mobileType];
     if (!deps?.getTexture || !deps?.uploadRecordFrame || !basics?.maleTexture) {
-      // Mac, 2026-09-17: "just fix it" - this used to fail silently (a
+      // this used to fail silently (a
       // permanent, unlogged fallback to the paperdoll) with no way to tell
       // WHICH of the three things was missing. Now it says so once per
       // mobileType, so the real cause (deps never wired vs. no texture row
@@ -925,7 +919,7 @@ export class RemotePlayers {
       // AUDIT (the pre-merge audit, I-G): a peer the classic lane stands NOWHERE (INVIS-NET) is still heard - DFU turns a
       // concealed entity's renderer off, not its sounds - but has no sprite, no doll and no name here
       if (hidden(peer.id)) continue;
-      // INVIS-LOOK (2026-09-27): a CONCEALED peer (the host hands ECV1's visual) is drawn translucent, as a concealed foe
+      // INVIS-LOOK: a CONCEALED peer (the host hands ECV1's visual) is drawn translucent, as a concealed foe
       // is on the enhanced lane - and carries no name: a name over an invisible player is the player, found
       const veil = conceal(peer.id) ?? null;
       // MWBODY1: a peer standing in a Morrowind body (net/peer/peerBodies.js) draws no doll/mobile; its name still rides this pass, at the body's own head
@@ -942,7 +936,7 @@ export class RemotePlayers {
       // DISC12 (Mac: werewolves "not wired correctly"): A PEER IN BEAST FORM IS THE BEAST. The pose's `wb` says which
       // (LycanthropyTypes 1 werewolf, 2 wereboar); the sprite is the enemy's own (MobileTypes 9 / 14), puppeted off the
       // pose like any class sprite - whatever the 'Other players' card says, since a person drawn there is a lie.
-      // PR-WW1 (2026-09-24, player report: "Werewolf morrowind sprite not showing online"): THE FALLBACK now. A beast
+      // PR-WW1: THE FALLBACK now. A beast
       // is drawn as Eye Of The Beholder's lycanthrope by net/peer/peerRiders.js - the art the transformed player sees on
       // themselves - and reaches here only while that art is not up (loading, failed, or a build without it), when
       // `bodyHeight` answers 0: the enemy sprite stands for them then, so a beast is never nothing
@@ -954,7 +948,7 @@ export class RemotePlayers {
       const mobileType = beast ? (beast === 2 ? MOBILE_TYPES.Wereboar : MOBILE_TYPES.Werewolf) : spritesOn && peer.look ? classMobileType(peer.look.class) : null;
       const bundle = mobileType != null && ENEMY_BASICS[mobileType] ? this._mobileFor(peer.id, mobileType, peer.look?.gender === 'female' ? 'female' : 'male') : null;
       if (bundle && typeof bundle.then !== 'function') { this._syncMobilePeer(peer, bundle, toScene, dt, eye, veil); continue; }
-      // BEAST-PEER (2026-09-26, Mac: "Wereform uses daggerfall paperdoll when others see you transform"): A BEAST IS
+      // BEAST-PEER: A BEAST IS
       // NEVER THE PERSON. The doll is the peer's HUMAN paperdoll, and it stood for a beast whenever the beast's art was
       // still on its way - EOTB's lycanthrope and the enemy sprite both load at first sight, which is the moment of the
       // change, on every screen. A beast whose art is not up yet draws nothing for those frames, and the doll it wore
@@ -1002,8 +996,7 @@ export class RemotePlayers {
     for (const id of this._mobiles.keys()) if (!live.has(id) && !inRoom?.has(id)) this._mobiles.delete(id);
   }
 
-  /** PEER-FS1 (Mac, 2026-09-18: "footstep sounds depending where they walk
-   *  on... like you have" for online peers): one FootstepMachine per peer,
+  /** PEER-FS1 (for online peers): one FootstepMachine per peer,
    *  driven by their own synced position and the SURFACE KIND they sent in
    *  their own pose (`fk` - their client already knows what they're
    *  standing on; a receiver has no cheap way to ask its own terrain
@@ -1011,7 +1004,7 @@ export class RemotePlayers {
    *  step plays AT them (`peerSound`, the panner's linear falloff of
    *  PEER_SOUND_PROFILE - full inside 6 m, silent past 30), where PEER-FS1
    *  once faked that falloff on a flat one-shot. */
-  /** PERF-PEERS2 (2026-10-10, Dudey: "big problems are caused by many players causing severe stutter"): A PEER'S FEET,
+  /** PERF-PEERS2: A PEER'S FEET,
    *  ONCE A SYNC. Six layers of this pass (the steps, the climb, the swing, the hooves, the doll, the class sprite) each
    *  asked `toScene(peer.shown)` for the same pose - a new triple each, and the host's own frame conversion each - for
    *  every peer every frame. The first to ask works them out and the rest read that answer, until the sync turns to
@@ -1029,8 +1022,7 @@ export class RemotePlayers {
     const shown = peer.shown;
     const f = this._feet(peer, toScene);
     const set = FOOTSTEP_CLIP_SETS[shown.fk ?? 0] ?? FOOTSTEP_CLIP_SETS[0];
-    // PEER-BUZZ (2026-09-22, Discord: "footstep sounds are broken" - a recording of a continuous buzz while a peer
-    // walked): AUDIT DROPS E5 measured the stride in the WIRE's frame to dodge the floating-origin shift, and in
+    // PEER-BUZZ: AUDIT DROPS E5 measured the stride in the WIRE's frame to dodge the floating-origin shift, and in
     // the OVERWORLD the wire's frame is world coordinates - 32768 per map pixel against the scene's 819.2, forty
     // scene units to one. A peer walking at 3 u/s moved 120 wire units a second, and the machine fired a step every
     // 2.5 of them: forty-eight a second, the buzz. The stride is measured in SCENE units, as the local one is, and
@@ -1060,7 +1052,7 @@ export class RemotePlayers {
     this._climbSounds.rebase();   // CLIMB5: and the climb's last places - the shift is no reach up the wall
   }
 
-  /** PEER-FS2 (Mac: "attacking sounds are not in"): every SWING - not just
+  /** PEER-FS2: every SWING - not just
    *  the ones drawn as a class sprite - carries an `an` edge in the pose
    *  already (systems/hostCombat.js's own weapon-swing counter, wired
    *  through world.js's `arm`), so this tracks it for EVERY peer
@@ -1218,14 +1210,14 @@ export class RemotePlayers {
     const striking = (entry != null && entry.lastAn != null && an !== entry.lastAn) || acted != null;
     const face = peerBodyYaw(shown);   // CLIMB5: on the wall, facing it
     const yaw = Number.isFinite(face) ? face : 0;
-    // BUGFIX (2026-09-17): mobileOrientation (characters/mobile/mobileUnit.js) reads cameraPos[0]/[2] unconditionally to
+    // BUGFIX: mobileOrientation (characters/mobile/mobileUnit.js) reads cameraPos[0]/[2] unconditionally to
     // work out which of the 8 directional frames faces the viewer - it was never optional the way `null` assumed,
     // and crashed the moment a sprite actually built successfully. `eye` is the local player's own position, passed
     // in from world.js's onlineFrame (the same call site already reading `player.pos` for peerBodies.sync); the `f`
     // fallback (face the peer's own feet - degenerates to an arbitrary but valid angle, never a crash) only matters
     // if sync() is ever called without an eye at all, which callers should not do.
     //
-    // BUGFIX 2 (2026-09-17, "same sideways stance no matter how anyone moves"): the guard here used to be
+    // BUGFIX 2: the guard here used to be
     // `Array.isArray(eye)`, which is FALSE for a typed array - and `player.pos` (world.js) is a Float32Array, not a
     // plain Array. So this always failed and silently substituted the peer's OWN feet as "the viewer", making every
     // peer face a coincident (zero-distance) point forever - orientation frozen regardless of anyone's real yaw or
@@ -1252,8 +1244,7 @@ export class RemotePlayers {
       entry.lastAn = an;
       entry.peer = peer;
     }
-    // PERF-PEERS4 (2026-10-10, Dudey: "Eye of the Beholder / class skin sprites" - "a lot if not most of the players play
-    // with morrowind assets"): A CLASS SPRITE'S ARCHIVE IS WARMED ONCE IT STANDS AS THE PEER. PERF-PEERS1 put every
+    // PERF-PEERS4: A CLASS SPRITE'S ARCHIVE IS WARMED ONCE IT STANDS AS THE PEER. PERF-PEERS1 put every
     // picture of a class's archive up at idle the moment its bundle landed - and a bundle lands for every peer, the
     // ones the viewer draws in an Eye Of The Beholder set or a Morrowind body included, for whom the class sprite is at
     // most a stand-in for the frames their own art takes to arrive. The peer lab's forty arrivals in sets: 1,191 uploads,
@@ -1310,7 +1301,7 @@ export class RemotePlayers {
    * live collider); nothing is passed on the probe hosts and every name is drawn, as it always was.
    *
    * THE ORDER IS THE BUDGET, and PERF-ON is why it is written down. The name pass is the one per-frame cost that
-   * scales with how many people are online (Mac: "the more people that are online, the worse fps becomes"), so the
+   * scales with how many people are online, so the
    * ray is paid ONLY for a peer who is in range, in front and on the strip - the peers a player can actually read -
    * and never for the room. One ray each, against a uniform grid, after three comparisons that cost nothing.
    * @param {((head: number[], id: string) => boolean)|null} [blocked]
@@ -1346,7 +1337,7 @@ export class RemotePlayers {
   }
 
   /**
-   * SOC4 (2026-09-16, Mac: "Upon joining a party, the players name who are in a party together should turn green"):
+   * SOC4:
    * `colorOf` is an APPENDED optional parameter (it was the last one until NAME1 appended `blocked` behind it - the
    * rule is the same, nothing ahead of it moved), because a name's colour is not this module's business to know. A peer is a tab in a room; whether that tab belongs to somebody in my party (PARTY_MAX seats) is the social
    * picture's question (net/social.js colorOf -> PARTY_GREEN or null), and the host asks it. Nothing is passed on
@@ -1412,8 +1403,7 @@ export class RemotePlayers {
         renderer.drawScreenQuad(null, { x: bx, y: by, w: bw, h: bh }, undefined, band.field);
         renderer.drawScreenQuad(null, { x: bx, y: by + bh, w: bw, h: eh }, undefined, band.border);
       }
-      // ACC3: THE TITLE IS ITS OWN LINE, ABOVE (Mac: "Player titles
-      // appear above a player name"), in its own colour - which is the
+      // ACC3: THE TITLE IS ITS OWN LINE, ABOVE, in its own colour - which is the
       // one thing on this label `colorOf` does NOT get an opinion on,
       // because gold IS the Founder title and a party's green would
       // erase the distinction Mac asked for.

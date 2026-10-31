@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV6 - THE DUNGEONS, DISCOVERED ON APPROACH (bible/06-Systems/Travel-View.md, THE OVERHAUL).
+// TV6 - THE DUNGEONS, DISCOVERED ON APPROACH (, THE OVERHAUL).
 //
-// Mac (2026-09-28): "Random encounters and nearby dungeons implemented should somehow be detailed implemented into the
-// new overworld ... Like a true overhaul for the new overworld"; his call "Discover on approach". Every dungeon within
+// his call "Discover on approach". Every dungeon within
 // TV_FAR_RANGE of the traveller stands on the Overworld: a discovered one is a plate with its name and distance (a
 // journey there, as a far town is), an undiscovered one an unnamed mark at its place. Coming within TV_DUNGEON_FIND_M of
 // an undiscovered one DISCOVERS it and says so - a departure from DFU (PlayerGPS discovers on the location's rect and
@@ -129,7 +128,7 @@ export function nearDungeons({ at, dungeons, locAt, isFound, spawns = [], spawnK
  * pixels, on the map) whose roll holds a spawn (`rolls`) and whose id is FILED (`filed`), and that the index does not
  * already speak for (`indexed` - a built spawn, or a real place), is asked what stands there (`stand`: the host's own
  * spawn tests and its clone, side-effect free - null for none) and comes back `{ x, y, loc }`, spawnedPixels' shape.
- * TVD-WORLD (2026-10-27): on the world's grid - the spawns stand past the Bay too (SPAWN-WORLD), and the circle was held
+ * TVD-WORLD: on the world's grid - the spawns stand past the Bay too (SPAWN-WORLD), and the circle was held
  * to the Bay's 1000 x 500.
  * @param {{ at: {x:number,y:number}, rolls: (x:number, y:number) => boolean, filed: (x:number, y:number) => boolean,
  *   indexed: (x:number, y:number) => boolean, stand: (x:number, y:number) => any, range?: number }} q

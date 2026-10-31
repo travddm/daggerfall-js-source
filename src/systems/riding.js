@@ -26,7 +26,7 @@
 // are 2..39 and 1..4 whole seconds; `rolls` stands in - THE ENGINE-PRNG
 // RULE, Ledger A, by name.
 //
-// HORSE-WALK (the port's own, bible/06-Systems/Horse-Care.md THE WALK):
+// HORSE-WALK (the port's own, THE WALK):
 // a horse horse care walks (the motor's rideWalking) is DFU's slow horse
 // - the slow clop and the halved volume - as a STATE, not an edge: a ride
 // that starts at a walk never crosses the half-speed line, and UpdateMode

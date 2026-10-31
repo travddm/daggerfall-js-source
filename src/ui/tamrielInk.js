@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - TAMRIEL ON THE HELD MAP: the continent inked round the Bay.
+// TAMRIEL1 - TAMRIEL ON THE HELD MAP: the continent inked round the Bay.
 //
-// Mac: "the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used and
-// connected as a gigantic map ... seen by players ingame", and "Performance should also not be affected".
+// and "Performance should also not be affected".
 //
 // The held map's world sheet (ui/heldMap.js) draws the Iliac Bay from the data; this layer draws the rest of Tamriel
 // round it from the authored geography (world/tamriel/tamrielGeography.js), in the same hand - the pen, the wash, the carets
@@ -82,8 +81,7 @@ export const CONTINENT_BELOW = 0.85;
 export const CITY_HIT_PX = 9;
 /** TESA1: a place's kind, as the hover says it. */
 export const ARENA_KIND_WORDS = Object.freeze({ 'city-state': 'city-state', town: 'town', village: 'village' });
-/** TESA1: a place's glyph, the Bay's own kinds - a capital is the city glyph whatever its kind. REGION-LINES (2026-10-25,
- *  the owner: "daggerfall's clustered icons need to be fixed amd standardized across tamriel"): one glyph a kind across
+/** TESA1: a place's glyph, the Bay's own kinds - a capital is the city glyph whatever its kind. REGION-LINES: one glyph a kind across
  *  Tamriel - Arena's city-state is a city as the Bay's TownCity is, its town a hamlet, its village a village. AUDIT TESA II
  *  M7: the kind's location type, the Bay's own - its classic bucket is its glyph, its filter and its hue (travelMapWindow
  *  getPixelColorIndex, inkMap markKind); the map's filters hid the Bay's towns and the countryside's past it, and not these. */
@@ -382,8 +380,7 @@ export function chaikinCapped(chain, passes = SMOOTH_PASSES, maxCut = Infinity) 
 }
 
 /** TAMRIEL3: the picture's coast and borders as chains in Bay coordinates, and each province's name at its clearest
- *  point (provinceMap labelPoint). SMOOTH-LAND (2026-10-26, bible/03-World/Tamriel.md SMOOTH-LAND; the owner: "Whatever is
- *  most detailed"): the coast and the borders are the land's own smooth law's lines (world/tamriel/tamrielLines.js
+ *  point (provinceMap labelPoint). SMOOTH-LAND: the coast and the borders are the land's own smooth law's lines (world/tamriel/tamrielLines.js
  *  lawLines - where its label changes between two map pixels' centres, at the map's own pixel), thinned by INK_THIN map
  *  pixels with their ends kept; Cyrodiil's outline is the zone's line (systems/wild/cyrodiilZone.js zoneLineOf - the same
  *  crossings, its runs in place of the province's own pieces there, `keys`), so a neighbour's coast and border end on it.
@@ -633,7 +630,7 @@ export function arenaRoadsIn(x0, y0, x1, y1) {
  *  one chain, from the pixel that starts it to the one it ends on - a stroke a run, not a step. */
 const FORWARD = /** @type {Set<number>} */ (new Set([DIR.E, DIR.SE, DIR.S, DIR.SW]));
 const OPPOSITE_BIT = new Map(DIR_DELTA.map(([bit], k) => [bit, DIR_DELTA[(k + 4) % 8][0]]));
-/** ZOOM-FAST (2026-10-24, the owner: "The map also is slow to load when zooming in and out"): EACH ROAD TILE'S RUNS AND
+/** ZOOM-FAST: EACH ROAD TILE'S RUNS AND
  *  DOTS, KEPT - the far painters read eight of the layer's bits a pixel over a tile and its rim at every tile's paint (three
  *  parts in four of a far tile's time, measured); now a road tile's runs (the steps that start on it) and its pixels' dots
  *  are walked once and kept until the roads' layer moves (a run reaches its neighbours' bits, so any install drops them
@@ -1230,12 +1227,11 @@ export function paintTamrielInk(ctx, view, ink, opts) {
     else paintPastBay(ctx, view, past);
   }
   if (part && part !== 'over') { ctx.restore(); return true; }
-  // REGION-LINES (the owner: "Theres no visible region lines", then a map of Tamriel each province cleanly parted: "This is
+  // REGION-LINES (, then a map of Tamriel each province cleanly parted: "This is
   // what I mean by region lines. Each region distinctly separated"): the provinces' borders - the regions past the Bay
   // (WW-R) - solid on a halo (PROVINCE_PEN), OVER the roads' web (under it, in the tracks' own pen, a border read as one
   // more track). High Rock and Hammerfell need none on the Bay: its water and the Bjoulsae part them on Daggerfall's own
-  // map. The 43 biome zones' borders stood here a day and were withdrawn (2026-10-25, the owner: "Those are just random
-  // lines"): unnamed, wandering through the land, they told a player nothing
+  // map. The 43 biome zones' borders stood here a day and were withdrawn: unnamed, wandering through the land, they told a player nothing
   provinceLines(ctx, view, paperW, paperH, ink.borders);
   // ZONE-NAMES-OVER: what the window lays over the land and under its names (the open zone's fog and red line - WILD1
   // had them under the place marks; laid after this layer, the fog's 0.78 hid Cyrodiil's every name)

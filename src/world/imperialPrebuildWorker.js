@@ -1,5 +1,5 @@
 // @ts-check
-// IC-GRAND's perf pass (bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's thread") - THE IMPERIAL CITY'S OWN
+// IC-GRAND's perf pass (IC-GRAND, "Off the page's thread") - THE IMPERIAL CITY'S OWN
 // WORKER: a slice's blocks and models made off the page's thread (world/imperialPrebuild.js says what and why), a piece at
 // a time, the wanted slices in the order the page last said (nearest the player first) - each piece handed back as it is
 // made, its buffers moved, not copied.
@@ -38,7 +38,7 @@ export const DONE_KEEP = 2400;
 /** @param {(msg: any, transfer?: ArrayBuffer[]) => void} post */
 export function createPrebuildWorkerState(post) {
   let deps = null, queue = /** @type {Array<{ kind: 'block', name: string } | { kind: 'model', id: number }>} */ ([]);
-  /** IC-STUTTER (bible/03-World/Arena-Provinces.md IC-STUTTER): the pieces a build waits on, ahead of the wanted list.
+  /** IC-STUTTER (IC-STUTTER): the pieces a build waits on, ahead of the wanted list.
    *  @type {Array<{ kind: 'block', name: string } | { kind: 'model', id: number }>} */
   let needs = [];
   /** The pieces made here or by the page lately, oldest first - DONE_KEEP of them, so a slice come back to after a walk

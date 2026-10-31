@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The landmarks"): THE LANDMARKS, MADE - procedural low-poly meshes of the
+// TESA-LANDS (, "The landmarks"): THE LANDMARKS, MADE - procedural low-poly meshes of the
 // port's own, every vertex a function of its kind's and variant's seed: the parasol (Morrowind's giant fungi), the spire
 // (a pillar, a hoodoo, a crag, a standing stone, a termite mound), the Hist, the reeds, a vineyard's row, a grove's tree.
 // Flat-shaded, each face wound out (the graht-oaks' law, world/jungle/grahtOakMesh.js), in three submeshes (body, crown,

@@ -1,12 +1,12 @@
 // @ts-check
-// STEED1 / WAGONS4 (2026-10-11): THE UPKEEP'S TWO ITEMS, A LEAF - the Sack of Oats a horse eats (systems/steedCare.js)
+// STEED1 / WAGONS4: THE UPKEEP'S TWO ITEMS, A LEAF - the Sack of Oats a horse eats (systems/steedCare.js)
 // and the Wagon Repair Kit a wagon is mended with in the field (systems/wagon/wagonUpkeep.js). Their rows register at import,
 // as the wallet's do, so the item law (systems/item/itemLaw.js, on the account service too) knows them headless; nothing here
 // stocks a shelf or rolls a loot table - the yards sell them (systems/merchantYards.js yardStock), and online only while
 // UPKEEP_ITEMS_ONLINE is on (SHIP BEFORE ANYONE CAN SEE ONE, Rest-Arc.md REST6: a release ships the templates first, so
 // no older client meets an item it cannot read).
 //
-// UPKEEP-ONLINE (2026-10-12, the owner: "We never added oats or repair kits to the new horse/wagon system"). The
+// UPKEEP-ONLINE. The
 // templates shipped with STEED1/WAGONS4's merge (#791, 2026-10-11) and every release since has carried them, so the
 // switch is ON: online a Stable sells oats and a Wagon Yard its kits, as they did offline from the first.
 

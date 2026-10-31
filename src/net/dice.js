@@ -1,5 +1,5 @@
 // @ts-check
-// DICE1 (2026-09-23, the community arc - Addison Knox: "Chat dice-rolling"): THE DICE'S LAW - pure, DOM-free, one home
+// DICE1: THE DICE'S LAW - pure, DOM-free, one home
 // for both ends (net/wire.js re-exports it, so the relay reads it through server/src/relay.js like every other law).
 //
 // THE RELAY ROLLS. A roll said by the client would be a number the client chose: a player who wants a 20 types one. So

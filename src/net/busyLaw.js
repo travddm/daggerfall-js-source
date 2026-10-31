@@ -1,10 +1,10 @@
 // @ts-check
-// BUSY-GATE (2026-10-13, after HOMES-SHED; the owner: "Build whatever can harden our server"): WHEN THE ACCOUNT DATABASE
+// BUSY-GATE: WHEN THE ACCOUNT DATABASE
 // IS OVERLOADED, THE READS A TAB KEEPS ASKING STAND BACK - TOGETHER, AND AT BOTH ENDS. ONE LAW for the client's gate
 // (net/accountClient.js `call`) and the service's shed (server-account/src/index.js), so the two can never disagree on
 // which reads may wait.
 //
-// The outage of 2026-10-13 (bible/11-Multiplayer/Scale-Arc.md HOMES-SHED): the one D1 primary overloaded from 14:11 UTC
+// The outage of 2026-10-13 (HOMES-SHED): the one D1 primary overloaded from 14:11 UTC
 // and stayed down for hours, because every book asked again on its own schedule the moment its answer failed - market,
 // marks, notices, writs and the professions twice within 1.5 s, others on a fixed 1-5 s - so a database too slow to
 // answer was asked harder than one that answered. HOMES-SHED took the busiest book's flat retry away; this takes the
@@ -21,13 +21,12 @@
 // and every act are never held - each keeps its own retry, and an act is never dropped (`call` sends it). Left out on
 // purpose: a read that may settle something on its way (the market's read, the chapters' list), the arena's board, and
 // the mint and the account's own state.
-// BUSY-HEART (2026-10-16, the owner: "Fix this" - the account database overloaded from 13:50 UTC and staying so;
-// bible/11-Multiplayer/Scale-Arc.md BUSY-HEART): AND THE HEARTBEAT AND THE DAY'S MOTHERLODES, the two routes that spent
+// BUSY-HEART: AND THE HEARTBEAT AND THE DAY'S MOTHERLODES, the two routes that spent
 // the most of the database's time in the overload. They had been left out as reads the tab's bookmark keeps off the
 // primary's queue; with the database slow the page keeps no bookmark (BOOKMARK-SPIRAL), and each was asked again on
 // its own schedule - the heartbeat three times in 2 s, twice as often as before the overload, the motherlodes three
 // times as often. Their writes are what a missed ask loses anyway: a beat's play credit (net/playClock.js, a beat that
-// fails is dropped) and a pick that is a pure roll the next ask makes again (INSERT OR IGNORE). DISPLAY-REPLICA (2026-10-13): the reads below are replica routes too (service.js
+// fails is dropped) and a pick that is a pure roll the next ask makes again (INSERT OR IGNORE). DISPLAY-REPLICA: the reads below are replica routes too (service.js
 // REPLICA_ROUTES), and still stand back - a page with no bookmark asks the primary their first statement. This file
 // imports nothing: it is in the account Worker's bundle and the client's, and keeps both graphs flat.
 
@@ -59,7 +58,7 @@ export const busyRead = (/** @type {string} */ path, /** @type {string} */ metho
 /** The seconds an overload answer tells a client to stand back (its Retry-After) - and the least a client waits. */
 export const BUSY_RETRY_AFTER_S = 5;
 /** How long the service, having met an overload, answers the reads without asking the database (ms). SHED-LONG
- *  (2026-10-16, bible/11-Multiplayer/Scale-Arc.md SHED-LONG): 10 s, where it was 2 - with the queue a minute deep, two
+ *  10 s, where it was 2 - with the queue a minute deep, two
  *  seconds' rest let the next wave of the same reads in before it had drained. */
 export const BUSY_SHED_MS = 10_000;
 /** The client's first wait after an overload answer, and the most it ever waits (ms): the wait doubles with each

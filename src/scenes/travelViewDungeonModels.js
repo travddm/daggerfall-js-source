@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -20,8 +20,7 @@ export function createTravelViewDungeonModels(host) {
     renderer, state, tileSide, tvDungeonAt, tvDungeonRowsAt, tvFiledSpawns, tvGroundAt, tvGroundGenNow, tvKnownGen,
     tvPlaceSummary, tvSpawnFound, tvSpawnGone, tvSpawnKnown
   } = host;
-  /** OW-DUNGEONS (2026-10-08, Mac: "with dungeons on the overworld it doesnt show a dungeon model"; "Its own model,
-   *  enlarged"; systems/travel/travelDungeonModels.js, bible/06-Systems/Travel-View.md OW-DUNGEONS): THE DUNGEONS STANDING AS
+  /** OW-DUNGEONS: THE DUNGEONS STANDING AS
    *  MODELS - TV6's own law (nearDungeons) with none left to TV2's grid (a found one there is a speck from the eye too)
    *  and a standing Abyss Dungeon among the spawns (its own host stands and takes it - it is known from its rise), the
    *  nearest TV_DUNGEON_MODELS_MAX; read again as TV6's is, when the pixel, the finds or the index move. */

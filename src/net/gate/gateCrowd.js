@@ -1,6 +1,5 @@
 // @ts-check
-// GATE-CROWD (2026-10-07, Mac: "We need to not allow followers inside the oblivion gates, plus need some type of filter
-// when there are too many people"): THE CROWD, FILTERED ON THIS SCREEN. A court holds as many challengers as come
+// GATE-CROWD: THE CROWD, FILTERED ON THIS SCREEN. A court holds as many challengers as come
 // (net/gate/gateBrain.js GATE_FIGHTERS_MAX), and forty round one boss are forty bodies, names, lights, spells and
 // footsteps over his telegraphs. Past the count the player chose on the Other players card - twelve or twenty-four;
 // everyone, the default, cuts nobody - only that many other players are drawn: those never cut (`crowdKept`: my party,
@@ -14,15 +13,14 @@
 // in and out - each one a sprite built and a Morrowind body handed over (net/peer/peerBodies.js, WB9h's churn). A player
 // drawn last frame keeps their place against one who is not until that one stands GATE_CROWD_HOLD_M nearer.
 //
-// EVERYWHERE A STRANGER CANNOT FIGHT ME (CROWD-WIDE, 2026-10-23, the owner: "Can we implement the player toggle we have
-// for the oblivion gate into the entire game? Like being able to see how many players you want to see at one time"). The
+// EVERYWHERE A STRANGER CANNOT FIGHT ME (CROWD-WIDE, 2026-10-23). The
 // count cut a gate's court alone until then: the street, a building and a dungeon hold duels, arena bouts and battles,
 // where a player cut from the screen could be the one fighting me. Now it cuts everywhere but where that can be so - the
 // open zone (WILD1's fair ground, its sea and its dungeons among it), while I am entered in a siege or a Royal Tourney,
 // an arena's room - and under the travel view, where nothing is cut (OW-PEERS, as PEER-RANGE). A gate's court is cut
 // whatever I am entered in: nobody fights anybody there but him. A player past the Other players card's draw distance is
 // cut first (PEER-RANGE, net/peer/peerRange.js), and this count is taken from the players within it. AUDIT CROWD-WIDE
-// (bible/01-Overview/audits/Audit-Crowd-Wide.md) added who is never cut and what goes with a cut player.
+//  added who is never cut and what goes with a cut player.
 //
 // The law is pure (`crowdDrawn`); `createGateCrowd` keeps the held places between frames for the host (scenes/world.js,
 // the online frame's drawn peers, which asks where the count cuts). Not a DFU member: Daggerfall has no other players.
@@ -31,7 +29,7 @@
 /** The Other players card's choices: how many other players are drawn at once (0: everyone), the default first - the
  *  card's row shows the first for a stored value that is none of them, as gateCrowdMax reads it. */
 export const GATE_CROWD_TIERS = Object.freeze([0, 12, 24]);
-/** Everyone, unless the player chose otherwise (Mac, 2026-10-07: "The default other setting should be everyone"). */
+/** Everyone, unless the player chose otherwise. */
 export const GATE_CROWD_DEFAULT = 0;
 /** A player drawn keeps their place against one who is not until that one stands this much nearer (m). */
 export const GATE_CROWD_HOLD_M = 4;
@@ -86,8 +84,7 @@ export function crowdKept(party, ones, ...lists) {
 }
 
 /**
- * RPT1026-EVENTS CROWD-KIN (2026-10-26; a private report: the Players shown at once count left other players' revenants
- * standing): THE CROWD'S LAST CUT, ASKED WHERE A PLAYER'S OWN FOES STAND. A peer's revenants, their bands and
+ * RPT1026-EVENTS CROWD-KIN: THE CROWD'S LAST CUT, ASKED WHERE A PLAYER'S OWN FOES STAND. A peer's revenants, their bands and
  * the peer's companions are puppets of a foe pool (scenes/exteriorFoes.js, scenes/dungeonContext.js), stood by the peer's own screen
  * about the peer - and a player the count left undrawn left them walking the ground on mine. The draw asks the page's one
  * crowd (the one createGateCrowd made last - the world host's) without the host handing it round: the construction seam's

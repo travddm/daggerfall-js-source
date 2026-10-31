@@ -227,9 +227,7 @@ export function houseContainerName(modelIdNum) {
   return HOUSE_CONTAINER_NAMES[modelIdNum] ?? INTERACT_TEXT;
 }
 
-/** UXB1-N / UXB1-O (2026-09-25, the UX backlog: "highlight private property titles with a different color to
- *  distinguish them from shop items for quick readability", and "flag objects with generated loot since sometimes there
- *  can be tons in a scene and 'your character' would know which ones have open lids"): WHAT A HOUSE CONTAINER'S PLAQUE
+/** UXB1-N / UXB1-O: WHAT A HOUSE CONTAINER'S PLAQUE
  *  SAYS BEYOND ITS WORD. The mod names a Chest a Chest whoever owns it (.cs:552-633), and in a shop the owner's
  *  furniture stands beside the stock, so "Shop Shelf" and "Chest" read alike - and only one of them is somebody's
  *  private property (PlayerActivate's HouseContainers arm asks, :902-925; a shelf does not). So a container that is
@@ -316,8 +314,7 @@ export const mobilePersonName = (nameNPC) => (nameNPC || null);
  * plaque draws nothing over it, exactly as an unnamed key does: the
  * mod will not label the thing that is trying to kill you.
  *
- * HOVER-PLAIN (2026-10-03, Mac: "remove the crosshair tooltip. They
- * should only have names/modifiers under their healthbar"): LOOT7-CHECK
+ * HOVER-PLAIN: LOOT7-CHECK
  * CHAMP-HOVER's exception - a hostile champion, elite or revenant named
  * here - is retired. The mod's law holds for every foe again: while a
  * special foe fights, its name and its trait stand on its health bar
@@ -499,7 +496,7 @@ export function staticDoorName(kind, {
   }
   if (kind !== 'building') return null;
   // Town23 is the city-wall "building", which has no name of its own
-  // (.cs:726-733). IC-PROPS (bible/03-World/Arena-Provinces.md IC-PROPS): any
+  // (.cs:726-733). IC-PROPS (IC-PROPS): any
   // other building with no name of its own - a ship's deck - says the place it
   // stands in, so every door a player can walk through names where it goes (the
   // mod would print "To" and nothing; DFU names every house "Residence" - the

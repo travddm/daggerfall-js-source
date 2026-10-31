@@ -164,7 +164,7 @@ export const dayRng = (minute, salt = 0) => seededRng(((Math.floor(minute / MINU
  *  the entity, and quests move them - Multiplayer.md's first lock); the PRICES are the world's (ECON1, below). */
 export const dayRollsFor = (minute, rolls, salt = 0) => (sharedClockOn() ? dayRng(minute, salt) : rolls);
 
-// ECON1 (2026-09-17, the STOP list's "one economy"): THE REGION'S PRICES ARE THE WORLD'S. DFU walks each region's
+// ECON1: THE REGION'S PRICES ARE THE WORLD'S. DFU walks each region's
 // price index once a day on the player's own state (RandomizeInitialRegionalPrices at the start, UpdateRegionalPrices
 // :2053-2088 each day), tilted by The Merchants' power against the region's. WORLD6b made the day's ROLLS the world's
 // and left the STATE each player's, so two players who arrived on different days read different prices in one shop.
@@ -795,8 +795,7 @@ function tickPlayerMinutesOnce({
   // broker's, and deliberately so: a multi-minute jump costs ONE minute's
   // fatigue (S20) while it costs many magic rounds.
   if (Math.floor(next) !== Math.floor(classicMinutes)) {
-    // FATIGUE-IDLE (2026-09-29, Mac: "You shouldn't lose fatigue at an insane rate standing still"; asked what it
-    // should cost: "Nothing"): THE BAND CHARGES NOTHING STANDING STILL ON THE GROUND. DFU charges DefaultFatigueLoss
+    // FATIGUE-IDLE: THE BAND CHARGES NOTHING STANDING STILL ON THE GROUND. DFU charges DefaultFatigueLoss
     // every minute the player is not climbing, running or swimming (PlayerEntity.cs:405-418) - standing still included:
     // the walk's 8 a minute on BALANCE1's scale, a full bar at STR/END 50 in ~67 real minutes of doing nothing.
     // `standing` is the motor's IsStandingStill term (grounded, no move input - player/motor.js); the arms below still
@@ -1014,7 +1013,7 @@ export function runCalendarArms(entity, lastMinutes, nowMinutes, { rolls = Math.
     if (ownArms && i % NORMALIZE_INTERVAL_MINUTES === 0 && !entity.preventNormalizingReputations) {
       normalizeReputations(entity, entity.factionRep ?? null);
     } else if (ownArms && i % RECOVERY_INTERVAL_MINUTES === 0 && !entity.preventNormalizingReputations) {
-      // REP4 (Mac: "Earn it + faster drift"): between DFU's 112-day walks, a standing below zero recovers a point every
+      // REP4: between DFU's 112-day walks, a standing below zero recovers a point every
       // seven days - the recovery half alone (a positive standing wears down on DFU's walk only). On a 112-day boundary
       // the walk above is the week's too, so no minute pays twice.
       normalizeReputations(entity, entity.factionRep ?? null, { recoveryOnly: true });
@@ -1070,7 +1069,7 @@ export function runCalendarArms(entity, lastMinutes, nowMinutes, { rolls = Math.
     if (ownArms && !shortWaits && i % CURE_QUEST_INTERVAL_MINUTES === 0) {
       startRacialOverrideQuest(entity, true, { rolls });
     }
-    // REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12 - TIMEFREE's arm, restored): online both
+    // REST8: online both
     // arms roll on the short wait, each only while it has nothing running (racialQuests.js racialArmIdle)
     if (ownArms && shortWaits && i % ONLINE_RACIAL_INTERVAL_MINUTES === 0) {
       if (racialArmIdle(false)) startRacialOverrideQuest(entity, false, { rolls });
@@ -1119,7 +1118,7 @@ export { CLASSIC_GAME_START_TIME as CLASSIC_GAME_START_MINUTES } from './gameDat
 
 let _worldMinutes = CLASSIC_GAME_START_TIME;
 
-// WORLD5 (Mac: "the shared clock and weather, and the quest clocks stood down online"): THE SHARED CLOCK. Online the
+// WORLD5: THE SHARED CLOCK. Online the
 // world's time is a function of wall time (net/wire.js sharedClassicMinutes), the same on every client, and nothing
 // local may move it - a rest, a fast travel, a sentence, a training session, ?tod. The source is installed by the
 // world host at boot; while it stands, worldMinutes() reads it and every write is refused. The tick claims what the
@@ -1127,8 +1126,8 @@ let _worldMinutes = CLASSIC_GAME_START_TIME;
 // the WORLD's clock's; a character's own time is theirs to spend - advanceOwnMinutes, below.]
 let _sharedClock = null;
 let _sharedLastTick = null;
-// TIME1 (Mac, 2026-10-01: "I don't want a band aid, I want a detailed way we can do this"): THE SKY, the third clock
-// (bible/06-Systems/Online-Time-Arc.md). Online the shared clock above becomes the EVENT clock - the economy, the
+// TIME1: THE SKY, the third clock
+// . Online the shared clock above becomes the EVENT clock - the economy, the
 // relay's events, every term and stamp, at WORLD5's TimeScale 12 for good - and the hour, the date and the moons a
 // player sees read the sky's own source (net/skyLaw.js, a faster rate), installed beside it. Nothing walks the sky and
 // nothing is stamped on it: skyMinutes() is read for "now". A shared clock installed without a sky (a test's bare
@@ -1259,8 +1258,7 @@ export function setSharedClock(source, wallOf = null, { sky = null, skyWall = nu
 }
 export const sharedClockOn = () => _sharedClock !== null;
 
-// LIVED1 (Mac, 2026-09-29: "We need a better system for time online instead of a band aid fix. Something detailed and
-// that really makes sense"): YOUR OWN TIME. DFU has one clock and the player owns it - every "and then time passes"
+// LIVED1: YOUR OWN TIME. DFU has one clock and the player owns it - every "and then time passes"
 // (a night's sleep, a loiter, a journey, a training session, a sentence, the vampire's fortnight) moves it. Online the
 // world's clock is nobody's (WORLD5), so each of those became a refusal and each system that needed its time back got
 // a patch of its own. The honest shape is TWO clocks:
@@ -1270,9 +1268,9 @@ export const sharedClockOn = () => _sharedClock !== null;
 //     (advanceOwnMinutes - every RaiseTime DFU has), and stands while they are away or dead. Offline it IS the
 //     world's clock - one variable, DFU byte for byte.
 // The rule for which one a law reads: the sun, the moons, the calendar and the world everyone shares read the world's;
-// the body, its magic, its needs, its contracts and its standing read the character's (bible/06-Systems/Lived-Time.md).
+// the body, its magic, its needs, its contracts and its standing read the character's.
 let _ownMinutes = null;
-// TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): THE SESSION'S RAISES - the minutes the character's clock has run
+// TIME3 (6.3): THE SESSION'S RAISES - the minutes the character's clock has run
 // AHEAD of the world's this session, counted as they are raised (every RaiseTime: the ticker's advance, through the
 // tick's raiseMinutes, and advanceOwnMinutes). A quest's countdowns run on the character's clock, which moves two
 // ways online: with the world while they live in it - a quest charges that by one played step a frame at most, the
@@ -1326,7 +1324,7 @@ export const sharedWallMs = (classicMinutes) => (_sharedWall && Number.isFinite(
 // [AUDIT LIVED1b U6: OL3's `realTimeText` and `sharedRealTimeText` - a classic minute as this machine's wall-clock words
 // - went with their last reader (LIVED1 moved the room's and the loan's words to the character's clock); the gates
 // and the raids read `sharedWallMs` itself.]
-/** BANISH-SKY (bible/06-Systems/Online-Waits.md WAIT4): a span of the world's (event) clock said as the REAL time it is
+/** BANISH-SKY (WAIT4): a span of the world's (event) clock said as the REAL time it is
  *  online - the event clock runs on the wall whether or not the player plays ("about 30 real hours", "about 40 real
  *  minutes"), rounded up as the nightfall words round; null offline, where the days are DFU's own words. */
 export function worldSpanRealWords(eventMinutes) {
@@ -1398,8 +1396,7 @@ let _lastMagicRoundMinute = null;
 export const worldMinutes = () => (_sharedClock ? _sharedClock() : _worldMinutes);
 /** TIME1: THE SKY - the minute the hour, the date, the season and the moons are read off. Online the sky's own source
  *  (net/skyLaw.js skyClassicMinutes through the relay's offset), or the event clock where none was installed; offline
- *  the one clock. Read for "now": a reading that is saved, sent or compared later is worldMinutes()'s or ownMinutes()'s
- *  (bible/06-Systems/Online-Time-Arc.md section 5). */
+ *  the one clock. Read for "now": a reading that is saved, sent or compared later is worldMinutes()'s or ownMinutes()'s */
 export const skyMinutes = () => (_sharedClock ? (_skySource ? _skySource() : _sharedClock()) : _worldMinutes);
 
 /** Set the clock - a load restores it, a rest or a court sentence jumps it. WORLD5: refused under the shared clock. */
@@ -1445,7 +1442,7 @@ export function alignEntityClocks(entity, nowMinutes, { worldLeft = null } = {})
  *  kept rolling conspiracy (encounters.js passiveGuardSpawns, DFU's own 5%) and the one road back was gone. Here
  *  each boundary in [from, to) is paid once, under the prison skip's own one-jump shield. Answers how many.
  *
- *  AUDIT DISC28 TM-1 (Mac, 2026-09-28: "Recovery only"): this is the ABSENCE's normalise, and it pays the recovery
+ *  AUDIT DISC28 TM-1: this is the ABSENCE's normalise, and it pays the recovery
  *  half alone (court.js normalizeReputations' `recoveryOnly`, the port's online time model): a reputation below zero
  *  drifts one point back per boundary, a positive standing is kept. Paid both ways, a break wore every guild,
  *  temple and noble standing down a point per nine real days away and demoted a member at their rank's line on the
@@ -1531,7 +1528,7 @@ export function resetMagicRoundMarker(v = null) {
  * Move the clock forward (or back, for a load). WORLD5: refused under
  * the shared clock.
  *
- * CLOCK-REFUSAL (2026-09-22). THE REFUSAL IS INVISIBLE TO THE CALLER
+ * CLOCK-REFUSAL. THE REFUSAL IS INVISIBLE TO THE CALLER
  * AND THAT HAS ALREADY COST ONE BUG. It answers a number either way -
  * the shared clock's current minute when it refuses, the new minute
  * when it moves - so nothing downstream can tell whether the hours it

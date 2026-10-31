@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-LOOK (2026-09-30) — A HOUSE'S OUTSIDE, WORN AS ITS OWNER CHOSE.
+// HOME-LOOK — A HOUSE'S OUTSIDE, WORN AS ITS OWNER CHOSE.
 //
 // Asked: "The introduction of exterior customization. The ability to
 // choose the texture for the roof, walls, door, windows, etc". The look

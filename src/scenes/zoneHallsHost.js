@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW-C2 (2026-10-24, bible/03-World/World-Wide.md WW-C; bible/11-Multiplayer/Wild-Zone.md) - THE OPEN ZONE'S HALLS IN
+// WW-C2 - THE OPEN ZONE'S HALLS IN
 // THE STREAMING WORLD: where a hall may stand (the ground test the halls and the giants share), the day's halls over the
 // zone's mask, and a hall stood in the index - out of the world host's bootWorld (HOST-SPLIT), the host keeping the
 // wiring.

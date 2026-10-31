@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-5 (2026-10-14) - A SPARSE HERMITIAN POSITIVE-DEFINITE SYSTEM, SOLVED DIRECTLY.
+// POI-5 - A SPARSE HERMITIAN POSITIVE-DEFINITE SYSTEM, SOLVED DIRECTLY.
 //
 // The UV editor's unwrap (poi/uv/uvMesh.js unwrapLscm) is a least-squares system over every vertex of an island; an
 // iterative solve crawls on a large one (two pins far apart: the low frequencies take thousands of steps - an

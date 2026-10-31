@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA1 (2026-10-12, bible/03-World/Arena-Provinces.md) - THE PLACES PAST THE BAY, STOOD ON THE BAY'S PIXELS.
+// TESA1 - THE PLACES PAST THE BAY, STOOD ON THE BAY'S PIXELS.
 //
 // TESA1 to TESA6 read these places from the player's own copy of The Elder Scrolls: Arena (CITYDATA.65 and A.EXE's list
-// of coastal cities). TESA12 (2026-10-13, the owner: "I want to make it where attaching the arena file isn't needed";
-// asked, "Canon + generated" and "Remove it") retired that: the places are the port's own (world/tamrielPlaces.js
+// of coastal cities). TESA12 retired that: the places are the port's own (world/tamrielPlaces.js
 // makeTamrielPlaces - TAMRIEL1's lore cities and the towns and villages made beside them), made on the trace from the
 // player's Daggerfall files, the same Tamriel on every client, online and off. Nothing of Arena is read. The module's
 // names keep TESA's (`arena...`): a save's and a discovery's ids, and the host's seams, are the same lane.

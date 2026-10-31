@@ -39,7 +39,7 @@
 // window is INERT - unlike the Mouse0 activate, which A8 deliberately
 // routed through `held(keys, 'ActivateCenterObject')` and which does
 // follow a rebind. The seam when that is closed is held(), same as A8's.
-// CLOSED by MAC-SWING1 (2026-09-21): swingHeld reads `held(keys,
+// CLOSED by MAC-SWING1: swingHeld reads `held(keys,
 // 'SwingWeapon')` for a non-mouse binding and swingKeyHeld is the latch
 // the four hosts poll - a swing bound to a key or a pad button swings.
 //
@@ -106,8 +106,7 @@ export function hostPaused() {
 }
 
 /**
- * SWING-SAY (2026-09-22, Mac: "its not working on the install but works
- * on the browser. Each time I bring this up you avoid it"): THE SWING
+ * SWING-SAY: THE SWING
  * CHAIN, SAID OUT LOUD, BECAUSE IT CANNOT BE READ FROM HERE.
  *
  * Three reports now - SquidKamer, Mango, Hawkiinz - all "the swing does
@@ -467,8 +466,7 @@ function actionCodes(b, action) {
 }
 
 /**
- * MWCROUCH (2026-09-17, Mac: "When crouching with the morrowind model.
- * you can't uncrouch"). THE EDGE RING - GetKeyDown and GetKeyUp, which
+ * MWCROUCH. THE EDGE RING - GetKeyDown and GetKeyUp, which
  * the port had no seam for and was deriving instead.
  *
  * Every per-frame PRESS in the four hosts was `held(keys, act) && !prev`
@@ -496,7 +494,7 @@ function actionCodes(b, action) {
  * `noteKeyDown` takes the DOM's `repeat` flag: auto-repeat is one
  * physical press to Unity, and GetKeyDown fires once for it.
  */
-// JAN1 (2026-09-18, Janome: "when I press T and then H to quickly get on my horse, my hand also changes sides"):
+// JAN1:
 // THE RING RELEASES ONLY WHAT IT CAPTURED. T opens the transport picker, whose H accelerator (DialogShortcuts.txt's
 // TransportHorse - DFU's own row) picks the horse and closes the window on the DOWN edge; the host's keydown is gated
 // behind the overlay, so that down never reached the ring - but the keyup listener is ungated (a window opened
@@ -567,9 +565,7 @@ const BUTTONS_BIT = Object.freeze([1, 4, 2]);
 export function swingHeld(buttons, keys = null) {
   const b = swingButton();
   if (b >= 0 && (buttons & BUTTONS_BIT[b]) !== 0) return true;   // KB1: the mouse's answer, and - below - any other code's too
-  // MAC-SWING1 (2026-09-21, a player on the desktop app: "can't swing
-  // my weapon on the installed version, tried binding it to other
-  // keys too"): a swing bound to a KEY or a pad code answered false
+  // MAC-SWING1: a swing bound to a KEY or a pad code answered false
   // here and everywhere, and nothing read `held(keys, 'SwingWeapon')`
   // - the recorded departure at the top of this file. setBinding
   // clears the Mouse1 row when a key takes the action, the desktop
@@ -699,7 +695,7 @@ export function routeKeyUp(e, ctx) {
  *  is dead for every DISPATCHED action while staying live for the
  *  polled ones, which read through held(). Every host that registers a
  *  keydown hands its own Set in; test/systems/combohosts.test.js sweeps them. */
-/** CG2 (2026-09-08, Mac: "unable to type in your name"): a key typed
+/** CG2: a key typed
  *  INTO a DOM text field is the field's. The enhanced wizard's name
  *  boxes are real <input>s over the canvas; every host's keydown ladder
  *  sat behind them and either preventDefault-ed the key (no character
@@ -766,9 +762,6 @@ export function neverTheFocus(n) {
 /**
  * MAC-L3: THE BROWSER MENU, SHUT ONCE.
  *
- * Mac's report, 2026-09-16 (Orion): "right click in general seems to
- * cause either a new window to open, or for the page to refresh to the
- * menu, causing unsaved progress to be lost."
  *
  * The right button is a WEAPON control here - classic Daggerfall swings
  * by dragging it - and every streaming host suppressed `contextmenu` ON
@@ -819,7 +812,7 @@ export function routeKey(e, ctx, setPlayerPos = null, keys = null) {
     const a = overlayAction(e);
     if (a) { ctx.overlayInput(a); return true; }
     // Quickload works from under the DEATH SCREEN (its F11 hint must be
-    // true); everything else stays gated. DUPE-LOAD (2026-10-11): that
+    // true); everything else stays gated. DUPE-LOAD: that
     // window alone (`loadsUnder`) - a load from under the pack or a
     // counter left the window holding what it took off the old game,
     // and its close handed it to the loaded one.
@@ -860,8 +853,7 @@ function routeKeyAction(e, act, ctx, setPlayerPos) {
   // literal Tab - a rebind moves it.
   if (act === 'QuickDial') { return ctx.toggleDial?.() === true; }
   if (POLLED_ACTIONS.has(act)) return false;
-  // MAC-R2 (2026-09-17, Mac: "The enhanced quickbar sometimes shows double
-  // messages"): A HELD KEY AUTO-REPEATS ITS KEYDOWN, and the two quickslot
+  // MAC-R2: A HELD KEY AUTO-REPEATS ITS KEYDOWN, and the two quickslot
   // actions that are NOT polled (the swap and the off hand) were routed on
   // every one of them - so a key held a beat too long readied the swap and
   // put it away again, or lit the torch and doused it, two lines and a net
@@ -1008,7 +1000,7 @@ export function routeAction(action, ctx, setPlayerPos = null) {
     // openPauseFlow opens the enhanced pages for it), or says why not
     // HELM-KEYS' merge: the key shares the down arrow with less sail - at a helm it is the sails' alone (`sailing`)
     case 'Professions': return ctx.togglePause && ctx.sailing?.() !== true ? (ctx.togglePause({ at: 'professions', setPlayerPos }), true) : false;
-    // LEGACY3 (Mac: "implement it into the pause menu as a new tab"): Project Legacy's key opens the pause on its Family tab -
+    // LEGACY3: Project Legacy's key opens the pause on its Family tab -
     // on either skin (ui/pauseDoor.js openPauseFlow opens the enhanced pages for it). Its mod's switch is actionLive's.
     case 'LegacyFamily': return ctx.togglePause ? (ctx.togglePause({ at: 'family', setPlayerPos }), true) : false;
     // GameManager.cs:550-553 - the CastSpell ACTION opens the
@@ -1053,9 +1045,7 @@ export function routeAction(action, ctx, setPlayerPos = null) {
     // owns the mode HUD line answers them.
     case 'CycleModeForward': return ctx.cycleMode ? (ctx.cycleMode(1), true) : false;
     case 'CycleModeBackward': return ctx.cycleMode ? (ctx.cycleMode(-1), true) : false;
-    // SOC5 (2026-09-16, Mac: "Players should be able to interact with others
-    // in the world upon encountering them by pressing F on their body, which
-    // should show options to add as a friend or invite to a party"): the port's
+    // SOC5: the port's
     // own action (systems/inputActions.js appends it past DFU's forty-four),
     // routed like every other - so F is rebindable and the door is a ctx arm
     // rather than a key literal in a host's ladder.
@@ -1066,8 +1056,7 @@ export function routeAction(action, ctx, setPlayerPos = null) {
     // the key keeps whatever meaning the rest of the host gives it. A host
     // without the door at all is the same answer one step earlier.
     case 'SocialInteract': return ctx.socialInteract?.() === true;
-    // QS2 (2026-09-17, Mac: the Demon's Souls quickslot diamond on the
-    // enhanced HUD): the three port actions the diamond's cells name. They are
+    // QS2: the three port actions the diamond's cells name. They are
     // EDGE actions, never polled - a held 1 drinks one potion, not one a frame
     // - so they belong in this table and not in POLLED_ACTIONS.
     //

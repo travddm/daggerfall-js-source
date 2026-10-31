@@ -259,7 +259,7 @@ export const lastHealthLostPercent = () => _lastHealthLostPercent;
 export function resetVitalsDetector() { _detector.primed = false; }
 
 /**
- * DUEL-BAR (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Bar shows duel vitality"). THE HEALTH THE HUD READS:
+ * DUEL-BAR (FIELD BUGS 2026-10-19f). THE HEALTH THE HUD READS:
  * `bar` - the host's `{ health, maxHealth }`, a duel's referee's vitality (net/duel/duelBar.js duelVitality), handed in
  * while the duel is live - else the entity's own; `from` names which ('referee' | 'save'). Both skins read this one
  * pair (ui/hud/hud.js drawHud: the classic bars and the large HUD's off its snapshot, the enhanced HUD's as `health`),

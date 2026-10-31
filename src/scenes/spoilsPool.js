@@ -1,11 +1,9 @@
 // @ts-check
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot and bounce (sort of how dropping a
-// torch works) and have a sort of rarity glow attached to it"): THE SPOILS ON THE COURT'S FLOOR - one player's share of a
+// WB5: THE SPOILS ON THE COURT'S FLOOR - one player's share of a
 // fallen boss (systems/gate/gateSpoils.js rollSpoils, off the relay's receipt), spewed out of his chest piece by piece
 // (world/gate/gateSpew.js - the thrown torch's own flight), each landing with the torch's own clatter, and at rest standing
 // in its tier's beam (render/spoilsGlow.js) with a Rare-or-better's light and chime. Pressed, a piece goes into the
 // pack (GATE-UX: no longer walked over - below); leaving the court gathers whatever is still on the floor. Design:
-// bible/11-Multiplayer/World-Bosses.md section 7.
 //
 // SEEN BY THIS PLAYER ALONE, and never sent: every other player's spoils are their own seed's, on their own screen.
 //
@@ -23,7 +21,7 @@
 // its burst holds every piece - the court refuses the save and leaving it gathers the floor - and the record goes;
 // else every piece is handed over again, and the record stays until a save holds them.
 //
-// AUDIT WBX S3/S5 (2026-09-26, Mac: "Do a comprehensive audit on everything so far"): THE RECORD CLEARS ON A SAVE, NOT ON A
+// AUDIT WBX S3/S5: THE RECORD CLEARS ON A SAVE, NOT ON A
 // CLOCK. "A save since the burst" was read off two wall clocks (the record's `at` against the slot's realTime), so a
 // clock set ahead at the burst handed the same pieces back at every boot, and one set behind dropped a record no save
 // held. A record now carries an `id` (v SPOILS_RECORD_V) and is cleared when a save of its character LANDS after its
@@ -41,8 +39,7 @@
 // by the hub's next hello - is its spoils straight into the pack (`grant`): the court's burst was the only door, and it
 // never opened for them. The same once, the same record.
 //
-// WBX3 (2026-09-26, Mac: "Loot drops should show their sprite and have a small colored loot line that extrudes from
-// the sprite itself"): EACH PIECE IS ITSELF ON THE FLOOR. WB5 dressed every piece in a treasure pile the seed chose, so
+// WBX3: EACH PIECE IS ITSELF ON THE FLOOR. WB5 dressed every piece in a treasure pile the seed chose, so
 // a Rare blade and a Magic ring lay as the same heap of coins; now an item stands as its own picture - the one the pack
 // shows (the host's `iconOf`, ui/textureCanvas.js's own door with the item's dye) - uploaded under the port's own
 // pseudo-archive and drawn as a billboard on the floor, and its tier's line leaves the top of that picture
@@ -51,13 +48,12 @@
 // pillaged by others before I could ever realise boss died" - the spoils are this player's alone, and a fighter
 // standing where they fell had walked over them in the second they landed).
 //
-// RAID4b (2026-09-28): A TOWN'S THANKS COME THROUGH THIS DOOR TOO (systems/raidSpoils.js) - a pool of their own, made
+// RAID4b: A TOWN'S THANKS COME THROUGH THIS DOOR TOO (systems/raidSpoils.js) - a pool of their own, made
 // with their own KEYS (so a town's receipts never push a boss's out of the list of those spent) and handed their own
 // roll and words at the grant; the crash's door asks their record by its own key. Its "day" is the raid's
 // (raidSpoilsDay - a string), and it tells the hub nothing: no `onSpent` (the hub never kept a raid's receipt).
 //
-// WB9f (2026-09-30, Mac: "Improve the loot drops that emit on his death and have them spread out more. The player should
-// be able to inspect and pick up the ground item, not just walk over it"): THE SPOILS, SPREAD AND HANDLED. The burst
+// WB9f: THE SPOILS, SPREAD AND HANDLED. The burst
 // throws each piece its own slot of a wider fan, kept on the court's floor (world/gate/gateSpew.js keepLaunch, off the
 // court's `keep` the burst hands in); and a resting piece is an ACTIVATION TARGET - `spoil:<i>` for an item (a pile of
 // one, so the plaque lists it with its tier and, under quick loot's stats, what it is), `spoilGold:<i>` for the gold -
@@ -65,13 +61,12 @@
 // (`contentsOf`). Walking over a piece still takes it. Each piece's rest is told to the court (`frame(onRest)`), which
 // throws its tier's sparks where it lands.
 //
-// GATE-UX (2026-10-01, Mac: "Loot at the end can still be walked over and picked up"): THE PRESS IS THE ONLY HAND. A
+// GATE-UX: THE PRESS IS THE ONLY HAND. A
 // piece on the floor is taken when it is pressed (`pick`) and no other way - a fighter crossing the court to the one
 // they wanted swept up every piece in their path, unlooked at. WBX3's wait after a piece came to rest (SPOILS_TAKE_AFTER_MS)
 // and the walk-over's reach (SPOILS_TAKE_M) went with it; leaving the court still gathers what is left (`gather`).
 //
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss"; asked, "Mail the leftovers"): WHAT IS LEFT ON THE FLOOR GOES TO THE MAILBOX. Leaving gathered every piece
+// LOST-SPOILS: WHAT IS LEFT ON THE FLOOR GOES TO THE MAILBOX. Leaving gathered every piece
 // still on the floor into the pack; now, where the host hands a `mail` (net/lostSpoils.js lostSpoilsMail) and its box is
 // known to take post, each ITEM still there is owed to the Lost and Found instead (net/lostLaw.js) - claimed from the
 // mailbox beside the hourglass, into whichever online character is played - and the gold still goes to the purse. The
@@ -160,7 +155,7 @@ export function spoilsList(seed, level, claims = null) {
   const pieces = s.pieces.map((p, i) => ({ kind: 'item', item: p.item, tier: p.tier, record: p.tier === 'gilded' || i >= firstPortent ? null : flat() }));
   const ember = { kind: 'item', item: s.sigil, tier: SIGIL_TIER, record: flat() };
   const gold = { kind: 'gold', gold: s.gold, tier: 'common', record: flat() };
-  // GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the Warden's gem, its picture drawn after the gold's - so every
+  // GEM2: the Warden's gem, its picture drawn after the gold's - so every
   // picture before it is what the seed gave it - and thrown after the pieces
   const gems = (s.gems ?? []).map((g) => ({ kind: 'item', item: g, tier: 'common', record: flat() }));
   for (const p of pieces) if (p.record === null) p.record = flat();   // AUDIT WORLD-REWARDS A1: the Oath's, last

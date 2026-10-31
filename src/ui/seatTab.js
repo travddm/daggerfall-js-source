@@ -1,5 +1,5 @@
 // @ts-check
-// SEAT1b (2026-09-30, Mac: "Finish the seats"): THE SEAT TAB of the Notice Board (bible/11-Multiplayer/Seats-Arc.md 7.9:
+// SEAT1b: THE SEAT TAB of the Notice Board (7.9:
 // "its Seat tab, at every Notice Board in a seat town (not its bounty boards) ... the standings: every pledged guild's
 // influence this week, live") - drawn inside the board's window (ui/noticeWindow.js), beside Notices, Work, Market and
 // Guilds, at a seat town's rumour board while the seats are open to this account.
@@ -13,9 +13,8 @@
 //
 // A seat is run from its town's board, in person - that is the point of a physical board: the war has a place.
 //
-// BOARD-UI (2026-10-06, Mac: "Enhance the guild war tab of the board for better organization, instruction and
-// readability"): the same parts, each on its own panel under its own name, in the order a reader asks them - the
-// Charter (who holds it, how firmly, the Tithe and Edict); PLAIN-UI (bible/10-UI/Plain-Words.md): WHAT THIS IS and the
+// BOARD-UI: the same parts, each on its own panel under its own name, in the order a reader asks them - the
+// Charter (who holds it, how firmly, the Tithe and Edict); PLAIN-UI: WHAT THIS IS and the
 // reader's next step, HOW THE SEAT WAR WORKS (five steps, its counts the law's own) and WORDS ON THIS BOARD; This week
 // (the phase on a strip - Muster, Reckoning, Turning - and its clock, the Season, the Tide); the battle; the standings,
 // each guild's bar toward what it needs (the claim, or the holder's defence); your guild (its pledge, your part, the
@@ -74,7 +73,7 @@ export const SEAT_PANELS = Object.freeze({
  *  Turning (the week settles). */
 export const SEAT_PHASES = Object.freeze([['muster', 'Muster'], ['reckoning', 'Reckoning'], ['turning', 'Turning']]);
 /**
- * BOARD-UI (Mac: "better organization, instruction"): HOW THE SEAT WAR WORKS, five steps - `[name, words]` - for a seat
+ * BOARD-UI: HOW THE SEAT WAR WORKS, five steps - `[name, words]` - for a seat
  * of `seat.tier`. Its numbers are the law's own (net/townSeatLaw.js), so the words never drift from the rules. Pure.
  * @param {{ tier?: string }} seat
  */
@@ -93,7 +92,7 @@ export function seatGuide(seat) {
 }
 
 /**
- * PLAIN-UI (bible/10-UI/Plain-Words.md; a player: "The seat page on the notice board is extremely vague ... doesnt
+ * PLAIN-UI (; a player: "The seat page on the notice board is extremely vague ... doesnt
  * explain anything"): WHAT THIS IS - the seat in two sentences, before any of its numbers. Pure.
  * @param {{ name: string }} seat
  */
@@ -554,7 +553,7 @@ export function createSeatTab(host, ui) {
       if (town !== seat) who.append(el('p', 'seat-holding', holdingTabLine(town)));   // DOMAIN3: this town a holding of it
       charter.append(who);
       body.append(charter);
-      /** PLAIN-UI (bible/10-UI/Plain-Words.md): WHAT THIS IS and the reader's next step (where the standings say it), then
+      /** PLAIN-UI: WHAT THIS IS and the reader's next step (where the standings say it), then
        *  HOW THE SEAT WAR WORKS and the board's words - above the numbers they explain, where they stood folded under the
        *  whole tab; AUDIT PLAIN-UI C4: and drawn for a reader the standings refused or have not reached yet, whom they
        *  explain the seat to as well. */

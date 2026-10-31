@@ -1,13 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SIGIL1 (2026-09-25) — SOME WEAPONS WON ONLINE CARRY A SIGIL, AND IT GROWS.
+// SIGIL1 — SOME WEAPONS WON ONLINE CARRY A SIGIL, AND IT GROWS.
 //
-// Mac: "weapons obtained through online play recieve a sort of sigil
-// power that is only effective online, which also scales with your
-// renown. Sigil power does not work offline. I want this system to
-// really enhance the fantasy but not be insanely overpowered. This
-// links up with both elements we have so far with scaling and renown".
-// Asked, Mac answered: "Bonus damage"; "Magic and up, found online";
+// Asked,; "Magic and up, found online";
 // "Bigger fights, stronger sigils"; "Five named stages". Then, of a
 // sigil fixed at the drop ("Makes sigil a static element"): "What if
 // the sigil is[n']t gaurenteed in of itself" - and chose "Chance at the
@@ -62,7 +57,6 @@
 //
 // ═══ SET1: A SIGIL MAY NAME A SET ══════════════════════════════════
 //
-// Mac (2026-09-26): "sigil armor sets that also come with set builds".
 // The record grows ONE optional field, `set` - the id of the set the
 // piece belongs to (systems/sigil/sigilSets.js holds the sets themselves) - and
 // `power` stops being required: a piece of ARMOUR or a SHIELD in a set
@@ -197,8 +191,7 @@ export function setSigilOnline(on) { _online = !!on; if (!_online) _renown = nul
 export function setSigilRenown(level) { _renown = _online && Number.isSafeInteger(level) && level >= 1 ? level : null; }
 export const sigilOnline = () => _online;
 export const sigilRenown = () => _renown;
-/** RENOWN-GATE (2026-10-12, the owner: "gate elite/revenant spawns behind renown level"; asked, offline "Unchanged
- *  offline"): DOES THE PAGE'S RENOWN OPEN WHAT WAITS FOR RENOWN `min`? Offline always - Renown is online's own and
+/** RENOWN-GATE: DOES THE PAGE'S RENOWN OPEN WHAT WAITS FOR RENOWN `min`? Offline always - Renown is online's own and
  *  offline earns none, so offline play keeps what it had (RENOWN-LOOT's offline answer). Online once the page's Renown
  *  reaches `min`, and never before the page knows it (the moments before the first token) - nothing opens ahead of the
  *  Renown behind it, RENOWN-LOOT's first-stage law. The one door: eliteFoes.js eliteRenownOpen (Renown 5) and revenant.js
@@ -277,8 +270,7 @@ export function sigilLines(item) {
 }
 
 /**
- * SIGIL-UI (2026-09-26, Mac: "sigil weapons need a visible indicator within the info section, something that makes it
- * stand out, along with progress as you use it"): the same facts sigilLines says, as a MODEL a card draws - the
+ * SIGIL-UI: the same facts sigilLines says, as a MODEL a card draws - the
  * stage it stands at in my hand, the five stages with the ones it has grown into, and how far it has drunk toward
  * its next. `rank` is the sigil's own growth (its xp's stage); `stage` is what my Renown lets it wake to (-1 while
  * Dormant); `held` says the Renown is the lower. `frac` is the share of the way from its rank's xp to the next one's

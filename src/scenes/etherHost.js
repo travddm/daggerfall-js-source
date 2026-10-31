@@ -1,7 +1,5 @@
 // @ts-check
-// ETHER-SEA (2026-10-11, the owner: "The etheric sea is a infinite procedural oceanscape with procedural islands with
-// towns, dungeons, exotic resources, deadly legendary ships, and whatever more you can add to give meaning to the etheric
-// sea"; bible/03-World/Eltheric-Ocean.md) - THE ELTHERIC OCEAN'S HOST: what a captain finds past the Veil and what it is worth,
+// ETHER-SEA - THE ELTHERIC OCEAN'S HOST: what a captain finds past the Veil and what it is worth,
 // stood over the captain's ledger (systems/naval/captainLedger.js, its `ether` record) for the world host and the naval
 // host. Pure in its deps: the law is world/ethericSea.js's and systems/naval/etherShips.js's.
 //

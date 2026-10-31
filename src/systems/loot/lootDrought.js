@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT8 (2026-10-01) — THE DROUGHT.
+// LOOT8 — THE DROUGHT.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 10; Mac: "Do you
-// wanna turn this into an arc and do all of the above?" - "Bad-luck
+// The Loot arc (; - "Bad-luck
 // protection"). Every eligible piece (LR1's eligibility: a weapon, armour,
 // jewellery) the player TAKES from a body or a pile below Legendary adds
 // one to the character's DROUGHT; a Legendary or better taken empties it.

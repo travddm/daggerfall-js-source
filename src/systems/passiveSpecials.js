@@ -8,7 +8,7 @@
 // arms, which had stood open since E1 and are answered here: the two
 // readers below are wired into the enchant ctx at world.js:"V2c filled inSunlight/inHolyPlace"
 // off the host seam that worldModes.js:"now: () => Math.floor(skyMinutes())" and dungeonContext.js:"const _prevPassiveHost"
-// register (bible/01-Overview/Port-Ledger.md:881 strikes the pair
+// register (:881 strikes the pair
 // through as closed, V2c 2026-08-27).
 //
 // THE TWO FLAGS ARE SMALL LAWS, verbatim:
@@ -83,8 +83,7 @@ export const playerInHolyPlace = () => !!(_host?.isHolyPlace?.() ?? false);
 // ── THE CAREER READS (the CFG bitfields the port's careers carry) ─
 const bitfield = (career) => career?.abilityFlagsAndSpellPointsBitfield ?? 0;
 export const careerSunDamage = (career) => !!(bitfield(career) & SPECIAL_ABILITY_BITS.sunDamage);
-/** HOOD-CAREER (2026-10-07, Mac: "Wearing a hood should protect you from the disadvantage of being damaged by
- *  sunlight"): whether the sun reaches the career's Damage from Sunlight - its CFG bit, UNLESS the wearer's hood is
+/** HOOD-CAREER: whether the sun reaches the career's Damage from Sunlight - its CFG bit, UNLESS the wearer's hood is
  *  up (survival/temperature.js cloakState, the one hood law VAMP-HOOD's racial arm reads: vampirism.js
  *  racialSunAverse). THE PORT'S DEPARTURE from DFU, which reads the bit bare: every rule the bit keys asks this -
  *  the burn below, the travel map's door and the arrival clamp (world.js). A hood in the pack shields nothing. */

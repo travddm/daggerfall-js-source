@@ -1,5 +1,4 @@
-// SHADOW-FANG (2026-09-26, Mac): "Wants a custom morrowind werewolf skin (skin base but blacker amd like crimson red
-// thru out the edging in the fur, red eyes)" - for SirMcMobdon, whose title and glyph are Shadow Fang
+// SHADOW-FANG (2026-09-26, - for SirMcMobdon, whose title and glyph are Shadow Fang
 // (ui/playerBadge.js). The werewolf is Bloodmoon's (WEREWOLF1: combat/fpArm.js builds it from the player's own
 // Bloodmoon data), so its textures are the player's own files and never this repo's: the skin cannot be a painted
 // texture shipped with the build. It is a LAW over the texture's pixels, applied on the way to the GPU, to a copy -
@@ -16,7 +15,7 @@
 //
 // ═══ THE LAW ═══════════════════════════════════════════════════════
 //
-// AUDIT F (2026-09-26, the audit before the merge) remade it - bible/04-Characters/Werewolf-Body.md, "AUDIT".
+// AUDIT F remade it, "AUDIT".
 //
 // ON THE TEXTURE'S FIRST LEVEL, and the rest of its chain is that level box-filtered down, each level keeping its own
 // alpha (AUDIT F4: the law run on every level apart faded the edging with distance and grew a cut's fringe a texel a

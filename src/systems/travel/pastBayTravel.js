@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT TESA II P4 (2026-10-25, bible/03-World/Arena-Provinces.md TESA-NO-FAST) - NO JOURNEY INTO THE LAND PAST THE BAY.
+// AUDIT TESA II P4 - NO JOURNEY INTO THE LAND PAST THE BAY.
 //
 // The owner, 2026-10-13: "fast travel shouldnt be a thing since we use portal stones online or the player can traverse
 // using the overworld". TESA-NO-FAST kept the travel map's press past the Bay from picking a journey (ui/heldMap.js) -
@@ -40,9 +40,7 @@ export function pastBayJourney(from, to, mask, zone) {
 }
 
 /**
- * PORTAL-BAY (2026-10-26, bible/06-Systems/Portal-Stone.md; the owner: "attempting to teleport anywhere outside the bay
- * with the portal stone leads to a black screen and a prompt telling you cannot travel", and "it wasnt letting the user
- * teleport to a city either"): A TELEPORT IS NO JOURNEY. P4 put pastBayJourney at the gate every journey passes
+ * PORTAL-BAY: A TELEPORT IS NO JOURNEY. P4 put pastBayJourney at the gate every journey passes
  * (scenes/world.js wildTravelGate), and the teleports pass it too - the guild's (teleportTo), a Portal Stone's portal
  * (scenes/portalStoneHost.js, which steps into teleportTo) and Recall's - so the road TESA-NO-FAST names past the Bay
  * ("reached through a Portal Stone") was refused as fast travel, after the stone was spent and the screen blacked. A
@@ -57,8 +55,7 @@ export function teleportJourney(_from, _to, _mask, zone) {
 }
 
 /**
- * PORTAL-ANYWHERE (2026-10-26, bible/06-Systems/Portal-Stone.md; the owner, asked whether the stone should reach any point
- * past the Bay: "Anywhere on land"): A PORTAL STONE'S END ON THE LAND PAST THE BAY - a departure from TESA-NO-FAST for the
+ * PORTAL-ANYWHERE: A PORTAL STONE'S END ON THE LAND PAST THE BAY - a departure from TESA-NO-FAST for the
  * Portal Stone alone (TESA13 had kept a portal's ends to the cities). A pixel past the Bay (not the Bay's map, not past
  * the Veil) whose centre is land by the land's own law (world/tamriel/tamrielLand.js provinceKeyBeyondBay - the world's
  * ground and the sheet's ink read it) is one, named by the province it is land of, as a peer names a portal's end off its

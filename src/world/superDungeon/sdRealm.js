@@ -1,5 +1,5 @@
 // @ts-check
-// SD5a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7): THE SHATTERED HOUR - the
+// SD5a: THE SHATTERED HOUR - the
 // place the Warp left: the moment of the Numidium's walk, kept outside time, where the Bay's broken endings still turn
 // against each other and the last of the Brass God still walks. Entered by a Hollow's Rift (SD4b).
 //
@@ -113,7 +113,7 @@ export const SD_REALM_TEXT = Object.freeze({
   // AUDIT SD II (L6 F4): a death in the Hour is the Hour's own - said so through its veil (the gate's court: "You are cast
   // out of the Burning Court."), never the plain dungeon's waking
   died: 'The Shattered Hour casts you out. You wake before the Abyss Dungeon\'s door.',   // SD-BACK (2026-10-28): its Rift takes you back to your own Hour
-  // SD-ALONE (Mac: "We need to make sure companions dont enter the rift"): said as a player steps through with any at
+  // SD-ALONE: said as a player steps through with any at
   // their side - the court's own words for its gate (world/gate/gateArena.js COURT_TEXT.noCompanions)
   noCompanions: 'Your companions cannot follow you through the Rift.',
 });

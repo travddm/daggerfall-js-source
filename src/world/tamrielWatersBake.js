@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL-DEEP (2026-10-26, the owner: "Overhaul coastlines to properly have sand/dirt and arc into the deep, with the
-// ability to slightly see through water and actually see the depth"; bible/03-World/Deep-Waters.md TAMRIEL-DEEP) - THE
+// TAMRIEL-DEEP - THE
 // CONTINENT'S SEA, CARVED BY THE BAY'S OWN LAW. Iliac Puddle No More carves the Bay's sea against a distance bake of its
 // map (deepWater/deepWatersBake.js), and ETHER-DEEP gave the Eltheric Ocean's box a bake of its own
 // (etherWatersBake.js); the sea past the Bay's edge - the continent's coasts, the Niben, Lake Rumare - was the kernel's
@@ -61,7 +60,7 @@ const H = HEIGHTMAP_DIMENSION, T = H - 1;
 const rimOf = (rect) => rect.xMin > 0 || rect.xMax < T || rect.yMin > 0 || rect.yMax < T;
 
 /**
- * RUMARE-WATER (bible/03-World/Tamriel.md RUMARE-WATER): THE IMPERIAL CITY'S WATER TO THE BAKE - a pixel of its span read as
+ * RUMARE-WATER (RUMARE-WATER): THE IMPERIAL CITY'S WATER TO THE BAKE - a pixel of its span read as
  * the streamed build lays it (world/terrain/terrainGen.js: flattened to a capital at the sea's land, its water let down to
  * the sea by world/terrain/capitalSea.js capitalSeaGround - the plan's law alone, no tile laid here), so its lake and its
  * mouth are the bake's water as they are the ground's; every other pixel the plain sampler's. AUDIT BAY-LEFT F1: read off

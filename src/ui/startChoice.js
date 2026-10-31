@@ -1,5 +1,4 @@
-// START2 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md section 7; the owner: "Each new region will each have
-// their own unique starting quest/dungeon within that region", the draft's page "Where does your story begin?") - THE
+// START2 - THE
 // START-CHOICE PAGE, the last question of making a character: where they wake - the Iliac Bay's Privateer's Hold or a
 // province past the Bay (systems/starts/starts.js STARTS) - their race's homeland chosen for them first.
 //

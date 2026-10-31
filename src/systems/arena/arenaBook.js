@@ -1,7 +1,7 @@
 // @ts-check
-// ARENA3 (2026-10-02, Mac: "Players can choose to watch AI fights"; "extremely detailed and authentic"): THE
+// ARENA3: THE
 // BOOKMAKER'S BOOK - wagers on the hour's exhibition, held in the league's save (systems/arena/arenaLeague.js `book`). Design:
-// bible/11-Multiplayer/Arena.md "1. The gate" ("the bookmaker - wagers on the bout on the floor (gold, house edge, odds
+// "1. The gate" ("the bookmaker - wagers on the bout on the floor (gold, house edge, odds
 // from the fighters' records)").
 //
 // THE FIGHTERS' RECORDS. An exhibition's two fighters (systems/arena/arenaLadder.js exhibitionFor) come with a record on the

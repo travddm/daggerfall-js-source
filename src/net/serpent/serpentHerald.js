@@ -1,5 +1,5 @@
 // @ts-check
-// SERPENT2 (2026-10-04, the owner: "the discord integration needs to happen"): THE SERPENT'S HERALD - what the relay's hub
+// SERPENT2: THE SERPENT'S HERALD - what the relay's hub
 // posts to the world events' Discord channel for the sea serpent, and when: DISCORD-GATES' law at sea (net/gate/gateHerald.js).
 // The bells - fifteen real minutes before it rises - pinging the opt-in role, and the kill, once a serpent day.
 //
@@ -21,7 +21,7 @@
 //   is rolled over the world's lanes, and a game that cannot roll it (the land past the Bay off) rises its serpent there.
 // - SAFE TO POST: gateHerald.js's law - the one role named in `allowed_mentions`, a name or a place held to letters,
 //   digits, spaces and a little punctuation.
-// - HERALD-CARDS (2026-10-22): each post is a card (net/herald/heraldCard.js) - the family The Sea Serpent, in its ring's
+// - HERALD-CARDS: each post is a card (net/herald/heraldCard.js) - the family The Sea Serpent, in its ring's
 //   colour, the moment's title and its facts as fields.
 //
 // Not a DFU member: Daggerfall has no other players and no Discord. Ledger A (SERPENT2).
@@ -101,7 +101,7 @@ export function agreedSerpentSite(rec, day) {
 }
 
 /**
- * WW7-12 (bible/03-World/World-Wide.md WW7-12; the owner, 2026-10-26: "Fucking do it"): THE HUB'S WORD OF WHERE THE
+ * WW7-12 (WW7-12): THE HUB'S WORD OF WHERE THE
  * SERPENT LIES - `{t: 'serpent', k: 'at', d, sx, sz, pl}`, the site its record agrees on (agreedSerpentSite) for the day
  * the record is of while that day is the one the clock is about (serpentSiteDayOk), or null. The site is rolled over the
  * world's lanes now, which a game without the land past the Bay (or before its picture comes) cannot roll: the hub tells

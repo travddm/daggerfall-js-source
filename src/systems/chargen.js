@@ -63,8 +63,7 @@ export function rollStats(career, rolls = Math.random) {
   return { stats, bonusPool };
 }
 
-// CHAR1 (2026-09-15, a player through Mac: "show the total dice rolls
-// in the enhanced character creator"): WHAT THE DICE ACTUALLY GAVE.
+// CHAR1: WHAT THE DICE ACTUALLY GAVE.
 // Neither screen ever said it. Eight values are rolled - a career
 // floor plus 0..10 each - and a bonus pool of 6..14 is rolled beside
 // them, and the only way to know whether a roll was a good one was to
@@ -111,7 +110,7 @@ export const STARTING_SPELL_SETS = Object.freeze({
   6: [37],                 // Bard
 });
 
-/** HEAL1 (2026-09-23, co-op): THE HEALER'S SECOND HEAL - the class
+/** HEAL1: THE HEALER'S SECOND HEAL - the class
  *  starts able to heal ANOTHER player, not only itself. It is Balyna's
  *  Balm (SPELLS.STD 97, the self heal the Healer set already carries)
  *  with its effects copied field for field and the range turned from

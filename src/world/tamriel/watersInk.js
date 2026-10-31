@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MAP-WATERS (2026-10-26, the coordinator: "The held map should draw G's Cyrodiil rivers and smoothed lake shores";
-// bible/03-World/Arena-Provinces.md MAP-WATERS): THE MAP'S COPY OF STREAM G'S WATERS - each river's centre line and its
+// MAP-WATERS: THE MAP'S COPY OF STREAM G'S WATERS - each river's centre line and its
 // widths, each lake's ring (world/tamriel/tamrielWaters.js tamrielWaters), made where the law is already compiled - the
 // terrain worker, which carves with it (world/terrain/terrainGenWorker.js 'waters') - and installed here for the held map
 // to ink (ui/tamrielInk.js), so the law's compile (some 0.6 s on the freeware's trace) never lands on the map's open.

@@ -1,8 +1,8 @@
 // @ts-check
-// SEAT2a part four (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): WHAT THE
+// SEAT2a part four: WHAT THE
 // CLIENT HOLDS OF A SIEGE - the room's words (net/wire.js validSiegeOut) folded into one state: the field (the banners,
 // the Throne, the clock, who is in), the roll call (every fighter's vitality and side), the end and this fighter's own
-// receipt; and the HUD's words for it (bible/11-Multiplayer/Seats-Arc.md 19, "The siege HUD" and "The result card").
+// receipt; and the HUD's words for it (19, "The siege HUD" and "The result card").
 //
 // PURE: a state and a word in, the next state out (`foldSiege`); the words from a state and what the client knows of the
 // battle (its seat, its two guilds, its kind and tier, this player's id and side). The session around it (scenes/
@@ -12,7 +12,7 @@
 // Not a DFU member. Ledger A (EVERY PALACE A SEAT's row).
 import { SIEGE_THRONE, SIEGE_BANNER_NAMES, SIEGE_SPECTATORS_MAX, SIEGE_NPC_KINDS, siegeNextWave, siegeWaveMs, siegeNpcAt, isSiegeNpcId } from './siegeRef.js';
 import { heraldryOf } from '../heraldryLaw.js';   // HERALDRY-SHOWN: each side's heraldry on the HUD
-import { marksText } from '../marksLaw.js';   // GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md): an amount of silver in its words
+import { marksText } from '../marksLaw.js';     // GUILD3a: an amount of silver in its words
 import { heraldryByTag } from '../heraldryIndex.js';   // HERALDRY-SHOWN: the dressed seat's guilds, by tag
 
 /**

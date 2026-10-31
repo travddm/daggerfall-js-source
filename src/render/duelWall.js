@@ -1,6 +1,5 @@
 // @ts-check
-// DUEL1 (2026-09-24, Mac: "...traps both players in a surrounding transparent holographic wall that keeps them from
-// going outside of the duel space"): THE RING'S WALL, DRAWN.
+// DUEL1: THE RING'S WALL, DRAWN.
 //
 // A cylinder of light around a duel's ring (net/duel/duelSession.js DUEL_RADIUS_M): a faint tint, a grid of thin lines
 // around it, bands of light rising up it and one bright sweep climbing it every few seconds, fading out toward its

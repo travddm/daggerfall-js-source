@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PEAKS2 (2026-10-26, the owner: "The world of daggerfall mountains need to be completely redesigned from the ground up
-// with more integration into the terrian ..."; bible/03-World/Peaks.md PEAKS2) - A RANGE IS THE LAND RISING: the massif's
+// PEAKS2 - A RANGE IS THE LAND RISING: the massif's
 // own relief over the macro ground, for the kernel's shaper to stand where LANDFORM8's cones stood (world/landforms.js
 // peakField: one cone to a 2.3 km cell, a separate bump on the land).
 //

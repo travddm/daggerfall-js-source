@@ -1,12 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAG1 (2026-10-03) — THE MATERIALS BAG, IN THE SAVE: the bag the player
+// BAG1 — THE MATERIALS BAG, IN THE SAVE: the bag the player
 // buys at a General Store and the materials it carries, handled as DFU
 // handles the wagon (systems/inventorySession.js, itemTransfer.js) - a
 // second list beside the pack, `entity.bagItems`, with a weight it may
 // not pass (bagLaw.js BAG_KG_LIMIT) - and what a harvest, a withdrawal
 // or a station does with the items a material is
-// (bible/06-Systems/Materials-Bag.md).
 //
 // THE BAG IS AN ITEM IN THE PACK, the way the Small Cart is (DFU's
 // HasCart reads the cart's template in the pack): owning one is

@@ -129,7 +129,7 @@ export function hasBoneMarker(nif, rec) {
 }
 
 /**
- * WS1 (2026-09-17; AUDIT-WS read it off the source): CUSTOM BONES,
+ * WS1: CUSTOM BONES,
  * OpenMW's `use additional anim sources` (animation.cpp:1306-1322
  * injectCustomBones -> :1284-1304 loadBonesFromFile). Every .nif under
  * `animations/<model>/` is a bone addon. GetExtendedBonesVisitor
@@ -417,8 +417,7 @@ export function skinBatch(batch, skeleton, pose, skelMats, positionsOut, normals
   const skin = batch.skin;
   const post = skinPost(skin, skeleton, pose);   // MW-D20 / MWNPC1: the one home of the post
   const n = batch.positions.length / 3;
-  // PERF-RIG1 (2026-09-21, Mac: "continue looking into fixing exterior
-  // performance issues"): THE ACCUMULATORS ARE THE BATCH'S. This runs
+  // PERF-RIG1: THE ACCUMULATORS ARE THE BATCH'S. This runs
   // once per skinned piece per body per FRAME - the player's arm, the
   // third-person body, every peer's - and it minted `acc` (12 floats a
   // vertex), `wsum`, `touched`, two 12-float scratches and one 9-float

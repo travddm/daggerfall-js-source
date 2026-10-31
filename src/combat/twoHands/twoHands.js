@@ -1,5 +1,5 @@
-// TWO-HANDS (2026-10-16): THE SPRITE LANE'S TWO HANDS - both fists up, a pair of weapons, and the hands that run.
-// Design and record: bible/05-Combat/Two-Hands.md; the law (which hand strikes, the mirror, the guard, the pump):
+// TWO-HANDS: THE SPRITE LANE'S TWO HANDS - both fists up, a pair of weapons, and the hands that run.
+// Design and record:; the law (which hand strikes, the mirror, the guard, the pump):
 // combat/twoHands/handsLaw.js. Wired by combat/weapon/weaponRig.js, the one surface all four hosts mount (THE FOUR HOSTS RULE: world.js,
 // exterior.js, worldModes.js and dungeonContext.js each build a rig and carry no line of this).
 //
@@ -152,7 +152,7 @@ export function createTwoHands({ audio = null, envHit = null, missEffect = null,
     const rect = moved(mirror ? mirrorRect(q.rect, canvas.width) : q.rect, nudge(hand, canvas, q.rect.h, v.state !== 'Idle'));
     const uv = mirror ? MIRROR_UV : q.uv;
     renderer.drawScreenQuad(q.tex, rect, uv, tint ?? undefined);
-    // WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): this hand's own weapon's element, its outline over its own picture -
+    // WEAPON-GLOW1: this hand's own weapon's element, its outline over its own picture -
     // the mirror's rect and source, measured in the record's own pixels (drawFpsWeapon's line)
     if (glow) renderer.drawScreenQuadGlow?.(q.tex, rect, uv, glow, { art: [q.rec.width, q.rec.height], view: [canvas.width, canvas.height] });
     return rect;

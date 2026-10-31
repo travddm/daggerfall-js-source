@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -42,7 +42,7 @@ export function createTownProbes(host) {
       return JSON.stringify(out);
     };
     window.__talk = () => JSON.stringify(townTalk._debug());   // T3b probe surface
-    // WW7-7 probe surface (bible/03-World/World-Wide.md WW7-7): the road's parties the living world's roads layer has near,
+    // WW7-7 probe surface (WW7-7): the road's parties the living world's roads layer has near,
     // each where its trip has it at the sky's minute - native, and in the scene - its kind and its two ends
     window.__livingRoads = () => (livingRoadsOf?.()?.parties() ?? []).map((p) => {
       const at = partyAt(p.trip, skyMinutes());
@@ -53,7 +53,7 @@ export function createTownProbes(host) {
     // MAP3: the held pose's tuning door - `__heldPose()` reads the pose in
     // force while the map is up, `__heldPose({ bones: { 'left forearm':
     // [rx, ry, rz], ... }, paper: { width, forward, drop, tilt } })` re-places
-    // the sheet on the live arm (bible/10-UI/Held-Map-Arc.md, MAP3)
+    // the sheet on the live arm (, MAP3)
     window.__heldPose = (spec) => (spec ? weaponRig?.setHeldPose?.(spec) : weaponRig?.heldPose?.());
     window.__chargenRace = () => townTalk._debug().overlayFlow?.race?.key ?? null;   // U10 probe surface
     window.__chargenConfirm = () => townTalk._debug().overlayFlow?.raceConfirm ?? null;   // U11 probe surface

@@ -1,6 +1,5 @@
 // @ts-check
-// NAV-A (2026-09-28, Mac: "enhance the newly integrated ships by adding proper naval combat with a huge reference to
-// assassins creed black flag. Being able to aim and fire when viewing from the side.") - THE BALLISTICS: where a
+// NAV-A - THE BALLISTICS: where a
 // round shot goes, and what it meets. The port's own (DFU has no cannon); pure, so the aim, the flight and the
 // pins all read the one law.
 //
@@ -116,7 +115,7 @@ export function arcPoints(p0, v0, h, n, g = SHOT_GRAVITY) {
 }
 
 /**
- * AIM-ENDS (2026-10-24, Discord - "trying to aim back cannons does not show projectile path"): `n` points along a
+ * AIM-ENDS: `n` points along a
  * barrel's fall from the stern's rail `p0` to where it lands, `land` - rolled off with no lift, so its height falls with
  * the square of the way out (the fall of anything let go with a way of its own and no rise) and its way out is even.
  * The stern's aim drew no arc at all: a barrel is dropped, not laid (navalGunnery.js aimSolution), and the line it

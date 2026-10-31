@@ -1,5 +1,5 @@
 // @ts-check
-// THE CELL TREE: a quadtree over the open country's fixed grid of 16-pixel cells (bible/11-Multiplayer/Scale-Arc.md,
+// THE CELL TREE: a quadtree over the open country's fixed grid of 16-pixel cells (,
 // COST-2). The page keeps computing its own 16-pixel cell (wire.js worldRoom, cellHaloFor) exactly as before. The Worker
 // maps that FINE key to the NODE that holds it, and the node is the Durable Object a cell's sockets share. The object is
 // named after the node, but each socket keeps the fine key it joined with (the same pattern as wire.js layerName for

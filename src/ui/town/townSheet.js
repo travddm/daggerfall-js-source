@@ -3,9 +3,6 @@
 // EM4 — THE TOWN SHEET: the streets behind the sheet contract, on the
 // same parchment as the bay and the dungeon.
 //
-// Mac (2026-09-21): "instead of 3 seperate keybinds, adding a tab
-// toggle on the map itself... we're going to put our own spin on the
-// automap and town map themselves."
 //
 // The second sheet written to `ui/map/mapStrip.js`'s SHEET_MEMBERS from
 // outside the window: no back-reference, no DOM, no renderer. It is
@@ -57,8 +54,7 @@ export const NAME_SIZE = 13;
 export const NAME_SIZE_MIN = 9;
 export const NAME_SIZE_MAX = 20;
 /**
- * EM8 — NOT EVERY NAME IS WORTH THE SAME. Mac: "let's enhance the
- * location names on the buildings more."
+ * EM8 — NOT EVERY NAME IS WORTH THE SAME.
  *
  * A town plan is read to FIND something, and the things a player
  * navigates BY are not the things they are hunting FOR. So a plate's

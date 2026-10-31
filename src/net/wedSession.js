@@ -1,6 +1,5 @@
 // @ts-check
-// LEGACY7 part three (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9; Mac: "online integration with permadeath
-// (Bloodline) or non-permadeath (Enduring)" - the design's "two players' characters may wed: both in the same temple,
+// LEGACY7 part three (2026-10-06,; - the design's "two players' characters may wed: both in the same temple,
 // both asking the priest, the service records the union (each family names the other's member as spouse)"): THE
 // WEDDING'S HANDSHAKE, AS A STATE MACHINE. Pure - no DOM, no game import: the socket, the account service and the house
 // are handed in, so test/systems/legacy/legacy7_wed.test.js drives two of these against each other over a fake wire and a real Worker.

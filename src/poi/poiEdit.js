@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - THE EDITOR'S DOCUMENTS: WHAT A BUILDER IS CHANGING, AND EVERY STEP BACK.
+// POI-3 - THE EDITOR'S DOCUMENTS: WHAT A BUILDER IS CHANGING, AND EVERY STEP BACK.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... I want this to be a tool my developers can use without having
-// to access the codebase ... No short cuts or band aids" (bible/06-Systems/POI-Editor-Arc.md). The editor's model, pure
+// . The editor's model, pure
 // (no DOM, no GL, no network) so the in-game editor (scenes/poiEditorHost.js) and the tests read it the same way:
 //
 //   - THE WORKING SET (`open`, `create`): each POI being edited is its document as the law keeps it (poi/poiLaw.js) -

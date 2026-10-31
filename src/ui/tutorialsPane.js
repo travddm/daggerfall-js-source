@@ -1,5 +1,4 @@
-// TUT1 (2026-10-11, Mac: "We also need a menu section where tutorials can be revisited. This needs to be
-// comprehensive"): THE TUTORIALS PANE - every page of systems/tutorialCatalogue.js, to read again whenever the player
+// TUT1: THE TUTORIALS PANE - every page of systems/tutorialCatalogue.js, to read again whenever the player
 // likes.
 //
 // ONE PANE, EVERY DOOR: the pause window's Tutorials tab and the front door's Tutorials section draw this same
