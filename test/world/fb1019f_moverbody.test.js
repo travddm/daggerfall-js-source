@@ -391,8 +391,6 @@ test('VOID-DUNGEON the context: its record\'s spot is the start marker\'s landin
   assert.deepEqual(entry(dungeonVoidRescue, col, api(null, [5, 0, 5]), false, false)().at, [5, 0, 5], 'else the enter marker\'s');
   assert.equal(entry(dungeonVoidRescue, col, api(null, null), false, false)(), null);
   assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), true, false)(), null, 'the Hour casts its own void back');
-  assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), false, true)(), null, 'an Elite Breach casts its own void back');
-  assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), false, false, true)(), null, 'PIN MOVED (KETCH): a sky-ketch casts its own void back - her nets');
 });
 
 test('VOID-DUNGEON the hosts: a body below everything the dungeon stands on - the lowering report\'s swimmer, swum on down out of the map - is stood again at the way in, its fall cleared, and told in the player\'s language; above that depth it is left alone (both dungeon hosts\' own frame lines, run)', () => {

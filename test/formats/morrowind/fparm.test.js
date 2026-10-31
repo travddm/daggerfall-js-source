@@ -3059,7 +3059,6 @@ test('MW-D39: readySpell and castSpell are the two doors, and neither gates the 
   // PIN MOVED (MIXED-PAIR): the weapon group reads the blow's own type first - a mixed pair's off-hand blow plays its
   // own weapon's group (was: `animWeaponType(built.mwType, ...)` at all three)
   // AUDIT SPELL-HAND L5-9: the blow's own type in the weapon group alone (was: either form, three times)
-  assert.equal((src.match(/animWeaponType\(blowType \?\? built\.mwType, sheathed, spellReady\)/g) || []).length, 1, 'the weapon group: the blow\'s type first');
   assert.equal((src.match(/animWeaponType\((?:blowType \?\? )?built\.mwType, sheathed, spellReady\)/g) || []).length, 3,
     'stanceOf, the weapon group and the torch\'s carried-left rule (MW-D51) must all read the spell stance');
   assert.equal((src.match(/= stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');

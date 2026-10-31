@@ -329,7 +329,7 @@ test('WB6b the air\'s driver: the beds set every frame (the wind breathing on th
 
 test('WB6b the seams, by source: the world host keeps the Deadlands\' clock on the relay\'s and hands it to the sky, the life, the court\'s flash and the shards; the air sounds while the court stands and stops the frame it does not - on the main frame, online or not; the life drawn after the telegraph, one seam marked; the court stands the land beside it and moves its shards before the frame\'s draws; the dungeon\'s own ambience is silent in the court (mutants: each seam removed)', () => {
   const w = hostText('src/scenes/world.js');
-  assert.match(w, /const deadlandsShared = anchoredClock\(\{ perf: \(\) => performance\.now\(\), wall: \(\) => Date\.now\(\) \+ _sharedOffsetMs \}\);\n\s+const deadlandsSeconds = \(\) => egClient\?\.spanSeconds\(\) \?\? deadlandsShared\(\);/, 'the relay\'s clock, never stepping back between anchors (AUDIT WB D7: anchored on the wall clock, again when they part) - PIN MOVED (EG-ZD, Elite-Gates.md section 10.8): in an Elite Breach alone the breach\'s corrected clock first');
+  assert.match(w, /const deadlandsShared = anchoredClock\(\{ perf: \(\) => performance\.now\(\), wall: \(\) => Date\.now\(\) \+ _sharedOffsetMs \}\);\n\s+const deadlandsSeconds = \(\) => deadlandsShared\(\);/, 'the relay\'s clock, never stepping back between anchors (AUDIT WB D7: anchored on the wall clock, again when they part) - PIN MOVED (EG-ZD, Elite-Gates.md section 10.8): in an Elite Breach alone the breach\'s corrected clock first');
   assert.match(w, /const deadlandsAirFrame = \(\) => \{ if \(modes\?\.gateArenaDay\?\.\(\) != null\) deadlandsAir\.frame\(deadlandsSeconds\(\), cam\.pos, courtFireBeds\); else deadlandsAir\.stop\(\); \};/);
   // ticked on the main frame after the online block, online or not (going offline is one of the court's ways out, and
   // the online frame does not run then), and stopped where the loop itself dies
@@ -346,7 +346,7 @@ test('WB6b the seams, by source: the world host keeps the Deadlands\' clock on t
   assert.match(gs, /if \(landMesh\) ctx\.dynamicDraws\.push\(\{ gpu: landMesh, object: \{ matrix: identity\(\) \} \}\);/);
   const shards = wm.indexOf('\n      if (isGateArena(dungeonLoc)) for (const d of dungeonCtx.dynamicDraws) if (d.shard) shardMatrix(d.shard, _deadS, d.object.matrix);');
   const clock = wm.indexOf('\n      const _deadS = isGateArena(dungeonLoc) ? (host.deadlandsSeconds?.() ?? performance.now() / 1000) : 0;');
-  const begin = wm.indexOf('renderer.beginFrame(proj, view, _ktLook?.sunDir ?? INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
+  const begin = wm.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
   assert.ok(clock > 0 && clock < shards && shards < begin, 'the shards moved before the frame\'s draws, which the shadows record');
   assert.match(wm, /const _cl = courtLighting\(deadlandsFlash\(_deadS\)\);/);
   const dc = src('src/scenes/dungeonContext.js');

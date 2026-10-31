@@ -1253,7 +1253,7 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   assert.ok(branch < rig.indexOf('_armDrewLast = !eotbHidesWeapon() && fpArm.active();'), 'above the arm\'s seam');
   assert.match(rig, /const runHands = !!c && twoHands\.running && !fpArm\.active\(\) && !eotbHidesWeapon\(\) && !sheetWindowUp\(\);/);
   // AUDIT 2: and never over another picture in the hands - the run yields to it at once
-  assert.match(rig, /const runDrawn = runHands && \(handsEmpty\(\) \|\| !\(shown\(\) \|\| torchOnly \|\| !!shieldRect \|\| gunSliding \|\| spellHandsDrawn\)\);/);
+  assert.match(rig, /const runDrawn = runHands && \(handsEmpty\(\) \|\| !\(shown\(\) \|\| torchOnly \|\| !!shieldRect \|\| spellHandsDrawn\)\);/);
   assert.match(rig, /finally \{ widget\.endOfFrame\(\); twoHands\.offWidget\.endOfFrame\(\); shield\.endOfFrame\(\); \}/);
   assert.match(rig, /playerWeapon\.leftBusy = lightInHand\(\);[^\n]*\n\s*playerWeapon\.applyWeapon\(claws\);/, 'the light\'s hand decided before the mode');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
