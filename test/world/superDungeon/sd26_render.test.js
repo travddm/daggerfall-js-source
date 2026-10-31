@@ -18,7 +18,7 @@ import { sdRiftArt } from '../../../src/world/superDungeon/sdRiftArt.js';
 import { Collider } from '../../../src/player/collider.js';
 import { ActionSystem } from '../../../src/world/actionSystem.js';
 import { sdRiftPlace, sdReturnPlace, sdLandingPlace } from '../../../src/world/superDungeon/sdDungeon.js';
-import { sdProbeOf } from '../../../src/scenes/superDungeon/sdEnd.js';     // SD-THROUGH (
+import { sdProbeOf } from '../../../src/scenes/superDungeon/sdEnd.js';   // SD-THROUGH (
 import { floorLanding } from '../../../src/player/enterExit.js';
 import { trs } from '../../../src/world/mat4.js';
 import { glslFunctions } from '../../glsl.mjs';

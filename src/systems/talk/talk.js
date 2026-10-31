@@ -28,7 +28,7 @@ import { SOCIAL_GROUP_COUNT, FACTION_TYPES, SOCIAL_GROUPS, GUILD_GROUPS } from '
 import { racialSuppressCrime } from '../lycanthropy.js';   // V4: SuppressCrime's inline gate (court.js imports this module)
 import { CRIMES } from '../crimes.js';   // GUARD1: the enum's leaf home - reachable from BOTH sides of the court/talk cycle
 import { tallyCrimeGuildRequirements } from '../crimeGuilds.js';   // CG2: a leaf, so this module can reach it
-import { dressTempleBonus } from '../clothingStanding.js';     // DRESS1: the temple half of the clothing reaction, a leaf
+import { dressTempleBonus } from '../clothingStanding.js';   // DRESS1: the temple half of the clothing reaction, a leaf
 import { calculatePickpocketingChance, dice100 } from '../../combat/formulas.js';
 import { skillValue, tallySkill, SKILLS } from '../skills.js';
 import { addGoldPieces } from '../inventory.js';   // E4: the pinched purse lands in the counter

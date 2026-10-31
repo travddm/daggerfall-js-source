@@ -4,7 +4,7 @@
 // fanned, a blow believed from the socket's own pose), a lost fight made fresh by the next `in`, the fall said once and
 // told to the hub - whose record falls with it - and the page's half: the words sent down my own socket, the fight heard
 // from my own realm alone.
-import { SD_ENDINGS } from '../../../src/net/superDungeon/sdMarks.js';     // SD18a (
+import { SD_ENDINGS } from '../../../src/net/superDungeon/sdMarks.js';   // SD18a (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

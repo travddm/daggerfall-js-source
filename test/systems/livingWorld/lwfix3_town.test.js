@@ -10,7 +10,7 @@ import { synthTown } from '../../lwTown.mjs';
 import { LivingTown, LIVING_RANGE, CENSUS_PATHS, WALK_STRAY_M, walkGap } from '../../../src/systems/livingWorld/livingTown.js';
 import { ResidentWalker } from '../../../src/characters/residentWalker.js';
 import { PERSON_MOVE_SPEED } from '../../../src/characters/mobile/mobilePerson.js';
-import { DAY_MIN, MIN_STAY, schedule, walkMinutes, dayPlan, watchDuty, patrolBeat, WATCH_SHIFTS } from '../../../src/systems/livingWorld/dayPlan.js';     // WATCH-DAY:
+import { DAY_MIN, MIN_STAY, schedule, walkMinutes, dayPlan, watchDuty, patrolBeat, WATCH_SHIFTS } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY:
 import { townPlaces } from '../../../src/systems/livingWorld/places.js';
 import { townCensus } from '../../../src/systems/livingWorld/census.js';
 import { createRelations, RELATIONS_MAX, EVENTS } from '../../../src/systems/livingWorld/relations.js';

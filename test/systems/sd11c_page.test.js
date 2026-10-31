@@ -10,7 +10,7 @@
 // the way back from the Hour stood a player on the Return's own foot; a mark or save in a Hollow gone since entered the
 // nearest dungeon. With them, the page's untested arms (the lens on the tests): the whole state folded in the shadow, the
 // world host's fight seams run from their own text, the End in the Dragon Break, and the smaller gaps.
-import { sdMarksLine } from '../../src/systems/superDungeon/sdOmen.js';     // SD19 (
+import { sdMarksLine } from '../../src/systems/superDungeon/sdOmen.js';   // SD19 (
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

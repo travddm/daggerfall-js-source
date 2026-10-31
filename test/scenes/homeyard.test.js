@@ -15,7 +15,7 @@ import {
 import { standService, T0 } from '../accountDb.mjs';
 import { decorWhyNot } from '../../src/ui/decorPanel.js';
 import { toolRig, fakeDoc, fakeWin, fakeBlocks, rmb, TOWN, settle } from '../decorFakes.mjs';
-import { DECOR_LOT_MARKS } from '../../src/scenes/decor/decorTool.js';     // FB1001 ROAD-LOT (
+import { DECOR_LOT_MARKS } from '../../src/scenes/decor/decorTool.js';   // FB1001 ROAD-LOT (
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');

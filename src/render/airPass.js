@@ -158,7 +158,7 @@ export const AIR_GLARE_SIZE = 0.25;   // EL7: a glare the size of a flame, not a
  *  floating in air (the torch in the player's hand, the Light spell's
  *  candle, a lantern placed above its flat) drew a bright ball "not
  *  connected to the source". */
-export const AIR_GLARE_SLACK = 0.25;     // F4: a QUARTER unit, either side. At a unit the band took a ceiling 0.4 in front of a hanging lantern and a wall 0.5 behind a bare light for "a flame" - the ball through the floor above, the ball beside a light with no flat. A flame flat is a camera-facing quad THROUGH the light, so its opaque texels sit at the light's own planar depth: a quarter unit holds the flat and nothing else
+export const AIR_GLARE_SLACK = 0.25;   // F4: a QUARTER unit, either side. At a unit the band took a ceiling 0.4 in front of a hanging lantern and a wall 0.5 behind a bare light for "a flame" - the ball through the floor above, the ball beside a light with no flat. A flame flat is a camera-facing quad THROUGH the light, so its opaque texels sit at the light's own planar depth: a quarter unit holds the flat and nothing else
 /** EL8: SCREEN-SPACE CONTACT SHADOWS - for every lantern that has no caster
  *  slot (the forty-two past the six), a march from the fragment toward the
  *  light through the PREVIOUS frame's depth, reprojected by the previous

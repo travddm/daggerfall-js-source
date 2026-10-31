@@ -25,7 +25,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { gateHash } from './gate/gateLaw.js';   // the one mix every clock-law in the world rolls with
-import { skyClassicMinutes } from './skyLaw.js';     // TIME1: a UTC day's season and month are the SKY's
+import { skyClassicMinutes } from './skyLaw.js';   // TIME1: a UTC day's season and month are the SKY's
 import { CLIMATES, REGION_NAMES, BAY_REGION_COUNT, MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y, isProvinceRegion, theatreOfRegion } from '../formats/mapsTables.js';
 import { SEASONS, seasonValue, dateFromClassicMinutes } from '../systems/gameDate.js';
 import { basketBlock, BASKET_BLOCKS } from '../systems/foraging/foragingCore.js';   // the Basket's blocks and foods - the IL's, one home

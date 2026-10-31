@@ -55,7 +55,7 @@ import { skillValue } from './skills.js';
 import { unitWeightInKg } from './inventory.js';   // AUDIT-RR2 G1: ExtraWeight's base
 import { enchantmentCost, defaultParam } from './enchantmentCatalogue.js';   // G4: the legacy value sum reads M4's costs
 import { artifactHook } from './artifactEffects.js';   // V3: the nine artifact classes' sub-registry
-import { applyDressStanding } from './clothingStanding.js';     // DRESS1: the clothing reaction, a leaf
+import { applyDressStanding } from './clothingStanding.js';   // DRESS1: the clothing reaction, a leaf
 
 // EnchantmentTypes moved HOME to formats/magicDef.js (V3) - it is
 // FallExe's enum and the artifact registry reads it below this module

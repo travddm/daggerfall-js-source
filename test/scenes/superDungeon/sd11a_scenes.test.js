@@ -31,7 +31,7 @@ import { SD_HALL_ATLAS, SD_HALL_ATLAS_RECORD, SD_HALL_GLOW_RECORD } from '../../
 import { createSdHall, ensureSdHallArt, sdStoneKey, SD_HALL_TEXT, sdHallNamed, sdSnapLine } from '../../../src/scenes/superDungeon/sdHall.js';
 import { createSdSteps, ensureSdStepsArt, sdStepKey, SD_CHECKS_KEY } from '../../../src/scenes/superDungeon/sdSteps.js';
 import { createSdRemnant, ensureSdRemnantArt, SD_GEAR_DRAWS, SD_DECOR_DRAWS } from '../../../src/scenes/superDungeon/sdRemnant.js';
-import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';     // SD17 (
+import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';   // SD17 (
 import { SD_HEARTS } from '../../../src/net/superDungeon/sdRemnant.js';
 import { createSdEnd, SD_RIFT_KEY } from '../../../src/scenes/superDungeon/sdEnd.js';
 import { SD_FIGHT_EMPTY } from '../../../src/net/superDungeon/sdFightLink.js';
@@ -297,7 +297,7 @@ test('AUDIT SD II L2 F6: EVERY FACE TURNED OUT - both kerbs\' tops face up (the 
 
 /** The sky's own functions, run (test/glsl.mjs) - every pow answered NaN for a negative base, as D3D's does (GLSL ES
  *  leaves it undefined). */
-const skyRun = (t = 100) => glslFunctions(SD_SKY_PAINT_FS.replace(/\bpow\(/g, 'spow(').replace('precision highp float;\n', 'precision highp float;\nfloat spow(float x, float y) { return x < 0.0 ? 0.0 / 0.0 : pow(x, y); }\n'), { uTime: t, uHaze: [0.2, 0.15, 0.07], uSteps: 10, uEnding: [0, 0, 0], uEndingIdx: -1, vUv: [0.5, 0.5], texelFetch: () => [0, 0, 0, 0] });     // SD-LOOK (
+const skyRun = (t = 100) => glslFunctions(SD_SKY_PAINT_FS.replace(/\bpow\(/g, 'spow(').replace('precision highp float;\n', 'precision highp float;\nfloat spow(float x, float y) { return x < 0.0 ? 0.0 / 0.0 : pow(x, y); }\n'), { uTime: t, uHaze: [0.2, 0.15, 0.07], uSteps: 10, uEnding: [0, 0, 0], uEndingIdx: -1, vUv: [0.5, 0.5], texelFetch: () => [0, 0, 0, 0] });   // SD-LOOK (
 
 test('AUDIT SD II L2 F7: THE AURORAE WHOLE ROUND - their curtain\'s noise read round a circle, as the Deadlands\' ridges are: either side of the azimuth\'s leap from PI to -PI (toward -z) the curtain is one, at every height of the band and every drift - it read the raw azimuth and was cut there by a hard seam (mutants: the raw azimuth)', () => {
   const f = skyRun();

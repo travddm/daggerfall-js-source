@@ -12,7 +12,7 @@
 // Not a DFU member. Ledger A (EVERY PALACE A SEAT's row).
 import { SIEGE_THRONE, SIEGE_BANNER_NAMES, SIEGE_SPECTATORS_MAX, SIEGE_NPC_KINDS, siegeNextWave, siegeWaveMs, siegeNpcAt, isSiegeNpcId } from './siegeRef.js';
 import { heraldryOf } from '../heraldryLaw.js';   // HERALDRY-SHOWN: each side's heraldry on the HUD
-import { marksText } from '../marksLaw.js';     // GUILD3a: an amount of silver in its words
+import { marksText } from '../marksLaw.js';   // GUILD3a: an amount of silver in its words
 import { heraldryByTag } from '../heraldryIndex.js';   // HERALDRY-SHOWN: the dressed seat's guilds, by tag
 
 /**

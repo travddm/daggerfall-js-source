@@ -17,7 +17,7 @@
 /** The three tiers, easiest first. */
 export const DUNGEON_TIERS = Object.freeze(['regular', 'elite', 'super']);
 /** Each tier's words - the plaque's title, the map's label, the entry line. */
-export const DUNGEON_TIER_TEXT = Object.freeze({ regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });     // ABYSS-NAME: the tier the code calls `super` is the player's Abyss Dungeon
+export const DUNGEON_TIER_TEXT = Object.freeze({ regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME: the tier the code calls `super` is the player's Abyss Dungeon
 /** The three sizes' words (world/dungeon/dungeonLabel.js reads which, off the built dungeon's block count). */
 export const DUNGEON_SIZE_TEXT = Object.freeze({ small: 'Small', medium: 'Medium', large: 'Large' });
 

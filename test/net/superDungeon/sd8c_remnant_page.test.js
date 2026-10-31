@@ -27,7 +27,7 @@ import {
 import { remnantBarModel, sdBarNear, SD_BAR_TEXT, SD_BAR_NEAR_M, SD_ENDS_WARN_MS, SD_ENDS_NEAR_MS } from '../../../src/ui/superDungeon/sdRemnantBar.js';
 import { drawGateBossBar, destroyGateBossBar, FELL_HOLD_MS, FELL_FADE_MS } from '../../../src/ui/gate/gateBossBar.js';
 import { buildRemnantModel, buildHeartModel, remnantMatrix, remnantScale, SD_REMNANT_WEAR, SD_REMNANT_HEART_RECORD, SD_REMNANT_EYE_RECORD } from '../../../src/world/superDungeon/sdRemnantModel.js';
-import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';     // SD17 (
+import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';   // SD17 (
 import { remnantArt, echoMetalArt, SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, SD_REMNANT_ART_SIZE, SD_ECHO_METALS } from '../../../src/world/superDungeon/sdRemnantArt.js';
 import { realmPillarTris, realmFloorTris, realmColliderTris, realmLampTris, SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD, SD_REALM_ARCHIVE } from '../../../src/world/superDungeon/sdRealm.js';
 import { SD_STEPS_CRACKED_RECORD, SD_STEPS_BEAT_RECORD } from '../../../src/world/superDungeon/sdStepsArt.js';

@@ -15,7 +15,7 @@ import { synthTown, closeTown } from '../../lwTown.mjs';
 import { townPlaces, harbourDock, streetGeometry, STAND_REACH_M } from '../../../src/systems/livingWorld/places.js';
 import { circleStands, circleMiddle, aloneStand, CIRCLE_APART, STAND_BEARINGS, STAND_SOUND_M, STAND_MARGIN_M, ALONE_NEED_M, ALONE_FAR_M } from '../../../src/systems/livingWorld/meetups.js';
 import { LivingTown } from '../../../src/systems/livingWorld/livingTown.js';
-import { ResidentWalker, STAND_FRAME } from '../../../src/characters/residentWalker.js';     // LW-TALK:
+import { ResidentWalker, STAND_FRAME } from '../../../src/characters/residentWalker.js';   // LW-TALK:
 import { PERSON_MOVE_SPEED, MOVE_RECORDS } from '../../../src/characters/mobile/mobilePerson.js';
 import { CityNavigation, NAV_CELL } from '../../../src/world/city/cityNavigation.js';
 import { DAY_MIN, isOutdoor } from '../../../src/systems/livingWorld/dayPlan.js';

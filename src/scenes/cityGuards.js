@@ -58,7 +58,7 @@ import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_RADIUS, CAPSULE_HEIGH
 import { findLowestOuterInteriorDoor } from '../player/enterExit.js';   // ROAD-B: DaggerfallInterior.FindLowestOuterInteriorDoor
 import { coverDistance } from '../ai/cover.js';   // TACT1: a witness does not see through a tree
 import { blowConnects, blowScaled } from '../ai/foeBlows.js';   // TACT4
-import { foeGlint } from '../ai/tactics.js';     // TELL2: a wind-up's glint
+import { foeGlint } from '../ai/tactics.js';   // TELL2: a wind-up's glint
 import { SOUND } from '../systems/soundClips.js';
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F217

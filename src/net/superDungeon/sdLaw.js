@@ -260,7 +260,7 @@ export const sdOwnerOfRoom = (key) => SD_ROOM.exec(String(key ?? ''))?.[2] ?? nu
 /** The Bay's own name in a line, its one home (sdWhere's, and the herald's rise - net/superDungeon/sdHerald.js). */
 export const SD_BAY_NAME = 'the Iliac Bay';
 export const sdWhere = (near, region = '', province = '') => (near ? `near ${near}` : region ? `in the ${region} region` : province ? 'in ' + province : 'near ' + SD_BAY_NAME);   // WW5: a province's Hollow is in its province (`province` - its name)
-export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;     // ABYSS-NAME: the player's word; the code's stays `super`
+export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;   // ABYSS-NAME: the player's word; the code's stays `super`
 /** AUDIT SD II (L6 F20): a Hollow's name inside a sentence - its article small ("in the Brass Hollow"), as the Orrery's
  *  stones store theirs (net/superDungeon/sdBrain.js). */
 export const sdNameIn = (name) => String(name ?? '').replace(/^The /, 'the ');

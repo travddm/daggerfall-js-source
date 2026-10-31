@@ -14,7 +14,7 @@ import { verifyToken, importPublicKeyB64 } from '../../src/net/identityToken.js'
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
 
 const DAY = 24 * 60 * 60;
-const CUT = Date.UTC(2026, 8, 25, 12) / 1000;     // FOUNDER5 (
+const CUT = Date.UTC(2026, 8, 25, 12) / 1000;   // FOUNDER5 (
 
 test('FOUNDER3: an account that first played by the cutoff holds Founder whenever it registered (mutants: registration again; the later stamp; first contact exclusive)', () => {
   const since = { handle: 'Played', created_at: CUT - 3 * DAY, registered_at: CUT + 2 * DAY, title: null };
