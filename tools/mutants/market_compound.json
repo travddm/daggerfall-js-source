@@ -38,5 +38,15 @@
       "test/server/market_compound.test.js"
     ],
     "note": "orders, won and sold auctions never show in the History"
+  },
+  {
+    "name": "MARKET-COMPOUND-the-bound-at-six",
+    "file": "test/accountDb.mjs",
+    "old": "if (terms > D1_MAX_COMPOUND) throw",
+    "new": "if (terms > D1_MAX_COMPOUND + 1) throw",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "a six-term compound passes every test and is refused on D1"
   }
 ]

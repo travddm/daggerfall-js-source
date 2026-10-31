@@ -6752,8 +6752,8 @@ The read is now two compounds of three, each newest first and limited to the 20 
 the newest 20 of both. Its sort keeps equal times in place, so a tie stays in the six terms' order, as the one compound
 gave it. The rows and their order are the same as before.
 
-Pins: `test/server/market_compound.test.js` runs the read over a database that refuses as D1 does
-(`test/accountDb.mjs` d1CompoundBound), and checks it against the six-term read over node:sqlite.
+Pins: `test/accountDb.mjs` `d1()` refuses a compound of more than five terms, as D1 does, so every server test holds the
+bound. `test/server/market_compound.test.js` checks the read against the six-term read over node:sqlite.
 `tools/mutants/market_compound.json` holds its mutants.
 
 ## Appendix A - a day of a gatherer

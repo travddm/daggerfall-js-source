@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { d1, d1CompoundBound, compoundTermsOf, D1_MAX_COMPOUND, standService, T0 } from '../accountDb.mjs';
+import { d1, compoundTermsOf, D1_MAX_COMPOUND, standService, T0 } from '../accountDb.mjs';
 import { newestTrades } from '../../server-account/src/market.js';
 import { MARKET_TAX_PCT, MARKET_TITHE_PCT, MARKET_TRADES_SHOWN, MARKET_KEEP_DAYS } from '../../src/net/marketLaw.js';
 
@@ -55,7 +55,7 @@ function seedTrades(raw, me, other, perSide, at) {
 
 async function stand() {
   Date.now = () => T0 * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DB: d1CompoundBound(d1()) });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DB: d1() });
   const me = await s.registered('Mac');
   const other = await s.registered('Ann');
   const read = () => s.call('/v1/market/read', { character: me.character, region: DF, view: 'history', hubs: HUBS }, me.secret);
@@ -65,10 +65,10 @@ async function stand() {
   return { s, me, other, read, sixTerms };
 }
 
-test('MARKET-COMPOUND the bound refuses as D1 does: five terms pass, six are refused, a quoted UNION and one in a nested compound counted apart (mutant: the bound at six)', () => {
+test('MARKET-COMPOUND d1() refuses as D1 does, for every test: five terms pass, six are refused, a quoted UNION and one in a nested compound counted apart (mutant: the bound at six)', () => {
   const chain = (n) => Array.from({ length: n }, (_, i) => `SELECT ${i}`).join(' UNION ALL ');
   assert.equal(D1_MAX_COMPOUND, 5);
-  const db = d1CompoundBound(d1());
+  const db = d1();
   assert.doesNotThrow(() => db.prepare(chain(5)));
   assert.throws(() => db.prepare(chain(6)), /too many terms in compound SELECT/);
   assert.equal(compoundTermsOf(`SELECT 'a UNION b' UNION SELECT 1`), 2, 'a quoted UNION is no term');
