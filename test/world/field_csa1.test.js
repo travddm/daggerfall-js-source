@@ -11,6 +11,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { StreamingWorldState } from '../../src/world/streamingWorld.js';
 
+const WORLD = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
+
 test('FIELD-CSA1: StreamingWorldState.init records the move it made of every scene point - a point carried by it keeps its natives across any init, the vertical untouched', () => {
   const state = new StreamingWorldState(3);
   assert.deepEqual(state.initOffset, [0, 0, 0], 'none before the first');
@@ -32,3 +34,23 @@ test('FIELD-CSA1: StreamingWorldState.init records the move it made of every sce
   }
 });
 
+test('FIELD-CSA1: world.js carries every placed boat by that move - _teleportToPixel calls csaReanchor after the init (mounted: the runtime told, or the pool with the mod off; the peers and the colliders with it)', () => {
+  const tp = WORLD.indexOf('  async function _teleportToPixel(');
+  const init = WORLD.indexOf('    queue.push(...state.init(px, py));', tp);
+  const call = WORLD.indexOf('    csaReanchor(state.initOffset);', tp);
+  const first = WORLD.indexOf('awaitedBuild(first.px', tp);
+  assert.ok(tp >= 0 && init > tp && call > init && first > call, 'after the init, before the first await');
+  const start = WORLD.indexOf('  function csaReanchor(offset) {');
+  assert.ok(start > 0, 'the helper');
+  const src = WORLD.slice(start, WORLD.indexOf('\n  }\n', start) + 4);
+  const run = (runtime) => {
+    const said = { runtime: [], pool: [], peers: [], synced: 0 };
+    const csaReanchor = new Function('csaRuntime', 'csaCall', 'csa', 'csaPeers', 'csaSyncColliders', `${src}\nreturn csaReanchor;`)(
+      runtime ? { OnWorldReanchored: (o) => said.runtime.push(o) } : null, (fn) => fn(),
+      { offsetAll: (o) => said.pool.push(o) }, { rebase: (o) => said.peers.push(o) }, () => { said.synced++; });
+    csaReanchor([12, 0, -34]);
+    return said;
+  };
+  assert.deepEqual(run(true), { runtime: [[12, 0, -34]], pool: [], peers: [[12, 0, -34]], synced: 1 });
+  assert.deepEqual(run(false), { runtime: [], pool: [[12, 0, -34]], peers: [[12, 0, -34]], synced: 1 }, 'the mod off: the pool\'s own boats');
+});

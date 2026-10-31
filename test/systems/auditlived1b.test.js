@@ -113,6 +113,14 @@ test('AUDIT LIVED1b K1 (K2): a collapse fired from inside a round walks its hour
   assert.equal(inside, true);
   assert.equal(ticks, 2, 'the window in hand, then the hour\'s own walk');
   assert.equal(e.lastGameMinutes, Math.floor(ownMinutes()), 'walked this frame');
+  // the hosts' guard, where the handler lives - AUDIT C&C N2/H1: in both lanes, as DFU's own (and exterior.js has it now)
+  assert.match(rd('src/scenes/world.js'), /function onExhaustedExterior\(\) \{\s*if \(_inExhaustion \|\| exhaustedShowing\(\)\) return;/);
+  assert.match(rd('src/scenes/exterior.js'), /function onExhaustedExterior\(\) \{\s*if \(_inExhaustion \|\| exhaustedShowing\(\)\) return;/);
+  assert.match(rd('src/scenes/world.js'), /_exhaustedBox = new ActionTextBox\(lines\);\s*townTalk\.pushOverlay\(_exhaustedBox\);/);
+  assert.match(rd('src/scenes/worldModes.js'), /function onExhaustedInterior\(\) \{\s*if \(_inExhaustion \|\| exhaustedShowing\(\)\) return;/);
+  assert.match(rd('src/scenes/worldModes.js'), /_exhaustedBox = new ActionTextBox\([^\n]*\);\s*mountInterior\(_exhaustedBox\);/);
+  assert.match(rd('src/scenes/world.js'), /const exhaustedShowing = \(\) => !!_exhaustedBox && !_exhaustedBox\.done && townTalk\.containsOverlay\(_exhaustedBox\);/, 'the box, while it stands');
+  assert.match(rd('src/scenes/worldModes.js'), /const exhaustedShowing = \(\) => !!_exhaustedBox && !_exhaustedBox\.done && interiorWindows\.containsWindow\(_exhaustedBox\);/);
 });
 
 test('AUDIT LIVED1b S1 (F2, K2): an online checkpoint waits while a raise waits for its walk - the load would re-anchor every marker to the moved clock and the span would never be walked', () => {
@@ -129,6 +137,13 @@ test('AUDIT LIVED1b S1 (F2, K2): an online checkpoint waits while a raise waits 
   setWorldMinutes(1000);
   e.lastGameMinutes = 500;
   assert.equal(ownWalkWaiting(e), false, 'offline, never: the host saves on its own, as before');
+  // each gate by its own line - AUDIT C&C (the list's run): the zone's death checkpoint (WILD1) copied the gate, and one
+  // pattern held either copy, so the realm checkpoint's could lose its walk under a pin that still passed
+  const world = rd('src/scenes/world.js');
+  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES review): the two copies are one gate now (checkpointGateOpen), which carries the walk, asked at both doors
+  assert.match(world, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/, 'the gate carries the walk');
+  assert.match(world, /if \(!checkpointGateOpen\(\)\) return false;/, 'the host asks');
+  assert.match(world, /const allowed = checkpointGateOpen\(\);/, 'and the zone\'s death checkpoint, the same gate');
 });
 
 test('AUDIT LIVED1b P3 (A4, K3): the world\'s arms walk what no walk covered - a fast machine clock at the boot, a correction forward then back: every lived world minute once, none twice', () => {
@@ -177,6 +192,8 @@ test('AUDIT LIVED1b P3 (A4, K3): the world\'s arms walk what no walk covered - a
   };
   assert.equal(powersMovedAtP7(false), true, 'an honest clock walks the power minute');
   assert.equal(powersMovedAtP7(true), true, 'a fast one too - the minutes it walked ahead were not the ones it lived after the welcome');
+  // and through the real tick: the zones after the true midnight are the new day's, fast clock or not
+  assert.match(rd('src/systems/worldTick.js'), /for \(const \[s, e\] of worldPieces\) runDayChange\(\{ entity, lastMinutes: s, nowMinutes: e, rolls, say, arms: DAY_ARMS\.world \}\);\s*\n\s*rollWorldZonesAcross\(worldFrom, worldTo\);/);
 });
 
 test('AUDIT LIVED1b K3: the six zones are the world\'s day\'s - rolled on every midnight the reading crosses, walked or not', async () => {
@@ -229,6 +246,7 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   let paid = 0;
   payAbsenceWhenHeard(left, () => { paid++; });
   assert.equal(paid, 1, 'a load after the welcome pays at once');
+  assert.match(rd('src/scenes/world.js'), /online\.onClock = \(offsetMs\) => \{[^\n]*onlineArrival\(\); hearSharedClock\(\); \};/, 'the host hears it');
 });
 
 test('AUDIT LIVED1b P2: a copy Bring online made joins fresh - its stamp is this machine\'s clock at the click, and an OS clock set a year back there buys no pardon', () => {
@@ -257,6 +275,13 @@ test('AUDIT LIVED1b F1: an online load re-anchors at the world\'s reading itself
   t.clock += 0.01;
   ticker.tick(0.05);
   assert.ok(Math.abs(ownMinutes() - 432000.01) < 1e-6, `lived ${ownMinutes() - 432000} for 0.01 of play`);
+});
+
+test('AUDIT LIVED1b S5: the online load restores the character\'s clock before the held enchantments recast - their reroll stamp is on the character\'s clock', () => {
+  const src = rd('src/systems/save/save.js');
+  const set = src.indexOf('if (sharedClockOn()) setOwnMinutes(Math.floor(snap.classicMinutes));');
+  const recast = src.indexOf('restartHeldEnchantments(entity);');
+  assert.ok(set > 0 && recast > 0 && set < recast, 'the clock first, then the recast');
 });
 
 test('AUDIT LIVED1b F3 (S4): a tampered clock neither freezes nor resets a load - it is none, and the clock that stands is taken', () => {
@@ -303,6 +328,7 @@ test('AUDIT LIVED1b D1 (A1, O6): the quest bridge hands the machine the characte
   act.skill = SKILLS.Archery;
   act.update(null);
   assert.equal(e.timeOfLastSkillTraining, 700600, 'TrainPc stamps the character\'s minute - the guild\'s twelve-hour gate reads it');
+  assert.match(rd('src/scenes/exterior.js'), /ownMinutes: \(\) => ownMinutes\(\),   \/\/ AUDIT LIVED1b D1/);
 });
 
 test('AUDIT LIVED1b R1 (A2, O3, S3): Copy to offline leaves the world\'s raid schedule behind - the offline game rolls its own from its first frame', () => {
@@ -413,6 +439,72 @@ test('AUDIT LIVED1b A3: a backward step of the world\'s clock re-rolls no raid d
   } finally { _resetModSettings(); RP._resetRaidingParties(); setSharedClock(null); }
 });
 
+test('AUDIT LIVED1b P1: a party mirror\'s night walks the follower\'s own watch - a hated member is watched as asleep alone - and rolls no wanderer (the rester\'s roll is the party\'s)', () => {
+  const src = rd('src/scenes/world.js');
+  const extract = (head) => {
+    const at = src.indexOf(head);
+    assert.ok(at >= 0, head);
+    let depth = 0;
+    for (let j = at + head.length - 1; j < src.length; j++) {   // the head ends with the body's own brace
+      if (src[j] === '{') depth++;
+      else if (src[j] === '}') { depth--; if (depth === 0) return src.slice(at, j + 1); }
+    }
+    throw new Error('unbalanced');
+  };
+  const fnText = extract('function runEncounterTick(playerFeet, isResting = false, { spawns = true } = {}) {');
+  const MIRROR = 'advanceMinutes: (n) => { playerTicker.advance(n); runEncounterTick(walkMode && playerSpawned ? player.pos : cam.pos, true, { spawns: false }); },';
+  const SOLO = 'advanceMinutes: (n) => { playerTicker.advance(n); runEncounterTick(walkMode && playerSpawned ? player.pos : cam.pos, true); },';
+  assert.ok(src.includes(MIRROR), 'the mirror hook');
+  assert.ok(src.includes(SOLO), 'the solo rest hook');
+  const realRandom = Math.random;
+  const night = (kind, seed) => {
+    Math.random = seeded(seed);
+    const e = player({ factionRep: null, legalRep: [] }); e.legalRep[17] = -20;
+    const { ticker } = online({ own: 90 * D + 20 * H, world: 800 * D + 13 * H, entity: e });
+    const counts = { spawnAsks: 0, watch: 0 };
+    const names = ['playerTicker', 'playerEntity', 'amGroupRollOwner', 'online', 'player', 'partyNear', 'modes', 'walkMode', 'playerSpawned',
+      'intermittentEnemySpawn', 'sharedClockOn', 'worldMinutes', 'skyMinutes', '_musicInLocationRect', 'maps', 'playerTravelPixel', 'SOLITARY_TYPES',   // TIME1: the roll's sky
+      'partyExtraFoes', 'partySize', '_standEncounterFoe', '_questRegionIndex', 'passiveGuardSpawns', 'legalRepOf', 'setCrimeCommitted', 'CRIMES',
+      '_witnessResponse', 'cityGuards', '_guardPool', 'cam', 'effectiveLevel',
+      'revenantPresence', 'takeRevenantNotice', 'revenantToReturn', 'exteriorFoes', 'townTalk', 'revenantSay'];   // REVENANT: none here   // SOFTCAP2: the mentor's level the loop's roll reads
+    const body = `let _lastEncMinutes = null;\n${fnText}\nconst mirrorHook = { ${MIRROR} };\nconst soloHook = { ${SOLO} };\n`
+      + 'return { run: runEncounterTick, mirror: mirrorHook.advanceMinutes, solo: soloHook.advanceMinutes };';
+    const h = new Function(...names, body)(ticker, e, () => true, { id: 'me' }, { pos: [0, 0, 0], feetAt: () => [0, 0, 0], isPlayerSwimming: false }, () => [], { mode: 'exterior' }, true, true,
+      (a) => { counts.spawnAsks++; return intermittentEnemySpawn(a); }, sharedClockOn, worldMinutes, skyMinutes, () => true, { getClimateIndex: () => 231 }, () => ({ x: 100, y: 100 }), SOLITARY_TYPES,
+      partyExtraFoes, () => 2, () => {}, () => 17, passiveGuardSpawns, legalRepOf, setCrimeCommitted, CRIMES,
+      () => { counts.watch++; }, { makeNpcGuardsIntoEnemies: () => Promise.resolve() }, () => [], { pos: [0, 0, 0] }, (x) => x?.level ?? 1,
+      () => false, () => null, () => null, { foes: [] }, { say() {} }, () => false);
+    h.run([0, 0, 0]);
+    e.isResting = true;
+    for (let k = 0; k < 48; k++) (kind === 'solo' ? h.solo : h.mirror)(10);
+    e.isResting = false;
+    const nightAsks = counts.spawnAsks;
+    h.run([0, 0, 0]);
+    setSharedClock(null);
+    return { ...counts, spawnAsks: nightAsks, burst: counts.spawnAsks - nightAsks };
+  };
+  try {
+    let watched = 0, asks = 0, burst = 0;
+    for (let r = 0; r < 20; r++) { const o = night('mirror', 1000 + r); if (o.watch > 0) watched++; asks += o.spawnAsks; burst += o.burst; }
+    // REP1 (the reputation overhaul, "Challenged on sight"): PIN MOVED - the minute loop rolls no conspiracy any more, so
+    // a hated member's night is not watched, mirrored or alone (the watch stops a known criminal a guard SEES, on the
+    // street - scenes/standingHost.js); the night's other two laws stand, the burst now read off the loop's own asks
+    assert.equal(watched, 0, 'no night of a hated member draws the old levy');
+    assert.equal(asks, 0, 'and no wanderer is asked for');
+    assert.equal(burst, 0, 'nor is the night walked again on the first frame up (AUDIT LIVED1 H)');
+    const solo = night('solo', 1000);
+    assert.ok(solo.spawnAsks > 0, 'a solo rest still asks');
+  } finally { Math.random = realRandom; }
+});
+
+test('AUDIT LIVED1b R4: a character born online takes the skill check\'s stamp at the character\'s own clock, as DFU\'s AssignCharacter does at Now', () => {
+  // each birth by its own lines - AUDIT C&C (the list's run): the legacy heir's (LEGACY1) copied the stamp, and one
+  // pattern held either copy, so the wizard's could go under a pin that still passed
+  const world = rd('src/scenes/world.js');
+  assert.match(world, /setLoadingAside\('window', false\);[^\n]*\n\s*finishChargen\(playerEntity, r, sbi\);\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) playerEntity\.lastSkillCheckTime = Math\.floor\(ownMinutes\(\)\);/, 'the wizard');
+  assert.match(world, /if \(!r\) \{ legacyBirthFailed\([^\n]*\n\s*finishChargen\(playerEntity, r, sbi\);\s*if \(sharedClockOn\(\)\) playerEntity\.lastSkillCheckTime = Math\.floor\(ownMinutes\(\)\);/, 'the heir, as the wizard\'s');
+});
+
 test('AUDIT LIVED1b U1-U8, D3: the words - two rows on the classic panel, one rounding per job, the parchment\'s own "due by", the offline card as it was, the play never rounded down, logging off', () => {
   assert.deepEqual([...ONLINE_TRAVEL_ROWS], ['Online, the trip\'s days pass only for you.', 'The world\'s time does not move.'], 'U1');
   assert.equal(ONLINE_TRAVEL_ROWS.join(' '), ONLINE_TRAVEL_LINE);
@@ -425,8 +517,12 @@ test('AUDIT LIVED1b U1-U8, D3: the words - two rows on the classic panel, one ro
   assert.equal(ownTimeLeftText(own + 34561), '24 days of your time (49 hours of play)', 'U5: the most it can take, never rounded down');
   setSharedClock(null);
   assert.equal(repairRowText({ done: false, doneAt: 1441, minutesLeft: 1441, estimate: false }), 'Ready in 2 days', 'offline, DFU\'s ceiling');
+  assert.match(rd('src/scenes/worldModes.js'), /if \(left === 'now'\) return short \? 'now' : 'due now';/, 'U3');
+  assert.match(rd('src/ui/enhanced/enhancedPorts.js'), /\[empire \? 'Loan due' : 'Loan due by', L\.loanByFull \?\? L\.loanBy\]/, 'U4');
   assert.equal(WT.realTimeText, undefined, 'U6');
   assert.equal(WT.sharedRealTimeText, undefined);
+  assert.match(rd('src/ui/enhanced/enhancedRest.js'), /const clockLine = el\('p', 'clock-line'\);/, 'U7');
   for (const s of ['src/ui/enhanced/enhancedPlusStyle.js', 'src/ui/enhanced/enhancedStyle.js']) assert.match(rd(s), /\.rest-shell \.clock-line:empty \{ display: none; \}/, s);
   assert.equal(OWN_TIME_ROOM_NOTE, '. Resting uses it; logging off does not.', 'U8');
+  assert.match(rd('src/scenes/world.js'), /LIVED1: the cure's minute is the character's own time/, 'D3');
 });

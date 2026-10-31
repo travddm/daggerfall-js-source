@@ -427,7 +427,48 @@ test('SD7b THE ENGINE, RUN: the real motor on the real collider - carried a whol
   }
 });
 
+/** The world host's cast-back, run from its own text. */
+function worldCast({ health = 80, max = 100 } = {}) {
+  const w = read('src/scenes/world.js');
+  const i = w.indexOf('\n  function sdCastBack('); assert.ok(i > 0);
+  const text = w.slice(i + 1, w.indexOf('\n  }\n', i) + 4);
+  const log = [], playerEntity = { health, maxHealth: max };
+  const env = {
+    playerEntity, SD_CAST_BACK_LOSS, SD_STEPS_TEXT,
+    hurtPlayer: (e, n, o) => { log.push(['hurt', n, !!o?.bypassShield]); e.health -= n; }, flashPlayerDamage: (n) => log.push(['flash', n]),
+    setMidScreenText: (t) => log.push(['said', t]),
+    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice
+  };
+  return { sdCastBack: new Function(...Object.keys(env), `${text}\nreturn sdCastBack;`)(...Object.values(env)), log };
+}
+/** The mode machine's cast-back, run from its own text. */
+function modesCast() {
+  const W = read('src/scenes/worldModes.js');
+  const i = W.indexOf('\n  function sdCastBack('); assert.ok(i > 0);
+  const text = W.slice(i + 1, W.indexOf('\n  }\n', i) + 4);
+  const log = [];
+  const player = { eye: [9, 9, 9], freezeMotor: 0, spawn: (x, y, z) => log.push(['spawn', x, y, z]) };
+  const cam = { pos: null };
+  const host = { sdCastBack: () => log.push(['told']) };
+  const fn = new Function('player', 'cam', 'host', 'TELEPORT_FREEZE_S', `${text}\nreturn sdCastBack;`)(player, cam, host, TELEPORT_FREEZE_S);
+  return { fn, log, player, cam };
+}
+
 test('SD7b THE CAST-BACK, run from the hosts\' own text: the mode machine stands the body on the checkpoint as the action teleport does - its settle, the eye with it - and tells the world host, which takes 15% of my health, no shield taking it, and says so; the dead are only told (mutants: no settle; the shield takes it; the loss forgotten)', () => {
+  const mc = modesCast();
+  mc.fn([1, 2, 3]);
+  assert.deepEqual(mc.log, [['spawn', 1, 2, 3], ['told']]);
+  assert.equal(mc.player.freezeMotor, TELEPORT_FREEZE_S, 'the settle');
+  assert.deepEqual(mc.cam.pos, [9, 9, 9], 'the eye with it');
   assert.equal(SD_CAST_BACK_LOSS, 0.15);
+  const w = worldCast();
+  w.sdCastBack();
+  assert.deepEqual(w.log, [['hurt', 15, true], ['flash', 15], ['said', SD_STEPS_TEXT.cast]]);
+  const low = worldCast({ health: 2, max: 3 });
+  low.sdCastBack();
+  assert.deepEqual(low.log[0], ['hurt', 1, true], 'at least one');
+  const dead = worldCast({ health: 0 });
+  dead.sdCastBack();
+  assert.deepEqual(dead.log, [['said', SD_STEPS_TEXT.cast]]);
 });
 

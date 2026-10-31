@@ -71,6 +71,7 @@ test('CHAT-TRADE commands: /trade, /tr and /lfg say a line on their channel; /jo
   assert.equal(optJoinedText('lfg'), 'LFG channel joined. /leave lfg leaves it.');
   assert.equal(optLeftText('trade'), 'Trade channel left.');
   assert.equal(alreadyJoinedText('lfg'), 'You are already in the LFG channel. /leave lfg leaves it.', 'AUDIT CHAT-TRADE A5');
+  assert.match(rd('src/scenes/world.js'), /note\(on \? alreadyJoinedText\(cmd\.chan\) : notJoinedText\(cmd\.chan\)\)/);
   assert.equal(optWaitText('lfg'), 'The LFG channel is still opening. Try again in a moment.');
   assert.ok(tradeChanOldText().includes('update'));
   assert.equal(optJoinedSayText('trade'), 'Trade channel joined. Press Enter to speak. /leave trade leaves it.');
@@ -81,10 +82,27 @@ test('CHAT-TRADE commands: /trade, /tr and /lfg say a line on their channel; /jo
   const rp = HELP_LINES.findIndex((l) => l.startsWith('/rp '));
   assert.equal(typeof Object.getOwnPropertyDescriptor(HELP_LINES, rp).get, 'function', '/rp\'s row');
   assert.ok(Object.isFrozen(HELP_LINES) && Array.isArray(HELP_LINES));
+  assert.match(rd('src/net/siege/siegeSession.js'), /isBattleLeaveCommand = \(text\) => \/\^\\\/leave\$\/i\.test/, 'a bare /leave is still the battle\'s');
 });
 
 test('CHAT-TRADE host: each tab follows its choice - on the bar while joined, joined only past a relay that opens it, left when the choice is taken back; a line said to one not joined joins it and stays in the field', () => {
+  const host = rd('src/scenes/world.js');
+  assert.match(host, /const joined = optJoined\(id\);\n      chatLog\.setShown\(id, joined\);\n      const room = joined \? c\.room : null;/);
+  assert.match(host, /if \(!room\) \{ chatLog\.setRoom\(id, null, null\); link\.leave\(\); continue; \}\n      if \(!chatLinks\.get\('world'\)\?\.tradeChanOk\) continue;\n      chatLog\.setRoom\(id, room, c\.name\);\n      link\.join\(room\);/);
+  assert.match(host, /chatLangFrame\(\);   \/\/ CHAT-LANG[^\n]*\n    chatOptFrame\(\);   \/\/ CHAT-TRADE/);
+  assert.equal((host.match(/return why\(optWhy\(tabId\) \?\? optWaitText\(tabId\)\);/g) ?? []).length, 2, 'the line\'s door and the roll\'s');
+  assert.match(host, /if \(\(tabId === 'trade' \|\| tabId === 'lfg'\) && !tab\?\.room\) return optWhy\(tabId\);/, 'the strip says why');
   assert.deepEqual(Object.keys(OPT_CHANNELS), ['trade', 'lfg'], 'the host\'s doors name the same two');
+  assert.match(host, /if \(cmd\.kind === 'join' \|\| cmd\.kind === 'leave'\) \{\n          if \(!cmd\.chan\) \{ note\(badJoinText\(cmd\.kind\)\); return false; \}/);
+  assert.match(host, /const optSet = \(id, on, \{ say = false \} = \{\}\) => \{\n    const c = OPT_CHANNELS\[id\];\n    if \(!c \|\| !chatLog\) return;\n    setPref\(c\.pref, !!on\);\n    chatOptFrame\(\);/, 'one door: the choice kept, the frame moving the tab at once');
+  assert.match(host, /if \(optJoined\(cmd\.chan\) === on\) \{[^\n]*\}[^\n]*\n          optSet\(cmd\.chan, on\);/, '/join and /leave through it');
+  assert.match(host, /channels: \{ list: \(\) => Object\.entries\(OPT_CHANNELS\)\.map\(\(\[id, c\]\) => \(\{ id, name: c\.name, hint: chatLog\?\.tab\(id\)\?\.hint \?\? '', joined: optJoined\(id\) \}\)\), set: \(id, on\) => optSet\(id, on\) \},/, 'and the picker through it');
+  assert.match(host, /if \(cmd\.kind === 'channel' && Object\.hasOwn\(OPT_CHANNELS, cmd\.tab\) && !optJoined\(cmd\.tab\)\) \{\n          optSet\(cmd\.tab, true, \{ say: true \}\);\n          return false;\n        \}/);
+  const at = host.indexOf("if (cmd.kind === 'channel' && Object.hasOwn(OPT_CHANNELS");
+  assert.ok(at > 0 && at < host.indexOf("if (cmd.kind === 'channel') return chatSend("), 'the join comes before the channel\'s own send');
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /prefRow\('chatTrade', t\('menu\.chat\.trade', 'Trade channel'\),/);
+  assert.match(menu, /prefRow\('chatLfg', t\('menu\.chat\.lfg', 'LFG channel'\),/);
 });
 
 test('CHAT-RP mark: /rp wraps the words in single asterisks, and a whole line so wrapped is roleplay - not bold, not a lone star, not a line that only starts with one', () => {
@@ -98,6 +116,7 @@ test('CHAT-RP mark: /rp wraps the words in single asterisks, and a whole line so
   for (const t of ['*draws her blade*', '*a*', ' *waves* ', '*x * y*']) assert.equal(isRpText(t), true, t);
   for (const t of ['**bold**', '* *', '*', '*sighs', 'hi *x*', '*x *', '((ooc))', '']) assert.equal(isRpText(t), false, t);
   assert.ok(HELP_LINES.includes('/rp <text> - a roleplay line on this tab, in green italics: /rp draws her blade'));
+  assert.match(rd('src/scenes/world.js'), /if \(cmd\.kind === 'rp'\) return chatSend\(tabId, cmd\.text, tabId, opts\);/, 'said on the tab it was typed on');
 });
 
 test('CHAT-RP line: the log draws a roleplay line as its own kind - read off the words, an action and an aside keep theirs, a line the game says is never one - and it stands over a head, being in character', () => {
@@ -121,6 +140,7 @@ test('CHAT-RP colour: green and leaning on every tab - the channel colours pass 
   assert.notEqual(RP_COLOURS.light, CHANNEL_COLOURS.region.light, 'not the Region\'s');
   assert.ok(COLOURED_LINE.endsWith(':not(.rp)'));
   assert.ok(CHAT_CSS.includes(`.dfchat-line.rp .dfchat-text { font-style: italic; color: ${RP_COLOURS.light}; }`));
+  assert.match(rd('src/ui/chatPanel.js'), /\$\{line\.kind === 'rp' \? ' rp' : ''\}/);
   assert.ok(GRIMOIRE_KIT_CSS.includes(`.dfchat-box .dfchat-line.rp .dfchat-text { color: ${RP_COLOURS.dark} !important; text-shadow: none !important; font-style: italic; }`));
   assert.ok(GRIMOIRE_KIT_CSS.includes(`.dfchat-peek .dfchat-line.rp .dfchat-text { color: ${RP_COLOURS.light} !important; }`));
 });

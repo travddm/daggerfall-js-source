@@ -27,6 +27,20 @@ test('completed vault releases hands when a slow frame skips the release window'
 });
 
 import { readFileSync } from 'node:fs';
+test('third-person cached mapping follows terminal hand release while body still fades', () => {
+  const source = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
+  const fn = source.slice(source.indexOf('  function thirdClimb('), source.indexOf('  /** CLIMB6: ...and the FIRST-PERSON'));
+  const map = new Function('climbRequestToRig', 'MW_UNITS_PER_METER', `let climbLast = null; const built = null; ${fn}; return thirdClimb;`)(
+    (world) => structuredClone(world), 70);
+  const hands = { L: { at: [0, 0, 0], w: 0.2 }, R: { at: [0, 0, 0], w: 0.2 } };
+  const active = { w: 1, hands };
+  const cached = map(active, { climb: { feet: [0, 0, 0], yaw: 0 } });
+  assert.equal(cached.hands.R.w, 0.2);
+  const faded = map({ w: 0.8, hands: { L: { w: 0 }, R: { w: 0 } } }, { climb: null });
+  assert.equal(faded.w, 0.8, 'body still eases out');
+  assert.equal(faded.hands, null, 'cache must not resurrect released hands');
+  assert.equal(cached.hands.R.w, 0.2, 'previous request was not mutated');
+});
 
 test('unfinished vault interruption retains ease-out, and a new hang can grip normally', () => {
   const law = new ClimbPose();

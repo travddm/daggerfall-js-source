@@ -56,12 +56,43 @@ test('audit26 F222: the pose bag rides the envelope and comes back', () => {
 });
 
 test('audit26 F222: both hosts write the pose and land it on load', () => {
+  const w = rd('src/scenes/world.js');
+  // MW-D30 widened the pose with the Morrowind camera's persisted pair.
+  // AUDIT 39 moved the tail of this pin: the TRANSPORT MODE joined the
+  // bag (SerializablePlayer.cs:179, the line beside the weapon), so the
+  // camera is no longer the last field.
+  // AUDIT 63 F25 widened it once more: the HAND rides beside the
+  // sheath, which is how SerializablePlayer.cs:175-176 writes the pair.
+  // AUDIT 65 SL-2 moved the SOURCE of that pair, not the bag: DFU has
+  // ONE WeaponManager for every WorldContext, and this host has four
+  // rigs - so the pair is composed from the mode host's LIVE rig when
+  // there is one (inside a building it is `interiorWeapon`, a rig this
+  // envelope never carried) and from this host's own when there is not.
+  // HARD2c moved the ARITHMETIC out from under this pin and left the
+  // bag: the sheath and the hand are one law now
+  // (combat/playerWeapon.js), so what is matched here is the host's
+  // WIRING - which rig it offers and where the pair sits in the bag -
+  // and the law itself is CALLED below rather than quoted.
+  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the fall joined the bag's tail (fb0930_fallkept.test.js runs it).
+  assert.match(w, /pose: \{ yaw: cam\.yaw, pitch: cam\.pitch, crouching: !!player\.crouching, \.\.\.mergeWeaponPose\(wp, weaponPoseOf\(weaponRig\.playerWeapon\)\), camera: mwViewSaveCamera\(\), transport: player\.transportMode, fall: player\.fallSnapshot\(\) \}/);
+  assert.match(w, /const wp = (?:host\.)?modes\?\.weaponPose\?\.\(\) \?\? null;/, 'and `wp` is the mode host\'s answer, null outside interior mode');
   // SAV3 moved the landing into the ONE pose-apply (quickload + the
   // classic import share it); HARD2c moved the inversion one step
   // further, into the law both hosts now call - so run it.
   const landed = { sheathed: true, usingRightHand: true };
   applyWeaponPose(landed, { weaponDrawn: true });
   assert.equal(landed.sheathed, false, 'Sheathed = !weaponDrawn, the :420-421 inversion');
+  assert.match(w, /applyWeaponPose\(weaponRig\.playerWeapon, pose\);/, 'and this host lands it through that law');
+  assert.match(w, /applyPose\(extras\.pose\);/, 'the quickload lands through it');
+  assert.match(w, /applyPose\(bundle\.snap\.pose\);/, 'and the classic import too');
+  const d = rd('src/scenes/dungeonContext.js');
+  assert.match(d, /pose: \{ \.\.\.\(opts\.pose\?\.read\?\.\(\) \?\? \{\}\), \.\.\.weaponPoseOf\(playerWeapon\) \}/,
+    'the dungeon context folds its own weapon AND the hand in, and takes yaw/pitch/crouch from the host seam');
+  assert.match(d, /opts\.pose\?\.apply\?\.\(extras\.pose\);/);
+  const m = rd('src/scenes/worldModes.js');
+  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): and the fall beside it (fb0930_fallkept.test.js runs it).
+  assert.match(m, /read: \(\) => \(\{ yaw: cam\.yaw, pitch: cam\.pitch, crouching: !!player\.crouching, fall: player\.fallSnapshot\(\) \}\)/,
+    'the mode host supplies the modal camera half');
 });
 
 // ---------------------------------------------------------------
@@ -97,6 +128,64 @@ test('audit26 F185/F187: the action record drops the counter and keeps the pick 
   assert.equal(o.failedSkillLevel, 31, 'the latch restores');
 });
 
+// ---------------------------------------------------------------
+// F102 - DFU restores the notebook only when the save carries one
+// (SaveLoadManager.cs:1451-1456). The empty-block substitute wiped
+// every note and filed quest of the session on an old envelope.
+// ---------------------------------------------------------------
+test('audit26 F102: a quest envelope without a notebook leaves the live notes standing', () => {
+  const s = rd('src/scenes/quest/questBridge.js');
+  assert.match(s, /if \(data\.notebook\) notebook\.restoreSaveData\(data\.notebook\);/);
+  assert.doesNotMatch(s, /data\.notebook \?\? \{ notebookEntries: \[\], finishedQuestEntries: \[\] \}/,
+    'the empty-block substitute is gone');
+});
+
+// ---------------------------------------------------------------
+// F216/F217 - DFU's SaveData_v1 carries enemyData for every registered
+// live enemy wherever the player stands (:865, restored :1006). The
+// exterior envelope carried pixel/coords/piles alone, so a quickload
+// during a wilderness ambush or a guard pursuit - with the spawn
+// catch-up suppressed across the load - despawned every attacker.
+// F220 - SerializableEnemy round-trips startingHealth (:109),
+// currentFatigue (:111) and the instanced bundles (:120/:222).
+// ---------------------------------------------------------------
+test('audit26 F216/F217: both exterior pools snapshot in natives and restore through their own mint', () => {
+  const ef = rd('src/scenes/exteriorFoes.js');
+  assert.match(ef, /function snapshotWorld\(toNative\)/);
+  assert.match(ef, /function snapshotWorld\(toNative\) \{\n\s*return foes\.filter\(\(f\) => !f\.dead && /, 'dead foes stay out - DFU disables, never re-mints (the snapshot\'s own filter: the pin had matched the swing pass\'s line, never this one)');
+  for (const field of ['mobileType', 'gender', 'nativeX', 'nativeZ', 'yaw', 'health', 'maxHealth', 'magicka', 'fatigue', 'activeEffects', 'hostile', 'encountered']) {
+    assert.ok(ef.includes(`${field}:`), `the foe record carries ${field}`);
+  }
+  // AUDIT 63 F24 widened the restore: the saved quest link is revived
+  // before the mint (SerializableEnemy.cs:205-218), through a callback
+  // the caller that owns a quest machine hands in.
+  // PIN MOVED (SEALED-SAVE, FIELD BUGS 2026-10-05c): the restore takes the host's restand too, and a quest foe it moves
+  // stands at `feet` (test/systems/quest/fb1004d_questmarkers.test.js)
+  assert.match(ef, /function restoreWorld\(saved, fromNative, yOffset = 0, \{ reviveQuestBehaviour = null, restandQuestFoe = null \} = \{\}\)/);
+  assert.match(ef, /const feet = \(questBehaviour && restandQuestFoe\?\.\(questBehaviour, \[lx, sf\.y \+ yOffset, lz\]\)\) \|\| \[lx, sf\.y \+ yOffset, lz\];/);
+  assert.match(ef, /spawnFoe\(sf\.mobileType, feet, \{ gender: sf\.gender, feetGiven: true, questBehaviour, placed: !!sf\.placed, eliteFoe: sf\.eliteFoe === true, champion: sf\.champion \? championIndex\(sf\.champion\) : null \}\)/,   // B04 (#534 fix package): its elite word restored, never re-rolled   // WOD3: a placed foe restores placed; LOOT7: a champion as one   // REVIEW 2026-09-05: the snapshot holds FEET
+    'the restore re-mints through the pool\'s ONE spawn chain, then overlays the saved truth');
+  const cg = rd('src/scenes/cityGuards.js');
+  assert.match(cg, /function snapshotWorld\(toNative\)/);
+  assert.match(cg, /guards\.filter\(\(g\) => !g\.dead\)/);
+  assert.match(cg, /return g;\s+\/\/ AUDIT 26 F217/, 'spawnGuardAt answers its record - guards[length-1] under interleaved spawns is a race');
+  assert.match(cg, /if \(sg\.hostile === false\) g\.ai\.isHostile = false;/,
+    'a restored peaceful guard stands down (spawnGuardAt seeds pursuit)');
+});
+
+test('audit26 F220: the dungeon foe record gains maxHealth, fatigue and the live effects', () => {
+  const d = rd('src/scenes/dungeonContext.js');
+  const collect = d.slice(d.indexOf('function collectWorld()'), d.indexOf('function applyWorld'));
+  assert.ok(collect.includes('maxHealth: f.entity.maxHealth'), 'startingHealth (:109)');
+  assert.ok(collect.includes('fatigue: f.entity.fatigue ?? 0'), 'currentFatigue (:111)');
+  assert.ok(collect.includes('activeEffects: (f.entity.activeEffects ?? []).map(copyEffectEntry)'), 'the instanced bundles (:120)');
+  const apply = d.slice(d.indexOf('function patchFoe'), d.indexOf('function patchFoe') + 3600);   // WORLD3: the per-foe body is patchFoe, above applyWorld
+  assert.ok(apply.includes('if (sf.maxHealth != null) { f.entity.maxHealth = sf.maxHealth; f.entity.health = Math.min(f.entity.health, sf.maxHealth); }'),
+    'the saved max replaces the re-roll and re-clamps health under it');
+  assert.ok(apply.includes('if (sf.activeEffects) f.entity.activeEffects = sf.activeEffects'),
+    'a paralyzed boss stays paralyzed across the load');
+});
+
 test('audit26 F216: copyEffectEntry strips the live caster reference on every pool record', () => {
   // The caster is a live scene reference, not state - DFU re-resolves
   // it on load. Serializing it would drag the whole entity (and,
@@ -105,4 +194,8 @@ test('audit26 F216: copyEffectEntry strips the live caster reference on every po
   const copy = copyEffectEntry(entry);
   assert.equal('caster' in copy, false, 'the caster is dropped');
   assert.notEqual(copy.effect, entry.effect, 'and the nested record detaches');
+  const ef = rd('src/scenes/exteriorFoes.js');
+  assert.match(ef, /\.map\(copyEffectEntry\)/, 'the exterior pool uses the ONE copier');
+  const cg = rd('src/scenes/cityGuards.js');
+  assert.match(cg, /\.map\(copyEffectEntry\)/, 'the watch too');
 });

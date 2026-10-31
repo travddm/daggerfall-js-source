@@ -189,6 +189,26 @@ test('ROAD-SPARE the bounty, measured: with the protection off a swing in the fi
   } finally { setValue('MeleeAttacks', 'MeleeAttackFriendlyProtection', true); }
 });
 
+test('ROAD-SPARE the host: world.js builds the road\'s strike over its own street pool (whose law it asks) and the open world alone, and offers it a swing that met nobody in the street - struck, it surfaces; spared, it whooshes and no door behind the traveller is bashed (AUDIT 29g\'s law); nobody, the door\'s (mutants: the struck answer unsurfaced; the open world unasked)', () => {
+  const src = rd('src/scenes/world.js');
+  assert.match(src, /const livingStrikeRoad = createRoadStrike\(\{ roads: \(\) => livingRoads, open: \(\) => livingWorldOn\(\) && _mode\(\) === 'exterior', collider, cityGuards, hitEffects, playerEntity \}\);/);
+  const at = src.indexOf('{ onMurder: () => _crimeResponse(), onHitSound: guardHitSound, swing }).then((r) => {');
+  assert.ok(at > 0, 'the civilian arm\'s tail');
+  const body = src.slice(src.indexOf('{\n', at) + 1, src.indexOf("}).catch((e) => console.error('[civil]', e));", at));
+  const tail = (r, road) => {
+    const d = { bashed: 0, whoosh: 0, surfaced: 0, road: 0 };
+    new Function('r', 'modes', 'audio', 'surfacePlayer', 'tallySwingSkills', 'swingSoundFor', 'weaponRig', 'playerEntity', 'cam', 'lookFwd', 'livingStrikeRoad', body)(
+      r, { attemptExteriorDoorBash: () => { d.bashed++; return true; } }, { playOneShot: () => { d.whoosh++; } }, () => { d.surfaced++; }, () => {},
+      () => 'swing', { playerWeapon: {} }, {}, { pos: [0, 1.6, 0] }, [0, 0, 1], () => { d.road++; return road; });
+    return d;
+  };
+  assert.deepEqual(tail(false, ROAD_STRUCK), { bashed: 0, whoosh: 0, surfaced: 1, road: 1 }, 'a traveller struck down');
+  assert.deepEqual(tail(false, ROAD_SPARED), { bashed: 0, whoosh: 1, surfaced: 0, road: 1 }, 'stopped on a spared traveller');
+  assert.deepEqual(tail(false, false), { bashed: 1, whoosh: 0, surfaced: 0, road: 1 }, 'nobody on the road: the door\'s');
+  assert.deepEqual(tail({ spared: true }, ROAD_STRUCK), { bashed: 0, whoosh: 1, surfaced: 0, road: 0 }, 'stopped on a spared walker: the road never asked');
+  assert.deepEqual(tail({ crime: 'murder' }, ROAD_STRUCK), { bashed: 0, whoosh: 0, surfaced: 1, road: 0 }, 'a townsperson struck: the road never asked');
+});
+
 test('ROAD-SPARE (AUDIT FB1025i D1) the other road to the same fine, DFU\'s own and intended: The Escort\'s WATCH branch (`_S.01_`, two Warriors with a warrant) - struck, the questgiver asks "are you going to turn me over?", and No is `_S.17_`\'s `legal repute -20`: the face the watch knows and its stop\'s 600 gold, as DFU\'s script has it (the script\'s, not a mutant of the port\'s: the pin records that the port keeps it)', async () => {
   setValue('MeleeAttacks', 'MeleeAttackFriendlyProtection', true);
   const r = await escortRoad({ roll: 0.1, band: 'guards' });

@@ -36,4 +36,21 @@ test('FOEBAR1: the two pictures are one crop, the pref defaults to the plain bar
   assert.deepEqual(empty, { w: 981, h: 130 }, 'the empty picture is the union alpha crop');
   assert.deepEqual(full, empty, 'and the fill is the same crop, so the two register');
   assert.equal(PREF_DEFAULTS.foeBarStyle, 'bar', 'the plain bar is what a player has until they choose');
+  const hud = read('src/ui/enhanced/enhancedHud.js');
+  assert.match(hud, /const foeBlade = el\('div', 'hud-foeblade'\);\s*\n\s*const foeBladeEmpty = el\('i', 'hud-bladeempty'\);\s*\n\s*const foeBladeFull = el\('i', 'hud-bladefull'\);\s*\n\s*foeBladeEmpty\.style\.backgroundImage = `url\("\$\{BLADE_EMPTY_URL\}"\)`;\s*\n\s*foeBladeFull\.style\.backgroundImage = `url\("\$\{BLADE_FULL_URL\}"\)`;\s*\n\s*foeBlade\.append\(foeBladeEmpty, foeBladeFull\);\s*\n(?:\s*\/\/[^\n]*\n)*(?:\s*const foePoise[^\n]*\n)+\s*foePoise\.append\(foePoiseFill, foePoiseWord\);\s*\n(?:\s*(?:\/\/[^\n]*|const foe(?:Traits|Ward) = [^\n]*|foeTrack\.append\(foeWard\);)\n)*\s*foe\.append\(foeName, foeTraits, foeTrack, foeBlade, foePoise\);/, 'two pictures under the one track, built once, their URLs the module\'s (PIN MOVED - AUDIT WORLD-EVENTS T1: BOSS-TRAITS\' trait line under the name)');   // PIN MOVED (TELL9: the poise track stands under both faces)
+  assert.match(hud, /const BLADE_EMPTY_URL = new URL\('\.\.\/assets\/foe-blade-empty\.png', import\.meta\.url\)\.href;\s*\n\s*const BLADE_FULL_URL = new URL\('\.\.\/assets\/foe-blade-full\.png', import\.meta\.url\)\.href;/, 'module-relative, the workers\' pattern - vite bundles it with the page\'s base; public/ is the root alone and the game runs at /play/');
+  assert.match(hud, /const blade = getPref\('foeBarStyle'\) === 'blade';\s*\n\s*if \(last\.foeStyle !== blade\) \{ last\.foeStyle = blade; parts\.foe\.classList\.toggle\('blade', blade\); \}\s*\n\s*if \(blade\) clipInset\(parts\.foeBladeFull, 'foeBlade', bladeInset\(foePct\)\);/, 'the pref picks the face each draw, written only when it changes; the clip follows the same fraction the plain fill takes');
+  assert.match(hud, /width\(parts\.foeFill, 'foeFill', foePct\);/, 'the plain fill is untouched');
+  assert.match(hud, /const v = `inset\(0 \$\{side\.toFixed\(2\)\}% 0 \$\{side\.toFixed\(2\)\}%\)`;\s*\n\s*if \(last\[key\] === v\) return;\s*\n\s*last\[key\] = v;\s*\n\s*node\.style\.clipPath = v;/, 'clipped in from both sides, written only when it changes');
+  const css = read('src/ui/enhanced/enhancedStyle.js');
+  assert.match(css, /\.hud-foe\.blade \.hud-foetrack \{ display: none; \}/, 'the plain track hides under the blade');
+  assert.match(css, /\.hud-foeblade \{ display: none; position: relative; width: min\(360px, 54vw\); aspect-ratio: 981 \/ 130; \}/, 'the blade keeps the crop\'s aspect');
+  assert.match(css, /\.hud-foe\.blade \.hud-foeblade \{ display: block; \}/);
+  assert.match(css, /\.hud-bladeempty, \.hud-bladefull \{ position: absolute; inset: 0; display: block;\s*\n\s*background-position: center; background-size: 100% 100%; background-repeat: no-repeat; \}/, 'the sheet sizes the pictures and names none - the URLs are the module\'s');
+  assert.doesNotMatch(css, /foe-blade-(?:empty|full)\.png/, 'no picture URL in the sheet');
+  assert.match(css, /\.hud-bladeempty \{ opacity: 0\.72; \}/, 'FOEBAR1b: the drained bar is slightly see-through, the fill is not');
+  assert.doesNotMatch(css, /\.hud-bladefull \{[^}]*opacity/, 'the fill stays solid red');
+  const menu = read('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /const blade = getPref\('foeBarStyle'\) === 'blade';[\s\S]{0,900}?setPref\('foeBarStyle', blade \? 'bar' : 'blade'\); render\(\);/, 'the Interface card offers the two faces as a two-way row');
+  assert.match(menu, /el\('button', 'act rowact', blade \? t\('menu\.hud\.foeBarBlade', 'Blade'\) : t\('menu\.hud\.foeBarBar', 'Bar'\)\)/, 'whose button names the OTHER option');
 });

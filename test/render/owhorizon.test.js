@@ -139,6 +139,8 @@ test('OW-HORIZON the ring\'s sun: without a deck the host\'s scale whole, as bef
 });
 
 test('OW-HORIZON the ring: its haze from where the world\'s fog is measured - the travel view\'s traveller, the eye on the ground - and the deck the ground takes, bound where the renderer binds it (mutants: the haze from the eye; the deck unbound)', () => {
+  const fr = rd('src/render/farRing.js');
+  assert.match(fr, /vDist = uHazeFrom\.w > 0\.5 \? length\(world - uHazeFrom\.xyz\) : length\(view\.xyz\);/, 'the VS: from the focus while one is set');
   assert.equal(RING_CLOUD_UNIT, CLOUD_SHADOW_UNIT, 'the renderer\'s own unit, the same map on it');
   const sent = {};
   let bound = null;
@@ -238,5 +240,24 @@ test('OW-HORIZON the click: as far as the view shows the land - past the lens\'s
 });
 
 test('OW-HORIZON the host\'s wiring: the fog row and the lens through the view\'s horizon, the lens after the view\'s frame says how far up it stands, the ring handed the renderer and the built pixels, the click through horizonHit over the land itself; the renderer tells every program the far law; the deck carries it (mutants: each wire cut)', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const fogNow = horizonFog\(wxNow\.fog, tvf\);/);
+  const tvfAt = w.indexOf('const tvf = travelView?.frame(dt, { eye: tvHeadEye, fwd }) ?? null;');
+  const projAt = w.indexOf('const proj = horizonProj(glassFov(fieldOfView() + climbFeel.fovRad(), spyglass.lens), worldAspect, spyglass.near, tvf);');
+  assert.ok(tvfAt > 0 && projAt > tvfAt, 'the lens after the view\'s frame');
+  assert.ok(projAt < w.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), '...and before the frame begins with it');
+  assert.ok(!/perspective\(glassFov\(fieldOfView\(\)/.test(w), 'no second lens');
+  assert.match(w, /new FarRingRenderer\(renderer\.gl, \{ renderer, mid: terrainGen \}\)/);   // PIN MOVED (MID-RING): and the terrain's client - the middle ring and the far field asked of its worker
+  assert.match(w, /\n  const built = new BuiltPixels\(\); \/\/ key -> pixel entry/, 'the host\'s built pixels count their changes');
+  assert.match(w, /\}, state\.current\.x, state\.current\.y, state\.terrainDistance, built\);/);
+  assert.match(w, /farRing\.punchHole\(state\.current\.x, state\.current\.y, state\.terrainDistance, built\);/);
+  assert.equal((w.match(/const hit = horizonHit\(travelView\.eye, dir, \(x, z\) => tvGroundAt\(x, z, false\)\);/g) ?? []).length, 2, 'the click and the waypoint menu\'s');
+  const r = rd('src/render/renderer.js');
+  assert.match(r, /if \(farLoc\) gl\.uniform2f\(farLoc, cloudFarOf\(cs\), 1\);/);
+  assert.equal((r.match(/gl\.getUniformLocation\([^,]+, 'uCloudShadowFar'\)\]/g) ?? []).length, 6, 'every program\'s pair a triple - the terrain, the mesh, the character, the flats, the decal and the ground\'s snow');
+  assert.match(r, /cloud: \[u\('uCloudShadowMap'\), u\('uCloudShadowRect'\), u\('uCloudShadowFar'\)\],/, 'the water\'s too');
+  const sh = rd('src/scenes/shared.js');
+  assert.match(sh, /Object\.assign\(enhancedSky\.cloudShadow, clouds\.shadow, \{ far: farCoverSun\(\) \}\);/);
+  assert.match(sh, /if \(!clouds\) return this\.sunFactor\(\);\s*\n\s*return farCoverSun\(\);/, 'the ring\'s dim and the deck\'s far one law');
   assert.ok(RING_RIM_START < TV_HAZE_END);
 });

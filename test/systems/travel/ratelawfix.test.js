@@ -56,3 +56,19 @@ test('RATE-LAW-FIX a route of no legs is a straight walk - the host\'s lanes say
   assert.equal(asked.at(-1), TRAVEL_OPEN_RATE, 'across country: x60');
 });
 
+test('RATE-LAW-FIX the host\'s ask never lifts a hold: a new ground\'s rate is recorded and the held clock kept for the governor to weigh; a lower ask is the clock\'s at once; unheld, the ask is the clock (mutants: the hold lifted, the lower ask held)', () => {
+  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  const m = /setTimeScale: (\(n\) => \{[^\n]*?\}),/.exec(W);
+  assert.ok(m, 'the ask lifted');
+  const d = { scale: 5, asked: 60 };
+  const ask = new Function('d', `const worldTimeScale = () => d.scale, setWorldTimeScale = (n) => { d.scale = n; };
+    let travelAsked; const sync = () => { travelAsked = d.asked; }; const f = ${m[1]};
+    return (n) => { sync(); f(n); d.asked = travelAsked; };`)(d);
+  ask(100);
+  assert.deepEqual([d.scale, d.asked], [5, 100], 'held at x5 for an enemy: onto a road the clock stays held, the ask recorded');
+  ask(1);
+  assert.deepEqual([d.scale, d.asked], [1, 1], 'an interrupt\'s x1: at once');
+  d.scale = 60; d.asked = 60;
+  ask(100);
+  assert.deepEqual([d.scale, d.asked], [100, 100], 'unheld: the road\'s rate at once');
+});

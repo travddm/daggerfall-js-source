@@ -41,6 +41,9 @@ import { LOCATION_TYPES, CLIMATES } from '../../../src/formats/mapsFile.js';
 import { isMainStoryDungeon } from '../../../src/world/dungeon/dungeonTextures.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
+const W = read('src/scenes/world.js');
+/** A `const name = ` arrow of world.js's own, its text (its body closing `\n  };`). */
+const constOf = (name) => { const at = W.indexOf(`\n  const ${name} = `); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  };\n', at) + 5); };
 const evalIn = (expr, env) => new Function(...Object.keys(env), `return (${expr});`)(...Object.values(env));
 const M = 60_000, H = 3_600_000, T0 = 1_800_000_000_000;
 
@@ -137,6 +140,28 @@ test('SD11d THE KILL READ WHOLE (L6 F2): the fall, the collapse\'s first readout
   assert.ok(e.shown[1].at >= 1500 && e.shown[1].at <= 1520, `the fall stands its 1.5 s, then the Last Moment (${e.shown[1].at} ms - it stood 250)`);
 });
 
+test('SD11d THE HOSTS SAY THROUGH THE VOICE, from the world host\'s own text: its one voice on the label\'s door at each line\'s length; the readouts a readout, the floor\'s words a note, the fight\'s a turn with its thread; the Hall\'s and the Rift\'s through the mode machine\'s door; a frame of the voice each frame of the arc; what waits let go as the Hour is left, once (mutants: the readouts a turn; the voice unframed; the leave never letting go; the hall around it)', () => {
+  assert.match(W, /const sdVoice = createSdVoice\(\{ show: \(t, secs\) => setMidScreenText\(t, secs\), now: \(\) => performance\.now\(\), covered: sdVoiceCovered \}\);/);   // PIN MOVED (AUDIT SD IV T3): covered while a window is up over the label (sd26_text)
+  assert.match(W, /const sdSay = \(t, rank = SD_VOICE_RANK\.turn, key = null\) => \{ sdVoice\.say\(t, rank, key\); return true; \};/);
+  assert.match(W, /warn: \(text\) => sdSay\(text, SD_VOICE_RANK\.readout\),/, 'the collapse\'s and the fade\'s readouts');
+  assert.match(W, /const sdSpoilsBurst = sdFightLink \? createSdSpoils\(\{[\s\S]{0,700}?say: \(t\) => sdSay\(t, SD_VOICE_RANK\.note\),/, 'the floor\'s word');
+  assert.match(W, /const sdFrame = \(\) => \{[^\n]*sdFightFrame\(\); sdBodyFrame\(\); sdVoiceFrame\(\); \};/, 'framed with the arc');   // PIN MOVED (INT15): the Hour's body word's own step between
+  assert.match(W, /sdSay: \(t, rank\) => sdSay\(t, rank\),/, 'handed to the mode machine');
+  const WM = read('src/scenes/worldModes.js'), D = read('src/scenes/dungeonContext.js');
+  assert.match(WM, /sdSay: \(t, rank\) => host\.sdSay\?\.\(t, rank\) \?\? false,/);
+  assert.match(D, /const sdSayHere = \(t\) => \{ if \(!opts\.sdSay\?\.\(t\)\) setMidScreenText\(t\); \};/);   // AUDIT SD-THROUGH (PIN MOVED, C13): one named closure, the hall's and the Way Through's
+  assert.match(D, /onTurn: \(i, a\) => !!opts\.sdTurn\?\.\(i, a\), say: sdSayHere/, 'the hall\'s lines, the label\'s own where no voice answers');   // SD-THROUGH (PIN MOVED): the hall's own, by its turn beside it - the Way Through says its line the same way
+  assert.match(D, /if \(!opts\.sdSay\?\.\(word \?\? SD_NO_RIFT\)\) setMidScreenText\(word \?\? SD_NO_RIFT\);/, 'the Rift\'s word');
+  // the voice's frame, run from its own text: in the Hour it frames; leaving lets go what waits, once
+  const log = [];
+  let slot = 3;
+  const frame = new Function('modes', 'sdVoice', `let _sdVoiceIn = false;\n${constOf('sdVoiceFrame')}\nreturn sdVoiceFrame;`)({ sdRealmSlot: () => slot }, { leave: () => log.push('leave'), frame: () => log.push('frame') });
+  frame(); frame();
+  assert.deepEqual(log, ['frame', 'frame'], 'in the Hour: framed');
+  slot = null; frame(); frame();
+  assert.deepEqual(log, ['frame', 'frame', 'leave', 'frame', 'frame'], 'out: let go once');   // AUDIT SD III (H5, PIN MOVED): what waits for the Hour let go - its turns still said (scenes/superDungeon/sdVoice.js leave)
+});
+
 // ── the bar (L6 F1, F6, F10) ───────────────────────────────────────────
 
 const NOW = T0 + 10 * M;
@@ -171,6 +196,11 @@ test('SD11d THE ECHO\'S CLOCK AND THE RETURN (L6 F6, F10): a fallen Echo counts 
   assert.equal(both.host, 'Gold 80% - Silver 45%');
   const back = remnantBarModel(fight({ ph: 3, ou: NOW + 2400 }), NOW);
   assert.equal(back.callout.text, 'It returns - 3s', 'the Remnant rising, the Echoes gone');
+  const bar = read('src/ui/gate/gateBossBar.js');
+  assert.match(bar, /const hostNear = !!model\.host && !!model\.hostNear && !model\.fallen;/);
+  assert.match(bar, /parts\.tags\[1\]\.className = hostNear \? 'wb-boss-tag wb-boss-host near' : 'wb-boss-tag wb-boss-host';/);
+  assert.match(bar, /\.wb-boss-host\.near \{[^}]*animation: wb-wrath-near/);
+  assert.match(bar, /\.wb-boss-bar\.brass \.wb-boss-host\.near \{ animation-name: wb-brass-near; \}/, 'in the Hour\'s brass');
 });
 
 // ── the Hearts (L6 F7) ────────────────────────────────────────────────
@@ -342,6 +372,31 @@ test('SD11d THE FADE COUNTED (L6 F5): a Hollow unbeaten closes at its `until` an
 
 // ── near the arena (L6 F15) ───────────────────────────────────────────
 
+test('SD11d THE FIGHT\'S LINES NEAR ITS ARENA (L6 F15), run from the world host\'s own text: the fight\'s turns and its blows\' lines are said to whoever stands where its bar stands - in the Hour, within the bar\'s reach of the arena - and its fall to the whole Hour; a body on the Steps heard the Dragon Break and the End, which never touch it (mutants: said everywhere; the fall held to the arena; the thread dropped)', () => {
+  const said = [];
+  let slot = 3, pos = realmToDungeon(SD_ARENA.x, 0, SD_ARENA.z - SD_ARENA.r - 5);
+  const env = { modes: { sdRealmSlot: () => slot }, sdDungeonToRealm: (x, y, z) => [x - realmToDungeon(0, 0, 0)[0], y - realmToDungeon(0, 0, 0)[1], z - realmToDungeon(0, 0, 0)[2]], player: { get pos() { return pos; } }, sdBarNear };
+  const near = new Function(...Object.keys(env), `${constOf('sdNearArena')}\nreturn sdNearArena;`)(...Object.values(env));
+  assert.equal(near(), true, 'at the arena\'s edge');
+  const linkSay = /createSdFightLink\(\{ now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, say: (\(t, key\) => \{ if \(sdNearArena\(\)\) sdSay\(t, SD_VOICE_RANK\.turn, key\); \}) \}\)/.exec(W)?.[1];
+  const blowsSay = /\n {4}say: (\(t, everyone = false, key = null\) => \{ if \(everyone \|\| sdNearArena\(\)\) sdSay\(t, SD_VOICE_RANK\.turn, key\); \}),/.exec(W)?.[1];
+  assert.ok(linkSay && blowsSay, 'the two doors');
+  const e2 = { sdNearArena: near, sdSay: (t, rank, key) => said.push([t, rank, key]), SD_VOICE_RANK };
+  const L = evalIn(linkSay, e2), B = evalIn(blowsSay, e2);
+  const db = SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS);   // AUDIT SD III (T14, PIN MOVED): its window in its words
+  L(db); B(SD_BLOWS_TEXT.reset(5), false, SD_HEARTS_KEY);
+  assert.deepEqual(said, [[db, 0, undefined], [SD_BLOWS_TEXT.reset(5), 0, SD_HEARTS_KEY]]);
+  pos = realmToDungeon(0, 4.6, 190);   // the Crumble
+  assert.equal(near(), false, 'on the Steps');
+  L(db); B(SD_BLOWS_TEXT.end);
+  assert.equal(said.length, 2, 'not heard on the Steps');
+  B(SD_BLOWS_TEXT.fell, true);
+  assert.deepEqual(said[2], [SD_BLOWS_TEXT.fell, 0, null], 'its fall: to the whole Hour');
+  slot = null; pos = realmToDungeon(SD_ARENA.x, 0, SD_ARENA.z);
+  assert.equal(near(), false, 'out of the Hour: no arena');
+  assert.match(read('src/scenes/superDungeon/sdRemnantBlows.js'), /say\(SD_BLOWS_TEXT\.fell, true\);/, 'the fall says itself to everyone');
+});
+
 // ── the veil (L6 F8) ──────────────────────────────────────────────────
 
 function fakePage() {
@@ -391,6 +446,16 @@ test('SD11d THE HOUR\'S OWN VEIL (L6 F8; Mac, of the Hour: "not oblivion, someth
   assert.match(GATE_VEIL_FS, /uniform float uTheme;/);
   assert.match(GATE_VEIL_FS, /float th = clamp\(uTheme, 0\.0, 1\.0\);/);
   for (const fire of ['vec3(0.98, 0.3, 0.03)', 'vec3(1.0, 0.72, 0.34)', 'vec3(1.0, 0.84, 0.56)', 'vec3(1.0, 0.76, 0.38)']) assert.ok(GATE_VEIL_FS.includes(`mix(${fire}, `), `the fire's ${fire} first, the brass mixed over it`);
+  // every way through the Hour asks it
+  const WM = read('src/scenes/worldModes.js');
+  // PIN MOVED (SD-LOOK S5, Super-Dungeons-Look.md section 3): the Hour's own veil (render/superDungeon/sdVeil.js) - in through its
+  // blades closing on the Rift, back in silver, home mended, forced out shattered; the brass whirl stays a theme
+  assert.match(WM, /async function stepThroughFire\(go, look = 'fire', opts = undefined\) \{[\s\S]{0,200}if \(veil\) await veil\.cover\(look, opts\);/);
+  assert.equal((W.match(/\}, 'hourIn'\);/g) ?? []).length, 1, 'the Rift\'s step in');
+  assert.equal((W.match(/\}, 'hourBack'\);/g) ?? []).length, 1, 'the way back');
+  assert.equal((W.match(/gateVeil\?\.flash\('hourCast'\)/g) ?? []).length, 4, 'a death, the cast-out, the Hour\'s eject, a death in an Elite Breach (EG-PLAY, PIN MOVED)');
+  assert.equal((W.match(/gateVeil\?\.flash\('hourHome'\)/g) ?? []).length, 1, 'the way home');
+  assert.match(W, /if \(hour\) gateVeil\?\.flash\('hourCast'\);[^\n]*\n\s*sdSay\(SD_CAST_OUT_LINE\);/, 'the cast-out from the Hour, never from the Hollow');
 });
 
 // ── the chart (L6 F11) ────────────────────────────────────────────────
@@ -408,6 +473,8 @@ test('SD11d THE CHART IN BRASS (L6 F11): the Remnant\'s damage chart heads its c
   assert.notEqual(hour.key, gate.key, 'the head redraws');
   assert.equal(damageChartModel(fell, { ...when, theme: 'brass" onclick' }).theme, null);
   assert.match(DAMAGE_CHART_CSS, /\.wb-dmg-chart\.wb-dmg-brass \{/);
+  assert.match(read('src/ui/gate/gateDamageChart.js'), /\$\{model\.theme \? ` wb-dmg-\$\{model\.theme\}` : ''\}/);
+  assert.match(read('src/scenes/superDungeon/sdRemnantBlows.js'), /damageChartModel\(chartFell, \{ boss: SD_BLOWS_TEXT\.boss, me: me\(\), since: chartAt, now: t, crystals: SD_BLOWS_TEXT\.hearts, theme: 'brass' \}\)/);
 });
 
 // ── the words (L6 F20, F21) ────────────────────────────────────────────

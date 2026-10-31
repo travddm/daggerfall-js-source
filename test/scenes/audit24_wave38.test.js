@@ -256,10 +256,21 @@ test('audit24 wave38: the kill notice, and the name table that was out of reach'
   assert.equal(enemyDisplayName(128), 'Mage', 'the first class enemy');
   assert.equal(enemyDisplayName(146), 'City Watch', 'the last');
 
+  // ONE HOME: the table moved to the leaf that holds the rows, and
+  // quest/foe.js re-exports the SAME object rather than keeping a copy.
+  assert.doesNotMatch(rd('src/systems/quest/foe.js'), /^export const ENEMY_NAMES = Object\.freeze\(\[/m,
+    'no second copy of the name list');
+  assert.match(rd('src/systems/quest/foe.js'), /export \{ ENEMY_NAMES, isClassEnemyId \} from '\.\.\/\.\.\/characters\/enemy\/enemyBasics\.js'/);
+
   // and the reason it had to move: no row has ever carried a `name`,
   // so the dungeon's pacification line called everything "The enemy".
   assert.equal(Object.values(ENEMY_BASICS).filter((r) => r.name !== undefined).length, 0,
     'ENEMY_BASICS rows have no name field');
+  // AUDIT 24 (wave 42): the line moved into hostCombat's shared
+  // pacification, which is where all three pools reach it now.
+  const hc = rd('src/scenes/hostCombat.js');
+  assert.match(hc, /enemyDisplayName\(mobileType\) \?\? 'The enemy'/);
+  assert.doesNotMatch(rd('src/scenes/dungeonContext.js'), /ENEMY_BASICS\[f\.mobileType\]\?\.name/, 'the field that never existed');
 
   // both pools announce their kills
   for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
@@ -268,6 +279,18 @@ test('audit24 wave38: the kill notice, and the name table that was out of reach'
 });
 
 test('audit24 wave38: the encounter pool exports the seam, and the host asks BOTH pools', () => {
+  const src = rd('src/scenes/exteriorFoes.js');
+  // The pin is about the loot SEAM being exported, not about the
+  // export list being frozen - X9 added removeFoe beside it for the
+  // creature dispel. Check the members this test is actually about.
+  const ret = src.slice(src.lastIndexOf('return {'));
+  for (const member of ['foes', 'spawnFoe', 'damageFoe', 'lootTargets', 'takeLoot']) {
+    assert.ok(new RegExp(`\\b${member}\\b`).test(ret), `${member} is exported`);
+  }
+  assert.match(src, /corpseLootTargets\(foes, 'foeCorpse'/);
+  // the target sits at the GROUND position the marker landed on
+  assert.match(src, /feetOf: \(f\) => f\.corpseMarker\?\.pos \?\? f\.ai\?\.feet \?\? null/);
+  assert.match(rd('src/scenes/cityGuards.js'), /feetOf: \(g\) => g\.corpseMarker\?\.pos \?\? g\.ai\?\.feet \?\? null/);
 
   // ONE pick over BOTH pools: the nearest body wins, not the pool the
   // host happens to ask first.
@@ -287,8 +310,81 @@ test('audit24 wave38: the encounter pool exports the seam, and the host asks BOT
       `${f}: the watch-only pick is gone`);
   }
 
+  // ...and the ROUTER itself, RUN off the fixed-city host's own line.
+  // Routing a `foeCorpse:` key into the watch pool is not a harmless
+  // miss: cityGuards.js:"const d = rayPersonDistance" turns the key into
+  // `guards.find((g) => g.id === id)` over ids minted by
+  // `_nextGuardId++`, and takeCorpseLoot (corpseMarker.js:"export function takeCorpseLoot")
+  // tests only `corpseDisabled` and `entity.items` - never death - so
+  // opening an encounter corpse would empty a LIVE watchman's pack.
+  // AUDIT 65 MC-2 MADE THE ARM TWO RUNGS: the corpse now competes for
+  // the ray at RayDistance and carries its own 150 units, so the rung
+  // ABOVE the router is ActivateLootContainer/the corpse arm's own
+  // `hit.distance > CorpseActivationDistance` ->
+  // SetMidScreenText(youAreTooFarAway) (PlayerActivate.cs:936-941).
+  // Both rungs are run here, because the ladder runs both.
+  const exSrc = rd('src/scenes/exterior.js');
+  const exLines = exSrc.split('\n');
+  // LOOT-STACK: the router moved into the host's ONE corpse door
+  // (`openBodyLoot`), which the press and the loot window's pile tabs
+  // both go through - so the arm is that call, and the harness below
+  // runs the door's own source with it.
+  const doorAt = exSrc.indexOf('  const bodyPool = (lootKey) => ');
+  assert.ok(doorAt > 0, 'the fixed-city host no longer carries the corpse-key router');
+  const doorSrc = exSrc.slice(doorAt, exSrc.indexOf('\n  };\n', doorAt) + 5);
+  assert.match(doorSrc, /lootKey\.startsWith\('foeCorpse:'\) \? exteriorFoes : cityGuards/);
+  const armAt = exLines.findIndex((l) => l.trim() === 'openBodyLoot(lootKey);');
+  assert.ok(armAt > 0, 'the press goes through the door');
+  // MAC-E gave the router a body (the pool takes the host's inventory
+  // door now, so the arm spans lines), so the window this reads is the
+  // ARM rather than the one line above it. The law is the same one:
+  // the refusal is the rung ABOVE the router, not inside it.
+  // MAC-E gave the router a BODY (the pool takes the host's inventory
+  // door now), so the span is the refusal rung through the router's
+  // closing brace rather than two lines. The law is the one it always
+  // was: the refusal is the rung ABOVE, not a line inside.
+  const refuseAt = exLines.findIndex((l) => l.includes('lootKey && _lootPick.distance > _lootPick.reach'));
+  assert.ok(refuseAt > 0 && refuseAt < armAt, 'the too-far refusal sits above the router');
+  const armSrc = exLines.slice(refuseAt, exLines.indexOf('          }', armAt) + 1).join('\n');
+  assert.ok(!exLines.slice(armAt, armAt + 6).join('\n').includes('tooFarAwayText'),
+    '...and not inside it, which would speak it after the pool had already answered');
+  const took = [];
+  const said = [];
+  const opened = [];
+  // QUICK-LOOT B4: the arm gained two free names - the take and the
+  // player it moves items into - so the harness supplies them like every
+  // other one. `quickLootTake` is stubbed to DECLINE by default, which
+  // is what it really answers with the switch off or nothing
+  // highlighted, and the assertions below are therefore about exactly
+  // the behaviour they were always about.
+  const quick = [];
   let quickTakes = false;
+  // PICKUP-FEED: and a third - the take's `took`, the cards' door (ui/pickupFeed.js showPickups) - supplied the same way
+  const arm = new Function('lootKey', '_lootPick', 'exteriorFoes', 'cityGuards', 'townTalk',
+    'surfacePlayer', 'setMidScreenText', 'tooFarAwayText', 'inventoryDoorReady', 'makeInventoryWindow',
+    'quickLootTake', 'playerEntity', 'lootPile', 'showPickups', doorSrc + armSrc);
+  const run = (k, pick) => arm(k, pick,
+    { takeLoot: (key, say2, open) => { took.push(['encounter', key]); if (open) open({ items: () => [] }); } },
+    { takeLoot: (key, say2, open) => { took.push(['watch', key]); if (open) open({ items: () => [] }); } },
+    { say: () => {}, showOverlay: (w) => opened.push(w) }, () => {}, (t) => said.push(t), () => TOO_FAR_AWAY_TEXT,
+    () => true, (o) => o,
+    (key, hooks) => { quick.push(key); return quickTakes ? {} : null; }, { items: [] }, () => null, () => false);
   const near = { distance: 1, reach: CORPSE_ACTIVATION_DISTANCE };
+  run('foeCorpse:3', near);
+  run('guardCorpse:3', near);
+  run(null, null);
+  // QUICK-LOOT B4: the take is OFFERED the body first, and declining it
+  // leaves every assertion below exactly as it was.
+  assert.deepEqual(quick, ['foeCorpse:3', 'guardCorpse:3'], 'both bodies are offered to quick loot');
+  assert.deepEqual(took, [['encounter', 'foeCorpse:3'], ['watch', 'guardCorpse:3']],
+    'the KEY picks the pool - an encounter corpse never reaches a live watchman');
+  assert.deepEqual(said, [], 'a body in reach is opened, not refused');
+  // MAC-E: and the door really is handed over - the pool is given a
+  // window maker, and using it mounts a window on the host.
+  assert.equal(opened.length, 2, 'each body reached the host\u2019s own inventory door');
+  run('foeCorpse:9', { distance: 8, reach: CORPSE_ACTIVATION_DISTANCE });
+  assert.deepEqual(said, [TOO_FAR_AWAY_TEXT], 'a body past 150 units is refused OUT LOUD (:936-941)');
+  assert.equal(took.length, 2, 'and is not opened');
 
   // the target reach is the corpse one, everywhere it is built - and
   // MC-2 put it in `reach`, the handler's gate, while `distance` is the

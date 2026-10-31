@@ -38,6 +38,7 @@ test('THE MERGE: LootTables.OnLootSpawned is one list - a named subscriber and a
     registerTabledLootHandler('zz-merge-named', null);
     registerTabledLootHandler('zz-merge-after', null);
   }
+  assert.match(hostText('src/scenes/ohLootHost.js'), /const offTable = tableLootSpawned\.add\(\(e\) => ohUpgrade\(e\.key, e\.items, \[\], e\.where, e\.rolls \?\? Math\.random, e\.roller \?\? player\(\)\)\);/, 'OH-E subscribes through the door');   // PIN MOVED (HOST-SPLIT, EVENT-RULES): out of the world host whole   // PIN MOVED (PARTY-LOOT): the raiser's dice and roller ride the event
 });
 
 test('THE MERGE: CSA-H\'s rows are a provider in GetCustomItemsForGroup\'s one home - after the providers before its first row, in registration order, a row only while its mod is on, a second registration none', () => {
@@ -50,6 +51,11 @@ test('THE MERGE: CSA-H\'s rows are a provider in GetCustomItemsForGroup\'s one h
   assert.deepEqual(customItemsForGroup(G), [9901, 9902, 9903]);
   on = false;
   assert.deepEqual(customItemsForGroup(G), [9901, 9903], 'a mod switched off has no row');
+  assert.doesNotMatch(rd('src/systems/roleplayRealismItems/rriItems.js'), /registerCustomItemGroup|_otherModItems/, 'rriItems.js answers RRI\'s own again');
+  // PIN MOVED (SHIPYARDS, 2026-10-11): Come Sail Away's two rows stand on no shelf - a port town's shipyard sells every
+  // hull (systems/shipyards.js) - so the fish are the one home's mod rows
+  assert.match(rd('src/systems/deepWater/deepWatersFishItems.js'), /import \{[^}]*registerCustomItemGroup[^}]*\} from '\.\.\/item\/itemTemplates\.js';/, 'the fish register into the one home');
+  assert.doesNotMatch(rd('src/systems/comeSailAway/comeSailAwayItems.js').replace(/^\s*\/\/.*$/gm, ''), /registerCustomItemGroup/, 'the boats register no shelf row');
 });
 
 test('THE MERGE: Come Sail Away\'s shelf subscriber is one of PlayerActivate.OnLootSpawned\'s, by its mod\'s name, after RRI2\'s - a shop shelf\'s alone; both shelf doors raise the one event', () => {
@@ -60,4 +66,10 @@ test('THE MERGE: Come Sail Away\'s shelf subscriber is one of PlayerActivate.OnL
     raiseContainerLootSpawned({ containerType: LOOT_CONTAINER_TYPES.HouseContainers, items: [{}], buildingType: 9, quality: 10 });
     assert.deepEqual(heard, [2], 'the shelf, not the house container');
   } finally { registerContainerLootHandler('zz-merge-shelf', null); }
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /registerContainerLootHandler\(COME_SAIL_AWAY_VENDOR, \(a\) => \{ if \(a\.containerType === LOOT_CONTAINER_TYPES\.ShopShelves\) csaShelfStocked\(a\.items\); \}\);/);
+  assert.doesNotMatch(w, /csaShelfStocked: \(items\)/, 'no host hook beside the event');
+  const m = rd('src/scenes/worldModes.js');
+  assert.doesNotMatch(m, /host\.csaShelfStocked/, 'no shelf door calls the mod by name');
+  assert.equal((m.match(/shelfLootSpawned\(stockShopShelf\(/g) ?? []).length, 3, 'the two doors and the probe');
 });

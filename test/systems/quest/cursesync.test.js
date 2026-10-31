@@ -249,3 +249,47 @@ test('CURSE-SYNC executed: the curse\'s body offers its pile and answers a stran
   assert.equal(take(own).length, 0, 'a private quest\'s body answers nothing - it never rode');
 });
 
+test('CURSE-SYNC executed: a player who leaves or falls hands the curse\'s foe to the nearest player, in a party or not; a private quest\'s goes to the party alone', () => {
+  const W = rd('src/scenes/world.js');
+  const body = (head) => {
+    const at = W.indexOf(head);
+    assert.ok(at > 0, `world.js has ${head}`);
+    let depth = 0;
+    for (let i = W.indexOf('{', at); i < W.length; i++) {
+      if (W[i] === '{') depth++;
+      else if (W[i] === '}' && --depth === 0) return W.slice(W.indexOf('{', at), i + 1);
+    }
+    return assert.fail('unbalanced');
+  };
+  const { m, ghost, rats } = quests();
+  const pool = { removeFoe() {}, zeroFoeHealth() {}, foeSinks: () => ({}) };
+  const bound = (foe) => { const f = { entity: { health: 10, maxHealth: 10 }, ai: { feet: [1, 0, 1] }, dead: false }; bindQuestFoeHost(f, behaviourOf(m, foe), pool); return f; };
+  const g = bound(ghost), own = bound(rats);
+  const near = [{ id: 'bob-0002', feet: [1, 0, 2] }, { id: 'amy-0003', feet: [9, 0, 9] }];   // the stranger nearest, the party member farther
+  const social = { isPartyPeer: (id) => id === 'amy-0003' };
+  const sent = [];
+  const cell = new Function('modes', 'online', 'isCellRoom', 'peersNear', 'social', 'exteriorFoes', 'isPrivateQuestFoe', `return () => ${body('const handOverFoes = () =>')};`)(
+    { mode: 'exterior' }, { room: 'world:3,12', sendFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social,
+    { handOver: (heirOf, send) => send({ f: [heirOf(g), heirOf(own)] }) ? 2 : 0 }, isPrivateQuestFoe);
+  assert.equal(cell(), 2);
+  assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'the cell\'s: the ghost to the nearest player, the private quest\'s foe to the party');
+  const room = new Function('modes', 'online', 'isWorldRoom', 'peersNear', 'social', 'isPrivateQuestFoe', `return () => ${body('const handOverRoomFoes = () =>')};`)(
+    { mode: 'interior', ownHandOverFrame: (heirOf) => ({ f: [heirOf(g), heirOf(own)] }), dropOwnHanded: () => 2 },
+    { room: 'world:bld:7', ownOk: true, sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
+  assert.equal(room(), 2);
+  assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'and a world room\'s, by the same word');
+});
+
+test('CURSE-SYNC by source: the pool\'s gates and the world host\'s handover read one word - a PRIVATE quest\'s foe, never any quest\'s', () => {
+  const x = rd('src/scenes/exteriorFoes.js');
+  assert.match(x, /const _qTag = \(f\) => \(!f \|\| f\.puppet \? null : isPrivateQuestFoe\(f\) \? /, 'the party\'s word is asked of a private quest\'s foe alone');
+  assert.match(x, /const _questLike = \(f\) => !!f && \(isPrivateQuestFoe\(f\) \|\| !!f\._keptTag\);/, 'what rides, whose blow lands, whom it hunts');
+  assert.match(x, /&& \(!!f\.puppet \|\| \(\(!isPrivateQuestFoe\(f\) \|\| !!_qTag\(f\)\) && !\(f\.placed && !f\.site\)\)\);/, 'a shared foe (PSCALE1)');
+  const w = rd('src/scenes/world.js');
+  const heirs = w.match(/const heirOf = \(f\) => \{[^\n]*\}; /g) ?? [];
+  assert.equal(heirs.length, 2, 'the cell\'s handover and the world room\'s');
+  for (const h of heirs) {
+    assert.match(h, /if \(\(isPrivateQuestFoe\(f\) \|\| f\._keptTag\) && !social\?\.isPartyPeer\(q\.id\)\) continue;/, 'a world quest\'s foe goes to the nearest player, as an encounter\'s');
+    assert.doesNotMatch(h, /f\.isQuestFoe/);
+  }
+});

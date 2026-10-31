@@ -10,7 +10,23 @@ import { drawEnhancedTextLayer, hideEnhancedTextLayer } from '../../src/ui/enhan
 import { PrisonScreenWindow, ENHANCED_PRISON_DAYS_ID } from '../../src/ui/prisonScreen.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+const WORLD = read('src/scenes/world.js');
 const grab = (src, re, what) => { const m = re.exec(src); assert.ok(m, `${what} not found`); return m[1]; };
+
+test('AUDIT FONT3 F1: the position map\'s words go down when the map is put away by a slot that never disposes', () => {
+  // the seam as world.js has it, over a mode whose closeWindow drops the window WITHOUT dispose - worldModes'
+  // interior and dungeon arms of closeSpellWindow
+  const src = grab(WORLD, /\n(\s*let _csaMapWindow = null;[\s\S]*?\n  function csaMapClose\(\) \{[\s\S]*?\n  \})\n/, 'csaMapOpen / csaMapClose');
+  const hides = [];
+  const modes = { mountWindow: () => true, closeWindow: () => {} };
+  const seam = new Function('modes', 'csaDrawMap', 'hideEnhancedTextLayer', '_csaMapKeys',
+    `${src}\nreturn { csaMapOpen, csaMapClose, CSA_MAP_TEXT_LAYER };`)(modes, () => {}, (id) => hides.push(id), { held: new Set() });
+  seam.csaMapOpen();
+  seam.csaMapClose();
+  assert.deepEqual(hides, [seam.CSA_MAP_TEXT_LAYER], 'the close itself takes the words down');
+  // ...and every frame with no map up keeps them down, whatever slot it left by
+  assert.match(WORLD, /function csaUpdate\(dt\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(!_csaMapWindow\) hideEnhancedTextLayer\(CSA_MAP_TEXT_LAYER\);\n\s*if \(!csaRuntime\) return;/);
+});
 
 test('AUDIT FONT3 F2: the held map\'s toolbar buttons take the face alone - their own 0.12em is not outranked', () => {
   const i = PLUS_CSS.indexOf('.hmroot .hmtools button, .hmroot .hmtools .hmfloor, .hmroot .hmtools .dlg-key {');
@@ -22,6 +38,8 @@ test('AUDIT FONT3 F2: the held map\'s toolbar buttons take the face alone - thei
 });
 
 test('AUDIT FONT3 F3: the readied spell is "doubled" only while the spell chip or the hotbar is naming it', () => {
+  const hud = read('src/ui/enhanced/enhancedHud.js');
+  assert.match(hud, /const named = getPref\('quickslots'\) !== false \|\| hotbarMode\(\);\n\s*const doubled = named && !!readySpell && !!slotSpell && slotSpell\.index === readySpell\.index;/);
   // the chip it defers to is hidden with the diamond (the reason the caption must speak then)
   assert.match(ENHANCED_CSS, /\.hud-quick\.nodiamond \.hud-qspell \{ display: none; \}/);
 });
@@ -81,11 +99,32 @@ test('AUDIT FONT3 F5: a text layer belongs to the document it was built in', () 
   assert.ok(ra.removed, 'the first one\'s node taken out');
   hideEnhancedTextLayer('audit-f5');
   assert.equal(rb.style.display, 'none');
+  // the prison id's doc sits on DAYS_LABEL_POS's export again, not between it and its doc block
+  assert.match(read('src/ui/prisonScreen.js'), /the x is kept\n \*  because DFU writes it\. \*\/\nexport const DAYS_LABEL_POS/);
+});
+
+test('AUDIT FONT3 F6: the faces that are NOT the pixel face keep their own smoothing and spacing under the body\'s trio', () => {
+  const ok = /-webkit-font-smoothing:antialiased;letter-spacing:normal;/;
+  assert.match(read('src/ui/fpsCounter.js'), new RegExp(`ui-monospace,Menlo,Consolas,monospace;${ok.source}`));
+  const main = read('src/main.js');
+  assert.match(main, new RegExp(`font:14px monospace;${ok.source}`), 'the boot error');
+  assert.match(main, new RegExp(`font:12px monospace;${ok.source}`), 'the crash panel');
+  const ds = read('src/scenes/dataSource.js');
+  assert.equal((ds.match(new RegExp(`font:14px monospace;${ok.source}`, 'g')) ?? []).length, 2, 'both pickers\' monospace arms');
+  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /fallback \(monospace - since\n \*  FONT3 the whole skin is the pixel stack/, 'the ?nofonts record');
 });
 
 // ── the layout lens (L) and the record (C): each a rule the measurement found broken, held where it was fixed ──
 import { PARTY_CSS } from '../../src/ui/partyPanel.js';
 const ruleBody = (css, sel) => { const i = css.indexOf(`${sel} {`); assert.ok(i >= 0, `${sel} not found`); return css.slice(i, css.indexOf('}', i)); };
+
+test('AUDIT FONT3 L1: the naval plate\'s batteries hold their words on one line at the floor', () => {
+  const naval = read('src/ui/naval/navalHud.js');
+  assert.match(naval, /\.dfnaval-rose \{[^}]*gap: 4px; margin: 8px 3px 2px;/, 'the rose\'s side margin 3px');
+  assert.match(naval, /\.dfnaval-gun \{ position: relative; overflow: hidden; padding: 3px 1px 4px;/, 'a battery\'s side padding 1px');
+  assert.match(naval, /\.dfnaval-gun-side \{ font-size: 11px; letter-spacing: 0\.04em;/, 'STARBOARD inside its box');
+  assert.match(naval, /\.dfnaval-gun-count \{ font-size: 11px; letter-spacing: 0; word-spacing: -2px; font-weight: 400;/, '"12 great guns" on one line');
+});
 
 test('AUDIT FONT3 L2: the party\'s place line keeps a row inside PARTY8\'s 48px', () => {
   assert.match(ruleBody(PARTY_CSS, '.dfparty-where'), /font-size: 11px; line-height: 1; letter-spacing: 0;/);
@@ -93,14 +132,20 @@ test('AUDIT FONT3 L2: the party\'s place line keeps a row inside PARTY8\'s 48px'
 });
 
 test('AUDIT FONT3 L3/L6/L7: the corners and the narrow labels track none where the floor met a fixed box', () => {
+  assert.match(read('src/ui/enhanced/enhancedHotbar.js'), /@media \(max-width: 480px\) \{[^\n]*\n\s*\/\*[^\n]*\*\/\n\s*\.hb-key, \.hb-count, \.hb-pip \{ line-height: 1; letter-spacing: 0; \} \}/);
   // the phone override stands AFTER the shelf label's own rule, or it loses on order (the fix's own first cut did)
   const label = PLUS_CSS.indexOf('.pack-shell .shelflabel { max-width: 100%;');
   const phone = PLUS_CSS.indexOf('@media (max-width: 640px) { .pack-shell .shelflabel { letter-spacing: 0; } }');
   assert.ok(label >= 0 && phone > label, 'the phone\'s shelf label after the label');
   assert.match(ENHANCED_CSS, /\.ft-tile-name \{[^}]*letter-spacing: 0; \}/);
+  assert.match(read('src/ui/chatPanel.js'), /\.dfchat-who-name \{[^}]*letter-spacing: 0; \}/);
   assert.match(PLUS_CSS, /body \.wb-dmg-num \{ font-size: 11px; letter-spacing: 0; \}/);
 });
 
 test('AUDIT FONT3 C2/C3: the dim a step under the mid, and the film\'s phone words at the floor', () => {
   assert.match(ENHANCED_CSS, /--dim: #9a9486;/);
+  const intro = read('src/ui/intro/introScreen.js');
+  // TITLE-DOOR (2026-10-27): Tap to continue is retired - the menu's doors stand on the held title in its place
+  assert.doesNotMatch(intro, /intro-continue/);
+  assert.match(intro, /intro-footer\{font-size:11px\}/);
 });

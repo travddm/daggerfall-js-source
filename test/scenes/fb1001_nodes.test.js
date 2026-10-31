@@ -33,6 +33,7 @@ import { CLIMATES, LOCATION_TYPES } from '../../src/formats/mapsFile.js';
 import { WORLD_MAP_TILE_DIM } from '../../src/world/terrain/terrainTiles.js';
 import { HEIGHTMAP_DIMENSION, TERRAIN_SIZE } from '../../src/world/terrain/terrainSampler.js';
 
+const WORLD = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
 const WOODS = CLIMATES.Woodlands, GLENUMBRA = 59;
 const PX = 405, PY = 150;
 const NOON_MS = (20500 * 86_400 + 43_200) * 1000;
@@ -187,3 +188,23 @@ test('SEASONAL-EYE: Herbalism 100\'s Seasonal Eye chosen mid-session stands the 
   } finally { s.done(); }
 });
 
+test('NAVAL-E: at sea, a press the sea takes (a struck ship\'s rail, a prize, the grapples) is never offered to a node - the net\'s cast in the look; with nothing for the sea, the node has it first as ever (mutants: the sea never asked)', () => {
+  const start = WORLD.indexOf('        // GUN-HOLD: Activate while the guns are laid holds fire');
+  const ifLine = '        if (((_act.activate && !gatherHost?.acting() && !_actClick && !nodeClicked) || (useEdge && !nodeTook)) && !modes.transitioning && !_holdFire) {';   // PROF-MENU: and a node's lit row's click
+  const end = WORLD.indexOf(ifLine, start);
+  assert.ok(start > 0 && end > start, 'the street\'s gate');
+  const cond = ifLine.trim().slice('if ('.length, -') {'.length);
+  // eslint-disable-next-line no-new-func
+  const gate = new Function('_act', 'naval', 'magic', 'gatherHost', 'travelView', 'pressed', 'latch', 'keys', 'modes', '_activateDown',
+    `${WORLD.slice(start, end)}return { nodeTook, ladder: !!(${cond}) };`);
+  const run = (seaTakes) => {
+    const calls = [];
+    const naval = { aiming: false, holdFire: () => false, takesActivate: () => seaTakes };
+    const gatherHost = { acting: () => false, press: () => { calls.push('cast'); return true; }, clickTaken: () => false };
+    return { ...gate({ activate: false, cast: false }, naval, { interceptAttack() {} }, gatherHost, null, (_e, _k, a) => a === 'Interact', { edge: null }, null, { transitioning: false }, false), calls };
+  };
+  const sea = run(true);
+  assert.deepEqual([sea.calls, sea.nodeTook, sea.ladder], [[], false, true], 'the sea\'s: the ladder runs (its naval arm boards her), the cast never asked');
+  const calm = run(false);
+  assert.deepEqual([calm.calls, calm.nodeTook, calm.ladder], [['cast'], true, false], 'nothing for the sea: the net\'s cast, as ever');
+});

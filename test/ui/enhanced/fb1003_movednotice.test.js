@@ -121,9 +121,19 @@ test('MOVED-NOTICE: a stack left where the sheet stands it is not marked moved -
 });
 
 test('MOVED-NOTICE: a moved stack\'s panels FADE where they stand - no slide in, no slide out - for notices and revenant cards alike; the rule outweighs the sheets\' own (mutants: the rule dropped; the out-state left sliding)', () => {
+  const hud = readFileSync(new URL('../../../src/ui/hud/hudLayout.js', import.meta.url), 'utf8');
   const style = (withPage({}, (doc) => { tickHudLayout(doc, 0); return doc.getElementById('hud-layout-style')?.textContent; })) ?? '';
   for (const [stack, card, inCls, outCls] of [['notice-stack', 'notice', 'notice-in', 'notice-out'], ['rvncard-stack', 'rvncard', 'rvncard-in', 'rvncard-out']]) {
     const rule = new RegExp(`\\.${stack}\\[data-hm-moved\\] > \\.${card}, \\.${stack}\\[data-hm-moved\\] > \\.${card}\\.${inCls},\\s*\\n\\.${stack}\\[data-hm-moved\\] > \\.${card}\\.${outCls} \\{ transform: none; \\}`);
     assert.match(style, rule, `${stack}: the moved stack's ${card} rests, enters and leaves untranslated`);
   }
+  // SPECIFICITY: the out-state's selector (0,4,0) outweighs every sheet rule that translates a panel - the notice's
+  // own .notice.notice-out (0,2,0), the toast's .notice.notice-toast.notice-out (0,3,0), the card's
+  // body .rvncard.rvncard-out (0,2,1) - so no stylesheet order can put the slide back
+  assert.match(hud, /\.notice-stack\[data-hm-moved\] > \.notice\.notice-out/);
+  assert.match(hud, /\.rvncard-stack\[data-hm-moved\] > \.rvncard\.rvncard-out/);
+  // the fade is the sheets' own opacity transition, which leaves before the node is taken
+  const sheet = readFileSync(new URL('../../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
+  const fade = Number(/\.notice \{[^}]*transition: transform \d+ms cubic-bezier\([^)]*\), opacity (\d+)ms/.exec(sheet)?.[1]);
+  assert.ok(fade > 0 && fade <= NOTICE_SLIDE_MS, `the notice fades (${fade} ms) within the ${NOTICE_SLIDE_MS} ms the node stands`);
 });

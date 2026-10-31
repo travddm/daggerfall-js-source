@@ -147,6 +147,35 @@ function statementAt(src, needle) {
   return '';
 }
 
+test('AUDIT 68 S02-contextlost-tap-dead: the lost-context report takes the tap it promises, and reloads once', () => {
+  // main.js touches the DOM at import, so its crashOverlay and the
+  // context-lost handler run here against a minimal document. PL3 gave
+  // #crash pointer-events:none, so the "tap here to reload" fell through
+  // to the dead canvas; and each loss stacked another click listener.
+  const main = rd('src/main.js');
+  const code = statementAt(main, 'function crashOverlay(msg) {') + '\n'
+    + statementAt(main, 'function crashDismiss(el) {') + '\n'   // RPT1026-CLIENT: the report's own Dismiss
+    + statementAt(main, "document.getElementById('c')?.addEventListener('webglcontextlost'");
+  const els = new Map();
+  let lost = null, reloads = 0;
+  const canvas = { addEventListener: (ev, fn) => { if (ev === 'webglcontextlost') lost = fn; } };
+  const document = {
+    getElementById: (id) => (id === 'c' ? canvas : els.get(id) ?? null),
+    createElement: () => ({ style: {}, clicks: [], appendChild() {}, addEventListener(ev, fn) { if (ev === 'click') this.clicks.push(fn); } }),
+    body: { appendChild: (el) => els.set(el.id, el) },
+  };
+  new Function('document', 'location', 'pageGoing', code)(document, { reload: () => reloads++ }, false);   // GL-LEAK: the page is not going (main.js's own flag; a context let go on purpose as it goes puts up no report)
+  assert.equal(typeof lost, 'function', 'the handler is registered on the canvas');
+  lost({ preventDefault() {} });
+  lost({ preventDefault() {} });   // a phone can lose it twice
+  const el = els.get('crash');
+  assert.match(el.textContent, /tap here to reload/);
+  // a tap reaches the element only when its computed pointer-events is not none
+  const pe = el.style.pointerEvents || /pointer-events:\s*([a-z]+)/.exec(el.style.cssText ?? '')?.[1];
+  if (pe !== 'none') { el.onclick?.(); for (const fn of el.clicks) fn(); }
+  assert.equal(reloads, 1, 'one tap, one reload');
+});
+
 test('AUDIT 68 S02-surfh-linear-scan: a route\'s heights read only the boxes under its points, and answer as the full scan did', async () => {
   // surfH/surfHNear scanned every collider per query: each waypoint of
   // every findPath cost O(colliders) - 66k-400k boxes on a real soup.
@@ -256,3 +285,27 @@ test('AUDIT 68 S02-bake-pipeline-triplicated: the worker, the fallback and navBa
   client.dispose();
 });
 
+test('AUDIT 68 S02-coarsen-sizing-pass: the grid is sized from the soup\'s bounds, and the soup is voxelised once', async () => {
+  // coarsenAgent reads only the boxes' xz extent, and that extent is the
+  // soup's bounds snapped to cells: the fine first pass every bake cut
+  // only to measure it (~2 s on a large dungeon) carried nothing more.
+  const { soupExtent, trianglesToColliders } = await import('../../../src/ai/triRaster.js');
+  const { coarsenAgent, AGENT } = await import('../../../src/ai/nav/navmesh.js');
+  let seed = 3; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  for (const span of [30, 400]) {
+    const P = [], I = [];
+    for (let t = 0; t < 300; t++) {
+      const cx = (rnd() - 0.5) * span, cz = (rnd() - 0.5) * span;
+      for (let k = 0; k < 3; k++) { P.push(cx + (rnd() - 0.5) * 4, (rnd() - 0.5) * 3, cz + (rnd() - 0.5) * 4); I.push(t * 3 + k); }
+    }
+    P.push(-900, 0, -900, -900, 0, -900, -900, 0, -900); I.push(900, 901, 902);   // a zero-area triangle far off: it cuts no box
+    const cols = trianglesToColliders(P, I, { cs: AGENT.cs });
+    const ext = (cs) => cs.reduce((e, c) => [Math.min(e[0], c.x0), Math.max(e[1], c.x1), Math.min(e[2], c.z0), Math.max(e[3], c.z1)], [Infinity, -Infinity, Infinity, -Infinity]);
+    assert.deepEqual(ext(soupExtent(P, I, AGENT.cs)), ext(cols), `span ${span}: the voxeliser's own extent`);
+    assert.deepEqual(coarsenAgent(soupExtent(P, I, AGENT.cs), AGENT), coarsenAgent(cols, AGENT), `span ${span}: the same cell size`);
+  }
+  const nb = rd('src/ai/nav/navBake.js'), at = nb.indexOf('export function bakeSoup(');
+  assert.ok(at > 0, 'the one bake core');
+  const core = nb.slice(at, nb.indexOf('\n}\n', at));
+  assert.equal((core.match(/trianglesToColliders\(/g) ?? []).length, 1, 'the bake voxelises the soup once');
+});

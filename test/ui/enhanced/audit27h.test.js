@@ -58,13 +58,117 @@ function constOf(text, name, env = {}) {
 
 // ── A: THE F5 PAGE'S DOORS ─────────────────────────────────────────────────────────────────────────────────────────
 
+test('AUDIT 27h A1: the building\'s pack crosses over (F5) to the BUILDING\'s page - one sheet door for F5, the pause bag and the pack', () => {
+  const modes = rd('src/scenes/worldModes.js');
+  const mounted = [];
+  const host = { makeCharSheet: (doors) => ({ sheet: doors }) };
+  const openInteriorSheet = constOf(modes, 'openInteriorSheet', { host, interiorSheetDoors: () => 'BUILDING-DOORS', mountInterior: (w) => mounted.push(w) });
+  assert.equal(openInteriorSheet(), true);
+  assert.deepEqual(mounted, [{ sheet: 'BUILDING-DOORS' }], 'the world\'s builder, handed the building\'s doors, mounted in the building\'s slot');
+  const refused = constOf(modes, 'openInteriorSheet', { host: { makeCharSheet: () => null }, interiorSheetDoors: () => 'X', mountInterior: (w) => mounted.push(w) });
+  assert.equal(refused(), false, 'a sheet not ready is no window, and says so');
+  assert.equal(mounted.length, 1);
+  // the pack's own bag - world.js makeInventoryWindow's, handed through host.makeInventory - carries it OVER the
+  // builder's street door (world.js's openCharSheet showed the street's page, whose pack dropped into the street's pool)
+  const bagOf = (extra) => mountLiteral(modes, 'const interiorInventory = ({ onClose, ...extra } = {}) => host.makeInventory?.(', {
+    openInteriorSheet: 'THE-BUILDING-SHEET', extra, onClose: undefined,
+  });
+  assert.equal(bagOf({}).openCharSheet, 'THE-BUILDING-SHEET');
+  assert.equal(bagOf({ openCharSheet: 'A-CALLER-S-OWN' }).openCharSheet, 'A-CALLER-S-OWN', 'a caller\'s own door still wins (it rides ...extra)');
+  const world = rd('src/scenes/world.js');
+  assert.match(world, /const makeInventoryWindow = \(extra = \{\}\) => createInventoryWindow\(\{[\s\S]*?openCharSheet: [^\n]*\n[\s\S]*?\.\.\.extra,\n\s*\}\);/, 'the builder spreads the caller\'s bag last, so the building\'s door stands');
+});
+
+test('AUDIT 27h A2/A3/A4: ?exterior\'s builder takes the doors; the building\'s bag carries playerId; every arm answers whether it opened', () => {
+  // A2: exterior.js's sheet takes a building's pack and bag, as world.js's does
+  const ext = rd('src/scenes/exterior.js');
+  const head = 'const makeCharSheetWindow = ({ inventory = null, pause = null } = {}) => createCharSheetWindow(';
+  assert.equal(mountLiteral(ext, head, { pauseDoorHooks: () => 'STREET', inventory: null, pause: () => 'BUILDING' }).pause(), 'BUILDING');
+  assert.equal(mountLiteral(ext, head, { pauseDoorHooks: () => 'STREET', inventory: 'PACK', pause: null }).inventory, 'PACK');
+  assert.match(ext, /makeCharSheet: \(doors\) => \(charSheetDoorReady\(\) \? makeCharSheetWindow\(doors\) : null\),/);
+  // A3 + A4: the building's bag - its own playerId (CHARID1's by-id Save list), and doors that answer
+  const modes = rd('src/scenes/worldModes.js');
+  const mounted = [];
+  const mountInterior = (w) => mounted.push(w);
+  const bag = mountLiteral(modes, 'const interiorPauseHooks = () => (', {
+    host: { playerId: () => 'ID-7', makeJournal: () => null }, magic: null, makeSpellbookWindow: () => 'BOOK',
+    interiorInventory: () => 'PACK', mountedInterior: constOf(modes, 'mountedInterior', { mountInterior }),
+  });
+  assert.equal(bag.playerId(), 'ID-7', 'the Save pane names this character\'s slots by id, as the street\'s bag always let it');
+  assert.deepEqual([bag.openPack(), bag.openSpellbook(), bag.openChronicle()], [true, false, false], 'no magic, no journal: the doors say they opened nothing');
+  assert.deepEqual(mounted, ['PACK']);
+  // the world's and ?exterior's bags answer the same way
+  for (const [file, text] of [['world.js', rd('src/scenes/world.js')], ['exterior.js', ext]]) {
+    const shown = [];
+    const b = mountLiteral(text, 'const pauseDoorHooks = () => (', {
+      makeInventoryWindow: () => null, makeSpellbookWindow: () => 'BOOK', makeJournalWindow: () => null,
+      townTalk: { showOverlay: (w) => shown.push(w) },
+    });
+    assert.deepEqual([b.openPack(), b.openSpellbook(), b.openChronicle()], [false, true, false], `${file}: each arm answers`);
+    assert.deepEqual(shown, ['BOOK'], `${file}: and only what opened was shown`);
+  }
+  // the dungeon's: a context with no quest bridge draws no Chronicle (makeJournalWindow's null) - never a dead door
+  const dc = rd('src/scenes/dungeonContext.js');
+  const dbag = (opts) => mountLiteral(dc, 'const ctx = this;   // the sibling save verbs on this same context\n      return ', {   // f5quests.test.js's opener
+    opts, openInventory: () => 'PACK', makeSpellbookWindow: () => null, makeJournalWindow: () => 'J',
+  });
+  assert.equal(dbag({}).openChronicle, undefined, 'no bridge, no door');
+  assert.equal(typeof dbag({ questBridge: {} }).openChronicle, 'function');
+  assert.deepEqual([dbag({}).openPack(), dbag({}).openSpellbook()], [true, false]);
+});
+
 test('AUDIT 27h A4: a door that opened nothing RESUMES - the page gone and nothing up is not left with the pointer free', () => {
   // the page's doors hand the arm's answer back
   assert.equal(sheetPageDoors({ openPack: () => false }, () => {}).openPack(), false);
   assert.equal(sheetPageDoors({ openPack: () => true }, () => {}).openPack(), true);
+  // the Stats page's door, as written, over the pause door's own act law
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  const at = menu.indexOf('function pauseStats(body)');
+  // PIN MOVED (AUDIT SEASON-BOOK S3): the door through the menu's one handoff - and the pause door's close UNMOUNTS the face,
+  // whose unmount empties `onAction`, as the real one does (this test's close had never unmounted, so a resume asked of
+  // the emptied handler passed here and did nothing in play)
+  const onclick = /b\.onclick = (\(\) => \{ handoff\(fn\); \});/.exec(menu.slice(at, menu.indexOf('\nfunction ', at + 10)));
+  assert.ok(onclick, 'the Stats door');
+  const body = /\nfunction handoff\(fn, opened = \(r\) => r !== false\) \{\n([\s\S]*?)\n\}\n/.exec(menu);
+  assert.ok(body, 'the handoff');
+  assert.match(menu, /\n {6}onAction = \(\) => \{\};/, 'the unmount empties the handler');
+  const press = (opened) => {
+    const seen = [];
+    const live = { onAction: null, fn: () => { seen.push('door'); return opened; }, handoff: null };
+    // eslint-disable-next-line no-new-func
+    const inLive = (expr) => new Function('scope', `with (scope) { return (${expr}); }`)(live);
+    live.handoff = inLive(`function (fn, opened = (r) => r !== false) {${body[1]}}`);
+    live.onAction = pauseMenuAct({ relock: () => seen.push('relock') }, () => { seen.push('close'); live.onAction = () => {}; });
+    inLive(onclick[1])();
+    return seen;
+  };
+  assert.deepEqual(press(true), ['close', 'door'], 'a door that opened hands off: nothing relocks under its window');
+  assert.deepEqual(press(undefined), ['close', 'door'], 'an arm that answers nothing is taken at its word - a handoff');
+  assert.deepEqual(press(false), ['close', 'door', 'close', 'relock'], 'a door that opened nothing resumes, inside the same click');
+  // the classic journal's art warms at the world's boot, so its first L, N or Chronicle press opens
+  assert.match(rd('src/scenes/world.js'), /preloadBookArt\(\{ renderer, fetchBytes, palette \}\);[^\n]*\n\s*preloadQuestJournalArt\(\{ renderer, fetchBytes, palette \}\);   \/\/ AUDIT 27h A4/);
 });
 
 // ── S: THE SEA AND THE SHIELD ──────────────────────────────────────────────────────────────────────────────────────
+
+test('AUDIT 27h S2: no way back from death comes up running - the Resurrect, the Hold\'s rise, and every load', () => {
+  const w = rd('src/scenes/world.js');
+  const rez = w.slice(w.indexOf('function resurrectInPlace(rez) {'), w.indexOf('function closeDeathScreen() {'));
+  assert.match(rez, /^\s*player\.stopAutorun\(\);/m, 'a party member\'s Resurrect');
+  const load = w.slice(w.indexOf('async function worldQuickLoad('), w.indexOf('async function worldQuickLoad(') + 8000);   // PIN MOVED (DUPE-LOAD): 6000 -> 8000, the windows closed before the save is read stand above it now
+  assert.match(load, /cameraRecoiler\.reset\(\);\n\s*resetVitalsDetector\(\);[^\n]*\n\s*player\.stopAutorun\(\);/, 'a load (F11 off the death screen) - the incoming character inherits no latch, as it inherits no reel');
+  const m = rd('src/scenes/worldModes.js');
+  assert.match(m, /player\.spawn\(spawn\[0\], spawn\[1\], spawn\[2\]\);\n\s*player\.stopAutorun\(\);/, 'the Privateer\'s Hold rise');
+  // the dungeons' loads: each host's ONE load law (DIAL-LOAD - every load its context runs lands by it), RUN out of
+  // the live source, where this pin used to count copies of an applier's text
+  const placed = [];
+  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): worldModes' law lands a saved fall after the spawn - none is handed
+  // here, and fb0930_fallkept.test.js runs it on the real motor.
+  const motor = { spawn: (...p) => placed.push(['spawn', ...p]), stopAutorun: () => placed.push(['stop']), restoreFall: () => {} };
+  constOf(m, 'placeLoadedPlayer', { player: motor })([1, 2, 3]);
+  constOf(rd('src/scenes/dungeon.js'), 'placeLoadedPlayer', { _motorRef: motor })([4, 5, 6]);
+  assert.deepEqual(placed, [['spawn', 1, 2, 3], ['stop'], ['spawn', 4, 5, 6], ['stop']], 'the world-hosted dungeon\'s loads and the standalone\'s drop the latch');
+});
 
 // sw1_shield_widget.test.js's harness (the mod's defaults; Recoil off, so only a re-read repoints the sheet)
 const RAW = {
@@ -203,10 +307,24 @@ test('AUDIT 27h B1: a tile owns a press and ITS release - a press of the world\'
   const idle = endingGesture(() => null, (b) => ended.push(b));
   const d7 = ev(A); idle.down(d7); const m7 = ev(A); idle.menu(m7);
   assert.deepEqual([d7.stopped, m7.prevented, ended.length], [false, false, 1]);
+  // the wiring: every press anywhere clears it first (the window's capture), and the HUD's teardown takes that listener
+  const hud = rd('src/ui/enhanced/enhancedHud.js');
+  assert.match(hud, /globalThis\.addEventListener\?\.\('mousedown', g\.forget, true\);\n\s*holds\.push\(\{ off: \(\) => globalThis\.removeEventListener\?\.\('mousedown', g\.forget, true\) \}\);/);
+  // HB1c's twin, the hotbar's sockets in mouse mode: the same law - a socket's press and ITS release, cleared at every
+  // press by the bar's own window capture (onMouse) before a socket hears it
+  const bar = rd('src/ui/enhanced/enhancedHotbar.js');
+  assert.match(bar, /function onMouse\(e\) \{\n\s*hbTook = null;/);
+  assert.match(bar, /node\.addEventListener\('mousedown', \(e\) => \{\n\s*if \(!editable\(\)\) return;\n\s*hbTook = \{ node, button: e\.button \};\n\s*e\.stopPropagation\(\);\n\s*\}\);/);
+  assert.match(bar, /node\.addEventListener\('mouseup', \(e\) => \{ if \(hbTook\?\.node === node && hbTook\.button === e\.button\) e\.stopPropagation\(\); \}\);/);
+  assert.match(bar, /window\.addEventListener\('mousedown', onMouse, true\);/, 'on the window\'s capture, so it runs first');
 });
 
 test('AUDIT 27h B2: the classic icons are where they were last DRAWN - a hidden HUD answers none', () => {
   assert.deepEqual(activeSpellIconsPlaced(), [], 'never drawn, nothing to click');
+  const hud = rd('src/ui/hud/hud.js');
+  assert.equal((hud.match(/if \(!hudDrawn\) \{ _placedSpellIcons = \[\]; return; \}/g) ?? []).length, 2, 'both skins\' hidden returns empty the rects (Shift-F10)');
+  assert.match(hud, /export const activeSpellIconsPlaced = \(\) => \(nowMs\(\) - _placedAt <= PLACED_FRESH_MS \? _placedSpellIcons : \[\]\);/, 'and a placement no longer drawn answers none');
+  assert.match(hud, /_placedSpellIcons = drawActiveSpells\([\s\S]{0,120}?\}\);\n\s*_placedAt = nowMs\(\);/);
 });
 
 // ── H: THE SPELL MAKER'S HOLD AND FIELD ────────────────────────────────────────────────────────────────────────────
@@ -241,5 +359,28 @@ test('AUDIT 27h H1: a spinner act of an editor since shut presses nothing - its 
   assert.equal(clicks, 0, 'no stale act reached the classic window (where Buy spell, Add effect and the slots stand now)');
   assert.equal(w.slots[0].settings.magnitudeBaseHigh, was, 'and no stale set wrote the slot');
   assert.equal(w.editor, null);
+  // the port's own half: each repeat reads the LIVE view before it finds its button
+  const port = rd('src/ui/enhanced/enhancedPort.js');
+  assert.match(port, /try \{ view = win\.done \? null : spec\.view\(proxy\); \} catch \{ view = null; \}\n\s*if \(!view\) \{ stopHold\(\); return; \}\n\s*const vs = viewSig\(view\);\n\s*if \(vs !== sig\) \{ sig = vs; render\(view\); \} else acts = collectActs\(view\);\n\s*const btn = /);
 });
 
+test('AUDIT 27h H2-H7: the field keeps the browser\'s keys swallowed, its focus and its scroll; a typed value commits before a press; the pad\'s release is heard', () => {
+  const port = rd('src/ui/enhanced/enhancedPort.js');
+  // H2: F5/F6/F11 typed in the field - the hosts' swallow never heard them, and F5 reloaded the page
+  assert.match(port, /e\.stopPropagation\(\);   \/\/ the field's keys are the field's\n\s*swallowBrowserKey\(e\);/);
+  assert.match(port, /^import \{ swallowBrowserKey \} from '\.\.\/input\.js';/m);
+  // H3: a value clamped to the one already set repaints the field from the model
+  assert.match(port, /fn\(v\);\n\s*sig = '';/);
+  // H4: the focused field keeps its focus (by place), its uncommitted text and its selection through a rebuild
+  assert.match(port, /const fi = had \? fieldsOf\(\)\.indexOf\(had\) : -1;/);
+  assert.match(port, /const nf = kept \? fieldsOf\(\)\[fi\] : null;\n\s*if \(nf\) \{\n\s*if \(kept\.dirty\) nf\.value = kept\.value;\n\s*nf\.focus\?\.\(\{ preventScroll: true \}\);/);
+  // H5: the body keeps its scroll, per view
+  assert.match(port, /main\.dataset\.scrollKey = `body:\$\{view\.title \?\? ''\}`;/);
+  // H6: the pad's release on the pressed node (rebuilt away, so the document never hears it)
+  assert.match(port, /spin\.addEventListener\('pointerup', onRelease, \{ once: true \}\);\n\s*spin\.addEventListener\('pointercancel', onRelease, \{ once: true \}\);/);
+  // H7: a typed value goes in at a button's CLICK, before its act (Done shut the editor with it still in the field)
+  assert.match(port, /e\.stopPropagation\(\);\n\s*if \(b && !b\.disabled\) commitTyped\(\);/);
+  assert.match(port, /const commitTyped = \(\) => \{\n\s*const f = doc\.activeElement;\n\s*if \(f && host\?\.contains\?\.\(f\) && f\.matches\?\.\('input\[data-s\]'\)\) f\.blur\(\);\n\s*\};/);
+  // ...and H1's second half: every spinner act is its own editor's
+  assert.match(rd('src/ui/enhanced/enhancedPorts.js'), /const live = \(fn\) => \(\.\.\.a\) => \(w\.editor === ed \? fn\(\.\.\.a\) : undefined\);/);
+});

@@ -152,6 +152,18 @@ test('AUDIT-SEATS C1 THE HUD\'S WAY OUT: the bar\'s Leave and the result card\'s
   hud.destroy();
 });
 
+test('AUDIT-SEATS C1 THE WORLD\'S WAYS OUT by source: the one door (whichever is entered), the HUD\'s and the chat\'s, the sessions told where the seat is, the dead and a frame with no online tick (mutants: each wire)', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const leaveBattle = \(\) => !!\(siegeSession\?\.leave\(\) \|\| royalSession\?\.leave\(\)\);/);
+  assert.match(w, /siegeHud = createSiegeHud\(document, \{ onClaim: \(\) => siegeClaims\.offer\(\{ force: true \}\), onLeave: \(\) => leaveBattle\(\) \}\);/);
+  assert.match(w, /if \(isBattleLeaveCommand\(text\)\) \{\n\s*if \(!leaveBattle\(\)\) chatLog\.push\(tabId, \{ text: BATTLE_NONE_TEXT, system: true \}\);\n\s*return true;\n\s*\}/);
+  assert.equal((w.match(/here: \(seat\) => atSeat\(seat\)/g) ?? []).length, 2, 'both sessions');
+  assert.match(w, /const atSeat = \(seat\) => \{\n\s*if \(!Array\.isArray\(seat\?\.pixel\) \|\| \(modes\?\.mode \?\? 'exterior'\) === 'dungeon'\) return false;\n\s*const p = playerTravelPixel\(\);\n\s*return Math\.abs\(p\.x - seat\.pixel\[0\]\) <= 1 && Math\.abs\(p\.y - seat\.pixel\[1\]\) <= 1;/);
+  const frame = w.slice(w.indexOf('const gateFrame = () => {'), w.indexOf('const gateFrame = () => {') + 3500);
+  assert.match(frame, /if \(townTalk\.overlay instanceof DeathScreen \|\| modes\?\.deathUp\?\.\(\)\) \{ leaveBattle\(\);/, 'the dead leave it - the gate\'s frame runs before the death return');
+  assert.match(w, /onlineFrame\(now, dt\); \} else \{[^\n]*courtRing\(\) : null; if \(!player\.arena\) player\.arena = arenaBouts\.ring\(\); \/\* ARENA2[^*\n]*\*\/ siegeHud\?\.hide\(\); \/\*/);   // the arena merge: ARENA2's bout ring stands before it
+});
+
 test('AUDIT-SEATS C2 ONE MINT SLOT: a leave clears net/online.js mintSiegePass only while it is its own (another battle\'s stays); a fresh enter lets its old one go; the world enters one battle at a time (mutants: the ownership test; the doors\' leaves)', async () => {
   let now = AT;
   const online = { id: 'p1', room: '', status: 'open', terminal: false, mintSiegePass: null, sendSiege: () => true };
@@ -189,6 +201,9 @@ test('AUDIT-SEATS C2 ONE MINT SLOT: a leave clears net/online.js mintSiegePass o
   other.leave({ quiet: true });
   assert.equal(await online.mintSiegePass(), 'v1.royal.x', 'a siege that never joined clears nothing of the tourney\'s');
   rs.leave({ quiet: true });
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /if \(field\) royalSession\?\.leave\(\);   \/\/ AUDIT-SEATS C2[^\n]*\n\s*return siegeSession\.enter\(seat, fight, field\);/);
+  assert.match(w, /if \(field\) siegeSession\?\.leave\(\);   \/\/ AUDIT-SEATS C2[^\n]*\n\s*return royalSession\.enter\(seat, royal, field, \{ watch \}\);/);
 });
 
 test('AUDIT-SEATS C3 AN UNSETTLED FIELD BACKS OFF: said once, asked again after 5 s, 10, 20, 40, then every 60 s - twenty minutes ask some twenty-three times, never the 121 that ran into the service\'s hourly bound; a Royal Tourney\'s ring the same (mutants: the doubling; the ceiling; the once)', async () => {
@@ -215,6 +230,18 @@ test('AUDIT-SEATS C3 AN UNSETTLED FIELD BACKS OFF: said once, asked again after 
   assert.ok(asked <= 26 && said.length === 1, `${asked} asks, ${said.length} lines`);
 });
 
+test('AUDIT-SEATS C4 THE FIRST SEAT TOWN: the arrival waits on the seats\' read and is said while the player still stands in that town; the seats read as the online session starts (mutants: the wait; the still-there; the start\'s read)', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const arrive = \(\) => \{\n\s*if \(!stillAt\(mapId\)\) return;\n\s*const seat = seatHere\(mapId\);/);
+  assert.match(w, /const stillAt = \(mapId\) => _wasInLocationRect && _musicLoc\?\.mapTableData\?\.mapId === mapId;/);
+  assert.match(w, /if \(seatBook\) seatBook\.read\(\)\.then\(arrive, arrive\); else Promise\.resolve\(\)\.then\(arrive\);/);
+  assert.doesNotMatch(w, /seatBook\?\.read\(\);\n\s*const seat = seatHere\(mapId\);/, 'never read un-awaited and asked at once');
+  assert.match(w, /\n\s*seatBook\.read\(\);   \/\/ AUDIT-SEATS C4: the seats read as the session starts/);
+  const start = w.indexOf('const onlineStart = () => {');
+  const read = w.indexOf('seatBook.read();   // AUDIT-SEATS C4');
+  assert.ok(start > 0 && read > start, 'in the online session\'s start');
+});
+
 test('AUDIT-SEATS C5 THE RECEIPTS OFFERED ON THEIR OWN CLOCK: `due` says, in sync, whether an unforced offer would go (something kept, none in flight, the retry run) - the gate\'s frame asks it each frame and offers then (mutants: each term; the frame\'s two)', async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   let now = AT;
@@ -239,6 +266,20 @@ test('AUDIT-SEATS C5 THE RECEIPTS OFFERED ON THEIR OWN CLOCK: `due` says, in syn
   const r = createRoyalClaims({ claim: async () => ({ ok: true }), me: () => 'acct-me01', nowMs: () => now, storage: null });
   r.keep(await mintRoyalReceipt({ s: 'acct-me01', l: 'acct-them', sk: 5023, sw: 20, n: 1 }, kp.privateKey, { subtle, nowS: Math.floor(now / 1000) }));
   assert.equal(r.due(), true, 'the bouts\' carrier too');
+  const w = hostText('src/scenes/world.js');
+  const frame = w.slice(w.indexOf('const gateFrame = () => {'), w.indexOf('const gateFrame = () => {') + 3000);
+  assert.match(frame, /if \(siegeClaims\?\.due\(\)\) siegeClaims\.offer\(\);/);
+  assert.match(frame, /if \(royalClaims\?\.due\(\)\) royalClaims\.offer\(\);/);
+  assert.match(w, /let siegeClaims = null, royalClaims = null, siegeHud = null;/, 'kept where the frame can reach them');
+});
+
+test('AUDIT-SEATS C6 THE RELAY\'S CLOCK: both sessions and both carriers read the shared offset the rest of the scene reads (mutants: each nowMs)', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const battleNowMs = \(\) => Date\.now\(\) \+ _sharedOffsetMs;/);
+  assert.match(w, /siegeSession = createSiegeSession\(\{[^\n]*\n\s*nowMs: battleNowMs, here: \(seat\) => atSeat\(seat\) \}\);/);
+  assert.match(w, /royalSession = createRoyalSession\(\{[^\n]*\n[^\n]*name: \(id\) => peerName\(id\) \?\? '', nowMs: battleNowMs, here: \(seat\) => atSeat\(seat\) \}\);/);
+  assert.match(w, /siegeClaims = createSiegeClaims\(\{[^\n]*nowMs: battleNowMs,/);
+  assert.match(w, /royalClaims = createRoyalClaims\(\{[^\n]*nowMs: battleNowMs \}\);/);
 });
 
 test('AUDIT-SEATS C7 EVERY SETTLING ANSWER REACHES THE CARD: claimed before, a void battle, a receipt that is not the relay\'s - each said in the Honours\' place, the Claim gone; a mendable refusal keeps it claimable; an older battle\'s answer is not this card\'s (mutants: the carrier\'s every-answer; the refusal\'s words; the receipt test)', async () => {
@@ -277,6 +318,7 @@ test('AUDIT-SEATS C7 EVERY SETTLING ANSWER REACHES THE CARD: claimed before, a v
   t.ses.claimed({ ok: true, honours: { marks: 50, xp: 2000 } }, mine);
   t.ses.tick();
   assert.match(t.hud.at(-1).card.honour, /50 silver/);   // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - silver, as every sentence says it
+  assert.match(hostText('src/scenes/world.js'), /onClaimed: \(a, r\) => siegeSession\?\.claimed\(a, r\)/);
 });
 
 /** The Seat tab over a scripted book and a window stand-in. */
@@ -359,6 +401,18 @@ test('AUDIT-SEATS C10 THE WATCH KEPT THROUGH A SESSION RUN OUT: `auth` and `no-s
   }
 });
 
+test('AUDIT-SEATS C11 THE HALL OF RECORDS READ ONCE AT A TIME: a press while a read is in flight sends nothing; a book that lands over a window opened meanwhile (or after the player left) is disposed, never put in its place; the castle\'s the same (mutants: the flag; the overlay test; the dispose)', () => {
+  const m = rd('src/scenes/worldModes.js');
+  const palace = m.slice(m.indexOf('function openHallOfRecords(b) {'), m.indexOf('const castleRecordsHere = '));
+  assert.match(palace, /if \(recordsReading\) return;\n\s*recordsReading = true;/);
+  assert.match(palace, /recordsReading = false;\n\s*if \(interiorBuilding !== b \|\| interiorOverlay\) \{ dropRecords\(w\); return; \}/);
+  assert.match(palace, /\.catch\(\(\) => \{ recordsReading = false; say\(HALL_OF_RECORDS_SHUT\); \}\);/);
+  const castle = m.slice(m.indexOf('function openCastleRecords() {'), m.indexOf('function openCastleRecords() {') + 900);
+  assert.match(castle, /if \(recordsReading\) return;\n\s*recordsReading = true;/);
+  assert.match(castle, /if \(mode !== 'dungeon' \|\| dungeonLoc !== at \|\| dungeonCtx\?\.overlayWindow\?\.\(\)\) \{ dropRecords\(w\); return; \}/);
+  assert.match(m, /const dropRecords = \(w\) => \{ try \{ w\?\.dispose\?\.\(\); \} catch \{ \/\* already gone \*\/ \} \};/);
+});
+
 test('AUDIT-SEATS C12 NOTHING MADE A FRAME FOR NOTHING: the Watch\'s due asked in sync agrees with its claim; a ribbon\'s tints parsed once; the seats\' banners one kept list, refilled in place as the origin moves (mutants: the due\'s terms; the cache; the kept list)', async () => {
   // the Watch's due
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -386,12 +440,15 @@ test('AUDIT-SEATS C12 NOTHING MADE A FRAME FOR NOTHING: the Watch\'s due asked i
   assert.equal(b2.claimWatchDue(), false);
   now += 1000;
   assert.equal(b2.claimWatchDue(), true, 'the oldest ten minutes old');
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /if \(seatBook\?\.claimWatchDue\(\)\) seatBook\.claimWatch\(\);/);
   // the ribbon
   const a = ribbonTints([0, 2]);
   assert.deepEqual(a, ribbonRgba([0, 2]));
   assert.equal(ribbonTints([0, 2]), a, 'the same tints, not parsed again');
   assert.equal(ribbonTints([1, 1]), null);
   assert.equal(ribbonTints('junk'), null);
+  assert.match(rd('src/net/remotePlayers.js'), /const band = ribbonTints\(n\.rb\);/);
   // the banners
   let t = [100, 0, 200];
   const anchors = Array.from({ length: 3 }, (_, i) => ({ top: [i, 1, 0], right: [1, 0, 0], out: [0, 0, 1] }));
@@ -435,6 +492,7 @@ test('AUDIT-SEATS G1 THE MARKS: the Turning that placed a battle, 24 hours, 1 ho
   assert.equal(fightAnnouncement(f, 'Anticlere'), `The Silver Hand <SH> has won the Right of Siege at Anticlere. Ebon Oath <EO> holds its Charter. Battle is joined ${battleWhenText(start)}.`);
   assert.notEqual(battleWhenText(start), battleWhenText(start / 1000), 'the seconds read as seconds');
   assert.equal(fightAnnouncement({ kind: 'siege' }, 'x'), null);
+  assert.match(rd('src/ui/seatTab.js'), /out\.append\(el\('p', 'notice-seat-battle', fightAnnouncement\(f, seat\.name\)\)\);/);
 });
 
 test('AUDIT-SEATS G1 THE HERALD: each battle at a seat this client derives said in red at each mark, ONCE a page however often the list is read; a page opened late hears the latest mark alone; nothing once joined; a void battle and a seat the derivation lacks never; a line the chat cannot take yet offered again; its start read once a seat a week, or taken from the list (mutants: the once; the late; the void; the derivation; the retry; the one read)', async () => {
@@ -504,6 +562,9 @@ test('AUDIT-SEATS G1 THE HERALD: each battle at a seat this client derives said 
   named = false; n6 = start - 3_600_000 + 5; h6.tick();
   assert.deepEqual(s6, [line], 'the day\'s mark, and no hour\'s');
   assert.equal(seatWeekOf(start), week);
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /siegeHerald = createSiegeHerald\(\{\n\s*seats: \(\) => \(seatBook\.open === true \? seatBook\.data\?\.seats \?\? null : null\),\n\s*fightOf: \(key\) => seatBook\.standings\(key\)\.then\(\(r\) => r\?\.data\?\.fight \?\? null\),\n\s*nameOf: \(key\) => seatAtMapId\(townSeats, key\)\?\.name \?\? null,\n\s*say: \(text, at\) => \(redChat \? redChat\(\{ text, at \}\) : false\),\n\s*nowMs: battleNowMs,/);
+  assert.match(w, /siegeHerald\?\.tick\(\);/);
 });
 
 test('AUDIT-SEATS G5 A SHAFT, A SPELL AND THE WARDS: an arrow\'s blow is a shaft\'s on the wire; a harmful spell\'s harm and a heal\'s restoring counted through the one spell door (the heal as a gift lands - no save), clamped to what the referee keeps; Teleport (its Recall) and Levitate refused (mutants: the kind; each count; the self-cast; the clamps; the barred list)', () => {
@@ -609,9 +670,31 @@ test('AUDIT-SEATS G4 A SPECTATOR\'S FREE CAMERA: while the host says I watch a b
     applyMotorEffectFlags(player, { activeEffects: [] });
     assert.deepEqual(writes, [false], 'a flight that throws lifts nothing');
   } finally { registerFreeFlight(null); registerLevitateWard(null); }
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const spectatingHere = \(\) => \{\n\s*const b = siegeSession\?\.active\(\) \? siegeSession : royalSession;\n\s*return !!b\?\.active\(\) && b\.side\(\) === 'watch' && !!online\?\.room && online\.room === b\.room\(\);/);
+  assert.match(w, /registerFreeFlight\(\(\) => spectatingHere\(\)\);/);
+  assert.match(w, /if \(watching\) \{ if \(!_watchedFrom\) _watchedFrom = campToWire\(player\.pos\); return; \}/);
+  assert.match(w, /if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{\n\s*const q = campToScene\(_watchedFrom\);\n\s*player\.pos\[0\] = q\[0\]; player\.pos\[1\] = q\[1\]; player\.pos\[2\] = q\[2\];\n\s*player\._airVelX = 0; player\._airVelZ = 0; player\.velY = 0; player\.falling = false; player\.fallStart = player\.pos\[1\];/);
+  assert.match(w, /\n\s*spectatorFrame\(\);   \/\/ AUDIT-SEATS G4/);
+  assert.match(w, /\{ leaveBattle\(\); _watchedFrom = null; \}/);
 });
 
 test('AUDIT-SEATS G5 THE WORLD\'S BATTLE ARMS by source: the swing and the shaft one door with their kinds; the arrows and the cast engine see a battle\'s foes outside a duel; a heal on a side-mate goes to the referee; the wards and the saddle in a siege\'s room; the side-mates (mutants: each wire)', async () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const duelStrikeOut = \(by, weapon, swing, drawMs = 0, to = null, \{ off = false \} = \{\}\) => \{[^\n]*\n\s*if \(!duelMgr\.fighting\) return siegeStrikeOut\(to, by, weapon, swing, drawMs, \{ off \}\);/);   // PIN MOVED (TWO-HANDS AUDIT): the off hand's blow rides along
+  assert.match(w, /const duelSpellOut = \(peerId, sp\) => \{\n\s*if \(!duelMgr\.fighting\) return siegeSpellOut\(peerId, sp\);/);
+  assert.match(w, /siegeStrikeOut\(best, 'melee', weaponRig\.playerWeapon\.strikingWeapon, weaponRig\.playerWeapon\.machine\?\.state, 0, \{ off: weaponRig\.playerWeapon\.offStrike \}\);/);   // PIN MOVED (TWO-HANDS AUDIT)
+  assert.match(w, /battle\.blow\(to, \{ w: weapon \? weapon\.templateIndex : -1, m: held\?\.material \?\? 0, d: r\.dmg, r: siegeBlowKind\(by\) \}\);/);
+  assert.match(w, /duelStrikeOut\('arrow', m\.weapon \?\? null, 'StrikeDown', weaponRig\.playerWeapon\?\.lastDrawMs \?\? 0, t\.id, \{ off: !!weaponRig\.playerWeapon\?\.isOffHandItem\?\.\(m\.weapon\) \}\)/);
+  assert.match(w, /const duelArrowTargets = \(\) => \{\n\s*if \(!duelMgr\.fighting\) \{\n\s*const bodies = battleFoeBodies\(royalSession\?\.active\(\) \? royalSession : siegeSession\);/);
+  assert.match(w, /duelMark: \(\) => \{ if \(!duelMgr\.fighting\) return siegeSpellMarks\(\);/);
+  assert.match(w, /return harm > 0 && siegeSession\.cast\(peerId, siegeCastClamp\(harm, false\)\);/);
+  assert.match(w, /const castAtAllyDoor = \(id, frame\) => siegeHealOut\(id, frame\) \|\| !!online\?\.sendCast\?\.\(frame\);/);
+  assert.match(w, /return heal > 0 && siegeSession\.cast\(id, siegeCastClamp\(heal, true\), true\);/);
+  assert.match(w, /spellRefusal: \(sp\) => battleSpellRefusal\(sp\),/);
+  assert.match(w, /const battleSpellRefusal = \(sp\) => \(inSiegeRoom\(\) && siegeSpellBarred\(sp\) \? SIEGE_SPELL_BARRED_TEXT : null\);/);
+  assert.match(w, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/);   // SD7b (PIN MOVED): and the Shattered Hour's - its Steps walked, not flown; PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
+  assert.match(w, /if \(inSiegeRoom\(\) && isRiding\(player\.transportMode\)\) \{ setTransportModeHere\(TRANSPORT_MODES\.Foot\); townTalk\.say\(SIEGE_DISMOUNT_TEXT\); \}/);
   // the side-mates the heal reaches: standing, of my side, never me
   const t = siegeRig();
   t.ses.enter(ANTICLERE, FIGHT, [[1, 2]]); await settle();

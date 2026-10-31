@@ -61,9 +61,22 @@ const press = { stopPropagation() {} };
 test('AUDIT LOOT II A1: a player\'s fall is billed in one home - DFU\'s bill, the Long Road off it, below ground as above', () => {
   on();
   const walker = { isPlayer: true, _mods: {} }, pilgrim = { isPlayer: true, _mods: { fallLess: 50 } };
+  for (const d of [6, 9.5, 14, 30]) {
+    const dfu = Math.trunc(FALL_HP_PER_METRE * (d - FALL_DAMAGE_THRESHOLD));
+    assert.equal(playerFallDamage(walker, d), dfu, `DFU's own at ${d} m`);
+    assert.equal(playerFallDamage({ isPlayer: true }, d), dfu, 'nothing folded: DFU\'s');
+    assert.equal(playerFallDamage(pilgrim, d), Math.trunc(FALL_HP_PER_METRE * (d - FALL_DAMAGE_THRESHOLD) * 0.5));
+    assert.equal(playerFallDamage({ _mods: { fallLess: 400 } }, d), Math.trunc(FALL_HP_PER_METRE * (d - FALL_DAMAGE_THRESHOLD) * (1 - WARDROBE_FALL_MOST / 100)), 'at most its cap');
+  }
   let billed = 0;
   applyFallLanding(pilgrim, 14, { hurt: (n) => { billed += n; }, sound: () => {} });
   assert.equal(billed, playerFallDamage(pilgrim, 14), 'the three hosts\' landing bills it');
+  // the dungeon's own landing (dungeonContext.js reportActivity) reads it - before, it billed DFU's inline and the
+  // Pilgrim's Sandals did nothing below ground
+  const d = read('src/scenes/dungeonContext.js');
+  const arm = d.slice(d.indexOf('if (fell > FALL_DAMAGE_THRESHOLD) {'));
+  assert.match(arm.slice(0, 200), /const _fallDmg = playerFallDamage\(playerEntity, fell\);/);
+  assert.equal(/FALL_HP_PER_METRE \* \(fell/.test(d), false, 'no bill of its own');
 });
 
 test('AUDIT LOOT II A2: a Legendary garment\'s degrees come off the felt number on their own side alone, never past comfortable - the Wayfarer\'s Robes never chill a cold night', () => {
@@ -410,6 +423,9 @@ test('AUDIT LOOT II B6: the card makes one comparison for both its blocks, and t
       assert.equal(lineCompareBlock(e, next, untouched), null, 'off: none, and nothing compared');
     } finally { on(); }
   });
+  const card = read('src/ui/enhanced/enhancedInventory.js');
+  assert.equal((card.match(/wearComparison\(/g) ?? []).length, 1, 'one comparison a card');
+  assert.match(card, /compareBlock\(deps\.entity, picked, \(it\) => itemLongName\(it, \{ getQuest: deps\.getQuest \?\? null \}\), wear\)/);
 });
 
 test('AUDIT LOOT II C1: a honed made piece is no longer what its record mints - the market carries it whole, never minted back to its roll', () => {
@@ -423,3 +439,10 @@ test('AUDIT LOOT II C1: a honed made piece is no longer what its record mints - 
   assert.equal(asMinted(mw), false, 'honed: the record mints the roll, not the hone');
 });
 
+test('AUDIT LOOT II C5: a sold piece\'s junk mark ends at the shelf - both of the host\'s sales', () => {
+  const wm = read('src/scenes/worldModes.js');
+  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): a sold piece lands through landSold (the shelf for an honest piece)
+  const pushes = [...wm.matchAll(/landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);[^\n]*\n\s*setJunk\(it, false\);/g)];   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
+  assert.equal(pushes.length, 2, 'the counter\'s sale and the keyed shelf\'s');
+  assert.match(wm, /import \{ setJunk \} from '\.\.\/systems\/item\/itemJunk\.js';/);
+});

@@ -220,9 +220,53 @@ test('WB3b the link: the relay\'s words folded into one state - a whole state st
 });
 
 test('WB3b the seams, by source: the dungeon host enters the court through its own transition (the made level whole, its blocks file, the court stood before the marker is read, the way home landing before the gate - GATE-FBX: no exit door of its own, the portal\'s named the way home), wears the Deadlands\' air and braziers there, and names its room the gate\'s; the context refuses the map, the rest and the save; the world host opens the door at a relay that runs the room, keys the court\'s room, says the level claim once per welcome, holds the ring, casts a death out before the gate, refuses the mark, and ends the court with its day or with online (mutants: each seam removed)', () => {
+  const wm = read('src/scenes/worldModes.js');
+  assert.match(wm, /async function enterGateArena\(g\) \{[\s\S]{0,1500}return gatedTransition\(\(live\) => dungeonTransition\(hit, \[\], true, live\)\);/);   // AUDIT WB B3/B5: the door's two checks after the fire widened it
+  assert.match(wm, /const sized = dungeonLocationFor\(hit\.dfLocation, /, 'the court\'s one block passes the sizing law whole');
+  assert.match(wm, /const dfLocation = ownDungeonLocation\(sized\);/, '...into the build\'s own copy (OH-E)');
+  assert.match(wm, /dfLocation, hit\.blocksFile \?\? blocks, dfLocation\.climate\.climateType, \{/);
+  const stood = wm.indexOf('if (hit.gateArena) gateStand.standCourt(ctx, hit.gateArena.day);'), marker = wm.indexOf('const spawn = ctx.startSpawn({ preferEnterMarker });');   // WB14b: stood by scenes/gate/gateStand.js, the night's
+  assert.ok(stood > 0 && stood < marker, 'the court stands before its start marker is read (the spawn lands on its floor)');
+  assert.ok(stood < wm.indexOf("ctx.addActivationNamer((key) => (typeof key === 'string' && key.startsWith('exit:') ? staticDoorName('dungeonExit'"), 'and its way home is named before the dungeon exit\'s own namer');
+  assert.match(wm, /gate: hit\.gateArena \?\? null,/);
+  assert.match(wm, /const returnLanding = \(\) => \(dungeonReturn\.gate \? host\.gateLanding\?\.\(dungeonReturn\.gate\) \?\? null : (?:dungeonReturn\.arena \? host\.arenaLanding\?\.\(\) \?\? (?:dungeonReturn\.arenaFrom \?\? )?null : )?dungeonEntranceLanding\(/);   // ARENA2: the arena floor's way out sits between, after the gate's
+  assert.match(wm, /const landing = returnLanding\(\);/);
+  assert.match(wm, /if \(isGateArena\(dungeonLoc\)\) applyFog\(renderer, dungeonFog\(!!renderer\.lightingLane, COURT_FOG\)\);/);
+  // WB4a: the boss's glow joins them - WB9b: the fight's own lights first, the braziers nearest first after (the cap drops a far court's fire)
+  assert.match(wm, /if \(isGateArena\(dungeonLoc\)\) \{ const _court = withCourtLights\(_dgLit, \[\.\.\.\(host\.gateCourtLights\?\.\(\) \?\? \[\]\), \.\.\.courtLightsNear\(cam\.pos, planOfDay\(dungeonLoc\.gate\)\)\]\); renderer\.setPointLights\(_court\.data, null, _court\.colors\); \}/);   // WB14b: the night's braziers
+  // GATE-FBX: the court lays no door of its own (the bridge's membrane is gone) - the portal's, laid at his fall, is named the way home
+  // WB14b (PIN MOVED): the court is stood by scenes/gate/gateStand.js (out of the host whole) - the night's floors
+  const gs = read('src/scenes/gate/gateStand.js');
+  assert.match(gs, /function standCourt\(ctx, day = null\) \{[\s\S]{0,2800}\n\s*ctx\.addActivationNamer\(\(key\) => \(typeof key === 'string' && key\.startsWith\('exit:'\) \? \{ title: COURT_TEXT\.wayHome \} : null\)\);/, 'the way home named the way home');
+  assert.doesNotMatch(gs.slice(gs.indexOf('function standCourt(ctx, day = null) {'), gs.indexOf('function standCourt(ctx, day = null) {') + 2800), /exitDoors\.push/, 'and no door of its own');
+  assert.match(wm, /blocksFile: gateArenaBlocks\(blocks, g\.day\)/, 'the start marker on the night\'s root floor');
+  assert.match(wm, /isGateArena\(dungeonLoc\) \? \{ kind: 'gate', day: dungeonLoc\.gate \}/);
+  assert.match(gs, /ctx\.collider\.addMesh\(COURT_BUCKET, tris, idx, identity\(\)\);/);
+  assert.match(wm, /if \(hit\.gateArena\) cam\.yaw = Math\.PI;/, 'arriving by the bridge, facing him');
+  const dc = read('src/scenes/dungeonContext.js');
+  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the court's refusals are its row's, in COURT_TEXT's own words
+  for (const [what, re] of [['the map', /toggleAutomap\(\) \{\n\s+if \(activeOverlay\) return;\n\s+if \(madeLevelRule\(_made, 'automap'\) === 'off'\) \{ hudText\.add\(madeLevelSays\(_made, 'automap'\)\); return; \}/],
+    ['the rest', /toggleRest\(\) \{\n\s+if \(activeOverlay\) return;\n\s+if \(madeLevelRule\(_made, 'rest'\) === 'refused'\) \{ hudText\.add\(madeLevelSays\(_made, 'rest'\)\); return; \}/],
+    ['the save', /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}[^\n]*\n(?:[^\n]*isArenaFloor\(dfLocation\)[^\n]*\n)?\s+const snap = snapshotPlayer\(/],   // ARENA2: the arena floor's own refusal may follow   // REALM P0.5: a quiet checkpoint is refused in silence
+    ['the pause\'s save', /savingPrevented: \(\) => madeLevelRule\(_made, 'save'\) === 'refused' \|\| isArenaFloor\(dfLocation\),/]]) assert.match(dc, re, what);   // SD5a (PIN MOVED): the Shattered Hour's refusal beside the court's
   assert.deepEqual(['automap', 'rest', 'save', 'mark'].map((r) => madeLevelSays('court', r)), [COURT_TEXT.noMap, COURT_TEXT.noRest, COURT_TEXT.noSave, COURT_TEXT.noMark], 'in the court\'s own words');
   assert.deepEqual(['automap', 'rest', 'save'].map((r) => madeLevelRule('court', r)), ['off', 'refused', 'refused'], 'the court keeps no map, no rest, no save');
+  const w = read('src/scenes/world.js');
+  assert.match(w, /ready: \(\) => !!online\?\.gateOk,/);
+  assert.match(w, /enter: \(g\) => \{ modes\?\.enterGateArena\?\.\(g\); \},/);
+  assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'gate'\) key = \(gateLink\?\.room \?\? gateRoomKey\)\(modes\?\.roomIdentity\?\.\(\)\?\.day\);/);   // PIN MOVED (GATE-COURTS): the court the night's book seats me in
+  assert.match(w, /if \(gateLink && online\.gateOk && isGateRoom\(online\.room\) && \(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in', lv: Math\.max\(1, playerEntity\.level \| 0\), bv: GATE_BRAIN_V \}\)\) _gateInFor = online\.welcomes;/);   // PIN MOVED (COURT-WATCH): and a watcher's ask again; AUDIT WBX R7: the brain's law said with it
+  assert.match(w, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);   // PIN MOVED (INT11): the count's fall heard beside the link
+  assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onGate = \(g\) => gateLink\?\.word\(g\);/);
+  // WB9b: the three courts' floor, as far as the walkways are laid - one arena, its crossings and clock refilled each frame
+  assert.match(w, /if \(!player\.arena && modes\?\.gateArenaDay\?\.\(\) != null\) player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/, 'the floor in the online frame');   // WB14b: the night's plan; PIN MOVED (WB14e): guarded, as every read of modes above its making (audit24_wave37); PIN MOVED (WB14, the merge of LAYERED-GEAR): refilled by world/gate/gateArena.js courtArenaAt - the host's ceiling
+  assert.match(w, /if \(!onlineOn && modes\?\.gateArenaDay\?\.\(\) != null\) \{ ejectFromCourt\(COURT_TEXT\.collapse\); gateCourt\?\.leave\(\);/, 'offline, no court - and (AUDIT SS) its floor gathered on the way out');
+  // AUDIT WBX F10: the court's own frame once first - a screen asleep through midnight lands the Wrath, then is carried out
+  assert.match(w, /if \(courtDay != null && Date\.now\(\) \+ _sharedOffsetMs >= gateTimes\(courtDay\)\.wrathAt \+ GATE_COLLAPSE_MS\) \{[\s\S]{0,400}?try \{ gateCourt\?\.frame\(\); \} catch[^\n]*\n\s*ejectFromCourt\(COURT_TEXT\.collapse\);/);
+  assert.match(w, /const courtGate = modes\?\.gateArenaGate\?\.\(\) \?\? null;[\s\S]{0,200}if \(courtGate\) \{\n\s+modes\?\.forceExitToExterior\(\);\n\s+if \(landBeforeGate\(courtGate\)\) \{ gateVeil\?\.flash\(\); townTalk\.showOverlay\(new ActionTextBox\(\[COURT_TEXT\.castOut\]\)\); return; \}/, 'a death in the court is cast out before its gate');
+  assert.match(w, /function setRecallAnchor\(\) \{\n\s+if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
   assert.deepEqual([madeLevelRule('court', 'mark'), madeLevelRule('court', 'says'), madeLevelRule('court', 'recall')], ['refused', 'mid', null], 'the court refuses the Mark alone, on the mid-screen line');
+  assert.match(w, /fellAt: \(day\) => gateLink\?\.fellAt\(day\) \?\? null, {3}\/\/ WB3b: the relay's word of the kill/, 'the omen hears the kill');   // AUDIT GATE-FBX P12: the omen's own line - the rite's (AUDIT WB12d R7) is its twin
   assert.equal(gateRoomKey(200), 'gate:200');
   assert.ok(Object.values(COURT_TEXT).every((t) => typeof t === 'string' && t.length > 8));
 });

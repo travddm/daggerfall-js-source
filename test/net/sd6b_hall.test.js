@@ -232,5 +232,13 @@ test('SD6b the session: a turn goes down my own socket in the realm alone, numbe
 });
 
 test('SD6b the relay by source: a turn routed before the find\'s bucket, on the hall\'s own; judged from the socket\'s own pose; the hall said after the welcome on the world path, where a realm\'s hello goes', () => {
+  const src = read('server/src/index.js');
+  const pz = src.indexOf("      if (m.k === 'pz') {\n        if (!this._spend(ws, now, sdPzRelayGate, 'sdPzBucket', 'sdPzDrops', 'too many turns')) return;\n        if (!isSdRoom(a.key)) { this._junk(ws); return; }");
+  const found = src.indexOf("      if (!this._spend(ws, now, sdRelayGate, 'sdBucket', 'sdDrops', 'too many sd frames')) return;");
+  assert.ok(pz > 0 && found > pz, 'the turn before the find\'s bucket');
+  assert.match(src, /const \[x, , z\] = dungeonToRealm\(a\.pose\.x, a\.pose\.y \?\? 0, a\.pose\.z\);\n\s+if \(!stoneInReach\(m\.i, x, z, SD_STONE_REACH_SLACK\)\) return;/);
+  const welcome = src.indexOf('      if (!this._send(ws, welcome)) return;');
+  const hall = src.indexOf('      if (isSdRoom(a.key)) { try { if (!this._send(ws, this._sdHallWord(await this._sdHallOf(sdSlotOfRoom(a.key))))) return; }');
+  assert.ok(welcome > 0 && hall > welcome, 'after the world path\'s welcome');
   assert.equal(SD_ORRERY_KEY, 'sdorrery');
 });

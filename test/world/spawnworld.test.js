@@ -109,6 +109,64 @@ test('SPAWN-WORLD the open zone in the spawn law: a spawn the Overworld\'s far r
   assert.equal(law({ zoneMask: () => mask }).spawnAt(...zoned), null, 'in the zone: only a hall stands');
 });
 
+/** The stand as the host has it (scenes/spawnStandHost.js), lifted and run over fakes. */
+function stand({ places = new Set(), online = true } = {}) {
+  const src = rd('src/scenes/spawnStandHost.js');
+  const lift = (head, close) => { const i = src.indexOf(head); assert.ok(i > 0, head); return src.slice(i, src.indexOf(close, i) + close.length); };
+  const d = { index: new Map(), ledger: createSpawnLedger(), now: 0, inside: null, gen: 0, roads: { roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500) } };
+  const make = new Function('d', 'places', 'online', 'cloneAt', 'pathFreePixel', 'spawnsDungeon', 'CLIMATES', `
+    const params = { has: (k) => k === 'online' && online }, _spawnSalt = 1, maps = { getClimateIndex: () => 231 }, _spawnGround = () => true;
+    const terrainGen = { roads: () => d.roads }, _spawnUnroaded = new Set(), _spawnLedger = d.ledger, _insideSpawn = (k) => k === d.inside, locationIndex = d.index;
+    const cyrodiilMask = () => null, wildInside = () => false, zoneHalls = { standOf: () => null, standIn: () => null };
+    const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
+    const _arenaTemplates = {}, _countryTemplates = {}, _capitalBase = {};
+    const farm = { name: 'The Ulfgar Farmstead', country: { type: 0 } };
+    const host = { get _locIndexGen() { return d.gen; }, set _locIndexGen(v) { d.gen = v; }, _spawnClock: () => d.now, _spawnCloneAt: cloneAt,
+      capitalLocationAt: () => null, arenaLocationAt: () => null, countryLocationAt: (x, y) => (places.has(x + ',' + y) ? farm : null), lairLocationAt: () => null,
+      provinceQuestPlaces: { placeOnPixel: (x, y) => places.has(x + ',' + y) } };
+    ${lift('  const spawnedDungeonAt = (px, py) => {', '\n  };\n')}
+    ${lift('  function _locationToBuild(px, py) {', '\n  }\n')}
+    ${lift('  function spawnPastBayAt(px, py) {', '\n  }\n')}
+    return { _locationToBuild, spawnedDungeonAt };`);
+  return { d, ...make(d, places, online, cloneAt, pathFreePixel, spawnsDungeon, CLIMATES) };
+}
+
+test('SPAWN-WORLD the stand past the Bay (scenes/spawnStandHost.js, run): online the spawner stands last, after every place; kept in the index; its clocks the Bay\'s (gone past its time, never while the player is in it); a road landing on a provisional one takes it back - the index and its clocks; offline none (mutants: the spawner\'s tail, the clocks past the Bay, the roads\' take-back, the place gate)', () => {
+  const [sx, sy] = rolledAt(2200, -371);
+  const key = `${sx},${sy}`;
+  let h = stand({ places: new Set([key]) });
+  assert.equal(h._locationToBuild(sx, sy).name, 'The Ulfgar Farmstead', 'a place stands first');
+  assert.equal(h.spawnedDungeonAt(sx, sy), null, 'and the spawner itself never stands on one');
+  assert.equal(h.d.index.size, 0);
+  h = stand();
+  const loc = h._locationToBuild(sx, sy);
+  assert.deepEqual([loc.spawned, loc.mapTableData.mapId, h.d.index.get(key)], [true, worldLaneMapId(SPAWN_WORLD_LANE, sx, sy), loc], 'no place: the spawn, stood in the index');
+  assert.equal(h._locationToBuild(sx, sy), loc, 'the one it holds, again');
+  assert.equal(h._locationToBuild(...rolledAt(2200, -371, false)), null, 'a pixel the roll stands none on');
+  // the clocks
+  h.d.ledger.note(key, 0);
+  h.d.now = GENERAL_TTL_MINUTES;
+  h.d.inside = key;
+  assert.equal(h._locationToBuild(sx, sy), loc, 'never while the player is in it (TTL1)');
+  h.d.inside = null;
+  const gen = h.d.gen;
+  assert.equal(h._locationToBuild(sx, sy), null, 'past its time: its pixel empty');
+  assert.deepEqual([h.d.index.has(key), h.d.ledger.size, h.d.gen > gen], [false, 1, true], 'out of the index, its row kept (AUDIT OW5b D2), the index\'s generation moved');
+  // the roads past the Bay landing on one stood before them
+  h = stand();
+  const again = h._locationToBuild(sx, sy);
+  h.d.ledger.note(key, 0);
+  try {
+    setArenaRoads({ roads: new Map([[beyondKey(sx, sy), 0x81]]), tracks: new Map() });
+    assert.equal(h._locationToBuild(sx, sy), null, 'a road past the Bay landed on it: taken back');
+    assert.deepEqual([h.d.index.has(key), h.d.ledger.size], [false, 0], 'its index entry and its clocks (SPAWN-ROADS\' take-back)');
+    h.d.index.set(key, again);
+    h.d.inside = key;
+    assert.equal(h._locationToBuild(sx, sy), again, 'never while the player stands in it');
+  } finally { setArenaRoads(null); }
+  assert.equal(stand({ online: false })._locationToBuild(sx, sy), null, 'offline the land past the Bay stands no spawn');
+});
+
 test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cell\'s - the ledger says it, the relay\'s law reads it (the roll its own copy, the cell its square), a client says it to the relay that reads it alone (mutants: the ledger\'s spelling, the relay\'s bound, the client\'s gate)', () => {
   const [sx, sy] = rolledAt(2200, -371);
   const L = createSpawnLedger();
@@ -133,6 +191,10 @@ test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cel
   assert.deepEqual(validOwOut(validOwIn({ k: 'dg', rows: [row] })), { k: 'dg', rows: [row] }, 'the word round-trips');
   assert.equal(OW_WORLD_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): world275, past main's world274 (LADDER-CUT), which refuses
   assert.deepEqual([relaySupportsOwWorld('world276'), relaySupportsOwWorld('world275'), relaySupportsOwWorld('x')], [true, false, false], 'world275 refuses the word whole - and closes the socket');   // PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270   // PIN MOVED: world276, SHOP (Genesis, Eternal and Origin join the vocabulary, last; the token's body bound 896); PIN MOVED: world275, the merge of main (world274 on its branch, renumbered past world274 on main at the merge); PIN MOVED: world274, the merge of main (world272 on its branch, renumbered past world272-world273 on main at the merge)
+  const online = rd('src/net/online.js');
+  assert.match(online, /k === 'dg' \? validOwIn\(\{ k, rows: payload\.filter\(\(r\) => owRowSane\(r\) && owRowInCell\(r, room\) && \(this\.owWorldOk \|\| bayMapPixel\(r\?\.\[0\], r\?\.\[1\]\)\)\)/, 'a row past the Bay to the relay that reads it alone');
+  assert.match(online, /if \(primary\) this\.owWorldOk = relaySupportsOwWorld\(relayV\);/);
+  assert.match(online, /old\.owWorldOk = this\.owWorldOk; this\.owWorldOk = !!h\.owWorldOk;/, 'and its word moves with the cell a crossing makes mine');
 });
 
 test('SPAWN-WORLD the room, the discovered places and the docks: a spawn past the Bay entered is a world room the relay keeps - public and instanced - and no hall\'s nor the sea\'s; found, it is filed by its whole id and finds no Bay place; it is no dock (mutants: the lane\'s flag)', () => {
@@ -162,6 +224,15 @@ test('SPAWN-WORLD the room, the discovered places and the docks: a spawn past th
   const dock = DOCK_PIXEL_IDS[0];
   assert.equal(hasDock(dock), true);
   for (let y = -380; y < -360; y++) for (let x = 2200; x < 2240; x++) { const i = spawnedMapId(WORLD_SALT, x, y); assert.ok(!hasDock(i) && !nearDock(i), `${x},${y}`); }
+});
+
+test('SPAWN-WORLD by source: the host hands the place law to the ground\'s and the stand\'s spawns; the stand ends in the spawner past the Bay; the boards keep a pack off a spawn past the Bay as on it', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /placeAt: \(x, y\) => !!provinceQuestPlaces\?\.placeOnPixel\(x, y\),/);
+  assert.match(w, /get provinceQuestPlaces\(\) \{ return provinceQuestPlaces; \},   \/\/ SPAWN-WORLD/);
+  assert.match(w, /\|\| host\.lairLocationAt\(px, py\) \|\| spawnPastBayAt\(px, py\);/);
+  assert.match(w, /if \(!onTheBay\(px, py\) && host\.provinceQuestPlaces\?\.placeOnPixel\(px, py\)\) return null;/);
+  assert.match(w, /: !provinceQuestPlaces\.placeOnPixel\(x, y\) && !spawnsDungeon\(_spawnSalt, x, y\)\)/, 'a board\'s pack never on a spawn past the Bay');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

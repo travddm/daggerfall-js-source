@@ -428,6 +428,13 @@ test('LW9 the days: a carter come to market keeps a stall from MARKET_STALL_H; a
 
 test('LW9 the host: the roads\' trouble world reads the patrol\'s cover, the town\'s visitors take the inn\'s guests at a roadside tavern, the stands the patrol\'s halt by the region\'s law; the layer keeps a lodged party out of the open (mutants: each seam)', async () => {
   const { readFileSync } = await import('node:fs');
+  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  assert.match(w, /covered: \(trip\) => livingCovered\(patrolCover\(trip, livingTripWorld/);   // PIN MOVED (AUDIT LW-II E1): a cover waiting on a round's way waits
+  assert.match(w, /town\.type === INN_TYPE \? innGuestsOf\(town, day, livingTripWorld, o\)/);
+  // FIELD BUGS 2026-10-21d PATROL-GRACE: the region's law outside the grace an answered law gives (standing.js patrolHalts)
+  assert.match(w, /wanted: \(res, trip\) => \(res\.job === 'patrol' && trip\?\.from\?\.region != null && patrolHalts\(playerEntity, trip\.from\.region/);
+  const r = readFileSync(new URL('../../../src/scenes/livingWorld/livingRoads.js', import.meta.url), 'utf8');
+  assert.match(r, /if \(at\.inn\) continue;   \/\/ LW9: lodged at the inn on the road/);
   assert.equal(paceScale(CALENDAR_MPM), 1);
 });
 
@@ -631,6 +638,8 @@ test('AUDIT LW-II LW9: a party setting out before first light is at home till it
   assert.equal(placeName(hamlet), hamlet.name);
   const enc = { id: `${wild.id}:e`, kind: 'driven', foes: [7], t0: wild.outT1, t1: wild.outT1 + 30 };
   assert.deepEqual(newsOf([{ ...wild, enc }], wild.backT1 + 60).map((n) => n.place), [''], 'nor of the news');
+  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  assert.match(w, /const places = \[\.\.\.new Set\(\[\.\.\.trips, \.\.\.told\]\.map\(\(tr\) => placeName\(tr\.to\)\)\.filter\(Boolean\)\)\]\.sort\(\);/, 'the talk\'s towns of the road');
 });
 
 test('AUDIT LW-II LW9: the road\'s new traffic\'s own tables read - each job\'s reach (ROAD_RANGE_PX), stay (ROAD_STAY_DAYS), pace (ROAD_PACE) and cycle (ROAD_CYCLE_DAYS); a minstrel travels at the calendar\'s pace; a rider the road takes sends the patrol\'s round out (mutants: F1 each read, F2 the minstrel\'s cycle, F2 the rider)', () => {

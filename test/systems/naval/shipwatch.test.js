@@ -34,6 +34,9 @@ import { CREW_ORDERS } from '../../../src/systems/naval/shipCrew.js';
 import { setLights } from '../../../src/systems/comeSailAway/comeSailAwayBoat.js';
 import { sea } from '../../navalSea.mjs';
 
+const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+const HOST = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
+
 /** A plain deck: a flat 8 m by 24 m at 2 m (her frame) with a mast amidships (livingcrew.test.js's). */
 const plainDeck = () => buildDeck([
   { positions: [-4, 2, -12, 4, 2, -12, 4, 2, 12, -4, 2, 12], indices: [0, 1, 2, 0, 2, 3] },
@@ -206,6 +209,11 @@ test('SHIP-WATCH AT WORK: what a fight left to mend sets most of the idle crew t
   busy.step(0.05, { battle: true, work: 1 });
   assert.equal(busy.members.filter((m) => m.state === 'work').length, 0, 'to the guns');
   assert.ok(WORK_S[0] > 0 && WORK_S[1] > WORK_S[0]);
+  // the host: the swing is the attack, the sleepers undrawn
+  const NAV = readFileSync(new URL('../../../src/scenes/naval/navalCrew.js', import.meta.url), 'utf8');
+  assert.match(NAV, /_motion\.striking = !!member\.swing;/);
+  assert.match(NAV, /if \(member\.below \|\| !s\.unit \|\| !s\.batch\) continue;/);
+  assert.match(NAV, /if \(s\?\.batch && s\.unit && !m\.below\) out\.push\(s\.batch\);/);
 });
 
 test('SHIP-WATCH THE HOST DRAWS NONE BELOW: through the real crew host, a ship\'s crew at night - the ones below stand no batch, the watch does, and every hand is drawn again at the guns (mutants: the sleepers drawn)', async () => {
@@ -320,7 +328,15 @@ test('SHIP-WATCH THE LANTERNS ON THE REAL HOST: at the lights\' hour a merchantm
   e('p').ship.pos[0] = e('m').ship.pos[0] + 120; e('p').ship.pos[2] = e('m').ship.pos[2];
   for (let t = 0; t < 5 && e('m').ship.mode !== 'flee'; t += 0.1) h.host.frame(0.1);
   assert.equal(e('m').ship.mode, 'flee');
+  assert.ok(HOST.includes('const lit = shipLit(e);'), 'posed by the law');
   assert.equal(e('m').boat.LightOn, false, 'running, she douses hers');
+  // the contacts the captains see
+  assert.match(HOST, /ship: e\.ship, lit: shipLit\(e\) \}\);/);
+  // AUDIT WK-N4 (PIN MOVED): a boat lit only by lanterns she carries; WK-N5: the captains' night is the dark's
+  assert.match(HOST, /lit: !!boat\.LightOn && carriesLanterns\(boat, boat\.hull\),/);
+  assert.match(HOST, /lit: !!p\.boat\?\.LightOn && carriesLanterns\(p\.boat, p\.hull\),/);
+  assert.match(HOST, /const night = !!where\(\)\.night;[^\n]*\n\s*const world = \{/);
+  assert.match(HOST, /\n\s*night,[^\n]*\n\s*\};\n\s*life\.night = night;/);
   const d = await sea({ hull: HULL.SmallShip, where: { cityLights: false } });
   const dm = d.host._sea.get(d.host.spawnShip('merchantGalleon', { range: 300, bearing: 1 }));
   d.run(0.5);
@@ -353,6 +369,7 @@ test('SHIP-WATCH THE LOOKOUT\'S CRY ON THE REAL HOST: by night a dark pirate is 
   w.host.restoreSaveData({ v: 1, boats: { 42: { hull: 100, sail: 160, crew: 24, fire: 0, state: 'afloat', barrels: 4 } }, notoriety: {}, day: 1, raids: [] });
   const hurt = w.host.myCrew(w.boat).work;
   assert.ok(hurt > 0.4 && hurt <= 1, `her hurts: ${hurt}`);
+  assert.match(HOST, /const work = boat\.crewed && st\.crew\.order === CREW_ORDERS\.repair \? 1 : workOf\(st\.damage\);/);
   assert.ok(CREW_ORDERS.repair);
 });
 
@@ -387,5 +404,10 @@ test('SHIP-WATCH THE FAR LAMPS ON THE REAL HOST: by night a lit ship past LAMP_N
 });
 
 test('SHIP-WATCH THE WORLD\'S WIRING: every crew is told the night (the world\'s hour, through the watch\'s law), her work - mine off myCrew, the sea\'s off their hurts - and my lookout\'s cry, handed on once (mutants: the night untold, the work unread, the cry kept)', () => {
+  assert.match(WORLD, /const asleep = asleepHour\(hourOf\(minuteNow\(\)\)\);/);
+  assert.match(WORLD, /_crewCtx\.asleep = asleep; _crewCtx\.work = ship\.mine \? ship\.mine\.work \?\? 0 : ship\.work \?\? 0;/);
+  assert.match(WORLD, /_crewCtx\.call = ship\.mine\?\.call \?\? null;\n\s*if \(ship\.mine\) ship\.mine\.call = null;/);
+  assert.match(WORLD, /hold: s\.hold, work: s\.work \?\? 0 \}\);/);
+  assert.match(HOST, /toward, work: st === SHIP_STATES\.afloat \? workOf\(e\.ship\.damage\) : 0 \}\);/);
   assert.ok(SHIP_STATES.afloat);
 });

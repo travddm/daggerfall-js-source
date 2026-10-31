@@ -25,6 +25,7 @@ import { patronMinute } from '../../../src/net/patronLaw.js';
 import { skyMinutesPerMsAt, SKY_SEGMENTS } from '../../../src/net/skyLaw.js';
 import { NAV_CELL } from '../../../src/world/city/cityNavigation.js';
 
+const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const D = 50 * DAY_MIN;
 const TOWN = Object.freeze({ mapId: 777, blocks: 9, region: 17, people: 3 });
 /** A LivingTown over the synthetic town, its census the real one. @param {any} [o] @param {any} [size] */
@@ -155,6 +156,129 @@ test('AUDIT LW-II-2 W4/H4: the Vendor page names a sale\'s buyer off the househo
   assert.ok(named > 0);
 });
 
+/** The host's patrons' read (world.js, LW15), lifted whole and run with the market stubbed - its answers settled by hand. */
+function liftPatrons({ online = true, built = new Map() } = {}) {
+  const a = W.indexOf('  const PATRON_READ_S = 600;');
+  const b = W.indexOf('  /** LW15: who of a town a patron\'s sale names');
+  assert.ok(a > 0 && b > a, 'the host\'s read found');
+  const asked = [], pending = [];
+  const marketBook = { vendors: (region) => { asked.push(region); return new Promise((res) => pending.push(res)); } };
+  const make = new Function('deps', `const { params, marketBook, skyClassicMinutes, built, LivingTown, playerTravelPixel, maps } = deps;\n${W.slice(a, b)}\nreturn { livingPatronsStep, livingPatronsRegion, _livingPatrons };`);
+  const host = make({
+    params: new Map(online ? [['online', '1']] : []), marketBook, skyClassicMinutes: (ms) => ms / 2500, built, LivingTown,
+    playerTravelPixel: () => ({ x: 207, y: 212 }), maps: { getRegionIndexAt: (x, y) => (x === 207 && y === 212 ? 17 : -1) },
+  });
+  const answer = (region) => ({ ok: true, data: { rows: [{ map: region * 100, buildingKey: 7, home: { entry: 'public' } }], patrons: [] } });
+  /** Settle the oldest read out with `r` (the region's own answer by default), and let its promise run. */
+  const settle = async (r) => { pending.shift()(r); for (let i = 0; i < 4; i++) await new Promise((res) => setImmediate(res)); };
+  return { ...host, asked, pending, answer, settle };
+}
+
+test('AUDIT LW-II-2 W3/H8: each region\'s read its own clock - a step in region 17, then one in region 5 a minute later reads region 5 at once; region 17 again read only PATRON_READ_S on; a region asked while a read is out remembered and read once it settles (ASYNC NEVER DROPS); a failed read asked again PATRON_RETRY_S on, not a whole PATRON_READ_S; offline never (one clock for every region left a region crossed into unread ten real minutes - four living hours online) (mutants: W3-own-clock, W3-remembered, W3-settled, W3-failed, P17 LW15P-read-s)', async () => {
+  const h = liftPatrons();
+  h.livingPatronsStep(1000, () => 17);
+  assert.deepEqual(h.asked, [17]);
+  await h.settle(h.answer(17));
+  assert.ok(h._livingPatrons.has(1700));
+  h.livingPatronsStep(1060, () => 5);
+  assert.deepEqual(h.asked, [17, 5], 'region 5 read at once');
+  await h.settle(h.answer(5));
+  assert.ok(h._livingPatrons.has(500), 'its town known');
+  h.livingPatronsStep(1300, () => 17);
+  h.livingPatronsStep(1599, () => 17);
+  assert.deepEqual(h.asked, [17, 5], 'region 17 read 300 and 599 s ago: not again');
+  h.livingPatronsStep(1600, () => 17);
+  assert.deepEqual(h.asked, [17, 5, 17], 'PATRON_READ_S on');
+  // a region asked while that read is out: remembered, read when it settles
+  h.livingPatronsStep(1601, () => 9);
+  h.livingPatronsStep(1602, () => 9);
+  assert.deepEqual(h.asked, [17, 5, 17], 'one read out at a time');
+  await h.settle(h.answer(17));
+  assert.deepEqual(h.asked, [17, 5, 17, 9], 'region 9 read once 17\'s settled');
+  // that read fails: asked again a minute on, not ten
+  await h.settle({ ok: false, error: 'busy' });
+  h.livingPatronsStep(1602 + 58, () => 9);
+  assert.deepEqual(h.asked, [17, 5, 17, 9]);
+  h.livingPatronsStep(1602 + 60, () => 9);
+  assert.deepEqual(h.asked, [17, 5, 17, 9, 9], 'a failed read asked again PATRON_RETRY_S on');
+  assert.match(W, /const PATRON_RETRY_S = 60;/);
+  // PATRON-LOAD: failing again, each retry twice the last - 120 s, then 240 - to PATRON_READ_S; a read that answers starts over
+  await h.settle({ ok: false, error: 'busy' });
+  h.livingPatronsStep(1662 + 119, () => 9);
+  assert.deepEqual(h.asked, [17, 5, 17, 9, 9], 'the second failure: not a minute on');
+  h.livingPatronsStep(1662 + 120, () => 9);
+  assert.deepEqual(h.asked, [17, 5, 17, 9, 9, 9], 'two minutes on');
+  await h.settle({ ok: false, error: 'busy' });
+  h.livingPatronsStep(1782 + 239, () => 9);
+  assert.equal(h.asked.length, 6, 'the third: not two minutes on');
+  h.livingPatronsStep(1782 + 240, () => 9);
+  assert.equal(h.asked.length, 7, 'four');
+  await h.settle(h.answer(9));
+  h.livingPatronsStep(2022 + 599, () => 9);
+  assert.equal(h.asked.length, 7, 'answered: PATRON_READ_S again');
+  h.livingPatronsStep(2022 + 600, () => 9);
+  assert.equal(h.asked.length, 8);
+  await h.settle({ ok: false, error: 'busy' });
+  h.livingPatronsStep(2622 + 60, () => 9);
+  assert.equal(h.asked.length, 9, 'and its next failure a minute again');
+  // offline: never
+  const off = liftPatrons({ online: false });
+  off.livingPatronsStep(1000, () => 17);
+  assert.deepEqual(off.asked, []);
+});
+
+test('AUDIT LW-II-2 W11: the patrons\' read runs only while a living town stands - in the wilderness (no built LivingTown, a fixed city\'s pool) its region is none and nothing is read; with one standing, the region the player stands in; the host\'s frame asks it so (a read there was /vendors and up to two hundred of the service\'s statements each PATRON_READ_S, for towns nobody walks) (mutants: W11-a-living-town, W11-the-frame)', async () => {
+  const built = new Map([['207,211', { population: { pool: [] } }], ['206,212', { population: null }]]);
+  const h = liftPatrons({ built });
+  assert.equal(h.livingPatronsRegion(), null, 'the wilderness: none');
+  h.livingPatronsStep(1000, h.livingPatronsRegion);
+  assert.deepEqual(h.asked, [], 'nothing read');
+  built.set('207,212', { population: Object.create(LivingTown.prototype) });
+  assert.equal(h.livingPatronsRegion(), 17, 'a living town stands: the region the player stands in');
+  h.livingPatronsStep(1001, h.livingPatronsRegion);
+  assert.deepEqual(h.asked, [17]);
+  assert.match(W, /if \(livingWorldOn\(\) && _mode\(\) === 'exterior'\) livingPatronsStep\(Date\.now\(\) \/ 1000, livingPatronsRegion\);/);
+});
+
+/** The host's carried word (world.js, LW16), lifted whole and run with its generator stubbed: each day's word takes three
+ *  slices to work, as a town about read cold does. */
+function liftCarried() {
+  const a = W.indexOf('  const _livingCarried = new Map();');
+  const b = W.indexOf('  // LW5: THE BAY\'S SAILORS');
+  assert.ok(a > 0 && b > a, 'the host\'s word found');
+  const make = new Function('deps', `let { livingMemoFresh, livingTurnsFresh, livingWays, livingRelations, livingVisitsGen, PERSON_MOVE_SPEED, livingBaseRate, _livingTripMemo, _livingVisitorsKept, _livingToldKept } = deps;
+${W.slice(a, b)}
+return { livingCarriedOf, livingCarriedStep };`);
+  const visitsOf = (day) => [{ id: `v${day}`, from: { mapId: 2, name: 'Wayrest' }, inT: day * DAY_MIN + 600, outT0: day * DAY_MIN + 300, news: [] }];
+  return make({
+    livingMemoFresh() {}, livingTurnsFresh() {}, livingWays: { generation: 1 }, livingRelations: { turnsVersion: () => 0 },
+    livingVisitsGen: function* (town, day) { yield; yield; yield; return visitsOf(day); },
+    PERSON_MOVE_SPEED, livingBaseRate: () => 0.4, _livingTripMemo: new Map(), _livingVisitorsKept: new Map(), _livingToldKept: new Map(),
+  });
+}
+
+test('AUDIT LW-II-2 W7: AUDIT LW-II B11 at the day\'s turn - a town whose day\'s word is done tells it while the next day\'s is worked (its strangers\' regard and heard words never blink out: the next day\'s key had none, and the town told nothing for every frame its working took), then the next day\'s own (mutants: W7-last)', () => {
+  const h = liftCarried();
+  const town = { mapId: 1 };
+  assert.equal(h.livingCarriedOf(town, 10), null, 'nothing yet');
+  for (let f = 0; f < 4; f++) h.livingCarriedStep(1e9);
+  assert.deepEqual(h.livingCarriedOf(town, 10).map((v) => v.id), ['v10']);
+  // the day turns: day 11's word worked over frames with no budget left - day 10's told meanwhile
+  for (let f = 0; f < 5; f++) { assert.deepEqual(h.livingCarriedOf(town, 11)?.map((v) => v.id), ['v10'], `frame ${f}`); h.livingCarriedStep(0); }
+  for (let f = 0; f < 4; f++) h.livingCarriedStep(1e9);
+  assert.deepEqual(h.livingCarriedOf(town, 11).map((v) => v.id), ['v11'], 'then its own');
+  assert.equal(h.livingCarriedOf({ mapId: 2 }, 11), null, 'another town tells none of it');
+});
+
+test('AUDIT LW-II-2 H7: the carried word is worked in the modal frame too, beside the caravans\' step - a town first asked from a room (a save loaded in its tavern, a day begun abed) told none of it all its stay, the open world\'s frame alone working it (mutants: H7-modal)', () => {
+  const modal = W.indexOf('    if (modes.frame(dt, now)) {');
+  const back = W.indexOf('      requestAnimationFrame(frame);\n      return;\n    }', modal);
+  assert.ok(modal > 0 && back > modal, 'the modal frame found');
+  const frame = W.slice(modal, back);
+  assert.match(frame, /caravanStep\(dt\);[^\n]*\n\s+if \(livingWorldOn\(\)\) livingCarriedStep\(LIVING_CARRIED_SLICE_MS\);/, 'beside the caravans\' step, before the modal frame returns');
+  assert.match(W.slice(back), /if \(livingWorldOn\(\)\) livingCarriedStep\(LIVING_CARRIED_SLICE_MS\);   \/\/ LW16/, 'and the open world\'s');
+});
+
 test('AUDIT LW-II-2 W8 / C11: a token that opens a sentence opens it with a capital - at the line\'s start, or after a stop and a space - and a band\'s minted "the" with it ("The Hanged Company are finished"); mid-sentence it keeps its case; no line of the band\'s pools opens a sentence in lower case (mutants: W8-start, W8-stop, W8-mid)', () => {
   let band = null;
   for (let i = 0; i < 50 && !band; i++) { const n = outlawBandName(`O17.h${i}~0`, 'Ada Lark'); if (n.startsWith('the ')) band = n; }
@@ -181,6 +305,7 @@ test('AUDIT LW-II-2 W10: the word carried is the host\'s alone (`carriedOf` - th
   const hosted = makeTown({ tripsOf: () => roads, relations: () => createRelations(), carriedOf: (d) => (d === day ? [visit] : null) }).town;
   hosted._roadsOf(day);
   assert.deepEqual(hosted.carriedAt(D + 1000).map((x) => [x.key, x.from]), [['trip:a9', 'Wayrest']], 'the host\'s told');
+  assert.match(W, /return \{ away, visitors, holders, news, places \};/);
   // the online pace: the measure of test/systems/livingWorld/lw16_word.test.js's B2 at the walk a real hour a sky day gives
   assert.equal(ONLINE_MPM, CALENDAR_MPM / 2);
   const { nav, buildings, doors } = synthTown();

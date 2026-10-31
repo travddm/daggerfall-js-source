@@ -30,6 +30,11 @@ test('ELITE x PSCALE1: an elite foe\'s blow on a party is elite\'s double, THEN 
   } finally {
     registerFormulaOverride('calculateAttackDamage', null);
   }
+  // the dungeon weighs a shared foe's weapon and arrow hit AROUND the blow the formula returned - elite's tail inside it
+  const d = rd('src/scenes/dungeonContext.js');
+  assert.match(d, /function _weighHit\(f, dmg\) \{ return f && _sharedFoe\(f\) \? partyFoeHits\(dmg, fightN\(f\), playerEntity\) : dmg; \}/);
+  assert.match(d, /const dmg = (?:blowScaled\(f\.ai, )?_weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the melee hit');
+  assert.match(d, /const dmg = foeDeps && shooter \? _weighHit\(shooter, foeDeps\.calculateAttackDamage\(shooter\.entity, playerEntity, \{/, 'the arrow');
 });
 
 test('ELITE x PSCALE1: an elite foe fights a party with elite\'s doubled health AND the party\'s toughness; its copies are shared foes like its original', () => {
@@ -39,6 +44,19 @@ test('ELITE x PSCALE1: an elite foe fights a party with elite\'s doubled health 
   let left = health, blows = 0;
   while (left > 0 && blows < 1000) { left -= partyFoeLoses(foe, 10, 4); blows++; }
   assert.equal(blows, Math.ceil((health * partyToughness(4)) / 10), 'four fighters take 2.5x the blows of the doubled pool');
+  const d = rd('src/scenes/dungeonContext.js');
+  assert.match(d, /entity\.maxHealth = Math\.max\(1, Math\.round\(entity\.maxHealth \* ELITE_HEALTH_SCALE\)\);/);
+  assert.match(d, /foe\.entity\.health -= !bypassShield && !_whole && _sharedFoe\(foe\) \? partyFoeLoses\(foe, healthDamage, fightN\(foe\)\) : healthDamage;/);
+  // the copies are the LAYOUT's: the expanded list is built before the load loop, and the layout's run is counted after it,
+  // so every copy is `i < _layoutFoes` - shared, streamed by index, weighed by who fights it, the same on every client
+  const expand = d.indexOf('const enemies = dfLocation?.elite');
+  const layout = d.indexOf('const _layoutFoes = foes.length;');
+  assert.ok(expand > 0 && layout > expand, 'expanded before the layout run is counted');
+  // REST-SYNC re-aim: the layout's run, or a rest's shared encounter (test/net/restsync.test.js) - a copy is still the former
+  // PSCALE-OWN re-aim: or a shared quest's foe on the own lane (test/scenes/quest/pscaleown.test.js) - asked after the room's predicate;
+  // SUMMON-SYNC: or a loose stand on it (ownRides, test/scenes/summonsync.test.js)
+  assert.match(d, /function _sharedFoe\(f\) \{\n\s*if \(!f \|\| f\.entity\?\.team === 'PlayerAlly'\) return false;\n\s*return isRoomFoe\(f\) \|\| f\._ownFrom != null \|\| ownRides\(f\);/);
+  assert.match(d, /const isRoomFoe = \(f, i = foes\.indexOf\(f\)\) => \(i >= 0 && i < _layoutFoes\) \|\| \(f != null && \(f\._encId != null \|\| f\._surI != null\)\);/);
 });
 
 test('ELITE x PSCALE1: the host\'s full foes frame for the largest elite dungeon still fits the wire with party scaling\'s `n` and Renown\'s `l` on every record', () => {
@@ -64,8 +82,14 @@ test('ELITE x AUDIT SET P-M3 (AUDIT FINAL F7): a joiner\'s name rides a death\'s
   // every body named, as it was: over the wire's cap - the window is what holds it
   const named = JSON.stringify({ t: 'foes', data: { n: 1e9, k: 'dungeon:4294967295', f: records.map((r) => ({ ...r, h: 0, n: undefined, v: peer })) } });
   assert.ok(named.length > FOES_FRAME_MAX, `every body named: ${named.length} bytes`);
+  assert.match(rd('src/scenes/dungeonContext.js'), /if \(f\.dead && typeof f\._killedBy === 'string' && performance\.now\(\) - \(f\._killedAt \?\? -Infinity\) <= KILLED_BY_MS\) r\.v = f\._killedBy;/);
 });
 
 test('ELITE x PSCALE1 outdoors: a camp grows by the party it meets, and CAMP-RING\'s room is asked for the grown group', () => {
   assert.deepEqual(partyGroupMembers([1, 2, 3], 5), [1, 2, 3, 1, 2], 'five together: two more, drawn from its own');
+  assert.match(rd('src/scenes/world.js'), /const size = campMembers\(h\.mobileTypes\)\.length;\n\s*if \(size > room\) continue;/);
+  assert.match(rd('src/scenes/world.js'), /for \(const mobileType of \(hit\.fixed \? hit\.mobileTypes : campMembers\(hit\.mobileTypes\)\)\) \{/, 'the stand grows it the same way (a camp; BOUNTY1\'s `fixed` pack is the posting\'s count - auditbounty1 B2)');
+  // PVPDUNGEONS: the pool's bound is its encounterCap() now - MAX_ACTIVE_ENCOUNTER_FOES, four times it in the open zone
+  assert.match(rd('src/scenes/world.js'), /const campMembers = \(types\) => partyGroupMembers\(types, partySize\(\)\)\.slice\(0, encounterCap\(\)\);/, 'OW6: one home for the growth, bounded by the pool');
+  assert.match(rd('src/scenes/exteriorFoes.js'), /export const encounterCap = \(\) => \(wildHere\(\) \? MAX_ACTIVE_ENCOUNTER_FOES \* WILD_PACK_MULT : MAX_ACTIVE_ENCOUNTER_FOES\);/, 'the pool\'s cap, the open zone\'s four times');
 });

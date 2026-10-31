@@ -50,4 +50,10 @@ test('TI3: ?touch=on / ?touch=off outranks the heuristic; anything else is no an
 
 test('TI3: one home - touch.js hands out the same function, and the data diet reads it (mutant: a second sniff in dataSource.js)', () => {
   assert.equal(fromTouch, isTouchDevice);
+  const ds = readFileSync(new URL('../../../src/scenes/dataSource.js', import.meta.url), 'utf8');
+  assert.match(ds, /import \{ isTouchDevice \} from '\.\.\/ui\/touch\/touchDevice\.js'/);
+  assert.match(ds, /const LEAN = typeof window !== 'undefined' && !window\.daggerShell && isTouchDevice\(\);/, 'the shell still outranks the law');
+  assert.ok(!/maxTouchPoints/.test(ds), 'no sniff of its own');
+  const td = readFileSync(new URL('../../../src/ui/touch/touchDevice.js', import.meta.url), 'utf8');
+  assert.ok(!/import /.test(td), 'a leaf');
 });

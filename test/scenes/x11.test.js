@@ -123,6 +123,20 @@ test('X11 Comprehend Languages: the bonus really moves the pacification roll', (
   assert.equal(calculateEnemyPacification(e, SKILLS.Etiquette, true, roll, comprehendLanguagesChance(e)), true);
 });
 
+test('X11 Comprehend Languages: the pacification seam reads it for all three enemy pools', () => {
+  const hc = src('src/scenes/hostCombat.js');
+  const i = hc.indexOf('export function tryLanguagePacification');
+  assert.ok(i > 0);
+  const arm = hc.slice(i);
+  assert.ok(arm.includes('comprehendLanguagesChance(playerEntity)'), 'the seam reads the live effect');
+  assert.ok(/calculateEnemyPacification\([^)]*comprehend\)/.test(arm), 'and hands it to the roll');
+  // the three pools all go through that seam - a fourth-host divergence
+  // is exactly what moving the roll there was for
+  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
+    assert.ok(src(f).includes('tryLanguagePacification('), `${f} runs the roll`);
+  }
+});
+
 // ── Spell Reflection (21,255) ─────────────────────────────────────
 const reflector = (chance = 100) => {
   const e = being();
@@ -210,7 +224,26 @@ test('X11 Spell Reflection: DFU\'s multi-effect quirk - only the FIRST effect bo
 });
 
 test('X11 Spell Reflection: the host seam re-targets - the effect module never does', () => {
+  // DFU's TryReflection calls casterEffectManager.AssignBundle: the
+  // re-target belongs to whoever holds both parties. Here that is
+  // hostMagic (both cast doors) and world.js's enchantment door.
+  const eff = src('src/systems/effects.js');
+  assert.ok(!/applySpell\(spell,[^\n]*reflectedCount/.test(eff), 'effects.js does not re-enter itself');
+  const hm = src('src/scenes/hostMagic.js');
+  assert.ok(hm.includes('spellReflectedText()'), 'the player-side line is spoken');
   assert.equal(SPELL_REFLECTED_TEXT, 'Spell was reflected.');
+  // the FOE arm must NOT speak it - the line is gated on the reflecting
+  // manager being the player's (:1231-1233)
+  const foeArm = hm.slice(hm.indexOf('function applySpellToFoe'), hm.indexOf('function applySpellToPlayer'));
+  assert.ok(foeArm.includes('r.reflected'), 'the foe arm re-targets');
+  assert.ok(!foeArm.includes('spellReflectedText'), 'and stays silent about it');
+  assert.ok(/reflectedCount: 1/.test(foeArm), 'the bounce is marked so it cannot volley');
+  // WAVE D: the enchantment door is scenes/hostEnchant.js's, one body
+  // for both mounting hosts - so the bounce cannot be re-targeted in
+  // one host and dropped in the other.
+  // AUDIT 68 S21-strike-landing-dup: and it re-targets through the foe arm above, not a copy of it.
+  assert.ok(src('src/scenes/hostEnchant.js').includes('magic.applySpellToFoe(record,'), 'the enchantment door re-targets too - through the one foe landing');
+  assert.ok(!src('src/scenes/hostEnchant.js').includes('r.reflected'), 'with no second copy of the re-target');
 });
 
 // ── Light (15,255) and its candle ─────────────────────────────────
@@ -290,6 +323,33 @@ test('X11 the magic candle: the light goes to the FRONT of a host\'s array, and 
   assert.equal(withPlayerLights(b2, null), b2);
 });
 
+test('X11 the magic candle: every host that lets the player cast puts it in its light array', () => {
+  // THE FOUR HOSTS RULE. hostMagic owns the candle (one engine per
+  // casting host), but each host builds its own point-light array, so
+  // each has to prepend it. The standalone ?interior host is NOT here
+  // and must not be: it builds no cast engine, so a player cannot cast
+  // Light there at all.
+  const sites = {
+    'src/scenes/worldModes.js': 2,   // the ?world dungeon and interior branches
+    'src/scenes/world.js': 2,        // the exterior, lanterns on AND off
+    'src/scenes/exterior.js': 1,
+    'src/scenes/dungeon.js': 1,
+  };
+  for (const [f, n] of Object.entries(sites)) {
+    const hits = src(f).split('withPlayerLights(').length - 1;
+    assert.equal(hits, n, `${f} prepends the candle at ${n} light site(s), found ${hits}`);
+  }
+  assert.ok(!src('src/scenes/interior.js').includes('withPlayerLights'),
+    'the standalone interior host builds no cast engine, so it has no candle to draw');
+  // and the tick reaches all four, with a real look direction
+  for (const f of ['src/scenes/worldModes.js', 'src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
+    const call = src(f).match(/magic\.update\(dt,.*/);
+    assert.ok(call, `${f} ticks the engine`);
+    assert.equal(call[0].split(',').length >= 4, true,
+      `${f} passes the forward and the height into magic.update - got ${call[0]}`);
+  }
+});
+
 // ── the catalog, and the one row deliberately left inert ──────────
 test('X11 catalog: four rows leave the inert set, and MORPH SELF stays with its reason', () => {
   for (const k of ['5,255', '15,255', '21,255', '44,255']) {
@@ -310,4 +370,5 @@ test('X11 catalog: four rows leave the inert set, and MORPH SELF stays with its 
   assert.deepEqual(SPELL_MAKER_EFFECTS.filter((e) => !e.ported).map((e) => e.key),
     [], 'no row remains inert');
   assert.equal(effectByKey('29,255').craftable, false);
+  assert.ok(!src('src/systems/effects.js').includes("'29,255': "), 'no BUFF_KINDS row pretends otherwise');
 });

@@ -189,6 +189,10 @@ test('OWNER-CLOCK the relay carries `tm` as it carries every word inside a frame
   const data = { n: 1, k: 'world:3,12', full: 1, f: [{ i: 1, t: 0, f: [1, 2, 3] }], tm };
   assert.deepEqual(parseClient(JSON.stringify({ t: 'foes', data }), { hasHello: true }), { t: 'foes', data }, 'the relay\'s parse asks only that `data` is an object');
   assert.deepEqual(parseClient(JSON.stringify({ t: 'own', data }), { hasHello: true }), { t: 'own', data });
+  const idx = rd('server/src/index.js');
+  assert.doesNotMatch(idx, /data\??\.tm\b/, 'the relay reads no frame\'s `tm` - no relay change, no version (its own `tm` is a traveller\'s mark)');
+  assert.match(idx, /out = JSON\.stringify\(g \? \{ t, id, g: 1, data \} : \{ t, id, data \}\);/, 'the fan re-serialises `data` whole');
+  assert.match(idx, /return keep\.length === data\.f\.length \? data : \{ \.\.\.data, f: keep \};/, 'and the grant strip keeps every field but the records it strips');
   const C = await stripCell(t);
   const mac = await C.join('sock-mac-01', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW }), zed = await C.join('sock-zed-01');
   const forged = { i: 2, t: 0, f: [1, 2, 3], k: 99_999, h: 99_999 };   // no builder's rat: FOE-BOUNDS strips it at the relay
@@ -444,6 +448,7 @@ function countedPool(clock, cost = 0) { const calls = []; return { calls, update
 const bodyS = (calls) => calls.reduce((a, d) => a + foeFrameDt(d), 0);
 
 test('OWNER-CLOCK the owner: THE PARITY - at every rate world.js\'s clamp allows, a street foe\'s body takes the seconds its owner\'s player takes and never more: 60 to 20 fps the host\'s one call as ever, 15 fps and below the clamped frame (0.1 s from 10 fps down) in FOE-CATCHUP\'s steps; alone, FOE-CATCHUP\'s half below 10 fps; a quarter-second frame is not read as a quarter second of foe time (mutants: the wall time planned; the plan outrunning the host)', () => {
+  assert.match(rd('src/scenes/world.js'), /const dt = Math\.min\(0\.1, \(now - last\) \/ 1000\);/, 'the player\'s frame: world.js\'s clamp');
   const perFrame = (fps, shared) => {
     const clock = { ms: 0 };
     const p = catchUpOwnerFoes(countedPool(clock, 1), { shared: () => shared, clock: () => clock.ms, tick: () => {}, mark: () => {} });
@@ -571,6 +576,24 @@ test('OWNER-CLOCK the mode machine: a building\'s and a dungeon\'s foes are step
 });
 
 test('OWNER-CLOCK the wiring by source: the world host wires it once, beside the mode machine, with nobody-else-here as the street\'s test; the hosts\' own calls stand as they stood (the street\'s step, the modal frame, the streams); the session stamps at its two doors and holds the frame at its two deliveries; both pools copy the moment beside the feet; no pool reads `data.tm` itself (mutants: the dungeon\'s door drops the stamp)', () => {
+  const w = rd('src/scenes/world.js');
+  assert.equal((w.match(/wireOwnerClock\(/g) ?? []).length, 1);
+  // PIN MOVED (HOST-CLOCK, test/scenes/fb1021b_hostclock.test.js): the street's watch rides the one statement beside its encounter pool
+  assert.match(w, /\n {2}\}\);\n {2}wireOwnerClock\(\[exteriorFoes, cityGuards\], modes, \(\) => online\?\.status === 'open' && online\.othersHere > 0\);/, 'after the mode machine is made, with the streams\' own nobody-to-hear test (foesStream\'s `othersHere === 0`)');
+  assert.match(w, /exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);/, 'the street\'s step is the host\'s as it was');
+  assert.match(w, /if \(modes\.frame\(dt, now\)\) \{/);
+  assert.match(w, /if \(online\.othersHere === 0\) \{ _foesFullAt = -Infinity; return false; \}/);
+  const o = rd('src/net/online.js');
+  assert.match(o, /const s = stampedFrameText\('foes', data, this\._ownerTm\(\), FOES_FRAME_MAX\);/);
+  assert.match(o, /const s = stampedFrameText\('own', data, this\._ownerTm\(\), FOES_FRAME_MAX\);/);
+  assert.match(o, /this\._deliver\('foes', \(\) => applyingOwnerTm\(m\.data, \(\) => this\.onFoes\?\.\(m\.id, m\.data\)\)\);/);
+  assert.match(o, /this\._deliver\('own', \(\) => applyingOwnerTm\(m\.data, \(\) => this\.onOwnFoes\?\.\(m\.id, m\.data\)\)\);/);
+  const x = rd('src/scenes/exteriorFoes.js'), d = rd('src/scenes/dungeonContext.js');
+  assert.match(x, /p\.wire = r\.f;\n\s*p\.tm = appliedOwnerTm\(\);/, 'the street\'s door: beside the feet');
+  assert.match(d, /\{ p\.feet\[0\] = r\.f\[0\]; p\.feet\[1\] = r\.f\[1\]; p\.feet\[2\] = r\.f\[2\]; p\.tm = appliedOwnerTm\(\); \}/, 'the dungeon\'s door: beside the feet');
+  for (const [f, t] of [['exteriorFoes', x], ['dungeonContext', d], ['puppetLead', rd('src/scenes/puppetLead.js')]]) assert.doesNotMatch(t, /data\.tm\b/, `${f} reads the frame's clock through net/ownerClock.js alone`);
+  // the steps the catch-up takes are FOE-CATCHUP's own size, so its pins hold: the pools still hand their bodies foeFrameDt
+  assert.match(x, /f\.ai\.update\(foeFrameDt\(dt\), playerFeet, _armed\(f, senses\), _fParalyzed, _fPaused\);/);
   assert.equal(FIXED_DT * 3, FOE_MAX_FRAME_DT);
 });
 

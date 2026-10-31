@@ -138,6 +138,7 @@ test('AUDIT PRE-MERGE 1003 WD1 the client: the hall\'s post says its town\'s lay
     configureLayoutPins({ vendorOn: () => false });
     assert.equal(homeClaimLayout(TOWN), null, 'Daggerfall\'s own town: no stamp, never "classic"');
   } finally { _resetLayoutPins(); }
+  assert.match(src('src/systems/online/onlineHomes.js'), /const layout = homeClaimLayout\(mapId\);/, 'a home\'s claim says it the same way');
   const seen = [];
   const store = { getItem: () => JSON.stringify({ secret: 's', id: 'p' }) };
   const door = accountGuilds({ fetch: async (url, init) => { seen.push([String(url).replace(/^.*\/v1/, '/v1'), JSON.parse(init.body)]); return new Response('{}', { status: 200 }); }, storage: store });
@@ -154,6 +155,47 @@ test('AUDIT PRE-MERGE 1003 WD1 the client: the hall\'s post says its town\'s lay
   await book.refresh();
   await book.buyHall({ mapId: 7, buildingKey: 300, region: 17, price: 20_000, layout: BV });
   assert.equal(calls[0].layout, BV);
+});
+
+/** worldModes.js buyHallAt, lifted out and run over a host the test holds (AUDIT MERGE-PLUS A1's lift). */
+function liftBuyHallAt() {
+  const WM = src('src/scenes/worldModes.js');
+  const at = WM.indexOf('  function buyHallAt(bd, price) {');
+  assert.ok(at > 0, 'the host\'s hall buy');
+  const body = WM.slice(at, WM.indexOf('\n  }\n', at) + 4);
+  return new Function('host', 'homeIdOf', '_hallBuying', 'hallGuild', 'homeTownOf', 'townTalk', 'hallBoughtLine', 'hallShortLine', 'guildHallPrice',
+    'accountRefusalText', 'homeClaimLayout', `${body}\nreturn buyHallAt;`);
+}
+
+test('AUDIT PRE-MERGE 1003 WD1 the host: the door\'s hall buy (worldModes.js buyHallAt, lifted out) posts NOTHING before the room\'s homes\' towns are heard, or where a town mod\'s pack did not load here - buyHomeAt\'s own gates, said in its words and the towns asked again; heard, it posts its town\'s layout, and a refusal for the town\'s layout hears them again (mutants: either gate; the layout unsent; the refusal not heard again)', async () => {
+  const posts = [], said = [];
+  let heard = false, missing = false, asks = 0, answer = { ok: true };
+  const host = {
+    homeLayoutsHeard: () => heard, homeTownsMissing: () => missing, hearHomeLayouts: () => { asks++; },
+    guildHall: { buy: async (o) => { posts.push(o); return answer; } },
+    onlineHomes: { ensure: () => {} },
+  };
+  const press = liftBuyHallAt()(host, (b) => `${b.townMapId}:${b.buildingKey}`, new Set(), () => ({ name: 'The Hand' }), (b) => b.townMapId,
+    { say: (l) => said.push(l) }, hallBoughtLine, hallShortLine, guildHallPrice, accountRefusalText, (mapId) => (mapId === TOWN ? BV : null));
+  const bd = { townMapId: TOWN, buildingKey: 0x10203, regionIndex: 17 };
+  const go = async () => { press(bd, 20_000); await new Promise((res) => { setImmediate(res); }); };
+  await go();
+  assert.deepEqual(posts, [], 'not heard: nothing posted');
+  assert.deepEqual(said, [accountRefusalText('home-layout')]);
+  assert.equal(asks, 1, 'and the towns asked again');
+  heard = true; missing = true;
+  await go();
+  assert.deepEqual(posts, [], 'a town mod\'s pack missing here: nothing posted');
+  assert.equal(said.at(-1), accountRefusalText('home-towns'));
+  missing = false;
+  await go();
+  assert.equal(posts.length, 1);
+  assert.equal(posts[0].layout, BV, 'the town\'s layout, as a home\'s claim says it');
+  answer = { ok: false, error: 'home-layout' };
+  await go();
+  assert.equal(posts.length, 2);
+  assert.equal(asks, 2, 'refused for the town\'s layout: the towns heard again');
+  assert.equal(said.at(-1), accountRefusalText('home-layout'));
 });
 
 /** A quest whose building site in Aldleigh (map 1001) was chosen while the village stood in Beautiful Villages, the

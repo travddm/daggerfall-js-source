@@ -152,6 +152,8 @@ test('WB5b the worker: /v1/gate/claim behind a session and never open - the sess
   const no = await bare.call('POST', '/v1/gate/claim', { receipt: await receiptFor(g.id, 700, priv, T0) }, g.secret);
   assert.equal(no.status, 503); assert.equal(no.body.error, 'no-gate-key');
   for (const w of ['no-gate-key', 'receipt', 'not-yours']) assert.equal(typeof REFUSALS[w], 'string', `${w} has its sentence`);
+  const signing = src('server-account/src/signing.js');
+  assert.match(signing, /if \(_gateKey !== undefined\) return _gateKey;/, 'imported once per isolate');
 });
 
 test('WB5b the client: with no session there is no account to claim for - nothing is sent; with one, the receipt goes as a POST carrying the bearer and nothing else of mine (mutants: a knock with no session; the secret in the body)', async () => {
@@ -311,6 +313,8 @@ test('WB5b the words and the cards: the account card\'s row says the count or "N
   assert.deepEqual(all(w.root.children[0], 'dfprofile-gates').map((n) => n.textContent), ['Breaches closed: 3'], 'the Inspect card\'s line');
   w.update('peer-1', profileView({ name: 'Bran', state: 'asking', record: { wins: 0, losses: 0, gates: { closed: 0 } } }));
   assert.equal(all(w.root.children[0], 'dfprofile-gates').length, 0, 'and none for none');
+  const card = src('src/ui/enhanced/enhancedAccount.js');
+  assert.match(card, /const gates = gateRecordText\(flow\.account\.gates\);\s*\n\s*if \(gates\) row\(t\('account\.card\.gates', 'Breaches closed'\), gates\);/, 'the main menu\'s account card');   // L10N4 (PIN MOVED): the row's word through t()
 });
 
 test('WB5b the key tool mints ONE pair - the relay\'s private half (PKCS8, what the relay imports) and the account service\'s public half (base64url raw, what it verifies with), a receipt signed by the one verifying with the other - and writes nothing to disk (mutants: two pairs; a key on disk)', async () => {
@@ -321,6 +325,8 @@ test('WB5b the key tool mints ONE pair - the relay\'s private half (PKCS8, what 
   assert.ok(priv && pub);
   const r = await mintReceipt({ d: 700, b: 'ruhn', s: 'acct-me', c: 1, x: 'stood' }, priv, { subtle, nowS: T0 });
   assert.equal((await verifyReceipt(r, pub, { subtle, nowS: T0 + 1 })).ok, true, 'one pair');
+  const tool = src('tools/mintGateKeys.mjs');
+  assert.doesNotMatch(tool, /writeFile|appendFile|createWriteStream/, 'nothing is ever written to disk');
 });
 
 test('WB5b the seams: the gate link tells every receipt it folds; the world host keeps a queue online on the account service\'s call and the spoils\' JSON door, hands it each receipt, offers it on the gate frame, and draws the Inspect card\'s line off the same record (mutants: each seam removed)', () => {

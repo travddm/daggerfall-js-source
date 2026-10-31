@@ -581,5 +581,37 @@ test('LEGACY7 part three the inspect card: the Propose button beside the Challen
   assert.deepEqual(v.wed, { label: 'Propose marriage', enabled: false, why: 'You are wed already.' });
   assert.equal(profileView({ name: 'Iszara', peer: {} }).wed, null);
   assert.deepEqual(profileView({ name: 'I', peer: {}, wed: { label: 'Propose marriage', enabled: true, why: 'x' } }).wed, { label: 'Propose marriage', enabled: true, why: null });
+  const w = rd('src/scenes/world.js');
+  // PIN MOVED (AUDIT LEGACY III O1): the relay's character stamp (`sc`) rides the frame to the wedding's law, and a half names it
+  assert.match(w, /online\.onWed = \(id, d, sub = null, sc = null\) => \{ wedMgr\.onFrame\(id, d, sub, sc\); \};/);
+  assert.match(w, /onWed: \(peerId\) => wedPropose\(peerId\),/);
+  assert.match(w, /wed: wedButtonFor\(peerId\),/);
+  assert.match(w, /half: \(sid, partner, partnerChar, opts\) => \(realmSession && !realmSession\.lost \? realmSession\.wed\(sid, partner, partnerChar, opts\)/);
+  assert.match(w, /onWed: \(union\) => \{ legacyHost\?\.wedPlayer\(union\); \},/);
+  assert.match(w, /peerCan: \(id\) => !!online\?\.peers\.get\(id\)\?\.house,/);
+  assert.match(w, /wedFrame\(\);/);
+  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE): the tombstone carries its options - `keepalive` as the page goes
+  assert.match(w, /tombstone: \(why, o\) => \(realmSession \? realmSession\.die\(why, o\) : false\),/);
+  assert.match(w, /realmId: \(\) => realmSession\?\.id \?\? null,/);
+  assert.match(w, /realmUnions\(realmIoNow\(\)\)\.then\(\(r\) => \{ if \(r\.ok\) legacyHost\?\.unionsHeard\(r\.unions\); \}\)/);
+  assert.match(rd('server/src/index.js'), /this\._send\(tws, JSON\.stringify\(\{ t: 'wed', id: a\.id, \.\.\.\(typeof a\.sub === 'string' && a\.sub \? \{ sub: a\.sub \} : \{\}\), \.\.\.\(typeof a\.ci === 'string' && a\.ci \? \{ sc: a\.ci \} : \{\}\), data: m\.data \}\)\);/);
 });
 
+test('FIELD BUGS 2026-10-08 THE WEDDING GATE LETS A CHARACTER WHO MAY WED WED (Sahh: two Enduring or two Bloodlines characters "cannot seem to marry each other", the button grey at every temple): the world host\'s wedCan, run out of its own text - the house\'s null (may wed) is null, every refusal the house\'s own, \'house\' only with no house host, \'busy\' dead, under a death, or with no relay to carry it (mutant: `?? \'house\'` back - the null read as no house)', () => {
+  const lines = rd('src/scenes/world.js').split('\n');
+  const a = lines.findIndex((l) => /^  const wedCan = \(\) => /.test(l));
+  assert.ok(a >= 0, 'world.js holds wedCan');
+  let b = a;
+  while (!/;$/.test(lines[b])) b++;
+  const make = new Function('playerEntity', 'modes', 'online', 'legacyHost', `${lines.slice(a, b + 1).join('\n')}\nreturn wedCan;`);
+  const open = { status: 'open', wedOk: true };
+  const alive = { health: 10 };
+  const host = (why) => ({ wedRefusal: () => why });
+  assert.equal(make(alive, null, open, host(null))(), null, 'may wed: the button lit, the ask and the answer sent');
+  for (const why of ['house', 'busy', 'wed', 'temple']) assert.equal(make(alive, null, open, host(why))(), why, `the house's own ${why}`);
+  assert.equal(make(alive, null, open, null)(), 'house', 'no house host');
+  assert.equal(make({ health: 0 }, null, open, host(null))(), 'busy', 'lying dead');
+  assert.equal(make(alive, { deathUp: () => true }, open, host(null))(), 'busy', 'under a death');
+  assert.equal(make(alive, null, { status: 'open', wedOk: false }, host(null))(), 'busy', 'a relay that cannot carry it');
+  assert.equal(make(alive, null, { status: 'closed', wedOk: true }, host(null))(), 'busy', 'offline');
+});

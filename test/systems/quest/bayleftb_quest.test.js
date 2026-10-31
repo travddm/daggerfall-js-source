@@ -145,6 +145,11 @@ test('BAY-LEFT-B B4: the talk\'s regional "Where is" past the Bay names a town o
   assert.ok(found >= 15, `${found} of the 30 Regional rows answered in Skyrim`);
   assert.equal(pipe.getRegionalLocationCityName({ index: 20 }), true, 'any tavern');
   assert.notEqual(pipe.locationOfRegionalBuilding, '');
+  // the host wires it: the quest layer's region, a province's location its table's
+  const W = rd('src/scenes/world.js');
+  assert.match(W, /currentRegion: \(\) => questWorld\.maps\.getRegion\(_questRegionIndex\(\)\) \?\? null,/);
+  assert.match(W, /getLocation: \(r, i\) => \(isProvinceRegion\(r\) \? questWorld\.provinceSites\?\.getLocation\(r, i\) \?\? null : maps\.getLocation\(r, i\)\),/);
+  assert.match(rd('src/scenes/questWorld.js'), /\{ playerMapPixel: playerTravelPixel, maps: questWorld\.maps \},/, '%di\'s remote arm over the same maps');
 });
 
 test('BAY-LEFT-B B4: provinceRow - its location\'s key, and a place with no dungeon NoDungeon as MAPS.BSA\'s towns (mutants: the key\'s default; the town\'s dungeon type)', () => {
@@ -154,6 +159,36 @@ test('BAY-LEFT-B B4: provinceRow - its location\'s key, and a place with no dung
   assert.deepEqual([country.key, country.dungeonType], [0, DUNGEON_TYPES.NoDungeon]);
   const lair = provinceRow({ mapId: 7, name: 'L', px: 1700, py: -400, type: LOCATION_TYPES.DungeonRuin, dungeonType: 0 });
   assert.equal(lair.dungeonType, 0, 'a lair\'s own type - a crypt');
+});
+
+test('BAY-LEFT-B B5: the map item\'s and the guilds\' reveal reads the politic region\'s table - past the Bay its places, and on the Bay\'s road and sea as on its towns (mutants: the location\'s region; the raw maps)', { skip: NO_DATA }, async () => {
+  const w = await world();
+  const W = rd('src/scenes/world.js');
+  const from = W.indexOf('  const revealLocation = (noteKey) => {');
+  const to = W.indexOf('  let _locationRevealedByMapItem = null;', from);
+  assert.ok(from > 0 && to > from, 'world.js\'s reveal moved');
+  const body = W.slice(from, to);
+  assert.match(body, /const region = questWorld\.maps\.getRegion\(_questRegionIndex\(\)\);/);
+  const run = (questWorld, region) => {
+    restoreDiscovery(null);
+    const notes = [];
+    const fn = new Function('questWorld', '_questRegionIndex', 'discoverRandomLocation', 'getLocalizedLocationName', 'questBridge', 'REVEAL_NOTE_TEXT', `let _locationRevealedByMapItem = null; ${body} return revealLocation('readMap');`);
+    return { got: fn(questWorld, () => region, (rows) => discoverRandomLocation(rows, seeded(3)), (id, n) => n, { notebook: { addNote: (t) => notes.push(t) } }, { readMap: 'map to %map' }), notes };
+  };
+  const L = await w.questLayerAt(SOLITUDE, w.sol);
+  const far = run(L.questWorld, SKYRIM);
+  assert.ok(far.got?.name, 'a place past the Bay revealed');
+  const row = L.questWorld.maps.getRegion(SKYRIM).mapTable.find((r) => r.mapId === far.got.mapId);
+  assert.ok(row, 'one of Skyrim\'s table');
+  assert.equal(hasDiscoveredLocationId(far.got.mapId), true, 'discovered by its whole id');
+  assert.deepEqual(far.notes, [`map to ${far.got.shown}`]);
+  // the Bay's wilderness: a road pixel off any town (Daggerfall's region) reveals one of its region's rows
+  const wild = { x: w.bayPx.x + 3, y: w.bayPx.y + 3 };
+  const Lb = await w.questLayerAt(wild, w.bay);
+  const r = w.maps.getRegionIndexAt(wild.x, wild.y);
+  const bay = run(Lb.questWorld, r);
+  assert.ok(bay.got?.name && w.maps.getRegion(r).mapTable.some((x) => x.mapId === bay.got.mapId), `the Bay's region ${r} (${REGION_NAMES[r]})`);
+  restoreDiscovery(null);
 });
 
 test('BAY-LEFT-B B6: the Mages Guild\'s scrying past the Bay reads its province\'s table - a lair of the family nearest, never a town read as a crypt (mutants: the raw maps; the town\'s dungeon type)', { skip: NO_DATA }, async () => {
@@ -167,6 +202,7 @@ test('BAY-LEFT-B B6: the Mages Guild\'s scrying past the Bay reads its province\
   assert.ok(pick && familyKinds('undead').includes(pick.dungeonType));
   assert.equal((pick.mapId >>> 20) & 0xfff, LAIR_LANE, `${pick.name}: a lair past the Bay`);
   assert.ok(where.rows.filter((r) => r.dungeonType === DUNGEON_TYPES.NoDungeon).length >= 30, 'the towns no dungeon');
+  assert.match(rd('src/scenes/world.js'), /const region = questWorld\.maps\.getRegion\(maps\.getRegionIndexAt\(at\.x, at\.y\)\);\n\s+return region \? \{ rows: scryRows\(region\), at: \{ x: at\.x, y: at\.y \} \} : null;/);
 });
 
 test('BAY-LEFT-B B7: %lp past the Bay is the province\'s own name (Skyrim, Cyrodiil, ...), the Bay\'s DFU\'s two (mutant: the province\'s arm)', async () => {

@@ -160,6 +160,11 @@ test('AUDIT HOLDINGS F8: a claim that failed forgets her record with her title; 
   titleDeed(mintDeed(2, 0, 660, 1));
   forgetShip(660);
   assert.deepEqual([fleetShip(660), titleOf(660)], [null, null]);
+  const host = read('src/scenes/naval/navalHost.js'), world = read('src/scenes/world.js'), modes = read('src/scenes/worldModes.js');
+  assert.match(host, /if \(!boat\) \{ const list = pack\(\), i = list\.indexOf\(deed\); if \(i >= 0\) list\.splice\(i, 1\); deps\.board\?\.forgetDeed\?\.\(deed\); return false; \}/);
+  assert.match(world, /nearPort: \(\) => !!csaRuntime\.IsNearPort\(csaPortRange\(\)\),/);
+  assert.match(world, /const csaPortRange = \(\) => \{ try \{ return Number\(modSetting\(COME_SAIL_AWAY_VENDOR, 'Controls\.PortLocationSearchRange'\) \?\? 3\) \| 0; \} catch \{ return 3; \} \};/);
+  assert.match(modes, /else if \(!\(it\?\.templateIndex === FLEET_DEED_TEMPLATE && titleDeed\(it, \{ port: buildingDirectory\?\.\(\)\?\.locationName \? \{ name: buildingDirectory\(\)\.locationName \} : null \}\)\)\) addItem\(playerEntity\.items, it\);/);
 });
 
 // ── THE CREW ──────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -222,9 +227,23 @@ test('AUDIT HOLDINGS C8: a Gunner past her guns stands beside one, never on its 
 // ── THE TAB AND THE STABLE ────────────────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT HOLDINGS C1: no note in FRAME_ROLES swallows a selector - every selector the source names is a selector the kit dresses (the Companions page\'s slots, faces and chips, the HUD\'s quick chips, the Settings search, the cards)', () => {
+  const src = read('src/ui/enhanced/enhancedFrame.js');
+  const a = src.indexOf('export const FRAME_ROLES'), b = src.indexOf('\n});', a);
+  const text = src.slice(a, b);
+  for (const line of text.split('\n')) {
+    if (!line.includes('//')) continue;
+    assert.doesNotMatch(line.slice(line.indexOf('//')), /'[.#a-z][^']*',/, `a selector inside a note: ${line.trim().slice(0, 100)}`);
+  }
   for (const [role, sel] of [['chip', '.hud-qspell'], ['chip', '.px-sys .cmp-mood'], ['well', '.px-sys .cmp-slot'], ['well', '.shell .opt-search'], ['panel', '.px-sys .card'], ['panel', '.hmcard'], ['panel', '.px-sys .hld-row']]) {
     assert.ok(FRAME_ROLES[role].includes(sel), `${role}: ${sel}`);
   }
+});
+
+test('AUDIT HOLDINGS C4: four tabs never cut on a narrow window - the strip wraps as a last resort, tighter under 900 px and 660 px (the diamonds gone); measured in Chromium over 320-1280 px, one row from 320', () => {
+  const css = read('src/ui/enhanced/enhancedStyle.js');
+  assert.match(css, /\.px-tabs \{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;/);
+  assert.match(css, /@media \(max-width: 900px\) \{\n  \.px-tabs button \{ font-size: 18px; letter-spacing: 0\.1em; text-indent: 0\.1em; padding: 6px 10px; gap: 6px; \}\n\}/);
+  assert.match(css, /@media \(max-width: 660px\) \{\n  \.px-tabs button \{ font-size: 15px; letter-spacing: 0\.06em; text-indent: 0\.06em; padding: 6px 6px; gap: 0; \}\n  \.px-tabs button \.px-c \{ display: none; \}\n\}/);
 });
 
 test('AUDIT HOLDINGS C5/C6: a horse never named, renamed with nothing, keeps no name - said as his, never "You do not own a horse"; an empty Holdings rail says so, never the Stable\'s "you own no horse"', () => {
@@ -236,6 +255,12 @@ test('AUDIT HOLDINGS C5/C6: a horse never named, renamed with nothing, keeps no 
   assert.deepEqual(p.stableAct('rename', 'Shadowmere'), { ok: true, text: 'Your horse is called Shadowmere.' });
   owns = false;
   assert.deepEqual(p.stableAct('rename', 'X'), { ok: false, text: 'You do not own a horse.' });
+  const menu = read('src/ui/enhanced/enhancedMenu.js');
+  // PIN MOVED (AUDIT COLLECTIONS-II, lanes 2 and 5): the rail is never empty - the Collections page is every player's, so a
+  // host with no holdings opens on it, never on the Stable's "you own no horse"; the empty rail's branch went with it
+  assert.doesNotMatch(menu, /if \(!secs\.length\) \{/);
+  assert.match(menu, /\.\.\.\(collectionsPageShown\(playerEntity\) \? COLLECTION_PAGE_SECTIONS : \[\]\)\];/);
+  assert.match(read('src/ui/collectionsPage.js'), /export const collectionsPageShown = \(_player = null\) => true;/);
 });
 
 // ── THE QUAYS ─────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -276,6 +301,26 @@ function warpFor(h, seconds) {
     h.boat.GameObject.rotation = w.rotation;
   }
 }
+
+test('AUDIT HOLDINGS O1: a harbour is sounded only once every pixel its scan reads is built (the world\'s `ready`) - never off a half-streamed shore, where a pixel not built reads as land and two players coming by different roads found different berths', async () => {
+  const h = await sea({ hull: 2, water: coast, settings: { ShipsAtSea: 'off' } });
+  let ready = false;
+  h.deps.harbourNear = () => ({ key: 'port:1', name: 'Sentinel', rect: TOWN, ready: () => ready });
+  h.boat.GameObject.position = [5000, 0, 5000]; h.view.feet = [5000, 0, 5000];
+  h.run(0.5);
+  assert.deepEqual(h.host.harbourList(), [], 'not sounded while its shore streams');
+  ready = true;
+  h.run(0.2);
+  assert.deepEqual(h.host.harbourList().map((x) => x.harbour.berths.map((b) => b.pos)), [HARBOUR.berths.map((b) => b.pos)], 'sounded once it is built - the berths every client finds');
+  // PIN MOVED (RPT1026-WORLD FAR-QUAY): the readiness moved out of world.js navalHarbourNear to systems/naval/harbourBook.js
+  // harbourOf, and a pixel it reads is known built - or dry for certain (harbourKnown: no build stands water there)
+  const world = read('src/systems/naval/harbourBook.js');
+  assert.ok(world.includes('for (let i = 0; i <= nx; i++) for (let k = 0; k <= nz; k++) if (!harbourKnown(built, state, woods, x0 + Math.min(sx * i / nx, sx - EDGE_IN), z0 + Math.min(sz * k / nz, sz - EDGE_IN))) return false;'), 'every point of the scan box known');
+  assert.match(world, /return \{ key: `port:\$\{t\.id\}`, name: t\.name \?\? null, rect, ready, reach \};/);   // PIN MOVED (AUDIT CAPTAIN'S SEA H1): and the reach it is sounded to - an isle port's its shore
+  assert.match(hostText('src/scenes/world.js'), /return \{ \.\.\.h, keep: harbourKeep\(t\.loc, h\.rect\) \};/);   // PIN MOVED (PORT-SHIPS): each town's keep beside its harbour (scenes/harbourHost.js, systems/naval/harbourKeep.js)
+  // PIN MOVED (FB1020c HARBOUR-REACH): any reach the book asks it at - its own, or the port law's ring's - every pixel built
+  assert.match(world, /const reach = t\.reach \?\? HARBOUR_REACH;[^\n]*\n\s+const ready = \(r = reach\) => \{[^\n]*\n\s+const x0 = rect\.minX - r, z0 = rect\.minZ - r, sx = rect\.maxX - rect\.minX \+ 2 \* r, sz = rect\.maxZ - rect\.minZ \+ 2 \* r;/, 'every pixel of that reach built');
+});
 
 test('AUDIT HOLDINGS Q1: the gangway runs square to her side at her waist and touches nothing but where it rests - every edge, face and rope of it clear of her colliders and of the quay\'s, a ship\'s climbing from the deck at GANGWAY_SLOPE, a boat\'s stepping down from the kerb\'s edge onto her gunwale over the water; the cargo never in its lane', async () => {
   for (const hull of [0, 1, 2, 4]) {
@@ -372,6 +417,7 @@ test('AUDIT HOLDINGS Q4: the gangway takes no press the ray gives her own helm, 
   assert.equal(h.host.takesActivate(), true, 'square enough');
   stand(g.deckAt, turn(toLand, 50 * DEG));
   assert.equal(h.host.takesActivate(), false, 'looking along her (it was 60 degrees)');
+  assert.match(read('src/scenes/world.js'), /naval\?\.activate\(\{ boatTrigger: !!_race\.boatWins \}\)/);
 });
 
 test('AUDIT HOLDINGS Q5: a ship coming in looks at her berth again on the way - taken since she chose it, another free berth, else out to sea (shipLife.js arrive); the berth my ship is warped in to is taken from the warp\'s first step, though she lies past BERTH_SNAP_M of it', async () => {

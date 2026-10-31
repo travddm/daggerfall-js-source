@@ -39,6 +39,7 @@ import { plunderText, mountNavalPlunderWindow } from '../../../src/ui/naval/nava
 const press = (n) => n.dispatch('click', { stopPropagation() {}, preventDefault() {} });
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
+const WORLD = read('src/scenes/world.js');
 const close = (a, b, eps = 1e-6) => Math.abs(a - b) <= eps;
 const closeV = (a, b, eps, msg) => assert.ok(a.length === b.length && a.every((v, i) => close(v, b[i], eps)), `${msg}: ${a} against ${b}`);
 
@@ -481,3 +482,17 @@ test('SHIP-CLAIM the window: "Claim her" beside Scuttle and Cast adrift while th
 
 // ── the world's seams (scenes/world.js) ───────────────────────────────────────────────────────────────────────────
 
+test('SHIP-CLAIM the world\'s seams - the naval host\'s board in scenes/world.js, the one host with a sea (THE FOUR HOSTS RULE: exterior.js, worldModes.js and dungeonContext.js stand none): the mint the mod\'s items\' own, the deed into the pack with no weight\'s gate answering the live pack, the terrain under her, and her dead re-decked - every body that stood on her hull stands on mine, another hull\'s where it was (mutants: each seam unwired, the redeck re-pointing nothing or every body)', () => {
+  assert.match(WORLD, /\n {6}mintUid: \(\) => csaNewItemUid\(\),\n/);
+  // PIN MOVED (HOLDINGS): the deed into the Fleet's book (systems/fleet.js titleDeed), its collection the book's
+  assert.match(WORLD, /\n {6}packDeed: \(item\) => \{ titleDeed\(item, \{ port: null \}\); return \(\) => fleetBook\(\); \},[^\n]*\n/);
+  assert.match(WORLD, /\n {6}terrainAt: \(p\) => csaTerrainOf\(csaPixelAt\(p\[0\], p\[2\]\)\),\n/);
+  const line = /\n {6}redeck: (\(from, to\) => \{[^\n]*\}),\n/.exec(WORLD);
+  assert.ok(line, 'the redeck seam');
+  const bodies = [{ deckBoat: 'hers' }, { deckBoat: 'hers', dead: true, corpse: {} }, { deckBoat: 'another' }];
+  const redeck = new Function('_deckBodies', `return ${line[1]};`)(new Set(bodies));
+  redeck('hers', 'mine');
+  assert.deepEqual(bodies.map((f) => f.deckBoat), ['mine', 'mine', 'another']);
+  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.ok(!read(host).includes('createNavalHost('), `${host} stands no sea`);
+  assert.ok(WORLD.includes('naval = createNavalHost({'));
+});

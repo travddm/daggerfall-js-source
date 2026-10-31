@@ -162,6 +162,16 @@ const clearBtn = (view, action) => {
 // not the reachability - so the pin walks the two places that render
 // them rather than the two rails that used to carry them.
 test('FT16: the key bindings live inside Settings, and both doors still reach them', () => {
+  const src = read('src/ui/enhanced/enhancedMenu.js');
+  const list = (name) => {
+    const m = new RegExp(`const ${name} = \\[([^\\]]*)\\]`).exec(src);
+    assert.ok(m, `${name} is gone`);
+    return m[1].split(',').map((s2) => s2.trim().replace(/^'|'$/g, '')).filter(Boolean);
+  };
+  // the door that carries them is on BOTH rails - that IS FIX-F's law
+  assert.ok(list('SECTIONS_PAUSE').includes('Settings'),
+    'Escape must reach the key bindings - the whole of FIX-F\'s bug');
+  assert.ok(list('SECTIONS_BOOT').includes('Settings'), 'and so must the front door');
   // AUDIT FT16 CTRL-a: the bindings are reachable only through a
   // Settings CATEGORY now, and nothing held that the category EXISTS -
   // deleting `controls` from CATEGORIES makes them unreachable from the
@@ -171,13 +181,34 @@ test('FT16: the key bindings live inside Settings, and both doors still reach th
   assert.ok(CATEGORY_IDS.includes('controls'),
     'FIX-F: there is a category to reach the bindings THROUGH - a renderer with no door is the bug this law is about');
 
+  // and Controls is no longer a door of its own, on any rail or in the
+  // pause window's System page
+  for (const r of ['SECTIONS_BOOT', 'SECTIONS_CLASSIC', 'SECTIONS_PAUSE']) {
+    assert.ok(!list(r).includes('Controls'), `${r} must not carry a second door to one subject`);
+  }
   assert.equal(SYSTEM_PANES.find(([id]) => id === 'controls'), undefined,
     'the pause System page reaches the bindings through its Settings row');
+  // a dispatch is a LOOKUP, so a dead key is `undefined(body)` - the
+  // wrapper and both table entries must be gone together
+  assert.equal(src.match(/controls: paneControlsPane/g), null, 'no dispatch entry survives the move');
+  assert.doesNotMatch(src, /paneControlsPane/, 'and neither does the wrapper it pointed at');
 
   // THE RENDERER. ORG2: one Settings screen draws every tab, the pause window's too, and the bindings are an item of the
   // Controls tab's last section - drawn by the one function that draws every item. Dropping it is FIX-F's bug.
   assert.equal(whereIsOption('bindings')?.tab.id, 'controls', 'the full Settings screen draws the bindings in the Controls tab');
+  assert.match(src, /if \(item === 'bindings'\) \{ const box = el\('div', 'opt-bindings'\); paneControls\(box, \{ render \}\); return \[box\]; \}/);
+  assert.match(src, /paneSettings\(detail, \{ pause: true \}\);/, 'and the pause window draws the same screen');
+  const full = src.slice(src.indexOf('function paneSettings('), src.indexOf('\n}\n', src.indexOf('function paneSettings(')));
 
+  // AND THE STAGING FOLLOWS THE ADDRESS. "Leave this page and your
+  // changes are dropped" was enforced by the section rail; the category
+  // rail has to enforce it now, or a staged bind survives a hop to
+  // Audio and back and lands on a Continue the player never meant.
+  // ORG2: and the search and the filters, which repaint the page without the bindings
+  assert.match(src, /search\.oninput = \(\) => \{\s*\n\s*discardControlsStaging\(\);/, 'a search is a walk away');
+  assert.match(src, /b\.onclick = \(\) => \{ discardControlsStaging\(\); optFilter = id;/, 'and so is a filter');
+  assert.match(full, /else \{ discardControlsStaging\(\);/,
+    'a category change drops the staged dicts');
 });
 
 test('KB1: the pane draws the standard\'s groups - every action once, the two DFU leaves nothing reads never, a mod\'s group only while that mod is on (mutant: draw the classic grid slice again)', () => {
@@ -254,6 +285,12 @@ test('FIX-F: arming then a keydown binds through the STAGED dict, and the listen
 });
 
 test('FIX-F: Escape binds like any other key, and the shell stands down for it', () => {
+  // ReservedKeys is empty in DFU (InputManager.cs:73 `new KeyCode[] { }`,
+  // exposed :174-177), so the capture gate that consults it
+  // (DaggerfallControlsWindow.cs:410) never refuses a key - Escape
+  // included. The shell's own Escape handler stands down for it.
+  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /if \(captureArmed\(\)\) return;/,
+    'ui/enhanced/enhancedMenu.js’s onKey must stand down while a rebind is armed');
   withPane(({ doc, view }) => {
     keyBtn(view, 'Jump').onclick();
     doc.listeners[0].fn(keyEvent('Escape'));
@@ -456,6 +493,34 @@ test('KB1: a key another action holds ASKS before it moves (law 4) - No stages n
   });
 });
 
+test('FIX-F: duplicates are flagged and BLOCK Continue with the classic window’s words', () => {
+  withPane(({ view, store, render }) => {
+    // KB1 + AUDIT KB1 F5: every capture ASKS now, exact codes and DFU's combo law alike, so a clash reaches the pane
+    // only from the FILE - a hand-edited one, or one saved before the prompt existed. Here the live registry holds
+    // Inventory on Shift+T while Run holds Left Shift bare (GetDuplicates' second phase, :188-196), and the pane
+    // stages what it is handed.
+    setBinding(store, comboCode('ShiftLeft', 'KeyT'), 'Inventory');
+    discardControlsStaging();
+    render();
+    assert.equal(controlsDuplicates().ok, false);
+    assert.ok(controlsDuplicates().internal.has(comboCode('ShiftLeft', 'KeyT')));
+    const flagged = find(view.body, 'ctl-dupe').map((b) => b.dataset.action).sort();
+    assert.deepEqual(flagged, ['Inventory', 'Run'],
+      'both halves of the clash are marked, as the grid colours them');
+
+    one(view.body, 'ctl-continue').onclick();
+    const notices = find(view.body, 'ctl-notice').map((n) => n.textContent);
+    assert.ok(notices.includes(MULTIPLE_ASSIGNMENTS),
+      'the refusal is the classic window’s own line, not a rewording');
+    assert.equal(MULTIPLE_ASSIGNMENTS, 'You have multiple assignments...');
+    assert.match(read('src/ui/controlsWindow.js'), /'You have multiple assignments\.\.\.'/,
+      'and the two windows say the same thing because it is the same refusal');
+    // ...and NOTHING reached the registry: it holds what it held.
+    assert.equal(getBinding(store, 'Inventory', true), comboCode('ShiftLeft', 'KeyT'));
+    assert.equal(getBinding(store, 'Run', true), 'ShiftLeft');
+  });
+});
+
 test('FIX-F: CONTINUE applies to the live registry and saves', () => {
   withPane(({ doc, view, store }) => {
     let saved = 0;
@@ -493,7 +558,32 @@ test('FIX-F: leaving without CONTINUE discards', () => {
     assert.equal(getBinding(store, 'MoveForwards', true), 'KeyW');
     assert.equal(keyBtn(view, 'MoveForwards').textContent, 'W');
   });
+  // ...and the shell calls it on every way out.
+  const src = read('src/ui/enhanced/enhancedMenu.js');
+  assert.equal((src.match(/discardControlsStaging\(\)/g) ?? []).length >= 5, true,
+    'the rail, the tabs, go(), the mount reset and the unmount all drop the staging');
+  const unmount = src.slice(src.indexOf('    unmount() {'));
+  assert.match(unmount, /discardControlsStaging\(\);/,
+    'a document listener that outlives its screen is the bug the unmount note names');
 
+  // AUDIT FT16 F10: ...on every way OUT, and nowhere else. FIX-F guarded
+  // this with `id !== 'controls'` - Controls was its own section, so a
+  // click on the section you stood in kept your staging. FT16 folded
+  // Controls into a Settings category and dropped the guard with the
+  // section, so clicking the Settings rail row WHILE REBINDING (the row
+  // is right there, and it is the section you are in) threw the staged
+  // binds away. The discard belongs to a section CHANGE.
+  const goBody = src.slice(src.indexOf('function go(id) {'), src.indexOf('// ── PX1'));
+  const goCode = goBody.replace(/\/\/[^\n]*/g, '');
+  assert.match(goCode, /if \(id !== section\) discardControlsStaging\(\);/,
+    'go() drops the staging when the section actually changes - not when the rail row is the section you are in');
+  assert.doesNotMatch(goCode, /^\s*discardControlsStaging\(\);/m,
+    'and never unconditionally (AUDIT FT16 F10)');
+  // the category tabs keep their own unconditional drop - THAT switch is
+  // a walk away from the bindings even though the section does not change
+  const tabs = src.slice(src.indexOf('if (on) { pickedKey = null; pickedFeature = null; sheetOpen = true; }'));
+  assert.match(tabs.slice(0, 200), /discardControlsStaging\(\); category = cat\.id;/,
+    'leaving the controls CATEGORY still discards');
 });
 
 test('UXB1-C: the ✕ and the right-click CLEAR AT ONCE - no question, staged like every edit, refused on an unbound slot', () => {
@@ -544,6 +634,49 @@ test('UXB1-B: the commit button says Confirm, head and foot, and the page says t
 });
 
 test('UXB1-D: a replace prompt is a tooltip on the changed binding, marks both rows, and leaves the list inert', () => {
+  withPane(({ doc, view, store }) => {
+    const rowOf = (action) => find(view.body, 'ctl-row').find((r) => one(r, 'ctl-key').dataset.action === action);
+    const classes = (n) => n.className.split(/\s+/);
+    keyBtn(view, 'MoveForwards').onclick();
+    doc.listeners[0].fn(keyEvent('KeyS'));   // MoveBackwards' default
+    const head = one(view.body, 'ctl-head');
+    const wanted = rowOf('MoveForwards');
+    const tip = one(wanted, 'ctl-tooltip');
+    assert.ok(tip, 'the question is beside the binding being changed');
+    assert.ok(classes(tip).includes('ctl-prompt'), 'the tooltip keeps the prompt card and its answers');
+    assert.equal(one(head, 'ctl-prompt'), undefined, 'the sticky head no longer owns key conflicts');
+    assert.ok(!classes(head).includes('ctl-asking'));
+    assert.equal(keyBtn(view, 'MoveForwards').attrs['aria-expanded'], 'true');
+    assert.equal(tip.attrs.role, 'dialog');
+    assert.equal(tip.tag, 'dialog', 'the top layer keeps the fallback outside the Settings scrollport');
+    assert.equal(tip.open, true, 'the conflict is a native modal dialog');
+    assert.equal(doc.activeElement.textContent, 'Yes', 'the first answer owns keyboard focus');
+    assert.equal(keyBtn(view, 'Jump').attrs.inert, '', 'background controls are outside the tab order');
+    assert.equal(tip.querySelector('[autofocus]').attrs.inert, undefined, 'the answers remain reachable');
+    const css = read('src/ui/enhanced/enhancedStyle.js');
+    assert.match(css, /\.ctl-tooltip \{[\s\S]*?position: fixed;[\s\S]*?top: 50%; left: 50%;[\s\S]*?max-height: calc\(100dvh - 24px\)/,
+      'without CSS anchors the top-layer dialog is fitted to and centred in the viewport');
+    assert.match(css, /@supports \(position-anchor:[\s\S]*?position-area: bottom span-left;[\s\S]*?position-try-fallbacks: flip-block, flip-inline;/,
+      'where anchors exist the tooltip stays beside the binding and flips to fit');
+    assert.ok(keyBtn(view, 'MoveForwards'), 'and the list is still drawn under it, so the scroll has somewhere to stay');
+    assert.ok(classes(rowOf('MoveForwards')).includes('ctl-want'), 'the row the key would go to is marked');
+    assert.ok(classes(rowOf('MoveBackwards')).includes('ctl-holder'), 'the row that holds it now is marked');
+    assert.equal(find(view.body, 'ctl-holder').length, 1, 'and no other');
+    assert.equal(find(view.body, 'ctl-want').length, 1);
+
+    // Inert: a key and a ✕ under the question do nothing.
+    keyBtn(view, 'Jump').onclick();
+    assert.equal(captureArmed(), null, 'no capture arms under a prompt');
+    clearBtn(view, 'Jump').onclick();
+    assert.equal(currentDict(controlsStaging()).get('Jump'), getBinding(store, 'Jump', true), 'no clear lands under a prompt');
+    assert.equal(controlsPromptOpen(), true, 'the question still stands');
+
+    answer(view, false);
+    assert.equal(find(view.body, 'ctl-holder').length, 0, 'answered: the marks go with it');
+    assert.equal(find(view.body, 'ctl-want').length, 0);
+    assert.equal(one(view.body, 'ctl-prompt'), undefined);
+    assert.equal(doc.activeElement, keyBtn(view, 'MoveForwards'), 'answering returns focus to the binding that asked');
+  });
   // a holder in the OTHER set is named by the prompt, not marked on a page that does not show it
   const marks = promptMarks({ kind: 'replace', action: 'Jump', holders: [{ action: 'Run', primary: false }, { action: 'Sneak', primary: true }] }, true);
   assert.equal(marks.want, 'Jump');
@@ -614,6 +747,7 @@ test('FIX-F / KB1: DEFAULTS resets behind a confirm, through the registry’s ow
     assert.equal(getBinding(store, 'MoveForwards', true), 'KeyW', 'Continue commits it');
     assert.equal(store.removedPrimary.has('QuickSwap'), false, 'with the live reset\'s own law - the removal marks go too');
   });
+  assert.match(read('src/ui/enhanced/enhancedControls.js'), /if \(pendingDefaults\) \{ resetDefaults\(bindings\(\)\); pendingDefaults = false; \}/);
 });
 
 test('FIX-F: the PRIMARY/SECONDARY toggle is refused while the shown dict clashes', () => {
@@ -636,6 +770,31 @@ test('FIX-F: the PRIMARY/SECONDARY toggle is refused while the shown dict clashe
 });
 
 // ── AND THE PANE IS PAINTED IN THE SKIN, NOT BESIDE IT ───────────
+
+test('FIX-F: the pane wears the skin’s own classes and adds no face of its own', () => {
+  const css = read('src/ui/enhanced/enhancedStyle.js');
+  for (const rule of ['.ctl-key {', '.ctl-key.ctl-dupe {', '.ctl-key.ctl-cross {',
+    '.ctl-notice.bad {', '.px-sys .ctl-key {']) {
+    assert.ok(css.includes(rule), `enhancedStyle.js must carry ${rule}`);
+  }
+  const block = css.slice(css.indexOf('/* ── FIX-F: THE CONTROLS PANE'), css.indexOf('.px-qdetail {'));
+  assert.ok(!/font-family/.test(block),
+    'the shell and the pause window already put Pixelify over everything inside them');
+  const src = read('src/ui/enhanced/enhancedControls.js');
+  assert.ok(!/style\.cssText|\.style\./.test(src), 'no inline styling - the sheet is the one place a media query can see');
+  // and the law is BORROWED, never restated
+  for (const fn of ['createUnsavedKeybinds', 'setUnsavedBinding', 'checkDuplicates',
+    'applyUnsavedKeybinds', 'stagedDefaults', 'comboFromEvent', 'buttonText', 'bindingHolder', 'stageReplace']) {
+    assert.ok(src.includes(fn), `${fn} must be driven, not reimplemented`);
+  }
+  const imports = [...src.matchAll(/from '([^']+)'/g)].map((m) => m[1]);
+  assert.ok(imports.includes('../../systems/controlsConfig.js'));
+  assert.deepEqual(imports.sort(),
+    ['../../systems/controlsConfig.js', '../../systems/inputActions.js', '../../systems/modSettings.js', '../../systems/textDatabases.js', '../../systems/textManager.js', '../input.js', '../peerMenuBindCard.js'],   // PEERMENU1: the player menu's bind card - an enhanced-face card over its own pref, no classic canvas window; L10N3d: the text core, a leaf with no art; L10N3f: DFU's text databases, no art either
+    'the enhanced pane drives the LAW modules and nothing else - dragging the '
+    + 'classic canvas windows (controlsWindow/mouseControlsWindow/nativePanel) in '
+    + 'would make the enhanced skin pay for art it never draws');
+});
 
 test('AUDIT KB1 (UI 4): Escape on the replace prompt answers No and KEEPS the staged binds - the menu\'s back stack asks the pane first (mutant: the prompt not reported open, so the section is left and the staging discarded)', () => {
   withPane(({ doc, view }) => {

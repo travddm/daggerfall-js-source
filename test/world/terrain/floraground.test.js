@@ -58,6 +58,17 @@ function drawnOracle(hm) {
   };
 }
 
+/** The world host's own walk floor, lifted off world.js (as RESPAWN-GROUND lifts it) over one built pixel at the origin. */
+function hostHeightAt(samples) {
+  const W = hostText('src/scenes/world.js');
+  const i = W.indexOf('const heightAt = (x, z, terrainOnly = false) => {'), j = W.indexOf('\n  };', i);
+  const body = W.slice(i, j + 5).replace('const heightAt = ', 'return ');
+  const state = { compensation: [0, 0, 0], mapOrigin: { x: 300, y: 200 }, pixelTranslation: (px, py, out = [0, 0, 0]) => { out[0] = (px - 300) * TERRAIN_SIZE; out[1] = 0; out[2] = (200 - py) * TERRAIN_SIZE; return out; } };
+  const built = new Map([['300,200', { px: 300, py: 200, samples }]]);
+  return new Function('state', 'built', 'TERRAIN_SIZE', 'HEIGHTMAP_DIMENSION', 'heightCell', 'worldHeight', 'deepWaters', '_htT', 'walkGroundAt', body)(
+    state, built, TERRAIN_SIZE, H, CELL, M, null, [0, 0, 0], walkGroundAt);
+}
+
 /** Every flat stands on the walk law: at it or sunk into its slope, never over it. Answers the worst float. */
 function onTheWalkFloor(flats, hm, what) {
   let worst = -Infinity;
@@ -71,7 +82,22 @@ function onTheWalkFloor(flats, hm, what) {
 
 test('FLORA-GROUND the ground\'s one law is the drawn ground: walkGroundAt is the near grid\'s own triangles, the world host\'s walk floor walks it (the bilinear patch it walked is gone), and the grass stands on it (mutants: the law\'s stride; the walk floor\'s bilinear back; the grass off it)', () => {
   const { hm } = saddleField();
+  const drawn = drawnOracle(hm), walk = hostHeightAt(hm);
+  let apart = 0, n = 0;
+  for (let k = 0; k < 3000; k++) {
+    const x = ((k * 0.6180339887) % 1) * (TERRAIN_SIZE - 0.01), z = ((k * 0.7548776662) % 1) * (TERRAIN_SIZE - 0.01);
+    const g = walkGroundAt(hm, x, z);
+    assert.ok(Math.abs(g - drawn(x, z)) < 1e-3, `the law is the drawn triangle at (${x.toFixed(2)}, ${z.toFixed(2)}): ${g} against ${drawn(x, z)}`);   // the mesh's vertices are float32
+    assert.ok(Math.abs(walk(x, z) - g) < 1e-9, `the walker stands on it at (${x.toFixed(2)}, ${z.toFixed(2)})`);
+    if (groundAt(hm, x, z) - g > 0.05) apart++;
+    n++;
+  }
+  assert.ok(apart > n / 20, `the field tells the two apart: the bilinear patch over the drawn ground by 5 cm at ${apart} of ${n} points`);
   assert.equal(walkGroundAt(hm, 3 * CELL, 7 * CELL), surfaceHeightAt(hm, 3 * CELL, 7 * CELL, 1));
+  const W = hostText('src/scenes/world.js');
+  assert.match(W, /return walkGroundAt\(p\.samples, lx, lz\) \+ t\[1\];/, 'the walk floor');
+  assert.match(W, /const h = walkGroundAt\(p\.samples, lx, lz\);/, 'the grass');
+  assert.doesNotMatch(W, /at\(ix, iz\) \* \(1 - sx\) \* \(1 - sz\)/, 'the bilinear walk floor gone, not merely unused');
 });
 
 test('FLORA-GROUND every plant stands on the walk floor: the woods, DFU\'s scatter, a border\'s, an herb\'s stand, the jungle\'s four storeys - at it, or sunk into its slope by DFU\'s steepness / 70, never over it; on the bilinear patch the woods stood on until now, dozens of them stood over it (mutants: the woods\' law; the corner\'s; the border\'s; the stand\'s; the jungle\'s)', () => {
@@ -110,6 +136,35 @@ test('FLORA-GROUND what the build stands reads the same law: a town\'s nature fl
   for (let x = 102.5; x <= 107.5; x += 0.25) for (let z = 203.5; z <= 210.5; z += 0.25) low = Math.min(low, walkGroundAt(hm, x, z));
   assert.ok(Math.abs(lowestGroundUnder(hm, box) - low) < 0.02, 'a shrub\'s foot the lowest walk floor under its middle');
   assert.ok(lowestGroundUnder(hm, box) <= low + 1e-9);
+  assert.match(src('src/scenes/pixelBuild.js'), /addFlat\(archive, t\.record, t\.x, walkGroundAt\(samples, t\.x, t\.z\), t\.z, \{ wild: JUNGLE_ARCHIVE \}\);/, 'the pairs\' fallback flats');
+  const jn = src('src/world/terrain/jungleNature.js'), jr = src('src/world/jungle/jungleRoadside.js');
+  assert.match(jn, /ground: \(mx, mz\) => walkGroundAt\(heightmapData, mx, mz\),/, 'the graht-oaks\' foot');
+  assert.equal((jr.match(/walkGroundAt\(heightmapData, /g) ?? []).length, 4, 'the pairs\' four reads of the ground');
+  assert.doesNotMatch(jr, /surfaceHeightAt\(/, 'the pairs read no second law');
+});
+
+test('FLORA-GROUND what rides the ground reads it by the same law: the landforms\' lift field between its samples (the frame a save\'s heights are shed into) on the drawn triangles, and a rebuilt pixel\'s ground moved under what lies on it (mutants: the lift field bilinear again; the rider\'s read)', async () => {
+  const { WoodsFile } = await import('../../../src/formats/woodsFile.js');
+  const { landformLiftField } = await import('../../../src/world/landforms.js');
+  const { syntheticWoodsBytes } = await import('../../landformWorld.mjs');
+  const w = new WoodsFile();
+  assert.equal(w.load(syntheticWoodsBytes()), true);
+  let apart = 0, n = 0;
+  for (const [px, py] of [[398, 251], [610, 245], [450, 120]]) {
+    const f = landformLiftField(w, px, py);
+    for (let k = 0; k < 400; k++) {
+      const sx = 2 + ((k * 0.6180339887) % 1) * 120, sy = 2 + ((k * 0.7548776662) % 1) * 120;
+      const ix = Math.floor(sx), iy = Math.floor(sy), fx = sx - ix, fy = sy - iy;
+      const f00 = f(ix, iy), f10 = f(ix + 1, iy), f01 = f(ix, iy + 1), f11 = f(ix + 1, iy + 1);
+      const tri = fy >= fx ? f00 + fy * (f01 - f00) + fx * (f11 - f01) : f00 + fx * (f10 - f00) + fy * (f11 - f10);
+      const bil = f00 * (1 - fx) * (1 - fy) + f10 * fx * (1 - fy) + f01 * (1 - fx) * fy + f11 * fx * fy;
+      assert.ok(Math.abs(f(sx, sy) - tri) < 1e-9, `the lift at (${sx.toFixed(2)}, ${sy.toFixed(2)}) read on the drawn triangles`);
+      if (Math.abs(tri - bil) > 1e-6) apart++;
+      n++;
+    }
+  }
+  assert.ok(apart > n / 4, `the fields tell the two reads apart at ${apart} of ${n} points`);
+  assert.match(src('src/scenes/pixelBuild.js'), /const groundIn = \(smp, x, z\) => walkGroundAt\(smp, Math\.max\(0, Math\.min\(TERRAIN_SIZE, x - t\[0\]\)\), Math\.max\(0, Math\.min\(TERRAIN_SIZE, z - t\[2\]\)\)\);/, 'a rebuilt pixel\'s ground, moved under what lies on it, read by the walk floor\'s law');
 });
 
 test('FLORA-GROUND THE BAND STANDS DOWN OVER A BUILT PIXEL: each band tree carries its pixel\'s slot about the base (BAND_REACH a side, the Land View\'s most and the ring), the program drops a tree whose slot the stream has built, and the built bits are written the frame the built map changes - not at the next crossing (mutants: the slot unwritten; its byte; the drop; the bit\'s row; the bits not rewritten; the key blind to the map; the upload)', () => {

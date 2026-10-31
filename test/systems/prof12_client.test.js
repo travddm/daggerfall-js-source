@@ -272,6 +272,9 @@ test('PROF12 pages: The Enchanting Station - away, the word; at a Mages Guild ha
 
 test('PROF12 pages: Alchemy and Enchanting practised on the Professions page - their cards chosen at their ranks, Alchemy\'s unlocks by DFU\'s twenty, how each is practised said', () => {
   stubPages({ alchemyTrack: { rank: 100, specs: { 50: null, 100: null } } });
+  const src0 = src('src/ui/professions/profPages.js');
+  // PIN MOVED (CRAFT3): PRACTISED is the ten tracks - Alchemy practised as Provisioning's, beside Enchanting
+  assert.match(src0, /const PRACTISED = Object\.freeze\(\['herbalism', 'mining', 'hunting', 'fishing', 'logging', 'smithing', 'building', 'outfitting', 'provisioning', 'enchanting'\]\);/);
   const page = pageOf(drawProfessionsPage);
   try {
     page.buttonStarting('Provisioning').onclick();   // PIN MOVED (CRAFT3): Alchemy's brewing is the Provisioning track's pane
@@ -323,6 +326,8 @@ test('PROF12 items: a brew\'s potions are DFU\'s own (createPotion - its key, pr
   const bundle = potionBundle(healing.key);
   const e = bundle.effects[0];
   assert.deepEqual([e.magnitudeBaseLow, e.magnitudeLevelBase], [5, 9]);
+  const src0 = src('src/scenes/hostMagic.js');
+  assert.match(src0, /drinkPotion\(recipeKey, potent = 0\) \{\n\s*const plain = potionBundle\(recipeKey\);\n\s*if \(!plain\) return null;\n[^\n]*(?:\s*\/\/[^\n]*\n)+\s*const bundle = potent \? \{ \.\.\.plain, effects: plain\.effects\.map\(\(e\) => potentEffect\(e, potent, castingLevel\(playerEntity\)\)\) \} : plain;/);
   const drunk = [];
   const bag = [{ ...potent[0], stackCount: 1 }];
   useItem(bag[0], bag, { drinkPotion: (key, share) => { drunk.push([key, share]); return 'Healing'; } });
@@ -342,6 +347,12 @@ test('PROF12 goods: the Apothecaries\' sixteen withdraw as DFU\'s own ingredient
   assert.deepEqual([t?.name, t?.worldTextureArchive, t?.worldTextureRecord, t?.stackable], ['Arcane Essence', 254, 39, true]);
   assert.deepEqual([mintMaterialItem('essence:arcane')?.templateIndex, materialCountLabel('essence:arcane', 4)], [680, 'Arcane Essence']);
   assert.deepEqual(stockOf('reagent:ichor'), { key: 'reagent:ichor', marks: 4, counter: 'apothecaries' });
+  const m = src('src/ui/marketTab.js');
+  // BOARD-UI (PIN MOVED): the counters folded under the suppliers' line, which the Materials view hangs
+  assert.match(m, /if \(\(m\.apothecaries \?\? \[\]\)\.length\) box\.append\(apothecariesNode\(\)\);/);
+  assert.match(m, /if \(st\.view === 'materials'\) box\.append\(suppliersNode\(\)\);/);
+  assert.match(m, /box\.append\(el\('h4', null, 'The Apothecaries\\' counter'\)\);/);
+  assert.match(hostText('src/scenes/world.js'), /apothecaries: APOTHECARY_STOCK,/);
 });
 
 // ─── THE BOOK ────────────────────────────────────────────────────────
@@ -372,6 +383,7 @@ test('PROF12 book: a brew is kept as a craft - a lost answer asked again with th
   const ds = asked.filter((a) => a[0] === 'disenchant');
   assert.equal(ds[0][2], ds[1][2], 'the same id');
   assert.equal(book.held('essence:arcane'), 6);
+  assert.match(src('src/net/accountClient.js'), /brew: \(character, potion, keys, rid, seat = null\) => post\('\/v1\/prof\/brew', \{ character, potion, keys, rid, \.\.\.\(seat == null \? \{\} : \{ seat \}\) \}\),/);
   assert.match(accountRefusalText('prof-transmuter'), /Only a Transmuter/);
   assert.match(accountRefusalText('prof-no-essence'), /Arcane Essence/);
   assert.match(accountRefusalText('bad-brew'), /no such potion/);
@@ -380,6 +392,27 @@ test('PROF12 book: a brew is kept as a craft - a lost answer asked again with th
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
 test('PROF12 wiring: the alchemy station an Alchemist\'s (open for trade) or a home\'s; the enchanting station a Mages Guild hall or a home\'s; the world brews there through the book (its fee, the Apothecary\'s town), transmutes at it by the smelt, mints a brew\'s potions, disenchants the pack\'s pieces; the item maker reads Enchanting\'s share; the service\'s routes stand', () => {
+  const m = src('src/scenes/worldModes.js');
+  assert.match(m, /if \(interiorBuilding\.buildingType === BUILDING_TYPES\.Alchemist\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: ALCHEMY_FEE \};/);
+  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'alchemy'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
+  assert.match(m, /guildGroupOfFaction\(townTalk\?\.factionDict \?\? null, interiorBuilding\.factionId\) === GUILD_GROUPS\.MagesGuild\) return \{ kind: 'shop', fee: ENCHANT_FEE \};/);
+  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'enchant'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
+  assert.match(m, /goldDiscountPct: \(\) => enchantGoldPct\(\),/);
+  assert.match(src('src/ui/item/itemMakerWindow.js'), /enchantDecision\(this\.selected, this\.powers, this\.sideEffects, \{ gold: this\.gold\(\), discountPct: this\.goldDiscountPct\(\), souls: this\._souls \}\)/);   // PIN MOVED (RPT1026-PROGRESS SOUL-HELD, test/ui/rpt1026_progress_ui.test.js): and the souls the pack holds now
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /alchemy: \(\) => modes\?\.alchemyHere\?\.\(\) \?\? null,/);
+  assert.match(w, /const myHall = \(profession\) => hallStepsFor\(seatHere\(_musicLoc\?\.mapTableData\?\.mapId\), guildBook\?\.guild\?\.id \?\? null, profession\);\n\s*const alchemyHall = \(\) => myHall\('alchemy'\);/);   // PIN MOVED (AUDIT PROF-541 R2-H1): the guard fortLaw.js hallStepsFor's (prof9_client.test.js drives it)
+  assert.match(w, /const \{ seat \} = alchemyHall\(\);\n\s*const r = await profBook\.brew\(potion, keys, \{ fee: f\.fee > 0 \? f\.fee : 0, seat \}, profMintCraft\);/);
+  assert.match(w, /alchemySteps: \(\) => alchemyHall\(\)\.steps,/, 'AUDIT PROF-541 B4: the station\'s line says the steps the service adds');
+  assert.match(w, /if \(typeof data\?\.potion === 'string'\) \{\n\s*const potions = brewItems\(data\);/);
+  assert.match(w, /const f = \(alch \? modes\?\.alchemyHere\?\.\(\) : mason \?/);
+  assert.match(w, /r = await profBook\.disenchant\(provenance\);\n\s*if \(r\?\.ok && here\(\) && !r\.elsewhere\) takeOut\(\);/);
+  assert.match(w, /if \(at >= 0\) out = \{ piece: playerEntity\.items\.splice\(at, 1\)\[0\], at \};/);
+  const idx = src('server-account/src/index.js');
+  assert.match(idx, /'\/v1\/prof\/brew': \(\) => brewAtStation\(ctx, who\.player, env, body\),/);
+  assert.match(idx, /'\/v1\/prof\/disenchant': \(\) => disenchantPiece\(\{ \.\.\.ctx, bucket: env\.SAVES \}, who\.player, env, body\),/);
+  assert.match(src('server-account/src/service.js'), /'\/v1\/prof\/brew', '\/v1\/prof\/disenchant',/);
+  assert.match(src('src/ui/professions/profPages.js'), /\['jeweller', \(d\) => drawJewellerBench\(d, rerender, kit\)\],   \/\/ PROF10\n\s*\['alchemy', \(d\) => drawAlchemyStation\(d, rerender, kit\)\],   \/\/ PROF12\n\s*\['enchant', \(d\) => drawEnchantingStation\(d, rerender, kit\)\],   \/\/ PROF12/);   // PIN MOVED (MENU-ORDER)
   assert.equal(POTENT.pct, 25);
 });
 
@@ -435,6 +468,7 @@ test('AUDIT PROF12 E2 client: the Enchanting Station says a piece\'s XP by its r
   const ring = mintPiece({ recipe: 'ring:gold:ruby', quality: 1, seed: 1, maker: 'Mac' }, 'dddddddddddddddd');
   assert.deepEqual(disenchantableOf([ring]), [{ provenance: 'dddddddddddddddd', name: 'Gold Ruby Ring', points: 2160, essence: 21, recipe: 'ring:gold:ruby' }]);
   assert.equal(disenchantableOf([ring], { book: { track: () => ({ specs: { 50: 'disenchanter', 100: null } }) } })[0].essence, 42, 'a Disenchanter\'s twice');
+  assert.match(hostText('src/scenes/world.js'), /disenchantable: \(\) => disenchantableOf\(playerEntity\.items, \{ kept: pieceKept, book: profBook \}\),/);
 });
 
 test('AUDIT PROF12 A2 client: a quick slot keeps a Potent potion and a plain one of the same recipe apart - two kinds, and the HUD\'s count each its own', async () => {
@@ -471,6 +505,7 @@ test('AUDIT PROF12 A3 client (Mac: "Potent lasts longer"): a Potent potion whose
     assert.match(page.text(), /3 potions a brew\. Potent 20% \(\+40% magnitude\)/);
   } finally { page.done(); setProfessionsPages(null); }
 });
+
 
 // ─── AUDIT PROF12 (2026-10-03) ───────────────────────────────────────
 
@@ -537,6 +572,9 @@ test('AUDIT PROF-541 B2 client: a realm character\'s disenchant names where its 
   await wire.disenchant('char-1', 'aaaaaaaaaaaaaaaa', 'rid-1', at);
   await wire.disenchant('char-1', 'aaaaaaaaaaaaaaaa', 'rid-2');
   assert.deepEqual(bodies.map((b) => b.realm ?? null), [at, null], 'the record where it stands, on the wire - and none for another character');
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /call: \(at\) => \{ if \(!here\(\)\) return Promise\.resolve\(\{ ok: false, error: 'elsewhere', elsewhere: true \}\); if \(!asked\) \{ asked = true; takeOut\(\); \} return out \? profBook\.disenchant\(provenance, at\) : Promise\.resolve\(\{ ok: false, error: 'prof-piece-gone' \}\); \},/);
+  assert.match(w, /if \(r\?\.error === 'prof-no-piece' && r\?\.why === 'disenchanted' && takeOut\(\)\)/);
 });
 
 // ─── AUDIT PROF-541 ROUND 2 (2026-10-03) ─────────────────────────────
@@ -549,10 +587,17 @@ test('AUDIT PROF-541 R2-C1/N1: a realm disenchant that LANDED (its first answer 
   const session = { async transact(call) { const r = await call({ id: 'r0123456789abcdef0123', lease: 'f'.repeat(32), seq: 5 }); return r; } };
   const r = await realmGoldAct({ session, checkpoint: () => {}, wait: noWait, call: (at) => book.disenchant('aaaaaaaaaaaaaaaa', at) });
   assert.deepEqual([r.ok, r.landed, r.data], [true, true, undefined], 'landed, its Essence and XP unsaid');
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /if \(paid\) deductGold\(playerEntity, Math\.min\(f\.fee, totalGoldAmount\(playerEntity\)\)\);\n(?:\s*\/\/[^\n]*\n)*\s*if \(!r\.data\) profBook\.refresh\(\{ force: true \}\)\.catch\(\(\) => \{\}\);/, 'a landed act: the state read again');
+  assert.match(w, /if \(r\?\.error === 'prof-no-piece' && r\?\.why === 'disenchanted' && takeOut\(\)\) \{\n\s*const owed = f\.fee > 0 \? Math\.min\(f\.fee, totalGoldAmount\(playerEntity\)\) : 0;\n\s*if \(owed > 0\) deductGold\(playerEntity, owed\);\n\s*profBook\.refresh\(\{ force: true \}\)\.catch\(\(\) => \{\}\);/, 'disenchanted already: the fee paid, the state read again');
+  assert.match(w, /and it leaves your pack\$\{owed > 0 \? `; you paid the enchanter \$\{owed\} gold` : ''\}\./);
 });
 
 test('AUDIT PROF-541 R2-C2: one latch holds every craft and brew (profBook _craftBusy), so the busy word names no station - not the anvil at the fire, nor the fire at the loom', async () => {
   assert.equal(accountRefusalText('prof-busy'), 'Your hands are busy with another craft.');
+  const w = hostText('src/scenes/world.js');
+  assert.doesNotMatch(w, /'The anvil is still ringing|'Your last (?:work|dish|piece) is still on the/);
+  assert.match(w, /if \(!r\?\.ok\) return \{ ok: false, text: r\?\.kept \? `\$\{st\.kept\}\$\{chain \? ` \$\{chain\}` : ''\}` : `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}\$\{chain \? ` \$\{chain\}` : ''\}` \};/);   // PIN MOVED (AUDIT2 BAG1 K8): and what went into the Stores first; (CRAFT1) and what the chain refined first - kept or refused (AUDIT CRAFT1 F3)
   // the latch is one: a brew under way refuses a dish
   let release;
   const door = { account: () => 'acc', brew: () => new Promise((r) => { release = r; }), craft: async () => ({ ok: true, data: {} }) };

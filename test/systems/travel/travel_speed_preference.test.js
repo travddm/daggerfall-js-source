@@ -121,3 +121,24 @@ import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/sys
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 
+const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+
+test('RATE-LAW host: travellerOnRoad (lifted from world.js) answers from the network\'s own lanes - a road or a track under the feet, whichever network painted the land; the mod and the keys\' travel are both handed it (mutants: the lanes unread, the tracks unread, the dep unwired)', () => {
+  const m = /\n {2}function travellerOnRoad\(\) \{\n[\s\S]*?\n {2}\}\n/.exec(WORLD);
+  assert.ok(m, 'travellerOnRoad lifted');
+  const net = { roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500), source: 'port' };
+  const w = { pos: [0, 0, 0], px: { x: 500, y: 250 }, at: mid(500, 250) };
+  const run = new Function('terrainGen', 'state', 'walkMode', 'player', 'cam', 'playerTravelPixel', 'playerOnPathAt', 'pathsDataPoint',
+    `${m[0]}\nreturn travellerOnRoad;`)(
+    { roads: () => net }, { worldCoords: () => w.at }, true, { pos: w.pos }, { pos: w.pos }, () => w.px, playerOnPathAt, pathsDataPoint);
+  assert.equal(run(), false, 'no lane here');
+  net.roads[500 + 250 * 1000] = E | W;
+  assert.equal(run(), true, 'a road through the pixel middle, east to west');
+  const o = mapPixelWorldOrigin(500, 250);
+  w.at = { x: o.x + 16384, z: o.z + 2000 };
+  assert.equal(run(), false, 'off its lane, far to the south of it');
+  net.roads.fill(0); net.tracks[500 + 250 * 1000] = E | W; w.at = mid(500, 250);
+  assert.equal(run(), true, 'a track counts');
+  assert.match(WORLD, /onRoad: \(\) => travellerOnRoad\(\),/, 'the mod is handed it');
+  assert.match(WORLD, /travels: !!travelControlUI, onRoad: !journey && travelView\?\.state === 'up' && travellerOnRoad\(\),/, 'and the keys\' travel');
+});

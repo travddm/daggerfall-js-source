@@ -131,6 +131,7 @@ test('AUDIT LEGACY III O1: A HALF NAMES THE CHARACTER THE OTHER PLAYER SAW - the
   assert.deepEqual(await realmWed(ctx, B.g.id, { id: B.chars[1].id, lease: B.chars[1].lease, sid: 'wedO1shape', partner: A.g.id, partnerChar: A.chars[1].id, withdraw: 'yes' }), { error: 'body' }, 'a withdraw is a word, never a truthy stand-in');
   // one shape for a realm character's id, the token's (identityToken.js REALM_CHARACTER_RE), the realm's and the client's
   for (const re of [REALM_ID_RE, REALM_ID_SHAPE]) assert.equal(re.source, REALM_CHARACTER_RE.source);
+  assert.match(rd('server-account/src/legacy.js'), /import \{ ID_RE, REALM_CHARACTER_RE \} from '\.\.\/\.\.\/src\/net\/identityToken\.js';/);
   assert.match(REFUSALS['wed-partner'], /no longer the one who stood with you/);
 });
 
@@ -160,6 +161,11 @@ test('AUDIT LEGACY III O1: THE TOKEN VOUCHES FOR THE REALM CHARACTER (`ci`, besi
   const chat = fakeRoom('chat:world');
   const c = chat.connect(); await chat.hello(c, 'peer-0003', null, { rc: 1, ci: 'r00000000000000000c03' });
   assert.equal('ci' in c.att, false, 'a channel is nowhere to wed - and carries no character');
+  // the client: the stamp to the law, only of the realm's shape
+  const online = rd('src/net/online.js');
+  assert.match(online, /const scOf = \(m\) => \(typeof m\?\.sc === 'string' && REALM_CHARACTER_RE\.test\(m\.sc\) \? m\.sc : null\);/);
+  assert.match(online, /validWedData, \(id, d\) => this\.onWed\?\.\(id, d, subOf\(m\), scOf\(m\)\)\);/);
+  assert.match(hostText('src/scenes/world.js'), /online\.onWed = \(id, d, sub = null, sc = null\) => \{ wedMgr\.onFrame\(id, d, sub, sc\); \};/);
 });
 
 test('AUDIT LEGACY III O11: THE TOKEN\'S BODY BOUND IS ONE - the relay\'s hello read a 640-character body and the mint asked only the verifier\'s 1024: every optional claim at once was 639, so a house (LEGACY7) carried such a token to 739, minted and then refused at every hello as "bad token"; with the realm character it is 778 now, under TOKEN_BODY_MAX, and a house past it is left unsaid (WIKIMAID: every glyph with the WikiMaid\'s took it to 808 - the bound 864 now, PIN MOVED)', async () => {
@@ -190,6 +196,59 @@ test('AUDIT LEGACY III O11: THE TOKEN\'S BODY BOUND IS ONE - the relay\'s hello 
   assert.ok(widest.length <= TOKEN_MAX_CHARS);
   assert.equal(parseClient(JSON.stringify({ t: 'hello', id: 'mac-0001', secret: 'shh-shh-shh-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, tok: widest })).tok, widest, 'the wire takes it');
   assert.ok((await verifyToken(widest, kp.publicKey, { subtle, nowS })).ok);
+  // one bound, the wire's and the token module's
+  assert.match(rd('src/net/wire.js'), new RegExp(`const TOKEN_RE = /\\^\\[A-Za-z0-9\\]\\{1,8\\}\\\\\\.\\[A-Za-z0-9_-\\]\\{1,${TOKEN_BODY_MAX}\\}\\\\\\.`));
+  // the mint leaves a house unsaid past EITHER bound - never the rest (the character stays: it fits beside every claim)
+  assert.match(rd('server-account/src/index.js'), /if \(house && \(token\.length > TOKEN_MAX_CHARS \|\| tokenBodyOf\(token\)\.length > TOKEN_BODY_MAX\)\) \{ token = await mintToken\(signed, key, \{ subtle, nowS \}\); houseWorn = null; \}/);
+  assert.match(rd('server-account/src/index.js'), /rc, \.\.\.\(rc \? \{ ci: body\.character \} : \{\}\),/);
+});
+
+test('AUDIT LEGACY III O12: A TOMBSTONE ACTS IN NOTHING - its last open item, driven: a fallen Bloodline character\'s Stores were read and WITHDRAWN into the heir\'s pack by a request that named it, its tracks written after its death (only the guilds\' door asked, O5). Every act naming one of the account\'s tombstones is refused at the service\'s one door - an Enduring elder retired too - the heir acts, the token still mints (rc 0), and another account learns nothing of whose character is dead', async () => {
+  const S = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
+  const raw = S.env.DB._raw;
+  const mac = await S.registered('Mac');
+  const call = (p, b, who = mac) => S.call(p, b, who.secret);
+  const lineOf = async (fam, model) => assert.equal((await call('/v1/realm/lineage', { id: fam, record: { v: 1, id: fam, surname: 'Hlaalu', model, rev: 1, people: ysolde } })).status, 200);
+  const born = async (fam, person) => { const c = await call('/v1/realm/create', { name: `${ysolde[person - 1].given} Hlaalu`, lineage: fam, person }); assert.equal(c.status, 200, JSON.stringify(c.body)); return c.body; };
+  await lineOf('fam-o12-aaaaaa', 'bloodline');
+  const fallen = await born('fam-o12-aaaaaa', 1);
+  const heir = await born('fam-o12-aaaaaa', 2);
+  raw.prepare("INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, 'p1:19', 'own', 5)").run(mac.id, fallen.id);
+  const stores = () => raw.prepare('SELECT origin, qty FROM prof_stores WHERE char_id = ?').all(fallen.id).map((r) => [r.origin, Number(r.qty)]);
+  const carried = () => raw.prepare('SELECT COUNT(*) AS n FROM prof_carried WHERE char_id = ?').get(fallen.id).n;
+  assert.equal((await call('/v1/prof/state', { character: fallen.id })).status, 200, 'alive, it acts');
+  const lease = (await call('/v1/realm/join', { id: fallen.id })).body.lease;   // one account plays one character: the heir's birth took it
+  assert.equal((await call('/v1/realm/die', { id: fallen.id, lease })).status, 200, 'it falls for good');
+  const asks = [
+    ['/v1/prof/state', {}],
+    ['/v1/stores/withdraw', { material: 'p1:19', qty: 2, rid: 'aaaaaaaaaaaaaa12', carry: true, held: 0, seen: 0 }],
+    ['/v1/prof/harvest', { node: 'n1', kind: 'ore', rid: 'aaaaaaaaaaaaab12' }],
+    ['/v1/market/read', { view: 'mine' }],
+    ['/v1/renown/xp', { xp: 50, rid: '00000000000000c1' }],
+    ['/v1/guilds/invite', { handle: 'nobody' }],
+  ];
+  for (const [path, body] of asks) {
+    const r = await call(path, { character: fallen.id, ...body });
+    assert.deepEqual([r.status, r.body.error], [410, 'dead'], `${path}: a tombstone acts in nothing`);
+  }
+  assert.deepEqual(stores(), [['own', 5]], 'its Stores as it left them');
+  assert.equal(carried(), 0, 'nothing of theirs in anyone\'s pack');
+  assert.equal((await call('/v1/prof/state', { character: heir.id })).status, 200, 'the heir acts');
+  const token = await call('/v1/auth/token', { character: fallen.id });
+  assert.equal(token.status, 200, 'the mint is no act - a page under its death screen still mints');
+  assert.equal(JSON.parse(Buffer.from(token.body.token.split('.')[1], 'base64url').toString()).rc, 0, 'and vouches for no realm character (REALM-DOOR)');
+  // an Enduring elder's retirement is a tombstone too: never played again
+  await lineOf('fam-o12-eeeeee', 'enduring');
+  const elder = await born('fam-o12-eeeeee', 1);
+  assert.equal((await call('/v1/realm/die', { id: elder.id, lease: elder.lease, why: 'retired' })).status, 200);
+  assert.deepEqual([(await call('/v1/prof/state', { character: elder.id })).status], [410]);
+  // another account naming this account's dead character hears nothing of it: its own rows under the name, as ever
+  const bran = await S.registered('Bran');
+  assert.equal((await call('/v1/prof/state', { character: fallen.id }, bran)).status, 200, 'no word of whose character is dead');
+  // one door, before every route
+  const src = rd('server-account/src/index.js');
+  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the tombstone is the door's one statement's first read (door.js doorReads)
+  assert.ok(src.indexOf('if (door.dead) return no(\'dead\', 410, origin);') > 0 && src.indexOf('if (door.dead) return no(\'dead\', 410, origin);') < src.indexOf("if (path === '/v1/auth/token' && request.method === 'POST')"), 'asked before the first route');
 });
 
 test('AUDIT LEGACY III O3: A YES IS TAKEN BACK, AND NEVER OUTLIVES ITS WORD - the service: a half is written once (posted again it keeps its first `at`), `withdraw` takes it back (answered the union when it stood first), and the other\'s half is the union only while it stands (asked IN the write)', async () => {
@@ -229,6 +288,9 @@ test('AUDIT LEGACY III O3: A YES IS TAKEN BACK, AND NEVER OUTLIVES ITS WORD - th
   const took = await realmWedHalf(io, C.chars[1].id, C.chars[1].lease, 'wedO3clnt1', A.g.id, A.chars[1].id, { withdraw: true });
   assert.deepEqual([took.ok, took.data?.wed], [true, false]);
   assert.equal(at(C, 'wedO3clnt1'), null, 'taken back by the client\'s word');
+  // the union's write asks the other's half IN it: a half deleted between the read and the write makes nothing
+  assert.match(rd('server-account/src/legacy.js'), /\+ ' AND EXISTS \(SELECT 1 FROM realm_wed_halves WHERE sid = \? AND player = \? AND char_id = \? AND partner_char = \?\)',/);
+  assert.match(rd('server-account/src/legacy.js'), /ON CONFLICT \(sid, player\) DO NOTHING/);
 });
 
 /** Two players' wedding managers on one fake wire, each with its half at the REAL Worker (test/systems/legacy/legacy7_wed.test.js's
@@ -420,6 +482,27 @@ test('AUDIT LEGACY III O6: A RETIREMENT IS AN ENDURING LINE\'S ALONE, and the to
   assert.equal(why(), 'fell', 'never back');
 });
 
+test('AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED - nor undone: it is the realm\'s only word on a death, and its row the person\'s claim, so the person was born again once the line\'s record forgot the death', async () => {
+  const S = await standService();
+  const A = await accountOf(S, 'fam-o7-aaaaaa', 'Hlaalu', ysolde);
+  await A.die(1);
+  for (const route of ['/v1/realm/delete', '/v1/realm/undo']) {
+    const r = await A.call(route, { id: A.chars[1].id });
+    assert.notEqual(r.status, 200, route);
+  }
+  const del = await A.call('/v1/realm/delete', { id: A.chars[1].id });
+  assert.deepEqual([del.status, del.body.error], [410, 'dead']);
+  // one brought in through customs (an origin to undo to) is no more undone than deleted
+  S.env.DB._raw.prepare('UPDATE realm_characters SET origin_id = ? WHERE id = ?').run('o-ysolde-offline', A.chars[1].id);
+  const undo = await A.call('/v1/realm/undo', { id: A.chars[1].id });
+  assert.deepEqual([undo.status, undo.body.error], [410, 'dead']);
+  assert.equal(S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?').get(A.chars[1].id).n, 1, 'the tombstone stands');
+  // the record rewritten without the death: the person is still the played one's
+  await A.write({ people: ysolde });
+  assert.equal((await A.call('/v1/realm/create', { name: 'Ysolde Hlaalu', lineage: A.fam, person: 1 })).body.error, 'lineage-played');
+  assert.match(rd('server-account/src/realm.js'), /if \(row\.dead_at != null\) return \{ error: 'dead' \};   \/\/ AUDIT LEGACY III O7/);
+});
+
 test('AUDIT LEGACY III O8/O9: AN ACCOUNT\'S UNIONS, THE LATEST WORD FIRST, READ BY ITS OWN INDEXES - listed newest-wed first, a union older than fifty others was never listed again and its end never reached the house; and every read scanned the whole table', async () => {
   const S = await standService();
   const A = await accountOf(S, 'fam-o8-aaaaaa', 'Hlaalu', ysolde);
@@ -489,6 +572,7 @@ test('AUDIT LEGACY III A2 (the realm\'s half): TWO DEVICES OF ONE ACCOUNT - the 
   const stored = JSON.parse(S.env.DB._raw.prepare('SELECT record FROM lineages WHERE id = ?').get(A.fam).record);
   assert.ok(stored.people.find((p) => p.id === 2).died, 'the death stands');
   for (const bad of [-1, 1.5, '1', true]) assert.deepEqual(await putLineage(ctx, A.g.id, { id: A.fam, record: rec(10, ysolde), base: bad }), { error: 'body' }, `base ${JSON.stringify(bad)}`);
+  assert.match(rd('server-account/src/index.js'), /putLineage\(rctx, me, \{ id: body\.id, record: body\.record, base: body\.base \?\? null \}\)/);
 });
 
 test('AUDIT LEGACY III O2/P1: THE LINE\'S ROUTE READS ITS OWN BOUND - every JSON route read 4 KiB, and a played founder\'s first save (some four kilobytes) was refused: the realm held the founding copy for good, an heir never born online. A real line goes through; one past LINEAGE_MAX_BYTES gets its own word, 413, never a malformed body\'s', async () => {
@@ -1538,6 +1622,9 @@ test('AUDIT LEGACY III A11/F10/U7/U9/P17: THE CARD SAYS WHAT THE HOUSE KEEPS - n
   // PIN MOVED (PORTRAIT3D): and their census id beside it - the seed their Morrowind head is walked off, as their body's
   assert.deepEqual(facePose(spouse), { race: 'Breton', gender: 'male', face: 0, common: 20, resident: 'L120.9' });
   assert.deepEqual(facePose(me), { race: me.race, gender: me.gender, face: me.face });
+  assert.match(rd('src/ui/legacy/legacySuccession.js'), /faces\(facePose\(who\)\)/);
+  // PIN MOVED (MW-HEADS2): and whether they are the one played - a member not played is one of the people
+  assert.match(rd('src/ui/familyPages.js'), /faces\(facePose\(p, \{ currentId: _provider\?\.family\?\.\(\)\?\.currentId \?\? null \}\)\)/);
   // the loader draws it from the talk window's own CommonFaces archive
   assert.equal(COMMON_FACES_FILE, PORTRAIT_ARCHIVE.CommonFaces);
 });
@@ -1685,12 +1772,90 @@ test('AUDIT LEGACY III P16: THE WEDDING HANDSHAKE\'S GUARDS - at most WED_INCOMI
 // world.js cannot boot headless (no ARENA2): what can run is lifted out of its own text and run (lens W's way); the rest
 // is pinned by source, its reproduction driven in Chromium (bible/01-Overview/audits/Audit-Legacy-III.md says how).
 
+/** world.js's own text from the line matching `from` to the first line matching `to` after it. */
+function liftWorld(from, to) {
+  const lines = hostText('src/scenes/world.js').split('\n');
+  const a = lines.findIndex((l) => from.test(l));
+  assert.ok(a >= 0, `world.js holds ${from}`);
+  let b = a + 1;
+  while (b < lines.length && !to.test(lines[b])) b++;
+  return lines.slice(a, b + 1).join('\n');
+}
+
+test('AUDIT LEGACY III W1: THE LIVING WORLD\'S INDICES READ THE GAME\'S ROWS, AND AN ONLINE HOME IS NAMED - the boot emptied the rows before either index was built, so every town and dungeon index was empty (LW3\'s roads, LW6\'s deep) and every home of the line reached it with no town name: the rows go once BOTH indices stand, and a home is named off the boot\'s own complete table', async () => {
+  const src = hostText('src/scenes/world.js');
+  assert.equal((src.match(/_hubRows\.length = 0/g) ?? []).length, 1, 'emptied in one place');
+  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the indices read the world's registry (scenes/livingWorld/livingIndex.js),
+  // which takes the rows at the boot - so the rows go there, AFTER the registry has them, and both indices are built from
+  // it whenever they are first asked, in either order. The boot's own lines, lifted and run over the real modules.
+  const boot = liftWorld(/^  const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);$/, /^  _hubRows\.length = 0;$/);   // PIN MOVED (AUDIT RELEASE R2-7): the registry handed to the Staff Panel's picker as it is made (net/staffPlaces.js gamePlaces)
+  const { createWorldPlaces } = await import('../../../src/world/worldWide/worldPlaces.js');
+  const { bayPlaceRows, BAY_SOURCE } = await import('../../../src/world/worldWide/bayPlaces.js');
+  const { createLivingIndex } = await import('../../../src/scenes/livingWorld/livingIndex.js');
+  const make = new Function('_hubRows', 'createWorldPlaces', 'gamePlaces', 'bayPlaceRows', 'BAY_SOURCE', 'hasPort', `${boot}\nreturn worldPlaces;`);
+  // MapsFile's longitude and latitude for a pixel (LongitudeLatitudeToMapPixel's inverse - 128 units a pixel, latitude counted from the south)
+  const row = (name, mapId, locationType, x) => ({ name, regionIndex: 17, mapTableData: { mapId, locationType, longitude: x * 128, latitude: (499 - 1) * 128 }, exterior: { exteriorData: { width: 2, height: 2 } } });
+  for (const order of [['towns', 'dungeons'], ['dungeons', 'towns']]) {
+    const rows = [row('Gothway Garden', 5001, LOCATION_TYPES.TownCity, 1), row('Castle Necromoghan', 6001, LOCATION_TYPES.DungeonLabyrinth, 2)];
+    const places = make(rows, createWorldPlaces, (p) => p, bayPlaceRows, BAY_SOURCE, () => false);
+    assert.equal(rows.length, 0, 'let go at the boot, once the registry has them');
+    const idx = createLivingIndex({ places, populated: (t) => t === LOCATION_TYPES.TownCity, peopleAt: () => 1 });
+    assert.equal(idx[order[0]]().size, 1, `${order[0]} first: built from the rows`);
+    assert.equal(idx[order[1]]().size, 1, `${order[1]} second: built from the rows too`);
+  }
+  // a home of the account, as the line is handed it - ACCOUNT-HOMES (2026-10-06, PIN MOVED: "mine alone", this realm
+  // character's rows, before): a home is its account's, every member's, so every row of the account's list is the line's
+  const read = liftWorld(/^  let _legacyOnlineHomes = null;$/, /^  }$/);
+  const mk = new Function('homesApi', 'realmSession', '_townOfMapId', `${read}\nreturn { read: legacyOnlineHomesRead, get homes() { return _legacyOnlineHomes; } };`);
+  const w = mk({ mine: async () => ({ ok: true, data: { homes: [{ mapId: 5001, buildingKey: 66051, region: 17, character: 'r-me' }, { mapId: 5002, buildingKey: 7, region: 17, character: 'r-other' }, null] } }) },
+    { id: 'r-me' }, new Map([[5001, { name: 'Gothway Garden' }], [5002, { name: 'Ripmarket' }]]));
+  w.read();
+  await new Promise((r) => { setImmediate(r); });
+  assert.deepEqual(w.homes, [{ regionIndex: 17, mapId: 5001, buildingKey: 66051, location: 'Gothway Garden' }, { regionIndex: 17, mapId: 5002, buildingKey: 7, location: 'Ripmarket' }],
+    'named, and the account\'s - the other character\'s home the line\'s too, a row that is no home none');
+});
+
+test('AUDIT LEGACY III W5: THE ONLINE HOMES READ - THE LAST ASKED WINS, and a home the arena moved is read again: two reads after two writes could land in either order, and the older answer (a home since sold) was handed to the next save', async () => {
+  const read = liftWorld(/^  let _legacyOnlineHomes = null;$/, /^  }$/);
+  const pending = [];
+  const mk = new Function('homesApi', 'realmSession', '_townOfMapId', `${read}\nreturn { read: legacyOnlineHomesRead, get homes() { return _legacyOnlineHomes; } };`);
+  const w = mk({ mine: () => new Promise((res) => pending.push(res)) }, { id: 'r-me' }, new Map([[5001, { name: 'Gothway Garden' }]]));
+  w.read();   // after a claim
+  w.read();   // after the release a moment later
+  pending[1]({ ok: true, data: { homes: [] } });
+  await new Promise((r) => { setImmediate(r); });
+  pending[0]({ ok: true, data: { homes: [{ mapId: 5001, buildingKey: 66051, region: 17, character: 'r-me' }] } });
+  await new Promise((r) => { setImmediate(r); });
+  assert.deepEqual(w.homes, [], 'the newer answer stands - the sold home is not handed back');
+  assert.match(hostText('src/scenes/world.js'), /if \(moved\.length\) legacyOnlineHomesRead\(\);   \/\/ AUDIT LEGACY III W5/);
+});
+
 test('AUDIT LEGACY III W3/W4/W6/A12/F11c/F11d (the world host, by source): the wedding prompt waits under the building\'s own windows and a death, and nobody weds lying dead; the line\'s street holds still under a talk window and is let go indoors; one identity line for a card met; the Succession\'s words by who is offered; no elder "retires to the seat"', () => {
+  const src = hostText('src/scenes/world.js');
+  assert.match(src, /const wedAsk = \(peerId\) => \{\n(?:    \/\/.*\n)*    if \(\(townTalk\.overlayActive && !townTalk\.overlayDone\) \|\| \(modes\?\.overlayHeld \?\? false\) \|\| \(modes\?\.deathUp\?\.\(\) \?\? false\)\) return false;/, 'W3: under the street\'s window, the building\'s, or a death');
+  assert.match(src, /const wedCan = \(\) => \(playerEntity\.health <= 0 \|\| modes\?\.deathUp\?\.\(\) \? 'busy'\n/, 'W3: never while lying dead');
+  assert.match(src, /familyStreet\.end\(townTalk\.overlayActive \? 0 : dt, cam\.pos\)/, 'W4: held as the street is');
+  assert.match(src, /if \(livingRoads\) livingRoads\.clear\(\);[^\n]*\n      familyStreet\?\.clear\(\);   \/\/ AUDIT LEGACY III W6/, 'W6: let go with the roads, indoors and below');
+  assert.match(src, /const legacyIdentity = \(p\) => identityLine\(p\);/, 'A12/F4/U6: the Family tab\'s own line');
+  assert.match(src, /retired \? `\$\{fallen\.given\} has carried the house long enough\. The mantle passes on\.` : out\.newborn \? LEGACY_TEXT\.heir : choices\.length \? LEGACY_TEXT\.kin : LEGACY_TEXT\.noHeir,/, 'F11c');
   assert.equal(LEGACY_TEXT.kin, 'You died. One of your house will take your place.');
   for (const f of ['src/scenes/world.js', 'src/ui/familyPages.js']) assert.doesNotMatch(rd(f), /retires? to the family seat/, `F11d: ${f}`);
 });
 
 test('AUDIT LEGACY III O2/P1 (the world host, by source): a line the realm refuses is said, once; and the birth door waits on the line standing at the realm (a refusal the reason it gives, never "they cannot take up the line")', () => {
+  const src = hostText('src/scenes/world.js');
+  assert.match(src, /createRealmLine\(\{ io: realmIoNow, storage: \(\) => appStorage\(\), onRefused: \(id, error\) => \{ townTalk\.say\(LEGACY_TEXT\.lineRefused\(realmRefusalText\(error\)\)\); \} \}\)/);
+  assert.match(src, /for \(let i = 0; born && legacyRealmLine\?\.unwrittenOf\(fam\.id\) && !legacyRealmLine\.refusalOf\(fam\.id\) && i < 2; i\+\+\) \{/);
+  assert.match(src, /const unwritten = born \? legacyRealmLine\?\.unwrittenOf\(fam\.id\) \?\? null : null;\n    if \(unwritten\) return \{ ok: false, error: unwritten \};\n    let made = null;/);
   assert.match(LEGACY_TEXT.lineRefused('X.'), /^The realm refused your family's record\. X\. It is kept on this device instead\.$/);
 });
 
+test('AUDIT LEGACY III U1/U2 (the pause window, by source - driven in Chromium): a held Enter or Space presses nothing (the Succession\'s own rule: Play as and Pass the mantle armed and fired on one held press); the keyboard comes into the window - a Tab from outside lands on its first control, and the window takes the focus as it mounts', () => {
+  const src = rd('src/ui/pauseDoor.js');
+  // PIN MOVED (AUDIT PRIVATE-REPORT UI-10): never in a field - a held Space or Enter in the report form's words types
+  assert.match(src, /host\.addEventListener\?\.\('keydown', \(e\) => \{\n(?:    \/\/[^\n]*\n)*    if \(e\.repeat && \(e\.key === 'Enter' \|\| e\.key === ' '\) && !isTextEntryTarget\(e\.target\)\) \{ e\.preventDefault\(\); e\.stopPropagation\(\); \}\n  \}, true\);/, 'U1');
+  assert.match(src, /document\.addEventListener\?\.\('keydown', tabIn, true\);/, 'U2: the Tab from outside');
+  assert.match(src, /const close = \(\) => \{\n    if \(fired\) return;\n    rvnStars\.drop\(\);[^\n]*\n    document\.removeEventListener\?\.\('keydown', tabIn, true\);/, 'U2: gone with the window');   // PIN MOVED (GROWTH3): the Ascension and the Firmament are drawn in the window now - only a sworn revenant's stars (RVN-STARS) stand over it
+  assert.match(src, /view = mountEnhancedMenu\(host, \{ mode: 'pause', hooks, onAction: act, at: hooks\.at \?\? null \}\);\n      focusIn\(\);   \/\/ AUDIT LEGACY III U2/, 'U2: the focus taken as it mounts');
+  assert.match(src, /const to = host\.querySelector\?\.\('\.px-tabs button\.on'\) \?\? host\.querySelector\?\.\('button:not\(\[disabled\]\)'\);/);
+});

@@ -281,6 +281,17 @@ test('WW7-7 THE LAND PAST THE BAY\'S WORD: the trips\' world waits a town past t
   assert.equal(trips.world.waiting(far), false, 'laid: it sets out');
   assert.notEqual(trips.world.generation(), g, 'the generation moves with the build');
   assert.equal(trips.world.generation, trips.index.generation);
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /, marketBandOf: townEcon\.marketBandOf, pastTheBay: _tamrielRoads \}\);/, 'the host hands the roads past the Bay\'s host');
+  assert.ok(w.indexOf('const { _tamrielRoads,') < w.indexOf('= createLivingTrips({'), 'made before it');
+  assert.doesNotMatch(w, /livingRoams|createLivingIndex\(|createWayBook\(/, 'the host builds neither the index nor the ways');
+  assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: pastTheBay \? \{ epoch, placesIn: pastBayPlacesIn, landedIn, landed: \(\) => landed \} : null \}\);/);   // PIN MOVED (WW7-9)
+});
+
+test('WW7-7 THE ROLL PAST THE BAY READS A ROADS\' PLACE AS DRY: a pixel the roads past the Bay rolled a place on stands on dry ground without its plateau summed again (the same answer: the roads\' workers rolled it on that plateau) (mutant: the vouch dropped)', () => {
+  const m = rd('src/scenes/tamrielPlacesHost.js');
+  assert.match(m, /ground: \(x, y\) => pastBayPlacesIn\(x, y, x \+ 1, y \+ 1\)\.length > 0 \|\| _countryGround\(x, y\) \};/);
+  assert.match(m, /import \{ pastBayPlacesIn \} from '\.\.\/world\/pastBayPlaces\.js';/);
 });
 
 // ─── 6. THE SHIPS NAMED PAST THE BAY (WW7-8) ───────────────────────
@@ -317,6 +328,15 @@ test('WW7-8 EVERY READER NAMES HER AS HER STANDER DID: a province\'s region name
     const region = regionOfTheatre(t);
     for (const [cx, cy] of [[90, 80], [100, 85], [110, 90]]) assert.equal(shipNameBank(region, -1), shipNameBank(region, areaOfDistrict(t, cx, cy)), `${THEATRE_KEYS[t]}: its region's people its districts'`);
   }
+  const n = rd('src/scenes/naval/navalHost.js');
+  const law = /const namesArea = (\(spec, w\) => [^\n]*);\n/.exec(n);
+  assert.ok(law, 'the law beside watersShipNames');
+  const namesArea = new Function(`return ${law[1]};`)();
+  assert.deepEqual([namesArea({ area: 300 }, { area: 400 }), namesArea({ region: 17 }, { area: 400 }), namesArea({}, { area: 400 }), namesArea({ region: -1 }, { area: 400 }), namesArea({}, {})], [300, -1, 400, 400, -1]);
+  assert.match(n, /const area = namesArea\(spec, w\), names = ether \? etherShipNames\(cls, spec\.seed\) : watersShipNames\(cls, spec\.seed, region, crown, area\);/);
+  assert.match(n, /gen: Math\.max\(0, Math\.min\(NAVAL_GEN_MAX, spec\.gen \| 0\)\), region, area, deep: !!spec\.deep,/, 'kept on her entry');
+  assert.match(n, /gen: e\.gen, region: e\.region, area: e\.area,/, 'said');
+  assert.match(n, /yaw: w\.yaw, gen: w\.gen, region: w\.region, area: w\.area, deep: w\.deep \}, owner, w\.n\);/, 'a copy launched by the word named by it');
 });
 
 // ─── 7. ON THE FREEWARE'S WORLD ────────────────────────────────────

@@ -14,6 +14,8 @@ import { createDataPipeline } from '../../src/scenes/dataPipeline.js';
 import { DFPalette } from '../../src/formats/dfPalette.js';
 import { StreamingWorldState, BUILD_RETRY_MS } from '../../src/world/streamingWorld.js';
 
+const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
+
 /** A TEXTURE file of `n` 1x1 records (test/scenes/fb1004d_placelru.test.js's synthetic archive). */
 function textureArchive(n) {
   const recPos = 26 + 20 * n, RECORD_HEADER = 28;
@@ -43,6 +45,20 @@ test('BUILD-RETRY, the texture: A READ THAT FAILED IS NO ANSWER - an archive who
   assert.equal(reads, 2);
   assert.equal(await pipe.getTexture(302), t, 'one file from then on');
   assert.equal(reads, 2, 'and never read again');
+});
+
+test('BUILD-RETRY, the people: a town\'s person pictures whose load failed are loaded again by the next populated pixel (the host\'s own lines, lifted) - kept, one failed archive failed every town\'s build for the session (mutant: the failure kept)', async () => {
+  const m = /\n {2}let _personTexLoad = null;\n[\s\S]*?\n {2}const ensurePersonTex = \(\) =>\n[^\n]*\n[^\n]*\);\n/.exec(W);
+  assert.ok(m, 'world.js holds ensurePersonTex');
+  let fails = 1, asks = 0;
+  const getTexture = async (a) => { asks++; if (a === 2 && fails-- > 0) throw new Error(`TEXTURE.${a}: the read failed`); return { a }; };
+  const { ensurePersonTex, personTex } = new Function('getTexture', `const personArchives = [1, 2, 3]; const personTex = new Map();${m[0]}return { ensurePersonTex, personTex };`)(getTexture);
+  await assert.rejects(ensurePersonTex(), /the read failed/);
+  await ensurePersonTex();
+  assert.deepEqual([...personTex.keys()].sort(), [1, 2, 3], 'the next town loads them again, and they stand');
+  const before = asks;
+  await ensurePersonTex();
+  assert.equal(asks, before, 'loaded once from then on');
 });
 
 /** A fake IndexedDB holding `store`: `connections` the ones opened; `close(c)` is the browser closing one under the
@@ -136,3 +152,44 @@ test('BUILD-RETRY, the stream\'s law: A PIXEL WHOSE BUILD THREW IS ASKED FOR AGA
   assert.equal(far.failed.size, 0, 'and forgotten');
 });
 
+test('BUILD-RETRY, the host: the pump\'s catch lets a failed pixel go to the stream\'s wait and the frame\'s line asks for it again - a pixel whose first build threw stands after the first wait with the traveller still where they were (no crossing); one that cannot be built is asked five times more and no more (the host\'s own pump and frame line, lifted)', async () => {
+  const pump = /\n {2}async function pump\(\) \{\n[\s\S]*?\n {2}\}\n/.exec(W);
+  const retry = /\n {4}if \(state\.failed\.size\) queue\.push\(\.\.\.state\.retryDue\(performance\.now\(\)\)\);[^\n]*\n/.exec(W);
+  assert.ok(pump && retry, 'world.js holds the pump and the frame\'s retry line');
+  const run = (failsFor) => {
+    const clock = { t: 0 };
+    const state = new StreamingWorldState(3);
+    const built = new Map();
+    const queue = [];
+    for (const p of state.init(500, 250)) if (p.px !== 502 || p.py !== 250) built.set(`${p.px},${p.py}`, p);
+    queue.push({ px: 502, py: 250 });
+    const counts = { builds: 0 };
+    const buildPixel = async (px, py) => {
+      const k = `${px},${py}`;
+      if (built.has(k)) return built.get(k);
+      counts.builds++;
+      if (counts.builds <= failsFor) throw new Error(`pixel ${k}: a read failed`);
+      built.set(k, { px, py });
+      return built.get(k);
+    };
+    // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers which pixel is ready (scenes/capitalPrebuild.js
+    // firstReady) - none of the city's here, every pixel ready
+    const s = { state, built, queue, buildPixel, destroyPixel: (px, py) => built.delete(`${px},${py}`), _wodArrival: { keys: new Set() }, console: { error() {} }, performance: { now: () => clock.t }, capitalPrebuild: { firstReady: () => true } };
+    const frame = new Function('s', `let { state, built, queue, buildPixel, destroyPixel, _wodArrival, console, performance, capitalPrebuild } = s;
+      let building = false, _streamSince = null;
+      ${pump[0]}
+      return () => {${retry[0]}    pump();
+      };`)(s);
+    return { clock, state, built, counts, frame };
+  };
+  const settle = () => new Promise((r) => setImmediate(r));
+  const once = run(1);
+  for (let i = 0; i < 40; i++) { once.clock.t = i * 100; once.frame(); await settle(); }   // four seconds of frames at 10 a second
+  assert.equal(once.built.has('502,250'), true, 'a read that failed once: the pixel stands after the stream\'s first wait');
+  assert.equal(once.counts.builds, 2);
+  assert.equal(once.state.failed.size, 0, 'its failure forgotten');
+  const never = run(Infinity);
+  for (let i = 0; i < 1200; i++) { never.clock.t = i * 100; never.frame(); await settle(); }   // two minutes
+  assert.equal(never.counts.builds, 1 + BUILD_RETRY_MS.length, 'a pixel that cannot be built: its own build and five asks, no more');
+  assert.equal(never.state.loaded.has('502,250'), false, 'let go - nothing owed, so nothing holds the clock (LOAD-OWED)');
+});

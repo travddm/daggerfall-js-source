@@ -89,6 +89,8 @@ test('PH1: a lift advancing past the sphere\'s radius in one frame carries the r
     assert.ok(Math.abs(m.pos[1] - y) < 1e-3, `lift ${lift}/frame: feet ${m.pos[1].toFixed(3)} on the plate at ${y.toFixed(2)}`);
     assert.equal(m.grounded, true);
   }
+  // PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the ride is the mover's own carry, a bare Move of the body's own stance
+  assert.match(read('src/player/moverBody.js'), /collider\.move\(to, want\[0\], want\[1\], want\[2\], body\.height, false\);/, 'the ride resolves the rider\'s own capsule');
 });
 
 /** Walk a staircase down (from the landing, -z) or up, counting what the camera would feel. */
@@ -131,6 +133,18 @@ test('PH2: descending a staircase never leaves the ground - no airborne frame, n
 });
 
 test('PH2: the snap descends a quantum at a time from the feet, accepts a hair of slide off an edge and refuses more; a drop past STEP_OFFSET is still a fall', () => {
+  const src = read('src/player/collider.js');
+  assert.match(src, /for \(let y = feet\[1\] - STEP_OFFSET \/ 8; y >= feet\[1\] - STEP_OFFSET - 1e-9; y -= STEP_OFFSET \/ 8\) \{/, 'the descent');
+  assert.match(src, /slidSq <= \(STEP_OFFSET \/ 8\) \*\* 2/, 'the slide tolerance');
+  assert.doesNotMatch(src, /const probe = \[feet\[0\], feet\[1\] - STEP_OFFSET, feet\[2\]\];/, 'the whole-STEP_OFFSET teleport probe is gone');
+  // AUDIT DISC28 MO-1: the one-way floor's own line is no longer held by its text - each of its terms is behaviour now:
+  // a floor the lower sphere sank under is set ON (the PH1 tests above; rising and at rest, test/player/disc28_swim.test.js),
+  // a rising body meets what is over its head's centre as a ceiling (DISC28-G, the same file) - and so does one moving
+  // sideways (WW-LID, test/world/fb0929d_waterwalk.test.js) - and a wall and its edges are never a floor
+  // (test/player/auditdisc28_motion.test.js)
+  assert.match(src, /const lowOneWay = straddle \? axis : true;/);
+  assert.match(src, /this\._resolveSphere\(low, CAPSULE_RADIUS, out, standCeil, lowOneWay\);/, 'the lower sphere\'s');
+  assert.match(src, /this\._resolveSphere\(high, CAPSULE_RADIUS, out, standCeil, axis === 0 \? lowOneWay : false, axis !== 0\);/, 'never the head\'s (AUDIT pre-merge S1, AUDIT CLIMB-FIELD W2: and a body\'s head never grounds at all, but the swim stance\'s one sphere)');
   // a ledge deeper than STEP_OFFSET is a fall, as MAC3 pins for terrain
   const col = dungeonFloor();
   const low = quad(-10, -(STEP_OFFSET + 0.3), 20, 10, -(STEP_OFFSET + 0.3), 20, 10, -(STEP_OFFSET + 0.3), 40, -10, -(STEP_OFFSET + 0.3), 40);
@@ -248,6 +262,12 @@ test('AUDIT COL1 F8: a middle sphere never LIFTS the body onto what it walked in
         `stance ${height}: a single frame rose ${maxRise.toFixed(3)} - only the step ladder may raise the body, and only by STEP_OFFSET (${STEP_OFFSET})`);
     }
   }
+  // the law in the source, so the parameter cannot be quietly dropped
+  const src = read('src/player/collider.js');
+  assert.match(src, /midBody && dy > 0 && dy \/ d >= GROUND_NY/,
+    'an upward-leaning face met by a MIDDLE sphere is a wall (the sideways push), never a tread');
+  assert.match(src, /this\._resolveSphere\(m2, CAPSULE_RADIUS, out, standCeil, false, true\)/,
+    'and the middles are the spheres that pass it');
 });
 
 // AUDIT COL1 F13: THE CEILING CLAMP ASKED ONE BEAD. "A body cannot be
@@ -269,6 +289,52 @@ test('AUDIT COL1 F13: the ceiling clamp re-probes every bead - a wedged WAIST re
     assert.equal(out.hitCeiling, true, `slab ${slabY}: the body is against it`);
     assert.ok(feet[1] <= entryY + 1e-9,
       `slab ${slabY}: the body rose to ${feet[1].toFixed(4)} with a bead still wedged - the clamp asked the head only`);
+  }
+  const src = read('src/player/collider.js');
+  const clamp = src.slice(src.indexOf('if (out.hitCeiling && feet[1] > entryY) {'));
+  assert.match(clamp.slice(0, 700), /for \(let i = 1; i <= middles \+ 1; i\+\+\)/,
+    'from the first middle up to the head - every bead a ceiling can wedge');
+});
+
+test('COL1: every stance is covered - consecutive sphere centres OVERLAP, never merely touch', () => {
+  const src = read('src/player/collider.js');
+  assert.match(src, /const middles = Math\.max\(0, Math\.ceil\(axis \/ span\) - 1\);/,
+    'the count is derived from the axis, never fixed');
+
+  // AUDIT COL1 F6b: this used to recompute `2 * CAPSULE_RADIUS` inside the
+  // test, so the SOURCE's spacing constant was never pinned - setting
+  // `span = CAPSULE_RADIUS` (half the true diameter, so twice as many
+  // spheres and a slower resolve for nothing) left both COL1 pins green.
+  // The constant is read out of the source and driven.
+  // AUDIT COL1 F12: and the constant is no longer a whole diameter. A
+  // diameter is TANGENCY - the chain's reach falls to zero at the join -
+  // so the step is a diameter times an overlap, both read from source.
+  const spanSrc = /const span = ([^;]+);/.exec(src)?.[1]?.trim();
+  assert.equal(spanSrc, '2 * CAPSULE_RADIUS * BEAD_OVERLAP',
+    'the chain steps by a diameter LESS an overlap - a whole diameter is a join with no bite');
+  const overlap = Number(/const BEAD_OVERLAP = ([\d.]+);/.exec(src)?.[1]);
+  assert.ok(overlap > 0.5 && overlap < 1,
+    `the overlap is a real fraction of a diameter (read ${overlap}) - 1 is tangency, small is wasted spheres`);
+  const SPAN = 2 * CAPSULE_RADIUS * overlap;
+
+  // the derivation itself, over every stance the PlayerHeightChanger has
+  // AND the tall end of the foe range (SetupDemoEnemy takes the height
+  // off the idle sprite, so 3+ metres is ordinary).
+  for (const height of [0.30, 0.9, 1.8, 2.6, 3.0, 3.4]) {
+    const axis = Math.max(0, height - 2 * CAPSULE_RADIUS);
+    const middles = Math.max(0, Math.ceil(axis / SPAN) - 1);
+    const centres = [0];
+    for (let i = 0; i < middles; i++) centres.push((axis * (i + 1)) / (middles + 1));
+    centres.push(axis);
+    for (let i = 1; i < centres.length; i++) {
+      const gap = centres[i] - centres[i - 1];
+      assert.ok(gap <= SPAN + 1e-9,
+        `stance ${height}: centres ${centres[i - 1].toFixed(2)} and ${centres[i].toFixed(2)} leave a hole`);
+      // the REACH at the join - what the old "<= a diameter" pin never said
+      const reach = Math.sqrt(Math.max(0, CAPSULE_RADIUS ** 2 - (gap / 2) ** 2));
+      assert.ok(reach > CAPSULE_RADIUS * 0.25,
+        `stance ${height}: the join at ${centres[i].toFixed(2)} bites only ${reach.toFixed(3)} - a thin slab there is walked through`);
+    }
   }
 });
 

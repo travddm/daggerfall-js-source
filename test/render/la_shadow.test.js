@@ -305,6 +305,13 @@ test('LA-LIGHTS1: EACH LANTERN FLICKERS ON ITS PIXEL\'S SLOTS - a pixel streamed
   assert.ok(kept(byIndex(pixels), byIndex(after)) < 7, 'the base: the remaining lanterns took other lanterns\' ranges');
   assert.notEqual(lanternSlot(110, 220), lanternSlot(111, 220)); assert.notEqual(lanternSlot(110, 220), lanternSlot(110, 221));
   assert.equal(lanternSlot(110, 220), lanternSlot(110, 220), 'named by the pixel alone');
+  // the host: the street fills its pool by fillLanternPool from the animator's ranges, and the selection reads the pool's own ranges
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const _pool = fillLanternPool\(built\.values\(\), \(p\) => state\.pixelTranslation\(p\.px, p\.py, _lightT\), _sceneLights, _litRanges, worldLightAnimator\.ranges, festivalStage \? festivalStage\.lanterns : null\);/);   // FESTIVAL-STAGE: and a Festival town's lanterns
+  assert.match(w, /_litRanges = _pool\.ranges;/);
+  assert.match(w, /nearestLights\(_sceneLights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), _litRanges, null, 0, n\)/);
+  assert.doesNotMatch(w, /nearestLights\([^)]*worldLightAnimator\.ranges/, 'no selection reads the animator by pool index');
+  assert.doesNotMatch(w, /worldLightAnimator\.ranges\.subarray/, 'nor copies it by pool index');
 });
 
 // ── LA-LIGHTS2: the cap fades ─────────────────────────────────────────────────────────────────────────────────────
@@ -371,6 +378,17 @@ test('LA-LIGHTS2: A WALK THROUGH A NIGHT TOWN - with the cap cutting every frame
   assert.ok(worst.faded < 0.05, 'a twentieth of a lantern at most');
 });
 
+test('LA-LIGHTS2: the host - on the lane the street picks one lantern past the cap and hands the renderer the faded colours; classic picks the cap and fades nothing; the hand lights ride the call they always did', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /const _lanterns = wodSel \? null : nearestLights\(_sceneLights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), _litRanges, null, 0, n\);/);
+  assert.match(w, /const lit = withPlayerLights\(wodSel \? wodSel\.data : _lanterns,/);
+  assert.match(w, /else renderer\.setPointLights\(lit, CITY_LIGHT_COLOR_F32, renderer\.lightingLane \? capFadeColors\(lit, lit\.length \/ 4 - _lanterns\.length \/ 4, cam\.pos, renderer\.maxPointLights, CITY_LIGHT_COLOR_F32\) : null\);/);
+});
+
 test('LA-SHADOW1: the pass and the grid by source - the anchor held and passed, carried by the recentre, the Z up', () => {
+  const sp = rd('src/render/shadowPass.js');
+  assert.match(sp, /sunAnchorFor\(f\.eye, this\._sunAnchor, f\.lightDir, sunTexelWorld\(SHADOW_CASCADES\.length - 1, k\)\);[^\n]*\n\s+sunCascadeMatrices\(f\.eye, f\.lightDir, this\._sunVPNew, this\._sunAnchor, k\);/);
+  assert.match(sp, /this\._sunAnchor\[0\] \+= offset\[0\]; this\._sunAnchor\[1\] \+= offset\[1\]; this\._sunAnchor\[2\] \+= offset\[2\];/);
+  assert.match(sp, /const up = Math\.abs\(lightDir\[2\]\) < 0\.9 \? Z_UP : Y_UP;/);
   assert.ok(sunTexelWorld(0) < 0.02);
 });

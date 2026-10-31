@@ -178,6 +178,7 @@ test('QUEST-SHELF in the world: its questor\'s door opens and a click on them is
   const step = r.q.getSaveData();
   assert.equal(r.m.updateSharedQuest(r.q.questName, step), null, 'no step taken');
   assert.equal(isShelved(r.q), true, 'still set aside');
+  assert.match(src('src/scenes/world.js'), /if \(result\.reason === 'shelved' && quest\.data\?\.sync === 1\) return;/, 'a sync said nothing');
   assert.equal(shareRefusalText({ reason: 'shelved' }), 'have abandoned it. Reclaim it from the Quests tab of the pause menu to take it up again.', 'a deliberate share is answered');   // PIN MOVED (QUEST-AUDIT III SHELF-WORDS): the door named where it is
   // reclaimed: running again, its share once more possible
   assert.equal(r.m.reclaimQuest(r.q.uid).ok, true);
@@ -194,7 +195,29 @@ test('QUEST-SHELF the journal: the walk hands the quests set aside, their clocks
   assert.deepEqual(['gone', 'shelved', 'running', 'ending', 'protected', 'raid', 'twin', 'x'].map(shelfRefusalText), [
     'That quest is over.', 'That quest is already abandoned.', 'That quest is not abandoned.', 'That quest is ending.',
     'That quest cannot be abandoned.', 'Not while the raid is on.', 'You have taken that quest up again. Finish or abandon it first.', 'That cannot be done now.']);
+  const bridge = src('src/scenes/quest/questBridge.js');
+  assert.match(bridge, /return \{ active, finished: notebook\?\.getFinishedQuests\(\) \?\? \[\], ended, hidden: notebook\?\.getHiddenQuests\?\.\(\) \?\? \[\], shelved(?:, [^}]*)? \};/);
+  assert.match(bridge, /const refuseRaid = \(q\) => \(WA_RAID_QUESTS\.includes\(q\.questName\) \? 'raid' : null\);/);
+  assert.match(bridge, /const r = machine\.shelveQuest\(Number\(id\), \{ refuse: refuseRaid \}\);/);
+  assert.match(bridge, /canAbandon: \(id\) => machine\.shelveRefusal\(Number\(id\), \{ refuse: refuseRaid \}\) === null,/, 'the button asks the press\'s own ladder');
+  assert.match(bridge, /if \(r\.ok\) notebook\?\.unhideQuest\?\.\(id\);/, 'a reclaimed quest the player had hidden is on the page again');
+  assert.match(bridge, /if \(!q \|\| q\.questComplete \|\| isShelved\(q\)\) questTracker\.pinned = null;/, 'the tracker lets it go');
+  const menu = src('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /if \(shelved\.length\) section\(t\('pause\.journal\.abandoned', 'Abandoned'\), shelved, ' done'\);/);
+  assert.match(menu, /const ab = el\('button', 'act', armed \? t\('pause\.journal\.abandonArmed', 'Click again to abandon'\) : t\('pause\.journal\.abandonQuest', 'Abandon quest'\)\);/);   // PIN MOVED (QUEST-AUDIT III SHELF-WORDS): the player's language
+  // AUDIT QUESTLINES UI-8 (PIN MOVED): a row with no journal entry yet (unloggedRail) offered no Abandon - set aside, it was
+  // no row at all, and no Reclaim could reach it. PIN MOVED (RPT1026-QUESTS ABANDON-ALWAYS): such a row has its Abandon
+  // again, and set aside it is an Abandoned row (scenes/quest/questBridge.js questLog), so its Reclaim stands
+  assert.match(menu, /} else if \(sel\.entries && sel\.id != null && clean\.abandon && clean\.canAbandon\?\.\(sel\.id\)\) \{/);
+  assert.match(menu, /const rc = el\('button', 'act', t\('pause\.journal\.reclaim', 'Reclaim quest'\)\);/);
+  // its audit: the selection follows the quest only where it went
+  assert.match(menu, /const out = clean\.reclaim\(sel\.id\); questShelfSaid = out\?\.text \?\? null; if \(out\?\.ok\) questSel = `a:\$\{sel\.id\}`;/);
+  assert.match(menu, /if \(out\?\.ok\) questSel = `s:\$\{sel\.id\}`;/);
+  assert.match(menu, /const shelved = shelvedRail\(log\);/);
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) assert.match(src(f), /journalClean: \(\) => /, `${f} hands journalClean`);
+  // the topic lists, the hosts' live quest ids
+  assert.equal((src('src/systems/topicTree.js').match(/if \(isShelved\(this\.deps\.getQuest\?\.\(questID\)\)\) continue;/g) ?? []).length, 3, 'by the quest itself');
+  assert.match(src('src/scenes/world.js'), /\.filter\(\(q\) => !q\.questTombstoned && !isShelved\(q\)\)\.map\(\(q\) => q\.uid\);/);
 });
 
 test('QUEST-SHELF\'s audit: the same quest taken again runs ahead of the copy set aside (its syncs, a partner\'s step), and that copy\'s reclaim is refused while it runs; a reclaim relinks what stands of it and its topics at once; a named NPC\'s home copy stays and its click still reaches the running quests; a partner\'s envelope carries no shelf; the repair, the rumor mill and the lens leave a quest set aside alone (mutants: each)', () => {
@@ -255,6 +278,7 @@ test('QUEST-SHELF\'s audit: the same quest taken again runs ahead of the copy se
   home._clickAllIndividualNPCs = () => { broadcast++; return true; };
   assert.equal(home.doClick(), true, 'its click reaches the running quests');
   assert.equal(broadcast, 1);
+  assert.match(src('src/systems/quest/machine.js'), /const behaviour = new QuestResourceBehaviour\(this, host\);\n\s*behaviour\.individualHome = true;/, 'the block marks its home copy');
 
   // a partner's envelope never carries a shelf
   const e = rig();
@@ -276,6 +300,7 @@ test('QUEST-SHELF\'s audit: the same quest taken again runs ahead of the copy se
   const mill = new RumorMill({ nowClassicMinutes: () => 0, questAway: (id) => id === 7, rolls: () => 0 });
   mill.listRumorMill = [7, 8].map((questID) => ({ rumorType: RUMOR_TYPE.QuestRumorMill, questID, textID: 0, regionID: -1, faction1: 0, faction2: 0, type: 0, flags: 0, timeLimit: 999999, listRumorVariants: [] }));
   assert.deepEqual(mill.getValidRumors().map((x) => x.questID), [8]);
+  assert.match(src('src/scenes/world.js'), /questAway: \(uid\) => isShelved\(questBridge\?\.machine\.getQuest\(uid\)\),/);
 
   // the lens: set aside is away, not gone - its reclaim is no news
   const l = rig();

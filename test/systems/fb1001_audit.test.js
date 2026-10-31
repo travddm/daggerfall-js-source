@@ -50,6 +50,8 @@ import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { HEIGHTMAP_DIMENSION, TERRAIN_SIZE } from '../../src/world/terrain/terrainSampler.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+const WORLD = read('src/scenes/world.js');
+const MODES = read('src/scenes/worldModes.js');
 const WOODS = CLIMATES.Woodlands, GLENUMBRA = 59;
 const PX = 405, PY = 150;
 const NOON_MS = (20500 * 86_400 + 43_200) * 1000;
@@ -131,6 +133,75 @@ test('NODE-SHUT: the professions shut with a vein under the look - the host keep
   } finally { s.done(); }
 });
 
+/** world.js's tap hook (inputHooks.tap), lifted out of the source and run over a scope. */
+function tapRig(acting) {
+  const m = WORLD.match(/\n    tap: (\(x, y, opts = null\) => \{\n[\s\S]*?\n    \}),\n/);
+  assert.ok(m, 'the touch layer\'s tap hook');
+  const strikes = [];
+  const scope = {
+    _tapArmed: 0, _tapPoint: null, _tapLockOnly: false,
+    modes: null, yards: null, canvas: { clientWidth: 320, clientHeight: 200 }, worldViewportRect: () => null,
+    ndcFromScreen: (x, y) => (y > 180 ? null : [0, 0]),   // the docked bar's strip: the bottom twenty pixels, off the world's view
+    gatherHost: { acting: () => acting, strike: (h) => strikes.push(h) },
+  };
+  return { scope, strikes, tap: new Function('__s', `with (__s) { return (${m[1]}); }`)(scope) };
+}
+
+test('STICK-TAP: mid-act a thumb re-placed on the move stick strikes nothing - it arms the lock pick as before; a tap in the docked bar\'s strip is nothing; a tap on the look\'s half strikes once and arms nothing (mutants: the stick\'s tap struck; the bar\'s tap struck)', () => {
+  const r = tapRig(true);
+  r.tap(40, 150, { lockOnly: true });
+  assert.deepEqual(r.strikes, [], 'the stick\'s lock-only tap: no strike');
+  assert.deepEqual([r.scope._tapArmed, r.scope._tapLockOnly], [2, true], 'the lock pick armed, as before the act (the ladder holds it off mid-act)');
+  const l = tapRig(true);
+  l.tap(250, 100);
+  assert.deepEqual(l.strikes, [true, false], 'the look\'s half: one strike');
+  assert.equal(l.scope._tapArmed, 0, 'and no activation armed');
+  const idle = tapRig(false);
+  idle.tap(250, 100);
+  assert.deepEqual([idle.strikes, idle.scope._tapArmed], [[], 2], 'no act: the tap is the activation\'s, as ever');
+  const bar = tapRig(true);
+  bar.tap(250, 190);
+  assert.deepEqual([bar.strikes, bar.scope._tapArmed], [[], 0], 'a tap in the docked bar\'s strip mid-act: nothing, as with no act');
+});
+
+/** The street's ladder, its two lines lifted out of world.js: the act's click asked, and the ladder's condition. */
+function streetLadder() {
+  const ask = WORLD.match(/\n\s*const _actClick = (gatherHost\?\.clickTaken\(_activateDown\) \?\? false);\n/);
+  const cond = WORLD.match(/\n\s*if \((\(\(_act\.activate && [^\n]*?\) \|\| \(useEdge && !nodeTook\)\)) && !modes\.transitioning && !_holdFire\) \{/);
+  assert.ok(ask && cond, 'the street ladder\'s act click and condition');
+  const askFn = new Function('gatherHost', '_activateDown', `return ${ask[1]};`);
+  const condFn = new Function('_act', 'gatherHost', 'useEdge', 'nodeTook', '_actClick', 'nodeClicked', `return ${cond[1]};`);   // PROF-MENU: a node's lit row's click, none here
+  return { cond: cond[1], frame: (gate, host, down, now) => { const a = activateFrame(gate, { down, now }); const c = askFn(host, down); return condFn(a, host, false, false, c, false); } };
+}
+
+test('CLICK-LIFT: a vein mined by left clicks to its end - no click of the act reaches the street\'s ladder, the last one\'s release included; a click after it, with no act, does (mutants: the latch never held; the latch never let go; the ladder never asks it)', async () => {
+  const s = await stage();
+  try {
+    const street = streetLadder();
+    s.face(s.vein);
+    assert.equal(s.host.press(), true, 'E starts the act');
+    s.host.tick(0.016);
+    const gate = createActivateGate();
+    let t = 100, ran = 0, clicks = 0;
+    for (let i = 0; i < 40 && s.host.acting(); i++) {
+      // the press: the gate sees it down, the act takes it as its strike (ACT-CLICK: the host's input().attack)
+      if (street.frame(gate, s.host, true, t += 0.016)) ran++;
+      s.input = { held: false, attack: true, choice: false }; s.host.tick(0.016); s.input = { held: false, attack: false, choice: false };
+      // the release, a frame on
+      if (street.frame(gate, s.host, false, t += 0.016)) ran++;
+      s.host.tick(MINE_ACT.swingS);
+      clicks++;
+    }
+    assert.equal(s.host.acting(), false, `the vein mined in ${clicks} clicks`);
+    assert.equal(s.asked.length, 1, 'the ore asked');
+    assert.equal(ran, 0, 'no click of the act ran the ladder - the finishing one\'s release included');
+    // with no act, a click is the world's on its release - and once
+    assert.equal(street.frame(gate, s.host, true, t += 0.016), false, 'the press: nothing (A8: the release activates)');
+    assert.equal(street.frame(gate, s.host, false, t += 0.016), true, 'the release: the ladder');
+    assert.equal(street.frame(gate, s.host, false, t += 0.016), false, 'once');
+  } finally { s.done(); }
+});
+
 test('CLICK-LIFT: the latch is the press\'s - pressed mid-act it is taken to its release and let go after; pressed with no act it is never taken; held into an act it is taken (mutants: the latch never held; the latch never let go)', async () => {
   const s = await stage();
   try {
@@ -147,6 +218,13 @@ test('CLICK-LIFT: the latch is the press\'s - pressed mid-act it is taken to its
     assert.equal(s.host.clickTaken(true), false, 'a new press with no act: the world\'s');
     assert.equal(s.host.clickTaken(false), false);
   } finally { s.done(); }
+});
+
+test('CLICK-LIFT: underground the dungeon\'s ladder holds the act\'s click to its release - the modal frame asks it every frame with the button\'s level, the world host hands the gathering host\'s, and tryExitDungeon stops on it (mutants: the dungeon never asks)', () => {
+  assert.match(MODES, /\n\s*const _activateDown = held\(keys, 'ActivateCenterObject'\) \|\| !!host\.activateDown\?\.\(\);\n\s*const _act = activateFrame\(\(latch\.activate \?\?= createActivateGate\(\)\), \{\n\s*down: _activateDown,/, 'the gate\'s press is the level the latch is asked with');
+  assert.match(MODES, /\n\s*const actClick = host\.profClickTaken\?\.\(_activateDown\) \?\? false;[^\n]*\n\s*if \(\(_act\.activate \|\| useEdge\) && !overlayHeld\) \(mode === 'dungeon' \? tryExitDungeon : tryExit\)\(\{ pressCast: _act\.pressCast, interact: useEdge, actClick \}\);/, 'asked every frame, before the ladder, and handed to it');
+  assert.match(MODES.slice(MODES.indexOf('  function tryExitDungeon(')), /\n\s*if \(!interact && \(actClick \|\| host\.profActing\?\.\(\)\)\) return true;/, 'tryExitDungeon: the act\'s click, or an act playing, stops the ladder');   // PIN MOVED (INDOOR-SKIN): the building's ladder has its own, above
+  assert.match(WORLD, /\n\s*profClickTaken: \(down\) => gatherHost\?\.clickTaken\(down\) \?\? false,/, 'the world host hands the gathering host\'s latch');
 });
 
 // ─── CURE-ENDS, CURE-FILL ───────────────────────────────────────────

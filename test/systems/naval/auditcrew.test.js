@@ -104,10 +104,69 @@ test('AUDIT CC-A4: a companion stays the player\'s - whatever turned his team, t
   assert.deepEqual([rec.entity.team, rec.entity.mobileTeam, rec.shipmate], ['PlayerAlly', 'PlayerAlly', true]);
 });
 
+test('AUDIT CC-A5 (major): a hand home again stands on her deck - the last of the party back too (the host answers an empty set, never null), and with his sprite', async () => {
+  const { crewRoster } = await import('../../../src/systems/naval/crewLife.js');
+  const { createNavalCrew } = await import('../../../src/scenes/naval/navalCrew.js');
+  const { Boat, spawnBoat } = await import('../../../src/systems/comeSailAway/comeSailAwayBoat.js');
+  const { ctxFor } = await import('../../csaScene.mjs');
+  const { readyPool } = await import('../../navalSea.mjs');
+  const pool = await readyPool();
+  const deck = pool.deckOf(2, 0);
+  const b = new Boat(2, 0);
+  spawnBoat(b, ctxFor({ position: [0, 0, 0], rotation: [0, 0, 0, 1] }));
+  const renderer = { createBillboardBatch: (archive) => ({ archive }), destroyBillboardBatch: () => {}, textures: new Map() };
+  const tex = { getFrameCount: () => 4, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 20 };
+  const crew = createNavalCrew({ renderer, getTexture: async () => tex, uploadRecordFrame: () => {}, rand: () => 0.3 });
+  const entry = (away) => ({ key: 'mine', boat: b, deck, count: 6, rosterOf: () => crewRoster({ hull: 2, seed: 3, crew: 60 }), seed: 3, faction: null, battle: false, away });
+  const step = (away, n = 1) => { for (let i = 0; i < n; i++) { crew.sync([entry(away)]); crew.frame(0.05, [0, 10, 0]); } };
+  const member = (i) => crew.ships()[0].life.members[i];
+  const sprite = (i) => !!crew.ships()[0].sprites.get(member(i));
+  step(new Set());
+  await settle();
+  step(new Set([1, 2]));
+  assert.ok(member(1).gone && member(2).gone, 'two ashore');
+  step(new Set([2]), 5);
+  assert.ok(!member(1).gone && sprite(1), 'one home: standing, and seen');
+  step(new Set(), 5);   // the last home: the host's empty set
+  assert.ok(!member(2).gone && sprite(2), 'the last home too');
+  assert.equal(crew.ships()[0].life.standing(), 6);
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /away: naval\?\.awayOf\?\.\(boat\) \?\? NO_HANDS_AWAY/, 'my boats always say who is away');
+  // PIN MOVED (AUDIT CAPTAIN'S SEA C1): the rule moved into the host's one ashore set (`ashoreNames`), which the deck, her
+  // posts' worth, her answering hand and her card all read - the deck still answers the empty set, never null
+  assert.match(rd('src/scenes/naval/navalHost.js'), /const ashoreNames = \(boat\) => \(boat\?\.uid && companions\.party\.length && !sailing\(\) \? companions\.awayOf\(boat\.uid\) : NO_HANDS_AWAY\);/, 'none away: an empty set - and none while I sail (Mac: back on deck)');
+  assert.match(rd('src/scenes/naval/navalHost.js'), /const names = ashoreNames\(boat\);[^\n]*\n\s*if \(!names\.size\) return NO_HANDS_AWAY;/, 'the deck reads the one set');
+});
+
+test('AUDIT CC-A6 (major): the bars come down under a dungeon window - the overlay\'s early return draws them covered too', () => {
+  const m = rd('src/scenes/worldModes.js');
+  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
+  assert.match(m, /if \(windowHoldsDungeon\(dungeonCtx\.uiOverlayActive, aliveUnder\(\)\)\) \{[^\n]*host\.drawCompanionBars\?\.\(\{ proj, view, eye: mwv\.eye \}\);[^\n]*dungeonCtx\.drawOverlay\(canvas\); return true; \}/);
+});
+
+test('AUDIT CC-A7: companions take none of the street\'s (or a building\'s) encounter slots', () => {
+  assert.match(rd('src/scenes/exteriorFoes.js'), /const activeCount = \(\) => foes\.filter\(\(f\) => !f\.dead && !f\.puppet && !f\.placed && f\.companion == null\)\.length;/);
+});
+
+test('AUDIT CC-A8: a quickload lifts the party first (a dungeon\'s save patches foes by number - a companion in the list took another\'s record)', () => {
+  const w = hostText('src/scenes/world.js');
+  const at = w.indexOf('async function worldQuickLoad(');
+  const body = w.slice(at, at + 4000);
+  assert.match(body, /crewAshore\.clear\(\);   \/\/ AUDIT CC-A8/);
+});
+
 test('AUDIT CC-A9: a boat with no deed number lists no Companions row (its press could only do nothing)', () => {
   const ids = (s) => boatMenuRows({ boxes: new Set(['drive']), packable: true, naval: true, crewed: true, ...s }).map((r) => r.id);
   assert.ok(ids({ companions: true }).includes(BOAT_VERB.companions));
   assert.ok(!ids({ companions: false }).includes(BOAT_VERB.companions));
+  assert.match(hostText('src/scenes/world.js'), /naval: navalOn\(\), crewed: !!boat\.crewed, companions: !!boat\.uid,/);
+});
+
+test('AUDIT CC-A10: a pause holds the layer (no knock, no stand, no catch-up under a window); the bars show the peers\' companions indoors and underground too', () => {
+  const w = hostText('src/scenes/world.js');
+  // PIN MOVED (COMPANION-KIT): the party panel's companions are drawn first - its own covering word holds it under a window
+  assert.match(w, /function crewAshoreTick\(\) \{\n(?:\s*try \{ companionPanelFrame\(\); \}[^\n]*\n)?\s*if \(!navalOn\(\)\) \{ crewAshore\.clear\(\); return; \}\n\s*if \(gamePaused\(\)\) return;/);
+  assert.match(w, /for \(const f of _mode\(\) === 'exterior' \? exteriorFoes\.foes : _insidePool\(\)\) \{/);
 });
 
 // ── CC-B: combat and AI ──────────────────────────────────────────────────────────────────────────────────────────
@@ -132,6 +191,13 @@ const run = (pool, playerFeet, seconds) => {
   const targeting = armed(pool);
   for (let t = 0; t < seconds; t += 1 / 60) for (const f of pool) f.ai.update(1 / 60, playerFeet, mkSenses({ targeting }));
 };
+
+test('AUDIT CC-B1 (blocker): no blow of the player\'s turns a companion - both pools\' attack door passes him by, and the dungeon\'s shaft flies past him', () => {
+  for (const [p, v] of [['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/dungeonContext.js', 'foe']]) {
+    assert.match(rd(p), new RegExp(`function handleAttackFromPlayer\\(${v}, playerFeet = null, peer = false, peerId = null\\) \\{\\n\\s*if \\(!${v}\\?\\.ai \\|\\| ${v}\\.companion != null\\) return;`), p);
+  }
+  assert.match(rd('src/scenes/dungeonContext.js'), /for \(const f of foes\) \{\n\s*if \(f\.dead \|\| f\.companion != null\) continue;   \/\/ AUDIT CC-B1/);
+});
 
 test('AUDIT CC-B2: a companion takes no ally for his foe whatever his team reads, and no ally takes him', () => {
   const pf = [0, 0, 30];
@@ -195,7 +261,13 @@ test('AUDIT CC-B4 (major): a companion never runs out past the leash at a foe st
   assert.equal(m2.ai.target, ghost, 'and keeps it');
 });
 
+test('AUDIT CC-B5: the pathing motor drops the route it held when it turns from fighting to following and back', () => {
+  assert.match(rd('src/ai/enhancedMotor.js'), /if \(this\._following !== this\._wasFollowing\) \{ this\._wasFollowing = this\._following; this\.path = null; this\.repathT = 0; \}/);
+});
+
 test('AUDIT CC-B6: a torch thrown indoors or underground passes a companion by (the street\'s already did); the watch stays while a monster fights one', () => {
+  assert.match(rd('src/scenes/worldModes.js'), /foes: \(\) => interiorFoePool\(\)\.filter\(\(f\) => !sparedByPlayer\(f\)\),/);
+  assert.match(rd('src/scenes/dungeonContext.js'), /collider: \(\) => collider, foes: \(\) => foes\.filter\(\(f\) => !sparedByPlayer\(f\)\),/);
   const monster = { ai: { isHostile: true, target: { companion: 'k', dead: false } }, entity: { team: 'Orcs' } };
   assert.equal(isTownThreat(monster, { inTownRect: () => true }), true);
 });
@@ -306,6 +378,12 @@ test('AUDIT CC-D5: one round of grog a port day, and a prize\'s hold lifts spiri
   assert.ok(y, 'the yard\'s window');
   assert.equal(y.buyProvision('grog').ok, true);
   assert.equal(y.buyProvision('grog').ok, false, 'not twice a day');
+  assert.match(rd('src/scenes/naval/navalHost.js'), /if \(all\.length > left\.length && !_plundered\.has\(hold\)\) \{ _plundered\.add\(hold\); crewEvent\(boat \?\? boatInPlay\(\), 'plunder'\); \}/);
+});
+
+test('AUDIT CC-D6: the hands stand on her deck as they were named - their class and sex off her saved crew, not a seed that moves with the session', () => {
+  assert.match(hostText('src/scenes/world.js'), /rosterOf: \(\) => navalMyRoster\(boat, seed, crew\)/);
+  assert.match(hostText('src/scenes/world.js'), /return crewRoster\(\{ hull: boat\.hull, seed, crew \}\)\.map\(\(r, i\) => \(hands\[i\] \? \{ mobile: hands\[i\]\.mobile, gender: hands\[i\]\.gender === 'female' \? 'female' : 'male' \} : r\)\);/, 'each place the hand named there');
 });
 
 test('AUDIT CC-D7: a knock after a load still costs her crew - the event lands on the saved record of a boat not yet stood', async () => {
@@ -317,8 +395,11 @@ test('AUDIT CC-D7: a knock after a load still costs her crew - the event lands o
 });
 
 test('AUDIT CC-D8: the plate says her repairs while the order stands; the card marks a hand ashore; the next hand answers for a First Mate ashore', () => {
+  assert.match(rd('src/scenes/naval/navalHost.js'), /repairing: !!st\.repairing, repairOrdered: st\.crew\.order === CREW_ORDERS\.repair,/);
+  assert.match(rd('src/ui/naval/navalHud.js'), /ship\.repairOrdered \? 'Crippled, repairs ordered'/);
   const lines = crewCard({ morale: 60, hands: [{ name: 'Aldric', role: 'First Mate', fights: 0, boardings: 0 }, { name: 'Brand', role: 'Bard', fights: 1, boardings: 0 }] }, { ashore: new Set(['Aldric']) });
   assert.ok(lines.some((l) => /^Aldric, First Mate.*ashore with you/.test(l)));
+  assert.match(rd('src/scenes/naval/navalHost.js'), /const mateOf = \(boat, st\) =>/);
 });
 
 // ── CC-E: co-op - the companions' fights across the clients ──────────────────────────────────────────────────────
@@ -395,6 +476,20 @@ test('AUDIT CC-E1 (major, Mac: "Full co-op combat now"): on the street my compan
   assert.equal(hitsA.length, n);
 });
 
+test('AUDIT CC-E2 (major): underground my companion rides the room\'s own lane (`cp`), stood as my ally by everyone; his blows on the room\'s foes and theirs on him reach the body\'s owner', () => {
+  const d = rd('src/scenes/dungeonContext.js');
+  assert.doesNotMatch(hostText('src/scenes/world.js'), /if \(f\) f\._loose = false; return f;/, 'no longer kept off the lane');
+  // PIN MOVED (AUDIT WK-U3, 2026-10-01): his name rides beside his place (`cn`), the law unchanged
+  assert.match(d, /if \(!qt && f\.companion != null && !f\.dead\) \{ cp\.push\(i\); cn\.push\(/);
+  assert.match(d, /comp = validLooseSeqs\(data\.cp\)[,;]/);   // PIN MOVED (RPT1026-PROGRESS SUMMON-BARE): the summons ride the same statement
+  assert.match(d, /companionPuppet\(f, lo && comp\.has\(r\.i\), compNames\.get\(r\.i\)\); f\._heirElse/);   // PIN MOVED (AUDIT WK-U3): and named
+  assert.match(d, /if \(coop\) opts\.onFoeHit\?\.\(\{ own: 1, to: foe\._ownFrom, k: _locationKey, i: foe\._ownI, \.\.\.coop \}\);/, 'own-lane bodies');
+  assert.match(d, /if \(coop\?\.al === 1\) opts\.onFoeHit\?\.\(\{ \.\.\.\(foe\._encId != null \? \{ i: foe\._encId, xs: 1 \} : \{ i: foe\._surI \?\? pi \}\), \.\.\.coop \}\);/, 'the room\'s foes, as a joiner');
+  assert.match(d, /if \(data\.fb === 1\) \{\n\s*if \(!f \|\| f\.dead \|\| f\.companion == null/, 'the foe\'s blow lands on my companion');
+  assert.match(d, /rec\.hurtFromFoe = \(dmg, dir, striker = null\) => damageFoe\(rec, dmg, null, dir \?\? null, \{ fromPlayer: false, striker \}\);/);
+  assert.match(d, /dealDamage: \(tt, d\) => tt\.hurtFromFoe\?\.\(blowScaled\(f\.ai, d\), fwd, f\),/);   // PIN MOVED (AUDIT ARENA-LADDER): a telegraphed blow's weight on it
+});
+
 test('AUDIT CC-E3/E4: a companion lifted on the street makes the next frame whole (the room lets him go at once); a ship another stands that strikes to my guns cheers my crew', async () => {
   const hits = [];
   const A = createExteriorFoes(poolRig());
@@ -405,6 +500,9 @@ test('AUDIT CC-E3/E4: a companion lifted on the street makes the next frame whol
   assert.equal(A.foesFrame(false), null, 'nothing changed');
   A.removeFoe(mate);
   assert.equal(A.foesFrame(false)?.full, 1, 'whole');
+  // PIN MOVED (AUDIT QUESTLINES ACTS-11): the win and the questlines' act, one arm (test/systems/questlines/ql11_acts.test.js drives it)
+  assert.match(rd('src/scenes/naval/navalHost.js'), /if \(was === SHIP_STATES\.afloat && dmg\.state === SHIP_STATES\.struck && clock - \(e\.myBlowAt \?\? -Infinity\) <= SINK_CREDIT_S\) struckToMe\(\);/);
+  assert.match(rd('src/scenes/naval/navalHost.js'), /const struckToMe = \(\) => \{ crewEvent\(boatInPlay\(\) \?\? myBoat\(\), 'win'\); noteAct\('ship-struck'\); \};/);
 });
 
 // ── CC-F: the safety net - behaviour the audit's mutants found unpinned ──────────────────────────────────────────
@@ -446,6 +544,30 @@ test('AUDIT CC-F1: the host\'s companion API on the real host - a press takes a 
   assert.ok(h.host.companionRows(h.boat, 0).filter((r) => !r.back).every((r) => r.disabled), 'no crew, nobody to take (one ashore may still go back)');
   assert.equal(h.host.companionPress(h.boat, hands[2].name, 0), null);
   assert.equal(h.host.companions.isAshore(42, hands[2].name), false);
+});
+
+test('AUDIT CC-F2: the follow brain\'s guards - no follow while paralyzed, paused or knocked back; no leader, no walk; a detour aims round the obstacle; the navmesh\'s last leg aims at the live leader', () => {
+  const leader = [20, 0, 0];
+  const make = () => { const m = body([0, 0, 0], { team: 'PlayerAlly', companion: 'k' }); m.ai.follow = { feet: () => leader, stop: 2.5 }; return m; };
+  const step = (m, o = {}) => m.ai.update(1 / 60, leader, mkSenses({ targeting: armed([m]) }), !!o.paralyzed, !!o.paused);
+  const p = make(); for (let i = 0; i < 60; i++) step(p, { paralyzed: true });
+  assert.equal(p.ai._following, false, 'paralyzed');
+  assert.deepEqual(p.ai.feet.map((v) => Math.round(v * 100) / 100), [0, 0, 0]);
+  const q = make(); for (let i = 0; i < 60; i++) step(q, { paused: true });
+  assert.equal(q.ai._following, false, 'paused');
+  const k = make(); k.ai.knockbackSpeed = 10; step(k);
+  assert.equal(k.ai._following, false, 'knocked back');
+  const n = make(); n.ai.follow = { feet: () => null, stop: 2.5 }; n.ai.moving = true;
+  n.ai._followTicks(4, 1 / 60);
+  assert.equal(n.ai.moving, false, 'no leader: standing');
+  n.ai.target = null;
+  assert.equal(n.ai._followWanted(), true, 'no leader and no foe: he keeps to nobody, standing');
+  const d = make(); d.ai.avoidObstaclesTimer = 1; d.ai.detourDestination = [0, 0, 20]; d.ai.yaw = 0;
+  d.ai._followTicks(1, 1 / 60);
+  assert.equal(d.ai.moving, true, 'the detour aims ahead (+z), the leader is to the side (+x): it walks the detour');
+  const rd2 = rd('src/ai/enhancedMotor.js');
+  assert.match(rd2, /if \(this\.navBroken \|\| this\.avoidObstaclesTimer > 0\) return leader;/, 'a detour runs the classic way round');
+  assert.match(rd2, /return this\.pathI === this\.path\.length - 1 \? leader : wp;/, 'the last leg at the leader\'s live feet');
 });
 
 test('AUDIT CC-F3: grog and provisions by number - a gold a hand at least GROG_MIN, none at the top of their spirits, the cost what the purse pays for', () => {
@@ -542,6 +664,12 @@ test('AUDIT CC-F7: the deck\'s away - a hand going ashore ends his talk and drop
 });
 
 test('AUDIT CC-F8: the world\'s wiring - the arc off lifts every body, the prune runs, none stand at the helm, the spot is the collider\'s sweep, the picker says why a row is refused; a peaceful foe fights no companion', () => {
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /if \(!navalOn\(\)\) \{ crewAshore\.clear\(\); return; \}/);
+  assert.match(w, /if \(\+\+_companionPruneN >= 60\) \{ _companionPruneN = 0; naval\?\.pruneCompanions\?\.\(\); \}/);
+  assert.match(w, /\|\| csaRuntime\?\.isSailing\?\.\(\)\) return null;/);
+  assert.match(w, /try \{ col\?\.move\(p, dx, 0, dz, 1\.8\); \}/);
+  assert.match(w, /csaOpenListPicker\(rows\.map\(\(r\) => \(r\.disabled \? `\$\{r\.label\} \(\$\{r\.why\}\)` : r\.label\)\), \(i\) => \{\n[^\n]*\n\s*if \(rows\[i\]\) naval\.companionPress/, 'the companions\' own picker');
   const pf = [0, 0, 30];
   const calm = body([0, 0, 0], { team: 'Orcs', hostile: false });
   const mate = body([0, 0, 3], { team: 'PlayerAlly', yaw: Math.PI, companion: 'k' });

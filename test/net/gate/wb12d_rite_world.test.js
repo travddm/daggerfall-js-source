@@ -612,6 +612,7 @@ test('AUDIT WB12d (G14): the smoke\'s pass is built by the frame - before the re
   assert.equal(h.smoking(), true);
   assert.equal(h.drawSmoke(I, I, [0, 0, 0], 5), 1, 'asked, it draws');
   assert.equal(createRiteHost({ now: () => r.now(), omen: () => ({ site: SITE }), pixelTranslation: () => [0, 0, 0] }).drawSmoke(I, I, [0, 0, 0], 5), 0);
+  assert.match(read('src/render/riteSmoke.js'), /s\.fade > SMOKE_FADE_MIN\)\.slice\(0, SMOKE_MAX\)/);
 });
 
 test('AUDIT WB12d (G2): the burned earth - the circle says where no grass grows (its heart, past its braziers) and asks the grass placed there to be placed again when it stands and when it goes (mutants: no clearing; never placed again; placed again where it is no longer)', () => {
@@ -630,6 +631,10 @@ test('AUDIT WB12d (G2): the burned earth - the circle says where no grass grows 
   r2.set(T.wrathAt + GATE_COLLAPSE_MS); r2.host.frame();
   assert.deepEqual(r2.bare.at(-1), [E + 100 - RITE_BARE_R, N - RITE_BARE_R, E + 100 + RITE_BARE_R, N + RITE_BARE_R], 'gone: placed again where the scene has it now');
   assert.equal(r2.host.clearing(), null);
+  const w = read('src/scenes/world.js');
+  assert.match(w, /const _bare = riteHost\?\.clearing\(\) \?\? starfall\?\.clearing\(\) \?\? null;/);
+  assert.match(w, /if \(_bare && \(x - _bare\.x\) \* \(x - _bare\.x\) \+ \(z - _bare\.z\) \* \(z - _bare\.z\) <= _bare\.r \* _bare\.r\) return null;/);
+  assert.match(w, /onBare: \(x0, z0, x1, z1\) => labGrassField\?\.invalidate\(x0, z0, x1, z1\),/);
 });
 
 test('WB12d the circle\'s stone: the sigil faces up and rides the land - over the ground everywhere, a fold of it too; the altar, the casket and the braziers sunk at their lowest corner on a slope; six braziers ring it, the faithful\'s ring leaves its gap toward the gate and their camp stands behind (mutants: the sigil under the land; standing on air)', () => {
@@ -927,6 +932,10 @@ test('WB12d the spoils: a receipt of the rite alone pays its ember and nothing e
   assert.equal(pool.spew({ day: DAY + 1, seed: 4242, level: 20, acct: 'a', at: [0, 0, 0], bearing: 0, claims: { x: 'stood', r: 1 } }), true);
   assert.equal(pool.state().pieces.length, plain.length + 1, 'spewed: an ember more');
   assert.equal(COURT_STRIKE_TEXT.spilledRite(), 'Your ember from the broken rite falls to the floor.');
+  const court = read('src/scenes/gate/gateCourt.js');
+  assert.match(court, /spoils\.spew\(\{ day: s\.day, seed: claims\.c, level: spoilsLevel\(player\(\)\?\.level \?\? 1, claims\.l\), at, bearing, acct: claims\.s, keep, claims \}\)/);
+  assert.match(court, /say\(claims\.x === 'rite' \? COURT_STRIKE_TEXT\.spilledRite\(\) : COURT_STRIKE_TEXT\.spilled\(\)\);/);
+  assert.match(read('src/scenes/world.js'), /spoilsPool\.grant\(\{ day: c\.d, seed: c\.c, level: spoilsLevel\(playerEntity\.level \?\? 1, c\.l\), acct: c\.s, claims: c, text: c\.x === 'rite' \? SPOILS_TEXT\.rite : SPOILS_TEXT\.granted \}\)/);
 });
 
 test('WB12d the claim: a rite\'s own receipt is "Rite recorded." and closes no breach; refused its claims by a service from before acct62, it is kept for its week - for that refusal alone (mutants: let go; said a breach; kept on any refusal; the verdict blind to the receipt)', async () => {
@@ -977,6 +986,9 @@ test('WB12d the omen\'s order: right after the omen\'s line, before tonight\'s m
   assert.deepEqual(ok.seen, [[DAY, PX, PY]], 'asked of this breach\'s circle, once');
   assert.deepEqual(run({ broken: true }).said.slice(1), [marks, pt]);
   assert.deepEqual(run({ ready: false }).said.slice(1), [marks, pt]);
+  const w = read('src/scenes/world.js');
+  assert.match(w, /riteBroken: \(day, s\) => !!riteHost\?\.isBroken\(day, s\?\.px, s\?\.py\),/);
+  assert.match(w, /riteReady: \(\) => !!online\?\.riteOk,/);
 });
 
 test('AUDIT WB12d (D2): the Summoner by his own name in the classic lines - "You see the Summoner.", "The Summoner just died." and "The Summoner (dead)"; the faithful by their careers (mutants: each line by his kind)', () => {
@@ -988,16 +1000,24 @@ test('AUDIT WB12d (D2): the Summoner by his own name in the classic lines - "You
   activateMobileEnemy({ mobileType: RITE_SUMMONER_CAREER, entity: { properName: RITE_TEXT.summoner } }, 2, 'info', null, { hud: (t) => hud.push(t) });
   activateMobileEnemy({ mobileType: 128, entity: {} }, 2, 'info', null, { hud: (t) => hud.push(t) });
   assert.deepEqual(hud, ['You see the Summoner.', 'You see a Mage.']);
+  assert.match(read('src/scenes/exteriorFoes.js'), /title: corpseName\(properName\(e\.entity\) \?\? championName\(e\.entity, corpseEntityName\(e\.mobileType\)\)\)/);
 });
 
 test('AUDIT WB12d (C15): the faithful on the Overworld are the rite\'s - "Dagon\'s Faithful, 7", attacked as "Dagon\'s Faithful (7)" - mine or a peer\'s, and the attack spares them all (mutants: a "Mage pack"; the attack\'s question by the pack\'s regex; the attacked rite still holding the clock)', () => {
   assert.equal(RITE_TEXT.mark(7), 'Dagon\'s Faithful, 7');
   assert.equal(RITE_TEXT.mark(1), 'Dagon\'s Faithful');
   assert.equal(RITE_TEXT.markAsk(7), 'Dagon\'s Faithful (7)');
+  const w = read('src/scenes/world.js');
+  const m = /\n {2}function travelViewCamps\(\) \{\n[\s\S]*?\n {2}\}\n/.exec(w);
   const pool = { foes: [
     { site: SITE_ID, campId: 7, mobileType: 131, ai: { feet: [0, 0, 0] } }, { site: SITE_ID, puppet: 'peer-2', _pupCamp: { id: 3, kind: 'pack' }, mobileType: 128, ai: { feet: [2, 0, 0] } },
     { site: SITE_ID, campId: 7, dead: true, mobileType: 130, ai: { feet: [1, 0, 0] } }, { campId: 9, campKind: 'pack', mobileType: 128, ai: { feet: [90, 0, 0] } },
   ] };
+  const lift = (rite) => new Function('exteriorFoes', 'groupCamps', 'enemyDisplayName', 'riteHost', 'RITE_TEXT', `${m[0]} return travelViewCamps;`)(pool, groupCamps, () => 'Mage', rite, RITE_TEXT)();
+  assert.deepEqual(lift({ siteNow: () => SITE_ID }).map((c) => [c.key, c.kind, c.n, c.label]), [[`rite:${SITE_ID}`, 'rite', 2, 'Dagon\'s Faithful, 2'], ['me:9', 'pack', 1, 'Mage']], 'mine and the peer\'s copies one mark, the living alone');
+  assert.deepEqual(lift(null).map((c) => c.label), ['Mage', 'Mage', 'Mage'], 'no circle standing: as ever');
+  assert.match(w, /const label = c\.kind === 'rite' \? RITE_TEXT\.markAsk\(c\.n\) :/);
+  assert.match(w, /const foeCampKey = \(f\) => \(f\?\.site && f\.site === riteHost\?\.siteNow\(\) \? `rite:\$\{f\.site\}` :/);
 });
 
 test('AUDIT WB12d (C14, C5, R1, D4): a day\'s faithful are a site of their own - the camps\' law carries `px,py:rite.<day>`, a save\'s faithful from before the day joined it are known as the rite\'s; the hub\'s word carries how many broke it, never fewer than it names nor more than a rite counts (mutants: the day-less site; the count trusted)', () => {
@@ -1016,6 +1036,7 @@ test('AUDIT WB12d (C14, C5, R1, D4): a day\'s faithful are a site of their own -
   assert.deepEqual(cardOf(ritePost({ by: ['Ann'], n: 2 })).fields, { Where: 'In the wilds', 'Broken by': 'Ann and 1 other' });
   assert.deepEqual(cardOf(ritePost({ place: 'Copperham', by: [] })).fields, { Where: 'Near Copperham' });
   assert.deepEqual(ritePost({ by: ['<@&1> x'] }).allowed_mentions, { parse: [] }, 'pings nobody');
+  assert.match(read('server/src/index.js'), /ritePost\(\{ day: st\.riteOwe\.d, place: site\?\.pl \?\? null, by: riteNames\(c\), n: Object\.keys\(c\.h\)\.length \}\)/);
 });
 
 test('WB12d the session: a word down the circle\'s cell socket only to a relay that keeps the rite - a halo\'s by its own welcome, and (AUDIT WB12d C6) each socket keeping its own word across a seam\'s promotion; RITE_HZ_MAX a second (mutants: the halo never keeps it; the promotion forgets it; any room; unmetered)', () => {
@@ -1072,3 +1093,42 @@ test('WB12d the session: a word down the circle\'s cell socket only to a relay t
   } finally { console.info = log; }
 });
 
+test('WB12d the world host by source: the host made beside the gate on the camps\' law and stood at every seam (mutants: each seam removed)', () => {
+  const on = read('src/net/online.js');
+  assert.match(on, /if \(r && isSocialRoom\(room\)\) this\._deliver\('rite', \(\) => this\.onRite\?\.\(r, room\)\);/);
+  const w = read('src/scenes/world.js');
+  const at = w.indexOf('const riteHost = gateOmen ? createRiteHost(');
+  const deps = w.slice(at, w.indexOf('}) : null;', at));
+  assert.match(deps, /omen: \(\) => gateOmen\.nearCurrent\(\),/);   // PIN MOVED (WW2): the nearest gate's - its circle stands where the player is
+  assert.match(deps, /fellAt: \(day\) => gateLink\?\.fellAt\(day\) \?\? null,/);
+  assert.match(deps, /online: \(\) => !!online\?\.riteOk,/);
+  assert.match(deps, /return exteriorFoes\.spawnFoe\(career, \[x, y, z\], \{ yaw, placed: true, groundAlign: \{ hitDist: hitDistance\(hit\) \}, site, transient \}\);/);
+  assert.match(deps, /drop: \(site\) => exteriorFoes\.dropSiteFoes\(site\),/);
+  assert.match(deps, /remove: \(f\) => exteriorFoes\.removeFoe\(f\),/);
+  assert.match(deps, /reclaim: \(site\) => exteriorFoes\.reclaimSite\(site\),/);
+  assert.match(deps, /peerSprang: \(site\) => _wodPeerSprung\.has\(site\),/);
+  assert.match(deps, /peerHeldAgo: \(site\) => wodPeerHeldAgo\(site\),/);
+  assert.match(deps, /forgetPeer: \(site\) => wodForgetPeer\(site\),/);
+  assert.match(deps, /sprang: \(site\) => wodSprang\(site\),/);
+  assert.match(deps, /unsprang: \(site\) => wodUnsprang\(site\),/);
+  assert.match(deps, /struckAt: \(f\) => renownStruckAt\(f\),/);
+  assert.match(deps, /collider: \(\) => collider,/);
+  assert.match(deps, /pixelTranslation: \(px, py, out\) => state\.pixelTranslation\(px, py, out\),/);
+  assert.match(deps, /send: \(w, cell\) => !!online\?\.sendRite\?\.\(w, cell\),/);
+  assert.match(deps, /droppedLoot\.seedPile\(items, feet, \{ archive: RANDOM_TREASURE_ARCHIVE, record: 0 \}, null, pixelKey, \{ unsaved: true, drawn: false \}\), keyOf: \(p\) => `droppedLoot:\$\{p\.id\}` \},[^\n]*\n\s*level: \(\) => playerEntity\.level \?\? 1,/);
+  assert.match(w, /try \{ riteHost\?\.frame\(\); \}/);
+  assert.equal(w.split('...(riteHost?.lights() ?? [])').length - 1, 2, 'both light lists');
+  assert.match(w, /riteHost\?\.draw\(renderer, null, mwv\.eye\);/, 'AUDIT WB12d (G6): the eye, for the sigil');
+  assert.match(w, /riteHost\.tick\(dt\); livePersonBatches\.push\(\.\.\.riteHost\.batches\(\)\);/);
+  assert.match(w, /if \(riteHost\?\.smoking\(\) && riteHost\.drawSmoke\(proj, view, new Float32Array\(mwv\.eye\), now \/ 1000,[^\n]*\n[^\n]*camPos: renderer\._camPos, focus: renderer\._focus, haze: renderer\._haze, light: \(renderer\._ambient\[0\] \+ renderer\._ambient\[1\] \+ renderer\._ambient\[2\]\) \/ 3 \+ 0\.6 \* renderer\._sunScale \}\)\) renderer\.markForeignPass\(\);/, 'the smoke handed the travel view\'s focus, the jungle\'s haze (AUDIT BANTHA1 HAZE-3) and (AUDIT WB12d G8) the frame\'s light, its foreign pass marked');
+  assert.ok(w.indexOf('try { riteHost?.frame(); }') < w.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), 'AUDIT WB12d (G14): its frame - the smoke\'s pass built there - before the renderer\'s');
+  assert.match(w, /\(key\) => sigilBroker\?\.hoverName\(key\) \?\? null,[^\n]*\n\s*\(key\) => riteHost\?\.hoverName\(key\) \?\? null,/, 'named after the gate and the Broker');
+  assert.ok(w.indexOf('(key) => riteHost?.hoverName(key) ?? null,') < w.indexOf("(key) => (typeof key === 'string' && key.startsWith('droppedLoot:')"), 'its pile named before the piles\' word');
+  assert.equal(w.split('[...gatePool.targets(), ...(riteHost?.targets() ?? [])]').length - 1, 2, 'the press and the hover');
+  assert.match(w, /else if \(!riteHost\?\.activate\(_gatePick\.key\)\) gatePool\.activate\(_gatePick\.key\);/);
+  assert.match(w, /online\.onRite = \(w\) => riteHost\?\.onBroken\(w\);/);
+  assert.match(w, /link\.onRite = \(w\) => riteHost\?\.onBroken\(w\);/);
+  assert.match(w, /riteHost\?\.destroyAll\(\);/);
+  assert.match(w, /\n {4}handOverSiteFoes\(\);\n {4}exteriorFoes\.clearLive\(\);\n {4}wodCarry\.clear\(\);/, 'AUDIT WB12d (C2): the teleport hands them over first');
+  assert.match(w, /globalThis\.addEventListener\?\.\('pagehide', \(\) => handOverSiteFoes\(\)\);[^\n]*\n\s*globalThis\.addEventListener\?\.\('pagehide', \(\) => \{\n\s*try \{ worldPublish/, 'and the page\'s going, before its farewell');
+});

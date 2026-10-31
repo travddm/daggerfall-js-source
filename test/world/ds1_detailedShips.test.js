@@ -306,6 +306,12 @@ test('DS1 the pipeline: a registered model is asked before ARCH3D (MeshReplaceme
 });
 
 test('DS1 the dungeon: a model neither ARCH3D nor the registry answers is GetModelData\'s false - nothing drawn, said by name, never a thrown dungeon', () => {
+  const src = read('src/scenes/dungeonContext.js');
+  const body = /const getModelPre = \(id\) => \{[\s\S]*?\n {2}\};/.exec(src)?.[0];
+  assert.ok(body, 'getModelPre is where it was');
+  assert.ok(body.indexOf('customModelFor(id)') >= 0 && body.indexOf('customModelFor(id)') < body.indexOf('arch.getRecordIndex(id)'), 'the registry first, as MeshReplacement is');
+  assert.match(body, /preModels\.set\(id, emptyModel\(\)\)/);
+  assert.doesNotMatch(body, /throw /);
   const e = emptyModel();
   assert.deepEqual([e.positions.length, e.indices.length, e.subMeshes, e.doors], [0, 0, [], []]);
 });

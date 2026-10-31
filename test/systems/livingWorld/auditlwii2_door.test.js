@@ -101,8 +101,35 @@ const codes = (log) => log.choices.at(-1)?.options.map((o) => o.code) ?? [];
 /** Hired on (the record the door's H writes) - `near` the minute the escort was last with the party. */
 const hire = (h, trip, t, pay = 99) => h.rel.setEscort({ trip: trip.id, t, pay, fights: 0, leader: trip.leader.id, to: trip.to?.mapId ?? 0, near: t });
 
+// ── world.js, as it is written ─────────────────────────────────────
+const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+const HOST_AT = WORLD.indexOf('const caravanHostOf = () => (_caravanHost ??= createCaravanHost({');
+/** The caravan host's deps as world.js hands them over. */
+const DEPS = WORLD.slice(HOST_AT, WORLD.indexOf('\n  }));', HOST_AT));
+/** One dep of them, a line's expression. */
+const depOf = (name) => { const m = new RegExp(`\\n {4}${name}: (.*),(?: {3}//[^\\n]*)?\\n`).exec(DEPS); assert.ok(m, `the host's ${name}`); return m[1]; };
+/** The offline journey with a caravan (`travelWith`), whole. */
+const TRAVEL_WITH = (() => { const i = DEPS.indexOf('    travelWith: (trip, until) => {'); return i < 0 ? '' : DEPS.slice(i + '    travelWith: '.length, DEPS.indexOf('\n    },', i) + '\n    }'.length); })();
 /** A seam lifted over stubs for the names it reads. @param {string} src @param {Record<string, any>} names */
 const lift = (src, names) => new Function(...Object.keys(names), `return ${src};`)(...Object.values(names));
+/** world.js's `travelFree` and `travelWith` over a stub host: `mode` the host's, `enemies` the travel map's refusal. */
+function travelHost({ mode = 'exterior', enemies = false, online = false, now = 0 } = {}) {
+  const log = [];
+  const names = {
+    params: { has: (k) => k === 'online' && online },
+    livingTravelEnemies: () => enemies,
+    townTalk: { say: (x) => log.push(['say', x]) },
+    CANNOT_TRAVEL_ENEMIES_TEXT: 'You cannot travel with enemies nearby.',
+    localizedText: (key, en) => en,   // L10N3d: the refusal through DFU's key - English here
+    _mode: () => mode,
+    modes: { forceExitToExterior: () => { log.push(['exit']); mode = 'exterior'; } },
+    advanceOwnMinutes: (m) => log.push(['clock', m]),
+    skyMinutes: () => now,
+    livingPartyAt: partyAt,
+    ohTeleportToWorld: (x, z) => { log.push(['teleport', x, z, mode]); return { catch: (f) => log.push(['caught', typeof f]) }; },
+  };
+  return { travelWith: lift(TRAVEL_WITH, names), travelFree: lift(depOf('travelFree'), names), log };
+}
 
 /** A merchant's armed caravan of the lives' map (the host's own composition, its real `fate`), with no trouble, the
  *  noon it was read at and a minute it walks out. */
@@ -272,6 +299,13 @@ test('AUDIT LW-II-2 C3: a stack partly taken from a counter is recorded with wha
   assert.deepEqual(f.rel.snapshot().road.wares[0][1], [], 'before: the step has not run');
   f.host.flush();
   assert.deepEqual(f.rel.snapshot().road.wares[0][1], [lamp[WARE_KEY]], 'the save names the piece');
+  // world.js: the character's save flushes the caravan host first, then snapshots (none made: the snapshot alone)
+  const save = /registerModSaveData\(LIVING_WORLD_VENDOR, \{\n {4}newSaveData: \(\) => null,\n(?: {4}\/\/[^\n]*\n)* {4}getSaveData: (\(\) => \{ _caravanHost\?\.flush\(\); return livingRelations\.snapshot\(\); \}),\n/.exec(WORLD);
+  assert.ok(save, 'the save\'s getSaveData flushes the shelves');
+  const calls = [];
+  assert.deepEqual(lift(save[1], { _caravanHost: { flush: () => calls.push('flush') }, livingRelations: { snapshot: () => { calls.push('snapshot'); return 'snap'; } } })(), 'snap');
+  assert.deepEqual(calls, ['flush', 'snapshot']);
+  assert.equal(lift(save[1], { _caravanHost: null, livingRelations: { snapshot: () => 'snap' } })(), 'snap');
 });
 
 test('AUDIT LW-II-2 C6/H1: travel on with them only where a journey may go - the door offers R only when the host says a journey may go (outdoors, no enemy, duel or hostile ship near: the travel map\'s own refusals); world.js\'s travelWith refuses with enemies near in the map\'s words, goes out to the open world first were it reached inside, and catches its teleport (mutants: the door\'s gate, the host\'s gate, the refusal, the exit, the catch)', () => {
@@ -282,9 +316,28 @@ test('AUDIT LW-II-2 C6/H1: travel on with them only where a journey may go - the
   assert.ok(!door(false).includes('KeyR'), 'indoors (a lodged party at an inn), or enemies near: no R');
   // world.js's gate: outdoors and the travel map's refusal - the very expression the map's door asks
   const enemies = 'duelEnemyNear() || areEnemiesNearby([...cityGuards.guards, ...exteriorFoes.foes]) || navalHostileNear()';
+  assert.ok(WORLD.includes(`const livingTravelEnemies = () => ${enemies};`), 'the travel map\'s refusal');
+  assert.ok(WORLD.includes(`    if (${enemies}) {   // NAV-H: a hostile ship in reach too\n      townTalk.say(localizedText('cannotTravelWithEnemiesNearby', CANNOT_TRAVEL_ENEMIES_TEXT));`), 'as the map\'s door asks it');
+  assert.equal(travelHost().travelFree(), true);
+  assert.equal(travelHost({ mode: 'interior' }).travelFree(), false, 'indoors');
+  assert.equal(travelHost({ mode: 'dungeon' }).travelFree(), false, 'below');
+  assert.equal(travelHost({ enemies: true }).travelFree(), false, 'enemies near');
   // world.js's journey: refused with enemies near, the map's words, the clock unmoved
   const until = t + 30;
+  const foes = travelHost({ enemies: true, now: t });
+  assert.equal(foes.travelWith(trip, until), false);
+  assert.deepEqual(foes.log, [['say', 'You cannot travel with enemies nearby.']]);
+  assert.equal(travelHost({ online: true, now: t }).travelWith(trip, until), false, 'online the clock is everyone\'s');
+  // outdoors: the clock moved, the player set down beside the party, the teleport's failure caught
+  const out = travelHost({ now: t });
+  assert.equal(out.travelWith(trip, until), true);
   const at = partyAt(trip, until);
+  assert.deepEqual(out.log, [['clock', 30], ['teleport', at.x + 120, at.z, 'exterior'], ['caught', 'function']]);
+  // reached inside all the same: out to the open world first, then the teleport
+  const inside = travelHost({ mode: 'interior', now: t });
+  assert.equal(inside.travelWith(trip, until), true);
+  assert.deepEqual(inside.log.map((e) => e[0]), ['exit', 'clock', 'teleport', 'caught']);
+  assert.equal(inside.log[2][3], 'exterior', 'the teleport from the open world');
 });
 
 test('AUDIT LW-II-2 C7: travelled on with them to its town, the player is set down where the party last walked - a minute short of the town, never left on the empty road (the party has no place at its town: `stay`); a stop on the road sets them beside it (mutants: the last minute)', () => {
@@ -293,7 +346,13 @@ test('AUDIT LW-II-2 C7: travelled on with them to its town, the player is set do
   assert.equal(partyAt(trip, trip.outT1).x, undefined, 'in its town the party stands nowhere');
   const last = partyAt(trip, trip.outT1 - 1);
   assert.ok(last.x != null, 'a minute short of it, on its road');
+  const town = travelHost({ now: t });
+  assert.equal(town.travelWith(trip, trip.outT1), true);
+  assert.deepEqual(town.log.find((e) => e[0] === 'teleport'), ['teleport', last.x + 120, last.z, 'exterior']);
+  const road = travelHost({ now: t });
+  road.travelWith(trip, t + 60);
   const by = partyAt(trip, t + 60);
+  assert.deepEqual(road.log.find((e) => e[0] === 'teleport'), ['teleport', by.x + 120, by.z, 'exterior'], 'a stop on the road: beside the party there');
 });
 
 test('AUDIT LW-II-2 C8: a witnessed murder outlives forty reports nobody lives to carry - the book full, a void one leaves first; a report whose every witness is dead now is dropped at the step (a hand\'s death is for good); the one struck down never witnesses their own murder (mutants: the eviction, the host\'s word, the drop, the victim)', () => {
@@ -457,6 +516,10 @@ test('AUDIT LW-II-2 C15: a failed pickpocket on a road party puts back the crime
       else assert.deepEqual([playerEntity.crimeCommitted, log.crimes], [CRIMES.Pickpocketing, 1], 'in a town: the crime');
     }
   } finally { setInteractionMode('dialogue'); }
+  // world.js's road door clears no flag of its own
+  const caught = WORLD.slice(WORLD.indexOf('  const livingRoadCaught = (p) => {'), WORLD.indexOf('\n  };', WORLD.indexOf('  const livingRoadCaught = (p) => {')));
+  assert.ok(caught.includes('caravanHostOf().caught(p.living.res, skyMinutes());'), 'the road\'s report');
+  assert.ok(!/setCrimeCommitted/.test(caught), 'no flag cleared');
 });
 
 test('AUDIT LW-II-2 R9: a deed against a hunter on its way out is carried home - its way out ends in the wild, no town to carry it to; a merchant\'s still to the town it is bound for (mutants: the wild)', () => {
@@ -482,9 +545,27 @@ test('AUDIT LW-II-2 R9: a deed against a hunter on its way out is carried home -
 });
 
 test('AUDIT LW-II-2 P4: the caravan host\'s real deps in world.js - the escort\'s pay reaches the purse, the region read at the deed\'s map pixel, the counter\'s roll seeded by its trip, the escort\'s rate by the player\'s level - and the counter\'s window and a deed\'s report read the region where the party stands (mutants: each wire, the counter\'s region)', () => {
+  // the pay: the player's purse
+  const paid = [];
   const pe = { level: 9 };
+  lift(depOf('pay'), { addGoldPieces: (e, g) => paid.push([e, g]), playerEntity: pe })(250);
+  assert.deepEqual(paid, [[pe, 250]], 'the escort\'s pay reaches addGoldPieces');
+  // the level: the player's
+  assert.equal(lift(depOf('level'), { playerEntity: pe })(), 9);
+  assert.equal(lift(depOf('level'), { playerEntity: {} })(), 1, 'none yet: the first');
+  // the region: maps' at the native point's map pixel
+  const asked = [];
+  const regionAt = lift(depOf('regionAt'), { maps: { getRegionIndexAt: (px, py) => { asked.push([px, py]); return 23; } } });
+  assert.equal(regionAt(3 * NATIVE_PIXEL + 100, (499 - 7) * NATIVE_PIXEL + 100), 23);
+  assert.deepEqual(asked, [[3, 7]], 'the deed\'s map pixel');
+  // the counter's roll: the trip's own seed - the same all trip, another trip's its own
+  assert.match(depOf('stock'), /^\(counter, trip\) => stockShopShelf\(\{ buildingType: counter\.buildingType, quality: counter\.quality \}, playerEntity, \{ rolls: lwRng\(textSeed\(trip\.id\), 0x77617265\) \}\)$/);
+  const stock = lift(depOf('stock'), { stockShopShelf, lwRng, textSeed, playerEntity: { level: 5 } });
   const trip = armedCaravan();
   const counter = counterOf(trip);
+  const shelfOf = (tr) => stock(counter, tr).map((it) => `${it.name}x${it.stackCount ?? 1}`);
+  assert.deepEqual(shelfOf(trip), shelfOf(trip), 'the same all trip');
+  assert.notDeepEqual(shelfOf(trip), shelfOf({ ...trip, id: `${trip.id}x` }), 'another trip, its own');
   // the host over a region that varies by map pixel: the counter's window and a deed's report read it where the party is
   const byPixel = (x, z) => 1 + ((Math.floor(x / NATIVE_PIXEL) + 2 * (499 - Math.floor(z / NATIVE_PIXEL))) % 60);
   const t = walkingOut(trip);

@@ -144,6 +144,11 @@ test('STORE-KEEPS THE LAW (systems/wild/wildDropLaw.js takeWildDeath, wildDropCa
 
 test('STORE-KEEPS THE CLIENT\'S WORDS: the fallen\'s ask says nothing of the wagon - CART-AWAY\'s word retired with the drop it shaped; the words left are the packs\' (an answer from before the word may still name one) and the letters\' (mutants: the wagon\'s word back)', () => {
   assert.deepEqual(wildFallWords(), { packs: 1, letters: 1 });
+  const w = hostText('src/scenes/world.js');
+  assert.ok(w.includes('call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),'), 'my drop names no wagon');
+  assert.ok(!w.includes('hccRuntime.getSaveData(), cyrodiilMask()'), 'nor reads where it stands');   // WW-C2: the zone's mask, Cyrodiil's
+  assert.ok(rd('src/scenes/wildSeizeHost.js').includes('wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then('), 'a seizure says nothing of another\'s wagon');
+  assert.ok(!rd('server-account/src/wild.js').includes('body?.cart'), 'the service reads no word of the wagon');
 });
 
 // ─── THE ACCOUNT SERVICE, the whole act ─────────────────────────────────────────────────────────────────────────

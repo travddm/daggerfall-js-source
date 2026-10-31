@@ -187,6 +187,24 @@ test('audit24 wave39: the pool registers with a persistent draw list when the ho
   fx.tick(1 / BLOOD_FPS);
   assert.equal(list.length, 0, 'spliced out when the one-shot ends');
 
+  assert.match(rd('src/scenes/dungeonContext.js'), /onSpawn: \(b\) => billboardBatches\.push\(b\)/);
+  // 2026-08-27 (Mac: "blood texture stays static in the air ... in
+  // dungeons"): this line used to pin the clock in dungeon.js - the dev
+  // host - and said nothing about worldModes, the host the game is
+  // played in, which never ran it. The clock is the CONTEXT's now, in
+  // drawFoes, the one frame function both dungeon hosts call; neither
+  // host runs it itself, so neither can forget it and neither can run it
+  // twice.
+  const ctxSrc = rd('src/scenes/dungeonContext.js');
+  // 1500 chars was a fit to the body as it stood; MW-D15's latch pushed
+  // the tick past it. A window big enough to hold the body is the point,
+  // not the number. (2500 held until CLIMB6's climb snapshot and AUDIT CLIMB-ARC F10's aim joined its head.)
+  const drawFoes = ctxSrc.slice(ctxSrc.indexOf('function drawFoes('), ctxSrc.indexOf('function drawFoes(') + 4000);
+  assert.match(drawFoes, /hitEffects\.tick\(dt\);/, 'the splash clock runs inside drawFoes');
+  assert.doesNotMatch(rd('src/scenes/dungeon.js'), /hitEffects\.tick\(/, 'the dev host no longer runs it (it would run twice)');
+  assert.doesNotMatch(rd('src/scenes/worldModes.js'), /hitEffects\.tick\(/, 'the played host never has to');
+  assert.match(rd('src/scenes/worldModes.js'), /dungeonCtx\.drawFoes\(dt,/, '...because it calls drawFoes, which does');
+  assert.match(rd('src/scenes/dungeon.js'), /ctx\.drawFoes\(dt,/);
 });
 
 test('audit24 wave39: ShowPlayerDamage - 0.4 alpha falling at 0.7 a second', () => {
@@ -232,6 +250,12 @@ test('audit24 wave39: ShowPlayerDamage - 0.4 alpha falling at 0.7 a second', () 
 });
 
 test('audit24 wave39: which hits flash is a LAW, not an omission', () => {
+  // PlayerHealth.RemoveHealth is ShowPlayerDamage's only trigger, and
+  // the whole DFU tree sends that message from three places. Spell
+  // damage is NOT one of them.
+  assert.match(rd('src/scenes/shared.js'), /flashPlayerDamage\(dmg\);/, 'the fall (PlayerHealth.cs:57) - BA1: the message carries its amount');
+  const act = rd('src/world/actionSystem.js');
+  assert.equal((act.match(/flashPlayerDamage\(dmg\)/g) ?? []).length, 2, 'both damage traps (DaggerfallAction :739 and :768) - BA1: with the amount');
   for (const f of ['src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js', 'src/scenes/dungeonContext.js']) {
     assert.match(rd(f), /flashPlayerDamage\(dmg\)/, `${f}: an enemy blow (EnemyAttack:406) - BA1: with the amount`);
   }
@@ -250,6 +274,13 @@ test('audit24 wave39: which hits flash is a LAW, not an omission', () => {
   playerDamageFlash.tick(100);
   assert.equal(playerDamageFlash.fading, false);
 
+  // THE FOUR HOSTS RULE: it rides the one drawHud call all four make,
+  // and runs BEFORE the no-art return because a host with no HUD art
+  // still takes damage.
+  const hud = rd('src/ui/hud/hud.js');
+  const body = hud.slice(hud.indexOf('export function drawHud('));
+  assert.ok(body.indexOf('playerDamageFlash.draw(') < body.indexOf('if (!art) return;'), 'before the art guard');
+  assert.match(hud, /export function drawHud\(renderer, canvas, art, vitals, heading01, dt = 0,/);
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     // U38 widened drawHud with an options object, so the clock is no
     // longer the LAST argument. The law is that it is PASSED.
@@ -257,3 +288,37 @@ test('audit24 wave39: which hits flash is a LAW, not an omission', () => {
   }
 });
 
+test('audit24 wave39: the two DFU call sites deliberately NOT ported, and why', () => {
+  // Both are dead in the shipped game, and porting them would make the
+  // port bleed where Daggerfall does not.
+  const m = rd('src/scenes/hitEffects.js');
+  assert.match(m, /DaggerfallEntityBehaviour\.cs:173-176/);
+  assert.match(m, /EnemyHealth\.cs:52/);
+  // AUDIT 24 (wave 44): sparkles WAS the queued one here, cut rather
+  // than half-wired on the reading that it needed the player's feet.
+  // That reading was wrong - its one call site is inside
+  // EnemyCastReadySpell and it blooms on the CASTER - so it shipped in
+  // wave 44 and audit24_wave44 owns it now. The two DEAD sites above
+  // stay unported, which is what this test is about.
+  assert.match(m, /ShowMagicSparkles/);
+  assert.match(m, /export const SPARKLES_RECORD = 3;/, 'ported in wave 44');
+
+  // the four sites that ARE live
+  assert.match(rd('src/scenes/cityGuards.js'), /hitEffects\?\.showBloodSplash\(ENEMY_BASICS\[GUARD_MOBILE_TYPE\]\?\.bloodIndex \?\? 0/);
+  assert.match(rd('src/scenes/cityGuards.js'), /hitEffects\?\.showBloodSplash\(0,\n\s*\[eye\[0\] \+ lookDir\[0\] \* bestD/, 'the civilian murder, at the REAL impact point');
+  assert.match(rd('src/scenes/exteriorFoes.js'), /hitEffects\?\.showBloodSplash\(ENEMY_BASICS\[foe\.mobileType\]\?\.bloodIndex \?\? 0/);
+  // AUDIT 62 F20: the fall splash rides the foe's TRANSFORM (feet +
+  // centreOffset, which _centre() answers), not its feet -
+  // EnemyMotor.cs:1403-1406 passes bare `transform.position`, and the
+  // enemy transform is the idle sprite's CENTRE (prefab m_Center 0,
+  // SetupDemoEnemy.cs:98-115 moves only controller.center). This pin
+  // used to hold the bare-feet literal in place.
+  for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/dungeonContext.js']) {
+    // BLOOD1b carried the BLOW in beside it - a fall bleeds by what it
+    // cost, like any other blow - and what this pin holds is unchanged:
+    // record 0, at the transform.
+    assert.match(rd(f), /hitEffects\?\.showBloodSplash\(0, f\.ai\._centre\(\), null, \{ \.\.\.bloodHit\(\w+, f\.entity\), markIndex: ENEMY_BASICS\[f\.mobileType\]\?\.bloodIndex \?\? 0 \}\);/, `${f}: fall damage bleeds at index 0, at the transform, carrying its blow - and (BLOOD1 AUDIT 3) the MARK is the foe's own, so a skeleton's fall stains nothing`);
+    assert.doesNotMatch(rd(f), /showBloodSplash\(0, \[f\.ai\.feet\[0\], f\.ai\.feet\[1\], f\.ai\.feet\[2\]\]\)/, `${f}: not at the feet`);
+    assert.match(rd(f), /SOUND\.FallDamage, \[f\.ai\.feet\[0\], f\.ai\.feet\[1\], f\.ai\.feet\[2\]\]/, `${f}: the FallDamage clip stays at FindGroundPosition() (EnemyMotor.cs:1409)`);
+  }
+});

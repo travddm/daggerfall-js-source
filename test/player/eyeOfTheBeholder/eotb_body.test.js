@@ -24,6 +24,8 @@ resetSettings();
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const viteConfig = readFileSync(join(root, 'vite.config.js'), 'utf8');
+const weaponRig = readFileSync(join(root, 'src/combat/weapon/weaponRig.js'), 'utf8');
+const bodySrc = readFileSync(join(root, 'src/player/eyeOfTheBeholder/eotbBody.js'), 'utf8');
 
 const renderer = () => ({
   uploads: [], batches: [], draws: 0,
@@ -73,6 +75,8 @@ test('EOTB-IL: the per-sprite offsets are the XML’s, in metres, six triples ov
   assert.equal(Object.keys(info.offsets).length, 288);
   const triples = new Set(Object.values(info.offsets).map((o) => `${o.scale},${o.x},${o.y}`));
   assert.equal(triples.size, 6);
+  // the dial the pane still shows is inert in the assembly: get_scaleOffset has no caller
+  assert.ok(!/(function|const|let)\s+scaleOffset\b/.test(readFileSync(join(root, 'src/player/eyeOfTheBeholder/eotbSprite.js'), 'utf8')), 'no scaleOffset in the port either');
 });
 
 test('EOTB-IL: bodyState reads the motion bag the way LoopIdleBillboard reads PlayerMotor', () => {
@@ -379,6 +383,11 @@ test('EOTB-IL: the placement is UpdateBillboard’s - the feet on the ground, su
   ticks(b, 2, still({ motion: { forward: 0, standing: true, grounded: true, onExteriorWater: true, height: 1.8 } }));
   p = b.state().placed;
   assert.equal(Number(p[1].toFixed(6)), Number((0.9 - h).toFixed(6)), 'swimming: the top at the swim line (IL_4a1a-IL_4a62) - the base a whole size below it');
+  // and the two conventions, pinned where they meet: the renderer's
+  // shader anchors at the base, and place() converts the mod's centre.
+  const vs = readFileSync(join(root, 'src/render/renderer.js'), 'utf8');
+  assert.match(vs, /\+ uUp \* \(\((?:aCorner|cn)\.y \+ 0\.5\) \* uSize\.y\);/, 'the billboard shader is bottom-anchored');   // ELITE FOES: `cn` is aCorner, widened only for an elite
+  assert.match(readFileSync(join(root, 'src/player/eyeOfTheBeholder/eotbBody.js'), 'utf8'), /const base = y - size\.h \* 0\.5;\n\s+return \[origin\[0\] \+ right\[0\] \* x \+ fwd\[0\] \* z, origin\[1\] \+ base,/, 'and the body hands it the base');
   // the XML X: record 18 (x -0.2) is index 5 straight and index 3
   // mirrored, and UpdateBillboard negates X for the mirrored state
   // (IL_4ba7-IL_4bd1). A drawn weapon faces the camera's forward (+z);
@@ -450,6 +459,39 @@ test('EOTB-IL: the camera drives the billboard through ToggleOffset - shown out,
   assert.equal(cam.spellHandsEnabled(), false, 'and the spell hands still go');
 });
 
+test('EOTB-IL: UpdateMaterial - invisible white at 0.4, a shade BLACK at 0.6, blending white at 0.8, in that order', async () => {
+  const { b } = await liveBody();
+  ticks(b, 2, still());
+  assert.equal(b.state().material, null);
+  ticks(b, 1, still({ concealment: { invisible: true, blending: true, shade: true } }));
+  assert.deepEqual(b.state().material, { mode: 3, alpha: 0.4 }, 'invisible first');
+  ticks(b, 1, still({ concealment: { blending: true, shade: true } }));
+  assert.deepEqual(b.state().material, { mode: 4, alpha: 0.6 }, 'then the shade - the black mode');
+  ticks(b, 1, still({ concealment: { blending: true } }));
+  assert.deepEqual(b.state().material, { mode: 3, alpha: 0.8 }, 'then blending');
+  // the renderer draws mode 4 as black
+  const rs = readFileSync(join(root, 'src/render/renderer.js'), 'utf8');
+  assert.match(rs, /if \(uConceal\.x == 4\.0\) lit = vec3\(0\.0\);/);
+});
+
+test('EOTB5: THE FOUR HOSTS are named, and the wiring is ONE site because all four reach it', () => {
+  assert.match(weaponRig, /const bindBody = \(\) => eotbBody\.attach\(renderer, eotbState\);/, 'the body attaches in the weapon rig, with the state only the rig can answer');
+  assert.match(weaponRig, /fpArm\.attach\(renderer, camera\)/, '...beside the arm');
+  const hosts = ['exterior', 'world', 'worldModes', 'dungeonContext'];
+  for (const h of hosts) {
+    const src = readFileSync(join(root, `src/scenes/${h}.js`), 'utf8');
+    assert.match(src, /createWeaponRig\(/, `${h}.js builds a weapon rig, so it gets the body`);
+    assert.doesNotMatch(src, /eotbBody/, `${h}.js must NOT carry its own call - four sites is four chances to forget one`);
+  }
+  assert.match(weaponRig, /export function createWeaponRig/, 'one builder');
+  assert.match(bodySrc, /scenes\/exterior\.js.*scenes\/world\.js|THE FOUR HOSTS/s, 'the body names them in its head');
+  // and the rig no longer CALLS the body - the doors are polled off the record, as the mod polls DFU
+  assert.doesNotMatch(weaponRig, /eotbBody\.(attack|cast|release)\(/, 'no strike call: PlayerBillboard polls IsAttacking itself');
+  for (const f of ['attacking: playerWeapon.machine.state !== \'Idle\'', 'castPlaying: !!fpsSpellCasting.isPlayingAnim', 'bowDrawback: getBool(\'Controls\', \'BowDrawback\')', 'swingHeld: _held', 'concealment: entity ? concealmentFlags(entity) : null']) {
+    assert.ok(weaponRig.includes(f), `the record carries ${f}`);
+  }
+});
+
 test('EOTB5: the mod\u2019s art is EXCLUDED from Vite\u2019s inlining - and since INLINE1, so is every other mod\u2019s', () => {
   assert.match(viteConfig, /assetsInlineLimit:/, 'the rule exists');
   const m = /assetsInlineLimit: \(filePath\) => \((.*?)\),/.exec(viteConfig);
@@ -488,6 +530,41 @@ test('MAC-O3: attach is RE-CLAIMED by the stepping rig - the same pair is a no-o
   b.attach(r, f);
   await new Promise((res) => setTimeout(res, 5));
   assert.equal(r.uploads.length, uploads, 'the same renderer and thunk redo nothing - no second preload');
+  // the rig re-claims it every frame, beside the arm
+  assert.match(weaponRig, /const bindBody = \(\) => eotbBody\.attach\(renderer, eotbState\);/, 'one thunk, one bind');
+  assert.match(weaponRig, /bindArm\(\);[^\n]*\n\s*bindBody\(\);/, 'frame() re-claims the body right after the arm');
+  assert.doesNotMatch(weaponRig, /eotbBody\.attach\(renderer, \(\) => \(\{/, 'and the construction-only attach is gone');
   b.attach(null, null);
 });
 
+test('OW-BIG (Mac: "The player sprite needs to appear larger"): under the travel view the traveller\'s sprite is drawn face.grow times its size - its own batch at each step, casting no giant\'s shadow, its lantern not hung on a waist that moved; back on the ground the plain sprite and its shadow return', async () => {
+  const { tvOwnGrow, TV_OWN_GROW_M, TV_OWN_GROW_MAX } = await import('../../../src/player/travelCamera.js');
+  assert.deepEqual([tvOwnGrow(0), tvOwnGrow(20), tvOwnGrow(200), tvOwnGrow(450), tvOwnGrow(5000), tvOwnGrow(NaN)], [1, 1, 6, TV_OWN_GROW_MAX, TV_OWN_GROW_MAX, 1]);
+  assert.equal(TV_OWN_GROW_M, 32);
+  const { b, r } = await liveBody();
+  ticks(b, 10, still());
+  const draw = (face) => { b.draw(null, { eye: [0, 1.5, -2], feet: [0, 0, 0], yaw: 0, face }); };
+  draw(null);
+  await new Promise((res) => setTimeout(res, 2));
+  draw(null);
+  const plain = r.batches.at(-1);
+  assert.equal(plain.selfCard, true);
+  draw({ yaw: 0, up: [0, 1, 0], grow: 6 });
+  const big = r.batches.at(-1);
+  assert.notEqual(big, plain, 'a batch of its own at the step');
+  assert.deepEqual([big.size.w, big.size.h].map((v) => Number(v.toFixed(6))), [plain.size.w * 6, plain.size.h * 6].map((v) => Number(v.toFixed(6))), 'six times the sprite');
+  assert.equal(big.selfCard, false, 'not the player\'s own card at the lamps');
+  // PIN MOVED (AUDIT OW5 R2): the giant casts nothing - noShadow, which every shadow replay skips; selfCard off was never that
+  assert.equal(big.noShadow, true, 'no giant\'s shadow');
+  assert.ok(!plain.noShadow, 'the sprite at its own size casts as ever');
+  assert.match(readFileSync(new URL('../../../src/render/shadowPass.js', import.meta.url), 'utf8'), /if \(b\.noShadow \|\| b\.castOnly \|\| SHADOW_NO_CAST_ARCHIVES\.has\(b\.archive\)/, 'the replay skips a noShadow batch in every pass');   // PIN MOVED (MWNPC16): and a cast-only one - its Morrowind body casts
+  const n = r.batches.length;
+  draw({ yaw: 0.3, up: [0, 1, 0], grow: 6 });
+  assert.equal(r.batches.length, n, 'the same step: the same batch');
+  draw(null);
+  assert.equal(r.batches.at(-1).selfCard, true, 'down again: the plain sprite, casting');
+  assert.deepEqual(r.batches.at(-1).size, plain.size);
+  assert.match(bodySrc, /if \(grow === 1\) drawLantern\(\);/, 'no lantern on a grown body');
+  const tv = readFileSync(join(root, 'src/scenes/travelView.js'), 'utf8');
+  assert.match(tv, /grow: tvOwnGrow\(Math\.hypot\(shown\.eye\[0\] - f\[0\], shown\.eye\[1\] - f\[1\], shown\.eye\[2\] - f\[2\]\)\),/, 'the view hands the host the step from its own eye');
+});

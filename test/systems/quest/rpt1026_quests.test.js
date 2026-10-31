@@ -200,13 +200,73 @@ function room() {
   collider.addMesh('room', new Float32Array([92, 0, 44, 110, 0, 44, 110, 0, 56, 92, 0, 56]), new Uint32Array([0, 1, 2, 0, 2, 3]), IDENTITY);
   return { collider, parentPt: (x, y, z) => [x + 100, y, z + 50], enterMarkers: [[93, 0, 50]], billboardBatches: [], people: [] };
 }
+/** worldModes.js's building quest stands, lifted out and run over `ctx` (fb1020c_crowdclear.test.js's lift). */
+function liftInteriorStands(ctx) {
+  const WM = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
+  const cut = (start, end) => {
+    const a = WM.indexOf(start);
+    assert.ok(a >= 0, `worldModes.js: ${start.trim()}`);
+    return WM.slice(a, WM.indexOf(end, a) + end.length);
+  };
+  const source = [
+    cut('export const INTERIOR_MARKER_FEET_LIFT = ', ';\n').replace(/^export /, ''),
+    cut('  const QUEST_ITEM_MARKER_SHIFT = ', ';\n'),
+    cut('  function standQuestFlatIn(', '\n  }\n'),
+    cut('  const standQuestFlat = ', ';\n'),
+    cut('  const interiorStandSpots = ', '\n  };\n'),
+    cut('  const questAdapter = {', '\n  };\n'),
+    'return questAdapter;',
+  ].join('\n');
+  const questFlats = [];
+  const deps = {
+    questFlats, interiorCtx: ctx, interiorFoeStands: [], _enemyRestoreInProgress: false,
+    interiorFoes: { spawnFoe: () => Promise.resolve() },
+    questSceneCtx: () => ({ mapId: CROWD_MAP }), sceneBehaviours: () => questFlats.map((s) => s.behaviour),
+    getTexture: async () => ({ recordCount: 1000 }), uploadRecord: () => {}, billboardSize: () => ({ w: 0.95, h: 2 }), drawnFlat: (a, r) => [a, r],
+    renderer: { createBillboardBatch: (_a, _r, _size, at) => ({ at: at[0] }) }, rideSceneMarker: () => {},
+    templateByIndex, markerScenePosition, siteMarkerSpots, standSpot, buildingStandSpot, MARKER_FLOOR_REACH,
+  };
+  return { adapter: new Function(...Object.keys(deps), source)(...Object.values(deps)), questFlats };
+}
 const MA = mark(SPAWN, 40, 0, 40);    // (101, 0, 51) in the parent frame
 const MB = mark(SPAWN, 240, 0, 40);   // (106, 0, 51)
 /** A quest that places its one Person at the town's House2. */
 const personAt = (name, who) => [`Quest: ${name}`, 'QRC:', 'Message:  1011', ' x', '', 'QBN:',
   `Person _${who}_ group Questor`, 'Place _hall_ local house2', '', `\tplace npc _${who}_ at _hall_`, '', 'variable _done_'];
 
+/** Two quests both drawn before either runs (the board's offer, then the take), each placing a Person at the one House2
+ *  of `markers`, stood in its room: the Persons' drawn points, in the order the quests started. */
+async function twoAtOneHall(markers) {
+  _resetLayoutPins(); _resetWorldDataReplacement(); installWorldDataReplacement();
+  const blocks = new Map([
+    ['HALL.RMB', rmbBlock('HALL.RMB', [{ type: BUILDING_TYPES.House2, markers }])],
+    ['FARM.RMB', rmbBlock('FARM.RMB', [{ type: BUILDING_TYPES.House1 }])],   // the Persons' remote homes (Person.cs AssignHomeTown)
+  ]);
+  const farm = town({ name: 'Ashford', locationIndex: 0, mapId: CROWD_MAP + 1, grid: ['FARM.RMB'] });
+  const hall = town({ name: 'Aldleigh', locationIndex: 1, mapId: CROWD_MAP, grid: ['HALL.RMB'] });
+  const machine = new QuestMachine({ nowSeconds: () => 0, world: worldOf({ locations: [farm, hall], blocks, current: hall }), getReputation: () => 0, changeReputation: () => {} });
+  const quests = quiet(() => [personAt('__ANN', 'ann'), personAt('__BEA', 'bea')].map((src) => machine.parseQuestForLists(src, 0, { rolls: () => 0 })));
+  for (const q of quests) quiet(() => machine.startQuestImmediate(q));
+  quiet(() => machine.tick());
+  const sites = quests.map((q) => q.getPlace({ name: 'hall' }).siteDetails);
+  assert.equal(sites[0].buildingKey, sites[1].buildingKey, 'both took the one House2');
+  assert.deepEqual(sites.map((sd) => sd.selectedMarker.flatPosition), sites.map(() => sites[0].questSpawnMarkers[0].flatPosition), 'both drew its first marker');
+  const { adapter, questFlats } = liftInteriorStands(room());
+  quiet(() => addQuestResourceObjects(machine, adapter, SITE_TYPES.Building, sites[0].buildingKey));
+  await new Promise((resolve) => setImmediate(resolve));   // the billboards' async fill
+  assert.equal(questFlats.length, 2, 'both Persons stand');
+  return questFlats.map((s) => s.batch.at);
+}
 const near = (got, want, why) => assert.ok(Math.abs(got[0] - want[0]) < 1e-9 && Math.abs(got[2] - want[2]) < 1e-9, `${why}: ${got} vs ${want}`);
+
+test('QUEST-CROWD: two quests\' Persons that drew one marker of one building no longer stand in one pick box - the second stands at the site\'s other spawn marker; with none (a tavern\'s single marker, 215 of 345), beside the first (mutants: the stands unread; a stand counted as its own crowd; beside never asked)', async () => {
+  const [ann, bea] = await twoAtOneHall([MA, MB]);
+  near(ann, [101, 0, 51], 'the first where DFU stands her');
+  near(bea, [106, 0, 51], 'the second at the clear marker, a pick box of her own');
+  const [a1, b1] = await twoAtOneHall([MA]);
+  near(a1, [101, 0, 51], 'one marker only: the first on it');
+  near(b1, [101 + 1.1 * 0.95, 0, 51], 'the second beside her, east - a box apart');
+});
 
 test('QUEST-CROWD: besideSpot - the first of eight spots a box and a tenth out that stands on the same floor, in plain line and clear; never through a wall, onto a table or past a ledge; none, null (mutants: the floor\'s height unread; the wall unread; the crowd unread)', () => {
   const floorTop = (y, x0, x1, z0, z1) => [new Float32Array([x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z1]), new Uint32Array([0, 1, 2, 0, 2, 3])];

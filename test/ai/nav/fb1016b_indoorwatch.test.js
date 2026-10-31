@@ -550,6 +550,27 @@ test('INDOOR-WATCH AUDIT W2 - THE SOUP: navInputFromCollider, counted first and 
   assert.ok(c._buckets.get('mover').r && Math.abs(want(new Set()).maxY - (52.7 + 1.1)) < 1e-4, 'a turned mover and a moved bucket in it, its height the moved one');
 });
 
+test('INDOOR-WATCH THE HOST: the mode machine holds one module, hands it to both pools, mounts it with each building at the player\'s arrival, runs its frame before either pool steps, and releases it at both teardowns; the street\'s hosts hand their pools no mesh (mutants: each wiring line)', () => {
+  const wm = rd('src/scenes/worldModes.js');
+  assert.match(wm, /import \{ createInteriorNav \} from '\.\/interiorNav\.js';/);
+  assert.equal((wm.match(/const interiorNav = createInteriorNav\(\);/g) ?? []).length, 1, 'one, for the mode machine');
+  for (const fn of ['function makeInteriorFoes(ctx) {', 'function makeInteriorGuards(ctx) {']) {
+    const body = wm.slice(wm.indexOf(fn), wm.indexOf(fn) + 400);
+    assert.match(body, /collider: ctx\.collider, nav: interiorNav,/, `${fn} hands the room's mesh beside its collider`);
+  }
+  const spawn = wm.indexOf('player.spawn(spot[0], spot[1], spot[2]);'), mount = wm.indexOf('interiorNav.mount(ctx, spot);', spawn);
+  assert.ok(spawn > 0 && mount > spawn && mount - spawn < 200, 'mounted at the player\'s arrival, with the room');
+  const frame = wm.indexOf('interiorNav.frame(foeDt, player.pos, interiorGuards?.guards, !!player.grounded);');
+  assert.ok(frame > 0, 'its frame, on the foes\' clock');
+  assert.ok(frame < wm.indexOf('interiorFoes.update(foeDt, player.pos, cam.pos, _interiorSenses());') && frame < wm.indexOf('const _guardBatches = interiorGuards.update(foeDt'), 'before either pool steps');
+  assert.equal((wm.match(/interiorGuards = null;\n\s*interiorNav\.release\(\);/g) ?? []).length, 2, 'released at both teardowns, beside the watch');
+  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.ok(!/nav: interiorNav|createInteriorNav/.test(rd(host)), `${host}: its street pools walk the classic motor (the streamed world's half of ENHANCED AI 5)`);
+});
+
 test('INDOOR-WATCH AUDIT (the merge): THE DUNGEON\'S FOES TAKE THE SAME OFF-MESH GOAL - both of buildDungeonContext\'s motor sites hand navGoalOn over the dungeon\'s own bake and its collider, on the line that hands the bake (no host line grown); the building\'s goal is the same law, and no mesh or no feet answers nothing (mutant: the dungeon handed none)', () => {
+  const dc = rd('src/scenes/dungeonContext.js');
+  assert.match(dc, /import \{ navGoalOn \} from '\.\/interiorNav\.js';/);
+  assert.equal((dc.match(/nav: \(\) => enhancedNav\.chf, navWorld: enhancedNav\.world, navGoal: \(f\) => navGoalOn\(enhancedNav\.chf, f, \{ collider \}\), navSeed: \(yawDeg \* 1000\) \| 0,/g) ?? []).length, 2, 'both motor sites: the placed foes and the spawned');
+  assert.match(rd('src/scenes/interiorNav.js'), /goal: \(feet\) => \(room\?\.chf \? navGoalOn\(room\.chf, feet, \{ collider: room\.collider, skip: doorsOutOfSoup\(room\.actions\) \}\) : null\),/);
   assert.deepEqual([navGoalOn(null, [0, 0, 0]), navGoalOn({ mesh: { polys: [] } }, null)], [null, null]);
 });

@@ -27,4 +27,12 @@ test('SWIM-EYE CLEAR OF THE GROUND THROUGH THE BOUNCE: the real bobber swimming 
   for (let i = 0; i < 600; i++) low = Math.min(low, b.update(1 / 60, cam, { enabled: true, swimming: true, grounded: true })[1]);
   assert.ok(Math.abs(low + BOUNCE_MAX) < 1e-9, `the swim bounce dips BOUNCE_MAX: ${low}`);
   const eyeLow = SWIM_EYE_HEIGHT + low;
+  const w = read('src/scenes/world.js');
+  const near = Number(/perspective\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), worldAspect, ([\d.]+), 6000\)/.exec(w)?.[1]);
+  const fov = Number(/"FieldOfView": "(\d+)"/.exec(read('src/systems/settings/settingsDefaults.js'))?.[1]) * Math.PI / 180;
+  assert.ok(near > 0 && fov > 0, 'the lens read');
+  const reach = Math.hypot(near, near * Math.tan(fov / 2));   // the near plane's lowest point under the eye, over every pitch (no roll)
+  assert.ok(eyeLow - reach > 0.05, `the near plane over the ground at the dip's foot: ${(eyeLow - reach).toFixed(3)} m`);
+  const band = Number(/f\.camera\[1\] <= oceanY \+ ([\d.]+)\) return \{ under: true/.exec(read('src/scenes/deepWater/deepWatersPlayer.js'))?.[1]);
+  assert.ok(band > 0 && eyeLow > band, `over Deep Waters' underwater band (${band}): ${eyeLow.toFixed(3)}`);
 });

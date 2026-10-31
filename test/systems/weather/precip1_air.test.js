@@ -155,6 +155,7 @@ test('PRECIP1 THE LAW\'S LANE: on with the ground law\'s lane, the world weather
     assert.equal(precipLawOn(), false, 'the classic lane: off');
     setPrecipLaw(true); assert.equal(precipLawOn(), true, 'forced');
   } finally { setPrecipLaw(null); setSnowGroundLaw(null); setWeatherMapLaw(null); setAirGround(null); resetWeatherSim(); }
+  assert.match(readFileSync('src/systems/weather/weatherSim.js', 'utf8'), /return \(pageHas\('online'\) \|\| pageParam\('biomeprecip'\) !== 'off'\) && snowGroundLawOn\(\) && weatherMapOn\(\) && airGround\(\) !== null;/, 'the door back, refused online');
 });
 
 test('PRECIP1 WHAT FALLS: a wet system\'s word at a place is its share\'s rounding - rain in cold air falls as snow, snow in warm air as rain, a storm in cold air a snow - PURE in the share (AUDIT PRECIP AIR-6: a client\'s memory of its last word made two clients wear two words); a dry word itself; the map\'s ground law routes through it and hands its readers the one air and the strikes (mutants: a band about the half; a snow system kept snow in warm air; the strikes gated off the law)', () => {
@@ -246,6 +247,9 @@ test('PRECIP2 THE FRONT\'S SNOW SHARE: off the law the mode\'s own, on it the si
     resetWeatherSim(); setPrecipLaw(true);
     assert.deepEqual([currentSnowShare(), weatherSystemStamp(), weatherPhaseFlip()], [0, 0, false], 'forgotten');
   } finally { setPrecipLaw(null); setWeatherFieldLaw(null); setWeatherMapLaw(null); setAirGround(null); resetWeatherSim(); }
+  const src = readFileSync('src/systems/weather/weatherFront.js', 'utf8');
+  assert.match(src, /const fallOf = \(mode\) => \(mode && !isDryFall\(mode\) && precipLawOn\(\) \? 'wet' : precipKind\(mode\)\);/);   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls, the sand and the ash
+  assert.match(src, /const id = systemWordOf\(weather\);/);
 });
 
 test('PRECIP2 THE FALL\'S END (AUDIT PRECIP FALL-1): the outgoing fall drains at the share it fell at - a snowfall\'s last flakes never relabelled as drops when the air warms under a clearing sky (mutants: the outgoing share the live one)', () => {
@@ -293,6 +297,8 @@ test('PRECIP2 THE MIXED FALL: on the enhanced lane a wet mode is one fall in two
     calls.length = 0; p.snowShare = share; p.enhanced = enhanced; p.drawFall(mode, null, null, null, null, 0);
     assert.deepEqual(calls.map((c) => [c.mode, c.intensity]), [[mode, 0.8]], `as it is: ${share} ${enhanced} ${mode}`);
   }
+  const src = readFileSync('src/render/precipitation.js', 'utf8');
+  assert.match(src, /if \(this\.enhanced\) return this\.drawLab\(mode, proj, view, camPos, camRight, timeSeconds\);/, 'the draw itself untouched');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const h = readFileSync(host, 'utf8');
     assert.match(h, /precip\.drawFall\(precipShown, proj, view, /, `${host}: draws the fall`);
@@ -324,6 +330,9 @@ test('PRECIP2 THE SKY\'S CELLS at their own place\'s share: a wet cell\'s air re
   assert.deepEqual([...mixColor(CURTAIN_RAIN_COLOR, CURTAIN_SNOW_COLOR, 1)], [...CURTAIN_SNOW_COLOR].map(Math.fround));
   const mid = mixColor(CURTAIN_RAIN_COLOR, CURTAIN_SNOW_COLOR, 0.5);
   for (let i = 0; i < 3; i++) near(mid[i], (CURTAIN_RAIN_COLOR[i] + CURTAIN_SNOW_COLOR[i]) / 2, 1e-6, 'between');
+  const src = readFileSync('src/render/rainCurtains.js', 'utf8');
+  assert.match(src, /kind: c\.fallKind \?\? 0,/);
+  assert.match(src, /gl\.uniform3fv\(U\.uColor, mixColor\(CURTAIN_RAIN_COLOR, CURTAIN_SNOW_COLOR, c\.kind, c\.tint\)\);/);   // PIN MOVED (ASHFALL1, 2026-10-27): in its cell's tint
   assert.equal(typeof curtainsOf, 'function');
 });
 
@@ -339,6 +348,12 @@ test('PRECIP1 THE JUNGLE\'S AIR (AUDIT PRECIP AIR-12): it leans in over a band o
 });
 
 test('PRECIP1 THE HOSTS: the world hands the air the law\'s map (airGround.js lawAirGround - its climates, the kernel\'s ground, its tops) and the player\'s height above the sea; the fixed city hands it none (its ground wears DFU\'s season); the jungle leans its own air in by its own band (mutants: a host unwired; the height dropped; the jungle\'s haze for its air)', () => {
+  const w = readFileSync('src/scenes/world.js', 'utf8');
+  assert.match(w, /setAirGround\(lawAirGround\(\{ woods, maps, landforms: landform, climates: \(\) => _landformClimates \}\)\);/);
+  assert.match(w, /return \[\.\.\.fieldFromNative\(wc\.x, wc\.z\), altitudeOfWorldY\(p\[1\] - state\.compensation\[1\]\)\];/);
+  assert.match(readFileSync('src/scenes/exterior.js', 'utf8'), /setAirGround\(null\);/);
+  const j = readFileSync('src/scenes/jungleHost.js', 'utf8');
+  assert.match(j, /setAirBiome\('jungle', \(fx, fz\) => \{[\s\S]{0,400}?jungleAirShare\(jungleDepthAt\([\s\S]{0,200}?\}, CLIMATE_AIR\[CLIMATES\.Rainforest\]\);/);
   assert.equal(airGround(), null, 'no test left a map behind');
 });
 

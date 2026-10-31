@@ -47,6 +47,7 @@ test('AUDIT REST F1: leaving a dungeon, my own Campfire comes back into the pack
   assert.deepEqual(entity.items.map((i) => [i.templateIndex, i.currentCondition]), [[TEMPLATE.Campfire, 5]]);
   assert.equal(said.at(-1), CAMP_TEXT.carriedOut);
   assert.deepEqual(p.camps.map((c) => !!c.rec.jar), [true], 'the Campfire left the pool; the Ember Jar\'s fire goes with the dungeon\'s teardown');
+  assert.match(rd('src/scenes/dungeonContext.js'), /\n\s+camps\.packOwnFires\(\);   \/\/ AUDIT REST F1[^\n]*\n\s+camps\.destroyAll\(\);/, 'the dungeon\'s teardown, before its pool goes');
 });
 
 test('AUDIT REST F3: the Draught makes only a ROUGH night a bed\'s (a fire or a tent prices as one already, and keeps its tent tended); an hour\'s rest under it spends it, offline too', () => {
@@ -149,8 +150,12 @@ test('AUDIT REST: the dungeon fires - no candidate in a palace\'s block; every m
   assert.equal(fireCandidates([block(false)]).length, 2);
   assert.equal(fireCandidates([block(true)]).length, 0);
   assert.equal(RDB_SIDE > 0, true);
+  assert.doesNotMatch(rd('src/world/dungeon/dungeonFires.js').replace(/^\/\/.*$/gm, ''), /Math\.hypot\(/);
 });
 
 test('AUDIT REST: the words - "Rest with my party" says the night, /ready says there is no vote online, an Ember Jar\'s last night says its embers', () => {
+  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /'Sleep when a party member within 15 m sleeps at a fire, a tent or a bed\.'/);
+  assert.match(rd('src/net/chatCommands.js'), /'\/ready - how party resting works online \(resting at a fire rests the whole party\)',/);
+  assert.match(rd('src/scenes/camps.js'), /say\(best\.rec\.jar \? CAMP_TEXT\.embersOut : best\.rec\.kind === CAMP_KIND\.Fire \? CAMP_TEXT\.outOfFuel : CAMP_TEXT\.campWorn\)/);
   assert.equal(CAMP_TEXT.embersOut, 'The embers die out.');
 });

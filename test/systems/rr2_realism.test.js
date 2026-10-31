@@ -137,6 +137,19 @@ test('RR2 the decision per person: the two switches, the face override for the b
   assert.equal(flatFaceOverride(182, 10), PERSON_FACE_RECORDS.Redguard.female[1] + 5, 'flatsDict[182_10] = { faceIndex } - the born flat, so the talk portrait matches');
   assert.equal(rrVariantPerson(resident, { buildingType: BUILDING_TYPES.Tavern, quality: 10, nameSeed: 5 }), null, 'a resident is only swapped in a house');
   assert.equal(rrVariantPerson(null), null);
+  // the interior context asks per person and draws the answer; identity keeps the born flat
+  const ic = rd('src/scenes/interiorContext.js');
+  assert.match(ic, /const v = opts\.variantPerson\?\.\(pn\) \?\? null;/);
+  // NUDE-FLATS: the answer reaches the draw through drawnFlat (a dressed variant is itself), and a variant always draws
+  assert.match(ic, /const \[da, dr\] = drawnFlat\(v\?\.textureArchive \?\? pn\.textureArchive, v\?\.textureRecord \?\? pn\.textureRecord\);/);
+  assert.match(ic, /const redrawn = v \|\| da !== pn\.textureArchive \|\| dr !== pn\.textureRecord;[^\n]*\n[^\n]*\.\.\.\(redrawn \? \{ drawArchive: da, drawRecord: dr \} : \{\}\)/);
+  // AUDIT 68 S21-person-hide-noop: the build's stand and the late one are one stand now - four reads, every one a draw
+  assert.ok((ic.match(/pn\.drawArchive \?\? pn\.textureArchive/g) ?? []).length >= 4, 'every draw read');
+  assert.doesNotMatch(ic, /(?:getTexture|uploadRecord|createBillboardBatch)\(pn\.textureArchive/, 'and none reads the born flat');
+  assert.match(rd('src/scenes/dataPipeline.js'), /flatFaceOverride\(archive, record\) \?\? flats\?\.faceIndex\(archive, record\) \?\? -1/, 'the face lookup reads the override first');
+  const wm = rd('src/scenes/worldModes.js');
+  assert.match(wm, /variantPerson: \(pn\) => rrVariantPerson\(pn, \{\s*buildingType: building\?\.buildingType \?\? -1, quality: building\?\.quality \?\? 0,/);   // AUDIT 68 S23-failed-entry-stale-building: the door's record, read during the build
+  assert.match(wm, /worldClimate: hit\.dfLocation\?\.climate\?\.worldClimate \?\? null,/, 'AUDIT-RR F13: the WORLD climate (223-232), not the base type');
   reset();
 });
 
@@ -273,6 +286,19 @@ test('RR2 riding seams: CanRun through the host reads, the axes clamped, the loo
 });
 
 test('RR2 the trample and the charge on the hosts: the contacts each frame, the walker retired, the watchman minted where they stood, the installs', () => {
+  const w = rd('src/scenes/world.js');
+  assert.match(w, /if \(rrRidingOn\(\) && player\.riding && player\.isRunning && !rideOnTheRoad\(\)\) rrRidingContacts\(\);/, 'TrampleCivilians && IsRiding && IsRunning, after the rig\'s frame - PIN MOVED (RPT1026-MISC JOURNEY-TRAMPLE): never under a journey');
+  // AUDIT-RR F15: the contacts live in systems/roleplayRealism/rrRidingHost.js now and BOTH outdoor hosts stand one on their own reads
+  const rh = rd('src/systems/roleplayRealism/rrRidingHost.js');
+  assert.match(rh, /latch\.pickpocketAttempted = true;/, 'PickpocketByPlayerAttempted, the latch (AUDIT-RR2 G24: the pickpocket\'s own)');
+  assert.match(rh, /f\.ai\.knockbackSpeed = RR_RIDING\.chargeKnockback; f\.ai\.knockbackDir = \[\.\.\.direction\];/);
+  assert.match(rh, /playerEntity\.fatigue = Math\.max\(0, \(playerEntity\.fatigue \?\? 0\) - Math\.trunc\(FATIGUE_LOSS\.Default \* RR_RIDING\.chargeFatigueMultiplier \* FATIGUE_DRAIN_SCALE\)\);/);   // BALANCE1 (the pre-merge audit 0927b F1): a charge is exertion
+  assert.match(rh, /rrChargeDamage\(\{ minBase: handToHandMinDamage\(h2h\), maxBase: handToHandMaxDamage\(h2h\), agility: liveStat\(playerEntity, 'agility'\), willpower: liveStat\(playerEntity, 'willpower'\), roll: rolls\(\) \}\)/);
+  assert.match(rh, /if \(isGuardRecord\(f\)\) hurtGuard\(f, damage, at\);\s*else damageFoe\(f, damage, at\);/, 'AUDIT-RR F17: DamageHealthFromSource - no knock direction handed to the weapon path');
+  assert.match(rh, /const out = rrTrampleOutcome\(\{ isGuard: !!person\.guard, female: person\.gender === GENDERS\.Female \}\);/);
+  assert.match(rh, /if \(out\.clip\) playClip\(SOUND\[out\.clip\], ridingVolumeScale\(\)\);/, 'AUDIT-RR F16: RidingVolumeScale');
+  assert.match(rh, /spawnCityGuard\(\[\.\.\.seat\.pos\], person\.facingYaw \?\? yaw\(\), \[\.\.\.at\]\)\)\.then\(\(g\) => \{ if \(g\) \{ g\.livingFrom = from; chargeFoe\(g, fwd\); \} \}\)/, 'SpawnCityGuard + HandleCharge');   // LW-FIX2: the guard marks whom it stands for (the living world's turned watch - LW-FIX5: the struck body's identity, read before the spawn)
+  assert.match(rh, /if \(out\.remove\) \{ person\.trampled = true; retire\(person\); \}/);
   for (const h of ['world', 'exterior']) {
     const s = rd(`src/scenes/${h}.js`);
     assert.match(s, /const rrRiding = createRrRidingContacts\(\{/, `${h}: stands the contacts`);
@@ -280,11 +306,20 @@ test('RR2 the trample and the charge on the hosts: the contacts each frame, the 
     assert.match(s, /voice: \(f\) => enemyHeavyPainVoice\(f\),/, `${h}: AUDIT-RR F18 - the heavy pain cry`);
     assert.match(s, /setRrHostSeams\(\{ inTown: \(\) => _isPlayerInTownStrict\(\), transportMode: \(\) => player\.transportMode, riding: \(\) => player\.riding \}\);/, `${h}: the seams`);
   }
+  assert.match(rd('src/scenes/exterior.js'), /if \(rrRidingOn\(\) && player\.riding && player\.isRunning\) rrRiding\.contacts\(\);/, 'the fixed-city host runs them too (AUDIT-RR F15)');
+  assert.match(w, /ridingVolumeScale: \(\) => \(_travelSoundsOff \? 0 : RIDING_VOLUME_SCALE\),/);
   for (const h of ['world', 'exterior']) {
     const s = rd(`src/scenes/${h}.js`);
     assert.match(s, /lookPitch: \(\) => cam\.pitch, lookYaw: \(\) => cam\.yaw, groundHeightAt: \(x, z\) => (heightAt|collider\.heightAt)\(x, z\),/, `${h}: the rig's reads`);
     assert.match(s, /enhancedRiding: \(\) => \(rrRidingOn\(\) \? \{ terrainFollowing: rrRidingSetting\('followTerrainEnabled'\) === true, softenFollow: rrRidingSetting\('followTerrainSoftenFactor'\) \?\? 8 \} : null\),/, h);
   }
+  assert.match(rd('src/scenes/cityGuards.js'), /spawnCityGuard: \(pos, yaw, attackerFeet = null\) => spawnGuardAt\(\[\.\.\.pos\], yaw, attackerFeet\),/);
+  const inst = rd('src/systems/roleplayRealism/rrInstall.js');
+  assert.match(inst, /setCanRunOverride\(\(mode\) => \(rrRidingOn\(\)\s*\? rrCanRunRiding\(\{ mode, riding: !!_host\.riding\?\.\(\), inTown: !!_host\.inTown\?\.\(\), gallopingInTowns: rrRidingSetting\('GallopingInTowns'\) === true \}\)\s*: null\)\);/);
+  assert.match(inst, /setAxisLimitsProvider\(\(\) => \(rrRidingOn\(\) && rrRidingSetting\('RealisticMovement'\) === true\s*\? rrRidingInputLimits\(\{ riding: !!_host\.riding\?\.\(\), mode: _host\.transportMode\?\.\(\) \?\? 'Foot' \}\)\s*: null\)\);/);
+  assert.match(inst, /installRoleplayRealismArt\(\);/);
+  assert.match(rd('src/systems/transport.js'), /export const canRunUnlessRiding = \(mode\) => \{\n\s*const mods = _canRun\?\.\(mode\) \?\? null;\n\s*return _gallop\?\.\(mode, mods\) \?\? mods \?\? !isRiding\(mode\);/);   // PIN MOVED (STEED1): horse care's word after the mod's
+  assert.match(rd('src/player/lookFilter.js'), /Math\.max\(-pitchFloor\(\), Math\.min\(PITCH_LIMIT, cam\.pitch \+ this\.residualPitch\)\)/);
   assert.ok(typeof rrHostSeams().spawnFoe !== 'undefined');
   // the walker leaves the street at once and its slot is free
   const nav = new CityNavigation(1, 1);
@@ -387,4 +422,12 @@ test('RR2 refined training wiring: the window swapped under the switch, the host
   on('Enabled'); on('RefinedTraining.refinedTraining');
   assert.equal(rrRefinedTrainingOn(), true);
   reset();
+  const wm = rd('src/scenes/worldModes.js');
+  assert.match(wm, /const refined = rrRefinedTrainingOn\(\);\s*flow = \(refined \? buildRefinedTrainingFlow : buildTrainingFlow\)\(playerEntity, guild, membership, \{/, 'RegisterCustomUIWindow(GuildServiceTraining, GuildServiceTrainingRR)');
+  assert.match(wm, /variablePrice: rrSetting\('RefinedTraining\.variableTrainingPrice'\) === true, intensive: rrSetting\('RefinedTraining\.intensiveTraining'\) === true,/);
+  assert.match(wm, /applyIntensive: \(skill, days, points\) => \{\s*interiorTicker\.advance\(days \* MINUTES_PER_DAY\);[^\n]*\n\s*if \(playerEntity\.skills && typeof playerEntity\.skills === 'object'\) playerEntity\.skills\[skill\] = permanentSkillValue\(playerEntity, skill\) \+ points;/, 'AUDIT-RR F30: RaiseTime first, then the +4 (:171-172)');
+  const mb = rd('src/ui/messageBox.js');
+  assert.match(mb, /const custom = _buttonArt\.get\(record\);\s*if \(custom && \(custom\.isOn\?\.\(\) \?\? true\)\) \{/, 'a registered record past the classic 20');
+  assert.match(mb, /_art\.buttons\.set\(record, _art\.renderer\.uploadTexture\('img', `buttons:\$\{record\}`, \{ width: img\.width, height: img\.height, colors \}\)\);/);
+  assert.match(rd('src/ui/guildServiceWindows.js'), /buttonsMulti: \[MB_BUTTONS\.Yes, RR_WEEK_BUTTON, MB_BUTTONS\.No\]/);
 });

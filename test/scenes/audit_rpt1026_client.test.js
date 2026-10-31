@@ -16,6 +16,7 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 
 // ── K2: the lost graphics context's report keeps its way back ──────────────────────────────────────────────────────
 
+const main = read('src/main.js');
 /** The whole statement that starts at `needle` (balanced braces; a listener's call closes after its body). */
 function statementAt(src, needle) {
   const at = src.indexOf(needle);
@@ -26,6 +27,25 @@ function statementAt(src, needle) {
     else if (src[i] === '}' && --depth === 0) return src.slice(at, src[i + 1] === ')' ? src.indexOf(';', i) + 1 : i + 1);
   }
   return assert.fail('unbalanced');
+}
+/** A page whose elements keep a real element's rules: textContent replaces the children, remove() takes an element out
+ *  of its parent (or the page). */
+function page() {
+  const els = new Map();
+  class El {
+    constructor(tag) { this.tag = tag; this.style = {}; this.children = []; this._text = ''; this.parent = null; }
+    get textContent() { return this._text + this.children.map((c) => c.textContent).join(''); }
+    set textContent(v) { this._text = String(v); for (const c of this.children) c.parent = null; this.children = []; }
+    appendChild(c) { this.children.push(c); c.parent = this; return c; }
+    remove() { if (this.parent) { this.parent.children = this.parent.children.filter((c) => c !== this); this.parent = null; } else if (els.get(this.id) === this) els.delete(this.id); }
+  }
+  let lost = null, reloads = 0;
+  const canvas = { addEventListener: (ev, fn) => { if (ev === 'webglcontextlost') lost = fn; } };
+  const document = { getElementById: (id) => (id === 'c' ? canvas : els.get(id) ?? null), createElement: (tag) => new El(tag), body: { appendChild: (el) => els.set(el.id, el) } };
+  const code = `${statementAt(main, 'function crashOverlay(msg) {')}\n${statementAt(main, 'function crashDismiss(el) {')}\n`
+    + `${statementAt(main, "document.getElementById('c')?.addEventListener('webglcontextlost'")}\nreturn crashOverlay;`;
+  const crashOverlay = new Function('document', 'location', 'pageGoing', code)(document, { reload: () => reloads++ }, false);
+  return { els, crashOverlay, lose: () => lost({ preventDefault() {} }), reloads: () => reloads };
 }
 const buttons = (el) => el.children.filter((c) => c.tag === 'button');
 

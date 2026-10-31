@@ -153,8 +153,22 @@ test('QUESTOR-SAID: the words are the text core\'s (quest.offer.questorBusy, que
 });
 
 test('QUESTOR-SAID: what still reaches "That service is not available yet." is a service that is not there - every other cause says its own truth', () => {
+  const modes = rd('src/scenes/worldModes.js');
+  // the line answers a flow that is not there: a service no destination maps (genuinely unbuilt), a window whose art or
+  // data has not come in, no quest machine or no FACTION.TXT
+  assert.match(modes, /if \(!flow\) return \{ rows: \['That service is not available yet\.'\] \};/);
   assert.equal(serviceDestination('NoSuchService'), null, 'an unbuilt service has no destination');
+  assert.match(modes, /function openServiceFlow\(destination, [^\n]*\n\s*if \(!destination\) return null;/);
+  // the guild's quest door: a questor's close boxes its words (above); an empty chain - a drawn quest with no offer
+  // message - is C#'s silent close, a dispatch of nothing, never the line
+  assert.match(modes, /flow = boxes\.length \? new ServiceFlowWindow\(boxes, \{ onClose: \(\) => closeSelf\(\) \}\) : DOOR_REFUSED;/,
+    'mutants: an empty chain left null - "not available yet" over a quest the guild could not offer');
+  assert.match(modes, /if \(!win \|\| win\.refusedByDoor\) return null;/, 'the sentinel mounts nothing');
   assert.deepEqual(makeBridge().offerBoxes(null, () => []), []);
+  // the potion and item makers mounted their window and answered null - the line pushed onto the popup they replaced
+  assert.match(modes, /return mountServiceWindow\(potionWin\);/);
+  assert.match(modes, /return mountServiceWindow\(itemWin\);/);
+  assert.doesNotMatch(modes, /mountServiceWindow\((?:potionWin|itemWin)\);\n\s*return null;/);
 });
 
 // ── AUDIT FB1019f F1: THE BUSY BOX STANDS ON THE SCREEN ───────────────────────────────────────────────────────────────

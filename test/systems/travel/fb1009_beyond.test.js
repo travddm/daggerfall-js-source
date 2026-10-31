@@ -91,6 +91,21 @@ test('TV-BEYOND, no road\'s byte past the table: a step west of the map read the
   assert.deepEqual(onMap.kinds, ['road'], 'the road itself, where it lies');
 });
 
+test('TV-BEYOND, the host: the Overworld\'s water law is the ground\'s own past the Bay where TAMRIEL2 composed the reader, the sea off the map where it did not; the planner is handed it', () => {
+  const w = rd('src/scenes/world.js');
+  const line = w.match(/^ {2}const tvWater = \(px, py\) => [^\n]+$/m)?.[0];
+  assert.ok(line, 'the host\'s own line');
+  const tvWaterOf = (woods) => new Function('woods', 'WATER_BYTE', `${line}\nreturn tvWater;`)(woods, 2);
+  const bay = tvWaterOf({ getHeightMapValue: (x, y) => (x < 0 || y < 0 ? 60 : y === 7 ? 0 : 60) });   // WoodsFile clamps: off the map reads the edge's byte
+  assert.equal(bay(-1, 5), true, 'no land past the Bay: off the map is the sea, the clamp\'s byte never believed');
+  assert.equal(bay(5, 5), false); assert.equal(bay(5, 7), true, 'on the map, the bytes');
+  const composed = tvWaterOf({ isTamrielGround: true, getHeightMapValue: (x) => (x < -10 ? 0 : 60) });
+  assert.equal(composed(-1, 5), false, 'the land past the Bay is land');
+  assert.equal(composed(-20, 5), true, 'and its sea the sea');
+  // PIN MOVED (RUMARE-WATER): and its voyages' sea the Imperial City's lake too (world/rumareWaters.js rumareSeaPixel)
+  assert.match(w, /WATER_BYTE, 1000, 500, \(x, y\) => !tvWater\(x, y\), undefined, rumareSeaPixel\)\)\.setRocks\(tvWodRocks\(\)\);/, 'routeGround is handed the land past the Bay as the view\'s own law reads it');
+});
+
 test('TV-BEYOND, the wire\'s world: every fit\'s frame lies inside WORLD_PIXEL_BOUND, and a pose anywhere on it is carried - the relay refused one past 1024 pixels and closed the socket on it ("bad pose")', () => {
   const poseAt = (px, py) => ({ x: px * PIXEL_UNITS + 100, y: 0, z: (499 - py) * PIXEL_UNITS + 100, yaw: 0, pitch: 0 });
   try {

@@ -205,6 +205,29 @@ test('REST8: online a DELAY\'s day count reads "a few" - "come back in a few day
   assert.equal(questWaitsShort(off), false);
 });
 
+test('REST8: the journal walk skips a DELAY online and keeps a DEADLINE\'s "Time remains" - the rail, the lens and the herald read it in played time; offline every running clock counts (mutants: the walk reads delays, TIMEFREE\'s walk back - every clock skipped online)', () => {
+  const src = rd('src/scenes/quest/questBridge.js');
+  const body = src.slice(src.indexOf('    questLog({ windows = true } = {}) {'), src.indexOf('\n    },', src.indexOf('    questLog({ windows = true } = {}) {')) + 6);
+  assert.ok(body.includes('if (r.waitsShort) continue;'), 'the slice really is the walk');
+  const questLog = new Function('machine', 'notebook', 'clockCounts', `const isShelved = (q) => q?.shelvedAt != null; const questlines = { rowOf: () => null, lineRows: () => [] }; const quietText = () => ''; const questlinesOn = () => false; const ladderRows = () => []; const clocksNamed = () => new Set(); const o = { ${body} }; return o.questLog();`);   // QUEST-AUDIT III NAMED-TIMER (PIN MOVED): these entries name no clock - the tightest stands   // QUEST-SHELF (PIN MOVED): the walk files a quest set aside apart; QL1/QL12 (PIN MOVED): its rows' objectives and the questlines' rows, none here (the switch off)
+  const walk = (online, { deadline = true } = {}) => {
+    const now = { s: 1_000_000, raised: 0 };
+    const q = parse('S0000500', online, now);
+    q.getLogMessages = () => [{ stepID: 0, messageID: 1010, time: 0 }];
+    q.getMessage = (id) => ({ id });
+    q.resources.get('S.00').startTimer();   // the letter: a delay
+    if (deadline) q.resources.get('firsttimer').startTimer();   // the rumour's limit: a deadline
+    return { row: questLog({ quests: new Map([[1, q]]) }, null, clockCounts).active[0], q };
+  };
+  const on = walk(true);
+  assert.deepEqual(on.row.clocks.map((c) => c.name), ['firsttimer'], 'online: the deadline alone');
+  assert.equal(on.row.clockSeconds, on.q.resources.get('firsttimer').remainingTimeInSeconds, '"Time remains": the deadline\'s, whole');
+  const off = walk(false);
+  assert.deepEqual(off.row.clocks.map((c) => c.name).sort(), ['S.00', 'firsttimer'], 'offline: both, DFU\'s journal');
+  assert.equal(walk(true, { deadline: false }).row.clockSeconds, null, 'online, a delay alone: no time left to show');
+  assert.ok(walk(false, { deadline: false }).row.clockSeconds >= 31 * DAY_S, 'offline: its weeks');
+});
+
 test('REST8: OUT of the short wait, as QCLOCK-WORLD has them - online a quest letter still waits for the sky\'s morning, and a taken bounty still lapses and shows its time (mutants: TIMEFREE\'s any-hour letter back)', () => {
   const sky = { s: 0 };
   const q = { nowSeconds: () => 0, skySeconds: () => sky.s, hooks: { skySeconds: () => sky.s, nowSeconds: () => 0, isPlayerInTown: () => true, sharedClock: () => true, onOfferPending() {} }, rolls: () => 0, getPlace: () => null, showMessagePopup() {} };
@@ -215,6 +238,10 @@ test('REST8: OUT of the short wait, as QCLOCK-WORLD has them - online a quest le
   sky.s = 100 * DAY_S + 10 * 3600;
   give.update();
   assert.equal(give.waitingForTown, false, '...and the sky\'s morning lets it through');
+  assert.match(rd('src/systems/quest/actions.js'), /if \(!hooks\?\.isPlayerInTown\?\.\(\) \|\| now\.hour < minHour \|\| now\.hour > maxHour\) \{/);
+  const bounty = rd('src/scenes/bountyHost.js');
+  assert.match(bounty, /for \(const gone of lapseBounties\(ledger, now\)\) \{/, 'a bounty lapses online');
+  assert.match(bounty, /clockSeconds: bountyMinutesLeft\(h, now\) \* 60,/, 'and shows its time left');
 });
 
 test('REST8 (TIMEFREE\'s): online a crime guild\'s letter is due the short wait after the tally reached it; offline three days (mutants: online kept at three days, the tick not saying it is online)', () => {
@@ -229,6 +256,7 @@ test('REST8 (TIMEFREE\'s): online a crime guild\'s letter is due the short wait 
     assert.equal(handleStartingCrimeGuildQuests(entity(), { nowClassicMinutes: stamp + 1 }).length, 1, 'offline: three days on');
     assert.equal(CRIME_GUILD_LETTER_ONLINE_MINUTES, 24);
   } finally { setCrimeGuildQuestHost(prev); }
+  assert.match(rd('src/systems/worldTick.js'), /handleStartingCrimeGuildQuests\(entity, \{ nowClassicMinutes: next, inside, online: sharedClockOn\(\) \}\);/, 'the tick says it is online');
 });
 
 test('REST8 (TIMEFREE\'s): online the curse\'s quests roll on the short wait, each arm only while it has nothing running, one at a time; offline the 38 and 84 days (mutants: the idle check dropped, both arms on online, the short-wait arm off)', () => {
@@ -266,4 +294,9 @@ test('REST8 (TIMEFREE\'s): online the curse\'s quests roll on the short wait, ea
     'online: on an 84-day mark too only the short-wait arm rolls - DFU\'s cure arm, on, would roll first and unchecked');
   assert.deepEqual(walk(true, base + 1, 23), [], 'online: the minutes between two short-wait marks roll nothing');
 
+  const tick = rd('src/systems/worldTick.js');
+  assert.match(tick, /if \(ownArms && !shortWaits\) startRacialOverrideQuest\(entity, false, \{ rolls \}\);/);
+  assert.match(tick, /if \(ownArms && !shortWaits && i % CURE_QUEST_INTERVAL_MINUTES === 0\) \{/);
+  assert.match(tick, /if \(ownArms && shortWaits && i % ONLINE_RACIAL_INTERVAL_MINUTES === 0\) \{\n\s+if \(racialArmIdle\(false\)\) startRacialOverrideQuest\(entity, false, \{ rolls \}\);\n\s+if \(racialArmIdle\(true\)\) startRacialOverrideQuest\(entity, true, \{ rolls \}\);/);
+  assert.match(rd('src/scenes/world.js'), /activeQuestNames: \(\) => \[\.\.\.questBridge\.machine\.quests\.values\(\)\]\.filter\(\(q\) => !q\.questComplete && !q\.questTombstoned\)\.map\(\(q\) => q\.questName\),/, 'the world host answers its live quests');
 });

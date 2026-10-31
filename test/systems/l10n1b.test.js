@@ -132,7 +132,19 @@ test('L10N1b executed: a language\'s file patched in speaks through t(); tIn ask
   tm.setLocale('fr');
   assert.equal(tm.t('menu.rail.new', 'New Game'), 'Nouvelle partie');
   assert.equal(tm.t('settings.language.name', 'Language'), 'Langue');
+  // the menu's own table, read off its source: each entry's English is the label whose id it answers
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  const entries = [...menu.matchAll(/^ {2}(\w+): \(\) => t\('menu\.rail\.(\w+)', '([^']+)'\),$/gm)];
+  assert.equal(entries.length, 15);
+  const labels = new Set();
+  for (const m of menu.matchAll(/^const SECTIONS_(?:BOOT|CLASSIC|PAUSE) = \[([^\]]+)\];/gm)) for (const q of m[1].matchAll(/'([^']+)'/g)) labels.add(q[1]);
   const idOf = (label) => label.toLowerCase().split(' ')[0];
+  for (const label of labels) {
+    const e = entries.find((m) => m[1] === idOf(label));
+    assert.ok(e, `the rail's ${label} has a translation entry`);
+    assert.equal(e[3], label, `${label} reads back as itself in English`);
+    assert.equal(e[2], e[1], `${label}'s key is its id`);
+  }
 });
 
 test('L10N1b the boot, run: the saved choice, ?lang= for one visit, only the chosen language\'s chain fetched and each file once, English never fetched, a language without text is English, the offer\'s language fetched while English stands and never once answered, and a failed load forgotten with English left standing', async () => {
@@ -211,8 +223,29 @@ test('L10N1b the boot, run: the saved choice, ?lang= for one visit, only the cho
 });
 
 test('L10N1b by source: the boot loads the language behind a door before every other door, the prefs carry the choice, the menu routes both rails, offers the language row on the front door alone and the first-run offer on its boot face', () => {
+  const main = rd('src/main.js');
+  const boot = main.indexOf('async function boot()');
+  const lang = main.indexOf("await import('./scenes/localeData.js').then(({ initLocale }) => initLocale(params))");
+  assert.ok(lang > boot, 'the boot loads the language');
+  for (const door of ["if (params.has('music')", "if (params.has('interior'))", "if (params.has('world'))", 'runCinematicFrontDoor(']) {
+    const at = main.indexOf(door, boot);
+    assert.ok(at > lang, `the language is in before ${door}`);
+  }
+  assert.doesNotMatch(main, /^import .*localeData/m, 'behind a door - BOOT2\'s ceiling on the entry\'s static graph');
   assert.equal(PREF_DEFAULTS.language, 'en');
   assert.equal(PREF_DEFAULTS.languageOffered, false);
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /menu\.append\(doorBtn\(id, railLabel\(label\), '', RAIL_ACTS/, 'the front door\'s buttons (UI-CALM: through the one door maker)');
+  assert.match(menu, /b\.append\(el\('span', 'rk', railLabel\(label\)\)\);/, 'the shell rail');
+  assert.match(menu, /if \(!pause\) out\.push\(languageRow\(\)\);/, 'the language row on the front door alone');
+  assert.match(menu, /const offer = languageOffer\(\);\n\s+if \(offer\) home\.append\(offer\);/, 'the offer on the boot face');
+  assert.match(menu, /if \(!code \|\| !localeTable\(code, 'Port_Strings'\)\?\.has\('lang\.offer'\)\) return null;/, 'never an offer in English');
+  assert.match(menu, /if \(!offer && !accountOpen && !accountOffered && !signedIn\(\)\) \{ accountOffered = true; accountOpen = true; \}/, 'the account window waits while the language is asked (tools/languageProbe.mjs found it covering the offer)');
+  assert.doesNotMatch(menu, /^import .*localeData/m, 'the menu loads the browser-only module behind a door (node tests import the menu)');
+  const data = rd('src/scenes/localeData.js');
+  assert.match(data, /import\.meta\.glob\('\.\.\/\.\.\/locales\/\*\/\*\.csv', \{ query: '\?raw', import: 'default' \}\)/, 'every file its own lazy chunk');
+  assert.match(data, /if \(!f \|\| f\.code === BASE_LOCALE\) continue;/, 'English is the code\'s, never loaded');
+  assert.match(data, /setLocale\(BASE_LOCALE\);\n\s+applyDocumentLanguage\(BASE_LOCALE\);\n\s+return BASE_LOCALE;/, 'a failure leaves English standing');
 });
 
 test('L10N1b the writer: every file the port writes reads back through DFU\'s parser unchanged, and what the parser cannot hold is refused', () => {

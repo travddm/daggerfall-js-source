@@ -234,6 +234,7 @@ test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, 
   // LR1's own hexes, each pinned against the ladder (AUDIT SERVER-POST: the sheet never imports it - it reaches the combat graph)
   for (const [k, r] of Object.entries(RARITIES)) if (k !== 'common') assert.ok(ENHANCED_CSS.includes(`.px-postwin [data-rarity="${k}"] { color: ${r.colour}; }`), k);
   for (const k of ['magic', 'legendary', 'artifact']) assert.match(ENHANCED_CSS, new RegExp(`:root\\[data-plus-theme="stone"\\] \\.px-postwin \\[data-rarity="${k}"\\] \\{ color: #[0-9a-f]{6}; \\}`), `${k} lifted on Stone`);
+  assert.doesNotMatch(src('src/ui/enhanced/enhancedStyle.js'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*lootRarity\.js'/, 'the stylesheet imports no loot ladder');
 
   // OPENED
   await view.openOne(post[0].id);
@@ -286,6 +287,27 @@ test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, 
 });
 
 test('SERVER-POST the wiring: the pause face stands the envelope beside the hourglass where the host hands a box, opens its window on the hourglass\'s stage with its own scrim, Escapes it before resuming, stops its ticks on every rebuild and unmount; every host hands the world\'s box, online only and never a throw before the boot declared it; the world host makes the box beside the letterbox, says its news on the world tab and rides the heartbeat (mutants: the envelope without a box; a host that forgets it)', () => {
+  const menu = src('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /const envelope = postEnvelope\(home, mark\);/, 'beside the hourglass');
+  assert.match(menu, /function postEnvelope\(home, glass\) \{\n  if \(!hooks\.post\?\.\(\)\) return null;/, 'online only - where the host hands a box');
+  assert.match(menu, /postAnchor = anchorPost\(envelope, glass, home\.querySelector\?\.\('\.px-profile'\), home\);/);
+  assert.match(menu, /else if \(postOpen && hooks\.post\?\.\(\)\) \{\n[^\n]*\n\s*const pstage = el\('div', 'px-stage px-timersstage px-poststage'\);/);
+  assert.match(menu, /for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);/);   // PIN MOVED (SEASON-BOOK): and the laurel beside it; PIN MOVED (SHOP): and the gem
+  assert.match(menu, /: postOpen && postView \? \(\) => \{ postOpen = false; postKeep = \{\}; postFocusBack = true; render\(\); \}/, 'Escape closes it first');
+  assert.match(menu, /stopTimers\(\);   \/\/ TIMERS1: a rebuild builds the window again, with its own tick\n  stopPost\(\);/);
+  assert.match(menu, /releaseShotsPane\(\);   \/\/ LOAD1[^\n]*\n      stopPost\(\);   \/\/ SERVER-POST/, 'and on unmount');
+  assert.match(menu, /postOpen = false;   \/\/ SERVER-POST: and the mailbox's/, 'a visit\'s window');
+  const world = src('src/scenes/world.js');
+  assert.match(world, /const postSource = \(\) => \{ try \{ return online && postBox \? postBox : null; \} catch \{ return null; \} \};/, 'online, and never a throw before the boot declared it');
+  assert.equal((world.match(/post: postSource,/g) ?? []).length, 2, 'the street\'s pause bag and the modes host');
+  assert.match(src('src/scenes/worldModes.js'), /\n {4}post: host\.post,   \/\/ SERVER-POST/, 'a building\'s pause - the live line, never a comment of it');
+  assert.match(src('src/scenes/worldModes.js'), /\n {10}post: \(\) => host\.post\?\.\(\) \?\? null,/, 'the dungeon\'s opts');
+  assert.match(src('src/scenes/dungeonContext.js'), /\n {8}post: \(\) => opts\.post\?\.\(\) \?\? null,/, 'the dungeon\'s pause');
+  assert.match(world, /onPost: \(event\) => \{ chatLog\.push\(tab\.id, \{ text: postNoticeText\(event\), system: true \}\); \},/, 'its news on the world tab, a line nobody spoke');
+  assert.match(world, /heartbeat\.add\('post', whileLive\(postBox\.heartbeatPart\(\), \(\) => performance\.now\(\) - _mailFrameAt < FRAME_LIVE_MS\)\);/, 'on the letterbox\'s clock, while the lane runs');
+  // PIN MOVED (LOST-SPOILS): a claimed item goes into the pack by a spoil's own door (takeGateSpoil - addItem's own 'back',
+  // and a first Sigil Stone's book, which a Lost and Found ember brings as the floor's does)
+  assert.match(world, /pack: \{ add: \(rec\) => \{ playerEntity\.items \?\?= \[\]; takeGateSpoil\(\{ kind: 'item', item: setItemFields\(rec\) \}\); \}, changed: \(\) => \{ saveSoon\.changed\(\); \} \},[^\n]*\n    \}\);\n    heartbeat\.add\('post'/, 'a claimed item made whole and put in the pack as the vault\'s');
   assert.match(ENHANCED_CSS, /\n\.px-postmark \{ position: absolute;/);
   assert.match(ENHANCED_CSS, /\n\.px-win\.px-postwin \{/);
 });
@@ -377,4 +399,19 @@ test('AUDIT SERVER-POST the window keeps its place: rebuilt by the face (a rende
 test('AUDIT SERVER-POST the doors: /mail opens the mailbox on either skin and wherever the player stands (the enhanced pause face with its window open - the classic pause has no envelope); the face under the account window is out of reach; Tab never lands on what is inert; the window\'s place is the menu\'s, reset with the visit (mutants: the classic skin without a way in; /mail outdoors only)', () => {
   assert.ok(HOST_COMMANDS.includes('mail') && HOST_COMMANDS.includes('mailbox'));
   assert.ok(HELP_LINES.some((l) => l.startsWith('/mail - ')), '/help says it');
+  const world = src('src/scenes/world.js');
+  // PIN MOVED (PRIVATE-REPORT): the line read by chatCommands.js mailboxCommandOf - `/mail` and `/mailbox` the mailbox, `/bug` its form;
+  // PIN MOVED (SEASON-BOOK): through pauseCommandOf, `/season` beside them - the mailbox's lines still refused without a box
+  assert.match(world, /\{ const at = pauseCommandOf\(text\); if \(at\) \{[^\n]*\n[^\n]*if \(!\(at === 'season' \? timersSource\(\) : postSource\(\)\)\)[^\n]*\n\s*if \(!modes\?\.openPauseAt\?\.\(at\)\) hudCtx\.togglePause\(\{ at \}\);/);
+  const modes = src('src/scenes/worldModes.js');
+  assert.match(modes, /openPauseAt: \(at\) => \{\n\s*if \(mode === 'dungeon' && dungeonCtx\) \{ dungeonCtx\.togglePause\(\{ at \}\); return true; \}\n\s*if \(mode === 'interior' && interiorCtx\) \{ interiorKeyCtx\.togglePause\(\{ at \}\); return true; \}\n\s*return false;/, 'indoors and underground, their own pause');
+  const door = src('src/ui/pauseDoor.js');
+  assert.match(door, /if \(\(hooks\.at === 'mailbox' \|\| hooks\.at === 'report' \|\| hooks\.at === 'season'\) && typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\);/, 'either skin');   // PIN MOVED (SEASON-BOOK): and `/season`   // PIN MOVED (PRIVATE-REPORT): and `/bug` (its form, at `report`)
+  assert.ok(door.indexOf("hooks.at === 'mailbox'") < door.indexOf('if (isEnhanced() && typeof document'), 'before the skin is asked');
+  assert.match(door, /\.filter\(\(n\) => !n\.closest\?\.\('\[inert\]'\)\);/, 'Tab never into what is out of reach');
+  const menu = src('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /else if \(at === 'mailbox'\) postOpen = true;/, 'the door lands on the window');
+  assert.match(menu, /closeOnOutsideTap\(home, '\.px-acctwin', [^\n]*\n\s*for \(const n of \[stage, mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'the face under the account window inert');   // PIN MOVED (SEASON-BOOK): the laurel too; PIN MOVED (SHOP): and the gem
+  assert.match(menu, /postKeep = \{\};\n/, 'the window\'s place reset with the visit');
+  assert.match(menu, /postView = postWindow\(document, \{ box: \(\) => hooks\.post\?\.\(\) \?\? null, keep: postKeep,/);
 });

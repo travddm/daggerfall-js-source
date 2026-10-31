@@ -190,6 +190,16 @@ test('MW-D25: state round-trips and restore clamps', () => {
 
 test('MW-D25: one live instance is exported for the hosts, and the module keeps the reference\'s sentences', () => {
   assert.equal(typeof mwCamera.wheel, 'function');
+  const src = readFileSync(new URL('../../src/player/mwCamera.js', import.meta.url), 'utf8');
+  // The zoom law's two gates must stay the reference's own, not a
+  // simplification: the min-ring switch and the obstacle-debt gate.
+  assert.ok(/baseDistance === MIN_DISTANCE/.test(src), 'the min-ring FP switch gate');
+  assert.ok(/obstacleDelta < -delta/.test(src), 'the obstacle-debt out-zoom gate (camera.lua:151)');
+  // The bridge literal is MINTED in the format layer (one home) and
+  // re-exported here; both facts are load-bearing.
+  const fmt = readFileSync(new URL('../../src/formats/morrowind/mwFirstPerson.js', import.meta.url), 'utf8');
+  assert.ok(/69\.99125109/.test(fmt), 'the unit bridge literal lives in the format layer');
+  assert.ok(!/69\.99125109/.test(src), 'and is not restated here - one home');
 });
 
 // ── MW-D25: THE VIEW SYNC's no-data law, on the live singletons ─────
@@ -217,6 +227,9 @@ test('MW-D30: the pitch clamp is the reference\'s own, and every host rides it',
   // camera.cpp:323-331 - +/-(PI/2 - 0.000001f). The hand-rolled +/-1.5
   // stopped the look ~4 degrees short of vertical.
   assert.equal(PITCH_LIMIT, Math.PI / 2 - 0.000001);
+  // AUDIT 68 S22: the clamp is the look filter's (lookFilter.js), and a host rides it by driving its camera through
+  // one - an import of PITCH_LIMIT the host never read satisfied this pin while proving nothing.
+  assert.match(readFileSync(new URL('../../src/player/lookFilter.js', import.meta.url), 'utf8'), /Math\.min\(PITCH_LIMIT, cam\.pitch \+ this\.residualPitch\)/);
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/interior.js']) {
     const src = hostText(host);
     assert.ok(!/Math\.max\(-1\.5, Math\.min\(1\.5,/.test(src), `${host} clamps at PITCH_LIMIT, not 1.5`);
@@ -238,6 +251,24 @@ test('MW-D30: wheel clicks ACCUMULATE and flush once per frame', () => {
 });
 
 test('MW-D30: the pose carries the camera and the load FORCES it', () => {
+  // worldimp.cpp:425-427 saves the flag; statemanagerimp.cpp:617-618
+  // togglePOVs the live camera to match on load; camera.lua:347-352
+  // rides the distance. The port's one pose-apply does both through
+  // mwCamera.restore, and a pose without a camera (older save, the
+  // classic import) leaves the live camera standing.
+  const src = hostText('src/scenes/world.js');
+  // AUDIT 39 (#24) MOVED THIS PIN: the pose grew `transport` after the
+  // camera (the mount rides the quicksave now), so the camera is no
+  // longer the pose's last key. The law pinned is the CARRY, not the tail.
+  assert.ok(/camera: mwViewSaveCamera\(\),/.test(src), 'the saved pose carries mwCamera.state() - through mwViewSaveCamera, the player\'s own under a travel view\'s hold (AUDIT DEEP X-3)');
+  // AUDIT-EOTB2: the one pose-apply goes through the view seam's load
+  // door, which restores the Morrowind camera AND re-seeds the sprite
+  // camera (the mod's OnLoad) - the restore itself is unchanged
+  // EOTB-IL: the door also carries WHERE the player stands (the mod's
+  // OnLoad reads PlayerEnterExit.IsPlayerInside); the restore is unchanged
+  assert.ok(/mwViewLoadPose\(pose\.camera, .*\);/.test(src), 'and the one pose-apply restores it, through the seam');
+  // PIN MOVED (AUDIT CAPTAIN'S SEA S8): the glass's hold forgotten first - a load decides the view
+  assert.match(readFileSync(new URL('../../src/player/mwView.js', import.meta.url), 'utf8'), /export function mwViewLoadPose\(pose, inside = false\) \{\s*heldFirst = null;[^\n]*\n\s*if \(pose\) mwCamera\.restore\(pose\);/, 'the seam restores exactly as the host did');
   // restore(undefined) is the older-save no-op, behaviorally:
   const cam = createMwCamera();
   cam.wheel(-1);
@@ -245,3 +276,19 @@ test('MW-D30: the pose carries the camera and the load FORCES it', () => {
   assert.equal(cam.mode(), 'third', 'a pose without a camera leaves the live camera standing');
 });
 
+test('MW-D34: the focal height rides the race HEIGHT through the one seam', () => {
+  // adjustScale's z (npc.cpp:1127/1134) scales the actor the camera
+  // tracks, so the third-person focal height scales with it. The
+  // answer comes from the rig itself, in mwViewFrame - the hosts stay
+  // out of the seam (MW-D25's law) and a caller may still pass an
+  // explicit value.
+  const view = readFileSync(new URL('../../src/player/mwView.js', import.meta.url), 'utf8');
+  assert.match(view, /heightScale = null/, 'the default is "ask the rig", not 1');
+  assert.match(view, /if \(heightScale == null\) heightScale = fpArm\.raceHeightScale\(\);/);
+  const arm = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
+  assert.match(arm, /raceHeightScale: \(\) => \(built && built\.ok && built\.raceScale \? built\.raceScale\.height : 1\)/,
+    'and the rig answers its race height, 1 unbuilt');
+  // The camera really multiplies it into the focal (mwCamera.js).
+  const cam = readFileSync(new URL('../../src/player/mwCamera.js', import.meta.url), 'utf8');
+  assert.match(cam, /FOCAL_HEIGHT \* heightScale \* u/);
+});
