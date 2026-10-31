@@ -227,9 +227,113 @@ test('TESA7 the ground: the spawns\' dry-plateau law (SPAWN-SHORE), kept per pix
 
 // ── THE HOST ────────────────────────────────────────────────────
 
+const W = hostText('src/scenes/world.js');
+const lift = (head) => { const i = W.indexOf(head); assert.ok(i > 0, head); return W.slice(i, W.indexOf('\n  }\n', i) + 4); };
+
 test('TESA7 the host: the templates and the count off the game\'s rows before they go, the land past the Bay streamed and the door open; the rates at the first ask, the Bay\'s water law; past the Bay Arena\'s place first, else the country\'s', () => {
   assert.equal(countrysideOn('?country=off'), false);
   assert.equal(countrysideOn(''), true);
   assert.equal(countrysideOn('?online&country=on'), true, 'online too');
+  assert.match(W, /const _countryTemplates = tamrielLand && countrysideOn\(\) \? countryTemplates\(_classicRows \?\? _hubRows\.map\(classicRow\)\.filter\(Boolean\), isMainStoryDungeon\) : null;/);
+  assert.match(W, /const _countryCounts = _countryTemplates \? countryCounts\(_countryTemplates, \(x, y\) => maps\.getClimateIndex\(x, y\)\) : null;/);
+  assert.ok(W.indexOf('const _countryCounts = _countryTemplates') < W.indexOf('  _classicRows = null;   // read, let go'), 'before the rows go');
+  assert.match(W, /const bayLandNow = \(\) => \(_pastBay\.bayLand \?\?= bayLand\(\(x, y\) => maps\.getClimateIndex\(x, y\), \(x, y, c\) => isWaterPixel\(c, host\.woods\.getHeightMapValue\(x, y\)\)\)\);\n\s+const countryRatesNow = \(\) => \(_pastBay\.countryRates \?\?= countryRates\(_countryCounts, bayLandNow\(\)\)\);/);   // PIN MOVED (TESA8): the Bay's land read once for the lairs' rates too
+  assert.match(W, /const _countryGround = _countryTemplates \? createCountryGround\(host\.woods\) : null;/);
+  // PIN MOVED (AUDIT TESA II P1): online the open zone's hall of the day first - Cyrodiil's lie past the Bay
+  assert.match(W, /if \(\(_arenaTemplates \|\| _countryTemplates \|\| _capitalBase\) && !onTheBay\(px, py\)\) return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| \(params\.has\('online'\) && zoneHalls\.standIn\(cyrodiilMask\(\), px, py\)\) \|\| host\.capitalLocationAt\(px, py\) \|\| \(_arenaTemplates && host\.arenaLocationAt\(px, py\)\) \|\| host\.countryLocationAt\(px, py\) \|\| host\.lairLocationAt\(px, py\) \|\| spawnPastBayAt\(px, py\);/);   // PIN MOVED (TESA8): then the lair's (tesa8_lairs); PIN MOVED (TESA10): a capital first (tesa10_capitals)   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild is scenes/spawnStandHost.js's, the places' rolls through `host`   // PIN MOVED (SPAWN-WORLD 2026-10-26): online, the spawner's last - never on a place   // PIN MOVED (WW5, bible/03-World/World-Wide.md WW5): a province's Hollow first, as its lane stands it in the index (scenes/superDungeon/sdLanes.js) - carried into scenes/spawnStandHost.js at the packages' merge (AUDIT BAY-LEFT)
+  const tp = W.slice(W.indexOf('    window.__tesaPlace = (x, y) => {'), W.indexOf('    window.__arena = () => {'));
+  assert.match(tp, /country: loc\?\.country \?\? null, type: loc\?\.mapTableData\?\.locationType \?\? null \};/, 'the probe reads it');
+  const M = read('src/scenes/worldModes.js');
+  // PIN MOVED (BAY-LEFT-B, bible/03-World/Arena-Provinces.md): a country place sells its houses and reads its deed - its
+  // province's region's, held to its own map id (banking.js deedHeldIn; test/systems/bayleftb_houses.test.js)
+  assert.match(M, /if \(isEtherPlaceId\(dir\.mapId\)\) return \[\];/, 'a house sold in one');
+  assert.match(M, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(/, 'and its deed read there');
 });
 
+/** countryLocationAt as the host has it, over stubs: the real pick, name and clone, a pixel's water, road and ground the test's. */
+function host({ water = new Set(), roads = new Set(), wet = new Set(), templates = true } = {}) {
+  const T5 = new Map(COUNTRY_TYPES.map((t) => [t, [row(1000 + t, t), row(2000 + t, t)]]));
+  const rates = new Map([[230, [[T.HomeFarms, 0.5], [T.Tavern, 1]]], [226, [[T.TownHamlet, 1]]]]);
+  const d = { index: new Map(), gen: 0, climate: () => 230, asked: 0 };
+  const src = `${lift('  function countryRollAt(px, py) {')}\n${lift('  function countryLocationAt(px, py) {')}`;   // PIN MOVED (TESA13): the roll is its own function, the map's read of it too
+  const make = new Function('d', 'countryStandsAt', 'countryName', 'countryNameSeed', 'synthesizeCountryLocation', 'T5', 'rates', 'water', 'roads', 'wet', 'templates', `
+    const _countryTemplates = templates ? T5 : null, locationIndex = d.index;
+    const countryRatesNow = () => { d.asked++; return rates; };
+    const maps = { getClimateIndex: (x, y) => d.climate(x, y), getRegionIndexAt: () => 23 };
+    const woods = { getHeightMapValue: (x, y) => (water.has(x + ',' + y) ? 0 : 40) };
+    const _countryGround = (x, y) => !wet.has(x + ',' + y);
+    // TESA14: the world the roll reads, as the host hands it - no road among it
+    const _pastBayAt = { climateAt: (x, y) => maps.getClimateIndex(x, y), heightAt: (x, y) => woods.getHeightMapValue(x, y), ground: (x, y) => _countryGround(x, y) };
+    const _pastBay = { countryRoll: null };   // PIN MOVED (HOST-SPLIT, at the merge of main): the place law is scenes/tamrielPlacesHost.js's, its live names through host
+    const provinceKeyBeyondBay = (x) => (x < 3000 ? 'skyrim' : null), provinceNameBank = (k) => (k === 'skyrim' ? 2 : null), getNameBankOfRegion = () => 0;
+    const REGION_NAMES = { 23: 'Wrothgarian Mountains' }, getWorldClimateSettings = (c) => ({ worldClimate: c });
+    const townClimateAt = (x, y, settings) => settings;   // PIN MOVED (URBANIZER U1): the province's set laid over the zone's - its own test's (urban1_look)
+    const host = { _locIndexGen: 0 };
+    const outlineTownLocation = (loc) => loc, blockOf = null, imperialOutskirts = () => false;   // PIN MOVED (TOWN-SHAPES TS3): the clone laid as its outline - its own test's (townoutline); TS5: round in the Imperial City's outskirts
+    ${src}
+    return { countryLocationAt, gen: () => host._locIndexGen };`);
+  return { d, ...make(d, countryStandsAt, countryName, countryNameSeed, synthesizeCountryLocation, T5, rates, water, roads, wet, templates) };
+}
+
+test('TESA7 the host\'s ask: the roll\'s place stood once in the index under the province\'s name; the same pixel the same object; water and the sea\'s edge stand none; a climate that moves clones again - TESA14: and a road takes no place\'s pixel', () => {
+  const h = host();
+  const loc = h.countryLocationAt(2200, -360);
+  assert.ok(loc?.country, 'a farm or an inn: every roll stands under ceilings of 1');
+  assert.equal(h.d.index.get('2200,-360'), loc);
+  assert.equal(h.gen(), 1);
+  assert.equal(loc.name, countryName(loc.country.type, BANK_TYPES.Nord, countryNameSeed(2200, -360)), 'a Nord\'s, its province\'s');
+  assert.deepEqual([loc.regionIndex, loc.regionName, loc.politic, loc.climate.worldClimate], [23, 'Wrothgarian Mountains', 128 + 23, 230]);
+  assert.equal(h.countryLocationAt(2200, -360), loc, 'once');
+  assert.equal(h.gen(), 1);
+  const west = h.countryLocationAt(3100, -360);
+  assert.equal(west.name, countryName(west.country.type, BANK_TYPES.Breton, countryNameSeed(3100, -360)), 'no province: the clamp\'s region\'s bank');
+  h.d.climate = () => 226;
+  const moved = h.countryLocationAt(2200, -360);
+  assert.notEqual(moved, loc);
+  assert.equal(moved.country.type, T.TownHamlet, 'the climate moved, the kind with it');
+  assert.equal(h.d.index.get('2200,-360'), moved);
+  // AUDIT TESA-BIOME P13: a pixel that stops standing a place leaves the index - no stale place stays (a zone's climate with
+  // no countryside, the trace landing)
+  const genBefore = h.gen();
+  h.d.climate = () => 999;
+  assert.equal(h.countryLocationAt(2200, -360), null, 'nothing stands there now');
+  assert.equal(h.d.index.has('2200,-360'), false, 'the old place gone from the index');
+  assert.equal(h.gen(), genBefore + 1, 'and the index\'s generation moved');
+  h.d.climate = () => 226;
+  assert.ok(h.countryLocationAt(2200, -360), 'stood again');
+  for (const [o, what] of [[{ water: new Set(['5,-5']) }, 'water'], [{ wet: new Set(['5,-5']) }, 'the sea\'s edge']]) {
+    const g = host(o);
+    assert.equal(g.countryLocationAt(5, -5), null, what);
+    assert.equal(g.d.index.has('5,-5'), false);
+    assert.ok(g.countryLocationAt(6, -5), 'its neighbour stands');
+  }
+  // PIN MOVED (TESA14): the roads are laid round the places (world/tamrielRoads.js) - a road no longer takes one's pixel
+  assert.doesNotMatch(lift('  function countryRollAt(px, py) {'), /arenaPathsAt/, 'the roll reads no road');
+  const late = host({ roads: new Set(['7,-7']) });
+  const stood = late.countryLocationAt(7, -7);
+  assert.ok(stood, 'on a road pixel all the same');
+  assert.equal(late.countryLocationAt(7, -7), stood, 'and kept');
+  assert.equal(host({ templates: false }).countryLocationAt(7, -7), null, 'the door shut');
+  assert.equal(h.d.asked > 0, true);
+});
+
+test('TESA7 the build\'s order past the Bay: Arena\'s place where one stands, else the country\'s; on the Bay neither is asked', () => {
+  const src = lift('  function _locationToBuild(px, py) {');
+  const make = new Function('arena', 'country', `
+    const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
+    const _arenaTemplates = arena ? {} : null, _countryTemplates = {}, _capitalBase = null, capitalLocationAt = () => null, locationIndex = new Map([['5,5', { name: 'Daggerfall' }]]);
+    const arenaLocationAt = (x) => (x === 2000 ? { name: 'Winterhold' } : null), countryLocationAt = () => country;
+    const _spawnLedger = { expired: () => false }, _spawnClock = () => 0, _insideSpawn = () => false, spawnedDungeonAt = () => null;
+    const params = new URLSearchParams(''), zoneHalls = { standIn: () => null }, cyrodiilMask = () => null;   // PIN MOVED (AUDIT TESA II P1): offline, no zone's hall
+    let _locIndexGen = 0;
+    const host = { get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; }, _spawnClock, capitalLocationAt, arenaLocationAt, countryLocationAt, lairLocationAt: () => null };   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD): scenes/spawnStandHost.js's live names
+    ${src}
+    return _locationToBuild;`);
+  const farm = { name: 'The Ulfgar Farmstead' };
+  const b = make(true, farm);
+  assert.equal(b(2000, -300).name, 'Winterhold', 'Arena\'s first');
+  assert.equal(b(2001, -300), farm, 'else the country\'s');
+  assert.equal(b(5, 5).name, 'Daggerfall', 'the Bay its own');
+  assert.equal(b(6, 5), null, 'and never the country\'s');
+  assert.equal(make(false, farm)(2000, -300), farm, 'no Arena: the countryside alone');
+});

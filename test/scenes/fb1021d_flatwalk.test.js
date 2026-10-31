@@ -34,6 +34,27 @@ const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const ARENA2 = process.env.ARENA2_PATH;
 const SKIP = !ARENA2 || !existsSync(join(ARENA2, 'BLOCKS.BSA')) ? 'ARENA2_PATH has no BLOCKS.BSA' : false;
 
+/** dungeonContext.js collisionTriggers, as the host has it - lifted out of its source, so the pin reads the host. AUDIT
+ *  FB1021d FW-5: with every gate the module offers in scope, so a pass back on hasActionCollision fails by what the walk
+ *  hears, not by a name the lift left out. */
+function hostPass(world) {
+  const DC = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8');
+  const at = DC.indexOf('  function collisionTriggers(dt, playerFeet, moveHeld');
+  assert.ok(at > 0, 'the host\'s collision pass');
+  const src = DC.slice(at, DC.indexOf('\n  }\n', at) + 4);
+  // eslint-disable-next-line no-new-func
+  return new Function('actions', 'walkHears', 'hasActionCollision', 'COLLISION_TIMEOUT_S', 'objectAabb', 'standsOnAction', 'actionContact', 'triggerSurfaces', 'collider', 'CAPSULE_HEIGHT',
+    `const _wish = [0, 0];\n${src}\nreturn collisionTriggers;`)(world.actions, walkHears, hasActionCollision, COLLISION_TIMEOUT_S, objectAabb, standsOnAction, actionContact, world.triggerSurfaces, world.collider, CAPSULE_HEIGHT);
+}
+/** worldModes.js's dungeon arm: where a relay's Teleport lands the body. */
+function hostLanding(ctx, player, cam) {
+  const WM = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
+  const at = WM.indexOf('      ctx.actions.onTeleport = ({ pos }) => {');
+  assert.ok(at > 0, 'the host\'s teleport landing');
+  // eslint-disable-next-line no-new-func
+  new Function('ctx', 'player', 'cam', 'TELEPORT_FREEZE_S', WM.slice(at, WM.indexOf('      };', at) + 8))(ctx, player, cam, TELEPORT_FREEZE_S);
+}
+
 /** The build, registered as the host registers it: the models' collision, the position index (P10) and every acting
  *  flat through registerFlatAction's arms - its box the billboard's (TEXTURE's own size). */
 function build(data, loc) {
@@ -69,6 +90,26 @@ function build(data, loc) {
   return { d, collider, triggerSurfaces, actions, roots, start: floorLanding(collider, [sm.x, sm.y + 1.08, sm.z]) };
 }
 
+/** Hold Forward from `from` toward `target`, in the host's frame order (motor, collision pass with a move held, the
+ *  actions' update); answers where a teleport landed the body, or null. */
+function walkUnder(world, from, target) {
+  const player = new PlayerMotor(world.collider), cam = { pos: [0, 0, 0], yaw: 0 }, ctx = { actions: world.actions };
+  hostLanding(ctx, player, cam);
+  let landed = null;
+  const land = ctx.actions.onTeleport;
+  ctx.actions.onTeleport = (dest) => { landed = [...dest.pos]; land(dest); };
+  const pass = hostPass(world);
+  player.spawn(...from);
+  for (let f = 0; f < 30; f++) player.update(FIXED_DT, { forward: 0, strafe: 0 }, 0);
+  const yaw = Math.atan2(target[0] - player.pos[0], target[2] - player.pos[2]);
+  for (let f = 0; f < 60 * 3 && !landed; f++) {
+    player.update(FIXED_DT, { forward: 1, strafe: 0, run: false, jump: false }, yaw);
+    pass(FIXED_DT, [player.pos[0], player.pos[1], player.pos[2]], true, player.height, { yaw, forward: 1, strafe: 0 });
+    world.actions.update?.(FIXED_DT);
+  }
+  return landed;
+}
+
 test('FLAT-WALK: Edworyan Laboratory as the online room builds it - every hanging root walked under from every clear bearing hears nothing and moves nobody, and a click on one still lands the body beside the start (mutants: the pass back on hasActionCollision, walkHears blind to flats)', { skip: SKIP }, (t) => {
   const data = loadData(ARENA2);
   const loc = data.maps.getLocationByName('Daggerfall', 'Edworyan Laboratory');
@@ -76,6 +117,28 @@ test('FLAT-WALK: Edworyan Laboratory as the online room builds it - every hangin
   assert.equal(world.d.blocks.find((b) => b.isStartingBlock)?.name ?? world.d.blocks[0].name, 'N0000014.RDB', 'the online build starts in N0000014');
   const roots = world.roots.filter((r) => r.o.triggerFlag === TRIGGER_FLAGS.MultiTrigger && r.art.startsWith('213.'));
   assert.equal(roots.length, 6, `the six roots: ${roots.map((r) => `${r.block}#${r.o.positionKey} ${r.art}`).join(', ')}`);
+  let walks = 0;
+  for (const r of roots) {
+    const c = world.collider;
+    const down = c.raycast(r.at, [0, -1, 0], 8);
+    assert.ok(Number.isFinite(down), `root #${r.o.positionKey} hangs over a floor`);
+    const floorY = r.at[1] - down;
+    let mine = 0;
+    for (const dist of [1.6, 2.4, 3.2]) for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2, dx = Math.sin(a), dz = Math.cos(a);
+      const p = [r.at[0] + dx * dist, floorY + 0.6, r.at[2] + dz * dist];
+      const fd = c.raycast(p, [0, -1, 0], 2);
+      if (!Number.isFinite(fd) || Math.abs((p[1] - fd) - floorY) > 0.35) continue;   // no floor there
+      const back = c.raycast([p[0], floorY + 0.9, p[2]], [-dx, 0, -dz], dist + 0.5);
+      if (Number.isFinite(back) && back < dist - 0.3) continue;   // a wall between
+      for (const o of world.actions.objects.values()) o._colTimer = undefined;
+      assert.equal(walkUnder(world, [p[0], floorY + 0.05, p[2]], r.at), null, `walked under root #${r.o.positionKey} from bearing ${k} at ${dist} m: sent to the entrance`);
+      mine++;
+    }
+    assert.ok(mine >= 2, `root #${r.o.positionKey}: ${mine} clear ways in`);
+    walks += mine;
+  }
+  assert.ok(walks >= 24, `${walks} walks`);
   // a click (DFU's PlayerActivate: Direct) on a root is heard, and lands the body by the start marker
   const sent = [];
   world.actions.onTeleport = (dest) => sent.push(dest.pos);
@@ -84,4 +147,5 @@ test('FLAT-WALK: Edworyan Laboratory as the online room builds it - every hangin
   assert.equal(sent.length, 1, 'clicked, sent on');
   const gap = Math.hypot(sent[0][0] - world.start[0], sent[0][2] - world.start[2]);
   assert.ok(gap < 2, `beside the start (${gap.toFixed(2)} m)`);
+  t.diagnostic(`${roots.length} roots, ${walks} walks under them, none heard; a click lands ${gap.toFixed(2)} m from the start (${roots.map((r) => `${r.block}#${r.o.positionKey}`).join(' ')})`);
 });

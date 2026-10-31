@@ -60,6 +60,18 @@ test('BAY-LEFT-B HOUSES: a deed past the Bay stands in the town it was bought in
   assert.equal(deedHeldIn(houses[SKYRIM], ARENA_B), false);
 });
 
+/** worldModes.js currentHousesForSale, run off its own text - the gate and the market over a town's directory. */
+function currentHousesForSaleOf(dir) {
+  const W = rd('src/scenes/worldModes.js');
+  const from = W.indexOf('  function currentHousesForSale() {');
+  const to = W.indexOf('  /**\n   * H2 - GetHousePrice', from);
+  assert.ok(from > 0 && to > from, 'worldModes.js\'s market moved');
+  // PIN MOVED (HOUSES-3): the market leaves the player's own deeds off it (houseOwnedAt, the town buildings' one door)
+  const fn = new Function('buildingDirectory', 'isEtherPlaceId', 'housesForSale', 'worldMinutes', 'MINUTES_PER_DAY', 'DAYS_PER_MONTH', 'questBridge', 'houseMeshRadius', 'host', 'houseOwnedAt',
+    `${W.slice(from, to)} return currentHousesForSale();`);
+  return fn(() => dir, isEtherPlaceId, housesForSale, () => 0, MINUTES_PER_DAY, DAYS_PER_MONTH, null, () => 1, { onlineHomes: null }, () => false);
+}
+
 /** A town's directory as the world host's buildingDirectory makes it (scenes/world.js): its buildings with their keys, off
  *  its laid blocks (talkTopics.js locationBuildings). */
 const directoryOf = (loc) => ({ mapId: loc.mapTableData.mapId >>> 0, locationName: loc.name,
@@ -84,14 +96,38 @@ test('BAY-LEFT-B HOUSES: houses are for sale in an Arena town, a country town an
   const hamlet = countryTemplates(w.rows, isMainStoryDungeon).get(LOCATION_TYPES.TownHamlet)[0];
   const country = synthesizeCountryLocation(hamlet, { px: 1700, py: -398, type: LOCATION_TYPES.TownHamlet, name: 'Riverwood' }, { regionIndex: SKYRIM, regionName: 'Skyrim', politic: 128 + SKYRIM });
   const solitude = P.standAt(1569, -430);
+  for (const loc of [arena, country, solitude]) {
+    assert.ok(loc, 'a town past the Bay stands');
+    assert.equal(isMadePlaceId(loc.mapTableData.mapId), true, loc.name);
+    const dir = directoryOf(loc);   // the world host's buildingDirectory: its buildings with their keys
+    const forSale = currentHousesForSaleOf(dir);
+    assert.ok(forSale.length > 0, `${loc.name}: houses for sale`);
+    assert.deepEqual(forSale, housesForSale(dir.buildings, { mapId: dir.mapId, month: 0, isActiveQuestBuilding: () => false, stands: () => true }), 'the one producer\'s list');
+    const gift = receiveHouseDecision({ rank: 9, flags: 0 }, { ownsHouse: false, housesForSale: forSale, rolls: () => 0 });
+    assert.equal(gift.kind, 'grant', `${loc.name}: a knight's house given`);
+    // bought, deeded and owned there - and only there
+    const houses = createHouses(BANK_REGION_COUNT);
+    allocateHouseToPlayer(houses, SKYRIM, { buildingKey: gift.house.buildingKey, mapId: dir.mapId, location: loc.name }, { regionName: 'Skyrim' });
+    assert.equal(isHouseOwned(houses, SKYRIM, gift.house.buildingKey, dir.mapId), true, `${loc.name} key ${gift.house.buildingKey} stands ${JSON.stringify(houses[SKYRIM])}`);
+  }
   assert.notEqual(arena.mapTableData.mapId, country.mapTableData.mapId);
+  // the isles' (AUDIT CAPTAIN'S SEA P9, recorded): no region's slot of their own
+  assert.deepEqual(currentHousesForSaleOf({ ...directoryOf(arena), mapId: etherPlaceId(veilhaven()) }), []);
   // the Bay's town: the same market as ever
   const daggerfall = w.maps.getLocationByName('Daggerfall', 'Daggerfall');
   const bayDir = directoryOf(daggerfall);
   assert.ok(bayDir.buildings.length > 100);
+  assert.deepEqual(currentHousesForSaleOf(bayDir), housesForSale(bayDir.buildings, { mapId: bayDir.mapId, month: 0, isActiveQuestBuilding: () => false, stands: () => true }));
 });
 
 test('BAY-LEFT-B HOUSES: the deed\'s readers name the town asking - the building where it stands, the quest world\'s residences - and online homes key by the town\'s map id in any region, so both ends agree (mutants: the town dropped at a reader)', () => {
+  const M = rd('src/scenes/worldModes.js'), W = rd('src/scenes/world.js');
+  assert.match(M, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\);/);
+  assert.match(M, /if \(isEtherPlaceId\(dir\.mapId\)\) return \[\];\n\s+return housesForSale\(dir\.buildings, \{/);
+  assert.match(W, /return !isEtherPlaceId\(id\) && isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \},/);
+  // PIN MOVED (HOUSES-3): the bank's resolver over the region's three is banking.js townDeeds
+  assert.match(M, /const townHouses = \(\) => townDeeds\(playerEntity\.houses \?\? \[\], bankRegion\(\), buildingDirectory\?\.\(\)\);/);
+  assert.match(rd('src/systems/banking.js'), /\.filter\(\(deed\) => deedStands\(deed\) && deedHeldIn\(deed, dir\.mapId\)\)/, 'the bank sells it in its own town');
   // HOME1: the account's deed of a knight's house past the Bay - its region's slot, held to its town's map id
   assert.equal(homeRegionOk(SKYRIM), true);
   assert.equal(homeMapIdOk(ARENA_A), true);

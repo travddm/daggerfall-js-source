@@ -236,6 +236,15 @@ test('PICKUP-FEED: the feed stands on the mid-screen line when the band allows; 
 test('PICKUP-FEED: the keep-outs name the surfaces they mean - the plaque, its stats, the act\'s panel above; the HUD\'s bottom block and the prompt below (a renamed class fails here, not on a screen)', () => {
   assert.deepEqual([...PICKUP_KEEP_ABOVE], ['.wplaque.on', '.wplaque.on .wplaque-stats', '.prof-meter:not([hidden])']);
   assert.deepEqual([...PICKUP_KEEP_BELOW], ['.hud .hud-bottom', '.prof-prompt']);
+  const plaque = rd('src/ui/worldPlaque.js');
+  assert.match(plaque, /node\.className = 'wplaque';/);
+  assert.match(plaque, /n\.classList\.add\('on'\);/);
+  assert.match(plaque, /panel\.className = 'wplaque-stats';/);
+  const prof = rd('src/ui/professions/profHud.js');
+  assert.match(prof, /mk\('prof-meter'\)/);
+  assert.match(prof, /mk\('prof-prompt'\)/);
+  assert.match(prof, /meter\.hidden = true;/);
+  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /hud-bottom/);
 });
 
 // ── THE TAKE'S SEAM ──────────────────────────────────────────────

@@ -179,6 +179,9 @@ test('QS2 (re-aimed by KB1): the enhanced pane draws the quickslots under their 
   const all = ACTION_GROUPS.flatMap((x) => x.rows.map((r) => r.action));
   assert.equal(new Set(all).size, all.length, 'none twice');
   assert.deepEqual([...all, ...HIDDEN_ACTIONS].sort(), [...ACTIONS].sort(), 'and none missing');
+  assert.match(rd('src/ui/enhanced/enhancedControls.js'),
+    /for \(const grp of shownGroups\(\)\) group\(body, grp\.title, grp\.rows\.map\(\(r\) => \[r\.action, r\.label\]\)\);/,
+    'the groups are RENDERED, not merely declared');
 });
 
 // ── THE ROUTE ────────────────────────────────────────────────────────
@@ -221,6 +224,13 @@ test('QS2: routeAction sends each action to its ctx door with the slot number, a
   // hold stay edge actions, because there the down edge is the whole press.
   for (const a of HOLD) assert.ok(POLLED_ACTIONS.has(a), `${a} holds, so the frame owns it`);
   for (const a of QS) if (!HOLD.includes(a)) assert.ok(!POLLED_ACTIONS.has(a), `${a} does not hold, so it is an edge action`);
+  const src = rd('src/ui/input.js');
+  // AUDIT CONTRIB H1: each arm stands down first while the hotbar is in force (the diamond put away)
+  assert.match(src, /case 'QuickUse1': return !hotbarInForce\(\) && ctx\.quickUse\?\.\(1\) === true;/);
+  assert.match(src, /case 'QuickUse2': return !hotbarInForce\(\) && ctx\.quickUse\?\.\(2\) === true;/);
+  assert.match(src, /case 'QuickSwap': return !hotbarInForce\(\) && ctx\.quickSwap\?\.\(\) === true;/);
+  assert.match(src, /case 'QuickOffHand': return !hotbarInForce\(\) && ctx\.quickOffHand\?\.\(\) === true;/);
+  assert.match(src, /case 'QuickSpell': return !hotbarInForce\(\) && ctx\.quickSpell\?\.\(\) === true;/);
   assert.deepEqual([...QUICKSLOT_ACTIONS].sort(), [...QS].sort(), 'and the set the self-routing hosts read is the same five');
 });
 
@@ -237,9 +247,137 @@ const HOSTS = Object.freeze([
   ['src/scenes/worldModes.js', 'the interior mode'],
 ]);
 
+test('QS2: every host ctx that carries toggleSheath carries quickUse, quickSwap and quickOffHand - the AUDIT SOC B4/D1 walk (mutants: a door dropped from one host, so the keys die in a shop or underground)', () => {
+  for (const [path, what] of HOSTS) {
+    const src = rd(path);
+    assert.match(src, /toggleSheath/, `${path} really is a host that answers gameplay keys`);
+    assert.match(src, /quickUse/, `${path} (${what}) has no quickUse door`);
+    assert.match(src, /quickSwap/, `${path} (${what}) has no quickSwap door`);
+    assert.match(src, /quickOffHand/, `${path} (${what}) has no quickOffHand door`);
+    assert.match(src, /quickSpell/, `${path} (${what}) has no quickSpell door`);   // QS6
+    // QS6: and the HOLD machine reaches every one of them - a host that never
+    // ticks it is a host where the three polled keys do nothing at all, which
+    // is the AUDIT SOC B4/D1 trap wearing a new hat.
+    assert.match(src, /tickQuickslotHold|tickQuickHold/, `${path} (${what}) never drives the hold machine`);
+  }
+  // The three that OWN a performer call the model; none of them writes a
+  // second use ladder or a second equip.
+  for (const path of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
+    const src = rd(path);
+    assert.match(src, /import \{ useQuickslot, swapQuickslot, offHandQuickslot, spellQuickslotPress, offHandOffersSwap, tickQuickslotHold \} from '\.\.\/systems\/quickslots\.js';/, `${path} takes the model's performers`);
+    // QS6: the spell's ready is the CAST ENGINE's, asked through the model.
+    assert.match(src, /spellQuickslotPress\(\{ entity: playerEntity, magic, say:/, `${path}: the spell slot presses the one engine`);
+    // QS6: and the off hand presses the SWAP when that is what the cell shows.
+    assert.match(src, /if \(offHandOffersSwap\(playerEntity\)\) return quickSwap\(\);/, `${path}: the key does what the cell shows`);
+    // The tap performs, the hold cycles - the model's split, named in the host.
+    assert.match(src, /onTap: \(slot\) => \(slot === 'spell' \? quickSpell\(\) : quickUse\(slot === 'c1' \? 1 : 2\)\),/, `${path}: the tap is the host's performer`);
+    // QS4: and the off hand's light is the MOD's act, reached through the rig's
+    // one door - no host lights a torch itself.
+    assert.match(src, /offHandQuickslot\(\{ entity: playerEntity, say: [^\n]*toggleLight: \(\) => weaponRig\.toggleLight\(\) \}\);/s, `${path}: the off hand is the model's, on the rig's door`);
+    assert.match(src, /useQuickslot\(n === 1 \? 'c1' : 'c2', \{/, `${path}: the slot number picks the slot`);
+    assert.match(src, /swapQuickslot\(\{ entity: playerEntity, say:/, `${path}: the swap is the model's`);
+    assert.match(src, /weaponRig\.refreshWorn\(\);/, `${path}: and the rig is told at once`);
+    // THE HOOKS ARE THE WINDOW'S OWN BAG, not a second one written beside it -
+    // U53's one-builder law, which is what makes a potion drunk from the key
+    // and a potion drunk from the Use button the same potion. The bag is named
+    // `useHooks` in every host and the inventory builder spreads the same one.
+    // DISC21-C: the world host's bag takes the rig in the player's hands (an empty press reads it)
+    assert.match(src, /hooks: (\{ \.\.\.useHooks[^}]*\}|quickslotHooks\((?:rig)?\))/, `${path}: the quickslot use takes the host's own bag`);
+    assert.match(src, /const useHooks = \{/, `${path}: and there is exactly one of it`);
+    assert.equal((src.match(/const useHooks = \{/g) ?? []).length, 1, `${path}: exactly one bag, not two`);
+    assert.match(src, /\.\.\.useHooks,/, `${path}: which the inventory builder takes too`);
+  }
+  // The INTERIOR mode borrows the outer host's performer and refreshes its OWN
+  // rig - the one place the two halves differ, and the reason it is written out.
+  const wm = rd('src/scenes/worldModes.js');
+  // DISC21-C: with THIS mode's rig, which is the hand an empty press reads
+  assert.match(wm, /quickUse\(n\) \{ return host\.quickUse\?\.\(n, interiorWeapon\) === true; \},/);
+  assert.match(wm, /const ok = host\.quickSwap\?\.\(interiorWeapon\) === true;[^\n]*\n\s*if \(ok\) interiorWeapon\.refreshWorn\(\);/,
+    'the interior rig is the one this mode draws, so it is the one told');
+  // QS4: and its light is that rig's too - the outer host's door would toggle
+  // the wrong one, which is the same B4/D1 lesson one hand over.
+  assert.match(wm, /toggleLight: \(\) => interiorWeapon\.toggleLight\(\)/);
+  // QS6: the spell is the OUTER host's, like the use - the cast engine indoors
+  // IS that host's `magic`, so a second performer here would ready on a second
+  // engine. And the hold machine is driven PER MODE, because underground the
+  // parts it needs are the dungeon context's.
+  assert.match(wm, /quickSpell\(\) \{ return host\.quickSpell\?\.\(\) === true; \},/);
+  assert.match(wm, /if \(mode === 'dungeon'\) dungeonCtx\?\.tickQuickHold\?\.\(dt, \{ isHeld: \(a\) => held\(keys, a\), blocked: overlayHeld \}\);/);
+  // AUDIT QS6 F6: above its own `walkMode && !overlayHeld` gate, so `blocked`
+  // is a live argument rather than a dead one.
+  assert.match(rd('src/scenes/dungeon.js'), /ctx\.tickQuickHold\?\.\(dt, \{ isHeld: \(a\) => held\(keys, a\), blocked: overlayHeld \|\| !walkMode \}\);/,
+    'the standalone ?dungeon page drives the same machine with its own keys');
+  for (const path of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
+    // DISC21-C: the use takes the mode's rig as the swap does (an empty press reads the hand it is in)
+    assert.match(rd(path), /quickUse: \(n, rig\) => quickUse\(n, rig\),[^\n]*\n\s*quickSwap: \(rig\) => quickSwap\(rig\),/g,
+      `${path} hands the performers down to the mode machine as well as onto its own ctx`);
+    assert.match(rd(path), /quickSpell: \(\) => quickSpell\(\),/, `${path} hands the spell door down too`);
+    assert.equal((rd(path).match(/quickUse: \((?:n|n, rig)\) => quickUse\((?:n|n, rig)\),/g) ?? []).length, 3,   // DISC21-C: two take the rig
+      `${path}: on hudCtx (the key ladder), on the host bag (the interior mode), and on drawHud (QS4: the phone's tap)`);
+  }
+});
+
+test('QS2 + QS7: the two self-routing hosts answer the dispatchable quickslots in EXTERIOR mode, under the overlay gate - the modal ladders own the key where they are mounted (mutants: the mode gate dropped so a tavern fires both ladders and the torch douses then re-ignites; the overlay gate dropped so 1 drinks a potion while a window is typing)', () => {
+  // scenes/world.js: beside SOC5's own arm, which is the one that had to be
+  // moved here after the fact.
+  const w = rd('src/scenes/world.js');
+  // QS6: ...and DECLINES the polled three, or the down edge would drink the
+  // potion the hold was about to choose. This ladder never calls routeKey, so
+  // routeKey's own POLLED_ACTIONS arm never reaches it - WEAPON-VIS2's lesson
+  // at a second door.
+  // QS7 (2026-09-17) REVERSED THIS PIN'S OWN CLAUSE, and the reason is
+  // the whole finding: the arm stood above the mode gate because the
+  // modal contexts had no quickslot doors, and QS4 gave them the whole
+  // set without anyone coming back here. Two ladders then answered one
+  // key - the outer host's and worldModes' - and because the mod's
+  // off-hand toggle is a FLIP, a Digit4 in a tavern doused the torch and
+  // re-lit it in the same press. The law it was defending (a quickslot
+  // works in a tavern and in a dungeon) is UNCHANGED and now held by the
+  // modal ladder; what changed is which ladder holds it.
+  // test/systems/qs7_one_dispatch.test.js drives the flip and proves the doors.
+  // MAC-R2 (2026-09-17): the arm routes the press edge alone and eats a held key's auto-repeat - test/ui/enhanced/macr_fixes.test.js
+  const wArm = /if \(!townTalk\.overlayActive && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && QUICKSLOT_ACTIONS\.has\(act\) && !POLLED_ACTIONS\.has\(act\) && socialMenuCanOpen\(\)\) \{ if \(!e\.repeat && routeAction\(act, hudCtx\)\) \{ e\.preventDefault\(\); return true; \} if \(e\.repeat\) \{ e\.preventDefault\(\); return true; \} \}/;
+  assert.match(w, wArm);
+  const social = w.indexOf("act === 'SocialInteract' && socialMenuCanOpen()");
+  const mine = w.search(wArm);
+  assert.ok(social > 0 && mine > 0);
+  assert.ok(mine > social, 'it stands beside the social door, whose note carries the lesson');
+  // ...and the social arm keeps NO mode gate: the modal contexts carry
+  // no socialInteract, so F has no second answer to collide with and
+  // AUDIT SOC B4/D1's finding stands exactly as it was.
+  const socialLine = w.split('\n').find((l) => l.includes("act === 'SocialInteract'"));
+  assert.ok(!/\(modes\?\.mode \?\? 'exterior'\) === 'exterior'/.test(socialLine), 'F still answers inside');
+  // scenes/exterior.js: the same place, its own gate words.
+  const x = rd('src/scenes/exterior.js');
+  const xArm = /if \(!townTalk\.overlayActive && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && QUICKSLOT_ACTIONS\.has\(act\) && !POLLED_ACTIONS\.has\(act\) && !gamePaused\(\)\) \{ if \(!e\.repeat && routeAction\(act, hudCtx\)\) \{ e\.preventDefault\(\); return true; \} if \(e\.repeat\) \{ e\.preventDefault\(\); return true; \} \}/;   // MAC-R2
+  assert.match(x, xArm);
+  // The two hosts that call routeKey need no arm at all - routeKey's own
+  // overlay branch and its routeAction tail are the gate and the door.
+  for (const path of ['src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
+    assert.match(rd(path), /routeKey\(/, `${path} routes through routeKey, so it inherits the table`);
+    assert.doesNotMatch(rd(path), /QUICKSLOT_ACTIONS/, `${path} must not grow a second ladder for these`);
+  }
+});
+
 // ── THE MODEL'S OWN IMPORTS ──────────────────────────────────────────
 
 test('QS2: the quickslot model imports no UI window - the cycle that killed five test files the moment anything imported it (mutant: USE_PENDING taken from ui/native/nativeInventory.js again)', () => {
+  // QS1 read the classic window's USE_PENDING table straight out of
+  // ui/native/nativeInventory.js. Nothing imported the quickslots yet, so the edge
+  // was invisible; this slice imports them from the enhanced pack and from
+  // four hosts, and that closed a cycle through ui/targetIconPanel.js -
+  // droppedloot, interiordrop, targeticonpanel, audit26_questitem and x11b all
+  // died on `Cannot access 'LOCAL_TARGET_ICON_RECT' before initialization`.
+  // The table lives beside the result KINDS it is keyed by now
+  // (systems/useItem.js), and the window re-exports it, so every reader still
+  // reads the same words.
+  const src = rd('src/systems/quickslots.js');
+  const imports = [...src.matchAll(/from '([^']+)';/g)].map((m) => m[1]);   // the multi-line one counts too
+  assert.ok(imports.length >= 4, 'the model really does import things');
+  for (const i of imports) assert.ok(!i.includes('/ui/'), `systems/quickslots.js must not import a UI module (${i})`);
+  assert.ok(imports.includes('./useItem.js'), 'the use ladder, which is where the stand-in words now live');
+  assert.match(rd('src/systems/useItem.js'), /export const USE_PENDING = Object\.freeze\(\{/);
+  assert.match(rd('src/ui/native/nativeInventory.js'), /export \{ USE_PENDING \};/, 'and the window re-exports it, so its own readers are untouched');
   // The words themselves are one table, read three ways.
   assert.equal(USE_PENDING_UI, USE_PENDING_SYS, 'the window and the ladder hand out the same frozen object');
 });

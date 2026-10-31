@@ -115,6 +115,13 @@ test('VC6b: the deck sees the sun past the ground\'s horizon, and the light it t
   // the geometry, by value - a degree and a half for this slab
   assert.equal(EARTH_RADIUS_M, 6371000);
   assert.ok(Math.abs(horizonDip(2300) * 180 / Math.PI - 1.54) < 0.01, `1.54 degrees: ${horizonDip(2300) * 180 / Math.PI}`);
+  // THE PALETTE. The clouds used to be a quarter of the way to night by
+  // the time the sun touched the horizon, and only a quarter of the way
+  // to the sun's own colour. Both are the hour Mac is describing.
+  const s = readFileSync(join(ROOT, 'src/render/enhancedSky.js'), 'utf8');
+  assert.match(s, /const twilight = clamp01\(\(elevDeg \+ 9\) \/ 10\);/, 'full colour at the horizon, night over the civil twilight that follows');
+  assert.match(s, /const lit = mix3\(nightLit, mix3\(cloudLitDay, pal\.sun, 0\.55 \* lowSun\), twilight\);/, 'over half the way to the sun\'s colour at a low sun');
+  assert.match(s, /const shade = mix3\(nightShade, mix3\(cloudShadeDay, pal\.glow, 0\.30 \* \(1 - clamp01\(elevDeg \/ 12\)\)\), twilight\);/, 'and the shaded side takes the horizon\'s glow');
   // BY VALUE, on the real clock. At noon nothing moved; at the horizon
   // the cloud is amber and warmer than its own weather row.
   const noon = skyState({ minuteOfDay: 720, weather: 'sunny' });
@@ -143,6 +150,7 @@ test('VC6b: the march\'s three low-sun terms are weighted by how low the sun is,
   assert.match(MARCH_FS, /float low = uDusk;/, 'the march is handed the weight, it does not derive one');
   assert.doesNotMatch(MARCH_FS, /smoothstep\([^)]*uLightDir/, 'and never takes it off the light\'s direction');
   assert.ok(MARCH_UNIFORMS.includes('uDusk'));
+  assert.match(read('src/render/volumetricClouds.js'), /gl\.uniform1f\(u\.uDusk, duskWeight\(s\.sunDir\[1\], light\.day\)\);/, 'the SUN\'s y and the SUN\'s weight - neither is the light\'s');
   assert.equal(duskWeight(0.8, 1), 0, 'noon: nothing');
   assert.ok(duskWeight(0, 1) > 0.95, 'the sun on the horizon: the whole of it');
   assert.ok(duskWeight(0.09, 1) > 0.5 && duskWeight(0.09, 1) < 0.9, 'five degrees up: most of it');
@@ -164,6 +172,10 @@ test('VC6b: the march\'s three low-sun terms are weighted by how low the sun is,
   // every one of them is dead at noon: low is 0 for any sun above 0.30
   assert.ok(MARCH_FS.includes('uniform vec3 uSkyTint;'), 'the zenith is a uniform of the march');
   assert.ok(MARCH_UNIFORMS.includes('uSkyTint'), 'and its location is fetched');
+  assert.match(read('src/render/volumetricClouds.js'), /gl\.uniform3fv\(u\.uSkyTint, s\.zenith\);/, 'from the dome\'s own zenith - one palette, two readers');
+  // and the controller hands the light the SLAB it falls on, or the dip
+  // would be the default 2300 m for a storm's 4200 m tops as well
+  assert.match(read('src/render/volumetricClouds.js'), /const light = cloudLight\(s, p\);   \/\/ VC6b:/, 'the eased profile, not nothing');
   // the underside, by its own pin: a low sun lights it
   assert.match(MARCH_FS, /float sideLit = mix\(h, 0\.25 \* h \+ 0\.75, low\);   \/\/ VC6b: top-lit by day, whole-lit at dusk/);
   // the SHADOW march takes none of it: a shadow is a transmittance, and
@@ -176,14 +188,45 @@ test('VC6b: the march\'s three low-sun terms are weighted by how low the sun is,
 // ═══════════════════════════════════════════════════════════════════════
 
 test('VC6c: a sun behind a bank throws no shafts - the gate is the cloud shadow at the player\'s own feet', () => {
+  const air = read('src/render/airPass.js');
+  // THE BUG: the mask was sky depth alone, so anything at the far plane
+  // near the sun's screen position was a light source, cloud or no cloud.
+  assert.match(air, /float sky = depthAt\(uv\) >= 0\.99999 \? 1\.0 : 0\.0;/, 'the mask still finds the sky');
+  assert.match(air, /float through = cloudShadowAt\(uEye\);/, 'and now asks how much sun reaches the player at all');
+  assert.match(air, /return uSunColor \* \(acc \/ \$\{AIR_SHAFT_TAPS\}\.0 \* uShaftParams\.y \* through \* through\);/, 'squared: a shaft needs a BEAM, so half the sun is a quarter of the rays (VC7b: the beams\' own function, the gate unchanged)');
+  assert.match(air, /\$\{CLOUD_SHADOW_GLSL\}/, 'the same block the ground reads - one field, three consumers');
+  assert.match(air, /uniform vec3 uEye;/);
+  assert.match(air, /shaft: P\(QUAD_VS, SHAFT_FS, \['uDepth', 'uSun', 'uShaftParams', 'uSunColor', 'uProjInfo', 'uRect', 'uCanvas', 'uEye', 'uCloudShadowMap', 'uCloudShadowRect', 'uSunOn', 'uViewRot', 'uCloudSky', 'uCloudSkyOn', 'uLightDir', 'uHaze'\]\)/, 'every uniform it declares has its location fetched (VC7b: the sky map and the haze)');
+  assert.match(air, /gl\.uniform3fv\(S\.uEye, f\.eye\);/);   // VC7b: S is this.programs.shaft
+  assert.match(air, /gl\.uniform4fv\(S\.uCloudShadowRect, deck\?\.rect \?\? this\._noDeck\);/);
+  assert.match(air, /const S = this\.programs\.shaft;/, 'S is the shaft program');
+  // ═══ THE DECK IS READ AT THE RESOLVE, NEVER AT PREPARE ═════════════
+  // beginFrame CLEARS the deck (a deck is a frame's, so an interior never
+  // inherits the last exterior's map) and `prepare` runs inside
+  // beginFrame, a moment after that clear - while both exterior hosts set
+  // the frame's deck AFTER beginFrame returns. The first cut of VC6c took
+  // it as a prepare input and was handed null every frame of the real
+  // game: the gate could never have fired. No pin could see it - the pins
+  // drive no frame - and the field probe did (tools/vc6ShaftProbe.mjs).
+  assert.doesNotMatch(air, /f\.cloudShadow/, 'never a prepare input');
+  assert.match(air, /setCloudShadow\(deck\) \{ this\.cloudShadow = deck \?\? null; \}/);
+  assert.match(air, /const deck = this\.cloudShadow;/, 'the shafts read what the resolve set');
+  const r = read('src/render/renderer.js');
+  assert.match(r, /this\._air\.setCloudShadow\(this\._cloudShadow \?\? this\._deckOwed\);[^\n]*\n\s*this\._air\.composite\(\);/, 'set at the resolve, immediately before the images are drawn');
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const src = read(h);
     assert.ok(src.indexOf('renderer.beginFrame(') < src.indexOf('renderer.setCloudShadow('), `${h}: the host sets the deck AFTER beginFrame - which is the whole reason the resolve is where it must be read`);
   }
+  // and a frame that drew no screen quad resolves at the TOP of the next
+  // one, by which time beginFrame has cleared the deck - so the cleared
+  // deck is held exactly that long, and dropped the instant it is spent
+  assert.match(r, /if \(this\._cloudShadow\) \{ this\._deckOwed = this\._cloudShadow; this\._cloudShadow = null; this\._csStamp\+\+; \}/);
+  assert.match(r, /if \(this\._air\?\.pending && !this\._panelSaved\) this\._compositeAir\(\);\s*\n\s*this\._deckOwed = null;/, 'dropped the instant the owed image is drawn, so the next frame can only read its own host\'s deck');
   // OFF IS FREE. No deck - the classic skin, every interior, ?clouds=off -
   // means an amount of 0, and the block's own first line answers full sun
   // before it samples anything. The pass is exactly what it was.
   assert.match(CLOUD_SHADOW_GLSL, /if \(uCloudShadowRect\.w <= 0\.0\) return 1\.0;/);
+  assert.match(air, /this\._noDeck = new Float32Array\(\[0, 0, 0, 0\]\);/, 'and that is what a missing deck uploads');
 
 });
 
@@ -232,3 +275,20 @@ test('VC6d: the march strides over empty air and walks the cloud\'s EDGE fine, a
   assert.match(shadowBody, /sum \+= density\(p, 0\.5\) \* ds;\s*\n\s*t \+= ds;/, 'one fixed step, as it always was');
 });
 
+test('VC6d: the frame\'s spans TILE it - every mark hands the clock straight to the next, so the zones sum to the frame', () => {
+  const r = read('src/render/renderer.js');
+  const shared = read('src/scenes/shared.js');
+  // shadow -> world -> (sky -> world) -> air -> stop. Every span begins
+  // where the last ended; nothing is counted twice and nothing is lost
+  // between them, which is the only reason the total in the line is true.
+  assert.match(r, /this\._perf\.begin\(\); this\._perf\.mark\('shadow'\);/);
+  assert.match(r, /this\._perf\?\.mark\('world'\);[^\n]*\n\s*sp\.discard\(\);/, 'the passes end where the world\'s draws begin');
+  assert.match(r, /this\._perf\?\.mark\('air'\);[^\n]*\n[^\n]*\n\s*this\._air\.composite\(\);/, 'the air\'s span opens before its images are drawn (VC6c\'s deck is set between the two)');
+  assert.match(r, /this\._perf\.end\(\);\s*\n\s*this\._perf\.stop\(\);/, 'and the last span closes with the frame');
+  assert.match(shared, /meter\?\.mark\('sky'\);/); assert.match(shared, /meter\?\.mark\('world'\);/);
+  assert.equal((shared.match(/meter\?\.mark\(/g) || []).length, 2, 'the sky takes its span and hands the frame back - it does not keep it');
+  // the meter is found by the GL the host already holds: no renderer is
+  // threaded into scenes/shared.js for a readout
+  assert.match(shared, /import \{ meterFor \} from '\.\.\/render\/perfMeter\.js';/);
+  assert.doesNotMatch(shared, /new PerfMeter\(/, 'one meter a context, and the renderer builds it');
+});

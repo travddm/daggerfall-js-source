@@ -331,8 +331,10 @@ test('AUDIT WK-P1 (major): realm customs and the account service\'s first save c
 });
 
 test('AUDIT WK-P2 (major): a tap never locks onto my companion in any host - a building\'s and the world dungeon\'s tap arms pass him by as the street\'s does (COMPANION-KIT): indoors a finger\'s tap locked onto him, ate the press (no pack on a phone indoors) and turned the camera to him; a foe behind him still locks; the street\'s, a building\'s and the world dungeon\'s arms pinned by source; the companion layer is world.js\'s alone, so those three are every arm that can meet him (mutants: the building\'s filter dropped, the dungeon\'s dropped)', () => {
+  const wm = rd('src/scenes/worldModes.js'), w = rd('src/scenes/world.js');
   // the shipped arms, cut out of the shipped source and run (audit62_touch's own method)
   const cut = (src, start) => { const i = src.indexOf(start); assert.ok(i >= 0, `the arm moved: ${start}`); const j = src.indexOf('\n    }\n', i); return src.slice(i, j + 6); };
+  const arms = { building: cut(wm, 'if (host.activateDir?.() && interiorCtx) {'), dungeon: cut(wm, 'if (host.activateDir?.() && dungeonCtx) {') };
   const hilda = { companion: '42:Hilda', shipmate: true, dead: false, mobileType: 144, ai: { feet: [0, 0, 2], height: 1.8 }, entity: { name: 'Hilda', isClass: true, team: 'PlayerAlly' } };
   const rat = { dead: false, mobileType: 0, ai: { feet: [0, 0, 6], height: 1.8 }, entity: { name: 'Rat' } };
   const tap = (arm, pool) => {
@@ -343,6 +345,15 @@ test('AUDIT WK-P2 (major): a tap never locks onto my companion in any host - a b
       host, pickFoe, LOCK_PICK_DISTANCE, [0, 1.6, 0], [0, -0.2, 1], () => pool, { collider }, { foes: pool, collider });
     return { out, locked: lock.target?.entity?.name ?? null };
   };
+  for (const [where, arm] of Object.entries(arms)) {
+    assert.deepEqual(tap(arm, [hilda]), { out: 'fell through', locked: null }, `${where}: a tap on him locks nothing - the ladder below opens his pack`);
+    assert.deepEqual(tap(arm, [hilda, rat]), { out: true, locked: 'Rat' }, `${where}: the rat behind him locks`);
+    assert.deepEqual(tap(arm, [rat]), { out: true, locked: 'Rat' }, `${where}: a foe alone, as ever`);
+  }
+  // the three arms by source
+  assert.match(w, /pickFoe\(cam\.pos, useFwd, \[\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards\]\.filter\(\(f\) => f\.companion == null\), collider, LOCK_PICK_DISTANCE\)/, 'the street (COMPANION-KIT)');
+  assert.match(wm, /pickFoe\(eye, dir, interiorFoePool\(\)\.filter\(\(f\) => f\.companion == null\), interiorCtx\.collider, LOCK_PICK_DISTANCE\)/, 'a building');
+  assert.match(wm, /pickFoe\(eye, dir, dungeonCtx\.foes\.filter\(\(f\) => f\.companion == null\), dungeonCtx\.collider, LOCK_PICK_DISTANCE\)/, 'the world\'s dungeon');
   // the four hosts: the layer stands companions from world.js alone - exterior.js and dungeon.js stand none
   const standers = readdirSync(new URL('../../src/scenes/', import.meta.url), { recursive: true }).filter((f) => f.endsWith('.js') && f.split(/[\\/]/).pop() !== 'crewAshore.js' && rd(`src/scenes/${f}`).includes('createCrewAshore('));
   assert.deepEqual(standers, ['world.js'], 'a host that stands companions is a host whose tap arm must pass them by');

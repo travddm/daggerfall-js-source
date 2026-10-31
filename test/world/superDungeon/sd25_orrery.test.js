@@ -110,6 +110,8 @@ test('SD-LOOK S10 NO VISUAL LARGER THE LAW: every part of every stone - plinth, 
       || (Math.abs(r) <= SD_PLAQUE.w / 2 + M + e && Math.abs(o - 0.09) <= M + e && y >= SD_PLAQUE.post - M - e && y <= SD_PLAQUE.post + SD_PLAQUE.h + M + e)));
     assert.equal(bad.length, 0, `lectern ${k}: ${bad.length} points past its post and tablet`);
   }
+  // the lab draws the law over it (?law)
+  assert.match(read('src/tools/abyssLab.js'), /if \(lawMesh\) renderer\.drawMeshWire\(lawMesh, identity\(\), null\);/);
 });
 
 test('SD-LOOK S10 THE TURN PROBE: a turn heard sets its stone\'s hand going and its partners\' (the law\'s gearing, as every hand shows its stone) - and each CROWN GEAR moves exactly when its own hand moves, 2:1 against it, a proper turn; at rest none moves; IN MODE A NO RING MOVES on a turn, a partner\'s or any: the rings follow only their decor, never a stone (mutants: the gear 1:1; the gear with its hand\'s way; the gear ahead of its hand; a ring on its stone\'s hour; mode B switched on)', () => {
@@ -468,6 +470,29 @@ test('SD-LOOK S10 THE DIAL\'S FLOOR AND THE HALL\'S PARTS: twelve numerals raise
 });
 
 test('SD-LOOK S10 THE LAB: the Orrery\'s knobs stand the hall at any word from its own text - a stone\'s hour, a turn heard, a refusal, the snap, the Concord at a moment - and the law\'s solids as wire; the hall\'s halos and gem light in its frame', () => {
+  const L = read('src/tools/abyssLab.js');
+  for (const k of ['?hours=', '?turn=', '?refuse=', '?snap', '?concord=', '?cs=', '?law']) assert.ok(L.includes(`//   ${k}`) || L.includes(`?${k.slice(1)}`), `the header names ${k}`);
+  assert.match(L, /const hall = createSdHall\(\{ renderer, s: LAB_SLOT, now: \(\) => hallMs, clock: \(\) => clock, onTurn: \(\) => true \}\);/);
+  assert.match(L, /hall\.press\(sdStoneKey\(i, 1\)\);/);
+  assert.match(L, /\.\.\.hall\.halos\(\)/);
+  assert.match(L, /\.\.\.hall\.lights\(\)/);
   assert.ok(SD_HAND_RATE > 0 && SD_STONE_SETTLE_MS === 700);
 });
 
+test('SD-LOOK S10 THE HOSTS: the dungeon host hangs the orrery\'s decor on the realm\'s anchored clock (every screen\'s rings tick together) and hands the hall\'s halos and gem light on with the end\'s - drawn and lit where the hosts already draw and light the end\'s (world.js drawSdRift, the mode machine\'s light list), in kept lists, the end\'s alone when the hall has none (mutants: the hall\'s halos dropped; the gem\'s light dropped)', () => {
+  const D = read('src/scenes/dungeonContext.js');
+  assert.match(D, /createSdHall\(\{ renderer, audio, s: dfLocation\.sdRealm, clock: sdEndClock,/);
+  // SD-THROUGH (PIN MOVED): or, in a Hollow (the hall is the Hour's), the Way Through's
+  assert.match(D, /sdEndHalos: sdEnd \? \(\) => sdEndWith\(sdEnd\.halos\(\), sdHall\?\.halos\(\) \?\? sdThrough\?\.halos\(\), _sdEndHalos\) : undefined,/);
+  assert.match(D, /sdEndLights: sdEnd \? \(\) => sdEndWith\(sdEnd\.lights\(\), sdHall\?\.lights\(\) \?\? sdThrough\?\.lights\(\), _sdEndLights\) : undefined,/);
+  const i = D.indexOf('  const sdEndWith = (a, b, into) => {'), body = D.slice(i, D.indexOf('\n  };\n', i) + 5);
+  const sdEndWith = new Function(`${body}\nreturn sdEndWith;`)();
+  const a = [1, 2], kept = [];
+  assert.equal(sdEndWith(a, [], kept), a, 'the end\'s own when the hall has none');
+  assert.equal(sdEndWith(a, null, kept), a);
+  assert.deepEqual(sdEndWith(a, [3], kept), [1, 2, 3], 'the hall\'s after the end\'s');
+  assert.equal(sdEndWith(a, [3], kept), kept, 'one kept list');
+  // the world host draws the end's halos in its Rift pass, and the mode machine lights the end's lights in the Hour
+  assert.match(read('src/scenes/world.js'), /sdHaloPassOf\(\)\?\.draw\(proj, view, end\.sdEndHalos\?\.\(\) \?\? \[\]/);
+  assert.match(read('src/scenes/worldModes.js'), /\.\.\.\(dungeonCtx\.sdEndLights\?\.\(\) \?\? \[\]\)/);
+});

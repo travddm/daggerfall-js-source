@@ -413,14 +413,35 @@ test('TELL2: the glint on the batch - written only when it changes, cleared at n
 test('TELL2: both billboard shaders take the glint - the outline in its colour by the elite rim\'s texel test, the body lifted toward it; the renderer uploads it, resets it, and widens the quad for it (mutants: any wire cut)', () => {
   assert.match(GLINT_GLSL, /vec3 glintRimColor\(vec4 g\)/);
   assert.match(GLINT_GLSL, /return mix\(lit, c, clamp\(g\.a, 0\.0, 1\.0\) \* 0\.45\);/);
+  const R = rd('src/render/renderer.js'), EL = rd('src/render/enhancedLighting.js');
+  for (const [name, src] of [['BB_FS', R], ['EL_BB_FS', EL]]) {
+    assert.match(src, /uniform vec4 uGlint;/, name);
+    assert.match(src, /\$\{GLINT_GLSL\}/, name);
+    assert.match(src, /if \(uGlint\.a > 0\.0 && uConceal\.x == 0\.0 && uDissolve\.x <= 0\.0 && eliteRim\(uTex, uv\) > 0\.0\)/, `${name}: the rim, never round a concealed or burning body`);
+    const gl = src.indexOf('lit = glintLit('), hf = src.indexOf('lit = hitFlashLit(lit, albedo + emission, uHitFlash)');
+    assert.ok(gl > 0 && hf > gl, `${name}: the glint under the hit's red`);
+  }
+  assert.match(EL, /glintLit\(lit, albedo \+ emission, vec4\(elDecode\(uGlint\.rgb\), uGlint\.a\)\)/, 'the lane decodes it');
+  assert.match(R, /this\.bbUGlint = gl\.getUniformLocation\(this\.bbProgram, 'uGlint'\)/);
+  assert.match(R, /gl\.uniform4f\(this\.bbUGlint, 0, 0, 0, 0\);[^\n]*\n\s*this\._bbGlintOn = false;/, 'reset with the frame');
+  assert.match(R, /if \(gt \|\| this\._bbGlintOn\) \{ gl\.uniform4f\(this\.bbUGlint/);
+  assert.match(R, /const ep = eg !== 0 \? b\.elitePad : \(gt \? TELL_GLINT_PAD : null\);/, 'the outline\'s room');
+  assert.match(R, /elitePad: undefined, glint: undefined,/, 'a batch born without one');
 });
 
 // ── the ground ──────────────────────────────────────────────────────
 
 test('TELL2: the ground\'s mark takes the boss\'s line from a leaf - premultiplied over the floor, "now" through its last 0.2 s, never lost near me (mutants: the blend additive; the floor dropped)', () => {
+  assert.doesNotMatch(rd('src/render/telegraphStyle.js'), /^import /m, 'a leaf');
   assert.match(TELEGRAPH_STYLE_GLSL, /vec4 telegraphStyle\(float edge, float fin, float s, float t, float nowK, float flash, vec3 col, float fogK\)/);
   assert.match(TELEGRAPH_STYLE_GLSL, /keyl \* 0\.55/, 'the dark keyline');
   assert.match(TELEGRAPH_STYLE_GLSL, /return vec4\(rgb \* fogK, clamp\(a, 0\.0, 1\.0\) \* fogK\);/, 'premultiplied');
+  const P = rd('src/render/foeTelegraph.js');
+  assert.match(P, /import \{ TELEGRAPH_STYLE_GLSL \} from '\.\/telegraphStyle\.js';/);
+  assert.match(P, /gl\.blendFunc\(gl\.ONE, gl\.ONE_MINUS_SRC_ALPHA\)/);
+  assert.doesNotMatch(P, /blendFunc\(gl\.ONE, gl\.ONE\)/);
+  assert.match(P, /float fogK = max\(fogFactorAt\(vWorld\), uNearFloor\);/);
+  assert.match(P, /gl\.uniform1f\(U\.uNow, phase\.flash > 0 \? 0 : nowShare\(b, phase\)\);/);
   const b = makeBlow('lunge', [0, 0, 0], 0, 0);
   const w = BLOW.lunge.windup;
   assert.equal(nowShare(b, { t: 0 }), 0);
@@ -438,3 +459,21 @@ test('TELL2: the ground\'s mark takes the boss\'s line from a leaf - premultipli
 
 // ── the pools ───────────────────────────────────────────────────────
 
+test('TELL2: all three pools wire it - the hold into the sprite, the strike clip held for the WIND, the cues after the sprite, the glint beside the hit flash (mutants: any pool unwired)', () => {
+  const pools = [
+    ['src/scenes/exteriorFoes.js', 'f', 'hold: f.ai._blowHold,'],
+    ['src/scenes/dungeonContext.js', 'f', 'hold: _puppet ? (_pb?.hold ?? false) : f.ai._blowHold,'],   // PIN MOVED (TELL8: a puppet's on its host's word)
+    ['src/scenes/cityGuards.js', 'g', 'hold: g.ai._blowHold,'],
+  ];
+  for (const [file, v, hold] of pools) {
+    const src = rd(file);
+    assert.ok(src.includes(hold), `${file}: the hold`);
+    assert.ok(src.includes(`${v}.ai._blowHold !== true`), `${file}: the strike clip held`);
+    const upd = src.indexOf(hold), cue = src.indexOf(`tellCues(${v}, audio, acuteHearingMultiplier(playerEntity));`, upd);   // PIN MOVED (TELL8: a puppet's cues stand in its own branch too - the owner's are the first after its sprite)
+    assert.ok(cue > upd && cue - upd < 400, `${file}: the cues right after the sprite`);
+    assert.ok(src.includes(`setBatchGlint(${v}.batch, foeGlint(${v}.ai, undefined, prefersReducedMotion())`), `${file}: the glint`);   // PIN MOVED (RVN4: else phase two's rim, after it)
+  }
+  // PIN MOVED (TELL8: a puppet's cues are its own - its owner's wind-up rides the wire, ai/puppetBlows.js)
+  assert.ok(!/if \(!_puppet\) tellCues\(f, audio/.test(rd('src/scenes/dungeonContext.js')), 'a puppet\'s cues play here');
+  assert.match(rd('src/scenes/exteriorFoes.js'), /const _pb = f\.ai\._tac\?\.puppet \? puppetBlowTurn\(f\.ai, playerFeet\) : NO_PUPPET_BLOW;[\s\S]{0,4000}tellCues\(f, audio, acuteHearingMultiplier\(playerEntity\)\);   \/\/ TELL8/);
+});

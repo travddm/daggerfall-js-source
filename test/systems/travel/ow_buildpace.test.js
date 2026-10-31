@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as BB from '../../../src/systems/buildBreather.js';
 
+const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const VSYNC = 1000 / 60;
 
 test('OW-BUILD, the law: under the Overworld a slice is what a frame of 30 a second leaves past the frame\'s own script and the margin - up to 20 ms, never under the ordinary 6, whatever the display\'s rate; a NaN is the ordinary slice', () => {
@@ -27,6 +28,28 @@ test('OW-BUILD, the law: under the Overworld a slice is what a frame of 30 a sec
   // the view down: PERF-EXT24's slice as it was
   assert.equal(f({ intervalMs: VSYNC, busyMs: 8, streamingMs: 0 }), Math.max(BB.BUILD_SLICE_FLOOR_MS, Math.min(BB.BUILD_SLICE_MS, VSYNC - 8 - BB.BUILD_SLICE_MARGIN_MS)));
   assert.equal(f({ intervalMs: VSYNC, busyMs: 8, streamingMs: 5000 }), BB.BUILD_SLICE_MS);
+});
+
+test('OW-BUILD, the host: the breather\'s budget asks whether the Overworld is up - the view\'s `active`, read at each slice; down, every arm as it was (the host\'s own budget line, lifted)', () => {
+  const m = /\n {4}budget: (\(\) => frameFitBudget\(\{[^\n]*?\}\)),[^\n]*\n/.exec(W);
+  assert.ok(m, 'the breather\'s budget');
+  assert.match(m[1], /overworld: !!travelView\?\.active/, 'the view\'s own flag');
+  const view = { active: false };
+  const env = { frameFitBudget: BB.frameFitBudget, frameInterval: () => VSYNC, lastBusy: () => 8, performance: { now: () => 10000 }, travelView: view };
+  const host = new Function(...Object.keys(env), `let _streamSince = null; let _awaitedBuilds = 0;
+    const budget = ${m[1]};
+    return { budget, stream: (v) => { _streamSince = v; }, wait: (n) => { _awaitedBuilds = n; } };`)(...Object.values(env));
+  host.stream(9900);   // a stream begun 100 ms ago
+  const down = host.budget();
+  assert.ok(down >= BB.BUILD_SLICE_FLOOR_MS && down <= BB.BUILD_SLICE_MS, `the view down: the frame-fit slice (${down})`);
+  view.active = true;
+  assert.equal(host.budget(), BB.BUILD_SLICE_OVERWORLD_MS, 'the view up: the Overworld\'s slice');
+  view.active = false;
+  host.stream(1000);   // nine seconds on
+  assert.equal(host.budget(), BB.BUILD_SLICE_MS, 'down again: an old stream\'s whole slice, as ever');
+  const none = new Function('frameFitBudget', 'frameInterval', 'lastBusy', 'performance', 'travelView',
+    `let _streamSince = null; let _awaitedBuilds = 1; return (${m[1]})();`)(BB.frameFitBudget, () => VSYNC, () => 8, { now: () => 0 }, null);
+  assert.equal(none, BB.BUILD_SLICE_MS, 'no view at all (the boot, before it is made): an awaited build\'s whole slice');
 });
 
 /** The real breather over a pixel's `workMs` of build, in 1 ms units, on a 60 Hz display: each frame the host's own

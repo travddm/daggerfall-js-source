@@ -488,8 +488,34 @@ test('SEA-EVENTS the chart: the storm a violet ring about its eye, named once wi
   assert.ok(log.some((c) => c[0] === 'fillText' && c[1] === 'AETHER STORM'), 'the storm named');
   assert.deepEqual([...M.CHART_STORM_KEY], ['storm', 'The Aether storm, blowing now']);
   assert.deepEqual([...M.CHART_FLEET_KEY], ['fleet', 'The treasure fleet, under way']);
+  const chart = src('src/ui/etherChartWindow.js');
+  assert.match(chart, /stormItem\.hidden = !word\.storm; fleetItem\.hidden = !word\.fleet;/);
 });
 
 test('SEA-EVENTS the seams by source: the world shows the storm\'s thunder (its weather, its front, its rain, its sky, its wind) as the Sun Baby\'s clear day is shown; the sea\'s host wired over the clock, the naval host, the scene, the hub and the ether host, stepped with the lanes; its wrack among the captain\'s sites and its haul; the hub\'s word; the flagship\'s end; the harbourmaster\'s talk; the naval host\'s fleet, spoils and lightning (mutants: each seam)', () => {
+  const w = src('src/scenes/world.js');
+  assert.match(w, /const shownWeather = \(\) => \(sunbaby\.on \? SUNBABY_WEATHER : seaStormShown\(\) \?\? currentWeather\(\)\);/);
+  assert.match(w, /weatherType: \(\) => WEATHER_TYPES\.indexOf\(seaStormShown\(\) \?\? currentWeather\(\)\),/);
+  assert.match(w, /const crossing = weatherCrossingStamp\(\) !== seenCrossing \|\| seaVentures\.stormTurned\(\);/);
+  assert.match(w, /peak: weatherOverride \? null : seaStormShown\(\) \? 1 : currentWeatherIntensity\(\) \}\);/);
+  assert.match(w, /violence: weatherOverride \?\? seaStormShown\(\) \?\? currentWeatherRaw\(\),/);
+  assert.match(w, /cloudBase: weatherOverride \|\| seaStormShown\(\) \? null : currentCloudBase\(\),/);
+  assert.match(w, /clock: \(\) => raidNowMs\(\), naval: \(\) => naval, state, link: socialLink, ether: etherHost,/);   // V4: raidNowMs is declared below the sea's host - read when called
+  assert.match(w, /\{ laneShips\(\); seaVentures\.step\(lightning\?\.strikes \?\? 0\); \}/);
+  assert.match(w, /const wdunWord = \(w\) => \{\n\s+const now = Date\.now\(\);\n\s+seaVentures\.hubWord\(w\);/);
+  assert.match(w, /gather: \(siteId\) => seaVentures\.gather\(siteId\) \?\? etherHost\.gather\(siteId\),/);
+  assert.match(w, /fleetEnded: \(n, act\) => seaVentures\.fleetEnded\(n, act\),/);
+  assert.match(w, /\.\.\.etherHost\.sites\(p\.x, p\.y\), \.\.\.seaVentures\.wrackSites\(p\.x, p\.y\)\]/);
+  assert.match(w, /rumours: \[\.\.\.o\.rumours, \.\.\.seaVentures\.rumours\(port\)\],/);
+  const n = src('src/scenes/naval/navalHost.js');
+  assert.match(n, /const treasureFleet = createTreasureFleet\(\{/);
+  assert.match(n, /fleetEnded: \(n, act\) => deps\.ether\?\.fleetEnded\?\.\(n, act\),/);
+  assert.match(n, /treasureFleet\.ended\(entry, act\);/);
+  assert.match(n, /fleet: \(list, o\) => \{ if \(enabled\) treasureFleet\.step\(list, o\); \},/);
+  assert.match(n, /stormStrike: \(strike\) => strikeShip\(enabled && aboardShip\(\) \? myBoatState\(boatInPlay\(\)\)\?\.damage : null, strike, clock\),/);
+  assert.match(n, /deps\.say\?\.\(site\.word \?\? SITE_WORDS\[site\.kind\], 4\)/);
+  const eh = src('src/scenes/etherHost.js');
+  assert.match(eh, /credit: \(n\) => deps\.credit\?\.\(n\), mid: \(text, s\) => deps\.mid\?\.\(text, s\), say: \(text, s\) => deps\.say\?\.\(text, s\),/);
+  assert.match(src('server/src/index.js'), /if \(m\.k === 'fk'\) \{[^\n]*\n\s+if \(a\?\.gu\) return;[^\n]*\n\s+if \(wdunFleetSunk\(st, m\.n, now\)\) \{ await this\._wdunSave\(now, true\); this\._wildFan\(\{ t: 'wdun', k: 'fd', fleets: wdunFleets\(st, now\) \}\); \}/);   // PIN MOVED (AUDIT SEA VENTURES A7): never a guest's
   assert.ok(inEther(8000, -5100));
 });

@@ -15,6 +15,7 @@ import { HULL } from '../../../src/systems/naval/navalShips.js';
 import { sea } from '../../navalSea.mjs';
 import { madeLevelRule } from '../../../src/systems/madeLevel.js';   // EG-H2: the made level's law the world host's doors ask
 
+const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const open = () => true;
 const world = (o = {}) => ({ now: 0, dt: 1, seaY: 0, wind: [0, 0, WIND_RATED], isWater: open, contacts: [], random: () => 0.5, ...o });
 const contactOf = (s, o = {}) => ({ id: s.id, kind: 'ship', faction: s.cls.faction, pos: s.pos, vel: [0, 0, 0], speed: 0, yaw: s.yaw, hull: s.hull, ship: s, ...o });
@@ -122,3 +123,28 @@ test('AUDIT WK-SN the host: her work is her hull\'s loss and half her canvas\'s;
 
 // ── the world's wiring ─────────────────────────────────────────────────────────────────────────────────────────────
 
+test('AUDIT WK-SN the world: the cards drawn every frame of the layer; a card\'s health off his body where one stands, else the party\'s; the offline panel gives way to the party\'s; the pack door asks the pack is ready and says no when the slot is held (mutants: the frame dropped, the card off the party, the offline panel orphaned, the door unasked, a failed mount said open)', () => {
+  assert.match(WORLD, /function crewAshoreTick\(\) \{\n\s*try \{ companionPanelFrame\(\); \} catch/);
+  assert.match(WORLD, /partyPanel\?\.destroy\?\.\(\);   \/\/ COMPANION-KIT: the offline panel my companions stood gives way to the party's\n\s*makePartyPanel\(social\);/);
+  assert.match(WORLD, /if \(!naval\?\.companionPack\?\.\(key\) \|\| !inventoryDoorReady\(\)\) return false;/);
+  assert.match(WORLD, /if \(!modes\?\.mountWindow\?\.\(w\)\) \{ \(w\.dispose\?\.bind\(w\) \?\? w\._closeSilently\?\.bind\(w\)\)\?\.\(\); return false; \}\n\s*return true;\n\s*\};/);
+  // the card, lifted
+  const at = WORLD.indexOf('function partyCompanions() {');
+  const body = WORLD.slice(WORLD.indexOf('{', at) + 1, WORLD.indexOf('\n  }\n', at));
+  const cardsOf = new Function('navalOn', 'csaRuntime', 'naval', 'crewAshore', 'composePartyFx', 'swornCards', 'modes', 'madeRuleHere', body);   // REVENANT-COMPANION: the sworn's cards (none here); GATE-ALONE: the mode machine, for a gate's court
+  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the door asks the made level's law - the world host's word, off the stub's court
+  const cards = (...a) => cardsOf(...a.slice(0, 7), ...Array(Math.max(0, 7 - a.length)).fill(undefined), (rule) => madeLevelRule(a[6]?.gateArenaDay?.() != null ? 'court' : null, rule));
+  const party = [{ boat: 42, name: 'Hilda', role: 'Bosun', health: 20, maxHealth: 60 }];
+  const naval = { companions: { party } };
+  const standing = { bodies: () => [{ companion: '42:Hilda', dead: false, entity: { health: 45, maxHealth: 60 } }] };
+  const none = { bodies: () => [] };
+  const fx = () => ['fx'];
+  assert.deepEqual(cards(() => true, null, naval, standing, fx), [{ key: '42:Hilda', name: 'Hilda', role: 'Bosun', h: 45, hm: 60, fx: ['fx'] }], 'off his body');
+  assert.deepEqual(cards(() => true, null, naval, none, fx), [{ key: '42:Hilda', name: 'Hilda', role: 'Bosun', h: 20, hm: 60, fx: [] }], 'off the party');
+  const fallen = { bodies: () => [{ companion: '42:Hilda', dead: true, entity: { health: 0, maxHealth: 60 } }] };
+  assert.deepEqual(cards(() => true, null, naval, fallen, fx), [{ key: '42:Hilda', name: 'Hilda', role: 'Bosun', h: 20, hm: 60, fx: [] }], 'a body down: the party\'s word');
+  assert.deepEqual(cards(() => false, null, naval, standing, fx), [], 'the arc off');
+  assert.deepEqual(cards(() => true, { isSailing: () => true }, naval, standing, fx), [], 'sailing (AUDIT WK-U5)');
+  assert.deepEqual(cards(() => true, null, naval, standing, fx, undefined, { gateArenaDay: () => 3 }), [], 'in a gate\'s court (GATE-ALONE: they wait outside it)');
+  assert.equal(cards(() => true, null, naval, standing, fx, undefined, { gateArenaDay: () => null }).length, 1, 'out of it, the cards as ever');
+});

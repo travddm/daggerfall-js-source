@@ -177,7 +177,23 @@ test('TESA12 no Arena: no reader, no card, no store read - the boot empties the 
   for (const f of ['src/formats/arenaCityData.js', 'src/formats/arenaExe.js']) assert.equal(existsSync(new URL(`../${f}`, import.meta.url)), false, f);
   for (const name of ['registerArenaData', 'pickArenaFolder', 'clearStoredArena', 'storeArenaFiles', 'loadArenaFile', 'ARENA_FILES']) assert.equal(name in dataSource, false, name);
   await dataSource.clearRetiredArena();   // node has no IndexedDB: nothing to clear, nothing thrown
+  const ds = read('src/scenes/dataSource.js');
+  assert.match(ds, /const ASSET_STORES = \[MUSIC_STORE, TEXTURE_STORE, MW_STORE, DERIVED_STORE, ARENA_STORE\];/, 'a wipe still sweeps it');
+  assert.match(ds, /indexedDB\.open\(DB_NAME, 6\);/, 'the schema as it was - its arms are additive');
+  assert.match(ds, /export async function clearRetiredArena\(\) \{\n\s+try \{ await clearAssets\(ARENA_STORE\); \} catch \{/);
+  const w = hostText('src/scenes/world.js');
+  assert.equal(w.match(/clearRetiredArena\(\);/g)?.length, 1, 'the boot asks it once');
+  assert.ok(w.indexOf('  clearRetiredArena();') < w.indexOf('preloadTamrielTrace({ fetchBytes, palette })'));
+  for (const gone of ['registerArenaData', 'setArenaCityData', 'setArenaRoom', 'arenaBeyondNotice', 'ARENA_PLACES_TEXT', 'arenaReady']) assert.equal(w.includes(gone), false, gone);
+  assert.match(w, /const arenaStands = tamrielLand && arenaPlacesOn\(\);\n\s+setArenaStanding\(arenaStands\);/);
+  assert.match(w, /arenaWarm\(\);   \/\/ TESA1: the places onto the trace that just landed/);
+  assert.match(w, /loc: ident\?\.kind === 'dungeon' \? \(ident\.name \?\? ''\) : \(loc\?\.name \?\? ''\),/, 'AUDIT-TESA A1-1\'s guard lifted: the name is every client\'s');
+  const menu = read('src/ui/enhanced/enhancedMenu.js');
+  for (const gone of ['arenaCard', 'ARENA_CARD_LINE', 'arenaDataAttached', 'card:arena']) assert.equal(menu.includes(gone), false, gone);
+  assert.match(read('src/ui/settings/settingsMap.js'), /"card:morrowind", "card:packs"\]\),/);
   assert.deepEqual([arenaPlacesOn(''), arenaPlacesOn('?arenaplaces=off'), arenaPlacesOn('?arenaplaces=off&online=1')], [true, false, true], 'offline alone, as the countryside\'s door');
+  const places = read('src/world/arenaPlaces.js');
+  assert.doesNotMatch(places, /ARENA_CITYDATA_PRINTS|ARENA_COASTAL_PRINTS|setArenaCityData|setArenaCoastal|setArenaRoom|_online|arenaGlobalCityId/);
 });
 
 // ── THE PLAYER'S OWN FILES ─────────────────────────────────────────

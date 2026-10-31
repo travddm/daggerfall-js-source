@@ -254,5 +254,16 @@ test('PROF3 anvil page: at a smith\'s forge - the families and metals, a recipe\
 });
 
 test('PROF3 wiring: the host mints a craft\'s pieces once each by provenance, pays the smith on the answer, asks the heat\'s band off STR and AGI; every host installs the kit\'s use; the Stores refuse to withdraw the stock', () => {
+  const w = src('src/scenes/world.js');
+  assert.match(w, /const pieces = mintPieces\(data\)\.filter\(\(it\) => !it\.provenance \|\| !have\.has\(it\.provenance\)\);/);   // PROF4: arrows carry none
+  assert.match(w, /settle: \(\) => profBook\.settle\(profMint, profMintCraft\),/);
+  assert.match(w, /onSettle: \(\) => \{ profBook\.settle\(profMint, profMintCraft\)\.catch\(\(\) => \{\}\); \},/);
+  // PROF4: a Heartwood for a plank; AUDIT 30 C4: the fee rides the kept craft and is paid where its pieces are minted
+  // PROF7 moved it: the station's own kept word (craftStation), and a garment's dye beside the Heartwood
+  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: f\.fee > 0 \? f\.fee : 0, name: [^\n]*\n\s*\/\/ CRAFT1 \(bible[^\n]*\n\s*\/\/ AUDIT CRAFT1 F3: [^\n]*\n\s*const chain = \[refinedText\([^\n]*\n\s*if \(!r\?\.ok\) return \{ ok: false, text: r\?\.kept \? `\$\{st\.kept\}\$\{chain \? ` \$\{chain\}` : ''\}` : `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}\$\{chain \? ` \$\{chain\}` : ''\}` \};/);   // PIN MOVED (PROF10): a Lapidary's `cracked` gem; (AUDIT PROF-541 R2-C2) the busy word the book's   // PIN MOVED (AUDIT2 BAG1 K8): and what went into the Stores first; (CRAFT1) and what the chain refined first - kept or refused (AUDIT CRAFT1 F3)
+  assert.match(w, /const profMintCraft = \(data, kept = null\) => \{\n\s*if \(kept\?\.fee > 0\) \{ deductGold\(playerEntity, Math\.min\(kept\.fee, totalGoldAmount\(playerEntity\)\)\); saveSoon\.changed\(\); \}/);
+  assert.match(w, /heatBand: \(\) => heatBand\(\{ strength: liveStat\(playerEntity, 'strength'\), agility: liveStat\(playerEntity, 'agility'\) \}\),/);
+  assert.match(src('src/scenes/shared.js'), /installSmithing\(\);/);
+  assert.match(src('src/ui/professions/profPages.js'), /go\.disabled = _stores\.busy \|\| !withdrawable\(pick\.material\);/);
   assert.equal(recipeById('longsword:mithril').templateIndex, 120);
 });

@@ -45,6 +45,21 @@ test('INTRO4: the film is cut on the recording’s own downbeats - bars 4, 8, 14
 
 test('INTRO4: the narrator - five lines in the player’s language, one at a time, readable, between the cuts and clear of the credits and the mark', () => {
   assert.equal(INTRO_NARRATION.length, 5);
+  const cue = read('src/ui/intro/introCue.js');
+  INTRO_NARRATION.forEach((line, i) => {
+    assert.equal(line.key, `narration${i + 1}`);
+    assert.match(cue, new RegExp(`t\\('menu\\.intro\\.${line.key}', '`), 'routed through the text core');
+    assert.ok(line.start < line.up && line.up < line.out && line.out < line.end);
+    assert.ok(line.out - line.up >= 4.3, `${line.key} is up long enough to read`);
+    assert.ok(line.text.length / (line.out - line.up) <= 21, `${line.key} reads at ${(line.text.length / (line.out - line.up)).toFixed(1)} characters a second`);
+    if (i > 0) assert.ok(INTRO_NARRATION[i - 1].end <= line.start, 'no two lines at once');
+    for (const cut of [CLOUD_REVEAL_TIME, CREST_TIME, DISTRICTS_TIME, ASCENT_TIME]) assert.ok(!(line.start < cut && cut < line.end), `${line.key} does not run across the cut at ${cut}`);
+    for (const credit of INTRO_CREDITS) assert.ok(line.start >= credit.end, 'never over a credit');
+    assert.ok(line.end <= TITLE_ENTER_TIME, 'gone before the mark moves');
+    const st = introFrameAt((line.up + line.out) / 2);
+    assert.deepEqual(st.narration.filter((n) => n.opacity > 0).map((n) => n.key), [line.key]);
+    assert.equal(introNarrationOpacity(line, (line.up + line.out) / 2), 1);
+  });
   for (const t of [0, TITLE_IMPACT_TIME, 600]) assert.ok(introFrameAt(t).narration.every((n) => n.opacity === 0));
 });
 
@@ -206,6 +221,9 @@ test('INTRO4: the map’s words are the geography’s own - the nine provinces a
   assert.deepEqual(capital.map((l) => l.name), ['Imperial City']);
   assert.deepEqual(pictureToFilm(...capital[0].at), [0, 0], 'the film’s city is at the map’s point');
   assert.ok(Math.abs(UNIT_M - 15360) < 1e-6, 'a picture unit is 18.75 of the Bay\u2019s 819.2 m pixels');
+  const screen = read('src/ui/intro/introScreen.js');
+  assert.match(screen, /const map = make\(doc, 'div', 'intro-map'\); map\.setAttribute\('aria-hidden', 'true'\);/);
+  assert.match(screen, /narrationLine\.textContent = INTRO_NARRATION\.find\(\(n\) => n\.key === line\.key\)\.text;/);
 });
 
 /** A fake worker: what it posts, when asked. */

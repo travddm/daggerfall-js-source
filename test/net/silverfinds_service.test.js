@@ -300,4 +300,7 @@ test('SILVER-FINDS the card: an account\'s balance says the day\'s finds - gathe
 
 test('SILVER-FINDS the deploy: the route is served and listed; the service answers it through the Marks door; the law says why both are bounded, not witnessed (mutants: the route unlisted)', () => {
   assert.ok(ROUTES.has('/v1/marks/find'));
+  assert.match(src('server-account/src/index.js'), /'\/v1\/marks\/find': \(\) => findMarks\(ctx, who\.player, env, body\),/);
+  assert.match(src('src/net/marksLaw.js'), /TWO FAUCETS ARE BOUNDED, NOT\n\/\/ WITNESSED/);
+  assert.match(src('server-account/src/professions.js'), /\.\.\.\(find \? \[find\] : \[\]\),   \/\/ SILVER-FINDS: the find, last/);
 });

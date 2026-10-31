@@ -29,6 +29,8 @@ const ARENA2 = process.env.ARENA2_PATH ?? '';
 const HAVE = !!ARENA2 && existsSync(join(ARENA2, 'MAPS.BSA'));
 const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+const W = rd('src/scenes/world.js');
+const STAND = rd('src/scenes/spawnStandHost.js');   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild left world.js, its live names read through `host`
 const lift = (text, head, end = '\n  }\n') => { const i = text.indexOf(head); assert.ok(i >= 0, head); return text.slice(i, text.indexOf(end, i) + end.length); };
 afterEach(() => { setTamrielTrace(null); setTamrielFit(null); });
 
@@ -47,6 +49,40 @@ class BayWoods {
     return dst;
   }
 }
+
+test('AUDIT TESA II K15 ARENA\'S NEAREST PORT: of the ports within a pixel, the nearest - never the last the scan finds, nor the first (mutants: nearest -> last; nearest -> first)', () => {
+  const near = (ports) => new Function('arenaPortAt', `${lift(rd('src/scenes/tamrielPortsHost.js'), '  const arenaPortNear = (x, y) => {', '\n  };\n')}\nreturn arenaPortNear;`)((x, y) => ports.find((p) => p.x === x && p.y === y) ?? null);
+  const a = { x: 10, y: 19, name: 'Near' }, b = { x: 11, y: 21, name: 'Far' };   // a pixel north (scanned early), a corner south-east (scanned last)
+  assert.equal(near([a, b])(10, 20), a, 'the nearer, though the scan meets the farther last');
+  const c = { x: 9, y: 19, name: 'Corner' }, d = { x: 10, y: 21, name: 'South' };   // the corner first, the nearer later
+  assert.equal(near([c, d])(10, 20), d, 'the nearer, though the scan meets the farther first');
+  assert.equal(near([])(10, 20), null);
+});
+
+test('AUDIT TESA II P1 THE BUILD PAST THE BAY: online, a pixel of the open zone stands the zone\'s hall of the day before any place past the Bay; else the places as before - and offline, or on the Bay, the hall is never asked there (mutants: the hall\'s ask dropped; asked offline; asked after the places)', () => {
+  const asked = [];
+  const make = (search) => new Function('URLSearchParams', `
+    const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
+    const _arenaTemplates = {}, _countryTemplates = {}, _capitalBase = {}, params = new URLSearchParams(${JSON.stringify(search)});
+    const MASK = { zone: true }, cyrodiilMask = () => MASK, asked = arguments[1];
+    const zoneHalls = { standIn: (mask, px, py) => { asked.push(['hall', px, py]); return mask === MASK && px === 2069 && py === 700 ? { name: 'Elite Hall' } : null; } };
+    const capitalLocationAt = (px, py) => (px === 2069 && py === 700 ? { name: 'A capital slice' } : null);
+    const arenaLocationAt = (px) => (px === 2100 ? { name: 'Bravil' } : null), countryLocationAt = () => null, lairLocationAt = () => null;
+    const locationIndex = new Map([['5,5', { name: 'Daggerfall' }]]);
+    const _spawnLedger = { expired: () => false }, _spawnClock = () => 0, _insideSpawn = () => false, spawnedDungeonAt = () => null;
+    let _locIndexGen = 0;
+    const host = { get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; }, _spawnClock, capitalLocationAt, arenaLocationAt, countryLocationAt, lairLocationAt };
+    ${lift(STAND, '  function _locationToBuild(px, py) {')}
+    return _locationToBuild;`)(URLSearchParams, asked);
+  const online = make('online');
+  assert.equal(online(2069, 700).name, 'Elite Hall', 'the zone\'s hall first, where a capital\'s slice would stand');
+  assert.equal(online(2100, 700).name, 'Bravil', 'no hall there: the places');
+  assert.equal(online(5, 5).name, 'Daggerfall', 'the Bay its own');
+  assert.deepEqual(asked, [['hall', 2069, 700], ['hall', 2100, 700]], 'never asked on the Bay (its spawns ask it there)');
+  asked.length = 0;
+  assert.equal(make('')(2069, 700).name, 'A capital slice', 'offline no zone');
+  assert.deepEqual(asked, []);
+});
 
 test('AUDIT TESA II Z7 THE ZONE\'S HALLS KEEP OFF THE PLACES: never on or beside a pixel the countryside or a lair may roll (the rolls the places host hands); picked again when the registry\'s places move and when the rolls are handed; a hall never stands over an index entry it did not make; the build\'s hall the zone\'s alone (mutants: the rolls unread; the cache kept past the places; the entry overwritten; standIn outside the mask)', () => {
   const m = cyrodiilMask();
@@ -190,6 +226,8 @@ test('AUDIT TESA II P7 THE LANES PAST THE BAY: their own reach and their own nea
   const two = [{ id: 1, name: 'A', px: 2000, py: -300 }, { id: 2, name: 'B', px: 2300, py: -300 }];
   assert.equal(laneNetwork(two, open, BEYOND_LANE_MAX_PX).length, 1);
   assert.equal(laneNetwork(two, open).length, 0, 'the Bay\'s reach: none');
+  assert.match(rd('src/scenes/naval/worldLanes.js'), /beyondList = laneNetwork\(ports\.list\(\), worldOpen, BEYOND_LANE_MAX_PX\);/);
+  assert.match(W, /if \(!worldLanes\.near\(lane, here\)\) continue;/, 'the host\'s feed asks the book');
 });
 
 test('AUDIT TESA II P7 A WAY PAST THE BAY KEEPS OFF THE BAY\'S RECTANGLE: the Bay\'s water is WOODS.WLD\'s, never the picture\'s - two roadsteads either side of the Bay\'s south-west corner sail round it, never across (mutant: the rectangle sailed)', () => {
@@ -252,6 +290,22 @@ test('AUDIT TESA II P7 (ARENA2) THE WAYS PAST THE BAY on the freeware\'s world, 
   assert.deepEqual([off, inRect, onLake], [0, 0, 0], 'on the lane water, off the Bay, off the lakes');
 });
 
+test('AUDIT TESA II P2/P3 THE WORLD\'S NEAREST TOWN, lifted off the places host and run: the registry\'s places and the countryside\'s towns this session stood (the index\'s - never a lair), the nearest a caller takes (mutants: the stood towns unread; a lair a town; the caller\'s accept dropped)', async () => {
+  const { nearestSafePlace } = await import('../../src/systems/deathRespawn.js');
+  const T = LOCATION_TYPES;
+  const make = (rows, index) => new Function('nearestSafePlace', 'worldPlaces', 'locationIndex', `${lift(rd('src/scenes/tamrielPlacesHost.js'), '  const nearestTownOf = ', '\n  };\n')}\nreturn nearestTownOf;`)(nearestSafePlace, { all: () => rows }, index);
+  const rows = [{ type: T.TownCity, px: 10, py: 0 }];
+  const index = new Map([
+    ['1,0', { country: { px: 1, py: 0, dungeon: true }, mapTableData: { locationType: T.Graveyard, dungeonType: DUNGEON_TYPES.Cemetery } }],   // a lair - a graveyard's kind, its monsters' own
+    ['5,0', { country: { px: 5, py: 0 }, mapTableData: { locationType: T.TownHamlet } }],                // a farmstead's hamlet
+    ['3,0', { name: 'A Bay row', mapTableData: { locationType: T.TownCity } }],                            // no country: the registry's own
+  ]);
+  const near = make(rows, index);
+  assert.deepEqual(near({ x: 0, y: 0 }).mapPixel, { x: 5, y: 0 }, 'the stood town, nearer than the registry\'s');
+  assert.deepEqual(near({ x: 0, y: 0 }, (h) => h.mapPixel.x > 6).mapPixel, { x: 10, y: 0 }, 'the caller\'s accept');
+  assert.equal(make([], new Map([['1,0', index.get('1,0')]]))({ x: 0, y: 0 }), null, 'a lair is no town');
+});
+
 test('AUDIT TESA II P7 THE LIVING INDEX AT THE BAY\'S EDGE: asked from the Bay, a town past the Bay a pixel off is never among its near ones; asked from past the Bay, none (mutants: the places\' filter dropped; the asker\'s guard dropped)', async () => {
   const { createLivingIndex } = await import('../../src/scenes/livingWorld/livingIndex.js');
   const places = createWorldPlaces();
@@ -293,3 +347,18 @@ test('AUDIT TESA II P9 THE TRACE\'S DOOR is offline alone, as the land\'s others
   assert.equal(tamrielTraceOn(''), true);
 });
 
+test('AUDIT TESA II P2/P3/P4 THE WIRING: the world\'s nearest town (scenes/tamrielPlacesHost.js nearestTownOf) read by the rise past the Bay, the open zone\'s rise and /unstuck - one law; the places past the Bay registered live and the rolls handed to the zone\'s halls; every journey asked of the door past the Bay (systems/travel/pastBayTravel.js) after the zone\'s own (mutants: each read put back on MAPS.BSA; the door unasked)', () => {
+  const P = rd('src/scenes/tamrielPlacesHost.js');
+  assert.match(P, /const nearestTownOf = \([^\n]*\) => nearestSafePlace\(\[worldPlaces\?\.all\(\) \?\? \[\], countryTowns\(\)\], px, accept\);/);
+  assert.match(P, /if \(worldPlaces && \(_arenaTemplates \|\| _capitalBase\)\) \{\n\s+worldPlaces\.registerLive\(PAST_BAY_SOURCE, \{\n\s+stamp: \(\) => \[_arenaTemplates \? arenaPixels\(\) : null, tamrielFit\(\), tamrielLandVersion\(\)\],\n\s+rows: \(\) => pastBayPlaceRows\(\{ pixels: _arenaTemplates \? arenaPixels\(\) : null, templateOf: \(p\) => arenaTemplateOf\(_arenaTemplates, p\), capitals: !!_capitalBase \}\),/);
+  assert.match(P, /if \(_countryTemplates\) zoneHalls\?\.standsToo\(pastBayRolledAt\);/);
+  assert.match(W, /for \(const pick of wildRisePicks\(cyrodiilMask\(\), px, \{ inDungeon, kill \}\)\) \{ const at = nearestTownOf\(px, pick\); if \(at\) return at; \}/, 'the zone\'s rise');
+  assert.match(W, /const town = etherSea && inEther\(px\.x, px\.y\) \? wildRiseSite\(px\) : nearestTownOf\(px, \(hit\) => hit\.kind === 'city' && !\(_zm && wildNear\(_zm, hit\.mapPixel\.x, hit\.mapPixel\.y\)\)\);/, '/unstuck');
+  assert.match(W, /const town = nearestTownOf\(px\);\n\s+if \(town\) land = town\.mapPixel;/, 'the rise past the Bay');
+  assert.doesNotMatch(W, /nearestTownPastTheBay|TOWN_RISE_REACH|nearestSafeLocationAnywhere\(maps, px, \(hit\)/, 'no second law');
+  // PIN MOVED (PORTAL-BAY, bible/06-Systems/Portal-Stone.md): the gate's law past the Bay is its third argument - a journey's
+  // pastBayJourney unless a teleport hands its own (pastBayTravel.js teleportJourney: teleportTo, Recall, a stone's pick and step)
+  assert.match(W, /const wildTravelGate = \(to, spoken = 0, law = pastBayJourney\) => \{/, 'every journey\'s gate: the journey\'s law unless told');
+  assert.match(W, /const j = law\(playerTravelPixel\(\), to, online\?\.wildOk \? wildMapMask\(\) : null, wildJourney\(\{/, 'asked after the zone\'s own');
+  assert.ok(W.indexOf('const zoneHalls = createZoneHalls(') < W.indexOf('createTamrielPlaces('), 'the halls stand before the places host hands them the rolls (BOOT-TDZ)');
+});

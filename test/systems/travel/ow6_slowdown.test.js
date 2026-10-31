@@ -94,3 +94,227 @@ test('OW6: the panel says why the clock is held - the land loading, an enemy nea
   assert.equal(areEnemiesNearby([foe({ ai: { isHostile: false, detected: true, inSight: true } })]), false);
 });
 
+// ── THE HOST'S GOVERNOR, RUN ─────────────────────────────────────────────────────────────────────────────────────────
+const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+const cut = (name) => {
+  const m = new RegExp(`\\n {2}function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n {2}\\}\\n`).exec(W);
+  assert.ok(m, `${name} lifted`);
+  return m[0];
+};
+const constLine = (name) => { const m = new RegExp(`\\n {2}const ${name} = [^\\n]*\\n`).exec(W); assert.ok(m, `${name} lifted`); return m[0]; };
+
+const governorHost = (over = {}) => {
+  const d = {
+    journey: true, up: true, owns: true, asked: 40, unbuilt: 0, speed: 16, driveYaw: 0,
+    bands: [], spent: new Set(), chases: new Map(), foes: [], raiders: [], raidChase: new Map(), sea: false,
+    camps: true, prevent: false, scale: 40, said: [], now: 0,
+    ...over,
+  };
+  const scope = {
+    travelControlUI: { get isShowing() { return d.journey; } }, travelOptions: { state: { get autopilot() { return d.journey ? {} : null; } } },
+    travellerOnRoad: () => !!d.onRoad, foePaced, foeRate, tvTownPace: () => (d.town ? 5 : null),   /* OW-TOWN-WALK: out of town unless a test stands the traveller in one */   // RATE-LAW: the keys' travel's ground; ENEMY-PACE's fixed floor
+    travelView: { get active() { return d.up; }, get state() { return d.up ? 'up' : 'off'; } }, tvOwnsJourneys: () => d.owns,
+    worldTimeScale: () => d.scale, setWorldTimeScale: (n) => { d.scale = n; },
+    // OW-LEAD: the feet in the middle of pixel (100, 100), native - the rig's owed pixels are that one (the hole underfoot)
+    travellerPace, travelGovernor: createLoadGovernor({ max: 100 }), state: { terrainDistance: 3, localFromWorld: (x, z) => [x, z], worldCoords: () => ({ x: 100.5 * 32768, z: 399.5 * 32768 }) },
+    playerTravelPixel: () => ({ x: 100, y: 100 }), tvGroundGenNow: () => 1, _tvUnbuilt: { gen: -1, x: NaN, y: NaN, r: -1, n: 0 },
+    unbuiltAround: (c, r, b, out) => { for (let i = 0; i < d.unbuilt; i++) out?.push([100, 100]); return d.unbuilt; }, built: new Set(),
+    player: { feetAt: () => [0, 0, 0], get speed() { return d.speed; }, isPlayerSwimming: false },
+    getPref: () => d.camps, playerEntity: { get preventEnemySpawns() { return d.prevent; } },
+    bandNowMs: () => 0, bandSight: () => 320, tvBandSeen: { night: false }, travelViewBands: () => d.bands,
+    _bandSpent: d.spent, _bandChase: d.chases, bandMake: () => ({ mobileTypes: [1], name: 'Orc' }), bandPlace: (b) => b.at,
+    BAND_CONTACT_M: 30, BAND_CHASE_MPS: 5.2, warmAshesOn: () => d.sea, csaOn: () => d.sea, raidQuarry: () => d.sea,
+    raiderSight: () => 1000, isNight: () => false, minuteNow: () => 0, travelViewRaiders: () => d.raiders,
+    tvRaid: { spent: new Set(), chase: d.raidChase }, RAIDER_CONTACT_M: 60, RAIDER_CHASE_MPS: 4.2, seaRaidPeerChase: (id) => d.peerRaid?.[id] ?? null,
+    exteriorFoes: { get foes() { return d.foes; } }, foeHostile, foeAlerted, SIGHT_RADIUS: 102.4,   // WILD-ALERT: an alerted foe alone holds the clock
+    _tvAttack: d.attack ?? null, foeCampKey: (f) => f?.camp ?? null,   // OW-ATTACK: the enemy I go to fight, if any
+    get _travelDrive() { return d.driveYaw == null ? null : { yaw: d.driveYaw }; }, threatCap,
+    tvSay: (t) => d.said.push(t), TRAVEL_VIEW_TEXT, performance: { now: () => d.now },   // AUDIT OW5 G2: the view's own lines through tvSay
+    // TV-WASD (main): the keys' travel beside the journey - none held unless a test says so
+    travelWalkRate, TV_MOVE_ACTIONS, held: (keys, a) => keys.has(a), keys: d.keys ?? new Set(), walkMode: true, playerSpawned: true,
+    csaBoatUnderMe: () => null, gamePaused: () => false, csaHoldsTimeScale: () => d.helm ?? false, resetTimeScale: () => { d.scale = 1; },
+    // THE MERGE (NAV-H, NAV-R): the sea fight - none unless a test stands one (its hostile ships, its raiders as ships)
+    naval: d.naval ?? null, navalRaidersOn: () => !!d.navalRaiders,
+    // WILD3: the open zone's strangers - none unless a test stands them
+    _wildStrangers: d.strangers ?? [], WILD_STRANGER_SLOW_M: 200,
+  };
+  const names = Object.keys(scope);
+  const body = `
+    let { ${names.filter((n) => n !== '_travelDrive').join(', ')} } = s;
+    let tvHeld = null, tvHeldWhy = null, tvWalking = 0, _tvWalkYaw = d.walkYaw ?? null;
+    const travelAsked = d.asked;
+    ${constLine('JOURNEY_SLOW_SAY_MS')}
+    let _slowWas = null, _slowSaidAt = -Infinity;
+    ${cut('journeyThreats')}${cut('journeyThreatCap')}${cut('journeySlowSaid')}${cut('travelViewGovern')}
+    return { govern: travelViewGovern, held: () => [tvHeld, tvHeldWhy] };`.replace(/\b_travelDrive\b/g, 's._travelDrive');
+  const h = new Function('s', 'd', body)(scope, d);
+  return { d, ...h };
+};
+
+test('OW6 x WILD-ALERT host run: UNDER THE VIEW A BAND HOLDS THE JOURNEY ONLY ONCE IT HAS NOTICED THE TRAVELLER - a wandering band down the way, unaware, holds nothing (it was held for its sight alone); the same band chasing holds the rider, the panel told it is the enemies, the line said once; the ground\'s cap and the enemies\' the lower holds; a chase the camps off or the spawns held holds nothing (mutants: the enemies\' cap never met, the wanderers counted again, the reason wrong)', () => {
+  const unaware = governorHost({ bands: [{ id: 'b1', at: { x: 0, z: 670 } }] });
+  unaware.govern(0.033);
+  assert.deepEqual([unaware.d.scale, ...unaware.held()], [40, null, null], 'a band that has not noticed me: the ask whole, nothing said');
+  assert.deepEqual(unaware.d.said, []);
+  const chase = () => new Map([['b1', { band: { id: 'b1' }, pos: { x: 0, z: 300 } }]]);
+  const g = governorHost({ chases: chase() });
+  g.govern(0.033);
+  assert.equal(g.d.scale, 20, 'held to x20 of x40 - (300 - 30) / (0.6 x (16 + 5.2)) = 21.2, down the ladder');
+  assert.deepEqual(g.held(), [20, 'foes']);
+  assert.deepEqual(g.d.said, [TRAVEL_VIEW_TEXT.enemiesSlow], 'said as it began');
+  g.govern(0.033); g.govern(0.033);
+  assert.equal(g.d.said.length, 1, 'once, not every frame');
+  // the ground's cap, lower still, is the reason
+  const both = governorHost({ chases: chase(), unbuilt: 3 });
+  for (let i = 0; i < 20; i++) both.govern(0.05);   // PIN MOVED (OW-LEAD): the hole underfoot holds the ground's cap to walking pace, below the enemies'
+  assert.equal(both.held()[1], 'load');
+  assert.ok(both.d.scale <= 20);
+  for (const quiet of [{ camps: false }, { prevent: true }]) {
+    const q = governorHost({ chases: chase(), ...quiet });
+    q.govern(0.033);
+    assert.deepEqual([q.d.scale, ...q.held()], [40, null, null], `nothing held: ${JSON.stringify(Object.keys(quiet))}`);
+  }
+});
+
+test('OW-TOWN-WALK x OW6 host run (AUDIT OW-REVISITED L6-10): IN A TOWN THE GOVERNOR HOLDS THE CLOCK TO A TOWN\'S PACE AND SAYS SO - x5 of x40, the panel told "in town"; a chasing band\'s x20 does not lift it and is not the reason; the ground\'s cap lower still is; out of the town the ask is whole (mutants: the town unread, the reason the enemies\')', () => {
+  const town = governorHost({ town: true });
+  town.govern(0.033);
+  assert.deepEqual([town.d.scale, ...town.held()], [5, 5, 'town'], 'held to x5 of x40, in town');
+  assert.equal(TRAVEL_HELD_TEXT(5, 40, town.held()[1]), 'Held to ×5 of ×40 in town');
+  const chased = governorHost({ town: true, chases: new Map([['b1', { band: { id: 'b1' }, pos: { x: 0, z: 300 } }]]) });
+  chased.govern(0.033);
+  assert.deepEqual([chased.d.scale, ...chased.held()], [5, 5, 'town'], 'the enemies\' x20 above the town\'s x5: the town holds');
+  const both = governorHost({ town: true, unbuilt: 3 });
+  for (let i = 0; i < 20; i++) both.govern(0.05);
+  assert.deepEqual([both.d.scale, ...both.held()], [5, 5, 'town'], 'the ground\'s first cut (x20) above the town\'s x5: the town holds');
+  for (let i = 0; i < 600; i++) both.govern(0.05);   // the rig's bare count: the ceiling halved, cut by cut, under the town
+  assert.equal(both.held()[1], 'load', 'the ground held lower than the town: the ground is the reason');
+  assert.ok(both.d.scale < 5);
+  const out = governorHost({ town: false });
+  out.govern(0.033);
+  assert.deepEqual([out.d.scale, ...out.held()], [40, null, null], 'out of the town: the ask whole');
+});
+
+test('OW6 host run: a CHASER holds from any side, at its own pace; at sea a raider\'s lookout and a raider\'s chase hold a crossing; on land no raider is asked of (mutants: the chase uncounted, the sea\'s arm unwired)', () => {
+  const chase = governorHost({ chases: new Map([['b2', { pos: { x: 0, z: -300 } }]]) });
+  chase.govern(0.033);
+  assert.deepEqual(chase.held(), [20, 'foes'], 'a band closing from behind: (300 - 30) / (0.6 x (16 + 5.2)) = 21.2 - x20');
+  // OW6-HALF: 0.6 s - a raider 1500 m off holds nothing at x40 now ((1500 - 1000) / 9.6 = 52), so she stands nearer
+  const sea = governorHost({ sea: true, raiders: [{ id: 'r1', x: 0, z: 1250 }] });
+  sea.govern(0.033);
+  assert.deepEqual(sea.held(), [25, 'foes'], 'a raider 1250 m ahead, its lookout 1000 m: (1250 - 1000) / (0.6 x 16) = 26.0 - x25 of x40');
+  // OW6: a raider a peer's chase holds is where they say it sails - here 150 m nearer: (1100 - 1000) / (0.6 x 16) = 10.4 - x10
+  const held = governorHost({ sea: true, raiders: [{ id: 'r1', x: 0, z: 1250 }], peerRaid: { r1: { x: 0, z: 1100 } } });
+  held.govern(0.033);
+  assert.deepEqual(held.held(), [10, 'foes'], 'a peer\'s chase: where it runs, not where it would wander');
+  const land = governorHost({ sea: false, raiders: [{ id: 'r1', x: 0, z: 2000 }] });
+  land.govern(0.033);
+  assert.deepEqual(land.held(), [null, null], 'ashore, no raider');
+});
+
+test('THE MERGE (NAV-H x OW6) host run: AT SEA A HOSTILE SHIP HOLDS THE CROSSING before her ring - where she is an enemy nearby and the journey stops (navalHost.js HOSTILE_NEAR_M), or her lookout past it - on either skin, and one coming for me from any side at her pace; a raider stood as a ship holds as the ship, never her seeded sail beside it; no hostile ship, nothing held (mutants: the sea unread by the journey, her closing unsaid, a raider ship counted twice)', () => {
+  const sea = (threats, more = {}) => ({ threats: () => threats, raiderShipOf: () => null, ...more });
+  // OW6-HALF: THREAT_WARN_S 0.6 - each distance below re-derived at the 0.6 s warning
+  const ahead = [{ pos: [0, 0, 1025], reach: 750, chasing: false, mps: 6 }];
+  const view = governorHost({ naval: sea(ahead) });
+  view.govern(0.033);
+  assert.deepEqual(view.held(), [25, 'foes'], 'a ship 1025 m ahead, her lookout 750 m: (1025 - 750) / (0.6 x 16) = 28.6 - x25 of x40');
+  const classic = governorHost({ up: false, owns: false, naval: sea(ahead) });
+  classic.govern(0.033);
+  assert.deepEqual(classic.held(), [25, 'foes'], 'the classic skin the same');
+  const behind = governorHost({ naval: sea([{ pos: [0, 0, -1100], reach: 700, chasing: true, mps: 8 }]) });
+  behind.govern(0.033);
+  assert.deepEqual(behind.held(), [25, 'foes'], 'coming for me from behind: (1100 - 700) / (0.6 x (16 + 8)) = 27.8 - x25');
+  const raider = governorHost({ sea: true, navalRaiders: true, raiders: [{ id: 'r1', seed: 7, x: 0, z: 1000 }],
+    naval: sea([{ pos: [0, 0, 1250], reach: 1000, chasing: false, mps: 4.6 }], { raiderShipOf: (seed) => (seed === 7 ? { pos: [0, 0, 1250], chase: false } : null) }) });
+  raider.govern(0.033);
+  assert.deepEqual(raider.held(), [25, 'foes'], 'the ship where she sails, (1250 - 1000) / (0.6 x 16) = 26.0 - x25, never her seeded sail at the lookout\'s edge');
+  const none = governorHost({ naval: sea([]) });
+  none.govern(0.033);
+  assert.deepEqual(none.held(), [null, null], 'no hostile ship: nothing held');
+});
+
+test('OW6 host run: ON THE CLASSIC SKIN (no view), A FOE STANDING AHEAD HOLDS THE JOURNEY and nothing near hands the mod\'s ask back whole; a friend, a pacified foe or the dead hold nothing; the Overworld\'s journey with its view down says so, not "the land loads"; no journey, nothing held (mutants: the classic skin ungoverned, the ask not handed back)', () => {
+  // WILD-ALERT: an ALERTED foe - on me, and seeing me (systems/encounters.js foeAlerted)
+  const AI = { isHostile: true, feet: [0, 0, 125], sightRadius: 60, targetIsLocalPlayer: true, detected: true };
+  const foe = (o = {}) => ({ dead: false, ai: { ...AI, ...o.ai }, entity: {}, ...o, ...(o.ai ? { ai: { ...AI, ...o.ai } } : {}) });
+  const unaware = governorHost({ up: false, owns: false, speed: 4, foes: [foe({ ai: { targetIsLocalPlayer: false, detected: false } })] });
+  unaware.govern(0.033);
+  assert.deepEqual([unaware.d.scale, ...unaware.held()], [40, null, null], 'WILD-ALERT: a foe ahead that has not noticed me holds nothing');
+  const g = governorHost({ up: false, owns: false, speed: 4, foes: [foe()] });
+  g.govern(0.033);
+  assert.deepEqual([g.d.scale, ...g.held()], [25, 25, 'foes'], 'a camp\'s foe 65 m from its sight at 4 m/s: 65 / (0.6 x 4) = 27.1 - x25 of x40');
+  assert.equal(g.d.said.length, 1);
+  g.d.foes.length = 0;
+  g.govern(0.033);
+  assert.deepEqual([g.d.scale, ...g.held()], [40, null, null], 'nothing near: the ask back whole');
+  for (const quiet of [foe({ dead: true }), foe({ ai: { isHostile: false } })]) {
+    const q = governorHost({ up: false, owns: false, speed: 4, foes: [quiet] });
+    q.govern(0.033);
+    assert.deepEqual(q.held(), [null, null]);
+  }
+  const helm = governorHost({ up: false, owns: false, speed: 4, foes: [foe()], helm: true, scale: 3 });
+  helm.govern(0.033);
+  assert.deepEqual([helm.d.scale, ...helm.held()], [3, null, null], 'the helm\'s own time step holds the clock: left to it (AUDIT OW5 G5\'s law)');
+  const down = governorHost({ up: false, owns: true, foes: [foe()] });
+  down.govern(0.033);
+  assert.deepEqual([down.d.scale, ...down.held()], [1, 1, 'ground']);   // AUDIT OW5 G1's word
+  const none = governorHost({ journey: false, foes: [foe()] });
+  none.govern(0.033);
+  assert.deepEqual(none.held(), [null, null]);
+});
+
+test('OW6 x TV-WASD host run: THE KEYS\' TRAVEL SLOWS FOR ENEMIES TOO - held under the ground\'s rate (RATE-LAW: x60 off the road, x100 on it) under the view, a band that noticed me (WILD-ALERT: its chase) holds it (the reason the enemies), one far off holds nothing, and the keys let go let the hold go (mutants: the keys uncapped, their way unread)', () => {
+  dialAtTop();
+  const keys = () => new Set([TV_MOVE_ACTIONS[0]]);
+  // WILD-ALERT: a band that has noticed me - its chase, ahead along the way the keys move
+  const band = () => new Map([['b1', { band: { id: 'b1' }, pos: { x: 0, z: 470 } }]]);
+  const ahead = governorHost({ journey: false, keys: keys(), driveYaw: null, walkYaw: 0, chases: band() });
+  ahead.govern(0.033);
+  assert.deepEqual([ahead.d.scale, ...ahead.held()], [30, 30, 'foes'], 'x30 of x60: (470 - 30) / (0.6 x (16 + 5.2)) = 34.6, down the ladder');
+  assert.deepEqual(ahead.d.said, [TRAVEL_VIEW_TEXT.enemiesSlow], 'and said, as a journey\'s is');
+  const far = () => new Map([['b1', { band: { id: 'b1' }, pos: { x: 0, z: 1500 } }]]);
+  const behind = governorHost({ journey: false, keys: keys(), driveYaw: null, walkYaw: Math.PI, chases: far() });
+  behind.govern(0.033);
+  assert.deepEqual([behind.d.scale, ...behind.held()], [60, null, null], 'a chase far off: the keys\' own speed, the open ground\'s x60');
+  const road = governorHost({ journey: false, keys: keys(), driveYaw: null, walkYaw: Math.PI, chases: far(), onRoad: true });
+  road.govern(0.033);
+  assert.deepEqual([road.d.scale, ...road.held()], [100, null, null], 'on a road: the road\'s x100');
+  ahead.d.keys.clear();
+  ahead.govern(0.033);
+  assert.deepEqual([ahead.d.scale, ...ahead.held()], [1, null, null], 'the keys let go: walking pace, nothing held');
+});
+
+test('OW-ATTACK host run: THE ENEMY I GO TO FIGHT HOLDS NOTHING - an attacked band\'s chase and every member of an attacked camp leave the clock alone; any other alerted enemy still holds it (WILD-ALERT: only an enemy that has noticed me holds at all)', () => {
+  const chase = (...ids) => new Map(ids.map((id) => [id, { band: { id }, pos: { x: 0, z: 300 } }]));
+  const held = governorHost({ chases: chase('b1') });
+  held.govern(0.033);
+  assert.deepEqual(held.held(), [20, 'foes']);
+  // its chase, attacked: it holds nothing - the journey runs at the ask straight at it
+  const at = governorHost({ chases: chase('b1'), attack: { kind: 'band', id: 'b1' } });
+  at.govern(0.033);
+  assert.deepEqual([at.d.scale, ...at.held()], [40, null, null], 'the attacked band lets the clock go');
+  // another band still holds
+  const other = governorHost({ chases: chase('b1', 'b2'), attack: { kind: 'band', id: 'b1' } });
+  other.govern(0.033);
+  assert.deepEqual(other.held(), [20, 'foes'], 'any other enemy still holds');
+  // a camp: every member of the attacked one lets go, an alerted foe of another still holds
+  const foe = (camp) => ({ dead: false, camp, ai: { isHostile: true, feet: [0, 0, 125], sightRadius: 60, targetIsLocalPlayer: true, detected: true }, entity: {} });
+  const campAt = governorHost({ up: false, owns: false, speed: 4, foes: [foe('me:7'), foe('me:7')], attack: { kind: 'camp', id: 'me:7' } });
+  campAt.govern(0.033);
+  assert.deepEqual(campAt.held(), [null, null], 'the attacked camp, every member');
+  const campOther = governorHost({ up: false, owns: false, speed: 4, foes: [foe('me:7'), foe('me:9')], attack: { kind: 'camp', id: 'me:7' } });
+  campOther.govern(0.033);
+  assert.deepEqual(campOther.held()[1], 'foes', 'another camp\'s alerted foe still holds');
+});
+
+test('OW6 host wiring: the governor runs before the frame reads its scale, the panel is handed the reason, the enemies\' cap is taken on both skins', () => {
+  assert.match(W, /travelViewGovern\(dt\);[^\n]*\n\s*const travelScale = worldTimeScale\(\);/);
+  assert.match(W, /heldWhy: tvHeldWhy,/);
+  // since the merge with main: every fast travel the governor runs - a journey, or TV-WASD's keys along the way they last went
+  assert.match(W, /const foes = journey \|\| walk \? journeyThreatCap\(!!travelView\?\.active, !journey\) : null;/);
+  assert.match(W, /const yaw = _travelDrive \? \(_travelDrive\.yaw \* Math\.PI\) \/ 180 : keys \? _tvWalkYaw : null;/);
+  assert.match(W, /forward: 1 \}\) === 0\) \{ axes\.forward = 0; axes\.strafe = 0; \}\n\s*_tvWalkYaw = way;/, 'the keys\' way kept as they move the body');
+  // PIN MOVED (PVPNEAR/STRANGER-PACE): the cap kept, and a near stranger's own pace carried beside it
+  assert.match(W, /const r = threatCap\(\{ threats: journeyThreats\(up\), heading: yaw == null \? null : \{ x: Math\.sin\(yaw\), z: Math\.cos\(yaw\) \}, speedMps: travellerPace\(player, csaBoatUnderMe\(\)\) \}\);[^\n]*\n(?:[^\n]*\n){1,14}?\s*return sr \? \{ \.\.\.r, strangerRate: sr \} : r;/);   // PIN MOVED (PASSAGE-PACE): the traveller's own pace, a boat's way at her helm
+});

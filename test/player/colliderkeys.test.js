@@ -30,9 +30,71 @@ import { readFileSync } from 'node:fs';
 import { Collider } from '../../src/player/collider.js';
 import { trs } from '../../src/world/mat4.js';
 
+const SRC = readFileSync(new URL('../../src/player/collider.js', import.meta.url), 'utf8');
+/** collider.js's own constants, read from it rather than written twice */
+const constant = (name) => Number(new RegExp(`^const ${name} = (\\d+);`, 'm').exec(SRC)[1]);
+const CELL = constant('CELL'), FINE_CELLS_MAX = constant('FINE_CELLS_MAX');
 /** The coarse grid's two numbers at e9dd612e7 - OW-WOD-LAG retired that grid for a tree over the wide faces, and the old
  *  filing below is still the witness of which faces are WIDE (the ones it filed coarse or on the short list). */
 const COARSE = 64, COARSE_CELLS_MAX = 1024;
+
+/** addMesh's filing at e9dd612e7 (the triangles, the bounds, the fine grid, the coarse grid, the short list) */
+function oldFiling(positions, indices, m) {
+  const bucket = { tris: [], grid: new Map(), coarse: new Map(), huge: [], min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
+  const fileWide = (a, b, c, idx) => {
+    const minX = Math.floor(Math.min(a[0], b[0], c[0]) / COARSE);
+    const maxX = Math.floor(Math.max(a[0], b[0], c[0]) / COARSE);
+    const minZ = Math.floor(Math.min(a[2], b[2], c[2]) / COARSE);
+    const maxZ = Math.floor(Math.max(a[2], b[2], c[2]) / COARSE);
+    if (!(Number.isFinite(minX) && Number.isFinite(maxX) && Number.isFinite(minZ) && Number.isFinite(maxZ))) return;
+    if ((maxX - minX + 1) * (maxZ - minZ + 1) > COARSE_CELLS_MAX) { bucket.huge.push(idx); return; }
+    for (let gx = minX; gx <= maxX; gx++) {
+      for (let gz = minZ; gz <= maxZ; gz++) {
+        const k = `${gx},${gz}`;
+        let cell = bucket.coarse.get(k);
+        if (!cell) { cell = []; bucket.coarse.set(k, cell); }
+        cell.push(idx);
+      }
+    }
+  };
+  const tx = (i) => {
+    const x = positions[i * 3];
+    const y = positions[i * 3 + 1];
+    const z = positions[i * 3 + 2];
+    return [
+      m[0] * x + m[4] * y + m[8] * z + m[12],
+      m[1] * x + m[5] * y + m[9] * z + m[13],
+      m[2] * x + m[6] * y + m[10] * z + m[14],
+    ];
+  };
+  for (let i = 0; i < indices.length; i += 3) {
+    const a = tx(indices[i]);
+    const b = tx(indices[i + 1]);
+    const c = tx(indices[i + 2]);
+    const idx = bucket.tris.length;
+    bucket.tris.push([a, b, c]);
+    for (const v of [a, b, c]) {
+      for (let k = 0; k < 3; k++) {
+        if (v[k] < bucket.min[k]) bucket.min[k] = v[k];
+        if (v[k] > bucket.max[k]) bucket.max[k] = v[k];
+      }
+    }
+    const minX = Math.floor(Math.min(a[0], b[0], c[0]) / CELL);
+    const maxX = Math.floor(Math.max(a[0], b[0], c[0]) / CELL);
+    const minZ = Math.floor(Math.min(a[2], b[2], c[2]) / CELL);
+    const maxZ = Math.floor(Math.max(a[2], b[2], c[2]) / CELL);
+    if ((maxX - minX + 1) * (maxZ - minZ + 1) > FINE_CELLS_MAX) { fileWide(a, b, c, idx); continue; }
+    for (let gx = minX; gx <= maxX; gx++) {
+      for (let gz = minZ; gz <= maxZ; gz++) {
+        const k = `${gx},${gz}`;
+        let cell = bucket.grid.get(k);
+        if (!cell) { cell = []; bucket.grid.set(k, cell); }
+        cell.push(idx);
+      }
+    }
+  }
+  return bucket;
+}
 
 /** a scene with every kind of triangle: small ones in the thousands, wide ones on the coarse grid, huge ones on the
  *  short list, at positive and negative cells, rotated, and the far corner of a pixel */
@@ -57,7 +119,34 @@ test('PERF-EXT25: every bucket files every triangle in the cells the old string-
     c.addMesh(key, p, i, m);
     olds.push([key, p, i, m]);
   }
+  // the old filing of each bucket, its pieces in the order they went in
+  const want = new Map();
+  for (const [key, p, i, m] of olds) {
+    const o = oldFiling(p, i, m);
+    const w = want.get(key);
+    if (!w) { want.set(key, o); continue; }
+    const base = w.tris.length;
+    w.tris.push(...o.tris);
+    for (let k = 0; k < 3; k++) { w.min[k] = Math.min(w.min[k], o.min[k]); w.max[k] = Math.max(w.max[k], o.max[k]); }
+    for (const [name, map] of [['grid', o.grid], ['coarse', o.coarse]]) {
+      for (const [ck, list] of map) { const into = w[name].get(ck) ?? []; into.push(...list.map((t) => t + base)); w[name].set(ck, into); }
+    }
+    w.huge.push(...o.huge.map((t) => t + base));
+  }
   const decode = (k) => { assert.equal(typeof k, 'number', `a cell key is a number (${JSON.stringify(k)})`); const hi = Math.floor(k / 0x200000); return `${hi - 0x100000},${k - hi * 0x200000 - 0x100000}`; };
+  let fine = 0, wide = 0;
+  for (const [key, w] of want) {
+    const b = c._buckets.get(key);
+    assert.deepEqual(b.tris.map((t) => t.slice(0, 3)), w.tris, `${key}: the same triangles, in the same order`);
+    assert.deepEqual([b.min, b.max], [w.min, w.max], `${key}: the same bounds`);
+    assert.deepEqual(new Map([...b.grid].map(([k, v]) => [decode(k), v])), w.grid, `${key}: the fine grid, cell for cell`);
+    // OW-WOD-LAG: the wide faces - every one the old filing put on the coarse grid or the short list - each once, in the
+    // order they went in (the tree over them is built from this list)
+    const oldWide = [...new Set([...[...w.coarse.values()].flat(), ...w.huge])].sort((x, y) => x - y);
+    assert.deepEqual(b.wide, oldWide, `${key}: the wide faces, once each`);
+    fine += b.grid.size; wide += b.wide.length;
+  }
+  assert.ok(fine > 1000 && wide >= 2, `both homes are exercised (${fine} fine cells, ${wide} wide faces)`);
 });
 
 test('PERF-EXT25 (a guard, not a pin - true on the base by design): every query finds what a walk of EVERY triangle finds - the lookups read the cells the filing wrote, fine and coarse, across cell boundaries either side of zero', () => {
@@ -108,3 +197,20 @@ test('PERF-EXT25 (a guard, not a pin - true on the base by design): every query 
   assert.ok(rays > 50, `rays hit (${rays})`);
 });
 
+test('PERF-EXT25: the key is one-to-one over the cells a map can hold, and every cell lookup in the collider spells it the one way', () => {
+  // the formula the decode above inverts, at the corners of its range and across zero
+  const key = (gx, gz) => (gx + 0x100000) * 0x200000 + (gz + 0x100000);
+  const seen = new Set();
+  for (const gx of [-0xfffff, -65536, -1, 0, 1, 65535, 0xfffff]) for (const gz of [-0xfffff, -1, 0, 1, 0xfffff]) {
+    const k = key(gx, gz);
+    assert.ok(Number.isSafeInteger(k) && !seen.has(k), `(${gx}, ${gz}) -> ${k}`);
+    seen.add(k);
+  }
+  assert.match(SRC, /const cellKey = \(gx, gz\) => \(gx \+ 0x100000\) \* 0x200000 \+ \(gz \+ 0x100000\);/, 'the collider\'s key is that formula');
+  // no string is minted for a cell any more, on the insert or on a lookup
+  assert.doesNotMatch(SRC, /\.(grid|coarse)\.get\(`/, 'no template literal is looked up');
+  assert.doesNotMatch(SRC, /const k = `\$\{/, 'none is filed');
+  assert.doesNotMatch(SRC, /for \(const v of \[a, b, c\]\)/, 'and no fourth array is made a triangle for its bounds');
+  const lookups = SRC.match(/\.(grid|coarse)\.get\(cellKey\(/g) || [];
+  assert.equal(lookups.length, 4, 'the four lookups: the point query\'s fine 3x3 and the ray\'s fine DDA (OW-WOD-LAG: the wide faces are the tree\'s, no grid); FIELD BUGS 2026-10-02 ROCK-FREE\'s hull overlap over its radius\'s cells and the line up from her centre (partsHolding)');
+});

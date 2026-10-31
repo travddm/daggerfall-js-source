@@ -63,6 +63,14 @@ test('EM3: the dungeon is drawn in the BAY\'s pen - not one colour is invented h
   for (const [name, value] of Object.entries(PLAN_PEN)) {
     assert.ok(Object.values(PEN).includes(value), `PLAN_PEN.${name} is a colour inkMap does not have`);
   }
+  // and the two sheets share the hand at the SOURCE too: the pen, the
+  // halo and the face all come from inkMap, and the strip's scale from
+  // the tab strip, so nothing here can drift away from the world map
+  const text = src('src/ui/ink/inkAutomap.js');
+  assert.match(text, /import \{ PEN, HALO_PEN, NAME_FACE, toPaper, paintCaret, paintPartyCarets, CARET_R \} from '\.\/inkMap\.js';/);
+  assert.match(text, /import \{ STRIP, stripScale, grabHit \} from '\.\.\/map\/mapStrip\.js';/);
+  assert.doesNotMatch(text, /rgba?\(/, 'a colour written out here is a colour that drifts');
+  assert.doesNotMatch(text, /#[0-9a-fA-F]{3,8}\b/);
 });
 
 test('EM3: the wall is the outline of what was REVEALED, in world units through the view', () => {
@@ -346,4 +354,6 @@ test('EM3: two grabbed boxes that overlap give the press to the NEAREST - the se
   assert.equal(grabHit(boxes, 5, 11, 6), 0, 'nearer the first');
   assert.equal(grabHit(boxes, 5, 13, 6), 1, 'nearer the second');
   assert.equal(grabHit(boxes, 5, 40, 6), -1, 'clear of both');
+  assert.match(src('src/ui/ink/inkAutomap.js'), /grabHit\(rows, px, py/, 'the floor strip does not write its own');
+  assert.match(src('src/ui/map/mapStrip.js'), /grabHit\(tabs, px, py/, 'nor does the tab strip');
 });

@@ -565,6 +565,272 @@ test('c2/S10 HALF B: the plates - the discovery gate, the residence arm, the ren
   } finally { _resetForTests(); _resetZoomForTests(); restoreDiscovery(null); }
 });
 
+test('c2/S10 REVIEW: the rename push must not LATCH the panel drag - the uncovered map comes back released (BaseScreenComponent.cs:642-648)', () => {
+  _resetForTests(); _resetZoomForTests();
+  restoreDiscovery(null);
+  try {
+    const summaries = buildingSummaries(
+      [{ buildingType: 9, nameSeed: 1, factionId: 0, quality: 10 }], [FAKE_BLOCK], {});
+    const shop = summaries[0];
+    discoverBuilding('r:latch', { buildingKey: shop.buildingKey, name: 'The Odd Blades', buildingType: 9 });
+    const pushes = [];
+    const w = new ExteriorAutomapWindow({
+      ...deps('r:latch'),
+      buildings: () => summaries,
+      discovered: () => discoveredBuildings('r:latch'),
+      rename: (k, n) => pushes.push([k, n]),
+    });
+    w._hoverPlate = w.buildPlates(FONT, { s: 1, ox: 0, oy: 0 })[0];
+    // the double click is a press ON THE RENDER PANEL, so it arms the
+    // pan drag beside the rename - in DFU too (the nameplate label is a
+    // CHILD of panelRenderAutomap, so PanelAutomap_OnMouseDown fires as
+    // well, window :1332-1341)
+    const P = CHROME_RECTS.panel;
+    const nx = P.x + 100, ny = P.y + 40;
+    w.pointer('down', nx, ny, 0);
+    w.pointer('up', nx, ny, 0);
+    w.pointer('down', nx, ny, 0);
+    assert.deepEqual(pushes, [[shop.buildingKey, 'The Odd Blades']], 'the double click pushed the rename box');
+    assert.equal(w.chrome.inDragMode(), true, 'and that press armed the pan drag, exactly as DFU\'s does');
+    // THE RELEASE NEVER COMES BACK. townTalk.pointer('up') bails at
+    // `if (!overlay?.pointer) return false` because the slot now holds
+    // the ServiceFlowWindow, which has no pointer seam - so what must
+    // clear the latch is OnReturn, fired on the window the pop
+    // uncovers (windowStack.js's RemoveWindow). DFU needs no such hook
+    // because its release is polled off the button STATE and lands on
+    // the first frame after the box pops.
+    assert.match(src('src/ui/windowStack.js'), /const t = top\(\);\n\s*if \(t\) t\.onReturn\?\.\(\);/,
+      'the uncovered window really is told');
+    // ROAD-E E1 widened that gate (a window with only `release()` - the
+    // list picker's thumb - now hears the up too), but it did NOT widen
+    // it to the covered windows: the release still goes to the SLOT's
+    // occupant alone, which after the push is the box.
+    assert.match(src('src/scenes/townTalk.js'),
+      /overlay\.pointer\?\.\(phase, v \? v\[0\] : -1, v \? v\[1\] : -1, e\.button \?\? 0\);\n\s*if \(phase === 'up'\) overlay\.release\?\.\(\);/,
+      'and the release cannot reach a covered window - hence the hook');
+    w.onReturn();
+    assert.equal(w.chrome.inDragMode(), false, 'the map is released the moment it is uncovered');
+    const before = [...w.cam.center];
+    w.hover(nx + 20, ny + 8);
+    assert.deepEqual([...w.cam.center], before, 'a bare mouse move over the returned map does not pan it');
+    // ...and the very next chrome press is not swallowed by
+    // `if (this.inDragMode()) return out`
+    const G = CHROME_RECTS.grid;
+    w.pointer('down', G.x + 2, G.y + 2, 0);
+    w.pointer('up', G.x + 2, G.y + 2, 0);
+    assert.equal(w.mode, VIEW_MODES[1], 'the grid button answers the FIRST press after the rename');
+  } finally { _resetForTests(); _resetZoomForTests(); restoreDiscovery(null); }
+});
+
+test('c2/S10 REVIEW: ONE compass drawer (hud.js) at COMPBOX\'s own 69x17, and the plate tooltip is toolTip.js\'s box in DFU\'s two GUI colors', () => {
+  _resetForTests(); _resetZoomForTests();
+  restoreDiscovery(null);
+  try {
+    const summaries = buildingSummaries(
+      [{ buildingType: 9, nameSeed: 1, factionId: 0, quality: 10 }], [FAKE_BLOCK], {});
+    const shop = summaries[0];
+    discoverBuilding('r:chrome', { buildingKey: shop.buildingKey, name: 'The Odd Blades', buildingType: 9 });
+    // the two colours DFU assigns the nameplate tooltip by hand
+    // (window :874-875), and the master switch OFF - DFU's
+    // nameplateToolTip is a bare `new ToolTip()` (:870-871) drawn
+    // unconditionally (:571-572), so it is not gated by EnableToolTips
+    setValue('GUI', 'EnableToolTips', false);
+    setValue('GUI', 'ToolTipBackgroundColor', '102030C0');
+    setValue('GUI', 'ToolTipTextColor', 'FFEE00FF');
+    const log = [];
+    const r = stubRenderer(log);
+    const F = { ...FONT, tex: 'atlas' };
+    const w = new ExteriorAutomapWindow({
+      ...deps('r:chrome'),
+      compassArt: { compass: { tex: 'COMPASS', w: 322, h: 13 }, compassBox: { tex: 'COMPBOX', w: 69, h: 17 } },
+      buildings: () => summaries,
+      discovered: () => discoveredBuildings('r:chrome'),
+    });
+    // park the plate's anchor dead centre of the render panel, so the
+    // hover point is exact: anchor (96,48) minus half the 128x128 layout
+    w.cam = { ...w.cam, center: [32, 0, -16] };
+    // a 320x200 canvas puts nativeMetrics at scale 1 - every recorded
+    // rect IS a native rect
+    const canvas = { width: 320, height: 200 };
+    w.hover(161, 85);   // over the plate, which sits at the panel centre
+    w.draw(r, canvas, F, 1);
+    const quads = log.filter((l) => l.kind === 'quad');
+
+    // THE COMPASS: dummyPanelCompass gives the POSITION alone (:456
+    // `compass.Position = dummyPanelCompass.Rectangle.position`), and
+    // HUDCompass sizes the frame from the ART (HUDCompass.cs:132-135) -
+    // COMPBOX.IMG is 69x17, NOT the dummy panel's 76x17 (:433).
+    const box = quads.find((q) => q.tex === 'COMPBOX');
+    assert.ok(box, 'the compass frame drew');
+    assert.deepEqual([box.dst.x, box.dst.y, box.dst.w, box.dst.h], [3, 172, 69, 17],
+      'the ART\'s size at the dummy panel\'s position - the same rect the dungeon window and the HUD draw');
+    const strip = quads.find((q) => q.tex === 'COMPASS');
+    assert.deepEqual([strip.dst.x, strip.dst.y, strip.dst.w], [5, 174, 65],
+      'the strip window is the box inset by the 2px outline, so 69-4 - never 76-4');
+    // and it is the SHARED drawer, not a second home for the scroll law
+    const wsrc = src('src/ui/exteriorAutomapWindow.js');
+    assert.match(wsrc, /import \{ drawCompassStrip \} from '\.\/hud\/hud\.js';/);
+    assert.equal(/compassScroll|COMPASS_BOX_OUTLINE|COMPASS_BOX_INTERIOR/.test(wsrc), false,
+      'the scroll law and the outline inset live in hud.js and nowhere else');
+
+    // THE PLATE TOOLTIP: ToolTip.Draw's own box (ToolTip.cs:158-179) at
+    // the CURSOR plus MouseOffset (0,4) - not at the plate - sized
+    // widest+4 by glyph*rows+3, in the two settings colours.
+    const bg = [0x10 / 255, 0x20 / 255, 0x30 / 255, 0xc0 / 255];
+    const tip = quads.find((q) => q.tex === null && q.color && q.color.length === 4
+      && Math.abs(q.color[0] - bg[0]) < 1e-9 && Math.abs(q.color[3] - bg[3]) < 1e-9);
+    assert.ok(tip, 'the tooltip drew with tooltips DISABLED - DFU\'s nameplate tooltip is not gated');
+    const tw = measureText(F.fnt, 'The Odd Blades') + 4;
+    assert.deepEqual([tip.dst.x, tip.dst.y, tip.dst.w, tip.dst.h], [161, 89, tw, 9],
+      'cursor + MouseOffset(0,4), widest + 2*margin by glyph*rows + 2*margin - 1');
+    const fg = [1, 0xee / 255, 0, 1];
+    const glyphs = quads.filter((q) => q.tex === 'atlas' && q.color && Math.abs(q.color[1] - fg[1]) < 1e-9);
+    assert.ok(glyphs.length > 0, 'and the text takes GUI/ToolTipTextColor');
+    assert.equal(glyphs[0].dst.y, 89 + 2, 'inset by the 2px top margin');
+    assert.equal(glyphs.every((g) => g.color[0] === 1 && g.color[2] === 0), true);
+    // the canonical name, never the drawn custom one (:878)
+    assert.equal(setDiscoveredBuildingCustomName('r:chrome', shop.buildingKey, 'My Smith'), true);
+    log.length = 0;
+    w.hover(161, 85);
+    w.draw(r, canvas, F, 1);
+    const tip2 = log.filter((l) => l.kind === 'quad').find((q) => q.tex === null && q.color
+      && Math.abs(q.color[3] - bg[3]) < 1e-9);
+    assert.equal(tip2.dst.w, tw, 'the tooltip still measures the CANONICAL name');
+  } finally { _resetForTests(); _resetZoomForTests(); restoreDiscovery(null); }
+});
+
+test('A2 wiring pins: the M-outside dispatch in both exterior hosts, gated on a location (DaggerfallUI.cs:633-650)', () => {
+  // I2: the dispatch reads the ACTION, not the raw code - M is its
+  // registry default (inputActions ResetDefaults :1027) and rebinding
+  // it moves the town map with it, as DFU's does.
+  // U43 collapsed the per-arm guards into ONE gate per host - the
+  // ladder and the large HUD's panels now open the same windows
+  // through one hudCtx - so the pin follows the law to its new shape
+  // rather than to the line it used to sit on. The gate and the arm
+  // are checked separately, and the arm must be INSIDE the gate.
+  const GATE = "if (!townTalk.overlayActive && (modes?.mode ?? 'exterior') === 'exterior') {";
+  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
+    const h = src(host);
+    const g = h.indexOf(GATE);
+    assert.ok(g > 0, `${host}: the ladder is gated once, on the overlay AND the mode`);
+    const arm = h.indexOf("if (act === 'AutoMap') { hudCtx.toggleAutomap(); return true; }");
+    assert.ok(arm > g, `${host}: and M-outside sits inside that gate`);
+  }
+  const w = src('src/scenes/world.js');
+  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): `townHere` answers null off a location, and the M key opens nothing without one
+  assert.match(w, /if \(!dfLoc \|\| !b\?\.locBlocks \|\| !b\.locOrigin\) return null;/, 'empty wilderness builds nothing');
+  assert.match(w, /const here = townHere\(\);\n\s+if \(!here\) return;/, 'empty wilderness opens nothing');
+  // EM4: the town map is behind a SKIN DOOR now - the classic skin
+  // still gets `new ExteriorAutomapWindow(...)`, from inside
+  // ui/town/townMapDoor.js, and the host opens whichever the skin wears.
+  // The law this line holds is that the host builds a town map at all,
+  // so it follows the build to the door rather than to the class.
+  const e = src('src/scenes/exterior.js');
+  assert.match(e, /createTownMapWindow\(/, 'the host opens a town map');
+  assert.match(src('src/ui/town/townMapDoor.js'), /new ExteriorAutomapWindow\(/,
+    'and the classic arm of that door still builds DFU\'s own window');
+  assert.match(src('src/scenes/world.js'), /createTownMapWindow\(/, 'both exterior hosts, one door');
+  assert.match(src('src/systems/inputActions.js'), /\['KeyM', 'AutoMap'\]/, 'and M is that action\'s default');
+});
+
+test('A2 review: every townTalk overlay drop frees the occupant (the A1 death-presenter lesson on THIS slot)', () => {
+  // uploadTexture memoizes forever, so a window replaced or dropped
+  // without dispose leaks its texture AND leaves a live cache key -
+  // the exact A1 bug, one slot over. All four clear-points covered.
+  // THE FOUR CLEAR-POINTS BECAME ONE at the 2026-08-29 recursion fix
+  // (townTalk.dropOverlay), so this reads the seam and then checks that
+  // every drop still goes through it - which is strictly stronger than
+  // the four literals it replaces: those could only fail for the four
+  // sites they named, and a FIFTH drop added tomorrow passed them all.
+  const t = src('src/scenes/townTalk.js');
+  const seam = t.match(/function dropOverlay\([\s\S]*?\n {2}}/)?.[0] ?? '';
+  assert.ok(seam.includes('win.dispose?.()'), 'the one drain frees the occupant');
+  assert.match(t, /outgoing\?\.dispose\?\.\(\);/, 'showOverlay frees what it replaces');
+  // Nothing else in the module may dispose the slot - a drop that
+  // sidesteps the seam is both a leak and a way back into the crash.
+  const strays = [...t.matchAll(/^.*\boverlay\??\.dispose\?\.\(\).*$/gm)].map((m) => m[0].trim());
+  assert.deepEqual(strays, [], `a drop bypasses dropOverlay:\n  ${strays.join('\n  ')}`);
+  for (const site of ['if (overlay?.done) dropOverlay();', 'dropOverlay(false)'])
+    assert.ok(t.includes(site), `a clear-point stopped going through the seam: ${site}`);
+  // and the exterior window really exposes one - which now frees THREE
+  // uploaded textures (the layout, the mesh stamp and the disc)
+  const w = src('src/ui/exteriorAutomapWindow.js');
+  assert.match(w, /dispose\(\) \{/);
+  assert.equal((w.match(/releaseTexture\('amap'/g) ?? []).length >= 3, true);
+});
+
+test('c2/S10 SOURCE PINS: the rotate option is the only new GL, the chrome is the SHARED module, and the release really is routed', () => {
+  const r = src('src/render/renderer.js');
+  assert.match(r, /uniform vec4 uRot;/, 'the screen quad gained ONE uniform pair');
+  assert.match(r, /if \(uRotOn == 1\) \{/);
+  // it must NOT be wired to the mesh path's handedness mirror
+  const vs = r.slice(r.indexOf('uniform vec4 uRot;'), r.indexOf('vec2 ndc = vec2(px.x'))
+    .replace(/^\s*\/\/.*$/gm, '');   // the comment SAYS mirrorProjectionX; the CODE must not use one
+  assert.equal(/mirror/i.test(vs), false, 'screen quads run with culling disabled - no mirrorProjectionX');
+  assert.equal(/mirrorProjectionX/.test(src('src/ui/exteriorAutomapWindow.js')), false,
+    'and the window never builds a mirrored projection either - it has no mesh pass at all');
+  // the scissor-only bracket lives in the RENDERER (EV6's law), and it
+  // clears in a finally so a throwing body cannot leak SCISSOR_TEST -
+  // which silently blanks the NEXT host frame's clear
+  assert.match(r, /screenScissor\(rect, body\) \{/);
+  assert.match(r, /try \{ return body\(\); \} finally \{ this\.clearScreenScissor\(\); \}/);
+  const w = src('src/ui/exteriorAutomapWindow.js');
+  assert.equal(/renderer\.setScreenScissor\(/.test(w), false, 'the window never sets the scissor itself');
+  assert.match(w, /from '\.\/automap\/automapChrome\.js'/, 'ONE chrome module, two tables');
+  assert.match(w, /EXTERIOR_ACTIONS/, 'and the exterior table is this window\'s');
+  // no rotated nameplate corners anywhere in the arc. The headers NAME
+  // RotateBuildingNameplates to record that it is dead; the CODE must
+  // not carry it, so the comments come out before the check.
+  const bare = (f) => src(f).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.equal(/upperLeftCorner|AngleAxis|RotateBuildingNameplates/.test(bare('src/ui/exteriorAutomapWindow.js') + bare('src/ui/nameplateLayout.js')), false,
+    'RotateBuildingNameplates\' corner rotation is dead code in DFU and is not ported');
+  // the three pointer phases reach the slot exactly ONCE each: down on
+  // pointerdown, move on hover, up on the window listener. A press
+  // delivered twice would arm the press-hold machine twice.
+  const t = src('src/scenes/townTalk.js');
+  assert.match(t, /function pointer\(phase, e\) \{/);
+  assert.match(t, /if \(overlay\.pointer\) overlay\.pointer\('down', v\[0\], v\[1\], e\.button \?\? 0\);\n\s*else overlay\.click/,
+    'a window with the three-phase seam never takes the press through click as well');
+  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
+    assert.match(src(host), /townTalk\.pointer\('up', e\)/, `${host} routes the release`);
+  }
+});
+
+test('A2 grayscale pins: the shader law and the two-tier dungeon pass (DaggerfallAutomap.shader:102-110)', () => {
+  const r = src('src/render/renderer.js');
+  assert.match(r, /1\.0 - clamp\(sliceDist \/ 20\.0, 0\.0, 0\.6\)/, 'the slice-distance dim, floored at 40%');
+  assert.match(r, /dot\(outColor\.rgb, vec3\(0\.3, 0\.59, 0\.11\)\)/, 'the luminance weights digit for digit');
+  assert.match(r, /setAutomapMode\(m\) \{/, 'the immediate-upload setter');
+  const aw = src('src/ui/automap/automapWindow.js');
+  // c2/S6 named the six presentations and moved the two-tier split
+  // into _partitionDraws, so the LAW reads through the names now - the
+  // draw groups are still issued colour-then-grayscale, and the
+  // prior-run predicate is still "revealed but not visited this run".
+  assert.match(aw, /AUTOMAP_MODE\.BELOW_COLOUR\);[\s\S]{0,400}AUTOMAP_MODE\.BELOW_GRAY\);/, 'visited draws colour, prior-run grayscale');
+  // RE-BASELINED at ROAD-C c2/S8: DFU's two bits are INDEPENDENT -
+  // MeshRenderer.enabled says drawn, RENDER_IN_GRAYSCALE says which
+  // tier - and HideAll (Automap.cs:2450-2464) clears the first without
+  // touching the second, so `revealed` had to become the gate and the
+  // tier a choice made inside it. Both halves are pinned, because
+  // collapsing them back into one conditional is exactly the mistake.
+  assert.match(aw, /if \(!rec\.revealed\.has\(key\)\) return;/, 'revealed IS the draw gate (MeshRenderer.enabled)');
+  // RE-BASELINED at ROAD-C c2/S9: `run` is NULL inside a building, which
+  // is the always-colour law (AutomapModel.cs:46-72 passes
+  // visitedInThisEntering = playerIsInsideBuilding), so the predicate
+  // reads through that arm. Both halves stay pinned.
+  assert.match(aw, /const run = this\.deps\.insideBuilding \? null : rec\.visitedThisRun;/, 'inside a building there is no prior-run tier');
+  assert.match(aw, /const row = \(run === null \|\| run\.has\(key\)\) \? visited : prior;/, 'the prior-run predicate (RENDER_IN_GRAYSCALE)');
+  assert.match(aw, /setClipY\(null\);\n\s*renderer\.setAutomapMode\(AUTOMAP_MODE\.OFF\);/, 'beacons ride neither the slice nor the tint');
+  // PIN MOVED, ROAD-C c2/S2: the automap mode is one of the globals
+  // renderer.panelFrame saves and returns in its own finally, so the
+  // window's hand-rolled restore list is gone. The throwing-body
+  // proof lives in test/ui/automap/roadc_panelframe.test.js, where it runs
+  // against the bracket instead of against this file's text.
+  assert.match(aw, /renderer\.panelFrame\(\{/, 'the pass runs inside the renderer\'s bracket');
+  assert.match(src('src/render/renderer.js'), /automapMode: this\._automapMode,/, 'and the bracket saves the mode by name');
+  assert.match(src('src/render/renderer.js'), /this\.setAutomapMode\(s\.automapMode\);/, 'and hands it back');
+});
+
 // ── ROAD-C c2 flight-2 review fixes ──────────────────────────────────
 
 test('c2/S10 THE ROTATION SIGN, from ExteriorAutomap.cs\'s camera math: rotate-LEFT turns the town counter-clockwise, and rotate-around-player PINS the marker', () => {
@@ -617,6 +883,117 @@ test('c2/S10 THE ROTATION SIGN, from ExteriorAutomap.cs\'s camera math: rotate-L
   } finally { _resetForTests(); _resetZoomForTests(); }
 });
 
+test('c2/S10 THE HOTKEYS ARE DFU\'S OWN ExtAutomap TABLE - every verb bound, resolved through ShortcutOrFallback, and A2\'s invented letters gone', () => {
+  _resetForTests(); _resetZoomForTests();
+  try {
+    // (1) THE TABLE, resolved out of DialogShortcuts.txt:267-296 rather
+    // than spelled here: both classes together are DFU's thirty rows,
+    // each carries a key, and each names a verb runVerb owns.
+    const all = [...EXT_HOTKEYS_DOWN, ...EXT_HOTKEYS_HELD];
+    assert.equal(all.length, 30, 'all thirty ExtAutomap rows are live');
+    assert.equal(new Set(all).size, 30);
+    for (const b of all) assert.ok(shortcutBinding(b).code, `${b} resolves to a key`);
+    // (sequenceString prints the port's alphabet - the browser code -
+    // where DFU's table names the Unity KeyCode: LeftArrow, PageUp,
+    // KeypadPlus.)
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapMoveLeft')), 'ArrowLeft');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapRotateLeft')), 'Ctrl-ArrowLeft');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapRotateAroundPlayerPosLeft')), 'Alt-ArrowLeft');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapMoveToWestLocationBorder')), 'Shift-ArrowLeft');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapMaxZoom1')), 'Ctrl-PageUp');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapSwitchToNextExteriorAutomapViewMode')), 'Enter');
+    assert.equal(sequenceString(shortcutBinding('ExtAutomapZoomOut')), 'NumpadSubtract');
+    const RV = src('src/ui/exteriorAutomapWindow.js');
+    for (const b of all) {
+      if (EXT_BACKGROUND_HOTKEYS[b]) { assert.equal(EXT_HOTKEY_VERBS[b], undefined, `${b} is a background, not a verb`); continue; }
+      const verb = EXT_HOTKEY_VERBS[b];
+      assert.ok(verb && RV.includes(`case '${verb}'`), `${b} -> ${verb} has a runVerb arm`);
+    }
+
+    // (2) THE KEYS REALLY DRIVE, and one code carries three verbs by
+    // its modifier - which the invented letter table could not express.
+    const w = new ExteriorAutomapWindow(deps('r:keys'));
+    w.cam = { ...w.cam, center: [0, 0, 0], yawDeg: 0, orthoSize: 100 };
+    w._dt = 1;
+    // ROAD-E E1: THE HELD CLASS IS A FRAME POLL NOW (IsPressedWith =
+    // InputManager.GetKey), so a hotkey is driven the way a player
+    // drives it - press, one frame of 1.0s, release. The DOWN class
+    // below still fires on the press, because IsDownWith is the edge.
+    const hold = (code, mods = {}) => {
+      w.input(code, { code, ...mods });
+      w.tick(1);
+      w.keyup(code, { code, ...mods });
+    };
+    hold('ArrowLeft');
+    assert.equal(w.cam.center[0], -100, 'LeftArrow is ExtAutomapMoveLeft at 100 units/second');
+    assert.equal(w.cam.yawDeg, 0, 'and it does not rotate');
+    hold('ArrowLeft', { ctrlKey: true });
+    assert.equal(w.cam.yawDeg, 150, 'Ctrl-LeftArrow is ExtAutomapRotateLeft');
+    w.cam = { ...w.cam, yawDeg: 0, center: [0, 0, 0] };
+    hold('ArrowLeft', { altKey: true });
+    assert.equal(w.cam.yawDeg, 150, 'Alt-LeftArrow is ExtAutomapRotateAroundPlayerPosLeft');
+    assert.notDeepEqual(w.cam.center, [0, 0, 0], 'and it swings the centre about the marker');
+    w.cam = { ...w.cam, center: [7, 0, -9], yawDeg: 0 };
+    hold('ArrowUp', { shiftKey: true });
+    assert.deepEqual(w.cam.center, [7, 0, +64], 'Shift-UpArrow is ExtAutomapMoveToNorthLocationBorder, not MoveForward');
+
+    // (3) THE ZOOM, BOTH DIRECTIONS. A2's `case 'minus'` could never
+    // fire - ui/input.js returns 'char:-' for the hyphen - so keyboard
+    // zoom-OUT did not exist at all. DFU binds PageUp/PageDown and
+    // Keypad+/-, and the ZoomIn/ZoomOut arms (:700-708) are the same
+    // ActionZoom bodies as Upstairs/Downstairs.
+    w.cam = { ...w.cam, orthoSize: 100 };
+    hold('PageDown');
+    assert.equal(w.cam.orthoSize, 150, 'PageDown is ExtAutomapDownstairs = ActionZoom(+zoomSpeed*dt)');
+    hold('PageUp');
+    assert.equal(w.cam.orthoSize, 100, 'PageUp is ExtAutomapUpstairs');
+    hold('NumpadSubtract');
+    assert.equal(w.cam.orthoSize, 150, 'KeypadMinus is ExtAutomapZoomOut - the arm the hyphen never reached');
+    hold('NumpadAdd');
+    assert.equal(w.cam.orthoSize, 100, 'KeypadPlus is ExtAutomapZoomIn');
+    hold('PageUp', { ctrlKey: true });
+    assert.equal(w.cam.orthoSize, ZOOM_MIN, 'Ctrl-PageUp is ExtAutomapMaxZoom1');
+    hold('PageDown', { ctrlKey: true });
+    assert.equal(w.cam.orthoSize, ZOOM_MAX, 'Ctrl-PageDown is ExtAutomapMinZoom1');
+    hold('NumpadAdd', { ctrlKey: true });
+    assert.equal(w.cam.orthoSize, ZOOM_MAX, 'Ctrl-KeypadPlus is MinZoom2 - DFU\'s own odd pairing, kept');
+    hold('NumpadSubtract', { ctrlKey: true });
+    assert.equal(w.cam.orthoSize, ZOOM_MIN, 'and Ctrl-KeypadMinus is MaxZoom2');
+
+    // (4) THE THREE DIRECT VIEW MODES (:1235-1262) had no arm anywhere
+    // before - F2/F3/F4 SET the mode, they do not cycle to it.
+    w.input('F4', { code: 'F4' });
+    assert.equal(w.mode, 'all');
+    w.input('F2', { code: 'F2' });
+    assert.equal(w.mode, 'original');
+    w.input('F3', { code: 'F3' });
+    assert.equal(w.mode, 'extra');
+    w.input('Enter', { code: 'Enter' });
+    assert.equal(w.mode, 'all', 'Return is ExtAutomapSwitchToNextExteriorAutomapViewMode');
+    w.cam = { ...w.cam, yawDeg: 42, center: [500, 0, 500] };
+    w.input('Tab', { code: 'Tab' });
+    assert.deepEqual(w.cam.center, [...w.markerPos().slice(0, 1), 0, w.markerPos()[2]], 'Tab is ExtAutomapFocusPlayerPosition');
+    w.input('Backspace', { code: 'Backspace' });
+    assert.equal(w.cam.yawDeg, 0, 'Backspace is ExtAutomapResetView');
+
+    // (5) A2'S INVENTED VOCABULARY IS GONE. Not one of its letters or
+    // digits does anything now. ('up'/'down' are left out: those are
+    // ui/input.js's cooked names for the ARROWS, which normalizeCode
+    // resolves back to DFU's own MoveForward/MoveBackward rows.)
+    const shot = () => JSON.stringify({ cam: w.cam, mode: w.mode, bg: w.background, done: w.done, latch: w.isCloseWindowDeferred });
+    const frozen = shot();
+    for (const ch of ['char:w', 'char:a', 'char:s', 'char:d', 'char:q', 'char:e',
+      'char:n', 'char:b', 'char:h', 'char:l', 'char:v', 'char:f', 'char:c',
+      'char:1', 'char:2', 'char:7', 'char:8', 'char:9', 'char:0', 'plus', 'minus']) w.input(ch, null);
+    assert.equal(shot(), frozen, 'the WASD/QE/digit table no longer exists');
+
+    // (6) THE SEAM. townTalk hands raw codes only to a window that asks
+    // for them, and that one flag is what forced the invention.
+    assert.equal(w.isChoiceWindow, true);
+    assert.match(src('src/scenes/townTalk.js'), /if \(overlay\.isChoiceWindow\) overlay\.input\(e\.code, e\);/);
+  } finally { _resetForTests(); _resetZoomForTests(); }
+});
+
 test('c2/S10 the two panel drags run in REAL SCREEN pixels, and the right drag carries ActionRotate\'s own dt', () => {
   _resetForTests(); _resetZoomForTests();
   try {
@@ -651,6 +1028,28 @@ test('c2/S10 the two panel drags run in REAL SCREEN pixels, and the right drag c
     // ...while the LEFT drag stays dt-FREE: :733-740 has no dt at all,
     // and the asymmetry is deliberate in the reference.
     assert.deepEqual(drag(1, 1 / 30, 0).center, one.center, 'the pan is not a per-second speed');
+  } finally { _resetForTests(); _resetZoomForTests(); }
+});
+
+test('c2/S10 the hover sentinel never reaches the drag machine: (-1,-1) freezes the drag, it does not teleport the map', () => {
+  _resetForTests(); _resetZoomForTests();
+  try {
+    const w = new ExteriorAutomapWindow(deps('r:hover'));
+    w.cam = { ...w.cam, center: [0, 0, 0], yawDeg: 0, orthoSize: 250 };
+    w._scale = 1;
+    w.pointer('down', 160, 85, 0);
+    w.hover(170, 85);
+    const moved = [...w.cam.center];
+    assert.ok(Math.abs(moved[0]) > 0, 'a real move drags');
+    // townTalk hands (-1,-1) for ANY pointer outside the native rect -
+    // its listener is on the window, not the canvas - and that is a
+    // FABRICATED coordinate, not a position. DFU never has one: its
+    // Update differences two real MousePosition samples.
+    w.hover(-1, -1);
+    assert.deepEqual(w.cam.center, moved, 'the excursion moves nothing at all');
+    w.hover(180, 85);
+    assert.ok(Math.abs(w.cam.center[0] - moved[0] * 2) < 1e-9, 'and the drag resumes from the re-entry point');
+    assert.match(src('src/scenes/townTalk.js'), /overlay\.hover\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/);
   } finally { _resetForTests(); _resetZoomForTests(); }
 });
 
@@ -759,6 +1158,134 @@ test('D5 the residence-with-active-quest plate arm: ExteriorAutomap.cs:693-709\'
   // (systems/topicTree.js:"isBuildingQuestResource(mapID, buildingKey)") and the real discovery store ----
   _resetForTests(); _resetZoomForTests();
   restoreDiscovery(null);
+  try {
+    const summaries = buildingSummaries(
+      [{ buildingType: 9, nameSeed: 1, factionId: 0, quality: 10 }], [FAKE_BLOCK], {});
+    const shop = summaries[0], house = summaries[1];
+    assert.equal(house.isResidence, true);
+    const site = {
+      isPlace: true,
+      symbol: { name: '_site_' },
+      siteDetails: { mapId: 100, buildingKey: house.buildingKey, buildingName: 'The Marked House', locationName: 'T', regionName: 'R' },
+    };
+    const quest = { uid: 3, resources: new Map([['_site_', site]]) };
+    const tree = new TopicTree({
+      getQuest: () => quest,
+      getAllActiveQuestIds: () => [3],
+      currentRegionIndex: () => 17,
+      currentRegionName: () => 'R',
+      currentLocationName: () => 'T',
+      currentMapId: () => 100,
+      isPlayerInside: () => false,
+      isPlayerInsideBuilding: () => false,
+      isPlayerInsideCastle: () => false,
+      currentBuildingKey: () => -1,
+      getBuildingList: () => [],
+      exteriorBuildings: () => [],
+      factionName: () => '',
+      addOrReplaceQuestProgressRumor: () => {},
+      undiscoverBuilding: () => {},
+      talkPartner: () => null,
+      onTopicListsUpdated: () => {},
+    });
+    tree.addQuestTopicWithInfoAndRumors(3, site, '_site_', QUEST_INFO_RESOURCE_TYPE.Location, null, null);
+    const source = {
+      getAllActiveQuestIds: () => [3],
+      getQuest: () => quest,
+      isBuildingQuestResource: (mapID, key) => tree.isBuildingQuestResource(mapID, key),
+    };
+    const w = new ExteriorAutomapWindow({
+      ...deps('r:questplate'),
+      buildings: () => summaries,
+      discovered: () => discoveredBuildings('r:questplate'),
+    });
+    const m = { s: 3, ox: 0, oy: 0 };
+    discoverBuilding('r:questplate', { buildingKey: house.buildingKey, name: 'House', buildingType: 17 });
+    // the quest exists and the residence is discovered, but the NPC has
+    // not marked it on the map yet: no plate, exactly as before D5
+    stampResidenceQuestNames(summaries, discoveredBuildings('r:questplate'), source, 100);
+    assert.equal(house.questName, '');
+    assert.deepEqual(w.buildPlates(FONT, m), []);
+    // ...and now an NPC marks it (BUILDING_HINT_TYPE.LocationWasMarkedOnMap)
+    const info = tree.dictQuestInfo.get(3).resourceInfo.get('_site_');
+    info.questPlaceResourceHintTypeReceived = BUILDING_HINT_TYPE.LocationWasMarkedOnMap;
+    assert.equal(tree.isBuildingQuestResource(100, house.buildingKey).locationWasMarkedOnMapByNPC, true);
+    stampResidenceQuestNames(summaries, discoveredBuildings('r:questplate'), source, 100);
+    assert.equal(house.questName, 'The Marked House');
+    let plates = w.buildPlates(FONT, m);
+    assert.equal(plates.length, 1, 'the quest-marked residence is finally named on the town map');
+    assert.equal(plates[0].text, 'The Marked House');
+    assert.equal(plates[0].isResidence, true);
+    // PlayerGPS.CurrentMapID is a real gate: standing in another town,
+    // IsBuildingQuestResource never matches and the plate goes away
+    house.questName = '';
+    stampResidenceQuestNames(summaries, discoveredBuildings('r:questplate'), source, 101);
+    assert.equal(house.questName, '');
+    assert.deepEqual(w.buildPlates(FONT, m), []);
+    // THE GATE IS DFU'S WHOLE LADDER (:676-682), not "is it a
+    // residence": an OVERRIDE-NAMED residence takes the display-name
+    // arm and is never stamped at all...
+    const over = [{ buildingKey: house.buildingKey, displayName: 'The Odd House', isOverrideName: true, customUserDisplayName: '' }];
+    house.questName = 'stale';
+    stampResidenceQuestNames(summaries, over, source, 100);
+    assert.equal(house.questName, 'stale', 'the override arm never reaches the quest walk');
+    // ...an UNdiscovered building is not stamped either (its arm is
+    // revealUndiscoveredBuildings)...
+    house.questName = '';
+    stampResidenceQuestNames(summaries, [], source, 100);
+    assert.equal(house.questName, '');
+    // ...and a NON-residence never is: the shop keeps its displayName
+    discoverBuilding('r:questplate', { buildingKey: shop.buildingKey, name: 'The Odd Blades', buildingType: 9 });
+    stampResidenceQuestNames(summaries, discoveredBuildings('r:questplate'), source, 100);
+    assert.equal(shop.questName, undefined, 'the non-residence arm is `!IsResidence || isOverrideName`, which returns first');
+    plates = w.buildPlates(FONT, m);
+    assert.deepEqual(plates.map((p) => p.text).sort(), ['The Marked House', 'The Odd Blades']);
+    // AND THE FIELD REALLY HAS A PRODUCER NOW. Before D5 `questName`
+    // had none anywhere in src/, so this arm could never fire and a
+    // quest-marked residence was silently plateless. The stamp lives in
+    // the M-outside door of the host that HAS a quest machine, between
+    // the summaries walk and the window, on DFU's own three inputs.
+    const wsrc = src('src/scenes/world.js');
+    // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the plates are built in `townHere`
+    const at = wsrc.indexOf('const townHere'), door = wsrc.slice(at, wsrc.indexOf('\n  };\n', at));   // HOST-SPLIT 2: the toggle, wherever it lives (scenes/exteriorAutomapToggle.js)
+    assert.match(door, /\n {4}stampResidenceQuestNames\(summaries, discoveredBuildings\(locId\), \{/);
+    assert.match(door, /getAllActiveQuestIds: host\.activeQuestIds,/, 'QuestMachine.GetAllActiveQuests, the tree\'s own definition');   // HOST-SPLIT 2: a live name, read through the handle
+    assert.match(door, /isBuildingQuestResource: \(mapID, key\) => host\.topicTree\.isBuildingQuestResource\(mapID, key\),/);
+    assert.match(door, /\}, dfLoc\.mapTableData\?\.mapId \?\? 0\);/, 'PlayerGPS.CurrentMapID');
+    // ...and QX1 gave the OTHER host a machine, so it stamps too - the
+    // same call between the summaries walk and the window, off its own
+    // bridge. Its THIRD source arm stays absent on purpose: that one is
+    // TalkManager's (`locationWasMarkedOnMapByNPC`) and `?exterior`
+    // runs no topic tree at all.
+    //   AND THAT ABSENCE COSTS THE WHOLE PLATE, not one clause.
+    // residenceQuestName optional-calls the arm and the very next line
+    // is `if (!r?.isQuestResource) continue`, which skips the only
+    // assignment to buildingQuestName - so with two arms of three that
+    // host's stamp resolves '' for EVERY residence and raises no plate
+    // at all. That is still DFU's own answer for a route with no NPC
+    // who can mark a house (ExteriorAutomap.cs:695-700 reads
+    // locationWasMarkedOnMapByNPC only through that ref call), so the
+    // stamp is wired and correct the moment a topic tree lands there -
+    // it is not a plate that host raises today. Pinned as a fact, with
+    // the fixed-city host's OWN two-arm source shape:
+    const edoor = src('src/scenes/exterior.js');
+    const estamp = edoor.slice(edoor.indexOf('    stampResidenceQuestNames(summaries, discoveredBuildings(locId), {'),
+      edoor.indexOf('townTalk.showOverlay(new ExteriorAutomapWindow({'));
+    assert.ok(estamp.length, 'the fixed-city host stamps its residence plates');
+    assert.match(estamp, /getAllActiveQuestIds: \(\) => \[\.\.\.\(questBridge\?\.machine\.quests\.values\(\) \?\? \[\]\)\]/);
+    assert.match(estamp, /getQuest: \(questID\) => questBridge\?\.machine\.getQuest\(questID\) \?\? null,/);
+    assert.equal(/isBuildingQuestResource/.test(estamp), false,
+      'no topic tree in this route - the arm is absent, not faked');
+    assert.match(estamp, /\}, dfLocation\.mapTableData\.mapId \?\? 0\);|\}, dfLocation\.mapTableData\?\.mapId \?\? 0\);/, 'PlayerGPS.CurrentMapID');
+    // The two-arm source, RUN against the very quest and building this
+    // test just marked: the marked house that names 'The Marked House'
+    // with all three arms names NOTHING with the fixed-city host's two.
+    assert.equal(residenceQuestName({
+      getAllActiveQuestIds: () => [3],
+      getQuest: () => quest,
+    }, 100, house.buildingKey), '',
+    'two arms of three: `?exterior` names no residence until a topic tree lands there');
+  } finally { _resetForTests(); _resetZoomForTests(); restoreDiscovery(null); }
 });
 
 test('D5 the exterior BUTTON tooltips: Internal_Strings.csv:908-917 with its typos, DFU\'s own {0}.. order, the Home fallback, and the chrome\'s rest clock', () => {

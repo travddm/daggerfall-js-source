@@ -188,6 +188,21 @@ test('audit24 wave31: the host tick runs the kill check, and rest cannot', () =>
   tickPlayerMinutes({ entity: e, classicMinutes: 0, dt: 0.3, sinks });
   assert.equal(e.health, 0, 'the entity tick carries it, so every host gets it');
 
+  // DFU's is Update()'s refreshMods timer and Time.deltaTime is ZERO under
+  // a paused UI, so a rest cannot kill you this way however long it runs -
+  // which is why this does NOT ride runMagicRounds.
+  const src = rd('src/systems/worldTick.js');
+  // AUDIT 39: the pin moved from `dt` to `realSeconds`, which is the line
+  // above made true - a clock jump fabricates dt out of game minutes, so
+  // feeding it here is exactly the paused-UI kill this comment forbids.
+  assert.ok(src.includes('killIfAnyLiveStatZero(entity, sinks, realSeconds);'), 'in the tick');
+  const rmr = src.slice(src.indexOf('export function runMagicRounds'), src.indexOf('export function tickPlayerMinutes'));
+  assert.ok(!rmr.includes('killIfAnyLiveStatZero'), 'and NOT in the broker catch-up');
+
+  // every entity has an EntityEffectManager, so the foes get it too
+  const dc = rd('src/scenes/dungeonContext.js');
+  assert.ok(dc.includes('for (const f of foes) if (!f.dead) killIfAnyLiveStatZero(f.entity, foeSinks(f, false), dt);'),   // AUDIT 68 S19-round-ticks-player-provenance: SetHealth(0) has no source
+    'the dungeon pool runs it per frame');
 });
 
 test('audit24 wave31: the C# really does break at every CalculateAttackDamage caller', { skip: noDfu }, () => {

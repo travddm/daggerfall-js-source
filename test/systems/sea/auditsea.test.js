@@ -305,6 +305,33 @@ test('AUDIT SEA VENTURES B3: a wrecked ship\'s hold is shut while her wreck may 
   const pvp = createNavalPvp({ enabled: () => true, boat: () => boat, stateOf: () => ({ damage: dmg }), clock: () => 5 });
   const kept = new Map();
   globalThis.localStorage = { getItem: (k) => kept.get(k) ?? null, setItem: (k, v) => kept.set(k, String(v)), removeItem: (k) => kept.delete(k) };
+  try {
+  openSeaHold(77);
+  pvp.wreck();
+  assert.equal(seaHoldShut(77), true, 'the referee\'s wreck shuts her hold');
+  assert.ok(JSON.parse(appStorage().getItem(SEA_HOLD_SHUT_KEY))['77'] > Date.now(), 'kept in the page\'s storage');
+  const reloaded = await import(`../../../src/systems/naval/seaHoldGuard.js?reload=${Date.now()}`);
+  assert.equal(reloaded.seaHoldShut(77), true, 'a reloaded page reads it back');
+  const said = [];
+  let opened = 0;
+  const door = createHoldDoor({ csa: () => ({ AllBoats: [boat] }), ships: () => [{ uid: 77, hull: 2 }], openHold: () => { opened++; return true; }, say: (x) => said.push(x) });
+  assert.equal(door.openShip(77), false);
+  assert.deepEqual([opened, said], [0, ['Her hold is shut while her wreck may be boarded.']]);
+  const csa = readFileSync(new URL('../../../src/systems/comeSailAway/comeSailAway.js', import.meta.url), 'utf8');
+  assert.match(csa, /function OpenCargo\(boat\) \{ if \(seaHoldShut\(boat\?\.uid\)\) \{ deps\.messageBox\?\.\(seaHoldShutText\(\)\); return; \} deps\.openCargo\?\.\(boat\.Cargo\); \}/, 'the mod\'s own box');
+  assert.match(csa, /if \(!lost && seaHoldShut\(boat\?\.uid\)\) \{ deps\.messageBox\?\.\(seaHoldShutText\(\)\); return false; \}/, 'never packed - a lost boat\'s recovery aside');
+  assert.match(csa, /function LayUpBoat\(boat\) \{\n[^\n]*\n\s+if \(seaHoldShut\(boat\.uid\)\) \{ deps\.messageBox\?\.\(seaHoldShutText\(\)\); return false; \}/, 'nor laid up');
+  // her carry settled: open again
+  const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+  const rc = await mintSeaWreck({ f: 'acct-kim', c: RC, k: 'acct-hal', kc: RK, r: '0123456789ab', u: 77, b: 1, m: SEA_CELL }, kp.privateKey, { subtle, nowS: Math.floor(Date.now() / 1000) });
+  const w = createSeaWreckHost({ session: sessionAt(), checkpoint: () => true, character: () => RC, me: () => 'acct-kim', naval: () => ({ pvp }), door: { wreck: async () => ({ ok: true, data: { r: '0123456789ab', b: 1, took: [], n: 0, realm: { seq: 4 } } }) }, storage: { getItem: () => null, setItem: () => {} }, say: () => {} });
+  w.receipt(rc); w.frame(); await settle();
+  assert.equal(seaHoldShut(77), false, 'her carry landed: open');
+  assert.equal(door.openShip(77), true);
+  // never past SEA_HOLD_SHUT_MS
+  shutSeaHold(78, 1_000);
+  assert.deepEqual([seaHoldShut(78, 1_000 + SEA_HOLD_SHUT_MS - 1), seaHoldShut(78, 1_000 + SEA_HOLD_SHUT_MS)], [true, false]);
+  } finally { delete globalThis.localStorage; }
 });
 
 test('AUDIT SEA VENTURES B4: a post on a head gone - deleted, or dead SEA_REFUND_AFTER_S - is owed back to its poster and paid by its collect, once; a character with bounties, prizes or hold goods waiting is not deleted until they come home (mutants: the refund, its wait, the delete\'s refusal)', async () => {
@@ -556,6 +583,14 @@ test('AUDIT SEA VENTURES E6A, E6B, E6C: the page\'s guns - stepped every online 
   st.helm = { ...st.helm, wrecked: true, h: 0.3 };
   st.now += 1000; b.step();
   assert.deepEqual(st.sent.at(-1), { k: 'helm', hl: 4, t: 100, u: 22, h: 0 });
+  // E6A: by source - the zone's frame steps them, the cabin asks the captains
+  const sea = readFileSync(new URL('../../../src/scenes/seaVenturesHost.js', import.meta.url), 'utf8');
+  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  assert.match(sea, /gather, step, guns: pvpStep,/);
+  assert.doesNotMatch(sea, /function step\(strikes = 0\) \{\n\s+pvpStep\(\);/);
+  const wf = world.slice(world.indexOf('const wildFrame = () => {'), world.indexOf('const takeSeat = () => {'));
+  assert.match(wf, /\n\s+seaVentures\.guns\(\);/, 'every online frame, the dead\'s and the paused\'s');
+  assert.match(world, /hostile: \(\) => navalHostileNear\(\) \|\| !!naval\?\.pvp\?\.captainNear\?\.\(\),/);
   // the cabin's captain near
   const guns = { live: true, open: (peer) => peer !== 'kin' };
   const peers = [];
@@ -585,6 +620,8 @@ test('AUDIT SEA VENTURES D7, D8, A5: a vault of the deep stands in a room of its
   assert.equal(wdunRoomKey(H), `dungeon:m${seaVaultRoomMapId(cx, cy)}`, 'the hub wipes the vault\'s room alone');
   assert.ok(seaRoomOf(`dungeon:m${seaVaultRoomMapId(cx, cy)}.m`), 'a fall in a vault is the open sea\'s');
   assert.deepEqual(seaRoomCell(`dungeon:m${seaVaultRoomMapId(cx, cy)}`), [cx, cy], 'and keeps no instance');
+  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  assert.match(w, /mapId: ident\?\.kind === 'dungeon' \? seaVaultRoomId\(ident\.mapId \?\? null, _wdunInside\?\.h \?\? seaVentures\.vaultHere\(\)\?\.key\) :/);
   // A5: the hub's wipe at every size - a mountain hall laid small, a vault laid medium
   const realNow = Date.now; let clock = 1e12; Date.now = () => clock;
   try {
@@ -693,6 +730,8 @@ test('AUDIT SEA VENTURES D1, D12: a legend\'s Tidemail comes with her purse alon
   assert.ok(piece, 'her purse paid: the Abyss\'s piece every time');
   assert.deepEqual(out.gave, [piece]);
   assert.deepEqual(dueOnHull({ hull: 10, sail: 4 }, { hull: 0.5 }), { hull: 5, sail: 2 });
+  const n = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(n, /function legendTidemail\(|function dueOnHull\(/, 'never inside createNavalHost');
 });
 
 test('AUDIT SEA VENTURES D2, D4, D5, D9, D10: a treasure fleet\'s flagship pays each captain once a sailing - kept in the save, so a second end, another\'s copy or a reload pays nothing and gives no piece - and a reload never stands her again; the hub\'s hello never puts my own sinking out, and the hub is told until it says so; her piece rolls the sailing\'s band; each ship stands on water deep enough for her own hull (mutants: the once, the save, the piece\'s gate, the stood, the hello, the telling, the band, the hull)', () => {
@@ -823,6 +862,12 @@ test('AUDIT SEA VENTURES C2: Veilhaven\'s peace holds the way home - her own row
 });
 
 test('AUDIT SEA VENTURES C1, C3, C4, C5/F2: the linked bank cabin is a teleport like any - never into, out of or about the open sea, nor across the Veil; a party\'s walk onto the open sea warns as one into the mountains does; a wagon parked on the open sea\'s ground keeps its cargo through a death there, as every wagon does since STORE-KEEPS; a death past the Veil rises at the nearest freeport, however far (mutants: the cabin\'s refusals, the walk, the cart, the rise)', () => {
+  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+  const cab = w.slice(w.indexOf('async function enterLinkedBankCabin('), w.indexOf('async function boardOrDisembark('));
+  const refuse = cab.indexOf('if (!loading && (wildTeleportRefused(boatPixelOf(boat)) || veilRefused(boatPixelOf(boat)))) return true;');
+  assert.ok(refuse > 0 && refuse < cab.indexOf('await _teleportToPixel(boat.MapPixel.X, boat.MapPixel.Y);'), 'refused before the teleport');
+  assert.match(w, /const boatPixelOf = \(boat\) => \(\{ x: boat\.MapPixel\.X, y: boat\.MapPixel\.Y \}\);/);
+  assert.match(w, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online\?\.wildOk \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/);
   assert.equal(zoneWord('walkInto', ETHER_KIND), ETHER_WILD_TEXT.walkInto());
   assert.match(zoneWord('walkInto', ETHER_KIND), /open Eltheric Ocean past Veilhaven's peace, an open PvP zone/);
   // C4 (PIN MOVED, STORE-KEEPS 2026-10-26): a wagon parked on the open sea's ground was WITH its owner at a death there
@@ -859,6 +904,12 @@ test('AUDIT SEA VENTURES C6, C7: the open sea says its own words - /unstuck outd
   assert.match(sea('dropLate'), /when you died at sea/);
   assert.match(sea('burntLate')(), /when you died at sea .* frozen/);
   assert.equal(sea('quiet'), 'You are out of the open Eltheric Ocean\'s PvP zone. No player may attack you here.');
+  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT): the risen word in scenes/wildDropHost.js, read with its host
+  assert.match(w, /say\(zoneWord\('unstuckOut'\)\); return true; \}/);
+  assert.match(w, /townTalk\.say\(zoneWord\('truce'\)\);/);
+  assert.match(w, /townTalk\.say\(d\.burnt \? zoneWord\('burntLate', seaRoomOf\(room\) \? ETHER_KIND : null\)\(\) : zoneWord\('dropLate', seaRoomOf\(room\) \? ETHER_KIND : null\)\);/);
+  assert.match(w, /zoneWord\(left === ETHER_KIND && !etherInPeace\(playerTravelPixel\(\)\?\.x, playerTravelPixel\(\)\?\.y\) \? 'quiet' : 'leave', left \|\| undefined\)/);
+  assert.match(readFileSync(new URL('../../../src/systems/revenant/revenantCompanions.js', import.meta.url), 'utf8'), /revenantsWithYou\(\)\.length >= WILD_REVENANTS_MAX\) return zoneWord\('revenantOne'\);/);
   const was = tm.currentLocale();   // the mountains' two, as the sea's: through the text core (L10N4), read when said
   try {
     tm.setLocale(tm.PSEUDO_LOCALE);

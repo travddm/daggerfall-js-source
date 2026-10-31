@@ -195,3 +195,46 @@ test('VEIN-NEED: what a node says for each thing it lacks - the rank with the pl
   assert.equal(needLine(null, () => 0), '');
 });
 
+test('VEIN-NEED: the hosts - each ladder hands the press back at its foot, only when nothing took it, and only for E', () => {
+  const m = src('src/scenes/worldModes.js');
+  const w = src('src/scenes/world.js');
+  // THE DUNGEON (worldModes tryExitDungeon): its nothing-under-the-ray line, lifted off its source and run
+  const from = m.indexOf('function tryExitDungeon(');
+  const t = m.slice(from, m.indexOf('\n  }\n', from));
+  const foot = /\n {4}if \(key === null\) \{ ([^\n]*) \}\n/.exec(t);
+  assert.ok(foot, 'the dungeon ladder\'s foot');
+  const dungeonFoot = new Function('interact', 'pressCast', 'host', foot[1]);
+  const asked = [];
+  const host = { profNeed: () => { asked.push('need'); return true; } };
+  assert.equal(dungeonFoot(true, false, host), false, 'the ladder still answers that nothing took the press');
+  assert.deepEqual(asked, ['need'], 'E: the vein it passed on speaks');
+  dungeonFoot(false, false, host);
+  dungeonFoot(true, true, host);
+  assert.deepEqual(asked, ['need'], 'a click, or a press that cast, asked no node: nothing to hand back');
+  assert.doesNotThrow(() => dungeonFoot(true, false, {}), 'a host without the professions');
+  const at = t.indexOf('host.profNeed?.()');
+  for (const arm of ['host.profPress?.()', 'pickQuestFoe(', 'pickFoe(', 'host.plaquePeerAct?.(', 'pickActivatableHit(', '_enemyArm(RAY_DISTANCE', 'host.csaActivate?.(_pick)']) {
+    assert.ok(t.indexOf(arm) >= 0 && t.indexOf(arm) < at, `${arm} has the press before the node's word`);
+  }
+  assert.match(w, /\n {4}profNeed: \(\) => gatherHost\?\.sayNeed\(\) \?\? false,/, 'the world host hands the mode machine the node\'s word');
+  // THE STREET (world.js): the door arm's answer - its first statement, lifted and run
+  const cb = /else modes\.tryEnter\(\)\.then\(\(opened\) => \{\n(?: *\/\/[^\n]*\n)* *(if \(!opened && useEdge && gatherHost\?\.sayNeed\(\)\) return;)\n/.exec(w);
+  assert.ok(cb, 'the street\'s door arm asks the node first when nothing opened');
+  const streetFoot = new Function('opened', 'useEdge', 'gatherHost', `${cb[1]} return 'GRAVE1';`);
+  const said = [];
+  const g = (answer) => ({ sayNeed: () => { said.push(answer); return answer; } });
+  assert.equal(streetFoot(false, true, g(true)), undefined, 'nothing opened, E pressed, the node spoke: the arm ends there');
+  assert.equal(streetFoot(false, true, g(false)), 'GRAVE1', 'nothing to say: GRAVE1\'s epitaph arm runs as before');
+  assert.equal(streetFoot(true, true, g(true)), 'GRAVE1', 'a door opened: the node is not asked');
+  assert.equal(streetFoot(false, false, g(true)), 'GRAVE1', 'a click asked no node');
+  assert.equal(streetFoot(false, true, null), 'GRAVE1', 'no gathering host');
+  assert.deepEqual(said, [true, false]);
+  // ...at the foot of the street's ladder: every arm before it has the press first
+  const s0 = w.indexOf('const nodeTook = useEdge');
+  const street = w.slice(s0, w.indexOf('}).catch((e) => console.error(e));', s0));
+  const here = street.indexOf('gatherHost?.sayNeed()');
+  // PIN MOVED (AUDIT HOLDINGS Q4): the sea's arm is handed whether her own trigger wins the ray (the gangway yields to it)
+  for (const arm of ['lockOn.toggle(_lockFoe)', 'plaquePeerAct(cam.pos, useFwd)', 'naval?.activate({ boatTrigger: !!_race.boatWins })', '_enemyArm(RAY_DISTANCE, _rivalDist)', 'townTalk.tryActivate(', '_race.gateWins', 'else if (lootKey)', 'quickLootTake(', 'modes.tryEnter()']) {
+    assert.ok(street.indexOf(arm) >= 0 && street.indexOf(arm) < here, `${arm} has the press before the node's word`);
+  }
+});

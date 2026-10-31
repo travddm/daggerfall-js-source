@@ -68,6 +68,8 @@ test('SD-THROUGH the law: the Way Through stands once the first soul went throug
   // its words: its own title, its own row (AUDIT SD-THROUGH B10: keyed, so the plaque is one language), its line
   assert.deepEqual(SD_THROUGH_TEXT, { title: 'The Way Through', to: 'To the Shattered Hour', opens: 'The Rift stands open. The Way Through opens beside you.' });
   assert.equal(SD_THROUGH_TEXT.to, SD_END_TEXT.riftTo, 'in English the Rift\'s own row');
+  const D = read('src/world/superDungeon/sdDungeon.js');
+  for (const k of ['sd.through.title', 'sd.through.to', 'sd.through.opens']) assert.match(D, new RegExp(`t\\('${k.replace(/\./g, '\\.')}', `), k);
   assert.equal(SD_THROUGH_SIZE_M, SD_RIFT_MIN_M, 'the Rift\'s least ring - it stands in a corridor');
 });
 
@@ -239,6 +241,56 @@ test('SD-THROUGH the two rings drawn: the veil\'s pivot the nearer to the eye - 
   assert.equal(far, near, 'one kept pair');
   assert.deepEqual([...far], [through, end], 'the Rift nearer: drawn last');
   assert.deepEqual([...sdRingsFarFirst([0, 0, 0], null, end)], [null, end], 'no Way Through: the Rift alone');
+  const T = read('src/scenes/superDungeon/sdThrough.js');
+  const body = T.slice(T.indexOf('export function sdVeilModelOf('), T.indexOf('const _pair = [null, null];'));
+  assert.ok(body.length > 300);
+  assert.doesNotMatch(body, /new |[=(,:]\s*\[|=>|\.\.\./, 'nothing made: no array, no closure, no spread');
+});
+
+test('SD-THROUGH the word from the world host\'s own text: sdRiftOf says `through` off the hub\'s record - one went through, found, this slot - beside the Rift\'s word (AUDIT SD-THROUGH C12: the producer\'s own shape, not a hand-built word) (mutant: the word without it)', () => {
+  const W = read('src/scenes/world.js');
+  const at = W.indexOf('\n  const sdRiftOf = ');
+  assert.ok(at > 0);
+  const body = W.slice(at + 1, W.indexOf('\n  };\n', at) + 5);
+  const found = sdFind(sdRise(null, T0, 3), T0 + 1000, 'Mara'), entered = sdEnter(found, T0 + 2000);
+  let rec = found;
+  const env = { sdHost: { record: () => rec }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, _sdEntered: new Set(), _sdFallen: new Set(), sdEnterRealm: () => true };
+  const sdRiftOf = new Function(...Object.keys(env), `${body}\nreturn sdRiftOf;`)(...Object.values(env));
+  const realNow = Date.now;
+  Date.now = () => T0 + 3000;
+  try {
+    assert.equal(sdRiftOf(found.s).through, false, 'found, nobody through');
+    rec = entered;
+    const w = sdRiftOf(found.s);
+    assert.equal(w.through, true, 'one went through');
+    assert.equal(w.word, null, 'and the Rift admits');
+    assert.equal(sdRiftOf(found.s + 1).through, false, 'another slot\'s');
+  } finally { Date.now = realNow; }
+});
+
+test('SD-THROUGH the hosts by source: the dungeon host makes the Way Through for a Hollow alone - the Rift\'s step, word and look, the Hour\'s voice, its collider and the block\'s water - one named closure each with the Rift and the hall (AUDIT SD-THROUGH C13); frames it beside the Rift with my heading, offers it to the ray, names it, presses it, draws and lights it and frees it; the world host draws the two windows farther first, its veil on the nearer; the mode machine forwards the look and its press arm takes its key (mutants: the Hour stands one; never framed; never freed; never drawn; the look unforwarded)', () => {
+  const D = read('src/scenes/dungeonContext.js');
+  assert.match(D, /const sdThrough = _superTier \? createSdThrough\(\{ renderer, audio, word: \(\) => sdEndWord\(\), look: sdRiftLookNow, clock: sdEndClock, onStep: \(\) => sdRiftStep\(\), say: sdSayHere, probe: \{ \.\.\.sdProbeOf\(collider\), water: waterSurfaceYAt \}, riftOf: \(\) => sdEnd\.rift, dynamicDraws \}\) : null;/);
+  assert.match(D, /sdEnd\.frame\(playerFeet \?\? null, playerFeet \? _sdEye : null\);\n\s*sdThrough\?\.frame\(playerFeet \?\? null, _fpYaw, playerFeet \? _sdEye : null\);/, 'framed beside the Rift, my heading latched this frame');
+  assert.match(D, /if \(sdThrough\) targets\.push\(\.\.\.sdThrough\.targets\(\)\);/);
+  assert.match(D, /\(key\) => sdEnd\?\.hoverName\(key\) \?\? sdThrough\?\.hoverName\(key\) \?\? null,/);
+  assert.match(D, /sdPress\(key\) \{ return !!sdEnd\?\.press\(key\) \|\| !!sdThrough\?\.press\(key\) \|\| !!sdHall\?\.press\(key\); \},/);
+  assert.match(D, /sdThroughLook: sdThrough \? \(eye, sky, hour\) => sdThrough\.look\(eye, sky, hour\) : undefined,/);
+  assert.match(D, /sdEndWith\(sdEnd\.halos\(\), sdHall\?\.halos\(\) \?\? sdThrough\?\.halos\(\), _sdEndHalos\)/);
+  assert.match(D, /sdEndWith\(sdEnd\.lights\(\), sdHall\?\.lights\(\) \?\? sdThrough\?\.lights\(\), _sdEndLights\)/);
+  assert.match(D, /sdEnd\?\.clear\(\);[^\n]*\n\s*sdThrough\?\.clear\(\);/);
+  assert.equal(D.match(/look: sdRiftLookNow/g)?.length, 2, 'the Rift and the Way Through ask one look');
+  assert.equal(D.match(/say: sdSayHere/g)?.length, 2, 'the hall and the Way Through say one way');
+  const W = read('src/scenes/world.js');
+  assert.match(W, /through: sdThroughStands\(rec, s, now\),/);
+  assert.match(W, /const through = end\.sdThroughLook\?\.\(eye, sky \? _sdRiftSky : null, minuteNow\(\) \/ 60\) \?\? null;/);
+  assert.match(W, /sdVeilAim\(proj, view, sdVeilModelOf\(eye, through, look\)\);/);
+  assert.match(W, /for \(const l of sdRingsFarFirst\(eye, through, look\)\) if \(l && pass\?\.draw\(proj, view, l, fog, renderer\.lightingLane \? SD_SKY_STEPS\.lane : SD_SKY_STEPS\.classic\)\) drew = true;/);
+  const M = read('src/scenes/worldModes.js');
+  assert.match(M, /if \(key\.startsWith\('sdrift:'\)/, 'its key rides the Rift\'s arm');
+  assert.match(M, /superRiftLook: \(s\) => host\.superRiftLook\?\.\(s\) \?\? null,/, 'the look forwarded (B4)');
+  const T = read('src/scenes/superDungeon/sdThrough.js');
+  assert.match(T, /createSdEnd\(\{ renderer, audio, now, onRift: onStep, riftKey: SD_THROUGH_KEY, riftTitle: \(\) => SD_THROUGH_TEXT\.title, riftTo: \(\) => SD_THROUGH_TEXT\.to, riftCount: \(\) => word\(\)\?\.count \?\? null, look, clock, walkIn: false, riftYields: true \}\);/);
 });
 
 // ── on the freeware's own Hollows ──────────────────────────────────────────────────────

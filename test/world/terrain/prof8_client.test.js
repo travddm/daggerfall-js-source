@@ -86,6 +86,7 @@ test('PROF8 act: the tug - E (a new press) or attack inside 600 ms (an Angler\'s
   waitOut(b);
   b.tick(0.05, {});
   assert.deepEqual([b.state.phase, buzzed], ['tug', 1]);
+  assert.match(src('src/scenes/world.js'), /tug: \(\) => \{ if \(!getPref\('touchHaptics'\)\) return; try \{ navigator\.vibrate\?\.\(120\); \}/);
   // a press of E: the level going down, not a key held since the wind
   const e = createFishAct({ rng: () => 0.5 });
   throwFor(e, 0.3);
@@ -312,6 +313,11 @@ test('PROF8 answers: the goods\' line the kind\'s (the species named), and a tro
   k.answered({ node: haulKey({ x: 300, y: 200, day: 20724, id: '000000000001' }), qty: 1 }, (t) => said.push(t));
   assert.deepEqual(minted, [species.templateIndex]);
   assert.deepEqual(said, [`A trophy ${species.itemName}. It is in your pack.`]);
+  // the host hooks read them
+  const gh = src('src/scenes/gatherHost.js');
+  assert.match(gh, /hud\.toast\(k\?\.storesLine \? k\.storesLine\(d\) : storesLine\(d\), \{ keep: true \}\);/);
+  assert.match(gh, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);   // HAUL-CARDS (PIN MOVED): whether its card said the goods; PIN MOVED (HUNTERS-MARK): and whose pack a trophy goes to
+  assert.match(gh, /if \(!n \|\| n\.kind === 'body' \|\| n\.kind === 'haul'\) return;/);
 });
 
 // ─── THE METER, THE BOOK, THE PAGE, THE HOST ─────────────────────────
@@ -338,5 +344,17 @@ test('PROF8 meter: each phase its words - wind (the throw it makes), the wait (o
 });
 
 test('PROF8 book, page, words and wiring: the book keeps the account\'s hauls (the state\'s, an answer\'s - CAP-OFF: no refusal\'s forty); the page practises Fishing and says its day and how; the host builds the kind over its world', () => {
+  const pb = src('src/net/profBook.js');
+  assert.match(pb, /applyHauls\(data\?\.hauls\);/);
+  assert.match(pb, /applyHauls\(r\.data\?\.hauls\);/);
+  assert.doesNotMatch(pb, /'prof-fish-cap'/, 'no forty to learn');   // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills")
+  const pp = src('src/ui/professions/profPages.js');
+  assert.match(pp, /const PRACTISED = Object\.freeze\(\['herbalism', 'mining', 'hunting', 'fishing',/);
+  assert.match(pp, /t\('prof\.page\.today\.hauls', 'Today: \{hauls, plural, one \{# haul\} other \{# hauls\}\} \(shared by all your characters\)', \{ hauls \}\)/);   // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): 'of forty'; PIN MOVED (L10N4): the line through t(), its plural ICU's
+  const w = src('src/scenes/world.js');
+  assert.match(w, /fishKind\(\{ book: profBook, host: \{/);
+  assert.match(w, /storm: \(\) => currentWeather\(\) === 'thunder',/);
+  assert.match(w, /const item = createFishItem\(species\);\n\s+if \(!item\) return false;\n\s+addItem\(\(playerEntity\.items \?\?= \[\]\), item\);/);
+  assert.doesNotMatch(src('server-account/src/index.js'), /'prof-fish-cap':/);   // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): a status for a refusal said no more
   assert.equal(utcDayOfMs(86_400_000 * 3 + 5), 3);
 });

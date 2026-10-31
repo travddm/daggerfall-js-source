@@ -320,8 +320,59 @@ test('MWNPC1f the face normal: the derivatives\' cross, signed by the winding ag
 });
 
 test('MWNPC1g the GLSL says what its JS law says: the blend, the post composed once, the face normal\'s sign and matrices; every lane\'s character shader takes the edit, and one without the input refuses it', () => {
+  const src = rd('src/render/renderer.js');
+  const vs = src.match(/const CHAR_SKIN_VS = `([\s\S]*?)`;/)[1];
+  for (const line of [
+    'int row = g / ${SKIN_PAL_ROW};',
+    'int col = (g - row * ${SKIN_PAL_ROW}) * 3;',
+    'a0 += r0 * w; a1 += r1 * w; a2 += r2 * w;',
+    'if (uSkin > 1.5) {',
+    'skinEntry(aSkinPost, q0, q1, q2);',
+    // PIN MOVED (MW-SMOOTH x MWNPC1): the composed rows are made once and move both the position and the normal
+    '  c0 = q0.x * a0 + q0.y * a1 + q0.z * a2 + vec4(0.0, 0.0, 0.0, q0.w);',
+    '    p = vec3(dot(c0.xyz, aPos) + c0.w, dot(c1.xyz, aPos) + c1.w, dot(c2.xyz, aPos) + c2.w);',
+    '    vec3 m = vec3(dot(c0.xyz, aNormal), dot(c1.xyz, aNormal), dot(c2.xyz, aNormal));',
+    '    n = l2 > 1e-24 ? m * inversesqrt(l2) : vec3(0.0);',
+    'vNormalV = mat3(uModel) * n;',
+    'vRel = mat3(uModel) * p;',
+    'vec4 world = uModel * vec4(p, 1.0);',
+  ]) assert.ok(vs.includes(line), `CHAR_SKIN_VS: ${line}`);
+  for (const line of [
+    'vec3 d = cross(dFdx(vRel), dFdy(vRel));',
+    'if (uSkin < 0.5) return vNormalV;',
+    'if (dot(vNormalV, vNormalV) > 1e-20) return vNormalV;',   // MW-SMOOTH x MWNPC1: the skinned normal first, the face where it is zero
+    'bool ccw = gl_FrontFacing != (uFrontCW > 0.5);',
+    'vec3 nw = ccw ? d : -d;',
+    'return normalize(uSkinFlip * (uSkinNrm * nw));',
+  ]) assert.ok(src.includes(line), `the face normal: ${line}`);
+  assert.ok(src.includes('char: this._charSkinProgram(src.charFs),') && src.includes('const program = this._buildProgram(CHAR_SKIN_VS, skinFaceFs(fs));'), 'the world set builds its character program from the skin VS and the edited lane shader');
+  assert.ok(src.includes("vs: { mesh: VS, bb: BB_VS, terrain: TERRAIN_VS, char: CHAR_VS, charSkin: CHAR_SKIN_VS }"), 'the shadow pass keeps the unskinned CHAR_VS');   // PIN MOVED (MWNPC16): and takes the skinned one for a body's own shadow
+  const classic = src.match(/const CHAR_FS = `([\s\S]*?)`;/)[1];
+  for (const [name, fs] of [['classic', classic], ['lane', EL_CHAR_FS], ['classic-shadow lane', classicLook(EL_CHAR_FS)]]) {
+    const out = skinFaceFs(fs);
+    assert.ok(out.includes('vec3 vNormal;') && !out.includes('in vec3 vNormal;'), `${name}: the input became the global`);
+    assert.ok(out.includes('void main() {\n  vNormal = charFaceNormal();'), `${name}: filled at the top of main, before any discard`);
+  }
   assert.throws(() => skinFaceFs('#version 300 es\nvoid main() {}'), /MWNPC1/);
   assert.equal(SKIN_PALETTE_UNIT, 21);
+});
+
+test('MWNPC1h drawCharacter: the palette sampler always reads a complete texture, the body\'s for its draw and the identity after; drawCharacter records no shadow under the sprite target - a body casts through recordShadowBody (MWNPC16, section 24)', () => {
+  const src = rd('src/render/renderer.js');
+  const draw = src.slice(src.indexOf('  drawCharacter(mesh, modelMatrix) {'), src.indexOf('  _charSpriteRT() {'));
+  // PIN MOVED (MWNPC16): the shadow door no longer turns a skinned body away - it casts through its own skinned depth
+  // program (test/render/mwnpc16_bodyshadow.test.js) - but drawCharacter still records nothing under the sprite target, the one
+  // place a skinned body is drawn: its shadow is recordShadowBody's, from drawThird
+  assert.ok(draw.includes('if (this._casting && this._spriteDepth === 0 && this._studioDepth === 0) this._shadows.recordCharacter(mesh, modelMatrix);'), 'the sprite target records no shadow');
+  assert.ok(draw.includes('    if (skin) {\n      gl.uniform1f(c.skin, skin.pairs);'), 'uSkin set only by a skinned draw (LA-COST1: an unskinned call sends nothing new)');
+  assert.ok(draw.includes('gl.bindTexture(gl.TEXTURE_2D, skin.tex);'));
+  const once = src.slice(src.indexOf('  _charSkinProgram(fs) {'), src.indexOf('  /** LA-COST7 (2026-09-27, Mac: "performance improvements"): THE SET\'S LOCATIONS'));
+  assert.ok(once.includes("gl.uniform1i(gl.getUniformLocation(program, 'uSkinPalette'), SKIN_PALETTE_UNIT);"), 'the palette unit, set at link');
+  assert.ok(once.includes("gl.uniform1f(gl.getUniformLocation(program, 'uFrontCW'), 1);") && src.includes('    gl.frontFace(gl.CW);'), 'and the front face, CW as the constructor sets it');
+  assert.ok(once.includes('this._skinIdentityTex();'), 'and the identity on the unit');
+  assert.ok(draw.includes("if (skin) gl.uniform1f(c.skinFlip, r.piece && r.piece.mirrored ? -1 : 1);"), 'the flip, per piece');
+  const after = draw.slice(draw.indexOf("if (skin) {\n      // MWNPC1: the identity back on the unit"));
+  assert.ok(after.includes('gl.bindTexture(gl.TEXTURE_2D, this._skinIdentityTex());') && after.includes('gl.uniform1f(c.skin, 0);'), 'the identity back, and the skin off, after a skinned draw');
 });
 
 /** the counting renderer, with the skinned path: meshes minted each way, palettes written, streams re-uploaded */
@@ -378,4 +429,7 @@ test('MWNPC1i the rig: a third-person body on a renderer with the skinned path i
   assert.equal(arm.status().third.skin, 'gpu', 'the door open again: laid out again');
   assert.equal(renderer.c.skinMeshes, 2);
   assert.equal(gpuSkinOn(countingRenderer()), false, 'a renderer without the path keeps the CPU skin - every earlier pin\'s renderer');
+  // the third-person muzzle asks the palette for its one point (skinnedVertex - MWNPC1b holds it to the CPU skin)
+  const src = rd('src/combat/fpArm.js');
+  assert.ok(src.includes('const at = thirdMesh && thirdMesh.skin && thirdSkin ? skinnedVertex(thirdSkin, piece, muzzleIndexOf(piece)) : posedVertex(piece.positions, muzzleIndexOf(piece));'));
 });

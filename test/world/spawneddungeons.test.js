@@ -111,6 +111,42 @@ test('SPAWNED-DUNGEONS: templates are real non-main-story dungeons, one-block ex
   assert.deepEqual(spawnTemplates([wide, big, tall], () => false), [big], 'the two-block one alone');
 });
 
+test('SPAWNED-DUNGEONS by source: ONE choke point (buildPixelNow), online-only off the page params, wrapped, never a fresh roll per load', async () => {
+  const { readFileSync } = await import('node:fs');
+  const w = hostText('src/scenes/world.js');
+  // PIN MOVED (IC-GRAND, test/world/icgrand_lod.test.js): the ask's answer through capitalBuildView - a far slice of the
+  // Imperial City its far view, every other location as it stands
+  assert.match(w, /const dfLocation = capitalBuildView\(_locationToBuild\(px, py\), px, py, host\.state\.current\) \|\| null;/, 'the build asks what stands (AUDIT OW5b D2)');
+  assert.match(w, /function _locationToBuild\(px, py\) \{[\s\S]{0,1300}?return loc \|\| spawnedDungeonAt\(px, py\);\n  \}/, 'a real location always wins; only an empty pixel is asked');   // PIN MOVED (TESA8): 600 -> 640, past the Bay the lair's ask after the country's; PIN MOVED (TESA10): 640 -> 700; 700 -> 800 at the merge of main into TESA (main's ether place beside the arc's), a capital's before them; PIN MOVED (AUDIT TESA II P1): 800 -> 1000, online the zone's hall of the day first past the Bay; PIN MOVED (WW5): 1000 -> 1200, a province's Hollow first past the Bay; 1200 -> 1300 at AUDIT BAY-LEFT's merge (WW5's Hollow-first clause and SPAWN-WORLD's host reads on the one line past the Bay, 1,233 measured)
+  const i = w.indexOf('const spawnedDungeonAt = (px, py) => {');
+  const fn = w.slice(i, w.indexOf('\n  };\n', i));
+  assert.match(fn, /if \(!params\.has\('online'\)\) return null;/, 'online only - and off params: `onlineOn` is a const declared far below this build');
+  assert.match(fn, /spawnsDungeon\(_spawnSalt, px, py\)/, 'the roll is the hash, so a reload of the pixel answers the same');
+  assert.match(fn, /CLIMATES\.Ocean \|\| !_spawnGround\(px, py\)\) return null/, 'no dungeon at sea - nor on a coast the climate page was spread over (SPAWN-SHORE)');
+  assert.match(fn, /const key = `\$\{px\},\$\{py\}`;/);
+  assert.match(fn, /locationIndex\.set\(key, loc\)/, 'stood in the index every reader already asks');
+  assert.match(fn, /catch \(e\) \{ console\.warn\('\[spawned dungeons\]'[^\n]*return null; \}/, 'a failure costs one pixel its dungeon, never the stream');
+  assert.doesNotMatch(fn, /Math\.random/);
+  assert.match(w, /const _spawnSalt = WORLD_SALT;/, 'one salt for every client: everyone sees the same dungeons');
+});
+
+test('SPAWNED-DUNGEONS3 by source: the player\'s OWN pixel, once, with the distance and direction from their feet in metres', async () => {
+  const { readFileSync } = await import('node:fs');
+  const w = hostText('src/scenes/world.js');
+  assert.match(w, /queue\.push\(\.\.\.r\.load\);\s*\n\s*announceNearbySpawns\(r\.current\.x, r\.current\.y, walkMode \? player\.pos : cam\.pos\);/, 'said on the crossing, from where the player stands');
+  const i = w.indexOf('function announceNearbySpawns(px, py, feet) {');
+  assert.ok(i > 0, 'the announcer takes the feet');
+  const fn = w.slice(i, w.indexOf('\n  }\n', i));
+  assert.doesNotMatch(w, /SPAWN_NEARBY_RADIUS/, '2b\'s 5x5 search is gone: no radius');
+  assert.doesNotMatch(fn, /for \(let d[xy]/, 'no loop over the neighbours');
+  assert.match(fn, /const loc = locationIndex\.get\(key\);\s*\n\s*if \(!loc\?\.spawned \|\| _announcedSpawnPixels\.has\(key\)\) return;/, 'the entered pixel\'s own spawn, never announced twice');
+  assert.match(fn, /const t = state\.pixelTranslation\(px, py, _announceT\);\s*\n\s*const \[lx, lz\] = spawnedLocationCentreLocal\(loc\);\s*\n\s*const dx = t\[0\] \+ lx - feet\[0\], dz = t\[2\] \+ lz - feet\[2\];/, 'the pixel\'s frame plus the centred location, less the feet');
+  assert.equal((fn.match(/tvSay\(/g) ?? []).length, 1, 'one spelling now: the distance and the direction');
+  // OW-DUNGEON-SAID: through tvSay, held five seconds at the scale it is said at (a plain say stood 1/35 s at x35)
+  assert.match(fn, /tvSay\(dungeonSightLine\(Math\.hypot\(dx, dz\), _capitalize\(directionHintString\(dx, dz\)\), dungeonTier\(loc\)\), 5\);/, 'scene x is east and scene z is north - the pair directionHintString takes, no sign flipped (PIN MOVED, TIER1: the tier the line says, not a flag)');
+  assert.doesNotMatch(fn, /You see a Dungeon/, 'the words live in the pure law');
+});
+
 test('SPAWNED-DUNGEONS3: a spawn stands CENTRED in its pixel, so a walk-in is always 300+ metres from it - the clearance gate on the template is what keeps it so', () => {
   const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg ?? ''} ${a} ~ ${b}`);
   assert.equal(SPAWN_CLEARANCE_M, 300);
@@ -299,6 +335,57 @@ test('SPAWN-REBIRTH: a save carries no life that is over - toJSON leaves out eve
   assert.deepEqual(L.toJSON(), rows, 'AUDIT F4: a load forgets the clock - nothing judged until it is asked again');
 });
 
+test('TTL1 by source: expiry is checked on the pixel build, and never while the player is in it', async () => {
+  const { readFileSync } = await import('node:fs');
+  const w = hostText('src/scenes/world.js');
+  const i = w.indexOf('const spawnedDungeonAt = (px, py) => {');
+  const fn = w.slice(i, w.indexOf('\n  };\n', i));
+  // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the stand is scenes/spawnStandHost.js's, the clock and the index's
+  // generation the host's, read through `host`
+  assert.match(fn, /_spawnLedger\.expired\(key, host\._spawnClock\(\)\) && !_insideSpawn\(key\)/, 'both clocks AND the creator\'s "no player in it"');
+  assert.match(fn, /host\._locIndexGen \+= 1;[^\n]*\n\s*locationIndex\.delete\(key\);\s*\n\s*return null;/, 'expired: the location goes, the pixel is empty land');
+  assert.ok(!/_spawnLedger\.forget\(key\)/.test(fn), 'AUDIT OW5b D2: and the row STAYS - its clocks keep it gone; forgotten, the pure roll stood the same dungeon again on a fresh seven days');
+  assert.doesNotMatch(fn, /_spawnSeen\(/, 'SPAWN-REBIRTH: standing a spawn starts no clock - a pixel streaming in is nobody entering it');
+  const seenAt = w.indexOf('  function _spawnSeen(key) {');
+  assert.match(w.slice(seenAt, w.indexOf('\n  }\n', seenAt)), /const now = _spawnClock\(\);\n\s*const fresh = !_spawnLedger\.has\(key, now\);\n\s*_spawnLedger\.note\(key, now\);/, 'the first-entry door notes the ledger - a row of a life that is over is no row (SPAWN-REBIRTH)');
+  // the boot builds the player's OWN pixel through this function before
+  // `playerTicker` is declared - a temporal dead zone `?.` cannot save
+  assert.match(w, /let _spawnClock = \(\) => NaN;/, 'the clock is ASKED, not read: until the ticker stands every ledger call is a no-op');
+  assert.ok(w.indexOf('let _spawnClock = () => NaN;') < w.indexOf('const { _locationToBuild } = createSpawnStand({'), 'declared above its first use');   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD): the stand constructed where it stood
+  assert.match(w, /_spawnClock = \(\) => Math\.floor\(playerTicker\.classicMinutes\);/, 'armed the moment the ticker stands');
+  assert.ok(w.indexOf('_spawnClock = () => Math.floor(playerTicker.classicMinutes);') > w.indexOf('const playerTicker = createPlayerTicker('), 'and never before it');
+  // the ONE thing that holds a spawn past its time
+  const j = w.indexOf('const _insideSpawn = (key) =>');
+  const inside = w.slice(j, w.indexOf(';\n', w.indexOf('=== key', j)));
+  assert.match(inside, /\(modes\?\.mode \?\? 'exterior'\) === 'dungeon'/, 'outside a dungeon nothing is in one');
+  assert.match(inside, /`\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}` === key/, 'a dungeon freezes the pixel at the entrance, which IS the spawn\'s key');
+  // the short clock's start, from the mode machine's dungeon
+  const k = w.indexOf('const _noteSpawnCleared = () => {');
+  const cleared = w.slice(k, w.indexOf('\n  };\n', k));
+  assert.match(cleared, /if \(!locationIndex\.get\(key\)\?\.spawned\) return;/, 'a real dungeon being cleared never invents a ledger row');
+  assert.match(cleared, /if \(locationIndex\.get\(key\)\.wildHall\) return;/, 'AUDIT SPAWN-REBIRTH F6: nor a Wild Zone hall being cleared - its day is the hub\'s');
+  assert.match(cleared, /_spawnLedger\.clear\(key, _spawnClock\(\)\)/);
+  assert.match(w, /onDungeonCleared: _noteSpawnCleared,/, 'the host answers the context');
+  assert.match(w, /onDungeonSpawned: \(\) => \{ const p = playerTravelPixel\(\); _spawnSeen\(`\$\{p\.x\},\$\{p\.y\}`\); \},/, 'entering one starts the long clock too - a save loaded straight into a spawn was never built through buildPixelNow this session');
+});
+
+test('TTL1 by source: the dungeon context tells the host, on a throttle, ahead of the automap\'s own early return', async () => {
+  const { readFileSync } = await import('node:fs');
+  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
+  assert.match(d, /if \(dfLocation\?\.spawned\) opts\.onDungeonSpawned\?\.\(\);/, 'only a synthesized dungeon, and only once - this is the build');
+  const i = d.indexOf('    automapTick(dt, eye, fwd) {');
+  const tick = d.slice(i, i + 1400);
+  const clearAt = tick.indexOf('opts.onDungeonCleared();');
+  const returnAt = tick.indexOf('if (automapScanT < SCAN_INTERVAL_S) return;');
+  assert.ok(clearAt > 0 && returnAt > 0 && clearAt < returnAt, 'ahead of the scan\'s early return, so it still runs on the frames the scan skips');
+  assert.match(tick, /foes\.every\(\(f\) => f\.dead\) && lootPiles\.every\(\(p\) => p\.items\.length === 0\)/, 'fully cleared: every foe dead, every pile taken');
+  assert.match(tick, /if \(!_clearedSent && opts\.onDungeonCleared\)/, 'told once, and nothing at all until a host passes it');
+  assert.match(d, /_clearedCheckT >= CLEARED_CHECK_INTERVAL_S/, 'on its own slow throttle, not every frame');
+  const w = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
+  assert.match(w, /onDungeonSpawned: \(\) => host\.onDungeonSpawned\?\.\(\),/, 'forwarded to the outer host, which owns the ledger and the pixel');
+  assert.match(w, /onDungeonCleared: \(\) => host\.onDungeonCleared\?\.\(\),/);
+});
+
 test('TTL1: the ledger rides EVERY save - and the quickslots block it sat beside was being dropped', async () => {
   const { snapshotPlayer, composeSessionState, restoreSessionState } = await import('../../src/systems/save/save.js');
   const { createSpawnLedger } = await import('../../src/world/spawnedDungeons.js');
@@ -321,3 +408,102 @@ test('TTL1: the ledger rides EVERY save - and the quickslots block it sat beside
   assert.doesNotThrow(() => restoreSessionState({}, {}), 'no ledger passed: the same no-op every other block takes');
 });
 
+test('TTL1 by source: both hosts carry the ledger, so a save made underground keeps the clocks', async () => {
+  const { readFileSync } = await import('node:fs');
+  const w = hostText('src/scenes/world.js');
+  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
+  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
+  assert.match(w, /composeSessionState\(\{ questBridge(?:: host\.questBridge)?, talk: \{[^}]*\}, spawnLedger: _spawnLedger \}\)/);   // PIN MOVED (TESA's merge): the quick save is scenes/worldQuickSave.js's, `questBridge` its live name
+  assert.match(w, /restoreSessionState\(extras, \{[^\n]*spawnLedger: _spawnLedger \}\)/);
+  assert.match(w, /spawnLedger: \(\) => _spawnLedger,/, 'the mode machine\'s dungeon saves through the SAME ledger object, not a copy');
+  assert.match(d, /composeSessionState\(\{ questBridge: opts\.questBridge, talk: opts\.talkSave, spawnLedger: opts\.spawnLedger\?\.\(\) \?\? null \}\)/);
+  assert.match(d, /restoreSessionState\(extras, \{[^\n]*spawnLedger: opts\.spawnLedger\?\.\(\) \?\? null \}\)/);
+  assert.match(m, /spawnLedger: \(\) => host\.spawnLedger\?\.\(\) \?\? null,/);
+});
+
+// AUDIT OW5b D2 (TTL1, the creator's rule relayed by Mac: "Spawned Dungeons should expire/removed after 2 ingame days when
+// cleared ... and after 7 ingame days in general"): spawnedDungeonAt and the build's own ask lifted out of world.js and
+// RUN - an expired spawn is REMOVED and stays removed, however often its pixel is asked or built. SPAWN-REBIRTH (2026-10-12,
+// a player's lockout report; Mac: "Do all 3"): standing a spawn starts no clock - entering it does - and it stays removed
+// until REBIRTH_TTL_DAYS after it died, when the same dungeon stands again with no clock running.
+test('AUDIT OW5b D2 host run (SPAWN-REBIRTH): A SPAWN PAST ITS TIME IS GONE UNTIL IT STANDS AGAIN - standing it starts no clock, entering it does; past its time the build\'s probe and the build itself both leave its pixel empty, neither standing it again on a fresh clock; the wait over, the same dungeon stands with no clock running and the next entry starts the new life\'s; never while the player is in it; a real place always wins', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { createSpawnLedger, GENERAL_TTL_MINUTES, REBIRTH_TTL_MINUTES } = await import('../../src/world/spawnedDungeons.js');
+  const w = hostText('src/scenes/world.js');
+  const i = w.indexOf('  const spawnedDungeonAt = (px, py) => {');
+  const spawned = w.slice(i, w.indexOf('\n  };\n', i) + 5);
+  const j = w.indexOf('  function _locationToBuild(px, py) {');
+  const build = w.slice(j, w.indexOf('\n  }\n', j) + 4);
+  const k = w.indexOf('  function _spawnSeen(key) {');
+  const seen = w.slice(k, w.indexOf('\n  }\n', k) + 4);   // OW6L: the one first-entry door, run as it stands
+  assert.ok(i > 0 && j > 0 && k > 0, 'all three lifted');
+  const run = ({ inside = false } = {}) => {
+    const d = { now: 0, inside, index: new Map(), ledger: createSpawnLedger(), owed: [] };
+    const host = new Function('d', 'createSpawnLedger', `
+      const params = { has: () => true }, spawnsDungeon = () => true, _spawnSalt = 1, maps = { getClimateIndex: () => 0 }, CLIMATES = { Ocean: 99 }, _spawnGround = () => true;
+      const terrainGen = { roads: () => null }, pathFreePixel = () => true, _spawnUnroaded = new Set();
+      const _spawnLedger = d.ledger, _spawnClock = () => d.now, _insideSpawn = () => d.inside, locationIndex = d.index;
+      const _spawnCloneAt = (px, py) => ({ name: 'Old Keep', spawned: true, px, py });
+      const owSayRow = (key) => d.owed.push(key);
+      const cyrodiilMask = () => null, wildInside = () => false, zoneHalls = { standOf: () => null };   // PVPDUNGEONS: no open zone here - the spawner's own pixel (PIN MOVED, WW-C2: the zone's mask Cyrodiil's, its halls scenes/zoneHallsHost.js)
+      const etherSea = false;   // PIN MOVED (ETHER-PLACES): the build answers an Eltheric pixel by its isle first - the sea off here, the Bay's pixels this pin's
+      const _arenaTemplates = null;   // PIN MOVED (TESA2): and past the Bay its Arena place - off here too
+      const _countryTemplates = null;   // PIN MOVED (TESA7): and the countryside's
+      const _capitalBase = null;   // PIN MOVED (TESA10): and the capitals
+      let _locIndexGen = 0;
+      const host = { get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; }, _spawnClock, _spawnCloneAt };   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD): scenes/spawnStandHost.js's live names
+      const onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;   // PIN MOVED (SPAWN-WORLD): past the Bay a place stands first - these pixels are the Bay's
+      ${seen}
+      ${spawned}
+      ${build}
+      return { spawnedDungeonAt, _locationToBuild, _spawnSeen, gen: () => _locIndexGen };`)(d, createSpawnLedger);
+    return { d, ...host };
+  };
+  const h = run();
+  assert.equal(h._locationToBuild(7, 9)?.name, 'Old Keep', 'first build: stood');
+  assert.equal(h.d.ledger.size, 0, 'SPAWN-REBIRTH: streamed in with nobody in it - no clock started');
+  assert.deepEqual(h.d.owed, [], 'and nothing owed to the cell');
+  h.d.now = GENERAL_TTL_MINUTES * 3;
+  assert.equal(h._locationToBuild(7, 9)?.name, 'Old Keep', 'never entered: it stands however long the road beside it is walked');
+  const t0 = h.d.now;
+  h._spawnSeen('7,9');   // the first-entry door (world.js onDungeonSpawned)
+  assert.deepEqual(h.d.ledger.toJSON(), [['7,9', t0]], 'entered: its seven days begun');
+  assert.deepEqual(h.d.owed, ['7,9'], 'and its row owed to the cell (OW6L)');
+  h.d.now = t0 + GENERAL_TTL_MINUTES;
+  const gen = h.gen();
+  assert.equal(h._locationToBuild(7, 9), null, 'held in the index, past its time: its pixel built empty');
+  assert.equal(h.d.index.has('7,9'), false, 'out of the index');
+  assert.ok(h.gen() > gen, 'the index\'s generation moved (AUDIT OW4 D5)');
+  assert.equal(h._locationToBuild(7, 9), null, 'the probe asked again: still empty');
+  assert.equal(h.spawnedDungeonAt(7, 9), null, 'the build\'s own ask: still empty - never the same dungeon on a fresh clock');
+  h.d.now = t0 + GENERAL_TTL_MINUTES + REBIRTH_TTL_MINUTES - 1;
+  assert.equal(h._locationToBuild(7, 9), null, 'a minute short of the wait: still empty');
+  assert.equal(h.d.ledger.size, 1, 'its row kept - the tombstone the save carries');
+  h.d.now += 1;
+  assert.equal(h._locationToBuild(7, 9)?.name, 'Old Keep', 'SPAWN-REBIRTH: the wait over, the same dungeon stands again');
+  assert.deepEqual(h.d.ledger.toJSON(), [], 'its old life is no row a save carries');
+  h.d.owed.length = 0;
+  h.d.now += 5;
+  h._spawnSeen('7,9');
+  assert.deepEqual(h.d.ledger.toJSON(), [['7,9', h.d.now]], 'the next entry starts the new life\'s clocks');
+  assert.deepEqual(h.d.owed, ['7,9'], 'and the cell hears them');
+  // AUDIT SPAWN-REBIRTH F6: a Wild Zone hall is `spawned` too, and its day is the hub's - its entry starts no spawn's clock,
+  // and a row an older build left for its pixel never takes it out
+  const hall = run();
+  hall.d.index.set('9,9', { name: 'Elite Hall (9,9)', spawned: true, wildHall: { ring: 1, key: '9,9' } });
+  hall._spawnSeen('9,9');
+  assert.equal(hall.d.ledger.size, 0, 'entering a hall starts no clock');
+  assert.deepEqual(hall.d.owed, [], 'and owes the cell nothing');
+  hall.d.ledger.note('9,9', 0);
+  hall.d.now = GENERAL_TTL_MINUTES + 1;
+  assert.equal(hall._locationToBuild(9, 9)?.name, 'Elite Hall (9,9)', 'a row past its seven days never takes a hall out');
+  const inside = run({ inside: true });
+  inside._locationToBuild(3, 3);
+  inside._spawnSeen('3,3');
+  inside.d.now = GENERAL_TTL_MINUTES + 1;
+  assert.equal(inside._locationToBuild(3, 3)?.name, 'Old Keep', 'nobody\'s dungeon expires under its own explorer');
+  const real = run();
+  real.d.index.set('5,5', { name: 'Castle Dread' });
+  real.d.now = GENERAL_TTL_MINUTES * 10;
+  assert.equal(real._locationToBuild(5, 5)?.name, 'Castle Dread', 'a real place always wins');
+});

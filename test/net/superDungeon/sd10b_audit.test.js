@@ -56,6 +56,11 @@ const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, 
 const near = (a, b, e = 1e-6) => a.length === b.length && [...a].every((v, i) => Math.abs(v - b[i]) < e);
 const tick = () => new Promise((r) => setImmediate(r));
 const T0 = 1_800_000_000_000;
+const W = read('src/scenes/world.js');
+/** A `function name(` of world.js's own, its text. */
+const fnOf = (name) => { const at = W.indexOf(`\n  function ${name}(`); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  }\n', at) + 4); };
+/** A `const name = (` of world.js's own, its text (an arrow whose body closes `\n  };`). */
+const constOf = (name) => { const at = W.indexOf(`\n  const ${name} = `); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  };\n', at) + 5); };
 const receiptFor = (d, over = {}) => mintSdReceipt({ d, s: 'acct-a', c: 1234, x: 'dealt', l: 7, ...over }, null, { subtle: globalThis.crypto.subtle, nowS: 1_700_000_000 });
 
 // ── the page: the Remnant's blows on me ───────────────────────────────
@@ -128,6 +133,122 @@ test('AUDIT SD THE NEXT HOUR SAYS ITS OWN: out of the Hour the driver forgets wh
 });
 
 // ── the page: the world host ──────────────────────────────────────────
+
+/** world.js's way home's place, from its own text, over a fight link the test sets. */
+function homeHost() {
+  let state = null, now = 0;
+  const said = [];
+  const env = {
+    sdFightLink: { state: () => state, now: () => now }, SD_REM_SINK_MS, clearOfPillars, sdRealmToDungeon: realmToDungeon, SD_ARENA,
+    sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT,   // AUDIT SD II (SD11f, L6 F16, PIN MOVED): said as it rises
+  };
+  const body = `let _sdHome = null;\n${constOf('sdHomeAt')}\n${constOf('sdHomeAge')}\nreturn { sdHomeAt, sdHomeAge };`;
+  const { sdHomeAt, sdHomeAge } = new Function(...Object.keys(env), body)(...Object.values(env));
+  return { sdHomeAt, sdHomeAge, said, set: (s, t) => { state = s; now = t; } };
+}
+
+test('AUDIT SD THE WAY HOME, ONE PLACE A FALL: where the Remnant fell, keyed by the fall\'s own instant - the next Hollow\'s Hour (its fight numbered 1 again) stands its way home where ITS Remnant fell, never the last one\'s place; a fall inside a pillar stands it clear of the pillar\'s square (mutants: keyed by the fight\'s number; inside the pillar)', () => {
+  const h = homeHost();
+  const fellAt = (fi, at, x, z) => ({ fi, fell: { at, top: ['A'], n: 1 }, rem: { x, z } });
+  h.set(fellAt(1, T0, 3, -4), T0 + SD_REM_SINK_MS - 1);
+  assert.equal(h.sdHomeAt(), null, 'not before its body has sunk');
+  h.set(fellAt(1, T0, 3, -4), T0 + SD_REM_SINK_MS);
+  assert.ok(near(h.sdHomeAt(), realmToDungeon(SD_ARENA.x + 3, 0, SD_ARENA.z - 4)), 'where it fell');
+  // the next Hollow's Hour: its fight numbered 1 again, its Remnant fallen elsewhere
+  h.set(fellAt(1, T0 + 3_600_000, -8, 12), T0 + 3_600_000 + SD_REM_SINK_MS);
+  assert.ok(near(h.sdHomeAt(), realmToDungeon(SD_ARENA.x - 8, 0, SD_ARENA.z + 12)), 'its own fall\'s place');
+  // inside a pillar
+  const [px, pz] = SD_PILLARS[0];
+  h.set(fellAt(1, T0 + 7_200_000, px + 0.2, pz - 0.3), T0 + 7_200_000 + SD_REM_SINK_MS);
+  const half = SD_PILLAR_W / 2 + SD_PILLAR_CLEAR_M;
+  assert.ok(near(h.sdHomeAt(), realmToDungeon(SD_ARENA.x + px + 0.2, 0, SD_ARENA.z + pz - half)), 'out of its square the shortest way, clear of its side');
+});
+
+/** world.js's Rift and its step through, from its own text, over fakes of what they ask (SD5a's harness). */
+function riftHost({ rec = null, entered = true, s = 7 } = {}) {
+  const log = [];
+  let step = null;
+  const hollow = { s, key: 'k', site: { px: 303, py: 202 }, loc: { name: 'The Hollow', regionName: 'Daggerfall' } };
+  const modes = {
+    mode: 'dungeon', dungeonLocation: null, stepThroughFire: (go) => { step = go; },
+    forceExitToExterior: () => log.push('out'), enterSdRealm: async () => { log.push('realm'); return entered; },
+  };
+  const env = {
+    sdHost: { record: () => rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, isSdRealm,
+    SD_REALM_TEXT: { lost: 'lost' }, setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async () => log.push('pixel'), _sdEntered: new Set(), _sdFallen: new Set(),   // SD-ONELIFE (PIN MOVED)
+    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d, PIN MOVED): the Hour's lines through its voice
+    sdVeilCentre: () => null, standBeforeHollowDoor: () => true,   // SD-LOOK S5: the veil's centre; AUDIT SD IV (F40): before its door
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (PIN MOVED): my party's own Hour
+  };
+  const body = `${constOf('sdRiftOf')}\n${fnOf('sdEnterRealm')}\nreturn { sdRiftOf, sdEnterRealm };`;
+  const api = new Function(...Object.keys(env), body)(...Object.values(env));
+  return { ...api, log, entered: env._sdEntered, run: () => step?.() };
+}
+
+test('AUDIT SD THE RIFT REMEMBERS WHO WENT THROUGH: during the collapse a newcomer is refused ("The Hour has closed.") - and one who went through this session is admitted again, as the realm keeps them (SD4b\'s `entered`, which the host never passed); a step through that never reached the Hour remembers nothing (mutants: `entered` unpassed; the step through unremembered; remembered when the realm would not build)', async () => {
+  const found = { s: 7, ph: 'found', r: 3, at: T0 - 60_000, until: T0 + 3_600_000, next: T0 + 9_000_000 };
+  const fell = sdFell(found, T0, { top: 'Ann', n: 2 });
+  const realNow = Date.now;
+  Date.now = () => T0 + 1000;
+  try {
+    const a = riftHost({ rec: found });
+    assert.equal(a.sdRiftOf(7).word, null, 'found: through');
+    assert.equal(a.sdEnterRealm(7), true);
+    assert.equal(await a.run(), true);
+    assert.deepEqual([...a.entered], [7], 'through: remembered');
+    const b = riftHost({ rec: fell });
+    assert.equal(b.sdRiftOf(7).word, SD_NO_CLOSED, 'fallen: a newcomer refused');
+    b.entered.add(7);
+    assert.equal(b.sdRiftOf(7).word, null, 'one who went through: admitted again');
+    b.entered.add(8);
+    b.entered.delete(7);
+    assert.equal(b.sdRiftOf(7).word, SD_NO_CLOSED, 'another Hollow\'s going-through is not this one\'s');
+    const c = riftHost({ rec: found, entered: false });
+    c.sdEnterRealm(7);
+    assert.equal(await c.run(), false);
+    assert.deepEqual([...c.entered], [], 'the realm would not build: nothing remembered');
+  } finally { Date.now = realNow; }
+});
+
+/** world.js's receipts, from its own text: kept in my realm, granted out of it - over a pool that keeps what it is asked. */
+function receiptHost() {
+  let slot = null;
+  const grants = [];
+  const env = {
+    readSdReceipt, isSdRoom, modes: { sdRealmSlot: () => slot }, spoilsLevel, playerEntity: { level: 30 }, spoilsLock: (f) => Promise.resolve().then(f),
+    sdSpoilsPool: { grant: (o) => { grants.push(o); return true; } }, sdSpoilsDay, sdSpoilsList, SD_SPOILS_TEXT, _sdReceipts: new Map(),
+  };
+  const body = `${fnOf('sdSpoilsReceipt')}\n${fnOf('grantSdSpoils')}\n${fnOf('sdReceiptsLeft')}\nreturn { sdSpoilsReceipt, sdReceiptsLeft };`;
+  const api = new Function(...Object.keys(env), body)(...Object.values(env));
+  return { ...api, grants, kept: env._sdReceipts, at: (s) => { slot = s; } };
+}
+
+test('AUDIT SD MY HOUR RECEIPT, WHEREVER IT COMES: the hub\'s hand of it (at the kill, when I stood outside the realm; at my hello) is heard by the hub\'s own link - the chat tab\'s, the one in chat:world - to the account service and the spoils, as the realm\'s is; one my realm handed me, kept for a burst that never came (I left before it - the way back, a death, the Hour\'s end), is its spoils straight into the pack as I am out of the realm, once (mutants: the hub\'s hand unheard; the kept receipt left for a week; granted every frame)', async () => {
+  const w = strip(W);
+  assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\); sdSpoilsReceipt\(r, room\); \};/);
+  assert.match(w, /if \(!inRealm && _sdReceipts\.size\) sdReceiptsLeft\(\);\s*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}/, 'before the floor is gathered and the fight forgotten');   // AUDIT SD II (L5 F5, PIN MOVED): and a checkpoint asked
+  const h = receiptHost();
+  h.at(7);
+  const r = await receiptFor(7);
+  h.sdSpoilsReceipt(r, sdTestKey(7));
+  await tick();
+  assert.deepEqual([h.grants.length, h.kept.size], [0, 1], 'in my realm: kept for the burst');
+  // out of the realm before the burst
+  h.at(null);
+  h.sdReceiptsLeft();
+  await tick();
+  assert.equal(h.grants.length, 1);
+  assert.deepEqual([h.grants[0].day, h.grants[0].acct, h.grants[0].text], [sdSpoilsDay(7), 'acct-a', SD_SPOILS_TEXT.granted]);
+  assert.deepEqual(JSON.parse(JSON.stringify(h.grants[0].roll())), JSON.parse(JSON.stringify(sdSpoilsList(1234, 7))), 'the Hour\'s roll, at the fight\'s level');
+  assert.equal(h.kept.size, 0);
+  h.sdReceiptsLeft();
+  await tick();
+  assert.equal(h.grants.length, 1, 'once');
+  // the hub's hand, wherever I stand: straight into the pack
+  h.sdSpoilsReceipt(await receiptFor(8), SOCIAL_ROOM);
+  await tick();
+  assert.equal(h.grants.length, 2);
+});
 
 // ── the page: the spoils, the portals, the hall ───────────────────────
 
@@ -208,6 +329,7 @@ test('AUDIT SD NOTHING MADE A FRAME FOR NOTHING: the Rift\'s and the Return\'s b
   assert.equal(stepAt(drift, 3.5, into), into, 'into the scratch given');
   assert.deepEqual(into, stepAt(drift, 3.5), 'the place a fresh one has');
   assert.notEqual(stepAt(drift, 3.5)[0], drift.x, 'a drifting one, off its centre');
+  assert.match(read('src/scenes/superDungeon/sdSteps.js'), /stepAt\(s, t, _at\);[^\n]*\n\s*const x = SD_REALM_ORIGIN\[0\] \+ _at\[0\], y = SD_REALM_ORIGIN\[1\] \+ _at\[1\], z = SD_REALM_ORIGIN\[2\] \+ _at\[2\];/);
   assert.deepEqual(realmToDungeon(1, 2, 3), [SD_REALM_ORIGIN[0] + 1, SD_REALM_ORIGIN[1] + 2, SD_REALM_ORIGIN[2] + 3], 'realmToDungeon is that sum - the pose\'s own');
 });
 

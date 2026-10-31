@@ -70,5 +70,84 @@ test('TP1: it is a FOLD over memberships, as GuildManager.FastTravel is', () => 
   const two = { HolyOrder: { guild: akatosh, rank: 0 }, FightersGuild: { guild: 'Fighters Guild', rank: 9 } };
   assert.equal(guildFastTravel(null, 1000, { memberships: two }), 950,
     'the non-perk guild threads the value through unchanged');
+  const src = readFileSync(join(HERE, '..', 'src/systems/guild/guildVariants.js'), 'utf8');
+  const body = src.slice(src.indexOf('export function guildFastTravel'));
+  const fn = body.slice(0, body.indexOf('\n}'));
+  assert.match(fn, /for \(const m of Object\.values\(book \?\? \{\}\)\)/,
+    'the shape is a walk over every membership, not a single lookup');
+  // ...and it may not stop early. THE CAMPAIGN FOUND THIS ONE and it
+  // is worth being exact about: adding `break` after the discount
+  // SURVIVED every behavioural arm, and it always will, because only
+  // one guild in the game has the perk and all eight temples share the
+  // HolyOrder slot - so no reachable membership book has two. The
+  // mutant is behaviourally EQUIVALENT under real data. What it breaks
+  // is the contract GuildManager.FastTravel states (:380-386: thread
+  // the duration through EVERY membership), which is what the second
+  // guild would need on the day one gains a perk. So the pin guards
+  // the contract explicitly rather than pretending an observable
+  // exists.
+  assert.equal(/\bbreak\b/.test(fn), false,
+    'the fold threads through every membership - it must not stop at the first perk');
+  assert.equal(/\breturn\b/.test(fn.slice(0, fn.lastIndexOf('return'))), false,
+    'and there is exactly one return, at the end');
 });
 
+test('TP1: the discount is applied BEFORE the trip cost - it cuts the fare too', () => {
+  // DaggerfallTravelPopUp.cs:281-296 orders CalculateTravelTime,
+  // FastTravel, CalculateTripCost. Applying the discount after the
+  // cost would leave a member of Akatosh's temple paying the full fare
+  // for a shorter trip, which is the plausible wrong wiring and the
+  // reason the flag sat exactly where it did.
+  const src = readFileSync(join(HERE, '..', 'src/ui/travel/travelPopUp.js'), 'utf8');
+  const discount = src.indexOf('guildFastTravel(');
+  const cost = src.indexOf('calculateTripCost(');
+  assert.ok(discount > 0 && cost > 0, 'both calls are present');
+  assert.ok(discount < cost,
+    'the guild discount must land between CalculateTravelTime and CalculateTripCost');
+});
+
+test('TP1: RaiseSkills has ONE home and fast travel calls it after the clamp', () => {
+  const shared = readFileSync(join(HERE, '..', 'src', 'scenes', 'shared.js'), 'utf8');
+  assert.match(shared, /export function raisePlayerSkills\(/,
+    'named for DFU\'s member, since rest and travel both call it');
+  assert.equal(/export function raiseAtRestEnd\(/.test(shared), false,
+    'the rest-only name is gone - it became a small lie the moment travel used it');
+  const world = readFileSync(join(HERE, '..', 'src', 'scenes', 'world.js'), 'utf8');
+  // AUDIT 63 F13 armed that same clamp advance with the broker's
+  // synthetic-time flag (DaggerfallTravelPopUp.cs:355/:367/:374 are
+  // raised before the flag goes up at :383), so the anchor grew to the
+  // whole armed statement - the ORDER this pin owns is unchanged, and
+  // the guard stays inside the anchor rather than outside it.
+  assert.match(world, /\n      if \(clamp > 0 && !sharedClockOn\(\)\) \{ setSyntheticTimeIncrease\(true\); playerTicker\.advance\(clamp\); \}/,   // WORLD5: and not at all under the shared clock
+    'the arrival advance is a guarded statement at the top of the block, not a bare call');
+  const clamp = world.indexOf('\n      if (clamp > 0 && !sharedClockOn()) { setSyntheticTimeIncrease(true); playerTicker.advance(clamp); }');   // WORLD5
+  // matched with its LINE START and indentation, not as a bare
+  // substring: the campaign wrapped the call in `if (false)` and a
+  // substring test still found the text, which is PY1's lesson in
+  // another costume - a pin that greps for a call does not test that
+  // the call runs.
+  assert.match(world, /\n      raisePlayerSkills\(playerEntity, \{/,
+    'the raise is an unconditional statement, not a call sitting inside a disabled branch');
+  const raise = world.indexOf('\n      raisePlayerSkills(playerEntity, {');
+  assert.ok(clamp > 0 && raise > clamp,
+    'RaiseSkills fires AFTER the arrival clamp (:380 is performFastTravel\'s tail), so a trip\n'
+    + 'landing at 7:10am raises against the arrival minute rather than the departure one');
+});
+
+test('TP1: the two closed flags are gone from the popup header', () => {
+  const src = readFileSync(join(HERE, '..', 'src/ui/travel/travelPopUp.js'), 'utf8');
+  // EF1c's rule: ban the claim as an assertion, not as a quotation.
+  const unquoted = src.replace(/"[^"]*"/g, '""');
+  for (const dead of [/no guild perk seam/, /RaiseSkills on arrival \(:380\), and/]) {
+    assert.equal(dead.test(unquoted), false, `a retired blocker still reads as current: ${dead}`);
+  }
+  // D4 CLOSED THE OTHER TWO. This pin used to assert they were still
+  // named as open; it now asserts the opposite, because the header
+  // that keeps a retired blocker alive and the header that keeps a
+  // SHIPPED law described as pending are the same defect.
+  assert.equal(/FLAGGED/.test(unquoted), false, 'the popup header carries no open flag any more');
+  assert.equal(/no fade layer in the port/.test(unquoted), false,
+    'the fade layer exists - ui/fadeLayer.js');
+  assert.equal(/overlay seam has\s*\n?\/\/ no key-up edge/.test(unquoted), false,
+    'the overlay seam has a key-up edge - townTalk.keyup');
+});

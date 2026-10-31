@@ -185,7 +185,13 @@ test('AUDIT EG IV lane3 #16 A GATE KILL\'S WEIR KEY IN ITS CLAIM\'S OWN BATCH (s
 
 // ── lane3 #18 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 test('AUDIT EG IV lane3 #18 THE SERVICE\'S ROUTE COMMENT IS THE ROUTES\' (server-account/src/index.js): the open\'s line names every field openEg reads and every refusal it answers, and the admission\'s every refusal admitEg answers (mutants: a field unsaid)', () => {
+  const S = rd('server-account/src/index.js'), E = rd('server-account/src/eg.js');
+  const line = (route) => S.split('\n').find((l) => l.startsWith(`//   POST ${route} `));
   const fn = (f) => { const src = String(f); return { reads: [...new Set([...src.matchAll(/body\?\.(\w+)/g)].map((m) => m[1]))], refuses: [...new Set([...src.matchAll(/error: '([\w-]+)'/g)].map((m) => m[1]))] }; };
   const open = fn(openEg), admit = fn(admitEg);
   assert.ok(open.reads.includes('again') && open.reads.includes('wg'));
+  for (const f of open.reads) assert.match(line('/v1/eg/open').split('->')[0], new RegExp(`\\b${f}\\??\\b`), `the open's \`${f}\``);
+  for (const w of open.refuses.filter((x) => x !== 'no-signing-key')) assert.ok(line('/v1/eg/open').includes(w), `the open's refusal ${w}`);
+  for (const w of admit.refuses.filter((x) => x !== 'no-signing-key')) assert.ok(line('/v1/eg/admit').includes(w), `the admission's refusal ${w}`);
+  assert.ok(E.includes('export async function openEg'));
 });

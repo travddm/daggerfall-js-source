@@ -57,6 +57,12 @@ function recordingGl(w = 1920, h = 1080) {
 // ── L6-10 ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 test('AUDIT EG V L6-10 A SPIREBRIDGE\'S PLANK LEAVES THE COLLIDER AT ITS END, through the dungeon host\'s own wrapper (sections 15 and 21: "known to the fair trail" - the relay holds the plank as ground until its end, so every screen must too): the spans stood through egSpanCollider - the wrapper scenes/dungeonContext.js egSpanRide hands them - take a plank\'s bucket out at its end, nothing under the gap after, and its key leaves the host\'s list (egRecircle takes the rest at THE SWAP); the host hands no wrapper of its own (mutants: the wrapper\'s removeBucket dropped; the key kept on the list; the host\'s literal wrapper back)', () => {
   const SEED = 1, HALL = 7, spec = egHallOf(SEED, HALL, 0), b0 = egBridgeOf(spec, 0);
+  // the host's own line: the spans stand through egSpanCollider, and no hand-built `{ addMesh }` wrapper is left
+  const DC = rd('src/scenes/dungeonContext.js');
+  const ride = DC.slice(DC.indexOf('function egSpanRide('), DC.indexOf('function egRecircle('));
+  assert.match(ride, /egSpan\.stand\(\{ dynamicDraws, collider: egSpanCollider\(collider, keys\) \}\)/, 'the dungeon host stands the spans through egSpanCollider');
+  assert.doesNotMatch(ride, /collider: \{ addMesh/, 'no wrapper of the host\'s own');
+  assert.match(DC.slice(DC.indexOf('function egRecircle('), DC.indexOf('function egRecircle(') + 900), /for \(const k of keys\) collider\.removeBucket\(k\);/, 'THE SWAP takes what the list still holds');
   const R = { createMesh: (m) => ({ subMeshes: m.subMeshes }), destroyMesh: () => {} };
   const span = createEgSpan({ renderer: R, seed: SEED, c: spec.c }), dynamicDraws = [], collider = new Collider(), keys = [];
   span.stand({ dynamicDraws, collider: egSpanCollider(collider, keys) });
@@ -79,6 +85,13 @@ test('AUDIT EG V L6-10 A SPIREBRIDGE\'S PLANK LEAVES THE COLLIDER AT ITS END, th
     span.ride(40, 0.016, null, false);
     assert.ok(!Number.isFinite(under()), 'and never again');
   } finally { registerSpireObjs(null); }
+});
+
+// ── L6-7 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+test('AUDIT EG V L6-7 egSpan\'s clear names the Beat\'s pictures\' owner as egBeatTellUp\'s doc does - the breach\'s end (egBeatTellDown), never "the session\'s"', () => {
+  const S = rd('src/scenes/eliteGates/egSpan.js'), clear = S.slice(S.indexOf('    clear() {'));
+  assert.match(clear, /the Beat's pictures are the breach's, freed at its end - egBeatTellDown/);
+  assert.doesNotMatch(S, /the Beat's pictures are the session's/);
 });
 
 // ── GLSH (lane 6's UNVERIFIED shader objects) ────────────────────────────────────────────────────────────────────────────
@@ -116,8 +129,123 @@ test('AUDIT EG V L6-5 THE FIGHT\'S PASSES HAVE A DESTROY (sections 11.9 and 29):
   assert.equal(R.stray() + C.stray(), 0, 'nothing freed twice');
 });
 
+/** The dungeon host's spans, its own source (scenes/dungeonContext.js - egSpanRide, egRecircle) over `renderer`, and the
+ *  line its destroy() frees them by. */
+function hostSpans(renderer, loc) {
+  const DC = rd('src/scenes/dungeonContext.js');
+  const src = between(DC, '  let egSpan = _egHall ? createEgSpan(', '  // SD8c (Super-Dungeons.md section 10): THE BRASS REMNANT');
+  const destroyLine = DC.split('\n').find((l) => l.trim().startsWith('egSpan?.clear();'));
+  assert.ok(destroyLine, 'the host\'s destroy frees its spans');
+  return new Function('_egHall', 'createEgSpan', 'egSpanCollider', 'renderer', 'audio', 'dfLocation', 'dynamicDraws', 'collider', 'opts',
+    `${src}\nreturn { egSpanRide, egRecircle, destroy() { ${destroyLine.trim().split(';')[0]}; }, get span() { return egSpan; } };`)(true, createEgSpan, egSpanCollider, renderer, null, loc, [], new Collider(), { sdClock: () => 0 });
+}
+
+/** A screen with a breach client over the recording GL `R`: its fight (scenes/eliteGates/egFight.js), its look, the spans stood by the
+ *  dungeon host's own lines, every mesh and billboard batch counted. */
+function screen(R) {
+  const ME = 'acct-0', meshes = new Set(), batches = new Set();
+  let mt = 0;
+  const renderer = { gl: R.gl, _worldViewportPx: null, createMesh: (m) => { const g = { m, n: ++mt }; meshes.add(g); return g; }, destroyMesh: (g) => { meshes.delete(g); },
+    updateMeshVertices: () => {}, createBillboardBatch: () => { const b = { origin: [0, 0, 0] }; batches.add(b); return b; }, destroyBillboardBatch: (b) => { batches.delete(b); } };
+  const st = { inside: false, b: null, circle: 0, host: null, swaps: 0 };
+  const hostDown = () => { const h = st.host; st.host = null; h?.destroy(); };
+  const modes = { get mode() { return st.inside ? 'dungeon' : 'exterior'; }, egHallBreach: () => (st.inside ? st.b : null), egHallCircle: () => (st.inside ? st.circle : null), egPlace: () => true,
+    egLeave: () => { st.inside = false; hostDown(); return true; }, egHallReturn: () => null, egSwapDrop: () => {}, egBandsDown: () => 0,
+    dungeonCtx: { exitDoors: [], egSpanDraw: (p, v, f) => !!st.host?.span?.drawPass(p, v, f) } };
+  const entity = { level: 30, health: 80, maxHealth: 100, magicka: 10, maxMagicka: 50, fatigue: 0, stats: {}, items: [] };
+  const player = { pos: realmToDungeon(0, 0, 0), height: 1.8, grounded: true, collider: { move: () => {} } };
+  const online = { welcomes: 1, terminal: false, error: null, sendEg: () => true };
+  let clock = 1_800_000_000_000;
+  const client = createEgClient({ modes: () => modes, online: () => online, hub: () => null, now: () => clock, entity, player, cam: { pos: [0, 0, 0], yaw: 0 }, renderer,
+    account: { me: () => ME, guest: () => false, keys: async () => ({ ok: false }) }, say: () => {}, mid: () => {}, site: () => ({}), wire: () => null, landAt: () => true, hurt: () => {}, peers: () => [], store: null,
+    fight: (link) => createEgFight({ renderer, gl: R.gl, link, me: () => ME, player: () => entity, feet: () => player.pos }), win: { innerWidth: 1920, innerHeight: 1080, matchMedia: () => ({ matches: false }) } });
+  const proj = perspective(new Float32Array(16), 1.2, 16 / 9, 0.1, 2000);
+  let s = 7;
+  const rng = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return s / 4294967296; };
+  function draw() {
+    const eye = [player.pos[0], player.pos[1] + 5, player.pos[2] - 8], view = lookAt(new Float32Array(16), eye, player.pos, [0, 1, 0]);
+    client.drawPass(proj, view, eye, clock / 1000, null); client.drawSky(proj, view, eye, 0, null);
+  }
+  /** A breach of two from Hall 1 through Hall `halls`, `frames` a hall (each a director's step, its word, the spans' ride, a
+   *  frame and a draw); a new circle stood by the host's ride, THE SWAP's by its recircle. Answers its way out. */
+  function breach(n, seed, halls = 10, frames = 25) {
+    const bid = `${n}`.padStart(16, '0');
+    clock += 3_600_000;
+    const co = [[ME, 'Mac', 1], ['acct-1', 'Ann', 2]];
+    const Br = egBreachNew({ b: bid, ez: 'z'.repeat(20), s: ME, o: 'Mac', ew: 0, rh: 0, seed, op: clock - EG_SEALED_MS - 60_000, co, site: { px: 1, py: 1, x: 0, y: 0, z: 0, yaw: 0 }, wg: [] });
+    for (const [sub] of co) egEnter(Br, sub, `ord${sub}${bid}`.padEnd(20, 'x'), 30, clock);
+    online.terminal = false;
+    st.inside = true; st.b = bid; st.circle = 0;
+    registerSpireObjs(() => client.objs());
+    const word = () => client.word(validEgOut(JSON.parse(JSON.stringify(egStateOf(Br, clock)))));
+    for (let h = 1; h <= halls; h++) {
+      Br.h = h; Br.sg = 'arrive'; Br.wk = clock; Br.cnt = { left: 1_500_000, at: clock }; Br.pulledAt = clock; Br.gatherAt = clock - EG_GATHER_MS; Br.su = clock;   // its gather done: woken at the first step
+      const spec = egHallOf(seed, h, 0), c = egCircleOfHall(h);
+      if (c !== st.circle) {
+        if (!st.host) st.host = hostSpans(renderer, { egSeed: seed, egCircle: c, egGeo: 0 }); else { st.host.egRecircle({ seed, c }); st.swaps++; }
+        st.circle = c;
+      }
+      const pos = spec.arrive ? { sx: spec.x0 + spec.arrive.x, z: spec.arrive.z } : { sx: spec.x0, z: 0 };
+      player.pos = realmToDungeon(pos.sx, 0, pos.z);
+      for (let k = 0; k < frames; k++) {
+        clock += 100;
+        const said = egStep(Br, clock, Object.entries(Br.mem).filter(([, m]) => m.alive).map(([sub]) => ({ sub, sx: pos.sx, z: pos.z, dead: false, at: clock })), rng);
+        for (const w of said) if (!w.to || w.to === ME) { const v = validEgOut(JSON.parse(JSON.stringify(w))); if (v) client.word(v); }   // the room's words, as the relay says them to me
+        word();
+        st.host?.egSpanRide(0.1, null, false);
+        client.frame(); draw();
+      }
+    }
+    /** The way out `exit`, through the director's own doors where it has one, then the walk out's frames. */
+    return function leave(exit) {
+      const out = [];
+      if (exit === 'home') { Br.sg = 'rest'; Br.mem[ME].home = clock; }   // the way home at a Redoubt's rest, as net/eliteGates/egBrain.js egHome marks it
+      else if (exit === 'forsake') { Br.mem[ME].alive = 0; Br.mem[ME].wit = 1; assert.ok(egForsake(Br, ME, clock, out), 'forsaken'); }
+      else if (exit === 'socket') online.terminal = true;
+      else if (exit === 'away') { client.away(); st.inside = false; hostDown(); }   // a load or a reload: the online frame gone, the context with it
+      else egEnd(Br, exit, clock, out);
+      if (exit !== 'away') word();
+      for (let k = 0; k < 300; k++) { clock += 16; client.frame(); }
+      registerSpireObjs(null);
+      return { inside: st.inside };
+    };
+  }
+  return { breach, renderer, meshes, batches, st, draw };
+}
+
+test('AUDIT EG V L6-5 EVERY GL OBJECT BACK TO ITS BASELINE AFTER TEN HALLS AND EVERY EXIT KIND (section 11.9: "Pinned: after ten halls and every exit kind, the live mesh and texture counts return to baseline"; section 29): a screen\'s breach client - its fight, its look, the spans the dungeon host stands - over a recording GL, ten halls a breach (THE SWAP\'s recircle at Hall 6), then each way out: the way home, forsaking, the tear, a fall (the company\'s, `wipe`), the last hall, a void, the socket lost and a load (away) - every program, vertex array, buffer, texture and shader, every mesh and every billboard batch let go each time, nothing freed twice (mutants: the telegraph pass kept; the crystal pass kept; the passes never freed at leave; the shaders kept)', () => {
+  const R = recordingGl(), S = screen(R);
+  assert.deepEqual(R.count(), {}, 'nothing before the first breach');
+  let n = 0, peak = null;
+  for (const exit of ['home', 'forsake', 'tear', 'wipe', 'last', 'void', 'socket', 'away']) {
+    const leave = S.breach(++n, 70 + n);
+    peak ??= R.count();
+    const at = leave(exit);
+    assert.equal(at.inside, false, `${exit}: walked out`);
+    assert.deepEqual(R.count(), {}, `${exit}: every GL object let go`);
+    assert.equal(S.meshes.size, 0, `${exit}: every mesh freed`);
+    assert.equal(S.batches.size, 0, `${exit}: every billboard batch freed`);
+  }
+  assert.ok(peak.Program >= 5 && peak.VertexArray >= 8 && peak.Buffer >= 10, `the passes stood in a hall - the telegraphs' with its floors' buffer, the crystals', the look's, the ghosts' (${JSON.stringify(peak)})`);
+  assert.equal(S.st.swaps, 8, 'THE SWAP\'s recircle in every breach');
+  assert.equal(R.stray(), 0, 'nothing freed twice');
+});
+
 // ── L6-3 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 test('AUDIT EG V L6-3 THE EDGE LINE IN THE WORLD IMAGE\'S PIXELS (section 25.3; bible/07-Rendering/Retro-Mode.md - a pass sizes its pixels in `worldViewportPx`): the breach client\'s line pass, under Retro Picture Mode (a 320x200 world image on a 1920x1080 canvas), lays its line in the image\'s pixels - its viewport the image\'s, its width egEdgeLinePx of the image\'s height - as the spans\' ghosts drawn in the same pass are; the canvas\'s with no world image set (mutants: the viewport unpassed; the width off the canvas)', () => {
+  const R = recordingGl(1920, 1080), S = screen(R);
+  const last = (name, pick) => R.uni.filter((u) => u.n === name && pick(R.vsOf.get(u.p) ?? '')).at(-1)?.v;
   const line = (vs) => vs === EG_LINE_VS;
+  const leave = S.breach(1, 71, 7, 6);
+  assert.deepEqual(last('uViewport', line), [1920, 1080], 'no world image: the canvas\'s');
+  assert.deepEqual(last('uWidth', line), [egEdgeLinePx(1080)]);
+  S.renderer._worldViewportPx = [0, 0, 320, 200];
+  S.draw();
+  assert.deepEqual(last('uViewport', line), [320, 200], 'the world image\'s pixels');
+  assert.deepEqual(last('uWidth', line), [egEdgeLinePx(200)], 'its width off the image\'s height');
   assert.notDeepEqual(egEdgeLinePx(200), egEdgeLinePx(1080));
+  // the ghosts in the same pass read the same rect (scenes/eliteGates/egSpan.js drawPass - the sibling the line now agrees with)
+  assert.match(rd('src/scenes/eliteGates/egSpan.js'), /const vp = renderer\._worldViewportPx;[^\n]*\n[^\n]*vp\?\.\[2\] \?\? 0, vp\?\.\[3\] \?\? 0/);
+  S.renderer._worldViewportPx = null;
+  leave('void');
 });

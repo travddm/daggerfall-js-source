@@ -147,6 +147,7 @@ test('PROFILE-MENU: the plate wears the corner mark\'s portrait - a face handed 
 });
 
 test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn has its colour rule per title, the window widens for it and keeps clear of the foot, and a phone gives it the screen (mutants: the plate\'s title colourless; the window\'s width; the short screen\'s height; Close out of reach)', async () => {
+  const css = src('src/ui/enhanced/enhancedStyle.js');
   const worn = new Set();
   // every class, the gradient title's word among them (Shadow Fang's is a gradient), an SVG's too (its class is an
   // attribute) - each matched WHOLE against the composed sheet's rules (AUDIT P6: a prefix passed for its longer name,
@@ -159,9 +160,31 @@ test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn
   const rules = ENHANCED_CSS.replace(/\/\*[\s\S]*?\*\//g, ' ');
   assert.deepEqual([...worn].filter((c) => !new RegExp(`\\.${c}(?![\\w-])`).test(rules)), [], 'a class the skin has no rule for');
   assert.match(ENHANCED_CSS, /\.card \.acctworntitle\.tl-founder \{ color: (#[0-9a-f]{6}|rgba?\()/, 'the worn title\'s colour, walked out of the vocabulary');
+  assert.match(css, /\.px-win\.px-acctwin:has\(\.card\.acct\.acctin\) \{ max-height: min\(720px, calc\(100dvh - clamp\(270px, 33vh, 400px\) - 84px\)\); \}/);
+  assert.match(css, /\.px-win\.px-acctwin:has\(\.acctgrid2\) \{ width: min\(820px, 94vw\); \}/, 'wide only for two columns');
   // AUDIT P1: a short screen gives it the height - LATER than the rule above, at its weight, or 844x390 drew 36px
   const short = '@media (max-height: 560px) { .px-win.px-acctwin:has(.card.acct.acctin) { max-height: calc(100dvh - 20px); } }';
+  assert.ok(css.indexOf(short) > css.indexOf('.px-win.px-acctwin:has(.card.acct.acctin) { max-height: min(720px'), 'the short screen\'s rule, after the window\'s');
+  assert.match(css, /\.px-over \.px-win\.px-acctwin:has\(\.card\.acct\.acctin\) \{ max-height: min\(760px, 86dvh\); \}/, 'over a game: centred, the height the pause window has');
+  // a phone gives it the screen - the stage AND the window
+  assert.match(css, /@media \(max-width: 480px\) \{\n  \.px-stage\.px-acctstage \{ padding: max\(10px, env\(safe-area-inset-top\)\) 8px max\(10px, env\(safe-area-inset-bottom\)\); background: rgba\(8,10,15,0\.88\); \}\n  \.px-win\.px-acctwin, \.px-win\.px-acctwin:has\(\.card\.acct\.acctin\) \{ width: 100%; max-height: calc\(100dvh - 20px\); \}/);
+  // two columns are the CARD's width's call - the card is the container the query reads, or it never matches
+  assert.match(css, /\.card\.acctin \{ container-type: inline-size; \}/);
+  assert.match(css, /@container \(min-width: 600px\) \{ \.card \.acctgrid\.acctgrid2 \{ grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\);/);
+  assert.match(css, /\.card ul\.acctfacts\.acctrecord li:has\(\.acctbar\) \{ grid-column: 1 \/ -1; \}/, 'the duels\' tile takes the row');
+  // AUDIT P4: Close in reach - the presses stand at the window's foot, the body's foot padding theirs
+  assert.match(css, /\.px-win\.px-acctwin \.card\.acct\.acctin \.acts \{ position: sticky; bottom: 0; z-index: 1; padding-bottom: 20px;/);
+  assert.match(css, /\.px-win\.px-acctwin:has\(\.card\.acct\.acctin\) \.px-body \{ padding-bottom: 0; \}/);
+  // AUDIT P3: Stone's light ground lifts the profile's quiet words, as it lifts the hourglass's
+  assert.match(css, /:root\[data-plus-theme="stone"\] \.px-acctwin \{ --dim: #e2dccd; --brass: #ffd98a;/);
   assert.ok(FRAME_ROLES.panel.includes('.px-win .card.acctin ul.acctfacts.acctrecord li'), 'under Plus a deed\'s tile is a panel');
+  // the card still brings no design language of its own (ACC1e)
+  const js = src('src/ui/enhanced/enhancedAccount.js').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
+  assert.doesNotMatch(js, /\.style\.|cssText|#[0-9a-fA-F]{6}/);
+  // the door hands the card the mark's own character and face
+  const menu = src('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /const save = profileCharacter\(\);\n  const card = accountCard\(document, acctFlow, \{/);   // PIN MOVED: AUDIT RECOVERY-SET B1 - the window's flow
+  assert.match(menu, /face: save \? loadFace\(save, \{ scale: 2, copy: true \}\) : null,\n    character: save \? `Playing \$\{characterLine\(save\)\}` : null,/);
 });
 
 // ── PLUS-MENU ───────────────────────────────────────────────────────
@@ -185,6 +208,11 @@ test('PLUS-MENU: the doors are the kit\'s buttons, given the edge the role paint
   assert.match(MENU_CSS, /:root\[data-plus-theme="stone"\] \.px-menu \.doorbtn:not\(:hover\):not\(:focus-visible\) \.px-c \{ color: #9a9079; \}/);
   assert.match(MENU_CSS, /@media \(max-width: 480px\) \{\n  \.px-home \.px-menu \{ gap: 6px; \}\n  \.px-menu \.doorbtn \{ padding: 2px 16px; min-height: 44px; font-size: 22px; \}/);
   assert.match(MENU_CSS, /\.px-home \.px-rule::before \{ background: linear-gradient\(90deg, transparent, #7a5424 45%, #f3cf86\); \}/, 'the rule under the wordmark gilt');
+  // AUDIT M2: standing at rest, the diamonds would be every door's name - "◆ Continue ◆" - so each is hidden from a reader
+  const menu = src('src/ui/enhanced/enhancedMenu.js');
+  // UI-CALM: every door is built by the one maker (doorBtn) - the drawn diamonds either side of its words
+  const doorMaker = menu.slice(menu.indexOf('function doorBtn('), menu.indexOf('return b;', menu.indexOf('function doorBtn(')));
+  assert.match(doorMaker, /const dia = \(\) => \{ const d = el\('span', 'px-c', '\\u25c6'\); d\.setAttribute\('aria-hidden', 'true'\); return d; \};\n[^]*b\.append\(dia\(\), word, dia\(\)\);/);
   // every Plus colour dresses them: the theme rules are walked out of the same role list
   assert.match(PLUS_CSS, /:root\[data-plus-theme="stone"\] \.px-menu \.doorbtn/);
 });

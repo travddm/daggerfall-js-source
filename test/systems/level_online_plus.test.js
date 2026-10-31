@@ -78,6 +78,14 @@ test('LEVEL-ONLINE-2: a new character is born on Daggerfall\'s leveling online, 
 });
 
 test('LEVEL-ONLINE: the law sits on every door a character is BORN through, and on no door one is LOADED through', () => {
+  const cs = read('src/systems/chargenSession.js');
+  assert.match(cs, /initVirtueLeveling\(playerEntity, newCharacterLevelingSystem\(result\.levelingSystem \?\? LEVELING_CLASSIC, \{ online: isOnlinePage\(\) \}\)\);/, 'finishChargen');
+  assert.match(cs, /initVirtueLeveling\(playerEntity, newCharacterLevelingSystem\(LEVELING_CLASSIC, \{ online: isOnlinePage\(\) \}\)\);/, 'the ?class= skip');
+  assert.match(read('src/systems/classicSave.js'), /levelingSystem: newCharacterLevelingSystem\(LEVELING_CLASSIC, \{ online \}\),/, 'the classic import');
+  assert.match(read('src/scenes/world.js'), /classicSaveToSnapshot\(saveGames, \{\n\s+spellsByIndex, online: isOnlinePage\(\),/, 'the import is told it is online');
+  // a LOAD reads the saved field untouched: a Daggerfall character online keeps Daggerfall's leveling
+  const save = read('src/systems/save/save.js');
+  assert.doesNotMatch(save, /newCharacterLevelingSystem/, 'no load path re-decides the system');
   assert.equal(usesVirtueLeveling({ levelingSystem: LEVELING_VIRTUE }), true, 'a loaded Oblivion character still levels Oblivion\'s way');
 });
 
@@ -110,6 +118,11 @@ test('LEVEL-ONLINE-2: the online question cannot answer Oblivion - not by key, d
   const off = new LevelingChoiceScreen(() => {});
   assert.equal(off.cursor, 0);
   assert.equal(off.defaultId, LEVELING_CLASSIC);
+  // the door answers a torn-down question with the OPEN default, not a literal Daggerfall (LEGACY2: each question
+  // still up in turn - the chain's)
+  assert.match(read('src/systems/chargenSession.js'), /while \(prompt && !fired\) prompt\.answer\(prompt\.defaultId\);/);
+  // and online the question is always put, the mod on or off
+  assert.match(read('src/systems/chargenSession.js'), /const online = isOnlinePage\(\);\n[\s\S]{0,600}?\n\s+if \(oblivionLevelingEnabled\(\) \|\| online\) asks\.push\(\(answer\) => new LevelingChoiceScreen\(/);
 });
 
 test('LEVEL-PLUS: on Enhanced Plus the question wears the Plus window - the shell, the frame, a tile per system', () => {
@@ -169,6 +182,15 @@ test('LEVEL-PLUS: the classic skin keeps the canvas screen, a shut option saying
     assert.ok(r.quads > 0, 'the canvas draws');
     assert.equal(levelingFaceOwner(), null, 'no face on the classic skin');
   });
+  assert.match(read('src/ui/levelingChoice.js'), /\$\{opt\.locked \? ` - \$\{opt\.lockNote\}` : ''\}/);
+});
+
+test('LEVEL-PLUS: the Plus sheet dresses the face, and a phone stacks the tiles', () => {
+  const css = read('src/ui/enhanced/enhancedPlusStyle.js');
+  for (const rule of ['.lvl-shell', '.lvl-shell .px-win', '.lvl-opts', '.lvl-opt.is-on', '.lvl-opt:disabled', '.lvl-lock']) {
+    assert.ok(css.includes(rule), rule);
+  }
+  assert.match(css, /\.lvl-opts \{ display: grid; grid-template-columns: repeat\(auto-fit, minmax\(240px, 1fr\)\);/);
 });
 
 test('LEVEL-ONLINE-2: a character brought online is a NEW online character - it crosses onto Daggerfall\'s leveling at the start of its level, and is told first', () => {
@@ -199,9 +221,19 @@ test('LEVEL-ONLINE-2: a character brought online is a NEW online character - it 
   // customs' own report stays the gold and the deeds - the door says the leveling line itself, first
   const snap = { level: 1, classicMinutes: 7, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [] };
   assert.ok(!customsLines(applyCustoms(snap), { before: true }).includes(LEVELING_CROSS_LINE.before));
+  const menu = read('src/ui/enhanced/enhancedMenu.js');
+  assert.match(menu, /const leveling = crossLeveling\(trial\);[^\n]*\n\s+const preview = \[\.\.\.\(leveling \? \[LEVELING_CROSS_LINE\.before\] : \[\]\), /, 'the Bring online question says it first');
+  assert.match(menu, /const leveling = crossLeveling\(copy\);[^\n]*\n\s+const report = applyCustoms\(copy\);/, 'customs switches the realm\'s COPY - the offline character keeps its own');
+  assert.match(menu, /lines: \[\.\.\.\(leveling \? \[LEVELING_CROSS_LINE\.after\] : \[\]\), \.\.\.customsLines\(report\)\]/, 'and the report after says it happened');
 });
 
 test('LEVEL-ONLINE-3: an Oblivion character already online is switched at its realm boot, before the save is restored, and told', () => {
+  const world = read('src/scenes/world.js');
+  const at = world.indexOf('const releveled = realmBoot && bootSnapRead ? crossLeveling(bootSnapRead) : false;');
+  assert.ok(at > 0, 'the realm boot runs the crossing on the joined save');
+  assert.ok(at > world.indexOf('if (realmBoot) { bootSnapRead = realmBoot.snap; realmBoot.snap = null; }'), 'on the one parse');
+  assert.ok(at < world.indexOf('const empireFolded = realmBoot ? foldEmpireAccounts(bootSnapRead) : null;'), 'beside the boot\'s other realm laws, before the restore');
+  assert.match(world, /if \(releveled\) townTalk\.say\(LEVELING_CROSS_LINE\.switched\);/, 'and says it once the world stands');
   assert.ok(LEVELING_CROSS_LINE.switched.includes('the classic way'));   // PIN MOVED: BR5, the classic, not the game's name
   // a second boot of the switched save changes nothing
   const snap = { levelingSystem: LEVELING_VIRTUE, level: 6, startingLevelUpSkillSum: 50, currentLevelUpSkillSum: 300, levelProgress: 70 };

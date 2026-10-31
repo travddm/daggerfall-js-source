@@ -237,9 +237,35 @@ test('DW3 GL door: the list drawer asks the pipeline by dye and reads back the v
 });
 
 test('DW3 wiring: the paper doll asks by item.dyeColor and blits an imported texture as it is; the DOM callers pass the dye; the install rides the scene boot; the drawers and the pipeline forward it', () => {
+  const doll = rd('src/ui/paperDoll.js');
+  assert.match(doll, /async function loadRecord\(archive, record, getTexture, dye = null, S = 1\) \{/);   // DFMOD4: and the compose's density
+  // DFMOD1: the swap is still blitted as it is when it has the classic size (every vendored set); a hi-res mod
+  // sprite is box-filtered into the classic record's size, or its xml <rect>, and placed there
+  assert.match(doll, /const swap = decodedTextureTopDown\(archive, record, 0, 'Albedo', dye\);\n\s+if \(swap\) \{\n[\s\S]{0,2400}?let pic = \{ width: swap\.width, height: swap\.height, data: swap\.rgba \};[\s\S]{0,1200}?return \{ bmp: \{ width: pic\.width, height: pic\.height, data: null, rgba: pic\.data, scale \}, off: place, mask \};/, 'the import arm first, in the RGBA shape the vendor arm blits - no ChangeDye (RRI1 adds the mask beside it)');
+  // PIN MOVED (APPEARANCES-II, bible/04-Characters/Wardrobe.md section 5): the piece as it is drawn - a look worn over it is asked in the look's metal
+  assert.match(doll, /loadRecord\(res\.archive, res\.record, deps\.getTexture, itemDyeColor\(drawnPiece\(it\)\), S\)/, 'the item\'s own dyeColor, not the remap\'s (an artifact\'s is Unchanged)');
+  assert.match(doll, /loadRecord\(t\.playerTextureArchive \+ \(raceByKey\(deps\.race\)\?\.morphologyIndex \?\? HUMAN_MORPHOLOGY\), t\.playerTextureRecord, deps\.getTexture, itemDyeColor\(it\), S\)/, 'the cloak interior too');
+  // DISC24-B: the pack's tile and detail ask through its one picture door (linePictureUrl), and the door asks by the dye
+  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /if \(line\.image\) return requestIcon\(line\.image\.archive, line\.image\.record, \{ scale, dye: line\.image\.dye, dyeTarget: line\.image\.dyeTarget, onReady \}\);/);   // DYE-ICON: and the swatch the dye changes
+  // UI1: the tile and the card ask the FITTED door, whose name carries the dye and whose source is the dyed door above
+  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /function itemTile\(line, box, ready = render, snap = true\) \{[\s\S]*?linePicture\(line, \{ box, onReady: ready, snap \}\)/);
+  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /function infoCard\(picked, side, ready = render, \{ body = false, own = true \} = \{\}\)[\s\S]*?linePicture\(line, \{ box: SLOT_BOX\.card, onReady: ready \}\)/, 'PLUS7: the card redraws through its caller - the detail column by default, the hover card its own');   // PIN MOVED (AUDIT FB1019 A1): the card's `own` - another window's card says each piece where it lies
+  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /const name = line\.image \? iconName\(line\.image\.archive, line\.image\.record, line\.image\.dye, line\.image\.dyeTarget\)/, 'UI1: two dyes, two fitted pictures - and (MERGE, DYE-ICON) two swatches');
+  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /requestFittedIcon\(image\.archive, image\.record, \{ box, dpr, dye: image\.dye, dyeTarget: image\.dyeTarget, onReady:/);   // UI2: the diamond's picture fitted, still by the dye; DYE-ICON: and its swatch
+  assert.match(rd('src/ui/enhanced/enhancedHotbar.js'), /requestFittedIcon\(image\.archive, image\.record, \{ box: fit\.box, dpr: fit\.dpr, dye: image\.dye, dyeTarget: image\.dyeTarget, onReady: again \}\)/);   // UI2 + DYE-ICON: the bar's slot the same
+  assert.match(rd('src/ui/textureCanvas.js'), /\(wake\) => requestIcon\(archive, record, \{ scale: 1, dye, dyeTarget, onReady: wake \}\)/, 'MERGE (UI1 x DYE-ICON): the fitted door asks its source by the swatch too');
+  // PIN MOVED (AUDIT VE R2): before the store's one registration - the seam's own copy of it is gone
+  assert.match(rd('src/scenes/shared.js'), /installDiverseWeaponsIcons\(\);[^\n]*\n\s+installRoleplayRealismItems\(\);[^\n]*\n\s+installRoleplayRealism\(\);[^\n]*\n\s+installEnemyExpansion\(\);[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+const textures = registerTextureStore\(\)/, 'installed at the scene boot, before the archives load - not at worldTick\'s module scope (a TDZ through the cycle)');
+  assert.ok(!/installDiverseWeaponsIcons/.test(rd('src/systems/worldTick.js')));
   for (const f of ['src/ui/item/itemScroller.js', 'src/ui/native/nativeInventory.js']) {
     assert.match(rd(f), /icons\.uploadRecord\(img\.archive, img\.record, \{ mips: false, removeMask: true, dye: img\.dye, dyeTarget: img\.dyeTarget \}\)/, f);
     assert.match(rd(f), /sizes\.set\(key, tex\.getSize\(img\.record\)\);/, `${f}: the CLASSIC record's size (ItemListScroller.cs:440-441)`);
   }
+  const pipe = rd('src/scenes/dataPipeline.js');
+  assert.match(pipe, /const swap = decodedTexture\(archive, record, 0, 'Albedo', dye\);/);
+  assert.match(pipe, /const variant = mips === false \? \(swap && token \? `#ui_\$\{token\}` : dyed \? `#ui_dye\$\{dye\}_\$\{dyeTarget\}` : '#ui'\) : undefined;/, 'DYE-ICON: a dyed classic picture keys apart too, by dye and swatch, apart from a replacement\'s');
+  assert.match(pipe, /return variant;/);
+  assert.match(rd('src/systems/item/itemTemplates.js'), /return \{ archive, record, dye: itemDyeColor\(item\), dyeTarget: itemDyeTarget\(item\) \};/);
+  assert.match(rd('src/systems/textureReplacement.js'), /const lane = async \(\) => \{ while \(next < todo\.length\) await one\(todo\[next\+\+\]\); \};/, 'the preload runs in lanes');
   assert.equal(PRELOAD_CONCURRENCY, 8);
 });

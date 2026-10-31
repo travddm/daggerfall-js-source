@@ -27,6 +27,17 @@ import { MODELS, ctxFor } from '../../csaScene.mjs';
 import { sea, readyPool, freshPool, modShipsPool } from '../../navalSea.mjs';
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
+const WORLD = src('src/scenes/world.js');
+/** A function declaration of world.js's, lifted whole (the suites' own way). */
+const lift = (name) => {
+  const m = new RegExp(`\\n  function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n  \\}\\n`).exec(WORLD);
+  assert.ok(m, `${name} lifted`);
+  return m[0];
+};
+/** One line of world.js's from its start. */
+const line = (start) => { const i = WORLD.indexOf(start); assert.ok(i >= 0, `lifted: ${start}`); return WORLD.slice(i, WORLD.indexOf('\n', i) + 1); };
+/** A line the fixes add: none before them, so the red run lifts what the tree had. */
+const added = (start) => (WORLD.includes(start) ? line(start) : '');
 const geometry = (c) => (c.m_Mesh?.mesh ? MODELS.geometry(c.m_Mesh.mesh) : c.m_Mesh?.builtin ? BUILTIN_COLLIDER_MESHES[c.m_Mesh.builtin] : null);
 /** A hull stood at rest - her colliders to cast at, her mesh node's frame. */
 const standing = (hull, variant = 0) => { const b = new Boat(hull, variant); spawnBoat(b, ctxFor({ position: [0, 0, 0], rotation: [0, 0, 0, 1] })); return b; };
@@ -35,6 +46,26 @@ const cellsOf = (d) => { const out = []; for (let j = 0; j < d.y.length; j++) if
 const cellKey = (d, p) => `${Math.floor((p[0] - d.minX) / d.cell)},${Math.floor((p[2] - d.minZ) / d.cell)}`;
 const settle = () => new Promise((r) => setTimeout(r, 0));
 const near = (a, b, eps = 1e-6) => a.every((v, i) => Math.abs(v - b[i]) < eps);
+
+/** world.js's deck doors over the pool's decks, cast at her live colliders (csaColliderMesh's reading of them). */
+function deckDoors(pool) {
+  const body = `const { intoDeck, outOfDeck, DECK_HEADROOM, csa, raycastColliders, csaColliderMesh, tvSeaY, navalHullBoxOf, mainLevel } = s;
+    ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}${line('  const NAVAL_RAIL_GAP = ')}
+    ${lift('navalDeckSpots')}${lift('navalDeckPoint')}${lift('navalDeckLanding')}${lift('navalRailSpots')}
+    return { navalDeckSpots, navalDeckPoint, navalDeckLanding, navalRailSpots };`;
+  // eslint-disable-next-line no-new-func
+  return new Function('s', body)({ intoDeck, outOfDeck, DECK_HEADROOM, csa: { deckOf: (h, v) => pool.deckOf(h, v), models: null }, raycastColliders, csaColliderMesh: geometry, tvSeaY: () => 0, navalHullBoxOf: () => null, mainLevel: NAVAL_DECK.mainLevel });
+}
+/** world.js's deck registry, leash and carry, over `csa` (a pool, or a stand-in with its deckOf) and `foes`. */
+function leashRig(csa, foes) {
+  const body = `const { intoDeck, outOfDeck, DECK_STEP, csa, exteriorFoes } = s;
+    ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}
+    ${line('  const _deckBodies = new Set();')}${line('  const navalDeckBody = (f, boat) =>')}${added('  const navalHullStands = ')}${line('  const _leashLocal = [0, 0, 0];')}
+    ${lift('navalLeash')}${lift('navalCarry')}
+    return { navalLeash, navalCarry, navalDeckBody, bodies: _deckBodies };`;
+  // eslint-disable-next-line no-new-func
+  return new Function('s', body)({ intoDeck, outOfDeck, DECK_STEP, csa, exteriorFoes: foes });
+}
 
 // ── F57: one deck a hull, baked at the load ─────────────────────────────────────────────────────────────────────
 
@@ -98,6 +129,23 @@ test('AUDIT NAV2 F58 THE SPOTS MADE ONCE A COUNT: deck.spots(n) is one frozen ar
 
 // ── F61: the walk's heuristic ───────────────────────────────────────────────────────────────────────────────────
 
+test('AUDIT NAV2 F61 THE WALK\'S HEURISTIC: path() asks Math.hypot nothing - its straight line home is a square root of its own (1.6x the speed, the same walks); and the corner cut\'s cost is said as it is, quadratic in the walk (mutants: the hypot back)', async () => {
+  const d = (await readyPool()).deckOf(3, 0);
+  const cells = cellsOf(d);
+  const walks = [];
+  const real = Math.hypot;
+  let asked = 0;
+  Math.hypot = (...a) => { asked++; return real(...a); };
+  try {
+    for (let q = 0; q < 40; q++) walks.push(d.path([cells[q * 97 % cells.length][0], cells[q * 97 % cells.length][2]], [cells[q * 389 % cells.length][0], cells[q * 389 % cells.length][2]]));
+  } finally { Math.hypot = real; }
+  assert.equal(asked, 0, 'no hypot in the walk');
+  assert.ok(walks.every((w) => w && w.length >= 1), 'every walk found');
+  const DECK = src('src/systems/naval/navalDeck.js');
+  assert.doesNotMatch(DECK, /a\s*(?:\/\/\s*)?walk's cost linear in its length/, 'the corner cut is no linear cost');
+  assert.match(DECK, /quadratic/, 'said as it is');
+});
+
 // ── F32: a small hull's deck ────────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT NAV2 F32 A SMALL HULL\'S DECK: kept off her walls and her open side, never off a bench (the Large Boat\'s midship compartment lost 18 of its 30 cells between her 0.6-0.7 m thwarts), and never kept off at all where that would take more than half her deck (the Rowboat\'s 4 cells); every hull stands sixteen distinct spots when she has the room, the Small Ship\'s, the Large Galley\'s and the Carrack\'s decks as they were; a rail\'s points each a cell of their own - fewer than asked on a short rail, never two bodies on one spot (mutants: the bench inset, no half-deck rule, the rail\'s cells repeated)', async () => {
@@ -144,9 +192,41 @@ test('AUDIT NAV2 F32 A SMALL HULL\'S DECK: kept off her walls and her open side,
   const carrack = pool.deckOf(4, 0);
   assert.equal(carrack.count, 1087, 'the Carrack\'s 1087');
   assert.equal(cellsOf(carrack).filter((c) => Math.abs(c[1] - mainLevel(carrack)) <= DECK_STEP).length, 1087, 'her main deck\'s every one');
+  // her rail: a cell a point
+  const w = deckDoors(pool);
+  for (let hull = 0; hull < HULL_NAMES.length; hull++) {
+    const boat = standing(hull), d = pool.deckOf(hull, 0), m = boat.MeshObject.worldMatrix();
+    for (const side of [1, -1]) {
+      for (const n of [4, 13]) {
+        const pts = w.navalRailSpots(boat, [side * 30, 0, 0], n);
+        const keys = pts.map(([f]) => cellKey(d, intoDeck(m, f)));
+        assert.equal(new Set(keys).size, keys.length, `${HULL_NAMES[hull]} ${n} over her ${side > 0 ? 'starboard' : 'port'} rail: a cell each`);
+        assert.ok(pts.length >= Math.min(n, 2) && pts.length <= n);
+        if (n === 4 && hull > 0) assert.equal(pts.length, 4, `${HULL_NAMES[hull]}: four hands, four places`);
+      }
+    }
+  }
 });
 
 // ── F33: a deck point set down on her deck ──────────────────────────────────────────────────────────────────────
+
+test('AUDIT NAV2 F33 A DECK POINT SET DOWN ON HER DECK: the ray that sets a muster\'s spot, a landing and a rail point down on her live colliders starts under the headroom her deck keeps (DECK_HEADROOM), never over it - every cell\'s point on every hull within DECK_STEP of her deck there (from 3 m up it met the Carrack\'s bow structure over 26 of her 515 cells, 2.1-2.7 m over her deck) (mutants: the ray from 3 m again, the spots\' ray alone)', async () => {
+  const pool = await readyPool();
+  const w = deckDoors(pool);
+  for (let hull = 0; hull < HULL_NAMES.length; hull++) {
+    const boat = standing(hull), d = pool.deckOf(hull, 0), m = boat.MeshObject.worldMatrix();
+    const off = [];
+    for (const c of cellsOf(d)) {
+      const q = intoDeck(m, w.navalDeckPoint(boat, d, c)[0]);
+      if (!(Math.abs(q[1] - d.heightAt(q[0], q[2])) <= DECK_STEP)) off.push(`(${c[0].toFixed(2)}, ${c[2].toFixed(2)}) ${(q[1] - c[1]).toFixed(2)} m over`);
+    }
+    assert.deepEqual(off, [], `${HULL_NAMES[hull]}: every cell's point on her deck`);
+    for (const [f] of w.navalDeckSpots(boat, Math.min(d.count, 600))) {
+      const q = intoDeck(m, f);
+      assert.ok(Math.abs(q[1] - d.heightAt(q[0], q[2])) <= DECK_STEP, `${HULL_NAMES[hull]}: a muster's spot on her deck (${q.map((v) => v.toFixed(2))})`);
+    }
+  }
+});
 
 // ── F34: raised decks ───────────────────────────────────────────────────────────────────────────────────────────
 
@@ -185,8 +265,37 @@ test('AUDIT NAV2 F34 RAISED DECKS, JOINED AND KEPT: PIN MOVED (GALLEON, 2026-10-
   }
   // the leash, lifted from the world host, over her real deck and her mesh node
   const boat = standing(2), m = boat.MeshObject.worldMatrix();
+  const foes = [];
+  const w = leashRig({ deckOf: () => d }, { foes });
+  const stand = (local) => { const f = { dead: false, ai: { feet: outOfDeck(m, local) }, entity: {} }; foes.push(f); w.navalDeckBody(f, boat); return f; };
+  const castle = stand([0.5, 11.018, -16]), flight = stand([-4.11, 9.523, -12.16]), other = stand([3.89, 8.787, -11.16]);
+  const was = [castle, flight, other].map((f) => [...f.ai.feet]);
+  for (let i = 0; i < 3; i++) { w.navalCarry(); w.navalLeash(); }
+  assert.ok(near(castle.ai.feet, was[0]), `her castle: untouched (${intoDeck(m, castle.ai.feet).map((v) => v.toFixed(2))})`);
+  assert.ok(near(flight.ai.feet, was[1]), 'her port flight: untouched');
+  assert.ok(near(other.ai.feet, was[2]), 'her starboard flight: untouched');
+  // over the side of her castle: back onto her castle, never onto her main deck 4.8 m under it
+  castle.ai.feet = outOfDeck(m, [7.5, 11.018, -16]);
+  w.navalLeash();
+  const back = intoDeck(m, castle.ai.feet);
+  assert.ok(Math.abs(back[1] - 11.018) < 0.05 && back[0] < 7.5, `back on her castle: ${back.map((v) => v.toFixed(2))}`);
   // her great cabin under her castle: a piece of hers, never her open deck
   assert.ok(d.pieceAt(0, -14, 6.2) > 0, 'her cabin a piece of its own');
+  // AUDIT GALLEON T1 (2026-10-02): the leash ON A PIECE OF ITS OWN - the new galleon's castle and flights are her open
+  // deck (piece 0), so every case above stood on piece 0 and the leash's piece went unread (four records survived): a
+  // foe in her great cabin (piece 1, under her castle at 6.2) stepping out through her castle's front (z -10, no floor
+  // of hers) is put back on his cabin's edge at z -11.41 - never onto her main deck before it, nor her castle's roof
+  // over him - and one standing in it keeps his floor (his own height read: her roof is the cabin cell's open deck).
+  // PIN MOVED (AUDIT GALLEON-2 DK3, 2026-10-03): through her front at x 1.5, beside her door - her doorway at x 0 is a
+  // way through it now (navalDeck.js `ajar`), the point this pin stepped him to (0, -10) a floor of it
+  const inCabin = stand([0, 6.2, -14]), stays = stand([0.5, 6.2, -15]);
+  for (let i = 0; i < 2; i++) { w.navalCarry(); w.navalLeash(); }
+  inCabin.ai.feet = outOfDeck(m, [1.5, 6.2, -10]);
+  w.navalLeash();
+  const out = intoDeck(m, inCabin.ai.feet);
+  assert.ok(Math.abs(out[2] - -11.41) < 0.01 && Math.abs(out[1] - 6.202) < 0.01 && d.pieceAt(out[0], out[2], out[1]) === d.pieceAt(0, -14, 6.2), `back on her cabin's edge: ${out.map((v) => v.toFixed(3))}`);
+  const kept = intoDeck(m, stays.ai.feet);
+  assert.ok(Math.abs(kept[1] - 6.2) < 1e-6 && Math.abs(kept[2] - -15) < 1e-6, `in her cabin, on its floor: ${kept.map((v) => v.toFixed(3))}`);
   // the Large Galley: her rowers' benches under her deck never deck; her crew's level her main deck
   const g = pool.deckOf(3, 0);
   assert.ok(Math.abs(mainLevel(g) - 10.25) < 0.05, `the Galley's main level: ${mainLevel(g)}`);
@@ -262,6 +371,21 @@ test('AUDIT NAV2 F60 A SHIP FAR OFF IS NEVER ASKED: a player 300 m from every hu
   }
 });
 
+test('AUDIT NAV2 F4 ANOTHER PLAYER\'S BOAT UNDER ME IS ABOARD: riding a peer\'s boat (Come Sail Away\'s riding - the host\'s aboardPeer, the world\'s csaAboard) is standing aboard: a pirate closing on her is an enemy near, the rest, the journey and the time scale held (SEA-PEACE read the rider as ashore); off her, ashore again (mutants: the dep unread, the world\'s wiring dropped)', async () => {
+  const h = await sea({ hull: null });
+  h.host.spawnShip('pirateBrig', { range: 300, bearing: 0 });
+  h.run(6);
+  assert.equal(h.host.aboard(), false, 'ashore');
+  assert.equal(h.host.hostileNear(), false);
+  const theirs = standing(2);
+  h.deps.aboardPeer = () => theirs;
+  assert.equal(h.host.aboard(), true, 'riding their boat');
+  assert.equal(h.host.hostileNear(), true, 'the pirate an enemy near');
+  h.deps.aboardPeer = () => null;
+  assert.equal(h.host.aboard(), false, 'off her');
+  assert.match(WORLD, /aboardPeer: \(\) => csaAboard\.aboard\?\.boat \?\? null,/, 'the world hands the naval host the boat I ride');
+});
+
 // ── F11: the dead ride her and go down with her ────────────────────────────────────────────────────────────────
 
 function craftCfg({ hpPerLevel = 4, speed = 90, str = 40, agi = 85, luck = 55, atkFlags = 0x08 } = {}) {
@@ -300,6 +424,46 @@ function foesPool() {
 }
 /** Where a corpse's batch draws: its baked centre moved by its origin. */
 const drawnAt = (c) => c.batch.centers[0].map((v, i) => v + (c.batch.origin?.[i] ?? 0));
+
+test('AUDIT NAV2 F11 THE DEAD LIE ON HER DECK AND GO DOWN WITH HER: a crewman killed on a ship\'s deck - his corpse carried with her (her way 20 m, her list), his body where it lies to loot; her hull out of the pool (the naval host\'s drop()) and his corpse is gone with her, the record letting her hull go (it hung in the air where he fell, its batch drawn on after she sank, her prefab tree kept by the record) (mutants: the dead let go by the leash, the corpse not carried, left behind at her drop, the hull kept)', async () => {
+  const h = await sea({ hull: 2 });
+  const id = h.host.spawnShip('merchantGalleon', { range: 40, bearing: Math.PI / 2, yaw: 0 });
+  h.host.frame(0.1);
+  const e = h.host._sea.get(id);
+  assert.ok(e?.boat && h.pool.seaBoats.includes(e.boat), 'her hull in the pool');
+  const { pool: foes, destroyed } = foesPool();
+  const w = leashRig(h.pool, foes);
+  const deck = h.pool.deckOf(e.boat.hull, 0);
+  const at = deck.nearest(0, 3);
+  const f = await foes.spawnFoe(0, outOfDeck(e.boat.MeshObject.worldMatrix(), at), { feetGiven: true, loose: true, transient: true, team: 'KnightsAndMages' });
+  w.navalDeckBody(f, e.boat);
+  w.navalCarry(); w.navalLeash();
+  foes.damageFoe(f, 10000, null, null, { fromPlayer: false, bypassShield: true });
+  for (let i = 0; i < 10; i++) await settle();
+  const c = f.corpseMarker;
+  assert.ok(f.dead && c, 'fallen: his corpse on her deck');
+  for (let t = 1; t <= 20; t++) {   // she sails 20 m on and takes a 10 degree list
+    const p = e.boat.GameObject.localPosition;
+    e.boat.GameObject.localPosition = [p[0], p[1], p[2] + 1];
+    const half = 0.0873 * t / 20;
+    e.boat.MeshObject.localRotation = [0, 0, Math.sin(half), Math.cos(half)];
+    w.navalCarry(); w.navalLeash();
+  }
+  const where = outOfDeck(e.boat.MeshObject.worldMatrix(), at);
+  assert.ok(near(c.pos, where, 0.2), `his body where he fell on her deck, 20 m on: ${c.pos.map((v) => v.toFixed(2))} for ${where.map((v) => v.toFixed(2))}`);
+  assert.ok(near(drawnAt(c), c.pos, 1e-6), `drawn there: ${drawnAt(c).map((v) => v.toFixed(2))}`);
+  assert.equal(f.corpseMarker, c, 'still his body, to loot');
+  assert.ok(foes.batches().includes(c.batch));
+  // her hull gone: the host drops her (her crew over the side, her hull out of the pool) - the world's next carry
+  h.host.clear();
+  assert.equal(h.pool.seaBoats.includes(e.boat), false, 'dropped');
+  w.navalCarry(); w.navalLeash();
+  assert.ok(destroyed.includes(c.batch), 'his corpse gone with her');
+  assert.equal(foes.batches().includes(c.batch), false, 'drawn no more');
+  assert.equal(f.corpse, false);
+  assert.equal(f.deckBoat, null, 'the record lets her hull go');
+  assert.equal(w.bodies.has(f), false);
+});
 
 // ── F38: a quay over shallow water ──────────────────────────────────────────────────────────────────────────────
 

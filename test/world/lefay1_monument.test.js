@@ -511,6 +511,28 @@ test('LEFAY1: THE PRESS - Read (or Info) reads it, Steal takes nothing, anything
 });
 
 test('LEFAY1: THE FOUR HOSTS - world.js and exterior.js stand it, the street press both share reaches it, the save carries it', () => {
+  const world = hostText('src/scenes/world.js'), ext = read('src/scenes/exterior.js'), modes = read('src/scenes/worldModes.js'), save = read('src/systems/save/save.js');
+  const dungeon = read('src/scenes/dungeonContext.js');
+  for (const [name, src] of [['world.js', world], ['exterior.js', ext]]) {
+    assert.match(src, /lefaySpot = lefaySpotOf\(loc, \{ camp: \{ block: PRIVATEERS_HOLD_BLOCK, models: HOLD_MODELS \}, exit: lefayExitOf\(dungeonEntranceLanding\(/, `${name} finds the spot off the place's own navgrid beside DFU's exit landing, WoD's camp closed on it (HOLD-MONUMENT, AUDIT FIVE-ASKS B1)`);
+    assert.match(src, /if \(lefaySpot\) carveLefay\((nav|cityNav), lefaySpot\);/, `${name} carves the people's navgrid`);
+    assert.match(src, /createLefayMonument\(\{/, `${name} makes the pool`);
+    assert.match(src, /lefay\??\.frame\(\)/, `${name} frames it`);
+    assert.match(src, /lefay\??\.draw\(renderer\)/, `${name} draws it`);
+    assert.match(src, /\.\.\.lefay\.batches\(\)/, `${name} draws its flowers`);
+    assert.match(src, /monumentTargets: \(\) => lefay\??\.targets\(\)/, `${name} hands the street's ray its box`);
+    assert.match(src, /activateMonument: \(key, mode, verb\) => lefay\??\.activate\(key, mode, verb\)/, `${name} hands it the press`);
+    assert.match(src, /\(key\) => lefay\??\.hoverName\(key\)/, `${name} names it on the plaque`);
+    assert.match(src, /lefay\??\.destroyAll\(\);/, `${name} takes it down at a change of place`);
+    assert.match(src, /tribute: \(\) => playerEntity\.lefayTribute, keep: \(next\) => \{ playerEntity\.lefayTribute = next; \}/, `${name} keeps the pile on the character`);
+  }
+  assert.match(world, /lefay: lefaySpot,/, 'the pixel keeps its spot');
+  assert.match(modes, /for \(const t of host\.monumentTargets\?\.\(\) \?\? \[\]\) targets\.push\(t\);/);
+  assert.match(modes, /return host\.activateMonument\?\.\(key, getInteractionMode\(\), plaqueActionFor\(key\)\) \?\? true;/);
+  assert.match(modes, /key\.startsWith\('lefay:'\)\) \{[^\n]*\n\s*if \(_hitDist > _hitReach\) \{ setMidScreenText\(tooFarAwayText\(\)\); return true; \}/, 'too far speaks the refusal');
+  assert.equal(/lefay/i.test(dungeon), false, 'the dungeon host stands no street, and nothing of it');
+  assert.match(save, /snap\.lefayTribute = normalTribute\(entity\.lefayTribute\);/);
+  assert.match(save, /entity\.lefayTribute = normalTribute\(snap\.lefayTribute\);/);
   assert.equal(LEFAY_KEY.startsWith('lefay:'), true, 'the press\'s arm reads its key\'s prefix');
 });
 
@@ -536,6 +558,8 @@ test('AUDIT LEFAY1 B1: a flower thrown before a load lands nowhere - never in th
   m.activate(LEFAY_KEY, 'grab', 'flowers');
   m.destroyAll();   // a transition lays one thrown since
   assert.equal(st.tribute.count, 5);
+  // the world host hands it the save's own count
+  assert.match(hostText('src/scenes/world.js'), /restores: restoresSoFar,/);
 });
 
 test('AUDIT LEFAY1 C2: a vertical recentre (the site\'s compensation) re-reads its ground at once', () => {
@@ -546,6 +570,7 @@ test('AUDIT LEFAY1 C2: a vertical recentre (the site\'s compensation) re-reads i
   st.ground = 2 - 500; st.site = [100, 50, -500];
   assert.deepEqual(m.frame(), [100, -498, 50], 'the next frame, not LEFAY_GROUND_EVERY frames on');
   assert.deepEqual([...log.buckets.get(LEFAY_KEY).m].slice(12, 15), [100, -498, 50]);
+  assert.match(hostText('src/scenes/world.js'), /_lefaySite\[2\] = state\.compensation\[1\];/);
 });
 
 test('AUDIT LEFAY1 B2: THE POOL\'S OWN LAWS - a flight laid when its town goes, the lit row over the mode, no count line before a flower, the work done once', async () => {

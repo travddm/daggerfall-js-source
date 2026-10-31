@@ -88,6 +88,7 @@ test('AUDIT EG V L6-4 THE FLOOR PLAN KEEPS ITS OWN (section 11.9; world/eliteGat
   assert.ok(per < 8192, `the floor plan allocates ${Math.round(per)} bytes a frame`);
   const B = [0, 0, 0, 0], bounds = await sampledBytes(() => { for (const sh of shapes) telegraphBounds(sh, B); }, 3000, ['render/gate/gateTelegraph.js']);
   assert.ok(bounds < 64, `a shape's bounds into a kept box make nothing (${Math.round(bounds)} bytes)`);
+  assert.match(rd('src/scenes/eliteGates/egFight.js'), /egFloorPlan\(_shapes, floors, myFeet\(\), floorBuf, undefined, planKeep\)/, 'the fight hands it its keep');
 });
 
 /** A breach of two woken in a Court with a broad floor, a Blood Tether, Morvayn's chain and a Vestige aura, its words
@@ -157,6 +158,8 @@ test('AUDIT EG V L6-4 THE FIGHT\'S FRAME KEEPS ITS LISTS (section 11.9; scenes/e
   Array.prototype.filter = function (...a) { if (/at (Object\.frame|frame|sigilsFrame) \(.*scenes\/eliteGates\/egFight\.js/.test(new Error().stack.split('\n')[2] ?? '')) made.filter++; return realFilter.apply(this, a); };
   try { for (let k = 0; k < 20; k++) S.frame(); } finally { globalThis.Map = RealMap; globalThis.Set = RealSet; Array.prototype.filter = realFilter; }   // eslint-disable-line no-extend-native
   assert.deepEqual(made, { Map: 0, Set: 0, filter: 0 }, 'the fight\'s frame keeps its collections');
+  const src = rd('src/scenes/eliteGates/egFight.js');
+  assert.match(src, /const a = tetherEnd\(tx\[0\], F, t, f, meSub\), b = tetherEnd\(tx\[1\], F, t, f, meSub\);/, 'a tether\'s ends by one function, never a closure a tether');
   const bytes = await sampledBytes(S.frame, 1500, ['scenes/eliteGates/egFight.js']);
   assert.ok(bytes < 11 * 1024, `the fight's frame allocates ${Math.round(bytes)} bytes a frame`);
 });
@@ -181,6 +184,7 @@ test('AUDIT EG V L6-4 THE MIST, THE ARCHES, THE OCCLUDERS AND THE PANEL KEEP THE
     risen++;
   }
   assert.ok(risen > 4);
+  assert.match(rd('src/scenes/eliteGates/egLookDraw.js'), /egMistSheetsAt\(sheets, ts, sheetsAt\)/, 'the look hands its kept list');
   // the mist pass reads the list in place, at most EG_MIST_MAX a frame - never sliced
   const gl = new Proxy({}, { get: (o, k) => (k in o ? o[k] : typeof k === 'string' && /^[A-Z_]+$/.test(k) ? 0 : () => ({})) });
   const mist = new EgMistPass(/** @type {any} */ (gl));
@@ -200,9 +204,20 @@ test('AUDIT EG V L6-4 THE MIST, THE ARCHES, THE OCCLUDERS AND THE PANEL KEEP THE
   assert.deepEqual(L.map((x) => x.length), [0, 0, 0, 0]);
   assert.ok(pool.passDraws() === L[0] && pool.lights() === L[1] && pool.targets() === L[2] && pool.clears() === L[3], 'one empty list each, every frame');
   assert.equal(pool.stands(), false);
+  // the occluders' ray and the eye's cast (the dungeon arm's own source)
+  const WM = rd('src/scenes/worldModes.js');
+  const src = between(WM, '  function egOccludeFrame(mwv, dt) {', '  /** EG-PLAY: A BODY STOOD ELSEWHERE IN THE CIRCLE');
+  const seen = [];
   const player = { feetAt: () => [1, 2, 3], collider: { sphereCast: (o, r, d, m) => (m > 5 ? { dist: 4 } : null) } };
+  const arm = new Function('host', 'decorTool', 'player', 'egOcc', 'dungeonCtx', 'EG_OCCLUDE_CHEST_M', `${src}\nreturn { egOccludeFrame, egEyeCast };`)({ egWitness: () => false }, { flying: () => false }, player, { frame: (r) => { seen.push(r); return 0; }, draw: () => 0 }, null, EG_OCCLUDE_CHEST_M);
   const mwv = { thirdPerson: true, focal: [1, 3, 3], eye: [1, 4, 0] };
-   
+  arm.egOccludeFrame(mwv, 0.016); arm.egOccludeFrame(mwv, 0.02);
+  assert.equal(seen[0], seen[1], 'one kept ray');
+  assert.deepEqual([seen[1].eye, seen[1].points[0], seen[1].points[1], seen[1].dt], [mwv.eye, mwv.focal, [1, 2 + EG_OCCLUDE_CHEST_M, 3], 0.02]);
+  arm.egOccludeFrame({ thirdPerson: false }, 0.016);
+  assert.equal(seen[2].points, null, 'first person: no ray');
+  assert.equal(arm.egEyeCast([0, 0, 0], 0.3, [0, 0, 1], 9), 4);
+  assert.equal(arm.egEyeCast([0, 0, 0], 0.3, [0, 0, 1], 2), null);
   // the panel
   const made = [];
   const node = () => { const n = { children: [], style: {}, className: '', textContent: '', attrs: {}, append(...c) { this.children.push(...c); }, remove() { this.gone = true; }, setAttribute(k, v) { this.attrs[k] = v; }, getAttribute(k) { return this.attrs[k]; }, addEventListener() {}, querySelectorAll(sel) { const out = []; const walk = (x) => { for (const c of x.children ?? []) { if (typeof c === 'object') { if (sel === '[data-left]' && c.attrs?.['data-left'] != null) out.push(c); walk(c); } } }; walk(this); return out; } }; made.push(n); return n; };

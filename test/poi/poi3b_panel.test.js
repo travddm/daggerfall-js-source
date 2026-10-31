@@ -265,5 +265,19 @@ test('POI-3b THE IMPORT: a model\'s parts held to the mesh law - one past a limi
 });
 
 test('POI-3b THE EDITOR IN THE WORLD, BY SOURCE: `?editor` alone, refused online with the other powers; the store asked who may build before anything is made; the motor held and the frame\'s eye the editor\'s while it is open; the drafts laid over the feed before the POI host reads it; the lines after the translucent pass, marked; no hand drawn; no blow on the body left standing; a draft\'s assets asked with the bearer (mutants: refused online no more; the motor stepped under the editor)', () => {
+  const w = src('src/scenes/world.js');
   assert.ok(ONLINE_REFUSED_FLAGS.includes('editor'));
+  assert.match(w, /if \(params\.has\('editor'\)\) startPoiEditor\(\);/);
+  assert.match(w, /poiMe\(first\)\.then\(\(r\) => \{[\s\S]{0,300}if \(!r\.data\.builder\) \{ townTalk\.say\(accountRefusalText\('poi-not-builder'\)\); return; \}\s*mountPoiEditor\(r\.data, io\);/);
+  assert.match(w, /const frameMotor = \(\) => \{[^\n]*\n\s*if \(poiEditor\?\.active\(\)\) poiEditor\.cameraFrame\(dt, cam\);[^\n]*\n\s*else if \(walkMode\) \{/);
+  assert.match(w, /if \(poiEditor\?\.active\(\)\) mwv0\.eye = \[cam\.pos\[0\], cam\.pos\[1\], cam\.pos\[2\]\];/);
+  assert.match(w, /try \{ poiEditor\?\.frame\(\); poiHost\?\.frame\(\); \}/);
+  // PIN MOVED (AUDIT POI R4, R14): the translucent pass sorts by the view's own eye and stands after the grass and the haze;
+  // the editor's lines moved with it, after it still
+  const tr = w.indexOf('poiHost?.drawTranslucent(renderer, mwv.eye, yardCull);'), lines = w.indexOf('if (poiEditor?.drawLines(proj, view)) renderer.markForeignPass();');
+  assert.ok(tr > 0 && lines > tr && lines - tr < 400, 'the lines after the translucent pass, the pass marked');
+  assert.match(w, /if \(!poiEditor\?\.active\(\)\) \{ if \(walkMode && playerSpawned && !tvf\) weaponRig\.draw\(\{ paralyzed \}\); \}/);
+  assert.match(w, /registerPlayerDamageMod\('poi-editor', \(_e, dmg\) => \(editor\.active\(\) \? 0 : dmg\)\);/);
+  assert.match(w, /auth: \(\) => storedSession\(appStorage\(\)\)\?\.secret \?\? null,/);
+  assert.match(w, /collideDrafts: \(\) => poiEditor\?\.collideDrafts\(\) \?\? true,/);
 });

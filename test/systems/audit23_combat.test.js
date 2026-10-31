@@ -77,6 +77,30 @@ test('AUDIT 23 combat-6: the melee swing resolves EVERY foe in reach, not the fi
   assert.equal(results.length, 2, 'both live foes resolve; the dead one skips');
 });
 
+test('AUDIT 23 combat-14: foes resolve before the environment; env is the no-entity fallback', () => {
+  // WeaponManager.cs:1048-1064 - the else arm is the only
+  // WeaponEnvDamage path.
+  const dc = src('src/scenes/dungeonContext.js');
+  const fn = dc.slice(dc.indexOf('function resolvePlayerHit'), dc.indexOf('// S3b: the classic clock'));
+  const envIdx = fn.indexOf('if (!hitEnemy && lookDir) envAttack');
+  const loopIdx = fn.indexOf('playerWeapon.resolveHit');
+  assert.ok(loopIdx > 0 && envIdx > loopIdx, 'the env fallback sits after the foe loop');
+  assert.equal(/Verbatim WeaponEnvDamage FIRST/.test(fn), false, 'the env-first claim is gone');
+});
+
 test('AUDIT 23 C9/combat-2: the hosts own the swing sounds - whiff whoosh at hit frame, ArrowShoot at bow frame 4', () => {
   assert.equal(SOUND.ArrowShoot, 3, 'SoundClips.ArrowShoot');
+  const rig = src('src/combat/weapon/weaponRig.js');
+  assert.equal(/startsWith\('Strike'\)\) audio\.playOneShot\(swingSoundFor/.test(rig), false,
+    'the rig strike-entry whoosh is gone');
+  const dc = src('src/scenes/dungeonContext.js');
+  assert.ok(dc.includes("if (ev === 'bowSound') { audio.playOneShot(SOUND.ArrowShoot, 1.1); continue; }"),
+    'dungeon: bow frame-4 sound');
+  assert.ok(dc.includes('else audio.playOneShot(swingSoundFor(playerWeapon.weapon), 1.1);'),
+    'dungeon: no-enemy swing sound at the hit frame');
+  const wm = src('src/scenes/worldModes.js');
+  assert.ok(wm.includes("if (ev === 'bowSound') { audio.playOneShot(SOUND.ArrowShoot, 1.1); continue; }"),
+    'interior: bow frame-4 sound');
+  assert.ok(wm.includes('audio.playOneShot(swingSoundFor(interiorWeapon.playerWeapon.weapon), 1.1);'),
+    'interior: the no-enemy swing sound');
 });

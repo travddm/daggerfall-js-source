@@ -34,6 +34,7 @@ import { setLocale, patchLocaleTable, clearLocaleTables, parseStringTableCsv } f
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(p, 'utf8').replace(/^﻿/, '');
 const src = (p) => read(join(ROOT, p));
+const W = src('src/scenes/world.js');   // the host's share wiring, read by source and lifted
 {
   const VENDOR = join(ROOT, 'vendor', 'dfu-quests', 'Tables');
   const sources = {};
@@ -274,6 +275,9 @@ test('PROGRESS-KEPT: two members\' deeds at about the same moment - each crossin
   const qr = R.sharedCandidateNamed('__X');
   assert.equal(qr._keptLocal, 0);
   assert.equal(QS.syncBaselineAfter(qr, r), QS.shareSignature(qr));
+  // the host's baseline after a receipt is this one (scenes/world.js onQuestShared) - PIN MOVED (AUDIT QA3 E4): handed the
+  // baseline it had too, which a held answer (merged by nobody) leaves as it was
+  assert.match(W, /if \(q\) _questSyncSeen\.set\(quest\.questName, syncBaselineAfter\(q, result, _questSyncSeen\.get\(quest\.questName\)\)\);/);
 });
 
 test('PROGRESS-KEPT: a journal step I logged stays; the partner\'s NEW `clear` and `remove log step` of mine are taken, one already run on both copies is not (mutants: the step let go, the clear unread, the removal unread, the newly)', () => {
@@ -331,9 +335,32 @@ test('BUSY-SYNC: an ordinary sync the hub refused as \'busy\' lets its baseline 
   const fin = { sync: 1, final: 1 };
   QS.questBusyAgain(m, { questName: '__X', data: fin }, seen);
   assert.deepEqual([seen.get('__X'), pended], ['sig', [fin]], 'a final: back on the machine');
+  // the host: world.js's sync check and its 'busy' arm, lifted verbatim
+  const make = new Function('d', `const { questBridge, _questSyncSeen, partyMembersHere, prepareShareData, socialLink, performance, QUEST_SYNC_CHECK_MS,
+    shareSignature, prepareQuestShare, link, questBusyAgain } = d;
+  let _questSyncCheckAt = -Infinity;
+  ${lift(W, 'const questSyncTick = () => {')}
+  ${lift(W, 'link.onQuestBusy = (quest) => {')}
+  return questSyncTick;`);
   const A = machine();
   const qa = take(A, '__X'); QS.prepareQuestShare(A, qa.uid); A.markQuestShared('__X');
+  const clock = { t: 0 }, sent = [], link = {};
+  const sync = make({ questBridge: { machine: A }, _questSyncSeen: new Map(), partyMembersHere: () => ['acct-b'], prepareShareData: QS.prepareShareData,
+    socialLink: () => ({ shareQuest: (f) => { sent.push(f); return true; } }), performance: { now: () => clock.t }, QUEST_SYNC_CHECK_MS: 2000,
+    shareSignature: QS.shareSignature, prepareQuestShare: QS.prepareQuestShare, link, questBusyAgain: QS.questBusyAgain });
+  const check = () => { clock.t += 2000; sync(); };
+  check();   // first sight: the baseline
   task(qa, 'doA').start(); run(A, 2);
+  check();
+  assert.equal(sent.length, 1, 'the change left as a sync');
+  check();
+  assert.equal(sent.length, 1, 'unchanged: nothing more');
+  link.onQuestBusy(sent[0]);   // ...and the hub dropped it
+  check();
+  assert.equal(sent.length, 2, 'the next check sends it again');
+  assert.equal(sent[1].data.sync, 1);
+  check();
+  assert.equal(sent.length, 2, 'once');
 });
 
 // ---- GOLD-HOLDERS ----
@@ -379,6 +406,8 @@ test('GOLD-HOLDERS: never more shares than the party; a holder counted once; a w
   B.noteShareHolder('__X', undefined); B.noteShareHolder('__X', null); B.noteShareHolder('__X', '');
   assert.equal(qb._holdersHeard?.size ?? 0, 0, 'no sender: no holder');
   assert.equal(qb.hooks.rewardShares(qb), 1);
+  // the host names the sender (world.js onQuestShared)
+  assert.match(W, /carriesQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),[^\n]*\n\s*from: acct,/, 'the receipt carries `from: acct`');
 });
 
 test('GOLD-ONCE across a share: a received copy has paid its holder nothing - the sharer\'s paid mark never rides in, and a resync keeps the holder\'s own, either way (mutants: the receipt\'s reset, the resync\'s keep)', () => {
@@ -566,4 +595,8 @@ test('SHARE-WORDS: every word goes through the text core - a language\'s table a
     clearLocaleTables('xx');
   }
   assert.equal(QS.shareSomeone(), 'A party member', 'English again');
+  // the host's three lines are these (scenes/world.js onQuestShared)
+  assert.match(W, /const who = name \|\| shareSomeone\(\);/);
+  assert.match(W, /if \(!result\.resync\) setMidScreenText\(shareReceivedLine\(who, label\)\);/);
+  assert.match(W, /setMidScreenText\(shareRefusedLine\(result, who, label, quest\.data\?\.build \?\? null\)\);/);
 });

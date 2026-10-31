@@ -289,9 +289,36 @@ test('AUDIT MW-TORCH F6/F7: a build arriving mid-build is queued and runs (the n
 // The wiring, by source
 // ---------------------------------------------------------------
 test('MW-D51/52 pins: the rig hands the lit light over per frame and at the build; the arm hides the torch on the carried-left rule, overlays it on both rigs, re-picks it on a view switch; the idle reads the stance (mutant: a door dropped)', () => {
+  const rig = rd('src/combat/weapon/weaponRig.js');
+  assert.match(rig, /torch: isLitTorch\(entity\.lightSource\),/, 'armBuildOptsOf carries the lit light');
+  // PIN MOVED (TWO-HANDS): the weapon handed over is `armItem` (the right hand's item with both hands up), and the hands'
+  // mode and the left hand's weapon ride beside it before the light (was: `fpArm.setWeapon(playerWeapon.weapon, ...)`
+  // straight above `fpArm.setTorch`)
+  assert.match(rig, /fpArm\.setWeapon\(armItem, \{ hasAmmo: hasAmmoFor\(entity\?\.items, armItem\), ammoCount: ammoCountFor\(entity\?\.items, armItem\) \}\);[^\n]*\n\s*fpArm\.setHands\([^\n]*\n(?:\s*const offItem = [^\n]*\n)?\s*fpArm\.setOffWeapon\([^\n]*\n/, 'the hands\' hand-over');
+  // PIN MOVED (TWO-HANDS AUDIT 2): the hands go through their one door (handArm - the enhanced pack asks it too), and the
+  // light is handed over beside its call in the frame
+  assert.match(rig, /const \{ armItem, offItem \} = handArm\(\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);/, 'the per-frame hand-over, beside the weapon');   // PIN MOVED (TWO-HANDS x WEAPON-GLOW1): the left item named once, its blade and its glow
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Torch }), true);
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Lantern }), false, 'a lantern is the classic lane’s');
   assert.equal(isLitTorch(null), false);
   const opts = armBuildOptsOf({ race: 'Argonian', gender: 'male', faceIndex: 0, items: [], lightSource: { templateIndex: TEMPLATES.Torch } });
   assert.equal(opts.torch, true);
+  const arm = rd('src/combat/fpArm.js');
+  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, sheathed, spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
+  assert.equal((arm.match(/else if \(r\.slot === 'torch'\) r\.hidden = !torchVisible\(\);/g) ?? []).length, 2, 'both world meshes hide on the rule');
+  assert.match(arm, /else if \(r\.slot === 'torch'\) r\.hidden = !torchLit;/, 'the portrait shows the lit light whatever the hand holds');
+  assert.equal((arm.match(/overlayFor\((?:tBase|fBase), (?:t|built)\.leftArm\)/g) ?? []).length, 2, 'the overlay on both rigs’ own LeftArm sets, through the memo');
+  assert.equal((arm.match(/if \((?:t|f)Overlay\) overlayClock = torchState\.time;/g) ?? []).length, 2, 'F4: the torch’s clock through a variable, both rigs - no sampler allocated per frame');
+  assert.match(arm, /const overlaySample = overlaySampler\(sampleTrack, \(\) => overlayClock\);/, 'F4: one sampler for the life of the rig');
+  assert.match(arm, /if \(pendingBuild\) \{[\s\S]*?api\.build\(o\);\n\s+return;\n\s+\}/, 'F6: a queued build drains first and supersedes the rest');
+  assert.match(arm, /resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
+  assert.match(arm, /refreshTorch\(\);\n\s+if \(torchState\) advanceClip\(torchState, \(torchSource \|\| rig\(\)\)\.keys, dt, null\);/, 'the torch’s own clock, on its own keys');
+  assert.match(arm, /pickAnimSource\(r\.sources, TORCH_GROUP, resetClip, \{ loopFallback: true \}\)/, '"torch", start to stop, looping');
+  assert.match(arm, /const base = idleBaseFor\(\{ sneaking, inJump: !!jumpState, hasGroup \}\);/, 'MW-D52: refreshIdle takes the state');
+  assert.match(arm, /const short = base === FP_IDLE_SNEAK \? null : weaponShortGroup\(type\);/, 'the sneak idle rolls no loop dice');
+  assert.match(arm, /if \(pendingTorch !== null\) \{ const l = pendingTorch; pendingTorch = null; api\.setTorch\(l\); \}/, 'a light that arrived mid-build is not dropped (MAC-S1’s law)');
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  assert.doesNotMatch(menu, /\['Torch', armState\.torch/, 'MWA4: the carried light left the card with the per-piece readout - status() still carries it');
+  const peers = rd('src/net/peer/peerBodies.js');
+  assert.doesNotMatch(peers, /torch:/, 'a peer’s look carries no light on the wire yet - recorded, not faked');
 });

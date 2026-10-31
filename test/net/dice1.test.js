@@ -220,5 +220,18 @@ test('DICE1 at the chat: /roll and /dice take the dice\'s grammar - a d20 with n
 });
 
 test('DICE1 host by source: /roll is the parser\'s after the host\'s own, said on the active tab through that tab\'s own door (its session, an older relay said in words, a party that is not there), a roll lands where a line would - and Local\'s within earshot; the panel draws a roll in its own colour (mutants: a roll on the wrong tab; Local\'s rolls heard from anywhere)', () => {
+  const w = rd('src/scenes/world.js');
+  const onSend = /onSend: \(tabId, text, opts = \{\}\) => \{([\s\S]*?)\n {6}\},/.exec(w)[1];
+  assert.match(onSend, /if \(cmd\.kind === 'badroll'\) \{ note\(badRollText\(cmd\.name\)\); return false; \}/);
+  assert.match(onSend, /if \(cmd\.kind === 'roll'\) return chatRoll\(tabId, cmd\.spec\);/);
+  const door = w.slice(w.indexOf('const chatRoll = '), w.indexOf('const _regionHold'));
+  assert.match(door, /const s = tabId === 'local' \? online : tabId === 'party' \|\| tabId === 'guild' \? socialLink\(\) : chatLinks\.get\(tabId\);/);   // GUILD1c: the Guild tab's door is the hub's too
+  assert.match(door, /if \(s\?\.status === 'open' && !s\.rollOk\) return why\(ROLL_OLD_RELAY_TEXT\);/);
+  assert.match(door, /return s\?\.sendRoll\(spec, tabId === 'party' \|\| tabId === 'guild' \? \{ ch: tabId \} : \{\}\) \?\? false;/);
+  assert.match(w, /link\.onRoll = \(line\) => chatLog\.push\(tab\.room === SOCIAL_ROOM && \(line\.ch === 'party' \|\| line\.ch === 'guild'\) \? line\.ch : tab\.id, line\);/);
+  assert.match(w, /online\.onRoll = \(line\) => \{ if \(localLineHeard\(line, peersNear\(\), player\.feetAt\(\)\)\) chatLog\.push\('local', line\); \};/);
   assert.match(ROLL_OLD_RELAY_TEXT, /server's next update/);
+  const panel = rd('src/ui/chatPanel.js');
+  assert.match(panel, /\$\{line\.kind === 'roll' \? ' roll' : ''\}/);
+  assert.match(panel, /\.dfchat-line\.roll \.dfchat-text \{ color: #e7c46a; \}/);
 });

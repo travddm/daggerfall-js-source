@@ -21,6 +21,15 @@ import { sea, readyPool, modShipsPool } from '../../navalSea.mjs';
 
 const { hullBuild, HULL } = ships;
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
+const WORLD = src('src/scenes/world.js');
+/** A function declaration of world.js's, lifted whole (the suites' own way). */
+const lift = (name) => {
+  const m = new RegExp(`\\n  function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n  \\}\\n`).exec(WORLD);
+  assert.ok(m, `${name} lifted`);
+  return m[0];
+};
+/** One line of world.js's from its start. */
+const line = (start) => { const i = WORLD.indexOf(start); assert.ok(i >= 0, `lifted: ${start}`); return WORLD.slice(i, WORLD.indexOf('\n', i) + 1); };
 const geometry = (c) => (c.m_Mesh?.mesh ? MODELS.geometry(c.m_Mesh.mesh) : c.m_Mesh?.builtin ? BUILTIN_COLLIDER_MESHES[c.m_Mesh.builtin] : null);
 /** A hull stood at rest - her colliders, her mesh node's frame. */
 const standing = (hull, variant = 0) => { const b = new Boat(hull, variant); spawnBoat(b, ctxFor({ position: [0, 0, 0], rotation: [0, 0, 0, 1] })); return b; };
@@ -31,6 +40,30 @@ const standingMod = (hull, variant = 0) => { const b = new Boat(hull, variant); 
 /** A deck's cells' centres, `[x, y, z]` in her frame. */
 const cellsOf = (d) => { const out = []; for (let j = 0; j < d.y.length; j++) if (!Number.isNaN(d.y[j])) { const i = j % d.nx, k = (j - i) / d.nx; out.push([d.minX + (i + 0.5) * d.cell, d.y[j], d.minZ + (k + 0.5) * d.cell]); } return out; };
 const fmt = (p) => p.map((v) => v.toFixed(2)).join(', ');
+
+/** world.js's deck registry, leash and carry, over `csa` (a pool, or a stand-in with its deckOf) and `foes`. */
+function leashRig(csa, foes) {
+  const body = `const { intoDeck, outOfDeck, DECK_STEP, csa, exteriorFoes } = s;
+    ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}
+    ${line('  const _deckBodies = new Set();')}${line('  const navalDeckBody = (f, boat) =>')}${line('  const navalHullStands = ')}${line('  const _leashLocal = [0, 0, 0];')}
+    ${lift('navalLeash')}${lift('navalCarry')}
+    return { navalLeash, navalCarry, navalDeckBody, bodies: _deckBodies };`;
+  // eslint-disable-next-line no-new-func
+  return new Function('s', body)({ intoDeck, outOfDeck, DECK_STEP, csa, exteriorFoes: foes });
+}
+/** One body on her deck under the lifted leash: `step(from, to)` - where the leash leaves a body that stood at `from`
+ *  (her frame) a frame ago and stands at `to` now; `press(to)` - on from wherever the leash left it last. */
+function leashOne(deck, boat) {
+  const foes = [], w = leashRig({ deckOf: () => deck }, { foes }), m = boat.MeshObject.worldMatrix();
+  const f = { dead: false, ai: { feet: [0, 0, 0] }, entity: {} };
+  foes.push(f);
+  w.navalDeckBody(f, boat);
+  return {
+    f,
+    step(from, to) { f.ai.feet = outOfDeck(m, from); w.navalLeash(); f.ai.feet = outOfDeck(m, to); w.navalLeash(); return intoDeck(m, f.ai.feet); },
+    press(to) { f.ai.feet = outOfDeck(m, to); w.navalLeash(); return intoDeck(m, f.ai.feet); },
+  };
+}
 
 // ── her own faces, for the probes (test/systems/naval/auditgalleon_deck.test.js's own) ──────────────────────────────────────────
 
@@ -114,7 +147,101 @@ const standable = (F, x, z) => {
   return out;
 };
 
+/** THE WALK EVERYWHERE (the reviewer's probe): a body standing on every standable floor of hers at or over her main deck
+ *  that the leash leaves be, walking 0.75 m in 5 cm frames each of four ways with its feet on the surface it walks (the
+ *  one within 0.3 m of the last, a capsule clear of every wall, a head's room) - how often the leash sets it more than
+ *  DECK_STEP off that surface, and the first. */
+function walkEverywhere(d, F, b) {
+  const main = mainLevel(d), cache = new Map();
+  const st = (x, z) => { const k = `${Math.round(x * 20)},${Math.round(z * 20)}`; let v = cache.get(k); if (!v) { v = standable(F, Math.round(x * 20) / 20, Math.round(z * 20) / 20); cache.set(k, v); } return v; };
+  const near = (x, z, y) => { let best = NaN; for (const v of st(x, z)) if (Math.abs(v - y) <= 0.3 && !(Math.abs(best - y) <= Math.abs(v - y))) best = v; return best; };
+  const body = leashOne(d, F.boat);
+  let starts = 0, walks = 0, bad = 0, first = '';
+  for (let x0 = -b.halfWidth; x0 <= b.halfWidth; x0 += 0.25) for (let z0 = b.aftZ; z0 <= b.bowZ; z0 += 0.25) {
+    for (const y0 of st(x0, z0)) {
+      if (y0 < main - DECK_STEP) continue;
+      const s = body.step([x0, y0, z0], [x0, y0, z0]);
+      if (Math.abs(s[0] - x0) > 1e-6 || Math.abs(s[2] - z0) > 1e-6 || Math.abs(s[1] - y0) > 1e-6) continue;   // the leash's own margin: not a start
+      starts++;
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        body.step([x0, y0, z0], [x0, y0, z0]);
+        walks++;
+        let y = y0;
+        for (let n = 1; n <= 15; n++) {
+          const x = x0 + dx * 0.05 * n, z = z0 + dz * 0.05 * n, t = near(x, z, y);
+          if (Number.isNaN(t)) break;
+          y = t;
+          const got = body.press([x, y, z]);
+          if (Math.abs(got[1] - y) > DECK_STEP) { bad++; first ||= `(${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}) -> (${fmt(got)})`; break; }
+          if (Math.hypot(got[0] - x, got[2] - z) > 0.02) break;   // held at an edge - its walk ends there
+        }
+      }
+    }
+  }
+  return { starts, walks, bad, first };
+}
+
 // ── DK2: the leash on a piece of two levels ───────────────────────────────────────────────────────────────────────
+
+test('AUDIT GALLEON-2 DK2: THE LEASH KEEPS A BODY ON THE LEVEL IT LAST STOOD ON - her open piece holds floors at two levels in some cells since D-wall (the deck under the Carrack\'s forecastle kept beside her walk as piece 0), and the leash took a piece\'s floor there nearest the body\'s height of the moment and its edge at any level: a body walking anywhere on any floor of hers at or over her main deck was set 2-3 m onto another level (the Carrack\'s 124 of 32904 walks, 3.64 <-> 6.77; none before D-wall), 6 of the 8 walks across her forecastle stair\'s top treads dropped 2.8 m, and 185 of the 914 standing points under her forecastle lifted 3.1 m onto it - now the floor of its piece nearest the one it LAST stood on, within FLIGHT_JOIN, else that piece\'s nearest cell within FLIGHT_JOIN of it, else its edge: none on any hull (mutants: the height of the moment again, its piece\'s floor at any distance, the edge at any level, the deck under her stair unread, the search blind to it)', async () => {
+  const pool = await readyPool();
+  for (let hull = 0; hull < HULL_NAMES.length; hull++) {
+    const d = pool.deckOf(hull, 0), F = facesOf(hull);
+    const { starts, walks, bad, first } = walkEverywhere(d, F, hullBuild(hull));
+    assert.ok(starts > 50, `${HULL_NAMES[hull]}: her standable starts (${starts})`);
+    assert.equal(bad, 0, `${HULL_NAMES[hull]}: ${bad} of ${walks} walks set more than a step off the floor they walk - first ${first}`);
+  }
+  // the Carrack's forecastle stair: across its top treads, 5 cm a frame, the feet on the tread. SHIPS-2: the mod's own
+  // Carrack's (Mac's carrack has no stair over her deck - her open deck one level, walked above)
+  const mod = await modShipsPool();
+  try {
+  const d = mod.pool.deckOf(HULL.Carrack, 0), F = facesOf(HULL.Carrack, standingMod(HULL.Carrack)), main = mainLevel(d);
+  const treadAt = (x, z, near) => { let best = NaN; for (const y of standable(F, x, z)) if (Math.abs(y - near) < 0.3 && !(Math.abs(best - near) < Math.abs(y - near))) best = y; return best; };
+  let walks = 0, dropped = 0, first = '';
+  for (let z = 11.8; z <= 14.6; z += 0.1) {
+    const y0 = d.heightAt(0.32, z);
+    if (!(y0 > main + DECK_STEP && y0 < 6.6)) continue;
+    for (const dir of [-1, 1]) {
+      const body = leashOne(d, F.boat);
+      let y = treadAt(0.32, z, y0);
+      if (Number.isNaN(y)) continue;
+      body.step([0.32, y, z], [0.32, y, z]);
+      walks++;
+      for (let x = 0.32 + dir * 0.05; Math.abs(x - 0.32) < 1.2; x += dir * 0.05) {
+        const t = treadAt(x, z, y);
+        if (Number.isNaN(t)) break;
+        y = t;
+        const got = body.press([x, y, z]);
+        if (got[1] < y - DECK_STEP) { dropped++; first ||= `z ${z.toFixed(2)} x ${x.toFixed(2)}: ${y.toFixed(2)} -> ${got[1].toFixed(2)}`; break; }
+      }
+    }
+  }
+  assert.equal(walks, 8, 'the walks across her stair\'s top treads');
+  assert.equal(dropped, 0, `dropped off her stair: ${dropped} of ${walks} - first ${first}`);
+  // standing on her main deck under her forecastle, no floor stood on before (a body new to the leash): never lifted,
+  // and put on her deck under her forecastle beside it - a cell's diagonal across at the most, never slid out to her
+  // waist (her deck there is her open piece's floor under her forecastle's, `more`)
+  const body = leashOne(d, F.boat);
+  let n = 0, lifted = 0, firstUp = '', across = 0, acrossAt = '';
+  for (let x = -2; x <= 2; x += 0.1) for (let z = 13.6; z <= 16.6; z += 0.1) for (const y of standable(F, x, z)) {
+    if (Math.abs(y - main) > 0.05) continue;
+    n++;
+    body.f.deckLocal = null;
+    const got = body.press([x, y, z]), side = Math.hypot(got[0] - x, got[2] - z);
+    if (got[1] > y + DECK_STEP) { lifted++; firstUp ||= `(${x.toFixed(2)}, ${z.toFixed(2)}) -> ${fmt(got)}`; }
+    if (side > across) { across = side; acrossAt = `(${x.toFixed(2)}, ${z.toFixed(2)}) -> ${fmt(got)}`; }
+  }
+  assert.equal(n, 914, 'her standable main-deck points under her forecastle');
+  assert.equal(lifted, 0, `lifted onto her forecastle standing still: ${lifted} of ${n} - first ${firstUp}`);
+  assert.ok(across <= d.cell * Math.SQRT2, `moved ${across.toFixed(2)} m across her at ${acrossAt}`);
+  // fallen through her main deck under her forecastle (stood on it a frame ago): back on it, never lifted onto her
+  // forecastle - the floor of its piece nearest the one it stood on, never the one nearest where it fell to
+  for (const [x, z] of [[0, 15.01], [-1, 14.51], [1, 15.51]]) for (const drop of [1.5, 2.5]) {
+    const y0 = d.heightAt(x, z, main), got = leashOne(d, F.boat).step([x, y0, z], [x, y0 - drop, z]);
+    assert.ok(Math.abs(y0 - main) < 0.01 && Math.abs(got[1] - main) < 0.01, `fallen ${drop} m through her deck at (${x}, ${z}): set at ${fmt(got)}`);
+  }
+  } finally { mod.restore(); }
+});
 
 test('AUDIT GALLEON-2 DK2: NEVER ONTO ANOTHER PIECE\'S FLOOR, WITHIN A FLIGHT\'S RISE OR PAST IT - two pieces of a deck beside each other across a 0.8 m ledge and no tread (past the motors\' step, within FLIGHT_JOIN): a body on either pressed over the ledge is put back on its own piece\'s edge at its own level, never stepped up or down onto the other (AUDIT GN-D1\'s law: the leash\'s threshold alone would let it) (mutants: any piece\'s floor in the cell, the piece filter unread, her open deck read in every piece)', () => {
   const P = [], I = [];
@@ -126,19 +253,121 @@ test('AUDIT GALLEON-2 DK2: NEVER ONTO ANOTHER PIECE\'S FLOOR, WITHIN A FLIGHT\'S
   const low = d.pieceAt(-2, 0, 0), high = d.pieceAt(1.5, 0, 0.8);
   assert.ok(low === 0 && high > 0, `her deck her open piece, the platform a piece of its own (${low}, ${high})`);
   const boat = { hull: 0, GameObject: { activeSelf: true }, MeshObject: { worldMatrix: () => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] } };
+  // off the platform over her deck, 0.8 m over it: back on the platform's edge
+  const down = leashOne(d, boat).step([1.5, 0.8, 0], [-0.25, 0.8, 0]);
+  assert.ok(Math.abs(down[1] - 0.8) < 1e-6 && down[0] >= 0, `kept on the platform: ${fmt(down)}`);
+  // into the platform's ledge from her deck, 0.8 m under it: back on her deck's edge
+  const up = leashOne(d, boat).step([-1.5, 0, 0], [0.25, 0, 0]);
+  assert.ok(Math.abs(up[1]) < 1e-6 && up[0] <= 0, `kept on her deck: ${fmt(up)}`);
 });
 
 // ── DK1: a shut cover stood on ────────────────────────────────────────────────────────────────────────────────────
+
+test('AUDIT GALLEON-2 DK1: A SHUT COVER IS STOOD ON - D7 made a part that opens no floor, so the Carrack\'s two cargo doors (4 x 5 m mid her main deck, spawned shut) were a hole to standing aboard and to the leash: 600 of the 1575 points on them read ASHORE by the host\'s aboard() (none on the base or the galleon commits), and a boarder pressing across them at a player standing there was held 2.48 m off him (MELEE_DISTANCE 2.25); now her parts\' upward faces as they stand shut are baked beside her deck (`ajar`): standing aboard reads them, and the leash lets a body be within a step of one - her walk, her spots and a landing still never on one (D7), a foe gone down the open hatchway still set back at its edge (mutants: the covers unbaked, unread by aboard, unread by the leash, their margin unbaked, the leash\'s band a metre)', async () => {
+  // SHIPS-2: the cargo doors are the mod's own Carrack's (test/navalSea.mjs modShipsPool - hull 4 as the game stands it
+  // when the new carrack's model will not load); Mac's carrack has none (her hatchways open companions under her houses)
+  const mod = await modShipsPool();
+  try {
+  for (const [hull, what, x0, x1, z0, z1, y, total] of [[HULL.Carrack, 'the Carrack\'s cargo doors', -2.01, 1.99, 1.0, 6.0, 3.64, 1575], [HULL.SmallShip, 'the galleon\'s fore cover', -1.25, 1.25, 2.95, 6.34, 6.44, 560], [HULL.SmallShip, 'the galleon\'s aft cover', -1.25, 1.25, -6.34, -2.95, 6.44, 560]]) {
+    if (hull === HULL.SmallShip) mod.restore();
+    const h = await sea(hull === HULL.Carrack ? { hull, pool: mod.pool } : { hull });
+    h.runtime.sailing = false;   // moored, off her helm (D3's own setup)
+    const m = h.boat.MeshObject.worldMatrix();
+    let n = 0, ashore = 0, firstA = '';
+    for (let x = x0 + 0.3; x <= x1 - 0.3 + 1e-9; x += 0.1) for (let z = z0 + 0.3; z <= z1 - 0.3 + 1e-9; z += 0.1) {
+      n++;
+      h.view.feet = outOfDeck(m, [x, y + 0.01, z]);
+      if (!h.host.aboard()) { ashore++; firstA ||= `(${x.toFixed(2)}, ${z.toFixed(2)})`; }
+    }
+    assert.equal(n, total, `${what}: the points on it`);
+    assert.equal(ashore, 0, `${what} shut: ${ashore} of ${n} read ashore - first ${firstA}`);
+  }
+  const pool = await readyPool();
+  const d = mod.pool.deckOf(HULL.Carrack, 0), boat = standingMod(HULL.Carrack), main = mainLevel(d);
+  // a boarder pressing across her shut cargo doors at a player standing on them
+  const player = [0.09, 3.64, 2.8], body = leashOne(d, boat);
+  body.step([3.0, main, 2.8], [3.0, main, 2.8]);
+  let closest = Infinity, at = null;
+  for (let x = 3.0; x >= 0.2; x -= 0.05) { at = body.press([x, 3.64, 2.8]); closest = Math.min(closest, Math.hypot(at[0] - player[0], at[2] - player[2])); }
+  assert.ok(closest < MELEE_DISTANCE, `a boarder at a player on her shut cargo doors held ${closest.toFixed(2)} m off him (${fmt(at)})`);
+  assert.ok(Math.abs(at[1] - 3.64) <= DECK_STEP, `on the doors: ${fmt(at)}`);
+  // a body standing on the galleon's shut fore cover, a step over her deck: left where it stands (it was put on her deck
+  // at the hatchway's edge)
+  const g = pool.deckOf(HULL.SmallShip, 0), onCover = leashOne(g, standing(HULL.SmallShip)).step([0, 6.378, 4.6], [0, 6.378, 4.6]);
+  assert.ok(Math.abs(onCover[0]) < 1e-6 && Math.abs(onCover[1] - 6.378) < 1e-6 && Math.abs(onCover[2] - 4.6) < 1e-6, `on her fore cover: ${fmt(onCover)}`);
+  // D7's walk rule stands: no cell of hers over her cargo hatch, no landing on it, no spot
+  const inHatch = (x, z) => x > -2.01 && x < 1.99 && z > 1 && z < 6;
+  assert.deepEqual(cellsOf(d).filter((c) => inHatch(c[0], c[2])).length, 0, 'no cell of her deck over her cargo hatch');
+  const land = d.land(0, 3.5, main + 3);
+  assert.ok(d.walkable(land[0], land[2]) && !inHatch(land[0], land[2]), `a landing over her hatch comes down on her deck beside it: ${fmt(land)}`);
+  assert.ok(d.spots(24, main).every((p) => !inHatch(p[0], p[2])), 'no spot over her hatch');
+  // gone down her open hatchway, more than a step under her doors' tops: back on her deck at its edge
+  for (const yy of [3.1, 2.0, 0.5]) {
+    const got = leashOne(d, boat).step([3.0, main, 3.5], [0.4, yy, 3.5]);
+    assert.ok(Math.abs(got[1] - main) < 0.01 && d.walkable(got[0], got[2]) && !inHatch(got[0], got[2]), `fallen to ${yy} down her cargo hatch: set at ${fmt(got)}`);
+  }
+  } finally { mod.restore(); }
+});
 
 // ── DK3: her doors ────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT GALLEON-2 DK3: HER DOORS ARE WAYS IN - a door\'s leaf is baked a wall as it stands shut (D7), so the cells of its doorway and her deck\'s margin either side were no floor to the leash, and no boarder went through any door of hers: one chasing a player in the new galleon\'s great cabin stood 4.59 m off him at her castle\'s front; now the floor under each doorway a leaf alone walls, and her margin either side of it, are baked beside her deck (`ajar`) - the leash lets a body through (the motor\'s collider holds a shut door) and, pressed off one, puts it back on the floor of the room it came from; her deck itself the bake it was - her great cabin a piece of its own, her walk, her spots and her crew never through a door (mutants: the doorways unbaked, a leaf unmarked, a leaf no wall, the margin unbaked, the room a body came from unread, its band unread)', async () => {
   const pool = await readyPool();
   const d = pool.deckOf(HULL.SmallShip, 0), boat = standing(HULL.SmallShip), main = mainLevel(d);
+  // a boarder chasing a player in her great cabin through her castle's doorway, 5 cm a frame
+  const target = [0.1, main, -14], body = leashOne(d, boat);
+  let pos = body.step([0.1, main, -7], [0.1, main, -7]), off = 0;
+  for (let f = 0; f < 400; f++) {
+    const dx = target[0] - pos[0], dz = target[2] - pos[2], L = Math.hypot(dx, dz) || 1;
+    pos = body.press([pos[0] + dx / L * 0.05, main, pos[2] + dz / L * 0.05]);
+    off = Math.max(off, Math.abs(pos[1] - main));
+  }
+  const gap = Math.hypot(pos[0] - target[0], pos[2] - target[2]);
+  assert.ok(gap < MELEE_DISTANCE, `a boarder at a player in her great cabin stands ${gap.toFixed(2)} m off him (${fmt(pos)})`);
+  assert.ok(off <= DECK_STEP, `never on another level (${off.toFixed(2)} m off her main deck)`);
+  // and back out onto her deck
+  for (let f = 0; f < 400; f++) {
+    const dx = 0.1 - pos[0], dz = -7 - pos[2], L = Math.hypot(dx, dz) || 1;
+    pos = body.press([pos[0] + dx / L * 0.05, main, pos[2] + dz / L * 0.05]);
+  }
+  assert.ok(Math.hypot(pos[0] - 0.1, pos[2] + 7) < 0.1 && d.walkable(pos[0], pos[2]), `back out on her deck: ${fmt(pos)}`);
+  // in her doorway's margin on her cabin's side, pressed on into her castle's front beside her door: back on her cabin's
+  // floor at its edge (z -11.41) - the room it came from, never out onto her main deck through the wall
+  const cabin = d.pieceAt(0, -14, main), inside = leashOne(d, boat);
+  let p = inside.step([0, main, -12.4], [0, main, -12.4]);
+  for (const [x, z] of [[0, -11.9], [0, -11.4], [0, -11.16], [-0.5, -11.16], [-1.0, -11.16]]) p = inside.press([x, main, z]);
+  assert.ok(Math.abs(p[2] + 11.41) < 0.01 && Math.abs(p[1] - main) < 0.01 && d.pieceAt(p[0], p[2], p[1], DECK_STEP) === cabin, `pressed into her castle's front from her cabin: ${fmt(p)}`);
+  // through every door of hers at her main deck or over it - the galleon's castle door, the Carrack's five - each way, a
+  // body walking straight through at the leaf's middle from a floor of hers 1.5 m one side to 1.5 m the other, 5 cm a
+  // frame (each held at the doorway's near margin, 2.6-3.0 m short of 2 m beyond it)
+  // SHIPS-2: the Carrack's five are the mod's own Carrack's (test/navalSea.mjs modShipsPool); Mac's carrack's one door
+  // opens onto her aft companion, down to her gun deck - under her main deck, where no deck is (AUDIT NAV2 F34)
+  let doors = 0;
   const mod = await modShipsPool();
+  try {
+  for (const hull of [HULL.SmallShip, HULL.Carrack]) {
+    const dk = (hull === HULL.Carrack ? mod.pool : pool).deckOf(hull, 0), bt = hull === HULL.Carrack ? standingMod(hull) : standing(hull), lv = mainLevel(dk);
+    for (const leaf of leavesOf(bt)) {
+      if (leaf.y1 - leaf.y0 < 1 || leaf.y0 < lv - DECK_STEP) continue;   // a door's leaf at her main deck or over it
+      const x = (leaf.x0 + leaf.x1) / 2, zc = (leaf.z0 + leaf.z1) / 2;
+      for (const dir of [1, -1]) {
+        const za = zc - dir * 1.5, zb = zc + dir * 1.5, ya = dk.heightAt(x, za, leaf.y0), yb = dk.heightAt(x, zb, leaf.y0);
+        assert.ok(Math.abs(ya - leaf.y0) <= DECK_STEP && Math.abs(yb - leaf.y0) <= DECK_STEP, `${HULL_NAMES[hull]} ${leaf.name}: a floor of hers either side (${ya}, ${yb})`);
+        const walker = leashOne(dk, bt);
+        let q = walker.step([x, ya, za], [x, ya, za]), most = 0;
+        for (let f = 0; f < 200 && Math.abs(q[2] - zb) > 0.03; f++) { q = walker.press([x, q[1], q[2] + dir * 0.05]); most = Math.max(most, Math.abs(q[1] - leaf.y0)); }
+        doors++;
+        assert.ok(Math.abs(q[2] - zb) <= 0.03, `${HULL_NAMES[hull]} ${leaf.name} ${dir > 0 ? 'forward' : 'aft'}: held ${Math.abs(q[2] - zb).toFixed(2)} m short (${fmt(q)})`);
+        assert.ok(most <= DECK_STEP, `${HULL_NAMES[hull]} ${leaf.name}: ${most.toFixed(2)} m off its level`);
+      }
+    }
+  }
+  } finally { mod.restore(); }
+  assert.equal(doors, 12, 'the galleon\'s castle door and the Carrack\'s five, each both ways');
   // her deck the bake it was: her great cabin a piece of its own, her castle's doorway no deck, her walk never in
   assert.ok(d.pieceAt(0, -14, main) > 0, 'her great cabin a piece of its own');
   assert.equal(d.walkable(0, -10.4), false, 'her castle\'s doorway no deck');
+  assert.ok(d.spots(48, main).every((p) => p[2] > -10), 'no spot through her door');
 });
 
 // ── TS9: a flight climbed square ──────────────────────────────────────────────────────────────────────────────────
@@ -185,5 +414,21 @@ async function fallbackPool() {
 }
 
 test('AUDIT GALLEON-2 DK2 and DK4: THE MOD\'S GALLEON - where the new galleon will not load, hull 2 is the mod\'s own galleon on her own build (MOD_SMALL_SHIP_BUILD): her deck 727 cells (the D-wall comment said 714 -> 750, measured over the new galleon\'s extent; 690 -> 727 over her own), and the walk everywhere never set off its floor (43 of her 19880 walks were, 6.77 <-> 8.84-9.40 under her forecastle) (mutants: as DK2\'s)', async () => {
+  try {
+    const pool = await fallbackPool();
+    assert.equal(hullBuild(HULL.SmallShip), ships.MOD_SMALL_SHIP_BUILD, 'her numbers the mod galleon\'s');
+    const d = pool.deckOf(HULL.SmallShip, 0);
+    assert.equal(d.count, 727, 'the mod\'s galleon\'s deck');
+    const DECK = src('src/systems/naval/navalDeck.js');
+    assert.doesNotMatch(DECK, /the mod's galleon 714 -> 750/, 'measured over the new galleon\'s extent');
+    assert.match(DECK, /the mod's galleon 690 -> 727/, 'over her own');
+    const boat = pool.spawnNow(new Boat(HULL.SmallShip, 0), { position: [0, 0, 0], rotation: [0, 0, 0, 1] });
+    const geo = (c) => (c.m_Mesh?.mesh ? pool.models.geometry(c.m_Mesh.mesh) : c.m_Mesh?.builtin ? BUILTIN_COLLIDER_MESHES[c.m_Mesh.builtin] : null);
+    const { starts, walks, bad, first } = walkEverywhere(d, facesOf(HULL.SmallShip, boat, geo), hullBuild(HULL.SmallShip));
+    assert.ok(starts > 4000, `her standable starts (${starts})`);
+    assert.equal(bad, 0, `the mod's galleon: ${bad} of ${walks} walks set more than a step off the floor they walk - first ${first}`);
+  } finally {
+    ships.setGalleonStanding?.(true);
+  }
   assert.notEqual(hullBuild(HULL.SmallShip), ships.MOD_SMALL_SHIP_BUILD, 'standing again: hers');
 });

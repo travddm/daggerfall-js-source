@@ -384,7 +384,37 @@ test('CREW-COMPANIONS the boat\'s menu: a crewed boat of mine lists Companions w
 // ── the wiring, by source ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('CREW-COMPANIONS by source: both pools knock a companion out before every death arm; the dungeon spares him my blows and never saves him', () => {
+  const x = rd('src/scenes/exteriorFoes.js');
+  // PIN MOVED (RVN10, bible/12-Enhanced-AI/Feud-Arc.md 21.1): the arm notes the striker whose blow knocked him down
+  const knockX = x.indexOf("if (f.companion != null) { f.entity.health = 1; if (!f._knockedOut) f._knockedBy = striker; f._knockedOut = true; return; }");
+  assert.ok(knockX > 0 && knockX < x.indexOf('attemptSoulTrap(f.entity', knockX), 'the street: before the trap, the notice and the corpse');
   assert.ok(CATCH_UP_M < ENCOUNTER_CULL_DISTANCE, 'the street\'s cull never reaches a companion - the layer stands him at the player first (and re-stands a swept one)');
+  const d = rd('src/scenes/dungeonContext.js');
+  const knockD = d.indexOf("if (foe.companion != null) { foe.entity.health = 1; if (!foe._knockedOut) foe._knockedBy = striker; foe._knockedOut = true; return; }");   // PIN MOVED (RVN10): its twin
+  assert.ok(knockD > 0 && knockD < d.indexOf('attemptSoulTrap(foe.entity', knockD), 'the dungeon: before the trap and the corpse');
+  assert.match(d, /if \(foe\.dead \|\| \(fromPlayer && !peer && foe\.companion != null\)\) return;/, 'no blow of mine reaches him');
+  assert.match(d, /const live = (?:dropFateHeld\()?foes\.filter\(\(f\) => !f\.dead && f\.companion == null\)\)?;/, 'nor my swing');   // PIN MOVED (the revenant audit): and one held by its fate
+  assert.match(d, /foes: foes\.filter\(\(f\) => f\._ownFrom == null && f\.companion == null\)/, 'the room\'s save holds none');
+  assert.match(d, /function removeLooseFoe\(f\) \{\n\s*if \(!f \|\| f\._gone \|\| !foes\.includes\(f\)\) return false;\n\s*dropOwnPuppet\(null, f\);/, 'the out door');
+});
+
+test('CREW-COMPANIONS by source: the world stands the party in every place and every mode, and the naval save keeps it', () => {
+  const w = rd('src/scenes/world.js');
+  assert.match(w, /if \(mode === 'exterior'\) return \{ key: exteriorFoes, spawn: standIn\(exteriorFoes\)/);
+  assert.match(w, /if \(mode === 'interior'\) \{\n\s*const pool = modes\?\.interiorPool\?\.\(\);/);
+  assert.match(w, /spawn: \(mobile, feet, o\) => d\.spawnLooseFoe\(mobile, feet, \{ yawRad: o\.yaw, allied: true, gender: o\.gender \}\),/, 'PIN MOVED (AUDIT CC-E1): a companion rides the room\'s own lane, named in its `cp`');
+  assert.match(w, /allied: true, loose: true, transient: true \}\)/);
+  assert.match(w, /crewAshoreTick\(\);   \/\/ CREW-COMPANIONS: the party stood indoors and underground too/);
+  assert.match(w, /crewAshoreTick\(\);   \/\/ CREW-COMPANIONS: the party stood on the street/);
+  assert.match(w, /onKnocked: \(c, by\) => \{ naval\?\.companionKnocked\?\.\(c\); felledBy\(by, c\.name\); \},/);   // PIN MOVED (RVN10, Feud-Arc.md 21.1): and the felling's deed on the striker
+  assert.match(w, /else navalCompanions\(pick\.boat\);/);
+  assert.match(w, /away: naval\?\.awayOf\?\.\(boat\) \?\? NO_HANDS_AWAY \}\);/);
+  const m = rd('src/scenes/worldModes.js');
+  assert.equal((m.match(/host\.drawCompanionBars\?\.\(\{ proj, view, eye: mwv\.eye \}\);/g) ?? []).length, 3, 'the bars indoors and underground - and under a dungeon window (AUDIT CC-A6)');
+  const n = rd('src/scenes/naval/navalHost.js');
+  assert.match(n, /raids: \[\.\.\.raidUids\], party: companions\.snapshot\(\) \};/);
+  assert.match(n, /companions = createCompanions\(r\?\.party \?\? null, deps\.packedItems \?\? null\);/);
+  assert.match(n, /const live = boatState\.get\(c\.boat\);\n\s*if \(live\) live\.crew\.event\('knocked'\);/);
 });
 
 test('FIELD BUGS 2026-10-05c ASSIST (\'revenants just "stand there" during fight sometimes\'): a companion takes the foe striking his leader, whichever way he faces, over an idle foe behind a wall (DFU\'s +5 for "targets no one" kept every other pair); he never walks into the wall at it, and it is not pulled onto him (mutants: the assist unread, a foe fighting a companion not his side)', () => {

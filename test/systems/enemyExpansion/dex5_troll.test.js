@@ -215,6 +215,9 @@ test('DEX5-5 THE MISSILE: my spell\'s missile meets the body\'s trigger and its 
   assert.equal(magic.castInput(eye, [0, 0, 1]), true, 'the bolt is loosed');
   withRandom(0, () => { for (let i = 0; i < 40 && troll.corpsePrefab; i++) magic.update(0.05, [0, 0, -50], [0, 0, 1], CAPSULE_HEIGHT); });
   assert.equal(troll.corpsePrefab, null, 'the missile met the trigger and the fire burned it');
+  // the melee and arrow doors read living foes alone: the body's prefab is never on them
+  const ext = rd('src/scenes/exteriorFoes.js');
+  assert.match(ext, /function damageFoe\(f, damage[^\n]*\n\s*if \(f\.dead \|\| \(fromPlayer && !peer && sparedBySwing\(f\)\)\) return;/, 'a blade or an arrow on a body lands nothing (WeaponDamage passes an entity of type None by)');   // AUDIT WORLD-EVENTS: PIN MOVED - a shipmate is now one of the bodies `sparedBySwing` spares (combat/friendlyFire.js), a refugee the other
   // the switch off: the prefab is the loaded mod's - a plain corpse, lootable, and it lies
   const off = await fallenTroll({ on: false });
   assert.equal(off.troll.corpsePrefab, null);
@@ -272,6 +275,20 @@ test('DEX5-7 THE SAVE: every body still down with its time left, by the host\'s 
   assert.deepEqual(trollSaveData(), { activeCorpses: [] }, 'the host destroyed: no body of it is saved');
   restoreModSaveRecords({});
   assert.equal(trollSaveData().activeCorpses.length, 0, 'a save without the record: NewSaveData');
+});
+
+test('DEX5-8 THE HOSTS WIRE IT: the dungeon and the street mint a body\'s prefab at their corpse mint, drive it on the foes\' clock and its magic rounds, drop it with the host; the dungeon\'s loot gate honours the disabled body and its save writes a destroyed body as none', () => {
+  const dc = rd('src/scenes/dungeonContext.js'), ext = rd('src/scenes/exteriorFoes.js'), sh = rd('src/scenes/shared.js');
+  assert.match(dc, /f\.corpsePos = p;[^\n]*\n\s*corpsePrefabs\.mint\(f, ct\);/);
+  assert.match(dc, /function lootableBody\(f\) \{ return !!f\?\.dead && !!f\.corpse && f\._ownFrom == null && !f\.corpseDisabled; \}/);
+  assert.match(dc, /roomClaimTick\(_ecvT \* 1000\);[^\n]*\n\s*corpsePrefabs\.frame\(foes, dt\);/);
+  assert.equal((dc.match(/if \(f\.dead\) \{ f\.corpsePrefab\?\.rounds\?\.\(/g) ?? []).length, 2, 'both of the dungeon\'s foe round loops');
+  assert.match(dc, /_peopleLane\.destroy\(\);[^\n]*\n\s*corpsePrefabs\.destroy\(\);/);
+  assert.match(dc, /\.\.\.\(f\.dead && f\.corpseDestroyed \? \{ bg: f\.corpseDestroyed \} : \{\}\),/, 'AUDIT DEX D3: its kind, which the memory carries too');
+  assert.match(ext, /corpsePrefabs\.mint\(f, ct\);[^\n]*\n\s*mintCorpseMarker\(\{/);
+  assert.match(ext, /corpsePrefabs\.frame\(foes, dt\);/);
+  assert.match(ext, /foes\.length = 0;\n\s*corpsePrefabs\.destroy\(\);/);
+  assert.match(sh, /if \(f\?\.dead && !f\.puppet\) f\.corpsePrefab\?\.rounds\?\.\(from, to\);/);
 });
 
 /** DEX5b: two players in one cell - the troll's owner and a peer - each a real pool, their frames and hits carried by
@@ -343,6 +360,19 @@ test('DEX5-11 ONLINE, THE RISE: the owner alone counts; its body goes with its r
 });
 
 test('DEX5-12 ONLINE UNDERGROUND: the record says a body gone (`bg`, roomRecord) and every copy loses it (applyFoeRecord); a destroyed body rides on in a shared encounter\'s and a loose foe\'s lanes; a copy\'s missile goes by the lane its foe rides, and the seat and a loose foe\'s owner land it on the body', () => {
+  const dc = rd('src/scenes/dungeonContext.js');
+  assert.match(dc, /^\s*if \(f\.dead && f\.corpseDestroyed\) r\.bg = f\.corpseDestroyed;/m);
+  assert.match(dc, /\$\{r\.d\},\$\{r\.bg \?\? 0\},\$\{r\.a\}/, 'and a change of it is a change of the record (its key)');
+  assert.match(dc, /else setFoeDead\(f, false\);\n\s*\}\n\s*if \(r\.d === 1 && r\.bg\) corpsePrefabs\.told\(f, r\.bg\);/);
+  assert.match(dc, /if \(f\._ownFrom != null \|\| \(f\.dead && !f\.corpse && !f\.corpseDestroyed\)\) continue;/);
+  assert.match(dc, /if \(\(f\.dead && !f\.corpse && !f\.corpseDestroyed\) \|\| !foes\.includes\(f\)\) _sharedById\.delete\(id\);/);
+  assert.match(rd('src/scenes/corpsePrefabHost.js'), /f\._ownFrom != null \? \{ own: 1, to: f\._ownFrom, k: h\.locationKey\(\), i: f\._ownI, \.\.\.hit \} : \{ \.\.\.\(f\._encId != null \? \{ i: f\._encId, xs: 1 \} : \{ i: f\._surI \?\? h\.foes\.indexOf\(f\) \}\), \.\.\.hit \}/);
+  assert.match(dc, /if \(f\?\.dead && data\.cs === 1 && \(xs \|\| i < _layoutFoes\)\) \{ const s = hitSpellOf\(data\); return !!s && !!f\.corpsePrefab\?\.struck\(s\.spell, s\.level, null\); \}/);
+  assert.match(dc, /if \(f\?\.dead && data\.cs === 1\) \{ if \(f\.entity\?\.team === 'PlayerAlly' \|\| !\(ownLoose\(f\) \|\| \(!!ownQuestTag\(f\) && ownPeerMayHit\(id, f\)\)\)\) return false; const s = hitSpellOf\(data\); return !!s && !!f\.corpsePrefab\?\.struck\(s\.spell, s\.level, null\); \}/, 'AUDIT DEX D7: through the gate a living blow passes');
+  assert.match(dc, /if \(!foes\.includes\(f\) \|\| f\.corpseDestroyed\) return;/, 'a body told gone while its art warmed never lands');
+  const ext = rd('src/scenes/exteriorFoes.js');
+  assert.match(ext, /if \(npcLane\) for \(const f of foes\) if \(f\.dead && f\.corpse && !f\.corpseDestroyed && isBodyFoe\(f\) && f\.ai\)/, 'the street\'s ash stands no Morrowind body');
+  assert.match(ext, /if \(_corpseGen !== epoch \|\| f\._gone \|\| f\.corpseDestroyed\) \{ renderer\.destroyBillboardBatch\(c\.batch\); return; \}/, 'a body told gone while its art loaded never lands');
   // the door's told, by itself: a copy with a prefab loses the body by the prefab's word, one with none by the host's
   const seen = [];
   const runner = createCorpsePrefabs({ vanish: (f) => seen.push(`vanish:${f.id}`) });

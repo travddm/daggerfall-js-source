@@ -97,6 +97,11 @@ test('GL-LEAK the ink\'s mesh is the SHEET\'s: two sheets whose reveals count th
   assert.equal(walked, 2, 'another sheet with the same count: its own rows uploaded');
   assert.ok(uploads() > 0);
   disposeDungeonInk();
+  // the sheet asks the page's ink, with its own rows' owner, and asks again when it was lost
+  const sheet = rd('src/ui/automap/automapSheet.js');
+  assert.match(sheet, /if \(glInk === undefined \|\| glInk\?\.lost\?\.\(\)\) glInk = dungeonInkFor\(ctx\?\.canvas\?\.ownerDocument \?\? null\);/);
+  assert.match(sheet, /glInk\.setMesh\(`\$\{r\?\.revealed\?\.size \?\? 0\}\|\$\{f\.rows\.length\}`, rowsIn\(f\.model, r\?\.revealed \?\? null\), solids\);/);
+  assert.doesNotMatch(sheet, /createDungeonInk\(/, 'no sheet makes an ink of its own');
 });
 
 test('GL-LEAK AS THE PAGE GOES: every seated context let go once, an unseated one not, one that throws keeping no other from it; main.js seats the game\'s own and runs them all on a pagehide the browser does not keep - the ink, the veil and the intro seat theirs (mutants: pagehide not wired; the back-forward page let go; the renderer not seated)', () => {
@@ -114,4 +119,14 @@ test('GL-LEAK AS THE PAGE GOES: every seated context let go once, an unseated on
   loseGlContext({ getExtension: () => ({ loseContext: () => { lost++; } }) });
   loseGlContext(null); loseGlContext({ getExtension: () => null });
   assert.equal(lost, 1);
+  const main = rd('src/main.js');
+  assert.match(main, /addEventListener\('pagehide', \(e\) => \{ if \(!e\.persisted\) releaseGlContexts\(\); \}\);/);
+  assert.match(main, /const renderer = new Renderer\(canvas\);\n\s*onPageGone\(\(\) => \{ pageGoing = true; loseGlContext\(renderer\.gl\); \}\);/);
+  assert.match(main, /e\.preventDefault\(\);\n\s*if \(pageGoing\) return;/, 'no "context lost" banner over a closing tab');
+  assert.match(main, /from '\.\/render\/glRelease\.js';/);
+  assert.doesNotMatch(rd('src/render/glRelease.js'), /^\s*import\s/m, 'a leaf: the entry\'s static reach unchanged (BOOT1)');
+  assert.match(rd('src/ui/ink/inkDungeonGL.js'), /if \(ink\) _shared = \{ doc, ink, unseat: onPageGone\(disposeDungeonInk\) \};/);
+  assert.match(rd('src/ui/gate/gateVeil.js'), /unseat = onPageGone\(\(\) => loseGlContext\(gl\)\);/);
+  assert.match(rd('src/ui/gate/gateVeil.js'), /loseGlContext\(veilGl\); unseat\?\.\(\);/, 'and its destroy lets it go');
+  assert.match(rd('src/ui/intro/introLandscape.js'), /unseat\(\);\n\s*loseGlContext\(gl\);/);
 });

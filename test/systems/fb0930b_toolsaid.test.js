@@ -445,6 +445,18 @@ test('TOOL-USE: Foraging switched off online - the card still offers Use, and th
   } finally { s.done(); }
 });
 
+test('TOOL-USE: the world host hands Foraging the professions, the keys, and the tool\'s Use to the gathering host (world.js setForagingHost)', () => {
+  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
+  const at = w.indexOf('setForagingHost({');
+  assert.ok(at > 0);
+  const host = w.slice(at, w.indexOf('\n  });', at));
+  assert.match(host, /professionsOpen: \(\) => profBook\?\.state\.open === true,/);
+  // PIN MOVED (2026-10-01 part four, TOUCH-HOLD): the key as the hand holds it - a pad in hand, its button (world.js
+  // actKeyWord, pinned whole in test/systems/fb1001_touchhold.test.js); else the key, as before
+  assert.match(host, /keyLabel: \(a\) => actKeyWord\(a\),/);
+  assert.match(host, /\n {4}professionUse: \(t\) => gatherHost\?\.useTool\(t\) \?\? false,/);
+});
+
 test('TOOL-USE: the Professions page says a tool\'s Use at the node is the key\'s and from the pack only points the way; the empty Stores say where their goods come from', () => {
   assert.match(GATHER_HOW.herbalism, /patch of herbs/);   // VOICE1 (PIN MOVED): the same law in plain words
   assert.match(GATHER_HOW.mining, /vein of ore or a boulder/);   // VOICE1 (PIN MOVED)
@@ -455,11 +467,20 @@ test('TOOL-USE: the Professions page says a tool\'s Use at the node is the key\'
   for (const k of ['herbalism', 'mining', 'logging']) assert.doesNotMatch(GATHER_HOW[k], /Foraging|earns no XP/);
   // PIN MOVED (2026-10-01 part four, TOUCH-HOLD): and the Skinning Knife's Use
   assert.match(STORES_EMPTY_LINE, /You can also use the matching tool from your hotbar or a quick slot\. Tools used from your pack gather nothing\.$/);
+  const src = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
+  assert.match(src, /if \(GATHER_HOW\[_sel\]\) pane\.append\(el\('p', 'px-note', gatherHow\(_sel\)\)\);/);   // PIN MOVED (L10N4): said through its reader
+  assert.match(src, /: storesEmptyLine\(\)\)\);/);
+  assert.match(src, /const gatherHow = \(id\) => \(id === 'herbalism' \? t\('prof\.page\.how\.herbalism', GATHER_HOW_HERBALISM\)/);
+  assert.match(src, /const storesEmptyLine = \(\) => t\('prof\.page\.stores\.empty', STORES_EMPTY_LINE\);/);
   // AUDIT (2026-10-04): PROF-MENU retired the act choice key's search - the patch's and the body's lists carry it now; and
   // BAG1's page says where a carrying book's goods go (the bag or the pack), not the Stores
   assert.doesNotMatch(GATHER_HOW.herbalism, /act choice key/);
   assert.match(GATHER_HOW.herbalism, /the patch's list also lets you search it for food/);
+  assert.doesNotMatch(src, /act choice key searches/);
+  assert.match(src, /The carcass\\'s list also lets you search it\.'\)\)\);/);   // VOICE1 (PIN MOVED)   // PIN MOVED (L10N4): said through t()
   assert.match(STORES_EMPTY_CARRY_LINE, /goes into your Materials Bag or pack\. Put it in here in any town\.$/);
+  assert.match(src, /all\.size \? t\('prof\.page\.stores\.noMatch', 'Nothing in the Stores matches\.'\) : storesEmptyCarryLine\(\)\)\);/);   // PIN MOVED (L10N4): said through its reader
+  assert.match(src, /const storesEmptyCarryLine = \(\) => t\('prof\.page\.stores\.emptyCarry', STORES_EMPTY_CARRY_LINE\);/);
 });
 
 // ─── PROF-MENU (2026-10-01, Mac: "They should use the same menu the loot menu uses and not an interaction button") ───
@@ -576,5 +597,22 @@ test('PROF-MENU: the act choice key steps the plaque\'s light down the node\'s l
 });
 
 test('PROF-MENU host by source: the street\'s plaque races the node over its own winner and names it first, its click presses a lit row (never mid-act), the list opens where no plaque stands; the dungeon\'s the same through its host; an absent reason still says "not now" (mutants: each wire cut)', () => {
+  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
+  assert.match(w, /plaque: \(\) => worldPlaqueOn\(\),\n\s*lit: \(key\) => plaqueActionFor\(key\),\n\s*choose: \(rows, pick\) => profChoose\(rows, pick\),\n\s*step: \(n\) => plaqueStep\(n\),/);
+  assert.match(w, /const _hoverNamers = \[\n\s*\(key\) => gatherHost\?\.hoverName\?\.\(key\) \?\? yards\?\.hoverName\?\.\(key\) \?\? null,/);
+  assert.match(w, /pick: \(\) => profHoverOver\(modes\.exteriorHoverPick\(cam\.pos, _hd, \{/);
+  assert.match(w, /const profHoverOver = \(ray\) => gatherHost\?\.hoverHit\?\.\(ray\) \?\? ray;/);
+  assert.match(w, /const nodeClicked = !useEdge && _act\.activate && !_holdFire && !modes\.transitioning && !gatherHost\?\.acting\(\) && !_actClick && !naval\?\.takesActivate\?\.\(\) && profClickPress\(\);/);   // PIN MOVED (AUDIT HERB-CURSOR B2): nor an act's click lifting
+  assert.match(w, /return typeof lit\?\.key === 'string' && lit\.key\.startsWith\('prof:'\) && lit\.id != null && \(gatherHost\?\.press\(\{ click: true \}\) \?\? false\);/);
+  assert.match(w, /const win = new ListPickerWindow\(\{ backdrop: 'none', items: rows, onPick: \(i\) => \{ close\(\); pick\(i\); \}, onCancel: close \}\);/, 'the list closed before the act starts');
+  assert.match(w, /profClick: \(\) => profClickPress\(\),/);
+  assert.match(w, /profHoverPick: \(ray\) => gatherHost\?\.hoverHit\?\.\(ray\) \?\? null,/);
+  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
+  // PIN MOVED (FIELD BUGS 2026-10-07 INDOOR-SKIN): the building's ladder carries the same arm, above - this pin is the dungeon's
+  assert.match(m.slice(m.indexOf('  function tryExitDungeon(')), /if \(!interact && !pressCast && !actClick && !host\.profActing\?\.\(\) && host\.profClick\?\.\(\)\) return true;/);
+  assert.match(m, /profHoverPick: \(ray\) => host\.profHoverPick\?\.\(ray\) \?\? null,/);
+  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
+  assert.match(d, /return opts\.profHoverPick\?\.\(ray\) \?\? ray;/);
+  assert.match(d, /hoverName\(key, hit\) \{ return opts\.profHoverName\?\.\(key\) \?\? _namer\(key, hit\); \}/);
   assert.equal(resolveHover({ key: 'k', distance: 1, reach: 2 }, { name: () => ({ title: 'T', actions: [{ id: 'a', label: 'A', disabled: true, why: null }] }) }).rows[0].name, 'A (not now)');
 });

@@ -424,5 +424,24 @@ test('AUDIT RAID R4/R8a device: ANOTHER CHARACTER\'S THANKS are kept for it - ne
 });
 
 test('AUDIT RAID wiring by source: the relay keeps receipts at the hub and hands them at the hello, sweeps them, and makes a raid only from its pixel; the hub\'s list is put before its copy moves; the client matches a relay\'s word by its signature; the session takes a receipt from the hub (mutants: each line undone)', () => {
+  const idx = rd('server/src/index.js');
+  assert.match(idx, /if \(!here\) return;   \/\/ AUDIT RAID R1/);
+  assert.match(idx, /if \(!\(await this\._raidMakeRoom\(now, acct\)\)\) return;/);
+  assert.match(idx, /if \(!raidWordSane\(m\)\) \{ this\._junk\(ws\); return; \}/);
+  assert.match(idx, /if \(!raidWordFits\(m, sharedClassicMinutes\(now\)\)\) return;   \/\/ outside its raid's time: nothing read, kept or said\n(?:[^\n]*\n){0,10}?\s*const id = raidLedgerId\(m\);/);   // RAID-ROLL's reads of the day's roll sit between (test/systems/raidroll.test.js); PIN MOVED (WW6): and the word's lane, two lines of it said
+  assert.match(idx, /await this\.state\.storage\.put\('raidcl', next\);\n\s*this\._raidCleans = next;/);
+  assert.match(idx, /await this\._raidReceiptsKeep\(cl, body\?\.rc, now\);/);
+  assert.match(idx, /if \(sub\) \{ try \{ await this\._raidReceiptsTo\(ws, sub, now\); \}/);
+  assert.match(idx, /g: raidSig\(led\), rc: led\.rc \?\? \{\} \}/);
+  const rp = rd('src/systems/raidingParties.js');
+  assert.match(rp, /const raidOfWord = \(key, g\) => \{ const r = raidByKey\(key\); return r && raidSigOf\(r\) === g \? r : null; \};/);
+  assert.match(rp, /for \(const \[key, , g\] of Array\.isArray\(f\.l\) \? f\.l : \[\]\) \{ const r = raidOfWord\(key, g\);/);
+  assert.match(rp, /const raid = raidOfWord\(f\.key, f\.g\);/);
+  const on = rd('src/net/online.js');
+  assert.match(on, /r\.k === 'cl' \|\| r\.k === 'rc' \? isCellRoom\(room\) \|\| isSocialRoom\(room\)/);
+  assert.match(on, /if \(!\(this\._mine\(cell\) \? this\.raidOk : halo\?\.raidOk\)\) return false;/);   // PIN MOVED (COST-2): my own room, or a cell my socket covers
+  assert.match(on, /else \{ const h = this\._halo\.get\(room\); if \(h\) h\.raidOk = relaySupportsRaid\(relayV\); \}/);
+  assert.match(rd('src/net/accountClient.js'), /claim: async \(receipt, character, name = null, cid = null\) =>/);
+  assert.match(rd('server-account/src/index.js'), /cid: body\.cid \?\? null \}/);
   assert.ok(readRaidReceipt, 'the relay reads its own receipts back');
 });

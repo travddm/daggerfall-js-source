@@ -46,6 +46,8 @@ test('RE1: the arm table is CreateFoeSpawner\'s arguments, per call site', () =>
   // row, so the table is the whole call-site list AND every row of it
   // drives something.
   assert.deepEqual({ ...SPAWNER_ARMS.cityGuards }, { minDistance: 12.8, maxDistance: 51.2, lineOfSightCheck: true });
+  assert.match(read('src/scenes/cityGuards.js'), /placeFoeFreely\(env, SPAWNER_ARMS\.cityGuards\)/,
+    'the guards row is the crime law\'s own band, read from the table');
 });
 
 test('RE1: THE DUNGEON ARM ALONE CLEARS THE LINE-OF-SIGHT CHECK', () => {
@@ -83,12 +85,103 @@ test('RE1: the roll hands its arm\'s WHOLE band to the host, not just a distance
   assert.equal(dungeon.lineOfSightCheck, false);
 });
 
+test('RE1: the exterior host stands its encounter through the ONE law', () => {
+  const world = read('src/scenes/world.js');
+  // the eight-point ring is gone
+  assert.equal(/eight compass points at the classic distance, terrain-landed/.test(world), false);
+  assert.equal(/const a = \(d \* Math\.PI\) \/ 4;/.test(world), false);
+  const at = world.indexOf('const _standEncounterFoe =');
+  assert.ok(at > 0, 'the stander exists');
+  const body = world.slice(at, world.indexOf('\n  };\n', at));   // WILD-ALERT: the whole stander (its placement roll grew it past a fixed window)
+  assert.match(body, /placeFoeFreely\(env, \{\n\s*minDistance: hit\.minDistance, maxDistance: hit\.maxDistance,\n\s*lineOfSightCheck: hit\.lineOfSightCheck,\n\s*\}\)/,
+    'all three of the arm\'s arguments are passed, not a hardcoded band');
+  assert.match(body, /fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI,/, 'fieldOfView() answers RADIANS');
+  assert.match(body, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet \?\? f\.feet, _placingPool, feet\)/,
+    'and the spot must be empty of the foes already standing - AUDIT PSCALE1 COUNT-3: and of those still arriving');
+  assert.match(body, /const fly = \(ENEMY_BASICS\[hit\.mobileType\]\?\.behaviour \?\? 'General'\) === 'Flying';/);
+  assert.match(body, /yaw: Math\.atan2\(feet\[0\] - spot\.x, feet\[2\] - spot\.z\)/, 'LookAt player');
+  assert.match(world, /_standEncounterFoe\(hit, playerFeet\);/, 'the tick calls it');
+});
+
+test('RE1: the dungeon host stands its rest interruption the same way, with its own flag', () => {
+  const dc = read('src/scenes/dungeonContext.js');
+  assert.equal(/const landed = foeDeps\.floorLanding\(collider, \[x, feet\[1\] \+ 1\.5, z\]\);/.test(dc), false,
+    'the eight-point ring is gone');
+  // PIN MOVED (RVN7d: a rest's revenant rides the same door - its record and its lair)
+  assert.match(dc, /async function _spawnEncounter\(\{ mobileType, minDistance, maxDistance, lineOfSightCheck \}, \{ feet = lastPlayerFeet, yaw = _motorYaw, shared = false, asked = null, revenant = null, lairStand = false \} = \{\}\)/,
+    'the whole band arrives from the roll (REST-SYNC re-aim: by the resting player\'s feet and look - a joiner\'s, when the host stands its ask; AUDIT III E1 re-aim: and the spot its placement found)');
+  assert.match(dc, /spot = placeFoeFreely\(env, \{ minDistance, maxDistance, lineOfSightCheck \}\);/);
+  assert.match(dc, /playerYawRad: yaw,/, 'the host\'s live look yaw, which both dungeon hosts report as cam.yaw (REST-SYNC: the asker\'s, by default this player\'s)');
+  assert.match(dc, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => foes, feet\)/, 'against THIS host\'s pool');
+  assert.match(dc, /if \(f\?\.ai\) f\.ai\.yaw = Math\.atan2\(feet\[0\] - spot\.x, feet\[2\] - spot\.z\);/, 'LookAt player');
+  // FinalizeFoe's fork, which the exterior stander also carries - a bat
+  // woken at rest hangs above the floor rather than standing on it
+  assert.match(dc, /const fly = \(ENEMY_BASICS\[mobileType\]\.behaviour \?\? 'General'\) === 'Flying';/);
+  assert.match(dc, /y: fly \? spot\.y \+ 1\.5 : spot\.y,/, 'the flier lift rides into the build record');
+  // the NT2 gender law survived the rewrite - it is the reason this
+  // call passes 'unspecified' rather than rolling one here
+  assert.match(dc, /gender: so\?\.gender \?\? 'unspecified',/);   // PIN MOVED (RVN7d: a returning person's own gender)
+  assert.match(dc, /no ad-hoc roll - buildFoeAt resolves an unspecified/);
+});
+
+test('RE1: both hosts bound the retry, and neither invented a second law', () => {
+  const world = read('src/scenes/world.js');
+  const dc = read('src/scenes/dungeonContext.js');
+  assert.match(dc, /const ENCOUNTER_PLACE_ATTEMPTS = 12;/);
+  assert.match(dc, /for \(let i = 0; i < ENCOUNTER_PLACE_ATTEMPTS && !spot; i\+\+\)/);
+  assert.match(world, /for \(let i = 0; i < LOOSE_FOE_PLACE_ATTEMPTS && !spot; i\+\+\)/);
+  // both import the shared ring rather than reimplementing it
+  for (const [name, src] of [['world.js', world], ['dungeonContext.js', dc]]) {
+    assert.match(src, /import \{ placeFoeFreely\b[^}]*\} from '\.\.\/systems\/quest\/sceneMount\.js'/, `${name} imports the law`);
+    assert.match(src, /placeFoeEnv/, `${name} uses the shared env adapter`);
+  }
+});
+
 // AUDIT OW5b E1 (Mac, 2026-09-28: "Need to get pullout of fast travel little sooner for encounters. U run thru them"):
 // the wanderer placed beside a walking traveller stops the journey THEN - the foe's loads and its real-time classic tick
 // came after twenty to a hundred times DFU's ground at the journey's scale. Lifted out of world.js and run.
 test('AUDIT OW5b E1: a wanderer PLACED beside the traveller asks the walking journey at once (after the stand is sent); nothing placed - the pool full, no spot - asks nothing; WILD-ALERT: a FAST traveller is asked only if the wanderer notices them on its first stealth check, and the foe stands alerted or checked accordingly (mutants: the roll skipped, the journey asked unnoticed)', async () => {
+  const world = read('src/scenes/world.js');
+  const at = world.indexOf('  const _standEncounterFoe = (hit, feet) => {');
+  assert.ok(at > 0, 'the stander is found');
+  const src = world.slice(at, world.indexOf('\n  };\n', at) + 5);
+  const run = ({ room = 8, spot = { x: 3, y: 0, z: 4 }, fast = false, die = 0.5 } = {}) => {
+    const order = [];
+    const wild = { alerted: [], checked: [] };
+    const scope = {
+      exteriorFoes: { encounterRoom: () => room, spawnFoe: (t) => { order.push(`spawn ${t}`); return Promise.resolve({ id: t }); } },
+      placeFoeEnv: () => ({}), collider: {}, cam: { yaw: 0 }, fieldOfView: () => 1, entityOccupancy: () => () => false, _placingPool: () => [],
+      LOOSE_FOE_PLACE_ATTEMPTS: 2, placeFoeFreely: () => spot, ENEMY_BASICS: {}, journeyMet: () => { order.push('met'); return 'stopped'; },
+      ambushNight: () => false,   // AUDIT REST-PARTY A1: a night running is told of the stand (none here)
+      campFeet: () => [], campPasses: (env) => [env],   // CAMP-ROLL (RE-AIMED): no camp - the one pass, DFU's (test/systems/camproll.test.js runs the camp's)
+      // WILD-ALERT: the traveller's pace and the roll
+      wildTravelling: () => fast, _inAnyLocationRect: () => false, noticeRoll, SIGHT_RADIUS, wildStealth: () => 50,
+      concealmentFlags: () => ({ invisible: false, blending: false, shade: false }), playerEntity: {},   // INVIS-SWING: the traveller unconcealed
+      wildFoes: { alert: (f) => wild.alerted.push(f.id), checked: (f) => wild.checked.push(f.id) },
+      Math: { ...Math, random: () => die, hypot: Math.hypot, atan2: Math.atan2 }, performance: { now: () => 0 },
+    };
+    const k = Object.keys(scope);
+    const stand = new Function(...k, `${src}\nreturn _standEncounterFoe;`)(...k.map((x) => scope[x]));
+    const out = stand({ mobileType: 7, minDistance: 10, maxDistance: 20, lineOfSightCheck: true }, [0, 0, 0]);
+    return { out, order, wild };
+  };
+  const placed = run();
+  assert.deepEqual(placed.order, ['spawn 7', 'met'], 'stood, then the journey asked');
+  assert.ok(placed.out instanceof Promise, 'the stand handed back');
+  await placed.out;
+  assert.deepEqual(placed.wild, { alerted: [], checked: [] }, 'no fast traveller: the alert law is not asked');
+  assert.deepEqual(run({ room: 0 }), { out: null, order: [], wild: { alerted: [], checked: [] } }, 'the encounter pool full: nobody comes, nothing stops');
+  assert.deepEqual(run({ spot: null }), { out: null, order: [], wild: { alerted: [], checked: [] } }, 'no spot: nobody comes, nothing stops');
   // five metres off at Stealth 50: the wanderer notices on a die under its notice chance
   const chance = noticeChance(5, SIGHT_RADIUS, 50);
   assert.ok(chance > 50 && chance < 100, `near: a likely notice (${chance})`);
+  const seen = run({ fast: true, die: 0 });
+  assert.deepEqual(seen.order, ['spawn 7', 'met'], 'noticed: the journey is met at once');
+  await seen.out;
+  assert.deepEqual(seen.wild, { alerted: [7], checked: [] }, 'and it stands alerted');
+  const missed = run({ fast: true, die: 0.9999 });
+  assert.deepEqual(missed.order, ['spawn 7'], 'unnoticed: it stands, and the journey runs on');
+  await missed.out;
+  assert.deepEqual(missed.wild, { alerted: [], checked: [7] }, 'checked and unaware - its next check a classic minute on');
 });
 

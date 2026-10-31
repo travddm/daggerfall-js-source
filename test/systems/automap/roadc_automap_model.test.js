@@ -439,7 +439,30 @@ test('c2/S1 the collider bucket filter is strictly additive (only/skip); no filt
 });
 
 test('c2/S1 SOURCE PINS: action doors leave the entry set, the rows carry DFU identity, the door bucket is distinct', () => {
+  const ctx = src('src/scenes/dungeonContext.js');
+  // the action-door push is GONE - DFU's automap copy has none
+  assert.equal(/automapEntries\.push\([^)]*worldAabb/.test(ctx), false, 'action doors no longer enter the automap entry set');
+  assert.match(ctx, /RDBLayout\.cs:625-627/, 'and the reason is recorded at the site');
+  assert.match(ctx, /automapEntries\.push\(amapRow\(/, 'every entry goes through the identity row builder');
+  assert.match(ctx, /elementName: ELEMENT_NAMES\[elementIndex\]/, 'the four-level identity rides as metadata');
+  assert.match(ctx, /isDoorBucket: \(k\) => \{ const o = actions\.objects\.get\(k\); return o\?\.kind === 'door' && !o\.special; \}/,
+    'the tick names the door bucket - and a SPECIAL door is not one (AUDIT-AMAP F3: RDBLayout filters by description, :751-765)');
+  assert.match(ctx, /isMovedBucket: \(k\) => \{ const o = actions\.objects\.get\(k\); return !!o && o\.state != null && o\.state !== 'start' && \(o\.kind !== 'door' \|\| !!o\.special\); \}/,
+    'and a MOVED action model blocks the scan (AUDIT-AMAP H7)');
+  assert.match(ctx, /bindAutomapLayout\(automapRec, automapModel\)/, 'the layout guard runs at mount');
 
+  // BUCKET DISTINCTNESS - the whole door discrimination rests on it.
+  // If a future change merges action geometry into the dungeon bucket
+  // the reveal law silently reverts to over-reveal.
+  const act = src('src/world/actionSystem.js');
+  assert.match(act, /this\.collider\.addMesh\(key, cpu\.positions, cpu\.indices, baseMatrix\)/, 'an action object registers under its OWN key');
+  assert.equal(/addMesh\('dungeon'/.test(act), false, 'no action object may join the dungeon bucket');
+  assert.match(ctx, /collider\.addMesh\('dungeon', cpu\.positions/, 'dungeon geometry is the one shared bucket');
+
+  // the reveal law itself must never fall back to a single ray
+  const am = src('src/systems/automap/automap.js');
+  assert.match(am, /HIT_DISTANCE_AGREEMENT = 0\.01/);
+  assert.match(am, /PROTECTION_RAYCAST_OFFSET = 0\.1/);
   assert.equal(PROTECTION_RAYCAST_OFFSET, 0.1);
   assert.equal(HIT_DISTANCE_AGREEMENT, 0.01);
 });

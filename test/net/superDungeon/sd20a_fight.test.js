@@ -39,9 +39,13 @@ import { sdTestKey, sdOneParty } from './sdParty.mjs';   // SD-PARTY: the rig's 
 sdOneParty();
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
+const W = read('src/scenes/world.js');
+const RELAY = read('server/src/index.js');
 const near = (a, b, e = 1e-9) => Math.abs(a - b) < e;
 const T0 = 1_800_000_000_000;
 const seeded = (s) => () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+/** A `function name(` of world.js's own, its text. */
+const fnOf = (name) => { const at = W.indexOf(`\n  function ${name}(`); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  }\n', at) + 4); };
 /** A fight in `s` with `n` fighters at `lv`, born at T0 - its Hollow's marks its own. */
 function fight(s = 4, n = 4, lv = 30) {
   const f = newRemnantFight(s, 1, T0, sdMarksOf(s));
@@ -112,7 +116,14 @@ test('SD20a THE ARENA HOLDS WHAT IT HAS TAKEN (F2): joined to a living fight and
   const held = realmArena(SD_ARENA_FLOORS).clamp(off);
   assert.ok(held && near(held[0], off[0], 1e-6) && near(held[1], oz + SD_ARENA.z - SD_ARENA.r, 1e-6), `held: back to the rim (${held})`);
   // the host: whether it holds me, from its own text
-   
+  const at = W.indexOf('\n  const sdArenaHeld = () => {'); assert.ok(at > 0);
+  const text = W.slice(at + 1, W.indexOf('\n  };\n', at) + 5);
+  const run = (joined, x, z) => new Function('sdFightLink', 'player', 'sdDungeonToRealm', 'arenaHolds', `${text}\nreturn sdArenaHeld();`)({ joined: () => joined }, { pos: realmToDungeon(x, 0, z) }, dungeonToRealm, arenaHolds);
+  assert.equal(run(true, SD_ARENA.x + 3, SD_ARENA.z - 20), true, 'joined, inside: held');
+  assert.equal(run(false, SD_ARENA.x + 3, SD_ARENA.z - 20), false, 'not joined: free');
+  assert.equal(run(true, SD_ARENA.x, SD_ARENA.z - SD_ARENA.r - 2), false, 'on the Steps: free');
+  assert.match(W, /const _realmArenaHeld = realmArena\(SD_ARENA_FLOORS\);/);
+  assert.match(W, /if \(!player\.arena && modes\?\.sdRealmSlot\?\.\(\) != null\) player\.arena = sdArenaHeld\(\) \? _realmArenaHeld : sdConcordHere\(\) \? _realmArenaBridged : _realmArena;/);
 });
 
 // ── F3: the hidden tab, the frozen page ─────────────────────────────────
@@ -189,6 +200,9 @@ test('SD20a A FROZEN PAGE IS ABSENT (F3): a fighter\'s pose in the Hour is stamp
     await cell.pose(mara, doorPose(11));
     assert.equal(cell.room._all().get(mara).pAt, undefined, 'a cell\'s pose: no stamp');
   });
+  // PIN MOVED (INT12): the census as the relay's count has it (net/bossBody.js bodyCensus) - read at the beat's own instant still
+  assert.match(RELAY, /bodies = this\._sdFightBodies\(f, now\), census = \(\) => bodyCensus\(f, bodies, now, line\.body, line\.enforce, \{ lives: raised \}\);/);   // PIN MOVED (AUDIT INT11): the bodies read once a beat, at its own instant still; PIN MOVED (SD-REZ): the raised alone rise
+  assert.match(RELAY, /this\._sdFightFan\(SD_SEAM\.step\(f, now, this\._bodiesBare\(census\(\)\), rand01\)\);/);   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
 });
 
 // ── F4: a blow strikes a fighter ───────────────────────────────────────
@@ -305,6 +319,7 @@ test('SD20a A PILLAR SHADES WHAT STANDS BELOW ITS TOP (F8): fourteen metres up, 
   };
   assert.deepEqual(rig(SD_PILLAR_H), { struck: [SD_BLOWS.hand.name], over: true });
   assert.deepEqual(rig(0, 1.25), { struck: [], over: false });
+  assert.match(W, /sdPerilAt\(s, now, x - SD_ARENA\.x, z - SD_ARENA\.z, cam\.yaw, !!sdBlows\?\.over\?\.\(\)\)/);
 });
 
 test('SD20a THE HEARTS\' FLOOR (F9): never more than one second of the living\'s damage - a lone fighter at level one met three Hearts of 20, ten seconds of its damage in the 7.5 they stand, and every Reset landed; its three are three seconds now, and a strong fighter\'s floor is SD_HEART.min as ever (mutant: the old floor)', () => {
@@ -320,3 +335,29 @@ test('SD20a THE HEARTS\' FLOOR (F9): never more than one second of the living\'s
 
 // ── F10: the Hour's own costs ──────────────────────────────────────────
 
+test('SD20a THE HOUR\'S COSTS ARE SETBACKS (F10): the void\'s cast-back and the Orrery\'s lash take their share, no shield taking it, and leave a body at one - never the death that ends a Hollow with one life a Hollow; the death presenter is never reached (mutants: the void kills; the lash kills)', () => {
+  let died = 0;
+  setDeathPresenter(() => { died++; });
+  setAvoidDeathHook(() => false);
+  try {
+    const e = { health: 10, maxHealth: 100, activeEffects: [] };
+    const said = [];
+    const cast = new Function('playerEntity', 'hurtPlayer', 'flashPlayerDamage', 'SD_CAST_BACK_LOSS', 'sdSay', 'SD_STEPS_TEXT', `${fnOf('sdCastBack')}\nreturn sdCastBack;`)(e, hurtPlayer, () => {}, SD_CAST_BACK_LOSS, (t) => said.push(t), { cast: 'cast back' });
+    cast();
+    assert.deepEqual([e.health, died], [1, 0], 'the void: at one');
+    cast();
+    assert.deepEqual([e.health, died], [1, 0], 'and again: at one');
+    const g = { health: 5, maxHealth: 100, activeEffects: [] };
+    const [hx, , hz] = realmToDungeon(0, 0, 0);
+    const env = {
+      modes: { sdRealmSlot: () => 4 }, sdSay: () => {}, sdDungeonToRealm: () => [0, 0, 0], player: { pos: [hx, 0, hz] }, playerEntity: g,
+      inOrreryHall: () => true, SD_FRAY_LASH, hurtPlayer, flashPlayerDamage: () => {}, online: { id: 'peer-me' },
+      SD_HALL_TEXT: { snap: 'The Hour snaps back.' }, SD_TURN_WAIT_LINE: 'wait',
+      sdHallNamed, sdSnapLine, peerName: () => null,   // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the hall's word named off the roster
+    };
+    const heard = new Function(...Object.keys(env), `let _sdHall = null;\n${fnOf('sdHallHeard')}\nreturn sdHallHeard;`)(...Object.values(env));
+    assert.ok(Math.round(100 * SD_FRAY_LASH) >= 5, 'a lash that would kill');
+    heard({ k: 'pz', s: 4, st: [0, 0, 0, 0, 0, 0], f: 0, lit: 0, ok: false, i: 0, a: 1, id: 'peer-x', q: 48, x: 1, ls: ['peer-me'] });
+    assert.deepEqual([g.health, died], [1, 0], 'the lash: at one');
+  } finally { setDeathPresenter(null); setAvoidDeathHook(null); }
+});

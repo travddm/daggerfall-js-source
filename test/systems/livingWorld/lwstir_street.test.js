@@ -519,6 +519,8 @@ test('LW-STIR on the street: an incident takes its two out of the round\'s circl
   const inc = { kind: 'quarrel', spot: 'sq', members: [x, y], anchor: 1, guard: g, mood: null, script, seed: 9, round: 0, t0: H(10), from: H(10) + GATHER, end: H(10) + GATHER + script.length * LINE + AFTER, loudFrom: H(10) + GATHER + 2 * LINE };
   const at = inc.from + (QUARREL_SCRIPTS[1].length + 0.5) * LINE;
   assert.equal(stirLine(inc, at, LINE, ctx).who, g);
+  assert.match(rd('src/systems/livingWorld/livingTown.js'), /if \(inc\.guard && !absent\.has\(inc\.guard\.id\)\) this\._stirVoice\.set\(inc\.guard\.id, inc\);/, 'the watch\'s voice, while it is on this street');
+  assert.match(rd('src/systems/livingWorld/livingTown.js'), /const inc = own \?\? this\._stirVoice\.get\(id\) \?\? null;/, 'heard by its own row');
 });
 
 test('LW-STIR the places before (meetups.js besideStand, aloneStands `beside`): the one who comes stands FACE_M before the one who keeps their stand - the way they face, else a step of arc about them - SPACE_M from every place taken, on the street with nothing between; laid at their own turn, or just after the one they come to where that one comes after them; the rest laid as they were, none on another (mutants: the way they face, the arc, the turn, the wait)', () => {
@@ -575,6 +577,11 @@ test('LW-STIR every reader alike: two readers of a town - one stood through the 
 });
 
 test('LW-STIR the host: the street\'s words reach the one layer as they are said - a shout a shout, a song a song (world.js livingLinePoints: the kind passed through; ui/naval/navalHud.js draws each its own way); a room\'s talk is talk (FLAGGED: no incident indoors yet)', () => {
+  const w = rd('src/scenes/world.js');
+  assert.match(w, /name: livingRelations\.known\(id\) \? firstNameOf\(l\.person\.nameNPC\) : null, who: key, kind: l\.kind \?\? 'talk', distance: d \}\);   \/\/ LW-STIR: a shout, a song/);
+  assert.match(rd('src/ui/naval/navalHud.js'), /\.dfnaval-say\.sing \{/);
+  assert.match(rd('src/ui/naval/navalHud.js'), /\.dfnaval-say\.shout \{/);
+  assert.match(w, /points\.push\(\{ x: at\.x, y: at\.y, text: l\.text, who: key, kind: 'talk', distance: d, name: livingRelations\.known\(id\) \? firstNameOf\(l\.person\.nameNPC\) : null \}\);/, 'a room\'s talk');
   assert.equal(BUILDING_TYPES.Tavern, 15);
 });
 

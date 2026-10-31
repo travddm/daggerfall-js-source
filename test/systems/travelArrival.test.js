@@ -23,6 +23,24 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (f) => readFileSync(join(ROOT, f), 'utf8');
 
 test('TL3: the fast-travel arrival takes DFU\'s reposition - the start marker or the edge, never the pixel\'s centre - so TL2\'s roof guard is live on it', () => {
+  const w = read('src/scenes/world.js');
+  const fn = w.slice(w.indexOf('async function fastTravelTo('), w.indexOf('\n  }\n', w.indexOf('async function fastTravelTo(')));   // AUDIT 68: to the function's own close - a fixed 4000 characters broke on one added line (WOD4's lesson below)
+  // AUDIT 64 F18 (integrated the same day): the method is DFU's own
+  // DirectionFromStartMarker (DaggerfallTravelPopUp.cs:334) with the
+  // cached departure as the facing hint; SIB2's travel event rides too.
+  assert.match(fn, /await _teleportToPixel\(pick\.pixel\.x, pick\.pixel\.y, null,\s*\n\s*\{ arriveMinutes: sharedClockOn\(\) \? skyMinutes\(\) : worldMinutes\(\) \+ computed\.minutes,[^\n]*\n\s*reposition: REPOSITION\.DirectionFromStartMarker,\s*\n\s*travelStart, modEvent: 'travel',\s+resolveArrival:/, 'the arrival asks for the start-marker landing');
   assert.equal(REPOSITION.DirectionFromStartMarker, 'DirectionFromStartMarker');
   assert.equal(REPOSITION.RandomStartMarker, 'RandomStartMarker');
+  // the teleport core: the landing is computed only for that method, the default point is the pixel's centre,
+  // and the roof guard runs only with a landing - which the arrival now always has
+  const core = w.slice(w.indexOf('async function _teleportToPixel('), w.indexOf('\n  }\n', w.indexOf('async function _teleportToPixel(')));   // WOD4: to the function's own close - a fixed 9000 characters broke on one added line
+  assert.match(core, /const wantsLanding = reposition === REPOSITION\.RandomStartMarker\s*\n\s*\|\| reposition === REPOSITION\.DirectionFromStartMarker;/, 'both marker methods take the landing arm (StreamingWorld.cs:279-282)');
+  assert.match(core, /const landing = wantsLanding \? locationLandingFor\(px, py, \{ travelStart: hint \}\) : null;/);
+  assert.match(core, /const raw = local \?\? \[TERRAIN_SIZE \/ 2, dest\.centerHeight \+ state\.compensation\[1\] \+ 2, TERRAIN_SIZE \/ 2\];/, 'the default point is the centre of the pixel - the town\'s middle');
+  assert.match(core, /if \(walkMode && landing && pos\[1\] - raw\[1\] > OBSTRUCTED_ABOVE\) \{/, 'TL2\'s guard, gated on the landing');
+  assert.match(core, /if \(landing\) cam\.yaw = landing\.yaw;/, 'and the facing lands with the position');
+  // the three arms DFU sends through PositionPlayerToLocation all ask for it now: the court release, the ship, the travel
+  assert.match(w, /_teleportToPixel\(px\.x, px\.y, null, \{ reposition: REPOSITION\.RandomStartMarker \}\)/, 'the court release asks for it the same way');
+  assert.ok((w.match(/REPOSITION\.RandomStartMarker/g) || []).length >= 3, 'the landing test, the court release and the guild teleport (the ship\'s arm carries its own name; the travel is DirectionFromStartMarker)');
+  assert.match(read('src/world/locationEntrance.js'), /FIVE callers reach the arm in DFU, and they are not one caller:[\s\S]{0,600}DaggerfallTravelPopUp\.cs:334 \(the\s*\n\/\/ fast-travel arrival\)/, 'the record names the travel among the owed callers (AUDIT 64 F18/F19 counted all five)');
 });

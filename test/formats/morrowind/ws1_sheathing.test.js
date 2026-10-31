@@ -363,3 +363,59 @@ test('WS1: the vendored archive duck and its canonical paths; the bone-source li
   assert.equal(mwLoosePath('Data Files/Animations/xbase_anim/xbase_anim_sh.nif'), 'animations/xbase_anim/xbase_anim_sh.nif');
 });
 
+test('WS1: the wiring, by source - the third-person build takes the addons and the holster, the swap re-resolves it, the three hide sites, the options, the pref, the card, the data path, the build', () => {
+  const fp = rd('src/combat/fpArm.js');
+  assert.match(fp, /const boneSourcePaths = werewolf \? \[\] : boneSourcesFor\(TP_BASE_MODEL, skeletonPath, archives\);/);
+  // PIN MOVED (MWNPC3): the binder takes the shared parse too
+  // PIN MOVED (TWO-HANDS AUDIT): and asks for the left hand's weapon bone - made by the mirror after the addons, where the
+  // skeleton (with them) has none
+  assert.match(fp, /let arm = await assembleFirstPersonArm\(\{ skeletonBytes, parts: partBytes, boneSources, parseNif: parseNifOnce, offWeaponBone: true \}\);/);   // PIN MOVED (HEAD-HELD, FIELD BUGS 2026-10-12b): `let` - a helm that bound nothing assembles it again
+  assert.match(fp, /hasBone: boneProbe\(skeletonBytes, boneSources\), parseNif: parseNifOnce,/);
+  assert.match(fp, /ammoCount: ammoCount \?\? \(hasAmmo \? Number\.MAX_SAFE_INTEGER : 0\),/g);
+  assert.equal((fp.match(/ammoCount: ammoCount \?\? \(hasAmmo \? Number\.MAX_SAFE_INTEGER : 0\),/g) || []).length, 2, 'the build and the swap');
+  assert.match(fp, /const swapped = new Set\(\['weapon', 'arrow', \.\.\.HOLSTER_SLOTS\]\);/);
+  assert.match(fp, /bindPartsInto\(t\.arm, \[\.\.\.tResolved\.parts, \.\.\.tHolster\.parts\]\);/);
+  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, weaponShown, \{ arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the world draw, with the round on the string');
+  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, true, \{ arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the portrait: the weapon is in the hand');
+  assert.match(rd('src/systems/weaponSheathingAssets.js'), /\{ eager: true, query: '\?url', import: 'default' \}/, 'AUDIT-WS: the table is eager - no chunk per file');
+  assert.match(fp, /sheathing = true, ammoCount = null,/);
+  const rig = rd('src/combat/weapon/weaponRig.js');
+  assert.match(rig, /sheathing: getPref\('mwSheathing'\),/); assert.match(rig, /ammoCount: ammoCountFor\(entity\.items, worn\),/);
+  const feat = rd('src/systems/features.js');
+  assert.match(feat, /id: 'mod-weapon-sheathing',/);
+  // MODS-ONLINE-3 (2026-09-22, Mac): the online answer is the PLAYER's
+  // now. It was forced "so every body a peer sees wears its blade the
+  // same way" - a claim about how MY machine DRAWS someone else, which
+  // is `peerClassSprites`'s category and has always been the player's.
+  // A scabbard stands no object, rolls nothing and never reaches the
+  // wire; the pose's `wd` carries a peer's drawn weapon either way.
+  assert.match(feat, /control: Object\.freeze\(\{ store: 'prefs', key: 'mwSheathing', initial: true, online: 'player' \}\),/, 'RF4: the switch declared once, on its row, on by default, and the player\'s online');
+  assert.ok(!/mwSheathing: (true|false),/.test(rd('src/systems/uiPrefs.js')), 'and not on the shelf');
+  // FT18: the card's own row drew NOTHING since FT13 (a moved key's prefRow answers null, and the bare append printed
+  // "null" on the card) - the switch is the tile, and the tile's write rebuilds the standing body, as the row did
+  const menu = rd('src/ui/enhanced/enhancedMenu.js');
+  assert.doesNotMatch(menu, /prefRow\('mwSheathing'/, 'no second switch, and no null on the card');
+  // MW-STEEL1: the rebuild is one helper now, the Steel Helm's tile beside the sheathing's
+  assert.match(menu, /const rebuildMorrowindBody = async \(\) => \{\s*\n\s*if \(!morrowindDataCount\(\) \|\| !playerEntity\?\.chargenDone\) return;[^\n]*\n\s*const \{ buildArmsFor \} = await import\('\.\.\/\.\.\/combat\/weapon\/weaponRig\.js'\);\s*\n\s*await buildArmsFor\(playerEntity\);/, 'the tile rebuilds the holster into a standing body');
+  assert.match(menu, /\n  mwSheathing: rebuildMorrowindBody,\n/, 'the sheathing tile takes that rebuild');
+  assert.match(menu, /set: \(i\) => \{ setPref\(c\.key, i === 1\); TILE_AFTER\[c\.key\]\?\.\(\); \} \};/, 'through the prefs switch\'s one write');
+  const ds = rd('src/scenes/dataSource.js');
+  const loosePush = ds.indexOf('archives.push(makeLooseArchive(loose));');
+  const vendPush = ds.indexOf('archives.push(ws.weaponSheathingArchive());');
+  const bsaPush = ds.indexOf('archives.push(await MwBsaFile.open(blob));');
+  assert.ok(loosePush > 0 && vendPush > loosePush && bsaPush > vendPush, 'loose, then vendored, then the .bsa archives');
+  assert.match(ds, /'animations\/'\]/);
+  // INLINE1 (2026-09-20): this pin matched the allow-list's literal text -
+  // `eye-of-the-beholder|immersive-footsteps|weapon-sheathing` - which is the
+  // enumeration INLINE1 retired. Re-aimed at what it MEANS: this mod's art is
+  // never inlined, through the real rule; and a folder no list has ever named
+  // is refused too, so the pin goes red if the enumeration ever comes back.
+  const vite = rd('vite.config.js');
+  const m = /assetsInlineLimit: \(filePath\) => \((.*?)\),/.exec(vite);
+  assert.ok(m, 'the inline rule is a callback');
+  // eslint-disable-next-line no-new-func
+  const rule = new Function('filePath', `return (${m[1]});`);
+  assert.equal(rule('/x/vendor/weapon-sheathing/Textures/a.png'), false, 'this mod\'s art is a file, never base64');
+  assert.equal(rule('/x/vendor/a-mod-no-list-has-named/a.png'), false, 'and so is every mod\'s - the rule is the class (test/ui/vendorinline.test.js walks it)');
+  assert.match(rd('src/formats/morrowind/mwFirstPerson.js'), /if \(part\.slot === 'sheath'\) sheathBoneOffset = bound\.boneOffset \|\| null;/);
+});
