@@ -182,8 +182,8 @@
   {
     "name": "ICS-need-asked-every-frame",
     "file": "src/world/imperialPrebuildClient.js",
-    "old": "        if (held.has(k) || failed.has(k) || asked.has(k)) continue;",
-    "new": "        if (held.has(k) || failed.has(k)) continue;",
+    "old": "(k) => !held.has(k) && !failed.has(k) && !asked.has(k));",
+    "new": "(k) => !held.has(k) && !failed.has(k));",
     "tests": [
       "test/world/ic_stutter.test.js"
     ],

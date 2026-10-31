@@ -2918,6 +2918,23 @@ flights, the sweep's findings held, every building's door kept); the moved pins 
 and `test/world/icgrand_fabric.test.js` (PIN MOVED (IC-STAIRS)). Mutants: `tools/mutants/icstairs.json` (32);
 `icbld.json` re-aimed by content.
 
+## CITY-IDLE - the Imperial City's workers let go when idle (2026-10-31)
+
+The city's prebuild workers (IC-STUTTER's pool) cost the renderer about 0.4-0.5 GB each. They started after the city's
+121 slices were built and then stood with nothing to make for as long as the player stayed in the city's reach. The
+roads' pool has let its workers go when idle since R4; the city's pool now does the same
+(`world/prebuildIdleRelease.js`, wired by `world/imperialPrebuildClient.js`).
+
+- **Idle**: a worker says `idle` with the count of messages it heard. The page counts it idle only once it heard every
+  message, so an idle sent before its latest want does not let it go.
+- **Release**: with every worker idle and no need out, the workers go after `PREBUILD_IDLE_MS` (10 s). Departure from
+  R4, which lets the roads' workers go at once: a roads build has one end, but the city's wants come and go as the
+  player moves, and a short pause should not cost each worker its start again.
+- **Again**: the next new want or need makes the workers again. Each is told what is made (`done`) and the last want.
+  `alive` stays true, so the stream still waits for the workers and does not make the pieces on the page's thread.
+
+`PREBUILD_POOL_MAX` stays 3. Pins: `test/world/cityidle.test.js` (4), mutants `tools/mutants/cityidle.json` (10).
+
 ## Pins
 
 `test/world/audittesa2c_capitals.test.js` (16, AUDIT TESA II lane C): the rim (eleven tiles, 70.4 m, the span's outer

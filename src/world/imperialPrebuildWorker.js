@@ -5,18 +5,18 @@
 // made, its buffers moved, not copied.
 //
 // Messages in:
-//   {t: 'want', slices: [{s, near}]} - the slices wanted now, in order; it replaces the last list (what is no longer
-//     wanted is not made), and a piece the page has already made is skipped
+//   {t: 'want', slices: [{s, near}]} - the slices wanted now, in order, replacing the last list; a piece made is skipped
 //   {t: 'made', key} - a piece the page made itself ('b:<name>' or 'm:<id>'): never made here
 //   {t: 'need', keys} - IC-STUTTER: pieces a build is waiting on ('b:<name>' or 'm:<id>'), made before the wanted list -
 //     made again even where made before (the page let its copy go), in the order asked; a new list never drops them
+//   {t: 'done', keys} - CITY-IDLE: pieces made before this worker stood (by the one it replaces, or the page): not made
 // Messages out:
 //   {t: 'block', name, json} - a block's JSON, its automap's buffer moved
 //   {t: 'model', id, model} - a model (null: none in that cell), its buffers moved
 //   {t: 'error', key, message} - a piece that threw (the page makes it itself)
+//   {t: 'idle', heard} - CITY-IDLE: nothing left to make, after `heard` messages in (world/prebuildIdleRelease.js)
 //
-// Pure modules only (no ui/, scenes/, render/) - a worker has no DOM. The state machine is exported for the pins and for
-// the page's own fallback (world/imperialPrebuildClient.js).
+// Pure modules only (no ui/, scenes/, render/): a worker has no DOM. The state is exported for the pins and the page.
 import { sliceWork, prebuildDeps, makeWork, modelTransfers } from './imperialPrebuild.js';
 import { installCapitals, imperialSliceFootprint, isImperialPartId } from './capitalModels.js';   // IC-FOOTPRINT-OFF-THREAD
 import { customModelFor } from './customModels.js';
@@ -51,6 +51,9 @@ export function createPrebuildWorkerState(post) {
     on(msg) {
       if (msg?.t === 'want') { queue = (msg.slices ?? []).flatMap(({ s, near }) => sliceWork(s, !!near)).filter((w) => !done.has(keyOf(w))); }
       else if (msg?.t === 'made' && msg.key) { mark(msg.key); queue = queue.filter((w) => keyOf(w) !== msg.key); needs = needs.filter((w) => keyOf(w) !== msg.key); }
+      else if (msg?.t === 'done') {
+        for (const key of msg.keys ?? []) mark(key);
+      }
       else if (msg?.t === 'need') {
         const has = new Set(needs.map(keyOf));
         for (const w of (msg.keys ?? []).map(workOfKey)) {
@@ -95,6 +98,16 @@ if (typeof G.WorkerGlobalScope !== 'undefined' && G instanceof G.WorkerGlobalSco
   const scope = G;
   const state = createPrebuildWorkerState((m, transfer) => scope.postMessage(m, transfer ?? []));
   let running = false;
-  const run = () => { running = false; if (state.step()) { running = true; setTimeout(run, 0); } };
-  scope.onmessage = (/** @type {MessageEvent} */ e) => { state.on(e.data); if (!running) { running = true; setTimeout(run, 0); } };
+  // CITY-IDLE: the messages heard so far, said with `idle` so the page can tell an idle from before its latest message
+  let heard = 0;
+  const run = () => {
+    running = false;
+    if (state.step()) {
+      running = true;
+      setTimeout(run, 0);
+    } else {
+      scope.postMessage({ t: 'idle', heard });
+    }
+  };
+  scope.onmessage = (/** @type {MessageEvent} */ e) => { heard++; state.on(e.data); if (!running) { running = true; setTimeout(run, 0); } };
 }

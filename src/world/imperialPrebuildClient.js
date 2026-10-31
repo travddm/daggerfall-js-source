@@ -18,6 +18,8 @@
 // a piece asks it (`need`: made before every wanted piece, even one made before and let go) and the stream builds the
 // slice once it is held (scenes/capitalPrebuild.js readyToBuild) - the page makes none of the city while a worker stands.
 import { setImperialPrebuild, imperialPrebuilt, pieceSlice } from './imperialPrebuild.js';
+import { DONE_KEEP } from './imperialPrebuildWorker.js';
+import { createIdleRelease, PREBUILD_IDLE_MS, laterTimeout } from './prebuildIdleRelease.js';
 
 /** The city's worker, as Vite bundles it - `new Worker(new URL(...))` in exactly that spelling. */
 export function defaultPrebuildWorker() {
@@ -39,42 +41,87 @@ export function prebuildPoolSize(cores = globalThis.navigator?.hardwareConcurren
 }
 
 /**
- * @param {{ makeWorker?: () => any, keep?: number, log?: { warn: Function }, workers?: number }} [o] - IC-STUTTER: `workers`
- *   the pool's size (prebuildPoolSize)
+ * @param {{ makeWorker?: () => any, keep?: number, log?: { warn: Function }, workers?: number, idleMs?: number,
+ *   later?: (fn: () => void, ms: number) => () => void }} [o] - IC-STUTTER: `workers` the pool's size (prebuildPoolSize).
+ *   CITY-IDLE: `idleMs` how long idle workers stand, `later` the timer (world/prebuildIdleRelease.js).
  */
-export function createImperialPrebuild({ makeWorker = defaultPrebuildWorker, keep = PREBUILD_KEEP, log = console, workers: size = prebuildPoolSize() } = {}) {
-  /** @type {any[]} */
+export function createImperialPrebuild({ makeWorker = defaultPrebuildWorker, keep = PREBUILD_KEEP, log = console, workers: size = prebuildPoolSize(), idleMs = PREBUILD_IDLE_MS, later = laterTimeout } = {}) {
+  /** The workers standing now - none after an idle release (CITY-IDLE), made again by the next want or need.
+   *  @type {any[]} */
   const pool = [];
-  for (let i = 0; i < Math.max(1, size); i++) {
-    try { pool.push(makeWorker()); } catch (e) { if (!pool.length) log.warn('[imperial] no worker for the city\'s blocks - they are made on the page\'s thread', e); break; }
-  }
+  /** CITY-IDLE: false once no worker can run (none could be made, one failed, or the client was let go). The page then
+   *  makes every piece itself, as it always did. */
+  let usable = true;
   /** @type {Map<string, any>} */
   const held = new Map();
   const put = (k, v) => { held.delete(k); held.set(k, v); if (held.size > keep) held.delete(/** @type {string} */ (held.keys().next().value)); };
   /** IC-STUTTER: the pieces asked for and not yet back, and the ones a worker could not make (the page makes those). */
   const asked = new Set(), failed = new Set();
+  /** CITY-IDLE: the pieces made lately, by a worker or the page. A worker made again is told them, so it does not make
+   *  them twice: its own record went with the worker it replaces. */
+  const done = new Set();
+  const markDone = (/** @type {string} */ key) => {
+    done.delete(key);
+    done.add(key);
+    if (done.size > DONE_KEEP) done.delete(/** @type {string} */ (done.values().next().value));
+  };
+  /** CITY-IDLE: the last want, said again to workers made after an idle release. @type {Array<{ s: number, near: boolean }>} */
+  let lastSlices = [];
   let lastWant = '', taken = 0, missed = 0;
-  const stop = () => { for (const w of pool) { try { w?.terminate?.(); } catch { /* gone */ } } pool.length = 0; held.clear(); asked.clear(); failed.clear(); };
   /** IC-STUTTER: the worker a slice's pieces are made on. @param {number} s */
   const ownerOf = (s) => pool[(((s | 0) % pool.length) + pool.length) % pool.length];
-  for (const worker of pool) {
-    worker.onmessage = (/** @type {MessageEvent} */ e) => {
-      const m = e.data;
-      if (m?.t === 'block' && m.json) { put(`b:${m.name}`, m.json); asked.delete(`b:${m.name}`); }
-      else if (m?.t === 'model') { put(`m:${m.id}`, m.model ?? null); asked.delete(`m:${m.id}`); }
-      else if (m?.t === 'error' && m.key) { asked.delete(m.key); failed.add(m.key); }   // IC-STUTTER: never waited on for ever - the page makes it
-    };
-    worker.onerror = (/** @type {any} */ e) => { log.warn('[imperial] the city\'s worker failed - its blocks are made on the page\'s thread', e?.message ?? e); stop(); };
-  }
+  const shareOf = (/** @type {any} */ worker, /** @type {Array<{ s: number, near: boolean }>} */ slices) => (pool.length === 1 ? slices : slices.filter((w) => ownerOf(w.s) === worker));
+  const letWorkersGo = () => {
+    idleRelease.forget();
+    for (const w of pool) { try { w?.terminate?.(); } catch { /* gone */ } }
+    pool.length = 0;
+  };
+  const idleRelease = createIdleRelease({ workers: () => pool, waiting: () => asked.size > 0, release: letWorkersGo, idleMs, later });
+  const post = (/** @type {any} */ worker, /** @type {any} */ message) => {
+    idleRelease.posted(worker);
+    worker.postMessage(message);
+  };
+  const stop = () => { letWorkersGo(); held.clear(); asked.clear(); failed.clear(); };
+  /** CITY-IDLE: the workers made, if none stand - each told what is made and the last want. False when no worker can run. */
+  const stand = () => {
+    if (!usable) return false;
+    if (pool.length) return true;
+    for (let i = 0; i < Math.max(1, size); i++) {
+      let worker;
+      try { worker = makeWorker(); } catch (e) { if (!pool.length) log.warn('[imperial] no worker for the city\'s blocks - they are made on the page\'s thread', e); break; }
+      worker.onmessage = (/** @type {MessageEvent} */ e) => {
+        const m = e.data;
+        if (m?.t === 'block' && m.json) { put(`b:${m.name}`, m.json); asked.delete(`b:${m.name}`); markDone(`b:${m.name}`); }
+        else if (m?.t === 'model') { put(`m:${m.id}`, m.model ?? null); asked.delete(`m:${m.id}`); markDone(`m:${m.id}`); }
+        else if (m?.t === 'error' && m.key) { asked.delete(m.key); failed.add(m.key); }   // IC-STUTTER: never waited on for ever - the page makes it
+        else if (m?.t === 'idle') idleRelease.saidIdle(worker, m.heard);
+      };
+      worker.onerror = (/** @type {any} */ e) => { log.warn('[imperial] the city\'s worker failed - its blocks are made on the page\'s thread', e?.message ?? e); usable = false; stop(); };
+      idleRelease.stood(worker);
+      pool.push(worker);
+    }
+    if (!pool.length) {
+      usable = false;
+      return false;
+    }
+    for (const worker of pool) {
+      if (done.size) post(worker, { t: 'done', keys: [...done] });
+      if (lastSlices.length) post(worker, { t: 'want', slices: shareOf(worker, lastSlices) });
+    }
+    return true;
+  };
+  stand();
   const client = {
     /** The slices wanted now, in order (`[{ s, near }]`) - said to the worker when the list changes; IC-STUTTER: each
      *  worker its own slices' share, in the same order. */
     want(/** @type {Array<{ s: number, near: boolean }>} */ slices) {
-      if (!pool.length) return;
+      if (!usable) return;
       const k = slices.map((w) => `${w.s}${w.near ? 'n' : 'f'}`).join(',');
       if (k === lastWant) return;
       lastWant = k;
-      for (const worker of pool) worker.postMessage({ t: 'want', slices: pool.length === 1 ? slices : slices.filter((w) => ownerOf(w.s) === worker) });
+      lastSlices = slices;
+      if (!pool.length) { stand(); return; }   // CITY-IDLE: workers made again are told this want as they stand
+      for (const worker of pool) post(worker, { t: 'want', slices: shareOf(worker, slices) });
     },
     /** A block's JSON the worker made, handed over once - or null (the page makes it, and the worker is told). */
     takeBlock(/** @type {string} */ name) {
@@ -95,30 +142,34 @@ export function createImperialPrebuild({ makeWorker = defaultPrebuildWorker, kee
       return v;
     },
     /** A piece the page made itself: the worker skips it. */
-    made(/** @type {string} */ key) { failed.delete(key); asked.delete(key); if (pool.length) ownerOf(pieceSlice(key) ?? 0).postMessage({ t: 'made', key }); },
+    made(/** @type {string} */ key) { failed.delete(key); asked.delete(key); markDone(key); if (pool.length) post(ownerOf(pieceSlice(key) ?? 0), { t: 'made', key }); },
     /** IC-STUTTER: whether a piece is ready for the page to take without making it - held, or one no worker could make
      *  (the page makes that one, as ever). */
     has: (/** @type {string} */ key) => held.has(key) || failed.has(key),
     /** IC-STUTTER: pieces a build is waiting on, asked of their slices' workers once (`asked` until each comes back) -
      *  made before any wanted piece. */
     need(/** @type {string[]} */ keys) {
-      if (!pool.length) return;
+      const fresh = [...new Set(keys)].filter((k) => !held.has(k) && !failed.has(k) && !asked.has(k));
+      if (!fresh.length) return;
+      if (!stand()) return;   // CITY-IDLE: workers let go while idle are made again for a need
       /** @type {Map<any, string[]>} */
       const by = new Map();
-      for (const k of keys) {
-        if (held.has(k) || failed.has(k) || asked.has(k)) continue;
+      for (const k of fresh) {
         asked.add(k);
+        done.delete(k);   // made again: the page let its copy go
         const w = ownerOf(pieceSlice(k) ?? 0);
         if (!by.has(w)) by.set(w, []);
         /** @type {string[]} */ (by.get(w)).push(k);
       }
-      for (const [w, ks] of by) w.postMessage({ t: 'need', keys: ks });
+      for (const [w, ks] of by) post(w, { t: 'need', keys: ks });
     },
     /** The worker let go (out of the city's reach): nothing held, nothing wanted. */
-    dispose() { stop(); lastWant = ''; if (imperialPrebuilt() === client) setImperialPrebuild(null); },
+    dispose() { usable = false; stop(); lastWant = ''; lastSlices = []; if (imperialPrebuilt() === client) setImperialPrebuild(null); },
     get held() { return held.size; },
-    get alive() { return pool.length > 0; },
-    /** IC-STUTTER: the pool's size, and the pieces asked for and not yet back. */
+    /** CITY-IDLE: whether workers make the city's pieces - true while they stand or can be made again after an idle
+     *  release, so the stream waits for them and does not make the pieces on the page's thread. */
+    get alive() { return usable; },
+    /** IC-STUTTER: the pool's size (CITY-IDLE: none after an idle release), and the pieces asked for and not yet back. */
     get workers() { return pool.length; },
     get asked() { return asked.size; },
     /** The pieces handed over, and the ones asked before the worker made them (the probe's read). */
