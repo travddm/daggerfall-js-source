@@ -72,7 +72,7 @@ async function stand({ open = 'on', developers = 'Devra' } = {}) {
   const gate = await gatePair();
   const env = {
     DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', GATE_PUBLIC_KEY: gate.pub,   // MERGE 2: SAVES, the realm's records
-    MARKS_OPEN: open, DEVELOPER_HANDLES: developers,
+    MARKS_OPEN: open,
   };
   const call = async (path, body, bearer = null, method = 'POST') => {
     const res = await worker.fetch(new Request(`https://accounts.invalid${path}`, {
@@ -86,6 +86,7 @@ async function stand({ open = 'on', developers = 'Devra' } = {}) {
   const registered = async (handle, { character = `char-${handle.toLowerCase()}`, renown = 1 } = {}) => {
     const g = await guest();
     assert.equal((await call('/v1/auth/register', { handle, password: 'a good long one', ...ACCEPTED }, g.secret)).status, 200, `${handle} registers`);
+    if (developers.split(',').includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(g.id);   // STAFF-ROLES-BY-ACCOUNT: Admin is the account's role, not a list
     if (renown > 1) {
       // RENOWN-CHAR: the character's own track again (MERGE 2 had seeded RENOWN-ACCOUNT's one track an account)
       env.DB._raw.prepare('INSERT OR REPLACE INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')

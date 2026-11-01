@@ -51,7 +51,7 @@ const HOT = (character) => [
 test('SESSION-SIGN the oracle: every hot route answers under a pass exactly as under the lookup - for a guest, an account, a developer, a newcomer a week can not yet witness and a muted one, with the switches on and at `dev`, in a town with a home - and asks no lookup; the first ask, the lookup\'s, hands the pass back, exposed to the page; a banned account is handed none (mutants: a field the pass leaves out; the handle; the registration; the mute; a route added; the mint before the ban)', async () => {
   assert.deepEqual(HOT('c').map(([path]) => path), [...PASS_PATHS], 'the oracle asks every hot route there is');
   for (const sw of ['on', 'dev']) {
-    const t = await stand({ DEVELOPER_HANDLES: 'mac', BOARD_OPEN: sw, SEATS_OPEN: sw, CHAPTERS_OPEN: sw, PROFESSIONS_OPEN: sw, FESTIVAL_OPEN: sw });
+    const t = await stand({ SEAT_ADMINS: 'mac', BOARD_OPEN: sw, SEATS_OPEN: sw, CHAPTERS_OPEN: sw, PROFESSIONS_OPEN: sw, FESTIVAL_OPEN: sw });
     try {
       const guest = await t.s.guest();
       const eve = await t.s.seated('eve');
@@ -71,6 +71,14 @@ test('SESSION-SIGN the oracle: every hot route answers under a pass exactly as u
         for (const [path, body] of HOT(who.character)) {
           const looked = await t.ask('POST', path, who.secret, body);
           assert.equal(looked.lookups, 1, `${path}: the first ask is the lookup's`);
+          if (who === mac) {
+            // a staff role is the row's and a pass carries none: a staff account is handed no pass, so every ask is the lookup
+            assert.equal(looked.pass, null, `${path}: a staff account is handed no pass`);
+            const again = await t.ask('POST', path, who.secret, body);
+            assert.deepEqual([again.status, again.body, again.lookups], [looked.status, looked.body, 1]);
+            answers.set(`${path} ${who.handle}`, JSON.stringify([looked.status, looked.body]));
+            continue;
+          }
           assert.ok(looked.pass, `${path}: and hands a pass back`);
           assert.match(looked.expose, /x-session-pass/, 'exposed, so the page can read it');
           const passed = await t.ask('POST', path, who.secret, body, { pass: looked.pass });

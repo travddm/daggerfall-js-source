@@ -41,7 +41,7 @@ async function extensionKey() {
 async function stand({ hide = true } = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY,
   });
   const pushed = [];
@@ -149,13 +149,12 @@ test('STAFF-PANEL5-HIDDEN: HIDE ME (pressed - STAFF-HIDE-TOGGLE made it off by d
     // STAFF-PANEL5-HIDDEN-FIX: Asynian's game was minted hidden by the session now past its life - no token, never a shown one
     assert.deepEqual(await s.mint('Asynian'), { status: 409, body: { error: 'staff-session-lapsed' } }, 'nor one expired - and one that hid the game shows nobody');
     assert.equal(s.audits('hidden-token').length, 4, 'and writes no row');
-    // a member the role lists no longer name, their session row still standing: a player's token
-    const mods = s.env.MODERATOR_HANDLES;
-    s.env.MODERATOR_HANDLES = 'Tabbyvish';
+    // a member whose account no longer holds the role, their session row still standing: a player's token
+    s.setStaff('Asynian', 'none');
     s.raw.prepare('UPDATE staff_sessions SET expires_at = ?, last_act = ? WHERE player_id = ?').run(nowS() + 600, nowS(), s.game.Asynian.id);
     assert.equal(claimsOf((await s.mint('Asynian')).body.token).hd, undefined, 'no role, no mark');
-    s.env.MODERATOR_HANDLES = mods;
-    assert.equal(claimsOf((await s.mint('Asynian')).body.token).hd, 1, 'named again, hidden again');
+    s.setStaff('Asynian', 'moderator');
+    assert.equal(claimsOf((await s.mint('Asynian')).body.token).hd, 1, 'the role again, hidden again');
     // an owner's session by a key the config no longer names stands no more (staff.js staffSession's law)
     const keys = s.env.OWNER_KEYS;
     s.env.OWNER_KEYS = 'SirMcMobdon:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';

@@ -84,7 +84,7 @@ function counted(env) {
 }
 
 test('PRIMARY-FOLD the trips: an enforced Renown claim asks the door\'s three questions in ONE statement and its bucket nowhere else - neither the enforced room nor the spend reads it (the spend steps it where it stands - AUDIT PLAN-1000 C1) - credited as before; a route that names a character and claims nothing asks the tombstone alone (mutants: the room asks again; the door asks no stream)', async () => {
-  const t = await stand({ DEVELOPER_HANDLES: 'mac', PROFESSIONS_OPEN: 'on' });
+  const t = await stand({ SEAT_ADMINS: 'mac', PROFESSIONS_OPEN: 'on' });
   try {
     const mac = await t.s.registered('mac');
     const line = { enforce: true, streams: { ...PROGRESS_LINE.streams, renown: { rate: 3_600, cap: 1_000 } } };

@@ -21,7 +21,7 @@ import { seeded } from '../../honestItems.mjs';
 const forged = () => freshSave({ name: 'ann', items: [{ ...createWeapon(113, 1, seeded(7)), affixes: [{ id: 'damage', value: 40 }] }] });
 
 async function stand() {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const put = async (who, R, save) => {
     const at = R.at();
     const res = await worker.fetch(new Request(`https://accounts.invalid/v1/realm/${R.id}/data`, {

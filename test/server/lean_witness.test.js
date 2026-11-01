@@ -261,7 +261,7 @@ const witness = (raw, id, nowS) => {
   raw.prepare('INSERT INTO players (id, guest_name, handle, created_at, last_seen, registered_at) VALUES (?, ?, ?, 0, 0, ?)').run(id, id, id, nowS - 8 * DAY);
   return { id, handle: id, registered_at: nowS - 8 * DAY };
 };
-const ENV = { CHAPTERS_OPEN: 'on', SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'devra' };
+const ENV = { CHAPTERS_OPEN: 'on', SEATS_OPEN: 'on' };
 /** A database whose statements are recorded as they are prepared. */
 const counted = (db) => {
   const seen = [];
@@ -307,8 +307,8 @@ test('LEAN-WITNESS a hall witness reads no region unless its own answers could h
   assert.equal(await mayBeIgnored(base, 'npchall', 'liar', nowS + 2 * SEAT_WITNESS_IGNORED_S), false);
   assert.equal(await mayBeIgnored(base, 'npchall', 'liar', nowS - 3 + 2 * SEAT_WITNESS_IGNORED_S - 1), true, 'the oldest of the three still inside twice the week');
   assert.equal(await mayBeIgnored(base, 'npchall', 'wit3', nowS), false);
-  // the developers' audit list still counts every witness, late or not
-  const dev = witness(raw, 'devra', nowS);
+  // the Admins' audit list still counts every witness, late or not
+  const dev = { ...witness(raw, 'devra', nowS), staff_admin: 1 };
   const listed = await listHalls({ db: base, nowS }, dev, ENV, { region: 21 });
   assert.equal(listed.towns.find((t) => t.key === 700).witnesses, 4, 'the audit counts the late answer too');
   assert.equal(listed.towns.find((t) => t.key === 700).audit, false, 'a fourth joined: off the audit');
@@ -325,7 +325,7 @@ test('LEAN-WITNESS the judging reads use the lean indexes - a region\'s towns an
   const c = counted(db);
   await keepSeatFacts(c.db, T0);
   assert.ok(c.seen.includes(SEAT_JUDGED_SQL) && !c.seen.includes(SEAT_ROWS_SQL), 'the clock: the judged rows');
-  const dev = witness(raw, 'devra', T0);
+  const dev = { ...witness(raw, 'devra', T0), staff_admin: 1 };
   const c2 = counted(db);
   await listSeats({ db: c2.db, nowS: T0 }, dev, ENV);
   assert.ok(c2.seen.includes(SEAT_ROWS_SQL), 'a developer\'s list: every row - its audit counts every witness');
@@ -347,7 +347,7 @@ test('LEAN-WITNESS a key\'s answers deleted in one statement - a strike, the old
     }
   };
   const total = () => raw.prepare('SELECT total_changes() AS n').get().n;
-  const dev = witness(raw, 'devra', nowS);
+  const dev = { ...witness(raw, 'devra', nowS), staff_admin: 1 };
   fill('npchall', '1:900', 900);
   fill('seat', '900', 900);
   fill('seat', '901', 901);
@@ -387,7 +387,7 @@ test('LEAN-WITNESS a strike of a key whose answers lie interleaved - split betwe
   };
   const fill = (kind, key, k, shape) => ids.forEach((id, i) => ins.run(kind, key, id, KINDS[kind].report(k, 21, shape(i)), 21, nowS + i));
   const total = () => raw.prepare('SELECT total_changes() AS n').get().n;
-  const dev = witness(raw, 'devra', nowS);
+  const dev = { ...witness(raw, 'devra', nowS), staff_admin: 1 };
   let k = 50;
   for (const [label, shape] of Object.entries(shapes)) {
     k++;

@@ -23,7 +23,7 @@ const noWait = () => Promise.resolve();
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 async function board(extra = {}) {
-  const svc = await standService({ BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devra', MODERATOR_HANDLES: 'Mora', ...extra });
+  const svc = await standService({ BOARD_OPEN: 'on', SEAT_ADMINS: 'Devra', SEAT_MODERATORS: 'Mora', ...extra });
   const read = (who, map = TOWN) => svc.call('/v1/board/read', { map }, who.secret);
   const pin = (who, extra2 = {}) => svc.call('/v1/board/pin', { map: TOWN, subject: 'Hands wanted', body: 'Meet at the gate at dusk.', days: 7, rid: rid(), ...extra2 }, who.secret);
   const seasoned = (...who) => { for (const w of who) svc.env.DB._raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(Math.floor(Date.now() / 1000) - 15 * DAY, w.id); };

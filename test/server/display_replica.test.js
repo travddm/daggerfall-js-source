@@ -46,7 +46,7 @@ test('DISPLAY-REPLICA: the display reads and the arena\'s board are replica rout
 });
 
 test('DISPLAY-REPLICA: a seat read asked from a request already on a session (a market\'s or a pixel\'s read asking a seat) opens its own off the binding - any instance\'s first, the primary\'s after a write here (mutant: the request\'s session read)', async () => {
-  const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
+  const ENV = { SEATS_OPEN: 'on' };
   const svc = await standService(ENV);
   const base = svc.env.DB;
   const anticlere = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
@@ -57,7 +57,7 @@ test('DISPLAY-REPLICA: a seat read asked from a request already on a session (a 
   const first = await listSeats({ db: request, nowS: T0 }, player, ENV);
   assert.deepEqual(first.seats.map((s) => s.key), [anticlere.key]);
   assert.deepEqual(seatSessions(), [SEAT_ROWS_FROM], 'its own session, off the binding - not the request\'s');
-  assert.equal((await strikeSeat({ db: request, nowS: T0 + 1 }, { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * 86400 }, ENV, { key: anticlere.key })).ok, true);
+  assert.equal((await strikeSeat({ db: request, nowS: T0 + 1 }, { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * 86400, staff_admin: 1 }, ENV, { key: anticlere.key })).ok, true);
   await listSeats({ db: request, nowS: T0 + 2 }, player, ENV);
   assert.equal(seatSessions().at(-1), 'first-primary', 'the read after a write here: the primary\'s, whatever bookmark the request began from');
 });

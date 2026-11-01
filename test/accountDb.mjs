@@ -91,8 +91,14 @@ export const T0 = 1_800_000_000;
 /** INT19: the routes that take a crafted piece out of its realm record (the pins' `call` names the record for them). */
 const CRAFTED_ACTS = new Set(['/v1/market/list', '/v1/market/auction', '/v1/writs/fulfil']);
 
+/** STAFF-ROLES-BY-ACCOUNT: the handles a stood service SEATS with a role as they register - `SEAT_ADMINS`, `SEAT_MODERATORS` and
+ *  `SEAT_OWNERS` in `extra`, comma lists. The service itself reads no list: the harness sets the account's role columns
+ *  (migration 0002) on the row a listed handle registers, the way the operator sets them on a real one. An owner is an admin. */
+const seatList = (/** @type {unknown} */ v) => new Set(String(v ?? '').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
+
 /** The Worker on a fresh database, with the gate's key pair - `env` extended by `extra`. */
-export async function standService(extra = {}) {
+export async function standService({ SEAT_ADMINS, SEAT_MODERATORS, SEAT_OWNERS, ...extra } = {}) {
+  const seats = { admin: seatList(SEAT_ADMINS), mod: seatList(SEAT_MODERATORS), owner: seatList(SEAT_OWNERS) };
   _resetKeyForTests();
   _resetPassKeyForTests();   // SESSION-SIGN: the pass key drawn from this service's own key
   _resetYardsKept();
@@ -106,6 +112,11 @@ export async function standService(extra = {}) {
   const gatePriv = await importReceiptKey(Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', gk.privateKey))).toString('base64'), { subtle });
   const gatePub = Buffer.from(new Uint8Array(await subtle.exportKey('raw', gk.publicKey))).toString('base64url');
   const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', GATE_PUBLIC_KEY: gatePub, ...extra };   // MERGE 2: SAVES, the realm's records (R2)
+  const seatRoles = (/** @type {string} */ handle) => {
+    const lc = handle.toLowerCase();
+    const owner = seats.owner.has(lc);
+    if (owner || seats.admin.has(lc) || seats.mod.has(lc)) env.DB._raw.prepare('UPDATE players SET staff_owner = ?, staff_admin = ?, staff_mod = ? WHERE handle_lc = ?').run(owner ? 1 : 0, owner || seats.admin.has(lc) ? 1 : 0, seats.mod.has(lc) ? 1 : 0, lc);
+  };
   const call = async (path, body, bearer = null) => {
     // INT19: A CRAFTED ACT NAMES WHERE ITS RECORD STANDS - a listing's, an
     // auction's or a commission fill's piece leaves the realm record (server-account/src/craftedPiece.js), and the client's
@@ -121,6 +132,7 @@ export async function standService(extra = {}) {
       headers: { ...(body !== undefined ? { 'content-type': 'application/json' } : {}), ...(bearer ? { authorization: `Bearer ${bearer}` } : {}) },
       body: body === undefined ? undefined : JSON.stringify(body),
     }), env);
+    if (path === '/v1/auth/register' && res.status === 200 && typeof body?.handle === 'string') seatRoles(body.handle);
     return { status: res.status, body: await res.json().catch(() => null) };
   };
   const guest = async () => (await call('/v1/auth/guest', { ...ACCEPTED })).body;   // MERGE 2: main's TERMS1 - an account is made with the Terms ticked
@@ -168,7 +180,10 @@ export async function standService(extra = {}) {
     const R = await seatRealm(env, who.secret, who.handle, { name: who.handle, level: 9, goldPieces: 1_000_000, items: [] });
     return { ...(await call('/v1/homes/claim', { layout: null, ...home, character: R.id, realm: R.at() }, who.secret)), character: R.id };
   };
-  return { env, call, guest, registered, seated, claim, seedMarks, fetch, found, seatHome, identityPublic: kp.publicKey, gateKey: gatePriv, gatePriv };   // ARENA4: the relay's signing half, so a bout's receipt is signed as the relay signs it   // PROF3: the identity key's public half, a product record's verifier; SEAT1b: the relay's private half, a watch receipt's signer
+  /** Set a registered handle's role by hand, as the operator does (tools/staffRole.mjs ROLE_COLUMNS): 'owner', 'admin', 'moderator' or 'none'. */
+  const setStaff = (/** @type {string} */ handle, /** @type {'owner'|'admin'|'moderator'|'none'} */ role) => env.DB._raw.prepare('UPDATE players SET staff_owner = ?, staff_admin = ?, staff_mod = ? WHERE handle_lc = ?')
+    .run(role === 'owner' ? 1 : 0, role === 'owner' || role === 'admin' ? 1 : 0, role === 'moderator' ? 1 : 0, handle.toLowerCase());
+  return { env, call, setStaff, guest, registered, seated, claim, seedMarks, fetch, found, seatHome, identityPublic: kp.publicKey, gateKey: gatePriv, gatePriv };   // ARENA4: the relay's signing half, so a bout's receipt is signed as the relay signs it   // PROF3: the identity key's public half, a product record's verifier; SEAT1b: the relay's private half, a watch receipt's signer
 }
 
 /** A device's storage holding `who`'s session (net/accountClient.js SESSION_KEY). */

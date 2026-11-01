@@ -41,7 +41,7 @@ async function mintSiege(claims, key, nowS) {
 async function stood(t, extra = {}) {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devra', ...extra });
+  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Devra', ...extra });
   const raw = svc.env.DB._raw;
   const witnesses = [await svc.guest(), await svc.guest(), await svc.guest()];
   for (const seat of SEATS) for (const w of witnesses) raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(seat.key), w.id, seatReportText(seat), seat.region, T0 - DAY);

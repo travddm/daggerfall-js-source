@@ -108,7 +108,7 @@ crons = ["* * * * *", "41 * * * *"]
 [vars]
 # Answered by /health so a deploy that did not happen cannot look like
 # one that did. Kept in step with ACCOUNT_VERSION in src/service.js.
-ACCOUNT_VERSION = "acct207"
+ACCOUNT_VERSION = "acct208"
 # WB5b: THE RELAY'S PUBLIC HALF, GATE_PUBLIC_KEY - the key an Oblivion
 # Gate's kill receipts verify with (src/net/gate/gateReceipt.js) - is NOT a
 # var here. GATE-KEYS (2026-09-26): the account deploy mints the pair
@@ -124,49 +124,13 @@ ACCOUNT_VERSION = "acct207"
 # The site that may call this. "*" while nothing is live; it is narrowed
 # to the real origin before a single account exists.
 ALLOWED_ORIGIN = "*"
-# ACC3: WHO HOLDS THE DEVELOPER TITLE. A comma-separated list of
-# handles, case-folded by server-account/src/titles.js on the way in.
+# STAFF ROLES (Admin, Owner, Moderator) ARE COLUMNS OF THE ACCOUNT, NOT HANDLE LISTS (server-account/migrations/0002, titles.js,
+# staff.js). This file names no handle that holds a role: a name is free to whoever registers it first, so a name list was a way
+# in to bans, rollbacks and grants. An Owner sets the first Admin and Owner from a machine with deploy access, once:
+# docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, Admins add and
+# remove Moderators, and the Discord moderators' queue links a Discord id to an account the same way.
+# The other *_HANDLES lists below grant a TITLE (a name beside a name), never a right to act on another player.
 #
-# A LIST IN CONFIG AND NOT A COLUMN, because granting one is a thing a
-# person does by editing a file that is reviewed and deployed - not by
-# reaching into a live database at three in the morning. Taking a
-# handle back off this list takes the title off too, on that player's
-# next token, because the grant is read fresh every time rather than
-# stored anywhere.
-#
-# EMPTY IS A VALID ANSWER and is what this ships as: nobody holds it
-# until a handle is written here. It is not a secret - a title is a
-# thing other players are meant to see.
-# DEV2 (2026-09-24, Mac: "Give trashBattery, LostMyLeg the developer
-# title/glyph"): the list grants the whole developer set - the title,
-# the glyph, /red, and /mute and /unmute (titles.js canModerate).
-# DEV3 (2026-09-26, Mac: "grant Tabby the developer title/glyph"): the
-# fourth, with the same whole set.
-# DEV4 (2026-10-05, the owner: "Also add RookieG(Dev) as developer", then
-# "Change RookieG(Dev) to RookieG"): RookieG, the fifth, with the same whole
-# set and the developers' Seraph Wings. The handle exactly - "RookieG(Dev)"
-# (a handle may carry brackets, net/handleShape.js HANDLE_RE) is another
-# account and holds none of it.
-# DEV5 (2026-10-16, Mac: "Remove trashBattery ingame as a dev"): off the
-# list, and the whole set goes with the handle - the title, the glyph, the
-# wings, /red, /mute and /unmute, the developer's acts (titles.js
-# isDeveloper) and the POI editor's builder door - on their next token
-# and next call.
-# DEV6 (2026-10-16, Mac: "Give roderic the developer access ingame
-# (title/glyph)"): Roderic, the fifth again, with the same whole set - the
-# title, the glyph, the Seraph Wings, /red, /mute and /unmute, the developer's
-# acts and the POI editor's builder door - on their next token and next call.
-# Case-folded as every list is: the account roderic, Roderic or RODERIC.
-# STAFF-PANEL1: SirMcMobdon, with the whole set above - the developer's acts include the relay's live settings (/relay)
-# and the trade-freeze review's clear and roll back - and the staff panel's Admin role (server-account/src/staff.js),
-# which is this list.
-# STAFF-PANEL1 (2026-10-22, mob: "kpblca_1 needs added to them as welll"): the account kpblca_1, with the same whole set.
-DEVELOPER_HANDLES = "Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1"
-# STAFF-PANEL1 (2026-10-22, server-account/src/staff.js): THE STAFF PANEL'S OWNERS (mob: "only mob and Latty" read the audit
-# log) - staff who may also read the audit log of every staff sign-in and act, invite a staff member to enrol one more
-# extension (a new invite replaces the member's unspent one; keys stay) and cut one off (every key and session ended). A handle here that no role list names is no owner (staff.js isOwner). Comma-separated,
-# case-insensitive, read at every call.
-OWNER_HANDLES = "Lattymoy,SirMcMobdon"
 # STAFF-PANEL1: AN OWNER'S FIRST WAY IN - `handle:publicKey`, comma-separated, the key raw Ed25519 in base64url. The owner's own
 # staff panel extension minted the pair on their computer and holds the private half; this half only checks its signature,
 # so it is safe in a public repository. It is that owner's first way in; every other staff member is invited from the
@@ -174,30 +138,6 @@ OWNER_HANDLES = "Lattymoy,SirMcMobdon"
 # STAFF-PANEL1 (2026-10-22, mob pasted the key his panel showed): SirMcMobdon's first computer. Latty enrols by mob's invite,
 # or adds a pair here.
 OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
-# POI-1 (2026-10-14, the POI editor; bible/06-Systems/POI-Editor-Arc.md): WHO BUILDS AND WHO APPROVES. Mac, asked how a
-# POI reaches players: "I need to be able to approve changes"; asked who uses the editor: "Developers + Builders". A
-# BUILDER imports models, places POIs, saves drafts and submits them - every developer above is one, and BUILDER_HANDLES
-# adds map makers who are not. An APPROVER decides what goes live (server-account/src/poi.js); nothing reaches a player
-# unapproved. Comma-separated handles, case-insensitive, read at every call - a handle taken off loses the door at once.
-BUILDER_HANDLES = ""
-APPROVER_HANDLES = "Lattymoy"
-# PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client";
-# bible/06-Systems/Private-Reports.md): WHO READS THE PRIVATE REPORTS - the exploits, bugs and security holes players
-# send from the mailbox (/bug). Nobody else sees one: not a moderator, not a developer this list does not name, because
-# an exploit read by one more person is one more person who can use it before it is fixed. Comma-separated handles,
-# case-insensitive, read at every call - a handle taken off loses the inbox on its next request. Empty: the reports wait,
-# unread, until a handle is written here.
-REPORT_READER_HANDLES = "Lattymoy"
-# MOD1: THE MODERATORS - the blue shield beside the name, and /mute and
-# /unmute in chat. Comma-separated handles, case-insensitive, the same
-# as the line above; a developer may already moderate without being
-# listed here. Asynian is the first (Mac, 2026-09-22: "Username is
-# Asynian"). Taking a handle off revokes the shield on the next token
-# and the commands on the next call.
-# MOD2 (2026-10-02, Mac: "give tabbyvish the moderator title/glyph for
-# ingame"): the second, with the same shield and commands. MOD3 (same
-# day, Mac: "Also add Starempire42 as a moderator"): the third.
-MODERATOR_HANDLES = "Asynian,tabbyvish,Starempire42"
 # SAFE1-SAFE8 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system";
 # bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY.
 #
@@ -219,16 +159,14 @@ MOD_AI_MODEL = ""
 MOD_AI_DAILY_MAX = ""
 # SAFE8: THE MODERATORS' QUEUE IN DISCORD (src/discord.js). DISCORD_MOD_CHANNEL: the private channel's id the bot posts
 # each case to. DISCORD_PUBLIC_KEY: the Discord application's public key (hex - not a secret), which every press and
-# /mod is signed with. DISCORD_MODERATORS: "<discord user id>:<game handle>", comma-separated - a press is that
-# handle's act, and only while it holds MODERATOR_HANDLES or DEVELOPER_HANDLES. The bot's token is DISCORD_BOT_TOKEN, a
+# /mod is signed with. Who may press is a `staff_discord` row (account id), not a var - a press is that account's act, and only
+# while it holds a staff role. The bot's token is DISCORD_BOT_TOKEN, a
 # secret the deploy puts, never here. Empty: no cards and no presses - the cases still gather, and the game's
 # /mute, /ban and /strikes still answer. The setup: bible/11-Multiplayer/Chat-Safety-Arc.md section 9.
 DISCORD_MOD_CHANNEL = "1560996671440293908"
 DISCORD_PUBLIC_KEY = "36e74945022f94ec7955a84ccccb270e63780100e558d30777742337b62de3e0"
-# 2026-10-17 (Mac): the queue's channel and the application's public key set. The moderators' Discord ids, each
-# `<discord user id>:<in-game handle>` - the handle must also stand in MODERATOR_HANDLES or DEVELOPER_HANDLES, which
-# every press and /mod re-checks (discord.js actorOf); anyone not here is answered that only the game's moderators may act
-DISCORD_MODERATORS = "128705730965536768:Lattymoy"
+# DISCORD MODERATORS ARE LINKED BY ACCOUNT, NOT BY NAME: the `staff_discord` table binds a Discord user id to an account id
+# (tools/staffRole.mjs discord, docs/operations/staff-roles.md), and a press is that account's act only while it holds a staff role.
 # STAFF-PANEL5-FREEZE (2026-10-22, mob, 03:22Z; design doc "DFO Staff Panel: design", Freeze player): DISCORD_INVITE_URL - the
 # server's Discord invite the frozen player's Staff tab shows beside its Copy button (server-account/src/staffFreeze.js
 # discordInvite), so it changes without a game update. An https address; empty, the tab shows none.
@@ -270,17 +208,17 @@ DISCIPLE_HANDLES = "Dutchess,Satranath,Skibbster,Flylighter,valenvalarys"
 # The list is empty again.
 APOSTLE_HANDLES = ""
 HIEROPHANT_HANDLES = ""
-# MARKS1 (PROF0 20): Marks open by this switch - "off", "dev" (the DEVELOPER_HANDLES alone) or "on". Shipped at "dev":
+# MARKS1 (PROF0 20): Marks open by this switch - "off", "dev" (the Admins alone) or "on". Shipped at "dev":
 # the currency is struck and spent by the developers first, and opened to everyone by this one line.
 # SWITCH-ON (2026-09-29, Mac: "Fuck it lets switch everything on"): "on" - Marks are everyone's.
 MARKS_OPEN = "on"
-# NOTICE1 (PROF0 20): the Notice Board by this switch - "off", "dev" (the DEVELOPER_HANDLES alone) or "on". Shipped
+# NOTICE1 (PROF0 20): the Notice Board by this switch - "off", "dev" (the Admins alone) or "on". Shipped
 # at "dev": the developers read and pin first; everyone else's rumour boards stayed DFU's until this line said "on".
 # BOARD-ON (2026-09-29, Mac's choice: "Board now, rest after fixes"): "on" - the board is everyone's; its Work and
 # Market tabs stay the professions' and the Marks' (a tab shows only while PROFESSIONS_OPEN and MARKS_OPEN let the
 # account in), so they open with those two lines below.
 BOARD_OPEN = "on"
-# PROF1 (PROF0 20): the professions by this switch - "off", "dev" (the DEVELOPER_HANDLES alone) or "on". Shipped at
+# PROF1 (PROF0 20): the professions by this switch - "off", "dev" (the Admins alone) or "on". Shipped at
 # "dev": the developers gather, store and fill Court writs first; opened to everyone by this one line.
 # SWITCH-ON (2026-09-29, Mac: "Fuck it lets switch everything on"): "on" - the professions and, with Marks and the
 # board, the market are everyone's, after PROF-SAVE and PROF-DELETE.
@@ -290,7 +228,7 @@ PROFESSIONS_OPEN = "on"
 # Shipped at "dev": the developers witness the seats, see the map's rings and the arrival lines first; opened to
 # everyone by this one line.
 SEATS_OPEN = "on"
-# CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the DEVELOPER_HANDLES alone)
+# CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's
 # listing and its delivery by the same switch; AUDIT CHAP2: the halls' audit list and strike, a developer's (at "dev" or
@@ -301,17 +239,17 @@ SEATS_OPEN = "on"
 # patch notes had told everyone; Field-Bugs-2026-10-12.md): "on" - the Chapters are everyone's. CHAPTER_TITLES below is
 # its own switch and stays off.
 CHAPTERS_OPEN = "on"
-# FIRM1 (bible/06-Systems/Firmament.md): THE FIRMAMENT by this switch - "off", "dev" (the DEVELOPER_HANDLES alone) or
+# FIRM1 (bible/06-Systems/Firmament.md): THE FIRMAMENT by this switch - "off", "dev" (the Admins alone) or
 # "on". Shipped at "dev": the developers plan their trees, pay their refunds and gather under them first; opened to
 # everyone by this one line. FIRMAMENT-ON (2026-10-15, the owner, at the audit's merge: "switch it on for players"):
 # "on" - the Firmament is everyone's.
 FIRMAMENT_OPEN = "on"
 # QL12 (bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' CLAIM by this switch - "off", "dev" (the
-# DEVELOPER_HANDLES alone) or "on". The service pays a questline only what it witnessed - a step's endgame receipt written
+# Admins alone) or "on". The service pays a questline only what it witnessed - a step's endgame receipt written
 # after the step was opened here - a line's title, held for good (server-account/src/questlines.js). Shut, every claim is refused (`ql-closed`) and the client's lines still move on
 # its own quests, as the design has it: the service pays, it never gates. "on" - the owner's ask is the whole arc live.
 QUESTLINES_OPEN = "on"
-# WITCH1 (bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL by this switch - "off", "dev" (the DEVELOPER_HANDLES
+# WITCH1 (bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL by this switch - "off", "dev" (the Admins
 # alone) or "on". Inside the festival's days (src/net/festivalLaw.js FESTIVALS) it opens the finds, the Wyrd Sisters' sales
 # and the Hearth Offerings (server-account/src/festival.js); outside them the days shut it whatever this says. Shut,
 # nothing is found, sold or set out, and every count is kept. "on" - the owner's ask is the event live for everyone.

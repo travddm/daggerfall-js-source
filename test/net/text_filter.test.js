@@ -112,7 +112,7 @@ test('TEXT-F1 a piece\'s names: a name a player typed starred wherever it is nam
 });
 
 test('TEXT-F1 the service: a note pinned with a caught word is kept starred, and read starred; a note kept before the filter is starred as the board is read; a guild note and a letter likewise (mutants: the board read raw; the notices read raw; the guild board read raw)', async () => {
-  const svc = await standService({ BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const svc = await standService({ BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = svc.env.DB._raw;
   const ann = await svc.registered('Ann');
   const pin = await svc.call('/v1/board/pin', { map: 7, subject: 'Party, assholes', body: 'Heading out.\nNo dickheads.', days: 1, rid: 'rid-ann-0001' }, ann.secret);

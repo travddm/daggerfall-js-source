@@ -6,7 +6,7 @@
 // What a report is - its kinds, its bounds, its states - is
 // src/net/reportLaw.js. This file is what its two sides do with one:
 // a REPORTER (any registered account) sends one and lists their own;
-// a READER (a handle REPORT_READER_HANDLES names, wrangler.toml) lists
+// a READER (an Owner account) lists
 // every report, opens one and closes it. Nothing here shows a report to
 // anybody else - not a moderator, not a developer the list does not
 // name - because an exploit read by one more person is one more person
@@ -19,24 +19,20 @@
 // opened each report and how it was closed - never who read it, and
 // never the words back (the reporter wrote them).
 //
-// ═══ THE READERS ARE A LIST IN CONFIG ══════════════════════════════
+// ═══ THE READERS ARE THE OWNERS ════════════════════════════════════
 //
-// The developers' own law (titles.js isDeveloper): granting the door is
-// a reviewed, deployed edit, read at every call - a handle taken off the
-// list loses the inbox on its next request. Empty is a valid answer: the
-// reports wait, unread, until a handle is written there.
+// An Owner account (titles.js isOwner, `staff_owner`), set only by the operator and read at every call - an Owner taken
+// off loses the inbox on its next request. With no Owner the reports wait, unread.
 // ═══════════════════════════════════════════════════════════════════
 import { mintId, displayName, overRate } from './accounts.js';
-import { handleList } from './titles.js';
+import { isOwner } from './titles.js';
 import {
   reportWordsOf, reportContextOf, REPORT_ID_RE, REPORT_RID_RE, REPORT_STATES, REPORT_SEND_MAX, REPORT_WINDOW_S,
   REPORT_OPEN_MAX, REPORT_MINE_MAX, REPORT_INBOX_MAX, REPORT_INBOX_PAGES,
 } from '../../src/net/reportLaw.js';
 
-/** Does this player read the reports? A guest holds no handle, so never. @param {any} player @param {any} env */
-export const isReportReader = (player, env) =>
-  typeof player?.handle === 'string' && !!player.handle
-  && handleList(env?.REPORT_READER_HANDLES).has(player.handle.toLowerCase());
+/** Does this player read the reports? An Owner account only; a guest holds no handle, so never. @param {any} player @param {any} env */
+export const isReportReader = (player, env) => isOwner(player, env);
 
 /** A row's head as its reporter's list shows it. */
 const headOf = (/** @type {any} */ row) => ({

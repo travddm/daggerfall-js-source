@@ -56,7 +56,7 @@ function goods(n = 8) {
 }
 
 async function stand(env = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devi', ...env });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Devi', ...env });
   const raw = s.env.DB._raw;
   /** A registered account a week old - a witness (nodeLaw.js WITNESS.ageS). */
   const aged = async (handle) => {

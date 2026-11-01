@@ -37,7 +37,7 @@ const noWait = () => Promise.resolve();
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Lattymoy' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Lattymoy' });
   const raw = s.env.DB._raw;
   /** A checkpoint of `who`'s tab: its save as a fresh character's, holding `items`, its purse `gold`. */
   const put = async (who, items, gold = 100, extra = {}) => {

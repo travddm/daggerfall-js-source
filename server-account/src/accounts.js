@@ -403,7 +403,7 @@ export const isMuted = (row, nowS) => mutedUntil(row) > nowS;
  * /mute and /unmute.
  *
  * THE AUTHORITY IS DERIVED, like every grant in titles.js: the actor's
- * handle in MODERATOR_HANDLES or DEVELOPER_HANDLES, read now. Nothing a
+ * account holding the Moderator or Admin role (`staff_mod`, `staff_admin`), read now. Nothing a
  * client says makes it a moderator.
  *
  * A MODERATOR CANNOT MUTE A MODERATOR, NOR THEMSELVES. A mod-on-mod

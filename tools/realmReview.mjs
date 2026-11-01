@@ -54,7 +54,7 @@
 // its BOSS_BODY var (server/wrangler.toml, net/bossBody.js bodyConfig) to `{"enforce": true, "body": {"depth", "perS"},
 // "hull": {"depth", "perS"}}`, `perS` past the 0.999 quantile's rate (a minute's, in thousandths: / 60000) with room.
 //
-// Signed in as YOU - a developer, your handle in the service's DEVELOPER_HANDLES: DAGGER_HANDLE and DAGGER_PASSWORD sign
+// Signed in as YOU - a developer, your account holds the Admin role: DAGGER_HANDLE and DAGGER_PASSWORD sign
 // in for this one call and sign out after it; DAGGER_SECRET, a session secret you already hold, is used as it is and left
 // signed in. DAGGER_ACCOUNT_SERVICE points at another service (a local one); the live one by default.
 import { DEFAULT_ACCOUNT_SERVICE, accountRefusalText } from '../src/net/accountClient.js';

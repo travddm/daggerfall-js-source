@@ -51,8 +51,8 @@ const RECORD = {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', DUNGEON_MASTER_HANDLES: 'SquidKamer',
-    OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, DISCORD_MODERATORS: '111111111111111111:Asynian,333333333333333333:Watcher9',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', DUNGEON_MASTER_HANDLES: 'SquidKamer',
+    OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
   });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
@@ -397,12 +397,11 @@ test('STAFF-PANEL3-PLAYERS: A HANDLE RENAMED - the old name and the new written 
   const helper = await s.registered('Helper');
   raw.prepare('UPDATE players SET staff_mod = 1 WHERE id = ?').run(helper.id);
   const refusals = [
-    [{ target: brisk.id, to: 'Lattymoy' }, 409, 'rename-listed', 'an Admin\'s handle'],
+    [{ target: brisk.id, to: 'SirMcMobdon' }, 409, 'rename-listed', 'a handle OWNER_KEYS binds'],
     [{ target: brisk.id, to: 'squidkamer' }, 409, 'rename-listed', 'a title\'s handle, any case'],
-    [{ target: brisk.id, to: 'Watcher9' }, 409, 'rename-listed', 'a handle DISCORD_MODERATORS binds'],
-    [{ target: s.raw.prepare("SELECT id FROM players WHERE handle = 'Asynian'").get().id, to: 'Calmer' }, 409, 'rename-listed', 'a Moderator\'s own handle is the config\'s'],
+    [{ target: s.raw.prepare("SELECT id FROM players WHERE handle = 'Asynian'").get().id, to: 'Calmer' }, 409, 'rename-listed', 'a staff member keeps the handle it holds'],
     [{ target: squid.id, to: 'Calmer' }, 409, 'rename-listed', 'a title\'s holder keeps the name the list holds'],
-    [{ target: helper.id, to: 'Calmer' }, 409, 'rename-listed', 'a Moderator made on the row (staff_mod), on no list'],
+    [{ target: helper.id, to: 'Calmer' }, 409, 'rename-listed', 'a Moderator made on the row (staff_mod)'],
     [{ target: brisk.id, to: 'SYLVIA' }, 409, 'rename-taken', 'another account\'s, any case'],
     [{ target: brisk.id, to: 'two words' }, 400, 'rename-bad', 'a guest\'s shape'],
     [{ target: brisk.id, to: 'me@x.com' }, 400, 'rename-bad', 'an address'],
@@ -418,7 +417,7 @@ test('STAFF-PANEL3-PLAYERS: A HANDLE RENAMED - the old name and the new written 
   const failed = s.audits('rename');
   assert.equal(failed.length, refusals.length - 1, 'every refusal written down, failed (a name names no account to write)');
   assert.ok(failed.every((a) => a.outcome === 'failed'));
-  assert.deepEqual(JSON.parse(failed[0].detail), { from: 'Brisk', to: 'Lattymoy', error: 'rename-listed' });
+  assert.deepEqual(JSON.parse(failed[0].detail), { from: 'Brisk', to: 'SirMcMobdon', error: 'rename-listed' });
 
   const ok = await rename({ target: brisk.id, to: 'Bristle' });
   assert.deepEqual(ok.body, { ok: true, target: brisk.id, from: 'Brisk', to: 'Bristle' });
@@ -443,7 +442,7 @@ test('STAFF-PANEL3-PLAYERS: A CHARACTER RENAMED - its row\'s name, the one the m
   const rename = (body) => s.staff('/v1/staff/player/rename', body, s.mob.session);
   const refusals = [
     [{ target: brisk.id, char: brisk.character, to: 'Sylvia' }, 'rename-taken', 'another account\'s handle'],
-    [{ target: brisk.id, char: brisk.character, to: 'Lattymoy' }, 'rename-listed', 'a listed name'],
+    [{ target: brisk.id, char: brisk.character, to: 'SirMcMobdon' }, 'rename-listed', 'a listed name'],
     [{ target: brisk.id, char: brisk.character, to: '' }, 'rename-bad', 'nothing'],
     [{ target: brisk.id, char: brisk.character, to: ' Padded' }, 'rename-bad', 'not as the realm keeps it'],
     [{ target: brisk.id, char: brisk.character, to: 'x'.repeat(30) }, 'rename-bad', 'past what the wire carries'],
@@ -460,9 +459,9 @@ test('STAFF-PANEL3-PLAYERS: A CHARACTER RENAMED - its row\'s name, the one the m
   assert.equal(s.audits('rename').filter((a) => a.outcome === 'failed').length, refusals.length);
 });
 
-test('STAFF-PANEL3-PLAYERS: the lists a rename refuses are every role and title list, and a handle\'s copies are columns the schema holds, less the columns that hold no handle', () => {
-  const listed = listedHandles({ DEVELOPER_HANDLES: 'A1x', HOURS_FIRST_HANDLES: 'Bee, cee', OWNER_KEYS: 'Own1:abc', DISCORD_MODERATORS: '1:Disc1', OTHER: 'Nope', DB: {} });
-  assert.deepEqual([...listed].sort(), ['a1x', 'bee', 'cee', 'disc1', 'own1']);
+test('STAFF-PANEL3-PLAYERS: the lists a rename refuses are every title list and the handle an owner key binds, and a handle\'s copies are columns the schema holds, less the columns that hold no handle', () => {
+  const listed = listedHandles({ HOURS_FIRST_HANDLES: 'Bee, cee', OWNER_KEYS: 'Own1:abc', OTHER: 'Nope', DB: {} });
+  assert.deepEqual([...listed].sort(), ['bee', 'cee', 'own1'], 'any *_HANDLES var, and the handles OWNER_KEYS binds');
   const raw = d1()._raw;
   const copies = [...NAME_COPIES].map((c) => c.slice(0, 2).join('.'));
   for (const copy of copies) {

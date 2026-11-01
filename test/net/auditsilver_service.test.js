@@ -33,7 +33,7 @@ const DF = 17;
 const raidKey = (region, location, gameDay = 1000) => `${region}:${location}:${gameDay}`;
 
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
   const raw = s.env.DB._raw;
   const balance = (who) => Number(raw.prepare('SELECT balance FROM marks WHERE account = ?').get(who.id)?.balance ?? 0);
   const guildMarks = (g) => Number(raw.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').get(g)?.balance ?? 0);
@@ -235,7 +235,7 @@ test('AUDIT SILVER-WAYS B3: a guild with a contract standing refuses to disband 
 // ─── C: THE MOTHERLODES ──────────────────────────────────────────────────────────────────────────────────────────────
 
 async function lodeRig(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
   const raw = s.env.DB._raw;
   const witnesses = [await s.seated('Wita'), await s.seated('Witb'), await s.seated('Witc')];
   const confirm = (n, day = DAY0) => {
