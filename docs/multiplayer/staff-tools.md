@@ -66,7 +66,8 @@ game's hook.
   the minute cron (`retryFreezePushes`).
 - The relay (`server/src/staffFreeze.js`) pins a frozen player in place: `frozenHello` keeps the position its old
   socket had, and `frozenFrame` passes only pings, leases, camera turns and staff-channel lines. Any blow, cast, trade
-  or duel aimed at a frozen player is dropped. The client shows a freeze screen with a staff chat tab (`src/net/staffChat.js`, `src/scenes/staffFreezeHost.js`).
+  or duel aimed at a frozen player is dropped. The client shows a freeze screen with a staff chat tab (`src/net/staffChat.js`,
+  `src/scenes/staffFreezeHost.js`).
 - Staff chat threads: `/v1/staff/talk`, `/chat`, `/chat-send`; the player side is `/v1/staff-chat/read` and `/send`.
   Tables `staff_chat_threads`, `staff_chat_lines`.
 

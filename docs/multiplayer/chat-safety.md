@@ -66,7 +66,8 @@ lists, with normalisation and an allow-list for innocent words. The service runs
 | Ban | `players.banned_until`, `ban_reason`, `banned_by` | `_banClose` closes the sockets; `_bannedHello` refuses tokens older than the ban; bans stored in room storage |
 | Dismiss | Case closed; `voidAutoMutes` lifts its automatic mutes | Unmute order |
 
-- Every act is a `mod_actions` row, never deleted. The ladder (`src/net/safety/safetyLaw.js`, `LADDER_MIN`) is 30 minutes, 1 day,
+- Every act is a `mod_actions` row, never deleted. The ladder (`src/net/safety/safetyLaw.js`, `LADDER_MIN`) is 30
+  minutes, 1 day,
   7 days; after those three steps (`LADDER_BAN_AT`) the next act is a ban; strikes count over 90 days (`strikesOf`,
   `server-account/src/sanctions.js`).
 - Session doors answer a banned account with `{ error: 'banned', until, reason }`.
@@ -111,7 +112,8 @@ The bot is an **interactions endpoint** on the account service, not a gateway bo
 - Commands are declared in `server-account/src/discordCommands.js` (`DISCORD_COMMANDS`): `/mod lookup`, `/mod mute`,
   `/mod unmute`, `/mod ban`, `/mod unban`. Guild-only and hidden from members without Manage Messages.
 - `actorOf` maps the Discord user to a game account through the `staff_discord` table (Discord user id to account id,
-  set by the operator with `tools/staffRole.mjs discord`). The account must pass `canModerate`. A Discord role grants nothing by itself.
+  set by the operator with `tools/staffRole.mjs discord`). The account must pass `canModerate`. A Discord role grants
+  nothing by itself.
 - **Case cards.** `postCards` (minute cron) posts one card per case to `DISCORD_MOD_CHANNEL` (`caseCard`): the
   reported lines, reasons, reviewer verdict, strikes and next ladder step. Buttons (`safe:<act>:<caseId>`): mute 30
   minutes, 1 day, 7 days, ban 30 days, dismiss. A press claims the case for 60 s, acts through `modAct`, and redraws

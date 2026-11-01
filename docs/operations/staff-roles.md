@@ -32,8 +32,11 @@ The operator needs deploy access to the Cloudflare account (the same access as `
    ```
 
    `set` takes `owner`, `admin`, `moderator` or `none`; it replaces the account's earlier role. Add `--local` for the
-   local database and `--print` to show the SQL without running it. Without the tool, the same change is one
-   `wrangler d1 execute daggerfall-accounts --remote --command "UPDATE players SET staff_owner = 1, staff_admin = 1 WHERE id = '<account id>'"`.
+   local database and `--print` to show the SQL without running it. Without the tool, run one statement:
+
+   ```bash
+   wrangler d1 execute daggerfall-accounts --remote \n     --command "UPDATE players SET staff_owner = 1, staff_admin = 1 WHERE id = '<account id>'"
+   ```
 
 4. The Owner enrols its staff-panel extension: `OWNER_KEYS` in `wrangler.toml` names the public key of the Owner's first
    computer (`<handle>:<key>`). The key only works for an account that already holds `staff_owner`. Every other staff
