@@ -117,7 +117,7 @@ export const fullNameOf = (given, sur) => (sur ? `${given} ${sur}` : given);
  *   stats:Record<string,number>|null, skills:number[]|null, groups:{primary:number[], major:number[], minor:number[]},
  *   blood:Record<string,number>, hearth:Record<string,number>, estate:number,
  *   parents:number[], children:number[], spouse:number|null, born:number, died:Death|null,
- *   heir:boolean|null, characterId:string|null, leveling:string|null, kind:'member'|'resident'|'player', residentId:string|null,
+ *   heir:boolean|null, characterId:string|null, kind:'member'|'resident'|'player', residentId:string|null,
  *   startAge:number, toll:number, bornOwn:number, lived:number, retired:number|null, bequest?:any[],
  *   parked?:{mapId:number, buildingKey:number}|null, courting?:Record<string, any>, wedAt?:number|null,
  *   childDay?:number|null, minor?:boolean, residentFace?:number|null, mapId?:number,
@@ -143,7 +143,7 @@ function blankPerson(id) {
     id, gen: 0, given: '', surname: '', gender: 'male', race: 'Breton', raceId: RACES.Breton, face: 0,
     careerIndex: 0, className: CLASS_CAREERS[0], career: null, level: 1, stats: null, skills: null,
     groups: { primary: [], major: [], minor: [] }, blood: {}, hearth: {}, estate: 0,
-    parents: [], children: [], spouse: null, born: 0, died: null, heir: null, characterId: null, leveling: null,
+    parents: [], children: [], spouse: null, born: 0, died: null, heir: null, characterId: null,
     kind: 'member', residentId: null, startAge: 20, toll: 0, bornOwn: 0, lived: 0, retired: null, bequest: [], parked: null,
     deedsTaken: [],
   });
@@ -209,7 +209,6 @@ export function writePlayer(person, entity) {
   person.stats = permanentStats(entity);
   person.skills = permanentSkills(entity);
   if (entity?.characterId) person.characterId = String(entity.characterId);
-  if (entity?.levelingSystem) person.leveling = String(entity.levelingSystem);
   return person;
 }
 
@@ -397,7 +396,6 @@ export function addChild(family, parentId, { rng = Math.random, at = 0, settings
   p.surname = surname;
   p.blood = bloodOf(parent, other);
   p.hearth = hearthOf(parent);
-  p.leveling = parent?.leveling ?? null;
   p.parents = [parent?.id, other?.id].filter((id) => id != null);
   p.born = at;
   p.heir = heirAnswer(settings, rng);
@@ -438,7 +436,6 @@ function addFounderSibling(family, of, { rng, at, settings }) {
   Object.assign(s, inheritCareer(null, rng));
   s.given = withBankSeed(rng, () => firstName(getNameBank(s.race), s.gender === 'female' ? GENDERS.Female : GENDERS.Male) || 'Nameless');
   s.surname = family.surname;
-  s.leveling = of.leveling;
   s.born = at;
   s.heir = heirAnswer(settings, rng);
   family.people.push(s);

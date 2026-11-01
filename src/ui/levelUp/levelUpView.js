@@ -24,8 +24,7 @@
 // reason that file gives: Skyrim advances ONE of three pools, and
 // Daggerfall hands you a POOL of four to six points to spread over
 // EIGHT attributes (FormulaHelper.BonusPool; thirty from the Oghma
-// Infinium; a priced purse under the vendored Oblivion-Remastered
-// mod). A screen that offered "Magicka / Health / Stamina" would be a
+// Infinium). A screen that offered "Magicka / Health / Stamina" would be a
 // picture of another game's law.
 //
 // So the sky is ours: the eight attributes are one asterism - a
@@ -44,18 +43,14 @@
 //
 //   classic / oghma  ui/charsheet.js LevelUpScreen  (statUp/statDown,
 //                    applyLevelUp with the pre-rolled pool)
-//   virtue           ui/virtueLevelUp.js VirtueLevelUpScreen
-//                    (canRaiseAttribute ... commitVirtueLevelUp)
 //
-// Both are already headless state machines whose only canvas-bound
-// part is `draw`, so the enhanced window is a SECOND FACE on the same
-// object rather than a third rollout. That matters beyond tidiness:
-// the hosts read `.done` off the screen, the dungeon's font-less
-// escape reads `.isVirtueLevelUp` and `spendRemainingHeadless`, and
-// the mod's three-attribute cap, its +5 ceiling and Luck's price are
-// all questions only its own module can answer. A window that asked
-// them itself would be the ONE DFU MEMBER, ONE EXPORT violation with
-// a player's stat sheet on the other end of it.
+// It is a headless state machine whose only canvas-bound part is `draw`,
+// so the enhanced window is a SECOND FACE on the same object rather than
+// a second rollout. That matters beyond tidiness: the hosts read `.done`
+// off the screen and the dungeon's font-less escape reads
+// `spendRemainingHeadless`. A window that asked the law's questions
+// itself would be the ONE DFU MEMBER, ONE EXPORT violation with a
+// player's stat sheet on the other end of it.
 //
 // ── ASK THE LAW, NEVER RESTATE IT ─────────────────────────────────
 // `canRaise` on the classic lane is not `pool > 0 && value < 100`.
@@ -68,8 +63,6 @@
 import { STAT_KEYS_ORDER } from '../../systems/chargen.js';
 import { statUp, statDown, MAX_STAT_VALUE } from '../chargen.js';
 import { mustDistributeBonusPointsText } from '../charsheet.js';
-import { REMAINING_POINTS_ERROR, remainingPointsLabel, TAKE_ONE_BACK_HINT } from '../virtueLevelUp.js';
-import { attributeOffset, canRaiseAttribute, canLowerAttribute, LEVELUP_TOTAL, levelBarProgress, levelingSettings, usesVirtueLeveling } from '../../systems/oblivionLeveling.js';   // ASCEND-ANYTIME: a mod-law view still needs the mod's own prices to draw a row
 import { LEVELUP_SKILL_SUM_PER_LEVEL, skillRecentlyIncreased } from '../../systems/advancement.js';
 import { onlineLevelRawPoints } from '../../systems/levelClimb.js';   // LEVEL-45, LEVEL-BAR, LEVEL-RAW
 import { atLevelCap } from '../../systems/levelCap.js';   // LEVEL-45: the bar at the cap
@@ -79,28 +72,22 @@ import { sheetModel } from '../enhanced/enhancedCharSheet.js';
 import { t } from '../../systems/textManager.js';   // AUDIT GROWTH LANE5-1: the window's own words, read in the player's language when drawn
 import { isOnlinePage } from '../../systems/online/onlineLane.js';   // LEVEL-EVEN: Endurance's words online
 
-/** The three shapes a level-up can wear. They are not three laws -
+/** The two shapes a level-up can wear. They are not two laws -
  *  oghma is the classic screen with `oghma` latched (AUDIT 39: a FIXED
- *  thirty, no Level++, no health roll) - but they are three different
+ *  thirty, no Level++, no health roll) - but they are two different
  *  sentences to say to a player, and the window says the right one. */
 export const LANE_CLASSIC = 'classic';
 export const LANE_OGHMA = 'oghma';
-export const LANE_VIRTUE = 'virtue';
 
-/** DUCK-TYPED, like every other seam that asks about these two screens
- *  (scenes/dungeonContext.js's font-less escape reads `isVirtueLevelUp`
- *  for the same reason): a `instanceof` here would drag two UI classes
- *  into every caller's import graph for a type test. */
+/** DUCK-TYPED: a `instanceof` here would drag the screen's UI class into every caller's import graph for a type test. */
 export function levelUpLane(screen) {
   if (!screen) return LANE_CLASSIC;
-  if (screen.isVirtueLevelUp) return LANE_VIRTUE;
   return screen.oghma ? LANE_OGHMA : LANE_CLASSIC;
 }
 
 /** The eight, as a player reads them. The classic sheet prints
  *  three-letter heads because a 320x200 panel has no room; this window
- *  has the room for the whole word, the same call ui/virtueLevelUp.js
- *  made. AUDIT GROWTH LANE5-1: each read in the player's language; a key that is no attribute keeps its own word. */
+ *  has the room for the whole word. AUDIT GROWTH LANE5-1: each read in the player's language; a key that is no attribute keeps its own word. */
 const ATTRIBUTE_NAME = Object.freeze({
   strength: () => t('levelup.attr.strength', 'Strength'),
   intelligence: () => t('levelup.attr.intelligence', 'Intelligence'),
@@ -283,16 +270,15 @@ export function crowdedStarPairs(fig = STAR_FIGURE) {
  *
  * It is a plain object rather than a class because every reader here
  * already takes a duck: `pool`/`base`/`working` is the classic
- * rollout's shape and `purse`/`deltas`/`s` is the mod's, so the rows,
- * the bar and the crown all answer without a branch of their own. The
- * two pools are zero, which is what makes every star refuse - `statUp`
- * and `canRaiseAttribute` both stop at an empty pool, so nothing here
- * restates "you may not raise this".
+ * rollout's shape, so the rows, the bar and the crown all answer without
+ * a branch of their own. The pool is zero, which is what makes every star
+ * refuse - `statUp` stops at an empty pool, so nothing here restates
+ * "you may not raise this".
  *
  * `confirm` closes it and does nothing else, which is why `canAscend`
  * is true from the first frame: there is nothing to finish.
  */
-export function viewOnlyScreen(entity, virtue = false) {
+export function viewOnlyScreen(entity) {
   const e = entity ?? {};
   const stats = { ...(e.stats ?? {}) };
   return {
@@ -306,13 +292,6 @@ export function viewOnlyScreen(entity, virtue = false) {
     pool: 0,
     base: stats,
     working: { ...stats },
-    // ...and THE MOD'S, for a character who levels by its law. The
-    // prices are real (a row still draws its cost) and the purse is
-    // empty, which is the whole of the refusal.
-    isVirtueLevelUp: virtue,
-    purse: 0,
-    deltas: Object.fromEntries(STAT_KEYS_ORDER.map((k) => [k, 0])),
-    s: virtue ? levelingSettings() : null,
     /** Never the all-max branch: that is a thing a LEVEL-UP says about
      *  points it cannot place, and this one has none to place. */
     allMax: () => false,
@@ -345,22 +324,7 @@ const liveOf = (entity, key, value, canRaise) => {
 
 export function rolloutRows(screen) {
   if (!screen) return [];
-  const virtue = levelUpLane(screen) === LANE_VIRTUE;
   return STAT_KEYS_ORDER.map((key, index) => {
-    if (virtue) {
-      const stats = screen.entity?.stats ?? {};
-      const base = stats[key] ?? 0;
-      const delta = screen.deltas?.[key] ?? 0;
-      const canRaise = canRaiseAttribute(key, stats, screen.deltas ?? {}, screen.purse ?? 0, screen.s);
-      return {
-        key, index, label: attributeLabel(key),
-        base, value: base + delta, delta,
-        ...liveOf(screen.entity, key, base + delta, canRaise),
-        cost: attributeOffset(key, screen.s),
-        canRaise,
-        canLower: canLowerAttribute(key, screen.deltas ?? {}),
-      };
-    }
     const base = screen.base?.[key] ?? 0;
     const value = screen.working?.[key] ?? base;
     const pool = screen.pool ?? 0;
@@ -402,16 +366,12 @@ export function starLabel(row) {
   return said.join(', ');
 }
 
-/** What is left to spend, in whichever currency this lane counts in. */
-export const rolloutPool = (screen) =>
-  (levelUpLane(screen) === LANE_VIRTUE ? (screen?.purse ?? 0) : (screen?.pool ?? 0));
+/** What is left to spend. */
+export const rolloutPool = (screen) => screen?.pool ?? 0;
 
-/** ...and what that currency is CALLED. The mod's own label for its
- *  side (l10n/en.yaml:36, through ui/virtueLevelUp.js), and the port's
- *  for Daggerfall's - "bonus points" is what CheckIfDoneLeveling's own
- *  refusal calls them (Internal_Strings.csv:110). AUDIT GROWTH LANE5-1: both read in the player's language. */
-export const poolLabel = (screen) =>
-  (levelUpLane(screen) === LANE_VIRTUE ? remainingPointsLabel() : t('levelup.pool.bonus', 'Bonus points left'));
+/** ...and what it is CALLED: "bonus points" is what CheckIfDoneLeveling's own refusal calls them (Internal_Strings.csv:110).
+ *  AUDIT GROWTH LANE5-1: read in the player's language. */
+export const poolLabel = () => t('levelup.pool.bonus', 'Bonus points left');
 
 /**
  * THE OK BUTTON'S GATE - and BOTH of CheckIfDoneLeveling's terms.
@@ -431,18 +391,10 @@ export const poolLabel = (screen) =>
  * (`_workingAllMax`). `ui/charsheet.js`'s LevelUpScreen did NOT - the
  * screen the enhanced skin mounted until this slice - so this is a
  * hole closed in both faces at once, from ui/chargen.js's one home.
- *
- * THE MOD'S LANE NEEDS NO SUCH ARM and must not get one: `virtuePurse`
- * clamps the purse to what a legal spend can actually pay for (ORL1's
- * own fix for its own wall), so an all-max virtue character is minted
- * a purse of nothing and this reads zero by the first term.
  */
 export const canAscend = (screen) => !!screen && (rolloutPool(screen) === 0 || allMaxed(screen));
 
-/** DaggerfallStats.IsAllMax, asked of whichever screen is live - the
- *  classic rollout answers it from ui/chargen.js's one home, and the
- *  mod's window does not answer it at all (it has no such branch, and
- *  its purse is clamped instead). */
+/** DaggerfallStats.IsAllMax, asked of the live screen - the classic rollout answers it from ui/chargen.js's one home. */
 export const allMaxed = (screen) => typeof screen?.allMax === 'function' && screen.allMax();
 
 /** ...and what the window SAYS on that branch, because a plate reading
@@ -450,14 +402,11 @@ export const allMaxed = (screen) => typeof screen?.allMax === 'function' && scre
  *  broken. The port's own words: DFU shows nothing here at all. AUDIT GROWTH LANE5-1: read when drawn, and plain. */
 export const allMaxLine = () => t('levelup.allMax', 'Every attribute is at its maximum. Leftover points can\'t be spent.');
 
-/** The refusal each lane already ships, so the window quotes rather
- *  than invents. */
-export const refusalText = (screen) =>
-  (levelUpLane(screen) === LANE_VIRTUE ? REMAINING_POINTS_ERROR : mustDistributeBonusPointsText());
+/** The refusal the rollout already ships, so the window quotes rather than invents. */
+export const refusalText = () => mustDistributeBonusPointsText();
 
-/** IN A CORNER: points left and no star will take another. Only the
- *  mod's priced purse can reach that state (ui/virtueLevelUp.js's
- *  `cornered`), and its answer - take one back - is the same here. */
+/** IN A CORNER: points left and no star will take another. Only a
+ *  maxed character can reach that state, and it has its own line. */
 export function corneredHint(screen) {
   if (!screen || rolloutPool(screen) <= 0) return null;
   if (rolloutRows(screen).some((r) => r.canRaise)) return null;
@@ -466,7 +415,7 @@ export function corneredHint(screen) {
   // instruction with no elsewhere in it, on a window that would not
   // have let them out either way. There the truth is the other line
   // and the button is open (LV1's audit).
-  return allMaxed(screen) ? allMaxLine() : TAKE_ONE_BACK_HINT;
+  return allMaxed(screen) ? allMaxLine() : null;
 }
 
 /**
@@ -477,7 +426,7 @@ export function corneredHint(screen) {
  * same two moves the keyboard makes, in the same order, through the
  * same `input`. Going around it to `raise(key)` would skip the click
  * sound on one lane and the refusal latch on the other, and would put
- * a second set of rules in the window (ORL1's hover incident is what
+ * a second set of rules in the window (a hover incident is what
  * two sets of rules cost: every mouse press acted on Luck).
  *
  * Returns whether anything moved, so the view can stay silent when a
@@ -555,35 +504,19 @@ export function levelUpCrown(entity, screen) {
  * Classic: PlayerEntity's own sum, through calculatePlayerLevel's
  * arithmetic - `(current - starting + 28)` is the numerator and
  * LEVELUP_SKILL_SUM_PER_LEVEL divides it, so the remainder is how far
- * into the level you stand. The divisor is IMPORTED, not typed: ORL1's
- * deep audit made that a rule, because a screen that quotes a law by
+ * into the level you stand. The divisor is IMPORTED, not typed: because a screen that quotes a law by
  * copying its number goes stale the day the law moves.
  *
- * Virtue: the mod's bar, out of LEVELUP_TOTAL, with what rolled over
- * (rollOverLevelProgress) named beside it - for a character the mod's
- * law levels, whichever screen is up: the Oghma Infinium mounts the
- * classic rollout for them too, and its crown read the skill sum that
- * levels nothing for them (AUDIT 28e, LEVEL-PCT's mismatch inside
- * Enhanced Plus; the classic Level box asks the same question).
  */
 export function levelProgress(entity, screen) {
   const e = entity ?? {};
   // LEVEL-45 (systems/levelCap.js): at the cap no level is next - the bar is full and says so, on either lane
-  if (atLevelCap(e)) return { now: 1, max: 1, carried: 0, label: t('levelup.progress.cap', 'Highest level reached'), cap: true };   // AUDIT FB1026d II C3: `cap` - the bar says its label alone
-  if (levelUpLane(screen) === LANE_VIRTUE || usesVirtueLeveling(e)) {
-    return {
-      now: levelBarProgress(e),
-      max: LEVELUP_TOTAL,
-      carried: e.levelRollUp ?? 0,
-      label: t('levelup.progress.virtue', 'Progress to next level'),
-    };
-  }
+  if (atLevelCap(e)) return { now: 1, max: 1, label: t('levelup.progress.cap', 'Highest level reached'), cap: true };   // AUDIT FB1026d II C3: `cap` - the bar says its label alone
   if (e._online === true) {   // LEVEL-45: online the climb is shared out to 45 (systems/levelClimb.js); LEVEL-RAW: in the sheet's points
     const { now, max } = onlineLevelRawPoints(e);
     return {
       now,
       max,
-      carried: 0,
       label: t('levelup.progress.classic', 'Skill progress to next level'),
     };
   }
@@ -592,7 +525,6 @@ export function levelProgress(entity, screen) {
   return {
     now: ((span % per) + per) % per,
     max: per,
-    carried: 0,
     label: t('levelup.progress.classic', 'Skill progress to next level'),
   };
 }
@@ -758,7 +690,7 @@ export function levelUpFrame(entity, screen, refused = false) {
     crown: levelUpCrown(entity, screen),
     progress: levelProgress(entity, screen),
     pool: rolloutPool(screen),
-    poolLabel: poolLabel(screen),
+    poolLabel: poolLabel(),
     rows: rolloutRows(screen),
     focus: focusedKey(screen),
     canAscend: canAscend(screen),
@@ -769,7 +701,7 @@ export function levelUpFrame(entity, screen, refused = false) {
     // enhanced skin's OK button would refuse a classic level-up in
     // total silence, which is the defect ui/enhanced/enhancedChunk.js's whole
     // header is about.
-    refusal: (refused || screen?.refused) ? refusalText(screen) : null,
+    refusal: (refused || screen?.refused) ? refusalText() : null,
     cornered: corneredHint(screen),
   };
 }

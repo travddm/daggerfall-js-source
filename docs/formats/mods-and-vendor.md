@@ -65,7 +65,6 @@ Mods (the folder README has the version, credits and permission):
 | `dynamic-skies`, `handheld-torches`, `shield-widget`, `weapon-widget` | Settings, textures, shaders |
 | `grimoire-ui` | UI art listing (`systems/uiPack.js`) |
 | `weapon-sheathing` | An OpenMW mod's scabbard meshes and bone add-ons (`systems/weaponSheathingAssets.js`) |
-| `oblivion-remaster-leveling` | An OpenMW Lua mod's source (leveling rules) |
 | `raum-book` | The animated journal's book and paper code |
 | `pixelify-glyphs`, `silkscreen-five` | Single glyphs for the enhanced skin's fonts |
 | `roads-hazelnut` | Basic Roads' road, track, river and stream bitmaps |

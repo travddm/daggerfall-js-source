@@ -1,21 +1,17 @@
-// ORL1 - THE
-// LEVELING CHOICE, the last screen of making a character.
+// THE ONE-TIME QUESTIONS OF MAKING A CHARACTER, on one screen: Project Legacy's model (ui/legacy/legacyModelChoice.js)
+// is put on it, and ui/startChoice.js follows its contract. Its cursor, its one answer, its keys and clicks and both
+// faces (the canvas text below, and the Enhanced Plus window of ui/enhanced/enhancedChoiceFace.js) are shared.
 //
-// ── WHY IT IS A SCREEN AND NOT A CHARGEN STAGE ────────────────────
-// The wizard's stages are DFU's WizardStages, in both skins
-// (ui/chargen.js's STATES, ui/enhanced/enhancedChargen.js's STAGE_RAIL), and a
-// port-invented stage in that list would be a stage with no DFU line
-// behind it - in two lists that have to be kept in step. So this is
-// not a stage: it is a screen the chargen DOOR puts up after the
-// wizard has finished and before the character reaches the world, and
-// it lives in ONE place (systems/chargenSession.js's
-// createChargenWindow) so that all three chargen hosts get it without
+// ── WHY A SCREEN AND NOT A CHARGEN STAGE ──────────────────────────
+// The wizard's stages are DFU's WizardStages, in both skins (ui/chargen.js's STATES,
+// ui/enhanced/enhancedChargen.js's STAGE_RAIL), and a port-invented stage in that list would be a stage with no DFU
+// line behind it. So a question is a screen the chargen DOOR (systems/chargenSession.js) puts up after the wizard has
+// finished and before the character reaches the world, in ONE place, so that all three chargen hosts get it without
 // knowing it exists.
 //
 // ── WHY THE TEXT IDIOM ────────────────────────────────────────────
-// THE NATIVE-WINDOW RULE, same answer as ui/virtueLevelUp.js's: there
-// is no DFU window to cite geometry from, because Daggerfall never
-// asked this question, and the rule's own answer to an element whose
+// THE NATIVE-WINDOW RULE: there is no DFU window to cite geometry from, because Daggerfall never asked these
+// questions, and the rule's own answer to an element whose
 // value is unknown is that the element does not draw. So nothing here
 // claims any, and no native art is loaded at all. The
 // port's parchment box (ui/messageBox.js) would be the right frame for
@@ -32,78 +28,10 @@ import { audio } from '../systems/audio.js';
 import { SOUND } from '../systems/soundClips.js';
 import { drawText, measureText } from './text.js';
 import { nativeMetrics, NATIVE_W } from './native/nativePanel.js';
-import {
-  LEVELUP_BONUS_POOL_MIN, LEVELUP_BONUS_POOL_MAX, LEVELUP_SKILL_SUM_PER_LEVEL,
-} from '../systems/advancement.js';
-import {
-  LEVELING_CLASSIC, LEVELING_VIRTUE, levelingSettings, LEVELUP_TOTAL, ONLINE_LEVELING_SYSTEM,
-} from '../systems/oblivionLeveling.js';
 import { isEnhanced } from '../systems/uiSkin.js';   // LEVEL-PLUS: the Enhanced Plus face
-import { drawLevelingFace, releaseLevelingFace } from './enhanced/enhancedLevelingChoice.js';
-import { ONLINE_BONUS_POOL } from '../systems/levelEven.js';   // LEVEL-EVEN: online, every level's five
-import { t } from '../systems/textManager.js';
+import { drawChoiceFace, releaseChoiceFace } from './enhanced/enhancedChoiceFace.js';
 
-/** LEVEL-ONLINE-2: why Oblivion's option is shut on the online page (oblivionLeveling.js newCharacterLevelingSystem). */
-export const LEVELING_OFFLINE_ONLY_NOTE = 'Offline characters only';
-
-/**
- * The two answers, in the order they are offered. Daggerfall's own is
- * FIRST and is what a player who presses Enter without reading gets -
- * the port's own law is the default, and the mod is the opt-in.
- *
- * IT IS A FUNCTION, NOT A FROZEN TABLE, because the mod's purse and its
- * bar are SETTINGS: `attributePoints` is a slider from 0 to 60 and the
- * Mods pane exposes it. A literal "twelve virtues" here would lie to
- * any player who had moved it - and this is the one screen a character
- * cannot come back to, so it is the worst screen in the game to lie on.
- * (ORL1's adversarial review; the answer is read once, when the
- * question is built.)
- */
-export function levelingOptions(s = null, { online = false } = {}) {
-  const set = s ?? levelingSettings();
-  // LEVEL-ONLINE-2: online, every system but ONLINE_LEVELING_SYSTEM is shown but SHUT - a new online character levels
-  // Daggerfall's way (the law is newCharacterLevelingSystem at finishChargen; this is only the screen saying so first).
-  const shut = { locked: true, lockNote: LEVELING_OFFLINE_ONLY_NOTE };
-  const open = { locked: false, lockNote: null };
-  const gate = (id) => (online && id !== ONLINE_LEVELING_SYSTEM ? shut : open);
-  const purse = set.attributePoints;
-  const virtues = purse === 1 ? '1 virtue' : `${purse} virtues`;
-  return Object.freeze([
-    Object.freeze({
-      id: LEVELING_CLASSIC,
-      title: 'Classic',
-      ...gate(LEVELING_CLASSIC),
-      lines: Object.freeze([
-        'Level with your skills, the classic way.',
-        'Primary, major and minor skills make a sum;',
-        `every ${LEVELUP_SKILL_SUM_PER_LEVEL} points of it is a level.`,
-        online ? t('leveling.classic.poolOnline', 'Each level gives {n} attribute points.', { n: ONLINE_BONUS_POOL }) : `Each level rolls ${LEVELUP_BONUS_POOL_MIN} to ${LEVELUP_BONUS_POOL_MAX} attribute points.`,   // LEVEL-EVEN
-      ]),
-    }),
-    Object.freeze({
-      id: LEVELING_VIRTUE,
-      title: 'Oblivion Remastered',
-      ...gate(LEVELING_VIRTUE),
-      lines: Object.freeze([
-        'Level with a bar, as in Oblivion Remastered.',
-        'Every skill you raise fills it, your best',
-        `skills fastest. At ${LEVELUP_TOTAL} you level; the rest`,
-        purse > 0
-          ? `rolls over. Each level gives you ${virtues},`
-          : 'rolls over. Attribute points are set to 0,',
-        purse > 0
-          ? `to spend on up to ${set.maxUpdatableAttribute} attributes.`
-          : 'so leveling raises only your health.',
-      ]),
-    }),
-  ]);
-}
-
-/** The ids, in the order the screen offers them - what a caller wants
- *  when it is asking about the ANSWERS rather than drawing the words. */
-export const LEVELING_OPTION_IDS = Object.freeze([LEVELING_CLASSIC, LEVELING_VIRTUE]);
-
-/** WHERE THE TWO ANSWERS SIT, in the 320x200 native units the hosts'
+/** WHERE THE ANSWERS SIT, in the 320x200 native units the hosts'
  *  pointer seam speaks (ui/chargen.js's `clickNative`, townTalk's own
  *  route). ONE table, read by the draw AND by the hit test, because a
  *  screen whose picture and whose click target are written twice is a
@@ -116,8 +44,8 @@ export const CHOICE_X0 = 16, CHOICE_X1 = 304;
 
 /** How tall one option's block is - TITLE PLUS ITS LINES, which is what
  *  the draw paints and therefore what a click on it must cover. It was a
- *  literal 52 while the Oblivion option painted 62, so its last line sat
- *  outside its own hit box (ORL1's deep audit). Derived here, once, so
+ *  literal 52 while an option painted 62, so its last line sat
+ *  outside its own hit box. Derived here, once, so
  *  the picture and the target cannot drift apart again. */
 export const choiceHeight = (opt) =>
   CHOICE_TITLE_H + (opt?.lines?.length ?? 0) * CHOICE_LINE_H;
@@ -151,24 +79,17 @@ export function stackedTops(options = []) {
 /** The keys a screen of `n` answers names ('1 or 2', '1, 2 or 3'). */
 export const choiceKeysWord = (n) => (n <= 1 ? '1' : `${Array.from({ length: n - 1 }, (_, i) => i + 1).join(', ')} or ${n}`);
 
-/** The classic face's three lines above the options. */
-export const LEVELING_SCREEN_TEXT = Object.freeze({ title: 'HOW WILL YOU GROW?', lines: Object.freeze(['Choose how this character will level.', 'It cannot be changed later.']) });
-
-export class LevelingChoiceScreen {
-  /** @param {(id: string) => void} onAnswer */
-  /** LEGACY2: `options`, `text` and the Plus face's `faceText` / `faceTags` let another one-time question of a new
-   *  character (ui/legacy/legacyModelChoice.js, Project Legacy's model) wear this same screen - its cursor, its one answer,
-   *  its keys and clicks, and both faces - rather than a copy of it. Without them it is the leveling question. */
-  constructor(onAnswer, { settings = null, online = false, options = null, text = null, faceText = null, faceTags = null, stacked = false } = {}) {
+export class ChoiceScreen {
+  /** @param {(id: string) => void} onAnswer
+   *  @param {{ options: readonly any[], text: { title: string, lines: readonly string[] }, faceText: any, faceTags?: any, stacked?: boolean }} question
+   *  `options` are the answers, `text` the canvas face's words above them, `faceText` / `faceTags` the Plus face's. */
+  constructor(onAnswer, { options, text, faceText, faceTags = null, stacked = false }) {
     this._onAnswer = onAnswer;
-    /** Read ONCE, when the question is built - a player cannot move a
-     *  slider while this screen is up, and re-reading per frame would
-     *  make the words change under them. */
-    this.options = options ?? levelingOptions(settings, { online });
+    this.options = options;
     /** LEGACY-CHOICE: a stacked screen's own block tops (stackedTops), one past the last its footer's; null keeps the
-     *  fixed pitch (the leveling question's two). */
+     *  fixed pitch. */
     this.tops = stacked ? stackedTops(this.options) : null;
-    this.text = text ?? LEVELING_SCREEN_TEXT;
+    this.text = text;
     this.faceText = faceText;
     this.faceTags = faceTags;
     this._fired = false;
@@ -187,7 +108,7 @@ export class LevelingChoiceScreen {
     if (this._fired) return false;
     this._fired = true;
     this.done = true;
-    releaseLevelingFace(this);   // LEVEL-PLUS: the face goes with the question
+    releaseChoiceFace(this);   // LEVEL-PLUS: the face goes with the question
     this._onAnswer?.(id);
     return true;
   }
@@ -234,7 +155,7 @@ export class LevelingChoiceScreen {
 
   input(action) {
     if (this._fired) return;
-    const move = LevelingChoiceScreen.ACTIONS[action];
+    const move = ChoiceScreen.ACTIONS[action];
     switch (move) {
       case 'up':
       case 'down': {
@@ -264,7 +185,7 @@ export class LevelingChoiceScreen {
    * the door puts in FRONT of its OK must be clickable too. Without
    * this a player who never touched the keyboard reached the question
    * and could go no further: the wizard was finished, `done` never came
-   * true, and `finishChargen` never ran. (ORL1's adversarial review.)
+   * true, and `finishChargen` never ran.
    *
    * A click on an option picks it AND answers, which is the one-press
    * behaviour every other picker in the wizard has.
@@ -275,7 +196,7 @@ export class LevelingChoiceScreen {
    * mapped the pointer onto the canvas face's ROWS - which the Plus face
    * does not draw (its tiles stand side by side) - and the highlight
    * followed rows nobody could see. While the face is up its tiles own
-   * the pointer (ui/enhanced/enhancedLevelingChoice.js: pointerenter and click),
+   * the pointer (ui/enhanced/enhancedChoiceFace.js: pointerenter and click),
    * as ui/yesNoBox.js's card owns its presses.
    */
   click(vx, vy) {
@@ -308,7 +229,7 @@ export class LevelingChoiceScreen {
    * wrong leveling system, chosen
    * silently, on the one screen a character can never come back to.
    * tools/chargenClickProbe.mjs runs at 1400x900 and clicked a point
-   * inside the overlap, so it could not see it. (ORL1's deep audit.)
+   * inside the overlap, so it could not see it.
    *
    * `nativeMetrics(canvas)` is the idiom every other clickable native
    * window uses, and it is right in BOTH hosts: dungeonContext hands a
@@ -316,10 +237,10 @@ export class LevelingChoiceScreen {
    * nativeMetrics of that returns ox = oy = 0.
    */
   draw(renderer, canvas, font) {
-    // LEVEL-PLUS: on the Enhanced Plus skin the question wears the Plus window (ui/enhanced/enhancedLevelingChoice.js); the
+    // LEVEL-PLUS: on the Enhanced Plus skin the question wears the Plus window (ui/enhanced/enhancedChoiceFace.js); the
     // canvas below is the classic skin's, and the fallback for a host with no document.
     this._faced = false;
-    if (!this._fired && isEnhanced() && typeof document !== 'undefined' && drawLevelingFace(this)) { this._faced = true; return; }
+    if (!this._fired && isEnhanced() && typeof document !== 'undefined' && drawChoiceFace(this)) { this._faced = true; return; }
     const m = nativeMetrics(canvas);
     const s = m.s;
     renderer.drawScreenQuad(null, { x: 0, y: 0, w: canvas.width, h: canvas.height },

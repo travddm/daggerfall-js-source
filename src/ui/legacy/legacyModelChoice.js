@@ -1,16 +1,15 @@
 // @ts-check
 // LEGACY2: PROJECT LEGACY'S QUESTION - the model of the house a new character founds, put by
-// the chargen door after the leveling question (systems/chargenSession.js withLevelingChoice), on the leveling
-// question's own screen (ui/levelingChoice.js LevelingChoiceScreen: its cursor, its one answer, both faces). Like the
-// leveling system it is answered once and never changed: the permanence is the point of one and the safety of the
-// other. Enduring is first - the answer a player who presses Enter without reading gets is the one that cannot cost
+// the chargen door after the wizard (systems/chargenSession.js withChargenQuestions), on the one-time question
+// screen (ui/choiceScreen.js ChoiceScreen: its cursor, its one answer, both faces). It is answered once and never
+// changed: the permanence is the point of one model and the safety of the other. Enduring is first - the answer a player who presses Enter without reading gets is the one that cannot cost
 // them a character.
 //
 // LEGACY-CHOICE: ONLINE THE QUESTION HAS A THIRD
 // ANSWER - no lineage (systems/legacy/family.js NO_LINEAGE): the character founds no house, and Project Legacy sits
 // them out for good (legacyHost.js found). Its own words on the Plus face (the popup), the three side by side.
 // Offline the mod's own switch in Features does that for every character, and the question keeps its two.
-import { LevelingChoiceScreen } from '../levelingChoice.js';
+import { ChoiceScreen } from '../choiceScreen.js';
 import { MODELS, NO_LINEAGE } from '../../systems/legacy/family.js';
 import { legacySettings } from '../../systems/legacy/settings.js';
 import { isOnlinePage } from '../../systems/online/onlineLane.js';
@@ -33,8 +32,8 @@ export const LEGACY_CHOICE_FACE = Object.freeze({
 });
 /** ...and the classic face's two lines over the options, online. */
 export const LEGACY_CHOICE_TEXT = Object.freeze({ title: 'WILL YOUR LINE ENDURE?', lines: Object.freeze(['Found a house and choose its way with death,', 'or play without one. It cannot be changed later.']) });
-/** Each answer's short tag on the Plus face. LEGACY-CHOICE: no lineage is the game's own death, tagged with the word the
- *  leveling question gives the game as it always was (LEVELING_FACE_TAGS) - not its title said twice. */
+/** Each answer's short tag on the Plus face. LEGACY-CHOICE: no lineage is the game's own death, tagged 'Classic' - not its
+ *  title said twice. */
 export const LEGACY_MODEL_TAGS = Object.freeze({ [MODELS.enduring]: 'Not permadeath', [MODELS.bloodline]: 'Permadeath', [NO_LINEAGE]: 'Classic' });
 
 /** LEGACY7: Bloodline's word online - the realm holds the line, so the death is final on every device. */
@@ -68,8 +67,8 @@ export function legacyModelOptions({ online = isOnlinePage(), tollShare = legacy
 }
 
 /** The question, answering `onAnswer(model)` once - online a model or no lineage (LEGACY-CHOICE), offline a model. Its
- *  three online answers stack on the classic face by their own heights (LevelingChoiceScreen `stacked`). */
-export const legacyModelScreen = (onAnswer, { online = isOnlinePage() } = {}) => new LevelingChoiceScreen(onAnswer, {
+ *  three online answers stack on the classic face by their own heights (ChoiceScreen `stacked`). */
+export const legacyModelScreen = (onAnswer, { online = isOnlinePage() } = {}) => new ChoiceScreen(onAnswer, {
   options: legacyModelOptions({ online }), text: online ? LEGACY_CHOICE_TEXT : LEGACY_MODEL_TEXT,
   faceText: online ? LEGACY_CHOICE_FACE : LEGACY_MODEL_FACE, faceTags: LEGACY_MODEL_TAGS, stacked: online,
 });

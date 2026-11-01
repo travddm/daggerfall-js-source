@@ -48,7 +48,6 @@ import { registerModSaveData } from '../systems/modSaveData.js';
 import { REALM_ACT_TRANSIENT } from '../systems/realmSaves.js';   // REZ-BLOODLINE AUDIT R1: a Resurrect's ask the realm never heard
 import { t } from '../systems/textManager.js';   // REZ-BLOODLINE AUDIT R1: the fallen told in their own language (L10N4)
 import { rollStats, rollSkills, spendPoolLowest, STAT_KEYS_ORDER } from '../systems/chargen.js';
-import { LEVELING_CLASSIC } from '../systems/oblivionLeveling.js';
 import { pickHeirloom, markHeirloom, mintRemainsItem, isRemainsItem, isHeirloom, attuneHeirloom, blessingOf, blessedIn, remainsGoldOf, REMAINS_LIST, BLESSING_POINTS } from '../systems/legacy/heirloom.js';
 import { SKILL_NAMES } from '../systems/skills.js';
 import { syncHouses, householdOf, residentOf, familyResOf, kinGreeting, setFamilyHome, familyHome, sameHouse, deedsDue, houseKeyOf } from '../systems/legacy/household.js';
@@ -1092,7 +1091,6 @@ export function createLegacyHost(deps) {
       careerIndex: p.careerIndex, career, stats: values.stats, skills: values.skills, isCustom: custom, customReps: null,
       biographyEffects: [], reflexes: BORN_REFLEXES, factionDict,
       backStory: [`${parent ? `Child of ${fullNameOf(parent.given, parent.surname)}, of` : 'Of'} the house${houseWord(family.surname) ? ` of ${houseWord(family.surname)}` : ''}.`],   // LEGACY-NAME
-      levelingSystem: p.leveling ?? LEVELING_CLASSIC,
     };
   }
 

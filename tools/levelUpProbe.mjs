@@ -3,7 +3,7 @@
 // The claim a source sweep cannot make: the enhanced level-up window
 // DRAWS, its stars spend the pool the law rolled, it refuses every way
 // out while a point is unspent, and the commit that ends it moves the
-// entity by exactly one level - in all three lanes, at four viewport
+// entity by exactly one level - in both lanes, at four viewport
 // sizes, by pointer and by keyboard alone.
 //
 // Run against a dev server (no game data needed):
@@ -174,39 +174,6 @@ async function boxes(page) {
   check('oghma: no health roll', end.maxHealth === start.maxHealth);
   check('oghma: both flags clear together', end.ready === false && end.oghma === false);
   check('oghma: no page errors', errors.length === 0, errors.join(' | '));
-  await ctx.close();
-}
-
-// ── 7. THE MOD'S LANE, BY ITS OWN RULES ──────────────────────────
-{
-  const { ctx, page, errors } = await open('virtue', { width: 1400, height: 900 });
-  const m = await model(page);
-  check('virtue: the purse is counted in the mod’s own words', /virtue/i.test(m.poolLabel), m.poolLabel);
-  check('virtue: the window is the mod’s lane', m.lane === 'virtue');
-  // Luck is priced differently from the rest (attributeOffset), and the
-  // window must say so rather than let a player discover it by pressing.
-  const luck = m.rows.find((r) => r.key === 'luck');
-  check('virtue: Luck carries its own price', luck.cost >= 1, `${luck.cost} per point`);
-  await page.screenshot({ path: `${shots}/levelup-virtue.png` });
-  // Spend the purse the way a player would - into the row the window
-  // offers - until nothing is legal, then commit.
-  for (let i = 0; i < 40; i++) {
-    const cur = await model(page);
-    if (cur.pool === 0) break;
-    const row = cur.rows.find((r) => r.canRaise);
-    if (!row) break;
-    await page.locator('.lv-star').nth(row.index).click();
-  }
-  const spent = await model(page);
-  check('virtue: the purse spends to zero under the mod’s caps', spent.pool === 0, `left ${spent.pool}`);
-  const raised = spent.rows.filter((r) => r.delta > 0).length;
-  check('virtue: at most the mod’s number of attributes moved', raised > 0 && raised <= 3, `${raised} attributes`);
-  const start = await entity(page);
-  await page.locator('.lv-ok').click();
-  await page.waitForTimeout(150);
-  const end = await entity(page);
-  check('virtue: the commit is the mod’s commit', end.level === start.level + 1 && end.ready === false, `${start.level} -> ${end.level}`);
-  check('virtue: no page errors', errors.length === 0, errors.join(' | '));
   await ctx.close();
 }
 

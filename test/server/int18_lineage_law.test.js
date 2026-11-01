@@ -20,7 +20,7 @@ import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 const entity = (over = {}) => ({
   name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', raceId: 4, faceIndex: 3, careerIndex: 5,
   career: { name: 'Nightblade', primarySkills: [28, 22, 16], majorSkills: [19, 24, 13], minorSkills: [1, 2, 3, 4, 5, 6] },
-  level: 7, characterId: 'c-ysolde', chargenDone: true, levelingSystem: 'virtue',
+  level: 7, characterId: 'c-ysolde', chargenDone: true,
   stats: { strength: 100, intelligence: 100, willpower: 100, agility: 100, endurance: 100, personality: 100, speed: 100, luck: 100 },
   skills: Array.from({ length: 35 }, () => 100),
   ...over,

@@ -32,13 +32,6 @@ import { onlineLevelFor } from './levelClimb.js';   // LEVEL-45: the online leve
 import { refreshOnlineLayer } from './renownLayer.js';   // LEVEL-EVEN: the online health floor read again over the level's new maximum
 import { isOnlinePage } from './online/onlineLane.js';
 import { LEVEL_CAP, atLevelCap, releaseCapLatch } from './levelCap.js';   // LEVEL-45: the level stops at 45
-// ORL1: the ONE question this file asks the vendored mod - whose law
-// levels this character. Everything DFU below is untouched by the
-// answer; the two arms simply do not both run.
-import {
-  usesVirtueLeveling, addSkillProgress, checkForVirtueLevelUp, levelingSettings, virtueLevelUpHeadless,
-} from './oblivionLeveling.js';
-
 // DaggerfallSkills.GetAdvancementMultiplier, all 35, verbatim.
 export const SKILL_ADVANCEMENT_MULTIPLIER = Object.freeze([
   12,   // Medical
@@ -83,20 +76,11 @@ export function skillUsesForAdvancement(skillValue, skillMult, careerAdvMult, le
   return Math.floor((skillValue * skillMult * careerAdvMult * levelMod * 2) / 5) + 1;
 }
 
-/** ORL1 (deep audit): the divisor, named - the leveling question prints
- *  it, and a screen that quotes a law by copying its number is a screen
- *  that goes stale the day the law moves. */
+/** The divisor, named: a screen that quotes a law by copying its number goes stale the day the law moves. */
 export const LEVELUP_SKILL_SUM_PER_LEVEL = 15;
 
 export const calculatePlayerLevel = (startingSum, currentSum) =>
   Math.floor((currentSum - startingSum + 28) / LEVELUP_SKILL_SUM_PER_LEVEL);
-
-/** LEVEL-ONLINE-2: the port's own inverse of calculatePlayerLevel - the starting sum that puts a character with
- *  `currentSum` at the very START of `level` (calculatePlayerLevel answers `level`, and no sum is yet banked toward the
- *  next). What a character switched ONTO Daggerfall's leveling is anchored at, so the sum its skills built under
- *  another system neither pays out levels at once nor owes any. */
-export const levelUpSkillSumAnchor = (currentSum, level) =>
-  currentSum + 28 - level * LEVELUP_SKILL_SUM_PER_LEVEL;
 
 /** sum(primary) + sum(major) - lowest major + highest minor - one home in skills.js, re-exported for this file's importers. */
 export { levelUpSkillSum };
@@ -149,14 +133,6 @@ export function raiseSkills(entity, classicTimeMinutes, rolls = Math.random, onL
   if (!entity.chargenDone) return [];
   if ((classicTimeMinutes - (entity.lastSkillCheckTime ?? 0)) <= SKILL_RAISE_CHECK_INTERVAL) return [];
   entity.lastSkillCheckTime = classicTimeMinutes;
-  // ORL1: read ONCE per pass, not per raise - the mod's Lua reads its
-  // three impact keys out of `skillsSettings` inside the handler
-  // (player.lua:35-37; its other storage handle, `levelUpSettings`, is
-  // read only outside it), but a player cannot move a slider in the
-  // middle of one skill check and one read per pass makes every raise in
-  // a pass obey the same rules.
-  const virtue = usesVirtueLeveling(entity);
-  const virtueSettings = virtue ? levelingSettings() : null;
   const raised = [];
   const priceLevel = raisePriceLevel(entity);   // LEVEL-45: online, the level its skills earned
   for (let i = 0; i < entity.skillUses.length; i++) {
@@ -198,14 +174,6 @@ export function raiseSkills(entity, classicTimeMinutes, rolls = Math.random, onL
     // primary hitting 100 mid-pass blocks later 95+ raises, verbatim.
     // SOFTCAP3: Master Skills lifts DFU's 95 lock - every skill may reach 100 (and, above, the climb goes on)
     if (entity.skills[i] < 100 && (entity.skills[i] < 95 || master || !alreadyMasteredASkill(entity))) {
-      // ORL1: the mod's own skill-level-up handler (player.lua:29-51),
-      // in the mod's own position - BEFORE the raise lands, because
-      // OpenMW calls it with the value the skill is leaving and the
-      // 0.5.3 fix reads exactly that value. It sits inside this gate
-      // rather than outside it because a raise the cap refuses is a
-      // skill that never levelled up, and OpenMW would not have called
-      // the handler at all.
-      if (virtue) addSkillProgress(entity, i, virtueSettings);
       entity.skills[i] += 1;
       // A4/A11: SetSkillRecentlyIncreased(i) sits between the raise
       // and SetCurrentLevelUpSkillSum (PlayerEntity.cs:1386-1388) - the
@@ -236,15 +204,10 @@ export function raiseSkills(entity, classicTimeMinutes, rolls = Math.random, onL
   // sheet after a one-level acknowledgment left `level` still below
   // the calculated level. DFU posts dfuiOpenCharacterSheetWindow; the
   // hosts' onLevelUp hook is that message.
-  // ORL1: the mod replaces the SUM with a bar, so it replaces the
-  // question asked of it - and only the question. Both arms raise the
-  // SAME `readyToLevelUp` flag, so every host's onLevelUp door, every
-  // sheet and the save all carry on reading what they already read.
-  if (virtue ? checkForVirtueLevelUp(entity) : checkForLevelUp(entity)) {
+  if (checkForLevelUp(entity)) {
     if (!onLevelUp) {
       // headless path (tests, ?class runs without the UI arc active)
-      if (virtue) virtueLevelUpHeadless(entity, virtueSettings, rolls);
-      else applyLevelUp(entity, (stats, pool) => spendPoolLowest(stats, Object.keys(stats), pool), rolls);
+      applyLevelUp(entity, (stats, pool) => spendPoolLowest(stats, Object.keys(stats), pool), rolls);
     } else {
       onLevelUp(entity);
     }

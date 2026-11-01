@@ -3,8 +3,8 @@
 // province past the Bay (systems/starts/starts.js STARTS) - their race's homeland chosen for them first.
 //
 // THE CHARGEN DOOR'S QUESTION, as the leveling and the lineage questions are (systems/chargenSession.js
-// withLevelingChoice: a stage of the one overlay, answered once, the answer riding the result as `startKey`), and
-// with their screen's contract (ui/levelingChoice.js LevelingChoiceScreen): one answer through `answer` (the
+// withChargenQuestions: a stage of the one overlay, answered once, the answer riding the result as `startKey`), and
+// with their screen's contract (ui/choiceScreen.js ChoiceScreen): one answer through `answer` (the
 // fire-once latch), `defaultId` for a question torn down unanswered, the overlay's action names and the raw codes, the
 // pointer in native 320x200 units, both faces. Eight answers do not stand as that screen's tiles, so this one is a
 // list and the chosen start's story beside it (the Plus face: ui/enhanced/enhancedStartChoice.js) - the classic face
@@ -82,7 +82,7 @@ export const START_CHOICE_TEXT = Object.freeze({
 });
 
 /** Where the list sits, in the native 320x200 units the hosts' pointer seam speaks - ONE table, read by the draw and by
- *  the hit test (ui/levelingChoice.js's law). */
+ *  the hit test (ui/choiceScreen.js's law). */
 export const START_ROW_TOP = 46;
 export const START_ROW_H = 11;
 export const START_X0 = 16, START_X1 = 304;
@@ -123,7 +123,7 @@ export class StartChoiceScreen {
    */
   constructor(onAnswer, { race = null, open = () => true, why = () => null } = {}) {
     this._onAnswer = onAnswer;
-    /** Read ONCE, when the question is built (ui/levelingChoice.js's law: the words never change under the player). */
+    /** Read ONCE, when the question is built (ui/choiceScreen.js's law: the words never change under the player). */
     const home = homelandStart(race);
     this.options = Object.freeze(STARTS.map((start) => {
       const shut = start !== STARTS[0] && !open(start);
@@ -132,7 +132,7 @@ export class StartChoiceScreen {
     /** The page's own words, which the Plus face reads off the screen. */
     this.text = START_CHOICE_TEXT;
     this._fired = false;
-    this._faced = false;   // the Plus face drew last frame - its rows take the pointer (ui/levelingChoice.js's LEGACY-POINTER)
+    this._faced = false;   // the Plus face drew last frame - its rows take the pointer (ui/choiceScreen.js's LEGACY-POINTER)
     this._shown = -1;   // AUDIT STARTS U3: the start whose story a face last drew - the one a press may answer for
     const at = this.options.findIndex((o) => o.homeland && !o.locked);
     this.cursor = at >= 0 ? at : this.defaultIndex;
@@ -190,7 +190,7 @@ export class StartChoiceScreen {
     if (this.options[i] && !this.options[i].locked) this.cursor = i;
   }
 
-  /** Both vocabularies (ui/levelingChoice.js ACTIONS): the overlay's action names and the raw codes - digits 1 to 8. */
+  /** Both vocabularies (ui/choiceScreen.js ACTIONS): the overlay's action names and the raw codes - digits 1 to 8. */
   static ACTIONS = Object.freeze({
     up: 'up', ArrowUp: 'up', down: 'down', ArrowDown: 'down',
     confirm: 'confirm', Enter: 'confirm', NumpadEnter: 'confirm', KeyE: 'confirm',
@@ -225,7 +225,7 @@ export class StartChoiceScreen {
   }
 
   /** The Plus face on the Enhanced Plus skin; else the classic face - the list, then the chosen start's story - painted
-   *  where the hit test looks (nativeMetrics, ui/levelingChoice.js's law). */
+   *  where the hit test looks (nativeMetrics, ui/choiceScreen.js's law). */
   draw(renderer, canvas, font) {
     this._faced = false;
     if (!this._fired && isEnhanced() && typeof document !== 'undefined' && drawStartChoiceFace(this)) { this._faced = true; this._shown = this.cursor; return; }

@@ -10,7 +10,6 @@ import {
 import { calculatePlayerLevel, checkForLevelUp, applyLevelUp } from '../../src/systems/advancement.js';
 import { evenHpFloor } from '../../src/systems/levelEven.js';
 import { LEVEL_CAP } from '../../src/systems/levelCap.js';
-import { crossLeveling } from '../../src/systems/realmLeveling.js';
 import { JUDGE_LEVEL_MAX, characterFindings } from '../../server-account/src/judge.js';
 import { REALM_LEVEL_CLAIM_MAX } from '../../server-account/src/realm.js';
 import { rollSkills, spendPoolLowest } from '../../src/systems/chargen.js';
@@ -153,16 +152,16 @@ test('LEVEL-OWED: online a level taken offers the next one owed at once; offline
   assert.equal(off.readyToLevelUp, false, 'offline: DFU\'s RaiseSkills re-offers on its next pass');
 });
 
-test('LEVEL-45: the conversion keeps the sum the level stands on (SWAP-CYCLE) and rides LEVEL-ONLINE\'s switch at every join', () => {
+test('LEVEL-45: the conversion keeps the sum the level stands on (SWAP-CYCLE) and runs at every join', () => {
   const held = save({ level: 30, start: 150, current: 640 });
   onlineLevelConvert(held);
   assert.equal(held.currentLevelUpSkillSum, 640, 'never below the held sum');
-  const crossing = { ...save({ level: 60, start: 200, current: 700 }), levelingSystem: 'virtue', levelProgress: 40, readyToLevelUp: false };
-  crossLeveling(crossing);
-  assert.equal(crossing.level, 38, 'switched, then converted');
+  const crossing = save({ level: 60, start: 200, current: 700 });
+  onlineLevelConvert(crossing);
+  assert.equal(crossing.level, 37, 'converted');
   const classic = save({ level: 113, start: 150, current: LEVEL_SUM_TOP });
-  assert.equal(crossLeveling(classic), false, 'no switch said for a Daggerfall character');
-  assert.equal(classic.level, 45, 'but converted all the same');
+  onlineLevelConvert(classic);
+  assert.equal(classic.level, 45, 'held to the cap');
 });
 
 test('LEVEL-45: online character creation has no biography - the class goes straight to the name, and the name\'s back stays there', async () => {

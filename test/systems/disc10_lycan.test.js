@@ -345,12 +345,6 @@ test('DISC10-E L4: a level gained under the urge adds its hit points to the RAW 
   applyLevelUp(p, () => {}, () => 0.5);
   assert.ok(p.rawMaxHealth > 100, `the raw ceiling grew from 100: ${p.rawMaxHealth}`);
   assert.equal(p.maxHealth, 30, 'and the urge still holds it down');
-  // ...and the Oblivion leveling lane's commit, the same law (ORL1 keeps Daggerfall's hit points)
-  const { commitVirtueLevelUp } = await import('../../src/systems/oblivionLeveling.js');
-  const q = chargen.defineLiveMaxHealth({ isPlayer: true, level: 5, readyToLevelUp: true, pendingLevel: 6, career: { hitPointsPerLevel: 10 }, stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, health: 20, maxHealth: 100, activeEffects: [], levelProgress: 0 });
-  q.maxHealthLimiter = 30;
-  assert.equal(commitVirtueLevelUp(q, {}, 0, null, () => 0.5), true);
-  assert.ok(q.rawMaxHealth > 100, `the virtue lane too: ${q.rawMaxHealth}`);
 });
 
 test('DISC10-E L3: quick loot takes nothing into a beast\'s pack - it answers "open the window", and the window refuses', async () => {
