@@ -129,7 +129,9 @@ export async function run({ browser, base, ck }) {
     }
     const say = async (g) => {
       await g.page.keyboard.press('Enter');
-      await sleep(500);
+      // the key is handled on a frame, and a frame takes seconds in software GL: type only once the field has the focus,
+      // or the letters fall on the key bindings (the journal opens)
+      await g.until(() => g.page.evaluate(() => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)), 120000, 250);
       await g.page.keyboard.type(line, { delay: 20 });
       await g.page.keyboard.press('Enter');
     };
