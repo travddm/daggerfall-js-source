@@ -95,19 +95,21 @@ const _blowMods = new Map();
  *  pcaaoWeaponAttackDamage). */
 export function registerWeaponBlowMod(name, fn) { if (typeof fn === 'function') _blowMods.set(name, fn); else _blowMods.delete(name); }
 const NO_BLOW_INFO = Object.freeze({ unaware: false });
-/** The blow's damage through every registered blow modifier, in registration order. POWER-CEILING: inside one product
+/** The blow's damage through every registered blow modifier, in registration order. POWER-CEILING: inside one sum
  *  (powerCeiling.js) - each modifier asks blowRoom for its per cent, so together they stay under BLOW_MOST. */
 export function weaponBlowMods(weapon, damage, attacker, target, info = NO_BLOW_INFO) {
-  let d = damage;
+  // B1: THE POWERS ADD. Each modifier is handed the damage the blow started with and returns its own, and what each added
+  // (or took) is summed onto it, so +6% and +8% make +14% and a card's number is what the blow gets.
+  let added = 0;
   const was = openBlowCeiling();
   // AUDIT SET L6: a modifier that throws is skipped, as every other seam here skips one - a blow modifier now reaches a
   // second foe's whole damage door and death (SET3's Cleave), and a throw there aborted the swing that carried it
   try {
     for (const fn of _blowMods.values()) {
-      try { const next = fn(weapon, d, attacker, target, info ?? NO_BLOW_INFO); if (Number.isFinite(next)) d = next; } catch (e) { console.warn('[entityMods] a blow modifier threw', e?.message ?? e); }
+      try { const next = fn(weapon, damage, attacker, target, info ?? NO_BLOW_INFO); if (Number.isFinite(next)) added += next - damage; } catch (e) { console.warn('[entityMods] a blow modifier threw', e?.message ?? e); }
     }
   } finally { closeBlowCeiling(was); }
-  return d;
+  return damage + added;
 }
 
 /** Run every fold and sum the channels onto `entity._mods`. Called at

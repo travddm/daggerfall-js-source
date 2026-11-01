@@ -57,7 +57,7 @@ const piece = (templateIndex, set, xp = 0) => {
   return it;
 };
 const wear = (e, ...items) => { for (const it of items) { e.items.push(it); equipItem(e, it); } return e; };
-const setWeapon = (set, xp = 0, templateIndex = 120) => { const w = createWeapon(templateIndex, 0); w.rarity = 'rare'; w.sigil = set ? { power: 5, set, party: 1, xp } : { power: 5, party: 1, xp }; return w; };
+const setWeapon = (set, xp = 0, templateIndex = 120) => { const w = createWeapon(templateIndex, 0); w.rarity = 'rare'; w.sigil = set ? { power: 3, set, party: 1, xp } : { power: 3, party: 1, xp }; return w; };
 function fresh() { _resetSigilForTests(); _resetSigilSetsForTests(); setPref('lootRarity', true); }
 const online = (renown) => { setSigilOnline(true); setSigilRenown(renown); };
 
@@ -114,7 +114,7 @@ test('SET4 the stamp: a list won online - every Magic-or-better piece of armour 
   setSigilOnline(true);
   const won = list();
   assert.equal(stampWonWeapons(won, 4, { rolls: () => 0 }), 4, 'the sword, the helm, the shield, the cuirass');
-  assert.deepEqual(won[0].sigil, { power: 3, party: 4, xp: 0, set: 'malacath' }, 'the sword\'s blow, and a set');
+  assert.deepEqual(won[0].sigil, { power: 1, party: 4, xp: 0, set: 'malacath' }, 'the sword\'s blow, and a set');
   for (const i of [1, 2, 3]) assert.deepEqual(won[i].sigil, { set: 'malacath', party: 4, xp: 0 }, `piece ${i}`);
   for (const i of [4, 5, 6, 7, 8]) assert.equal(won[i].sigil, undefined, `piece ${i}: never`);
   assert.deepEqual(won[9].sigil, { set: 'mora', party: 2, xp: 900 }, 'one already marked keeps its own');

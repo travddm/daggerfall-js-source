@@ -76,11 +76,11 @@ test('AUDIT SET D6: the wire\'s item law cross-checks the marks - a set\'s sigil
   assert.ok(wire({ ...cuirass(), rarity: 'rare', sigil: { set: 'mora', party: 1, xp: 0 } }), 'a set piece');
   assert.equal(wire({ ...ring(), sigil: { set: 'mora', party: 1, xp: 0 } }), null, 'a set\'s sigil on a ring');
   // a blow
-  assert.ok(wire({ ...sword(), rarity: 'rare', sigil: { power: 5, party: 1, xp: 0 } }), 'a sigil weapon');
-  assert.ok(wire({ ...sword(), rarity: 'rare', sigil: { power: 5, set: 'dagon', party: 1, xp: 0 } }), 'a set weapon');
-  assert.equal(wire({ ...cuirass(), rarity: 'rare', sigil: { power: 5, set: 'mora', party: 1, xp: 0 } }), null, 'a blow on armour');
+  assert.ok(wire({ ...sword(), rarity: 'rare', sigil: { power: 3, party: 1, xp: 0 } }), 'a sigil weapon');
+  assert.ok(wire({ ...sword(), rarity: 'rare', sigil: { power: 3, set: 'dagon', party: 1, xp: 0 } }), 'a set weapon');
+  assert.equal(wire({ ...cuirass(), rarity: 'rare', sigil: { power: 3, set: 'mora', party: 1, xp: 0 } }), null, 'a blow on armour');
   const arrows = createWeapon(ARROW_TEMPLATE, 0, () => 0.5);
-  assert.equal(wire({ ...arrows, sigil: { power: 5, party: 1, xp: 0 } }), null, 'a blow on arrows');
+  assert.equal(wire({ ...arrows, sigil: { power: 3, party: 1, xp: 0 } }), null, 'a blow on arrows');
   // the Regalia's set, and the Aetheric
   assert.equal(wire({ ...cuirass(), rarity: 'legendary', sigil: { set: 'ruhn', party: 1, xp: 0 } }), null, 'a Regalia sigil on a Daedric cuirass that is no Aetheric piece');
   for (const r of REGALIA) assert.ok(wire(mintAetheric(r)), `${r.id} passes`);
@@ -92,8 +92,8 @@ test('AUDIT SET D6: the wire\'s item law cross-checks the marks - a set\'s sigil
   assert.equal(wire({ ...plate, rarity: 'legendary' }), null, 'an Aetheric record on another tier');
   assert.equal(wire({ ...cuirass(), rarity: 'aetheric' }), null, 'the tier with no record');
   // the projection
-  const odd = wire({ ...sword(), rarity: 'rare', sigil: { power: 5, set: 'dagon', party: 2, xp: 7, note: 'x'.repeat(50), evil: { deep: 1 } } });
-  assert.deepEqual(odd.sigil, { power: 5, set: 'dagon', party: 2, xp: 7 }, 'the four keys, nothing else');
+  const odd = wire({ ...sword(), rarity: 'rare', sigil: { power: 3, set: 'dagon', party: 2, xp: 7, note: 'x'.repeat(50), evil: { deep: 1 } } });
+  assert.deepEqual(odd.sigil, { power: 3, set: 'dagon', party: 2, xp: 7 }, 'the four keys, nothing else');
   assert.deepEqual(wire({ ...cuirass(), rarity: 'rare', sigil: { set: 'mora', party: 1, xp: 3 } }).sigil, { set: 'mora', party: 1, xp: 3 });
   // a list with one forged piece is no list (the law every other forged field meets)
   assert.equal(validLootList([JSON.parse(JSON.stringify(sword())), { ...ring(), sigil: { set: 'mora', party: 1, xp: 0 } }]), null);

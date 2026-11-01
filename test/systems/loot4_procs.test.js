@@ -70,10 +70,10 @@ test('LOOT4: the kinds - five that do things, banded, worded, valid; never in th
     assert.ok(LR.affixLabel(a) && LR.affixWord(a, 'rare'), `${id}: a label and a word`);
   }
   assert.equal(LR.validAffix({ id: 'elemental', param: 'acid', value: 3 }), false, 'an element it does not know');
-  assert.equal(LR.validAffix({ id: 'slayer', param: 'dragon', value: 12 }), false, 'a kind of foe it does not know');
+  assert.equal(LR.validAffix({ id: 'slayer', param: 'dragon', value: 5 }), false, 'a kind of foe it does not know');
   assert.equal(LR.validAffix({ id: 'leech', param: 'fire', value: 3 }), false, 'a param a kind without one');
   assert.equal(LR.affixLabel({ id: 'elemental', param: 'fire', value: 5 }), '+5 Fire damage');
-  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 15 }), '+15% damage vs the undead');
+  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 5 }), '+5% damage vs the undead');
   assert.equal(LR.affixLabel({ id: 'leech', value: 5 }), '5% life leech on this weapon\'s own blows');   // PIN MOVED: FIELD BUGS 2026-10-14 LEECH-HAND
   assert.equal(LR.affixLabel({ id: 'thorns', value: 4 }), '4 thorns');
   assert.equal(LR.affixLabel({ id: 'focus', value: 6 }), '-6% spell cost');
@@ -182,7 +182,7 @@ test('LOOT4: the seeded doors keep their earlier draws - the gate\'s and a town\
 test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, its own kind, none on the immune, half on the resisting', () => {
   on();
   const me = player();
-  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 20 }]);
+  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 5 }]);
   const zombie = foeOf(17), orc = foeOf(7), fireDaedra = foeOf(26, { immunityFlags: EFFECT_FLAGS.Fire }), resists = foeOf(15, { resistanceFlags: EFFECT_FLAGS.Fire });
   assert.equal(LP.foeGroup(zombie), 'undead');
   assert.equal(LP.foeGroup(orc), 'humanoid');
@@ -190,19 +190,19 @@ test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, 
   assert.equal(LP.foeGroup(foeOf(28)), 'undead', 'a vampire');
   assert.equal(LP.foeGroup(foeOf(34)), 'animal', 'a dragonling, DFU\'s own grouping');
   assert.equal(LP.foeGroup(foeOf(35)), null, 'an atronach is none');
-  assert.equal(LP.lootBlow(w, 10, me, zombie, {}), 10 + 2 + 5, 'the undead: 20% and the fire');
-  assert.equal(LP.lootBlow(w, 10, me, orc, {}), 15, 'an orc: the fire alone');
-  assert.equal(LP.lootBlow(w, 10, me, fireDaedra, {}), 10, 'fire-proof: none of it');
-  assert.equal(LP.lootBlow(w, 10, me, resists, {}), 10 + 2 + 2, 'a resisting skeleton: half the fire, floored');
-  assert.equal(weaponBlowMods(w, 10, me, zombie, { unaware: false }), 17, 'registered: the blow modifier reads it');
-  // the fraction carried: four blows of 3 at +20% land 12 whole and 2 more
+  assert.equal(LP.lootBlow(w, 100, me, zombie, {}), 100 + 5 + 5, 'the undead: 5% and the fire');
+  assert.equal(LP.lootBlow(w, 100, me, orc, {}), 105, 'an orc: the fire alone');
+  assert.equal(LP.lootBlow(w, 100, me, fireDaedra, {}), 100, 'fire-proof: none of it');
+  assert.equal(LP.lootBlow(w, 100, me, resists, {}), 100 + 5 + 2, 'a resisting skeleton: half the fire, floored');
+  assert.equal(weaponBlowMods(w, 100, me, zombie, { unaware: false }), 110, 'registered: the blow modifier reads it');
+  // the fraction carried: five blows of 10 at +5% land 50 whole and 2 more
   LP._resetLootPowersForTests();
-  const w2 = sword([{ id: 'slayer', param: 'animal', value: 20 }]);
+  const w2 = sword([{ id: 'slayer', param: 'animal', value: 5 }]);
   let total = 0;
-  for (let i = 0; i < 5; i++) total += LP.lootBlow(w2, 3, me, foeOf(0), {});
-  assert.equal(total, 15 + 3, 'a fifth of every 3, carried: three whole points over five blows');
+  for (let i = 0; i < 5; i++) total += LP.lootBlow(w2, 10, me, foeOf(0), {});
+  assert.equal(total, 50 + 2, 'a twentieth of every 10, carried: two whole points over five blows');
   // PIN ADDED (AUDIT MARTIAL L2 F7): the Stats page's reading before each blow carries nothing - blow for blow the same
-  const blows = (read) => { LP._resetLootPowersForTests(); return Array.from({ length: 5 }, () => { if (read) LP.lootBlow(w2, 3, me, foeOf(0), { estimate: true }); return LP.lootBlow(w2, 3, me, foeOf(0), {}); }); };
+  const blows = (read) => { LP._resetLootPowersForTests(); return Array.from({ length: 5 }, () => { if (read) LP.lootBlow(w2, 10, me, foeOf(0), { estimate: true }); return LP.lootBlow(w2, 10, me, foeOf(0), {}); }); };
   assert.deepEqual(blows(true), blows(false), 'the page read between blows');
   // never: a player, a peer, a foe's blow, the ward, a miss, off
   assert.equal(LP.lootBlow(w, 10, me, { isPlayer: true }, {}), 10, 'a duel');

@@ -21,6 +21,7 @@ import { weaponMasteryBlow, weaponMasteryPace, WEAPON_MASTERY } from '../../src/
 import { registerWeaponBlowMod } from '../../src/systems/entityMods.js';
 import { blowRoom, guardRoom } from '../../src/systems/powerCeiling.js';
 import { registerSpellPowerMod } from '../../src/systems/spell/spellPower.js';
+import { SPELL_POWER_MOST as LOOT_SPELL_POWER_MOST } from '../../src/systems/loot/lootPowers.js';
 import { registerSwingPaceMod } from '../../src/characters/weaponStates.js';
 import { evenHpFloor } from '../../src/systems/levelEven.js';
 import { playerDamageMods, registerPlayerDamageMod } from '../../src/characters/playerEntity.js';
@@ -41,7 +42,7 @@ export const LAYERS = Object.freeze({
   power: 'Loot-ladder gear: a damage line on the weapon, an armour line on each piece (systems/loot/lootRarity.js)',
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
   swing: 'Swing law: the port\'s own swing speed curve (characters/weaponStates.js swingFrameSeconds)',
-  ceiling: 'Every stacking source at its cap: the blow takes the rest of the room up to BLOW_MOST and the hurt the rest of the share down to GUARD_LEAST (systems/powerCeiling.js). The maxed character; not in the default set',
+  ceiling: 'Every stacking source at its cap: the blow takes the room up to the net (BLOW_MOST) and the hurt down to GUARD_LEAST (systems/powerCeiling.js). The maxed character; not in the default set',
   virtue: 'Oblivion-style levelling: 12 attribute points a level instead of 5 (mod oblivion-remaster-leveling)',
 });
 export const LAYER_NAMES = Object.freeze(Object.keys(LAYERS));
@@ -55,6 +56,8 @@ const DEFAULT_CAREER = Object.freeze({
   attackModifierFlags: 0, hitPointsPerLevel: 8,
 });
 const CEILING_MOD = 'harness-ceiling';
+/** The most per cent a spell's modifiers add together: the loot's lines under their cap, an arcane path's best (the Firmament tree is left to B5). */
+const SPELL_LINES_TOP = LOOT_SPELL_POWER_MOST + 5;
 export const MC_DEFAULT_SWINGS = 4000;
 const NEUTRAL_BLOW_REFLEXES = 2;
 const UNBREAKABLE = 1e9;
@@ -97,7 +100,7 @@ export function applyLayers(layers) {
   registerWeaponBlowMod(WEAPON_MASTERY, online ? (...args) => whileOnlinePage(() => weaponMasteryBlow(...args)) : weaponMasteryBlow);
   // Registered after every game registry, so it takes only the room they left: what a character with every source at its top gets.
   registerWeaponBlowMod(CEILING_MOD, layers.has('ceiling') ? (_weapon, damage) => damage + Math.floor((damage * blowRoom(1e9)) / 100) : null);
-  registerSpellPowerMod(CEILING_MOD, layers.has('ceiling') ? () => 1e6 : null);   // far past SPELL_POWER_MOST, which holds it
+  registerSpellPowerMod(CEILING_MOD, layers.has('ceiling') ? () => SPELL_LINES_TOP : null);
   registerPlayerDamageMod(CEILING_MOD, layers.has('ceiling') ? (_entity, damage) => damage * (1 - guardRoom(100) / 100) : null);
   registerSwingPaceMod(WEAPON_MASTERY, online ? (...args) => whileOnlinePage(() => weaponMasteryPace(...args)) : weaponMasteryPace);
 }

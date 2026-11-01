@@ -92,18 +92,19 @@ level 1. Two numbers are compared with it:
 
 ## The player-power budget (B1)
 
-The default run measures typical gear, which never reaches the stacking caps.
-`+ceiling` measures the same character with every source at its cap.
-Before B1 that character was x20 to x54 a DFU character at level 45 (ARENA2 attributes, DFU's own foe row).
-The caps are now:
+The default run measures typical gear, which never reaches the stacking limits. `+ceiling` measures the same character with
+every stacking source near its top, held by the safety net. Before B1 that character was x20 to x54 a DFU character at level
+45 (ARENA2 attributes, DFU's own foe row).
 
-- a blow at most x1.75 (`BLOW_TOPS` in `powerCeiling.js`; was x119.95);
-- a hurt keeps at least 74% (`GUARD_TOPS`; was 10.71%);
-- a spell at most x1.25 (`SPELL_BUDGET_MOST`);
-- a mastered skill reads at most 110 to hit and to crit (`AIM_PAST_MAX`);
-- a point of a school or weapon past 100 pays 0.25% (was 1%);
-- gear on a weapon skill pays 0.1% a point up to 5% (was 0.44% up to 320%);
-- a technique aims +5 to +10 and tops at x1.95 of a blow.
+B1 rescaled the numbers on the sources, so a card prints what a blow gets and no registry is cut:
+
+- each registry's records reach exactly its top (`BLOW_TOPS`, `GUARD_TOPS` in `powerCeiling.js`), held equal by
+  `test/combat/powerceiling.test.js`;
+- blow percents add (the runner sums them; they multiplied before);
+- the net (`BLOW_MOST`, +75.4%, and `GUARD_LEAST`, 74%) sits above a normal kit and below the tops summed;
+- a skill past 100 pays 0.2% a point, gear on a weapon skill 0.1% a point up to 5%, and a mastered skill reads at most 110
+  to hit and to crit (`AIM_PAST_MAX`);
+- a technique aims +5 to +10 and tops at x1.95 of a blow. The Firmament tree is left to B5.
 
 `test/tooling/playerPowerBudget.test.js` holds the character-power bounds.
 

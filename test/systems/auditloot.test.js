@@ -114,7 +114,7 @@ test('AUDIT LOOT F4: a Legendary in one hand and a Rare imprinted with its power
     for (const it of order) equipItem(me, it);
     assert.equal(equipTableOf(me).filter(Boolean).length, 2, 'both in hand');
     assert.equal(wornPowers(me).filter((p) => p.id === 'nightwhisper').length, 1, 'one power, counted once');
-    assert.deepEqual([lootBlow(nw, 100, me, foe, { unaware: true }), lootBlow(rare, 100, me, foe, { unaware: true })], [120, 120], 'Silent Death on either hand blow: its +100% is cut to the loot blow top of +20 (B1 BLOW_TOPS.loot)');
+    assert.deepEqual([lootBlow(nw, 100, me, foe, { unaware: true }), lootBlow(rare, 100, me, foe, { unaware: true })], [112, 112], 'Silent Death on either hand\'s blow');
     assert.equal(lootBlow(rare, 100, me, foe, { unaware: false }), 100, 'and only where it says');
   }
   const plain = rareOf(createWeapon(113, 1), 2);

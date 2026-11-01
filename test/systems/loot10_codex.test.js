@@ -142,7 +142,7 @@ test('LOOT10: the imprint - a known, unworn Rare takes a found power of its grou
   assert.deepEqual(CX.imprintPiece(rare, 'nightwhisper', me), { ok: true });
   assert.deepEqual([rare.imprint, rare.rarity, shardsHeld(me.items), me.goldPieces], ['nightwhisper', 'rare', 5, 1000], 'it stays Rare; paid');
   assert.equal(CX.imprintRefusal(rare, 'graveward', me), 'imprinted', 'once');
-  assert.equal(LR.imprintLine(rare), 'Imprint: Silent Death (of Nightwhisper) - +100% vs unaware foes');
+  assert.equal(LR.imprintLine(rare), 'Imprint: Silent Death (of Nightwhisper) - +12% vs unaware foes');
   assert.ok(LR.rarityLines(rare).includes(LR.imprintLine(rare)), 'its card says so');
   equipItem(me, rare);
   assert.ok(wornPowers(me).some((p) => p.id === 'nightwhisper' && p.power.name === 'Silent Death' && p.item === rare), 'its power works as the Legendary\'s');

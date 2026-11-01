@@ -107,8 +107,8 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   assert.deepEqual(setLines(a), [
     "Dagon's Brand: 3 of 9 worn (sets only work online)",
     `2 pieces - Ravager: ${SIGIL_SETS.dagon.tiers[0].brief({ strength: 2, critical: 4 })} (inactive)`,   // CARD-FIT: each tier by its brief
-    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 4 })} (1 more)`,
-    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 4 })} (3 more)`,
+    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 1 })} (1 more)`,
+    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 1 })} (3 more)`,
   ]);
   online(1);
   const lines = setLines(a);
@@ -134,8 +134,8 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   assert.deepEqual(rarityLines(a).slice(1, 2), ['Sigil (inactive in a duel)']);
   const sw = createWeapon(120, 0);
   sw.rarity = 'rare';
-  sw.sigil = { power: 6, set: 'dagon', party: 1, xp: 0 };
-  assert.match(rarityLines(sw)[1], /^Sigil \(Faint\): \+[\d.]+% damage, \+6% at Ascendant$/, 'the set weapon\'s blow, awake on a foe');
+  sw.sigil = { power: 3, set: 'dagon', party: 1, xp: 0 };
+  assert.match(rarityLines(sw)[1], /^Sigil \(Faint\): \+[\d.]+% damage, \+3% at Ascendant$/, 'the set weapon\'s blow, awake on a foe');
   setSetsDueling(false);
   _resetForTests();
   fresh();
@@ -227,8 +227,8 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');
     const rows = kids(card, 'set-tier');
     assert.deepEqual(rows.map((t) => t.classList.contains('awake')), [true, true, false]);
-    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 6 }));
-    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 6 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 12 })}`);
+    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 2 }));
+    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 2 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 3 })}`);
     assert.equal(one(rows[2], 'set-tier-every'), null, 'no recovery, no tag');
     { const e2 = player(), m = piece(107, 'malacath', 0); wear(e2, m);
       const tag = one(kids(setCard(m, e2), 'set-tier')[2], 'set-tier-every');
@@ -347,11 +347,11 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
     assert.equal(one(box, 'sigil-note').textContent, 'It grows as you earn Renown wearing it.');
     assert.equal(one(sigilCard(armour), 'sigil-effect'), null, 'the card\'s dress: a set\'s armour says no more - its set\'s block does');
     const w = createWeapon(120, 0);
-    w.sigil = { power: 6, set: 'dagon', party: 1, xp: 0 };
+    w.sigil = { power: 3, set: 'dagon', party: 1, xp: 0 };
     box = sigilCard(w, whole);
-    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+6% at Ascendant$/, 'a set weapon keeps its blow\'s words');
+    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+3% at Ascendant$/, 'a set weapon keeps its blow\'s words');
     assert.equal(one(box, 'sigil-note').textContent, 'It grows as you earn Renown with this weapon.');
-    assert.match(one(sigilCard(w), 'sigil-effect').textContent, /^\+[\d.]+% damage \(up to \+6%\)$/, 'and its card\'s one line');
+    assert.match(one(sigilCard(w), 'sigil-effect').textContent, /^\+[\d.]+% damage \(up to \+3%\)$/, 'and its card\'s one line');
     // AUDIT SET U11: a duel
     setSetsDueling(true);
     box = sigilCard(armour, whole);
@@ -361,7 +361,7 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
     assert.ok(kids(box, 'sigil-gem').every((g) => !g.classList.contains('awake')), 'no gem burning');
     assert.ok(kids(sigilCard(armour), 'sigil-gem').every((g) => !g.classList.contains('awake')), 'nor on the card');
     box = sigilCard(w, whole);
-    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+6% at Ascendant$/, 'a set weapon\'s blow is awake on a foe');
+    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+3% at Ascendant$/, 'a set weapon\'s blow is awake on a foe');
     setSetsDueling(false);
     // U12: a set's sigil on a ring - no set piece
     box = sigilCard({ name: 'Ring', sigil: { set: 'mora', party: 1, xp: 0 } }, whole);

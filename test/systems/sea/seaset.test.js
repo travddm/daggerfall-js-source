@@ -72,7 +72,7 @@ test('SEA-SET THE LAW: the Eltheric Tidemail last of every set - Aetheric, the D
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'eltheric'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'stormwrack', 'Stormwrack', { shock: [10, 30], speed: [2, 6] }],
-    [4, 'undertow', 'Undertow', { more: [15, 40] }],
+    [4, 'undertow', 'Undertow', { more: [2, 5] }],
     [6, 'captains-due', "The Captain's Due", { guns: [10, 30], hull: [10, 25] }],
   ]);
   for (const t of s.tiers) for (let st = 0; st <= SET_STAGE_MAX; st++) {
@@ -81,7 +81,7 @@ test('SEA-SET THE LAW: the Eltheric Tidemail last of every set - Aetheric, the D
     assert.ok(!/\S - \S/.test(t.text(tierValues(t, st))), `${t.key}: no dash aside`);
   }
   assert.equal(s.tiers[0].brief(tierValues(s.tiers[0], 0)), '+10 shock resist, +2 Speed');
-  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], SET_STAGE_MAX)), `Your weapon deals 40% more damage in the open ${ETHER_WORD} Ocean, and half of that anywhere else`);
+  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], SET_STAGE_MAX)), `Your weapon deals 5% more damage in the open ${ETHER_WORD} Ocean, and half of that anywhere else`);
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], SET_STAGE_MAX)), 'Guns +30%, hull hits -25%');
 });
 
@@ -189,20 +189,20 @@ test('SEA-SET STORMWRACK (2): one fold - shock resistance and Speed, Faint to As
 test('SEA-SET UNDERTOW (4): my weapon blow its share more while I stand in the open Eltheric Ocean - the zone\'s live flag on the sea\'s ground - and half of it anywhere else (the mountains\' zone too); never asleep, never with three pieces, never a bare-handed blow (mutants: the share at sea; the half ashore; the ground)', () => {
   fresh(); online();
   const e = wearSet(player(), 'eltheric', 4), w = sword();
-  assert.equal(setBlow(w, 100, e, RAT, {}), 106, 'ashore: half of 15, carried, cut to the sets top of +6 (B1)');
-  assert.equal(setBlow(w, 100, e, RAT, {}), 106, 'the half carried, cut to the sets top of +6 (B1)');
+  assert.equal(setBlow(w, 100, e, RAT, {}), 101, 'ashore: half of 2');
+  assert.equal(setBlow(w, 100, e, RAT, {}), 101, 'the half again');
   setWildHere(true, 4, ETHER_KIND);
-  assert.equal(setBlow(w, 100, e, RAT, {}), 106, 'at sea: the whole 15%, cut to the sets top of +6 (B1)');
+  assert.equal(setBlow(w, 100, e, RAT, {}), 102, 'at sea: the whole');
   setWildHere(true, 4);
-  assert.equal(setBlow(sword(), 100, e, RAT, {}), 106, 'the mountains are no sea (half of 15, carried, cut to the sets top of +6 (B1))');
+  assert.equal(setBlow(sword(), 100, e, RAT, {}), 101, 'the mountains are no sea');
   setWildHere(true, 2, ETHER_KIND);
   online(40);
   const asc = wearSet(player(), 'eltheric', 4, XP[4]);
-  assert.equal(setBlow(sword(), 100, asc, RAT, {}), 106, 'Ascendant at sea, cut to the sets top of +6 (B1)');
+  assert.equal(setBlow(sword(), 100, asc, RAT, {}), 105, 'Ascendant at sea');
   assert.equal(setBlow(null, 100, asc, RAT, {}), 100, 'no weapon, no Undertow');
   assert.equal(setBlow(sword(), 100, wearSet(player(), 'eltheric', 3), RAT, {}), 100, 'three pieces');
   online(1);
-  assert.equal(setBlow(sword(), 100, wearSet(player(), 'eltheric', 4), RAT, {}), 106, 'Faint again, cut to the sets top of +6 (B1)');
+  assert.equal(setBlow(sword(), 100, wearSet(player(), 'eltheric', 4), RAT, {}), 102, 'Faint again');
   setSigilOnline(false);
   assert.equal(setBlow(sword(), 100, e, RAT, {}), 100, 'asleep');
   setWildHere(false);

@@ -7,19 +7,22 @@ import assert from 'node:assert/strict';
 import { buildReport } from '../../tools/balance/report.mjs';
 import { parseLayers } from '../../tools/balance/run.mjs';
 import { BLOW_MOST, GUARD_LEAST } from '../../src/systems/powerCeiling.js';
-import { SPELL_BUDGET_MOST } from '../../src/systems/spell/spellPower.js';
+import { SPELL_POWER_MOST, POTENCY_CAP } from '../../src/systems/loot/lootPowers.js';
 
 const SWINGS = 1500;
 const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'average');
 
 /** Power at level 45 with every source at its cap, no ARENA2: what B1 reached, rounded up in the third place. A ceiling that later lanes
  *  (B3 bow rules, B5 health, the spell magnitudes) lower toward 1.5 and never raise. Before B1 these were x20 to x54. */
-const MAXED_POWER_MOST = Object.freeze({ warrior: 1.38, archer: 2.42, spellsword: 1.86, mage: 1.79, thief: 1.42 });
+const MAXED_POWER_MOST = Object.freeze({ warrior: 1.38, archer: 2.42, spellsword: 1.86, mage: 1.79, thief: 1.4 });
 
-test('budget: the stacking caps are the ones B1 set (the blow x1.75, the hurt keeps 74%, a spell x1.25)', () => {
+test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%) and sit above a normal kit', () => {
   assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
   assert.ok(GUARD_LEAST < 0.75 && GUARD_LEAST > 0.73, `hurt ${GUARD_LEAST}`);
-  assert.equal(SPELL_BUDGET_MOST, 1.25);
+  assert.ok(
+    POTENCY_CAP <= SPELL_POWER_MOST,
+    'worn potency lines fit under the loot spell cap, so it cuts nothing a card prints',
+  );
 });
 
 test('budget: a level-45 character with every stacking source at its cap stays inside the power budget', () => {

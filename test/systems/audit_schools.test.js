@@ -116,8 +116,8 @@ test('AUDIT SCHOOLS L1 H2 / L5 H1: THE LIGHTBRINGER READS THE LOOT\'S ONE FOE GR
   const lb = pathMage('lightbringer', 100);
   const pow = (t) => page(true, () => spellPowerMult(lb, t, { online: false }));
   for (const mt of [MT.barbarian, MT.knight, MT.watch]) assert.equal(pow(realFoe(mt)), 1, `class ${mt}: a man`);
-  assert.equal(pow(realFoe(MT.skeleton)), 1.2, 'undead');
-  assert.equal(pow(realFoe(MT.daedra)), 1.2, 'daedra');
+  assert.equal(pow(realFoe(MT.skeleton)), 1.04, 'undead');
+  assert.equal(pow(realFoe(MT.daedra)), 1.04, 'daedra');
   assert.equal(pow(realFoe(MT.rat)), 1, 'an animal');
   // the burn, through the cast engine
   lb.health = 10;
@@ -204,7 +204,7 @@ test('AUDIT SCHOOLS L1 M3: FORESIGHT IS ASKED BEFORE ANY MODIFIER - a foreseen b
   } finally { registerPlayerDamageMod('auditSchoolsProbe', null); }
 }));
 
-test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 35-point blows 4% lighter (the Warden guard of 20% cut to the arcane top, B1) take 34, 34 and 33 (101 of 105, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
+test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 20-point blows a twenty-fifth (4%) lighter take 20, 19 and 19 (58 of 60, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
   let now = 10;
   POW._setArcanePowersClockForTests(() => now);
   const wa = pathMage('warden', 100);
@@ -216,8 +216,8 @@ test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CAR
   wa.health = 1000;
   const orc = realFoe(MT.knight);
   const took = [];
-  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 35); hurtPlayer(wa, 35); took.push(b - wa.health); }
-  assert.deepEqual(took, [34, 34, 33], '1.4 owed: 1 off; 2.8: 1 off; 4.2: 2 off - 4 of the 4.2 owed');   // 35 x 4% = 1.4 a blow (the 20% guard is cut to GUARD_TOPS.arcane, 4)
+  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 20); hurtPlayer(wa, 20); took.push(b - wa.health); }
+  assert.deepEqual(took, [20, 19, 19], '0.8 owed: 0 off; 1.6: 1 off; 2.4: 2 off - 2 of the 2.4 owed');   // 20 x 4% = 0.8 a blow
   assert.ok(Number.isInteger(wa.health), 'whole');
   now = 10 + 29.9;
   let b = wa.health; setStruck(orc, wa, 100); hurtPlayer(wa, 100);
@@ -486,10 +486,10 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.deepEqual(t200.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [50], 'the item\'s own 50');
   const own = mage([THA], 200);
   page(true, () => applySpell(SELF(eff(21, 255, { durationBase: 5, chanceBase: 50 })), 20, own, {}, () => 0.5, { entity: own }));
-  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [55], 'my own cast: x1.10');
+  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [54], 'my own cast: x1.08');
   const heal = SELF(eff(10, 8, { magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }, { reflectedCount: 1 }).healed), 50, 'turned back at me');
-  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 55, 'my own');
+  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 54, 'my own');
   // Troll's Blood held: a Regenerate's rounds read no school
   const worn = mage([RES], 200);
   let got = 0;
@@ -497,13 +497,13 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.equal(got, 10, 'a worn Regenerate: its own 10');
 }));
 
-test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 14 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
+test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 11 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
   const r200 = mage([RES], 200);
   r200.health = 10; r200.maxHealth = 10000;
   const sinks = { heal: (n) => { r200.health += n; }, hurt() {}, say() {} };
   page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 10, magnitudeBaseHigh: 10 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
   const round = (k) => { const b = r200.health; page(true, () => runMagicRoundsFor(r200, k, k + 1, { sinks, rolls: () => 0.5 })); return r200.health - b; };
-  assert.equal(round(0), 11, 'x1.10');
+  assert.equal(round(0), 11, 'x1.08');
   assert.equal(refreshMentor(r200, [5, 5]), 'on', 'a party of level 5s: mentoring');
   assert.equal(round(1), 10, 'mentoring');
   assert.equal(refreshMentor(r200, []), 'off');
@@ -549,7 +549,7 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
       assert.ok(a, `${kind} landed (${p.activeEffects.map((x) => x.kind)})`);
       return a.roundsRemaining + 1;
     };
-    assert.deepEqual([rounds(100), rounds(200)], [10, 11], `${kind}: 10 rounds, x1.10`);
+    assert.deepEqual([rounds(100), rounds(200)], [10, 11], `${kind}: 10 rounds, x1.08`);
   }
   const m200 = mage([MYS, THA], 200);   // Comprehend Languages is Mysticism's (spellcost.js '44,255')
   page(true, () => applySpell(SELF(eff(44, 255, { durationBase: 5, chanceBase: 50 })), 20, m200, {}, () => 0.5, { entity: m200 }));

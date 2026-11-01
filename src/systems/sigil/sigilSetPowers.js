@@ -453,7 +453,7 @@ export function setDeathSave(entity) {
   _s.unbrokenReady = now + v.recover;
   _s.halvedUntil = now + v.halved;
   _s.recovering.add('unbroken');
-  say(`Unbroken! Damage halved for ${v.halved} s.`);   // WB13b
+  say(`Unbroken! Damage cut by ${UNBROKEN_LESS}% for ${v.halved} s.`);   // WB13b
   sound('unbroken');
   return true;
 }

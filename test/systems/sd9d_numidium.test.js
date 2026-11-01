@@ -74,12 +74,12 @@ test('SD9d THE LAW: The Brass of Numidium after the serpent\'s - Aetheric, Kagre
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'numidium'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'dwemer-brass', 'Dwemer Brass', { magic: [4, 10], shock: [4, 10] }],
-    [4, 'gearward', 'Gearward', { lighter: [15, 30], recover: [18, 12] }],
+    [4, 'gearward', 'Gearward', { lighter: [3, 6], recover: [18, 12] }],
     [6, 'hour-turns', 'The Hour Turns', { heal: [15, 25], recover: [90, 60] }],
   ]);
   for (const t of s.tiers) for (let st = 0; st <= SET_STAGE_MAX; st++) { const b = t.brief(tierValues(t, st)); assert.ok(b.length <= BRIEF_MAX, `${t.key} at ${st}: "${b}"`); }
-  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 30% lighter', 'Death turned back, heal 25%']);
-  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], 0)), 'The next enemy hit on you deals 15% less damage. Recovers in 18 s');
+  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 6% lighter', 'Death turned back, heal 25%']);
+  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], 0)), 'The next enemy hit on you deals 3% less damage. Recovers in 18 s');
 });
 
 test('SD9d THE RECORDS: nine in the places\' order - the seven body pieces, a round shield and a ONE-HANDED Longsword (all nine worn at once) - Dwarven, the Dwemer\'s brass; every affix at the Legendary band\'s TOP (the Regalia\'s), the blow the sigil\'s greatest; never a magic or shock resistance (the 2-piece tier\'s) and one of an element at most; AETHERIC_RECORDS ends with them (mutants: a number off the top; a doubled element; the make; the order)', () => {
@@ -162,30 +162,30 @@ test('SD9d GEARWARD (4): while the gear is wound a foe\'s blow lands its share l
   door(e);
   at(10);
   blow(e, 40);
-  assert.equal(e.health, 63, 'Faint: 15% is cut to the sets guard top of 8% (B1), 3 of 40 - the blow lands 37');
+  assert.equal(e.health, 61, 'Faint: 3% of 40 is 1.2 - the blow lands 39');
   assert.deepEqual(v.sounds, ['gear'], 'the gear catches it');
   at(20);
   blow(e, 40);
-  assert.equal(e.health, 23, 'wound again only at 28: this one lands whole');
+  assert.equal(e.health, 21, 'wound again only at 28: this one lands whole');
   e.health = 100;
   at(30);
   hurtPlayer(e, 20);
   assert.equal(e.health, 80, 'a fall\'s hurt - no foe\'s blow - lands whole');
   blow(e, 30);
-  assert.equal(e.health, 52, 'the gear still wound for the blow after it: 15% is cut to the sets guard top of 8% (B1), 2.4 of 30 - whole points, 2 turned');
+  assert.equal(e.health, 51, 'the gear still wound for the blow after it: 3% of 30 is 0.9 - whole points, 1 turned');
   assert.equal(setPowerStates(30).gearLeft, 18, 'winding again for 18 s');
   fresh(); online(40);
   const asc = wearSet(player(), 'numidium', 4, XP[4]);
   door(asc);
   at(5);
   blow(asc, 50);
-  assert.equal(asc.health, 54, 'Ascendant: 30% is cut to the sets guard top of 8% (B1), 4 of 50 - the blow lands 46');
+  assert.equal(asc.health, 53, 'Ascendant: 6% of 50 is 3 - the blow lands 47');
   at(16);
   blow(asc, 10);
-  assert.equal(asc.health, 44, 'wound at 17: whole');
+  assert.equal(asc.health, 43, 'wound at 17: whole');
   at(17);
   blow(asc, 10);
-  assert.equal(asc.health, 35, 'wound: 8% of 10 (B1 cut from 30%) is 0.8, 1 turned');
+  assert.equal(asc.health, 34, 'wound: 6% of 10 is 0.6, 1 turned');
   fresh(); online(1);
   const three = wearSet(player(), 'numidium', 3);
   door(three);

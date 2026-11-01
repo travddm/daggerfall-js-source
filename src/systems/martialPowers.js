@@ -73,9 +73,9 @@ import { t } from './textManager.js';
 import { mentorPowerScale, mentorScaled } from './mentorMode.js';   // MENTOR2: the paths at the mentor's share
 
 const N = MARTIAL_NUMBERS;
-/** All a path's percents onto one blow, at most - the Ranger's beast and mark together (20 + 20) are the most any path
+/** All a path's percents onto one blow, at most - the Ranger's beast and mark together (3 + 3) are the most any path
  *  reaches; this keeps a later number from passing it unseen. */
-export const MARTIAL_BLOW_MOST = 40;
+export const MARTIAL_BLOW_MOST = 6;
 
 // ── the session's memory, its clock, its dice and its voice ─────────
 let _now = () => performance.now() / 1000;

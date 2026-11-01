@@ -7,7 +7,7 @@
 //     hoard's very last (a ship that stood never), so every spoils before them is what it was for its seed.
 //   - DRAGONFIRE: a landed blow on a Daedra bursts on every OTHER Daedra within 3 m for a third of it, unresisted - never
 //     on another kind of foe, never from a blow on one.
-//   - UNDERTOW: its landed blows on a foe are counted on THAT foe, +10% a blow up to +50%; a foe it fells heals 10%.
+//   - UNDERTOW: its landed blows on a foe are counted on THAT foe, +2% a blow up to +10%; a foe it fells heals 10%.
 //   - THE LOOK: named as an artifact is, its card's lines and power, its codex row's own hint.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -76,7 +76,7 @@ test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +4
   assert.equal(DRAGONFIRE_OATH.power, DRAGONFIRE);
   assert.deepEqual({ kind: DRAGONFIRE.kind, group: DRAGONFIRE.group, share: DRAGONFIRE.share, metres: DRAGONFIRE.metres }, { kind: 'dragonfire', group: 'daedra', share: 33, metres: 3 });
   assert.equal(SUNKEN_SOVEREIGN.power, UNDERTOW);
-  assert.deepEqual({ kind: UNDERTOW.kind, pct: UNDERTOW.pct, max: UNDERTOW.max, seconds: UNDERTOW.seconds, heal: UNDERTOW.heal }, { kind: 'undertow', pct: 10, max: 5, seconds: 6, heal: 10 });
+  assert.deepEqual({ kind: UNDERTOW.kind, pct: UNDERTOW.pct, max: UNDERTOW.max, seconds: UNDERTOW.seconds, heal: UNDERTOW.heal }, { kind: 'undertow', pct: 2, max: 5, seconds: 6, heal: 10 });
 });
 
 // ── the mint ──────────────────────────────────────────────────────────
@@ -228,7 +228,7 @@ test('GILDED2 DRAGONFIRE: a landed blow of the Oath on a Daedra burns it again f
   assert.equal(LP.lootBlow(oath, 100, me, struck, {}), 100, 'no slayer line now - the burn is its edge on a Daedra');
 });
 
-test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s - +10% a blow before, up to +50%, for 6 s from the last (B4: let go after); another foe starts at nought; a blow asked and never landed counts nothing, nor one the ward turns (B3); a foe it fells (within TOLL_REFUND_S of its last landed blow on it) heals 10% of my health, once - and each foe one swing fells, its own (B2); another weapon neither reads nor moves it (mutants: no cap; one count for every foe; no heal; any kill heals; no window; one heal a swing)', () => {
+test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s - +2% a blow before, up to +10%, for 6 s from the last (B4: let go after); another foe starts at nought; a blow asked and never landed counts nothing, nor one the ward turns (B3); a foe it fells (within TOLL_REFUND_S of its last landed blow on it) heals 10% of my health, once - and each foe one swing fells, its own (B2); another weapon neither reads nor moves it (mutants: no cap; one count for every foe; no heal; any kill heals; no window; one heal a swing)', () => {
   fresh();
   const me = player();
   const sov = wear(me, mintGilded(SUNKEN_SOVEREIGN));
@@ -236,21 +236,21 @@ test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s -
   assert.deepEqual(LP.wornPowers(me).map((p) => p.id), ['the-sunken-sovereign']);
   const a = foe(ORC), b = foe(ORC);
   const land = (f) => { const d = LP.lootBlow(sov, 100, me, f, {}); LP.lootStrike(me, f, d, sov); return d; };
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 110, 120, 120, 120, 120, 120], 'ten a blow before it, cut to the loot blow top of 20% (B1; was never past fifty)');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 102, 104, 106, 108, 110, 110], 'two a blow before it, never past ten');
   assert.equal(land(b), 100, 'another foe starts at nought');
   LP.lootBlow(sov, 100, me, b, {}); LP.lootBlow(sov, 100, me, b, {});
-  assert.equal(land(b), 110, 'blows asked and never landed count nothing');
+  assert.equal(land(b), 102, 'blows asked and never landed count nothing');
   const other = createWeapon(WEAPONS.Longsword, 1);
   assert.equal(LP.lootBlow(other, 100, me, a, {}), 100, 'another weapon reads none of it');
   LP.lootStrike(me, b, 100, other);
-  assert.equal(land(b), 120, 'nor moves it');
+  assert.equal(land(b), 104, 'nor moves it');
   // TWO-HANDS (AUDIT 2): a landed blow that does not count whole (an off-hand blow's share of the time - formulas.js
   // `blow`) drags nothing deeper
   LP.lootStrike(me, b, 100, sov, { blow: false });
-  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 120, 'no stack from a blow that does not count whole (the three landed before it, its +30% asked, cut to the loot blow top of 20% (B1))');
+  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 106, 'no stack from a blow that does not count whole (the three landed before it, its +6%)');
   // B4: the tide lets go - six seconds from the last landed blow on it, the foe is at nought again
   T = 5.9;
-  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 120, 'held while the tide holds (the stacked +50% cut to the loot blow top of 20%, B1)');
+  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 110, 'held while the tide holds');
   T = 6.1;
   assert.equal(LP.lootBlow(sov, 100, me, a, {}), 100, 'let go past it');
   assert.equal(land(a), 100, 'and it starts again from nought');
