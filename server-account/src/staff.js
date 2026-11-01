@@ -364,6 +364,91 @@ export async function staffSession(ctx, env, token, { act = true } = {}) {
 }
 
 /**
+ * THE ADMINS' DOORS: THE PANEL'S MODERATORS
+ * /v1/staff/mods lists them; /v1/staff/mod/add and /mod/remove { handle } - a registered account, not banned, not staff
+ * already. One who holds another role (an Admin) is that role's to remove, never this door's. Removed, a member holding
+ * no other role loses every key, session and invite, as a cut does.
+ * @param {any} ctx @param {any} env @param {string} path @param {any} body @param {any} who @param {(act: string, target?: string|null, detail?: object|null, how?: any) => any} audit
+ */
+async function staffMods(ctx, env, path, body, who, audit) {
+  const { db, nowS } = ctx;
+  const denied = async (/** @type {string} */ error) => { await audit('refused', null, { path, need: 'admin' }, { outcome: 'denied' }).run(); return { error }; };
+  if (who.role !== 'admin') return denied('staff-admin');
+  if (path === '/v1/staff/mods') {
+    // STAFF-PANEL-SPEED: the read and its audit row in one trip, one transaction - never shown without its row
+    const [r] = await db.batch([db.prepare('SELECT id, handle FROM players WHERE staff_mod = 1 ORDER BY handle_lc LIMIT 500'), audit('mods-read', null, null, { onceIn: STAFF_READ_ROW_S })]);
+    return { mods: (r.results ?? []).map((p) => ({ id: p.id, handle: p.handle })) };
+  }
+  const lc = handleLc(body.handle);
+  const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
+  if (!target?.handle) return { error: 'no-player' };
+  if (path === '/v1/staff/mod/add') {
+    if (staffRole(target, env)) return { error: 'staff-already' };
+    if (staffSuspended(target)) return { error: 'staff-suspended' };   // STAFF-PANEL2-FIX: an owner's cut, an owner's invite to lift
+    if (isBanned(target, nowS)) return { error: 'staff-banned' };
+    const [, set] = await db.batch([
+      audit('mod-add', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_mod = 0)', args: [target.id] } }),
+      db.prepare('UPDATE players SET staff_mod = 1 WHERE id = ? AND staff_mod = 0').bind(target.id),
+    ]);
+    return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
+  }
+  if (target.staff_mod !== 1) return { error: staffRole(target, env) ? 'staff-config' : 'no-staff' };
+  if (staffRole({ ...target, staff_mod: 0 }, env)) return { error: 'staff-config' };   // another role holds them still
+  const hashes = await sessionHashes(db, target.id);
+  await db.batch([
+    audit('mod-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_mod = 1)', args: [target.id] } }),
+    db.prepare('UPDATE players SET staff_mod = 0 WHERE id = ?').bind(target.id),
+    db.prepare('UPDATE staff_keys SET revoked_at = ? WHERE player_id = ? AND revoked_at IS NULL').bind(nowS, target.id),
+    ...['staff_sessions', 'staff_invites'].map((t) => db.prepare(`DELETE FROM ${t} WHERE player_id = ?`).bind(target.id)),
+  ]);
+  // STAFF-PANEL5-HIDDEN: their hidden sockets closed with their sessions - STAFF-PANEL5-HIDDEN-R2: every one the cut
+  // would find (a session idled out or pruned before the removal, a follow eye's), the cut's own union, no staffcut
+  await cutPush(ctx, env, target.id, hashes, false);
+  return { ok: true, handle: target.handle };
+}
+
+/**
+ * ═══ THE OWNERS' DOORS: THE ADMINS ═══
+ * /v1/staff/admin/add and /admin/remove { handle } - a registered account, not banned, not cut. An Owner is the operator's
+ * alone (no door here makes or unmakes one), and an Owner cannot take its own Admin. A removed Admin who holds no other
+ * role loses every key, session and invite, as a cut does; a new Admin enrols a key with an Owner's invite
+ * (/v1/staff/invite) like any member.
+ * @param {any} ctx @param {any} env @param {string} path @param {any} body @param {any} who @param {(act: string, target?: string|null, detail?: object|null, how?: any) => any} audit
+ */
+async function staffAdmins(ctx, env, path, body, who, audit) {
+  const { db, nowS } = ctx;
+  const me = who.player;
+  const lc = handleLc(body.handle);
+  const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
+  if (!target?.handle) return { error: 'no-player' };
+  if (path === '/v1/staff/admin/add') {
+    if (target.staff_admin === 1) return { error: 'staff-already' };
+    if (staffSuspended(target)) return { error: 'staff-suspended' };
+    if (isBanned(target, nowS)) return { error: 'staff-banned' };
+    const [, set] = await db.batch([
+      audit('admin-add', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 0)', args: [target.id] } }),
+      db.prepare('UPDATE players SET staff_admin = 1 WHERE id = ? AND staff_admin = 0').bind(target.id),
+    ]);
+    return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
+  }
+  if (target.id === me.id) return { error: 'staff-self' };
+  if (target.staff_admin !== 1) return { error: 'no-staff' };
+  if (target.staff_owner === 1) return { error: 'staff-owner' };   // an Owner is unmade by the operator only
+  const left = !!staffRole({ ...target, staff_admin: 0 }, env);   // a Moderator still, so its keys and sessions stay
+  const hashes = await sessionHashes(db, target.id);
+  await db.batch([
+    audit('admin-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 1 AND staff_owner = 0)', args: [target.id] } }),
+    db.prepare('UPDATE players SET staff_admin = 0 WHERE id = ? AND staff_owner = 0').bind(target.id),
+    ...(left ? [] : [
+      db.prepare('UPDATE staff_keys SET revoked_at = ? WHERE player_id = ? AND revoked_at IS NULL').bind(nowS, target.id),
+      ...['staff_sessions', 'staff_invites'].map((t) => db.prepare(`DELETE FROM ${t} WHERE player_id = ?`).bind(target.id)),
+    ]),
+  ]);
+  await cutPush(ctx, env, target.id, hashes, false);
+  return { ok: true, handle: target.handle };
+}
+
+/**
  * THE STAFF DOORS, one entry: the two open ones by password and key, the rest behind a live staff session.
  * Answers the route's body, or `{ error }` (STAFF_STATUS its status).
  * @param {any} ctx @param {any} env @param {string} path @param {any} body @param {{ ip: string, token: string|null }} req
@@ -428,44 +513,7 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
   if (HIDDEN_ROUTES.includes(path)) return staffHidden(ctx, env, path, body, who, audit);   // STAFF-PANEL5-HIDDEN: Hide me and Show myself (staffHidden.js)
   if (FREEZE_ROUTES.includes(path)) return staffFreeze(ctx, env, path, body, who, audit);   // STAFF-PANEL5-FREEZE: freeze (Admins) and the staff chat (both)
 
-  // ═══ THE ADMINS' DOORS: THE PANEL'S MODERATORS ═══
-  // /v1/staff/mods lists them; /v1/staff/mod/add and /mod/remove { handle } - a registered account, not banned, not staff
-  // already. One who holds another role (an Admin) is that role's to remove, never this door's. Removed, a member holding
-  // no other role loses every key, session and invite, as a cut does.
-  if (path === '/v1/staff/mods' || path === '/v1/staff/mod/add' || path === '/v1/staff/mod/remove') {
-    if (who.role !== 'admin') return denied('staff-admin');
-    if (path === '/v1/staff/mods') {
-      // STAFF-PANEL-SPEED: the read and its audit row in one trip, one transaction - never shown without its row
-      const [r] = await db.batch([db.prepare('SELECT id, handle FROM players WHERE staff_mod = 1 ORDER BY handle_lc LIMIT 500'), audit('mods-read', null, null, { onceIn: STAFF_READ_ROW_S })]);
-      return { mods: (r.results ?? []).map((p) => ({ id: p.id, handle: p.handle })) };
-    }
-    const lc = handleLc(body.handle);
-    const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
-    if (!target?.handle) return { error: 'no-player' };
-    if (path === '/v1/staff/mod/add') {
-      if (staffRole(target, env)) return { error: 'staff-already' };
-      if (staffSuspended(target)) return { error: 'staff-suspended' };   // STAFF-PANEL2-FIX: an owner's cut, an owner's invite to lift
-      if (isBanned(target, nowS)) return { error: 'staff-banned' };
-      const [, set] = await db.batch([
-        audit('mod-add', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_mod = 0)', args: [target.id] } }),
-        db.prepare('UPDATE players SET staff_mod = 1 WHERE id = ? AND staff_mod = 0').bind(target.id),
-      ]);
-      return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
-    }
-    if (target.staff_mod !== 1) return { error: staffRole(target, env) ? 'staff-config' : 'no-staff' };
-    if (staffRole({ ...target, staff_mod: 0 }, env)) return { error: 'staff-config' };   // another role holds them still
-    const hashes = await sessionHashes(db, target.id);
-    await db.batch([
-      audit('mod-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_mod = 1)', args: [target.id] } }),
-      db.prepare('UPDATE players SET staff_mod = 0 WHERE id = ?').bind(target.id),
-      db.prepare('UPDATE staff_keys SET revoked_at = ? WHERE player_id = ? AND revoked_at IS NULL').bind(nowS, target.id),
-      ...['staff_sessions', 'staff_invites'].map((t) => db.prepare(`DELETE FROM ${t} WHERE player_id = ?`).bind(target.id)),
-    ]);
-    // STAFF-PANEL5-HIDDEN: their hidden sockets closed with their sessions - STAFF-PANEL5-HIDDEN-R2: every one the cut
-    // would find (a session idled out or pruned before the removal, a follow eye's), the cut's own union, no staffcut
-    await cutPush(ctx, env, target.id, hashes, false);
-    return { ok: true, handle: target.handle };
-  }
+  if (path === '/v1/staff/mods' || path === '/v1/staff/mod/add' || path === '/v1/staff/mod/remove') return staffMods(ctx, env, path, body, who, audit);   // the Admins' doors: the panel's Moderators
 
   // ═══ THE OWNERS' DOORS ═══
   if (!who.owner) return denied('staff-owner');
@@ -483,41 +531,7 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
       })),
     };
   }
-  // ═══ THE OWNERS' DOORS: THE ADMINS ═══
-  // /v1/staff/admin/add and /admin/remove { handle } - a registered account, not banned, not cut. An Owner is the operator's
-  // alone (no door here makes or unmakes one), and an Owner cannot take its own Admin. A removed Admin who holds no other
-  // role loses every key, session and invite, as a cut does; a new Admin enrols a key with an Owner's invite
-  // (/v1/staff/invite) like any member.
-  if (path === '/v1/staff/admin/add' || path === '/v1/staff/admin/remove') {
-    const lc = handleLc(body.handle);
-    const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
-    if (!target?.handle) return { error: 'no-player' };
-    if (path === '/v1/staff/admin/add') {
-      if (target.staff_admin === 1) return { error: 'staff-already' };
-      if (staffSuspended(target)) return { error: 'staff-suspended' };
-      if (isBanned(target, nowS)) return { error: 'staff-banned' };
-      const [, set] = await db.batch([
-        audit('admin-add', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 0)', args: [target.id] } }),
-        db.prepare('UPDATE players SET staff_admin = 1 WHERE id = ? AND staff_admin = 0').bind(target.id),
-      ]);
-      return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
-    }
-    if (target.id === me.id) return { error: 'staff-self' };
-    if (target.staff_admin !== 1) return { error: 'no-staff' };
-    if (target.staff_owner === 1) return { error: 'staff-owner' };   // an Owner is unmade by the operator only
-    const left = !!staffRole({ ...target, staff_admin: 0 }, env);   // a Moderator still, so its keys and sessions stay
-    const hashes = await sessionHashes(db, target.id);
-    await db.batch([
-      audit('admin-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 1 AND staff_owner = 0)', args: [target.id] } }),
-      db.prepare('UPDATE players SET staff_admin = 0 WHERE id = ? AND staff_owner = 0').bind(target.id),
-      ...(left ? [] : [
-        db.prepare('UPDATE staff_keys SET revoked_at = ? WHERE player_id = ? AND revoked_at IS NULL').bind(nowS, target.id),
-        ...['staff_sessions', 'staff_invites'].map((t) => db.prepare(`DELETE FROM ${t} WHERE player_id = ?`).bind(target.id)),
-      ]),
-    ]);
-    await cutPush(ctx, env, target.id, hashes, false);
-    return { ok: true, handle: target.handle };
-  }
+  if (path === '/v1/staff/admin/add' || path === '/v1/staff/admin/remove') return staffAdmins(ctx, env, path, body, who, audit);   // the Owners' doors: the Admins
   if (path === '/v1/staff/invite' || path === '/v1/staff/cut') {
     const lc = handleLc(body.handle);
     const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
