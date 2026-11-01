@@ -43,27 +43,37 @@ export function statementsFor(args, nowS) {
   const [cmd, a, b] = args;
   if (cmd === 'find') {
     if (!a || !HANDLE_RE.test(a)) return { error: 'find needs a handle' };
-    return { sql: [`SELECT id, handle, registered_at, staff_owner, staff_admin, staff_mod, staff_suspended FROM players WHERE handle_lc = '${a.toLowerCase()}'`] };
+    return {
+      sql: [
+        `SELECT id, handle, registered_at, staff_owner, staff_admin, staff_mod, staff_suspended FROM players WHERE handle_lc = '${a.toLowerCase()}'`,
+      ],
+    };
   }
   if (cmd === 'set') {
     if (!a || !ID_RE.test(a)) return { error: 'set needs an account id (run find first)' };
-    const cols = Object.hasOwn(ROLE_COLUMNS, String(b)) ? ROLE_COLUMNS[/** @type {keyof typeof ROLE_COLUMNS} */ (b)] : null;
+    const cols = Object.hasOwn(ROLE_COLUMNS, String(b))
+      ? ROLE_COLUMNS[/** @type {keyof typeof ROLE_COLUMNS} */ (b)]
+      : null;
     if (!cols) return { error: 'the role is owner, admin, moderator or none' };
     // a registered account only (a guest holds no handle and so no role), and the row must exist: the UPDATE says how many it moved
-    return { sql: [
-      `UPDATE players SET staff_owner = ${cols.staff_owner}, staff_admin = ${cols.staff_admin}, staff_mod = ${cols.staff_mod} WHERE id = '${a}' AND handle IS NOT NULL`,
-      `SELECT id, handle, staff_owner, staff_admin, staff_mod FROM players WHERE id = '${a}'`,
-    ] };
+    return {
+      sql: [
+        `UPDATE players SET staff_owner = ${cols.staff_owner}, staff_admin = ${cols.staff_admin}, staff_mod = ${cols.staff_mod} WHERE id = '${a}' AND handle IS NOT NULL`,
+        `SELECT id, handle, staff_owner, staff_admin, staff_mod FROM players WHERE id = '${a}'`,
+      ],
+    };
   }
   if (cmd === 'discord') {
     if (!a || !ID_RE.test(a)) return { error: 'discord needs an account id' };
     if (b === '--remove') return { sql: [`DELETE FROM staff_discord WHERE player_id = '${a}'`] };
     if (!b || !SNOWFLAKE_RE.test(b)) return { error: 'discord needs the Discord user id (digits) or --remove' };
-    return { sql: [
-      `DELETE FROM staff_discord WHERE discord_id = '${b}' OR player_id = '${a}'`,
-      `INSERT INTO staff_discord (discord_id, player_id, created_at) SELECT '${b}', id, ${Math.floor(nowS)} FROM players WHERE id = '${a}' AND handle IS NOT NULL`,
-      `SELECT discord_id, player_id FROM staff_discord WHERE player_id = '${a}'`,
-    ] };
+    return {
+      sql: [
+        `DELETE FROM staff_discord WHERE discord_id = '${b}' OR player_id = '${a}'`,
+        `INSERT INTO staff_discord (discord_id, player_id, created_at) SELECT '${b}', id, ${Math.floor(nowS)} FROM players WHERE id = '${a}' AND handle IS NOT NULL`,
+        `SELECT discord_id, player_id FROM staff_discord WHERE player_id = '${a}'`,
+      ],
+    };
   }
   return { error: USAGE };
 }
@@ -73,11 +83,26 @@ if (isMain(import.meta.url)) {
   const flags = new Set(argv.filter((x) => x === '--local' || x === '--print'));
   const words = argv.filter((x) => !x.startsWith('--') || x === '--remove');
   const plan = statementsFor(words, Date.now() / 1000);
-  if ('error' in plan) { console.error(plan.error); process.exit(2); }
-  const exec = wranglerExec();   // WRANGLER names another command; the default is npx wrangler@4, run where server-account/wrangler.toml is
+  if ('error' in plan) {
+    console.error(plan.error);
+    process.exit(2);
+  }
+  const exec = wranglerExec(); // WRANGLER names another command; the default is npx wrangler@4, run where server-account/wrangler.toml is
   for (const sql of plan.sql) {
-    if (flags.has('--print')) { console.log(`${sql};`); continue; }
-    const out = exec(['d1', 'execute', 'daggerfall-accounts', flags.has('--local') ? '--local' : '--remote', '--json', '--yes', '--command', sql]);
+    if (flags.has('--print')) {
+      console.log(`${sql};`);
+      continue;
+    }
+    const out = exec([
+      'd1',
+      'execute',
+      'daggerfall-accounts',
+      flags.has('--local') ? '--local' : '--remote',
+      '--json',
+      '--yes',
+      '--command',
+      sql,
+    ]);
     const rows = JSON.parse(out)?.[0]?.results ?? [];
     for (const r of rows) console.log(JSON.stringify(r));
   }
