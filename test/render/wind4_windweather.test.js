@@ -89,7 +89,9 @@ test('WIND4 (3) the grass darkens: the sward takes the sun\'s SCALE and the moon
   assert.match(LAB_GRASS_VS, /vMoonLam = max\(dot\(nrm, normalize\(uMoonDir\)\), 0\.0\);/);
   // GR1's law: the lab is the same text, and sets the new uniforms itself
   const lab = read('grass-proto.html');
-  assert.ok(lab.includes(LAB_GRASS_FS), 'the lab carries this fragment stage verbatim - GRASS2 changed no fragment law');
+  // The port's comments are edited on their own and the lab's are not, so the code is compared with `//` comments dropped.
+  const glslCode = (t) => t.replace(/[ \t]*\/\/[^\n]*/g, '');
+  assert.ok(glslCode(lab).includes(glslCode(LAB_GRASS_FS)), 'the lab carries this fragment stage’s code verbatim - GRASS2 changed no fragment law');
   // GRASS2: the VERTEX stage is the lab's text plus its declared edits (four since GRASS6)
   // now, so it is no longer a substring of the lab. The whole-text law
   // lives in labGrass.test.js, which applies the edits and compares; what
