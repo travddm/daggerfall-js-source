@@ -110,7 +110,7 @@ test('HARD3: the type run is part of the gate, and the config stays opt-in', () 
   assert.equal(ts.compilerOptions.checkJs, false, 'checkJs stays false: the opt-in IS the scope');
   assert.equal(ts.compilerOptions.allowJs, true);
   assert.equal(ts.compilerOptions.noEmit, true, 'the checker never writes output');
-  assert.deepEqual(ts.include, ['src/**/*.js'], 'the whole of src/ is parsed, so a seam can see what it imports');
+  assert.deepEqual(ts.include, ['src/**/*.js', 'src/**/*.ts'], 'the whole of src/ is parsed, so a seam can see what it imports');
 });
 
 test('HARD3: every file at a seam opts in, and the seam sets are read out of the tree', () => {
