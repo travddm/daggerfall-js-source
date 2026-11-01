@@ -86,11 +86,9 @@ test('BR1: no surface still says the old name', () => {
 });
 
 test('BR4: no surface still says the old name - whole, or split across a wordmark', () => {
-  // The BR1 sweep, for the name BR1 gave it. Case-sensitive, so Mac's
-  // lower-case "keep the daggerfall Enhanced title" (the landing page's
-  // and its test's quote of him) is no hit; the capitalised survivors are
-  // named below. The bible is the record of what the project was called
-  // when, and is not swept.
+  // The BR1 sweep, for the name BR1 gave it. Case-sensitive; the one
+  // capitalised survivor is named below. The bible is the record of what
+  // the project was called when, and is not swept.
   let hits = '';
   try {
     // Nor are the mutant records: a record's `new` is the old name ON
@@ -100,18 +98,12 @@ test('BR4: no surface still says the old name - whole, or split across a wordmar
   } catch (e) {
     assert.equal(e.status, 1, `git grep failed: ${e.stderr || e.message}`);
   }
-  // THE SURVIVORS ARE WORDS SOMEONE SAID OR WROTE DOWN AT THE TIME, each
-  // named: a player's Discord question (REL2), Mac's BR3 ruling as the
-  // landing test quotes it, and REL2's record of the file the release
-  // actually carried. None is a surface. (The patch notes announcing the
-  // rename were a fourth until REL6 took notes out of the tree. The sweep
-  // reads git's INDEX: the first run of this pin went green with those
-  // notes and br4.json on disk but not yet added, and red in CI on the
-  // commit that carried them.)
+  // THE SURVIVOR IS A RECORD, not a surface: REL2's note of the file name
+  // the release actually carried. It is matched by its text, not its line
+  // number, so a comment edit above it does not break the sweep. The sweep
+  // reads git's INDEX, so a file on disk but not yet added is not seen.
   const SAID = [
-    /^test\/tooling\/relwin1\.test\.js:[23]:\/\/ /,
-    /^test\/tooling\/relwin1\.test\.js:9:\/\/ `artifactName`, so both wrote DaggerfallEnhanced-<v>-win-x64\.exe/,
-    /^test\/ui\/enhanced\/landing\.test\.js:\d+:\s*\/\/ logo to the original Daggerfall Enhanced text"\)/,
+    /^test\/tooling\/relwin1\.test\.js:\d+:\/\/ `artifactName`, so both wrote DaggerfallEnhanced-<v>-win-x64\.exe/,
   ];
   const survivors = hits.split('\n').filter((l) => l && !SAID.some((re) => re.test(l))).join('\n');
   assert.equal(survivors, '', `the old name survives:\n${survivors}`);

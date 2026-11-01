@@ -278,9 +278,8 @@ test('F036: the world host runs those rolls in the catch-up loop and calls Spawn
   assert.ok(i > 0, 'the port of PlayerEntity.Update:486-511 was found');
   assert.ok(!fn.includes('passiveGuardSpawns('), 'the loop rolls no levy');
   assert.ok(!fn.includes('CRIMES.Criminal_Conspiracy'), 'and levies no Conspiracy');
-  assert.match(fn, /REP1 \(Mac: "Challenged on sight"\): THE PASSIVE LEVY IS RETIRED\./);
   assert.ok(!WORLD.includes('function _witnessResponse()'), 'the witness hook had one caller, the levy, and went with it');
-  assert.match(WORLD, /\n\s*standingWatch\.frame\(\);   \/\/ REP1: a guard who sees a known criminal stops them/, 'the stop is looked for in the frame');
+  assert.match(WORLD, /\n\s*standingWatch\.frame\(\);/, 'the stop is looked for in the frame');
   assert.ok(WORLD.includes("cityGuards.spawnCityGuards(!!immediate, { playerFeet: [...feet], playerFwd: fwd, pool: _guardPool() })"),
     'the seen crime still reaches the pool with the live NPC pool');
 });
