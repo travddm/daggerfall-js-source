@@ -198,9 +198,10 @@ async function boot() {
     // reader handed in (ui/uiClickSound.js names no data module: the HUD imports it). Not awaited, and a missing bank
     // boots nothing.
     import('./ui/uiClickSound.js').then((m) => m.wakeUiClickSound(getBytes)).catch(() => {});
-    // INTRO2: the cinematic and menu share ONE music session. The final
-    // splash holds for the player's tap; opening the menu ducks the track,
-    // choosing a game closes it before any in-game or classic video audio.
+    // INTRO2: the cinematic and menu share ONE music session, Daggerfall's
+    // title song from the player's ARENA2 data (systems/titleMusic.js) - with
+    // no data yet the film plays silently. Opening the menu ducks the song,
+    // and choosing a game fades it out for the next host's music.
     status('introduction');
     const freeze = import.meta.env.DEV && params.has('introat') ? Number(params.get('introat')) : null;
     choice = await runCinematicFrontDoor(() => {
@@ -213,6 +214,7 @@ async function boot() {
       menuMusic: !params.has('nointro') && !!getPref('skipStartVideo'),
       debug: import.meta.env.DEV && params.has('introdebug'),
       freezeAt: freeze !== null && Number.isFinite(freeze) ? Math.max(0, freeze) : null,
+      fetchBytes: getBytes,
     }).finally(detachMenuPad);   // PAD-DOOR: the choice is made - the door's pad stops before the scene's starts
   }
   if (choice !== 'begin') {
