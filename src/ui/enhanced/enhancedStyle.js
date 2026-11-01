@@ -6549,7 +6549,7 @@ body:has(.travelpanel-junction.show) .qtrack { visibility: hidden; }
 
 /* THE FIGURE. The stage is a fixed 100x62 coordinate space
    (STAR_FIGURE.box) laid out as an aspect box, so the lines and the
-   stars read the SAME numbers - ui/levelingChoice.js's law about a
+   stars read the SAME numbers - ui/choiceScreen.js's law about a
    picture and its hit test, applied to a drawing that has both in one
    element tree. */
 .lv-stage { display: flex; align-items: center; justify-content: center; padding: 6px 20px; min-height: 0; }
@@ -6584,11 +6584,9 @@ body:has(.travelpanel-junction.show) .qtrack { visibility: hidden; }
 .lv-star.full .lv-val { color: #9c937d; }
 
 /* THE CHOICE: the focused star, spelled out, with the two presses.
-   The mod's HIDE-DO-NOT-GREY rule is the STARS' business (a star with
-   no legal press simply does not light); these two are the window's
-   furniture and stay put, dimmed, because a button that vanishes under
-   the pointer is worse than one that says no - ui/virtueLevelUp.js's
-   own words for its own pair. */
+   A star with no legal press simply does not light; these two are the
+   window's furniture and stay put, dimmed, because a button that vanishes
+   under the pointer is worse than one that says no. */
 .lv-choice { display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 4px 20px 10px; }
 .lv-ask { color: #9c937d; font-size: 14px; letter-spacing: 0.2em; text-indent: 0.2em;

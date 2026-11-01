@@ -73,7 +73,8 @@ makes a fresh copy. Only the owner's party is admitted. Entry from the world goe
 - Rooms (`src/net/arena/arenaLaw.js`): `arena:hall` (the lobby), `arena:b<16hex>` (a bout), `arena:p<code>` (a
   private bout), `arena:x<hour>` (an exhibition).
 - Before a run the client takes a ticket (`/v1/arena/attempt`, `arenaAttempt`, table `arena_attempts`); a claim needs
-  an open ticket (`claimArena`, `server-account/src/arena.js`). Results go to `arena_pve` and `arena_pvp`; the champion is
+an open ticket (`claimArena`, `server-account/src/arena.js`). Results go to `arena_pve` and `arena_pvp`; the champion
+  is
   settled by the `arena-champion` minute job.
 - Bout logic: `src/net/arena/arenaBrain.js`, `src/systems/arena/arenaBout.js`.
 

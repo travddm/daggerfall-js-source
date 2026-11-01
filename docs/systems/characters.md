@@ -20,7 +20,7 @@ The rules are Daggerfall Unity's (DFU, MIT, Daggerfall Workshop), ported from `P
 | Class questionnaire | `src/systems/classQuestions.js` |
 | Creation | `src/systems/chargen.js`, `src/systems/chargenSession.js`, `src/ui/chargen.js`, `src/systems/startingGear.js` |
 | Biography | `src/formats/biogFile.js`, `src/systems/biography.js` |
-| Advancement and levelling | `src/systems/advancement.js`, `levelCap.js`, `levelClimb.js`, `levelEven.js`, `oblivionLeveling.js`, `skillSwap.js` (all in `src/systems/`) |
+| Advancement and levelling | `src/systems/advancement.js`, `levelCap.js`, `levelClimb.js`, `levelEven.js`, `skillSwap.js` (all in `src/systems/`) |
 | Equip slots and paperdoll | `src/characters/paperdoll/`, `src/characters/equipRules.js`, `src/characters/equipTable.js`, `src/systems/equip.js` |
 | Enemy entities | `src/characters/enemy/enemyEntity.js`, `src/characters/enemy/enemyBasics.js` |
 
@@ -45,7 +45,8 @@ is undead without an import cycle.
   drain effects. Never read `entity.stats` directly in a formula.
 - 35 skills (`SKILLS`, `SKILL_NAMES`, `SKILL_COUNT` in `skills.js`). `tallySkill` counts a use into
   `entity.skillUses`.
-- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill` (`skillSoftcap.js`), not
+- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill`
+  (`skillSoftcap.js`), not
   the raw value: past 100 a point is worth a quarter (`OVERCAP_POINT_WEIGHT`), plus milestone bonuses at 125, 150,
   175 and 200 (`SKILL_MILESTONES`). A raw 200 reads as 140. Screens print the raw value (`displaySkillValue`).
 
@@ -148,16 +149,8 @@ minutes (`SKILL_RAISE_CHECK_INTERVAL`) a skill with enough uses rises one point.
   `hitPointsPerLevelUp` and hands a bonus pool for attributes: 4 to 6 points offline, 5 online (`ONLINE_BONUS_POOL`).
 - Online, `levelEven.js` `evenHpFloor` keeps maximum health at or above an average-roll floor for the class, level
   and current Endurance. It rides the online layer and is never saved.
-- `LEVEL_CAP` is 45 on both lanes (`levelCap.js`), a departure: DFU has no cap. `releaseCapLatch` clears a level-up
+- `LEVEL_CAP` is 45 online and offline (`levelCap.js`), a departure: DFU has no cap. `releaseCapLatch` clears a level-up
   latched in an old save at the cap.
-
-### Two levelling systems
-
-`oblivionLeveling.js` ports the OpenMW mod Oblivion Remaster Like Leveling (vendored under
-`vendor/oblivion-remaster-leveling/`; the choice screen is `src/ui/levelingChoice.js`). `entity.levelingSystem` is `LEVELING_CLASSIC` or `LEVELING_VIRTUE`;
-`usesVirtueLeveling` is the one reader. Virtue levelling fills a level bar from skill progress and lets the player
-spend a purse on attributes. A new character chooses at creation offline only; online it is always classic
-(`newCharacterLevelingSystem`, `ONLINE_LEVELING_SYSTEM`). `advancement.js` asks this one question and runs one arm.
 
 ### Master Skills and the soft cap
 
@@ -186,10 +179,12 @@ The firmament is a passive skill tree that applies online only. Offline the char
 
 ## Bodies, equipment and the paperdoll
 
-- **Equip slots.** `src/characters/paperdoll/paperdoll.js` holds `EQUIP_SLOTS` (DFU's 27-slot table) and the 288 item templates
+- **Equip slots.** `src/characters/paperdoll/paperdoll.js` holds `EQUIP_SLOTS` (DFU's 27-slot table) and the 288 item
+  templates
   (`src/characters/itemTemplates.json`, DFU's ItemTemplates.txt). `equipRules.js` is generated from DFU's
   `ItemEquipTable` (do not hand-edit); `equipTable.js` assigns slots. `src/systems/equip.js` is the runtime API.
-- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE archives, by race
+- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE
+  archives, by race
   morphology, with dyes applied as palette band swaps (`src/characters/dyes.js`).
 - **Morrowind bodies (enhanced skin).** The player, peers, NPCs and foes can stand in Morrowind NIF bodies read from
   the player's own Morrowind data (`src/formats/morrowind/`). `src/combat/fpArm.js` builds the rig;
@@ -200,7 +195,8 @@ The firmament is a passive skill tree that applies online only. Offline the char
   ships that Morrowind lacks; `src/systems/ownMwAssets.js` serves them.
 - **Classic sprites.** Without a Morrowind body, foes and NPCs are DFU's billboards (`enemyBasics.js` textures,
   `src/characters/staticNpc.js`, `src/characters/mobile/`).
-- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`) is parked;
+- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`)
+  is parked;
   it is reachable only behind `?voxelfolk` in `src/scenes/interiorContext.js` and the paperdoll tools.
 
 ## The player entity and the player folder
@@ -227,8 +223,8 @@ beyond DFU's ranges for vendored enemy mods. Stats, elites and boss traits are o
 
 - Creation: `test/systems/chargen.test.js`, `chargenseam.test.js`, `chargenui.test.js`, `customclass.test.js`,
   `stockclasses.test.js`, `races.test.js`.
-- Advancement and levelling: `test/systems/advancement.test.js`, `level45_cap.test.js`, `level_online_plus.test.js`,
-  `orl1_leveling.test.js`, `fb1026d_masterthree.test.js`, `fb1019b_leveleven.test.js`, `fb1019b_skillswap.test.js`.
+- Advancement and levelling: `test/systems/advancement.test.js`, `level45_cap.test.js`,
+  `fb1026d_masterthree.test.js`, `fb1019b_leveleven.test.js`, `fb1019b_skillswap.test.js`.
 - Bodies: `test/characters/paperdoll.test.js`, `equip.test.js`, `mwnpc4_npclane.test.js`, `mwnpc17_wardrobe.test.js`,
   `humanclasses.test.js`, `enemies.test.js`.
 
@@ -242,7 +238,7 @@ Several class and race tests read real ARENA2 files: run `sh tools/fetch-data.sh
   plain value, or the limiter and online layers vanish.
 - **Effective vs raw skill.** A formula that reads `skills[i]` directly over-counts skills past 100 and misses effect
   mods and mentor mode. Formulas read `skillValue`; screens read `displaySkillValue`.
-- **Online and offline differ** in level formula, bonus pool, health floor, levelling system and Master Skills. Test
+- **Online and offline differ** in level formula, bonus pool, health floor and Master Skills. Test
   both lanes (`isOnlinePage` in `src/systems/online/onlineLane.js`).
 - **Leaf modules.** `levelCap.js`, `masterSkills.js`, `skillSoftcap.js`, `statMods.js` and `racialLive.js` import
   little or nothing on purpose; adding an import there can close a cycle through `skills.js` or `formulas.js`.

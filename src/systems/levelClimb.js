@@ -95,7 +95,7 @@ function countedRate(entity) {
 }
 
 /**
- * THE CONVERSION, on a save snapshot (realmLeveling.js crossLeveling runs it at every join). Moves the
+ * THE CONVERSION, on a save snapshot (scenes/world.js runs it at every realm join). Moves the
  * start, the level, the stored maximum health and the owed level-up; skills, attributes and items are never touched.
  * Run again it changes nothing. Answers whether it moved anything.
  * @param {any} snap

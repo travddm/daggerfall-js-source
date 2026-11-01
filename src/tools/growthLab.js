@@ -29,7 +29,7 @@ const e = {
   skills: new Array(35).fill(0).map((_, i) => 8 + ((i * 7 + 13) % 46)),
   skillsRecentlyRaised: [0, 0],
   health: 96, maxHealth: 118, magicka: 40, maxMagicka: 80, fatigue: 64 * 104,
-  startingLevelUpSkillSum: 180, currentLevelUpSkillSum: 254, levelProgress: 38, levelRollUp: 6,
+  startingLevelUpSkillSum: 180, currentLevelUpSkillSum: 254,
   equipment: {}, items: [],
 };
 e.readyToLevelUp = q.get('owed') === '1';

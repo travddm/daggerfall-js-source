@@ -868,7 +868,7 @@ import {
   realmFetch,   // PERMADEATH-HOUSES: a fallen member's record read, for their home's cupboards
 } from '../systems/realmSaves.js';   // REALM P1.3: an online character is the realm's - joined, loaded and checkpointed through the service
 import { createRealmLine } from '../systems/legacy/realmLine.js';   // LEGACY7: online, Project Legacy's lines are the realm's
-import { crossLeveling, LEVELING_SWITCHED_LINE } from '../systems/realmLeveling.js';   // LEVEL-ONLINE-3: the realm's one leveling
+import { onlineLevelConvert } from '../systems/levelClimb.js';   // LEVEL-45: a realm character's level read again from its skills under the online cap
 import { appStorage } from '../systems/appStorage.js';   // ACC1d: where that session lives - the app's store, not the tab's (a second tab is the same player)
 import { createStaffMessages } from '../net/staffMessages.js';   // STAFF-PANEL5-MESSAGE: Message on screen, the game's half
 import { createStaffFreezeHost } from './staffFreezeHost.js';   // STAFF-PANEL5-FREEZE: the staff freeze's screen and the Staff tab
@@ -1325,7 +1325,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const testRoomOffline = testRoomOnlineRefused(params, { snap: bootSnap });
   if (testRoomOffline) { params.delete('online'); publishBootParams(params); }
   if (testRoomOffline && realmSession) { setRealmNotice(globalThis.sessionStorage, realmRefusalText('test-room')); exitToTitleMenu(); return; }   // REALM P1.3: never the realm's
-  const releveled = realmBoot && bootSnapRead ? crossLeveling(bootSnapRead) : false;   // LEVEL-ONLINE-3: an Oblivion-levelling realm character onto Daggerfall's leveling, into the one parse before it is restored (systems/realmLeveling.js)
+  if (realmBoot && bootSnapRead) onlineLevelConvert(bootSnapRead);   // LEVEL-45: into the one parse before it is restored
   const empireFolded = realmBoot ? foldEmpireAccounts(bootSnapRead) : null;   // EMPIRE-ACCOUNT: every branch's gold into the Empire's one account, before it is restored and before the join settles a loan (systems/banking.js)
   if (refuseOnlinePowerFlags(params).length) publishBootParams(params);   // REALM P0.1: ?shot, ?fly, ?nofoes and the rest - dropped online before anything below reads them
   const regionName = params.get('region') || 'Daggerfall';
@@ -15192,7 +15192,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     let bundle;
     try {
       bundle = classicSaveToSnapshot(saveGames, {
-        spellsByIndex, online: isOnlinePage(),   // LEVEL-ONLINE: an online import is a new online character (the law's system)
+        spellsByIndex,
         factionStore: townTalk.factionDict ? { dict: townTalk.factionDict } : null,
         resolveLocation: (regionIndex, locationIndex) => {
           const region = maps.getRegion(regionIndex);
@@ -27507,7 +27507,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   if (realmRefused) townTalk.say(REALM_OFFLINE_TEXT);   // REALM P1.3: an online boot with no realm character plays offline, and says so
   if (realmBoot?.restored && realmBoot.missed) townTalk.say(REALM_RESTORED_TEXT);   // RESCUE-SAVE: the device's copy of a save the realm refused or never answered, played on (AUDIT A8: an ordinary close's, silently)
   if (realmBoot?.stranded) townTalk.say(realmStrandedText());   // STRANDED: a copy behind the record, set aside rather than deleted (realmSaves.js)
-  if (releveled) townTalk.say(LEVELING_SWITCHED_LINE);   // LEVEL-ONLINE-3: the switch, said once the world stands
   for (const line of empireAccountLines(empireFolded)) townTalk.say(line);   // EMPIRE-ACCOUNT: said once the world stands
   // EOTB-IL: StartGameBehaviour.OnNewGame (the mod's handler, IL_0930) -
   // a boot that loaded nothing is a new game, wherever it starts

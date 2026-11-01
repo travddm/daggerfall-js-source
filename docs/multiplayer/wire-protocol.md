@@ -35,7 +35,11 @@ Frames are JSON text with a type field `t`. There is no binary encoding.
 | Group content | `gate`, `sd`, `eg`, `arena`, `sea`, `raid`, `serpent`, `star`, `siege`, `rite`, `ow` |
 | Leases | `lease` (see [group-instances.md](group-instances.md)) |
 
-The `sea` frame (social room only) carries the treasure fleet's sunk sailings, the one piece of sea state the relay keeps. A client sends `hi` (ask the state) or `fk` with the sailing number `n` (its flagship went down); the relay answers `hi` with `st` and fans `fd` to every socket in the room when a flagship is newly down, both carrying `fleets` (the sunk sailings; `st` also carries the relay clock `now`). Validators: `validSeaIn`, `validSeaOut`. Vaults have no hub and no frame.
+The `sea` frame (social room only) carries the treasure fleet's sunk sailings, the one piece of sea state the relay
+keeps. A client sends `hi` (ask the state) or `fk` with the sailing number `n` (its flagship went down); the relay
+answers `hi` with `st` and fans `fd` to every socket in the room when a flagship is newly down, both carrying `fleets`
+(the sunk sailings; `st` also carries the relay clock `now`). Validators: `validSeaIn`, `validSeaOut`. Vaults have no
+hub and no frame.
 
 Each content area has a validator pair in `wire.js` (`validSdIn`/`validSdOut`, `validEgIn`/`validEgOut`,
 `validRaidIn`/`validRaidOut`, ...). The relay runs the `In` check on what a client sends and the client runs the `Out`
@@ -113,7 +117,8 @@ list of files in the graph. So:
    `server/src/index.js` or a module it calls.
 2. Bump `RELAY_VERSION` to the next `world<N>`.
 3. If the relay must refuse old clients, raise the matching hello law number and its refusal reason.
-4. Add the row `world<N>: '<sha256>'` to `test/net/relayversion.test.js` (add the row with a placeholder; the failing equality assertion shows the actual hash) and update
+4. Add the row `world<N>: '<sha256>'` to `test/net/relayversion.test.js` (add the row with a placeholder; the failing
+   equality assertion shows the actual hash) and update
    the expected graph if imports changed.
 5. Merge. The relay deploys on the push to `main`, and every player reconnects.
 

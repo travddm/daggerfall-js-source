@@ -347,21 +347,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['better-ambience']),
     }),
     Object.freeze({
-      title: 'Oblivion Remaster Like Leveling',
-      version: '0.5.3',
-      // THE ONE ROW ON THIS SCREEN WHOSE AUTHOR IS NOT KNOWN. Nothing
-      // in the shipped archive names them - no licence file, no script
-      // header, an empty author field in the `.omwaddon` - so the
-      // screen says so and names the page the mod comes from, rather
-      // than crediting a guess. The record is open in
-      // vendor/oblivion-remaster-leveling/README.md and in the
-      // registry row, and it is filled in the moment Mac has the name.
-      get author() { return t('credits.author.unnamed', 'Unnamed ({source})', { source: 'Nexus Morrowind 56569' }); },
-      get what() { return t('credits.oblivionLeveling.what', 'Another way to level, offered when you create a character. Raising skills fills a 100-point bar instead of Daggerfall’s skill total: primary and major skills fill it fastest, minor skills next and the rest slowest, and any overflow carries into the next level. Each level up gives you points to spend on a few attributes, with Luck costing more. You can set the points, how many attributes, and Luck’s cost on the mod’s tile. Originally an OpenMW Lua mod for Morrowind.'); },
-      get terms() { return t('credits.oblivionLeveling.terms', 'Used with the author\u2019s permission, on Mac\u2019s word. The archive states no license and names no author.'); },
-      vendor: Object.freeze(['oblivion-remaster-leveling']),
-    }),
-    Object.freeze({
       title: 'Horse Cart and Cargo',
       version: '1.0.0-rc12',
       author: 'demifiend000',

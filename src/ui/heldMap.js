@@ -542,7 +542,7 @@ export class HeldMapWindow {
     this.done = false;
     this.isChoiceWindow = true;
     // MAP-WEAPON / EM-BUG1: the scene's tick tag, this file's own idiom
-    // (`isRestWindow`, `isVirtueLevelUp`): the weapon rig asks whether
+    // (`isRestWindow`): the weapon rig asks whether
     // a map holds the screen and must not import a UI class to ask.
     //
     // THIS IS ITS OWN TAG NOW, AND THAT IS THE BUG EM4 LEFT. The rig's

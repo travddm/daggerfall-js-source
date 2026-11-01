@@ -690,8 +690,6 @@ export function createWorldModes(host) {
       // levels the player in classic. This host builds no windows -
       // host.makeCharSheet is the outer host's own builder, the same
       // one toggleCharSheet mounts.
-      // ORL1: ...and the LAST-RESORT screen, for a host that hands no
-      // builder, must obey this character's law too.
       // LV1: WHICH IS THE DOOR'S QUESTION, SO IT IS ASKED THERE. The
       // door takes `entity` alone and answers the whole fork - skin,
       // lane and book - so a face added to it is a face every host

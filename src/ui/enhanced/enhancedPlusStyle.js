@@ -286,7 +286,7 @@ body .dfchat-form .dfchat-close { min-width: 32px; padding: 4px 8px; }
      dai-katana) hung out of the box into the rows beneath. The shop and a player trade (a trade-shell too). */
   display: flex; align-items: center; justify-content: center; }
 
-/* LEVEL-PLUS: THE LEVELING QUESTION (ui/enhanced/enhancedLevelingChoice.js) - the last screen of making a character, in the
+/* LEVEL-PLUS: THE LEVELING QUESTION (ui/enhanced/enhancedChoiceFace.js) - the last screen of making a character, in the
    rest window's shell: an eyebrow, the question as the heading, one line of lead, then the two systems side by side as
    sunk stone tiles (stacked on a phone). The chosen tile rises in brass; a tile shut online (LEVEL-ONLINE) is dimmed
    with its reason where its Choose would be. Tints and bevels only - every Plus theme keeps its own stone. */

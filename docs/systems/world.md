@@ -97,7 +97,8 @@ A location is assembled by `layoutLocation` (`src/world/locationLayout.js`), a p
 `DaggerfallLocation.LayoutLocation`. Each MAPS.BSA grid cell names an RMB block in BLOCKS.BSA; the block is placed at
 `(x * RMB_SIDE, y * RMB_SIDE)`.
 
-- `src/world/rmbLayout.js` `layoutRmbBlock`: one block's buildings, models and ground tilemap. `src/world/rmbFlats.js`: block and misc flats (billboards). Editor flats (archive 199) are kept with `editor: true`
+- `src/world/rmbLayout.js` `layoutRmbBlock`: one block's buildings, models and ground tilemap.
+  `src/world/rmbFlats.js`: block and misc flats (billboards). Editor flats (archive 199) are kept with `editor: true`
   and not drawn. Departure: nature flats under a building's footprint are not placed.
 - `src/world/staticBuildings.js`, `staticDoors.js`, `buildingNames.js`: bounds, doors, names. Interiors:
   `src/world/interior/`. `src/world/city/`: NPC walk grid (`cityNavigation.js`), gates by the clock, street lights.
