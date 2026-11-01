@@ -7,20 +7,11 @@ import assert from 'node:assert/strict';
 import { inventoryItemImage, templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { paperdollItemImage } from '../../src/ui/paperDoll.js';
 import {
-  armorArchive as armorArchiveByMorphology,
-  BODY_MORPHOLOGY,
-  clampArmorVariant,
-  ARMOR_MATERIAL,
+  armorArchive as armorArchiveByMorphology, BODY_MORPHOLOGY, clampArmorVariant, ARMOR_MATERIAL,
 } from '../../src/systems/armorMaterials.js';
-import {
-  armorArchive,
-  morphologyOfRace,
-  armorVariant,
-  MATERIAL_FAMILY,
-  playerArchiveFor,
-} from '../../src/characters/paperdoll/paperdollArt.js';
+import { armorArchive, morphologyOfRace, armorVariant, MATERIAL_FAMILY, playerArchiveFor } from '../../src/characters/paperdoll/paperdollArt.js';
 import { assignStartingGear, STARTING_GOLD } from '../../src/systems/startingGear.js';
-import { isWalletItem } from '../../src/systems/walletItem.js'; // WALLET1: the port's own tail's wallet, set aside from DFU's bag
+import { isWalletItem } from '../../src/systems/walletItem.js';   // WALLET1: the port's own tail's wallet, set aside from DFU's bag
 import { GOLD_TEMPLATE, goldStack, itemWeight } from '../../src/systems/inventory.js';
 import { addGold } from '../../src/systems/court.js';
 import { createChargenWindow, finishChargen } from '../../src/systems/chargenSession.js';
@@ -42,25 +33,16 @@ test('17f F1: the item list addresses icons for the WEARER morphology', () => {
   // every list drew the morphology-0 (Argonian) row for every player.
   const shirtM = { group: 'MensClothing', templateIndex: 165, variant: 0 };
   const base = templateByIndex(165).playerTextureArchive;
-  assert.equal(base, 239, 'the TEMPLATE archive is the Argonian-row base');
+  assert.equal(base, 239, "the TEMPLATE archive is the Argonian-row base");
   assert.equal(inventoryItemImage(shirtM, { gender: 'male', race: 'Breton' }).archive, base + BODY_MORPHOLOGY.Human);
   assert.equal(inventoryItemImage(shirtM, { gender: 'male', race: 'Khajiit' }).archive, base + BODY_MORPHOLOGY.Khajiit);
-  assert.equal(
-    inventoryItemImage(shirtM, { gender: 'male', race: 'Argonian' }).archive,
-    base,
-    'only an Argonian sits on the base row',
-  );
+  assert.equal(inventoryItemImage(shirtM, { gender: 'male', race: 'Argonian' }).archive, base, 'only an Argonian sits on the base row');
   // armor replaces the archive outright (ApplyArmorSettings :466-485)
   const cuirass = { group: 'Armor', templateIndex: 102, material: ARMOR_MATERIAL.Iron, variant: 1 };
-  assert.equal(
-    inventoryItemImage(cuirass, { gender: 'female', race: 'HighElf' }).archive,
-    armorArchiveByMorphology('female', BODY_MORPHOLOGY.Elf),
-  );
+  assert.equal(inventoryItemImage(cuirass, { gender: 'female', race: 'HighElf' }).archive,
+    armorArchiveByMorphology('female', BODY_MORPHOLOGY.Elf));
   // and the two windows must agree - the doll already had the law
-  for (const id of [
-    { gender: 'male', race: 'Nord' },
-    { gender: 'female', race: 'WoodElf' },
-  ]) {
+  for (const id of [{ gender: 'male', race: 'Nord' }, { gender: 'female', race: 'WoodElf' }]) {
     assert.equal(inventoryItemImage(shirtM, id).archive, paperdollItemImage(shirtM, id).archive, JSON.stringify(id));
   }
 });
@@ -70,10 +52,8 @@ test('17f F1: archive 0 stays 0 - the world-texture fallback survives', () => {
   // (ItemHelper.cs:424-430): offsetting the 0 sentinel would forge a
   // real archive number and break the fallback.
   assert.equal(templateByIndex(132).playerTextureArchive, 0, 'Spellbook has no player texture');
-  assert.deepEqual(archiveRecord(inventoryItemImage({ group: 'MiscItems', templateIndex: 132 }, { race: 'Khajiit' })), {
-    archive: templateByIndex(132).worldTextureArchive,
-    record: templateByIndex(132).worldTextureRecord,
-  });
+  assert.deepEqual(archiveRecord(inventoryItemImage({ group: 'MiscItems', templateIndex: 132 }, { race: 'Khajiit' })),
+    { archive: templateByIndex(132).worldTextureArchive, record: templateByIndex(132).worldTextureRecord });
   assert.equal(playerArchiveFor({ group: 'MensClothing' }, { playerTextureArchive: 0 }, { race: 'Khajiit' }), 0);
 });
 
@@ -99,10 +79,8 @@ test('17f F5: the spellbook heads the bag, as AddPosition.Back gives it', () => 
   // order = draw order (ItemListScroller walks items[i] forward).
   const e = { gender: 'male', race: 'Breton' };
   assignStartingGear(e, { classIndex: 0, rolls: () => 0.5 });
-  assert.deepEqual(
-    e.items.slice(0, 4).map((i) => i.name),
-    ['Spellbook', 'Short Shirt', 'Casual Pants', 'Shortsword'],
-  );
+  assert.deepEqual(e.items.slice(0, 4).map((i) => i.name),
+    ['Spellbook', 'Short Shirt', 'Casual Pants', 'Shortsword']);
 });
 
 test('17f F4: the pants variant rolls over the TEMPLATE variant count', () => {
@@ -122,20 +100,18 @@ test('17f F4: the pants variant rolls over the TEMPLATE variant count', () => {
 });
 
 test('17f F12: item names come from the TEMPLATE, not a hand copy', () => {
-  setPref('survival', false); // AUDIT SURV E: the survival kit rides after DFU's bag; this pin is DFU's bag alone
+  setPref('survival', false);   // AUDIT SURV E: the survival kit rides after DFU's bag; this pin is DFU's bag alone
   // DaggerfallUnityItem.ItemName is ItemTemplate.name - the port's
   // hand-written "Short shirt"/"Casual pants" were lower-cased.
   const e = { gender: 'female', race: 'Khajiit' };
-  assignStartingGear(e, { classIndex: 13, rolls: () => 0.1, torchesFromItems: false }); // MODS-ON turned the setting on; this pin is about the class kit's NAMES, so it names the flag rather than reading the store
+  assignStartingGear(e, { classIndex: 13, rolls: () => 0.1, torchesFromItems: false });   // MODS-ON turned the setting on; this pin is about the class kit's NAMES, so it names the flag rather than reading the store
   // E4: the kit's last row used to be a 'Gold Pieces' stack. Gold is
   // PlayerEntity.GoldPieces now (ItemHelper.cs:1354's `+= 100`), so
   // the bag ends at the arrows and the purse is a number.
   // - it is the kit's last piece, and DFU's bag is the rest
   assert.equal(e.items.at(-1)?.name, 'Wallet');
-  assert.deepEqual(
-    e.items.filter((i) => !isWalletItem(i)).map((i) => i.name),
-    ['Spellbook', 'Short Shirt', 'Casual Pants', 'Long Bow', 'Battle Axe', 'Arrow'],
-  );
+  assert.deepEqual(e.items.filter((i) => !isWalletItem(i)).map((i) => i.name),
+    ['Spellbook', 'Short Shirt', 'Casual Pants', 'Long Bow', 'Battle Axe', 'Arrow']);
   assert.equal(e.items.find((i) => i.name === 'Arrow').stackCount, 24);
   assert.equal(e.goldPieces, STARTING_GOLD);
   assert.equal(e.items.filter((i) => i.group === 'Currency').length, 0);
@@ -146,17 +122,9 @@ test('17f F12: item names come from the TEMPLATE, not a hand copy', () => {
 // through createChargenWindow's own key seam rather than hand-building
 // a result literal.
 const CAREER = {
-  name: 'Mage',
-  hitPointsPerLevel: 8,
-  advancementMultiplier: 1.0,
-  strength: 40,
-  intelligence: 65,
-  willpower: 55,
-  agility: 45,
-  endurance: 40,
-  personality: 50,
-  speed: 50,
-  luck: 50,
+  name: 'Mage', hitPointsPerLevel: 8, advancementMultiplier: 1.0,
+  strength: 40, intelligence: 65, willpower: 55, agility: 45,
+  endurance: 40, personality: 50, speed: 50, luck: 50,
   primarySkills: [SKILLS.Destruction, SKILLS.Restoration, SKILLS.Thaumaturgy],
   majorSkills: [SKILLS.Mysticism, SKILLS.Illusion, SKILLS.Alteration],
   minorSkills: [SKILLS.Dodging, SKILLS.Running, SKILLS.Stealth, SKILLS.Etiquette, SKILLS.Streetwise, SKILLS.Medical],
@@ -166,28 +134,22 @@ function walkChargen(onDone) {
   // AUDIT 17i: the window WRAPS a flow now - hosts no longer
   // construct one, so neither does the pin.
   const w = createChargenWindow(new ChargenFlow([{ name: 'Mage', career: CAREER }], () => 0), { onDone });
-  const key = (code, n = 1) => {
-    for (let i = 0; i < n; i++) w.input(code);
-  };
+  const key = (code, n = 1) => { for (let i = 0; i < n; i++) w.input(code); };
   // U15: the CLASSIC ORDER - race, gender, class, biography, name,
   // face, stats, skills, reflexes.
-  key('Enter'); // race (Breton) -> gender
-  key('KeyM'); // AUDIT 64 F32 (review round): the gender box's Male HOTKEY closes it; Return is inert (no default button)
-  key('Enter'); // method (choose from a list) -> class
-  key('Enter'); // class -> (no biog set) name
+  key('Enter');                       // race (Breton) -> gender
+  key('KeyM');                        // AUDIT 64 F32 (review round): the gender box's Male HOTKEY closes it; Return is inert (no default button)
+  key('Enter');                       // method (choose from a list) -> class
+  key('Enter');                       // class -> (no biog set) name
   for (const c of 'KeyM KeyA KeyC'.split(' ')) w.input(c);
-  key('Enter'); // name -> face
-  key('Enter'); // face 0 -> stats
-  key('Equal', 6);
-  key('Enter'); // spend the 6-point stat pool
-  key('Equal', 6);
-  key('ArrowDown', 3);
-  key('Equal', 6);
-  key('ArrowDown', 3);
-  key('Equal', 6);
-  key('Enter'); // the three skill pools -> reflexes
-  key('Enter'); // U13: the reflex pick -> U16's summary
-  key('Enter'); // U16: the summary's OK -> the wizard's last screen
+  key('Enter');                       // name -> face
+  key('Enter');                       // face 0 -> stats
+  key('Equal', 6); key('Enter');      // spend the 6-point stat pool
+  key('Equal', 6); key('ArrowDown', 3);
+  key('Equal', 6); key('ArrowDown', 3);
+  key('Equal', 6); key('Enter');      // the three skill pools -> reflexes
+  key('Enter');                       // U13: the reflex pick -> U16's summary
+  key('Enter');                       // U16: the summary's OK -> the wizard's last screen
   // ORL1: ...and the LEVELING CHOICE, which the door puts up after the
   // wizard and before `done` (chargenSession.withChargenQuestions). The
   // cursor starts on Daggerfall's own system, so this Enter is the walk
@@ -202,16 +164,12 @@ function walkChargen(onDone) {
 
 test('17f F10: createChargenWindow fires onDone exactly once', () => {
   let fired = 0;
-  const w = walkChargen(() => {
-    fired++;
-  });
+  const w = walkChargen(() => { fired++; });
   assert.ok(w.done, 'the walk reaches done');
   assert.equal(fired, 1);
   // every key AFTER done used to re-run applyCharacter and re-roll the
   // starting kit - the doc promised once, the code did not
-  w.input('Enter');
-  w.input('KeyA');
-  w.input('Escape');
+  w.input('Enter'); w.input('KeyA'); w.input('Escape');
   assert.equal(fired, 1);
 });
 
@@ -219,25 +177,17 @@ test('17f F10: createChargenWindow fires onDone exactly once', () => {
 test('17f F2: finishChargen fills the spellbook when given the table', () => {
   const spellsByIndex = new Map(STARTING_SPELL_IDS.map((i) => [i, { index: i, name: `spell${i}` }]));
   let result = null;
-  walkChargen((r) => {
-    result = r;
-  });
+  walkChargen((r) => { result = r; });
   const entity = { gender: 'male', race: 'Breton' };
   finishChargen(entity, result, spellsByIndex);
   assert.ok(entity.spells.length > 0, 'a Mage created in a TOWN used to start with an empty book');
-  assert.deepEqual(
-    entity.spells.map((s) => s.index),
-    startingSpells(0, spellsByIndex).map((s) => s.index),
-  );
+  assert.deepEqual(entity.spells.map((s) => s.index), startingSpells(0, spellsByIndex).map((s) => s.index));
   // and WITHOUT a table the port must not wipe an existing book
   const keep = { gender: 'male', race: 'Breton', spells: [{ index: 9 }] };
   finishChargen(keep, result, null);
   assert.deepEqual(keep.spells, [{ index: 9 }], 'a null table leaves the book alone');
   // the kit still lands on the town path
-  assert.deepEqual(
-    entity.items.slice(0, 2).map((i) => i.name),
-    ['Spellbook', 'Short Shirt'],
-  );
+  assert.deepEqual(entity.items.slice(0, 2).map((i) => i.name), ['Spellbook', 'Short Shirt']);
 });
 
 // ---- F15: one gold mint (three producers, no template, two names) ----
@@ -259,10 +209,7 @@ test('17f F15: the gold stack is Currency.Gold_pieces, minted once', () => {
   const e = { gender: 'male', race: 'Breton' };
   assignStartingGear(e, { classIndex: 0, rolls: () => 0.5 });
   addGold(e, 50);
-  assert.equal(
-    e.items.filter((i) => i.group === 'Currency').length,
-    0,
-    'the pack can never hold Currency (DoTransferItem :1562-1571)',
-  );
+  assert.equal(e.items.filter((i) => i.group === 'Currency').length, 0,
+    'the pack can never hold Currency (DoTransferItem :1562-1571)');
   assert.equal(e.goldPieces, STARTING_GOLD + 50);
 });

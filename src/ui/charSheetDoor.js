@@ -37,18 +37,18 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { isEnhanced } from '../systems/uiSkin.js';
-import { PIXEL_FAMILIES } from './pixelifyFive.js'; // FONT3: the wait card names the enhanced face first
-import { eventActions } from './input.js'; // MAC-C: the REGISTRY's answer for the two window keys
-import { mountEnhancedChunk, paintChunkNotice } from './enhanced/enhancedChunk.js'; // MENU1: the one lazy-chunk door, and the notice it paints when a chunk is gone
-import { registerOverlay } from './enhanced/enhancedOverlays.js'; // PX28: Tab puts it away
-import { revenantStarsOver } from './firmamentOver.js'; // RVN-STARS: a sworn one's stars, over Companions
-import { pauseMenuHooks, pauseMenuAct, openPauseFlow } from './pauseDoor.js'; // F5-QUESTS: the pause window's own hooks and act - a cycle (pauseDoor imports this door), read only at call time
+import { PIXEL_FAMILIES } from './pixelifyFive.js';   // FONT3: the wait card names the enhanced face first
+import { eventActions } from './input.js';   // MAC-C: the REGISTRY's answer for the two window keys
+import { mountEnhancedChunk, paintChunkNotice } from './enhanced/enhancedChunk.js';   // MENU1: the one lazy-chunk door, and the notice it paints when a chunk is gone
+import { registerOverlay } from './enhanced/enhancedOverlays.js';   // PX28: Tab puts it away
+import { revenantStarsOver } from './firmamentOver.js';   // RVN-STARS: a sworn one's stars, over Companions
+import { pauseMenuHooks, pauseMenuAct, openPauseFlow } from './pauseDoor.js';   // F5-QUESTS: the pause window's own hooks and act - a cycle (pauseDoor imports this door), read only at call time
 import { CharSheet, LevelUpScreen, charSheetArtLoaded } from './charsheet.js';
 import { charSheetHooks } from './charSheetNav.js';
-import { levelNotices } from './levelUp/levelNotice.js'; // LV2: who already played the fanfare
-import { releaseCapLatch } from '../systems/levelCap.js'; // AUDIT FB1026d C1: F5 at the cap opens the sheet, never a level-up with no level
-import { spendPoolLowest } from '../systems/chargen.js'; // LV1: the headless pool policy, for the font-less escape
-import { noteFirstUse } from '../systems/tutorials.js'; // TUT1: the first touch of a system pops its tutorial page
+import { levelNotices } from './levelUp/levelNotice.js';   // LV2: who already played the fanfare
+import { releaseCapLatch } from '../systems/levelCap.js';   // AUDIT FB1026d C1: F5 at the cap opens the sheet, never a level-up with no level
+import { spendPoolLowest } from '../systems/chargen.js';   // LV1: the headless pool policy, for the font-less escape
+import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
 
 export { charSheetArtLoaded };
 
@@ -109,7 +109,7 @@ const fanfared = new WeakMap();
  * Ascension in its pane) both build it here.
  */
 export function levelUpScreenFor(entity) {
-  releaseCapLatch(entity); // LEVEL-45 (AUDIT FB1026d C1)
+  releaseCapLatch(entity);   // LEVEL-45 (AUDIT FB1026d C1)
   if (!entity?.readyToLevelUp) return null;
   // LV2: ...and whether the WINDOW still owes the fanfare. On the
   // enhanced skin ui/levelUp/levelNotice.js played it at the moment the level
@@ -132,7 +132,7 @@ export function levelUpScreenFor(entity) {
  * button, on either skin.
  */
 export function createCharSheetWindow(deps = {}) {
-  noteFirstUse(deps.entity?.readyToLevelUp ? 'level-up' : 'character-sheet'); // TUT1
+  noteFirstUse(deps.entity?.readyToLevelUp ? 'level-up' : 'character-sheet');   // TUT1
   // AUDIT 39: THE SHEET IS WHERE DFU LEVELS YOU UP. UpdatePlayerValues
   // (DaggerfallCharacterSheetWindow.cs:369-394) mounts the stats
   // rollout on the sheet itself whenever ReadyToLevelUp is set - there
@@ -155,9 +155,9 @@ export function createCharSheetWindow(deps = {}) {
   // second rollout: it drives LevelUpScreen through that screen's own
   // `input`, so the Level++ and the health roll stay exactly where a11
   // put them.
-  releaseCapLatch(deps.entity); // LEVEL-45 (AUDIT FB1026d C1): a level latched past the cap opens nothing
+  releaseCapLatch(deps.entity);   // LEVEL-45 (AUDIT FB1026d C1): a level latched past the cap opens nothing
   if (deps.entity?.readyToLevelUp) {
-    const rollout = () => levelUpScreenFor(deps.entity); // GROWTH1: the screen's one home (LV2's fanfare with it)
+    const rollout = () => levelUpScreenFor(deps.entity);   // GROWTH1: the screen's one home (LV2's fanfare with it)
     // `document` for the reason this file's other fork gives: node
     // drives these hosts headless and keeps the canvas windows.
     if (isEnhanced() && typeof document !== 'undefined') return enhancedLevelUpOverlay(rollout(), deps.entity);
@@ -185,15 +185,13 @@ export function createCharSheetWindow(deps = {}) {
     // anything new. What changes is which face is inside it, and the
     // sheet's own four buttons become that page's doors, out of these
     // same hooks: PX25 built the Stats page to take them.
-    return enhancedSheetPageOverlay(hooks, deps.entity, deps.pause ?? null); // F5-QUESTS: and the host's pause bag
+    return enhancedSheetPageOverlay(hooks, deps.entity, deps.pause ?? null);   // F5-QUESTS: and the host's pause bag
   }
   // GROWTH4: the classic sheet's S and W rows open the Growth tab's guide - the enhanced
   // pause window on either skin (pauseDoor.js growthPageAt), pushed as the sheet's own child with this host's pause bag;
   // its Resume comes back to the sheet. No document (node), no hook: the rows keep DFU's boxes.
   // AUDIT GROWTH LANE3-14: no relock on its Save or Load - the sheet still stands under it.
-  if (typeof document !== 'undefined')
-    hooks.growth = (at) =>
-      openPauseFlow(() => {}, { ...(deps.pause?.() ?? {}), at, onResume: () => {}, relock: () => {} });
+  if (typeof document !== 'undefined') hooks.growth = (at) => openPauseFlow(() => {}, { ...(deps.pause?.() ?? {}), at, onResume: () => {}, relock: () => {} });
   return new CharSheet(deps.entity, hooks);
 }
 
@@ -210,19 +208,8 @@ export function createCharSheetWindow(deps = {}) {
  */
 export function sheetPageDoors(bag, close) {
   // AUDIT 27h A4: the arm's answer rides back (false: it opened nothing), so the page's door can resume instead.
-  const door = (arm) =>
-    typeof bag?.[arm] === 'function'
-      ? () => {
-          close();
-          return bag[arm]();
-        }
-      : undefined;
-  return {
-    openPack: door('openPack'),
-    openSpellbook: door('openSpellbook'),
-    openChronicle: door('openChronicle'),
-    openArena: door('openArena'),
-  }; // ARENA3: the Arena window
+  const door = (arm) => (typeof bag?.[arm] === 'function' ? () => { close(); return bag[arm](); } : undefined);
+  return { openPack: door('openPack'), openSpellbook: door('openSpellbook'), openChronicle: door('openChronicle'), openArena: door('openArena') };   // ARENA3: the Arena window
 }
 
 /**
@@ -234,8 +221,8 @@ export function sheetPageDoors(bag, close) {
 function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   let fired = false;
   let view = null;
-  let seams = null; // F5-QUESTS: the enhanced menu module, once it lands - the Save and Load panes' picks (SLOTS1)
-  let unregister = () => {}; // PX28
+  let seams = null;   // F5-QUESTS: the enhanced menu module, once it lands - the Save and Load panes' picks (SLOTS1)
+  let unregister = () => {};   // PX28
   const host = document.createElement('div');
   host.id = 'enhanced-sheetpage';
   // z-index 13, the pause door's depth: they are peers, never stacked.
@@ -244,30 +231,19 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   // GROWTH3: the Firmament and the Ascension are drawn IN the window now (its Growth tab - ui/growth/growthStage.js) - its
   // unmount takes a face on the stage down with it. A sworn revenant's stars still stand over the page (RVN-STARS; the
   // owner: "Keep it on the companion page"), the page back on Companions when they close.
-  let landing = 'stats'; // RVN-STARS: the page the next mount lands on (remountPage)
+  let landing = 'stats';   // RVN-STARS: the page the next mount lands on (remountPage)
   const rvnStars = revenantStarsOver({
     alive: () => !fired,
-    below: () => {
-      try {
-        view?.unmount?.();
-      } catch {
-        /* already gone */
-      }
-      view = null;
-    },
+    below: () => { try { view?.unmount?.(); } catch { /* already gone */ } view = null; },
     back: () => remountPage('companions'),
   });
   const close = () => {
     if (fired) return;
-    rvnStars.drop(); // RVN-STARS: the sheet key closes a sworn one's stars too
-    try {
-      view?.unmount?.();
-    } catch {
-      /* already gone */
-    }
+    rvnStars.drop();   // RVN-STARS: the sheet key closes a sworn one's stars too
+    try { view?.unmount?.(); } catch { /* already gone */ }
     view = null;
     host.remove();
-    fired = true; // last: `done` must not be true while the DOM is up
+    fired = true;   // last: `done` must not be true while the DOM is up
     // MAC-C: EVERY LISTENER HAS AN OWNER. The capture handler below
     // outlives the DOM it was raised for unless this line runs, and an
     // orphan capture listener that swallows F5 for the life of the page
@@ -279,13 +255,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   // first placement of this line read it before its initialiser.
   // GROWTH5 (AUDIT RVN-STARS S8's law): the QuickDial's key asks a sky on the Growth stage first - unaccepted stars said
   // once, the window kept, the arm laid again; the second press puts it away
-  const dialClose = () => {
-    if (view?.asksFirst?.()) {
-      unregister = registerOverlay(dialClose);
-      return;
-    }
-    close();
-  };
+  const dialClose = () => { if (view?.asksFirst?.()) { unregister = registerOverlay(dialClose); return; } close(); };
   unregister = registerOverlay(dialClose);
   // MAC-C.
   //
@@ -311,7 +281,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
     if (e.metaKey) return;
     const t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    const acts = eventActions(e); // AUDIT KB1: the event's own read - a sheet opened by a combo closes on it; UXB1-S: every action a shared key carries
+    const acts = eventActions(e);   // AUDIT KB1: the event's own read - a sheet opened by a combo closes on it; UXB1-S: every action a shared key carries
     // ESC-BOOK: the pack's key crosses over through the HOST's arm - the Pack door's own (sheetPageDoors) - which opens
     // the pack in the host's slot; the factory's pack was built here and held by nobody.
     const pack = acts.includes('Inventory') ? sheetPageDoors(pause?.(), close).openPack : undefined;
@@ -322,11 +292,10 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
     // press is closing - never sees a key this screen used.
     e.preventDefault();
     e.stopPropagation();
-    if (e.repeat) return; // AUDIT KB1: a held key's repeat is swallowed, not an open-shut flicker
-    const toPack = !acts.includes('CharacterSheet'); // the pack's key crosses over; the sheet's own closes (UXB1-S: a key that is both is the sheet's)
-    if (view?.asksFirst?.() || rvnStars.asks()) return; // GROWTH5: a sky's unaccepted stars asked about once first (AUDIT GROWTH LANE4-1: a sworn one's too)
-    if (toPack)
-      pack(); // the door closes the page FIRST, then the host's arm fills the slot it freed
+    if (e.repeat) return;   // AUDIT KB1: a held key's repeat is swallowed, not an open-shut flicker
+    const toPack = !acts.includes('CharacterSheet');   // the pack's key crosses over; the sheet's own closes (UXB1-S: a key that is both is the sheet's)
+    if (view?.asksFirst?.() || rvnStars.asks()) return;      // GROWTH5: a sky's unaccepted stars asked about once first (AUDIT GROWTH LANE4-1: a sworn one's too)
+    if (toPack) pack();                   // the door closes the page FIRST, then the host's arm fills the slot it freed
     else close();
   }
   /** THE PAGE'S OWN OPTIONS, named once: the page mounts again after a
@@ -340,28 +309,25 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
     // function the host's own togglePause spreads, so the two doors cannot drift; the act and the slot seams are
     // ui/pauseDoor.js's own.
     const bag = pause?.() ?? {};
-    const menuHooks = pauseMenuHooks(
-      {
-        ...bag,
-        // The sheet's own buttons, onto the page PX25 built to take
-        // them. A host that hands no hook gets no button, which is the
-        // same honest refusal the classic sheet gives.
-        // ESC-BOOK: through the HOST's arms (sheetPageDoors) - the sheet's factories built windows no slot held.
-        ...sheetPageDoors(bag, close),
-        // GROWTH1 (was ASCEND-ANYTIME's Ascend door): the Growth tab's Level page draws the Ascension in its pane, and
-        // this door owns the entity it is about. A host that handed no entity gets no Ascension, the same refusal the
-        // three above give for a door they were handed none of.
-        ascendScreen: entity ? () => levelUpScreenFor(entity) : undefined,
-        openRevenantStars: rvnStars.hook, // RVN-STARS: a sworn one's stars (firmamentOver.js revenantStarsOver)
-      },
-      () => seams,
-    );
+    const menuHooks = pauseMenuHooks({
+      ...bag,
+      // The sheet's own buttons, onto the page PX25 built to take
+      // them. A host that hands no hook gets no button, which is the
+      // same honest refusal the classic sheet gives.
+      // ESC-BOOK: through the HOST's arms (sheetPageDoors) - the sheet's factories built windows no slot held.
+      ...sheetPageDoors(bag, close),
+      // GROWTH1 (was ASCEND-ANYTIME's Ascend door): the Growth tab's Level page draws the Ascension in its pane, and
+      // this door owns the entity it is about. A host that handed no entity gets no Ascension, the same refusal the
+      // three above give for a door they were handed none of.
+      ascendScreen: entity ? () => levelUpScreenFor(entity) : undefined,
+      openRevenantStars: rvnStars.hook,   // RVN-STARS: a sworn one's stars (firmamentOver.js revenantStarsOver)
+    }, () => seams);
     return {
       mode: 'pause',
       at: 'stats',
       onAction: pauseMenuAct(menuHooks, close),
       hooks: menuHooks,
-      ...(landing === 'stats' ? {} : { at: landing }), // RVN-STARS: back on the Companions page a sworn one's stars were opened from
+      ...(landing === 'stats' ? {} : { at: landing }),   // RVN-STARS: back on the Companions page a sworn one's stars were opened from
     };
   }
 
@@ -370,14 +336,8 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
     landing = at;
     mountEnhancedChunk({
       load: () => import('./enhanced/enhancedMenu.js'),
-      alive: () => !fired,
-      host,
-      onDismiss: close,
-      label: 'charsheet',
-      mount: (mod) => {
-        seams = mod;
-        view = mod.mountEnhancedMenu(host, pageOpts());
-      },
+      alive: () => !fired, host, onDismiss: close, label: 'charsheet',
+      mount: (mod) => { seams = mod; view = mod.mountEnhancedMenu(host, pageOpts()); },
     });
   }
 
@@ -391,14 +351,8 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   // unhandled rejection and a dial arm that did nothing.
   mountEnhancedChunk({
     load: () => import('./enhanced/enhancedMenu.js'),
-    alive: () => !fired,
-    host,
-    onDismiss: close,
-    label: 'charsheet',
-    mount: (mod) => {
-      seams = mod;
-      view = mod.mountEnhancedMenu(host, pageOpts());
-    },
+    alive: () => !fired, host, onDismiss: close, label: 'charsheet',
+    mount: (mod) => { seams = mod; view = mod.mountEnhancedMenu(host, pageOpts()); },
   });
   return {
     // THE HOST CONTRACT, in the hosts' own words - `input`, not
@@ -407,27 +361,13 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
     // thrown inside the host's keydown handler. Same arms as
     // ui/pauseDoor.js and ui/inventoryDoor.js.
     isChoiceWindow: true,
-    get done() {
-      return fired;
-    },
-    input() {
-      /* the view's own capture keydown owns the keyboard */
-    },
-    click() {
-      /* the view is a fixed div over the canvas; pointers never get here */
-    },
-    wheel() {
-      /* the view scrolls itself */
-    },
-    hover() {
-      /* the view has its own :hover, and no canvas to hit-test */
-    },
-    tick() {
-      /* nothing on this screen moves on a clock */
-    },
-    draw() {
-      /* DOM, not canvas */
-    },
+    get done() { return fired; },
+    input() { /* the view's own capture keydown owns the keyboard */ },
+    click() { /* the view is a fixed div over the canvas; pointers never get here */ },
+    wheel() { /* the view scrolls itself */ },
+    hover() { /* the view has its own :hover, and no canvas to hit-test */ },
+    tick() { /* nothing on this screen moves on a clock */ },
+    draw() { /* DOM, not canvas */ },
     close,
     // `dispose` and `destroy` are both the hosts' words for the same
     // act; the overlay this replaced answered both, so this does too.
@@ -484,10 +424,9 @@ export function paintLevelUpWait(host, { oghma = false } = {}) {
   const doc = host.ownerDocument;
   const el = doc.createElement('div');
   el.id = 'levelup-wait';
-  el.style.cssText =
-    'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;' +
-    `background:#0a0c11;color:#d8cfae;font:500 20px/1.6 ${PIXEL_FAMILIES},system-ui,sans-serif;letter-spacing:0.18em;` +
-    'text-transform:uppercase;text-align:center;padding:24px';
+  el.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;'
+    + `background:#0a0c11;color:#d8cfae;font:500 20px/1.6 ${PIXEL_FAMILIES},system-ui,sans-serif;letter-spacing:0.18em;`
+    + 'text-transform:uppercase;text-align:center;padding:24px';
   el.textContent = oghma ? OGHMA_WAIT_TEXT : RISEN_WAIT_TEXT;
   host.append(el);
   return el;
@@ -510,32 +449,19 @@ function enhancedLevelUpOverlay(screen, entity) {
   // the case `warmLevelUpWindow` makes the common one - never flashes
   // it. The timer is owned: every exit below clears it.
   let wait = null;
-  let waitTimer = setTimeout(() => {
-    wait = paintLevelUpWait(host, { oghma: !!screen?.oghma });
-  }, LEVELUP_WAIT_MS);
+  let waitTimer = setTimeout(() => { wait = paintLevelUpWait(host, { oghma: !!screen?.oghma }); }, LEVELUP_WAIT_MS);
   const stopWaiting = () => {
-    if (waitTimer) {
-      clearTimeout(waitTimer);
-      waitTimer = null;
-    }
-    try {
-      wait?.remove();
-    } catch {
-      /* already gone */
-    }
+    if (waitTimer) { clearTimeout(waitTimer); waitTimer = null; }
+    try { wait?.remove(); } catch { /* already gone */ }
     wait = null;
   };
   const close = () => {
     if (fired) return;
     stopWaiting();
-    try {
-      view?.destroy?.();
-    } catch {
-      /* already gone */
-    }
+    try { view?.destroy?.(); } catch { /* already gone */ }
     view = null;
     host.remove();
-    fired = true; // last: `done` must not be true while the DOM is up
+    fired = true;   // last: `done` must not be true while the DOM is up
   };
   // MENU1: the ONE lazy-chunk door. A deploy that moved this chunk
   // leaves the notice up and the door OPEN - `done` stays false and
@@ -547,22 +473,16 @@ function enhancedLevelUpOverlay(screen, entity) {
   // stream and which no player can observe).
   mountEnhancedChunk({
     load: () => import('./enhanced/enhancedLevelUp.js'),
-    alive: () => !fired,
-    host,
-    onDismiss: close,
-    label: 'levelup',
+    alive: () => !fired, host, onDismiss: close, label: 'levelup',
     mount: ({ mountEnhancedLevelUp }) => {
-      stopWaiting(); // the window is the wait's successor, and takes the slot before it is torn down
+      stopWaiting();   // the window is the wait's successor, and takes the slot before it is torn down
       view = mountEnhancedLevelUp(host, { screen, entity, onExit: close });
     },
     // ...and the NOTICE is the other successor. Without this arm a
     // failed chunk left the wait underneath it saying "You have
     // risen." over a message that says the screen could not be
     // loaded - two answers to one event.
-    notice: (h, o) => {
-      stopWaiting();
-      return paintChunkNotice(h, o);
-    },
+    notice: (h, o) => { stopWaiting(); return paintChunkNotice(h, o); },
   });
   return {
     /** The duck type the font-less escape asks for, in this file's own
@@ -570,27 +490,13 @@ function enhancedLevelUpOverlay(screen, entity) {
      *  import a UI class for a type test. */
     isEnhancedLevelUp: true,
     isChoiceWindow: true,
-    get done() {
-      return fired;
-    },
-    input() {
-      /* the view's own capture keydown owns the keyboard */
-    },
-    click() {
-      /* the view is a fixed div over the canvas; pointers never get here */
-    },
-    wheel() {
-      /* the view scrolls itself */
-    },
-    hover() {
-      /* the view has its own :hover, and no canvas to hit-test */
-    },
-    tick() {
-      /* the sky owns its own clock */
-    },
-    draw() {
-      /* DOM, not canvas */
-    },
+    get done() { return fired; },
+    input() { /* the view's own capture keydown owns the keyboard */ },
+    click() { /* the view is a fixed div over the canvas; pointers never get here */ },
+    wheel() { /* the view scrolls itself */ },
+    hover() { /* the view has its own :hover, and no canvas to hit-test */ },
+    tick() { /* the sky owns its own clock */ },
+    draw() { /* DOM, not canvas */ },
     /**
      * THE FONT-LESS ESCAPE. The pool takes the policy every other
      * headless path takes (systems/chargen.js's spendPoolLowest), which
@@ -602,7 +508,7 @@ function enhancedLevelUpOverlay(screen, entity) {
       if (screen?.working) {
         spendPoolLowest(screen.working, Object.keys(screen.working), screen.pool ?? 0);
         screen.pool = 0;
-        screen.input('confirm'); // applyLevelUp writes the working stats home, with the PRE-ROLLED pool
+        screen.input('confirm');   // applyLevelUp writes the working stats home, with the PRE-ROLLED pool
       }
       close();
       return true;
@@ -628,3 +534,4 @@ function enhancedLevelUpOverlay(screen, entity) {
  * sheets always read, and it is now read by the one that remains.
  * What went is the ~200 lines of view that drew the second one.
  */
+

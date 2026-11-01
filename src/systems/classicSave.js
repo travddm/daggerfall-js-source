@@ -39,7 +39,7 @@
 //     the 101/102 lycanthropy ids are read.
 
 import { SKILLS } from './skills.js';
-import { mintCharacterId } from './characterId.js'; // CHARID1
+import { mintCharacterId } from './characterId.js';   // CHARID1
 import { VAMPIRE_CLANS, LYCANTHROPY_TYPES } from './infection.js';
 import { raceById } from './races.js';
 import { RECORD_TYPES, ENVIRONMENTS, isWagonRecord } from '../formats/save/saveTreeFile.js';
@@ -50,19 +50,17 @@ import { STAT_KEYS_ORDER } from './statMods.js';
 import { SOCIAL_GROUP_COUNT } from '../formats/factionFile.js';
 import { ITEM_GROUP_BY_ID } from './biography.js';
 import { GROUP_TEMPLATE_INDICES, templateFor } from './item/itemTemplates.js';
-import { ENCHANTMENT_TYPES } from '../formats/magicDef.js'; // the None sentinel FromItemRecord tests
+import { ENCHANTMENT_TYPES } from '../formats/magicDef.js';   // the None sentinel FromItemRecord tests
 import { isPotion, isPotionRecipe } from './useItem.js';
 import {
-  CLASSIC_RECIPE_KEYS, // PotionRecipe.classicRecipeKeys
+  CLASSIC_RECIPE_KEYS,   // PotionRecipe.classicRecipeKeys
   // A4: the flag masks and the legacy artifact-index recovery, at
   // their one home beside createArtifact.
-  ITEM_ARTIFACT_MASK,
-  ITEM_IDENTIFIED_MASK,
-  legacyArtifactIndexBitfieldCheck,
+  ITEM_ARTIFACT_MASK, ITEM_IDENTIFIED_MASK, legacyArtifactIndexBitfieldCheck,
 } from './loot/loot.js';
 import { equipItem } from './equip.js';
 import { guildGroupOfFaction, membershipKey, daySinceZero } from './guild/guilds.js';
-import { createGuildForGroup } from './guild/guildVariants.js'; // GuildManager.CreateGuildObj (:167-213)
+import { createGuildForGroup } from './guild/guildVariants.js';   // GuildManager.CreateGuildObj (:167-213)
 import { dateFromClassicMinutes } from './gameDate.js';
 import { createVampirismCurse } from './vampirism.js';
 import { createLycanthropyCurse } from './lycanthropy.js';
@@ -70,29 +68,21 @@ import { SPECIAL_ABILITY_BITS } from './specialAdvantages.js';
 import { spellPoints, spellPointMultiplier } from './chargen.js';
 import { levelUpSkillSum } from './advancement.js';
 import { ClassFile } from '../formats/classFile.js';
-import { usingRightHandFromSaveVars } from '../combat/playerWeapon.js'; // AUDIT 63 F31: StartGameBehaviour.cs:606's one line, kept with the hand
+import { usingRightHandFromSaveVars } from '../combat/playerWeapon.js';   // AUDIT 63 F31: StartGameBehaviour.cs:606's one line, kept with the hand
 
 /** EntityEnums.Races' transformed tail (races.js owns the selectable
  *  1-8 half; classic stores these three when the player is turned). */
 export const TRANSFORMED_RACES = Object.freeze({
-  None: -1, // Races.None
-  Vampire: 9,
-  Werewolf: 10,
-  Wereboar: 11,
+  None: -1,           // Races.None
+  Vampire: 9, Werewolf: 10, Wereboar: 11,
 });
 
 // DFCareer.Stats order (the statMods charter): 0 Strength,
 // 1 Intelligence, 2 Willpower, 3 Agility, 4 Endurance, 5 Personality,
 // 6 Speed, 7 Luck.
 const STAT = Object.freeze({
-  Strength: 0,
-  Intelligence: 1,
-  Willpower: 2,
-  Agility: 3,
-  Endurance: 4,
-  Personality: 5,
-  Speed: 6,
-  Luck: 7,
+  Strength: 0, Intelligence: 1, Willpower: 2, Agility: 3,
+  Endurance: 4, Personality: 5, Speed: 6, Luck: 7,
 });
 
 /**
@@ -117,11 +107,9 @@ export function stripTransformedRace(parsedData, stripLycanthropyType = LYCANTHR
   // the one place where writing the type down is also the plain truth.
   /** @type {number} */
   let classicTransformedRace = TRANSFORMED_RACES.None;
-  if (
-    liveRace === TRANSFORMED_RACES.Vampire ||
-    liveRace === TRANSFORMED_RACES.Werewolf ||
-    liveRace === TRANSFORMED_RACES.Wereboar
-  ) {
+  if (liveRace === TRANSFORMED_RACES.Vampire ||
+      liveRace === TRANSFORMED_RACES.Werewolf ||
+      liveRace === TRANSFORMED_RACES.Wereboar) {
     classicTransformedRace = liveRace;
     liveRace = parsedData.race2 + 1;
   }
@@ -140,7 +128,8 @@ export function stripTransformedRace(parsedData, stripLycanthropyType = LYCANTHR
     stats[STAT.Personality] -= 20;
     stats[STAT.Speed] -= 20;
     stats[STAT.Luck] -= 20;
-    if (parsedData.vampireClan === VAMPIRE_CLANS.Anthotis) stats[STAT.Intelligence] -= 20;
+    if (parsedData.vampireClan === VAMPIRE_CLANS.Anthotis)
+      stats[STAT.Intelligence] -= 20;
 
     skills[SKILLS.Jumping] -= 30;
     skills[SKILLS.Running] -= 30;
@@ -152,11 +141,9 @@ export function stripTransformedRace(parsedData, stripLycanthropyType = LYCANTHR
 
   // Remove werewolf/wereboar bonuses: +40 to four stats, +30 to the
   // seven lycanthrope skills (the vampire six plus Swimming).
-  if (
-    classicTransformedRace === TRANSFORMED_RACES.Werewolf ||
-    classicTransformedRace === TRANSFORMED_RACES.Wereboar ||
-    stripLycanthropyType !== LYCANTHROPY_TYPES.None
-  ) {
+  if (classicTransformedRace === TRANSFORMED_RACES.Werewolf ||
+      classicTransformedRace === TRANSFORMED_RACES.Wereboar ||
+      stripLycanthropyType !== LYCANTHROPY_TYPES.None) {
     stats[STAT.Strength] -= 40;
     stats[STAT.Speed] -= 40;
     stats[STAT.Agility] -= 40;
@@ -184,7 +171,8 @@ export function stripTransformedRace(parsedData, stripLycanthropyType = LYCANTHR
  * @param {number} [stripLycanthropyType]
  */
 export function toCharacterDocument(parsedData, stripLycanthropyType = LYCANTHROPY_TYPES.None) {
-  const { liveRace, classicTransformedRace } = stripTransformedRace(parsedData, stripLycanthropyType);
+  const { liveRace, classicTransformedRace } =
+    stripTransformedRace(parsedData, stripLycanthropyType);
 
   return {
     raceTemplate: raceById(liveRace),
@@ -273,11 +261,7 @@ export function classicGlobalVars(saveVars) {
  *  @param {number} regionCount */
 export function classicBankAccounts(bankRecord, regionCount = 62) {
   const accounts = Array.from({ length: regionCount }, (_, regionIndex) => ({
-    regionIndex,
-    accountGold: 0,
-    loanTotal: 0,
-    loanDueDate: 0,
-    hasDefaulted: false,
+    regionIndex, accountGold: 0, loanTotal: 0, loanDueDate: 0, hasDefaulted: false,
   }));
   if (!bankRecord || bankRecord.recordType !== RECORD_TYPES.BankAccount) return accounts;
   const data = bankRecord.recordData;
@@ -285,7 +269,7 @@ export function classicBankAccounts(bankRecord, regionCount = 62) {
   let pos = 0;
   let count = 0;
   while (pos + 13 < data.length) {
-    if (count >= accounts.length) break; // "error reading bank data from classic save"
+    if (count >= accounts.length) break;   // "error reading bank data from classic save"
     accounts[count] = {
       regionIndex: count,
       accountGold: v.getInt32(pos, true),
@@ -331,7 +315,7 @@ export function classicItemFromRecord(record) {
     group,
     templateIndex,
     name: d.name,
-    material: d.material, // nativeMaterialValue, raw
+    material: d.material,      // nativeMaterialValue, raw
     value: d.value,
     flags: d.flags,
     currentCondition: d.currentCondition,
@@ -369,7 +353,7 @@ export function classicItemFromRecord(record) {
   };
   // "If item is an arrow, typeDependentData is the stack count" -
   // Weapons group index 18.
-  item.stackCount = d.group === 3 && d.index === 18 ? d.typeDependentData : 1;
+  item.stackCount = (d.group === 3 && d.index === 18) ? d.typeDependentData : 1;
   // "Convert classic recipes to DFU recipe key" (:1577-1579). The same
   // byte names the recipe on a potion or a recipe sheet; without the
   // conversion an imported bottle carries no key and drinks as
@@ -393,7 +377,7 @@ export function classicItemFromRecord(record) {
     item.dye = d.color;
     if (template?.variants > 0) {
       const playerRecord = d.image1 & 0x7f;
-      const CLOAK_INDICES = new Set([147, 148, 152, 153]); // Casual/Formal cloaks, both wardrobes (IsCloak's template list)
+      const CLOAK_INDICES = new Set([147, 148, 152, 153]);   // Casual/Formal cloaks, both wardrobes (IsCloak's template list)
       item.variant = playerRecord - template.playerTextureRecord - (CLOAK_INDICES.has(templateIndex) ? 1 : 0);
     }
   } else if (template?.variants > 0) {
@@ -420,10 +404,10 @@ export function classicItemFromRecord(record) {
 export function classicSpellsFromContainer(containerRecord, spellsByIndex = null) {
   const spells = [];
   const book = containerRecord?.children?.[0];
-  if (!book || !book.children?.length) return spells;
+  if (!book || !(book.children?.length)) return spells;
   for (const spellRecord of book.children) {
     const rec = spellRecord.parsedData;
-    if (!rec) continue; // the C# skips a record the reader refused
+    if (!rec) continue;   // the C# skips a record the reader refused
     const stock = spellsByIndex?.get?.(rec.index) ?? null;
     if (stock && stock.name === rec.name) spells.push(rec.index);
     else spells.push({ ...rec, effects: rec.effects.map((e) => ({ ...e })), custom: true });
@@ -565,13 +549,8 @@ export function classicGuildMemberships(saveTree, factionDict, vampire = false) 
   };
   const live = buildBook(saveTree.findRecords(RECORD_TYPES.GuildMembership, character));
   const old = buildBook(saveTree.findRecords(RECORD_TYPES.OldGuild, character));
-  if (vampire) {
-    store.vampire = live;
-    store.mortal = old;
-  } else {
-    store.mortal = live;
-    store.vampire = old;
-  }
+  if (vampire) { store.vampire = live; store.mortal = old; }
+  else { store.mortal = live; store.vampire = old; }
   return store;
 }
 
@@ -584,9 +563,7 @@ export function classicFactionRep(saveVars, store) {
   const repById = new Map();
   for (const f of saveVars.factions ?? []) repById.set(f.id, f.rep);
   const ids = [...store.dict.keys()].sort((a, b) => a - b);
-  const rep = [],
-    flags = [],
-    power = [];
+  const rep = [], flags = [], power = [];
   for (const id of ids) {
     const f = store.dict.get(id);
     rep.push(repById.has(id) ? repById.get(id) : f.rep);
@@ -658,7 +635,7 @@ export function restoreOldClassSpecials(saveTree, career, classicTransformedRace
     }
     return true;
   } catch {
-    return false; // "Could not restore old class specials" - logged and survived
+    return false;   // "Could not restore old class specials" - logged and survived
   }
 }
 
@@ -680,10 +657,10 @@ export function restoreOldClassSpecials(saveTree, career, classicTransformedRace
  * @param {number[]} [deps.regionLocationCounts] - per-region location
  *   counts for the MAPSAVE walk (with resolveLocation).
  */
-export function classicSaveToSnapshot(
-  saveGames,
-  { spellsByIndex = null, factionStore = null, resolveLocation = null, regionLocationCounts = null } = {},
-) {
+export function classicSaveToSnapshot(saveGames, {
+  spellsByIndex = null, factionStore = null,
+  resolveLocation = null, regionLocationCounts = null,
+} = {}) {
   const saveTree = saveGames.saveTree;
   const saveVars = saveGames.saveVars;
 
@@ -710,9 +687,7 @@ export function classicSaveToSnapshot(
 
   // The stats object in the port's keyed shape.
   const stats = {};
-  STAT_KEYS_ORDER.forEach((k, i) => {
-    stats[k] = doc.workingStats[i];
-  });
+  STAT_KEYS_ORDER.forEach((k, i) => { stats[k] = doc.workingStats[i]; });
 
   // The transform curses re-apply through the effect system, exactly
   // as StartFromClassicSave restores them - on the scratch, so the
@@ -743,9 +718,9 @@ export function classicSaveToSnapshot(
     // job); restorePlayer derives lastGameMinutes from it, which is
     // exactly PlayerEntity.LastGameMinutes = saveVars.GameTime.
     classicMinutes: saveVars.gameTime,
-    position: null, // the host frame owns it - see the bundle
+    position: null,          // the host frame owns it - see the bundle
     pose: {
-      yaw: classicYawDegrees(0), // the CharacterPositionRecord's yaw/pitch land in the bundle
+      yaw: classicYawDegrees(0),   // the CharacterPositionRecord's yaw/pitch land in the bundle
       pitch: 0,
       crouching: false,
       weaponDrawn: saveVars.weaponDrawn,
@@ -759,30 +734,24 @@ export function classicSaveToSnapshot(
       usingRightHand: usingRightHandFromSaveVars(saveVars),
     },
     readiedSpellIndex: null,
-    world: null,
-    locationKey: null,
-    quest: null,
-    talk: null,
-    weather: null, // the sky stands; the zone array rides the bundle
+    world: null, locationKey: null, quest: null, talk: null,
+    weather: null,           // the sky stands; the zone array rides the bundle
 
     name,
     gender: doc.gender === 1 ? 'female' : 'male',
     race: doc.raceTemplate?.key ?? 'Breton',
     raceId: doc.raceTemplate?.id ?? 1,
     faceIndex: doc.faceIndex,
-    careerIndex: -1, // the career rides WHOLE; classic saves name no template row
+    careerIndex: -1,         // the career rides WHOLE; classic saves name no template row
     career,
     level: parsed.level,
     reflexes: doc.reflexes,
     health: doc.currentHealth,
-    maxHealth: doc.maxHealth, // BASEhealth, the ToCharacterDocument law
+    maxHealth: doc.maxHealth,          // BASEhealth, the ToCharacterDocument law
     magicka: doc.currentSpellPoints,
     // MaxMagicka is DERIVED in DFU (never read from the record); the
     // port's stored ceiling computes through the same formula home.
-    maxMagicka: spellPoints(
-      stats.intelligence,
-      spellPointMultiplier(career.abilityFlagsAndSpellPointsBitfield ?? 0x1000),
-    ),
+    maxMagicka: spellPoints(stats.intelligence, spellPointMultiplier(career.abilityFlagsAndSpellPointsBitfield ?? 0x1000)),
     fatigue: doc.currentFatigue,
     currentBreath: saveVars.breathRemaining,
     stats,
@@ -791,11 +760,9 @@ export function classicSaveToSnapshot(
     startingLevelUpSkillSum: doc.startingLevelUpSkillSum,
     // SetCurrentLevelUpSkillSum() straight after AssignCharacter.
     currentLevelUpSkillSum: levelUpSkillSum({ career, skills: doc.workingSkills }),
-    readyToLevelUp: false,
-    pendingLevel: null,
-    pendingBonusPool: null,
+    readyToLevelUp: false, pendingLevel: null, pendingBonusPool: null,
     chargenDone: true,
-    characterId: mintCharacterId(), // CHARID1: a character read out of a classic save is a new character here
+    characterId: mintCharacterId(),   // CHARID1: a character read out of a classic save is a new character here
 
     biographyResistDiseaseMod: saveVars.biographyResistDiseaseMod,
     biographyResistMagicMod: saveVars.biographyResistMagicMod,
@@ -837,8 +804,7 @@ export function classicSaveToSnapshot(
     // first visit after an import.
     skillsRecentlyRaised: [doc.skillsRaisedThisLevel1, doc.skillsRaisedThisLevel2],
 
-    items,
-    wagonItems,
+    items, wagonItems,
     // StartGameBehaviour.cs:603 - the purse rides the envelope as the
     // counter restorePlayer now restores (E4).
     goldPieces,
@@ -850,7 +816,7 @@ export function classicSaveToSnapshot(
     // their index.
     spells: scratch.spells
       .filter((sp) => sp != null)
-      .map((sp) => (typeof sp === 'number' ? sp : sp.custom ? sp : sp.index)),
+      .map((sp) => (typeof sp === 'number' ? sp : (sp.custom ? sp : sp.index))),
     activeEffects: scratch.activeEffects,
     lightSourceIndex: -1,
 
@@ -870,12 +836,12 @@ export function classicSaveToSnapshot(
     regionConditions,
     pendingFactionRep: [],
     factionRep: classicFactionRep(saveVars, factionStore),
-    guildMemberships: classicGuildMemberships(saveTree, factionStore?.dict ?? null, vampire),
+    guildMemberships: classicGuildMemberships(
+      saveTree, factionStore?.dict ?? null, vampire),
 
     bankAccounts: classicBankAccounts(saveTree.findRecord(RECORD_TYPES.BankAccount)),
     ownedShip: saveVars.playerOwnedShip ?? SHIP_TYPES.None,
-    houses: [],
-    rentedRooms: [],
+    houses: [], rentedRooms: [],
     anchorPosition: null,
     racialOverridePending: null,
 
@@ -896,8 +862,7 @@ export function classicSaveToSnapshot(
           const info = resolveLocation(regionIndex, locationIndex);
           if (info?.mapId != null) {
             locations[info.mapId & 0xfffff] = {
-              regionName: info.regionName ?? '',
-              locationName: info.locationName ?? '',
+              regionName: info.regionName ?? '', locationName: info.locationName ?? '',
             };
           }
         }
@@ -930,9 +895,7 @@ export function classicSaveToSnapshot(
 
   return {
     snap,
-    position: root
-      ? { worldX: root.position.worldX, worldY: root.position.worldY, worldZ: root.position.worldZ }
-      : null,
+    position: root ? { worldX: root.position.worldX, worldY: root.position.worldY, worldZ: root.position.worldZ } : null,
     environment: saveTree.header?.environment ?? ENVIRONMENTS.Outside,
     climateWeathers: convertClassicClimateWeathers(saveVars.climateWeathers),
     globalVars: classicGlobalVars(saveVars),
@@ -950,9 +913,7 @@ export function classicSaveToSnapshot(
 // converter rather than in either scene. Taking it clears it: a
 // second boot cannot replay a consumed import.
 let _pendingClassicSave = null;
-export const setPendingClassicSave = (saveGames) => {
-  _pendingClassicSave = saveGames;
-};
+export const setPendingClassicSave = (saveGames) => { _pendingClassicSave = saveGames; };
 export const peekPendingClassicSave = () => _pendingClassicSave;
 export function takePendingClassicSave() {
   const s = _pendingClassicSave;

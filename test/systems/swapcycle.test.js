@@ -15,7 +15,7 @@ import { SKILLS, levelUpSkillSum } from '../../src/systems/skills.js';
 import { raiseSkills, calculatePlayerLevel, SKILL_RAISE_CHECK_INTERVAL } from '../../src/systems/advancement.js';
 import { SKILL_SWAP_GOLD, swapSkill, swapInChoices, swapShortfall } from '../../src/systems/skillSwap.js';
 import { specGuideModel } from '../../src/ui/growth/specGuide.js';
-import { onlineLevelFor } from '../../src/systems/levelClimb.js'; // LEVEL-45: the online level
+import { onlineLevelFor } from '../../src/systems/levelClimb.js';   // LEVEL-45: the online level
 
 const S = SKILLS;
 const PRIMARY = [S.LongBlade, S.Dodging, S.CriticalStrike];
@@ -26,24 +26,9 @@ const MINOR = [S.Climbing, S.Jumping, S.Swimming, S.Medical, S.Etiquette, S.Stre
  *  (Master Skills on: no 95 lock), its sums anchored at creation. */
 function made() {
   const p = structuredClone(playerEntity);
-  const stats = {
-    strength: 50,
-    intelligence: 50,
-    willpower: 50,
-    agility: 50,
-    endurance: 50,
-    personality: 50,
-    speed: 50,
-    luck: 50,
-  };
-  createCharacter(
-    p,
-    buildCustomCareer({ name: 'Cycler', hp: 12, skills: [...PRIMARY, ...MAJOR, ...MINOR], stats }),
-    -1,
-    { rolls: () => 0.5 },
-  );
-  p._online = true;
-  p.items = [];
+  const stats = { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 };
+  createCharacter(p, buildCustomCareer({ name: 'Cycler', hp: 12, skills: [...PRIMARY, ...MAJOR, ...MINOR], stats }), -1, { rolls: () => 0.5 });
+  p._online = true; p.items = [];
   p.clock = p.lastSkillCheckTime ?? 0;
   return p;
 }
@@ -56,28 +41,20 @@ function train(p, id, to) {
     assert.ok(raiseSkills(p, p.clock, () => 0.5).includes(id), `skill ${id} raised from ${p.skills[id]}`);
   }
 }
-const swap = (p, out, inn) => {
-  p.goldPieces = SKILL_SWAP_GOLD;
-  const r = swapSkill(p, out, inn);
-  assert.equal(r.ok, true, r.text);
-};
+const swap = (p, out, inn) => { p.goldPieces = SKILL_SWAP_GOLD; const r = swapSkill(p, out, inn); assert.equal(r.ok, true, r.text); };
 const sums = (p) => ({ starting: p.startingLevelUpSkillSum, current: p.currentLevelUpSkillSum, level: p.level });
 
-test("SWAP-CYCLE THE REPORT: every skill outside the class cycled through a primary place and trained to 100 takes the level no further than the class's own lists hold - 31, not 223 (mutants: a drop moving the starting sum; a raise lowering the stored sum)", () => {
+test('SWAP-CYCLE THE REPORT: every skill outside the class cycled through a primary place and trained to 100 takes the level no further than the class\'s own lists hold - 31, not 223 (mutants: a drop moving the starting sum; a raise lowering the stored sum)', () => {
   const p = made();
   const start = p.startingLevelUpSkillSum;
   // top (800), and the class's sum at 100 stands at 31 there as Daggerfall's 15 a level says; the law is unchanged
-  const ceiling = onlineLevelFor(start, 600); // six counted skills at 100: the most the class's sum can be
+  const ceiling = onlineLevelFor(start, 600);   // six counted skills at 100: the most the class's sum can be
   assert.equal(ceiling, 31);
-  assert.equal(calculatePlayerLevel(start, 600), 31, "Daggerfall's 15 a level, offline");
+  assert.equal(calculatePlayerLevel(start, 600), 31, 'Daggerfall\'s 15 a level, offline');
   for (const id of [...PRIMARY, ...MAJOR, ...MINOR]) train(p, id, 100);
   assert.equal(p.level, ceiling, 'every class skill at 100: the ceiling, by training alone');
   let swaps = 0;
-  for (
-    let fresh = swapInChoices(p).filter((id) => p.skills[id] < 100);
-    fresh.length;
-    fresh = swapInChoices(p).filter((id) => p.skills[id] < 100)
-  ) {
+  for (let fresh = swapInChoices(p).filter((id) => p.skills[id] < 100); fresh.length; fresh = swapInChoices(p).filter((id) => p.skills[id] < 100)) {
     const inn = fresh[0];
     swap(p, p.career.primarySkills[0], inn);
     swaps++;
@@ -95,16 +72,15 @@ test('SWAP-CYCLE THE GROUND: a trained class skill given up for an untrained one
   const [ls, dodge] = PRIMARY;
   train(p, ls, 100);
   const before = sums(p);
-  const inn = S.Mercantile,
-    from = p.skills[inn];
+  const inn = S.Mercantile, from = p.skills[inn];
   assert.equal(swapShortfall(p, ls, inn), 100 - from, 'the ground, said before the swap');
   swap(p, ls, inn);
   assert.deepEqual(sums(p), before, 'the level and its progress stand');
-  assert.equal(levelUpSkillSum(p), before.current - (100 - from), "the class's sum under the one the level stands on");
+  assert.equal(levelUpSkillSum(p), before.current - (100 - from), 'the class\'s sum under the one the level stands on');
   train(p, inn, 100);
   assert.deepEqual(sums(p), before, 'the ground made up: nothing earned');
   train(p, dodge, p.skills[dodge] + 1);
-  assert.equal(p.currentLevelUpSkillSum, before.current + 1, "past it, a point is the level's again");
+  assert.equal(p.currentLevelUpSkillSum, before.current + 1, 'past it, a point is the level\'s again');
 });
 
 test('SWAP-CYCLE UNDONE: a trained skill given up and taken back - a point trained between - leaves both sums exactly as they were (mutant: a raise lowering the stored sum)', () => {
@@ -120,52 +96,38 @@ test('SWAP-CYCLE UNDONE: a trained skill given up and taken back - a point train
   assert.deepEqual(sums(p), before, 'no ground lost for good, none gained');
 });
 
-test("SWAP-CYCLE A TRAINED SKILL BROUGHT IN: it wins back the ground an earlier swap gave up first, and only what takes the class's sum above the one the level stands on moves the sums - so it pays no level (mutants: the rise read from the class's sum, not the one the level stands on; the form's number blind to the earlier ground)", () => {
+test('SWAP-CYCLE A TRAINED SKILL BROUGHT IN: it wins back the ground an earlier swap gave up first, and only what takes the class\'s sum above the one the level stands on moves the sums - so it pays no level (mutants: the rise read from the class\'s sum, not the one the level stands on; the form\'s number blind to the earlier ground)', () => {
   const p = made();
   const [ls, dodge] = PRIMARY;
   train(p, ls, 100);
   const before = sums(p);
-  swap(p, ls, S.Mercantile); // ground: 100 less Mercantile's value
-  train(p, S.Lockpicking, 60); // trained outside the class: the class's sum does not move
+  swap(p, ls, S.Mercantile);   // ground: 100 less Mercantile's value
+  train(p, S.Lockpicking, 60);   // trained outside the class: the class's sum does not move
   assert.deepEqual(sums(p), before);
-  assert.equal(
-    swapShortfall(p, S.Mercantile, S.Lockpicking),
-    100 - 60,
-    "the form's number: the ground the earlier swap left, less what Lockpicking wins back",
-  );
-  swap(p, S.Mercantile, S.Lockpicking); // within the ground
+  assert.equal(swapShortfall(p, S.Mercantile, S.Lockpicking), 100 - 60, 'the form\'s number: the ground the earlier swap left, less what Lockpicking wins back');
+  swap(p, S.Mercantile, S.Lockpicking);   // within the ground
   assert.deepEqual(sums(p), before, 'the ground partly won back: nothing moved');
   assert.equal(swapShortfall(p, S.Lockpicking, ls), 0, 'Long Blade back: no ground left');
   swap(p, S.Lockpicking, ls);
   assert.deepEqual(sums(p), before, 'the ground won back whole: nothing moved');
   train(p, S.Mysticism, 100);
   const rise = 100 - p.skills[dodge];
-  swap(p, dodge, S.Mysticism); // above the sum the level stands on
-  assert.deepEqual(
-    sums(p),
-    { starting: before.starting + rise, current: before.current + rise, level: before.level },
-    'the rise moves both sums: no level paid',
-  );
+  swap(p, dodge, S.Mysticism);   // above the sum the level stands on
+  assert.deepEqual(sums(p), { starting: before.starting + rise, current: before.current + rise, level: before.level }, 'the rise moves both sums: no level paid');
 });
 
-test("SWAP-CYCLE CAUGHT UP: points the class's skills hold that no raise stored yet (intensive training's SetPermanentSkillValue) are the level's, not absorbed by the swap (mutant: the swap reading the stored sum alone)", () => {
+test('SWAP-CYCLE CAUGHT UP: points the class\'s skills hold that no raise stored yet (intensive training\'s SetPermanentSkillValue) are the level\'s, not absorbed by the swap (mutant: the swap reading the stored sum alone)', () => {
   const p = made();
   const [, dodge] = PRIMARY;
   train(p, PRIMARY[0], 100);
   const before = sums(p);
-  p.skills[dodge] += 4; // worldModes.js applyIntensive's write: the sum stored at the next raise
-  const lowMinor = MINOR.find(
-    (id) =>
-      levelUpSkillSum({
-        ...p,
-        career: { ...p.career, minorSkills: p.career.minorSkills.filter((m) => m !== id).concat(S.Mercantile) },
-      }) === levelUpSkillSum(p),
-  );
-  swap(p, lowMinor, S.Mercantile); // a minor that is not the highest: the class's sum unmoved
+  p.skills[dodge] += 4;   // worldModes.js applyIntensive's write: the sum stored at the next raise
+  const lowMinor = MINOR.find((id) => levelUpSkillSum({ ...p, career: { ...p.career, minorSkills: p.career.minorSkills.filter((m) => m !== id).concat(S.Mercantile) } }) === levelUpSkillSum(p));
+  swap(p, lowMinor, S.Mercantile);   // a minor that is not the highest: the class's sum unmoved
   assert.deepEqual(sums(p), { starting: before.starting, current: before.current + 4, level: before.level });
 });
 
-test("SWAP-CYCLE THE FORM'S NUMBER: the model's shortfall is the ground a swap would leave, none where it leaves none", () => {
+test('SWAP-CYCLE THE FORM\'S NUMBER: the model\'s shortfall is the ground a swap would leave, none where it leaves none', () => {
   const p = made();
   const [ls] = PRIMARY;
   train(p, ls, 100);

@@ -18,37 +18,16 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SKILLS, SKILL_NAMES } from '../../src/systems/skills.js';
-import {
-  bonusPoolFor,
-  applyLevelUp,
-  LEVELUP_BONUS_POOL_MIN,
-  LEVELUP_BONUS_POOL_MAX,
-} from '../../src/systems/advancement.js';
+import { bonusPoolFor, applyLevelUp, LEVELUP_BONUS_POOL_MIN, LEVELUP_BONUS_POOL_MAX } from '../../src/systems/advancement.js';
 import { audio } from '../../src/systems/audio.js';
 import { SOUND } from '../../src/systems/soundClips.js';
 import { loadOrCreateBindings, codeForAction, actionForCode } from '../../src/systems/inputActions.js';
-import { hostText } from '../hostText.mjs'; // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import {
-  LevelNotices,
-  levelNotices,
-  announceLevelUp,
-  announceSkillRaise,
-  announceMastery,
-  announceRenownRise,
-  NOTICE_RENOWN,
-  drawLevelNotices,
-  destroyLevelNotices,
-  levelOwed,
-  sheetKeyText,
-  ANNOUNCE_MS,
-  MAX_ROWS,
-  NOTICE_LEVEL,
-  NOTICE_SKILL,
-  NOTICE_MASTERY,
-  RISEN_TITLE,
-  AWAITS_TITLE,
-  MASTERED_TITLE,
-  LEVEL_NOTICE_ID,
+  LevelNotices, levelNotices, announceLevelUp, announceSkillRaise, announceMastery, announceRenownRise, NOTICE_RENOWN,
+  drawLevelNotices, destroyLevelNotices, levelOwed, sheetKeyText,
+  ANNOUNCE_MS, MAX_ROWS, NOTICE_LEVEL, NOTICE_SKILL, NOTICE_MASTERY,
+  RISEN_TITLE, AWAITS_TITLE, MASTERED_TITLE, LEVEL_NOTICE_ID,
 } from '../../src/ui/levelUp/levelNotice.js';
 
 /** The smallest document this strip can be drawn into - it touches
@@ -65,29 +44,10 @@ import {
 function fakeDoc() {
   const make = (tag) => {
     const n = {
-      tag,
-      className: '',
-      textContent: '',
-      attrs: {},
-      children: [],
-      parentNode: null,
-      setAttribute(k, v) {
-        this.attrs[k] = v;
-      },
-      append(...kids) {
-        for (const k of kids) {
-          k.remove?.();
-          k.parentNode = this;
-          this.children.push(k);
-        }
-      },
-      prepend(...kids) {
-        for (const k of kids.reverse()) {
-          k.remove?.();
-          k.parentNode = this;
-          this.children.unshift(k);
-        }
-      },
+      tag, className: '', textContent: '', attrs: {}, children: [], parentNode: null,
+      setAttribute(k, v) { this.attrs[k] = v; },
+      append(...kids) { for (const k of kids) { k.remove?.(); k.parentNode = this; this.children.push(k); } },
+      prepend(...kids) { for (const k of kids.reverse()) { k.remove?.(); k.parentNode = this; this.children.unshift(k); } },
       remove() {
         const at = n.parentNode?.children?.indexOf(n) ?? -1;
         if (at >= 0) n.parentNode.children.splice(at, 1);
@@ -108,15 +68,8 @@ const src = (f) => hostText(f);
 const withSounds = (fn) => {
   const played = [];
   const real = audio.playOneShot;
-  audio.playOneShot = (i) => {
-    played.push(i);
-    return 0.1;
-  };
-  try {
-    fn();
-  } finally {
-    audio.playOneShot = real;
-  }
+  audio.playOneShot = (i) => { played.push(i); return 0.1; };
+  try { fn(); } finally { audio.playOneShot = real; }
   return played;
 };
 
@@ -142,17 +95,10 @@ test('LV2: the cap drops the OLDEST CHATTER and never the level - the one row th
   q.announceLevel(6, 0);
   for (let i = 0; i < MAX_ROWS + 3; i++) q.announceSkill(i, 10 + i, 10 + i);
   assert.equal(q.rows.length, MAX_ROWS);
-  assert.ok(
-    q.rows.some((r) => r.kind === NOTICE_LEVEL),
-    'the level survives a flurry',
-  );
+  assert.ok(q.rows.some((r) => r.kind === NOTICE_LEVEL), 'the level survives a flurry');
   assert.equal(q.rows.filter((r) => r.kind === NOTICE_LEVEL).length, 1);
   const kept = q.rows.filter((r) => r.kind === NOTICE_SKILL).map((r) => r.at);
-  assert.deepEqual(
-    kept,
-    [...kept].sort((a, b) => a - b),
-    'what is kept is the newest chatter',
-  );
+  assert.deepEqual(kept, [...kept].sort((a, b) => a - b), 'what is kept is the newest chatter');
   assert.ok(Math.min(...kept) > 10, 'and the oldest went first');
 });
 
@@ -164,21 +110,14 @@ test('LV2: the announcement is an EVENT and the reminder is a STATE', () => {
 
   let rows = q.frame(100, { owed: true });
   assert.equal(rows.length, 3);
-  assert.equal(
-    rows.every((r) => !r.standing),
-    true,
-    'all three are news at first',
-  );
+  assert.equal(rows.every((r) => !r.standing), true, 'all three are news at first');
   assert.equal(rows.find((r) => r.kind === NOTICE_LEVEL).title, RISEN_TITLE);
   assert.equal(rows.find((r) => r.kind === NOTICE_MASTERY).title, MASTERED_TITLE);
   assert.equal(rows.find((r) => r.kind === NOTICE_SKILL).title, SKILL_NAMES[SKILLS.Archery]);
 
   // Past the announcement: the chatter is gone and the level FOLDS.
   rows = q.frame(ANNOUNCE_MS, { owed: true });
-  assert.deepEqual(
-    rows.map((r) => r.kind),
-    [NOTICE_LEVEL],
-  );
+  assert.deepEqual(rows.map((r) => r.kind), [NOTICE_LEVEL]);
   assert.equal(rows[0].standing, true);
   assert.equal(rows[0].title, AWAITS_TITLE, 'and it stops calling itself news');
 
@@ -194,31 +133,24 @@ test('LV2: a level owed but never announced here still says so', () => {
   // waiting, so it says it from the STATE rather than from memory.
   const q = new LevelNotices();
   const rows = q.frame(0, { owed: true });
-  assert.deepEqual(
-    rows.map((r) => [r.kind, r.title, r.standing]),
-    [[NOTICE_LEVEL, AWAITS_TITLE, true]],
-  );
+  assert.deepEqual(rows.map((r) => [r.kind, r.title, r.standing]), [[NOTICE_LEVEL, AWAITS_TITLE, true]]);
   assert.deepEqual(q.frame(0, { owed: false }), []);
 });
 
-test("LV2: the level's row is drawn LAST, so the one row that asks does not move", () => {
+test('LV2: the level\'s row is drawn LAST, so the one row that asks does not move', () => {
   // raiseSkills raises the skills and THEN levels the player
   // (PlayerEntity.cs:1371-1414), so a plain newest-first sort puts the
   // level on top at a level-up and at the bottom on the next raise -
   // the row a player is hunting for, moving under them.
   const q = new LevelNotices();
   q.announceSkill(SKILLS.Archery, 26, 0);
-  q.announceLevel(6, 1); // the game's own order
+  q.announceLevel(6, 1);            // the game's own order
   let rows = q.frame(2, { owed: true });
   assert.equal(rows.at(-1).kind, NOTICE_LEVEL);
   q.announceSkill(SKILLS.Climbing, 41, 3);
   rows = q.frame(4, { owed: true });
   assert.equal(rows.at(-1).kind, NOTICE_LEVEL, 'still last after the next raise');
-  assert.deepEqual(
-    rows.slice(0, -1).map((r) => r.sub),
-    ['41', '26'],
-    'and the chatter is newest first above it',
-  );
+  assert.deepEqual(rows.slice(0, -1).map((r) => r.sub), ['41', '26'], 'and the chatter is newest first above it');
 });
 
 test('LV2: the sweep keeps the queue from growing across an evening', () => {
@@ -258,15 +190,7 @@ test('LV2: the ENHANCED skin notifies and does NOT open the window; the classic 
   // this is the CLASSIC arm, and it must be exactly what the hosts did
   // before this slice: the line, then the sheet.
   const played = withSounds(() => {
-    assert.equal(
-      announceLevelUp(entity, {
-        say: (m) => said.push(m),
-        open: () => {
-          opened += 1;
-        },
-      }),
-      false,
-    );
+    assert.equal(announceLevelUp(entity, { say: (m) => said.push(m), open: () => { opened += 1; } }), false);
   });
   assert.deepEqual(said, ['You have gained a level!']);
   assert.equal(opened, 1, 'the classic skin still opens the sheet where DFU opens it');
@@ -293,27 +217,14 @@ test('LV2: the ENHANCED skin ANNOUNCES, and the window does not open itself', ()
   const said = [];
   let opened = 0;
   const played = withSounds(() => {
-    assert.equal(
-      announceLevelUp(entity, {
-        say: (m) => said.push(m),
-        open: () => {
-          opened += 1;
-        },
-        now: 0,
-        doc,
-      }),
-      true,
-    );
+    assert.equal(announceLevelUp(entity, { say: (m) => said.push(m), open: () => { opened += 1; }, now: 0, doc }), true);
   });
   assert.equal(opened, 0, 'NOTIFY, THEN YOU CHOOSE - nothing is put over the player');
   assert.deepEqual(said, [], 'and the popup column is not used either: the strip is the announcement');
   assert.deepEqual(played, [SOUND.LevelUp], 'the fanfare plays HERE, where the level was earned');
   assert.equal(entity.readyToLevelUp, true, 'and the level stays owed, exactly where DFU leaves it');
   const rows = levelNotices.frame(1, { owed: true });
-  assert.deepEqual(
-    rows.map((r) => r.kind),
-    [NOTICE_LEVEL],
-  );
+  assert.deepEqual(rows.map((r) => r.kind), [NOTICE_LEVEL]);
   assert.equal(rows[0].sub, 'Level 6', 'naming the level the player is rising TO');
 
   // ...and the two smaller events take the same fork.
@@ -322,19 +233,14 @@ test('LV2: the ENHANCED skin ANNOUNCES, and the window does not open itself', ()
   const boxes = [];
   assert.equal(announceMastery(SKILLS.LongBlade, { box: (r) => boxes.push(r), rows: ['x'], now: 1, doc }), true);
   assert.deepEqual(boxes, [], 'and the mastery box does not interrupt');
-  assert.deepEqual(
-    levelNotices
-      .frame(2, { owed: true })
-      .map((r) => r.kind)
-      .sort(),
-    [NOTICE_LEVEL, NOTICE_MASTERY, NOTICE_SKILL].sort(),
-  );
+  assert.deepEqual(levelNotices.frame(2, { owed: true }).map((r) => r.kind).sort(),
+    [NOTICE_LEVEL, NOTICE_MASTERY, NOTICE_SKILL].sort());
   destroyLevelNotices();
 });
 
 // ── AUDIT LV2, the pre-merge sweep ───────────────────
 
-test("AUDIT LV2 (reopened): the bonus pool is the LEVEL's, so re-opening the window cannot re-roll it", () => {
+test('AUDIT LV2 (reopened): the bonus pool is the LEVEL\'s, so re-opening the window cannot re-roll it', () => {
   // AUDIT LV2 recorded this rather than fixing it - FormulaHelper's
   // 4..6 draw is taken at the rollout's setup in DFU too. Mac reopened
   // it: "Yes fucking fix it." The reason it is LV2's to close is that
@@ -342,74 +248,28 @@ test("AUDIT LV2 (reopened): the bonus pool is the LEVEL's, so re-opening the win
   // character sheet and commits the level AT MOUNT, so there is never
   // an unspent level to re-open on; the enhanced window is a thing the
   // player OPENS, and `readyToLevelUp` stays set until they spend.
-  const stats = () => ({
-    strength: 50,
-    intelligence: 50,
-    willpower: 50,
-    agility: 50,
-    endurance: 50,
-    personality: 50,
-    speed: 50,
-    luck: 50,
-  });
-  const e = {
-    level: 5,
-    readyToLevelUp: true,
-    pendingLevel: 6,
-    stats: stats(),
-    health: 40,
-    maxHealth: 40,
-    career: { hitPointsPerLevel: 8, primarySkills: [] },
-  };
+  const stats = () => ({ strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 });
+  const e = { level: 5, readyToLevelUp: true, pendingLevel: 6, stats: stats(), health: 40, maxHealth: 40, career: { hitPointsPerLevel: 8, primarySkills: [] } };
   // SIX OPENS, each handed a roll that would answer differently.
   const seen = [];
   for (let i = 0; i < 6; i++) seen.push(bonusPoolFor(e, () => i / 6));
   assert.equal(new Set(seen).size, 1, `re-opening re-rolled the pool: ${seen.join(',')}`);
-  assert.ok(
-    seen[0] >= LEVELUP_BONUS_POOL_MIN && seen[0] <= LEVELUP_BONUS_POOL_MAX,
-    'and it is still FormulaHelper.BonusPool',
-  );
+  assert.ok(seen[0] >= LEVELUP_BONUS_POOL_MIN && seen[0] <= LEVELUP_BONUS_POOL_MAX, 'and it is still FormulaHelper.BonusPool');
   assert.equal(e.pendingBonusPool, seen[0], 'remembered on the entity, beside pendingLevel');
 
   // SPENDING IT clears the pool with the level, so the NEXT level is a
   // fresh draw and not this one again.
-  applyLevelUp(
-    e,
-    (st, pool) => {
-      st.strength += pool;
-    },
-    () => 0.5,
-    e.pendingBonusPool,
-  );
+  applyLevelUp(e, (st, pool) => { st.strength += pool; }, () => 0.5, e.pendingBonusPool);
   assert.equal(e.readyToLevelUp, false);
   assert.equal(e.pendingBonusPool, null, 'the pool is not pending when the level is not');
-  assert.equal(
-    bonusPoolFor(e, () => 0.99),
-    LEVELUP_BONUS_POOL_MAX,
-    'a new level draws again',
-  );
+  assert.equal(bonusPoolFor(e, () => 0.99), LEVELUP_BONUS_POOL_MAX, 'a new level draws again');
 
   // ...and the OGHMA arm clears it too: a level owed UNDER the book is
   // pending, and the book's thirty is not this draw.
-  const o = {
-    level: 5,
-    readyToLevelUp: true,
-    pendingLevel: 6,
-    pendingBonusPool: 5,
-    oghmaLevelUp: true,
-    stats: stats(),
-    health: 40,
-    maxHealth: 40,
-    career: { hitPointsPerLevel: 8, primarySkills: [] },
-  };
-  applyLevelUp(
-    o,
-    (st, pool) => {
-      st.strength += pool;
-    },
-    () => 0.5,
-  );
+  const o = { level: 5, readyToLevelUp: true, pendingLevel: 6, pendingBonusPool: 5, oghmaLevelUp: true, stats: stats(), health: 40, maxHealth: 40, career: { hitPointsPerLevel: 8, primarySkills: [] } };
+  applyLevelUp(o, (st, pool) => { st.strength += pool; }, () => 0.5);
   assert.equal(o.pendingBonusPool, null);
+
 });
 
 test('AUDIT LV2 F2: an unspent level is announced ONCE, not once per rest', () => {
@@ -424,9 +284,7 @@ test('AUDIT LV2 F2: an unspent level is announced ONCE, not once per rest', () =
   destroyLevelNotices();
   const doc = fakeDoc();
   const entity = { level: 5, pendingLevel: 6, readyToLevelUp: true };
-  const first = withSounds(() => {
-    announceLevelUp(entity, { now: 0, doc });
-  });
+  const first = withSounds(() => { announceLevelUp(entity, { now: 0, doc }); });
   assert.deepEqual(first, [SOUND.LevelUp], 'the level the player just earned sounds');
   assert.equal(levelNotices.frame(0, { owed: true })[0].title, RISEN_TITLE);
   // ...it folds, as an announcement must.
@@ -437,42 +295,27 @@ test('AUDIT LV2 F2: an unspent level is announced ONCE, not once per rest', () =
     announceLevelUp(entity, { now: ANNOUNCE_MS * 4, doc });
   });
   assert.deepEqual(again, [], 'a level already announced has nothing new to say');
-  assert.equal(
-    levelNotices.frame(ANNOUNCE_MS * 4, { owed: true })[0].title,
-    AWAITS_TITLE,
-    'and the reminder it put up is still a reminder',
-  );
+  assert.equal(levelNotices.frame(ANNOUNCE_MS * 4, { owed: true })[0].title, AWAITS_TITLE,
+    'and the reminder it put up is still a reminder');
 
   // THE CLASSIC LANE KEEPS DFU'S RE-OFFER WHOLE: no document, so every
   // pass says its line and opens the sheet again, as it always has.
   let opened = 0;
   const said = [];
-  announceLevelUp(entity, {
-    say: (m) => said.push(m),
-    open: () => {
-      opened += 1;
-    },
-  });
-  announceLevelUp(entity, {
-    say: (m) => said.push(m),
-    open: () => {
-      opened += 1;
-    },
-  });
+  announceLevelUp(entity, { say: (m) => said.push(m), open: () => { opened += 1; } });
+  announceLevelUp(entity, { say: (m) => said.push(m), open: () => { opened += 1; } });
   assert.equal(opened, 2, 'the classic skin re-offers the sheet, which is DFU (:1413)');
   assert.equal(said.length, 2);
 
   // ...and a level that was SPENT and earned again is news again: the
   // sweep drops the latch with the flag it describes.
   levelNotices.sweep(ANNOUNCE_MS * 5, { owed: false });
-  const fresh = withSounds(() => {
-    announceLevelUp({ level: 6, pendingLevel: 7, readyToLevelUp: true }, { now: ANNOUNCE_MS * 5, doc });
-  });
+  const fresh = withSounds(() => { announceLevelUp({ level: 6, pendingLevel: 7, readyToLevelUp: true }, { now: ANNOUNCE_MS * 5, doc }); });
   assert.deepEqual(fresh, [SOUND.LevelUp], 'a new level is a new event');
   destroyLevelNotices();
 });
 
-test("AUDIT LV2 F4: the strip hangs in the HUD's own bottom column, not on the body", () => {
+test('AUDIT LV2 F4: the strip hangs in the HUD\'s own bottom column, not on the body', () => {
   // It shipped body-level at a flat `bottom: 150px`, and `.hud-bottom`
   // grows upward with its CONTENT (breath, effects, needs) and again
   // with `--hud-scale` - so with a live block the strip sat 19px into
@@ -517,7 +360,7 @@ test("AUDIT LV2 F4: the strip hangs in the HUD's own bottom column, not on the b
   destroyLevelNotices();
 });
 
-test("AUDIT LV2 F5: the level's row names a key only when there IS one", () => {
+test('AUDIT LV2 F5: the level\'s row names a key only when there IS one', () => {
   // `buttonText(null)` is KeyCode.None's own string, "NONE"
   // (systems/controlsConfig.js:"if (code == null) return 'NONE';"), so a player who cleared the sheet
   // binding was handed a plate reading A LEVEL AWAITS / NONE.
@@ -529,7 +372,7 @@ test("AUDIT LV2 F5: the level's row names a key only when there IS one", () => {
   assert.equal(codeForAction({ primary: new Map(), secondary: new Map() }, 'CharacterSheet'), null);
 });
 
-test("LV2: the key it names is the REGISTRY's, and the lookup has one home", () => {
+test('LV2: the key it names is the REGISTRY\'s, and the lookup has one home', () => {
   const store = loadOrCreateBindings();
   const code = codeForAction(store, 'CharacterSheet');
   assert.ok(code, 'the sheet has a key');
@@ -591,7 +434,7 @@ test('LV2: the paint is UPDATED, not rebuilt - a still frame costs one string co
   assert.equal(levelNotices.rows.length, 0);
 });
 
-test("LV2: the owed flag is the PLAYER's, read live rather than remembered", () => {
+test('LV2: the owed flag is the PLAYER\'s, read live rather than remembered', () => {
   // The default argument is the whole point: a level spent by the
   // window, by the font-less escape, by a headless roll or by a load
   // takes the reminder with it, and none of those roads knows this
@@ -602,22 +445,16 @@ test("LV2: the owed flag is the PLAYER's, read live rather than remembered", () 
   assert.equal(levelOwed(null), false);
 });
 
-test("LV2: the element reads no game data, and says so in the port's own words", () => {
+test('LV2: the element reads no game data, and says so in the port\'s own words', () => {
   assert.equal(RISEN_TITLE.length > 0 && AWAITS_TITLE.length > 0 && MASTERED_TITLE.length > 0, true);
   assert.notEqual(RISEN_TITLE, AWAITS_TITLE);
   assert.equal(LEVEL_NOTICE_ID, 'enhanced-levelnotice');
   destroyLevelNotices();
   let reads = 0;
   const calls = [];
-  const read = () => {
-    reads += 1;
-    return ['MASTERED'];
-  };
+  const read = () => { reads += 1; return ['MASTERED']; };
   // THE ENHANCED ARM (a document, as the two pins above fork it).
-  assert.equal(
-    announceMastery(SKILLS.LongBlade, { doc: fakeDoc(), box: (r) => calls.push(r), rows: read, now: 0 }),
-    true,
-  );
+  assert.equal(announceMastery(SKILLS.LongBlade, { doc: fakeDoc(), box: (r) => calls.push(r), rows: read, now: 0 }), true);
   assert.equal(reads, 0, 'the enhanced lane read TEXT.RSC for a box it never shows');
   assert.equal(calls.length, 0, 'and it must not raise the classic box either');
   // THE CLASSIC ARM (no document, node's own guard).
@@ -633,30 +470,14 @@ test("LV2: the element reads no game data, and says so in the port's own words",
 test('LV3: the level row is a button that presses the sheet key, and the key-less row stays a plain line', async () => {
   const { openLevelUpWindow, levelUpDoorBound } = await import('../../src/ui/levelUp/levelUpOpener.js');
   const sent = [];
-  const realKE = globalThis.KeyboardEvent,
-    realDispatch = globalThis.dispatchEvent;
-  globalThis.KeyboardEvent = class {
-    constructor(type, init) {
-      this.type = type;
-      Object.assign(this, init);
-    }
-  };
-  globalThis.dispatchEvent = (e) => {
-    sent.push(e);
-    return true;
-  };
+  const realKE = globalThis.KeyboardEvent, realDispatch = globalThis.dispatchEvent;
+  globalThis.KeyboardEvent = class { constructor(type, init) { this.type = type; Object.assign(this, init); } };
+  globalThis.dispatchEvent = (e) => { sent.push(e); return true; };
   try {
     const key = codeForAction(loadOrCreateBindings(), 'CharacterSheet');
     assert.equal(levelUpDoorBound(), true, 'the default build binds the sheet');
     assert.equal(openLevelUpWindow(), true);
-    assert.deepEqual(
-      sent.map((e) => [e.type, e.code]),
-      [
-        ['keydown', key],
-        ['keyup', key],
-      ],
-      'a tap of the sheet key, down then up',
-    );
+    assert.deepEqual(sent.map((e) => [e.type, e.code]), [['keydown', key], ['keyup', key]], 'a tap of the sheet key, down then up');
     assert.equal(sent[0].bubbles, true);
 
     // ...and the strip's row is the button that does it
@@ -670,17 +491,8 @@ test('LV3: the level row is a button that presses the sheet key, and the key-les
     assert.equal(row.children.length, 3, 'still gem + body + key');
     sent.length = 0;
     let stopped = 0;
-    row.onclick({
-      preventDefault() {},
-      stopPropagation() {
-        stopped++;
-      },
-    });
-    assert.deepEqual(
-      sent.map((e) => e.type),
-      ['keydown', 'keyup'],
-      'a click presses the sheet key',
-    );
+    row.onclick({ preventDefault() {}, stopPropagation() { stopped++; } });
+    assert.deepEqual(sent.map((e) => e.type), ['keydown', 'keyup'], 'a click presses the sheet key');
     assert.equal(stopped, 1, 'and the click never reaches the world behind it');
     // a skill line is a report, not a door
     levelNotices.announceSkill(SKILLS.Archery, 26, 1);
@@ -690,8 +502,7 @@ test('LV3: the level row is a button that presses the sheet key, and the key-les
     assert.equal(skillRow.tag, 'div', 'a skill row is not a button');
   } finally {
     globalThis.KeyboardEvent = realKE;
-    if (realDispatch) globalThis.dispatchEvent = realDispatch;
-    else delete globalThis.dispatchEvent;
+    if (realDispatch) globalThis.dispatchEvent = realDispatch; else delete globalThis.dispatchEvent;
     destroyLevelNotices();
   }
 });
@@ -700,23 +511,13 @@ test('FIRM1: A RENOWN LEVEL IS SAID AS A LEVEL IS - the fanfare, "You have risen
   const q = new LevelNotices();
   q.announceRenown(12, 2, 1000);
   const [row] = q.frame(1000, { owed: false });
-  assert.deepEqual(
-    [row.kind, row.title, row.sub, row.standing],
-    [NOTICE_RENOWN, RISEN_TITLE, 'Renown 12 · 2 new Stars', false],
-  );
+  assert.deepEqual([row.kind, row.title, row.sub, row.standing], [NOTICE_RENOWN, RISEN_TITLE, 'Renown 12 · 2 new Stars', false]);
   assert.equal(q.frame(1000 + ANNOUNCE_MS, { owed: false }).length, 0, 'news, never a reminder');
   const said = [];
   const real = audio.playOneShot;
   const played = [];
-  audio.playOneShot = (i) => {
-    played.push(i);
-    return 0.1;
-  };
-  try {
-    announceRenownRise(7, { stars: 2, say: (t) => said.push(t), doc: null });
-  } finally {
-    audio.playOneShot = real;
-  }
+  audio.playOneShot = (i) => { played.push(i); return 0.1; };
+  try { announceRenownRise(7, { stars: 2, say: (t) => said.push(t), doc: null }); } finally { audio.playOneShot = real; }
   assert.deepEqual(played, [SOUND.LevelUp]);
   assert.deepEqual(said, ['You have risen to Renown 7! 2 new Stars shine in your Firmament.']);
 });

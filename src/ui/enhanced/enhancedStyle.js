@@ -31,22 +31,22 @@
    drift this file exists to prevent. scripts/landingHtml.mjs injects
    this block into that page at build; the rest of the skin stays a
    string the game pays for only when a screen is mounted. */
-import { DFICON_CSS } from '../menu/menuGlyphs.js'; // MENU-ORDER (AUDIT U8): the menus' pictures, laid with this sheet
-import { PIXELIFY_FIVE_FACE, PIXEL_STACK, PIXEL_FONT_CSS } from '../pixelifyFive.js'; // FIX-D: Silkscreen's five ahead of Pixelify Sans
-import { badgeCss } from '../playerBadge.js'; // ACC3c: one rule per title and per glyph, walked out of the vocabulary - the card writes a class and the skin carries the colour
-import { STONE_WORD, PLUS_CSS, PLUS_STYLE_ID, applyPlusTheme } from './enhancedPlusStyle.js'; // PLUS1: the Enhanced Plus sheet, laid over this one
-import { installPlusCursor } from '../plus/plusCursor.js'; // PLUS7: the gauntlet cursor
-import { injectUiCalmStyle } from '../uiCalmStyle.js'; // UI-CALM: the quiet pass, laid after the Plus sheet
-import { installWindowMotion } from '../windowMotion.js'; // PLUS1/WM1: windows unfold and fold - Enhanced Plus only
-import { isEnhancedPlus } from '../../systems/uiSkin.js'; // PLUS1: the Plus sheet is laid only under Plus
-import { pageHas } from '../../systems/pageQuery.js'; // PERF-URL: the page's query, parsed once a search
-import { paceControlsCss } from '../travel/travelPaceControls.js'; // PACE-DIALS: the Overworld block's speed dials
-import { SERPENT_RING_MAP_CSS } from '../serpentMapMark.js'; // SERPENT-TIMERS: the sea serpent's row marked in its waters' own colour
-import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js'; // SD2c: the Super dungeon's row in its omen's brass
-import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js'; // STAR6: a fallen star's row in its violet
-import { heraldCss } from '../../net/herald/heraldCard.js'; // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
-import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js'; // LOOT-MARKS: the quick loot's tier gem and wash
-import { SUPPORT_MARKS_CSS } from '../supportAsks.js'; // SUPPORT1: the asks' marks - the door's icons and the website's corner, one drawing
+import { DFICON_CSS } from '../menu/menuGlyphs.js';   // MENU-ORDER (AUDIT U8): the menus' pictures, laid with this sheet
+import { PIXELIFY_FIVE_FACE, PIXEL_STACK, PIXEL_FONT_CSS } from '../pixelifyFive.js';   // FIX-D: Silkscreen's five ahead of Pixelify Sans
+import { badgeCss } from '../playerBadge.js';   // ACC3c: one rule per title and per glyph, walked out of the vocabulary - the card writes a class and the skin carries the colour
+import { STONE_WORD, PLUS_CSS, PLUS_STYLE_ID, applyPlusTheme } from './enhancedPlusStyle.js';   // PLUS1: the Enhanced Plus sheet, laid over this one
+import { installPlusCursor } from '../plus/plusCursor.js';   // PLUS7: the gauntlet cursor
+import { injectUiCalmStyle } from '../uiCalmStyle.js';   // UI-CALM: the quiet pass, laid after the Plus sheet
+import { installWindowMotion } from '../windowMotion.js';   // PLUS1/WM1: windows unfold and fold - Enhanced Plus only
+import { isEnhancedPlus } from '../../systems/uiSkin.js';   // PLUS1: the Plus sheet is laid only under Plus
+import { pageHas } from '../../systems/pageQuery.js';   // PERF-URL: the page's query, parsed once a search
+import { paceControlsCss } from '../travel/travelPaceControls.js';   // PACE-DIALS: the Overworld block's speed dials
+import { SERPENT_RING_MAP_CSS } from '../serpentMapMark.js';   // SERPENT-TIMERS: the sea serpent's row marked in its waters' own colour
+import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js';   // SD2c: the Super dungeon's row in its omen's brass
+import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's row in its violet
+import { heraldCss } from '../../net/herald/heraldCard.js';   // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
+import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js';   // LOOT-MARKS: the quick loot's tier gem and wash
+import { SUPPORT_MARKS_CSS } from '../supportAsks.js';   // SUPPORT1: the asks' marks - the door's icons and the website's corner, one drawing
 
 /**
  * QUICK-LOOT-STATS: THE PLAQUE'S LAYOUT NUMBERS LIVE WITH THE DRESS.
@@ -6810,10 +6810,9 @@ export function injectEnhancedStyle(doc = document) {
     plus.id = PLUS_STYLE_ID;
     plus.textContent = PLUS_CSS;
     doc.head.append(plus);
-    installWindowMotion(doc);
-    installPlusCursor(doc); // PLUS7: the gauntlet presses while a button is held
-    applyPlusTheme(doc); // PLUS2: the stored colour
-    injectUiCalmStyle(doc); // UI-CALM: the quiet pass - its type, its space - laid after Plus's, so it wins by order
+    installWindowMotion(doc);  installPlusCursor(doc);   // PLUS7: the gauntlet presses while a button is held
+    applyPlusTheme(doc);   // PLUS2: the stored colour
+    injectUiCalmStyle(doc);   // UI-CALM: the quiet pass - its type, its space - laid after Plus's, so it wins by order
   }
   // SND1: every enhanced surface is styled through here once, so the UI's
   // click sound is installed with it. Loaded late, so this sheet (which
@@ -6844,7 +6843,7 @@ export function injectEnhancedStyle(doc = document) {
  *  slice: it costs bytes in the repo and that is Mac's call, not
  *  mine. */
 export function injectEnhancedFonts(doc = document, search = globalThis.location?.search ?? '') {
-  if (pageHas('nofonts', search)) return; // PERF-URL
+  if (pageHas('nofonts', search)) return;   // PERF-URL
   if (doc.getElementById('dagger-enhanced-fonts')) return;
   const link = doc.createElement('link');
   link.id = 'dagger-enhanced-fonts';

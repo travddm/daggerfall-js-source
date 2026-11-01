@@ -19,30 +19,30 @@
 // rather than a second mapping of its own.
 
 import { ClassFile } from '../formats/classFile.js';
-import { TextRsc } from '../formats/textRsc.js'; // U18: the class questions ride TEXT.RSC 9000
-import { parseQuestionLibrary } from './classQuestions.js'; // U18
-import { ChargenFlow, handHeroGenderToGrammar } from '../ui/chargen.js'; // L10N3g: the live hero's gender, handed to the grammar at the start
-import { applyCharacter, createCharacter, assignStartingSpells, CLASS_CAREERS } from './chargen.js'; // RRI2: AssignStartingSpells, the delegate
-import { levelUpSkillSum } from './advancement.js'; // AUDIT 18: SetCurrentLevelUpSkillSum, one home
+import { TextRsc } from '../formats/textRsc.js';   // U18: the class questions ride TEXT.RSC 9000
+import { parseQuestionLibrary } from './classQuestions.js';   // U18
+import { ChargenFlow, handHeroGenderToGrammar } from '../ui/chargen.js';   // L10N3g: the live hero's gender, handed to the grammar at the start
+import { applyCharacter, createCharacter, assignStartingSpells, CLASS_CAREERS } from './chargen.js';   // RRI2: AssignStartingSpells, the delegate
+import { levelUpSkillSum } from './advancement.js';   // AUDIT 18: SetCurrentLevelUpSkillSum, one home
 import { overlayAction } from '../ui/input.js';
-import { isEnhanced } from './uiSkin.js'; // THE SKIN: which wizard
-import { assignStartingEquipment } from './startingGear.js'; // S3d; RRI2: AssignStartingEquipment, the delegate
-import { NUMBER_BODY_PARTS } from './armorMaterials.js'; // wave 28: CharacterDocument's 7-part table
-import { standardSpellsByIndex } from './spell/standardSpells.js'; // DEX4a: the one RebuildClassicSpellsDict
-import { parseBiog, biogFileName } from '../formats/biogFile.js'; // S3e
-import { applyBiographyEffects } from './biography.js'; // S3e
-import { customSpellSetIndex } from './customClass.js'; // U20a
-import { reviseStockCareer } from './stockClasses.js'; // CLASS-USE: the stock careers' revised skill lists
-import { SOCIAL_GROUP_COUNT, FactionFile } from '../formats/factionFile.js'; // U20a + S25
-import { attachFactionRep } from './faction/factionRep.js'; // S25
+import { isEnhanced } from './uiSkin.js';   // THE SKIN: which wizard
+import { assignStartingEquipment } from './startingGear.js';   // S3d; RRI2: AssignStartingEquipment, the delegate
+import { NUMBER_BODY_PARTS } from './armorMaterials.js';   // wave 28: CharacterDocument's 7-part table
+import { standardSpellsByIndex } from './spell/standardSpells.js';   // DEX4a: the one RebuildClassicSpellsDict
+import { parseBiog, biogFileName } from '../formats/biogFile.js';   // S3e
+import { applyBiographyEffects } from './biography.js';   // S3e
+import { customSpellSetIndex } from './customClass.js';   // U20a
+import { reviseStockCareer } from './stockClasses.js';   // CLASS-USE: the stock careers' revised skill lists
+import { SOCIAL_GROUP_COUNT, FactionFile } from '../formats/factionFile.js';   // U20a + S25
+import { attachFactionRep } from './faction/factionRep.js';   // S25
 import { createRegionConditions } from './region/regionConditions.js';
-import { clearWorldDataVariants } from './worldDataVariants.js'; // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
-import { bootstrapRegionPower } from './region/regionPower.js'; // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
-import { legacyOn } from './legacy/settings.js'; // LEGACY2: Project Legacy's question - the family's model
+import { clearWorldDataVariants } from './worldDataVariants.js';   // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
+import { bootstrapRegionPower } from './region/regionPower.js';   // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
+import { legacyOn } from './legacy/settings.js';   // LEGACY2: Project Legacy's question - the family's model
 import { legacyModelScreen } from '../ui/legacy/legacyModelChoice.js';
-import { StartChoiceScreen } from '../ui/startChoice.js'; // START2: where the story begins, the last question
+import { StartChoiceScreen } from '../ui/startChoice.js';   // START2: where the story begins, the last question
 import { STARTS, BAY_START } from './starts/starts.js';
-import { isLegacyChoice } from './legacy/family.js'; // LEGACY-CHOICE: the answer kept on the character
+import { isLegacyChoice } from './legacy/family.js';   // LEGACY-CHOICE: the answer kept on the character
 
 /** SPELLS.STD as an index -> spell map. AUDIT 17f: the exterior
  *  hosts ran chargen without one and called finishChargen with no
@@ -53,7 +53,7 @@ import { isLegacyChoice } from './legacy/family.js'; // LEGACY-CHOICE: the answe
  *  unavailable, which is the pre-existing no-magic fallback. */
 export async function loadSpellIndex(fetchBytes) {
   try {
-    return standardSpellsByIndex(await fetchBytes('SPELLS.STD')); // AUDIT 23 (FTD-2): FIRST record wins a duplicate index (RebuildClassicSpellsDict); DEX4a: the mods' records merged first
+    return standardSpellsByIndex(await fetchBytes('SPELLS.STD'));   // AUDIT 23 (FTD-2): FIRST record wins a duplicate index (RebuildClassicSpellsDict); DEX4a: the mods' records merged first
   } catch (e) {
     console.warn('[chargen] SPELLS.STD unavailable; the starting spellbook stays empty', e);
     return null;
@@ -88,19 +88,14 @@ export async function loadBiog(fetchBytes, classIndex) {
  *  questions path (the method screen's questions arm falls to the
  *  list); DFU throws on both. */
 export async function loadClassQuestionData(fetchBytes) {
-  let questionLibrary = null,
-    classesData = null;
+  let questionLibrary = null, classesData = null;
   try {
     questionLibrary = parseQuestionLibrary(new TextRsc().load(await fetchBytes('TEXT.RSC')));
     if (!questionLibrary) console.warn('[chargen] TEXT.RSC has no record 9000; the class questions are skipped');
-  } catch (e) {
-    console.warn('[chargen] TEXT.RSC unavailable; the class questions are skipped', e);
-  }
+  } catch (e) { console.warn('[chargen] TEXT.RSC unavailable; the class questions are skipped', e); }
   try {
     classesData = await fetchBytes('CLASSES.DAT');
-  } catch (e) {
-    console.warn('[chargen] CLASSES.DAT unavailable; the class questions are skipped', e);
-  }
+  } catch (e) { console.warn('[chargen] CLASSES.DAT unavailable; the class questions are skipped', e); }
   return { questionLibrary, classesData };
 }
 
@@ -125,7 +120,7 @@ export async function loadCareers(fetchBytes) {
 export async function applyHeadlessChargen(playerEntity, classIndex, { fetchBytes, spellsByIndex = null } = {}) {
   const cf = new ClassFile();
   cf.load(await fetchBytes(`CLASS${String(classIndex).padStart(2, '0')}.CFG`));
-  const career = reviseStockCareer(classIndex, cf.career); // CLASS-USE: the career loadCareers hands the wizard
+  const career = reviseStockCareer(classIndex, cf.career);   // CLASS-USE: the career loadCareers hands the wizard
   createCharacter(playerEntity, career, classIndex);
   playerEntity.spells = assignStartingSpells(classIndex, spellsByIndex, career);
   // S3d: the same kit every other creation path gets
@@ -157,12 +152,10 @@ export async function applyHeadlessChargen(playerEntity, classIndex, { fetchByte
   // StartGameBehaviour.cs:433 InitializeRegionData - the same store the
   // wizard's path mints, on the second construction copy above.
   playerEntity.regionConditions = createRegionConditions();
-  clearWorldDataVariants(); // AUDIT-RR F39: PlayerEntity.Reset (:818) - a new game starts with no variant set
+  clearWorldDataVariants();   // AUDIT-RR F39: PlayerEntity.Reset (:818) - a new game starts with no variant set
   // AUDIT 26 F107: InitializeRegionData's own tail (:2211-2217).
   bootstrapRegionPower(playerEntity.factionRep, { regionConditions: playerEntity.regionConditions });
-  console.log(
-    `[chargen] ${CLASS_CAREERS[classIndex]}: HP ${playerEntity.maxHealth}, spells ${playerEntity.spells.length}`,
-  );
+  console.log(`[chargen] ${CLASS_CAREERS[classIndex]}: HP ${playerEntity.maxHealth}, spells ${playerEntity.spells.length}`);
   return playerEntity;
 }
 
@@ -245,16 +238,15 @@ export function applyCreationExtras(playerEntity, result, spellsByIndex = null, 
   // recorded a blank store. Nothing in the mint reads the character,
   // so it sits with the rest of what creation hands out.
   playerEntity.regionConditions = createRegionConditions();
-  clearWorldDataVariants(); // AUDIT-RR F39: PlayerEntity.Reset (:818) - a new game starts with no variant set
-  bootstrapRegionPower(playerEntity.factionRep, { regionConditions: playerEntity.regionConditions }); // AUDIT 26 F107: InitializeRegionData's tail (:2211-2217)
+  clearWorldDataVariants();   // AUDIT-RR F39: PlayerEntity.Reset (:818) - a new game starts with no variant set
+  bootstrapRegionPower(playerEntity.factionRep, { regionConditions: playerEntity.regionConditions });   // AUDIT 26 F107: InitializeRegionData's tail (:2211-2217)
   return playerEntity;
 }
 
 /** Apply a finished flow result onto the entity: the career/stat/
  *  skill derivations (applyCharacter), the starting spellbook, and
  *  the IDENTITY the paperdoll reads. */
-export function finishChargen(playerEntity, result, spellsByIndex = null, { rolls = Math.random } = {}) {
-  handHeroGenderToGrammar(playerEntity); // L10N3g: StartGameBehaviour.cs:147, the NewCharacter start - the wizard's pick (CreateCharGenderSelect.cs:63/:70) gives way to the live hero
+export function finishChargen(playerEntity, result, spellsByIndex = null, { rolls = Math.random } = {}) { handHeroGenderToGrammar(playerEntity);   // L10N3g: StartGameBehaviour.cs:147, the NewCharacter start - the wizard's pick (CreateCharGenderSelect.cs:63/:70) gives way to the live hero
   applyCharacter(playerEntity, result.career, result.careerIndex, result);
   // U13: the reflex pick. Both consumers were already live - the
   // EnemyAttack melee timer (450ms per step from Average) and the
@@ -320,15 +312,13 @@ async function loadFactions(fetchBytes) {
  *  run, plus the tables a host needs for finishChargen. */
 export async function createChargenFlow(fetchBytes, { rolls = Math.random } = {}) {
   const [careers, spellsByIndex, biogs, questionData, factionDict] = await Promise.all([
-    loadCareers(fetchBytes),
-    loadSpellIndex(fetchBytes),
-    loadBiogs(fetchBytes),
-    loadClassQuestionData(fetchBytes), // U18
-    loadFactions(fetchBytes), // S25
+    loadCareers(fetchBytes), loadSpellIndex(fetchBytes), loadBiogs(fetchBytes),
+    loadClassQuestionData(fetchBytes),   // U18
+    loadFactions(fetchBytes),            // S25
   ]);
   const flow = new ChargenFlow(careers, rolls);
-  flow.biogFor = (i) => biogs[i] ?? null; // S3e
-  flow.questionLibrary = questionData.questionLibrary; // U18
+  flow.biogFor = (i) => biogs[i] ?? null;   // S3e
+  flow.questionLibrary = questionData.questionLibrary;   // U18
   flow.classesData = questionData.classesData;
   // S25: FACTION.TXT rides the FLOW, so it reaches finishChargen
   // through flow.result() rather than through a fifth return value a
@@ -416,20 +406,11 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
   // can stand a start past the Bay (`startChoice`), once one is open there (one start open is no choice); the new
   // character's race read off the wizard's answer, its homeland chosen first. The answer rides the result as `startKey`.
   if (startChoice && STARTS.some((s) => s !== BAY_START && startChoice.open(s))) {
-    asks.push(
-      (answer, made) =>
-        new StartChoiceScreen((key) => answer({ startKey: key }), {
-          race: made?.race ?? null,
-          open: startChoice.open,
-          why: startChoice.why,
-        }),
-    );
+    asks.push((answer, made) => new StartChoiceScreen((key) => answer({ startKey: key }), { race: made?.race ?? null, open: startChoice.open, why: startChoice.why }));
   }
   if (!asks.length) {
     return chargenWizard(flow, {
-      onCancel,
-      hudScale,
-      onDone,
+      onCancel, hudScale, onDone,
     });
   }
   let fired = false;
@@ -438,24 +419,13 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
   let answers = {};
   let result = null;
   const next = () => {
-    if (stage >= asks.length) {
-      prompt = null;
-      fired = true;
-      onDone?.({ ...result, ...answers });
-      return;
-    }
+    if (stage >= asks.length) { prompt = null; fired = true; onDone?.({ ...result, ...answers }); return; }
     const i = stage++;
-    prompt = asks[i]((a) => {
-      answers = { ...answers, ...a };
-      next();
-    }, result);
+    prompt = asks[i]((a) => { answers = { ...answers, ...a }; next(); }, result);
   };
   const inner = chargenWizard(flow, {
     hudScale,
-    onCancel: () => {
-      fired = true;
-      onCancel?.();
-    },
+    onCancel: () => { fired = true; onCancel?.(); },
     onDone: (r) => {
       // AUDIT 17f's law, one layer out: the wizard fires once, and the
       // questions it opens are built once with it.
@@ -465,42 +435,19 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
     },
   });
   return {
-    get flow() {
-      return flow;
-    },
-    get isChoiceWindow() {
-      return prompt ? false : !!inner.isChoiceWindow;
-    },
-    get done() {
-      return fired;
-    },
-    get questionPrompt() {
-      return prompt;
-    }, // what a pin reads to know the stage
-    input(code, ev) {
-      if (prompt) prompt.input(code, ev);
-      else inner.input(code, ev);
-    },
+    get flow() { return flow; },
+    get isChoiceWindow() { return prompt ? false : !!inner.isChoiceWindow; },
+    get done() { return fired; },
+    get questionPrompt() { return prompt; },   // what a pin reads to know the stage
+    input(code, ev) { if (prompt) prompt.input(code, ev); else inner.input(code, ev); },
     // The pointer reaches the QUESTION too. It used to be
     // swallowed here, which dead-ended anyone creating a character with
     // the mouse - the wizard is completable that way by design (U8b).
-    click(vx, vy) {
-      if (prompt) prompt.click(vx, vy);
-      else inner.click?.(vx, vy);
-    },
-    hover(vx, vy, e = null) {
-      if (prompt) prompt.hover(vx, vy);
-      else inner.hover?.(vx, vy, e);
-    },
-    release() {
-      if (!prompt) inner.release?.();
-    }, // the question has nothing to drag
-    wheel(dir) {
-      if (!prompt) inner.wheel?.(dir);
-    }, // ...and nothing to scroll
-    tick(dt) {
-      if (!prompt) inner.tick?.(dt);
-    },
+    click(vx, vy) { if (prompt) prompt.click(vx, vy); else inner.click?.(vx, vy); },
+    hover(vx, vy, e = null) { if (prompt) prompt.hover(vx, vy); else inner.hover?.(vx, vy, e); },
+    release() { if (!prompt) inner.release?.(); },             // the question has nothing to drag
+    wheel(dir) { if (!prompt) inner.wheel?.(dir); },           // ...and nothing to scroll
+    tick(dt) { if (!prompt) inner.tick?.(dt); },
     draw(renderer, canvas, font, scale = hudScale) {
       if (prompt) prompt.draw(renderer, canvas, font, scale);
       else inner.draw?.(renderer, canvas, font, scale);
@@ -530,10 +477,8 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   let _fired = false;
   return {
     flow,
-    isChoiceWindow: true, // raw key codes through the overlay seam
-    get done() {
-      return flow.done;
-    },
+    isChoiceWindow: true,   // raw key codes through the overlay seam
+    get done() { return flow.done; },
     input(code, ev) {
       // AUDIT 17f / THE MODAL CONTRACT: the doc above promised onDone
       // fires once and the code did not - every key after the flow
@@ -553,30 +498,16 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
       if (a) flow.input(a, kev);
       // ui-chargen-4: backing out of the race screen cancels the
       // wizard (the flow flags it; the host unwinds) - once, like done
-      if (flow.cancelled) {
-        _fired = true;
-        onCancel?.();
-        return;
-      }
-      if (flow.done) {
-        _fired = true;
-        onDone?.(flow.result());
-      }
+      if (flow.cancelled) { _fired = true; onCancel?.(); return; }
+      if (flow.done) { _fired = true; onDone?.(flow.result()); }
     },
     // U10: the shared overlay pointer seam hands NATIVE coords; the
     // classic screens are clickable exactly where DFU's buttons are.
     click(vx, vy) {
       if (_fired) return;
       flow.clickNative(vx, vy);
-      if (flow.cancelled) {
-        _fired = true;
-        onCancel?.();
-        return;
-      }
-      if (flow.done) {
-        _fired = true;
-        onDone?.(flow.result());
-      }
+      if (flow.cancelled) { _fired = true; onCancel?.(); return; }
+      if (flow.done) { _fired = true; onDone?.(flow.result()); }
     },
     // ROAD-E2 / THE FOUR HOSTS RULE: the HOVER seam, which the wizard
     // had no use for until the list pickers' scroll bar gained a
@@ -591,9 +522,7 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
     // (ROAD-G G4 review: all four were stale - re-resolved by content,
     // against the same six routes G4-11 sweeps.) Hovering never
     // advances the flow, so no done check.
-    hover(vx, vy, e = null) {
-      if (!_fired) flow.hover?.(vx, vy, e);
-    },
+    hover(vx, vy, e = null) { if (!_fired) flow.hover?.(vx, vy, e); },
     // ROAD-G G4: THE OTHER EDGE, on the same rule. The hover seam above
     // is GetMouseButton(0)'s per-frame poll; this is the frame it turns
     // false (VerticalScrollBar.Update's else arm, :123-129), and every
@@ -602,20 +531,14 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
     // slot and `dungeonContext.overlayPointer`'s up arm call it beside
     // their pointer route, and `interior.js` has its own listener.
     // Releasing never advances the flow, so no done check.
-    release() {
-      if (!_fired) flow.releasePickBar?.();
-    },
+    release() { if (!_fired) flow.releasePickBar?.(); },
     // U-scroll: the hosts' wheel seam (scroll never advances the flow,
     // so no done check).
-    wheel(dir) {
-      if (!_fired) flow.wheel?.(dir);
-    },
+    wheel(dir) { if (!_fired) flow.wheel?.(dir); },
     // F2 / THE FOUR-HOSTS RULE: every host that runs the wizard drives
     // the overlay's clock through this wrapper - dungeonContext reached
     // flow.tick directly until wave D put it through this door too.
-    tick(dt) {
-      flow.tick?.(dt);
-    },
+    tick(dt) { flow.tick?.(dt); },
     // FS-slice (wave D): the host's OWN scale wins when it hands one
     // in. Every overlay seam in the tree passes the letterbox scale it
     // just computed off the real canvas (townTalk:881,
@@ -623,9 +546,7 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
     // floor for the constructed default - so the art-less interim
     // panels drew at 2 on a canvas the rest of the UI was drawing at 3
     // or 4. `hudScale` stays the default for a caller that passes none.
-    draw(renderer, canvas, font, scale = hudScale) {
-      flow.draw(renderer, canvas, font, scale);
-    },
+    draw(renderer, canvas, font, scale = hudScale) { flow.draw(renderer, canvas, font, scale); },
   };
 }
 
@@ -647,7 +568,7 @@ function classicChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
 function enhancedChargenOverlay(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   let fired = false;
   let view = null;
-  let fallback = null; // CG2: the classic window, built only if the enhanced view will not mount
+  let fallback = null;   // CG2: the classic window, built only if the enhanced view will not mount
   const finish = (why) => {
     if (fired) return;
     fired = true;
@@ -664,67 +585,36 @@ function enhancedChargenOverlay(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   host.id = 'enhanced-chargen';
   host.style.cssText = 'position:fixed;inset:0;z-index:14;background:#0e1013;overflow:hidden';
   document.body.append(host);
-  import('../ui/enhanced/enhancedChargen.js')
-    .then(async ({ mountEnhancedChargen, attachChargenText }) => {
-      const deps = await chargenViewDeps();
-      attachChargenText(flow, deps.textRsc);
-      view = mountEnhancedChargen(host, { flow, ...deps, onExit: finish });
-      view.unmount = ((inner) => () => {
-        inner();
-        host.remove();
-      })(view.unmount);
-    })
-    .catch((e) => {
-      // CG2: a wrapper whose view never mounted used to hold the slot for
-      // ever - `done` false, every key and pointer swallowed, nothing on
-      // screen. The classic wizard takes over on the same flow and the
-      // same callbacks: the design is lost, the game is not.
-      console.warn('[chargen] the enhanced wizard would not mount - the classic wizard takes over', e);
-      host.remove();
-      fallback = classicChargenWindow(flow, {
-        hudScale,
-        onDone: (r) => {
-          fired = true;
-          onDone?.(r);
-        },
-        onCancel: () => {
-          fired = true;
-          onCancel?.();
-        },
-      });
+  import('../ui/enhanced/enhancedChargen.js').then(async ({ mountEnhancedChargen, attachChargenText }) => {
+    const deps = await chargenViewDeps();
+    attachChargenText(flow, deps.textRsc);
+    view = mountEnhancedChargen(host, { flow, ...deps, onExit: finish });
+    view.unmount = ((inner) => () => { inner(); host.remove(); })(view.unmount);
+  }).catch((e) => {
+    // CG2: a wrapper whose view never mounted used to hold the slot for
+    // ever - `done` false, every key and pointer swallowed, nothing on
+    // screen. The classic wizard takes over on the same flow and the
+    // same callbacks: the design is lost, the game is not.
+    console.warn('[chargen] the enhanced wizard would not mount - the classic wizard takes over', e);
+    host.remove();
+    fallback = classicChargenWindow(flow, {
+      hudScale,
+      onDone: (r) => { fired = true; onDone?.(r); },
+      onCancel: () => { fired = true; onCancel?.(); },
     });
+  });
   return {
     flow,
     isChoiceWindow: true,
-    get done() {
-      return fired;
-    },
-    input(code, ev) {
-      fallback?.input(code, ev);
-    }, // the view's own keydown owns the keyboard (the fallback's the seam)
-    click(vx, vy) {
-      fallback?.click(vx, vy);
-    }, // the view is a fixed opaque div; pointers never get here
-    hover(vx, vy, e = null) {
-      fallback?.hover(vx, vy, e);
-    },
-    release() {
-      fallback?.release();
-    },
-    wheel(dir) {
-      fallback?.wheel(dir);
-    }, // the view scrolls itself
-    tick(dt) {
-      fallback?.tick(dt);
-    }, // no constellation animation on this side yet
-    draw(renderer, canvas, font, scale) {
-      fallback?.draw(renderer, canvas, font, scale);
-    }, // DOM, not canvas
-    dispose() {
-      view?.unmount();
-      view = null;
-      host.remove();
-    },
+    get done() { return fired; },
+    input(code, ev) { fallback?.input(code, ev); },   // the view's own keydown owns the keyboard (the fallback's the seam)
+    click(vx, vy) { fallback?.click(vx, vy); },       // the view is a fixed opaque div; pointers never get here
+    hover(vx, vy, e = null) { fallback?.hover(vx, vy, e); },
+    release() { fallback?.release(); },
+    wheel(dir) { fallback?.wheel(dir); },             // the view scrolls itself
+    tick(dt) { fallback?.tick(dt); },                 // no constellation animation on this side yet
+    draw(renderer, canvas, font, scale) { fallback?.draw(renderer, canvas, font, scale); },   // DOM, not canvas
+    dispose() { view?.unmount(); view = null; host.remove(); },
   };
 }
 
@@ -735,37 +625,27 @@ function enhancedChargenOverlay(flow, { onDone, onCancel, hudScale = 2 } = {}) {
  *  lost. */
 async function chargenViewDeps() {
   const out = { picker: null, picture: null, palette: null, loadFaces: null, textRsc: null };
-  const [{ ImgFile }, { DFPalette }, { TextRsc }, { loadFaceCanvases }] = await Promise.all([
-    import('../formats/imgFile.js'),
-    import('../formats/dfPalette.js'),
-    import('../formats/textRsc.js'),
-    import('../ui/facePortrait.js'),
-  ]);
+  const [{ ImgFile }, { DFPalette }, { TextRsc }, { loadFaceCanvases }] =
+    await Promise.all([
+      import('../formats/imgFile.js'), import('../formats/dfPalette.js'),
+      import('../formats/textRsc.js'), import('../ui/facePortrait.js'),
+    ]);
   const { getBytes } = await import('../scenes/dataSource.js');
   const img = async (name) => {
     const f = new ImgFile();
     f.load(await getBytes(name), name, new DFPalette());
     return f.getDFBitmap(0, 0);
   };
-  try {
-    out.textRsc = new TextRsc().load(await getBytes('TEXT.RSC'));
-  } catch (e) {
-    console.warn('[chargen] TEXT.RSC unavailable; descriptions stay empty', e);
-  }
+  try { out.textRsc = new TextRsc().load(await getBytes('TEXT.RSC')); }
+  catch (e) { console.warn('[chargen] TEXT.RSC unavailable; descriptions stay empty', e); }
   try {
     const pal = new DFPalette();
     pal.load(await getBytes('ART_PAL.COL'), 'ART_PAL.COL');
-    const rgb = (i) => {
-      const c = pal.get(i);
-      return [c.r, c.g, c.b];
-    };
+    const rgb = (i) => { const c = pal.get(i); return [c.r, c.g, c.b]; };
     out.palette = rgb;
     out.picker = await img('TAMRIEL2.IMG');
-    try {
-      out.picture = await img('TMAP00I0.IMG');
-    } catch (e) {
-      console.warn('[chargen] TMAP00I0 unavailable; the Imperial Province is absent', e);
-    }
+    try { out.picture = await img('TMAP00I0.IMG'); }
+    catch (e) { console.warn('[chargen] TMAP00I0 unavailable; the Imperial Province is absent', e); }
     // TILE1: ONE HOME. This was the only place that knew which CIF a
     // race's heads live in, which palette reads it and which record is
     // which - and the save tiles are the second caller, so it moved to
@@ -784,20 +664,11 @@ function codeToKey(code) {
   if (typeof code !== 'string') return '';
   if (code.startsWith('Key')) return code.slice(3).toLowerCase();
   if (code.startsWith('Digit')) return code.slice(5);
-  return (
-    {
-      ArrowUp: 'ArrowUp',
-      ArrowDown: 'ArrowDown',
-      Enter: 'Enter',
-      Backspace: 'Backspace',
-      Escape: 'Escape',
-      Space: ' ',
-      Equal: '=',
-      Minus: '-',
-      NumpadAdd: '+',
-      NumpadSubtract: '-',
-    }[code] ?? ''
-  );
+  return ({
+    ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown', Enter: 'Enter',
+    Backspace: 'Backspace', Escape: 'Escape', Space: ' ',
+    Equal: '=', Minus: '-', NumpadAdd: '+', NumpadSubtract: '-',
+  })[code] ?? '';
 }
 
 // L10N3g: the hosts hand the grammar the live hero at their own start (a load) through the same door.

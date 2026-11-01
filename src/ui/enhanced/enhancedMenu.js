@@ -89,153 +89,68 @@
 // the pick is a zip upload.
 // ═══════════════════════════════════════════════════════════════════
 
-import { statsHunt } from '../bounty/huntRank.js'; // HUNTERS-MARK (Bounty-Boards.md 12.3)
+import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
 import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
-import { dressStanding } from '../../systems/clothingStanding.js'; // DRESS1: the Standing page's Dress line
-import {
-  questRail,
-  shelvedRail,
-  unloggedRail,
-  journalLines,
-  questTitleOf,
-  QUEST_URGENT_SECONDS,
-  remainWords,
-} from '../quest/questRail.js'; // MAC-K2: the ONE quest walk, shared with the chronicle
-import {
-  qlObjectivesBlock,
-  qlOfferDetail,
-  offerRowWords,
-  qlLineDetail,
-  lineStateWords,
-  qlLadderDetail,
-} from '../questlines/qlJournal.js'; // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
-import { lineStepOf } from '../../systems/questlines/qlLines.js'; // QL-OFFERED: a questline's step drawn under its line, never as a side quest
-import { TITLE_TEXT } from '../playerBadge.js'; // QL12: the title a questline earns, in the badge's own words
-import { filedOutcome } from '../../systems/notebook.js'; // AUDIT QUESTLINES UI-5: an archived quest's outcome, the archive's alone to draw
-import { entryTarget, targetWords, WHERE_TEXT } from '../quest/questLens.js'; // GUIDE2: where a quest points, and the way there
-import { questTracker, followOn, trackButton } from '../quest/questTracker.js'; // GUIDE4: the HUD's card - the Track toggle, and the quest the journal opens on
-import { closeOnOutsideTap } from './enhancedOverlays.js'; // OT1: a tap on the scrim resumes
-import { drawTutorialsPane, releaseTutorialsPane } from '../tutorialsPane.js'; // TUT1: the Tutorials tab and section - every tutorial page, to read again
-import { drawShotsPane, releaseShotsPane } from '../shotsPane.js'; // LOAD1: the Screenshots pane - the gallery the PrintScreen key keeps
-import { TEST_PRESETS, TEST_RIDE, TEST_SEA, TEST_LOOT } from '../../systems/testRoom.js'; // TR3: the one home the pane shows; TSR4: the ride; LR3: the loot ladder
+import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
+import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
+import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
+import { lineStepOf } from '../../systems/questlines/qlLines.js';   // QL-OFFERED: a questline's step drawn under its line, never as a side quest
+import { TITLE_TEXT } from '../playerBadge.js';   // QL12: the title a questline earns, in the badge's own words
+import { filedOutcome } from '../../systems/notebook.js';   // AUDIT QUESTLINES UI-5: an archived quest's outcome, the archive's alone to draw
+import { entryTarget, targetWords, WHERE_TEXT } from '../quest/questLens.js';   // GUIDE2: where a quest points, and the way there
+import { questTracker, followOn, trackButton } from '../quest/questTracker.js';   // GUIDE4: the HUD's card - the Track toggle, and the quest the journal opens on
+import { closeOnOutsideTap } from './enhancedOverlays.js';   // OT1: a tap on the scrim resumes
+import { drawTutorialsPane, releaseTutorialsPane } from '../tutorialsPane.js';   // TUT1: the Tutorials tab and section - every tutorial page, to read again
+import { drawShotsPane, releaseShotsPane } from '../shotsPane.js';   // LOAD1: the Screenshots pane - the gallery the PrintScreen key keeps
+import { TEST_PRESETS, TEST_RIDE, TEST_SEA, TEST_LOOT } from '../../systems/testRoom.js';   // TR3: the one home the pane shows; TSR4: the ride; LR3: the loot ladder
 import { mwRaceId } from '../../formats/morrowind/mwNpc.js';
 import { EQUIP_SLOTS, equipTableOf } from '../../systems/equip.js';
-import { boonStatRows } from '../temperatureCard.js'; // AUDIT C&C B11: the Attributes page names the boons that raise them
+import { boonStatRows } from '../temperatureCard.js';   // AUDIT C&C B11: the Attributes page names the boons that raise them
 import { dfWornEquipment } from '../../formats/morrowind/mwItemMap.js';
 import { ARMOR_ENUM } from '../../combat/enemyEquipment.js';
-import {
-  morrowindDataCount,
-  morrowindDataCounted,
-  countMorrowindArchives,
-  assetPickerOpen,
-  textureStoreRegistered,
-  textureStoreSettled,
-} from '../../scenes/dataSource.js'; // MAC1: the boot door counts the store itself; AUDIT 65 XL-6: by NAME - it never reads a stored file   // MW-IMPORT: the attach door; MWFIX: and the modal it opens owns the keyboard
-import { CATEGORIES, keysOf, isSettingItem, optionPath, whereIs } from '../settings/settingsMap.js'; // ORG2: the one map of every option
-import { GRAPHICS_PRESETS, PRESET_ROWS, PRESET_PARTS, presetNow } from '../../systems/graphicsPresets.js'; // ORG2; MEM-AUDIT: and its parts
-import {
-  widgetFor,
-  blockedReason,
-  formatValue,
-  stepValue,
-  COLOUR_KEYS,
-  ENUM_LAW,
-  enumWords,
-} from '../settings/settingsLaw.js'; // FT14: the enum's own values are the bar's segments
+import { morrowindDataCount, morrowindDataCounted, countMorrowindArchives, assetPickerOpen, textureStoreRegistered, textureStoreSettled } from '../../scenes/dataSource.js';   // MAC1: the boot door counts the store itself; AUDIT 65 XL-6: by NAME - it never reads a stored file   // MW-IMPORT: the attach door; MWFIX: and the modal it opens owns the keyboard
+import { CATEGORIES, keysOf, isSettingItem, optionPath, whereIs } from '../settings/settingsMap.js';   // ORG2: the one map of every option
+import { GRAPHICS_PRESETS, PRESET_ROWS, PRESET_PARTS, presetNow } from '../../systems/graphicsPresets.js';   // ORG2; MEM-AUDIT: and its parts
+import { widgetFor, blockedReason, formatValue, stepValue, COLOUR_KEYS, ENUM_LAW, enumWords } from '../settings/settingsLaw.js';   // FT14: the enum's own values are the bar's segments
 import { labelOf, helpOf, INSTEAD, TIER_TEXT } from '../settings/settingsCopy.js';
 import {
-  effectiveSettings,
-  setValue,
-  saveSettings,
-  resetToDefaults,
-  tierOf,
-  DEFAULTS,
-  defaultOf,
+  effectiveSettings, setValue, saveSettings, resetToDefaults, tierOf, DEFAULTS, defaultOf,
 } from '../../systems/settings/settings.js';
+import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
+import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
+import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
-  mostRecentRestorable,
-  restorableSaves,
-  firstRestorable,
-  deleteSave,
-  QUICK_SAVE_NAME,
-  loadSlot,
-  saveSlot,
-} from '../../systems/save/saveSlots.js';
-import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js'; // AUDIT LIVED1 E: Copy to offline changes lanes
-import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js'; // TIME4: the sky's day, said at the door
-import {
-  realmIo,
-  realmList,
-  realmDelete,
-  realmFetch,
-  realmRowAsSave,
-  realmSummaryOf,
-  realmRefusalText,
-  takeRealmNotice,
+  realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
-} from '../../systems/realmSaves.js'; // REALM P1.3: the Online door lists the realm's characters, the service's
-import { createRealmLine } from '../../systems/legacy/realmLine.js'; // HOUSE-WAITS (FIELD BUGS 2026-10-09f): the account's lines, read at the door
+} from '../../systems/realmSaves.js';   // REALM P1.3: the Online door lists the realm's characters, the service's
+import { createRealmLine } from '../../systems/legacy/realmLine.js';   // HOUSE-WAITS (FIELD BUGS 2026-10-09f): the account's lines, read at the door
 import { loadFamily } from '../../systems/legacy/store.js';
-import {
-  waitingHouses,
-  takeUpLine,
-  houseWaitsTitle,
-  houseWaitsLine,
-  heirButtonLabel,
-  newbornButtonLabel,
-} from '../../systems/legacy/waitingHouses.js';
-import { legacySettings } from '../../systems/legacy/settings.js'; // RPT1026-MISC HEIR-WAITS: the Descendants dial a newborn heir is offered by
-import { mintCharacterId } from '../../systems/characterId.js'; // REALM P1.4: a copy to offline is a new offline character
-import {
-  exportSavesZip,
-  collectSlots,
-  importSlots,
-  entriesFromFiles,
-  slotPathOf,
-  TRANSFER_ZIP_NAME,
-} from '../../systems/save/saveTransfer.js'; // SP1: saves move between the website and the app
-import { appStorage, tabStorage } from '../../systems/appStorage.js'; // SP1: the store under this build - the browser's on the site, the file store in the app   // SAV4: the slot store; SLOTS1: every slot
-import { uiSkin, SKIN_NAMES, isEnhanced } from '../../systems/uiSkin.js'; // FD1: which boot rail
+import { waitingHouses, takeUpLine, houseWaitsTitle, houseWaitsLine, heirButtonLabel, newbornButtonLabel } from '../../systems/legacy/waitingHouses.js';
+import { legacySettings } from '../../systems/legacy/settings.js';   // RPT1026-MISC HEIR-WAITS: the Descendants dial a newborn heir is offered by
+import { mintCharacterId } from '../../systems/characterId.js';   // REALM P1.4: a copy to offline is a new offline character
+import { exportSavesZip, collectSlots, importSlots, entriesFromFiles, slotPathOf, TRANSFER_ZIP_NAME } from '../../systems/save/saveTransfer.js';   // SP1: saves move between the website and the app
+import { appStorage, tabStorage } from '../../systems/appStorage.js';   // SP1: the store under this build - the browser's on the site, the file store in the app   // SAV4: the slot store; SLOTS1: every slot
+import { uiSkin, SKIN_NAMES, isEnhanced } from '../../systems/uiSkin.js';   // FD1: which boot rail
 import { getPref, setPref, isOpen, setOpen, PREF_DEFAULTS } from '../../systems/uiPrefs.js';
-import { TOUCH_BUTTON_SLOTS, touchButtonSlots, nextTouchButton, touchButtonChoices } from '../touch/touchButtons.js'; // TOUCH-BUTTONS: the corner's three slots
-import { DEFAULT_SERVER } from '../../net/online.js'; // ONLINE1: the relay this port hosts, the field's placeholder   // R7: the port's own switches; SO1: the folded tiers' memory
-import { GATE_CROWD_TIERS } from '../../net/gate/gateCrowd.js'; // GATE-CROWD: how many other players are drawn at once (CROWD-WIDE: everywhere, not a gate's court alone)
+import { TOUCH_BUTTON_SLOTS, touchButtonSlots, nextTouchButton, touchButtonChoices } from '../touch/touchButtons.js';   // TOUCH-BUTTONS: the corner's three slots
+import { DEFAULT_SERVER } from '../../net/online.js';   // ONLINE1: the relay this port hosts, the field's placeholder   // R7: the port's own switches; SO1: the folded tiers' memory
+import { GATE_CROWD_TIERS } from '../../net/gate/gateCrowd.js';   // GATE-CROWD: how many other players are drawn at once (CROWD-WIDE: everywhere, not a gate's court alone)
 import { PEER_RANGE_TIERS, peerRangeOf } from '../../net/peer/peerRange.js';
-import { YARD_RANGE_TIERS, yardRangeOf } from '../../net/yardRange.js'; // YARD-RANGE: how far other players' yards are drawn   // PEER-RANGE: how far out other players are drawn, and the distance a stored value stands for
-import { replacementCount } from '../../systems/musicReplacement.js'; // M-EXT: the packs card reports what the pick covers
-import {
-  midiOutSupported,
-  midiOutDenied,
-  midiOutName,
-  midiOutputs,
-  setMidiOut,
-  nextMidiOut,
-  MIDI_OUT_PREF,
-} from '../../systems/midiOut.js'; // MIDI-OUT1: the Audio tab's device row
-import { brandMark } from '../brandMark.js'; // INTRO2: Mac's supplied logo, shared with the final splash
-import { titleHeld } from '../intro/titleHeld.js'; // TITLE-DOOR: the film's held title, the boot home's ground
-import { soundReplacementCount } from '../../systems/soundReplacer.js'; // SNDREP1: the sound pack's count
-import { textureReplacementCount, bundleTextureCount } from '../../systems/textureReplacement.js'; // M-TEX: and the texture half; DFMOD1: and the bundles'
-import {
-  attachedDfmods,
-  DFMOD_DETAIL,
-  dfmodMaxSize,
-  setDfmodEnabled,
-  unregisteredDfmods,
-} from '../../systems/dfmodTextures.js'; // VE3: a mod switched on or off; AUDIT VE R5: and one stored that did not register
-import { isIilMod } from '../../systems/improvedInteriorLighting.js'; // IIL3: the lighting mod's own section   // DFMOD1: the attached texture mods, one row each; DFMOD2: the detail choice
-import { isTouchDevice } from '../touch/touch.js'; // TI2: the Touch card mounts only where a finger can reach it
+import { YARD_RANGE_TIERS, yardRangeOf } from '../../net/yardRange.js';   // YARD-RANGE: how far other players' yards are drawn   // PEER-RANGE: how far out other players are drawn, and the distance a stored value stands for
+import { replacementCount } from '../../systems/musicReplacement.js';   // M-EXT: the packs card reports what the pick covers
+import { midiOutSupported, midiOutDenied, midiOutName, midiOutputs, setMidiOut, nextMidiOut, MIDI_OUT_PREF } from '../../systems/midiOut.js';   // MIDI-OUT1: the Audio tab's device row
+import { brandMark } from '../brandMark.js';   // INTRO2: Mac's supplied logo, shared with the final splash
+import { titleHeld } from '../intro/titleHeld.js';   // TITLE-DOOR: the film's held title, the boot home's ground
+import { soundReplacementCount } from '../../systems/soundReplacer.js';   // SNDREP1: the sound pack's count
+import { textureReplacementCount, bundleTextureCount } from '../../systems/textureReplacement.js';   // M-TEX: and the texture half; DFMOD1: and the bundles'
+import { attachedDfmods, DFMOD_DETAIL, dfmodMaxSize, setDfmodEnabled, unregisteredDfmods } from '../../systems/dfmodTextures.js';   // VE3: a mod switched on or off; AUDIT VE R5: and one stored that did not register
+import { isIilMod } from '../../systems/improvedInteriorLighting.js';   // IIL3: the lighting mod's own section   // DFMOD1: the attached texture mods, one row each; DFMOD2: the detail choice
+import { isTouchDevice } from '../touch/touch.js';   // TI2: the Touch card mounts only where a finger can reach it
 import { dateFromClassicMinutes, dateString } from '../../systems/gameDate.js';
 // PX5: the pause clock reads THE ONE CLOCK directly (AUDIT 23 C2's
 // law - every host already reads this same module), so no host seam
 // is needed and no host can drift.
-import {
-  worldMinutes,
-  skyMinutes,
-  trustedWorldMinutes,
-  worldSpanRealWords,
-  ownMinutes,
-} from '../../systems/worldTick.js';
+import { worldMinutes, skyMinutes, trustedWorldMinutes, worldSpanRealWords, ownMinutes } from '../../systems/worldTick.js';
 import { BUILD_TAG, UPDATE } from '../../buildTag.js';
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
 import { repaintKeepingScroll } from '../domRepaint.js';
@@ -245,230 +160,95 @@ import { drawPixelGround } from '../pixelGround.js';
 // Both are plain modules with no game data; the boot door never
 // renders the tab, so the front door still reads no game state.
 import { sheetModel } from './enhancedCharSheet.js';
-import {
-  profPagesShown,
-  PROF_PAGE_SECTIONS,
-  drawProfessionsPage,
-  drawStoresPage,
-  resetProfPages,
-  profActUnderWay,
-  setDownProfAct,
-} from '../professions/profPages.js'; // PROF1: the Professions and Stores pages, online
-import { drawCraftingPage, PROF_STATS_PAGES } from '../professions/profPages.js'; // CRAFT-HALL
-import { boundKeyName } from '../tutorialPopup.js'; // CRAFT-HALL: names the Professions key on the Crafting page
-import { vendorPageShown, VENDOR_PAGE_SECTIONS, drawVendorPage } from '../vendor/vendorPage.js'; // HOME-VENDOR: the Vendor page
+import { profPagesShown, PROF_PAGE_SECTIONS, drawProfessionsPage, drawStoresPage, resetProfPages, profActUnderWay, setDownProfAct } from '../professions/profPages.js';   // PROF1: the Professions and Stores pages, online
+import { drawCraftingPage, PROF_STATS_PAGES } from '../professions/profPages.js';   // CRAFT-HALL
+import { boundKeyName } from '../tutorialPopup.js';   // CRAFT-HALL: names the Professions key on the Crafting page
+import { vendorPageShown, VENDOR_PAGE_SECTIONS, drawVendorPage } from '../vendor/vendorPage.js';   // HOME-VENDOR: the Vendor page
 import { REVENANT_PAGE_SECTIONS, revenantPageShown, drawRevenantsPage } from '../revenant/revenantPage.js';
-import {
-  COMPANION_PAGE_SECTIONS,
-  companionPageShown,
-  drawCompanionsPage,
-  resetCompanionRoster,
-} from '../companionRoster.js'; // COMPANION-ROSTER: the sworn and the slots
-import {
-  STABLE_PAGE_SECTIONS,
-  stablePageShown,
-  drawStablePage,
-  resetHoldingsPages,
-  holdingsProvider,
-} from '../holdingsPages.js'; // HOLDINGS: the horse and the wagon - GROWTH1: and the captain's sky's deps
-import {
-  FAMILY_PAGE_SECTIONS,
-  drawTreePage,
-  drawHousePage,
-  drawHallPage,
-  drawGuidePage,
-  resetFamilyPages,
-  disarmFamilyPages,
-  sheetHouse,
-  familyTabShown,
-} from '../familyPages.js'; // LEGACY3: Project Legacy's Family tab; LEGACY-SHEET: the house on the Stats page; FAMILY-TAB: drawn while the game is played with it
-import { FLEET_PAGE_SECTIONS, fleetPageShown, drawFleetPage, resetFleetPage } from '../fleetPage.js'; // HOLDINGS: the ships
-import { CAPTAIN_PAGE_SECTIONS, captainPageShown, drawCaptainPage } from '../captainPage.js'; // CAPT-LOG: the captain's standing and log
-import {
-  drawGrowthTab,
-  resetGrowthTab,
-  releaseGrowthTab,
-  growthBack,
-  growthAsks,
-  growthPageAt,
-  setGrowthSection,
-  growthDue,
-} from '../growth/growthTab.js'; // GROWTH1: the Growth tab - the level, the specialisations, the skies
-import { stageLive } from '../growth/growthStage.js'; // GROWTH3: a face up in the tab - the window's Escape asks it first
-import {
-  COLLECTION_PAGE_SECTIONS,
-  COLLECTION_PARTS,
-  collectionsPageShown,
-  drawCollectionsPage,
-  resetCollectionsPage,
-  disarmCollectionsPage,
-  setCollectionsPart,
-  rereadCollectionsAccount,
-} from '../collectionsPage.js'; // COLLECTIONS: the codex and the cards - AUDIT COLLECTIONS-II: its parts by name, and its read asked again when the account card closes
-import { swornBodyOf } from '../../systems/revenant/revenantCompanions.js'; // COMPANION-ROSTER: a sworn one's live health
-import { enemyDisplayName } from '../../characters/enemy/enemyBasics.js'; // REVENANT-PAGE: a revenant's kind   // REVENANT-PAGE: the foes that have earned your name
+import { COMPANION_PAGE_SECTIONS, companionPageShown, drawCompanionsPage, resetCompanionRoster } from '../companionRoster.js';   // COMPANION-ROSTER: the sworn and the slots
+import { STABLE_PAGE_SECTIONS, stablePageShown, drawStablePage, resetHoldingsPages, holdingsProvider } from '../holdingsPages.js';   // HOLDINGS: the horse and the wagon - GROWTH1: and the captain's sky's deps
+import { FAMILY_PAGE_SECTIONS, drawTreePage, drawHousePage, drawHallPage, drawGuidePage, resetFamilyPages, disarmFamilyPages, sheetHouse, familyTabShown } from '../familyPages.js';   // LEGACY3: Project Legacy's Family tab; LEGACY-SHEET: the house on the Stats page; FAMILY-TAB: drawn while the game is played with it
+import { FLEET_PAGE_SECTIONS, fleetPageShown, drawFleetPage, resetFleetPage } from '../fleetPage.js';   // HOLDINGS: the ships
+import { CAPTAIN_PAGE_SECTIONS, captainPageShown, drawCaptainPage } from '../captainPage.js';   // CAPT-LOG: the captain's standing and log
+import { drawGrowthTab, resetGrowthTab, releaseGrowthTab, growthBack, growthAsks, growthPageAt, setGrowthSection, growthDue } from '../growth/growthTab.js';   // GROWTH1: the Growth tab - the level, the specialisations, the skies
+import { stageLive } from '../growth/growthStage.js';   // GROWTH3: a face up in the tab - the window's Escape asks it first
+import { COLLECTION_PAGE_SECTIONS, COLLECTION_PARTS, collectionsPageShown, drawCollectionsPage, resetCollectionsPage, disarmCollectionsPage, setCollectionsPart, rereadCollectionsAccount } from '../collectionsPage.js';   // COLLECTIONS: the codex and the cards - AUDIT COLLECTIONS-II: its parts by name, and its read asked again when the account card closes
+import { swornBodyOf } from '../../systems/revenant/revenantCompanions.js';   // COMPANION-ROSTER: a sworn one's live health
+import { enemyDisplayName } from '../../characters/enemy/enemyBasics.js';   // REVENANT-PAGE: a revenant's kind   // REVENANT-PAGE: the foes that have earned your name
 import { affiliations } from '../../systems/affiliations.js';
-import { ROLL_GAIN_DAY_MAX } from '../../net/npcChapterLaw.js'; // STANDING-WORDS: the day's pace, said beside the owed
-import { legalRepOf } from '../../systems/court.js'; // REP5: the law, region by region
-import {
-  banishmentLeft,
-  banishmentDaysLeft,
-  KNOWN_CRIMINAL_BELOW,
-  pardonPrice,
-  challengeFine,
-} from '../../systems/standing.js';
+import { ROLL_GAIN_DAY_MAX } from '../../net/npcChapterLaw.js';   // STANDING-WORDS: the day's pace, said beside the owed
+import { legalRepOf } from '../../systems/court.js';   // REP5: the law, region by region
+import { banishmentLeft, banishmentDaysLeft, KNOWN_CRIMINAL_BELOW, pardonPrice, challengeFine } from '../../systems/standing.js';
 import { legalStandingWord } from '../../systems/legalBands.js';
-import { REGION_NAMES } from '../../formats/mapsTables.js'; // GUILD-REP: the sheet's Affiliations box, on the Standing page
-import { hudLocked, setHudLocked, resetHudLayout, hudBarsSplit, setHudBarsSplit } from '../hud/hudLayout.js'; // HUD-MOVE: Lock UI and Reset UI
-import { enhancedHudScale as hudScaleNow, HUD_SCALE_MIN, HUD_SCALE_MAX } from './enhancedHud.js'; // PX30c
-import { mapScaleLabel, nextMapScale } from '../map/mapScale.js'; // FIELD BUGS 2026-10-09e MAP-SCALE: the Maps row
-import { standingGroups } from '../../systems/faction/factionStanding.js'; // FIELD BUGS 2026-10-09e EVERY-STANDING: every organization's reputation
-import { wayBackQuestLine } from '../../systems/guild/guildServiceFlow.js'; // WAY-BACK: the way into a guild, under its row
-import { activeMemberships, guildOfFaction } from '../../systems/guild/guilds.js'; // WAY-BACK: the book the join reads, and GetGuild(factionId)
-import { resolveVariantGuild } from '../../systems/guild/guildVariants.js'; // WAY-BACK: ...a temple's or an order's
+import { REGION_NAMES } from '../../formats/mapsTables.js';   // GUILD-REP: the sheet's Affiliations box, on the Standing page
+import { hudLocked, setHudLocked, resetHudLayout, hudBarsSplit, setHudBarsSplit } from '../hud/hudLayout.js';   // HUD-MOVE: Lock UI and Reset UI
+import { enhancedHudScale as hudScaleNow, HUD_SCALE_MIN, HUD_SCALE_MAX } from './enhancedHud.js';   // PX30c
+import { mapScaleLabel, nextMapScale } from '../map/mapScale.js';   // FIELD BUGS 2026-10-09e MAP-SCALE: the Maps row
+import { standingGroups } from '../../systems/faction/factionStanding.js';   // FIELD BUGS 2026-10-09e EVERY-STANDING: every organization's reputation
+import { wayBackQuestLine } from '../../systems/guild/guildServiceFlow.js';   // WAY-BACK: the way into a guild, under its row
+import { activeMemberships, guildOfFaction } from '../../systems/guild/guilds.js';   // WAY-BACK: the book the join reads, and GetGuild(factionId)
+import { resolveVariantGuild } from '../../systems/guild/guildVariants.js';   // WAY-BACK: ...a temple's or an order's
 import { playerEntity } from '../../characters/playerEntity.js';
 // PX6: the Stats page's skill labels - the one home (systems/skills.js).
 import { SKILLS, SKILL_NAMES } from '../../systems/skills.js';
-import { overlayAction, bindings, eventMeans } from '../input.js'; // U51: Escape, through the shared table; UXB1-F: the live keys a tile names; DISC28-A: the pause action's own key
-import { bindings as liveBindings } from '../input.js'; // PADPLUS1: the store the layout reset writes
-import { resetPlusPadLayout } from '../plus/plusPad.js'; // PADPLUS1
-import { hdGlyphSvg, hdGlyphName } from '../padGlyphsHD.js'; // PADPLUS1: the layout card's glyphs
-import { padFamily as livePadFamily } from '../padGlyphs.js'; // PADPLUS1
-import { openPlusPadBinds, plusPadLegend } from '../plus/plusPadBinds.js'; // PADPLUS10: the controller bindings window
+import { overlayAction, bindings, eventMeans } from '../input.js';   // U51: Escape, through the shared table; UXB1-F: the live keys a tile names; DISC28-A: the pause action's own key
+import { bindings as liveBindings } from '../input.js';   // PADPLUS1: the store the layout reset writes
+import { resetPlusPadLayout } from '../plus/plusPad.js';   // PADPLUS1
+import { hdGlyphSvg, hdGlyphName } from '../padGlyphsHD.js';   // PADPLUS1: the layout card's glyphs
+import { padFamily as livePadFamily } from '../padGlyphs.js';   // PADPLUS1
+import { openPlusPadBinds, plusPadLegend } from '../plus/plusPadBinds.js';   // PADPLUS10: the controller bindings window
 import { plusBindsOpen, resetPlusDpad } from '../plus/plusPad.js';
-import { peerBindBusy } from '../peerMenuBindCard.js'; // PEERMENU1   // PADPLUS10: the window over this one answers its own keys
-import { modKeyRows } from '../../systems/controlsConfig.js'; // UXB1-F: a mod's keys, read-only on its tile
-import {
-  MOD_SETTINGS,
-  modSetting,
-  setModSetting,
-  onlineModSetting,
-  isIntKey,
-  isFloatKey,
-  isChoiceKey,
-  isTextKey,
-  isTupleKey,
-} from '../../systems/modSettings.js'; // REALM P0.2: onlineModSetting, the room's value for a key it owns (whole mods included)
-import { keyCodeForDomCode, KEYCODE_NONE } from '../../systems/keyCodes.js'; // HT1: a TextKey's capture spells the key as Unity would
-import {
-  isOnlinePage,
-  onlineForcedPref,
-  onlineForcedModSetting,
-  onlineForcedSetting,
-  onlineWholeModKey,
-  ONLINE_ROOM_MOD_KEYS,
-} from '../../systems/online/onlineLane.js'; // OL1: online is the enhanced lane, whole - a forced switch is shown locked   // ROADS 24; DS1: the integer keys; UL1: the choice keys
-import { onlineSyncPlan, applyOnlineSync, lastOnlineSync, undoOnlineSync } from '../../systems/online/onlineSync.js'; // UXB1-E: the room's rules, copied home
-import { CREDITS, translationCredits } from '../credits.js'; // CR1: who made what the port carries
-import { SUPPORT_ASKS } from '../supportAsks.js'; // SUPPORT1: the project's asks - the website's corner and this door's
-import {
-  t,
-  tIn,
-  currentLocale,
-  localeInfo,
-  localeTable,
-  availableLocales,
-  BASE_LOCALE,
-  localizedText,
-  formatText,
-} from '../../systems/textManager.js'; // L10N1b: the port's own strings, the language row and the first-run offer; L10N3d: DFU's Internal_Strings
-import { localeForBrowser, catalogLocale } from '../../systems/localeCatalog.js'; // L10N1b
+import { peerBindBusy } from '../peerMenuBindCard.js';   // PEERMENU1   // PADPLUS10: the window over this one answers its own keys
+import { modKeyRows } from '../../systems/controlsConfig.js';   // UXB1-F: a mod's keys, read-only on its tile
+import { MOD_SETTINGS, modSetting, setModSetting, onlineModSetting, isIntKey, isFloatKey, isChoiceKey, isTextKey, isTupleKey } from '../../systems/modSettings.js';   // REALM P0.2: onlineModSetting, the room's value for a key it owns (whole mods included)
+import { keyCodeForDomCode, KEYCODE_NONE } from '../../systems/keyCodes.js';   // HT1: a TextKey's capture spells the key as Unity would
+import { isOnlinePage, onlineForcedPref, onlineForcedModSetting, onlineForcedSetting, onlineWholeModKey, ONLINE_ROOM_MOD_KEYS } from '../../systems/online/onlineLane.js';   // OL1: online is the enhanced lane, whole - a forced switch is shown locked   // ROADS 24; DS1: the integer keys; UL1: the choice keys
+import { onlineSyncPlan, applyOnlineSync, lastOnlineSync, undoOnlineSync } from '../../systems/online/onlineSync.js';   // UXB1-E: the room's rules, copied home
+import { CREDITS, translationCredits } from '../credits.js';   // CR1: who made what the port carries
+import { SUPPORT_ASKS } from '../supportAsks.js';   // SUPPORT1: the project's asks - the website's corner and this door's
+import { t, tIn, currentLocale, localeInfo, localeTable, availableLocales, BASE_LOCALE, localizedText, formatText } from '../../systems/textManager.js';   // L10N1b: the port's own strings, the language row and the first-run offer; L10N3d: DFU's Internal_Strings
+import { localeForBrowser, catalogLocale } from '../../systems/localeCatalog.js';   // L10N1b
 // FIX-F: the
 // rebinding pane. The enhanced skin is the DEFAULT and had no door to
 // the key bindings at all - the only one in the port opens off the
 // CLASSIC pause window. The pane is its own module because it owns a
 // document-level capture listener and a staged copy of both binding
 // dicts, neither of which belongs in a screen that repaints itself.
-import {
-  paneControls,
-  discardControlsStaging,
-  captureArmed,
-  controlsPromptOpen,
-  dismissControlsPrompt,
-} from './enhancedControls.js';
+import { paneControls, discardControlsStaging, captureArmed, controlsPromptOpen, dismissControlsPrompt } from './enhancedControls.js';
 // FT0: the features home - one list over the three stores, filtered by kind
 import { OVERHAUL_PANELS, currentOption } from '../../systems/overhauls.js';
-import { setVeAddon } from '../../systems/vanillaEnhanced/vanillaEnhanced.js'; // VE4: an add-on switched from the Texture Overhaul card
-import { installVanillaEnhancedPack } from '../../systems/vanillaEnhanced/vanillaEnhancedPack.js'; // VE4: the shipped mods listed before any host boots
-import { PLUS_THEMES } from './enhancedFrame.js'; // PLUS2: Enhanced Plus's colours
+import { setVeAddon } from '../../systems/vanillaEnhanced/vanillaEnhanced.js';   // VE4: an add-on switched from the Texture Overhaul card
+import { installVanillaEnhancedPack } from '../../systems/vanillaEnhanced/vanillaEnhancedPack.js';   // VE4: the shipped mods listed before any host boots
+import { PLUS_THEMES } from './enhancedFrame.js';   // PLUS2: Enhanced Plus's colours
 import { plusTheme, setPlusTheme } from './enhancedPlusStyle.js';
-import { plusCursorOn, setPlusCursor } from '../plus/plusCursor.js'; // OVH1: the three looks
-import { CHAT_LANGS } from '../../net/wire.js'; // CHAT-LANG: the language channels, for the Chat rows
-import {
-  TEXT_FONTS,
-  textFont,
-  textFontSystem,
-  setTextFont,
-  setTextFontSystem,
-  cleanFamily,
-  canListFonts,
-  installedFamilies,
-  fontMatches,
-} from '../textFont.js'; // TEXT-FONT: the words' face
-import {
-  GRIMOIRE_PAGES,
-  GRIMOIRE_BACKDROPS,
-  GRIMOIRE_VITALS,
-  GRIMOIRE_SPELLBOOKS,
-  GRIMOIRE_DIALS,
-  grimoirePages,
-  grimoireBackdrop,
-  grimoireVitals,
-  grimoireSpellbook,
-  grimoireDial,
-  setGrimoirePages,
-  setGrimoireBackdrop,
-  setGrimoireVitals,
-  setGrimoireSpellbook,
-  setGrimoireDial,
-} from '../grimoireDress.js'; // GRIM1: DFO Grimoire's own rows; GRIM3: and its spellbook
-import { UI_PACKS, packUrl } from '../../systems/uiPack.js'; // OVH2: a pack's own picture on its card
-import {
-  FEATURES,
-  KINDS,
-  KIND_ORDER,
-  featureForControl,
-  resolveControl,
-  modModules,
-  modDials,
-  featureSearchText,
-} from '../../systems/features.js'; // FT14: each mod's curated keys (ORG2: the map places the rows, ui/settings/settingsMap.js)
-import '../../world/landView.js'; // RF4: the land-view lane registers itself with the registry
-import '../../world/outdoors.js'; // RF4: the outdoors lane too
-import '../../systems/featureLanes.js'; // FT18: the wind, the quick slots and the blood
+import { plusCursorOn, setPlusCursor } from '../plus/plusCursor.js';   // OVH1: the three looks
+import { CHAT_LANGS } from '../../net/wire.js';   // CHAT-LANG: the language channels, for the Chat rows
+import { TEXT_FONTS, textFont, textFontSystem, setTextFont, setTextFontSystem, cleanFamily, canListFonts, installedFamilies, fontMatches } from '../textFont.js';   // TEXT-FONT: the words' face
+import { GRIMOIRE_PAGES, GRIMOIRE_BACKDROPS, GRIMOIRE_VITALS, GRIMOIRE_SPELLBOOKS, GRIMOIRE_DIALS, grimoirePages, grimoireBackdrop, grimoireVitals, grimoireSpellbook, grimoireDial, setGrimoirePages, setGrimoireBackdrop, setGrimoireVitals, setGrimoireSpellbook, setGrimoireDial } from '../grimoireDress.js';   // GRIM1: DFO Grimoire's own rows; GRIM3: and its spellbook
+import { UI_PACKS, packUrl } from '../../systems/uiPack.js';   // OVH2: a pack's own picture on its card
+import { FEATURES, KINDS, KIND_ORDER, featureForControl, resolveControl, modModules, modDials, featureSearchText } from '../../systems/features.js';   // FT14: each mod's curated keys (ORG2: the map places the rows, ui/settings/settingsMap.js)
+import '../../world/landView.js';   // RF4: the land-view lane registers itself with the registry
+import '../../world/outdoors.js';   // RF4: the outdoors lane too
+import '../../systems/featureLanes.js';   // FT18: the wind, the quick slots and the blood
 // ACC1e: the account card at the head of the Online pane - the flow
 // thinks (ui/accountFlow.js, node-drivable), this draws it
 import { AccountFlow } from '../accountFlow.js';
 import { accountCard } from './enhancedAccount.js';
-import { skinCard } from '../skinCard.js'; // DISC23-B2: the skin, on the profile
-import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js'; // TILE1, and ACC2c's card-shaped save
+import { skinCard } from '../skinCard.js';   // DISC23-B2: the skin, on the profile
+import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js';   // TILE1, and ACC2c's card-shaped save
 import { loadFace } from '../facePortrait.js';
-import { timersMark, timersWindow, anchorBeside } from './enhancedTimers.js'; // TIMERS1: the hourglass beside the profile mark, and its window
-import { postMark, postWindow, watchPostMark, anchorPost } from './enhancedPost.js'; // SERVER-POST: the mailbox beside the hourglass, and its window
-import { seasonMark, seasonWindow, seasonSource, anchorSeason } from './enhancedSeason.js'; // SEASON-BOOK: the laurel beside the envelope, and its window
-import { profileBadge, portraitSave, liveCharacter, characterLine } from '../profileBadge.js'; // PROFILE1: the mark is the last character's portrait   // TILE1: the character's face, the one home chargen also reads
-import { profileIconNode } from '../profileIcons.js'; // WITCH1: a profile icon worn, in the mark's portrait
-import { ownIcon } from '../../systems/ownGlyphs.js'; // WITCH1: the icon the stored session says this device's player wears
-import {
-  cloudIo,
-  cloudList,
-  pushSlot,
-  pullSlot,
-  removeCloudSlot,
-  cloudOnly,
-  slotKeyOf,
-  cloudRefusalText,
-} from '../../systems/cloudSaves.js'; // ACC2: the backup a tile can offer, AUDIT-312 F1's delete, and ACC2c's download of a save that is only up there
+import { timersMark, timersWindow, anchorBeside } from './enhancedTimers.js';   // TIMERS1: the hourglass beside the profile mark, and its window
+import { postMark, postWindow, watchPostMark, anchorPost } from './enhancedPost.js';   // SERVER-POST: the mailbox beside the hourglass, and its window
+import { seasonMark, seasonWindow, seasonSource, anchorSeason } from './enhancedSeason.js';   // SEASON-BOOK: the laurel beside the envelope, and its window
+import { profileBadge, portraitSave, liveCharacter, characterLine } from '../profileBadge.js';   // PROFILE1: the mark is the last character's portrait   // TILE1: the character's face, the one home chargen also reads
+import { profileIconNode } from '../profileIcons.js';   // WITCH1: a profile icon worn, in the mark's portrait
+import { ownIcon } from '../../systems/ownGlyphs.js';   // WITCH1: the icon the stored session says this device's player wears
+import { cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, cloudOnly, slotKeyOf, cloudRefusalText } from '../../systems/cloudSaves.js';   // ACC2: the backup a tile can offer, AUDIT-312 F1's delete, and ACC2c's download of a save that is only up there
 import { serviceBase, storedSession } from '../../net/accountClient.js';
-import {
-  isBountyQuestId,
-  abandonBountyQuest,
-  shareBountyQuest,
-  bountyQuestShareable,
-} from '../../systems/bounty/bountyJournal.js'; // BOUNTY1: a bounty in the journal - its Abandon and its Share
-import { isHuntQuestId, abandonHuntQuest } from '../../systems/huntJournal.js'; // RVN7c: a revenant's hunt in the journal - its Abandon
-import { liveBundles, canEndBundle, endBundle } from '../../systems/mysticism.js'; // BUFF-END: the Stats page's Effects - the ONE bundle walk, and which the player may end
-import { maxRoundsRemaining } from '../hud/hudActiveSpells.js'; // BUFF-END: a bundle's rounds, as the HUD reads them
+import { isBountyQuestId, abandonBountyQuest, shareBountyQuest, bountyQuestShareable } from '../../systems/bounty/bountyJournal.js';   // BOUNTY1: a bounty in the journal - its Abandon and its Share
+import { isHuntQuestId, abandonHuntQuest } from '../../systems/huntJournal.js';   // RVN7c: a revenant's hunt in the journal - its Abandon
+import { liveBundles, canEndBundle, endBundle } from '../../systems/mysticism.js';   // BUFF-END: the Stats page's Effects - the ONE bundle walk, and which the player may end
+import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a bundle's rounds, as the HUD reads them
 
 // ── THE RAIL ─────────────────────────────────────────────────────
 // Six destinations. Mac's call: the menus get set up now even where
@@ -491,18 +271,7 @@ import { maxRoundsRemaining } from '../hud/hudActiveSpells.js'; // BUFF-END: a b
 // Mod Authored, DFU Classic) as a coloured label and a chip row filters
 // by it. Empty at FT0; the Enhanced category of Settings and the Mods
 // section keep their rows until each one's slice moves it here
-const SECTIONS_BOOT = [
-  'Online',
-  'Continue',
-  'New Game',
-  'Load Game',
-  'Test Room',
-  'Settings',
-  'Overhauls',
-  'Tutorials',
-  'Screenshots',
-  'About',
-]; // UI-CALM: Online first, Offline's four under it (drawDoors, the rail's own word)   // TUT1: the tutorials, to read before the game (ui/tutorialsPane.js)   // ORG2: Features is Settings' tabs now   // LOAD1: the gallery (ui/shotsPane.js)   // OVH1: the three looks   // FT16: Controls is a Settings CATEGORY, not a rail door   // FT14: Mods is gone - every mod is a tile on Features, and what the pane carried besides stands under them   // ONLINE1: the shared world's door
+const SECTIONS_BOOT = ['Online', 'Continue', 'New Game', 'Load Game', 'Test Room', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About'];   // UI-CALM: Online first, Offline's four under it (drawDoors, the rail's own word)   // TUT1: the tutorials, to read before the game (ui/tutorialsPane.js)   // ORG2: Features is Settings' tabs now   // LOAD1: the gallery (ui/shotsPane.js)   // OVH1: the three looks   // FT16: Controls is a Settings CATEGORY, not a rail door   // FT14: Mods is gone - every mod is a tile on Features, and what the pane carried besides stands under them   // ONLINE1: the shared world's door
 // FD1 (Mac, 2026-09-11): the CLASSIC skin opens on this same door. Its
 // three game doors collapse into BEGIN, which leads into the classic
 // start sequence - the title, the film, Daggerfall's own start window -
@@ -510,7 +279,7 @@ const SECTIONS_BOOT = [
 // the one it never did: settings before the game, without a wizard.
 // SO1: ENHANCED left the rail for a category of Settings (settingsMap).
 // ONLINE1: ONLINE joins it - the same pane, the same save brought in.
-const SECTIONS_CLASSIC = ['Begin', 'Online', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About']; // TUT1   // ORG2   // LOAD1: the key keeps its shots under either skin   // OVH1   // FT14; FT16: Controls is a Settings category
+const SECTIONS_CLASSIC = ['Begin', 'Online', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About'];   // TUT1   // ORG2   // LOAD1: the key keeps its shots under either skin   // OVH1   // FT14; FT16: Controls is a Settings category
 
 // U51: the same rail with the boot-only questions swapped for the
 // in-game ones. Continue and New Game answer "which game", which is
@@ -523,17 +292,7 @@ const SECTIONS_CLASSIC = ['Begin', 'Online', 'Settings', 'Overhauls', 'Tutorials
 // mode's doors), and the pane says so in words. A rail that drops the
 // row instead teaches the player the door was never there - the same
 // argument the Mods section is built on.
-const SECTIONS_PAUSE = [
-  'Resume',
-  'Save Game',
-  'Load Game',
-  'Settings',
-  'Overhauls',
-  'Tutorials',
-  'Screenshots',
-  'About',
-  'Exit',
-]; // TUT1: a landing's shell (the window's own door is its Tutorials tab)   // ORG2   // LOAD1   // OVH1   // FT14; FT16: Controls is a Settings category
+const SECTIONS_PAUSE = ['Resume', 'Save Game', 'Load Game', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About', 'Exit'];   // TUT1: a landing's shell (the window's own door is its Tutorials tab)   // ORG2   // LOAD1   // OVH1   // FT14; FT16: Controls is a Settings category
 
 const idOf = (label) => label.toLowerCase().split(' ')[0];
 
@@ -576,7 +335,7 @@ const RAIL_ACTS = Object.freeze({ resume: 'resume' });
 let section = 'continue';
 let category = CATEGORIES[0].id;
 let pickedKey = null;
-let sheetOpen = false; // the help pane is a sheet on a phone
+let sheetOpen = false;   // the help pane is a sheet on a phone
 let app = null;
 let onAction = () => {};
 // U51: 'boot' (the front door) or 'pause' (Escape, over a running
@@ -591,9 +350,7 @@ let hooks = {};
 let homeLevel = 'top';
 /** AUDIT UICALM-FIRM1 L3 L1: the keyboard's place after a level changes - the door named, else the level's first. */
 function focusDoor(id) {
-  globalThis.requestAnimationFrame?.(() =>
-    (app?.querySelector?.(`.px-menu .door-${id}`) ?? app?.querySelector?.('.px-menu .doorbtn'))?.focus?.(),
-  );
+  globalThis.requestAnimationFrame?.(() => (app?.querySelector?.(`.px-menu .door-${id}`) ?? app?.querySelector?.('.px-menu .doorbtn'))?.focus?.());
 }
 let keyHandler = null;
 // ACC1f: whether the account window is
@@ -602,25 +359,15 @@ let accountOpen = false;
 /** TIMERS1: the timers window over the pause face, and its live view (the tick it must stop). */
 let timersOpen = false;
 let timersView = null;
-let timersAnchor = null; // AUDIT TIMERS1 UI-3: the hourglass's re-placing, disconnected with the face it stands in
-let timersFocusBack = false; // AUDIT TIMERS1 UI-5: a closed window hands the focus back to the hourglass
-let timersFocusIn = false; // AUDIT SEASON-BOOK U3: the window just opened - the focus goes into it, once
-const stopTimers = () => {
-  timersView?.stop();
-  timersView = null;
-  timersAnchor?.();
-  timersAnchor = null;
-};
+let timersAnchor = null;      // AUDIT TIMERS1 UI-3: the hourglass's re-placing, disconnected with the face it stands in
+let timersFocusBack = false;  // AUDIT TIMERS1 UI-5: a closed window hands the focus back to the hourglass
+let timersFocusIn = false;    // AUDIT SEASON-BOOK U3: the window just opened - the focus goes into it, once
+const stopTimers = () => { timersView?.stop(); timersView = null; timersAnchor?.(); timersAnchor = null; };
 /** A season row's door is a handoff, as the sheet's doors are - the pause face down first, the door's window in the slot
  *  it frees, and a door that opened nothing a resume. */
 // AUDIT GROWTH LANE2-3: a Growth face under it asked first (GROWTH5) - the timers window shut so the ask is seen
 const timersDoor = (fn) => {
-  if (pauseTab === 'growth' && growthAsks()) {
-    timersOpen = false;
-    timersFocusBack = true;
-    render();
-    return;
-  }
+  if (pauseTab === 'growth' && growthAsks()) { timersOpen = false; timersFocusBack = true; render(); return; }
   handoff(fn, (r) => !!r);
 };
 /** AUDIT SEASON-BOOK S3: A DOOR HANDED THE SLOT - the pause face down, the door asked, and a door that opened nothing
@@ -629,7 +376,7 @@ const timersDoor = (fn) => {
  *  27h A4's law, at every door that leaves the face: the sheet's, the hourglass's, the Fleet's, the Captain's, a Growth
  *  page's, the season's). */
 function handoff(fn, opened = (r) => r !== false) {
-  const act = onAction; // AUDIT SEASON-BOOK S3: the handler as it stood - the handoff can unmount the face, which empties it
+  const act = onAction;   // AUDIT SEASON-BOOK S3: the handler as it stood - the handoff can unmount the face, which empties it
   onAction('handoff');
   const r = fn();
   if (!opened(r)) act('resume');
@@ -640,82 +387,40 @@ let postOpen = false;
 let postView = null;
 let postWatch = null;
 let postAnchor = null;
-let postFocusBack = false; // a closed window hands the focus back to the envelope, as the hourglass's does
-let postKeep = {}; // AUDIT SERVER-POST: what the window shows (the piece open, the line said) - a rebuild of the face keeps it
-const stopPost = () => {
-  postView?.stop();
-  postView = null;
-  postWatch?.();
-  postWatch = null;
-  postAnchor?.();
-  postAnchor = null;
-};
+let postFocusBack = false;   // a closed window hands the focus back to the envelope, as the hourglass's does
+let postKeep = {};   // AUDIT SERVER-POST: what the window shows (the piece open, the line said) - a rebuild of the face keeps it
+const stopPost = () => { postView?.stop(); postView = null; postWatch?.(); postWatch = null; postAnchor?.(); postAnchor = null; };
 /** SERVER-POST: THE ENVELOPE on the pause face - online, where the host hands its box
  *  (hooks.post), left of the hourglass `glass` (or the profile mark); its count follows the box while the face stands
  *  (the face draws itself only when asked). Answers the envelope, or null where there is no box. */
 function postEnvelope(home, glass) {
   if (!hooks.post?.()) return null;
-  const envelope = postMark(document, {
-    open: postOpen,
-    count: hooks.post()?.waiting ?? 0,
-    onOpen: () => {
-      postOpen = true;
-      render();
-    },
-  });
+  const envelope = postMark(document, { open: postOpen, count: hooks.post()?.waiting ?? 0, onOpen: () => { postOpen = true; render(); } });
   home.append(envelope);
   postAnchor = anchorPost(envelope, glass, home.querySelector?.('.px-profile'), home);
   postWatch = watchPostMark(envelope, () => hooks.post?.() ?? null);
-  if (postFocusBack && !postOpen) {
-    postFocusBack = false;
-    globalThis.requestAnimationFrame?.(() => envelope.focus?.());
-  }
+  if (postFocusBack && !postOpen) { postFocusBack = false; globalThis.requestAnimationFrame?.(() => envelope.focus?.()); }
   return envelope;
 }
 /** SEASON-BOOK: the season window over the pause face, its live view and the laurel's placing - the hourglass's way. */
 let seasonOpen = false;
 let seasonView = null;
 let seasonAnchor = null;
-let seasonFocusBack = false; // a closed window hands the focus back to the laurel
-let seasonFocusIn = false; // AUDIT SEASON-BOOK U3: the window just opened - the focus goes into it, once
-const stopSeason = () => {
-  seasonView?.stop();
-  seasonView = null;
-  seasonAnchor?.();
-  seasonAnchor = null;
-};
-const closeSeason = () => {
-  seasonOpen = false;
-  seasonFocusBack = true;
-  render();
-};
+let seasonFocusBack = false;   // a closed window hands the focus back to the laurel
+let seasonFocusIn = false;     // AUDIT SEASON-BOOK U3: the window just opened - the focus goes into it, once
+const stopSeason = () => { seasonView?.stop(); seasonView = null; seasonAnchor?.(); seasonAnchor = null; };
+const closeSeason = () => { seasonOpen = false; seasonFocusBack = true; render(); };
 /** A season row's door - the hourglass's handoff (timersDoor), the season window shut first where a Growth face under it
  *  asks (AUDIT GROWTH LANE2-3's law: the ask seen, never a press that does nothing). */
-const seasonDoor = (fn) => {
-  if (pauseTab === 'growth' && growthAsks()) {
-    closeSeason();
-    return;
-  }
-  timersDoor(fn);
-};
+const seasonDoor = (fn) => { if (pauseTab === 'growth' && growthAsks()) { closeSeason(); return; } timersDoor(fn); };
 /** SEASON-BOOK: THE LAUREL on the pause face - online, where the hourglass stands (its clock is
  *  the hourglass's), at the end of the row of marks `chain`. Answers the laurel, or null with no clock. */
 function seasonLaurel(home, chain) {
   if (!hooks.timers?.()) return null;
-  const laurel = seasonMark(document, {
-    open: seasonOpen,
-    onOpen: () => {
-      seasonOpen = true;
-      seasonFocusIn = true;
-      render();
-    },
-  });
+  const laurel = seasonMark(document, { open: seasonOpen, onOpen: () => { seasonOpen = true; seasonFocusIn = true; render(); } });
   home.append(laurel);
   seasonAnchor = anchorSeason(laurel, chain, home.querySelector?.('.px-profile'), home);
-  if (seasonFocusBack && !seasonOpen) {
-    seasonFocusBack = false;
-    globalThis.requestAnimationFrame?.(() => laurel.focus?.());
-  }
+  if (seasonFocusBack && !seasonOpen) { seasonFocusBack = false; globalThis.requestAnimationFrame?.(() => laurel.focus?.()); }
   return laurel;
 }
 let accountOffered = false;
@@ -728,26 +433,26 @@ let accountOffered = false;
 // line at all, which is also what a player with no account sees.
 let cloudCards = null;
 let cloudAsked = false;
-let cloudBusy = null; // the slot being pushed or removed, as slotKeyOf writes it
-let cloudWhy = null; // { slot, key, error, act } - the last refusal WORD, under the slot it was about, and the ACT it refused (the pre-merge audit 0927b B1) - a restore's under its one local copy
-let cloudArm = null; // the slot whose Delete is armed - a destructive act asks twice (AUDIT-312 F1); FIELD 2026-09-27: or `restore|key` / `push|key`, a newer backup's two acts - by the LOCAL key, since each replaces one local copy (0927b B5)
+let cloudBusy = null;    // the slot being pushed or removed, as slotKeyOf writes it
+let cloudWhy = null;     // { slot, key, error, act } - the last refusal WORD, under the slot it was about, and the ACT it refused (the pre-merge audit 0927b B1) - a restore's under its one local copy
+let cloudArm = null;     // the slot whose Delete is armed - a destructive act asks twice (AUDIT-312 F1); FIELD 2026-09-27: or `restore|key` / `push|key`, a newer backup's two acts - by the LOCAL key, since each replaces one local copy (0927b B5)
 let lockHandler = null;
-let resizeHandler = null; // PX1: the home ground's redraw-on-resize
-let textKeyCapture = null; // DISC28-A: a mod TextKey row waiting for its key (HT1) - the back stack stands down; cleared by the capture and by unmount
-let groundTimer = null; // PX1b: the home sky's 8fps clock - cleared by every rebuild and by unmount
-let questTimer = null; // QT-LIVE1: the journal's once-a-second timer redraw - the same two owners
-let pauseTab = 'system'; // PX3: which tab the pause window shows - System lands on Resume/Save
-let questSel = null; // PX4: the journal's selected row - 'a:<uid>' | 'f:<index>' | null = first active
-let bountyAbandonArmed = null; // BOUNTY1: the bounty whose Abandon was pressed once - the second press gives it up
-let journalCleanArmed = null; // JOURNAL-CLEAN: 'f:<index>' (Remove) | 'clear' (Clear archive) pressed once - the second press acts
-let questShowHidden = false; // JOURNAL-CLEAN: the rail's "Show hidden" - whether the hidden quests are drawn, in their own section
-let questReveal = false; // AUDIT QUESTLINES UI-14: a row was just pressed - its page is brought into view on a phone
-let questShelfSaid = null; // QUEST-SHELF: the last Abandon / Reclaim's words, said under the quest until the next press
+let resizeHandler = null;   // PX1: the home ground's redraw-on-resize
+let textKeyCapture = null;   // DISC28-A: a mod TextKey row waiting for its key (HT1) - the back stack stands down; cleared by the capture and by unmount
+let groundTimer = null;     // PX1b: the home sky's 8fps clock - cleared by every rebuild and by unmount
+let questTimer = null;      // QT-LIVE1: the journal's once-a-second timer redraw - the same two owners
+let pauseTab = 'system';    // PX3: which tab the pause window shows - System lands on Resume/Save
+let questSel = null;        // PX4: the journal's selected row - 'a:<uid>' | 'f:<index>' | null = first active
+let bountyAbandonArmed = null;   // BOUNTY1: the bounty whose Abandon was pressed once - the second press gives it up
+let journalCleanArmed = null;   // JOURNAL-CLEAN: 'f:<index>' (Remove) | 'clear' (Clear archive) pressed once - the second press acts
+let questShowHidden = false;    // JOURNAL-CLEAN: the rail's "Show hidden" - whether the hidden quests are drawn, in their own section
+let questReveal = false;   // AUDIT QUESTLINES UI-14: a row was just pressed - its page is brought into view on a phone
+let questShelfSaid = null;      // QUEST-SHELF: the last Abandon / Reclaim's words, said under the quest until the next press
 let statsSec = 'character'; // PX6: the Stats page's rail - character | attributes | skills | standing
-let famSec = 'tree'; // LEGACY3: the Family page's rail - tree | house | hall | guide
-let holdSec = 'stable'; // HOLDINGS: the Holdings page's rail - stable | fleet | companions | revenants | stores | collections
+let famSec = 'tree';       // LEGACY3: the Family page's rail - tree | house | hall | guide
+let holdSec = 'stable';     // HOLDINGS: the Holdings page's rail - stable | fleet | companions | revenants | stores | collections
 let statsAllSkills = false; // PX6: the Miscellaneous disclosure, the sheet's own gesture
-let sysSec = 'save'; // PX7: the System page's rail - which pane fills the detail
+let sysSec = 'save';        // PX7: the System page's rail - which pane fills the detail
 
 const el = (t, cls, txt) => {
   const n = document.createElement(t);
@@ -779,56 +484,27 @@ let _saveNameDraft = '';
  *  of the world, at the half hour or a quarter past where a clock is set off the hour.
  *  Before the switch the sky is still the event clock's, a day every two hours, and the sentence says when it turns.
  *  test/systems/quest/time4_words.test.js holds the numbers to the law. */
-export function skyDayWords(
-  nowMs = Date.now(),
-  localTime = (ms) => new Date(ms).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
-  localMinute = (ms) => {
-    const d = new Date(ms);
-    return d.getMinutes() + d.getSeconds() / 60;
-  },
-) {
+export function skyDayWords(nowMs = Date.now(), localTime = (ms) => new Date(ms).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
+  localMinute = (ms) => { const d = new Date(ms); return d.getMinutes() + d.getSeconds() / 60; }) {
   const turn = SKY_SEGMENTS[SKY_SEGMENTS.length - 1].fromMs;
   const midnight = wallMsForSkyMinutes(Math.ceil(skyClassicMinutes(turn) / 1440) * 1440);
   const m0 = ((localMinute(midnight) % 60) + 60) % 60;
-  const at = (m) => {
-    const v = ((m % 60) + 60) % 60;
-    return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`;
-  };
+  const at = (m) => { const v = ((m % 60) + 60) % 60; return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`; };
   // L10N4: one sentence, one pattern - the midnight's two shapes are a select inside it, never a glued fragment
   const day = { onHour: m0 === 0 ? 'yes' : 'no', midnight: at(m0), dusk: at(m0 + 45) };
   return nowMs >= turn
-    ? t(
-        'menu.online.skyDay',
-        'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.',
-        day,
-      )
-    : t(
-        'menu.online.skyDayUntil',
-        'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.',
-        { ...day, turn: localTime(turn) },
-      );
+    ? t('menu.online.skyDay', 'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', day)
+    : t('menu.online.skyDayUntil', 'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', { ...day, turn: localTime(turn) });
 }
 
-export function takePickedSaveKey() {
-  const k = _pickedSaveKey;
-  _pickedSaveKey = null;
-  return k;
-}
+export function takePickedSaveKey() { const k = _pickedSaveKey; _pickedSaveKey = null; return k; }
 /** REALM P1.3: the realm character the Online door's Play pressed - its id rides the boot (main.js ?realm). */
 let _pickedRealmId = null;
-export function takePickedRealmId() {
-  const id = _pickedRealmId;
-  _pickedRealmId = null;
-  return id;
-}
+export function takePickedRealmId() { const id = _pickedRealmId; _pickedRealmId = null; return id; }
 /** HOUSE-WAITS (FIELD BUGS 2026-10-09f): the member the Online page's waiting house was answered with - `{ personId,
  *  region, loc }` - taken once by the boot (main.js), which births them online through the world host's own door. */
 let _pickedLegacyBirth = null;
-export function takePickedLegacyBirth() {
-  const b = _pickedLegacyBirth;
-  _pickedLegacyBirth = null;
-  return b;
-}
+export function takePickedLegacyBirth() { const b = _pickedLegacyBirth; _pickedLegacyBirth = null; return b; }
 /** REALM P1.3: the realm's characters as the service listed them this visit (null: not asked yet), its bound, what the
  *  last act said (a refusal or a copy's word) and whether an act is running. Per VISIT, as the cloud's. */
 let realmRows = null;
@@ -839,22 +515,18 @@ let realmBusy = false;
 /** HOUSE-WAITS: the account's lines as this visit read them (their ids, once pulled into the device's store), or null. */
 let realmLineIds = null;
 let realmLinesAsked = false;
-export function takePickedSaveName() {
-  const n = _pickedSaveName;
-  _pickedSaveName = null;
-  return n;
-}
+export function takePickedSaveName() { const n = _pickedSaveName; _pickedSaveName = null; return n; }
 
 /** One slot as the cards draw it: the character's line and numbers, and the slot's own name. */
 function saveOf(entry) {
   const snap = entry.snap;
-  const date = Number.isFinite(snap.classicMinutes) ? dateFromClassicMinutes(snap.classicMinutes) : null; // AUDIT LIVED1 E (S5/U4's card; AUDIT LIVED1b T13 corrected the cite): a card is a LOCAL slot's, and a local slot plays offline on its one clock - the date it loads at, as the classic window and the cloud cards say
+  const date = Number.isFinite(snap.classicMinutes) ? dateFromClassicMinutes(snap.classicMinutes) : null;   // AUDIT LIVED1 E (S5/U4's card; AUDIT LIVED1b T13 corrected the cite): a card is a LOCAL slot's, and a local slot plays offline on its one clock - the date it loads at, as the classic window and the cloud cards say
   return {
     key: entry.key,
     saveName: entry.info?.saveName ?? QUICK_SAVE_NAME,
     characterName: entry.info?.characterName ?? snap.name ?? '',
-    characterId: entry.info?.characterId ?? null, // CHARID1
-    dateAndTime: entry.info?.dateAndTime ?? null, // FIELD 2026-09-27: when this device saved the slot - a later save in the backup is told from it
+    characterId: entry.info?.characterId ?? null,   // CHARID1
+    dateAndTime: entry.info?.dateAndTime ?? null,   // FIELD 2026-09-27: when this device saved the slot - a later save in the backup is told from it
     name: snap.name || t('menu.save.unnamed', 'Unnamed'),
     // TILE1: the identity the PORTRAIT needs, and it was already in the
     // envelope - S3c/U9 put `race`, `gender` and `faceIndex` on the
@@ -865,23 +537,18 @@ function saveOf(entry) {
     faceIndex: Number.isInteger(snap.faceIndex) ? snap.faceIndex : 0,
     career: snap.career?.name ?? null,
     level: snap.level ?? null,
-    health: snap.health,
-    maxHealth: snap.maxHealth,
+    health: snap.health, maxHealth: snap.maxHealth,
     gold: snap.goldPieces ?? null,
     when: date ? dateString(date) : null,
     hour: date ? `${String(date.hour).padStart(2, '0')}:${String(date.minute).padStart(2, '0')}` : null,
     chargenDone: snap.chargenDone !== false,
-    testRoom: snap.testRoom === true, // AUDIT SET D4: a Test Room character, which plays offline
+    testRoom: snap.testRoom === true,   // AUDIT SET D4: a Test Room character, which plays offline
   };
 }
 
 /** SLOTS1: every restorable slot, most recent first (systems/save/saveSlots.js restorableSaves). */
 function savedGames() {
-  try {
-    return restorableSaves().map(saveOf);
-  } catch {
-    return [];
-  }
+  try { return restorableSaves().map(saveOf); } catch { return []; }
 }
 
 /** AUDIT SLOTS2 S1: THE DOOR'S PORTRAIT, read only as far as its answer -
@@ -893,9 +560,7 @@ export function newestPortraitSave(storage) {
   try {
     const hit = firstRestorable((entry) => portraitSave([saveOf(entry)]) !== null, storage);
     return hit ? saveOf(hit) : null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 // ═══ TILE1/TILE2: THE TILES ══════════════════════════════════════
@@ -920,14 +585,12 @@ function ensureCloud() {
   cloudAsked = true;
   const io = cloudIo({ fetch: (...a) => globalThis.fetch(...a), storage: appStorage() });
   if (!io) return;
-  cloudList(io)
-    .then((r) => {
-      if (!r.ok) return;
-      cloudCards = r.saves;
-      if (cloudWhy?.error === 'stale') cloudWhy = null; // 0927b: the list it said had changed is here - the line reads it
-      render();
-    })
-    .catch(() => {});
+  cloudList(io).then((r) => {
+    if (!r.ok) return;
+    cloudCards = r.saves;
+    if (cloudWhy?.error === 'stale') cloudWhy = null;   // 0927b: the list it said had changed is here - the line reads it
+    render();
+  }).catch(() => {});
 }
 
 /** The cloud line for one slot, or the state that draws none.
@@ -955,29 +618,23 @@ function cloudFor(save, { restore = false } = {}) {
     // the same slot keeps its own line rather than a one-press Try again that restores over it
     error: cloudWhy?.slot === slot && (cloudWhy.act !== 'restore' || cloudWhy.key === save.key) ? cloudWhy.error : null,
     nowS: Math.floor(Date.now() / 1000),
-    localTime: save.dateAndTime, // FIELD 2026-09-27: a later save of this slot in the backup is `newer`
+    localTime: save.dateAndTime,   // FIELD 2026-09-27: a later save of this slot in the backup is `newer`
   });
   const why = state.error ? cloudRefusalText(state.error) : null;
   const line = { state: state.state, when: state.when, why, actions: [] };
   switch (state.state) {
     // A WAIT HAS NO BUTTON. The act it needs is loading the save, which
     // is the tile's own Load and is already there.
-    case 'off':
-    case 'busy':
-    case 'wait':
-      break;
+    case 'off': case 'busy': case 'wait': break;
     case 'bad': {
       // THE PRE-MERGE AUDIT (0927b B1): TRY AGAIN IS THE ACT THAT FAILED. It was always a push - so a restore that failed
       // (a dropped connection, a full store) left one press that put the older save over the newer backup, the very
       // loss the restore exists to prevent. A push over a newer backup asks twice here too, as it does on the line.
       const act = cloudWhy?.slot === slot ? cloudWhy.act : 'push';
       if (act === 'restore') {
-        if (restore && newerBackup(card, save.dateAndTime))
-          line.actions.push({ label: t('menu.cloud.tryAgain', 'Try again'), onClick: () => restoreBackup(save, card) });
-      } else if (act === 'delete')
-        line.actions.push({ label: t('menu.cloud.tryAgain', 'Try again'), onClick: () => removeBackup(save) });
-      else if (newerBackup(card, save.dateAndTime))
-        line.actions.push(guardedPush(save, t('menu.cloud.tryAgain', 'Try again')));
+        if (restore && newerBackup(card, save.dateAndTime)) line.actions.push({ label: t('menu.cloud.tryAgain', 'Try again'), onClick: () => restoreBackup(save, card) });
+      } else if (act === 'delete') line.actions.push({ label: t('menu.cloud.tryAgain', 'Try again'), onClick: () => removeBackup(save) });
+      else if (newerBackup(card, save.dateAndTime)) line.actions.push(guardedPush(save, t('menu.cloud.tryAgain', 'Try again')));
       else line.actions.push({ label: t('menu.cloud.tryAgain', 'Try again'), onClick: () => backUp(save) });
       break;
     }
@@ -1001,21 +658,9 @@ function cloudFor(save, { restore = false } = {}) {
       // AND IT ASKS TWICE, because this is the one button here that
       // destroys anything. The armed slot is cleared by the press, by
       // arming a different tile, and by the next visit to the menu.
-      line.actions.push(
-        cloudArm === slot
-          ? {
-              label: t('menu.cloud.deleteBackupAsk', 'Delete backup?'),
-              primary: true,
-              onClick: () => removeBackup(save),
-            }
-          : {
-              label: t('menu.cloud.deleteBackup', 'Delete backup'),
-              onClick: () => {
-                cloudArm = slot;
-                render();
-              },
-            },
-      );
+      line.actions.push(cloudArm === slot
+        ? { label: t('menu.cloud.deleteBackupAsk', 'Delete backup?'), primary: true, onClick: () => removeBackup(save) }
+        : { label: t('menu.cloud.deleteBackup', 'Delete backup'), onClick: () => { cloudArm = slot; render(); } });
       break;
     case 'newer':
       // ═══ FIELD 2026-09-27 (Masta_Fu): A NEWER BACKUP CAN COME BACK ═══
@@ -1033,26 +678,13 @@ function cloudFor(save, { restore = false } = {}) {
       // download, so it lives where ACC2c put downloads - the Load pane;
       // the others still name the newer backup and guard the upload.
       if (restore) {
-        line.actions.push(
-          cloudArm === `restore|${save.key}`
-            ? {
-                label: t('menu.cloud.replaceWithBackup', 'Replace with backup?'),
-                primary: true,
-                onClick: () => restoreBackup(save, card),
-              }
-            : {
-                label: t('menu.cloud.restoreBackup', 'Restore backup'),
-                primary: true,
-                onClick: () => {
-                  cloudArm = `restore|${save.key}`;
-                  render();
-                },
-              },
-        );
+        line.actions.push(cloudArm === `restore|${save.key}`
+          ? { label: t('menu.cloud.replaceWithBackup', 'Replace with backup?'), primary: true, onClick: () => restoreBackup(save, card) }
+          : { label: t('menu.cloud.restoreBackup', 'Restore backup'), primary: true, onClick: () => { cloudArm = `restore|${save.key}`; render(); } });
       }
       line.actions.push(guardedPush(save, t('menu.cloud.backUpAgain', 'Back up again')));
       break;
-    default: // 'none'
+    default:   // 'none'
       line.actions.push({ label: t('menu.cloud.backUp', 'Back up'), onClick: () => backUp(save) });
   }
   return line;
@@ -1062,20 +694,8 @@ function cloudFor(save, { restore = false } = {}) {
  *  Armed by this LOCAL copy's key (the pre-merge audit 0927b B5): two local copies of one slot are two presses. */
 function guardedPush(save, label) {
   return cloudArm === `push|${save.key}`
-    ? {
-        label: t('menu.cloud.replaceNewer', 'Replace newer backup?'),
-        onClick: () => {
-          cloudArm = null;
-          backUp(save);
-        },
-      }
-    : {
-        label,
-        onClick: () => {
-          cloudArm = `push|${save.key}`;
-          render();
-        },
-      };
+    ? { label: t('menu.cloud.replaceNewer', 'Replace newer backup?'), onClick: () => { cloudArm = null; backUp(save); } }
+    : { label, onClick: () => { cloudArm = `push|${save.key}`; render(); } };
 }
 
 /** THE PLAYER'S OWN ACT. Nothing uploads by itself (bible ACC2 D6): an
@@ -1136,36 +756,23 @@ function download(card) {
 function cloudForCard(card) {
   const slot = slotKeyOf(card);
   const state = cloudStateOf({
-    signedIn: true, // a card only reaches this surface through a listing, which needs a session
+    signedIn: true,   // a card only reaches this surface through a listing, which needs a session
     card,
     local: false,
     busy: cloudBusy === slot,
     error: cloudWhy?.slot === slot ? cloudWhy.error : null,
     nowS: Math.floor(Date.now() / 1000),
   });
-  const line = {
-    state: state.state,
-    when: state.when,
-    why: state.error ? cloudRefusalText(state.error) : null,
-    actions: [],
-  };
+  const line = { state: state.state, when: state.when, why: state.error ? cloudRefusalText(state.error) : null, actions: [] };
   // THE DELETE BELONGS HERE TOO, and this is the rest of AUDIT-312 F1
   // rather than a new idea: F1 gave a player the way to act on "delete
   // a save there to make room" and gave it to them on LOCAL tiles only,
   // so a cloud-only slot went on holding its share of SAVES_MAX with no
   // surface that could ever free it. Same word, same two presses.
   if (state.state === 'only') {
-    line.actions.push(
-      cloudArm === slot
-        ? { label: t('menu.cloud.deleteBackupAsk', 'Delete backup?'), primary: true, onClick: () => removeBackup(card) }
-        : {
-            label: t('menu.cloud.deleteBackup', 'Delete backup'),
-            onClick: () => {
-              cloudArm = slot;
-              render();
-            },
-          },
-    );
+    line.actions.push(cloudArm === slot
+      ? { label: t('menu.cloud.deleteBackupAsk', 'Delete backup?'), primary: true, onClick: () => removeBackup(card) }
+      : { label: t('menu.cloud.deleteBackup', 'Delete backup'), onClick: () => { cloudArm = slot; render(); } });
   }
   return line;
 }
@@ -1182,24 +789,16 @@ function runCloud(save, call, act = 'push') {
   cloudBusy = slot;
   cloudWhy = null;
   render();
-  call(io)
-    .then((r) => {
-      cloudBusy = null;
-      // THE WORD, NOT THE SENTENCE. `cloudFor` asks accountClient.js for
-      // the sentence at paint time, so a refusal held over a repaint
-      // cannot drift out of step with the one table that owns it.
-      // a STALE refusal (0927b B2) is the listing's fault, so it is asked again too
-      if (r.ok || r.error === 'stale') {
-        cloudAsked = false;
-        ensureCloud();
-      }
-      if (!r.ok) cloudWhy = { slot, key: save?.key, error: r.error, act };
-      render();
-    })
-    .catch(() => {
-      cloudBusy = null;
-      render();
-    });
+  call(io).then((r) => {
+    cloudBusy = null;
+    // THE WORD, NOT THE SENTENCE. `cloudFor` asks accountClient.js for
+    // the sentence at paint time, so a refusal held over a repaint
+    // cannot drift out of step with the one table that owns it.
+    // a STALE refusal (0927b B2) is the listing's fault, so it is asked again too
+    if (r.ok || r.error === 'stale') { cloudAsked = false; ensureCloud(); }
+    if (!r.ok) cloudWhy = { slot, key: save?.key, error: r.error, act };
+    render();
+  }).catch(() => { cloudBusy = null; render(); });
 }
 
 /** One save, as a tile - the face asked for lazily, the cloud line
@@ -1241,17 +840,7 @@ function cloudOnlyGrid(saves) {
   const cards = cloudOnly(cloudCards, saves);
   if (!cards.length) return null;
   const box = el('div', 'svcloudonly');
-  box.append(
-    el(
-      'h4',
-      null,
-      t(
-        'menu.cloud.onlyInBackup',
-        '{n, plural, =1 {One save is only in your backup} other {# saves are only in your backup}}',
-        { n: cards.length },
-      ),
-    ),
-  );
+  box.append(el('h4', null, t('menu.cloud.onlyInBackup', '{n, plural, =1 {One save is only in your backup} other {# saves are only in your backup}}', { n: cards.length })));
   // THE ONE LINE OF PROSE THIS GRID GETS, because without it the
   // heading is a statement and not an instruction: a player looking at
   // a character they cannot press Load on needs to be told what the
@@ -1259,23 +848,19 @@ function cloudOnlyGrid(saves) {
   box.append(el('p', 'meta', t('menu.cloud.downloadHint', 'Download one to bring it back to this device.')));
   const grid = el('div', 'svgrid');
   for (const card of cards) {
-    grid.append(
-      saveTile(document, saveFromCard(card, dateFromClassicMinutes, dateString), {
-        cloud: cloudForCard(card),
-        // NO FACE, AND NOT A BUG. Nothing about a portrait was ever
-        // uploaded (server-account/src/saves.js keeps eleven columns and
-        // none of them is a look), so the well draws the character's
-        // initial - TILE1's own no-face arm, reached honestly.
-        actions: [
-          {
-            label: t('menu.cloud.download', 'Download'),
-            primary: true,
-            disabled: cloudBusy === slotKeyOf(card),
-            onClick: () => download(card),
-          },
-        ],
-      }),
-    );
+    grid.append(saveTile(document, saveFromCard(card, dateFromClassicMinutes, dateString), {
+      cloud: cloudForCard(card),
+      // NO FACE, AND NOT A BUG. Nothing about a portrait was ever
+      // uploaded (server-account/src/saves.js keeps eleven columns and
+      // none of them is a look), so the well draws the character's
+      // initial - TILE1's own no-face arm, reached honestly.
+      actions: [{
+        label: t('menu.cloud.download', 'Download'),
+        primary: true,
+        disabled: cloudBusy === slotKeyOf(card),
+        onClick: () => download(card),
+      }],
+    }));
   }
   box.append(grid);
   return box;
@@ -1283,21 +868,16 @@ function cloudOnlyGrid(saves) {
 
 function savedGame() {
   let entry = null;
-  try {
-    entry = mostRecentRestorable();
-  } catch {
-    entry = null;
-  }
+  try { entry = mostRecentRestorable(); } catch { entry = null; }
   if (!entry) return null;
   const snap = entry.snap;
-  const date = Number.isFinite(snap.classicMinutes) ? dateFromClassicMinutes(snap.classicMinutes) : null; // AUDIT LIVED1 E (S5/U4's card; AUDIT LIVED1b T13 corrected the cite): a card is a LOCAL slot's, and a local slot plays offline on its one clock - the date it loads at, as the classic window and the cloud cards say
+  const date = Number.isFinite(snap.classicMinutes) ? dateFromClassicMinutes(snap.classicMinutes) : null;   // AUDIT LIVED1 E (S5/U4's card; AUDIT LIVED1b T13 corrected the cite): a card is a LOCAL slot's, and a local slot plays offline on its one clock - the date it loads at, as the classic window and the cloud cards say
   return {
     key: entry.key,
     name: snap.name || t('menu.save.unnamed', 'Unnamed'),
     career: snap.career?.name ?? null,
     level: snap.level ?? null,
-    health: snap.health,
-    maxHealth: snap.maxHealth,
+    health: snap.health, maxHealth: snap.maxHealth,
     // AUDIT 58: THE PURSE IS A COUNTER, NOT AN ITEM. E4 moved gold onto
     // GoldPieces (`data.playerEntity.goldPieces = entity.GoldPieces`,
     // SerializablePlayer.cs:133 - systems/save/save.js's snapshotPlayer
@@ -1323,10 +903,8 @@ function savedGame() {
 // they come to disagree about which of those a player is shown. Both
 // helpers are lifted verbatim out of paneContinue, so that pane draws
 // exactly what it drew before.
-const saveLine = (save) =>
-  [save.career, save.level ? t('menu.save.level', 'level {level}', { level: save.level }) : null, save.when, save.hour]
-    .filter(Boolean)
-    .join(' · ');
+const saveLine = (save) => [save.career, save.level ? t('menu.save.level', 'level {level}', { level: save.level }) : null,
+  save.when, save.hour].filter(Boolean).join(' · ');
 
 const saveStats = (save) => [
   [localizedText('health', 'Health'), save.maxHealth ? `${save.health} / ${save.maxHealth}` : save.health],
@@ -1369,33 +947,16 @@ function empty(title, line = null) {
 // it and returned. A button that looks operable and is not is the
 // thing the anti-lie law forbids; a destructive one that does not ask
 // is worse.
-let confirming = null; // { title, body, label, onYes }
+let confirming = null;   // { title, body, label, onYes }
 
 function confirmCard() {
   const c = el('div', 'card');
   c.append(el('h3', null, confirming.title));
   c.append(el('p', 'meta', confirming.body));
-  c.append(
-    acts([
-      {
-        label: confirming.label,
-        primary: true,
-        onClick: () => {
-          const f = confirming.onYes;
-          answered();
-          f();
-          render();
-        },
-      },
-      {
-        label: localizedText('cancel', 'Cancel'),
-        onClick: () => {
-          answered();
-          render();
-        },
-      },
-    ]),
-  );
+  c.append(acts([
+    { label: confirming.label, primary: true, onClick: () => { const f = confirming.onYes; answered(); f(); render(); } },
+    { label: localizedText('cancel', 'Cancel'), onClick: () => { answered(); render(); } },
+  ]));
   return c;
 }
 
@@ -1410,18 +971,9 @@ function confirmCard() {
  * its answer closes the sheet again where the ask was the one that opened it.
  */
 let askOpenedSheet = false;
-const ask = (title, body, label, onYes) => {
-  confirming = { title, body, label, onYes };
-  askOpenedSheet = !sheetOpen;
-  sheetOpen = true;
-  render();
-};
+const ask = (title, body, label, onYes) => { confirming = { title, body, label, onYes }; askOpenedSheet = !sheetOpen; sheetOpen = true; render(); };
 /** The confirm answered (Yes, Cancel or Escape): its card goes, and a sheet it raised goes with it. */
-function answered() {
-  confirming = null;
-  if (askOpenedSheet) sheetOpen = false;
-  askOpenedSheet = false;
-}
+function answered() { confirming = null; if (askOpenedSheet) sheetOpen = false; askOpenedSheet = false; }
 
 /** ONE LINE. It carried a kicker, a title and a blurb - the rail's own
  *  word said three times before the player reaches anything pressable. */
@@ -1440,15 +992,8 @@ const head = (title) => {
 function paneContinue(body) {
   const save = savedGame();
   if (!save) {
-    body.append(
-      empty(
-        t('menu.continue.none', 'No game in progress'),
-        t('menu.continue.noneHint', 'Quicksave with F9 and it appears here.'),
-      ),
-    );
-    body.append(
-      acts([{ label: t('menu.continue.startNew', 'Start a new game'), primary: true, onClick: () => go('new') }]),
-    );
+    body.append(empty(t('menu.continue.none', 'No game in progress'), t('menu.continue.noneHint', 'Quicksave with F9 and it appears here.')));
+    body.append(acts([{ label: t('menu.continue.startNew', 'Start a new game'), primary: true, onClick: () => go('new') }]));
     return;
   }
   const c = el('div', 'card');
@@ -1489,16 +1034,7 @@ function paneNew(body) {
 function paneBegin(body) {
   const c = el('div', 'card');
   c.append(el('h3', null, t('menu.begin.title', 'Classic')));
-  c.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.begin.blurb',
-        'The classic start: the original game\u2019s own title, intro and menu (Load Game, Start New Game, Exit).',
-      ),
-    ),
-  );
+  c.append(el('p', 'meta', t('menu.begin.blurb', 'The classic start: the original game\u2019s own title, intro and menu (Load Game, Start New Game, Exit).')));
   c.append(acts([{ label: t('menu.act.begin', 'Begin'), primary: true, onClick: () => onAction('begin') }]));
   body.append(c);
 }
@@ -1512,33 +1048,17 @@ function paneBegin(body) {
 function paneTest(body) {
   const intro = el('div', 'card');
   intro.append(el('h3', null, t('menu.test.title', 'The test room')));
-  intro.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.test.blurb',
-        'A ready-made character in the normal world, with one of every weapon, armor in every ' +
-          'material, all four shields and spare clothes in the pack. Equip things from the inventory ' +
-          'to see them on the paperdoll and in your hands, and on the Morrowind body if you have its ' +
-          'data. Scroll to switch views. Nothing here touches your real saves.',
-      ),
-    ),
-  );
+  intro.append(el('p', 'meta', t('menu.test.blurb',
+    'A ready-made character in the normal world, with one of every weapon, armor in every '
+    + 'material, all four shields and spare clothes in the pack. Equip things from the inventory '
+    + 'to see them on the paperdoll and in your hands, and on the Morrowind body if you have its '
+    + 'data. Scroll to switch views. Nothing here touches your real saves.')));
   body.append(intro);
   for (const p of TEST_PRESETS) {
     const c = el('div', 'card');
     c.append(el('h3', null, p.label));
     c.append(el('p', 'meta', p.blurb));
-    c.append(
-      acts([
-        {
-          label: t('menu.test.enterAs', 'Enter as the {preset}', { preset: p.label }),
-          primary: true,
-          onClick: () => onAction(`test:${p.id}`),
-        },
-      ]),
-    );
+    c.append(acts([{ label: t('menu.test.enterAs', 'Enter as the {preset}', { preset: p.label }), primary: true, onClick: () => onAction(`test:${p.id}`) }]));
     body.append(c);
   }
   // TSR4: the ride - one more door through the SAME `test:<id>` choice,
@@ -1546,37 +1066,21 @@ function paneTest(body) {
   const ride = el('div', 'card');
   ride.append(el('h3', null, TEST_RIDE.label));
   ride.append(el('p', 'meta', TEST_RIDE.blurb));
-  ride.append(
-    acts([
-      { label: t('menu.test.rideOut', 'Ride out'), primary: true, onClick: () => onAction(`test:${TEST_RIDE.id}`) },
-    ]),
-  );
+  ride.append(acts([{ label: t('menu.test.rideOut', 'Ride out'), primary: true, onClick: () => onAction(`test:${TEST_RIDE.id}`) }]));
   body.append(ride);
   // FIELD BUGS 2026-09-29 (the sea) #5: the sea battle - the same
   // `test:<id>` door, a helm on the open Bay and a pirate standing in (systems/testRoom.js TEST_SEA)
   const sea = el('div', 'card');
   sea.append(el('h3', null, TEST_SEA.label));
   sea.append(el('p', 'meta', TEST_SEA.blurb));
-  sea.append(
-    acts([
-      { label: t('menu.test.setSail', 'Set sail'), primary: true, onClick: () => onAction(`test:${TEST_SEA.id}`) },
-    ]),
-  );
+  sea.append(acts([{ label: t('menu.test.setSail', 'Set sail'), primary: true, onClick: () => onAction(`test:${TEST_SEA.id}`) }]));
   body.append(sea);
   // LR3: the loot ladder - one of everything Loot rarity can mint, in
   // the pack, through the same `test:<id>` door.
   const loot = el('div', 'card');
   loot.append(el('h3', null, TEST_LOOT.label));
   loot.append(el('p', 'meta', TEST_LOOT.blurb));
-  loot.append(
-    acts([
-      {
-        label: t('menu.test.enterLadder', 'Enter with the ladder'),
-        primary: true,
-        onClick: () => onAction(`test:${TEST_LOOT.id}`),
-      },
-    ]),
-  );
+  loot.append(acts([{ label: t('menu.test.enterLadder', 'Enter with the ladder'), primary: true, onClick: () => onAction(`test:${TEST_LOOT.id}`) }]));
   body.append(loot);
   // FT12: the outdoors test door lives with the other test doors. It
   // was the last row of the Enhanced category of Settings, which is off
@@ -1618,26 +1122,20 @@ function paneTest(body) {
 // written it down" is the one way off the `code` stage.
 let acctFlow = null;
 let acctPaint = null;
-let acctOff = null; // MEM-AUDIT: the drawn card's focus listener, let go with the card (enhancedAccount.js accountCard `off`)
+let acctOff = null;   // MEM-AUDIT: the drawn card's focus listener, let go with the card (enhancedAccount.js accountCard `off`)
 const accountMayClose = () => !acctFlow || (acctFlow.stage !== 'code' && !acctFlow.busy);
 function closeAccount() {
   if (!accountMayClose()) return;
   accountOpen = false;
   acctFlow = null;
-  acctOff?.();
-  acctOff = null;
+  acctOff?.(); acctOff = null;
   acctPaint = null;
-  rereadCollectionsAccount(); // AUDIT COLLECTIONS-II (lane 2): what the card did, the Collections page reads again
+  rereadCollectionsAccount();   // AUDIT COLLECTIONS-II (lane 2): what the card did, the Collections page reads again
   render();
 }
 /** COLLECTIONS-II: THE ONE CONSTRUCTION of an account flow (Home.md, THE ONE CONSTRUCTION SEAM) - the account card's,
  *  and the Collections page's that reads the wardrobe and wears from it (ui/collections/wardrobePart.js). */
-const newAccountFlow = (onChange) =>
-  AccountFlow({
-    io: { fetch: (...a) => globalThis.fetch(...a), base: serviceBase(appStorage()) },
-    storage: appStorage(),
-    onChange,
-  });
+const newAccountFlow = (onChange) => AccountFlow({ io: { fetch: (...a) => globalThis.fetch(...a), base: serviceBase(appStorage()) }, storage: appStorage(), onChange });
 function accountBody() {
   const host = el('div', 'acctmount');
   const fresh = !acctFlow;
@@ -1651,8 +1149,7 @@ function accountBody() {
     character: save ? `Playing ${characterLine(save)}` : null,
   });
   acctPaint = card.paint;
-  acctOff?.();
-  acctOff = card.off ?? null;
+  acctOff?.(); acctOff = card.off ?? null;
   host.append(card.root);
   // Not awaited: the door must be on screen before the service is
   // asked anything, and `start` catches its own refusals. The guard is
@@ -1691,11 +1188,8 @@ function profileMark() {
   return profileBadge(document, {
     session: who,
     save,
-    face: portraitOf(save), // WITCH1: the icon worn, else the face
-    onOpen: () => {
-      accountOpen = true;
-      render();
-    },
+    face: portraitOf(save),   // WITCH1: the icon worn, else the face
+    onOpen: () => { accountOpen = true; render(); },
   });
 }
 
@@ -1709,9 +1203,7 @@ function supportMarks() {
   nav.setAttribute('aria-label', 'Support');
   for (const ask of SUPPORT_ASKS) {
     const a = el('a', `px-supportlink px-support-${ask.id}`);
-    a.href = ask.url;
-    a.target = '_blank';
-    a.rel = 'noopener';
+    a.href = ask.url; a.target = '_blank'; a.rel = 'noopener';
     a.title = ask.label;
     a.setAttribute('aria-label', ask.label);
     const mark = el('i', `supmark supmark-${ask.id}`);
@@ -1728,7 +1220,7 @@ function accountWindow() {
   for (const c of ['tl', 'tr', 'bl', 'br']) win.append(el('span', `px-gem px-corner px-${c}`));
   const body = el('div', 'px-body');
   body.append(accountBody());
-  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root); // DISC23-B2: who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
+  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root);   // DISC23-B2: who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
   win.append(body);
   return win;
 }
@@ -1772,26 +1264,13 @@ function paneOnline(body) {
   const who = storedSession(appStorage());
   if (!who) {
     const c = el('div', 'card');
-    c.append(
-      el(
-        'p',
-        'meta bad',
-        t(
-          'menu.online.needsAccount',
-          'Online needs an account, so no one else can use your name. Playing as a guest takes one click and no email.',
-        ),
-      ),
-    );
+    c.append(el('p', 'meta bad', t('menu.online.needsAccount', 'Online needs an account, so no one else can use your name. Playing as a guest takes one click and no email.')));
     const go = el('button', 'act primary');
     go.type = 'button';
     go.textContent = t('menu.online.signIn', 'Sign in or continue as guest');
     // THE WINDOW LIVES AT THE DOOR (ACC1f) and this sends the player
     // there rather than growing a second home for it here.
-    go.onclick = () => {
-      section = 'home';
-      accountOpen = true;
-      render();
-    };
+    go.onclick = () => { section = 'home'; accountOpen = true; render(); };
     c.append(go);
     body.append(c);
   }
@@ -1804,10 +1283,7 @@ function paneOnline(body) {
     const wrap = el('label', 'field');
     wrap.append(el('span', 'fieldlabel', label));
     const input = el('input');
-    input.type = 'text';
-    input.maxLength = maxLength;
-    input.placeholder = placeholder;
-    input.value = getPref(key) || '';
+    input.type = 'text'; input.maxLength = maxLength; input.placeholder = placeholder; input.value = getPref(key) || '';
     input.oninput = () => setPref(key, input.value.trim());
     wrap.append(input);
     return wrap;
@@ -1822,20 +1298,10 @@ function paneOnline(body) {
   // page in the bible cannot reach them.
   const foot = el('div', 'card svonlinefoot');
   // L10N4: ONE pattern, the sky's sentence an argument in it (skyDayWords is itself routed)
-  foot.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.online.rules',
-        'Everyone plays their own save, and you can see and talk to each other anywhere. Dungeons and buildings are shared: enemies, doors, levers and opened chests are the same for everyone and stay that way. In towns and the wilds, everyone nearby sees the same monsters and can fight them, and they can hurt you too. {skyDay} The world\u2019s clock and sky run on real time. Resting, travel, jail and training don\u2019t move them, so a quest waiting for a time of day waits for the world\u2019s, and a lycanthrope\u2019s full moon lasts one night. Your character also has their own clock. It runs while you play and stops while you are logged off. Resting, travel, jail and training use it. Your wounds, spells, hunger, diseases, curses, guild ranks, rented rooms, loans and repairs run on it. Quest timers run on the world\u2019s clock while you play. Resting, waiting and traveling don\u2019t use up a quest\u2019s days, and time logged off never counts. A quest that only asks you to wait, like a letter or \u201ccome back in a few days\u201d, moves on after a couple of minutes of play. Rest at a fire, a tent or a bed: a night passes at once, at most once every 10 minutes of play, and party members within 15 meters sleep with you. Every enhancement is on for everyone, but your interface is your own. Most mods stay your choice online. A few are set for everyone: those that change the ground, monsters, loot or the rules. The Mods page marks each one.',
-        { skyDay: skyDayWords() },
-      ),
-    ),
-  ); // AUDIT WORLD5 C12: the shared clock, said at the door; OL1: the lane, said at the door; QCLOCK-WORLD: the quests' clock; REST8: the short wait; REST9: the rest act and the party's night
+  foot.append(el('p', 'meta', t('menu.online.rules', 'Everyone plays their own save, and you can see and talk to each other anywhere. Dungeons and buildings are shared: enemies, doors, levers and opened chests are the same for everyone and stay that way. In towns and the wilds, everyone nearby sees the same monsters and can fight them, and they can hurt you too. {skyDay} The world\u2019s clock and sky run on real time. Resting, travel, jail and training don\u2019t move them, so a quest waiting for a time of day waits for the world\u2019s, and a lycanthrope\u2019s full moon lasts one night. Your character also has their own clock. It runs while you play and stops while you are logged off. Resting, travel, jail and training use it. Your wounds, spells, hunger, diseases, curses, guild ranks, rented rooms, loans and repairs run on it. Quest timers run on the world\u2019s clock while you play. Resting, waiting and traveling don\u2019t use up a quest\u2019s days, and time logged off never counts. A quest that only asks you to wait, like a letter or \u201ccome back in a few days\u201d, moves on after a couple of minutes of play. Rest at a fire, a tent or a bed: a night passes at once, at most once every 10 minutes of play, and party members within 15 meters sleep with you. Every enhancement is on for everyone, but your interface is your own. Most mods stay your choice online. A few are set for everyone: those that change the ground, monsters, loot or the rules. The Mods page marks each one.', { skyDay: skyDayWords() })));   // AUDIT WORLD5 C12: the shared clock, said at the door; OL1: the lane, said at the door; QCLOCK-WORLD: the quests' clock; REST8: the short wait; REST9: the rest act and the party's night
   foot.append(field(t('menu.online.relay', 'Relay'), 'onlineServer', DEFAULT_SERVER, 200));
   body.append(foot);
-  body.append(onlineSyncCard()); // UXB1-E: under the rules it copies
+  body.append(onlineSyncCard());   // UXB1-E: under the rules it copies
 }
 
 /** REALM P1.3: THE REALM CARD - the account's online characters as tiles (the service's list, asked once a visit), each
@@ -1847,77 +1313,32 @@ function realmCard(who) {
   if (!who) return box;
   if (!realmAsked) {
     realmAsked = true;
-    realmList(realmIo({ fetch: (...a) => globalThis.fetch(...a), storage: appStorage() }))
-      .then((r) => {
-        realmRows = r.ok ? r.characters : [];
-        if (r.ok) sweepUnsent(appStorage(), r.characters, storedSession(appStorage())?.id ?? null); // AUDIT RESCUE-SAVE A7 + 2 B5: a copy no join can play goes
-        realmMax = r.ok ? r.max : 0;
-        if (!r.ok) realmWords = [...realmWords, realmRefusalText(r.error)];
-        render();
-      })
-      .catch(() => {});
+    realmList(realmIo({ fetch: (...a) => globalThis.fetch(...a), storage: appStorage() })).then((r) => {
+      realmRows = r.ok ? r.characters : [];
+      if (r.ok) sweepUnsent(appStorage(), r.characters, storedSession(appStorage())?.id ?? null);   // AUDIT RESCUE-SAVE A7 + 2 B5: a copy no join can play goes
+      realmMax = r.ok ? r.max : 0;
+      if (!r.ok) realmWords = [...realmWords, realmRefusalText(r.error)];
+      render();
+    }).catch(() => {});
   }
-  if (realmRows == null) {
-    box.append(el('p', 'meta', t('menu.realm.asking', 'Asking the realm...')));
-    return box;
-  }
+  if (realmRows == null) { box.append(el('p', 'meta', t('menu.realm.asking', 'Asking the realm...'))); return box; }
   if (realmRows.length) {
     const grid = el('div', 'svgrid');
     for (const row of realmRows) {
       const save = realmRowAsSave(row, { dateText: (sec) => new Date(sec * 1000).toLocaleDateString() });
-      grid.append(
-        saveTile(document, save, {
-          face: loadFace(save, { scale: 2, copy: true }),
-          actions: [
-            {
-              label: save.unfinished ? t('menu.realm.neverSaved', 'Never saved') : t('menu.realm.play', 'Play'),
-              primary: true,
-              disabled: realmBusy || save.unfinished,
-              onClick: () => {
-                _pickedRealmId = row.id;
-                onAction('online');
-              },
-            },
-            {
-              label: t('menu.realm.copyOffline', 'Copy to offline'),
-              disabled: realmBusy || save.unfinished,
-              onClick: () => copyToOffline(row),
-            },
-            {
-              label: t('menu.realm.delete', 'Delete character'),
-              disabled: realmBusy,
-              onClick: () =>
-                ask(
-                  t('menu.realm.deleteAsk', 'Delete {name}?', { name: row.name }),
-                  t(
-                    'menu.realm.deleteBody',
-                    'Deleting an online character is permanent. Its Renown, professions, Stores, the homes it bought and its guild place are lost. Homes belong to your account, so your other characters lose them too. Any offline copy you made stays.',
-                  ),
-                  t('menu.realm.deleteYes', 'Delete'),
-                  () =>
-                    realmAct(
-                      () => realmDelete(realmIoNow(), row.id),
-                      () => [t('menu.realm.deleted', '{name} is gone from the realm.', { name: row.name })],
-                    ),
-                ),
-            },
-          ],
-        }),
-      );
+      grid.append(saveTile(document, save, {
+        face: loadFace(save, { scale: 2, copy: true }),
+        actions: [
+          { label: save.unfinished ? t('menu.realm.neverSaved', 'Never saved') : t('menu.realm.play', 'Play'), primary: true, disabled: realmBusy || save.unfinished, onClick: () => { _pickedRealmId = row.id; onAction('online'); } },
+          { label: t('menu.realm.copyOffline', 'Copy to offline'), disabled: realmBusy || save.unfinished, onClick: () => copyToOffline(row) },
+          { label: t('menu.realm.delete', 'Delete character'), disabled: realmBusy, onClick: () => ask(t('menu.realm.deleteAsk', 'Delete {name}?', { name: row.name }), t('menu.realm.deleteBody', 'Deleting an online character is permanent. Its Renown, professions, Stores, the homes it bought and its guild place are lost. Homes belong to your account, so your other characters lose them too. Any offline copy you made stays.'), t('menu.realm.deleteYes', 'Delete'), () => realmAct(() => realmDelete(realmIoNow(), row.id), () => [t('menu.realm.deleted', '{name} is gone from the realm.', { name: row.name })])) },
+        ],
+      }));
     }
     box.append(grid);
   } else box.append(el('p', 'meta', t('menu.realm.none', 'No online characters yet. Make one to play online.')));
   for (const card of waitingHouseCards()) box.append(card);
-  box.append(
-    acts([
-      {
-        label: t('menu.realm.new', 'New online character'),
-        primary: !realmRows.length,
-        disabled: realmBusy || realmRows.length >= realmMax,
-        onClick: () => onAction('online-new'),
-      },
-    ]),
-  );
+  box.append(acts([{ label: t('menu.realm.new', 'New online character'), primary: !realmRows.length, disabled: realmBusy || realmRows.length >= realmMax, onClick: () => onAction('online-new') }]));
   return box;
 }
 /** HOUSE-WAITS (FIELD BUGS 2026-10-09f, Sahh: a Bloodline's fall whose heir's birth went back to the title - "despite the
@@ -1930,155 +1351,74 @@ function waitingHouseCards() {
   if (!realmLinesAsked) {
     realmLinesAsked = true;
     realmLine = createRealmLine({ io: () => realmIoNow(), storage: () => appStorage() });
-    realmLine
-      .pull()
-      .then((r) => {
-        realmLineIds = r?.ok ? r.ids : [];
-        render();
-      })
-      .catch(() => {
-        realmLineIds = [];
-      });
+    realmLine.pull().then((r) => { realmLineIds = r?.ok ? r.ids : []; render(); }).catch(() => { realmLineIds = []; });
   }
   if (!realmLineIds?.length) return [];
   const living = new Set(realmRows.map((r) => String(r.id)));
   const families = realmLineIds.map((id) => loadFamily(appStorage(), id)).filter(Boolean);
-  return waitingHouses(families, { played: (cid) => living.has(cid), settings: legacySettings() }).map(
-    ({ family, fallen, heirs, newborn }) => {
-      const card = el('div', 'card svhousewaits');
-      card.append(el('h4', null, houseWaitsTitle(family)), el('p', 'meta', houseWaitsLine(family, fallen)));
-      card.append(
-        acts([
-          ...heirs.map((p) => ({
-            label: heirButtonLabel(p),
-            disabled: realmBusy || realmRows.length >= realmMax,
-            onClick: () => carryOn(family.id, p.id),
-          })),
-          ...(newborn
-            ? [
-                {
-                  // RPT1026-MISC HEIR-WAITS: the Succession's newborn heir, where the fall may raise one
-                  label: newbornButtonLabel(fallen),
-                  disabled: realmBusy || realmRows.length >= realmMax,
-                  onClick: () => carryOn(family.id, null, true),
-                },
-              ]
-            : []),
-        ]),
-      );
-      return card;
-    },
-  );
+  return waitingHouses(families, { played: (cid) => living.has(cid), settings: legacySettings() }).map(({ family, fallen, heirs, newborn }) => {
+    const card = el('div', 'card svhousewaits');
+    card.append(el('h4', null, houseWaitsTitle(family)), el('p', 'meta', houseWaitsLine(family, fallen)));
+    card.append(acts([...heirs.map((p) => ({
+      label: heirButtonLabel(p),
+      disabled: realmBusy || realmRows.length >= realmMax,
+      onClick: () => carryOn(family.id, p.id),
+    })), ...(newborn ? [{   // RPT1026-MISC HEIR-WAITS: the Succession's newborn heir, where the fall may raise one
+      label: newbornButtonLabel(fallen),
+      disabled: realmBusy || realmRows.length >= realmMax,
+      onClick: () => carryOn(family.id, null, true),
+    }] : [])]));
+    return card;
+  });
 }
 /** HOUSE-WAITS: the Succession's choice, made here - the record stored and the realm's copy written (its birth checks
  *  the person there), then the boot births them online. */
 function carryOn(familyId, personId, newborn = false) {
-  realmBusy = true;
-  render();
-  const took = takeUpLine({
-    storage: appStorage(),
-    tab: tabStorage(),
-    familyId,
-    personId,
-    newborn,
-    settings: legacySettings(),
-  }); // RPT1026-MISC HEIR-WAITS: or the newborn, made here
-  if (!took.ok) {
-    realmWords = [took.why];
+  realmBusy = true; render();
+  const took = takeUpLine({ storage: appStorage(), tab: tabStorage(), familyId, personId, newborn, settings: legacySettings() });   // RPT1026-MISC HEIR-WAITS: or the newborn, made here
+  if (!took.ok) { realmWords = [took.why]; realmBusy = false; render(); return; }
+  Promise.resolve(realmLine?.push(took.family)).then(() => realmLine?.flush()).then((ok) => {
+    if (!ok) { realmWords = [realmRefusalText(realmLine?.refusalOf(familyId) ?? realmLine?.error ?? 'server')]; realmBusy = false; render(); return; }
+    _pickedLegacyBirth = { personId: took.heirId, region: took.place.region, loc: took.place.loc, ...(Number.isInteger(took.place.mapId) ? { mapId: took.place.mapId } : {}) };   // RPT1026-MISC HEIR-WAITS: the heir the take named (a newborn's id is minted there); BAY-LEFT-B: and the seat's map id
     realmBusy = false;
-    render();
-    return;
-  }
-  Promise.resolve(realmLine?.push(took.family))
-    .then(() => realmLine?.flush())
-    .then((ok) => {
-      if (!ok) {
-        realmWords = [realmRefusalText(realmLine?.refusalOf(familyId) ?? realmLine?.error ?? 'server')];
-        realmBusy = false;
-        render();
-        return;
-      }
-      _pickedLegacyBirth = {
-        personId: took.heirId,
-        region: took.place.region,
-        loc: took.place.loc,
-        ...(Number.isInteger(took.place.mapId) ? { mapId: took.place.mapId } : {}),
-      }; // RPT1026-MISC HEIR-WAITS: the heir the take named (a newborn's id is minted there); BAY-LEFT-B: and the seat's map id
-      realmBusy = false;
-      onAction('online-new');
-    })
-    .catch(() => {
-      realmWords = [realmRefusalText('server')];
-      realmBusy = false;
-      render();
-    });
+    onAction('online-new');
+  }).catch(() => { realmWords = [realmRefusalText('server')]; realmBusy = false; render(); });
 }
 const realmIoNow = () => realmIo({ fetch: (...a) => globalThis.fetch(...a), storage: appStorage() });
 /** One realm act at a time: busy while it runs, its words (or its refusal) shown after, and the list asked again. */
 function realmAct(run, words) {
-  realmBusy = true;
-  render();
-  return Promise.resolve()
-    .then(run)
-    .then((r) => {
-      realmWords = r?.ok === false ? [realmRefusalText(r.error)] : typeof words === 'function' ? words(r) : words;
-    })
-    .catch(() => {
-      realmWords = [realmRefusalText('server')];
-    })
-    .finally(() => {
-      realmBusy = false;
-      realmAsked = false;
-      realmRows = null;
-      render();
-    });
+  realmBusy = true; render();
+  return Promise.resolve().then(run).then((r) => {
+    realmWords = r?.ok === false ? [realmRefusalText(r.error)] : (typeof words === 'function' ? words(r) : words);
+  }).catch(() => { realmWords = [realmRefusalText('server')]; }).finally(() => { realmBusy = false; realmAsked = false; realmRows = null; render(); });
 }
 /** REALM P1.4: COPY TO OFFLINE - the realm's save read and written as a NEW offline character (a new id), a slot like
  *  any other. Nothing played on the copy ever goes back: the Online door loads only from the service. */
 function copyToOffline(row) {
-  return realmAct(
-    async () => {
-      const got = await realmFetch(realmIoNow(), row.id);
-      if (!got.ok) return got;
-      let snap = null;
-      try {
-        snap = JSON.parse(got.text);
-      } catch {
-        snap = null;
-      }
-      if (!snap || typeof snap !== 'object') return { ok: false, error: 'no-data' };
-      snap = offlineCopyOf(snap); // AUDIT LIVED1 E: the world's stamps rebased onto the character's clock, the one clock offline
-      snap.characterId = mintCharacterId();
-      const r = saveSlot(snap.name || row.name, REALM_COPY_SAVE_NAME, snap, { storage: appStorage() });
-      return r.ok ? { ok: true } : { ok: false, error: 'no-room' };
-    },
-    () => [
-      t(
-        'menu.realm.copied',
-        '{name} is copied as a new offline character. Nothing you play on the copy comes back online.',
-        { name: row.name },
-      ),
-    ],
-  );
+  return realmAct(async () => {
+    const got = await realmFetch(realmIoNow(), row.id);
+    if (!got.ok) return got;
+    let snap = null;
+    try { snap = JSON.parse(got.text); } catch { snap = null; }
+    if (!snap || typeof snap !== 'object') return { ok: false, error: 'no-data' };
+    snap = offlineCopyOf(snap);   // AUDIT LIVED1 E: the world's stamps rebased onto the character's clock, the one clock offline
+    snap.characterId = mintCharacterId();
+    const r = saveSlot(snap.name || row.name, REALM_COPY_SAVE_NAME, snap, { storage: appStorage() });
+    return r.ok ? { ok: true } : { ok: false, error: 'no-room' };
+  }, () => [t('menu.realm.copied', '{name} is copied as a new offline character. Nothing you play on the copy comes back online.', { name: row.name })]);
 }
 
 // UXB1-E: THE ROOM'S RULES, OFFLINE. The copy and its undo are
 // systems/online/onlineSync.js's; this is the card - what differs, the one press, and the way back. Every relay plays by
 // the same rules (they are this build's, not the server's), so there is no host to pick: the card says so.
 export const ONLINE_SYNC_TITLE = 'Sync from server';
-export const ONLINE_SYNC_NOTE =
-  'Play offline by the same rules as online. This sets the settings that are fixed online to match. Everything else stays your choice.';
+export const ONLINE_SYNC_NOTE = 'Play offline by the same rules as online. This sets the settings that are fixed online to match. Everything else stays your choice.';
 export const ONLINE_SYNC_SAME = 'Your offline game already plays by the online rules.';
 /** L10N4: the card's words in the player's language - the English constants above stay what the tests compare. */
 export const onlineSyncTitle = () => t('menu.sync.title', ONLINE_SYNC_TITLE);
 export const onlineSyncNote = () => t('menu.sync.note', ONLINE_SYNC_NOTE);
 export const onlineSyncSame = () => t('menu.sync.same', ONLINE_SYNC_SAME);
-const syncWord = (v) =>
-  v === true || /^true$/i.test(String(v))
-    ? t('menu.toggle.on', 'On')
-    : v === false || /^false$/i.test(String(v))
-      ? t('menu.toggle.off', 'Off')
-      : String(v);
+const syncWord = (v) => (v === true || /^true$/i.test(String(v)) ? t('menu.toggle.on', 'On') : v === false || /^false$/i.test(String(v)) ? t('menu.toggle.off', 'Off') : String(v));
 export function onlineSyncCard() {
   const card = el('div', 'card svsync');
   card.append(el('h3', null, onlineSyncTitle()));
@@ -2090,25 +1430,14 @@ export function onlineSyncCard() {
     const list = el('ul', 'svsync-list');
     for (const r of differ) {
       const li = el('li', 'svsync-row');
-      li.append(
-        el('span', 'svsync-name', r.label),
-        el('span', 'svsync-was', syncWord(r.offline)),
-        el('span', 'svsync-arrow', '\u2192'),
-        el('span', 'svsync-to', syncWord(r.online)),
-      );
+      li.append(el('span', 'svsync-name', r.label), el('span', 'svsync-was', syncWord(r.offline)),
+        el('span', 'svsync-arrow', '\u2192'), el('span', 'svsync-to', syncWord(r.online)));
       list.append(li);
     }
     card.append(list);
-    const go = el(
-      'button',
-      'act primary svsync-go',
-      t('menu.sync.go', '{n, plural, one {Sync # setting} other {Sync # settings}}', { n: differ.length }),
-    );
+    const go = el('button', 'act primary svsync-go', t('menu.sync.go', '{n, plural, one {Sync # setting} other {Sync # settings}}', { n: differ.length }));
     go.type = 'button';
-    go.onclick = () => {
-      applyOnlineSync(plan);
-      render();
-    };
+    go.onclick = () => { applyOnlineSync(plan); render(); };
     acts.append(go);
   } else {
     card.append(el('p', 'meta svsync-same', onlineSyncSame()));
@@ -2117,15 +1446,8 @@ export function onlineSyncCard() {
   if (last?.rows?.length) {
     const undo = el('button', 'act svsync-undo', t('menu.sync.undo', 'Undo sync'));
     undo.type = 'button';
-    undo.title = t(
-      'menu.sync.undoTip',
-      '{n, plural, one {Puts back the # setting the last sync changed} other {Puts back the # settings the last sync changed}}',
-      { n: last.rows.length },
-    );
-    undo.onclick = () => {
-      undoOnlineSync();
-      render();
-    };
+    undo.title = t('menu.sync.undoTip', '{n, plural, one {Puts back the # setting the last sync changed} other {Puts back the # settings the last sync changed}}', { n: last.rows.length });
+    undo.onclick = () => { undoOnlineSync(); render(); };
     acts.append(undo);
   }
   if (acts.children.length) card.append(acts);
@@ -2139,12 +1461,8 @@ function paneLoad(body) {
   // a live online session.
   const locked = hooks.loadingPrevented?.();
   if (locked) {
-    body.append(
-      empty(
-        t('menu.load.onlineLocked', 'Loading is disabled during online play.'),
-        t('menu.load.onlineLockedWhy', 'Leave the shared world to load a save.'),
-      ),
-    );
+    body.append(empty(t('menu.load.onlineLocked', 'Loading is disabled during online play.'),
+      t('menu.load.onlineLockedWhy', 'Leave the shared world to load a save.')));
     return;
   }
   // SLOTS1: EVERY restorable slot, most recent first - the classic
@@ -2160,50 +1478,26 @@ function paneLoad(body) {
   // TILE2 (Mac: the tile design "will translate to the load character
   // pane also"): the same tiles the Online pane draws, with this
   // pane's own actions on them.
-  body.append(
-    tileGrid(saves, (save) => ({
-      current: save.key === saves[0]?.key,
-      restore: true, // FIELD 2026-09-27: the pane that gets a game back is where a newer backup comes back
-      actions: [
-        // NO CONFIRM ON LOAD, in either mode. It discards unsaved play,
-        // which is the shape AUDIT F3/F4 made confirm - but classic's
-        // own pause window loads on one press (pauseWindow.js:"exterior host, whose".."this._closeWith();")
-        // and so does F11, and inventing a prompt on exactly one of the
-        // port's three load doors is a divergence, not a safety net.
-        {
-          label: localizedText('loadButton', 'Load'),
-          primary: true,
-          disabled: !canLoad,
-          onClick: () => {
-            _pickedSaveKey = save.key;
-            onAction('load');
-          },
-        }, // L10N3d: the save window's own buttons (DaggerfallUnitySaveGameWindow.cs:445, :256)
-        // ...and the destructive one still asks, and takes THIS slot
-        // alone.
-        {
-          label: localizedText('deleteSave', 'Delete'),
-          onClick: () =>
-            ask(
-              t('menu.load.deleteTitle', 'Delete this save'),
-              t('menu.load.deleteBody', 'Deleting {name}\'s "{slot}" cannot be undone.', {
-                name: save.name,
-                slot: save.saveName,
-              }),
-              localizedText('deleteSave', 'Delete'),
-              () => {
-                try {
-                  deleteSave(save.key);
-                } catch {
-                  /* storage disabled */
-                }
-                render();
-              },
-            ),
-        },
-      ],
-    })),
-  );
+  body.append(tileGrid(saves, (save) => ({
+    current: save.key === saves[0]?.key,
+    restore: true,   // FIELD 2026-09-27: the pane that gets a game back is where a newer backup comes back
+    actions: [
+      // NO CONFIRM ON LOAD, in either mode. It discards unsaved play,
+      // which is the shape AUDIT F3/F4 made confirm - but classic's
+      // own pause window loads on one press (pauseWindow.js:"exterior host, whose".."this._closeWith();")
+      // and so does F11, and inventing a prompt on exactly one of the
+      // port's three load doors is a divergence, not a safety net.
+      { label: localizedText('loadButton', 'Load'), primary: true, disabled: !canLoad, onClick: () => { _pickedSaveKey = save.key; onAction('load'); } },   // L10N3d: the save window's own buttons (DaggerfallUnitySaveGameWindow.cs:445, :256)
+      // ...and the destructive one still asks, and takes THIS slot
+      // alone.
+      { label: localizedText('deleteSave', 'Delete'), onClick: () => ask(
+        t('menu.load.deleteTitle', 'Delete this save'),
+        t('menu.load.deleteBody', 'Deleting {name}\'s "{slot}" cannot be undone.', { name: save.name, slot: save.saveName }),
+        localizedText('deleteSave', 'Delete'),
+        () => { try { deleteSave(save.key); } catch { /* storage disabled */ } render(); },
+      ) },
+    ],
+  })));
   // ACC2c: ...and under them, the saves that are only in the backup.
   // THIS PANE AND NO OTHER. Online brings a character in to play NOW
   // and a save that is not here cannot be brought in until it is
@@ -2217,17 +1511,10 @@ function paneLoad(body) {
   // line ends "Save a game and every slot of it appears here", which
   // told a player with a shelf full of backups that they had none -
   // which is the very sentence this slice exists to stop being shown.
-  if (!saves.length && !onlyCloud)
-    body.append(
-      empty(t('menu.saves.none', 'No saved games'), t('menu.load.noneHint', 'Your saved games appear here.')),
-    );
+  if (!saves.length && !onlyCloud) body.append(empty(t('menu.saves.none', 'No saved games'), t('menu.load.noneHint', 'Your saved games appear here.')));
   if (mode === 'pause' && typeof hooks.quickLoad !== 'function') {
-    body.append(
-      empty(
-        t('menu.load.notHere', 'Not from here'),
-        t('menu.load.notHereWhy', 'You can\u2019t load a game from here. Use the main menu instead.'),
-      ),
-    );
+    body.append(empty(t('menu.load.notHere', 'Not from here'),
+      t('menu.load.notHereWhy', 'You can\u2019t load a game from here. Use the main menu instead.')));
   }
   body.append(transferCard(saves.length));
 }
@@ -2246,93 +1533,44 @@ function transferCard(count) {
   c.append(el('span', 'tag grey', t('menu.transfer.tag', 'Move saves')));
   c.append(el('h3', null, t('menu.transfer.title', 'Between the website and the app')));
   const shell = globalThis.daggerShell;
-  c.append(
-    el(
-      'p',
-      'meta',
-      shell?.savesPath
-        ? t(
-            'menu.transfer.app',
-            'This app keeps your saves as files in {path}. Export them as one zip to carry to the website, or import a zip the website exported.',
-            { path: shell.savesPath },
-          )
-        : t(
-            'menu.transfer.web',
-            'The website keeps your saves in this browser. Export them as one zip to carry to the desktop app or another browser, or import a zip the app or another browser exported.',
-          ),
-    ),
-  );
-  if (_transferNote) {
-    c.append(el('p', 'meta', _transferNote));
-    _transferNote = null;
-  }
-  const zipIn = el('input');
-  zipIn.type = 'file';
-  zipIn.accept = '.zip,application/zip';
-  zipIn.style.display = 'none';
-  const dirIn = el('input');
-  dirIn.type = 'file';
-  dirIn.setAttribute('webkitdirectory', '');
-  dirIn.multiple = true;
-  dirIn.style.display = 'none';
+  c.append(el('p', 'meta', shell?.savesPath
+    ? t('menu.transfer.app', 'This app keeps your saves as files in {path}. Export them as one zip to carry to the website, or import a zip the website exported.', { path: shell.savesPath })
+    : t('menu.transfer.web', 'The website keeps your saves in this browser. Export them as one zip to carry to the desktop app or another browser, or import a zip the app or another browser exported.')));
+  if (_transferNote) { c.append(el('p', 'meta', _transferNote)); _transferNote = null; }
+  const zipIn = el('input'); zipIn.type = 'file'; zipIn.accept = '.zip,application/zip'; zipIn.style.display = 'none';
+  const dirIn = el('input'); dirIn.type = 'file'; dirIn.setAttribute('webkitdirectory', ''); dirIn.multiple = true; dirIn.style.display = 'none';
   const done = (slots, r) => {
     const n = r.imported.length;
-    _transferNote = !slots.length
-      ? t(
-          'menu.transfer.noneIn',
-          'No saves in that selection. Pick the zip an Export made, or a Saves folder holding SAVE0, SAVE1, ...',
-        )
-      : t(
-          'menu.transfer.imported',
-          'Imported {n, plural, one {# save} other {# saves}}{skipped, plural, =0 {} other {, # already here}}{failed, plural, =0 {} other {, # could not be written}}.',
-          { n, skipped: r.skipped || 0, failed: r.failed || 0 },
-        );
+    _transferNote = !slots.length ? t('menu.transfer.noneIn', 'No saves in that selection. Pick the zip an Export made, or a Saves folder holding SAVE0, SAVE1, ...')
+      : t('menu.transfer.imported', 'Imported {n, plural, one {# save} other {# saves}}{skipped, plural, =0 {} other {, # already here}}{failed, plural, =0 {} other {, # could not be written}}.', { n, skipped: r.skipped || 0, failed: r.failed || 0 });
     render();
   };
   zipIn.onchange = async () => {
-    const f = zipIn.files?.[0];
-    if (!f) return;
+    const f = zipIn.files?.[0]; if (!f) return;
     try {
-      const { readZipEntries } = await import('../../scenes/dataSource.js'); // the port's own reader, methods 0 and 8
+      const { readZipEntries } = await import('../../scenes/dataSource.js');   // the port's own reader, methods 0 and 8
       const slots = collectSlots(await readZipEntries(f, { pick: (names) => names.filter((n) => slotPathOf(n)) }));
       done(slots, importSlots(slots, appStorage()));
-    } catch (err) {
-      _transferNote = t('menu.transfer.readFailed', 'Could not read {file}: {error}', {
-        file: f.name,
-        error: err?.message ?? err,
-      });
-      render();
-    }
+    } catch (err) { _transferNote = t('menu.transfer.readFailed', 'Could not read {file}: {error}', { file: f.name, error: err?.message ?? err }); render(); }
   };
   dirIn.onchange = async () => {
     const slots = collectSlots(await entriesFromFiles([...(dirIn.files ?? [])]));
     done(slots, importSlots(slots, appStorage()));
   };
   c.append(zipIn, dirIn);
-  c.append(
-    acts([
-      {
-        label: t('menu.transfer.export', 'Export all saves'),
-        primary: true,
-        disabled: !count,
-        onClick: () => {
-          const zip = exportSavesZip(appStorage());
-          if (!zip) {
-            _transferNote = t('menu.transfer.nothing', 'Nothing to export.');
-            render();
-            return;
-          }
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
-          a.download = TRANSFER_ZIP_NAME;
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(a.href), 30000);
-        },
-      },
-      { label: t('menu.transfer.importZip', 'Import a zip'), onClick: () => zipIn.click() },
-      { label: t('menu.transfer.importFolder', 'Import a Saves folder'), onClick: () => dirIn.click() },
-    ]),
-  );
+  c.append(acts([
+    { label: t('menu.transfer.export', 'Export all saves'), primary: true, disabled: !count, onClick: () => {
+      const zip = exportSavesZip(appStorage());
+      if (!zip) { _transferNote = t('menu.transfer.nothing', 'Nothing to export.'); render(); return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
+      a.download = TRANSFER_ZIP_NAME;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+    } },
+    { label: t('menu.transfer.importZip', 'Import a zip'), onClick: () => zipIn.click() },
+    { label: t('menu.transfer.importFolder', 'Import a Saves folder'), onClick: () => dirIn.click() },
+  ]));
   return c;
 }
 
@@ -2356,12 +1594,8 @@ function paneSave(body) {
   // thing this screen gets to reword.
   const prevented = hooks.savingPrevented?.() || typeof hooks.quickSave !== 'function';
   if (prevented) {
-    body.append(
-      empty(
-        localizedText('cannotSaveNow', 'You cannot save now.'),
-        t('menu.save.notHereWhy', 'You can\u2019t save here. Step back outside to save again.'),
-      ),
-    );
+    body.append(empty(localizedText('cannotSaveNow', 'You cannot save now.'),
+      t('menu.save.notHereWhy', 'You can\u2019t save here. Step back outside to save again.')));
     return;
   }
   // SLOTS1: a save is (character, slot
@@ -2371,7 +1605,7 @@ function paneSave(body) {
   // new slot. The pressed name rides the pause door's quickSave
   // through takePickedSaveName, onto the host's saveAs seam.
   const me = hooks.playerName?.() ?? savedGame()?.name ?? '';
-  const myId = hooks.playerId?.() ?? null; // CHARID1: the slots the press can overwrite are THIS character's, by id - a namesake's are not
+  const myId = hooks.playerId?.() ?? null;   // CHARID1: the slots the press can overwrite are THIS character's, by id - a namesake's are not
   const mine = savedGames().filter((s) => (myId ? s.characterId === myId : s.characterName === me));
   const c = el('div', 'card');
   c.append(el('span', 'tag', t('menu.save.tag', 'Save as')));
@@ -2379,10 +1613,7 @@ function paneSave(body) {
   const wrap = el('label', 'field');
   wrap.append(el('span', 'fieldlabel', t('menu.save.slotName', 'Slot name')));
   const input = el('input');
-  input.type = 'text';
-  input.maxLength = 32;
-  input.placeholder = QUICK_SAVE_NAME;
-  input.value = _saveNameDraft || QUICK_SAVE_NAME;
+  input.type = 'text'; input.maxLength = 32; input.placeholder = QUICK_SAVE_NAME; input.value = _saveNameDraft || QUICK_SAVE_NAME;
   wrap.append(input);
   c.append(wrap);
   // THE LINE SAYS WHAT THE PRESS DOES: the slot it overwrites, drawn
@@ -2392,30 +1623,13 @@ function paneSave(body) {
   const describe = () => {
     const name = input.value.trim() || QUICK_SAVE_NAME;
     const save = mine.find((s) => s.saveName.localeCompare(name, undefined, { sensitivity: 'accent' }) === 0) ?? null;
-    line.textContent = save
-      ? t('menu.save.overwrites', 'Overwrites "{slot}" - {line}', { slot: save.saveName, line: saveLine(save) })
-      : t('menu.save.newSlot', 'A new slot, "{slot}".', { slot: name });
-    numbers.replaceChildren();
-    if (save) numbers.append(stats(saveStats(save)));
+    line.textContent = save ? t('menu.save.overwrites', 'Overwrites "{slot}" - {line}', { slot: save.saveName, line: saveLine(save) }) : t('menu.save.newSlot', 'A new slot, "{slot}".', { slot: name });
+    numbers.replaceChildren(); if (save) numbers.append(stats(saveStats(save)));
   };
-  input.oninput = () => {
-    _saveNameDraft = input.value;
-    describe();
-  };
+  input.oninput = () => { _saveNameDraft = input.value; describe(); };
   describe();
   c.append(line, numbers);
-  c.append(
-    acts([
-      {
-        label: localizedText('saveButton', 'Save'),
-        primary: true,
-        onClick: () => {
-          _pickedSaveName = input.value.trim() || QUICK_SAVE_NAME;
-          onAction('save');
-        },
-      },
-    ]),
-  ); // L10N3d: the save window's (DaggerfallUnitySaveGameWindow.cs:439)
+  c.append(acts([{ label: localizedText('saveButton', 'Save'), primary: true, onClick: () => { _pickedSaveName = input.value.trim() || QUICK_SAVE_NAME; onAction('save'); } }]));   // L10N3d: the save window's (DaggerfallUnitySaveGameWindow.cs:439)
   body.append(c);
   // TILE2: the same tiles the other two panes draw. Mac named Online
   // and Load; this pane lists the SAME slots, and leaving one of the
@@ -2427,18 +1641,8 @@ function paneSave(body) {
   // brass edge moves as the player types rather than naming a slot
   // nobody is about to touch.
   const grid = tileGrid(mine, (save) => ({
-    current:
-      save.saveName.localeCompare(input.value.trim() || QUICK_SAVE_NAME, undefined, { sensitivity: 'accent' }) === 0,
-    actions: [
-      {
-        label: t('menu.save.overwrite', 'Overwrite'),
-        primary: true,
-        onClick: () => {
-          _pickedSaveName = save.saveName;
-          onAction('save');
-        },
-      },
-    ],
+    current: save.saveName.localeCompare(input.value.trim() || QUICK_SAVE_NAME, undefined, { sensitivity: 'accent' }) === 0,
+    actions: [{ label: t('menu.save.overwrite', 'Overwrite'), primary: true, onClick: () => { _pickedSaveName = save.saveName; onAction('save'); } }],
   }));
   body.append(grid);
 }
@@ -2462,38 +1666,21 @@ function paneExit(body) {
   const save = savedGame();
   const c = el('div', 'card');
   c.append(el('h3', null, t('menu.exit.title', 'Back to the main menu')));
-  c.append(
-    el(
-      'p',
-      'meta',
-      t('menu.exit.blurb', 'This takes you back to the main menu. A browser tab can\u2019t close itself.'),
-    ),
-  );
+  c.append(el('p', 'meta', t('menu.exit.blurb', 'This takes you back to the main menu. A browser tab can\u2019t close itself.')));
   c.append(stats([[t('menu.exit.lastSave', 'Last save'), save ? saveLine(save) : t('menu.exit.none', 'none')]]));
-  c.append(
-    acts([
-      {
-        label: t('menu.exit.leave', 'Leave this game'),
-        primary: true,
-        onClick: () =>
-          ask(
-            t('menu.exit.leave', 'Leave this game'),
-            save
-              ? save.when != null
-                ? t('menu.exit.lostSince', 'Anything since {when} is lost. The quicksave itself is untouched.', {
-                    when: save.when,
-                  })
-                : t(
-                    'menu.exit.lostSinceLast',
-                    'Anything since the last save is lost. The quicksave itself is untouched.',
-                  )
-              : t('menu.exit.allLost', 'Nothing has been saved in this game, so all of it is lost.'),
-            t('menu.exit.yes', 'Exit'),
-            () => onAction('exit'),
-          ),
-      },
-    ]),
-  );
+  c.append(acts([{
+    label: t('menu.exit.leave', 'Leave this game'),
+    primary: true,
+    onClick: () => ask(
+      t('menu.exit.leave', 'Leave this game'),
+      save
+        ? (save.when != null ? t('menu.exit.lostSince', 'Anything since {when} is lost. The quicksave itself is untouched.', { when: save.when })
+          : t('menu.exit.lostSinceLast', 'Anything since the last save is lost. The quicksave itself is untouched.'))
+        : t('menu.exit.allLost', 'Nothing has been saved in this game, so all of it is lost.'),
+      t('menu.exit.yes', 'Exit'),
+      () => onAction('exit'),
+    ),
+  }]));
   body.append(c);
 }
 
@@ -2515,19 +1702,13 @@ function paneExit(body) {
 // with none, the tab: its sections and a Restore of its own defaults. Graphics opens on a PRESET (systems/
 // graphicsPresets.js). The pause window draws the same screen, condensed as PX10 had it: the rows that act in play.
 
-let optQuery = ''; // ORG2: the search, over every tab - kept across a repaint, cleared by a tab change
-let optFilter = 'all'; // ORG2: 'all' | 'changed' | a KINDS id
-let pickedFeature = null; // ORG2: the Features row the help pane reads (pickedKey is DFU's key)
-let optScrollTo = null; // ORG2: a row to bring into view after the next paint (the mods' list sends you to one)
+let optQuery = '';          // ORG2: the search, over every tab - kept across a repaint, cleared by a tab change
+let optFilter = 'all';      // ORG2: 'all' | 'changed' | a KINDS id
+let pickedFeature = null;   // ORG2: the Features row the help pane reads (pickedKey is DFU's key)
+let optScrollTo = null;     // ORG2: a row to bring into view after the next paint (the mods' list sends you to one)
 
 /** ORG2: the filters over the rows - what you changed, then the Features home's three kinds. */
-const OPT_FILTERS = Object.freeze([
-  ['all', 'All'],
-  ['changed', 'Changed'],
-  ['enhanced', 'Enhanced'],
-  ['mod', 'Mods'],
-  ['classic', 'Daggerfall Unity'],
-]);
+const OPT_FILTERS = Object.freeze([['all', 'All'], ['changed', 'Changed'], ['enhanced', 'Enhanced'], ['mod', 'Mods'], ['classic', 'Daggerfall Unity']]);
 
 /** ORG2: the port's own rows, built once a paint and found by the id each carries (`dataset.opt`). A row its builder
  *  does not draw here - the touch knobs off a touch device, the HUD's layout on the classic skin, the start video at
@@ -2536,13 +1717,7 @@ const OPT_FILTERS = Object.freeze([
 export function portPool({ pause = false } = {}) {
   const pool = new Map();
   // RPT1026-CLIENT: and the Motion section's other players' shake beside the Game rows
-  for (const r of [
-    ...portRowsGame({ pause }),
-    peerSpellShakeRow(),
-    ...portRowsAudio(),
-    ...portRowsControls({ pause }),
-    ...portRowsInterface({ pause }),
-  ]) {
+  for (const r of [...portRowsGame({ pause }), peerSpellShakeRow(), ...portRowsAudio(), ...portRowsControls({ pause }), ...portRowsInterface({ pause })]) {
     if (r?.dataset?.opt) pool.set(r.dataset.opt, r);
   }
   return pool;
@@ -2556,8 +1731,7 @@ function featureValue(id) {
 
 /** ORG2: whether an item stands away from how the game ships - a DFU key off its default, a Features row off its
  *  default segment, a port row's pref off the shelf's default. The Changed filter and the row's mark read it. */
-export function itemChanged(item, pool) {
-  // AUDIT MEM-AUDIT G1: exported for the pins
+export function itemChanged(item, pool) {   // AUDIT MEM-AUDIT G1: exported for the pins
   if (isSettingItem(item)) {
     const [sec, k] = item.split('/');
     const d = defaultOf(sec, k);
@@ -2571,21 +1745,11 @@ export function itemChanged(item, pool) {
     if (d >= 0 && d !== st.at) return true;
     // AUDIT MEM-AUDIT G1: and a part of its drawer off its default (featuresDefaults' own walk) - the preset reads Steady
     // shadows, and a part turned off read Custom on a tab that said nothing was changed
-    return (resolveControl(f)?.parts ?? []).some(
-      (pt) =>
-        Object.hasOwn(PREF_DEFAULTS, pt.key) &&
-        onlineForcedPref(pt.key) === undefined &&
-        String(getPref(pt.key)) !== String(PREF_DEFAULTS[pt.key]),
-    );
+    return (resolveControl(f)?.parts ?? []).some((pt) => Object.hasOwn(PREF_DEFAULTS, pt.key) && onlineForcedPref(pt.key) === undefined && String(getPref(pt.key)) !== String(PREF_DEFAULTS[pt.key]));
   }
   if (item.startsWith('port:')) {
     const pref = pool?.get(item.slice(5))?.dataset?.pref;
-    return (
-      !!pref &&
-      Object.hasOwn(PREF_DEFAULTS, pref) &&
-      onlineForcedPref(pref) === undefined &&
-      String(getPref(pref)) !== String(PREF_DEFAULTS[pref])
-    );
+    return !!pref && Object.hasOwn(PREF_DEFAULTS, pref) && onlineForcedPref(pref) === undefined && String(getPref(pref)) !== String(PREF_DEFAULTS[pref]);
   }
   return false;
 }
@@ -2603,36 +1767,20 @@ function itemKinds(item) {
  *  row's own text, a card's. */
 function itemText(item, pool) {
   if (isSettingItem(item)) return `${labelOf(item)} ${helpOf(item)} ${item}`;
-  if (item.startsWith('feat:')) {
-    const f = FEATURES.find((x) => x.id === item.slice(5));
-    return f ? featureSearchText(f) : '';
-  }
+  if (item.startsWith('feat:')) { const f = FEATURES.find((x) => x.id === item.slice(5)); return f ? featureSearchText(f) : ''; }
   if (item.startsWith('port:')) return pool.get(item.slice(5))?.textContent ?? '';
   if (item === 'preset:graphics') return presetSearchText();
   if (item === 'link:overhauls') return 'overhauls looks textures vanilla enhanced sounds interface';
   if (item === 'bindings') return 'key bindings keys keyboard rebind controls';
-  if (item.startsWith('card:'))
-    return (
-      {
-        morrowind: 'morrowind files data body 3d attach',
-        packs: 'packs textures music replacement folder',
-        peerSprites: 'other players look sprites',
-        nightSounds: 'night sounds crickets howl',
-      }[item.slice(5)] ?? ''
-    );
+  if (item.startsWith('card:')) return { morrowind: 'morrowind files data body 3d attach', packs: 'packs textures music replacement folder',
+    peerSprites: 'other players look sprites', nightSounds: 'night sounds crickets howl' }[item.slice(5)] ?? '';
   return '';
 }
-const normWords = (s) =>
-  String(s)
-    .toLowerCase()
-    .replace(/[\u2018\u2019]/g, "'");
+const normWords = (s) => String(s).toLowerCase().replace(/[\u2018\u2019]/g, "'");
 /** ORG2: every word of the query in the item's text. */
 function itemMatches(item, pool, q) {
   const text = normWords(itemText(item, pool));
-  return normWords(q)
-    .split(/\s+/)
-    .filter(Boolean)
-    .every((w) => text.includes(w));
+  return normWords(q).split(/\s+/).filter(Boolean).every((w) => text.includes(w));
 }
 
 /** ORG2: whether a DFU key draws as a row here - live, or read at the next start; at pause, live alone (PX10). */
@@ -2645,14 +1793,11 @@ function itemNodes(item, ctx) {
   if (optFilter !== 'all') {
     if (optFilter === 'changed' ? !itemChanged(item, pool) : !itemKinds(item).includes(optFilter)) return [];
   }
-  const mark = (n) => {
-    if (n && itemChanged(item, pool)) n.classList.add('changed');
-    return n;
-  };
+  const mark = (n) => { if (n && itemChanged(item, pool)) n.classList.add('changed'); return n; };
   if (isSettingItem(item)) {
-    if (featureForControl('settings', item)) return []; // FT13: its switch is the Features row beside it
+    if (featureForControl('settings', item)) return [];   // FT13: its switch is the Features row beside it
     if (!drawsHere(item, pause)) {
-      if (any && !pause) return [mark(settingRow(item))].filter(Boolean); // the search finds a folded key where it stands
+      if (any && !pause) return [mark(settingRow(item))].filter(Boolean);   // the search finds a folded key where it stands
       fold?.push(item);
       return [];
     }
@@ -2662,30 +1807,14 @@ function itemNodes(item, ctx) {
     const f = FEATURES.find((x) => x.id === item.slice(5));
     return f ? [mark(featureTile(f))] : [];
   }
-  if (item === 'port:language') {
-    const r = pool.get('language');
-    const pack = r ? translationPackRow() : null;
-    return r ? [mark(r), ...(pack ? [pack] : [])] : [];
-  } // L10N3b: the translation pack rides under the language row
-  if (item.startsWith('port:')) {
-    const r = pool.get(item.slice(5));
-    return r ? [mark(r)] : [];
-  }
+  if (item === 'port:language') { const r = pool.get('language'); const pack = r ? translationPackRow() : null; return r ? [mark(r), ...(pack ? [pack] : [])] : []; }   // L10N3b: the translation pack rides under the language row
+  if (item.startsWith('port:')) { const r = pool.get(item.slice(5)); return r ? [mark(r)] : []; }
   if (item === 'preset:graphics') return [graphicsPresetRow()];
   if (item === 'link:overhauls') return pause ? [] : [overhaulsLinkRow()];
   if (item === 'mods-index') return modsIndexRows();
-  if (item === 'bindings') {
-    const box = el('div', 'opt-bindings');
-    paneControls(box, { render });
-    return [box];
-  }
+  if (item === 'bindings') { const box = el('div', 'opt-bindings'); paneControls(box, { render }); return [box]; }
   if (item.startsWith('card:')) {
-    const make = {
-      morrowind: () => morrowindCard(),
-      packs: () => packsCard(),
-      peerSprites: () => peerSpritesCard(),
-      nightSounds: () => nightSoundsCard(),
-    }[item.slice(5)];
+    const make = { morrowind: () => morrowindCard(), packs: () => packsCard(), peerSprites: () => peerSpritesCard(), nightSounds: () => nightSoundsCard() }[item.slice(5)];
     return make ? [make()] : [];
   }
   return [];
@@ -2704,9 +1833,7 @@ function sectionHead(tab, s, n, { path = false } = {}) {
 
 /** ORG2: a node that is an option - a row or a Features row - and not the screen's own door (the Overhauls link), a
  *  card, or a row greyed here. What a section's head counts, as the rail's count does (tabCount). */
-const isOptionNode = (x) =>
-  (x.classList?.contains('row') && !x.classList.contains('opt-link') && x.dataset?.live !== '0') ||
-  x.classList?.contains('ft-tile');
+const isOptionNode = (x) => (x.classList?.contains('row') && !x.classList.contains('opt-link') && x.dataset?.live !== '0') || x.classList?.contains('ft-tile');
 
 /** ORG2: the rows one tab draws, section by section - `[{ s, nodes }]`, a section that drew nothing left out - and
  *  the keys it folds. */
@@ -2725,16 +1852,11 @@ function tabCount(tab, ctx) {
   let n = 0;
   for (const s of tab.sections) {
     for (const item of s.items) {
-      if (isSettingItem(item)) {
-        if (!featureForControl('settings', item) && drawsHere(item, ctx.pause)) n++;
-      } else if (item.startsWith('feat:')) n++;
-      else if (item.startsWith('port:')) {
-        const r = ctx.pool.get(item.slice(5));
-        if (r && r.dataset.live !== '0') n++;
-      } // QREPAIR: a row greyed here is not one that works here
-      else if (item === 'mods-index')
-        n += FEATURES.filter((f) => f.kinds.includes('mod')).length; // every mod has a row in the list
-      else if (item === 'preset:graphics') n++; // the preset is a choice of its own; the Overhauls door is not
+      if (isSettingItem(item)) { if (!featureForControl('settings', item) && drawsHere(item, ctx.pause)) n++; }
+      else if (item.startsWith('feat:')) n++;
+      else if (item.startsWith('port:')) { const r = ctx.pool.get(item.slice(5)); if (r && r.dataset.live !== '0') n++; }   // QREPAIR: a row greyed here is not one that works here
+      else if (item === 'mods-index') n += FEATURES.filter((f) => f.kinds.includes('mod')).length;   // every mod has a row in the list
+      else if (item === 'preset:graphics') n++;   // the preset is a choice of its own; the Overhauls door is not
     }
   }
   return n;
@@ -2752,9 +1874,7 @@ function paintOptionsBody(body, { pause = false } = {}) {
     let found = 0;
     for (const tab of CATEGORIES) {
       for (const s of tab.sections) {
-        const nodes = s.items
-          .filter((item) => item !== 'mods-index' && itemMatches(item, pool, q))
-          .flatMap((item) => itemNodes(item, { ...ctx, any: true }));
+        const nodes = s.items.filter((item) => item !== 'mods-index' && itemMatches(item, pool, q)).flatMap((item) => itemNodes(item, { ...ctx, any: true }));
         if (!nodes.length) continue;
         body.append(sectionHead(tab, s, nodes.filter(isOptionNode).length, { path: true }), ...nodes);
         found += nodes.length;
@@ -2764,7 +1884,7 @@ function paintOptionsBody(body, { pause = false } = {}) {
     return;
   }
   const tab = CATEGORIES.find((c) => c.id === category) ?? CATEGORIES[0];
-  if (tab.id === 'mods' && isOnlinePage()) body.append(el('p', 'meta opt-note', noteText(ONLINE_MODS_NOTE))); // MODS-ONLINE-2: said once, over the mods; L10N4: in the player's language
+  if (tab.id === 'mods' && isOnlinePage()) body.append(el('p', 'meta opt-note', noteText(ONLINE_MODS_NOTE)));   // MODS-ONLINE-2: said once, over the mods; L10N4: in the player's language
   const { sections, fold } = tabSections(tab, ctx);
   if (sections.length >= 3 && !pause) {
     const strip = el('nav', 'sec-jump');
@@ -2784,12 +1904,12 @@ function paintOptionsBody(body, { pause = false } = {}) {
     body.append(...nodes);
   }
   if (!sections.length) body.append(empty(optFilter === 'changed' ? 'Nothing changed' : 'Nothing here'));
-  if (pause) body.append(el('p', 'meta opt-note', 'More options in the main menu\u2019s Settings.')); // PX10: the closing line says so
+  if (pause) body.append(el('p', 'meta opt-note', 'More options in the main menu\u2019s Settings.'));   // PX10: the closing line says so
   // the tiers a tab folds: SAVED FOR LATER and NOT AVAILABLE HERE (SO1), counted and remembered per tab
   if (!pause) {
     for (const [tier, title, blurb] of TIER_GROUPS) {
       const ks = fold.filter((k) => tierOf(k) === tier);
-      if (ks.length) body.append(tierGroup(tab.id, tier, title(), blurb(), ks)); // L10N4: the group's words read as drawn
+      if (ks.length) body.append(tierGroup(tab.id, tier, title(), blurb(), ks));   // L10N4: the group's words read as drawn
     }
   }
 }
@@ -2799,18 +1919,9 @@ function paintOptionsBody(body, { pause = false } = {}) {
  *  the chips, the actions), so it is measured, not assumed: once now and on every resize, until the bar leaves the page
  *  (a repaint builds a new one). No observer, no measure: the card sticks at the top, as before. */
 export function stickUnderToolbar(list, bar, RO = globalThis.ResizeObserver) {
-  const put = () => {
-    const h = bar.offsetHeight;
-    if (Number.isFinite(h) && h > 0) list.style?.setProperty?.('--opt-tools-h', `${h}px`);
-  };
+  const put = () => { const h = bar.offsetHeight; if (Number.isFinite(h) && h > 0) list.style?.setProperty?.('--opt-tools-h', `${h}px`); };
   if (typeof RO !== 'function') return null;
-  const ro = new RO(() => {
-    if (bar.isConnected === false) {
-      ro.disconnect();
-      return;
-    }
-    put();
-  });
+  const ro = new RO(() => { if (bar.isConnected === false) { ro.disconnect(); return; } put(); });
   ro.observe(bar);
   return ro;
 }
@@ -2820,108 +1931,49 @@ function optionsToolbar(body, { pause = false } = {}) {
   const bar = el('div', 'opt-tools');
   const search = el('input', 'opt-search');
   search.type = 'search';
-  search.id = 'opt-search'; // AUDIT 32 P3: a repaint gives the caret back by id
+  search.id = 'opt-search';   // AUDIT 32 P3: a repaint gives the caret back by id
   search.placeholder = 'Search settings';
   search.setAttribute('aria-label', 'Search settings');
   search.value = optQuery;
   search.oninput = () => {
-    discardControlsStaging(); // FIX-F: a search repaints the page - a walk away from the bindings, which drops what they staged
-    optQuery = search.value;
-    pickedKey = null;
-    pickedFeature = null;
+    discardControlsStaging();   // FIX-F: a search repaints the page - a walk away from the bindings, which drops what they staged
+    optQuery = search.value; pickedKey = null; pickedFeature = null;
     paintOptionsBody(body, { pause });
     // the rail says no tab while the search reads them all - painted in place, as the body is
-    for (const b of search.closest('.panes')?.querySelectorAll('.subbtn') ?? [])
-      b.classList.toggle('on', !optQuery.trim() && b.dataset.tab === category);
+    for (const b of search.closest('.panes')?.querySelectorAll('.subbtn') ?? []) b.classList.toggle('on', !optQuery.trim() && b.dataset.tab === category);
   };
   bar.append(search);
   const chips = el('div', 'opt-filters');
   const pool = portPool({ pause });
-  const changed = CATEGORIES.reduce(
-    (n, t) =>
-      n +
-      t.sections.reduce(
-        (m, s) =>
-          m +
-          s.items.filter((i) => !(isSettingItem(i) && featureForControl('settings', i)) && itemChanged(i, pool)).length,
-        0,
-      ),
-    0,
-  );
+  const changed = CATEGORIES.reduce((n, t) => n + t.sections.reduce((m, s) => m + s.items.filter((i) => !(isSettingItem(i) && featureForControl('settings', i)) && itemChanged(i, pool)).length, 0), 0);
   for (const [id, label] of OPT_FILTERS) {
-    const b = el(
-      'button',
-      `chip${optFilter === id ? ' on' : ''}${id === 'all' || id === 'changed' ? '' : ` ${id}`}`,
-      label,
-    );
+    const b = el('button', `chip${optFilter === id ? ' on' : ''}${id === 'all' || id === 'changed' ? '' : ` ${id}`}`, label);
     b.type = 'button';
     b.setAttribute('aria-pressed', String(optFilter === id));
     if (id === 'changed') b.append(el('span', 'n', String(changed)));
-    b.onclick = () => {
-      discardControlsStaging();
-      optFilter = id;
-      pickedKey = null;
-      pickedFeature = null;
-      render();
-    }; // FIX-F: a filter hides the bindings
+    b.onclick = () => { discardControlsStaging(); optFilter = id; pickedKey = null; pickedFeature = null; render(); };   // FIX-F: a filter hides the bindings
     chips.append(b);
   }
   bar.append(chips);
   // FT18 + FEATURES-DEFAULTS (issue #399): the switches' All off and its Restore, and one reset of everything
   const kept = getPref(FEATURES_RESTORE_PREF);
-  bar.append(
-    acts([
-      {
-        label: t('menu.features.allOff', 'All off'),
-        onClick: () =>
-          ask(
-            t('menu.features.allOffTitle', 'Turn Everything Off'),
-            allOffAsk(),
-            t('menu.features.allOff', 'All off'),
-            () => {
-              featuresAllOff();
-            },
-          ),
-      },
-      ...(kept && typeof kept === 'object'
-        ? [
-            {
-              label: t('menu.features.restore', 'Restore'),
-              onClick: () => {
-                featuresRestore();
-                render();
-              },
-            },
-          ]
-        : []),
-      {
-        label: t('menu.settings.reset', 'Reset everything to defaults'),
-        onClick: () =>
-          ask(
-            t('menu.settings.resetTitle', 'Reset Everything'),
-            resetAllAsk(),
-            t('menu.settings.resetYes', 'Reset'),
-            () => {
-              resetEverything();
-            },
-          ),
-      }, // L10N4: the words the Features toolbar and the category card carried, routed where they stand now
-    ]),
-  );
+  bar.append(acts([
+    { label: t('menu.features.allOff', 'All off'), onClick: () => ask(t('menu.features.allOffTitle', 'Turn Everything Off'), allOffAsk(), t('menu.features.allOff', 'All off'), () => { featuresAllOff(); }) },
+    ...(kept && typeof kept === 'object' ? [{ label: t('menu.features.restore', 'Restore'), onClick: () => { featuresRestore(); render(); } }] : []),
+    { label: t('menu.settings.reset', 'Reset everything to defaults'), onClick: () => ask(t('menu.settings.resetTitle', 'Reset Everything'), resetAllAsk(), t('menu.settings.resetYes', 'Reset'), () => { resetEverything(); }) },   // L10N4: the words the Features toolbar and the category card carried, routed where they stand now
+  ]));
   return bar;
 }
 
 /** ORG2: the one reset of everything - DFU's settings as Daggerfall Unity ships them, and every Features row, part, mod
  *  module and dial as the game ships them (FEATURES-DEFAULTS). Your interface, text size and key bindings are not
  *  options here, and are left alone. */
-export const RESET_ALL_ASK =
-  'Every setting and mod goes back to its default. Your interface, text size and key bindings are kept.';
+export const RESET_ALL_ASK = 'Every setting and mod goes back to its default. Your interface, text size and key bindings are kept.';
 /** L10N4: the confirm's body in the player's language (RESET_ALL_ASK stays the English the pins read) - the reset's ask, its
  *  words main's since ORG2. */
 const resetAllAsk = () => t('menu.settings.resetBody', RESET_ALL_ASK);
 function resetEverything() {
-  resetToDefaults();
-  _eff = null;
+  resetToDefaults(); _eff = null;
   featuresDefaults();
 }
 
@@ -2937,22 +1989,13 @@ export function restoreTabDefaults(tab) {
     const d = defaultOf(sec, k);
     if (d !== undefined) setValue(sec, k, d);
   }
-  saveSettings();
-  _eff = null; // AUDIT F7: the store changed
-  featuresDefaults(
-    items
-      .filter((i) => i.startsWith('feat:'))
-      .map((i) => FEATURES.find((f) => f.id === i.slice(5)))
-      .filter(Boolean),
-    { spendKeep: false },
-  );
+  saveSettings(); _eff = null;   // AUDIT F7: the store changed
+  featuresDefaults(items.filter((i) => i.startsWith('feat:')).map((i) => FEATURES.find((f) => f.id === i.slice(5))).filter(Boolean), { spendKeep: false });
   const pool = portPool();
   for (const item of items) {
     const pref = item.startsWith('port:') ? pool.get(item.slice(5))?.dataset?.pref : null;
-    if (pref === MIDI_OUT_PREF)
-      setMidiOut(PREF_DEFAULTS[pref]); // AUDIT MIDI-OUT1: through the door the music hears
-    else if (pref && Object.hasOwn(PREF_DEFAULTS, pref) && onlineForcedPref(pref) === undefined)
-      setPref(pref, PREF_DEFAULTS[pref]);
+    if (pref === MIDI_OUT_PREF) setMidiOut(PREF_DEFAULTS[pref]);   // AUDIT MIDI-OUT1: through the door the music hears
+    else if (pref && Object.hasOwn(PREF_DEFAULTS, pref) && onlineForcedPref(pref) === undefined) setPref(pref, PREF_DEFAULTS[pref]);
   }
 }
 
@@ -2965,7 +2008,7 @@ function paneSettings(pane, { pause = false } = {}) {
     const on = cat.id === category && !optQuery.trim();
     const b = el('button', `subbtn${on ? ' on' : ''}`, cat.title);
     b.dataset.tab = cat.id;
-    b.append(el('span', 'count', String(tabCount(cat, { pool, pause })))); // SO1: what works here, not the file's row count
+    b.append(el('span', 'count', String(tabCount(cat, { pool, pause }))));   // SO1: what works here, not the file's row count
     // AUDIT F8, found by the live check rather than by reading: on a
     // PHONE the detail pane is a sheet that only rises when a ROW is
     // tapped, so the category card - and the Reset button living in it
@@ -2985,17 +2028,7 @@ function paneSettings(pane, { pause = false } = {}) {
     b.onclick = () => {
       // FT16: a category change is a walk away from the bindings, and
       // their copy says a walk away drops them. ORG2: and from the search - a tab pressed is the tab wanted.
-      if (on) {
-        pickedKey = null;
-        pickedFeature = null;
-        sheetOpen = true;
-      } else {
-        discardControlsStaging();
-        category = cat.id;
-        pickedKey = null;
-        pickedFeature = null;
-        optQuery = '';
-      }
+      if (on) { pickedKey = null; pickedFeature = null; sheetOpen = true; } else { discardControlsStaging(); category = cat.id; pickedKey = null; pickedFeature = null; optQuery = ''; }
       render();
     };
     if (on) b.append(el('span', 'more-dot'));
@@ -3006,7 +2039,7 @@ function paneSettings(pane, { pause = false } = {}) {
   const body = el('div', 'opt-body');
   const tools = optionsToolbar(body, { pause });
   list.append(tools, body);
-  stickUnderToolbar(list, tools); // UNSAVED-MARK: the bindings' sticky head stands under this sticky bar, never behind it
+  stickUnderToolbar(list, tools);   // UNSAVED-MARK: the bindings' sticky head stands under this sticky bar, never behind it
   paintOptionsBody(body, { pause });
   if (optScrollTo) {
     const id = optScrollTo;
@@ -3016,16 +2049,10 @@ function paneSettings(pane, { pause = false } = {}) {
 
   const detail = el('div', 'detail');
   const close = el('button', 'sheet-close', t('menu.sheet.close', 'Close'));
-  close.onclick = () => {
-    sheetOpen = false;
-    confirming = null;
-    render();
-  };
+  close.onclick = () => { sheetOpen = false; confirming = null; render(); };
   detail.append(close);
   const f = pickedFeature ? FEATURES.find((x) => x.id === pickedFeature) : null;
-  detail.append(
-    confirming ? confirmCard() : pickedKey ? helpCard(pickedKey) : f ? featureCard(f) : categoryCard({ pool, pause }),
-  );
+  detail.append(confirming ? confirmCard() : (pickedKey ? helpCard(pickedKey) : f ? featureCard(f) : categoryCard({ pool, pause })));
   if (sheetOpen) detail.classList.add('open');
 
   panes.append(rail, list, detail);
@@ -3043,29 +2070,15 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
   const d = el('div', 'dcard');
   d.append(el('h3', null, cat.title));
   const ctx = { pool, pause };
-  const changed = cat.sections.reduce(
-    (n, s) =>
-      n +
-      s.items.filter((i) => !(isSettingItem(i) && featureForControl('settings', i)) && itemChanged(i, ctx.pool)).length,
-    0,
-  );
-  d.append(
-    el(
-      'p',
-      'status',
-      t('menu.settings.tabStatus', '{n} options \u00b7 {changed} changed', { n: tabCount(cat, ctx), changed }),
-    ),
-  );
+  const changed = cat.sections.reduce((n, s) => n + s.items.filter((i) => !(isSettingItem(i) && featureForControl('settings', i)) && itemChanged(i, ctx.pool)).length, 0);
+  d.append(el('p', 'status', t('menu.settings.tabStatus', '{n} options \u00b7 {changed} changed', { n: tabCount(cat, ctx), changed })));
   const b = el('button', 'act', t('menu.settings.restoreTab', 'Restore defaults'));
-  b.onclick = () =>
-    ask(
-      t('menu.settings.restoreTabTitle', 'Restore {tab} Defaults', { tab: cat.title }),
-      t('menu.settings.restoreTabBody', 'Every option on this tab goes back to its default.'),
-      t('menu.settings.restoreYes', 'Restore'),
-      () => {
-        restoreTabDefaults(cat);
-      },
-    );
+  b.onclick = () => ask(
+    t('menu.settings.restoreTabTitle', 'Restore {tab} Defaults', { tab: cat.title }),
+    t('menu.settings.restoreTabBody', 'Every option on this tab goes back to its default.'),
+    t('menu.settings.restoreYes', 'Restore'),
+    () => { restoreTabDefaults(cat); },
+  );
   d.append(b);
   return d;
 }
@@ -3077,49 +2090,30 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
  *  of English words did not know its own note, and the row was the one on the tab no language reached. */
 const PRESET_WORDS = {
   name: () => t('menu.settings.preset.name', 'Quality preset'),
-  note: () =>
-    t(
-      'menu.settings.preset.note',
-      'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.',
-    ),
-  effect: () =>
-    t(
-      'menu.settings.preset.effect',
-      'Steady shadows and the windows change at once; the rest when the world next loads.',
-    ),
+  note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.'),
+  effect: () => t('menu.settings.preset.effect', 'Steady shadows and the windows change at once; the rest when the world next loads.'),
   custom: () => t('menu.settings.preset.custom', 'Custom'),
 };
 const PRESET_LABELS = {
-  low: () => t('menu.settings.preset.low', 'Low'),
-  medium: () => t('menu.settings.preset.medium', 'Medium'),
-  high: () => t('menu.settings.preset.high', 'High'),
-  ultra: () => t('menu.settings.preset.ultra', 'Ultra'),
+  low: () => t('menu.settings.preset.low', 'Low'), medium: () => t('menu.settings.preset.medium', 'Medium'),
+  high: () => t('menu.settings.preset.high', 'High'), ultra: () => t('menu.settings.preset.ultra', 'Ultra'),
 };
-export const presetSearchText = () =>
-  [
-    'quality preset graphics low medium high ultra performance frame rate slow',
-    'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.',
-    PRESET_WORDS.name(),
-    PRESET_WORDS.note(),
-    PRESET_WORDS.effect(),
-    ...GRAPHICS_PRESETS.map((p) => PRESET_LABELS[p.id]?.() ?? p.label),
-    ...PRESET_ROWS.map((id) => FEATURES.find((f) => f.id === id)?.title ?? ''),
-    ...PRESET_PARTS.map(
-      (k) => FEATURES.flatMap((f) => resolveControl(f)?.parts ?? []).find((pt) => pt.key === k)?.label ?? k,
-    ),
-  ].join(' ');
+export const presetSearchText = () => ['quality preset graphics low medium high ultra performance frame rate slow',
+  'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.', PRESET_WORDS.name(), PRESET_WORDS.note(), PRESET_WORDS.effect(),
+  ...GRAPHICS_PRESETS.map((p) => PRESET_LABELS[p.id]?.() ?? p.label),
+  ...PRESET_ROWS.map((id) => FEATURES.find((f) => f.id === id)?.title ?? ''),
+  ...PRESET_PARTS.map((k) => FEATURES.flatMap((f) => resolveControl(f)?.parts ?? []).find((pt) => pt.key === k)?.label ?? k)].join(' ');
 /** ORG2: THE GRAPHICS PRESET - one bar over the six rows that cost the most and its parts (systems/graphicsPresets.js), reading
  *  the preset they stand at or Custom. A press writes each row through its own door, so a lane's second store moves
  *  with it and a row the room decides is left as it is. */
-export function graphicsPresetRow() {
-  // AUDIT MEM-AUDIT G3: exported for the pins - the bar as drawn
+export function graphicsPresetRow() {   // AUDIT MEM-AUDIT G3: exported for the pins - the bar as drawn
   const now = presetNow(featureValue, getPref);
   const row = el('div', 'row opt-preset');
   row.dataset.opt = 'graphicsPreset';
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', PRESET_WORDS.name()));
-  main.append(el('div', 'row-note', PRESET_WORDS.note())); // RW1: and the real windows; MEM-AUDIT: and Steady shadows
-  main.append(el('div', 'row-sub', PRESET_WORDS.effect())); // AUDIT MEM-AUDIT G6: when it takes effect, as every other row says
+  main.append(el('div', 'row-note', PRESET_WORDS.note()));   // RW1: and the real windows; MEM-AUDIT: and Steady shadows
+  main.append(el('div', 'row-sub', PRESET_WORDS.effect()));   // AUDIT MEM-AUDIT G6: when it takes effect, as every other row says
   row.append(main);
   const ctl = el('div', 'ctl');
   const seg = el('div', 'ft-seg');
@@ -3129,18 +2123,10 @@ export function graphicsPresetRow() {
     const b = el('button', 'ft-segb', PRESET_LABELS[p.id]?.() ?? p.label);
     b.type = 'button';
     b.setAttribute('aria-pressed', String(now?.id === p.id));
-    b.onclick = (e) => {
-      e.stopPropagation();
-      applyGraphicsPreset(p);
-      render();
-    };
+    b.onclick = (e) => { e.stopPropagation(); applyGraphicsPreset(p); render(); };
     seg.append(b);
   }
-  if (!now) {
-    const c = el('span', 'ft-segb custom', PRESET_WORDS.custom());
-    c.setAttribute('aria-current', 'true');
-    seg.append(c);
-  }
+  if (!now) { const c = el('span', 'ft-segb custom', PRESET_WORDS.custom()); c.setAttribute('aria-current', 'true'); seg.append(c); }
   ctl.append(seg);
   row.append(ctl);
   return row;
@@ -3153,11 +2139,10 @@ export function applyGraphicsPreset(p) {
     const st = f && tileStates(f);
     if (!st || st.locked || !c?.tiers) continue;
     const i = c.tiers.findIndex(([v]) => String(v) === String(p.values[id]));
-    if (i >= 0 && (i !== st.at || c.write)) st.set(i); // AUDIT MEM-AUDIT G2: a lane's row written whole - its bar reads one store (land view off the enhanced outdoors: DFU's 1..4), and Low left the other at 5
+    if (i >= 0 && (i !== st.at || c.write)) st.set(i);   // AUDIT MEM-AUDIT G2: a lane's row written whole - its bar reads one store (land view off the enhanced outdoors: DFU's 1..4), and Low left the other at 5
   }
   // MEM-AUDIT: and its parts, each written straight as its drawer writes it - one the room decides is left as it is
-  for (const k of PRESET_PARTS)
-    if (onlineForcedPref(k) === undefined && String(getPref(k)) !== String(p.parts[k])) setPref(k, p.parts[k]);
+  for (const k of PRESET_PARTS) if (onlineForcedPref(k) === undefined && String(getPref(k)) !== String(p.parts[k])) setPref(k, p.parts[k]);
 }
 
 /** ORG2: the Overhauls page's door, on the Graphics tab - the whole looks are chosen there. */
@@ -3165,13 +2150,7 @@ function overhaulsLinkRow() {
   const row = el('div', 'row opt-link');
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', 'Overhauls'));
-  main.append(
-    el(
-      'div',
-      'row-note',
-      'Overhauls for the world, its sounds and the interface, such as Vanilla Enhanced, are on the Overhauls page.',
-    ),
-  );
+  main.append(el('div', 'row-note', 'Overhauls for the world, its sounds and the interface, such as Vanilla Enhanced, are on the Overhauls page.'));
   row.append(main);
   const ctl = el('div', 'ctl');
   const b = el('button', 'act rowact', 'Open');
@@ -3185,33 +2164,19 @@ function overhaulsLinkRow() {
 /** ORG2: EVERY MOD, ONE LIST - each mod the game carries, where its options live, and its switch. A press on its name
  *  takes you to its row on its own tab. */
 function modsIndexRows() {
-  return FEATURES.filter((f) => f.kinds.includes('mod'))
-    .sort((a, b) => a.title.localeCompare(b.title))
-    .map((f) => {
-      const st = tileStates(f);
-      const row = el('div', 'row opt-modrow');
-      const main = el('button', 'row-main');
-      main.type = 'button';
-      main.append(
-        el('div', 'row-name', f.title),
-        el('div', 'row-note', optionPath(`feat:${f.id}`).replace(/^Settings \u203a /, '')),
-      );
-      main.onclick = () => {
-        const w = whereIs(`feat:${f.id}`);
-        if (w) {
-          category = w.tab.id;
-          pickedFeature = f.id;
-          pickedKey = null;
-          optScrollTo = `opt-${f.id}`;
-          render();
-        }
-      };
-      row.append(main);
-      const ctl = el('div', 'ctl');
-      if (st) ctl.append(segBar(st, f.title));
-      row.append(ctl);
-      return row;
-    });
+  return FEATURES.filter((f) => f.kinds.includes('mod')).sort((a, b) => a.title.localeCompare(b.title)).map((f) => {
+    const st = tileStates(f);
+    const row = el('div', 'row opt-modrow');
+    const main = el('button', 'row-main');
+    main.type = 'button';
+    main.append(el('div', 'row-name', f.title), el('div', 'row-note', optionPath(`feat:${f.id}`).replace(/^Settings \u203a /, '')));
+    main.onclick = () => { const w = whereIs(`feat:${f.id}`); if (w) { category = w.tab.id; pickedFeature = f.id; pickedKey = null; optScrollTo = `opt-${f.id}`; render(); } };
+    row.append(main);
+    const ctl = el('div', 'ctl');
+    if (st) ctl.append(segBar(st, f.title));
+    row.append(ctl);
+    return row;
+  });
 }
 
 /** ORG2: A FEATURES ROW'S CARD in the help pane - where it lives, what it does, when it takes effect, a mod's keys. */
@@ -3224,24 +2189,13 @@ function featureCard(f) {
   if (f.note) d.append(el('p', 'ft-rail-note', f.note));
   if (f.effect) d.append(el('p', 'ft-rail-effect', f.effect));
   const kv = el('dl', 'ft-rail-kv');
-  const pair = (k, v) => {
-    kv.append(el('dt', null, k), el('dd', null, v));
-  };
-  const rv =
-    c.store === 'mods'
-      ? c.vendor
-      : ((Array.isArray(c.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null);
+  const pair = (k, v) => { kv.append(el('dt', null, k), el('dd', null, v)); };
+  const rv = c.store === 'mods' ? c.vendor
+    : (Array.isArray(c.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null;
   if (rv) {
     // UXB1-F: a mod's keys, where a player reading about the mod is already looking
     const keys = modKeyRows(rv, bindings());
-    if (keys.length)
-      pair(
-        t('menu.features.keysLabel', 'Keys'),
-        t('menu.features.keysList', '{keys} \u2013 {note}', {
-          keys: keys.map((k) => `${k.label}: ${k.key}`).join(' · '),
-          note: featureKeysNote(),
-        }),
-      ); // L10N4: one pattern
+    if (keys.length) pair(t('menu.features.keysLabel', 'Keys'), t('menu.features.keysList', '{keys} \u2013 {note}', { keys: keys.map((k) => `${k.label}: ${k.key}`).join(' · '), note: featureKeysNote() }));   // L10N4: one pattern
   }
   if (kv.children?.length) d.append(kv);
   return d;
@@ -3315,11 +2269,7 @@ function settingRow(key, { compact = false, home = false } = {}) {
   // always meant to be and where the player who wants it will look.
   const main = el('button', 'row-main');
   main.append(el('div', 'row-name', labelOf(key)));
-  main.onclick = () => {
-    pickedKey = key;
-    sheetOpen = true;
-    render();
-  };
+  main.onclick = () => { pickedKey = key; sheetOpen = true; render(); };
   row.append(main);
 
   const ctl = el('div', 'ctl');
@@ -3346,25 +2296,16 @@ function settingRow(key, { compact = false, home = false } = {}) {
     // A switch has one direction, so it gets one control rather than a
     // pair of arrows pointing at the same place.
     const b = el('button', 'act', formatValue(key, raw));
-    b.classList.add('rowact'); // AUDIT UI: sized by the sheet, not inline
+    b.classList.add('rowact');   // AUDIT UI: sized by the sheet, not inline
     if (raw === 'True') b.classList.add('primary');
     b.onclick = () => write(key, stepValue(key, raw, 1));
-    if (onlineForcedSetting(_sec, _k) !== undefined)
-      lockOnline(b, null, { note: ONLINE_SETTING_NOTE, value: raw === 'True' }); // DISC22-A: the room's rule, shown locked
+    if (onlineForcedSetting(_sec, _k) !== undefined) lockOnline(b, null, { note: ONLINE_SETTING_NOTE, value: raw === 'True' });   // DISC22-A: the room's rule, shown locked
     ctl.append(b);
   } else {
     ctl.append(val);
-    for (const [dir, glyph] of [
-      [-1, '\u2039'],
-      [1, '\u203a'],
-    ]) {
+    for (const [dir, glyph] of [[-1, '\u2039'], [1, '\u203a']]) {
       const b = el('button', 'step', glyph);
-      b.setAttribute(
-        'aria-label',
-        dir < 0
-          ? t('menu.settings.less', 'less {name}', { name: labelOf(key) })
-          : t('menu.settings.more', 'more {name}', { name: labelOf(key) }),
-      );
+      b.setAttribute('aria-label', dir < 0 ? t('menu.settings.less', 'less {name}', { name: labelOf(key) }) : t('menu.settings.more', 'more {name}', { name: labelOf(key) }));
       // shift is the COARSE step settingsLaw already defines - a
       // volume slider that moves in 5% steps is 20 presses of patience
       // without it.
@@ -3387,16 +2328,13 @@ function settingRow(key, { compact = false, home = false } = {}) {
  *  the now moved settings options that are now in our new Features
  *  pane"). Every seam that draws a row asks the registry and answers
  *  null through here; every caller appends only what it is handed. */
-function movedRow(_f) {
-  return null;
-}
+function movedRow(_f) { return null; }
 /** FT13: the keys of a category that still LIVE on the settings pane -
  *  the moved ones are the home's and are neither drawn nor counted. */
 const paneKeys = (catId) => keysOf(catId).filter((key) => !featureForControl('settings', key));
 /** Append what a row builder handed back, or nothing (FT13). */
-const put = (parent, row) => {
-  if (row) parent.append(row);
-};
+const put = (parent, row) => { if (row) parent.append(row); };
+
 
 /** Write through the real store and persist, exactly as the shipped
  *  screen does. setValue drops an override that equals the default
@@ -3406,7 +2344,7 @@ function write(key, next) {
   const [sec, k] = key.split('/');
   setValue(sec, k, next);
   saveSettings();
-  _eff = null; // the store changed - drop the cache, then redraw from it
+  _eff = null;   // the store changed - drop the cache, then redraw from it
   render();
 }
 
@@ -3439,59 +2377,38 @@ const ONLINE_LOCK_NOTE = 'Always on online: the shared world uses every enhancem
 /** MODS-ONLINE-2: the Mods pane's own line. The lane's note (above)
  *  is about the PORT's switches and was wrong over the tiles the
  *  moment a mod stopped being forced. */
-const ONLINE_MODS_NOTE =
-  'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Detailed Ships, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism and Roleplay & Realism: Items, except who stands behind shop counters. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.'; // AUDIT IT1 W5: a port's ship passage is fast travel online too
-const ONLINE_GROUND_NOTE =
-  'Set for everyone online, because everyone has to stand on the same ground: roads, rivers, camp sites, ship decks and the seafloor. Offline, your own choice applies.'; // AUDIT LANDFORMS C4: the rivers' row is one of the ground's since LANDFORM3 cut their channels
+const ONLINE_MODS_NOTE = 'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Detailed Ships, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism and Roleplay & Realism: Items, except who stands behind shop counters. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.';   // AUDIT IT1 W5: a port's ship passage is fast travel online too
+const ONLINE_GROUND_NOTE = 'Set for everyone online, because everyone has to stand on the same ground: roads, rivers, camp sites, ship decks and the seafloor. Offline, your own choice applies.';   // AUDIT LANDFORMS C4: the rivers' row is one of the ground's since LANDFORM3 cut their channels
 /** WOD1: the vendors whose room-owned switch is the GROUND's - the two
  *  that write terrain heights (roads' beds, World of Daggerfall's sites). */
-const ONLINE_GROUND_VENDORS = Object.freeze(['roads-hazelnut', 'world-of-daggerfall', 'detailed-ships', 'ocean-holes']); // DS1: the ships' shared deck   // OH-A: the pits cut into the seafloor
+const ONLINE_GROUND_VENDORS = Object.freeze(['roads-hazelnut', 'world-of-daggerfall', 'detailed-ships', 'ocean-holes']);   // DS1: the ships' shared deck   // OH-A: the pits cut into the seafloor
 /** DW-D: a vendor whose room-owned switches are the ground's AND other reasons names its ground keys - the carved
  *  sea's switch and its depth. */
 const ONLINE_GROUND_KEYS = Object.freeze({ 'iliac-puddle-no-more': Object.freeze(['Enabled', 'General.WaterDepth']) });
 /** MODS-ONLINE-4: the other three, and their reason is not the ground -
  *  it is that this switch would be spending somebody else's evening. */
-const ONLINE_SHARED_NOTE =
-  'On for everyone online, because a dungeon\u2019s monsters belong to whoever hosts it and loot passes between players. Offline, your own choice applies.';
+const ONLINE_SHARED_NOTE = 'On for everyone online, because a dungeon\u2019s monsters belong to whoever hosts it and loot passes between players. Offline, your own choice applies.';
 /** MODS-ONLINE-5: one ruleset per room - the reason PCAAO is forced whole, and RR's six combat overrides and its
  *  intensive training with it. Not the ground's reason and not the host's foes', so its own words. */
-const ONLINE_RULESET_NOTE =
-  'Set for everyone online, so all players share one set of combat, training and swimming rules. Offline, your own choice applies.';
+const ONLINE_RULESET_NOTE = 'Set for everyone online, so all players share one set of combat, training and swimming rules. Offline, your own choice applies.';
 const ONLINE_RULESET_KEYS = Object.freeze({
-  'roleplay-realism': Object.freeze([
-    'advancedArchery',
-    'weaponSpeed',
-    'weaponMaterials',
-    'classicStrengthDamageBonus',
-    'equipDamage',
-    'encumbranceEffects',
-    'RefinedTraining.intensiveTraining',
-  ]),
-  'iliac-puddle-no-more': Object.freeze([
-    'General.SwimSpeedMultiplier',
-    'General.EnableSwimStroke',
-    'General.ArgonianInfiniteBreath',
-  ]), // DW-D: the swim and the breath
+  'roleplay-realism': Object.freeze(['advancedArchery', 'weaponSpeed', 'weaponMaterials', 'classicStrengthDamageBonus', 'equipDamage', 'encumbranceEffects', 'RefinedTraining.intensiveTraining']),
+  'iliac-puddle-no-more': Object.freeze(['General.SwimSpeedMultiplier', 'General.EnableSwimStroke', 'General.ArgonianInfiniteBreath']),   // DW-D: the swim and the breath
 });
 /** REALM P0.2: a dial of a balance mod the room owns whole (onlineLane.js ONLINE_WHOLE_MODS) - its own reason. */
-const ONLINE_BALANCE_NOTE =
-  'Set for everyone online, so no setting makes one character stronger or richer than the rest. Offline, your own choice applies.';
+const ONLINE_BALANCE_NOTE = 'Set for everyone online, so no setting makes one character stronger or richer than the rest. Offline, your own choice applies.';
 /** DISC22-A: a DFU setting the room plays by (onlineLane.js ONLINE_FORCED_SETTINGS) - its own reason. */
-const ONLINE_SETTING_NOTE =
-  'Set for everyone online, so enchanted items are repaired the same way for all players. Offline, your own choice applies.';
+const ONLINE_SETTING_NOTE = 'Set for everyone online, so enchanted items are repaired the same way for all players. Offline, your own choice applies.';
 /** RAID2: a world event the room shares - its own reason, not the ground's, the ruleset's or a host's foes'. */
 const ONLINE_WORLD_EVENT_VENDORS = Object.freeze(['world-events-raiding-parties']);
-const ONLINE_WORLD_EVENT_NOTE =
-  'On for everyone online: a raid is shared, so everyone in town fights the same raiders and every kill counts for all. Offline, your own choice applies.';
+const ONLINE_WORLD_EVENT_NOTE = 'On for everyone online: a raid is shared, so everyone in town fights the same raiders and every kill counts for all. Offline, your own choice applies.';
 /** TRAVEL-ONLINE: Travel Options' three room switches - the mod and its two journey dials - and their own reason. */
 const ONLINE_TRAVEL_VENDORS = Object.freeze(['travel-options']);
-const ONLINE_TRAVEL_NOTE =
-  'On for everyone online: every trip over land is traveled, and ships sail only from ports. Offline, your own choice applies.';
+const ONLINE_TRAVEL_NOTE = 'On for everyone online: every trip over land is traveled, and ships sail only from ports. Offline, your own choice applies.';
 /** IT1: Immersive Travel's two room switches - the mod (its carriages stand at the gates, ground everyone walks among) and
  *  Disable Normal Travel held off - and their own reason. */
 const ONLINE_CARRIAGE_VENDORS = Object.freeze(['immersive-travel']);
-const ONLINE_CARRIAGE_NOTE =
-  'Set for everyone online. Carriages wait at every city gate, trips on the travel map are traveled in full, and a driver\u2019s fare is your fast travel over land, at the same price for everyone. Offline, your own choice applies.'; // AUDIT IT1 W5
+const ONLINE_CARRIAGE_NOTE = 'Set for everyone online. Carriages wait at every city gate, trips on the travel map are traveled in full, and a driver\u2019s fare is your fast travel over land, at the same price for everyone. Offline, your own choice applies.';   // AUDIT IT1 W5
 /** L10N4: the notes above in the player's language. Each constant stays the English identity the ladders below hand
  *  round (and the pins read); a note is turned into words where it is shown (noteText). */
 const NOTE_TEXT = new Map([
@@ -3507,31 +2424,12 @@ const NOTE_TEXT = new Map([
   [ONLINE_CARRIAGE_NOTE, () => t('menu.online.carriageNote', ONLINE_CARRIAGE_NOTE)],
 ]);
 const noteText = (note) => NOTE_TEXT.get(note)?.() ?? note;
-const onlineLockNote = (vendor, key) =>
-  ONLINE_GROUND_VENDORS.includes(vendor) || ONLINE_GROUND_KEYS[vendor]?.includes(key)
-    ? ONLINE_GROUND_NOTE
-    : ONLINE_RULESET_KEYS[vendor]?.includes(key)
-      ? ONLINE_RULESET_NOTE
-      : ONLINE_WORLD_EVENT_VENDORS.includes(vendor)
-        ? ONLINE_WORLD_EVENT_NOTE
-        : ONLINE_TRAVEL_VENDORS.includes(vendor)
-          ? ONLINE_TRAVEL_NOTE
-          : ONLINE_CARRIAGE_VENDORS.includes(vendor)
-            ? ONLINE_CARRIAGE_NOTE
-            : ONLINE_SHARED_NOTE; // IT1
+const onlineLockNote = (vendor, key) => (ONLINE_GROUND_VENDORS.includes(vendor) || ONLINE_GROUND_KEYS[vendor]?.includes(key) ? ONLINE_GROUND_NOTE : ONLINE_RULESET_KEYS[vendor]?.includes(key) ? ONLINE_RULESET_NOTE : ONLINE_WORLD_EVENT_VENDORS.includes(vendor) ? ONLINE_WORLD_EVENT_NOTE : ONLINE_TRAVEL_VENDORS.includes(vendor) ? ONLINE_TRAVEL_NOTE : ONLINE_CARRIAGE_VENDORS.includes(vendor) ? ONLINE_CARRIAGE_NOTE : ONLINE_SHARED_NOTE);   // IT1
 /** REALM P0.2: a key the room owns only because its mod is owned whole wears the balance note; a key the room table names keeps its own. */
-const modLockNote = (vendor, key) =>
-  !Object.hasOwn(ONLINE_ROOM_MOD_KEYS[vendor] ?? {}, key) &&
-  onlineWholeModKey(vendor, key, undefined, { offline: true })
-    ? ONLINE_BALANCE_NOTE
-    : onlineLockNote(vendor, key);
+const modLockNote = (vendor, key) => (!Object.hasOwn(ONLINE_ROOM_MOD_KEYS[vendor] ?? {}, key) && onlineWholeModKey(vendor, key, undefined, { offline: true }) ? ONLINE_BALANCE_NOTE : onlineLockNote(vendor, key));
 /** REALM P0.2: a DIAL the room owns online - its steppers and buttons answer nothing, and say why. */
 function lockDial(ctl, note) {
-  for (const b of ctl.querySelectorAll('button')) {
-    b.disabled = true;
-    b.setAttribute('aria-disabled', 'true');
-    b.title = noteText(note);
-  }
+  for (const b of ctl.querySelectorAll('button')) { b.disabled = true; b.setAttribute('aria-disabled', 'true'); b.title = noteText(note); }
   ctl.title = noteText(note);
 }
 function lockOnline(b, main, { note = ONLINE_LOCK_NOTE, value = true } = {}) {
@@ -3545,37 +2443,26 @@ function lockOnline(b, main, { note = ONLINE_LOCK_NOTE, value = true } = {}) {
 
 /** One toggle over a uiPrefs key. */
 function prefRow(key, name, note, { onChange = null, home = false } = {}) {
-  if (!home) {
-    const moved = featureForControl('prefs', key);
-    if (moved) return movedRow(moved);
-  } // FT2: one home per idea, every store
+  if (!home) { const moved = featureForControl('prefs', key); if (moved) return movedRow(moved); }   // FT2: one home per idea, every store
   const row = el('div', 'row');
-  row.dataset.opt = key;
-  row.dataset.pref = key; // ORG2: the map places a port row by its id; Changed reads its pref
+  row.dataset.opt = key; row.dataset.pref = key;   // ORG2: the map places a port row by its id; Changed reads its pref
   const main = el('button', 'row-main');
   main.append(el('div', 'row-name', name));
   if (note) main.append(el('div', 'row-note', note));
   const on = !!getPref(key);
-  main.onclick = () => {
-    setPref(key, !on);
-    onChange?.(!on);
-    render();
-  };
+  main.onclick = () => { setPref(key, !on); onChange?.(!on); render(); };
   row.append(main);
   const ctl = el('div', 'ctl');
   const b = el('button', `act${on ? ' primary' : ''}`, on ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'));
-  b.classList.add('rowact'); // AUDIT UI: sized by the sheet, so the coarse-pointer rule can reach it
+  b.classList.add('rowact');   // AUDIT UI: sized by the sheet, so the coarse-pointer rule can reach it
   b.setAttribute('aria-pressed', String(on));
-  b.onclick = () => {
-    setPref(key, !on);
-    onChange?.(!on);
-    render();
-  };
-  if (onlineForcedPref(key) !== undefined) lockOnline(b, main); // OL1
+  b.onclick = () => { setPref(key, !on); onChange?.(!on); render(); };
+  if (onlineForcedPref(key) !== undefined) lockOnline(b, main);   // OL1
   ctl.append(b, el('span', 'tier live'));
   row.append(ctl);
   return row;
 }
+
 
 // ── SO1: THE PORT'S OWN ROWS, IN THE CATEGORIES A PLAYER LOOKS IN ──
 // . The Enhanced PANE - a rail entry of its own holding
@@ -3595,43 +2482,22 @@ function prefRow(key, name, note, { onChange = null, home = false } = {}) {
 /** A choice row: the button names the CURRENT tier and a click steps
  *  to the next, wrapping (PERF1). */
 function choiceRow(key, name, note, tiers, { home = false, read = null, write = null } = {}) {
-  if (!home) {
-    const moved = featureForControl('prefs', key);
-    if (moved) return movedRow(moved);
-  } // FT2
+  if (!home) { const moved = featureForControl('prefs', key); if (moved) return movedRow(moved); }   // FT2
   // FT2: a condensed row reads the lane's live value and writes both stores
   const cur = String(read ? read() : getPref(key));
   const found = tiers.findIndex(([v]) => String(v) === cur);
-  const at =
-    found >= 0
-      ? found
-      : Math.max(
-          0,
-          tiers.findIndex(
-            ([v]) =>
-              String(v) ===
-              String(
-                featureForControl('prefs', key)?.control?.default ?? featureForControl('prefs', key)?.control?.initial,
-              ),
-          ),
-        ); // BLOOD AUDIT 5: the row's default, not the first tier, for a value that is no tier
+  const at = found >= 0 ? found : Math.max(0, tiers.findIndex(([v]) => String(v) === String(featureForControl('prefs', key)?.control?.default ?? featureForControl('prefs', key)?.control?.initial)));   // BLOOD AUDIT 5: the row's default, not the first tier, for a value that is no tier
   const row = el('div', 'row');
   const main = el('button', 'row-main');
   main.append(el('div', 'row-name', name));
   main.append(el('div', 'row-note', note));
-  const step = () => {
-    (write ?? ((v) => setPref(key, v)))(tiers[(at + 1) % tiers.length][0]);
-    render();
-  };
+  const step = () => { (write ?? ((v) => setPref(key, v)))(tiers[(at + 1) % tiers.length][0]); render(); };
   main.onclick = step;
   row.append(main);
   const ctl = el('div', 'ctl');
   const b = el('button', 'act rowact', tiers[at][1]);
   b.onclick = step;
-  if (onlineForcedPref(key) !== undefined) {
-    lockOnline(b, main);
-    b.textContent = t('menu.online.lockedTier', '{tier} (online)', { tier: tiers[at][1] });
-  } // OL1: the outdoors row reads the lane's forced answer and names its tier under the lock
+  if (onlineForcedPref(key) !== undefined) { lockOnline(b, main); b.textContent = t('menu.online.lockedTier', '{tier} (online)', { tier: tiers[at][1] }); }   // OL1: the outdoors row reads the lane's forced answer and names its tier under the lock
   ctl.append(b, el('span', 'tier live'));
   row.append(ctl);
   return row;
@@ -3640,17 +2506,13 @@ function choiceRow(key, name, note, tiers, { home = false, read = null, write = 
 /** A stepped number row over a uiPrefs key (TI2's shape). */
 function stepRow(key, name, note, { min, max, step: inc, fmt }) {
   const row = el('div', 'row');
-  row.dataset.opt = key;
-  row.dataset.pref = key; // ORG2
+  row.dataset.opt = key; row.dataset.pref = key;   // ORG2
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', name));
   if (note) main.append(el('div', 'row-note', note));
   row.append(main);
   const ctl = el('div', 'ctl');
-  const cur = () => {
-    const v = Number(getPref(key));
-    return Number.isFinite(v) ? v : 1;
-  }; // MONSTER-VOL: 0 is a value (a muted volume), not unset
+  const cur = () => { const v = Number(getPref(key)); return Number.isFinite(v) ? v : 1; };   // MONSTER-VOL: 0 is a value (a muted volume), not unset
   const val = el('span', 'val', fmt(cur()));
   const step = (delta, label) => {
     const b = el('button', 'step', label);
@@ -3672,16 +2534,12 @@ function stepRow(key, name, note, { min, max, step: inc, fmt }) {
  *  strings are Claude's drafts says so. */
 function languageRow() {
   const row = el('div', 'row');
-  row.dataset.opt = 'language';
-  row.dataset.pref = 'language'; // ORG2: the map finds it by its key (settingsMap port:language)
+  row.dataset.opt = 'language'; row.dataset.pref = 'language';   // ORG2: the map finds it by its key (settingsMap port:language)
   const main = el('div', 'row-main');
   const cur = currentLocale();
   main.append(el('div', 'row-name', t('settings.language.name', 'Language')));
-  main.append(
-    el('div', 'row-note', t('settings.language.note', 'The language of the game\u2019s text. Takes effect at once.')),
-  );
-  if (localeInfo(cur)?.source === 'machine')
-    main.append(el('div', 'row-note', t('settings.language.machine', 'Machine translated')));
+  main.append(el('div', 'row-note', t('settings.language.note', 'The language of the game\u2019s text. Takes effect at once.')));
+  if (localeInfo(cur)?.source === 'machine') main.append(el('div', 'row-note', t('settings.language.machine', 'Machine translated')));
   row.append(main);
   const ctl = el('div', 'ctl');
   const sel = el('select', 'act langsel');
@@ -3695,9 +2553,7 @@ function languageRow() {
     if (l.code === cur) o.selected = true;
     sel.append(o);
   }
-  sel.onchange = () => {
-    chooseLanguage(sel.value);
-  };
+  sel.onchange = () => { chooseLanguage(sel.value); };
   ctl.append(sel, el('span', 'tier live'));
   row.append(ctl);
   return row;
@@ -3715,35 +2571,12 @@ function translationPackRow() {
   const row = el('div', 'row');
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', t('settings.pack.name', 'Translation pack')));
-  main.append(
-    el(
-      'div',
-      'row-note',
-      pack
-        ? t(
-            'settings.pack.installed',
-            '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the machine translation.',
-            {
-              name: pack.name,
-              tables: pack.counts?.table ?? 0,
-              quests: pack.counts?.quest ?? 0,
-              books: pack.counts?.book ?? 0,
-            },
-          )
-        : t(
-            'settings.pack.none',
-            'Install a Daggerfall Unity translation into {language} from your own files. Nothing is uploaded.',
-            { language: info.name },
-          ),
-    ),
-  );
+  main.append(el('div', 'row-note', pack
+    ? t('settings.pack.installed', '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the machine translation.', { name: pack.name, tables: pack.counts?.table ?? 0, quests: pack.counts?.quest ?? 0, books: pack.counts?.book ?? 0 })
+    : t('settings.pack.none', 'Install a Daggerfall Unity translation into {language} from your own files. Nothing is uploaded.', { language: info.name })));
   row.append(main);
   const ctl = el('div', 'ctl');
-  const install = el(
-    'button',
-    'act',
-    pack ? t('settings.pack.replace', 'Replace…') : t('settings.pack.install', 'Install…'),
-  );
+  const install = el('button', 'act', pack ? t('settings.pack.replace', 'Replace…') : t('settings.pack.install', 'Install…'));
   install.onclick = async () => {
     const ds = await import('../../scenes/dataSource.js');
     await ds.pickTranslationPack(cur, info.name);
@@ -3771,9 +2604,7 @@ async function chooseLanguage(code) {
   try {
     const { switchLocale } = await import('../../scenes/localeData.js');
     await switchLocale(code);
-  } catch (err) {
-    console.error('[text] the language could not switch:', err?.message ?? err);
-  }
+  } catch (err) { console.error('[text] the language could not switch:', err?.message ?? err); }
   render();
 }
 
@@ -3783,39 +2614,16 @@ async function chooseLanguage(code) {
 function languageOffer() {
   if (getPref('languageOffered') || currentLocale() !== BASE_LOCALE) return null;
   const nav = globalThis.navigator;
-  const code = localeForBrowser(nav?.languages?.length ? nav.languages : [nav?.language], (c) =>
-    availableLocales().some((l) => l.code === c),
-  );
+  const code = localeForBrowser(nav?.languages?.length ? nav.languages : [nav?.language], (c) => availableLocales().some((l) => l.code === c));
   if (!code || !localeTable(code, 'Port_Strings')?.has('lang.offer')) return null;
   const card = el('div', 'px-langoffer');
   card.lang = code;
   card.append(el('div', 'px-langoffer-q', tIn(code, 'lang.offer', 'Play in English?')));
-  if (localeInfo(code)?.source === 'machine')
-    card.append(
-      el(
-        'div',
-        'px-langoffer-note',
-        tIn(code, 'lang.offer.machine', 'This translation is machine-made and still being checked.'),
-      ),
-    );
-  card.append(
-    acts([
-      {
-        label: tIn(code, 'lang.offer.yes', 'Yes'),
-        primary: true,
-        onClick: () => {
-          chooseLanguage(code);
-        },
-      },
-      {
-        label: tIn(code, 'lang.offer.no', 'No, keep English'),
-        onClick: () => {
-          setPref('languageOffered', true);
-          render();
-        },
-      },
-    ]),
-  );
+  if (localeInfo(code)?.source === 'machine') card.append(el('div', 'px-langoffer-note', tIn(code, 'lang.offer.machine', 'This translation is machine-made and still being checked.')));
+  card.append(acts([
+    { label: tIn(code, 'lang.offer.yes', 'Yes'), primary: true, onClick: () => { chooseLanguage(code); } },
+    { label: tIn(code, 'lang.offer.no', 'No, keep English'), onClick: () => { setPref('languageOffered', true); render(); } },
+  ]));
   return card;
 }
 
@@ -3823,8 +2631,7 @@ function languageOffer() {
  *  a range). `choices` is [id, label] in order; the store holds the id. */
 function slotChoiceRow(key, name, note, choices, current) {
   const row = el('div', 'row');
-  row.dataset.opt = key;
-  row.dataset.pref = key; // ORG2
+  row.dataset.opt = key; row.dataset.pref = key;   // ORG2
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', name));
   if (note) main.append(el('div', 'row-note', note));
@@ -3835,11 +2642,7 @@ function slotChoiceRow(key, name, note, choices, current) {
   const val = el('span', 'val', labelOf(cur));
   const step = (dir, label) => {
     const b = el('button', 'step', label);
-    b.onclick = () => {
-      cur = nextTouchButton(cur, dir);
-      setPref(key, cur);
-      val.textContent = labelOf(cur);
-    };
+    b.onclick = () => { cur = nextTouchButton(cur, dir); setPref(key, cur); val.textContent = labelOf(cur); };
     return b;
   };
   ctl.append(step(-1, '\u2039'), val, step(1, '\u203a'));
@@ -3851,13 +2654,9 @@ function slotChoiceRow(key, name, note, choices, current) {
  *  at uiPrefs.hudScale). Takes effect at once. */
 function hudScaleRow() {
   const row = el('div', 'row');
-  row.dataset.opt = 'hudScale';
-  row.dataset.pref = 'hudScale'; // ORG2
+  row.dataset.opt = 'hudScale'; row.dataset.pref = 'hudScale';   // ORG2
   const main = el('div', 'row-main');
-  main.append(
-    el('div', 'row-name', t('menu.hud.scale', 'Gameplay HUD scale')),
-    el('div', 'row-note', t('menu.hud.scaleNote', 'Compass, bars and effect icons.')),
-  );
+  main.append(el('div', 'row-name', t('menu.hud.scale', 'Gameplay HUD scale')), el('div', 'row-note', t('menu.hud.scaleNote', 'Compass, bars and effect icons.')));
   row.append(main);
   const ctl = el('div', 'ctl');
   const val = el('span', 'val', `${hudScaleNow().toFixed(2)}\u00d7`);
@@ -3880,13 +2679,9 @@ function hudScaleRow() {
  *  scale, stepped through MAP_SCALE_CHOICES (ui/map/mapScale.js). An open map takes it on its next frame. */
 function mapScaleRow() {
   const row = el('div', 'row');
-  row.dataset.opt = 'mapScale';
-  row.dataset.pref = 'mapScale'; // ORG2
+  row.dataset.opt = 'mapScale'; row.dataset.pref = 'mapScale';   // ORG2
   const main = el('div', 'row-main');
-  main.append(
-    el('div', 'row-name', 'Map text and icons'),
-    el('div', 'row-note', 'The world, town and dungeon maps. Auto grows them on screens taller than 1080p.'),
-  );
+  main.append(el('div', 'row-name', 'Map text and icons'), el('div', 'row-note', 'The world, town and dungeon maps. Auto grows them on screens taller than 1080p.'));
   row.append(main);
   const ctl = el('div', 'ctl');
   const h = () => globalThis.innerHeight || 0;
@@ -3910,31 +2705,17 @@ function mapScaleRow() {
  *  moves with a drag of the freed mouse. Reset puts every piece back where the game stands it. */
 function hudLayoutRows() {
   const lockRow = el('div', 'row');
-  lockRow.dataset.opt = 'hudLock'; // ORG2
+  lockRow.dataset.opt = 'hudLock';   // ORG2
   const main = el('button', 'row-main');
   const locked = hudLocked();
-  main.append(
-    el('div', 'row-name', t('menu.hud.lock', 'Lock UI')),
-    el(
-      'div',
-      'row-note',
-      locked
-        ? t('menu.hud.lockOn', 'Turn off (or press Alt+U) to move HUD pieces.')
-        : t('menu.hud.lockOff', 'In play, drag a piece to move it; double-click to put it back.'),
-    ),
-  );
-  const flip = () => {
-    setHudLocked(!hudLocked());
-    render();
-  };
+  main.append(el('div', 'row-name', t('menu.hud.lock', 'Lock UI')), el('div', 'row-note', locked
+    ? t('menu.hud.lockOn', 'Turn off (or press Alt+U) to move HUD pieces.')
+    : t('menu.hud.lockOff', 'In play, drag a piece to move it; double-click to put it back.')));
+  const flip = () => { setHudLocked(!hudLocked()); render(); };
   main.onclick = flip;
   lockRow.append(main);
   const ctl = el('div', 'ctl');
-  const b = el(
-    'button',
-    `act rowact${locked ? ' primary' : ''}`,
-    locked ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'),
-  );
+  const b = el('button', `act rowact${locked ? ' primary' : ''}`, locked ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'));
   b.setAttribute('aria-pressed', String(locked));
   b.onclick = flip;
   ctl.append(b, el('span', 'tier live'));
@@ -3942,53 +2723,30 @@ function hudLayoutRows() {
 
   // the three bars: moved as one piece, or each on its own
   const barsRow = el('div', 'row');
-  barsRow.dataset.opt = 'hudBars'; // ORG2
+  barsRow.dataset.opt = 'hudBars';   // ORG2
   const bmain = el('button', 'row-main');
   const split = hudBarsSplit();
-  bmain.append(
-    el('div', 'row-name', t('menu.hud.splitBars', 'Move bars separately')),
-    el(
-      'div',
-      'row-note',
-      split
-        ? t('menu.hud.splitBarsOn', 'Each bar moves on its own.')
-        : t('menu.hud.splitBarsOff', 'The three bars move as one.'),
-    ),
-  );
-  const bflip = () => {
-    setHudBarsSplit(!hudBarsSplit());
-    render();
-  };
+  bmain.append(el('div', 'row-name', t('menu.hud.splitBars', 'Move bars separately')), el('div', 'row-note', split
+    ? t('menu.hud.splitBarsOn', 'Each bar moves on its own.')
+    : t('menu.hud.splitBarsOff', 'The three bars move as one.')));
+  const bflip = () => { setHudBarsSplit(!hudBarsSplit()); render(); };
   bmain.onclick = bflip;
   barsRow.append(bmain);
   const bctl = el('div', 'ctl');
-  const bb = el(
-    'button',
-    `act rowact${split ? ' primary' : ''}`,
-    split ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'),
-  );
+  const bb = el('button', `act rowact${split ? ' primary' : ''}`, split ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'));
   bb.setAttribute('aria-pressed', String(split));
   bb.onclick = bflip;
   bctl.append(bb, el('span', 'tier live'));
   barsRow.append(bctl);
 
   const resetRow = el('div', 'row');
-  resetRow.dataset.opt = 'hudReset'; // ORG2
+  resetRow.dataset.opt = 'hudReset';   // ORG2
   const rmain = el('div', 'row-main');
-  rmain.append(
-    el('div', 'row-name', t('menu.hud.reset', 'Reset UI')),
-    el('div', 'row-note', t('menu.hud.resetNote', 'Puts every HUD piece you moved back in its usual place.')),
-  );
+  rmain.append(el('div', 'row-name', t('menu.hud.reset', 'Reset UI')), el('div', 'row-note', t('menu.hud.resetNote', 'Puts every HUD piece you moved back in its usual place.')));
   resetRow.append(rmain);
   const rctl = el('div', 'ctl');
   const rb = el('button', 'act rowact', t('menu.hud.resetGo', 'Reset'));
-  rb.onclick = () => {
-    resetHudLayout();
-    rb.textContent = t('menu.hud.resetDone', 'Done');
-    setTimeout(() => {
-      rb.textContent = t('menu.hud.resetGo', 'Reset');
-    }, 1200);
-  };
+  rb.onclick = () => { resetHudLayout(); rb.textContent = t('menu.hud.resetDone', 'Done'); setTimeout(() => { rb.textContent = t('menu.hud.resetGo', 'Reset'); }, 1200); };
   rctl.append(rb, el('span', 'tier live'));
   resetRow.append(rctl);
   return [lockRow, barsRow, resetRow];
@@ -4000,54 +2758,19 @@ function outdoorsTestRow() {
   const test = el('div', 'row');
   const testMain = el('div', 'row-main');
   testMain.append(el('div', 'row-name', t('menu.test.outdoorsName', 'Test the outdoors')));
-  testMain.append(
-    el(
-      'div',
-      'row-note',
-      t(
-        'menu.test.outdoorsNote',
-        'Pick a season and a weather, and drop into a random town. A test door: it stores nothing, and it names the town in the console.',
-      ),
-    ),
-  );
+  testMain.append(el('div', 'row-note', t('menu.test.outdoorsNote', 'Pick a season and a weather, and drop into a random town. A test door: it stores nothing, and it names the town in the console.')));
   const testCtl = el('div', 'ctl');
   const seasonSel = el('select', 'act');
   // Daggerfall has three ARCHIVE seasons (winter, rain, summer),
   // and the field has a CALENDAR. A season here is both: the archive
   // the world dresses in; the day is sent for any test that wants it.
-  const SEASONS = [
-    ['winter', 'winter', 0],
-    ['spring', 'rain', 90],
-    ['summer', 'summer', 180],
-    ['fall', 'summer', 300],
-  ];
+  const SEASONS = [['winter', 'winter', 0], ['spring', 'rain', 90], ['summer', 'summer', 180], ['fall', 'summer', 300]];
   // L10N4: what the two lists SAY; each option's value stays the id the world's door reads
-  const SEASON_TEXT = {
-    winter: () => t('menu.test.season.winter', 'winter'),
-    spring: () => t('menu.test.season.spring', 'spring'),
-    summer: () => t('menu.test.season.summer', 'summer'),
-    fall: () => t('menu.test.season.fall', 'fall'),
-  };
-  const WEATHER_TEXT = {
-    sunny: () => t('menu.test.weather.sunny', 'sunny'),
-    cloudy: () => t('menu.test.weather.cloudy', 'cloudy'),
-    overcast: () => t('menu.test.weather.overcast', 'overcast'),
-    fog: () => t('menu.test.weather.fog', 'fog'),
-    rain: () => t('menu.test.weather.rain', 'rain'),
-    thunder: () => t('menu.test.weather.thunder', 'thunder'),
-    snow: () => t('menu.test.weather.snow', 'snow'),
-  };
-  for (const [label, , day] of SEASONS) {
-    const o = el('option', '', SEASON_TEXT[label]());
-    o.value = String(day);
-    seasonSel.append(o);
-  }
+  const SEASON_TEXT = { winter: () => t('menu.test.season.winter', 'winter'), spring: () => t('menu.test.season.spring', 'spring'), summer: () => t('menu.test.season.summer', 'summer'), fall: () => t('menu.test.season.fall', 'fall') };
+  const WEATHER_TEXT = { sunny: () => t('menu.test.weather.sunny', 'sunny'), cloudy: () => t('menu.test.weather.cloudy', 'cloudy'), overcast: () => t('menu.test.weather.overcast', 'overcast'), fog: () => t('menu.test.weather.fog', 'fog'), rain: () => t('menu.test.weather.rain', 'rain'), thunder: () => t('menu.test.weather.thunder', 'thunder'), snow: () => t('menu.test.weather.snow', 'snow') };
+  for (const [label, , day] of SEASONS) { const o = el('option', '', SEASON_TEXT[label]()); o.value = String(day); seasonSel.append(o); }
   const weatherSel = el('select', 'act');
-  for (const wn of ['sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow']) {
-    const o = el('option', '', WEATHER_TEXT[wn]());
-    o.value = wn;
-    weatherSel.append(o);
-  }
+  for (const wn of ['sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow']) { const o = el('option', '', WEATHER_TEXT[wn]()); o.value = wn; weatherSel.append(o); }
   const go = el('button', 'act primary', t('menu.test.spawn', 'Spawn'));
   go.type = 'button';
   go.addEventListener('click', () => {
@@ -4056,22 +2779,14 @@ function outdoorsTestRow() {
     url.search = '';
     const day = Number(seasonSel.value);
     const archive = SEASONS.find((x) => x[2] === day)?.[1] ?? 'summer';
-    for (const [k, v] of [
-      ['world', ''],
-      ['spawn', 'random'],
-      ['season', archive],
-      ['day', String(day)],
-      ['weather', weatherSel.value],
-      ['class', '1'],
-      ['novideo', ''],
-    ])
-      url.searchParams.set(k, v);
+    for (const [k, v] of [['world', ''], ['spawn', 'random'], ['season', archive], ['day', String(day)], ['weather', weatherSel.value], ['class', '1'], ['novideo', '']]) url.searchParams.set(k, v);
     location.href = url.toString().replace(/=(&|$)/g, '$1');
   });
   testCtl.append(seasonSel, weatherSel, go);
   test.append(testMain, testCtl);
   return test;
 }
+
 
 /** MIDI-OUT1: THE AUDIO TAB'S PORT ROW - the music on a MIDI device
  *  (systems/midiOut.js). The button names the device; a click steps to the next one connected, then Off. The first
@@ -4082,22 +2797,17 @@ export const MIDI_OUT_NONE = 'This browser has no MIDI.';
 export const MIDI_OUT_DENIED = 'MIDI is blocked for this site.';
 export const MIDI_OUT_EMPTY = 'No MIDI device connected.';
 export const MIDI_OUT_AWAY = 'Not connected. The game’s own synthesizer plays.';
-let midiOutList = null; // the outputs as last asked - null until the row's first click
+let midiOutList = null;   // the outputs as last asked - null until the row's first click
 function portRowsAudio() {
   const can = midiOutSupported();
   const cur = midiOutName();
-  const note = !can
-    ? MIDI_OUT_NONE
-    : midiOutDenied()
-      ? MIDI_OUT_DENIED
-      : midiOutList && !midiOutList.length
-        ? MIDI_OUT_EMPTY
-        : cur && midiOutList && !midiOutList.some((o) => o.name === cur)
-          ? MIDI_OUT_AWAY
-          : MIDI_OUT_NOTE;
+  const note = !can ? MIDI_OUT_NONE
+    : midiOutDenied() ? MIDI_OUT_DENIED
+    : midiOutList && !midiOutList.length ? MIDI_OUT_EMPTY
+    : cur && midiOutList && !midiOutList.some((o) => o.name === cur) ? MIDI_OUT_AWAY
+    : MIDI_OUT_NOTE;
   const row = el('div', 'row');
-  row.dataset.opt = 'midiOut';
-  row.dataset.pref = 'midiOut'; // ORG2
+  row.dataset.opt = 'midiOut'; row.dataset.pref = 'midiOut';   // ORG2
   const main = el('button', 'row-main');
   main.append(el('div', 'row-name', MIDI_OUT_NAME));
   main.append(el('div', 'row-note', note));
@@ -4122,11 +2832,8 @@ function portRowsAudio() {
  *  Audio tab's Volume row for what monsters say - calls, attack sounds, pain cries (systems/monsterVolume.js). */
 export const MONSTER_VOLUME_NAME = 'Monster Volume';
 function monsterVolumeRow() {
-  return volumeRow(
-    'monsterVolume',
-    t('menu.audio.monsterVolume', MONSTER_VOLUME_NAME),
-    t('menu.audio.monsterVolumeNote', 'How loud monsters call, strike and cry out.'),
-  );
+  return volumeRow('monsterVolume', t('menu.audio.monsterVolume', MONSTER_VOLUME_NAME),
+    t('menu.audio.monsterVolumeNote', 'How loud monsters call, strike and cry out.'));
 }
 /** COMPANION-VOL: the Audio tab's
  *  Volume row for a companion's idle calls - the moans and cries a crew hand or a sworn one gives out while it walks with
@@ -4134,61 +2841,39 @@ function monsterVolumeRow() {
  *  Grimoire dress paint it as every Volume row. */
 export const COMPANION_VOLUME_NAME = 'Companion Idle Volume';
 function companionVolumeRow() {
-  return volumeRow(
-    'companionVolume',
-    t('menu.audio.companionVolume', COMPANION_VOLUME_NAME),
-    t(
-      'menu.audio.companionVolumeNote',
-      "How loud companions moan and cry out while they idle, yours and other players' alike. 0% silences them.",
-    ),
-  ); // AUDIT UPDATE E-N6: every companion's idle call - a peer's puppet carries `companion` too
+  return volumeRow('companionVolume', t('menu.audio.companionVolume', COMPANION_VOLUME_NAME),
+    t('menu.audio.companionVolumeNote', 'How loud companions moan and cry out while they idle, yours and other players\' alike. 0% silences them.'));   // AUDIT UPDATE E-N6: every companion's idle call - a peer's puppet carries `companion` too
 }
 /** HORSE-VOL, ANIMAL-VOL: the Audio tab's Volume rows for every
  *  horse heard and for the other animal flats (systems/animalVolume.js), drawn as Monster Volume's. */
 export const HORSE_VOLUME_NAME = 'Horse Volume';
 export const ANIMAL_VOLUME_NAME = 'Animal Volume';
 function horseVolumeRow() {
-  return volumeRow(
-    'horseVolume',
-    t('menu.audio.horseVolume', HORSE_VOLUME_NAME),
-    t('menu.audio.horseVolumeNote', 'How loud horses neigh and clop, your own mount included.'),
-  );
+  return volumeRow('horseVolume', t('menu.audio.horseVolume', HORSE_VOLUME_NAME),
+    t('menu.audio.horseVolumeNote', 'How loud horses neigh and clop, your own mount included.'));
 }
 function animalVolumeRow() {
-  return volumeRow(
-    'animalVolume',
-    t('menu.audio.animalVolume', ANIMAL_VOLUME_NAME),
-    t('menu.audio.animalVolumeNote', 'How loud dogs, cats, pigs and cows call.'),
-  );
+  return volumeRow('animalVolume', t('menu.audio.animalVolume', ANIMAL_VOLUME_NAME),
+    t('menu.audio.animalVolumeNote', 'How loud dogs, cats, pigs and cows call.'));
 }
 /** MONSTER-VOL's row, for any 0..1 volume on the shelf (`key`): its name, `note` its title. */
 function volumeRow(key, name, note) {
   // drawn as Sound Volume and Music Volume are (settingRow's number arm): the name alone, then the value and its two
   // arrows - 5% a press, 20% with Shift - and the row's tier
   const row = el('div', 'row');
-  row.dataset.opt = key;
-  row.dataset.pref = key; // ORG2
+  row.dataset.opt = key; row.dataset.pref = key;   // ORG2
   const main = el('button', 'row-main');
   main.append(el('div', 'row-name', name));
   main.title = note;
   row.append(main);
   const ctl = el('div', 'ctl');
-  const cur = () => {
-    const v = Number(getPref(key));
-    return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 1;
-  };
+  const cur = () => { const v = Number(getPref(key)); return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 1; };
   const pct = (v) => `${Math.round(v * 100)}%`;
   const val = el('span', 'val', pct(cur()));
   ctl.append(val);
-  for (const [dir, glyph] of [
-    [-1, '\u2039'],
-    [1, '\u203a'],
-  ]) {
+  for (const [dir, glyph] of [[-1, '\u2039'], [1, '\u203a']]) {
     const b = el('button', 'step', glyph);
-    b.setAttribute(
-      'aria-label',
-      dir < 0 ? t('menu.settings.less', 'less {name}', { name }) : t('menu.settings.more', 'more {name}', { name }),
-    );
+    b.setAttribute('aria-label', dir < 0 ? t('menu.settings.less', 'less {name}', { name }) : t('menu.settings.more', 'more {name}', { name }));
     b.onclick = (e) => {
       const next = Math.round(Math.max(0, Math.min(1, cur() + dir * (e.shiftKey ? 0.2 : 0.05))) * 100) / 100;
       setPref(key, next);
@@ -4206,118 +2891,59 @@ function volumeRow(key, name, note) {
 function portRowsControls() {
   const out = [];
   // PAD-CURSOR: a controller's, on every device and both skins - the touch knobs below stay a finger's device's
-  out.push(
-    prefRow('padCursorAssist', 'Controller cursor assist', 'Eases the controller\u2019s menu cursor onto buttons.'),
-  );
+  out.push(prefRow('padCursorAssist', 'Controller cursor assist',
+    'Eases the controller\u2019s menu cursor onto buttons.'));
   if (!isTouchDevice()) return out;
   const times = (v) => `${v.toFixed(2)}\u00d7`;
-  out.push(
-    stepRow(
-      'touchLookSensitivity',
-      t('menu.touch.look', 'Look sensitivity'),
-      t('menu.touch.lookNote', 'How far a drag turns the camera.'),
-      { min: 0.25, max: 4, step: 0.25, fmt: times },
-    ),
-  );
-  out.push(
-    prefRow(
-      'touchAnalogStick',
-      t('menu.touch.analog', 'Analog stick'),
-      t('menu.touch.analogNote', 'Push farther to run. Off: any push is a full step.'),
-    ),
-  );
+  out.push(stepRow('touchLookSensitivity', t('menu.touch.look', 'Look sensitivity'),
+    t('menu.touch.lookNote', 'How far a drag turns the camera.'),
+    { min: 0.25, max: 4, step: 0.25, fmt: times }));
+  out.push(prefRow('touchAnalogStick', t('menu.touch.analog', 'Analog stick'),
+    t('menu.touch.analogNote', 'Push farther to run. Off: any push is a full step.')));
   // the anchor is a two-way choice, not a switch: a row whose button names the OTHER option
   {
     const fixed = getPref('touchStickAnchor') === 'fixed';
     const row = el('div', 'row');
-    row.dataset.opt = 'touchStickAnchor';
-    row.dataset.pref = 'touchStickAnchor'; // ORG2
+    row.dataset.opt = 'touchStickAnchor'; row.dataset.pref = 'touchStickAnchor';   // ORG2
     const main = el('button', 'row-main');
     main.append(el('div', 'row-name', t('menu.touch.stick', 'Stick position')));
-    main.append(
-      el(
-        'div',
-        'row-note',
-        fixed
-          ? t('menu.touch.stickFixedNote', 'Bottom-left.')
-          : t('menu.touch.stickFloatNote', 'Wherever your thumb lands.'),
-      ),
-    );
-    const flip = () => {
-      setPref('touchStickAnchor', fixed ? 'float' : 'fixed');
-      render();
-    };
+    main.append(el('div', 'row-note', fixed
+      ? t('menu.touch.stickFixedNote', 'Bottom-left.')
+      : t('menu.touch.stickFloatNote', 'Wherever your thumb lands.')));
+    const flip = () => { setPref('touchStickAnchor', fixed ? 'float' : 'fixed'); render(); };
     main.onclick = flip;
     row.append(main);
     const ctl = el('div', 'ctl');
-    const b = el(
-      'button',
-      'act rowact',
-      fixed ? t('menu.touch.stickFixed', 'Fixed') : t('menu.touch.stickFloat', 'Floating'),
-    );
+    const b = el('button', 'act rowact', fixed ? t('menu.touch.stickFixed', 'Fixed') : t('menu.touch.stickFloat', 'Floating'));
     b.onclick = flip;
     ctl.append(b, el('span', 'tier live'));
     row.append(ctl);
     out.push(row);
   }
-  out.push(
-    prefRow('touchGyroLook', t('menu.touch.gyro', 'Gyro aim'), t('menu.touch.gyroNote', 'Tilt the phone to aim.'), {
-      // iOS grants motion only from a user gesture - this click is one.
-      onChange: (on) => {
-        if (on) {
-          try {
-            globalThis.DeviceMotionEvent?.requestPermission?.()?.catch?.(() => {});
-          } catch {
-            /* not iOS */
-          }
-        }
-      },
-    }),
-  );
-  out.push(
-    stepRow(
-      'touchGyroSensitivity',
-      t('menu.touch.gyroSensitivity', 'Gyro sensitivity'),
-      t('menu.touch.gyroSensitivityNote', 'Degrees of camera per degree of phone.'),
-      { min: 0.25, max: 4, step: 0.25, fmt: times },
-    ),
-  );
-  out.push(
-    prefRow(
-      'touchHaptics',
-      t('menu.touch.haptics', 'Haptics'),
-      t('menu.touch.hapticsNote', 'A short buzz on presses, swings and locks.'),
-    ),
-  );
+  out.push(prefRow('touchGyroLook', t('menu.touch.gyro', 'Gyro aim'),
+    t('menu.touch.gyroNote', 'Tilt the phone to aim.'), {
+    // iOS grants motion only from a user gesture - this click is one.
+    onChange: (on) => { if (on) { try { globalThis.DeviceMotionEvent?.requestPermission?.()?.catch?.(() => {}); } catch { /* not iOS */ } } },
+  }));
+  out.push(stepRow('touchGyroSensitivity', t('menu.touch.gyroSensitivity', 'Gyro sensitivity'),
+    t('menu.touch.gyroSensitivityNote', 'Degrees of camera per degree of phone.'),
+    { min: 0.25, max: 4, step: 0.25, fmt: times }));
+  out.push(prefRow('touchHaptics', t('menu.touch.haptics', 'Haptics'),
+    t('menu.touch.hapticsNote', 'A short buzz on presses, swings and locks.')));
   // TOUCH-BUTTONS: the corner's three slots, right to left. Changed here while
   // playing, the corner is re-laid as soon as no finger holds one of its buttons.
   {
     const choices = touchButtonChoices();
-    const slotNames = [
-      t('menu.touch.slot1', 'Corner button'),
-      t('menu.touch.slot2', 'Second button'),
-      t('menu.touch.slot3', 'Third button'),
-    ];
+    const slotNames = [t('menu.touch.slot1', 'Corner button'), t('menu.touch.slot2', 'Second button'), t('menu.touch.slot3', 'Third button')];
     TOUCH_BUTTON_SLOTS.forEach((slot, i) => {
-      out.push(
-        slotChoiceRow(
-          slot,
-          slotNames[i],
-          i === 0 ? t('menu.touch.slotNote', 'The bottom-right buttons, from the corner in.') : null,
-          choices,
-          () => touchButtonSlots(getPref)[i].id,
-        ),
-      );
+      out.push(slotChoiceRow(slot, slotNames[i],
+        i === 0 ? t('menu.touch.slotNote', 'The bottom-right buttons, from the corner in.') : null,
+        choices, () => touchButtonSlots(getPref)[i].id));
     });
   }
-  out.push(
-    prefRow(
-      'touchFullscreen',
-      t('menu.touch.fullscreen', 'Fullscreen on touch'),
-      t('menu.touch.fullscreenNote', 'Fullscreen on the first touch. On iPhone, add the game to the home screen.'),
-    ),
-  );
-  return out.filter(Boolean); // FT13: a pref that lives on the home draws nothing
+  out.push(prefRow('touchFullscreen', t('menu.touch.fullscreen', 'Fullscreen on touch'),
+    t('menu.touch.fullscreenNote', 'Fullscreen on the first touch. On iPhone, add the game to the home screen.')));
+  return out.filter(Boolean);   // FT13: a pref that lives on the home draws nothing
 }
 
 /** The INTERFACE category's port rows: the HUD's size, the FPS counter
@@ -4325,43 +2951,25 @@ function portRowsControls() {
  *  (MENU-TOGGLE: the Interface Style row is retired). */
 function portRowsInterface({ pause = false } = {}) {
   const out = [];
-  if (!pause) out.push(languageRow()); // L10N1b: the front door's alone - a running game is the language it booted in
-  if (!pause) {
-    const packRow = translationPackRow();
-    if (packRow) out.push(packRow);
-  } // L10N3b: and its translation pack
+  if (!pause) out.push(languageRow());   // L10N1b: the front door's alone - a running game is the language it booted in
+  if (!pause) { const packRow = translationPackRow(); if (packRow) out.push(packRow); }   // L10N3b: and its translation pack
   out.push(hudScaleRow());
-  out.push(mapScaleRow()); // MAP-SCALE
-  out.push(
-    prefRow(
-      'standingAll',
-      "Every faction's standing",
-      "Show your reputation with every guild, temple, knightly order, kingdom, coven, vampire clan and Daedric Prince on the character sheet's Standing page, including ones you don't belong to.",
-    ),
-  ); // EVERY-STANDING
-  if (isEnhanced()) out.push(...hudLayoutRows()); // HUD-MOVE: the Enhanced Plus HUD's own - Classic draws none of it
+  out.push(mapScaleRow());   // MAP-SCALE
+  out.push(prefRow('standingAll', 'Every faction\'s standing',
+    'Show your reputation with every guild, temple, knightly order, kingdom, coven, vampire clan and Daedric Prince on the character sheet\'s Standing page, including ones you don\'t belong to.'));   // EVERY-STANDING
+  if (isEnhanced()) out.push(...hudLayoutRows());   // HUD-MOVE: the Enhanced Plus HUD's own - Classic draws none of it
   // FOEBAR1: the target bar's face is a two-way choice, not a switch - the
   // stick-position row's shape: a row whose button names the OTHER option.
   {
     const blade = getPref('foeBarStyle') === 'blade';
     const row = el('div', 'row');
-    row.dataset.opt = 'foeBarStyle';
-    row.dataset.pref = 'foeBarStyle'; // ORG2
+    row.dataset.opt = 'foeBarStyle'; row.dataset.pref = 'foeBarStyle';   // ORG2
     const main = el('button', 'row-main');
     main.append(el('div', 'row-name', t('menu.hud.foeBar', 'Target bar')));
-    main.append(
-      el(
-        'div',
-        'row-note',
-        blade
-          ? t('menu.hud.foeBarBladeNote', 'Twin blades under the compass.')
-          : t('menu.hud.foeBarBarNote', 'A plain bar under the compass.'),
-      ),
-    );
-    const flip = () => {
-      setPref('foeBarStyle', blade ? 'bar' : 'blade');
-      render();
-    };
+    main.append(el('div', 'row-note', blade
+      ? t('menu.hud.foeBarBladeNote', 'Twin blades under the compass.')
+      : t('menu.hud.foeBarBarNote', 'A plain bar under the compass.')));
+    const flip = () => { setPref('foeBarStyle', blade ? 'bar' : 'blade'); render(); };
     main.onclick = flip;
     row.append(main);
     const ctl = el('div', 'ctl');
@@ -4371,22 +2979,18 @@ function portRowsInterface({ pause = false } = {}) {
     row.append(ctl);
     out.push(row);
   }
-  out.push(
-    prefRow('showFps', t('menu.hud.fps', 'FPS counter'), t('menu.hud.fpsNote', 'Frame rate in the top-right corner.')),
-  );
-  if (!pause) out.push(prefRow('skipStartVideo', skipStartVideoName(), skipStartVideoNote())); // UXB1-A: read at launch, so the front door's alone - as the skin's
-  out.push(reducedMotionRow()); // Settings > Accessibility lists it (ui/settings/settingsMap.js)
-  return out.filter(Boolean); // FT13
+  out.push(prefRow('showFps', t('menu.hud.fps', 'FPS counter'),
+    t('menu.hud.fpsNote', 'Frame rate in the top-right corner.')));
+  if (!pause) out.push(prefRow('skipStartVideo', skipStartVideoName(), skipStartVideoNote()));   // UXB1-A: read at launch, so the front door's alone - as the skin's
+  out.push(reducedMotionRow());   // Settings > Accessibility lists it (ui/settings/settingsMap.js)
+  return out.filter(Boolean);   // FT13
 }
 
 /** The reduced-motion row (systems/uiPrefs.js reducedMotion): the gate's title cards stand still
  *  (ui/gate/gateTitleCard.js). Every device, both skins. */
 function reducedMotionRow() {
   const name = t('menu.spire.motion.name', 'Reduced motion');
-  const note = t(
-    'menu.spire.motion.note',
-    "Nothing on the HUD pulses, flies or rises. Your system's own setting does the same.",
-  );
+  const note = t('menu.spire.motion.note', 'Nothing on the HUD pulses, flies or rises. Your system\'s own setting does the same.');
   return prefRow('reducedMotion', name, note);
 }
 
@@ -4414,7 +3018,7 @@ const questRepairAsk = () => t('menu.questRepair.ask', QUEST_REPAIR_ASK);
 function portRowsGame({ pause = false } = {}) {
   const can = pause && typeof hooks?.repairQuests === 'function';
   const row = el('div', 'row');
-  row.dataset.opt = 'questRepair'; // ORG2
+  row.dataset.opt = 'questRepair';   // ORG2
   if (!can) row.dataset.live = '0';
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', t('menu.questRepair.name', 'Repair active quests')));
@@ -4425,20 +3029,11 @@ function portRowsGame({ pause = false } = {}) {
   if (!can) b.disabled = true;
   b.onclick = () => {
     if (!can) return;
-    ask(
-      t('menu.questRepair.title', 'Repair Active Quests'),
-      questRepairAsk(),
-      t('menu.questRepair.go', 'Repair'),
-      () => {
-        let r = null;
-        try {
-          r = hooks.repairQuests();
-        } catch {
-          r = null;
-        }
-        questRepairSaid = r?.text ?? t('menu.questRepair.failed', 'The repair could not run here.');
-      },
-    );
+    ask(t('menu.questRepair.title', 'Repair Active Quests'), questRepairAsk(), t('menu.questRepair.go', 'Repair'), () => {
+      let r = null;
+      try { r = hooks.repairQuests(); } catch { r = null; }
+      questRepairSaid = r?.text ?? t('menu.questRepair.failed', 'The repair could not run here.');
+    });
   };
   ctl.append(b, el('span', `tier ${can ? 'live' : 'unavailable'}`));
   row.append(ctl);
@@ -4448,54 +3043,26 @@ function portRowsGame({ pause = false } = {}) {
  *  another player's spell shakes the view where it lands (scenes/hostMagic.js peerKickShare); Settings > Accessibility >
  *  Motion lists it beside the recoil, which is the player's own injuries alone. */
 function peerSpellShakeRow() {
-  const row = choiceRow(
-    'peerSpellShake',
-    t('menu.motion.peerShake.name', "Shake from other players' spells"),
-    t(
-      'menu.motion.peerShake.note',
-      "How much another player's spell shakes your view when it lands near you. Your own spells and your enemies' always shake it fully.",
-    ),
-    [
-      [1, t('menu.motion.peerShake.full', 'Full')],
-      [0.5, t('menu.motion.peerShake.half', 'Half')],
-      [0, t('menu.motion.peerShake.off', 'Off')],
-    ],
-  );
-  if (row?.dataset) {
-    row.dataset.opt = 'peerSpellShake';
-    row.dataset.pref = 'peerSpellShake';
-  } // ORG2: the map finds it by its key
+  const row = choiceRow('peerSpellShake', t('menu.motion.peerShake.name', "Shake from other players' spells"),
+    t('menu.motion.peerShake.note', "How much another player's spell shakes your view when it lands near you. Your own spells and your enemies' always shake it fully."),
+    [[1, t('menu.motion.peerShake.full', 'Full')], [0.5, t('menu.motion.peerShake.half', 'Half')], [0, t('menu.motion.peerShake.off', 'Off')]]);
+  if (row?.dataset) { row.dataset.opt = 'peerSpellShake'; row.dataset.pref = 'peerSpellShake'; }   // ORG2: the map finds it by its key
   return row;
 }
 /** TECH-FX (THE FEEL): how much a weapon technique moves the screen - every device,
  *  both skins; Settings > Accessibility > Motion lists it (ui/settings/settingsMap.js). GATHER-FEEL II: and a gathering tool's
  *  landed blow (systems/gatherBlow.js gatherBlowFeel - the springs' one door), on the enhanced skin. */
 function techniqueMotionRow() {
-  const row = choiceRow(
-    'techniqueMotion',
-    'Technique camera motion',
+  const row = choiceRow('techniqueMotion', 'Technique camera motion',
     'How much a weapon technique shakes and tilts the view and dips your hands. On the Enhanced skin, it also sets how far your hands dip when you gather.',
-    [
-      [1, 'Full'],
-      [0.75, '75%'],
-      [0.5, 'Half'],
-      [0.25, 'Low'],
-      [0, 'Off'],
-    ],
-  );
-  if (row?.dataset) {
-    row.dataset.opt = 'techniqueMotion';
-    row.dataset.pref = 'techniqueMotion';
-  } // ORG2: the map finds it by its key
+    [[1, 'Full'], [0.75, '75%'], [0.5, 'Half'], [0.25, 'Low'], [0, 'Off']]);
+  if (row?.dataset) { row.dataset.opt = 'techniqueMotion'; row.dataset.pref = 'techniqueMotion'; }   // ORG2: the map finds it by its key
   return row;
 }
 
 /** FPS-VSYNC: a key the desktop shell reads at its next launch does something here too - drawn flat with the live
  *  ones (never at pause, whose rows take effect at once). */
-function drawsFlat(key) {
-  const t = tierOf(key);
-  return t === 'live' || t === 'restart';
-}
+function drawsFlat(key) { const t = tierOf(key); return t === 'live' || t === 'restart'; }
 
 /** The tiers a category folds: SAVED FOR LATER (stored, unread) and
  *  NOT AVAILABLE HERE (fixed by the browser or a port choice). Each is
@@ -4504,19 +3071,9 @@ function drawsFlat(key) {
  *  rest with one press. The fold is remembered per category on the
  *  prefs shelf (uiPrefs isOpen/setOpen), which is what the shelf's
  *  `open` map was made for. */
-const TIER_GROUPS = Object.freeze([
-  // L10N4: each group's title and blurb read when drawn, in the player's language
-  [
-    'stored',
-    () => t('menu.settings.storedTitle', 'Saved for later'),
-    () => t('menu.settings.storedBlurb', 'Kept in your settings file, but not used yet.'),
-  ],
-  [
-    'unavailable',
-    () => t('menu.settings.unavailableTitle', 'Not available here'),
-    () =>
-      t('menu.settings.unavailableBlurb', 'Fixed by the browser or by this game. Each row says what you get instead.'),
-  ],
+const TIER_GROUPS = Object.freeze([   // L10N4: each group's title and blurb read when drawn, in the player's language
+  ['stored', () => t('menu.settings.storedTitle', 'Saved for later'), () => t('menu.settings.storedBlurb', 'Kept in your settings file, but not used yet.')],
+  ['unavailable', () => t('menu.settings.unavailableTitle', 'Not available here'), () => t('menu.settings.unavailableBlurb', 'Fixed by the browser or by this game. Each row says what you get instead.')],
 ]);
 
 function tierGroup(catId, tier, title, blurb, keys) {
@@ -4524,15 +3081,8 @@ function tierGroup(catId, tier, title, blurb, keys) {
   const g = el('section', `group${open ? ' open' : ''}`);
   const headBtn = el('button', 'group-head');
   headBtn.setAttribute('aria-expanded', String(open));
-  headBtn.append(
-    el('span', 'group-title', title),
-    el('span', 'count', String(keys.length)),
-    el('span', 'group-chev', open ? '\u2212' : '+'),
-  );
-  headBtn.onclick = () => {
-    setOpen(catId, tier, !open);
-    render();
-  };
+  headBtn.append(el('span', 'group-title', title), el('span', 'count', String(keys.length)), el('span', 'group-chev', open ? '\u2212' : '+'));
+  headBtn.onclick = () => { setOpen(catId, tier, !open); render(); };
   g.append(headBtn);
   if (open) {
     const body = el('div', 'group-body');
@@ -4543,39 +3093,26 @@ function tierGroup(catId, tier, title, blurb, keys) {
   return g;
 }
 
+
 /** MWA4: what the Morrowind files do, in the card's one line. */
-export const MW_CARD_LINE =
-  'Your Morrowind.bsa and Morrowind.esm draw your character in 3D. They stay in this browser.';
+export const MW_CARD_LINE = 'Your Morrowind.bsa and Morrowind.esm draw your character in 3D. They stay in this browser.';
 /** L10N4: the card's line in the player's language (MW_CARD_LINE stays the English the pins read). */
 export const mwCardLine = () => t('menu.mw.line', MW_CARD_LINE);
 /** MWA4: the arms' state in words - the one row the card keeps beside the data count. */
 export function morrowindArmsLine(armState) {
   if (armState?.active) return t('menu.toggle.on', 'On');
   const reason = armState?.reason ?? 'not built';
-  return reason === 'not built' || reason === 'unloaded' ? t('menu.mw.buildsLater', 'Builds when you play') : reason; // a refusal says why (MWDIAG)
+  return reason === 'not built' || reason === 'unloaded' ? t('menu.mw.buildsLater', 'Builds when you play') : reason;   // a refusal says why (MWDIAG)
 }
 /** MWA4: what did not work, in words - and nothing when everything did. */
 export function morrowindTroubleLines(armState) {
   const out = [];
-  if (armState?.notes?.length)
-    out.push(t('menu.mw.notInArms', 'Not in the arms: {notes}', { notes: armState.notes.join('; ') }));
-  if (armState?.third && !armState.third.ok)
-    out.push(
-      t('menu.mw.thirdRefused', 'Third person refused - {stage}: {error}', {
-        stage: armState.third.stage,
-        error: armState.third.error,
-      }),
-    );
+  if (armState?.notes?.length) out.push(t('menu.mw.notInArms', 'Not in the arms: {notes}', { notes: armState.notes.join('; ') }));
+  if (armState?.third && !armState.third.ok) out.push(t('menu.mw.thirdRefused', 'Third person refused - {stage}: {error}', { stage: armState.third.stage, error: armState.third.error }));
   const e = armState?.esm;
   if (e && !e.raceIsThere) {
-    out.push(
-      e.racesFound.length
-        ? t('menu.mw.noBody', 'Your files carry no "{race}" body (they have: {found}).', {
-            race: e.raceWanted,
-            found: e.racesFound.join(', '),
-          })
-        : t('menu.mw.noBodyNone', 'Your files carry no "{race}" body (they have: none).', { race: e.raceWanted }),
-    );
+    out.push(e.racesFound.length ? t('menu.mw.noBody', 'Your files carry no "{race}" body (they have: {found}).', { race: e.raceWanted, found: e.racesFound.join(', ') })
+      : t('menu.mw.noBodyNone', 'Your files carry no "{race}" body (they have: none).', { race: e.raceWanted }));
   }
   return out;
 }
@@ -4598,17 +3135,10 @@ export function morrowindCard({ count = morrowindDataCount(), armState = fpArm.s
   const mw = el('div', 'card');
   mw.append(el('h3', null, t('menu.mw.title', 'Morrowind assets')));
   mw.append(el('p', 'meta', mwCardLine()));
-  mw.append(
-    stats([
-      [
-        t('menu.mw.data', 'Data'),
-        t('menu.mw.archives', '{n, plural, =0 {none attached} one {# archive attached} other {# archives attached}}', {
-          n: count || 0,
-        }),
-      ],
-      ...(count ? [[t('menu.mw.arms', 'Arms'), morrowindArmsLine(armState)]] : []),
-    ]),
-  );
+  mw.append(stats([
+    [t('menu.mw.data', 'Data'), t('menu.mw.archives', '{n, plural, =0 {none attached} one {# archive attached} other {# archives attached}}', { n: count || 0 })],
+    ...(count ? [[t('menu.mw.arms', 'Arms'), morrowindArmsLine(armState)]] : []),
+  ]));
   const attach = async () => {
     const ds = await import('../../scenes/dataSource.js');
     const n = await ds.pickMorrowindFiles();
@@ -4624,24 +3154,17 @@ export function morrowindCard({ count = morrowindDataCount(), armState = fpArm.s
   // MWA2: the door that removes the data itself - the one off there is now. Routed through the same
   // confirm-before-destroy pattern as Delete Save.
   if (count) {
-    actions.push({
-      label: t('menu.mw.remove', 'Remove data'),
-      onClick: () =>
-        ask(
-          t('menu.mw.removeTitle', 'Remove Morrowind data'),
-          t(
-            'menu.mw.removeBody',
-            'This clears the Morrowind files from this browser and unloads the arms. You can attach them again later.',
-          ),
-          t('menu.packs.removeYes', 'Remove'),
-          async () => {
-            fpArm.unload();
-            const ds = await import('../../scenes/dataSource.js');
-            await ds.clearStoredMorrowind();
-            render();
-          },
-        ),
-    });
+    actions.push({ label: t('menu.mw.remove', 'Remove data'), onClick: () => ask(
+      t('menu.mw.removeTitle', 'Remove Morrowind data'),
+      t('menu.mw.removeBody', 'This clears the Morrowind files from this browser and unloads the arms. You can attach them again later.'),
+      t('menu.packs.removeYes', 'Remove'),
+      async () => {
+        fpArm.unload();
+        const ds = await import('../../scenes/dataSource.js');
+        await ds.clearStoredMorrowind();
+        render();
+      },
+    ) });
   }
   mw.append(acts(actions));
   for (const line of morrowindTroubleLines(armState)) mw.append(el('p', 'meta', line));
@@ -4656,174 +3179,51 @@ export function morrowindCard({ count = morrowindDataCount(), armState = fpArm.s
 function peerSpritesCard() {
   const c = el('div', 'card');
   c.append(el('h3', null, t('menu.peers.title', 'Other players')));
-  c.append(
-    el(
-      'p',
-      'meta',
-      t('menu.peers.blurb', 'Players without a Morrowind body show as their chosen sprite, or their class.'),
-    ),
-  ); // DISC23-B: the chosen set first, the class only for a player without one
-  c.append(
-    prefRow(
-      'peerClassSprites',
-      t('menu.peers.sprite', 'Animated sprite'),
-      t('menu.peers.spriteNote', 'On: the sprite above. Off: the paperdoll.'),
-      { home: true },
-    ),
-  );
-  c.append(
-    prefRow(
-      'peerAttackSounds',
-      t('menu.peers.attack', 'Attack sounds'),
-      t('menu.peers.attackNote', 'Hear other players\u2019 weapon swings, and their tools as they gather.'),
-      { home: true },
-    ),
-  ); // PEER-FS1: the two peer-sound switches, beside the sprite one; PEER-ACTS: a gathering tool's blow is a swing, and the act's other beats its hands' work (net/remotePlayers.js _syncGatherSound)
-  c.append(
-    prefRow(
-      'peerFootsteps',
-      t('menu.peers.footsteps', 'Footstep sounds'),
-      t('menu.peers.footstepsNote', 'Hear other players\u2019 footsteps.'),
-      { home: true },
-    ),
-  );
+  c.append(el('p', 'meta', t('menu.peers.blurb', 'Players without a Morrowind body show as their chosen sprite, or their class.')));   // DISC23-B: the chosen set first, the class only for a player without one
+  c.append(prefRow('peerClassSprites', t('menu.peers.sprite', 'Animated sprite'), t('menu.peers.spriteNote', 'On: the sprite above. Off: the paperdoll.'), { home: true }));
+  c.append(prefRow('peerAttackSounds', t('menu.peers.attack', 'Attack sounds'), t('menu.peers.attackNote', 'Hear other players\u2019 weapon swings, and their tools as they gather.'), { home: true }));   // PEER-FS1: the two peer-sound switches, beside the sprite one; PEER-ACTS: a gathering tool's blow is a swing, and the act's other beats its hands' work (net/remotePlayers.js _syncGatherSound)
+  c.append(prefRow('peerFootsteps', t('menu.peers.footsteps', 'Footstep sounds'), t('menu.peers.footstepsNote', 'Hear other players\u2019 footsteps.'), { home: true }));
   // PEER-RANGE: far
   // players, not drawn - the near tier is inside a player's shot (200 m), and the row says so; the row reads the law's own
   // answer, so a stored value that is no tier shows the 300 m it stands for (AUDIT PEER-RANGE A L2)
-  c.append(
-    choiceRow(
-      'peerRange',
-      t('menu.peers.range', 'Draw distance'),
-      t(
-        'menu.peers.rangeNote',
-        'How far away other players are drawn. Your party and your duel opponent always show. Shorter runs faster, but 150 m can hide an archer.',
-      ),
-      PEER_RANGE_TIERS.map((m) => [
-        m,
-        m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.peers.everyone', 'Everyone'),
-      ]),
-      { home: true, read: () => peerRangeOf(getPref('peerRange')) },
-    ),
-  );
+  c.append(choiceRow('peerRange', t('menu.peers.range', 'Draw distance'),
+    t('menu.peers.rangeNote', 'How far away other players are drawn. Your party and your duel opponent always show. Shorter runs faster, but 150 m can hide an archer.'),
+    PEER_RANGE_TIERS.map((m) => [m, m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.peers.everyone', 'Everyone')]), { home: true, read: () => peerRangeOf(getPref('peerRange')) }));
   // YARD-RANGE: how far their yards' decorations are drawn - none, nearer, or
   // as far as ever; one's own yard always (scenes/homeYards.js)
-  c.append(
-    choiceRow(
-      'yardRange',
-      t('menu.peers.yards', 'Yard decorations'),
-      t(
-        'menu.peers.yardsNote',
-        'How far away other players\u2019 yard decorations are drawn. Your own yard always shows. Nearer is faster in busy towns.',
-      ),
-      YARD_RANGE_TIERS.map((m) => [m, m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.toggle.off', 'Off')]),
-      { home: true, read: () => yardRangeOf(getPref('yardRange')) },
-    ),
-  );
+  c.append(choiceRow('yardRange', t('menu.peers.yards', 'Yard decorations'),
+    t('menu.peers.yardsNote', 'How far away other players\u2019 yard decorations are drawn. Your own yard always shows. Nearer is faster in busy towns.'),
+    YARD_RANGE_TIERS.map((m) => [m, m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.toggle.off', 'Off')]), { home: true, read: () => yardRangeOf(getPref('yardRange')) }));
   // GATE-CROWD: a crowd, thinned - CROWD-WIDE
   // everywhere, not the Burning Court alone, but never where a stranger can
   // fight you; AUDIT CROWD-WIDE D1: the note says what the count does - the Draw distance row above still hides the far
-  c.append(
-    choiceRow(
-      'gateCrowd',
-      t('menu.peers.crowd', 'Players shown at once'),
-      t(
-        'menu.peers.crowdNote',
-        'How many other players are drawn at once, the nearest first. Your party, your duel opponent and anyone you trade, ride or sail with always show. The count is off in a PvP zone, a siege, a Royal Tourney and the Arena, but not in the Burning Court.',
-      ),
-      GATE_CROWD_TIERS.map((n) => [
-        n,
-        n ? t('menu.peers.nearest', 'Nearest {n}', { n }) : t('menu.peers.everyone', 'Everyone'),
-      ]),
-      { home: true },
-    ),
-  );
+  c.append(choiceRow('gateCrowd', t('menu.peers.crowd', 'Players shown at once'),
+    t('menu.peers.crowdNote', 'How many other players are drawn at once, the nearest first. Your party, your duel opponent and anyone you trade, ride or sail with always show. The count is off in a PvP zone, a siege, a Royal Tourney and the Arena, but not in the Burning Court.'),
+    GATE_CROWD_TIERS.map((n) => [n, n ? t('menu.peers.nearest', 'Nearest {n}', { n }) : t('menu.peers.everyone', 'Everyone')]), { home: true }));
   // SPELL-GIFT: the receiver's say
-  c.append(
-    prefRow(
-      'acceptStrangerSpells',
-      t('menu.peers.spells', 'Spells from strangers'),
-      t('menu.peers.spellsNote', 'Let players outside your party cast healing and protective spells on you.'),
-      { home: true },
-    ),
-  );
+  c.append(prefRow('acceptStrangerSpells', t('menu.peers.spells', 'Spells from strangers'),
+    t('menu.peers.spellsNote', 'Let players outside your party cast healing and protective spells on you.'), { home: true }));
   // REST-OPT
-  c.append(
-    prefRow(
-      'restWithParty',
-      t('menu.peers.rest', 'Rest with my party'),
-      t('menu.peers.restNote', 'Sleep when a party member within 15 m sleeps at a fire, a tent or a bed.'),
-      { home: true },
-    ),
-  ); // AUDIT REST: REST5's night, no vote
+  c.append(prefRow('restWithParty', t('menu.peers.rest', 'Rest with my party'),
+    t('menu.peers.restNote', 'Sleep when a party member within 15 m sleeps at a fire, a tent or a bed.'), { home: true }));   // AUDIT REST: REST5's night, no vote
   // TV3: being SEEN - the region's travellers see where you are
-  c.append(
-    prefRow(
-      'showToTravellers',
-      t('menu.peers.show', 'Show me to travelers in my region'),
-      t(
-        'menu.peers.showNote',
-        'Outdoors, players in your region see you on the overworld and the map. ' +
-          'Nothing is shared from indoors except with your party. Kept on this device.',
-      ),
-      { home: true },
-    ),
-  ); // AUDIT DEEP2 C5: the party pose rides from indoors too
+  c.append(prefRow('showToTravellers', t('menu.peers.show', 'Show me to travelers in my region'),
+    t('menu.peers.showNote', 'Outdoors, players in your region see you on the overworld and the map. '
+    + 'Nothing is shared from indoors except with your party. Kept on this device.'), { home: true }));   // AUDIT DEEP2 C5: the party pose rides from indoors too
   // CHAT-LANG, CHAT-COLOURS, PING1: the chat's own three, beside the other players'
   c.append(el('h3', null, t('menu.chat.title', 'Chat')));
-  c.append(
-    choiceRow(
-      'chatLang',
-      t('menu.chat.lang', 'Language channel'),
-      t(
-        'menu.chat.langNote',
-        'A chat tab for players who speak your language, wherever they are. /lang in the chat chooses it too.',
-      ),
-      [['', t('menu.toggle.off', 'Off')], ...Object.entries(CHAT_LANGS).map(([code, name]) => [code, name])],
-      { home: true },
-    ),
-  );
+  c.append(choiceRow('chatLang', t('menu.chat.lang', 'Language channel'),
+    t('menu.chat.langNote', 'A chat tab for players who speak your language, wherever they are. /lang in the chat chooses it too.'),
+    [['', t('menu.toggle.off', 'Off')], ...Object.entries(CHAT_LANGS).map(([code, name]) => [code, name])], { home: true }));
   // CHAT-TRADE: the two channels a player joins, beside the language's
-  c.append(
-    prefRow(
-      'chatTrade',
-      t('menu.chat.trade', 'Trade channel'),
-      t(
-        'menu.chat.tradeNote',
-        'A chat tab for buying, selling and swapping with players anywhere. /join trade in the chat joins it too.',
-      ),
-      { home: true },
-    ),
-  );
-  c.append(
-    prefRow(
-      'chatLfg',
-      t('menu.chat.lfg', 'LFG channel'),
-      t(
-        'menu.chat.lfgNote',
-        'A chat tab for finding a group, or one more for yours. /join lfg in the chat joins it too.',
-      ),
-      { home: true },
-    ),
-  );
-  c.append(
-    prefRow(
-      'chatChannelColours',
-      t('menu.chat.colours', 'Chat colors by channel'),
-      t(
-        'menu.chat.coloursNote',
-        'World white, Region green, Guild purple, Local gray, Party teal, Language rose, Trade gold, LFG blue.',
-      ),
-      { home: true },
-    ),
-  );
-  c.append(
-    prefRow(
-      'chatPingSound',
-      t('menu.chat.ping', 'Chime when someone @mentions you'),
-      t('menu.chat.pingNote', 'A line with @YourName is always marked in gold; this adds a chime.'),
-      { home: true },
-    ),
-  );
+  c.append(prefRow('chatTrade', t('menu.chat.trade', 'Trade channel'),
+    t('menu.chat.tradeNote', 'A chat tab for buying, selling and swapping with players anywhere. /join trade in the chat joins it too.'), { home: true }));
+  c.append(prefRow('chatLfg', t('menu.chat.lfg', 'LFG channel'),
+    t('menu.chat.lfgNote', 'A chat tab for finding a group, or one more for yours. /join lfg in the chat joins it too.'), { home: true }));
+  c.append(prefRow('chatChannelColours', t('menu.chat.colours', 'Chat colors by channel'),
+    t('menu.chat.coloursNote', 'World white, Region green, Guild purple, Local gray, Party teal, Language rose, Trade gold, LFG blue.'), { home: true }));
+  c.append(prefRow('chatPingSound', t('menu.chat.ping', 'Chime when someone @mentions you'),
+    t('menu.chat.pingNote', 'A line with @YourName is always marked in gold; this adds a chime.'), { home: true }));
   return c;
 }
 
@@ -4834,12 +3234,7 @@ function peerSpritesCard() {
 let _storeWait = null;
 function waitForTextureStore() {
   if (textureStoreSettled() || _storeWait) return;
-  _storeWait = textureStoreRegistered()
-    .catch(() => 0)
-    .finally(() => {
-      _storeWait = null;
-      render();
-    });
+  _storeWait = textureStoreRegistered().catch(() => 0).finally(() => { _storeWait = null; render(); });
 }
 
 /** M-EXT: the replacement packs - music and textures - attach here.
@@ -4848,127 +3243,36 @@ function waitForTextureStore() {
  *  behind the same confirm Delete Save uses - and Daggerfall Unity .dfmod texture mods (DREAM and its kin) attach
  *  as files, each listed with its own Remove. */
 function packsCard() {
-  waitForTextureStore(); // AUDIT VE R2: the attached mods registered before they are listed - a host may not have yet
-  installVanillaEnhancedPack(); // VE4: the shipped mods are listed even before a host has registered the store
+  waitForTextureStore();   // AUDIT VE R2: the attached mods registered before they are listed - a host may not have yet
+  installVanillaEnhancedPack();   // VE4: the shipped mods are listed even before a host has registered the store
   const c = el('div', 'card');
   c.append(el('h3', null, t('menu.packs.title', 'Replacement packs')));
-  c.append(
-    el('p', 'meta', t('menu.packs.blurb', 'Your own music, sounds and texture packs (.dfmod), kept in this browser.')),
-  );
+  c.append(el('p', 'meta', t('menu.packs.blurb', 'Your own music, sounds and texture packs (.dfmod), kept in this browser.')));
   let mods = attachedDfmods();
-  const attached = mods.filter((m) => !m.shipped); // VE4: what the player attached - the shipped mods are never removed
+  const attached = mods.filter((m) => !m.shipped);   // VE4: what the player attached - the shipped mods are never removed
   const builtIn = mods.length - attached.length;
-  c.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.packs.supplied',
-        'Music files supplied: {music} \u00b7 Texture files supplied: {textures} \u00b7 Sound files supplied: {sounds}',
-        { music: replacementCount(), textures: textureReplacementCount(), sounds: soundReplacementCount() },
-      ),
-    ),
-  ); // the row reports what the pick covers
-  c.append(
-    stats([
-      [
-        t('menu.packs.textureMods', 'Texture mods'),
-        attached.length || builtIn
-          ? builtIn
-            ? t(
-                'menu.packs.textureModsBuiltIn',
-                '{n} attached \u00b7 {builtIn} built in \u00b7 {inUse} textures in use',
-                { n: attached.length, builtIn, inUse: bundleTextureCount() },
-              )
-            : t('menu.packs.textureModsAttached', '{n} attached \u00b7 {inUse} textures in use', {
-                n: attached.length,
-                inUse: bundleTextureCount(),
-              })
-          : t('menu.packs.none', 'none'),
-      ],
-    ]),
-  );
+  c.append(el('p', 'meta', t('menu.packs.supplied', 'Music files supplied: {music} \u00b7 Texture files supplied: {textures} \u00b7 Sound files supplied: {sounds}', { music: replacementCount(), textures: textureReplacementCount(), sounds: soundReplacementCount() })));   // the row reports what the pick covers
+  c.append(stats([
+    [t('menu.packs.textureMods', 'Texture mods'), attached.length || builtIn
+      ? (builtIn
+        ? t('menu.packs.textureModsBuiltIn', '{n} attached \u00b7 {builtIn} built in \u00b7 {inUse} textures in use', { n: attached.length, builtIn, inUse: bundleTextureCount() })
+        : t('menu.packs.textureModsAttached', '{n} attached \u00b7 {inUse} textures in use', { n: attached.length, inUse: bundleTextureCount() }))
+      : t('menu.packs.none', 'none')],
+  ]));
   /** A removal behind the confirm; a storage failure is logged and costs nothing else. */
-  const remove = (label, title, body, run) => ({
-    label,
-    onClick: () =>
-      ask(title, body, t('menu.packs.removeYes', 'Remove'), async () => {
-        try {
-          await run(await import('../../scenes/dataSource.js'));
-        } catch (err) {
-          console.warn(`[packs] ${title.toLowerCase()} failed: ${err?.message ?? err}`);
-        }
-        render();
-      }),
-  });
+  const remove = (label, title, body, run) => ({ label, onClick: () => ask(title, body, t('menu.packs.removeYes', 'Remove'), async () => {
+    try { await run(await import('../../scenes/dataSource.js')); } catch (err) { console.warn(`[packs] ${title.toLowerCase()} failed: ${err?.message ?? err}`); }
+    render();
+  }) });
   // L10N4: "It takes full effect the next time an area loads." closes two of the sentences below - each its own whole pattern
-  c.append(
-    acts([
-      {
-        label: t('menu.packs.attachMusic', 'Attach music pack'),
-        onClick: async () => {
-          const ds = await import('../../scenes/dataSource.js');
-          await ds.pickMusicFolder();
-          render();
-        },
-      },
-      ...(replacementCount() > 0
-        ? [
-            remove(
-              t('menu.packs.removeMusic', 'Remove music pack'),
-              t('menu.packs.removeMusic', 'Remove music pack'),
-              t(
-                'menu.packs.removeMusicBody',
-                'This clears your music files from this browser; the original game\u2019s own songs play again. A sound pack stays.',
-              ),
-              (d) => d.clearStoredMusic(),
-            ),
-          ]
-        : []),
-      {
-        label: t('menu.packs.attachSound', 'Attach sound pack'),
-        onClick: async () => {
-          const ds = await import('../../scenes/dataSource.js');
-          await ds.pickSoundFolder();
-          render();
-        },
-      }, // SNDREP1
-      ...(soundReplacementCount() > 0
-        ? [
-            remove(
-              t('menu.packs.removeSound', 'Remove sound pack'),
-              t('menu.packs.removeSound', 'Remove sound pack'),
-              t(
-                'menu.packs.removeSoundBody',
-                'This clears your sound files from this browser; the original game\u2019s own sounds play again. A music pack stays.',
-              ),
-              (d) => d.clearStoredSounds(),
-            ),
-          ]
-        : []),
-      {
-        label: t('menu.packs.attachTexture', 'Attach texture pack'),
-        onClick: async () => {
-          const ds = await import('../../scenes/dataSource.js');
-          await ds.pickTextureFolder();
-          render();
-        },
-      },
-      ...(textureReplacementCount() > 0
-        ? [
-            remove(
-              t('menu.packs.removeTexture', 'Remove texture pack'),
-              t('menu.packs.removeTexture', 'Remove texture pack'),
-              t(
-                'menu.packs.removeTextureBody',
-                'This clears the texture folder you picked from this browser. Attached .dfmod texture mods stay. It takes full effect the next time an area loads.',
-              ),
-              (d) => d.clearStoredTexturePack(),
-            ),
-          ]
-        : []),
-    ]),
-  );
+  c.append(acts([
+    { label: t('menu.packs.attachMusic', 'Attach music pack'), onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickMusicFolder(); render(); } },
+    ...(replacementCount() > 0 ? [remove(t('menu.packs.removeMusic', 'Remove music pack'), t('menu.packs.removeMusic', 'Remove music pack'), t('menu.packs.removeMusicBody', 'This clears your music files from this browser; the original game\u2019s own songs play again. A sound pack stays.'), (d) => d.clearStoredMusic())] : []),
+    { label: t('menu.packs.attachSound', 'Attach sound pack'), onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickSoundFolder(); render(); } },   // SNDREP1
+    ...(soundReplacementCount() > 0 ? [remove(t('menu.packs.removeSound', 'Remove sound pack'), t('menu.packs.removeSound', 'Remove sound pack'), t('menu.packs.removeSoundBody', 'This clears your sound files from this browser; the original game\u2019s own sounds play again. A music pack stays.'), (d) => d.clearStoredSounds())] : []),
+    { label: t('menu.packs.attachTexture', 'Attach texture pack'), onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickTextureFolder(); render(); } },
+    ...(textureReplacementCount() > 0 ? [remove(t('menu.packs.removeTexture', 'Remove texture pack'), t('menu.packs.removeTexture', 'Remove texture pack'), t('menu.packs.removeTextureBody', 'This clears the texture folder you picked from this browser. Attached .dfmod texture mods stay. It takes full effect the next time an area loads.'), (d) => d.clearStoredTexturePack())] : []),
+  ]));
   // IIL3: THE LIGHTING MOD HAS ITS OWN
   // SECTION. It is a .dfmod like the texture mods and rides the same store, but it carries no picture - listed among
   // them it read as a texture pack that did nothing. Here it says what it is, whether it is attached, and where it
@@ -4976,155 +3280,40 @@ function packsCard() {
   const lighting = mods.filter(isIilMod);
   mods = mods.filter((m) => !isIilMod(m));
   c.append(el('h3', null, t('menu.packs.lighting', 'Lighting mod')));
-  c.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.packs.lightingBlurb',
-        'Improved Interior Lighting: warm lights in buildings and dungeons. Pick its .dfmod, then turn it on in {path}.',
-        { path: optionPath('feat:modded-lighting') },
-      ),
-    ),
-  ); // ORG2
+  c.append(el('p', 'meta', t('menu.packs.lightingBlurb', 'Improved Interior Lighting: warm lights in buildings and dungeons. Pick its .dfmod, then turn it on in {path}.', { path: optionPath('feat:modded-lighting') })));   // ORG2
   for (const m of lighting) {
     const row = el('div', 'card');
     row.append(el('p', null, `${m.title}${m.version ? ` ${m.version}` : ''}${m.author ? ` \u00b7 ${m.author}` : ''}`));
-    row.append(
-      el(
-        'p',
-        'meta',
-        m.error
-          ? t('menu.packs.notWorking', 'Not working: {error}.', { error: m.error })
-          : t('menu.packs.attached', 'Attached.'),
-      ),
-    );
-    row.append(
-      acts([
-        remove(
-          t('menu.packs.removeYes', 'Remove'),
-          t('menu.packs.removeMod', 'Remove {mod}', { mod: m.title }),
-          t(
-            'menu.packs.removeLightingBody',
-            'This clears {mod} from this browser; the lighting goes back to what it was.',
-            { mod: m.title },
-          ),
-          (d) => d.removeStoredDfmod(m.key),
-        ),
-      ]),
-    );
+    row.append(el('p', 'meta', m.error ? t('menu.packs.notWorking', 'Not working: {error}.', { error: m.error }) : t('menu.packs.attached', 'Attached.')));
+    row.append(acts([remove(t('menu.packs.removeYes', 'Remove'), t('menu.packs.removeMod', 'Remove {mod}', { mod: m.title }), t('menu.packs.removeLightingBody', 'This clears {mod} from this browser; the lighting goes back to what it was.', { mod: m.title }), (d) => d.removeStoredDfmod(m.key))]));
     c.append(row);
   }
-  if (!lighting.length)
-    c.append(
-      acts([
-        {
-          label: t('menu.packs.attachLighting', 'Attach lighting mod'),
-          primary: true,
-          onClick: async () => {
-            const ds = await import('../../scenes/dataSource.js');
-            await ds.pickLightingModFiles();
-            render();
-          },
-        },
-      ]),
-    );
+  if (!lighting.length) c.append(acts([{ label: t('menu.packs.attachLighting', 'Attach lighting mod'), primary: true, onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickLightingModFiles(); render(); } }]));
   // DFMOD1: the texture mods, one row each
   c.append(el('h3', null, t('menu.packs.dfmods', 'Texture mods (.dfmod)')));
   // DFMOD2: two mods that dress the same things (DREAM and DREAM 90s side by side) cost memory twice for one picture
-  const sameTitle = (t) =>
-    String(t ?? '')
-      .replace(/\b90s\b/i, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
+  const sameTitle = (t) => String(t ?? '').replace(/\b90s\b/i, '').replace(/\s+/g, ' ').trim().toLowerCase();
   const seen = new Map();
-  for (const m of mods) {
-    const k = sameTitle(m.title);
-    seen.set(k, (seen.get(k) ?? 0) + 1);
-  }
-  if ([...seen.values()].some((n) => n > 1))
-    c.append(
-      el(
-        'p',
-        'meta',
-        t(
-          'menu.packs.twoVersions',
-          'Two versions of the same mod are attached (for example DREAM and DREAM 90s). Only one shows for each texture, but both use memory. Remove one.',
-        ),
-      ),
-    );
-  c.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.packs.dfmodsBlurb',
-        'Daggerfall Unity texture mods, such as DREAM. Pick one or more .dfmod files. Mod scripts don\u2019t run. Vanilla Enhanced comes with the game, and a copy you attach is used instead of the built-in one.',
-      ),
-    ),
-  );
+  for (const m of mods) { const k = sameTitle(m.title); seen.set(k, (seen.get(k) ?? 0) + 1); }
+  if ([...seen.values()].some((n) => n > 1)) c.append(el('p', 'meta', t('menu.packs.twoVersions', 'Two versions of the same mod are attached (for example DREAM and DREAM 90s). Only one shows for each texture, but both use memory. Remove one.')));
+  c.append(el('p', 'meta', t('menu.packs.dfmodsBlurb', 'Daggerfall Unity texture mods, such as DREAM. Pick one or more .dfmod files. Mod scripts don\u2019t run. Vanilla Enhanced comes with the game, and a copy you attach is used instead of the built-in one.')));
   // VE1: listed in load order - a mod loads after the mods it depends on, and where two carry the same texture the one
   // loaded later is drawn (DFU's ModManager)
-  if (mods.length > 1)
-    c.append(
-      el(
-        'p',
-        'meta',
-        t(
-          'menu.packs.loadOrder',
-          'In load order: where two mods carry the same texture, the later one is drawn. A mod always loads after the mods it is built on.',
-        ),
-      ),
-    );
-  if (!textureStoreSettled())
-    c.append(el('p', 'meta', t('menu.packs.reading', 'Reading your attached texture mods\u2026'))); // AUDIT VE R2
+  if (mods.length > 1) c.append(el('p', 'meta', t('menu.packs.loadOrder', 'In load order: where two mods carry the same texture, the later one is drawn. A mod always loads after the mods it is built on.')));
+  if (!textureStoreSettled()) c.append(el('p', 'meta', t('menu.packs.reading', 'Reading your attached texture mods\u2026')));   // AUDIT VE R2
   for (const m of mods) {
     const row = el('div', 'card');
     row.append(el('p', null, `${m.title}${m.version ? ` ${m.version}` : ''}${m.author ? ` \u00b7 ${m.author}` : ''}`));
-    row.append(
-      el(
-        'p',
-        'meta',
-        m.shipped
-          ? m.enabled
-            ? t('menu.packs.shipped', 'Ships with the game \u00b7 {n} textures', { n: m.textures })
-            : t('menu.packs.shippedOff', 'Ships with the game \u00b7 {n} textures \u00b7 switched off', {
-                n: m.textures,
-              })
-          : m.enabled
-            ? t('menu.packs.inBundle', '{n} textures in the bundle', { n: m.textures })
-            : t('menu.packs.inBundleOff', '{n} textures in the bundle \u00b7 switched off', { n: m.textures }),
-      ),
-    );
-    if (m.error) row.append(el('p', 'meta', t('menu.packs.notWorking', 'Not working: {error}.', { error: m.error }))); // DFMOD2: said where the Remove is
-    row.append(
-      acts([
-        // VE3: DFU's mod window switches a mod off without removing it (Mod.Enabled); the Texture Overhaul card does the same
-        {
-          label: m.enabled ? t('menu.packs.switchOff', 'Switch off') : t('menu.packs.switchOn', 'Switch on'),
-          onClick: () => {
-            setDfmodEnabled(m.key, !m.enabled);
-            render();
-          },
-        },
-        // VE4: a shipped mod is switched, never removed - it is not in this browser's store
-        ...(m.shipped
-          ? []
-          : [
-              remove(
-                t('menu.packs.removeYes', 'Remove'),
-                t('menu.packs.removeMod', 'Remove {mod}', { mod: m.title }),
-                t(
-                  'menu.packs.removeModBody',
-                  'This clears {mod} from this browser. It takes full effect the next time an area loads.',
-                  { mod: m.title },
-                ),
-                (d) => d.removeStoredDfmod(m.key),
-              ),
-            ]),
-      ]),
-    );
+    row.append(el('p', 'meta', m.shipped
+      ? (m.enabled ? t('menu.packs.shipped', 'Ships with the game \u00b7 {n} textures', { n: m.textures }) : t('menu.packs.shippedOff', 'Ships with the game \u00b7 {n} textures \u00b7 switched off', { n: m.textures }))
+      : (m.enabled ? t('menu.packs.inBundle', '{n} textures in the bundle', { n: m.textures }) : t('menu.packs.inBundleOff', '{n} textures in the bundle \u00b7 switched off', { n: m.textures }))));
+    if (m.error) row.append(el('p', 'meta', t('menu.packs.notWorking', 'Not working: {error}.', { error: m.error })));   // DFMOD2: said where the Remove is
+    row.append(acts([
+      // VE3: DFU's mod window switches a mod off without removing it (Mod.Enabled); the Texture Overhaul card does the same
+      { label: m.enabled ? t('menu.packs.switchOff', 'Switch off') : t('menu.packs.switchOn', 'Switch on'), onClick: () => { setDfmodEnabled(m.key, !m.enabled); render(); } },
+      // VE4: a shipped mod is switched, never removed - it is not in this browser's store
+      ...(m.shipped ? [] : [remove(t('menu.packs.removeYes', 'Remove'), t('menu.packs.removeMod', 'Remove {mod}', { mod: m.title }), t('menu.packs.removeModBody', 'This clears {mod} from this browser. It takes full effect the next time an area loads.', { mod: m.title }), (d) => d.removeStoredDfmod(m.key))]),
+    ]));
     c.append(row);
   }
   // AUDIT VE R5/R11: a stored mod that did not register - still being read, one that will not read, or the page opened
@@ -5132,87 +3321,22 @@ function packsCard() {
   for (const u of unregisteredDfmods()) {
     const row = el('div', 'card');
     row.append(el('p', null, u.fileName));
-    row.append(
-      el(
-        'p',
-        'meta',
-        u.state === 'indexing'
-          ? t('menu.packs.indexing', 'Reading. It joins the load order when done.')
-          : u.state === 'nomods'
-            ? t('menu.packs.nomods', 'Not loaded: this page was opened with ?nomods.')
-            : t('menu.packs.notWorking', 'Not working: {error}.', { error: u.error }),
-      ),
-    );
-    row.append(
-      acts([
-        remove(
-          t('menu.packs.removeYes', 'Remove'),
-          t('menu.packs.removeMod', 'Remove {mod}', { mod: u.fileName }),
-          t(
-            'menu.packs.removeModBody',
-            'This clears {mod} from this browser. It takes full effect the next time an area loads.',
-            { mod: u.fileName },
-          ),
-          (d) => d.removeStoredDfmod(u.key),
-        ),
-      ]),
-    );
+    row.append(el('p', 'meta', u.state === 'indexing' ? t('menu.packs.indexing', 'Reading. It joins the load order when done.')
+      : u.state === 'nomods' ? t('menu.packs.nomods', 'Not loaded: this page was opened with ?nomods.') : t('menu.packs.notWorking', 'Not working: {error}.', { error: u.error })));
+    row.append(acts([remove(t('menu.packs.removeYes', 'Remove'), t('menu.packs.removeMod', 'Remove {mod}', { mod: u.fileName }), t('menu.packs.removeModBody', 'This clears {mod} from this browser. It takes full effect the next time an area loads.', { mod: u.fileName }), (d) => d.removeStoredDfmod(u.key))]));
     c.append(row);
   }
   // DFMOD2: TEXTURE DETAIL - the longest side a mod's picture is decoded at (a smaller mip past it). Full-resolution
   // packs (DREAM's HD set) are gigabytes of pixels; 512 keeps them several times Daggerfall's own and inside memory
   const cap = dfmodMaxSize();
-  const detailLabel = Number.isFinite(cap)
-    ? t('menu.packs.detailPx', '{px} px', { px: cap })
-    : t('menu.packs.detailFull', 'full');
-  const nextDetail = () => {
-    const i = DFMOD_DETAIL.indexOf(Number.isFinite(cap) ? cap : 0);
-    return DFMOD_DETAIL[(i + 1) % DFMOD_DETAIL.length];
-  };
-  c.append(
-    el(
-      'p',
-      'meta',
-      t(
-        'menu.packs.detailNote',
-        'Texture detail: {detail}. Higher is sharper but uses more memory and loads slower. \u201cfull\u201d can run out of memory with HD packs. Applies to areas loaded afterwards.',
-        { detail: detailLabel },
-      ),
-    ),
-  );
-  c.append(
-    acts([
-      {
-        label: t('menu.packs.detail', 'Texture detail: {detail}', { detail: detailLabel }),
-        onClick: () => {
-          setPref('dfmodTextureDetail', nextDetail());
-          render();
-        },
-      },
-      {
-        label: t('menu.packs.addDfmods', 'Add texture mods'),
-        primary: !mods.some((m) => !m.shipped),
-        onClick: async () => {
-          const ds = await import('../../scenes/dataSource.js');
-          await ds.pickDfmodFiles();
-          render();
-        },
-      },
-      ...(mods.filter((m) => !m.shipped).length + unregisteredDfmods().length > 1
-        ? [
-            remove(
-              t('menu.packs.removeAllDfmods', 'Remove all texture mods'),
-              t('menu.packs.removeAllDfmods', 'Remove all texture mods'),
-              t(
-                'menu.packs.removeAllDfmodsBody',
-                'This clears every attached .dfmod texture mod from this browser; the built-in ones stay. It takes full effect the next time an area loads.',
-              ),
-              (d) => d.clearStoredDfmods(),
-            ),
-          ]
-        : []),
-    ]),
-  );
+  const detailLabel = Number.isFinite(cap) ? t('menu.packs.detailPx', '{px} px', { px: cap }) : t('menu.packs.detailFull', 'full');
+  const nextDetail = () => { const i = DFMOD_DETAIL.indexOf(Number.isFinite(cap) ? cap : 0); return DFMOD_DETAIL[(i + 1) % DFMOD_DETAIL.length]; };
+  c.append(el('p', 'meta', t('menu.packs.detailNote', 'Texture detail: {detail}. Higher is sharper but uses more memory and loads slower. \u201cfull\u201d can run out of memory with HD packs. Applies to areas loaded afterwards.', { detail: detailLabel })));
+  c.append(acts([
+    { label: t('menu.packs.detail', 'Texture detail: {detail}', { detail: detailLabel }), onClick: () => { setPref('dfmodTextureDetail', nextDetail()); render(); } },
+    { label: t('menu.packs.addDfmods', 'Add texture mods'), primary: !mods.some((m) => !m.shipped), onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickDfmodFiles(); render(); } },
+    ...(mods.filter((m) => !m.shipped).length + unregisteredDfmods().length > 1 ? [remove(t('menu.packs.removeAllDfmods', 'Remove all texture mods'), t('menu.packs.removeAllDfmods', 'Remove all texture mods'), t('menu.packs.removeAllDfmodsBody', 'This clears every attached .dfmod texture mod from this browser; the built-in ones stay. It takes full effect the next time an area loads.'), (d) => d.clearStoredDfmods())] : []),
+  ]));
   return c;
 }
 
@@ -5221,19 +3345,8 @@ function packsCard() {
 function nightSoundsCard() {
   const c = el('div', 'card');
   c.append(el('h3', null, t('menu.night.title', 'Night sounds')));
-  c.append(
-    prefRow(
-      'nightCrickets',
-      t('menu.night.crickets', 'Crickets'),
-      t('menu.night.cricketsNote', 'Outdoors on clear nights.'),
-      { home: true },
-    ),
-  );
-  c.append(
-    prefRow('distantHowl', t('menu.night.howl', 'Distant howl'), t('menu.night.howlNote', 'Near graveyards.'), {
-      home: true,
-    }),
-  );
+  c.append(prefRow('nightCrickets', t('menu.night.crickets', 'Crickets'), t('menu.night.cricketsNote', 'Outdoors on clear nights.'), { home: true }));
+  c.append(prefRow('distantHowl', t('menu.night.howl', 'Distant howl'), t('menu.night.howlNote', 'Near graveyards.'), { home: true }));
   return c;
 }
 
@@ -5242,10 +3355,7 @@ function nightSoundsCard() {
  *  draws the same row; `name`/`note` override the mod's own key name and
  *  description when the registry has better words. */
 function modRow(vendor, key, def, { name = null, note = null, home = false } = {}) {
-  if (!home) {
-    const moved = featureForControl('mods', key, vendor);
-    if (moved) return movedRow(moved);
-  } // FT2
+  if (!home) { const moved = featureForControl('mods', key, vendor); if (moved) return movedRow(moved); }   // FT2
   const row = el('div', 'row');
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', name ?? key.replace(/([a-z])([A-Z])/g, '$1 $2')));
@@ -5259,10 +3369,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     const val = el('span', 'val', def.options[modSetting(vendor, key)]);
     const step = (delta, label) => {
       const b = el('button', 'step', label);
-      b.onclick = () => {
-        const n = def.options.length;
-        val.textContent = def.options[setModSetting(vendor, key, (modSetting(vendor, key) + delta + n) % n)];
-      };
+      b.onclick = () => { const n = def.options.length; val.textContent = def.options[setModSetting(vendor, key, (modSetting(vendor, key) + delta + n) % n)]; };
       return b;
     };
     ctl.append(step(-1, '\u2039'), val, step(1, '\u203a'));
@@ -5273,11 +3380,10 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     // cancels the capture.
     const b = el('button', 'act rowact', modSetting(vendor, key));
     b.onclick = () => {
-      b.textContent = t('mods.pane.pressKey', 'press a key'); // L10N4: the Mods pane's own words
-      if (textKeyCapture) removeEventListener('keydown', textKeyCapture, true); // DISC28-A: one armed capture at a time
+      b.textContent = t('mods.pane.pressKey', 'press a key');   // L10N4: the Mods pane's own words
+      if (textKeyCapture) removeEventListener('keydown', textKeyCapture, true);   // DISC28-A: one armed capture at a time
       const onKey = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         removeEventListener('keydown', onKey, true);
         textKeyCapture = null;
         const name = e.code === 'Escape' ? null : keyCodeForDomCode(e.code);
@@ -5291,9 +3397,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     const clear = el('button', 'act ctl-clear', '\u2715');
     clear.setAttribute('type', 'button');
     clear.title = t('mods.pane.clearKey', 'Clear this key');
-    clear.onclick = () => {
-      b.textContent = setModSetting(vendor, key, KEYCODE_NONE);
-    };
+    clear.onclick = () => { b.textContent = setModSetting(vendor, key, KEYCODE_NONE); };
     ctl.append(b, clear);
   } else if (isTupleKey(def)) {
     // HT1: a TupleIntKey / TupleFloatKey - two steppers, one a half
@@ -5303,11 +3407,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
       const val = el('span', 'val', String(pair()[i]));
       const step = (delta, label) => {
         const b = el('button', 'step', label);
-        b.onclick = () => {
-          const cur = [...pair()];
-          cur[i] += delta * stepOf;
-          val.textContent = String(setModSetting(vendor, key, cur)[i]);
-        };
+        b.onclick = () => { const cur = [...pair()]; cur[i] += delta * stepOf; val.textContent = String(setModSetting(vendor, key, cur)[i]); };
         return b;
       };
       ctl.append(step(-1, '\u2039'), val, step(1, '\u203a'));
@@ -5317,9 +3417,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     const val = el('span', 'val', String(modSetting(vendor, key)));
     const step = (delta, label) => {
       const b = el('button', 'step', label);
-      b.onclick = () => {
-        val.textContent = String(setModSetting(vendor, key, modSetting(vendor, key) + delta * (def.step ?? 0.1)));
-      };
+      b.onclick = () => { val.textContent = String(setModSetting(vendor, key, modSetting(vendor, key) + delta * (def.step ?? 0.1))); };
       return b;
     };
     ctl.append(step(-1, '\u2039'), val, step(1, '\u203a'));
@@ -5330,9 +3428,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     const val = el('span', 'val', String(modSetting(vendor, key)));
     const step = (delta, label) => {
       const b = el('button', 'step', label);
-      b.onclick = () => {
-        val.textContent = String(setModSetting(vendor, key, modSetting(vendor, key) + delta));
-      };
+      b.onclick = () => { val.textContent = String(setModSetting(vendor, key, modSetting(vendor, key) + delta)); };
       return b;
     };
     ctl.append(step(-1, '\u2039'), val, step(1, '\u203a'));
@@ -5340,21 +3436,14 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
     const on = modSetting(vendor, key);
     const b = el('button', 'act rowact', on ? t('menu.toggle.on', 'On') : t('menu.toggle.off', 'Off'));
     if (on) b.classList.add('primary');
-    b.onclick = () => {
-      setModSetting(vendor, key, !modSetting(vendor, key));
-      render();
-    };
-    const ground = onlineModSetting(vendor, key); // MODS-ONLINE-2: the road switches the room's ground depends on; REALM P0.2: and every key of a balance mod the room owns whole
-    if (ground !== undefined) lockOnline(b, null, { note: modLockNote(vendor, key), value: ground }); // MODS-ONLINE-5: the ground's, the ruleset's or the shared reason - a lock that gives the wrong reason is a refusal nobody can read
+    b.onclick = () => { setModSetting(vendor, key, !modSetting(vendor, key)); render(); };
+    const ground = onlineModSetting(vendor, key);   // MODS-ONLINE-2: the road switches the room's ground depends on; REALM P0.2: and every key of a balance mod the room owns whole
+    if (ground !== undefined) lockOnline(b, null, { note: modLockNote(vendor, key), value: ground });   // MODS-ONLINE-5: the ground's, the ruleset's or the shared reason - a lock that gives the wrong reason is a refusal nobody can read
     ctl.append(b);
   }
   // REALM P0.2: a DIAL the room owns online (a balance mod owned whole: Unleveled Loot's materials, Oblivion leveling's
   // points) wears the lock too - the switch above locks itself
-  if (
-    (isChoiceKey(def) || isTextKey(def) || isTupleKey(def) || isFloatKey(def) || isIntKey(def)) &&
-    onlineModSetting(vendor, key) !== undefined
-  )
-    lockDial(ctl, modLockNote(vendor, key));
+  if ((isChoiceKey(def) || isTextKey(def) || isTupleKey(def) || isFloatKey(def) || isIntKey(def)) && onlineModSetting(vendor, key) !== undefined) lockDial(ctl, modLockNote(vendor, key));
   row.append(ctl);
   return row;
 }
@@ -5396,8 +3485,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
  *  a colour, a free number - is not given a bar; `null` sends the row
  *  back to its own builder, which is how the panel stays honest about
  *  the controls it has not learned yet. */
-export function tileStates(f) {
-  // FT18: exported for the All off pins, which read and press the bars through it
+export function tileStates(f) {   // FT18: exported for the All off pins, which read and press the bars through it
   const c = resolveControl(f);
   if (c.store === 'prefs') {
     const locked = onlineForcedPref(c.key) !== undefined;
@@ -5405,70 +3493,38 @@ export function tileStates(f) {
       const cur = String(c.read ? c.read() : getPref(c.key));
       // BLOOD AUDIT 5: a stored value that is no tier reads as the row's
       // DEFAULT, which is what the game runs - not the first segment
-      const fallback = Math.max(
-        0,
-        c.tiers.findIndex(([v]) => String(v) === String(c.default ?? c.initial)),
-      );
+      const fallback = Math.max(0, c.tiers.findIndex(([v]) => String(v) === String(c.default ?? c.initial)));
       const found = c.tiers.findIndex(([v]) => String(v) === cur);
       const at = found >= 0 ? found : fallback;
-      return {
-        labels: c.tiers.map(([, l]) => l),
-        at,
-        locked,
-        set: (i) => {
-          (c.write ?? ((v) => setPref(c.key, v)))(c.tiers[i][0]);
-          TILE_AFTER[c.key]?.();
-        },
-      }; // MW-STEEL1: a choice's after-step too (the Steel Helm)
+      return { labels: c.tiers.map(([, l]) => l), at, locked,
+        set: (i) => { (c.write ?? ((v) => setPref(c.key, v)))(c.tiers[i][0]); TILE_AFTER[c.key]?.(); } };   // MW-STEEL1: a choice's after-step too (the Steel Helm)
     }
-    return {
-      labels: ['Off', 'On'],
-      shown: toggleWords(),
-      at: getPref(c.key) ? 1 : 0,
-      locked,
-      set: (i) => {
-        setPref(c.key, i === 1);
-        TILE_AFTER[c.key]?.();
-      },
-    };
+    return { labels: ['Off', 'On'], shown: toggleWords(), at: getPref(c.key) ? 1 : 0, locked,
+      set: (i) => { setPref(c.key, i === 1); TILE_AFTER[c.key]?.(); } };
   }
   if (c.store === 'settings') {
     const [sec, k] = c.key.split('/');
     const raw = effective()[sec]?.[k];
     const w = widgetFor(c.key);
     if (w === 'switch') {
-      return {
-        labels: ['Off', 'On'],
-        shown: toggleWords(),
-        at: raw === 'True' ? 1 : 0,
-        locked: false,
-        set: (i) => write(c.key, i === 1 ? 'True' : 'False'),
-      };
+      return { labels: ['Off', 'On'], shown: toggleWords(), at: raw === 'True' ? 1 : 0, locked: false,
+        set: (i) => write(c.key, i === 1 ? 'True' : 'False') };
     }
     if (w === 'enum' && ENUM_LAW[c.key]?.encode === 'index') {
       const vals = ENUM_LAW[c.key].values;
       const i = parseInt(raw, 10);
       // L10N3d: `labels` stay the law's words (All off and the switch reading find Off by them); the bar SHOWS DFU's
       // words for them in the player's language (enumWords, DaggerfallAdvancedSettingsWindow.cs:248)
-      return {
-        labels: vals,
-        shown: enumWords(c.key),
-        at: Number.isInteger(i) && i >= 0 && i < vals.length ? i : 0,
-        locked: false,
-        set: (n) => write(c.key, String(n)),
-      };
+      return { labels: vals, shown: enumWords(c.key), at: Number.isInteger(i) && i >= 0 && i < vals.length ? i : 0, locked: false,
+        set: (n) => write(c.key, String(n)) };
     }
     return null;
   }
   // a vendored mod's Enabled - the player's online too (MODS-ONLINE-2), but for the road switches the room's ground depends on
   const on = modSetting(c.vendor, c.key) === true || modSetting(c.vendor, c.key) === 'True';
-  return {
-    labels: ['Off', 'On'],
-    shown: toggleWords(),
-    at: on ? 1 : 0,
+  return { labels: ['Off', 'On'], shown: toggleWords(), at: on ? 1 : 0,
     locked: onlineForcedModSetting(c.vendor, c.key) !== undefined,
-    set: (i) => setModSetting(c.vendor, c.key, i === 1),
-  };
+    set: (i) => setModSetting(c.vendor, c.key, i === 1) };
 }
 /** L10N4: what a two-state bar SHOWS for its law's ['Off', 'On'] - the labels stay the law's words (All off, the
  *  switch reading and Restore find Off by them), the shown words are the player's language. */
@@ -5494,15 +3550,15 @@ export function classicSegment(f, st) {
  *  `prefRow` answers nothing for a moved key), so since then the tile wrote the pref and the body kept the old
  *  holster until the next build - while the row's effect line promised it at once. */
 const rebuildMorrowindBody = async () => {
-  if (!morrowindDataCount() || !playerEntity?.chargenDone) return; // MWA4: attached is on - a character in play wears it
+  if (!morrowindDataCount() || !playerEntity?.chargenDone) return;   // MWA4: attached is on - a character in play wears it
   const { buildArmsFor } = await import('../../combat/weapon/weaponRig.js');
   await buildArmsFor(playerEntity);
   render();
 };
 const TILE_AFTER = Object.freeze({
   mwSheathing: rebuildMorrowindBody,
-  mwSteelHelm: rebuildMorrowindBody, // MW-STEEL1: the steel helm's style, closed or open, on the standing body at once
-  mwBeastFeet: rebuildMorrowindBody, // BEAST-BOOTS: a beast's footwear and helmet, on the standing body at once
+  mwSteelHelm: rebuildMorrowindBody,   // MW-STEEL1: the steel helm's style, closed or open, on the standing body at once
+  mwBeastFeet: rebuildMorrowindBody,   // BEAST-BOOTS: a beast's footwear and helmet, on the standing body at once
   mwBeastHelm: rebuildMorrowindBody,
 });
 
@@ -5538,11 +3594,7 @@ function segBar(st, label) {
       b.setAttribute('aria-disabled', 'true');
       b.title = noteText(ONLINE_LOCK_NOTE);
     } else {
-      b.onclick = (e) => {
-        e.stopPropagation();
-        st.set(i);
-        render();
-      };
+      b.onclick = (e) => { e.stopPropagation(); st.set(i); render(); };
     }
     seg.append(b);
   });
@@ -5560,8 +3612,8 @@ export function featureTile(f) {
   const c = resolveControl(f);
   const st = tileStates(f);
   const tile = el('div', `ft-tile${pickedFeature === f.id ? ' sel' : ''}`);
-  tile.id = `opt-${f.id}`; // ORG2: the mods' list brings a row into view by it
-  tile.dataset.fid = f.id; // FT18: the search hides tiles by it
+  tile.id = `opt-${f.id}`;   // ORG2: the mods' list brings a row into view by it
+  tile.dataset.fid = f.id;   // FT18: the search hides tiles by it
   tile.dataset.on = st && barReading(st).on ? '1' : '0';
   if (st?.locked) tile.dataset.locked = '1';
 
@@ -5572,12 +3624,7 @@ export function featureTile(f) {
   for (const k of KIND_ORDER) if (f.kinds.includes(k)) meta.append(el('span', `kind ${k}`, KINDS[k].label));
   if (st?.locked) meta.append(el('span', 'ft-tile-lock', t('menu.features.onlineLock', 'online')));
   main.append(meta);
-  main.onclick = () => {
-    pickedFeature = f.id;
-    pickedKey = null;
-    sheetOpen = true;
-    render();
-  };
+  main.onclick = () => { pickedFeature = f.id; pickedKey = null; sheetOpen = true; render(); };
   tile.append(main);
 
   // the control, or the row's own builder when it is not a bar
@@ -5595,37 +3642,22 @@ export function featureTile(f) {
   // and reading `c.vendor` alone left that mod's five particle keys
   // with no tile to open once the Mods pane was gone. `also` already
   // declared the cover; the drawer follows it.
-  const vendor =
-    c.store === 'mods'
-      ? c.vendor
-      : ((Array.isArray(c.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null);
+  const vendor = c.store === 'mods' ? c.vendor
+    : (Array.isArray(c.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null;
   if (vendor) {
     const mods = modModules(vendor);
     const dials = modDials(vendor);
-    const keys = modKeyRows(vendor, bindings()); // UXB1-F
+    const keys = modKeyRows(vendor, bindings());   // UXB1-F
     if (mods.length || dials.length || keys.length) {
       const open = featureOpen === f.id;
       const b = el('button', 'ft-tile-more');
       b.type = 'button';
       b.setAttribute('aria-expanded', String(open));
-      b.append(
-        el('span', `ft-tile-car${open ? ' open' : ''}`, '\u203a'),
-        document.createTextNode(
-          ' ' +
-            [
-              mods.length ? t('menu.features.modules', '{n, plural, other {# modules}}', { n: mods.length }) : '',
-              dials.length ? t('menu.features.dials', '{n, plural, other {# dials}}', { n: dials.length }) : '',
-              keys.length ? t('menu.features.keys', '{n, plural, other {# keys}}', { n: keys.length }) : '',
-            ]
-              .filter(Boolean)
-              .join(' \u00b7 '),
-        ),
-      );
-      b.onclick = (e) => {
-        e.stopPropagation();
-        featureOpen = open ? null : f.id;
-        render();
-      };
+      b.append(el('span', `ft-tile-car${open ? ' open' : ''}`, '\u203a'), document.createTextNode(' '
+        + [mods.length ? t('menu.features.modules', '{n, plural, other {# modules}}', { n: mods.length }) : '', dials.length ? t('menu.features.dials', '{n, plural, other {# dials}}', { n: dials.length }) : '',
+          keys.length ? t('menu.features.keys', '{n, plural, other {# keys}}', { n: keys.length }) : '']
+          .filter(Boolean).join(' \u00b7 ')));
+      b.onclick = (e) => { e.stopPropagation(); featureOpen = open ? null : f.id; render(); };
       tile.append(b);
       if (open) tile.append(featureDrawer(vendor, mods, dials, keys));
     }
@@ -5638,15 +3670,8 @@ export function featureTile(f) {
     const b = el('button', 'ft-tile-more');
     b.type = 'button';
     b.setAttribute('aria-expanded', String(open));
-    b.append(
-      el('span', `ft-tile-car${open ? ' open' : ''}`, '\u203a'),
-      document.createTextNode(` ${parts.map((pt) => pt.label).join(' \u00b7 ')}`),
-    );
-    b.onclick = (e) => {
-      e.stopPropagation();
-      featureOpen = open ? null : f.id;
-      render();
-    };
+    b.append(el('span', `ft-tile-car${open ? ' open' : ''}`, '\u203a'), document.createTextNode(` ${parts.map((pt) => pt.label).join(' \u00b7 ')}`));
+    b.onclick = (e) => { e.stopPropagation(); featureOpen = open ? null : f.id; render(); };
     tile.append(b);
     if (open) tile.append(featurePartsDrawer(parts));
   }
@@ -5660,9 +3685,8 @@ export const FEATURE_KEYS_NOTE = 'Keys are changed in Settings \u203a Controls.'
 export const featureKeysNote = () => t('menu.features.keysNote', FEATURE_KEYS_NOTE);
 function openControls() {
   category = 'controls';
-  optQuery = '';
-  optFilter = 'all'; // ORG2: a search or a filter would hide the bindings it was sent to
-  optScrollTo = 'sec-controls-bindings'; // and it lands on them, not the top of the tab
+  optQuery = ''; optFilter = 'all';   // ORG2: a search or a filter would hide the bindings it was sent to
+  optScrollTo = 'sec-controls-bindings';   // and it lands on them, not the top of the tab
   go('settings');
 }
 
@@ -5679,14 +3703,8 @@ function featurePartsDrawer(parts) {
       const b = el('button', 'ft-mchip', pt.label);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(on));
-      if (onlineForcedPref(pt.key) !== undefined) {
-        b.disabled = true;
-        b.title = noteText(ONLINE_LOCK_NOTE);
-      } else
-        b.onclick = () => {
-          setPref(pt.key, !on);
-          render();
-        };
+      if (onlineForcedPref(pt.key) !== undefined) { b.disabled = true; b.title = noteText(ONLINE_LOCK_NOTE); }
+      else b.onclick = () => { setPref(pt.key, !on); render(); };
       box.append(b);
     }
     d.append(box);
@@ -5694,20 +3712,8 @@ function featurePartsDrawer(parts) {
   for (const pt of parts.filter((x) => x.tiers)) {
     d.append(el('div', 'ft-drawer-label', pt.label));
     const cur = String(getPref(pt.key));
-    d.append(
-      segBar(
-        {
-          labels: pt.tiers.map(([, l]) => l),
-          at: Math.max(
-            0,
-            pt.tiers.findIndex(([v]) => String(v) === cur),
-          ),
-          locked: onlineForcedPref(pt.key) !== undefined,
-          set: (i) => setPref(pt.key, pt.tiers[i][0]),
-        },
-        pt.label,
-      ),
-    );
+    d.append(segBar({ labels: pt.tiers.map(([, l]) => l), at: Math.max(0, pt.tiers.findIndex(([v]) => String(v) === cur)),
+      locked: onlineForcedPref(pt.key) !== undefined, set: (i) => setPref(pt.key, pt.tiers[i][0]) }, pt.label));
   }
   return d;
 }
@@ -5752,10 +3758,7 @@ export function featuresRestore(list = FEATURES) {
       const st = tileStates(f);
       if (!st || st.locked) continue;
       const i = st.labels.indexOf(keep[f.id]);
-      if (i >= 0 && i !== st.at) {
-        st.set(i);
-        n++;
-      }
+      if (i >= 0 && i !== st.at) { st.set(i); n++; }
     }
   }
   setPref(FEATURES_RESTORE_PREF, null);
@@ -5775,7 +3778,7 @@ export function defaultSegment(f, st) {
   let i = -1;
   if (c.store === 'prefs') {
     const d = c.default ?? c.initial ?? PREF_DEFAULTS[c.key];
-    i = c.tiers ? c.tiers.findIndex(([v]) => String(v) === String(d)) : d ? 1 : 0;
+    i = c.tiers ? c.tiers.findIndex(([v]) => String(v) === String(d)) : (d ? 1 : 0);
   } else if (c.store === 'settings') {
     const [sec, k] = c.key.split('/');
     const d = defaultOf(sec, k);
@@ -5793,36 +3796,21 @@ export function featuresDefaults(list = FEATURES, { spendKeep = true } = {}) {
     const st = tileStates(f);
     if (st && !st.locked) {
       const to = defaultSegment(f, st);
-      if (to >= 0 && to !== st.at) {
-        st.set(to);
-        n++;
-      }
+      if (to >= 0 && to !== st.at) { st.set(to); n++; }
     }
     const c = resolveControl(f);
-    for (const pt of c?.parts ?? []) {
-      // the drawer's parts write their pref straight, as the drawer does
+    for (const pt of c?.parts ?? []) {   // the drawer's parts write their pref straight, as the drawer does
       if (onlineForcedPref(pt.key) !== undefined || !Object.hasOwn(PREF_DEFAULTS, pt.key)) continue;
-      if (String(getPref(pt.key)) !== String(PREF_DEFAULTS[pt.key])) {
-        setPref(pt.key, PREF_DEFAULTS[pt.key]);
-        n++;
-      }
+      if (String(getPref(pt.key)) !== String(PREF_DEFAULTS[pt.key])) { setPref(pt.key, PREF_DEFAULTS[pt.key]); n++; }
     }
-    const vendor =
-      c?.store === 'mods'
-        ? c.vendor
-        : ((Array.isArray(c?.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null);
+    const vendor = c?.store === 'mods' ? c.vendor : (Array.isArray(c?.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null;
     for (const key of vendor ? [...modModules(vendor), ...modDials(vendor)] : []) {
       const def = MOD_SETTINGS[vendor].keys[key];
-      if (
-        onlineModSetting(vendor, key) !== undefined ||
-        JSON.stringify(modSetting(vendor, key)) === JSON.stringify(def.default)
-      )
-        continue; // a tuple dial is a frozen pair
-      setModSetting(vendor, key, def.default);
-      n++;
+      if (onlineModSetting(vendor, key) !== undefined || JSON.stringify(modSetting(vendor, key)) === JSON.stringify(def.default)) continue;   // a tuple dial is a frozen pair
+      setModSetting(vendor, key, def.default); n++;
     }
   }
-  if (spendKeep) setPref(FEATURES_RESTORE_PREF, null); // nothing for Restore to go back to (ORG2: one tab's restore leaves it)
+  if (spendKeep) setPref(FEATURES_RESTORE_PREF, null);   // nothing for Restore to go back to (ORG2: one tab's restore leaves it)
   return n;
 }
 
@@ -5860,10 +3848,7 @@ function featureDrawer(vendor, mods, dials, keys = []) {
       const b = el('button', 'ft-mchip', key.slice('Modules.'.length).replace(/([a-z])([A-Z])/g, '$1 $2'));
       b.type = 'button';
       b.setAttribute('aria-pressed', String(on));
-      b.onclick = () => {
-        setModSetting(vendor, key, !on);
-        render();
-      };
+      b.onclick = () => { setModSetting(vendor, key, !on); render(); };
       box.append(b);
     }
     d.append(box);
@@ -5878,19 +3863,17 @@ function featureDrawer(vendor, mods, dials, keys = []) {
 // ── OVH1 - THE OVERHAULS PANE. Three cards,
 // one look each (systems/overhauls.js is the registry and the only writer): the arrows BROWSE, the button WEARS, so a
 // look that reloads the game is never worn by a stray arrow press. The card a player is browsing survives a render.
-const ovhAt = {}; // panel id -> the option index being shown
+const ovhAt = {};   // panel id -> the option index being shown
 /** The picture a look carries: a UI pack's own art, else its emblem. */
 function overhaulPicture(p, o, inUse) {
   const pic = el('div', 'look-pic');
   pic.dataset.look = o.id;
   // GRIM1: DFO Grimoire wears the pack's art too - shown by its desk, where GrimoireUI is shown by its inventory
   const grim = p.id === 'ui' && o.dress === 'grimoire';
-  const pack = p.id === 'ui' ? (UI_PACKS[o.pack] ?? (grim ? UI_PACKS.grimoire : null)) : null;
+  const pack = p.id === 'ui' ? UI_PACKS[o.pack] ?? (grim ? UI_PACKS.grimoire : null) : null;
   if (pack) {
     const img = el('img');
-    img.alt = grim
-      ? t('menu.ovh.packAltDesk', '{look}: the desk', { look: o.name })
-      : t('menu.ovh.packAlt', '{look}: the inventory', { look: o.name });
+    img.alt = grim ? t('menu.ovh.packAltDesk', '{look}: the desk', { look: o.name }) : t('menu.ovh.packAlt', '{look}: the inventory', { look: o.name });
     img.loading = 'lazy';
     img.src = packUrl(pack, grim ? 'Img/BIOG00I0.IMG.png' : 'Img/INVE00I0.IMG.png');
     pic.append(img);
@@ -5912,9 +3895,8 @@ function overhaulPicture(p, o, inUse) {
  *  or Enter picks, Escape closes. The machine's list is asked once a session (`fontFamiliesSeen`). */
 let fontFamiliesSeen = null;
 /** FONT-PICK: the list button's word once the machine has answered - how many, and where to pick (L10N4). */
-const fontsPickBelow = (n) =>
-  t('menu.font.pickBelow', '{n, plural, one {# font - pick below} other {# fonts - pick below}}', { n });
-let fontPickShut = false; // a pick's own repaint hands the field its focus back: that focus does not reopen the list
+const fontsPickBelow = (n) => t('menu.font.pickBelow', '{n, plural, one {# font - pick below} other {# fonts - pick below}}', { n });
+let fontPickShut = false;   // a pick's own repaint hands the field its focus back: that focus does not reopen the list
 function systemFontRow(redraw) {
   const row = el('div', 'look-colours look-fontrow');
   row.setAttribute('role', 'group');
@@ -5936,124 +3918,59 @@ function systemFontRow(redraw) {
   pick.setAttribute('aria-label', t('menu.font.installed', 'Installed fonts'));
   pick.hidden = true;
   input.setAttribute('aria-controls', pick.id);
-  pick.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true }); // the list's own scroll - no window under it takes the wheel
-  const look = () => {
-    const f = cleanFamily(input.value);
-    if (f) input.style.setProperty('font-family', `'${f}', sans-serif`, 'important');
-    else input.style.removeProperty('font-family');
-  }; // important: over the words' own face
+  pick.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });   // the list's own scroll - no window under it takes the wheel
+  const look = () => { const f = cleanFamily(input.value); if (f) input.style.setProperty('font-family', `'${f}', sans-serif`, 'important'); else input.style.removeProperty('font-family'); };   // important: over the words' own face
   look();
-  const keep = () => {
-    if (cleanFamily(input.value) !== textFontSystem()) {
-      setTextFontSystem(input.value);
-      redraw();
-    }
-  };
+  const keep = () => { if (cleanFamily(input.value) !== textFontSystem()) { setTextFontSystem(input.value); redraw(); } };
   let hi = -1;
   /** @type {string[]} */
   let shown = [];
-  const close = () => {
-    pick.hidden = true;
-    input.setAttribute('aria-expanded', 'false');
-    hi = -1;
-  };
-  const settle = () => {
-    fontPickShut = true;
-    try {
-      keep();
-    } finally {
-      fontPickShut = false;
-    }
-  };
-  const choose = (f) => {
-    input.value = f;
-    look();
-    close();
-    settle();
-  };
+  const close = () => { pick.hidden = true; input.setAttribute('aria-expanded', 'false'); hi = -1; };
+  const settle = () => { fontPickShut = true; try { keep(); } finally { fontPickShut = false; } };
+  const choose = (f) => { input.value = f; look(); close(); settle(); };
   const paint = () => {
-    if (!fontFamiliesSeen?.length) {
-      close();
-      return;
-    }
+    if (!fontFamiliesSeen?.length) { close(); return; }
     shown = fontMatches(fontFamiliesSeen, input.value);
     hi = Math.min(hi, shown.length - 1);
     const all = fontFamiliesSeen.length;
-    pick.replaceChildren(
-      el('div', 'look-fontcount', shown.length === all ? `${all} fonts` : `${shown.length} of ${all} fonts`),
-    );
+    pick.replaceChildren(el('div', 'look-fontcount', shown.length === all ? `${all} fonts` : `${shown.length} of ${all} fonts`));
     shown.forEach((f, i) => {
       const o = el('button', 'look-fontopt', f);
       o.type = 'button';
       o.setAttribute('role', 'option');
       o.setAttribute('aria-selected', String(i === hi));
       o.style.fontFamily = `'${f}', sans-serif`;
-      o.onmousedown = (e) => e.preventDefault(); // the field keeps its focus, so its blur never closes the list under the click
-      o.onclick = (e) => {
-        e.stopPropagation();
-        choose(f);
-      };
+      o.onmousedown = (e) => e.preventDefault();   // the field keeps its focus, so its blur never closes the list under the click
+      o.onclick = (e) => { e.stopPropagation(); choose(f); };
       pick.append(o);
     });
     pick.hidden = false;
     input.setAttribute('aria-expanded', 'true');
   };
   const move = (d) => {
-    if (pick.hidden) {
-      paint();
-      if (pick.hidden) return;
-    }
+    if (pick.hidden) { paint(); if (pick.hidden) return; }
     if (!shown.length) return;
     hi = hi < 0 ? (d > 0 ? 0 : shown.length - 1) : (hi + d + shown.length) % shown.length;
     const opts = pick.querySelectorAll('.look-fontopt');
     opts.forEach((o, i) => o.setAttribute('aria-selected', String(i === hi)));
     opts[hi]?.scrollIntoView?.({ block: 'nearest' });
   };
-  input.oninput = () => {
-    look();
-    hi = -1;
-    if (fontFamiliesSeen?.length) {
-      paint();
-      pick.scrollTop = 0;
-    }
-  };
-  input.onfocus = () => {
-    if (fontFamiliesSeen?.length && !fontPickShut) paint();
-  };
+  input.oninput = () => { look(); hi = -1; if (fontFamiliesSeen?.length) { paint(); pick.scrollTop = 0; } };
+  input.onfocus = () => { if (fontFamiliesSeen?.length && !fontPickShut) paint(); };
   input.onblur = () => close();
   input.onchange = keep;
   input.onkeydown = (e) => {
     e.stopPropagation();
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      move(1);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      move(-1);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (!pick.hidden && hi >= 0 && shown[hi]) choose(shown[hi]);
-      else {
-        close();
-        settle();
-      }
-    } else if (e.key === 'Escape' && !pick.hidden) {
-      e.preventDefault();
-      close();
-    }
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (!pick.hidden && hi >= 0 && shown[hi]) choose(shown[hi]); else { close(); settle(); } }
+    else if (e.key === 'Escape' && !pick.hidden) { e.preventDefault(); close(); }
   };
   input.onkeyup = (e) => e.stopPropagation();
-  input.onclick = (e) => {
-    e.stopPropagation();
-    if (pick.hidden && fontFamiliesSeen?.length) paint();
-  };
+  input.onclick = (e) => { e.stopPropagation(); if (pick.hidden && fontFamiliesSeen?.length) paint(); };
   row.append(input);
   if (canListFonts()) {
-    const b = el(
-      'button',
-      'look-colour',
-      fontFamiliesSeen?.length ? fontsPickBelow(fontFamiliesSeen.length) : 'List my fonts',
-    );
+    const b = el('button', 'look-colour', fontFamiliesSeen?.length ? fontsPickBelow(fontFamiliesSeen.length) : 'List my fonts');
     b.type = 'button';
     b.onclick = async (e) => {
       e.stopPropagation();
@@ -6068,8 +3985,7 @@ function systemFontRow(redraw) {
   return row;
 }
 function overhaulPanel(p) {
-  if (!p.options.length) {
-    // OVH1b: a panel with nothing in it yet - its title, an empty picture, one line
+  if (!p.options.length) {   // OVH1b: a panel with nothing in it yet - its title, an empty picture, one line
     const card = el('section', 'look-panel look-empty');
     card.dataset.panel = p.id;
     card.dataset.state = 'empty';
@@ -6081,26 +3997,17 @@ function overhaulPanel(p) {
   }
   const cur = currentOption(p);
   const n = p.options.length;
-  const at = (((ovhAt[p.id] ?? Math.max(0, p.options.indexOf(cur))) % n) + n) % n;
+  const at = ((ovhAt[p.id] ?? Math.max(0, p.options.indexOf(cur))) % n + n) % n;
   const o = p.options[at];
   const card = el('section', 'look-panel');
   card.dataset.panel = p.id;
   card.dataset.state = !cur ? 'custom' : o === cur ? 'on' : 'browse';
   card.setAttribute('aria-label', p.title);
   card.tabIndex = 0;
-  const go = (d) => {
-    ovhAt[p.id] = (at + d + n) % n;
-    render();
-    document.querySelector(`.look-panel[data-panel="${p.id}"]`)?.focus();
-  };
+  const go = (d) => { ovhAt[p.id] = (at + d + n) % n; render(); document.querySelector(`.look-panel[data-panel="${p.id}"]`)?.focus(); };
   card.onkeydown = (e) => {
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      go(-1);
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      go(1);
-    }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
   };
   card.append(el('h2', 'look-title', p.title), overhaulPicture(p, o, o === cur));
   const nav = el('div', 'look-nav');
@@ -6109,10 +4016,7 @@ function overhaulPanel(p) {
     b.type = 'button';
     b.setAttribute('aria-label', word(p.title.toLowerCase()));
     b.disabled = n < 2;
-    b.onclick = (e) => {
-      e.stopPropagation();
-      go(d);
-    };
+    b.onclick = (e) => { e.stopPropagation(); go(d); };
     return b;
   };
   const mid = el('div');
@@ -6121,11 +4025,7 @@ function overhaulPanel(p) {
   const dots = el('div', 'look-dots');
   p.options.forEach((x, i) => dots.append(el('span', `look-dot${i === at ? ' at' : ''}${x === cur ? ' on' : ''}`)));
   mid.append(dots);
-  nav.append(
-    arrow(-1, '‹', (panel) => t('menu.ovh.previous', 'Previous {panel} look', { panel })),
-    mid,
-    arrow(1, '›', (panel) => t('menu.ovh.next', 'Next {panel} look', { panel })),
-  );
+  nav.append(arrow(-1, '‹', (panel) => t('menu.ovh.previous', 'Previous {panel} look', { panel })), mid, arrow(1, '›', (panel) => t('menu.ovh.next', 'Next {panel} look', { panel })));
   card.append(nav, el('p', 'look-blurb', o.blurb));
   // PLUS2: ENHANCED PLUS'S COLOURS - offered on its own card while it is the look in use (they are its surfaces, and
   // they change at once, no reload). One swatch per stone; the chosen one is pressed.
@@ -6142,11 +4042,7 @@ function overhaulPanel(p) {
         const b = el('button', 'look-colour', name);
         b.type = 'button';
         b.setAttribute('aria-pressed', String(id === now));
-        b.onclick = (e) => {
-          e.stopPropagation();
-          wear(id);
-          render();
-        };
+        b.onclick = (e) => { e.stopPropagation(); wear(id); render(); };
         row.append(b);
       }
       return row;
@@ -6155,48 +4051,37 @@ function overhaulPanel(p) {
       card.append(choiceRow('Pages', GRIMOIRE_PAGES, grimoirePages(), (id) => setGrimoirePages(id)));
       card.append(choiceRow('Backdrop', GRIMOIRE_BACKDROPS, grimoireBackdrop(), (id) => setGrimoireBackdrop(id)));
       card.append(choiceRow('Vitals', GRIMOIRE_VITALS, grimoireVitals(), (id) => setGrimoireVitals(id)));
-      card.append(choiceRow('Spellbook', GRIMOIRE_SPELLBOOKS, grimoireSpellbook(), (id) => setGrimoireSpellbook(id))); // GRIM3: a player: "(optionally) retain the look of the original GrimoireUI spellbook"
-      card.append(choiceRow('Tab dial', GRIMOIRE_DIALS, grimoireDial(), (id) => setGrimoireDial(id))); // DIAL-PACK: Daggerfall's own icons, or the pack's paintings
+      card.append(choiceRow('Spellbook', GRIMOIRE_SPELLBOOKS, grimoireSpellbook(), (id) => setGrimoireSpellbook(id)));   // GRIM3: a player: "(optionally) retain the look of the original GrimoireUI spellbook"
+      card.append(choiceRow('Tab dial', GRIMOIRE_DIALS, grimoireDial(), (id) => setGrimoireDial(id)));   // DIAL-PACK: Daggerfall's own icons, or the pack's paintings
     } else {
-      const row = el('div', 'look-colours');
-      row.setAttribute('role', 'group');
-      row.setAttribute('aria-label', t('menu.ovh.plusColour', 'Enhanced Plus color'));
-      row.append(el('span', 'look-colours-label', t('menu.ovh.uiColour', 'UI color'))); // Mac, 2026-09-29
-      const now = plusTheme();
-      for (const [id, th] of Object.entries(PLUS_THEMES)) {
-        const b = el('button', 'look-colour');
-        b.type = 'button';
-        b.title = th.name;
-        b.setAttribute('aria-pressed', String(id === now));
-        const chip = el('i', 'look-colour-chip');
-        chip.style.background = th.swatch;
-        b.append(chip, el('span', null, th.name));
-        b.onclick = (e) => {
-          e.stopPropagation();
-          setPlusTheme(id);
-          render();
-        };
-        row.append(b);
-      }
-      card.append(row);
+    const row = el('div', 'look-colours');
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', t('menu.ovh.plusColour', 'Enhanced Plus color'));
+    row.append(el('span', 'look-colours-label', t('menu.ovh.uiColour', 'UI color')));   // Mac, 2026-09-29
+    const now = plusTheme();
+    for (const [id, th] of Object.entries(PLUS_THEMES)) {
+      const b = el('button', 'look-colour');
+      b.type = 'button';
+      b.title = th.name;
+      b.setAttribute('aria-pressed', String(id === now));
+      const chip = el('i', 'look-colour-chip');
+      chip.style.background = th.swatch;
+      b.append(chip, el('span', null, th.name));
+      b.onclick = (e) => { e.stopPropagation(); setPlusTheme(id); render(); };
+      row.append(b);
+    }
+    card.append(row);
     }
     // PLUS6: the gauntlet cursor, on or off - worn at once
     const crow = el('div', 'look-colours');
     crow.setAttribute('role', 'group');
     crow.setAttribute('aria-label', t('menu.ovh.plusCursor', 'Enhanced Plus cursor'));
     crow.append(el('span', 'look-colours-label', t('menu.ovh.cursor', 'Cursor')));
-    for (const [on, label] of [
-      [true, t('menu.ovh.cursorGauntlet', 'Gauntlet')],
-      [false, t('menu.ovh.cursorSystem', 'System')],
-    ]) {
+    for (const [on, label] of [[true, t('menu.ovh.cursorGauntlet', 'Gauntlet')], [false, t('menu.ovh.cursorSystem', 'System')]]) {
       const b = el('button', 'look-colour', label);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(plusCursorOn() === on));
-      b.onclick = (e) => {
-        e.stopPropagation();
-        setPlusCursor(on);
-        render();
-      };
+      b.onclick = (e) => { e.stopPropagation(); setPlusCursor(on); render(); };
       crow.append(b);
     }
     card.append(crow);
@@ -6205,18 +4090,11 @@ function overhaulPanel(p) {
     hrow.setAttribute('role', 'group');
     hrow.setAttribute('aria-label', t('menu.ovh.itemHover', 'Item info on hover'));
     hrow.append(el('span', 'look-colours-label', t('menu.ovh.itemHover', 'Item info on hover')));
-    for (const [on, label] of [
-      [true, t('menu.toggle.on', 'On')],
-      [false, t('menu.toggle.off', 'Off')],
-    ]) {
+    for (const [on, label] of [[true, t('menu.toggle.on', 'On')], [false, t('menu.toggle.off', 'Off')]]) {
       const b = el('button', 'look-colour', label);
       b.type = 'button';
       b.setAttribute('aria-pressed', String((getPref('plusItemHover') !== false) === on));
-      b.onclick = (e) => {
-        e.stopPropagation();
-        setPref('plusItemHover', on);
-        render();
-      };
+      b.onclick = (e) => { e.stopPropagation(); setPref('plusItemHover', on); render(); };
       hrow.append(b);
     }
     card.append(hrow);
@@ -6224,35 +4102,24 @@ function overhaulPanel(p) {
     // this machine's own (ui/textFont.js).
     card.append(choiceRow('Text font', TEXT_FONTS, textFont(), (id) => setTextFont(id)));
     if (textFont() === 'system') card.append(systemFontRow(render));
-    card.append(plusControllerRows()); // PADPLUS1
+    card.append(plusControllerRows());   // PADPLUS1
   }
   // VE4: A LOOK'S ADD-ONS - Vanilla Enhanced's Masked Roads and Snowless Swamps and Jungles, offered as switches while
   // the look is worn (the PLUS rows' shape); each takes effect when the world next loads, and is kept for the next wear
-  const addons = o === cur ? (o.addons?.() ?? []) : [];
+  const addons = o === cur ? o.addons?.() ?? [] : [];
   for (const m of addons) {
     // ALIKR1/SNOWFALL1: the environment packs ride the look as its add-ons do (built on its Base) - each named with its
     // own author where the archive names one, so Snowfall does not read as carademono's
-    const label = /^Vanilla Enhanced - /.test(m.title)
-      ? String(m.title).replace(/^Vanilla Enhanced - /, '')
-      : m.author
-        ? t('menu.ovh.addonBy', '{title} by {author}', { title: m.title, author: m.author })
-        : m.title;
+    const label = /^Vanilla Enhanced - /.test(m.title) ? String(m.title).replace(/^Vanilla Enhanced - /, '') : m.author ? t('menu.ovh.addonBy', '{title} by {author}', { title: m.title, author: m.author }) : m.title;
     const row = el('div', 'look-colours');
     row.setAttribute('role', 'group');
     row.setAttribute('aria-label', label);
     row.append(el('span', 'look-colours-label', label));
-    for (const [on, word] of [
-      [true, t('menu.toggle.on', 'On')],
-      [false, t('menu.toggle.off', 'Off')],
-    ]) {
+    for (const [on, word] of [[true, t('menu.toggle.on', 'On')], [false, t('menu.toggle.off', 'Off')]]) {
       const b = el('button', 'look-colour', word);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(m.enabled === on));
-      b.onclick = (e) => {
-        e.stopPropagation();
-        setVeAddon(m.key, on);
-        render();
-      };
+      b.onclick = (e) => { e.stopPropagation(); setVeAddon(m.key, on); render(); };
       row.append(b);
     }
     card.append(row);
@@ -6261,33 +4128,18 @@ function overhaulPanel(p) {
   // miss the attached mods; AUDIT VE R10: what stands in a look's way (a loose texture pack, Classic's)
   const reading = p.id === 'texture' && !textureStoreSettled();
   const blocked = o.blocked?.() ?? null;
-  const use = el(
-    'button',
-    'act primary look-use',
-    o === cur ? t('menu.ovh.inUse', 'In use') : t('menu.ovh.use', 'Use {look}', { look: o.name }),
-  );
+  const use = el('button', 'act primary look-use', o === cur ? t('menu.ovh.inUse', 'In use') : t('menu.ovh.use', 'Use {look}', { look: o.name }));
   use.type = 'button';
   use.disabled = o === cur || reading || !!blocked;
   use.onclick = () => {
     const r = o.apply();
-    if (r?.reload) {
-      location.replace(r.url);
-      return;
-    }
+    if (r?.reload) { location.replace(r.url); return; }
     render();
   };
   card.append(use);
   if (reading) card.append(el('p', 'look-note', t('menu.ovh.reading', 'Reading your texture mods\u2026')));
   else if (blocked && o !== cur) card.append(el('p', 'look-note', blocked));
-  if (!cur)
-    card.append(
-      el(
-        'p',
-        'look-note',
-        p.custom ??
-          t('menu.ovh.custom', 'Custom: your own mix from Settings. Using a look sets every switch it covers.'),
-      ),
-    );
+  if (!cur) card.append(el('p', 'look-note', p.custom ?? t('menu.ovh.custom', 'Custom: your own mix from Settings. Using a look sets every switch it covers.')));
   const forced = isOnlinePage() && p.online ? p.online : null;
   card.append(el('p', 'look-note', forced ? `${p.effect} ${forced}` : p.effect));
   return card;
@@ -6306,50 +4158,20 @@ function plusControllerRows() {
       const b = el('button', 'look-colour', word);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(now === v));
-      b.onclick = (e) => {
-        e.stopPropagation();
-        set(v);
-        render();
-      };
+      b.onclick = (e) => { e.stopPropagation(); set(v); render(); };
       r.append(b);
     }
     return r;
   };
   const xb = ['on', 'off'].includes(getPref('plusCrossbar')) ? getPref('plusCrossbar') : 'auto';
-  wrap.append(
-    row(
-      t('menu.pad.crossbar', 'Controller crossbar'),
-      [
-        ['auto', t('menu.pad.auto', 'Auto')],
-        ['on', t('menu.toggle.on', 'On')],
-        ['off', t('menu.toggle.off', 'Off')],
-      ],
-      xb,
-      (v) => setPref('plusCrossbar', v),
-    ),
-  );
-  wrap.append(
-    row(
-      t('menu.pad.stickRun', 'Left stick run'),
-      [
-        [true, t('menu.pad.toggle', 'Toggle')],
-        [false, t('menu.pad.hold', 'Hold')],
-      ],
-      getPref('plusToggleRun') !== false,
-      (v) => setPref('plusToggleRun', v),
-    ),
-  );
+  wrap.append(row(t('menu.pad.crossbar', 'Controller crossbar'), [['auto', t('menu.pad.auto', 'Auto')], ['on', t('menu.toggle.on', 'On')], ['off', t('menu.toggle.off', 'Off')]], xb, (v) => setPref('plusCrossbar', v)));
+  wrap.append(row(t('menu.pad.stickRun', 'Left stick run'), [[true, t('menu.pad.toggle', 'Toggle')], [false, t('menu.pad.hold', 'Hold')]], getPref('plusToggleRun') !== false, (v) => setPref('plusToggleRun', v)));
   const fam = livePadFamily() ?? 'xbox';
   const legend = el('div', 'look-padlegend');
   legend.setAttribute('aria-label', t('menu.pad.layout', 'Controller layout'));
   for (const [codes, word] of plusPadLegend(liveBindings())) {
     const it = el('div', 'look-paditem');
-    for (const c of codes) {
-      const im = el('img');
-      im.src = hdGlyphSvg(fam, c, { size: 40 }) ?? '';
-      im.alt = hdGlyphName(fam, c);
-      it.append(im);
-    }
+    for (const c of codes) { const im = el('img'); im.src = hdGlyphSvg(fam, c, { size: 40 }) ?? ''; im.alt = hdGlyphName(fam, c); it.append(im); }
     it.append(el('span', null, word));
     legend.append(it);
   }
@@ -6360,17 +4182,12 @@ function plusControllerRows() {
   binds.onclick = (e) => {
     e.stopPropagation();
     openPlusPadBinds();
-    globalThis.addEventListener?.('plus-padbinds-closed', () => render(), { once: true }); // the legend shows what was set
+    globalThis.addEventListener?.('plus-padbinds-closed', () => render(), { once: true });   // the legend shows what was set
   };
   wrap.append(binds);
   const reset = el('button', 'act look-padreset', t('menu.pad.reset', 'Reset controller layout'));
   reset.type = 'button';
-  reset.onclick = (e) => {
-    e.stopPropagation();
-    resetPlusPadLayout(liveBindings());
-    resetPlusDpad();
-    render();
-  }; // PADPLUS10: and the d-pad's tap/hold
+  reset.onclick = (e) => { e.stopPropagation(); resetPlusPadLayout(liveBindings()); resetPlusDpad(); render(); };   // PADPLUS10: and the d-pad's tap/hold
   wrap.append(reset);
   if (!document.getElementById('look-padplus-style')) {
     const st = document.createElement('style');
@@ -6387,7 +4204,7 @@ function plusControllerRows() {
 }
 
 function paneOverhauls(body) {
-  waitForTextureStore(); // AUDIT VE R2
+  waitForTextureStore();   // AUDIT VE R2
   body.classList.add('wide');
   const grid = el('div', 'look-grid');
   for (const p of OVERHAUL_PANELS) grid.append(overhaulPanel(p));
@@ -6403,12 +4220,10 @@ function kindTags(kinds) {
 
 /** One registry row, drawn by its store's own builder and dressed. */
 function featureRow(f) {
-  const c = resolveControl(f); // RF4: the lane's tiers/read/write folded in
+  const c = resolveControl(f);   // RF4: the lane's tiers/read/write folded in
   let row;
   if (c.store === 'prefs') {
-    row = c.tiers
-      ? choiceRow(c.key, f.title, f.note, c.tiers, { home: true, read: c.read, write: c.write })
-      : prefRow(c.key, f.title, f.note, { home: true });
+    row = c.tiers ? choiceRow(c.key, f.title, f.note, c.tiers, { home: true, read: c.read, write: c.write }) : prefRow(c.key, f.title, f.note, { home: true });
   } else if (c.store === 'settings') {
     row = settingRow(c.key, { compact: true, home: true });
     const main = row.querySelector('.row-main');
@@ -6433,35 +4248,17 @@ function featureRow(f) {
 // ── ABOUT ────────────────────────────────────────────────────────
 function paneAbout(body) {
   const c = el('div', 'card');
-  c.append(el('h3', null, 'DFO Online')); // the public name (BR1, BR4, BR5); project-dagger is the repo
+  c.append(el('h3', null, 'DFO Online'));   // the public name (BR1, BR4, BR5); project-dagger is the repo
   c.append(el('p', 'meta', t('menu.about.tagline', 'An open-source reimplementation of a classic 1996 RPG.')));
-  c.append(
-    stats([
-      [t('menu.about.update', 'Update'), UPDATE ?? t('menu.about.devBuild', 'a development build')], // REL8: the player's update number (scripts/updateNumber.mjs)
-      [t('menu.about.build', 'Build'), BUILD_TAG],
-      [
-        t('menu.about.interface', 'Interface'),
-        currentOption(OVERHAUL_PANELS.find((p) => p.id === 'ui'))?.name ?? SKIN_NAMES[uiSkin()],
-      ], // PLUS1; MENU-TOGGLE: the UI Overhaul worn, by its card's name (GrimoireUI is the classic skin with a pack)
-      [
-        t('menu.about.settings', 'Settings'),
-        t('menu.about.keys', '{n, plural, other {# keys}}', {
-          n: Object.values(DEFAULTS).reduce((n, s2) => n + Object.keys(s2).length, 0),
-        }),
-      ],
-    ]),
-  );
+  c.append(stats([
+    [t('menu.about.update', 'Update'), UPDATE ?? t('menu.about.devBuild', 'a development build')],   // REL8: the player's update number (scripts/updateNumber.mjs)
+    [t('menu.about.build', 'Build'), BUILD_TAG],
+    [t('menu.about.interface', 'Interface'), currentOption(OVERHAUL_PANELS.find((p) => p.id === 'ui'))?.name ?? SKIN_NAMES[uiSkin()]],   // PLUS1; MENU-TOGGLE: the UI Overhaul worn, by its card's name (GrimoireUI is the classic skin with a pack)
+    [t('menu.about.settings', 'Settings'), t('menu.about.keys', '{n, plural, other {# keys}}', { n: Object.values(DEFAULTS).reduce((n, s2) => n + Object.keys(s2).length, 0) })],
+  ]));
   body.append(c);
   body.append(creditsCard());
-  body.append(
-    empty(
-      t('menu.about.exit', 'Exit'),
-      t(
-        'menu.about.exitNote',
-        'A browser tab can\u2019t close itself. Close the tab yourself. Your quicksave is kept.',
-      ),
-    ),
-  );
+  body.append(empty(t('menu.about.exit', 'Exit'), t('menu.about.exitNote', 'A browser tab can\u2019t close itself. Close the tab yourself. Your quicksave is kept.')));
 }
 
 // CR1: THE CREDITS (Mac, 2026-08-30). Rendered from ui/credits.js, the
@@ -6472,13 +4269,7 @@ function paneAbout(body) {
 function creditsCard() {
   const c = el('div', 'card credits');
   c.append(el('h3', null, t('menu.credits.title', 'Credits')));
-  c.append(
-    el(
-      'p',
-      'meta',
-      t('menu.credits.blurb', "What this game is built on, and the mods included with their authors' permission."),
-    ),
-  );
+  c.append(el('p', 'meta', t('menu.credits.blurb', 'What this game is built on, and the mods included with their authors\' permission.')));
   const group = (heading, rows) => {
     c.append(el('h4', 'credits-head', heading));
     for (const r of rows) {
@@ -6494,9 +4285,7 @@ function creditsCard() {
       if (foot.length) row.append(el('p', 'credit-terms', foot.join(' ')));
       if (r.link) {
         const a = el('a', 'credit-link', r.link.replace(/^https?:\/\//, ''));
-        a.href = r.link;
-        a.target = '_blank';
-        a.rel = 'noopener';
+        a.href = r.link; a.target = '_blank'; a.rel = 'noopener';
         row.append(a);
       }
       c.append(row);
@@ -6504,7 +4293,7 @@ function creditsCard() {
   };
   group(t('menu.credits.builtOn', 'Built on'), CREDITS.builtOn);
   group(t('menu.credits.mods', 'Mods'), CREDITS.mods);
-  const languages = translationCredits(); // L10N6: whose words each language's are, a bundled pack's terms
+  const languages = translationCredits();   // L10N6: whose words each language's are, a bundled pack's terms
   if (languages.length) group(t('menu.credits.translations', 'Translations'), languages);
   return c;
 }
@@ -6522,21 +4311,16 @@ function go(id) {
   // while rebinding, with the Settings row right there. The category
   // switch does its own discard (see the CATEGORIES tabs), so this
   // fires only where it means to: the section actually changing.
-  if (id === 'features') id = 'settings'; // ORG2: the Features home is Settings' tabs - an old door's name still lands
+  if (id === 'features') id = 'settings';   // ORG2: the Features home is Settings' tabs - an old door's name still lands
   if (id !== section) discardControlsStaging();
   // UI-CALM: back home from one of Offline's games is back on the offline doors; from Online, Settings or Overhauls the
   // two questions; from a page both levels show (Tutorials, Screenshots, About) the level it was opened from
   if (id === 'home' && mode === 'boot') {
     if (offlineSection(section)) homeLevel = 'offline';
-    else if (section === 'online') homeLevel = 'top'; // AUDIT UICALM-FIRM1 L3 N1: Settings and Overhauls stand in the foot of both levels, so they keep the level they were opened from, as Tutorials does
+    else if (section === 'online') homeLevel = 'top';   // AUDIT UICALM-FIRM1 L3 N1: Settings and Overhauls stand in the foot of both levels, so they keep the level they were opened from, as Tutorials does
   }
-  pickedFeature = null; // ORG2: a walk away drops the picked Features row, as it drops pickedKey
-  section = id;
-  pickedKey = null;
-  sheetOpen = false;
-  confirming = null;
-  cloudArm = null;
-  render(); // 0927b B5: an armed press never outlives its pane
+  pickedFeature = null;   // ORG2: a walk away drops the picked Features row, as it drops pickedKey
+  section = id; pickedKey = null; sheetOpen = false; confirming = null; cloudArm = null; render();   // 0927b B5: an armed press never outlives its pane
 }
 
 // ── PX1: THE PIXEL HOME (Mac, 2026-08-27) ────────────────────────
@@ -6570,15 +4354,14 @@ function renderHome() {
     // cleared by every rebuild (renderInto) and by unmount, skipped
     // entirely under prefers-reduced-motion - the same opt-out the CSS
     // drift honours.
-    const still =
-      typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const still = typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!still) {
       const t0 = Date.now();
       groundTimer = setInterval(() => drawPixelGround(ground, vw(), vh(), (Date.now() - t0) / 1000), 125);
     }
     home.append(ground);
   }
-  if (!title) home.append(el('div', 'px-vignette')); // TITLE-DOOR: the film draws its own
+  if (!title) home.append(el('div', 'px-vignette'));   // TITLE-DOOR: the film draws its own
 
   // PX3: PAUSE IS A WINDOW, NOT A SECOND MAIN MENU (Mac's reference:
   // Skyrim's journal - a framed panel with tabs over the paused game).
@@ -6599,146 +4382,81 @@ function renderHome() {
     // where the host hands the clock and what it holds (hooks.timers); its window counts every shared moment down
     let mark = null;
     if (hooks.timers?.()) {
-      mark = timersMark(document, {
-        open: timersOpen,
-        onOpen: () => {
-          timersOpen = true;
-          timersFocusIn = true;
-          render();
-        },
-      });
+      mark = timersMark(document, { open: timersOpen, onOpen: () => { timersOpen = true; timersFocusIn = true; render(); } });
       home.append(mark);
-      timersAnchor = anchorBeside(mark, home.querySelector?.('.px-profile'), home); // AUDIT TIMERS1 UI-3: placed again on every resize
-      if (timersFocusBack && !timersOpen) {
-        timersFocusBack = false;
-        globalThis.requestAnimationFrame?.(() => mark.focus?.());
-      } // UI-5: back where the press was
+      timersAnchor = anchorBeside(mark, home.querySelector?.('.px-profile'), home);   // AUDIT TIMERS1 UI-3: placed again on every resize
+      if (timersFocusBack && !timersOpen) { timersFocusBack = false; globalThis.requestAnimationFrame?.(() => mark.focus?.()); }   // UI-5: back where the press was
     }
-    const envelope = postEnvelope(home, mark); // SERVER-POST: the mailbox beside the hourglass, online - its count kept live
-    const laurel = seasonLaurel(home, [mark, envelope]); // SEASON-BOOK: the laurel beside the envelope, online
+    const envelope = postEnvelope(home, mark);   // SERVER-POST: the mailbox beside the hourglass, online - its count kept live
+    const laurel = seasonLaurel(home, [mark, envelope]);   // SEASON-BOOK: the laurel beside the envelope, online
     // AUDIT SEASON-BOOK S4: a window whose mark is gone (the clock lost, the box gone) is closed - never kept to come back
     // over whatever the player moved on to when the mark returns
     if (timersOpen && !mark) timersOpen = false;
-    if (postOpen && !envelope) {
-      postOpen = false;
-      postKeep = {};
-    }
+    if (postOpen && !envelope) { postOpen = false; postKeep = {}; }
     if (seasonOpen && !laurel) seasonOpen = false;
     if (accountOpen) {
       const acct = el('div', 'px-stage px-acctstage');
       acct.append(accountWindow());
       home.append(acct);
-      closeOnOutsideTap(home, '.px-acctwin', closeAccount); // AUDIT RECOVERY-SET B1: not over codes
-      for (const n of [stage, mark, envelope, laurel]) n?.setAttribute?.('inert', ''); // AUDIT SERVER-POST: the face under the account window out of reach, as under the timers' - SEASON-BOOK: the laurel too
-    } else if (timersOpen && hooks.timers?.()) {
+      closeOnOutsideTap(home, '.px-acctwin', closeAccount);   // AUDIT RECOVERY-SET B1: not over codes
+      for (const n of [stage, mark, envelope, laurel]) n?.setAttribute?.('inert', '');   // AUDIT SERVER-POST: the face under the account window out of reach, as under the timers' - SEASON-BOOK: the laurel too
+    }
+    else if (timersOpen && hooks.timers?.()) {
       const tstage = el('div', 'px-stage px-timersstage');
       // AUDIT TIMERS1 UI-9: the window's read is the one that asks the service (the seats list); the hourglass's test does not
-      timersView = timersWindow(document, {
-        read: () => hooks.timers?.({ ask: true }) ?? null,
-        onClose: () => {
-          timersOpen = false;
-          timersFocusBack = true;
-          render();
-        },
-        focus: timersFocusIn,
-      });
+      timersView = timersWindow(document, { read: () => hooks.timers?.({ ask: true }) ?? null, onClose: () => { timersOpen = false; timersFocusBack = true; render(); }, focus: timersFocusIn });
       timersFocusIn = false;
       tstage.append(timersView.root);
       home.append(tstage);
-      closeOnOutsideTap(
-        home,
-        '.px-timerswin',
-        () => {
-          timersOpen = false;
-          timersFocusBack = true;
-          render();
-        },
-        { swallow: true },
-      ); // AUDIT SEASON-BOOK U1: the tap's release never lands on the face drawn under it
+      closeOnOutsideTap(home, '.px-timerswin', () => { timersOpen = false; timersFocusBack = true; render(); }, { swallow: true });   // AUDIT SEASON-BOOK U1: the tap's release never lands on the face drawn under it
       // AUDIT TIMERS1 UI-5/UI-7: the pause face under the window is out of reach - no Tab into it, no Enter on its
       // Resume, no bumper turning its tabs (plusPad's tab strips skip what is not visible to it), no profile window
       for (const n of [stage, home.querySelector?.('.px-profile'), mark]) n?.setAttribute?.('inert', '');
-      envelope?.setAttribute?.('inert', ''); // SERVER-POST: and the envelope beside it
-      laurel?.setAttribute?.('inert', ''); // SEASON-BOOK: and the laurel
-    } else if (postOpen && hooks.post?.()) {
+      envelope?.setAttribute?.('inert', '');   // SERVER-POST: and the envelope beside it
+      laurel?.setAttribute?.('inert', '');   // SEASON-BOOK: and the laurel
+    }
+    else if (postOpen && hooks.post?.()) {
       // SERVER-POST: the mailbox's window, on the hourglass's own stage (centred, its own padding - enhancedStyle.js)
       const pstage = el('div', 'px-stage px-timersstage px-poststage');
-      postView = postWindow(document, {
-        box: () => hooks.post?.() ?? null,
-        keep: postKeep,
-        onClose: () => {
-          postOpen = false;
-          postKeep = {};
-          postFocusBack = true;
-          render();
-        },
-      });
+      postView = postWindow(document, { box: () => hooks.post?.() ?? null, keep: postKeep, onClose: () => { postOpen = false; postKeep = {}; postFocusBack = true; render(); } });
       pstage.append(postView.root);
       home.append(pstage);
-      closeOnOutsideTap(
-        home,
-        '.px-postwin',
-        () => {
-          postOpen = false;
-          postKeep = {};
-          postFocusBack = true;
-          render();
-        },
-        { swallow: true },
-      );
-      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel])
-        n?.setAttribute?.('inert', '');
-    } else if (seasonOpen && laurel) {
+      closeOnOutsideTap(home, '.px-postwin', () => { postOpen = false; postKeep = {}; postFocusBack = true; render(); }, { swallow: true });
+      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel]) n?.setAttribute?.('inert', '');
+    }
+    else if (seasonOpen && laurel) {
       // SEASON-BOOK: the season window, on the hourglass's own stage; its read asks the boards (the laurel's test does not)
       const sstage = el('div', 'px-stage px-timersstage px-seasonstage');
-      seasonView = seasonWindow(document, {
-        read: (opening) => seasonSource(hooks, { opening }),
-        onClose: closeSeason,
-        door: seasonDoor,
-        focus: seasonFocusIn,
-      }); // a row's door is a handoff, as the hourglass's
+      seasonView = seasonWindow(document, { read: (opening) => seasonSource(hooks, { opening }), onClose: closeSeason, door: seasonDoor, focus: seasonFocusIn });   // a row's door is a handoff, as the hourglass's
       seasonFocusIn = false;
       sstage.append(seasonView.root);
       home.append(sstage);
       closeOnOutsideTap(home, '.px-seasonwin', closeSeason, { swallow: true });
-      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel])
-        n?.setAttribute?.('inert', '');
+      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel]) n?.setAttribute?.('inert', '');
     }
     // OT1: a tap on the
     // scrim - outside the window, the clock and the foot - resumes,
     // the way Escape does; the front door has no scrim and no resume.
     // PROFILE2: the mark is inside too (a press on it opens the window), and with the window open the tap is its.
-    else
-      closeOnOutsideTap(
-        home,
-        '.px-win, .px-clock, .px-foot, .px-profile, .px-timersmark, .px-postmark, .px-seasonmark',
-        () => {
-          if (pauseTab === 'growth' && growthAsks()) return;
-          onAction('resume');
-        },
-      ); // SERVER-POST: the envelope inside too - AUDIT GROWTH LANE3-4: a Growth face asked first (GROWTH5)
+    else closeOnOutsideTap(home, '.px-win, .px-clock, .px-foot, .px-profile, .px-timersmark, .px-postmark, .px-seasonmark', () => { if (pauseTab === 'growth' && growthAsks()) return; onAction('resume'); });   // SERVER-POST: the envelope inside too - AUDIT GROWTH LANE3-4: a Growth face asked first (GROWTH5)
     // PX4 (Mac): NO FOOT AT PAUSE - no skin toggle, no About plaque;
     // About is a System-tab row instead, and the skin switch stays on
     // the boot face and the settings shell.
     // PX5: the world's date and time, bottom-right like the reference,
     // through DFU's own header formatter over THE ONE CLOCK - a paused
     // clock, so one read at render is the truth for the whole visit.
-    const d = dateFromClassicMinutes(Math.floor(skyMinutes())); // TIME1: the date and time the world shows are the sky's
+    const d = dateFromClassicMinutes(Math.floor(skyMinutes()));   // TIME1: the date and time the world shows are the sky's
     const clock = el('div', 'px-clock');
     // the time is DateTimeString's own head ('{0:00}:{1:00}:{2:00}'), read off the clock - never by splitting the
     // formatted line at ' on ', which a translation's pattern need not contain (L10N3d)
-    clock.append(
-      el('span', null, dateString(d)),
-      el('span', 'px-clocktime', formatText('{0:00}:{1:00}:{2:00}', d.hour, d.minute, d.second)),
-    );
+    clock.append(el('span', null, dateString(d)), el('span', 'px-clocktime', formatText('{0:00}:{1:00}:{2:00}', d.hour, d.minute, d.second)));
     home.append(clock);
     app.append(home);
     return;
   }
 
   const stage = el('div', 'px-stage');
-  if (!title) {
-    // TITLE-DOOR: on the title the film's mark is the masthead
+  if (!title) {   // TITLE-DOOR: on the title the film's mark is the masthead
     const mark = el('h1', 'px-wordmark');
     mark.append(brandMark());
     stage.append(mark);
@@ -6757,10 +4475,10 @@ function renderHome() {
   // the shared-sections law hold.
   else {
     for (const label of sections) {
-      if (label === 'About' || label === 'Screenshots') continue; // LOAD1: Screenshots stands in the foot, beside About
-      if (label === 'Tutorials') continue; // TUT1: the foot's left plaque (an eighth door ran the list past a 720-pixel screen)
+      if (label === 'About' || label === 'Screenshots') continue;   // LOAD1: Screenshots stands in the foot, beside About
+      if (label === 'Tutorials') continue;   // TUT1: the foot's left plaque (an eighth door ran the list past a 720-pixel screen)
       const id = idOf(label);
-      menu.append(doorBtn(id, railLabel(label), '', RAIL_ACTS[id] ? () => onAction(RAIL_ACTS[id]) : () => go(id))); // L10N1b
+      menu.append(doorBtn(id, railLabel(label), '', RAIL_ACTS[id] ? () => onAction(RAIL_ACTS[id]) : () => go(id)));   // L10N1b
     }
   }
   stage.append(menu);
@@ -6782,17 +4500,14 @@ function renderHome() {
   // L10N1b: the language is asked first - the window waits while the
   // offer stands (found by tools/languageProbe.mjs: it covered the
   // offer, so a French player was asked in English before French).
-  if (!offer && !accountOpen && !accountOffered && !signedIn()) {
-    accountOffered = true;
-    accountOpen = true;
-  }
+  if (!offer && !accountOpen && !accountOffered && !signedIn()) { accountOffered = true; accountOpen = true; }
   if (accountOpen) {
     const acct = el('div', 'px-stage px-acctstage');
     acct.append(accountWindow());
     home.append(acct);
     // OT1, the same law the pause window lives under: a tap outside
     // closes it. The account is never a thing a player is stuck in.
-    closeOnOutsideTap(home, '.px-win', closeAccount); // AUDIT RECOVERY-SET B1: not over codes
+    closeOnOutsideTap(home, '.px-win', closeAccount);   // AUDIT RECOVERY-SET B1: not over codes
   }
 
   appendPxFoot(home);
@@ -6817,21 +4532,14 @@ function doorBtn(id, label, sub, onClick) {
   const b = el('button', `doorbtn door-${id}`);
   // AUDIT PLUS-MENU M2: the diamonds stand at rest under Plus (MENU_CSS), so they are drawing, not words - hidden from
   // a reader, or every door was named "◆ Continue ◆"
-  const dia = () => {
-    const d = el('span', 'px-c', '\u25c6');
-    d.setAttribute('aria-hidden', 'true');
-    return d;
-  };
+  const dia = () => { const d = el('span', 'px-c', '\u25c6'); d.setAttribute('aria-hidden', 'true'); return d; };
   const word = el('span', 'door-word');
   word.append(el('span', 'door-name', label));
   if (sub) word.append(el('span', 'door-sub', sub));
   b.append(dia(), word, dia());
   // AUDIT UICALM-FIRM1 L3 M2: a double click's second click is no door's - a door drawn under the pointer by the first
   // (Offline's level: Load Game stood where Offline was) took it
-  b.onclick = (e) => {
-    if (e?.detail > 1) return;
-    onClick(e);
-  };
+  b.onclick = (e) => { if (e?.detail > 1) return; onClick(e); };
   return b;
 }
 
@@ -6860,27 +4568,16 @@ function drawDoors(menu) {
   if (homeLevel === 'offline') {
     const games = page('px-page-games', t('menu.home.offline', 'Offline'));
     games.append(el('p', 'px-pagenote', t('menu.home.offlineSub', 'Your own game, kept on this device')));
-    for (const label of HOME_OFFLINE.slice(0, 3))
-      games.append(doorBtn(idOf(label), railLabel(label), '', () => go(idOf(label))));
+    for (const label of HOME_OFFLINE.slice(0, 3)) games.append(doorBtn(idOf(label), railLabel(label), '', () => go(idOf(label))));
     const more = page('px-page-more', t('menu.home.elsewhere', 'Elsewhere'));
-    for (const label of HOME_OFFLINE.slice(3))
-      more.append(doorBtn(idOf(label), railLabel(label), '', () => go(idOf(label))));
+    for (const label of HOME_OFFLINE.slice(3)) more.append(doorBtn(idOf(label), railLabel(label), '', () => go(idOf(label))));
     more.append(doorBtn('back', t('menu.home.back', 'Back'), '', level('top')));
     return;
   }
-  page('px-page-online', t('menu.home.realmHead', 'The Realm')).append(
-    doorBtn('online', railLabel('Online'), t('menu.home.onlineSub', 'Play with others in the shared world'), () =>
-      go('online'),
-    ),
-  );
-  page('px-page-offline', t('menu.home.ownHead', 'Thine Own Tale')).append(
-    doorBtn(
-      'offline',
-      t('menu.home.offline', 'Offline'),
-      t('menu.home.offlineSub', 'Your own game, kept on this device'),
-      level('offline'),
-    ),
-  );
+  page('px-page-online', t('menu.home.realmHead', 'The Realm'))
+    .append(doorBtn('online', railLabel('Online'), t('menu.home.onlineSub', 'Play with others in the shared world'), () => go('online')));
+  page('px-page-offline', t('menu.home.ownHead', 'Thine Own Tale'))
+    .append(doorBtn('offline', t('menu.home.offline', 'Offline'), t('menu.home.offlineSub', 'Your own game, kept on this device'), level('offline')));
   // Settings and Overhauls stand in the foot's box beside Screenshots and About (appendPxFoot) - UI-CALM, a player:
   // "settings and overhaul can be put in the ... bottom" - so the book's leaves hold the two questions and nothing else
 }
@@ -6895,11 +4592,11 @@ function appendPxFoot(home) {
   build.append(document.createTextNode(`${t('menu.foot.build', 'build')} `), el('span', null, BUILD_TAG));
   const about = el('button', 'px-about', RAIL_TEXT.about());
   about.onclick = () => go('about');
-  foot.append(build, about); // MENU-TOGGLE: the skin pair that stood between them is retired
+  foot.append(build, about);   // MENU-TOGGLE: the skin pair that stood between them is retired
   // TUT1: the tutorials' plaque stands over the build line, at the LEFT - the book a new player reads before the game. A
   // third plaque in About's box ran into the menu's column on a 1280x720 screen, and three stacked overran a phone's foot.
   if (mode !== 'pause' && sections.includes('Tutorials')) {
-    const tuts = el('button', 'px-about px-tuts door-tutorials', RAIL_TEXT.tutorials()); // AUDIT UICALM-FIRM1 L3 N3: the player's language, as About beside it
+    const tuts = el('button', 'px-about px-tuts door-tutorials', RAIL_TEXT.tutorials());   // AUDIT UICALM-FIRM1 L3 N3: the player's language, as About beside it
     tuts.onclick = () => go('tutorials');
     const left = el('div', 'px-footleft');
     build.remove();
@@ -6930,17 +4627,9 @@ function appendPxFoot(home) {
   // foot to a second row the stage's fixed reserve did not hold, and Settings stood over Offline, Load and Back - a tap
   // on a door opened Settings. The foot says its height (--px-foot-h) and the sheet keeps the stage's foot clear of it.
   footObs?.disconnect?.();
-  const reserve = () => {
-    const h = Math.ceil(foot.getBoundingClientRect?.().height ?? 0);
-    if (h > 0) home.style?.setProperty?.('--px-foot-h', `${h}px`);
-  };
+  const reserve = () => { const h = Math.ceil(foot.getBoundingClientRect?.().height ?? 0); if (h > 0) home.style?.setProperty?.('--px-foot-h', `${h}px`); };
   reserve();
-  try {
-    footObs = new globalThis.ResizeObserver(reserve);
-    footObs.observe(foot);
-  } catch {
-    footObs = null;
-  } // no observer: the sheet's own reserve stands
+  try { footObs = new globalThis.ResizeObserver(reserve); footObs.observe(foot); } catch { footObs = null; }   // no observer: the sheet's own reserve stands
 }
 /** The foot's watch (appendPxFoot) - one at a time, the last door's. */
 let footObs = /** @type {ResizeObserver|null} */ (null);
@@ -6954,15 +4643,7 @@ let footObs = /** @type {ResizeObserver|null} */ (null);
 // (pauseTutorials, below; ui/tutorialsPane.js) - the same pane the front door's Tutorials section draws.
 // GROWTH1: how a character grows - the Ascension, the specialisations' guide, the Firmament and the captain's stars, the
 // skies drawn in the tab (pauseGrowth, below; ui/growth/growthTab.js), after the Stats it grew out of.
-const PAUSE_TABS = Object.freeze([
-  ['quests', 'Quests'],
-  ['stats', 'Stats'],
-  ['growth', 'Growth'],
-  ['holdings', 'Holdings'],
-  ['family', 'Family'],
-  ['tutorials', 'Tutorials'],
-  ['system', 'System'],
-]);
+const PAUSE_TABS = Object.freeze([['quests', 'Quests'], ['stats', 'Stats'], ['growth', 'Growth'], ['holdings', 'Holdings'], ['family', 'Family'], ['tutorials', 'Tutorials'], ['system', 'System']]);
 /** HOLDINGS: every tab a landing may name (mountEnhancedMenu's `at`). */
 export const PAUSE_TAB_IDS = Object.freeze(PAUSE_TABS.map(([id]) => id));
 /** LEGACY3: a tab drawn now - the Family tab while the game is played with Project Legacy (FAMILY-TAB: the mod on AND a
@@ -6997,35 +4678,15 @@ function pauseWindow() {
   if (!pauseTabShown(pauseTab)) pauseTab = 'system';
   for (const [id, label] of PAUSE_TABS.filter(([id]) => pauseTabShown(id))) {
     const b = el('button', id === pauseTab ? 'on' : null);
-    b.append(
-      el('span', 'px-c', '\u25c6'),
-      document.createTextNode(pauseLabel(id, label)),
-      el('span', 'px-c', '\u25c6'),
-    );
-    b.onclick = () => {
-      if (pauseTab === 'growth' && id !== 'growth' && growthAsks()) return;
-      if (id !== 'system') discardControlsStaging();
-      disarmFamilyPages();
-      disarmCollectionsPage();
-      if (id !== 'growth') releaseGrowthTab();
-      pauseTab = id;
-      render();
-    }; // AUDIT CARDS-5 D5: and the Collections page's - GROWTH3: and a face on the Growth stage
+    b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(pauseLabel(id, label)), el('span', 'px-c', '\u25c6'));
+    b.onclick = () => { if (pauseTab === 'growth' && id !== 'growth' && growthAsks()) return; if (id !== 'system') discardControlsStaging(); disarmFamilyPages(); disarmCollectionsPage(); if (id !== 'growth') releaseGrowthTab(); pauseTab = id; render(); };   // AUDIT CARDS-5 D5: and the Collections page's - GROWTH3: and a face on the Growth stage
     tabs.append(b);
   }
   win.append(tabs);
 
   const body = el('div', 'px-body');
-  ({
-    quests: pauseQuests,
-    stats: pauseStats,
-    growth: pauseGrowth,
-    holdings: pauseHoldings,
-    family: pauseFamily,
-    tutorials: drawTutorialsPane,
-    system: pauseSystem,
-  })[pauseTab](body); // TUT1 - GROWTH1
-  if (pauseTab === 'growth') win.classList.add('px-win-growth'); // GROWTH-BOOK: one size for every page of the tab (was GROWTH3's px-win-wide, a face up only)
+  ({ quests: pauseQuests, stats: pauseStats, growth: pauseGrowth, holdings: pauseHoldings, family: pauseFamily, tutorials: drawTutorialsPane, system: pauseSystem })[pauseTab](body);   // TUT1 - GROWTH1
+  if (pauseTab === 'growth') win.classList.add('px-win-growth');   // GROWTH-BOOK: one size for every page of the tab (was GROWTH3's px-win-wide, a face up only)
   win.append(body);
   return win;
 }
@@ -7036,21 +4697,8 @@ function pauseWindow() {
 // Ascension and the skies drawn in the pane (ui/growth/growthStage.js), Master Skills a press away on the Stats tab.
 function pauseGrowth(body) {
   drawGrowthTab(body, {
-    el,
-    divider: pxDivider,
-    skillMeter,
-    askCard,
-    entity: playerEntity,
-    render,
-    hooks,
-    captain: holdingsProvider()?.captain ?? null,
-    openMaster: () => {
-      releaseGrowthTab();
-      pauseTab = 'stats';
-      statsSec = 'master';
-      _masterNote = null;
-      render();
-    },
+    el, divider: pxDivider, skillMeter, askCard, entity: playerEntity, render, hooks, captain: holdingsProvider()?.captain ?? null,
+    openMaster: () => { releaseGrowthTab(); pauseTab = 'stats'; statsSec = 'master'; _masterNote = null; render(); },
   });
 }
 
@@ -7069,15 +4717,11 @@ function pauseHoldings(body) {
   for (const [id, label] of secs) {
     const b = el('button', `px-qrow${id === holdSec ? ' on' : ''}`);
     b.append(el('span', 'px-c', '◆'), document.createTextNode(label));
-    b.onclick = () => {
-      holdSec = id;
-      disarmCollectionsPage();
-      render();
-    }; // AUDIT CARDS-5 D5: an armed act never waits for the way back
+    b.onclick = () => { holdSec = id; disarmCollectionsPage(); render(); };   // AUDIT CARDS-5 D5: an armed act never waits for the way back
     rail.append(b);
   }
   wrap.append(rail);
-  const detail = el('div', 'px-qdetail px-sys'); // the system page's dress, as the Stats detail wears it (PLUS4)
+  const detail = el('div', 'px-qdetail px-sys');   // the system page's dress, as the Stats detail wears it (PLUS4)
   const kit = { el, divider: pxDivider, meter: pxMeter };
   // AUDIT HOLDINGS C6: a host with no page to show (the standalone dungeon sets no provider) never draws the Stable's "you
   // own no horse" - AUDIT COLLECTIONS-II (lanes 2, 5): the rail is never empty now, the Collections page every player's
@@ -7086,35 +4730,12 @@ function pauseHoldings(body) {
     stable: (d) => drawStablePage(d, render, kit),
     // a door the page opens over the world (the shipwright's window, the water's placing click): the pause goes down
     // first, as the sheet's doors do (PX25/ESC-BOOK), and comes back if the door opened nothing (AUDIT 27h A4)
-    fleet: (d) =>
-      drawFleetPage(d, render, {
-        ...kit,
-        door: (fn) => {
-          handoff(fn);
-        },
-      }), // AUDIT SEASON-BOOK S3: the handoff's one home
-    captain: (d) =>
-      drawCaptainPage(d, render, {
-        ...kit,
-        door: (fn) => {
-          handoff(fn);
-        },
-        growth: () => {
-          setGrowthSection('captain');
-          pauseTab = 'growth';
-          render();
-        },
-      }), // CAPT-LOG: the crowns' regard, the letter, the contracts, the log - CAPTAIN-TREE: the stars' door, the Fleet's shape
-    companions: (d) =>
-      drawCompanionsPage(d, render, {
-        ...kit,
-        kindName: enemyDisplayName,
-        here: swornBodyOf,
-        stars: typeof hooks.openRevenantStars === 'function' ? hooks.openRevenantStars : null,
-      }), // COMPANION-ROSTER - RVN-STARS: a sworn one's stars, over this window
-    revenants: (d) => drawRevenantsPage(d, render, { ...kit, player: playerEntity, kindName: enemyDisplayName }), // REVENANT-PAGE
-    stores: (d) => drawStoresPage(d, render, kit), // PROF1
-    collections: (d) => drawCollectionsPage(d, render, { ...kit, player: playerEntity, account: newAccountFlow }), // COLLECTIONS: the codex and the cards - COLLECTIONS-II: and the account's wardrobe, read through its own flow
+    fleet: (d) => drawFleetPage(d, render, { ...kit, door: (fn) => { handoff(fn); } }),   // AUDIT SEASON-BOOK S3: the handoff's one home
+    captain: (d) => drawCaptainPage(d, render, { ...kit, door: (fn) => { handoff(fn); }, growth: () => { setGrowthSection('captain'); pauseTab = 'growth'; render(); } }),   // CAPT-LOG: the crowns' regard, the letter, the contracts, the log - CAPTAIN-TREE: the stars' door, the Fleet's shape
+    companions: (d) => drawCompanionsPage(d, render, { ...kit, kindName: enemyDisplayName, here: swornBodyOf, stars: typeof hooks.openRevenantStars === 'function' ? hooks.openRevenantStars : null }),   // COMPANION-ROSTER - RVN-STARS: a sworn one's stars, over this window
+    revenants: (d) => drawRevenantsPage(d, render, { ...kit, player: playerEntity, kindName: enemyDisplayName }),   // REVENANT-PAGE
+    stores: (d) => drawStoresPage(d, render, kit),   // PROF1
+    collections: (d) => drawCollectionsPage(d, render, { ...kit, player: playerEntity, account: newAccountFlow }),   // COLLECTIONS: the codex and the cards - COLLECTIONS-II: and the account's wardrobe, read through its own flow
   }[holdSec];
   draw?.(detail);
   wrap.append(detail);
@@ -7131,11 +4752,7 @@ function pauseFamily(body) {
   for (const [id, label] of FAMILY_PAGE_SECTIONS) {
     const b = el('button', `px-qrow${id === famSec ? ' on' : ''}`);
     b.append(el('span', 'px-c', '◆'), document.createTextNode(label));
-    b.onclick = () => {
-      famSec = id;
-      disarmFamilyPages();
-      render();
-    }; // AUDIT LEGACY U8: an armed act never waits for the way back
+    b.onclick = () => { famSec = id; disarmFamilyPages(); render(); };   // AUDIT LEGACY U8: an armed act never waits for the way back
     rail.append(b);
   }
   wrap.append(rail);
@@ -7144,17 +4761,9 @@ function pauseFamily(body) {
   // first, as the Fleet's doors do, and comes back if the act did nothing
   // AUDIT LEGACY U4: a refused act is refused on the card before the press (switchRefusal, mantleRefusal); one refused
   // after it (a save that would not take) is said on the HUD by the host, and the world resumes under it
-  const kit = {
-    el,
-    divider: pxDivider,
-    door: (fn) => handoff(fn, (r) => !!r?.ok), // AUDIT SEASON-BOOK S3
-    goto: (id) => {
-      famSec = id;
-      disarmFamilyPages();
-      render();
-    },
-  }; // AUDIT PLAIN-UI U8: the tree's way to How it works
-  ({ tree: drawTreePage, house: drawHousePage, hall: drawHallPage, guide: drawGuidePage })[famSec](detail, render, kit); // PLAIN-UI: How it works
+  const kit = { el, divider: pxDivider, door: (fn) => handoff(fn, (r) => !!r?.ok),   // AUDIT SEASON-BOOK S3
+    goto: (id) => { famSec = id; disarmFamilyPages(); render(); } };   // AUDIT PLAIN-UI U8: the tree's way to How it works
+  ({ tree: drawTreePage, house: drawHousePage, hall: drawHallPage, guide: drawGuidePage })[famSec](detail, render, kit);   // PLAIN-UI: How it works
   wrap.append(detail);
   body.append(wrap);
 }
@@ -7179,14 +4788,11 @@ function pauseFamily(body) {
 // the front door and the pause door reach one implementation. It is
 // the row whose absence was the bug.
 export const SYSTEM_PANES = Object.freeze([
-  ['resume', 'Resume'],
-  ['save', 'Save Game'],
-  ['load', 'Load Game'],
-  ['settings', 'Settings'], // FT16: Controls is a category INSIDE it
-  ['overhauls', 'Overhauls'], // OVH1
-  ['screenshots', 'Screenshots'], // LOAD1: the gallery, mid-game too
-  ['about', 'About'],
-  ['exit', 'Exit'], // FT14: no Mods pane
+  ['resume', 'Resume'], ['save', 'Save Game'], ['load', 'Load Game'],
+  ['settings', 'Settings'],   // FT16: Controls is a category INSIDE it
+  ['overhauls', 'Overhauls'],   // OVH1
+  ['screenshots', 'Screenshots'],   // LOAD1: the gallery, mid-game too
+  ['about', 'About'], ['exit', 'Exit'],   // FT14: no Mods pane
 ]);
 
 function pauseSystem(body) {
@@ -7194,21 +4800,15 @@ function pauseSystem(body) {
   const rail = el('div', 'px-qrail');
   for (const [id, label] of SYSTEM_PANES) {
     const b = el('button', `px-qrow${id === sysSec && !RAIL_ACTS[id] ? ' on' : ''}`);
-    b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(railLabel(label))); // L10N4: the rail's own words
-    b.onclick = RAIL_ACTS[id]
-      ? () => onAction(RAIL_ACTS[id])
+    b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(railLabel(label)));   // L10N4: the rail's own words
+    b.onclick = RAIL_ACTS[id] ? () => onAction(RAIL_ACTS[id])
       : () => {
-          // FIX-F: leaving the Controls pane without CONTINUE DISCARDS -
-          // that is what a staged copy is for. FT16: the bindings sit
-          // inside Settings now, so every OTHER system pane is a walk away.
-          if (id !== 'settings') discardControlsStaging();
-          sysSec = id;
-          confirming = null;
-          sheetOpen = false;
-          pickedKey = null;
-          cloudArm = null;
-          render(); // 0927b B5
-        };
+        // FIX-F: leaving the Controls pane without CONTINUE DISCARDS -
+        // that is what a staged copy is for. FT16: the bindings sit
+        // inside Settings now, so every OTHER system pane is a walk away.
+        if (id !== 'settings') discardControlsStaging();
+        sysSec = id; confirming = null; sheetOpen = false; pickedKey = null; cloudArm = null; render();   // 0927b B5
+      };
     rail.append(b);
   }
   wrap.append(rail);
@@ -7224,12 +4824,10 @@ function pauseSystem(body) {
     detail.append(confirmCard());
   } else {
     ({
-      save: paneSave,
-      load: paneLoad,
-      overhauls: paneOverhauls, // OVH1
-      screenshots: drawShotsPane, // LOAD1
-      about: paneAbout,
-      exit: paneExit,
+      save: paneSave, load: paneLoad,
+      overhauls: paneOverhauls,   // OVH1
+      screenshots: drawShotsPane,   // LOAD1
+      about: paneAbout, exit: paneExit,
     })[sysSec](detail);
   }
   wrap.append(detail);
@@ -7243,25 +4841,17 @@ function pauseSystem(body) {
 // sheet's model (vitals, attributes, the career skill groups), and
 // the three reputation stores the talk and court systems read.
 const STATS_SECTIONS = Object.freeze([
-  ['character', 'Character'],
-  ['attributes', 'Attributes'],
-  ['skills', 'Skills'],
-  ['specials', 'Advantages'],
-  ['standing', 'Standing'],
-  ['effects', 'Effects'], // BUFF-END: the spells on you, and an End on the ones that are yours to end
+  ['character', 'Character'], ['attributes', 'Attributes'],
+  ['skills', 'Skills'], ['specials', 'Advantages'], ['standing', 'Standing'],
+  ['effects', 'Effects'],   // BUFF-END: the spells on you, and an End on the ones that are yours to end
 ]);
 // The five NAMED social groups getReactionToPlayer reads
 // (formats/factionFile.js:"export const SOCIAL_GROUPS"; talk.js seeds the array) - the enum
 // slots past Underworld are DFU's own placeholders and stay unlisted.
 const SOCIAL_GROUP_NAMES = Object.freeze(['Commoners', 'Merchants', 'Scholars', 'Nobility', 'Underworld']);
 /** L10N4: the five groups' names as DFU keys them (Internal_Strings commoners..underworld), in the player's language. */
-const socialGroupNames = () => [
-  localizedText('commoners', 'Commoners'),
-  localizedText('merchants', 'Merchants'),
-  localizedText('scholars', 'Scholars'),
-  localizedText('nobility', 'Nobility'),
-  localizedText('underworld', 'Underworld'),
-];
+const socialGroupNames = () => [localizedText('commoners', 'Commoners'), localizedText('merchants', 'Merchants'),
+  localizedText('scholars', 'Scholars'), localizedText('nobility', 'Nobility'), localizedText('underworld', 'Underworld')];
 
 /** A whole-pixel meter: 2px frame, flat fill, no easing. */
 function pxMeter(now, max, tone) {
@@ -7278,17 +4868,13 @@ function pxMeter(now, max, tone) {
  *  125/150/175 milestones. */
 function skillMeter(v, mastered = false) {
   const wrap = pxMeter(Math.min(v, 100), 100, 'thin');
-  if (!mastered) return wrap; // SOFTCAP7: the gold bar is a MASTERY's - a curse's or a Fortify's +30 never draws it
+  if (!mastered) return wrap;   // SOFTCAP7: the gold bar is a MASTERY's - a curse's or a Fortify's +30 never draws it
   const box = el('div', 'px-skillmeter');
   const over = el('div', 'px-meter px-over');
   const fill = el('div', 'px-fill px-overfill');
   fill.style.width = `${Math.max(0, Math.min(100, v - 100))}%`;
   over.append(fill);
-  for (const at of [25, 50, 75]) {
-    const t = el('div', 'px-tick');
-    t.style.left = `${at}%`;
-    over.append(t);
-  }
+  for (const at of [25, 50, 75]) { const t = el('div', 'px-tick'); t.style.left = `${at}%`; over.append(t); }
   box.append(wrap, over);
   return box;
 }
@@ -7308,31 +4894,14 @@ const PROF_STATS_SECTIONS = Object.freeze(PROF_PAGE_SECTIONS.filter(([id]) => PR
 const PROF_HOLD_SECTIONS = Object.freeze(PROF_PAGE_SECTIONS.filter(([id]) => !PROF_STATS_PAGES.includes(id)));
 /** CRAFT-HALL: opens a professions page from another one, on whichever rail it lives. */
 function profGo(at) {
-  if (PROF_STATS_SECTIONS.some(([id]) => id === at)) {
-    pauseTab = 'stats';
-    statsSec = at;
-  } else if (PROF_HOLD_SECTIONS.some(([id]) => id === at)) {
-    pauseTab = 'holdings';
-    holdSec = at;
-  }
+  if (PROF_STATS_SECTIONS.some(([id]) => id === at)) { pauseTab = 'stats'; statsSec = at; }
+  else if (PROF_HOLD_SECTIONS.some(([id]) => id === at)) { pauseTab = 'holdings'; holdSec = at; }
   render();
 }
-const statsSections = () => [
-  ...STATS_SECTIONS,
-  ...(profPagesShown() ? PROF_STATS_SECTIONS : []),
-  ...(vendorPageShown() ? VENDOR_PAGE_SECTIONS : []),
-]; // HOME-VENDOR: the Vendor page, under the Professions
+const statsSections = () => [...STATS_SECTIONS, ...(profPagesShown() ? PROF_STATS_SECTIONS : []), ...(vendorPageShown() ? VENDOR_PAGE_SECTIONS : [])];   // HOME-VENDOR: the Vendor page, under the Professions
 /** HOLDINGS: the Holdings rail's pages - what the player owns (the Stable, the Fleet while ships sail, the Stores
  *  online) and who follows them (the Companions, the Revenants), each while it has a thing to show. */
-const holdingsSections = () => [
-  ...(stablePageShown() ? STABLE_PAGE_SECTIONS : []),
-  ...(fleetPageShown() ? FLEET_PAGE_SECTIONS : []),
-  ...(captainPageShown() ? CAPTAIN_PAGE_SECTIONS : []),
-  ...(companionPageShown() ? COMPANION_PAGE_SECTIONS : []),
-  ...(revenantPageShown(playerEntity) ? REVENANT_PAGE_SECTIONS : []),
-  ...(profPagesShown() ? PROF_HOLD_SECTIONS : []),
-  ...(collectionsPageShown(playerEntity) ? COLLECTION_PAGE_SECTIONS : []),
-]; // COLLECTIONS
+const holdingsSections = () => [...(stablePageShown() ? STABLE_PAGE_SECTIONS : []), ...(fleetPageShown() ? FLEET_PAGE_SECTIONS : []), ...(captainPageShown() ? CAPTAIN_PAGE_SECTIONS : []), ...(companionPageShown() ? COMPANION_PAGE_SECTIONS : []), ...(revenantPageShown(playerEntity) ? REVENANT_PAGE_SECTIONS : []), ...(profPagesShown() ? PROF_HOLD_SECTIONS : []), ...(collectionsPageShown(playerEntity) ? COLLECTION_PAGE_SECTIONS : [])];   // COLLECTIONS
 
 function pauseStats(body) {
   const m = sheetModel(playerEntity);
@@ -7346,10 +4915,7 @@ function pauseStats(body) {
   for (const [id, label] of statsSections()) {
     const b = el('button', `px-qrow${id === statsSec ? ' on' : ''}`);
     b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(pauseLabel(id, label)));
-    b.onclick = () => {
-      statsSec = id;
-      render();
-    };
+    b.onclick = () => { statsSec = id; render(); };
     rail.append(b);
   }
   wrap.append(rail);
@@ -7357,27 +4923,14 @@ function pauseStats(body) {
   // Ascend, below) - and the one that never picked up the px-sys class its System-tab twin (below,
   // pauseSystem) carries. The kit's button role (enhancedFrame.js FRAME_ROLES) reads `.px-sys .act`,
   // so without it these four fell through to the bare, unpainted base .act under Plus.
-  const detail = el('div', 'px-qdetail px-sys'); // DROPS-AUDIT F3: the system-page dress (Plus's; PLUS-DEAD: the only one)
-  if (statsSec === 'professions' || statsSec === 'crafting' || statsSec === 'stores')
-    detail.classList.add('prof-detail');
-  const profKit = {
-    el,
-    divider: pxDivider,
-    meter: pxMeter,
-    go: profGo,
-    keyName: (/** @type {string} */ a) => boundKeyName(a),
-  }; // CRAFT-HALL: page links and the key's name
+  const detail = el('div', 'px-qdetail px-sys');   // DROPS-AUDIT F3: the system-page dress (Plus's; PLUS-DEAD: the only one)
+  if (statsSec === 'professions' || statsSec === 'crafting' || statsSec === 'stores') detail.classList.add('prof-detail');
+  const profKit = { el, divider: pxDivider, meter: pxMeter, go: profGo, keyName: (/** @type {string} */ a) => boundKeyName(a) };   // CRAFT-HALL: page links and the key's name
   ({
-    character: statsCharacter,
-    attributes: statsAttributes,
-    skills: statsSkills,
-    specials: statsSpecials,
-    standing: statsStanding,
-    effects: statsEffects,
-    master: statsMaster, // SOFTCAP4: `master` - the Master Skills door's page
+    character: statsCharacter, attributes: statsAttributes, skills: statsSkills, specials: statsSpecials, standing: statsStanding, effects: statsEffects, master: statsMaster,   // SOFTCAP4: `master` - the Master Skills door's page
     professions: (d) => drawProfessionsPage(d, render, profKit),
-    crafting: (d) => drawCraftingPage(d, render, profKit), // CRAFT-HALL
-    vendor: (d) => drawVendorPage(d, render, profKit), // HOME-VENDOR
+    crafting: (d) => drawCraftingPage(d, render, profKit),   // CRAFT-HALL
+    vendor: (d) => drawVendorPage(d, render, profKit),   // HOME-VENDOR
   })[statsSec](detail, m);
   // PX25: THE DOORS THE F5 SHEET CARRIED. The classic character sheet
   // has four buttons down its side - Inventory, Spellbook, Logbook,
@@ -7386,18 +4939,12 @@ function pauseStats(body) {
   // it was simply the only one of the two with no way out. Each door
   // appears ONLY when the host handed one over, because a button that
   // opens nothing is PX14's drawn door.
-  const doors =
-    statsSec === 'master'
-      ? []
-      : [
-          // SOFTCAP6: the Master Skills page carries none of the sheet's doors
-          [t('pause.door.pack', 'Pack'), hooks.openPack],
-          [t('pause.door.spellbook', 'Spellbook'), hooks.openSpellbook],
-          [t('pause.door.chronicle', 'Chronicle'), hooks.openChronicle],
-          // ARENA3: THE ARENA WINDOW, once a banner is worn (5 - "from the pause menu's Arena entry
-          // once you have joined"): the host's arm (scenes/arena/arenaGate.js windowOverlay, shown in its own slot)
-          [t('pause.door.arena', 'Arena'), hooks.arenaJoined?.() ? hooks.openArena : undefined],
-        ].filter(([, fn]) => typeof fn === 'function');
+  const doors = statsSec === 'master' ? [] : [   // SOFTCAP6: the Master Skills page carries none of the sheet's doors
+    [t('pause.door.pack', 'Pack'), hooks.openPack], [t('pause.door.spellbook', 'Spellbook'), hooks.openSpellbook], [t('pause.door.chronicle', 'Chronicle'), hooks.openChronicle],
+    // ARENA3: THE ARENA WINDOW, once a banner is worn (5 - "from the pause menu's Arena entry
+    // once you have joined"): the host's arm (scenes/arena/arenaGate.js windowOverlay, shown in its own slot)
+    [t('pause.door.arena', 'Arena'), hooks.arenaJoined?.() ? hooks.openArena : undefined],
+  ].filter(([, fn]) => typeof fn === 'function');
   if (doors.length) {
     const row = el('div', 'px-sheetdoors');
     for (const [label, fn] of doors) {
@@ -7410,9 +4957,7 @@ function pauseStats(body) {
       // refused pack, a journal whose art has not landed): then it IS
       // a resume, inside this same click - no page and no window up,
       // and the pointer left free under a running game, was the hole.
-      b.onclick = () => {
-        handoff(fn);
-      }; // AUDIT SEASON-BOOK S3: the handler read before the handoff unmounts the face
+      b.onclick = () => { handoff(fn); };   // AUDIT SEASON-BOOK S3: the handler read before the handoff unmounts the face
       row.append(b);
     }
     detail.append(row);
@@ -7420,41 +4965,21 @@ function pauseStats(body) {
   // SOFTCAP4: THE MASTER SKILLS DOOR. It opens a page of THIS window (statsSec 'master'), so it neither resumes nor hands off; the page's own
   // button comes back to Skills. A count on the button when a mastery is waiting (GROWTH2: a specialisation waiting is
   // the Growth door's count now - its guide moved there).
-  const masterDoor = m.master
-    ? (() => {
-        const n = m.master.candidates?.length ?? 0;
-        const b = el(
-          'button',
-          n ? 'act primary' : 'act',
-          n ? t('pause.door.masterCount', 'Master Skills ({n})', { n }) : t('pause.master.title', 'Master Skills'),
-        );
-        b.onclick = () => {
-          statsSec = 'master';
-          _masterNote = null;
-          render();
-        };
-        return b;
-      })()
-    : null;
+  const masterDoor = m.master ? (() => {
+    const n = m.master.candidates?.length ?? 0;
+    const b = el('button', n ? 'act primary' : 'act', n ? t('pause.door.masterCount', 'Master Skills ({n})', { n }) : t('pause.master.title', 'Master Skills'));
+    b.onclick = () => { statsSec = 'master'; _masterNote = null; render(); };
+    return b;
+  })() : null;
   // GROWTH1 (): THE GROWTH DOOR where Ascend and the
   // Firmament stood (ASCEND-ANYTIME's and FIRM1's) - both moved to the Growth tab with the specialisations and the
   // captain's stars, drawn in its pane. A page of this window, so it neither resumes nor hands off; a count on it when
   // something waits there (a level owed, a path open, the captain's points).
   if (statsSec !== 'master') {
     const row = el('div', 'px-sheetdoors');
-    const n = Object.values(growthDue({ entity: playerEntity, captain: holdingsProvider()?.captain ?? null })).reduce(
-      (a, b) => a + b,
-      0,
-    );
-    const g = el(
-      'button',
-      n ? 'act primary' : 'act',
-      n ? t('pause.door.growthCount', 'Growth ({n})', { n }) : t('pause.door.growth', 'Growth'),
-    );
-    g.onclick = () => {
-      pauseTab = 'growth';
-      render();
-    };
+    const n = Object.values(growthDue({ entity: playerEntity, captain: holdingsProvider()?.captain ?? null })).reduce((a, b) => a + b, 0);
+    const g = el('button', n ? 'act primary' : 'act', n ? t('pause.door.growthCount', 'Growth ({n})', { n }) : t('pause.door.growth', 'Growth'));
+    g.onclick = () => { pauseTab = 'growth'; render(); };
     row.append(g);
     if (masterDoor) row.append(masterDoor);
     detail.append(row);
@@ -7467,36 +4992,18 @@ function pauseStats(body) {
  *  in the skin's blood, fatigue in bone, magicka in verdigris. */
 function statsCharacter(detail, m) {
   const head2 = el('div', 'px-qname');
-  head2.append(
-    el('span', 'px-qwing'),
-    el('h3', null, m.name || t('pause.stats.adventurer', 'Adventurer')),
-    el('span', 'px-qwing px-flip'),
-  );
+  head2.append(el('span', 'px-qwing'), el('h3', null, m.name || t('pause.stats.adventurer', 'Adventurer')), el('span', 'px-qwing px-flip'));
   detail.append(head2);
   const meta = el('div', 'px-qmeta');
-  meta.append(
-    el(
-      'span',
-      'px-qkind',
-      m.career
-        ? t('pause.stats.kindCareer', '{race} {career} \u00b7 Level {level}', {
-            race: m.race,
-            career: m.career,
-            level: m.level,
-          })
-        : t('pause.stats.kind', '{race} \u00b7 Level {level}', { race: m.race, level: m.level }),
-    ),
-  );
+  meta.append(el('span', 'px-qkind', m.career ? t('pause.stats.kindCareer', '{race} {career} \u00b7 Level {level}', { race: m.race, career: m.career, level: m.level })
+    : t('pause.stats.kind', '{race} \u00b7 Level {level}', { race: m.race, level: m.level })));
   detail.append(meta);
   detail.append(meterRow(localizedText('health', 'Health'), m.health.now, m.health.max, 'blood'));
   detail.append(meterRow(localizedText('fatigue', 'Fatigue'), m.fatigue.now, m.fatigue.max, ''));
   detail.append(meterRow(localizedText('magicka', 'Magicka'), m.magicka.now, m.magicka.max, 'verdigris'));
   detail.append(pxDivider(t('pause.stats.burden', 'Burden')));
   const g = el('div', 'px-statgrid');
-  for (const [label, v] of [
-    [t('menu.save.gold', 'Gold'), String(m.gold)],
-    [t('pause.stats.encumbrance', 'Encumbrance'), `${m.encumbrance.now} / ${m.encumbrance.max}`],
-  ]) {
+  for (const [label, v] of [[t('menu.save.gold', 'Gold'), String(m.gold)], [t('pause.stats.encumbrance', 'Encumbrance'), `${m.encumbrance.now} / ${m.encumbrance.max}`]]) {
     const r = el('div', 'px-stat');
     r.append(el('span', 'k', label), el('span', 'v', v));
     g.append(r);
@@ -7508,11 +5015,7 @@ function statsCharacter(detail, m) {
   if (house) {
     detail.append(pxDivider(house.title));
     const h = el('div', 'px-statgrid');
-    for (const [label, v] of house.rows) {
-      const r = el('div', 'px-stat');
-      r.append(el('span', 'k', label), el('span', 'v', v));
-      h.append(r);
-    }
+    for (const [label, v] of house.rows) { const r = el('div', 'px-stat'); r.append(el('span', 'k', label), el('span', 'v', v)); h.append(r); }
     detail.append(h);
     if (house.word) detail.append(el('p', 'px-note', house.word));
   }
@@ -7521,12 +5024,7 @@ function statsCharacter(detail, m) {
   if (m.arena) {
     detail.append(pxDivider('The Arena'));
     const a = el('div', 'px-statgrid');
-    for (const [label, v] of [
-      ['Title', m.arena.title ?? 'None yet'],
-      ['Record', m.arena.record],
-      ...(m.arena.banner ? [['Banner', m.arena.banner]] : []),
-    ]) {
-      // ARENA3: the banner worn
+    for (const [label, v] of [['Title', m.arena.title ?? 'None yet'], ['Record', m.arena.record], ...(m.arena.banner ? [['Banner', m.arena.banner]] : [])]) {   // ARENA3: the banner worn
       const r = el('div', 'px-stat');
       r.append(el('span', 'k', label), el('span', 'v', v));
       a.append(r);
@@ -7550,24 +5048,13 @@ function statsEffects(detail) {
     const r = el('div', 'px-stat px-effect');
     const held = b.bundleType === 'HeldMagicItem';
     const rounds = maxRoundsRemaining(b);
-    r.append(
-      el('span', 'k', String(b.name ?? '').replace(/^!+/, '') || t('pause.effects.aSpell', 'A spell')),
-      el(
-        'span',
-        'v px-src',
-        held
-          ? t('pause.effects.whileHeld', 'While held')
-          : t('pause.effects.rounds', '{n, plural, one {# round} other {# rounds}}', { n: rounds }),
-      ),
-    );
+    r.append(el('span', 'k', String(b.name ?? '').replace(/^!+/, '') || t('pause.effects.aSpell', 'A spell')),
+      el('span', 'v px-src', held ? t('pause.effects.whileHeld', 'While held') : t('pause.effects.rounds', '{n, plural, one {# round} other {# rounds}}', { n: rounds })));
     if (canEndBundle(b)) {
       const end = el('button', 'act', t('pause.effects.end', 'End'));
       end.type = 'button';
       end.title = t('pause.effects.endTip', 'End this spell now');
-      end.onclick = () => {
-        endBundle(playerEntity, b.bundleId);
-        render();
-      };
+      end.onclick = () => { endBundle(playerEntity, b.bundleId); render(); };
       r.append(end);
     }
     detail.append(r);
@@ -7580,7 +5067,7 @@ function statsEffects(detail) {
 function statsAttributes(detail, m) {
   detail.append(pxDivider(localizedText('helpAttributes', 'Attributes')));
   for (const a of m.attributes) {
-    detail.append(meterRow(localizedText(a.key, a.key[0].toUpperCase() + a.key.slice(1)), a.value, 100, '')); // L10N4: DFU's own attribute keys (strength..luck)
+    detail.append(meterRow(localizedText(a.key, a.key[0].toUpperCase() + a.key.slice(1)), a.value, 100, ''));   // L10N4: DFU's own attribute keys (strength..luck)
   }
   const boons = boonStatRows(playerEntity);
   if (!boons.length) return;
@@ -7594,7 +5081,7 @@ function statsAttributes(detail, m) {
 
 /** SKILLS: the three career groups open - the character's chosen
  *  shape - and Miscellaneous behind the sheet's own disclosure. */
-let _masterNote = null; // SOFTCAP3: the switch's last answer, said under it until the page is left
+let _masterNote = null;   // SOFTCAP3: the switch's last answer, said under it until the page is left
 
 /** SOFTCAP3: THE MASTER SKILLS PANE - the state and the rules in words, always. ONLINE it is always on, so the pane
  *  only explains. OFFLINE it carries the switch: a refusal (inside a dungeon) is said, never a greyed button (the kit's
@@ -7607,22 +5094,11 @@ function statsMaster(detail, m) {
   // of the sheet's doors on it). One short line of what it is; then the three career groups, each with its slots as
   // pips and every one of its skills as a row: mastered (gold, its climb on the gold bar), ready (a Master button that
   // asks first), or not yet (why, in a word). Offline the switch stands at the foot.
-  const back = acts([
-    {
-      label: `\u2039 ${localizedText('helpSkills', 'Skills')}`,
-      onClick: () => {
-        statsSec = 'skills';
-        _masterNote = null;
-        render();
-      },
-    },
-  ]);
+  const back = acts([{ label: `\u2039 ${localizedText('helpSkills', 'Skills')}`, onClick: () => { statsSec = 'skills'; _masterNote = null; render(); } }]);
   back.classList.add('px-master-back');
   detail.append(back, pxDivider(t('pause.master.title', 'Master Skills')));
   const lead = !ms.on
-    ? ms.switchable
-      ? t('pause.master.offClassic', 'Off \u2013 your skills stop at 100, as in the original game.')
-      : t('pause.master.off', 'Off.')
+    ? (ms.switchable ? t('pause.master.offClassic', 'Off \u2013 your skills stop at 100, as in the original game.') : t('pause.master.off', 'Off.'))
     : t('pause.master.on', 'Choose the skills that may climb past 100, up to 200. A choice is permanent.');
   detail.append(el('div', 'px-master-lead', lead));
   if (_masterNote) detail.append(el('div', 'px-master-note', _masterNote));
@@ -7631,32 +5107,9 @@ function statsMaster(detail, m) {
   // AUDIT GROWTH LANE5-6: and only for a character with a family still to reach or one held (AUDIT SCHOOLS L4 8)
   if (ms.on && (ms.paths?.open || ms.paths?.held)) {
     const card = el('section', 'px-mgroup px-spec');
-    card.append(
-      el(
-        'div',
-        'px-master-about',
-        ms.paths.open
-          ? t(
-              'pause.master.specMoved',
-              'Master two schools of magic or two weapon skills to unlock a specialization. See every path and what it needs on the Growth tab.',
-            )
-          : t(
-              'pause.master.specHeld',
-              '{n, plural, one {Your specialization is on the Growth tab.} other {Your specializations are on the Growth tab.}}',
-              { n: ms.paths.held },
-            ),
-      ),
-    );
-    const go = acts([
-      {
-        label: t('pause.master.specGo', 'Specializations'),
-        onClick: () => {
-          setGrowthSection('specs');
-          pauseTab = 'growth';
-          render();
-        },
-      },
-    ]);
+    card.append(el('div', 'px-master-about', ms.paths.open ? t('pause.master.specMoved', 'Master two schools of magic or two weapon skills to unlock a specialization. See every path and what it needs on the Growth tab.')
+      : t('pause.master.specHeld', '{n, plural, one {Your specialization is on the Growth tab.} other {Your specializations are on the Growth tab.}}', { n: ms.paths.held })));
+    const go = acts([{ label: t('pause.master.specGo', 'Specializations'), onClick: () => { setGrowthSection('specs'); pauseTab = 'growth'; render(); } }]);
     card.append(go);
     detail.append(card);
   }
@@ -7664,36 +5117,18 @@ function statsMaster(detail, m) {
     const card = el('section', 'px-mgroup');
     const head = el('div', 'px-mhead');
     const pips = el('span', 'px-pips');
-    for (let k = 0; k < g.max; k++)
-      pips.append(el('span', k < g.used ? 'px-pip on' : 'px-pip', k < g.used ? '\u25c6' : '\u25c7'));
-    head.append(
-      el('span', 'px-mname', g.label),
-      pips,
-      el('span', 'px-mcount', t('pause.master.chosen', '{used} of {max} chosen', { used: g.used, max: g.max })),
-    );
+    for (let k = 0; k < g.max; k++) pips.append(el('span', k < g.used ? 'px-pip on' : 'px-pip', k < g.used ? '\u25c6' : '\u25c7'));
+    head.append(el('span', 'px-mname', g.label), pips, el('span', 'px-mcount', t('pause.master.chosen', '{used} of {max} chosen', { used: g.used, max: g.max })));
     card.append(head);
     for (const sk of g.skills) {
       const row = el('div', sk.mastered ? 'px-mrow2 is-mastered' : sk.candidate ? 'px-mrow2 is-ready' : 'px-mrow2');
       const top = el('div', 'px-mtop');
       top.append(el('span', 'k', `${sk.mastered ? '\u25c6 ' : ''}${sk.name}`), el('span', 'v', String(sk.value)));
       const side = el('div', 'px-mside');
-      if (sk.mastered)
-        side.append(
-          el(
-            'span',
-            'px-mtag gold',
-            sk.value >= 200
-              ? t('pause.master.masteredFull', 'Mastered \u00b7 200')
-              : t('pause.master.mastered', 'Mastered'),
-          ),
-        );
+      if (sk.mastered) side.append(el('span', 'px-mtag gold', sk.value >= 200 ? t('pause.master.masteredFull', 'Mastered \u00b7 200') : t('pause.master.mastered', 'Mastered')));
       else if (sk.candidate) {
         const b = el('button', 'act primary px-mbtn', t('pause.master.master', 'Master'));
-        b.onclick = () =>
-          askCard(sk.rows, () => {
-            _masterNote = ms.master(sk.id).text;
-            render();
-          });
+        b.onclick = () => askCard(sk.rows, () => { _masterNote = ms.master(sk.id).text; render(); });
         side.append(b);
       } else side.append(el('span', 'px-mtag', sk.why));
       const body = el('div', 'px-mbody');
@@ -7703,42 +5138,16 @@ function statsMaster(detail, m) {
     }
     detail.append(card);
   }
-  if (ms.switchable) {
-    // offline only - online it is always on
-    const flip = () => {
-      _masterNote = ms.toggle().text;
-      render();
-    };
-    const foot = acts([
-      {
-        label: ms.on
-          ? t('pause.master.turnOff', 'Turn off Master Skills')
-          : t('pause.master.activate', 'Activate Master Skills'),
-        primary: !ms.on,
-        onClick: () => {
-          if (ms.blocked) {
-            _masterNote = ms.blocked;
-            render();
-            return;
-          }
-          if (ms.on) {
-            flip();
-            return;
-          }
-          askCard(
-            [
-              t('pause.master.askTitle', 'Activate Master Skills?'),
-              '',
-              ...t(
-                'pause.master.askBody',
-                'Dangerous dungeons will send stronger enemies,\nand points past 100 are slow to earn.\nYou can turn it off here at any time.',
-              ).split('\n'),
-            ],
-            flip,
-          );
-        },
+  if (ms.switchable) {   // offline only - online it is always on
+    const flip = () => { _masterNote = ms.toggle().text; render(); };
+    const foot = acts([{
+      label: ms.on ? t('pause.master.turnOff', 'Turn off Master Skills') : t('pause.master.activate', 'Activate Master Skills'), primary: !ms.on,
+      onClick: () => {
+        if (ms.blocked) { _masterNote = ms.blocked; render(); return; }
+        if (ms.on) { flip(); return; }
+        askCard([t('pause.master.askTitle', 'Activate Master Skills?'), '', ...t('pause.master.askBody', 'Dangerous dungeons will send stronger enemies,\nand points past 100 are slow to earn.\nYou can turn it off here at any time.').split('\n')], flip);
       },
-    ]);
+    }]);
     foot.classList.add('px-master-foot');
     detail.append(foot);
   }
@@ -7768,26 +5177,18 @@ function askCard(lines, onYes) {
   // AUDIT SPEC-RESET L3-4: answered ONCE, however many doors call it (THE SLOT IS EMPTIED's other half, as the skin's
   // YesNoBoxWindow.answer is), and a key held down before the card stood answers nothing by its repeat
   let answered = false;
-  const answer = (yes) => {
-    if (answered) return;
-    answered = true;
-    close();
-    if (yes) onYes();
-  };
+  const answer = (yes) => { if (answered) return; answered = true; close(); if (yes) onYes(); };
   // DFU's keys, as the skin's YesNo box keeps them: Y yes, N or Return no (the default) - and Escape no here too, on
   // CAPTURE and stopped, so it answers the card instead of closing the pause page under it
   const onKey = (e) => {
     const k = e.code;
     if (k !== 'KeyY' && k !== 'KeyN' && k !== 'Enter' && k !== 'NumpadEnter' && k !== 'Escape') return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
+    e.preventDefault(); e.stopImmediatePropagation();
     if (e.repeat) return;
     answer(k === 'KeyY');
   };
   const close = () => {
-    removeEventListener('keydown', onKey, true);
-    back.remove();
-    under?.removeAttribute?.('inert');
+    removeEventListener('keydown', onKey, true); back.remove(); under?.removeAttribute?.('inert');
     if (askUp === close) askUp = null;
     if (opener?.isConnected) opener.focus?.({ preventScroll: true });
   };
@@ -7803,7 +5204,7 @@ function askCard(lines, onYes) {
   back.append(card);
   document.body.append(back);
   under?.setAttribute?.('inert', '');
-  [...(bar.querySelectorAll?.('button') ?? [])].pop()?.focus?.({ preventScroll: true }); // No, the default
+  [...(bar.querySelectorAll?.('button') ?? [])].pop()?.focus?.({ preventScroll: true });   // No, the default
 }
 
 /** SKILL-TICK (systems/advancement.js skillAdvanceProgress): a skill's line under its bar - the uses it has toward its next
@@ -7815,17 +5216,12 @@ export function skillTickText(p) {
   if (p.held === 'master') return t('pause.skills.tickMaster', 'At 100 - master it to climb further');
   if (p.held === 'lock') return t('pause.skills.tickLock', 'Held while a primary skill is at 100 - uses are not kept');
   // AUDIT SUGGESTIONS-1019 L3-1: ready, but the gate shut - a rest or a journey before it opens raises nothing
-  if (p.ready && p.wait > 0)
-    return t(
-      'pause.skills.tickReadyLater',
-      'Ready - a rest or a trip raises it once {hours, plural, one {# more hour has} other {# more hours have}} passed',
-      { hours: Math.ceil(p.wait / 60) },
-    );
+  if (p.ready && p.wait > 0) return t('pause.skills.tickReadyLater', 'Ready - a rest or a trip raises it once {hours, plural, one {# more hour has} other {# more hours have}} passed', { hours: Math.ceil(p.wait / 60) });
   if (p.ready) return t('pause.skills.tickReady', 'Ready - rest or travel to raise it');
   return t('pause.skills.tick', '{have} / {need} uses to the next point', { have: p.have, need: p.need });
 }
 function statsSkills(detail, m) {
-  if (m.mentor) detail.append(el('div', 'px-qrow', m.mentor)); // SOFTCAP1: mentor mode says so where the lowered numbers are
+  if (m.mentor) detail.append(el('div', 'px-qrow', m.mentor));   // SOFTCAP1: mentor mode says so where the lowered numbers are
   for (const group of m.groups) {
     if (!group.career && !statsAllSkills) continue;
     if (!group.ids.length) continue;
@@ -7834,19 +5230,12 @@ function statsSkills(detail, m) {
     for (const id of group.ids) {
       const r = el('div', 'px-skill');
       const top = el('div', 'px-mtop');
-      const mastered = !!m.master?.isMastered?.(id); // SOFTCAP4: a mastered skill wears the diamond, in gold
-      top.append(
-        el(
-          'span',
-          mastered ? 'k px-mastered' : 'k',
-          `${mastered ? '\u25c6 ' : ''}${SKILL_NAMES[id] ?? t('pause.skills.unknown', 'Skill {id}', { id })}`,
-        ),
-        el('span', 'v', m.skillText ? m.skillText(id) : String(m.skill(id))),
-      );
+      const mastered = !!m.master?.isMastered?.(id);   // SOFTCAP4: a mastered skill wears the diamond, in gold
+      top.append(el('span', mastered ? 'k px-mastered' : 'k', `${mastered ? '\u25c6 ' : ''}${SKILL_NAMES[id] ?? t('pause.skills.unknown', 'Skill {id}', { id })}`), el('span', 'v', m.skillText ? m.skillText(id) : String(m.skill(id))));
       // SOFTCAP1/6: 0..100 as ever, and under a MASTERED skill the gold 100..200 bar (its track shows from the moment
       // of mastery, empty at 100) - the one mark this pane carries of it
-      r.append(top, skillMeter(m.skillBase ? m.skillBase(id) : m.skill(id), mastered)); // SOFTCAP7: the bars climb the TRAINED value
-      const tick = m.progress ? skillTickText(m.progress(id, ownMinutes())) : ''; // SKILL-TICK; AUDIT SUGGESTIONS-1019 L3-1: on the character's own clock (systems/worldTick.js), the gate's
+      r.append(top, skillMeter(m.skillBase ? m.skillBase(id) : m.skill(id), mastered));   // SOFTCAP7: the bars climb the TRAINED value
+      const tick = m.progress ? skillTickText(m.progress(id, ownMinutes())) : '';   // SKILL-TICK; AUDIT SUGGESTIONS-1019 L3-1: on the character's own clock (systems/worldTick.js), the gate's
       if (tick) r.append(el('div', 'px-skilltick', tick));
       grid.append(r);
     }
@@ -7857,33 +5246,16 @@ function statsSkills(detail, m) {
     // gate here is per group, as it is there.
     if (group.ids.includes(SKILLS.HandToHand)) {
       const hth = el('div', 'px-qrow');
-      hth.append(
-        document.createTextNode(
-          formatText(
-            localizedText('hthDamageFormatString', '{0} dmg: {1}-{2}'),
-            SKILL_NAMES[SKILLS.HandToHand],
-            m.handToHandDamage.min,
-            m.handToHandDamage.max,
-          ),
-        ),
-      );
+      hth.append(document.createTextNode(
+        formatText(localizedText('hthDamageFormatString', '{0} dmg: {1}-{2}'), SKILL_NAMES[SKILLS.HandToHand], m.handToHandDamage.min, m.handToHandDamage.max)));
       detail.append(hth);
     }
   }
   const more = el('button', 'px-qrow px-disclose');
   const miscCount = m.groups[3]?.ids.length ?? 0;
-  more.append(
-    el('span', 'px-c', '\u25c6'),
-    document.createTextNode(
-      statsAllSkills
-        ? t('pause.skills.hideMisc', 'Hide miscellaneous')
-        : t('pause.skills.showMisc', 'Show {n} miscellaneous skills', { n: miscCount }),
-    ),
-  );
-  more.onclick = () => {
-    statsAllSkills = !statsAllSkills;
-    render();
-  };
+  more.append(el('span', 'px-c', '\u25c6'),
+    document.createTextNode(statsAllSkills ? t('pause.skills.hideMisc', 'Hide miscellaneous') : t('pause.skills.showMisc', 'Show {n} miscellaneous skills', { n: miscCount })));
+  more.onclick = () => { statsAllSkills = !statsAllSkills; render(); };
   detail.append(more);
 }
 
@@ -7907,25 +5279,14 @@ function statsSpecials(detail, m) {
     detail.append(el('p', 'px-note', t('pause.specials.none', 'No special advantages or disadvantages.')));
     return;
   }
-  for (const [kind, title] of [
-    ['advantage', t('pause.stats.advantages', 'Advantages')],
-    ['disadvantage', t('pause.specials.disadvantages', 'Disadvantages')],
-  ]) {
+  for (const [kind, title] of [['advantage', t('pause.stats.advantages', 'Advantages')], ['disadvantage', t('pause.specials.disadvantages', 'Disadvantages')]]) {
     const list = rows.filter((r) => r.kind === kind);
     if (!list.length) continue;
     detail.append(pxDivider(title));
     for (const r of list) {
       const row = el('div', 'px-stat');
       row.append(el('span', 'k', r.label));
-      row.append(
-        el(
-          'span',
-          'v px-src',
-          r.source === 'race'
-            ? m.race || t('pause.specials.race', 'Race')
-            : m.career || t('pause.specials.class', 'Class'),
-        ),
-      );
+      row.append(el('span', 'v px-src', r.source === 'race' ? (m.race || t('pause.specials.race', 'Race')) : (m.career || t('pause.specials.class', 'Class'))));
       detail.append(row);
     }
   }
@@ -7950,8 +5311,8 @@ function statsStanding(detail) {
   statsDress(detail, playerEntity);
   statsLaw(detail, playerEntity);
   statsGuilds(detail, playerEntity);
-  if (getPref('standingAll')) statsEveryStanding(detail, playerEntity); // EVERY-STANDING
-  statsHunt(detail, { el, divider: pxDivider, meter: pxMeter }); // HUNTERS-MARK: the hunter's rank, online
+  if (getPref('standingAll')) statsEveryStanding(detail, playerEntity);   // EVERY-STANDING
+  statsHunt(detail, { el, divider: pxDivider, meter: pxMeter });   // HUNTERS-MARK: the hunter's rank, online
 }
 
 /** FIELD BUGS 2026-10-09e EVERY-STANDING ("Could we have a setting to see our reputation with every guild/kingdoms?" -
@@ -7967,11 +5328,7 @@ export function statsEveryStanding(detail, entity) {
       detail.append(row);
       // WAY-BACK (FIELD BUGS 2026-10-16d): under a guild that will not take this standing, its quests' way in - the hall's
       // own line (the rest is said at the hall, and on the classic skin's refusal of the join)
-      const way = wayBackQuestLine(
-        guildOfFaction(r.factionId, resolveVariantGuild(entity.factionRep?.dict)),
-        activeMemberships(entity),
-        entity.factionRep,
-      );
+      const way = wayBackQuestLine(guildOfFaction(r.factionId, resolveVariantGuild(entity.factionRep?.dict)), activeMemberships(entity), entity.factionRep);
       if (way) detail.append(el('p', 'px-note', way));
     }
   }
@@ -7984,10 +5341,8 @@ export function dressLine(entity) {
   const d = dressStanding(entity);
   const parts = [];
   const groupNames = socialGroupNames();
-  for (let i = 0; i < SOCIAL_GROUP_NAMES.length; i++)
-    if (d.groups[i]) parts.push(`${groupNames[i]} ${d.groups[i] > 0 ? '+' : ''}${d.groups[i]}`);
-  if (d.temple)
-    parts.push(t('pause.standing.temples', 'Temples {mod}', { mod: `${d.temple > 0 ? '+' : ''}${d.temple}` }));
+  for (let i = 0; i < SOCIAL_GROUP_NAMES.length; i++) if (d.groups[i]) parts.push(`${groupNames[i]} ${d.groups[i] > 0 ? '+' : ''}${d.groups[i]}`);
+  if (d.temple) parts.push(t('pause.standing.temples', 'Temples {mod}', { mod: `${d.temple > 0 ? '+' : ''}${d.temple}` }));
   return parts.join(', ');
 }
 export function statsDress(detail, entity) {
@@ -7999,69 +5354,37 @@ export function statsDress(detail, entity) {
 }
 
 /** REP5: THE LAW, REGION BY REGION - every region with a standing other than a common citizen's, or a banishment. */
-export function statsLaw(detail, entity, { worldNow = trustedWorldMinutes() } = {}) {
-  // AUDIT REP F2
+export function statsLaw(detail, entity, { worldNow = trustedWorldMinutes() } = {}) {   // AUDIT REP F2
   const rows = lawRows(entity, worldNow);
   if (!rows.length) return;
   detail.append(pxDivider(t('pause.law.title', 'The law')));
   for (const w of rows) {
     const r = el('div', 'px-stat px-law');
-    r.append(
-      el('span', 'k', w.region),
-      el(
-        'span',
-        'v px-rank',
-        w.note ? t('pause.law.wordNote', '{word} - {note}', { word: w.word, note: w.note }) : w.word,
-      ),
-      signedRep(w.rep),
-    );
+    r.append(el('span', 'k', w.region), el('span', 'v px-rank', w.note ? t('pause.law.wordNote', '{word} - {note}', { word: w.word, note: w.note }) : w.word), signedRep(w.rep));
     detail.append(r);
   }
 }
 /** The law's rows, worst first: { region, rep, word, note }. */
 export function lawRows(entity, worldNow) {
   const out = [];
-  const regions = new Set([
-    ...Object.keys(entity?.legalRep ?? {}).map(Number),
-    ...(entity?.regionConditions ?? [])
-      .map((r, i) => ((r?.severePunishmentFlags ?? 0) & 1 ? i : -1))
-      .filter((i) => i >= 0),
-  ]);
+  const regions = new Set([...Object.keys(entity?.legalRep ?? {}).map(Number),
+    ...(entity?.regionConditions ?? []).map((r, i) => ((r?.severePunishmentFlags ?? 0) & 1 ? i : -1)).filter((i) => i >= 0)]);
   for (const i of regions) {
     if (!Number.isInteger(i) || i < 0) continue;
     const rep = legalRepOf(entity, i);
     // AUDIT REP F2: NaN is a banishment whose term is not known yet (online, the relay's clock unheard) - still a row
     const left = banishmentLeft(entity, i, worldNow);
     if (rep === 0 && left === 0) continue;
-    const days = banishmentDaysLeft(entity, i, worldNow); // BANISH-SKY: the days of the calendar the player sees
-    const real = Number.isFinite(left) ? worldSpanRealWords(left) : null; // ...and online what they are on the wall
+    const days = banishmentDaysLeft(entity, i, worldNow);   // BANISH-SKY: the days of the calendar the player sees
+    const real = Number.isFinite(left) ? worldSpanRealWords(left) : null;   // ...and online what they are on the wall
     // the price of each: a pardon at the region's temple, a stop's fine on the street (L10N4: each note one pattern)
-    const note =
-      left !== 0
-        ? Number.isFinite(left)
-          ? real
-            ? t(
-                'pause.law.banishedDaysReal',
-                'banished, {days, plural, one {# day} other {# days}} left, {real} (a pardon: {gold} gold)',
-                { days, real, gold: pardonPrice(entity, i) },
-              )
-            : t(
-                'pause.law.banishedDays',
-                'banished, {days, plural, one {# day} other {# days}} left (a pardon: {gold} gold)',
-                { days, gold: pardonPrice(entity, i) },
-              )
-          : t('pause.law.banished', 'banished (a pardon: {gold} gold)', { gold: pardonPrice(entity, i) })
-        : rep < KNOWN_CRIMINAL_BELOW
-          ? t('pause.law.known', 'known to the watch (a stop: {gold} gold)', {
-              gold: challengeFine(entity, i, { worldNow }),
-            })
-          : '';
-    out.push({
-      region: REGION_NAMES[i] ?? t('pause.law.region', 'Region {i}', { i }),
-      rep,
-      word: legalStandingWord(rep),
-      note,
-    });
+    const note = left !== 0 ? (Number.isFinite(left)
+      ? (real
+        ? t('pause.law.banishedDaysReal', 'banished, {days, plural, one {# day} other {# days}} left, {real} (a pardon: {gold} gold)', { days, real, gold: pardonPrice(entity, i) })
+        : t('pause.law.banishedDays', 'banished, {days, plural, one {# day} other {# days}} left (a pardon: {gold} gold)', { days, gold: pardonPrice(entity, i) }))
+      : t('pause.law.banished', 'banished (a pardon: {gold} gold)', { gold: pardonPrice(entity, i) }))
+      : rep < KNOWN_CRIMINAL_BELOW ? t('pause.law.known', 'known to the watch (a stop: {gold} gold)', { gold: challengeFine(entity, i, { worldNow }) }) : '';
+    out.push({ region: REGION_NAMES[i] ?? t('pause.law.region', 'Region {i}', { i }), rep, word: legalStandingWord(rep), note });
   }
   return out.sort((a, b) => a.rep - b.rep);
 }
@@ -8083,30 +5406,11 @@ export function statsGuilds(detail, entity) {
   }
   for (const a of book) {
     const r = el('div', 'px-stat px-guild');
-    r.append(
-      el('span', 'k', a.affiliation),
-      el(
-        'span',
-        'v px-rank',
-        a.probation ? t('pause.guilds.probation', '{title} - on probation', { title: a.title }) : a.title,
-      ),
-      signedRep(a.rep),
-    ); // REP6
+    r.append(el('span', 'k', a.affiliation), el('span', 'v px-rank', a.probation ? t('pause.guilds.probation', '{title} - on probation', { title: a.title }) : a.title), signedRep(a.rep));   // REP6
     detail.append(r);
     // STANDING-WORDS (Field-Bugs-2026-10-15g): a probation's stakes, and what the Roll still owes online
-    for (const w of a.warnings) detail.append(el('p', 'px-note', w)); // AUDIT GUILD-WORDS L1-2: a probation's stakes, a demotion before it lands
-    if (a.owed > 0)
-      detail.append(
-        el(
-          'p',
-          'px-note',
-          t(
-            'pause.guilds.owed',
-            '{owed} more standing on the way, at most {max} a real day (days turn at midnight UTC).',
-            { owed: a.owed, max: ROLL_GAIN_DAY_MAX },
-          ),
-        ),
-      ); // AUDIT GUILD-WORDS L1-6: the owed's pace, not the standing's; II C-8: the UTC day
+    for (const w of a.warnings) detail.append(el('p', 'px-note', w));   // AUDIT GUILD-WORDS L1-2: a probation's stakes, a demotion before it lands
+    if (a.owed > 0) detail.append(el('p', 'px-note', t('pause.guilds.owed', '{owed} more standing on the way, at most {max} a real day (days turn at midnight UTC).', { owed: a.owed, max: ROLL_GAIN_DAY_MAX })));   // AUDIT GUILD-WORDS L1-6: the owed's pace, not the standing's; II C-8: the UTC day
   }
 }
 
@@ -8148,12 +5452,9 @@ export function statsGuilds(detail, entity) {
  *  the same the render writes; this is what the interval writes. */
 export function questTimerWords(log, key) {
   const r = questRail(log ?? { active: [], finished: [] });
-  const q = [...r.active, ...r.hidden].find((row) => row.key === key); // JOURNAL-CLEAN: a hidden quest shown is still timed
+  const q = [...r.active, ...r.hidden].find((row) => row.key === key);   // JOURNAL-CLEAN: a hidden quest shown is still timed
   if (!q || q.clockSeconds == null) return null;
-  return {
-    text: t('pause.journal.timeRemains', 'Time remains: {left}', { left: remainWords(q.clockSeconds) }),
-    urgent: q.clockSeconds < QUEST_URGENT_SECONDS,
-  };
+  return { text: t('pause.journal.timeRemains', 'Time remains: {left}', { left: remainWords(q.clockSeconds) }), urgent: q.clockSeconds < QUEST_URGENT_SECONDS };
 }
 
 /** The journal rendered once when it opened and again on a click, so
@@ -8168,16 +5469,10 @@ export function questTimerWords(log, key) {
  *  that repaints. One owner: cleared by every rebuild and by unmount,
  *  the ground clock's own law. */
 function armQuestTimer(span, key) {
-  if (questTimer) {
-    clearInterval(questTimer);
-    questTimer = null;
-  }
+  if (questTimer) { clearInterval(questTimer); questTimer = null; }
   questTimer = setInterval(() => {
     const w = questTimerWords(hooks.questLog?.(), key);
-    if (!w) {
-      render();
-      return;
-    }
+    if (!w) { render(); return; }
     span.textContent = w.text;
     span.className = `px-qtimer${w.urgent ? ' urgent' : ''}`;
   }, 1000);
@@ -8204,18 +5499,11 @@ function pxDivider(word) {
  *  here. `wayOnly` draws nothing unless there is a way to take; `skip` is a place already offered above. Null when the
  *  entry points nowhere. */
 function questWhere(message, cls, { wayOnly = false, skip = null } = {}) {
-  if (!isEnhanced()) return null; // AUDIT GUIDE W3: THE LAWS 4 - the classic Controls door (DISC22-B) opens this tab on DFU's skin
-  const said = targetWords(
-    entryTarget(message, { canFindPlace: hooks.canFindPlace, currentLocationName: hooks.currentLocationName }),
-  );
+  if (!isEnhanced()) return null;   // AUDIT GUIDE W3: THE LAWS 4 - the classic Controls door (DISC22-B) opens this tab on DFU's skin
+  const said = targetWords(entryTarget(message, { canFindPlace: hooks.canFindPlace, currentLocationName: hooks.currentLocationName }));
   const door = typeof hooks.showQuestPlace === 'function' ? hooks.showQuestPlace : null;
   // AUDIT GUIDE W5: a place offered above is skipped by its region AND its name - two towns may share a name
-  if (
-    !said ||
-    (wayOnly && !(said.find && door)) ||
-    (skip && said.find?.locationName === skip.locationName && said.find?.regionName === skip.regionName)
-  )
-    return null;
+  if (!said || (wayOnly && !(said.find && door)) || (skip && said.find?.locationName === skip.locationName && said.find?.regionName === skip.regionName)) return null;
   const box = el('div', cls);
   box.append(el('span', `${cls}-place`, said.where));
   if (said.find && door) {
@@ -8224,9 +5512,7 @@ function questWhere(message, cls, { wayOnly = false, skip = null } = {}) {
     go.title = WHERE_TEXT.showLabel(said.where);
     go.setAttribute('aria-label', WHERE_TEXT.showLabel(said.where));
     const find = said.find;
-    go.onclick = () => {
-      handoff(() => door(find));
-    }; // AUDIT SEASON-BOOK S3
+    go.onclick = () => { handoff(() => door(find)); };   // AUDIT SEASON-BOOK S3
     box.append(go);
   }
   if (said.note) box.append(el('span', `${cls}-note`, said.note));
@@ -8234,10 +5520,7 @@ function questWhere(message, cls, { wayOnly = false, skip = null } = {}) {
 }
 /** GUIDE2: the place the quest's latest entry offers a way to (its find payload: region and name), or null. */
 function latestPlace(sel) {
-  const t = entryTarget(sel.written?.at(-1)?.message, {
-    canFindPlace: hooks.canFindPlace,
-    currentLocationName: hooks.currentLocationName,
-  });
+  const t = entryTarget(sel.written?.at(-1)?.message, { canFindPlace: hooks.canFindPlace, currentLocationName: hooks.currentLocationName });
   return t?.find ?? null;
 }
 
@@ -8263,7 +5546,7 @@ function pauseQuests(body) {
   const { finished, hidden } = rail0;
   // QL2: a stamped quest whose objectives stand before its first journal entry is a quest of the rail's too
   const active = [...rail0.active, ...unloggedRail(log)];
-  const shelved = shelvedRail(log); // QUEST-SHELF: and the quests set aside
+  const shelved = shelvedRail(log);   // QUEST-SHELF: and the quests set aside
   // JOURNAL-CLEAN: the host's tidy-ups (scenes/quest/questBridge.js journalClean - remove / clear the
   // archive, hide / unhide an active quest). A host that hands none draws no buttons rather than buttons that do
   // nothing.
@@ -8275,9 +5558,8 @@ function pauseQuests(body) {
   // line begun or on offer, under its own heading (key `l:<id>`): the ones under way first, then those on offer, the
   // finished last. None while the questlines are off (the bridge hands none). QL-OFFERED: a line its gate shuts is no row
   // (the runner draws none - UI-Calm's law, nothing drawn that cannot be taken)
-  const LINE_ORDER = { running: 0, retry: 1, shelved: 1, waiting: 1, offered: 2, done: 3 }; // AUDIT QUESTLINES UI-7: retry, shelved
-  const lines = (log.lines ?? [])
-    .map((l) => ({ key: `l:${l.id}`, name: l.title, line: l }))
+  const LINE_ORDER = { running: 0, retry: 1, shelved: 1, waiting: 1, offered: 2, done: 3 };   // AUDIT QUESTLINES UI-7: retry, shelved
+  const lines = (log.lines ?? []).map((l) => ({ key: `l:${l.id}`, name: l.title, line: l }))
     .sort((a, b) => (LINE_ORDER[a.line.state] ?? 9) - (LINE_ORDER[b.line.state] ?? 9));
   // QL12 (section 4.4): and each guild the player is a member of, as its own ladder (key `g:<guild>`)
   const ladderRows = (log.ladders ?? []).map((g) => ({ key: `g:${g.key}`, name: g.name, ladder: g }));
@@ -8285,35 +5567,21 @@ function pauseQuests(body) {
   // STORY-AGAIN (#982): a step of the main story that failed, under Main Quests (key `st:<quest>`), one press (twice)
   // from starting again - the host's door (scenes/quest/questBridge.js journalClean.storyAgain)
   const story = (clean?.storyAgain?.() ?? []).map((s) => ({ key: `st:${s.questName}`, name: s.title, story: s }));
-  if (
-    !active.length &&
-    !finished.length &&
-    !hidden.length &&
-    !shelved.length &&
-    !offers.length &&
-    !lines.length &&
-    !story.length
-  ) {
+  if (!active.length && !finished.length && !hidden.length && !shelved.length && !offers.length && !lines.length && !story.length) {
     body.append(el('p', 'px-note', t('pause.journal.none', 'No active quests.')));
-    if (questShelfSaid) {
-      body.append(el('p', 'px-note', questShelfSaid));
-      questShelfSaid = null;
-    } // AUDIT QA3 F6: said, the tab empty or not
+    if (questShelfSaid) { body.append(el('p', 'px-note', questShelfSaid)); questShelfSaid = null; }   // AUDIT QA3 F6: said, the tab empty or not
     return;
   }
   const shown = questShowHidden ? hidden : [];
   const rows = [...offers, ...active, ...story, ...shown, ...shelved, ...finished, ...lines];
   // AUDIT QA3 B9: the words of a press whose quest has no row yet (a step started again waits for its questor, no entry)
   // are said at the tab's head - under the detail they landed at the foot of whichever quest the selection fell to
-  if (questShelfSaid && !rows.some((r) => r.key === questSel)) {
-    body.append(el('p', 'px-note', questShelfSaid));
-    questShelfSaid = null;
-  }
+  if (questShelfSaid && !rows.some((r) => r.key === questSel)) { body.append(el('p', 'px-note', questShelfSaid)); questShelfSaid = null; }
   // GUIDE4: THE JOURNAL OPENS ON THE QUEST THE HUD SHOWS - the tracker's (the one tracked, else the one the journal
   // last changed) - and only then on the first row.
   if (!rows.some((r) => r.key === questSel)) {
-    const onHud = followOn() ? questTracker.tracked()?.id : null; // AUDIT GUIDE T2: the card's or the marks' quest
-    questSel = (onHud != null ? rows.find((r) => r.id === onHud)?.key : null) ?? rows[0]?.key ?? null; // JOURNAL-CLEAN: every quest hidden is no row; QL12: the lines come last, so a quest is opened on first
+    const onHud = followOn() ? questTracker.tracked()?.id : null;   // AUDIT GUIDE T2: the card's or the marks' quest
+    questSel = (onHud != null ? rows.find((r) => r.id === onHud)?.key : null) ?? rows[0]?.key ?? null;   // JOURNAL-CLEAN: every quest hidden is no row; QL12: the lines come last, so a quest is opened on first
   }
   const sel = rows.find((r) => r.key === questSel);
 
@@ -8322,13 +5590,9 @@ function pauseQuests(body) {
   const railList = (items, cls) => {
     for (const q of items) {
       const b = el('button', `px-qrow${cls}${q.key === questSel ? ' on' : ''}`);
-      b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(questTitleOf(q.name))); // PX28
+      b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(questTitleOf(q.name)));   // PX28
       if (q.clockSeconds != null) b.append(el('span', 'px-qtimed', '\u25c6'));
-      b.onclick = () => {
-        questSel = q.key;
-        questReveal = true;
-        render();
-      }; // AUDIT QUESTLINES UI-14
+      b.onclick = () => { questSel = q.key; questReveal = true; render(); };   // AUDIT QUESTLINES UI-14
       rail.append(b);
     }
   };
@@ -8351,10 +5615,7 @@ function pauseQuests(body) {
   // QL-OFFERED: a questline's step is its
   // line's - drawn under the line's row in Questlines, never a second time as a side quest (while the line is drawn)
   const drawnLines = new Set(lines.filter((r) => r.line).map((r) => r.line.id));
-  const lineOfStep = (q) => {
-    const at = lineStepOf(q.questName);
-    return at && drawnLines.has(at.line.id) ? at.line.id : null;
-  };
+  const lineOfStep = (q) => { const at = lineStepOf(q.questName); return at && drawnLines.has(at.line.id) ? at.line.id : null; };
   const sides = active.filter((q) => !q.main && !lineOfStep(q));
   const section = (label, items, cls, first = false) => {
     rail.append(el('div', `px-qarch${first ? ' px-qfirst' : ''}`, label));
@@ -8362,10 +5623,7 @@ function pauseQuests(body) {
     else rail.append(el('div', 'px-qnone', '\u2014'));
   };
   // QL3: a section only while a reward waits - a quest's choice of gear, the first thing the journal has to ask
-  if (offers.length) {
-    rail.append(el('div', 'px-qarch px-qfirst', t('ql.journal.rewards', 'Rewards waiting')));
-    railList(offers, ' px-qreward');
-  }
+  if (offers.length) { rail.append(el('div', 'px-qarch px-qfirst', t('ql.journal.rewards', 'Rewards waiting'))); railList(offers, ' px-qreward'); }
   section(t('pause.journal.main', 'Main Quests'), [...mains, ...story], '', !offers.length);
   section(t('pause.journal.side', 'Side Quests'), sides, '');
   // QL12: the questlines - each row tagged with where it stands, a finished one dimmed as the archive is
@@ -8379,18 +5637,10 @@ function pauseQuests(body) {
       const b = el('button', cls.join(' '));
       b.append(el('span', 'px-c', '\u25c6'), document.createTextNode(questTitleOf(q.name)));
       b.title = q.ladder ? t('ql.journal.ladderRow', 'Your guild\u2019s quests, rank by rank') : lineStateWords(state);
-      b.onclick = () => {
-        questSel = q.key;
-        questReveal = true;
-        render();
-      }; // AUDIT QUESTLINES UI-14
+      b.onclick = () => { questSel = q.key; questReveal = true; render(); };   // AUDIT QUESTLINES UI-14
       rail.append(b);
       // QL-OFFERED: the line's step under way, under its line - its own quest's page, one press away
-      if (q.line)
-        railList(
-          active.filter((s) => lineOfStep(s) === q.line.id),
-          ' px-qstep',
-        );
+      if (q.line) railList(active.filter((s) => lineOfStep(s) === q.line.id), ' px-qstep');
     }
   }
   // JOURNAL-CLEAN: the hidden quests, drawn only when asked for, under their own heading - and the toggle that asks,
@@ -8408,34 +5658,20 @@ function pauseQuests(body) {
   };
   if (clean && finished.length) {
     const armed = journalCleanArmed === 'clear';
-    railAct(
-      armed
-        ? t('pause.journal.clearArmed', 'Click again to clear archive')
-        : t('pause.journal.clear', 'Clear archive ({n})', { n: finished.length }),
-      () => {
-        if (journalCleanArmed !== 'clear') {
-          journalCleanArmed = 'clear';
-          render();
-          return;
-        }
-        journalCleanArmed = null;
-        clean.clearFinished?.();
-        if (String(questSel).startsWith('f:')) questSel = null;
-        render();
-      },
-    );
+    railAct(armed ? t('pause.journal.clearArmed', 'Click again to clear archive') : t('pause.journal.clear', 'Clear archive ({n})', { n: finished.length }), () => {
+      if (journalCleanArmed !== 'clear') { journalCleanArmed = 'clear'; render(); return; }
+      journalCleanArmed = null;
+      clean.clearFinished?.();
+      if (String(questSel).startsWith('f:')) questSel = null;
+      render();
+    });
   }
   if (hidden.length) {
-    railAct(
-      questShowHidden
-        ? t('pause.journal.hideHidden', 'Hide hidden ({n})', { n: hidden.length })
-        : t('pause.journal.showHidden', 'Show hidden ({n})', { n: hidden.length }),
-      () => {
-        questShowHidden = !questShowHidden;
-        if (!questShowHidden && hidden.some((q) => q.key === questSel)) questSel = null;
-        render();
-      },
-    );
+    railAct(questShowHidden ? t('pause.journal.hideHidden', 'Hide hidden ({n})', { n: hidden.length }) : t('pause.journal.showHidden', 'Show hidden ({n})', { n: hidden.length }), () => {
+      questShowHidden = !questShowHidden;
+      if (!questShowHidden && hidden.some((q) => q.key === questSel)) questSel = null;
+      render();
+    });
   }
   wrap.append(rail);
 
@@ -8449,25 +5685,11 @@ function pauseQuests(body) {
     // second Enter chose for a reward never looked at. Armed by the piece (`take:<offer>:<index>`, its button's own key)
     const takeKey = (i) => `take:${sel.offer.id}:${i}`;
     const armedTake = sel.offer.pieces.findIndex((_, i) => journalCleanArmed === takeKey(i));
-    detail.append(
-      head2,
-      qlOfferDetail(
-        document,
-        sel.offer,
-        (i) => {
-          if (journalCleanArmed !== takeKey(i)) {
-            journalCleanArmed = takeKey(i);
-            render();
-            return;
-          }
-          journalCleanArmed = null;
-          clean?.takeOffer?.(sel.offer.id, i);
-          questSel = null;
-          render();
-        },
-        { armed: armedTake },
-      ),
-    );
+    detail.append(head2, qlOfferDetail(document, sel.offer, (i) => {
+      if (journalCleanArmed !== takeKey(i)) { journalCleanArmed = takeKey(i); render(); return; }
+      journalCleanArmed = null;
+      clean?.takeOffer?.(sel.offer.id, i); questSel = null; render();
+    }, { armed: armedTake }));
   } else if (sel?.line) {
     // QL12: a questline - its story, its steps as the path walked, what it waits on and what it earns
     const head2 = el('div', 'px-qname');
@@ -8479,18 +5701,10 @@ function pauseQuests(body) {
       const acts = el('div', 'px-qacts');
       acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
       const armed = journalCleanArmed === sel.key;
-      const go = el(
-        'button',
-        'act',
-        armed ? t('ql.journal.takeUpArmed', 'Click again to take it up') : t('ql.journal.takeUp', 'Take it up'),
-      );
+      const go = el('button', 'act', armed ? t('ql.journal.takeUpArmed', 'Click again to take it up') : t('ql.journal.takeUp', 'Take it up'));
       go.title = t('ql.journal.takeUpTitle', 'Begin this questline: its first step starts now');
       go.onclick = () => {
-        if (journalCleanArmed !== sel.key) {
-          journalCleanArmed = sel.key;
-          render();
-          return;
-        }
+        if (journalCleanArmed !== sel.key) { journalCleanArmed = sel.key; render(); return; }
         journalCleanArmed = null;
         questShelfSaid = clean.takeLine(sel.line.id)?.text ?? null;
         render();
@@ -8502,28 +5716,14 @@ function pauseQuests(body) {
     // STORY-AGAIN: the step that failed - what happened, and its one press (twice, BOUNTY1's arming)
     const head2 = el('div', 'px-qname');
     head2.append(el('span', 'px-qwing'), el('h3', null, questTitleOf(sel.name)), el('span', 'px-qwing px-flip'));
-    detail.append(
-      head2,
-      el('p', 'px-note', t('quest.story.stalled', 'This step of the main story ended before the story could go on.')),
-    );
+    detail.append(head2, el('p', 'px-note', t('quest.story.stalled', 'This step of the main story ended before the story could go on.')));
     const acts = el('div', 'px-qacts');
     acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
     const armed = journalCleanArmed === sel.key;
-    const go = el(
-      'button',
-      'act',
-      armed ? t('quest.story.againArmed', 'Click again to take it up') : t('quest.story.again', 'Take it up again'),
-    );
-    go.title = t(
-      'quest.story.againTitle',
-      'Start this step of the main story again from the beginning, so the story can go on',
-    );
+    const go = el('button', 'act', armed ? t('quest.story.againArmed', 'Click again to take it up') : t('quest.story.again', 'Take it up again'));
+    go.title = t('quest.story.againTitle', 'Start this step of the main story again from the beginning, so the story can go on');
     go.onclick = () => {
-      if (journalCleanArmed !== sel.key) {
-        journalCleanArmed = sel.key;
-        render();
-        return;
-      }
+      if (journalCleanArmed !== sel.key) { journalCleanArmed = sel.key; render(); return; }
       journalCleanArmed = null;
       const out = clean.startStoryAgain(sel.story.questName);
       questShelfSaid = out?.text ?? null;
@@ -8539,9 +5739,9 @@ function pauseQuests(body) {
     detail.append(head2, qlLadderDetail(document, sel.ladder));
   } else if (sel) {
     const head2 = el('div', 'px-qname');
-    head2.append(el('span', 'px-qwing'), el('h3', null, questTitleOf(sel.name)), el('span', 'px-qwing px-flip')); // PX28
+    head2.append(el('span', 'px-qwing'), el('h3', null, questTitleOf(sel.name)), el('span', 'px-qwing px-flip'));   // PX28
     detail.append(head2);
-    const isShelvedRow = String(sel.key).startsWith('s:'); // QUEST-SHELF: a quest set aside - its clock stopped, nothing to track
+    const isShelvedRow = String(sel.key).startsWith('s:');   // QUEST-SHELF: a quest set aside - its clock stopped, nothing to track
     // AUDIT QUESTLINES UI-8: nor a stamped quest with no journal entry yet (unloggedRail) - no clock, no place, and no Track:
     // the HUD's card reads the entries (ui/quest/questLens.js), so Track pinned a quest it never sees and the card went blank
     if (sel.entries?.length && !isShelvedRow) {
@@ -8555,18 +5755,14 @@ function pauseQuests(body) {
       if (sel.clockSeconds != null) {
         // Under a game day the words go URGENT gold.
         const urgent = sel.clockSeconds < QUEST_URGENT_SECONDS;
-        const timer = el(
-          'span',
-          `px-qtimer${urgent ? ' urgent' : ''}`,
-          t('pause.journal.timeRemains', 'Time remains: {left}', { left: remainWords(sel.clockSeconds) }),
-        );
+        const timer = el('span', `px-qtimer${urgent ? ' urgent' : ''}`, t('pause.journal.timeRemains', 'Time remains: {left}', { left: remainWords(sel.clockSeconds) }));
         meta.append(timer);
         armQuestTimer(timer, sel.key);
       }
       // GUIDE4: TRACK THIS QUEST on the HUD's card (ui/quest/questTracker.js), beside its clock - the card follows the quest
       // the journal last changed until the player chooses one here (or in the chronicle: the same toggle, one home).
-      if (followOn() && sel.id != null) meta.append(trackButton(document, sel.id, questTitleOf(sel.name))); // AUDIT GUIDE T2; T5: changed in place, the tab not rebuilt
-      if (meta.childNodes.length) detail.append(meta); // PX22: an empty meta line is a gap the eye reads as a mistake
+      if (followOn() && sel.id != null) meta.append(trackButton(document, sel.id, questTitleOf(sel.name)));   // AUDIT GUIDE T2; T5: changed in place, the tab not rebuilt
+      if (meta.childNodes.length) detail.append(meta);   // PX22: an empty meta line is a gap the eye reads as a mistake
       // GUIDE2: WHERE THE QUEST POINTS NOW, and the way there - DFU's own logbook click (HandleQuestClicks), which
       // this journal never had: the latest entry's target through the quest lens, in the find-place box's words.
       const where = questWhere(sel.written?.at(-1)?.message, 'px-qwhere');
@@ -8574,10 +5770,7 @@ function pauseQuests(body) {
     }
     // QL2: a stamped quest's objectives, its choices and how it ended -
     // ui/questlines/qlJournal.js, the chronicle's own block too. DFU's quest (no `ql`) draws nothing here.
-    {
-      const block = qlObjectivesBlock(document, sel.ql);
-      if (block) detail.append(block);
-    }
+    { const block = qlObjectivesBlock(document, sel.ql); if (block) detail.append(block); }
     // BOUNTY1: a bounty's two presses - Abandon
     // (twice: the first arms it, so a stray click gives nothing up) and, in a party, Share
     if (sel.entries && isBountyQuestId(sel.id)) {
@@ -8585,26 +5778,13 @@ function pauseQuests(body) {
       acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
       if (bountyQuestShareable(sel.id)) {
         const sh = el('button', 'act', t('pause.journal.share', 'Share with party'));
-        sh.onclick = () => {
-          shareBountyQuest(sel.id);
-          render();
-        };
+        sh.onclick = () => { shareBountyQuest(sel.id); render(); };
         acts.append(sh);
       }
       const armed = bountyAbandonArmed === sel.id;
-      const ab = el(
-        'button',
-        'act',
-        armed
-          ? t('pause.journal.abandonArmed', 'Click again to abandon')
-          : t('pause.journal.abandon', 'Abandon bounty'),
-      );
+      const ab = el('button', 'act', armed ? t('pause.journal.abandonArmed', 'Click again to abandon') : t('pause.journal.abandon', 'Abandon bounty'));
       ab.onclick = () => {
-        if (bountyAbandonArmed !== sel.id) {
-          bountyAbandonArmed = sel.id;
-          render();
-          return;
-        }
+        if (bountyAbandonArmed !== sel.id) { bountyAbandonArmed = sel.id; render(); return; }
         bountyAbandonArmed = null;
         abandonBountyQuest(sel.id);
         questSel = null;
@@ -8618,19 +5798,9 @@ function pauseQuests(body) {
       const acts = el('div', 'px-qacts');
       acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
       const armed = bountyAbandonArmed === sel.id;
-      const ab = el(
-        'button',
-        'act',
-        armed
-          ? t('pause.journal.abandonArmed', 'Click again to abandon')
-          : t('pause.journal.abandonHunt', 'Abandon hunt'),
-      ); // QUEST-AUDIT III SHELF-WORDS
+      const ab = el('button', 'act', armed ? t('pause.journal.abandonArmed', 'Click again to abandon') : t('pause.journal.abandonHunt', 'Abandon hunt'));   // QUEST-AUDIT III SHELF-WORDS
       ab.onclick = () => {
-        if (bountyAbandonArmed !== sel.id) {
-          bountyAbandonArmed = sel.id;
-          render();
-          return;
-        }
+        if (bountyAbandonArmed !== sel.id) { bountyAbandonArmed = sel.id; render(); return; }
         bountyAbandonArmed = null;
         abandonHuntQuest(sel.id);
         questSel = null;
@@ -8648,33 +5818,18 @@ function pauseQuests(body) {
       // QUEST-SHELF: a running quest ABANDONS - twice, BOUNTY1's arming (its clocks stop and its questor is free the moment
       // it goes) - where the quest may be set aside (scenes/quest/questBridge.js canAbandon); one set aside RECLAIMS in one press
       if (isShelvedRow && sel.id != null && clean.reclaim) {
-        const rc = el('button', 'act', t('pause.journal.reclaim', 'Reclaim quest')); // QUEST-AUDIT III SHELF-WORDS
+        const rc = el('button', 'act', t('pause.journal.reclaim', 'Reclaim quest'));   // QUEST-AUDIT III SHELF-WORDS
         // its audit: the selection follows the quest only where it went - a refusal is said under the quest it refused
-        rc.onclick = () => {
-          const out = clean.reclaim(sel.id);
-          questShelfSaid = out?.text ?? null;
-          if (out?.ok) questSel = `a:${sel.id}`;
-          render();
-        };
+        rc.onclick = () => { const out = clean.reclaim(sel.id); questShelfSaid = out?.text ?? null; if (out?.ok) questSel = `a:${sel.id}`; render(); };
         acts.append(rc);
-        // RPT1026-QUESTS ABANDON-ALWAYS: and on a quest with no journal entry yet too - the bridge's walk lists one set aside
-        // under Abandoned now, so its Reclaim is a row (AUDIT QUESTLINES UI-8 had kept Abandon off it while it was none), and
-        // a quest that shuts its questor's door with nothing written could not be given up at all
+      // RPT1026-QUESTS ABANDON-ALWAYS: and on a quest with no journal entry yet too - the bridge's walk lists one set aside
+      // under Abandoned now, so its Reclaim is a row (AUDIT QUESTLINES UI-8 had kept Abandon off it while it was none), and
+      // a quest that shuts its questor's door with nothing written could not be given up at all
       } else if (sel.entries && sel.id != null && clean.abandon && clean.canAbandon?.(sel.id)) {
         const armed = journalCleanArmed === `ab:${sel.id}`;
-        const ab = el(
-          'button',
-          'act',
-          armed
-            ? t('pause.journal.abandonArmed', 'Click again to abandon')
-            : t('pause.journal.abandonQuest', 'Abandon quest'),
-        ); // QUEST-AUDIT III SHELF-WORDS
+        const ab = el('button', 'act', armed ? t('pause.journal.abandonArmed', 'Click again to abandon') : t('pause.journal.abandonQuest', 'Abandon quest'));   // QUEST-AUDIT III SHELF-WORDS
         ab.onclick = () => {
-          if (journalCleanArmed !== `ab:${sel.id}`) {
-            journalCleanArmed = `ab:${sel.id}`;
-            render();
-            return;
-          }
+          if (journalCleanArmed !== `ab:${sel.id}`) { journalCleanArmed = `ab:${sel.id}`; render(); return; }
           journalCleanArmed = null;
           const out = clean.abandon(sel.id);
           questShelfSaid = out?.text ?? null;
@@ -8687,23 +5842,10 @@ function pauseQuests(body) {
       // twice, the same arming - where it may be (scenes/quest/questBridge.js canRestart); the selection follows its new copy
       if (!isShelvedRow && sel.entries && sel.id != null && clean.restart && clean.canRestart?.(sel.id)) {
         const armed = journalCleanArmed === `rs:${sel.id}`;
-        const rs = el(
-          'button',
-          'act',
-          armed
-            ? t('pause.journal.restartArmed', 'Click again to restart')
-            : t('pause.journal.restart', 'Restart quest'),
-        );
-        rs.title = t(
-          'pause.journal.restartTitle',
-          'Start this quest again from the beginning. Anything it placed or gave you is taken back',
-        );
+        const rs = el('button', 'act', armed ? t('pause.journal.restartArmed', 'Click again to restart') : t('pause.journal.restart', 'Restart quest'));
+        rs.title = t('pause.journal.restartTitle', 'Start this quest again from the beginning. Anything it placed or gave you is taken back');
         rs.onclick = () => {
-          if (journalCleanArmed !== `rs:${sel.id}`) {
-            journalCleanArmed = `rs:${sel.id}`;
-            render();
-            return;
-          }
+          if (journalCleanArmed !== `rs:${sel.id}`) { journalCleanArmed = `rs:${sel.id}`; render(); return; }
           journalCleanArmed = null;
           const out = clean.restart(sel.id);
           questShelfSaid = out?.text ?? null;
@@ -8716,62 +5858,41 @@ function pauseQuests(body) {
       // Show hidden toggle never named it (the rail hides only the logged rows, ui/quest/questRail.js questRail)
       if (sel.entries?.length && sel.id != null && !isShelvedRow) {
         const isHidden = hidden.some((q) => q.key === sel.key);
-        const hb = el(
-          'button',
-          'act',
-          isHidden ? t('pause.journal.unhide', 'Unhide') : t('pause.journal.hide', 'Hide from journal'),
-        );
+        const hb = el('button', 'act', isHidden ? t('pause.journal.unhide', 'Unhide') : t('pause.journal.hide', 'Hide from journal'));
         hb.onclick = () => {
           if (isHidden) clean.unhide?.(sel.id);
-          else {
-            clean.hide?.(sel.id);
-            questSel = null;
-          }
+          else { clean.hide?.(sel.id); questSel = null; }
           render();
         };
         acts.append(hb);
       } else if (!sel.entries) {
         const index = Number(String(sel.key).slice(2));
         const armed = journalCleanArmed === sel.key;
-        const rb = el(
-          'button',
-          'act',
-          armed ? t('pause.journal.removeArmed', 'Click again to remove') : t('pause.journal.remove', 'Remove'),
-        );
+        const rb = el('button', 'act', armed ? t('pause.journal.removeArmed', 'Click again to remove') : t('pause.journal.remove', 'Remove'));
         rb.onclick = () => {
-          if (journalCleanArmed !== sel.key) {
-            journalCleanArmed = sel.key;
-            render();
-            return;
-          }
+          if (journalCleanArmed !== sel.key) { journalCleanArmed = sel.key; render(); return; }
           journalCleanArmed = null;
           clean.removeFinished?.(index);
-          questSel = null; // the indices past it moved down one: 'f:<index>' now names the next record
+          questSel = null;   // the indices past it moved down one: 'f:<index>' now names the next record
           render();
         };
         acts.append(rb);
       }
       if (acts.childNodes.length) detail.append(acts);
-      if (questShelfSaid) {
-        detail.append(el('p', 'px-note', questShelfSaid));
-        questShelfSaid = null;
-      } // QUEST-SHELF: said once
+      if (questShelfSaid) { detail.append(el('p', 'px-note', questShelfSaid)); questShelfSaid = null; }   // QUEST-SHELF: said once
     }
     if (sel.entries) {
       // Active: the LATEST entry is the state of the quest; the trail
       // beneath it, newest first.
       const latest = sel.entries[sel.entries.length - 1];
       const desc = el('div', 'px-qdesc');
-      for (const line of latest ?? []) desc.append(el('p', null, line)); // QL2: a quest with no entry yet has its objectives alone
+      for (const line of latest ?? []) desc.append(el('p', null, line));   // QL2: a quest with no entry yet has its objectives alone
       if (latest) detail.append(desc);
       // RPT1026-QUESTS ABANDON-ALWAYS: DFU's quest with nothing written and no objectives of its own - said, not blank
-      else if (!sel.ql?.objectives?.length)
-        detail.append(
-          el('p', 'px-note', t('pause.journal.unwritten', 'Nothing is written in your journal for this quest yet.')),
-        );
+      else if (!sel.ql?.objectives?.length) detail.append(el('p', 'px-note', t('pause.journal.unwritten', 'Nothing is written in your journal for this quest yet.')));
       if (sel.entries.length > 1) {
         detail.append(pxDivider(t('pause.journal.title', 'Journal')));
-        const offered = latestPlace(sel); // GUIDE2: the place the where line above already offers
+        const offered = latestPlace(sel);   // GUIDE2: the place the where line above already offers
         for (let i = sel.entries.length - 2; i >= 0; i--) {
           const e = el('div', 'px-qentry');
           const mark = el('span', 'px-qmark', '\u25c7');
@@ -8788,23 +5909,13 @@ function pauseQuests(body) {
       }
     } else {
       // Archived: the verdict line, then the filed record.
-      const verdict =
-        sel.success == null
-          ? null
-          : sel.when
-            ? sel.success
-              ? t('pause.journal.completedAt', 'Completed at {when}', { when: sel.when })
-              : t('pause.journal.endedAt', 'Ended at {when}', { when: sel.when })
-            : sel.success
-              ? t('pause.journal.completed', 'Completed')
-              : t('pause.journal.ended', 'Ended');
+      const verdict = sel.success == null ? null
+        : sel.when ? (sel.success ? t('pause.journal.completedAt', 'Completed at {when}', { when: sel.when }) : t('pause.journal.endedAt', 'Ended at {when}', { when: sel.when }))
+          : (sel.success ? t('pause.journal.completed', 'Completed') : t('pause.journal.ended', 'Ended'));
       if (verdict) detail.append(el('p', `px-qverdict${sel.success ? ' won' : ''}`, verdict));
       const desc = el('div', 'px-qdesc');
       for (const line of sel.lines) {
-        if (line === '') {
-          desc.append(el('div', 'px-qgap'));
-          continue;
-        }
+        if (line === '') { desc.append(el('div', 'px-qgap')); continue; }
         desc.append(el('p', null, line));
       }
       // AUDIT QUESTLINES UI-5: how a stamped quest ended - the filed entry's side record (systems/notebook.js filedOutcome),
@@ -8815,10 +5926,7 @@ function pauseQuests(body) {
     }
   }
   // QUEST-SHELF: the words of a press, under the quest they speak of
-  if (questShelfSaid) {
-    detail.append(el('p', 'px-note', questShelfSaid));
-    questShelfSaid = null;
-  }
+  if (questShelfSaid) { detail.append(el('p', 'px-note', questShelfSaid)); questShelfSaid = null; }
   wrap.append(detail);
   body.append(wrap);
   // AUDIT QUESTLINES UI-14: on a phone the journal stacks (enhancedStyle.js PX4: the rail a strip over the page, at 480px),
@@ -8826,10 +5934,7 @@ function pauseQuests(body) {
   // repaint has put the scroll back (ui/domRepaint.js), as the broker's card is (ui/brokerWindow.js)
   if (questReveal) {
     questReveal = false;
-    if (globalThis.matchMedia?.('(max-width: 480px)')?.matches)
-      Promise.resolve().then(() => {
-        if (detail.isConnected !== false) detail.scrollIntoView?.({ block: 'start' });
-      });
+    if (globalThis.matchMedia?.('(max-width: 480px)')?.matches) Promise.resolve().then(() => { if (detail.isConnected !== false) detail.scrollIntoView?.({ block: 'start' }); });
   }
 }
 
@@ -8840,37 +5945,25 @@ function render() {
   // nulls `app`). A screen that is gone has nothing to paint; the repaint after it was the crash, on every exit
   // through the confirm.
   if (!app) return;
-  repaintKeepingScroll(app, () => renderInto(), { focus: true }); // AUDIT 32 P3: the focus and the caret too
+  repaintKeepingScroll(app, () => renderInto(), { focus: true });   // AUDIT 32 P3: the focus and the caret too
 }
 
 /** The rebuild. Wrapped for the reason the wizard's is: the settings
  *  list carries the same steppers, and a repaint that forgets the
  *  scroll throws the player back to the top of 66 Video rows. */
 function renderInto() {
-  if (groundTimer) {
-    clearInterval(groundTimer);
-    groundTimer = null;
-  }
-  if (questTimer) {
-    clearInterval(questTimer);
-    questTimer = null;
-  }
-  stopTimers(); // TIMERS1: a rebuild builds the window again, with its own tick
-  stopPost(); // SERVER-POST: and the mailbox's, and the envelope's count
-  stopSeason(); // SEASON-BOOK: and the season window's
+  if (groundTimer) { clearInterval(groundTimer); groundTimer = null; }
+  if (questTimer) { clearInterval(questTimer); questTimer = null; }
+  stopTimers();   // TIMERS1: a rebuild builds the window again, with its own tick
+  stopPost();   // SERVER-POST: and the mailbox's, and the envelope's count
+  stopSeason();   // SEASON-BOOK: and the season window's
   app.innerHTML = '';
   // TITLE-DOOR: the boot home stands on the film's held title, so its host is see-through there (uiCalmStyle.js
   // TITLE_DOOR_CSS); every section keeps the opaque ground the canvas is hidden under
-  if (app.dataset) {
-    if (onTitle()) app.dataset.overTitle = '';
-    else delete app.dataset.overTitle;
-  }
+  if (app.dataset) { if (onTitle()) app.dataset.overTitle = ''; else delete app.dataset.overTitle; }
   // PX1/PX2: both doors open on the pixel home; every section keeps
   // its shell.
-  if (section === 'home') {
-    renderHome();
-    return;
-  }
+  if (section === 'home') { renderHome(); return; }
   // PX11 (Mac): the BOOT shell stands on the same living sky as the
   // home - the ground draws behind it and the shell's own chrome goes
   // translucent (enhancedStyle's PX11 block), so Settings at boot is
@@ -8882,8 +5975,7 @@ function renderInto() {
     const vw = () => globalThis.innerWidth ?? 1280;
     const vh = () => globalThis.innerHeight ?? 720;
     drawPixelGround(ground, vw(), vh(), 0);
-    const still =
-      typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const still = typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!still) {
       const t0 = Date.now();
       groundTimer = setInterval(() => drawPixelGround(ground, vw(), vh(), (Date.now() - t0) / 1000), 125);
@@ -8918,10 +6010,9 @@ function renderInto() {
   for (const label of sections) {
     const id = idOf(label);
     // UI-CALM: on the enhanced front door's rail Offline's doors stand under their word, as they do on the door
-    if (sections === SECTIONS_BOOT && label === HOME_OFFLINE[0])
-      rail.append(el('span', 'railgroup', t('menu.home.offline', 'Offline')));
+    if (sections === SECTIONS_BOOT && label === HOME_OFFLINE[0]) rail.append(el('span', 'railgroup', t('menu.home.offline', 'Offline')));
     const b = el('button', `railbtn${id === section ? ' on' : ''}`);
-    b.append(el('span', 'rk', railLabel(label))); // L10N1b
+    b.append(el('span', 'rk', railLabel(label)));   // L10N1b
     // RAIL_ACTS: Resume resolves on the rail rather than opening a
     // pane. Every other entry is a destination.
     b.onclick = RAIL_ACTS[id] ? () => onAction(RAIL_ACTS[id]) : () => go(id);
@@ -8942,23 +6033,18 @@ function renderInto() {
     pane.style.overflow = 'hidden';
     paneSettings(pane);
   } else {
-    pane.append(head(railLabel(sections.find((l) => idOf(l) === section)))); // L10N4: the rail's own word for the pane
+    pane.append(head(railLabel(sections.find((l) => idOf(l) === section))));   // L10N4: the rail's own word for the pane
     const body = el('div', 'body');
     if (confirming) body.append(confirmCard());
     else {
       ({
-        continue: paneContinue,
-        new: paneNew,
-        load: paneLoad,
-        online: paneOnline, // ONLINE1
+        continue: paneContinue, new: paneNew, load: paneLoad, online: paneOnline,   // ONLINE1
         test: paneTest,
-        save: paneSave,
-        exit: paneExit,
-        overhauls: paneOverhauls, // OVH1
-        screenshots: drawShotsPane, // LOAD1
-        tutorials: drawTutorialsPane, // TUT1
-        about: paneAbout,
-        begin: paneBegin, // FD1: the classic rail's door; SO1: Enhanced is a Settings category now
+        save: paneSave, exit: paneExit,
+        overhauls: paneOverhauls,   // OVH1
+        screenshots: drawShotsPane,   // LOAD1
+        tutorials: drawTutorialsPane,   // TUT1
+        about: paneAbout, begin: paneBegin,   // FD1: the classic rail's door; SO1: Enhanced is a Settings category now
       })[section](body);
     }
     pane.append(body);
@@ -9004,11 +6090,11 @@ function renderInto() {
 // exterior.js's own pause arms answer a repeat and opened it again.
 // The boot door answers on the press, as it always has: it is no DFU
 // window, and the menu pad's Back (ui/menu/menuPad.js) sends a press alone.
-let backArmed = null; // AUDIT DISC28 UI-2: the code of the back press the pause face saw, answered on ITS release - cleared by that release and by every mount
+let backArmed = null;   // AUDIT DISC28 UI-2: the code of the back press the pause face saw, answered on ITS release - cleared by that release and by every mount
 function onKey(e) {
   const release = e.type === 'keyup';
   if (release) {
-    if (e.code !== backArmed) return; // not the end of a press this screen armed (only the pause face arms one)
+    if (e.code !== backArmed) return;   // not the end of a press this screen armed (only the pause face arms one)
     backArmed = null;
   }
   // AUDIT DISC28 UI-1: THE META CHORD ALONE IS REFUSED UP FRONT. Ctrl
@@ -9028,7 +6114,7 @@ function onKey(e) {
   // picker is exactly that, and Escape over it must close the picker,
   // not walk this screen's back stack out from under it.
   if (assetPickerOpen()) return;
-  if (askUp) return; // AUDIT GROWTH LANE3-9: and the Yes/No card answers its own keys
+  if (askUp) return;   // AUDIT GROWTH LANE3-9: and the Yes/No card answers its own keys
   // FIX-F: ...and so does an ARMED REBIND. This handler is on the GLOBAL
   // in capture, so it runs before the Controls pane's own listener and
   // would eat the one key DFU lets through: ReservedKeys is empty in DFU
@@ -9040,18 +6126,13 @@ function onKey(e) {
   // one key it waits for walked the back stack first; with the pause action's own key now back, a pause rebound to P
   // could not be given to a mod key without also leaving the page.
   if (textKeyCapture) return;
-  if (peerBindBusy()) return; // PEERMENU1: the player-menu bind is waiting for a key (or swallowing a pad B's Back)
-  if (plusBindsOpen()) return; // PADPLUS10: the Controller bindings window is over the menu - its Escape is its own
+  if (peerBindBusy()) return;   // PEERMENU1: the player-menu bind is waiting for a key (or swallowing a pad B's Back)
+  if (plusBindsOpen()) return;   // PADPLUS10: the Controller bindings window is over the menu - its Escape is its own
   const t = e.target;
   // PRIVATE-REPORT (AUDIT PRIVATE-REPORT UI-2): a field's keys are the field's - but Escape in the mailbox's window leaves it,
   // as the notice and arena windows let it (noticeWindow.js): `/bug` lands the focus in the report form, and its Escape
   // had done nothing at all
-  if (
-    t &&
-    (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) &&
-    !(e.key === 'Escape' && t.closest?.('.px-postwin'))
-  )
-    return;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) && !(e.key === 'Escape' && t.closest?.('.px-postwin'))) return;
   // DISC28-A (EvoAva, Discord: "If you change the default pause key binding from escape to anything else, it allows you
   // to open pause menu with that key binding, but not close it"): the table above maps the LITERAL Escape to back, and
   // the host opens this screen on the PAUSE ACTION - so a pause rebound to P opened it and P then meant `char:p` here,
@@ -9077,61 +6158,20 @@ function onKey(e) {
   // ahead of the confirm card and the help sheet - it is a modal over
   // the door, so the one press that means "not that" must close IT
   // rather than walk the screen out from under it.
-  const back = accountOpen
-    ? () => closeAccount() // AUDIT RECOVERY-SET B1: Escape is held while the window shows codes
-    : timersOpen && timersView
-      ? () => {
-          timersOpen = false;
-          timersFocusBack = true;
-          render();
-        } // TIMERS1: the window first, ahead of the pause face's resume (AUDIT UI-11: a window that is drawn)
-      : postOpen && postView
-        ? () => {
-            postOpen = false;
-            postKeep = {};
-            postFocusBack = true;
-            render();
-          } // SERVER-POST: the mailbox's window, as the timers'
-        : seasonOpen && seasonView
-          ? () => closeSeason() // SEASON-BOOK: the season window, as the timers'
-          : // AUDIT 32 P12: an act under way on the Stores page is set down first (nothing spent, said) - never the window
-            profActUnderWay()
-            ? () => {
-                setDownProfAct();
-                render();
-              }
-            : confirming
-              ? () => {
-                  answered();
-                  render();
-                } // RPT1026-MISC CONFIRM-SHEET: and the sheet the ask raised
-              : sheetOpen
-                ? () => {
-                    sheetOpen = false;
-                    render();
-                  }
-                : controlsPromptOpen()
-                  ? () => dismissControlsPrompt() // AUDIT KB1: the Controls pane's own prompt answers No first - it never leaves the section with the staged binds
-                  : section !== 'home'
-                    ? () => {
-                        const from = section;
-                        go('home');
-                        if (mode !== 'pause') focusDoor(from);
-                      } // PX1/PX2: a section backs out to the face (AUDIT L3 L1: the keyboard on its door)
-                    : mode === 'pause' && pauseTab === 'growth' && stageLive()
-                      ? () => {
-                          if (!growthBack()) onAction('resume');
-                        } // GROWTH3: a face in the tab answers first (a confirm, unaccepted stars, full screen)
-                      : mode === 'pause'
-                        ? () => onAction('resume') // Escape on the pause face resumes
-                        : homeLevel !== 'top' && twoQuestionDoor()
-                          ? () => {
-                              const from = homeLevel;
-                              homeLevel = 'top';
-                              render();
-                              focusDoor(from);
-                            } // UI-CALM: the offline doors back out to the two questions (AUDIT L3 L1: the keyboard back on Offline)
-                          : null;
+  const back = accountOpen ? () => closeAccount()   // AUDIT RECOVERY-SET B1: Escape is held while the window shows codes
+    : timersOpen && timersView ? () => { timersOpen = false; timersFocusBack = true; render(); }   // TIMERS1: the window first, ahead of the pause face's resume (AUDIT UI-11: a window that is drawn)
+    : postOpen && postView ? () => { postOpen = false; postKeep = {}; postFocusBack = true; render(); }   // SERVER-POST: the mailbox's window, as the timers'
+    : seasonOpen && seasonView ? () => closeSeason()   // SEASON-BOOK: the season window, as the timers'
+    // AUDIT 32 P12: an act under way on the Stores page is set down first (nothing spent, said) - never the window
+    : profActUnderWay() ? () => { setDownProfAct(); render(); }
+    : confirming ? () => { answered(); render(); }   // RPT1026-MISC CONFIRM-SHEET: and the sheet the ask raised
+    : sheetOpen ? () => { sheetOpen = false; render(); }
+      : controlsPromptOpen() ? () => dismissControlsPrompt()   // AUDIT KB1: the Controls pane's own prompt answers No first - it never leaves the section with the staged binds
+      : section !== 'home' ? () => { const from = section; go('home'); if (mode !== 'pause') focusDoor(from); }   // PX1/PX2: a section backs out to the face (AUDIT L3 L1: the keyboard on its door)
+        : mode === 'pause' && pauseTab === 'growth' && stageLive() ? () => { if (!growthBack()) onAction('resume'); }   // GROWTH3: a face in the tab answers first (a confirm, unaccepted stars, full screen)
+        : mode === 'pause' ? () => onAction('resume')   // Escape on the pause face resumes
+          : homeLevel !== 'top' && twoQuestionDoor() ? () => { const from = homeLevel; homeLevel = 'top'; render(); focusDoor(from); }   // UI-CALM: the offline doors back out to the two questions (AUDIT L3 L1: the keyboard back on Offline)
+            : null;
   if (!back) return;
   e.preventDefault();
   // A MODAL OVERLAY OWNS ITS INPUT (the wizard's own law, U50). On
@@ -9164,9 +6204,7 @@ function onKey(e) {
 function releaseLock() {
   try {
     if (typeof document !== 'undefined' && document.pointerLockElement) document.exitPointerLock();
-  } catch {
-    /* a browser that refuses is a browser with no lock to drop */
-  }
+  } catch { /* a browser that refuses is a browser with no lock to drop */ }
 }
 
 /**
@@ -9180,33 +6218,27 @@ function releaseLock() {
  * writes to the document when it is merely IMPORTED cannot be imported
  * by a test, and the classic skin imports nothing of this at all.
  */
-export function mountEnhancedMenu(
-  host,
-  {
-    onAction: handler = () => {},
-    mode: m = 'boot',
-    hooks: h = {},
-    // PX26: which page the window opens ON. A door pressed for a page
-    // should land on that page rather than on a menu with it one press
-    // further in - the dial's north asked for the character sheet.
-    at = null,
-  } = {},
-) {
+export function mountEnhancedMenu(host, {
+  onAction: handler = () => {}, mode: m = 'boot', hooks: h = {},
+  // PX26: which page the window opens ON. A door pressed for a page
+  // should land on that page rather than on a menu with it one press
+  // further in - the dial's north asked for the character sheet.
+  at = null,
+} = {}) {
   injectEnhancedStyle();
   injectEnhancedFonts();
   app = host;
   onAction = handler;
   mode = m === 'pause' ? 'pause' : 'boot';
   hooks = h ?? {};
-  questRepairSaid = null; // QREPAIR: a repair's line is that visit's
+  questRepairSaid = null;   // QREPAIR: a repair's line is that visit's
   // PROFILE2: and the profile window is a visit's too - the pause screen mounts this module again, and a window left
   // open on the door (or on the last pause) must not be standing over the next one before the player asks for it
   accountOpen = false;
-  acctFlow = null;
-  acctPaint = null;
-  timersOpen = false; // TIMERS1: and the timers window the same
+  acctFlow = null; acctPaint = null;
+  timersOpen = false;   // TIMERS1: and the timers window the same
   timersFocusBack = false;
-  postOpen = false; // SERVER-POST: and the mailbox's
+  postOpen = false;   // SERVER-POST: and the mailbox's
   postFocusBack = false;
   postKeep = {};
   // MAC1. The Morrowind store is COUNTED
@@ -9227,11 +6259,7 @@ export function mountEnhancedMenu(
   // The sizes and the fingerprint stay on the host bootstrap
   // (scenes/shared.js), which is the reader that needs them.
   if (!morrowindDataCounted()) {
-    countMorrowindArchives()
-      .then(() => {
-        if (app === host && host.isConnected) render();
-      })
-      .catch(() => {});
+    countMorrowindArchives().then(() => { if (app === host && host.isConnected) render(); }).catch(() => {});
   }
   // ACC2c: THE CLOUD LATCH IS PER VISIT, and AUDIT-312 F4 found it was
   // per PAGE LOAD - the module state simply stayed true, so a player
@@ -9242,21 +6270,17 @@ export function mountEnhancedMenu(
   // destructive button must never outlive the screen it was armed on.
   cloudAsked = false;
   cloudArm = null;
-  cloudWhy = null; // the pre-merge audit (0927b): a refusal is last visit's news - this visit asks the service again
-  realmAsked = false;
-  realmRows = null;
-  realmBusy = false;
-  realmLinesAsked = false;
-  realmLineIds = null; // REALM P1.3: the realm is asked again each visit
-  realmWords = [takeRealmNotice(globalThis.sessionStorage)].filter(Boolean); // REALM P1.3: why the last online boot came back here
-  sections = mode === 'pause' ? SECTIONS_PAUSE : isEnhanced() ? SECTIONS_BOOT : SECTIONS_CLASSIC; // FD1: one door, two rails
+  cloudWhy = null;   // the pre-merge audit (0927b): a refusal is last visit's news - this visit asks the service again
+  realmAsked = false; realmRows = null; realmBusy = false; realmLinesAsked = false; realmLineIds = null;   // REALM P1.3: the realm is asked again each visit
+  realmWords = [takeRealmNotice(globalThis.sessionStorage)].filter(Boolean);   // REALM P1.3: why the last online boot came back here
+  sections = mode === 'pause' ? SECTIONS_PAUSE : isEnhanced() ? SECTIONS_BOOT : SECTIONS_CLASSIC;   // FD1: one door, two rails
   // WHICH PANE OPENS. Both doors open on the PIXEL HOME (PX1/PX2) -
   // the face itself, every section one press away. Pause used to open
   // straight on SAVE GAME (U51's law: what Escape was pressed for);
   // PX2 trades one press of depth for the face Mac adopted, with Save
   // Game the second row a thumb meets and Resume the first.
   section = 'home';
-  homeLevel = 'top'; // UI-CALM: every visit asks which world first
+  homeLevel = 'top';   // UI-CALM: every visit asks which world first
   pauseTab = 'system';
   // ...and THEN the caller's landing, if it named one. After the reset,
   // which is what keeps the reset the default rather than a thing this
@@ -9267,93 +6291,63 @@ export function mountEnhancedMenu(
   // whole settings screen, Controls among its categories), not on the home face a press away from it.
   else if (at && sections.some((l) => idOf(l) === at)) section = at;
   questSel = null;
-  bountyAbandonArmed = null; // AUDIT 28 B11: an armed Abandon never outlives the visit it was armed on
-  journalCleanArmed = null; // JOURNAL-CLEAN: ...nor an armed Remove or Clear archive
+  bountyAbandonArmed = null;   // AUDIT 28 B11: an armed Abandon never outlives the visit it was armed on
+  journalCleanArmed = null;   // JOURNAL-CLEAN: ...nor an armed Remove or Clear archive
   questShowHidden = false;
-  questReveal = false; // AUDIT QUESTLINES UI-14: a press is this visit's
+  questReveal = false;   // AUDIT QUESTLINES UI-14: a press is this visit's
   statsSec = 'character';
-  resetProfPages(); // PROF1: an armed change of specialisation never outlives the visit
-  resetCompanionRoster(); // COMPANION-ROSTER: nor an armed Release
-  holdSec = 'stable'; // HOLDINGS: the Holdings rail opens on its first page
-  famSec = 'tree'; // LEGACY3: the Family rail opens on the tree, centred on the one played
+  resetProfPages();   // PROF1: an armed change of specialisation never outlives the visit
+  resetCompanionRoster();   // COMPANION-ROSTER: nor an armed Release
+  holdSec = 'stable';   // HOLDINGS: the Holdings rail opens on its first page
+  famSec = 'tree';   // LEGACY3: the Family rail opens on the tree, centred on the one played
   resetFamilyPages();
-  resetHoldingsPages();
-  resetFleetPage();
-  resetCollectionsPage(); // ...and an act's word, an open name field, an armed press never outlive the visit
-  resetGrowthTab(at); // GROWTH1: the Growth rail on its landing's page (else the Level), the guide fresh, no face up
+  resetHoldingsPages(); resetFleetPage(); resetCollectionsPage();   // ...and an act's word, an open name field, an armed press never outlive the visit
+  resetGrowthTab(at);   // GROWTH1: the Growth rail on its landing's page (else the Level), the guide fresh, no face up
   statsAllSkills = false;
   sysSec = 'save';
   category = CATEGORIES[0].id;
   pickedKey = null;
   sheetOpen = false;
   confirming = null;
-  optQuery = ''; // FT18: a fresh visit searches nothing (ORG2: over every tab)
+  optQuery = '';   // FT18: a fresh visit searches nothing (ORG2: over every tab)
   optFilter = 'all';
   pickedFeature = null;
-  discardControlsStaging(); // FIX-F: a second visit never inherits the first one's staged binds
-  seasonOpen = false; // SEASON-BOOK: and the season window's (a visit's, as the timers' and the mailbox's above)
+  discardControlsStaging();   // FIX-F: a second visit never inherits the first one's staged binds
+  seasonOpen = false;   // SEASON-BOOK: and the season window's (a visit's, as the timers' and the mailbox's above)
   seasonFocusBack = false;
   // PROF2: a landing on a professions page - the Stats tab at it (a home forge's press opens the Stores' forge); the
   // draw falls back to the character's own page when the professions are not the account's
   // HOLDINGS: the Professions page is the Stats rail's, the Stores page the Holdings rail's
-  if (PROF_STATS_SECTIONS.some(([id]) => id === at)) {
-    pauseTab = 'stats';
-    statsSec = at;
-  } else if (PROF_HOLD_SECTIONS.some(([id]) => id === at)) {
-    pauseTab = 'holdings';
-    holdSec = at;
-  } else if (FAMILY_PAGE_SECTIONS.some(([id]) => id === at)) {
-    pauseTab = 'family';
-    famSec = at;
-  } // LEGACY3: a Family page by name
-  else if (growthPageAt(at))
-    pauseTab = 'growth'; // GROWTH1: a Growth page by name (its rail set by resetGrowthTab, above)
-  else if (at === 'mailbox')
-    postOpen = true; // SERVER-POST: the mailbox's door (/mail, either skin) - the pause face with its window open
-  else if (at === 'report') {
-    postOpen = true;
-    postKeep = { view: 'report' };
-  } // PRIVATE-REPORT: `/bug` - the mailbox's window on its report form
-  else if (at === 'season') {
-    seasonOpen = true;
-    seasonFocusIn = true;
-  } // SEASON-BOOK: `/season` - the pause face with the season window open
-  else if (at === 'collections' || COLLECTION_PARTS.some(([id]) => id === at)) {
-    pauseTab = 'holdings';
-    holdSec = 'collections';
-    if (at !== 'collections') setCollectionsPart(at);
-  } // AUDIT CARDS-5 D14: the Collections page by name, or one of its parts - AUDIT COLLECTIONS-II (lanes 2, 5): every part, the wardrobe's four too
-  else if (at === 'companions') {
-    pauseTab = 'holdings';
-    holdSec = 'companions';
-  } // RVN-STARS: back from a sworn one's stars
+  if (PROF_STATS_SECTIONS.some(([id]) => id === at)) { pauseTab = 'stats'; statsSec = at; }
+  else if (PROF_HOLD_SECTIONS.some(([id]) => id === at)) { pauseTab = 'holdings'; holdSec = at; }
+  else if (FAMILY_PAGE_SECTIONS.some(([id]) => id === at)) { pauseTab = 'family'; famSec = at; }   // LEGACY3: a Family page by name
+  else if (growthPageAt(at)) pauseTab = 'growth';   // GROWTH1: a Growth page by name (its rail set by resetGrowthTab, above)
+  else if (at === 'mailbox') postOpen = true;   // SERVER-POST: the mailbox's door (/mail, either skin) - the pause face with its window open
+  else if (at === 'report') { postOpen = true; postKeep = { view: 'report' }; }   // PRIVATE-REPORT: `/bug` - the mailbox's window on its report form
+  else if (at === 'season') { seasonOpen = true; seasonFocusIn = true; }   // SEASON-BOOK: `/season` - the pause face with the season window open
+  else if (at === 'collections' || COLLECTION_PARTS.some(([id]) => id === at)) { pauseTab = 'holdings'; holdSec = 'collections'; if (at !== 'collections') setCollectionsPart(at); }   // AUDIT CARDS-5 D14: the Collections page by name, or one of its parts - AUDIT COLLECTIONS-II (lanes 2, 5): every part, the wardrobe's four too
+  else if (at === 'companions') { pauseTab = 'holdings'; holdSec = 'companions'; }   // RVN-STARS: back from a sworn one's stars
   _eff = null;
   render();
   keyHandler = onKey;
-  backArmed = null; // AUDIT DISC28 UI-2: a press is a visit's - the last screen's never answers on this one
+  backArmed = null;   // AUDIT DISC28 UI-2: a press is a visit's - the last screen's never answers on this one
   globalThis.addEventListener('keydown', keyHandler, { capture: true });
-  globalThis.addEventListener('keyup', keyHandler, { capture: true }); // AUDIT DISC28 UI-2: the release, where the pause face answers
+  globalThis.addEventListener('keyup', keyHandler, { capture: true });   // AUDIT DISC28 UI-2: the release, where the pause face answers
   // PX1: the pixel ground is drawn for the viewport it mounted on; a
   // rotate or a resize while the home is up redraws it, or the sky
   // stretches - the prototype's own phone-shot lesson.
-  resizeHandler = () => {
-    if (mode === 'boot' && section === 'home') render();
-  };
+  resizeHandler = () => { if (mode === 'boot' && section === 'home') render(); };
   globalThis.addEventListener('resize', resizeHandler);
   lockHandler = releaseLock;
   releaseLock();
   if (typeof document !== 'undefined') document.addEventListener('pointerlockchange', lockHandler);
   // The probe surface, the same shape settingsProbe.mjs drives: a real
   // browser check should read the SAME layout a finger taps.
-  globalThis.__menu = () =>
-    JSON.stringify({
-      mode,
-      section,
-      category,
-      pickedKey,
-      sections: sections.map(idOf),
-      rows: [...host.querySelectorAll('.row')].length,
-    });
+  globalThis.__menu = () => JSON.stringify({
+    mode, section, category, pickedKey,
+    sections: sections.map(idOf),
+    rows: [...host.querySelectorAll('.row')].length,
+  });
   return {
     /** GROWTH5: a door about to put this window away (the sheet's key, the QuickDial's) asks first: whether a face on the
      *  Growth stage held the press (its unaccepted stars said once - the second press goes). */
@@ -9365,40 +6359,27 @@ export function mountEnhancedMenu(
       // - which on the pause door means the game can never be paused
       // again.
       if (keyHandler) globalThis.removeEventListener('keydown', keyHandler, { capture: true });
-      if (keyHandler) globalThis.removeEventListener('keyup', keyHandler, { capture: true }); // AUDIT DISC28 UI-2
-      if (lockHandler && typeof document !== 'undefined')
-        document.removeEventListener('pointerlockchange', lockHandler);
+      if (keyHandler) globalThis.removeEventListener('keyup', keyHandler, { capture: true });   // AUDIT DISC28 UI-2
+      if (lockHandler && typeof document !== 'undefined') document.removeEventListener('pointerlockchange', lockHandler);
       if (resizeHandler) globalThis.removeEventListener('resize', resizeHandler);
-      if (groundTimer) {
-        clearInterval(groundTimer);
-        groundTimer = null;
-      }
-      if (textKeyCapture) {
-        globalThis.removeEventListener('keydown', textKeyCapture, true);
-        textKeyCapture = null;
-      } // DISC28-A
-      if (questTimer) {
-        clearInterval(questTimer);
-        questTimer = null;
-      }
-      stopTimers(); // TIMERS1
-      releaseShotsPane(); // LOAD1: the gallery's pictures and its listener
-      stopPost(); // SERVER-POST: and the mailbox's ticks
-      releaseTutorialsPane(); // TUT1: the next visit opens on the first page
-      stopSeason(); // SEASON-BOOK: and the season window's
-      releaseGrowthTab(); // GROWTH3: a face on the Growth stage goes with the window (full screen too)
-      askUp?.(); // AUDIT GROWTH LANE3-9: and a Yes/No card standing over it
+      if (groundTimer) { clearInterval(groundTimer); groundTimer = null; }
+      if (textKeyCapture) { globalThis.removeEventListener('keydown', textKeyCapture, true); textKeyCapture = null; }   // DISC28-A
+      if (questTimer) { clearInterval(questTimer); questTimer = null; }
+      stopTimers();   // TIMERS1
+      releaseShotsPane();   // LOAD1: the gallery's pictures and its listener
+      stopPost();   // SERVER-POST: and the mailbox's ticks
+      releaseTutorialsPane();   // TUT1: the next visit opens on the first page
+      stopSeason();   // SEASON-BOOK: and the season window's
+      releaseGrowthTab();   // GROWTH3: a face on the Growth stage goes with the window (full screen too)
+      askUp?.();   // AUDIT GROWTH LANE3-9: and a Yes/No card standing over it
       // FIX-F: and the rebind pane's own capture listener, which is on
       // the DOCUMENT and would outlive this screen exactly as the one
       // above would.
       discardControlsStaging();
       // MEM-AUDIT: and what still watched the last screen - the foot's observer (its reserve keeps the home's
       // whole tree, the sky's canvas with it) and the account card's paint and focus listener
-      footObs?.disconnect?.();
-      footObs = null;
-      acctPaint = null;
-      acctOff?.();
-      acctOff = null;
+      footObs?.disconnect?.(); footObs = null;
+      acctPaint = null; acctOff?.(); acctOff = null;
       keyHandler = null;
       lockHandler = null;
       resizeHandler = null;
