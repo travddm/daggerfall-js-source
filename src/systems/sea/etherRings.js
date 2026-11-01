@@ -47,7 +47,7 @@ export function etherRingAtPlace(loc) {
   const at = loc?.mapTableData;
   if (!loc?.ether || !Number.isFinite(at?.longitude) || !Number.isFinite(at?.latitude)) return 0;
   const px = Math.trunc(at.longitude / 128);
-  const py = 499 - Math.trunc(at.latitude / 128);   // formats/mapsFile.js longitudeLatitudeToMapPixel
+  const py = 499 - Math.trunc(at.latitude / 128); // formats/mapsFile.js longitudeLatitudeToMapPixel
   return etherWildRingAt(px, py);
 }
 
@@ -60,7 +60,9 @@ export function etherRisePort(x, y) {
   const far = Math.hypot(h.px - x, h.py - y);
   if (!Number.isFinite(far)) return h;
   for (let r = ETHER_RISE_PX; ; r *= 2) {
-    const port = islesNear(x, y, Math.min(r, far + 1)).find((i) => i.kind === 'port' && Math.hypot(i.px - x, i.py - y) <= r);
+    const port = islesNear(x, y, Math.min(r, far + 1)).find(
+      (i) => i.kind === 'port' && Math.hypot(i.px - x, i.py - y) <= r,
+    );
     if (port) return port;
     if (r > far) return h;
   }
@@ -74,18 +76,32 @@ const BAND_NAMES = Object.freeze({
   abyss: () => t('sea.wild.band.abyss', 'The Abyss'),
 });
 /** A ring's name on the sea: its band's ("The Shallows" ... "The Abyss"). */
-export const etherRingName = (ring) => BAND_NAMES[BANDS[Math.max(1, Math.min(ETHER_RINGS, ring | 0 || ETHER_RINGS)) - 1].id]();
+export const etherRingName = (ring) =>
+  BAND_NAMES[BANDS[Math.max(1, Math.min(ETHER_RINGS, ring | 0 || ETHER_RINGS)) - 1].id]();
 
 /** The compass's sixteen points through the text core (world/ethericSea.js compassPoint's words: the sea's rumours, its
  *  storm's and its fleet's lines, the chart's ways), each its own key whole for the extractor. */
 const WAY_WORDS = Object.freeze({
-  north: () => t('sea.way.n', 'north'), 'north-north-east': () => t('sea.way.nne', 'north-north-east'), 'north-east': () => t('sea.way.ne', 'north-east'), 'east-north-east': () => t('sea.way.ene', 'east-north-east'),
-  east: () => t('sea.way.e', 'east'), 'east-south-east': () => t('sea.way.ese', 'east-south-east'), 'south-east': () => t('sea.way.se', 'south-east'), 'south-south-east': () => t('sea.way.sse', 'south-south-east'),
-  south: () => t('sea.way.s', 'south'), 'south-south-west': () => t('sea.way.ssw', 'south-south-west'), 'south-west': () => t('sea.way.sw', 'south-west'), 'west-south-west': () => t('sea.way.wsw', 'west-south-west'),
-  west: () => t('sea.way.w', 'west'), 'west-north-west': () => t('sea.way.wnw', 'west-north-west'), 'north-west': () => t('sea.way.nw', 'north-west'), 'north-north-west': () => t('sea.way.nnw', 'north-north-west'),
+  north: () => t('sea.way.n', 'north'),
+  'north-north-east': () => t('sea.way.nne', 'north-north-east'),
+  'north-east': () => t('sea.way.ne', 'north-east'),
+  'east-north-east': () => t('sea.way.ene', 'east-north-east'),
+  east: () => t('sea.way.e', 'east'),
+  'east-south-east': () => t('sea.way.ese', 'east-south-east'),
+  'south-east': () => t('sea.way.se', 'south-east'),
+  'south-south-east': () => t('sea.way.sse', 'south-south-east'),
+  south: () => t('sea.way.s', 'south'),
+  'south-south-west': () => t('sea.way.ssw', 'south-south-west'),
+  'south-west': () => t('sea.way.sw', 'south-west'),
+  'west-south-west': () => t('sea.way.wsw', 'west-south-west'),
+  west: () => t('sea.way.w', 'west'),
+  'west-north-west': () => t('sea.way.wnw', 'west-north-west'),
+  'north-west': () => t('sea.way.nw', 'north-west'),
+  'north-north-west': () => t('sea.way.nnw', 'north-north-west'),
 });
 /** A compass point's word in the language of the moment (compassPoint's, or '' for none). */
-export const etherWayWord = (/** @type {string | null | undefined} */ point) => (point ? WAY_WORDS[/** @type {keyof typeof WAY_WORDS} */ (point)]?.() ?? point : '');
+export const etherWayWord = (/** @type {string | null | undefined} */ point) =>
+  point ? (WAY_WORDS[/** @type {keyof typeof WAY_WORDS} */ (point)]?.() ?? point) : '';
 
 // ── THE SEA GROUND FLAG ──────────────────────────────────────────────────────────────────────────────────────────────
 // Which ground the player stands on, for the laws that differ at sea (SEA-SET Undertow). It used to ride the open zone's

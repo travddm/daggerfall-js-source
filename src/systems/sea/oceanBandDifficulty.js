@@ -51,6 +51,7 @@ export function oceanBandDifficulty({ ring, vault = false }) {
  */
 export function scaleGoldPieces(items, factor) {
   if (!Array.isArray(items) || !(factor > 1)) return items;
-  for (const it of items) if (isGoldPieces(it)) it.stackCount = Math.max(1, Math.round(Math.max(1, it.stackCount ?? 1) * factor));
+  for (const it of items)
+    if (isGoldPieces(it)) it.stackCount = Math.max(1, Math.round(Math.max(1, it.stackCount ?? 1) * factor));
   return items;
 }

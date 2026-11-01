@@ -23,7 +23,15 @@ function rig({ live = true, pixel = { x: 0, y: 0 }, clock = fleetClock() } = {})
   const credited = [];
   const done = new Set();
   const state = { live, pixel, clock, linkOpen: true };
-  const link = { get status() { return state.linkOpen ? 'open' : 'closed'; }, sendSea: (word) => { sent.push(word); return true; } };
+  const link = {
+    get status() {
+      return state.linkOpen ? 'open' : 'closed';
+    },
+    sendSea: (word) => {
+      sent.push(word);
+      return true;
+    },
+  };
   const ether = {
     credit: (n) => credited.push(n),
     mid: (text) => said.push(text),
@@ -45,11 +53,15 @@ function rig({ live = true, pixel = { x: 0, y: 0 }, clock = fleetClock() } = {})
   return { host, state, sent, said, credited };
 }
 
-test('SEA VENTURES vaults: the day\'s vaults stand while the sea stands, none when it does not; the vault at the player\'s pixel is the one found', () => {
+test("SEA VENTURES vaults: the day's vaults stand while the sea stands, none when it does not; the vault at the player's pixel is the one found", () => {
   const picks = seaVaultPicks(DAY);
   assert.ok(picks.length > 0, 'a day has vaults');
   const r = rig();
-  assert.deepEqual(r.host.vaultsNow().map((v) => v.key), picks.map((v) => v.key), 'the day\'s picks, by the shared clock\'s day');
+  assert.deepEqual(
+    r.host.vaultsNow().map((v) => v.key),
+    picks.map((v) => v.key),
+    "the day's picks, by the shared clock's day",
+  );
   r.state.pixel = { x: picks[0].x, y: picks[0].y };
   assert.equal(r.host.vaultHere()?.key, picks[0].key, 'standing at its ruin: that vault');
   r.state.pixel = { x: picks[0].x + 1, y: picks[0].y };
@@ -94,7 +106,7 @@ test('SEA VENTURES fleet: a sinking told while the socket is shut is told again 
   assert.deepEqual(r.sent, [{ k: 'fk', n: f.n }], 'told again once it can be');
 });
 
-test('SEA VENTURES hub word: `st` and `fd` carry the sunk sailings; `fd` is the fleet\'s word alone; other words are not', () => {
+test("SEA VENTURES hub word: `st` and `fd` carry the sunk sailings; `fd` is the fleet's word alone; other words are not", () => {
   const r = rig();
   const f = fleetAt(r.state.clock);
   assert.equal(r.host.chartWord().fleet.sunk, false);
@@ -104,6 +116,6 @@ test('SEA VENTURES hub word: `st` and `fd` carry the sunk sailings; `fd` is the 
   assert.equal(r.host.chartWord().fleet.sunk, false, 'a hello without her stands her again');
   assert.equal(r.host.hubWord({ k: 'fd', fleets: [f.n] }), true);
   assert.equal(r.host.chartWord().fleet.sunk, true);
-  assert.equal(r.host.hubWord({ k: 'zz' }), false, 'an unknown word is none of the fleet\'s');
+  assert.equal(r.host.hubWord({ k: 'zz' }), false, "an unknown word is none of the fleet's");
   assert.equal(r.host.hubWord(null), false);
 });

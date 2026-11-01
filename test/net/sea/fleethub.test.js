@@ -5,10 +5,24 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SOCIAL_ROOM, SEA_FLEET_PERIOD_MS, SEA_FLEET_OFFSET_MS, SEA_FLEET_SAIL_MS, SEA_FLEET_LATE_MS, SEA_FRAME_MAX,
-  parseClient, validSeaIn, validSeaOut,
+  SOCIAL_ROOM,
+  SEA_FLEET_PERIOD_MS,
+  SEA_FLEET_OFFSET_MS,
+  SEA_FLEET_SAIL_MS,
+  SEA_FLEET_LATE_MS,
+  SEA_FRAME_MAX,
+  parseClient,
+  validSeaIn,
+  validSeaOut,
 } from '../../../src/net/wire.js';
-import { SEA_HUB_KEY, fleetHubEmpty, fleetHubOf, fleetHubPrune, fleetSunk, fleetsDown } from '../../../src/net/sea/fleetHub.js';
+import {
+  SEA_HUB_KEY,
+  fleetHubEmpty,
+  fleetHubOf,
+  fleetHubPrune,
+  fleetSunk,
+  fleetsDown,
+} from '../../../src/net/sea/fleetHub.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
 
 const SAILING = 400;
@@ -18,7 +32,11 @@ test('SEA fleet hub law: a flagship is sunk only while her sailing is under way,
   const record = fleetHubEmpty();
   const start = SAILING * SEA_FLEET_PERIOD_MS + SEA_FLEET_OFFSET_MS;
   assert.equal(fleetSunk(record, SAILING, start - 1), false, 'in port, before she sails');
-  assert.equal(fleetSunk(record, SAILING, start + SEA_FLEET_SAIL_MS + SEA_FLEET_LATE_MS + 1), false, 'long after she is home');
+  assert.equal(
+    fleetSunk(record, SAILING, start + SEA_FLEET_SAIL_MS + SEA_FLEET_LATE_MS + 1),
+    false,
+    'long after she is home',
+  );
   assert.equal(fleetSunk(record, 'x', start + 5), false, 'a sailing is a number');
   assert.deepEqual(fleetsDown(record, start + 5), [], 'nothing moved');
   assert.equal(fleetSunk(record, SAILING, start + 5), true, 'under way: news');
@@ -44,7 +62,11 @@ test('SEA wire: the words in and out are bounded, and the frame parses only afte
   assert.equal(validSeaIn({ k: 'fk', n: -1 }), null);
   assert.equal(validSeaIn({ k: 'fk', n: 1.5 }), null);
   assert.equal(validSeaIn({ k: 'gk', g: 1 }), null, 'the giants are gone with the zone');
-  assert.deepEqual(validSeaOut({ t: 'sea', k: 'st', fleets: [3, 4, 'x', -1], now: 99 }), { k: 'st', fleets: [3, 4], now: 99 });
+  assert.deepEqual(validSeaOut({ t: 'sea', k: 'st', fleets: [3, 4, 'x', -1], now: 99 }), {
+    k: 'st',
+    fleets: [3, 4],
+    now: 99,
+  });
   assert.deepEqual(validSeaOut({ t: 'sea', k: 'st', fleets: [], now: 'later' }), { k: 'st', fleets: [], now: null });
   assert.deepEqual(validSeaOut({ t: 'sea', k: 'fd', fleets: [5] }), { k: 'fd', fleets: [5] });
   assert.equal(validSeaOut({ t: 'sea', k: 'cr' }), null);
@@ -52,9 +74,20 @@ test('SEA wire: the words in and out are bounded, and the frame parses only afte
   assert.deepEqual(parseClient(JSON.stringify({ t: 'sea', k: 'hi' }), { hasHello: true }), { t: 'sea', k: 'hi' });
   assert.equal(parseClient(JSON.stringify({ t: 'sea', k: 'hi' })).error, 'sea before hello');
   assert.equal(parseClient(JSON.stringify({ t: 'sea', k: 'fk', n: 'x' }), { hasHello: true }).error, 'bad sea');
-  assert.equal(parseClient(JSON.stringify({ t: 'sea', k: 'hi', pad: 'x'.repeat(SEA_FRAME_MAX) }), { hasHello: true }).error, 'frame too large');
-  assert.equal(parseClient(JSON.stringify({ t: 'wdun', k: 'hi' }), { hasHello: true }).error !== undefined, true, 'the hall frame no longer parses');
-  assert.equal(parseClient(JSON.stringify({ t: 'wild', data: { k: 'zone', z: 1 } }), { hasHello: true }).error !== undefined, true, 'nor the zone frame');
+  assert.equal(
+    parseClient(JSON.stringify({ t: 'sea', k: 'hi', pad: 'x'.repeat(SEA_FRAME_MAX) }), { hasHello: true }).error,
+    'frame too large',
+  );
+  assert.equal(
+    parseClient(JSON.stringify({ t: 'wdun', k: 'hi' }), { hasHello: true }).error !== undefined,
+    true,
+    'the hall frame no longer parses',
+  );
+  assert.equal(
+    parseClient(JSON.stringify({ t: 'wild', data: { k: 'zone', z: 1 } }), { hasHello: true }).error !== undefined,
+    true,
+    'nor the zone frame',
+  );
 });
 
 /** Run `fn` with the clock at `at`, so the room's `Date.now()` is the sailing's moment. */
@@ -62,7 +95,15 @@ async function atClock(at, fn) {
   const realNow = Date.now;
   let clock = at;
   Date.now = () => clock;
-  try { await fn({ tick: (ms) => { clock += ms; } }); } finally { Date.now = realNow; }
+  try {
+    await fn({
+      tick: (ms) => {
+        clock += ms;
+      },
+    });
+  } finally {
+    Date.now = realNow;
+  }
 }
 const seaWords = (ws, k) => ws.sent.filter((m) => m.t === 'sea' && (k == null || m.k === k));
 
@@ -71,7 +112,13 @@ test('SEA relay: a flagship sunk under way is kept once, written once and told t
     const hub = fakeRoom(SOCIAL_ROOM);
     const join = async (n, who = {}) => {
       const ws = hub.connect();
-      await hub.hello(ws, `peer-${n}`, null, { name: n, acct: `acct-${n}`, asecret: `secret-of-acct-${n}`, kind: 'linked', ...who });
+      await hub.hello(ws, `peer-${n}`, null, {
+        name: n,
+        acct: `acct-${n}`,
+        asecret: `secret-of-acct-${n}`,
+        kind: 'linked',
+        ...who,
+      });
       tick(10);
       return ws;
     };
@@ -79,13 +126,25 @@ test('SEA relay: a flagship sunk under way is kept once, written once and told t
     const alice = await join('alice');
     const bob = await join('bob');
     await say(alice, { k: 'hi' });
-    assert.deepEqual(seaWords(alice, 'st').map((m) => m.fleets), [[]], 'nothing down yet');
-    assert.equal(seaWords(alice, 'st')[0].now, Date.now(), 'the answer carries the relay\'s clock');
+    assert.deepEqual(
+      seaWords(alice, 'st').map((m) => m.fleets),
+      [[]],
+      'nothing down yet',
+    );
+    assert.equal(seaWords(alice, 'st')[0].now, Date.now(), "the answer carries the relay's clock");
     assert.equal(hub.store.has(SEA_HUB_KEY), false, 'a question writes nothing');
 
     await say(alice, { k: 'fk', n: SAILING });
-    assert.deepEqual(seaWords(alice, 'fd').map((m) => m.fleets), [[SAILING]], 'the sinker hears it');
-    assert.deepEqual(seaWords(bob, 'fd').map((m) => m.fleets), [[SAILING]], 'so does everyone online');
+    assert.deepEqual(
+      seaWords(alice, 'fd').map((m) => m.fleets),
+      [[SAILING]],
+      'the sinker hears it',
+    );
+    assert.deepEqual(
+      seaWords(bob, 'fd').map((m) => m.fleets),
+      [[SAILING]],
+      'so does everyone online',
+    );
     assert.deepEqual(hub.store.get(SEA_HUB_KEY).fleets[SAILING] > Date.now(), true, 'kept, with the time it is let go');
 
     tick(2000);
@@ -96,7 +155,11 @@ test('SEA relay: a flagship sunk under way is kept once, written once and told t
 
     const carol = await join('carol');
     await say(carol, { k: 'hi' });
-    assert.deepEqual(seaWords(carol, 'st').map((m) => m.fleets), [[SAILING]], 'a newcomer asks and is told');
+    assert.deepEqual(
+      seaWords(carol, 'st').map((m) => m.fleets),
+      [[SAILING]],
+      'a newcomer asks and is told',
+    );
 
     tick(2000);
     await say(alice, { k: 'fk', n: SAILING + 1 });

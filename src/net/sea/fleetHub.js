@@ -21,7 +21,8 @@ export function fleetHubOf(/** @type {unknown} */ stored) {
   const fleets = stored && typeof stored === 'object' ? /** @type {any} */ (stored).fleets : null;
   if (!fleets || typeof fleets !== 'object' || Array.isArray(fleets)) return out;
   for (const [sailing, until] of Object.entries(fleets)) {
-    if (Number.isSafeInteger(Number(sailing)) && Number.isFinite(until)) out.fleets[sailing] = /** @type {number} */ (until);
+    if (Number.isSafeInteger(Number(sailing)) && Number.isFinite(until))
+      out.fleets[sailing] = /** @type {number} */ (until);
   }
   return out;
 }
@@ -43,7 +44,11 @@ export function fleetHubPrune(/** @type {{ fleets: Record<string, number> }} */ 
  * The sailing stays down until the one after it is over. A second report moves nothing.
  * Returns whether it was news.
  */
-export function fleetSunk(/** @type {{ fleets: Record<string, number> }} */ record, /** @type {unknown} */ n, /** @type {number} */ now) {
+export function fleetSunk(
+  /** @type {{ fleets: Record<string, number> }} */ record,
+  /** @type {unknown} */ n,
+  /** @type {number} */ now,
+) {
   if (!Number.isSafeInteger(n)) return false;
   const sailing = /** @type {number} */ (n);
   const start = sailing * SEA_FLEET_PERIOD_MS + SEA_FLEET_OFFSET_MS;

@@ -14,10 +14,18 @@ const sword = () => createWeapon(120, 3, () => 0.5);
 test('the window asks the host only when the destination is storage - the wagon, or a list marked `storage` - and says nothing without a host word', () => {
   const no = () => 'the host says no';
   assert.equal(storeRefusalOf({ storeRefusal: no }, { usingWagon: true }), 'the host says no', 'the wagon');
-  assert.equal(storeRefusalOf({ storeRefusal: no, loot: { storage: true, playerOwned: true } }, {}), 'the host says no', 'a companion\'s pack, a hold, a chest');
+  assert.equal(
+    storeRefusalOf({ storeRefusal: no, loot: { storage: true, playerOwned: true } }, {}),
+    'the host says no',
+    "a companion's pack, a hold, a chest",
+  );
   assert.equal(storeRefusalOf({ storeRefusal: no }, {}), null, 'the ground');
   assert.equal(storeRefusalOf({ storeRefusal: no, loot: { playerOwned: false } }, {}), null, 'a corpse, a pile');
-  assert.equal(storeRefusalOf({ storeRefusal: no, loot: { storage: true } }, { chooseOne: true }), null, 'a choose-one list');
+  assert.equal(
+    storeRefusalOf({ storeRefusal: no, loot: { storage: true } }, { chooseOne: true }),
+    null,
+    'a choose-one list',
+  );
   assert.equal(storeRefusalOf({}, { usingWagon: true }), null, 'no host word: stored');
   assert.equal(storeRefusalOf({ loot: { storage: true } }, {}), null, 'no host word: stored in a chest');
   assert.equal(storeRefusalOf({ storeRefusal: () => null }, { usingWagon: true }), null, 'a host that does not refuse');
