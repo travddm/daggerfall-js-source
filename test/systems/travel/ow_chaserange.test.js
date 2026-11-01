@@ -114,13 +114,11 @@ function regionLink(relayV) {
   return { s, out: () => ws.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'trav') };
 }
 
-test('OW-CHASE-RANGE the session: the words go beside the mark to any relay (an older one reads the mark and drops them - nothing refused); a word the door would refuse goes unsaid, never the mark with it (AUDIT OW-REVISITED L4-9: one bad entry froze the region mark every frame) (mutants: a word inside the mark; a bad word sent; the mark refused for it)', () => {
+test('OW-CHASE-RANGE the session: the words go beside the mark; a word the door would refuse goes unsaid, never the mark with it (AUDIT OW-REVISITED L4-9: one bad entry froze the region mark every frame) (mutants: a word inside the mark; a bad word sent; the mark refused for it)', () => {
   const link = regionLink(RELAY_VERSION);
   assert.equal(link.s.sendTraveller({ ...MARK, bd: BD, sr: SR }), true);
   const sent = link.out().at(-1);
   assert.deepEqual([sent.p, sent.bd, sent.sr], [MARK, BD, SR], 'beside the mark, never in it');
-  const old = regionLink('world223');
-  assert.equal(old.s.sendTraveller({ ...MARK, bd: BD }), true, 'an older relay: the same frame (its door reads the mark alone)');
   const twice = regionLink(RELAY_VERSION);
   assert.equal(twice.s.sendTraveller({ ...MARK, bd: [['b1.2.3', 0, 0, 2], ['b1.2.3', 0, 0, 2]], sr: SR }), true, 'the mark still goes');
   const t2 = twice.out().at(-1);

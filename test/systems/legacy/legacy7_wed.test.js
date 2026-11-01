@@ -13,7 +13,7 @@ import { ROUTES } from '../../../server-account/src/service.js';
 import { WED_HALF_LIFE_S, wedCardOf } from '../../../server-account/src/legacy.js';
 import { REFUSALS } from '../../../src/net/accountClient.js';
 import {
-  parseClient, validWedData, relaySupportsWed, RELAY_VERSION, WED_RELAY_MIN, WED_KINDS, WED_WHY, WED_FRAME_MAX, WED_HZ_MAX,
+  parseClient, validWedData, RELAY_VERSION, WED_KINDS, WED_WHY, WED_FRAME_MAX, WED_HZ_MAX,
   WED_IN_HZ_MAX,
 } from '../../../src/net/wire.js';
 import { OnlineSession } from '../../../src/net/online.js';
@@ -182,7 +182,7 @@ test('LEGACY7 part three the union\'s end: a death ends it (died, by whose); a r
 // ─── THE WIRE AND THE RELAY ─────────────────────────────────────────────────────────────────────────────────────
 
 const S = 'wedAbc1234';
-test('LEGACY7 part three the wire: a wed frame carries a peer, a kind and the handshake - a reason on a `no` alone, of the list; parsed only after a hello, inside its bound; the relay that first routes it is this one', () => {
+test('LEGACY7 part three the wire: a wed frame carries a peer, a kind and the handshake - a reason on a `no` alone, of the list; parsed only after a hello, inside its bound', () => {
   assert.deepEqual(WED_KINDS, ['ask', 'yes', 'no', 'done']);
   for (const k of WED_KINDS) assert.deepEqual(validWedData({ to: 'peer-0002', k, s: S, extra: 1 }), { to: 'peer-0002', k, s: S });
   for (const why of WED_WHY) assert.deepEqual(validWedData({ to: 'peer-0002', k: 'no', s: S, why }), { to: 'peer-0002', k: 'no', s: S, why });
@@ -191,11 +191,6 @@ test('LEGACY7 part three the wire: a wed frame carries a peer, a kind and the ha
   }
   assert.equal(validWedData(null), null);
   assert.equal(validWedData([]), null);
-  assert.equal(WED_RELAY_MIN, 174, 'the LEGACY7 relay is the first that routes it');
-  assert.ok(Number(/^world(\d+)$/.exec(RELAY_VERSION)[1]) >= WED_RELAY_MIN, 'and this relay routes it');
-  assert.equal(relaySupportsWed(RELAY_VERSION), true);
-  assert.equal(relaySupportsWed(`world${WED_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsWed(null), false);
   const frame = (data) => JSON.stringify({ t: 'wed', data });
   assert.deepEqual(parseClient(frame({ to: 'peer-0002', k: 'ask', s: S }), { hasHello: true }), { t: 'wed', data: { to: 'peer-0002', k: 'ask', s: S } });
   assert.equal(parseClient(frame({ to: 'peer-0002', k: 'ask', s: S }), { hasHello: false }).error, 'wed before hello');
@@ -247,11 +242,7 @@ test('LEGACY7 part three the session: a wed frame goes only to a relay that rout
     quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: relayV }));
     return { s, ws, got, out: () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'wed'), tick: (ms) => { t += ms; } };
   };
-  const old = rig('world173');   // the relay before LEGACY7's (world174): main's SERPENT3 - WATCH-FIX and SERPENT3 took world172 and world173 first
-  assert.equal(old.s.wedOk, false);
-  assert.equal(old.s.sendWed({ to: 'peer-0002', s: S, k: 'ask' }), false, 'never at a relay that would close the socket for it');
   const { s, ws, got, out, tick } = rig(RELAY_VERSION);
-  assert.equal(s.wedOk, true);
   assert.equal(s.sendWed({ to: 'peer-0002', s: S, k: 'ask', extra: 1 }), true);
   assert.deepEqual(out().at(-1), { t: 'wed', data: { to: 'peer-0002', k: 'ask', s: S } });
   assert.equal(s.sendWed({ to: 'aaaa-0001', s: S, k: 'ask' }), false, 'never at myself');
@@ -598,7 +589,7 @@ test('FIELD BUGS 2026-10-08 THE WEDDING GATE LETS A CHARACTER WHO MAY WED WED (S
   let b = a;
   while (!/;$/.test(lines[b])) b++;
   const make = new Function('playerEntity', 'modes', 'online', 'legacyHost', `${lines.slice(a, b + 1).join('\n')}\nreturn wedCan;`);
-  const open = { status: 'open', wedOk: true };
+  const open = { status: 'open' };
   const alive = { health: 10 };
   const host = (why) => ({ wedRefusal: () => why });
   assert.equal(make(alive, null, open, host(null))(), null, 'may wed: the button lit, the ask and the answer sent');
@@ -606,6 +597,5 @@ test('FIELD BUGS 2026-10-08 THE WEDDING GATE LETS A CHARACTER WHO MAY WED WED (S
   assert.equal(make(alive, null, open, null)(), 'house', 'no house host');
   assert.equal(make({ health: 0 }, null, open, host(null))(), 'busy', 'lying dead');
   assert.equal(make(alive, { deathUp: () => true }, open, host(null))(), 'busy', 'under a death');
-  assert.equal(make(alive, null, { status: 'open', wedOk: false }, host(null))(), 'busy', 'a relay that cannot carry it');
-  assert.equal(make(alive, null, { status: 'closed', wedOk: true }, host(null))(), 'busy', 'offline');
+  assert.equal(make(alive, null, { status: 'closed' }, host(null))(), 'busy', 'offline');
 });

@@ -153,7 +153,7 @@ test('ARENA4b my cheer from the stands over the real relay: sent through the wat
   await R.hello(s2, 'seat-tam', { x: C[0] + 2, y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Tam' });
   await wordTo(R, s2, { k: 'in', r: 's' });
   const out = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { out.push(wordTo(R, s, w)); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { out.push(wordTo(R, s, w)); return true; } };
   const huds = [], cues = [];
   const D = createArenaBouts({ now, playerEntity: { name: 'Sola', health: 50, maxHealth: 50 }, drawHud: (m, o2) => huds.push([m, o2]), sound: { cue: (l) => cues.push(...l), bed: () => {}, stop: () => {} } });
   D.setStage(stageOf());
@@ -264,7 +264,7 @@ test('ARENA4b the realm\'s banners on a relay\'s sand: mine the account\'s banne
   D.frame(0.016, {});
   assert.deepEqual([huds.at(-1).left[0].team, huds.at(-1).right[0].team], ['red', ''], 'a watched bout\'s banners - not my own');
   // the arena online hands the realm while live, and nothing offline
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let handed = null;
   const bouts = { ask: (p) => { bouts.asked = p; }, setRealm: (fn) => { handed = fn; }, dismiss() {}, holds: () => false };
   const board = { season: 3, me: { banner: 'red', ladder: arenaLadderOf([]) }, team: { laurel: 'blue', standings: { red: 1, blue: 2 } } };
@@ -274,13 +274,11 @@ test('ARENA4b the realm\'s banners on a relay\'s sand: mine the account\'s banne
   A.model();
   await new Promise((r) => setTimeout(r, 0));
   assert.deepEqual(handed(), { banner: 'red', laurel: 'blue' });
-  // AUDIT PRE-MERGE 1003 O4: offline is a relay that opens no arena room, or a seat lost - a socket between rooms
+  // AUDIT PRE-MERGE 1003 O4: offline is a seat lost - a socket between rooms
   // ('closed' for a door's reconnect) is online all the same (this pinned the socket's status)
   session.status = 'closed';
   assert.deepEqual(handed(), { banner: 'red', laurel: 'blue' }, 'a door\'s reconnect is no logout');
-  session.arenaOk = false;
-  assert.equal(handed(), null, 'offline: the save\'s league is the law');
-  Object.assign(session, { arenaOk: true, superseded: true });
+  Object.assign(session, { arenaHeard: true, superseded: true });
   assert.equal(handed(), null, 'a seat lost: offline');
   Object.assign(session, { status: 'open', superseded: false });
   // a bout between players: my rival's bill handed to the driver, by its side

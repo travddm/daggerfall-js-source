@@ -9,7 +9,7 @@
 //                                        {t:'grant', k:'no', id, r}           a refusal: the gate's, while enforcing; `cell`
 //                                                                             to a pose not in the cell
 //                                        {t:'grant', k:'off', id}             the law is off: ask no more
-//                        welcome `gm`    the law's mode in a cell (GRANT_MODES), from world218 (GRANT_RELAY_MIN)
+//                        welcome `gm`    the law's mode in a cell (GRANT_MODES)
 //
 //   A GRANT (section 4.2) - the room's own number `g`, the owner's socket id `o`, the room it was minted for `q`, the
 //     owner's account `a` (its token's `s` - a guest's token has its own; '' for a socket with none), its kind `k`, the map
@@ -38,7 +38,7 @@
 // its bracket to Port-Ledger section A, row ONLINE (Spawn-Grants section 6).
 import { _b64url, SIG_BYTES, ID_RE, characterLevelIssuable, renownIssuable } from './identityToken.js';
 import { coversCell } from './cellTree.js';   // COST-2 (b): a grant stands in any cell the reader's socket covers
-import { roomOf, tokenGate, worldPixelOk, WORLD_WIDE_RELAY_MIN, relaySupportsWorldWide } from './wire.js';   // a room's name; the relay's one bucket
+import { roomOf, tokenGate, worldPixelOk } from './wire.js';   // a room's name; the relay's one bucket
 /** A signature's shape on the wire: 64 bytes, base64url. */
 const GRANT_SG_RE = /^[A-Za-z0-9_-]{86}$/;
 
@@ -292,37 +292,6 @@ export function grantRefusal(g, { from, cell, nowMs, i, cover = cell }) {
 export const grantMarksAllow = (g, i, { z, cp }) => GRANT_MARKLESS.includes(g.k) || ((!z || ((g.e >>> i) & 1) === 1) && (cp == null || cp === g.c[i]));
 
 // ── GRANT2: THE ASK, THE ANSWER, THE MODE (Spawn-Grants section 12) ─────────────────────────────────────────────────
-/** The first relay that takes the `grant` frame (RELAY_VERSION's number). An older relay refuses a frame it does not
- *  know by closing the socket, so a client asks only of a relay at this or later (relayCfgSupported's way). */
-export const GRANT_RELAY_MIN = 218;
-/** Does the relay at version `v` take a grant's ask? */
-export const relaySupportsGrant = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= GRANT_RELAY_MIN;
-/** FOE-BOUNDS (Spawn-Grants section 19): the first relay that takes a tally's `stats` - an older one refuses the whole tally
- *  for a word it does not know, so a reader hands that row only to a relay at this or later. */
-export const GRANT_STATS_RELAY_MIN = 223;
-/** Does the relay at version `v` take a tally's `stats`? */
-export const relaySupportsGrantStats = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= GRANT_STATS_RELAY_MIN;
-/** AUDIT STAR-TUNE F1: the first relay that mints the `star` kind (STAR-TUNE's). An older one answers the ask `kind`, so
- *  under `enforce` no wave stands and under `grantStrip` the coven is its owner's alone - and the site goes live before
- *  the relay's deploy is through (deploy.yml waits on the account service, which STAR-TUNE does not move). A client asks
- *  `star` of a relay at this or later, and its stand's own kind (`site`, the master `kept` - main's) of an older one,
- *  whose waves its own law holds to nine. */
-export const STAR_GRANT_RELAY_MIN = 238;
-/** Does the relay at version `v` mint the `star` kind? */
-export const relaySupportsStarGrant = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= STAR_GRANT_RELAY_MIN;
-/** AUDIT TESA II Z6: THE FIRST RELAY THAT READS A GRANT'S PIXEL PAST THE BAY - AUDIT TESA-BIOME F2's `validGrant` on the
- *  world's pixel, which shipped in the world-wide relay (net/wire.js WORLD_WIDE_RELAY_MIN, one number for all its gates).
- *  An older relay MINTS a grant on any pose's pixel (its mapPixelOfWire has no bound) but reads it back nowhere: a renewal,
- *  a carry or a handover naming it is junk there - a strike, and no answer - so the grant lapsed unrenewed and the strikes
- *  ran to the socket's close. A client on such a relay takes no grant off the Bay's map (grantPixelReadBack), as before F2:
- *  its stand stands ungranted there. */
-export const GRANT_WORLD_RELAY_MIN = WORLD_WIDE_RELAY_MIN;
-/** Does the relay at version `v` read a grant's pixel past the Bay? */
-export const relaySupportsGrantWorld = relaySupportsWorldWide;
-/** AUDIT TESA II Z6: does a relay read grant `g`'s pixel back - any pixel of the world where it reads the world (`world`,
- *  relaySupportsGrantWorld's word), else the Bay's own map alone. Pure. @param {any} g @param {boolean} world */
-export const grantPixelReadBack = (g, world) => world || (intIn(g?.p?.[0], 0, 999) && intIn(g?.p?.[1], 0, 499));
-
 /** The law's modes (relayCfg `grantMode`, the welcome's `gm`): `off` - no ask is made or answered; `measure` - every ask
  *  is granted and what the gate would refuse is counted (GRANT2 to GRANT5); `enforce` - the gate refuses (GRANT6). */
 export const GRANT_MODES = Object.freeze(['off', 'measure', 'enforce']);

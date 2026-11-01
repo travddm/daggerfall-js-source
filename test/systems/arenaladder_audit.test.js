@@ -565,7 +565,7 @@ test('AUDIT ARENA-LADDER O4: THE LAUREL TAKES TEN RATED BOUTS AGAINST FIVE ACCOU
  *  accountClient's shapes), `enterFloor` as `entering` does; the calls kept in `order`. */
 function onlineClient({ attemptAnswer, entering = () => true, guest = false } = {}) {
   const order = [], said = [], boutSent = [], entered = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const board = { me: { ladder: arenaLadderOf([]) } };
   const A = createArenaOnline({
     now: () => 0, session: () => session, say: (l) => said.push(l), guest: () => guest, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }),

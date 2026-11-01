@@ -10,7 +10,7 @@
 //   the looks        world/gate/gateBoss.js LAND_SHAKE (SCREEN-12); ui/gate/gateGroundView.js the Gaze's white (SCREEN-14)
 //   the words        the profile's names and the card's rows read live (TEXT-8), the phase card's (TEXT-9), the bar before
 //                    a wave (TEXT-15)
-//   the door         net/wire.js relaySupportsPortents, net/online.js portentsOk, scenes/world.js gateRefusal, and the relay
+//   the door         scenes/world.js gateRefusal, and the relay
 //                    letting go a fight from before the portents (WIRE-1 / SCREEN-8)
 //
 // Design:.
@@ -22,7 +22,7 @@ import {
   BASE_PROFILE, PLAN_PLAIN, nightPlan,
 } from '../../../src/net/gate/gateBrain.js';
 import { wheelStrikes, wheelSlack, inAttack } from '../../../src/net/gate/gateStrike.js';
-import { validGateOut, RELAY_VERSION, GATE_PORTENTS_RELAY_MIN, relaySupportsPortents } from '../../../src/net/wire.js';
+import { validGateOut } from '../../../src/net/wire.js';
 import { foldGate, GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { createGateCourt, perilAt, courtPhaseCard, WHEEL_PERIL_MS } from '../../../src/scenes/gate/gateCourt.js';
 import { hostShapes, HOST_SHAPES_MAX } from '../../../src/scenes/gate/gateHost.js';
@@ -206,10 +206,7 @@ test('AUDIT WB14 TEXT-8 / TEXT-9 / TEXT-15 the words read in the player\'s langu
   assert.equal(bossBarModel({ ...s, vg: [0, 2] }, T0, BOSS).host, 'The Vanguard - Bridgehead, wave 2 of 3');
 });
 
-test('AUDIT WB14 WIRE-1 / SCREEN-8 a portent night\'s door refuses a relay from before the portents (its fight is fought plain - on floors the screen does not build); a new relay lets go unfallen a fight from before them it wakes on a portent night (mutants: the door open on an old relay; the old fight kept)', () => {
-  assert.ok(relaySupportsPortents(RELAY_VERSION));
-  assert.ok(!relaySupportsPortents(`world${GATE_PORTENTS_RELAY_MIN - 1}`));
-  assert.ok(!relaySupportsPortents(null));
+test('AUDIT WB14 SCREEN-8 the relay lets go unfallen a fight from before the portents it wakes on a portent night: every fight says its portents (mutants: the old fight kept)', () => {
   assert.ok('pt' in newFight(7, T0, WRATH, 'ruhn'), 'every fight since says its portents, a plain night\'s null');
   assert.equal(OPENING_MS > 0, true);
 });

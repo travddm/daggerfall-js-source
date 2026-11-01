@@ -461,7 +461,7 @@ import { itemIconColor32 } from '../ui/item/itemIconColor32.js';   // WBX3: a sp
 import { setCourtRules } from '../systems/courtRules.js';   // WBX6: the court's laws, switched by the frame
 import '../systems/courtRulesDoor.js';   // AUDIT WORLD-EVENTS L1-10: and their pause, at the player's hurt door
 import { sendRaiseWord } from '../net/raiseWord.js';   // AUDIT WORLD-EVENTS L1-1, L1-4: a Resurrect said to the room that keeps the death
-import { gateRoomKey, isGateRoom, gateBossOf, gateTimes, gateAdmits, gateAt, gatePortentsOf, gateLaneOf, GATE_COLLAPSE_MS } from '../net/gate/gateLaw.js';   // WB3b: the court's room, and its day's end
+import { gateRoomKey, isGateRoom, gateBossOf, gateTimes, gateAdmits, gateAt, gateLaneOf, GATE_COLLAPSE_MS } from '../net/gate/gateLaw.js';   // WB3b: the court's room, and its day's end
 import { createGateCrowd, gateCrowdMax, crowdKept } from '../net/gate/gateCrowd.js';   // GATE-CROWD: the card's count draws the nearest of a crowd (CROWD-WIDE: everywhere a stranger cannot fight me)
 import { createPeerRange, peerRangeOf } from '../net/peer/peerRange.js';   // PEER-RANGE: the others drawn out to the distance on the Other players card
 import { gateLandingFor, courtRing, courtArena, courtArenaAt, courtToDungeon, courtBraziers, COURT_TEXT, COURT_FOG, LAVA_Y } from '../world/gate/gateArena.js';   // WB3b: the Burning Court's way home, its ring and its words   // WB2: the gate's countdown over the screen, near it
@@ -888,18 +888,18 @@ import { makeHitPend } from '../net/hitPend.js';   // AUDIT FOES FOE2: a blow th
 import { PeerBodies, peerIsWolf, BODY_BUILD_GATE, playerBuildOpts } from '../net/peer/peerBodies.js';   // MWBODY1: the others in the Morrowind body; WEREWOLF1: and in Bloodmoon's wolf; MW-HEADS2: a player's build
 import { ChatLog, CHAT_REJOIN_MS } from '../net/chat.js';   // CHAT1: the tabs and their lines
 import { createChatSafetyHost } from './chatSafetyHost.js';   // SAFE1-SAFE7: blocks, reports, the relay's word on my chat, the code of conduct
-import { LANG_OLD_RELAY_TEXT, NO_LANG_TEXT, langJoinedText } from '../net/chat.js';   // CHAT-LANG: the Language tab's words
+import { NO_LANG_TEXT, langJoinedText } from '../net/chat.js';   // CHAT-LANG: the Language tab's words
 import { CHAT_LANGS, chatLangRoom } from '../net/wire.js';   // CHAT-LANG: the language channels
 import { LANG_LINES, unknownLangText } from '../net/chatCommands.js';   // CHAT-LANG: /lang's list and refusal
-import { OPT_CHANNELS, tradeChanOldText, notJoinedText, optJoinedText, optJoinedSayText, optLeftText, optWaitText, alreadyJoinedText } from '../net/chat.js';   // CHAT-TRADE: the Trade and LFG tabs' words
+import { OPT_CHANNELS, notJoinedText, optJoinedText, optJoinedSayText, optLeftText, optWaitText, alreadyJoinedText } from '../net/chat.js';   // CHAT-TRADE: the Trade and LFG tabs' words
 import { badJoinText } from '../net/chatCommands.js';   // CHAT-TRADE: /join's and /leave's refusal
-import { oocText, localLineHeard, nextRegionRoom, regionJoinedText, CHAN_OLD_RELAY_TEXT, ROLL_OLD_RELAY_TEXT, EMOTE_OLD_RELAY_TEXT, GUILD_OLD_RELAY_TEXT, NO_GUILD_TEXT, partyNoteTab } from '../net/chat.js';   // CHAT-CHAN: the channels' own laws (a second chat import: CHAT1's pin holds the first as it stands)
+import { oocText, localLineHeard, nextRegionRoom, regionJoinedText, NO_GUILD_TEXT, partyNoteTab } from '../net/chat.js';   // CHAT-CHAN: the channels' own laws (a second chat import: CHAT1's pin holds the first as it stands)
 import { helpLines, pauseCommandOf, pauseCommandRefusal } from '../net/chatCommands.js';   // AUDIT EG V (c, L7-21): /help's lines
-import { parseChatLine, CHAT_GREETING_TEXT, unknownCommandText, emptyCommandText, hostMisuseText, badRollText, expandShortcodes, EMOTE_LINES, foundText, FIND_OFFLINE_TEXT, FIND_RELAY_TEXT } from '../net/chatCommands.js';   // CHAT-CHAN: what a typed line IS; DICE1: and a roll; EMOTE1: an action, a gesture, a shortcode
+import { parseChatLine, CHAT_GREETING_TEXT, unknownCommandText, emptyCommandText, hostMisuseText, badRollText, expandShortcodes, EMOTE_LINES, foundText, FIND_OFFLINE_TEXT } from '../net/chatCommands.js';   // CHAT-CHAN: what a typed line IS; DICE1: and a roll; EMOTE1: an action, a gesture, a shortcode
 import { partyRosterSource, localRosterSource, guildRosterSource, placedRosterSource } from '../net/roster.js';   // CHAT-CHAN: the Party and Local tabs' composed lists; HIDDEN-UNCOUNTED: and a placed tab's
 import { partyCompassPoints } from '../ui/partyMapMarks.js';   // COMPASS-PARTY: the party's points on the compass
 import { SocialState, accountId, accountSecret } from '../net/social.js';   // SOC2: the friends and the party, as the hub says them; the account the hub's hello carries; SOC3: and the two colours a name wears in the DOM - my party's green, a friend's blue
-import { SOCIAL_ROOM, PARTY_SEND_MS, chatRegionRoom, relaySupportsRite, relaySupportsCage } from '../net/wire.js';   // CHAT-CHAN: a region's channel
+import { SOCIAL_ROOM, PARTY_SEND_MS, chatRegionRoom } from '../net/wire.js';   // CHAT-CHAN: a region's channel
 import { cellRoomOfWire, seaVaultRoomId } from '../net/wire.js';   // HCC-PARK: the cell a parked team's anchor stands in; AUDIT SEA VENTURES D7, D8: a vault's own room
 import { parkKeyOf } from '../net/wire.js';   // WAGONS2-VISIT: my caravan's room is named by my park key
 import { caravanRoomOf, caravanKeyOf } from '../net/privateInterior.js';   // WAGONS2-VISIT: a caravan's own room
@@ -988,11 +988,11 @@ import { heraldryLookup } from '../ui/heraldrySwatch.js';   // HERALDRY-SHOWN: a
 import { AuraRingRenderer, auraWearers, auraLookOf, auraMotionStep, auraCapeStep, auraSpriteBones, auraSpritePosed, auraWingLights, CLOAK_BONES, AURA_KINDLE_S, AURA_FORGET_S } from '../render/auraRing.js'; import { peerBodyYaw } from '../net/peer/peerClimb.js'; import { compiledPass } from '../render/glProgram.js';   // WB9g: Dagon's Fire at a wearer's feet; a peer's facing, for a look on the body (on this line, so no cite below it moves); AURA-STALL: its pass built once its program is done
 import { duelAttackerOf, duelWeaponOf, duelSwingOf, resolveDuelStrike, duelWearDamage, duelStandIn } from '../combat/duelCombat.js';   // DUEL1: the blow between two duellists - INT8/INT9: the striker's half alone, the relay referees (AUDIT C&C H5: against the neutral stand-in)
 import { createPageWindow, pageView } from '../ui/pageWindow.js';   // JOURNAL1: a page another player holds out, read and kept
-import { PageOffers, pageOfferText, pageShownText, pageTooFarText, keptPageTokens, keptLetterTokens, letterOfPage, PAGE_UNSUPPORTED_TEXT, PAGE_NO_READERS_TEXT, PAGE_GONE_TEXT } from '../net/journalPage.js';   // JOURNAL1: a page of the journal shown, and one shown to me kept
+import { PageOffers, pageOfferText, pageShownText, pageTooFarText, keptPageTokens, keptLetterTokens, letterOfPage, PAGE_NO_READERS_TEXT, PAGE_GONE_TEXT } from '../net/journalPage.js';   // JOURNAL1: a page of the journal shown, and one shown to me kept
 import { quickslotTag, quickslotHand, tagText, actionKeyWord } from '../ui/quickslotTags.js';   // JOURNAL1: the F-menu's own key, named off the live bindings
 import { isTouchDevice } from '../ui/touch/touchDevice.js';   // JOURNAL1: ...or a tap, where a finger points
 import { composeCard, createCardAnswerGate, CARD_WAIT_MS } from '../net/profileCard.js';   // INSPECT1: my card when asked, and how often one asker is answered
-import { relayVersionSeen, buildUpdateSeen, fetchLiveBuildTag, relayRestartText, buildUpdateText, BUILD_POLL_MS } from '../net/updateNotice.js';   // SRV-N: the relay moved, or the build did
+import { buildUpdateSeen, fetchLiveBuildTag, buildUpdateText, BUILD_POLL_MS } from '../net/updateNotice.js';   // SRV-N: the relay moved, or the build did
 import { BUILD_TAG } from '../buildTag.js';   // SRV-N: which build this tab is actually running
 import { morrowindDataCount, morrowindDataGeneration, getBytes, clearRetiredArena } from './dataSource.js';   // MWBODY1: the bodies' gate - Morrowind data attached - and its generation
 // Q4-v: THE QUEST BRIDGE - the machine goes live in this host.
@@ -1067,7 +1067,6 @@ import { createStormLights } from '../systems/lightning.js';   // BOLT: the stri
 import { LightningBoltsRenderer } from '../render/lightningBolts.js';   // BOLT: the channels, drawn
 import { createDread, createDreadStorm, dreadLight, dreadCloudGlow, DREAD_KEY_DIM, DREAD_FLASH_COLOR } from '../world/dreadSky.js';   // EVENT1: the live event's sky and its red storm
 import { parseEventCommand } from '../net/chatCommands.js';   // EVENT1: /event, a dev's live event
-import { relayKnowsLiveEvent } from '../net/wire.js';   // a word staged only on a relay that knows it
 import { createStaffTeleportClient, validStaffDestination, staffDestinationKey, followStaffPlayer, staffTpLine } from '../net/staffTeleport.js';   // STAFF-PANEL5-FOLLOW: and the line a /tp @player ends on
 import { gameMaps, gamePlaces } from '../net/staffPlaces.js';   // STAFF-EVENT: the game's maps, for the Staff Panel's place picker; AUDIT RELEASE R2-7: and the world's places past the Bay
 import { staffFollowOnPage, relinkGame } from './staffFollowHost.js';   // STAFF-PANEL5-FOLLOW: the game's staff hook (net/staffHook.js) and the host's half of a follow; STAFF-HIDE-TOGGLE: and the panel's relink
@@ -1079,7 +1078,7 @@ const TEST_GODMODE = false;
 const isStaffT = (g) => TEST_GODMODE || isStaff(g);
 import { isStaff, parseStaffCommand, STAFF_HELP_LINES, findPlace } from '../net/staffCommands.js';   // STAFF1: the staff's own commands
 import { RELAY_CFG_KEYS, mayRelayCfg } from '../net/relayCfg.js';   // SCALE5b: the relay's settings, a developer's
-import { shardOf, isChannelBus, isChannelShard, channelOf, hubShardsSupported } from '../net/hubShards.js';
+import { shardOf, isChannelBus, channelOf } from '../net/hubShards.js';
 import { cellOfRoom as layerCellOf, worldRoom as layerCellAt } from '../net/wire.js';   // SCALE5d: a crowded place's layer, my party's   // SCALE5c: the hub, sixteen ways; part two: a region's channel, four
 import { fieldFromNative, nativeFromField, fieldOfPixelLocal } from '../systems/weather/weatherField.js';   // WEATHER2b: the field's metres from the streaming world's natives, and back
 import { cellOfField, VC_PROFILE } from '../render/volumetricClouds.js';   // WEATHER2c: the field's cells as the clouds' cells   // W1: the live weather state (the save halves ride save.js); SAV3: the classic import's zone array
@@ -2428,7 +2427,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** OW6L: what is owed, said (a second apart at most) - what the cell took no longer owed; a spent id of a life gone, and
    *  a row owed too long, let go (the cell drops the one quietly, and its behind-answer heals the other). */
   function overworldLedgerFrame(now) {
-    if (!online?.owOk || now - _owSaidAt < OW_SAY_MS || (!_owSay.sp.size && !_owSay.dg.size)) return;
+    if (!online || now - _owSaidAt < OW_SAY_MS || (!_owSay.sp.size && !_owSay.dg.size)) return;
     _owSaidAt = now;
     // AUDIT SPAWN-REBIRTH F1: WHAT IS OWED WAITS FOR A CELL. A first entry and a clear are made underground, with my socket
     // in the dungeon's room, where nothing is said (online.js sendOverworld: a cell's alone) - and a row owed past
@@ -6328,20 +6327,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   let staffTeleportClient = null, staffTeleportHeld = false;
   let _staffGlyphs = [];
   // SCALE5c: A CHANNEL LINK'S ROOM - the hub's or a region's (part two): this account's own shard of it (net/hubShards.js
-  // shardOf, by the session's account, which the token's subject is) once a relay has said it keeps them; else the
-  // channel itself, which tells a link of this build its shard (`hub`) when it does. Remembered between pages, so a page
-  // joins its shard at once rather than by way of the bus. Any other room is itself.
-  // AUDIT SCALE II C-2: REMEMBERED PER RELAY - the relay's own address beside the key. One flag for every relay let a
-  // `?server=` visit to a staging relay with the shards send the next page on production to a shard production's relay
-  // refuses (and a rolled-back staging relay pull production's page off its shards)
-  const HUB_SHARDS_SEEN_KEY = 'dfjs.hubShards';
-  const hubShardsSeenKey = () => `${HUB_SHARDS_SEEN_KEY}@${online?.url ?? ''}`;
-  const channelLinkRoom = (room) => {
-    if (!isChannelBus(room)) return room;
-    let seen = null;
-    try { seen = appStorage()?.getItem?.(hubShardsSeenKey()) ?? null; } catch { seen = null; }
-    return seen === '1' ? (shardOf(room, storedSession(appStorage())?.id) ?? room) : room;
-  };
+  // shardOf, by the session's account, which the token's subject is), so a page joins its shard at once rather than by
+  // way of the bus. Any other room is itself.
+  const channelLinkRoom = (room) => (isChannelBus(room) ? (shardOf(room, storedSession(appStorage())?.id) ?? room) : room);
   let relayCfgLink = null, relayCfgTab = null;   // SCALE5b: the hub's link a relay setting goes down, and the tab that asked
   let findTab = null;   // SCALE5c: the tab a `/find` was typed in - the hub's answer lands there
   const gamePaused = () => staffTeleportHeld || townTalk.overlayActive || (modes?.overlayHeld ?? false);
@@ -7677,7 +7665,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** Whether another's parked caravan opens to me: online at a relay that keeps caravans' rooms, outdoors, its owner's
    *  word read as a home's door reads it - my party's handles (the relay's), my guild's tag. */
   const caravanDoorOpen = (t) => caravanMayEnter(t, { partyNames: (social?.others?.() ?? []).map((m) => m.name).filter((n) => typeof n === 'string' && n.length > 0), guild: myGuildTag() });
-  const caravanVisitMay = (t) => !!online?.caravanOk && online.status === 'open' && (modes?.mode ?? 'exterior') === 'exterior' && caravanDoorOpen(t)
+  const caravanVisitMay = (t) => online?.status === 'open' && (modes?.mode ?? 'exterior') === 'exterior' && caravanDoorOpen(t)
     && !wagonRiders?.seated();   // WAGONS2-VISIT (AUDIT): never from a seat in another's wagon (its row offered, its press said nothing)
   /** Its press: into it, through the same door as my own (scenes/caravanRoom.js visit) - its room the record's key. */
   const caravanVisitEnter = (t) => {
@@ -9141,7 +9129,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     pay: (n) => { deductGold(playerEntity, n); surfacePlayer(); },
     accounts: () => playerEntity.bankAccounts ?? [],
     regionName: (i) => REGION_NAMES[i] ?? null,
-    where: () => { const px = playerTravelPixel(); return { inside: (modes?.mode ?? 'exterior') !== 'exterior', pixel: { X: px.x, Y: px.y }, feet: dwPlayerObjectPosition(), sea: !!online?.wildOk && !!etherSea }; },   // AUDIT FOE-KEEPS E3: `sea`, the open sea a PvP zone
+    where: () => { const px = playerTravelPixel(); return { inside: (modes?.mode ?? 'exterior') !== 'exterior', pixel: { X: px.x, Y: px.y }, feet: dwPlayerObjectPosition(), sea: !!online && !!etherSea }; },   // AUDIT FOE-KEEPS E3: `sea`, the open sea a PvP zone
     nearPort: () => !!csaRuntime.IsNearPort(csaPortRange()),   // the deed's own reach (DEED-PORT) - AUDIT HOLDINGS F8: its setting's, as the deed reads it (PortLocationSearchRange), never IsNearPort's bare three
     nearestPort: () => csaNearestPort(),
     terrainAt: (p) => csaTerrainOf(csaPixelAt(p[0], p[2])),
@@ -9284,7 +9272,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (why) { if (_crossSaid !== way) { _crossSaid = way; townTalk.say(CROSS_REFUSED[why], 4); } return; }
     crossGate.asked(way);
     const boat = csaRuntime.state.CurrentBoat;
-    _crossBox = new YesNoBoxWindow({ rows: crossingRows(way, { pvp: _onlineWorldSession() && !!online?.wildOk }), onYes: () => { _crossBox = null; crossYes(way, boat); }, onNo: () => { _crossBox = null; } });
+    _crossBox = new YesNoBoxWindow({ rows: crossingRows(way, { pvp: _onlineWorldSession() && !!online }), onYes: () => { _crossBox = null; crossYes(way, boat); }, onNo: () => { _crossBox = null; } });
     townTalk.showOverlay(_crossBox);
   }
   /** AUDIT CAPTAIN'S SEA X2: Yes is the question as it stands NOW - the same helm, the same waters, no enemy, no passenger,
@@ -19043,10 +19031,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (tries > 1) setTimeout(() => offerRaidTowns(link, h, tries - 1), 10_000);
     }).catch((e) => console.warn('[raid] towns table', e?.message ?? e));
   };
-  /** REST-OPT (AUDIT C1): my "Rest with my party" switch as the party can hear it - off only through a hub that carries
-   *  a pose's `nr` (net/wire.js REST_OPT_RELAY_MIN). Through an older one the party went on counting me a voter to
-   *  gather while my own client refused every rest of theirs: nobody rested, and my own night was theirs to follow. */
-  const restsWithParty = () => getPref('restWithParty') !== false || !socialLink()?.restOptOk;
+  /** REST-OPT (AUDIT C1): my "Rest with my party" switch as the party can hear it - off only through a hub link (its
+   *  pose's `nr`); with none I rest with the party as before. */
+  const restsWithParty = () => getPref('restWithParty') !== false || !socialLink();
   /** GUILD1c: a room took my guild off (a removal the hub heard, a disbanding, my own leave's echo) - the book looks
    *  again, and a membership that moved goes to every room I hold (net/guild/guildBook.js onOrders). */
   const guildGone = () => { guildBook?.refresh(); };
@@ -19063,8 +19050,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // WAYPOINTS: a shared waypoint rides the hub's own party and guild channels (CHAT-CHAN, GUILD1c) - asked at the moment
   // of the send, so a hub link made or remade later is the one that carries it
   setWaypointSender((ch, text) => socialLink()?.sendChat(text, { ch }) ?? false);
-  /** GUILD1c: the Guild tab on a relay from before the guild's channel - the World link's welcome said so. */
-  const guildOld = () => { const world = chatLinks?.get('world'); return world?.status === 'open' && !world.guildOk; };
   /** SOC3: what a click on a chat ROSTER ROW offers for that peer. The
    *  roster is the one place a stranger has a name, so it is the one place "other individuals" can be acted on -
    *  and every answer here is net/social.js's (actionsFor), including the reason a refused one carries. An act by
@@ -19146,7 +19131,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // that died before the relay read it was never said at all (client C4).
   let _parkSent = null, _parkSentAt = -Infinity, _parkRoom = null, _parkWelcomes = -1;
   const hccParkTick = (now) => {
-    if (!online || online.status !== 'open' || !online.parkOk) return;
+    if (!online || online.status !== 'open') return;
     const c = characterIdOf(playerEntity);
     if (!c) return;
     const word = hcc.parkWord(campToWire);
@@ -19170,7 +19155,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const CARAVAN_DECOR_MIN_MS = 1500;
   let _cvSent = null, _cvWelcomes = -1, _cvRoom = null, _cvReadAt = -Infinity;
   const caravanDecorTick = (now) => {
-    if (!online || online.status !== 'open' || !online.caravanOk || !caravanKeyOf(online.room)) return;
+    if (!online || online.status !== 'open' || !caravanKeyOf(online.room)) return;
     const fresh = online.welcomes !== _cvWelcomes || online.room !== _cvRoom;
     if (!fresh && now - _cvReadAt < CARAVAN_DECOR_MIN_MS) return;
     _cvReadAt = now;
@@ -19216,7 +19201,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  - a building's, and a dungeon's shared quest's - every FOES_MS (every one FOES_FULL_MS apart), beside the host's
    *  stream and whoever hosts; only through a relay that carries the lane. */
   const ownStream = (now) => {
-    if (!online || online.status !== 'open' || !online.ownOk || !isWorldRoom(online.room)) return false;
+    if (!online || online.status !== 'open' || !isWorldRoom(online.room)) return false;
     const m = modes?.mode ?? 'exterior';
     if (m !== 'interior' && m !== 'dungeon') return false;
     if (online.othersHere === 0) { _ownFullAt = -Infinity; return false; }   // SCALE2b: nobody to hear - the foes stream's law
@@ -19395,7 +19380,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     }   // WAGONS2-VISIT (AUDIT): and my own caravan at an older relay - the owned room, as before it (it left me in none)
     // Old relays accept arbitrary room names without this room's owner gate.
     // Never advertise personal presence through one of those relays.
-    if (!chatLinks.get('world')?.staffTeleportOk || !social?.acct || !realmSession?.id) return null;
+    if (!chatLinks.get('world') || !social?.acct || !realmSession?.id) return null;
     if (identity?.privateRoom) return identity.privateRoom;
     const source = `${social.acct}:${realmSession.id}`;
     if (_privateSource !== source) {
@@ -19426,10 +19411,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     return _caravanKey;
   }
   function myCaravanRoom() { return caravanRoomOf(myParkKey()); }
-  // WAGONS2-VISIT (FINAL AUDIT): a fresh session (a load inside my caravan, online turned on in it) has had no welcome
-  // to say its relay - and with no room it is never welcomed - so the world channel's word stands for it, as the owned
-  // rooms' staffTeleportOk does; the frame itself still waits for the primary's own (online.js sendCaravan)
-  const caravanRelayOk = () => !!(online?.caravanOk || chatLinks?.get('world')?.caravanOk);
+  // WAGONS2-VISIT (FINAL AUDIT): a fresh session (a load inside my caravan, online turned on in it) has no room yet, so
+  // the world channel's link stands for it; the frame itself still waits for the primary's own welcome (online.js sendCaravan)
+  const caravanRelayOk = () => !!(online || chatLinks?.get('world'));
   function caravanRoomHere(identity) {   // its one caller asks the relay first (privateRoomHere's caravanRelayOk)
     return caravanKeyOf(identity?.privateRoom) ? identity.privateRoom : myCaravanRoom();
   }
@@ -20062,7 +20046,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // the receipt it answers, to the card; C1: the HUD's Leave and the card's Close leave whichever is entered
       siegeClaims = createSiegeClaims({ claim: (r) => seatBook.claimSiege(r), me: () => _seatDoor?.me() ?? null, storage: appStorage(), nowMs: battleNowMs, onClaimed: (a, r) => siegeSession?.claimed(a, r) });
       siegeHud = createSiegeHud(document, { onClaim: () => siegeClaims.offer({ force: true }), onLeave: () => leaveBattle() });
-      siegeSession = createSiegeSession({ online, pass: (seat, field) => seatBook.siegePass(seat, field), claims: siegeClaims, hud: siegeHud, movePlayer: siegeMoveTo, say: (t) => { if (t) townTalk.say(t); }, relayOk: () => online.siegeOk,
+      siegeSession = createSiegeSession({ online, pass: (seat, field) => seatBook.siegePass(seat, field), claims: siegeClaims, hud: siegeHud, movePlayer: siegeMoveTo, say: (t) => { if (t) townTalk.say(t); },
         nowMs: battleNowMs, here: (seat) => atSeat(seat) });
       // SEAT2b part two (c): their feet on the town's ground, where the field's frame says they stand
       siegeNpcs = createSiegeNpcs({ renderer, getTexture, uploadRecordFrame, audio, cam: () => cam.pos,
@@ -20070,7 +20054,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // CROWN1 part two: A ROYAL TOURNEY - the same room's words, the same HUD; the bouts won carried to the service
       royalClaims = createRoyalClaims({ claim: (r) => seatBook.claimRoyal(r), me: () => _seatDoor?.me() ?? null, storage: appStorage(), nowMs: battleNowMs });
       royalSession = createRoyalSession({ online, pass: (seat, field, watch) => seatBook.royalPass(seat, field, watch), claims: royalClaims, hud: siegeHud, movePlayer: siegeMoveTo,
-        say: (t) => { if (t) townTalk.say(t); }, relayOk: () => online.royalOk, name: (id) => peerName(id) ?? '', nowMs: battleNowMs, here: (seat) => atSeat(seat) });
+        say: (t) => { if (t) townTalk.say(t); }, name: (id) => peerName(id) ?? '', nowMs: battleNowMs, here: (seat) => atSeat(seat) });
       online.onSiege = (g, room) => { siegeSession?.onSiege(g, room); royalSession?.onSiege(g, room); };
       siegeClaims.offer();
       royalClaims.offer();
@@ -20195,7 +20179,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // CHAT-CHAN: on EVERY tab, as one line (ChatLog.pushAll) - the server speaks to the whole game, not to a channel
       link.onRed = (line) => chatLog.pushAll({ text: line.text, at: line.at, red: true });
       link.onMuted = onMuted;
-      link.onRelay = onRelayVersion;
       link.onGuildGone = guildGone;   // GUILD1c: a room took my guild off - the hub's word on a removal most of all
       if (tab.room) link.join(channelLinkRoom(tab.room));   // CHAT-CHAN: the Region tab's room waits for the region and the relay (chatRegionFrame); SCALE5c: the hub link its own shard
       chatLinks.set(tab.id, link);
@@ -20247,11 +20230,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (tab.room === SOCIAL_ROOM) link.onEvent = (ev, o) => { dread.set(ev, o); };   // EVENT1: the hub - the one room every online player holds - says the live event
       if (tab.room === SOCIAL_ROOM) link.onHome = (words) => { onlineHomes?.hearHome(words); };   // QUEST-HOME: and a home that moved since the boot's read, every page told
     }
-    // SRV-N: the PRESENCE session hears the relay too, and it is usually
-    // the first back after a deploy. Both arms run the same detector,
-    // which is a Set - so N sockets reconnecting to a new relay produce
-    // ONE notice, not one each.
-    online.onRelay = onRelayVersion;
     online.onGuildGone = guildGone;   // GUILD1c
     void chatSafety.start();   // SAFE1-SAFE7: the log hears through my block list; every room's word on my own chat
     noteFirstUse('online');   // TUT1: the first time this device plays online
@@ -20332,9 +20310,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           const say = (line) => { chatLog.push(tabId, { text: line, system: true }); return true; };
           if ('error' in staged) return say(staged.error);
           const hub = chatLinks.get('world');
-          if (!hub?.eventOk) return say('The server cannot stage live events yet.');
-          if (staged.kind && !relayKnowsLiveEvent(hub.eventV, staged.kind)) return say('The server cannot stage that event yet.');   // an older relay closes the socket on a word it does not know
-          return hub.sendStage(staged.kind);
+          return !!hub?.sendStage(staged.kind);
         }   // CHAT-CHAN: from any tab, on the World channel - the one room every player online is in
         // AUDIT-SEATS C1: `/leave` - out of the battle or the Royal Tourney entered (its own word said in the town's talk)
         if (isBattleLeaveCommand(text)) {
@@ -20472,7 +20448,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           setPref('chatLang', cmd.code);
           chatLangFrame();
           chatLog.select('lang');
-          if (!chatLog.tab('lang').room) chatLog.push('lang', { text: langOld() ? LANG_OLD_RELAY_TEXT : langJoinedText(CHAT_LANGS[cmd.code]), system: true });
+          if (!chatLog.tab('lang').room) chatLog.push('lang', { text: langJoinedText(CHAT_LANGS[cmd.code]), system: true });
           return 'read';
         }
         // CHAT-TRADE: /join trade, /leave lfg - the choice is kept (`chatTrade`, `chatLfg`) and the frame moves the tab; a
@@ -20491,7 +20467,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           return false;
         }
         if (cmd.kind === 'rp') return chatSend(tabId, cmd.text, tabId, opts);   // CHAT-RP: a line of roleplay, on this tab - its *mark* is the drawing's
-        if (cmd.kind === 'find') { findTab = tabId; const hub = chatLinks?.get('world'); if (!hub?.sendFind(cmd.q)) note(hub?.welcomed && !hub.findOk ? FIND_RELAY_TEXT : FIND_OFFLINE_TEXT); return 'read'; }   // SCALE5c: everyone online, by name - the hub's answer comes back to this tab. AUDIT SCALE II C-1: a hub online on a relay before the shards answers no search, and is never asked one (it closes the link on it) - said as that, not as offline
+        if (cmd.kind === 'find') { findTab = tabId; const hub = chatLinks?.get('world'); if (!hub?.sendFind(cmd.q)) note(FIND_OFFLINE_TEXT); return 'read'; }   // SCALE5c: everyone online, by name - the hub's answer comes back to this tab. - said as that, not as offline
         if (cmd.kind === 'me') return chatSend(tabId, cmd.text, tabId, { ...opts, me: true });   // EMOTE1: an action, on this tab
         if (cmd.kind === 'emote') return chatSend('local', cmd.text, tabId, { ...opts, me: true });   // EMOTE1: a gesture - the body's, so those near see it
         if (cmd.kind === 'unknown') { note(unknownCommandText(cmd.name)); return false; }
@@ -20699,7 +20675,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       send: (act) => socialLink()?.sendSocial(act) ?? false,   // false is the rate gate's answer: the panel keeps the button and says "try again"
       keepLetter: (letter) => keepLetterInJournal(letter),   // JOURNAL1: a letter kept in my journal, as a page is
       journey: () => partyTravel,   // PARTY-UI: the Party tab's Journey - the session is made later in this host, so it is read when drawn
-      canLead: () => !!socialLink()?.partyLeadOk,   // PARTY-LEAD: Make leader, through a hub that knows the act
+      canLead: () => !!socialLink(),   // PARTY-LEAD: Make leader, through the hub
       canOpen: () => !gamePaused() && !(townTalk.hudCovered || (modes?.hudCovered ?? false)),
       onOpen: () => surfaceOpen('social'),   // AUDIT SOC B6: counted with the chat's and the F-menu's - the first up frees the mouse, the last down takes it back
       onClose: () => surfaceClose('social'),
@@ -20833,7 +20809,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** What the F-menu says about trading with this peer: nothing at all when the skin cannot draw the window. */
   const tradeActionsFor = (peerId) => {
     if (!online || !playerTradeReady()) return {};
-    if (!online.tradeOk) return { canTrade: false, whyNotTrade: 'relay not updated' };   // an older relay closes the socket on a trade frame - it is never sent one
     if (!online.reachesPeer(peerId)) return { canTrade: false, whyNotTrade: 'no link to them' };   // no open socket of mine reports them: the frame has nowhere to go (NOT a distance - metres are judged below)
     const far = { canTrade: false, whyNotTrade: `too far away (max ${TRADE_RANGE_M} m)` };
     switch (tradeMgr.stateFor(peerId)) {
@@ -20878,7 +20853,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const duelCan = () => {
     if (playerEntity.health <= 0 || modes?.deathUp?.()) return 'dead';
     if ((modes?.mode ?? 'exterior') !== 'exterior') return 'outdoors';
-    if (!online || online.status !== 'open' || !online.duelOk) return 'busy';
+    if (!online || online.status !== 'open') return 'busy';
     return null;
   };
   /** DUEL_RANGE_M between two BODIES, the trade's own measure (metres, never a pixel or a room). */
@@ -20939,7 +20914,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // button grey everywhere): wedRefusal answers NULL when the one played may wed, and `?? 'house'` read that null as
   // no house - every character refused, at every temple, and every proposal and answer with it. 'house' only for no host.
   const wedCan = () => (playerEntity.health <= 0 || modes?.deathUp?.() ? 'busy'
-    : online?.status === 'open' && online.wedOk ? (legacyHost ? legacyHost.wedRefusal() : 'house') : 'busy');
+    : online?.status === 'open' ? (legacyHost ? legacyHost.wedRefusal() : 'house') : 'busy');
   /** The proposal at me on the town's Yes/No box (the window it stands for, so a proposal taken back closes it). */
   let _wedBox = null;
   let _wedBoxPeer = null;
@@ -20982,7 +20957,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const wedButtonFor = (peerId) => {
     if (!online || !peerId || !realmSession || !legacyOn()) return null;
     const label = 'Propose marriage';
-    if (!online.wedOk) return { label, enabled: false, why: 'The server does not support weddings yet.' };
     const st = wedMgr.stateFor(peerId);
     if (st === 'incoming') return { label: 'Answer their proposal', enabled: true };
     if (st === 'outgoing') return { label: 'Proposal sent', enabled: false, why: 'Waiting for their answer.' };
@@ -21315,7 +21289,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   let _wdunEpoch = new Map();     // hall -> its epoch as the hub last said it (a reset is a new one)
   // SEA VENTURES (scenes/seaVenturesHost.js): the sea's own - SEA-VAULTS' vaults of the deep keep the halls' hub, locks and crows
   const seaVentures = createSeaVentures({
-    live: () => etherSea && _onlineWorldSession() && !!online?.wildOk, day: wdunDayNow, pixel: playerTravelPixel, locks: _wdunLocks, crows: _wdunCrows, mine: () => _wildMine,
+    live: () => etherSea && _onlineWorldSession() && !!online, day: wdunDayNow, pixel: playerTravelPixel, locks: _wdunLocks, crows: _wdunCrows, mine: () => _wildMine,
     clock: () => raidNowMs(), naval: () => naval, state, link: socialLink, ether: etherHost,   // SEA-EVENTS: the shared clock (asked when called - raidNowMs stands further down, V4), the naval host, the scene, the hub, the purse and the words (the ether host's)
     session: realmSession, checkpoint: onlineCheckpoint, wallet: realmWallet, region: _questRegionIndex,   // SEA-BOUNTY: the record's gold acts (the character the sea's host's own)
     cell: () => online, foe: (id) => wildIsStranger(id, online?.drawable?.()?.find((d) => d.id === id)?.gt),   // SHIP-PVP: my cell's socket (a peer's name its own), a stranger captain
@@ -21525,7 +21499,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         _giantsDown.set(g, now + WILD_GIANT_RESPAWN_MS);
         { const feetF = f.ai?.feet ?? f.feet; const w = feetF ? campToWire(feetF) : null; giantFell(g, w ? { x: w[0] / 32768, y: 500 - w[2] / 32768, ring: Math.floor(g / 2) + 1 } : null); }   // GIANT-FALL: where its body lies
         const link = socialLink();
-        if (link?.wdunGiantsOk && link.status === 'open') link.sendWdun({ k: 'gk', g });
+        if (link?.status === 'open') link.sendWdun({ k: 'gk', g });
         continue;
       }
       if (!exteriorFoes.foes.includes(f)) _giantsStood.delete(g);   // let go (far behind me): it walks on, on its path
@@ -21609,7 +21583,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const wdunFrame = () => {
     const link = socialLink(), now = Date.now();
     if (link !== _wdunLink) { _wdunLink = link; _wdunHiAt = 0; if (link) link.onWdun = (w) => wdunWord(w); }
-    const open = !!link?.wdunOk && link.status === 'open';
+    const open = link?.status === 'open';
     if (!open) _wdunHiAt = 0;
     else if (!_wdunHiAt || now - _wdunHiAt > 10 * 60_000) { if (link.sendWdun({ k: 'hi' })) _wdunHiAt = now; }
     if (_wdunInside && open && now - _wdunInside.hereAt >= WDUN_HERE_MS) { link.sendWdun({ k: 'here', h: _wdunInside.h }); _wdunInside.hereAt = now; }
@@ -21669,7 +21643,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (left > 0 && !myPile) { lockSay(left); return false; }
     }
     const link = socialLink();
-    if (link?.wdunOk && link.status === 'open' && !_wdunWait) {
+    if (link?.status === 'open' && !_wdunWait) {
       const w = await new Promise((done) => {
         _wdunWait = { h: hall.key, done };
         if (!link.sendWdun({ k: 'in', h: hall.key })) { _wdunWait = null; done(null); return; }
@@ -21694,7 +21668,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (died) _wdunCrows.set(h, Date.now() + WILD_REMAINS_MS);
     socialLink()?.sendWdun?.({ k: died ? 'die' : 'out', h });
   };
-  const wildCan = () => !!online?.wildOk && online.status === 'open' && wildHere() && (wildOutdoors() ? !settledAt(campToWire(player.feetAt()), locationIndex) : modes?.mode === 'dungeon') && playerEntity.health > 0 && !modes?.deathUp?.();   // PVPDUNGEON: players fight in the zone's dungeons too - ZONE-SAFE (systems/wild/zoneSafe.js): never outdoors in a settlement's streets
+  const wildCan = () => online?.status === 'open' && wildHere() && (wildOutdoors() ? !settledAt(campToWire(player.feetAt()), locationIndex) : modes?.mode === 'dungeon') && playerEntity.health > 0 && !modes?.deathUp?.();   // PVPDUNGEON: players fight in the zone's dungeons too - ZONE-SAFE (systems/wild/zoneSafe.js): never outdoors in a settlement's streets
   /** Is this player one I may fight (and be fought by): standing in the zone, and never KIN - net/wild/wildRef.js wildKin, the
    *  referee's own law: my party, or one under its truce; my duel's opponent (a duel's blows are the duel's own); or, MAC'S
    *  DECISION, one of my guild - its tag as the relay stamped it, mine as the hub
@@ -21707,7 +21681,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   };
   /** PARTY-TRUCE: the row a party's walk asks with when it ends in the zone or at its edge - the walk is the one door
    *  into it no journey's gate asks (wildJourney: "The Overworld map's journeys are walked, never asked"). */
-  const wildWalkRow = (x, y) => { const m = wildMask(); return !online?.wildOk ? null : etherSea && etherWildRingAt(x, y) > 0 ? zoneWord('walkInto', ETHER_KIND) : m && wildNear(m, x, y) ? WILD_TEXT.walkInto : null; };   // wildNear: inside, or within its band - AUDIT SEA VENTURES C3: and the open sea past Veilhaven's peace
+  const wildWalkRow = (x, y) => { const m = wildMask(); return !online ? null : etherSea && etherWildRingAt(x, y) > 0 ? zoneWord('walkInto', ETHER_KIND) : m && wildNear(m, x, y) ? WILD_TEXT.walkInto : null; };   // wildNear: inside, or within its band - AUDIT SEA VENTURES C3: and the open sea past Veilhaven's peace
   /** The fair players' bodies in this scene (peersNear's { id, feet, height }). */
   const wildBodiesNow = () => {
     if (!wildCan()) return NO_BODIES;
@@ -21996,7 +21970,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  usual tenth of the purse at the rise, and the service refuses a foe's fall). Either way my socket stays in the room
    *  while my body lies, so the deposit and the receipt reach it. Answers whether the death was the zone's. */
   const wildDeathBegin = () => {
-    if (!wildHere() || !online?.wildOk || online.status !== 'open' || !online.room || !_deadMark) return false;
+    if (!wildHere() || !online || online.status !== 'open' || !online.room || !_deadMark) return false;
     const fell = wildFallHeard();   // AUDIT FOE-KEEPS H1: any fall heard since my last rise (wildGhostEnd clears it) - a hidden tab hears it, runs no frame
     // WILD-REJOIN: a death the referee told of has its body and its words already (wildDownIn), and offers nothing
     const rejoined = wildRejoin.begin();
@@ -22069,8 +22043,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const wildFrame = () => {
     setWildMask(cyrodiilMask());   // WW-C2: Cyrodiil's, kept while the picture stands (built again when the trace or the fit moves)
     try { wdunFrame(); } catch (e) { console.warn('[wdun]', e?.message ?? e); }   // PVPDUNGEONS: the hub's word, the heartbeat, the day's halls
-    const seaRing = _onlineWorldSession() && !!online?.wildOk && etherSea && playerSpawned ? etherWildRingAt(playerTravelPixel()?.x, playerTravelPixel()?.y) : 0;   // ETHER-WILD: the sea past Veilhaven's peace, its band the ring
-    const here = seaRing > 0 || (_onlineWorldSession() && !!online?.wildOk && playerSpawned && (() => { const px = playerTravelPixel(); return !!px && wildRingAt(px.x, px.y) > 0; })());   // WW-C2: Cyrodiil's mask (the Wrothgarian cut retired)
+    const seaRing = _onlineWorldSession() && !!online && etherSea && playerSpawned ? etherWildRingAt(playerTravelPixel()?.x, playerTravelPixel()?.y) : 0;   // ETHER-WILD: the sea past Veilhaven's peace, its band the ring
+    const here = seaRing > 0 || (_onlineWorldSession() && !!online && playerSpawned && (() => { const px = playerTravelPixel(); return !!px && wildRingAt(px.x, px.y) > 0; })());   // WW-C2: Cyrodiil's mask (the Wrothgarian cut retired)
     if (_wildTruce.frame(social?.partyPeers?.() ?? new Set(), Date.now()).length && here) townTalk.say(zoneWord('truce'));   // PARTY-TRUCE
     wildGrace.frame(here);   // ZONE-GRACE: my safe passage run out, said - out of the zone, forgotten (AUDIT PVP-EASE L3-7)
     if (playerEntity.health > 0 && !modes?.deathUp?.()) {
@@ -22275,7 +22249,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   };
   const wildTeleportRefused = (to = null) => {
     if (TEST_GODMODE && staffPowers().god) return false;   // TESTBUILD
-    const m = online?.wildOk ? wildMapMask() : null;
+    const m = online ? wildMapMask() : null;
     if (m && etherSea && (etherWildRingAt(playerTravelPixel()?.x, playerTravelPixel()?.y) > 0 || (to && etherWildRingAt(to.x, to.y) > 0))) { townTalk.say(ETHER_WILD_TEXT.teleport()); return true; }   // ETHER-WILD: nor about the open sea
     if (!m) return false;
     const from = playerTravelPixel();
@@ -22287,7 +22261,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  pastBayTravel.js teleportJourney - teleportTo and a stone's pick and step, scenes/portalStoneHost.js). */
   const wildTravelGate = (to, spoken = 0, law = pastBayJourney) => {
     if (TEST_GODMODE && staffPowers().god) return { ok: true, fee: 0 };   // TESTBUILD: god mode travels anywhere, free
-    const j = law(playerTravelPixel(), to, online?.wildOk ? wildMapMask() : null, wildJourney({ from: playerTravelPixel(), to, mask: online?.wildOk ? wildMapMask() : null, lastAt: playerEntity.wildTravelAt ?? null, gold: legacyGold(playerEntity) - spoken }));   // AUDIT TESA II P4: never a journey INTO the land past the Bay (systems/travel/pastBayTravel.js - TESA-NO-FAST's law at the gate every journey passes: a party's to its leader, a rider's), the zone's own journeys its own
+    const j = law(playerTravelPixel(), to, online ? wildMapMask() : null, wildJourney({ from: playerTravelPixel(), to, mask: online ? wildMapMask() : null, lastAt: playerEntity.wildTravelAt ?? null, gold: legacyGold(playerEntity) - spoken }));   // AUDIT TESA II P4: never a journey INTO the land past the Bay (systems/travel/pastBayTravel.js - TESA-NO-FAST's law at the gate every journey passes: a party's to its leader, a rider's), the zone's own journeys its own
     if (!j.ok) townTalk.say(j.text);
     return j;
   };
@@ -22341,7 +22315,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** The Inspect card's Challenge button, as the law says it now: the label and whether it can go (and why not). */
   const duelButtonFor = (peerId) => {
     if (!online || !peerId) return null;
-    if (!online.duelOk) return { label: 'Challenge to a duel', enabled: false, why: 'The server does not support duels yet.' };
     const st = duelMgr.stateFor(peerId);
     if (st === 'incoming') return { label: 'Accept duel', enabled: !duelCan() && duelNear(peerId), why: duelCan() === 'outdoors' ? 'A duel is fought outdoors.' : `Stand within ${DUEL_RANGE_M} m of them.` };
     if (st === 'outgoing') return { label: 'Challenge sent', enabled: false, why: 'Waiting for their answer.' };
@@ -22476,7 +22449,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (!online?.url) return null;
       const link = new OnlineSession({ url: online.url, name: online.name, look: online.look, id: online.id, secret: online.secret, presence: false, wave: pageWave, wire2: true });   // SCALE2c: the page's one wave; SCALE5b: the second wire
       link.mintToken = identityMinter;
-      link.onRelay = onRelayVersion;
       link.onSuperseded = () => seatLostNow();
       return chatSafety.adoptLink(link);   // AUDIT SAFE CLIENT-13: the arena's rooms hear the relay's word on my chat too, and a ban leaves them
     },
@@ -22615,7 +22587,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     onFell: (day, f) => { const site = gateOmen?.siteOf?.(day); eventNotice('gate', (f.c != null ? courtFellLine : fellLine)({ ...f, near: site?.day === day ? site.near : null, boss: gateBossOf(day).name }), gateLineId(day)); },   // WB13b: no place found - "in the wilds"; AUDIT WW F5: on its own gate's card; GATE-COURTS: a court's fall its own line
     onReceipt: (r) => { gateClaims?.add(r); grantSpoilsOutside(r); },   // WB5b: to the account service, kept until it is counted; AUDIT WB A2: and its spoils, when no court's floor will give them
     onRefused: (why) => { if (modes?.gateArenaDay?.() != null) ejectFromCourt(gateRefusalText(why)); },   // AUDIT WB B5: the relay will not have me in this fight - out before the gate, not left in an empty court; GATE-RELOAD: in what its word means (an outdated game is told to reload, never that an open gate is closed)
-    place: bossPlace, watches: () => !!online?.courtWatchOk,   // AUDIT WBX F3: his fall frozen where he fell, as the court draws him; AUDIT PLAN-1000 G3: a watcher only on a relay that says `me`
+    place: bossPlace,   // AUDIT WBX F3: his fall frozen where he fell, as the court draws him
   }) : null;
   let _gateInFor = -1;   // WB3b: the welcome my level claim was said for - once per welcome of the court's room
   /** WB4: THE FIGHT ON THIS SCREEN (scenes/gate/gateCourt.js) - the boss where the relay says he stands, his telegraphs, his
@@ -22855,7 +22827,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     sendCrystal: (hit) => !!online?.sendGate?.({ k: 'xhit', ...hit }),   // WB9c: a blow of mine on a crystal of Oblivion
     sendHost: (hit) => !!online?.sendGate?.({ k: 'ahit', ...hit }),   // WB11c: a blow of mine on one of his host
     sendHeal: (heal) => !!online?.sendGate?.({ k: 'heal', ...heal }),   // GATE-HEAL: what my mates' spells healed in me, and whose
-    sendBody: (v) => !!online?.bossOk && !!online?.sendGate?.({ k: 'vt', v }),   // INT15: my body, to a relay that counts it
+    sendBody: (v) => !!online?.sendGate?.({ k: 'vt', v }),   // INT15: my body
     portalDoor: (door) => { modes?.dungeonCtx?.exitDoors?.push?.(door); },   // WBX2: its door, for the exit's ray and name - and (SS3) its press, the one way through it
     // WBX7: a soul trap of mine still on him as he fell - the port's own kill roll (EnemyEntity.AttemptSoulTrap), his soul
     // into an empty gem of my pack, its words; the tether's arm is not his (the relay has already killed him)
@@ -22892,13 +22864,13 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       ready: () => { if (!online?.clockRead) { _omenClockAt = null; return false; } if (_omenClockAt == null) { _omenClockAt = performance.now(); warmGateScan(); } return !!socialLink()?.clockRead || performance.now() - _omenClockAt > 8000; },
       settleMs: OMEN_SETTLE_MS,
       riteBroken: (day, s) => !!riteHost?.isBroken(day, s?.px, s?.py),   // AUDIT WB12d (C8): the hub's word came first - its order is no order
-      riteReady: () => !!online?.riteOk,   // AUDIT WB12d (L5): a relay that keeps the rite
+      riteReady: () => !!online,   // AUDIT WB12d (L5): online, the relay keeps the rite
     },
     bayGateSite: (day) => {
       if (!maps) return null;
       try { const scan = gateScanOf(); return scan ? findGateSite(day, scan) : null; } catch (e) { console.warn('[gate] no site', e?.message ?? e); return null; }
     },
-    scans: theatreGates, lanesOk: () => !!online?.gateLanesOk && !!socialLink()?.gateLanesOk, here: () => playerTravelPixel(),
+    scans: theatreGates, lanesOk: () => !!online && !!socialLink(), here: () => playerTravelPixel(),
   }) : null;
   /** GATE-CLEAR: THE CLEARING World of Daggerfall keeps its rock off (world/gate/gateClearance.js, the streamer's sweep far
    *  above) - the site of the gate the clock is about (net/gate/gateLaw.js gateAt: from the last gate's collapse to this
@@ -23219,7 +23191,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     say: (text) => setMidScreenText(text),
     banner: (text) => { _gateBannerWish = text; },   // AUDIT WB C5: never over the step's fire - SD19: shared with a Hollow's door (presenceFrame)
     marks: (card) => { _gateMarksWish = card; },   // WB9a: tonight's marks beside the countdown - never over the step's fire (SD19: presenceFrame)
-    ready: () => !!online?.gateOk,   // WB3b: a relay that runs a gate's boss room (net/wire.js relaySupportsGate)
+    ready: () => !!online,   // WB3b: online, the relay runs a gate's boss room
     landBefore: (g) => landBeforeGate(g),   // AUDIT WBX W1: a player sealed in the stone as it stands whole, set down before the gate
     enter: (g) => { modes?.enterGateArena?.(g); },   // WB3b: into the Burning Court (scenes/worldModes.js)
   }) : null;
@@ -23237,7 +23209,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     groundAt: (x, z) => surfaceAt(x, z),   // the drawn triangles' height - what a placed thing stands on
     coarseGround: (px, py, x, z) => gateGroundAt(px, py, x, z),   // the smoke beyond the streamed grid
     feet: () => (walkMode && playerSpawned ? player.feetAt() : null),
-    online: () => !!online?.riteOk,   // AUDIT WB12d (L5, D9): a relay that keeps the rite (net/wire.js relaySupportsRite) - an older one never hears its word
+    online: () => !!online,   // AUDIT WB12d (L5, D9): online, the relay keeps the rite
     foes: {
       spawn: (career, [x, z], { yaw, site, transient }) => {
         const y = surfaceAt(x, z);
@@ -23687,7 +23659,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** INT15: MY BODY, in my own word, while I fight alive in the Hour's fight that answered me - to a relay that counts it
    *  (net/bossBody.js bodySayer's pace). A frame step of its own beside the fight's. */
   const sdBodyFrame = () => {
-    if (!sdFightLink || modes?.sdRealmSlot?.() == null || !online?.bossOk) return;
+    if (!sdFightLink || modes?.sdRealmSlot?.() == null || !online) return;
     if (playerEntity.health > 0 && playerEntity.maxHealth > 0 && sdFightLink.joined()) _sdSayBody(playerEntity.health / playerEntity.maxHealth, performance.now());
   };
   /** One online frame of the fight: forgotten out of the realm; its bar (ui/superDungeon/sdRemnantBar.js - the gate's, in brass) over
@@ -23819,10 +23791,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  the law's, made on the pack - the unlocked stones out, a fresh mint of the piece in, the offer marked - behind the
    *  pack's own carry gate (itemTransfer.js planTake), and it clinks as every concluded deal does (nativeTrade.js). */
   const _brokerNow = () => Date.now() + _sharedOffsetMs;
-  /** AUDIT BROKER-CAGE C4, C6: whether the relay keeps the faithful's rite, and says the cage open, as its last welcome
-   *  named it (onRelayVersion) - null until one has, so she is caged until it is known (the omen waits on the hub's
-   *  welcome all the same). */
-  let _relayKeepsRite = null, _relayKeepsCage = null;
   let _brokerStock = null;
   const brokerStockNow = () => {
     const day = brokerDay(_brokerNow());
@@ -23926,7 +23894,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     now: _brokerNow,
     // BROKER-CAGE: every one of the faithful fallen - AUDIT BROKER-CAGE C6: the hub's word where the relay says it, my own
     // eyes before it; AUDIT BROKER-CAGE C4: or no faithful at all (a relay before the rite stands none - no captors, no cage)
-    freed: (day, px, py) => _relayKeepsRite === false || !!riteHost?.isCleared(day, px, py, _relayKeepsCage !== true),
+    freed: (day, px, py) => !!riteHost?.isCleared(day, px, py, !online),   // AUDIT BROKER-CAGE C4, C6: online the relay's word on the cage, offline this screen's own eyes
     freedAt: (day, px, py) => riteHost?.clearedAt(day, px, py) ?? NaN,   // AUDIT BROKER-CAGE C8: a cage the hub opened before I saw it shut neither swings nor speaks
     feet: () => (walkMode && playerSpawned ? player.feetAt() : null),
     cam: () => cam.pos,
@@ -24509,8 +24477,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // `wz`: the world pose's own frame) so a member travelling to me lands beside me - never while a journey, a load
       // or a teleport is moving me, when the scene's frame is between two places.
       ...(partyTravel?.poseFields() ?? {}),
-      ...(_walkLead && socialLink()?.partyWalkOk ? { tw: _walkLead } : {}),   // TV8: my walk while I lead one
-      ...(_walkTs != null && socialLink()?.partyWalkOk ? { ts: _walkTs } : {}),   // TV8: when my journey last stopped for a reason of mine
+      ...(_walkLead && socialLink() ? { tw: _walkLead } : {}),   // TV8: my walk while I lead one
+      ...(_walkTs != null && socialLink() ? { ts: _walkTs } : {}),   // TV8: when my journey last stopped for a reason of mine
       ...(social?.leads?.() && mode === 'exterior' && walkMode && playerSpawned && !worldMoveBusy() ? partyFeetOf(player.pos) : {}),
       ...(!social?.party && mode === 'exterior' && walkMode && playerSpawned && !worldMoveBusy() && partyFeetOf(player.pos)),   // STAFF-PANEL5-FOLLOW: and outside a party, so a staff /tp lands on my feet without asking my game
       ...partyFxField(),   // PARTY-BUFFS: my live spell effects, for the party's cards (net/partyBuffs.js)
@@ -24805,7 +24773,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  named on one last own frame; what nobody took goes with me, as the room's teardown takes it. Answers how many went. */
   const handOverRoomFoes = () => {
     const m = modes?.mode ?? 'exterior';
-    const near = online?.room && isWorldRoom(online.room) && online.ownOk && (m === 'interior' || m === 'dungeon') ? (peersNear() ?? []) : [];
+    const near = online?.room && isWorldRoom(online.room) && (m === 'interior' || m === 'dungeon') ? (peersNear() ?? []) : [];
     if (!near.length) return 0;
     const heirOf = (f) => { if (f.entity?.team === 'PlayerAlly' || f.deckBoat != null) return null; const at = f.ai?.feet; if (!at) return null; let id = null, best = Infinity; for (const q of near) { if ((isPrivateQuestFoe(f) || f._keptTag) && !social?.isPartyPeer(q.id)) continue; const d = Math.hypot(at[0] - q.feet[0], at[2] - q.feet[2]); if (d < best) { best = d; id = q.id; } } return id; };   // SUMMON-SYNC: my ally goes with me, as outside
     const frame = modes?.ownHandOverFrame?.(heirOf);
@@ -25537,7 +25505,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     travel: (pick, opts, computed) => partyTravelJourney(pick, opts, computed),
     openMap: () => toggleTravelMap(),
     clock: () => performance.now(),
-    relayOk: () => !!socialLink()?.partyTravelOk,
+    relayOk: () => !!socialLink(),
     poseDirty: () => { _partyComposedAt = -Infinity; },
   });
   /** SOC6: THE
@@ -26156,7 +26124,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   function partyWalkBegin(dest) {
     const prev = _walkLead;
     _walkLead = null;   // AUDIT OW3 P2: a begin that makes no walk leaves none - the old one went on riding the pose
-    if (!social?.party || !social.leads?.() || !socialLink()?.partyWalkOk) return;
+    if (!social?.party || !social.leads?.() || !socialLink()) return;
     const gathered = social.others().filter((m) => memberPresent(m) && distanceToPartyAccount(m.acct) <= PARTY_WALK_RADIUS_M);
     _walkLead = walkBegin(prev, dest, walkNow(), gathered.length);
     _walkCleared = travelOptions?.cleared ?? 0;   // AUDIT OW3 P5: an end BEFORE this journey is not this walk's
@@ -26354,14 +26322,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // chat line, including `ui/nameLayer.js`'s BUBBLE1 speech-bubble treatment over the sender's own character.
   // See `_partyRestVoteTrackTick`'s own doc comment (this file, above) for the replacement: every near
   // member's own client now watches the shared pose data and pushes its own local, bubble-free `chatNotice`.
-  // AUDIT SCALE II C-2: A RELAY THAT KEEPS NO SHARDS (rolled back, or one before them) refuses a shard's key at its door, so
-  // every channel link standing on one - a page that remembered the shards, or a link whose relay just went back - goes
-  // to its channel now, which keeps it, rather than waiting out two misses (or, before the miss read the socket's own
-  // word, for ever in a browser). A link its own shard has welcomed stays: its own relay keeps them
-  const channelLinksOffShards = () => { for (const link of chatLinks?.values?.() ?? []) if (isChannelShard(link.room) && !link.welcomed) link.join(channelOf(link.room)); };
-  // SCALE5c: and whether the relay keeps the hub's shards, remembered for the next page (`channelLinkRoom`) - AUDIT SCALE II
-  // C-2: under this relay's own key, and a relay without them takes the links off their shards
-  const onRelayVersion = (v) => { const keeps = hubShardsSupported(v); try { appStorage()?.setItem?.(hubShardsSeenKey(), keeps ? '1' : '0'); } catch { /* storage refused: the hub itself says it again */ } if (!keeps) channelLinksOffShards(); _relayKeepsRite = relaySupportsRite(v); _relayKeepsCage = relaySupportsCage(v); if (relayVersionSeen(v) === 'changed') chatNotice(relayRestartText()); };   // AUDIT BROKER-CAGE C4, C6: and whether it keeps the rite and the cage
   // SRV-N: THE BUILD POLL. The relay moves by hand and rarely; the client
   // moves on every merge, which is what "whenever we push" actually is
   // for this project. Nothing tells a tab held open across a deploy that
@@ -26413,29 +26373,21 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const place = chatLog?.tab(tabId)?.place ?? null;
     return place && s ? placedRosterSource(s, place) : s;   // GUILD1c: my own row wears my tag; HIDDEN-UNCOUNTED: and my hidden mark (net/roster.js)
   };
-  /** CHAT-CHAN: the Party and Region tabs on a relay from before the channels - the World link's welcome said so. */
-  const chanOld = () => { const world = chatLinks?.get('world'); return world?.status === 'open' && !world.chanOk; };
   /** CHAT-LANG: the language channel the player chose (`chatLang`), or null for none. */
   const chatLangCode = () => (chatLangRoom(getPref('chatLang')) ? getPref('chatLang') : null);
-  /** CHAT-LANG: the Language tab on a relay from before the language channels - the World link's welcome said so. */
-  const langOld = () => { const world = chatLinks?.get('world'); return world?.status === 'open' && !world.langOk; };
-  /** CHAT-TRADE: the Trade and LFG tabs on a relay from before them - the World link's welcome said so. */
-  const tradeChanOld = () => { const world = chatLinks?.get('world'); return world?.status === 'open' && !world.tradeChanOk; };
   /** CHAT-TRADE: has the player joined this channel (`chatTrade`, `chatLfg`) - false for a tab that is not one. */
   const optJoined = (tabId) => (Object.hasOwn(OPT_CHANNELS, tabId) ? getPref(OPT_CHANNELS[tabId].pref) === true : false);
-  /** CHAT-TRADE: why a Trade or LFG tab cannot talk yet - not joined, or a relay from before them; null when it can. */
-  const optWhy = (tabId) => (!Object.hasOwn(OPT_CHANNELS, tabId) || chatLog?.tab(tabId)?.room ? null : tradeChanOld() ? tradeChanOldText() : optJoined(tabId) ? null : notJoinedText(tabId));
-  /** CHAT-CHAN: the strip under the chat - why the ACTIVE tab cannot talk, when it cannot: the tab's own reason (a relay
-   *  from before the channels, no party), else the socket it rides (connecting, reconnecting, refused: the session's
+  /** CHAT-TRADE: why a Trade or LFG tab cannot talk yet - not joined; null when it can. */
+  const optWhy = (tabId) => (!Object.hasOwn(OPT_CHANNELS, tabId) || chatLog?.tab(tabId)?.room ? null : optJoined(tabId) ? null : notJoinedText(tabId));
+  /** CHAT-CHAN: the strip under the chat - why the ACTIVE tab cannot talk, when it cannot: the tab's own reason (no party),
+   *  else the socket it rides (connecting, reconnecting, refused: the session's
    *  own line, labelled with the tab - AUDIT CHAT B5). The Region tab before its first region reads the World link's,
    *  whose welcome is what it waits on. */
   const chatStatus = (tabId) => {
     const tab = chatLog?.tab(tabId);
-    if ((tabId === 'party' || tabId === 'region') && chanOld()) return CHAN_OLD_RELAY_TEXT;
     if (tabId === 'party' && !social?.party) return NO_PARTY_TEXT;
-    if (tabId === 'guild' && guildOld()) return GUILD_OLD_RELAY_TEXT;   // GUILD1c
     if (tabId === 'guild' && !myGuildTag()) return NO_GUILD_TEXT;
-    if (tabId === 'lang' && !tab?.room) return langOld() ? LANG_OLD_RELAY_TEXT : chatLangCode() ? null : NO_LANG_TEXT;   // CHAT-LANG: before its channel
+    if (tabId === 'lang' && !tab?.room) return chatLangCode() ? null : NO_LANG_TEXT;   // CHAT-LANG: before its channel
     if ((tabId === 'trade' || tabId === 'lfg') && !tab?.room) return optWhy(tabId);   // CHAT-TRADE: before its channel
     const s = tabId === 'region' && !tab?.room ? chatLinks?.get('world') : chatSessionOf(tabId);
     return s?.statusLine(tab?.label ?? 'chat') ?? null;
@@ -26452,13 +26404,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const linkItemInChat = (item) => (canPostItemInChat() ? chatPanel.linkItem?.(item) === true : false);
   const chatSend = (tabId, text, from = tabId, { me = false, item = null, items = null } = {}) => {
     const why = (line) => { chatLog.push(from, { text: line, system: true }); return false; };
-    if ((tabId === 'party' || tabId === 'region') && chanOld()) return why(CHAN_OLD_RELAY_TEXT);
-    if (tabId === 'guild' && guildOld()) return why(GUILD_OLD_RELAY_TEXT);   // GUILD1c
-    if (tabId === 'lang' && !chatLog.tab('lang')?.room) return why(langOld() ? LANG_OLD_RELAY_TEXT : NO_LANG_TEXT);   // CHAT-LANG: no channel yet
-    if ((tabId === 'trade' || tabId === 'lfg') && !chatLog.tab(tabId)?.room) return why(optWhy(tabId) ?? optWaitText(tabId));   // CHAT-TRADE: not joined, an older relay, or the channel not open yet
-    // EMOTE1: an action only down a session whose relay carries one - an older one would say the words bare
+    if (tabId === 'lang' && !chatLog.tab('lang')?.room) return why(NO_LANG_TEXT);   // CHAT-LANG: no channel yet
+    if ((tabId === 'trade' || tabId === 'lfg') && !chatLog.tab(tabId)?.room) return why(optWhy(tabId) ?? optWaitText(tabId));   // CHAT-TRADE: not joined, or the channel not open yet
     const s = tabId === 'local' ? online : tabId === 'party' || tabId === 'guild' ? socialLink() : chatLinks.get(tabId);
-    if (me && s?.status === 'open' && !s.emoteOk) return why(EMOTE_OLD_RELAY_TEXT);
     if (tabId === 'local') return online?.sendChat(text, { me, item, items }) ?? false;
     if (tabId === 'party') {
       if (!social?.party) return why(NO_PARTY_TEXT);
@@ -26476,12 +26424,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  reasons it cannot (an older relay, no party). False keeps the line in the field. */
   const chatRoll = (tabId, spec) => {
     const why = (line) => { chatLog.push(tabId, { text: line, system: true }); return false; };
-    if ((tabId === 'party' || tabId === 'region') && chanOld()) return why(CHAN_OLD_RELAY_TEXT);
-    if (tabId === 'guild' && guildOld()) return why(GUILD_OLD_RELAY_TEXT);   // GUILD1c
-    if (tabId === 'lang' && !chatLog.tab('lang')?.room) return why(langOld() ? LANG_OLD_RELAY_TEXT : NO_LANG_TEXT);   // CHAT-LANG
+    if (tabId === 'lang' && !chatLog.tab('lang')?.room) return why(NO_LANG_TEXT);   // CHAT-LANG
     if ((tabId === 'trade' || tabId === 'lfg') && !chatLog.tab(tabId)?.room) return why(optWhy(tabId) ?? optWaitText(tabId));   // CHAT-TRADE
     const s = tabId === 'local' ? online : tabId === 'party' || tabId === 'guild' ? socialLink() : chatLinks.get(tabId);
-    if (s?.status === 'open' && !s.rollOk) return why(ROLL_OLD_RELAY_TEXT);
     if (tabId === 'party' && !social?.party) return why(NO_PARTY_TEXT);
     if (tabId === 'guild' && !myGuildTag()) return why(NO_GUILD_TEXT);
     return s?.sendRoll(spec, tabId === 'party' || tabId === 'guild' ? { ch: tabId } : {}) ?? false;
@@ -26495,9 +26440,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const chatRegionFrame = (now) => {
     if (seatOut()) return;   // ONE-SEAT: a tab out of the seat joins no channel and says no region
     const link = chatLinks?.get('region');
-    if (!link || !chatLinks.get('world')?.chanOk) return;
+    if (!link || !chatLinks.get('world')?.welcomed) return;   // the Region tab waits on the World link's welcome
     const index = _questRegionIndex();
-    const room = nextRegionRoom(_regionHold, chatRegionRoom(index, !!chatLinks.get('world')?.provinceRegionsOk), chatLog.tab('region').room, now);   // WW-R: a province's channel where the relay opens it
+    const room = nextRegionRoom(_regionHold, chatRegionRoom(index), chatLog.tab('region').room, now);
     if (!room) return;
     const place = maps.getRegionName(index) || 'this region';
     chatLog.setRoom('region', room, place);
@@ -26518,7 +26463,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const tab = chatLog.tab('lang');
     if (room === tab.room) return;
     if (!room) { chatLog.setRoom('lang', null, null); link.leave(); return; }
-    if (!chatLinks.get('world')?.langOk) return;
+    if (!chatLinks.get('world')?.welcomed) return;
     chatLog.setRoom('lang', room, CHAT_LANGS[code]);
     link.join(room);
     chatLog.push('lang', { text: langJoinedText(CHAT_LANGS[code]), system: true });
@@ -26538,7 +26483,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       const room = joined ? c.room : null;
       if (room === chatLog.tab(id).room) continue;
       if (!room) { chatLog.setRoom(id, null, null); link.leave(); continue; }
-      if (!chatLinks.get('world')?.tradeChanOk) continue;
+      if (!chatLinks.get('world')?.welcomed) continue;
       chatLog.setRoom(id, room, c.name);
       link.join(room);
     }
@@ -26552,7 +26497,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (!c || !chatLog) return;
     setPref(c.pref, !!on);
     chatOptFrame();
-    if (on) { chatLog.select(id); chatLog.push(id, { text: tradeChanOld() ? tradeChanOldText() : say ? optJoinedSayText(id) : optJoinedText(id), system: true }); }
+    if (on) { chatLog.select(id); chatLog.push(id, { text: say ? optJoinedSayText(id) : optJoinedText(id), system: true }); }
     else chatLog.push(chatLog.active, { text: optLeftText(id), system: true });
   };
   /** PING1: the log marks a line that names me
@@ -26566,10 +26511,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     _pingRangAt = now;
     audio.playOneShot(SOUND.MakeItem, 0.6);
   };
-  /** TV3: my mark, when it is due - on the Region tab's own link, through a relay that knows the frame. */
+  /** TV3: my mark, when it is due - on the Region tab's own link. */
   const travellerFrame = (now) => {
     const link = chatLinks?.get('region');
-    if (!link?.travOk || seatOut()) return;
+    if (!link || seatOut()) return;
     if (link.room !== travellerSent.room) { travellerSent.room = link.room; travellerSent.last = null; travellerSent.at = 0; travellerBook.clear(); }   // a new room holds nothing of mine - AUDIT DEEP2 C4: nor the old room's travellers (its leaves and clears can no longer reach this link; a refused hello there left them drawn five minutes)
     const outdoors = (modes?.mode ?? 'exterior') === 'exterior' && walkMode && playerSpawned && (playerEntity.health ?? 0) > 0;
     // AUDIT TV C4: and never into the region I just LEFT - the Region link holds the old room for CHAT_REGION_HOLD_MS after a
@@ -26783,9 +26728,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   };
   /** AID1 onto ALLY-CAST: THE PARTY MATES' BODIES, for the cast engine's touch, missile and blast - the peers standing in
    *  this scene that the crosshair pick would accept (a party mate some socket of mine reaches), with their names. Null
-   *  offline or on a relay that cannot carry the cast frame, so nothing is aimed at a door that is shut. */
+   *  offline, so nothing is aimed at a door that is shut. */
   const allyMarksNear = (sp = null) => {
-    if (!online?.castOk) return null;
+    if (!online) return null;
     const strangers = !!sp && strangerCastable(sp);   // SPELL-GIFT: and the strangers a stranger-castable spell may reach
     if (!social?.party && !strangers) return null;
     const near = peersNear();
@@ -26818,7 +26763,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const inspectPeer = (peerId) => {
     const p = online?.peers.get(peerId) ?? null;
     if (!p || !profileWin) return false;
-    const can = !!online?.cardOk;
+    const can = !!online;
     _profileAsk = can ? { peerId, at: performance.now(), sent: false } : null;
     if (_profileAsk) _profileAsk.sent = online.sendCard({ to: peerId, ask: true }) === true;
     _profileSub = null;   // DUEL1: no stamp until their card answers
@@ -26854,9 +26799,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   };
   /** WHO A PAGE CAN BE HELD OUT TO: the players standing within the reach a talk has (player/socialPick.js SOCIAL_REACH,
    *  DFU's own distance for a person - the F-menu's), in metres between two bodies (net/tradeSession.js tradeDistance,
-   *  the trade's one measure), that a socket of mine reports, nearest first. Nobody where the relay cannot carry a page. */
+   *  the trade's one measure), that a socket of mine reports, nearest first. Nobody offline. */
   const pageReaders = () => {
-    if (!online?.pageOk) return [];
+    if (!online) return [];
     const near = peersNear();
     if (!near) return [];
     const me = player.feetAt();
@@ -26870,7 +26815,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const showPage = (id, page) => {
     const name = peerName(id);
     if (!online || online.status !== 'open') return `${NOT_CONNECTED_TEXT}.`;
-    if (!online.pageOk) return PAGE_UNSUPPORTED_TEXT;
     if (!pageReaders().some((p) => p.id === id)) return pageTooFarText(name);
     return online.sendPage({ to: id, page }) ? pageShownText(name) : `${TRY_AGAIN_TEXT}.`;
   };
@@ -26890,7 +26834,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const readers = pageReaders();
     const why = readers.length ? null
       : (!online || online.status !== 'open') ? `${NOT_CONNECTED_TEXT}.`
-        : (!online.pageOk ? PAGE_UNSUPPORTED_TEXT : PAGE_NO_READERS_TEXT);
+        : PAGE_NO_READERS_TEXT;
     return { readers, why, show: showPage, letter: mail ? letterPage : null };
   };
   /** The F-menu's 'Read their page': the page they hold out, in the window - if it still waits. */
@@ -27360,7 +27304,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     spectatorFrame();   // AUDIT-SEATS G4: a spectator's free camera begun - or, its watching over, set back where it stood
     // WB3b: THE COURT'S ROOM HEARS MY LEVEL CLAIM once per welcome (net/gate/gateBrain.js - the health I bring into the fight
     // and the bucket I may deal from); a reconnect's welcome says it again, and the relay keeps my first
-    if (gateLink && online.gateOk && isGateRoom(online.room) && (online.welcomes !== _gateInFor || gateCourt?.askAgain()) && online.sendGate({ k: 'in', lv: Math.max(1, playerEntity.level | 0), bv: GATE_BRAIN_V })) _gateInFor = online.welcomes;
+    if (gateLink && isGateRoom(online.room) && (online.welcomes !== _gateInFor || gateCourt?.askAgain()) && online.sendGate({ k: 'in', lv: Math.max(1, playerEntity.level | 0), bv: GATE_BRAIN_V })) _gateInFor = online.welcomes;
     // PERF11: ONE peersNear() A FRAME. The owner sweeps below -
     // the foes' prune and the camps' - each built the list from scratch
     // and then a Set of its ids from scratch, twice a frame, for the
@@ -27697,8 +27641,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // mine names, at Privateer's Hold, where a partner stands an instance; built once, asked by the modes host - a player's
   // door its popup, every other way in its rule (scenes/instanceDoor.js). The room's key reads what the place was entered as
   const seatHalls = createSeatHallHost({ seatHere, guild: () => guildBook?.guild ?? null });   // HOST-SPLIT (DOMAIN2): a seat's halls, out of this scope
-  const instanceDoor = createInstanceDoor({ online: () => onlineOn, instanceOk: () => !!(online?.instanceOk || chatLinks?.get('world')?.instanceOk), account: () => social?.acct ?? null, character: () => realmSession?.id ?? null,
-    castle: (site) => (online?.guildInstanceOk || chatLinks?.get('world')?.guildInstanceOk ? seatHalls.castleAt(site.mapId) : null),   // DOMAIN2: my guild's castle there, where the relay admits a guild (AUDIT DOMAINS R3: the world link's word too, as the instances' own)
+  const instanceDoor = createInstanceDoor({ online: () => onlineOn, instanceOk: () => !!(online || chatLinks?.get('world')), account: () => social?.acct ?? null, character: () => realmSession?.id ?? null,
+    castle: (site) => (online || chatLinks?.get('world') ? seatHalls.castleAt(site.mapId) : null),   // DOMAIN2: my guild's castle there (AUDIT DOMAINS R3: the world link stands in, as for the instances)
     members: () => social?.others() ?? [], questMachine: () => questBridge?.machine ?? null, openOverlay: (w, onClosed) => townTalk.pushOverlay(w, onClosed), say: (l) => townTalk.say(l), wild: () => { const m = wildMapMask(), p = playerTravelPixel(); return (!!m && wildInside(m, p.x, p.y)) || seaVentures.openSeaAt(p); },   // `wild`: inside the open zone nothing keeps an instance - its dungeons sealed, its halls the relay's to refuse; SEA-VAULTS: the open sea's too
     remains: () => legacyHost?.remainsWhere() ?? [] });   // HEIR-WHOLE: where the line's remains lie - a dungeon they lie in whole is the death quest's place
   // WITCH1: THE WITCHES' FESTIVAL IN THE STREETS (scenes/witchesHost.js) - the town
@@ -27858,11 +27802,11 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     drawSdTelegraph: ({ proj, view, eye }) => { const t = performance.now() / 1000, fog = courtFogNow(); const blows = !!sdBlows?.drawPass(proj, view, eye, t, fog), lines = !!sdSpoilsPool?.drawPass(proj, view, eye, t, fog); const motes = !!sdMotesPassOf()?.draw(proj, view, deadlandsSeconds(), fog, skyGain(renderer._fogColor, SD_REALM_FOG.color), renderer.worldViewportPx?.[3]); const sparks = !!(sdFx && sdFightLink && sdFx.draw(renderer.gl, proj, view, eye, sdFightLink.now(), fog, renderer.worldViewportPx?.[3])); const beams = sdFightLink ? sdBeamDraws(sdFightLink.state(), sdFightLink.now(), _sdBeamDraws) : NO_SD_BEAMS; const beam = beams.length > 0 && !!sdBeamPassOf()?.draw(beams, proj, view, eye, t, fog); const reads = drawSdArenaReads(proj, view, fog); if (blows || lines || motes || sparks || beam || reads) renderer.markForeignPass(); },   // SD-LOOK S7: and the arena's reads
     deadlandsSeconds: () => deadlandsSeconds(),   // WB6b: the court's flash and the shards' drift keep the sky's clock
     staffTeleportHeld: () => staffTeleportHeld,
-    canVisitPrivateRoom: () => !seatOut() && isStaff(_staffGlyphs) && !!chatLinks.get('world')?.staffTeleportOk,
+    canVisitPrivateRoom: () => !seatOut() && isStaff(_staffGlyphs) && !!chatLinks.get('world'),
     gateVeil: () => gateVeil,   // WB6c: the step through the gate's fire, both ways
     // AUDIT WB B5: why the gate's door refuses the step now it has closed, or null - no relay to hold the court, its
     // master fallen, or sealed while the fire burned (the pool's own words where it has them)
-    gateRefusal: (g) => (!online?.gateOk || online?.terminal || (!!gatePortentsOf(g.day) && !online?.portentsOk) ? GATE_TEXT.notYet   // AUDIT WB14 (WIRE-1): a portent night on a relay from before them
+    gateRefusal: (g) => (!online || online.terminal ? GATE_TEXT.notYet
       : Number.isFinite(gateLink?.fellAt(g.day)) ? GATE_NO_TEXT['the gate is closing']
         : !gateAdmits(g.day, Date.now() + _sharedOffsetMs) ? GATE_TEXT.sealed : null),
     drawPeerNames: ({ proj, view, eye }) => drawPeerNames(proj, view, eye),

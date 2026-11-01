@@ -20,7 +20,7 @@ import {
   COURTS, COURT_CENTRE, HIT_KINDS, HEAL_REF_BASE, HEAL_REF_LV, HEAL_REFILL_S, HEAL_DEPTH_X, healRef,
   newFight, joinFight, applyHeal, applyHit, damageChart,
 } from '../../../src/net/gate/gateBrain.js';
-import { validGateIn, validGateOut, GATE_KINDS, GATE_HEAL_ROWS_MAX, GATE_HEAL_WIRE_MAX, GATE_HEAL_RELAY_MIN, relaySupportsGateHeal, GATE_BRAIN_V, RELAY_VERSION } from '../../../src/net/wire.js';
+import { validGateIn, validGateOut, GATE_KINDS, GATE_HEAL_ROWS_MAX, GATE_HEAL_WIRE_MAX, GATE_BRAIN_V, RELAY_VERSION } from '../../../src/net/wire.js';
 import { gateTimes, gateRoomKey } from '../../../src/net/gate/gateLaw.js';
 import { GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { createGateCourt, HEAL_SEND_MS } from '../../../src/scenes/gate/gateCourt.js';
@@ -98,7 +98,7 @@ test('GATE-HEAL the chart: each healer\'s row carries `hl` (whole), none for one
 
 // ═══ THE WIRE ══════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('GATE-HEAL the wire: `heal` - one to GATE_HEAL_ROWS_MAX rows, each a caster\'s peer id once (no row of my own: a heal on myself is no one\'s), whole points to GATE_HEAL_WIRE_MAX, projected row by row; a chart row\'s `hl` whole and bounded (a bad one is no chart, never a refused kill); the relay that hears it (mutants: a caster twice; a fraction; a row of my own)', () => {
+test('GATE-HEAL the wire: `heal` - one to GATE_HEAL_ROWS_MAX rows, each a caster\'s peer id once (no row of my own: a heal on myself is no one\'s), whole points to GATE_HEAL_WIRE_MAX, projected row by row; a chart row\'s `hl` whole and bounded (a bad one is no chart, never a refused kill) (mutants: a caster twice; a fraction; a row of my own)', () => {
   assert.ok(GATE_KINDS.includes('heal'));
   assert.deepEqual(validGateIn({ k: 'heal', h: [['peer-0008', 12], ['peer-0009', 30]], junk: 1 }), { k: 'heal', h: [['peer-0008', 12], ['peer-0009', 30]] });
   const most = Array.from({ length: GATE_HEAL_ROWS_MAX }, (_, i) => [`peer-${1000 + i}`, GATE_HEAL_WIRE_MAX]);
@@ -109,9 +109,6 @@ test('GATE-HEAL the wire: `heal` - one to GATE_HEAL_ROWS_MAX rows, each a caster
     { k: 'heal', h: [['peer-0009', 1.5]] }, { k: 'heal', h: [['peer-0009', GATE_HEAL_WIRE_MAX + 1]] },
     { k: 'heal', h: [['a b', 5]] }, { k: 'heal', h: [[7, 5]] }, { k: 'heal', h: [['peer-0009', 5, 1]] }, { k: 'heal', h: 'x' },
   ]) assert.equal(validGateIn(bad), null, JSON.stringify(bad).slice(0, 80));
-  assert.equal(relaySupportsGateHeal(`world${GATE_HEAL_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsGateHeal(`world${GATE_HEAL_RELAY_MIN}`), true);
-  assert.ok(relaySupportsGateHeal(RELAY_VERSION), 'this tree\'s relay hears it');
   const row = { n: 'Ann', l: 10, d: 500, x: 0, h: 3, b: 90, f: 0 };
   assert.equal(validGateOut({ k: 'fell', at: 9, top: [], n: 1, dm: [{ ...row, hl: 120 }] }).dm[0].hl, 120);
   assert.ok(!('hl' in validGateOut({ k: 'fell', at: 9, top: [], n: 1, dm: [row] }).dm[0]));
@@ -150,18 +147,14 @@ test('GATE-HEAL the relay: a fighter\'s `heal` credits the caster its socket\'s 
 
 // ═══ THE SESSION ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
-function gateRig(relayV) {
+function gateRig() {
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
   const log = console.log, warn = console.warn; console.log = () => {}; console.warn = () => {};
-  try { s.join(gateRoomKey(202), { x: 25.6, y: 0, z: 45, yaw: 0 }); const ws = sockets[0]; ws.open(); ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: relayV }); return { s, ws }; } finally { console.log = log; console.warn = warn; }
+  try { s.join(gateRoomKey(202), { x: 25.6, y: 0, z: 45, yaw: 0 }); const ws = sockets[0]; ws.open(); ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION }); return { s, ws }; } finally { console.log = log; console.warn = warn; }
 }
-test('GATE-HEAL the session: a `heal` goes only to a relay that hears it - an older one junks an unknown gate word (mutants: the door dropped; every relay heard)', () => {
-  const old = gateRig(`world${GATE_HEAL_RELAY_MIN - 1}`);
-  assert.equal(old.s.gateHealOk, false);
-  assert.equal(old.s.sendGate({ k: 'heal', h: [['peer-0009', 5]] }), false);
-  assert.equal(old.s.sendGate({ k: 'in', lv: 10 }), true, 'the rest of the gate as ever');
-  const now = gateRig(RELAY_VERSION);
+test('GATE-HEAL the session: a `heal` goes to the relay as the wire\'s word (mutants: the word dropped)', () => {
+  const now = gateRig();
   assert.equal(now.s.sendGate({ k: 'heal', h: [['peer-0009', 5]] }), true);
   assert.deepEqual(JSON.parse(now.ws.sent.at(-1)), { t: 'gate', k: 'heal', h: [['peer-0009', 5]] });
 });

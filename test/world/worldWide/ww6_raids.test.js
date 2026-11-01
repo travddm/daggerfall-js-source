@@ -27,7 +27,7 @@ import { REGION_NAMES, BAY_REGION_COUNT, regionOfTheatre, theatreOfRegion } from
 import { THEATRE_COUNT, areaAt } from '../../../src/world/worldWide/worldGrid.js';
 import { WILD_REGION } from '../../../src/systems/wild/wildZone.js';
 import {
-  WORLD_PIXEL_BOUND, validRaidIn, validRaidOut, parseClient, worldRoom, relaySupportsRaidWorld, RAID_WORLD_RELAY_MIN, RELAY_VERSION,
+  WORLD_PIXEL_BOUND, validRaidIn, validRaidOut, parseClient, worldRoom, RELAY_VERSION,
   PIXEL_UNITS, wallMsForClassicMinutes, raidLedgerKey,
 } from '../../../src/net/wire.js';
 import { dayRng, DAY_SALT } from '../../../src/systems/worldTick.js';
@@ -442,9 +442,7 @@ test('WW6 the relay: a raid past the Bay is kept in its town\'s cell as the Bay\
   }, r);
 });
 
-test('WW6 the session: a raid past the Bay goes only to a relay that hears one (world274 on - an older relay refuses the word); a Bay raid to any raid relay as before; the halo says for itself (mutants: the gate unread; the version floor off)', () => {
-  assert.equal(RAID_WORLD_RELAY_MIN, 276);
-  assert.deepEqual([relaySupportsRaidWorld('world275'), relaySupportsRaidWorld('world276'), relaySupportsRaidWorld(RELAY_VERSION), relaySupportsRaidWorld('x')], [false, true, true, false]);
+test('WW6 the session: a raid past the Bay goes to the relay as a Bay raid does', () => {
   const rigOf = (cell, v, pose) => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
@@ -454,12 +452,10 @@ test('WW6 the session: a raid past the Bay goes only to a relay that hears one (
   };
   const past = { key: `64:-1000124:${D}`, st: D * 1440 + 700, tg: 17, ty: 1, px: 2425, py: 270, n: 0, s: 0, k: 'w' };
   const bay = { ...past, key: `3:7:${D}`, px: 100, py: 200 };
-  const oldPast = rigOf(worldRoom(past.px, past.py), 'world271', poseOn(past.px, past.py));
-  assert.deepEqual([oldPast.raidOk, oldPast.raidWorldOk, oldPast.sendRaid(past, worldRoom(past.px, past.py))], [true, false, false], 'an older raid relay hears no raid past the Bay');
-  const oldBay = rigOf(worldRoom(bay.px, bay.py), 'world271', poseOn(bay.px, bay.py));
-  assert.equal(oldBay.sendRaid(bay, worldRoom(bay.px, bay.py)), true, 'the Bay\'s as before');
+  const atBay = rigOf(worldRoom(bay.px, bay.py), RELAY_VERSION, poseOn(bay.px, bay.py));
+  assert.equal(atBay.sendRaid(bay, worldRoom(bay.px, bay.py)), true, 'the Bay\'s as before');
   const now = rigOf(worldRoom(past.px, past.py), RELAY_VERSION, poseOn(past.px, past.py));
-  assert.deepEqual([now.raidWorldOk, now.sendRaid(past, worldRoom(past.px, past.py))], [true, true]);
+  assert.equal(now.sendRaid(past, worldRoom(past.px, past.py)), true, 'past the Bay');
 });
 
 // ═══ A STAFF TOWN EVENT PAST THE BAY ═════════════════════════════════════════════════════════════

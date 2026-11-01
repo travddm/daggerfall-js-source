@@ -111,7 +111,6 @@ test('STAFF-PANEL5-FOLLOW LIVE: a staff pick follows a solo player over the real
     };
     for (let i = 0; i < 20; i++) await frame();
     assert.ok(H.isHubShard(thub.room), `the target's hub link sits on its shard (${thub.room})`);
-    assert.ok(main.followOk, 'the relay says follow at its welcome');
     hook.follow(TARGET);
     const trace = [];
     for (let i = 0; i < 80; i++) { await frame(); trace.push(`${i}:${hook.locked() ? 'L' : '-'}:${hook.room() ?? '?'}:${hook.view() ? 'V' : '-'}`); }

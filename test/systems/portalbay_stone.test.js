@@ -99,7 +99,7 @@ function worldHost(o = {}) {
     townTalk: { say: (l) => said.push(l), showOverlay: (w) => { scope.overlay = w; } },
     hudFade, console: { warn: () => {}, error: () => {} },
     etherSea: false, inEther, pastBayJourney, teleportJourney, wildJourney, wildInside, WILD_NAME, ETHER_WILD_TEXT: { teleport: () => 'the sea' },
-    TEST_GODMODE: false, staffPowers: () => ({}), online: { wildOk: false }, wildMapMask: () => null, etherWildRingAt: () => 0,
+    TEST_GODMODE: false, staffPowers: () => ({}), online: {}, wildMapMask: () => null, etherWildRingAt: () => 0,
     playerEntity: { wildTravelAt: null, anchorPosition: null }, legacyGold: () => 0, deductGoldPieces() {}, WILD_TEXT: { travelPaid: () => '' },
     here: { x: 300, y: 300 }, busy: false, _teleporting: false, _recalling: false,
     modes: { forceExitToExterior() {}, mode: 'exterior', insideContext: () => ({ insideBuilding: false, insideDungeon: false, buildingKey: 0 }) },
@@ -216,7 +216,7 @@ test('PORTAL-BAY a refused pick never fades and never spends; a refused step is 
   const blacks = countBlacks();
   try {
     // THE PICK: online, the open zone's city - refused at the pick, said, nothing spent, nothing blacked
-    let W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
+    let W = worldHost({ online: {}, wildMapMask: () => zone });
     let s = stoneHost(W);
     const pack = [portalStones(2)];
     playerEntity.health = 50;
@@ -230,7 +230,7 @@ test('PORTAL-BAY a refused pick never fades and never spends; a refused step is 
     win.dispose?.();
     // THE STEP: a portal standing to the zone's city (a peer's, or mine opened before the zone was raised) - refused before
     // the black, said, never blacked; no arrival
-    W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
+    W = worldHost({ online: {}, wildMapMask: () => zone });
     s = stoneHost(W);
     s.host.portalGates.open([0, 0, 2], { pixel: imperial.pixel, name: imperial.name });
     hudFade.clearFade(); blacks.n = 0; W.said.length = 0;
@@ -265,7 +265,7 @@ test('PORTAL-BAY a refused pick never fades and never spends; a refused step is 
     W.scope._teleporting = true;
     assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), false, 'a teleport under way');
     W.scope._teleporting = false;
-    W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
+    W = worldHost({ online: {}, wildMapMask: () => zone });
     assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), false, 'into the zone');
     W = worldHost();
     assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), true, 'arrived');
@@ -281,7 +281,7 @@ test('PORTAL-BAY Recall is a teleport too: an anchor set past the Bay is reached
   assert.deepEqual(W.jumps.map((j) => [j.px, j.py]), [[solitude.x, solitude.y]], 'the anchor past the Bay reached');
   assert.ok(!W.said.includes(PAST_BAY_TRAVEL_TEXT.refused), 'never the journey\'s refusal');
   const zone = buildWildMask({ width: 100, height: 100, ox: solitude.x - 50, oy: solitude.y - 50, inZone: () => true });
-  const Z = worldHost({ stopAfterJump: true, online: { wildOk: true }, wildMapMask: () => zone });
+  const Z = worldHost({ stopAfterJump: true, online: {}, wildMapMask: () => zone });
   Z.scope.playerEntity.anchorPosition = anchorAt(solitude);
   await Z.scope.recallToAnchor().catch(() => {});
   assert.deepEqual([Z.jumps, Z.said], [[], [`You cannot teleport into or out of ${WILD_NAME}. Walk or ride its roads.`]], 'the zone\'s own law stands');
@@ -371,7 +371,7 @@ test('PORTAL-ANYWHERE the stone\'s map picks ANY land past the Bay, named by its
   // online, the zone's land: refused at the pick, said, nothing spent
   const imperial = LAND[1];
   const zone = buildWildMask({ width: 100, height: 100, ox: imperial.x - 50, oy: imperial.y - 50, inZone: () => true });
-  const W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
+  const W = worldHost({ online: {}, wildMapMask: () => zone });
   const { host, stone } = stoneHost(W);
   const pack = [portalStones(2)];
   stone.openPortalStone(pack[0], pack);

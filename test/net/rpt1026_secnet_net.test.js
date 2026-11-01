@@ -96,7 +96,7 @@ async function hearing(blocks, peers = []) {
   quiet(() => s.join('world:3,12'));
   const ws = sockets.at(-1);
   ws.open();
-  ws.receive({ t: 'welcome', id: 'me-00001', peers, n: 1 + peers.length, v: 'world268' });
+  ws.receive({ t: 'welcome', id: 'me-00001', peers, n: 1 + peers.length });
   const got = [];
   s.onTrade = (id) => got.push(`trade:${id}`); s.onPage = (id) => got.push(`page:${id}`);
   const fetch = async () => new Response(JSON.stringify({ ok: true, blocks }), { status: 200, headers: { 'content-type': 'application/json' } });
@@ -239,6 +239,8 @@ test('RPT1026-SECNET A HALO\'S STALLED LINE HOLDS ITS POSES TOO: my own cell\'s 
   quiet(() => s.setHalo(halos));
   for (let i = 1; i < sockets.length; i++) welcome(sockets[i]);
   assert.equal(sockets.length, 4, 'a corner: my cell and three halos');
+  // a player far across the last halo keeps the session from being alone, so lone sleep holds none of my poses
+  quiet(() => sockets[3].receive({ t: 'join', id: 'far-0001', name: 'Far', look: null, pose: { x: start.x - 5 * PIXEL_UNITS, y: 0, z: start.z, yaw: 0, pitch: 0, mv: 0 } }));
   t += PING_MS;
   quiet(() => s.tick());
   for (const ws of sockets) assert.equal(ws.sent.at(-1), '{"t":"ping"}', 'every deaf line asked');
@@ -280,7 +282,6 @@ test('RPT1026-SECNET A BOUT\'S ROOM AND THE ZONE\'S ROOM WORDS WAIT FOR THE WELC
   const welcome = { t: 'welcome', id: 'duel-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'duel-0001', world: null, v: RELAY_VERSION };
   sockets[0].open();
   quiet(() => sockets[0].receive(welcome));
-  assert.equal(s.duelOk && s.wildOk, true);
   const blow = { to: 'peer-0002', s: 'abc123def0', k: 'strike', n: 1, by: 'melee', p: [100000, 10.5, 200000], d: 5, a: { lv: 30 } };
   const take = { k: 'take', r: '0123456789ab', i: 0, n: 1 };
   assert.equal(s.sendDuel(blow, { room: s.room }), true, 'welcomed: the bout\'s room hears it');

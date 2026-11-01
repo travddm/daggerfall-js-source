@@ -3,8 +3,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseClient, validWildData, validWildOut, relaySupportsWild, WILD_RELAY_MIN, WILD_ITEMS_MAX, WILD_REMAINS_ITEMS_MAX,
-  RELAY_VERSION, worldRoom, PIXEL_UNITS,
+  parseClient, validWildData, validWildOut, WILD_ITEMS_MAX, WILD_REMAINS_ITEMS_MAX,
+  worldRoom, PIXEL_UNITS,
 } from '../../src/net/wire.js';
 import { WILD_REMAINS_MS } from '../../src/net/wire.js';
 import { newRemains, foldFall, takeFrom, remainsWords, remainsEvict, remainsEmpty, remainsOf, wildRemainsKey } from '../../src/net/wild/wildLaw.js';
@@ -43,9 +43,6 @@ test('WILD1 wire: the room\'s words back, and the relay that first carries the f
   assert.deepEqual(validWildOut({ k: 'rm', r: 'rrrrrr01', i: 1, n: 2 }), { k: 'rm', r: 'rrrrrr01', i: 1, n: 2 });
   assert.equal(validWildOut({ k: 'got', r: 'rrrrrr01', i: 1 }), null);
   assert.deepEqual(validWildOut({ k: 'gone', r: 'rrrrrr01' }), { k: 'gone', r: 'rrrrrr01' });
-  assert.equal(WILD_RELAY_MIN, 177);   // the zone's one version, renumbered past main's SUPER-DUNGEONS (world176)
-  assert.deepEqual(['world176', 'world177', 'junk', null].map(relaySupportsWild), [false, true, false, false]);
-  assert.ok(relaySupportsWild(RELAY_VERSION));
 });
 
 // relay's check on its last chunk - test/net/int9_wild_ref.test.js)

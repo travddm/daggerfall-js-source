@@ -20,7 +20,7 @@ import { takeWildDeath, wornOffer, wildRecord, wildPickOf, wildDropCandidates, w
 import { WILD_PARTY_TRUCE_MS } from '../../src/systems/wild/wildZone.js';
 import { TEMPLATES } from '../../src/systems/item/itemKinds.js';
 import { WILD_BODY_MS } from '../../src/net/wild/wildFight.js';
-import { validWildData, validWildRefOut, WILD_ITEMS_MAX, WILD_REMAINS_ITEMS_MAX, WILD_REF_RELAY_MIN, relaySupportsWildRef, RELAY_VERSION, WILD_ORDER_MAX, worldRoom, PIXEL_UNITS, WILD_DATA_MAX, SOCIAL_ROOM } from '../../src/net/wire.js';
+import { validWildData, validWildRefOut, WILD_ITEMS_MAX, WILD_REMAINS_ITEMS_MAX, RELAY_VERSION, WILD_ORDER_MAX, worldRoom, PIXEL_UNITS, WILD_DATA_MAX, SOCIAL_ROOM } from '../../src/net/wire.js';
 import { OnlineSession, WILD_ZONE_KEEP_MS } from '../../src/net/online.js';
 import { wildChunks } from '../../src/systems/wild/wildDeath.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
@@ -359,7 +359,7 @@ test('INT9 (AUDIT) THE ROOM\'S REMAINS, ONCE: an emptied remains is a TOMBSTONE 
   assert.deepEqual([back.gi, back.lastAt, back.ok], ['gabcdefghij', 1000, true]);
 });
 
-test('INT9 THE WIRE: a blow carries the striker\'s rolled number (`d`) and no sheet; the pick is the relay\'s (`r`, `w`), the zone word a bit, a deposit its order on every chunk; the referee\'s three words projected; the relay that first referees (mutants: a deposit with no order; a pick with an unbounded place)', () => {
+test('INT9 THE WIRE: a blow carries the striker\'s rolled number (`d`) and no sheet; the pick is the relay\'s (`r`, `w`), the zone word a bit, a deposit its order on every chunk; the referee\'s three words projected (mutants: a deposit with no order; a pick with an unbounded place)', () => {
   assert.deepEqual(validWildData({ k: 'strike', to: 'peer-0002', n: 1, by: 'melee', p: [1, 2, 3], d: 9, a: { lv: 5 } }), { to: 'peer-0002', k: 'strike', n: 1, by: 'melee', p: [1, 2, 3], d: 9 }, 'no attacker\'s sheet for a defender to read');
   assert.deepEqual(validWildData({ k: 'zone', z: 1 }), { k: 'zone', z: 1 });
   assert.equal(validWildData({ k: 'zone', z: 2 }), null);
@@ -375,9 +375,6 @@ test('INT9 THE WIRE: a blow carries the striker\'s rolled number (`d`) and no sh
   assert.deepEqual(validWildRefOut({ t: 'wref', k: 'hp', by: 'peer-0001', to: 'peer-0002', d: 4, r: 0, h: [['peer-0001', 320, 320], ['peer-0002', 316, 320]] }).h[1], ['peer-0002', 316, 320]);
   assert.deepEqual(validWildRefOut({ t: 'wref', k: 'fell', id: 'peer-0002', by: 'peer-0001', r: '0123456789ab' }), { k: 'fell', id: 'peer-0002', by: 'peer-0001', r: '0123456789ab' });
   assert.equal(validWildRefOut({ t: 'wref', k: 'rc', r: '0123456789ab', rc: 'x'.repeat(WILD_RECEIPT_MAX + 1) }), null);
-  assert.equal(WILD_REF_RELAY_MIN, 185);
-  assert.deepEqual(['world184', 'world185', null].map(relaySupportsWildRef), [false, true, false]);
-  assert.ok(relaySupportsWildRef(RELAY_VERSION));
 });
 
 // ─── THE RELAY ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -742,7 +739,6 @@ test('INT9 THE SERVICE, THE LEDGER AND THE FREEZE: a piece the ledger bars from 
 
 test('INT9 THE CLIENT: a blow rolled on my own sheet and sent as a number; no defender\'s resolve; the referee\'s fall a DEATH no door turns aside (AUDIT INT9: the SetHealth(0) door\'s AvoidDeath and withholding stood a fallen up); my drop the service\'s act on my record, naming the room my remains lie in, and EXACTLY what it took out of my pack (AUDIT INT9: the game ran the law again without the ledger\'s word); the room given the service\'s records on its order, chunked by their bytes; a fall I won seized after the grace where the body fell (mutants: the defender\'s resolve kept; a drop of my own choosing taken; the seizure unread; the deposit in one heavy frame)', () => {
   const w = hostText('src/scenes/world.js'), o = rd('src/net/online.js');
-  assert.ok(o.includes('if (primary) this.wildOk = relaySupportsWildRef(relayV);'), 'a relay that referees the zone, or none of it');
   assert.ok(o.includes("} else if (m.t === 'wref') {"));
   assert.ok(w.includes('online?.setWildZone?.(wildCan() ? 1 : 0, playerEntity.health <= 0);'));
   assert.ok(w.includes("const n = wildFight.blow(to, 'strike', { by, p: campToWire(player.feetAt()), d: Math.trunc(r.dmg),"));
@@ -766,7 +762,7 @@ test('INT9 THE CLIENT: a blow rolled on my own sheet and sent as a number; no de
   assert.equal(validWildData({ k: 'fall', r: '0123456789ab', p: [1, 2, 3], items: heavy, last: 0, o: 'x'.repeat(900) }), null, 'the drop in one frame: refused');
 });
 
-test('INT9 (AUDIT) THE CLIENT\'S LINK: my zone word on MY OWN CELL\'S socket alone - a halo hears none (each held a whole bar of its own) - said again every WILD_ZONE_KEEP_MS while it stands; at a crossing the cell left hears 0 and the one crossed into 1, the zone\'s relay word going with each socket; a pick or a deposit for a room I no longer hold goes nowhere (it went down my own socket); the duel referee\'s word heard on any socket, with its room (mutants: the word on a halo; the keepalive unsaid; the crossing unsaid; the room\'s fallback; the referee\'s word on the primary alone)', () => {
+test('INT9 (AUDIT) THE CLIENT\'S LINK: my zone word on MY OWN CELL\'S socket alone - a halo hears none (each held a whole bar of its own) - said again every WILD_ZONE_KEEP_MS while it stands; at a crossing the cell left hears 0 and the one crossed into 1; a pick or a deposit for a room I no longer hold goes nowhere (it went down my own socket); the duel referee\'s word heard on any socket, with its room (mutants: the word on a halo; the keepalive unsaid; the crossing unsaid; the room\'s fallback; the referee\'s word on the primary alone)', () => {
   const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
   quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
@@ -785,7 +781,6 @@ test('INT9 (AUDIT) THE CLIENT\'S LINK: my zone word on MY OWN CELL\'S socket alo
     assert.deepEqual(zones(sockets[0]), [1, 1], 'said again while it stands');
     s.join('world:3,12', pose);
     assert.deepEqual([zones(sockets[0]), zones(sockets[1])], [[1, 1, 0], [1]], 'the cell left hears I left it; the one crossed into, that I stand in it');
-    assert.equal(s.wildOk, true, 'the zone\'s relay word crossed with its socket');
     assert.equal(s.sendWild({ k: 'pick', r: '0123456789ab', w: 0 }, { room: 'world:9,9' }), false, 'a room I do not hold: nowhere');
     const refs = []; s.onDuelRef = (g, room) => refs.push([g.k, room]);
     sockets[0].receive({ t: 'dref', k: 'no', s: 'duel123456', why: 'busy' });

@@ -1189,7 +1189,7 @@ export function raidWireWord(t = localNow()) {
 }
 
 // ---- RAID3: the relay's arm -------------------------------------------------------
-/** Does the relay keep this world's raids? Online, at a relay that knows the frame (net/wire.js relaySupportsRaid). */
+/** Does the relay keep this world's raids? Online, on a session the relay holds. */
 export const raidRelayOn = () => sharedClockOn() && !!host().relayRaids?.();
 const raidByKey = (key) => state.raids.find((r) => raidKey(r) === key) ?? null;
 /** AUDIT RAID R1: my raid's signature - the tuple my word names (the day's roll's own), which the relay's words carry. */

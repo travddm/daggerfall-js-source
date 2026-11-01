@@ -21,8 +21,8 @@
 // GATE_COLLAPSE_MS and the beacon goes out). The collider stands only while the gate stands risen.
 //
 // THE DOOR. Activate the fire, or walk through it while it is open: `enter(gate)` - the host's arena door (WB3).
-// A gate that is not open says why; a relay that cannot hold a gate's arena says "not yet" (`ready()` false - the
-// wire's relaySupportsGate, WB3), and nothing else happens.
+// A gate that is not open says why; with no relay to hold a gate's arena it says "not yet" (`ready()` false, WB3), and
+// nothing else happens.
 //
 // Not a DFU member. Ledger A (WB).
 import { buildGateModel, gateArchProfile, insideGateStone, GATE_ARCHIVE, GATE_HEIGHT, GATE_HALF_W, PORTAL_CENTRE_Y, ARCH_Y0, ARCH_Y1, ARCH_PROFILE_N } from '../../world/gate/gateModel.js';

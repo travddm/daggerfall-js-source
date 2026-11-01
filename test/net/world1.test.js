@@ -174,7 +174,7 @@ test('WORLD1: the session - the host from the welcome and the host frame, isHost
   const ws = sockets[0]; ws.open();
   assert.equal(s.host, null); assert.equal(s.isHost(), false, 'unknown until the welcome');
   assert.equal(s.sendWorld({ a: 1 }), false, 'not the host: nothing goes');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'bob-0002', world: null });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'bob-0002', world: null, v: RELAY_VERSION });
   assert.equal(s.host, 'bob-0002'); assert.equal(s.isHost(), false); assert.deepEqual(hosts, [['bob-0002', false]]); assert.deepEqual(worlds, [], 'no memory: onWorld silent');
   ws.receive({ t: 'host', id: 'bob-0002' });
   assert.deepEqual(hosts, [['bob-0002', false]], 'the same host again: nothing said');
@@ -186,9 +186,9 @@ test('WORLD1: the session - the host from the welcome and the host frame, isHost
   assert.equal(s.sendWorld(null), false); assert.equal(s.sendWorld([1]), false); assert.equal(s.sendWorld('x'), false);
   assert.equal(s.sendWorld({ pad: 'x'.repeat(WORLD_FRAME_MAX) }), false, 'past the cap: kept home, never a terminal close');
   assert.equal(ws.sent.filter((m) => m.t === 'world').length, 1);
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: shared });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: shared, v: RELAY_VERSION });
   assert.deepEqual(worlds, [shared], 'a welcome with a memory: onWorld');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: [1] });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: [1], v: RELAY_VERSION });
   assert.deepEqual(worlds, [shared], 'not an object: not a memory');
   s.leave();
   assert.equal(s.host, null); assert.equal(s.isHost(), false, 'forgotten with the room');

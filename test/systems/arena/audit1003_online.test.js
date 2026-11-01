@@ -65,7 +65,7 @@ async function signingKey() {
 function clientSocket(R, ws, room) {
   let seen = 0;
   const s = {
-    status: 'open', arenaOk: true, room, ws, q: [], ticks: 0, onArena: null,
+    status: 'open', arenaHeard: true, room, ws, q: [], ticks: 0, onArena: null,
     sendArena(w) { const v = validArenaIn(w); if (!v || s.status !== 'open' || !isArenaRoom(s.room)) return false; s.q.push(word(R, s.ws, v)); return true; },
     async flush() { while (s.q.length) await Promise.all(s.q.splice(0)); },
     pump(onArena = (w) => s.onArena?.(w, s.room)) {
@@ -190,7 +190,7 @@ test('AUDIT PRE-MERGE 1003 O2 the relay says the bout this screen stands in is o
     const D = createArenaBouts({ now: () => t, playerEntity: P, say() {}, notice() {}, drawHud() {}, heal() {}, pay() {} });
     D.setStage(floorStage());
     const said = [], hallSent = [];
-    const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+    const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
     const hall = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
     const A = createArenaOnline({ now: () => t, session: () => session, makeHall: () => hall, bouts: D, account: noAccount('acct-alva'), enterFloor: () => true, inBout: () => D.holds(), say: (l) => said.push(l), level: () => 20 });
     A.model();
@@ -215,7 +215,7 @@ test('AUDIT PRE-MERGE 1003 O2 the relay says the bout this screen stands in is o
   const EX = exhibitionFor(NOON + 2);
   const D = createArenaBouts({ now: () => 1000, playerEntity: { name: 'Alva', health: 80, maxHealth: 80 }, say() {}, drawHud() {}, gameMinutes: () => NOON + 2 });
   D.setStage(floorStage());
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const A = createArenaOnline({ now: () => 1000, session: () => session, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }), bouts: D, names, account: noAccount(), enterFloor: () => true });
   assert.equal(A.watchExhibition(EX), true);
   await settled();
@@ -239,7 +239,7 @@ function cityBook(gm0) {
   const D = createArenaBouts({ now: () => st.t, playerEntity: P, say() {}, drawHud() {}, gameMinutes: () => st.gm, exhibitionVerdict: (h, s) => gate.verdictSeen(h, s) });
   D.setStage(cityStage(c));
   const links = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const A = createArenaOnline({ now: () => st.t, session: () => session, bouts: D, names,
     makeHall: () => { const l = { status: 'open', room: null, join(r) { this.room = r; }, leave() { this.status = 'closed'; }, sendArena: () => true }; links.push(l); return l; },
     account: noAccount(), enterFloor: () => true, verdictHeard: () => gate.settle() });
@@ -288,7 +288,7 @@ test('AUDIT PRE-MERGE 1003 O3 the book online shuts on what this screen heard of
 
 test('AUDIT PRE-MERGE 1003 O4 online is a fact of the session, not of its socket this frame: a door\'s reconnect (`connecting`) with the arena\'s relay known keeps every door online - an online wager waits for the relay\'s verdict (it was settled by the house\'s seeded record), the Herald offers no Fight before the realm\'s climb is in (it offered the save\'s), the city\'s hour is the relay\'s (the local exhibition was stood); a seat lost or a relay without the arena is offline (mutants: the socket\'s status read; the seat ignored; the relay\'s word ignored)', async () => {
   const EX = exhibitionFor(NOON + 2);
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const links = [];
   const bouts = { ask() {}, relay: () => null, dismiss() {}, exhibitionWord: () => true, relayWord: () => true, holds: () => false, setRealm() {} };
   const A = createArenaOnline({ now: () => 0, session: () => session, bouts, names,
@@ -316,7 +316,7 @@ test('AUDIT PRE-MERGE 1003 O4 online is a fact of the session, not of its socket
   // world.js arenaFrame's branch, over the real driver: stepping out of a door beside the colosseum in the hour
   let t = 1000;
   const D = createArenaBouts({ now: () => t, playerEntity: { name: 'Alva', health: 80, maxHealth: 80 }, say() {}, drawHud() {}, gameMinutes: () => NOON + 2 });
-  const S2 = { status: 'connecting', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const S2 = { status: 'connecting', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const links2 = [];
   const B = createArenaOnline({ now: () => t, session: () => S2, bouts: D, names,
     makeHall: () => { const l = { status: 'open', room: null, join(r) { this.room = r; }, leave() { this.status = 'closed'; }, sendArena: () => true }; links2.push(l); return l; },
@@ -346,12 +346,10 @@ test('AUDIT PRE-MERGE 1003 O4 online is a fact of the session, not of its socket
   assert.equal(B.live(), true);
   Object.assign(S2, { superseded: true, status: 'error' });
   assert.equal(B.live(), false, 'a seat lost is not the arena online');
-  Object.assign(S2, { superseded: false, status: 'open', arenaOk: false });
-  assert.equal(B.live(), false, 'a relay that opens no arena room is offline');
 });
 
 test('AUDIT PRE-MERGE 1003 O4 a door that needs a socket waits for it with a line that says so: Find a match while the hall\'s own socket is still opening says the hall is a moment away - not "Online only" (mutants: the offline line online)', () => {
-  const session = { status: 'connecting', arenaOk: true, room: 'world:1,1', sendArena: () => false };
+  const session = { status: 'connecting', arenaHeard: true, room: 'world:1,1', sendArena: () => false };
   const hall = { status: 'connecting', join() {}, leave() {}, sendArena: () => false };
   const A = createArenaOnline({ now: () => 0, session: () => session, makeHall: () => hall, bouts: { ask() {}, dismiss() {}, relay: () => null, setRealm() {}, holds: () => false }, account: noAccount('acct-alva'), enterFloor: () => true, level: () => 10 });
   const r = A.act('queue');
@@ -371,7 +369,7 @@ test('AUDIT PRE-MERGE 1003 O5 the hall\'s socket comes back while I seek: my que
     const hello = async (id, sub, name) => { const ws = H.connect(); await H.hello(ws, id, null, { name, kind: 'linked', tokenSub: sub, ar: 1000 }); return ws; };
     const s1 = await hello('peer-alva', 'acct-alva', 'Alva');
     const hall = clientSocket(H, s1, ARENA_HALL);
-    const presence = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+    const presence = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
     const A = createArenaOnline({ now, session: () => presence, makeHall: () => hall, bouts: { ask() {}, dismiss() {}, relay: () => null, setRealm() {}, holds: () => false }, account: noAccount('acct-alva'), enterFloor: () => true, level: () => 10 });
     const run = async (ms) => { for (let t = 0; t < ms; t += 1000) { step(1000); A.tick(); await hall.flush(); await H.fire(); hall.pump(); } };
     A.model();
@@ -447,7 +445,7 @@ test('AUDIT PRE-MERGE 1003 O7 the stands\' cheer at the hour\'s exhibition: from
     const D = createArenaBouts({ now, playerEntity: { name: 'Alva', health: 80, maxHealth: 80 }, say() {}, drawHud() {}, gameMinutes: () => NOON + 2 });
     const c = [400, 12, -300];
     D.setStage(cityStage(c));
-    const A = createArenaOnline({ now, session: () => ({ status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true }), makeHall: () => link, bouts: D, names, account: noAccount(), enterFloor: () => true });
+    const A = createArenaOnline({ now, session: () => ({ status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true }), makeHall: () => link, bouts: D, names, account: noAccount(), enterFloor: () => true });
     assert.equal(A.watchCity(EX), true);
     A.tick(); await link.flush(); link.pump();
     await settled();
@@ -489,7 +487,7 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
     const t1 = H.connect();
     await H.hello(t1, 'tab1-alva', null, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', ar: 1000 });
     const hall = clientSocket(H, t1, ARENA_HALL);
-    const presence = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+    const presence = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
     const cityLinks = [];
     const A = createArenaOnline({ now, session: () => presence,
       makeHall: () => { if (!cityLinks.length && hall.status === 'open' && !hall.used) { hall.used = true; return hall; } const l = { status: 'open', room: null, join(r) { this.room = r; }, leave() { this.status = 'closed'; }, sendArena: () => true }; cityLinks.push(l); return l; },
@@ -517,7 +515,7 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
   let relay = null;
   const dismissed = [];
   const fl = { status: 'open', join() {}, leave() { this.status = 'closed'; }, sendArena: () => true };
-  const P0 = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const P0 = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const F = createArenaOnline({ now: () => 0, session: () => P0, makeHall: () => fl, bouts: { ask: (p) => { relay = { o: p.relay.o, me: p.relay.me }; }, relay: () => relay, dismiss: () => { dismissed.push(1); relay = null; }, setRealm() {}, holds: () => !!relay }, account: noAccount('acct-alva'), enterFloor: () => true, level: () => 10 });
   F.model();
   fl.onArena({ k: 'go', o: '0123456789abcdef', side: 0, vs: { n: 'Brann', r: 1000 } });
@@ -528,7 +526,7 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
   assert.deepEqual([F.bout(), dismissed.length], [null, 1], 'the bout and its mirror let go');
   // a word on a link still standing while the seat is another tab's: no offer shown, no call followed
   const entered = [], closed = [];
-  const presence = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const presence = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const link = { status: 'open', join() {}, leave() { this.status = 'closed'; }, sendArena: () => true };
   const B = createArenaOnline({ now: () => 0, session: () => presence, makeHall: () => link, bouts: { ask() {}, dismiss() {}, relay: () => null, setRealm() {}, holds: () => false }, account: noAccount('acct-alva'), enterFloor: (k, o) => { entered.push([k, o]); return true; }, closeWindow: () => closed.push(1), level: () => 10 });
   B.model();
@@ -541,7 +539,7 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
   // here - `live()` false, so every door ran ARENA3's arena: the save's ladder fought, its purses paid into the realm's save
   // (47,950 gold over 40 bouts), the book settling an online wager by the house's record. On the online lane (a realm
   // character) the offline arena runs for a relay's no alone: a seat given up shuts the doors, said in ONE-SEAT's words
-  const away = { status: 'error', arenaOk: true, arenaHeard: true, superseded: true, terminal: true, room: null, sendArena: () => false };
+  const away = { status: 'error', arenaHeard: true, superseded: true, terminal: true, room: null, sendArena: () => false };
   const L = createArenaOnline({ now: () => 0, session: () => away, lane: () => true, makeHall: () => link, bouts: { ask() {}, dismiss() {}, relay: () => null, setRealm() {}, holds: () => false }, account: noAccount('acct-alva'), enterFloor: (k, o) => { entered.push([k, o]); return true; }, level: () => 10 });
   assert.deepEqual([L.live(), L.waiting(), L.fightLadder(), L.act('queue')], [false, true, { ok: false, text: SEAT_NOTICE }, { ok: false, text: SEAT_NOTICE }], 'shut, never offline - the seat\'s words');
   const gateL = createArenaGate({ playerEntity: { goldPieces: 0, items: [], arenaLeague: null, arenaLadder: null, health: 100, maxHealth: 100, name: 'Alva' }, gameMinutes: () => NOON + 2, showOverlay() {}, liveHour: () => null, begun: () => false, online: () => L, openWindow: null, atGate: () => true, heraldAct() {} });

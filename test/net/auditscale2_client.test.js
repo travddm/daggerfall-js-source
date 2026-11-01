@@ -1,9 +1,7 @@
 // AUDIT SCALE II: THE CLIENT'S HALF. Each finding the reviewers reproduced against the frozen head
 // (e729cea7), pinned by its ID:
-//   C-1   the new client against a relay before the shards: `find` (a search, the Guild tab's ask) only of a relay that
-//         answers it - world191 closed the hub link 1008 on it, every frame the Guild tab was drawn;
-//   C-2   the shard fallback by the socket's own word (a browser fires `error`, then `close`), a relay without shards
-//         taking the links off them, and the remembered flag kept per relay;
+//   C-1   `find` (a search, the Guild tab's ask) only down a socket its own welcome has answered;
+//   C-2   the shard fallback by the socket's own word (a browser fires `error`, then `close`);
 //   R3-4  a party's layer asked of the same cell only;
 //   R3-10 a badge said again (AURA-LIVE's rehello) in the layer the old socket stands in;
 //   C-3   a `capped` answer kept for the hour its report was SENT in;
@@ -13,9 +11,8 @@
 //   D-7   a reconnect that never opened is no wave (SCALE2c's unpinned law), and the spread's cap exactly;
 //   D-8   a rise reported within a minute of being earned, over the real Worker (SCALE4h's fighter hour).
 // The real OnlineSession over the pins' fake socket, the real tracker over the real account service (test/accountDb.mjs),
-// and world.js's own closures lifted out of the host and run (as test/world/audit68_worldjs.test.js runs its). A relay before
-// the shards is modelled by what lane C saw base757's real Room (world191) do: its welcome's `v`, and `find` refused as
-// an unknown message, closed 1008. tools/mutants/auditscale2_client.json.
+// and world.js's own closures lifted out of the host and run (as test/world/audit68_worldjs.test.js runs its).
+// tools/mutants/auditscale2_client.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -27,8 +24,6 @@ import { reportRenownXp } from '../../server-account/src/renownTracks.js';
 import { OnlineSession, BACKOFF_MIN_MS } from '../../src/net/online.js';
 import { reconnectWave, WAVE_SPREAD_MAX_MS } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM, RELAY_VERSION, CLOSE_REPLACED, CLOSE_POLICY, cellOfRoom, worldRoom } from '../../src/net/wire.js';
-import * as H from '../../src/net/hubShards.js';
-import * as CC from '../../src/net/chatCommands.js';
 import { rosterRows, guildRosterSource } from '../../src/net/roster.js';
 import { createRenownTracker, renownAnswer, renownReportSoon } from '../../src/net/renownTracker.js';
 import { RENOWN_REPORT_MS, RENOWN_COALESCE_MS, RENOWN_XP_HOUR_MAX, RENOWN_XP_REPORT_MAX, renownXpFor } from '../../src/net/renown.js';
@@ -43,28 +38,9 @@ const POSE = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 };
 const session = (FakeWS, o = {}) => { let t = o.t ?? 1_000_000; const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => t, rand: () => 0, presence: false, ...o.opts }); return { s, adv: (ms) => { t += ms; }, now: () => t }; };
 const finds = (ws) => ws.sent.filter((x) => JSON.parse(x).t === 'find');
 
-// ═══ C-1: `find` ONLY OF A RELAY THAT ANSWERS IT ═══════════════════════════════════════════════════════════════════
+// ═══ C-1: `find` ONLY DOWN A WELCOMED SOCKET ══════════════════════════════════════════════════════════════════════
 
-test('AUDIT SCALE II C-1 the new client on a relay before the shards: no search and no guild ask is ever sent it (it closes the hub link 1008, terminal) - ten minutes of the Guild tab drawn leave the link open; a relay with them is asked, and a new socket asks nothing until its own welcome says so; `/find` says it needs a newer relay (mutants: the word unread by the search; unread by the guild ask; never reset at a socket; the version unread; the line\'s words)', async () => {
-  await quiet(() => {
-    const { FakeWS, sockets } = fakeSocketClass();
-    const { s, adv, now } = session(FakeWS);
-    s.join(SOCIAL_ROOM);
-    const ws = sockets[0];
-    // world191's answer to `find` (lane C, base757's real Room): `{t:'error'}` 'unknown message', closed CLOSE_POLICY
-    ws.send = function (x) { this.sent.push(x); if (JSON.parse(x).t === 'find') { this.receive({ t: 'error', error: 'unknown message' }); this.drop(CLOSE_POLICY, 'unknown message'); } };
-    ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: 'world191', now: now() });
-    for (let sec = 0; sec < 600; sec++) { adv(1000); s.rejoin(SOCIAL_ROOM, 30_000); s.tick(); s.sendGuildWho(); }   // the Guild tab drawn, a frame a second
-    assert.deepEqual(finds(ws), [], 'nothing it would close the link on');
-    assert.equal(s.terminal, false);
-    assert.equal(s.status, 'open', 'ten minutes on, the hub link stands');
-    assert.equal(sockets.length, 1, 'never closed, never rejoined');
-    assert.equal(s.sendFind('Ald'), false, '`/find` is not sent');
-    assert.deepEqual(finds(ws), []);
-    assert.equal(s.findOk, false, 'world191 keeps no shards, and answers no `find`');
-    assert.equal(s.welcomed, true, 'its relay has answered - the word is that relay\'s');
-  });
+test('AUDIT SCALE II C-1 a search and a guild ask go only down a socket its own welcome has answered: nothing before the welcome, both after it, and a new socket asks nothing until its own welcome; `/find` that is not sent says so (mutants: never reset at a socket; the line\'s words)', async () => {
   await quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
     const { s, adv, now } = session(FakeWS);
@@ -72,31 +48,22 @@ test('AUDIT SCALE II C-1 the new client on a relay before the shards: no search 
     sockets[0].open();
     assert.equal(s.welcomed, false, 'open, not yet answered');
     assert.equal(s.sendFind('Ald'), false, 'nothing before the welcome');
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: 'world192', now: now() });
-    assert.equal(s.findOk, true, 'world192 has the shards and answers `find`');
-    assert.equal(s.findOk, H.hubShardsSupported('world192'));
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: RELAY_VERSION, now: now() });
     assert.equal(s.sendFind('Ald'), true);
     assert.equal(s.sendGuildWho(), true);
     assert.deepEqual(finds(sockets[0]).map((x) => JSON.parse(x)), [{ t: 'find', q: 'Ald' }, { t: 'find', g: 1 }]);
-    // the relay rolls back: the new socket says nothing until ITS welcome has spoken
+    // the socket drops: the new socket says nothing until ITS welcome has spoken
     sockets[0].drop(1006);
     adv(5000); s.tick();
     const again = sockets.at(-1);
     assert.notEqual(again, sockets[0]);
     again.open();
-    assert.equal(s.findOk, false, 'a new socket\'s relay has said nothing yet');
     adv(60_000);
     assert.equal(s.sendGuildWho(), false);
     assert.equal(s.sendFind('Ald'), false);
-    again.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: 'world191', now: now() });
-    assert.equal(s.findOk, false);
-    assert.equal(s.sendGuildWho(), false);
     assert.deepEqual(finds(again), []);
   });
-  assert.equal(typeof CC.FIND_RELAY_TEXT, 'string');
-  assert.notEqual(CC.FIND_RELAY_TEXT, CC.FIND_OFFLINE_TEXT);
-  assert.equal(CC.FIND_RELAY_TEXT, 'Search is not available on this server yet.');
-  assert.match(WORLD, /if \(cmd\.kind === 'find'\) \{ findTab = tabId; const hub = chatLinks\?\.get\('world'\); if \(!hub\?\.sendFind\(cmd\.q\)\) note\(hub\?\.welcomed && !hub\.findOk \? FIND_RELAY_TEXT : FIND_OFFLINE_TEXT\); return 'read'; \}/, 'the line says why');
+  assert.match(WORLD, /if \(cmd\.kind === 'find'\) \{ findTab = tabId; const hub = chatLinks\?\.get\('world'\); if \(!hub\?\.sendFind\(cmd\.q\)\) note\(FIND_OFFLINE_TEXT\); return 'read'; \}/, 'the line says why');
 });
 
 // ═══ C-2: THE SHARD FALLBACK, AS A BROWSER FAILS A SOCKET ══════════════════════════════════════════════════════════
@@ -159,54 +126,6 @@ test('AUDIT SCALE II C-2 (found on the way, the same cause) a relay deploy\'s un
   });
 });
 
-/** world.js's channel-link room, its per-relay flag and its word on a relay's version, lifted out of the host and run
- *  over the test's storage, relay address and chat links. */
-function channelHost({ storage, online, chatLinks }) {
-  const room = span(/ {2}const HUB_SHARDS_SEEN_KEY = 'dfjs\.hubShards';\n(?:[\s\S]*?\n)? {2}const channelLinkRoom = \(room\) => \{[\s\S]*?\n {2}\};\n/, 'channelLinkRoom');
-  const off = /^ {2}const channelLinksOffShards = .*$/m.exec(WORLD)?.[0] ?? '';
-  const onv = span(/^ {2}const onRelayVersion = .*$/m, 'onRelayVersion');
-  const make = new Function('appStorage', 'online', 'chatLinks', 'storedSession', 'shardOf', 'isChannelBus', 'isChannelShard', 'channelOf', 'hubShardsSupported', 'relaySupportsRite', 'relaySupportsCage', 'relayVersionSeen', 'chatNotice', 'RELAY_RESTART_TEXT',
-    `let _relayKeepsRite = null, _relayKeepsCage = null;\n${room}\n${off}\n${onv}\nreturn { channelLinkRoom, onRelayVersion };`);
-  return make(() => storage, online, chatLinks, () => ({ id: 'acct-mac' }), H.shardOf, H.isChannelBus, H.isChannelShard, H.channelOf, H.hubShardsSupported, () => true, () => true, () => 'same', () => {}, '');
-}
-const mapStorage = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); }, m }; };
-
-test('AUDIT SCALE II C-2 the host: the shards remembered per relay - a staging relay\'s word moves nothing on production\'s; a relay that keeps none takes every channel link off its shard to its channel at once, the hub\'s and the region\'s, and leaves one its own shard has welcomed (mutants: one flag for every relay; the links left on their shards; a welcomed link moved)', async () => {
-  const storage = mapStorage();
-  const online = { url: 'wss://relay.prod.test' };
-  const hub = H.shardOf(SOCIAL_ROOM, 'acct-mac');
-  assert.ok(H.isChannelShard(hub));
-  await quiet(() => {
-    const { FakeWS, sockets } = fakeSocketClass();
-    const links = new Map();
-    const host = channelHost({ storage, online, chatLinks: links });
-    assert.equal(host.channelLinkRoom(SOCIAL_ROOM), SOCIAL_ROOM, 'nothing heard: the bus, which says where');
-    host.onRelayVersion('world192');
-    assert.equal(host.channelLinkRoom(SOCIAL_ROOM), hub, 'production keeps them: the next page goes straight to its shard');
-    // a `?server=` visit to a staging relay rolled back behind them
-    online.url = 'wss://relay.staging.test';
-    assert.equal(host.channelLinkRoom(SOCIAL_ROOM), SOCIAL_ROOM, 'staging\'s own word, not production\'s');
-    host.onRelayVersion('world191');
-    online.url = 'wss://relay.prod.test';
-    assert.equal(host.channelLinkRoom(SOCIAL_ROOM), hub, 'production\'s page still goes to its shard');
-    // production rolls back: the links standing on shards go to their channels, now
-    const mk = () => new OnlineSession({ url: online.url, name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000, rand: () => 0, presence: false });
-    const world = mk(), region = mk(), kept = mk();
-    world.join(hub);
-    region.join('chat:region.17.2');
-    kept.join('chat:region.20.1');
-    links.set('world', world); links.set('region', region); links.set('other', kept);
-    const keptWs = sockets.at(-1);
-    keptWs.open(); keptWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 2, v: 'world192', now: 1_000_000 });
-    host.onRelayVersion('world191');
-    assert.equal(world.room, SOCIAL_ROOM, 'the hub link on the bus');
-    assert.equal(region.room, 'chat:region.17', 'the region link on its region\'s channel');
-    assert.equal(kept.room, 'chat:region.20.1', 'a link its own shard welcomed stays - its relay keeps them');
-    assert.equal(host.channelLinkRoom(SOCIAL_ROOM), SOCIAL_ROOM, 'and the next page goes to the bus');
-  });
-  assert.ok(storage.m.has('dfjs.hubShards@wss://relay.prod.test') && storage.m.has('dfjs.hubShards@wss://relay.staging.test'), 'a key a relay');
-});
-
 // ═══ R3-4 and R3-10: THE LAYER ═════════════════════════════════════════════════════════════════════════════════════
 
 test('AUDIT SCALE II R3-4 a party\'s layer is asked of the cell the mate stands in, never a neighbour\'s: a mate in layer 3 of the next cell asks nothing of mine; the leader\'s first in my own; a mate indoors or without a layer, nothing (mutants: a neighbour\'s layer taken; the cell unread)', () => {
@@ -234,11 +153,11 @@ test('AUDIT SCALE II R3-10 a badge said again (rehello) asks the layer the old s
     s.layerHint = 3;
     s.join('world:10,10', POSE);
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: 'world192', ly: 3 });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: RELAY_VERSION, ly: 3 });
     s.setHalo(['world:11,10', 'world:9,10']);
     const [h1, h2] = sockets.slice(1);
-    h1.open(); h1.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: 'world192', ly: 2 });
-    h2.open(); h2.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: 'world192' });
+    h1.open(); h1.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: RELAY_VERSION, ly: 2 });
+    h2.open(); h2.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: RELAY_VERSION });
     s.layerHint = 0;   // the party moved on: the room I stand in is still layer 3's
     adv(60_000);
     assert.equal(s.rehello(), true);
@@ -249,7 +168,7 @@ test('AUDIT SCALE II R3-10 a badge said again (rehello) asks the layer the old s
     assert.match(of('world:9,10'), /\/room\/world:9,10$/, 'the place itself asks none');
     const mine = made.find((w) => w.url.includes('world:10,10'));
     mine.open();
-    mine.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: 'world192', ly: 3 });
+    mine.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: now(), v: RELAY_VERSION, ly: 3 });
     assert.equal(s.layer, 3, 'the player is where the party is');
   });
   await quiet(() => {
@@ -257,7 +176,7 @@ test('AUDIT SCALE II R3-10 a badge said again (rehello) asks the layer the old s
     const { s, adv, now } = session(FakeWS);
     s.layerHint = 3;
     s.join('chat:world.3');
-    sockets[0].open(); sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 2, v: 'world192', now: now() });
+    sockets[0].open(); sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 2, v: RELAY_VERSION, now: now() });
     adv(60_000); s.rehello();
     assert.doesNotMatch(sockets.at(-1).url, /\?ly=/, 'a channel is never asked a layer');
   });
@@ -397,7 +316,7 @@ test('AUDIT SCALE II C-5 the page\'s last word carries every region\'s pending -
 
 test('AUDIT SCALE II C-6 the World, Region and Guild tabs\' lists of everyone online go with the room they were asked in - the seat taken, a refusal, a leave, another region - and the next room\'s welcome asks at once (mutants: kept past a terminal close; kept past a leave; the floors kept)', async () => {
   const names = (src) => rosterRows(src).rows.filter((r) => !r.me).map((r) => r.name);
-  const stand = async (room, v = 'world192') => {
+  const stand = async (room, v = RELAY_VERSION) => {
     const { FakeWS, sockets } = fakeSocketClass();
     const { s, adv, now } = session(FakeWS);
     s.join(room); sockets[0].open();
@@ -434,7 +353,7 @@ test('AUDIT SCALE II C-6 the World, Region and Guild tabs\' lists of everyone on
     r.s.join('chat:region.18.2');
     gone(r.s, 'another region');
     r.sockets[1].open();
-    r.sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world192', now: r.now() });
+    r.sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: RELAY_VERSION, now: r.now() });
     assert.equal(r.s.sendHubWho(), true, 'its welcome asks at once');
     assert.deepEqual(JSON.parse(r.sockets[1].sent.at(-1)), { t: 'find', all: 1 });
     // the hub link left and back (a page's goodbye and the rejoin): the Guild tab asks at once too
@@ -442,7 +361,7 @@ test('AUDIT SCALE II C-6 the World, Region and Guild tabs\' lists of everyone on
     r.adv(2000);
     r.s.leave(); r.s.join('chat:world.3');
     r.sockets[1].open();
-    r.sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: 'world192', now: r.now() });
+    r.sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 3, v: RELAY_VERSION, now: r.now() });
     assert.equal(r.s.sendGuildWho(), true, 'the Guild tab\'s ask at once');
   });
 });

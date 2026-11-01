@@ -141,7 +141,7 @@ test('ZONE-SAFE THE HOST\'S DOORS (scenes/world.js wildCan, wildFair - the four 
   const cityPx = [207, 213], city = place(LOCATION_TYPES.TownCity), index = new Map([[cityPx.join(','), city]]);
   const r = rectOf(city, ...cityPx), inStreets = mid(r), outside = at(r.maxX + 3 * WORLD_MAP_RMB_DIM, (r.minZ + r.maxZ) / 2);
   const scope = {
-    online: { wildOk: true, status: 'open', guildTagOf: () => null }, wildHere: () => true, wildOutdoors: () => scope.modes.mode === 'exterior',
+    online: { status: 'open', guildTagOf: () => null }, wildHere: () => true, wildOutdoors: () => scope.modes.mode === 'exterior',
     settledAt, campToWire: (p) => p, player: { feetAt: () => scope.me }, locationIndex: index, modes: { mode: 'exterior', deathUp: () => false },
     playerEntity: { health: 50 }, me: outside, peers: new Map(),
     wildKin, social: { isPartyPeer: () => false }, _wildTruce: { holds: () => false }, duelMgr: { live: false }, myGuildTag: () => null,

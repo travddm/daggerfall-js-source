@@ -18,8 +18,8 @@ import { worldCoordToMapPixel as fileWorldToPixel } from '../../../src/formats/m
 import { worldCoordToMapPixel, mapPixelToWorldCoords } from '../../../src/world/streamingWorld.js';
 import { sitePixelOfNative } from '../../../src/systems/serpent/serpentSite.js';
 import {
-  wdunHall, wdunRoomKey, wdunHallOfRoom, spawnedHallMapId, WDUN_WORLD_LANE, relaySupportsWdunWorld, WDUN_WORLD_RELAY_MIN,
-  RELAY_VERSION, isWorldRoom, mapPixelOfWire, cellRoomOfWire, worldRoom, PIXEL_UNITS, WORLD_WIDE_RELAY_MIN,
+  wdunHall, wdunRoomKey, wdunHallOfRoom, spawnedHallMapId, WDUN_WORLD_LANE,
+  isWorldRoom, mapPixelOfWire, cellRoomOfWire, worldRoom, PIXEL_UNITS,
 } from '../../../src/net/wire.js';
 import { summaryPixel } from '../../../src/ui/overworldModel.js';
 import { zoneMapView, zoneMapLimits, ringPixels } from '../../../src/ui/wild/wildZoneMap.js';
@@ -185,13 +185,11 @@ test('WW-C2 THE MAPS: the zone\'s ink and its views are on the world - the fog\'
   assert.deepEqual(summaryPixel({ id: 250 * 1000 + 500 }), { x: 500, y: 250 }, 'a Bay place\'s off its id, as ever');
 });
 
-test('WW-C2 NO WORLD EVENT IN THE ZONE, AND THE WIRE: a theatre\'s gate never opens in Cyrodiil\'s areas; a hall\'s word only to a relay that reads a world pixel\'s key (mutants: Cyrodiil\'s areas open; the old relay asked)', () => {
+test('WW-C2 NO WORLD EVENT IN THE ZONE, AND THE WIRE: a theatre\'s gate never opens in Cyrodiil\'s areas (mutants: Cyrodiil\'s areas open)', () => {
   const area = (px, py) => { const [cx, cy] = districtOf(px, py); return areaOfDistrict(theatreAt(px, py), cx, cy); };
   const scan = { byArea: new Map([[area(2400, 900), new Int32Array(GATE_REGION_MIN_PIXELS)], [area(2000, -200), new Int32Array(GATE_REGION_MIN_PIXELS)]]) };
   assert.equal(theatreAt(2000, -200), 3, 'Skyrim\'s');
   assert.deepEqual(theatreGateAreas(/** @type {any} */ (scan)), [area(2000, -200)], 'Skyrim\'s area, never Cyrodiil\'s');
-  assert.equal(WDUN_WORLD_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
-  assert.ok(relaySupportsWdunWorld(RELAY_VERSION) && relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN}`) && !relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN - 1}`), 'the relay before the world-wide one reads no hall of Cyrodiil\'s');
   assert.equal(wdunHall('8192,0'), null, 'past the world\'s grid: no hall');
 });
 

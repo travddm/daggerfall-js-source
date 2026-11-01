@@ -105,7 +105,7 @@ test('AUDIT-SEATS THE RIBBON GOES WITH THE GUILD: a socket whose guild is taken 
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', gt: 'OA', rb: [0, 2] }], n: 2, v: 'world149' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', gt: 'OA', rb: [0, 2] }], n: 2 });
   ws.receive({ t: 'guild', id: 'bob-0002', gt: 'OA' });
   assert.deepEqual(s.ribbonOf('bob-0002'), [0, 2], 'the tag as it was: kept');
   ws.receive({ t: 'guild', id: 'bob-0002', gt: 'SH' });

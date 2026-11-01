@@ -111,7 +111,6 @@ test('COST-2 (b) THE PAGE: a crossing into a cell its socket covers is no crossi
     assert.deepEqual(s.haloRooms(), ['world:26,9'], 'a halo toward the next node alone');
     assert.equal(new URL(sockets[1].url).searchParams.get('of'), 'world:25,9');
     // the overworld word: a band of world:24,8, in the node, said from world:25,9
-    s.owOk = true;
     assert.deepEqual(s.sendOverworld('sp', ['b195.180.1', 'b215.180.1']), ['b195.180.1'], 'bounded by the node\'s square, not the fine cell\'s');
     // a welcome whose cells hold another node, or only the room itself, is no node of this socket's
     assert.equal(session([26, 8, 28, 10]).s.coverOf('world:24,8'), 'world:24,8', 'a node that does not hold the room is never believed');

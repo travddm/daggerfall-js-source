@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  parseClient, validCard, validCardData, relaySupportsCard, CARD_RELAY_MIN, CARD_HZ_MAX, CARD_IN_HZ_MAX, CARD_FRAME_MAX,
+  parseClient, validCard, validCardData, CARD_HZ_MAX, CARD_IN_HZ_MAX, CARD_FRAME_MAX,
   CARD_LEVEL_MAX, CARD_STAT_MAX, CARD_VITAL_MAX, CARD_ATTRS, CARD_VITALS, RELAY_VERSION, CAST_HZ_MAX, DROP_STRIKES_MAX,
 } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -39,7 +39,7 @@ const CARD = { level: 12, attrs: [55, 60, 45, 70, 50, 40, 65, 50], vitals: [118,
 
 // ─── THE WIRE ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('INSPECT1 wire: a card frame is an ASK or an ANSWER, never both; the card whole or nothing - the level, eight attributes and three vitals each an integer inside its bound, the look through the room\'s own law; world102 the first relay that routes it (world99 before the first merge, world101 before the sixth: main\'s world99, world100 and world101 route no card) (mutants: an ask carrying a card admitted; a bound off by one; a short card admitted; the look unprojected)', () => {
+test('INSPECT1 wire: a card frame is an ASK or an ANSWER, never both; the card whole or nothing - the level, eight attributes and three vitals each an integer inside its bound, the look through the room\'s own law (mutants: an ask carrying a card admitted; a bound off by one; a short card admitted; the look unprojected)', () => {
   assert.deepEqual(validCardData({ to: 'peer-0002', ask: true }), { to: 'peer-0002', ask: true });
   assert.deepEqual(validCardData({ to: 'peer-0002', card: CARD }), { to: 'peer-0002', card: { ...CARD, look: { ...LOOK } } });
   for (const bad of [
@@ -68,11 +68,7 @@ test('INSPECT1 wire: a card frame is an ASK or an ANSWER, never both; the card w
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002', ask: true } })), { error: 'card before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002' } }), { hasHello: true }), { error: 'bad card' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002', card: CARD, pad: 'x'.repeat(CARD_FRAME_MAX) } }), { hasHello: true }), { error: 'frame too large' });
-  assert.equal(RELAY_VERSION, 'world281');
-  assert.equal(CARD_RELAY_MIN, 102);
-  assert.equal(relaySupportsCard('world102'), true);
-  assert.equal(relaySupportsCard('world101'), false);
-  assert.equal(relaySupportsCard(null), false);
+  assert.equal(RELAY_VERSION, 'world282');
   // a full card of 27 worn items of the widest fields fits the frame
   const wide = { templateIndex: 65535, group: 'WomensClothing', material: 4095, dye: 4095, variant: 4095 };
   const full = { ...CARD, level: CARD_LEVEL_MAX, attrs: Array(8).fill(CARD_STAT_MAX), vitals: [CARD_VITAL_MAX, CARD_VITAL_MAX, CARD_VITAL_MAX], look: { ...LOOK, items: Array.from({ length: 27 }, (_, i) => ({ ...wide, equipSlot: i })) } };
@@ -164,13 +160,8 @@ function linkRig(relayV = RELAY_VERSION) {
   return { s, ws, got, out, tick: (ms) => { t += ms; } };
 }
 
-test('INSPECT1 session: a card frame goes only to a relay that routes it (an older one would close the socket), through the wire\'s projection, to a peer some socket reports, CARD_HZ_MAX a second; one in is delivered only when a peer\'s, addressed to ME and whole, CARD_IN_HZ_MAX a second per sender (mutants: the version door dropped; the gate dropped; a frame at someone else delivered)', () => {
-  const old = linkRig('world100');
-  assert.equal(old.s.cardOk, false);
-  assert.equal(old.s.sendCard({ to: 'peer-0002', ask: true }), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('INSPECT1 session: a card frame goes through the wire\'s projection, to a peer some socket reports, CARD_HZ_MAX a second; one in is delivered only when a peer\'s, addressed to ME and whole, CARD_IN_HZ_MAX a second per sender (mutants: the version door dropped; the gate dropped; a frame at someone else delivered)', () => {
   const { s, got, out, ws, tick } = linkRig();
-  assert.equal(s.cardOk, true);
   assert.equal(s.sendCard({ to: 'peer-0002', ask: true }), true);
   assert.deepEqual(out().at(-1), { t: 'card', data: { to: 'peer-0002', ask: true } });
   assert.equal(s.sendCard({ to: 'aaaa-0001', ask: true }), false, 'never at myself');

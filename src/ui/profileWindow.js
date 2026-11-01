@@ -109,7 +109,7 @@ export function gearGroups(rows) {
 }
 
 /** The states a profile can stand in: waiting on their card, drawn from it, or drawn without one - because they did not
- *  answer, or because the relay cannot carry a card (net/wire.js relaySupportsCard). */
+ *  answer, or because no relay can carry a card (offline). */
 export const PROFILE_STATES = Object.freeze(['asking', 'answered', 'silent', 'unsupported']);
 /** The line under the card for each state - the one place its words live. */
 export function profileNote(state, who = 'They') {

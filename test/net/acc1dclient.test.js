@@ -30,7 +30,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { OnlineSession, TOKEN_WAIT_MS } from '../../src/net/online.js';
-import { parseClient, rosterFor, HELLO_WAIT_MS } from '../../src/net/wire.js';
+import { parseClient, rosterFor, HELLO_WAIT_MS, RELAY_VERSION } from '../../src/net/wire.js';
 import { TOKEN_BODY_MAX } from '../../src/net/identityToken.js';   // AUDIT LEGACY III O11: the hello's body bound, named
 import { ChatLog } from '../../src/net/chat.js';
 import { RELAY_GRAPH } from './relayversion.test.js';
@@ -307,7 +307,7 @@ test('ACC1g: no door between the relay and the client carries a verdict any more
   const s = session({ WS: FakeWS });
   s.join('world:0,0');
   sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', host: 'mac-0001', peers: [
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', host: 'mac-0001', v: RELAY_VERSION, peers: [
     { id: 'a-0001', name: 'Nystul', look: LOOK, pose: null, v: true },
   ] });
   assert.equal(s.peers.get('a-0001').v, undefined, 'a peer kept a verdict off the wire');
@@ -321,7 +321,7 @@ test('ACC1g: no door between the relay and the client carries a verdict any more
   c.onChat = (line) => heard.push(line);
   c.join('chan:world');
   s2[0].open();
-  s2[0].receive({ t: 'welcome', id: 'mac-0001', host: 'mac-0001', peers: [] });
+  s2[0].receive({ t: 'welcome', id: 'mac-0001', host: 'mac-0001', peers: [], v: RELAY_VERSION });
   s2[0].receive({ t: 'chat', id: 'a-0001', name: 'Nystul', text: 'hail', at: 1, v: true });
   assert.equal(heard[0].v, undefined, 'a chat line kept a verdict off the wire');
   const log = new ChatLog({ now: () => 1 });

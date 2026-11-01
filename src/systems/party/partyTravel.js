@@ -64,7 +64,7 @@ export function followerSeatOf(party, me) {
  *   travel(pick, opts, computed) -> Promise<boolean>   the map's fast travel (a pick may carry besideAt / besideText /
  *                       besideMissedText / besideSeat)
  *   openMap()           the travel map, after a No at its own offer
- *   clock()             a monotonic clock, ms (performance.now);  relayOk()  the hub carries the round's fields
+ *   clock()             a monotonic clock, ms (performance.now);  relayOk()  a hub link carries the round's fields
  *   poseDirty()         compose my party pose again on the next frame
  */
 export function createPartyTravel(host) {
@@ -171,8 +171,8 @@ export function createPartyTravel(host) {
   }
 
   /** THE LEADER'S BEGIN WITH THE PARTY GATHERED - a PROPOSAL, not a departure. True when a round opened (the map's
-   *  journey waits on it); false and the journey is the map's own, alone, as always: no party, not its leader, a hub
-   *  from before PARTY_TRAVEL_RELAY_MIN (the round's fields would reach nobody), a WALKED trip (Travel Options' - the
+   *  journey waits on it); false and the journey is the map's own, alone, as always: no party, not its leader, no hub
+   *  link (the round's fields would reach nobody), a WALKED trip (Travel Options' - the
    *  party rides it together on its own feet, and no teleport can arrive beside anyone), a trip to where I stand,
    *  nobody gathered, a round of mine that set out and is still held for its followers. The leader's Begin is the
    *  leader's yes; the fare is taken when the party sets out. */

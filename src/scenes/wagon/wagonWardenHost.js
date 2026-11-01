@@ -17,8 +17,7 @@
 //     moves the record): the throw is played from where their team was drawn - live where their live wagon stands on the
 //     spot thrown from, else the cell's kept one (AUDIT WARDEN1 C9).
 //   - OFFLINE (no online session at all): the road's rule on the stamp's clock (wagonWarden.js offlineDue) - my save
-//     moves, I am told, and the throw is played as above. Online the cell alone throws (a relay before WARDEN_RELAY_MIN
-//     throws nothing).
+//     moves, I am told, and the throw is played as above. Online the cell alone throws.
 // A throw lifts the team the throw moves - the wagon, its horses in harness and a horse standing by it (horseThrownWith),
 // never one following me or left further off (AUDIT WARDEN1 C2) - and ends at once when its team is no longer the one
 // thrown (summoned, driven off or moved since - AUDIT WARDEN1 C7: a summoned wagon stayed held, drawn nowhere).

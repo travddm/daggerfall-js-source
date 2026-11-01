@@ -328,6 +328,3 @@ export function validStaffEventTell(t) {
   return { id: t.id, n: t.n, bd: bit(t.bd), bu: bit(t.bu), bk: bit(t.bk), fc: t.fc ?? 0, bossN: t.bossN ?? 0, f: t.f ?? 0, ...(top ? { top } : {}) };
 }
 
-/** The relay that knows staff events (net/wire.js RELAY_VERSION) - an older one closes a socket on the frame. */
-export const STAFF_EVENT_RELAY_MIN = 256;   // world255 on its branch, renumbered past KETCH at the merge
-export const relaySupportsStaffEvents = (/** @type {unknown} */ v) => { const r = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!r && Number(r[1]) >= STAFF_EVENT_RELAY_MIN; };

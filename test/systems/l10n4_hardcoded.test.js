@@ -36,7 +36,7 @@ const HARDCODED = {
   'src/combat/combatStats.js': 10,
   'src/combat/diverseWeapons/diverseWeaponsAssets.js': 1,
   'src/combat/enemyEquipment.js': 1,
-  'src/combat/fpArm.js': 72,   // guns removed: -1
+  'src/combat/fpArm.js': 72,
   'src/combat/pcaao.js': 19,
   'src/combat/playerWeapon.js': 2,
   'src/combat/rriEnemyEquipment.js': 9,
@@ -50,7 +50,7 @@ const HARDCODED = {
   'src/formats/cifRciFile.js': 2,
   'src/formats/hmiFile.js': 17,
   'src/formats/imgFile.js': 1,
-  'src/formats/mapsTables.js': 25,   // WW-R: +3, the provinces' region names (PROVINCE_REGION_NAMES - High Rock, Sumurset Isle, Black Marsh the two-word ones): the canonical English a region's name is, which the locale's regionNames list translates past the Bay's 62 as on it (systems/textManager.js getLocalizedRegionName)
+  'src/formats/mapsTables.js': 25,
   'src/formats/morrowind/mwAnim.js': 11,
   'src/formats/morrowind/mwFaceMatch.js': 6,
   'src/formats/morrowind/mwFirstPerson.js': 75,
@@ -73,19 +73,17 @@ const HARDCODED = {
   'src/net/boardLaw.js': 4,
   'src/net/chainLaw.js': 3,
   'src/net/chapterEvents.js': 13,
-  'src/net/chat.js': 15,
-  'src/net/chatCommands.js': 53,
+  'src/net/chat.js': 10,
+  'src/net/chatCommands.js': 52,
   'src/net/decorLaw.js': 5,
   'src/net/duel/duelRecord.js': 6,
   'src/net/duel/duelSession.js': 36,
-  'src/net/superDungeon/egRouteProof.js': 8,   // THE ASCENT - THE PROOFS (LAW 9): THE ROUTE'S refusals (egLegRefusal's and egClimbGrip's `why` - a stair too steep, a Drop upward or past the billed fall, a climb downward, faceless or past the grip) - read by a test and the sweep's tool, never said to a player, kept as egSpanLaw.js's are
-  'src/net/superDungeon/egSpanLaw.js': 16,
   'src/net/firmament/firmamentLaw.js': 42,
   'src/net/firmament/firmamentTree.js': 113,
   'src/net/fortLaw.js': 21,
-  'src/net/gate/gateBrain.js': 7,   // AUDIT WB14 (TEXT-9): the phase names through the text core
+  'src/net/gate/gateBrain.js': 7,
   'src/net/gate/gateClaims.js': 5,
-  'src/net/gate/gateHerald.js': 13,   // HERALD-CARDS: +4, the cards' titles, field names and moments - the Discord channel's English, as every herald post is (the relay sets no locale); GATE-COURTS: +1, the night's card's title with its courts won (net/gate/gateCourts.js nightWord) - the same channel's English
+  'src/net/gate/gateHerald.js': 13,
   'src/net/gate/gateLaw.js': 4,
   'src/net/gate/gateLink.js': 6,
   'src/net/gate/gateMods.js': 31,
@@ -93,18 +91,18 @@ const HARDCODED = {
   'src/net/guild/guildBook.js': 1,
   'src/net/guild/guildPowers.js': 34,
   'src/net/guild/guildVaultLaw.js': 4,
-  'src/net/herald/heraldCard.js': 2,   // Elite Gates removed: -1   // HERALD-CARDS: the families' names on their cards ('The Sea Serpent', ...) - the Discord channel's English, as every herald post is
+  'src/net/herald/heraldCard.js': 2,
   'src/net/heraldryLaw.js': 8,
   'src/net/hitPend.js': 2,
   'src/net/homeLaw.js': 3,
   'src/net/homeVoteLaw.js': 11,
   'src/net/houseLaw.js': 1,
-  'src/net/journalPage.js': 16,
-  'src/net/kingdomLaw.js': 2,   // WW7-3: two provinces' names of two words ('Black Marsh', the Imperial City its seat) - proper names, as the Bay's kingdoms' and world/tamrielCapitals.js's
+  'src/net/journalPage.js': 15,
+  'src/net/kingdomLaw.js': 2,
   'src/net/mail.js': 3,
   'src/net/marketBook.js': 1,
   'src/net/marketLaw.js': 12,
-  'src/net/marksBook.js': 17,   // Elite Gates removed: -1
+  'src/net/marksBook.js': 17,
   'src/net/motherlodeBook.js': 5,
   'src/net/nameFilter.js': 4,
   'src/net/noticeBook.js': 18,
@@ -113,43 +111,45 @@ const HARDCODED = {
   'src/net/oneSeat.js': 3,
   'src/net/peer/peerBodies.js': 5,
   'src/net/postLaw.js': 1,
-  'src/net/professionLaw.js': 112,   // FIELD BUGS 2026-10-20h DEX-HIDES: the Wolf Pelt's, the Boar Hide's and the Mudcrab Chitin's names - an item's canonical name is its row's, as the ten hides' are
+  'src/net/professionLaw.js': 112,
   'src/net/raid/raidClaims.js': 5,
   'src/net/realm/realmGoldLaw.js': 1,
-  'src/net/realm/realmTradeLaw.js': 20,   // RPT1026-MARKET HOLD-SAID: -1, the law's named hold's words through t() (realm.held.lawNamed)
+  'src/net/realm/realmTradeLaw.js': 20,
   'src/net/recipeLaw.js': 109,
   'src/net/relayCfg.js': 3,
   'src/net/renown.js': 2,
   'src/net/royalLink.js': 10,
-  'src/net/royalSession.js': 13,
-  'src/net/superDungeon/sdBrain.js': 14,
-  'src/net/superDungeon/sdClaims.js': 5,
-  'src/net/superDungeon/sdFightLink.js': 13,
-  'src/net/superDungeon/sdHerald.js': 11,   // HERALD-CARDS: +5, the cards' titles, field names and moments - the Discord channel's English, as every herald post is (the relay sets no locale)
-  'src/net/superDungeon/sdLaw.js': 19,
-  'src/net/superDungeon/sdMarks.js': 37,
-  'src/net/superDungeon/sdRemnant.js': 9,
+  'src/net/royalSession.js': 12,
   'src/net/serpent/serpentBrain.js': 9,
   'src/net/serpent/serpentClaims.js': 4,
-  'src/net/serpent/serpentHerald.js': 7,   // HERALD-CARDS: +3, the cards' titles, field names and moments - the Discord channel's English, as every herald post is (the relay sets no locale)
+  'src/net/serpent/serpentHerald.js': 7,
   'src/net/serpent/serpentLaw.js': 7,
   'src/net/serpent/serpentLink.js': 6,
   'src/net/serverPost.js': 5,
   'src/net/siege/siegeLink.js': 27,
   'src/net/siege/siegeRef.js': 4,
-  'src/net/siege/siegeSession.js': 19,
+  'src/net/siege/siegeSession.js': 18,
   'src/net/social.js': 20,
   'src/net/staffCommands.js': 10,
   'src/net/staffTeleport.js': 7,
+  'src/net/superDungeon/egRouteProof.js': 8,
+  'src/net/superDungeon/egSpanLaw.js': 16,
+  'src/net/superDungeon/sdBrain.js': 14,
+  'src/net/superDungeon/sdClaims.js': 5,
+  'src/net/superDungeon/sdFightLink.js': 13,
+  'src/net/superDungeon/sdHerald.js': 11,
+  'src/net/superDungeon/sdLaw.js': 19,
+  'src/net/superDungeon/sdMarks.js': 37,
+  'src/net/superDungeon/sdRemnant.js': 9,
   'src/net/tideLaw.js': 21,
-  'src/net/townEconBook.js': 6,   // AUDIT TOWN-ECON 2 SVC-1: a developer's `/town audit` and `/town strike` - their usage and the audit's lines, a developer's words (as npcHallBook.js's `/hall` and townSeatBook.js's `/seat`), never a player's; BAY-LEFT-SEA (+1): the audit's next page, the same developer's
+  'src/net/townEconBook.js': 6,
   'src/net/townSeatBook.js': 37,
-  'src/net/townSeatLaw.js': 176,   // AUDIT DOMAINS C2: the seat's info line through the text core whole
+  'src/net/townSeatLaw.js': 176,
   'src/net/tradeSession.js': 44,
   'src/net/vendorLaw.js': 9,
   'src/net/wedSession.js': 21,
   'src/net/wild/wildRemains.js': 3,
-  'src/net/wire.js': 18,   // Elite Gates removed: -9
+  'src/net/wire.js': 18,
   'src/net/writBook.js': 1,
   'src/player/enterExit.js': 2,
   'src/player/eyeOfTheBeholder/eotbCamera.js': 4,
@@ -158,7 +158,7 @@ const HARDCODED = {
   'src/player/parkour.js': 1,
   'src/player/socialPick.js': 1,
   'src/render/airPass.js': 11,
-  'src/render/auraRing.js': 4,   // the vertex shader's GLSL source, not player text: a removed comment naming a .js file had kept the scan off it
+  'src/render/auraRing.js': 4,
   'src/render/bannerPass.js': 2,
   'src/render/classicShadowLane.js': 3,
   'src/render/cloudNoise.js': 4,
@@ -166,38 +166,44 @@ const HARDCODED = {
   'src/render/courtCrystals.js': 3,
   'src/render/deadlands.js': 4,
   'src/render/deepWatersRender.js': 13,
-  'src/render/dryFall.js': 1,   // ASHFALL1: the ash's fragment stage (GLSL, never a player's text - as windWisps.js's)
+  'src/render/dryFall.js': 1,
   'src/render/duelWall.js': 1,
   'src/render/dynamicSkiesRenderer.js': 1,
   'src/render/enhancedLighting.js': 4,
   'src/render/enhancedSky.js': 1,
-  'src/render/farTrees.js': 2,   // FAR-TREES: its fragment stages' head and body - GLSL the scan reads as prose (`in vec3`), as every pass's; no word a player reads
+  'src/render/farTrees.js': 2,
   'src/render/foeTelegraph.js': 1,
   'src/render/gate/gateFx.js': 3,
   'src/render/gate/gatePass.js': 7,
-  'src/render/gate/gateTelegraph.js': 1,   // Elite Gates removed: -4
+  'src/render/gate/gateTelegraph.js': 1,
   'src/render/gate/gateVeil.js': 1,
+  'src/render/ghostfenceGlow.js': 1,
   'src/render/heatHaze.js': 2,
   'src/render/labGrass.js': 176,
   'src/render/lightningBolts.js': 2,
   'src/render/navalRender.js': 2,
+  'src/render/nodeGlint.js': 3,
   'src/render/nodeGlow.js': 1,
-  'src/render/npcMarkPass.js': 1,   // NPC-MARKS: its vertex stage's source (GLSL, never a player's words)
-  'src/render/nodeGlint.js': 3,   // RESOURCE-HIGHLIGHTS: +1, the ring's program's label ('node outline ring') - a developer's word in a thrown fault
+  'src/render/npcMarkPass.js': 1,
   'src/render/oceanHolesRender.js': 4,
   'src/render/orderedDither.js': 1,
-  'src/render/partyPingDraw.js': 2,   // PARTY-PING: the route's two shaders - GLSL the scan reads as prose (`in vec3`), weaponGlowGlsl.js's same line
-  'src/render/partyPingLabels.js': 1,   // PARTY-PING: the pin's SVG, markup the scan reads as prose
+  'src/render/partyPingDraw.js': 2,
+  'src/render/partyPingLabels.js': 1,
   'src/render/precipitation.js': 6,
   'src/render/rainCurtains.js': 1,
   'src/render/realWindows.js': 11,
-  'src/render/redMountainFire.js': 3,   // RED-MOUNTAIN: its shaders' sources, as every pass's - no word a player reads
-  'src/render/ghostfenceGlow.js': 1,   // GHOSTFENCE: its shaders' sources - no word a player reads (AUDIT RED-MOUNTAIN: 4 to 1, its looks named functions)
+  'src/render/redMountainFire.js': 3,
   'src/render/renderer.js': 17,
   'src/render/retroPass.js': 1,
   'src/render/riteSmoke.js': 1,
+  'src/render/serpentRender.js': 4,
+  'src/render/shadowPass.js': 6,
   'src/render/shipFlagPass.js': 1,
-  'src/render/starfall/starfallPass.js': 3,   // STAR4: its shaders' sources, as every pass's (AUDIT STARFALL R3: the ring's vertex stage reads its bearings' count, one fewer)
+  'src/render/skyRenderer.js': 1,
+  'src/render/snowfallGlsl.js': 2,
+  'src/render/spellImpactFx.js': 2,
+  'src/render/spoilsGlow.js': 2,
+  'src/render/starfall/starfallPass.js': 3,
   'src/render/superDungeon/sdArenaGlow.js': 1,
   'src/render/superDungeon/sdBeam.js': 1,
   'src/render/superDungeon/sdHalo.js': 2,
@@ -205,19 +211,13 @@ const HARDCODED = {
   'src/render/superDungeon/sdPillarPass.js': 1,
   'src/render/superDungeon/sdRiftPass.js': 2,
   'src/render/superDungeon/sdSky.js': 4,
-  'src/render/superDungeon/sdStepsPass.js': 1,   // Elite Gates removed: -2
+  'src/render/superDungeon/sdStepsPass.js': 1,
   'src/render/superDungeon/sdStompWall.js': 2,
   'src/render/superDungeon/sdVeil.js': 1,
-  'src/render/serpentRender.js': 4,
-  'src/render/shadowPass.js': 6,
-  'src/render/skyRenderer.js': 1,
-  'src/render/snowfallGlsl.js': 2,
-  'src/render/spellImpactFx.js': 2,
-  'src/render/spoilsGlow.js': 2,
   'src/render/volumetricClouds.js': 2,
   'src/render/waterBedGlsl.js': 1,
   'src/render/waterSurface.js': 1,
-  'src/render/weaponGlowGlsl.js': 1,   // AUDIT WEAPON-GLOW SPR-1: GLOW_FIELD_VS, the field bake's vertex shader - GLSL the scan reads as prose (`in vec2`), gateVeil.js's same line
+  'src/render/weaponGlowGlsl.js': 1,
   'src/render/windWisps.js': 2,
   'src/render/windfallParticles.js': 2,
   'src/scenes/arena/arenaOnline.js': 1,
@@ -226,12 +226,11 @@ const HARDCODED = {
   'src/scenes/camps.js': 3,
   'src/scenes/caravanHost.js': 13,
   'src/scenes/comeSailAway/comeSailAwayPeers.js': 1,
-  'src/scenes/comeSailAway/comeSailAwayPool.js': 7,   // SHIP-PLAQUE: +1, the log's line when FONT0003 will not load - a developer's, never a player's
+  'src/scenes/comeSailAway/comeSailAwayPool.js': 7,
   'src/scenes/comeSailAway/shipLiveryPaint.js': 1,
   'src/scenes/corpseMarker.js': 3,
   'src/scenes/dataSource.js': 29,
   'src/scenes/decor/decorTool.js': 45,
-  'src/scenes/livingWorld/deepRemains.js': 2,
   'src/scenes/dungeon.js': 3,
   'src/scenes/dungeonContext.js': 12,
   'src/scenes/dungeonDivers.js': 15,
@@ -240,7 +239,7 @@ const HARDCODED = {
   'src/scenes/fishHost.js': 14,
   'src/scenes/fleetHost.js': 52,
   'src/scenes/foragingWait.js': 1,
-  'src/scenes/gate/gateCourt.js': 10,   // AUDIT WB14 (TEXT-9): the phase card's orders through the text core
+  'src/scenes/gate/gateCourt.js': 10,
   'src/scenes/gate/gateHost.js': 7,
   'src/scenes/gate/gatePool.js': 4,
   'src/scenes/gatherHost.js': 10,
@@ -254,25 +253,19 @@ const HARDCODED = {
   'src/scenes/huntHost.js': 10,
   'src/scenes/interior.js': 1,
   'src/scenes/legacyHost.js': 66,
+  'src/scenes/livingWorld/deepRemains.js': 2,
   'src/scenes/livingWorld/livingRoads.js': 3,
-  'src/scenes/marketPiecesHost.js': 4,   // BAY-LEFT-SEA (HOST-SPLIT): the market's pieces' words, moved verbatim out of world.js
+  'src/scenes/marketPiecesHost.js': 4,
   'src/scenes/merchantYardsHost.js': 2,
   'src/scenes/mineHost.js': 13,
   'src/scenes/naval/navalHost.js': 136,
   'src/scenes/oceanHolesAbyss.js': 3,
   'src/scenes/oceanHolesHost.js': 7,
   'src/scenes/portHost.js': 21,
-  'src/scenes/quest/questProvinceSites.js': 3,   // AUDIT RELEASE R2-5b: the Imperial City plan's three fills (PLAN_FILL_NAMES - City Isle, Lake Rumare, Rumare Shore) - proper names its law compares a slice's name against, never shown, as imperialCity.js's own
+  'src/scenes/quest/questProvinceSites.js': 3,
   'src/scenes/riteHost.js': 5,
   'src/scenes/roadStands.js': 2,
   'src/scenes/sailingCabin.js': 1,
-  'src/scenes/superDungeon/sdArenaRead.js': 12,
-  'src/scenes/superDungeon/sdEnd.js': 4,
-  'src/scenes/superDungeon/sdHall.js': 10,
-  'src/scenes/superDungeon/sdHost.js': 7,
-  'src/scenes/superDungeon/sdRemnant.js': 4,
-  'src/scenes/superDungeon/sdRemnantBlows.js': 10,
-  'src/scenes/superDungeon/sdSteps.js': 1,
   'src/scenes/serpentHost.js': 9,
   'src/scenes/shared.js': 1,
   'src/scenes/shipyardHost.js': 12,
@@ -281,27 +274,36 @@ const HARDCODED = {
   'src/scenes/snowfallHost.js': 3,
   'src/scenes/spoilsPool.js': 7,
   'src/scenes/standingHost.js': 14,
-  'src/scenes/townEconHost.js': 1,   // AUDIT TOWN-ECON 2 SVC-1: the `/town strike` answer, a developer's
+  'src/scenes/superDungeon/sdArenaRead.js': 12,
+  'src/scenes/superDungeon/sdEnd.js': 4,
+  'src/scenes/superDungeon/sdHall.js': 10,
+  'src/scenes/superDungeon/sdHost.js': 7,
+  'src/scenes/superDungeon/sdRemnant.js': 4,
+  'src/scenes/superDungeon/sdRemnantBlows.js': 10,
+  'src/scenes/superDungeon/sdSteps.js': 1,
+  'src/scenes/tamrielRoadsHost.js': 4,
+  'src/scenes/townEconHost.js': 1,
   'src/scenes/townTalk.js': 9,
   'src/scenes/travelView.js': 39,
   'src/scenes/treeHost.js': 3,
+  'src/scenes/vendorHost.js': 7,
   'src/scenes/windfallHost.js': 5,
-  'src/scenes/vendorHost.js': 7,   // VENDOR-LOST: the home traders' words, moved verbatim out of world.js
-  'src/scenes/world.js': 306,   // Elite Gates removed: -4   // THE SIXTH MERGE OF MAIN INTO #1184: MENTOR2 (main's): -1, mentoring's end through mentorText.js's t(). THE FOURTH MERGE OF MAIN INTO #1184: 319 measured on the merged host (RPT1026-MARKET's Collect through t() on main). BAY-LEFT-SEA: -4, the market's pieces' words moved verbatim to scenes/marketPiecesHost.js (HOST-SPLIT). TESA x MAIN (the merge of main into TESA, AUDIT RELEASE R3): 325 measured - TESA's -6 (the quick save's words moved whole to scenes/worldQuickSave.js) on main's 331. VENDOR-LOST: -7, the home traders' words moved verbatim to vendorHost.js; QUEST-AUDIT III SHARE-WORDS: -4, the share's lines through questShare.js's t(); AUDIT QA3: -2, the sender's (shareSentLine); STAFF-PANEL5-FOLLOW-FIX: -1 already at the relay base (ec3d522d61), written down; FB1020c ONE-SAVE: the kept words moved to the Stores page (BAG_PAGE_WORDS.kept); CABIN-FOES: Transport > Ship's helm refusal read off CABIN_REFUSAL; AUDIT SEA VENTURES C6: -1, /unstuck's outdoor refusal read off the zone's words; SEASON-BOOK: -1, /mail's refusal read off chatCommands.js pauseCommandRefusal (344 at the merge of main #1161: both -1s stand)
-  'src/scenes/worldModes.js': 55,   // the fourth merge of main: 82 measured (main's own)
-  'src/systems/aetheric.js': 150,   // Elite Gates removed: -18   // SEA-SET: +17, the Eltheric Tidemail's nine names and lore, as the Weave's - the records' own data, minted onto the item; WITCH1: the Wyrd's Raiment's nine pieces, each its name and its affixes' names (+18) - an item's canonical name, as every Aetheric set's; STAR7: +18, the Starspun Weave's nine names and lore - the records' own data, minted onto the item, never read at load
+  'src/scenes/world.js': 301,
+  'src/scenes/worldModes.js': 55,
+  'src/scenes/worldQuickSave.js': 4,
+  'src/systems/aetheric.js': 150,
   'src/systems/alchemyItems.js': 3,
   'src/systems/allyCast.js': 5,
   'src/systems/answerPipeline.js': 1,
   'src/systems/arena/arenaLadder.js': 8,
-  'src/systems/arena/arenaText.js': 426,   // ARENA-WAIT AUDIT (FIELD BUGS 2026-10-16b A1/A3): a tier not yet loaded and the server gone - written as the table's other words are
+  'src/systems/arena/arenaText.js': 426,
   'src/systems/automap/automap.js': 10,
   'src/systems/automap/automapModel.js': 1,
   'src/systems/ayleidStones.js': 9,
   'src/systems/banking.js': 15,
   'src/systems/betterAmbience.js': 42,
   'src/systems/booksData.js': 85,
-  'src/systems/bounty/bountyBoard.js': 41,   // QUARRY-WORLD: the beasts' words through t() (bounty.foes.*)
+  'src/systems/bounty/bountyBoard.js': 41,
   'src/systems/bounty/bountyReward.js': 2,
   'src/systems/breachBook.js': 1,
   'src/systems/buildingLocks.js': 1,
@@ -316,6 +318,7 @@ const HARDCODED = {
   'src/systems/comeSailAway/comeSailAwayItems.js': 2,
   'src/systems/comeSailAway/comeSailAwayMap.js': 6,
   'src/systems/comeSailAway/comeSailAwayModels.js': 4,
+  'src/systems/comeSailAway/csaBoatMenu.js': 18,
   'src/systems/companionSlots.js': 1,
   'src/systems/consoleCommands.js': 7,
   'src/systems/controlsConfig.js': 28,
@@ -323,7 +326,6 @@ const HARDCODED = {
   'src/systems/createItemRows.js': 27,
   'src/systems/crewHall.js': 32,
   'src/systems/crownHall.js': 4,
-  'src/systems/comeSailAway/csaBoatMenu.js': 18,
   'src/systems/customClass.js': 10,
   'src/systems/daedraSummoning.js': 7,
   'src/systems/deathPenalty.js': 5,
@@ -339,25 +341,25 @@ const HARDCODED = {
   'src/systems/dynamicSkies/dynamicSkies.js': 3,
   'src/systems/enchanting.js': 7,
   'src/systems/enchantmentCatalogue.js': 65,
-  'src/systems/enemyExpansion/dexTableText.js': 5,   // DEX0: the mod's tables as text, verbatim (data, read by its own parser). AUDIT DEX A6: the fifty enemies' names among it are the game's own English (the Foes table's keys, the save); a player reads them through enemyExpansion/dexNames.js, in the player's language (getLocalizedEnemyName's custom arm), where DFU shows a custom enemy's English in every language
-  'src/systems/enemyExpansion/mudexTableText.js': 2,   // MUDEX1: MUDEX's two tables as text, verbatim (data, read by DEX's parser) - its classic lines' names ("Sabertooth Tiger") are a classic row's properties, never shown; its enemies' names are DEX's
-  'src/systems/enemyExpansion/dexBodies.js': 8,   // DEX7: the census's miss and sprite reasons (creatureBodies.js's eight are the classic table's) - read by the tests, never shown to a player: a miss keeps its sprite
-  'src/systems/enemyExpansion/dexSpells.js': 1,   // DEX4a: the mod's `[DEX] Unknown enemy spell table` Debug.LogError line, verbatim - through the install's `log` seam, never shown to a player
-  'src/systems/enemyExpansion/dexTables.js': 29,   // DEX1 (24) and DEX3 (5, ParseEncounterTables' and the first Update's): the mod's `[DEX]` Debug.LogError lines, verbatim - console diagnostics through the reading's `log` seam (a test silences it), never shown to a player
+  'src/systems/enemyExpansion/dexBodies.js': 8,
+  'src/systems/enemyExpansion/dexSpells.js': 1,
+  'src/systems/enemyExpansion/dexTableText.js': 5,
+  'src/systems/enemyExpansion/dexTables.js': 29,
+  'src/systems/enemyExpansion/mudexTableText.js': 2,
   'src/systems/equip.js': 3,
-  'src/systems/eventTimers.js': 44,   // Elite Gates removed: -6
+  'src/systems/eventTimers.js': 44,
   'src/systems/faction/factionStanding.js': 3,
-  'src/systems/faction/provinceFactions.js': 1,   // PROVINCE-COURTS: Cyrodiil's ruler, Uriel Septim VII - a proper name, Daggerfall's own Emperor (TEXT.RSC), a faction's name and its key
-  'src/systems/features.js': 128,   // RPT1026-CLIENT: the mod's 'Camera Shake.maxShake' on its tile - a mod's settings key the scan reads as words, as its three neighbours on the list are
+  'src/systems/faction/provinceFactions.js': 1,
+  'src/systems/features.js': 128,
+  'src/systems/festival/soulCake.js': 2,
   'src/systems/fleet.js': 10,
   'src/systems/fletching.js': 1,
-  'src/systems/festival/soulCake.js': 2,   // WITCH1: the Soul Cake's and the Hearth Offering's names - an item's canonical name is its row's, as the Weir Key's
   'src/systems/foeTitle.js': 1,
   'src/systems/foraging/foragingInstall.js': 8,
   'src/systems/foraging/foragingLaw.js': 64,
   'src/systems/gate/gateOmen.js': 10,
   'src/systems/gate/gateSpoils.js': 3,
-  'src/systems/gilded.js': 10,   // GILDED2: the Dragonfire Oath's and the Sunken Sovereign's names, powers, lore and hints - an item's own story   // guns removed: -6, the Hourlock and the gun eras gone
+  'src/systems/gilded.js': 10,
   'src/systems/gravestoneLore.js': 16,
   'src/systems/guild/guilds.js': 3,
   'src/systems/handheldTorches.js': 12,
@@ -368,7 +370,7 @@ const HARDCODED = {
   'src/systems/horse/horseCart.js': 26,
   'src/systems/horse/horseCartLaw.js': 47,
   'src/systems/horse/horseCoats.js': 3,
-  'src/systems/horse/trailingPoseCache.js': 3,   // STALE-PARK: the far-park warning's three - a console line through the runtime's injected `log`, which the scan reads as prose (it exempts `console.*` alone)
+  'src/systems/horse/trailingPoseCache.js': 3,
   'src/systems/immersiveFootsteps.js': 10,
   'src/systems/immersiveTravel.js': 13,
   'src/systems/improvedInteriorLighting.js': 1,
@@ -392,7 +394,7 @@ const HARDCODED = {
   'src/systems/livingWorld/trips.js': 1,
   'src/systems/localeCatalog.js': 3,
   'src/systems/loot/loot.js': 2,
-  'src/systems/loot/lootCodex.js': 11,   // guns removed: -1, GILDED_HINT gone
+  'src/systems/loot/lootCodex.js': 11,
   'src/systems/loot/lootPowers.js': 7,
   'src/systems/loot/lootRarity.js': 250,
   'src/systems/loot/lootScry.js': 8,
@@ -406,7 +408,7 @@ const HARDCODED = {
   'src/systems/naval/captainLedger.js': 15,
   'src/systems/naval/crewCompanions.js': 3,
   'src/systems/naval/crewLife.js': 124,
-  'src/systems/naval/etherCrossing.js': 12,   // VEIL-PARTY: the crossing's refusal through t()
+  'src/systems/naval/etherCrossing.js': 12,
   'src/systems/naval/etherShips.js': 22,
   'src/systems/naval/harbourBoard.js': 24,
   'src/systems/naval/navalPlunder.js': 17,
@@ -414,7 +416,8 @@ const HARDCODED = {
   'src/systems/naval/shipCrew.js': 52,
   'src/systems/naval/shipKnowledge.js': 21,
   'src/systems/naval/treasureCharts.js': 1,
-  'src/systems/online/onlineHomes.js': 63,   // the home-crossed words are three lines of their own, no longer the bank's spread
+  'src/systems/offlineCopy.js': 1,
+  'src/systems/online/onlineHomes.js': 63,
   'src/systems/online/onlineLane.js': 1,
   'src/systems/overhauls.js': 23,
   'src/systems/party/partyArrival.js': 3,
@@ -424,24 +427,23 @@ const HARDCODED = {
   'src/systems/party/partyTravelLaw.js': 28,
   'src/systems/peerWord.js': 2,
   'src/systems/physicalItems.js': 25,
-  'src/systems/portBooks.js': 18,   // a port book's pages are written into the BOK format's bytes and read whole, and no language holds a -LOC book for one (ui/bookDoor.js), so they are English   // guns removed: -19, Rourken Thunder gone
+  'src/systems/portBooks.js': 18,
   'src/systems/portPlaces.js': 8,
-  'src/systems/portalStone.js': 20,   // PORTAL-BULK: -2, the counter's offer and its sale's line through t() (portal.buy.ask, portal.buy.bought - their plurals the count's)
+  'src/systems/portalStone.js': 20,
   'src/systems/potionRecipes.js': 15,
-  'src/systems/professions/profItems.js': 36,   // AUDIT FB1021 (merged onto FB1020h's DEX-HIDES): 'Mudcrab Chitin' a mass, as the Scorpion's
+  'src/systems/professions/profItems.js': 36,
   'src/systems/professions/profTemplates.js': 1,
   'src/systems/quest/actions.js': 11,
   'src/systems/quest/machine.js': 1,
+  'src/systems/quest/questGuidance.js': 2,
   'src/systems/quest/questMacros.js': 1,
   'src/systems/quest/questPatches.js': 13,
   'src/systems/quest/questRepair.js': 9,
-  'src/systems/quest/questGuidance.js': 2,
-  'src/systems/offlineCopy.js': 1,   // the copy's slot name - a slot's identity, so it stays one English string
   'src/systems/quickLoot.js': 4,
   'src/systems/quickslots.js': 32,
   'src/systems/raidSpoils.js': 4,
   'src/systems/raidingParties.js': 4,
-  'src/systems/realmLeveling.js': 1,   // the leveling switch's line, said at the realm boot
+  'src/systems/realmLeveling.js': 1,
   'src/systems/realmSaves.js': 13,
   'src/systems/region/regionHubs.js': 4,
   'src/systems/repairService.js': 2,
@@ -452,7 +454,7 @@ const HARDCODED = {
   'src/systems/rest/restWarning.js': 5,
   'src/systems/resurrect.js': 6,
   'src/systems/revenant/revenant.js': 73,
-  'src/systems/revenant/revenantCompanions.js': 3,   // AUDIT SEA VENTURES C7: -1, the zone's one-revenant refusal read off the zone's words
+  'src/systems/revenant/revenantCompanions.js': 3,
   'src/systems/revenant/revenantFate.js': 14,
   'src/systems/revenant/revenantFeud.js': 27,
   'src/systems/revenant/revenantPersonality.js': 621,
@@ -462,8 +464,6 @@ const HARDCODED = {
   'src/systems/roleplayRealismItems/rriItems.js': 5,
   'src/systems/roleplayRealismItems/rriKits.js': 5,
   'src/systems/sailingCabin.js': 3,
-  'src/systems/superDungeon/sdOmen.js': 21,
-  'src/systems/superDungeon/sdSpoils.js': 5,
   'src/systems/searchables.js': 97,
   'src/systems/seasonsIliacBay.js': 4,
   'src/systems/seasonsIliacBayAssets.js': 2,
@@ -478,18 +478,20 @@ const HARDCODED = {
   'src/systems/shopStock.js': 2,
   'src/systems/sigil/sigil.js': 8,
   'src/systems/sigil/sigilBroker.js': 8,
-  'src/systems/sigil/sigilSetPowers.js': 21,   // Elite Gates removed: -3
-  'src/systems/sigil/sigilSets.js': 117,   // Elite Gates removed: -9   //
+  'src/systems/sigil/sigilSetPowers.js': 21,
+  'src/systems/sigil/sigilSets.js': 117,
   'src/systems/smithItems.js': 26,
   'src/systems/snowfall.js': 12,
   'src/systems/snowfallRuntime.js': 10,
   'src/systems/spell/spellEffects.js': 29,
   'src/systems/staleChunk.js': 6,
-  'src/systems/starfall/starglass.js': 1,   // AUDIT STAR I1: Starfall Glass's name - an item's canonical name is its row's, as the Soul Cake's and the Weir Key's
+  'src/systems/starfall/starglass.js': 1,
   'src/systems/startDungeon.js': 1,
   'src/systems/statusReadout.js': 2,
   'src/systems/steedCare.js': 16,
-  'src/systems/studioArt/studioSlots.js': 9,   // STUDIO1: the painted models' titles the studio page and tools/studioArt.mjs show the game's artists - no player reads them
+  'src/systems/studioArt/studioSlots.js': 9,
+  'src/systems/superDungeon/sdOmen.js': 21,
+  'src/systems/superDungeon/sdSpoils.js': 5,
   'src/systems/survival/camp.js': 42,
   'src/systems/survival/food.js': 4,
   'src/systems/survival/items.js': 26,
@@ -499,7 +501,7 @@ const HARDCODED = {
   'src/systems/survival/tavernMenu.js': 129,
   'src/systems/survival/temperature.js': 13,
   'src/systems/talk/talk.js': 2,
-  'src/systems/testRoom.js': 55,   // guns removed: -4, the test room's gun rows gone
+  'src/systems/testRoom.js': 55,
   'src/systems/tradePack.js': 10,
   'src/systems/translationPacks.js': 1,
   'src/systems/travel/travelBands.js': 1,
@@ -508,8 +510,8 @@ const HARDCODED = {
   'src/systems/travel/travelOptionsText.js': 30,
   'src/systems/travel/travelPace.js': 5,
   'src/systems/travel/travelPathMode.js': 3,
-  'src/systems/travel/travelViewFilters.js': 7,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (MAP-PLAYERS: +1, the Players switch's tip)
-  'src/systems/tutorialCatalogue.js': 209,   // RPT1026-QUESTS BOUNTY-WAY: +1, the bounties page rewritten - its old words held "return", which the scan reads as code, so they were never counted; the catalogue is English, as every page's
+  'src/systems/travel/travelViewFilters.js': 7,
+  'src/systems/tutorialCatalogue.js': 209,
   'src/systems/uiSkin.js': 1,
   'src/systems/upkeep/upkeepItemRows.js': 2,
   'src/systems/upkeep/upkeepRuntime.js': 8,
@@ -527,7 +529,7 @@ const HARDCODED = {
   'src/systems/weaponSheathing.js': 3,
   'src/systems/weaponSheathingAssets.js': 1,
   'src/systems/wild/wildRemainsWaypoint.js': 1,
-  'src/systems/wild/wildZone.js': 37,   // the merge: FOE-KEEPS's and WW-C2's (37 once the zone's entry named Cyrodiil bare)
+  'src/systems/wild/wildZone.js': 37,
   'src/systems/windfall.js': 23,
   'src/systems/windfallEffects.js': 7,
   'src/systems/worldTick.js': 4,
@@ -539,7 +541,7 @@ const HARDCODED = {
   'src/tools/firmamentLab.js': 3,
   'src/tools/mwViewer.js': 9,
   'src/tools/paperdoll/paperdollViewer.js': 18,
-  'src/tools/studioLab.js': 3,   // STUDIO1: the studio page's own words to the game's artists (studio.html) - no player reads them
+  'src/tools/studioLab.js': 3,
   'src/ui/accountFlow.js': 2,
   'src/ui/arena/arenaWindow.js': 4,
   'src/ui/armourCard.js': 5,
@@ -547,7 +549,7 @@ const HARDCODED = {
   'src/ui/bankWindow.js': 1,
   'src/ui/bounty/bountyMapMark.js': 1,
   'src/ui/bounty/bountyWindow.js': 33,
-  'src/ui/brokerWindow.js': 20,   // Elite Gates removed: -22
+  'src/ui/brokerWindow.js': 20,
   'src/ui/captainPage.js': 13,
   'src/ui/chapterRoll.js': 1,
   'src/ui/charSheetDoor.js': 2,
@@ -566,17 +568,17 @@ const HARDCODED = {
   'src/ui/enhanced/enhancedBook.js': 1,
   'src/ui/enhanced/enhancedCharSheet.js': 1,
   'src/ui/enhanced/enhancedChargen.js': 108,
-  'src/ui/enhanced/enhancedChronicle.js': 33,   // QUEST-AUDIT III SHELF-WORDS: -2, "Time remains" through t()
+  'src/ui/enhanced/enhancedChronicle.js': 33,
   'src/ui/enhanced/enhancedChunk.js': 2,
   'src/ui/enhanced/enhancedControls.js': 20,
   'src/ui/enhanced/enhancedDialog.js': 1,
   'src/ui/enhanced/enhancedFrame.js': 2,
   'src/ui/enhanced/enhancedHelm.js': 16,
   'src/ui/enhanced/enhancedHotbar.js': 13,
-  'src/ui/enhanced/enhancedHud.js': 9,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: +3, the two tiles' names and their cell's class)
-  'src/ui/enhanced/enhancedInventory.js': 91,   // CHAT-POST: +3 Link/Post/Linked strings on the pack card; HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (BELT-LANTERN: +5, the lantern slot's acts)
+  'src/ui/enhanced/enhancedHud.js': 9,
+  'src/ui/enhanced/enhancedInventory.js': 91,
   'src/ui/enhanced/enhancedLevelingChoice.js': 6,
-  'src/ui/enhanced/enhancedMenu.js': 52,   // AUDIT MEM-AUDIT G5: -2, the Graphics preset's name and note routed (with its effect, its Custom and its four labels). QUEST-AUDIT III SHELF-WORDS: -5, the shelf's buttons and lines through t(). AUDIT COLLECTIONS-II: -2, the empty Holdings rail's words, gone with the rail that is never empty now. AUDIT EG V (c, L7-10): the Spire's three accessibility rows routed; UI-CALM's doors at the merge of main. REALM-COPY: -1, the copy's slot name moved to systems/realmCopyMark.js
+  'src/ui/enhanced/enhancedMenu.js': 52,
   'src/ui/enhanced/enhancedMerchantPanel.js': 1,
   'src/ui/enhanced/enhancedNotice.js': 1,
   'src/ui/enhanced/enhancedPlayerTrade.js': 14,
@@ -585,11 +587,11 @@ const HARDCODED = {
   'src/ui/enhanced/enhancedPorts.js': 106,
   'src/ui/enhanced/enhancedPost.js': 13,
   'src/ui/enhanced/enhancedRest.js': 10,
-  'src/ui/enhanced/enhancedSaddle.js': 19,   // AUDIT UICALM-FIRM1 L4 M8: the saddle's notes routed (saddle.note.*), back to its count before UI-CALM
+  'src/ui/enhanced/enhancedSaddle.js': 19,
   'src/ui/enhanced/enhancedSpellbook.js': 22,
   'src/ui/enhanced/enhancedTalk.js': 8,
   'src/ui/enhanced/enhancedTavern.js': 7,
-  'src/ui/enhanced/enhancedTimers.js': 5,   // TIMERS2: -1, the Now and Coming up heads gone; its groups' words through the text core
+  'src/ui/enhanced/enhancedTimers.js': 5,
   'src/ui/enhanced/enhancedTrade.js': 19,
   'src/ui/enhanced/enhancedTravelControl.js': 3,
   'src/ui/eventMapMarks.js': 6,
@@ -604,38 +606,38 @@ const HARDCODED = {
   'src/ui/gate/gateMarksView.js': 18,
   'src/ui/gate/gateTitleCard.js': 1,
   'src/ui/grimoireDress.js': 13,
-  'src/ui/growth/growthStage.js': 1,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (GROWTH-BOOK)
+  'src/ui/growth/growthStage.js': 1,
   'src/ui/guildServiceWindow.js': 1,
   'src/ui/guildServiceWindows.js': 8,
   'src/ui/hallOfRecords.js': 4,
-  'src/ui/haulCards.js': 13,   // Elite Gates removed: -1   // AUDIT STAR W2: the cap's card through the text core
-  'src/ui/heldMap.js': 41,   // AUDIT TESA II M5: -1, the zone map's door through t() (wild.map.door, wild.map.doorOffline)
+  'src/ui/haulCards.js': 13,
+  'src/ui/heldMap.js': 41,
   'src/ui/heraldryArt.js': 4,
   'src/ui/hitNumbers.js': 1,
   'src/ui/holdingsPages.js': 59,
   'src/ui/howManyField.js': 1,
-  'src/ui/hud/hudAdvance.js': 8,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: ADV_WORDS, the tiles' hover card)
+  'src/ui/hud/hudAdvance.js': 8,
   'src/ui/hud/hudLayout.js': 28,
   'src/ui/hud/hudStatus.js': 1,
-  'src/ui/hud/statusTips.js': 53,   // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (STATUS-TIPS: what each status tile says under the pointer)
+  'src/ui/hud/statusTips.js': 53,
   'src/ui/ink/inkDungeonGL.js': 1,
   'src/ui/ink/inkDungeonSolid.js': 6,
   'src/ui/input.js': 2,
   'src/ui/inputMessageBox.js': 1,
   'src/ui/intro/introScreen.js': 3,
-  'src/ui/intro/introShaders.js': 2,   // INTRO4: introLandscape.js's 6 moved with its shaders - two GLSL sources the scan reads as words
-  'src/ui/intro/set/imperialCity.js': 23,   // INTRO4's set (at the merge of main into #1184): main's world/imperialCity.js as the film was shot on it, kept as shot - TOWN-SHAPES TS5's lake and the districts' proper names
+  'src/ui/intro/introShaders.js': 2,
+  'src/ui/intro/set/imperialCity.js': 23,
   'src/ui/inventoryDoor.js': 1,
   'src/ui/joystickControlsWindow.js': 1,
   'src/ui/legacy/legacyModelChoice.js': 26,
   'src/ui/legacy/legacySuccession.js': 3,
-  'src/ui/levelUp/levelNotice.js': 6,   // AUDIT UICALM-FIRM1 L4 M8: the Renown rise routed (level.renown.*)
+  'src/ui/levelUp/levelNotice.js': 6,
   'src/ui/levelingChoice.js': 16,
   'src/ui/loadingScreen.js': 10,
   'src/ui/localeFaces.js': 27,
   'src/ui/lootBanner.js': 3,
   'src/ui/map/mapStrip.js': 1,
-  'src/ui/marketTab.js': 140,   // PACK-PICK: the List form's piece and pack words through the text core; AUDIT PACK-PICK: its kinds' and empty forms' too
+  'src/ui/marketTab.js': 140,
   'src/ui/merchant/merchantRepairDoor.js': 2,
   'src/ui/mouseControlsWindow.js': 2,
   'src/ui/native/nativeInventory.js': 5,
@@ -644,7 +646,7 @@ const HARDCODED = {
   'src/ui/naval/navalPlunderWindow.js': 19,
   'src/ui/naval/navalYardWindow.js': 67,
   'src/ui/noticeWindow.js': 99,
-  'src/ui/oreMapTip.js': 2,   // WW-C1 (WW-C): Cyrodiil's line and the richest ores held back, its English - main's DEEP-OPEN routed the card's other lines through the text core (TESA x MAIN, the merge: 2 measured)
+  'src/ui/oreMapTip.js': 2,
   'src/ui/padGlyphsHD.js': 15,
   'src/ui/pageWindow.js': 4,
   'src/ui/partyMapMarks.js': 3,
@@ -654,14 +656,14 @@ const HARDCODED = {
   'src/ui/pickupFeed.js': 1,
   'src/ui/pixelDial.js': 3,
   'src/ui/pixelifyFive.js': 2,
-  'src/ui/playerBadge.js': 31,   // Elite Gates removed: -10   // HUNTERS-MARK: the hunt's and the Marks of Mastery's fourteen two-word titles in words, beside the other titles'; NIRNROOT-SAGE: the Nirnroot Sage's title in words, beside the other titles'; QL12: the questlines' five titles in words ("Witness of the Hour" the one two-word phrase); SERPENT5: The Maelstrom's word, beside the other auras'; EG-E2: the Spire's thirteen titles and three auras in words; WIKIMAID: the Lilac Warren's word, beside the other auras'
+  'src/ui/playerBadge.js': 31,
   'src/ui/playerHistory.js': 1,
   'src/ui/plus/plusPad.js': 18,
   'src/ui/plus/plusPadBinds.js': 30,
   'src/ui/prisonScreen.js': 1,
-  'src/ui/professions/profPages.js': 29,   // FB1020c ONE-SAVE: the kept words, moved here from the world host; REFORGE-REPLACE: the Reforge with Essence's two words through t()
+  'src/ui/professions/profPages.js': 29,
   'src/ui/profileBadge.js': 4,
-  'src/ui/profileIcons.js': 4,   // WITCH1: the four profile icons' names (ICON_TEXT) - the badge's words, as playerBadge.js's titles and auras
+  'src/ui/profileIcons.js': 4,
   'src/ui/profileWindow.js': 14,
   'src/ui/provinceMap.js': 5,
   'src/ui/quest/questHerald.js': 6,
@@ -670,17 +672,13 @@ const HARDCODED = {
   'src/ui/quest/questMarks.js': 1,
   'src/ui/quest/questRail.js': 1,
   'src/ui/quest/questTracker.js': 5,
-  'src/ui/reforgeWindow.js': 89,   // REFORGE-REPLACE: the card's note and the line's refusal through t(), the one-line lock's words gone
+  'src/ui/reforgeWindow.js': 89,
   'src/ui/restWindow.js': 7,
   'src/ui/revenant/revenantCard.js': 5,
   'src/ui/revenant/revenantFateView.js': 3,
   'src/ui/revenant/revenantPage.js': 45,
   'src/ui/saveTile.js': 1,
   'src/ui/screenshot.js': 5,
-  'src/ui/superDungeon/sdMapMark.js': 1,
-  'src/ui/superDungeon/sdMarksView.js': 19,
-  'src/ui/superDungeon/sdRemnantBar.js': 11,
-  'src/ui/superDungeon/sdTitleCard.js': 1,
   'src/ui/seatTab.js': 89,
   'src/ui/seatWorks.js': 6,
   'src/ui/serpentBar.js': 5,
@@ -688,7 +686,7 @@ const HARDCODED = {
   'src/ui/setCard.js': 9,
   'src/ui/settings/settingsCopy.js': 185,
   'src/ui/settings/settingsLaw.js': 18,
-  'src/ui/settings/settingsMap.js': 23,   // Elite Gates removed: -1
+  'src/ui/settings/settingsMap.js': 23,
   'src/ui/shipyardWindow.js': 43,
   'src/ui/shotsPane.js': 21,
   'src/ui/siegeHud.js': 1,
@@ -696,14 +694,18 @@ const HARDCODED = {
   'src/ui/sigilRune.js': 5,
   'src/ui/skinCard.js': 7,
   'src/ui/socialMenu.js': 4,
-  'src/ui/socialPanel.js': 235,   // GUILD-WINDOW: -2, the header's two sentences are its tiles, their names in t()
+  'src/ui/socialPanel.js': 235,
   'src/ui/socketWells.js': 4,
   'src/ui/spell/spellMakerWindow.js': 15,
   'src/ui/spellbookWindow.js': 4,
   'src/ui/spyglassView.js': 2,
   'src/ui/statsCard.js': 5,
+  'src/ui/superDungeon/sdMapMark.js': 1,
+  'src/ui/superDungeon/sdMarksView.js': 19,
+  'src/ui/superDungeon/sdRemnantBar.js': 11,
+  'src/ui/superDungeon/sdTitleCard.js': 1,
   'src/ui/supportAsks.js': 2,
-  'src/ui/tamrielInk.js': 4,   // TESA13 (the Arena arc, at its merge with main): +1, a place's kind in the land past the Bay's tip line
+  'src/ui/tamrielInk.js': 4,
   'src/ui/tavernWindow.js': 2,
   'src/ui/techniqueCard.js': 8,
   'src/ui/techniqueGlyph.js': 2,
@@ -718,12 +720,12 @@ const HARDCODED = {
   'src/ui/tutorialsPane.js': 9,
   'src/ui/vendor/vendorMapMark.js': 1,
   'src/ui/vendor/vendorPage.js': 28,
-  'src/ui/vendor/vendorTab.js': 27,   // PACK-PICK
-  'src/ui/virtueLevelUp.js': 4,   // AUDIT GROWTH LANE5-1: its purse label routed (and enhancedLevelUp.js, levelUpView.js and firmamentWindow.js down to none - the Level and Firmament faces said through t())
+  'src/ui/vendor/vendorTab.js': 27,
+  'src/ui/virtueLevelUp.js': 4,
   'src/ui/waitWindow.js': 1,
   'src/ui/waypointMenu.js': 11,
   'src/ui/wild/wildMapInk.js': 1,
-  'src/ui/wild/wildZoneMap.js': 15,   // AUDIT TESA II M5: -2, the Wrothgarian zone's carriage and fast-travel laws gone - Cyrodiil's travel law through t() (wild.legend.travel)
+  'src/ui/wild/wildZoneMap.js': 15,
   'src/ui/workTab.js': 3,
   'src/ui/worldPlaque.js': 1,
   'src/ui/yesNoBox.js': 2,
@@ -731,54 +733,45 @@ const HARDCODED = {
   'src/world/arena/arenaCity.js': 1,
   'src/world/arena/arenaFloor.js': 1,
   'src/world/buildingNames.js': 2,
+  'src/world/capitalPlans.js': 26,
   'src/world/caravanRoomModel.js': 1,
-  'src/world/ships/carrackModel.js': 7,
-  'src/world/ships/carrackRig.js': 2,
   'src/world/ethericSea.js': 8,
-  'src/world/ships/galleonModel.js': 7,
-  'src/world/ships/galleonRig.js': 18,
   'src/world/gate/gateArena.js': 12,
   'src/world/gate/gateBoss.js': 17,
-  'src/world/ships/largeBoatModel.js': 8,
-  'src/world/ships/largeBoatRig.js': 5,
+  'src/world/imperialBlocks.js': 2,
+  'src/world/imperialCity.js': 23,
+  'src/world/imperialFabric.js': 7,
+  'src/world/imperialPrebuildClient.js': 2,
+  'src/world/imperialYards.js': 1,
   'src/world/lefayMonument.js': 13,
   'src/world/oceanHoles.js': 9,
   'src/world/outdoors.js': 2,
   'src/world/passiveFish.js': 5,
-  'src/world/pseudoArchives.js': 42,   // Elite Gates removed: -3   // guns removed: -3, the guns' art rows gone   // GHOSTFENCE (AUDIT RED-MOUNTAIN, CI): +1, the Ghostfence's art row (GHOSTFENCE_ARCHIVE) - the registry's own words for a developer; LOCKPICK (main): +1, the Lockpick's picture's row (LOCKPICK_ARCHIVE) - the registry's own words for a developer; AUDIT TESA III (at URBANIZER's merge): +1, the towns' fabric's art row (URBAN_ARCHIVE) - the registry's own words for a developer; TESA10 (at the merge of main into TESA): +1, the capitals' row (CAPITAL_ARCHIVE) - the registry's own words for a developer; WITCH1: +1, the Witches' Festival's pictures' row (FESTIVAL_ARCHIVE) - the registry's own words for a developer; NAVAL-REFIT: +3, the ship's paint's, her cabin's and her name boards' rows (LIVERY_ARCHIVE, CABIN_ARCHIVE, PLAQUE_ARCHIVE) - the registry's own words for a developer, never a player's; STAR4/STAR7: +2, the star's two archives' rows
+  'src/world/pseudoArchives.js': 42,
+  'src/world/road/cyrodiilRoads.js': 8,
+  'src/world/ships/carrackModel.js': 7,
+  'src/world/ships/carrackRig.js': 2,
+  'src/world/ships/galleonModel.js': 7,
+  'src/world/ships/galleonRig.js': 18,
+  'src/world/ships/largeBoatModel.js': 8,
+  'src/world/ships/largeBoatRig.js': 5,
+  'src/world/spawnedDungeons.js': 3,
   'src/world/superDungeon/sdDungeon.js': 6,
   'src/world/superDungeon/sdRealm.js': 10,
-  'src/world/spawnedDungeons.js': 3,
-  'src/world/tamriel/tamrielLands.js': 33,   // TESA-LANDS: each zone's land in a line of the lore its sources give it - a data table's English, not shown a player
-  'src/world/tamriel/tamrielBiomes.js': 80,   // TESA-BIOME (AUDIT TESA-BIOME: forty-three zones): each zone's name and the lore its sources give it - a data table's English, not yet shown a player; AUDIT TESA II G6: +2, the Grazelands' name and lore (forty-four), the range's key one constant (RED_MOUNTAIN) where its zone had held it
+  'src/world/tamriel/groundDressClient.js': 5,
+  'src/world/tamriel/tamrielBiomes.js': 80,
   'src/world/tamriel/tamrielGeography.js': 25,
-  // TESA (the Arena arc, written on its branch before L10N4's ratchet reached it; recorded at its merge with main): the
-  // places past the Bay - a lair's name patterns (The Crypt of %m), a capital's districts and its plan's block codes (a
-  // developer's, never a player's), the countryside's patterns, the roads' worker's progress line. Routing the names
-  // through t() is the arc's own to do; until then the ratchet holds them where they stand.
-  'src/scenes/tamrielRoadsHost.js': 4,
-  'src/scenes/worldQuickSave.js': 4,   // TESA's merge (HOST-SPLIT): moved verbatim out of world.js's bootWorld, its six with it
-  'src/world/capitalPlans.js': 26,
-  'src/world/imperialBlocks.js': 2,   // IC-GRAND: 'City Isle' (a district's proper name, as imperialCity.js's)
-  'src/world/imperialCity.js': 23,   // TOWN-SHAPES TS5: 'Lake Rumare' names the lake's slices ('Rumare Shore' the land past it) - proper names, as the districts'; IC-GRAND: 'Palace District' and the districts' names its laws read - proper names; IC-PROPS (28 -> 23): the old district-trade tables gone, the trades the yards' and the fabric's own
-  'src/world/imperialFabric.js': 7,   // IC-GRAND: the districts' names its styles and its neighbourhoods read - proper names; IC-GRAND's courts: the Elven Gardens' orchards keyed by the district's name; IC-PROPS: the Arcane University's grounds by its district's name
-  'src/world/imperialYards.js': 1,   // IC-PROPS: the yards' trades stand on City Isle - the district's proper name, as imperialBlocks.js's
-  'src/world/tamriel/groundDressClient.js': 5,   // TESA-LANDS (AUDIT): the dress's worker's warnings (no worker, a worker that failed, a dress it could not be handed - the second audit) and the two reasons a failed one is given (an answer unreadable, none in time) - console lines through the client's injected logger, as imperialPrebuildClient.js's
-  'src/world/imperialPrebuildClient.js': 2,   // IC-GRAND's city worker: its two warnings (no worker, a worker that failed) - console lines through the client's injected logger, as tamrielRoadsClient.js's
+  'src/world/tamriel/tamrielLands.js': 33,
+  'src/world/tamriel/tamrielWaters.js': 20,
   'src/world/tamrielCapitals.js': 6,
   'src/world/tamrielCountry.js': 6,
   'src/world/tamrielDungeons.js': 44,
-  'src/world/tamrielRoadsClient.js': 7,   // AUDIT TESA II R8/R10: the roads' warnings - no IndexedDB, a keep that failed (twice), the page's own thread building - console lines through the client's injected logger (console's own by default), which the scan reads only as `console.` calls
+  'src/world/tamrielRoadsClient.js': 7,
   'src/world/townPictures.js': 6,
+  'src/world/urban/townLook.js': 15,
   'src/world/windowRoomArt.js': 2,
   'src/world/worldOfDaggerfall/wodLocationData.js': 3,
   'src/world/worldOfDaggerfall/worldOfDaggerfall.js': 7,
-  // KPbICA's spec, forwarded by the owner: proper names in
-  // data tables, as the districts' and Lake Rumare's above - none yet shown a player; routing them through t() is their
-  // arcs' own to do when a label shows them.
-  'src/world/road/cyrodiilRoads.js': 8,   // VOYAGER-CYRODIIL: the named roads (the Red Ring Road, the Gold Road...)
-  'src/world/tamriel/tamrielWaters.js': 20,   // CYRODIIL-WATERS: the rivers', lakes' and named waters' names, and the reference's credit (WATERS_SOURCE)
-  'src/world/urban/townLook.js': 15,   // URBANIZER U1: why each province's towns wear their building set - the table's own notes, read by no screen
 };
 
 test('L10N4 the ratchet: no file holds more hard-coded English than it did - route a new sentence through t(key, en, args); when a count falls, write the map down again', () => {
