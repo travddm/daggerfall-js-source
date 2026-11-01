@@ -39,7 +39,7 @@
 // ═══════════════════════════════════════════════════════════════════
 import { call, forgetSession, handleShapeOk } from './accountClient.js';
 import { letterWords, LETTER_ID_RE, LETTER_SUBJECT_MAX, LETTER_BODY_MAX, LETTERS_INBOX_MAX } from './letterLaw.js';
-import { GLYPHS_MAX, ID_RE } from './identityToken.js';   // AUDIT B7 (SHADOW-FANG): a letter's glyphs are bounded as a token's; NAME-AS: a friend's account, by its id's own shape
+import { GLYPHS_MAX, ID_RE } from './identityToken.js';   // AUDIT B7: a letter's glyphs are bounded as a token's; NAME-AS: a friend's account, by its id's own shape
 import { agoLadder } from './social.js';   // AUDIT 68 S14-ago-text-duplicated: the friends list's own ladder, not a copy of it
 
 /** How often the host looks at the box while the game runs. */
@@ -68,7 +68,7 @@ export const deleteCall = (io, id) => call(io, '/v1/mail/delete', { id });
 
 const text = (v, max) => (typeof v === 'string' && v.length <= max ? v : null);
 const when = (v) => (Number.isSafeInteger(v) && v > 0 ? v : null);
-const glyphList = (v) => (Array.isArray(v) ? v.filter((g) => typeof g === 'string').slice(0, GLYPHS_MAX) : []);   // AUDIT B7: the token's own bound, not a copy of it (SHADOW-FANG's glyph made eight of eight)
+const glyphList = (v) => (Array.isArray(v) ? v.filter((g) => typeof g === 'string').slice(0, GLYPHS_MAX) : []);   // AUDIT B7: the token's own bound, not a copy of it, so a glyph added to the vocabulary moves both
 
 /** A letter's head as the box keeps it, or null for one that is not a letter's shape.
  *  @returns {LetterHead|null} */

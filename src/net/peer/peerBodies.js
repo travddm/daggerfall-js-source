@@ -66,7 +66,6 @@
 //     its look and its form - stands in it at once, with no build.
 import { createFpArm } from '../../combat/fpArm.js';
 import { dfWornEquipment } from '../../formats/morrowind/mwItemMap.js';
-import { werewolfSkinOf } from '../../characters/werewolfSkin.js';   // SHADOW-FANG: a peer's wolf in the skin their signed glyphs name
 import { npcHintOf, npcKeyOf, withNpcPicks, npcFaceOf, WARDROBE_BEAST_RACES } from '../../characters/wardrobe.js';   // MWNPC17: an NPC's own garments, head and hair
 import { ownOutfitFor } from '../../characters/ownModels/ownClothingModels.js';   // MW-FOLK1: a townsperson's whole outfit
 import { ARMOR_ENUM } from '../../combat/enemyEquipment.js';
@@ -285,15 +284,15 @@ function wolfLookKey(look) {
 }
 
 /** WEREWOLF1: WHICH BODY A PEER WEARS, as a key - the look's own for a person, unchanged; for a werewolf the wolf, its
- *  race, sex and skin, so a peer who transforms is a different body (built at once, not after BODY_REBUILD_MS) and a
+ *  race and sex, so a peer who transforms is a different body (built at once, not after BODY_REBUILD_MS) and a
  *  wolf refused (no Bloodmoon here) is waited out as a wolf and never as the person. AUDIT E1: NOT the person's look -
  *  the transformation unequips both hands and PROFILE2 says the look again a second later, and a key that read the
  *  equip table tore the standing wolf down and built it again ten seconds on (a second refusal and warning, where it
  *  was refused). */
-export function peerBodyKey(look, shown = null, glyphs = null) {
+export function peerBodyKey(look, shown = null) {
   if (look?.creature) return `crea|${look.creature}${look.flies ? '|flies' : ''}`;   // MWNPC9: a creature is its record - every one of a kind one body, never a person's; AUDIT MW-NPC II K5: one asked to fly another
   if (look?.vampire && !peerIsWolf(shown)) return `vamp|${bodyLookKey(look)}`;   // MWNPC14: a vampire's face is its own body - never a living look's spare
-  return peerIsWolf(shown) ? `wolf|${wolfLookKey(look)}|${werewolfSkinOf(glyphs) ?? ''}` : bodyLookKey(look);   // SHADOW-FANG: and the wolf's skin; MWNPC17: and an NPC's own picks (bodyLookKey) - two people in one outfit are two bodies
+  return peerIsWolf(shown) ? `wolf|${wolfLookKey(look)}` : bodyLookKey(look);   // MWNPC17: and an NPC's own picks (bodyLookKey) - two people in one outfit are two bodies
 }
 
 /** MW-CROWD (FIELD BUGS 2026-10-01 #8): A PERSON'S BODY IS ITS LOOK LESS ITS WEAPONS. The weapon in hand is the arm's
@@ -321,11 +320,10 @@ function bodyLookKey(look) {
 const lookOutfit = (look) => (typeof look?.outfit === 'string' && !WARDROBE_BEAST_RACES.includes(look.race) ? ownOutfitFor(look.outfit) : null);
 export const outfitKeyOf = (look) => { const o = lookOutfit(look); return o ? `|outfit:${o.id}` : ''; };
 
-export function peerBuildOpts(look, shown = null, glyphs = null) {
+export function peerBuildOpts(look, shown = null) {
   if (look?.creature) return { creature: look.creature, reachSweep: false, ...(look.flies ? { flies: true } : {}) };   // MWNPC9: its CREA record (fpArm buildCreatureBody) - nothing worn or held; AUDIT MW-NPC II K5: a flyer's must fly
   const stub = peerStubEntity(look);
   const wolf = peerIsWolf(shown);
-  const skin = wolf ? werewolfSkinOf(glyphs) : null;   // SHADOW-FANG: the glyphs the relay read off the peer's own token
   const npc = wolf ? null : npcHintOf(look);   // MWNPC17: a dressed NPC's seed and rung (characters/wardrobe.js) - a player's look carries none
   const worn = dfWornEquipment(stub.equip.slots, EQUIP_SLOTS, ARMOR_ENUM);
   return {
@@ -337,7 +335,7 @@ export function peerBuildOpts(look, shown = null, glyphs = null) {
     weapon: wolf ? null : stub.equip.slots[shown?.lh ? EQUIP_SLOTS.LeftHand : EQUIP_SLOTS.RightHand] ?? null,
     hasAmmo: false,
     reachSweep: false,   // MWNPC3: a peer is never looked out of - no first-person reach sweep in its build
-    ...(wolf ? { werewolf: true, ...(skin ? { skin } : {}) } : {}),   // WEREWOLF1: Bloodmoon's wolf - its skeleton, head, hair and robe; SHADOW-FANG: its skin
+    ...(wolf ? { werewolf: true } : {}),   // WEREWOLF1: Bloodmoon's wolf - its skeleton, head, hair and robe
     ...(look?.vampire && !wolf ? { vampire: true } : {}),   // MWNPC14: a vampire foe's face (an NPC's look - the wire's never carries it)
     ...(npc ? { npcFace: npcFaceOf(npc) } : {}),   // MWNPC17: its head and hair walked off its seed
   };
@@ -347,7 +345,7 @@ export function peerBuildOpts(look, shown = null, glyphs = null) {
  *  peerBuildOpts, and the port's own heads, as the local player's body wears them (combat/weapon/weaponRig.js
  *  armBuildOptsOf). The peers' PeerBodies takes it (scenes/world.js); the people's lanes take peerBuildOpts, the data's
  *  heads. */
-export const playerBuildOpts = (look, shown = null, glyphs = null) => ({ ...peerBuildOpts(look, shown, glyphs), ownHeads: true });
+export const playerBuildOpts = (look, shown = null) => ({ ...peerBuildOpts(look, shown), ownHeads: true });
 
 /** MW-FOLK1: the worn piece a look's outfit is (mwItemMap.js composeWornArmor's `outfit` kind) - none for a wolf, whose
  *  body is the robe's, nor for an id the table does not hold. */
@@ -515,14 +513,14 @@ export class PeerBodies {
   /** MWNPC10: a body's own scale (the lane's `scaleOf`), 1 without one. */
   _scaleOf(b) { const s = this._cam?.scaleOf ? this._cam.scaleOf(b.id) : 1; return s > 0 ? s : 1; }   // OW-PEERS: a grown body's head, for its name
 
-  /** Why a look has no body - a person's, or (AUDIT E7) a wolf's by the pose and glyphs it is keyed on - or null. */
-  failureOf(look, shown = null, glyphs = null) {
+  /** Why a look has no body - a person's, or (AUDIT E7) a wolf's by the pose it is keyed on - or null. */
+  failureOf(look, shown = null) {
     if (peerIsWolf(shown) && this._wolfRefused) return this._wolfRefused.reason;
-    const f = this._failed.get(peerBodyKey(look, shown, glyphs));
+    const f = this._failed.get(peerBodyKey(look, shown));
     return f ? f.reason : null;
   }
 
-  /** SHADOW-CLOAK: a peer's body's named bones where they stand - { feet, yaw, bones }: the feet and the eased yaw the
+  /** A peer's body's named bones where they stand - { feet, yaw, bones }: the feet and the eased yaw the
    *  body is drawn at and its bones in its own frame (the rig's thirdBones) - or null without a standing body. A body out
    *  of view keeps its last pose, as its skin does. */
   bonesOf(id, names) {
@@ -573,7 +571,7 @@ export class PeerBodies {
     for (const [id, b] of this._bodies) {
       const peer = live.get(id);
       if (!peer) continue;
-      const key = peerBodyKey(peer.look, peer.shown, peer.glyphs);
+      const key = peerBodyKey(peer.look, peer.shown);
       // a new look is a new body (built below) - not oftener than BODY_REBUILD_MS; WEREWOLF1: a new FORM at once - the
       // wolf the moment the peer transforms and the person the moment they turn back, as their own screen shows it
       if (b.key !== key && (!!b.wolf !== peerIsWolf(peer.shown) || now - b.builtAt >= BODY_REBUILD_MS)) {
@@ -615,7 +613,7 @@ export class PeerBodies {
       if (peer.told === false) continue;
       const fw = this._formWait.get(id);   // AUDIT E3
       if (fw != null && now < fw) continue;
-      const fkey = peerBodyKey(peer.look, peer.shown, peer.glyphs);   // WEREWOLF1: a wolf refused is waited out as a wolf
+      const fkey = peerBodyKey(peer.look, peer.shown);   // WEREWOLF1: a wolf refused is waited out as a wolf
       const f = this._failed.get(fkey);
       if (f) { if (now < f.until) continue; this._failed.delete(fkey); }
       const p = toScene(peer.shown);
@@ -642,7 +640,7 @@ export class PeerBodies {
       const spare = this._takeSpare(w.key);   // WB9h: a body given up for this one's, built - no build
       // AUDIT WB9 (bodies F3): the look its key names, read NOW - the queue reaches its build later, and a look changed
       // meanwhile was built under the old key (a spare the next wearer of the old look stood in, in the wrong armour)
-      const look = peer.look, shown = peer.shown, glyphs = peer.glyphs;
+      const look = peer.look, shown = peer.shown;
       const b = { id: peer.id, key: w.key, wolf: peerIsWolf(shown), rig: spare ? spare.rig : this._createRig(), state: spare ? 'ok' : 'building', cam: null, feet: null, yaw: peerBodyYaw(shown), speed: 0, goneAt: null, far: false, d2: w.d2, pri: w.pri, builtAt: now, born: now, byForm: this._flipped.delete(peer.id), swing: null, cast: null, pending: null, held: false, ammo: spare ? spare.ammo : null, weapon: spare ? spare.weapon : null,
         posed: false, phase: this._phase++, bank: 0,   // PEER-CADENCE
         posedAt: 0, rank: 0, inView: true, stale: false, owed: false, peer: null,   // WB9h
@@ -652,7 +650,7 @@ export class PeerBodies {
       b.rig.attach(this.renderer, () => b.cam);
       this._place(b, peer, toScene, dt, near);
       if (!spare) {
-        const build = () => this._build(b, look, shown, glyphs);
+        const build = () => this._build(b, look, shown);
         // MWNPC4: through the page's gate when the host gave one - a peer's body, the family's and an NPC's wait their turn
         // on ONE queue, so two lanes never build at once (a build's synchronous spans - the bind, the skin transfer -
         // were one lane's stutter at a time; two lanes doubled it)
@@ -961,7 +959,7 @@ export class PeerBodies {
     this._release(b.id);
   }
 
-  async _build(b, look, shown = null, glyphs = null) {
+  async _build(b, look, shown = null) {
     if (this._bodies.get(b.id) !== b) return;   // released before its turn: no parse for a body already gone
     // AUDIT MW-NPC B4 (MWNPC11's NO RIG PAST THE RANGE): an NPC lane's body whose actor fell past the cut while it waited
     // its turn on the one queue is let go unbuilt - it would stand as its sprite (a scene's first frame, a hitch's, cut
@@ -969,7 +967,7 @@ export class PeerBodies {
     if (this._buildInRange && b.far) { this._release(b.id); return; }
     let res = null, reason = 'threw';
     // WEREWOLF1: the form it was keyed on rides the build - a wolf's body is built as the wolf
-    try { const opts = this._buildOpts(look, b.wolf ? { ...shown, wb: 1 } : null, glyphs); b.weapon = opts.weapon ?? null; res = await b.rig.build(opts); } catch (e) { res = null; reason = `threw: ${e?.message ?? e}`; }
+    try { const opts = this._buildOpts(look, b.wolf ? { ...shown, wb: 1 } : null); b.weapon = opts.weapon ?? null; res = await b.rig.build(opts); } catch (e) { res = null; reason = `threw: ${e?.message ?? e}`; }
     if (this._bodies.get(b.id) !== b) { try { b.rig.unload(); } catch { /* gone */ } return; }   // released while building
     if (res && res.ok && b.rig.canThirdPerson() && b.rig.setViewMode('third')) { b.state = 'ok'; b.builtAt = this._now(); this._failed.delete(b.key); return; }
     if (res) reason = res.ok ? 'no third-person body' : `${res.stage}: ${res.error}`;

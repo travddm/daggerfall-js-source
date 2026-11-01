@@ -74,13 +74,11 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   assert.deepEqual(titlesHeld({ handle: 'Valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), ['disciple'], 'valenvalarys: the Disciple title, case-folded');
   assert.deepEqual(glyphsOf({ handle: 'VALENVALARYS', created_at: 0 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }, 10 ** 10), ['disciple'], 'and its glyph');
   assert.equal(equipRefusal('disciple', { handle: 'valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), null, 'theirs to wear');
-  // Mac (2026-09-25): "Add SirMcMobdon as an Apostle ingame title/glyph"; then (2026-09-26): "SirMcMobdon gets a brand
-  // new title/glyph. Remove them from Apostle" - Shadow Fang is theirs now (test/ui/shadowfang.test.js), and the Apostle
-  // list is empty again
+  // SirMcMobdon was an Apostle for a day; the Apostle list is empty again
   assert.equal(v('APOSTLE_HANDLES'), '', 'SirMcMobdon is no longer an Apostle');
   assert.deepEqual(titlesHeld({ handle: 'sirmcmobdon', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }), [], 'SirMcMobdon holds no Apostle title');
   assert.deepEqual(glyphsOf({ handle: 'SirMcMobdon', created_at: 0 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }, 10 ** 10), [], 'and no Apostle glyph');
-  assert.equal(v('DEVELOPER_HANDLES'), 'Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1', 'DEV2, Mac: "Give trashBattery, LostMyLeg the developer title/glyph"; DEV3: "grant Tabby the developer title/glyph"; DEV4, the owner: "Also add RookieG(Dev) as developer", then "Change RookieG(Dev) to RookieG"; DEV5, Mac: "Remove trashBattery ingame as a dev"; DEV6, Mac: "Give roderic the developer access ingame (title/glyph)"; STAFF-PANEL1, mob 06:33Z: \"can we just add me to the dev and my shadow fang just becomes vanity and i gain admin as well?\"; then \"kpblca_1 needs added to them as welll\"');
+  assert.equal(v('DEVELOPER_HANDLES'), 'Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1', 'DEV2, Mac: "Give trashBattery, LostMyLeg the developer title/glyph"; DEV3: "grant Tabby the developer title/glyph"; DEV4, the owner: "Also add RookieG(Dev) as developer", then "Change RookieG(Dev) to RookieG"; DEV5, Mac: "Remove trashBattery ingame as a dev"; DEV6, Mac: "Give roderic the developer access ingame (title/glyph)"; STAFF-PANEL1: SirMcMobdon; then \"kpblca_1 needs added to them as welll\"');
   // DEV6 (2026-10-16): Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
   for (const h of ['LOSTMYLEG', 'tabby', 'RookieG', 'rookieg', 'ROOKIEG', 'roderic', 'Roderic', 'RODERIC']) {
     const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };   // FOUNDER3: first played after the cutoff too, so no Founder
@@ -118,10 +116,10 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
     assert.deepEqual(glyphsOf(mod, { MODERATOR_HANDLES: v('MODERATOR_HANDLES') }, 1_900_000_000), ['mod'], `${h}: the mod shield`);
   }
   assert.equal(v('HIEROPHANT_HANDLES'), '', 'nobody yet');
-  // AUDIT B8 (SHADOW-FANG): the whole list, not a prefix of it - and every list's title and glyph IN the token's closed
+  // AUDIT B8: the whole list, not a prefix of it - and every list's title and glyph IN the token's closed
   // vocabulary: one outside it makes mintToken throw, and /v1/auth/token a 500 for every handle on that list
-  assert.deepEqual(Object.keys(TIER_LISTS), [...NEW_TITLES, 'shadowfang', 'penitent', 'herald', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage'], 'TITLE-N\'s four, then SHADOW-FANG\'s, then PENITENT\'s, then HERALD\'s, then AEGIS\'s, then PRIMARCH\'s, then CRYSTAL-FIST\'s, then WIKIMAID\'s, then NIRNROOT-SAGE\'s (PIN MOVED)');
-  assert.deepEqual(Object.values(TIER_GLYPH), [...NEW_GLYPHS, 'shadowfang', 'penitent', 'herald', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage']);   // NIRNROOT-SAGE's last (PIN MOVED); WIKIMAID's last (PIN MOVED); CRYSTAL-FIST's before it
+  assert.deepEqual(Object.keys(TIER_LISTS), [...NEW_TITLES, 'herald'], "TITLE-N's four, then HERALD's");
+  assert.deepEqual(Object.values(TIER_GLYPH), [...NEW_GLYPHS, 'herald']);
   for (const t of Object.keys(TIER_LISTS)) assert.ok(TITLES.includes(t), `${t}: a title the token may carry`);
   for (const g of Object.values(TIER_GLYPH)) assert.ok(GLYPHS.includes(g), `${g}: a glyph the token may carry`);
   const env = { DUNGEON_MASTER_HANDLES: v('DUNGEON_MASTER_HANDLES'), DISCIPLE_HANDLES: v('DISCIPLE_HANDLES'), APOSTLE_HANDLES: 'Paul', HIEROPHANT_HANDLES: 'Pope, Other' };

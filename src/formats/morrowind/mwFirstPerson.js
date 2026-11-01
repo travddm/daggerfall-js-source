@@ -2479,7 +2479,6 @@ export function bindPartsInto(assembly, parts) {
                 ? (part.inheritOffsetFrom === 'sheath' ? sheathBoneOffset : null)   // WS1: a bare instance under the scabbard's node
                 : (bound.boneOffset || null),
             uvs: batch.uvs || null, colors: batch.colors || null, material: batch.material || null,
-            shape: batch.name || null,   // SHADOW-FANG (AUDIT F2): the shape's own name - a skinned piece keeps its batch, a rigid one only this (an eye names itself)
             // MW-BOW1: the file and the batch's chain, for a part whose own controllers move it on the weapon clock
             // (formats/morrowind/mwPartClock.js posePartBatch) - the weapon's slots alone, so no other part keeps its parsed
             // file alive; and, for a part instanced under a node of ANOTHER file (the arrow under the bow's

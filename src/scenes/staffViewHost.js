@@ -161,7 +161,7 @@ export function createStaffViewHost({ follow, glyphs, links, book, foes, overwor
   /** STAFF-OW-TAGS: the Overworld's players this frame, as marks() found them (`kind` their flag's line, STAFF-FLAG-LINES). @type {Array<{ id: string, at: number[], name: string, line: string, level: string, kind: number|null }>} */
   let owTags = [];
   /** THE GATE: a Staff Panel spoke on this page (a player's page: false, and nothing more is asked), and my glyphs are an
-   *  Admin's or a Moderator's (chatSafetyHost.js staffLineActs: dev, mod or Shadow Fang, never a Dungeon Master) - the true
+   *  Admin's or a Moderator's (chatSafetyHost.js staffLineActs: dev or mod, never a Dungeon Master) - the true
    *  glyphs, which the issue keeps while Hide me is on. */
   const on = () => !!follow.panel() && staffLineActs(glyphs()).length > 0;
   const admin = () => { const g = glyphs(); return Array.isArray(g) && g.includes('dev'); };

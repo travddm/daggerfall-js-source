@@ -316,14 +316,14 @@ test('STAFF-PANEL5-FOLLOW relay: the bus\'s door takes a room\'s word only in it
   assert.deepEqual([ok.status, await ok.json()], [200, { ok: 1, told: 0 }]);
 }));
 
-test('STAFF-PANEL5-FOLLOW relay: SILENT TP - an Admin\'s or a Shadow Fang\'s /tp is answered from the where note and the target\'s game is sent nothing; a missing or unmatched note falls back to the capture, flagged; a Dungeon Master\'s is today\'s capture', () => hub(async ({ r, tick, join, party }) => {
+test('STAFF-PANEL5-FOLLOW relay: SILENT TP - an Admin\'s /tp is answered from the where note and the target\'s game is sent nothing; a missing or unmatched note falls back to the capture, flagged; a Dungeon Master\'s is today\'s capture', () => hub(async ({ r, tick, join, party }) => {
   const send = (ws, m) => { tick(3000); return r.raw(ws, JSON.stringify({ t: 'stp', ...m })); };   // paced: the hub meters teleport frames
   const stp = (ws, k) => ws.sent.filter((m) => m.t === 'stp' && m.k === k);
-  const dev = await join('peer-dev', 'Mac', ['dev']), fang = await join('peer-fang', 'Mob', ['shadowfang']), dm = await join('peer-dm', 'Dee', ['dm']);
+  const dev = await join('peer-dev', 'Mac', ['dev']), dm = await join('peer-dm', 'Dee', ['dm']);
   const bran = await join('peer-bran', 'Bran');
   await party(bran, note('dungeon:m1234', { in: 1 }));
   tick(1000);
-  for (const [staff, nonce, ag] of [[dev, 'a1', 4], [fang, 'a2', 7]]) {
+  for (const [staff, nonce, ag] of [[dev, 'a1', 4]]) {
     await send(staff, { k: 'ask', name: 'Bran', nonce, nt: 1 });
     const res = stp(staff, 'result').at(-1);
     assert.deepEqual([res.via, res.id, res.name, res.acct, res.ag, res.note.rk], ['note', 'peer-bran', 'Bran', 'acct-peer-bran', ag, 'dungeon:m1234']);

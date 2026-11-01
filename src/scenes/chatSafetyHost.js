@@ -103,17 +103,15 @@ const verdictText = (ai) => (ai && typeof ai === 'object'
  * usefu for us", "replace them follow mute freeze tp ban and other things we use for players", "in chat"): THE ACTS A
  * STAFF MEMBER'S CHAT LINE MENU OFFERS IN PLACE OF REPORT, by their own glyphs as the service last issued them - the
  * design's in-game card. An Admin is a Developer (`dev`): Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch. A
- * Moderator wears the shield (`mod`) or Shadow Fang (`shadowfang`, which moderates - server-account titles.js
- * MOD_TIERS): the same less TP and Freeze, and Shadow Fang keeps the TP its staff commands already give it (TP is
- * "Admin and Shadow Fang only"). Anyone else, a Dungeon Master included: none, and Report stays. The rows only open a
+ * Moderator wears the shield (`mod`): the same less TP and Freeze. Anyone else, a Dungeon Master included: none, and Report stays. The rows only open a
  * door: the account service, the relay and the Staff Panel each check the role again.
  * @param {unknown} glyphs @returns {string[]}
  */
 export function staffLineActs(glyphs) {
   const g = Array.isArray(glyphs) ? glyphs : [];
-  const admin = g.includes('dev'), fang = g.includes('shadowfang');
-  if (!admin && !fang && !g.includes('mod')) return [];
-  return ['follow', ...(admin || fang ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
+  const admin = g.includes('dev');
+  if (!admin && !g.includes('mod')) return [];
+  return ['follow', ...(admin ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
 }
 /** STAFF-PANEL2-CHATMENU: a line menu's mute lengths, minutes (30 min, 1 h, 1 day, 7 days - MOD1's bound, MUTE_MAX_MIN). */
 export const STAFF_MUTE_MINUTES = Object.freeze([30, 60, 24 * 60, 7 * 24 * 60]);

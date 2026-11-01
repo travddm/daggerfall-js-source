@@ -11,10 +11,9 @@ export const STAFF_TP_RELAY_MIN = 159;   // world156 now belongs to upstream's a
 export const STAFF_TP_TIMEOUT_MS = 8000;
 export const STAFF_TP_ERRORS = Object.freeze(['offline', 'ambiguous', 'busy', 'private', 'battle', 'unavailable', 'denied']);
 export const staffTeleportSupported = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= STAFF_TP_RELAY_MIN;
-/** STAFF-PANEL5-FOLLOW (design doc "DFO Staff Panel: design", weak spot "TP is visible...": "keep it Admin and Shadow Fang
- *  only"): who the hub answers from the target's where note, never asking the target's game - an Admin (`dev`) or the
- *  Shadow Fang. A Dungeon Master's /tp @player stays today's capture. */
-export const quietTeleportAllowed = (glyphs) => Array.isArray(glyphs) && (glyphs.includes('dev') || glyphs.includes('shadowfang'));
+/** STAFF-PANEL5-FOLLOW: who the hub answers from the target's where note, never asking the target's game - an Admin
+ *  (`dev`) alone, because the silent teleport is an Admin's tool. A Dungeon Master's /tp @player stays today's capture. */
+export const quietTeleportAllowed = (glyphs) => Array.isArray(glyphs) && glyphs.includes('dev');
 /** Why the target's game was asked after all: no fresh where note at the hub, or one the asker's game could not place. */
 export const STAFF_TP_FALLBACKS = Object.freeze(['missing', 'mismatch']);
 const token = (v) => typeof v === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(v);

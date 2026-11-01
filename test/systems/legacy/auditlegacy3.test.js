@@ -186,7 +186,7 @@ test('AUDIT LEGACY III O11: THE TOKEN\'S BODY BOUND IS ONE - the relay\'s hello 
   // is the one checked here. Without the province crowns the house still fits beside every other claim (855).
   const crowns = /^crown(SK|MW|SU|VW|EW|BM|CY)$/;
   const arms = { ci: `r${'f'.repeat(20)}`, wa: [TOKEN_ARMS_TOP_MAX, 1] };
-  assert.ok(tokenBodyOf(await mintToken({ ...every, ...house, ...arms }, kp.privateKey, { subtle, nowS })).length > TOKEN_BODY_MAX, 'every glyph and a house: past the hello - the mint leaves the house unsaid');
+  assert.ok(tokenBodyOf(await mintToken({ ...every, ...house, ...arms }, kp.privateKey, { subtle, nowS })).length <= TOKEN_BODY_MAX, 'every glyph and a house fit inside the hello');
   const bay = tokenBodyOf(await mintToken({ ...every, g: GLYPHS.filter((g) => !crowns.test(g)), ...house, ...arms }, kp.privateKey, { subtle, nowS })).length;
   assert.ok(bay <= TOKEN_BODY_MAX, `the house beside every claim but the province crowns (${bay} of ${TOKEN_BODY_MAX})`);
   const widest = await mintToken({ ...every, ...arms }, kp.privateKey, { subtle, nowS });   // what the mint makes of every claim and a house

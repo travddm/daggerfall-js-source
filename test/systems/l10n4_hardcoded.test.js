@@ -158,7 +158,7 @@ const HARDCODED = {
   'src/player/parkour.js': 1,
   'src/player/socialPick.js': 1,
   'src/render/airPass.js': 11,
-  'src/render/auraRing.js': 3,
+  'src/render/auraRing.js': 4,   // the vertex shader's GLSL source, not player text: a removed comment naming a .js file had kept the scan off it
   'src/render/bannerPass.js': 2,
   'src/render/classicShadowLane.js': 3,
   'src/render/cloudNoise.js': 4,
@@ -654,7 +654,7 @@ const HARDCODED = {
   'src/ui/pickupFeed.js': 1,
   'src/ui/pixelDial.js': 3,
   'src/ui/pixelifyFive.js': 2,
-  'src/ui/playerBadge.js': 40,   // Elite Gates removed: -10   // HUNTERS-MARK: the hunt's and the Marks of Mastery's fourteen two-word titles in words, beside the other titles'; NIRNROOT-SAGE: the Nirnroot Sage's title in words, beside the other titles'; QL12: the questlines' five titles in words ("Witness of the Hour" the one two-word phrase); SERPENT5: The Maelstrom's word, beside the other auras'; EG-E2: the Spire's thirteen titles and three auras in words; WIKIMAID: the Lilac Warren's word, beside the other auras'
+  'src/ui/playerBadge.js': 31,   // Elite Gates removed: -10   // HUNTERS-MARK: the hunt's and the Marks of Mastery's fourteen two-word titles in words, beside the other titles'; NIRNROOT-SAGE: the Nirnroot Sage's title in words, beside the other titles'; QL12: the questlines' five titles in words ("Witness of the Hour" the one two-word phrase); SERPENT5: The Maelstrom's word, beside the other auras'; EG-E2: the Spire's thirteen titles and three auras in words; WIKIMAID: the Lilac Warren's word, beside the other auras'
   'src/ui/playerHistory.js': 1,
   'src/ui/plus/plusPad.js': 18,
   'src/ui/plus/plusPadBinds.js': 30,

@@ -237,7 +237,7 @@ test('STAFF-PANEL2 STAFF REPORT NOTHING FROM CHAT: an Admin\'s or a Moderator\'s
   const player = hostRig().host.lineActions(line);
   assert.equal(player.length, REPORT_REASONS.length + 1);
   assert.equal(hostRig({ opts: { glyphs: () => ['dm', 'sprout'] } }).host.lineActions(line).length, REPORT_REASONS.length + 1, 'a Dungeon Master moderates nothing');
-  for (const g of ['dev', 'mod', 'shadowfang']) {
+  for (const g of ['dev', 'mod']) {
     const staff = hostRig({ opts: { glyphs: () => [g] } }).host.lineActions(line);
     assert.equal(staff.some((x) => /^Report/.test(x.label)), false, g);
     assert.equal(staff.at(-1).label, 'Block', `${g}: Block stays, last`);
@@ -248,17 +248,15 @@ const STAFF_LINE = { id: 'p2', name: 'Troll', text: 'gross', at: 2, sub: 'acct-t
 const staffRig = (glyphs, more = {}) => hostRig({ ...more, opts: { glyphs: () => glyphs, ...(more.opts ?? {}) } });
 const rowOf = (rows, label) => rows.find((x) => x.label === label);
 
-test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; Shadow Fang a Moderator\'s with TP; Follow only with the staff hook, TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator; Follow without the hook)', () => {
+test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; Follow only with the staff hook, TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator; Follow without the hook)', () => {
   assert.deepEqual(hostNs.staffLineActs(['dev']), ['follow', 'tp', 'message', 'mute', 'freeze', 'ban', 'notes', 'watch']);
   assert.deepEqual(hostNs.staffLineActs(['mod']), ['follow', 'message', 'mute', 'ban', 'notes', 'watch']);
-  assert.deepEqual(hostNs.staffLineActs(['shadowfang']), ['follow', 'tp', 'message', 'mute', 'ban', 'notes', 'watch']);
   assert.deepEqual(hostNs.staffLineActs(['dev', 'mod']), hostNs.staffLineActs(['dev']));
   for (const g of [[], ['dm'], ['sprout', 'laurel'], null, 'dev']) assert.deepEqual(hostNs.staffLineActs(g), [], JSON.stringify(g));
   const seams = { follow: () => () => {}, teleport: () => {} };
   const labels = (glyphs, opts = seams) => staffRig(glyphs, { opts }).host.lineActions(STAFF_LINE).map((x) => x.label);
   assert.deepEqual(labels(['dev']), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block']);
   assert.deepEqual(labels(['mod']), ['Follow', 'Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
-  assert.deepEqual(labels(['shadowfang']), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
   assert.deepEqual(labels(['dev'], {}), ['Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block'], 'no hook, no Follow; no door, no TP');
   assert.deepEqual(labels(['dev'], { follow: () => null, teleport: () => {} }).slice(0, 1), ['TP'], 'a hook that is not there hides Follow');
   const rows = staffRig(['dev'], { opts: seams }).host.lineActions(STAFF_LINE);

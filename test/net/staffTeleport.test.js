@@ -100,7 +100,7 @@ async function hub(fn, key = SOCIAL_ROOM) {
 }
 const messages = (ws, k) => ws.sent.filter((m) => m.t === 'stp' && m.k === k);
 
-for (const glyph of ['dev', 'dm', 'shadowfang']) test(`STAFF-TP relay: signed ${glyph} locates any hub player without region/party markers`, () => hub(async ({ join, send }) => {
+for (const glyph of ['dev', 'dm']) test(`STAFF-TP relay: signed ${glyph} locates any hub player without region/party markers`, () => hub(async ({ join, send }) => {
   const staff = await join('peer-staff', 'Mac', [glyph]), target = await join('peer-bran', 'Bran'), bystander = await join('peer-other', 'Other');
   await send(staff, { k: 'ask', name: 'Bran', nonce: 'lookup-one', glyphs: ['anything'] });
   const capture = messages(target, 'capture').at(-1); assert.ok(capture);

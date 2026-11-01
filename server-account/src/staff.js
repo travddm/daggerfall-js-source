@@ -45,7 +45,7 @@
 // write than a wrong one - a clock to guess a password by, from as many addresses as an attacker holds.
 import { verifyPassword, mintRecoveryCode, canonicalCode } from './password.js';
 import { mintId, mintSecret, hashSecret, displayName, overRate, clearRate, overAccountRate } from './accounts.js';
-import { isDeveloper, canModerate, handleList, developerHandles, moderatorHandles, staffSuspended, TIER_LISTS, MOD_TIERS } from './titles.js';
+import { isDeveloper, canModerate, handleList, developerHandles, moderatorHandles, staffSuspended } from './titles.js';
 import { isBanned, pushLaw, staffCutOrder } from './sanctions.js';
 import { staffCases, CASE_ROUTES } from './staffCases.js';
 import { staffDesk, DESK_ROUTES } from './staffDesk.js';   // STAFF-PANEL3-DESK: notes, the watchlist, your settings, and the Admins' notice, scorecard and reported notes
@@ -175,7 +175,6 @@ export const configKey = (player, env, pub) => typeof pub === 'string' && isOwne
 /** Every handle a role list names - the team an owner manages. @param {any} env */
 function staffHandles(env) {
   const all = new Set([...developerHandles(env), ...moderatorHandles(env)]);
-  for (const t of MOD_TIERS) for (const h of handleList(env?.[TIER_LISTS[/** @type {keyof typeof TIER_LISTS} */ (t)]])) all.add(h);
   return [...all];
 }
 

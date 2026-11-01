@@ -209,11 +209,6 @@
   "tr": "fb8b9a2bd3ef",
   "by": "claude-in-session"
  },
- "coll.avail.bestowed": {
-  "en": "fd09f780426e",
-  "tr": "084facf3c351",
-  "by": "claude-in-session"
- },
  "coll.avail.chance": {
   "en": "3b2f229a52da",
   "tr": "477342ec49e4",
@@ -267,11 +262,6 @@
  "coll.availLine.auto": {
   "en": "5d55d79fe72d",
   "tr": "078062421231",
-  "by": "claude-in-session"
- },
- "coll.availLine.bestowed": {
-  "en": "632223c73642",
-  "tr": "9826d9e5c7b4",
   "by": "claude-in-session"
  },
  "coll.availLine.chance": {
@@ -402,11 +392,6 @@
  "coll.how.arenachampion": {
   "en": "727337ef4eba",
   "tr": "c85e9f14b4dc",
-  "by": "claude-in-session"
- },
- "coll.how.bestowed": {
-  "en": "1ab34fb5ed92",
-  "tr": "050495ea9164",
   "by": "claude-in-session"
  },
  "coll.how.broker": {
@@ -584,44 +569,14 @@
   "tr": "db2c63316251",
   "by": "claude-in-session"
  },
- "coll.look.lilacwarren": {
-  "en": "f173914a62f6",
-  "tr": "5d3fe5e6655f",
-  "by": "claude-in-session"
- },
  "coll.look.maelstrom": {
   "en": "36f5e003124b",
   "tr": "2f13b3e2d599",
   "by": "claude-in-session"
  },
- "coll.look.oblivionward": {
-  "en": "e4e4f727e8f4",
-  "tr": "a8a4dbfd5f74",
-  "by": "claude-in-session"
- },
- "coll.look.radiance": {
-  "en": "ba85180f5d77",
-  "tr": "108c77178f6e",
-  "by": "claude-in-session"
- },
- "coll.look.resonance": {
-  "en": "4f617addf148",
-  "tr": "8cfc360af9b9",
-  "by": "claude-in-session"
- },
- "coll.look.sagesmoke": {
-  "en": "d110d0fa1d62",
-  "tr": "488e837ebf15",
-  "by": "claude-in-session"
- },
  "coll.look.seraphwings": {
   "en": "6ddde4c0aa32",
   "tr": "01bedd23ef98",
-  "by": "claude-in-session"
- },
- "coll.look.shadowcloak": {
-  "en": "a11b8f996f7e",
-  "tr": "6096c47f0956",
   "by": "claude-in-session"
  },
  "coll.look.turninghour": {
@@ -677,11 +632,6 @@
  "coll.src.account": {
   "en": "d7913205f384",
   "tr": "695b8f996557",
-  "by": "claude-in-session"
- },
- "coll.src.bestowed": {
-  "en": "2a5741c7d758",
-  "tr": "12b7b989e223",
   "by": "claude-in-session"
  },
  "coll.src.broker": {

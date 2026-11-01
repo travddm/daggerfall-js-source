@@ -88,7 +88,6 @@ import { materialName } from '../systems/item/itemInfo.js';
 import { composeWornArmor, composeWornModest, shadowSkinRows, fpWornAdds, mwArmorRecords, mwClothingRecord, CLOTHING_NAME, werewolfRobeOf, firstPersonPartGroup } from '../formats/morrowind/mwItemMap.js';   // WEREWOLF1: the robe and its first-person ladder; NUDE-FLATS: the upper weld
 import { showNudity } from '../characters/nudeFlats.js';   // NUDE-FLATS: Show Nudity, the weld's switch
 import { getPref } from '../systems/uiPrefs.js';   // MW-STEEL1: the Steel Helm switch, read where the worn set is composed
-import { skinMips, skinUseOf, skinUseKey } from '../characters/werewolfSkin.js';   // SHADOW-FANG: the werewolf's skin, a law over its own textures
 import { correctTexturePath, correctActorModelPath, wrapModes, warningImage, decodeTextureImage } from '../formats/morrowind/mwTexture.js';
 import { decodeTextureOffThread } from '../formats/morrowind/mwTextureClient.js';   // MW-TEXTHREAD: the preload's decodes, in the pool
 import { diffuseAt, emissiveAt } from '../formats/morrowind/mwNifMesh.js';   // MWT2: the emission the pass has always resolved and never read
@@ -931,7 +930,7 @@ export const nifParseCount = () => parseNifOnce.parses;
  */
 /**
  * MWNPC3: ONE GL TEXTURE A PICTURE, FOR EVERY BODY. The decoded image was already shared (TEXTURE_CACHE, by data
- * generation and file; SKINNED_MIPS for a painted one) - but every mesh uploaded its own GL copy of every texture it
+ * generation and file) - but every mesh uploaded its own GL copy of every texture it
  * wore, one a range a body: a crowd in one outfit held the same skin, shirt and hair a body at a time on the GPU. A
  * texture is ACQUIRED now, per renderer, by the image it uploads (its mips array - the caches hand every body the same
  * one) and its wrap: the first range makes it, every later range holds it, and the mesh's release lets go of its
@@ -1076,35 +1075,6 @@ async function cachedClipReport(gen, skeletonPath, name, bytesOf, skeleton) {
 // IG2: decoded-texture memo, same generation key - a steel cuirass's
 // texture does not change because a gauntlet did.
 const TEXTURE_CACHE = new Map();
-/** SHADOW-FANG (AUDIT D2/E5/F5): THE SKINNED COPIES, module-wide - keyed by the decoded image they paint (a
- *  TEXTURE_CACHE entry's, shared by every rig on the page: this body's and every peer's) and by the skin and its use
- *  (characters/werewolfSkin.js skinUseKey), so a rebuild, a peer's wolf and a second viewer's wolf in the same skin
- *  paint nothing twice. They were a per-rig map, cleared at every build and filled in the FRAME that first hung the
- *  mesh - a 1024-square texture was half a second's stall on every screen at every transformation. A generation's
- *  images go with their cache entries, and their copies with them. */
-const SKINNED_MIPS = new WeakMap();   // decoded image -> Map(skinUseKey -> mips)
-function skinnedMipsOf(image, skin, use) {
-  let per = SKINNED_MIPS.get(image);
-  if (!per) { per = new Map(); SKINNED_MIPS.set(image, per); }
-  const key = skinUseKey(skin, use);
-  let mips = per.get(key);
-  if (!mips) { mips = skinMips(image.mips, skin, use); per.set(key, mips); }
-  return mips;
-}
-/** ...painted IN THE BUILD, one texture a turn (a macrotask between two, so the frames keep drawing the body that
- *  still stands), for every piece the wolf's meshes will hang - the frame that hangs them finds them ready. */
-async function preskinTextures(pieces, textures, skin) {
-  if (!skin) return;
-  for (const piece of pieces ?? []) {
-    const file = piece?.material?.textureFile;
-    const entry = file ? textures.get(file) : null;
-    if (!entry?.image?.mips) continue;
-    const use = skinUseOf(piece, file);
-    if (SKINNED_MIPS.get(entry.image)?.has(skinUseKey(skin, use))) continue;
-    skinnedMipsOf(entry.image, skin, use);
-    await new Promise((r) => setTimeout(r, 0));
-  }
-}
 /** AUDIT 32 F2: the face match per identity per data generation. */
 const FACE_MATCH_CACHE = new Map();
 
@@ -1489,7 +1459,7 @@ export function fpWeaponKey(item, hasAmmo) {
  * wrong copy of the bone" (rule 16's duplicate trap) from "the view is
  * mirrored" without a screenshot argument.
  */
-/** SHADOW-CLOAK: A RIG POINT IN THE BODY'S OWN FRAME - `t` [x, y, z] in the third-person rig's Morrowind units (x its
+/** A RIG POINT IN THE BODY'S OWN FRAME - `t` [x, y, z] in the third-person rig's Morrowind units (x its
  *  right, y its forward, z up, its feet at the origin) to [right, up, forward] in metres, the race's `weight` across and
  *  `height` up: exactly where drawThird's model (its feet and yaw, NIF_TO_PASS) puts it about the feet. Pure. */
 export function rigPointToBody(t, { weight = 1, height = 1 } = {}) {
@@ -1497,7 +1467,7 @@ export function rigPointToBody(t, { weight = 1, height = 1 } = {}) {
   return [t[0] * u * weight, t[2] * u * height, t[1] * u * weight];
 }
 
-/** SHADOW-CLOAK: a posed arm's named bones in the body's own frame (rigPointToBody) - its skeleton's byName and its
+/** A posed arm's named bones in the body's own frame (rigPointToBody) - its skeleton's byName and its
  *  pose's mats - null for a bone it lacks; null whole for an arm not posed. Pure. */
 export function armBonesInBody(arm, names, raceScale = null) {
   if (!arm || !arm.mats || !arm.skeleton) return null;
@@ -2087,7 +2057,6 @@ async function buildTpBody({
   sheathing = true, ammoCount = null,   // WS1: the holster, and the quiver's count (null: a full quiver when there is ammunition)
   hipLight = false,   // HT-WAIST: a lit lantern at the waist
   werewolf = false,   // WEREWOLF1: the transformed werewolf - the wolf's skeleton, head, hair and robe, and its own .kf
-  skin = null,   // SHADOW-FANG (AUDIT D2): the wolf's skin, painted here
   vampire = false,   // MWNPC14: a vampire - the race's vampire head (getVampireHead)
   walk = null,   // MWNPC17: an NPC's own head and hair, walked off its seed ({ head, hair } - playerBodyRows)
   ownHeads = false,   // MW-HEADS2: a player's body - the port's own heads where its race has them
@@ -2207,7 +2176,6 @@ async function buildTpBody({
     // knowable now that the NIFs are parsed.
     await preloadArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen);   // MAC-Q: and the flame's
     const textures = collectArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen);
-    if (werewolf) await preskinTextures(arm.pieces, textures, skin);   // SHADOW-FANG (AUDIT D2): the skin, here and not in the frame
 
     const sourcePaths = tpAnimSources(skeletonPath, exists, { werewolf });   // WEREWOLF1: the wolf's .kf alone
     if (!sourcePaths.length) {
@@ -2533,7 +2501,7 @@ export function headBounds(pieces, model, heads, hoods) {
 /** PORTRAIT3D: the head as the body wears it - its skin rows, the parts worn on it, assembled on the skeleton at rest -
  *  rendered to a picture `pw` x `ph` (`{ width, height, data }` top-down RGBA, transparent round the head), or null when
  *  the skeleton, a mesh or a texture is not in hand or nothing of the head stands. */
-async function renderHeadAssembly(renderer, cat, { skeletonPath, skinRows, heads, rows, worn, werewolf, skin }, pw, ph) {
+async function renderHeadAssembly(renderer, cat, { skeletonPath, skinRows, heads, rows, worn, werewolf }, pw, ph) {
   const find = (p) => cat.archives.find((a) => a.has(p)) ?? null;
   await loadFromArchives(cat.archives, [skeletonPath, ...[...skinRows, ...heads].map((r) => `meshes/${r.model}`), ...heads.flatMap((a) => ownBodyPaths(a, rows)).map((b) => b.path)]);
   const skelArc = find(skeletonPath);
@@ -2572,7 +2540,7 @@ async function renderHeadAssembly(renderer, cat, { skeletonPath, skinRows, heads
     const entry = r.textureFile ? textures.get(r.textureFile) : null;
     if (!entry) continue;
     const m = r.piece.material;
-    r.tex = acquireCharacterTexture(renderer, skin ? skinnedMipsOf(entry.image, skin, skinUseOf(r.piece, r.textureFile)) : entry.image.mips, wrapModes(m ? m.clampMode : 3));   // SHADOW-FANG: the wolf in its skin
+    r.tex = acquireCharacterTexture(renderer, entry.image.mips, wrapModes(m ? m.clampMode : 3));
     r.alphaCut = m && m.alphaTest ? (m.alphaThreshold || 0) / 255 : 0;
   }
   try {
@@ -2592,12 +2560,12 @@ const beastWearPref = () => ({ feet: getPref('mwBeastFeet'), helm: getPref('mwBe
 
 /** PORTRAIT3D: THE PORTRAIT OF A MORROWIND HEAD - the face of a race and sex as the body wears it: the player's by its
  *  portrait (`faceIndex`: the curated table, the measured match, the walk), an NPC's walked off its seed (`npcFace`,
- *  characters/wardrobe.js npcFaceOf); a vampire's head (`vampire`), the transformed werewolf's (`werewolf`, in its
- *  `skin`); and what is worn on it (`armor`, the build's own list - a helm, a hooded outfit); a player's (`ownHeads`) the
+ *  characters/wardrobe.js npcFaceOf); a vampire's head (`vampire`), the transformed werewolf's (`werewolf`); and
+ *  what is worn on it (`armor`, the build's own list - a helm, a hooded outfit); a player's (`ownHeads`) the
  *  port's own heads where its race has them, as a player's body wears them (MW-HEADS2). `{ width, height, data }`
  *  or null (no data attached, no renderer, no head for the race, the skeleton or a mesh or a texture not in hand).
- *  @param {{ renderer?: any, race?: string|null, female?: boolean, faceIndex?: number, npcFace?: { head: number, hair: number }|null, ownHeads?: boolean, vampire?: boolean, werewolf?: boolean, skin?: string|null, armor?: any[]|null, px?: number, ph?: number, deps?: any }} [opts] */
-export async function headPortrait({ renderer, race, female = false, faceIndex = 0, npcFace = null, vampire = false, werewolf = false, skin = null, armor = null, ownHeads = false, px = 128, ph = px, deps = null } = {}) {
+ *  @param {{ renderer?: any, race?: string|null, female?: boolean, faceIndex?: number, npcFace?: { head: number, hair: number }|null, ownHeads?: boolean, vampire?: boolean, werewolf?: boolean, armor?: any[]|null, px?: number, ph?: number, deps?: any }} [opts] */
+export async function headPortrait({ renderer, race, female = false, faceIndex = 0, npcFace = null, vampire = false, werewolf = false, armor = null, ownHeads = false, px = 128, ph = px, deps = null } = {}) {
   if (!renderer || !race) return null;
   const d = deps || await import('../scenes/dataSource.js');
   const cat = await headCatalogOf(d);
@@ -2620,10 +2588,10 @@ export async function headPortrait({ renderer, race, female = false, faceIndex =
   let skinRows = shadowSkinRows(rows.filter((r) => r.record).map((r) => ({ slot: r.slot, bones: PART_BONES[r.slot] ?? [], model: r.record.model })), worn.shadows);
   if (werewolf && worn.shadows.includes('head')) skinRows = skinRows.filter((r) => r.slot !== 'hair');
   const skeletonPath = correctActorModelPath(tpSkeletonPath({ female, beast, werewolf }), exists);
-  const key = [cat.gen, skeletonPath, ...skinRows.map((r) => r.model), ...heads.map((a) => `${a.slot}=${a.model}`), werewolf ? 'wolf' : '', skin ?? '', `${px | 0}x${ph | 0}`].join(':');
+  const key = [cat.gen, skeletonPath, ...skinRows.map((r) => r.model), ...heads.map((a) => `${a.slot}=${a.model}`), werewolf ? 'wolf' : '', `${px | 0}x${ph | 0}`].join(':');
   const hit = HEAD_PORTRAIT_CACHE.get(key);
   if (hit) return hit;
-  const picture = renderHeadAssembly(renderer, cat, { skeletonPath, skinRows, heads, rows, worn, werewolf, skin }, px, ph).catch(() => null);
+  const picture = renderHeadAssembly(renderer, cat, { skeletonPath, skinRows, heads, rows, worn, werewolf }, px, ph).catch(() => null);
   HEAD_PORTRAIT_CACHE.set(key, picture);
   picture.then((img) => { if (!img && HEAD_PORTRAIT_CACHE.get(key) === picture) HEAD_PORTRAIT_CACHE.delete(key); });
   return picture;
@@ -2635,7 +2603,6 @@ export async function buildFpArm({
   sheathing = true, ammoCount = null,   // WS1: the holster on the third-person body, and the quiver's count
   hipLight = false,   // HT-WAIST: a lit lantern hung at the waist at the build (the third-person body's alone)
   werewolf = false,   // WEREWOLF1: the transformed werewolf - Bloodmoon's wolf, in both views
-  skin = null,   // SHADOW-FANG (AUDIT D2): the wolf's skin (characters/werewolfSkin.js), painted in the build - a person wears none
   reachSweep = true,   // MWNPC3: PX27's every-clip reach sweep - the first-person far plane's; false for a rig that never draws first person
   creature = null,   // MWNPC9: a CREA id, or the match's candidates in order - a creature's body instead (buildCreatureBody)
   vampire = false,   // MWNPC14: a vampire's face - the race's vampire head
@@ -2971,7 +2938,6 @@ export async function buildFpArm({
     // MAC-Q: the particle systems' textures ride the same catalog as the pieces'
     if (arm.ok) await preloadArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen);
     const textures = arm.ok ? collectArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen) : new Map();
-    if (arm.ok && werewolf) await preskinTextures(arm.pieces, textures, skin);   // SHADOW-FANG (AUDIT D2): the skin, here and not in the frame
     stage('textures');
     // MW-D38: THE CATALOG the item icons resolve against - the same
     // archives and records this build used, kept on the result so an
@@ -2980,7 +2946,7 @@ export async function buildFpArm({
     catalog.magic = magic;   // MW-SPELLFX1: and the magic the world's spell effects draw with
     // MW-D24: the THIRD-PERSON BODY, while the same archives are open.
     // Its refusal is a note on the card, never the arm's refusal.
-    const tpBody = (wornNow) => buildTpBody({ race, female, beast, faceIndex, faceMatch, weapon, hasAmmo, worn: wornNow, archives, parts, allWeapons, find, gen, torch, allLights, sheathing, ammoCount, hipLight, werewolf, skin: werewolf ? skin : null, vampire: !!vampire, walk: npcFace, ownHeads: !!ownHeads });   // (the wolf's rows read no face)   // MW-D51; WS1; HT-WAIST; WEREWOLF1; SHADOW-FANG; MWNPC14; MWNPC17
+    const tpBody = (wornNow) => buildTpBody({ race, female, beast, faceIndex, faceMatch, weapon, hasAmmo, worn: wornNow, archives, parts, allWeapons, find, gen, torch, allLights, sheathing, ammoCount, hipLight, werewolf, vampire: !!vampire, walk: npcFace, ownHeads: !!ownHeads });   // (the wolf's rows read no face)   // MW-D51; WS1; HT-WAIST; WEREWOLF1; MWNPC14; MWNPC17
     let third = arm.ok ? await tpBody(worn) : null;
     // AUDIT MW-FOLK1 (L2-F2): AN OUTFIT THAT BOUND NOTHING HIDES NOTHING AND DRESSES NOTHING. Its `hides` took the skin
     // under it and its `covers` stood the modesty shirt down at the composition, before its mesh was read; one whose mesh
@@ -3704,7 +3670,7 @@ export function createFpArm() {
   let pairSpread = 0, spreadMemo = null;   // TWO-HANDS SPREAD: the first-person pair's arms' turn out this frame, eased; and what its blades ask, per rig and bound blades (stepPairSpread)
   let heldMemo = null;           // { base, spec, inner, tracks, sampler }
   let lastFrame = null;          // { model, view, proj, rect } - what draw() last composed with
-  let drawnArm = null, drawnMats = null;   // SHADOW-CLOAK (AUDIT): the arm and the pose drawThird last drew - a host that poses again before the auras (the dungeon) never hands a cape the next frame's
+  let drawnArm = null, drawnMats = null;   // the arm and the pose drawThird last drew - a host that poses again before the auras (the dungeon) never hands an aura the next frame's
   let drewLast = false;          // AUDIT-MAP2: whether the LAST draw() call composed the arm
   /** Put (or re-put) the sheet on the rig at the camera node's translation.
    *  The reach - which sets the pass's far plane (rule 54: the planes come
@@ -3956,25 +3922,18 @@ export function createFpArm() {
     target.effects = [...head, ...mine];
   }
 
-  /** SHADOW-FANG: THE WEREWOLF'S SKIN, applied on the way to the GPU (characters/werewolfSkin.js). The decoded
-   *  texture is TEXTURE_CACHE's and shared by every rig on the page - this body's and every peer's - so the skin
-   *  paints a COPY: SKINNED_MIPS, module-wide, painted in the build (AUDIT D2), found here by the image, the skin and
-   *  the piece's use of it (the head's eyes, a cut card's fringe, the texture's wrap). */
-  /** The skin this rig's BODY wears: the wolf's, when the build was the wolf and named one - never an item icon's. */
-  const bodySkin = () => (built && built.werewolf && lastBuildOpts && lastBuildOpts.skin) || null;
-
   /** MW-D11: the textures hung on a packed mesh's ranges, ONCE - a
    *  character texture per textured range with its NiTexturingProperty
    *  clamp (3, WRAP_S_WRAP_T, when there is no material), and the
    *  NiAlphaProperty threshold (0-255 in the file). One home for the
    *  icon, the body and the arm (AUDIT 68 S08-fparm-texture-hang-triplicate). */
-  function hangRangeTextures(ranges, textures, { skin = null } = {}) {
+  function hangRangeTextures(ranges, textures) {
     for (const r of ranges) {
       if (!r.textureFile) continue;
       const entry = textures.get(r.textureFile);
       if (!entry) continue;
       const m = r.piece.material;
-      r.tex = acquireCharacterTexture(renderer, skin ? skinnedMipsOf(entry.image, skin, skinUseOf(r.piece, r.textureFile)) : entry.image.mips, wrapModes(m ? m.clampMode : 3));   // MWNPC3: one GL copy a picture, every body
+      r.tex = acquireCharacterTexture(renderer, entry.image.mips, wrapModes(m ? m.clampMode : 3));   // MWNPC3: one GL copy a picture, every body
       r.alphaCut = m && m.alphaTest ? (m.alphaThreshold || 0) / 255 : 0;
     }
   }
@@ -4156,7 +4115,7 @@ export function createFpArm() {
         const packed = packSkinStream(thirdSkin, pieceLanes);
         thirdMesh = renderer.createSkinnedCharacterMesh(packed.stream, { floats: packed.floats, pairs: thirdSkin.pairs, width: thirdSkin.width, height: thirdSkin.height });
         thirdMesh.ranges = packed.ranges;
-        hangRangeTextures(thirdMesh.ranges, t.textures, { skin: bodySkin() });   // SHADOW-FANG
+        hangRangeTextures(thirdMesh.ranges, t.textures);
       } else {
         // MW-BOW1 x MWNPC1: a part the weapon clock re-posed (the bow drawing, the arrow on its ArrowBone) - its corners alone
         for (const m of restreamMovedRows(thirdSkin, pieceLanes)) renderer.updateSkinStream(thirdMesh, m.offset, m.data);
@@ -4171,7 +4130,7 @@ export function createFpArm() {
     if (!thirdMesh) {
       thirdMesh = renderer.createCharacterMesh(thirdPacked.packed, { uv: true, bounds: false });   // MW-CROWD: drawn only through the sprite target (drawBodyPicture), which casts nothing - no sphere to walk at every pose
       thirdMesh.ranges = thirdPacked.ranges;
-      hangRangeTextures(thirdMesh.ranges, t.textures, { skin: bodySkin() });   // SHADOW-FANG
+      hangRangeTextures(thirdMesh.ranges, t.textures);
     } else {
       renderer.updateCharacterMesh(thirdMesh, thirdPacked.packed);
     }
@@ -5088,7 +5047,7 @@ export function createFpArm() {
       api.build(o);
       return;
     }
-    if (pendingWerewolf !== null) { const w = pendingWerewolf; pendingWerewolf = null; api.setWerewolf(w.want, { skin: w.skin }); }   // WEREWOLF1: the form first - the table below waits on its build
+    if (pendingWerewolf !== null) { const w = pendingWerewolf; pendingWerewolf = null; api.setWerewolf(w.want); }   // WEREWOLF1: the form first - the table below waits on its build
     if (pendingVampire !== null) { const v = pendingVampire; pendingVampire = null; api.setVampire(v); }   // PORTRAIT3D: and the curse's face
     if (pendingWorn) { const p = pendingWorn; pendingWorn = null; api.setWorn(p); }
     if (pendingWeapon) { const w = pendingWeapon; pendingWeapon = null; api.setWeapon(w.item, { hasAmmo: w.hasAmmo, ammoCount: w.ammoCount }); }   // AUDIT 68 X7-pendingweapon-drops-ammocount: the quiver's count rides the queue
@@ -5364,23 +5323,20 @@ export function createFpArm() {
      * able to turn back into the person it was, and a person refused must not be asked again each frame - the
      * compare is against the last build's opts, which a refusal keeps.
      */
-    setWerewolf(on, { skin = null } = {}) {
+    setWerewolf(on) {
       const want = !!on;
-      // SHADOW-FANG: the wolf's skin rides the form - a person wears none; a skin that changes under a standing wolf
-      // (its holder signed in mid-change) rebuilds it too
-      const wantSkin = want ? (skin ?? null) : null;
       // AUDIT D6: queued BEFORE the opts are asked for - a form asked during the very first build waits for it.
       // AUDIT D4: a build already queued behind the one in flight (a door: a load, the pack, the sheathing tile)
       // TAKES the form - it is the newer word, and a queued build clears whatever else was queued for the rig it
       // replaces; kept apart, the door's stale form was built and the turn back was lost.
       if (busy) {
-        if (pendingBuild) pendingBuild = { ...pendingBuild, werewolf: want, skin: wantSkin };
-        else pendingWerewolf = { want, skin: wantSkin };
+        if (pendingBuild) pendingBuild = { ...pendingBuild, werewolf: want };
+        else pendingWerewolf = { want };
         return false;
       }
       if (!lastBuildOpts) return false;
-      if (want === !!lastBuildOpts.werewolf && wantSkin === (lastBuildOpts.skin ?? null)) return false;
-      return this.build({ ...lastBuildOpts, werewolf: want, skin: wantSkin });
+      if (want === !!lastBuildOpts.werewolf) return false;
+      return this.build({ ...lastBuildOpts, werewolf: want });
     },
     /**
      * PORTRAIT3D (the owner: "Do this" - the curse's face): THE FACE FOLLOWS THE CURSE. A vampire's body wears the
@@ -6480,7 +6436,7 @@ export function createFpArm() {
         // resolved ONCE and hung on them - the per-frame path re-uploads
         // vertices and touches nothing else.
         mesh.ranges = packed.ranges;
-        hangRangeTextures(mesh.ranges, built.textures, { skin: bodySkin() });   // SHADOW-FANG
+        hangRangeTextures(mesh.ranges, built.textures);
       } else {
         renderer.updateCharacterMesh(mesh, packed.packed);
       }
@@ -6718,19 +6674,19 @@ export function createFpArm() {
      * (player/mwView.js's other lane) - what the transformed player without Morrowind data sees, and what everyone
      * else already sees. The rig keeps stepping (ready() is untouched), so the arm is there again at once when the
      * player turns back. Set by the weapon rig from the curse every frame; answers whether it changed.
-     * SHADOW-FANG (the merge): Bloodmoon's wolf is the one Morrowind beast (WEREWOLF1, setWerewolf) - while it is what
+     * Bloodmoon's wolf is the one Morrowind beast (WEREWOLF1, setWerewolf) - while it is what
      * stands for a werewolf the rig does not stand aside; the weapon rig asks wolfStanding().
      */
     setStandIn(v) { const was = standIn; standIn = !!v; return was !== standIn; },
     standingIn: () => standIn,
-    /** SHADOW-FANG (the merge): whether the rig standing is Bloodmoon's wolf - built, and built as the wolf. */
+    /** Whether the rig standing is Bloodmoon's wolf - built, and built as the wolf. */
     wolfStanding: () => !!(built && built.ok && built.werewolf),
-    /** SHADOW-CLOAK: THE BODY'S BONES WHERE THEY STAND THIS FRAME - each named bone's origin in the third-person body's
+    /** THE BODY'S BONES WHERE THEY STAND THIS FRAME - each named bone's origin in the third-person body's
      *  own frame, [right, up, forward] in metres from its feet (drawThird places that frame in the world by its feet and
      *  yaw: the rig's x is its right, y its forward and z up, the race's weight across and height up), null for a bone its
      *  skeleton lacks; null whole while no third-person body is posed (first person, a stand-in, nothing built). The pose
      *  it was last DRAWN in (drawnArm, drawnMats), so a host that poses again before its auras are drawn (the dungeon's) never
-     *  hands a cape the next frame's. Do not keep it: the next pose answers anew. */
+     *  hands an aura the next frame's. Do not keep it: the next pose answers anew. */
     thirdBones(names) {
       if (!thirdActive() || !thirdBuilt) return null;
       const arm = thirdBuilt.arm, drawn = drawnArm === arm ? drawnMats : null;   // the pose it was drawn in, while it is this arm's
@@ -6789,7 +6745,7 @@ export function createFpArm() {
       // Rx(-90)) and local y is the MW vertical.
       const rs = (built && built.raceScale) || { weight: 1, height: 1 };
       const model = thirdModel(feet, yaw, grow);   // MWNPC16: one home with castThird's
-      drawnArm = t.arm; drawnMats = t.arm.mats;   // SHADOW-CLOAK (AUDIT): the pose this body was drawn in
+      drawnArm = t.arm; drawnMats = t.arm.mats;   // the pose this body was drawn in
       // The box the sprite law needs, measured off the POSED pieces in
       // MW axes and mapped: MW z is world up, MW x/y are the horizontal
       // pair. The azimuth-safe half-width holds under yaw for free,
@@ -7199,7 +7155,3 @@ export function createFpArm() {
 }
 
 export const fpArm = createFpArm();
-
-/** SHADOW-FANG (AUDIT D2) test seam: has the build already painted `image` in `skin` for `use` (the frame then only
- *  finds it)? */
-export const _skinPainted = (image, skin, use) => !!SKINNED_MIPS.get(image)?.has(skinUseKey(skin, use));

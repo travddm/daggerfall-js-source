@@ -111,17 +111,15 @@ const CATALOGUE = {
   'title:formermaster': 'chapters dormant', 'title:highmaster': 'chapters dormant', 'title:seasonmaster': 'chapters dormant', 'title:grandchampion': 'ranked open',
   'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
   'title:founder': 'account closed', 'title:disciple': 'patrons patron', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons patron',
-  'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff', 'title:shadowfang': 'bestowed bestowed',
-  'title:penitent': 'bestowed bestowed', 'title:aegis': 'bestowed bestowed', 'title:primarch': 'bestowed bestowed', 'title:crystalfist': 'bestowed bestowed',
-  'title:wikimaid': 'bestowed bestowed', 'title:nirnrootsage': 'bestowed bestowed' /* NIRNROOT-SAGE (PIN MOVED): Blob-Marley's own */,
+  'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff',
   /* HUNTERS-MARK, MARKS-OF-MASTERY (PIN MOVED): the hunt's four, a Master's ten, the sea's two */
   'title:bloodhound': 'hunt open', 'title:beastbane': 'hunt open', 'title:grandhuntsman': 'hunt open', 'title:huntlegend': 'hunt open',
   'title:mastermining': 'mastery open', 'title:masterlogging': 'mastery open', 'title:masterherbalism': 'mastery open', 'title:masterhunting': 'mastery open',
   'title:masterfishing': 'mastery open', 'title:mastersmithing': 'mastery open', 'title:masterbuilding': 'mastery open', 'title:masteroutfitting': 'mastery open',
   'title:masterprovisioning': 'mastery open', 'title:masterenchanting': 'mastery open', 'title:serpenthunter': 'serpent open', 'title:deepbane': 'serpent open',
   'aura:turninghour': 'abyss chance', 'aura:firsthour': 'abyss retired', 'aura:maelstrom': 'serpent chance', 'aura:dagonfire': 'broker open',
-  'aura:witchfire': 'festival seasonal', 'aura:seraphwings': 'staff staff', 'aura:oblivionward': 'bestowed bestowed', 'aura:radiance': 'bestowed bestowed',
-  'aura:shadowcloak': 'bestowed bestowed', 'aura:resonance': 'bestowed bestowed', 'aura:lilacwarren': 'bestowed bestowed', 'aura:sagesmoke': 'bestowed bestowed' /* NIRNROOT-SAGE (PIN MOVED) */, 'icon:tallowskull': 'festival seasonal',
+  'aura:witchfire': 'festival seasonal', 'aura:seraphwings': 'staff staff',
+  'icon:tallowskull': 'festival seasonal',
   'icon:twinmoons': 'festival seasonal', 'icon:wyrdcauldron': 'festival seasonal', 'icon:soulcake': 'festival seasonal', 'glyph:tower': 'seats open character',
   'glyph:crownDF': 'seats open character', 'glyph:crownWR': 'seats open character', 'glyph:crownSN': 'seats open character',
   'glyph:crownSK': 'seats open character', 'glyph:crownMW': 'seats open character', 'glyph:crownSU': 'seats open character', 'glyph:crownVW': 'seats open character',
@@ -129,8 +127,6 @@ const CATALOGUE = {
   'glyph:laurel': 'ranked ranked',
   'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons patron', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons patron',
   'glyph:herald': 'patrons patron', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
-  'glyph:shadowfang': 'bestowed bestowed', 'glyph:penitent': 'bestowed bestowed', 'glyph:aegis': 'bestowed bestowed', 'glyph:primarch': 'bestowed bestowed',
-  'glyph:crystalfist': 'bestowed bestowed', 'glyph:wikimaid': 'bestowed bestowed', 'glyph:nirnrootsage': 'bestowed bestowed' /* NIRNROOT-SAGE (PIN MOVED) */,
 };
 
 // ── THE CATALOGUE ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -141,7 +137,7 @@ test('COLLECTIONS-II THE CATALOGUE IS WHOLE AND AS RECORDED: every title, aura, 
   const got = {};
   for (const kind of W.WARDROBE_KINDS) for (const e of W.wardrobeEntries(kind)) got[`${kind}:${e.key}`] = [e.src, e.avail, ...(e.scope ? [e.scope] : [])].join(' ');
   assert.deepEqual(got, CATALOGUE);
-  assert.deepEqual(W.WARDROBE_SOURCES.map(([id]) => id), ['abyss', 'serpent', 'broker', 'questlines', 'hunt', 'mastery', 'festival', 'seats', 'chapters', 'ranked', 'world', 'account', 'patrons', 'staff', 'bestowed'], 'play\'s first, what no play earns last');   // PIN MOVED (HUNTERS-MARK, MARKS-OF-MASTERY): The Hunt and Marks of Mastery, play's own, after the questlines
+  assert.deepEqual(W.WARDROBE_SOURCES.map(([id]) => id), ['abyss', 'serpent', 'broker', 'questlines', 'hunt', 'mastery', 'festival', 'seats', 'chapters', 'ranked', 'world', 'account', 'patrons', 'staff'], 'play\'s first, what no play earns last');   // PIN MOVED (HUNTERS-MARK, MARKS-OF-MASTERY): The Hunt and Marks of Mastery, play's own, after the questlines
   for (const kind of W.WARDROBE_KINDS) for (const e of W.wardrobeEntries(kind)) {
     const how = e.how();
     assert.ok(typeof how === 'string' && how.length > 12, `${kind}:${e.key} says how`);
@@ -176,7 +172,7 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
       assert.deepEqual([e.src, e.avail], ['patrons', mapped.includes(t) ? 'patron' : 'dormant'], `${t}: a pledge's, ${mapped.includes(t) ? 'mapped' : 'no tier yet'}`);
       if (mapped.includes(t)) assert.match(e.how(), new RegExp(`at the ${t[0].toUpperCase()}${t.slice(1)} tier`), `${t}: its own tier named`);
     } else if (t === 'dungeonmaster') assert.deepEqual([e.src, e.avail], ['staff', 'staff']);
-    else assert.deepEqual([e.src, e.avail], ['bestowed', 'bestowed'], `${t}: one player's`);
+    else assert.fail(`${t}: every listed title is a pledge's or the Dungeon Master's`);
     assert.equal(entry('glyph', TIER_GLYPH[t]).avail, e.avail, `${t}'s glyph is had as it is`);
     if (TIER_AURA[t]) assert.equal(entry('aura', TIER_AURA[t]).avail, e.avail, `${t}'s aura is had as it is`);
   }
@@ -263,7 +259,7 @@ test('COLLECTIONS-II THE SEASONS AND THE FILTERS: a festival\'s piece seasonal w
   const w = mintedWardrobe();
   const titles = W.wardrobeEntries('title');
   const now = titles.filter((e) => wardrobeFilterPasses('now', e, w, DURING)).map((e) => e.key);
-  for (const k of ['founder', 'shadowfang', 'developer', 'chaptermaster', 'hoursfirst', 'apostle']) assert.ok(!now.includes(k), `${k} is not to be had now`);
+  for (const k of ['founder', 'developer', 'chaptermaster', 'hoursfirst', 'apostle']) assert.ok(!now.includes(k), `${k} is not to be had now`);
   assert.ok(!W.wardrobeEntries('glyph').filter((e) => wardrobeFilterPasses('now', e, w, DURING)).some((e) => e.key === 'sprout'), 'the sprout comes by itself, never had now');
   for (const k of ['gatebreaker', 'covenbane', 'hourbreaker', 'arenachampion', 'witchwarden', 'disciple', 'ilovelamp']) assert.ok(now.includes(k), `${k} is`);
   assert.ok(!titles.filter((e) => wardrobeFilterPasses('now', e, w, AFTER)).some((e) => e.key === 'witchwarden'), 'out of season, not now');
@@ -392,8 +388,8 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   assert.deepEqual(tags(gate), ['Worn', 'Obtainable']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'founder')), ['Held', 'Closed']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'hourbreaker')), ['Held', 'By chance']);
-  assert.deepEqual(tags(rowOf(p.root, 'title', 'shadowfang')), ['Bestowed'], 'not held: no state chip');
-  assert.ok(gate.classList.contains('held') && !rowOf(p.root, 'title', 'shadowfang').classList.contains('held'));
+  assert.deepEqual(tags(rowOf(p.root, 'title', 'developer')), ['Staff only'], 'not held: no state chip');
+  assert.ok(gate.classList.contains('held') && !rowOf(p.root, 'title', 'developer').classList.contains('held'));
   assert.ok(gate.classList.contains('nopic') && cls(gate, 'coll-prev').length === 0, 'a title\'s picture is its word');
   assert.equal(cls(p.root, 'coll-season').length, 1, 'the festival is on');
   // the Held filter: the dividers keep their own counts
@@ -420,7 +416,7 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   flow.busy = false; p.draw();
   assert.equal(cls(p.root, 'coll-wear')[0].attrs['aria-disabled'], 'false');
   // a thing not held: no press
-  rowOf(p.root, 'title', 'shadowfang').onclick();
+  rowOf(p.root, 'title', 'developer').onclick();
   assert.equal(cls(p.root, 'coll-wear').length, 0);
   assert.match(cls(p.root, 'coll-whole')[0].textContent, /does not hold this yet/);
   // the other kinds' presses; a shown glyph offers Hide

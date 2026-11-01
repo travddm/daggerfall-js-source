@@ -59,8 +59,8 @@ export const HIDDEN_ROUTES = Object.freeze(['/v1/staff/hide']);
 /** The name a hidden token carries - never the account's (wire.js sanitizeName keeps it as it is; a bare "Staff" it does not). */
 export const HIDDEN_NAME = 'Staff member';
 /** The glyphs a hidden token keeps: the staff's own, which the relay's staff rights read (net/staffCommands.js, the dev,
- *  mod and shadowfang glyphs of Message on screen) - never a cosmetic one. */
-export const HIDDEN_GLYPHS = Object.freeze(['dev', 'mod', 'dm', 'shadowfang']);
+ *  and mod glyphs of Message on screen) - never a cosmetic one. */
+export const HIDDEN_GLYPHS = Object.freeze(['dev', 'mod', 'dm']);
 /** The staff sessions one lapse reads at most (a member holds STAFF_KEYS_MAX keys, a session each, and a few dead ones). */
 const SESSIONS_MAX = 20;
 
