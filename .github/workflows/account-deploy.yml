@@ -550,7 +550,7 @@ jobs:
       # SCALE1 (2026-09-30, the scaling audit): THE DATABASE AS IT STOOD
       # BEFORE THEM, written where a person will look. Some migrations are
       # not idempotent and none can be undone by another; D1 Time Travel
-      # can put the whole database back to this bookmark (realm-restore.yml
+      # can put the whole database back to this bookmark (realm-revive.yml
       # reads it the same way). A bookmark that cannot be read is a warning,
       # not a stop - a restore by timestamp still works without it.
       - name: Record the database's bookmark before the migrations

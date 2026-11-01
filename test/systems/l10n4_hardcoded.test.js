@@ -298,7 +298,7 @@ const HARDCODED = {
   'src/systems/automap/automap.js': 10,
   'src/systems/automap/automapModel.js': 1,
   'src/systems/ayleidStones.js': 9,
-  'src/systems/banking.js': 20,
+  'src/systems/banking.js': 18,
   'src/systems/betterAmbience.js': 42,
   'src/systems/booksData.js': 85,
   'src/systems/bounty/bountyBoard.js': 41,   // QUARRY-WORLD: the beasts' words through t() (bounty.foes.*)
@@ -414,7 +414,7 @@ const HARDCODED = {
   'src/systems/naval/shipCrew.js': 52,
   'src/systems/naval/shipKnowledge.js': 21,
   'src/systems/naval/treasureCharts.js': 1,
-  'src/systems/online/onlineHomes.js': 61,
+  'src/systems/online/onlineHomes.js': 63,   // the home-crossed words are three lines of their own, no longer the bank's spread
   'src/systems/online/onlineLane.js': 1,
   'src/systems/overhauls.js': 23,
   'src/systems/party/partyArrival.js': 3,
@@ -436,13 +436,13 @@ const HARDCODED = {
   'src/systems/quest/questPatches.js': 13,
   'src/systems/quest/questRepair.js': 9,
   'src/systems/quest/questGuidance.js': 2,
+  'src/systems/offlineCopy.js': 1,   // the copy's slot name - a slot's identity, so it stays one English string
   'src/systems/quickLoot.js': 4,
   'src/systems/quickslots.js': 32,
   'src/systems/raidSpoils.js': 4,
   'src/systems/raidingParties.js': 4,
-  'src/systems/realmCopyMark.js': 1,   // REALM-COPY: the copy's slot name, moved here from enhancedMenu.js - a slot's identity, so it stays one English string
-  'src/systems/realmCustoms.js': 26,
-  'src/systems/realmSaves.js': 15,
+  'src/systems/realmLeveling.js': 1,   // the leveling switch's line, said at the realm boot
+  'src/systems/realmSaves.js': 13,
   'src/systems/region/regionHubs.js': 4,
   'src/systems/repairService.js': 2,
   'src/systems/rest/rest.js': 1,
@@ -474,7 +474,7 @@ const HARDCODED = {
   'src/systems/settings/settings.js': 11,
   'src/systems/settings/settingsText.js': 156,
   'src/systems/shellUpdates.js': 4,
-  'src/systems/shipyards.js': 21,
+  'src/systems/shipyards.js': 20,
   'src/systems/shopStock.js': 2,
   'src/systems/sigil/sigil.js': 8,
   'src/systems/sigil/sigilBroker.js': 8,

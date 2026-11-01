@@ -14,7 +14,6 @@ import { playerCrewCount } from '../../../src/systems/naval/crewLife.js';
 import { RANK_PERKS } from '../../../src/systems/naval/captainLedger.js';
 import { exchangeText } from '../../../src/ui/naval/navalYardWindow.js';
 import { townExchangeFactors } from '../../../src/net/townEconLaw.js';
-import { restoreFleetSaveData, _resetFleetForTests } from '../../../src/systems/fleet.js';
 import { charterRecord } from '../../../src/systems/naval/passage.js';
 import * as tm from '../../../src/systems/textManager.js';
 
@@ -56,12 +55,11 @@ test('AUDIT CREW-TRADE E1 - A BOOKED PASSAGE\'S CREW IS HER MASTER\'S: a boat on
   assert.deepEqual(q.x().sell('crew', 1), { ok: false, text: CREW_TRADE_TEXT.charter }, 'a charter answered before a fight');
 });
 
-test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a ship come through customs, a shore party\'s last place, her last man - each reason beside the row where the press is greyed, never while the exchange takes none today (mutants: the reason unshown, the reason always)', async () => {
+test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a shore party\'s last place, her last man - each reason beside the row where the press is greyed, never while the exchange takes none today (mutants: the reason unshown, the reason always)', async () => {
+  const last = await quay(SMALL_SHIP, 1, { port: portStanding('wants') });
+  const t = exchangeText(last.x()).rows[0];
+  assert.deepEqual([t.canSell, t.extra], [false, `Aboard: 1 of 24 crew - ${CREW_TRADE_TEXT.lastMan}`]);
   const c = await quay(SMALL_SHIP, 12, { port: portStanding('wants') });
-  restoreFleetSaveData({ v: 1, ships: [], crossed: [42] });
-  const t = exchangeText(c.x()).rows[0];
-  assert.deepEqual([t.canSell, t.extra], [false, `Aboard: 12 of 24 crew - ${CREW_TRADE_TEXT.crossed}`]);
-  _resetFleetForTests();
   assert.equal(exchangeText(c.x()).rows[0].extra, 'Aboard: 12 of 24 crew', 'no reason while men may leave her');
   const spare = await quay(SMALL_SHIP, 24, { port: portStanding('makes') });
   spare.x().sell('crew', Infinity);

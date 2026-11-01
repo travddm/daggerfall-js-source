@@ -25,7 +25,7 @@
 //
 // REST-LOOT (LOOT-EASE, 2026-10-05). The
 // templates shipped with the arc's merge (#554, 2026-10-03) and every release since has carried them, so the switch is
-// ON: online the shelves, the piles and the foes carry them, and customs lets a character's own walk in. And the
+// ON: online the shelves, the piles and the foes carry them. And the
 // loot is wider and commoner: a looting foe five of the seven (it was the Ember Jar alone, 2 in 100), a J-O pile six
 // (the Ember Jar and the Tonic, 4 each). The Bedroll stays the counter's - online's own rest point, bought.
 // ═══════════════════════════════════════════════════════════════════
@@ -44,7 +44,7 @@ import { renownLootQuarters, lootEased } from '../renownLoot.js';   // RENOWN-LO
  *  (REST-LOOT, 2026-10-05). Off again is the way back if an older client ever meets one it cannot read. */
 export const REST_ITEMS_ONLINE = true;
 let _restItemsOnline = REST_ITEMS_ONLINE;
-/** The switch as every reader asks it (the sources here, the use gate below, customs) - REST_ITEMS_ONLINE, unless a test
+/** The switch as every reader asks it (the sources here, the use gate below) - REST_ITEMS_ONLINE, unless a test
  *  shut it to pin the way back: the shut release's laws still stand behind the switch, and still answer for it. */
 export const restItemsOnline = () => _restItemsOnline;
 /** Tests only: the switch set (null puts REST_ITEMS_ONLINE back). */
@@ -202,9 +202,8 @@ export function meditate(entity) {
 /** A kneel stopped, or another rest begun: the candle goes back to the pack unspent. */
 export const snuffCandle = () => { _candle = null; };
 
-/** AUDIT REST-PARTY B4: ONLINE, NONE IS USED WHILE ITS SOURCES ARE SHUT (restItemsOnline). Customs keeps them offline
- *  then (realmCustoms.js), but a door customs never closed - an older realm save, a trade from a build that sold them -
- *  had them in hand and working online: a laid Bedroll a rest point, a Tonic a draught. The card offers no Use
+/** AUDIT REST-PARTY B4: ONLINE, NONE IS USED WHILE ITS SOURCES ARE SHUT (restItemsOnline). A character could still
+ *  hold them online - an older realm save, a trade from a build that sold them - and had them in hand and working online: a laid Bedroll a rest point, a Tonic a draught. The card offers no Use
  *  (`usable`, useItem.js usableItem) and a hotbar press is told why; offline as ever. REST-LOOT: open now, every one
  *  is used online as offline - this is the switch's way back. */
 const restItemsShut = () => isOnlinePage() && !restItemsOnline();

@@ -9,7 +9,7 @@
 // database is (progress.js's config, townSeats.js's rows).
 // AUDIT PLAN-1000 D6: ONE THING UNSETTLES A WEEK - D1 Time Travel. A restore past a Turning rewinds its rows under every
 // warm isolate, which keeps skipping it (and passing seat acts as on a settled week) until its week ends, up to seven
-// days. realm-restore.yml and realm-revive.yml hold and lift the service by deploys (fresh isolates); a restore by hand
+// days. realm-revive.yml holds and lifts the service by deploys (fresh isolates); a restore by hand
 // is followed by a redeploy of the Worker - the restore lines the workflows print say so.
 import { DB_ROOT } from './service.js';
 

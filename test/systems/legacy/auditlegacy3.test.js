@@ -480,20 +480,14 @@ test('AUDIT LEGACY III O6: A RETIREMENT IS AN ENDURING LINE\'S ALONE, and the to
   assert.equal(why(), 'fell', 'never back');
 });
 
-test('AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED - nor undone: it is the realm\'s only word on a death, and its row the person\'s claim, so the person was born again once the line\'s record forgot the death', async () => {
+test('AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED: it is the realm\'s only word on a death, and its row the person\'s claim, so the person was born again once the line\'s record forgot the death', async () => {
   const S = await standService();
   const A = await accountOf(S, 'fam-o7-aaaaaa', 'Hlaalu', ysolde);
   await A.die(1);
-  for (const route of ['/v1/realm/delete', '/v1/realm/undo']) {
-    const r = await A.call(route, { id: A.chars[1].id });
-    assert.notEqual(r.status, 200, route);
-  }
   const del = await A.call('/v1/realm/delete', { id: A.chars[1].id });
   assert.deepEqual([del.status, del.body.error], [410, 'dead']);
-  // one brought in through customs (an origin to undo to) is no more undone than deleted
-  S.env.DB._raw.prepare('UPDATE realm_characters SET origin_id = ? WHERE id = ?').run('o-ysolde-offline', A.chars[1].id);
-  const undo = await A.call('/v1/realm/undo', { id: A.chars[1].id });
-  assert.deepEqual([undo.status, undo.body.error], [410, 'dead']);
+  const again = await A.call('/v1/realm/delete', { id: A.chars[1].id });
+  assert.deepEqual([again.status, again.body.error], [410, 'dead'], 'a retry is refused the same');
   assert.equal(S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?').get(A.chars[1].id).n, 1, 'the tombstone stands');
   // the record rewritten without the death: the person is still the played one's
   await A.write({ people: ysolde });

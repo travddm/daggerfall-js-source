@@ -35,7 +35,7 @@
 //   }
 //
 // Not a DFU member. Ledger A (SHIPYARDS).
-import { fleetShip, titleDeed, forgetShip, shipLabel, fleetCrossed } from '../systems/fleet.js';
+import { fleetShip, titleDeed, forgetShip, shipLabel } from '../systems/fleet.js';
 import {
   SHIPYARD_HULLS, shipSpec, shipyardItem, shipBuyPrice, shipSalePrice, shipWorth, saleRefusal, SHIPYARD_TEXT, BOAT_DEED_TEMPLATE, BOAT_PARTS_TEMPLATE,
 } from '../systems/shipyards.js';
@@ -93,7 +93,7 @@ export function createShipyardHost(deps) {
   function saleWhy(s) {
     const why = saleRefusal({
       where: s.at.where, hold: holdOf(s), ashore: ashoreOf(s), fighting: !!s.row.status?.inFight,
-      aboard: s.at.boat && s.at.where === 'here' ? deps.passengersAboard?.(s.at.boat) ?? 0 : 0, atPort: true, crossed: fleetCrossed(s.row.uid),
+      aboard: s.at.boat && s.at.where === 'here' ? deps.passengersAboard?.(s.at.boat) ?? 0 : 0, atPort: true,
     });
     if (why) return why;
     if ((deps.cabinHolds?.(s.row.uid) ?? 0) > 0) return 'Empty the cabin first. Anything left in it is sold with the ship.';

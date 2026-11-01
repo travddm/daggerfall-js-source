@@ -1373,15 +1373,13 @@ test('AUDIT CAPTAIN\'S SEA L2/B1/L8/L11: the day\'s dealing kept for every excha
   assert.equal(lines['Contracts done'], '3 - 1 bounty, 2 deliveries');
 });
 
-test('AUDIT CAPTAIN\'S SEA L4: the captain\'s days cross the lanes with the clocks - a legend ended, a strand gathered, the day\'s dealing moved by the days between them, both ways (a copy taken offline found her sunk for months, "gone down today") (mutants: each map, the dealing, the vendor)', async () => {
-  const { offlineCopyOf, onlineCopyOf, CAPTAIN_RECORD_VENDOR } = await import('../../../src/systems/offlineCopy.js');
+test('AUDIT CAPTAIN\'S SEA L4: the captain\'s days go offline with the clocks - a legend ended, a strand gathered, the day\'s dealing moved by the days between them (a copy taken offline found her sunk for months, "gone down today") (mutants: each map, the dealing, the vendor)', async () => {
+  const { offlineCopyOf, CAPTAIN_RECORD_VENDOR } = await import('../../../src/systems/offlineCopy.js');
   const { CAPTAIN_SAVE_VENDOR } = await import('../../../src/systems/naval/captainLedger.js');
   assert.equal(CAPTAIN_RECORD_VENDOR, CAPTAIN_SAVE_VENDOR);
   const snap = { classicMinutes: 300 * 1440 + 10, worldMinutes: 4800 * 1440 + 10, modData: { Captain: { ether: { legends: { queen: 4799 }, harvested: { '3,4': 4800 } }, dealt: { day: 4800, at: {} } } } };
   const off = offlineCopyOf(snap).modData.Captain;
   assert.deepEqual([off.ether.legends.queen, off.ether.harvested['3,4'], off.dealt.day], [299, 300, 300], 'onto the character\'s clock');
-  const on = onlineCopyOf({ classicMinutes: 300 * 1440 + 10, modData: { Captain: { ether: { legends: { queen: 299 }, harvested: {} }, dealt: null } } }, 5000 * 1440 + 10).modData.Captain;
-  assert.equal(on.ether.legends.queen, 4999, 'onto the world\'s');
 });
 
 test('AUDIT CAPTAIN\'S SEA L5/L10/B14/B15: the Captain page\'s meter below nothing reads what the next rank wants; a crown that keeps no favours never says its navy hunts (it hunts at twice it); "an Admiral"; the shipwright\'s discount named for what it covers, and a purse that pays for her whole offered her whole (mutants: the meter, the words, the article, the row\'s whole gold)', async () => {

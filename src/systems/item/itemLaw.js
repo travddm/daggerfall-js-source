@@ -526,10 +526,9 @@ function artifactFindings(/** @type {any} */ item, /** @type {any[]} */ found) {
 }
 
 /** A CLASSIC SAVE'S PIECE: ten slots kept whole by its importer (classicSave.js classicItemFromRecord), `None` among them
- *  - an offline character's, come into the realm through customs. The classic item maker's own law is not this tree's,
+ *  - an offline character's. The classic item maker's own law is not this tree's,
  *  so the law takes the piece as it stands, and the realm keeps it the character's: no route of the service hands it to
- *  another player (realm.js prepareRealmRecord, realmTrade.js - 'piece-legacy'; RESTORE's word for what customs brings,
- *  ). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
+ *  another player (realm.js prepareRealmRecord, realmTrade.js - 'piece-legacy'). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
 export const classicPiece = (/** @type {any} */ item) => !!item && typeof item === 'object' && item.artifact !== true && item.magic !== true
   && Array.isArray(item.enchantments) && classicSlots(item.enchantments);
 

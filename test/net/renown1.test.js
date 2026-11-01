@@ -284,7 +284,7 @@ test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bo
   assert.deepEqual(parseClient('{"t":"renown","order":"v1.a.b"}', { hasHello: false }), { error: 'renown before hello' });
   assert.deepEqual(parseClient('{"t":"renown"}', { hasHello: true }), { error: 'bad renown' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'renown', order: 'x'.repeat(1025) }), { hasHello: true }), { error: 'bad renown' });
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world281');
   assert.equal(RENOWN_RELAY_MIN, 111);
   assert.equal(relaySupportsRenown('world111'), true);
   assert.equal(relaySupportsRenown('world110'), false);

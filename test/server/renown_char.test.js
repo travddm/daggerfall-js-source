@@ -18,7 +18,7 @@ import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { createGuest, mintId } from '../../server-account/src/accounts.js';
 import { reportRenownXp, renownTrackOf, renownTracksOf, RENOWN_CARD_TRACKS } from '../../server-account/src/renownTracks.js';
 import { claimRaid } from '../../server-account/src/raids.js';
-import { createRealm, deleteRealm, CHARACTER_TABLES } from '../../server-account/src/realm.js';
+import { createRealm, deleteRealm } from '../../server-account/src/realm.js';
 import { ACCOUNT_VERSION } from '../../server-account/src/service.js';
 import {
   renownRaidXp, renownForXp, renownXpFor, RENOWN_XP_HOUR_MAX, RENOWN_XP_REPORT_MAX, RENOWN_XP_MAX, RENOWN_MAX, RENOWN_TRACKS_MAX,
@@ -306,7 +306,7 @@ test('RENOWN-CHAR the migration\'s bound and order: the new rows only into the r
   assert.match(sql, /60 - \(SELECT COUNT\(\*\) FROM renown_tracks t WHERE t\.player = r\.player\) AS room/);
 });
 
-test('RENOWN-CHAR a realm character deleted takes its OWN Renown with it and leaves the others\' be; RENOWN-ACCOUNT\'s table is no character table and realm.js writes it nowhere; a new realm character starts at Renown 1 (mutants: the track left behind by a delete)', async () => {
+test('RENOWN-CHAR a realm character deleted takes its OWN Renown with it and leaves the others\' be; a new realm character starts at Renown 1 (mutants: the track left behind by a delete)', async () => {
   const db = d1();
   const A = await player(db);
   const made = await createRealm({ db, rand, nowS: T0 }, A.id, { name: 'Nystul' });
@@ -316,8 +316,6 @@ test('RENOWN-CHAR a realm character deleted takes its OWN Renown with it and lea
   assert.deepEqual(await deleteRealm({ db, bucket: null }, A.id, made.id), { ok: true });
   assert.equal(await renownTrackOf({ db }, A.id, made.id), null, 'its Renown went with it');
   assert.deepEqual(await renownTrackOf({ db }, A.id, 'char-keep'), { xp: 900, level: renownForXp(900) }, 'another character\'s stays');
-  assert.ok(CHARACTER_TABLES.includes('renown_tracks'), 'the track is a character\'s table');
-  assert.equal(CHARACTER_TABLES.includes('renown_accounts'), false);
   const next = await createRealm({ db, rand, nowS: T0 + 2 }, A.id, { name: 'Tamsin' });
   assert.equal((await reportRenownXp({ db, nowS: T0 + 3 }, A, { character: next.id, xp: 10 })).xp, 10, 'a new character starts at its own nothing');
 });

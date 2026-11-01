@@ -29,7 +29,7 @@ import { getMacroValue, getContextValue } from '../../../src/systems/quest/quest
 import {
   QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, raisedSince, shiftQuestStamps, markOwnClock, questBlockOnOwnClock, questDataOnThisClock,
 } from '../../../src/systems/quest/questStamps.js';
-import { offlineCopyOf, onlineCopyOf } from '../../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { snapshotPlayer, restorePlayer } from '../../../src/systems/save/save.js';
 import { RestSession, REST_WAIT_PER_HOUR, MINUTES_PER_TICK } from '../../../src/systems/rest/restSession.js';
 import { setSkyCalendar, skySecondsOfEvent } from '../../../src/systems/skyCalendar.js';
@@ -417,7 +417,7 @@ test('TIME3 AUDIT (second round): a resync that keeps a run-out clock keeps its 
   assert.equal(bw.created.length, 3, 'four more hours: no wave past the three');
 });
 
-test('TIME3 saves: an online save from before TIME3 has its countdowns moved onto the character\'s clock once, at the load; a TIME3 save and an offline one load as they stand; the doors between the lanes move only a TIME3 envelope\'s journal dates', () => {
+test('TIME3 saves: an online save from before TIME3 has its countdowns moved onto the character\'s clock once, at the load; a TIME3 save and an offline one load as they stand; the offline copy moves only a TIME3 envelope\'s journal dates', () => {
   const own = 50 * D, world = 230 * D;
   const block = () => ({ machine: { quests: [{ questName: 'Q', questStartTime: world * 60 - 600, questTombstoneTime: 0, activeLogMessages: [{ stepID: 0, messageID: 1, time: world * 60 - 300 }], resources: [{ clock: { lastWorldTimeSample: world * 60 } }], tasks: [{ actions: [{ actionSpecific: { lastTimePlayed: world * 60 - 30, lastSpawnTime: 0 } }] }] }] } });
   const pre = { classicMinutes: own, worldMinutes: world, quest: block() };
@@ -444,11 +444,6 @@ test('TIME3 saves: an online save from before TIME3 has its countdowns moved ont
   assert.deepEqual([off.resources[0].clock.lastWorldTimeSample, off.questTombstoneTime, off.ownSecondsAt], [own * 60 - 60, own * 60 - 5, own * 60 - 17], 'the countdowns were the character\'s already, and its mark stands');
   const legacy = offlineCopyOf({ ...pre, quest: block() }).quest.machine.quests[0];
   assert.deepEqual([legacy.resources[0].clock.lastWorldTimeSample, legacy.ownSecondsAt], [own * 60, own * 60], 'an envelope from before TIME3 moves whole, as LIVED1 moved it, and is marked');
-  // BRING ONLINE: the journal's dates onto the world's, the countdowns stay, marked
-  const on = onlineCopyOf({ classicMinutes: own, quest: { machine: { quests: [{ questName: 'Q', questStartTime: own * 60 - 600, questTombstoneTime: 0, activeLogMessages: [], resources: [{ clock: { lastWorldTimeSample: own * 60 - 60 } }] }] } } }, world);
-  const oq = on.quest.machine.quests[0];
-  assert.deepEqual([oq.questStartTime, oq.resources[0].clock.lastWorldTimeSample, oq.ownSecondsAt], [world * 60 - 600, own * 60 - 60, own * 60], 'the start onto the world\'s clock, the countdown unmoved, marked');
-  assert.equal(questBlockOnOwnClock(on).machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60 - 60, 'so its first load online moves nothing again');
   // the walk itself
   const tree = { a: { lastSpawnTime: 10, questStartTime: 20, activeLogMessages: [{ time: 30 }, { time: 0 }] } };
   shiftQuestStamps(tree, 5, { own: true });

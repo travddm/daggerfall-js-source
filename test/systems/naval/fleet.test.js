@@ -146,7 +146,7 @@ test('FLEET the save: her record round-trips whole, her title by a flag; an olde
   assert.deepEqual(saved, { v: 1, ships: [
     { uid: 901, hull: 4, variant: 0, value: 37500, name: 'Mara\'s Grace', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 2 }, credit: { region: 2, due: 10 }, port: { name: 'Wayrest' }, title: true },
     { uid: 902, hull: 1, variant: 3, value: 8000, name: '', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 0 }, credit: null, port: null, title: false },
-  ], crossed: [] });
+  ] });
   restoreFleetSaveData(newFleetSaveData());
   assert.equal(fleetShips().length, 0);
   restoreFleetSaveData(saved);

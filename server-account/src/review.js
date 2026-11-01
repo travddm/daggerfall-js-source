@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // INT6: THE REVIEW - what staff read and do about
 // the judge's verdicts. Realm-Arc section 4: "the character is flagged for review"; phase 3: "a review tool". A
-// developer's alone (titles.js isDeveloper - the developers' list, as the customs pass is), each act written into the
+// developer's alone (titles.js isDeveloper - the developers' list), each act written into the
 // character's findings with who did it, and said by tools/realmReview.mjs:
 //
 //   /v1/mod/realm-holds      the characters held or flagged, with their last finding (and a law hold's end, when timed -
@@ -172,7 +172,7 @@ export async function reviewAct(ctx, player, env, act, body = {}) {
   if (act === 'grants') return grantsMeasure(db, nowS, Number.isSafeInteger(body.days) && body.days >= 1 && body.days <= 30 ? body.days : 7, ranked);   // GRANT2: the spawn grants' measure
   if (act === 'gains') return gainsMeasure(db, nowS, Number.isSafeInteger(body.days) && body.days >= 1 && body.days <= 30 ? body.days : 7);
   if (act === 'characters') {
-    // SUMMON-REPAIR: the account by its handle as the service folds it (the customs pass's way), and its realm characters -
+    // SUMMON-REPAIR: the account by its handle as the service folds it (as accounts.js folds a handle), and its realm characters -
     // the dead too, said so - with the id every act on one names
     if (!isHandleShaped(body.name)) return { error: 'body' };
     const account = await db.prepare('SELECT id, handle FROM players WHERE handle_lc = ? AND handle IS NOT NULL').bind(body.name.toLowerCase()).first();

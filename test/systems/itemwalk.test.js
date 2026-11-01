@@ -2,8 +2,8 @@
 // for their own pass, done in its pull request. A - the load's one-time item repairs (DISC21-A, WEAPON-POOL, DISC29-B,
 // WB12a, RARITY-WEAR) run over every list a save holds, by one walk (systems/save/save.js savedItemLists) and one runner
 // (repairItemLists). B - Project Legacy runs the same repairs on what leaves the line's record by no load: a bequest as
-// it is paid, a fallen member's remains as they open (scenes/legacyHost.js). C - customs counts a sworn revenant's pack
-// (net/realm/realmGoldLaw.js stashedItemLists)., ITEM-WALK.
+// it is paid, a fallen member's remains as they open (scenes/legacyHost.js). C - the realm's wealth measure counts a sworn
+// revenant's pack (net/realm/realmGoldLaw.js stashedItemLists)., ITEM-WALK.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,8 +12,7 @@ import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
 import { WEAPONS, WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { goldStack, letterOfCredit } from '../../src/systems/inventory.js';
-import { liquidWealthOf, stashedItemLists, customsAllowance } from '../../src/net/realm/realmGoldLaw.js';
-import { applyCustoms } from '../../src/systems/realmCustoms.js';
+import { liquidWealthOf, stashedItemLists } from '../../src/net/realm/realmGoldLaw.js';
 import { firstSaveRefusal } from '../../server-account/src/realm.js';
 import { modSaveRecords, _resetModSaveData } from '../../src/systems/modSaveData.js';
 import { MODELS, LEGACY_VENDOR } from '../../src/systems/legacy/family.js';
@@ -39,7 +38,7 @@ const cond = (it) => [it.maxCondition, it.currentCondition];
 /** An iron dagger as a build before WEAPON-POOL minted and wore it: its row's 50, half gone. */
 const stale = (over = {}) => Object.assign(createWeapon(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, at(0.5)), { maxCondition: 50, currentCondition: 25 }, over);
 
-// ── C: customs and a sworn revenant's pack ───────────────────────────────────────────────────────────────────────────
+// ── C: the first save and a sworn revenant's pack ───────────────────────────────────────────────────────────────────────────
 
 const me = { isPlayer: true, name: 'Ayla Stormwind', characterId: 'char-walk', level: 8, health: 100, maxHealth: 100 };
 function swornOne() {
@@ -52,19 +51,17 @@ function swornOne() {
 }
 const feudSave = () => ({ level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], houses: [], modData: { [N.REVENANT_SAVE]: JSON.parse(JSON.stringify(modSaveRecords()[N.REVENANT_SAVE])) } });
 
-test('ITEM-WALK C: customs and the account service\'s first save count a sworn revenant\'s pack - the storage the player fills as the crew\'s (revenantCompanions.js packOf), saved in the feud\'s record: a million gold in it crossed whole while the same million in a crew hand\'s pack was capped; now capped alike, taken from as the crew\'s is; a pack the load keeps for no one (not sworn, or defeated) counts nothing (mutants: the pack unread; the oath or the defeat unasked; the key misnamed)', () => {
+test('ITEM-WALK C: the account service\'s first save counts a sworn revenant\'s pack - the storage the player fills as the crew\'s (revenantCompanions.js packOf), saved in the feud\'s record: a million gold in it passed uncounted while the same million in a crew hand\'s pack was counted; now counted alike; a pack the load keeps for no one (not sworn, or defeated) counts nothing (mutants: the pack unread; the oath or the defeat unasked; the key misnamed)', () => {
   const r = swornOne();
   RC.revenantParty().packOf(r.id).push(goldStack(1_000_000), letterOfCredit(50_000));
   const snap = feudSave();
   const pack = snap.modData[N.REVENANT_SAVE].list[0].companion.items;
-  assert.ok(stashedItemLists(snap).includes(pack), 'its pack is a stash customs reads');
+  assert.ok(stashedItemLists(snap).includes(pack), 'its pack is a stash the wealth measure reads');
   assert.equal(liquidWealthOf(snap), 1_050_000);
-  const out = applyCustoms(snap);
-  assert.deepEqual([out.wealth, out.taken, liquidWealthOf(snap)], [1_050_000, 1_050_000 - customsAllowance(1), customsAllowance(1)], 'capped at the allowance');
-  // the service's first save: a customs character's - and what customs let through passes
-  const row = { origin_id: 'offline-1', summary: JSON.stringify({ level: 1 }) };
-  assert.deepEqual(firstSaveRefusal(JSON.stringify(feudSave()), row), { error: 'customs-allowance' });
-  assert.equal(firstSaveRefusal(JSON.stringify(snap), row), null);
+  // the service's first save: refused with the pack full, and passed once it is empty
+  assert.deepEqual(firstSaveRefusal(JSON.stringify(feudSave())), { error: 'realm-birth' });
+  pack.length = 0;
+  assert.equal(firstSaveRefusal(JSON.stringify(snap)), null);
   // a record the load keeps no pack for (revenant.js sanitize: sworn and not defeated) counts nothing, whatever it holds
   const rec = JSON.parse(JSON.stringify(modSaveRecords()[N.REVENANT_SAVE])).list[0];
   for (const off of [{ sworn: false }, { defeated: true }]) {
@@ -90,7 +87,7 @@ function loadOf(fill) {
   return { snap, loaded, extras };
 }
 
-test('ITEM-WALK A: the load\'s item repairs reach every list a save holds - beside the pack\'s five and customs\' walk, a thing set out in a room, a living foe\'s and a guard\'s kit (in the street and in a building), a revenant\'s take and a sworn one\'s pack, a quest\'s item and a quest foe\'s queue: each came back as an older build wrote it, a weapon to move at its first wear (WEAPON-POOL\'s P2 door) and the rest never (DISC21-A, DISC29-B, WB12a, RARITY-WEAR); now each is what a load makes it, as the hosts read it back; the walk also holds the furnisher\'s deliveries and a guild\'s shelves, where no repair applies today (mutants: each list dropped from the walk)', () => {
+test('ITEM-WALK A: the load\'s item repairs reach every list a save holds - beside the pack\'s five and the wealth measure\'s walk, a thing set out in a room, a living foe\'s and a guard\'s kit (in the street and in a building), a revenant\'s take and a sworn one\'s pack, a quest\'s item and a quest foe\'s queue: each came back as an older build wrote it, a weapon to move at its first wear (WEAPON-POOL\'s P2 door) and the rest never (DISC21-A, DISC29-B, WB12a, RARITY-WEAR); now each is what a load makes it, as the hosts read it back; the walk also holds the furnisher\'s deliveries and a guild\'s shelves, where no repair applies today (mutants: each list dropped from the walk)', () => {
   // the feud's record through its own producer: a sworn one with a pack, a living one holding what it took
   const sworn = swornOne();
   RC.revenantParty().packOf(sworn.id).push(stale());

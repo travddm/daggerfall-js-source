@@ -34,8 +34,8 @@
 // ═══ SEEDED ONCE, CLAIMED, PAID AT THE DAY'S PACE ══════════════════
 //
 // readRoll answers the Roll, and the first time - no Roll yet - seeds it
-// from the standing the client's save holds, under the cap the character's
-// own row names (rollSeedCapOf), its head and twenty-two rows in one batch.
+// from the standing the client's save holds, its head and twenty-two rows
+// in one batch.
 // A read also pays what is owed, as far as the day's room goes (rollDrain).
 //
 // claimRoll takes what moved on the client since its last word - a loss
@@ -54,11 +54,16 @@
 import { isDeveloper } from './titles.js';
 import { REALM_ID_RE, LEASE_RE } from './realm.js';
 import {
-  ROLL_FACTIONS, ROLL_EVENTS_KEEP_S, chaptersSwitchOf, rollRidOf, rollSeedOk, rollDeltasOk, rollMembersOk, rollSeedCapOf, rollSeedOf,
+  ROLL_FACTIONS, ROLL_EVENTS_KEEP_S, chaptersSwitchOf, rollRidOf, rollSeedOk, rollDeltasOk, rollMembersOk, rollSeedOf,
   rollCredit, rollDrain, rollBookRankOf, joinRecordable, ROLL_CLAIMS_HOUR,
 } from '../../src/net/npcChapterLaw.js';
 import { utcDay } from '../../src/net/marksLaw.js';
+import { MAX_REPUTATION } from '../../src/systems/guild/guildFactions.js';
 import { overRate } from './accounts.js';   // AUDIT CHAP2 E2: the claims' own hour
+
+/** The head's `cap` column (migration 0098) records the cap a seed was taken under. Every seed is taken whole now, so
+ *  it is DFU's top. */
+const ROLL_SEED_CAP = MAX_REPUTATION;
 
 /** CHAPTERS_OPEN: the Roll for everyone ("on"), the developers alone ("dev"), or nobody ("off" - the save keeps the
  *  standing, as before CHAP1). */
@@ -81,17 +86,17 @@ function mintTag(/** @type {((b: Uint8Array) => Uint8Array) | undefined} */ rand
   return out;
 }
 
-/** The realm character an act names: the account's own, standing, its first save landed, under `lease`. `{ createdAt,
- *  origin }` or `{ error }`: 'body', 'no-realm-character', 'dead', 'lease', 'no-data' (AUDIT CHAP S3: no Roll before the
- *  realm holds a save of it - a customs never landed is undone whole). */
+/** The realm character an act names: the account's own, standing, its first save landed, under `lease`. `{ createdAt }`
+ *  or `{ error }`: 'body', 'no-realm-character', 'dead', 'lease', 'no-data' (AUDIT CHAP S3: no Roll before the realm
+ *  holds a save of it). */
 async function heldUnder(/** @type {any} */ db, /** @type {string} */ playerId, /** @type {unknown} */ character, /** @type {unknown} */ lease) {
   if (typeof character !== 'string' || !REALM_ID_RE.test(character) || typeof lease !== 'string' || !LEASE_RE.test(lease)) return { error: 'body' };
-  const row = await db.prepare('SELECT lease, created_at, dead_at, origin_id, bytes FROM realm_characters WHERE id = ? AND player = ?').bind(character, playerId).first();
+  const row = await db.prepare('SELECT lease, created_at, dead_at, bytes FROM realm_characters WHERE id = ? AND player = ?').bind(character, playerId).first();
   if (!row) return { error: 'no-realm-character' };
   if (row.dead_at != null) return { error: 'dead' };
   if (row.lease !== lease) return { error: 'lease' };
   if (!(Number(row.bytes) > 0)) return { error: 'no-data' };
-  return { createdAt: Number(row.created_at), origin: row.origin_id ?? null };
+  return { createdAt: Number(row.created_at) };
 }
 
 /**
@@ -197,11 +202,10 @@ export async function readRoll({ db, nowS, rand }, player, body) {
   const seed = body?.seed;
   if (seed == null) return { roll: null };
   if (!rollSeedOk(seed?.factions) || !(seed?.members === null || rollMembersOk(seed?.members))) return { error: 'roll-seed' };
-  const cap = rollSeedCapOf(held);
   /** @type {Map<number, number>} */
   const reported = new Map((seed.members ?? []).map((/** @type {{ f: number, rank: number }} */ m) => [m.f, m.rank]));
   const asleep = new Set((seed.members ?? []).filter((/** @type {any} */ m) => m.d === 1).map((/** @type {any} */ m) => m.f));   // AUDIT CHAP4 D1
-  const values = rollSeedOf(seed.factions, cap, reported);
+  const values = rollSeedOf(seed.factions);
   const tag = mintTag(rand);
   /** @type {Map<number, RollRow>} */
   const rows = new Map();
@@ -215,7 +219,7 @@ export async function readRoll({ db, nowS, rand }, player, body) {
   }
   await db.batch([
     db.prepare(`INSERT OR IGNORE INTO npc_roll_heads (char_id, player, cap, seq, last_rid, tag, seeded_at, updated_at) SELECT ?, ?, ?, 0, NULL, ?, ?, ? WHERE ${HELD_SQL}`)
-      .bind(who.character, player.id, cap, tag, nowS, nowS, who.character, who.player, who.lease),
+      .bind(who.character, player.id, ROLL_SEED_CAP, tag, nowS, nowS, who.character, who.player, who.lease),
     ...[...rows].map(([f, r]) => db.prepare(
       `INSERT OR IGNORE INTO npc_roll (char_id, faction_id, player, rep, gained_day, gained, owed, member, rank, joined_at, dormant) SELECT ?, ?, ?, ?, 0, 0, 0, ?, ?, ?, ? WHERE ${TAGGED_SQL}`,
     ).bind(who.character, f, player.id, r.rep, r.member ? 1 : 0, r.rank, r.joinedAt, r.dormant ? 1 : 0, who.character, tag)),

@@ -310,8 +310,8 @@ export const saveKey = (playerId, characterId, saveName, part) =>
  *  bound somebody raises by accident. */
 export const SAVE_MAX_BYTES = 4 * 1024 * 1024;
 
-/** RESTORE: the switch the history restore throws for its minute - MAINTENANCE = "1", a var only its own
- *  deploy sets (.github/workflows/realm-restore.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
+/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only its own
+ *  deploy sets (.github/workflows/realm-revive.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
 export const maintaining = (/** @type {any} */ env) => env?.MAINTENANCE === '1';
 export const SHOT_MAX_BYTES = 256 * 1024;
 /** Slots per ACCOUNT. An account at this bound is refused; its oldest
@@ -360,9 +360,6 @@ export const ROUTES = new Set([
   // MOD1: the one moderation route. Behind a session like every other,
   // and it refuses anybody the service's own lists do not name.
   '/v1/mod/mute',
-  // CUSTOMS-PASS: a developer grants one account one character through
-  // customs - the same wall, the developers' list alone.
-  '/v1/mod/customs-pass',
   // INT6: the review of the judge's verdicts - the same wall, the developers' list alone (review.js)
   '/v1/mod/realm-holds',
   '/v1/mod/realm-findings',
@@ -604,14 +601,11 @@ export const ROUTES = new Set([
   '/v1/market/vendor', '/v1/market/vendors', '/v1/market/myvendors',
   // RPT1026-MARKET ARRIVE: the road alone - the account's market settled and what is on its way read (market.js marketRoad)
   '/v1/market/road',
-  // REALM P1: the realm's characters (realm.js). The listing and the five that change one; the save itself rides a
+  // REALM P1: the realm's characters (realm.js). The listing and the four that change one; the save itself rides a
   // path that names the character, matched by `realmPathOf`.
-  '/v1/realm', '/v1/realm/create', '/v1/realm/customs', '/v1/realm/join', '/v1/realm/leave', '/v1/realm/delete',
+  '/v1/realm', '/v1/realm/create', '/v1/realm/join', '/v1/realm/leave', '/v1/realm/delete',
   // REALM P2.1: a trade's half (realmTrade.js) - settled here, both records at once or neither.
   '/v1/realm/trade',
-  // HOUSE-LOSS: the door's undo of a customs whose first save never landed (realm.js undoRealm) - its own path, so a
-  // door newer than this service is told `not-found`, never handed a delete.
-  '/v1/realm/undo',
   // LEGACY7: Project Legacy's lines (legacy.js) - listed, written past their rev - and a fallen character's tombstone
   '/v1/realm/lineages', '/v1/realm/lineage', '/v1/realm/die',
   // REZ-BLOODLINE AUDIT R1 (FIELD BUGS 2026-10-16b): a party's Resurrect taking back a fall the realm holds (legacy.js realmRaise)

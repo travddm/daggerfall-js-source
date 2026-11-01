@@ -12,7 +12,7 @@ import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { SESSION_KEY } from '../../src/net/accountClient.js';
 import {
-  realmIo, realmList, realmCreate, realmJoin, realmFetch, realmDelete, realmCustoms, createRealmSession, REALM_LOST,
+  realmIo, realmList, realmCreate, realmJoin, realmFetch, realmDelete, createRealmSession, REALM_LOST,
 } from '../../src/systems/realmSaves.js';
 import { freshSave } from '../realmSeat.mjs';   // AUDIT REALM2 S1: a first save is a new character's
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
@@ -40,7 +40,7 @@ function d1() {
       };
       return api;
     },
-    // D1's batch is one transaction (test/net/realm4.test.js's face): all of it, or none - AUDIT REALM's delete and customs ride one
+    // D1's batch is one transaction (test/net/realm4.test.js's face): all of it, or none - AUDIT REALM's delete rides one
     async batch(list) {
       db.exec('BEGIN');
       try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; }
@@ -97,7 +97,6 @@ test('REALM P1.2: made, joined, checkpointed and read back - the save is the tex
   assert.deepEqual([back.ok, back.text, back.seq], [true, first('v1'), 1]);
   const listed = await realmList(io);
   assert.deepEqual([listed.characters.length, listed.characters[0].summary.level, listed.max], [1, 2, 6]);
-  assert.equal((await realmCustoms(io, 'c0ffee00-1111', 'X')).error, 'customs-never-online');
   assert.equal((await realmDelete(io, id)).ok, true);
   assert.deepEqual((await realmList(io)).characters, []);
 });
