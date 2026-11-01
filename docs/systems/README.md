@@ -23,5 +23,7 @@ One page per major gameplay area: what it does, where it lives, its data and its
   localization.
 - [audio.md](audio.md): the Web Audio engine, Daggerfall's sound and music formats, music selection, ambience,
   footsteps, combat voices, volumes.
+- [balance-harness.md](balance-harness.md): the tool that measures combat balance by level under DFU's rules and this
+  game's, with a switch for each rule layer.
 - [enhanced-ai.md](enhanced-ai.md): the optional layer over the classic foe AI: navmesh, tactics and cover, tells,
   the feud ledger.
