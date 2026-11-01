@@ -1,15 +1,13 @@
 // SS1: the
 // Deadlands Ember BOUND (systems/item/itemBound.js - never handed to another player: the trade will not hold one out, and a
-// peer's lot carrying one is refused whole) and STACKING with its own kind alone (systems/gate/gateSpoils.js), the stones a
-// save holds from before folded into their stacks on load (systems/save/save.js, below its index-keyed relinks), and the
-// card's line. The Broker's count, sale and prices over the stacks are test/systems/item/set7_broker.test.js's. SS3 (the world
+// peer's lot carrying one is refused whole) and STACKING with its own kind alone (systems/gate/gateSpoils.js), and the card's line. The Broker's count, sale and prices over the stacks are test/systems/item/set7_broker.test.js's. SS3 (the world
 // will not take one), SS4 (the Broker's wares bound too, and neither counter sells a bound piece) and SS5 (a ware
 // dismantled in the pack for a share of its stones) below.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sigilStone, restackStones, isSigilStone, SIGIL_STONE_TEMPLATE } from '../../../src/systems/gate/gateSpoils.js';
+import { sigilStone, SIGIL_STONE_TEMPLATE } from '../../../src/systems/gate/gateSpoils.js';
 import { isBound, BOUND_LINE, BOUND_TRADE_TEXT, BOUND_KEEPS, boundRefusesPut, boundText, unbound } from '../../../src/systems/item/itemBound.js';
 import { NativeInventoryWindow, tabAccepts } from '../../../src/ui/native/nativeInventory.js';
 import { NativeTradeWindow } from '../../../src/ui/native/nativeTrade.js';
@@ -33,7 +31,6 @@ import { createTradeManager, inTradeRange } from '../../../src/net/tradeSession.
 import { validTradeData } from '../../../src/net/wire.js';
 import { addItem, stacksWith, splitStack } from '../../../src/systems/inventory.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { restorePlayer, snapshotPlayer } from '../../../src/systems/save/save.js';
 import { withDom, fakeDom } from '../../invdrag.mjs';
 import { mountEnhancedInventory } from '../../../src/ui/enhanced/enhancedInventory.js';
 import { _resetForTests as _resetPrefsForTests } from '../../../src/systems/uiPrefs.js';
@@ -121,46 +118,6 @@ test('SS1 the stone stacks with its own kind alone: a won stone joins the stack 
   addItem(pack, sigilStone());
   assert.deepEqual(summary(pack), [['Deadlands Ember', 3, true], ['Ruby', 1, false], ['Deadlands Ember', 1, false]], 'a locked stack is its own');
   assert.equal(stacksWith(ruby(), sigilStone()), false);
-});
-
-test('SS1 the fold: a pack saved before the stone stacked - a record a stone - is one stack, each record into the first before it that it stacks with (a locked one with a locked one), its count whole, the other records in their order (mutants: the fold merging locked into unlocked; the fold losing a count)', () => {
-  const r = ruby();
-  const list = [sigilStone(), r, sigilStone(), Object.assign(stack(2), { locked: true }), stack(3), Object.assign(sigilStone(), { locked: true })];
-  assert.equal(restackStones(list), 3, 'three records folded');
-  assert.deepEqual(summary(list), [['Deadlands Ember', 5, false], ['Ruby', 1, false], ['Deadlands Ember', 3, true]]);
-  assert.equal(list[1], r, 'a gem untouched, in its place');
-  assert.equal(restackStones(list), 0, 'folded once: nothing more to fold');
-  const plain = [ruby(), ruby()];
-  assert.equal(restackStones(plain), 0, 'a pack with no stones is left as it is - a split gem stays split');
-  assert.equal(plain.length, 2);
-  assert.equal(restackStones(null), 0);
-  assert.ok(list.every((i) => !isSigilStone(i) || i.stackCount >= 1));
-});
-
-const makeEntity = (over = {}) => ({
-  name: 'Tester', race: 'Breton', gender: 'male', level: 3,
-  stats: { strength: 50, endurance: 40, agility: 30, speed: 30, willpower: 30, intelligence: 30, luck: 30, personality: 30 },
-  skills: new Array(35).fill(10), skillUses: new Array(35).fill(0),
-  items: [], wagonItems: [], activeEffects: [], spells: [],
-  health: 30, fatigue: 100, magicka: 10, gold: 0,
-  ...over,
-});
-
-test('SS1 a load folds the stones - the pack\'s and the wagon\'s - BELOW the index-keyed relinks: a light lit after the stones in the saved list is the same light after the load (mutants: the fold never run; the fold before the relinks; the wagon left unfolded)', () => {
-  const torch = { group: 'UselessItems2', templateIndex: 1, stackCount: 1, name: 'Torch' };
-  const e = makeEntity({ items: [sigilStone(), sigilStone(), sigilStone(), torch], wagonItems: [stack(2), ruby(), sigilStone()] });
-  e.lightSource = torch;
-  const snap = snapshotPlayer(e, {});
-  assert.equal(snap.lightSourceIndex, 3, 'the saved index: past the three stones');
-  const t = makeEntity();
-  const info = console.info;
-  const lines = [];
-  console.info = (s) => lines.push(String(s));
-  try { restorePlayer(t, snap); } finally { console.info = info; }
-  assert.deepEqual(t.items.map((i) => [i.name, i.stackCount ?? 1]), [['Deadlands Ember', 3], ['Torch', 1]], 'one stack');
-  assert.equal(t.lightSource, t.items[1], 'the torch is still the light - the index was read before a record moved');
-  assert.deepEqual(t.wagonItems.map((i) => [i.name, i.stackCount ?? 1]), [['Deadlands Ember', 3], ['Ruby', 1]], 'the wagon\'s too');
-  assert.ok(lines.some((l) => l.includes('SS1') && l.includes('2 Deadlands Ember record(s)')), 'said, in the console');
 });
 
 test('SS1 the card says a bound piece is bound, in the lock\'s own line style without its padlock; a gem says nothing of it (mutants: the card line missing)', () => {

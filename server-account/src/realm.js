@@ -232,7 +232,7 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
       + ' SELECT ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM realm_characters WHERE player = ? AND dead_at IS NULL) < ?',
     ).bind(id, playerId, n, realmSummaryOf(summary), lease, nowS, nowS, nowS, born ? lineage : null, born ? person : null, playerId, REALM_CHARACTERS_MAX).run();
   } catch (e) {
-    // LEGACY7: two tabs born as one person race to the unique index (migration 0084) - one wins
+    // LEGACY7: two tabs born as one person race to the unique index - one wins
     if (born && /UNIQUE/i.test(String(/** @type {any} */ (e)?.message ?? e))) return { error: 'lineage-played' };
     throw e;
   }
@@ -291,8 +291,8 @@ export function firstSaveRefusal(text) {
   return shaped && save.level === REALM_BIRTH_LEVEL && liquidWealthOf(save) <= REALM_BIRTH_WEALTH_MAX ? null : { error: 'realm-birth' };
 }
 
-/** INT2-INT6: the judge's columns on a character's row (migration 0096; AUTO-HOLD's timed hold, 0120; RPT1026-LEDGERLAW's
- *  `law_v`, 0178), as verdict.js reads them. */
+/** INT2-INT6: the judge's columns on a character's row (AUTO-HOLD's timed hold; RPT1026-LEDGERLAW's
+ *  `law_v`), as verdict.js reads them. */
 export const JUDGE_COLUMNS = 'judged_seq, held, held_at, strikes, review, wealth, witnessed, allowance, played_at, clean_obj, clean_seq,'
   + ' dupes, judge_rev, svc_seq, level_seen, level_at, law_sig, law_excused, law_v, wealth_v, held_until, law_holds, law_at';
 
@@ -481,7 +481,7 @@ export async function getRealmBlob({ db, bucket }, /** @type {string} */ playerI
 
 // ── REALM P2.2: A REALM CHARACTER'S GOLD MOVES ON ITS RECORD ─────────
 
-/** THE GUARD a batch step answers to (migration 0019's `realm_tx_guard`): placed right after an UPDATE that must change
+/** THE GUARD a batch step answers to (`realm_tx_guard`): placed right after an UPDATE that must change
  *  exactly `n` rows, it inserts only when that UPDATE changed another number, and the table's CHECK refuses the row - so
  *  D1 rolls the whole batch back. An UPDATE that matches nothing is not an error by itself; this makes it one. */
 export const mustChange = (/** @type {any} */ db, n = 1) => db.prepare('INSERT INTO realm_tx_guard (moved, expected) SELECT changes(), ? WHERE changes() != ?').bind(n, n);

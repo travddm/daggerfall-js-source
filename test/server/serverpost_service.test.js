@@ -1,10 +1,10 @@
-// SERVER-POST: THE SERVICE'S SIDE - migration 0093 (server_post), server-account/src/post.js and its four routes,
+// SERVER-POST: THE SERVICE'S SIDE - the server_post table, server-account/src/post.js and its four routes,
 // the heartbeat's `post` part. A piece is the developers' to one registered account; its item is claimed into the
 // realm character being played, written into the record by the service in the claim's own batch.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { standService, T0 } from '../accountDb.mjs';
+import { d1, standService, T0 } from '../accountDb.mjs';
 import { seatRealm, realmAt } from '../realmSeat.mjs';
 import { ROUTES, OPEN_ROUTES } from '../../server-account/src/service.js';
 import { HEARTBEAT_PARTS } from '../../server-account/src/heartbeat.js';
@@ -32,11 +32,12 @@ const recordOf = (env, id) => {
   return JSON.parse(new TextDecoder().decode(env.SAVES._map.get(row.obj)));
 };
 
-test('SERVER-POST the table and the doors: 0093 lays server_post - one piece a batch an account; four routes behind a session, none open; a guest refused every one (post-needs-account, 403); the box a GET; every word the routes answer has a sentence (mutants: a batch sent twice; the wall dropped)', async () => {
-  const mig = src('server-account/migrations/0093_server_post.sql');
-  assert.match(mig, /CREATE TABLE IF NOT EXISTS server_post \(/);
-  assert.match(mig, /CREATE UNIQUE INDEX IF NOT EXISTS ux_server_post_batch ON server_post \(to_id, batch\);/);
-  assert.match(mig, /FOREIGN KEY \(to_id\) REFERENCES players\(id\) ON DELETE CASCADE/);
+test('SERVER-POST the table and the doors: server_post - one piece a batch an account; four routes behind a session, none open; a guest refused every one (post-needs-account, 403); the box a GET; every word the routes answer has a sentence (mutants: a batch sent twice; the wall dropped)', async () => {
+  const schema = d1()._raw;
+  const sqlOf = (name) => schema.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name)?.sql ?? '';
+  assert.match(sqlOf('server_post'), /^CREATE TABLE server_post \(/);
+  assert.equal(sqlOf('ux_server_post_batch'), 'CREATE UNIQUE INDEX ux_server_post_batch ON server_post (to_id, batch)');
+  assert.match(sqlOf('server_post'), /FOREIGN KEY \(to_id\) REFERENCES players\(id\) ON DELETE CASCADE/);
   for (const r of ['/v1/post/box', '/v1/post/read', '/v1/post/claim', '/v1/post/delete']) { assert.ok(ROUTES.has(r), r); assert.ok(!OPEN_ROUTES.has(r), r); }
   assert.ok(HEARTBEAT_PARTS.includes('post'));
   for (const w of ['post-needs-account', 'no-post', 'post-no-item', 'post-claimed', 'post-unclaimed']) assert.equal(typeof REFUSALS[w], 'string', w);

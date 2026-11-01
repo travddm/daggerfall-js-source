@@ -1056,9 +1056,7 @@ function runHomes(run, seedsOf, S, minted) {
     one(AYLEID.welkyndStone()); one(AYLEID.varlaStone());
     for (const n of [1, 3, 10]) { for (const it of [].concat(GATE.welkyndShards(n) ?? [])) one(it); for (const it of [].concat(GATE.portalStones(n) ?? [])) one(it); }
     one(GATE.sigilStone());
-    const e = newPlayer(); GATE.givePortalGift?.(e); for (const it of e.items) one(it);
     const stones = [GATE.sigilStone(), GATE.sigilStone(), ...[].concat(GATE.welkyndShards(2)), GATE.sigilStone()];
-    GATE.restackStones(stones);
     GATE.nameEmbers?.(stones);
     for (const it of stones) one(it);
   });

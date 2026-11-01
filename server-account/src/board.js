@@ -85,7 +85,7 @@ function noteView(n, row, env, nowS, { mine = false, mod = false, reports = 0 } 
     // by name (scenes/world.js answerNote); an account id is what every chat line already carries
     id: n.id, from: n.author_name, by: n.author, ...badgeOf(row, env, nowS), subject: maskText(n.subject), body: maskText(n.body),
     // a recruitment note whose guild is gone - or whose author can no longer invite to it - keeps its words and loses
-    // its button and its seal (0026_board.sql)
+    // its button and its seal
     button: n.button === 'guild' && !guildOk ? null : (n.button ?? null),
     // GUILD1e: and its banner - the Guilds tab hangs a recruitment note as its guild's poster (PROF0 10.1)
     ...(guildOk ? { guild: { name: n.guild_name, tag: n.guild_tag, heraldry: heraldryOfRow(n.guild_heraldry) } } : {}),

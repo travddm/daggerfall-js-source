@@ -338,7 +338,7 @@ test('AUDIT RAID R4 service: A TOWN\'S THANKS ONCE A (RAID, ACCOUNT) - the first
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM raid_spoils WHERE account = ?').get(A.id).n, 0, 'an account gone takes its thanks');
   assert.ok(RAID_CID_RE.test(CID1) && !RAID_CID_RE.test('0123'));
   assert.equal(String(RAID_CID_RE), String(CLIENT_CID_RE), 'the client mints what the service reads');
-  const sql = rd('server-account/migrations/0017_raid_spoils.sql');
+  const sql = db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('raid_spoils').sql;
   assert.match(sql, /PRIMARY KEY \(raid, account\)/);
   assert.match(sql, /FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
 });

@@ -3,8 +3,7 @@
 //
 // ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
 //
-// THE REGISTERED DATE IS A COLUMN THAT ALREADY EXISTED (0002 stamps
-// `registered_at`); the only work was carrying it to the card, and the
+// THE REGISTERED DATE IS A COLUMN THAT ALREADY EXISTED (`players.registered_at`); the only work was carrying it to the card, and the
 // pin is that a guest gets no date rather than 1970.
 //
 // TIME PLAYED IS THE ONE THAT CAN BE BUILT WRONG, and the wrong build
@@ -34,8 +33,7 @@ const rand = (b) => globalThis.crypto.getRandomValues(b);
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url))
   .filter((f) => f.endsWith('.sql')).sort();
 
-/** D1's surface over the REAL migrations - 0005 included, because the
- *  walk picks up every file in the folder. */
+/** D1's surface over the REAL migrations - the walk picks up every file in the folder. */
 function d1() {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys = ON');
@@ -147,7 +145,6 @@ test('ACC4: every existing row starts at ZERO and no beat yet - nothing is guess
   const row = db._raw.prepare('SELECT played_s, played_at FROM players WHERE id = ?').get('p_old');
   assert.equal(row.played_s, 0);
   assert.equal(row.played_at, null);
-  assert.match(src('server-account/migrations/0005_played.sql'), /STARTS AT ZERO/);
 });
 
 // ── THE WORKER, end to end ──────────────────────────────────────────

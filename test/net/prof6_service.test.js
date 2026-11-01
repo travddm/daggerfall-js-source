@@ -433,25 +433,3 @@ test('PROF6 service: a commission withdrawn by its poster, declined by its craft
   assert.equal(g2.status, 200);
   assert.ok(s.addsUp());
 });
-
-test('PROF6 service: the notes\' rebuild for the fourth button keeps every note and its reports, and a note gone still takes its reports (0034_writs.sql over a board that stood before it)', async () => {
-  const { DatabaseSync } = await import('node:sqlite');
-  const { readdirSync, readFileSync } = await import('node:fs');
-  const dir = new URL('../../server-account/migrations/', import.meta.url);
-  const db = new DatabaseSync(':memory:');
-  db.exec('PRAGMA foreign_keys = ON');
-  for (const f of readdirSync(dir).filter((x) => x.endsWith('.sql')).sort()) {
-    if (f === '0034_writs.sql') {
-      db.exec(`INSERT INTO players (id, handle, handle_lc, guest_name, created_at, last_seen) VALUES ('p1', 'Ann', 'ann', 'A b', 1, 1), ('p2', 'Bob', 'bob', 'B c', 1, 1)`);
-      db.exec(`INSERT INTO board_notes (id, map_id, author, author_name, subject, body, button, at, expires_at, rid) VALUES ('n1', 5, 'p1', 'Ann', 's', 'b', 'duel', 1, 999, 'rid00001')`);
-      db.exec(`INSERT INTO board_reports (note_id, reporter, at) VALUES ('n1', 'p2', 2)`);
-    }
-    db.exec(readFileSync(new URL(f, dir), 'utf8'));
-  }
-  assert.deepEqual(db.prepare('SELECT note_id, reporter FROM board_reports').all().map((r) => [r.note_id, r.reporter]), [['n1', 'p2']], 'the report kept');
-  assert.deepEqual(db.prepare('SELECT id, button FROM board_notes').all().map((r) => [r.id, r.button]), [['n1', 'duel']]);
-  db.exec(`INSERT INTO board_notes (id, map_id, author, author_name, subject, body, button, at, expires_at, rid) VALUES ('n2', 5, 'p1', 'Ann', 's', 'b', 'commission', 1, 999, 'rid00002')`);
-  db.exec(`DELETE FROM board_notes WHERE id = 'n1'`);
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM board_reports').get().n, 0, 'the cascade stands');
-  assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(), []);
-});

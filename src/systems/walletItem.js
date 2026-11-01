@@ -63,16 +63,6 @@ export function giveWallet(/** @type {any} */ entity) {
   addItem(entity.items, mintWallet());
   return 1;
 }
-/** The wallet's gift, PORTAL-GIFT's shape: the mark a save carries once its character has been given one. */
-export const WALLET_GIFT = 1;
-/** A character from before the wallet (its save's mark short of WALLET_GIFT) is given one, once - and marked, so a
- *  character given it is never given it again. Answers giveWallet's count. */
-export function giveWalletGift(/** @type {any} */ entity) {
-  if (!entity || typeof entity !== 'object') return 0;
-  if ((Number.isSafeInteger(entity.walletGift) ? entity.walletGift : 0) >= WALLET_GIFT) return 0;
-  entity.walletGift = WALLET_GIFT;
-  return giveWallet(entity);
-}
 
 /** The account's silver, as the host knows it - online, the marks book's: its balance, null while it is not known yet,
  *  false for an account that holds none (a guest's, or silver not struck yet) - or no host at all (offline, the bench);

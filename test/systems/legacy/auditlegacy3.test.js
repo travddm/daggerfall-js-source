@@ -436,7 +436,7 @@ test('AUDIT LEGACY III O5: A TOMBSTONE\'S ONLINE LIFE GOES WITH IT - its guild s
   const raw = S3.env.DB._raw;
   for (let i = 0; i < RENOWN_TRACKS_MAX; i++) {
     const id = `r${i.toString(16).padStart(20, '0')}`;
-    raw.prepare('INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, origin_id, created_at, updated_at, dead_at) VALUES (?, ?, ?, NULL, 0, 0, NULL, 0, NULL, 1, 1, 5)').run(id, A.g.id, `Dead ${i}`);
+    raw.prepare('INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, created_at, updated_at, dead_at) VALUES (?, ?, ?, NULL, 0, 0, NULL, 0, 1, 1, 5)').run(id, A.g.id, `Dead ${i}`);
     raw.prepare('INSERT INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, 10, 1, 1)').run(A.g.id, id, `Dead ${i}`);
   }
   const held = raw.prepare(`SELECT ${renownHeldSql('?1')} AS n`).get(A.g.id).n;

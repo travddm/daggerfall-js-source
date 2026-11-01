@@ -6,7 +6,7 @@
 //   - NO RECORD. A player whose play before it the service never recorded (a guest's storage cleared, a character never
 //     saved to the cloud) cannot be proven by any rule. FOUNDER_HANDLES names them: a list in config, the developers'
 //     law - case-folded, a registered account's alone, and it only adds.
-// And then, "I want to do this without my input": FOUNDER4's link (0078) ran once, so a character carried onto a new
+// And then, "I want to do this without my input": FOUNDER4's link ran once, so a character carried onto a new
 // account after its deploy linked nothing until a person re-ran it. server-account/src/founderLink.js writes the same
 // fact as a character ARRIVES - a cloud save's new slot - with nobody's hand on it.
 import { test } from 'node:test';
@@ -142,15 +142,14 @@ test('FOUNDER5, end to end: an account first seen on the evening of the 24th in 
 
 // ── THE LINK, KEPT LIVE ─────────────────────────────────────────────
 
-test('FOUNDER5 the live link: the statement asks the cloud saves by character (renown_tracks left out, read whole by character), one hop, earlier only; 0087 indexes saves by character', () => {
+test('FOUNDER5 the live link: the statement asks the cloud saves by character (renown_tracks left out, read whole by character), one hop, earlier only; saves are indexed by character', () => {
   const sources = [...LINK_SQL.matchAll(/SELECT (\w+) FROM (\w+) WHERE (\w+) = \?2/g)].map((m) => `${m[2]}.${m[3]}`);
   assert.deepEqual(sources, ['saves.character_id']);
   assert.doesNotMatch(LINK_SQL, /renown_tracks/);
   assert.doesNotMatch(LINK_SQL, /o\.first_played_at/, 'one hop: another row\'s own link is never followed');
-  const migration = src('server-account/migrations/0087_founder_live.sql');
-  assert.match(migration, /^CREATE INDEX IF NOT EXISTS idx_saves_character ON saves \(character_id\);$/m);
   const db = new DatabaseSync(':memory:');
   for (const f of MIGRATIONS) db.exec(src(`server-account/migrations/${f}`));
+  assert.equal(db.prepare("SELECT sql FROM sqlite_master WHERE name = 'idx_saves_character'").get()?.sql, 'CREATE INDEX idx_saves_character ON saves (character_id)');
   const plan = (q) => db.prepare(`EXPLAIN QUERY PLAN ${q}`).all().map((r) => r.detail).join(' | ');
   assert.match(plan("SELECT player_id FROM saves WHERE character_id = 'x'"), /idx_saves_character/, 'a save asked by character reads the index');
 });

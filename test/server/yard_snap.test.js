@@ -8,8 +8,6 @@
 // answer off its rows, and a stale row never answered.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
 
 import { d1, standService, T0 } from '../accountDb.mjs';
 import {
@@ -19,7 +17,6 @@ import { shapeOf, KEPT_BOARD_MAX_BYTES } from '../../server-account/src/keptBoar
 import { DECOR_YARDS_TOWN_MAX } from '../../src/net/decorLaw.js';
 import { MINUTE_JOBS } from '../../server-account/src/cron.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const lcg = (seed) => { let x = seed % 2147483647 || 1; return () => (x = (x * 48271) % 2147483647) / 2147483647; };
 const TOWNS = [7, 8, 9];
 const KEYS = [300, 301, 302];
@@ -135,37 +132,6 @@ test('YARD-SNAP a decor route builds its town as it answers; the minute\'s clock
   assert.equal(await settleStaleYards(db), 3);
   assert.equal(await settleStaleYards(db), 0);
   _resetYardsKept();
-});
-
-/** The shape 0136 built every town in: the 2,000 bound's build (YARD-TOWN moved the bound - 0175 builds them again). */
-const SHAPE_0136 = '92826ba1';
-
-test('YARD-SNAP the migrations\' backfills: the towns standing yards when 0136 is applied are built in its own shape at its 2,000 bound; YARD-TOWN\'s 0175 builds every one again in the shape the code reads, at DECOR_YARDS_TOWN_MAX, their answers their rows\' (mutants: 0136\'s bound and shape; 0175\'s bound and shape, its rebuild kept as it was)', async () => {
-  const raw = new DatabaseSync(':memory:');
-  raw.exec('PRAGMA foreign_keys = ON');
-  const files = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-  for (const f of files.filter((f) => f < '0136')) raw.exec(src(`server-account/migrations/${f}`));
-  const db = { _raw: raw, prepare: (sql) => { const st = raw.prepare(sql); let a = []; const api = { bind: (...x) => { a = x; return api; }, first: async () => st.get(...a) ?? null, all: async () => ({ results: st.all(...a) }) }; return api; } };
-  world({ _raw: raw });
-  for (let i = 0; i < DECOR_YARDS_TOWN_MAX + 5; i++) put(raw, 8, KEYS[i % 3], `b${i}`, 1, 1, i % 8);
-  put(raw, 7, 300, 'one', 1, 1);
-  raw.exec(src(`server-account/migrations/${files.find((f) => f.startsWith('0136'))}`));
-  const at0136 = snapOf(raw, 8);
-  assert.equal(at0136.shape, SHAPE_0136, '0136 built in its own day\'s shape');
-  assert.equal(yardRowsOf(at0136.rows).length, 2000, '0136 at its own day\'s bound');
-  assert.ok(DECOR_YARDS_TOWN_MAX > 2000);
-  for (const f of files.filter((f) => f >= '0137')) raw.exec(src(`server-account/migrations/${f}`));
-  assert.equal(yardRowsOf(snapOf(raw, 8).rows).length, DECOR_YARDS_TOWN_MAX, '0175 at the town\'s bound now');
-  for (const t of [7, 8]) {
-    const r = snapOf(raw, t);
-    assert.equal(r.built, r.ver, `town ${t} built`);
-    assert.equal(r.shape, YARD_SNAP_SHAPE, `town ${t} built in the shape the code reads (the deploy reads it at once)`);
-    const asked = [];
-    assert.deepEqual(await yardsOf({ db: { prepare: (sql) => { asked.push(sql); return db.prepare(sql); } } }, null, { mapId: t }), await fromRows(db, raw, t));
-    assert.deepEqual(asked, [YARD_SNAP_READ], 'off its built row');
-  }
-  // AUDIT LEAN-READS B8: 0039's (map_id, yard) is the order index's prefix - gone
-  assert.equal(raw.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 'idx_home_decor_yard'").get().n, 0);
 });
 
 test('YARD-SNAP AUDIT LEAN-READS B1: a town built by another deploy\'s read - another shape - is read as its rows stand and built again by the minute\'s clock, however quiet the town; the shape is the build\'s columns, order and bound (mutants: the shape unread, the clock blind to it, the shape\'s parts)', async () => {

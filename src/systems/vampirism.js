@@ -190,7 +190,7 @@ export { liveVampirism };
  * (:70-82): the curse entry, the clan carried over, CureAll, the
  * clan's spells. Same refusals as the werewolf's.
  */
-export function createVampirismCurse(entity, clan, { now = 0, restore = false } = {}) {
+export function createVampirismCurse(entity, clan, { now = 0 } = {}) {
   if (!entity || liveVampirism(entity) || entity.racialOverride) return null;
   const entry = {
     kind: 'racialOverride',
@@ -209,7 +209,7 @@ export function createVampirismCurse(entity, clan, { now = 0, restore = false } 
     statMods: {},
     skillMods: {},
   };
-  if (!restore) endOldLifeEffects(entity);   // CureAll (:81) - the same clean start the werewolf gets; CURSE-REPAIR1: not on a curse given back
+  endOldLifeEffects(entity);   // CureAll (:81) - the same clean start the werewolf gets
   entity.activeEffects = entity.activeEffects || [];
   entity.activeEffects.push(entry);
   entity.racialOverride = entry;

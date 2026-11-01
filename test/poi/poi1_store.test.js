@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { encodePoiMesh, decodePoiMesh, poiMeshError, POI_MESH_LIMITS } from '../../src/poi/poiMesh.js';
 import { poiImageMetaOf } from '../../src/poi/poiImage.js';
 import { poiDocProblems, poiAssetProblems, poiAssetsOf, mintPoiId, unitQuat, problemLine, DEFAULT_MATERIAL, POI_LIMITS } from '../../src/poi/poiLaw.js';
-import { standService } from '../accountDb.mjs';
+import { d1, standService } from '../accountDb.mjs';
 import { poiPathOf } from '../../server-account/src/service.js';
 import { forgetPoiFeed, POI_FEED_KEEP_MS } from '../../server-account/src/poi.js';
 
@@ -332,8 +332,8 @@ test('POI-1 STORE: the feed kept in the isolate - asked again inside its keep, n
   assert.equal(n, 3, 'the version alone');
 });
 
-test('POI-1 RECORDS: the store is in the migrations, the roles in the config, its shared law in the account deploy\'s filter', () => {
-  assert.match(src('server-account/migrations/0116_poi.sql'), /CREATE TABLE IF NOT EXISTS poi_revs/);
+test('POI-1 RECORDS: the store is in the schema, the roles in the config, its shared law in the account deploy\'s filter', () => {
+  assert.ok(d1()._raw.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'poi_revs'").get());
   const toml = src('server-account/wrangler.toml');
   assert.match(toml, /^APPROVER_HANDLES = "Lattymoy"$/m);
   assert.match(toml, /^BUILDER_HANDLES = ""$/m);

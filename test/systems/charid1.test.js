@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { mintCharacterId, characterIdOf, adoptLegacyCards, SAVE_INFO_PREFIX, SAVE_DATA_PREFIX } from '../../src/systems/characterId.js';
+import { mintCharacterId, characterIdOf, SAVE_INFO_PREFIX, SAVE_DATA_PREFIX } from '../../src/systems/characterId.js';
 import { saveSlot, findSave, quickSaveSlot, quickLoadSlot, hasQuickSave, enumerateSaves, saveInfoOf } from '../../src/systems/save/saveSlots.js';
 import { snapshotPlayer, restorePlayer, SAVE_VERSION } from '../../src/systems/save/save.js';
 
@@ -54,35 +54,17 @@ test('CHARID1: THE BUG - two characters of one name each keep their own QuickSav
   assert.equal([...enumerateSaves(st).info.keys()].length, 2);
 });
 
-test('CHARID1: a legacy card (no id) is never a new character’s to overwrite, and is ADOPTED by its own character on load', () => {
+test('CHARID1: a card with no id is never a new character’s to overwrite', () => {
   const st = memStore();
-  // a card written before the id existed
+  // a card with no id
   st.setItem(SAVE_DATA_PREFIX + 0, JSON.stringify({ v: SAVE_VERSION, name: 'Borin', classicMinutes: 777 }));
   st.setItem(SAVE_INFO_PREFIX + 0, JSON.stringify({ saveVersion: 1, saveName: 'QuickSave', characterName: 'Borin', dateAndTime: { gameTime: 777, realTime: 1 } }));
   // a new Borin: his QuickSave lands beside it, not on it
   assert.deepEqual(quickSaveSlot('Borin', snapOf('Borin', 'id-new-borin', 1), { storage: st, now: 2 }), { ok: true, key: 1 });
   assert.equal(JSON.parse(st.getItem(SAVE_DATA_PREFIX + 0)).classicMinutes, 777);
-  // a legacy card of ANOTHER character, which adoption must not touch
-  st.setItem(SAVE_DATA_PREFIX + 2, JSON.stringify({ v: SAVE_VERSION, name: 'Wen', classicMinutes: 3 }));
-  st.setItem(SAVE_INFO_PREFIX + 2, JSON.stringify({ saveVersion: 1, saveName: 'QuickSave', characterName: 'Wen', dateAndTime: { gameTime: 3, realTime: 1 } }));
-  // the old Borin loads his legacy save: the entity gets an id and his cards take it
-  const entity = { name: '', stats: {} };
-  const snap = { ...JSON.parse(st.getItem(SAVE_DATA_PREFIX + 0)), stats: {}, position: [0, 0, 0] };
-  const stamped = adoptLegacyCards(st, 'Borin', 'id-old-borin');
-  assert.deepEqual(stamped, [SAVE_INFO_PREFIX + 0], 'only the card with no id, only his name');
-  assert.equal(saveInfoOf(0, st).characterId, 'id-old-borin'); assert.equal(saveInfoOf(1, st).characterId, 'id-new-borin', 'the new Borin’s card is not touched');
-  assert.equal(saveInfoOf(0, st).saveName, 'QuickSave', 'the rest of the card is kept');
-  assert.equal(saveInfoOf(2, st).characterId, undefined, 'and Wen\u2019s legacy card is NOT stamped with Borin\u2019s id - adoption is one character\u2019s'); 
-  // ...and from then on his QuickSave overwrites HIS slot
-  assert.deepEqual(quickSaveSlot('Borin', snapOf('Borin', 'id-old-borin', 800), { storage: st, now: 3 }), { ok: true, key: 0 });
-  assert.equal(JSON.parse(st.getItem(SAVE_DATA_PREFIX + 1)).classicMinutes, 1, 'the new Borin’s untouched');
-  // a store that throws leaves the card a legacy card, adopted next time
-  const bad = { ...st, get length() { return st.length; }, setItem: () => { throw new Error('quota'); } };
-  assert.deepEqual(adoptLegacyCards(bad, 'Borin', 'x'), []);
-  void entity; void snap;
 });
 
-test('CHARID1: the envelope carries the id - snapshotPlayer mints one onto a character born before this, restorePlayer adopts a legacy envelope’s cards', () => {
+test('CHARID1: the envelope carries the id - snapshotPlayer mints one onto a character that has none', () => {
   // executed: a fresh entity through snapshotPlayer carries an id
   const e = { name: 'Cato', stats: {}, health: 1, maxHealth: 1, magicka: 0, maxMagicka: 0, fatigue: 1, skills: [], skillUses: [], items: [], spellbook: [], wagon: [] };
   let snap = null;

@@ -3,7 +3,7 @@
 // TITLE, KEPT ON THE ROW.
 //
 // A shop's keeper stands as a lamp now and then (src/systems/lampKeeper.js - the room's own pick, every client's), and
-// the account that speaks to one is granted I Love Lamp: `players.lamp_title` (migration 0113), laid once and held for
+// the account that speaks to one is granted I Love Lamp: `players.lamp_title`, laid once and held for
 // good, read off the row by titles.js titlesHeld as Hourbreaker is read off `sd_honours`. A guest - no handle - holds
 // no title (FOUNDER's law), so its word is answered `guest` and nothing is written.
 //

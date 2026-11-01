@@ -1,4 +1,4 @@
-// HOME-CROSSED. A home that no realm record paid for (`homes.paid` 0, migration 0020) once sold for a deed share of
+// HOME-CROSSED. A home that no realm record paid for (`homes.paid` 0) once sold for a deed share of
 // nothing, and the sale deleted the house and its pieces, while the door asked a sale price taken from the client's own
 // price. A second press then read as a service fault while the realm act was still out (`busy`). Such a home is never
 // bought back online: it stays a house.

@@ -402,7 +402,7 @@ export const DECOR_YARD_POS_MAX = 48;
  * ends ask the one place they share. A fence with a lantern on it, a cart, a crate on a crate - never a tower: each piece
  * stood on the one below climbed as far as DECOR_YARD_POS_MAX. A piece placed or moved past it is refused at both ends
  * (decorYardHighOk - scenes/homeYards.js yardWhyNot, server-account/src/decor.js); YARD-SWEEP: one standing
- * from before it is deleted (migration 0109) and never served or stood (decor.js yardsOf, homeYards.js ensure).
+ * from before it is deleted and never served or stood (decor.js yardsOf, homeYards.js ensure).
  */
 export const DECOR_YARD_HIGH = 4;
 /** YARD-HEIGHT: whether a yard piece's place stands within DECOR_YARD_HIGH of the ground. */
@@ -413,7 +413,7 @@ export const DECOR_YARD_HIGH_WHY = `Too high. Yard decorations can be at most ${
 /**
  * THE MOST YARD PIECES ONE TOWN HOLDS, and so the most its yards answer at once (server-account/src/decor.js yardRowsSql).
  * YARD-TOWN: the answer was 2,000 pieces, read in building-key order, and placing never asked it - Daggerfall's
- * city held 3,357 on 2026-10-19 (migration 0136), so every piece in its eastern blocks (a key's high byte is the block's
+ * city held 3,357 on 2026-10-19, so every piece in its eastern blocks (a key's high byte is the block's
  * column - talkTopics.js makeBuildingKey) was written, paid for and never served again. Now the bound is the town's
  * whole yards, refused at the placement (`yard-town-full`), so nothing written is ever left out of the answer. It is as
  * many rows as the town's built row keeps (YARD-SNAP, keptBoard.js KEPT_BOARD_MAX_BYTES, 1.5 MB), with room to spare:

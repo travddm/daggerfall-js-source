@@ -1,5 +1,5 @@
 // REALM P1: THE REALM'S CHARACTERS, SERVICE SIDE (server-account/src/realm.js,
-// migration 0018 - 0016 on its branch). These pins drive the REAL Worker over the REAL migrations (node:sqlite behind a D1-shaped face and
+// `realm_characters`). These pins drive the REAL Worker over the REAL migrations (node:sqlite behind a D1-shaped face and
 // R2's three calls, as test/server/cloudsaves.test.js does): a realm character is minted by the service, joined under a lease
 // that takes it from any other tab, checkpointed only under that lease at the next sequence, left, deleted and copied
 // back.

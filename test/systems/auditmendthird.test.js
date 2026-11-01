@@ -26,7 +26,7 @@ import { createRandomBook, setBookPrice } from '../../src/systems/books.js';
 import { upgradeLoot } from '../../src/world/oceanHoles.js';
 import { temperItem } from '../../src/systems/smithItems.js';
 import { pieceQuality, temperRefusal } from '../../src/net/temperLaw.js';
-import { repoolWeaponConditions, repairUnmintedConditions } from '../../src/systems/conditionRepair.js';
+import { repoolWeapon } from '../../src/systems/conditionRepair.js';
 import { creditOwnMend } from '../../src/systems/item/foundMark.js';
 import { assignSkillEquipment } from '../../src/systems/roleplayRealismItems/rriKits.js';
 import { patronWorth, patronCap } from '../../src/net/patronLaw.js';
@@ -135,11 +135,11 @@ test('AUDIT MEND-THIRD L1-6, L2-6, L3-5: a temper moves a found piece\'s mark an
   assert.equal(plate.selfMended, plate.maxCondition - plate.foundCondition, 'mended whole, then tempered: the room above the mark, moved');
   // WEAPON-POOL: an iron dagger on its row's 50, found at 25 and mended by its owner to 40, moves to the pool's 1,600
   const dagger = Object.assign(randomConditionLootItems([weaponOfMaterial(WEAPONS.Dagger, WEAPON_MATERIALS.Iron)], at(0.5))[0], { maxCondition: 50, currentCondition: 40, foundCondition: 25, selfMended: 15 });
-  assert.equal(repoolWeaponConditions([dagger]), 1);
+  assert.equal(repoolWeapon(dagger), true);
   assert.deepEqual([dagger.maxCondition, dagger.currentCondition, dagger.foundCondition, dagger.selfMended], [1600, 1280, 800, 480]);
 });
 
-test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dagger are handed over marked - at creation and at a classic load\'s mint (mutants: the kit\'s or the dagger\'s mark dropped)', () => {
+test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dagger are handed over marked at creation (mutants: the kit\'s or the dagger\'s mark dropped)', () => {
   installRoleplayRealismItems({ fetchBytes: async () => new Uint8Array() });
   let wornPieces = 0, unmarked = 0;
   for (let s = 0; s < 40; s++) {
@@ -151,11 +151,6 @@ test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dag
   }
   assert.ok(wornPieces > 80, `${wornPieces} worn pieces`);
   assert.equal(unmarked, 0);
-  // a classic load's questions' dagger, never minted: minted at 20% and marked there
-  const old = setItemFields({ group: 'Weapons', templateIndex: WEAPONS.Dagger, material: WEAPON_MATERIALS.Ebony });
-  delete old.maxCondition; old.currentCondition = 0;
-  assert.equal(repairUnmintedConditions([old]), 1);
-  assert.ok(old.currentCondition > 0 && old.foundCondition === old.currentCondition);
 });
 
 test('AUDIT MEND-THIRD L1-4: a patron values a piece at the condition a counter\'s sale reads, through the mod\'s condition price - a found Daedric cuirass at 20% was worth its whole 153,600 (a cap of 92,160, the best counter paying 25,344); mended at a smith it is worth what it was found at, by its owner\'s kit a third more, whole and unmarked the whole (mutants: the condition unread; the mark unread)', () => {

@@ -26,7 +26,7 @@
 // A COPY HOLDS NO CHARACTER (AUTO-HOLD, 2026-10-16). The ledger locks
 // the copied PIECE (ledger.js item_dupes - it moves by no route) and the checkpoint's answer names it; the character
 // trades on. 'dupe' - DUPES_FOR_HOLD copies, staff alone to lift - is retired: no verdict writes it, a row still holding
-// it is lifted by its next checkpoint, and migration 0120 lifted every one standing.
+// it is lifted by its next checkpoint, and the schema's start has none standing.
 //
 // ═══ WHAT A VERDICT WRITES OVER ════════════════════════════════════
 //

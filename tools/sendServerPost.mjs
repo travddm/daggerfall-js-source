@@ -3,25 +3,18 @@
 // (server-account/src/post.js only reads, claims and throws away), so a piece is written here, by hand, through
 // .github/workflows/server-post.yml:
 //   1. a dry run reads the accounts the names find, and whether each already holds this send - and nothing is written;
-//   2. the run with apply on writes one piece to each, INSERT OR IGNORE over the one-a-send index (0093's
-//      ux_server_post_batch), so a send run twice sends once.
+//   2. the run with apply on writes one piece to each, INSERT OR IGNORE over the one-a-send index
+//      (ux_server_post_batch), so a send run twice sends once.
 //
 //   node tools/sendServerPost.mjs --names <handles>                                        the names, one a line
 //   node tools/sendServerPost.mjs --look <handles> <batch>                                 the dry run's statement
 //   node tools/sendServerPost.mjs --words <subject> <message>                              the words as they will be sent
 //   node tools/sendServerPost.mjs --sql <handles> <batch> <item> <subject> <message>       the send's statement
-//   node tools/sendServerPost.mjs --migration hours-first|tamriel                          a frozen send's migration
 //
 // `handles` is comma-separated, as the config's lists are; `item` is one of POST_ITEMS - an item is MINTED here by the
 // game's own code, never typed into a workflow; `message` takes `\n` for a line break. Every word reaches the statement
 // through sqlText, quotes doubled.
-//
-// HOURS-FIRST: the post's first use - HOURS_FIRST, the thirteen of the first clear. That send is migration
-// 0094 (`--migration hours-first` prints it). Its names and its record are FROZEN here, never read off the config's list
-// or the game's mint, because an applied migration never changes. The item it holds, the Hourlock, is no longer in the
-// game: a claim of it drops the item as an unknown one.
 
-import { readFileSync } from 'node:fs';
 import { isMain } from './lib/isMain.mjs';
 import { HANDLE_RE } from '../src/net/handleShape.js';
 import { POST_BATCH_RE, POST_SENDER, POST_SUBJECT_MAX, POST_BODY_MAX } from '../src/net/postLaw.js';
@@ -32,47 +25,6 @@ export const POST_ITEMS = Object.freeze({
 });
 /** How many accounts one send may name. */
 export const POST_RECIPIENTS_MAX = 200;
-
-/** HOURS-FIRST: the first send - its name, to whom, what it holds and its words, as migration 0094 sent them. */
-export const HOURS_FIRST = Object.freeze({
-  batch: 'hours-first-hourlock',
-  handles: 'aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDeeJew,mayaamano,Nirnroot,ofrizz,rosalina,ShikiX3,Temegast,Terra',
-  item: 'hourlock',
-  subject: "Hour's First",
-  body: [
-    'You were among the first to break an Abyss Dungeon. The Hour remembers.',
-    '',
-    "Your title, Hour's First, and its aura, The First Hour, are yours to wear - choose them on your profile.",
-    '',
-    'The Hourlock is enclosed. Claim it and it goes into the pack of the online character you are playing.',
-    '',
-    `- ${POST_SENDER}`,
-  ].join('\n'),
-});
-
-/** HOURS-FIRST: the Hourlock's record as 0094 sent it, frozen. */
-export const HOURS_FIRST_RECORD = "{\"group\":\"Weapons\",\"templateIndex\":560,\"material\":4,\"flags\":0,\"variant\":0,\"message\":0,\"stackCount\":1,\"name\":\"The Hourlock\",\"value\":39740,\"maxCondition\":4800,\"currentCondition\":4800,\"rarity\":\"gilded\",\"gilded\":\"the-hourlock\",\"affixes\":[{\"id\":\"damage\",\"value\":40},{\"id\":\"stat\",\"param\":\"agility\",\"value\":15},{\"id\":\"skill\",\"param\":33,\"value\":30},{\"id\":\"elemental\",\"param\":\"shock\",\"value\":10}],\"isIdentified\":true}";
-
-/** TAMRIEL-POST: the Tamriel update's letter, to every registered account, ten Portal Stones in one stack. Migration
- *  0188 (`--migration tamriel`) sends it with the deploy; its words and record are FROZEN here, as HOURS_FIRST's. */
-export const TAMRIEL_POST = Object.freeze({
-  batch: 'tamriel-portal-stones',
-  sender: 'DFO Team',
-  subject: 'Thank you, and something for the road',
-  body: [
-    'Thank you for playing, and for sticking with us.',
-    '',
-    'This update opens up the rest of Tamriel, past the Iliac Bay. It took a long time to build, and a lot of it was shaped by your bug reports and ideas.',
-    '',
-    'There are ten Portal Stones in this letter. Go and see it: the ash on Red Mountain, the reeds of the Shadowfen, the vineyards of Summerset.',
-    '',
-    "We're really glad you're here. See you out there.",
-    '',
-    '- DFO Team',
-  ].join('\n'),
-});
-/** TAMRIEL-POST: the stones' record as 0188 sends it - `portalStones(10)` that day (systems/gate/gateSpoils.js), frozen. */
-export const TAMRIEL_POST_RECORD = '{"group":"UselessItems2","templateIndex":572,"name":"Portal Stone","value":1250,"maxCondition":1000,"currentCondition":1000,"stackCount":10}';
 
 /** A word as an SQL string, its quotes doubled - nothing in it can end the string. */
 export const sqlText = (/** @type {string} */ s) => `'${String(s).replaceAll("'", "''")}'`;
@@ -119,48 +71,26 @@ export function lookSql(handles, batch) {
 }
 
 /**
- * THE SEND: one piece to each registered account the names find - once a send an account (INSERT OR IGNORE over 0093's
- * index), its id the database's own random, its moment the database's own clock. RETURNING names the pieces it wrote
- * (a migration's copy leaves it off).
+ * THE SEND: one piece to each registered account the names find - once a send an account (INSERT OR IGNORE over the
+ * one-a-send index), its id the database's own random, its moment the database's own clock. RETURNING names the pieces
+ * it wrote.
  * @param {{ handles: string, batch: string, item: string, subject: string, body: string }} o
  */
-export function sendSql({ handles, batch, item, subject, body, record = null }, { returning = true } = {}) {
+export function sendSql({ handles, batch, item, subject, body, record = null }) {
   const names = postHandles(handles), b = postBatch(batch), words = postWords({ subject, body });
-  const rec = record ?? postItem(item);   // a frozen record (HOURS_FIRST_RECORD), or the item's name minted now
+  const rec = record ?? postItem(item);   // a record made by the caller, or the item's name minted now
   return `INSERT OR IGNORE INTO server_post (id, to_id, batch, sender, subject, body, item, sent_at)
 SELECT lower(hex(randomblob(12))), p.id, ${sqlText(b)}, ${sqlText(POST_SENDER)}, ${sqlText(words.subject)}, ${sqlText(words.body)}, ${rec ? sqlText(rec) : 'NULL'}, CAST(strftime('%s', 'now') AS INTEGER)
-FROM players p WHERE p.handle IS NOT NULL AND p.handle_lc IN (${inList(names)})${returning ? '\nRETURNING id, to_id' : ''};`;
+FROM players p WHERE p.handle IS NOT NULL AND p.handle_lc IN (${inList(names)})
+RETURNING id, to_id;`;
 }
-
-/** HOURS-FIRST: the title's list, off the config (the first send's names are its own, frozen above - this is for the pin
- *  that every one of them holds the title). */
-export function hoursFirstHandles(toml = readFileSync(new URL('../server-account/wrangler.toml', import.meta.url), 'utf8')) {
-  const m = /^HOURS_FIRST_HANDLES = "([^"]*)"$/m.exec(toml);
-  if (!m) throw new Error('server-account/wrangler.toml holds no HOURS_FIRST_HANDLES');
-  return m[1];
-}
-/** HOURS-FIRST: the first send's statement, as migration 0094 holds it - its own names and record, frozen. */
-export const hoursFirstSql = () => sendSql({ ...HOURS_FIRST, record: HOURS_FIRST_RECORD }, { returning: false });
-
-/** TAMRIEL-POST: a send to EVERY registered account standing when it runs - a migration's alone (the workflow names its
- *  accounts, POST_RECIPIENTS_MAX at most); once a send an account, as sendSql's. */
-export function everyoneSql({ batch, sender = POST_SENDER, subject, body, record = null }) {
-  const b = postBatch(batch), words = postWords({ subject, body });
-  return `INSERT OR IGNORE INTO server_post (id, to_id, batch, sender, subject, body, item, sent_at)
-SELECT lower(hex(randomblob(12))), p.id, ${sqlText(b)}, ${sqlText(sender)}, ${sqlText(words.subject)}, ${sqlText(words.body)}, ${record ? sqlText(record) : 'NULL'}, CAST(strftime('%s', 'now') AS INTEGER)
-FROM players p WHERE p.handle IS NOT NULL;`;
-}
-/** TAMRIEL-POST: the update's letter, as migration 0188 holds it. */
-export const tamrielPostSql = () => everyoneSql({ ...TAMRIEL_POST, record: TAMRIEL_POST_RECORD });
 
 function main(argv) {
   if (argv[0] === '--names' && argv.length === 2) return void process.stdout.write(`${postHandles(argv[1]).join('\n')}\n`);
   if (argv[0] === '--look' && argv.length === 3) return void process.stdout.write(`${lookSql(argv[1], argv[2])}\n`);
   if (argv[0] === '--words' && argv.length === 3) return void process.stdout.write(`${JSON.stringify(postWords({ subject: argv[1], body: argv[2] }))}\n`);   // AUDIT SERVER-POST: the dry run shows what will be sent
   if (argv[0] === '--sql' && argv.length === 6) return void process.stdout.write(`${sendSql({ handles: argv[1], batch: argv[2], item: argv[3], subject: argv[4], body: argv[5] })}\n`);
-  if (argv[0] === '--migration' && argv[1] === 'hours-first' && argv.length === 2) return void process.stdout.write(`${hoursFirstSql()}\n`);
-  if (argv[0] === '--migration' && argv[1] === 'tamriel' && argv.length === 2) return void process.stdout.write(`${tamrielPostSql()}\n`);
-  throw new Error('usage: node tools/sendServerPost.mjs --names <handles> | --look <handles> <batch> | --words <subject> <message> | --sql <handles> <batch> <item> <subject> <message> | --migration hours-first|tamriel');
+  throw new Error('usage: node tools/sendServerPost.mjs --names <handles> | --look <handles> <batch> | --words <subject> <message> | --sql <handles> <batch> <item> <subject> <message>');
 }
 
 if (isMain(import.meta.url)) {

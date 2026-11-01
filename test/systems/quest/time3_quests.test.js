@@ -27,7 +27,7 @@ import { DailyFrom, GivePc, SeasonCondition, PlaySound } from '../../../src/syst
 import { RaiseTime } from '../../../src/systems/quest/questActionsExtension.js';
 import { getMacroValue, getContextValue } from '../../../src/systems/quest/questMacros.js';
 import {
-  QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, raisedSince, shiftQuestStamps, markOwnClock, questBlockOnOwnClock, questDataOnThisClock,
+  QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, raisedSince, shiftQuestStamps, markOwnClock, questDataOnThisClock,
 } from '../../../src/systems/quest/questStamps.js';
 import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { snapshotPlayer, restorePlayer } from '../../../src/systems/save/save.js';
@@ -417,25 +417,16 @@ test('TIME3 AUDIT (second round): a resync that keeps a run-out clock keeps its 
   assert.equal(bw.created.length, 3, 'four more hours: no wave past the three');
 });
 
-test('TIME3 saves: an online save from before TIME3 has its countdowns moved onto the character\'s clock once, at the load; a TIME3 save and an offline one load as they stand; the offline copy moves only a TIME3 envelope\'s journal dates', () => {
+test('TIME3 saves: a save\'s quest block loads as it stands; the offline copy moves only a TIME3 envelope\'s journal dates', () => {
   const own = 50 * D, world = 230 * D;
   const block = () => ({ machine: { quests: [{ questName: 'Q', questStartTime: world * 60 - 600, questTombstoneTime: 0, activeLogMessages: [{ stepID: 0, messageID: 1, time: world * 60 - 300 }], resources: [{ clock: { lastWorldTimeSample: world * 60 } }], tasks: [{ actions: [{ actionSpecific: { lastTimePlayed: world * 60 - 30, lastSpawnTime: 0 } }] }] }] } });
   const pre = { classicMinutes: own, worldMinutes: world, quest: block() };
-  const keep = JSON.stringify(pre);
-  const moved = questBlockOnOwnClock(pre).machine.quests[0];
-  assert.equal(JSON.stringify(pre), keep, 'the snap is untouched');
-  assert.deepEqual([moved.resources[0].clock.lastWorldTimeSample, moved.tasks[0].actions[0].actionSpecific.lastTimePlayed, moved.tasks[0].actions[0].actionSpecific.lastSpawnTime, moved.questTombstoneTime], [own * 60, own * 60 - 30, 0, 0], 'the countdowns onto the character\'s clock by the distance at the save - three days stay three days');
-  assert.deepEqual([moved.questStartTime, moved.activeLogMessages[0].time], [world * 60 - 600, world * 60 - 300], 'the journal\'s dates stay the world\'s');
-  assert.equal(moved.ownSecondsAt, own * 60, 'and marked, so no load moves them twice');
-  assert.equal(questBlockOnOwnClock({ ...pre, quest: { machine: { quests: [moved] } } }).machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60, 'a TIME3 envelope loads as it stands');
-  const offline = { classicMinutes: own, quest: block() };
-  assert.equal(questBlockOnOwnClock(offline), offline.quest, 'an offline envelope: one clock, nothing to move');
-  // end to end: the load hands the hosts the moved block
+  // end to end: the load hands the hosts the block it saved
   setSharedClock(() => world + 5);
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(player(), { classicMinutes: own, quest: block() })));
   snap.worldMinutes = world;
   const extras = restorePlayer(player(), snap);
-  assert.equal(extras.quest.machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60, 'restorePlayer: the countdowns on the character\'s clock');
+  assert.deepEqual(extras.quest, snap.quest, 'restorePlayer: the quest block as it was saved');
   setSharedClock(null);
   // COPY TO OFFLINE, a TIME3 envelope: the journal's dates onto the one clock, the countdowns stay
   const t3 = { classicMinutes: own, worldMinutes: world, quest: { machine: { quests: [{ questName: 'Q', ownSecondsAt: own * 60 - 17, questStartTime: world * 60 - 600, questTombstoneTime: own * 60 - 5, activeLogMessages: [{ stepID: 0, messageID: 1, time: world * 60 - 300 }], resources: [{ clock: { lastWorldTimeSample: own * 60 - 60 } }] }] } } };

@@ -61,7 +61,7 @@ import { utcDay } from '../../src/net/marksLaw.js';
 import { MAX_REPUTATION } from '../../src/systems/guild/guildFactions.js';
 import { overRate } from './accounts.js';   // AUDIT CHAP2 E2: the claims' own hour
 
-/** The head's `cap` column (migration 0098) records the cap a seed was taken under. Every seed is taken whole now, so
+/** The head's `cap` column records the cap a seed was taken under. Every seed is taken whole now, so
  *  it is DFU's top. */
 const ROLL_SEED_CAP = MAX_REPUTATION;
 

@@ -12,7 +12,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { standService, T0, sessionStorageOf } from '../accountDb.mjs';
+import { d1, standService, T0, sessionStorageOf } from '../accountDb.mjs';
 import { accountProf, SESSION_KEY, accountRefusalText } from '../../src/net/accountClient.js';
 import { createProfBook } from '../../src/net/profBook.js';
 import { xpForRank, PROF_XP_MAX, COOK_FIRE, trackOf } from '../../src/net/professionLaw.js';
@@ -503,7 +503,7 @@ test('PROF9 wiring: the fire is any lit one (the street\'s camps and braziers, a
   const svc = src('server-account/src/professions.js');
   assert.match(svc, /const xp = scaleXp\(r\.kind === 'dish' \? cookXp\(rank, \{ clean: clean === true, steps: halls \}\) : craftXp\(r\.tier, rank\),/);
   assert.match(svc, /const hand = dishHand\(r, specs\[100\]\) \?\? jewelHand\(r, specs\[50\]\);/);
-  assert.match(src('server-account/migrations/0069_cooking.sql'), /ALTER TABLE products ADD COLUMN hand INTEGER CHECK \(hand IS NULL OR hand IN \(1, 2\)\);/);
+  assert.match(d1()._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('products').sql, /\n +hand +INTEGER CHECK \(hand IS NULL OR hand IN \(1, 2\)\),/);
   assert.equal(recipeById('feast:hearth').profession, 'cooking');
 });
 

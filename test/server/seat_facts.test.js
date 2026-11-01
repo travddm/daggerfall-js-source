@@ -2,7 +2,7 @@
 // every isolate read every seat row of world_witness once a minute and counted the facts over them on every ask - after
 // SEAT-REPLICA some 100 reads of 15,899 rows a minute on the one replica, its p99 from 2 ms to some 60 ms. The minute's
 // clock (server-account/src/cron.js `seat-facts`) now reads the rows once and keeps what they say in one row
-// (migration 0112), and every isolate reads that row: fresh (SEAT_FACTS_FRESH_S) and newer than its own last write, or
+// (`seat_facts_kept`), and every isolate reads that row: fresh (SEAT_FACTS_FRESH_S) and newer than its own last write, or
 // the rows as before. Each pin failed on the build before it. tools/mutants/seat_facts.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

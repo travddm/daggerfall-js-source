@@ -4,8 +4,7 @@
 // and act written down.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { standService } from '../accountDb.mjs';
+import { d1, standService } from '../accountDb.mjs';
 import { seatRealm } from '../realmSeat.mjs';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import { PLAYER_ROUTES, PLAYER_TABS, PLAYERS_PAGE, ITEMS_PAGE, NAME_COPIES, profileBadges, saveViewOf, listedHandles, isPieceFinding } from '../../server-account/src/staffPlayers.js';
@@ -385,7 +384,7 @@ test('STAFF-PANEL3-PLAYERS FIX: SIGN OUT EVERYWHERE REFUSES A GUEST - its sessio
   assert.deepEqual(s.audits('signout-all').map((a) => [a.target, JSON.parse(a.detail), a.outcome]), [[g.id, { name, error: 'no-handle' }, 'failed']]);
 });
 
-test('STAFF-PANEL3-PLAYERS: A HANDLE RENAMED - migration 0134\'s way, the old name and the new written down; never to or from a role or title list\'s name, never another\'s, never one the game refuses (mutants: each refusal; a copy left unwritten)', async () => {
+test('STAFF-PANEL3-PLAYERS: A HANDLE RENAMED - the old name and the new written down; never to or from a role or title list\'s name, never another\'s, never one the game refuses (mutants: each refusal; a copy left unwritten)', async () => {
   const s = await stand();
   const { raw, brisk } = s;
   const t = nowS();
@@ -461,14 +460,18 @@ test('STAFF-PANEL3-PLAYERS: A CHARACTER RENAMED - its row\'s name, the one the m
   assert.equal(s.audits('rename').filter((a) => a.outcome === 'failed').length, refusals.length);
 });
 
-test('STAFF-PANEL3-PLAYERS: the lists a rename refuses are every role and title list, and a handle\'s copies are migration 0134\'s own, less the columns that hold no handle', () => {
+test('STAFF-PANEL3-PLAYERS: the lists a rename refuses are every role and title list, and a handle\'s copies are columns the schema holds, less the columns that hold no handle', () => {
   const listed = listedHandles({ DEVELOPER_HANDLES: 'A1x', HOURS_FIRST_HANDLES: 'Bee, cee', OWNER_KEYS: 'Own1:abc', DISCORD_MODERATORS: '1:Disc1', OTHER: 'Nope', DB: {} });
   assert.deepEqual([...listed].sort(), ['a1x', 'bee', 'cee', 'disc1', 'own1']);
-  const sql = readFileSync(new URL('../../server-account/migrations/0134_handle_rename.sql', import.meta.url), 'utf8');
-  const copies = [...sql.matchAll(/^UPDATE (\w+) SET (\w+) = 'SanguinePanguine' WHERE lower/gm)].map((m) => [m[1], m[2]]);
+  const raw = d1()._raw;
+  const copies = [...NAME_COPIES].map((c) => c.slice(0, 2).join('.'));
+  for (const copy of copies) {
+    const [table, column] = copy.split('.');
+    assert.ok(raw.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column), `${copy} is a column`);
+  }
   // STAFF-PANEL3-PLAYERS FIX: a character's name (renown_tracks), an account's id (closed_by) and a guild's (fealty, pacts)
   const NO_HANDLE = ['renown_tracks.name', 'guild_writs.closed_by', 'guild_contracts.closed_by', 'guild_fealty.offered_by', 'guild_fealty.broken_by', 'guild_pacts.offered_by'];
-  assert.deepEqual([...NAME_COPIES].map((c) => c.slice(0, 2).join('.')).sort(), copies.map((c) => c.join('.')).filter((c) => !NO_HANDLE.includes(c)).sort());
+  assert.deepEqual(copies.filter((c) => NO_HANDLE.includes(c)), [], 'no column that holds no handle');
 });
 
 test('STAFF-PANEL3-PLAYERS FIX: A HANDLE RENAMED WRITES ITS OWN COPIES ALONE - never another account\'s row that reads like the old handle, a guild\'s hall named like it, or a character\'s renown track (mutants: each scope; the renown track a copy again)', async () => {
@@ -503,7 +506,7 @@ test('STAFF-PANEL3-PLAYERS FIX: A HANDLE RENAMED WRITES ITS OWN COPIES ALONE - n
   assert.equal(one("SELECT from_name FROM letters WHERE id = 'lt-brisk'").from_name, 'Bristle', 'the account\'s own letter');
 });
 
-test('STAFF-PANEL3-PLAYERS: SERVER LOAD - the trades read and the search by a character\'s name stand on migration 0151\'s indexes, and "online now" on the play beat\'s, never a scan of the table (mutant: the online filter beside the handle\'s range)', async () => {
+test('STAFF-PANEL3-PLAYERS: SERVER LOAD - the trades read and the search by a character\'s name stand on their own indexes, and "online now" on the play beat\'s, never a scan of the table (mutant: the online filter beside the handle\'s range)', async () => {
   const s = await stand();
   const seen = [];
   const prepare = s.env.DB.prepare.bind(s.env.DB);

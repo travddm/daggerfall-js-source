@@ -118,10 +118,12 @@ re-mint the signing pair.
 
 ### D1 migrations
 
-- Files: `server-account/migrations/NNNN_name.sql`, numbered in order. Add a new file; never edit an applied one.
+- Files: `server-account/migrations/NNNN_name.sql`, numbered in order. `0001_schema.sql` holds the whole schema an
+  empty database starts from. A schema change is a new file with the next number (`0002_<what>.sql`); never edit a
+  file that was applied, `0001_schema.sql` included.
 - Applied by `wrangler d1 migrations apply`, which records each applied file in the `d1_migrations` table and runs
-  only the missing ones, in order. Many migrations are not idempotent (`ALTER TABLE ADD COLUMN`), so never run a file
-  by hand with `d1 execute`.
+  only the missing ones, in order. A file is not idempotent (`ALTER TABLE ADD COLUMN`, `CREATE TABLE` without
+  `IF NOT EXISTS`), so never run one by hand with `d1 execute`.
 - When D1 answers "overloaded" (code 7429 with that wording), the step retries after 20, 40, 60, 90 and 120 seconds.
   Any other failure stops the deploy. A 7429 "reset" (CPU limit) is never retried: retrying would reset the live
   database again.

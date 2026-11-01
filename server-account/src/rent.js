@@ -5,7 +5,7 @@
 // Asked: "For houses with multiple rooms, the owner can choose to rent
 // out to other players and adjust the price as needed". The shapes and
 // bounds are src/net/homeLaw.js (RENT_*), which the client reads too; the
-// table is migrations/0037_home_rooms.sql.
+// table is `home_rooms`.
 //
 // ═══ THE OWNER OFFERS, THE TENANT RENTS, THE OWNER COLLECTS ═════════
 //

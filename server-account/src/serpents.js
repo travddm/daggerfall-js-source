@@ -11,7 +11,7 @@
 // section 8. The raids' claim (raids.js) rung for rung - SERPENT-SET:
 // and its silver now, a combat strike under the day's cap (marks.js
 // serpentStrikeStatement), and the gate's currency on its row: the
-// embers its hoard paid (`stones`, migration 0083 - SERPENT_EMBERS), which
+// embers its hoard paid (`stones` - SERPENT_EMBERS), which
 // the insignia's purse counts as a breach's (accounts.js insigniaPurse).
 //
 // ═══ WHOSE WORD, AND WHAT BOUNDS IT ════════════════════════════════
@@ -20,7 +20,7 @@
 // account's part in it. What the relay could not check, this file bounds:
 // it holds no map, so a modified client could stand a serpent's fight at
 // a site that is not the day's (the relay keeps it apart - AUDIT SERPENT
-// S1); an account is counted ONE serpent a day (migration 0081's key),
+// S1); an account is counted ONE serpent a day (the table's key),
 // and its Renown is charged to the account's hour, as every report is
 // (renownTracks.js). A receipt earned by standing the fight out is paid
 // SERPENT_STOOD_RENOWN of it.
@@ -44,7 +44,7 @@
 // rolled HERE, off a draw this service makes (never the receipt's seed,
 // which the page holds - AUDIT SD III R4), for a REGISTERED account whose
 // ship DEALT (a receipt earned by standing is paid none), and laid on the
-// account's `serpent_honours` (migration 0119) by THIS claim's row alone,
+// account's `serpent_honours` by THIS claim's row alone,
 // in the row's own batch - so a receipt claimed twice at once rolls once.
 // Once held, held for good (titles.js reads it off the row).
 //
@@ -63,7 +63,7 @@ export const SERPENT_CID_RE = /^[0-9a-f]{16}$/;
  *  waters) is paid of a serpent's Renown - half; one whose guns dealt their share is paid it whole. */
 export const SERPENT_STOOD_RENOWN = 0.5;
 const HOUR_S = 3600;
-/** SERPENT5: the account's grants on its row (`players.serpent_honours`, migration 0119), bit by bit. */
+/** SERPENT5: the account's grants on its row (`players.serpent_honours`), bit by bit. */
 export const SERPENT_HONOUR_TITLE = 1;
 export const SERPENT_HONOUR_AURA = 2;
 /** SERPENT5: how often a dealing ship's kill's first write grants each - Coilbreaker one in twenty, The Maelstrom one in

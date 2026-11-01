@@ -27,7 +27,7 @@ import { QuestMachine } from '../../src/systems/quest/machine.js';
 import { TrainPc } from '../../src/systems/quest/actions.js';
 import { SKILLS } from '../../src/systems/skills.js';
 import { RACES } from '../../src/systems/races.js';
-import { snapshotPlayer, restorePlayer, clampMarkersAheadOf } from '../../src/systems/save/save.js';
+import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { setSharedWeather, resetWeatherSim, rollClimateWeathersForDay, weatherForClimate, ZONE_CLIMATES, setWeatherMapLaw } from '../../src/systems/weather/weatherSim.js';
 import { BankWindow } from '../../src/ui/bankWindow.js';
 import { PORT_SPECS } from '../../src/ui/enhanced/enhancedPorts.js';
@@ -172,13 +172,6 @@ test('AUDIT LIVED1b T7 (a legacy save left at the world\'s now): a save from bef
   assert.equal(ownMinutes(), own, 'the character\'s clock is the save\'s');
   assert.equal(back.legalRep[0], -14, 'the absence crossed the world\'s boundary: one point back');
   assert.equal(back.survival.thirst, 0, 'two days away: fed, watered and rested');
-});
-
-test('AUDIT LIVED1b T7 (the clamp\'s incubation, feeding and kill uncapped): the legacy clamp brings EVERY marker ahead back - an infection\'s incubation start, the vampire\'s feeding and the werewolf\'s kill', () => {
-  const inf = { kind: 'disease', infection: true, startingDay: 3, lastDay: 3 };
-  const curse = { racial: 'vampirism', lastTimeFed: 2000, lastKilledInnocent: 1990 };
-  assert.equal(clampMarkersAheadOf({ activeEffects: [inf, curse] }, D + 5), 4);
-  assert.deepEqual([inf.startingDay, inf.lastDay, curse.lastTimeFed, curse.lastKilledInnocent], [1, 1, D + 5, D + 5]);
 });
 
 test('AUDIT LIVED1b T2 (the world day block walks the character\'s half, or is gone): the WORLD\'s midnight crossed in play rolls the six zones from the shared day\'s seed - the day block\'s world half runs on the world\'s window', () => {

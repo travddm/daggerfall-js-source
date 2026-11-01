@@ -3,7 +3,7 @@
 // (server-account/src/staffCases.js /v1/staff/banned), driven through the real Worker on the node:sqlite database every
 // account pin stands on (test/accountDb.mjs): a banned account out of the list unless asked for, a lapsed ban none, the
 // cursor paging the filtered list, the Banned tab's rows, order, cursor and Unban, its audit row, and both reads on
-// migration 0164's index.
+// the `players_banned` index.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -141,7 +141,7 @@ test('STAFF-BANNED: THE CURSOR PAGES THE FILTERED LIST - each account once, none
   assert.ok(!seen.includes('P56') && !seen.includes('P01'), 'the newly banned left; the unbanned was behind the cursor');
 });
 
-test('STAFF-BANNED: SERVER LOAD - the banned filter and the Banned tab read migration 0164\'s index, never a walk of every account (mutants: the index; the filter beside the handle\'s range)', async () => {
+test('STAFF-BANNED: SERVER LOAD - the banned filter and the Banned tab read the players_banned index, never a walk of every account (mutants: the index; the filter beside the handle\'s range)', async () => {
   const s = await stand();
   const t = nowS();
   for (let i = 0; i < 40; i++) s.player(`L${String(i).padStart(2, '0')}`, i === 7 ? { banned_until: t + 600 } : {});

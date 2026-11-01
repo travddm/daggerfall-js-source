@@ -1,6 +1,6 @@
 // WB12d:
 // THE FAITHFUL'S RITE - its law (net/gate/gateRite.js: where the circle stands, who stands at it, when it holds), the wire's
-// word (net/wire.js), the receipt's rite (net/gate/gateReceipt.js) and the account service's ember (migration 0066) -
+// word (net/wire.js), the receipt's rite (net/gate/gateReceipt.js) and the account service's ember (`gate_kills.stones`) -
 // D.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -161,7 +161,7 @@ async function gatePair() {
   return { priv: await importReceiptKey(pkcs8, { subtle }), pubKey: await importPublicKeyB64(pub, { subtle }) };
 }
 
-test('WB12d the account service: a fighter who broke the rite takes two embers, one who broke it alone takes one - struck no Drakes and closed no breach; the purse sums the rows\' embers, every row before 0066 paying one; SEAT1b at the merge: a kill\'s row keeps the region its claim names, the rite\'s own row none (mutants: the rite\'s row given the region; the rite\'s ember unpaid; the rite counted a breach closed; the rite struck; the purse counting rows)', async () => {
+test('WB12d the account service: a fighter who broke the rite takes two embers, one who broke it alone takes one - struck no Drakes and closed no breach; the purse sums the rows\' embers, a row written without them paying one; SEAT1b at the merge: a kill\'s row keeps the region its claim names, the rite\'s own row none (mutants: the rite\'s row given the region; the rite\'s ember unpaid; the rite counted a breach closed; the rite struck; the purse counting rows)', async () => {
   const db = d1();
   const A = await member(db), B = await member(db);
   const { priv, pubKey } = await gatePair();
@@ -180,7 +180,7 @@ test('WB12d the account service: a fighter who broke the rite takes two embers, 
   assert.deepEqual(await claimGate(ctx, A, await mint({ d: 712, s: A.id, x: 'stood' }), pubKey), { recorded: true, day: 712, stones: 1, closed: 2 });
   assert.equal(await insigniaPurse({ db }, { id: A.id, insignia_spent: 1 }), 2, 'three embers, one spent');
   assert.deepEqual(await gateRecordOf({ db }, A.id), { closed: 2 });
-  assert.match(src('server-account/migrations/0066_rite_ember.sql'), /^ALTER TABLE gate_kills ADD COLUMN stones INTEGER NOT NULL DEFAULT 1;$/m);
+  assert.deepEqual({ ...db._raw.prepare("SELECT type, \"notnull\", dflt_value FROM pragma_table_info('gate_kills') WHERE name = 'stones'").get() }, { type: 'INTEGER', notnull: 1, dflt_value: '1' });
 });
 
 test('AUDIT WB12d (A1) the account service: A FIGHTER\'S `r` COUNTED AT ONE EMBER (a service from before acct62 kept its row as a plain receipt\'s) is made good when it is claimed again - and only that: a rite\'s own row, or a row already two, is never raised; every answer says the row\'s embers (mutants: never made good; a rite row raised; the embers unsaid)', async () => {

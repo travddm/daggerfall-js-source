@@ -1,13 +1,10 @@
 // CRAFT3 - FIVE CRAFTS, NOT EIGHT: Smithing with Jewelcrafting, Building of
 // Carpentry and Masonry, Outfitting, Provisioning of Alchemy and Cooking, Enchanting. The disciplines stay - a Ring is
-// Jewelcrafting's, the Gemcutter its choice - and the TRACK is the craft's (net/professionLaw.js trackOf); 0088 merges
-// the eight tracks a character held (the higher's XP, its choices, the lost one's change free). The done-when: a Ring and
-// a Dagger raise one Smithing through the real Worker; the merge as 0088 writes it. 41.
+// Jewelcrafting's, the Gemcutter its choice - and the TRACK is the craft's (net/professionLaw.js trackOf). The done-when: a Ring and
+// a Dagger raise one Smithing through the real Worker. 41.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
 
 import { standService, sessionStorageOf } from '../accountDb.mjs';
 import { accountProf, SESSION_KEY } from '../../src/net/accountClient.js';
@@ -19,11 +16,8 @@ import {
 import { RECIPES, masterworkSpec, recipeById, firstCraftXp, craftXp, cookXp } from '../../src/net/recipeLaw.js';
 import { mintPieces } from '../../src/systems/smithItems.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const noWait = () => Promise.resolve();
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
-const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-const FUTURE = 4_000_000_000;
 
 // ─── THE DONE-WHEN ───────────────────────────────────────────────────
 
@@ -47,87 +41,6 @@ test('CRAFT3 DONE WHEN: a Silver Ring and an Iron Dagger raise one Smithing trac
   assert.equal(book.track('smithing').xp, 2 * each);
   assert.equal(book.track('jewelcrafting'), book.track('smithing'), 'a discipline\'s track its craft\'s');
   assert.deepEqual(raw.prepare('SELECT profession, xp FROM prof_tracks WHERE player = ?').all(mac.id).map((t) => [t.profession, t.xp]), [['smithing', 2 * each]], 'one row, the craft\'s');
-});
-
-// ─── THE MERGE (0088) ────────────────────────────────────────────────
-
-/** Every migration before 0088 applied, `rows` written as the eight tracks stood, then 0088: the tracks as it leaves them. */
-function merged(rows) {
-  const db = new DatabaseSync(':memory:');
-  db.exec('PRAGMA foreign_keys = OFF');   // the tracks alone - no account rows to stand behind them
-  for (const f of MIGRATIONS.filter((m) => m < '0088')) db.exec(src(`server-account/migrations/${f}`));
-  const put = db.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, respec_rank, respec_to, respec_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-  for (const r of rows) put.run(r.p ?? 'a', r.c, r.prof, r.xp, r.s50 ?? null, r.s100 ?? null, r.rr ?? null, r.rt ?? null, r.ra ?? null, r.up ?? 1);
-  db.exec(src('server-account/migrations/0088_five_crafts.sql'));
-  const out = {};
-  for (const t of db.prepare('SELECT * FROM prof_tracks ORDER BY char_id, profession').all()) {
-    out[`${t.char_id}|${t.profession}`] = [t.xp, t.spec50, t.spec100, t.respec_rank, t.respec_to, t.respec_at, t.free_respec];
-  }
-  assert.deepEqual(db.prepare("SELECT name FROM sqlite_master WHERE name LIKE 'craft3_%'").all(), [], 'its work tables dropped');
-  return out;
-}
-
-test('CRAFT3 merge (0088): the higher parent\'s XP; a rank\'s choice the higher\'s, else the lower\'s; both chosen, the higher\'s kept and the rank free once; equal XP the first named; a lone parent as it stood; the other tracks untouched', () => {
-  const x = (r) => xpForRank(r);
-  const out = merged([
-    // c1: both chose at 50 - the Jeweller's (higher) kept, 50 free; its 100 kept (the Smith chose none there)
-    { c: 'c1', prof: 'smithing', xp: x(60), s50: 'weaponsmith' }, { c: 'c1', prof: 'jewelcrafting', xp: x(100), s50: 'gemcutter', s100: 'lapidary', up: 9 },
-    // c2: the Mason higher, its Quarryman kept; the Carpenter chose nothing
-    { c: 'c2', prof: 'carpentry', xp: x(20) }, { c: 'c2', prof: 'masonry', xp: x(55), s50: 'quarryman' },
-    // c3: equal XP - the Carpenter (named first) is the higher
-    { c: 'c3', prof: 'carpentry', xp: x(50), s50: 'joiner' }, { c: 'c3', prof: 'masonry', xp: x(50), s50: 'builder' },
-    // c4: a lone Alchemist, as it stood
-    { c: 'c4', prof: 'alchemy', xp: x(70), s50: 'brewer' },
-    // c6: the higher (Smithing) chose nothing - the Jeweller's Goldsmith kept, nothing free
-    { c: 'c6', prof: 'smithing', xp: x(70) }, { c: 'c6', prof: 'jewelcrafting', xp: x(40), s50: 'goldsmith' },
-    // c5: untouched - a gatherer, a tailor, an enchanter
-    { c: 'c5', prof: 'mining', xp: x(30), s50: 'prospector' }, { c: 'c5', prof: 'outfitting', xp: x(40) }, { c: 'c5', prof: 'enchanting', xp: x(75), s50: 'efficient' },
-  ]);
-  assert.deepEqual(out, {
-    'c1|smithing': [x(100), 'gemcutter', 'lapidary', null, null, null, 1],
-    'c2|building': [x(55), 'quarryman', null, null, null, null, 0],
-    'c3|building': [x(50), 'joiner', null, null, null, null, 1],
-    'c4|provisioning': [x(70), 'brewer', null, null, null, null, 0],
-    'c5|enchanting': [x(75), 'efficient', null, null, null, null, 0],
-    'c5|mining': [x(30), 'prospector', null, null, null, null, 0],
-    'c5|outfitting': [x(40), null, null, null, null, null, 0],
-    'c6|smithing': [x(70), 'goldsmith', null, null, null, null, 0],
-  });
-});
-
-test('CRAFT3 merge (0088): a change on its way - the higher\'s kept; the lower\'s kept where its rank\'s choice is, else dropped and that rank free; a change already in effect folded first', () => {
-  const x = (r) => xpForRank(r);
-  const out = merged([
-    // d1: the higher (Alchemy) has a change on its way at 50 - kept; the Cook's at 100 dropped (the Alchemist chose there), 100 free
-    { c: 'd1', prof: 'alchemy', xp: x(100), s50: 'brewer', s100: 'transmuter', rr: 50, rt: 'distiller', ra: FUTURE },
-    { c: 'd1', prof: 'cooking', xp: x(100) - 1, s50: 'cook', s100: 'chef', rr: 100, rt: 'provisioner', ra: FUTURE },
-    // d2: the higher (Masonry) chose nothing at 100; the Carpenter's 100 and its change on its way kept, nothing free
-    { c: 'd2', prof: 'carpentry', xp: x(90), s100: 'siegewright', rr: 100, rt: 'master-joiner', ra: FUTURE },
-    { c: 'd2', prof: 'masonry', xp: PROF_XP_MAX },
-    // d3: the lower's change at 100 dropped though its choice there is kept - the higher's own change at 50 stands; 100 free
-    { c: 'd3', prof: 'smithing', xp: x(100), s50: 'armoursmith', rr: 50, rt: 'weaponsmith', ra: FUTURE },
-    { c: 'd3', prof: 'jewelcrafting', xp: x(100) - 5, s100: 'master-jeweller', rr: 100, rt: 'lapidary', ra: FUTURE },
-    // d4: a change already in effect (its day passed) is the choice, folded before the merge - so both chose at 50, 50 free
-    { c: 'd4', prof: 'cooking', xp: x(80), s50: 'cook', rr: 50, rt: 'field-cook', ra: 1 },
-    { c: 'd4', prof: 'alchemy', xp: x(60), s50: 'brewer' },
-  ]);
-  assert.deepEqual(out, {
-    'd1|provisioning': [x(100), 'brewer', 'transmuter', 50, 'distiller', FUTURE, 2 | 1],
-    'd2|building': [PROF_XP_MAX, null, 'siegewright', 100, 'master-joiner', FUTURE, 0],   // the lower's change kept
-    'd3|smithing': [x(100), 'armoursmith', 'master-jeweller', 50, 'weaponsmith', FUTURE, 2],
-    'd4|provisioning': [x(80), 'field-cook', null, null, null, null, 1],
-  });
-});
-
-test('CRAFT3 merge (0088): the crafter\'s limit holds after it - a merged track is past Journeyman only where a parent was, so no character stands past it in three', () => {
-  const x = (r) => xpForRank(r);
-  const out = merged([
-    { c: 'e1', prof: 'smithing', xp: x(70) }, { c: 'e1', prof: 'jewelcrafting', xp: x(60) },
-    { c: 'e1', prof: 'carpentry', xp: x(50) }, { c: 'e1', prof: 'masonry', xp: x(50) },
-    { c: 'e1', prof: 'alchemy', xp: x(30) }, { c: 'e1', prof: 'cooking', xp: x(50) },
-  ]);
-  const past = Object.entries(out).filter(([, v]) => v[0] > x(50)).map(([k]) => k);
-  assert.deepEqual(past, ['e1|smithing'], 'two parents past it are one craft past it');
 });
 
 // ─── THE LAW ─────────────────────────────────────────────────────────
