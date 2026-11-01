@@ -84,6 +84,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Lint ratchet is current
+        run: node tools/lintRatchet.mjs --strict
       - name: Type-check
         run: npm run types
 
