@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,11 @@
     "test:changed": "node tools/testChanged.mjs",
     "test:shard": "node tools/testShards.mjs",
     "test:times": "node tools/testTimes.mjs",
-    "types": "tsc -p tsconfig.json",
+    "types": "tsc -p tsconfig.json && tsc -p tsconfig.node.json",
+    "format:check": "node tools/check-changed.mjs format-check",
+    "format:fix": "node tools/check-changed.mjs format-fix",
+    "markdown": "node tools/check-changed.mjs markdown",
+    "spell": "node tools/check-changed.mjs spell",
     "check": "npm run lint && npm run types && npm test && npm run build",
     "prebuild": "node scripts/buildTag.mjs",
     "postbuild": "git checkout -- src/buildTag.js",
@@ -41,11 +45,15 @@
     "mwattach": "node tools/mwAttachProbe.mjs"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "acorn": "^8.18.0",
+    "cspell": "^10.4.0",
     "esbuild": "^0.28.1",
     "eslint": "^10.10.0",
+    "markdownlint-cli2": "^0.24.0",
     "playwright": "^1.56.0",
     "pngjs": "^7.0.0",
+    "prettier": "^3.9.10",
     "rollup": "^4.62.2",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"

@@ -12,7 +12,7 @@ online play or for a written design that is better for play ([README.md](README.
 
 | Tool | Version | Used for |
 | --- | --- | --- |
-| Node.js | `^20.19.0` or `>=22.12.0` (`package.json` `engines`) | Vite, the test runner, every tool |
+| Node.js | `>=22.18.0` (`package.json` `engines`) | Vite, the test runner, every tool |
 | npm | the one that ships with Node | installs |
 | Git Bash, or any POSIX shell | - | `tools/fetch-data.sh` and the examples below |
 | `curl` and `unzip` | - | fetching ARENA2 |

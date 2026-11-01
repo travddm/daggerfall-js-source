@@ -22,10 +22,10 @@ import { isMain } from './lib/isMain.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const TIMES_FILE = 'tools/testTimes.json';
 
-/** The suite's files - every `*.test.js` under test/, its folders' among them - sorted. */
+/** The suite's files - every `*.test.js` and `*.test.ts` under test/, its folders' among them - sorted. */
 export function testFiles(root = ROOT) {
   // TIDY5: every test file under test/, its area's folder and its feature's
-  return readdirSync(join(root, 'test'), { recursive: true }).map((f) => f.split('\\').join('/')).filter((f) => f.endsWith('.test.js')).sort().map((f) => `test/${f}`);
+  return readdirSync(join(root, 'test'), { recursive: true }).map((f) => f.split('\\').join('/')).filter((f) => /\.test\.(js|ts)$/.test(f)).sort().map((f) => `test/${f}`);
 }
 
 /** The recorded times (file -> ms), or none. */

@@ -15,7 +15,7 @@ the repository, the live domain, the servers and the desktop app's identifier
 still carry the old `daggerfall` spellings - renaming those is a move outside
 this tree (BR1, BR5).
 
-Play it: https://daggerfalljs.dev/
+Play it: <https://daggerfalljs.dev/>
 
 The site is `index.html` (what it is, how to play, credits); the game is
 `play/index.html`, served at `/play/`. Both deploy from `main` to GitHub
@@ -34,9 +34,9 @@ costs about **$600 per month** to sustain across development tooling,
 multiplayer infrastructure, testing, builds, releases, and mod compatibility
 work.
 
-Support on Patreon: https://www.patreon.com/c/dfenhanced
+Support on Patreon: <https://www.patreon.com/c/dfenhanced>
 
-Support on Ko-fi: https://ko-fi.com/daggerfallonline
+Support on Ko-fi: <https://ko-fi.com/daggerfallonline>
 
 The monthly goal, suggested support levels, and funding breakdown are in
 [`SUPPORT.md`](SUPPORT.md). Sponsorship does not lock gameplay, source code,
@@ -50,14 +50,15 @@ they are fixed.
 
 ## Scripts
 
-Node 20.19+ or 22.12+ (Vite 8's floor; CI runs 22).
+Node 22.18+ (the first 22 release that runs `.ts` files; CI runs 22).
 
 - `npm run dev` - Vite dev server
 - `npm test` - Node test runner
 - `npm run build` - production build
 - `npm run lint` - eslint over `src/` (no-undef, no-dupe-keys, ...)
 - `npm run check` - lint + test + build (pre-push gate)
-- `npm run cites [-- --apply | -- --check]` - write a line number cited into our code as an anchor, `file.js:"the line's text"`, and resolve every anchor (tools/citeAnchor.mjs)
+- `npm run cites [-- --apply | -- --check]` - write a line number cited into our code as an anchor,
+  `file.js:"the line's text"`, and resolve every anchor (tools/citeAnchor.mjs)
 - `npm run shot [out.png]` - headless render proof (needs ARENA2_PATH + provisioned Chromium)
 - `node tools/landingProbe.mjs` - the landing page and `/play/` in a real browser, no ARENA2 needed
 - `node tools/verify-deploy.mjs` - after a push: proves the live `/play/` serves your commit
@@ -66,8 +67,8 @@ Node 20.19+ or 22.12+ (Vite 8's floor; CI runs 22).
 
 `app/` is the downloadable build: an Electron shell that loads the
 same `dist/` the website deploys and adds what a browser can't -
-**saves as real files** (DFU's own layout: `Saves/SAVE<n>/SaveData.txt`
-+ `SaveInfo.txt` + `Screenshot.jpg`, settings under `Prefs/`) and
+**saves as real files** (DFU's own layout: `Saves/SAVE<n>/SaveData.txt` +
+`SaveInfo.txt` + `Screenshot.jpg`, settings under `Prefs/`) and
 **ARENA2 read straight from your folder on disk** (found for you on
 first run, or picked once - no ingest, no diet, full sky sets). The browser build
 is unchanged; the storage seam is `src/systems/appStorage.js`.
