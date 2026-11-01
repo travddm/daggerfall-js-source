@@ -12,8 +12,9 @@ import { SPELL_POWER_MOST } from '../../src/systems/spell/spellPower.js';
 const SWINGS = 1500;
 const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'average');
 
-/** Power ceilings at level 45 with every source at its cap and DFU's own foe row. Before B1 these were x20 to x50. */
-const MAXED_POWER_MOST = Object.freeze({ warrior: 1.45, archer: 2.5, spellsword: 1.9, mage: 1.85, thief: 1.5 });
+/** Power at level 45 with every source at its cap, no ARENA2: what B1 reached, rounded up in the third place. A ceiling that later lanes
+ *  (B3 bow rules, B5 health, the spell magnitudes) lower toward 1.5 and never raise. Before B1 these were x20 to x54. */
+const MAXED_POWER_MOST = Object.freeze({ warrior: 1.38, archer: 2.42, spellsword: 1.86, mage: 1.79, thief: 1.42 });
 
 test('budget: the stacking caps are the ones B1 set (the blow x1.75, the hurt keeps 74%, a spell x1.25)', () => {
   assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
