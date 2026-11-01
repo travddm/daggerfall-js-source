@@ -34,7 +34,7 @@ import { createWildFight } from '../../src/net/wild/wildFight.js';
 import { createWildRemains } from '../../src/net/wild/wildRemains.js';
 import { wildKin, sameGuild, WILD_GRACE } from '../../src/net/wild/wildRef.js';
 import { readWildReceipt, readWildCollect, WILD_COLLECT_TTL_S } from '../../src/net/wild/wildReceipt.js';
-import { validWildData, validWildOut, validWildRefOut, worldRoom, PIXEL_UNITS, WILD_ITEMS_MAX, WILD_DATA_MAX, SOCIAL_ROOM, RELAY_VERSION, relaySupportsWildCollect } from '../../src/net/wire.js';
+import { validWildData, validWildOut, validWildRefOut, worldRoom, PIXEL_UNITS, WILD_ITEMS_MAX, WILD_DATA_MAX, SOCIAL_ROOM, RELAY_VERSION } from '../../src/net/wire.js';
 import { SIEGE_UNITS_PER_M } from '../../src/net/siege/siegeRef.js';
 import { WILD_ESCROW_HOLD_S, escrowBackAt } from '../../server-account/src/wild.js';
 import { WILD_TEXT, wildDeathLines } from '../../src/systems/wild/wildZone.js';

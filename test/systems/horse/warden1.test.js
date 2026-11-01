@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   validParkData, parkKeyOf, parkKey, PIXEL_UNITS, WARDEN_ROAD_MS, WARDEN_TOWN_CAP, WARDEN_LAND_REACH, WARDEN_TOWN_MAX,
-  wardenVerdicts, wardenDue, validParkYeet, parkSpotOf, parkSameSpot, WARDEN_RELAY_MIN, POSE_BOUND, RELAY_VERSION, WARDEN_SPOT_NATIVES,
+  wardenVerdicts, wardenDue, validParkYeet, parkSpotOf, parkSameSpot, POSE_BOUND, WARDEN_SPOT_NATIVES,
 } from '../../../src/net/wire.js';
 import { fakeRooms } from '../../fakeRoom.mjs';
 import {
@@ -63,7 +63,7 @@ const road = (extra = {}) => ({ w: W(), ly: LY, tw: 77, rd: 1, ...extra });
 
 // ─── the wire ───────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('WARDEN1 wire: the park word carries its landing (within a map pixel of its wagon), and with it its town and its road - none of them without a landing; the relay this client ships with keeps the watch\'s clock (WARDEN_RELAY_MIN)', () => {
+test('WARDEN1 wire: the park word carries its landing (within a map pixel of its wagon), and with it its town and its road - none of them without a landing', () => {
   const v = validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw: 77, rd: 1 } });
   assert.deepEqual(v.r, { w: W(), ly: LY, tw: 77, rd: 1 });
   assert.deepEqual(validParkData({ c: CA, a: [AX, AZ], r: { w: W(), tw: 77, rd: 1 } }).r, { w: W() }, 'no landing: never thrown, so neither the town nor the road rides');
@@ -75,8 +75,6 @@ test('WARDEN1 wire: the park word carries its landing (within a map pixel of its
   for (const tw of [-1, 1.5, '77', WARDEN_TOWN_MAX + 1]) assert.equal('tw' in validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw } }).r, false, `town ${tw}`);
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw: WARDEN_TOWN_MAX } }).r.tw, WARDEN_TOWN_MAX, 'an unsigned map id');
   assert.equal('rd' in validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, rd: 2 } }).r, false, 'the road is 1 or nothing');
-  assert.equal(WARDEN_RELAY_MIN, 191);
-  assert.ok(Number(RELAY_VERSION.slice(5)) >= WARDEN_RELAY_MIN, 'AUDIT WARDEN1 D17: relaySupportsWarden had no caller - the version law is the relay\'s own');
 });
 
 test('WARDEN1 wire: wardenVerdicts - a road team WARDEN_ROAD_MS after it came to stand (not a moment before); a town past WARDEN_TOWN_CAP throws its longest parked, ties by key; a team already thrown, or one with no landing, neither thrown nor counted; `next` the soonest road team', () => {

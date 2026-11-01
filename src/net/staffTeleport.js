@@ -7,10 +7,8 @@ import { instanceOfWord, instanceOf, instanceWord } from './instanceRoom.js';   
 import { validPartyPose, gatePixelOk, worldPixelOk } from './wire.js';   // STAFF-PANEL5-FOLLOW: a where note, as the hub keeps it; WW2: a gate's pixel, its lane's map; AUDIT RELEASE R2-1: the world's pixel
 import { GATE_COURTS_MAX } from './gate/gateCourts.js';   // AUDIT GATE-COURTS C6: a court's number on a staff landing - gateCourts.js imports nothing
 import { t } from '../systems/textManager.js';   // STAFF-PANEL5-FOLLOW-FIX: a finished /tp's line in the player's language (L10N4)
-export const STAFF_TP_RELAY_MIN = 159;   // world156 now belongs to upstream's arena; unpublished local candidates through 158 are superseded by the combined law.
 export const STAFF_TP_TIMEOUT_MS = 8000;
 export const STAFF_TP_ERRORS = Object.freeze(['offline', 'ambiguous', 'busy', 'private', 'battle', 'unavailable', 'denied']);
-export const staffTeleportSupported = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= STAFF_TP_RELAY_MIN;
 /** STAFF-PANEL5-FOLLOW: who the hub answers from the target's where note, never asking the target's game - an Admin
  *  (`dev`) alone, because the silent teleport is an Admin's tool. A Dungeon Master's /tp @player stays today's capture. */
 export const quietTeleportAllowed = (glyphs) => Array.isArray(glyphs) && glyphs.includes('dev');

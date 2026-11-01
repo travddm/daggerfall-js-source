@@ -12,7 +12,7 @@ import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
 import { FOES_STALE_MS, FOES_FULL_MS, PIXEL_UNITS, RELAY_VERSION } from '../../src/net/wire.js';
-import { seatOf, createSeatClock, seatStreams, relaySupportsSeatLive, SEAT_RELAY_MIN } from '../../src/net/seatLive.js';
+import { seatOf, createSeatClock, seatStreams } from '../../src/net/seatLive.js';
 
 const at = (k = 0) => ({ x: PIXEL_UNITS + 10 + k, y: 0, z: PIXEL_UNITS + 10, yaw: 0, pitch: 0, mv: 0 });
 const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);
@@ -146,9 +146,9 @@ test('SEAT-LIVE THE RELAY: the seat\'s leave is said - a joiner named by the hos
   assert.equal(seatStreams(ROOM), true); assert.equal(seatStreams('interior:m187.65537'), false); assert.equal(seatStreams('cell:0,0'), false);
 });
 
-test('SEAT-LIVE THE PAGE: the session asks a seat-live relay for a silent host\'s seat - an unmoved pose every FOES_FULL_MS once the named host\'s stream has not come for FOES_STALE_MS, none while it comes, none of an older relay, none for its own seat (mutants: no ask; the ask every frame; the host\'s frame no word)', () => {
+test('SEAT-LIVE THE PAGE: the session asks a seat-live relay for a silent host\'s seat - an unmoved pose every FOES_FULL_MS once the named host\'s stream has not come for FOES_STALE_MS, none while it comes, none for its own seat (mutants: no ask; the ask every frame; the host\'s frame no word)', () => {
   const quiet = (fn) => { const l = console.log, w = console.warn, i = console.info; console.log = console.warn = console.info = () => {}; try { return fn(); } finally { console.log = l; console.warn = w; console.info = i; } };
-  const rig = (v = `world${SEAT_RELAY_MIN}`, host = 'hhhh-0001') => {
+  const rig = (v = RELAY_VERSION, host = 'hhhh-0001') => {
     const { FakeWS, sockets } = fakeSocketClass();
     const c = { t: 1_000_000 };
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'p', id: 'pppp-0002', secret: 'secret-of-pppp-0002', WebSocketImpl: FakeWS, now: () => c.t });
@@ -161,7 +161,6 @@ test('SEAT-LIVE THE PAGE: the session asks a seat-live relay for a silent host\'
     const run = (ms) => { for (let k = 0; k < ms; k += 100) { c.t += 100; quiet(() => s.tick()); } };
     return { s, ws, c, poses, run };
   };
-  assert.equal(relaySupportsSeatLive(`world${SEAT_RELAY_MIN}`), true); assert.equal(relaySupportsSeatLive(`world${SEAT_RELAY_MIN - 1}`), false);
   const p = rig();
   const p0 = p.poses();
   p.run(FOES_STALE_MS - 200);
@@ -178,10 +177,6 @@ test('SEAT-LIVE THE PAGE: the session asks a seat-live relay for a silent host\'
   const p2 = p.poses();
   p.run(FOES_STALE_MS * 2);
   assert.equal(p.poses(), p2, 'named: the seat is mine, nothing to ask');
-  const old = rig(`world${SEAT_RELAY_MIN - 1}`);
-  const o0 = old.poses();
-  old.run(FOES_STALE_MS * 2);
-  assert.equal(old.poses(), o0, 'an older relay keeps the eldest whatever is said: never asked');
 });
 
 test('SEAT-LIVE THE PAGE: the page\'s own absence spends no seat\'s patience - a gap of FOES_STALE_MS between its frames gives the named seat FOES_STALE_MS again, so SEAT-HEAL never takes the foes on the first frame back; scenes/world.js tells the clock each frame before it reads the seat, and stamps it where the old heartbeat was (mutants: the gap unread; the gap\'s bound off by one)', () => {
@@ -262,10 +257,7 @@ test('SEAT-LIVE (AUDIT FB1018D L4-3): THE FRAMES THAT HOLD A SEAT ARE A PAGE\'S 
   }
 });
 
-test('SEAT-LIVE (AUDIT FB1018D L4-1, L4-3): THE RELAY TO ASK IS THE ONE THAT CARRIES THE LAW, AND A HOST NAMED IS HEARD - world220 first (world219 is EG-PERFECT\'s, with no seat law), and this build\'s own; a session told a new host asks nothing for FOES_STALE_MS after (mutants: the min a relay too low; the host frame not heard)', () => {
-  assert.equal(SEAT_RELAY_MIN, 220, 'world220 first carries net/seatLive.js');
-  assert.equal(relaySupportsSeatLive('world219'), false, 'EG-PERFECT\'s world219 keeps the eldest');
-  assert.equal(relaySupportsSeatLive(RELAY_VERSION), true, 'this build\'s relay');
+test('SEAT-LIVE (AUDIT FB1018D L4-3): A HOST NAMED IS HEARD - a session told a new host asks nothing for FOES_STALE_MS after (mutants: the host frame not heard)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   const c = { t: 1_000_000 };
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'p', id: 'pppp-0002', secret: 'secret-of-pppp-0002', WebSocketImpl: FakeWS, now: () => c.t });

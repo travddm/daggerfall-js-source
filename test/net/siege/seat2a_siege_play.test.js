@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../../chargenDom.mjs';
-import { validSiegeOut, SIEGE_END_RESULTS, SIEGE_ROLL_MAX, PIXEL_UNITS } from '../../../src/net/wire.js';
+import { validSiegeOut, SIEGE_END_RESULTS, SIEGE_ROLL_MAX, PIXEL_UNITS, RELAY_VERSION } from '../../../src/net/wire.js';
 import { SIEGE_RESULTS, mintSiegeReceipt } from '../../../src/net/siege/siegeReceipt.js';
 import { foldSiege, SIEGE_STATE_EMPTY, siegeBarLines, siegeSidesLine, siegeSelfLines, siegeResultTitle, siegeResultLine, siegeHonourLine, siegeClockText, bannerMark, siegeHudModel } from '../../../src/net/siege/siegeLink.js';
 import { createSiegeHud, SIEGE_HUD_STYLE_ID } from '../../../src/ui/siegeHud.js';
@@ -218,7 +218,7 @@ test('SEAT2a part four THE FIELD FROM THE TOWN: the Throne a pace out of the pal
   assert.deepEqual(buildingKeysOfType(blocks, (x, y, i) => `${x}.${y}.${i}`, 14), ['1.2.0'], 'the records the block holds, no more');
 });
 
-test('SEAT2a part four THE SOCKET: a siege\'s room hello carries a fresh pass minted for it (none elsewhere); its words reach the battle from my own socket alone; my words leave only at a relay that fights battles, in a siege\'s room, under the bucket (mutants: the pass on the hello; the room; the gate; the projection)', async () => {
+test('SEAT2a part four THE SOCKET: a siege\'s room hello carries a fresh pass minted for it (none elsewhere); its words reach the battle from my own socket alone; my words leave only once welcomed, in a siege\'s room, under the bucket (mutants: the pass on the hello; the room; the gate; the projection)', async () => {
   const sockets = [];
   class FakeWS {
     constructor(url) { this.url = url; this.sent = []; sockets.push(this); }
@@ -245,9 +245,8 @@ test('SEAT2a part four THE SOCKET: a siege\'s room hello carries a fresh pass mi
   ws.open(); await settle();
   assert.equal(ws.sent[0].t, 'hello');
   assert.equal(ws.sent[0].sp, `v1.pass1.${room.length}`, 'a pass minted for this hello');
-  assert.equal(o.sendSiege({ k: 'in' }), false, 'not before a relay that fights battles welcomed the socket');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: null, now: AT, v: 'world149' });
-  assert.equal(o.siegeOk, true);
+  assert.equal(o.sendSiege({ k: 'in' }), false, 'not before the socket is welcomed');
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: null, now: AT, v: RELAY_VERSION });
   assert.equal(o.sendSiege({ k: 'in' }), true);
   assert.deepEqual(ws.sent.at(-1), { t: 'siege', k: 'in' });
   assert.equal(o.sendSiege({ k: 'blow', to: 'x' }), false, 'a malformed word never leaves');
@@ -262,14 +261,9 @@ test('SEAT2a part four THE SOCKET: a siege\'s room hello carries a fresh pass mi
   assert.equal(cell.sent[0].sp, undefined, 'a pass rides a siege\'s hello alone');
   // a reconnect mints again
   ws.onclose?.({ code: 1006, reason: '' });
-  const old = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0002', secret: 'shh-shh-shh-0002', WebSocketImpl: FakeWS, now: () => AT });
-  old.join(room, pose(0, 0));
-  const w2 = sockets.at(-1); w2.open(); await settle();
-  w2.receive({ t: 'welcome', id: 'mac-0002', peers: [], host: 'mac-0002', world: null, now: AT, v: 'world146' });
-  assert.equal(old.sendSiege({ k: 'in' }), false, 'an older relay closes on the frame: never sent');
 });
 
-test('SEAT2a part four THE SESSION: no field, not in the town; an old relay said; an unsettled field asked again after its wait; a pass joins the battle\'s room and mints for every hello; `in` said once an open socket, again after a reconnect; a pull-back and my own rise at the camp move me; the end\'s receipt carried; the HUD drawn; foes are the other side\'s standing fighters - a blow and a harmful cast for them alone, a heal for a side-mate; the window\'s close leaves (mutants: each)', async () => {
+test('SEAT2a part four THE SESSION: no field, not in the town; an unsettled field asked again after its wait; a pass joins the battle\'s room and mints for every hello; `in` said once an open socket, again after a reconnect; a pull-back and my own rise at the camp move me; the end\'s receipt carried; the HUD drawn; foes are the other side\'s standing fighters - a blow and a harmful cast for them alone, a heal for a side-mate; the window\'s close leaves (mutants: each)', async () => {
   let now = AT;
   const said = [], moved = [], sent = [], kept = [];
   const online = { id: 'me-00001', room: null, status: 'connecting', mintSiegePass: null, sendSiege: (f) => { sent.push(f); return true; } };
@@ -281,11 +275,7 @@ test('SEAT2a part four THE SESSION: no field, not in the town; an old relay said
   const claims = { keep: (r) => kept.push(r), offer: () => kept.push('offered') };
   const seat = { key: 3021, name: 'Anticlere' };
   const fight = { kind: 'siege', tier: 'palace', attackerGuild: EO, defenderGuild: SH };
-  let relay = false;
-  const ses = createSiegeSession({ online, pass, claims, hud, nowMs: () => now, movePlayer: (p) => moved.push(p), say: (t) => said.push(t), relayOk: () => relay });
-  assert.equal(ses.enter(seat, fight, [[1, 2]]), false);
-  assert.deepEqual(said, [SIEGE_SESSION_TEXT.old]);
-  relay = true;
+  const ses = createSiegeSession({ online, pass, claims, hud, nowMs: () => now, movePlayer: (p) => moved.push(p), say: (t) => said.push(t) });
   assert.equal(ses.enter(seat, fight, null), false);
   assert.equal(said.at(-1), SIEGE_SESSION_TEXT.notHere('Anticlere'));
   const sf = [[1, 2], [3, 4]];
@@ -343,7 +333,7 @@ test('SEAT2a part four THE SESSION: no field, not in the town; an old relay said
   assert.equal(online.mintSiegePass, null);
   assert.deepEqual([hudCalls.at(-1), said.at(-1)], ['hidden', SIEGE_SESSION_TEXT.left]);
   // a refusal leaves at once
-  const r2 = createSiegeSession({ online, pass: async () => ({ ok: false, error: 'pass-late', text: 'closed' }), nowMs: () => now, say: (t) => said.push(t), relayOk: () => true });
+  const r2 = createSiegeSession({ online, pass: async () => ({ ok: false, error: 'pass-late', text: 'closed' }), nowMs: () => now, say: (t) => said.push(t) });
   r2.enter(seat, fight, sf); await Promise.resolve(); await Promise.resolve();
   assert.equal(r2.active(), false);
   assert.equal(said.at(-1), SIEGE_SESSION_TEXT.refused('closed'));
@@ -352,7 +342,7 @@ test('SEAT2a part four THE SESSION: no field, not in the town; an old relay said
   const book = createTownSeatBook({ door: { claimSiege: async () => ({ ok: false, error: 'receipt', why: 'signature' }) }, character: () => 'c1', storage: null });
   assert.equal((await book.claimSiege('s1.a.b')).why, 'signature', 'the rung the carrier reads');
   // a spectator strikes nobody
-  const w = createSiegeSession({ online, pass: async () => ({ ok: true, pass: 'v1.a.b', side: 'watch', week: 20, window: 9e9 }), nowMs: () => now, relayOk: () => true });
+  const w = createSiegeSession({ online, pass: async () => ({ ok: true, pass: 'v1.a.b', side: 'watch', week: 20, window: 9e9 }), nowMs: () => now });
   w.enter(seat, fight, sf); await Promise.resolve(); await Promise.resolve();
   w.onSiege({ k: 'st', f: [['foe-0001', 400, 400, 0, 2]] }, w.room());
   assert.deepEqual([w.foes(), w.isFoe('foe-0001'), w.cast('foe-0001', 5)], [[], false, false]);

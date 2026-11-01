@@ -3,8 +3,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { CHAT_TABS, ChatLog, OPT_CHANNELS, isRpText, rpText, notJoinedText, optJoinedText, optJoinedSayText, optLeftText, optWaitText, tradeChanOldText, alreadyJoinedText } from '../../src/net/chat.js';
-import { CHAT_TRADE_ROOM, CHAT_LFG_ROOM, CHAT_ROOMS, isChatRoom, isRegionRoom, TRADE_CHAN_RELAY_MIN, relaySupportsTradeChan, RELAY_VERSION } from '../../src/net/wire.js';
+import { CHAT_TABS, ChatLog, OPT_CHANNELS, isRpText, rpText, notJoinedText, optJoinedText, optJoinedSayText, optLeftText, optWaitText, alreadyJoinedText } from '../../src/net/chat.js';
+import { CHAT_TRADE_ROOM, CHAT_LFG_ROOM, CHAT_ROOMS, isChatRoom, isRegionRoom, RELAY_VERSION } from '../../src/net/wire.js';
 import { parseChatLine, CHANNEL_COMMANDS, HELP_LINES, JOIN_CHANNELS, badJoinText } from '../../src/net/chatCommands.js';
 import { RP_COLOURS, CHANNEL_COLOURS, CHAT_GROUNDS, PING_GROUNDS, COLOURED_LINE, contrast } from '../../src/ui/chatColours.js';
 import { bubbleLineOk } from '../../src/ui/nameLayer.js';
@@ -15,15 +15,11 @@ import { CHAT_CSS, createChatPanel } from '../../src/ui/chatPanel.js';
 
 const rd = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
 
-test('CHAT-TRADE wire: the Trade and LFG channels are two whitelisted rooms of their own, no region\'s; the relay that opens them is world201 and the version moved', () => {
+test('CHAT-TRADE wire: the Trade and LFG channels are two whitelisted rooms of their own, no region\'s; the version moved', () => {
   assert.deepEqual([CHAT_TRADE_ROOM, CHAT_LFG_ROOM], ['chat:trade', 'chat:lfg']);
   for (const room of [CHAT_TRADE_ROOM, CHAT_LFG_ROOM]) { assert.ok(CHAT_ROOMS.has(room), room); assert.ok(isChatRoom(room), room); assert.ok(!isRegionRoom(room), room); }
   assert.equal(isChatRoom('chat:trade.1'), false, 'a whitelist, not a prefix');
-  assert.equal(TRADE_CHAN_RELAY_MIN, 201);
-  assert.equal(relaySupportsTradeChan('world200'), false);
-  assert.equal(relaySupportsTradeChan('world201'), true);
-  assert.equal(relaySupportsTradeChan('world2010x'), false);
-  assert.equal(RELAY_VERSION, 'world281');
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 test('CHAT-TRADE tabs: Trade and LFG ride rooms of their own and stand OFF the bar until joined - a player who never joins sees the bar as it was', () => {
@@ -71,7 +67,6 @@ test('CHAT-TRADE commands: /trade, /tr and /lfg say a line on their channel; /jo
   assert.equal(alreadyJoinedText('lfg'), 'You are already in the LFG channel. /leave lfg leaves it.', 'AUDIT CHAT-TRADE A5');
   assert.match(rd('src/scenes/world.js'), /note\(on \? alreadyJoinedText\(cmd\.chan\) : notJoinedText\(cmd\.chan\)\)/);
   assert.equal(optWaitText('lfg'), 'The LFG channel is still opening. Try again in a moment.');
-  assert.ok(tradeChanOldText().includes('update'));
   assert.equal(optJoinedSayText('trade'), 'Trade channel joined. Press Enter to speak. /leave trade leaves it.');
   // L10N4: the new words are the text core's, READ WHEN SHOWN - a getter on the tab's hint and the /help rows, never a string
   // the boot's import froze in whatever language it found
@@ -83,10 +78,10 @@ test('CHAT-TRADE commands: /trade, /tr and /lfg say a line on their channel; /jo
   assert.match(rd('src/net/siege/siegeSession.js'), /isBattleLeaveCommand = \(text\) => \/\^\\\/leave\$\/i\.test/, 'a bare /leave is still the battle\'s');
 });
 
-test('CHAT-TRADE host: each tab follows its choice - on the bar while joined, joined only past a relay that opens it, left when the choice is taken back; a line said to one not joined joins it and stays in the field', () => {
+test('CHAT-TRADE host: each tab follows its choice - on the bar while joined, joined once the World link is welcomed, left when the choice is taken back; a line said to one not joined joins it and stays in the field', () => {
   const host = rd('src/scenes/world.js');
   assert.match(host, /const joined = optJoined\(id\);\n      chatLog\.setShown\(id, joined\);\n      const room = joined \? c\.room : null;/);
-  assert.match(host, /if \(!room\) \{ chatLog\.setRoom\(id, null, null\); link\.leave\(\); continue; \}\n      if \(!chatLinks\.get\('world'\)\?\.tradeChanOk\) continue;\n      chatLog\.setRoom\(id, room, c\.name\);\n      link\.join\(room\);/);
+  assert.match(host, /if \(!room\) \{ chatLog\.setRoom\(id, null, null\); link\.leave\(\); continue; \}\n      if \(!chatLinks\.get\('world'\)\?\.welcomed\) continue;\n      chatLog\.setRoom\(id, room, c\.name\);\n      link\.join\(room\);/);
   assert.match(host, /chatLangFrame\(\);   \/\/ CHAT-LANG[^\n]*\n    chatOptFrame\(\);   \/\/ CHAT-TRADE/);
   assert.equal((host.match(/return why\(optWhy\(tabId\) \?\? optWaitText\(tabId\)\);/g) ?? []).length, 2, 'the line\'s door and the roll\'s');
   assert.match(host, /if \(\(tabId === 'trade' \|\| tabId === 'lfg'\) && !tab\?\.room\) return optWhy\(tabId\);/, 'the strip says why');

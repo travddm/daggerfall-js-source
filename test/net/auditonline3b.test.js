@@ -10,6 +10,7 @@ import { OnlineSession, FALLEN_MAX, steadyClock, steadyNow } from '../../src/net
 import { RemotePlayers } from '../../src/net/remotePlayers.js';
 import { accountTokenMinter, SESSION_KEY, TOKEN_REUSE_MS } from '../../src/net/accountClient.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+import { RELAY_VERSION } from '../../src/net/wire.js';
 
 const session = (o = {}) => {
   const { FakeWS, sockets } = fakeSocketClass();
@@ -20,30 +21,12 @@ const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const STILL = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 };
 const helloOf = (ws) => JSON.parse(ws.sent.find((x) => x.startsWith('{"t":"hello"')));
 
-// ── C-1: THE OVERWORLD'S WORD STAYED WITH THE CELL LEFT ─────────────────────────────────────────────────────────
-
-test('AUDIT ONLINE 3 (the second read) C-1: a crossing carries `owOk` and `owGraveOk` both ways - a cell whose relay keeps no graves is never sent `gr` because the cell left kept them', async () => {
-  let t = 1e6;
-  const { s, sockets } = session({ now: () => t });
-  s.join('world:10,10', STILL); const A = sockets[0]; await A.onopen(); A.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world212' });
-  s.setHalo(['world:11,10']); const B = sockets[1]; await B.onopen(); B.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world211' });
-  assert.deepEqual([s.owOk, s.owGraveOk], [true, true], 'my cell keeps the ledger and its graves');
-  assert.deepEqual([s._halo.get('world:11,10').owOk, s._halo.get('world:11,10').owGraveOk], [true, false], 'the halo says for itself');
-  s.join('world:11,10', STILL);
-  assert.equal(s._ws, B, 'B promoted');
-  assert.deepEqual([s.owOk, s.owGraveOk], [true, false], 'the cell crossed into says for itself - a world211 relay closes the socket on `gr`');
-  assert.deepEqual([s._halo.get('world:10,10').owOk, s._halo.get('world:10,10').owGraveOk], [true, true], 'and the cell left keeps its own word');
-  s.join('world:10,10', STILL);
-  assert.equal(s._ws, A, 'and back');
-  assert.deepEqual([s.owOk, s.owGraveOk], [true, true]);
-});
-
 // ── A7: A GHOST'S RECONNECT SAID IT LIVED ──────────────────────────────────────────────────────────────────────
 
 test('AUDIT ONLINE 3 (the second read) A7: after my death, every hello says it (dd, standing still) - a Wild ghost\'s reconnect never stands me up on my body; a pose said (a rise) and a leave end it', async () => {
   let t = 1e6;
   const { s, sockets } = session({ now: () => t });
-  s.join('world:10,10', STILL); await sockets[0].onopen(); sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world212' });
+  s.join('world:10,10', STILL); await sockets[0].onopen(); sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
   t += 1000; s.sendPose({ ...STILL, x: 5, mv: 1 });
   assert.equal(helloOf(sockets[0]).pose.dd, undefined, 'a living hello');
   assert.equal(s.sendDeath(), true);
@@ -55,12 +38,12 @@ test('AUDIT ONLINE 3 (the second read) A7: after my death, every hello says it (
   const p = helloOf(again).pose;
   assert.deepEqual([p.dd, p.mv, p.x], [1, 0, 5], 'the reconnect\'s hello is the death\'s pose - where I fell, lying');
   // a rise: a pose said ends it
-  again.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world212' });
+  again.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
   t += 1000; s.sendPose({ ...STILL, x: 6 });
   again.drop(1006); t += 60_000; s.tick(); await sockets[2].onopen();
   assert.equal(helloOf(sockets[2]).pose.dd, undefined, 'risen: a living hello');
   // a leave ends it too - the next room's hello is a new life's
-  sockets[2].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world212' });
+  sockets[2].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
   s.sendDeath(); s.leave();
   s.join('world:20,20', STILL); await sockets[3].onopen();
   assert.equal(helloOf(sockets[3]).pose.dd, undefined, 'a new room after the ghost let go: alive');
@@ -135,7 +118,7 @@ test('AUDIT ONLINE 3 (the second read) A5: a roster composed before the death an
   s._receive(JSON.stringify({ t: 'pose', id: 'bob-0002', p: { ...STILL, dd: 1, ts: 200 } }), 'world:3,12');
   assert.deepEqual(deaths, ['bob-0002']);
   t += 300;
-  s._receive(JSON.stringify({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', look: null, pose: { ...STILL, mv: 1, ts: 150 } }], host: null, now: Date.now(), v: 'world212' }), 'world:4,12');
+  s._receive(JSON.stringify({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', look: null, pose: { ...STILL, mv: 1, ts: 150 } }], host: null, now: Date.now(), v: RELAY_VERSION }), 'world:4,12');
   assert.equal(s.peers.has('bob-0002'), false, 'the slower room\'s roster, from before he fell, stands nobody on his body');
   s._receive(JSON.stringify({ t: 'join', id: 'bob-0002', name: 'Bob', look: null, pose: { ...STILL, x: 50, ts: 900 } }), 'world:4,12');
   assert.equal(s.peers.has('bob-0002'), true, 'an introduction after the death is a rise');

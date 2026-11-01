@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HEARTBEAT_MS, PING_MS, KEEPALIVE_FAN_MS } from '../../src/net/wire.js';
+import { HEARTBEAT_MS, PING_MS, KEEPALIVE_FAN_MS, RELAY_VERSION } from '../../src/net/wire.js';
 import { OnlineSession, PEER_TIMEOUT_MS, POSE_HZ } from '../../src/net/online.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -75,7 +75,7 @@ test('RELAY-H1: a standing presence session pings at PING_MS and poses only at H
   const s = new OnlineSession({ url: 'wss://relay.test/', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, id: 'mac-0001', secret: 'shh-shh-shh-0001', WebSocketImpl: FakeWS, now: () => now });
   s.join('dungeon:m187853213', pose(0));
   sockets[0].open();
-  sockets[0].message({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob' }] });   // SD-HELLO (
+  sockets[0].message({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob' }], v: RELAY_VERSION });   // SD-HELLO (
   assert.equal(s.sendPose(pose(1)), true, 'the first pose goes');
   sockets[0].sent.length = 0; sockets[0].raw.length = 0;
   // stand still for exactly one minute, ticking every second, offering the same pose each frame

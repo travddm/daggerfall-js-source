@@ -9,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { riteFaithfulOf, riteRosterFell, cageStands, riteNativeOf, riteLocalOf, RITE_UNITS_PER_M, RITE_GRACE_MS, RITE_CAREERS } from '../../src/net/gate/gateRite.js';
 import { gateTimes, GATE_COLLAPSE_MS } from '../../src/net/gate/gateLaw.js';
-import { validRiteIn, validRiteOut, parseClient, RITE_OUT_KINDS, worldRoom, SOCIAL_ROOM, RITE_KEY, GATE_INTERNAL_FELL, relaySupportsCage, CAGE_RELAY_MIN } from '../../src/net/wire.js';
+import { validRiteIn, validRiteOut, parseClient, RITE_OUT_KINDS, worldRoom, SOCIAL_ROOM, RITE_KEY, GATE_INTERNAL_FELL } from '../../src/net/wire.js';
 import { createRiteHost } from '../../src/scenes/riteHost.js';
 import { riteMemory, riteSeen } from '../../src/systems/riteChest.js';
 import { restoreModSaveRecords } from '../../src/systems/modSaveData.js';
@@ -61,10 +61,6 @@ test('BROKER-CAGE the wire: the rite word\'s `c` 0 or 1, a word from before it 0
   assert.deepEqual(validRiteOut({ k: 'cl', d: DAY, px: PX, py: PY, at: 5, by: ['Ann'], n: 3, x: 1 }), { k: 'cl', d: DAY, px: PX, py: PY, at: 5 });
   for (const bad of [{ d: -1 }, { px: 1000 }, { py: 500 }, { at: 0 }, { at: 1.5 }]) assert.equal(validRiteOut({ k: 'cl', d: DAY, px: PX, py: PY, at: 5, ...bad }), null, JSON.stringify(bad));
   assert.equal(validRiteOut({ k: 'br', d: DAY, px: PX, py: PY, at: 5, by: ['Ann'] }).k, 'br', 'the broken word as it was');
-  // THE MERGE: world153 is main's REVENANT-WIRE, a relay that never says `cl` - read as the cage's, its every
-  // screen would wait on a word it never hears and keep her caged; the cage's own relay is world154
-  assert.equal(CAGE_RELAY_MIN, 154);
-  assert.deepEqual(['world152', 'world153', 'world154', 'world157', 'acct62', null, 154].map(relaySupportsCage), [false, false, true, true, false, false, false]);
 });
 
 /** The rite's host on a fake world (test/net/gate/wb12d_rite_world.test.js's rig, cut down): its foes a list, its words recorded. */

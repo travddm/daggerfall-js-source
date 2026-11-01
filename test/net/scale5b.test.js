@@ -587,7 +587,6 @@ test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most
   assert.equal(C.relayCfgValue([], {}, 'sdRole'), undefined);
   assert.equal(C.mayRelayCfg(['dev']), true);
   for (const g of [['dm'], ['herald'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
-  assert.equal(C.relayCfgSupported('world191'), false, 'main\'s WARDEN1 relay takes none (PIN MOVED: world192 at the merge)'); assert.equal(C.relayCfgSupported('world192'), true); assert.equal(C.relayCfgSupported('x'), false);
   const { parseStaffCommand, STAFF_HELP_LINES } = await import('../../src/net/staffCommands.js');
   assert.deepEqual(parseStaffCommand('/relay'), { cmd: 'relay' });
   assert.deepEqual(parseStaffCommand('/relay bossbody {"enforce": true}'), { cmd: 'relay', k: 'bossBody', v: '{"enforce": true}' });
@@ -597,7 +596,7 @@ test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most
   assert.ok(STAFF_HELP_LINES.some((l) => l.startsWith('/relay')));
 });
 
-test('SCALE5b the client: a session sends a relay setting only on the hub\'s link to a relay that takes one, reads the hub\'s answer from the hub alone; the world host runs /relay for a developer alone and hands the answer to the tab that asked (mutants: the version unasked; the answer from any room; the developer unasked)', async () => {
+test('SCALE5b the client: a session sends a relay setting only on the hub\'s link, reads the hub\'s answer from the hub alone; the world host runs /relay for a developer alone and hands the answer to the tab that asked (mutants: the answer from any room; the developer unasked)', async () => {
   await quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000, rand: () => 0, presence: false });
@@ -605,9 +604,7 @@ test('SCALE5b the client: a session sends a relay setting only on the hub\'s lin
     s.onRelayCfg = (m) => heard.push(m);
     s.join('chat:world');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world191', now: 1_000_000 });
-    assert.equal(s.sendRelayCfg({ k: 'gateRole', v: '1' }), false, 'a relay before it takes none - main\'s WARDEN1 world191 among them (PIN MOVED: world192 at the merge)');
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world192', now: 1_000_000 });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, now: 1_000_000 });
     assert.equal(s.sendRelayCfg({ k: 'gateRole', v: '1' }), true);
     assert.equal(s.sendRelayCfg({ k: 'nope', v: '1' }), false);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'cfg', k: 'gateRole', v: '1' });
@@ -655,8 +652,8 @@ test('SCALE5b the session hears the relay\'s referee word: a halo whose cell say
       s.setHalo([`world:${Math.floor(BX / 16) + 1},${Math.floor(BY / 16)}`]);
       for (const ws of sockets) ws.open();
       const [cellWs, haloWs] = sockets;
-      cellWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world192', now: t });
-      haloWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world192', now: t, ...(rf ? { rf: 1 } : {}) });
+      cellWs.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0002', name: 'Ann' }], now: t });   // not alone: lone sleep holds no pose
+      haloWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], now: t, ...(rf ? { rf: 1 } : {}) });
       const sentPoses = (ws) => ws.sent.filter((x) => x.startsWith('{"t":"pose"')).length;
       const c0 = sentPoses(cellWs), h0 = sentPoses(haloWs);
       const heard = [];

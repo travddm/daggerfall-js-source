@@ -214,26 +214,6 @@ test('SLAM13 A5: every welcome carries the relay\'s version - a place room\'s an
   assert.equal(ofType(s, 'welcome')[0].v, RELAY_VERSION, 'a channel\'s too');
 });
 
-test('SKEW1 (Mac: two strings outside the chat box after a deploy): the session puts NO version-skew line on the HUD - a foreign `v` is SRV-N\'s to read (`onRelay`), and statusLine stays quiet (mutant: SLAM13 A5\'s statusLine warning restored)', () => {
-  const { FakeWS, sockets } = fakeSocketClass();
-  const s = new OnlineSession({ url: 'wss://relay.test', name: 'M', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000 });
-  const heard = []; s.onRelay = (v) => heard.push(v);
-  const warned = [];
-  const realWarn = console.warn; console.warn = (...a) => warned.push(a.join(' '));
-  const realInfo = console.info; console.info = () => {};
-  try {
-    s.join('town:m9', at(0, 0)); const ws = sockets[0]; ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', v: 'world1', peers: [], host: null, world: null });
-    assert.deepEqual(heard, ['world1'], 'the relay\'s name reaches SRV-N\'s presenter');
-    assert.equal(s.statusLine('online'), null, 'and the HUD line says nothing about it');
-    assert.equal(s.statusLine('chat'), null, 'nor the chat link\'s');
-    assert.equal(warned.length, 0, 'nor the console');
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null });
-    assert.equal(s.statusLine('online'), null, 'a welcome with no version: the same silence');
-    assert.equal(s.versionWarning, undefined, 'the field is gone, not merely quiet');
-  } finally { console.warn = realWarn; console.info = realInfo; }
-});
-
 test('SLAM13 (final lens survivors): the asked list prunes by its own retry, poseHzFor rounds (33 peers is 7 Hz), and byteGate\'s cap is the rate (mutants: the prune removed; `round` -> `floor`; the cap dropped)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1_000_000;

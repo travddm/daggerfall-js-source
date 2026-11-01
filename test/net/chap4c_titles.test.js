@@ -35,7 +35,7 @@ test('CHAP4c the vocabulary: three chapter title ids, last in the closed list; e
   assert.deepEqual(row.ts, [4121, 2], 'the relay stamps the claim off the token');
   assert.deepEqual(readBadge({ title: 'chapterofficer', ts: [4121, 2], glyphs: [] }).ts, [4121, 2], 'and reads it back');
   assert.equal(readBadge({ title: 'founder', ts: [4121, 2], glyphs: [] }).ts, undefined, 'never beside a title that rides alone');
-  assert.equal(RELAY_VERSION, 'world281');
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 // ── THE LAW AND THE WORDS ───────────────────────────────────────────

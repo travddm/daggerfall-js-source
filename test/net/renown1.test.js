@@ -25,7 +25,7 @@ import {
 import {
   claimsValid, mintToken, verifyToken, orderValid, mintOrder, mintRenownOrder, verifyOrder, renownIssuable, ORDER_KINDS,
 } from '../../src/net/identityToken.js';
-import { badged, readRenown, parseClient, renownGate, RENOWN_HZ_MAX, relaySupportsRenown, RENOWN_RELAY_MIN, RELAY_VERSION, CHAT_WORLD_ROOM } from '../../src/net/wire.js';
+import { badged, readRenown, parseClient, renownGate, RENOWN_HZ_MAX, RELAY_VERSION, CHAT_WORLD_ROOM } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
@@ -272,7 +272,7 @@ test('RENOWN1 the token and the order: `lv` optional and within 1..50 when there
   await assert.rejects(mintRenownOrder({ s: 'acct-mara', lv: 0 }, kp.privateKey, { subtle, nowS: T0 }), /refused/);
 });
 
-test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bound, `readRenown` reads it back; the renown frame is its own arm after the hello with a bounded order; world108 is the first relay that knows it; one a second (mutants: a level out of bounds stamped; the frame before the hello; an old relay trusted)', () => {
+test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bound, `readRenown` reads it back; the renown frame is its own arm after the hello with a bounded order; one a second (mutants: a level out of bounds stamped; the frame before the hello)', () => {
   assert.deepEqual(badged({ id: 'a' }, { lv: 12 }), { id: 'a', lv: 12 });
   assert.deepEqual(badged({ id: 'a' }, { lv: 0 }), { id: 'a' });
   assert.deepEqual(badged({ id: 'a' }, { lv: 51 }), { id: 'a' });
@@ -284,11 +284,7 @@ test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bo
   assert.deepEqual(parseClient('{"t":"renown","order":"v1.a.b"}', { hasHello: false }), { error: 'renown before hello' });
   assert.deepEqual(parseClient('{"t":"renown"}', { hasHello: true }), { error: 'bad renown' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'renown', order: 'x'.repeat(1025) }), { hasHello: true }), { error: 'bad renown' });
-  assert.equal(RELAY_VERSION, 'world281');
-  assert.equal(RENOWN_RELAY_MIN, 111);
-  assert.equal(relaySupportsRenown('world111'), true);
-  assert.equal(relaySupportsRenown('world110'), false);
-  assert.equal(relaySupportsRenown(null), false);
+  assert.equal(RELAY_VERSION, 'world282');
   assert.equal(RENOWN_HZ_MAX, 1);
   const g1 = renownGate(null, 1000);
   assert.equal(g1.pass, true);
@@ -350,14 +346,14 @@ test('RENOWN1 the relay: the hello\'s token level rides the welcome\'s rows and 
 
 // ── THE CLIENT ──────────────────────────────────────────────────────
 
-test('RENOWN1 the session: a peer\'s level off the welcome, the join and a renown frame, which only ever raises it; mine off the service\'s answer; `renownOf` by id; a renown order is KEPT and goes down each socket once ITS OWN welcome names a relay that knows the frame, on its own gate, and again until that room answers with the level (mutants: a renown frame for a peer I do not hold standing one; an order sent to world107; a session-wide flag; a rise lost to the gate; an answered room sent again)', () => {
+test('RENOWN1 the session: a peer\'s level off the welcome, the join and a renown frame, which only ever raises it; mine off the service\'s answer; `renownOf` by id; a renown order is KEPT and goes down each socket once ITS OWN welcome comes, on its own gate, and again until that room answers with the level (mutants: a renown frame for a peer I do not hold standing one; a session-wide flag; a rise lost to the gate; an answered room sent again)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let clock = 1_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => clock });
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', lv: 12 }, { id: 'eve-0003', name: 'Eve', lv: 99 }], n: 3, v: 'world110' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', lv: 12 }, { id: 'eve-0003', name: 'Eve', lv: 99 }], n: 3 });
   assert.equal(s.renownOf('bob-0002'), 12);
   assert.equal(s.renownOf('eve-0003'), null, 'a level outside the bound is none');
   ws.receive({ t: 'renown', id: 'bob-0002', lv: 13 });
@@ -371,10 +367,8 @@ test('RENOWN1 the session: a peer\'s level off the welcome, the join and a renow
   assert.equal(s.adoptIdentity({ name: 'Mac', level: 4 }), true);
   assert.equal(s.renownOf('mac-0001'), 4);
   const renownSent = (w) => w.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'renown');
-  assert.equal(s.sendRenownOrder('v1.a.b', 5), false, 'a world110 relay would close the socket on the frame');
-  assert.equal(s.renownOf('mac-0001'), 5, 'but the level is mine either way');
-  // AUDIT RENOWN1 WIRE-2/WIRE-3: the order was KEPT, and goes the moment this socket's own welcome names world111
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world111' });
+  assert.equal(s.sendRenownOrder('v1.a.b', 5), true, 'a welcomed socket takes it at once');
+  assert.equal(s.renownOf('mac-0001'), 5);
   assert.deepEqual(renownSent(ws), [{ t: 'renown', order: 'v1.a.b' }]);
   // a second rise inside the second: the gate holds it - it is not lost, it goes on a tick
   assert.equal(s.sendRenownOrder('v1.a.c', 6), false, 'one a second, as the relay takes them');
@@ -397,7 +391,7 @@ test('RENOWN1 the session: a peer\'s level off the welcome, the join and a renow
   halo.open();
   s.tick();
   assert.deepEqual(renownSent(halo), [], 'no word from this socket\'s relay yet');
-  halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world111' });
+  halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1 });
   assert.deepEqual(renownSent(halo), [{ t: 'renown', order: 'v1.a.c' }], 'the rise this room never heard');
   // past its keeping the order is dropped, and nothing more is sent
   clock += 60_000; s.tick();

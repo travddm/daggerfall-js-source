@@ -24,7 +24,7 @@
 // MAC'S DECISION: THE TWO-PHASE HANDOFF. The fallen loses the worn piece its killer picked
 // only once the killer has it. The fall takes that piece off the fallen's record INTO ESCROW - `wild_escrow`, in the fall's
 // own batch, its ledger key the service's (ledger.js ledgerMoves `escrow`) - where a room that signs collects lays it
-// (the tab says so: `collect` 1, its relay's version - net/wire.js relaySupportsWildCollect). The killer's take of it in
+// (the tab says so: `collect` 1). The killer's take of it in
 // the room is the room's signed collect (net/wild/wildReceipt.js `g1`), carried by the killer's tab as an act on its record
 // (wildCollect): the piece into that record and the escrow ended, one batch. Nobody collecting by the time the remains
 // could have gone (`until_s`) and a collect signed at its last moment spent (WILD_COLLECT_TTL_S), the fallen's own tab

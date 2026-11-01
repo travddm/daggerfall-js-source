@@ -86,14 +86,6 @@ export function nextRegionRoom(hold, want, current, now, holdMs = CHAT_REGION_HO
 }
 /** CHAT-CHAN: the Region tab's line when it moves - where its channel is now. */
 export const regionJoinedText = (place) => `Region channel: ${place}.`;
-/** CHAT-CHAN: the Party and Region tabs on a relay from before the channels (CHAN_RELAY_MIN) - neither can be said. */
-export const CHAN_OLD_RELAY_TEXT = 'This channel needs the server\'s next update.';
-/** DICE1: a roll asked of a relay from before the dice (ROLL_RELAY_MIN) - it would close the socket on the frame. */
-export const ROLL_OLD_RELAY_TEXT = 'Dice need the server\'s next update.';
-/** EMOTE1: an action said to a relay from before them (EMOTE_RELAY_MIN) - it would say the words bare. */
-export const EMOTE_OLD_RELAY_TEXT = 'Actions need the server\'s next update.';
-/** CHAT-LANG: the Language tab on a relay from before the language channels (LANG_RELAY_MIN). */
-export const LANG_OLD_RELAY_TEXT = 'Language channels need the server\'s next update.';
 /** CHAT-LANG: the Language tab's word while no language is chosen. */
 export const NO_LANG_TEXT = 'Choose a language channel: /lang de, /lang en ... (/lang lists them).';
 /** CHAT-LANG: the Language tab's line when it moves - which channel it is now. */
@@ -106,8 +98,6 @@ export const OPT_CHANNELS = Object.freeze({
 });
 /** CHAT-TRADE: the words below, each through the text core when it is said (L10N4) - `name` the channel's, `id` its tab's. */
 const optArgs = (id) => ({ name: OPT_CHANNELS[id]?.name ?? id, id });
-/** CHAT-TRADE: the Trade and LFG tabs on a relay from before them (TRADE_CHAN_RELAY_MIN). */
-export const tradeChanOldText = () => t('net.chat.tradeOld', 'The Trade and LFG channels need the server\'s next update.');
 /** CHAT-TRADE: a tab's word while its channel is not joined - and how to join it. */
 export const notJoinedText = (id) => t('net.chat.notJoined', 'You are not in the {name} channel. /join {id} joins it.', optArgs(id));
 /** CHAT-TRADE: the lines a join and a leave leave on the log - and a join a line said to the channel made, whose line
@@ -128,8 +118,6 @@ export function mentions(text, name) {
   const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^\\p{L}\\p{N}_])@${esc}(?![\\p{L}\\p{N}_])`, 'iu').test(String(text ?? ''));
 }
-/** GUILD1c: the Guild tab on a relay from before the guild's channel - the World link's welcome said so. */
-export const GUILD_OLD_RELAY_TEXT = 'The guild channel needs the server\'s next update.';
 /** GUILD1c: the Guild tab's word while the character is in no guild. */
 export const NO_GUILD_TEXT = 'You are not in a guild.';
 /** CHAT-CHAN: how far a Local line carries, scene units - the distance a peer's NAME is drawn at (net/remotePlayers.js

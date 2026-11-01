@@ -355,6 +355,6 @@ test('AUDIT TESA II P2/P3/P4 THE WIRING: the world\'s nearest town (scenes/tamri
   assert.doesNotMatch(W, /nearestTownPastTheBay|TOWN_RISE_REACH|nearestSafeLocationAnywhere\(maps, px, \(hit\)/, 'no second law');
   // pastBayJourney unless a teleport hands its own (pastBayTravel.js teleportJourney: teleportTo, Recall, a stone's pick and step)
   assert.match(W, /const wildTravelGate = \(to, spoken = 0, law = pastBayJourney\) => \{/, 'every journey\'s gate: the journey\'s law unless told');
-  assert.match(W, /const j = law\(playerTravelPixel\(\), to, online\?\.wildOk \? wildMapMask\(\) : null, wildJourney\(\{/, 'asked after the zone\'s own');
+  assert.match(W, /const j = law\(playerTravelPixel\(\), to, online \? wildMapMask\(\) : null, wildJourney\(\{/, 'asked after the zone\'s own');
   assert.ok(W.indexOf('const zoneHalls = createZoneHalls(') < W.indexOf('createTamrielPlaces('), 'the halls stand before the places host hands them the rolls (BOOT-TDZ)');
 });

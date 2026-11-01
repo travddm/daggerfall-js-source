@@ -324,7 +324,7 @@ test('SUMMON-SYNC: an ALLY goes with its summoner - neither handover names an he
   const sent = [];
   const room = new Function('modes', 'online', 'isWorldRoom', 'peersNear', 'social', 'isPrivateQuestFoe', `return () => ${body('const handOverRoomFoes = () =>')};`)(
     { mode: 'dungeon', ownHandOverFrame: (heirOf) => ({ f: [heirOf(ally), heirOf(summon), heirOf(vamp)] }), dropOwnHanded: () => 2 },
-    { room: 'world:dungeon:7', ownOk: true, sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
+    { room: 'world:dungeon:7', sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
   assert.equal(room(), 2);
   assert.deepEqual(sent.at(-1).f, [null, 'bob-0005', 'mmm-0002'], 'the room\'s: no heir for my ally, the nearest for my summon, the party for my quest\'s');
   const cell = new Function('modes', 'online', 'isCellRoom', 'peersNear', 'social', 'exteriorFoes', 'isPrivateQuestFoe', `return () => ${body('const handOverFoes = () =>')};`)(

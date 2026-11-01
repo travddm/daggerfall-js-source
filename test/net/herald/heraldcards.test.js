@@ -4,7 +4,6 @@
 // and sdThread - net/relayCfg.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import {
   HERALD_FAMILIES, heraldCard, heraldCss, heraldThread, heraldPostUrl, heraldWho, heraldWhen, heraldEmbedSize, heraldWebhook, heraldRole, heraldName, heraldStamp, heraldList,
@@ -19,8 +18,6 @@ import { GATE_PLACE_MAX, SOCIAL_ROOM, SD_KEY } from '../../../src/net/wire.js';
 import { gateTimes } from '../../../src/net/gate/gateLaw.js';
 import { serpentTimes } from '../../../src/net/serpent/serpentLaw.js';
 import { SD_LIFETIME_MS, SD_COOLDOWN_MS } from '../../../src/net/superDungeon/sdLaw.js';
-import { RELAY_VERSION } from '../../../src/net/wire.js';
-import { relayCfgSupported, RELAY_CFG_KEY_MIN } from '../../../src/net/relayCfg.js';
 import { OnlineSession } from '../../../src/net/online.js';
 import { fakeSocketClass } from '../../fakeSocket.mjs';
 import { fakeRoom } from '../../fakeRoom.mjs';
@@ -189,19 +186,14 @@ test('HERALD-CARDS relay: a thread is a setting a developer changes at run time 
   }, { GATE_DISCORD_THREAD: T_GATE });
 });
 
-test('HERALD-CARDS the client says a thread setting only to a relay that knows it - an older one finds no such name and closes the hub link on the frame; the roles and every older setting as before (mutants: a thread said to world242; the floor read for every setting)', async () => {
-  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });
-  assert.ok(relayCfgSupported(RELAY_VERSION, 'gateThread'), 'this relay knows them');
-  assert.deepEqual([relayCfgSupported('world242'), relayCfgSupported('world242', 'gateThread'), relayCfgSupported('world250', 'sdThread'), relayCfgSupported('world242', 'gateRole'), relayCfgSupported('world191', 'gateRole')], [true, false, true, true, false]);
+test('HERALD-CARDS the client says a thread setting down the hub link; the roles as before', async () => {
   await quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000, rand: () => 0, presence: false });
     s.join('chat:world');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world242', now: 1_000_000 });
-    assert.equal(s.sendRelayCfg({ k: 'serpentThread', v: T_SEA }), false, 'world242 has no such setting');
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, now: 1_000_000 });
     assert.equal(s.sendRelayCfg({ k: 'gateRole', v: ROLE }), true, 'a role, as before');
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world250', now: 1_000_000 });
     assert.equal(s.sendRelayCfg({ k: 'serpentThread', v: T_SEA }), true);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'cfg', k: 'serpentThread', v: T_SEA });
   });
@@ -277,13 +269,4 @@ test('AUDIT HERALD-CARDS L3: a thread set that is no Discord id is said - its po
   said.length = 0;
   await read({ GATE_DISCORD_THREAD: T_GATE, SD_DISCORD_THREAD: T_ABYSS, SERPENT_DISCORD_THREAD: '' });
   assert.deepEqual(said, [], 'well formed, or unset: nothing said');
-});
-
-test('AUDIT HERALD-CARDS S1: the threads\' floor is the relay that made them - the version row RELAY_CFG_KEY_MIN names is HERALD-CARDS\'s own, so a renumber at a merge that leaves the floor behind fails here, before a client says a thread to another branch\'s relay of that number and is closed on it (mutants: the floor a number apart from its row)', () => {
-  const law = readFileSync(new URL('../relayversion.test.js', import.meta.url), 'utf8');
-  for (const [k, min] of Object.entries(RELAY_CFG_KEY_MIN)) {
-    const row = law.split('\n').find((l) => l.startsWith(`  world${min}: '`)) ?? '';
-    const own = k === 'cellSeed' ? /COST-2 part two/ : k === 'lootDoor' ? /LOOT-DOOR/ : k === 'sdCollapse' ? /SD-PARTY/ : /HERALD-CARDS/;
-    assert.match(row, own, `${k}: world${min}'s row is the row of the relay that made it`);
-  }
 });

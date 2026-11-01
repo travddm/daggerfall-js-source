@@ -11,7 +11,7 @@ import {
   RITE_SUMMONER_CAREER, riteOffset, riteLocalOf, riteNativeOf, riteNear, riteWindow, riteHolds, riteStands, riteFaithfulOf,
 } from '../../../src/net/gate/gateRite.js';
 import { gateSpotLocal, gateYaw, gateTimes, PIXEL_M, isGateDay, GATE_COLLAPSE_MS } from '../../../src/net/gate/gateLaw.js';
-import { PIXEL_UNITS, mapPixelOfWire, validRiteIn, validRiteOut, parseClient, relaySupportsRite, RITE_RELAY_MIN, RITE_BY_MAX, sanitizeName } from '../../../src/net/wire.js';
+import { PIXEL_UNITS, mapPixelOfWire, validRiteIn, validRiteOut, parseClient, RITE_BY_MAX, sanitizeName } from '../../../src/net/wire.js';
 import { ritePost } from '../../../src/net/gate/gateHerald.js';
 import { RECEIPT_EARNED, receiptValid, mintReceipt, readReceipt, importReceiptKey } from '../../../src/net/gate/gateReceipt.js';
 import { importPublicKeyB64 } from '../../../src/net/identityToken.js';
@@ -104,7 +104,7 @@ test('WB12d the receipt: a third way earned - the rite alone - and a fighter\'s 
   assert.equal(readReceipt(await mintReceipt({ d: 700, b: 'ruhn', s: 'acct-2', c: 9, x: 'rite' }, null, { subtle, nowS })).x, 'rite');
 });
 
-test('WB12d the wire: a rite word is {d, px, py, s, f, c} and nothing more (BROKER-CAGE\'s `c` 0 in a word from before it), parsed only after a hello; the hub\'s broken word bounds its names; a word is said only to a relay that keeps the rite (world151; world141 on its branch) - an older one closes the socket on it (mutants: a bad flag passed; the names unbounded; the version law)', () => {
+test('WB12d the wire: a rite word is {d, px, py, s, f, c} and nothing more (BROKER-CAGE\'s `c` 0 in a word from before it), parsed only after a hello; the hub\'s broken word bounds its names (mutants: a bad flag passed; the names unbounded)', () => {
   assert.deepEqual(validRiteIn({ d: 700, px: 10, py: 20, s: 1, f: 0, x: 'junk' }), { d: 700, px: 10, py: 20, s: 1, f: 0, c: 0 });
   assert.deepEqual(validRiteIn({ d: 700, px: 10, py: 20, s: 1, f: 1, c: 1 }), { d: 700, px: 10, py: 20, s: 1, f: 1, c: 1 }, 'BROKER-CAGE: every one of them seen to fall');
   for (const bad of [{ d: -1 }, { px: 1000 }, { py: 500 }, { s: 2 }, { f: true }, { d: 1.5 }, { c: 2 }, { c: true }, { c: null }]) assert.equal(validRiteIn({ d: 700, px: 10, py: 20, s: 0, f: 0, ...bad }), null, JSON.stringify(bad));
@@ -117,8 +117,6 @@ test('WB12d the wire: a rite word is {d, px, py, s, f, c} and nothing more (BROK
   // AUDIT WB12d (L8): junk ahead of the names hides none of them
   assert.deepEqual(validRiteOut({ k: 'br', d: 700, px: 1, py: 2, at: 5, by: ['', 3, null, {}, ...names] }).by, names.slice(0, RITE_BY_MAX));
   assert.equal(validRiteOut({ k: 'xx', d: 700, px: 1, py: 2, at: 5 }), null);
-  assert.equal(RITE_RELAY_MIN, 151);   // world141 on its branch: main's CLIMB5 and CLIMB6, FRIENDS-SYNC, ELITE FOES and the Seats arc took world141-world150 first
-  assert.deepEqual(['world150', 'world151', 'world152', 'world153', 'world155', 'acct62', null].map(relaySupportsRite), [false, true, true, true, true, false, false]);
 });
 
 // ═══ THE ACCOUNT SERVICE: THE RITE'S EMBER ═══════════════════════════════════════════════════════

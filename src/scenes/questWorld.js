@@ -386,7 +386,7 @@ export function createQuestWorld(host) {
         // QUEST-PARTY phase 3b/3c: in a building or a dungeon the member who shared this quest, in the room and near,
         // stands the wave (through a relay whose own lane carries it here); this copy counts it as placed, as the open
         // air's does - VERMIN-SHARED: only while the sharer's foe of this wave's Foe stands here; else this copy stands its own
-        if ((m === 'interior' || m === 'dungeon') && host.online?.ownOk && isWorldRoom(host.online.room) && partnerStandsQuestFoes({ questName: handle.foe?.parentQuest?.questName, symbol: handle.foe?.symbol?.name, sharerOf: (q) => host._liveSharer(q), inMyParty: (a) => !!host.social?.inMyParty(a), peers: host.peersNear(), accountOfPeer: (id) => host.social?.accountOfPeer(id), myFeet: player.pos, foes: host.modes?.insideFoes?.() ?? [] })) return true;
+        if ((m === 'interior' || m === 'dungeon') && isWorldRoom(host.online?.room) && partnerStandsQuestFoes({ questName: handle.foe?.parentQuest?.questName, symbol: handle.foe?.symbol?.name, sharerOf: (q) => host._liveSharer(q), inMyParty: (a) => !!host.social?.inMyParty(a), peers: host.peersNear(), accountOfPeer: (id) => host.social?.accountOfPeer(id), myFeet: player.pos, foes: host.modes?.insideFoes?.() ?? [] })) return true;
         return host.modes?.tryPlaceQuestFoe?.(handle) ?? false;
       }
       if (!(walkMode && host.playerSpawned)) return false;

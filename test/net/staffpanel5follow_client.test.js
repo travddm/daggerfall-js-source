@@ -9,8 +9,8 @@ import { SOCIAL_ROOM, validPartyPose, parseClient } from '../../src/net/wire.js'
 import { mintToken, claimsValid } from '../../src/net/identityToken.js';
 import { noteOf, followNoted, followHello, followJoined, followLeft } from '../../server/src/staffFollow.js';
 import {
-  FOLLOW_INTERNAL_SAY, FOLLOW_RELAY_MIN, FOLLOWERS_MAX, FOLLOWED_MAX, NOTE_STALE_MS, WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS,
-  followSupported, whereNoteDue, noteRoom, noteWhere, validFollowSay, validFollowOut,
+  FOLLOW_INTERNAL_SAY, FOLLOWERS_MAX, FOLLOWED_MAX, NOTE_STALE_MS, WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS,
+  whereNoteDue, noteRoom, noteWhere, validFollowSay, validFollowOut,
 } from '../../src/net/staffFollow.js';
 import { validStaffTeleportIn, validStaffTeleportOut } from '../../src/net/staffTeleport.js';
 
@@ -48,9 +48,6 @@ test('STAFF-PANEL5-FOLLOW law: the note\'s pace, its room, its place, the frames
   assert.equal(whereNoteDue(0, -Infinity, false), true, 'the first goes at once');
   assert.equal(NOTE_STALE_MS, 2 * WHERE_NOTE_STILL_MS + 30_000);
   assert.equal(WHERE_NOTE_MOVING_MS, 5_000);
-  assert.equal(followSupported(`world${FOLLOW_RELAY_MIN - 1}`), false);
-  assert.equal(followSupported(`world${FOLLOW_RELAY_MIN}`), true);
-  assert.equal(followSupported(null), false);
   // the room a note names: a cell's, a world room's or a private one's, with its layer; none is no room
   assert.deepEqual(noteRoom(note('dungeon:m1234', { ly: 2 })), { room: 'dungeon:m1234', ly: 2 });
   assert.deepEqual(noteRoom(note('world:3,4')), { room: 'world:3,4', ly: 0 });

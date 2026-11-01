@@ -23,8 +23,7 @@
 // quest's place where nothing was recorded. It lives as long as the page: a reload inside records the room in the save,
 // a reload outside forgets it.
 //
-// deps: online() - the page is online; instanceOk() - its relay admits instances (net/instanceRoom.js
-// relaySupportsInstances, the welcome's word); account(), character() - the verified account and the character's id
+// deps: online() - the page is online; instanceOk() - a relay link is held that admits the instance; account(), character() - the verified account and the character's id
 // (the private rooms' own: social.acct, realmSession.id); members() - the party's other members, each with its party
 // pose `p` (net/social.js); questMachine(); openOverlay(window, onClosed) - the window laid over whatever is open
 // (townTalk.pushOverlay), true when it went up; say(line); wild() - the player stands in the open zone (WILD1), where

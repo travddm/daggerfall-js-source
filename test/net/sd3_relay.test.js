@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import worker from '../../server/src/index.js';
 import {
-  SD_RELAY_MIN, relaySupportsSd, RELAY_VERSION, SD_KINDS, SD_OUT_KINDS, validSdIn, validSdOut, validSdFoundTell, parseClient,
+  RELAY_VERSION, SD_KINDS, SD_OUT_KINDS, validSdIn, validSdOut, validSdFoundTell, parseClient,
   SD_INTERNAL_CENSUS, SD_INTERNAL_FOUND, SD_INTERNAL_LIVE, SD_TELL_RETRY_MS, SD_KEY, SD_FOUND_KEY, SD_REALM_KEY, SD_HZ_MAX,
   SD_RELAY_BURST, SD_REGION_COUNT, CHAT_REGION_COUNT, chatRegionRoom, worldRoom, SOCIAL_ROOM, PIXEL_UNITS, validSdRecord, sanitizeName,
 } from '../../src/net/wire.js';
@@ -61,12 +61,8 @@ async function risen(W) {
   return h;
 }
 
-test('SD3 the wire: the frame\'s one kind each way, projected; the record\'s law moved beside it (net/superDungeon/sdLaw.js re-exports it); the relay that keeps it - world176 (mutants: a slot of 0 believed; a pixel off the map; the record\'s s 0 fanned; the version gate a version early)', () => {
-  assert.equal(RELAY_VERSION, 'world281');
-  assert.equal(SD_RELAY_MIN, 176, 'the Super Dungeons arc\'s one version (world171 on its branch, then world172 and world175; main\'s CRYSTAL-FIST, WATCH-FIX, SERPENT3, LEGACY7 and TEXT-F1 took world171-world175)');
-  assert.equal(relaySupportsSd(RELAY_VERSION), true);
-  assert.equal(relaySupportsSd('world174'), false, 'LEGACY7\'s relay closes the socket on `sd`');
-  for (const v of [undefined, null, '', 'world', 'world17x', 'acct172', 172]) assert.equal(relaySupportsSd(v), false, String(v));
+test('SD3 the wire: the frame\'s one kind each way, projected; the record\'s law moved beside it (net/superDungeon/sdLaw.js re-exports it); (mutants: a slot of 0 believed; a pixel off the map; the record\'s s 0 fanned)', () => {
+  assert.equal(RELAY_VERSION, 'world282');
   assert.deepEqual([...SD_KINDS], ['found', 'pz', 'in', 'hit', 'ehit', 'xhit', 'spent', 'vt', 'rz']);   // AUDIT WORLD-EVENTS L1-1 (
   assert.deepEqual([...SD_OUT_KINDS], ['ev', 'pz', 'st', 'mv', 'atk', 'hp', 'ph', 'ec', 'cx', 'cxh', 'cxb', 'stun', 'fell', 'lost', 'no', 'rcpt', 'bd', 'ln']);
   assert.deepEqual(validSdIn({ k: 'found', s: 3, px: PX, py: PY, junk: 1 }), { k: 'found', s: 3, px: PX, py: PY }, 'projected');
@@ -275,7 +271,7 @@ test('SD3 the realm: the Worker mints `sd:<s>` only for the slot the hub\'s reco
   });
 });
 
-test('SD3 the session: a find goes down the socket of the cell its pixel is in, only to a relay that keeps it - a halo\'s by its own welcome, each socket keeping its own word across a seam; SD_HZ_MAX a second; the hub\'s record heard from the hub alone (mutants: the halo never keeps it; the promotion forgets it; any room; unmetered; a cell\'s word believed)', () => {
+test('SD3 the session: a find goes down the socket of the cell its pixel is in - a halo\'s too, and each socket still across a seam; SD_HZ_MAX a second; the hub\'s record heard from the hub alone (mutants: the halo never keeps it; the promotion forgets it; any room; unmetered; a cell\'s word believed)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
@@ -287,19 +283,20 @@ test('SD3 the session: a find goes down the socket of the cell its pixel is in, 
     s.join(here, null);
     sockets[0].open();
     sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION });
-    assert.equal(s.sdOk, true);
     s.setHalo([there]);
     sockets[1].open();
-    sockets[1].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: 'world171' });
+    sockets[1].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const w = { s: 1, px: PX, py: PY }, w2 = { ...w, px: PX + 16 };
-    assert.equal(s.sendSdFound(w2, there), false, 'the halo on an older relay is said none');
+    assert.equal(s.sendSdFound(w2, there), true, 'down the halo\'s own socket');
+    assert.deepEqual(JSON.parse(sockets[1].sent.at(-1)), { t: 'sd', k: 'found', s: 1, px: PX + 16, py: PY });
+    t += 1000;
     assert.equal(s.sendSdFound(w, here), true);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'sd', k: 'found', s: 1, px: PX, py: PY });
     s.join(there, null);
-    assert.equal(s.sdOk, false, 'the promoted socket\'s word');
     t += 1000;
-    assert.equal(s.sendSdFound(w2, there), false);
-    assert.equal(s.sendSdFound(w, here), true, 'the stepped-down socket\'s own word');
+    assert.equal(s.sendSdFound(w2, there), true, 'the promoted socket');
+    t += 1000;
+    assert.equal(s.sendSdFound(w, here), true, 'the stepped-down socket');
     assert.equal(s.sendSdFound(w, 'dungeon:m1'), false, 'no cell');
     assert.equal(s.sendSdFound({ s: 0, px: PX, py: PY }, here), false, 'a word the wire would refuse');
     t += 1000;
