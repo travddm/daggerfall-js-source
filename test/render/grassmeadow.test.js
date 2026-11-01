@@ -13,6 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { bakeMeadow, spriteOf, SOURCES, OUT, MEADOW_ALPHABET as BAKE_ALPHABET } from '../../tools/bakeMeadow.mjs';
 import { readPng } from '../../tools/pngIO.mjs';
+import { codeOnly } from '../codeOnly.mjs';
 import { MEADOW_SPRITES, MEADOW_ALPHABET } from '../../src/render/meadowArt.js';
 import { buildMeadowAtlas, buildMeadowMips, downsampleMeadow, slotCoverage, meadowPick, meadowCardCorners, meadowCardIndices, meadowGrass, meadowTexel, meadowArtGround, meadowSpriteMean,
   meadowSpriteBox, MEADOW_SLOTS, MEADOW_CELL, MEADOW_CARDS, MEADOW_CARDS_FAR, MEADOW_NEAR_AT, MEADOW_NEAR_BAND, MEADOW_BLADES_PER_TUFT, MEADOW_VARIANTS, MEADOW_SHARES, MEADOW_LUSH,
@@ -50,7 +51,8 @@ function vertexStage() {
 }
 
 test('MEADOW1: the five sprites are the owner\'s PNGs texel for texel, hard-edged, and the module is the bake\'s byte for byte (mutant: a soft edge let through)', () => {
-  assert.equal(bakeMeadow(SOURCES.map((s) => raw(s.png))), read(OUT), `${OUT} is not what tools/bakeMeadow.mjs makes - re-run it`);
+  // The module's header comment is edited apart from the bake's template, so the module is held to the bake's code.
+  assert.equal(codeOnly(bakeMeadow(SOURCES.map((s) => raw(s.png)))), codeOnly(read(OUT)), `${OUT} is not what tools/bakeMeadow.mjs makes - re-run it`);
   assert.equal(MEADOW_ALPHABET, BAKE_ALPHABET);
   assert.deepEqual(MEADOW_SPRITES.map((s) => [s.name, s.source, s.width, s.height]), [
     ['tall', 'src/assets/grass/source/tuft-tall.png', 32, 32], ['short', 'src/assets/grass/source/tuft-short.png', 32, 32],
