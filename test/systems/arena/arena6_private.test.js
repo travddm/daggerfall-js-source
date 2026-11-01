@@ -375,7 +375,7 @@ const settled = () => new Promise((r) => setTimeout(r, 0));
 function clientSocket(R, ws, room) {
   let seen = 0;
   const s = {
-    status: 'open', arenaOk: true, room, ws, q: [],
+    status: 'open', arenaHeard: true, room, ws, q: [],
     sendArena(w) { const v = validArenaIn(w); if (!v || s.status !== 'open' || !isArenaRoom(s.room)) return false; s.q.push(word(R, s.ws, v)); return true; },
     async flush() { while (s.q.length) await Promise.all(s.q.splice(0)); },
     pump(onArena) { const out = s.ws.sent.slice(seen); seen = s.ws.sent.length; for (const m of out) if (m.t === 'arena') { const w = readArenaOut(m); if (w) onArena(w, s.room); } },

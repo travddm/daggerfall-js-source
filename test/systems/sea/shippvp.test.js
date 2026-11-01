@@ -16,7 +16,7 @@ import { newWildRef, wildZone, wildPose, WILD_REF, WILD_GRACE } from '../../../s
 import { SHIP_REF } from '../../../src/net/serpent/serpentBrain.js';
 import { HULL_BUILDS } from '../../../src/systems/naval/navalShips.js';
 import { refitShare, UPGRADE_TIERS } from '../../../src/systems/fleet.js';
-import { validWildData, validWildRefOut, wildDirected, relaySupportsSeaPvp, SEA_PVP_KINDS, SEA_PVP_RELAY_MIN, SEA_SHOT_MAX, worldRoom, PIXEL_UNITS } from '../../../src/net/wire.js';
+import { validWildData, validWildRefOut, wildDirected, SEA_PVP_KINDS, SEA_SHOT_MAX, worldRoom, PIXEL_UNITS } from '../../../src/net/wire.js';
 import { SIEGE_UNITS_PER_M } from '../../../src/net/siege/siegeRef.js';
 import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 import { itemWorth } from '../../../src/systems/item/itemLaw.js';
@@ -280,11 +280,9 @@ test('SHIP-PVP the wreck (seaRef.js): her bar at none by a captain\'s shot, or b
   assert.equal(R.SEA_WRECK_PREFIX, 'seawreck:');
 });
 
-test('SHIP-PVP the wire: a captain\'s helm, shot and boarding projected within their bounds, a shot directed at her captain\'s room and a boarding the wreck\'s room\'s; the referee\'s hull, wreck and signed wreck; the relay that referees them (mutants: the bounds, the kinds, the gate)', () => {
+test('SHIP-PVP the wire: a captain\'s helm, shot and boarding projected within their bounds, a shot directed at her captain\'s room and a boarding the wreck\'s room\'s; the referee\'s hull, wreck and signed wreck (mutants: the bounds, the kinds)', () => {
   assert.deepEqual([...SEA_PVP_KINDS], ['helm', 'shot', 'board']);
   assert.equal(SEA_SHOT_MAX, 8000);
-  assert.equal(SEA_PVP_RELAY_MIN, 246);
-  assert.deepEqual(['world245', 'world246', 'world300', 'x', null].map(relaySupportsSeaPvp), [false, true, true, false, false]);
   assert.deepEqual(validWildData({ k: 'helm', hl: 2, t: 150, u: 7, h: 900, junk: 1 }), { k: 'helm', hl: 2, t: 150, u: 7, h: 900 });
   for (const bad of [{ hl: 5 }, { hl: -2 }, { t: 99 }, { t: 241 }, { u: -1 }, { h: 1001 }, { h: 1.5 }]) assert.equal(validWildData({ k: 'helm', hl: 2, t: 150, u: 7, h: 900, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(validWildData({ k: 'shot', to: 'peer-0002', d: SEA_SHOT_MAX, s: 0, f: 1 }), { to: 'peer-0002', k: 'shot', d: SEA_SHOT_MAX, s: 0, f: 1 });
@@ -358,25 +356,23 @@ test('SHIP-PVP the relay, end to end over the fake room: two captains at their h
   } finally { Date.now = realNow; }
 });
 
-test('SHIP-PVP the socket\'s gate (online.js): the open sea\'s kinds go only to a relay that referees them - the socket each word leaves by: my cell\'s, a halo\'s its own, carried across a crossing (mutants: the gate, the halo, the crossing)', async () => {
+test('SHIP-PVP the socket (online.js): the open sea\'s kinds leave by the socket of the room they name - my cell\'s, or a halo\'s - and a crossing swaps which socket is mine (mutants: the halo, the crossing)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, rand: () => 0, now: () => 1e6 });
   const STILL = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 };
-  s.join('world:10,10', STILL); const A = sockets[0]; await A.onopen(); A.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: `world${SEA_PVP_RELAY_MIN}` });
-  s.setHalo(['world:11,10']); const B = sockets[1]; await B.onopen(); B.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: `world${SEA_PVP_RELAY_MIN - 1}` });
+  s.join('world:10,10', STILL); const A = sockets[0]; await A.onopen(); A.receive({ t: 'welcome', id: 'mac-0001', peers: [] });
+  s.setHalo(['world:11,10']); const B = sockets[1]; await B.onopen(); B.receive({ t: 'welcome', id: 'mac-0001', peers: [] });
   const said = (ws) => ws.sent.filter((x) => x.startsWith('{"t":"wild"')).map((x) => JSON.parse(x).data.k);
   const helm = { k: 'helm', hl: 2, t: 100, u: 5, h: 1000 }, board = { k: 'board', r: 'aaaaaaaaaaaa' };
-  assert.deepEqual([s.seaPvpOk, s._halo.get('world:11,10').seaPvpOk, s._halo.get('world:11,10').wildOk], [true, false, true], 'the halo says for itself');
   assert.equal(s.sendWild(helm), true);
-  assert.equal(s.sendWild(board, { room: 'world:11,10' }), false, 'never to a relay that does not referee them - it closes the socket');
+  assert.equal(s.sendWild(board, { room: 'world:11,10' }), true);
   assert.equal(s.sendWild(board, { room: 'world:10,10' }), true);
-  assert.deepEqual([said(A), said(B)], [['helm', 'board'], []]);
+  assert.deepEqual([said(A), said(B)], [['helm', 'board'], ['board']]);
   s.join('world:11,10', STILL);
   assert.equal(s._ws, B, 'B promoted');
-  assert.deepEqual([s.seaPvpOk, s._halo.get('world:10,10').seaPvpOk], [false, true], 'each word carried across the crossing');
-  assert.equal(s.sendWild(helm), false, 'my cell\'s relay now does not');
-  assert.equal(s.sendWild(board, { room: 'world:10,10' }), true, 'the halo\'s does');
-  assert.deepEqual([said(A), said(B)], [['helm', 'board', 'board'], []]);
+  assert.equal(s.sendWild(helm), true);
+  assert.equal(s.sendWild(board, { room: 'world:10,10' }), true, 'the old cell is a halo now');
+  assert.deepEqual([said(A), said(B)], [['helm', 'board', 'board'], ['board', 'helm']]);
 });
 
 /** The service, two realm characters - kim's ship a hold of swords, hal her hunter - and the gate's key. */

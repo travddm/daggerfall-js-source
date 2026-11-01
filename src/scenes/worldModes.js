@@ -326,7 +326,7 @@ import { freeTavernRooms } from '../systems/guild/guildServices.js';
 import { BankWindow, preloadBankArt, bankArtLoaded, BANK_RECTS, BANK_PANEL_X, BANK_PANEL_Y } from '../ui/bankWindow.js';
 import { BankPurchaseWindow, preloadPurchaseArt, purchaseArtLoaded } from '../ui/bankPurchaseWindow.js';   // H2
 import { titleDeed, shipLabel, BOAT_DEED_TEMPLATE as FLEET_DEED_TEMPLATE } from '../systems/fleet.js';   // HOLDINGS: a bought deed into the Fleet's book
-import { createBankAccounts, createHouses, BANK_REGION_COUNT, TRANSACTION_RESULT, ownsHouse, isHouseOwned, deedStands, deedHeldIn, regionDeeds, regionHousesFull, dropDeed, townDeeds, houseSellPrice, housesForSale, allocateHouseToPlayer, purchaseHouse, ownsShip, ownedShipType, purchaseShip, sellShip, sellHouse, SHIP_COORDS, SHIP_INTERIOR_MAP_IDS, creditMarksSale, marksSaleCredit, crossedDeedLines, goldRegion } from '../systems/banking.js';   // H1/H2   // H3: the two leaves - the sell price and the ship
+import { createBankAccounts, createHouses, BANK_REGION_COUNT, TRANSACTION_RESULT, ownsHouse, isHouseOwned, deedStands, deedHeldIn, regionDeeds, regionHousesFull, dropDeed, townDeeds, houseSellPrice, housesForSale, allocateHouseToPlayer, purchaseHouse, ownsShip, ownedShipType, purchaseShip, sellShip, sellHouse, SHIP_COORDS, SHIP_INTERIOR_MAP_IDS, creditMarksSale, marksSaleCredit, goldRegion } from '../systems/banking.js';   // H1/H2   // H3: the two leaves - the sell price and the ship
 import { isEtherPlaceId } from '../world/etherPlaces.js';   // AUDIT CAPTAIN'S SEA P9: an isle town's buildings are no deed's
 // HOME1: the online homes - the door's one answer, the offer, the owner's menu, and an owned home's own scene
 import {
@@ -3780,8 +3780,8 @@ export function createWorldModes(host) {
   }
   /** AUDIT HOME-PRICE C1: WHAT THE BANK PAYS FOR THIS REGION'S DEED. Online, the deed share of that house's ONLINE price
    *  (homeListPrice: the ground and the town's size, the directory's `townBlocks`) - one house price online. The deed an
-   *  online character holds is a knightly order's free house (the bank sells none online - HOME_BANK_LINES - and customs'
-   *  are `crossed`), and Daggerfall's radius x 1280 bought it back for up to a million, four times the dearest home.
+   *  online character holds is a knightly order's free house (the bank sells none online - HOME_BANK_LINES), and
+   *  Daggerfall's radius x 1280 bought it back for up to a million, four times the dearest home.
    *  Offline Daggerfall's own (GetHouseSellPrice). */
   function deedSellPrice(owned) {
     if (!owned) return 0;
@@ -4733,14 +4733,10 @@ export function createWorldModes(host) {
       // ONLY inside the two nested successes (DaggerfallBankingWindow.cs:443-451) and has no else, so an
       // owned-but-unresolved house gets no box at all - not a box priced at zero. HOUSES-3: each house of the region
       // this town resolves is an offer, in turn, priced as H3 prices one (AUDIT HOME-PRICE C1: online, the online
-      // price's share) - and RESTORE's crossed words beside it: what came through customs is never bought back online.
-      houseOffers: () => townHouses().map(({ deed, summary }) => ({
-        price: deedSellPrice(summary),
-        crossed: crossedDeedLines('house', { houses: playerEntity.houses, regionIndex: bankRegion(), player: playerEntity, deed }),
-      })),
+      // price's share).
+      houseOffers: () => townHouses().map(({ summary }) => ({ price: deedSellPrice(summary) })),
       ownsShip: () => ownsShip(playerEntity),
       ownedShip: () => ownedShipType(playerEntity),
-      crossedDeed: (kind) => crossedDeedLines(kind, { houses: playerEntity.houses, regionIndex: bankRegion(), player: playerEntity }),   // RESTORE: the ship's
       // The two SALES themselves. Both credit the bank ACCOUNT rather
       // than the purse - DFU pays a deed into the account - and both
       // drop what they made permanent.
@@ -7402,8 +7398,8 @@ export function createWorldModes(host) {
   /** Sell it back - asked first, at what the sale pays: the service's deed share of what was PAID, and the rent held on it
    *  (homeSaleOffer; AUDIT HOME-PRICE C3). */
   function openHomeSale(bd) {
-    // HOME-CROSSED (FIELD BUGS 2026-09-30): a home customs carried in is never bought back online - the door says so
-    // and asks no price (it asked 600,100 of Seanobi's, and the service paid its deed share of nothing and took it)
+    // HOME-CROSSED: a home no realm record paid for is never bought back online - the door says so and asks no price,
+    // since the service would pay the deed share of nothing and take the house
     const home = homeOf(bd);
     if (home?.crossed && host.realmAct) { townTalk?.showOverlay?.(new ChoiceWindow({ lines: HOME_CROSSED_LINES, options: [{ code: 'Escape', label: 'Esc - close', action: () => {} }] })); return; }
     // HOME-PRICE: what the sale will pay - the service's own sum (its deed share of what was PAID), never this client's

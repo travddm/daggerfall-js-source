@@ -6,8 +6,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CHANNEL_COLOURS, NAME_COLOURS, PING_COLOURS, CHAT_GROUNDS, PING_GROUNDS, contrast, channelRules, pipRules } from '../../src/ui/chatColours.js';
-import { CHAT_TABS, ChatLog, mentions, langJoinedText, NO_LANG_TEXT, LANG_OLD_RELAY_TEXT } from '../../src/net/chat.js';
-import { CHAT_LANGS, CHAT_LANG_PREFIX, chatLangRoom, isChatRoom, isRegionRoom, relaySupportsLang, LANG_RELAY_MIN, RELAY_VERSION } from '../../src/net/wire.js';
+import { CHAT_TABS, ChatLog, mentions, langJoinedText, NO_LANG_TEXT } from '../../src/net/chat.js';
+import { CHAT_LANGS, CHAT_LANG_PREFIX, chatLangRoom, isChatRoom, isRegionRoom, RELAY_VERSION } from '../../src/net/wire.js';
 import { parseChatLine, CHANNEL_COMMANDS, HELP_LINES, LANG_LINES, unknownLangText } from '../../src/net/chatCommands.js';
 import { PREF_DEFAULTS } from '../../src/systems/uiPrefs.js';
 import { ONLINE_PLAYERS_OWN_PREFS } from '../../src/systems/online/onlineLane.js';
@@ -89,7 +89,7 @@ test('PING1 log: a line naming me is marked and counted on its tab until read, m
   assert.ok(log.pingSeq > a.seq, 'and still chimed');
 });
 
-test('CHAT-LANG wire: one channel per language, keyed by its code under its own prefix, whitelisted, no region; the relay that opens them is world196 and the version moved', () => {
+test('CHAT-LANG wire: one channel per language, keyed by its code under its own prefix, whitelisted, no region; the version moved', () => {
   assert.equal(Object.keys(CHAT_LANGS).length, 15);
   assert.equal(CHAT_LANGS.de, 'Deutsch');
   assert.equal(chatLangRoom('de'), `${CHAT_LANG_PREFIX}de`);
@@ -97,10 +97,7 @@ test('CHAT-LANG wire: one channel per language, keyed by its code under its own 
   assert.equal(chatLangRoom('toString'), null);
   for (const code of Object.keys(CHAT_LANGS)) { assert.ok(isChatRoom(chatLangRoom(code)), code); assert.ok(!isRegionRoom(chatLangRoom(code)), code); }
   assert.equal(isChatRoom('chat:lang.xx'), false);
-  assert.equal(LANG_RELAY_MIN, 196);   // world192 on its branch, renumbered past main's world192-world195 at the port
-  assert.equal(relaySupportsLang('world195'), false);
-  assert.equal(relaySupportsLang('world196'), true);
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 test('CHAT-LANG tab and commands: the Language tab rides a room of its own, off the bar until chosen; /lang lists, chooses and leaves; /lc says a line on it', () => {
@@ -119,5 +116,5 @@ test('CHAT-LANG tab and commands: the Language tab rides a room of its own, off 
   assert.match(LANG_LINES[1], /^en English · de Deutsch/);
   assert.equal(unknownLangText('xx'), 'There is no "xx" language channel. /lang lists them.');
   assert.equal(langJoinedText('Deutsch'), 'Language channel: Deutsch.');
-  assert.ok(NO_LANG_TEXT.includes('/lang') && LANG_OLD_RELAY_TEXT.includes('update'));
+  assert.ok(NO_LANG_TEXT.includes('/lang'));
 });

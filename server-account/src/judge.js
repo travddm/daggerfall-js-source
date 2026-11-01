@@ -5,7 +5,7 @@
 // ═══ WHAT REALM-ARC SECTION 4 PROMISED, AND THE SAVE NEVER GOT ═════
 //
 // "The service reads the checkpoint's summary, spot-checks the blob, and refuses a checkpoint that breaks the law." Until
-// this module the service read a save twice - customs' wealth at the first checkpoint (realm.js firstSaveRefusal) and
+// this module the service read a save twice - a new character's wealth at the first checkpoint (realm.js firstSaveRefusal) and
 // the goods a hand-over takes (realmTradeLaw.js) - and stored every other checkpoint unopened. A client could write any
 // character it liked one checkpoint after its first: a sword no producer mints, a level it never earned, a purse that
 // grew by a million between two saves, and every route that hands a realm character's goods to another player

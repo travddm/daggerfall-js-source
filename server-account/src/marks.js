@@ -15,7 +15,7 @@
 // ═══ ONE STATEMENT DECIDES ═════════════════════════════════════════
 //
 // Every movement is ONE `INSERT ... SELECT ... WHERE` into the ledger
-// (0025_marks.sql), its WHERE holding the payer's balance, the payee's
+// (the `marks` ledger), its WHERE holding the payer's balance, the payee's
 // cap and the day's cap as they stand at that statement; the ledger's own
 // triggers move the balances on the line's insert. So two requests racing
 // never overdraw a balance nor pass a cap, no Mark moves without its line,
@@ -237,7 +237,7 @@ export const deedRid = (event) => `deed:${event}`;
  *      AUDIT SILVER-WAYS A1: a gate's guard is its row's second, and a refused re-claim in that second (the same
  *      receipt, another character named) passed it - the mark was once a (guild, event, account), so an account with a
  *      character in each of three guilds marked all three, and its gate struck their deeds. One account, one guild an
- *      event: the migration's unique (event, account), which this INSERT OR IGNORE meets.
+ *      event: the schema's unique (event, account), which this INSERT OR IGNORE meets.
  *   2. THE STRIKE: where that guild now has `members` (3) accounts' marks on the event, 25 silver into its treasury -
  *      once an event a guild (the line's id the deed's, the guild its actor), at most `perDay` (4) a guild a UTC day,
  *      never past MARKS_MAX. A strike the day's cap refused is struck by the next member's COUNTED claim of that event:

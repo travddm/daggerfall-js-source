@@ -2,7 +2,7 @@
 // street pools (scenes/exteriorFoes.js) each with its own grants' host (scenes/grantHost.js) - a record no builder could
 // give is never built, never updated and never ADOPTED: a hand-off of it is refused before it is mine, its copy taken
 // down silently (no death, no body, no loot), tallied once against its SENDER and never against me; an ally is
-// unverified; the staff's `off` switch judges nothing; a relay before world223 is never handed `stats`; and a sender the
+// unverified; the staff's `off` switch judges nothing; and a sender the
 // relay vouched stands on grants is held to them from its first frame.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -34,8 +34,8 @@ const playerEntity = () => ({ level: 9, reflexes: 2, health: 50, maxHealth: 50, 
 async function relay() {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   let n = 100;
-  const session = (id, { mode = 'measure', statsOk = true } = {}) => {
-    const s = { id, room: CELL, status: 'open', grantMode: mode, grantStatsOk: statsOk, grantSenders: new Set(), asks: [], host: null, sendGrant(ask) { s.asks.push(ask); void reply(s, ask); return true; } };
+  const session = (id, { mode = 'measure' } = {}) => {
+    const s = { id, room: CELL, status: 'open', grantMode: mode, grantSenders: new Set(), asks: [], host: null, sendGrant(ask) { s.asks.push(ask); void reply(s, ask); return true; } };
     return s;
   };
   async function reply(s, ask) {
@@ -132,24 +132,13 @@ test('BOSS-BOUND A LIVE STAFF EVENT\'S MINI BOSS IS HELD TO ITS EVENT\'S HEALTH:
   } finally { _resetStaffEvents(); }
 });
 
-test('FOE-BOUNDS THE STAFF\'S SWITCH, AND AN OLDER RELAY: while the law is `off` nothing is judged; a relay before world223 is never handed `stats` - the rest of the tally goes (mutants: judged with the law off; `stats` to an older relay)', async () => {
+test('FOE-BOUNDS THE STAFF\'S SWITCH: while the law is `off` nothing is judged (mutant: judged with the law off)', async () => {
   const { D, honest } = await stood();
   D.session.grantMode = 'off';
   D.pool.applyFoes(OWNER, { ...honest, n: 60, full: 0, f: [{ ...honest.f[0], i: 800, k: 50_000, h: 50_000 }] });
   await settle();
   assert.equal(puppets(D).length, 3, 'off: stood as it ever was');
   assert.equal(D.host.tallied().get(`${OWNER}|stats`), undefined, 'and no `stats` tallied');
-  const { D: E, honest: h2 } = await stood({ statsOk: false });
-  E.pool.applyFoes(OWNER, { ...h2, n: 61, full: 0, f: [{ ...h2.f[0], i: 801, k: 50_000, h: 50_000 }, { ...h2.f[0], i: 802, gr: undefined }] });
-  await settle();
-  assert.deepEqual([...E.host.tallied()].map(([k]) => k).sort(), [`${OWNER}|stats`, `${OWNER}|ungranted`]);
-  const realNow = Date.now;
-  try {
-    Date.now = () => realNow() + GRANT_TALLY_MS + 1000;
-    E.host.tick();
-  } finally { Date.now = realNow; }
-  const tally = E.session.asks.filter((a) => a.k === 'tally');
-  assert.deepEqual(tally.map((a) => a.rows.map((r) => r.r)), [['ungranted']], 'an older relay: no `stats`');
 });
 
 test('GRANT-DOOR A SENDER THE RELAY VOUCHES STANDS ON GRANTS IS HELD TO THEM FROM ITS FIRST FRAME: a record with no grant from a peer whose frames came vouched (net/online.js grantSenders) is `ungranted`, though it never carried one; from one never vouched and never seen with a grant, nothing (mutants: the vouch unread)', async () => {

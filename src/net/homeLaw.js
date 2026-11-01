@@ -39,8 +39,8 @@ export const HOME_ENTRY_DEFAULT = 'private';
 // model's box, at HOME_PRICE_PER_M2, raised by the town's size (homeTownFactor), rounded to HOME_PRICE_STEP and held
 // to HOME_PRICE_MIN..HOME_PRICE_MAX.
 // Offline Daggerfall's own price stands (the bank's market and its buy-back). Online the bank buys a deed back at
-// this price too (AUDIT HOME-PRICE C1: a knightly order's free house); customs counts every deed at its own constant
-// (net/realm/realmGoldLaw.js CUSTOMS_HOUSE_PRICE), never either price.
+// this price too (AUDIT HOME-PRICE C1: a knightly order's free house); the realm's wealth measure counts every deed at its own
+// constant (net/realm/realmGoldLaw.js DEED_HOUSE_PRICE), never either price.
 //
 // THE SERVICE HOLDS THE RANGE (homePriceOk): it bundles no ARENA2, so it cannot measure a building, but no claim names
 // a price outside the range or off its hundreds - a build from before it, which still asks Daggerfall's, is asked to
@@ -99,20 +99,18 @@ export const homeSaleRefund = (price) => Math.trunc((Number.isSafeInteger(price)
  * FIELD BUGS 2026-10-04d KNIGHT-HOUSE (the Discord: "Houses earned through Knightly Orders still possibly purchaseable?
  * ... I don't want to risk my Knight House being bought out from under me"): THE DEED A SAVE HOLDS TO A BUILDING, THAT
  * THE REALM GAVE IT - a deed of region `region` in the save's `houses` (systems/banking.js - HOUSES-3: three a region,
- * regionDeedsOf; a Knightly Order's ReceiveHouse writes one, AllocateHouseToPlayer) naming this town's building - or null. Never a deed
- * customs carried in (`crossed`, systems/realmCustoms.js): that is an offline house, which stays offline only (HOME1, Mac:
- * "Stay offline only" - the server's list decides it online). Both ends read it: the door, and the service's hold
+ * regionDeedsOf; a Knightly Order's ReceiveHouse writes one, AllocateHouseToPlayer) naming this town's building - or null. Both ends read it: the door, and the service's hold
  * (server-account/src/homes.js holdDeed). Map ids compare unsigned (a save keeps the signed one MAPS.BSA reads).
  */
 export function homeDeedOf(houses, region, mapId, buildingKey) {
   const id = Number(mapId) >>> 0;
   if (!homeRegionOk(region) || !homeBuildingKeyOk(buildingKey) || !homeMapIdOk(id)) return null;
-  return regionDeedsOf(houses, region).find((d) => !d.crossed && d.buildingKey === buildingKey && (Number(d.mapId) >>> 0) === id) ?? null;
+  return regionDeedsOf(houses, region).find((d) => d.buildingKey === buildingKey && (Number(d.mapId) >>> 0) === id) ?? null;
 }
 
 /**
  * HOUSES-3: A REGION'S DEEDS in a save's `houses` - Daggerfall's slot for the region (`houses[region]`, its first deed), then
- * the ones beside it (the slot's `more`, each `{ regionIndex, location, mapId, buildingKey, layout?, crossed? }`), up to
+ * the ones beside it (the slot's `more`, each `{ regionIndex, location, mapId, buildingKey, layout? }`), up to
  * HOME_CAP: owned ones only, the records themselves. A save from before keeps its one deed a region where it stood.
  * @param {unknown} houses @param {number} region @returns {any[]}
  */

@@ -75,7 +75,7 @@ test('STORM-SHED 2 B: an account\'s rating is read off its own bouts - one read,
   assert.doesNotMatch(p, /idx_arena_pvp_season/, 'never the season\'s every bout');
 });
 
-test('STORM-SHED 2 B: a Grand Champion\'s row, asked on every registered account\'s token, is found by the account and the bout on idx_arena_pve_player_grand - never every ladder bout the account fought (mutant: migration 0086\'s index unwritten)', async () => {
+test('STORM-SHED 2 B: a Grand Champion\'s row, asked on every registered account\'s token, is found by the account and the bout on idx_arena_pve_player_grand - never every ladder bout the account fought (mutant: the index unwritten)', async () => {
   const db = d1();
   const { db: cdb, sqls } = counting(db, {});
   await arenaHonoursOf({ db: cdb }, { id: 'p1', handle: 'Somebody' }, 1_800_000_000).catch(() => null);

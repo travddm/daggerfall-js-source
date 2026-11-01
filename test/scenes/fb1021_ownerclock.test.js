@@ -20,7 +20,7 @@ import { OnlineSession } from '../../src/net/online.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { createOwnerClock, ownerClock, ownerTmOf, ownerTmDiffS, stampedFrameText, applyingOwnerTm, appliedOwnerTm, OWNER_TM_MOD } from '../../src/net/ownerClock.js';
-import { POSE_TS_MOD, parseClient, FOES_FRAME_MAX, OWN_RELAY_MIN, GROUND_LAW, GRANT_HELLO_LAW, cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
+import { POSE_TS_MOD, parseClient, FOES_FRAME_MAX, RELAY_VERSION, GROUND_LAW, GRANT_HELLO_LAW, cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
 import { puppetLead, LEAD_MAX_S, LEAD_DIST_MAX, LEAD_SLOW_MAX_S, LEAD_DIST_SLOW_MAX, LEAD_SLACK_S, LEAD_GAP_EASE } from '../../src/scenes/puppetLead.js';
 import { catchUpPlan, catchUpOwnerFoes, markModalSteps, wireOwnerClock, extrasAfforded, OWNER_CATCHUP_MAX_S, OWNER_CATCHUP_SHARE, OWNER_CATCHUP_STEPS_MAX, FRAME_MS_MAX } from '../../src/scenes/ownerCatchUp.js';
 import { FOE_MAX_FRAME_DT, foeFrameDt } from '../../src/characters/enemy/enemyMotor.js';
@@ -146,7 +146,7 @@ test('OWNER-CLOCK the session: every foes frame - a cell\'s, a world room\'s hos
     // a world room: the host's stream and the own lane
     s.join('dungeon:m188', pose);
     ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null, v: `world${OWN_RELAY_MIN}` });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null, v: RELAY_VERSION });
     now += 1000; tm = 9001;
     const host = { n: 1, k: 'dungeon:m188', f: [] };
     assert.equal(s.sendFoes(host), true);

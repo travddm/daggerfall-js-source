@@ -317,9 +317,6 @@ export function foundText({ q, l, busy } = {}) {
 }
 /** SCALE5c: `/find` with no hub to ask. */
 export const FIND_OFFLINE_TEXT = 'Search needs the World channel to be connected.';
-/** AUDIT SCALE II C-1: `/find` on a hub whose relay answers no search (one before the shards, world192) - said here and
- *  never sent, since that relay closes the hub link on it. */
-export const FIND_RELAY_TEXT = 'Search is not available on this server yet.';
 
 /** CHAT-LANG: what `/lang` says - the channels, code and name, and how to choose one. */
 export const LANG_LINES = Object.freeze(['Language channels (/lang <code> joins one, /lang off leaves it):',

@@ -7,7 +7,7 @@
 // the ledger's market kinds; the migration's three rebuilds. 26, Appendix B.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { d1 } from '../accountDb.mjs';
 
 import {
   MARKET_LISTING_S, MARKET_ORDER_S, MARKET_LISTINGS_MAX, MARKET_ORDERS_MAX, MARKET_UNITS_MAX, MARKET_PRICE_MAX, MARKET_POSTS_MAX,
@@ -20,7 +20,6 @@ import { WEAVERS_STOCK, FURNISHER_STOCK, STOCKS, stockOf, WOOL, NO_PACK_FORM, wi
 import { MARKS_KINDS } from '../../src/net/marksLaw.js';
 import { material, witnessedFact, pixelReport } from '../../src/net/nodeLaw.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const H = 3600, D = 86_400;
 
 test('PROF5 law: the bounds (10.2, 10.3, section 20) - a listing 72 hours, thirty an account; an order 7 days, twenty; a price 1 to 1,000,000 Marks; 1 to a Stores\' 5,000 units; 60 postings and 120 acts an hour; the views and the crafted families; the switch the three together', () => {
@@ -107,13 +106,15 @@ test('PROF5 law: the ledger\'s market kinds - the fee, the tax and the courier b
   // seat's fee given back) - none of them the market's.
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, w]) => w === 'mint').map(([k]) => k),
     ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');
-  const sql = src('server-account/migrations/0032_market.sql');
-  assert.match(sql, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
-  assert.match(sql, /dst_kind TEXT NOT NULL CHECK \(dst_kind IN \('burn', 'account', 'guild', 'escrow'\)\)/);
-  assert.equal((sql.match(/CREATE TRIGGER IF NOT EXISTS marks_line_/g) ?? []).length, 4, 'the four triggers made again');
-  assert.doesNotMatch(sql, /WHEN NEW\.(src|dst)_kind = 'escrow'/, 'an escrow end moves no balance by trigger');
-  assert.match(sql, /kind\s+TEXT NOT NULL CHECK \(kind IN \('pixel', 'dungeon', 'hub'\)\)/);
-  const products = sql.slice(sql.indexOf('CREATE TABLE IF NOT EXISTS products_new'), sql.indexOf('INSERT INTO products_new'));
-  assert.doesNotMatch(products, /REFERENCES players/, 'a piece outlives its owner\'s account');
-  assert.match(sql, /CREATE UNIQUE INDEX IF NOT EXISTS idx_market_piece_open ON market_listings \(provenance\) WHERE state = 'open'/, 'one live listing a piece');
+  const raw = d1()._raw;
+  const sqlOf = (name) => raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
+  const ledger = sqlOf('marks_ledger');
+  assert.match(ledger, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
+  assert.match(ledger, /dst_kind TEXT NOT NULL CHECK \(dst_kind IN \('burn', 'account', 'guild', 'escrow'\)\)/);
+  const triggers = raw.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'marks_line_%'").all().map((r) => r.sql);
+  assert.equal(triggers.length, 4, 'four triggers move the balances');
+  assert.ok(triggers.every((t) => !/WHEN NEW\.(src|dst)_kind = 'escrow'/.test(t)), 'an escrow end moves no balance by trigger');
+  assert.match(sqlOf('world_witness'), /kind\s+TEXT NOT NULL CHECK \(kind IN \('pixel', 'dungeon', 'hub'/);
+  assert.doesNotMatch(sqlOf('products'), /REFERENCES players/, 'a piece outlives its owner\'s account');
+  assert.match(sqlOf('idx_market_piece_open'), /CREATE UNIQUE INDEX idx_market_piece_open ON market_listings \(provenance\) WHERE state = 'open'/, 'one live listing a piece');
 });

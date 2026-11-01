@@ -15,10 +15,10 @@ import {
 } from '../../../src/net/starfall/starfallLaw.js';
 import { readStarReceipt, verifyStarReceipt, mintStarReceipt, STAR_RECEIPT_MAX, STAR_RECEIPT_V } from '../../../src/net/starfall/starReceipt.js';
 import {
-  parseClient, validStarIn, validStarOut, relaySupportsStar, STAR_RELAY_MIN, STAR_STARS_MAX, STAR_WAVES_MAX, STAR_LEVEL_WIRE_MAX,
+  parseClient, validStarIn, validStarOut, STAR_STARS_MAX, STAR_WAVES_MAX, STAR_LEVEL_WIRE_MAX,
   STAR_KILLS_MAX, STAR_BLOWS_MAX, STAR_TOP_WIRE_MAX, STAR_COUNT_MAX, STAR_LIGHT_MAX, STAR_PHASE_MAX, STAR_RECEIPT_WIRE_MAX,
   STAR_HELD_MAX, STAR_HELD_KEY, STAR_LEDGERS_MAX, STAR_LEDGERS_BY_MAX, STAR_IDLE_MS, STAR_KEEP_MS, STAR_RC_KEEP, STAR_RC_KEEP_MS,
-  starLedgerKey, starReceiptKeyOf, LIVE_EVENTS, LIVE_EVENT_RELAY_MIN, relayKnowsLiveEvent, RELAY_VERSION, SOCIAL_ROOM,
+  starLedgerKey, starReceiptKeyOf, LIVE_EVENTS, RELAY_VERSION, SOCIAL_ROOM,
   worldRoom, STAR_INTERNAL_HELD, STAR_WAVE_SIZE_MAX, STAR_WAVE_SIZE_OLD_MAX,
 } from '../../../src/net/wire.js';
 import { fakeRooms } from '../../fakeRoom.mjs';
@@ -136,12 +136,8 @@ test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its dea
   assert.equal(STAR_PHASE_MAX, STAR_PHASES.length - 1);
   assert.equal(STAR_RECEIPT_WIRE_MAX, STAR_RECEIPT_MAX);
   assert.equal(STAR_RECEIPT_V, 'j1');
-  // the relay that speaks it - and no live event to stage: the stars fall on the festival's own days (net/festivalLaw.js)
-  assert.equal(STAR_RELAY_MIN, 235);   // world233 on the branch, renumbered past SD-SEA's world233 and DEX1's world234 at the merge - neither keeps a star
-  assert.equal(relaySupportsStar(`world${STAR_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsStar(`world${STAR_RELAY_MIN}`), true);
-  assert.equal(relaySupportsStar(RELAY_VERSION), true, 'this build\'s relay keeps a star');
-  assert.ok(!LIVE_EVENTS.includes('witchfest') && !Object.hasOwn(LIVE_EVENT_RELAY_MIN, 'witchfest'), 'no word of the hub\'s gates a star');
+  // no live event to stage: the stars fall on the festival's own days (net/festivalLaw.js)
+  assert.ok(!LIVE_EVENTS.includes('witchfest'), 'a star is no live event of the hub');
 });
 
 test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its star, pixel, phase, accounts and receipts - and nothing else under a star\'s key is read as one (a word makes the star anew) or kept (the sweep forgets a value under a key not its own); the held word is the wire\'s; a night\'s held stars stand until its last star is gone (mutants: a phase past the law\'s read; a ledger without its receipts read; a value under another star\'s key kept; the night gone with its first star)', async () => {
@@ -631,7 +627,7 @@ test('STAR3 THE HUB: a hold told again is neither said nor kept twice; a receipt
 
 // ═══ THE SESSION ══════════════════════════════════════════════════════════════════════════════════
 
-test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - my own or a halo\'s - only when that socket\'s own relay keeps a star; a cell\'s ledger is heard from a cell, the night\'s held list from the hub, a hold and a receipt from either (mutants: the halo sent on the primary\'s word; the hub\'s list heard from a cell)', () => {
+test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - my own or a halo\'s - only once that socket is welcomed; a cell\'s ledger is heard from a cell, the night\'s held list from the hub, a hold and a receipt from either (mutants: the halo sent on the primary\'s word; the hub\'s list heard from a cell)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = T.fallAt;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
@@ -639,9 +635,6 @@ test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - 
   try {
     s.join(CELL, { x: ON.x, y: 0, z: ON.z, yaw: 0 });
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: `world${STAR_RELAY_MIN - 1}` });
-    assert.equal(s.starReady(CELL), false);
-    assert.equal(s.sendStar(word(), CELL), false, 'an older relay would close the socket for it');
     sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION });
     assert.equal(s.sendStar(word(), CELL), true);
     assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'star').length, 1);
@@ -650,9 +643,8 @@ test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - 
     s.setHalo([other]);
     const halo = sockets[1];
     halo.open();
-    halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: `world${STAR_RELAY_MIN - 1}` });
     t += 1000;
-    assert.equal(s.sendStar(word({ px: PX + 16 }), other), false, 'the halo\'s own relay would close the socket for it');
+    assert.equal(s.sendStar(word({ px: PX + 16 }), other), false, 'the halo\'s socket is not welcomed yet');
     halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const before = sockets[0].sent.filter((x) => JSON.parse(x).t === 'star').length;
     assert.equal(s.sendStar(word({ px: PX + 16 }), other), true);

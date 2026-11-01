@@ -1,8 +1,8 @@
 // REALM P1: THE REALM'S CHARACTERS, SERVICE SIDE (server-account/src/realm.js,
-// migration 0018 - 0016 on its branch). These pins drive the REAL Worker over the REAL migrations (node:sqlite behind a D1-shaped face and
+// `realm_characters`). These pins drive the REAL Worker over the REAL migrations (node:sqlite behind a D1-shaped face and
 // R2's three calls, as test/server/cloudsaves.test.js does): a realm character is minted by the service, joined under a lease
-// that takes it from any other tab, checkpointed only under that lease at the next sequence, left, deleted, copied
-// back, and brought in once from offline through customs when it has played online before.
+// that takes it from any other tab, checkpointed only under that lease at the next sequence, left, deleted and copied
+// back.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -41,7 +41,7 @@ function d1() {
       };
       return api;
     },
-    // D1's batch is one transaction (test/net/realm4.test.js's face): all of it, or none - AUDIT REALM's delete and customs ride one
+    // D1's batch is one transaction (test/net/realm4.test.js's face): all of it, or none - AUDIT REALM's delete rides one
     async batch(list) {
       db.exec('BEGIN');
       try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; }
@@ -94,7 +94,7 @@ const save = (text) => new TextEncoder().encode(text);
 const FIRST = JSON.stringify(freshSave({ name: 'Nystul' }));
 
 test('REALM P1: the routes are the service\'s, behind a session and never open - a guest holds realm characters too; acct17 and the toml in step', async () => {
-  for (const r of ['/v1/realm', '/v1/realm/create', '/v1/realm/customs', '/v1/realm/join', '/v1/realm/leave', '/v1/realm/delete']) assert.ok(ROUTES.has(r), r);
+  for (const r of ['/v1/realm', '/v1/realm/create', '/v1/realm/join', '/v1/realm/leave', '/v1/realm/delete']) assert.ok(ROUTES.has(r), r);
   assert.deepEqual(realmPathOf('/v1/realm/r0123456789abcdef0123/data'), { id: 'r0123456789abcdef0123' });
   assert.equal(realmPathOf('/v1/realm/c0ffee00-1111/data'), null, 'a client\'s id is no realm id');
   assert.equal(realmPathOf('/v1/realm/r0123456789abcdef0123/shot'), null);
@@ -120,7 +120,7 @@ test('REALM P1: a new character is the service\'s - its id and lease minted ther
   assert.equal(row.id, made.body.id);
   assert.equal(row.name, 'Nystul', 'trimmed');
   assert.deepEqual(row.summary, { level: 1, className: 'Spellsword', race: 'Breton', gender: 'male', face: 3, region: null }, 'the tile\'s fields and nothing else');
-  assert.deepEqual([row.seq, row.bytes, row.playing, row.customs], [0, 0, true, false]);
+  assert.deepEqual([row.seq, row.bytes, row.playing], [0, 0, true]);
   assert.equal('lease' in row, false, 'the lease is never listed');
   assert.equal((await call('POST', '/v1/realm/create', { name: '' }, g.secret)).status, 400);
   assert.equal((await call('POST', '/v1/realm/create', { name: 'Bad\u0007' }, g.secret)).status, 400);
@@ -228,66 +228,6 @@ test('REALM P1: the player\'s own delete takes its objects and the row', async (
   assert.deepEqual((await call('GET', '/v1/realm', undefined, g.secret)).body.characters, []);
 });
 
-test('REALM P1: customs brings an offline character in ONCE, and only one that played online before the realm (its Renown track in the census the realm took at its start - AUDIT REALM L1-F5); a realm id is no origin', async () => {
-  const { env, call, put, guest } = await stand();
-  const g = await guest();
-  const origin = 'c0ffee00-1111-2222-3333-444455556666';
-  const never = await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, g.secret);
-  assert.deepEqual([never.status, never.body], [403, { error: 'customs-never-online' }]);
-  env.DB._raw.prepare('INSERT INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)').run(g.id, origin, 'Nystul', 500, 1, 1);
-  const late = await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, g.secret);
-  assert.deepEqual([late.status, late.body], [403, { error: 'customs-never-online' }], 'a track written after the realm began is no proof (AUDIT REALM L1-F5)');
-  // as migration 0020 counted it at the realm's start - here, and on a second account a copy of it played online from
-  const copied = await guest();
-  for (const who of [g, copied]) env.DB._raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(who.id, origin);
-  env.DB._raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (1, 2, ?, ?, 'Nystul', 17, 'private', 1000, 1)").run(g.id, origin);
-  env.DB._raw.prepare("INSERT INTO guilds (id, name, name_key, tag, ranks, treasury, founded_at) VALUES ('g1', 'The Order', 'the order', 'ORD', '[]', 0, 1)").run();
-  env.DB._raw.prepare("INSERT INTO guild_members (player, char_id, guild_id, rank, name, joined_at) VALUES (?, ?, 'g1', 5, 'Nystul', 1)").run(g.id, origin);
-  const came = await call('POST', '/v1/realm/customs', { origin, name: 'Nystul', summary: { level: 12 } }, g.secret);
-  assert.equal(came.status, 200);
-  assert.match(came.body.id, REALM_ID_RE);
-  assert.notEqual(came.body.id, origin, 'the service mints its own id');
-  // its Renown track comes in with it, under the realm's id now - CUSTOMS-CARRY (Mac 2026-09-29, "Carry them"): and its
-  // home and its guild place, what stood before the realm (AUDIT REALM2 S2 had left them with the offline id)
-  assert.deepEqual(env.DB._raw.prepare('SELECT char_id, xp FROM renown_tracks WHERE player = ?').all(g.id).map((r) => ({ ...r })), [{ char_id: came.body.id, xp: 500 }]);
-  assert.deepEqual(env.DB._raw.prepare('SELECT char_id FROM homes WHERE player = ?').all(g.id).map((r) => r.char_id), [came.body.id]);
-  assert.deepEqual(env.DB._raw.prepare('SELECT char_id, rank FROM guild_members WHERE player = ?').all(g.id).map((r) => ({ ...r })), [{ char_id: came.body.id, rank: 5 }], 'and its guild place');
-  // AUDIT REALM L3-F3: a customs whose first save never landed is taken up again - the same row, a new lease - and once
-  // its first save lands, the character is in and customs is spent
-  const again = await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, g.secret);
-  assert.deepEqual([again.status, again.body.id, again.body.resumed, again.body.seq], [200, came.body.id, true, 0], 'resumed, never a second character');
-  assert.notEqual(again.body.lease, came.body.lease, 'under a new lease');
-  const first = await put(came.body.id, '{"v":1}', g.secret, { lease: again.body.lease, seq: 1 });
-  assert.equal(first.status, 200, 'its first save lands');
-  const spent = await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, g.secret);
-  assert.deepEqual([spent.status, spent.body], [409, { error: 'customs-already' }]);
-  assert.equal((await call('POST', '/v1/realm/customs', { origin: came.body.id, name: 'X' }, g.secret)).status, 400, 'a realm id is no offline character');
-  const [row] = (await call('GET', '/v1/realm', undefined, g.secret)).body.characters;
-  assert.equal(row.customs, true);
-  // another account's track is not mine - and a character in once is in once, on every account (AUDIT REALM L3-F2): a
-  // copy of it counted on a second account before the realm finds it already in; a deleted realm character never lets
-  // its origin in again
-  const other = await guest();
-  // CUSTOMS-ELSEWHERE (FIELD BUGS 2026-09-30
-  // brought in is `customs-already` here too - customs no longer answers "no record" of one the realm counted
-  assert.deepEqual((await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, other.secret)).body, { error: 'customs-already' });
-  assert.deepEqual((await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, copied.secret)).body, { error: 'customs-already' });
-  assert.equal((await call('POST', '/v1/realm/delete', { id: came.body.id }, g.secret)).status, 200);
-  for (const who of [g, copied]) {
-    assert.deepEqual((await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, who.secret)).body, { error: 'customs-already' }, 'spent on every account');
-  }
-});
-
-test('AUDIT REALM L3-F2: customs holds the account\'s bound in its one write - a seventh character is refused and spends no census', async () => {
-  const { env, call, guest } = await stand();
-  const g = await guest();
-  for (let i = 0; i < REALM_CHARACTERS_MAX; i++) assert.equal((await call('POST', '/v1/realm/create', { name: `N${i}` }, g.secret)).status, 200);
-  const origin = 'c0ffee00-1111-2222-3333-444455556666';
-  env.DB._raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(g.id, origin);
-  assert.deepEqual((await call('POST', '/v1/realm/customs', { origin, name: 'Nystul' }, g.secret)).body, { error: 'too-many-characters' });
-  assert.equal(env.DB._raw.prepare('SELECT spent FROM realm_census WHERE char_id = ?').get(origin).spent, 0, 'still to come in');
-});
-
 test('REALM P1: the shapes - a summary projected and bounded, a name trimmed and printable, the CORS door open to the realm headers', async () => {
   assert.equal(realmSummaryOf(null), null);
   assert.equal(realmSummaryOf([1]), null);
@@ -300,5 +240,4 @@ test('REALM P1: the shapes - a summary projected and bounded, a name trimmed and
   const { env } = await stand();
   const res = await worker.fetch(new Request('https://accounts.invalid/v1/realm', { method: 'OPTIONS' }), env);
   assert.match(res.headers.get('access-control-allow-headers'), /x-realm-lease, x-realm-seq, x-realm-summary/);
-  assert.match(src('server-account/migrations/0018_realm_characters.sql'), /CREATE UNIQUE INDEX IF NOT EXISTS realm_characters_origin ON realm_characters \(player, origin_id\) WHERE origin_id IS NOT NULL;/);
 });

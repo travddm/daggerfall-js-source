@@ -11,9 +11,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  validTravellerMark, validTravellerFrame, parseClient, relaySupportsTravellers, isRegionRoom, travHubGate, travRoomGate,
+  validTravellerMark, validTravellerFrame, parseClient, isRegionRoom, travHubGate, travRoomGate,
   TRAV_KEYS, TRAV_MODES, TRAV_SEND_MIN_MS, TRAV_KEEPALIVE_MS, TRAV_STALE_MS, TRAV_HUB_MIN_MS, TRAV_ROOM_HZ_MAX, TRAV_WELCOME_MAX,
-  TRAVELLER_RELAY_MIN, RELAY_VERSION, chatRegionRoom, CHAT_WORLD_ROOM, DROP_STRIKES_MAX, WORLD_PIXEL_BOUND,
+  RELAY_VERSION, chatRegionRoom, CHAT_WORLD_ROOM, DROP_STRIKES_MAX, WORLD_PIXEL_BOUND,
 } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
@@ -63,10 +63,6 @@ test('TV3 wire: the frame parses after the hello only, a null clears, a bad mark
   assert.equal(validTravellerFrame({ t: 'trav', id: 'peer-0002', p: { ...MARK, m: 9 } }), null);
   assert.equal(validTravellerFrame({ t: 'trav', id: 'x', p: MARK }), null, 'an id off the wire\'s shape');
   assert.equal(validTravellerFrame({ t: 'party', id: 'peer-0002', p: MARK }), null);
-  assert.equal(TRAVELLER_RELAY_MIN, 122);
-  assert.equal(relaySupportsTravellers('world121'), false, 'an older relay closes the socket on the frame');
-  assert.equal(relaySupportsTravellers('world122'), true);
-  assert.equal(relaySupportsTravellers(RELAY_VERSION), true, 'this relay does');
   assert.equal(isRegionRoom(chatRegionRoom(17)), true);
   assert.equal(isRegionRoom(CHAT_WORLD_ROOM), false, 'the world channel is everyone\'s - a mark there would be the whole bay');
   assert.equal(isRegionRoom('chat:region.99'), false, 'a region the politic map does not have');
@@ -191,17 +187,12 @@ function regionLink(relayV = RELAY_VERSION, room = chatRegionRoom(5)) {
   return { s, ws, heard, out: () => ws.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'trav'), tick: (ms) => { t += ms; }, welcome: (extra = {}) => quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: relayV, ...extra })) };
 }
 
-test('TV3 session: a mark goes only through a relay that knows it, only in a region\'s channel, never sooner than the floor; a bad one never leaves', () => {
-  const old = regionLink('world121');
-  old.welcome();
-  assert.equal(old.s.travOk, false);
-  assert.equal(old.s.sendTraveller(MARK), false, 'world121 would close the socket on it');
+test('TV3 session: a mark goes only in a region\'s channel, never sooner than the floor; a bad one never leaves', () => {
   const world = regionLink(RELAY_VERSION, CHAT_WORLD_ROOM);
   world.welcome();
   assert.equal(world.s.sendTraveller(MARK), false, 'not in the world channel');
   const { s, out, tick, welcome } = regionLink();
   welcome();
-  assert.equal(s.travOk, true);
   assert.equal(s.sendTraveller({ ...MARK, m: 7 }), false, 'refused at home');
   assert.equal(s.sendTraveller(MARK), true);
   assert.deepEqual(out().at(-1), { t: 'trav', p: MARK });
@@ -321,15 +312,10 @@ test('AUDIT DEEP2 C2 relay: a clear over the room\'s budget is OWED, not lost - 
   } finally { Date.now = realNow; }
 });
 
-test('AUDIT DEEP T3-5/T3-6 session: a fresh socket knows nothing of its relay until ITS welcome (a rollback closes on a mark); a welcome row is aged as old as it says, and no older than the stale limit', () => {
-  const { s, ws, heard, welcome } = regionLink();
+test('AUDIT DEEP T3-5/T3-6 session: a welcome row is aged as old as it says, and no older than the stale limit', () => {
+  const { heard, welcome } = regionLink();
   welcome();
-  assert.equal(s.travOk, true);
-  ws.open();   // the same socket's handlers on a fresh open - a reconnect
-  assert.equal(s.travOk, false, 'reset on the open');
-  assert.equal(s.sendTraveller(MARK), false, 'no mark before the welcome says the relay knows it');
   welcome({ tr: [{ id: 'peer-0002', name: 'Bran', p: MARK, ag: 120 }, { id: 'peer-0003', name: 'Cass', p: MARK, ag: 1e9 }, { id: 'peer-0004', name: 'Dai', p: MARK }] });
-  assert.equal(s.travOk, true);
   const list = heard.room.at(-1);
   assert.deepEqual(list.map((f) => [f.id, f.ag]), [['peer-0002', 120], ['peer-0003', TRAV_STALE_MS / 1000], ['peer-0004', 0]], 'as said, clamped, and none is fresh (an older relay)');
   const book = createTravellerBook();

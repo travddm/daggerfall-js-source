@@ -121,7 +121,7 @@ test('RAID4 the claim: a receipt the relay signed, naming the claiming account, 
   assert.equal((await claimRaid(ctx, { id: G, handle: 'Registered' }, { receipt: rg, character: CH }, pubKey)).recorded, true, 'registered, the same receipt counts');
   db._raw.prepare('DELETE FROM players WHERE id = ?').run(A.id);
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM raid_cleanses WHERE account = ?').get(A.id).n, 0, 'the account gone, its towns with it');
-  const sql = src('server-account/migrations/0016_raid_cleanses.sql');
+  const sql = db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('raid_cleanses').sql;
   assert.match(sql, /PRIMARY KEY \(raid, account\)/);
   assert.match(sql, /FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
 });

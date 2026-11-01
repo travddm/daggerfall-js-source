@@ -88,7 +88,7 @@ test('ARENA4b the relay bills each fighter\'s banner: two queued under their ban
 test('ARENA4b the client claims my banner: the queue word and a ladder bout\'s `in` carry the account\'s banner (the board\'s), none before the board, and none for a banner the realm does not know; the hall\'s exhibition named off its hour under the banners the relay bills its sides by (mutants: the queue\'s banner unsent; the ladder `in`\'s unsent; an unknown banner claimed; the relay\'s exhibition banners ignored)', async () => {
   const hallSent = [], boutSent = [], entered = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   let board = { me: { ladder: arenaLadderOf([]) } };
   const deps = { now: () => 0, session: () => session, makeHall: () => hallLink, bouts: { ask() {}, relayWord: () => true, exhibitionWord: () => true, dismiss() {}, holds: () => false, relay: () => null },
     account: { board: async () => ({ ok: true, data: board }), claim: async () => ({ ok: true, data: {} }), attempt: async (tier, bout) => ({ ok: true, data: { ticket: 'feedc0de00000002', tier, bout } }), me: () => null }, enterFloor: (k, o) => { entered.push([k, o]); return true; }, level: () => 12,

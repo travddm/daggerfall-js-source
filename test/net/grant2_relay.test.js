@@ -6,8 +6,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { cellRoomOfWire, mapPixelOfWire, PIXEL_UNITS, sharedClassicMinutes, parseClient } from '../../src/net/wire.js';
-import { validGrant, verifyGrant, grantMarks, validGrantOut, validGrantAsk, grantModeOf, relaySupportsGrant, grantBucketIdle,
-  GRANT_TTL_MS, GRANT_KINDS, GRANT_MODES, GRANT_RELAY_MIN, GRANT_CFG_TTL_MS } from '../../src/net/grantLaw.js';
+import { validGrant, verifyGrant, grantMarks, validGrantOut, validGrantAsk, grantModeOf, grantBucketIdle,
+  GRANT_TTL_MS, GRANT_KINDS, GRANT_MODES, GRANT_CFG_TTL_MS } from '../../src/net/grantLaw.js';
 import { openGrantMeasure, GRANT_MEASURE_SIG_HEADER, GRANT_MEASURE_MS } from '../../src/net/grantMeasure.js';
 import { RELAY_CFG_KEYS } from '../../src/net/relayCfg.js';
 
@@ -38,7 +38,7 @@ async function cell(t, { mode, feed } = {}) {
   return { r, ws, kp, ask, answers, posts, tick: (ms) => { now += ms; }, get now() { return now; } };
 }
 
-test('GRANT2 THE ASK\'S LAW: a mint of a kind and a size within its most, an id that names its answer; the answer read whole - a grant, a refusal of the law\'s words, or off; the mode a setting names, measure unless off or enforce; the relay that takes it world218 or later; the setting `grantMode` (mutants: the kind\'s most ignored; an unknown setting read as enforce)', () => {
+test('GRANT2 THE ASK\'S LAW: a mint of a kind and a size within its most, an id that names its answer; the answer read whole - a grant, a refusal of the law\'s words, or off; the mode a setting names, measure unless off or enforce; the setting `grantMode` (mutants: the kind\'s most ignored; an unknown setting read as enforce)', () => {
   assert.deepEqual(validGrantAsk({ k: 'mint', id: 9, kind: 'enc', n: 4 }), { k: 'mint', id: 9, kind: 'enc', n: 4 });
   for (const bad of [{ k: 'mint', id: 9, kind: 'enc', n: 5 }, { k: 'mint', id: 9, kind: 'camp', n: 9 }, { k: 'mint', id: 9, kind: 'raid', n: 1 }, { k: 'mint', id: -1, kind: 'enc', n: 1 },
     { k: 'renew', id: 1, kind: 'enc', n: 1 }, { k: 'mint', id: 1, kind: 'constructor', n: 1 }, null]) assert.equal(validGrantAsk(bad), null, JSON.stringify(bad));
@@ -48,8 +48,6 @@ test('GRANT2 THE ASK\'S LAW: a mint of a kind and a size within its most, an id 
   assert.equal(validGrantOut({ k: 'ok', id: 3, gr: { g: 1 } }), null, 'a grant read whole or not at all');
   assert.deepEqual(GRANT_MODES, ['off', 'measure', 'enforce']);
   assert.deepEqual(['off', 'enforce', 'measure', undefined, '', 'Enforce', 'on'].map(grantModeOf), ['off', 'enforce', 'measure', 'measure', 'measure', 'measure', 'measure']);
-  assert.equal(GRANT_RELAY_MIN, 218);
-  assert.deepEqual(['world217', 'world218', 'world300', 'nope', undefined].map(relaySupportsGrant), [false, true, true, false, false]);
   assert.ok(RELAY_CFG_KEYS.includes('grantMode'));
   assert.equal(GRANT_CFG_TTL_MS, 300_000);
   assert.deepEqual(parseClient('{"t":"grant","k":"mint","id":1,"kind":"enc","n":2}', { hasHello: true }), { t: 'grant', k: 'mint', id: 1, kind: 'enc', n: 2 });

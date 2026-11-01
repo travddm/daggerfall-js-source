@@ -5,8 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { OnlineSession, POSE_HZ, HEARTBEAT_MS, PEER_TIMEOUT_MS, PING_MS } from '../../src/net/online.js';
-import { PIXEL_UNITS, WORLD_CELL, cellHaloFor, cellRoomOfWire, RELAY_VERSION, WORLD_WIDE_RELAY_MIN } from '../../src/net/wire.js';
-import { LONE_POSE_MS, LONE_HOLD_MS, LONE_RELAY_MIN, LONE_FIGHT_KEYS, loneNow, aloneNow, loneSupported, fightMoved } from '../../src/net/loneSleep.js';
+import { PIXEL_UNITS, WORLD_CELL, cellHaloFor, cellRoomOfWire, RELAY_VERSION } from '../../src/net/wire.js';
+import { LONE_POSE_MS, LONE_HOLD_MS, LONE_FIGHT_KEYS, loneNow, aloneNow, fightMoved } from '../../src/net/loneSleep.js';
 import { WATCH_TICK_MS, WATCH_MOVED_MS } from '../../src/net/watchReceipt.js';
 import { REACT_FIRST_MS } from '../../server/src/staffFeedLaw.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
@@ -19,15 +19,15 @@ const quiet = (fn) => { const keep = { log: console.log, info: console.info, war
 const isPose = (t) => t.startsWith('{"t":"pose"');
 
 /** A real session at the corner of four cells - in (1,1), holding the three round the corner - every socket open and
- *  welcomed by a relay at `v` with nobody in its roster, and a clock; `walk(s)` moves it north at 4 m/s, a frame each
+ *  welcomed with nobody in its roster, and a clock; `walk(s)` moves it north at 4 m/s, a frame each
  *  1/POSE_HZ, as the world host hands its poses in. */
-function loneSession({ v = RELAY_VERSION } = {}) {
+function loneSession() {
   const { FakeWS, sockets } = fakeSocketClass();
   const clock = { t: 1_000_000 };
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'shh-shh-shh-0001', WebSocketImpl: FakeWS, now: () => clock.t });
   const pose = { x: CELL + 100 * UNITS_PER_M, y: 0, z: CELL + 100 * UNITS_PER_M, yaw: 0, pitch: 0, mv: 1 };
   const halos = cellHaloFor(Math.floor(pose.x / PIXEL_UNITS), Math.floor(pose.z / PIXEL_UNITS));
-  const welcome = (ws) => quiet(() => { ws.open(); ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], ...(v ? { v } : {}), gm: 'measure' }); });
+  const welcome = (ws) => quiet(() => { ws.open(); ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], gm: 'measure' }); });
   quiet(() => s.join('world:1,1', { ...pose }));
   welcome(sockets[0]);
   quiet(() => s.setHalo(halos));
@@ -50,17 +50,7 @@ test('LONE-SLEEP the interval and what bounds it: a minute - over the heartbeat,
   assert.ok(LONE_HOLD_MS >= REACT_FIRST_MS && LONE_HOLD_MS < 10_000, 'the moves the reaction feed times, inside the wake the mint made');
 });
 
-test('LONE-SLEEP the gate: a relay at the release\'s own number or later - this release\'s, whose every pose reader was read - and nothing else (mutants: the gate open; another floor)', () => {
-  // release's one number, WORLD_WIDE_RELAY_MIN (world269), and moves with it at a merge
-  assert.equal(LONE_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
-  assert.equal(loneSupported(RELAY_VERSION), true, 'this branch\'s relay');
-  assert.equal(loneSupported(`world${LONE_RELAY_MIN}`), true);
-  assert.equal(loneSupported(`world${LONE_RELAY_MIN - 1}`), false, 'main\'s newest before the release');
-  assert.equal(loneSupported('world259'), false, 'the live relay at this release\'s start');
-  for (const v of [null, undefined, '', 'world', 'room260', 260]) assert.equal(loneSupported(v), false, String(v));
-});
-
-test('LONE-SLEEP alone and lone: ALONE (HIBERNATE\'s and LONE-SLEEP\'s one notion) is no referee, nobody in my room or any I hold, a world cell or a world room; LONE is alone, a relay at the gate, a presence session in a world cell with its socket open, outside the open zone and a fight\'s hold - each clause alone breaks it (mutants: each clause dropped)', () => {
+test('LONE-SLEEP alone and lone: ALONE (HIBERNATE\'s and LONE-SLEEP\'s one notion) is no referee, nobody in my room or any I hold, a world cell or a world room; LONE is alone, a presence session in a world cell with its socket open, outside the open zone and a fight\'s hold - each clause alone breaks it (mutants: each clause dropped)', () => {
   const al = { refereed: false, others: 0, peers: 0, room: 'world:1,1' };
   assert.equal(aloneNow(al), true);
   assert.equal(aloneNow({ ...al, room: 'dungeon:m123' }), true, 'a building or an ordinary dungeon: alone (HIBERNATE\'s)');
@@ -68,10 +58,9 @@ test('LONE-SLEEP alone and lone: ALONE (HIBERNATE\'s and LONE-SLEEP\'s one notio
   assert.equal(aloneNow({ ...al, others: 1 }), false, 'someone in my room');
   assert.equal(aloneNow({ ...al, peers: 1 }), false, 'a peer in a halo');
   assert.equal(aloneNow({ ...al, room: 'siege:3' }), false, 'a battle, a boss room, a channel - never');
-  const ok = { alone: true, ok: true, presence: true, room: 'world:1,1', open: true, zone: false, now: 1000, holdUntil: -Infinity };
+  const ok = { alone: true, presence: true, room: 'world:1,1', open: true, zone: false, now: 1000, holdUntil: -Infinity };
   assert.equal(loneNow(ok), true);
   assert.equal(loneNow({ ...ok, alone: false }), false, 'not alone');
-  assert.equal(loneNow({ ...ok, ok: false }), false, 'an older relay');
   assert.equal(loneNow({ ...ok, presence: false }), false, 'a channel');
   assert.equal(loneNow({ ...ok, room: 'dungeon:m123' }), false, 'a world room: HIBERNATE\'s alone, never LONE-SLEEP\'s');
   assert.equal(loneNow({ ...ok, open: false }), false, 'my cell\'s socket down');
@@ -105,14 +94,6 @@ test('LONE-SLEEP the count: a lone session walking N seconds says ceil(N / LONE_
   for (let f = 0; f < 300 * POSE_HZ; f++) { clock.t += 1000 / POSE_HZ; s.sendPose({ ...pose, mv: 0 }); s.tick(); }
   assert.equal(poses(sockets[0]).length, n + 1, 'the stop said, then nothing for five minutes standing');
   for (const ws of sockets.slice(1)) assert.equal(poses(ws).length, 0);
-});
-
-test('LONE-SLEEP mixed builds: welcomed by an older relay, or one that names no version, the session says POSE_HZ as it always has (mutants: the gate open)', () => {
-  for (const v of ['world259', null]) {
-    const { sockets, poses, walk } = loneSession({ v });
-    walk(30);
-    assert.equal(poses(sockets[0]).length, 30 * POSE_HZ, `${v}: every pose`);
-  }
 });
 
 test('LONE-SLEEP the wake: a peer\'s join in a halo, in my own cell, or a stranger\'s pose - my pose at once, before the next frame - down my cell\'s socket and each halo (none has heard me for a heartbeat) - and POSE_HZ from it; the peer gone, the quiet again a minute from the last pose; never a living pose from a body lying dead (mutants: no wake; the wake for the dead)', () => {
@@ -174,7 +155,6 @@ test('LONE-SLEEP referees: a cell\'s `rf` (a duel, a Wild zone fighter, a serpen
 
 test('LONE-SLEEP the open zone: standing in it (my zone word said) is POSE_HZ at once - its referee steps every pose it hears and reads a minute\'s walk as a jump, and the cell says `rf` only at the pose after the word; out of it, quiet again (mutants: the zone unread)', () => {
   const { s, sockets, poses, walk } = loneSession();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION, gm: 'measure' });   // a relay that referees the zone (wildOk)
   walk(10);
   const n = poses(sockets[0]).length;
   s.setWildZone(1);

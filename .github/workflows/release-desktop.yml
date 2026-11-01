@@ -182,6 +182,10 @@ jobs:
       - name: Install site dependencies
         run: npm ci
 
+      - name: Fetch the vendored mods' published files
+        shell: bash
+        run: sh tools/fetch-vendor.sh
+
       - name: Build the site
         env:
           DFO_UPDATE: ${{ needs.version.outputs.update }}   # REL8: the version job's number, stamped into the game this leg packs

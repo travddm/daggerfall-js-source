@@ -31,6 +31,7 @@ import { LoadClassicWindow, LOAD_CLASSIC_IMG } from '../ui/loadClassicWindow.js'
 import { fetchBytes } from './shared.js';
 import { readZipEntries, droppedEntries, walkDroppedEntries } from './dataSource.js';   // OT1: the saves picker's phone path rides the ARENA2 door's zip walk (AUDIT 68: and its drop walk)
 import { music } from '../systems/music.js';
+import { TITLE_SONGS, titleSongName } from '../systems/titleMusic.js';   // the front door plays the same title song
 import { mostRecentRestorable } from '../systems/save/saveSlots.js';   // SAV4: the F2 question, now over the slot store
 import { SaveGames, SAVENAME_TXT, MAPSAVE_FILENAME, RUMOR_FILENAME, BIO_FILENAME } from '../formats/save/saveGames.js';
 import { SAVETREE_FILENAME } from '../formats/save/saveTreeFile.js';
@@ -45,11 +46,9 @@ import { bitmapToColor32 } from '../formats/color32Order.js';
 import { SaveWindow } from '../ui/saveWindow.js';   // SAV4: the start menu's Load door
 import { t, localizedText } from '../systems/textManager.js';   // L10N4: the window title's step and the classic picker's words in the player's language
 
-const TITLE_SONGS = ['5STRONG.HMI', '03.HMI'];   // DFU start scene song, then the stand-in
-
 async function startTitleMusic() {
   await music.ensure(fetchBytes);
-  const name = TITLE_SONGS.find((n) => (music.archive?.getSongIndex(n) ?? -1) >= 0);
+  const name = titleSongName(music.archive);
   if (name) music.playSong(name);
   else if (music.enabled) console.warn('[menu] no title song in MIDI.BSA (tried ' + TITLE_SONGS.join(', ') + ')');
 }

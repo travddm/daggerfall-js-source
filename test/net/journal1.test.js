@@ -15,7 +15,7 @@ import { PlayerNotebook, breakableNote, wrapLinesIntoNote, MAX_LINE_LENGTH } fro
 import { graphemesOf } from '../../src/systems/graphemes.js';
 import { graphemeCut } from '../../src/ui/nameLayer.js';
 import {
-  parseClient, pageLaw, validPage, validPageData, wordsLine, foldBlankLines, relaySupportsPage, PAGE_RELAY_MIN, PAGE_HEAD_MAX,
+  parseClient, pageLaw, validPage, validPageData, wordsLine, foldBlankLines, PAGE_HEAD_MAX,
   PAGE_LINE_MAX, PAGE_LINES_MAX, PAGE_FRAME_MAX, PAGE_HZ_MAX, PAGE_IN_HZ_MAX, MAX_FRAME_BYTES, CAST_HZ_MAX, DROP_STRIKES_MAX,
   RELAY_VERSION,
 } from '../../src/net/wire.js';
@@ -128,11 +128,7 @@ test('JOURNAL1 wire: a page is a player\'s words with their lines - the letter\'
   assert.ok(widest.length <= PAGE_FRAME_MAX, `and its frame fits: ${widest.length} of ${PAGE_FRAME_MAX}`);
   assert.ok(PAGE_FRAME_MAX < MAX_FRAME_BYTES);
   assert.ok(PAGE_LINE_MAX >= MAX_LINE_LENGTH + 1, 'a notebook line, with DFU\'s leading space, is a page line - the relay imports no game module, so this pin holds the two apart');
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.equal(PAGE_RELAY_MIN, 102);
-  assert.equal(relaySupportsPage('world102'), true);
-  assert.equal(relaySupportsPage('world101'), false);
-  assert.equal(relaySupportsPage(undefined), false);
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 // ─── THE RELAY ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -201,25 +197,20 @@ test('JOURNAL1 relay: a page rides the cast arm\'s per-sender funnel onto its re
 
 // ─── THE SESSION ────────────────────────────────────────────────────────────────────────────────────────────────
 
-function linkRig(relayV = RELAY_VERSION) {
+function linkRig() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const got = []; s.onPage = (id, d) => got.push({ id, d });
   quiet(() => s.join('dungeon:m187', { x: 1, y: 0, z: 1, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'page');
   return { s, ws, got, out, tick: (ms) => { t += ms; } };
 }
 
-test('JOURNAL1 session: a page goes only to a relay that routes it (an older one would close the socket), through the page law first, to a peer some socket reports, PAGE_HZ_MAX a second; one in is delivered only when a peer\'s, addressed to ME and a page by the law, PAGE_IN_HZ_MAX a second per writer (mutants: the version door dropped; the law skipped on the way out; a page for someone else delivered)', () => {
-  const old = linkRig('world100');
-  assert.equal(old.s.pageOk, false);
-  assert.equal(old.s.sendPage({ to: 'peer-0002', page: PAGE }), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('JOURNAL1 session: a page goes through the page law first, to a peer some socket reports, PAGE_HZ_MAX a second; one in is delivered only when a peer\'s, addressed to ME and a page by the law, PAGE_IN_HZ_MAX a second per writer (mutants: the law skipped on the way out; a page for someone else delivered)', () => {
   const { s, got, out, ws, tick } = linkRig();
-  assert.equal(s.pageOk, true);
   assert.equal(s.sendPage({ to: 'peer-0002', page: { head: ' h ', lines: [' a ', '', ''] } }), true);
   assert.deepEqual(out().at(-1), { t: 'page', data: { to: 'peer-0002', page: { head: 'h', lines: ['a'] } } }, 'the page as the law cleaned it');
   tick(1000);

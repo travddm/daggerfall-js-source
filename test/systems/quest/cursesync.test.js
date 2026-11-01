@@ -274,7 +274,7 @@ test('CURSE-SYNC executed: a player who leaves or falls hands the curse\'s foe t
   assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'the cell\'s: the ghost to the nearest player, the private quest\'s foe to the party');
   const room = new Function('modes', 'online', 'isWorldRoom', 'peersNear', 'social', 'isPrivateQuestFoe', `return () => ${body('const handOverRoomFoes = () =>')};`)(
     { mode: 'interior', ownHandOverFrame: (heirOf) => ({ f: [heirOf(g), heirOf(own)] }), dropOwnHanded: () => 2 },
-    { room: 'world:bld:7', ownOk: true, sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
+    { room: 'world:bld:7', sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
   assert.equal(room(), 2);
   assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'and a world room\'s, by the same word');
 });

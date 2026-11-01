@@ -24,7 +24,7 @@ import {
 } from '../../src/net/raid/raidLaw.js';
 import { mintRaidReceipt, readRaidReceipt } from '../../src/net/raid/raidReceipt.js';
 import {
-  raidLedgerKey, raidReceiptKeyOf, RAID_RC_KEEP, RAID_RC_KEEP_MS, RAID_RELAY_MIN, relaySupportsRaid, worldRoom,
+  raidLedgerKey, raidReceiptKeyOf, RAID_RC_KEEP, RAID_RC_KEEP_MS, worldRoom,
   wallMsForClassicMinutes, SOCIAL_ROOM, PIXEL_UNITS, RELAY_VERSION,
 } from '../../src/net/wire.js';
 import { fakeRooms } from '../fakeRoom.mjs';
@@ -260,16 +260,11 @@ test('AUDIT RAID R8b session: A HALO SAYS FOR ITSELF - a raid word goes down a h
     s.setHalo([other]);
     const halo = sockets[1];
     halo.open();
-    halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: `world${RAID_RELAY_MIN - 1}` });
-    assert.equal(s.raidOk, true);
-    assert.equal(s.sendRaid(word({ px: PX + 16 }), other), false, 'the halo\'s relay would close the socket for it');
-    assert.equal(halo.sent.filter((x) => JSON.parse(x).t === 'raid').length, 0);
     halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const before = sockets[0].sent.filter((x) => JSON.parse(x).t === 'raid').length;
     assert.equal(s.sendRaid(word({ px: PX + 16 }), other), true, 'its own relay keeps raids');
     assert.equal(halo.sent.filter((x) => JSON.parse(x).t === 'raid').length, 1, 'down the halo\'s own socket');
     assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'raid').length, before, 'never the primary\'s (the relay strikes a word said in the wrong cell)');
-    assert.equal(relaySupportsRaid('world122'), false, 'world122 never carried a signature');
   } finally { console.info = log; }
 });
 
@@ -338,7 +333,7 @@ test('AUDIT RAID R4 service: A TOWN\'S THANKS ONCE A (RAID, ACCOUNT) - the first
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM raid_spoils WHERE account = ?').get(A.id).n, 0, 'an account gone takes its thanks');
   assert.ok(RAID_CID_RE.test(CID1) && !RAID_CID_RE.test('0123'));
   assert.equal(String(RAID_CID_RE), String(CLIENT_CID_RE), 'the client mints what the service reads');
-  const sql = rd('server-account/migrations/0017_raid_spoils.sql');
+  const sql = db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('raid_spoils').sql;
   assert.match(sql, /PRIMARY KEY \(raid, account\)/);
   assert.match(sql, /FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
 });
@@ -439,8 +434,7 @@ test('AUDIT RAID wiring by source: the relay keeps receipts at the hub and hands
   assert.match(rp, /const raid = raidOfWord\(f\.key, f\.g\);/);
   const on = rd('src/net/online.js');
   assert.match(on, /r\.k === 'cl' \|\| r\.k === 'rc' \? isCellRoom\(room\) \|\| isSocialRoom\(room\)/);
-  assert.match(on, /if \(!\(this\._mine\(cell\) \? this\.raidOk : halo\?\.raidOk\)\) return false;/);
-  assert.match(on, /else \{ const h = this\._halo\.get\(room\); if \(h\) h\.raidOk = relaySupportsRaid\(relayV\); \}/);
+  assert.match(on, /if \(!ws \|\| !this\._welcomed\.has\(ws\)\) return false;   \/\/ a socket says nothing past its hello until its own welcome/);
   assert.match(rd('src/net/accountClient.js'), /claim: async \(receipt, character, name = null, cid = null\) =>/);
   assert.match(rd('server-account/src/index.js'), /cid: body\.cid \?\? null \}/);
   assert.ok(readRaidReceipt, 'the relay reads its own receipts back');

@@ -8,8 +8,7 @@
 //   - THE LAW'S THIRD HOLD IS TIMED: a week, a month each after it, a clean checkpoint no way out inside it and the first
 //     past it lifting it; the count forgotten a month after the last finding (or the timed hold's end); staff's clear and
 //     rollback reset it;
-//   - 'dupe' RETIRED: a row still holding it lifts at its next checkpoint, and migration 0120 lifts every one standing
-//     (written as a staff act) and turns a law hold waiting for staff into the first timed hold;
+//   - 'dupe' RETIRED: a row still holding it lifts at its next checkpoint;
 //   - THE SHOP'S SHELF never lands back a piece its reader carries, nor one piece twice (world/interior/interiorShared.js);
 //   - (AUDIT) A KEY A RECORD HOLDS TWICE never leaves it, by a route or a trade - one of the two is a copy; a peer's word
 //     never hands its reader a piece it carries (systems/peerWord.js notCarried); a key on another piece holds while it is
@@ -255,44 +254,6 @@ test('AUTO-HOLD service (AUDIT): a key on ANOTHER piece holds while it is carrie
     assert.equal(s.row(X.R.id).strikes, 1, 'a finding of its own strikes');
   } finally { s.done(); }
 });
-
-test('AUTO-HOLD migration 0120: a hold waiting for staff on three strikes - law\'s or, AUDIT, a copies\' one over them - the first timed hold a week on, written with what it was; every other \'dupe\' hold lifted, written; every strike standing given its fade from its last finding (AUDIT: they stood for good); nothing else moved', async () => {
-  const s = await stand();
-  try {
-    const D = await s.seat('dup'), D2 = await s.seat('dlw'), L = await s.seat('law'), K = await s.seat('kep'), F = await s.seat('few'), N = await s.seat('non');
-    const set = (c, held, strikes) => s.raw.prepare('UPDATE realm_characters SET held = ?, held_at = ?, strikes = ?, held_until = NULL, law_holds = 0, law_at = NULL WHERE id = ?').run(held, held ? 777 : null, strikes, c.R.id);
-    set(D, 'dupe', 0); set(D2, 'dupe', STRIKES_FOR_TIMED); set(L, 'law', STRIKES_FOR_TIMED); set(K, 'staff', STRIKES_FOR_TIMED); set(F, 'law', STRIKES_FOR_TIMED - 1); set(N, null, 0);
-    const lawAt = s.now() - 40 * DAY;   // F's last law finding: the fade counts from it
-    s.raw.prepare("INSERT INTO realm_findings (player, char_id, seq, at, law, kind, detail) VALUES (?, ?, 1, ?, 0, 'law', '{}')").run(F.who.id, F.R.id, lawAt);
-    const revs = Object.fromEntries([D, D2, L, K, F, N].map((c) => [c.who.handle, s.row(c.R.id).judge_rev]));
-    const sql = readFileSync(new URL('../../server-account/migrations/0120_auto_hold.sql', import.meta.url), 'utf8');
-    const dml = sql.split('\n').filter((l) => !l.startsWith('--') && !l.startsWith('ALTER TABLE')).join('\n');
-    const before = Math.floor(realNowS());
-    s.raw.exec(dml);
-    const after = Math.ceil(realNowS());
-    const week = (r) => r.held_until >= before + LAW_HOLD_S && r.held_until <= after + LAW_HOLD_S;
-    assert.deepEqual([s.row(D.R.id).held, s.row(D.R.id).held_at, s.row(D.R.id).judge_rev], [null, null, revs.dup + 1]);
-    assert.deepEqual(s.findings(D.R.id, 'staff'), [{ act: 'clear', by: 'auto-hold', was: 'dupe' }]);
-    for (const [c, was] of [[L, 'law'], [D2, 'dupe']]) {
-      const r = s.row(c.R.id);
-      assert.deepEqual([r.held, r.strikes, r.law_holds, r.law_at, r.judge_rev, week(r)], ['law', 0, 1, r.held_until, revs[c.who.handle] + 1, true], `${was}: a week's hold from the migration`);
-      assert.deepEqual(s.findings(c.R.id, 'staff'), [{ act: 'timed', by: 'auto-hold', was, until: r.held_until }], `${was}: written with what it was`);
-    }
-    assert.equal(s.row(L.R.id).held_at, 777, 'a law hold keeps the time it began');
-    assert.ok(s.row(D2.R.id).held_at >= before && s.row(D2.R.id).held_at <= after, 'a copies\' hold turned the law\'s begins now');
-    const k = s.row(K.R.id);
-    assert.deepEqual([k.held, k.held_until, k.strikes], ['staff', null, STRIKES_FOR_TIMED], 'staff\'s own: never timed by the migration');
-    assert.ok(k.law_at >= before && k.law_at <= after, 'its strikes fade from now - no finding to count from');
-    const f = s.row(F.R.id);
-    assert.deepEqual([f.held, f.held_until, f.strikes, f.law_at, f.judge_rev], ['law', null, STRIKES_FOR_TIMED - 1, lawAt, revs.few + 1], 'a law hold under three: its fade from its last finding');
-    assert.deepEqual([s.row(N.R.id).law_at, s.row(N.R.id).judge_rev], [null, revs.non], 'no strike: untouched');
-    // and that fade is the law's: a clean checkpoint a month past the finding forgets the two strikes
-    assert.equal((await s.put(F, [])).tradeHeld, null);
-    assert.deepEqual([s.row(F.R.id).strikes, s.row(F.R.id).law_at], [0, null]);
-  } finally { s.done(); }
-});
-/** The wall clock the migration's SQL reads (`new Date()` is the engine's own - the stand replaces only Date.now). */
-const realNowS = () => new Date().getTime() / 1000;
 
 /** A device's storage, in memory. */
 const memoryStorage = () => {

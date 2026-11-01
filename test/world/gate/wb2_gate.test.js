@@ -492,7 +492,7 @@ test('WB2 the banner: a readout that is written only when its words change and h
 test('WB2 the seams: online alone, stood before the lights, the stone in the world pass, the fire after the duel wall, the press and the plaque', () => {
   const w = read('src/scenes/world.js');
   assert.match(w, /const gatePool = gateOmen \? createGatePool\(\{/, 'the omen\'s own gate - online alone');
-  assert.match(w, /ready: \(\) => !!online\?\.gateOk,   \/\/ WB3b/, 'the door opens at a relay that runs a gate\'s boss room (WB3b; it said "not yet" to every relay until then)');
+  assert.match(w, /ready: \(\) => !!online,   \/\/ WB3b/, 'the door opens online (WB3b; it said "not yet" to every relay until then)');
   const frameAt = w.indexOf('try { if (gatePool?.frame(dt)) warmGateVeil(); }'), lightsAt = w.indexOf('const wodLit = wod ? _wodLitCount() : 0;');   // AUDIT WB D5: and the step's veil warmed when a gate stands
   assert.ok(frameAt > 0 && frameAt < lightsAt, 'stood before the lights read it');
   assert.equal((w.match(/\.\.\.\(gatePool\?\.lights\(\) \?\? \[\]\), \.\.\.\(riteHost\?\.lights\(\) \?\? \[\]\), \.\.\.\(starfall\?\.lights\(\) \?\? \[\]\), \.\.\.camps\.lights\(\), \.\.\.droppedTorches\.lights\(\)\);/g) ?? []).length, 2,   // WB12d: the rite's braziers beside it; STAR4 (

@@ -18,7 +18,7 @@
 // saves stored before this read exactly as they did.
 //
 // OLDER ENDS KEEP WORKING. A service that does not name `gzip` on its
-// join, create and customs answers is sent the text as before; a tab
+// join and create answers is sent the text as before; a tab
 // that does not ask a read gzipped (`?enc=gzip`) is answered the text,
 // the service opening a packed save for it.
 // ═══════════════════════════════════════════════════════════════════

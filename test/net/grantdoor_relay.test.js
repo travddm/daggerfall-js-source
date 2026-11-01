@@ -109,19 +109,19 @@ test('FOE-BOUNDS THE RELAY STRIPS WHAT NO BUILDER COULD GIVE: with `grantStrip` 
   assert.deepEqual(opened.batch.tl, [{ a: GRANT_RELAY_READER, b: 'acct-sock-mac-01', r: 'stats', n: 1, e: { t: 0, k: 99_999, mx } }], 'once, under the relay\'s name, with its evidence');
 });
 
-test('GRANT-DOOR THE CLIENT: a foes room\'s hello says its spawn grants; a frame the relay vouched (`g` 1) makes its sender one held to them, an unvouched one does not; a relay at world223 takes `stats`, one before it does not (mutants: the vouch unread; the relay\'s version unread)', async () => {
+test('GRANT-DOOR THE CLIENT: a foes room\'s hello says its spawn grants; a frame the relay vouched (`g` 1) makes its sender one held to them, an unvouched one does not (mutant: the vouch unread)', async () => {
   const { OnlineSession } = await import('../../src/net/online.js');
   const { fakeSocketClass } = await import('../fakeSocket.mjs');
   const room = 'interior:m123456.7';
-  for (const v of ['world223', 'world222']) {
+  {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
     await quiet(() => s.join(room, { x: 1, y: 2, z: 3, yaw: 0 }));
     sockets[0].open();
     assert.equal(JSON.parse(sockets[0].sent[0]).gv, GRANT_HELLO_LAW, 'the hello says it');
-    await quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'zzz-0001', name: 'Z', look: null, pose: null }, { id: 'zzz-0002', name: 'Y', look: null, pose: null }], host: 'zzz-0001', world: null, v, gm: 'measure' }));
+    await quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'zzz-0001', name: 'Z', look: null, pose: null }, { id: 'zzz-0002', name: 'Y', look: null, pose: null }], host: 'zzz-0001', world: null, gm: 'measure' }));
     sockets[0].receive({ t: 'own', id: 'zzz-0001', g: 1, data: { n: 1, k: room, full: 1, f: [] } });
     sockets[0].receive({ t: 'own', id: 'zzz-0002', data: { n: 1, k: room, full: 1, f: [] } });
-    assert.deepEqual([[...s.grantSenders], s.grantStatsOk], [['zzz-0001'], v === 'world223'], v);
+    assert.deepEqual([...s.grantSenders], ['zzz-0001']);
   }
 });

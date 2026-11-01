@@ -175,14 +175,13 @@ test('DOMAIN2 THE SWITCHES: a castle is the seats\' and the silver\'s - shut whe
 // ─── THE ROOM: the relay's `guild` arm, the door, the throne room, the window ─────────────────────────────────────────
 import { fakeRooms } from '../fakeRoom.mjs';
 import {
-  instanceAdmission, instanceGuildOwnerOf, instanceOwnerOf, instanceRoomOf, instanceWord, relaySupportsGuildInstances, GUILD_INSTANCE_RELAY_MIN, INSTANCE_DOOR_WORD, CASTLE_MAP_IDS,
+  instanceAdmission, instanceGuildOwnerOf, instanceOwnerOf, instanceRoomOf, instanceWord, INSTANCE_DOOR_WORD, CASTLE_MAP_IDS,
 } from '../../src/net/instanceRoom.js';
-import { SOCIAL_ROOM, RELAY_VERSION } from '../../src/net/wire.js';
+import { SOCIAL_ROOM } from '../../src/net/wire.js';
 import { instanceOffer, INSTANCE_ROWS_MAX } from '../../src/systems/instancePlaces.js';
 import { createInstanceDoor, dungeonSite, buildingSite } from '../../src/scenes/instanceDoor.js';
 import { createSeatHallHost } from '../../src/scenes/seatHallHost.js';
 import { guildCastleText, guildSilverLineText } from '../../src/ui/socialPanel.js';
-import { readFileSync } from 'node:fs';
 
 const G = 'gabcdefghij', OTHER = 'gzyxwvutsrq';
 const CASTLE_WAYREST = 630439035;
@@ -190,7 +189,7 @@ const settle = async () => { for (let i = 0; i < 5; i++) await new Promise((r) =
 const refusal = (ws) => ws.sent.find((m) => m.t === 'error')?.m ?? null;
 const welcomed = (ws) => ws.sent.some((m) => m.t === 'welcome');
 
-test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - never an account\'s of the same name; the relay admits a token whose guild owns the room (`guild`), after staff and the owner, never a party\'s guest; a relay before world260 is offered no castle; a castle\'s room alone (AUDIT DOMAINS R2) (mutants: the domain; the arm; the arm\'s order; the relay minimum)', async () => {
+test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - never an account\'s of the same name; the relay admits a token whose guild owns the room (`guild`), after staff and the owner, never a party\'s guest; a castle\'s room alone (AUDIT DOMAINS R2) (mutants: the domain; the arm; the arm\'s order)', async () => {
   assert.notEqual(await instanceGuildOwnerOf(G), await instanceOwnerOf(G));
   assert.equal(await instanceGuildOwnerOf(null), null);
   const key = instanceRoomOf(`dungeon:m${CASTLE_WAYREST}`, { owner: await instanceGuildOwnerOf(G), epoch: '89abcdef' });
@@ -208,13 +207,6 @@ test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - ne
   assert.deepEqual(CASTLE_MAP_IDS.slice(0, 3), [6634853, 630439035, 1291010263], 'Sentinel, Wayrest and Daggerfall - measured on the freeware: the crown seats\' own keys, each a main-story dungeon');
   for (const k of CASTLE_MAP_IDS.slice(0, 3)) assert.ok(MAIN_STORY_DUNGEON_IDS.has(k));
   assert.deepEqual([castleKeyOk(630439035), castleKeyOk(5023), castleKeyOk('630439035')], [true, false, false]);
-  // test/net/relayversion.test.js that names DOMAIN2, as AUDIT TESA II Z2 holds the world-wide gates to theirs - a literal
-  // here beside the literal in instanceRoom.js let a renumber leave the gate on a number the live relay holds with no
-  // guild arm (main's world260 is THE FOLD), so a castle's members were offered a door that refused them
-  const law = readFileSync(new URL('./relayversion.test.js', import.meta.url), 'utf8');
-  const named = [...law.matchAll(/^ {2}world(\d+): '[0-9a-f]{64}',\s+\/\/[^\n]*\bDOMAIN2\b/gm)].map((m) => Number(m[1]));
-  assert.deepEqual(named, [GUILD_INSTANCE_RELAY_MIN], 'the castle\'s relay gate is the one row that names DOMAIN2 - a merge that renumbers the row moves it');
-  assert.deepEqual([relaySupportsGuildInstances(`world${GUILD_INSTANCE_RELAY_MIN - 1}`), relaySupportsGuildInstances(`world${GUILD_INSTANCE_RELAY_MIN}`), relaySupportsGuildInstances(RELAY_VERSION)], [false, true, true]);
 });
 
 test('DOMAIN2 AT THE RELAY: a castle\'s room admits its guild\'s members by their token\'s guild; another guild, no guild and a member\'s party guest are refused before anything is written; a member who leaves the guild while inside is refused out (mutants: the hello\'s guild; the mark; the refusal out)', async () => {

@@ -20,7 +20,7 @@ import { PERSON_RADIUS } from '../../src/systems/allyCast.js';
 import { TOUCH_RANGE, TOUCH_SPHERE_CAST_RADIUS } from '../../src/systems/spellcast.js';
 import {
   validCastData, parseClient, CAST_FRAME_MAX, CAST_LEVEL_MAX, CAST_SETTING_MAX, CAST_ICON_MAX, CAST_HZ_MAX, CAST_BURST_MAX, CAST_IN_HZ_MAX, CAST_DEST_SENDERS_MAX, RELAY_VERSION, castGate, castInGate,
-  relaySupportsCast, PARTY_MAX,
+  PARTY_MAX,
 } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
@@ -93,7 +93,7 @@ const GOOD = { to: 'peer-0002', level: 5, spell: { name: 'Heal', element: 4, ran
 const GOOD_OUT = { ...GOOD, spell: { ...GOOD.spell, icon: 0 } };
 
 test('ALLY-CAST wire (world97): validCastData projects a bounded spell record and refuses the whole frame otherwise; parseClient carries the `cast` frame after a hello and inside the cap', () => {
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world282');
   const d = validCastData(GOOD);
   assert.deepEqual(d, GOOD_OUT, 'a whole frame, every component an integer in bounds, the icon defaulted');
   assert.equal(validCastData({ ...GOOD, to: 'x' }), null, 'an id is an id');
@@ -131,10 +131,6 @@ test('ALLY-CAST wire (world97): validCastData projects a bounded spell record an
   assert.equal(castInGate(null, 1000).pass, true);
   assert.ok(CAST_IN_HZ_MAX >= CAST_HZ_MAX * 2, 'the frames coming in admit a few casters at once');
   assert.ok(CAST_DEST_SENDERS_MAX >= PARTY_MAX - 1, 'AUDIT ALLY-CAST B2: every party mate keeps a funnel of their own onto me');
-  // B1: the relay that routes the frame - an older one CLOSES the socket on a frame it does not know
-  assert.equal(relaySupportsCast('world96'), false, 'world96 knew the frame in a shape this client no longer sends');
-  assert.equal(relaySupportsCast('world97'), true); assert.equal(relaySupportsCast(RELAY_VERSION), true);
-  assert.equal(relaySupportsCast('world95'), false); assert.equal(relaySupportsCast(null), false); assert.equal(relaySupportsCast('junk'), false);
 });
 
 // ─── THE RELAY ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -196,25 +192,20 @@ test('AUDIT ALLY-CAST B2 relay: the funnel onto a destination is PER SENDER - th
 // ─── THE LINK ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
-function linkRig(relayV = RELAY_VERSION) {
+function linkRig() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const casts = []; s.onCast = (id, d) => casts.push({ id, d });
   quiet(() => s.join('dungeon:m187', { x: 1, y: 0, z: 1, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: RELAY_VERSION }));
   return { s, ws, casts, tick: (ms) => { t += ms; } };
 }
 const MINE = { to: 'aaaa-0001', level: 5, spell: { name: 'Heal', element: 4, rangeType: 1, effects: [HEAL] } };
 
-test('AUDIT ALLY-CAST B1 link: a relay before world97 gets no cast frame at all (it would close the socket on one); a world97 welcome opens the door, and the door refuses a frame at myself, at a peer no socket reports, and past a whole blast (CAST_BURST_MAX)', () => {
-  const old = linkRig('world96');
-  assert.equal(old.s.castOk, false, 'the welcome said world96');
-  assert.equal(old.s.sendCast(GOOD), false, 'refused at home');
-  assert.equal(old.ws.sent.filter((x) => x.startsWith('{"t":"cast"')).length, 0, 'nothing on the wire');
-  const { s, ws } = linkRig('world97');
-  assert.equal(s.castOk, true);
+test('AUDIT ALLY-CAST B1 link: the welcome opens the door, and the door refuses a frame at myself, at a peer no socket reports, and past a whole blast (CAST_BURST_MAX)', () => {
+  const { s, ws } = linkRig();
   assert.equal(s.reachesPeer('peer-0002'), true, 'the welcome named Bran');
   assert.equal(s.sendCast(GOOD), true);
   assert.deepEqual(JSON.parse(ws.sent.filter((x) => x.startsWith('{"t":"cast"')).at(-1)), { t: 'cast', data: GOOD_OUT }, 'the wire\'s own projection, the icon defaulted');

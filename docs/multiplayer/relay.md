@@ -94,8 +94,8 @@ The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ... }`.
 4. Ban and freeze checks run (`_bannedHello`, `frozenHello`).
 5. The room answers `{ t: 'welcome', id, peers, host, world, now, v }`. `v` is `RELAY_VERSION`.
 
-The hello carries no relay version. The client reads `v` from the welcome to decide which features the relay
-supports, and to show an update notice (`src/net/updateNotice.js`).
+The hello carries no relay version. The client compares `v` from the welcome with its own `RELAY_VERSION` and refuses
+a relay of another version (see [wire-protocol.md](wire-protocol.md), One version, client and relay).
 
 ## Durable storage
 

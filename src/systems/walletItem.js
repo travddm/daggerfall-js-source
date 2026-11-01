@@ -6,7 +6,7 @@
 // Embers (570) and the Welkynd Shards salvage gives (571) - stay in the pack's own collection (`entity.items`), so every
 // door that reads or spends one reads it where it always did: the bank's letters and the court's fines
 // (systems/banking.js, court.js), the Broker's embers (sigilBroker.js), the Reforge's shards (reforge.js), the save, the
-// realm's customs and its gold law. What the wallet changes is where the ENHANCED pack shows them - in the wallet's
+// realm's gold law. What the wallet changes is where the ENHANCED pack shows them - in the wallet's
 // sheet, not on its pages (ui/enhanced/enhancedInventory.js packModel) - beside the two currencies that are no pieces at all: the
 // purse's gold (`entity.goldPieces`, E4's counter) and the account's silver (online, the marks book's balance -
 // `setWalletSilver`). The classic window is DFU's and keeps DFU's four tabs; there the wallet's Use says what it holds.
@@ -62,16 +62,6 @@ export function giveWallet(/** @type {any} */ entity) {
   if (hasWallet(entity.items)) return 0;
   addItem(entity.items, mintWallet());
   return 1;
-}
-/** The wallet's gift, PORTAL-GIFT's shape: the mark a save carries once its character has been given one. */
-export const WALLET_GIFT = 1;
-/** A character from before the wallet (its save's mark short of WALLET_GIFT) is given one, once - and marked, so a
- *  character given it is never given it again. Answers giveWallet's count. */
-export function giveWalletGift(/** @type {any} */ entity) {
-  if (!entity || typeof entity !== 'object') return 0;
-  if ((Number.isSafeInteger(entity.walletGift) ? entity.walletGift : 0) >= WALLET_GIFT) return 0;
-  entity.walletGift = WALLET_GIFT;
-  return giveWallet(entity);
 }
 
 /** The account's silver, as the host knows it - online, the marks book's: its balance, null while it is not known yet,

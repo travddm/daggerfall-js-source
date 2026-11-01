@@ -57,7 +57,7 @@ export const ARENA_HALL_MAX = 20;
  *  minutes, so a laurel is at most six behind the board. */
 export const ARENA_CHAMPION_CACHE_S = 60;
 /** STORM-SHED 2: how long the season's #1 as the service last counted
- *  it (`arena_champions`, migration 0086) is taken as it stands before a reader counts it again, seconds. Every rated
+ *  it (`arena_champions`) is taken as it stands before a reader counts it again, seconds. Every rated
  *  bout recorded counts it at once (claimArena); this bounds whatever else moves the board (an account deleted). */
 export const ARENA_CHAMPION_STORED_S = 600;
 /** SCALE4b: the service's clock counts the season's #1 again once the kept word is this old - two minutes
@@ -81,7 +81,7 @@ const GRAND_TIER = ARENA_TIERS - 1;
 // bout past the Pit pays 195 and the Grand Champion 585 - the ceiling's whole point. The most a claim asks is far under a
 // report's 5,000. A loss, a draw and a bout kept unrated (the pair's day) pay none: two friends trading wins earn
 // nothing on each other. ONCE AN ACCOUNT: a bout between players is one row whoever claims it first, so the winner may
-// claim second - the right to its Renown is its own row (`arena_renown`, migration 0075 - 0071 before the second merge onto main, 0073 before the third), taken before the credit.
+// claim second - the right to its Renown is its own row (`arena_renown`), taken before the credit.
 
 /** A ladder tier's level for its Renown - the design table's top level of each tier (Arena.md 2: 1-3, 3-5, ... 20+). */
 export const ARENA_RENOWN_TIER_LEVEL = (tier) => 2 * Math.max(0, Math.min(ARENA_TIERS - 1, Math.trunc(Number(tier) || 0))) + 3;
@@ -187,7 +187,7 @@ export async function arenaChampionOf({ db }, season) {
   return laurelOfBoard(rows);
 }
 /** STORM-SHED 2: THE SEASON'S #1 COUNTED AND KEPT - the board's top as it stands now, written to `arena_champions`
- *  (migration 0086) for every Worker to read. Answers the #1 (or null). */
+ *  for every Worker to read. Answers the #1 (or null). */
 export async function storeArenaChampion(ctx, season, nowS) {
   const id = await arenaChampionOf(ctx, season);
   await ctx.db.prepare(`INSERT INTO arena_champions (season, player, at) VALUES (?1, ?2, ?3)

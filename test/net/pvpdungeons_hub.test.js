@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import {
   SOCIAL_ROOM, PIXEL_UNITS, worldRoom, parseClient, validWdunIn, validWdunOut, wdunHall, wdunRoomKey, isWorldRoom,
-  WDUN_LOCK_MS, WDUN_RESET_MS, WDUN_STALE_MS, WDUN_DAY_MS, relaySupportsWdun, RELAY_VERSION, WILD_REMAINS_MS,
+  WDUN_LOCK_MS, WDUN_RESET_MS, WDUN_STALE_MS, WDUN_DAY_MS, WILD_REMAINS_MS,
 } from '../../src/net/wire.js';
 import * as L from '../../src/net/wild/wildLaw.js';
 import { mintRemainsOrder, remainsDigest } from '../../src/net/identityToken.js';
@@ -32,8 +32,6 @@ test('PVPDUNGEONS wire: a hall is a pixel, its room a world room of its own lane
   assert.equal(parseClient(JSON.stringify({ t: 'wdun', k: 'hi' })).error, 'wdun before hello');
   assert.equal(validWdunOut({ t: 'wdun', k: 'st', day: -1 }), null);
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'cr', crows: [['1,2', 5], ['bad', 3]] }), { k: 'cr', crows: [['1,2', 5]] });
-  assert.ok(relaySupportsWdun(RELAY_VERSION));
-  assert.ok(!relaySupportsWdun('world175'));
 });
 
 test('PVPDUNGEONS law: a lock an hour, the way back while my remains lie there, the reset after twenty empty minutes, the crows', () => {

@@ -361,10 +361,10 @@ test('WAGONS2-VISIT THE LISTENER: inside another\'s caravan a second session on 
 });
 
 // ─── the world host: the caravan's room, the owner's word to it, a visitor's door ───────────────────────────────────
-function worldRoomRig({ caravanOk = true, worldCaravanOk = caravanOk, room = { kind: 'caravan' }, acct = 'acct-ann1', character = 'char-ann-0001', quest = null } = {}) {
+function worldRoomRig({ room = { kind: 'caravan' }, acct = 'acct-ann1', character = 'char-ann-0001', quest = null } = {}) {
   const scope = {
-    modes: { caravanRoom: room }, online: { caravanOk }, social: { acct }, playerEntity: {}, characterIdOf: () => character, parkKeyOf, caravanRoomOf, caravanKeyOf,
-    chatLinks: new Map([['world', { staffTeleportOk: true, caravanOk: worldCaravanOk }]]), realmSession: { id: 'realm-1' }, privateInteriorPrefix, privateBoatRoom: () => null, privateInteriorRoom,
+    modes: { caravanRoom: room }, online: {}, social: { acct }, playerEntity: {}, characterIdOf: () => character, parkKeyOf, caravanRoomOf, caravanKeyOf,
+    chatLinks: new Map([['world', {}]]), realmSession: { id: 'realm-1' }, privateInteriorPrefix, privateBoatRoom: () => null, privateInteriorRoom,
     _questLoc: () => quest,
   };
   const make = new Function(...Object.keys(scope), `let _caravanKeyFor = null, _caravanKey = null, _privateSource = null, _privatePrefix = null;
@@ -376,7 +376,7 @@ function worldRoomRig({ caravanOk = true, worldCaravanOk = caravanOk, room = { k
   return { privateRoomHere: make(...Object.values(scope)), scope };
 }
 
-test('WAGONS2-VISIT THE KNOWN BUG: inside my caravan online my room is the caravan\'s own - `caravan:<my park key>` - in the wilderness (no town under it: WAGONS2 keyed NO room there) and in a town alike; a visitor\'s is the room the record named; an older relay is asked for none; the online frame keys it and poses it in MapsFile\'s frame, as its visitors do (mutants: the caravan keyed as a town building, the visit\'s room ignored, an older relay asked)', async () => {
+test('WAGONS2-VISIT THE KNOWN BUG: inside my caravan online my room is the caravan\'s own - `caravan:<my park key>` - in the wilderness (no town under it: WAGONS2 keyed NO room there) and in a town alike; a visitor\'s is the room the record named; the online frame keys it and poses it in MapsFile\'s frame, as its visitors do (mutants: the caravan keyed as a town building, the visit\'s room ignored, an older relay asked)', async () => {
   const k = await parkKeyOf('acct-ann1', 'char-ann-0001');
   const wild = worldRoomRig();
   assert.equal(wild.privateRoomHere({ private: true, buildingKey: -2000000001 }), null, 'the key is a digest - nothing until it lands');
@@ -385,12 +385,6 @@ test('WAGONS2-VISIT THE KNOWN BUG: inside my caravan online my room is the carav
   assert.equal(await settle(() => town.privateRoomHere({ private: true, buildingKey: -2000000001 })), `caravan:${k}`, 'a town: the same room, never a building of it');
   const visitRoom = `caravan:${'b'.repeat(24)}`;
   assert.equal(town.privateRoomHere({ private: true, privateRoom: visitRoom }), visitRoom, 'a visit: the room its record named');
-  assert.equal(worldRoomRig({ caravanOk: false }).privateRoomHere({ private: true, privateRoom: visitRoom }), null, 'an older relay keeps no caravan\'s room');
-  // FINAL AUDIT: a fresh session (a load inside my caravan, online turned on in it) has had no welcome - with no room it
-  // would never have one - so the world channel's word for the relay stands for it
-  const fresh = worldRoomRig({ caravanOk: false, worldCaravanOk: true });
-  assert.equal(await settle(() => fresh.privateRoomHere({ private: true, buildingKey: -2000000001 })), `caravan:${k}`, 'a fresh session: my caravan\'s room still');
-  assert.equal(fresh.privateRoomHere({ private: true, privateRoom: visitRoom }), visitRoom, 'and a visit\'s');
   const other = worldRoomRig({ acct: 'acct-ann1', character: 'char-ann-0002' });
   assert.equal(await settle(() => other.privateRoomHere({ private: true })), `caravan:${await parkKeyOf('acct-ann1', 'char-ann-0002')}`, 'another character, another caravan');
   // any other private room keeps its own law
@@ -411,10 +405,10 @@ test('WAGONS2-VISIT THE KNOWN BUG: inside my caravan online my room is the carav
   assert.deepEqual(route.onlineToScene(route.pose), args.player.pos);
 });
 
-test('WAGONS2-VISIT THE OWNER\'S WORD TO THE ROOM: standing in my own caravan online, what I placed goes to its room on every welcome and again when it changed - read at most once in its spacing, never the same twice, never from another\'s caravan or at an older relay (mutants: said every frame, said to an older relay)', () => {
+test('WAGONS2-VISIT THE OWNER\'S WORD TO THE ROOM: standing in my own caravan online, what I placed goes to its room on every welcome and again when it changed - read at most once in its spacing, never the same twice, never from another\'s caravan (mutants: said every frame)', () => {
   const sent = [];
   let doc = { v: 1, p: [piece('a')] };
-  const online = { status: 'open', caravanOk: true, room: `caravan:${'a'.repeat(24)}`, welcomes: 1, sendCaravan: (f) => { sent.push(f); return true; } };
+  const online = { status: 'open', room: `caravan:${'a'.repeat(24)}`, welcomes: 1, sendCaravan: (f) => { sent.push(f); return true; } };
   const scope = { online, modes: { myCaravanDecor: () => doc }, characterIdOf: () => 'char-ann-0001', playerEntity: {}, caravanKeyOf };
   const tick = new Function(...Object.keys(scope), `const CARAVAN_DECOR_MIN_MS = 1500; let _cvSent = null, _cvWelcomes = -1, _cvRoom = null, _cvReadAt = -Infinity;
     return ${lift('src/scenes/world.js', 'caravanDecorTick')};`)(...Object.values(scope));
@@ -433,15 +427,12 @@ test('WAGONS2-VISIT THE OWNER\'S WORD TO THE ROOM: standing in my own caravan on
   scope.modes.myCaravanDecor = () => null;   // another's caravan (or none): nothing of mine to say
   online.welcomes = 3; tick(9000);
   assert.equal(sent.length, 3);
-  scope.modes.myCaravanDecor = () => doc;
-  online.caravanOk = false; online.welcomes = 4; tick(12000);
-  assert.equal(sent.length, 3, 'an older relay closes the socket on it');
 });
 
-test('WAGONS2-VISIT THE VISITOR\'S DOOR, ON THE WORLD HOST: another\'s caravan opens to me only online at a relay that keeps caravans\' rooms, outdoors, and by its owner\'s word read as a home\'s door is (my party\'s handles, my guild\'s tag); pressed shut it says so; open, it goes through the caravan\'s door with the record\'s room (mutants: the door open to whom its owner shut, an older relay\'s visit)', async () => {
+test('WAGONS2-VISIT THE VISITOR\'S DOOR, ON THE WORLD HOST: another\'s caravan opens to me only online, outdoors, and by its owner\'s word read as a home\'s door is (my party\'s handles, my guild\'s tag); pressed shut it says so; open, it goes through the caravan\'s door with the record\'s room (mutants: the door open to whom its owner shut, an older relay\'s visit)', async () => {
   const said = [], visits = [];
   const scope = {
-    online: { caravanOk: true, status: 'open' }, modes: { mode: 'exterior' }, caravanMayEnter, myGuildTag: () => 'ABC',
+    online: { status: 'open' }, modes: { mode: 'exterior' }, caravanMayEnter, myGuildTag: () => 'ABC',
     social: { others: () => [{ name: 'Mac' }, { name: null }] }, caravanRoomOf, townTalk: { say: (l) => said.push(l) }, CARAVAN_VISIT_TEXT,
     caravanRooms: { visit: async (t, room) => { visits.push([t.owner, room]); return true; } },
     wagonRiders: { seated: () => seated },   // WAGONS2-VISIT (AUDIT): never from a seat in another's wagon
@@ -456,7 +447,6 @@ test('WAGONS2-VISIT THE VISITOR\'S DOOR, ON THE WORLD HOST: another\'s caravan o
   assert.equal(may(t('Zed', 'guild', 'ABC')), true, 'my guild');
   assert.equal(may(t('Zed', 'private')), false);
   scope.modes.mode = 'interior'; assert.equal(may(t('Zed', 'public')), false, 'indoors no caravan is stepped into'); scope.modes.mode = 'exterior';
-  scope.online.caravanOk = false; assert.equal(may(t('Zed', 'public')), false, 'an older relay keeps no caravan\'s room'); scope.online.caravanOk = true;
   seated = true; assert.equal(may(t('Zed', 'public')), false, 'WAGONS2-VISIT (AUDIT): from a seat in another\'s wagon, no visit'); seated = false;
   assert.equal(await enter(t('Zed', 'private')), false);
   assert.deepEqual(said, ["This is Zed's caravan. Its door is shut."]);
@@ -571,7 +561,7 @@ test('WAGONS2-VISIT THE FOUR HOSTS: world.js wired - the pool\'s three, the cara
   for (const host of ['exterior', 'dungeonContext']) assert.doesNotMatch(read(`src/scenes/${host}.js`), /caravanVisit|caravanRoom|CARAVAN_VISIT/, `${host}.js names no visit`);
 });
 
-test('WAGONS2-VISIT (AUDIT) THE VISIT\'S EDGES: the listener hears the cell that keeps the record (its pose may stand past an edge); a door set against me while I stand inside stands me out, told why; a caravan changing hands opens to its new owner alone - who may enter is never carried (the wire\'s clamp and the vault\'s receipt); my own caravan at an older relay keeps the owned room it had (mutants: the pose\'s cell, the shut door unheard, the door carried, the owned room lost)', async () => {
+test('WAGONS2-VISIT (AUDIT) THE VISIT\'S EDGES: the listener hears the cell that keeps the record (its pose may stand past an edge); a door set against me while I stand inside stands me out, told why; a caravan changing hands opens to its new owner alone - who may enter is never carried (the wire\'s clamp and the vault\'s receipt) (mutants: the pose\'s cell, the shut door unheard, the door carried)', async () => {
   const { Session, sessions } = fakeSessions();
   const gone = [];
   let open = true;
@@ -592,8 +582,5 @@ test('WAGONS2-VISIT (AUDIT) THE VISIT\'S EDGES: the listener hears the cell that
   assert.equal(validLootItem(caravan).wagonEntry, undefined, 'the wire\'s clamp leaves it behind');
   assert.ok(RECEIVER_MARKS.includes('wagonEntry'));
   assert.match(read('src/scenes/world.js'), /add: \(rec\) => \{ const it = \{ \.\.\.rec \}; for \(const k of RECEIVER_MARKS\) delete it\[k\]; addItem\(/, 'the vault\'s receipt too');
-  // my own caravan at an older relay: the owned room it had
-  const old = worldRoomRig({ caravanOk: false, quest: { mapTableData: { mapId: 77 } } });
-  assert.match(await settle(() => old.privateRoomHere({ private: true, buildingKey: 9 })), /^owned:[0-9a-f]{32}\.[0-9a-f]{16}:77\.9$/);
 });
 

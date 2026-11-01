@@ -1,11 +1,11 @@
 // PRIVATE-REPORT: THE
-// SERVICE'S SIDE - migration 0129 (private_reports), server-account/src/reports.js and its five routes, the reader's
+// SERVICE'S SIDE - the private_reports table, server-account/src/reports.js and its five routes, the reader's
 // count on the post box and the heartbeat's post part. A report is a registered player's to the readers
 // REPORT_READER_HANDLES names, and nobody else lists or opens one.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { standService, T0 } from '../accountDb.mjs';
+import { d1, standService, T0 } from '../accountDb.mjs';
 import { ROUTES, OPEN_ROUTES } from '../../server-account/src/service.js';
 import { sendReport, myReports, reportInbox, readReport, closeReport, isReportReader } from '../../server-account/src/reports.js';
 import { postBoxOf } from '../../server-account/src/post.js';
@@ -29,11 +29,12 @@ const lay = (svc, who, n, state = 'open') => {
   }
 };
 
-test('PRIVATE-REPORT the table and the doors: 0129 lays private_reports - one report a send an account; five POST routes behind a session, none open; a guest refused every one (report-needs-account, 403); every word the routes answer has a sentence; the readers a list in config (mutants: a route open; the guest let in; a word with no sentence)', async () => {
-  const mig = src('server-account/migrations/0129_private_reports.sql');
-  assert.match(mig, /CREATE TABLE IF NOT EXISTS private_reports \(/);
-  assert.match(mig, /CREATE UNIQUE INDEX IF NOT EXISTS ux_private_reports_rid ON private_reports \(from_id, rid\);/);
-  assert.match(mig, /FOREIGN KEY \(from_id\) REFERENCES players\(id\) ON DELETE CASCADE/);
+test('PRIVATE-REPORT the table and the doors: private_reports - one report a send an account; five POST routes behind a session, none open; a guest refused every one (report-needs-account, 403); every word the routes answer has a sentence; the readers a list in config (mutants: a route open; the guest let in; a word with no sentence)', async () => {
+  const schema = d1()._raw;
+  const sqlOf = (name) => schema.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name)?.sql ?? '';
+  assert.match(sqlOf('private_reports'), /^CREATE TABLE private_reports \(/);
+  assert.equal(sqlOf('ux_private_reports_rid'), 'CREATE UNIQUE INDEX ux_private_reports_rid ON private_reports (from_id, rid)');
+  assert.match(sqlOf('private_reports'), /FOREIGN KEY \(from_id\) REFERENCES players\(id\) ON DELETE CASCADE/);
   for (const r of ROUTE_LIST) { assert.ok(ROUTES.has(r), r); assert.ok(!OPEN_ROUTES.has(r), r); }
   for (const w of ['report-needs-account', 'report-kind', 'report-subject', 'report-body', 'report-rid', 'report-rate', 'report-full', 'no-report', 'not-report-reader', 'report-state']) {
     assert.equal(typeof REFUSALS[w], 'string', w);

@@ -28,8 +28,7 @@ runs the room's foes and bosses.
 `src/net/roomLease.js`. In non-social rooms a socket must hold a lease before most of its frames are heard. The
 client asks its hub for a lease every `LEASE_MS` (2 minutes); a lease lives `LEASE_LIFE_S` (5 minutes). The key is
 derived from the relay's `GATE_SIGNING_KEY` by HKDF (`leaseKeyOf`). A room accepts a lease only for the socket's own
-account, and a newer lease wins. The client side is `_leased` in `src/net/online.js`. The feature is gated by
-`LEASE_RELAY_MIN`.
+account, and a newer lease wins. The client side is `_leased` in `src/net/online.js`.
 
 ### Receipts and claims
 

@@ -23,7 +23,7 @@ import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { accountHomes, onHomeOrders, SESSION_KEY } from '../../src/net/accountClient.js';
 import { OnlineSession } from '../../src/net/online.js';
-import { SOCIAL_ROOM, RELAY_VERSION, parseClient, validHomeWord, validHomeFrame, HOME_RELAY_MIN, HOME_WORDS_KEY, HOME_WORDS_KEEP_MS } from '../../src/net/wire.js';
+import { SOCIAL_ROOM, parseClient, validHomeWord, validHomeFrame, HOME_WORDS_KEY, HOME_WORDS_KEEP_MS } from '../../src/net/wire.js';
 import { ORDER_KINDS, orderValid, mintHomeOrder, verifyOrder } from '../../src/net/identityToken.js';
 import { createOnlineHomes } from '../../src/systems/online/onlineHomes.js';
 import { HOME_KEYS_MAX, HOME_LAYOUTS_MAX, HOME_ORDER_KEYS_MAX } from '../../src/net/homeLaw.js';
@@ -181,7 +181,6 @@ test('QUEST-HOME the home order and the home word: an order names one town, its 
   assert.deepEqual(validHomeWord({ m: FARM, u: [HOUSE], d: [], i: 1000 }), { m: FARM, u: [HOUSE], d: [], i: 1000 });
   for (const bad of [{ m: FARM, u: [], d: [], i: 1 }, { m: FARM, u: [1, 1], d: [], i: 1 }, { m: 0, u: [1], d: [], i: 1 }, { m: FARM, u: [1], i: 1 }, { m: FARM, u: [1], d: [], i: 0 }]) assert.equal(validHomeWord(bad), null, JSON.stringify(bad));
   assert.equal(validHomeFrame({ t: 'home', l: [{ m: FARM, u: [1], d: [], i: 1 }, { m: 0 }] }), null, 'one bad word, no frame');
-  assert.equal(HOME_RELAY_MIN, 205);   // FIELD BUGS 2026-10-14's one relay bump (201 on its branch, 203 on the integration): main's world201 (CHAT-TRADE), world202 (FIVE-ASKS), world203 (KG-SET) and world204 (KG5) close a socket on the frame
   for (const p of ['hellos', 'look:', 'secret:', 'party:', 'world:', 'acct:', 'asecret:', 'sweep:', 'hub', 'event:']) assert.equal(HOME_WORDS_KEY.startsWith(p), false, p);
 });
 
@@ -231,7 +230,6 @@ test('QUEST-HOME the live list (Mac, 2026-10-15: "Close both"): a house bought A
   homes.hearEveryTown(boot);
   const a = await pageOnHub(hub, 'aldric-0001'), b = await pageOnHub(hub, 'questr-0002');
   a.hear(); b.hear();
-  assert.equal(a.link.homeOk && b.link.homeOk, true, `the hub's welcome names ${RELAY_VERSION}`);
   b.link.onHome = (words) => { homes.hearHome(words); };   // as scenes/world.js hangs it on the hub link
   // Aldric buys the farmstead's only house after that read, at its door - through the client's own door
   const ears = [];

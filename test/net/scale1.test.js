@@ -3,7 +3,7 @@
 //   A. the per-request writes: `last_seen` touched only once it has gone stale (SESSION_TOUCH_S), both rows in one
 //      round trip - two of every authenticated request's three D1 writes;
 //   B. every request counted to Workers Analytics Engine (server-account/src/metrics.js) - and never at a request's cost;
-//   C. the statements that read a whole table, indexed (0043_scale_indexes.sql), asked of the real migrations' planner;
+//   C. the statements that read a whole table, indexed, asked of the real migrations' planner;
 //   D. D1's 100 bound parameters a statement: the market's materials asked as one bound JSON array;
 //   E. the deploys: the relay's and the service's wait for the suite, and the database's bookmark is written before
 //      the migrations;
@@ -139,7 +139,6 @@ test('SCALE1 C: every statement the audit found reading a whole table finds its 
     ['DELETE FROM market_deliveries WHERE collected = 1 AND at < ?1', 'idx_market_deliveries_at'],
     ["DELETE FROM realm_trades WHERE a_player = ? AND a_char = ? AND state = 'waiting' AND sid != ?", 'idx_realm_trades_waiting'],
     ['SELECT COUNT(*) AS n FROM players WHERE handle IS NOT NULL AND played_at >= ?1 AND played_at < ?2', 'idx_players_played'],
-    ['SELECT spent FROM realm_census WHERE char_id = ? LIMIT 1', 'idx_realm_census_char'],
     ['DELETE FROM market_fills WHERE day < ?1', 'idx_market_fills_day'],
     ["DELETE FROM market_listings WHERE state != 'open' AND closed_at < ?1 AND (returned = 1 OR state = 'sold')", 'idx_market_listings_closed'],
     ["DELETE FROM market_orders WHERE state != 'open' AND closed_at < ?1 AND returned = 1", 'idx_market_orders_closed'],
@@ -152,7 +151,7 @@ test('SCALE1 C: every statement the audit found reading a whole table finds its 
   for (const [sql, index] of cases) {
     const p = plan(sql);
     assert.ok(p.includes(index), `${index} is the way in:\n  ${sql}\n  ${p}`);
-    assert.ok(!/SCAN (home_decor|market_deliveries|realm_trades|players|realm_census|market_fills|market_listings|market_orders|market_bids|node_harvests|guild_writs)(?! USING)/.test(p), `no table read whole: ${p}`);
+    assert.ok(!/SCAN (home_decor|market_deliveries|realm_trades|players|market_fills|market_listings|market_orders|market_bids|node_harvests|guild_writs)(?! USING)/.test(p), `no table read whole: ${p}`);
   }
   // the statements the service runs are the ones planned above: every provenance asked of the decor spells the
   // expression as the index does, or the planner cannot use it

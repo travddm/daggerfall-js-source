@@ -11,7 +11,7 @@ import { createCharacter } from '../../src/systems/chargen.js';
 import { SKILLS, levelUpSkillSum } from '../../src/systems/skills.js';
 import { LEVEL_CAP, atLevelCap, releaseCapLatch } from '../../src/systems/levelCap.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
-import { crossLeveling } from '../../src/systems/realmCustoms.js';
+import { crossLeveling } from '../../src/systems/realmLeveling.js';
 import { createCharSheetWindow, levelUpScreenFor } from '../../src/ui/charSheetDoor.js';
 import { CharSheet } from '../../src/ui/charsheet.js';
 import { VirtueLevelUpScreen } from '../../src/ui/virtueLevelUp.js';
@@ -154,7 +154,7 @@ test('LEVEL-45 THE BOOK\'S LATCH ENDS AT A LOAD (AUDIT FB1026d II C2): restored 
   assert.notEqual(levelUpScreenFor(below)?.oghma, true, 'the next level is an ordinary one');
 });
 
-test('LEVEL-45 THE CLASSIC SHEET HANDS OUT NO POOL AT THE CAP, AND A LEVEL OWED OFFLINE CROSSES AS NONE (AUDIT FB1026d C2): the rollout never mounts for a level latched past the cap, and an Oblivion character at the cap brought online owes nothing (mutants: the rollout unguarded; the crossing\'s release)', () => {
+test('LEVEL-45 THE CLASSIC SHEET HANDS OUT NO POOL AT THE CAP, AND A LEVEL OWED ON OBLIVION\'S BAR CROSSES AS NONE (AUDIT FB1026d C2): the rollout never mounts for a level latched past the cap, and an Oblivion character at the cap switched at its realm boot owes nothing (mutants: the rollout unguarded; the crossing\'s release)', () => {
   const e = made();
   e.level = 45; e.readyToLevelUp = true; e.pendingLevel = 46; e.pendingBonusPool = 6;
   const before = statSum(e);
@@ -163,11 +163,11 @@ test('LEVEL-45 THE CLASSIC SHEET HANDS OUT NO POOL AT THE CAP, AND A LEVEL OWED 
   for (let i = 0; i < 10; i++) sheet.input('plus');
   sheet.input('Escape');
   assert.deepEqual([statSum(e), e.level, e.readyToLevelUp], [before, 45, false], 'no free points, no level');
-  // the Bring online door: an offline Oblivion character at 50 with a level owed
+  // the realm boot's switch: an Oblivion character at 50 with a level owed
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(latchedVirtue())));
   assert.equal(crossLeveling(snap), true);
   assert.equal(snap.readyToLevelUp, false, 'no level owed online');
-  // the level it has (50, never the one past it) is no roll's start, so the conversion that follows it at the same door
+  // the level it has (50, never the one past it) is no roll's start, so the conversion that follows it at the same boot
   // gives the average roll's and the level its skills earn, never above the cap.
   assert.equal(snap.startingLevelUpSkillSum, ROLLED_START_AVERAGE);
   assert.equal(snap.level, Math.min(50, onlineLevelFor(ROLLED_START_AVERAGE, snap.currentLevelUpSkillSum)));

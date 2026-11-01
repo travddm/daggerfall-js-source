@@ -1,7 +1,7 @@
 // PROF11 - MASONRY AS THE SERVICE KEEPS IT: the mason's bench's works on the forge's route (/v1/prof/smelt) -
 // the cut (Rough Stone 2 : 1, a Quarryman's 1 : 1) and the mix (Mortar ten at a time) - with a craft's law: their rank
 // asked, their XP Masonry's at the rank's own tier, half again for a clean chisel (read only where the work has the act),
-// 500 the first time, kept with the row (0060's `first` and `clean`) and answered so, asked twice one; the Stores'
+// 500 the first time, kept with the row (`first` and `clean`) and answered so, asked twice one; the Stores'
 // debits and credits, bought first and their origin carried; the crafter's limit; and the Sculptor's stone decor on the
 // craft route (/v1/prof/craft) - refused to all but a Sculptor (`prof-sculptor`), a piece with its signed record among
 // the products. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
@@ -184,7 +184,7 @@ test('PROF11 service: the stone decor is a Sculptor\'s - refused (`prof-sculptor
   assert.match(accountRefusalText('prof-sculptor'), /Sculptor/);
 });
 
-test('PROF11 service: 0060 gives the forge\'s table its `first` and `clean` - every row before it neither - and the index the decision reads a work\'s first by', async () => {
+test('PROF11 service: the forge\'s table has its `first` and `clean` - a row written without them neither - and the index the decision reads a work\'s first by', async () => {
   const s = await stand();
   const cols = s.raw.prepare('PRAGMA table_info(prof_smelts)').all().map((c) => [c.name, c.dflt_value, c.notnull]);
   assert.deepEqual(cols.filter(([n]) => n === 'first' || n === 'clean'), [['first', '0', 1], ['clean', '0', 1]]);

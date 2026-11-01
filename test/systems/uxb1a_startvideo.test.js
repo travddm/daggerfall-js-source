@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { PREF_DEFAULTS } from '../../src/systems/uiPrefs.js';
 import { ONLINE_PLAYERS_OWN_PREFS, ONLINE_FORCED_PREFS, onlineForcedPref } from '../../src/systems/online/onlineLane.js';
 import { runCinematicFrontDoor } from '../../src/ui/intro/introScreen.js';
-import { MENU_THEME_GAIN } from '../../src/systems/introTheme.js';
+import { MENU_MUSIC_LEVEL } from '../../src/systems/titleMusic.js';
 import { titleHeld } from '../../src/ui/intro/titleHeld.js';
 import { introPage } from '../introDom.mjs';
 
@@ -24,15 +24,15 @@ test('UXB1-A: the switch is a port pref, OFF by default, and the player\'s own o
   assert.equal(onlineForcedPref('skipStartVideo', '?online=1'), undefined);
 });
 
-/** A theme that records what the door asks of it - the IntroTheme calls enterMenu makes. */
+/** A theme that records what the door asks of it - the TitleMusic calls enterMenu makes. */
 function fakeTheme() {
   const calls = [];
   return {
-    calls, source: null, disposed: false, context: null,
+    calls, started: false, disposed: false, context: null,
     unlock() { calls.push('unlock'); return Promise.resolve(true); },
     prepare() { calls.push('prepare'); return Promise.resolve(true); },
     setLevel(level, seconds) { calls.push(['setLevel', level, seconds]); },
-    start() { calls.push('start'); this.source = {}; return true; },
+    start() { calls.push('start'); this.started = true; return true; },
     async pause() {},
     async dispose() { this.disposed = true; calls.push('dispose'); },
   };
@@ -67,7 +67,7 @@ test('UXB1-A: a skip by the pref lands on the title with no film before it, the 
     assert.deepEqual(theme.calls, [], 'nothing plays before a gesture - a browser would refuse it');
     gesture('pointerdown');
     await settle();
-    assert.deepEqual(theme.calls, ['unlock', 'prepare', ['setLevel', MENU_THEME_GAIN, 0], 'start'],
+    assert.deepEqual(theme.calls, ['unlock', 'prepare', ['setLevel', MENU_MUSIC_LEVEL, 0], 'start'],
       'the Skip intro button\'s music: unlocked on the gesture, at the menu\'s gain');
     gesture('keydown');
     await settle();

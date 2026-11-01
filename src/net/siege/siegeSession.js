@@ -39,7 +39,6 @@ export const BATTLE_NONE_TEXT = 'You are in no battle and no Royal Tourney.';
 /** The words. */
 export const SIEGE_SESSION_TEXT = Object.freeze({
   notHere: (town) => `Go to ${town} to fight for it. The battle is fought in the town itself.`,
-  old: 'The server does not fight sieges yet.',
   entered: (side) => (side === 'watch' ? 'You are watching the battle as a spectator.' : `You fight for the ${side === 'attack' ? 'attackers' : 'defenders'}. Make for your camp's banner.`),
   left: 'You have left the battle.',
   refused: (why) => `The battle would not have you: ${why}`,
@@ -55,12 +54,12 @@ export const SIEGE_SESSION_TEXT = Object.freeze({
  * THE SESSION. `online` (net/online.js), `pass(seat, field)` and `claim(receipt)` the book's (net/townSeatBook.js
  * siegePass, claimSiege), `claims` (net/siege/siegeClaims.js, or null), `hud` (ui/siegeHud.js createSiegeHud, or null),
  * `nowMs()` (AUDIT-SEATS C6: the relay's clock - the pass's window is the relay's), `movePlayer(pose)` (a wire pose:
- * natives on x and z), `say(text)`, `relayOk()` the relay fights battles; AUDIT-SEATS C1: `here(seat)` whether the player
+ * natives on x and z), `say(text)`; AUDIT-SEATS C1: `here(seat)` whether the player
  * is still at the seat's town.
  * @param {{ online: any, pass: (seat: any, field: any) => Promise<any>, claims?: any, hud?: any, nowMs?: () => number,
- *   movePlayer?: (p: any) => void, say?: (t: string) => void, relayOk?: () => boolean, here?: (seat: any) => boolean }} deps
+ *   movePlayer?: (p: any) => void, say?: (t: string) => void, here?: (seat: any) => boolean }} deps
  */
-export function createSiegeSession({ online, pass, claims = null, hud = null, nowMs = () => Date.now(), movePlayer = () => {}, say = () => {}, relayOk = () => true, here = () => true }) {
+export function createSiegeSession({ online, pass, claims = null, hud = null, nowMs = () => Date.now(), movePlayer = () => {}, say = () => {}, here = () => true }) {
   /** @type {null | { seat: any, battle: any, field: any, room: string, side: string, window: number, sentIn: boolean, state: any, retryAt: number, joined: boolean, honours: any, tries: number, mint: any, awayAt: number|null }} */
   let s = null;
   async function ask() {
@@ -91,7 +90,6 @@ export function createSiegeSession({ online, pass, claims = null, hud = null, no
     /** Enter `seat`'s battle - `battle` the Seat tab's (its kind, tier and two guilds), `field` the pass's `sf` this game
      *  derived (null: the player is not in the town). */
     enter(seat, battle, field) {
-      if (!relayOk()) { say(SIEGE_SESSION_TEXT.old); return false; }
       if (!field) { say(SIEGE_SESSION_TEXT.notHere(seat?.name ?? 'the town')); return false; }
       if (s?.mint && online.mintSiegePass === s.mint) online.mintSiegePass = null;   // AUDIT-SEATS C2: entered afresh - the old pass's mint goes
       s = { seat, battle: fightArmed(battle, seat), field, room: '', side: 'watch', window: 0, sentIn: false, state: SIEGE_STATE_EMPTY, retryAt: 0, joined: false, honours: undefined, tries: 0, mint: null, awayAt: null };

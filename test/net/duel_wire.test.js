@@ -9,10 +9,10 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 
 import {
-  parseClient, validDuelData, validCastData, relaySupportsDuel, RELAY_VERSION, DUEL_RELAY_MIN, DUEL_KINDS, DUEL_WHY,
+  parseClient, validDuelData, validCastData, RELAY_VERSION, DUEL_KINDS, DUEL_WHY,
   DUEL_FRAME_MAX, DUEL_DATA_MAX, DUEL_HZ_MAX, DUEL_IN_HZ_MAX,
   DUEL_TEMPLATE_MAX, DUEL_MATERIAL_MAX, DUEL_DMG_MAX, DUEL_SEQ_MAX, DUEL_SWINGS,
-  CAST_HZ_MAX, DROP_STRIKES_MAX, POSE_BOUND, DUEL_REF_RELAY_MIN, relaySupportsDuelRef,
+  CAST_HZ_MAX, DROP_STRIKES_MAX, POSE_BOUND,
 } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { fakeRoom } from '../fakeRoom.mjs';
@@ -66,21 +66,12 @@ test('DUEL1 the cast frame is exactly what it was: a touch or a ranged single ta
   for (const rangeType of [0, 3, 4]) assert.equal(validCastData({ to: 'peer-0002', level: 5, spell: { ...HEAL_SPELL, rangeType } }), null, `a cast frame at range ${rangeType}`);
 });
 
-test('DUEL1 the parser and the version: `duel` is its own arm (after the hello, under its own door); world107 is the first relay that routes it (mutants: the frame parsed before the hello; an old relay trusted)', () => {
+test('DUEL1 the parser and the version: `duel` is its own arm (after the hello, under its own door) (mutants: the frame parsed before the hello)', () => {
   const d = { to: 'peer-0002', s: S, k: 'ask' };
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: d }), { hasHello: true }), { t: 'duel', data: d });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: d })), { error: 'duel before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: { ...d, k: 'x' } }), { hasHello: true }), { error: 'bad duel' });
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.equal(DUEL_RELAY_MIN, 107);
-  assert.equal(relaySupportsDuel('world107'), true);
-  assert.equal(relaySupportsDuel('world106'), false, 'main\'s world106 closes the socket on a duel frame');
-  assert.equal(relaySupportsDuel(null), false);
-  // INT8: and world185 the first that referees one (
-  // CHAP4c's world183 and PERF-RELAY1's world184 at the merges) - a client duels on no relay before it (online.js duelOk)
-  assert.equal(DUEL_REF_RELAY_MIN, 185);
-  assert.equal(relaySupportsDuelRef('world185'), true);
-  assert.equal(relaySupportsDuelRef('world184'), false, 'a relay that would route a blow for a defender that resolves none');
+  assert.equal(RELAY_VERSION, 'world282');
   assert.equal(DUEL_IN_HZ_MAX, DUEL_HZ_MAX * 2);
 });
 
@@ -142,7 +133,7 @@ test('DUEL1 relay: the duel\'s meter is its own (DUEL_HZ_MAX a second, struck ou
 
 // ─── THE SESSION ────────────────────────────────────────────────────────────────────────────────────────────────
 
-function linkRig(relayV = RELAY_VERSION) {
+function linkRig() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
@@ -150,18 +141,13 @@ function linkRig(relayV = RELAY_VERSION) {
   const cards = []; s.onCard = (id, d, sub) => cards.push({ id, sub });
   quiet(() => s.join('world:3,12', { x: 1, y: 0, z: 1, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'aaaa-0001', world: null, v: RELAY_VERSION }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'duel');
   return { s, ws, got, cards, out, tick: (ms) => { t += ms; } };
 }
 
-test('DUEL1 session: a duel frame goes only to a relay that routes it, through the wire\'s projection, to a peer some socket reports, DUEL_HZ_MAX a second; one in is delivered only when a peer\'s and addressed to me, with the relay\'s account stamp, DUEL_IN_HZ_MAX a second per sender; a card answer hands its stamp on too (mutants: the version door dropped; the stamp lost; a frame at someone else delivered)', () => {
-  const old = linkRig('world104');
-  assert.equal(old.s.duelOk, false);
-  assert.equal(old.s.sendDuel({ to: 'peer-0002', s: S, k: 'ask' }), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('DUEL1 session: a duel frame goes through the wire\'s projection, to a peer some socket reports, DUEL_HZ_MAX a second; one in is delivered only when a peer\'s and addressed to me, with the relay\'s account stamp, DUEL_IN_HZ_MAX a second per sender; a card answer hands its stamp on too (mutants: the stamp lost; a frame at someone else delivered)', () => {
   const { s, ws, got, cards, out, tick } = linkRig();
-  assert.equal(s.duelOk, true);
   assert.equal(s.sendDuel({ to: 'peer-0002', s: S, k: 'ask' }), true);
   assert.deepEqual(out().at(-1), { t: 'duel', data: { to: 'peer-0002', s: S, k: 'ask' } });
   assert.equal(s.sendDuel({ to: 'aaaa-0001', s: S, k: 'ask' }), false, 'never at myself');

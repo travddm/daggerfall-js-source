@@ -6,12 +6,10 @@ import { readFileSync } from 'node:fs';
 
 import { applyBiographyEffect } from '../../src/systems/biography.js';
 import { assignSkillEquipment } from '../../src/systems/roleplayRealismItems/rriKits.js';
-import { repairUnmintedConditions, WEARABLE_GROUPS, isQuestionsDagger } from '../../src/systems/conditionRepair.js';
+import { isQuestionsDagger } from '../../src/systems/conditionRepair.js';
 import { isBrokenItem, equipItem } from '../../src/systems/equip.js';
 import { repairRefusal } from '../../src/systems/repairService.js';
-import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { conditionMultipliersByMaterial, WEAPONS, WEAPON_MATERIALS, WEAPON_CONDITION_POOL } from '../../src/characters/weapons.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { ServiceFlowWindow } from '../../src/ui/guildServiceWindows.js';
 import { useQuickslot, emptySlotLine, QUICKSLOT_TEXT, clearQuickslots } from '../../src/systems/quickslots.js';
 import { quickslotHand, quickslotTag, CELL_ACTIONS } from '../../src/ui/quickslotTags.js';
@@ -48,39 +46,6 @@ test('DISC21-A: the questions\' ebony dagger is minted as CreateWeapon mints it,
   const a = P();
   applyBiographyEffect(a, 'IT 2 0 1', { rolls: () => 0.5 });   // Armor, steel's plate
   assert.ok(a.items[0].maxCondition > 0 && a.items[0].currentCondition === a.items[0].maxCondition, `armor minted whole (${a.items[0].maxCondition})`);
-});
-
-test('DISC21-A: a save made since - the questions\' dagger at 0 with no maxCondition, broken and "not damaged" - is minted on load: the kit\'s 20% on its real condition; an arrow keeps CreateWeapon\'s 0; any other wearable whole; nothing minted is touched, and nothing that is not worn (mutants: no repair on load; the dagger whole or at 0; the arrow whole)', () => {
-  const stuck = { group: 'Weapons', templateIndex: WEAPONS.Dagger, material: WEAPON_MATERIALS.Ebony, name: 'Dagger', value: 1, currentCondition: 0 };
-  assert.equal(isBrokenItem(stuck), true, 'the report: broken');
-  assert.equal(repairRefusal(stuck), 'undamaged', 'the report: "it isn\'t damaged"');
-  const p = P();
-  p.items.push(stuck,
-    { group: 'Weapons', templateIndex: 131, material: 0, name: 'Arrow', value: 2, stackCount: 12, currentCondition: 0 },
-    { group: 'Armor', templateIndex: 102, material: 0x0201, name: 'Cuirass', value: 5 },
-    { group: 'Weapons', templateIndex: WEAPONS.Longsword, material: 1, name: 'Longsword', value: 5, maxCondition: 300, currentCondition: 120 },
-    { group: 'PlantIngredients1', templateIndex: 0, name: 'Twigs', value: 1 });
-  const q = { isPlayer: true };
-  restorePlayer(q, JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: 100 }))));
-  const [dagger, arrows, cuirass, sword, twigs] = q.items;
-  assert.equal(dagger.maxCondition, EBONY_DAGGER_MAX);
-  assert.equal(dagger.currentCondition, Math.trunc(EBONY_DAGGER_MAX * 0.2), 'the kit\'s 20%, on the real condition');
-  assert.equal(isBrokenItem(dagger), false, 'it can be worn');
-  assert.equal(repairRefusal(dagger), null, 'and repaired');
-  assert.equal(arrows.maxCondition, templateByIndex(131).hitPoints, 'the arrow\'s template hitPoints');
-  assert.equal(arrows.currentCondition, 0, 'and CreateWeapon\'s 0 - "classic does it"');
-  assert.ok(cuirass.maxCondition > 0 && cuirass.currentCondition === cuirass.maxCondition, 'another wearable: whole');
-  assert.deepEqual([sword.maxCondition, sword.currentCondition], [300, 120], 'a minted item keeps its wear');
-  assert.equal(twigs.maxCondition, undefined, 'nothing worn is touched');
-  // idempotent
-  assert.equal(repairUnmintedConditions(q.items), 0, 'a second load mints nothing');
-  assert.deepEqual(WEARABLE_GROUPS, ['Weapons', 'Armor', 'MensClothing', 'WomensClothing', 'Jewellery']);
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(P(), { classicMinutes: 100 })));
-  snap.sceneCache = { scenes: [{ sceneName: 'DaggerfallInterior [MapID=1, BuildingKey=2]', lootContainers: [{ items: [{ ...stuck, UID: 7 }] }] }] };
-  const r = {};
-  restorePlayer(r, snap);
-  const chest = r.sceneCache.scenes.get('DaggerfallInterior [MapID=1, BuildingKey=2]').lootContainers[0].items[0];
-  assert.deepEqual([chest.maxCondition, chest.currentCondition], [EBONY_DAGGER_MAX, Math.trunc(EBONY_DAGGER_MAX * 0.2)], 'the questions\' dagger kept in a house chest, minted as the pack\'s is');
 });
 
 // ── DISC21-B: "Can't access wagon from dungeon entrance - Clicking 'yes' on the prompt only closes it" ──

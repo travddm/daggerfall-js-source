@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // SEA-BOUNTY - A FREEPORT'S BOUNTY BOARD ON THE OPEN SEA'S KILLERS, the service's half. The law is both
-// ends' (src/net/sea/seaBountyLaw.js); the tables migrations/0146_sea_bounty.sql's.
+// ends' (src/net/sea/seaBountyLaw.js); the tables of the sea bounty.
 //
 //   THE KILL (seaKillSteps): a fall the relay refereed in a room of the open sea (its receipt's `m` - src/net/wire.js
 //     seaRoomOf) at another player's hand, written in the fall's OWN batch (wild.js wildFall) - so once, by its remains'

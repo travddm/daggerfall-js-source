@@ -39,7 +39,7 @@ const table = regionWritTable(ANTICLERE, [{ climate: WOODS, confirmed: true }], 
 
 // ── THE LAW ─────────────────────────────────────────────────────────
 
-test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a seed, a claim and a kept record; a rank-0 member is a member; a rank out of its shape, an inherited name, NaN and an empty origin read as the law says (mutants: the map\'s bound, rank 0, the members\' guards, hasOwn, the finite read, the empty origin)', () => {
+test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a seed, a claim and a kept record; a rank-0 member is a member; a rank out of its shape, an inherited name and NaN read as the law says (mutants: the map\'s bound, rank 0, the members\' guards, hasOwn, the finite read)', () => {
   assert.equal(L.rollSeedOk(ALL22), true);
   assert.notEqual(L.rollKeptOf({ seq: 1, factions: ALL22 }), null, 'every real kept record carries all twenty-two');
   assert.equal(L.rollDeltasOk(Object.fromEntries(L.ROLL_FACTIONS.map((f) => [f, 1]))), true);
@@ -51,7 +51,6 @@ test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a 
   assert.equal(L.rollFactionOfGuild('Temple:constructor'), null);
   assert.equal(L.rollFactionOfGuild('Order:toString'), null);
   assert.deepEqual([NaN, Infinity, -Infinity].map((v) => L.rollRep(v)), [0, 0, 0]);
-  assert.equal(L.rollSeedCapOf({ origin: '', createdAt: L.ROLL_EPOCH_S + DAY }), 100, 'an empty origin is born online');
 });
 
 test('AUDIT CHAP2 E3: the Roll takes a book DFU can hold - one temple and one order a book, two books at most (mutants: the count, the bound)', () => {
@@ -61,15 +60,6 @@ test('AUDIT CHAP2 E3: the Roll takes a book DFU can hold - one temple and one or
   assert.equal(L.rollMembersOk(temples.map((f) => ({ f, rank: 0 }))), false, 'three temples');
   assert.equal(L.rollMembersOk(orders.map((f) => ({ f, rank: 0 }))), false, 'three orders');
   assert.equal(L.rollMembersOk(L.ROLL_FACTIONS.map((f) => ({ f, rank: 0 }))), false, 'all twenty-two at once');
-});
-
-test('AUDIT CHAP2 D3/E6: a crossing member keeps its rank\'s band, never the seat\'s line - a rank 8 or 9 crossing keeps 79 (Mac: "You can decide whatever is best") (mutants: the band\'s top, the seat\'s line)', () => {
-  assert.equal(L.ROLL_SEAT_LINE, 80);
-  assert.deepEqual([0, 1, 4, 6, 7, 8, 9].map(L.rollRankKeepOf), [9, 19, 49, 69, 79, 79, 79]);
-  assert.equal(L.rollRankCapOf(L.rollRankKeepOf(9)), 7, 'reviewed to rank 7, as 3.5 holds everyone at CHAP4');
-  const seed = L.rollSeedOf({ 40: 100, 41: 100, 42: 100 }, 40, new Map([[40, 4], [41, 7]]));
-  assert.deepEqual([seed[40], seed[41], seed[42]], [49, 79, 40]);
-  assert.equal(L.rollSeedOf({ 40: 45 }, 40, new Map([[40, 4]]))[40], 45, 'never above what the save held');
 });
 
 test('AUDIT CHAP2 D2/S7: the join - the underworld two at any standing (their initiation quests), every other guild at 0, what the Roll owes counted (mutants: the hidden two, the floor)', () => {
@@ -274,12 +264,11 @@ test('AUDIT CHAP2 D4: the hidden guilds\' halls are revealed for a membership in
 
 // ── THE SERVICE: THE ROLL ───────────────────────────────────────────
 
-async function roll({ origin = null } = {}) {
+async function roll() {
   const svc = await standService({ CHAPTERS_OPEN: 'on' });
   const who = await svc.registered('Probe');
   const R = await seatRealm(svc.env, who.secret, 'Probe');
   const raw = svc.env.DB._raw;
-  raw.prepare('UPDATE realm_characters SET created_at = ?, origin_id = ? WHERE id = ?').run(L.ROLL_EPOCH_S + DAY, origin, R.id);
   const ctx = (nowS, db = svc.env.DB) => ({ db, nowS });
   const body = (extra = {}) => ({ character: R.id, lease: R.lease, ...extra });
   const head = () => raw.prepare('SELECT seq, kseq FROM npc_roll_heads WHERE char_id = ?').get(R.id);

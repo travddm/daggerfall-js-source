@@ -5,7 +5,7 @@
 // (src/net/renown.js carries the whole of the
 // law and Mac's answers; this file is where the track is kept).
 //
-// ONE TRACK A CHARACTER (migration 0009), keyed by the id the
+// ONE TRACK A CHARACTER, keyed by the id the
 // character's own save carries, so a track follows its character and
 // never rides in the save.
 //

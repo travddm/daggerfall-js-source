@@ -15,6 +15,7 @@ import { royalRingWire, siegeWorldPoint, SIEGE_FIELD } from '../../src/systems/s
 import { royalRoomKey, ROYAL_RING } from '../../src/net/siege/siegeRef.js';
 import { mintRoyalReceipt } from '../../src/net/siege/siegeReceipt.js';
 import { OnlineSession } from '../../src/net/online.js';
+import { RELAY_VERSION } from '../../src/net/wire.js';
 import { royalTourneyLines } from '../../src/net/townSeatLaw.js';
 import { mountNoticeBoard } from '../../src/ui/noticeWindow.js';
 
@@ -95,7 +96,7 @@ test('CROWN1 THE RING FROM THE TOWN: a crown\'s Palace square - its field\'s fou
   assert.equal(royalRingWire(590, 166, null), null);
 });
 
-test('CROWN1 THE SESSION: not in the city, an old relay; the ring unsettled asked again; a pass joins the tourney\'s room and mints for every hello; `in` said on an open socket; a challenge said; the card\'s Challenge challenges - or accepts one standing at me; a spectator challenges no one; in a bout its one foe and its ring; my blow on it alone; a mark moves me; a won bout\'s receipt kept and offered; the week\'s end leaves (mutants: each)', async () => {
+test('CROWN1 THE SESSION: not in the city; the ring unsettled asked again; a pass joins the tourney\'s room and mints for every hello; `in` said on an open socket; a challenge said; the card\'s Challenge challenges - or accepts one standing at me; a spectator challenges no one; in a bout its one foe and its ring; my blow on it alone; a mark moves me; a won bout\'s receipt kept and offered; the week\'s end leaves (mutants: each)', async () => {
   let now = AT;
   const sent = [], said = [], moved = [], kept = [];
   const online = { id: 'p1', room: '', status: 'closed', mintSiegePass: null, sendSiege: (f) => { sent.push(f); return true; } };
@@ -106,11 +107,7 @@ test('CROWN1 THE SESSION: not in the city, an old relay; the ring unsettled aske
   const hud = { update: (m) => { hudModel = m; }, hide: () => { hudModel = 'hidden'; } };
   const settle = async () => { for (let i = 0; i < 6; i++) await Promise.resolve(); };
   const name = (id) => ({ p2: 'Bryn', p3: 'Cade' })[id] ?? '';
-  let relay = false;
-  const rs = createRoyalSession({ online, pass, claims, hud, nowMs: () => now, movePlayer: (p) => moved.push(p), say: (t) => said.push(t), relayOk: () => relay, name });
-  assert.equal(rs.enter(WAYREST, { prize: 5000 }, RING), false);
-  assert.equal(said.at(-1), ROYAL_SESSION_TEXT.old);
-  relay = true;
+  const rs = createRoyalSession({ online, pass, claims, hud, nowMs: () => now, movePlayer: (p) => moved.push(p), say: (t) => said.push(t), name });
   assert.equal(rs.enter(WAYREST, { prize: 5000 }, null), false);
   assert.equal(said.at(-1), ROYAL_SESSION_TEXT.notHere('Wayrest'));
   assert.equal(rs.enter(WAYREST, { prize: 5000 }, RING), true);
@@ -185,13 +182,13 @@ test('CROWN1 THE SESSION: not in the city, an old relay; the ring unsettled aske
   assert.equal(hudModel, 'hidden');
   assert.equal(online.mintSiegePass, null);
   // a spectator
-  const eye = createRoyalSession({ online, pass: async (seat, field, watch) => ({ ok: true, side: watch ? 'watch' : 'duel', week: 20, endsAt: AT / 1000 + 86400 }), relayOk: () => true, say: () => {} });
+  const eye = createRoyalSession({ online, pass: async (seat, field, watch) => ({ ok: true, side: watch ? 'watch' : 'duel', week: 20, endsAt: AT / 1000 + 86400 }), say: () => {} });
   eye.enter(WAYREST, { prize: 5000 }, RING, { watch: true });
   await settle();
   assert.equal(eye.side(), 'watch');
   assert.equal(eye.challenge('p2'), false, 'a spectator challenges no one');
   // a refusal leaves
-  const no = createRoyalSession({ online, pass: async () => ({ ok: false, error: 'royal-none', text: 'none here' }), relayOk: () => true, say: (t) => said.push(t) });
+  const no = createRoyalSession({ online, pass: async () => ({ ok: false, error: 'royal-none', text: 'none here' }), say: (t) => said.push(t) });
   no.enter(WAYREST, {}, RING);
   await settle();
   assert.equal(no.active(), false);
@@ -222,7 +219,7 @@ test('CROWN1 THE BOUTS CARRIED: the siege\'s carrier over `t1` receipts in a sto
   assert.equal(again.keep(s1), false, 'a siege\'s receipt is not a bout\'s');
 });
 
-test('CROWN1 THE SOCKET\'S ROYAL ROOM: its hello carries a fresh pass; its words reach the tourney; my words leave only at a relay that keeps Royal Tourneys (mutants: the room; the relay\'s floor)', async () => {
+test('CROWN1 THE SOCKET\'S ROYAL ROOM: its hello carries a fresh pass; its words reach the tourney; my words leave down it (mutants: the room)', async () => {
   const sockets = [];
   class FakeWS {
     constructor(url) { this.url = url; this.sent = []; sockets.push(this); }
@@ -241,11 +238,7 @@ test('CROWN1 THE SOCKET\'S ROYAL ROOM: its hello carries a fresh pass; its words
   const ws = sockets.at(-1);
   ws.open(); await settle();
   assert.equal(ws.sent[0].sp, `v1.royal.${room.length}`);
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: null, now: AT, v: 'world147' });
-  assert.deepEqual([o.siegeOk, o.royalOk], [true, false]);
-  assert.equal(o.sendSiege({ k: 'in' }), false, 'a relay that fights sieges but keeps no Royal Tourney');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: null, now: AT, v: 'world149' });
-  assert.equal(o.royalOk, true);
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: 'mac-0001', world: null, now: AT, v: RELAY_VERSION });
   assert.equal(o.sendSiege({ k: 'ask', to: 'peer-0002' }), true);
   assert.deepEqual(ws.sent.at(-1), { t: 'siege', k: 'ask', to: 'peer-0002' });
   ws.receive({ t: 'siege', k: 'lad', l: [['peer-0002', 1, 0]] });

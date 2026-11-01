@@ -104,7 +104,7 @@ test('SCALE4a: a session whose player is gone is refused as the two reads refuse
   const base = d1();
   const a = await createGuest(ctx(base), {});
   const b = await createGuest(ctx(base), {});
-  // an orphan cannot be made through the cascade (0001's FOREIGN KEY ... ON DELETE CASCADE) - the old code checked for it
+  // an orphan cannot be made through the cascade (the schema's FOREIGN KEY ... ON DELETE CASCADE) - the old code checked for it
   // because "cannot happen" is how a null reaches a caller, and so does this one: made here with the keys off
   base._raw.exec('PRAGMA foreign_keys = OFF');
   base._raw.prepare('DELETE FROM players WHERE id IN (?, ?)').run(a.id, b.id);

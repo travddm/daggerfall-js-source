@@ -31,8 +31,6 @@ import { seaSeasonFigures, seaSeasonStartS, seaLegendsPossible, SEA_WORLD_DAY_S,
 import { worldRoom, validWildData, PIXEL_UNITS, SOCIAL_ROOM, seaVaultRoomId, seaVaultRoomMapId, seaVaultMapId, seaVaultKey, wdunRoomKey, seaRoomOf, seaRoomCell, SEA_VAULT_LANE, SEA_FLEET_OFFSET_MS, SEA_FLEET_SAIL_MS, SEA_FLEET_PERIOD_MS, spawnedHallMapId, WDUN_RESET_MS } from '../../../src/net/wire.js';
 import { FLEET_OFFSET_MS, FLEET_SAIL_MS } from '../../../src/systems/sea/seaEvents.js';
 import { etherPlaceId } from '../../../src/world/etherPlaces.js';
-import { OnlineSession } from '../../../src/net/online.js';
-import { fakeSocketClass } from '../../fakeSocket.mjs';
 import * as R from '../../../src/net/sea/seaRef.js';
 import { newWildRef, wildZone, wildPose, wildCarryOf, WILD_REF, WILD_GRACE } from '../../../src/net/wild/wildRef.js';
 import { SIEGE_UNITS_PER_M } from '../../../src/net/siege/siegeRef.js';
@@ -640,7 +638,7 @@ test('AUDIT SEA VENTURES D7, D8, A5: a vault of the deep stands in a room of its
   } finally { Date.now = realNow; }
 });
 
-test('AUDIT SEA VENTURES A7, A10: the hub hears a treasure fleet\'s flagship sunk only while she is under way (her hour in port and the hour before scattered her before she sailed) and never from a guest; a page asks it only of a hub that reads it (mutants: the window, the guest, the gate)', async () => {
+test('AUDIT SEA VENTURES A7, A10: the hub hears a treasure fleet\'s flagship sunk only while she is under way (her hour in port and the hour before scattered her before she sailed) and never from a guest (mutants: the window, the guest)', async () => {
   assert.deepEqual([SEA_FLEET_OFFSET_MS, SEA_FLEET_SAIL_MS], [FLEET_OFFSET_MS, FLEET_SAIL_MS], 'the relay\'s copy is the sea\'s');
   const n = 9000, start = n * SEA_FLEET_PERIOD_MS + SEA_FLEET_OFFSET_MS, realNow = Date.now;
   let clock = start - 60_000; Date.now = () => clock;
@@ -658,15 +656,6 @@ test('AUDIT SEA VENTURES A7, A10: the hub hears a treasure fleet\'s flagship sun
     await hub.raw(a, JSON.stringify({ t: 'wdun', k: 'fk', n })); clock += 700;
     assert.deepEqual(fd().at(-1)?.fleets, [n], 'under way, a registered captain\'s: scattered');
   } finally { Date.now = realNow; }
-  // A10: never to a hub that would close the socket on it
-  const { FakeWS, sockets } = fakeSocketClass();
-  const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1000 });
-  s.join(SOCIAL_ROOM);
-  sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', v: 'world241', peers: [], host: null, world: null });
-  assert.equal(s.wdunOk, true);
-  assert.equal(s.sendWdun({ k: 'fk', n }), false, 'an older hub: never said');
-  assert.equal(s.sendWdun({ k: 'hi' }), true);
 });
 
 test('AUDIT SEA VENTURES A8: a receipt owed a captain away is kept in the room\'s storage - an object that slept hands it to her when she is back; a wreck nobody comes back to is signed on the room\'s alarm (mutants: the owed kept, the owed read, the alarm armed, the alarm\'s beat)', async () => {
@@ -752,7 +741,7 @@ test('AUDIT SEA VENTURES D2, D4, D5, D9, D10: a treasure fleet\'s flagship pays 
   const make = () => createSeaVentures({
     live: () => false, day: () => 0, pixel: () => ({ x: Math.floor(f.from.x), y: Math.floor(f.from.y) }), locks: new Map(), crows: new Map(), mine: () => null,
     clock: () => now, naval: () => ({ fleet: (list, o) => fed.push(o) }), state: { localFromWorld: (x, z) => [x / 40, z / 40] },
-    link: () => ({ wdunSeaOk: true, status: 'open', sendWdun: (w) => { sent.push(w); return true; } }), ether: host,
+    link: () => ({ status: 'open', sendWdun: (w) => { sent.push(w); return true; } }), ether: host,
   });
   const v = make();
   assert.equal(v.fleetEnded(f.n, 'sink'), f.purse);
@@ -866,7 +855,7 @@ test('AUDIT SEA VENTURES C1, C3, C4, C5/F2: the linked bank cabin is a teleport 
   const refuse = cab.indexOf('if (!loading && (wildTeleportRefused(boatPixelOf(boat)) || veilRefused(boatPixelOf(boat)))) return true;');
   assert.ok(refuse > 0 && refuse < cab.indexOf('await _teleportToPixel(boat.MapPixel.X, boat.MapPixel.Y);'), 'refused before the teleport');
   assert.match(w, /const boatPixelOf = \(boat\) => \(\{ x: boat\.MapPixel\.X, y: boat\.MapPixel\.Y \}\);/);
-  assert.match(w, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online\?\.wildOk \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/);
+  assert.match(w, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/);
   assert.equal(zoneWord('walkInto', ETHER_KIND), ETHER_WILD_TEXT.walkInto());
   assert.match(zoneWord('walkInto', ETHER_KIND), /open Eltheric Ocean past Veilhaven's peace, an open PvP zone/);
   // C4 (

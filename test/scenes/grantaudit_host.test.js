@@ -7,7 +7,7 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { OnlineSession } from '../../src/net/online.js';
-import { cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
+import { cellRoomOfWire, PIXEL_UNITS, RELAY_VERSION } from '../../src/net/wire.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { createGrantHost, GRANT_HEIR_WAIT_MS, GRANT_WATCH_REASK_MS, GRANT_CARRY_TRIES } from '../../src/scenes/grantHost.js';
 import { signGrant, GRANT_TTL_MS, GRANT_SKEW_MS, GRANT_FRAME_GRANTS_MAX } from '../../src/net/grantLaw.js';
@@ -33,7 +33,7 @@ test('AUDIT GRANT A1/A10 THE SESSION HEARS A WORLD ROOM\'S ANSWERS, AND THE LAW 
     s.onGrant = (g) => heard.push(g);
     quiet(() => s.join(room, { x: 402 * PIXEL_UNITS + 100, y: 60, z: (499 - 151) * PIXEL_UNITS + 100, yaw: 0 }));
     sockets[0].open();
-    quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: 'world218', gm: 'measure' }));
+    quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION, gm: 'measure' }));
     sockets[0].receive({ t: 'grant', k: 'no', id: 3, r: 'bucket', gm: 'enforce' });
     assert.deepEqual([heard.map((g) => g.k), s.grantMode], [['no'], 'enforce'], room);
   }

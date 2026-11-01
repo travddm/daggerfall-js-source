@@ -1,6 +1,6 @@
 // REALM P2.1: A TRADE IS THE REALM'S.
-// The law both ends read (src/net/realm/realmTradeLaw.js), the service that settles it (server-account/src/realmTrade.js,
-// migration 0019 - 0017 on its branch) driven through the REAL Worker over the REAL migrations, and the client that hands its commit to it
+// The law both ends read (src/net/realm/realmTradeLaw.js), the service that settles it (server-account/src/realmTrade.js)
+// driven through the REAL Worker over the REAL migrations, and the client that hands its commit to it
 // (net/tradeSession.js's escrow, systems/realmSaves.js transact and realmTradeEscrow) - two realm tabs trading end to
 // end. Every write of a realm character is a new object now, so a write that loses its race never touches the save.
 import { test } from 'node:test';

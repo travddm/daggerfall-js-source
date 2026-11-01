@@ -2,7 +2,6 @@
 // pin fails on the head before its fix, and on its mutants (tools/mutants/auditrelease_r2_gaps.json).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { createWorldPlaces } from '../../../src/world/worldWide/worldPlaces.js';
 import { theatreAt, districtOf, DISTRICT_PX, WORLD_PIXEL_SPAN } from '../../../src/world/worldWide/worldGrid.js';
 import { cemeteryPastBay, nearestBayCemetery, isCemeteryPlace } from '../../../src/world/worldWide/worldCemetery.js';
@@ -20,6 +19,7 @@ import { poiPixelKey, poiPixelId, poiDocProblems, POI_WORLD_BOUND, POI_PAST_BAY_
 import { createPoiFeed } from '../../../src/poi/poiFeed.js';
 import { placeAtMapMetres, movePlace, mapMetresOf } from '../../../src/poi/poiEdit.js';
 import { codeOnly } from '../../codeOnly.mjs';
+import { d1 } from '../../accountDb.mjs';
 
 setTamrielTrace(null); setTamrielFit(null);   // the authored shape and fit: no player's picture in the suite
 
@@ -157,7 +157,8 @@ test('R2-8 a POI past the Bay: its law takes the world\'s pixel, its id is one a
   const q = placeAtMapMetres({ px: 0, py: 0, x: 0, z: 0, y: 0, ground: 'snap', r: [0, 0, 0, 1], s: 1 }, ...mapMetresOf({ px: WHITERUN.x, py: WHITERUN.y, x: 12.5, z: 40 }));
   assert.deepEqual([q.px, q.py, q.x, q.z], [WHITERUN.x, WHITERUN.y, 12.5, 40], 'stood at Whiterun');
   // the stored ids: the documents' own - the store's tables key no row by a pixel
-  const sql = readFileSync(new URL('../../../server-account/migrations/0116_poi.sql', import.meta.url), 'utf8');
-  assert.match(sql, /id\s+TEXT PRIMARY KEY,\s+-- poi-<12 hex>/);
+  const raw = d1()._raw;
+  assert.deepEqual(raw.prepare('PRAGMA table_info(poi_docs)').all().filter((c) => c.pk).map((c) => `${c.name} ${c.type}`), ['id TEXT']);
+  const sql = raw.prepare("SELECT group_concat(sql, ';') AS s FROM sqlite_master WHERE name LIKE 'poi\\_%' ESCAPE '\\'").get().s;
   assert.doesNotMatch(sql, /CHECK\s*\(\s*p[xy]/i, 'no bound on a place\'s pixel in the store');
 });

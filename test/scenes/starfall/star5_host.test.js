@@ -89,7 +89,7 @@ function fakeGl() {
 function world({ storage = memStorage(), t = starTimes(N, 0).omenAt - 1000, gfx = false, surface = () => 0, coarse = undefined, account = undefined } = {}) {
   const w = { t, feet: null, region: COVEN.region, said: [], mids: [], sounds: [], heard: [], words: [], sprung: new Set(), peer: new Set(), peerAgo: 0, forgot: [], bare: [], storage, origin: [0, 0, 0] };
   w.foes = pool();
-  w.session = { starReady: () => true, starGrantOk: true, sendStar: (word, cell) => { w.words.push({ ...word, cell }); return true; } };   // AUDIT STAR-TUNE F1: a relay that mints the `star` kind
+  w.session = { starReady: () => true, sendStar: (word, cell) => { w.words.push({ ...word, cell }); return true; } };
   w.gl = gfx ? fakeGl() : null;
   w.renderer = gfx ? { gl: w.gl, meshes: [], draws: [], createMesh(m) { const mesh = { m }; this.meshes.push(mesh); return mesh; }, destroyMesh() {}, uploadTexture() {}, uploadEmissionTexture() {}, drawMesh(mesh, mat) { w.draws.push({ mesh, mat: Array.from(mat), offset: w.gl.calls.filter(([k, c]) => (k === 'enable' || k === 'disable') && c === 'POLYGON_OFFSET_FILL').at(-1)?.[0] === 'enable' }); } } : null;
   w.draws = [];
@@ -862,14 +862,6 @@ test('STAR-TUNE THE COVEN STANDS AS AN EVENT\'S (the owner, of the first run: "t
     assert.equal(f.opts.groundAlign.hitDist, 0.2, 'its drop from just over it');
     assert.equal(f.opts.grantKind, 'star', 'a grant of the star\'s own kind - a wave of any size its law gives, one ask');
   }
-  // AUDIT STAR-TUNE F1: a relay before the star's kind (the site live first) is asked the stand's own - main's, a wave of nine at most
-  w.session.starGrantOk = false;
-  w.st(2, { p: P_WAVE, w: 2, wz: 5, kn: 0, b: 1 });
-  await w.beat();
-  const older = w.foes.stood.filter((f) => f && f.site === sites.base).slice(wave.length);
-  assert.equal(older.length, 5, 'the next wave stands on an older relay too');
-  for (const f of older) assert.equal(f.opts.grantKind, undefined, 'its own shape\'s kind (net/grantLaw.js grantKindOf), never one the relay refuses');
-  w.session.starGrantOk = true;
   // the master: an elite's own health; its circle the coven's
   w.st(2, { p: P_MASTER, w: 4, wz: 0, kn: 0, b: 1, nd: 1 });
   await w.beat();

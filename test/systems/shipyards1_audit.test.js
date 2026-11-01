@@ -7,12 +7,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { sea } from '../navalSea.mjs';
 import { createShipyardHost } from '../../src/scenes/shipyardHost.js';
-import { fleetShip, titleDeed, shipLabel, _resetFleetForTests, knowShip, fleetBook, restoreFleetSaveData, fleetSaveData, fleetCrossed, FLEET_SAVE_VENDOR } from '../../src/systems/fleet.js';
+import { fleetShip, titleDeed, shipLabel, _resetFleetForTests, knowShip, fleetBook } from '../../src/systems/fleet.js';
 import { mintDeed, mintParts } from '../../src/systems/comeSailAway/comeSailAwayItems.js';
 import { SHIPYARD_TEXT, shipWorth, shipSalePrice, shipBuyPrice, SHIPYARD_HULLS } from '../../src/systems/shipyards.js';
-import { applyCustoms, customsLines } from '../../src/systems/realmCustoms.js';
-import { createBankAccounts } from '../../src/systems/banking.js';
-import { COME_SAIL_AWAY_VENDOR } from '../../src/systems/comeSailAway/comeSailAway.js';
 import { HULL_NAMES, HULL_PRICES } from '../../src/systems/comeSailAway/comeSailAwayHulls.js';
 import { firstBuildOf } from '../../src/systems/naval/navalShips.js';
 import { SHIP_STATES, REPAIR_PRICE } from '../../src/systems/naval/navalDamage.js';
@@ -220,24 +217,11 @@ test('AUDIT SHIPYARDS THE SHIPMASTER\'S GUARDS THROUGH HIS ACT (L6-6): a placing
   assert.match(deed.text, /laid up at Sentinel\. Press Bring here/);
 });
 
-test('AUDIT SHIPYARDS CUSTOMS CROSSES THE FLEET (L1-2): every Come Sail Away ship a crossing save holds - the Fleet\'s records, the placed boats, the deeds and parts in its lists - is entered crossed in the Fleet\'s record, said on the customs page, kept through a save, and never bought by a shipmaster; a record\'s worth is never above a new hull of hers, and an offer is never below nothing', () => {
+test('AUDIT SHIPYARDS (L1-2): a shipmaster buys a ship laid up; a record\'s worth is never above a new hull of hers, and an offer is never below nothing', () => {
   _resetFleetForTests();
-  const snap = { level: 5, goldPieces: 100, items: [mintParts(0, 0, 601)], wagonItems: [], bankAccounts: createBankAccounts(), sceneCache: null, dungeon: null, world: { piles: [] },
-    modData: { [FLEET_SAVE_VENDOR]: { v: 1, ships: [{ uid: 501, hull: 2, variant: 0, value: HULL_PRICES[2] }] }, [COME_SAIL_AWAY_VENDOR]: { placedBoats: [{ UID: 502, Hull: 3 }, { UID: 501, Hull: 2 }] } } };
-  const rep = applyCustoms(snap);
-  assert.equal(rep.fleet, 3, 'three ships by number: a record, a placed boat (the record\'s twice), a pack\'s parts');
-  assert.deepEqual([...snap.modData[FLEET_SAVE_VENDOR].crossed].sort(), [501, 502, 601]);
-  assert.ok(customsLines(rep, { before: true }).includes('Your 3 boats will come with you; no shipyard in the realm buys a boat that comes through customs.'));
-  restoreFleetSaveData(snap.modData[FLEET_SAVE_VENDOR]);
-  assert.deepEqual([fleetCrossed(501), fleetCrossed(502), fleetCrossed(601), fleetCrossed(999)], [true, true, true, false]);
-  assert.deepEqual(fleetSaveData().crossed.sort(), [501, 502, 601], 'kept through a save');
-  // the shipmaster's refusal, through his act
   const r = tradeRig();
-  restoreFleetSaveData({ v: 1, ships: [], crossed: [701] });
-  r.own(701, 2, 'laidup');
   r.own(702, 2, 'laidup');
-  assert.deepEqual(r.host.act(SITE, 'sell', 701), { ok: false, text: SHIPYARD_TEXT.crossed });
-  assert.equal(r.host.act(SITE, 'sell', 702).ok, true, 'a ship bought in the realm sells');
+  assert.equal(r.host.act(SITE, 'sell', 702).ok, true, 'a ship laid up sells');
   // a hand-made worth: no more than a new hull of hers - the counter's 32-bit haggle never reached - and no negative offer
   assert.equal(shipWorth({ hull: 2, value: 9_000_000 }), shipWorth({ hull: 2, value: HULL_PRICES[2] }));
   for (const skills of [{ mercantile: 40, personality: 50 }, { mercantile: 100, personality: 100 }]) {

@@ -7,8 +7,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'acorn';
 import { OnlineSession } from '../../src/net/online.js';
-import { SOCIAL_ROOM, CLOSE_POLICY, validPartyPose, cellRoomOfWire, rosterFor } from '../../src/net/wire.js';
-import { FOLLOW_RELAY_MIN, WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS } from '../../src/net/staffFollow.js';
+import { SOCIAL_ROOM, CLOSE_POLICY, validPartyPose, cellRoomOfWire, rosterFor, RELAY_VERSION } from '../../src/net/wire.js';
+import { WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS } from '../../src/net/staffFollow.js';
 import { createStaffHook, staffHookDoor, hiddenSeat, validTags, STAFF_HOOK_VERSION, STAFF_TOKEN_WAIT_MS, STAFF_RELINK_GAP_MS, TAGS_MAX, TAG_WHY_MAX, NAMEPLATE_DIST } from '../../src/net/staffHook.js';
 import { createStaffFollowHost, staffFollowOnPage, relinkGame, followInFrame, FOLLOW_RETRY_MS, FOLLOW_RETRY_MAX_MS } from '../../src/scenes/staffFollowHost.js';
 import { accountTokenMinter, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
@@ -18,19 +18,18 @@ import { fakeSocketClass } from '../fakeSocket.mjs';
 const note = (rk = 'world:100,100', more = {}) => ({ px: 100, py: 100, in: 0, loc: 'Daggerfall', h: 50, hm: 60, f: 40, fm: 40, m: 10, mm: 20, rk, ...more });
 
 /** A session on the hub with an account, its clock the test's. */
-function hubSession(v = `world${FOLLOW_RELAY_MIN}`) {
+function hubSession() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', acct: 'acct-bran', asecret: 'asecret-bran', WebSocketImpl: FakeWS, presence: false, now: () => t });
   s.join(SOCIAL_ROOM); const ws = sockets[0]; ws.open();
-  ws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v });
+  ws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v: RELAY_VERSION });
   const parties = () => ws.sent.map(JSON.parse).filter((m) => m.t === 'party');
   return { s, ws, parties, tick: (ms) => { t += ms; } };
 }
 
-test('STAFF-PANEL5-FOLLOW session: a where note outside a party - one a 5 s while it changes, a keepalive a minute while it does not, and none to a relay before the follow; a member\'s pose as ever', () => {
+test('STAFF-PANEL5-FOLLOW session: a where note outside a party - one a 5 s while it changes, a keepalive a minute while it does not; a member\'s pose as ever', () => {
   const { s, parties, tick } = hubSession();
-  assert.equal(s.followOk, true);
   s.solo = true;
   assert.equal(s.sendParty(note()), true, 'the first goes at once');
   assert.equal(parties().at(-1).p.rk, 'world:100,100');
@@ -53,13 +52,6 @@ test('STAFF-PANEL5-FOLLOW session: a where note outside a party - one a 5 s whil
   tick(1000);
   assert.equal(s.sendParty(note('world:100,103')), false, 'and an unchanged one never');
   s.leave();
-  const old = hubSession(`world${FOLLOW_RELAY_MIN - 1}`);
-  assert.equal(old.s.followOk, false);
-  old.s.solo = true;
-  assert.equal(old.s.sendParty(note()), false, 'a relay before it writes each one at once: none goes there');
-  old.s.solo = false;
-  assert.equal(old.s.sendParty(note()), true, 'a member\'s goes, as ever');
-  old.s.leave();
 });
 
 test('STAFF-PANEL5-FOLLOW session: the hub\'s `fol` reaches onFollow through the wire\'s door, from the hub alone', () => {
@@ -76,7 +68,7 @@ test('STAFF-PANEL5-FOLLOW session: the hub\'s `fol` reaches onFollow through the
   const { FakeWS, sockets } = fakeSocketClass();
   const cell = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-c', secret: 'secret-c', WebSocketImpl: FakeWS, presence: true });
   cell.join('world:100,100', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0 }); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'peer-c', peers: [], n: 1, v: `world${FOLLOW_RELAY_MIN}` });
+  sockets[0].receive({ t: 'welcome', id: 'peer-c', peers: [], n: 1, v: RELAY_VERSION });
   const told = [];
   cell.onFollow = (f) => told.push(f);   // a throw here is contained (online.js _deliver): counted instead
   sockets[0].receive({ t: 'fol', k: 'on', sub: 'acct-target' });
@@ -245,7 +237,7 @@ test('STAFF-PANEL5-FOLLOW-R2 hook: the hub\'s newer word wins over an older pose
 test('STAFF-PANEL5-FOLLOW-FIX hook, on real sessions: a place room names no account, so the target is found by the id the room said (finding 1); the hub\'s lease rides the eye (finding 5); the eye alone asks a hidden seat (finding 18)', async () => {
   const flush = async () => { for (let i = 0; i < 8; i++) await new Promise((r) => setImmediate(r)); };
   const { FakeWS, sockets } = fakeSocketClass();
-  const v = `world${FOLLOW_RELAY_MIN}`;
+  const v = RELAY_VERSION;
   const hook = createStaffHook({ main: () => ({ url: 'wss://relay.test' }), askToken: async () => 'tok', WS: FakeWS });
   const idOf = (ws) => ws.sent.map(JSON.parse).find((m) => m.t === 'hello').id;
   hook.follow('acct-target'); hook.tick();
@@ -287,7 +279,7 @@ test('STAFF-PANEL5-FOLLOW-FIX hook, on real sessions: a place room names no acco
 
 test('STAFF-PANEL5-FOLLOW-R2 hook, on real sessions: once locked on, a fast travel and a door out still move the eye to the note\'s cell, on the note\'s feet - the last pose seen leads nowhere after they left its room', async () => {
   const flush = async () => { for (let i = 0; i < 8; i++) await new Promise((r) => setImmediate(r)); };
-  const v = `world${FOLLOW_RELAY_MIN}`;
+  const v = RELAY_VERSION;
   const idOf = (ws) => ws.sent.map(JSON.parse).find((m) => m.t === 'hello').id;
   const helloPose = (ws) => ws.sent.map(JSON.parse).find((m) => m.t === 'hello').pose;
   const at = (px, pz) => ({ x: px * 32768 + 10, y: 3, z: (499 - pz) * 32768 + 10 });
@@ -344,7 +336,7 @@ test('STAFF-PANEL5-FOLLOW-R2 hook, on real sessions: once locked on, a fast trav
  *  world:7,6 - the room's welcome shows them by the socket id the hub's `in` said. */
 async function seamFollow() {
   const flush = async () => { for (let i = 0; i < 8; i++) await new Promise((r) => setImmediate(r)); };
-  const v = `world${FOLLOW_RELAY_MIN}`;
+  const v = RELAY_VERSION;
   const { FakeWS, sockets } = fakeSocketClass();
   const counts = { mints: 0 };
   const hook = createStaffHook({ main: () => ({ url: 'wss://relay.test' }), askToken: async () => { counts.mints++; return 'tok'; }, WS: FakeWS });

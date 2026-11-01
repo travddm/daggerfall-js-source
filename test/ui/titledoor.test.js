@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { runIntro, runCinematicFrontDoor, TITLE_HELD_TIME, DOORS_FADE_MS } from '../../src/ui/intro/introScreen.js';
 import { titleHeld, holdTitle, TITLE_HELD } from '../../src/ui/intro/titleHeld.js';
 import { TITLE_READY_TIME, MENU_FADE_SECONDS } from '../../src/ui/intro/introCue.js';
-import { MENU_THEME_GAIN } from '../../src/systems/introTheme.js';
+import { MENU_MUSIC_LEVEL } from '../../src/systems/titleMusic.js';
 import { mountEnhancedMenu } from '../../src/ui/enhanced/enhancedMenu.js';
 import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { introPage, fakeTheme, settle } from '../introDom.mjs';
@@ -107,7 +107,7 @@ test('TITLE-DOOR: Skip intro and Escape land on the title - the score at the men
     assert.equal(opened, 1, `${how}: the menu up`);
     assert.equal(titleHeld(page.doc), true, `${how}: on the title`);
     await settle();
-    const menuLevel = ['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS];
+    const menuLevel = ['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS];
     assert.deepEqual(theme.calls, ['unlock', 'prepare', menuLevel, menuLevel, 'start'], `${how}: unlocked in the press, the score asked to the menu's level at once and again as it starts`);
     const release = await done;
     release();
@@ -136,7 +136,7 @@ test('TITLE-DOOR: the title the score carried in - the menu up on the mark\'s re
   page.frame();
   assert.equal(page.pending, 0);
   page.fire('pointerdown');
-  assert.deepEqual(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel'), [['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS]], 'the first press ducks the score to the menu\'s level');
+  assert.deepEqual(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel'), [['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS]], 'the first press ducks the score to the menu\'s level');
   page.fire('keydown', { key: 'a' });
   assert.equal(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel').length, 1, 'once');
   const release = await done;
@@ -158,7 +158,7 @@ test('TITLE-DOOR: a film that breaks before it lands is let go - the score at th
   assert.equal(opened, 0, 'the film never revealed the menu');
   assert.equal(page.doc.getElementById('intro'), null);
   assert.equal(titleHeld(page.doc), false);
-  assert.deepEqual(theme.calls.at(-1), ['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS]);
+  assert.deepEqual(theme.calls.at(-1), ['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS]);
 });
 
 test('TITLE-DOOR: the front door lets the title go with the menu - before the scene asks for the GPU - and ?nointro (no film, no title) still opens the menu on its own sky', async () => {

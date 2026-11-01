@@ -44,7 +44,7 @@ import { decorRefund } from '../../src/net/decorLaw.js';
 import { empireJoin } from '../../src/systems/worldTick.js';
 import { createOnlineHomes, buyOnlineHome, sellOnlineHome, homeRefund } from '../../src/systems/online/onlineHomes.js';
 import { TradeSession } from '../../src/net/tradeSession.js';
-import { applyCustoms, liquidWealthOf, stashedItemLists } from '../../src/systems/realmCustoms.js';
+import { liquidWealthOf, stashedItemLists } from '../../src/net/realm/realmGoldLaw.js';
 import { LETTER_OF_CREDIT_TEMPLATE, goldStack } from '../../src/systems/inventory.js';
 import { LOOT_CONTAINER_TYPES } from '../../src/systems/sceneCache.js';
 import { createBankAccounts } from '../../src/systems/banking.js';
@@ -190,12 +190,11 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
   assert.notEqual(tradeRefusal(holder.items[0]), null);
 });
 
-// ---- F2: customs caps the wealth a character left in the world too ----------------------------------------------------
+// ---- F2: the wealth count reaches what a character left in the world too ---------------------------------------------
 
 // AUDIT REALM2 T5 re-aimed this pin: F2 left a shelf, a body, a treasure pile and a dungeon's `piles` to the world - but the
-// pack fills any of them, and the save carries them back, so customs counts and takes from every one
-// (test/systems/auditrealm2_customs.test.js).
-test('AUDIT REALM F2: customs counts every coin and letter the character owns wherever it lies - the wagon\'s letters, a house chest, a storage piece, a pile dropped in a room, on a street or in a dungeon - and takes the excess from those stashes first (AUDIT REALM2 T5: the world\'s loot with them)', () => {
+// pack fills any of them, and the save carries them back, so the count reaches every one.
+test('AUDIT REALM F2: liquidWealthOf counts every coin and letter the character owns wherever it lies - the wagon\'s letters, a house chest, a storage piece, a pile dropped in a room, on a street or in a dungeon (AUDIT REALM2 T5: the world\'s loot with them)', () => {
   const letter = (value) => ({ group: 'MiscItems', templateIndex: LETTER_OF_CREDIT_TEMPLATE, value });
   const T = LOOT_CONTAINER_TYPES;
   const scene = {
@@ -211,29 +210,14 @@ test('AUDIT REALM F2: customs counts every coin and letter the character owns wh
   const street = { sceneName: 'street', lootContainers: [{ containerType: T.DroppedLoot, items: [goldStack(1_000)] }, { containerType: T.RandomTreasure, items: [goldStack(4_444)] }] };
   const open = { level: 1, goldPieces: 10_000, items: [letter(3_000)], wagonItems: [letter(100_000), goldStack(2_000)], bankAccounts: createBankAccounts(),
     sceneCache: { permanentScenes: ['house'], scenes: [scene, street] }, dungeon: null, world: { piles: [{ items: [goldStack(8_000)] }] } };
-  // before AUDIT REALM these crossed uncapped: 100,000 in a wagon letter, 145,000 in the house and 9,000 on the floors
-  // (and before AUDIT REALM2 T5, the shelf's, the body's and the treasure's 22,220)
   assert.equal(liquidWealthOf(open), 10_000 + 3_000 + 102_000 + (40_000 + 60_000 + 15_000 + 25_000 + 5_000) + 1_000 + 8_000 + (9_999 + 7_777 + 4_444));
   const stashed = stashedItemLists(open);
   assert.ok(stashed.includes(scene.lootContainers[0].items) && stashed.includes(scene.decorItems['piece-1']) && stashed.includes(scene.droppedPiles[0].items));
   assert.ok(stashed.includes(scene.lootContainers[1].items) && stashed.includes(scene.lootContainers[2].items) && stashed.includes(street.lootContainers[1].items), 'AUDIT REALM2 T5: a shelf, a body and a treasure pile too');
-  const r = applyCustoms(open);
-  assert.equal(r.allowance, 30_000);
-  assert.equal(liquidWealthOf(open), 30_000, 'what is left is the allowance, wherever it lay');
-  assert.equal(r.taken, 291_220 - 30_000);
-  // the stashes went first - so the wagon, the pack and the purse the player sees at the door are what stays
-  assert.deepEqual([scene.lootContainers[0].items, scene.decorItems['piece-1'], scene.droppedPiles[0].items, street.lootContainers[0].items, open.world.piles[0].items], [[], [], [], [], []], 'every stash emptied, and the emptied records gone from their lists');
-  assert.equal(open.wagonItems.length, 2);
-  assert.equal(open.wagonItems[0].value + open.wagonItems[1].stackCount, 30_000 - 10_000 - 3_000 + 0, 'the wagon keeps what the allowance leaves after the pack and the purse');
-  assert.deepEqual([open.items[0].value, open.goldPieces], [3_000, 10_000]);
-  // AUDIT REALM2 T5: the world's loot went with the stashes
-  assert.deepEqual([scene.lootContainers[1].items, scene.lootContainers[2].items, street.lootContainers[1].items], [[], [], []]);
   // a dungeon save: its `droppedLoot` is the player's, its `piles` are the dungeon's treasure - which the pack fills too
   const deep = { level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: createBankAccounts(), dungeon: { id: 1 },
     world: { piles: [{ items: [goldStack(90_000)] }], droppedLoot: [{ items: [goldStack(50_000)] }] } };
   assert.equal(liquidWealthOf(deep), 140_000);
-  applyCustoms(deep);
-  assert.deepEqual([deep.world.droppedLoot[0].items.map((it) => it.stackCount), deep.world.piles[0].items], [[30_000], []]);
 });
 
 // ---- lane 1 and lane 2: the service settles exactly, and answers each half its own outcome -----------------------------
@@ -391,8 +375,7 @@ test('AUDIT REALM L1-F3: a realm record is paid back only what realm records pai
   assert.deepEqual([sale.ok, sale.error], [false, 'home-crossed'], 'a house no record paid for: no sale, whichever character asks');
   assert.ok(s.env.DB._raw.prepare('SELECT 1 FROM homes WHERE map_id = 1234 AND building_key = 5').get(), 'it stands, the account\'s');
   assert.equal((await s.saveOf(A)).bankAccounts[17].accountGold, 0);
-  // (c) a house customs carried in from before the realm (no record paid for it): no gold - and HOME-CROSSED (FIELD BUGS
-  // 2026-09-30
+  // (c) a house under the realm character that no record paid for: no gold, and the house and its piece stay
   s.env.DB._raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (77, 9, ?, ?, 'Arthago', 17, 'private', 10000000, 1)").run(A.id, A.char);
   s.env.DB._raw.prepare(`INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (77, 9, 'p1', 41000, '{"pos":[0,0,0],"rot":[0,0,0],"scale":1,"paid":400}', 1)`).run();
   const old = await A.homes.release(77, 9, at());
@@ -496,9 +479,9 @@ test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild pl
   assert.equal((await B.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: B.char, price: HOME_PRICE_MIN, realm: { id: B.char, lease: B.lease, seq: 1 } })).ok, true, 'the house is for sale again');
 });
 
-test('AUDIT REALM L3-F8: a loan already due at the join is settled as an overdue one - customs\' unpaid call defaults, never kept as the Empire\'s one loan in good standing', () => {
+test('AUDIT REALM L3-F8: a loan already due at the join is settled as an overdue one - it defaults, never kept as the Empire\'s one loan in good standing', () => {
   const accounts = createBankAccounts();
-  Object.assign(accounts[5], { loanTotal: 4_900, loanDueDate: 1_000 });   // customs' unpaid remainder, due at the save's minute (carried to now)
+  Object.assign(accounts[5], { loanTotal: 4_900, loanDueDate: 1_000 });   // due at the save's minute (carried to now)
   const entity = { level: 10, goldPieces: 0, items: [], bankAccounts: accounts };
   empireJoin({ entity, nowMinutes: 1_000 });
   assert.deepEqual([accounts[5].hasDefaulted, accounts[5].loanTotal > 0], [true, true], 'defaulted - the Empire keeps no loan for a newcomer');

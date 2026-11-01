@@ -177,7 +177,7 @@ test('DECK-POSE THE SENDER: every pose I say carries my place aboard while the h
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => clock.now });
   const U = PIXEL_UNITS, me = { x: (25 * WORLD_CELL + 8) * U, y: 0, z: (15 * WORLD_CELL + 8) * U, yaw: 0, pitch: 0, mv: 0 };
   s.join('world:25,15', me); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0002', name: 'Ann' }], host: null, world: null });   // not alone: lone sleep holds no pose
   let place = ['ann', 1, 2, 1.5, -3];
   s.poseAboard = () => place;
   const said = () => sockets[0].sent.map((m) => JSON.parse(m)).filter((m) => m.t === 'pose').at(-1)?.p ?? null;

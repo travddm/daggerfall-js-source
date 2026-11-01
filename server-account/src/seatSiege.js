@@ -52,14 +52,14 @@ async function battleAt(db, week, key) {
   return b ? { ...b, starts_at: Number(b.starts_at), ends_at: Number(b.ends_at), week: Number(b.week), key: Number(b.key) } : null;
 }
 const resultAt = (db, week, key) => db.prepare('SELECT result, raised, winner FROM town_seat_results WHERE week = ? AND key = ?').bind(week, key).first();
-/** VOID (migration 0067): WHAT STOOD BEFORE A RESULT, kept in the result's own INSERT (`?1` the week, `?2` the seat) - the
+/** VOID: WHAT STOOD BEFORE A RESULT, kept in the result's own INSERT (`?1` the week, `?2` the seat) - the
  *  seat's Charter row (null at an unheld seat) and every Legacy row at the seat from the battle's week on - so a
  *  moderator's void (voidSiege) gives back exactly what the result moved. */
 const PRIOR_SQL = `json_object(
   'hold', json((SELECT json_object('guild', guild_id, 'region', region, 'standing', standing, 'since', since_week, 'truce', truce_week,
     'tithe', tithe, 'titheWeek', tithe_week, 'owed', owed) FROM town_seat_holds WHERE key = ?2)),
   'legacy', json((SELECT json_group_array(json_array(week, guild_id, amount)) FROM town_seat_legacy WHERE key = ?2 AND week >= ?1)))`;
-/** VOID (migration 0067): THE WORKS BEFORE A CAPTURE'S DROP, kept on the result - each work's tier the siege was fought
+/** VOID: THE WORKS BEFORE A CAPTURE'S DROP, kept on the result - each work's tier the siege was fought
  *  behind (`forts`). AUDIT 529 V2: and every building project the drop (or a revolt's lapse) makes fall (`projects`: `[work,
  *  building, guild, builder, siegewright, standsAt, at]`), what each holds (`held`: `[work, material, qty]`), and `guild`'s
  *  Edict for next week (`edict`; null for none) - so `/siege void` begins them again (seatForts.js fortsRestoredStatements).
@@ -277,7 +277,7 @@ async function applyResult(db, b, c, nowS, zero, env = null) {
     const seat = (await confirmedSeats(db, nowS)).get(K);
     // SEAT2b (6.8, 7.5): the seat's works a tier down with the Charter - a Fortifier's save keeping the Walls once a Season
     const seasonWeek = seasonFloor(W, zero);
-    // VOID (migration 0067): the works' tiers the siege was fought behind kept on the result - after the projects whose day
+    // VOID: the works' tiers the siege was fought behind kept on the result - after the projects whose day
     // had come are raised (the drop's own first step, idempotent), before the drop - so `/siege void` can give them back;
     // AUDIT 529 V2: and the defender's projects the drop makes fall
     stmts.push(...fortsDueStatements(db, nowS, K), priorWorks(db, W, K));
@@ -391,7 +391,7 @@ export async function claimSiege({ db, nowS, subtle }, player, env, { receipt, c
   return { ...out, honours: { side: c.sd, won, marks: give.marks, xp: give.xp, spoil, spent } };
 }
 
-/** VOID: what a result kept of the seat before it (migration 0067's `prior`), parsed. AUDIT 529 V3: null where it kept
+/** VOID: what a result kept of the seat before it (its `prior` column), parsed. AUDIT 529 V3: null where it kept
  *  none (a result written before the column) - never `{}`, which read as "kept, the seat unheld" (`hold` null). */
 function priorOf(row) {
   try { const p = JSON.parse(String(row?.prior ?? '')); return p && typeof p === 'object' && !Array.isArray(p) ? p : null; } catch { return null; }

@@ -1,7 +1,5 @@
-// SERVER-POST and HOURS-FIRST
-// ("... and each the gilded gun"): THE POST, SENT BY THE OPERATOR - tools/sendServerPost.mjs writes the statements,
-// .github/workflows/server-post.yml runs them by hand (a dry run, then the send), and the post's first send, the
-// Hourlock to the thirteen of the first clear, is migration 0094 - this file's statement, held to the tool's.
+// The post, sent by the operator: tools/sendServerPost.mjs writes the statements, and
+// .github/workflows/server-post.yml runs them by hand (a dry run, then the send).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdtempSync, chmodSync } from 'node:fs';
@@ -9,14 +7,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { d1, standService } from '../accountDb.mjs';
+import { d1 } from '../accountDb.mjs';
 import {
-  postHandles, postBatch, postWords, postItem, sqlText, lookSql, sendSql, hoursFirstSql, hoursFirstHandles, HOURS_FIRST, HOURS_FIRST_RECORD, POST_ITEMS,
-  POST_RECIPIENTS_MAX, tamrielPostSql, TAMRIEL_POST, TAMRIEL_POST_RECORD,
+  postHandles, postBatch, postWords, postItem, sqlText, lookSql, sendSql, POST_ITEMS, POST_RECIPIENTS_MAX,
 } from '../../tools/sendServerPost.mjs';
-import { seatRealm } from '../realmSeat.mjs';
-import { portalStones, isPortalStone } from '../../src/systems/gate/gateSpoils.js';
-import { postBoxOf } from '../../server-account/src/post.js';
 import { POST_SENDER, POST_BODY_MAX, POST_SUBJECT_MAX } from '../../src/net/postLaw.js';
 import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 
@@ -47,8 +41,7 @@ test('SERVER-POST the tool: names a handle\'s shape, none twice, folded; a send\
   assert.equal(execFileSync(process.execPath, [TOOL, '--names', 'Duck,Terra'], { encoding: 'utf8' }), 'duck\nterra\n');
   assert.equal(execFileSync(process.execPath, [TOOL, '--look', 'Duck', 'b-one'], { encoding: 'utf8' }), `${lookSql('Duck', 'b-one')}\n`);
   assert.equal(execFileSync(process.execPath, [TOOL, '--sql', 'Duck', 'b-one', 'none', 'Hi', 'A gift'], { encoding: 'utf8' }), `${sendSql({ handles: 'Duck', batch: 'b-one', item: 'none', subject: 'Hi', body: 'A gift' })}\n`);
-  assert.equal(execFileSync(process.execPath, [TOOL, '--migration', 'hours-first'], { encoding: 'utf8' }), `${hoursFirstSql()}\n`);
-  for (const args of [['--sql', 'Duck', 'b-one', 'sword', 'Hi', 'x'], ['--sql', "x'; --", 'b-one', 'none', 'Hi', 'x'], ['--look', 'Duck'], ['--migration', 'nobody'], []]) {
+  for (const args of [['--sql', 'Duck', 'b-one', 'sword', 'Hi', 'x'], ['--sql', "x'; --", 'b-one', 'none', 'Hi', 'x'], ['--look', 'Duck'], ['--migration', 'tamriel'], []]) {
     const r = spawnSync(process.execPath, [TOOL, ...args], { encoding: 'utf8' });
     assert.equal(r.status, 1, args.join(' '));
     assert.equal(r.stdout, '', 'nothing for the workflow to run');
@@ -58,7 +51,7 @@ test('SERVER-POST the tool: names a handle\'s shape, none twice, folded; a send\
 test('SERVER-POST the send, over the real schema: one piece to each registered account the names find - never a guest, never another; the words and the item as the tool made them; RETURNING names what it wrote; the same send again writes nothing, another send is another piece; the dry run reads who holds it; a quote in the words is words (mutants: the send not once a name; a guest sent post; the item\'s record changed)', () => {
   const db = d1();
   player(db, 'p-duck', 'Duck'); player(db, 'p-terra', 'Terra'); player(db, 'p-other', 'Other'); player(db, 'p-guest', null);
-  // POST_ITEMS names no item now, so the send carries a record the way a frozen send does (sendSql's `record`)
+  // POST_ITEMS names no item now, so the send carries a record the caller made (sendSql's `record`)
   const oathRecord = JSON.stringify(mintGilded(DRAGONFIRE_OATH));
   const o = { handles: 'duck, TERRA, Nobody', batch: 'gift-one', item: 'none', record: oathRecord, subject: "Hour's First", body: "It's yours.\\nClaim it." };
   const wrote = rows(db, sendSql(o));
@@ -79,77 +72,6 @@ test('SERVER-POST the send, over the real schema: one piece to each registered a
     { handle: 'Duck', handle_lc: 'duck', sent: 1 }, { handle: 'Other', handle_lc: 'other', sent: 0 }, { handle: 'Terra', handle_lc: 'terra', sent: 1 },
   ], 'the dry run: who it finds, and who holds it');
   assert.equal(rows(db, "SELECT COUNT(*) AS n FROM server_post WHERE to_id = 'p-guest'")[0].n, 0, 'never a guest');
-});
-
-test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to the thirteen, holding the Hourlock - its names and its record FROZEN in the tool (an applied migration never runs again), every one of them holding the title; applied over the live accounts it sends each of the thirteen one piece and no one else, the box lists it as words alone (its Hourlock left the game with the guns), and applied again it sends nothing (mutants: a name missing from the send; the record swapped; the send not once)', async () => {
-  const mig = src('server-account/migrations/0094_hours_first_post.sql');
-  const statement = mig.split('\n').filter((l) => !l.startsWith('--')).join('\n').trim();
-  assert.equal(statement, hoursFirstSql(), 'the tool\'s statement, as it prints it');
-  const first = postHandles(HOURS_FIRST.handles);
-  assert.equal(first.length, 13);
-  assert.deepEqual(first, HOURS_FIRST.handles.split(',').map((h) => h.toLowerCase()), 'thirteen names, each a handle');
-  const titled = new Set(postHandles(hoursFirstHandles()));
-  assert.ok(first.every((h) => titled.has(h)), 'every one sent the gift holds the title (HOURS_FIRST_HANDLES) - the workflow sends no item now');
-  // The Hourlock left the game with the guns: its record is no longer minted or lawful (a claim drops it), but the
-  // frozen record must stay the migration's own text, since an applied migration never changes
-  assert.ok(statement.includes(sqlText(HOURS_FIRST_RECORD)), 'the frozen record is the migration\'s');
-  assert.equal(HOURS_FIRST.item, 'hourlock');
-  assert.equal(HOURS_FIRST.subject, "Hour's First");
-  assert.ok(HOURS_FIRST.body.length <= POST_BODY_MAX);
-  assert.match(src('server-account/migrations/0093_server_post.sql'), /CREATE TABLE IF NOT EXISTS server_post/, '0093 lays the table it writes into');
-
-  const svc = await standService();
-  const thirteen = [];
-  for (const h of HOURS_FIRST.handles.split(',')) thirteen.push(await svc.registered(h));
-  const other = await svc.registered('Bystander');
-  svc.env.DB._raw.exec(mig);
-  const pieces = rows(svc.env.DB, 'SELECT to_id, batch, item FROM server_post');
-  assert.equal(pieces.length, 13, 'one each');
-  assert.deepEqual(new Set(pieces.map((p) => p.to_id)), new Set(thirteen.map((t) => t.id)));
-  assert.ok(pieces.every((p) => p.batch === 'hours-first-hourlock'));
-  assert.ok(pieces.every((p) => p.item === HOURS_FIRST_RECORD), 'the frozen record, as the migration wrote it');
-  const box = await postBoxOf({ db: svc.env.DB }, { id: thirteen[0].id });
-  // (server-account/src/post.js recordOf) - nothing to claim, and the piece may be thrown away
-  assert.deepEqual([box.post.length, box.post[0].subject, box.post[0].item, box.unread, box.unclaimed], [1, "Hour's First", null, 1, 0]);
-  assert.equal((await postBoxOf({ db: svc.env.DB }, { id: other.id })).post.length, 0, 'no one else');
-  svc.env.DB._raw.exec(mig);
-  assert.equal(rows(svc.env.DB, 'SELECT COUNT(*) AS n FROM server_post')[0].n, 13, 'applied again, nothing more');
-});
-
-test('TAMRIEL-POST THE UPDATE\'S LETTER, migration 0188: the tool\'s own statement to every registered account, ten Portal Stones in one stack - its words and record FROZEN in the tool, the record the mint\'s own, every sentence a plain one; applied over the live accounts it sends each registered one a piece and no guest, the box shows the stones, a claim puts all ten in the realm character\'s record, and applied again it sends nothing (mutants: a guest sent it; the stones not ten; the send not once)', async () => {
-  const mig = src('server-account/migrations/0188_tamriel_post.sql');
-  const statement = mig.split('\n').filter((l) => !l.startsWith('--')).join('\n').trim();
-  assert.equal(statement, tamrielPostSql(), 'the tool\'s statement, as it prints it');
-  assert.equal(execFileSync(process.execPath, [TOOL, '--migration', 'tamriel'], { encoding: 'utf8' }), `${tamrielPostSql()}\n`);
-  const stones = JSON.parse(TAMRIEL_POST_RECORD);
-  assert.deepEqual(stones, portalStones(10), 'the frozen record is the mint\'s own');
-  assert.ok(isPortalStone(stones) && stones.stackCount === 10, 'ten Portal Stones, one stack');
-  assert.ok(TAMRIEL_POST.subject.length <= POST_SUBJECT_MAX && TAMRIEL_POST.body.length <= POST_BODY_MAX);
-  assert.equal(TAMRIEL_POST.sender, 'DFO Team');
-  assert.ok(TAMRIEL_POST.body.endsWith(`- ${TAMRIEL_POST.sender}`), 'signed by its sender');
-  for (const sentence of TAMRIEL_POST.body.split(/(?<=[.!?:])\s+/)) assert.ok(sentence.split(/\s+/).length <= 25, `a plain sentence (PLAIN-TEXT): ${sentence}`);
-
-  const svc = await standService();
-  const ann = await svc.registered('Ann'), bob = await svc.registered('Bob');
-  player(svc.env.DB, 'p-guest', null);
-  svc.env.DB._raw.exec(mig);
-  const pieces = rows(svc.env.DB, 'SELECT id, to_id, batch, sender, item FROM server_post');
-  assert.deepEqual(new Set(pieces.map((p) => p.to_id)), new Set([ann.id, bob.id]), 'every registered account, once, and no guest');
-  assert.equal(pieces.length, 2);
-  assert.ok(pieces.every((p) => p.batch === TAMRIEL_POST.batch && p.sender === 'DFO Team' && p.item === TAMRIEL_POST_RECORD));
-  const box = await postBoxOf({ db: svc.env.DB }, { id: ann.id });
-  assert.deepEqual([box.post[0].from, box.post[0].subject, box.post[0].item?.name, box.unclaimed], ['DFO Team', TAMRIEL_POST.subject, 'Portal Stone', 1]);
-
-  const R = await seatRealm(svc.env, ann.secret, 'Ann', { name: 'Ann', level: 5, goldPieces: 10, items: [] });
-  const id = pieces.find((p) => p.to_id === ann.id).id;
-  const r = await svc.call('/v1/post/claim', { id, character: R.id, realm: R.at() }, ann.secret);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(r.body.item, portalStones(10), 'the claim answers the stones');
-  const row = svc.env.DB._raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(R.id);
-  const rec = JSON.parse(new TextDecoder().decode(svc.env.SAVES._map.get(row.obj)));
-  assert.deepEqual(rec.items, [portalStones(10)], 'all ten in the character\'s record');
-  svc.env.DB._raw.exec(mig);
-  assert.equal(rows(svc.env.DB, 'SELECT COUNT(*) AS n FROM server_post')[0].n, 2, 'applied again, nothing more');
 });
 
 /** A step's `run: |` block, by its name, as the runner hands it to bash (guildgrant.test.js's reader). */
