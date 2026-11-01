@@ -270,6 +270,12 @@ export class MusicService {
     }, seconds * 1000);
   }
 
+  /** Ramp the song sounding to `level` of its full level. The front door holds the title song lower under the menu
+   *  (systems/titleMusic.js). A switch under way owns the fader until the next song has started. */
+  fadeTo(level, seconds) {
+    if (!this._switch) this._fadeSounding(level, seconds);
+  }
+
   _cancelSwitch() {
     if (!this._switch) return;
     this._cancelLater(this._switch.timer);
