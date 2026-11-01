@@ -72,8 +72,8 @@ test('WITCH1 THE SET\'S POWERS through the real seam: Wyrd-Sight\'s Willpower, T
   const sword = createWeapon(120, 0, () => 0.5);
   const skeleton = { mobileType: MOBILE_TYPES.SkeletalWarrior };
   const rat = { mobileType: MOBILE_TYPES.Rat };
-  assert.equal(setBlow(sword, 100, e, skeleton, {}), 110, 'the dead: +10%');
-  assert.equal(setBlow(sword, 100, e, { mobileType: MOBILE_TYPES.FireAtronach }, {}), 110, 'the summoned too');
+  assert.equal(setBlow(sword, 100, e, skeleton, {}), 106, 'the dead: +10%, cut to the sets top of +6 (B1)');
+  assert.equal(setBlow(sword, 100, e, { mobileType: MOBILE_TYPES.FireAtronach }, {}), 106, 'the summoned too (cut to +6, B1)');
   assert.equal(setBlow(sword, 100, e, rat, {}), 100, 'a rat is neither');
   T = 100;
   reportPlayerKill(rat);

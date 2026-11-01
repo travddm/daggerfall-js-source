@@ -371,7 +371,7 @@ test('AUDIT SD GEARWARD ANSWERS THE BRASS REMNANT: a world boss\'s blow lands th
   hurtPlayer(e, 40);
   assert.equal(e.health, 57, 'the mark was that hurt\'s alone: a hurt after it in the same instant is no boss\'s blow');
   setBossStruck(); hurtPlayer(e, 40);
-  assert.deepEqual([e.health, v.sounds], [23, ['gear']], 'the boss\'s blow: 6 of 40 turned');
+  assert.deepEqual([e.health, v.sounds], [20, ['gear']], 'the boss\'s blow: Gearward 15% is cut to the sets guard top of 8% (B1), 3 of 40 turned');
   assert.equal(setPowerStates(10).gearLeft, 18, 'winding again');
   // a mark nobody took in its window is nobody's
   fresh();
@@ -425,7 +425,7 @@ test('AUDIT SD THE BODY\'S BLOWS ALONE: through the Remnant\'s own driver, a bod
   r.across(T0 + 29_900, T0 + 32_000);
   const d = r.struck.at(-1).dmg;
   assert.equal(d, strikeDamage(S.pct, 100, S.base));
-  assert.deepEqual([e.health, v.sounds], [100 - (d - Math.round((d * 15) / 100)), ['gear']], 'the Remnant\'s: lighter');
+  assert.deepEqual([e.health, v.sounds], [100 - (d - Math.round((d * 8) / 100)), ['gear']], 'the Remnant\'s: lighter');
   // an Echo's, once the gear has wound again
   at(10 + 18);
   e.health = 100;
@@ -435,7 +435,7 @@ test('AUDIT SD THE BODY\'S BLOWS ALONE: through the Remnant\'s own driver, a bod
   r.word({ k: 'atk', b: SD_BODY.gold, i: 6, a: S.id, at: T0 + 40_000, x: 0, z: 8, yw: 0, tg: [] });
   r.across(T0 + 39_900, T0 + 42_000);
   const d2 = r.struck.at(-1).dmg;
-  assert.deepEqual([e.health, v.sounds], [100 - (d2 - Math.round((d2 * 15) / 100)), ['gear', 'gear']], 'an Echo\'s: lighter');
+  assert.deepEqual([e.health, v.sounds], [100 - (d2 - Math.round((d2 * 8) / 100)), ['gear', 'gear']], 'an Echo\'s: lighter');
   // the Reset: the Remnant's body casts it, and it is the Hour's magic all the same
   at(10 + 18 + 18);
   e.health = 100;

@@ -182,14 +182,14 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   door({ me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 160, 100, 100, 100, 160], 'every 4th: +60% at Faint');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 106, 100, 100, 100, 106], 'every 4th: +60% at Faint, cut to the sets top of +6 (B1)');
   assert.equal(strandsAt(RAT), 0, 'the held blow cut the count');
   swing(e, s, RAT); swing(e, s, RAT);
   assert.equal(swing(e, s, WOLF), 100, 'another foe: its own count');
   assert.equal(strandsAt(RAT), 2, 'the first keeps its own');
   assert.equal(strandCount(), 1, 'the states say the foe struck last');
   assert.equal(swing(e, s, RAT), 100);
-  assert.equal(swing(e, s, RAT), 160, 'its 4th');
+  assert.equal(swing(e, s, RAT), 106, 'its 4th (+60%, cut to the sets top of +6, B1)');
   swing(e, s, RAT); swing(e, s, RAT); swing(e, s, RAT);
   at(10 + STRAND_SECONDS + 0.01);
   assert.equal(strandsAt(RAT), 0, 'fallen away past the window');
@@ -203,7 +203,7 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   fresh(); online(40);
   const asc = wearSet(player(), 'starspun', 4, XP[4]);
   door({ me: asc });
-  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 240], 'Ascendant: +140%');
+  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 106], 'Ascendant: +140%, cut to the sets top of +6 (B1)');
   fresh(); online(1);
   const three = wearSet(player(), 'starspun', 3);
   door({ me: three });

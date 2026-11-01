@@ -208,7 +208,7 @@ test('SERPENT-SET the hoard: every hoard - a ship that dealt and one that stood 
   ]]);
   // gem arc's - this seed's broadsword rolls Leap Strike there, its line after the last pass's
   assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 10 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
-  assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 18 }, 'TECH1: and the technique\'s, last');
+  assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 12 }, 'TECH1: and the technique\'s, last');
   assert.deepEqual(rollSerpentSpoils(6, 12, 'dealt'), h, 'the same seed, the same hoard');
   const grip = rollSerpentSpoils(12345, 20, 'dealt').pieces[2];
   assert.equal(grip.tier, AETHERIC, 'a dealer\'s set piece, last');
@@ -248,12 +248,12 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   door([], { me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT)), [100, 103, 106, 109, 112, 115, 115], 'three per cent a stack at Faint, five at the most');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT)), [100, 103, 106, 106, 106, 106, 106], 'three per cent a stack at Faint, five at the most, but the blow is cut to the sets top of +6 (B1) from the second stack');
   assert.equal(coilStacks(10), COIL_STACKS);
   assert.equal(coiledFoe(10), RAT);
   assert.equal(swing(e, s, WOLF), 100, 'another foe: its own coil, nothing yet');
   assert.equal(coiledFoe(10), WOLF, 'the states say the foe struck last');
-  assert.equal(swing(e, s, RAT), 115, 'the first foe keeps its own five');
+  assert.equal(swing(e, s, RAT), 106, 'the first foe keeps its own five (blow cut to +6, B1)');
   at(10 + COIL_SECONDS - 0.01);
   assert.equal(coilStacks(), COIL_STACKS, 'held to the window\'s end');
   assert.equal(coilStacksAt(WOLF), 1, 'the other foe its own');
@@ -276,7 +276,7 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   fresh(); online(40);
   const asc = wearSet(player(), 'coilscale', 4, XP[4]);
   door([], { me: asc });
-  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 108, 116], 'Ascendant: eight a stack');
+  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 106, 106], 'Ascendant: eight a stack (+8, +16), cut to the sets top of +6 (B1)');
   fresh();
   const off = wearSet(player(), 'coilscale', 4);
   swing(off, s, RAT); swing(off, s, RAT);

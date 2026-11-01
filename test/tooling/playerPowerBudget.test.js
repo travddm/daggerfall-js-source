@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { buildReport } from '../../tools/balance/report.mjs';
 import { parseLayers } from '../../tools/balance/run.mjs';
 import { BLOW_MOST, GUARD_LEAST } from '../../src/systems/powerCeiling.js';
-import { SPELL_POWER_MOST } from '../../src/systems/spell/spellPower.js';
+import { SPELL_BUDGET_MOST } from '../../src/systems/spell/spellPower.js';
 
 const SWINGS = 1500;
 const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'average');
@@ -19,7 +19,7 @@ const MAXED_POWER_MOST = Object.freeze({ warrior: 1.38, archer: 2.42, spellsword
 test('budget: the stacking caps are the ones B1 set (the blow x1.75, the hurt keeps 74%, a spell x1.25)', () => {
   assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
   assert.ok(GUARD_LEAST < 0.75 && GUARD_LEAST > 0.73, `hurt ${GUARD_LEAST}`);
-  assert.equal(SPELL_POWER_MOST, 1.25);
+  assert.equal(SPELL_BUDGET_MOST, 1.25);
 });
 
 test('budget: a level-45 character with every stacking source at its cap stays inside the power budget', () => {
@@ -27,15 +27,23 @@ test('budget: a level-45 character with every stacking source at its cap stays i
   const rows = averageRows(buildReport({ levels: [45], layers, swings: SWINGS }));
   assert.equal(rows.length, Object.keys(MAXED_POWER_MOST).length);
   for (const row of rows) {
-    assert.ok(row.ratios.power <= MAXED_POWER_MOST[row.build], `${row.build}: power x${row.ratios.power.toFixed(2)} is over x${MAXED_POWER_MOST[row.build]}`);
+    assert.ok(
+      row.ratios.power <= MAXED_POWER_MOST[row.build],
+      `${row.build}: power x${row.ratios.power.toFixed(2)} is over x${MAXED_POWER_MOST[row.build]}`,
+    );
   }
 });
 
-test('budget: inside DFU\'s level range the default character is where it was before B1 (within 0.05 of power)', () => {
+test("budget: inside DFU's level range the default character is where it was before B1 (within 0.05 of power)", () => {
   const BEFORE_B1 = { warrior: 0.851, mage: 0.841, archer: 1.512 };
-  const rows = averageRows(buildReport({ builds: Object.keys(BEFORE_B1), levels: [30], swings: SWINGS, layers: parseLayers('default') }));
+  const rows = averageRows(
+    buildReport({ builds: Object.keys(BEFORE_B1), levels: [30], swings: SWINGS, layers: parseLayers('default') }),
+  );
   assert.equal(rows.length, 3);
   for (const row of rows) {
-    assert.ok(Math.abs(row.ratios.power - BEFORE_B1[row.build]) <= 0.05, `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${BEFORE_B1[row.build]} before B1`);
+    assert.ok(
+      Math.abs(row.ratios.power - BEFORE_B1[row.build]) <= 0.05,
+      `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${BEFORE_B1[row.build]} before B1`,
+    );
   }
 });

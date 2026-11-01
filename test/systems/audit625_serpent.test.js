@@ -116,7 +116,7 @@ test('AUDIT 625 P3 (Mac: "A coil per foe"): every foe holds its own Constrict co
   T = 10;
   const sweep = [];
   for (let i = 0; i < 6; i++) { sweep.push(swing(e, s, RAT)); sweep.push(swing(e, s, WOLF)); }
-  assert.deepEqual(sweep, [100, 100, 103, 103, 106, 106, 109, 109, 112, 112, 115, 115], 'both built, to the cap');
+  assert.deepEqual(sweep, [100, 100, 103, 103, 106, 106, 106, 106, 106, 106, 106, 106], 'both built, to the cap (the stacks read COIL_STACKS below; the blow is cut to the sets top of +6, B1)');
   assert.deepEqual([coilStacksAt(RAT), coilStacksAt(WOLF)], [COIL_STACKS, COIL_STACKS]);
   assert.equal(coiledFoe(), WOLF, 'the states say the foe struck last');
   reportPlayerKill(RAT);

@@ -204,7 +204,7 @@ test('BAL9c POTENCY: what I wear, summed under 30, the loot\'s all under 50, thr
   wear(me, ring([{ id: 'potency', value: 15 }], 136));
   assert.equal(LP.POTENCY_CAP, 30);
   assert.equal(LP.lootSpellPower(me, foe()), 30, 'the lines, never past their cap');
-  assert.equal(lands(BOLT(100), me), 125, 'the lines sum to 30, and the spell power is held at SPELL_POWER_MOST x1.25 (B1)');
+  assert.equal(lands(BOLT(100), me), 125, 'the lines sum to 30, and the spell power is held at SPELL_BUDGET_MOST x1.25 (B1)');
   // Shalidor's Brand wielded: +25 while my magicka stands above three quarters - and the loot's whole is at most 50
   wear(me, legendary('shalidors-brand'));
   me.magicka = 160;

@@ -98,7 +98,7 @@ row). The caps are now:
 
 - a blow at most x1.75 (`BLOW_TOPS` in `powerCeiling.js`; was x119.95);
 - a hurt keeps at least 74% (`GUARD_TOPS`; was 10.71%);
-- a spell at most x1.25 (`SPELL_POWER_MOST`);
+- a spell at most x1.25 (`SPELL_BUDGET_MOST`);
 - a mastered skill reads at most 110 to hit and to crit (`AIM_PAST_MAX`);
 - a point of a school or weapon past 100 pays 0.25% (was 1%); gear on a weapon skill pays 0.1% a point up to 5% (was 0.44% up to 320%);
 - a technique aims +5 to +10 and tops at x1.95 of a blow.

@@ -82,10 +82,10 @@ export function registerSpellPierceMod(name, fn) { if (typeof fn === 'function')
 
 /** B1: the most the school past 100 and every modifier's percent make of one damage spell together (the weapon blow's
  *  BLOW_MOST is the same budget for a swing). Past it a modifier adds nothing. */
-export const SPELL_POWER_MOST = 1.25;
+export const SPELL_BUDGET_MOST = 1.25;
 
 /** The multiplier on MY damage spell's landed amount: the school past 100, times every modifier's percent, held at
- *  SPELL_POWER_MOST. 1 for anything that is not my spell at a target the port may strengthen. */
+ *  SPELL_BUDGET_MOST. 1 for anything that is not my spell at a target the port may strengthen. */
 export function spellPowerMult(caster, target, opts = {}) {
   if (!ownSpellAt(caster, target)) return 1;
   let pct = 0;
@@ -93,7 +93,7 @@ export function spellPowerMult(caster, target, opts = {}) {
     const v = fn(caster, target);
     if (Number.isFinite(v) && v !== 0) pct += v;   // FIRM1: a keystone's price may be a percent LESS (Martyr's Vow)
   }
-  return Math.min(SPELL_POWER_MOST, schoolPotency(caster, opts) * Math.max(SPELL_POWER_FLOOR, 1 + pct / 100));
+  return Math.min(SPELL_BUDGET_MOST, schoolPotency(caster, opts) * Math.max(SPELL_POWER_FLOOR, 1 + pct / 100));
 }
 
 /** SCHOOLS3: named listeners told when MY spell LANDED - `fn({ caster, target, foe, spell, r, self, reflected, took,
