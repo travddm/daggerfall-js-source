@@ -136,7 +136,7 @@ test('SERPENT2 wire: the `site` word - its day, its native point to the whole un
   for (const bad of [{ pl: 'Sentinel**' }, { pl: '<@&1> Sentinel' }, { pl: 'Sen  tinel' }, { pl: ' Sentinel' }, { pl: ', Sentinel' }, { pl: '' }, { pl: 'x'.repeat(65) }, { pl: 5 },
     { sx: POSE_BOUND + 1 }, { sz: -POSE_BOUND - 1 }, { sx: 1.5 }, { sz: '1' }, { d: -1 }, { d: '611' }, { d: 1.5 }]) assert.equal(validSerpentIn({ ...ok, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'serpent', ...ok, extra: 1 }), { hasHello: true }), { t: 'serpent', ...ok });
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
 });
 
 // ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -154,7 +154,7 @@ async function withHerald(fn, { env = { GATE_DISCORD_WEBHOOK: HOOK, GATE_DISCORD
   // with a rise ten years off, so this harness's alarms are the sweep's and the heralds' alone (the director's own are
   // sd3_relay.test.js's)
   r.store.set(SD_KEY, { s: 0, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
+  for (let lane = 1; lane <= 9; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
   const posts = [];
   const discord = { answer: () => ({ ok: true, status: 204 }) };
   Date.now = () => clock;

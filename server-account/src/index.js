@@ -236,10 +236,8 @@ import { GRANT_MEASURE_SIG_HEADER, GRANT_MEASURE_MAX_BYTES } from '../../src/net
 import { takeNetFeed, NET_FEED_PATH } from './staffNet.js';   // STAFF-PANEL5-FEEDS: the relay's net feed, its door in
 import { takeReactionFeed, REACTION_FEED_PATH } from './staffReactions.js';   // STAFF-PANEL5-FEEDS: the bot check's episodes, their door in
 import { STAFF_FEED_SIG_HEADER, STAFF_FEED_MAX_BYTES } from '../../server/src/staffFeedLaw.js';
-import { seaBountyBoard, seaBountyPost, seaBountyCollect } from './seaBounty.js';   // SEA-BOUNTY: a freeport's bounty board on the open sea's killers
 import { crewHall, crewSign, crewRelease, CREW_STATUS } from './crewSigns.js';   // CREW-SIGNED: a crew hall's recruit signed once online
 import { seaSeasonBoard } from './seaSeason.js';   // SEA-SEASON: the sea's season boards
-import { seaWreck, seaPrizeCollect, seaPrizeReclaim } from './seaWreck.js';   // SHIP-PVP: a wreck at sea, and its prize
 import { titleWorn, glyphsOf, glyphsHidden, auraWorn, iconWorn } from './titles.js';
 import { withHonours } from './honours.js';   // SIGN-BATCH: the three games' honours on a badge's row, in one batch
 import { claimArena, arenaAttempt, arenaBoardOf, arenaTeam, arenaRatingOf, ARENA_HONOUR_PATHS, ARENA_RENOWN_REGION } from './arena.js';   // ARENA4: the arena's records, its board, its banners, and the honours the mint reads
@@ -333,8 +331,6 @@ import { SESSION_PASS_HEADER } from '../../src/net/sessionPassLaw.js';   // SESS
 import { PROGRESS_ROUTES, seatRefusalOf, progressConfig, progressRoom, progressSpent } from './progress.js';   // INT16-INT17: a progression claim's seat, and the play that pays for it
 import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/net/realm/realmSaveCodec.js';   // REALM-GZIP: a save rides packed
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
-import { wildInsure, wildPolicies } from './wildInsure.js';   // WILD-INSURE: a policy on a piece of gear, written against its premium off the record
-import { wildFall, wildCollect, wildReclaim, wildEscrows } from './wild.js';   // INT9: a death in the open zone's drop, taken off the record; MAC: its killer's piece in escrow - collected, taken back, listed
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
 import { runCron } from './cron.js';   // SCALE4b: the service's own clock
@@ -420,9 +416,6 @@ const overloaded = (origin) => {
  *  hands a realm character's value to another player - its trade held, its record unread since the judge shipped, a
  *  piece the id ledger marked a duplicate - each a conflict with what stands (realm.js holdRefusal, prepareRealmRecord). */
 const JUDGE_STATUS = Object.freeze({ 'trade-held': 409, 'record-unjudged': 409, 'piece-dupe': 409, 'piece-claimed': 409, 'piece-legacy': 409 });
-/** INT9: a death's drop's refusals - no key to verify or sign with 503, a receipt not the caller's 403, the fallen's own
- *  grace or the room's falls 409; the record's own (REALM_STATUS) after them, a bad shape 400 (the default). */
-const WILD_STATUS = Object.freeze({ 'no-gate-key': 503, 'no-signing-key': 503, 'not-yours': 403, grace: 409, 'fallen-frozen': 409, nonce: 400, 'no-escrow': 404, 'escrow-wait': 409, 'escrow-late': 409, 'escrow-moved': 409, 'escrow-collected': 409, 'escrow-returned': 409, 'sea-prize-moved': 409, 'sea-prize-realm': 403, 'insure-held': 409, 'insure-full': 409, 'insure-piece': 409, 'realm-gold': 409 });   // MAC: the escrow's; SHIP-PVP: a prize's; WILD-INSURE: a policy's
 /** HOME-RENT: a room's refusals - a bad shape 400 (the default). */
 const RENT_STATUS = Object.freeze({
   ...JUDGE_STATUS,
@@ -1328,53 +1321,6 @@ const service = {
         return json(r, 200, origin);
       }
 
-      if (path === '/v1/wild/fall' && request.method === 'POST') {
-        // INT9 (lane 2): A DEATH IN THE OPEN ZONE'S DROP, TAKEN OFF THE FALLEN'S JUDGED
-        // RECORD (wild.js `wildFall`) - against the fall the relay signed (src/net/wild/wildReceipt.js `f1`: the fallen's own tab
-        // with its record's `at`, its killer's after the grace), or none (a death to a foe - refused `foe`, FOE-KEEPS). The
-        // answer's `order` is the service's word on the records, the room's to keep a deposit on.
-        const r = await wildFall({ ...ctx, bucket: env.SAVES }, who.player, body, { gateKey: body.receipt !== undefined ? await gatePublicKey(env, subtle) : null, signing: await signingKey(env, subtle) });
-        if (!('error' in r)) return json(r, 200, origin);
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);   // the record moved: its tab checkpoints and asks again
-        return json({ error: r.error, ...(r.why ? { why: r.why } : {}) }, WILD_STATUS[r.error] ?? REALM_STATUS[r.error] ?? 400, origin);
-      }
-
-      if ((path === '/v1/wild/collect' || path === '/v1/wild/reclaim' || path === '/v1/wild/escrows') && request.method === 'POST') {
-        // MAC'S DECISION: the killer's worn piece the fall put in ESCROW -
-        // collected into the killer's record against the room's signed collect (`g1`, the gate's key), taken back into the
-        // fallen's once its killer could no longer collect it, or listed for the fallen's tab
-        const wctx = { ...ctx, bucket: env.SAVES };
-        const r = path === '/v1/wild/collect' ? await wildCollect(wctx, who.player, body, { gateKey: await gatePublicKey(env, subtle) })
-          : path === '/v1/wild/reclaim' ? await wildReclaim(wctx, who.player, body) : await wildEscrows(wctx, who.player, body);
-        if (!('error' in r)) return json(r, 200, origin);
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);
-        return json({ error: r.error, ...(r.why ? { why: r.why } : {}), ...(Number.isSafeInteger(r.wait) ? { wait: r.wait } : {}) }, WILD_STATUS[r.error] ?? REALM_STATUS[r.error] ?? 400, origin);
-      }
-
-      if ((path === '/v1/wild/insure' || path === '/v1/wild/policies') && request.method === 'POST') {
-        // WILD-INSURE: a policy on a piece of gear, written as an act on the record against its
-        // premium - kept from a fall at another player's hand while in force, and spent by it - and the policies in force
-        // for the character's tab
-        const wctx = { ...ctx, bucket: env.SAVES };
-        const r = path === '/v1/wild/insure' ? await wildInsure(wctx, who.player, body) : await wildPolicies(wctx, who.player, body);
-        if (!('error' in r)) return json(r, 200, origin);
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);
-        return json({ error: r.error }, WILD_STATUS[r.error] ?? REALM_STATUS[r.error] ?? 400, origin);
-      }
-
-      if ((path === '/v1/sea/wreck' || path === '/v1/sea/prize/collect' || path === '/v1/sea/prize/reclaim') && request.method === 'POST') {
-        // SHIP-PVP: a ship wrecked at another captain's guns, against
-        // the wreck the relay signed (src/net/wild/wildReceipt.js `n1`, the gate's key: her captain's own tab with its
-        // record's `at`, her killer's after the grace) - boarded, her hold's share held for her killer; and the prizes
-        // collected by the killer's character, or reclaimed by her captain's once its killer left them (seaWreck.js)
-        const sctx = { ...ctx, bucket: env.SAVES };
-        const r = path === '/v1/sea/wreck' ? await seaWreck(sctx, who.player, body, { gateKey: await gatePublicKey(env, subtle) })
-          : path === '/v1/sea/prize/collect' ? await seaPrizeCollect(sctx, who.player, body) : await seaPrizeReclaim(sctx, who.player, body);
-        if (!('error' in r)) return json(r, 200, origin);
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);
-        return json({ error: r.error, ...(r.why ? { why: r.why } : {}) }, WILD_STATUS[r.error] ?? REALM_STATUS[r.error] ?? 400, origin);
-      }
-
       if (path === '/v1/duel/record' && request.method === 'POST') {
         // DUEL1: ANY account's record, for the Inspect card - asked by
         // a signed-in player of the account the relay stamped on the
@@ -2016,26 +1962,6 @@ const service = {
         const r = await act();
         if (progressRoute) await progressSpent(ctx, who.player.id, path, r);   // INT17: a clear recorded spends the bounties' stream
         return 'error' in r ? no(r.error, HUNT_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
-      }
-
-      // ═══ SEA-BOUNTY: A FREEPORT'S BOUNTY BOARD ══════════════════════════
-      //
-      // SEA-BOUNTY: the wanted captains of the open sea and the gold on their heads; a post
-      // off the poster's record, a collect into the killer's - each act its own batch, the gold and the row together
-      // (seaBounty.js). The kills are written with their falls (wild.js wildFall).
-      if (path.startsWith('/v1/sea/bounty/')) {
-        if (request.method !== 'POST') return no('method', 405, origin);
-        const sctx = { ...ctx, bucket: env.SAVES };
-        const act = {
-          '/v1/sea/bounty/board': async () => seaBountyBoard(sctx, who.player, body),
-          '/v1/sea/bounty/post': async () => seaBountyPost(sctx, who.player, body),
-          '/v1/sea/bounty/collect': async () => seaBountyCollect(sctx, who.player, body),
-        }[path];
-        if (!act) return no('not-found', 404, origin);
-        const r = await act();
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);   // the record moved under the act, as a checkpoint's
-        if ('error' in r) return json({ error: r.error }, REALM_STATUS[r.error] ?? JUDGE_STATUS[r.error] ?? 400, origin);
-        return json(r, 200, origin);
       }
 
       // CREW-SIGNED: a crew hall's recruit held by the first account

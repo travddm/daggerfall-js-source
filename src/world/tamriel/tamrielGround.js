@@ -56,7 +56,7 @@ export const BLEND_PX = 12;
 /** The ground's cache: pixels remembered before the cache is dropped whole (the stream asks a few hundred). */
 export const GROUND_CACHE_MAX = 262144;
 
-/** A small stable lattice hash, 0..1 (the fog's own shape, ui/wild/wildMapInk.js - a hash, not a table). */
+/** A small stable lattice hash, 0..1 (a hash, not a table). */
 export function groundHash(x, y, salt = 0x51ed) {
   let h = (x * 374761393 + y * 668265263 + salt * 2147483647) | 0;
   h = Math.imul(h ^ (h >>> 13), 1274126177);

@@ -13,7 +13,6 @@ import {
 import { childNodes, parentNode, nodeHolds } from '../../src/net/cellTree.js';
 import { owLedgerOf, owSpawnsDungeon, owIdPixel } from '../../src/net/overworldLaw.js';
 import { OW_LEDGER_KEY, PIXEL_UNITS, parkKey, sharedClassicMinutes, RAID_LEDGER_PREFIX, STAR_LEDGER_PREFIX } from '../../src/net/wire.js';
-import { WILD_REMAINS_PREFIX } from '../../src/net/wild/wildLaw.js';
 
 const NOW = 1_800_000_000_000;
 const NODE = 'cell:1:12,4';   // map pixels [384, 416) x [128, 160): its children world:24,8 25,8 24,9 25,9
@@ -46,7 +45,7 @@ test('COST-2 EVERY KEY HAS A CLASS, AND WHAT IS NOT HANDED OVER BLOCKS: the park
   assert.equal(keyClass(parkKey('aaaaaaaaaaaaaaaaaaaaaaaa')), 'part');
   assert.equal(keyClass('park'), 'block', 'a prefix is a prefix');
   assert.equal(keyClass('hellosx'), 'block', 'an exact key exactly');
-  for (const k of [`${RAID_LEDGER_PREFIX}x`, `${STAR_LEDGER_PREFIX}x`, `${WILD_REMAINS_PREFIX}x`, 'serpent', 'serpentsite', 'gatesite', 'wildowed:a', 'sevl:1', 'egbreach', 'world:0', 'nobody-named-this']) assert.equal(keyClass(k), 'block', k);
+  for (const k of [`${RAID_LEDGER_PREFIX}x`, `${STAR_LEDGER_PREFIX}x`, 'serpent', 'serpentsite', 'gatesite', 'sevl:1', 'egbreach', 'world:0', 'nobody-named-this']) assert.equal(keyClass(k), 'block', k);
   const W = fakeRooms({ now: () => NOW });
   const s = W.room(NODE).store;
   seed(s);

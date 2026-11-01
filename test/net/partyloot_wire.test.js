@@ -43,7 +43,7 @@ import { peerHanded, neverPeerHanded, notCarried } from '../../src/systems/peerW
 import { addItem, stacksWith, isGoldPieces, addGoldPieces } from '../../src/systems/inventory.js';
 import { isEquipped, unequipItem } from '../../src/systems/equip.js';
 import { planTake, applyTransfer } from '../../src/systems/item/itemTransfer.js';
-import { spawnEnemyLoot, wildLootAfter, rollRoomBonus } from '../../src/scenes/hostCombat.js';
+import { spawnEnemyLoot, rollRoomBonus } from '../../src/scenes/hostCombat.js';
 import { raiseEnemyDeath, corpseTextureOf } from '../../src/scenes/corpseMarker.js';
 import { rollCorpseKit, capFoeLoot } from '../../src/systems/foeLootCap.js';
 import { championTraitFor } from '../../src/systems/champions.js';
@@ -61,7 +61,6 @@ import { installHealingSupply } from '../../src/systems/healingSupply.js';
 import { installRestItemLoot, isDeepPileKey } from '../../src/systems/rest/restItems.js';
 import { installSurvivalLoot } from '../../src/systems/survival/loot.js';
 import { grantEliteLoot } from '../../src/systems/eliteFoes.js';
-import { wildPileMore } from '../../src/systems/wild/wildZone.js';
 import { seaPileMore } from '../../src/systems/sea/seaSpoils.js';
 import { markRoomCarried } from '../../src/systems/loot/roomCarriedList.js';
 import { asTheRoom } from '../../src/systems/online/onlineLane.js';
@@ -187,7 +186,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     foes: [], _layoutFoes: nFoes, _sharedById: new Map(), lootPiles: [], searchables: [], _locationKey: ROOM,
     _lootSeen: new Set(), _lootUnreadable: new Set(), _lootAt: new Map(), _lootOpenKey: null, _lootTooBig: new Set(),
     _authority: authority, playerEntity: player, dfLocation: { mapTableData: { dungeonType: DUNGEON_TYPE } }, lootKey: DUNGEON_LOOT_KEYS[DUNGEON_TYPE],
-    _superTier: false, _wildDungeon: false, _wildRing: null, _deepCleared: new Set(), _deepFoeCleared: new Set(),
+    _superTier: false, _deepCleared: new Set(), _deepFoeCleared: new Set(),
     SUPER_LOOT_DROP_MULT: 1.5, ELITE_LOOT_DROP_MULT: 1.2, SUPER_LOOT_QUALITY_MULT: 1.5, ELITE_LOOT_QUALITY_MULT: 1.2,
     opts: { selfId: () => id, onActions: (data) => { told.push(JSON.parse(JSON.stringify(data))); return send(data); }, onLootClaimed: () => {}, partyLevels: () => partners, roomHost: () => seat(), onFoeHit: () => assert.fail('the host applies its own blows') },
     _sharedStamp: `st${seed}`, clearSurplus: () => {},
@@ -195,9 +194,9 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     _wallNow: () => clock.t, performance: { now: () => clock.t }, respawnDue, validLootList, peerHanded, LOOT_LIST_MAX, LOOT_NEWER_TEXT, ENEMY_BASICS, corpseTextureOf,   // AUDIT DEX A1: the corpse mints read it
     isClassEnemyId, enemyEntityType,
     generateLootItems: generateItems, addPileLootExtras, rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons,
-    spawnEnemyLoot, wildLootAfter, grantEliteLoot, rollCorpseKit, raiseEnemyDeath, capFoeLoot, rollRoomBonus, championTraitFor,
+    spawnEnemyLoot, grantEliteLoot, rollCorpseKit, raiseEnemyDeath, capFoeLoot, rollRoomBonus, championTraitFor,
     CLAIM_KEEP_MS, CLAIMS_KEPT_MAX, SEARCH_COOLDOWN_MINUTES, SEARCH_LOOT_MAX, sharedClassicMinutes,   // OUTDOOR-LOOT: the claim ledger's and the search find's constants the room block reads
-    wildPileMore, seaPileMore, isDeepPileKey, effectiveLevel, liveStat, asTheRoom, withRollerLevel, markRoomCarried, ...RL,
+    seaPileMore, isDeepPileKey, effectiveLevel, liveStat, asTheRoom, withRollerLevel, markRoomCarried, ...RL,
     eliteLootOpts: () => ({}), searchHeard: () => {}, settleLootFlat: () => {}, _sharedFoe: () => false, fightN: () => 1,
     spawnCorpseNow: async (f) => { f.corpsePos = [...f.ai.feet]; }, renderer: { destroyBillboardBatch: () => {} }, billboardBatches: [], renownFoeRevived: () => {},
     respawnFoe: () => false, camps: { applyOwner: () => {}, activate: () => false }, roomEncounterAsked: () => false, actions: { applyRemote: () => 0, collectSaveData: () => [] },

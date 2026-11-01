@@ -11,7 +11,7 @@
 // service does not keep, no section.
 //
 // deps = {
-//   live() -> bool          online, at a relay that raises the open sea
+//   live() -> bool          the sea stands
 //   session                 the realm session (world.js realmSession - null: no realm character)
 //   character() -> id       the realm character
 //   door?                   the service's door (accountSeaSeason) - its own, when none is given
@@ -25,8 +25,7 @@ import { repaintNavalYard } from '../ui/naval/navalPlunderDoor.js';
 
 /** The boards are read again when they are this old and the tab is shown (ms). */
 export const SEA_SEASON_FRESH_MS = 60_000;
-/** AUDIT SEA VENTURES E1: refused boards are asked again this long on, doubling to SEA_SEASON_FRESH_MS (ms) - as the
- *  bounty board's (seaBountyHost.js SEA_BOARD_READ_RETRY_MS). */
+/** AUDIT SEA VENTURES E1: refused boards are asked again this long on, doubling to SEA_SEASON_FRESH_MS (ms). */
 export const SEA_SEASON_RETRY_MS = 5_000;
 
 /** @param {any} deps */

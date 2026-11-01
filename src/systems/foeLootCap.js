@@ -33,7 +33,6 @@ import {
   techniquePass,   // TECH1
 } from './loot/lootRarity.js';
 import { isGoldPieces, ARROW_TEMPLATE } from './inventory.js';   // STUCK-ARROWS: the quiver rides past the cap
-import { wildFoeLoot } from './wild/wildZone.js';   // WILD1: a foe of the open zone carries twice as much past its cap
 import { isPotion } from './useItem.js';   // CAP-SUPPLIES: a potion IS the glass bottle - DFU's IsPotion, its one export (AUDIT 625 L7)
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';   // KIT-ROLL: the row every host hands its spawn
 import { renownLootQuarters, lootEased } from './renownLoot.js';
@@ -88,8 +87,7 @@ export function plainFoeLootRule(entity, basics = null) {
   if (!entity || titledFoe(entity)) return null;
   if (corpseSource(basics, entity.level, entity.mobileType).boss) return null;
   const eliteDungeon = !!entity.elite;
-  const wide = wildFoeLoot(entity);   // WILD1: a foe of the open zone - "double drops" (WILD2: its ring's share), carried past the cap
-  return { cap: Math.ceil((eliteDungeon ? ELITE_DUNGEON_FOE_LOOT_CAP : PLAIN_FOE_LOOT_CAP) * wide), plainLadder: !eliteDungeon };
+  return { cap: eliteDungeon ? ELITE_DUNGEON_FOE_LOOT_CAP : PLAIN_FOE_LOOT_CAP, plainLadder: !eliteDungeon };
 }
 
 /** CAP-SUPPLIES (LOOT-EASE, 2026-10-05, Mac: the rest items, "majicka potions" and "health pots" "should be more common

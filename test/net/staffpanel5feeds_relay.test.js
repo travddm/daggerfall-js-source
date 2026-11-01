@@ -138,7 +138,7 @@ test('STAFF-PANEL5-FEEDS MONSTER WATCH: while grantStrip is on, a sender\'s full
   const C = R.room(CELL);
   const mac = await R.join(C, 'sock-mac-01', P0), ann = await R.join(C, 'sock-ann-01', P0);
   const rec = (i, extra = {}) => ({ i, t: 0, f: [1, 2, 3], ...extra });
-  const f = [...Array(30).keys()].map((i) => rec(i + 1)).concat(rec(31, { z: 1 }), rec(32, { t: 7, cp: 1, l: 10 }), rec(33, { t: 11 }), rec(34, { t: 41 }), rec(35, { d: 1 }), rec(36, { t: 16, gg: 1 }));
+  const f = [...Array(30).keys()].map((i) => rec(i + 1)).concat(rec(31, { z: 1 }), rec(32, { t: 7, cp: 1, l: 10 }), rec(33, { t: 11 }), rec(34, { t: 41 }), rec(35, { d: 1 }), rec(36, { t: 16, nm: 'Grak' }));
   await C.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n: 1, k: CELL, full: 1, f } }));
   await C.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n: 2, k: CELL, full: 0, f: f.slice(0, 3) } }));   // a delta: no count
   await C.raw(ann.ws, JSON.stringify({ t: 'foes', data: { n: 1, k: CELL, full: 1, f: [rec(1), rec(2), rec(3, { k: 1e6, h: 1e6 })] } }));   // a rat no builder could give: stripped
@@ -203,7 +203,7 @@ test('STAFF-PANEL5-MONSTERS RAW FRAMES: with grantStrip off the count reads the 
   assert.equal(room._staffNet?.foes.size ?? 0, 0, 'no frame, no row');
   // odd records and ids: a body and an id-less one not counted, the rest regular (an object id is a fresh key each time, so
   // a modded client can only swell its own row)
-  const odd = ['null', '3', '"s"', '[]', '{"i":null}', '{"i":{"x":1}}', '{"i":{"x":1}}', '{"i":"a"}', '{"i":"a"}', '{"__proto__":{"d":1},"i":5}', '{"i":6,"d":1}', '{"i":7,"t":"x","z":"1","cp":1.5,"nm":7,"gg":"16"}'];
+  const odd = ['null', '3', '"s"', '[]', '{"i":null}', '{"i":{"x":1}}', '{"i":{"x":1}}', '{"i":"a"}', '{"i":"a"}', '{"__proto__":{"d":1},"i":5}', '{"i":6,"d":1}', '{"i":7,"t":"x","z":"1","cp":1.5,"nm":7}'];
   seen(owner, `{"full":1,"f":[${odd.join(',')},${[...Array(40).keys()].map((i) => `{"i":${100 + i}}`).join(',')}]}`);
   const row = room._staffNet.foes.get('acct-raw-0001');
   assert.deepEqual(row, { a: 'acct-raw-0001', o: 45, h: 0, r: 45, e: 0, bo: 0, s: 0, x: 0 });

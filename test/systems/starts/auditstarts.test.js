@@ -18,7 +18,7 @@ import { STARTS, START_QUESTS, HAND_START_QUEST, startByKey, startOfSiteId } fro
 import { startLairSites, START_SITE_MIN } from '../../../src/systems/starts/startSite.js';
 import { lairCellOf, lairSite } from '../../../src/world/tamrielDungeons.js';
 import { LOCATION_TYPES, DUNGEON_TYPES, mapPixelToLongitudeLatitude } from '../../../src/formats/mapsFile.js';
-import { createStartsHost, STARTS_TEXT } from '../../../src/scenes/startsHost.js';
+import { createStartsHost } from '../../../src/scenes/startsHost.js';
 import { createQuestBridge } from '../../../src/scenes/quest/questBridge.js';
 import { createQuestWorld } from '../../../src/scenes/questWorld.js';
 import { StartChoiceScreen, START_ROW_TOP, START_ROW_H, START_X0, startRowAt } from '../../../src/ui/startChoice.js';
@@ -35,9 +35,6 @@ import { canFindPlace } from '../../../src/ui/travel/travelMapWindow.js';
 import { HeldMapWindow } from '../../../src/ui/heldMap.js';
 import { tamrielInkFor } from '../../../src/ui/tamrielInk.js';
 import { setCapitalsStanding } from '../../../src/world/tamrielCapitals.js';
-import { buildWildMask } from '../../../src/systems/wild/wildZone.js';
-import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
-import { PROVINCE_OF_ID } from '../../../src/world/tamriel/tamrielLand.js';
 import { createQuestlines } from '../../../src/systems/questlines/qlLayer.js';
 import { QUESTLINES_PREF, readObjectives } from '../../../src/systems/questlines/qlLaw.js';
 import { sheetFor } from '../../../src/systems/questlines/qlSheets.js';
@@ -174,31 +171,6 @@ test('AUDIT STARTS U1/U2 the held map: a quest\'s place past the Bay offers no j
     assert.deepEqual(ported.map((p) => p.pixel), [city.pixel], 'and the portal goes');
     win.dispose?.();
   } finally { setCapitalsStanding(false); }
-});
-
-test('AUDIT STARTS U4 the zone map: its card is down, so a press on a quest\'s diamond inside the zone is the zone\'s own journey, as a hall\'s is (PVPJOURNEY) - outside the zone, or on the armed map, no panel (mutants: the zone\'s press, the zone\'s bound)', () => {
-  skin('enhanced');
-  globalThis.document = fakeDocument();
-  const ZONE_PX = { x: 1600, y: 300 };   // a quest's place inside Cyrodiil, the open zone, past the Bay
-  const mask = buildWildMask({ width: 50, height: 50, ox: 1500, oy: 200, cell: 4, inZone: () => true });
-  for (const armed of [false, true]) {
-    const win = heldMap({ wildMask: () => mask });
-    if (armed) win.activateTeleportationTravel();
-    win._zoneMap = true;
-    win._onSheet = () => true;
-    win._markerAt = () => null;
-    let quest = { px: ZONE_PX.x, py: ZONE_PX.y, placeName: 'Fortress of Tibercles' };
-    win._questAt = () => quest;
-    win._pickAt(0, 0);
-    assert.equal(win._selected?.name, 'Fortress of Tibercles', 'picked');
-    assert.equal(win._panel ?? null, armed ? null : 'travel', armed ? 'the armed map: no portal into the zone' : 'the zone\'s journey, its legend\'s Begin');
-    win._closePanel?.();
-    win._selected = null;
-    quest = { px: LAIR_PX.x, py: LAIR_PX.y, placeName: 'The Haunt of Baringon' };   // Skyrim's: past the Bay, outside the zone
-    win._pickAt(0, 0);
-    assert.equal(win._panel ?? null, null, 'outside the zone no journey');
-    win.dispose?.();
-  }
 });
 
 test('AUDIT STARTS P9 the journal\'s find of a place past the Bay glides the map to its pixel as it picks it (mutants: the glide dropped)', () => {
@@ -386,20 +358,14 @@ test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made -
 
 // ── the start host ───────────────────────────────────────────────
 
-test('AUDIT STARTS W2 online the Imperial Province is the open zone, its dungeons sealed: a character born online is not offered its start - shut on the page with why - and offline it stands (mutants: the zone\'s start offered online)', () => {
+test('AUDIT STARTS W2 the start page reads the host\'s word: an option the host shuts is locked on the page with the host\'s why, and the rest stay open', () => {
   const imperial = startByKey('Imperial');
-  assert.equal(imperial.province, PROVINCE_OF_ID[CYRODIIL_THEATRE], 'the zone\'s province is the start\'s');
-  const online = startsHost({ params: 'online=1&realmnew=1' }).page;
-  assert.equal(online.open(imperial), false);
-  assert.equal(online.why(imperial), STARTS_TEXT.openZone);
-  for (const s of STARTS.filter((x) => x !== imperial)) assert.equal(online.open(s), true, `${s.key}: open online`);
-  const offline = startsHost().page;
-  assert.equal(offline.open(imperial), true, 'offline the province is no zone');
-  assert.equal(offline.why(imperial), null);
-  // the page reads the host's why
-  const page = new StartChoiceScreen(() => {}, { race: 'Breton', open: online.open, why: online.why });
+  const open = (s) => s !== imperial;
+  const why = (s) => (s === imperial ? 'shut for the test' : null);
+  const page = new StartChoiceScreen(() => {}, { race: 'Breton', open, why });
   const row = page.options.find((o) => o.id === 'Imperial');
-  assert.deepEqual([row.locked, row.lockNote], [true, STARTS_TEXT.openZone]);
+  assert.deepEqual([row.locked, row.lockNote], [true, 'shut for the test']);
+  for (const o of page.options.filter((x) => x.id !== 'Imperial')) assert.equal(o.locked ?? false, false, `${o.id}: open`);
 });
 
 test('AUDIT STARTS W3 a load at a running province start\'s own dungeon, its commission still in it, resumes inside - through the quest\'s own entry - where ONLINE-UNDERGROUND-LOAD1 woke every other online load at the door; once the commission is found, or the start ended, or at another pixel, the law stands (mutants: the pixel, the commission found, the province\'s alone, both doors in world.js)', () => {

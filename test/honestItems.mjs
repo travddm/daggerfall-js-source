@@ -111,7 +111,6 @@ const DFR = await load('../src/formats/dfRandom.js');
 const LOOT_POWERS = await load('../src/systems/loot/lootPowers.js');
 const ITEM_IDS = await load('../src/systems/item/itemIds.js');
 const TRANSFER = await load('../src/systems/item/itemTransfer.js');
-const WILD_DEATH = await load('../src/systems/wild/wildDeath.js');
 const TALK = await load('../src/systems/talk/talkTopics.js');
 const KNIGHT = await load('../src/systems/knightlyGifts.js');
 const BAG_LAW = await load('../src/net/bagLaw.js');
@@ -1117,9 +1116,6 @@ function runHomes(run, seedsOf, S, minted) {
         const wagon = TRANSFER.planDropGold(String(asked), { carried, usingWagon: true, remote: [] });
         if (wagon.ok) one(INV.goldStack(wagon.amount));
       }
-      const e = { ...newPlayer({ gold: carried }), wagonItems: [INV.goldStack(Math.min(carried, 60_000))] };
-      one(WILD_DEATH.takeWildGold(e));
-      for (const it of e.wagonItems) one(it);
       const g = HEIRLOOM.remainsGoldOf(carried);
       if (g > 0) one(INV.goldStack(g));
     }

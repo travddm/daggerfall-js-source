@@ -18,10 +18,10 @@ import { createTownTable } from '../../src/world/worldWide/townTable.js';
 import { REGION_NAMES } from '../../src/formats/mapsTables.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const BOOKS = ['market', 'professions', 'writs', 'contracts', 'seaBounty', 'npcChapters', 'npcHalls', 'npcReceipts'];
+const BOOKS = ['market', 'professions', 'writs', 'contracts', 'npcChapters', 'npcHalls', 'npcReceipts'];
 const TABLES = ['market_listings', 'market_orders', 'market_auctions', 'market_bids', 'guild_writs', 'commissions', 'guild_contracts'];
 
-test('WW7-5 the books every region\'s: no town book asks the Bay\'s alone - the market, the writs, the contracts, the cards, the sea bounty, the chapters, their halls and receipts read every region\'s; a home any region\'s; the staff\'s filter too (mutants: a book the Bay\'s; a home the Bay\'s)', () => {
+test('WW7-5 the books every region\'s: no town book asks the Bay\'s alone - the market, the writs, the contracts, the cards, the chapters, their halls and receipts read every region\'s; a home any region\'s; the staff\'s filter too (mutants: a book the Bay\'s; a home the Bay\'s)', () => {
   for (const b of BOOKS) {
     const s = rd(`server-account/src/${b}.js`);
     assert.ok(!/bayRegionOk/.test(s), `${b}: the Bay's no more`);

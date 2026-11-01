@@ -51,8 +51,8 @@ export function markUnquiet(entity) {
   entity.unquiet = _force ?? unquietId(entity._voiceId);
   return entity.unquiet;
 }
-/** Does this foe carry the mark? Never one of the open zone's (`wildFoe`, `wildGiant`) or the sand's (`bout`). */
-export const isUnquiet = (entity) => entity?.unquiet === true && !entity.wildFoe && !entity.wildGiant && !entity.bout;
+/** Does this foe carry the mark? Never one of the sand's (`bout`). */
+export const isUnquiet = (entity) => entity?.unquiet === true && !entity.bout;
 /** Tests only: every draw answers `v` (true, false), or the id's own again (null) - a real pool's foe marked at will. */
 let _force = null;
 export function _forceUnquietForTests(v = null) { _force = v == null ? null : !!v; }

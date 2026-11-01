@@ -179,9 +179,7 @@ test('INT3: EVERY ROUTE THAT HANDS A REALM CHARACTER\'S VALUE ON SAYS SO - no pr
   const dir = new URL('../../server-account/src/', import.meta.url);
   // payFromSave into nobody's hands: the realm's own price (FIRM1: the Firmament's respec, its gold burnt in the change's batch)
   // DECOR-ACCESS: the decorator's batch (decorBatch.js) is decor.js's sink in one Confirm - the realm's price for the pieces, the goods set in the room
-  // WILD-INSURE (PVP-EASE, 2026-10-26
-  // the batch that writes the policy, into no player's hands
-  const SINKS = { 'homes.js': 1, 'decor.js': 1, 'decorBatch.js': 1, 'guilds.js': 1, 'firmament.js': 1, 'wildInsure.js': 1 };
+  const SINKS = { 'homes.js': 1, 'decor.js': 1, 'decorBatch.js': 1, 'guilds.js': 1, 'firmament.js': 1 };
   const found = {};
   for (const f of readdirSync(dir).filter((n) => n.endsWith('.js'))) {
     const src = readFileSync(new URL(f, dir), 'utf8');
@@ -199,7 +197,7 @@ test('INT3: EVERY ROUTE THAT HANDS A REALM CHARACTER\'S VALUE ON SAYS SO - no pr
     }
   }
   // DECOR-ACCESS: a house's price paid by its buyer to its seller (homeTransfer.js)
-  assert.deepEqual(found, { 'alchemy.js': 1, 'guildVault.js': 1, 'guilds.js': 1, 'homeTransfer.js': 1, 'market.js': 2, 'rent.js': 1, 'seaBounty.js': 1 });
+  assert.deepEqual(found, { 'alchemy.js': 1, 'guildVault.js': 1, 'guilds.js': 1, 'homeTransfer.js': 1, 'market.js': 2, 'rent.js': 1 });
   const trade = readFileSync(new URL('realmTrade.js', dir), 'utf8');
   assert.match(trade, /const heldA = gives\(firstHalf\) \? holdRefusal\(other\) : null;\n\s+const heldBy = heldA \?\? \(gives\(half\) \? holdRefusal\(row\) : null\);\n(?:\s*\/\/[^\n]*\n)*\s+if \(heldBy\) return refuse\(db, sid, `\$\{heldBy\.error\}:\$\{heldA \? 'a' : 'b'\}`, playerId, asker, true\);/);
 });

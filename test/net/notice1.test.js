@@ -135,9 +135,9 @@ test('NOTICE1 the schema and the routes: a note\'s button and its hiding are CHE
   for (const r of ['/v1/board/read', '/v1/board/pin', '/v1/board/take-down', '/v1/board/report', '/v1/board/mod/remove', '/v1/board/mod/restore', '/v1/board/notice', '/v1/board/notice/remove']) {
     assert.ok(ROUTES.has(r), r);
   }
-  assert.equal(ACCOUNT_VERSION, 'acct207');
+  assert.equal(ACCOUNT_VERSION, 'acct208');
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /^ACCOUNT_VERSION = "acct207"$/m);
+  assert.match(toml, /^ACCOUNT_VERSION = "acct208"$/m);
   assert.match(toml, /^BOARD_OPEN = "on"$/m, 'BOARD-ON: shipped at dev, opened to everyone (Mac: "Board now, rest after fixes")');
   assert.deepEqual(['MARKS_OPEN', 'PROFESSIONS_OPEN'].map((k) => toml.match(new RegExp(`^${k} = "(\\w+)"$`, 'm'))?.[1]), ['on', 'on'], 'SWITCH-ON (Mac: "Fuck it lets switch everything on"): the Marks and the professions too, after PROF-SAVE and PROF-DELETE');
   assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/boardLaw\.js"/, 'the law the Worker bundles deploys it');

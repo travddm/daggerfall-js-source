@@ -13,7 +13,6 @@ import { WITCHES_FESTIVAL_DAY, witchesNight, heartStar, HEART_STAR, nightDayOfYe
 import { STAR_HOUR_MS, STAR_PER_NIGHT, starTimes } from '../../../src/net/starfall/starfallLaw.js';
 import { DAEDRA } from '../../../src/systems/daedraSummoning.js';
 import { HOLIDAYS, holidayDayOfYear } from '../../../src/systems/holidays.js';
-import { WILD_REGION } from '../../../src/systems/wild/wildZone.js';
 import { gateScanner, findGateSite } from '../../../src/systems/gate/gateSite.js';
 import { gameDayAt } from '../../../src/net/gate/gateLaw.js';
 import { LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
@@ -46,9 +45,8 @@ test('STAR2 THE BAG: every coven takes a night in each round of thirteen, none t
   assert.ok(new Set(orders).size > 30, 'each round shuffled anew');
 });
 
-test('STAR2 THE TABLE: thirteen covens, each its own, none in the open zone; Glenmoril (Hircine\'s) apart - Wroth\'s back since the zone left its mountains (mutants: a coven in the open zone)', () => {
+test('STAR2 THE TABLE: thirteen covens, each its own; Glenmoril (Hircine\'s) apart - Wroth\'s back since the zone left its mountains', () => {
   assert.equal(new Set(STAR_COVENS.map((c) => c.id)).size, 13);
-  assert.ok(STAR_COVENS.every((c) => c.region !== WILD_REGION));
   assert.deepEqual(STAR_COVENS_APART.map((c) => [c.id, c.region]), [['glenmoril', 60]]);
   assert.equal(STAR_COVENS.find((c) => c.id === 'wroth')?.region, 16, 'the Daughters of Wroth, in the Wrothgarian Mountains - no longer the zone');
   assert.ok(STAR_COVENS.every((c) => typeof c.member() === 'string' && c.member().length > 3));

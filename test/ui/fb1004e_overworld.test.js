@@ -153,7 +153,7 @@ test('OW-KIN / OW-WHO on the travel map: the rows keep their kin and Renown, a k
   // (DFU's mask, `y * 1000 + x`), one past the Bay by its whole id where the registry stands it - never every id as the Bay's
   assert.match(W, /on = hasCarriageGate\(townOfKey\(id\)\);/);
   assert.match(W, /if \(key < BAY_PIXEL_IDS\) return locationIndex\.get\(`\$\{key % MAX_MAP_PIXEL_X\},\$\{Math\.floor\(key \/ MAX_MAP_PIXEL_X\)\}`\);/);
-  assert.match(W, /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\) \|\| isHallMapId\(mapId\)\) return false;/, 'no carriages without the mod');
+  assert.match(hostText('src/scenes/mapPlacesHost.js'), /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\)\) return false;/, 'no carriages without the mod');
   // made only when its plate is under the pointer, one kept a town); SEAT-TIP's seat card is its guild lines
   assert.match(W, /seaRaidPeerChase, townEcon, state, travelViewBands,/, 'a town\'s card, made only when its plate is asked');
   assert.match(rd('src/scenes/gatherHost.js'), /color: nodeMarkCss\(g\.profession\), dist: d \/ 1000 \} \}\);/, 'a group\'s distance, km');

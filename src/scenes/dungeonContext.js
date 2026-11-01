@@ -143,7 +143,6 @@ import {
   takeAimedShot, aimedDirection, aimedArrowMeta, aimedBlowInfo,   // TELL6d: the aimed shot's loose and its weight
   landBlowEffect,                  // TELL6e: what a landing does to the player
 } from './hostCombat.js';   // AUDIT 18: the laws every host must share
-import { wildLootAfter } from './hostCombat.js';   // WILD1: the open zone's gold, after the chain
 import { seededRolls, isRoomWord, roomEmptied } from '../systems/roomLoot.js';   // PARTY-LOOT: a room's container is one base list for everyone, and a bonus of each player's own; the host grants a take of it
 import { TELL } from '../ai/tells.js';   // TELL1: the breaking blow's shove
 import { createCharacter } from '../systems/chargen.js';
@@ -252,11 +251,10 @@ import { Collider } from '../player/collider.js';
 import { ActionSystem } from '../world/actionSystem.js';
 import { collectDungeonEnemies, dungeonPlace, expandEliteEnemies, enemyHierarchyOrder } from '../characters/dungeonEnemies.js'; import { markDungeonChampions, applyChampion, championName } from '../systems/champions.js'; import { lootCrown } from './lootLines.js';   // LOOT7: the layout's champions; LOOT11: a find's line of light
 import { isOnlinePage } from '../systems/online/onlineLane.js';   // ELITE FOES: online play only
-import { wildHallFoes } from '../systems/wild/wildDungeons.js';   // PVPDUNGEONS: a hall's high tiers
-import { isWildRegion, applyWildFoe, wildLootOpts, wildPileMore, wildMask, WILD_RINGS } from '../systems/wild/wildZone.js';   // WILD1: the open zone's dungeons (WILD2: by their ring)
-import { wildRingAtPlace } from '../systems/wild/etherWild.js';
-import { cyrodiilMask } from '../systems/wild/cyrodiilZone.js';   // AUDIT TESA II Z8: the zone's own mask, where none is registered yet
-import { seaPileMore } from '../systems/sea/seaSpoils.js';   // SEA-SET: the deep's Tidemail, a ruin's pile's last roll   // WILD2: a place's ring by its map pixel - ETHER-WILD: an isle's ruin of the open sea by its band
+import { vaultFoes } from '../systems/sea/vaultFoes.js';   // SEA-VAULTS: a vault hall's high tiers
+import { oceanBandDifficulty, scaleGoldPieces } from '../systems/sea/oceanBandDifficulty.js';   // the deeper sea's harder dungeons
+import { etherRingAtPlace } from '../systems/sea/etherRings.js';
+import { seaPileMore } from '../systems/sea/seaSpoils.js';   // SEA-SET: the deep's Tidemail, a ruin's pile's last roll
 import { elitesAllowed, pickDungeonElites, promoteEliteFoe, grantEliteLoot, eliteGlow, setBatchEliteGlow, eliteSize, isEliteCorpse, markEliteCorpseBatch, eliteCorpseSize } from '../systems/eliteFoes.js';   // ELITE FOES: 3-4 champions in an Elite Dungeon
 import { ELITE_FOE_MULTIPLIER, ELITE_HEALTH_SCALE, ELITE_DAMAGE_SCALE, ELITE_LOOT_DROP_MULT, ELITE_LOOT_QUALITY_MULT } from '../world/spawnedDungeons.js';   // ELITE: an elite spawn's foe count and strength
 import { superFoeLevel, scaleSuperFoe, SUPER_ELITE_FOES, SUPER_LOOT_OPTS, SUPER_LOOT_DROP_MULT, SUPER_LOOT_QUALITY_MULT, sdEndMarks, sdRiftPlace, sdReturnPlace, sdLandingPlace } from '../world/superDungeon/sdDungeon.js';   // SD4a: a Super dungeon's difficulty; SD4b: its end's place
@@ -1118,10 +1116,10 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   // AUDIT LW-II D3: a foe's LoadID is its RDB block's (blockData.Position + the object's), so two placed copies of one block
   // share every LoadID - the stop is the PLACED block's: keyed by its index and the LoadID together
   const _deepFoeCleared = new Set(_deepStops.filter((s) => s.kind === 'foe' && _deepCleared.has(s.key)).map((s) => `${s.block}:${s.loadID}`));
-  // PVPDUNGEONS: a hall of the zone holds the high tiers alone - every rat, bat and orc of its template's tables swapped
-  // for its ring's own (systems/wild/wildDungeons.js wildHallFoes: a pure pick by the hall's id, the same on every client)
+  // SEA-VAULTS: a vault hall holds the high tiers alone - every rat, bat and orc of its template's tables swapped
+  // for its ring's own (systems/sea/vaultFoes.js: a pure pick by the hall's id, the same on every client)
   if (dfLocation?.wildRing > 0) {
-    const swapped = wildHallFoes(_layoutEnemies, dfLocation.wildRing, dfLocation.dungeon.recordElement.header.locationId >>> 0);
+    const swapped = vaultFoes(_layoutEnemies, dfLocation.wildRing, dfLocation.dungeon.recordElement.header.locationId >>> 0);
     for (let i = 0; i < swapped.length; i++) _layoutEnemies[i] = swapped[i];
   }
   // PROF2: A DUNGEON VEIN'S WALL (profIdentity / veinWall below; 23) - over the
@@ -1394,7 +1392,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   function eliteLootOpts(e) {
     if (e?.superTier) return SUPER_LOOT_OPTS;   // SD4a: a Super dungeon's +50%
     const base = e?.elite ? { lootDropMult: ELITE_LOOT_DROP_MULT, lootQualityMult: ELITE_LOOT_QUALITY_MULT } : {};
-    return _wildDungeon ? wildLootOpts(base, _wildRing) : base;   // WILD1: a dungeon of the open zone - twice the drops and the rarity's odds, over an elite's
+    if (!_oceanBand) return base;
+    return { ...base, lootDropMult: (base.lootDropMult ?? 1) * _oceanBand.loot, lootQualityMult: (base.lootQualityMult ?? 1) * _oceanBand.loot };
   }
   /** MT-ii's law, at the build (AUDIT OH-F C4): SetupDemoEnemy.cs:85-86 overwrites the MobileEnemy STRUCT COPY
    *  before SetEnemy and EnemyEntity.cs:316 seeds Entity.Team from that copy - so BOTH per-instance fields turn and the
@@ -1409,20 +1408,15 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
    *  class foe counts in full); the player's standing - veteran (75..100) and
    *  edge (past 100), both 0 while mentoring - gives the size. skillSoftcap.js has the whole law and its numbers. */
   const _dungeonShare = dungeonShare(dfLocation.mapTableData?.dungeonType);
-  /** WILD1 (systems/wild/wildZone.js): a dungeon of the open zone, online - its foes four times as strong, their loot and
-   *  its piles twice as rich. Read once, at the build: the dungeon's own region, never where the player stood before. */
-  const _wildRingRaw = isOnlinePage() && (isWildRegion(dfLocation?.regionIndex ?? -1) || !!dfLocation?.ether) ? wildRingAtPlace(dfLocation, wildMask() ?? cyrodiilMask()) : 0;   // ETHER-WILD: an isle's ruin too - AUDIT TESA II Z8: the registered mask, else the zone's own (a build ahead of the first online frame)
-  // only a dungeon whose pixel lies inside the zone, by the zone's own mask - AUDIT TESA II Z8: NO MASK IS NO ZONE (online the
-  // zone is the trace's alone, systems/wild/cyrodiilZone.js): the mountains' fallback read a maskless region-16 dungeon as
-  // the heart's, so a Cyrodiil dungeon on an untraced client played as the zone's (four times its foes, twice its loot)
-  // while the zone's own door (world.js wildDungeonGate) stood open and its fights off
-  const _wildDungeon = isOnlinePage() && _wildRingRaw > 0;
+  /** The deeper sea's harder dungeons (systems/sea/oceanBandDifficulty.js), online only as the open zone's scaling was: a
+   *  day's vault by the ring the host set on it, an isle's ruin by its band. Read once, at the build. */
+  const _isVault = !!dfLocation?.elite && dfLocation?.wildRing > 0;
+  const _oceanBand = isOnlinePage() ? oceanBandDifficulty({ ring: _isVault ? dfLocation.wildRing : etherRingAtPlace(dfLocation), vault: _isVault }) : null;
   // DUNGEON-RESPAWN: this
   // dungeon's own respawn time - each foe and each container on its own clock from when it fell or was emptied
-  const _respawnMs = dungeonRespawnMs({ elite: !!dfLocation?.elite, wild: _wildDungeon, superTier: _superTier });
+  const _respawnMs = dungeonRespawnMs({ elite: !!dfLocation?.elite, superTier: _superTier });
   // (the wire's respawnDue in its place: the hour at this dungeon's own pace for every call below - MAC-L1b: the wire's is not imported, nothing shadowed)
   const respawnDue = (stamp, now) => dungeonRespawnDue(stamp, now, _respawnMs);
-  const _wildRing = _wildDungeon ? (_wildRingRaw || WILD_RINGS) : 0;
   // BAL3: THE PLACE SETS THE THREAT - this dungeon's own tier (the loot
   // ladder's grading of its kind, lootRarity.js DUNGEON_RARITY_TIER), read once at the build, every client alike; it
   // stands while the ladder does (read at each spawn) - the ladder off, DFU's own foes, as its champions and elites go
@@ -1446,18 +1440,21 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   function applyEliteScaling(entity, e) {
     if (e?.eliteFoe && entity && promoteEliteFoe(entity, { eliteDungeon: !!e.elite, superDungeon: !!e.superTier, checkLevel: false })) { if (e.elite) entity.elite = true; eliteTraits(entity, e.eliteSeed); return; }   // BOSS-TRAITS: its trait off the pick's own seed - every client the same   // ELITE-FLOOR: the pick's own (by the kind's level, every client alike)   // ELITE FOES: 5x health, 3x damage - 7x / 4x in an Elite Dungeon, in place of its doubling
     if (e?.superTier && entity) { scaleSuperFoe(entity); return void applyChampion(entity, e.champion); }   // SD4a: a Super dungeon's - x4 health, x2.5 damage, an Elite dungeon's marks at the least
-    if (!e?.elite || !entity) return void applyChampion(entity, e?.champion);   // LOOT7: a plain dungeon's champion (its loot reads the mark, so before it)
-    entity.maxHealth = Math.max(1, Math.round(entity.maxHealth * ELITE_HEALTH_SCALE));
+    if (!entity || (!e?.elite && !_oceanBand)) return void applyChampion(entity, e?.champion);   // LOOT7: a plain dungeon's champion (its loot reads the mark, so before it)
+    // An ocean dungeon takes its band's factors (a vault's replace the elite step, a ruin isle's are its own); any other elite dungeon the elite step
+    const hp = _oceanBand ? _oceanBand.health : ELITE_HEALTH_SCALE;
+    entity.maxHealth = Math.max(1, Math.round(entity.maxHealth * hp));
     entity.health = entity.maxHealth;
-    entity.healthMult = (entity.healthMult ?? 1) * ELITE_HEALTH_SCALE;   // TELL1: what was stood on the kind's own health (its poise)
-    entity.damageScale = ELITE_DAMAGE_SCALE;
+    entity.healthMult = (entity.healthMult ?? 1) * hp;   // TELL1: what was stood on the kind's own health (its poise)
+    entity.damageScale = _oceanBand ? _oceanBand.damage : ELITE_DAMAGE_SCALE;
+    if (!e?.elite) return void applyChampion(entity, e?.champion);   // a ruin isle's foe is no elite: no mark
     entity.elite = true; applyChampion(entity, e.champion);   // LOOT7: an elite dungeon's champion - its scale on the elite's
   }
   let _roomMintHold = 0;            // a restore lands the room's words before anything mints over them
   let _roomClaimN = 0;              // this context's claims, counted (roomClaimId)
   let _roomNowMs = 0;               // the frame's clock as the claims' tick last read it
   const { _roomBase, _roomMine, _roomNextGen, _roomState, composeRoomContainer, forgetRoomContainer, holderList, isRoomBaseContainer, landRoomWord, letFindGo, lootBuiltOf, mintUnbornRoom, roomBaseHolder, roomBodyBorn, roomCanonOfFoe, roomClaimTick, roomGive, roomLootOn, roomRecordOf, roomSayNow, roomSettle, roomTakeSeat, roomUnborn, roomUnreadableText, searchFound, settleRoomBonus } = createRoomLoot({   // HOST-SPLIT: src/scenes/roomLootHost.js
-    _deepCleared, _deepFoeCleared, _sharedFoe, _wildDungeon, _wildRing, eliteLootOpts, fightN, foes, lootKeyOf,
+    _deepCleared, _deepFoeCleared, _sharedFoe, eliteLootOpts, fightN, foes, lootKeyOf,
     lootableBody, opts, respawnDue, rollPileItems, roomLootKey, searchHeard, searchables, settleLootFlat,
     dfLocation,   // SEA-SET: the place, whose piles of an isle's ruin roll the deep's Tidemail
     get _authority() { return _authority; },
@@ -1536,7 +1533,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       applyEliteScaling(entity, e); if (puppet) entity.unquiet = false;   // ELITE: double health, double damage; AUDIT UNQUIET: a puppet's mark is its owner's (each client drew its own)
       if (!puppet && e.level == null) applyProgressionScalingTo(entity, basics, { ally: !!e.allied });   // SOFTCAP1: tougher high-tier foes against skills past 100 (a puppet is its owner's build); ARENA2: never a bout fighter (the ladder is a fixed mountain)
       else if (puppet && e.level == null) applyProgressionScalingTo(entity, basics, { puppet: true, ally: !!e.allied });   // AUDIT BAL: a puppet stands at this place too - its blows on me as on its owner (BAL3)
-      if (_wildDungeon && !e.allied) applyWildFoe(entity, { ring: _wildRing });   // WILD1: a dungeon of the open zone - four times its health and its blows, over an elite's (every client builds the room's foes alike, so the maximum agrees)
       applySpawnAlliance(entity, e);   // MT-ii / AUDIT OH-F C4
       entity._feudPlace = 'dungeon';   // RVN1 (Feud-Arc.md 12): where a fight with it is fought, for its ledger
       if (e.revenant && !puppet) applyRevenant(entity, e.revenant, { turned: !!e.turned });   // RVN7d (Feud-Arc.md 18.4): a revenant stood here - its name and rank, before its loot; RVN11c: a betrayer's turning is no return
@@ -1547,7 +1543,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // hostCombat.spawnEnemyLoot); the loot rides the entity and the
       // corpse carries it on death.
       spawnEnemyLoot(entity, e.mobileType, basics, D.playerEntity, { ...eliteLootOpts(e), where: 'dungeon' });   // ELITE: +20% drops, +20% quality; AUDIT OH-F B3: the dungeon's own
-      if (_wildDungeon) wildLootAfter(entity);   // WILD1: twice the gold
+      if (_oceanBand) scaleGoldPieces(entity.items, _oceanBand.gold);   // the deeper sea's coin, after the chain and its cap
       if (e.eliteFoe) grantEliteLoot(entity, effectiveLevel(D.playerEntity));   // ELITE FOES: better loot
       if (e.revenant && entity.revenant) grantRevenantLoot(entity, effectiveLevel(D.playerEntity), Math.random, { goldMult: e.lairStand ? LAIR_GOLD : 1 });   // RVN7d: its own drop - found in its lair, its gold x LAIR_GOLD
       const ai = new (getPref('enhancedAI') ? D.EnhancedEnemyAI : D.EnemyAI)(collider, pos, yawDeg * Math.PI / 180, {   // ENHANCED AI 4: the switch chooses the motor; the bake is read per step
@@ -1629,12 +1625,11 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       applyEliteScaling(entity, e); if (puppet) entity.unquiet = false;   // ELITE: double health, double damage; AUDIT UNQUIET: a puppet's mark is its owner's (each client drew its own)
       if (!puppet && e.level == null) applyProgressionScalingTo(entity, basics, { ally: !!e.allied });   // SOFTCAP1: tougher high-tier foes against skills past 100 (a puppet is its owner's build); ARENA2: never a bout fighter
       else if (puppet && e.level == null) applyProgressionScalingTo(entity, basics, { puppet: true, ally: !!e.allied });   // AUDIT BAL: a puppet stands at this place too - its blows on me as on its owner (BAL3)
-      if (_wildDungeon && !e.allied) applyWildFoe(entity, { ring: _wildRing });   // WILD1: a dungeon of the open zone - four times its health and its blows, over an elite's (every client builds the room's foes alike, so the maximum agrees)
       applySpawnAlliance(entity, e);   // MT-ii / AUDIT OH-F C4
       entity._feudPlace = 'dungeon';   // RVN1 (Feud-Arc.md 12): where a fight with it is fought, for its ledger
       if (e.revenant && !puppet) applyRevenant(entity, e.revenant, { turned: !!e.turned });   // RVN7d (Feud-Arc.md 18.4): a revenant stood here - its name and rank, before its loot; RVN11c: a betrayer's turning is no return
       spawnEnemyLoot(entity, e.mobileType, basics, D.playerEntity, { ...eliteLootOpts(e), where: 'dungeon' });   // ELITE: +20% drops, +20% quality. RF2: SetEnemyCareer's whole loot chain, one seam (the table, the kit, the trio, the port's roll)
-      if (_wildDungeon) wildLootAfter(entity);   // WILD1: twice the gold
+      if (_oceanBand) scaleGoldPieces(entity.items, _oceanBand.gold);   // the deeper sea's coin, after the chain and its cap
       if (e.eliteFoe) grantEliteLoot(entity, effectiveLevel(D.playerEntity));   // ELITE FOES: the champion's own drop
       if (e.revenant && entity.revenant) grantRevenantLoot(entity, effectiveLevel(D.playerEntity), Math.random, { goldMult: e.lairStand ? LAIR_GOLD : 1 });   // RVN7d: its own drop - found in its lair, its gold x LAIR_GOLD
       // C12: the behaviour motors - flying/spectral pursue in 3D at
@@ -3523,8 +3518,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     // RPT1026-FIGHTS (HALL-SPELLS; two private reports: no spell met a player in the PvP zone's dungeons): asked AT THE CAST, never at the
     // build - the world-hosted dungeon is handed the arena's door always (worldModes.js `arenaRival`, answering null off the
     // sand), so a choice made here at the build took the arena's branch in every dungeon and the zone's halls met no player
-    duelMark: () => { const rb = arenaRivalBody(); return rb ? { id: rb.rival, name: rb.entity?.name ?? '', feet: rb.ai.feet, height: rb.ai.height } : (opts.wildSpellMarks?.() ?? null); },   // PVPDUNGEON: no bout - the zone's fair players, as in the open
-    castAtDuel: (id, sp) => (arenaRivalBody()?.rival === id ? spellOnRival(sp) : !!opts.wildSpellOut?.(id, sp)),
+    duelMark: () => { const rb = arenaRivalBody(); return rb ? { id: rb.rival, name: rb.entity?.name ?? '', feet: rb.ai.feet, height: rb.ai.height } : null; },
+    castAtDuel: (id, sp) => (arenaRivalBody()?.rival === id ? spellOnRival(sp) : false),
     // A10: THE RECALL ARRIVAL, ROUTED. This used to be a stand-in line
     // saying the anchor machinery lived in the streaming host - true of
     // the machinery, false as a refusal: this context is the one the
@@ -3956,7 +3951,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         // PARTY-LOOT: online a pile is the room's - its base, composed once its terms come - and until then it holds NOTHING
         // (UNBORN), so no reader this player's own roll could reach (LOOT11's line of light, the save) finds one
         const items = onlineRoom() ? [] : rollPileItems();
-        if (_wildDungeon && !onlineRoom()) wildPileMore(items, rollPileItems, _wildRing);   // WILD1: the open zone's ring - its share of a second roll
         if (!onlineRoom()) seaPileMore(items, dfLocation);   // SEA-SET: an isle's ruin of the deep - the Tidemail's share, last
         const stopKey = isRandom ? `${bi}:${m.position}` : null;   // LW14: a company's stop
         if (stopKey && _deepCleared.has(stopKey)) items.length = 0;   // LW14: a pile a company passed, picked over
@@ -4478,19 +4472,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     trapNow: () => opts.bossTrapNow?.() ?? null, onTrap: (trap) => !!opts.onBossTrap?.(trap),
   });
   function resolvePlayerHit(eye, inViewFn, playerFeet, lookDir) {
-    // PVPDUNGEON: a fair player of
-    // the zone in reach, in view and in sight takes the swing before any foe does - INT9: the relay referees it (net/wild/wildRef.js)
-    if (opts.wildBodies && opts.wildStrike) {
-      let best = null, bestD = Infinity;
-      for (const b of opts.wildBodies() ?? []) {
-        const c = [b.feet[0], b.feet[1] + (b.height ?? CAPSULE_HEIGHT) / 2, b.feet[2]];
-        const dx = c[0] - eye[0], dy = c[1] - eye[1], dz = c[2] - eye[2], dist = Math.hypot(dx, dy, dz), l = dist || 1;
-        const wall = collider.raycast(eye, [dx / l, dy / l, dz / l], dist);
-        if (!playerMeleeCanHit(dist, !!inViewFn?.(c), !Number.isFinite(wall) || wall >= dist - 1e-3)) continue;
-        if (dist < bestD) { bestD = dist; best = b.id; }
-      }
-      if (best && opts.wildStrike(best, playerWeapon.strikingWeapon, playerWeapon.machine?.state, { off: playerWeapon.offStrike })) return true;
-    }
     nextArenaQ();   // ARENA4b: this swing is one blow to the referee, every body it meets
     // AUDIT 23 (combat-14): entity colliders resolve FIRST
     // (WeaponManager.cs:1048-1056 foreach over hitColliders);
@@ -6250,7 +6231,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         continue;
       }
       _lootSeen.delete(canon); _lootAt.delete(canon);
-      if (canon.startsWith('loot:')) { const i = Number(canon.slice(5)); const p = lootPiles[i]; if (p && Array.isArray(p.items) && p.items.length === 0) { p.items = rollPileItems(); if (_wildDungeon) wildPileMore(p.items, rollPileItems, _wildRing); seaPileMore(p.items, dfLocation); settleLootFlat(i); } }   // AUDIT WORLD7/8 C4: a pile the room EMPTIED - one with a remainder keeps it, as the apply's skip keeps the local list
+      if (canon.startsWith('loot:')) { const i = Number(canon.slice(5)); const p = lootPiles[i]; if (p && Array.isArray(p.items) && p.items.length === 0) { p.items = rollPileItems(); seaPileMore(p.items, dfLocation); settleLootFlat(i); } }   // AUDIT WORLD7/8 C4: a pile the room EMPTIED - one with a remainder keeps it, as the apply's skip keeps the local list
     }
     mintUnbornRoom(nowSeconds * 1000);   // PARTY-LOOT: every room container standing here with no terms gets them (on the sweep's own clock)
   }
@@ -6347,10 +6328,10 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       droppedTorches: droppedTorches.snapshot(),   // HT1: HandheldTorchesSaveData
       camps: camps.snapshot(),   // SURV3: my fires, the same law
       droppedLoot: droppedLoot._piles.filter((p) => !p.unsaved).map((p) => ({   // STUCK-ARROWS: WOD5's LoadID-0 container rides no save (a stuck shaft)
-        pos: [...p.pos], archive: p.archive, record: p.record, items: p.items.map((it) => ({ ...it })), ...(p.owner === 'wild' ? { wild: true } : {}),
+        pos: [...p.pos], archive: p.archive, record: p.record, items: p.items.map((it) => ({ ...it })),
         ...(p.physical ? { physical: true } : {}),   // AUDIT PI1 H6: a shift-drop stays one - restorePiles lays it back lying
         ...(p.remainsKey ? { remainsKey: p.remainsKey } : {}),   // AUDIT LW-III: the deep's remains found again after a load
-      })).filter((p) => !p.wild),   // WILD1: a body's remains are the ROOM's (net/wild/wildRemains.js) - never a save's, never the room's memory
+      })),
       actions: actions.collectSaveData(),
       // AUDIT 63 F30: PlayerEnterExit.PlayerTeleportedIntoDungeon.
       // SerializablePlayer.cs:188-191 writes it ONLY under
@@ -8298,7 +8279,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   /** This dungeon's name in the search ledger: DFU's map id where it has one, else its name (a spawned dungeon's). */
   function searchLocationKey() {
     const id = dfLocation?.mapTableData?.mapId;
-    const ep = dfLocation?.wildEpoch ? `e${dfLocation.wildEpoch}` : '';   // PVPDUNGEONS: a zone hall's chests are keyed by its reset's epoch - a reset fills them again for everyone
+    const ep = dfLocation?.wildEpoch ? `e${dfLocation.wildEpoch}` : '';   // SEA-VAULTS: a vault hall's chests are keyed by the day (the host's wildHallEpoch), so the day's turn fills them again
     return Number.isSafeInteger(id) ? `d${id}${ep}` : `d:${dfLocation?.name ?? '?'}${ep}`;
   }
   for (const sb of searchables) sb.lock = searchLockValue(sb.kind, searchLocationKey(), sb.key);   // the same lock on every client, every visit
@@ -8543,7 +8524,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (key.startsWith('loot:') || key.startsWith('droppedLoot:')) {
       // .cs:534-548 - a pile of ONE is named by that one item; the
       // port lists the rest UNDER this title rather than stopping here.
-      return { title: (key.startsWith('droppedLoot:') ? droppedLoot.labelFor?.(key) : null) ?? lootPileName(api.lootContents(key)), ...(_lootUnreadable.has(roomLootKey(key)) ? { unlisted: true } : {}) };   // WILD1: a body's remains by its own name;  OUTDOOR-LOOT D-2.2: a pile whose room word this build cannot read - its name alone, never "Empty"
+      return { title: (key.startsWith('droppedLoot:') ? droppedLoot.labelFor?.(key) : null) ?? lootPileName(api.lootContents(key)), ...(_lootUnreadable.has(roomLootKey(key)) ? { unlisted: true } : {}) };   // OUTDOOR-LOOT D-2.2: a pile whose room word this build cannot read - its name alone, never "Empty"
     }
     if (!modOn) return null;
     // .cs:304-312 - a LIVE entity is `Entity.Name`, and only when its
@@ -9903,7 +9884,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
      *  offer it boxes. */
     goLive() { _live = true; },
     dropped: () => droppedLoot._piles,
-    droppedPool: () => droppedLoot,   // WILD1: the pool a body's remains in the open zone stand in (net/wild/wildRemains.js)
+    droppedPool: () => droppedLoot,   // the pool a dropped pile stands in (Project Legacy's remains stand in it, scenes/legacyRemainsStand.js)
     /** AUDIT 18 F5: the overlay's own clock. DFU runs
      *  DaggerfallRestWindow.Update every frame the window is topmost
      *  (DaggerfallRestWindow.cs:185-229), and TickRest reads

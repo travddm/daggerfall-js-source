@@ -58,7 +58,7 @@ export const STAFF_NUDGE_HZ_MAX = 8;
 /** The players a staff line joined to their thread that the hub remembers. */
 export const STAFF_IN_MAX = 512;
 /** The directed frames a player aims at another by its peer id (`data.to`, a siege's `to`). */
-const AIMED = new Set(['trade', 'cast', 'duel', 'wild', 'wed', 'siege']);
+const AIMED = new Set(['trade', 'cast', 'duel', 'wed', 'siege']);
 
 /** A token's claims as signed - read only off a hello whose token `_named` verified already. @param {any} tok */
 const claimsOf = (tok) => { try { return JSON.parse(new TextDecoder().decode(_b64url.decode(tokenBodyOf(tok)))); } catch { return null; } };

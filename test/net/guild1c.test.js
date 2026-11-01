@@ -73,7 +73,7 @@ test('GUILD1c the token: a character\'s guild rides it as three claims - its id,
 });
 
 test('GUILD1c the orders: `guild` says the carrier\'s guild now (all three or none), `guildout` a member removed (`gm`) or a guild gone (no `gm`) and never a tag; each kind carries its own fields and no other\'s, and the mute and renown orders carry none of a guild\'s; verifyOrder asks for its kind by name (mutants: a guild order read at the renown door; a guildout with a tag; a mute carrying a guild)', async () => {
-  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
+  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
   const o = { s: 'acct-0001', i: 1000, e: 1000 + ORDER_TTL_S };
   assert.equal(orderValid({ o: 'guild', ...o, gi: G1, gt: 'HND', gm: 'm3' }), true);
   assert.equal(orderValid({ o: 'guild', ...o }), true, 'none: a leave, a disbanding');
@@ -120,7 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
   const g1 = guildGate(null, 1000);
   assert.equal(GUILD_ORDER_HZ_MAX, 1);
   assert.equal(g1.pass, true);
@@ -216,7 +216,7 @@ test('GUILD1c the service: the mint signs the NAMED character\'s guild in - its 
   const bare = await mint({});
   assert.equal((await tokenOf(bare)).gi, undefined, 'a mint naming no character (an older build) carries none');
   assert.equal(bare.guild, null);
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
 });
 
 test('GUILD1c the service: every act that moves a membership answers a SIGNED order - founding, a join, a leave and the look say the actor\'s guild now (none after leaving), a removal an out order naming the member and its guild, a disbanding the guildmaster\'s none and an out order naming the guild; a declined invitation, a rank moved, a handover and the treasury answer none (mutants: a join answering none; a removal naming the remover; a disbanding naming one member; an order for an act that moved nobody)', async () => {

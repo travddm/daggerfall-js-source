@@ -45,7 +45,6 @@
 // RESTORE's rewind) runs nothing: a write in the rewind's minute would vanish with it.
 // ═══════════════════════════════════════════════════════════════════
 
-import { seaSweeps } from './seaBounty.js';   // AUDIT SEA VENTURES B5
 import { crewSweep } from './crewSigns.js';   // CREW-SIGNED
 import { closeAuctions, pruneMarketHistory, SETTLE_MAX, reckonPatrons, marketOpenFor, markPatronsShut } from './market.js';
 import { closeGuildWrits } from './writs.js';
@@ -71,7 +70,6 @@ import { GUILD_INVITE_TTL_S } from '../../src/net/guild/guildLaw.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { arenaSeasonOf } from '../../src/net/arena/arenaLaw.js';
 import { REALM_FINDINGS_KEEP_S, REALM_WEALTH_KEEP_S } from './review.js';   // INT2/INT5: the judge's record's keeping
-import { WILD_FALLS_KEEP_S } from './wild.js';   // INT9: a death's drop's keeping
 import { settleHolds, REZ_SETTLE_MAX } from './legacy.js';   // REZ-BLOODLINE AUDIT R1: a held fall's window closed
 import { TOWN_ECON_SWEEPS, TOWN_ECON_SEEN_SWEEP, townEconKeptFrom, townEconSeenFrom, keepTownShares, townsOpen } from './townEcon.js';   // TOWN-ECON TE2: a town's acts past the days kept; AUDIT TOWN-ECON 2 SVC-3: the shares kept once
 import { settleStaleYards } from './decor.js';   // YARD-SNAP: a town's yards built again where a write left them stale
@@ -227,20 +225,6 @@ export const HOUR_JOBS = Object.freeze([
   // INT17: the progression claims' hours, kept as the wealth's are - the window staff set the line from (progress.js)
   ['progress-hours', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM progress_hours WHERE rowid IN (SELECT rowid FROM progress_hours WHERE hour < ?1 LIMIT ?2)', ctx.nowS - REALM_WEALTH_KEEP_S), SWEEP_ROWS)],
-  // INT9: a death in the zone's drop, kept past its receipt's hour (wild.js - a second asking is answered the first's)
-  ['wild-falls', (ctx) => rounds(() => deleted(ctx.db,
-    'DELETE FROM wild_falls WHERE r IN (SELECT r FROM wild_falls WHERE at < ?1 LIMIT ?2)', ctx.nowS - WILD_FALLS_KEEP_S), SWEEP_ROWS)],
-  // MAC: an escrow ENDED (collected, or back with its fallen) kept as long as a fall is -
-  // a held one never: its piece is in no record but it
-  ['wild-escrow', (ctx) => rounds(() => deleted(ctx.db,
-    "DELETE FROM wild_escrow WHERE r IN (SELECT r FROM wild_escrow WHERE state != 'held' AND ended_at < ?1 LIMIT ?2)", ctx.nowS - WILD_FALLS_KEEP_S), SWEEP_ROWS)],
-  // AUDIT SEA VENTURES B5 (seaBounty.js seaSweeps): a kill at sea past the Wanted window, a wreck past its receipt's hour,
-  // and what has ended past its keeping - nothing standing, owed or held
-  ['sea', async (ctx) => {
-    let n = 0;
-    for (const [sql, cutoff] of seaSweeps(ctx.nowS)) n += await rounds(() => deleted(ctx.db, sql, cutoff), SWEEP_ROWS, ctx.budget);
-    return n;
-  }],
   // CREW-SIGNED (crewSigns.js): a hall's signed recruits, past their day's keeping
   ['crew-signs', (ctx) => rounds(() => deleted(ctx.db, ...crewSweep(ctx.nowS)), SWEEP_ROWS)],
   // LW15: the towns' patrons at their traders, the towns waiting (a read reckons its

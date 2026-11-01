@@ -31,7 +31,7 @@ import { busyRead, BUSY_SHED_MS } from '../../src/net/busyLaw.js';   // BUSY-GAT
  *  reason: a deploy that did not happen looks exactly like one that
  *  did. Kept in step with ACCOUNT_VERSION in wrangler.toml, which
  *  test/server/accountworker.test.js holds. */
-export const ACCOUNT_VERSION = 'acct207';
+export const ACCOUNT_VERSION = 'acct208';
 
 /** A body bigger than this is not a request this service has. Read
  *  BEFORE the JSON is parsed, so a megabyte of nothing costs nothing. */
@@ -399,12 +399,6 @@ export const ROUTES = new Set([
   // card; INT8: a duel's result, the relay's receipt claimed. All behind
   // a session.
   '/v1/duel/loss', '/v1/duel/record', '/v1/duel/claim',
-  // INT9: a death in the open zone's drop, taken off the fallen's record against the relay's fall (or none, a foe's);
-  // MAC: its killer's piece in escrow - collected by the killer, taken back by the fallen, listed for it
-  '/v1/wild/fall', '/v1/wild/collect', '/v1/wild/reclaim', '/v1/wild/escrows',
-  // WILD-INSURE: a policy on a piece of gear, written against its premium off the record, and the policies
-  // in force for a character's tab (wildInsure.js)
-  '/v1/wild/insure', '/v1/wild/policies',
   // RENOWN1: Renown - what one of the caller's characters earned
   // online (the account's for a day under RENOWN-ACCOUNT; the
   // character's again since RENOWN-CHAR). Behind a session; the level
@@ -593,10 +587,8 @@ export const ROUTES = new Set([
   '/v1/market/read', '/v1/market/list', '/v1/market/buy', '/v1/market/cancel', '/v1/market/order', '/v1/market/fill',
   '/v1/market/unorder', '/v1/market/collect', '/v1/market/report', '/v1/market/remove', '/v1/market/auction', '/v1/market/bid',
   '/v1/market/gold',
-  '/v1/sea/bounty/board', '/v1/sea/bounty/post', '/v1/sea/bounty/collect',   // SEA-BOUNTY: a freeport's bounty board on the open sea's killers
   '/v1/sea/season/board',   // SEA-SEASON: the sea's season boards
   '/v1/crew/hall', '/v1/crew/sign', '/v1/crew/release',   // CREW-SIGNED: a crew hall's recruit signed once online (crewSigns.js)
-  '/v1/sea/wreck', '/v1/sea/prize/collect', '/v1/sea/prize/reclaim',   // SHIP-PVP: a wreck at sea, and its prize
   // HOME-VENDOR: a home's trader's stock, and the region's traders
   '/v1/market/vendor', '/v1/market/vendors', '/v1/market/myvendors',
   // RPT1026-MARKET ARRIVE: the road alone - the account's market settled and what is on its way read (market.js marketRoad)

@@ -92,7 +92,7 @@ test('PROF9 service: a Hunter\'s Stew at the fire - its Raw Meat, Mushroom and R
   assert.deepEqual([supN.status, supN.body.first, supN.body.xp], [200, true, 20 + FIRST_DISH('supper:north')], 'a Supper: its own first');
   const supS = await s.cook(mac, 'supper:south');
   assert.deepEqual([supS.status, supS.body.first, supS.body.xp], [200, false, 40], 'the southern Supper: none (the rank\'s tier 2 now - 20 x 2)');
-  assert.match(ACCOUNT_VERSION, /^acct207$/);   // the live version: a deploy that changes the service moves it
+  assert.match(ACCOUNT_VERSION, /^acct208$/);   // the live version: a deploy that changes the service moves it
 });
 
 test('PROF9 service: a dish\'s rank is asked (the Tart 10, the Feast 70 - refused below, nothing spent); XP follows the rank - a stew at rank 55 is 20 x tier 5, never a quarter; a Master\'s full track credits none, answered so', async () => {

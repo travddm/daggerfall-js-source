@@ -41,8 +41,6 @@ import { isNight } from '../world/worldClock.js';
 import { isCellRoom, mapPixelOfWire } from '../net/wire.js';
 import { staffBossBound } from '../systems/staffEvents.js';   // BOSS-BOUND: a staff event's mini boss, past a plain elite's bound
 import { foeStatsRefusal } from '../net/foeBounds.js';   // FOE-BOUNDS: the most health a streamed foe can legally have
-import { wildHere, wildMask, wildRingAt, WILD_NEAR_PX } from '../systems/wild/wildZone.js';
-import { inEther } from '../world/ethericSea.js';   // ETHER-WILD: the open sea's foes, read from Veilhaven's peace
 import { KNIGHT_CITYWATCH_ID } from '../characters/enemy/enemyEntity.js';
 import { importPublicKeyB64 } from '../net/identityToken.js';
 import { serviceBase } from '../net/accountClient.js';
@@ -416,18 +414,6 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
     capMap(members, GRANT_MEMBERS_MAX);
     return was !== undefined && was !== seq ? 'twice' : null;
   }
-  /** FOE-BOUNDS (Spawn-Grants section 19): MAY THE OPEN ZONE BE ABOUT RECORD `r`? Its lane's own question - a street's
-   *  foe in a cell by its own pixel (WILD_NEAR_PX about it: its owner's ring is the owner's feet, a stride away), anything
-   *  else by the zone under my own feet (a building's and a dungeon's: its door's) - and yes while no zone is known. */
-  function wildAbout(r, lane) {
-    const mask = wildMask();
-    if (!mask || wildHere()) return true;
-    if (lane !== 'street' || !isCellRoom(session()?.room) || !Array.isArray(r?.f)) return false;
-    const [px, py] = mapPixelOfWire(r.f[0], r.f[2]);
-    if (inEther(px, py)) return true;   // ETHER-WILD: past the Veil the zone is everywhere but Veilhaven's peace - a foe stood by an owner a stride over its edge is the zone's (a wider bound only allows)
-    for (let dy = -WILD_NEAR_PX; dy <= WILD_NEAR_PX; dy++) for (let dx = -WILD_NEAR_PX; dx <= WILD_NEAR_PX; dx++) if (wildRingAt(px + dx, py + dy, mask) > 0) return true;
-    return false;
-  }
   const statsSaid = new Set();   // `${owner}|${record}`: a record refused for its health, tallied once (the spec's one case an enemy)
   /**
    * FOE-BOUNDS (Spawn-Grants section 19; the hand-off spec "REJECT AND REMOVE INVALID ENEMY HANDOFFS; DO NOT RESCALE"):
@@ -442,7 +428,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
    */
   function statsRefused(from, r, { lane = 'street', camp = false, ally = false, boss = null } = {}) {
     if (ally || !open() || typeof from !== 'string') return false;
-    const s = foeStatsRefusal(r, { lane, wild: wildAbout(r, lane), camp });
+    const s = foeStatsRefusal(r, { lane, camp });
     if (!s) return false;
     if (typeof boss === 'string') { const b = staffBossBound(boss, s.mx); if (b !== null && s.k <= b) return false; }   // BOSS-BOUND: a live staff event's mini boss, held to its event's own health
     const k = `${from}|${r.i}`;

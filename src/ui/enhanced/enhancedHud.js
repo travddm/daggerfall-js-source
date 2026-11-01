@@ -1455,8 +1455,6 @@ function drawStatus(vitals, opts, live = null) {
   if (vitals?.chargenDone && needs.some((c) => c.level !== 'boon')) noteFirstUse('survival');
   const rested = sharedClockOn() ? { minutes: nightRealMinutesLeft(vitals, ownMinutes()) } : null;   // REST1: the night interval, online
   const all = statusTiles({ spells, powers, afflictions: afflictionRows(vitals), needs, rested });
-  const zone = zoneTile();
-  if (zone) all.unshift(...statusTiles({ zone }));   // WILD1: the open zone's tile, first
   const rules = madeRulesTile(madeLevelHere(), regenPausedMs());
   if (rules) all.unshift(...statusTiles({ rules }));   // EVENT-RULES: a world event's rules, first - never silent
   const mentor = mentorHudTile(vitals);
@@ -1796,10 +1794,6 @@ function drawSpellChip(view, tag) {
  *  surface importing them closed a cycle. `fn(entity) -> [{ key, set, name, text, state }]`. */
 let _setChips = null;
 export function setHudSetChips(fn) { _setChips = typeof fn === 'function' ? fn : null; }
-/** WILD1: the host's word on the open zone - `{ name }` while the player stands in it, else null (systems/wild/wildZone.js). */
-let _zone = null;
-export function setHudZone(fn) { _zone = typeof fn === 'function' ? fn : null; }
-const zoneTile = () => { try { return _zone?.() ?? null; } catch { return null; } };
 const setPowerChips = (vitals) => { try { return _setChips?.(vitals) ?? []; } catch { return []; } };
 /** TECH1: the host's word on the weapon's technique - its chip, after the set powers'
  *  (combat/techniques.js techniqueHudChips, read off the rig that owns the frame). */

@@ -11,7 +11,6 @@ import { arenaPlaceId } from '../../src/world/arenaLocations.js';
 import { etherPlaceId } from '../../src/world/etherPlaces.js';
 import { capitalPlaceId } from '../../src/world/tamrielCapitals.js';
 import { spawnedMapId } from '../../src/world/spawnedDungeons.js';
-import { spawnedHallMapId } from '../../src/net/wire.js';
 import { getAbyssMapId } from '../../src/world/oceanHoles.js';
 import { pastBayJourney, PAST_BAY_TRAVEL_TEXT } from '../../src/systems/travel/pastBayTravel.js';
 import { nearestSafePlace } from '../../src/systems/deathRespawn.js';
@@ -43,7 +42,6 @@ test('AUDIT TESA II P6: a place off the Bay\'s pixel ids is filed and found by i
   assert.equal(discoveryKeyOf(getAbyssMapId(456, 123)), bayPixel);
   assert.equal(discoveryKeyOf(499 * 1000 + 999), 499999, 'the Bay\'s last pixel id is the Bay\'s');
   assert.equal(discoveryKeyOf((7 << 20) | 500000) >>> 0, ((7 << 20) | 500000) >>> 0, 'the first id past it is whole');
-  assert.equal(discoverLocation(spawnedHallMapId(2069, 700)), false, 'a hall is never filed');
 });
 
 test('AUDIT TESA II P6: the save keeps a whole id and drops a key of before - a place past the Bay filed by its low 20 bits, which no id answers now and which named several places (mutant: the old key kept)', () => {
@@ -58,25 +56,15 @@ test('AUDIT TESA II P6: the save keeps a whole id and drops a key of before - a 
   assert.deepEqual(Object.keys(snapshotDiscovery().locations), ['5007'], 'the old key past the Bay let go, the Bay\'s kept');
 });
 
-test('AUDIT TESA II P4: no journey INTO the land past the Bay - its end past the Bay refused in the door\'s words; the Bay\'s ends, the Veil\'s side and the open zone\'s own journeys (inside to inside) the zone\'s verdict; the zone\'s refusal said first (mutant: the end on the Bay refused; the zone\'s own journeys refused; the zone\'s refusal lost)', () => {
-  const ok = { ok: true, fee: 0 }, bay = { x: 200, y: 200 }, windhelm = { x: 2215, y: -371 };
-  assert.deepEqual(pastBayJourney(bay, windhelm, null, ok), { ok: false, text: PAST_BAY_TRAVEL_TEXT.refused });
+test('AUDIT TESA II P4: no journey INTO the land past the Bay - its end past the Bay refused in the door\'s words; an end on the Bay or past the Veil is not refused (mutant: the end on the Bay refused)', () => {
+  const bay = { x: 200, y: 200 }, windhelm = { x: 2215, y: -371 };
+  assert.deepEqual(pastBayJourney(null, windhelm), { ok: false, text: PAST_BAY_TRAVEL_TEXT.refused });
   assert.match(PAST_BAY_TRAVEL_TEXT.refused, /Portal Stone/);
-  assert.equal(pastBayJourney(windhelm, windhelm, null, ok).ok, false, 'from past the Bay to past it: no fast travel there either');
-  assert.equal(pastBayJourney(windhelm, bay, null, ok), ok, 'out to the Bay: the zone\'s verdict (OWNER - recorded on TESA-NO-FAST)');
-  assert.equal(pastBayJourney(bay, { x: 999, y: 499 }, null, ok), ok, 'the Bay\'s last pixel is the Bay\'s');
-  assert.equal(pastBayJourney(bay, { x: 1000, y: 499 }, null, ok).ok, false, 'one past it is not');
-  assert.equal(pastBayJourney(bay, { x: ETHER_BOX.x0 + 10, y: ETHER_BOX.y0 + 10 }, null, ok), ok, 'past the Veil: the Veil\'s law');
-  // the zone: a mask of the zone's own shape (systems/wild/wildZone.js - a grid of cells on the world), a square of Cyrodiil
-  const w = 200, inside = new Uint8Array(w * w);
-  for (let y = 50; y < 150; y++) for (let x = 50; x < 150; x++) inside[y * w + x] = 1;
-  const mask = { ox: 2000, oy: 600, cell: 1, width: w, height: w, inside, near: inside };
-  const z = { ...ok, fee: 40 };
-  assert.equal(pastBayJourney({ x: 2069, y: 700 }, { x: 2100, y: 700 }, mask, z), z, 'inside to inside: the zone\'s fee and wait');
-  const refused = { ok: false, text: 'You cannot travel into Cyrodiil.' };
-  assert.equal(pastBayJourney(bay, { x: 2100, y: 700 }, mask, refused), refused, 'the zone\'s own words first');
-  assert.equal(pastBayJourney({ x: 2300, y: 900 }, { x: 2100, y: 700 }, mask, ok).ok, false, 'into the zone from past it, the zone\'s own word aside: refused');
-  assert.equal(pastBayJourney({ x: 2069, y: 700 }, { x: 2300, y: 900 }, mask, ok).ok, false, 'out of the zone to past the Bay: refused');
+  assert.deepEqual(pastBayJourney(null, bay), { ok: true }, 'out to the Bay');
+  assert.deepEqual(pastBayJourney(null, { x: 999, y: 499 }), { ok: true }, 'the Bay\'s last pixel is the Bay\'s');
+  assert.equal(pastBayJourney(null, { x: 1000, y: 499 }).ok, false, 'one past it is not');
+  assert.deepEqual(pastBayJourney(null, { x: ETHER_BOX.x0 + 10, y: ETHER_BOX.y0 + 10 }), { ok: true }, 'past the Veil: the Veil\'s law');
+  assert.deepEqual(pastBayJourney(null, null), { ok: true }, 'no end named: nothing to refuse');
 });
 
 test('AUDIT TESA II P2/P3: the nearest safe place of the world - the three kinds over the registry\'s rows (`type`) and a list beside them (`locationType`), the crow\'s nearest the caller accepts, nearestSafeLocation\'s shape (mutant: a dungeon a rise; the nearer lost to the later; accept ignored)', () => {

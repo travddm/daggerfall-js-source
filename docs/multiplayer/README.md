@@ -17,5 +17,5 @@ The online game: the relay (`server/`), the wire protocol, the client's net laye
 - [chat-safety.md](chat-safety.md) - a chat line's path, reports, sanctions, the AI reviewer, the Discord bot.
 - [staff-tools.md](staff-tools.md) - roles, the staff panel's service side, in-game commands, follow, freeze, hidden
   mode, staff events, monitoring feeds.
-- [group-instances.md](group-instances.md) - how instances, Super Dungeons, the arena and the wild zone run on the
+- [group-instances.md](group-instances.md) - how instances, Super Dungeons, and the arena run on the
   relay: hosts, leases, receipts and claims.

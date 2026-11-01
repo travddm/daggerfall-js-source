@@ -626,9 +626,6 @@ export class RemotePlayers {
   corpseMarks(toScene = (p) => [p.x, p.y, p.z]) {
     return this._corpses.filter((c) => !c.dead && (c.id || c.acct)).map((c) => ({ id: c.id, acct: c.acct, feet: toScene(c.pose), height: 0.9 }));
   }
-  /** WILD1 (net/wild/wildFight.js): a body in the open zone lies the zone's two minutes - its time moved on to at least `ms`
-   *  from now (the killer's game hears of the death from the body's own offer). */
-  holdCorpse(id, ms) { for (const c of this._corpses) if (!c.dead && id && c.id === id) c.until = Math.max(c.until, this._now() + ms); }
   /** PCORPSE3: is a body already lying for this account (or peer)? */
   hasCorpseOf(acct, id = null) { return this._corpses.some((c) => !c.dead && ((acct && c.acct === acct) || (id && c.id === id))); }
   /** PCORPSE3: the body of a member who got up (a respawn, a rise) - gone. */

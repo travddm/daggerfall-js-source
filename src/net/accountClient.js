@@ -65,7 +65,6 @@ import { SERPENT_EMBERS } from './serpent/serpentHoardLaw.js';   // AUDIT 625 P4
 import { HERALDRY_CHANGE_DRAKES } from './heraldryLaw.js';   // GUILD1d: a change's cost, in its refusal's own sentence
 import { t, localizedTable } from '../systems/textManager.js';   // L10N4: the refusals in the player's language, each read when it is said
 import { VENDOR_REFUSAL_WORDS } from './vendorLaw.js';   // HOME-VENDOR: a trader's refusals
-import { SEA_BOUNTY_MIN, SEA_BOUNTY_MAX } from './sea/seaBountyLaw.js';   // SEA-BOUNTY: a post's bounds, in its refusal
 import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './busyLaw.js';   // BUSY-GATE: the reads that stand back while the service is overloaded
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
@@ -387,21 +386,6 @@ const REFUSAL_WORDS = {
   'not-yours': () => t('account.refusal.notYours', 'That gate result belongs to another account.'),
   // INT8: DUEL1's loser's own report, retired - a duel's result is the relay's receipt now
   retired: () => t('account.refusal.retired', 'Duels are now recorded by the referee. The game may need updating.'),
-  // INT9: a death in the open zone's drop (server-account/src/wild.js) - the fallen's own tab has the first half minute
-  grace: () => t('account.refusal.grace', 'The fallen player still has a moment to settle their own death. This will be tried again shortly.'),
-  nonce: () => t('account.refusal.nonce', 'That fall could not be read. Try again.'),
-  room: () => t('account.refusal.room', 'That death gave no place for the remains. Try again.'),
-  // FOE-KEEPS: a foe's fall asked by a tab from before the word (no receipt) - a death to a foe drops nothing now
-  foe: () => t('account.refusal.foe', 'A death to a foe in the open zone drops nothing now. The game may need updating.'),
-  // PVP-ESCROW (FIELD BUGS 2026-10-14, the two-phase handoff - server-account/src/wild.js wildCollect, wildReclaim,
-  // wildEscrows): the world host's collect and reclaim say nothing of these to the player - it keeps what they do not
-  // settle and lets go of what they do - but a word the service can say is a word with a sentence (ACC1e)
-  'no-escrow': () => t('account.refusal.noEscrow', 'That piece is not held for this character.'),
-  'escrow-moved': () => t('account.refusal.escrowMoved', 'That piece moved in the meantime. Look again.'),
-  'escrow-collected': () => t('account.refusal.escrowCollected', 'That piece has already been collected.'),
-  'escrow-returned': () => t('account.refusal.escrowReturned', 'That piece has already gone back to the one who fell.'),
-  'escrow-late': () => t('account.refusal.escrowLate', 'That piece was collected too late and goes back to the one who fell.'),
-  'escrow-wait': () => t('account.refusal.escrowWait', 'That piece is still held for its killer. It comes back to you shortly.'),
   // MARKS1: Marks, the server's currency (server-account/src/marks.js)
   'marks-need-account': () => t('account.refusal.marksNeedAccount', 'Silver is kept by registered accounts. Add a username to hold it.'),
   'marks-closed': () => t('account.refusal.marksClosed', 'Silver is not available yet.'),
@@ -791,22 +775,11 @@ const REFUSAL_WORDS = {
   'no-season': () => t('account.refusal.noSeason', 'No Season is counted yet, so there is no patronage to bid for.'),
   'no-chapter': () => t('account.refusal.noChapter', 'There is no chapter there whose patronage a guild may bid for.'),
   'patron-low': () => t('account.refusal.patronLow', 'A bid for a patronage is at least 1,000 silver, and more than your guild bid before.'),
-  // SEA-BOUNTY (server-account/src/seaBounty.js): a freeport's bounty board
-  'sea-bounty-realm': () => t('account.refusal.seaBountyRealm', 'Only an online character of the realm can post or collect a bounty.'),
-  'sea-bounty-gold': () => t('account.refusal.seaBountyGold', 'A bounty is between {min} and {max} gold.', { min: SEA_BOUNTY_MIN.toLocaleString('en-US'), max: SEA_BOUNTY_MAX.toLocaleString('en-US') }),
-  'sea-bounty-target': () => t('account.refusal.seaBountyTarget', 'There is no such captain on the board.'),
-  'sea-bounty-self': () => t('account.refusal.seaBountySelf', 'You cannot put a bounty on your own head, or on a character of your own account.'),
-  'sea-bounty-not-wanted': () => t('account.refusal.seaBountyNotWanted', 'That captain is no longer wanted.'),
-  'sea-bounty-failed': () => t('account.refusal.seaBountyFailed', 'The harbormaster could not record that. Try again in a moment.'),
-  // SHIP-PVP (server-account/src/seaWreck.js): a wreck's prizes
-  'sea-prize-realm': () => t('account.refusal.seaPrizeRealm', 'Only an online character of the realm can take a prize from a wreck.'),
-  'sea-prize-moved': () => t('account.refusal.seaPrizeMoved', 'Those goods were already taken. Look at the board again.'),
   // CREW-SIGNED (server-account/src/crewSigns.js): a crew hall's recruit
   'crew-bad': () => t('account.refusal.crewBad', 'The crewmaster does not know that sailor.'),
   'crew-day': () => t('account.refusal.crewDay', 'The crewmaster has a new day\'s roster.'),
   'crew-taken': () => t('account.refusal.crewTaken', 'That sailor has signed on elsewhere.'),
   'crew-many': () => t('account.refusal.crewMany', 'You have signed on as many sailors as one day allows. Come back tomorrow.'),
-  'sea-held': () => t('account.refusal.seaHeld', 'Bounties, prizes or hold goods are waiting for this character at a freeport. Collect them before the character is deleted.'),   // AUDIT SEA VENTURES B4
   // INT3/INT4: the judge's own (server-account/src/realm.js holdRefusal,
   // prepareRealmRecord)
   // RPT1026-MARKET HOLD-SAID (private reports 2026-10-26): the hold's own notice as the session stands - why, and what it
@@ -836,9 +809,6 @@ const REFUSAL_WORDS = {
   'firm-rate': () => t('account.refusal.firmRate', 'Too many changes this hour. Try again later.'),
   'firm-stale': () => t('account.refusal.firmStale', 'Your stars changed in another session. Check them and try again.'),
   'firm-respec-empty': () => t('account.refusal.firmRespecEmpty', 'Nothing is learned yet.'),
-  'insure-held': () => t('account.refusal.insureHeld', 'That piece is already insured.'),   // WILD-INSURE (server-account/src/wildInsure.js)
-  'insure-full': () => t('account.refusal.insureFull', 'You already hold as many policies as the insurers will write. One is spent each time it saves its piece.'),
-  'insure-piece': () => t('account.refusal.insurePiece', 'That piece cannot be insured. Only gear the realm tracks (Magic and up, enchanted, artifacts, crafted) that a death in the zone could take.'),
   'repair-no-faction': () => t('account.refusal.repairNoFaction', 'That character\'s record holds no such faction, so nothing was repaired.'),   // SUMMON-REPAIR: the review's repair (tools/realmReview.mjs)
   'repair-not-set': () => t('account.refusal.repairNotSet', 'That faction does not have that flag on this character, so nothing was repaired. Check that it is the right character.'),   // SUMMON-REPAIR: a repair aimed at the wrong character mends nothing
   'mend-not-negative': () => t('account.refusal.mendNotNegative', 'That character\'s gold is not below zero, so nothing was mended. Check that it is the right character.'),   // PURSE-MEND: the review's mend (tools/realmReview.mjs)
@@ -1772,29 +1742,6 @@ export function accountStaffChat({ fetch, storage }) {
   };
 }
 
-/** INT9: A DEATH IN THE OPEN ZONE'S DROP, taken off the realm record by the service (server-account/src/wild.js) - `body`
- *  `{ receipt, realm, room }` (the fallen's, its record's `at`), `{ receipt, room }` (the killer's, after the grace) or
- *  `{ n, realm, room }` (a death to a foe: the tab's nonce - refused `foe` since FOE-KEEPS, never asked by this game) - `room` where the remains will lie (AUDIT INT9: the order names
- *  it). Answers `{ r, order, items, kept, took, gold, wi, burnt?, realm? }`. */
-export const wildFallAsk = (io, body) => call(io, '/v1/wild/fall', body);
-/** MAC: the killer's collect of its piece in escrow
- *  (`{ receipt, realm }` - the room's `g1`, the killer's record's `at`), the fallen's taking it back (`{ r, realm }`), and
- *  the fallen character's pieces still held (`{ character }`). */
-export const wildCollectAsk = (io, body) => call(io, '/v1/wild/collect', body);
-export const wildReclaimAsk = (io, body) => call(io, '/v1/wild/reclaim', body);
-export const wildEscrowsAsk = (io, body) => call(io, '/v1/wild/escrows', body);
-/** WILD-INSURE: policies written on pieces of gear (`{ realm, keys, region }`
- *  - the record's `at`, the pieces' ledger keys, the bank the shortfall is paid from) - answers `{ policies, gold, realm }` -
- *  and the character's policies in force (`{ character }`) - answers `{ policies }`. */
-export const wildInsureAsk = (io, body) => call(io, '/v1/wild/insure', body);
-export const wildPoliciesAsk = (io, body) => call(io, '/v1/wild/policies', body);
-/** INT9: the zone's calls, bound to this device's stored session (the duels' way). */
-export function accountWild({ fetch, storage }) {
-  const io = () => { const s = storedSession(storage); return s ? { fetch, base: serviceBase(storage), secret: s.secret } : null; };
-  const on = (/** @type {(io: any, body: any) => Promise<any>} */ ask) => async (/** @type {any} */ body) => { const i = io(); return i ? ask(i, body) : { ok: false, error: 'no-session' }; };
-  return { fall: on(wildFallAsk), collect: on(wildCollectAsk), reclaim: on(wildReclaimAsk), escrows: on(wildEscrowsAsk), insure: on(wildInsureAsk), policies: on(wildPoliciesAsk) };
-}
-
 /** WB5b: the kill receipt the relay signed for this account, carried to
  *  the service - `{ recorded, closed }`, or `{ recorded: false, why }`
  *  (`claimed`, `guest`). */
@@ -2339,31 +2286,6 @@ export function accountMarket({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) 
     bid: (req) => post('/v1/market/bid', req),
     // GOLD-MARKET: a realm character's gold its sales hold, collected into its record (`{ character, realm, region }`)
     gold: (req) => post('/v1/market/gold', req),
-  };
-}
-
-/** SEA-BOUNTY: A FREEPORT'S BOUNTY BOARD'S DOOR (server-account/src/seaBounty.js) - the wanted captains and what is owed the
- *  asking character (`board`: `{ character }`), gold posted on a wanted head (`post`: `{ character, realm, region, target,
- *  gold, rid }`) and the owed collected (`collect`: `{ character, realm, region }`). Every answer is `call`'s shape. */
-export function accountSeaBounty({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    board: (req) => post('/v1/sea/bounty/board', req),
-    post: (req) => post('/v1/sea/bounty/post', req),
-    collect: (req) => post('/v1/sea/bounty/collect', req),
-  };
-}
-
-/** SHIP-PVP: A WRECK AT SEA'S DOOR (server-account/src/seaWreck.js) - a wreck's signed receipt carried (`wreck`: `{ receipt,
- *  realm? }` - the wrecked captain's own act with where its record stands, its killer's without), and a wreck's prizes
- *  collected by its killer's character or reclaimed by its captain's (`collect`, `reclaim`: `{ character, realm }`). Every
- *  answer is `call`'s shape. */
-export function accountSeaWreck({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    wreck: (req) => post('/v1/sea/wreck', req),
-    collect: (req) => post('/v1/sea/prize/collect', req),
-    reclaim: (req) => post('/v1/sea/prize/reclaim', req),
   };
 }
 

@@ -1,10 +1,7 @@
-// PVPDUNGEONS + the owner's game changes: the pure laws under them - the zone's halls (where they stand and
-// what stands in them), Heal Curse, the rest's warning, the hands swapped, Gothway Garden's side boards, and the spellbook
-// kept (KEEP-SPELLBOOK).
+// The owner's game changes: the pure laws under them - Heal Curse, the rest's warning, the hands swapped, Gothway Garden's
+// side boards, the dungeons' respawn and the spellbook kept (KEEP-SPELLBOOK).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWildMask } from '../../src/systems/wild/wildZone.js';
-import { wildHallPicks, wildRingBorderDistance, wildHallFoes, wildHallKeeps, wildHallTemplateOk, WILD_DUNGEONS_PER_RING, WILD_HALL_FOES } from '../../src/systems/wild/wildDungeons.js';
 import { startInfection, INFECTION, liveInfections } from '../../src/systems/infection.js';
 import { curseOf, healCurseOffer, healCursePaid, healCursePrice, HEAL_CURSE_BASE } from '../../src/systems/healCurse.js';
 import { restAilmentLines } from '../../src/systems/rest/restWarning.js';
@@ -19,39 +16,6 @@ import { NativeTradeWindow } from '../../src/ui/native/nativeTrade.js';
 import { mountEnhancedTrade } from '../../src/ui/enhanced/enhancedTrade.js';
 import { tabAccepts } from '../../src/ui/native/nativeInventory.js';
 import { withDom } from '../invdrag.mjs';
-
-const blob = (x, y) => { const dx = (x - 520) / 38, dy = (y - 110) / 24; return dx * dx + dy * dy + 0.15 * Math.sin(x / 5) < 1; };
-const mask = buildWildMask({ width: 1000, height: 500, inZone: blob });   // WW-C2: a cell a pixel (Cyrodiil's grid: test/world/worldWide/wwc2_zone.test.js)
-
-test('PVPDUNGEONS halls: every tier its full count (10, 8, 6, 4), never on or beside a place, off its tier\'s borders where the tier allows, spread, and the same on every client for a day - another day, other halls', () => {
-  const places = new Set();
-  for (let i = 0; i < 120; i++) places.add(`${490 + (i * 37) % 70},${92 + (i * 53) % 40}`);
-  const free = (x, y) => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (places.has(`${x + dx},${y + dy}`)) return false; return true; };
-  const bd = wildRingBorderDistance(mask);
-  const a = wildHallPicks(mask, free, 20369), b = wildHallPicks(mask, free, 20369), c = wildHallPicks(mask, free, 20370);
-  assert.deepEqual(a, b, 'the same day, the same halls');
-  assert.notDeepEqual(a.map((h) => h.key), c.map((h) => h.key), 'a new day, new halls');
-  assert.deepEqual([1, 2, 3, 4].map((r) => a.filter((h) => h.ring === r).length), [...WILD_DUNGEONS_PER_RING]);
-  for (const h of a) {
-    assert.ok(free(h.x, h.y), `${h.key}: never on or beside a place`);
-    assert.ok(bd[h.y * 1000 + h.x] >= 2, `${h.key}: never touching another tier`);
-  }
-  for (const p of a) for (const q of a) if (p !== q) assert.ok(Math.hypot(p.x - q.x, p.y - q.y) >= 2, 'never two halls on top of each other');
-});
-
-test('PVPDUNGEONS halls\' foes: the low tiers swapped for the ring\'s high tier, a water marker for a water foe, the human classes kept; pure by the hall\'s id; no graveyard for a template', () => {
-  const layout = [{ mobileType: 0 }, { mobileType: 3 }, { mobileType: 11 }, { mobileType: 131 }, { mobileType: 32 }, { mobileType: 17 }];
-  const one = wildHallFoes(layout, 1, 7428544), heart = wildHallFoes(layout, 4, 7428544);
-  assert.deepEqual(one, wildHallFoes(layout, 1, 7428544), 'the same hall, the same foes on every client');
-  for (const list of [one, heart]) for (const e of list) assert.ok(wildHallKeeps(e.mobileType), `no low tier: ${e.mobileType}`);
-  assert.ok(WILD_HALL_FOES.water.includes(one[2].mobileType), 'a water marker keeps a water foe');
-  assert.equal(one[3].mobileType, 131, 'a human class is kept');
-  assert.equal(one[4].mobileType, 32, 'a high tier is kept');
-  for (const e of heart.filter((x) => x.wildSwapped && !WILD_HALL_FOES.water.includes(x.mobileType))) assert.ok(WILD_HALL_FOES[4].includes(e.mobileType), 'the heart draws the heart\'s');
-  assert.equal(wildHallTemplateOk({ name: 'Cemetery of Fools', mapTableData: { locationType: 12 } }), false, '"Cemeteries cannot be zone dungeons!"');
-  assert.equal(wildHallTemplateOk({ name: 'The Tower', mapTableData: { locationType: 7, dungeonType: 18 } }), false);
-  assert.equal(wildHallTemplateOk({ name: 'Castle Grim', mapTableData: { locationType: 7, dungeonType: 0 } }), true);
-});
 
 test('HEAL-CURSE: the curse in the blood lifted for the temple\'s price, the turn cancelled; nothing to lift, no offer; short of gold, nothing taken', () => {
   const e = { name: 'T', isPlayer: true, level: 5, goldPieces: 20000, activeEffects: [], items: [] };
@@ -136,93 +100,16 @@ test('GOTHWAY-BOARDS: Gothway Garden alone; two boards at the NORTH entrance, on
   assert.equal(gothwayNorthSpots(() => 0, W, H, cell), null, 'no way in: no boards');
 });
 
-import { wildGiantsAt, WILD_GIANT_COUNT, WILD_GIANT_LEG_MS, wildGiantRing } from '../../src/systems/wild/wildGiants.js';
-import { wdunEmpty, wdunGiantDie, wdunGiants, wdunState, wdunPrune, WDUN_GIANT_DOWN_MS } from '../../src/net/wild/wildLaw.js';
-import { validWdunIn, validWdunOut } from '../../src/net/wire.js';
-import { wildRingAt } from '../../src/systems/wild/wildZone.js';
-
-test('ZONE-GIANTS: two giants a tier, always; each walks inside its own tier, the same on every client, a step at a time; the dead left out', () => {
-  const free = () => true, t0 = 1.7e12;
-  const a = wildGiantsAt(mask, free, t0), b = wildGiantsAt(mask, free, t0);
-  assert.equal(a.length, WILD_GIANT_COUNT);
-  assert.deepEqual(a, b, 'every client the same');
-  assert.deepEqual([1, 2, 3, 4].map((r) => a.filter((g) => g.ring === r).length), [2, 2, 2, 2]);
-  for (let k = 0; k < 40; k++) {
-    const t = t0 + k * (WILD_GIANT_LEG_MS / 3);
-    for (const gi of wildGiantsAt(mask, free, t)) {
-      assert.equal(gi.ring, wildGiantRing(gi.g));
-      const later = wildGiantsAt(mask, free, t + 60_000).find((q) => q.g === gi.g);
-      // home across it is a longer walk, a twentieth of the zone's span a minute at the most, never a jump
-      assert.ok(Math.hypot(later.x - gi.x, later.y - gi.y) < Math.hypot(mask.box.x1 - mask.box.x0, mask.box.y1 - mask.box.y0) / 20, 'a minute on, a short step - never a jump (the walk to a new day\'s home the longest)');
-    }
-  }
-  for (const gi of a) {   // its waypoints are its own tier's pixels
-    const leg = wildGiantsAt(mask, free, Math.floor((t0 + gi.g * 157_000) / WILD_GIANT_LEG_MS) * WILD_GIANT_LEG_MS - gi.g * 157_000).find((q) => q.g === gi.g);
-    assert.equal(wildRingAt(Math.floor(leg.x), Math.floor(leg.y), mask), gi.ring, 'a waypoint in its own tier');
-  }
-  assert.equal(wildGiantsAt(mask, free, t0, (g) => g === 3).length, WILD_GIANT_COUNT - 1, 'a dead giant is not on the map');
-});
-
-test('ZONE-GIANTS hub: a kill is down for everyone half an hour, a second report moves nothing, then it walks again; the words bounded', () => {
-  const st = wdunEmpty(), t = 1e12;
-  assert.equal(wdunGiantDie(st, 2, t), true);
-  assert.equal(wdunGiantDie(st, 2, t + 5000), false, 'already down');
-  assert.equal(wdunGiantDie(st, 9, t), false, 'no such giant');
-  assert.deepEqual(wdunGiants(st, t + 1000), [[2, WDUN_GIANT_DOWN_MS - 1000]]);
-  assert.deepEqual(wdunState(st, 'A', t).giants, [[2, WDUN_GIANT_DOWN_MS]]);
-  wdunPrune(st, t + WDUN_GIANT_DOWN_MS + 1);
-  assert.deepEqual(wdunGiants(st, t + WDUN_GIANT_DOWN_MS + 1), [], 'up again');
-  assert.deepEqual(validWdunIn({ k: 'gk', g: 7 }), { k: 'gk', g: 7 });
-  assert.equal(validWdunIn({ k: 'gk', g: 8 }), null);
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'gd', giants: [[1, 5], [12, 5], ['x', 1]] }), { k: 'gd', giants: [[1, 5]] });
-});
-
-test('GIANT-FIELDS: with the height map, the giants walk the low half of their tier - never the peaks', () => {
-  const free2 = (x, y) => x >= 0 && y >= 0;   // a fresh pixel test: a fresh table of cells
-  const hgt = (x, y) => ((x * 7 + y * 13) % 100);
-  const t0 = 1.75e12;
-  for (let k = 0; k < 30; k++) {
-    for (const gi of wildGiantsAt(mask, free2, t0 + k * WILD_GIANT_LEG_MS, () => false, hgt)) {
-      // at a leg's start the giant stands on a waypoint (its own offset aside, the same leg law)
-      const at = wildGiantsAt(mask, free2, Math.floor((t0 + k * WILD_GIANT_LEG_MS + gi.g * 157_000) / WILD_GIANT_LEG_MS) * WILD_GIANT_LEG_MS - gi.g * 157_000, () => false, hgt).find((q) => q.g === gi.g);
-      assert.ok(hgt(Math.floor(at.x), Math.floor(at.y)) <= 60, `giant ${gi.g} on low ground`);
-    }
-  }
-});
-
-test('GIANT-LEASH: a giant\'s walk never leaves the zone, minute by minute through a whole day', () => {
-  const t0 = 1.76e12;
-  for (let m = 0; m < 24 * 60; m += 7) for (const gi of wildGiantsAt(mask, () => true, t0 + m * 60_000)) assert.ok(wildRingAt(Math.floor(gi.x), Math.floor(gi.y), mask) > 0, `giant ${gi.g} inside at minute ${m}`);
-});
-
-test('CROW-NEWS: the crows\' word names whose death set them, bounded - so the fallen\'s party is not told', () => {
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'cr', crows: [['1,2', 5]], who: 'acct-a' }), { k: 'cr', crows: [['1,2', 5]], who: 'acct-a' });
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'cr', crows: [], who: 'x'.repeat(200) }), { k: 'cr', crows: [] });
-});
-
 import { dungeonRespawnMs, dungeonRespawnDue, DUNGEON_RESPAWN_MS, ELITE_DUNGEON_RESPAWN_MS } from '../../src/systems/dungeon/dungeonRespawn.js';
-test('DUNGEON-RESPAWN: a normal dungeon 20 minutes, an elite 40, each on its own clock; the zone\'s halls and a Super dungeon keep WORLD8\'s - half an hour since RESPAWN-30', () => {
+test('DUNGEON-RESPAWN: a normal dungeon 20 minutes, an elite 40, each on its own clock; a Super dungeon keeps WORLD8\'s - half an hour since RESPAWN-30', () => {
   assert.equal(dungeonRespawnMs({}), 20 * 60_000);
   assert.equal(dungeonRespawnMs({ elite: true }), 40 * 60_000);
-  assert.equal(dungeonRespawnMs({ elite: true, wild: true }), 30 * 60_000, 'the halls as they were');
   assert.equal(dungeonRespawnMs({ superTier: true }), 30 * 60_000);
   const t = 1e12;
   assert.equal(dungeonRespawnDue(t, t + DUNGEON_RESPAWN_MS - 1, DUNGEON_RESPAWN_MS), false);
   assert.equal(dungeonRespawnDue(t, t + DUNGEON_RESPAWN_MS, DUNGEON_RESPAWN_MS), true, 'twenty minutes after it fell, whoever came and went');
   assert.equal(dungeonRespawnDue(t, t + ELITE_DUNGEON_RESPAWN_MS - 1, ELITE_DUNGEON_RESPAWN_MS), false);
   assert.equal(dungeonRespawnDue(t, null, DUNGEON_RESPAWN_MS), false, 'offline: nothing respawns');
-});
-
-import { foeTitle } from '../../src/systems/foeTitle.js';
-import { GREATER_GIANT_NAME, GREATER_GIANT_CALL, GREATER_GIANT_CALL_AT } from '../../src/systems/wild/wildZone.js';
-import { validFoeRecord } from '../../src/net/wire.js';
-test('GREATER-GIANT: the zone\'s giants are Greater Giants, calling ten ordinary giants at half health; a puppet known by its health alone', () => {
-  assert.equal(foeTitle({ wildGiant: true }, 'Giant'), GREATER_GIANT_NAME);
-  assert.equal(foeTitle({}, 'Giant'), 'Giant', 'its ten are giants of the ordinary kind');
-  assert.deepEqual([GREATER_GIANT_CALL, GREATER_GIANT_CALL_AT], [10, 0.5]);
-  assert.equal(validFoeRecord({ i: 3, gg: 5 }).gg, 5, 'which Greater Giant rides every puppet\'s record');
-  assert.equal(validFoeRecord({ i: 3, gg: 8 }), null);
-  assert.equal(validFoeRecord({ i: 3 }).gg, undefined, 'any other foe carries none');
 });
 
 // WILD-KEEPOUT (Wrothgaria kept out of the zone, its west border moved east) RETIRED with the Wrothgarian zone (WW-C2,

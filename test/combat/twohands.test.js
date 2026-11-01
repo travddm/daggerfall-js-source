@@ -1265,7 +1265,7 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   }
   // the off hand's terms reach every blow between players (AUDIT): each melee arm hands the STRIKING rig's off flag on
   const world = rd('src/scenes/world.js');
-  assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 3, 'the duel, the battle and the wild zone');
+  assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 2, 'the duel and the battle');
   assert.match(world, /\.\.\.\(weaponRig\.playerWeapon\.offStrike \? \{ off: true \} : \{\}\) \}, duelStandIn\(playerEntity\)\);$/m, 'and the siege\'s works');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the stand-in struck by me
   assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 3, 'each strike-out hands it to the roll');
   assert.match(rd('src/scenes/dungeonContext.js'), /opts\.wildStrike\(best, playerWeapon\.strikingWeapon, playerWeapon\.machine\?\.state, \{ off: playerWeapon\.offStrike \}\)/, 'the dungeon\'s own rig too');

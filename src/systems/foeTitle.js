@@ -28,7 +28,6 @@ export function setTraitTitleFormat(fn) { if (typeof fn === 'function') _traitTi
  *  names the traits on their own line under the name, and said them twice) */
 export function foeTitle(entity, base, { traits = true } = {}) {
   if (!base) return base;
-  if (entity?.wildGiant) base = 'Greater Giant';   // GREATER-GIANT: the zone's own giants (systems/wild/wildZone.js GREATER_GIANT_NAME)
   const revenant = entity?.revenant?.name;
   if (typeof revenant === 'string' && revenant) return revenant;
   const band = entity?.bandName;   // RVN6 (17): a revenant's follower, by its band - "Orc of Grushnak's Warband"
@@ -38,5 +37,5 @@ export function foeTitle(entity, base, { traits = true } = {}) {
   const lead = typeof entity?.raidLeader?.name === 'string' && entity.raidLeader.name ? entity.raidLeader.name : null;   // RAID5: a raid's leader, by its party's word (systems/eliteFoes.js promoteRaidLeader)
   const special = entity?.staffBoss ? `Mighty ${named}` : lead ?? (entity?.eliteFoe ? `Elite ${named}` : named);   // STAFF-EVENT: a staff event's mini boss (systems/eliteFoes.js promoteStaffBoss)
   const traited = traits && typeof entity?.bossTitle === 'string' && entity.bossTitle ? _traitTitle(entity.bossTitle, special) : special;   // BOSS-TRAITS: its first trait's word (systems/bossTraits.js giveBossTraits)
-  return entity?.unquiet === true && !entity.wildFoe && !entity.wildGiant && !entity.bout ? `Unquiet ${traited}` : traited;   // UNQUIET: the mark - it may rise (unquietMark.js isUnquiet's own test: AUDIT UNQUIET, never the zone's or the sand's)
+  return entity?.unquiet === true && !entity.bout ? `Unquiet ${traited}` : traited;   // UNQUIET: the mark - it may rise (unquietMark.js isUnquiet's own test: AUDIT UNQUIET, never the zone's or the sand's)
 }

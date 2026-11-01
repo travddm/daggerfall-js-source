@@ -4,7 +4,7 @@
 // its chip on the HUD (ui/enhanced/enhancedHud.js statTile). A leaf with no imports, as the sigil's rune is (ui/sigilRune.js), so
 // a stylesheet or a test may read it without the roster.
 //
-// Not the sigil's ring, nor the open zone's two crossed blades (ui/hud/hudStatus.js STATUS_GLYPHS.wild): a shape no other
+// Not the sigil's ring: a shape no other
 // mark in the kit has, so the chip and the block are known for the same thing at a glance.
 
 /** The glyph on the 16px grid, a row a string - `#` a pixel. */

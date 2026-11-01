@@ -70,7 +70,7 @@ reads after its own writes.
 | Homes | `/v1/homes/*` (claim, release, transfer, entry, rooms, rent, decor, yards, layouts, vote, deed) |
 | Guilds | `/v1/guilds/*` (found, invite, ranks, vault, hall, castle, board, heraldry) |
 | Towns and seats | `/v1/towns/*`, `/v1/seats/*` (influence, sieges, royal tourney, fealty) |
-| Group content claims | `/v1/gate/claim`, `/v1/raid/claim`, `/v1/sd/claim`, `/v1/arena/*`, `/v1/wild/*`, `/v1/duel/*`, `/v1/serpent/claim`, `/v1/star/claim` |
+| Group content claims | `/v1/gate/claim`, `/v1/raid/claim`, `/v1/sd/claim`, `/v1/arena/*`, `/v1/duel/*`, `/v1/serpent/claim`, `/v1/star/claim` |
 | Other features | `/v1/chapters/*`, `/v1/firmament/*`, `/v1/festival/*`, `/v1/ql/claim`, `/v1/renown/xp`, `/v1/board/*`, `/v1/post/*`, `/v1/mail/*`, `/v1/sea/*` |
 | Safety | `/v1/safety/*`, `/v1/report/*`, `/v1/mod/*` |
 | Staff | `/v1/staff/*`, `/v1/staff-chat/*` |
@@ -124,8 +124,8 @@ Feature areas have a var with `off`, `dev` (developers only) or `on`: `MARKS_OPE
   `yard-snap`, `arena-champion`, `rez-holds`, `safety` (the chat reviewer, Discord cards and freeze-push retries),
   `motherlodes`.
 - **Hourly at :41** (`HOUR_JOBS`): `board`, `guild-board`, `harvests`, `craft-writs`, `market-history`, `town-econ`,
-  `rate-limits`, `sessions`, `guild-invites`, `realm-findings`, `realm-wealth-hours`, `progress-hours`, `wild-falls`,
-  `wild-escrow`, `sea`, `crew-signs`, `patrons`, `safety-sweep`, and the staff sweeps (audit, evidence,
+  `rate-limits`, `sessions`, `guild-invites`, `realm-findings`, `realm-wealth-hours`, `progress-hours`,
+  `crew-signs`, `patrons`, `safety-sweep`, and the staff sweeps (audit, evidence,
   census, messages, events, feeds, reactions, staff chat).
 
 Each job is bounded (`SWEEP_ROWS`, `ROUNDS_MAX`, `FIRING_STATEMENTS_MAX`). A minute job that runs long competes with

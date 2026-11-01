@@ -46,8 +46,7 @@ import { trophyItemName } from '../hunt/trophies.js';
 /** The groups whose items never stand as themselves: weapons and armour are mounted (DECOR2c); a vehicle is no thing
  *  one carries, coin is a counter, and a deed or a quest's own item is not the player's to set down. */
 export const DECOR_OWN_NEVER_GROUPS = Object.freeze(new Set(['Weapons', 'Armor', 'Transportation', 'Currency', 'Deeds', 'QuestItems']));
-// The items kept back by name - INT9: DECOR_OWN_KEPT_BACK's home is net/decorLaw.js (the account Worker reads it: a death in
-// the zone's drop keeps them too - systems/wild/wildDropLaw.js), re-exported here
+// The items kept back by name - INT9: DECOR_OWN_KEPT_BACK's home is net/decorLaw.js (the account Worker reads it), re-exported here
 export { DECOR_OWN_KEPT_BACK };
 
 /** An item's picture in the world - its own fields first (an artifact's own picture, a potion's own bottle - DFU's

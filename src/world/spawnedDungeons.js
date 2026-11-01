@@ -224,7 +224,7 @@ export const pickTemplate = (templates, salt, px, py) => (templates?.length ? te
  * @param {{salt:number, px:number, py:number, where?:{regionIndex?:number, regionName?:string, politic?:number, climate?:object}, elite?:boolean, mapId?:number|null}} o
  */
 export function synthesizeDungeonLocation(template, { salt, px, py, where = {}, elite = false, mapId: id = null }) {
-  const mapId = id ?? spawnedMapId(salt, px, py);   // WW-C2: a zone hall's own id (net/wire.js spawnedHallMapId - a world pixel's lane), the Bay's spawns' salt and pixel
+  const mapId = id ?? spawnedMapId(salt, px, py);   // WW-C2: a given id, else the Bay's spawns' salt and pixel
   const ll = mapPixelToLongitudeLatitude(px, py);
   return {
     ...template,

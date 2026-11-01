@@ -34,7 +34,7 @@ service itself is in [account-service.md](account-service.md).
 | Currency | `marks`, `marks_ledger` with balance triggers |
 | Market | `market_listings`, `market_sales`, `market_deliveries`, `market_orders`, `market_fills`, `market_prices`, `market_reports`, `products`, `market_auctions`, `market_bids`, `market_gold`, `piece_escrow` |
 | Guilds | `guilds` and the `guild_*` tables (members, notes, vault, castles, writs) |
-| Group content | `gate_kills`, `arena_*`, `serpent_kills`, `sd_kills`, `wild_falls`, `wild_escrow`, `sea_*` |
+| Group content | `gate_kills`, `arena_*`, `serpent_kills`, `sd_kills`, `sea_season` |
 | Professions and towns | the `prof_*` tables, `node_harvests`, `motherlodes`; town seats (`town_seat_*`); town economy (`town_econ_*`) |
 | Moderation and staff | `mod_cases`, `mod_reports`, `mod_case_lines`, `mod_actions`, `private_reports`, the `staff_*` tables |
 

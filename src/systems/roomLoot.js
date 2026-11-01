@@ -46,7 +46,6 @@ import { notCarried } from './peerWord.js';
 import { registerModSaveData } from './modSaveData.js';
 import { healingSupplyChances, mintHealingPotion, mintMagickaPotion } from './healingSupply.js';
 import { restLootChances, restItemsAvailable, createRestItem, REST_PILE_CHANCES, REST_FOE_CHANCES } from './rest/restItems.js';
-import { WILD_TEXT } from './wild/wildZone.js';
 import { t } from './textManager.js';   // RPT1026-ITEMS LOOT-SKEW: the room's two new lines, read when said
 
 // ---- the dice -------------------------------------------------------------------------------------------------------
@@ -177,8 +176,8 @@ export const isRoomWord = (/** @type {any} */ rec) => !!rec && typeof rec === 'o
 // one writer. Every word carries its claims' ids, and the host's word its verdicts, so a seat that changes hands judges
 // what the last host left unanswered (roomClaimOrder) and never what it answered.
 
-/** What a loser is told - the remains' own line (systems/wild/wildZone.js), one string for one refusal. */
-export const ROOM_TAKEN_TEXT = WILD_TEXT.taken;
+/** What a loser is told: one string for one refusal. */
+export const ROOM_TAKEN_TEXT = 'Someone took that first.';
 /** RPT1026-ITEMS LOOT-SKEW (two private reports: piles that told a current, restarted client to update, and a take that
  *  went back to the pile a few seconds later and never reached the pack): WHAT A ROOM CONTAINER SAYS WHEN ITS WORD IS ANOTHER
  *  BUILD'S. A base is every client's own computation (THE BASE, above), and a word whose signature this build does not

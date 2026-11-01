@@ -32,7 +32,6 @@ import { rollCorpseLoot, lootRarityOn, rarityRank, RARITIES, rarityEligible, app
 import { championOf } from '../systems/champions.js';   // LOOT7: the champions' traits register at import
 import { isGoldPieces, ARROW_TEMPLATE } from '../systems/inventory.js';   // PLAIN-LOOT: a plain foe's gold all of it; PARTY-LOOT: a shaft is never counted under the cap
 import { bonusShare, rollBonusSupplies, ROOM_BASE_QUARTERS } from '../systems/roomLoot.js';   // PARTY-LOOT: a player's own layer over a room's shared base
-import { wildFoeLoot } from '../systems/wild/wildZone.js';   // WILD1: the open zone's gold (wildLootAfter)
 import { liveStat, FATIGUE_DRAIN_SCALE } from '../systems/statMods.js';   // RF2: the player's live luck for the roll   // AUDIT 58: ItemHelper's EquipItem half - a foe's equip table is what DamageEquipment's struck side reads
 import { GLOBAL_SCALE } from '../world/meshReader.js';
 import { swingSoundFor, hitSoundFor, ENEMY_HIT_VOLUME, SOUND } from '../systems/soundClips.js';
@@ -175,8 +174,6 @@ export function spawnEnemyLoot(entity, mobileType, basics, player, { rolls = Mat
   return entity.items;
 }
 
-/** WILD1 (systems/wild/wildZone.js, the owner's "twice gold" - WILD2: at its ring's multiplier): a foe of the open zone's coin - after its chain
- *  (spawnEnemyLoot, given wildLootOpts), so the cap, which folds and keeps the gold whole, has had its word. */
 /** PARTY-LOOT (PARTY-LOOT): A PLAYER'S OWN LAYER OVER
  *  A ROOM'S SHARED BASE, read at their own RENOWN-LOOT stage and their Luck - the knobs' one home, as the base's are
  *  spawnEnemyLoot's - on the dice the caller hands (`rolls`, seeded by the base's name and the character). A BODY's:
@@ -202,12 +199,6 @@ export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, r
   stampWonWeapons(pieces, fighters, { rolls });
   if (Number.isInteger(lootCap)) capLootList(pieces, Math.max(0, lootCap - baseItems.filter((it) => !(it?.group === 'Weapons' && it.templateIndex === ARROW_TEMPLATE)).length));   // FOE-CAP: the body's cap is the base's and the bonus's together (STUCK-ARROWS: a shaft is never counted)
   return pieces;
-}
-
-export function wildLootAfter(entity) {
-  const m = wildFoeLoot(entity);   // WILD2: its ring's - x1.25 the outer to x2 the heart
-  if (m === 1) return;
-  for (const it of entity?.items ?? []) if (isGoldPieces(it)) it.stackCount = Math.max(1, Math.round(Math.max(1, it.stackCount ?? 1) * m));
 }
 
 // ---- EnemyEntity.SetEnemyCareer, the equipment chain (EnemyEntity.cs:330-347) ----

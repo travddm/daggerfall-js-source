@@ -130,7 +130,6 @@ import { noteAct } from '../../systems/questlines/qlActs.js';   // QL11: the fea
 import { captainsDue } from '../../systems/sigil/sigilSetPowers.js';
 import { dueOnHull, legendTidemail } from './navalSeaSet.js';   // SEA-SET: the Captain's Due on my ship's hull, a legend's Tidemail piece (AUDIT SEA VENTURES D12: out of this host)
 import { createTreasureFleet } from './treasureFleet.js';   // SEA-EVENTS: the treasure fleet's ships, stood and steered
-import { createNavalPvp } from './navalPvp.js';   // SHIP-PVP: the open sea's guns' seams
 import { strikeShip } from '../../systems/sea/seaEvents.js';   // SEA-EVENTS: the Aether Storm's lightning on my ship
 import { createBerthWatch } from './navalBerth.js';   // FIELD BUGS 2026-10-21b VOYAGE-HOLD: the berth, still or not, and the helm let go in port
 
@@ -789,12 +788,10 @@ export function createNavalHost(deps) {
     }
     // AUDIT NAV1 (online): another player's boat at her helm - a sea ship's ball or barrel that meets her bursts here too
     // (her own client alone judges it, the victim's law), never passing through her on my screen; a player's shot - mine
-    // or any peer's, her own among them - never meets her (`hitBy`: no fight between players at sea) - SHIP-PVP: but in the
-    // open sea (scenes/naval/seaBroadsides.js `open`), where my balls meet a stranger captain's ship and the referee judges
-    // them, and a peer's are seen to meet her too
+    // or any peer's, her own among them - never meets her (`hitBy`: no fight between players at sea)
     for (const p of deps.peerBoats?.() ?? []) {
       const box = p.boat ? hullBox(p.boat) : null;
-      if (box) out.push({ id: `peer:${p.id}`, box, rig: rigBoxesOf(p.boat), hitBy: (s) => shipShot(s) || pvp.open(p.id, s, isMine(s)) });
+      if (box) out.push({ id: `peer:${p.id}`, box, rig: rigBoxesOf(p.boat), hitBy: (s) => shipShot(s) });
     }
     for (const b of myBoats()) {
       const box = hullBox(b);
@@ -1029,16 +1026,6 @@ export function createNavalHost(deps) {
       const hurt = { hull: gun.hull * (e.weight ?? 1) * (0.85 + 0.3 * random()), sail: 0, crew: 0 };   // GALLEON-WEIGHT: her battery's weight of metal
       if (e.type !== 'blast') gunsRefit(hurt, e.shooter);
       deps.serpent?.struck?.(seg, hurt.hull);
-      return;
-    }
-    // SHIP-PVP: a ball of MINE on a stranger captain's ship in the open sea - its harm as it would strike a sea ship, my Guns
-    // refit's with it, gathered for the referee (seaBroadsides.js `shot`); her own game lays what the referee says landed
-    if (typeof e.target === 'string' && e.target.startsWith('peer:')) {
-      if (!isMine(e.shooter)) return;
-      const hurt = shotDamage(gun, zone, { roll: random(), weight: e.weight });
-      if (e.type !== 'blast') gunsRefit(hurt, e.shooter);
-      if (fire) hurt.fire = fire;
-      pvp.shot(e.target.slice(5), hurt);
       return;
     }
     const target = sea.get(e.target);
@@ -2411,11 +2398,6 @@ export function createNavalHost(deps) {
     isWater: (x, z, hull) => deps.isWater(x, z, hull), seaY: () => deps.seaY(), launches: () => launchesTraffic(),
     give: (items) => deps.board?.giveItems?.(items, boatInPlay() ?? null, { force: true }), say: (text, n) => deps.say?.(text, n),
     fleetEnded: (n, act) => deps.ether?.fleetEnded?.(n, act),
-  });
-  // ── SHIP-PVP: the open sea's guns between captains - their seams (scenes/naval/navalPvp.js) over the ships stood here ──
-  const pvp = createNavalPvp({
-    enabled: () => enabled, boat: () => boatInPlay(), stateOf: (b) => myBoatState(b), build: (b) => refitBuild(b), pose: (b) => boatPose(b),
-    boats: () => csa()?.state?.AllBoats ?? [], peers: () => deps.peerBoats?.() ?? [], clock: () => clock, shake: (k) => deps.shake?.(k),
   });
 
   // ── NAV-R: Warm Ashes' raiders, stood as ships (systems/naval/navalRaiders.js) ─────────────────────────────────────
@@ -5242,9 +5224,6 @@ export function createNavalHost(deps) {
      *  stormStrikeOf): hurt by its shares, never under her last timber by it alone. Answers whether it struck her. */
     fleet: (list, o) => { if (enabled) treasureFleet.step(list, o); },
     stormStrike: (strike) => strikeShip(enabled && aboardShip() ? myBoatState(boatInPlay())?.damage : null, strike, clock),
-    /** SHIP-PVP: the open sea's guns' seams (scenes/naval/navalPvp.js) - the guns attached, my ship as the referee is told of
-     *  her, its word laid on her, her wreck, a peer's boat where she lies, a prize out of her hold. */
-    pvp,
     fleetStatus, repairAway, refitBoat, openYard, freeBerth, crewHands, assignRole,   // HOLDINGS: the Fleet page's (scenes/fleetHost.js) - with giveOrder and hostileNear, below
     passageShip, charter, charterSailed,   // PASSAGE: a berth's ship to book, and her boat made the voyage's (scenes/naval/passageHost.js)
     bringIn: quay.begin, berthing: quay.state,   // PASSAGE-QUAY: her master brings her in to her port's quay, and where she stands with it

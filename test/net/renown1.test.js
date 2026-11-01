@@ -238,7 +238,7 @@ test('RENOWN1 the worker: /v1/renown/xp behind a session, the account the sessio
   const acct = (await call('GET', '/v1/account', undefined, me.secret)).body.account;
   assert.deepEqual(acct.renown.map((x) => [x.character, x.name, x.xp, x.level]), [[A, 'Mara', 5001, 9]]);
   assert.equal(RENOWN_CARD_TRACKS, 5);
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
   assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/renown\.js"/, 'the Worker bundles the curve, so a change to it deploys');
 });
 
@@ -251,7 +251,7 @@ test('RENOWN1 the token and the order: `lv` optional and within 1..50 when there
   assert.ok(claimsValid({ ...id, lv: 50 }));
   for (const lv of [0, 51, 1.5, '9', null]) assert.equal(claimsValid({ ...id, lv }), false, `lv ${lv}`);
   assert.equal(renownIssuable(12), true);
-  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
+  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
   const lvOrder = { o: 'renown', s: 'acct-mara', lv: 9, i: T0, e: T0 + 30 };
   assert.ok(orderValid(lvOrder));
   assert.equal(orderValid({ ...lvOrder, mu: 0 }), false, 'a renown order carrying a mute is neither');
@@ -284,7 +284,7 @@ test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bo
   assert.deepEqual(parseClient('{"t":"renown","order":"v1.a.b"}', { hasHello: false }), { error: 'renown before hello' });
   assert.deepEqual(parseClient('{"t":"renown"}', { hasHello: true }), { error: 'bad renown' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'renown', order: 'x'.repeat(1025) }), { hasHello: true }), { error: 'bad renown' });
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
   assert.equal(RENOWN_HZ_MAX, 1);
   const g1 = renownGate(null, 1000);
   assert.equal(g1.pass, true);

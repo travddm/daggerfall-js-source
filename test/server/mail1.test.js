@@ -154,7 +154,7 @@ test('MAIL1 law: a letter past its bound is REFUSED, never cut - one word each (
 
 test('MAIL1 service: four routes behind a session, none open; acct6; a GUEST can neither read nor write (mail-needs-account, 403) and cannot be written to; the wrong method is refused (mutants: the wall dropped; a route opened to strangers)', async () => {
   for (const r of ['/v1/mail/inbox', '/v1/mail/send', '/v1/mail/read', '/v1/mail/delete']) { assert.ok(ROUTES.has(r), r); assert.ok(!OPEN_ROUTES.has(r)); }
-  assert.equal(ACCOUNT_VERSION, 'acct207');
+  assert.equal(ACCOUNT_VERSION, 'acct208');
   const svc = await service();
   const ann = await svc.player('p_ann_0000000001', 'Ann');
   const guest = await svc.player('p_gst_0000000001', null);

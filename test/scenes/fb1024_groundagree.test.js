@@ -20,7 +20,6 @@ import { wodSiteClear } from '../../src/world/road/roadClearance.js';
 import { createSpawnGroundPlace } from '../../src/world/spawnGroundPlace.js';
 import { spawnsDungeon, WORLD_SALT } from '../../src/world/spawnedDungeons.js';
 import { ETHER_BOX } from '../../src/world/ethericSea.js';
-import { buildWildMask, wildInside } from '../../src/systems/wild/wildZone.js';
 import { syntheticWoodsBytes } from '../landformWorld.mjs';
 import { hostText } from '../hostText.mjs';
 
@@ -38,7 +37,7 @@ function rolledPixel(x0, y, wanted = true) {
 }
 
 /**
- * The law over a fake world: every pixel land with a dry plateau, no road network yet, and no open zone - unless the
+ * The law over a fake world: every pixel land with a dry plateau, no road network yet, - unless the
  * case says otherwise. `asked` records each clone the law asks for.
  */
 function makeLaw(overrides = {}) {
@@ -59,7 +58,7 @@ function makeLaw(overrides = {}) {
   return { law: createSpawnGroundPlace(handles), asked };
 }
 
-test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands, else online the spawn the roll stands, alive or dead - none offline, past the Veil, in the open zone or where the roll stands none (mutants: the stood ignored; the clocks asked; offline; past the Veil; in the zone; the roll transposed)', () => {
+test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands, else online the spawn the roll stands, alive or dead - none offline, past the Veil or where the roll stands none (mutants: the stood ignored; the clocks asked; offline; past the Veil; the roll transposed)', () => {
   const [sx, sy] = rolledPixel(300, 250);
   const [nx, ny] = rolledPixel(300, 250, false);
   const town = { name: 'Town' };
@@ -86,16 +85,6 @@ test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands,
   ({ law } = makeLaw({ etherSea: false }));
   assert.deepEqual(law.groundLocationAt(ex, ey, null), { name: `Spawn ${ex},${ey}` }, 'with no Eltheric Ocean that box is no isle\'s');
 
-  // (zoneMask - scenes/world.js hands systems/wild/cyrodiilZone.js cyrodiilMask); here a zone over the whole fake map
-  const zoneMaps = { getClimateIndex: () => CLIMATES.Woodlands };
-  const mask = buildWildMask({ width: 1000, height: 500, inZone: () => true });
-  let zoned = null;
-  for (let y = 0; y < 500 && !zoned; y++) for (let x = 0; x < 1000 && !zoned; x++) if (wildInside(mask, x, y) && spawnsDungeon(WORLD_SALT, x, y)) zoned = [x, y];
-  assert.ok(zoned, 'a spawn pixel in the open zone');
-  ({ law } = makeLaw({ maps: zoneMaps }));
-  assert.deepEqual(law.groundLocationAt(zoned[0], zoned[1], null), { name: `Spawn ${zoned[0]},${zoned[1]}` }, 'no zone handed in: the roll stands');
-  ({ law } = makeLaw({ maps: zoneMaps, zoneMask: () => mask }));
-  assert.equal(law.groundLocationAt(zoned[0], zoned[1], null), null, 'in the open zone only a hall stands, and a hall is `stood`');
 });
 
 test('GROUND-AGREE the spawn the roll stands (world/spawnGroundPlace.js spawnAt): the sea, a wet plateau and a path across the pixel stand none; before the road network lands a spawn stands provisionally (mutants: the clocks asked anyway)', () => {

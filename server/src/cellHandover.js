@@ -6,8 +6,8 @@
 //           overworld ledger (`ow:led` - its spent ids, its dungeons' rows, its searched graves);
 //   copy  - per-place config, copied to every receiver: the relay's settings, the room's bans and freezes;
 //   drop  - swept at every drain and made again at the next hello: ids' looks and secrets, the old hello bucket;
-//   block - everything else, an unknown key included: a live fight, a debt owed an account, a raid, a star, a serpent,
-//           the wild's remains. A node holding any key that blocks is not repartitioned, so the tree only moves where the
+//   block - everything else, an unknown key included: a live fight, a debt owed an account, a raid, a star, a serpent.
+//           A node holding any key that blocks is not repartitioned, so the tree only moves where the
 //           handover is whole, and a store this file does not know stops a move rather than being lost by it.
 // The receiver takes rows IDEMPOTENTLY by their own keys (a park by its key, the newest; a ledger entry by its id, row or
 // grave key), so a handover asked again after a partial failure leaves every receiver as one handover would.

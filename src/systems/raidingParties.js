@@ -102,7 +102,6 @@ import { areaAt } from '../world/worldWide/worldGrid.js';   // WW6: the area a r
 import { readRaidReceipt } from '../net/raid/raidReceipt.js';
 import { worldRoom, isCellRoom } from '../net/wire.js';
 import { worldCoordToMapPixel } from '../world/streamingWorld.js';   // PACK-EVERY: an area event's players, on its pixel
-import { isWildRegion } from './wild/wildZone.js';   // PVPDUNGEONS: no world event in the open zone
 import { noteAct } from './questlines/qlActs.js';   // QL11: the features' acts, heard by the running quests
 import { staffRaids, staffRaidsEnded, staffRaidHere, staffRaider, staffRaidRoom, staffBossWanted, staffBossLost, staffBossByHand, staffBossToSay, staffEventBook, staffEventEnd, staffEventLedger, staffRaidOfKey } from './staffEvents.js';   // STAFF-EVENT: a staff event runs as a raid
 import { validStaffEventIn, staffEventKey, STAFF_EVENT_AREA } from '../net/staffEvent/staffEventLaw.js';   // WW6: an area's own word
@@ -244,7 +243,7 @@ export function raidRegions(maps, pickerData) {
  * (the registry's `location` - a place past the Bay's, negative: no MAPS.BSA row holds it) - grouped by AREA, the
  * province's districts (world/worldWide/worldGrid.js - what a region is to the Bay's draw, World-Wide decision 4), the areas
  * ascending, each its towns by map id, each beside its province's region. None for the Bay's lane (raidRegions is its own)
- * nor for a lane that stands no raid (the open zone's).
+ * nor for a lane that stands no raid.
  * @param {{ inTheatre: (t: number) => ReadonlyArray<any> }|null|undefined} places @param {number} lane
  * @param {(p: any) => boolean} [street]
  * @returns {ReadonlyArray<{ region: number, area: number, towns: ReadonlyArray<{ index: number, name: string, px: number, py: number }> }>}
@@ -708,7 +707,7 @@ export function raidFrame(dt = 0) {
     expire(now, home);
     for (const r of state.raids) routRaid(r);
     state.lastSelectedDay = day;
-    state.raids = raidsForDay(day, regions).filter((r) => !isWildRegion(r.regionIndex));   // PVPDUNGEONS: every client drops the zone's towns from the day's roll alike
+    state.raids = raidsForDay(day, regions);
     cancelPending();
     scheduleNextSpawn(-1);
     scheduleNextDefender();
@@ -1514,7 +1513,7 @@ export function raidTimerList(relayOf, regionName = () => '', aheadMs = 0) {
   const next = state.lastSelectedDay + 1, now = (host().now ?? worldMinutes)(), turn = next * MINUTES_PER_DAY;
   if (aheadMs > 0 && Number.isFinite(next) && turn > now && relayOf(turn) - relayOf(now) <= aheadMs) {
     const gen = placesGen();   // WW6: and the lanes past the Bay's next day, as the registry holds their towns now
-    if (_ahead.day !== next || _ahead.gen !== gen) { const regions = regionsNow(); if (regions) _ahead = { day: next, gen, raids: [...raidsForDay(next, regions).filter((r) => !isWildRegion(r.regionIndex)), ...lanesForDay(next)] }; }
+    if (_ahead.day !== next || _ahead.gen !== gen) { const regions = regionsNow(); if (regions) _ahead = { day: next, gen, raids: [...raidsForDay(next, regions), ...lanesForDay(next)] }; }
     if (_ahead.day === next) out.push(..._ahead.raids.map(row));   // the regions not read yet: asked again next read
   }
   return out;

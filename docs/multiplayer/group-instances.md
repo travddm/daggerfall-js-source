@@ -1,8 +1,7 @@
 # Group content on the relay
 
 This page summarises how group content runs as rooms on the relay: private instances, Super Dungeons (the Abyss),
-the arena, and the wild PvP zone. It covers the shared mechanism and the files for each
-mode, not their content or tuning.
+and the arena. It covers the shared mechanism and the files for each mode, not their content or tuning.
 
 ## The shared mechanism
 
@@ -36,10 +35,10 @@ Rewards are not taken on the client's word.
 
 1. When a fight ends, the relay (or the hub) issues a **receipt** signed with `GATE_SIGNING_KEY`
    (`importReceiptKey`). Receipt formats: `src/net/gate/gateReceipt.js`, `superDungeon/sdReceipt.js`,
-   `arena/arenaReceipt.js`, `wild/wildReceipt.js`, `duel/duelReceipt.js`. Pending receipts
+   `arena/arenaReceipt.js`, `duel/duelReceipt.js`. Pending receipts
    are kept in hub storage under per-mode prefixes and swept by `_sweepHub`.
 2. The client posts it to the account service (`/v1/gate/claim`, `/v1/sd/claim`,
-   `/v1/arena/claim`, `/v1/wild/*`, `/v1/duel/claim`). The service verifies it with `GATE_PUBLIC_KEY`
+   `/v1/arena/claim`, `/v1/duel/claim`). The service verifies it with `GATE_PUBLIC_KEY`
    (`server-account/src/signing.js`).
 3. The service inserts the kill or result with `INSERT OR IGNORE` on a key that includes the receipt's nonce, so a
    receipt pays once, then pays the reward.
@@ -77,18 +76,6 @@ makes a fresh copy. Only the owner's party is admitted. Entry from the world goe
   an open ticket (`claimArena`, `server-account/src/arena.js`). Results go to `arena_pve` and `arena_pvp`; the champion is
   settled by the `arena-champion` minute job.
 - Bout logic: `src/net/arena/arenaBrain.js`, `src/systems/arena/arenaBout.js`.
-
-## The wild PvP zone
-
-- `src/net/wild/`: `wildLaw.js` (zone rules), `wildRef.js` (the relay's referee: truce, fighters, falls),
-  `wildFight.js`, `wildReceipt.js`, `wildRemains.js`, insurance (`wildInsureBook.js`, `wildInsureSlot.js`).
-- A fall at another player's hand is recorded through `/v1/wild/fall` (`wildFall`, `server-account/src/wild.js`,
-  table `wild_falls`). The one worn piece the killer picked moves from the fallen's realm record into `wild_escrow`
-  in the same batch.
-- The killer's collect (signed by the room) moves it into the killer's record (`/v1/wild/collect`). If nobody collects
-  before the remains expire, the fallen's tab takes it back (`wildReclaim`). Each step changes exactly one escrow
-  row's `state` (`held`, `collected`, `returned`) in the same batch as the receiving record, so the piece is always
-  in exactly one place. Insurance is in `wild_insurance`.
 
 ## Changing a mode
 

@@ -83,13 +83,11 @@ export function questionRows(text, width = ROW_CHARS) {
 }
 /** The widest row of the question's own (its first lines' measure). */
 export const ROW_CHARS = 56;
-/** The question, in rows (ui/yesNoBox.js). ETHER-WILD: `pvp` - online, where the open sea past Veilhaven's
- *  peace is an open PvP zone (systems/wild/etherWild.js) - says so before the way out is taken. */
-export function crossingRows(way, { days = CROSS_DAYS, pvp = false } = {}) {
+/** The question, in rows (ui/yesNoBox.js). */
+export function crossingRows(way, { days = CROSS_DAYS } = {}) {
   const time = `${days} ${days === 1 ? 'day' : 'days'}`;
   return way === 'out'
-    ? ['The Abecean runs empty to every horizon, and the stars', 'hang strangely low over the water. Sailors say that past', `here the sea is no longer the sea, but the ${ETHER_WORD}.`, '', `Set a course into the open sea? (${time}. Your ship,`, 'its crew and hold go with you.)',
-      ...(pvp ? ['', ...questionRows(t('sea.wild.crossWarn', 'Past Veilhaven\'s peace the open sea is an open PvP zone. Other players may attack you there.'))] : [])]
+    ? ['The Abecean runs empty to every horizon, and the stars', 'hang strangely low over the water. Sailors say that past', `here the sea is no longer the sea, but the ${ETHER_WORD}.`, '', `Set a course into the open sea? (${time}. Your ship,`, 'its crew and hold go with you.)']
     : ['Ahead the Veil thins, and through it, faint as a memory,', 'lie the gray waters of the Iliac Bay.', '', `Set a course for home? (${time})`];
 }
 /** What the screen says at the landfall. */

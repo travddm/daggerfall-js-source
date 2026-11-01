@@ -14,7 +14,7 @@
 //
 // THE CHECK THE ROUTE CANNOT MAKE (purseReach): the clean save must be older than the purse's first finding. A payment
 // the letters could not cover, a fare, a death in the open zone or a house bought through the bank sets such a purse at
-// nothing again (systems/court.js deductGold and deductGoldPieces, systems/wild/wildDropLaw.js), the next checkpoint is
+// nothing again (systems/court.js deductGold and deductGoldPieces), the next checkpoint is
 // judged clean, and the save from before the sale left the bucket when the clean one moved past it (realm.js keeps the
 // record, the one before it and the clean one) - a rollback would land after the sale, undo the play since and give
 // nothing back. So the earliest law finding naming 'gold' must stand after the clean save, or the act is never asked.

@@ -40,8 +40,6 @@ const SLOT_MS = 10_000;
 const MINUTE_MS = 60_000;
 /** The sea's monsters (characters/mobile/mobileTypes.js: Slaughterfish 11, Dreugh 41, Lamia 42). */
 export const FOE_SEA_TYPES = Object.freeze([11, 41, 42]);
-/** A greater giant's type (net/foeBounds.js FOE_BOUND.giantType). */
-const GIANT_TYPE = 16;
 /** A socket's open episodes at most, and a room's. */
 export const REACT_OPEN_MAX = 2;
 export const REACT_ROOM_OPEN_MAX = 64;
@@ -215,7 +213,7 @@ export function staffFoesSeen(room, a, data, now, lane) {
   else if (live.size > row.o) {
     row.o = live.size; row.r = 0; row.e = 0; row.bo = 0; row.s = 0;
     for (const r of live.values()) {
-      if (Number.isInteger(r.cp) || (typeof r.nm === 'string' && r.nm) || (Number.isInteger(r.gg) && r.t === GIANT_TYPE)) row.bo++;   // a champion, a revenant, a greater giant (net/foeBounds.js)
+      if (Number.isInteger(r.cp) || (typeof r.nm === 'string' && r.nm)) row.bo++;   // a champion, a revenant (net/foeBounds.js)
       else if (r.z === 1) row.e++;
       else if (FOE_SEA_TYPES.includes(r.t)) row.s++;
       else row.r++;

@@ -12,7 +12,7 @@ same checks.
 
 Other shared protocol modules in `src/net/` are bundled into the relay the same way: `identityToken.js`,
 `hubShards.js`, `cellTree.js`, `instanceRoom.js`, `roomLease.js`, and the per-mode `*Law.js`, `*Receipt.js` and
-`*Brain.js` files (gates, arena, Super Dungeons, wild, duel, raid, serpent).
+`*Brain.js` files (gates, arena, Super Dungeons, duel, raid, serpent).
 
 ## Frames
 
@@ -32,8 +32,10 @@ Frames are JSON text with a type field `t`. There is no binary encoding.
 | Presence | `pose`, `roster`, `world` (room snapshot published by the host), `own` |
 | Combat | `foes` (host's foe state), hits and acts (`HIT_HZ_MAX`, `ACT_HZ_MAX`), `quest` |
 | Social | `chat`, `dm`, `emote`, `roll`, party and guild frames, `trade`, `duel`, `wed`, `trav`, `caravan`, `park` |
-| Group content | `gate`, `sd`, `eg`, `arena`, `wild`/`wref`, `raid`, `serpent`, `star`, `siege`, `rite`, `ow` |
+| Group content | `gate`, `sd`, `eg`, `arena`, `sea`, `raid`, `serpent`, `star`, `siege`, `rite`, `ow` |
 | Leases | `lease` (see [group-instances.md](group-instances.md)) |
+
+The `sea` frame (social room only) carries the treasure fleet's sunk sailings, the one piece of sea state the relay keeps. A client sends `hi` (ask the state) or `fk` with the sailing number `n` (its flagship went down); the relay answers `hi` with `st` and fans `fd` to every socket in the room when a flagship is newly down, both carrying `fleets` (the sunk sailings; `st` also carries the relay clock `now`). Validators: `validSeaIn`, `validSeaOut`. Vaults have no hub and no frame.
 
 Each content area has a validator pair in `wire.js` (`validSdIn`/`validSdOut`, `validEgIn`/`validEgOut`,
 `validRaidIn`/`validRaidOut`, ...). The relay runs the `In` check on what a client sends and the client runs the `Out`

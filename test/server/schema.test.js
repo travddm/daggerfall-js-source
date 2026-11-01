@@ -37,8 +37,7 @@ const TABLES = [
   'prof_unbruised', 'prof_withdrawals', 'progress_hours', 'progress_play', 'ql_steps', 'raid_cleanses', 'raid_spoils',
   'rate_limits', 'reaction_batches', 'realm_characters', 'realm_config', 'realm_faucets', 'realm_findings',
   'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves',
-  'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_bounties', 'sea_bounty_owed', 'sea_kills',
-  'sea_prizes', 'sea_season', 'sea_wrecks', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
+  'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_season', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
   'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence',
   'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches',
   'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held',
@@ -49,8 +48,8 @@ const TABLES = [
   'town_seat_holds', 'town_seat_honours', 'town_seat_influence', 'town_seat_legacy', 'town_seat_levies',
   'town_seat_pledges', 'town_seat_red', 'town_seat_renown', 'town_seat_results', 'town_seat_ribbons',
   'town_seat_rights', 'town_seat_rosters', 'town_seat_royal', 'town_seat_royal_fields', 'town_seat_settling',
-  'town_seat_stockpile', 'town_seat_titles', 'town_seat_weeks', 'town_seat_windows', 'wild_escrow', 'wild_falls',
-  'wild_insurance', 'witness_confirmed', 'world_witness', 'writ_days', 'writs',
+  'town_seat_stockpile', 'town_seat_titles', 'town_seat_weeks', 'town_seat_windows',
+  'witness_confirmed', 'world_witness', 'writ_days', 'writs',
 ];
 
 /** The account row's columns. A grant the service derives (titles.js) is never one of them. */

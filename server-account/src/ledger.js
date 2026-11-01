@@ -292,8 +292,8 @@ export const ownCopyLiftSteps = (/** @type {any} */ db, /** @type {string} */ ch
     WHERE d.uid = item_dupes.uid AND d.char_id = ?1 AND ${OWN_COPY_SQL})`),
 ]);
 
-/** INT9 (AUDIT): `keys` written down as copies `char` holds - a death's dropped pieces, whose ids the remains carry afresh
- *  (server-account/src/wild.js): never charged, and moved by no route. */
+/** INT9 (AUDIT): `keys` written down as copies `char` holds - pieces whose ids a remains carries afresh: never charged,
+ *  and moved by no route. */
 export const knownCopySteps = (/** @type {any} */ db, /** @type {string} */ char, /** @type {string[]} */ keys, /** @type {number} */ nowS) =>
   copyRows(db, keys, char, nowS, 'drop', () => ({ first: char, firstAt: null, claimant: null, claimAt: null, fp: null }));   // STAFF-PANEL4-CENSUS: bookkeeping, never contested
 
@@ -352,11 +352,10 @@ export function chargeSteps(db, char, keys, nowS, { strike = true } = {}) {
  * craft's record (RPT1026-LEDGERLAW, `handed_to`), so a contested claim on it is settled for the record the service handed
  * it to, where the account handing it on is the one the record named (AUDIT RPT1026 C1). A batch moving two records runs both
  * records' `left` before either's `entered` (realmTrade.js), so a piece passing between them lands where it went.
- * MAC: `escrow` a Set of keys - those pieces alone into the service's hands (a
- * killer's worn piece, held for its collect - server-account/src/wild.js), the rest let go. AUDIT RPT1026 C1: `from` - the
+ * AUDIT RPT1026 C1: `from` - the
  * account handing the pieces over in the same batch (a realm trade's other side), where no escrow row names it.
  * @param {any} db @param {{ player: string, char: string, seq: number, nowS: number }} at
- * @param {{ key: string, fp: string }[]} before @param {{ key: string, fp: string }[]} after @param {{ escrow?: boolean | Set<string>, from?: string | null }} [o]
+ * @param {{ key: string, fp: string }[]} before @param {{ key: string, fp: string }[]} after @param {{ escrow?: boolean, from?: string | null }} [o]
  */
 export function ledgerMoves(db, at, before, after, { escrow = false, from = null } = {}) {
   const was = new Map(before.map((p) => [p.key, p.fp]));
@@ -364,7 +363,7 @@ export function ledgerMoves(db, at, before, after, { escrow = false, from = null
   const gone = [...was.keys()].filter((k) => !now.has(k));
   /** @type {[string, string][]} */
   const came = [...now].filter(([k]) => !was.has(k));
-  const held = escrow === true ? gone : escrow instanceof Set ? gone.filter((k) => escrow.has(k)) : [];
+  const held = escrow ? gone : [];
   const freed = gone.filter((k) => !held.includes(k));
   const left = [
     ...overKeys(db, held, [at.char, at.nowS], (m) => `UPDATE item_uids SET state = 'escrow', char_id = '', claim_char = NULL, claim_at = NULL, at = ?2 WHERE uid IN (${m}) AND char_id = ?1 AND state = 'held'`),
@@ -427,21 +426,6 @@ export async function piecesRefusal(db, char, keys) {
     if (rows.length) return 'piece-claimed';
   }
   return null;
-}
-
-/** INT9: WHICH OF `keys` MAY NOT LEAVE `char`'s record - piecesRefusal's own law, key by key: a copy, another's piece, a
- *  claim that is not this record's own waiting. A death in the zone drops every other piece (server-account/src/wild.js),
- *  never refused whole on one. Answers a Set. */
-export async function piecesBarred(db, char, keys) {
-  const out = new Set();
-  for (const part of chunks(keys, UID_CHUNK)) {
-    const m = marks(part.length, 2);
-    const copies = await db.prepare(`SELECT uid FROM item_dupes WHERE char_id = ?1 AND uid IN (${m})`).bind(char, ...part).all();
-    for (const x of copies?.results ?? []) out.add(/** @type {any} */ (x).uid);
-    const r = await db.prepare(`SELECT uid, char_id, state, claim_char FROM item_uids WHERE uid IN (${m}) AND (char_id != ?1 OR state != 'held' OR claim_char IS NOT NULL)`).bind(char, ...part).all();
-    for (const x of /** @type {any[]} */ (r?.results ?? [])) out.add(x.uid);
-  }
-  return out;
 }
 
 /**

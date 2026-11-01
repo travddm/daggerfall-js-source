@@ -391,7 +391,6 @@ async function tabOf(ctx, env, tab, p, chars, body, row) {
       db.prepare("SELECT id, char_id, auction, amount, courier FROM market_bids WHERE bidder = ?1 AND state = 'high'").bind(p.id),
       db.prepare('SELECT id, char_id, provenance, item, why, arrives_at FROM market_deliveries WHERE player = ?1 AND collected = 0').bind(p.id),
       db.prepare('SELECT char_id, gold FROM market_gold WHERE player = ?1 AND gold > 0').bind(p.id),
-      db.prepare(`SELECT r, char_id, rec, until_s FROM wild_escrow WHERE char_id IN (${marks(ids.length)}) AND state = 'held'`).bind(...ids),
     ] : [];
     const [view, law, got] = await Promise.all([viewOf(bucket, c), lawOf(db, c),
       db.batch([...(tab === 'skills' ? [] : [db.prepare('SELECT uid FROM item_dupes WHERE char_id = ?1').bind(c.id)]), ...service, row])]);
@@ -404,7 +403,7 @@ async function tabOf(ctx, env, tab, p, chars, body, row) {
     const rows = flagged(view?.items ?? [], law, c.seq, locked);
     if (tab === 'equipment') return { ...head, worn: rows.filter((r) => r.where === 'carried' && r.slot != null), findings: (law?.findings ?? []).filter(isPieceFinding) };
     // INVENTORIES, EVERYWHERE: the save's own lists (this character's), and what the service holds for the account
-    const [stores, vault, listings, auctions, orders, bids, deliveries, gold, wild] = got.slice(1);
+    const [stores, vault, listings, auctions, orders, bids, deliveries, gold] = got.slice(1);
     const res = (/** @type {any} */ x) => /** @type {any[]} */ (x?.results ?? []);
     const held = [
       ...res(stores).map((s) => ({ where: 'stores', char: s.char_id, name: s.material, origin: s.origin, count: s.qty, worth: null })),
@@ -415,7 +414,6 @@ async function tabOf(ctx, env, tab, p, chars, body, row) {
       ...res(bids).map((b) => ({ where: 'escrow', char: b.char_id, auction: b.auction, name: 'gold for a high bid', count: 1, worth: b.amount + b.courier })),
       ...res(deliveries).map((d) => ({ where: 'deliveries', char: d.char_id, delivery: d.id, name: recOf(d.item).name ?? d.provenance, why: d.why, arrivesAt: d.arrives_at, count: 1, worth: null })),
       ...res(gold).map((g) => ({ where: 'market-gold', char: g.char_id, name: 'gold held at the market', count: 1, worth: g.gold })),
-      ...res(wild).map((w) => ({ where: 'escrow', char: w.char_id, wild: w.r, name: recOf(w.rec).name, until: w.until_s, count: 1, worth: null })),
     ];
     const where = ITEM_PLACES.includes(body.where) ? body.where : null;
     const q = typeof body.q === 'string' ? body.q.trim().toLowerCase().slice(0, 32) : '';

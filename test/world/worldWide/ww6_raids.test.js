@@ -18,14 +18,14 @@ import { join } from 'node:path';
 
 import {
   RAID_KEY_RE, RAID_SIG_RE, raidSig, raidLaneOfRegion, raidLaneOfKey, raidLaneOpen, RAID_LANES_BEYOND, RAID_REGION_COUNT,
-  RAID_BAY_REGIONS, RAID_LANES, RAID_ZONE_LANE, RAID_PIXEL_BOUND, raidSideOk, raidWordSane, raidDayRandom, rollRaidTowns,
+  RAID_BAY_REGIONS, RAID_LANES, RAID_PIXEL_BOUND, raidSideOk, raidWordSane, raidDayRandom, rollRaidTowns,
   raidDaySlots, raidOnSlot, raidsPerDay, raidLaneCount, RAID_SLOTS_MAX, RAID_LANE_PARTIES, raidLaneParties, raidLedgerId,
   RAID_DAY_MINUTES, RAID_START_LAST, RAID_TYPES, RAID_TARGET_MIN, RAID_TARGET_MAX, RAID_LANE_SALT,
 } from '../../../src/net/raid/raidLaw.js';
 import { readRaidReceipt } from '../../../src/net/raid/raidReceipt.js';
 import { REGION_NAMES, BAY_REGION_COUNT, regionOfTheatre, theatreOfRegion } from '../../../src/formats/mapsTables.js';
 import { THEATRE_COUNT, areaAt } from '../../../src/world/worldWide/worldGrid.js';
-import { WILD_REGION } from '../../../src/systems/wild/wildZone.js';
+import { CYRODIIL_REGION } from '../../../src/formats/mapsTables.js';
 import {
   WORLD_PIXEL_BOUND, validRaidIn, validRaidOut, parseClient, worldRoom, RELAY_VERSION,
   PIXEL_UNITS, wallMsForClassicMinutes, raidLedgerKey,
@@ -107,14 +107,13 @@ test('WW6 the law: a raid\'s key names every region of the world - a Bay region 
   assert.equal(RAID_REGION_COUNT, REGION_NAMES.length);
   assert.equal(RAID_BAY_REGIONS, BAY_REGION_COUNT);
   assert.equal(RAID_LANES, THEATRE_COUNT);
-  assert.equal(RAID_ZONE_LANE, theatreOfRegion(WILD_REGION), 'the open zone\'s lane is Cyrodiil\'s');
   assert.equal(RAID_PIXEL_BOUND, WORLD_PIXEL_BOUND);
   // the lanes: a Bay region the Bay's 0, a province its theatre, past the 71 none
   assert.deepEqual(Array.from({ length: 72 }, (_, r) => raidLaneOfRegion(r)), [...Array(62).fill(0), 1, 2, 3, 4, 5, 6, 7, 8, 9, -1]);
   for (let t = 1; t < THEATRE_COUNT; t++) assert.equal(raidLaneOfRegion(regionOfTheatre(t)), t, PROVINCE_OF_ID[t]);
   assert.deepEqual([raidLaneOfRegion(-1), raidLaneOfRegion(1.5), raidLaneOfRegion('3')], [-1, -1, -1]);
-  assert.deepEqual(RAID_LANES_BEYOND, [1, 2, 3, 4, 5, 6, 7, 8], 'every province but the open zone');
-  assert.deepEqual([raidLaneOpen(0), raidLaneOpen(8), raidLaneOpen(9), raidLaneOpen(10), raidLaneOpen(-1)], [true, true, false, false, false]);
+  assert.deepEqual(RAID_LANES_BEYOND, [1, 2, 3, 4, 5, 6, 7, 8, 9], 'every province');
+  assert.deepEqual([raidLaneOpen(0), raidLaneOpen(8), raidLaneOpen(9), raidLaneOpen(10), raidLaneOpen(-1)], [true, true, true, false, false]);
   assert.deepEqual([raidLaneOfKey('64:-1000124:600'), raidLaneOfKey('3:7:600'), raidLaneOfKey('70:-41000000:1'), raidLaneOfKey('junk')], [3, 0, 9, -1]);
   // the tuple on the world's grid
   assert.ok(RAID_SIG_RE.test(raidSig({ st: 864587, tg: 15, ty: 1, px: 2425, py: -430 })));
@@ -128,9 +127,9 @@ test('WW6 the law: a raid\'s key names every region of the world - a Bay region 
     raidSideOk(w('3:7:600', 999, 499)), raidSideOk(w('3:7:600', 0, 0)), raidSideOk(w('3:7:600', 1000, 0)), raidSideOk(w('3:7:600', 0, -1)),
     raidSideOk(w('64:-1000124:600', 2425, 270)), raidSideOk(w('64:-1000124:600', 500, 200)), raidSideOk(w('64:-1000124:600', -5, 200)),
     raidSideOk(w('70:-41000000:600', 1500, 800)), raidSideOk(w('64:-1000124:600', 8192, 0)), raidSideOk(w('junk', 1, 1)),
-  ], [true, true, false, false, true, false, true, false, false, false]);
+  ], [true, true, false, false, true, false, true, true, false, false]);
   const sane = { key: `64:-1000124:${D}`, st: D * RAID_DAY_MINUTES + 600, px: 2425, py: 270 };
-  assert.deepEqual([raidWordSane(sane), raidWordSane({ ...sane, px: 400 }), raidWordSane({ ...sane, key: `70:-41000000:${D}` }), raidWordSane({ ...sane, key: `3:7:${D}` })], [true, false, false, false]);
+  assert.deepEqual([raidWordSane(sane), raidWordSane({ ...sane, px: 400 }), raidWordSane({ ...sane, key: `70:-41000000:${D}` }), raidWordSane({ ...sane, key: `3:7:${D}` })], [true, false, true, false]);
 });
 
 // ═══ THE BAY'S LANE, TO THE BYTE ═════════════════════════════════════════════════════════════════
@@ -187,10 +186,10 @@ test('WW6 a lane\'s parties are its province\'s OWN FAUNA\'s - the mod\'s three 
     const ids = new Set();
     for (const b of BIOMES.filter((x) => x.province === prov)) for (const e of [...(ROSTERS[b.key]?.day ?? []), ...(ROSTERS[b.key]?.night ?? [])]) ids.add(e[0]);
     for (const e of TOWN_ROSTERS[prov] ?? []) ids.add(e[0]);
-    return i + 1 === RAID_ZONE_LANE ? [] : [0, 1, 2].filter((p) => kinds[p].some((k) => ids.has(k)));
+    return [0, 1, 2].filter((p) => kinds[p].some((k) => ids.has(k)));
   });
   assert.deepEqual(RAID_LANE_PARTIES.slice(1), derived, 'each province\'s own');
-  assert.deepEqual(RAID_LANE_PARTIES, [[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], []]);
+  assert.deepEqual(RAID_LANE_PARTIES, [[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], [0, 1]]);
   assert.equal(PROVINCE_OF_ID[8], 'BlackMarsh');
   assert.equal(raidLaneParties(8).includes(2), false, 'Black Marsh stands no orc');
   assert.deepEqual(raidLaneParties(0), [0, 1, 2]);
@@ -220,7 +219,6 @@ test('WW6 a lane\'s day: its own generator (the Bay\'s untouched), its raids eac
       assert.ok(raids.filter((r) => raidOnSlot({ st: r.startMinute, tg: r.attackAmount, ty: r.type }, raidDaySlots(day))).length < raids.length, 'the Bay\'s slots are not its');
     }
   }
-  assert.equal(raidDaySlots(D, RAID_ZONE_LANE).size, 0, 'the open zone draws none');
   assert.equal(raidDaySlots(D, 99).size, 0);
   assert.equal(raidLaneCount(200), RAID_SLOTS_MAX, 'never past the relay\'s slots');
   assert.deepEqual(rollRaids(D, groups, 3, raidDayRandom(D, 3), raidLaneParties(3)).map((r) => r.area), rollRaidTowns(D, groups, 3, raidDayRandom(D, 3), raidLaneParties(3)).map((r) => r.area), 'each raid keeps its area');
@@ -248,7 +246,6 @@ test('WW6 a lane\'s towns off the world\'s registry: its theatre\'s LISTED towns
   assert.ok(RAID_TOWN_TYPES.includes(T.TownHamlet) && RAID_TOWN_TYPES.includes(T.TownVillage));
   assert.equal(towns.length, 5, 'no street, no tavern, no place without its own index');
   assert.deepEqual(raidLaneGroups(places, 0, capitalStreet), [], 'the Bay\'s lane is raidRegions\' own');
-  assert.deepEqual(raidLaneGroups(places, RAID_ZONE_LANE, capitalStreet), [], 'the open zone');
   assert.deepEqual(raidLaneGroups(null, 3), []);
   assert.equal(raidLaneGroups(places, 3).flatMap((x) => x.towns).length, 6, 'no street law handed: the street a town of its own');
 });
@@ -413,12 +410,10 @@ test('WW6 the relay: a raid past the Bay is kept in its town\'s cell as the Bay\
     const rc = out.find((m) => m.k === 'rc');
     assert.equal(readRaidReceipt(rc.r).w, raidKey(r), 'the receipt names the province\'s key');
     assert.ok(validRaidOut(out.find((m) => m.k === 'cl')), 'the client takes its word back');
-    // the wrong side, the open zone, another lane's slots: no raid (struck, or dropped)
+    // the wrong side, another lane's slots: no raid (struck, or dropped)
     const junk0 = a.meters.junk ?? 0;
     await quiet(() => cell.raw(a, JSON.stringify({ t: 'raid', ...wordOf(r, { key: `3:7:${D}` }) })));
-    step(1000);   // the raid frames' own bucket
-    await quiet(() => cell.raw(a, JSON.stringify({ t: 'raid', ...wordOf(r, { key: `70:${r.locationIndex}:${D}` }) })));
-    assert.equal((a.meters.junk ?? 0) - junk0, 2, 'a Bay key past the Bay, a raid of the open zone: no honest machine\'s');
+    assert.equal((a.meters.junk ?? 0) - junk0, 1, 'a Bay key past the Bay: no honest machine is');
     // a tuple the Bay's day drew and the lane's never: on its pixel, in its window - no ledger
     const [st, tg, ty] = [...raidDaySlots(D)][0].split('.').map(Number);
     const off = { ...wordOf(r), st, tg, ty };

@@ -13,7 +13,6 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as law from '../../src/net/realm/realmTradeLaw.js';
 import { validLootItem, validLootList, generateRandomLoot, LOOT_MATRICES } from '../../src/systems/loot/loot.js';
-import { wildRecord } from '../../src/systems/wild/wildDeath.js';
 import { createAcquireWatch, ACQUIRED_FIELD } from '../../src/systems/acquireWatch.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { seededRng } from '../../src/systems/wind/wind.js';
@@ -22,7 +21,7 @@ import { ARROW_TEMPLATE } from '../../src/systems/inventory.js';
 // read off the namespace, so the code before the fix fails each pin on its own assertion rather than at the import
 const { recordIsOffered, takeTradeGoods, TRADE_VOLATILE_FIELDS } = law;
 
-test('MARK-WIRE: the receiver\'s marks are ONE list - the realm\'s volatile fields, the wire\'s clamp and a wild death\'s record all drop every one of them, `acquired` among them (mutants: the volatile list spelled out without it; the moved record keeps it)', () => {
+test('MARK-WIRE: the receiver\'s marks are ONE list - the realm\'s volatile fields, the wire\'s clamp drop every one of them, `acquired` among them (mutants: the volatile list spelled out without it; the moved record keeps it)', () => {
   assert.deepEqual(law.RECEIVER_MARKS, ['equipSlot', 'questItem', ACQUIRED_FIELD, 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's; AUDIT STEED1: and its food's clock, its owner's character's
   const dagger = createWeapon(113, 1, () => 0.5);
   for (const k of law.RECEIVER_MARKS) {
@@ -31,7 +30,6 @@ test('MARK-WIRE: the receiver\'s marks are ONE list - the realm\'s volatile fiel
       : { ...JSON.parse(JSON.stringify(dagger)), [k]: k === 'equipSlot' ? 3 : k === 'wagonEntry' ? 'public' : k === 'appearance' ? { t: 120, m: 6, v: 0 } : true };   // WAGONS2-VISIT (AUDIT): a door's word is one of a home's
     const wire = validLootItem(rec);
     assert.equal(k in wire, false, `the wire's clamp strips ${k}`);
-    assert.equal(k in wildRecord(rec), false, `a wild death's record strips ${k}`);
     assert.ok(recordIsOffered(rec, wire), `a record carrying ${k} is its own wire projection`);
   }
   // a worn piece and a quest's never leave (tradeableRecord); a piece marked `acquired` does, and arrives unmarked

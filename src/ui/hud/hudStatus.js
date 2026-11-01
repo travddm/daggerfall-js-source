@@ -221,13 +221,6 @@ export const STATUS_GLYPHS = Object.freeze({
     'kcccccccccccccck', 'kkkaaaaaaaaaakkk', '..kkaaaaaaaakk..', '...kkaaaaaakk...',
     '....kkaaaakk....', '.....kkaakk.....', '......kkkk......', '................',
   ] }),
-  // WILD1 (systems/wild/wildZone.js): two blades crossed over the zone's blood - the open zone, on both skins
-  wild: Object.freeze({ pal: { a: '#cfd4dc', b: '#ffffff', g: '#c08a3e', c: '#a8241a' }, rows: [
-    'kkk..........kkk', 'kbkk........kkbk', 'kabkk......kkbak', 'kkabkk....kkbakk',
-    '.kkabkk..kkbakk.', '..kkabkkkkbakk..', '...kkabkkbakk...', '....kkabbakk....',
-    '....kkabbakk....', '...kkabkkbakk...', '.kkkabkkkkbakkk.', '.kgggkk..kkgggk.',
-    '.kkckk....kkckk.', '.kcck......kcck.', '.kkkk......kkkk.', '................',
-  ] }),
   // MENTOR2 (systems/mentorText.js mentorHudTile): a tall figure in gold, its arm on a smaller one's shoulder in blue
   mentor: Object.freeze({ pal: { a: '#e8c070', b: '#fff0c8', c: '#8fb8ff', d: '#d8e6ff' }, rows: [
     '.kkkkk..........', '.kbaak..........', '.kbaak..........', '.kaaak..........',
@@ -340,18 +333,15 @@ export function needGlyph(chip) {
 /**
  * The widget's tiles, in the order the foot row read them: the spells (mine, then others'), the set powers, the
  * poisons and diseases, the needs.
- * @param {{ spells?: any[], powers?: any[], afflictions?: any[], needs?: any[], rested?: { minutes: number }|null, zone?: { name: string, foot?: string|null }|null, rules?: { level: string, name: string, foot?: string|null }|null, mentor?: { name: string, foot?: string|null }|null }} lists - `spells` ui/enhanced/enhancedHud.js
+ * @param {{ spells?: any[], powers?: any[], afflictions?: any[], needs?: any[], rested?: { minutes: number }|null, rules?: { level: string, name: string, foot?: string|null }|null, mentor?: { name: string, foot?: string|null }|null }} lists - `spells` ui/enhanced/enhancedHud.js
  *   effectRows, `powers` the host's set chips (systems/sigil/sigilSetPowers.js setHudChips), `afflictions` afflictionRows,
- *   `needs` survivalHudChips, `rested` REST1's night interval (its real minutes left), `zone` WILD1's open zone (its
- *   tile first), `rules` EVENT-RULES' made level (ui/hud/statusTips.js madeRulesTile - first), `mentor` MENTOR2's
+ *   `needs` survivalHudChips, `rested` REST1's night interval (its real minutes left), `rules` EVENT-RULES' made level (ui/hud/statusTips.js madeRulesTile - first), `mentor` MENTOR2's
  * @returns {StatusTile[]}
  */
-export function statusTiles({ spells = [], powers = [], afflictions = [], needs = [], rested = null, zone = null, rules = null, mentor = null } = {}) {
+export function statusTiles({ spells = [], powers = [], afflictions = [], needs = [], rested = null, rules = null, mentor = null } = {}) {
   /** @type {StatusTile[]} */
   const out = [];
   const tile = (t) => out.push({ foot: null, blink: false, item: false, recovering: false, spell: null, glyph: null, set: null, bundle: null, endable: false, say: null, cost: false, ...t });
-  // WILD1: the open zone first - where the player stands is the first thing a glance should say there
-  if (zone) tile({ key: 'wild', kind: 'danger', name: String(zone.name ?? ''), glyph: 'wild', foot: zone.foot ?? null });
   // EVENT-RULES: the made level's own, first - its
   // regeneration's pause at its foot while it runs
   if (rules) tile({ key: 'rules', kind: 'warn', name: String(rules.name ?? ''), glyph: 'rules', foot: rules.foot ?? null, level: String(rules.level ?? '') });

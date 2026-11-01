@@ -15,8 +15,8 @@
 //
 // EVERYWHERE A STRANGER CANNOT FIGHT ME (CROWD-WIDE, 2026-10-23). The
 // count cut a gate's court alone until then: the street, a building and a dungeon hold duels, arena bouts and battles,
-// where a player cut from the screen could be the one fighting me. Now it cuts everywhere but where that can be so - the
-// open zone (WILD1's fair ground, its sea and its dungeons among it), while I am entered in a siege or a Royal Tourney,
+// where a player cut from the screen could be the one fighting me. Now it cuts everywhere but where that can be so - while I
+// am entered in a siege or a Royal Tourney,
 // an arena's room - and under the travel view, where nothing is cut (OW-PEERS, as PEER-RANGE). A gate's court is cut
 // whatever I am entered in: nobody fights anybody there but him. A player past the Other players card's draw distance is
 // cut first (PEER-RANGE, net/peer/peerRange.js), and this count is taken from the players within it. AUDIT CROWD-WIDE
@@ -111,7 +111,7 @@ export const crowdKinHidden = (f) => {
 
 /**
  * THE HOST'S CROWD - `cut(peers, o)`: the peers drawn this frame, the places held from the frame before. `peers` itself
- * when every one is drawn, else a list refilled each frame; where the count does not cut (`o.on` false - the open zone,
+ * when every one is drawn, else a list refilled each frame; where the count does not cut (`o.on` false -
  * a battle, an arena, the travel view) every peer, and the held places forgotten - the next place it cuts chooses
  * afresh. `shows(id)`: false only for a player the last cut left out by the count - one it never saw (filtered before
  * it, as a player below deck is, or not yet in the room) is not its to answer for, PEER-RANGE's law (AUDIT CROWD-WIDE
