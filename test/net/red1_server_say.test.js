@@ -18,8 +18,8 @@
 //
 // NOTHING HERE IS A NEW CREDENTIAL. That is the design: no admin
 // password, no second route, no separate key - each would be another
-// thing to leak and another thing to remember to revoke. A handle
-// taken off DEVELOPER_HANDLES stops being able to do this within one
+// thing to leak and another thing to remember to revoke. An account whose Admin
+// role is taken off stops being able to do this within one
 // token's life, with nothing to clear anywhere.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -142,11 +142,11 @@ test('RED1: even a developer is rated - the bucket is the socket\'s, and it is n
   assert.equal(ofType(other, 'chat').length, 1, 'the two rates are separate spends');
 });
 
-test('RED1: the grant is the SAME fact as the glyph beside the name - taking the handle off the list takes both', async () => {
+test('RED1: the grant is the SAME fact as the glyph beside the name - taking the Admin role off the account takes both', async () => {
   // This is the whole design, driven rather than argued: there is no
   // second credential. A developer reconnects with a token that no
   // longer carries the glyph - which is exactly what the service mints
-  // once a handle leaves DEVELOPER_HANDLES - and stops being able to
+  // once the Admin role leaves the account - and stops being able to
   // do this, with nothing cleared anywhere.
   const r = fakeRoom('chat:world');
   // THE WATCHER GOES IN FIRST, so the developer's arrival reaches it as

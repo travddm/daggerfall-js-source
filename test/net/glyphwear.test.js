@@ -16,9 +16,9 @@ const claimsOf = (token) => JSON.parse(Buffer.from(token.split('.')[1], 'base64u
 const memStore = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
 
 test('GLYPH-WEAR law: hidden is the stored choice read against what is true now; shown is the rest; only a true glyph may be pressed (mutants: a lapsed glyph still "hidden"; a glyph not true of the player hideable)', () => {
-  const env = { DEVELOPER_HANDLES: 'Dev', MODERATOR_HANDLES: 'Dev' };
+  const env = {};
   const nowS = 2_000_000_000;
-  const row = { handle: 'Dev', created_at: 1, glyphs_off: 'mod sprout' };
+  const row = { handle: 'Dev', created_at: 1, glyphs_off: 'mod sprout', staff_admin: 1, staff_mod: 1 };
   assert.deepEqual(glyphsOf(row, env, nowS), ['dev', 'mod']);
   assert.deepEqual(glyphsHidden(row, env, nowS), ['mod'], 'the sprout is long gone - not "hidden", just not true');
   assert.deepEqual(glyphsShown(row, env, nowS), ['dev']);
@@ -27,11 +27,11 @@ test('GLYPH-WEAR law: hidden is the stored choice read against what is true now;
   assert.equal(glyphRefusal('dev', row, env, nowS), null);
   assert.equal(glyphRefusal('dm', row, env, nowS), 'not-held');
   assert.equal(glyphRefusal('crown', row, env, nowS), 'no-glyph');
-  assert.deepEqual(glyphsShown({ handle: 'Dev', created_at: 1 }, env, nowS), ['dev', 'mod'], 'a row that never chose shows everything');
+  assert.deepEqual(glyphsShown({ handle: 'Dev', created_at: 1, staff_admin: 1, staff_mod: 1 }, env, nowS), ['dev', 'mod'], 'a row that never chose shows everything');
 });
 
 test('GLYPH-WEAR service: /v1/account/glyph hides and shows; the token keeps `g` whole and signs `gx` beside it; the answer says both (mutants: the hidden glyph dropped from `g`, so /red goes with the paint)', async () => {
-  const { call, registered } = await standService({ DEVELOPER_HANDLES: 'Mack', MODERATOR_HANDLES: 'Mack' });
+  const { call, registered } = await standService({ SEAT_ADMINS: 'Mack', SEAT_MODERATORS: 'Mack' });
   const me = await registered('Mack');
   let r = await call('/v1/account/glyph', { glyph: 'dev', on: false }, me.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));

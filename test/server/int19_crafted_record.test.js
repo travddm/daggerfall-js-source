@@ -34,7 +34,7 @@ const PV = 'a19a19a19a19a190';
 const PV2 = 'b19b19b19b19b190';
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', MODERATOR_HANDLES: 'Asynian', DEVELOPER_HANDLES: 'Lattymoy' });   // STAFF-PANEL2-FIX: a pull is a developer's
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_MODERATORS: 'Asynian', SEAT_ADMINS: 'Lattymoy' });   // STAFF-PANEL2-FIX: a pull is a developer's
   const raw = s.env.DB._raw;
   const fund = (who, marks) => raw.prepare('INSERT INTO marks (account, balance) VALUES (?, ?) ON CONFLICT (account) DO UPDATE SET balance = excluded.balance').run(who.id, marks);
   /** A crafted piece this account owns and made, as the anvil writes it (its maker `maker`, a character of the account). */

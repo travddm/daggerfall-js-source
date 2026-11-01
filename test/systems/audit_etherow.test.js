@@ -56,7 +56,7 @@ test('AUDIT ETHER-OW C2-1, the service: the day\'s three read from witnessed gro
   Date.now = () => (DAY0 * DAY + 60) * 1000;
   try {
     const stand = async (pixels) => {
-      const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+      const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
       const raw = s.env.DB._raw;
       const witnesses = [await s.registered('Wita'), await s.registered('Witb'), await s.registered('Witc')];
       for (const [x, y, region] of pixels) {

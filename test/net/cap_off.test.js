@@ -55,7 +55,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
   const realNow = Date.now;
   Date.now = () => NOON * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
     const day = utcDay(NOON);

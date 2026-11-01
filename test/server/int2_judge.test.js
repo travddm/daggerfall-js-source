@@ -29,7 +29,7 @@ const dagger = () => createWeapon(113, 1, seeded(7));
 const rareDagger = () => applyRarity(dagger(), 'rare', seeded(11));
 
 async function stand() {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const put = async (who, R, save, { summary = null, seq = null } = {}) => {
     const at = R.at();

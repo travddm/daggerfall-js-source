@@ -42,7 +42,7 @@ async function stand(extra = {}) {
   _resetStatusForTests();
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY + SAFE_LAW_PATH, ...extra,
   });
   const asked = [];

@@ -81,7 +81,7 @@ test.after(() => { Date.now = realNow; });
 async function stand({ open = 'on', factions = [41, 368, 108], members = [41, 368], reps = { 41: 10, 368: 5, 40: 0 }, extra = {} } = {}) {
   clock(T0);
   forgetChapters();
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra,Wit0,Wit1,Wit2', ...extra });   // the witnesses are developers: a town is witnessed at `dev` as at `on`
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra,Wit0,Wit1,Wit2', ...extra });   // the witnesses are developers: a town is witnessed at `dev` as at `on`
   const raw = s.env.DB._raw;
   for (let i = 0; i < 3; i++) {
     const w = await s.registered(`Wit${i}`);

@@ -50,7 +50,7 @@ const entryOf = (id, meshSha, extra = {}) => ({ v: 1, id, name: 'Lantern post', 
 
 async function theStore() {
   poi.forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw, headers = {} } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

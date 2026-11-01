@@ -109,16 +109,16 @@ const lawStands = (c) => c?.law_sig != null && !lawExcused(c.law_excused, c.law_
  *  Equipment tab's; the rest (the level, attributes, skills, gold: judge.js characterFindings) the Skills tab's. @param {any} f */
 export const isPieceFinding = (f) => f?.list != null || f?.code === 'provenance' || f?.code === 'uid';
 
-/** EVERY HANDLE A ROLE OR TITLE LIST NAMES - any `*_HANDLES` the config holds (titles.js, staff.js OWNER_HANDLES), and the
- *  handles DISCORD_MODERATORS and OWNER_KEYS bind - folded as the lists fold them (design doc, Weak spots: "Rename can hand
+/** EVERY HANDLE A TITLE LIST NAMES - any `*_HANDLES` the config holds (titles.js), and the
+ *  handles OWNER_KEYS binds - folded as the lists fold them (design doc, Weak spots: "Rename can hand
  *  out power, because role lists are handles"). @param {any} env */
 export function listedHandles(env) {
   const out = new Set();
   for (const [k, v] of Object.entries(env ?? {})) {
     if (k.endsWith('_HANDLES')) for (const h of handleList(v)) out.add(h);
-    if (k === 'DISCORD_MODERATORS' || k === 'OWNER_KEYS') {
+    if (k === 'OWNER_KEYS') {
       for (const pair of String(v ?? '').split(',')) {
-        const h = pair.split(':')[k === 'OWNER_KEYS' ? 0 : 1]?.trim().toLowerCase();
+        const h = pair.split(':')[0]?.trim().toLowerCase();
         if (h) out.add(h);
       }
     }

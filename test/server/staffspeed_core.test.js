@@ -19,7 +19,7 @@ const b64url = (bytes) => Buffer.from(bytes).toString('base64url');
 async function stand() {
   const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = b64url(new Uint8Array(await subtle.exportKey('raw', pair.publicKey)));
-  const s = await standService({ DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
+  const s = await standService({ SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
   await s.registered('SirMcMobdon');
   await s.registered('Asynian');
   const staff = async (path, body = {}, token = null) => {

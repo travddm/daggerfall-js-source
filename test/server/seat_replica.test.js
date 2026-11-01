@@ -14,12 +14,12 @@ import { countedDb } from '../../server-account/src/metrics.js';
 import { standService, d1Position, T0 } from '../accountDb.mjs';
 
 const DAY = 86400;
-const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
+const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
 const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
 const PLAYER = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * DAY };
-const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY };
+const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY, staff_admin: 1 };
 
 /** The service's database with three witnesses agreeing on Anticlere, its seat witness reads counted (`c.n`) and, with
  *  `c.fail` set, refused as an overloaded D1 refuses them - with `c.hold` set, held until `c.release()` first;

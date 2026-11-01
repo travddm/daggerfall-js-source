@@ -67,7 +67,7 @@
 //   POST /v1/mod/grant-feed  <batch>                 -> { ok, read }   (GRANT2: a cell's window of spawn grant asks, signed - x-relay-grant-sig)
 //   POST /v1/discord/interactions <interaction>      -> Discord's answer   (SAFE8: signed - x-signature-ed25519, x-signature-timestamp)
 // A BANNED ACCOUNT is answered 403 { error: 'banned', until, reason } on every door behind a session but signing out.
-// PRIVATE-REPORT, a registered player's private report to the readers REPORT_READER_HANDLES names (reports.js):
+// PRIVATE-REPORT, a registered player's private report to the Owner accounts (reports.js):
 //   POST /v1/report/send { kind, subject, body, context?, rid } -> { ok, id, sentAt } | { ok, repeat, id, sentAt }
 //   POST /v1/report/mine {}                    -> { reports: [{ id, kind, subject, sentAt, read, state }], max }
 //   POST /v1/report/inbox { which? }           -> { which, reports: [{ ...head, from }], unread, open, max }   (a reader's)
@@ -2264,7 +2264,7 @@ const service = {
       }
 
       // PRIVATE-REPORT: A
-      // PLAYER'S PRIVATE REPORT - an exploit, a bug, a security hole - to the readers REPORT_READER_HANDLES names, and
+      // PLAYER'S PRIVATE REPORT - an exploit, a bug, a security hole - to the Owner accounts, and
       // their inbox (reports.js). A registered account's alone, the letters' wall with its own word: a guest is a device,
       // and a report a reader cannot answer to anybody is one the next storage clear forgets who sent.
       if (path.startsWith('/v1/report/')) {

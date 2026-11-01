@@ -81,7 +81,7 @@ test('POI-4b THE LAW: a shelf entry is a POI\'s parts and lights without a place
 
 async function theStore() {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

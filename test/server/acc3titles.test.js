@@ -29,7 +29,7 @@ import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { register } from '../../server-account/src/accounts.js';
 import {
-  FOUNDER_UNTIL, SPROUT_S, developerHandles, isDeveloper,
+  FOUNDER_UNTIL, SPROUT_S, isDeveloper,
   titlesHeld, glyphsOf, titleWorn, equipRefusal, wardrobeOf,
 } from '../../server-account/src/titles.js';
 import {
@@ -119,43 +119,42 @@ test('ACC3: the sprout EXPIRES because time passed - nothing runs, nothing is cl
   assert.equal(SPROUT_S, 14 * 24 * 60 * 60, 'two weeks, as Mac wrote it');
 });
 
-test('ACC3: a developer is a handle in CONFIG, so taking the handle off takes the title and the glyph with it', () => {
-  const env = { DEVELOPER_HANDLES: 'mack, Someone_Else' };
-  assert.deepEqual([...developerHandles(env)], ['mack', 'someone_else'], 'trimmed and case-folded - handle_lc is what uniqueness is really on');
-  const dev = { handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 };   // FOUNDER3: first played after the cutoff, so no Founder beside the Developer
+test('ACC3: a developer is a role on the ACCOUNT (staff_admin), so taking the role off takes the title and the glyph with it', () => {
+  const env = {};
+  const dev = { handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1, staff_admin: 1 };   // FOUNDER3: first played after the cutoff, so no Founder beside the Developer
   assert.ok(isDeveloper(dev, env));
   assert.deepEqual(titlesHeld(dev, env), ['developer']);
-  assert.deepEqual(glyphsOf(dev, env, NOW), ['dev'], 'the glyph rides the same list as the title - one grant, two faces');
+  assert.deepEqual(glyphsOf(dev, env, NOW), ['dev'], 'the glyph rides the same role as the title - one grant, two faces');
 
-  // THE REMOVAL IS THE POINT. Nothing is written anywhere, so dropping
-  // the handle from the config is the whole of revoking it.
-  assert.deepEqual(titlesHeld(dev, { DEVELOPER_HANDLES: '' }), []);
-  assert.deepEqual(glyphsOf(dev, { DEVELOPER_HANDLES: '' }, NOW), []);
-  assert.deepEqual(titlesHeld(dev, {}), [], 'a service with no list at all grants nobody');
+  // THE REMOVAL IS THE POINT. Nothing else is written, so clearing the
+  // role on the row is the whole of revoking it.
+  assert.deepEqual(titlesHeld({ ...dev, staff_admin: 0 }, env), []);
+  assert.deepEqual(glyphsOf({ ...dev, staff_admin: 0 }, env, NOW), []);
+  assert.equal(titlesHeld(dev, { DEVELOPER_HANDLES: '' }).length, 1, 'the role is on the row: a list in the env neither adds nor removes it');
+  assert.deepEqual(titlesHeld({ handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 }, { DEVELOPER_HANDLES: 'mack' }), [], 'a handle on an env list, with no role on the row, is nobody');
 
-  // A GUEST HAS NO HANDLE, so a guest can never be in a list of
-  // handles - the list names people and a guest row is a device.
-  assert.equal(isDeveloper({ handle: null }, env), false);
+  // A GUEST HAS NO HANDLE and no role: a guest row is a device.
+  assert.equal(isDeveloper({ handle: null, staff_admin: 0 }, env), false);
   assert.equal(isDeveloper({ handle: '' }, env), false);
 });
 
 test('ACC3: HOLDING IS NOT WEARING - a stored title stops being worn the moment the grant behind it lapses', () => {
-  const env = { DEVELOPER_HANDLES: 'mack' };
-  const dev = { handle: 'mack', registered_at: FOUNDER_UNTIL - 1, created_at: 0, title: 'developer' };
+  const env = {};
+  const dev = { handle: 'mack', registered_at: FOUNDER_UNTIL - 1, created_at: 0, title: 'developer', staff_admin: 1 };
   assert.deepEqual(titlesHeld(dev, env), ['founder', 'developer'], 'both, in the order they are offered');
   assert.equal(titleWorn(dev, env), 'developer');
 
-  // OFF THE LIST, AND THE COLUMN STILL SAYS `developer`. Nothing
+  // THE ROLE TAKEN OFF, AND THE COLUMN STILL SAYS `developer`. Nothing
   // rewrote the row and nothing had to: a grant is a fact checked now.
-  assert.equal(titleWorn(dev, {}), undefined);
-  assert.equal(wardrobeOf(dev, {}, NOW).title, null, 'the wardrobe says null rather than a title nobody holds');
+  assert.equal(titleWorn({ ...dev, staff_admin: 0 }, env), undefined);
+  assert.equal(wardrobeOf({ ...dev, staff_admin: 0 }, env, NOW).title, null, 'the wardrobe says null rather than a title nobody holds');
 
   assert.equal(titleWorn({ ...dev, title: null }, env), undefined);
   assert.equal(titleWorn({ ...dev, title: 'emperor' }, env), undefined, 'a column somebody edited by hand is not a grant');
 });
 
 test('ACC3: equip refuses what is not held and what is not a title, and taking it off is always allowed', () => {
-  const env = { DEVELOPER_HANDLES: 'mack' };
+  const env = {};
   const founder = { handle: 'notmack', registered_at: FOUNDER_UNTIL - 1, created_at: 0 };
   assert.equal(equipRefusal('founder', founder, env), null);
   assert.equal(equipRefusal('developer', founder, env), 'not-held');
@@ -211,7 +210,7 @@ test('ACC3: the token carries the badge, and a body edited to claim one that is 
 
 // ── THE SERVICE, end to end ─────────────────────────────────────────
 
-async function stand(vars = {}) {
+async function stand({ admins = [], ...vars } = {}) {
   _resetKeyForTests();
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pkcs8 = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
@@ -235,6 +234,7 @@ async function stand(vars = {}) {
   const account = async (handle, { registeredAt = FOUNDER_UNTIL - 1, createdAt = null } = {}) => {
     const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
     await register({ db: env.DB, subtle, rand, nowS: registeredAt }, guest.id, { handle, password: 'a-long-enough-password' });
+    if (admins.includes(handle)) await env.DB.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').bind(guest.id).run();   // STAFF-ROLES-BY-ACCOUNT
     if (createdAt !== null) await env.DB.prepare('UPDATE players SET created_at = ? WHERE id = ?').bind(createdAt, guest.id).run();
     return guest;
   };
@@ -242,14 +242,14 @@ async function stand(vars = {}) {
 }
 
 test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one of it', async () => {
-  const { call, account } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call, account } = await stand({ admins: ['mack'] });
   const me = await account('mack');
 
   const seen = (await call('GET', '/v1/account', undefined, me.secret)).body;
   assert.deepEqual(seen.wardrobe.titles, ['founder', 'developer']);
   assert.equal(seen.wardrobe.title, null, 'nothing is worn until it is equipped - null is a perfectly good answer and is what every existing row gets');
   assert.ok(seen.wardrobe.glyphs.includes('dev'));
-  assert.equal('title' in seen.account, false, 'the wardrobe is its own field: an account view is the ROW, a wardrobe is the row read against config and a clock');
+  assert.equal('title' in seen.account, false, 'the wardrobe is its own field: an account view is the ROW, a wardrobe is the row read against the roles and a clock');
 
   const on = await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
   assert.equal(on.status, 200);
@@ -266,7 +266,7 @@ test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one o
 });
 
 test('ACC3: a title nobody granted cannot be equipped by a client that asks nicely', async () => {
-  const { call, account } = await stand({ DEVELOPER_HANDLES: 'someone-else' });
+  const { call, account } = await stand({ admins: ['someone-else'] });
   const me = await account('mack');
   // 403 AND NOT 401: the credential is GOOD and the title is simply
   // not theirs - the same reading the save wall takes.
@@ -284,7 +284,7 @@ test('ACC3: a title nobody granted cannot be equipped by a client that asks nice
 });
 
 test('ACC3: the minted token carries what the service DERIVED, not what the caller asked for', async () => {
-  const { call, account, pubB64, env } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call, account, pubB64, env } = await stand({ admins: ['mack'] });
   // OLD ENOUGH TO HAVE LOST THE SPROUT, so the only glyph in play
   // here is the developer's and the assertion below means what it says.
   const me = await account('mack', { createdAt: 1 });
@@ -300,11 +300,11 @@ test('ACC3: the minted token carries what the service DERIVED, not what the call
   assert.ok(r.claims.g.includes('dev'));
 
   // THE BADGE LAPSES ON THE NEXT TOKEN, with no cron and no column to
-  // clear: take the handle off the list and both halves of the
+  // clear: take the role off the account and both halves of the
   // developer grant are gone from what gets signed. The worn title
   // survives in the column and simply stops being worn.
   await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
-  env.DEVELOPER_HANDLES = '';
+  await env.DB.prepare('UPDATE players SET staff_admin = 0 WHERE id = ?').bind(me.id).run();
   const after = await call('POST', '/v1/auth/token', { secret: me.secret });
   assert.equal(after.body.title, null);
   assert.deepEqual(after.body.glyphs, [], 'the dev glyph went with the grant');
@@ -314,7 +314,7 @@ test('ACC3: the minted token carries what the service DERIVED, not what the call
 });
 
 test('ACC3: a guest gets a token and no badge - the wall for a title is the same one the saves have', async () => {
-  const { call } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call } = await stand({ admins: ['mack'] });
   const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
   const seen = (await call('GET', '/v1/account', undefined, guest.secret)).body;
   assert.deepEqual(seen.wardrobe.titles, [], 'Founder is for registered accounts (Mac)');

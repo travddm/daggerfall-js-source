@@ -117,7 +117,7 @@ test('MARKET-ANY law: a looted weapon and armour list from the pack; bound (a De
 // ─── THE SERVICE ─────────────────────────────────────────────────────
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', MODERATOR_HANDLES: 'Asynian', DEVELOPER_HANDLES: 'Lattymoy' });   // STAFF-PANEL2-FIX: a pull is a developer's
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_MODERATORS: 'Asynian', SEAT_ADMINS: 'Lattymoy' });   // STAFF-PANEL2-FIX: a pull is a developer's
   const raw = s.env.DB._raw;
   const record = (who) => {
     const row = raw.prepare('SELECT obj, seq FROM realm_characters WHERE id = ?').get(who.character);

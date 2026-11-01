@@ -79,7 +79,7 @@ async function stand(extra = {}) {
   let now = T0;
   const realNow = Date.now;
   Date.now = () => now * 1000;
-  const s = await standService({ DEVELOPER_HANDLES: 'mac', ...extra });
+  const s = await standService({ SEAT_ADMINS: 'mac', ...extra });
   const raw = s.env.DB._raw;
   const eve = await s.seated('eve');
   const play = (seconds) => { raw.prepare('UPDATE players SET played_s = played_s + ? WHERE id = ?').run(seconds, eve.id); now += seconds; };

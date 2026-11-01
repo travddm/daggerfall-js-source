@@ -341,7 +341,7 @@ test('AUDIT POI P4 AN ENTRY INTO THE SHELF, NEVER OVER ANOTHER: its id free, put
 
 test('AUDIT POI P4 ON THE REAL WORKER: a builder\'s entry changed since the pack was made is left as it is - another builder\'s import puts one copy however often it runs, and the approver\'s finds that copy (the approver\'s import put the pack\'s older copy over the builder\'s current one; another builder\'s made a copy each time)', async () => {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), mac = await s.registered('Mac');
   const ioOf = (who) => ({ fetch: s.fetch, base: 'https://accounts.invalid', secret: who.secret });
   const io = (who) => ({ putAsset: (b, k) => poiPutAsset(ioOf(who), b, k), history: (id) => poiHistory(ioOf(who), id), shelfEntry: (id) => poiShelfEntry(ioOf(who), id), shelve: (it) => poiShelve(ioOf(who), it), rand: (b) => crypto.getRandomValues(b) });

@@ -46,7 +46,7 @@ async function mintSiege(claims, key, nowS) {
 async function stood(t, extra = {}) {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devra', ...extra });
+  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Devra', ...extra });
   const raw = svc.env.DB._raw;
   // every statement carries its SQL, so a test can know the Turning's batch (its first statement the week's own key)
   const prep = svc.env.DB.prepare.bind(svc.env.DB);

@@ -15,10 +15,11 @@
 //     application's Ed25519 key; the signature (DISCORD_PUBLIC_KEY, the application's public key - not a secret) is
 //     checked over the exact bytes before anything is read, as the Patreon webhook's is.
 //
-// WHO MAY ACT IS THE GAME'S QUESTION, NOT DISCORD'S. DISCORD_MODERATORS pairs a Discord user's id with a game handle
-// ("<discord id>:<handle>,..."), and an act is that account's act: it must hold MODERATOR_HANDLES or DEVELOPER_HANDLES
-// now (titles.js canModerate) - so taking a handle off the list takes the buttons with it, a Discord role never grants
-// anything, and the record names the moderator's own account (sanctions.js). MOD1's law, through another door.
+// WHO MAY ACT IS THE GAME'S QUESTION, NOT DISCORD'S. The `staff_discord` table binds a Discord user's id to an ACCOUNT id
+// (set by the operator, tools/staffRole.mjs - never by a name), and an act is that account's act: it must hold a staff
+// role now (titles.js canModerate) - so taking the role off the account takes the buttons with it, a Discord role never
+// grants anything, a registered name grants nothing, and the record names the moderator's own account (sanctions.js).
+// MOD1's law, through another door.
 //
 // A PRESS ACTS ONCE (AUDIT SAFE DISCORD-3): the case is claimed in the statement that marks it (`claimed_at`), so a
 // double click or two moderators at once act once, and the other is shown the card as it now stands. A button never
@@ -76,16 +77,6 @@ const HEX_KEY_RE = /^[0-9a-f]{64}$/i;
 export const discordOn = (env) => SNOWFLAKE_RE.test(String(env?.DISCORD_MOD_CHANNEL ?? '')) && typeof env?.DISCORD_BOT_TOKEN === 'string' && env.DISCORD_BOT_TOKEN.length > 0;
 /** Whether Discord's presses and commands are taken: the application's public key. @param {any} env */
 export const interactionsOn = (env) => HEX_KEY_RE.test(String(env?.DISCORD_PUBLIC_KEY ?? ''));
-
-/** DISCORD_MODERATORS read: each Discord id's game handle, lowercased. @param {any} env @returns {Map<string, string>} */
-export function discordModerators(env) {
-  const out = new Map();
-  for (const pair of String(env?.DISCORD_MODERATORS ?? '').split(',')) {
-    const [id, handle] = pair.split(':').map((s) => s?.trim() ?? '');
-    if (SNOWFLAKE_RE.test(id) && handle) out.set(id, handle.toLowerCase());
-  }
-  return out;
-}
 
 const hexBytes = (h) => new Uint8Array(String(h).match(/../g)?.map((b) => parseInt(b, 16)) ?? []);
 /** @type {{ raw: string, key: CryptoKey|null }} */
@@ -226,11 +217,10 @@ const say = (text) => {
   return { type: 4, data: { content: out || text.slice(0, SAY_MAX), flags: 64, allowed_mentions: { parse: [] } } };
 };
 
-/** The moderator's account for a Discord user, or null - a moderator in the game now, and not banned. */
+/** The moderator's account for a Discord user, or null - the account `staff_discord` binds it to, a moderator in the game now, and not banned. */
 async function actorOf(db, env, discordId, nowS) {
-  const handle = discordModerators(env).get(String(discordId ?? ''));
-  if (!handle) return null;
-  const row = await db.prepare('SELECT * FROM players WHERE handle_lc = ?1').bind(handle).first();
+  if (!SNOWFLAKE_RE.test(String(discordId ?? ''))) return null;
+  const row = await db.prepare('SELECT p.* FROM staff_discord d JOIN players p ON p.id = d.player_id WHERE d.discord_id = ?1').bind(String(discordId)).first();
   return row && canModerate(row, env) && !isBanned(row, nowS) ? row : null;
 }
 
@@ -335,7 +325,7 @@ export async function discordInteraction(ctx, env, body, { fetchFn = (u, i) => g
   if (body?.type === 1) return { type: 1 };
   const io = { fetchFn, later: later ?? ((p) => { p.catch(() => {}); }) };
   const actor = await actorOf(ctx.db, env, body?.member?.user?.id ?? body?.user?.id, ctx.nowS);
-  if (!actor) return say('Only the game\'s moderators can do that - ask a developer to add your Discord id to DISCORD_MODERATORS.');
+  if (!actor) return say('Only the game\'s moderators can do that - ask an operator to link your Discord id to your staff account (docs/operations/staff-roles.md).');
   if (body?.type === 3) return onPress(ctx, env, body, actor, io);
   if (body?.type === 2 && body?.data?.name === 'mod') return onCommand(ctx, env, body, actor, io);
   return say('Nothing to do.');

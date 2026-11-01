@@ -56,7 +56,7 @@ async function stand({ open = 'on', developers = 'Devra', moderators = 'Mora' } 
   const pkcs8 = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
   const env = {
     DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*',   // MERGE 2: SAVES, the realm's records
-    BOARD_OPEN: open, DEVELOPER_HANDLES: developers, MODERATOR_HANDLES: moderators,
+    BOARD_OPEN: open,
   };
   const call = async (path, body, bearer = null) => {
     const res = await worker.fetch(new Request(`https://accounts.invalid${path}`, {
@@ -70,6 +70,9 @@ async function stand({ open = 'on', developers = 'Devra', moderators = 'Mora' } 
   const registered = async (handle, { renown = 1 } = {}) => {
     const g = await guest();
     assert.equal((await call('/v1/auth/register', { handle, password: 'a good long one', ...ACCEPTED }, g.secret)).status, 200, `${handle} registers`);
+    // STAFF-ROLES-BY-ACCOUNT: Admin and Moderator are the account's roles, not lists
+    if (developers.split(',').includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(g.id);
+    if (moderators.split(',').includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_mod = 1 WHERE id = ?').run(g.id);
     const character = `char-${handle.toLowerCase()}`;
     if (renown > 1) {
       // RENOWN-CHAR: the character's own track again (MERGE 2 had seeded RENOWN-ACCOUNT's one track an account)
