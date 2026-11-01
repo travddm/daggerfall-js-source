@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { LAB_GRASS_HEAD, LAB_GRASS_VS, LAB_GRASS_FS, LAB_GRASS, LAB_DIM, placeLabGrass, grassRecordsOf, labBladeCorners, GRASS2_VS_EDITS, GAME_GRASS_VS, GAME_GRASS_FIELD, placeLabGrassCell, grassCellSeed, grassHash, grassVnoise, grassClump, bakedTint, LabGrassRenderer, GRASS_FAR_SEGMENTS, GRASS_PACK_BYTES, GRASS_CELL, grassPerCell, heightFloor, heightSpan, WIDTH_SPAN, LEAN_SPAN } from '../../src/render/labGrass.js';
+import { codeOnly } from '../codeOnly.mjs';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
 const lab = () => readFileSync('grass-proto.html', 'utf8');
@@ -30,7 +31,8 @@ test('GR1/GRASS2/GRASS5/GRASS6: the shaders are the lab\u2019s own but for five 
     want = want.replace(e.from, e.to);
   }
   assert.equal(noComments(LAB_GRASS_VS), noComments(want), 'the vertex stage is the lab\u2019s text with the five declared edits, and nothing else');
-  assert.equal(LAB_GRASS_FS, src.slice(fsStart, fsEnd), 'the fragment stage is the lab\u2019s text, byte for byte - GRASS2 changed no fragment law');
+  // The port's comments are edited on their own and the lab's are not, so the fragment stage compares code only.
+  assert.equal(codeOnly(LAB_GRASS_FS), codeOnly(src.slice(fsStart, fsEnd)), 'the fragment stage is the lab\u2019s code, byte for byte - GRASS2 changed no fragment law');
   const headStart = src.indexOf('const HEAD = `');
   assert.equal(LAB_GRASS_HEAD, src.slice(headStart + 'const HEAD = `'.length, src.indexOf('`;', headStart)));
   // the lab itself: height 54, and the maxima the game uses

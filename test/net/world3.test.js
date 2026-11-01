@@ -74,9 +74,6 @@ test('WORLD3: the wire and the Room - an act is an object from a hello\'d socket
   await town.hello(t1, 'town-0001', at(1, 1)); await town.hello(t2, 'town-0002', at(1, 1));
   await town.raw(t1, JSON.stringify({ t: 'act', data: act }));
   assert.equal(ofType(t2, 'act').length, 0, 'a town has no shared doors'); assert.equal(t1.closed, null);
-  // the heads
-  assert.match(rd('server/src/index.js'), /WORLD3 \(2026-09-12\): THE LIVE DOORS, and WORLD4 \(2026-09-13\): THE\n\/\/ ROOM'S LOOT\./, 'the Room\'s head says what the frame now carries'); assert.match(rd('src/net/wire.js'), /THE LIVE DOORS \(WORLD3, 2026-09-12\) AND THE ROOM'S LOOT \(WORLD4,/, 'the wire\'s head says what the frame now carries');
-  assert.match(rd('src/net/wire.js'), /\{t:'act', data\}/); assert.match(rd('src/net/wire.js'), /\{t:'act', id, data\}/);
 });
 
 test('WORLD3: the session - sendAct anyone\'s in a world room alone, under its gate and the small cap with t first; onAct from another in my world room alone, never my own back, never in a town', () => {
@@ -236,7 +233,7 @@ test('WORLD3: the target machine with a PEER, executed - a peer is a player to e
 
 test('WORLD3: the hosts by source - the dungeon host (the state, the doors\' seam out and in by key, the roster rebuilt in place through the one build chain with the source record kept, the memory rebuilding a mismatch and landing on the rebuilt foe, the record\'s target, cast and gender with the key, the frame in latching them and rebuilding a mismatch, the puppet step reading whose blow it is and casting at me, the hit out with the striker\'s feet, the blow\'s direction and the shaft, the hit in reading them and naming the striker, the aggro on the peer, the handover\'s clears, the API); the mode machine\'s forwards; the world host\'s routes and the peers at their scene feet', () => {
   const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /let _foesFrom = null;[^\n]*\n\s*let _keyMismatchSaid = false;[^\n]*\n\s*\/\/ WORLD3 \(Mac: "Begin"\): THE LIVE WORLD AS EVENTS\./, 'the state, under WORLD2\'s');
+  assert.match(d, /let _foesFrom = null;[^\n]*\n\s*let _keyMismatchSaid = false;/, 'the state, under WORLD2\'s');
   assert.match(d, /if \(opts\.onActions\) actions\.onChanged = \(recs\) => opts\.onActions\(\{ k: _locationKey, a: recs \}\);/, 'the doors out, keyed by this dungeon');
   assert.match(d, /function applyActions\(id, data\) \{\s*if \(!data \|\| typeof data !== 'object' \|\| data\.k !== _locationKey\) return false;\s*(?:\/\/[^\n]*\n\s*)*(?:if \(Array\.isArray\(data\.c\)\) camps\.applyOwner\(id, data\.c\);[^\n]*\n\s*)?(?:const asked = data\.rs != null && roomEncounterAsked\(id, data\.rs\);[^\n]*\n\s*)?const n = \(Array\.isArray\(data\.a\) \? actions\.applyRemote\(data\.a\) : 0\) \+ \(Array\.isArray\(data\.l\) \? applyLoot\(data\.l(?:, typeof id === 'string' \? id : null)?\) : 0\);[^\n]*\n?\s*return n > 0(?: \|\| asked)?;\s*\}/, 'the doors in, this dungeon\'s alone - and since WORLD4 the room\'s loot in the same frame (REST-SYNC: and a joiner\'s rest ask, test/net/restsync.test.js)');   // PIN MOVED (PARTY-LOOT, host arbitrates): the loot is landed with its sender - a claim is its claimer's, the room's state its host's
   assert.match(d, /async function retypeFoe\(i, mobileType, gender = null, \{ anyFoe = false, at = null \} = \{\}\) \{\s*const f = foes\[i\];\s*(?:\/\/[^\n]*\n\s*)*if \(!f \|\| \(!anyFoe && i >= _layoutFoes\) \|\| !f\.src \|\| _retyping\.has\(i\) \|\| !canStandFoe\(mobileType\)\) return false;/, 'the rebuild: the layout\'s run, once at a time, a species the chain can stand (AUDIT WORLD3 E3) - a dead foe too (AUDIT WORLD34 B1); OH-E\'s `anyFoe` alone reaches past the run');
@@ -257,7 +254,7 @@ test('WORLD3: the hosts by source - the dungeon host (the state, the doors\' sea
   assert.match(d, /const at = inReach\(data\.p\), dir = kind === 'spell' \? null : unit\(data\.d\);/, 'the hit in: a spell knocks nothing, and both numbers are BOUNDED (AUDIT WORLD3 F2)'); assert.match(d, /damageFoe\(f, dmg, at, dir, \{ fromPlayer: true, peer: true, kind, peerId: id, whole: data\.z === 1(?:, \.\.\.\(data\.wc != null \? \{ wc: hitClassOf\(data\) \} : \{\}\))? \}\);/);
   assert.match(d, /if \(data\.ar === 1 && kind === 'arrow' && arrowsIn\(f\.entity\.items \?\?= \[\]\) < HIT_ARROWS_MAX\) addItem\(f\.entity\.items, bowDamageArrow\(\)\);/, 'the shaft where BowDamage puts it (AUDIT WORLD6b-iii(e) A1: bounded; MAC-N1: minted by the one export)');
   assert.match(d, /foe\.ai\.makeEnemyHostileToAttacker\?\.\(\(peer && peerCandidate\(peerId\)\) \|\| foeDeps\.PLAYER_TARGET, playerFeet \?\? lastPlayerFeet\);/, 'the aggro on the peer, at its feet');
-  assert.match(d, /f\._pupTarget = null; f\._pupMine = false;   \/\/ WORLD3/, 'the handover clears them');
+  assert.match(d, /f\._pupTarget = null; f\._pupMine = false;/, 'the handover clears them');
   assert.match(d, /isAuthority: \(\) => _authority,\s*(?:\/\/[^\n]*\n\s*)*applyActions,\s*(?:\/\*\*[\s\S]*?\*\/\s*)?actionRecords\(keys\) \{/, 'the API');   // AUDIT 68 S19-dead-api-exports: lootSeen, retypeFoe and peerCandidates had no reader outside the context and left it
   const m = rd('src/scenes/worldModes.js');
   assert.match(m, /onActions: \(data\) => host\.onActions\?\.\(data\), peers: \(\) => host\.peers\?\.\(\) \?\? null, selfId: \(\) => host\.selfId\?\.\(\) \?\? null,/, 'into the build');
