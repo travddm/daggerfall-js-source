@@ -1865,8 +1865,6 @@
  "test/systems/settings.test.js": 1256,
  "test/systems/settings/settingsText.test.js": 240,
  "test/ui/settings/settingsUI.test.js": 590,
- "test/ui/shadowfang.test.js": 1404,
- "test/net/shadowfangskin.test.js": 1827,
  "test/render/shadowreach.test.js": 480,
  "test/systems/quest/sharecopy.test.js": 2483,
  "test/systems/quest/sharemend.test.js": 1112,

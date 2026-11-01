@@ -147,11 +147,11 @@ test('PROFILE-MENU: the plate wears the corner mark\'s portrait - a face handed 
 test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn has its colour rule per title, the window widens for it and keeps clear of the foot, and a phone gives it the screen (mutants: the plate\'s title colourless; the window\'s width; the short screen\'s height; Close out of reach)', async () => {
   const css = src('src/ui/enhanced/enhancedStyle.js');
   const worn = new Set();
-  // every class, the gradient title's word among them (Shadow Fang's is a gradient), an SVG's too (its class is an
+  // every class, the gradient title's word among them (the Gatebreaker's is a gradient), an SVG's too (its class is an
   // attribute) - each matched WHOLE against the composed sheet's rules (AUDIT P6: a prefix passed for its longer name,
   // `.acctworn` for `.acctworntitle`, and the comments counted)
   const face = { tag: 'canvas', className: '', children: [], get all() { return [face]; } };
-  const card = draw({ face: Promise.resolve(face), wardrobe: { titles: ['shadowfang', 'disciple'], title: 'shadowfang', glyphs: ['sprout'], auras: ['dagonfire'] } });
+  const card = draw({ face: Promise.resolve(face), wardrobe: { titles: ['gatebreaker', 'disciple'], title: 'gatebreaker', glyphs: ['sprout'], auras: ['dagonfire'] } });
   await new Promise((r) => setTimeout(r, 0));   // the face lands: `hasface` is walked too
   for (const n of card.all()) for (const c of [...cls(n), ...String(n.attrs?.class ?? '').split(/\s+/)]) if (c) worn.add(c);
   assert.ok(worn.has('acctglyphart') && worn.has('acctworn') && worn.has('hasface'), 'the walk sees the SVG, the line and the face');

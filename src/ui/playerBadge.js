@@ -78,7 +78,6 @@ export const TITLE_TEXT = Object.freeze({
   disciple: 'Disciple',              // TITLE-N: the Patreon tiers, lowest first
   apostle: 'Apostle',
   hierophant: 'Hierophant',
-  shadowfang: 'Shadow Fang',         // SHADOW-FANG: SirMcMobdon's own
   gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
   herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
   // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
@@ -136,22 +135,12 @@ export const TITLE_TEXT = Object.freeze({
  *  AURA'S WORD, as a player reads it - the Broker's offer and the account card's button. */
 export const AURA_TEXT = Object.freeze({
   dagonfire: "Dagon's Fire",
-  shadowcloak: 'Holo Shadow Cloak',   // SHADOW-CLOAK: the Shadow Fang's hooded cloak of shadow and crimson light, granted with the title
   seraphwings: 'Seraph Wings',   // SERAPH-WINGS: wings of flowing golden light, the developers' own
   turninghour: 'The Turning Hour',   // SD9c: the Brass Remnant's wheel of brass gears and gold light, one kill in eight
   firsthour: 'The First Hour',   // HOURS-FIRST: The Turning Hour in the first dawn's light, Hour's First's own, granted with the title
   maelstrom: 'The Maelstrom',   // SERPENT5: the Old Coil's whirlpool of tide and foam, one dealing ship's serpent kill in fifty
   witchfire: 'Witchfire',   // WITCH1: a coven's green fire round the feet, tallow candles in its ring, bought from a Wyrd Sister
 });
-
-/** SHADOW-FANG (2026-09-26,, and the glyph "like the reference
- *  shown" - a snarling wolf's head in profile, black, with a red eye.
- *  The two ends of that gradient, named once: every table below that
- *  paints Shadow Fang reads them from here. */
-const SHADOW_BLACK = Object.freeze([0.051, 0.027, 0.035, 1]);    // #0d0709 - black, a breath of blood in it
-const SHADOW_CRIMSON = Object.freeze([0.827, 0.098, 0.235, 1]);  // #d3193c
-/** The wolf's eye, the one red that is not the gradient's (the reference's). */
-const SHADOW_EYE = Object.freeze([1, 0.133, 0.18, 1]);           // #ff222e
 
 /** WB9g: THE GATEBREAKER, the
  *  Oblivion Gate's own fire - a coal's crimson, burning through the fire's orange into an ember's gold. */
@@ -203,9 +192,6 @@ export const TITLE_RGBA = Object.freeze({
   disciple: Object.freeze([0.369, 0.784, 0.722, 1]),  // #5ec8b8
   apostle: Object.freeze([0.616, 0.486, 0.941, 1]),   // #9d7cf0
   hierophant: Object.freeze([0.910, 0.451, 0.749, 1]), // #e873bf
-  // SHADOW-FANG: the gradient's crimson end - the colour a face that cannot draw a gradient uses (the account
-  // card's button, the classic face's edge), and the glyph's outline
-  shadowfang: SHADOW_CRIMSON,
   // WB9g: the fire at the gradient's middle - the colour a face that cannot draw a gradient uses
   gatebreaker: GATEBREAKER_FIRE,
   // HERALD: AZURE, heraldry's own
@@ -275,13 +261,10 @@ export const TITLE_RGBA = Object.freeze({
   deepbane: Object.freeze([0.118, 0.353, 0.553, 1]),            // #1e5a8d
 });
 
-/** SHADOW-FANG: A TITLE DRAWN AS A GRADIENT - its stops, RGBA 0..1, left
- *  to right along the word. A title named here is painted by `titlePaint`
- *  on every DOM face and a letter at a time by the classic one; a title
- *  that is not keeps its one colour above. "Shadow" in the black, "Fang"
- *  in the crimson. */
+/** A TITLE DRAWN AS A GRADIENT - its stops, RGBA 0..1, left to right along the word. A title named here is painted by
+ *  `titlePaint` on every DOM face and a letter at a time by the classic one; a title that is not keeps its one colour
+ *  above. */
 export const TITLE_GRADIENT = Object.freeze({
-  shadowfang: Object.freeze([SHADOW_BLACK, SHADOW_CRIMSON]),
   gatebreaker: Object.freeze([GATEBREAKER_CRIMSON, GATEBREAKER_FIRE, GATEBREAKER_EMBER]),   // WB9g: coal, fire, ember
   hourbreaker: Object.freeze([HOUR_BRASS, HOUR_GOLD, HOUR_LIGHT]),   // SD9b: the Remnant's brass into the light of its heart
   hoursfirst: Object.freeze([HOUR_DAWN, HOUR_PEARL, HOUR_SUN]),   // HOURS-FIRST: rose gold into pearl into the dawn's white
@@ -290,8 +273,8 @@ export const TITLE_GRADIENT = Object.freeze({
 });
 
 /** THE EDGE A GRADIENT TITLE WEARS, where it is not the title's own colour. The edge is what the letters are read
- *  against (titlePaint, and the classic face's edge run): Shadow Fang's is its own crimson, because its black half needs
- *  a bright edge over a night sky. A title whose ends are both bright is edged in black, as every one-colour title's
+ *  against (titlePaint, and the classic face's edge run): by default the title's own colour. A title whose ends are
+ *  both bright is edged in black, as every one-colour title's
  *  text shadow is, because an edge in its own colour loses the paler half. */
 export const TITLE_EDGE = Object.freeze({
   gatebreaker: Object.freeze([0, 0, 0, 1]),   // WB9g: its ember end is bright - edged in black
@@ -314,7 +297,6 @@ export const GLYPH_RGBA = Object.freeze({
   disciple: TITLE_RGBA.disciple,
   apostle: TITLE_RGBA.apostle,
   hierophant: TITLE_RGBA.hierophant,
-  shadowfang: TITLE_RGBA.shadowfang,   // SHADOW-FANG: the outline's crimson - the fill is the gradient below
   herald: TITLE_RGBA.herald,           // HERALD: the trumpet in the title's azure
   // SEAT1c: a palace seat's tower in the Warden's bronze (the token carries no guild's colours - Seats-Arc 7.4 asked
   // the guild's first colour), and each crown in its kingdom's metal (townSeatLaw.js KINGDOM_METALS)
@@ -332,28 +314,6 @@ export const GLYPH_RGBA = Object.freeze({
   laurel: TITLE_RGBA.arenachampion,    // ARENA4: the wreath in the Arena Champion's own green - one grant's two halves
 });
 
-/** SHADOW-FANG: A GLYPH FILLED WITH A GRADIENT - its title's two stops,
- *  read from it and turned round, left to right across the 16x16 box. The
- *  wolf faces right, so its mane takes the crimson and its face the black
- *  its red eye burns in, as the reference's does. A glyph named here is
- *  drawn filled, outlined in its own colour (GLYPH_RGBA) at GLYPH_EDGE_W so
- *  the black half still reads over a night sky. */
-export const GLYPH_GRADIENT = Object.freeze({
-  shadowfang: Object.freeze([...TITLE_GRADIENT.shadowfang].reverse()),
-});
-/** The outline a gradient glyph wears, in the 16x16 box's units. */
-export const GLYPH_EDGE_W = 0.55;
-
-/** SHADOW-FANG: A SECOND SHAPE ON A GLYPH, in a colour of its own - the
- *  wolf's eye, an angry red slit over the black. Filled, on top.
- */
-export const GLYPH_DETAIL = Object.freeze({
-  shadowfang: Object.freeze({ path: 'M9.3 4.7L11.8 5.5L9.8 6.2Z', rgba: SHADOW_EYE }),
-});
-/** A glyph's details as a list: one shape (the wolf's eye) or several in their order, so every face that draws a glyph
- *  walks them the same way. Pure. */
-export const glyphDetails = (detail) => (Array.isArray(detail) ? detail : detail?.path ? [detail] : []);
-
 /** THE CLASSIC FACE'S STAND-IN: one character, and it must be one the
  *  Daggerfall font actually has a record for or it draws as nothing at
  *  all. Held inside FONT0003's printable range by a pin. */
@@ -365,7 +325,6 @@ export const GLYPH_MARK = Object.freeze({
   disciple: '~',
   apostle: '^',
   hierophant: '!',
-  shadowfang: '>',    // SHADOW-FANG: the wolf's muzzle, facing the way the glyph's does
   herald: '<',        // HERALD: the trumpet's bell, flaring the way the glyph's does
   tower: '=',         // SEAT1c: a tower's battlement
   crownDF: 'D',       // SEAT1c: each crown its kingdom's initial
@@ -406,9 +365,6 @@ export const GLYPH_PATH = Object.freeze({
   apostle: 'M8 4.5C6.5 3.5 4.5 3 1.5 3v9.5c3 0 5 .5 6.5 1.5 1.5-1 3.5-1.5 6.5-1.5V3c-3 0-5 .5-6.5 1.5zM8 4.5V14',
   // the Hierophant's crown
   hierophant: 'M2 13h12M2.5 13L1.8 5l3.6 3L8 2.5 10.6 8l3.6-3-.7 8',
-  // SHADOW-FANG: the reference's wolf, in profile facing right - the ear raised, the brow down, the jaws open on
-  // three fangs, the mane swept back in six blades and the ruff under the throat
-  shadowfang: 'M15.9 6.3Q15.8 5.5 15 5.3L11.4 4.1L9.9 3.3L8.7 0.3L6.9 3.2Q4.9 2.1 2.5 2.4Q4.2 3.2 5 4.5Q2.8 4.8 1 6.3Q3.2 6.6 4.3 7.6Q2.3 8.7 1.1 10.5Q3.2 10 4.8 10.2Q3.6 11.7 3.2 13.8Q5.2 12.2 6.8 11.9Q6.3 13.4 6.5 15.3Q7.8 13.2 9.2 12.7Q9.6 14 10.4 15.2Q10.5 12.9 11.6 12L12.9 11.3L15.1 10.7L14 10.4L13.8 9.4L13.3 10.3L9.8 8.8L11.7 8.3L12.1 9.5L12.6 8.1L14.4 7.6L14.8 8.7L15.2 7.4L15.9 7Z',
   // HERALD: the herald's trumpet, level, its bell flaring right, and the swallowtail banner hanging from it - a
   // mouthpiece, the tube, the bell, the banner. A raised trumpet read as a pick at a name's size, and a trumpet alone
   // as a megaphone; the banner is what makes it a herald's.
@@ -434,7 +390,7 @@ export const GLYPH_PATH = Object.freeze({
 /** Is this glyph DRAWN as an outline rather than filled? The sprout is
  *  a shape and the brackets are strokes; said here so the layer does
  *  not have to know which is which by name. */
-export const GLYPH_STROKE = Object.freeze({ sprout: true, dev: true, mod: true, dm: true, disciple: true, apostle: true, hierophant: true, shadowfang: false, herald: true, tower: false, crownDF: false, crownWR: false, crownSN: false, laurel: true, crownSK: false, crownMW: false, crownSU: false, crownVW: false, crownEW: false, crownBM: false, crownCY: false  });
+export const GLYPH_STROKE = Object.freeze({ sprout: true, dev: true, mod: true, dm: true, disciple: true, apostle: true, hierophant: true, herald: true, tower: false, crownDF: false, crownWR: false, crownSN: false, laurel: true, crownSK: false, crownMW: false, crownSU: false, crownVW: false, crownEW: false, crownBM: false, crownCY: false  });
 
 /**
  * The title a peer wears, ready to draw: `{ key, text, rgba }`, or
@@ -455,7 +411,7 @@ export function titleBadge(peer) {
   return { key, text, rgba: TITLE_RGBA[key] ?? null, gradient: TITLE_GRADIENT[key] ?? null, edge: TITLE_EDGE[key] ?? null };
 }
 
-/** SHADOW-FANG: a gradient's colour at `t` along it (0 the first stop, 1
+/** A gradient's colour at `t` along it (0 the first stop, 1
  *  the last), RGBA 0..1 - the classic face's tint for one letter of a
  *  gradient title, since a bitmap run takes a single tint. */
 export function gradientAt(stops, t) {
@@ -473,17 +429,14 @@ export const cssGradient = (stops) => `linear-gradient(90deg, ${stops.map(cssRgb
 /** THE STYLE PROPERTIES A DOM FACE WRITES FOR A TITLE, every one of them
  *  every time, so a face that re-uses one element (the name over a head)
  *  clears what the title before this one set. A one-colour title is its
- *  `color`; a GRADIENT title (SHADOW-FANG) is the gradient clipped to the
+ *  `color`; a GRADIENT title is the gradient clipped to the
  *  letters, in the loaded 500 face, with the text shadow every face gives
  *  its titles off - under a clipped background a text shadow paints OVER
  *  the letters - and an EDGE OUTSIDE each letter instead: a pixel of the
  *  title's own colour to the right and below (the classic face's own edge
- *  run) and a black one under that, so the black half still reads over a
- *  night sky (a crimson halo round the word was tried first and lost
- *  "Shadow" on every dark ground). AUDIT A4/A5: the edge was a crimson
- *  text-stroke ON the letters with a synthesised bold, which covered most
- *  of each stem - in the world the word read crimson, black in 4-15% of
- *  "Shadow"'s ink, and Mac asked for a black and crimson gradient.
+ *  run) and a black one under that, so a dark stop still reads over a
+ *  night sky. A text-stroke ON the letters is not used: with a synthesised
+ *  bold it covered most of each stem and hid the gradient.
  *  The edge is TITLE_EDGE's where it names one - black, for a word whose ends are both bright. No title: all empty. */
 export const TITLE_PAINT_KEYS = Object.freeze(['color', 'backgroundImage', 'webkitBackgroundClip', 'backgroundClip', 'webkitTextFillColor', 'webkitTextStroke', 'fontWeight', 'textShadow', 'filter']);
 export function titlePaint(badge) {
@@ -526,7 +479,6 @@ export function glyphBadges(peer) {
     if (!on.includes(key)) continue;
     out.push({
       key, mark: GLYPH_MARK[key] ?? '', rgba: GLYPH_RGBA[key] ?? null, path: GLYPH_PATH[key] ?? '',
-      gradient: GLYPH_GRADIENT[key] ?? null, detail: GLYPH_DETAIL[key] ?? null,   // SHADOW-FANG
     });
   }
   return out;
@@ -546,10 +498,10 @@ export function glyphBadges(peer) {
  */
 export const badgeClass = (kind, key) => `${kind}-${key}`;
 /** The title whose paint an aura's button wears on the account card, in the aura's own colour family: the Broker's fire
- *  the Gatebreaker's, the Holo Shadow Cloak the Shadow Fang's black and crimson, the Seraph Wings the Founder's gold
+ *  the Gatebreaker's, the Seraph Wings the Founder's gold
  *  (the developer's paint is a red). Every aura in AURA_TEXT needs an entry. */
-export const AURA_PAINT = Object.freeze({ dagonfire: 'gatebreaker', shadowcloak: 'shadowfang', seraphwings: 'founder', turninghour: 'hourbreaker', firsthour: 'hoursfirst', maelstrom: 'coilbreaker', witchfire: 'witchwarden' });
-/** SHADOW-FANG: `titlePaint`'s properties as CSS declarations, the colour
+export const AURA_PAINT = Object.freeze({ dagonfire: 'gatebreaker', seraphwings: 'founder', turninghour: 'hourbreaker', firsthour: 'hoursfirst', maelstrom: 'coilbreaker', witchfire: 'witchwarden' });
+/** `titlePaint`'s properties as CSS declarations, the colour
  *  left to the button (its border is drawn in it) - so a gradient title's
  *  word on the card is the SAME paint as over a head, not a second one. */
 const CSS_NAME = { backgroundImage: 'background-image', webkitBackgroundClip: '-webkit-background-clip', backgroundClip: 'background-clip', webkitTextFillColor: '-webkit-text-fill-color', webkitTextStroke: '-webkit-text-stroke', fontWeight: 'font-weight', textShadow: 'text-shadow', filter: 'filter' };
@@ -559,7 +511,7 @@ const wordCss = (t) => {
 };
 export const badgeCss = () => [
   ...TITLES.map((t) => `.card button.acttitle.${badgeClass('tl', t)} { color: ${cssRgba(TITLE_RGBA[t])}; }`),
-  // SHADOW-FANG: a gradient title's word (the card wraps it in .acttitleword) - the button keeps the plain colour
+  // a gradient title's word (the card wraps it in .acttitleword) - the button keeps the plain colour
   ...TITLES.filter((t) => TITLE_GRADIENT[t]).map((t) => `.card button.acttitle.${badgeClass('tl', t)} .acttitleword { ${wordCss(t)} }`),
   ...GLYPHS.map((g) => `.card .acctglyph.${badgeClass('gl', g)} .acctglyphart { color: ${cssRgba(GLYPH_RGBA[g])}; }`),
   // PROFILE-MENU: the title the profile's plate says it wears (ui/enhanced/enhancedAccount.js plateFacts) - the button's colour,
@@ -597,21 +549,13 @@ export function glyphSvgNode(doc, g, cls, strokeWidth = 1.8) {
   return svg;
 }
 
-/** Each gradient a glyph defines needs an id no other node in the
- *  document has - `url(#id)` resolves against the whole document, and a
- *  name that left the screen would take a shared one with it. */
-let gradientSerial = 0;
-
 /**
  * THE DRAWING ITSELF, WITH NO COLOUR OF ITS OWN: every shape the tables
  * above paint in `currentColor`, so the caller decides the colour - the
  * DOM faces inline (glyphSvgNode), the account card by its class (ACC3c:
- * that card may not style itself). SHADOW-FANG: a GRADIENT glyph is
- * filled with its stops (a `linearGradient` of its own, after the shape,
- * so the shape stays the first child every face and pin reads) and
- * outlined in `currentColor`; a DETAIL is drawn over it in its own colour.
+ * that card may not style itself).
  * @param {any} doc
- * @param {{ key: string, path: string, gradient?: any, detail?: any }} g
+ * @param {{ key: string, path: string }} g
  * @param {string} cls
  * @param {number} [strokeWidth]
  */
@@ -624,44 +568,14 @@ export function glyphArtNode(doc, g, cls, strokeWidth = 1.8) {
   svg.setAttribute('aria-hidden', 'true');
   const path = doc.createElementNS(NS, 'path');
   path.setAttribute('d', g.path);
-  const stops = Array.isArray(g.gradient) && g.gradient.length > 1 ? g.gradient : null;
   // `currentColor` on every shape, so the caller's colour is the one decision
-  if (stops) {
-    const id = `dfglyph-grad-${++gradientSerial}`;
-    svg.setAttribute('overflow', 'visible');   // AUDIT A7: the edge round a shape that meets the box's side (the wolf's nose) is drawn, not cut
-    path.setAttribute('fill', `url(#${id})`);
+  if (GLYPH_STROKE[g.key]) {
+    path.setAttribute('fill', 'none');
     path.setAttribute('stroke', 'currentColor');
-    path.setAttribute('stroke-width', String(GLYPH_EDGE_W));
+    path.setAttribute('stroke-width', String(strokeWidth));
+    path.setAttribute('stroke-linecap', 'round');
     path.setAttribute('stroke-linejoin', 'round');
-    svg.append(path);
-    const defs = doc.createElementNS(NS, 'defs');
-    const grad = doc.createElementNS(NS, 'linearGradient');
-    grad.setAttribute('id', id);
-    grad.setAttribute('gradientUnits', 'userSpaceOnUse');
-    grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0'); grad.setAttribute('x2', '16'); grad.setAttribute('y2', '0');
-    stops.forEach((rgba, i) => {
-      const stop = doc.createElementNS(NS, 'stop');
-      stop.setAttribute('offset', String(i / (stops.length - 1)));
-      stop.setAttribute('stop-color', cssRgba(rgba) ?? '');
-      grad.append(stop);
-    });
-    defs.append(grad);
-    svg.append(defs);
-  } else {
-    if (GLYPH_STROKE[g.key]) {
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', 'currentColor');
-      path.setAttribute('stroke-width', String(strokeWidth));
-      path.setAttribute('stroke-linecap', 'round');
-      path.setAttribute('stroke-linejoin', 'round');
-    } else path.setAttribute('fill', 'currentColor');
-    svg.append(path);
-  }
-  for (const det of glyphDetails(g.detail)) {   // each of a glyph's details, in order
-    const d = doc.createElementNS(NS, 'path');
-    d.setAttribute('d', det.path);
-    d.setAttribute('fill', cssRgba(det.rgba) ?? 'currentColor');
-    svg.append(d);
-  }
+  } else path.setAttribute('fill', 'currentColor');
+  svg.append(path);
   return svg;
 }

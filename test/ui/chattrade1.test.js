@@ -23,7 +23,7 @@ test('CHAT-TRADE wire: the Trade and LFG channels are two whitelisted rooms of t
   assert.equal(relaySupportsTradeChan('world200'), false);
   assert.equal(relaySupportsTradeChan('world201'), true);
   assert.equal(relaySupportsTradeChan('world2010x'), false);
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
 });
 
 test('CHAT-TRADE tabs: Trade and LFG ride rooms of their own and stand OFF the bar until joined - a player who never joins sees the bar as it was', () => {

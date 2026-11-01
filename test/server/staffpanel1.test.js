@@ -42,7 +42,7 @@ async function extensionKey() {
 async function stand(extra = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', SHADOW_FANG_HANDLES: 'SirMcMobdon,Fangy',
+    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Fangy',
     OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
     ...extra,
   });
@@ -122,7 +122,6 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
     await crypto.subtle.importKey('raw', Buffer.from(k, 'base64url'), { name: 'Ed25519' }, false, ['verify']);
   }
   assert.match(toml, /^DEVELOPER_HANDLES = "[^"]*,SirMcMobdon,kpblca_1"$/m);
-  assert.match(toml, /^SHADOW_FANG_HANDLES = "SirMcMobdon"$/m);
 });
 
 test('STAFF-PANEL1: unconfigured is shut - with no owner key named, nobody can sign in', async () => {
@@ -142,8 +141,7 @@ test('STAFF-PANEL1: three locks - the password, the extension\'s key and the lis
   assert.equal(typeof me.session, 'string');
   // Admin is the Developers list alone, and OWNER_HANDLES opens nothing by itself (mutants: an owner as Admin; an owner as staff)
   const sir = { handle: 'SirMcMobdon' };
-  assert.equal(staffRole(sir, { ...s.env, DEVELOPER_HANDLES: 'Lattymoy' }), 'moderator', 'off the Developers list a Shadow Fang is a Moderator');
-  const none = { ...s.env, DEVELOPER_HANDLES: 'Lattymoy', SHADOW_FANG_HANDLES: 'Fangy' };
+  const none = { ...s.env, DEVELOPER_HANDLES: 'Lattymoy' };
   assert.deepEqual([staffRole(sir, none), isOwner(sir, none)], [null, false], 'an owner off every role list');
   const wrongKey = { proof: async (what, handle) => {
     const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -203,7 +201,7 @@ test('STAFF-PANEL1: an owner invites; the invite registers one extension once; M
   assert.equal((await s.login('Asynian', mod.key)).status, 200);
   // a key registered to one account opens no other: Fangy cannot sign in with Asynian's extension
   const fang = await s.invited('Fangy', me);
-  assert.equal(fang.role, 'moderator', 'a Shadow Fang moderates, so is a Moderator here (mob, 06:20Z: "mods still get theres")');
+  assert.equal(fang.role, 'moderator', 'on the Moderators list, a Moderator here');
   assert.equal((await s.login('Fangy', mod.key)).status, 401);
   // a Moderator is no owner: the team, invites, cuts and the audit log are refused
   for (const path of ['/v1/staff/team', '/v1/staff/invite', '/v1/staff/cut', '/v1/staff/audit']) {

@@ -120,7 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
   assert.equal(relaySupportsGuild('world120'), true, 'the merged relay still routes the guild');
   assert.equal(relaySupportsGuild('world118'), true, 'a later relay still routes the guild');
   assert.equal(relaySupportsGuild('world116'), true);

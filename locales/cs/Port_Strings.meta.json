@@ -539,11 +539,6 @@
   "tr": "8ed7ac29b928",
   "by": "claude-in-session"
  },
- "account.glyph.shadowfang": {
-  "en": "ffecc7381117",
-  "tr": "fba3c23b5bc1",
-  "by": "claude-in-session"
- },
  "account.glyph.sprout": {
   "en": "d33d781dfbf7",
   "tr": "357cad1252c9",
@@ -4999,11 +4994,6 @@
   "tr": "ada523df08d1",
   "by": "claude-in-session"
  },
- "coll.avail.bestowed": {
-  "en": "fd09f780426e",
-  "tr": "9fe4c8cf4298",
-  "by": "claude-in-session"
- },
  "coll.avail.chance": {
   "en": "3b2f229a52da",
   "tr": "ab2a14503267",
@@ -5057,11 +5047,6 @@
  "coll.availLine.auto": {
   "en": "5d55d79fe72d",
   "tr": "f000bd44ee21",
-  "by": "claude-in-session"
- },
- "coll.availLine.bestowed": {
-  "en": "632223c73642",
-  "tr": "839e53fdc5d2",
   "by": "claude-in-session"
  },
  "coll.availLine.chance": {
@@ -5217,11 +5202,6 @@
  "coll.how.arenachampion": {
   "en": "727337ef4eba",
   "tr": "a650e1337bdb",
-  "by": "claude-in-session"
- },
- "coll.how.bestowed": {
-  "en": "1ab34fb5ed92",
-  "tr": "32c8999cf118",
   "by": "claude-in-session"
  },
  "coll.how.broker": {
@@ -5424,11 +5404,6 @@
   "tr": "d7e7b82624b4",
   "by": "claude-in-session"
  },
- "coll.look.shadowcloak": {
-  "en": "a11b8f996f7e",
-  "tr": "6387fb3c0b3f",
-  "by": "claude-in-session"
- },
  "coll.look.turninghour": {
   "en": "4fe8603b6840",
   "tr": "954c4e19860c",
@@ -5552,11 +5527,6 @@
  "coll.src.account": {
   "en": "d7913205f384",
   "tr": "f8dae3a99455",
-  "by": "claude-in-session"
- },
- "coll.src.bestowed": {
-  "en": "2a5741c7d758",
-  "tr": "476dccd5db06",
   "by": "claude-in-session"
  },
  "coll.src.broker": {

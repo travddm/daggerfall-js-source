@@ -586,7 +586,7 @@ test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most
   assert.equal(C.relayCfgValue(null, env, 'gateRole'), '1');
   assert.equal(C.relayCfgValue([], {}, 'sdRole'), undefined);
   assert.equal(C.mayRelayCfg(['dev']), true);
-  for (const g of [['dm'], ['shadowfang'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
+  for (const g of [['dm'], ['herald'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
   assert.equal(C.relayCfgSupported('world191'), false, 'main\'s WARDEN1 relay takes none (PIN MOVED: world192 at the merge)'); assert.equal(C.relayCfgSupported('world192'), true); assert.equal(C.relayCfgSupported('x'), false);
   const { parseStaffCommand, STAFF_HELP_LINES } = await import('../../src/net/staffCommands.js');
   assert.deepEqual(parseStaffCommand('/relay'), { cmd: 'relay' });

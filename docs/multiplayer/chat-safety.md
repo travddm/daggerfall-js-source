@@ -77,7 +77,7 @@ lists, with normalisation and an allow-list for innocent words. The service runs
 ### Who may moderate
 
 `canModerate` (`server-account/src/titles.js`) is true for accounts on `MODERATOR_HANDLES`, with
-`players.staff_mod = 1`, on `DEVELOPER_HANDLES`, or holding a tier in `MOD_TIERS`. Lists are read on every request.
+`players.staff_mod = 1`, or on `DEVELOPER_HANDLES`. Lists are read on every request.
 Accounts that can moderate cannot be muted or banned through these paths.
 
 ### How orders reach the relay

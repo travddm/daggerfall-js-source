@@ -56,7 +56,7 @@ async function dataAttached() {
 
 /** The player's face (or a save's, a portrait's) as a Morrowind head: `{ width, height, data }` or null, `px` x `ph`.
  *  A LIVE character (one with its equipment - the player's entity) is drawn as its body is built (combat/weapon/weaponRig.js
- *  armBuildOptsOf, the build's own door): its helm and hood, the vampire's head, the transformed werewolf's in its skin;
+ *  armBuildOptsOf, the build's own door): its helm and hood, the vampire's head, the transformed werewolf's;
  *  the transformed wereboar keeps Daggerfall's picture, as its body does (Morrowind has no wereboar). An identity alone (a
  *  save's envelope, a chargen portrait) is its bare face. A player's face wears the port's own heads where the race has
  *  them, as the player's body does (MW-HEADS2); `npc` - a portrait's face that is an NPC's (an escort) - the data's.
@@ -69,7 +69,7 @@ export async function playerHeadImage(who, { px = 128, ph = px, renderer = portr
     const [{ armBuildOptsOf }, { liveLycanthropy }] = await Promise.all([import('../combat/weapon/weaponRig.js'), import('../systems/lycanthropy.js')]);
     if (liveLycanthropy(who)?.isTransformed && !armBuildOptsOf(who).werewolf) return null;   // the wereboar: no Morrowind boar
     const o = armBuildOptsOf(who);
-    return headPortrait({ renderer, race: o.race, female: o.female, faceIndex: o.faceIndex, armor: o.armor, vampire: o.vampire, werewolf: o.werewolf, skin: o.skin, ownHeads: o.ownHeads, px, ph });
+    return headPortrait({ renderer, race: o.race, female: o.female, faceIndex: o.faceIndex, armor: o.armor, vampire: o.vampire, werewolf: o.werewolf, ownHeads: o.ownHeads, px, ph });
   }
   return headPortrait({
     renderer, race: mwRaceId(who.race ?? 'Breton'), female: who.gender === 'female',

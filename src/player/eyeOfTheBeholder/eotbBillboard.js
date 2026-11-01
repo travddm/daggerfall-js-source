@@ -212,8 +212,8 @@ export function orientationFor(facing, toCamera) {
  * SPRITE-FACE: THE FACING A FRAME PORTRAYS - `orientationFor` run backwards. The
  * sprite is drawn from one of ORIENTATIONS pictures, ANGLE_PER_ORIENTATION apart about the line from the figure to the
  * camera, so the way it is SEEN to face is that line's bearing turned back by the picture's angle - the middle of the
- * picture's bucket, whatever facing chose it. An aura hung on the sprite (render/auraRing.js - the Seraph Wings, the
- * Shadow Cloak) faces THIS, not the facing the walk wants: that one runs up to half a bucket (22.5 degrees) off the
+ * picture's bucket, whatever facing chose it. An aura hung on the sprite (render/auraRing.js - the Seraph Wings) faces
+ * THIS, not the facing the walk wants: that one runs up to half a bucket (22.5 degrees) off the
  * picture, and ahead of it by the mod's delayed repaint (UpdateBillboardDelayed, DELAYED_FRAMES). A yaw (forward
  * (sin, cos)) in (-pi, pi], or null with no line of sight (`toCamera` zero: signedAngleY's 0, the front picture, which
  * faces no bearing). Pure.

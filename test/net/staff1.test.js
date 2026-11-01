@@ -1,5 +1,5 @@
-// STAFF1 - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal,
-// /pos, /staff, for a player whose own glyphs are `dev`, `dm` or `shadowfang`, and nobody else.
+// STAFF1 - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal, /pos, /staff, for a
+// player whose own glyphs are `dev` or `dm`, and nobody else.
 //
 // Pinned here: who may (isStaff), the grammar (parseStaffCommand), the matching (findPlace, findPlayer), the two
 // switches at their doors (god at the damage veto, fly at the motor-flag write), and the world host's wiring by source.
@@ -13,12 +13,12 @@ import { applyMotorEffectFlags } from '../../src/scenes/shared.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-test('STAFF1 who: the Developer\'s, the Dungeon Master\'s and Shadow Fang\'s glyphs, every one a signed glyph - and no other', () => {
-  assert.deepEqual([...STAFF_GLYPHS], ['dev', 'dm', 'shadowfang']);
+test('STAFF1 who: the Developer\'s and the Dungeon Master\'s glyphs, every one a signed glyph - and no other', () => {
+  assert.deepEqual([...STAFF_GLYPHS], ['dev', 'dm']);
   for (const g of STAFF_GLYPHS) assert.ok(GLYPHS.includes(g), `${g} is a glyph the token signs`);
   assert.equal(isStaff(['sprout', 'dm']), true);
   assert.equal(isStaff(['dev']), true);
-  assert.equal(isStaff(['shadowfang']), true);
+  assert.equal(isStaff(['mod']), false, 'the moderator\'s shield opens no staff command');
   for (const g of GLYPHS.filter((x) => !STAFF_GLYPHS.includes(x))) assert.equal(isStaff([g]), false, `${g} is not staff`);
   assert.equal(isStaff([]), false);
   assert.equal(isStaff(null), false);

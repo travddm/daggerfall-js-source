@@ -113,8 +113,8 @@ test('AURA-LIVE: a run of changes inside the gap costs ONE hello, and it is the 
   const a = player(r, 'aaaa-0001', clock), b = player(r, 'bbbb-0002', clock);
   quiet(() => a.s.join(ROOM, at(1, 1))); await until(() => a.s.host === 'aaaa-0001', 'a');
   quiet(() => b.s.join(ROOM, at(1, 1))); await until(() => b.s.peers.has('aaaa-0001'), 'b');
-  a.aura = 'shadowcloak'; a.s.rehello();
-  await until(() => b.s.auraOf('aaaa-0001') === 'shadowcloak', 'first');
+  a.aura = 'maelstrom'; a.s.rehello();
+  await until(() => b.s.auraOf('aaaa-0001') === 'maelstrom', 'first');
   for (const k of ['turninghour', 'emberfall', 'seraphwings']) { a.aura = k; a.s.rehello(); a.s.tick(); }
   await settle();
   assert.equal(a.sockets.length, 2, 'held');

@@ -1157,7 +1157,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     const head = el('div', 'dfsocial-letterhead');
     const age = el('div', 'dfsocial-sub', `Sent ${letterAgeText(l.sentAt, mail.now())}`);
     liveSubs.push({ el: age, of: () => `Sent ${letterAgeText(l.sentAt, mail.now())}` });
-    const titled = titleBadge(l)?.text ?? null;   // AUDIT B7 (SHADOW-FANG): the title's words, never its key ("shadowfang")
+    const titled = titleBadge(l)?.text ?? null;   // AUDIT B7: the title's words, never its key
     head.append(el('div', 'dfsocial-subject', l.subject), senderNode('dfsocial-sub', `From ${l.from}${titled ? ` - ${titled}` : ''}`, l), age);
     out.push(head, el('div', 'dfsocial-lettertext', l.body));
     if (letters.word) out.push(el('div', 'dfsocial-err', letters.word));

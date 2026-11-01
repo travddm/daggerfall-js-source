@@ -9,7 +9,7 @@ in [chat-safety.md](chat-safety.md).
 | Role | Source | Checked by |
 | --- | --- | --- |
 | Admin | `DEVELOPER_HANDLES` | `isDeveloper`; `staffRole` returns `admin` |
-| Moderator | `MODERATOR_HANDLES`, `players.staff_mod`, `MOD_TIERS` | `canModerate`; `staffRole` returns `moderator` |
+| Moderator | `MODERATOR_HANDLES`, `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
 | Owner | `OWNER_HANDLES` (and staff) | `isOwner` |
 | Report reader | `REPORT_READER_HANDLES` | `isReportReader` |
 
@@ -17,7 +17,7 @@ All lists are in `server-account/wrangler.toml` and read fresh on every request 
 `server-account/src/titles.js`).
 
 In game, the relay sees roles only as **glyphs** in the identity token (`glyphsOf`). `isStaff`
-(`src/net/staffCommands.js`) accepts `STAFF_GLYPHS` (`dev`, `dm`, `shadowfang`). The `mod` glyph is not in that list;
+(`src/net/staffCommands.js`) accepts `STAFF_GLYPHS` (`dev`, `dm`). The `mod` glyph is not in that list;
 hidden mode (`HIDDEN_GLYPHS`) does include it.
 
 ## The staff panel

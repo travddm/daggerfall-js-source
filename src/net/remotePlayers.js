@@ -1412,9 +1412,9 @@ export class RemotePlayers {
         const tt = measureText(font.fnt, title.text) * s;
         const tx = Math.round(n.x - tt / 2), ty = Math.round(top - font.fnt.fixedHeight * s);
         if (title.gradient) {
-          // SHADOW-FANG: a bitmap run takes ONE tint, so a gradient title is drawn a letter at a time, each at its
+          // a bitmap run takes ONE tint, so a gradient title is drawn a letter at a time, each at its
           // place along the word - over a run of the title's own colour one pixel down and right, the edge the DOM
-          // face draws round the word, without which the black half is nothing over a night sky. It is drawn in its
+          // face draws round the word, without which a dark stop is nothing over a night sky. It is drawn in its
           // own edge colour where it has one (playerBadge.js TITLE_EDGE - black, under a word bright at both ends)
           drawText(renderer, font, title.text, tx + Math.max(1, Math.round(s)), ty + Math.max(1, Math.round(s)), s, title.edge ?? title.rgba ?? [1, 1, 1, 1]);
           const letters = [...title.text];

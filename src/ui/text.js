@@ -178,7 +178,7 @@ export function drawText(renderer, font, text, x, y, scale = 1, color = [1, 1, 1
       }
       cx += (g.advance * sdfRatio(fnt) + SDF_GLYPH_SPACING) * scale;
     }
-    return cx - x;   // SHADOW-FANG (AUDIT A3): the drawn advance, as the bitmap arm answers it
+    return cx - x;   // AUDIT A3: the drawn advance, as the bitmap arm answers it
   }
   // PERF-ON: ONE DRAW A STRING, not one a glyph.
   //

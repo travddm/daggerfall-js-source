@@ -194,24 +194,6 @@ export function tgaBytes(w, h, rgba) {
   return out;
 }
 
-/** SHADOW-FANG (AUDIT F1/F2): THE WOLF'S HEAD TEXTURE, its own file - 64 square, a dark brown fur with a lighter strand
- *  every fourth column, and two amber eyes (discs of radius 2) where a head's texture has them: the one texture the
- *  eye rule reads for a blob. */
-export const WOLF_HEAD_EYES = Object.freeze([[20, 22], [44, 22]]);
-function wolfHeadTexture() {
-  const W = 64, rgba = new Uint8Array(W * W * 4);
-  for (let y = 0; y < W; y++) {
-    for (let x = 0; x < W; x++) {
-      const o = (y * W + x) * 4, strand = x % 4 === 0 ? 30 : 0;
-      rgba[o] = 70 + strand; rgba[o + 1] = 50 + strand; rgba[o + 2] = 34 + strand; rgba[o + 3] = 255;
-    }
-  }
-  for (const [cx, cy] of WOLF_HEAD_EYES) {
-    for (let y = -2; y <= 2; y++) for (let x = -2; x <= 2; x++) if (x * x + y * y <= 4) rgba.set([255, 190, 20, 255], ((cy + y) * W + cx + x) * 4);
-  }
-  return tgaBytes(W, W, rgba);
-}
-
 /** The same bytes with a texture name for another of the SAME length (the NIF's string keeps its size), every time it
  *  stands. */
 function renamedTexture(bytes, from, to) {
@@ -229,7 +211,7 @@ const plainFur = (w) => tgaBytes(w, w, Uint8Array.from({ length: w * w * 4 }, (_
 
 /** WEREWOLF1: the werewolf's files under Bloodmoon's own names (fixture bytes), beside the person's - distinct paths
  *  each, so a read log says which the build took. `wolf` false is a player without Bloodmoon attached. The meshes name
- *  tx_fixture.tga, served as the archive's .dds (SHADOW-FANG's skin reads it); AUDIT F1/C6: the head names its own,
+ *  tx_fixture.tga, served as the archive's .dds; AUDIT F1/C6: the head names its own,
  *  tx_wolf_hd.tga, served as the authored .tga, and the third-person skeleton has the bones the head, hair and chest
  *  bind to. AUDIT F8: the base model's bone addon and the person's first-person neck are here to be REFUSED - the wolf
  *  takes neither. `robeModel` false is a robe with no MODL (AUDIT C2). */
@@ -237,7 +219,7 @@ export function werewolfBodyDeps({ wolf = true, robe = true, robeModel = true, e
   const hand = fixtureFile('armfphand.nif'), arm = fixtureFile('armfparm.nif');
   const f = fixtureFile;
   const files = new Map([
-    ['textures/tx_fixture.dds', f('fixture.dds')], ['textures/tx_wolf_hd.tga', wolfHeadTexture()], ['textures/tx_wolf1st.tga', plainFur(16)],
+    ['textures/tx_fixture.dds', f('fixture.dds')], ['textures/tx_wolf_hd.tga', plainFur(64)], ['textures/tx_wolf1st.tga', plainFur(16)],
     [fpSkeletonPath({}), f('armfp.nif')], [FP_CLIP_PATH, f('armfpidle.kf')],
     ['meshes/xbase_anim.nif', f('armfp.nif')], ['meshes/xbase_anim.kf', f('armfpidle.kf')],
     ['animations/xbase_anim/pelvisaddon.nif', PELVIS_ADDON],
@@ -271,7 +253,7 @@ export function werewolfBodyDeps({ wolf = true, robe = true, robeModel = true, e
       loadMorrowindArchives: async () => { opened++; return [{ has: (p) => files.has(p), get: (p) => { reads.add(p); return files.get(p); }, list: () => [...files.keys()] }]; },
       storedMorrowindNames: async () => esmNames,
       loadMorrowindFile: async () => all,
-      // a data generation turns the module's memos on (fpArm adoptMemoGeneration) - SHADOW-FANG's shared skin rides it
+      // a data generation turns the module's memos on (fpArm adoptMemoGeneration)
       ...(generation != null ? { morrowindDataGeneration: () => generation } : {}),
     },
   };

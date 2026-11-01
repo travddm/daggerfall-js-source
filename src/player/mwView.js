@@ -83,8 +83,8 @@ export function setEotbBodyReady(fn) { eotbBodyReady = typeof fn === 'function' 
 let eotbCartYields = () => false;
 /**
  * BEAST-SELF: the Morrowind arm and body STAND ASIDE while the player is a transformed lycanthrope
- * with no Morrowind beast standing (combat/fpArm.js setStandIn: a wereboar, or - SHADOW-FANG, at the merge -
- * Bloodmoon's wolf refused or still building; a standing wolf keeps this lane), so this lane's other side, Eye Of
+ * with no Morrowind beast standing (combat/fpArm.js setStandIn: a wereboar, or Bloodmoon's wolf refused
+ * or still building; a standing wolf keeps this lane), so this lane's other side, Eye Of
  * The Beholder's, takes the body as it does for a player with no Morrowind data. At that edge the view carries over
  * rather than jumping: the sprite camera takes the person the Morrowind camera stood in, and pulls out from the head,
  * not from wherever it last stood (its eye had not been asked in the Morrowind stretch); and back, the Morrowind
@@ -625,7 +625,7 @@ export function mwViewDrawBody(canvas, { proj, view, eye, feet, yaw, viewYaw = y
   return fpArm.drawThird(canvas, { proj, view, eye, feet, yaw, grow: face?.grow > 1 ? face.grow : 1, up: face?.up ?? null, horse });
 }
 
-/** SHADOW-CLOAK: the third-person Morrowind body's named bones where they stand this frame, in its own frame
+/** The third-person Morrowind body's named bones where they stand this frame, in its own frame
  *  (fpArm.thirdBones) - or null: the sprite lane's body has no bones, and first person poses no third-person body. */
 export function mwViewBodyBones(names) {
   if (eotbLane() || !mwCamera.thirdPerson()) return null;
