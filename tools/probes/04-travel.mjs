@@ -1,27 +1,12 @@
-// Probe 4: fast travel to another place through the real travel map, then a rest in a rented room; the clock advances in both.
+// Probe 4: fast travel to another place through the real travel map; the journey ends at the place asked for and the clock runs.
 //
 // The travel map is driven by keys as a player does (V opens it, F finds a place by name); `__travelNearest` names
 // the destination, `__travelProbe` reads the map pixel and the game clock, `__journeyState` says when the journey is over
-// (the game walks the player there at x60; its time scale is back to x1 on arrival). The rest is taken in a room rented at
-// a tavern: resting in the street asks the guards' leave and brings them. It opens through the Rest key (R) and the
-// window's "until fully healed" choice. Each half boots the town afresh, and the journey goes first: a journey that
-// starts after a night's rest has stalled.
+// (the game walks the player there at x60; its time scale is back to x1 on arrival).
 import { Game } from './lib/harness.mjs';
-import { TOWN_URL, enterTown, nativeClick, buildingsOfTown, openInnkeeper, rentRoom } from './lib/town.mjs';
+import { TOWN_URL, enterTown, nativeClick, clearBoxes } from './lib/town.mjs';
 
 export const name = 'travel';
-
-/** Puts away the quest boxes a new game opens with: they swallow keys. */
-async function clearBoxes(g) {
-  for (let i = 0, quiet = 0; i < 30 && quiet < 2; i++) {
-    const up = await g.page.evaluate(() => JSON.parse(window.__talk()).overlay);
-    if (up) {
-      quiet = 0;
-      await g.key('Escape');
-    } else quiet++;
-    await g.waitFrames(1);
-  }
-}
 
 export async function run({ browser, base, ck }) {
   const g = new Game(browser, base);
@@ -91,42 +76,7 @@ export async function run({ browser, base, ck }) {
       `${Math.round((after.minutes - before.minutes) / 60)}h`,
     );
 
-    // ── a rest in a rented room ──
-    await enterTown(g, TOWN_URL);
-    await clearBoxes(g);
-    const { taverns } = await buildingsOfTown(g);
-    const inn = await openInnkeeper(g, taverns);
-    ck('the innkeeper answers', inn);
-    const room = inn ? await rentRoom(g) : { rooms: 0 };
-    ck('a room is rented', room.rooms === 1);
-    if (room.rooms === 1) {
-      await g.page.evaluate(() => {
-        window.__playerEntity.health = Math.max(1, Math.floor(window.__playerEntity.maxHealth / 2));
-      });
-      const hurt = await g.entity();
-      const t0 = (await travelState()).minutes;
-      for (let i = 0; i < 6 && /Tavern/i.test((await g.overlayKind()) ?? ''); i++) await g.key('Escape', 4); // the innkeeper's window first
-      for (let i = 0; i < 6 && !/Rest/i.test((await g.overlayKind()) ?? ''); i++) {
-        await g.key('KeyR', 6);
-        await g.page.waitForTimeout(1000);
-      }
-      const restOpen = ck(
-        'pressing Rest opens the rest window',
-        /Rest/i.test((await g.overlayKind()) ?? ''),
-        `overlay: ${(await g.overlayKind()) ?? 'none'}`,
-      );
-      if (restOpen) {
-        await g.page.waitForTimeout(800);
-        await g.key('Digit2', 4);
-        // the rest runs on real time and closes its window when it is done
-        await g.until(async () => !(await g.overlayKind()) || (await g.entity()).health >= hurt.maxHealth, 120000, 500);
-        const rested = await g.entity();
-        const t1 = (await travelState()).minutes;
-        ck('resting heals the character', rested.health > hurt.health, `hp ${hurt.health} -> ${rested.health}`);
-        ck('resting advances the clock', t1 > t0, `${Math.round((t1 - t0) / 60)}h`);
-      }
-    }
-    g.noErrors(ck, 'fast travel and rest');
+    g.noErrors(ck, 'fast travel');
   } finally {
     await g.close();
   }

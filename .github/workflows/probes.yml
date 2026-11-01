@@ -41,7 +41,7 @@ jobs:
       # every probe reports, so one red run shows every broken part
       fail-fast: false
       matrix:
-        probe: [boot, dungeon, town, travel, save, pause, online]
+        probe: [boot, dungeon, town, travel, rest, save, pause, online]
     steps:
       - uses: actions/checkout@v4
         with:

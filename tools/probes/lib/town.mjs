@@ -124,3 +124,15 @@ export async function nativeClick(g, vx, vy) {
   );
   await g.page.mouse.click(pt.x, pt.y);
 }
+
+/** Puts away the quest boxes a new game opens with: they swallow keys. */
+export async function clearBoxes(g) {
+  for (let i = 0, quiet = 0; i < 30 && quiet < 2; i++) {
+    const up = await g.page.evaluate(() => JSON.parse(window.__talk()).overlay);
+    if (up) {
+      quiet = 0;
+      await g.key('Escape');
+    } else quiet++;
+    await g.waitFrames(1);
+  }
+}

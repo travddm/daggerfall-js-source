@@ -1,4 +1,4 @@
-// Probe 5: save, reload the page, load; position, gold, inventory and level must match.
+// Probe 6: save, reload the page, load; position, gold, inventory and level must match.
 //
 // The character is changed first (gold through the game's own producer, a new place to stand) so a restore of the
 // boot state would not match. `__quickSave` is the pause menu's save (the world host's own composer); the load is read

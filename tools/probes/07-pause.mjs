@@ -1,4 +1,4 @@
-// Probe 6: every pane of the pause menu opens and closes without errors, on the default (enhanced) skin.
+// Probe 7: every pane of the pause menu opens and closes without errors, on the default (enhanced) skin.
 //
 // Escape in the running town opens the pause door (`#enhanced-pause`). Its top tabs (Quests, Stats, ...) and the side rows
 // of each tab (`.px-qrow`) are each clicked once; every pane must draw text. Rows that leave the game (Resume, Exit) are

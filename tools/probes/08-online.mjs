@@ -1,4 +1,4 @@
-// Probe 7: online. Two clients join one room on the real relay and the real account service (local workerd), each sees
+// Probe 8: online. Two clients join one room on the real relay and the real account service (local workerd), each sees
 // the other move, and one chat line arrives.
 //
 // The services stand as tools/loadHarness.mjs stands them (a throwaway signing pair, every migration, both Workers). Each
