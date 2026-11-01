@@ -7,5 +7,7 @@ outside the suite.
   and what CI runs.
 - [writing-tests.md](writing-tests.md) - folder layout, shared helpers and fakes, `modsOff`, ARENA2-gated tests, and
   what makes a good test.
+- [game-probes.md](game-probes.md) - `npm run probes`: end-to-end probes that drive the running game (chargen, dungeon,
+  town, travel, save and load, pause menu, two clients online), as the safety net for refactors of the host files.
 - [probes.md](probes.md) - the Playwright probes in `tools/*Probe.mjs`, the account-service probe, the load harness
   and the desktop-shell probe: what they need and how to run one.
