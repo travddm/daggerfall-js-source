@@ -1,3 +1,4 @@
+// @ts-check
 // THE ONE-TIME QUESTIONS OF MAKING A CHARACTER, on one screen: Project Legacy's model (ui/legacy/legacyModelChoice.js)
 // is put on it, and ui/startChoice.js follows its contract. Its cursor, its one answer, its keys and clicks and both
 // faces (the canvas text below, and the Enhanced Plus window of ui/enhanced/enhancedChoiceFace.js) are shared.
@@ -57,7 +58,7 @@ export const choiceTop = (i) => CHOICE_TOP + i * CHOICE_PITCH;
  *  live list, because the blocks are as tall as their own text; `tops`
  *  where each block starts (LEGACY-CHOICE: a stacked screen's own), the
  *  fixed pitch's by default. */
-export function choiceAtNative(vx, vy, options = [], tops = null) {
+export function choiceAtNative(vx, vy, options = /** @type {readonly any[]} */ ([]), tops = null) {
   if (vx < CHOICE_X0 || vx > CHOICE_X1) return -1;
   for (let i = 0; i < options.length; i++) {
     const top = tops ? tops[i] : choiceTop(i);
@@ -71,7 +72,7 @@ export const CHOICE_STACK_GAP = 3;
 /** LEGACY-CHOICE: WHERE EACH BLOCK STARTS ON A STACKED SCREEN - each under the last by its own height and the gap, so
  *  three answers fit the 200 the fixed pitch spends on two - and, one past the last, where the footer stands. The
  *  draw and the hit test read this one table, as they read the fixed pitch's. */
-export function stackedTops(options = []) {
+export function stackedTops(options = /** @type {readonly any[]} */ ([])) {
   const tops = [CHOICE_TOP];
   for (let i = 0; i < options.length; i++) tops.push(tops[i] + choiceHeight(options[i]) + CHOICE_STACK_GAP);
   return tops;

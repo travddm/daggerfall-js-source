@@ -22,7 +22,7 @@ things with each mod it supports:
 ## Layout of a `vendor/<mod>/` folder
 
 | File or folder | Meaning |
-|---|---|
+| --- | --- |
 | `README.md` | What the mod is, its version and source, what is vendored, what the port does with it, and the permission or licence. Read it before touching the mod. |
 | `*.dfmod.json` | The bundle's manifest, verbatim (title, version, GUID, file list, dependencies). |
 | `modsettings.json`, `modpresets.json` | The mod's own settings and presets, verbatim. The port's copy of the keys lives in `modSettings.js`. |
@@ -41,7 +41,7 @@ tests register vendored data from the file system.
 DFU's own data (MIT, vendored verbatim):
 
 | Folder | Holds | Used by |
-|---|---|---|
+| --- | --- | --- |
 | `dfu-text` | DFU's nine English string tables (`Internal_*.csv`) | Translation masters ([localization.md](localization.md)); `formats/rscTable.js` rows. Not loaded at runtime. |
 | `dfu-quests` | DFU's decompiled quest sources (`Quests/*.txt`) and quest lists (`Tables/`) | `systems/quest/parser.js`, `questLists.js` |
 | `dfu-books` | Book id mapping | `systems/books.js`, `systems/booksData.js` |
@@ -51,7 +51,7 @@ DFU's own data (MIT, vendored verbatim):
 Mods (the folder README has the version, credits and permission):
 
 | Folder | What is vendored |
-|---|---|
+| --- | --- |
 | `ambient-text` | Ambient Text: its text table |
 | `aquatic-sprites`, `detailed-ships`, `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
 | `beautiful-villages`, `beautiful-cities` | One world-data pack each |
@@ -78,7 +78,7 @@ read into `vendor/<folder>/`. `.gitignore` lists the fetched paths. Each folder'
 differs from the published repository or is missing from it, stay committed.
 
 | Folder | Repository | Fetched | Committed, and why |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `better-ambience` | `joshcamas/daggerfall-unity-mods` | `Sound/` (the 29 clips the port plays) | `Scripts/`, the manifest, `modsettings.json`, `LICENSE`: the repository holds 0.1.3, the port follows the 0.1.4 bundle (six scripts, the manifest and the settings differ, and `InteriorAmbientSoundSource.cs` is 0.1.4 only) |
 | `immersive-footsteps` | `magicono43/DFU-Mod_Immersive-Footsteps` | `Audio/`, `Scripts/`, `modsettings.json`, the manifest (renamed from `ImmersiveFootsteps.dfmod.json`) | nothing but the README |
 | `meanerMonsters` | `Ralzar81/Meaner-Monsters` | `MeanerMonsters.dfmod.json` | `xml/`: the repository has no sprite records |
@@ -99,7 +99,7 @@ differs from the published repository or is missing from it, stay committed.
 These folders stay committed: no public download reproduces them. The folder README holds the full record.
 
 | Folder | Author | Mod and version | Source | Permission or licence | Licence files in the folder |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `aquatic-sprites` | Cliffworms | Aquatic Sprites 1.0 | Nexus Mods, Daggerfall Unity mod 276 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_AquaticSprites.txt` (the author's readme) |
 | `detailed-ships` | Cliffworms | Detailed Ships 1.0.0 | Nexus Mods, Daggerfall Unity mod 307 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_DetailedShips.txt` (the author's readme) |
 | `project-legacy` | Lattymoy, Ghð§† and Positronico | Project Legacy 0.4.1 | The shipped archive, from Lattymoy | The owner's own mod; the bundle states no licence. The co-authors' consent is not recorded | none |
@@ -118,7 +118,8 @@ does not claim a permission that is not recorded.
   `Section.Key` as in the mod's `modsettings.json`, with its default, description and kind: boolean, integer slider
   (`min`/`max`), float slider (`float: true`), choice (`options`), text, tuple or colour. Descriptions and option names
   are `t()` getters ([localization.md](localization.md)).
-- Each declared mod has an `Enabled` key. DFU enables a mod by listing it; the port has no mod list, so this is the port's own.
+- Each declared mod has an `Enabled` key. DFU enables a mod by listing it; the port has no mod list, so this is the
+  port's own.
   Mods default to on.
 - Read with `modSetting(vendor, key)`, write with `setModSetting(vendor, key, value)`. Both throw for an undeclared key.
   `modSettingIfDeclared` answers `undefined` instead (the analogue of DFU's `ModManager.GetMod` for a mod that is not

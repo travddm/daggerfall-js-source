@@ -508,7 +508,7 @@ export function levelUpCrown(entity, screen) {
  * copying its number goes stale the day the law moves.
  *
  */
-export function levelProgress(entity, screen) {
+export function levelProgress(entity) {
   const e = entity ?? {};
   // LEVEL-45 (systems/levelCap.js): at the cap no level is next - the bar is full and says so, on either lane
   if (atLevelCap(e)) return { now: 1, max: 1, label: t('levelup.progress.cap', 'Highest level reached'), cap: true };   // AUDIT FB1026d II C3: `cap` - the bar says its label alone
@@ -688,7 +688,7 @@ export function levelUpFrame(entity, screen, refused = false) {
   return {
     lane: levelUpLane(screen),
     crown: levelUpCrown(entity, screen),
-    progress: levelProgress(entity, screen),
+    progress: levelProgress(entity),
     pool: rolloutPool(screen),
     poolLabel: poolLabel(),
     rows: rolloutRows(screen),

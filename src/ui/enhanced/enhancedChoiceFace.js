@@ -1,3 +1,4 @@
+// @ts-check
 // LEVEL-PLUS - THE ENHANCED PLUS FACE of a one-time question of making a character (Project Legacy's model).
 //
 // The question itself - its options, its cursor, its one answer - stays ui/choiceScreen.js's ChoiceScreen,

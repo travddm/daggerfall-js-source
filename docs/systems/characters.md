@@ -45,7 +45,8 @@ is undead without an import cycle.
   drain effects. Never read `entity.stats` directly in a formula.
 - 35 skills (`SKILLS`, `SKILL_NAMES`, `SKILL_COUNT` in `skills.js`). `tallySkill` counts a use into
   `entity.skillUses`.
-- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill` (`skillSoftcap.js`), not
+- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill`
+  (`skillSoftcap.js`), not
   the raw value: past 100 a point is worth a quarter (`OVERCAP_POINT_WEIGHT`), plus milestone bonuses at 125, 150,
   175 and 200 (`SKILL_MILESTONES`). A raw 200 reads as 140. Screens print the raw value (`displaySkillValue`).
 
@@ -178,10 +179,12 @@ The firmament is a passive skill tree that applies online only. Offline the char
 
 ## Bodies, equipment and the paperdoll
 
-- **Equip slots.** `src/characters/paperdoll/paperdoll.js` holds `EQUIP_SLOTS` (DFU's 27-slot table) and the 288 item templates
+- **Equip slots.** `src/characters/paperdoll/paperdoll.js` holds `EQUIP_SLOTS` (DFU's 27-slot table) and the 288 item
+  templates
   (`src/characters/itemTemplates.json`, DFU's ItemTemplates.txt). `equipRules.js` is generated from DFU's
   `ItemEquipTable` (do not hand-edit); `equipTable.js` assigns slots. `src/systems/equip.js` is the runtime API.
-- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE archives, by race
+- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE
+  archives, by race
   morphology, with dyes applied as palette band swaps (`src/characters/dyes.js`).
 - **Morrowind bodies (enhanced skin).** The player, peers, NPCs and foes can stand in Morrowind NIF bodies read from
   the player's own Morrowind data (`src/formats/morrowind/`). `src/combat/fpArm.js` builds the rig;
@@ -192,7 +195,8 @@ The firmament is a passive skill tree that applies online only. Offline the char
   ships that Morrowind lacks; `src/systems/ownMwAssets.js` serves them.
 - **Classic sprites.** Without a Morrowind body, foes and NPCs are DFU's billboards (`enemyBasics.js` textures,
   `src/characters/staticNpc.js`, `src/characters/mobile/`).
-- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`) is parked;
+- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`)
+  is parked;
   it is reachable only behind `?voxelfolk` in `src/scenes/interiorContext.js` and the paperdoll tools.
 
 ## The player entity and the player folder
