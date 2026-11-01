@@ -192,13 +192,16 @@ test('AUDIT TESA II P7 THE GATES PAST THE BAY UNSCANNED WHILE THEIR LANES ARE SH
   places.register('tesa', rows('Imperial', 50_000));
   const asked = [];
   const counted = { ...places, inTheatre: (t) => { asked.push(t); return places.inTheatre(t); }, theatres: places.theatres, generation: places.generation, at: places.at };
-  assert.deepEqual(GATE_LANES_OPEN, [0, 1, 2, 3, 4, 5, 6, 7, 8], 'the Bay\'s and the eight provinces\' lanes stand; Cyrodiil\'s never');
-  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [], 'no lane in the open zone');
-  assert.deepEqual(asked, [], 'and its theatre never scanned for one');
+  assert.deepEqual(GATE_LANES_OPEN, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'the Bay\'s and every province\'s lane stand, Cyrodiil\'s with them');
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [cyrodiil], 'Cyrodiil\'s lane stands: its theatre scanned');
+  assert.deepEqual(asked, [cyrodiil], 'and asked for');
+  asked.length = 0;
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: (lane) => lane !== cyrodiil }).theatres(), [], 'a shut lane stands no scan');
+  assert.deepEqual(asked, [], 'and its theatre is never scanned for one');
   places.register('tesa2', rows('Skyrim', 60_000));
-  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [skyrim], 'a province\'s lane: its theatre scanned');
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: (lane) => lane !== cyrodiil }).theatres(), [skyrim], 'a province\'s lane: its theatre scanned');
   assert.deepEqual(asked, [skyrim], 'Skyrim\'s alone');
-  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: () => true }).theatres().sort((a, b) => a - b), [cyrodiil, skyrim].sort((a, b) => a - b), "opened, Cyrodiil's theatre is scanned too (a province like the others: its areas stand gates)");
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres().sort((a, b) => a - b), [cyrodiil, skyrim].sort((a, b) => a - b), 'every lane open: both theatres scanned');
   assert.ok(asked.includes(cyrodiil));
 });
 
