@@ -131,8 +131,7 @@ test('AUDIT 58 (f3/input): TWO registrations is the defect - one press, two flip
   }
 });
 
-// PL2 (2026-09-12) - Mac: "Pointer can detach from the game and you're
-// unable to click back in and use your pointer." The hosts' keydown
+// PL2  The hosts' keydown
 // ladders are bubble listeners registered before the toggle's, and a
 // window that closes on Enter closes INSIDE them - so by the time the
 // toggle read `isWindowUp()` the window was gone, the same press flipped

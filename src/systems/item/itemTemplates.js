@@ -128,8 +128,7 @@ export function itemBaseValue(item, lookup = templateByIndex) {
  *  trade window reads `item.value` raw: an undefined one sums to NaN
  *  and CalculateTradePrice's `>> 8` collapses that to 0.
  *
- *  MAC-N1 (2026-09-16, Mac: "Weapon and Armorsmiths dont want to pay
- *  for loot"): this law lived as FIVE private copies - loot.js,
+ *  MAC-N1: this law lived as FIVE private copies - loot.js,
  *  unleveledLoot.js, startingGear.js and two in shopStock.js - and the
  *  corpse's armor (combat/enemyEquipment.js equipmentItems) was minted
  *  by none of them. A cuirass off a dead knight had no value, so the
@@ -158,7 +157,7 @@ export function setItemFields(item) {
     value: itemValueOf(named),
   };
 }
-/** JAN1 (2026-09-18, Janome: "when I try to sell certain items I get COST:NaN ... he offers me 0"): THE ONE VALUE
+/** JAN1: THE ONE VALUE
  *  READ. DFU's `item.value` is always an int; the port's can be absent (an item saved before MAC-N1 set every minter)
  *  or, worse, NaN (a sum over an absent term), and `??` lets NaN through. A value that is not a finite number is no
  *  value: the template's base price answers, as SetItem's own write does. Every price arm reads through here. */
@@ -210,7 +209,7 @@ export function usesWorldTexture(item, template = templateByIndex(item.templateI
  *  minted none, so every torch/lantern/candle read as empty and no
  *  looted weapon carried a condition. Idempotent - an item that
  *  already has a condition (magic uses, a save round-trip) keeps it.
- *  WEAPON-POOL (2026-10-06): a weapon's hitPoints is the one pool every
+ *  WEAPON-POOL: a weapon's hitPoints is the one pool every
  *  weapon type shares (characters/weapons.js WEAPON_CONDITION_POOL),
  *  not its row's - ammunition alone keeps the row's - and the material
  *  scales it as before. */
@@ -232,8 +231,7 @@ export const conditionPercentage = (item) => ((item?.maxCondition ?? 0) > 0 ? Ma
 /** A piece's condition as a share of its maximum - the mend order's key, and a kit's before and after. */
 export const conditionShare = (item) => item.currentCondition / item.maxCondition;
 const wornFirst = (item) => (item.equipSlot != null ? 1 : 0);
-/** THE MEND ORDER. MEND-AIM's (2026-09-30, kurkku on Discord: "always repairing the most worn piece of equipment means
- *  fixing arrows or random loot you picked up most of the time"), one home since MEND-WORN gave Repairs Objects the
+/** THE MEND ORDER. MEND-AIM's, one home since MEND-WORN gave Repairs Objects the
  *  same answer: what is WORN first - the player's own gear, never a piece of loot carried to sell - then the rest,
  *  each the lowest share of its condition left first. A sort comparator, and the sort is stable, so two pieces at one
  *  share keep the pack's order. Read by the repair kit (smithItems.js repairKitTargets) and Repairs Objects

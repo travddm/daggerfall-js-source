@@ -1,6 +1,4 @@
-// PARTY-MAP (2026-09-30, Discord: "share map data between party members, possibly with a spell effect so that
-// maintaining some kind of buff for it becomes part of the dungeoneering loop"; and, from another player, "makes a
-// dedicated scout more viable and helps non-combat characters contribute"): SHARED CARTOGRAPHY.
+// PARTY-MAP: SHARED CARTOGRAPHY.
 //
 // THE EFFECT. `Shared Cartography` (46,255 - the port's own; no classic key uses 46, RESURRECT1's 45 is the
 // precedent) is a Mysticism duration buff, CasterOnly, a BUFF_KINDS row (systems/effects.js) - so it lands, stacks

@@ -1,5 +1,4 @@
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and do it
-// properly"): THE ITEM LAW - could an honest client of this port have minted this item? Pinned both ways: every item every
+// INT1: THE ITEM LAW - could an honest client of this port have minted this item? Pinned both ways: every item every
 // honest producer mints (test/honestItems.mjs: the loot doors, the ladder and its passes, the spoils, the Broker, the
 // records, the Reforge, the shelves, chargen, the crafts, the item maker, every port item home) carries no finding, as
 // it lies in the save and as it rides the wire; and every forgery the arc's research fed the wire's old validator - each
@@ -47,7 +46,6 @@ const honest = (pred, what) => {
 test('INT1: every item every honest producer mints carries no finding - in the save and on the wire; the sweep covers every producer, none skipped', () => {
   assert.deepEqual(honestItemsSkipped, [], 'every producer ran headless');
   const sources = new Set(SWEEP.map((s) => s.source));
-  // PIN MOVED (its audit): the producers counted exactly - a producer dropped from the sweep is a hole, never a pass
   assert.equal(sources.size, 88, `the sweep's producers: ${sources.size}`);   // PIN MOVED (Elite Gates removed): - the Weir Key's producer; PIN MOVED (AUDIT MAKER-RARE A1): + the temple's lift after the maker; PIN MOVED (MAKER-RARE): + the item maker over an identified Rare; PIN MOVED (STAFF-EVENT THE REWARD): + staffEventSpoils.staffSpoilsList; PIN MOVED (AUDIT QUESTLINES REWARD-9): + qlRewards.rollRewardChoice; PIN MOVED (guns removed): - the Thunderlock's producer; PIN MOVED (KEY-LAW): + the Weir Key; PIN MOVED (TECH1): + lootRarity.addTechniqueLine and what may follow it; PIN MOVED (AUDIT CAPTAIN'S SEA B12): + the exchange's goods and the treasure chart
   assert.ok(SWEEP.length >= 30_000, `the sweep's items: ${SWEEP.length}`);
   // AUDIT MAKER-RARE C3: the item maker's Rare run is held to what it is for - every group a Rare rolls on, found and
@@ -65,7 +63,7 @@ test('INT1: every item every honest producer mints carries no finding - in the s
     const bad = (wire ? honestItems({ seeds: 4, wire: true }) : SWEEP).map(({ source, item }) => ({ source, f: itemFindings(item), item })).filter((x) => x.f.length);
     assert.deepEqual(bad.slice(0, 5).map((b) => `${b.source}: ${b.f.join(',')} ${JSON.stringify(b.item).slice(0, 200)}`), [], `${wire ? 'wire' : 'save'}: ${bad.length} honest items with findings`);
   }
-  assert.equal(ITEM_LAW_VERSION, 14);   // PIN MOVED (AFFIX-LINES and REFORGE-REPLACE): law 14 - the Reforge's count a mark of the tiers it takes alone; PIN MOVED (KETCH): law 13 - the Gilded rung's Ketch pair (Volendrung's Echo, the Ketchmaster's Word) lawful; PIN MOVED (GUNS-UNFOUND): law 12 - the Hourlock lawful as a gilded Dwarven Long Bow and as the Thunderlock minted before, the Sunken Sovereign as the Ebony Saber again and as the Pistolet minted between; PIN MOVED (SEA-SET): law 11 - the Eltheric Tidemail's nine records lawful (law 10 on its branch, renumbered past PISTOLET's at the merge); PIN MOVED (PISTOLET, AUDIT PISTOLET): law 10 - the Pistolet known, the Sunken Sovereign lawful as a gilded Pistolet and as the saber minted before; PIN MOVED (SOUL-LAW, FIELD BUGS 2026-10-20h): law 9 - a soul of Daggerfall Enemy Expansion's fifty lawful in a Soul Gem or Azura's Star; PIN MOVED (WITCH1): the Soul Cake and the Hearth Offering known from law 8 on; PIN MOVED (KEY-LAW): the Weir Key is known to the service's law from law 7 on; PIN MOVED (MAKER-KEPT): a maker-era Aetheric piece keeps its maker's rows from law 6 on; PIN MOVED (GILDED2): the Gilded rung's two new records are lawful from law 5 on; PIN MOVED (HACKED-GOLD): a letter of credit's worth and a coin pile's count past one DFU int are findings from law 4 on (law 3 on its branch, renumbered past BAL9c at the merge); PIN MOVED (BAL9c): the caster's potency and wellspring lines and the arcane three are lawful from law 3 on; PIN MOVED (TECH1): a weapon's technique line is lawful from law 2 on
+  assert.equal(ITEM_LAW_VERSION, 14);
 });
 
 test('INT1: the forgeries the old wire validator took, each from an honest piece moved by one field - each named', () => {
@@ -113,7 +111,6 @@ test('INT1: the forgeries the old wire validator took, each from an honest piece
     ['an artifact\'s power on a dagger', { ...common, enchantments: [{ type: T.SpecialArtifactEffect, param: 3 }] }, 'artifact'],
     ['an enchantment on a plain dagger', { ...common, enchantments: [{ type: T.EnhancesSkill, param: 20 }] }, 'enchantments'],
     ['a made row past the dagger\'s power', { ...common, enchantments: Array.from({ length: 5 }, (_, i) => ({ type: T.EnhancesSkill, param: i, enchantCost: 1, parentEnchantment: 0, key: `EnhancesSkill:${i}` })) }, 'enchantments'],
-    // PIN MOVED (its audit): each held by the one rule it names - a drawback a weapon alone takes (every budget fits it; its
     // control on a dagger, below, is lawful), and a soul's whole forced set laid with no soul (its control with the soul)
     ['a weapon\'s made row on armour', { ...commonArmor, enchantments: [MADE_LOW_DAMAGE] }, 'enchantments'],
     ['a soul\'s rows with no soul', { ...claymore, enchantments: SOUL_27_FORCED }, 'enchantments'],
@@ -280,7 +277,7 @@ test('AUDIT WAGON-PRICE Y4: a marked wagon counts to the wealth measure at its o
   assert.equal(WEALTH_VERSION, 2, 'the measure moved: every stored record measured again, no gain charged');
 });
 
-// HACKED-GOLD PRICE-CAP (bible/01-Overview/bugs/Field-Bugs-2026-10-12f.md; the session: "I dont wanna mess with honest
+// HACKED-GOLD PRICE-CAP (; the session: "I dont wanna mess with honest
 // players"): THE CAP NEVER TOUCHES AN HONEST PRICE. systems/loot/loot.js lawPriced holds a peer's price under this law's
 // worthCeiling on every door the wire's projection guards - a room's container, a body, a shop's shelf, a trade, the
 // market's and the post's deliveries - so a ceiling an honest piece passed would take value from an honest player.

@@ -558,15 +558,13 @@ test('U59 equippedModel: every slot, in the BODY\'s order and not the enum\'s', 
 });
 
 // ── PX20: THE CENTRE, AND THE LOOT FRAME ──────────────────────────
-// Mac, on the pack: "spread out and organize the center of the
-// inventory panel now that we have more space. Enlarge the paper
-// sprite and remove the background"; then "ensure the paperdoll's slot
+// then "ensure the paperdoll's slot
 // is a perfect fit. Move the name outside of the space and to the top
 // bar, remove the slots filled subtext. Utilize the entire area for
 // enlarged icons and displayability." And: "when looting items, only
 // open the loot tooltip, not the entire inventory window."
 
-// HT5 (2026-09-15, Mac: "the torch doesnt appear slotted in inventory").
+// HT5.
 //
 // A light source has NO equip slot - getEquipSlot answers None for all four,
 // which is why HT2 had to make the act a USE rather than a wear - so the lit
@@ -612,7 +610,7 @@ test('HT5: picking the light row offers Douse, not Take off', () => {
   assert.deepEqual(localPrimaryAct(torch, entity), { kind: 'douse', label: 'Douse' });
 });
 
-// ── AUDIT INV2 (2026-09-15, Mac: "I want it to be perfect") ──────
+// ── AUDIT INV2 ──────
 //
 // THE PINS THIS REPLACES WERE SIXTY LINES OF GREPS OVER THE MODULE'S OWN
 // SOURCE TEXT, and a lens proved what that is worth: DELETING THE
@@ -738,7 +736,7 @@ test('AUDIT INV2: every way a drag can END ends it - release, cancel, Escape, an
   withPack(({ dom, rows, ghost, at, down, move }) => {
     at(dom.body); down(rows()[0], 10, 10); move(60, 60);
     // A RIGHT-CLICK, and Android's long-press, raise this with no cancel
-    // behind it. INV2 listened and ended the drag on it. MAC-R4 (2026-09-17)
+    // behind it. INV2 listened and ended the drag on it. MAC-R4
     // RETIRED that end: a touch pointer's IMPLICIT capture of the row is
     // given back at the press (see dragFrom), so a repaint that detaches
     // the row - which raises the same event - can no longer kill a hold;
@@ -806,8 +804,7 @@ test('AUDIT INV2: a drag holds an item, not a promise - what left the pack under
 
 // ═══ MAC-M1: THE TWO NUMBERS A PLAYER PICKS A WEAPON BY ═══════════
 //
-// 2026-09-17, Mac: "Damage values arent showing on weapon tool tips.
-// Also, not sure if armor has values either."
+// 2026-09-17,
 //
 // Both were true, and the cause is the shape this port keeps finding:
 // the PRODUCERS existed and had one reader. `weaponDamageString` and
@@ -897,8 +894,7 @@ test('MAC-M1: ONE suffix, shared by the three hovers that show it', () => {
 
 // ═══ MAC-M2 A: THE BODY DRAGS TOO ════════════════════════════════
 //
-// 2026-09-16, Mac: "Hold to drag enhanced functionality doesn't work
-// when trying to take items off your character."
+// 2026-09-16,
 //
 // It did not, and the reason is one line: INV1 attached `dragFrom` to
 // the LIST's rows alone (`if (from === 'local') dragFrom(row, item)`)
@@ -1006,8 +1002,7 @@ test('MAC-M2: the plain click on a slot is untouched - it picks, and the card st
 
 // ═══ MAC-M2 B: THE LOOT WINDOW IS FOR TAKING ═════════════════════
 //
-// 2026-09-16, Mac: "Remove the gold and pack buttons from the looting
-// menu."
+// 2026-09-16,
 //
 // Neither is DFU's in this frame. DFU has ONE parchment, so its
 // goldButton (DaggerfallInventoryWindow.cs:47/:515-517) sits on the
@@ -1070,8 +1065,7 @@ test('MAC-M2 B: the NORMAL pack keeps its Gold button - GOLD-DROP: on the pack i
 
 // ═══ MAC-M2: ONE HAND OR TWO ═════════════════════════════════════════
 //
-// 2026-09-16, Mac: "The Tooltip of weapons should also show if the
-// weapon is 1h or 2h."
+// 2026-09-16,
 //
 // The fact was already in the tree and had never been shown to the
 // player: `getItemHands` (characters/equipTable.js) is the port's
@@ -1161,7 +1155,7 @@ test('MAC-M2: itemLine carries the hands and the card draws the row', () => {
 
 });
 
-// ── JAN2 (2026-09-21, a player's CRASH "can't access property querySelector, l is null") ──
+// ── JAN2 ──
 // The card's button -> stow -> refuse -> render -> domRepaint's rebuild ->
 // host.querySelector, with `host` already nulled by an unmount. The module
 // is ONE pane (host, deps and the view state are singletons) and the door

@@ -1,6 +1,4 @@
-// SD-ONLINE (2026-10-05, Mac: "So medium dungeons will be the new by default option thats on (online only)", then "On
-// second thought. Large, medium and small should all play into account online" - and, asked which, "World mixes
-// sizes"; bible/11-Multiplayer/Super-Dungeons.md section 13): ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S.
+// SD-ONLINE: ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S.
 //
 // THE DELVE ARC shipped Medium Dungeons (DSIZE1) as an Enhanced row, refused online - every peer in a dungeon's room
 // must lay one layout, and the settings are each player's own (AUDIT WORLD34 B2 made that layout the whole dungeon).
@@ -97,7 +95,6 @@ test('SD-ONLINE: the size law - online the world\'s size whatever either switch 
   assert.equal(dungeonSizeFor(undercroft, { online: true }), 'full', 'the fighters\' hall keeps its blocks (ARENA5)');
   assert.equal(dungeonSizeFor({ hasDungeon: false }, { online: true }), 'full');
   // the quest stamp: online the world's sizes, whatever the switches say; offline too when they are asked for
-  // PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): online a quest's stamp is the whole dungeon's - its
   // markers are chosen on the layout its instance builds; the world's sizes are offline's ask alone
   assert.equal(smallerDungeonsStateNow(true, true, true, false), SMALLER_DUNGEONS_STATE.Disabled);
   assert.equal(smallerDungeonsStateNow(false, false, true, false), SMALLER_DUNGEONS_STATE.Disabled);

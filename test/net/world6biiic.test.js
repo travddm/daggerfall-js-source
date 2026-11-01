@@ -1,4 +1,4 @@
-// WORLD6b-iii(c) (Mac, 2026-09-14: "Continue" after AUDIT WORLD6b-iii(b)): A PUPPET'S CORPSE LOOT. A puppet's body was
+// WORLD6b-iii(c) (after AUDIT WORLD6b-iii(b)): A PUPPET'S CORPSE LOOT. A puppet's body was
 // its owner's and nobody else's - "no loot of this player's" (WORLD6b) - so a peer who killed my rat, or stood over
 // the one I killed, found a body that could not be opened. The law: THE PILE IS THE OWNER'S ROLL, TAKEN UNDER THE
 // OWNER'S WORD. The owner's record says how many items the body holds (`o`, the wire's law); a peer's body is a loot
@@ -135,7 +135,7 @@ test('WORLD6b-iii(c): a pile larger than one frame is granted in parts - the fir
   assert.equal(bob.foesFrame(true).f[0].o, 60 - g.grant.length, 'and the body still says it holds something');
 });
 
-// LOOT-DUP (2026-09-15, AUDIT ONCRASH1's own finding): THE SAME PILE CANNOT BE GRANTED TWICE.
+// LOOT-DUP: THE SAME PILE CANNOT BE GRANTED TWICE.
 //
 // `grantCorpse` emptied the body on `onPeerHit`'s return, and that return is the hit QUEUE's news, not this frame's:
 // a grant that is merely QUEUED answers false and is usually sent a frame later. So the taker's pack filled while

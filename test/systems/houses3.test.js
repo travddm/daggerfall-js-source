@@ -1,5 +1,4 @@
-// HOUSES-3 (2026-10-27, the owner: "Up the house ownership limit to 3 houses per region"; bible/06-Systems/Online-Arc.md
-// HOUSES-3): A REGION HOLDS THREE HOUSES - the bank's registry keeps the region's slot as its first deed and the others
+// HOUSES-3: A REGION HOLDS THREE HOUSES - the bank's registry keeps the region's slot as its first deed and the others
 // beside it (systems/banking.js, test/systems/houses.test.js), and every reader past the bank reads all three: the realm's
 // gold, the town map's marks, the deeds the service holds, the arena's move, and the hosts' wiring.
 // tools/mutants/houses3.json.

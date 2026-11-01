@@ -1,4 +1,4 @@
-// RECOVER-OP (2026-09-27) - A NEW RECOVERY CODE, ISSUED BY THE OPERATOR, for a player who lost both the password and
+// RECOVER-OP - A NEW RECOVERY CODE, ISSUED BY THE OPERATOR, for a player who lost both the password and
 // the code (Twoddle: "is there anyway this can be fixed without starting a new account as i would like to keep the
 // founders badge?"). The operator sets only the new code's hash (tools/reissueRecoveryCode.mjs, run by
 // .github/workflows/account-recovery.yml), and the player spends it in the game's own recovery: their own password, a
@@ -40,7 +40,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

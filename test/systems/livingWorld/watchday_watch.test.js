@@ -1,5 +1,4 @@
-// WATCH-DAY (2026-10-05, Mac: "improve the guards" - asked, the night watch, gate posts and pairs, the uniform only on
-// duty; bible/06-Systems/Living-World.md WATCH-DAY): THE WATCH KEEPS THE TOWN ROUND THE CLOCK. The first cut kept two
+// WATCH-DAY: THE WATCH KEEPS THE TOWN ROUND THE CLOCK. The first cut kept two
 // shifts (06-16, 14-24) and a day off, so from midnight to six nobody was on watch (the investigation's: zero outdoors
 // 01-03h); every watchman walked his own random beat alone - no posts, no pairs (two shared a stop in under 3% of
 // samples); and off duty he was still in uniform and still a guard to the crime response and the watch's stop, so more
@@ -222,7 +221,7 @@ test('WATCH-DAY the uniform on duty: the walk out, the watch or the post, the wa
     const got = pick(want);
     assert.ok(got, want ? 'one on his watch' : 'one off duty in the street');
     clock.t = got.t;
-    // LW-TALK: PIN MOVED - where he stands is read by the minute's deal, a beat of the census there first (read before it,
+    // LW-TALK:
     // his place was the last scene's: his own stand, 4 m off his place in the evening's circle, beyond its crowd's nearest)
     const was = lt.where(got.w, clock.t, true);
     step(1 / 30, [was.x + 1, 0, was.z], Math.PI / 2);

@@ -1,5 +1,4 @@
-// TIME3 (2026-10-01, Mac: "people have to wait insanely long" / "I don't want a band aid, I want a detailed way we can
-// do this" / "This needs to be perfect"): QUESTS ON TWO CLOCKS. Design: bible/06-Systems/Online-Time-Arc.md 6.3.
+// TIME3: QUESTS ON TWO CLOCKS. Design: 6.3.
 // Online a quest's countdowns - a Clock, a wave's and a sound's interval, a guard's watch, a tombstone - run on the
 // CHARACTER's own clock (LIVED1), which a rest, a loiter or a journey spends as in DFU: a three-day wait is a 72-hour
 // rest. Its hour, date and season are the SKY's (TIME1). Its journal's dates are stamped on the EVENT clock and read
@@ -7,8 +6,7 @@
 // away forgiven); the time they RAISE is charged whole. A party member's copy runs on its holder's clock; an online
 // save from before TIME3 moves its countdowns onto the character's clock once. THE LAW EXECUTES, end to end where a
 // rig reaches, and by source for the four hosts.
-// QCLOCK-WORLD (2026-10-02, Mac: "go back to the quest timer tied to the online world clock"; asked, "Shared world
-// clock"): online the time RAISED is charged NOTHING - a rest, a loiter, a journey spend no quest days - and only the
+// QCLOCK-WORLD: online the time RAISED is charged NOTHING - a rest, a loiter, a journey spend no quest days - and only the
 // time lived with the world is, one played step at most: played time on the world's clock, WORLD7's law. Offline DFU's
 // own. The tests below that drove a clock with a rest drive it with lived play now, and say what a rest no longer does.
 import '../../modsOff.js';
@@ -318,7 +316,7 @@ test('TIME3 a party member\'s copy runs on its holder\'s clock: its countdowns m
   assert.equal(got.ownSecondsAt, 3_000_000, 'marked: on this character\'s clock, in whole seconds');
   const old = JSON.parse(keep); delete old.ownSecondsAt; old.resources[0].clock.lastWorldTimeSample = 7000;
   assert.equal(questDataOnThisClock(old, 3_000_000, 7777).resources[0].clock.lastWorldTimeSample, 7000 + 3_000_000 - 7777, 'a sender from before TIME3 stamped the event clock: moved from there');
-  assert.deepEqual(QUEST_OWN_SECOND_KEYS, ['lastWorldTimeSample', 'lastTimePlayed', 'lastSpawnTime', 'guardAnchor', 'questTombstoneTime', 'shelvedAt']);   // QUEST-SHELF (PIN MOVED): the second a quest was set aside, on the same clock
+  assert.deepEqual(QUEST_OWN_SECOND_KEYS, ['lastWorldTimeSample', 'lastTimePlayed', 'lastSpawnTime', 'guardAnchor', 'questTombstoneTime', 'shelvedAt']);   // QUEST-SHELF (
   assert.deepEqual(QUEST_WORLD_SECOND_KEYS, ['questStartTime']);
 });
 

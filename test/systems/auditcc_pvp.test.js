@@ -15,7 +15,7 @@ import { SURVIVAL_RULES } from '../../src/systems/survival/difficulty.js';
 import { applySpell } from '../../src/systems/effects.js';
 import { buildCustomSpell } from '../../src/systems/spell/spellMaker.js';
 
-// ═══ AUDIT C&C, PvP (2026-10-12): H5 - THE STAND-IN EVERY BLOW BETWEEN PLAYERS IS ROLLED AGAINST ═══
+// ═══ AUDIT C&C, PvP: H5 - THE STAND-IN EVERY BLOW BETWEEN PLAYERS IS ROLLED AGAINST ═══
 //
 // AUDIT C&C B1 kept Boons online on the reading that "every live buff rides the duel's sheet". It rode the STRIKER's
 // sheet (duelAttackerOf reads liveStat), and since INT8 the striker's own machine rolls the blow - against a stand-in

@@ -1,4 +1,4 @@
-// AUDIT HORIZONTAL F3 (HUNTERS-MARK, bible/06-Systems/Bounty-Boards.md 12.10): THE DAY'S CEILING IS MEASURED. The walk
+// AUDIT HORIZONTAL F3 (HUNTERS-MARK, 12.10): THE DAY'S CEILING IS MEASURED. The walk
 // that measures it (tools/huntPace.mjs) on a drawn map - a pixel's nearest point, a pack's ride, a tour's shortest
 // order, the carriage's leg - and, where the game's data is at hand, on the game's own map: no honest day reaches the
 // ceiling (huntLaw.js HUNT_CLEARS_DAY_MAX).

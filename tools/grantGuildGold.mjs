@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// GUILD-GRANT (2026-10-03, Mac: "Can we award the empire of tamriel guild 1.6mil gold") - GOLD INTO A GUILD'S TREASURY,
+// GUILD-GRANT - GOLD INTO A GUILD'S TREASURY,
 // AWARDED BY THE OPERATOR. No route mints gold into a treasury, and on purpose: every gold piece in one was carried in
 // by a member (GUILD1), and only what realm characters carried in buys a hall or comes back out (AUDIT REALM L1-F3,
 // `realm_gold`). So an award is the operator's, written once, by hand, through .github/workflows/guild-grant.yml:

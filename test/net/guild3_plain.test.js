@@ -1,7 +1,6 @@
 // @ts-nocheck
-// GUILD3 (2026-10-11, the owner: "simplifying the player guild and npc guild system from being too overcomplicated.
-// Keeping depth, but making it easier to understand"; then "These are all of your decisions") - THE GUILDS MADE PLAIN:
-// one word, one thing; every rule before the press; a duplicate cut, never depth. bible/11-Multiplayer/Guilds-Made-Plain.md.
+// GUILD3 - THE GUILDS MADE PLAIN:
+// one word, one thing; every rule before the press; a duplicate cut, never depth..
 //
 // GUILD3a the words (a chapter's chairs and council, silver, the writ cards); GUILD3b the silver ledger says which way;
 // GUILD3c what each rank may do, everything that holds a guild that would go, the treasury's two golds, a guild in one
@@ -96,7 +95,6 @@ test('GUILD3b a silver line by its own kind and way: every kind a guild\'s treas
     assert.ok(Object.hasOwn(GUILD_SILVER_LINE_WORDS, k), `${k} has words`);
   }
   assert.equal(guildSilverLineText({ who: 'Alda', raw: 'tribute', out: true, amount: 1000 }), 'Alda paid Tribute of 1,000 silver');
-  // PIN MOVED: AUDIT GUILD3 W2 - a line the service made (its `who` a label: 'The Turning', an auction's id) is the guild's
   assert.equal(guildSilverLineText({ who: 'The Turning', raw: 'seat-upkeep', out: true, amount: 2500 }), 'The guild paid a Charter\'s upkeep of 2,500 silver');
   assert.equal(guildSilverLineText({ who: 'Alda', raw: 'patron-escrow', out: true, amount: 1500 }), 'Alda bid for a chapter\'s patronage: 1,500 silver');
   assert.equal(guildSilverLineText({ who: 'auction:4f1c', raw: 'tithe', out: false, amount: 12 }), 'The guild collected a Tithe of 12 silver');
@@ -136,7 +134,7 @@ test('GUILD3b the service: each silver line carries its own kind (`raw`) and whe
   assert.equal(mine.status, 200, JSON.stringify(mine.body));
   const lines = mine.body.guild.marksLedger.map((l) => [l.raw, l.out, l.kind, l.amount]);
   assert.deepEqual(lines.sort(), [['guild-deed', false, 'deed', 100], ['tribute', true, 'deposit', 40]].sort(), 'the Tribute left the treasury - its old `kind` still "deposit" for an older client');
-  assert.equal(guildSilverLineText(mine.body.guild.marksLedger.find((l) => l.raw === 'tribute')), 'Aldric paid Tribute of 40 silver');   // PIN MOVED: AUDIT GUILD3 W2 - a Tribute's `who` is its payer's name
+  assert.equal(guildSilverLineText(mine.body.guild.marksLedger.find((l) => l.raw === 'tribute')), 'Aldric paid Tribute of 40 silver');
 });
 
 // ─── GUILD3c: EVERY RULE BEFORE THE PRESS ───────────────────────────
@@ -151,7 +149,6 @@ test('GUILD3c what each rank may do: every power of the four tables worded, each
     }
   }
   assert.ok(GUILD_RANK_ACTS.some((r) => r.table === 'levers'), 'the seat\'s levers');
-  // PIN MOVED: AUDIT GUILD3 W3/W4/C4/C5/C7 - what a rank may NOT do is said (an Officer fills no writ of its own guild's,
   // is paid by none of its contracts); the guildmaster's acts by rank alone and the town board's call worded; the writ budget
   // the Officers'; the vault its own line; a rank named as its guild wrote it, never with an article guessed
   assert.deepEqual(guildRankActsOf(3), ['put gold and silver into the treasuries', 'put pieces into the vault', 'pin notes on the guild\'s board',
@@ -172,7 +169,6 @@ test('GUILD3c everything that holds a guild that would go: the page\'s own (gold
   const v = (o = {}) => ({ id: 'g1', treasury: 0, hall: null, vault: { used: 0 }, members: [{}], ...o });
   assert.deepEqual(guildKeepsOf(v(), null), []);
   assert.deepEqual(guildKeepsOf(v({ treasury: 5, hall: { region: 1 }, vault: { used: 2 } }), null), ['guild-treasury', 'guild-hall', 'guild-vault']);
-  // PIN MOVED: AUDIT GUILD3 C10/T15 - the leave's hand-over, which the page never asked here, gone: the Leave button says it
   assert.deepEqual(guildKeepsOf(v({ members: [{}, {}] }), ['guild-master-leaves']), []);
   assert.deepEqual(guildKeepsOf(v({ members: [{}, {}] }), null), [], 'a disbanding asks no one to leave');
   assert.deepEqual(guildKeepsOf(v({ treasury: 5 }), ['guild-stores', 'guild-treasury', 'guild-seat', 'guild-hall']), ['guild-stores', 'guild-treasury', 'guild-seat'],
@@ -271,7 +267,6 @@ test('GUILD3c the tab: a guild in one look for a character in none; where the re
   const t = await tab(view({ ranks: ['Captain', 'Adept', 'Initiate', 'Novice'] }));
   assert.ok(texts(t.panel.root).includes(GUILD_ELSEWHERE_TEXT));
   await t.go('treasury');
-  // PIN MOVED: AUDIT GUILD3 W15 - the rename's own words, a new name or tag; C10 - a guild with its hall, the name alone
   assert.ok(texts(t.panel.root).includes('12,000 of the treasury\'s 30,000 gold was put in by realm characters and can buy a hall, or a new name or tag. Gold in a bank account cannot.'));
   assert.equal(guildRealmGoldText(12_000, 30_000, true), '12,000 of the treasury\'s 30,000 gold was put in by realm characters and can pay for a new name or tag. Gold in a bank account cannot.');
   assert.equal(guildRealmGoldText(undefined, 1), null, 'an older service: nothing said');
@@ -281,7 +276,7 @@ test('GUILD3c the tab: a guild in one look for a character in none; where the re
   assert.equal(ranks.tagName, 'DETAILS');
   const lines = ranks.children.filter((c) => c.tagName === 'P').map((p) => texts(p).join(''));
   assert.deepEqual(lines.slice(0, 4).map((l) => l.split(':')[0]), ['Captain', 'Adept', 'Initiate', 'Novice']);
-  assert.equal(lines[2], 'Initiate: The same as the Novice.');   // PIN MOVED: AUDIT GUILD3 C7 - no article guessed
+  assert.equal(lines[2], 'Initiate: The same as the Novice.');
   assert.equal(lines[4], GUILD_RANK_ACTS_NOTE);
 });
 
@@ -312,7 +307,6 @@ test('GUILD3c the Settings page says, before the press, everything that holds th
   assert.equal(btn(viewed.panel.root, 'Disband').disabled, true);
   assert.ok(texts(btn(viewed.panel.root, 'Disband')).includes('clear the list above first'));
   assert.equal(btn(viewed.panel.root, 'Leave').disabled, true, 'a lone guildmaster leaves only a guild that can go');
-  // PIN MOVED: AUDIT GUILD3 S3 - the view reads the silver's room too now: its word stands for it; a code it reads not stays
   assert.deepEqual(guildKeepsOf(view({ treasury: 0, keeps: [] }), ['guild-writs', 'marks-full', 'guild-some-new-hold']), ['guild-some-new-hold'], 'the view\'s word stands for what it reads; a refusal\'s other word stays');
   const officer = await tab(view({ rank: 1, treasury: 9 }), 'settings');
   assert.equal(find(officer.panel.root, 'dfsocial-keeps').length, 0, 'an Officer is asked nothing of the guild\'s going');
@@ -321,9 +315,7 @@ test('GUILD3c the Settings page says, before the press, everything that holds th
 // ─── GUILD3d: THE CHAPTER'S CARD ────────────────────────────────────
 
 test('GUILD3d what a band does, in words off the bands and off what the guild\'s hall sells - training where it trains, spells at the Mages Guild and Kynareth\'s, a shelf where it keeps one, writs everywhere; a hidden guild\'s its writs alone; an Ascendant chapter\'s Master its High Master (mutants: each part)', () => {
-  // PIN MOVED: AUDIT GUILD3 L4 - Steady's line the usual of what the hall HAS (the Fighters keep no shelf); R1 - a Failing
   // chapter's fall said; L5/W8 - the High Master a rule of the band
-  // PIN MOVED: AUDIT GUILD3 W12 - the chapter's writs (a Court's move by no band); the card's lines sentences, each
   assert.equal(chapterBandEffectsLine(50, FIGHTERS), 'Its halls keep their usual prices and chapter writs.');
   assert.equal(chapterBandEffectsLine(50, MAGES), 'Its halls keep their usual prices, shelf and chapter writs.');
   assert.equal(chapterBandEffectsLine(50, DRAGON), 'Its halls keep their usual chapter writs.');
@@ -340,7 +332,6 @@ test('GUILD3d what a band does, in words off the bands and off what the guild\'s
 
 test('GUILD3d a chapter\'s Duties: what its guild asks of its members in the region and what each earns, the reader\'s first of each today; to a stranger its members\'; none for the Thieves Guild (mutants: the words, the state)', () => {
   const asks = [{ faction: FIGHTERS, kind: 'gate', member: true, done: true }, { faction: FIGHTERS, kind: 'raid', member: true, done: false }];
-  // PIN MOVED: AUDIT GUILD3 L2 - a member is promised Merit where its Merit row says it earns some
   assert.equal(chapterDutiesLine(FIGHTERS, asks, { merit: 10, max: 600 }), 'Duties here: hold a gate (done today), defend a raided town - standing each time, more for the day\'s first of each, and Merit.');
   assert.equal(chapterDutiesLine(FIGHTERS, []), 'Its members\' duties here: hold a gate, defend a raided town - standing each time, more for the day\'s first of each, and Merit.');
   assert.equal(chapterDutiesLine(MAGES, [{ faction: MAGES, kind: 'gate', member: false, done: true }]), 'Its members\' duties here: hold a gate - standing each time, more for the day\'s first of it, and Merit.', 'a stranger is told no state');

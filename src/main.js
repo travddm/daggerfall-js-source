@@ -16,7 +16,7 @@ import { Renderer } from './render/renderer.js';
 import { retroFrameConfig } from './systems/retroMode.js';   // RETRO1: the renderer's retro source - the settings are read here, not in render/
 import { renderScaleSetting } from './systems/renderScale.js';   // PERF-SCALE: the renderer's render-scale source, read the same way
 import { windowEmissionRGB } from './render/windowEmission.js';
-// BOOT1 (2026-09-20, Mac: "overall performance improvements"): THE GAME
+// BOOT1: THE GAME
 // HOSTS ARE BEHIND A DOOR, NOT ON THE ENTRY. These four were static
 // imports, and a static import of a host is the host's WHOLE graph at
 // module-evaluation time: 623 files and 13.4 MB of source reached from
@@ -140,8 +140,7 @@ async function boot() {
   if (params.has('shot') || params.has('nomenu')) { await ensureData(); return bootDungeon(canvas, renderer, params, status); }
 
   // ── THE FRONT DOOR ─────────────────────────────────────────────
-  // FD1 (2026-09-11, Mac: "Remove the classic Manager screen and instead
-  // use the enhanced menu for both enhanced and classic"): ONE door for
+  // FD1: ONE door for
   // BOTH skins. The enhanced screen carries continue, new game, load,
   // settings, controls, mods and about, and it needs no game data, so
   // a player who opens the page to change a setting is never asked for
@@ -186,7 +185,7 @@ async function boot() {
     publishBootParams(params);
     const { runEnhancedMenu } = await import('./ui/enhanced/enhancedMenu.js');
     const { runCinematicFrontDoor } = await import('./ui/intro/introScreen.js');
-    // PAD-DOOR (2026-09-27, Discord - an AYN Thor: "unable to select online, load game anything"): the intro, the menu
+    // PAD-DOOR: the intro, the menu
     // and its windows answer a controller - the d-pad moves, A presses, B backs out (ui/menu/menuPad.js) - until a game is
     // chosen, when the scene's own pad layer takes over.
     // PAD-CURSOR: and the stick is the game's own cursor here - its law and the gauntlet handed in, because the
@@ -237,7 +236,7 @@ async function boot() {
     const picked = takePickedSaveKey();
     if (choice === 'load' && picked != null) params.set('loadkey', String(picked));   // REALM P1.3: never online - a local slot is not the realm's
     else params.delete('loadkey');
-    // REALM P1.3 (bible/06-Systems/Realm-Arc.md section 2): THE ONLINE DOOR'S CHARACTER IS THE REALM'S - its id rides the
+    // REALM P1.3: THE ONLINE DOOR'S CHARACTER IS THE REALM'S - its id rides the
     // boot, which joins it and reads its save from the service; a character born online boots the online lane with no
     // save, its chargen, and the realm makes it (world.js realmBirth). The same SET-or-DELETE law.
     const realmId = choice === 'online' ? takePickedRealmId() : null;
@@ -268,8 +267,7 @@ async function boot() {
     // AUDIT STARTS W8: `?start=` is a headless boot's dev door (scenes/startsHost.js) - no menu door is one, so a URL that
     // once carried it never moves a later new character into a province (F12's law: DELETED on every door)
     params.delete('start');
-    // TSR4b (Mac: "it either places me in the dungeon or places me in
-    // the ground"): the classic start is Privateer's Hold - a map cell
+    // TSR4b: the classic start is Privateer's Hold - a map cell
     // out of settings, and StartInDungeon puts a new character INSIDE
     // it - and the ride was booting there too, racing the dungeon
     // entry with an exterior landing. The ride is a SPAWN OUTDOORS, a
@@ -480,9 +478,7 @@ addEventListener('unhandledrejection', (e) => crashOverlay(`unhandled rejection\
 
 // A lost WebGL context is the classic MOBILE black screen: the page
 // lives, the canvas goes permanently black, nothing throws. Surface
-// it with a reload path (2026-08-14 - Mac's phone report; ingest
-// memory pressure was the trigger, fixed in dataSource, but ANY
-// cause must read as signal, never as silent black).
+// it with a reload path.
 document.getElementById('c')?.addEventListener('webglcontextlost', (e) => {
   e.preventDefault();
   if (pageGoing) return;   // GL-LEAK: let go on purpose as the page goes - no "context lost" over a closing tab

@@ -1,5 +1,4 @@
-// AUDIT TESA III E2-1 (2026-10-26, the owner: "Comprehensive audit on everything to ensure perfection";
-// bible/01-Overview/audits/Audit-Tesa-III-E2.md): A CELL'S GRANT GATE OUTLIVES ITS SLEEP. GRANT-SLEEP (Spawn-Grants.md
+// AUDIT TESA III E2-1: A CELL'S GRANT GATE OUTLIVES ITS SLEEP. GRANT-SLEEP (Spawn-Grants.md
 // section 22) took away the ten-minute timer that held a cell awake from a window's first fold, and the gate - each
 // account's bucket per kind, the live grants that count against the cell's ceiling, the counter, the sockets that stood
 // on a grant - lived in the object's memory alone. So a cell nobody spoke in for ten seconds hibernated and woke with

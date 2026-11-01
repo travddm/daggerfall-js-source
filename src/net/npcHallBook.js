@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP2a (2026-10-07, Mac: "Do it") — THIS DEVICE'S HALF OF THE HALLS
+// CHAP2a — THIS DEVICE'S HALF OF THE HALLS
 // WITNESSED: which of the twenty-two guild factions keep a hall in the
 // town this client walked into, read off the town's own buildings, and
 // that answer reported once a UTC day a town while the Chapters are open
-// to this account. bible/11-Multiplayer/Chapters-Arc.md section 4; the
+// to this account.; the
 // law is npcChapterLaw.js, the service server-account/src/npcHalls.js.
 //
 // A HALL is what DFU's own map and doors say it is:

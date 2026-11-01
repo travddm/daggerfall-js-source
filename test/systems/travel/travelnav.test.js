@@ -1,6 +1,4 @@
-// TRAVEL-NAV1 (2026-09-25, Mac: "Improving travel options navigation to
-// properly route around objects and stopping before running into
-// buildings. Currently it could be so much better") - THE WALK GOES ROUND,
+// TRAVEL-NAV1 - THE WALK GOES ROUND,
 // AND STOPS SHORT.
 //
 // Travel Options' autopilot beelines: one bearing, latched a pixel at a
@@ -1123,7 +1121,7 @@ test('TRAVEL-NAV1 THE SWITCH: the port\'s own key on the mod\'s pane - on by def
   assert.ok(def, 'declared');
   assert.equal(def.default, true, 'ON - the improvement Mac asked for is the default');
   assert.equal(typeof def.default, 'boolean', 'a toggle');
-  // PLAIN-TEXT (2026-10-19): the words a player reads, exactly - the note that the switch is the port's own is gone
+  // PLAIN-TEXT: the words a player reads, exactly - the note that the switch is the port's own is gone
   assert.equal(def.description, 'Steers time accelerated travel around buildings, walls and rocks, and pauses the journey before walking into something it can\u2019t get round.');
   const shipped = JSON.parse(read('vendor/travel-options/modsettings.json'));
   assert.ok(!shipped.Sections.flatMap((s) => s.Keys.map((k) => `${s.Name}.${k.Name}`)).includes(KEY), 'the author\'s file is untouched');

@@ -13,7 +13,7 @@
 //   MacroHelper.ExpandMacros(ref tokens, this)   // this = TalkManagerMCP
 //   return TokensToString(tokens, false)         // note: NO separator
 //
-// E7 (2026-09-02) - THE TABLE IS THE WHOLE TABLE. `ExpandMacros` runs
+// E7 - THE TABLE IS THE WHOLE TABLE. `ExpandMacros` runs
 // MacroHelper's ONE macroHandlers dictionary - 217 rows - over every
 // token it is handed, whatever the context provider is. This file used
 // to carry a private table of twenty-six rows and answer everything
@@ -257,7 +257,7 @@ export function talkMacroHooks(ctx) {
  *  niladic handlers, each already carrying GetValue's ladder - so a
  *  row the talk source does not override answers its sentinel rather
  *  than nothing. `%pql` is absent because it is not a DFU macro. */
-/** ATTRMACRO1 (2026-09-18, Mac: "none of the attribute explanations show actual values"): THE ATTRIBUTE BOXES'
+/** ATTRMACRO1: THE ATTRIBUTE BOXES'
  *  OWN EXPANSION - DaggerfallCharacterSheetWindow's `SetTextTokens((int)sender.Tag, playerEntity.Stats)`, where the
  *  macro source is the player's STATS rather than a quest or a conversation. The window read TEXT.RSC records 0..7
  *  and mounted them with no macro pass at all, so every one of them showed its tokens raw.
@@ -389,8 +389,7 @@ export function expandRandomTextRecord(recordIndex, ctx) {
 }
 
 /**
- * TALK-UNKNOWN (2026-09-17, Mac, with the screenshot: "Listen up. Know
- * anything about work possibilities %2com?").
+ * TALK-UNKNOWN.
  *
  * `%2com` is a CLASSIC macro. MacroHelper.cs's dictionary carries
  * `%1com` (:44, GreetingOrFollowUpText) and has no row for its sibling

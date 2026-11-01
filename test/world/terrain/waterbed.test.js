@@ -1,6 +1,6 @@
 // WATER-NEXT 2 - THE BED (world/water/waterBed.js): clear water must have something under it. The ground the eye sees is
 // carved into a bowl under the water - the game's ground never moves - and the water's sheet keeps the grid as it
-// stood, the bed's depth under each vertex. The record: bible/07-Rendering/Water-Arc.md WATER-NEXT 2.
+// stood, the bed's depth under each vertex. The record: WATER-NEXT 2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

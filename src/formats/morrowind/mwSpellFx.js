@@ -1,4 +1,4 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): WHICH
+// MW-SPELLFX1: WHICH
 // MORROWIND VISUALS A DAGGERFALL SPELL IS DRAWN WITH.
 //
 // Morrowind draws a spell with its magic effects' records (MGEF, components/esm3/loadmgef.cpp): each effect names a

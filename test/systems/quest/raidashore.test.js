@@ -1,6 +1,4 @@
-// RAID-ASHORE (2026-10-17, the owner: "when pirates attack but your first boat (the one that is assigned to be your cabin
-// if you press T > ship) You spawn and fight in land ... after you defeat the pirates they keep spawning but passive";
-// bible/03-World/Naval-Refit.md RAID-ASHORE) - Warm Ashes' voyage raid, fought where the player stands, ENDS there: the
+// RAID-ASHORE - Warm Ashes' voyage raid, fought where the player stands, ENDS there: the
 // author's own WAQ_SHIP_SMALLRAID through the real quest machine, each of its three outcomes, won ashore - its crew and
 // its last raiders withdrawn, the dead left lying, the quest ended (no crew called again), the ship blocks at their base;
 // at sea the IL's own arm as it was; the withdraw's own law over the pools; one raid at a time on the fast travel too;

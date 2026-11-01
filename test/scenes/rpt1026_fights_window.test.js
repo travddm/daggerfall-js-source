@@ -3,7 +3,7 @@
 // inventory): online a window held the dungeon - its foes, the room's ONE
 // simulation (WORLD2), frozen for the whole party while they took the party's blows - but not the character's own clock,
 // which runs with the world's (LIVED1): the rounds a paralysis lasted ran out under the inventory and were walked whole on
-// the first frame after it. WINFOE1 (Mac: "enemies should still be able to do damage") had ended both above ground; the
+// the first frame after it. WINFOE1 had ended both above ground; the
 // dungeon never had it. Now online a window holds no dungeon while the player lives under it - the frame runs, its foes
 // act and its rounds tick, the player's own motor, input and breath held - and offline the dungeon pauses as DFU's does.
 // The law run (src/scenes/windowWorld.js), the clock it answers to run on the real tick, and the hosts by source.

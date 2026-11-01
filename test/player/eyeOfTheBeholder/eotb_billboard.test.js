@@ -16,8 +16,7 @@ import {
 // ═══ EOTB3: THE PLAYER BILLBOARD ══════════════════════════════════
 //
 // The body you see in third person when you have no Morrowind data
-// (Mac: "This is moreso for those who opt out of using morrowind").
-// EOTB-IL (2026-09-17): every law below is read off the assembly, and
+// EOTB-IL: every law below is read off the assembly, and
 // the two Mac reported - the chop and the turn - are the first two
 // pins after the table.
 
@@ -50,7 +49,7 @@ test('EOTB3: the GENERATED table is the mod’s own - all 168 states, checked no
 });
 
 test('EOTB-IL: THE CHOP - the clip lengths are the ART’s, counted per record over all 23 archives, and an idle is ONE frame', () => {
-  // Mac: "Frame chopping between animations". The port ran every table
+  // . The port ran every table
   // on a five-frame clock; the bundle's records are not five frames.
   // `InitializeTextures` counts `archive_record-i` while the bundle has
   // one (IL_5a70-IL_5ad4), so the count is asked of the vendored files
@@ -153,7 +152,7 @@ test('EOTB3: RoundToInt is UNITY’s, not JavaScript’s - a half goes to the ev
 });
 
 test('EOTB-IL: THE TURN - the angle is measured FROM the camera TO the facing, so the camera off the player’s left shows their left side', () => {
-  // Mac: "Sprite turns in wrong direction on input". `UpdateOrientation`
+  // . `UpdateOrientation`
   // is `SignedAngle(toCamera, facing, up)` (IL_4779-IL_4786), negated
   // and snapped; the port had the two arguments swapped, which negates
   // the angle and runs the wheel BACKWARDS.
@@ -281,7 +280,7 @@ test('EOTB-IL: the one-shots’ arithmetic - the melee tick, ONE-STROKE’s halv
   // GetMeleeAnimTickTime (IL_545c-IL_549c): the weapon's frame time times five over the clip's frames
   assert.equal(meleeAnimTickTime(0.2, 6), 0.2 * 5 / 6);
   assert.equal(meleeAnimTickTime(0.2, 5), 0.2, 'a five-frame clip runs at the weapon’s own tick');
-  // ONE-STROKE (Mac: "attacking plays only one animation"): a blow plays ONE of the swing's two strokes, by its count's
+  // ONE-STROKE: a blow plays ONE of the swing's two strokes, by its count's
   // parity - the six-frame swing is frames 0-2 and 3-5; the IL's ping-pong (0 1 2 3 3 2 1) is retired
   assert.deepEqual([0, 1, 2, 3].map((k) => meleeStrokeFrames(6, k)), [[0, 1, 2], [3, 4, 5], [0, 1, 2], [3, 4, 5]]);
   assert.deepEqual(meleeStrokeFrames(6), [0, 1, 2], 'no count named: the first stroke');

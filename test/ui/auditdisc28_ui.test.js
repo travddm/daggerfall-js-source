@@ -1,4 +1,4 @@
-// AUDIT DISC28 (2026-09-28, the pre-merge audit of the 2026-09-28 Discord batch, before the merge): THE PAUSE KEY'S
+// AUDIT DISC28: THE PAUSE KEY'S
 // TWO EDGES - the ui lane's fixes to DISC28-A.
 //
 // UI-1: a pause moved to a Ctrl/Alt COMBO, or to a bare Ctrl or Alt key, opened the pause screen through the host's

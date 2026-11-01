@@ -1,5 +1,4 @@
-// ROAD-FOLLOW, the gates (2026-10-27, the owner: "Also, city gates do not line up with the roads"; bible/03-World/
-// Town-Shapes.md ROAD-FOLLOW) - A WALLED CITY'S GATES STAND WHERE ITS ROADS COME IN. TS4 and TS7 stood a walled city's gates
+// ROAD-FOLLOW, the gates - A WALLED CITY'S GATES STAND WHERE ITS ROADS COME IN. TS4 and TS7 stood a walled city's gates
 // at the bearings of its template's gate blocks (Daggerfall's WALLAA08-11, wherever along their sides Daggerfall put
 // them) and the terrain paints each road's arm in from its pixel's edge along its own compass bearing (Basic Roads'
 // bands on the Bay, VOYAGER2's curves past it) - the two placed without reading each other: on the freeware's Bay 2,461
@@ -228,7 +227,6 @@ test('ROAD-FOLLOW a capital\'s approaches: the road on from the gate pixel\'s ar
       const turn = [end[0] + n[0] * (depth - APPROACH_SKIRT), end[1] + n[1] * (depth - APPROACH_SKIRT)];
       const pts = Math.abs(ug - end[lat]) < T ? [end, gate] : [end, turn, lat === 0 ? [ug, turn[1]] : [turn[0], ug], lat === 0 ? [ug, gate[1]] : [gate[0], ug]];
       assert.ok(!on(end[0] - n[0] * 3, end[1] - n[1] * 3), `${cap.key} ${g.side}: none past the span's edge`);
-      // PIN MOVED (SOLITUDE-RELIEF): a capital on its own line (`approach`, Solitude's Gate Road up its slope) - from the arm's
       // end to its gate; test/world/solitude_relief.test.js walks the line
       if (cap.approach) { assert.ok(on(end[0] + n[0], end[1] + n[1]) && on(gate[0], gate[1]), `${cap.key} ${g.side}: its own line, end to gate`); continue; }
       for (let i = 1; i < pts.length; i++) assert.ok(keepsTo(on, pts[i - 1], pts[i]), `${cap.key} ${g.side}: the way from ${pts[i - 1]} to ${pts[i]}`);

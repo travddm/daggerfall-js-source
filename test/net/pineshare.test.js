@@ -1,10 +1,10 @@
-// PINE-SHARE (2026-09-30, Mac: "2 in 5 trees Pine"; found tracing GATHER-SAID, `06-Systems/Online-Arc.md`). Pine is the
+// PINE-SHARE. Pine is the
 // one tier-1 wood (PROF0 4.2) and stood only in the Mountain and Mountain Woods: the Woodlands, the Haunted Woodlands and
 // the Swamp stood Oak alone on ground nobody confirmed (Logging 10), and the Rainforest and Subtropical stood nothing - a
 // Novice logger in five of the seven forests could never chop. Every herb table and every vein table holds a tier 1; the
 // woods were the one gap. Now a forest whose own woods hold no tier 1 stands PINE_SHARE of its trees as Pine (section 6's
 // tier-1 weight, 2 in 5), on any ground, after the rare wood's roll; the Mountain and Mountain Woods are untouched. The
-// service recomputes each tree from this law, so the fix is the law's alone. bible/06-Systems/Professions-Arc.md 25.
+// service recomputes each tree from this law, so the fix is the law's alone. 25.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

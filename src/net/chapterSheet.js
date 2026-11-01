@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP3c (2026-10-08, Mac: "Continue", on "Keep going with the arc/
-// slices") — THE CHAPTER SHEET, HELD BY THE PLAYING TAB: the service's
+// CHAP3c — THE CHAPTER SHEET, HELD BY THE PLAYING TAB: the service's
 // `/v1/chapters/list` (every chapter's Strength and band, CHAP3b) read
 // once a while, and the hall the player stands in priced by its chapter's
-// band (bible/11-Multiplayer/Chapters-Arc.md 5.2, 5.3).
+// band (5.2, 5.3).
 //
 // SYNCHRONOUS TO ITS READERS. A guild's service window prices as it opens;
 // it asks `strengthOf(faction, region)` and is answered from the sheet as
@@ -14,13 +13,13 @@
 // the account's (the Chapters shut to it) stops the asking for the page.
 // Online only: offline there is no sheet, and every hall is DFU's.
 //
-// CHAP5a (2026-10-09, Mac: "Continue"; Chapters-Arc 9): and each chapter's seats' holders, kept as the roll reads them
+// CHAP5a: and each chapter's seats' holders, kept as the roll reads them
 // (npcChapterLaw.js chapterRollSeatsOf) - `chapterOf(faction, region)` the hall's roll's read.
 //
-// CHAP6c (2026-10-09, Mac: "continue"; Chapters-Arc 7): and each chapter's Season - its event, its doctrine, its halls
+// CHAP6c: and each chapter's Season - its event, its doctrine, its halls
 // shut (npcChapterLaw.js chapterSeasonOf) - for the roll's lines and the town's talk.
 //
-// CHAP7b (2026-10-09, Mac: "continue"; Chapters-Arc 8): and each chapter's patron this Season - `{ id, name, tag,
+// CHAP7b: and each chapter's patron this Season - `{ id, name, tag,
 // heraldry }`, each checked (npcChapterLaw.js chapterPatronOf, heraldryLaw.js heraldryOf) - for its halls' banners and its
 // members' prices.
 // ═══════════════════════════════════════════════════════════════════

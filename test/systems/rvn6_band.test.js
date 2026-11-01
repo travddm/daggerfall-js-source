@@ -1,5 +1,4 @@
-// RVN6 - THE BAND (bible/12-Enhanced-AI/Feud-Arc.md section 17; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). From rank 2 a revenant brings its kin - RETINUE's none, 1, 2, 3, 3 by
+// RVN6 - THE BAND (;, then "Go"). From rank 2 a revenant brings its kin - RETINUE's none, 1, 2, 3, 3 by
 // rank - drawn on its id and kept on its record: of its faction (orcs bring orcs, the undead their own, a beast its own
 // kind), a person its class's family; a solitary kind rides alone. Stood about it in a camp member's ring, in the room
 // the pool has left (followers trimmed first), ordinary (never a champion or an elite, never a revenant), transient,
@@ -223,7 +222,6 @@ test('RVN4 RANK 5, built with RVN6: at its last stand its band\'s survivors run 
   c.f.roaring.until -= 5000;
   frame(c.pool);   // its roar spent - blows reach it again
   c.pool.damageFoe(c.f, 99999, [0, 0, 3], null, { fromPlayer: true, whole: true });
-  // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
   assert.ok(c.f.yielded, 'my kill kneels it - and a kneel scatters as a death does');
   assert.ok(c.pool.foes.filter((g) => g.retinueOf === c.r.id && !g.dead).every((g) => g.scattering));
   assert.equal(said.filter((l) => /scatters/.test(l)).length, 1);

@@ -1,6 +1,5 @@
 // @ts-check
-// IC-INTERIORS (2026-10-27, the owner's field report, item 5: "Interiors in the Imperial city need to match their exterior
-// with varied layouts"; bible/03-World/Arena-Provinces.md IC-INTERIORS) - DAGGERFALL'S OWN INTERIOR KIT, AS A TABLE.
+// IC-INTERIORS - DAGGERFALL'S OWN INTERIOR KIT, AS A TABLE.
 //
 // Daggerfall builds a building's rooms out of a kit of ARCH3D models on a grid of 128-unit cells (3.2 m, the fabric's
 // own storey - world/imperialFabric.js STOREY): a floor tile a cell (1000), a ceiling tile (2000), a wall a cell side

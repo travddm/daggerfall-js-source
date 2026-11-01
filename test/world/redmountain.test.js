@@ -1,5 +1,4 @@
-// RED-MOUNTAIN (2026-10-27, bible/03-World/Red-Mountain.md; the owner: "An absolute massive volcano true to lore that
-// towers in the distance") - the volcano at Vvardenfell's heart stood on the land past the Bay (world/tamriel/redMountain.js),
+// RED-MOUNTAIN - the volcano at Vvardenfell's heart stood on the land past the Bay (world/tamriel/redMountain.js),
 // through the kernel's own shaper (world/landforms.js). The law (its flank, its crater, its gullies and foyada, the land's
 // own shapes faded up it, its bound), the kernel (a pixel on the cone built whole: its seams one number from both pixels,
 // its crater floor the one floor, its top under groundTopOf), and where ARENA2_PATH names the data, the freeware's own

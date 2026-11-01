@@ -1,6 +1,4 @@
-// VOYAGER1 (2026-10-26, KPbICA's spec forwarded by the owner: "Roads should rely on landscape and should not be just
-// 100km straights. Roads should circle around rivers, on the shoreline, around tall mountains and not through all
-// this"; bible/03-World/Roads.md VOYAGER1) - THE LAND'S LAW the routes past the Bay pay (world/road/roadNetwork.js
+// VOYAGER1 - THE LAND'S LAW the routes past the Bay pay (world/road/roadNetwork.js
 // VOYAGER_DIALS, landForRoutes, landStep, landGrain): the grade squared on the smoothed height, the height, the shore,
 // the fords, the land's grain - handed by the regions' build (world/tamrielRoads.js) and never by the Bay's.
 import { test } from 'node:test';
@@ -141,7 +139,7 @@ test('VOYAGER1 the shore: a route between two towns on a lake\'s shore keeps to 
 });
 
 test('VOYAGER1 the regions build on the land\'s law - a pixel of the Bay water and never a ford, the grain at the pixel\'s own place - and their key moves with it (mutants: the terrain unhanded, the Bay a ford, the grain\'s origin, the version, the dials unprinted)', () => {
-  assert.equal(TAMRIEL_ROADS_VERSION, 8);   // PIN MOVED (RIVER-FORDS): 5, the carved rivers crossed as fords; PIN MOVED (ROAD-GAPS): 6; PIN MOVED (EXACT-PIECES): 7; PIN MOVED (ROAD-LOOK): 8, the carved lakes refused
+  assert.equal(TAMRIEL_ROADS_VERSION, 8);
   const base = { woodsBytes: new Uint8Array(4), fit: null, trace: null, spec: {}, nodes: [], obstacles: [], gates: [] };
   assert.notEqual(inputsPrint(base), inputsPrint({ ...base, trunks: { roads: [] } }), 'the named roads are in the print');
   // a region: a one-wide river past the Bay crossed by a ford, its towns joined

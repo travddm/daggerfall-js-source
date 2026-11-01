@@ -10,7 +10,7 @@
 // and by the plaque (activationRace.js raceWinner, the hit marked `ally` by peacefulFoePass off liveFoeTargets).
 // Driven through the real picks over the real producers' shapes (crewAshore.js stands the companion, corpseMarker.js
 // corpseLootTargets lays the body), and through each host's own `_enemyArm` and street race, cut out of the shipped
-// source and run. bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md.
+// source and run..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

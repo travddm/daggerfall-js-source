@@ -1,4 +1,4 @@
-// SD26 - AUDIT SD IV, the net lifecycle, the fight's laws and the relay lens (bible/11-Multiplayer/Super-Dungeons.md).
+// SD26 - AUDIT SD IV, the net lifecycle, the fight's laws and the relay lens.
 // SD-HELLO held `_send` and the realm's own words behind the welcome, and the rest of the page's senders wrote their
 // socket directly: a look, every directed frame (`_socketFor`: trade, cast, card, page, duel, wed), a `who` and the
 // parked team's word went down a realm socket before its welcome - each a frame before hello, refused for good, and the

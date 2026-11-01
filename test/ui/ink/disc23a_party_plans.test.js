@@ -1,6 +1,4 @@
-// DISC23-A (2026-09-24, Starempire42 on Discord, "Being able to see players on your town/dungeon map": "It would be
-// really nice to be able to see your party members on the town and dungeon maps. This would make it much easier to
-// figure out where everyone is and find each other").
+// DISC23-A.
 //
 // THE GAP: the party was on the BAY only (SOC6), read off the hub's travel pixel - which is the whole town, the whole
 // dungeon. The town and dungeon plans took no party at all: the doors built their bags without one, and neither sheet

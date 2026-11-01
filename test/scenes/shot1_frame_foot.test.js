@@ -1,5 +1,4 @@
-// SHOT1 (2026-10-07, a player's gallery: "Wayrest · 7 Oct 2026" and a Daggerfall shot kept FULLY BLACK, a battle at
-// Dak'fron kept whole): THE PRINTSCREEN SHOT IS READ AT THE HOST'S FRAME FOOT.
+// SHOT1: THE PRINTSCREEN SHOT IS READ AT THE HOST'S FRAME FOOT.
 //
 // The renderer's context does not preserve its drawing buffer, so the canvas is readable only in the task that drew
 // it. KB1 rode the read on a requestAnimationFrame of its own and trusted it to run after the host's draw. It did not

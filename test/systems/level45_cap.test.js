@@ -1,5 +1,4 @@
-// LEVEL-45 (2026-10-27, mob: "need to always be 45", "not let over leveling waste a player time", "everyone is
-// converting", "get rid of it for online", "juidge will need changed to lvl 45"): online the six-skill climb is shared
+// LEVEL-45: online the six-skill climb is shared
 // out so every start lands on exactly 45 at the top (800), every realm character's level is read again from its skills
 // at its join, and online character creation has no biography.
 import { test } from 'node:test';
@@ -115,7 +114,6 @@ test('LEVEL-45: the conversion - a level 113 with every counted skill maxed come
 });
 
 test('LEVEL-OWED: a level the skills earned is offered at the join, for the window and its points - or given there to attributes already at their maximum ("give the atribuit point")', () => {
-  // PIN MOVED: LEVEL-OWED (2026-10-28) - an owed level not flagged waited on a six-hour skill check
   const owed = save({ level: 10, start: 150, current: 500, maxHealth: 400 });
   owed.readyToLevelUp = false; owed.pendingLevel = null;
   assert.equal(onlineLevelConvert(owed), true);

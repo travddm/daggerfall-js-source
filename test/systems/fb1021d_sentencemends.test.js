@@ -6,7 +6,7 @@
 // `legal repute -20` (`_S.17_: when _no_ and _S.01_`), and the watch knows a face under -10. A sentence gave back only
 // the charge it tried (REP2) - so a name under the line before the arrest walked out as known as it went in, the stop's
 // own "come quietly" a closed loop, the road's patrols drawing at once outside the gate, and a Curfew town keeping two
-// points of every sentence. The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// points of every sentence. The record:.
 //
 // The real watch's stop (createStandingWatch), the real arrest flow (the court, the guilty plea, the prison screen served
 // day by day, ReleaseFromPrison), on the character's own clock.

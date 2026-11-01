@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-01 part five (FRIENDS-SYNC) - #bug-reports, Shanewerewolf5, "Friend list issues": "My friend list
-// is different between devices. On my laptop and desktop." Asked whether to build the merge, Mac: "Build it".
+// is different between devices. On my laptop and desktop." Asked whether to build the merge,.
 // The hub (server/src/index.js, SOC1) kept a friend list under `acct:<id>`, and `<id>` was the BROWSER
 // PROFILE's (net/social.js accountId - minted once per appStorage, carried on the hub hello as `acct`). A laptop and a
 // desktop are two profiles, so one signed-in player was two hub accounts with two lists; and two players who shared one

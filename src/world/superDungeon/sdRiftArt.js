@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md sections 1 and 2): WHAT THE RIFT AND THE RETURN WEAR
+// SD-LOOK: WHAT THE RIFT AND THE RETURN WEAR
 // - one 128-texel atlas painted through the Hour's paint box (world/superDungeon/sdPixelKit.js) from its ramps (world/superDungeon/sdLook.js):
 // twelve numeral faces for the hour-ring's blocks (I, V and X embossed, their inner bevel alight), rubbed and dark
 // brass, the plinth, the claws, the iris's leaves (riveted, engraved with minute ticks), and the Return's pale stone,

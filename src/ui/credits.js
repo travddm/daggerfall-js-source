@@ -526,8 +526,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['physical-items']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1411',
     }),
-    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1 (2026-10-08, Mac: "We have permission to use and
-    // implement everything into the codebase"): the four environment mods, handed over together.
+    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1: the four environment mods, handed over together.
     Object.freeze({
       title: 'Heat Haze',
       version: '1.0.1',
@@ -567,7 +566,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['sands-of-the-alikr']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1390',
     }),
-    // DEX0 (bible/04-Characters/Enemy-Expansion.md): Kamer & Kab's fifty enemies and their encounter tables.
+    // DEX0: Kamer & Kab's fifty enemies and their encounter tables.
     Object.freeze({
       get title() { return t('credits.dex.title', 'Daggerfall Enemy Expansion'); },   // the mod's name as its manifest says it (L10N4)
       version: '1.3.4',
@@ -578,7 +577,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['daggerfall-enemy-expansion']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/372',
     }),
-    // MUDEX1 (bible/04-Characters/Enemy-Expansion.md, MUDEX): Meaner Monsters' own form beside DEX, by its author.
+    // MUDEX1 (, MUDEX): Meaner Monsters' own form beside DEX, by its author.
     Object.freeze({
       title: 'MUDEX',
       version: '1.0.1',

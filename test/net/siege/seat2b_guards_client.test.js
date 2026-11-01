@@ -1,8 +1,8 @@
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE RELAY'S OWN FIGHTERS ON THE CLIENT -
+// SEAT2b part two (c): THE RELAY'S OWN FIGHTERS ON THE CLIENT -
 // the field's frame folded with them (where each stands and walks, its vitality, its blow, its fall), their HUD's words
 // (the guards standing, a revolt's Captain and rebels, its result and its Honours), the session's foes (a guard an
 // attacker's, a rebel and the Captain a defender's; no heal reaches one; the Captain's fall and a fighter cut down said),
-// and the screen's driver - its looks, its acts, its bodies and batches (bible/11-Multiplayer/Seats-Arc.md 7.5, 7.7, 19;
+// and the screen's driver - its looks, its acts, its bodies and batches (7.5, 7.7, 19;
 // src/net/siege/siegeLink.js, src/net/siege/siegeSession.js, src/scenes/siegeNpcs.js, src/scenes/world.js). `06-Systems/Online-Arc.md`
 // SEAT2b part two (c).
 import { test } from 'node:test';

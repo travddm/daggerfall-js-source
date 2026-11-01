@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FESTIVAL-STAGE (2026-10-02, Mac: "lets finish the build work") - A
+// FESTIVAL-STAGE - A
 // FESTIVAL'S MUSIC, BANNERS AND LANTERNS (bible/11-Multiplayer/
 // Seats-Arc.md 7.6: "Festival - music, banners, lanterns"). SEAT1d built
 // its Festive buff (systems/seatEdicts.js); this is the town dressed for

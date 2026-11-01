@@ -1,6 +1,4 @@
-// RAID-ROLL (2026-09-28, Mac: "Fix it" - AUDIT RAID's "not changed": the relay held no copy of the day's schedule, so a
-// modified client could name a raid the day never rolled, stand on its own pixel and be paid for it, and a many-socket
-// griefer could fill a cell's eight places with raids it kept "fought"). THE DAY'S ROLL IS THE RELAY'S TOO:
+// RAID-ROLL. THE DAY'S ROLL IS THE RELAY'S TOO:
 //   - a raid's start, party and target are the day's generator's alone - the relay reads every word against the day's
 //     slots with no game data (net/raid/raidLaw.js raidDaySlots), one generator for relay and client (raidDayRandom);
 //   - its region and town are the towns table's (the player's game files): a client hands the hub the table it asks

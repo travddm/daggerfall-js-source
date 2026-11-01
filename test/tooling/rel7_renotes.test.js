@@ -1,4 +1,4 @@
-// REL7 (2026-10-03, Mac: "I need you to do this auto") - A PUBLISHED
+// REL7 - A PUBLISHED
 // RELEASE'S NOTES, READ AGAIN. app-v0.1.5767 went out saying "Fixes and
 // improvements.": #547's notes had lived in a PATCH-NOTES file REL6
 // deleted, and its description gained them a minute after the publish job

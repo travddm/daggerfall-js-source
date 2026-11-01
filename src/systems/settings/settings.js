@@ -292,7 +292,7 @@ export const LIVE = Object.freeze({
   'Video/UseMipMapsInRetroMode': 'src/systems/retroMode.js',
   'Video/RetroModeAspectCorrection': 'src/systems/retroMode.js',
   'Video/PalettizationLUTShift': 'src/systems/retroMode.js',
-  // FPS-CAP1 (Mac: "Add FPS limiter to settings"): the Frame Rate Cap, stored-tier since the settings screen shipped.
+  // FPS-CAP1: the Frame Rate Cap, stored-tier since the settings screen shipped.
   // StartGameBehaviour's two lines (:244-250), read by the four hosts' frame gate and the FPS counter every frame.
   'Video/TargetFrameRate': 'src/systems/frameCap.js',
 });
@@ -319,7 +319,7 @@ export const UNAVAILABLE = Object.freeze({
   // FPS-VSYNC: in the BROWSER. The desktop app answers it at launch (SHELL_AT_LAUNCH, below).
   'Video/VSync': 'the browser always waits for the screen refresh',
 });
-/** FPS-VSYNC (2026-09-28, Mac, of the desktop app running above the screen's refresh: "Yes"): the keys the DESKTOP
+/** FPS-VSYNC: the keys the DESKTOP
  *  SHELL reads at launch (app/lib/frameRate.cjs). A page cannot stop waiting for the screen; the app's Chromium can,
  *  if told before it starts - so in the app VSync is a real choice, read at the next start ('restart'), and in a
  *  browser it stays unavailable. */
@@ -369,13 +369,12 @@ export function tierOf(key) {
 // for whoever wants it. The stored file carries overrides alone, so a
 // player who never touched the row takes this default too.
 //
-// DISC22-A (Mac, 2026-09-24: "repair magical items should be enabled by
-// default and required online"): AllowMagicRepairs. DFU ships False - a
+// DISC22-A: AllowMagicRepairs. DFU ships False - a
 // smith turns an enchanted item away (RepairsObjects' magic arm). The
 // port's default mends it; online the lane forces it (onlineLane.js
 // ONLINE_FORCED_SETTINGS), so a player's own False stands offline only.
 //
-// REPAIR-EASE (2026-09-30, Mac: "instant repair on by default"): InstantRepairs. DFU ships False - a smith keeps
+// REPAIR-EASE: InstantRepairs. DFU ships False - a smith keeps
 // the item for days. The port's default hands it back at once; a player's own False still stands.
 export const PORT_DEFAULTS = Object.freeze({
   Enhancements: Object.freeze({ PlayerTorchFromItems: 'True' }),
@@ -514,7 +513,7 @@ export function setValue(section, key, value) {
   _publish(section, key, str);
 }
 
-// ---- THE CHANGE, PUBLISHED (2026-08-27) ----
+// ---- THE CHANGE, PUBLISHED ----
 // LIVE was a tier the registry could name but a consumer could only
 // honour by re-reading on its next natural occasion - the next song, the
 // next boot. Mac, from play: the music slider must work while music is

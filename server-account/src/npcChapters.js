@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP3b (2026-10-08, Mac: "Continue", on "Keep going with the arc/
-// slices") — STRENGTH AND THE CHAPTER SHEET: each chapter's Strength moved
+// CHAP3b — STRENGTH AND THE CHAPTER SHEET: each chapter's Strength moved
 // at the week's Turning toward its members' Merit (Chapters-Arc 5.2), and
 // every chapter's state published (5.3). The law is
 // src/net/npcChapterLaw.js; the record is migration 0102_npc_chapters.
@@ -21,7 +20,7 @@
 // is the accounts that played in the week before its Turning or since (a
 // player's last play is all the service keeps).
 //
-// CHAP4a (2026-10-08, Mac: "Your decision", on "Whats next"): AND ITS
+// CHAP4a: AND ITS
 // SEATS - the same batch places every chapter's Master and three officers
 // by its Eligible members' Merit over the four weeks to the one it settles
 // (npcChapterLaw.js chapterSeatPlan, Chapters-Arc 6), writes the seats'
@@ -118,7 +117,7 @@ export async function settleChapterWeek(db, week, nowS, zero = null, open = 'on'
   for (const r of merits) at(Number(r.faction), Number(r.region)).merit += Number(r.n);
   const ends = seasonEndingAt(week, zero);
   const keys = new Set(confirmed.map((c) => `${c.faction}|${c.region}`));
-  // CHAP6a: the week's step (Chapters-Arc 7). GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md): the Decline gone as an
+  // CHAP6a: the week's step (Chapters-Arc 7). GUILD3e: the Decline gone as an
   // event - a row still holding one reads as none (heldEvent) - and AUDIT GUILD3 R1: its fall the Failing band's, every
   // week a chapter begins Failing (failingWeekAfter: 2 more unless the week's Merit meets twice the target)
   const season = seasonOf(week, zero);
@@ -802,7 +801,7 @@ export async function chapterSheet({ db, nowS }, player, env) {
   if (!chaptersOpenFor(player, env)) return { error: 'chapters-closed' };
   await settleChaptersDue(db, nowS, seasonZeroOf(env?.SEASON_ZERO_WEEK), env?.CHAPTERS_OPEN);
   const n = seasonNumberAt(nowS, seasonZeroOf(env?.SEASON_ZERO_WEEK));
-  // PRIMARY-FOLD (bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000): the sheet's reads in one trip - the regions'
+  // PRIMARY-FOLD (THE PLAN PAST 1,000): the sheet's reads in one trip - the regions'
   // halls, the chapters' rows, their seats' holders and this Season's patrons, each worded as it was asked alone
   const patronQ = patronsRead(db, null, n);
   const [hallRows, chapterRows, seatQ, patronRows] = await db.batch([

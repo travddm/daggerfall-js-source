@@ -1,7 +1,6 @@
 // @ts-check
-// WB9g (2026-09-30, Mac: "Add a brand new title to the broker and a new addition (the aura), an animated burning ground
-// aura that circles the ground where your character stands. These items should be expensive and sought after"): THE
-// BROKER'S INSIGNIA - what Sigil Stones buy that no day's stock carries. Design: bible/11-Multiplayer/World-Bosses.md
+// WB9g: THE
+// BROKER'S INSIGNIA - what Sigil Stones buy that no day's stock carries. Design:
 // section 14 (WB9g).
 //
 // ═══ THIS FILE IS THE LAW BOTH ENDS READ ═══════════════════════════
@@ -26,7 +25,7 @@ import { TITLES, AURAS } from './identityToken.js';
 
 /**
  * THE OFFERS, in the Broker's order: `{ id, kind, key, price }` - `kind` 'title' (its `key` one of identityToken.js
- * TITLES) or 'aura' (one of AURAS), `price` in Sigil Stones. Expensive on purpose (Mac: "expensive and sought after"):
+ * TITLES) or 'aura' (one of AURAS), `price` in Sigil Stones. Expensive on purpose:
  * a gate opens every two hours and drops one stone to a fighter, so the title is some thirty gates closed and the aura
  * fifty - a piece of Ruhn's Regalia in the day's stock is twelve.
  */
@@ -74,7 +73,7 @@ export function insigniaRefusal(offer, { held, stones, online }) {
 }
 
 /**
- * AUDIT FB1024 (2026-10-25; bible/01-Overview/bugs/Field-Bugs-2026-10-24.md, BROKER-RID): A BROKER SALE'S REQUEST ID. Each
+ * AUDIT FB1024: A BROKER SALE'S REQUEST ID. Each
  * press of the Broker's insignia or her Panoply piece carries one (`rid`) - the service writes it beside the sale it
  * makes (server-account/src/brokerSales.js), so a press whose answer was lost is asked after by its own id, never by
  * what else the account holds: the id names this sale, or the service FENCES it (no request of that id writes after).

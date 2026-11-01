@@ -1,5 +1,4 @@
-// SEA-BOUNTY (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - a freeport's
-// bounty board on the Eltheric Ocean's killers; bible/03-World/Eltheric-Ocean.md SEA-BOUNTY): a fall's receipt names its
+// SEA-BOUNTY: a fall's receipt names its
 // room and its killer's character (net/wild/wildReceipt.js, signed by the relay that refereed it); the open sea's rooms
 // (net/wire.js seaRoomOf); the service's board, posts, claims and collects over its real routes and a real record
 // (server-account/src/seaBounty.js, wild.js); the page's half (scenes/seaBountyHost.js) and the tab's words
@@ -116,7 +115,7 @@ async function harbour() {
 
 test('SEA-BOUNTY the service, end to end over its routes and real records: a kill at sea makes its killer wanted; a post leaves its poster\'s record onto a wanted head, once a request; the wanted captain\'s fall at sea at another\'s hand claims it all for that hand\'s character, once a fall; the hand collects it into its record, once; no gold made (mutants: the kill, the claim, the once, the wanted, the self, the gold, the owed, the collect)', async () => {
   const h = await harbour();
-  assert.deepEqual(await h.board('pat'), { wanted: [], owed: 0, refund: 0, mine: 0, prizes: 0, back: 0 }, 'a quiet sea');   // PIN MOVED (SHIP-PVP): and no prize held either way; PIN MOVED (AUDIT SEA VENTURES B4): nor posts on a head gone
+  assert.deepEqual(await h.board('pat'), { wanted: [], owed: 0, refund: 0, mine: 0, prizes: 0, back: 0 }, 'a quiet sea');
   assert.equal((await h.post('pat', 'kim', 500)).body.error, 'sea-bounty-not-wanted', 'nobody is wanted yet');
   // kim kills val at sea
   const f1 = await h.fall('kim', 'val', 'aaaaaaaaaaaa');
@@ -147,7 +146,7 @@ test('SEA-BOUNTY the service, end to end over its routes and real records: a kil
   assert.equal((await h.post('pat', 'kim', 500)).body.error, 'trade-held', 'a held record hands no gold toward another\'s hand');
   h.raw('UPDATE realm_characters SET held = NULL WHERE id = ?1', h.R.pat.id);
   assert.equal(h.gold('val'), 4500, 'three falls at kim\'s hand, a tenth of her purse at the first');   // PIN MOVED (FOE-KEEPS, bible/11-Multiplayer/Wild-Zone.md section 4): a tenth, the usual death's share - it was half (625); PIN MOVED (REPEAT-SHIELD, 2026-10-26): the second and third inside half an hour took nothing (it was 3,645)
-  assert.equal((await h.post('val', 'kim', 5000)).body.error, 'realm-gold', 'more than her record holds');   // PIN MOVED (FOE-KEEPS): her 3,645 - it was 1,000 past her 625; PIN MOVED (REPEAT-SHIELD): her 4,500
+  assert.equal((await h.post('val', 'kim', 5000)).body.error, 'realm-gold', 'more than her record holds');
   assert.equal((await h.post('val', 'kim', 500)).status, 200, 'the victim posts too');
   assert.equal((await h.board('kim')).mine, 2500, 'kim sees the bounty on her own head');
   assert.equal((await h.board('pat')).wanted[0].bounty, 2500);
@@ -221,7 +220,7 @@ test('SEA-BOUNTY the board\'s law: its bounds and presses, a wanted captain for 
   assert.equal(B.readSeaBoard({ wanted: 'x' }), null);
   const many = Array.from({ length: 20 }, (_, i) => ({ char: `r${i}`, name: `n${i}`, kills: i, bounty: i * 10 }));
   assert.equal(B.readSeaBoard({ wanted: many }).wanted.length, B.SEA_BOARD_MAX);
-  assert.deepEqual(B.readSeaBoard({ wanted: [{ char: 'r1', name: 'kim', kills: -3, bounty: 1.5 }, { char: 'r2', name: '' }, { name: 'x' }, null], owed: 'x', mine: 40 }), { wanted: [{ char: 'r1', name: 'kim', kills: 0, bounty: 0 }], owed: 0, refund: 0, mine: 40, prizes: 0, back: 0 });   // PIN MOVED (SHIP-PVP): the prizes' counts; PIN MOVED (AUDIT SEA VENTURES B4): the refund's
+  assert.deepEqual(B.readSeaBoard({ wanted: [{ char: 'r1', name: 'kim', kills: -3, bounty: 1.5 }, { char: 'r2', name: '' }, { name: 'x' }, null], owed: 'x', mine: 40 }), { wanted: [{ char: 'r1', name: 'kim', kills: 0, bounty: 0 }], owed: 0, refund: 0, mine: 40, prizes: 0, back: 0 });
 });
 
 /** The page's half over a fake door, session and wallet. */

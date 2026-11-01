@@ -1,6 +1,4 @@
-// WEATHER2b (2026-09-14, Mac: "a dynamic world space event system where
-// weather can be traveled out of and into instead of just starting and
-// stopping in your location") - THE WEATHER FIELD: the day's words as
+// WEATHER2b - THE WEATHER FIELD: the day's words as
 // PLACES.
 //
 // DFU's weather is a state of the player's climate ZONE: PlayerEntity

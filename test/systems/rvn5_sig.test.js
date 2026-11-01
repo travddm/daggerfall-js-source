@@ -1,5 +1,4 @@
-// RVN5 - SIGNATURE BLOWS (bible/12-Enhanced-AI/Feud-Arc.md section 16; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). From rank 2 a revenant has one signature, drawn on its id from the shapes
+// RVN5 - SIGNATURE BLOWS (;, then "Go"). From rank 2 a revenant has one signature, drawn on its id from the shapes
 // its family reaches past its ordinary set (a blade a slam or a charge, a beast a charge or a leap, a brute a ring or a
 // charge; a caster, a spectral, a small kind or a flyer the PYRE - a disc at its target's feet that lands as a blast of
 // its element through the one cast engine, so the saving throw answers it). x2.0, its own cooldown of 12-18 s, iron

@@ -1,9 +1,9 @@
-// AUDIT 29 (2026-09-28, Mac: "Lets audit everything so far before we continue") - THE GATHERING HOST AND THE SEAMS, AS
+// AUDIT 29 - THE GATHERING HOST AND THE SEAMS, AS
 // THE AUDIT FOUND THEM: a node takes E only near the crosshair, in reach, seen, and ready; a press during an act is the
 // act's; a switch shut mid-act ends it; the floating origin moves an act's node with it; one dungeon stand at a time; a
 // kept harvest's answer says its rank's rise and stands its node again; the Basket is not mashed; a rock's foot is not
 // inside its neighbour; the compass asks the near pixels alone - and the hosts' lines by source. Each pin failed on
-// the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 29.
+// the code before its fix. AUDIT 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -190,18 +190,18 @@ test('AUDIT 29 C4: a kept harvest answered through the pump says its rank\'s ris
     const v = await ready(t);
     t.face(v);
     t.host.tick(0.016);
-    const centers = () => t.entry.batches.reduce((a, b) => a + (b.dynamic ? 0 : b.centers ?? 0), 0);   // PIN MOVED (VEIN-CRACKS, GATHER-FEEL II, 2026-10-13): a blow's chunks are a dynamic batch on the pixel's list, no node's flats
+    const centers = () => t.entry.batches.reduce((a, b) => a + (b.dynamic ? 0 : b.centers ?? 0), 0);
     for (let i = 0; i < 4; i++) await tick();
     const drawnBefore = centers();
     assert.equal(t.host.press(), true);
     for (let i = 0; i < 8 && t.host.acting(); i++) { t.setInput({ attack: true }); t.host.tick(MINE_ACT.swingS + 0.01); t.setInput({}); t.host.tick(0.01); }
-    t.host.tick(MINE_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last strike's blow lands - its node goes then, not on the press
+    t.host.tick(MINE_ACT.swingS);   // GATHER-FEEL (
     for (let i = 0; i < 6; i++) await tick();
     assert.equal(t.book.pendingHarvests, 1, 'kept - its first ask unanswered');
     assert.ok(!t.said.some((x) => /Mining 24 -> 25/.test(x)));
     const shown = t.host.nodesOf(PX, 150).filter((x) => x.what === 'vein').length;
     assert.ok(shown > 0);
-    // GATHER-SPEED (PIN MOVED): the node went with its act - being counted is gone from the world (profBook `gone`)
+    // GATHER-SPEED (
     assert.equal(centers(), drawnBefore - 3, 'its node\'s flats taken down as its act ended, its harvest kept');
     t.clock.ms += 3_000;   // its wait past: the host's pump asks it again
     for (let i = 0; i < 10 && t.book.pendingHarvests; i++) { t.host.tick(0.016); await tick(); await tick(); }

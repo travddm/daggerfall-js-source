@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// REVENANTS (2026-10-02, Mac: "the ability for these enemies that kill you, or a very small chance to flee at low
-// health. These enemies can return at a later time stronger, with a new name, a chance of more loot and taunt the
-// player"; REVENANT-NAME, Mac: "Should instead be something unique" - a foe that RETURNS).
+// REVENANTS.
 //
 // WHO BECOMES ONE. A SPECIAL foe - an elite (systems/eliteFoes.js), a LOOT7 champion (systems/champions.js) or a
 // revenant already - that
@@ -31,13 +29,12 @@
 // OFF IS DFU EXACTLY: with the loot-rarity row off (the Loot arc's switch, as LOOT7's), no revenant is made, flees or
 // returns.
 //
-// RENOWN-GATE (2026-10-12, bible/06-Systems/Revenants.md section 39): ONLINE, REVENANTS WAIT FOR RENOWN 10
+// RENOWN-GATE: ONLINE, REVENANTS WAIT FOR RENOWN 10
 // (REVENANT_MIN_RENOWN). Under it a character's are HELD (revenantHeld): every door that makes, stands, spreads or marks
 // one answers as the switch's off does, while what is remembered stays on the page and the sworn keep their days.
 // Offline nothing is held. And a due one takes two encounter rolls in five, not one in two (REVENANT_RETURN_CHANCE).
 //
-// UNQUIET (2026-10-17, bible/06-Systems/Revenants.md section 46 - the owner: "harder, rarer, revenants need more of a
-// chance to flee instead of relying on player death"): the paragraphs above are the law as it began. Now only a special
+// UNQUIET: the paragraphs above are the law as it began. Now only a special
 // foe carrying THE MARK (systems/revenant/unquietMark.js, one in four) rises, and none while REVENANT_MAX (3) hunt the
 // player; a marked foe breaks at the young line on one roll in two and runs as a bolt does; a revenant ranks up at every
 // getting-away, at every second tear-away and at every second kill (revenantUnquiet.js TEAR_RANK, BLOOD_RANK); it comes
@@ -91,7 +88,7 @@ import { KNIGHT_CITY_WATCH } from '../../characters/mobile/mobileTypes.js';
 import { firstName, monsterName, BANK_TYPES, GENDERS } from '../../characters/nameHelper.js';
 import { getSeed, setSeed, srand } from '../../formats/dfRandom.js';
 import { personalityFor, isPersonality, personalityLabel, voiceLine, beastBody, possessive, MUTE_KINDS } from './revenantPersonality.js';   // REVENANT-VOICE: who it is, and how it talks
-// FEUD, Part B (bible/12-Enhanced-AI/Feud-Arc.md sections 12-26): what a revenant remembers - its record's new fields and
+// FEUD, Part B: what a revenant remembers - its record's new fields and
 // the draws it is born with (systems/revenant/revenantFeud.js), and the fight's ledger (systems/feudLedger.js, a leaf)
 import { ADAPT_HOW, DESERT, deserterSplit, LOYALTY, movedLoyalty, ROUT, FESTER, festersOn, WRATH_MAX, idStream, TOOK_MAX, LAIR_RING_R, RUMOR_CHANCE, RUMOR_PX, RUMOR_WEAK, RUMOR_NAMED, RUMOR_HINTS, weaknessKind, lairAfter, sameLair, feudFields, newFeudFields, feudScars, withScars, weaponFeudClass, drawSignature, sanitizeLoyalty, hashStr, SIG_RANK, lessonOf, withLesson, adaptEdge, adaptBlowClass, ADAPT, isWeakBlow, metalOf, willMatters, WEAK, WEAK_NAMES, FLINCH_LINES, FLINCH_HEALTH, WEAKNESS_ELEMENTS, signatureStamp } from './revenantFeud.js';
 import { sanitizeGear, gearItems } from './revenantGear.js';   // RVN-GEAR: a sworn one's kit - its record's, read back; inventory as its pack is
@@ -111,11 +108,10 @@ import { setFeudGate, setFeudClock, noteFeudHarm, noteFeudBackstab, takeFeud, se
 // ── the numbers ─────────────────────────────────────────────────────
 /** A revenant is a foe of this level or more (LOOT7's champion floor, ELITE-FLOOR's). */
 export const REVENANT_MIN_LEVEL = 3;
-/** RENOWN-GATE (2026-10-12, the owner: "gate elite/revenant spawns behind renown level"; asked, "Elites 5, revenants 10",
- *  offline "Unchanged offline"): online, a character's revenants wait for this Renown (revenantHeld) - an evening's play
+/** RENOWN-GATE: online, a character's revenants wait for this Renown (revenantHeld) - an evening's play
  *  past the elites' 5 (eliteFoes.js ELITE_FOE_MIN_RENOWN), so a returning elite always finds elites standing. */
 export const REVENANT_MIN_RENOWN = 10;
-/** How many living revenants hunt a character. UNQUIET (section 46; the owner: "rarer"): three - and while three hunt the
+/** How many living revenants hunt a character. UNQUIET (section 46): three - and while three hunt the
  *  player none other rises (no foe is marked - systems/revenant/unquietMark.js - and a marked one is no candidate); it was
  *  five, a sixth replacing the weakest, oldest. A deserter or a betrayer past it still buries the weakest, oldest; a
  *  kinsman's killer handed to an heir joins them past it (AUDIT UNQUIET). The Dread hunts no one - it waits at home - and
@@ -125,16 +121,14 @@ export const REVENANT_MAX = 3;
 export const REVENANT_MAX_RANK = 5;
 /** Under this share of its health a revenant past its will's rank may run - once, the first time it falls under. */
 export const REVENANT_FLEE_HEALTH = 0.2;
-/** ...and runs on this roll. UNQUIET (section 46; the owner: "revenants need more of a chance to flee instead of relying on
- *  player death"): a MARKED foe not yet a revenant breaks at the young line (REVENANT_FLEE_HEALTH_YOUNG) on
+/** ...and runs on this roll. UNQUIET (section 46): a MARKED foe not yet a revenant breaks at the young line (REVENANT_FLEE_HEALTH_YOUNG) on
  *  REVENANT_FLEE_CHANCE - it was an elite's or a champion's "very small chance", 5% at a fifth, so nearly every revenant
  *  was born of the player's death; a revenant past its will's rank on REVENANT_FLEE_CHANCE_REVENANT (it was 15%).
  *  AUDIT UNQUIET (section 49): one roll in two (it was three in four), at REVENANT_FLEE_PACE_MARKED - at the old pace a
  *  fast runner cornered every flight and a slow one let three and a half times as many be born. */
 export const REVENANT_FLEE_CHANCE = 0.5;
 export const REVENANT_FLEE_CHANCE_REVENANT = 0.35;
-/** FLIGHT-FIRST (2026-10-07, Mac: "Player death shouldnt be the common way of revenant growth, it should be more common
- *  for revenants to flee instead of being easily captured"): a revenant UNDER ITS WILL'S RANK (revenantFeud.js
+/** FLIGHT-FIRST: a revenant UNDER ITS WILL'S RANK (revenantFeud.js
  *  WILL_RANK) has no will to tear away on at the killing blow - its flight is how it lives. It breaks at this share of
  *  its health (one blow rarely carries it past the line, as it did the fifth) and runs on this roll. */
 export const REVENANT_FLEE_HEALTH_YOUNG = 0.35;
@@ -163,8 +157,7 @@ export const REVENANT_TOMBS_MAX = 200;
  *  one to three; a revenant of VENGEANCE comes in one to two (revenantUnquiet.js AMBITION.VENGEANCE_DUE). */
 export const REVENANT_RETURN_MIN_MINUTES = 2880;
 export const REVENANT_RETURN_MAX_MINUTES = 5760;
-/** A due revenant takes an open-world encounter roll this often. RENOWN-GATE (the owner: "slighty reduce the spawn rate
- *  of revnants"; asked, "Return chance 50% → 40%"): two rolls in five - it was one in two. */
+/** A due revenant takes an open-world encounter roll this often. RENOWN-GATE (; asked, "Return chance 50% → 40%"): two rolls in five - it was one in two. */
 export const REVENANT_RETURN_CHANCE = 0.4;
 /** Out in the world and gone unfought (outrun, a load, a sweep), it waits this long and comes again. */
 export const REVENANT_LOST_MINUTES = 360;
@@ -202,7 +195,7 @@ export const revenantSpeaks = (mobileType) => !MUTE_KINDS.has(mobileType);
 export const REVENANT_EPITHETS = Object.freeze({
   slew: Object.freeze(['the Butcher', 'the Gravedigger', 'the Widowmaker', 'Bloodhand', 'Bane of {p}', 'the Unbowed', 'Who Slew {p}', 'the Reaper']),
   fled: Object.freeze(['the Scarred', 'the Survivor', 'the Cunning', 'the Hunted', 'Half-Dead', 'the Lucky', 'Who Ran', 'the Unbroken']),
-  // RVN10 (bible/12-Enhanced-AI/Feud-Arc.md 21): it knocked out my companion (`{a}` the companion's name); I ran from it
+  // RVN10 (21): it knocked out my companion (`{a}` the companion's name); I ran from it
   felled: Object.freeze(['Bane of {a}', 'the Companion-Killer', 'Breaker of Oaths']),
   routed: Object.freeze(['Who Made {p} Run', 'the Pursuer']),
   // RVN11b (22.2): it broke its oath - whatever its rank, this is its name
@@ -265,7 +258,7 @@ const skyIsNight = () => { try { return isNight(skyMinutes()); } catch { return 
 const skyIsDay = () => { try { return !isNight(skyMinutes()); } catch { return false; } };
 const firstWord = (s) => String(s ?? '').trim().split(/\s+/)[0] || 'stranger';
 const pick = (list, rolls) => list[Math.min(list.length - 1, Math.floor(rolls() * list.length))];
-// AUDIT (2026-10-02): `{p}'s` the possessive the trophies spell ("Varis' Shadow"); a function replacement, so a `$` in
+// AUDIT: `{p}'s` the possessive the trophies spell ("Varis' Shadow"); a function replacement, so a `$` in
 // a typed name is a letter, never a pattern
 const fill = (s, { p = '', n = '', a = '' } = {}) => s.replace(/\{p\}'s/g, () => possessive(p)).replace(/\{p\}/g, () => p).replace(/\{n\}/g, () => n).replace(/\{a\}/g, () => a);   // RVN10: `{a}` the companion felled
 const joinName = (given, epithet) => (/^the /.test(epithet) ? `${given} ${epithet}` : `${given}, ${epithet}`);
@@ -274,7 +267,7 @@ const joinName = (given, epithet) => (/^the /.test(epithet) ? `${given} ${epithe
  *  breaks and runs) one minted on it then and kept, so the revenant it becomes speaks as it already did. */
 const voiceIdOf = (entity) => entity?.revenant?.id ?? (entity._voiceId ??= mintCharacterId());
 const isU32 = (v) => Number.isInteger(v) && v >= 0 && v <= 0xffffffff;
-/** FB1012d ALLY-RACE (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): ITS PERSON - the seed its Morrowind body's race,
+/** FB1012d ALLY-RACE: ITS PERSON - the seed its Morrowind body's race,
  *  face, head, hair and clothes are drawn by (characters/foeBodies.js ownPerson). Minted once, at its birth, off the body
  *  that did the deed (foeSeed: the man the player saw), and kept on the record, so every return, the kneel, the oath, the
  *  sworn one at the player's side and a betrayal are that one person - each stand drew its own off where it stood, and
@@ -419,7 +412,7 @@ function ensureMirror(player) {
   let kept = [], keptDay = null;
   try { const raw = appStorage()?.getItem(storeKey(id)); if (raw) { const m = JSON.parse(raw); kept = m?.list ?? []; keptDay = sanitizeDay(m?.lastDay); } } catch { /* a bad mirror is no mirror */ }
   const live = _state.list.map((r) => ({ id: r.id, out: r.out, outAt: r.outAt }));
-  // AUDIT (2026-10-02): A SWORN ONE'S PACK IS THE SAVE'S. The mirror outlives a load (a revenant remembers), but a pack
+  // AUDIT: A SWORN ONE'S PACK IS THE SAVE'S. The mirror outlives a load (a revenant remembers), but a pack
   // is inventory: the save's own copy says what is in it (none, where the save never knew it sworn) - else a load handed
   // back the items the save's own pack also held, or lost ones it never had. And one the save holds sworn with a pack,
   // released after it, comes back as the save had it: its pack is no one's to lose.
@@ -453,7 +446,7 @@ function ensureMirror(player) {
     r.took = s?.took ? s.took.slice() : [];   // RVN8 (Feud-Arc.md 19): what it took is inventory too - the save's copy wins (the mirror never brings back a piece the save holds)
     // LETTERS-HOME (FIELD BUGS 2026-10-18b): a letter of credit one took before revenantMayTake refused it is mine again -
     // living, fallen with a body that never carried it, or kept by a deserter. The save's copy, so never one its pack holds.
-    // STEED-KEPT (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Exclude, and return taken ones"): and EVERY piece it may
+    // STEED-KEPT (FIELD BUGS 2026-10-19f): and EVERY piece it may
     // no longer take - a horse, a cart, a deed, a ship's deed or parts, the spellbook - into my pack, where the game keeps
     // owned transport (DFU's Items.Contains(Transportation, Horse)), each said once the world can say it
     const home = r.took.filter((it) => !revenantMayTake(it));
@@ -490,7 +483,7 @@ function prune() {
 function trimLiving(keep) {
   const living = huntingRevenants();
   if (living.length > REVENANT_MAX) {
-    const drop = living.filter((x) => x !== keep && !x.out && !x.took?.length).sort((x, y) => x.rank - y.rank || x.born - y.born)[0];   // RVN8: never one holding a piece of mine   // AUDIT (2026-10-02): never one standing in the world   // UNQUIET: never the Dread (AUDIT UNQUIET: not among those that hunt - `living` holds none)
+    const drop = living.filter((x) => x !== keep && !x.out && !x.took?.length).sort((x, y) => x.rank - y.rank || x.born - y.born)[0];   // RVN8: never one holding a piece of mine   // AUDIT: never one standing in the world   // UNQUIET: never the Dread (AUDIT UNQUIET: not among those that hunt - `living` holds none)
     if (drop) bury(drop);
   }
 }
@@ -510,7 +503,7 @@ export function revenantCandidate(entity, rec = null) {
   if (!entity || !revenantOn()) return false;
   if (revenantHeld()) return false;   // RENOWN-GATE: held - none made, none runs (a flight that could make no revenant would only rob a kill), no ledger kept
   if (entity.retinueOf != null) return false;   // RVN6 (Feud-Arc.md 17): a band's follower is its master's, never one itself
-  if (entity.wildFoe || entity.wildGiant) return false;   // PVPDUNGEONS (the owner: "No elite or any monster in the zone can be a revenant")
+  if (entity.wildFoe || entity.wildGiant) return false;   // PVPDUNGEONS
   if (entity.bout) return false;   // AUDIT ARENA-LADDER 2: a fighter on the sand is its bout's - an elite champion never flees it as a revenant, nor becomes one
   const special = !!entity.revenant || !!entity.eliteFoe || (typeof entity.champion === 'string' && !!entity.champion);
   if (!special) return false;
@@ -543,7 +536,7 @@ export function revenantDeed(player, entity, deedName, { mobileType = entity?.mo
   if (!revenantCandidate(entity, rec) || !Number.isInteger(mobileType)) return null;
   const pName = player?.name ?? '';
   let r = entity.revenant?.id ? revenantById(entity.revenant.id) : null;
-  // AUDIT (2026-10-02): a judged one - executed, released, sworn - does no deed (a poison of its own finishing the player
+  // AUDIT: a judged one - executed, released, sworn - does no deed (a poison of its own finishing the player
   // after it knelt raised it again, under its own id); and a forgotten one's id is never worn again
   if (r && (r.defeated || r.sworn)) return null;
   if (!r && entity.revenant?.id) entity.revenant = null;
@@ -654,7 +647,7 @@ function armDeathCheck(entity) {
     _blowKiller = null;
     if (!(entity.health <= 0) || !killer || killer.isPlayer || !(killer.health > 0)) return;   // a foe I slew is no revenant - a fall after the fight names nobody dead
     const rec = playerDoor()?.foes?.()?.find((x) => x?.entity === killer) ?? null;
-    if (rec && (rec.yielded || rec.executing || rec.sparing)) return;   // AUDIT (2026-10-02): a beaten one kneeling claims no kill
+    if (rec && (rec.yielded || rec.executing || rec.sparing)) return;   // AUDIT: a beaten one kneeling claims no kill
     clearPlayerHarm();   // answered: a second death (a Resurrect's, a fall) is not this foe's again
     revenantDeed(entity, killer, 'slew', { mobileType: rec?.mobileType ?? killer.mobileType, gender: rec?.gender ?? 'male', rec, archive: rec?.archive ?? rec?.mobileArchive ?? null });
   });
@@ -862,7 +855,7 @@ export function revenantCompanionUpdate(player, id, change) {
 export const revenantRecord = (player, id) => { ensureMirror(player); return revenantById(id); };
 
 // ── LAIR-HOME: one revenant, one body ──────────────────────────────
-/** LAIR-HOME (FIELD BUGS 2026-10-19, bible/01-Overview/bugs/Field-Bugs-2026-10-19.md): EACH REVENANT'S BODY - the entity
+/** LAIR-HOME (FIELD BUGS 2026-10-19): EACH REVENANT'S BODY - the entity
  *  its latest stand put it in (applyRevenant), or the foe still standing after its deed (revenantDeed: a killer over my
  *  body, a felling foe). One revenant, one body: a body that is not its record's latest is STALE - it went home, or a
  *  later stand took its place - and its pool withdraws it (revenantStale). This session's, never saved: a load stands no
@@ -927,7 +920,7 @@ export function revenantToReturn(player, { now = nowMinutes(), rolls = Math.rand
   claim(due[0]);
   return due[0];
 }
-// ── RVN8: what it takes (bible/12-Enhanced-AI/Feud-Arc.md 19) ─────────────────────────────────────────────────────
+// ── RVN8: what it takes (19) ─────────────────────────────────────────────────────
 /** This death's killer, by the slew deed - taken (once) at the respawn; AUDIT FEUD: forgotten by a rise that is none
  *  (a Resurrect - forgetLastSlew), a load and a new game. */
 let _lastSlew = null;
@@ -938,7 +931,7 @@ export function forgetLastSlew() { _lastSlew = null; }
  *  Wallet's row): what it takes leaves the pack for its record, one that escapes keeps it, and a character is given its
  *  wallet once. LETTERS-HOME (FIELD BUGS 2026-10-18b): nor a LETTER OF CREDIT - a letter is gold (its `value` is the
  *  gold it stands for), and "gold" was the coin alone, so a 500,000-gold letter was the pack's most valuable piece and
- *  the likeliest drawn. STEED-KEPT (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Exclude, and return taken ones"):
+ *  the likeliest drawn. STEED-KEPT (FIELD BUGS 2026-10-19f):
  *  nor what never changes hands, as the open zone's death reads it (wildDropLaw.js wildCanLose) - A VEHICLE (the zone's
  *  own groups, WILD_NEVER_GROUPS: a horse, a cart), A DEED (those groups' Deeds, and the decor's kept-back list,
  *  decorLaw.js DECOR_OWN_KEPT_BACK - a house's or a ship's deed as Daggerfall files them, and the spellbook with them:
@@ -1007,7 +1000,7 @@ export function revenantHandBack(player, r, entity = null) {
   persist();
   return back;
 }
-/** RVN7d (bible/12-Enhanced-AI/Feud-Arc.md 18.4): WHO IS AT HOME - entering the dungeon at `here` ({ px, py }), the
+/** RVN7d (18.4): WHO IS AT HOME - entering the dungeon at `here` ({ px, py }), the
  *  living, unsworn revenant whose lair it is, not out, and due or its lair known; CLAIMED as a return is (its stand
  *  crosses awaits). Decided here: a Night-stalker is at home at any hour - the dark is its own underground. LAIR-HOME
  *  (FIELD BUGS 2026-10-19): one OUT is at home too, unless its body is here, in a fight with me, kneeling, or still
@@ -1138,7 +1131,7 @@ export function grantRevenantLoot(entity, level, rolls = Math.random, { goldMult
   entity.items.push(...revenantLoot(level ?? entity.level, entity.revenant.rank ?? 1, rolls, goldMult * hoard));
   carryTaken(entity);   // RVN8: what it took of mine, in its pack at every stand
 }
-/** RVN8 (bible/12-Enhanced-AI/Feud-Arc.md 19): what it took of mine rides in a standing body's pack - marked, so its
+/** RVN8 (19): what it took of mine rides in a standing body's pack - marked, so its
  *  death hands the record's pieces to its body. */
 function carryTaken(entity) {
   const r = entity?.revenant?.id ? revenantById(entity.revenant.id) : null;
@@ -1155,7 +1148,7 @@ function carryTaken(entity) {
 // the host's own `say`.
 const capFirst = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 /** What a returning revenant greets the player with: its words (a speaker's) or what it does (a beast's). */
-/** RVN12a (bible/12-Enhanced-AI/Feud-Arc.md 23): the deeds a return answers to, newest first. */
+/** RVN12a (23): the deeds a return answers to, newest first. */
 const TAUNT_DEEDS = new Set(['slew', 'fled', 'felled', 'routed', 'festered']);
 /** RVN12a (23): WHAT ITS RETURN SAYS - its newest deed against me speaks first: a companion it felled (`felled_return`,
  *  by name), my flight (`routed_return`), its long wait (`festered`); after a kill, what it took of mine (`stole`, the
@@ -1177,7 +1170,7 @@ export function tauntMoment(r) {
   const how = ADAPT_HOW[r?.learned?.[r.learned.length - 1]];
   if (how && (r.returns | 0) % 2 === 1) return { event: 'learned', vars: { how } };
   const lastSF = since.find((d) => d.deed === 'slew' || d.deed === 'fled')?.deed ?? 'slew';
-  // AUDIT (2026-10-02): the risen's taunt counts its kills ("I've killed you so often...") - one that only ever ran has none
+  // AUDIT: the risen's taunt counts its kills ("I've killed you so often...") - one that only ever ran has none
   return { event: r.rank >= 3 && (r.kills | 0) >= 2 ? 'taunt_risen' : lastSF === 'fled' ? 'taunt_fled' : 'taunt_slew', vars: {} };
 }
 function tauntParts(r, playerName, rolls) {
@@ -1358,7 +1351,7 @@ export function revenantSignatureEvent(r, noun, { archive = null, playerName = '
   const v = voiceParts(r, 'signature', playerName, rolls, { move: noun ?? null });   // RVN12a (23): its words for it
   return revenantEvent('signature', r, { speech: v.speech, body, line: v.speech ? `${body} "${v.speech}"` : body, archive });
 }
-/** RVN7b (bible/12-Enhanced-AI/Feud-Arc.md 18.2): A TOWN'S NEWS OF A REVENANT - "Any news?" asked `here` ({ px, py,
+/** RVN7b (18.2): A TOWN'S NEWS OF A REVENANT - "Any news?" asked `here` ({ px, py,
  *  region }: my map pixel and region) within RUMOR_PX of a living, unsworn revenant's lair, or in its lair's region,
  *  one time in RUMOR_CHANCE is answered with it: "They say a scarred orc called Grushnak the Butcher has been seen near
  *  the Tomb of Vaness, a day's ride to the north-east." It spends the person's one answer as the mill's own does (the
@@ -1427,7 +1420,7 @@ export function mendRevenantLairs(door = playerDoor()) {
   if (moved) persist();
   return moved;
 }
-/** RVN7c (bible/12-Enhanced-AI/Feud-Arc.md 18.3): THE LAIRS HEARD OF, ON THE MAPS - a circle at each living, unsworn
+/** RVN7c (18.3): THE LAIRS HEARD OF, ON THE MAPS - a circle at each living, unsworn
  *  revenant's lair the player knows (`lairKnown`), named for it (ui/bounty/bountyMapMark.js's shape, in blood red). */
 export function revenantMapMarks() {
   if (revenantHeld()) return [];   // RENOWN-GATE: held - no lair marked where none waits
@@ -1465,7 +1458,7 @@ export function forgetRevenantLair(id) {
   return true;
 }
 setHuntJournal({ abandon: (id) => forgetRevenantLair(id) });
-/** RVN9 (bible/12-Enhanced-AI/Feud-Arc.md 20): FESTERING - the character's day against the store's `lastDay`, whole days
+/** RVN9 (20): FESTERING - the character's day against the store's `lastDay`, whole days
  *  caught up (FESTER.CATCHUP at most): a living, unsworn, not-out revenant FESTER.DAYS past its due day gains a wrath,
  *  and another every FESTER.EVERY days more; at WRATH_MAX it ranks up on its own (the `festered` deed, a new epithet, its
  *  card's notice) and its wrath goes back to none - never past rank 5, where its wrath stops at three. Asked by the
@@ -1535,7 +1528,7 @@ export function revenantFester(player, { now = nowMinutes(), rolls = Math.random
   persist();
   return up;
 }
-/** RVN11b (bible/12-Enhanced-AI/Feud-Arc.md 22.2): the host's ear for a sworn one leaving the party by its own will (its
+/** RVN11b (22.2): the host's ear for a sworn one leaving the party by its own will (its
  *  member forgotten - systems/revenant/revenantCompanions.js registers it). */
 let _swornLeft = null;
 export function setSwornLeftListener(fn) { _swornLeft = typeof fn === 'function' ? fn : null; }
@@ -1578,7 +1571,7 @@ function splitPack(player, r) {
   r.took = [...(r.took ?? []), ...kept];
   return { kept, back };
 }
-/** RVN11c (bible/12-Enhanced-AI/Feud-Arc.md 22.3): BETRAYED - a sworn one under BETRAY.AT, Unhinged, Craven or Brutal,
+/** RVN11c (22.3): BETRAYED - a sworn one under BETRAY.AT, Unhinged, Craven or Brutal,
  *  turns on me: out of the party, its rank up (never past 5; its signature drawn at 2), "the Betrayer" whatever its rank,
  *  the `betrayed` deed; its pack as a deserter's (what it may hold it carries on its record - recovered when it falls -
  *  the rest, and its gold, to me); the cap held; its member forgotten. The host stands it, hostile, where its body stood
@@ -1640,14 +1633,14 @@ export function revenantWakeEvent(r, { archive = null } = {}) {
   const body = `You wake to ${r.given} standing over you.`;
   return revenantEvent('lair', r, { body, line: body, archive });
 }
-/** RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.1): A DEVOTED ONE'S WARNING - a wind-up at me begun behind me: "Behind you,
+/** RVN11 (22.1): A DEVOTED ONE'S WARNING - a wind-up at me begun behind me: "Behind you,
  *  Ayla!" (a beast's, what it does). RVN12 brings its voice's own lines. */
 export function revenantWarnEvent(r, playerName, { rolls = Math.random } = {}) {
   const v = voiceParts(r, 'devoted_warn', capFirst(firstWord(playerName)), rolls);   // RVN12a (23): in its own voice
   return revenantEvent('warn', r, { speech: v.speech, body: v.body, line: v.line });
 }
 
-// ── RVN10: felled and routed (bible/12-Enhanced-AI/Feud-Arc.md section 21) ─────────────────
+// ── RVN10: felled and routed ─────────────────
 /** RVN10 (21.1): FELLED - a special foe's blow knocked out my companion (a sworn revenant, a crew hand ashore): the deed
  *  on its striker (the pool's record the knock-out arm noted - `striker`), the companion's name on it; it still stands,
  *  so it is out. Answers the record, or null (a striker dead or down, a companion unnamed, or no candidate). */
@@ -1751,7 +1744,7 @@ export function revenantRiseEvent(r, playerName, { rolls = Math.random } = {}) {
  *  moment says more than its words), and its one text line. */
 export function revenantMomentEvent(kind, r, playerName, { body = null, line = null, rolls = Math.random, archive = null, as = null } = {}) {
   const v = voiceParts(r, kind, playerName, rolls);
-  // AUDIT (2026-10-02): what the moment says (`body` - its trophy, where it will wait, what to do) is kept for a beast
+  // AUDIT: what the moment says (`body` - its trophy, where it will wait, what to do) is kept for a beast
   // after its deed, and on the text line after either's. RVN-ERRAND: `as` - the card's own kind, its voice the moment's
   return revenantEvent(as ?? kind, r, {
     speech: v.speech, body: v.speech ? body : [v.body, body].filter(Boolean).join(' '),
@@ -1794,14 +1787,14 @@ function revenantOmen(now) {
 // ── the save ────────────────────────────────────────────────────────
 registerModSaveData(REVENANT_SAVE, {
   newSaveData: () => ({ v: 1, list: [], lastDay: null }),
-  // AUDIT (2026-10-02): one standing as the save is made comes back later (REVENANT_LOST_MINUTES), not at once beside
+  // AUDIT: one standing as the save is made comes back later (REVENANT_LOST_MINUTES), not at once beside
   // the street's copy of it - the street's save leaves it out (scenes/exteriorFoes.js snapshotWorld)
   getSaveData: () => ({ v: 1, list: _state.list.map((r) => (r.gone ? r : { ...r, out: false, outAt: 0, dueAt: r.out ? Math.max(r.dueAt, nowMinutes() + REVENANT_LOST_MINUTES) : r.dueAt })), lastDay: _state.lastDay }),
   restoreSaveData: (rec) => { _state.list = mergeRevenants(rec?.list ?? [], []); _state.lastDay = sanitizeDay(rec?.lastDay); _state.mirrorId = null; _lastSlew = null; clearPlayerHarm(); endPlayerFights(); forgetBodies(); },   // the last game's harm is no one's death in this one (RVN10: nor its fights a rout; AUDIT FEUD: nor its killer a thief)
   newGame: () => { _state.list = []; _state.lastDay = null; _state.mirrorId = null; _lastSlew = null; clearPlayerHarm(); endPlayerFights(); forgetBodies(); },
 });
 
-/** LEGACY6 (bible/06-Systems/Legacy-Arc.md section 10, "the killer is remembered"): THE FOE THAT ENDED A CHARACTER -
+/** LEGACY6 ("the killer is remembered"): THE FOE THAT ENDED A CHARACTER -
  *  read off that character's own mirror (the app's storage under its id): the living, unjudged revenant whose kill fell
  *  within KILL_NEAR_MINUTES of `ownAt` (the fallen's own clock as they fell), the latest such. A copy, or null. */
 export const KILL_NEAR_MINUTES = 2;

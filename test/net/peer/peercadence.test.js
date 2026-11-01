@@ -1,5 +1,4 @@
-// PEER-CADENCE (2026-09-22, Mac: "look for ways to improve online
-// performance"): A PEER'S BODY IS RE-POSED ON A CADENCE THE EYE CAN
+// PEER-CADENCE: A PEER'S BODY IS RE-POSED ON A CADENCE THE EYE CAN
 // SEE. Every standing peer body was skinned, re-uploaded and
 // particle-stepped every frame (PERF-RIG1: ~0.3 ms a body at 3,000
 // vertices, eight bodies at once) against a pose that arrives at

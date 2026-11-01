@@ -1,5 +1,5 @@
 // @ts-check
-// EL8 (2026-09-17): THE PERF READOUT - `?perf`. A frame's GPU time from
+// EL8: THE PERF READOUT - `?perf`. A frame's GPU time from
 // beginFrame to the resolve (EXT_disjoint_timer_query_webgl2, where the
 // browser has it - Chrome does, Safari and Firefox mostly do not, and then
 // the line carries the counts alone) and the lane's counts, one console
@@ -7,8 +7,7 @@
 // this is how Mac can, and how a quality setting could be tuned against
 // numbers instead of guesses. A leaf: no renderer, no lane.
 //
-// VC6d (2026-09-18, Mac: "overall enhancing performance on the outside
-// due to all our new additions"): `?perf=zones` breaks that one number
+// VC6d: `?perf=zones` breaks that one number
 // into the PASSES that make it. A frame's total is the only thing the
 // meter could say, and "14 ms" does not tell anyone which of the year's
 // additions to go after - the shadow cascades, the cloud march, the
@@ -36,7 +35,7 @@ export function perfZones(search = globalThis.location?.search ?? '') {
 }
 
 /**
- * PERF-CPU (2026-09-19): `?perf=cpu` - the same tiling, on the MAIN
+ * PERF-CPU: `?perf=cpu` - the same tiling, on the MAIN
  * THREAD's clock instead of the GPU's.
  *
  * Mac's readout, online: 51 fps, frame 19.7 ms, SCRIPT 23.3 ms, 1365
@@ -141,7 +140,7 @@ export class PerfMeter {
   }
   /** VC6d, DRAW PATH: close the last span of the frame. */
   stop() { if (this.cpu) this._cpuClose(); this._closeZone(); }
-  /** PERF-READ1 (2026-09-21, Mac's readout: `hud 7.09 | ... | world 0.06`):
+  /** PERF-READ1:
    *  close the CPU span at the END OF THE SCRIPT FRAME, and open nothing.
    *
    *  A CPU span closes at the next mark, and the next mark after the

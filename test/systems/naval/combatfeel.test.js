@@ -1,4 +1,4 @@
-// COMBAT-FEEL (2026-10-17, the owner: "Improve and polish combat and visuals"; bible/03-World/Naval-Refit.md COMBAT-FEEL)
+// COMBAT-FEEL
 // - the sea fight felt at my rail: gun smoke carried by the air (systems/naval/navalEffects.js SMOKE-WIND), a ball's
 // fall a spout grown for the eye far off (SPLASH-SPOUT), a near fall drenching her and a near pass whistling
 // (systems/naval/navalShots.js NEAR-MISS, scenes/naval/navalFeel.js DRENCH), the side a blow came from on her plate and

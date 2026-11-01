@@ -1,6 +1,5 @@
 // INTRO2: gesture -> score-led cinematic -> held title -> menu.
-// TITLE-DOOR (2026-10-27, the owner: "People really love the start game intro screen ... instead of this leading to the
-// online/offline options, we use the intro title screen as the landing pad itself with these options"): THE HELD TITLE
+// TITLE-DOOR: THE HELD TITLE
 // IS THE FRONT DOOR. Where it said Tap to continue, the menu's own doors stand on it - the film steps under the menu,
 // holds its last frame for the whole visit and is let go when a game is chosen (runCinematicFrontDoor). Skip intro and
 // Escape land on the title, not past it. The front door owns the audio session; the overlay owns its canvas, listeners
@@ -27,7 +26,7 @@ export const INTRO_CREDIT_URLS = Object.freeze({
   nexus: new URL('../../assets/intro/nexus.webp', import.meta.url).href,
 });
 
-// FONT3 (2026-10-02, Mac: "we need to ensure everything recieves our enhanced font"): the film's words - the credits,
+// FONT3: the film's words - the credits,
 // Begin, Continue, the footer - were Georgia and the system face, the front door's last words outside the skin's. They
 // are the pixel face (the trio, ui/pixelifyFive.js), with the five's own face carried here because this sheet mounts
 // before the skin's; the one font request is made at mount (injectEnhancedFonts, which ?nofonts still skips).
@@ -274,7 +273,7 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
     phase = 'playing'; gate.hidden = true; status.textContent = '';
   };
 
-  // MAC (2026-09-18): a browser gives audio exactly ONE chance per gesture, so
+  // MAC: a browser gives audio exactly ONE chance per gesture, so
   // the gesture surface is the WHOLE gate, not the 168 px button - a phone
   // player taps the screen, not a target. The button stays as the visible and
   // focusable affordance; a tap during 'preparing' is honoured too, so the

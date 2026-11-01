@@ -1,8 +1,7 @@
-// D1-LOAD (2026-10-11, from play: the account service stayed slow after SEAT-CAP and SEAT-LEASE; the owner: "do
-// whatever is the most detailed. I dont want band aid fixes") - WHAT IS FILLING THE ONE DATABASE, READ BY THE OPERATOR:
+// D1-LOAD - WHAT IS FILLING THE ONE DATABASE, READ BY THE OPERATOR:
 // tools/d1Load.mjs builds the Analytics Engine questions over the service's own metrics points (metrics.js) and
 // .github/workflows/d1-load.yml asks them by hand, beside D1's query insights, writing nothing.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-11h.md D1-LOAD.
+// D1-LOAD.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, writeFileSync, chmodSync } from 'node:fs';
@@ -142,7 +141,7 @@ case "$sql" in *"blob2 = 'CRON'"*) cp "$FAKE_DIR/cron.json" "$out"; echo -n "$FA
 
 const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
-const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (PIN MOVED): the rows the law judges by are a read of them
+const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
 /** The service with Anticlere confirmed and held by a guild, its seat witness reads counted (`c.n`). */
 async function heldSeat() {
   const svc = await standService(ENV);

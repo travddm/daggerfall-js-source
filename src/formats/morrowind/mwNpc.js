@@ -160,7 +160,7 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
  * src/formats/morrowind/mwFirstPerson.js (armReport, armMeshPaths), pinned against hand-built records and proven
  * against real archives.
  *
- * See bible/02-Formats/Morrowind-Rules.md rules 1 and 3, and Part VI.
+ * See rules 1 and 3, and Part VI.
  */
 
 /**

@@ -1,4 +1,4 @@
-// LOOT-GATE (2026-10-25): the roller's level holds Rare and Legendary back; the Imbue at the Mages Guild's Reforge.
+// LOOT-GATE: the roller's level holds Rare and Legendary back; the Imbue at the Mages Guild's Reforge.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { rareGate, legendaryGate, droughtHeld, registerRollerLevel } from '../../src/systems/loot/lootLevelGate.js';

@@ -1,5 +1,4 @@
-// GUILD-LIVE + GUILD-WRAP (2026-09-27, Discord: "Guild issues. Buttons not selectable until closed and reopened.
-// Depositing stretches names a lot with a syllable on each line").
+// GUILD-LIVE + GUILD-WRAP.
 //
 // GUILD-LIVE: the Guild tab's draft buttons (Found, Invite, Deposit, Withdraw, Rename ranks) were enabled once, at the
 // build, and a keystroke rebuilds nothing under the caret - so an amount typed left Deposit dead until the panel was
@@ -61,7 +60,7 @@ const button = (root, label) => find(root, 'dfsocial-btn').find((b) => b.textCon
 const settle = () => new Promise((r) => setImmediate(r));
 const field = (root, label) => find(root, 'dfsocial-field').find((f) => f.attrs['aria-label'] === label);
 
-// GUILD2 (PIN MOVED): the Guild tab is pages - a rig opens the one its test reads ('treasury', 'members'...)
+// GUILD2 (
 async function rig(guild = view(), invites = [], page = null) {
   const door = fakeDoor();
   door.mineGuild = guild; door.inviteList = invites;

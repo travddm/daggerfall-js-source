@@ -75,7 +75,7 @@ import { gameSettingsText } from '../systems/textDatabases.js';   // L10N3f: DFU
 /** SetupKeybindButtons' nine calls (:146-152): [startIndex, endIndex)
  *  into the Actions enum, and the group's anchor.
  *
- *  SOC5 (2026-09-16, Mac: "by pressing F on their body"): THIS WINDOW CANNOT
+ *  SOC5: THIS WINDOW CANNOT
  *  PLACE THE PORT'S OWN ACTION, and that is a layout fact, not a decision
  *  deferred. Every number above is a pixel on CNFG00I0.IMG - nine groups of
  *  47x7 buttons at a +11 stride, anchored where DFU's SetupKeybindButtons puts
@@ -392,7 +392,7 @@ export class ControlsWindow {
       return true;
     }
     if (this.capture) {
-      // MAC-K1 (Mac: "Mouse keybindings not working properly"). This
+      // MAC-K1. This
       // line read `return true` - "every tab ignores clicks
       // mid-capture (:283 etc.)" - which is the right law for a click
       // that means something ELSE, and the wrong one for the capture

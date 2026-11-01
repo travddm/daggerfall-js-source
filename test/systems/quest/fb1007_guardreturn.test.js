@@ -1,5 +1,4 @@
-// GUARD-RETURN (2026-10-07, a player through the lead: "Protect an Honored Mage: assassins spawn again after leaving and
-// re-entering the Mages Guild"; bible/06-Systems/Quest-Arc.md GUARD-RETURN). N0B20Y02: `until _S.12_ performed: pc at
+// GUARD-RETURN. N0B20Y02: `until _S.12_ performed: pc at
 // _magesguild_ set _S.01_`, and `_S.01_` is `create foe _F.00_ every 55 minutes 1 times with 100% success` - the three
 // Nightblades. PcAt.Update (PcAt.cs) STARTS the task on every tick the player is in the hall and CLEARS it on every tick
 // they are not; a clear rearms the task's actions (Task.SetTriggerValue -> RearmActions), and the next tick the task

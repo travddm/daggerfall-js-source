@@ -1,7 +1,5 @@
 // @ts-check
-// LEVEL-EVEN (2026-10-19, Discord #suggestions "Make Health from Endurance retroactive", through Mac; asked which of
-// retroactive endurance health, an averaged roll and a fixed bonus pool, Mac: "Your opinion" - the floor and the fixed
-// pool, online): "make the endurance effect on health per level retroactive, so that people are not penalized dozens or
+// LEVEL-EVEN: "make the endurance effect on health per level retroactive, so that people are not penalized dozens or
 // possibly hundreds of hp for not investing in endurance as early as possible ... making class health per level apply as
 // an average would help people not get gimped or buffed permanently by sheer randomness ... Making levels consistently
 // give 5 attribute points".

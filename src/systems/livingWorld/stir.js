@@ -1,7 +1,5 @@
 // @ts-check
-// LW-STIR (2026-10-08, bible/06-Systems/Living-World.md "LW-STIR"; Mac: "I say we improve the living world and go deeper.
-// Having spontaneous interactions, like a traveller being hostile with a guard and other smaller details that make the
-// world feel more alive"): THE STREET STIRS. Now and then two at one spot are more than a talking circle: the watch at a
+// LW-STIR: THE STREET STIRS. Now and then two at one spot are more than a talking circle: the watch at a
 // gate questions a stranger come in by it (halted there: `gateHalt`), and on its rounds stops one standing where it
 // stops, and the stranger answers as their humour has them that day - civil, curt, or hostile, the hostile shouting
 // back; two of the town fall out over a cart wheel or a goat, and the watch standing by breaks it up; a buyer haggles at

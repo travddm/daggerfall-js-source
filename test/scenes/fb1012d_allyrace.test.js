@@ -1,5 +1,4 @@
-// FB1012d ALLY-RACE (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md; the owner, 2026-10-12: "companions when morrowind
-// attached switches character race"). A companion's Morrowind body drew its race, face, head, hair and clothes off the
+// FB1012d ALLY-RACE (). A companion's Morrowind body drew its race, face, head, hair and clothes off the
 // STAND - characters/foeBodies.js foeSeed's species and where it stood (its number and feet, a dungeon's marker) - and the
 // companion layer (scenes/crewAshore.js) stands a fresh body at every door, dungeon, fast travel, load and sweep: the same
 // Breton hand walked out of the next door a Nord, a Wood Elf through the one after. A revenant drew its own afresh at
@@ -137,8 +136,8 @@ test('FB1012d ALLY-RACE a revenant is the person it was born as: the body that d
   }
   // a dungeon's record (its layout marker the stand's law) - the stamp wins there too
   assert.equal(foeSeed({ mobileType: r.mobileType, marker: [12, 0, 7], entity: { revenant: foe.entity.revenant } }), r.person, 'a dungeon return: its person over the marker');
-  // THE OATH: sworn, stood by the companion layer at my side through doors - the one that knelt. PIN MOVED (AUDIT FB1019
-  // C1, C2 - bible/01-Overview/audits/Audit-Field-Bugs-2026-10-19.md): the body its returns replaced is LEFT for good and
+  // THE OATH: sworn, stood by the companion layer at my side through doors - the one that knelt.
+  // C1, C2): the body its returns replaced is LEFT for good and
   // swears nothing in its name; the one that kneels is its latest
   assert.ok(!N.revenantSpared(me, foe.entity, { state: 'with' }), 'the body a later stand replaced swears nothing');
   assert.ok(N.revenantSpared(me, last.entity, { state: 'with' }), 'sworn');

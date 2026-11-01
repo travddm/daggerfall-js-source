@@ -9,7 +9,7 @@
 // (dungeonContext.js through worldModes.js) skin; the fixed city (exterior.js) stands no professions (FLAGGED, 29's law).
 // Every foe here is the real producer's: the quest's own Foe resource parsed from the vendored script (its foeType the
 // Quests-Foes table's), stood by the real pool's spawnFoe as tryPlaceInteriorQuestFoe stands it, felled by its damageFoe.
-// bible/06-Systems/Professions-Arc.md 29 (INDOOR-SKIN).
+// 29 (INDOOR-SKIN).
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// SEARCH1 + FOE-CAP (2026-10-03): short aimed pins - the searchables' law (systems/searchables.js), the box that acts
+// SEARCH1 + FOE-CAP: short aimed pins - the searchables' law (systems/searchables.js), the box that acts
 // only when clicked away (ui/actionText.js onClose), and the plain foe's cap and ladder (systems/foeLootCap.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -115,7 +115,7 @@ test('FOE-CAP: the plain ladder - white the rule, blue rare, yellow very rare, o
   const plain = rarityChances({ tier: 8, weights: PLAIN_FOE_RARITY_WEIGHTS });
   assert.deepEqual(plain, { magic: 90, rare: 15.6, legendary: 0.75 });
   assert.deepEqual(rarityChances({ tier: 0, weights: PLAIN_FOE_RARITY_WEIGHTS }), { magic: 50, rare: 6, legendary: 0.15 }, 'the floor');
-  // LOOT13 (bible/06-Systems/Loot-II-Arc.md section 5): luck leans on the source's odds - Luck 70 is a fifth more of each, where
+  // LOOT13: luck leans on the source's odds - Luck 70 is a fifth more of each, where
   // the additive 2 per mille a point took a tier-8 foe to every ceiling (yellow 3.8%, orange 0.3% - the orange twenty times over)
   const leaned = rarityChances({ tier: 8, luck: 70, weights: PLAIN_FOE_RARITY_WEIGHTS });
   for (const k of ['magic', 'rare', 'legendary']) assert.ok(Math.abs(leaned[k] - plain[k] * 1.2) < 1e-9, `LOOT13: luck 70 leans ${k} a fifth`);
@@ -186,7 +186,7 @@ test('KIT-ROLL (LOOT-EASE): a foe\'s dropped kit rolls the plain ladder at its d
 
 test('SEARCH1-PARTY: two foes a player, a search is the room\'s container, and a crowd says so', () => {
   assert.equal(SEARCH_FOES_PER_PLAYER, 2);
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/searchPartyHost.js']) assert.match(readFileSync(f, 'utf8'), /SEARCH_FOES_PER_PLAYER \* \(1 \+/, f);   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js for scenes/searchPartyHost.js
+  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/searchPartyHost.js']) assert.match(readFileSync(f, 'utf8'), /SEARCH_FOES_PER_PLAYER \* \(1 \+/, f);
   assert.equal(searchMessage('crate', 'foe', { foeName: 'Orc', count: 4, rolls: () => 0 }).at(-1), 'And it has brought company.');
   assert.notEqual(searchMessage('crate', 'foe', { foeName: 'Orc', count: 1, rolls: () => 0 }).at(-1), 'And it has brought company.');
 });

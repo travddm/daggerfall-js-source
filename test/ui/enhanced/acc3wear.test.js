@@ -1,7 +1,5 @@
 // ACC3c — THE EQUIP CONTROL, AND THE BADGE WHEREVER A NAME IS DRAWN.
 //
-// Mac (2026-09-22): "Players can tap the account icon to equip 1
-// feature along with signing out."
 //
 // ACC3a proved the service derives the grants and stores the worn one;
 // ACC3b drew the badge over a head. Until this, a player could HOLD

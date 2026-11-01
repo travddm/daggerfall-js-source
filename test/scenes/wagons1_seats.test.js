@@ -1,5 +1,4 @@
-// WAGONS1 (2026-10-09, Mac: "the ability for players to request to sit in the back of the cart and be transported
-// across daggerfall"; asked, "Players and companions"): the seats in the back - the law (systems/wagon/wagonSeats.js), the
+// WAGONS1: the seats in the back - the law (systems/wagon/wagonSeats.js), the
 // runtime both ends of it run (scenes/wagon/wagonRiders.js), the companions' seat (scenes/crewAshore.js, characters/
 // enemyMotor.js) - and the caravan's room (systems/caravanRoom.js, scenes/caravanRoom.js, the interior host's slot).
 import '../modsOff.js';

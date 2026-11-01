@@ -1,6 +1,4 @@
-// UNQUIET (bible/06-Systems/Revenants.md section 46; the owner, 2026-10-17: "With revenants becoming a full fledge game
-// loop. They need to become harder, rarer, revenants need more of a chance to flee instead of relying on player death, we
-// need to go deeper on the experience and make it something insanely deep."). One special foe in four carries THE MARK
+// UNQUIET (). One special foe in four carries THE MARK
 // (systems/revenant/unquietMark.js, drawn on its voice id - no die moved) and only it may rise, while fewer than three
 // hunt the player; it breaks and runs at the young line on three in four; a revenant climbs at every getting-away and at
 // every second kill; from rank II it breaks away in its own way (smoke, a blink, a sink, a bolt), keeps a wound by the
@@ -145,7 +143,7 @@ test('UNQUIET RARER: three at most - none rises while three hunt me (none buried
 });
 
 test('UNQUIET THE FLIGHT: a marked foe breaks at 35% on one in two (AUDIT UNQUIET - it was three in four); an unmarked never; a rank-1 revenant on 80%; from rank II (its will) on 35%; the Dread never (mutants: each number; the mark unread; the Dread running)', () => {
-  assert.deepEqual([N.REVENANT_FLEE_CHANCE, N.REVENANT_FLEE_CHANCE_YOUNG, N.REVENANT_FLEE_CHANCE_REVENANT, F.WILL_RANK], [0.5, 0.8, 0.35, 2]);   // PIN MOVED (AUDIT UNQUIET, section 49): 0.5 - it was 0.75
+  assert.deepEqual([N.REVENANT_FLEE_CHANCE, N.REVENANT_FLEE_CHANCE_YOUNG, N.REVENANT_FLEE_CHANCE_REVENANT, F.WILL_RANK], [0.5, 0.8, 0.35, 2]);
   const runs = (e, roll) => N.rollRevenantFlee(e, () => roll);
   assert.deepEqual([runs(foe(), 0.499), runs(foe(), 0.5)], [true, false]);
   assert.equal(runs(foe({ unquiet: false }), 0), false);
@@ -224,7 +222,7 @@ function standing(p, mobileType, rank) {
 }
 
 test('UNQUIET THE CRAFT BY KIND: a caster, a spirit, a lich, a daedra blinks; the dead and the spriggan sink; any other person throws down smoke; a beast bolts - from rank II, a plain run before; a bolt at 2.5 times its walk, a sink standing (mutants: a kind moved; the rank; the paces)', () => {
-  assert.deepEqual({ ...U.CRAFT }, { RANK: 2, BOLT_PACE: 2.5, BLINK_PACE: 0.5, SINK_PACE: 0.05, SMOKE_ROUNDS: 2, BLINK_DELAY: 0.8, BLINK_MS: 600, SINK_DELAY: 200, SINK_MS: 1400 });   // PIN MOVED (AUDIT UNQUIET, section 49): BLINK_PACE
+  assert.deepEqual({ ...U.CRAFT }, { RANK: 2, BOLT_PACE: 2.5, BLINK_PACE: 0.5, SINK_PACE: 0.05, SMOKE_ROUNDS: 2, BLINK_DELAY: 0.8, BLINK_MS: 600, SINK_DELAY: 200, SINK_MS: 1400 });
   assert.deepEqual([...U.CRAFTS], ['smoke', 'blink', 'sink', 'bolt']);
   for (const k of [M.Mage, M.Sorcerer, M.Healer, M.Battlemage, M.Ghost, M.Wraith, M.Lich, M.AncientLich, M.Nymph, M.OrcShaman, M.FireDaedra, M.DaedraLord, M.IronAtronach]) assert.equal(U.fleeCraftOf(k), 'blink', `blink ${k}`);
   assert.equal(U.fleeCraftOf(M.Imp), 'bolt', 'PIN MOVED (AUDIT UNQUIET, section 49): no blinker - under REVENANT_MIN_LEVEL, it never rises');
@@ -315,7 +313,7 @@ test('UNQUIET SINK: the dead stand and go into the ground - 200 ms then 1400 ms 
 // ── wounds ──────────────────────────────────────────────────────────
 
 test('UNQUIET WOUNDS: the blow that broke it leaves its wound - a blade bleeds it, a hammer or a fist cracks it, an axe maims it, an arrow lames it, an element sears it; three kept, the oldest healing; a wound taken again the newest (mutants: a class moved; the cap; the order)', () => {
-  assert.deepEqual({ ...U.WOUND }, { MAX: 3, RESIST: -15, HEAL_DAYS: 5 });   // PIN MOVED (AUDIT UNQUIET, section 49): five days - it was three
+  assert.deepEqual({ ...U.WOUND }, { MAX: 3, RESIST: -15, HEAL_DAYS: 5 });
   assert.deepEqual(['blade', 'blunt', 'h2h', 'axe', 'arrow', 'fire', 'frost', 'shock', 'poison', 'magic', 'silver', null].map(U.woundOf),
     ['bled', 'cracked', 'cracked', 'maimed', 'lamed', 'burned', 'frostbitten', 'stormstruck', 'blighted', 'hexed', null, null]);
   assert.deepEqual(U.withWound(['bled', 'lamed', 'burned'], 'hexed'), ['lamed', 'burned', 'hexed']);
@@ -328,7 +326,7 @@ test('UNQUIET WOUNDS: the blow that broke it leaves its wound - a blade bleeds i
   again(p, r, 'fled', { last: 'arrow' });
   assert.deepEqual(r.wounds, ['lamed'], 'an escape keeps one');
   const ev = N.revenantEscapeEvent(r, 'Ayla', { rolls: () => 0 });
-  assert.ok(ev.body.includes(' It bears the wound you left: Lamed.'), ev.body);   // PIN MOVED (AUDIT UNQUIET): "your mark" was THE MARK's word
+  assert.ok(ev.body.includes(' It bears the wound you left: Lamed.'), ev.body);
   assert.ok(!N.revenantEscapeEvent(r, 'Ayla', { rolls: () => 0 }).body.includes('the wound you left'), 'said once');
   again(p, r, 'slew', { last: 'blade' });
   assert.deepEqual(r.wounds, ['lamed'], 'a kill leaves none - it was never broken');
@@ -443,7 +441,7 @@ function dreadOf(p, { personality = 'witty' } = {}) {
 }
 
 test('UNQUIET THE DREAD: a rank-V revenant that gets away once more ascends - "the Dread", its lair known, the `ascended` deed and card; with no lair it only gets away; a kill at rank V never; it is kept past the cap (mutants: ascending on a kill; with no lair; the deed; the card\'s kind; buried)', () => {
-  assert.deepEqual({ ...U.DREAD }, { HEALTH: 1.5, STANDS: 2, SECOND_STAND: 0.25, GOLD: 3, MAX: 1 });   // PIN MOVED (AUDIT UNQUIET, section 49): one Dread at a time
+  assert.deepEqual({ ...U.DREAD }, { HEALTH: 1.5, STANDS: 2, SECOND_STAND: 0.25, GOLD: 3, MAX: 1 });
   const p = me();
   const r = made(p);
   r.rank = 5; r.lairKnown = false;
@@ -493,7 +491,6 @@ test('UNQUIET THE DREAD KEPT: a deserter past the cap buries the weakest, oldest
   a.rank = 5;
   again(p, a, 'fled', { now: DAY * 3 });
   assert.equal(a.dread, true);
-  // PIN MOVED (AUDIT UNQUIET, section 49): the Dread hunts no one - three more rise beside it
   const b = made(p, { now: DAY * 4 }), c = made(p, { now: DAY * 5 }), e = made(p, { now: DAY * 5 + 1 });
   assert.ok(e, 'a third rises beside the Dread');
   b.rank = 5; c.rank = 5; e.rank = 5;
@@ -552,7 +549,6 @@ test('UNQUIET THE DREAD\'S STAND: half again its health; its will never holds (i
   const g = { entity: o, ai: { feet: [0, 0, 0], fleeLeft: 0 } };
   FATE.beginLastStand(p, g, { now: 0, rolls: () => 0 });
   assert.equal(FATE.revenantLastStandDue(g), false, 'another stands once');
-  // PIN MOVED (AUDIT UNQUIET, section 49): its drop is its rank's - its Legendary is its trophy (unquiet2_hunt.test.js
   // THE DREAD'S TROPHY); with one here as well it dropped two. Through the real grant: none where the same rolls give
   // another none, and three times the gold
   const legend = (ent) => ent.items.filter((it) => it.rarity === 'legendary').length;

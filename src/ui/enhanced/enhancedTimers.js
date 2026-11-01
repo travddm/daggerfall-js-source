@@ -1,7 +1,5 @@
 // @ts-check
-// TIMERS1 (2026-10-02, Mac: "we need to create a new unique UI element for reset times like the Sunday wars, oblivion
-// gates, town raids, and anything else so the player can keep track of when things are and watch countdowns. Im
-// thinking maybe an enhanced plus button on the pause menu next to the profile icon").
+// TIMERS1.
 //
 // THE TIMERS WINDOW. An hourglass beside the profile mark over the paused game (online only - every row is a shared
 // moment of the relay's world) opens a window in the pause window's own frame: what is running NOW, counting down to
@@ -9,7 +7,7 @@
 // systems/eventTimers.js's - this file draws them and keeps them live: once a second the countdowns are rewritten in
 // place, and the list is rebuilt only when a row starts, ends or arrives (a live window, the world running under it).
 //
-// TIMERS2 (2026-10-22, the owner: "organize the timer system in the pause menu"): THE WINDOW IN GROUPS. The rows stand
+// TIMERS2: THE WINDOW IN GROUPS. The rows stand
 // under what they are - World events, Town raids, Seats and battles, Resets (eventTimers.js
 // TIMER_GROUPS) - each group's head saying how many of its rows are under way, and a row under way wears its own "Now"
 // above its countdown. A bar of buttons over the list shows every group or one alone (All, World, Raids, Seats,
@@ -54,7 +52,7 @@ export function timersMark(doc, { onOpen, open = false }) {
   const glass = doc.createElement('span');
   glass.className = 'px-hourglass';
   glass.setAttribute('aria-hidden', 'true');
-  b.append(glass);   // HOURGLASS-ALONE (2026-10-04, the owner: "remove the text \"timer\" from next of the hourglass"): the glass alone - its name is the label's and the title's
+  b.append(glass);   // HOURGLASS-ALONE: the glass alone - its name is the label's and the title's
   b.addEventListener('click', () => onOpen());
   return b;
 }

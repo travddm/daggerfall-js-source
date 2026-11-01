@@ -1,12 +1,12 @@
-// AFFIX-LINES and REFORGE-REPLACE (2026-10-25). A player, SaberGGaming: carrying capacity on four Rare pieces in five,
-// found and crafted alike - the owner: "No band aids". Two causes, both the roll's own: a pick drew a KIND at even
+// AFFIX-LINES and REFORGE-REPLACE. A player, SaberGGaming: carrying capacity on four Rare pieces in five,
+// found and crafted alike. Two causes, both the roll's own: a pick drew a KIND at even
 // weight, then its param, so carrying capacity (one line) came up as often as the eight attributes together; and a
 // Rare's last pick was held to whichever name slot its lines left empty, and a jewel's one numeric prefix IS carrying
-// capacity. THE FIX (bible/06-Systems/Loot-Rarity.md, the affix law): every pick drawn over the LINES still open - one
+// capacity. THE FIX (, the affix law): every pick drawn over the LINES still open - one
 // roll, as `pick` took (LOOT1's law), so a seeded stream keeps its count - and the name following the lines. A product
 // record made before (mint version 0 or 1, net/productRecord.js) mints the piece it always did.
 //
-// THE REFORGE (bible/06-Systems/Loot-Arc.md section 11; Professions-Arc.md 41.2 and 41.7): it could give a line its own
+// THE REFORGE (; Professions-Arc.md 41.2 and 41.7): it could give a line its own
 // kind back (a Rare's line held to its slot) and the first reforge locked the piece to that one line, at a flat price.
 // The owner chose "Replace, price rises": a reforge always puts a line of ANOTHER kind in the line's place (across the
 // name's slots, the piece renamed), any line, as often as the purse allows, each reforge twice the last - at the Mages

@@ -1,5 +1,4 @@
-// IC-PROPS (2026-10-27, the owner: "Some doors in Imperial city can be entered but dont show the tooltip", then "a world
-// wide issue": "Every enterable door shows its tooltip, world-wide"; bible/03-World/Arena-Provinces.md IC-PROPS) - EVERY
+// IC-PROPS - EVERY
 // DOOR A PLAYER CAN WALK THROUGH NAMES ITS BUILDING, AND THE BUILDING ITS OWN TOWN'S.
 //
 // Two causes, both world-wide: a house with no name of its own (every House1-4 and House6 of Daggerfall's blocks and both

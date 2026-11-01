@@ -1,4 +1,4 @@
-// SET2 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): THE SEAMS THE SETS' POWERS NEED, each a no-op
+// SET2: THE SEAMS THE SETS' POWERS NEED, each a no-op
 // until something registers, each proven here with a stand-in registrant. The blow's word that the foe had not noticed me
 // (the swing and the shaft read it off the foe's AI, the formula carries it to every blow modifier) - and the port's
 // layers under PCAAO's core too, which is ON by default and read neither the weapon's own modifiers nor the blow's, so no
@@ -54,7 +54,6 @@ test('SET2 the blow\'s word: a foe whose AI has not detected me is unaware - nev
   const af = strip(read('src/combat/arrowFlight.js'));
   assert.match(af, /calculateAttackDamage\(playerEntity, foe\.entity, \{[\s\S]*?unaware: foeUnaware\(foe\),[\s\S]*?\}\);/, 'the shaft\'s word');
   const f = strip(read('src/combat/formulas.js'));
-  // PIN MOVED (TWO-HANDS AUDIT 2, bible/05-Combat/Two-Hands.md): and, after it, the off hand's share (`blowShare`)
   assert.match(f, /core\(attacker, target, \{[^}]*unaware, blowShare \}\)/, 'a replacement core is handed the word');
 });
 
@@ -159,7 +158,7 @@ test('SET2 the damage door: a registered modifier over the damage before the shi
     const p = me(); p.health = 10;
     assert.equal(hurtPlayer(p, 30), false, 'no death');
     assert.equal(p.health, 1, 'left at one');
-    assert.deepEqual(told.splice(0), [{ dmg: 9, before: 10, after: 1, saved: true }], 'told as what it did');   // PIN MOVED (AUDIT 625 P1): and that a save turned it aside
+    assert.deepEqual(told.splice(0), [{ dmg: 9, before: 10, after: 1, saved: true }], 'told as what it did');
     const q = me(); q.health = 40; hurtPlayer(q, 10);
     assert.equal(asked, 1, 'asked only of a blow that would kill');
     const r = me(); r.health = 10; hurtPlayer(r, 30, { bypassShield: true });
@@ -246,10 +245,8 @@ test('SET2 the door and the duel: the running host publishes its door every fram
   const hm = strip(read('src/scenes/hostMagic.js'));
   assert.match(hm, /function update\(dt, playerFeet[^)]*\) \{\s*_doorFeet = playerFeet \?\? null;\s*setPlayerDoor\(_door\);/, 'published first thing each frame');
   assert.match(hm, /hurtFoe: \(t, n\) => \{ if \(t && !t\.dead && n > 0\) foeSinks\(t, true\)\?\.hurt\?\.\(Math\.round\(n\), \{ fromPlayer: true \}\); \}/, 'a hurt is mine, through the foe\'s own sinks');
-  assert.match(hm, /castOnPlayer: \(bundle, \{ power = false \} = \{\}\) => \{ if \(bundle\) applySpellToPlayer\(bundle, castingLevel\(playerEntity\) \?\? 1, null, \{ bypassSavingThrows: true, bypassChance: true, \.\.\.\(power \? \{ powerCast: true \} : \{\}\) \}\); \}/);   // PIN MOVED (AUDIT SCHOOLS L1 M1): and a power's word - a path's rider merges taking the larger pool or chance (effects.js powerCast)
+  assert.match(hm, /castOnPlayer: \(bundle, \{ power = false \} = \{\}\) => \{ if \(bundle\) applySpellToPlayer\(bundle, castingLevel\(playerEntity\) \?\? 1, null, \{ bypassSavingThrows: true, bypassChance: true, \.\.\.\(power \? \{ powerCast: true \} : \{\}\) \}\); \}/);
   assert.match(hm, /foes: \(\) => playerTargets\(\)\.filter/, 'the foes MY harm may reach - the defenders passed by');
-  // PIN MOVED (AUDIT 625 P2): and a live bout between players on a relay's sand is a duel too
-  // PIN MOVED (INT8, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): the frame offers a bout's unsettled receipt
   // again before it tells the sets
   assert.match(strip(read('src/scenes/world.js')), /const duelFrame = \(\) => \{\s*duelMgr\.tick\(\);\s*if \(duelClaims\.due\(\)\) duelClaims\.offer\(\);[^\n]*\n\s*const setsWere = setsDueling\(\);\s*setSetsDueling\(!!duelMgr\.live \|\| arenaPvpLive\(\)\);/);
 });

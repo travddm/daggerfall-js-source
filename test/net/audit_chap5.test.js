@@ -1,7 +1,7 @@
 // @ts-nocheck
-// AUDIT CHAP5 (2026-10-09, Mac: "I think we do a deep comprehensive audit across everything"): the Chapters arc read
+// AUDIT CHAP5: the Chapters arc read
 // again, end to end - CHAP0 to CHAP7b, the four audits before it and the merges - through six lenses
-// (bible/01-Overview/audits/Audit-Chapters-5.md). Each fix pinned here by its finding's id; the lens T's pins - laws no test
+// . Each fix pinned here by its finding's id; the lens T's pins - laws no test
 // could fail - after them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

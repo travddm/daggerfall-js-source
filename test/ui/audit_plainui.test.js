@@ -1,7 +1,6 @@
-// AUDIT PLAIN-UI (2026-10-12, the owner: "Audit this") - PLAIN-UI read by four cold lanes on a frozen snapshot
+// AUDIT PLAIN-UI - PLAIN-UI read by four cold lanes on a frozen snapshot
 // (a1388898): the words against the law that enforces them (W), the code (C), the pins and the record (T), the render (U).
 // Every finding's pin is here, each failing under its finding's mutant (tools/mutants/audit_plainui.json).
-// bible/01-Overview/audits/Audit-Plain-UI.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -50,7 +49,7 @@ test('AUDIT PLAIN-UI W1 How chapters work says the whole of Strength - the week\
   assert.match(s, new RegExp(`The week's mark is ${STRENGTH_TARGET} Merit for every 100 active players \\(at least ${STRENGTH_TARGET}\\)\\.`));
   assert.match(s, new RegExp(`A week below the mark moves a chapter above 50 back ${STRENGTH_SHORT} toward it\\. A week with no Merit costs ${STRENGTH_IDLE}\\. A Failing chapter loses ${CHAPTER_FAILING_FALL} more unless its Merit reaches twice the mark\\.`));
   assert.match(s, new RegExp(`A Rivalry's winner takes ${CHAPTER_EVENT_EFFECTS.rivalrySwing} from the loser, and a Season's end moves every chapter halfway back to 50\\.$`));
-  assert.match(said('The chairs'), new RegExp(`and an account ${SEAT_ACCOUNT_AGE_S / 86400} real days old\\.`));   // PIN MOVED (AUDIT GUILD-WORDS II C-8): real days, as the hall's line says them
+  assert.match(said('The chairs'), new RegExp(`and an account ${SEAT_ACCOUNT_AGE_S / 86400} real days old\\.`));
   assert.match(said('Patron'), /pay Thriving prices for training and spells in its halls, or the chapter's own prices if lower\.$/, 'W9: an Ascendant chapter\'s own is better');
 });
 
@@ -107,7 +106,6 @@ test('AUDIT PLAIN-UI W6 the badge\'s number toward nought, as the standing reads
   assert.deepEqual([b.label, b.value], ['Known', '+39']);
   assert.deepEqual([regardBadge({ regard: -40.5, standing: 'enemy' }).value, regardBadge({ regard: -39.5, standing: 'neutral' }).value], ['-40', '-39']);
   assert.equal(regardBadge({ regard: -0.4, standing: 'neutral' }).value, '0');
-  // PIN MOVED: TONE-TASTE (bible/06-Systems/Living-World.md) - the tone as they take it, townsfolk's named
   assert.match(b.words, /A tone they dislike, a crime they see, a blow, and worst of all killing one of their own lower it\. Townsfolk prefer Blunt to Polite\./);
 });
 

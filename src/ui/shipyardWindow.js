@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11, Mac: "A new highly detailed shipmaster vendor and crew recruitment station within it. All
-// detailed functions including ship upgrading should be present here, along with ship buying, etc."): THE SHIPMASTER'S
+// SHIPYARDS: THE SHIPMASTER'S
 // WINDOW - every ship a port does business in, one window, in the sea fight's stone-and-brass kit (ui/naval/navalYardWindow.js's
 // sheet and door, ui/naval/navalPlunderDoor.js). Five pages, a tab each:
 //   SHIPS FOR SALE - a card a hull: her figures, what she is, what the shipmaster asks of you, and Buy;
@@ -38,7 +37,7 @@ export const SHIPYARD_TABS = Object.freeze([
   Object.freeze({ id: 'refits', label: 'Refits' }),
   Object.freeze({ id: 'crew', label: 'Crew Hall' }),
 ]);
-/** MENU-ORDER (2026-10-12): each page's picture (ui/menu/menuGlyphs.js). */
+/** MENU-ORDER: each page's picture (ui/menu/menuGlyphs.js). */
 export const SHIPYARD_TAB_ICONS = Object.freeze({ ships: 'ship', fleet: 'anchor', yard: 'saw', refits: 'anvil', crew: 'people' });
 export const SHIPYARD_CSS = `
 .dfyard-pic { display: block; color: #c9bba1; } .dfyard-card .dfyard-pic::before { width: 40px; height: 40px; margin: 0 0 4px; }

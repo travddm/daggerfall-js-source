@@ -1,16 +1,15 @@
 // @ts-check
-// WB2 (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area"):
+// WB2:
 // THE GATE THE WORLD HOST STANDS - the pool on the runtime pools' shape (scenes/camps.js, scenes/horseCartPool.js):
 // the stone (world/gate/gateModel.js, uploaded once with its own art - world/gate/gateArt.js), the fire and the beacon
 // (render/gate/gatePass.js), its collider, its light, the eye's box and its names, the countdown over the screen, and
-// the door into the arena. Design: bible/11-Multiplayer/World-Bosses.md section 3.
+// the door into the arena. Design:
 //
 // NOTHING HERE IS SAVED OR SENT. Where and when a gate stands is the clock's (net/gate/gateLaw.js) over the map files
 // (systems/gate/gateSite.js) - the omen hands it over (systems/gate/gateOmen.js standing()), and this pool stands the stone
 // where that says, every frame, in THIS scene's frame: the pixel's translation plus the spot (the streaming host's
 // own sum), so a floating-origin recentre moves the gate with the world and the collider is stood again when its
-// matrix moves. The ground is the built pixel's (the host's `heightAt`). GATE-SEEN (2026-09-26, Mac: "Somepeople cant
-// see the gate spawn" - "No oblivion portal to enter"): a gate on a pixel NOT yet built stood nowhere, the beacon too -
+// matrix moves. The ground is the built pixel's (the host's `heightAt`). GATE-SEEN: a gate on a pixel NOT yet built stood nowhere, the beacon too -
 // and the streamed grid is the Land View Distance's, so from the town the omen names (2 to 4 pixels off) a player on a
 // short view saw no gate at all, and "the gate is found by looking up" was false for them. Such a gate stands its
 // BEACON alone now, on the ground the pixel will be built from (the host's `groundAt` - the terrain sampler's own
@@ -124,7 +123,7 @@ export function fireBox(place, profile, halfW = null) {
   return { min, max };
 }
 
-/** AUDIT WBX W1 (2026-09-26, Mac: "Do a comprehensive audit on everything so far"): A BODY SEALED IN THE STONE - the
+/** AUDIT WBX W1: A BODY SEALED IN THE STONE - the
  *  stone rises for GATE_RISE_MS with no collider, and stands whole on it in one frame: a capsule inside the stone's shell
  *  was held there by the shell's own push, out of reach of the fire, and /unstuck answers nothing outdoors. AUDIT GATE-FBX
  *  E1/E2: asked of the stone itself now (world/gate/gateModel.js insideGateStone, its closed pieces) at the capsule's axis -
@@ -260,7 +259,7 @@ export function createGatePool({
       if (place && f && Math.hypot(f[0] - place.origin[0], f[2] - place.origin[2]) <= GATE_BANNER_M) {
         const cd = gateCountdown(g.t, now(), place.phase);
         banner(cd ? `${GATE_TEXT.name} - ${cd.to === 'collapse' ? 'sealed, ' : ''}${countdownWords(cd)}` : null);   // GATE-COLLAPSE: the sealed hours count down to the collapse
-        // WB9a (Mac: "Allow people to see the modifers/trial as a popup before it starts"): TONIGHT'S MARKS beside the
+        // WB9a: TONIGHT'S MARKS beside the
         // countdown, while it stands - the day's draw (net/gate/gateLaw.js gateModsOf), which is what the relay's fight is
         // born under; a gate collapsing (its master fallen, or the Wrath) has none to show
         marks(cd && place.phase !== 'collapsing' ? marksCardModel(gateModsOf(g.day), gateBossOf(g.day), { mode: 'gate', pt: gatePortentsOf(g.day) }) : null);

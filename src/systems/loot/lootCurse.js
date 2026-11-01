@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT16 (2026-10-07) — THE TEMPLE'S LIFTING.
+// LOOT16 — THE TEMPLE'S LIFTING.
 //
-// The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 8; Mac:
+// The Loot arc II (; Mac:
 // "what could we do to make it even more amazing, while also balancing
 // everyrhing?", then "Lets go all in"). A CURSED FIND (lootRarity.js
 // cursePiece - one Rare or Legendary in twelve that a body or a pile

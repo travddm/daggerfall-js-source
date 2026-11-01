@@ -1,4 +1,4 @@
-// AUDIT-QUEST F1/F2/F3 - THE BRIDGE STATES WHAT IT WAS GIVEN (2026-09-15).
+// AUDIT-QUEST F1/F2/F3 - THE BRIDGE STATES WHAT IT WAS GIVEN.
 //
 // Three findings, one root cause: `createQuestBridge` never reported
 // which of its contract members the host left unwired.

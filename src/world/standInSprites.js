@@ -1,4 +1,4 @@
-// WD3 (2026-10-01): FLATS DAGGERFALL DRAWS NOTHING LIKE - the port's own sprites, drawn in code.
+// WD3: FLATS DAGGERFALL DRAWS NOTHING LIKE - the port's own sprites, drawn in code.
 //
 // Daggerfall Expanded Textures fills the towns Beautiful Villages and Beautiful Cities lay out with its own flats - a
 // farm's chickens and sheep, the rock doves on a city's walls, a table's cheese and grapes and porridge - and a few

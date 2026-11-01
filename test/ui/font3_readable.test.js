@@ -1,5 +1,4 @@
-// FONT3 (2026-10-02, Mac: "So I want to improve the readability of our ingame font as im recieving a lot of
-// complaints, additionally we need to ensure everything recieves our enhanced font"). The laws, pinned:
+// FONT3. The laws, pinned:
 //   - THE READING PAIR rides the one trio (weight 500, half a pixel of tracking), and the enhanced body wears it;
 //   - THE FLOOR: no enhanced sheet sets text under 11px (a decorative glyph and an SVG's own units aside);
 //   - THE DIM IS READABLE: the pixel skin's #7d7460 is never a text colour, and --dim clears 5.5:1 on the panels, under the mid tone (AUDIT FONT3 C2);
@@ -53,7 +52,7 @@ const FLOOR_SHEETS = ['src/ui/enhanced/enhancedStyle.js', 'src/ui/enhanced/enhan
   'src/ui/pageWindow.js', 'src/ui/pickupFeed.js', 'src/ui/plus/plusPadBinds.js', 'src/ui/professions/profActStyle.js', 'src/ui/professions/profStationStyle.js',
   'src/ui/profileWindow.js', 'src/ui/travel/travelViewHud.js', 'src/ui/enhanced/enhancedDeath.js', 'src/ui/enhanced/enhancedPlayerTrade.js', 'src/ui/plus/plusPad.js',
   'src/ui/enhanced/enhancedFrame.js', 'src/ui/intro/introScreen.js',   // AUDIT FONT3 C3: the film's words are the pixel face too
-  'src/ui/waypointMenu.js', 'src/ui/travel/travelPaceControls.js'];   // WAYPOINTS and PACE-DIALS (2026-10-06): the right-click menu and the pace box lay sheets of their own
+  'src/ui/waypointMenu.js', 'src/ui/travel/travelPaceControls.js'];   // WAYPOINTS and PACE-DIALS: the right-click menu and the pace box lay sheets of their own
 // a ◆, a rarity pip, the emblem's word, an SVG's own units - and (AUDIT FONT3 C3) the effect words and rounds INSIDE a
 // 16px effect icon (the party card's and the crew's), which are the icon's own marks at the icon's own scale
 const GLYPH_ONLY = /::?before|::?after|insignia-word|provlabel|dfparty-fx[wr]|dfnaval-crew-fxe/;

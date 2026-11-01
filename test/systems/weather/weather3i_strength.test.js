@@ -1,5 +1,4 @@
-// WEATHER3i (2026-09-23, Mac on WEATHER3h's render: "Let's make this more subtle and push the detail further";
-// the detail chosen: "Strength inside a region"): THE STRENGTH OF WHAT FALLS, on the map and under the sky. The law's
+// WEATHER3i: THE STRENGTH OF WHAT FALLS, on the map and under the sky. The law's
 // intensity now tapers across the CORE, where the system's word falls - a drizzle at the rain's edge, the downpour at
 // its heart - where before it tapered across the whole outline and a grown front's rain never fell below 0.73. The
 // travel map draws it: each region that falls closes its hatch up a step where the fall is moderate and again where it
@@ -8,7 +7,7 @@
 // dots set in rows, the steps drawn under their own light hatch on the sheet, the player's strength read before the
 // ground law and the hover at another minute than the hatch - and pins that a wrong painter, host or hatch passed.
 // Each is paid and pinned here by execution.
-// DISC17-C (2026-09-24, Mac: "Remove the enhanced map weather enhancements entirely"): the travel map draws no weather
+// DISC17-C: the travel map draws no weather
 // now, so its field, its steps' hand, its painter, its sheet, its hover and its key went with it. The law stands - the
 // intensity tapering across the core, and the player wearing the strongest of what falls after the ground law - pinned
 // here at the steps the map drew (0.35 and 0.7, strengthOf below).

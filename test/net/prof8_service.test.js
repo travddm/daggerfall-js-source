@@ -1,9 +1,9 @@
-// PROF8 (2026-09-30, Mac: "Continue the arc"; "XP follows your rank") - FISHING WITH THE NET, AS THE SERVICE KEEPS IT: a
+// PROF8 - FISHING WITH THE NET, AS THE SERVICE KEEPS IT: a
 // haul's key the client's own (`haul:<x>:<y>:<day>:<id>`) - bounded, not witnessed - its Raw Fish into the Stores as own,
 // worked at the rank's own tier; a full net x1.5, a school's fish; at sea on ground the witnesses confirmed a Pearl and a
 // Slaughterfish's scales, a trophy anywhere (said again to an answer asked twice); an ACCOUNT's hauls a day counted, past forty (CAP-OFF); the
 // daylight kept; the pixel witnessed. Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 30.
+// (test/accountDb.mjs). 30.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -117,7 +117,6 @@ test('PROF8 service: an ACCOUNT\'s hauls a day past forty (CAP-OFF) - the forty-
     const r = await s.haul(mac, { x: 320 + (i % 5) });
     assert.equal(r.status, 200, `haul ${i + 1}: ${JSON.stringify(r.body)}`);
   }
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the account's day held forty hauls - the
   // forty-first was `prof-fish-cap`, on another character too
   const over = await s.haul(mac);
   assert.deepEqual([over.status, over.body.hauls], [200, 41], JSON.stringify(over.body));
@@ -132,7 +131,6 @@ test('PROF8 service: an ACCOUNT\'s hauls a day past forty (CAP-OFF) - the forty-
   assert.deepEqual((await s.haul(ann, { node: `haul:0300:200:${day}:${hid()}` })).body, { error: 'bad-node' }, 'one spelling');
   assert.deepEqual((await s.haul(ann, { node: `haul:300:200:${day}:XYZ` })).body, { error: 'bad-node' });
   assert.deepEqual((await s.haul(ann, { day: day - 1 })).body, { error: 'prof-day' });
-  // PIN MOVED (ANY-HOUR, 2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"):
   // 23:00 refused a haul (`prof-night`, "the wilderness keeps Foraging's day"); now the net is hauled as at noon
   const night = secondAt(utcDay(NOON) * DAY + 3600, 23);
   Date.now = () => night * 1000;

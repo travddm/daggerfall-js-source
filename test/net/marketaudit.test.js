@@ -1,4 +1,4 @@
-// MARKET-AUDIT (2026-10-04, Mac: "I think the ingame market board is broken. Please audit this") - THE MARKET AUDITED: three
+// MARKET-AUDIT - THE MARKET AUDITED: three
 // lanes (the service, the client's book, the tab and its host) read the market end to end and reproduced what broke.
 // MARKET-BAG - since BAG1 every harvest is carried (bag, then pack) and the List form and Fill read the Stores alone: a
 // gatherer had nothing to sell and "0 in your Stores" on every order; what is carried now counts, put in first as a
@@ -261,7 +261,7 @@ test('MARKET-BAG: what the bag and the pack carry counts toward a silver listing
   const empty = createMarketTab(hostOf(book, { carried: () => new Map() }), ui());
   empty.state.view = 'mine';
   await empty.load(true);
-  assert.match(empty.body().textContent, /You have no materials to sell\./);   // BOARD-UI (PIN MOVED): the words cut
+  assert.match(empty.body().textContent, /You have no materials to sell\./);   // BOARD-UI (
 });
 
 test('MARKET-AUDIT U2, U3: a crafted piece is offered with its quality and wear; one past the read\'s first 64 is offered too - the service says which way it goes', async () => {
@@ -274,7 +274,6 @@ test('MARKET-AUDIT U2, U3: a crafted piece is offered with its quality and wear;
   tab.state.view = 'mine';
   tab.state.list.kind = 'piece';
   await tab.load(true);
-  // PIN MOVED (PACK-PICK): each piece a pictured tile in the crafted pieces' picker - its name, and under it its quality
   // and wear (the words the select's option had run on after the name)
   const picker = [...tab.body().querySelectorAll('.packpick')].find((s) => s.getAttribute('aria-label') === 'Your crafted pieces');
   const tiles = [...picker.querySelectorAll('button')].filter((b) => b.className.split(' ').includes('packpick-tile'));
@@ -295,7 +294,7 @@ test('MARKET-AUDIT U5, U7: a failed read keeps the filters and the counters, its
   const tab = createMarketTab(hostOf(book, { weavers: [{ key: 'cloth:wool', marks: 3 }] }), ui());
   await tab.open();
   const node = tab.body();
-  assert.match(node.textContent, /The market did not load\.Try again/);   // BOARD-UI (PIN MOVED)
+  assert.match(node.textContent, /The market did not load\.Try again/);   // BOARD-UI (
   assert.ok([...node.querySelectorAll('select')].some((x) => x.getAttribute('aria-label') === 'Family'), 'the filters');
   assert.match(node.textContent, /The Weavers' counter/);
   assert.match(node.textContent, /a piece from Wayrest - waiting for another of your characters/);

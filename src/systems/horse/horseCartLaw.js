@@ -1,6 +1,5 @@
 // @ts-check
-// HORSE CART AND CARGO - THE LAW (HCC, 2026-09-23, Mac: "Next mod I want to implement 1 to 1 and also enhance its
-// online integration functionality").
+// HORSE CART AND CARGO - THE LAW (HCC, 2026-09-23).
 //
 // demifiend000's Horse Cart and Cargo 1.0.0-rc12 for Daggerfall Unity, read off the shipped assembly's IL
 // (vendor/horse-cart-and-cargo/il/TrailingWagon.il.txt, `tools/ilDump.py`), every function below naming the method
@@ -10,7 +9,7 @@
 // coordinate conversions, the text, the horse's billboard arithmetic, the wheel's, the cargo tiers. Nothing here
 // touches a scene: `systems/horse/horseCart.js` is the runtime that holds the state and drives the hosts, and
 // `scenes/horseCartPool.js` is the presentation. What DFU says and does is written beside each function; what the
-// port does differently is marked DEPARTURE and recorded in bible/06-Systems/Horse-Cart-And-Cargo.md.
+// port does differently is marked DEPARTURE and recorded in.
 //
 // Unity's `Mathf.Epsilon` is the denormal 1.4e-45, so `x <= Mathf.Epsilon` is `x <= 0` for every normal float
 // (the reader's note 6); it is kept as a named constant so the comparisons read as the IL's.
@@ -52,7 +51,7 @@ export const LOG_PREFIX = '[TrailingWagon]';
 export const WAGON_MODEL_ID = 41214;
 export const HORSE_NAME_MAX = 31;
 export const WAGON_FOLLOW_DISTANCE = 2.5;
-/** WAGONS3 (Mac: "Spawning the wagon can trap you under the wagon"): how far past its own hitch a wagon laid fresh stands
+/** WAGONS3: how far past its own hitch a wagon laid fresh stands
  *  behind the player (m) - its pole's tip and its team clear of the capsule (systems/horse/horseCart.js deploySetback). Not the
  *  mod's: its one wagon laid at WAGON_FOLLOW_DISTANCE. */
 export const DEPLOY_CLEARANCE = 1.0;
@@ -172,12 +171,11 @@ export function applyLocalOffsetToWorld(originX, originZ, forward, localX, local
 // ─── THE SAVE RECORD (WagonSaveData) ───────────────────────────────────────────────────────────────────────────
 
 /** The record's slot in a save's `modData` (DFU's per-mod save data, IHasModSaveData - the mod's own name, under which
- *  the world host and the dungeon's save it). CART-AWAY (2026-10-15): the zone's death reads the wagon's record by it,
+ *  the world host and the dungeon's save it). CART-AWAY: the zone's death reads the wagon's record by it,
  *  on the account service too (systems/wild/wildDropLaw.js wildCartRecordOf). */
 export const HCC_VENDOR = 'horse-cart-and-cargo';
 
-/** WagonSaveData..ctor [IL_c6c3]: Version 7, the headings +Z, the horse None, an empty name. WAGON-STABLED (2026-10-15,
- *  the port's own, no IL twin): and two words of the port's - the wagon and the horse SENT TO THE STABLE
+/** WagonSaveData..ctor [IL_c6c3]: Version 7, the headings +Z, the horse None, an empty name. WAGON-STABLED: and two words of the port's - the wagon and the horse SENT TO THE STABLE
  *  (systems/horse/horseCart.js sendTransportAway), which the mod's WithPlayer alone cannot tell from "beside the player on
  *  foot", the state its next door parks outside. */
 export function newSaveData() {
@@ -327,8 +325,7 @@ export function resolveHorseActivation(wagonMode, horseMode, ownsCart, talkMode)
   return isDirectHitchedTeamMount(wagonMode, horseMode, ownsCart) ? HORSE_ACTIVATION.MountHitchedTeam : HORSE_ACTIVATION.Ride;
 }
 /**
- * ACT-MENU (2026-09-23, Mac: "for player interaction and horse interaction, instead of using a keybind toggle, let's
- * reuse the loot scroll menu to select options"): WHAT THE PLAQUE LISTS OVER MY HORSE OR WAGON. The mod picks the verb
+ * ACT-MENU: WHAT THE PLAQUE LISTS OVER MY HORSE OR WAGON. The mod picks the verb
  * from DFU's interaction mode (Steal opens the wagon, Info names the horse, Talk commands it, anything else rides) -
  * four keys the player had to set BEFORE the click. On the World Tooltips plaque the verbs are rows instead, the wheel
  * lights one and the activate key presses it: each row carries the MODE the mod reads, so the press runs the mod's
@@ -439,7 +436,7 @@ export const HCC_TEXT = Object.freeze({
   summonedBoth: 'Your horse and wagon have been summoned.',
   summonedWagon: 'Your wagon has been summoned.',
   summonedHorse: 'Your horse has been summoned.',
-  // HOLDINGS (the port's own, no IL twin - bible/03-World/Holdings.md): the Stable page's Send away
+  // HOLDINGS (the port's own, no IL twin): the Stable page's Send away
   sendAwayOutdoorsOnly: 'You can only send your horse and wagon away from outdoors.',
   sendAwayDismount: 'Dismount before you send them away.',
   notInTheWorld: 'Your horse and wagon travel with you while physical persistence is off.',

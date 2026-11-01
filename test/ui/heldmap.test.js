@@ -1,5 +1,4 @@
-// MAP1 - THE HELD MAP, pinned (2026-09-18; U61's pins carried where the
-// law they hold survived the relief map's retirement).
+// MAP1 - THE HELD MAP, pinned.
 //
 // The sprite and the ink are presentation; everything the player
 // COMMITS to is law, and every law here is held against the owning
@@ -7,7 +6,7 @@
 // calculateTravelTime, the buckets against getPixelColorIndex, the
 // trip against calculateTravelTime/calculateTripCost, the envelope
 // against travelMapState. The ink renderer is a pure display list over
-// small fixtures (bible/10-UI/Held-Map-Arc.md: a coast, a border, a
+// small fixtures (: a coast, a border, a
 // road, a junction, a discovered and an undiscovered town, the clamp,
 // the zoom bands, the selection) and its paint is driven through a
 // recording 2D context; node drives the window through a stub document
@@ -679,7 +678,7 @@ const code = (p) => read(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm
 
 // ═══ MAP1: THE PEN, pinned over fixtures ═══════════════════════════
 //
-// bible/10-UI/Held-Map-Arc.md's own list: "the ink renderer as a pure
+// 's own list: "the ink renderer as a pure
 // function over a table of fixtures (a coast, a border, a road, a
 // junction, a discovered and an undiscovered town), the clamp, the zoom
 // bands, the selection."
@@ -939,7 +938,7 @@ test('MAP1 ink: names compete for room in rank order - a city\'s beats a hamlet\
 });
 
 test('MAP-FIELD6: a name never lands on another mark\'s GLYPH - it takes another side of its own, or it is dropped (mutants: MAPFIELD6-names-ignore-glyphs, MAPFIELD6-one-candidate-only)', () => {
-  // Mac: "Some of the glyphs are hard to read." The fault he could see
+  // The fault he could see
   // rather than name: placeNames tested a label only against other
   // LABELS, so it was free to run straight through the next town's mark.
   const measure = (t, size) => t.length * size * 0.5;
@@ -1237,8 +1236,7 @@ test('MAP1 window: pan, wheel and keys move the VIEW under a clamp, the search g
 });
 
 test('MAP1: the sprite is the port\'s own under the doctrine row, the paper and thumb geometry are the painting\'s, and the hand key keeps only what is darker than the sheet (mutants: key-threshold-moved, key-clears-hands, url-off-public)', () => {
-  // MAP-FIELD (2026-09-18, Mac: "The sprite I gave to be used is nowhere
-  // to be seen at all"): THE URL IS RESOLVED FROM THE MODULE, NOT THE
+  // MAP-FIELD: THE URL IS RESOLVED FROM THE MODULE, NOT THE
   // DOCUMENT. It was the bare relative 'art/held-map.png' - and this pin
   // asserted that string, and a mutant that made it absolute DIED here,
   // so the wrong answer was locked in twice over. The game's document is
@@ -1359,7 +1357,7 @@ test('MAP1: the sprite is the port\'s own under the doctrine row, the paper and 
 
 // ═══ MAP2: TRAVEL OPTIONS ON THE SHEET ═══════════════════════════════
 //
-// bible/10-UI/Held-Map-Arc.md: "each through the same functions the
+// "each through the same functions the
 // classic window calls, so the two never drift." The fake mod below is
 // the settings shape systems/travel/travelOptions.js hands the windows.
 
@@ -1407,7 +1405,7 @@ test('MAP2 ports: the filter is the mod\'s law (portsFilterAllows over hasPort) 
     win.input('KeyP');
     assert.equal(win._sheet.ensure().marks.length, 2, 'and back');
     assert.equal(win._findLocations('B')[0]?.name, 'B', 'and so is the hamlet, to the find box');
-    // the harbour glyph: beside a port the band inks. PIN MOVED (PORT-MAP, 2026-10-04, Mac: "Also ports don't show on
+    // the harbour glyph: beside a port the band inks.
     // my map"): at EVERY band - far too, where the map opens - haloed then inked in the full pen; none only when the
     // sheet is asked none (the window always asks: test/ui/heldmap.test.js PORT-MAP)
     const harbours = (band, scale, ports) => {
@@ -1726,7 +1724,7 @@ test('MAP2 walked place: when the mod\'s fork says the player drives the trip to
   });
 });
 
-// ═══ AUDIT-MAP (2026-09-18, Mac: "Let's audit everything so far") ═══════
+// ═══ AUDIT-MAP ═══════
 //
 // The browser probe (tools/heldMapProbe.mjs) and three reviewer lenses
 // over MAP0-MAP2. Each finding below is pinned two-way with the window's
@@ -2032,7 +2030,7 @@ test('AUDIT-MAP H1 + TRAVEL-FARE + LIVED1: online the journey reads its days, of
     const st = win._panelState;
     assert.equal(st.opts.sleepModeInn, true, 'the toggle stands');
     const t = calculateTravelTime({ x: 5, y: 5 }, { x: 9, y: 5 }, { speedCautious: true, sleepModeInn: true, travelShip: true, hasHorse: false, hasCart: false }, climate);
-    // TRAVEL-FARE (2026-09-22, kurkku): the card used to be compared
+    // TRAVEL-FARE: the card used to be compared
     // against a NO-INN cost, which is what made a free trip look
     // correct here. The two surfaces bill ONE journey, so the enhanced
     // map is compared against the fare a player would pay offline -
@@ -2448,7 +2446,7 @@ test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edg
   // probe that measured it is tools/heldMapArtProbe.mjs.
   assert.ok(SPRITE_ART_FOOT > 0.7 && SPRITE_ART_FOOT < 0.95, `the painting ends at ${SPRITE_ART_FOOT} of the file`);
   assert.ok(SPRITE_ART_FOOT > CUFF_BAND, 'and the cuff band is above it - the cut cuffs end between the two');
-  // HOLD-CLOSE (Mac: "make the map hold bigger means closer to your face"): the PAPER is what is fitted, and the
+  // HOLD-CLOSE: the PAPER is what is fitted, and the
   // gauntlets run off the screen's sides; the paper itself is never cut, and the arms still leave no gap under them.
   for (const [vw, vh, why] of [[1600, 900, 'a desktop'], [1920, 1080, 'a bigger one'], [2400, 900, 'an ultrawide'],
     [800, 1200, 'a phone held upright'], [640, 360, 'a short landscape phone']]) {
@@ -2497,8 +2495,7 @@ test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edg
   assert.deepEqual(claims, ['src/ui/heldMap.js'], 'of these windows the held map alone takes the HUD away');
 });
 
-// Mac's second look: "There's still a gap at the bottom of the arms,
-// any way you can author the gap?" - and MAP-FIELD4, where the answer
+// and MAP-FIELD4, where the answer
 // had to be rebuilt for a third painting.
 //
 // The cuffs are CUT BY THE FRAME: the picture simply stops partway down
@@ -2607,9 +2604,6 @@ test('MAP-FIELD2/4: the cut cuffs are AUTHORED down to the foot, and nothing els
 
 // ═══ EM1: ONE MAP, THREE SHEETS ══════════════════════════════════════
 //
-// Mac (2026-09-21): "instead of 3 seperate keybinds, adding a tab toggle
-// on the map itself. So if you open it in a dungeon, the world map would
-// be not accessible, same for the town map."
 //
 // The window keeps the paper, the hands, the pan, the zoom, the held
 // pose and the closing; what is INKED on the sheet is a tab. These pins
@@ -2753,10 +2747,9 @@ test('ENH-NOTICE3 (AUDIT B4/B6): the card\'s refusal wears no hint (nothing dism
   });
 });
 
-// ═══ MAP-FIT1 (2026-09-22) ══════════════════════════════════════════
+// ═══ MAP-FIT1 ══════════════════════════════════════════
 // icebreyker and Hog Goblin, Discord bug-reports: "Map gets cut at the
-// bottom"; Mac: "the morrowind arms dont show holding the map and it sits
-// too low on the screen". The arm's sheet is placed in the ARM's space
+// bottom";. The arm's sheet is placed in the ARM's space
 // and the ink follows its corners wherever they project - on a screen
 // that cannot frame it (a tall phone, a narrow window, a pose off the
 // wrong eye) the corners land past the bottom and the sides, the ink is
@@ -2801,9 +2794,8 @@ test('MAP-FIT1: a sheet whose corners fall off the screen goes back to the paint
   });
 });
 
-// ── TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md): THE CONTINENT ROUND THE BAY, through the window ──────────
-// Mac: "the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used and
-// connected as a gigantic map ... seen by players ingame", "Performance should also not be affected". The pure laws
+// ── TAMRIEL1: THE CONTINENT ROUND THE BAY, through the window ──────────
+// "Performance should also not be affected". The pure laws
 // are test/ui/tamriel.test.js's; here the window: its limits carry the frame, its rest is the Bay's own fit, a pan goes
 // out onto the continent and no further, the continent is inked beyond the Bay and NOT inked while the view is on it,
 // a hover beyond the Bay names the continent and a press there picks nothing, and the switch's Off is the sheet as it

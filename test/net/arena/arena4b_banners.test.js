@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, the coordinator's note on the client stream's pennants: a rival's and a watched fighter's banner
-// are read off the relay's bills - `go.vs.b`, the hall's live list `a.b` / `b.b` - and the relay never sent one): THE
+// ARENA4b: THE
 // RELAY BILLS EACH FIGHTER'S BANNER. The token signs no banner, so the fighter's own word claims it (net/arena/arenaLaw.js
 // bannerClaim - 'red', 'blue' or none; anything else dropped, never a refusal): the queue's `q` and a ladder bout's
 // `in`. It is cosmetic only - a banner's points are the account service's, counted off its own arena_members row. The

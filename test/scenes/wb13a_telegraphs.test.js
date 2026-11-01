@@ -1,5 +1,4 @@
-// WB13a (2026-10-01, Mac: "continue to improve the boss, hone in telegraphs, and just overall bring more AAA grade
-// polish to what is already developed"): THE TELEGRAPHS, HONED - bible/11-Multiplayer/World-Bosses.md section 20, T1-T14.
+// WB13a: THE TELEGRAPHS, HONED T1-T14.
 // Every shape read in Chromium at a fighter's eye and from above before this; here, the laws the reading found broken,
 // held on the code the GPU runs (test/glsl.mjs) and on the court's own driver.
 import { test } from 'node:test';

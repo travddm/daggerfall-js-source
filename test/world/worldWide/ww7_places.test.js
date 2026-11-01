@@ -1,5 +1,4 @@
-// WW7 (2026-10-25, the owner: "we need the same city nodes populating the entire map of tamriel", "We also need to fully
-// integrate our living world into the entirety of tamriel"; bible/03-World/World-Wide.md WW7): TESA's places in the
+// WW7: TESA's places in the
 // world's registry, the living world's ways over the land past the Bay, a town by its map id the registry's past it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

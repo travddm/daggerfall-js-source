@@ -1,5 +1,5 @@
-// AUDIT 637 (2026-10-06, Mac: "Audit this"), the RUN-IN-PLACE lens: PR #637's drawn-pose hold (net/online.js `tick`)
-// and the far tier's play-out it laid bare (`_arriveTimed`), audited. bible/01-Overview/audits/Audit-637.md.
+// AUDIT 637, the RUN-IN-PLACE lens: PR #637's drawn-pose hold (net/online.js `tick`)
+// and the far tier's play-out it laid bare (`_arriveTimed`), audited..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,6 @@
 // KVAR-HOLD (FIELD BUGS 2026-10-08, Themicles: Lord K'avar Part 1 "assigned K'var's location to Privateers Hold in
 // Daggerfall. I've searched the dungeon several times now and have tried the repair button ... I can now not receive new
-// Fighters Guild quests with this one still stuck"; bible/06-Systems/Quest-Arc.md KVAR-HOLD). DFU's random dungeon draw
+// Fighters Guild quests with this one still stuck"; KVAR-HOLD). DFU's random dungeon draw
 // keeps out only a dungeon another Place holds, so once the tutorial let Privateer's Hold go a guild's `remote
 // dungeon2` could land in it - and NEARBY-QUESTS' nearest few made it likely beside the classic start. The main story's
 // dungeons are no random quest's now (quest/place.js _collectDungeonIndicesOfType), and a save that holds such a site has

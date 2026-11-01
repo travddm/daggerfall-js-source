@@ -1,5 +1,4 @@
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - broadsides between
-// captains in the open sea, a ship wrecked and boarded, her hold a prize; bible/03-World/Eltheric-Ocean.md SHIP-PVP): the
+// SHIP-PVP: the
 // wreck's receipt (net/wild/wildReceipt.js `n1`), the prize's law (net/sea/seaPrizeLaw.js), the relay's referee (net/sea/
 // seaRef.js) pure and over the fake relay, the service's wreck, prizes, collect and reclaim over its real routes and records
 // (server-account/src/seaWreck.js), the page's guns (scenes/naval/seaBroadsides.js), the naval host's seams (scenes/naval/
@@ -94,7 +93,6 @@ test('SHIP-PVP the prize\'s law: her hold the boat the wreck names; her best pie
 /** A room's referee state: two captains in the zone, their places `gap` metres apart. */
 function seaRoom(gap = 50, now = 1000) {
   const st = newWildRef();
-  // PIN MOVED (AUDIT PVP-EASE L3-3, 2026-10-26): entered a minute before - ZONE-GRACE's safe passage keeps a captain's ship
   // from a shot, and these are captains at war
   wildZone(st, 'a', { id: 'pa', lv: 10, ci: RK }, true, { x: 0, y: 0, z: 0 }, now - WILD_GRACE.ms);
   wildZone(st, 'b', { id: 'pb', lv: 10, ci: RC }, true, { x: gap * SIEGE_UNITS_PER_M, y: 0, z: 0 }, now - WILD_GRACE.ms);
@@ -209,7 +207,6 @@ test('SHIP-PVP the wreck (seaRef.js): her bar at none by a captain\'s shot, or b
   st.fighters.get('a').pose = { x: lay.x + (R.SEA_REF.boardM + R.SEA_REF.slackM - 1) * SIEGE_UNITS_PER_M, y: 0, z: 0 };
   assert.equal(R.seaBoard(st, 'a', '0123456789ab', now + R.SEA_REF.boardMs + 1), null, 'never late');
   // she rows off - alongside where her captain is now, never where she was
-  // PIN MOVED (AUDIT SEA VENTURES A6): the boards after the 10 km pose are past its jump - a jumper boards nothing
   st.fighters.get('b').pose = { x: lay.x + 1000 * SIEGE_UNITS_PER_M, y: 0, z: lay.z };
   st.fighters.get('a').pose = { x: lay.x + (1000 + R.SEA_REF.boardM + R.SEA_REF.slackM - 1) * SIEGE_UNITS_PER_M, y: 0, z: lay.z };
   assert.equal(R.seaBoard(st, 'a', '0123456789ab', now + 3000 + WILD_REF.jumpMs - 1), null, 'never in a jump (A6)');
@@ -250,7 +247,6 @@ test('SHIP-PVP the wreck (seaRef.js): her bar at none by a captain\'s shot, or b
   const aAt = s3.ships.get('a').at, wreckAt = s3.ships.get('b').wreckAt;
   assert.deepEqual(R.seaStep(s3, now + R.SEA_REF.creditMs + R.SEA_REF.boardMs).length, 0);
   assert.deepEqual(R.seaStep(s3, now + R.SEA_REF.creditMs + R.SEA_REF.boardMs + 1).map((x) => [x.r, x.boarded]), [['bbbbbbbbbbbb', false]]);
-  // PIN MOVED (AUDIT SEA VENTURES E6A, F1/A1): a quiet ship whose captain stands in the zone is at sea all the same (a
   // hidden tab, a window open); one whose captain has left the zone is off the guns, forgotten when her bar is whole
   const struck = aAt + 9 * R.SEA_REF.helmMs;
   const s4 = { fighters: s3.fighters, ships: new Map([['a', { at: aAt, wrecked: false, struckAt: struck }], ['b', { wrecked: true, wreckAt }]]), wrecks: new Map() };
@@ -287,7 +283,7 @@ test('SHIP-PVP the wreck (seaRef.js): her bar at none by a captain\'s shot, or b
 test('SHIP-PVP the wire: a captain\'s helm, shot and boarding projected within their bounds, a shot directed at her captain\'s room and a boarding the wreck\'s room\'s; the referee\'s hull, wreck and signed wreck; the relay that referees them (mutants: the bounds, the kinds, the gate)', () => {
   assert.deepEqual([...SEA_PVP_KINDS], ['helm', 'shot', 'board']);
   assert.equal(SEA_SHOT_MAX, 8000);
-  assert.equal(SEA_PVP_RELAY_MIN, 246);   // PIN MOVED: world246 (world241 on its branch, then world242 and world245, renumbered at the merges)
+  assert.equal(SEA_PVP_RELAY_MIN, 246);
   assert.deepEqual(['world245', 'world246', 'world300', 'x', null].map(relaySupportsSeaPvp), [false, true, true, false, false]);
   assert.deepEqual(validWildData({ k: 'helm', hl: 2, t: 150, u: 7, h: 900, junk: 1 }), { k: 'helm', hl: 2, t: 150, u: 7, h: 900 });
   for (const bad of [{ hl: 5 }, { hl: -2 }, { t: 99 }, { t: 241 }, { u: -1 }, { h: 1001 }, { h: 1.5 }]) assert.equal(validWildData({ k: 'helm', hl: 2, t: 150, u: 7, h: 900, ...bad }), null, JSON.stringify(bad));
@@ -622,7 +618,6 @@ test('SHIP-PVP the page\'s guns (seaBroadsides.js): my balls meet a stranger cap
   assert.equal(st.sent.length, n, 'nothing more while closed');
   assert.equal(b.open('peer-her', 'me:1', true), false);
   // a wrecked ship of mine opens no guns
-  // PIN MOVED (AUDIT SEA VENTURES E6B): and is said at her helm at none - never left, so the referee's credit to the captain
   // whose shot broke her comes
   const w = guns({ helm: { hl: 2, u: 22, t: 1, h: 0.4, wrecked: true, pos: [0, 0, 0] } });
   w.b.step();

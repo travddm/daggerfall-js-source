@@ -3,7 +3,7 @@
 // THE CHAIN'S ECHO, AND ITS EXAMINE. A lever that works something out of sight says which way (one popup line a press),
 // marks the place on the dungeon map until it is found, and lights it when it is; in Info mode a lever's plaque says
 // which way its work lies (systems/dungeon/dungeonEcho.js, the action system's `onPlayed`, scenes/dungeonContext.js).
-// bible/03-World/Delve-Arc.md, ECHO1.
+// ECHO1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -3,7 +3,6 @@
 // ACC1a — THE IDENTITY TOKEN: the one thing the relay is willing to
 // believe about who a player is.
 //
-// Mac (2026-09-21): "the account name would be used for online."
 //
 // THE HOLE THIS CLOSES EXISTS TODAY. The hello is
 // `{ t:'hello', id, secret, name, look, pose }` and THE CLIENT ASSERTS
@@ -71,8 +70,7 @@
 // the people who can be banned" (ACC0's wall) is weaker if a name can
 // be BORROWED for five minutes.
 //
-// MAC DECIDED IT (2026-09-21, asked whether to close replay or accept
-// the five-minute window: "Yes"). A TOKEN IS SPENT ONCE. The relay
+// MAC DECIDED IT. A TOKEN IS SPENT ONCE. The relay
 // keeps the signatures it has seen and refuses a repeat; `e` bounds how
 // long it must remember, so the set sweeps itself.
 //
@@ -89,7 +87,7 @@
 // to be in front of somebody is the second-home shape SLAM13 burned us
 // on.
 //
-// ACC1d BUILT BOTH (2026-09-22), so the paragraphs above describe
+// ACC1d BUILT BOTH, so the paragraphs above describe
 // RUNNING CODE and not an intention. `server/src/index.js` `_named`
 // verifies the token, keeps the signature for as long as `e` says the
 // room must remember it, refuses a repeat, and takes the name out of
@@ -169,9 +167,7 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
 
 /* ═══ ACC3: WHAT A PLAYER WEARS, AND WHY IT RIDES THE TOKEN ═══════════
  *
- * Mac (2026-09-22): "Player titles appear above a player name... 1st
- * title is Founder with a gold color, 2nd title is Developer with a red
- * color", and "name glyphs... appear on the right side of the player
+ * and "name glyphs... appear on the right side of the player
  * name".
  *
  * A TITLE A CLIENT COULD ASSERT IS A TITLE EVERY CLIENT HAS. This is
@@ -182,8 +178,7 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
  * - signs it into the token, and the relay reads it OUT of the token
  * exactly as it reads the name.
  *
- * AND IT COSTS NOTHING TO ADD NOW. Mac's own framing: "Next feature
- * before this becomes a live addition." The token module is in the
+ * AND IT COSTS NOTHING TO ADD NOW. The token module is in the
  * relay bundle, so a claim added here bumps RELAY_VERSION and drops
  * every connected player - but the deployed relay is world84 and both
  * world86 (ACC1g) and world87 (this) are still on the branch, so all
@@ -196,7 +191,7 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
  *  one); this list is the vocabulary both ends share. */
 export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
 
-/** SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE SEATS' TITLES - five GENERIC ids, because a town's
+/** SEAT1c: THE SEATS' TITLES - five GENERIC ids, because a town's
  *  or a Season's name cannot be a closed list's word: "Warden of <Town>" (a palace seat's guildmaster), "Protector of
  *  <Kingdom>" (a crown's), "Crowned in Season N", "Keeper of <Town>, Season N" (kept for good, SEASON1) and the Royal
  *  Tourney's champion (CROWN1). Each rides with a bounded claim beside it - `ts`: [the seat key, the Season] - from
@@ -205,20 +200,19 @@ export const SEAT_TITLES = Object.freeze(['warden', 'protector', 'crowned', 'kee
 /** SEAT1c: whether `ts` is a seat title's claim - [seat key (a map id, unsigned 32), Season (0-9999)]. */
 export const seatTitleClaimOk = (ts) => Array.isArray(ts) && ts.length === 2 && Number.isSafeInteger(ts[0]) && ts[0] >= 0 && ts[0] <= 0xffffffff
   && Number.isSafeInteger(ts[1]) && ts[1] >= 0 && ts[1] <= 9999;
-/** CHAP4c (2026-10-08, Chapters-Arc 6): A CHAPTER'S SEATS' TITLES - three GENERIC ids, as the seats' are, because a guild's
+/** CHAP4c: A CHAPTER'S SEATS' TITLES - three GENERIC ids, as the seats' are, because a guild's
  *  and a region's name cannot be a closed list's word: its Master (rank 9), an officer (rank 8), and a Master who lost
  *  the seat (for the rest of the Season). Each rides with the seats' bounded claim, `ts`: [the chapter's key - its
  *  guild faction x 100 + its region (net/npcChapterLaw.js chapterTitleKey) - and the Season], from which the client words
  *  it. Reaching the relay before the service mints any: the service mints them only while CHAPTER_TITLES is on.
- *  CHAP6e (2026-10-09, Chapters-Arc 7): and two more - a Master's in its chapter's Ascendancy ("High Master", signed in
+ *  CHAP6e: and two more - a Master's in its chapter's Ascendancy ("High Master", signed in
  *  the Master's place for the Season, never worn on its own) and the Master who held the seat a whole Season's, kept
  *  for good, its claim's Season the one it held. */
 export const CHAPTER_TITLES = Object.freeze(['chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster']);
 /** Whether a title rides with a claim (`ts`): the seats' and the chapters' - every other title rides alone. */
 export const titleClaimed = (t) => SEAT_TITLES.includes(t) || CHAPTER_TITLES.includes(t);
 
-/** WB9g (2026-09-30, Mac: "a new addition (the aura), an animated burning ground aura that circles the ground where
- *  your character stands. These items should be expensive and sought after"): THE AURAS THAT EXIST. An aura is WORN,
+/** WB9g: THE AURAS THAT EXIST. An aura is WORN,
  *  one at a time, as a title is - so a token carries at most one (`au`) - and it is signed for the same reason a title
  *  is: a fire at a player's feet that a client could assert is a fire every client has. Holding one is the service's
  *  business (the Broker's insignia, bought - net/insignia.js; or the developers' Seraph Wings -
@@ -228,7 +222,7 @@ export const AURAS = Object.freeze(['dagonfire', 'seraphwings', 'turninghour', '
 
 /** The glyphs that exist. A glyph is not worn, it is TRUE of a player -
  *  sprout is "this account is new", dev is "this is a developer", mod is
- *  "this is a moderator" (MOD1, Mac: "a moderator glyph") - so a token
+ *  "this is a moderator" (MOD1) - so a token
  *  may carry several and a player chooses none of them. */
 export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY']);
 
@@ -238,7 +232,7 @@ export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', '
  *  and either way the verifier says no. */
 export const GLYPHS_MAX = GLYPHS.length;
 
-/** WITCH1 (2026-10-20, the owner: "a brand new item (profile icon)"; bible/06-Systems/Witches-Festival.md): THE PROFILE
+/** WITCH1: THE PROFILE
  *  ICONS THAT EXIST. An icon is WORN, one at a time, as a title is - in the profile's portrait well in place of the
  *  character's face (ui/profileIcons.js paints each) - so a token carries at most one (`pi`), and it is signed for the
  *  title's reason: a picture another player's Inspect card shows is one the service vouches for. Holding one is the
@@ -246,9 +240,7 @@ export const GLYPHS_MAX = GLYPHS.length;
  *  the vocabulary both ends share. Appended, never reordered. */
 export const ICONS = Object.freeze(['tallowskull', 'twinmoons', 'wyrdcauldron', 'soulcake']);
 
-/** RENOWN1 (2026-09-24, Mac: "What if the leveling system was something
- *  seperate unique to online but compatible" ... "Plus having their level
- *  appear on the left side of character name"): THE RENOWN'S
+/** RENOWN1: THE RENOWN'S
  *  CAP, and it lives HERE because the level rides the token (`lv`) and
  *  the relay stamps it beside the name, exactly as a title - so the
  *  verifier's bound is the vocabulary both ends share, and the curve that
@@ -335,8 +327,7 @@ export function nameIsIssuable(name) {
  *      absent before its first judged checkpoint and from a service
  *      before INT7. Every referee's clip of a blow between players
  *      (net/siege/siegeRef.js siegeBlowMax, net/arena/arenaLaw.js arenaBlowCap)
- *   hd 1 on a HIDDEN STAFF SPECTATOR's token (STAFF-PANEL5-HIDDEN, mob: "true
- *      invis not lattys invis"), absent on every other: an Admin's or a
+ *   hd 1 on a HIDDEN STAFF SPECTATOR's token (STAFF-PANEL5-HIDDEN), absent on every other: an Admin's or a
  *      Moderator's while they hold a live staff session with Hide me on.
  *      Its `s` is then a subject minted for that session, never the
  *      account's id, so it takes no seat of the account's; the relay
@@ -584,7 +575,7 @@ async function openSealed(token, publicKey, { subtle, nowS, skewS, valid }) {
 
 /* ═══ MOD1: THE MUTE ORDER ══════════════════════════════════════════
  *
- * Mac: "moderator chat commands" - /mute and /unmute.
+ * /mute and /unmute.
  *
  * A mute lands in two places. The ACCOUNT ROW is the truth (ACC0's own
  * `muted_until`), and every identity token minted afterwards carries it
@@ -689,7 +680,7 @@ function staffEventOrderValid(c) {
   return c.op === 'look' && c.ev === undefined && c.ei === undefined;
 }
 
-/* ═══ QUEST-HOME: THE HOME ORDER (bible/01-Overview/bugs/Field-Bugs-2026-10-14.md QUEST-HOME; Mac, 2026-10-15: "Close both") ══
+/* ═══ QUEST-HOME: THE HOME ORDER (QUEST-HOME) ══
  *
  * A home bought, held or given up must reach every page online at once: a quest picks its residence in towns its player
  * never asked about, off the boot's read of every town's homes (server-account/src/homes.js homeLayouts), and a read at
@@ -718,7 +709,7 @@ export async function mintHomeOrder({ s, bm, bu = [], bd = [] }, privateKey, { s
   return sealClaims(claims, privateKey, subtle);
 }
 
-/* ═══ CARDS6: THE STAKE (bible/11-Multiplayer/Tavern-Cards.md section 23) ═══════════════════════════════════════════
+/* ═══ CARDS6: THE STAKE ═══════════════════════════════════════════
  *
  * Section 5, DECIDED: online stakes are escrowed by the service - sitting moves the buy-in from the character to the
  * table. FACT: the relay has no door to the service. So the service takes the buy-in off the realm character's record
@@ -763,7 +754,7 @@ export async function verifyStakeOrderAnyAge(token, publicKey, { subtle }) {
   return openSealed(token, publicKey, { subtle, nowS: i, skewS: 0, valid: (c) => orderValid(c) && c.o === 'stake' });
 }
 
-/* ═══ INT9: THE REMAINS ORDER (bible/06-Systems/Integrity-Arc.md lane 2) ════════════════════════════════════════════
+/* ═══ INT9: THE REMAINS ORDER (lane 2) ════════════════════════════════════════════
  *
  * A death in the open zone drops what the ACCOUNT SERVICE took off the fallen character's judged record
  * (server-account/src/wild.js), never what the fallen's own game hands over. The relay has no door to the service, so the
@@ -773,7 +764,7 @@ export async function verifyStakeOrderAnyAge(token, publicKey, { subtle }) {
  * order named no room, so one fall was laid in two); `wk` the killer whose worn piece is the list's record `wi`, theirs
  * alone to take; `wg` the fallen's guild, whose members take nothing of it (PVPDUNGEONS - whoever lays it). The room keeps
  * a deposit only whose records digest to `wh` (net/wild/wildLaw.js), and opens it to takes only then. MAC'S DECISION
- * (2026-10-14, the two-phase handoff): `we` 1 - the killer's piece is held by the service in ESCROW (server-account/src/
+ * `we` 1 - the killer's piece is held by the service in ESCROW (server-account/src/
  * wild.js), never the room's to hand: the killer's take is a COLLECT the room signs (net/wild/wildReceipt.js `g1`), and the
  * service commits the piece to the killer's record against it.
  */
@@ -789,7 +780,7 @@ export function remainsOrderValid(c) {
   if (!Number.isSafeInteger(c.wn) || c.wn < 0 || c.wn > REMAINS_RECORDS_MAX) return false;
   if (typeof c.wm !== 'string' || c.wm.length > 64 || !streamsFoes(c.wm)) return false;
   if (c.wg !== undefined && !(typeof c.wg === 'string' && GUILD_ID_RE.test(c.wg))) return false;
-  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;   // MAC (2026-10-14): an escrow is the killer's piece's
+  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;   // MAC: an escrow is the killer's piece's
   if (c.we !== undefined && c.we !== 1) return false;
   return typeof c.wk === 'string' && ID_RE.test(c.wk) && c.wk !== c.s && Number.isSafeInteger(c.wi) && c.wi >= 0 && c.wi < c.wn;
 }
@@ -807,7 +798,7 @@ export async function remainsDigest(/** @type {any[]} */ records, { subtle }) {
   return [...d].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/* ═══ CARDS10: THE DECK ORDER (bible/11-Multiplayer/Tavern-Cards.md section 33) ═════════════════════════════════════
+/* ═══ CARDS10: THE DECK ORDER ═════════════════════════════════════
  *
  * Section 6.4, DECIDED: online wins rank a player on a season board. A deck the client names is a deck the client
  * chose - any thirty the law takes, whether its character holds them or not. So a RANKED seat brings the service's word
@@ -832,7 +823,7 @@ export async function mintDeckOrder({ s, dh }, privateKey, { subtle, nowS, ttlS 
   return sealClaims(claims, privateKey, subtle);
 }
 
-/* ═══ SEAT2a: THE SIEGE PASS (bible/11-Multiplayer/Seats-Arc.md 6.2, 6.4, 6.6) ═══════════════════════════════════
+/* ═══ SEAT2a: THE SIEGE PASS (6.2, 6.4, 6.6) ═══════════════════════════════════
  *
  * FACT: the relay has no door to the account service (its receipts ride the players' own clients). So a siege's room
  * cannot ask who signed which side - the service tells it, once a socket, in an order the room checks with the key it
@@ -900,7 +891,7 @@ export async function mintOrder({ s, mu }, privateKey, { subtle, nowS, ttlS = OR
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** SAFE4 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md section 5): MINT A BAN ORDER - account `s` is banned
+/** SAFE4: MINT A BAN ORDER - account `s` is banned
  *  until `bn` (epoch seconds; 0 lifted), signed by the service that wrote the ban. Any socket may carry it, as a mute's:
  *  a room that checks it silences the account's sockets there and tells them (server/src/index.js `_takeOrder`). `bn`,
  *  never `bu`: that word is the home order's (HOME_ORDER_FIELDS). */
@@ -911,7 +902,7 @@ export async function mintBanOrder({ s, bn }, privateKey, { subtle, nowS, ttlS =
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** STAFF-PANEL5-MESSAGE (2026-10-22, mob: Message on screen; design doc "DFO Staff Panel: design"): MINT A STAFF MESSAGE'S
+/** STAFF-PANEL5-MESSAGE: MINT A STAFF MESSAGE'S
  *  ORDER - message `mi`, which the account service stored for account `s` (staff_messages), is waiting. The words never ride
  *  it: the hub hands `s`'s own sockets a nudge (`{t:'smsg', mi}`), and the game reads the message off the service with its
  *  own session (design doc, Weak spots: "the relay only sends a 'new staff message' nudge"). */
@@ -922,7 +913,7 @@ export async function mintStaffMessageOrder({ s, mi }, privateKey, { subtle, now
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use"; net/staffEvent/staffEventLaw.js):
+/** STAFF-EVENT:
  *  MINT A STAFF EVENT ORDER - staff member `s` stages event `ev` (`op` start), ends event `ei` (`end`), calls its boss by
  *  hand (`boss`), or reads the book (`look`). The account service pushes it through the Worker's law door to the hub
  *  (server/src/staffEvents.js), which keeps the book. Never carried by a client. */

@@ -1,4 +1,4 @@
-// AUDIT WORLD6b (Mac, 2026-09-14: "Audit first"): three opus lenses over WORLD6b-i - the relay and the session (A),
+// AUDIT WORLD6b: three opus lenses over WORLD6b-i - the relay and the session (A),
 // the encounter pool's puppet and stream arms (B), the world host's wiring, the day's rolls and the record (C).
 // Thirty-three findings paid at their root; these pins EXECUTE the pay-outs: the relay's Room on the fake Durable
 // Object, the session on the fake socket, the encounter pool on a crafted MONSTER.BSA with a converting net and a
@@ -191,7 +191,6 @@ test('AUDIT WORLD6b B1/B2/B10: the pool - a fall\'s, another foe\'s and a relaye
   rat.entity.activeEffects = [{ kind: 'soulTrap', chance: 100 }];   // a trap that succeeds with no empty gem TETHERS the foe at 1 (X5)
   rat.entity.health = 1;
   assert.equal(pool.applyHit('bob-0002', { k: 'world:3,12', i: rat.seq, dmg: 5 }), true);
-  // PIN MOVED (RPT1026-FIGHTS TRAP-TO-OWNER): my own trap is read for a peer's kill - its soul is mine whoever struck (DFU's
   // SetHealth, every source alike) - and never tethers it: here no empty gem, so its word is said and the rat falls
   assert.equal(rat.dead, true, 'B2: a peer\'s blow kills through the door - no trap of mine tethers it');
   assert.equal(said.length, 1, 'my trap\'s word alone - no kill notice of mine'); assert.match(said[0], /no empty soul traps/);

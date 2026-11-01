@@ -1,4 +1,4 @@
-// TESA3 (2026-10-12, the owner: "Continue"; bible/03-World/Arena-Provinces.md TESA3) - THE PROVINCE'S NAME AND ITS
+// TESA3 - THE PROVINCE'S NAME AND ITS
 // PEOPLE, pinned. Past the Bay a pixel answers the province it stands on (world/tamriel/tamrielLand.js provinceKeyBeyondBay) for
 // what the player READS - the loading screen, the Overworld's line, the new region's word and its edge - and for whose
 // NAMES its people carry (world/tamrielPeople.js: a Nord's in Skyrim, the Imperial bank in Black Marsh by DFU's own

@@ -1,8 +1,5 @@
 // @ts-check
-// COATS1 (2026-10-11, a player: "can we take the current horse sprite thats used for placement, riding and even the
-// character riding the horse and give the sprite different color types and colors. Like a variation of horse sprites";
-// then "What about also different patterns? The goal is for every person's horse to be unique" - asked, every horse BORN
-// unique and re-dyable on the Stable card, with pinto, appaloosa, dapples, socks and roan): THE HORSE'S LOOK - THE LAW.
+// COATS1: THE HORSE'S LOOK - THE LAW.
 //
 // Every horse the port draws is one bay horse: Daggerfall's riding sprite (MRED00I0.CFA, the player's own data), Horse
 // Cart and Cargo's standing and walking views (vendor/horse-cart-and-cargo) and Eye Of The Beholder's five riders
@@ -473,8 +470,7 @@ export function recolorHorse(image, look, { bottomFirst = true, legs = true, tac
 const _hides = new WeakMap();
 
 /**
- * PERF-HIDE (2026-10-12, a profile of a player's client in its first seconds in the world: the wagon pool's looks dyed
- * 0.9 s of the main thread, three quarters of it finding the hide again): THE HIDE IS THE PICTURE'S, NOT THE LOOK'S.
+ * PERF-HIDE: THE HIDE IS THE PICTURE'S, NOT THE LOOK'S.
  * Which pixels the dye moves (THE DYE's warm, coloured, not-tack pixels, gathered into regions, the horse's kept) and
  * the frame they make (`x0`..`x1`, `r0`..`r1`) are read off the picture's own pixels and `tack` alone - so they are
  * found once a picture and kept with it (`_hides`, weakly: a picture let go takes its hide with it), and every look

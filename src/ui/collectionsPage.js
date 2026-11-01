@@ -1,9 +1,8 @@
 // @ts-check
-// COLLECTIONS (2026-10-08, Mac: "I think we add a new tab in holdings for the weapon codex and card collection"; answered:
-// "One 'Collections' tab"): THE COLLECTIONS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
+// COLLECTIONS: THE COLLECTIONS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
 // pauseHoldings) - what a character has gathered, under one switch:
 //
-//   THE CODEX (LOOT10, systems/loot/lootCodex.js; bible/06-Systems/Loot-Arc.md section 12): every Legendary record and every
+//   THE CODEX (LOOT10, systems/loot/lootCodex.js): every Legendary record and every
 //     Aetheric set, found and not - a found one's name, its group, the day it was first found and what it is; an unfound
 //     one's group and where it is said to be. The rows, the lines a row opened shows and the sets' counts are the
 //     Reforge's Codex page's (ui/reforgeWindow.js renderCodex - AUDIT CARDS-5 D12 made the lines the same), read from the
@@ -11,14 +10,11 @@
 //     opens that window.
 //
 // Dressed by the stone-and-brass kit's roles as the other Holdings pages are (ui/enhanced/enhancedFrame.js FRAME_ROLES) - this
-// sheet writes geometry and the words' colours alone. CARDS-PLUS (2026-10-13, bible/11-Multiplayer/Tavern-Cards.md
-// section 38): until then that sentence was a claim the roles did not keep - none named the switch or the codex's rows,
+// sheet writes geometry and the words' colours alone. CARDS-PLUS: until then that sentence was a claim the roles did not keep - none named the switch or the codex's rows,
 // and this sheet's own `background` and border colours painted over any that might; the switch is the kit's tiles now,
 // a codex row its list line.
 //
-// COLLECTIONS-II (2026-10-22, the owner: "with the introduction of a lot of titles, auras, profile icons, etc I think its
-// time we introduce these elements to the collections tab, along with telling how they are found, even if they arent
-// currently able to be obtained. This needs to be a proper overhaul to the collections ui"; bible/10-UI/Collections.md):
+// COLLECTIONS-II:
 // the page is every player's now, its parts six - the account's WARDROBE first, a kind a part (Titles, Auras, Icons,
 // Glyphs: ui/collections/wardrobePart.js over ui/collections/wardrobeCatalogue.js - every one, held or not, where it
 // comes from and how it is had, worn from here), then this character's Codex. The switch is a row of tiles,
@@ -32,7 +28,7 @@ import { t } from '../systems/textManager.js';
 import { wardrobeCount, wordPair } from './collections/wardrobeCatalogue.js';   // COLLECTIONS-II: the wardrobe's parts
 import { GATHERED_PARTS, isGatheredPart, gatheredCount, drawGatheredPart } from './collections/gatheredPart.js';   // HUNTERS-MARK: the Trophies, the Fish
 import { drawWardrobePart, wardrobeAccount, wardrobeOfFlow, resetWardrobePart, rereadWardrobeAccount, WARDROBE_PART_CSS, WARDROBE_THEME_CSS } from './collections/wardrobePart.js';
-import { drawAppearancesPart, resetAppearancesPart, appearancesCount, LOOKS_PART_CSS } from './collections/appearancesPart.js';   // APPEARANCES: the character's looks (bible/04-Characters/Wardrobe.md)
+import { drawAppearancesPart, resetAppearancesPart, appearancesCount, LOOKS_PART_CSS } from './collections/appearancesPart.js';   // APPEARANCES: the character's looks
 
 export const COLLECTION_PAGE_SECTIONS = Object.freeze([Object.freeze(['collections', 'Collections'])]);
 export const COLLECTION_PAGE_STYLE_ID = 'collections-page-css';

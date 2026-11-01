@@ -1,10 +1,8 @@
 // @ts-check
-// STUDIO1 (2026-10-17, Mac, of trashBattery on the dev chat - "what Latty is working to build right now, and what I'm
-// waiting for, is a centralized location for you and I to put 2d art assets": "We need to build what trash is talking
-// about"): THE STUDIO - ONE FOLDER WHERE THE GAME'S ARTISTS PUT THEIR PICTURES, AND THE GAME WEARS THEM.
+// STUDIO1: THE STUDIO - ONE FOLDER WHERE THE GAME'S ARTISTS PUT THEIR PICTURES, AND THE GAME WEARS THEM.
 //
 // Until now every picture the game drew was a mod's it was handed, a record of the player's own ARENA2, or one the port
-// painted from numbers (the wagons, the ships, the yards - bible/01-Overview/DF-Art.md; the wagons' recoloured for each
+// painted from numbers (the wagons, the ships, the yards; the wagons' recoloured for each
 // paint). The studio is the fourth: `public/art/studio/<artist>/`, each artist's own drawings, named the way every
 // Daggerfall texture pack names its pictures (systems/textureReplacement.js textureName - `38181_1-0.png`), with a label
 // for the eye after `--` if the artist likes (`38181_1-0--cart-side.png`). An artist drops a PNG in their folder and it

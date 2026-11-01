@@ -1,7 +1,7 @@
 // @ts-check
-// STAR7 (2026-10-20): A HELD STAR'S SPOILS - what one defender's share in a held star pays, rolled from the relay's
+// STAR7: A HELD STAR'S SPOILS - what one defender's share in a held star pays, rolled from the relay's
 // receipt. The raid's thanks' twin (systems/raidSpoils.js), rung for rung: a star is held three times an hour while the
-// festival runs, as a town is raided through the day. Design: bible/11-Multiplayer/Starfall.md section 6.
+// festival runs, as a town is raided through the day. Design:
 //
 // PER PLAYER, AND THE SEED'S OWN. The receipt the relay signs at the master's fall (net/starfall/starReceipt.js `j1`)
 // carries a seed (`c`, 32 bits of the relay's CSPRNG), and everything here is rolled on `seededRng(c)` (systems/wind/wind.js):

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ZONE-SAFE (2026-10-25) - THE STREETS OF A SETTLEMENT ARE PEACE (bible/11-Multiplayer/Wild-Zone.md section 26).
+// ZONE-SAFE - THE STREETS OF A SETTLEMENT ARE PEACE.
 //
 // The owner: "Btw with the pvp changes. All cities should be considered safe zones" - and, asked which places, "Every
 // settlement". In the open zone (Cyrodiil, and the open sea past Veilhaven's peace) no player's blow or spell lands on

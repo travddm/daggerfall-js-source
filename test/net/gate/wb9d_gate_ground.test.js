@@ -1,5 +1,4 @@
-// WB9d (2026-09-30, Mac: "Further improve his effects, ensure his ground affects actually cause damage and the player
-// recieves proper feedback"): HIS GROUND BITES HARDER, AND IS FELT. Each pool bites half again what it did (a second in
+// WB9d: HIS GROUND BITES HARDER, AND IS FELT. Each pool bites half again what it did (a second in
 // the fire was 5% and 2 points - easy to stand through), and every bite and every elemental blow of his says itself on
 // the screen - the rim in its colour, flaring at the bite and breathing while I stand in it, its name and "step out"
 // under the crosshair, and the hiss of the step in at once (the bite is a tick off: a step through is free, standing is
@@ -9,7 +8,7 @@
 //   the court      scenes/gate/gateCourt.js burn/land - the ground's name and colour, the bite's moment and colour, the hiss
 //   the ground     net/gate/gateBrain.js POOLS, SCAR_POOLS; render/gate/gateTelegraph.js poolShapes in the ground's own grain
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9d).
+// Design: (WB9d).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

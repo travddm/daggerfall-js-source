@@ -1,7 +1,7 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "During fights, the crowd is present and can cheer/boo you"): THE CROWD'S LAW - its mood,
+// ARENA2: THE CROWD'S LAW - its mood,
 // its favour, what it says, what it sounds and how it moves, from the bout's events (systems/arena/arenaBout.js). Design:
-// bible/11-Multiplayer/Arena.md "4. The crowd".
+// "4. The crowd".
 //
 // MOOD is one number from -1 (booing) to 1 (roaring), pushed by what happens on the sand and settling back to its base
 // over MOOD_SETTLE_S: a big hit, a crit, a comeback, a fall raise it; a stall (no blow for eight seconds), a fighter

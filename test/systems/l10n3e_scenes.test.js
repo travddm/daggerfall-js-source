@@ -1,4 +1,4 @@
-// L10N3e (2026-09-28): THE NAMES THE SCENE HOSTS SHOW - the scenes batch. The places, things and beings batches routed
+// L10N3e: THE NAMES THE SCENE HOSTS SHOW - the scenes batch. The places, things and beings batches routed
 // DFU's name lookups everywhere but the scene hosts, which they could not edit; this routes them there. A place by
 // its MapTableData.MapId (GetLocalizedLocationName) and a region by its index (GetLocalizedRegionName), an item and a
 // spell through the helpers the things batch left (shownItemName, shownSpellName), an enemy through corpseEntityName,
@@ -131,7 +131,6 @@ function worldReveal() {
     return { revealLocation, revealMap, mapMacro: () => _locationRevealedByMapItem };
   `, {
     locationIndex: new Map([['5,6', { regionIndex: 17 }]]), playerTravelPixel: () => ({ x: 5, y: 6 }),
-    // PIN MOVED (BAY-LEFT-B, 06-Systems/Quest-Arc.md): the reveal reads the politic region (_questRegionIndex,
     // PlayerGPS.CurrentRegion) over the quest layer's maps - a province's region its table of the places past the Bay
     _questRegionIndex: () => 17, questWorld: { maps: { getRegion: () => CRYPT_REGION } },
     maps: { getRegion: () => CRYPT_REGION }, discoverRandomLocation, questBridge: { notebook: { addNote: (t) => notes.push(t) } },
@@ -252,7 +251,7 @@ test('L10N3e scenes: the town map\'s plates carry the shown pair beside the cano
       .map((t) => generateBuildingName(t === BUILDING_TYPES.GeneralStore ? cnSeed : 9, t, { ...o, palaceName: palace }));
   };
   const show = () => ({
-    world: plates(opts('exteriorAutomapToggle.js', { dfLoc: DAGGERFALL, b: { locBlocks: [] } })),   // PIN MOVED (STAR0): the world host's town map door, moved out of bootWorld by tools/hostMove.mjs (bible/01-Overview/Host-Split.md)
+    world: plates(opts('exteriorAutomapToggle.js', { dfLoc: DAGGERFALL, b: { locBlocks: [] } })),
     exterior: plates(opts('exterior.js', { dfLocation: DAGGERFALL, loc: { blocks: [] }, locationName: 'Daggerfall' })),
   });
   const { en, fr } = inFrench(PLACES, show);
@@ -263,7 +262,7 @@ test('L10N3e scenes: the town map\'s plates carry the shown pair beside the cano
   assert.deepEqual(fr.exterior, fr.world);
   // the title: the window's `locationName` is the name as shown, its key the locationId - by source, since the window's
   // bag is built inside the M key's whole arm
-  for (const file of ['exteriorAutomapToggle.js', 'exterior.js']) {   // PIN MOVED (STAR0): the world host's half in its moved module
+  for (const file of ['exteriorAutomapToggle.js', 'exterior.js']) {
     assert.match(host(file).text, /locationName: shownLocation,   \/\/ L10N3e: the title, as shown - the key is locationId\n\s*locationId: locId,/, `${file}'s title`);
   }
 });

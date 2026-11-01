@@ -1,5 +1,4 @@
-// TELL6d - THE AIMED SHOT (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into
-// it", then "Go" on every call). A class archer of the whole set (an elite, a champion, a revenant - section 9's table:
+// TELL6d - THE AIMED SHOT (;, then "Go" on every call). A class archer of the whole set (an elite, a champion, a revenant - section 9's table:
 // an ordinary archer of the tier keeps DFU's plain shot) aims one shot in three at the local player while it holds a
 // ranged token: the line from it to its target is drawn on the ground and LOCKED (0.6 s, 0.5 m wide); at the landing
 // the arrow leaves along it x1.3 as fast, and strikes for x1.4. No blowConnects - the arrow's own flight

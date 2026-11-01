@@ -9,7 +9,6 @@
 // this file, written to certify a fix for another - pins pay twice.
 //
 // The twelve, in the order the record tells them
-// (bible/01-Overview/audits/Audit-66.md):
 //
 //   F1  the dropped light sat half a torch too low
 //   F2  a world-clock JUMP burned the torches - and a load is a jump
@@ -206,7 +205,6 @@ test('AUDIT 66 F7: a dropped torch loses the click to a door, a board and a stat
     // HARD2: the fix moved from two hand-written copies into one law.
     // The host now feeds the door's distance to the race and reads the
     // answer; the LAW itself is tested below, against the module.
-    // PIN MOVED (ALLY-YIELDS, bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): the door goes in as its pick, reach and all
     // (`door:`); the race reads its distance off it - still one pick of the door set a press
     assert.match(src, /door: modes\.exteriorActivationHit\(cam\.pos, useFwd\),/, `${host}: the door's pick goes into the race`);
     assert.match(src, /const _torchNearest = _race\.torchWins;/, `${host}: and the torch arm reads the race's answer`);

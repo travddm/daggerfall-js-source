@@ -53,7 +53,7 @@ test('AT0: the settings entry IS the mod’s modsettings - section, names, bound
   assert.equal(ship.Sections.length, 1, 'the mod ships one section');
   assert.equal(ship.Sections[0].Name, AMBIENT_TEXT_SECTION);
   const keys = MOD_SETTINGS[AMBIENT_TEXT_VENDOR].keys;
-  // PLAIN-TEXT (2026-10-19): the four lines said plainly for a player - their words, exactly
+  // PLAIN-TEXT: the four lines said plainly for a player - their words, exactly
   const PLAIN = {
     textChance: 'Chance, in percent, of a line at each check',
     interval: 'Real-time seconds between checks for a line',

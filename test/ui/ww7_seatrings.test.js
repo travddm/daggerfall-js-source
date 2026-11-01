@@ -1,5 +1,4 @@
-// WW7-6 (2026-10-25, the owner: "we need the same city nodes populating the entire map of tamriel"; bible/03-World/
-// World-Wide.md WW7-6): the seats past the Bay on the map - each city the continent's layer inks carries its seat's key,
+// WW7-6: the seats past the Bay on the map - each city the continent's layer inks carries its seat's key,
 // ringed under its glyph as the Bay rings its own, and its card under the pointer.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

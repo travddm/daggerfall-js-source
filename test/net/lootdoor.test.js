@@ -1,4 +1,4 @@
-// LOOT-DOOR (AUDIT HORIZONTAL B7, 2026-10-27; bible/06-Systems/Professions-Arc.md 57.8): an older build's item law drops a
+// LOOT-DOOR (AUDIT HORIZONTAL B7, 2026-10-27; 57.8): an older build's item law drops a
 // Master's work it cannot read (a made Legendary of no record), so an older build in a room's seat said a container
 // without it, and every peer landed that - the piece gone. A loot room's hello says the loot its build reads (net/wire.js
 // LOOT_HELLO_LAW, `ll`), and while `lootDoor` is on the relay refuses one that says less or none - GRANT-DOOR's own law.
@@ -43,7 +43,7 @@ test('LOOT-DOOR THE WIRE: a hello says `ll` 1 to LOOT_HELLO_LAW_WIRE_MAX, any ot
   assert.equal(RELAY_CFG_VARS.lootDoor, 'LOOT_DOOR');
   assert.deepEqual(parseRelayCfgCommand('lootdoor on'), { cmd: 'relay', k: 'lootDoor', v: 'on' });
   assert.equal(RELAY_CFG_KEY_MIN.lootDoor, 273);   // world273: main's FIELD BUGS 2026-10-26r took world272 at the merge
-  assert.deepEqual([relayCfgSupported('world272', 'lootDoor'), relayCfgSupported('world274', 'lootDoor'), relayCfgSupported(RELAY_VERSION, 'lootDoor')], [false, true, true]);   // PIN MOVED: world274, LADDER-CUT (systems/skillSoftcap.js, a file the bundle reaches; NOT YET DEPLOYED)
+  assert.deepEqual([relayCfgSupported('world272', 'lootDoor'), relayCfgSupported('world274', 'lootDoor'), relayCfgSupported(RELAY_VERSION, 'lootDoor')], [false, true, true]);
 });
 
 test('LOOT-DOOR THE NUMBER READS WHAT IT SAYS: 1 is a Master\'s work and a Mounted Trophy, each minted by its producer - both ride a room\'s stored word whole at this build, where main\'s law drops the one and cannot read the other', () => {

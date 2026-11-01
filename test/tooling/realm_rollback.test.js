@@ -1,4 +1,4 @@
-// PURSE-BACK (2026-10-19; FIELD BUGS 2026-10-18b TRADE-WRAP's repair, bible/01-Overview/bugs/Field-Bugs-2026-10-18b.md) -
+// PURSE-BACK -
 // THE ROLLBACK FROM ACTIONS, driven over the real account service: every migration, the real checkpoint and its judge,
 // and the review's own act (server-account/src/review.js reviewAct) run through tools/lib/wranglerBindings.mjs, whose
 // wrangler is answered here by the service's own database and bucket - so every statement the act binds is written as a

@@ -1,5 +1,4 @@
-// DISC22-F (2026-09-24, Skibbster on Discord: "Unable to share quests with players if you've previously completed the
-// same quest" - the receiver read "... but you already has this quest").
+// DISC22-F.
 //
 // THE BUG: AUDIT DROPS A2 remembers a quest finished under a share so a partner who is behind cannot re-send it and pay
 // its rewards twice - and it remembered the quest's NAME. A repeatable quest (every guild and faction quest) finished

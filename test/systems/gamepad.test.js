@@ -1,4 +1,4 @@
-// GP1 (2026-09-11): THE GAMEPAD LAYER. InputManager.cs's joystick law
+// GP1: THE GAMEPAD LAYER. InputManager.cs's joystick law
 // EXECUTES against its mutants - the browser pad in Unity's frame, the
 // axis keys, the movement stick, the camera stick, the look rate, the
 // scroll, the cursor step - and the bindings store's three joystick
@@ -211,7 +211,7 @@ test('GP1 the poller: buttons and bound axis keys become synthetic keys by Unity
     gp.dispose();
     assert.equal(pickPad([null, { connected: false, mapping: 'standard' }, { connected: true, mapping: '' }]).mapping, '', 'the first connected pad, a blank mapping allowed');
     assert.equal(pickPad([{ connected: true, mapping: 'xr-standard' }]), null);
-    // HOTFIX (2026-09-25): a blank-mapping HID device enumerated BEFORE the
+    // HOTFIX: a blank-mapping HID device enumerated BEFORE the
     // real pad (a headset with inline media buttons, reported at index 0)
     // must not shadow a later standard-mapping controller.
     assert.equal(pickPad([{ connected: true, mapping: '', id: 'EPOS ADAPT 160' }, { connected: true, mapping: 'standard', id: 'Xbox 360 Controller' }]).id, 'Xbox 360 Controller', 'standard wins even when it comes second');
@@ -332,7 +332,7 @@ test('GP1 the hosts and the tiers: all four hosts attach the pad on the touch la
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/interior.js']) {
     const s = rd(h);
     assert.match(s, /const touch = attachTouch\(canvas, inputHooks\);\s*\n\s*const gamepad = attachGamepad\(canvas, inputHooks\);/, `${h}: the pad on the finger's hooks`);
-    assert.match(s, /gamepad\?\.tick\(dt\);[^\n]*\n(\s*\/\/[^\n]*\n)*(\s*const frameLook = \(\) => \{   \/\/ PERF-V8[^\n]*\n)?\s*if \(!/, `${h}: ticked before the paused gate`);   // PIN MOVED (MWNPC19): the world host's look step a PERF-V8 closure (`frameLook`)
+    assert.match(s, /gamepad\?\.tick\(dt\);[^\n]*\n(\s*\/\/[^\n]*\n)*(\s*const frameLook = \(\) => \{   \/\/ PERF-V8[^\n]*\n)?\s*if \(!/, `${h}: ticked before the paused gate`);
   }
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) assert.match(rd(h), /mv\.analog = touch\?\.axes\(\) \?\? gamepad\?\.axes\(\) \?\? null;/, h);
   for (const k of ['Controls/EnableController', 'Controls/JoystickLookSensitivity', 'Controls/JoystickCursorSensitivity', 'Controls/JoystickMovementThreshold', 'Controls/JoystickDeadzone']) {

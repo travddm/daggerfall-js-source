@@ -1,5 +1,4 @@
-// AUDIT REST (2026-10-03, bible/06-Systems/Rest-Arc.md "As built"; Mac: "Go" - the arc's own audit, every lens: the act,
-// the Campfire, the dungeon fires, the party's night, the consumables, online skew, the words). Each finding fixed is
+// AUDIT REST. Each finding fixed is
 // pinned here by execution where it can be: a Campfire left in a dungeon comes out with its owner (F1); the Draught
 // only makes a ROUGH night a bed's and an hour's rest spends it (F3); a lit Candle is the pack's (F4); a loiter is no
 // night (F5, by source); an older build's rest open carries no member into a night (F7); a worn-through tent is no

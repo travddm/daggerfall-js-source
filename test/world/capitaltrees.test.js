@@ -1,5 +1,4 @@
-// CAPITAL-TREES (2026-10-27; KPbICA on the game's Discord, forwarded by the owner: "The main trees in Falinesti and
-// Mournhold should get some love. They are too draftish for now"; bible/03-World/Arena-Provinces.md CAPITAL-TREES) - THE
+// CAPITAL-TREES - THE
 // CAPITALS' MAIN TREES FINISHED, pinned: Falinesti's Great Graht-Oak on the capitals' trees' kit (world/capitalTrees.js -
 // its fluted trunk and leader, its buttresses under the walkway, the boughs carrying its platforms, its limbs carrying their
 // decks, its crown in storeys, its sprays and lianas) with the city in its boughs kept walkable; Mournhold's own trees in

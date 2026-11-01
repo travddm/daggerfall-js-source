@@ -1,6 +1,4 @@
-// EL7 - ENHANCED LIGHTING, THE POLISH (2026-09-17, Mac: "Lets do #7 + I
-// notice a bug with light sources, that have this bright translucent ball
-// that isnt connected to the source").
+// EL7 - ENHANCED LIGHTING, THE POLISH.
 //   - THE GLARE NEEDS A FLAME: presence in the frame's depth within a unit of
 //     the light, five taps over the footprint; none for a light in the hand.
 //   - THREE CASCADES by view distance (the room, the street, the town).
@@ -61,7 +59,7 @@ test('EL7: the constants and the shader laws - the glare\'s presence test and it
   // the water surface with the receiver block: the shadow rides the cloud's
   const ws = waterSurfaceFs('float cloudShadowAt(vec3 p) { return 1.0; }', SHADOW_GLSL);
   assert.ok(ws.includes(SHADOW_GLSL) && ws.indexOf('uniform vec3 uCamPos;') < ws.indexOf(SHADOW_GLSL), 'the block after uCamPos, which it reads');
-  // PERF-SUN2 (2026-09-19) put a UNIFORM gate in front of both - the
+  // PERF-SUN2 put a UNIFORM gate in front of both - the
   // water reads its shadow only while the sun is up, and `shadow` reaches
   // the light exactly once through `uSunColor * (uSunScale * diff)`, so
   // the picture is unchanged. What EL7 pins here is unchanged with it:

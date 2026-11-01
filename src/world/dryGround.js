@@ -1,5 +1,5 @@
 // @ts-check
-// LW-DRY (2026-10-05, bible/06-Systems/Living-World.md LW-DRY): IS THE GROUND DRY - the terrain's own samples (the
+// LW-DRY: IS THE GROUND DRY - the terrain's own samples (the
 // sampler's kernel, terrainSampler.js sampleKernel, the samples a pixel is built from) read against the tile job's own
 // water compare (terrainTiles.js sampleHeight and isWaterHeight: a sample at or under the ocean's elevation is WATER, and
 // a tile with a water corner shows the water). Pure in the height map, which every client holds alike, so every client

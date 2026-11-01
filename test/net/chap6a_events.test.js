@@ -1,12 +1,12 @@
 // @ts-nocheck
-// CHAP6a (2026-10-09, Mac: "continue", the Chapters arc's sixth slice - bible/11-Multiplayer/Chapters-Arc.md section 7):
+// CHAP6a:
 // THE SEASON'S EVENT. The law: the seven events and their weights, each modifier section 7's table names, the pure draw,
 // the rivals' table (section 8), a Decline's week, a Rivalry's end, a Crackdown's pay and shut line, the Season's lines
 // in words. The service: the draw at the Turning that opens a Season, a Decline's 2 a week, the Season's end (a Rivalry
 // raced on the Season's Merit, a Crackdown's halls shut, the Chronicle's 'event' and 'season' rows), the opening week's
 // clean slate, the board's and the sheet's events (a hidden rival named to no stranger), a shut hall's writs none and a
 // Crackdown's half again.
-// GUILD3e (2026-10-11, bible/11-Multiplayer/Guilds-Made-Plain.md): FIVE events now - the Decline and the Ascendancy folded
+// GUILD3e: FIVE events now - the Decline and the Ascendancy folded
 // into the Failing and Ascendant bands they repeated; their pins here moved or retired, each said where it stood.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -35,7 +35,6 @@ const turnOf = (w) => seatWeekStartMs(w + 1) / 1000 + CHAPTER_TURNING_GRACE_S + 
 
 // ── THE LAW ─────────────────────────────────────────────────────────
 
-// PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md, CUT A DUPLICATE, NEVER DEPTH) - five events: the Decline
 // and the Ascendancy folded into the Failing and Ascendant bands they repeated (their numbers gone with them)
 test('CHAP6a the events: five (GUILD3e), section 7\'s base weights in the table\'s order; their names; anything else - a retired Decline or Ascendancy among it - no event (mutants: a weight, the order, the check)', () => {
   assert.deepEqual(CHAPTER_EVENTS.map((e) => [e.id, e.weight]), [['calm', 30], ['schism', 15], ['succession', 10], ['crackdown', 10], ['rivalry', 15]]);
@@ -57,7 +56,6 @@ test('CHAP6a the weights: each modifier of section 7\'s table - two Masters a Sc
   assert.deepEqual(w({ band: 'thriving' }), w({}), 'Thriving is no Ascendant');
   assert.deepEqual(w({ band: 'failing' }), w({}), 'PIN MOVED: GUILD3e - a Failing chapter draws as any; the band is its story');
   assert.deepEqual(w({ curfew: true }), [30, 15, 10, 20, 15]);
-  // PIN MOVED (AUDIT CHAP5 D3): the underworld holds one doctrine (more writs) - no Schism, its weight Calm's
   assert.deepEqual(chapterEventWeights({ faction: THIEVES, rivalBand: 'steady' }), [45, 0, 10, 20, 15]);
   assert.deepEqual(chapterEventWeights({ faction: BROTHERHOOD, rivalBand: 'steady', curfew: true }), [45, 0, 10, 30, 15], 'twice, then the Curfew\'s');
   assert.deepEqual(w({ rivalBand: null }), [45, 15, 10, 10, 0], 'CALL 5: no rival, the Rivalry\'s weight Calm\'s');
@@ -71,7 +69,6 @@ test('CHAP6a the draw: a pure function of the Season, the chapter and its weight
   const weights = chapterEventWeights({ faction: FIGHTERS, rivalBand: 'steady' });
   assert.equal(chapterEventOf(3, FIGHTERS, ANTICLERE, weights), chapterEventOf(3, FIGHTERS, ANTICLERE, weights), 'the same roll everywhere');
   // the roll itself, as every client and the service roll it - the salt, the key and the walk (a change is a new law)
-  // PIN MOVED (AUDIT CHAP5 E3): the roll scaled over the weights' sum (drawOf), never its remainder. PIN MOVED: GUILD3e -
   // the same roll over the five events' table (the salt, the key and the walk unmoved)
   assert.deepEqual(Array.from({ length: 24 }, (_, n) => chapterEventOf(n, FIGHTERS, ANTICLERE, weights)), ['crackdown', 'schism', 'rivalry', 'succession', 'calm', 'schism',
     'schism', 'rivalry', 'calm', 'calm', 'crackdown', 'rivalry', 'schism', 'rivalry', 'rivalry', 'schism', 'succession', 'schism', 'calm', 'schism', 'rivalry', 'schism', 'schism', 'crackdown']);
@@ -110,14 +107,13 @@ test('CHAP6a the rivals: section 8\'s table - the Fighters and the Thieves, the 
   assert.deepEqual([chapterRivalPick([]), chapterRivalPick(null)], [null, null]);
 });
 
-// PIN MOVED: GUILD3e - a Decline's week is gone with the event (the Failing band says it); its pins with it
 test('CHAP6a a Rivalry\'s end, a Crackdown\'s pay and shut line (mutants: the swing, its caps, the tie, the pay, the line)', () => {
   assert.deepEqual(rivalryEnd([50, 50], [10, 5]), { a: 60, b: 40, won: 'a' });
   assert.deepEqual(rivalryEnd([50, 50], [5, 10]), { a: 40, b: 60, won: 'b' });
   assert.deepEqual(rivalryEnd([95, 50], [10, 5]), { a: 100, b: 40, won: 'a' }, 'the winner stops at 100, the loser\'s sting whole');
   assert.deepEqual(rivalryEnd([50, 4], [10, 5]), { a: 54, b: 0, won: 'a' }, 'the loser never below 0');
   assert.deepEqual(rivalryEnd([50, 70], [7, 7]), { a: 50, b: 70, won: null });
-  assert.deepEqual([crackdownMerit(100), crackdownMerit(7), crackdownMerit(-3)], [150, 11, 0]);   // PIN MOVED (AUDIT CHAP5 E1): Merit, never pay
+  assert.deepEqual([crackdownMerit(100), crackdownMerit(7), crackdownMerit(-3)], [150, 11, 0]);
   assert.deepEqual([crackdownShuts(29), crackdownShuts(30), crackdownShuts(0)], [true, false, true]);
 });
 
@@ -182,7 +178,6 @@ test('CHAP6a the draw at the Turning that opens a Season: every confirmed chapte
   s.raw.prepare("INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, standing, at) VALUES (901, 'gcurfew', ?, 'palace', 0, 50, 0)").run(DAGGERFALL);
   s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, at) VALUES (901, ?, 'curfew', 'gcurfew', 'x', 'law', 0)").run(WEEK - 1);   // last week's, not this
   assert.deepEqual(await s.settle(WEEK), { settled: true, chapters: ROLL_FACTIONS.length * 2 });
-  // PIN MOVED: AUDIT GUILD3 R1 - a chapter that begins its week Failing falls 2 more (failingWeekAfter)
   const after = (f, g) => { const p = strengths.get(`${f}|${g}`); return failingWeekAfter(p, strengthAfter(p, 0, 60), 0, 60); };
   let rivalries = 0;
   for (const f of ROLL_FACTIONS) for (const g of [ANTICLERE, DAGGERFALL]) {
@@ -219,7 +214,6 @@ test('CHAP6a a draw only where a Season opens and is counted, and only for a cha
   assert.equal(shut.row(FIGHTERS, ANTICLERE)?.event ?? null, null, 'the opening Turning passed shut');
 });
 
-// PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Decline retired into the Failing band: a row the
 // developers' Turnings drew one for reads as none, and its chapter moves by the week's own step alone
 test('CHAP6a a retired Decline (GUILD3e): a chapter whose row still holds one moves by the week\'s own step alone - no 2 more, no `fell` - and its event reads as none from that Turning (mutants: none - the service asks the Decline no more)', async () => {
   const s = await stand();
@@ -312,7 +306,6 @@ test('CHAP6a the opening week: no developers\' event nor shut hall past it (muta
 test('CHAP6a the Chronicle reads a Season\'s lines - never a hidden guild\'s (mutants: none - the reader\'s own SQL)', async () => {
   const s = await stand();
   s.raw.prepare("INSERT INTO npc_chapter_weeks (week, active, target, chapters, open, at) VALUES (?, 0, 60, 0, 'on', 0)").run(WEEK + 7);
-  // PIN MOVED: GUILD3e - a live event's ending (the Ascendancy retired into the Ascendant band; its old rows keep their words)
   s.put(FIGHTERS, ANTICLERE, 95, { event: 'crackdown', season: 1 });
   s.put(THIEVES, ANTICLERE, 95, { event: 'crackdown', season: 1 });
   await s.settle(WEEK + 8);
@@ -385,10 +378,10 @@ test('CHAP6a a shut hall posts no writs this Season - nor its members their own;
   twin.put(MAGES, 50, {});
   await twin.call('/v1/writs/list', { character: twin.R.id, region: ANTICLERE }, twin.who.secret);
   const base = twin.raw.prepare("SELECT slot, pay FROM writs WHERE kind = 'hall' AND faction = 40 ORDER BY slot").all();
-  assert.deepEqual(posted.map((w) => w.pay), base.map((w) => w.pay));   // PIN MOVED (AUDIT CHAP5 E1)
+  assert.deepEqual(posted.map((w) => w.pay), base.map((w) => w.pay));
   // the member writ is drawn over its own character: the law's own draw, with the region's one witnessed pixel
   const day = utcDay(NOON);
   const own = memberWrit(day, ANTICLERE, MAGES, s.R.id, regionWritTable(ANTICLERE, [{ climate: WOODS, confirmed: false }], daySeason(day)));
-  assert.equal(s.raw.prepare("SELECT pay FROM writs WHERE kind = 'member' AND faction = 40").get().pay, own.pay);   // PIN MOVED (AUDIT CHAP5 E1)
+  assert.equal(s.raw.prepare("SELECT pay FROM writs WHERE kind = 'member' AND faction = 40").get().pay, own.pay);
 });
 

@@ -1,5 +1,4 @@
-// LW-ROOMS (2026-10-08, bible/06-Systems/Living-World.md "LW-ROOMS"; Mac: "With living world integration, NPCs still
-// group up in taverns"): THE WHOLE ROOM. A building's room was sounded twelve ways out to 6.6 m from its way in, at the
+// LW-ROOMS: THE WHOLE ROOM. A building's room was sounded twelve ways out to 6.6 m from its way in, at the
 // way in's own height - the door's middle - so a tavern's twelve stood within a few strides of its door as one crowd, and
 // in a house or a shop the sounding passed over a table onto its top; the room filled the deal's tables as they came,
 // stood as many as its fan found places whatever its floor, and one who stirred made for any free place, beside a table
@@ -191,7 +190,7 @@ test('LW-ROOMS the room fills its tables apart: in the building\'s deal, each ne
     const mids = [...tables.values()].map((at) => [at.reduce((a, p) => a + p[0], 0) / at.length, 0, at.reduce((a, p) => a + p[2], 0) / at.length]);
     for (const a of mids) for (const b of mids) if (a !== b) assert.ok(apart(a, b) >= TABLE_GAP_M, `${key}: tables at ${a} and ${b} apart`);
   }
-  // the sight, on the port's own collider: over a table, never through a wall (AUDIT LW-ROOMS: PIN MOVED - the hall's
+  // the sight, on the port's own collider: over a table, never through a wall (AUDIT LW-ROOMS:
   // partition has a narrow doorway mid-way: the eight ways walk its far side from it, a table's reach across the wall)
   const h = tavernHall({ partition: 3, doorway: [1.0, 1.9] });
   assert.equal(inSight(h.collider, [-3, 0, -2.4], [-3, 0, 0.4]), true, 'over a table (the one at -3, -1)');
@@ -231,7 +230,7 @@ test('LW-ROOMS a room holds what its floor does: one to every INDOOR_FLOOR_M2 of
     return layer;
   };
   const R = (i) => [{ id: `L9.${String(i).padStart(2, '0')}`, name: `R${i}`, job: 'labourer', cls: null }, 'tavern'];
-  // a small room: twelve places, so three (AUDIT LW-ROOMS: PIN MOVED - the eight ways walk two its walls drew in)
+  // a small room: twelve places, so three (AUDIT LW-ROOMS:
   const small = rig({ w: 6, d: 5, inside: Array.from({ length: 10 }, (_, i) => R(i)) });
   assert.equal(small.spots().length, 12);
   assert.equal(small.size, Math.ceil((12 * INDOOR_APART_M ** 2) / INDOOR_FLOOR_M2));

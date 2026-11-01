@@ -1,4 +1,4 @@
-// LW5 (2026-10-05, bible/06-Systems/Living-World.md, Mac: NPCs "link with the ship AI at ports"): THE BAY'S SAILORS -
+// LW5: THE BAY'S SAILORS -
 // a port's sailors the crews of the packets calling there (naval/seaLanes.js), each where her clock has her: aboard
 // under way, ashore at home, ashore at the far port as her visitors; the town's dock off its harbour; the visiting
 // crews' days; and the host's seams - on synthetic lanes and the synthetic town (test/lwTown.mjs). No game data.

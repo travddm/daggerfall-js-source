@@ -1,7 +1,5 @@
-// ACC4 — REGISTERED DATE AND TIME PLAYED ON THE PROFILE CARD (2026-09-22).
+// ACC4 — REGISTERED DATE AND TIME PLAYED ON THE PROFILE CARD.
 //
-// Mac: "Lets add an account registered date and time played to the
-// icon profile."
 //
 // ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
 //
@@ -56,7 +54,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

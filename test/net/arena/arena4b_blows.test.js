@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, the audit of ARENA4's PvP blows): THE BLOW'S SEQUENCE AND THE SPELL ON A PLAYER. The relay's
+// ARENA4b: THE BLOW'S SEQUENCE AND THE SPELL ON A PLAYER. The relay's
 // referee counts a swing through several bodies as one blow by its `q` (net/arena/arenaBrain.js refBlow), but the client never
 // sent it, so a cleave through a Grand Melee spent the rate four bodies at a time; and a spell of mine that met my
 // opponent went nowhere (only a swing and a shaft reached `rival`). Now the dungeon's host numbers every swing, shaft

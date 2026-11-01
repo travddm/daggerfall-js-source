@@ -1,5 +1,5 @@
 // @ts-check
-// PRIMARY-FOLD (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, PRIMARY-FOLD): A WEEK SEEN SETTLED STAYS
+// PRIMARY-FOLD: A WEEK SEEN SETTLED STAYS
 // SETTLED. The seats' Turnings (seatTurning.js settleDueOnce) and the chapters' (npcChapters.js settleChaptersDue) are
 // settled by the first reader past a week's boundary, and every reader asked whether one was due - `SELECT MAX(week)`, a
 // round trip to the account database's one primary on every seat list, chapter sheet, Focus and hall writ, to learn the

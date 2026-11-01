@@ -1,11 +1,10 @@
-// WB9h (2026-09-30, Mac: "Further improve the morrowind model performance as it's unplayable with so many players
-// around"): THE MORROWIND BODIES IN A CROWD (net/peer/peerBodies.js). tools/peerCrowdProbe.mjs stood forty players milling
+// WB9h: THE MORROWIND BODIES IN A CROWD (net/peer/peerBodies.js). tools/peerCrowdProbe.mjs stood forty players milling
 // round the eye: 81 bodies built in thirty seconds (up to 24 in five), 68 torn down while their player stood within
 // 25 m, every body skinned and drawn whether the eye saw it or not. Four laws, each pinned here by driving PeerBodies:
 // THE VIEW (a body out of it neither drawn nor skinned, posed as it is seen), THE BUDGET (SKIN_BUDGET skins a frame,
 // the overdue first), THE SWAP (a stranger's body handed over only after SWAP_DWELL_MS, no oftener than SWAP_EVERY_MS,
 // never while another builds), THE SPARES (a body given up kept for the next peer who wears it). Design:
-// bible/07-Rendering/Performance-Rig.md (WB9h).
+// (WB9h).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -209,7 +208,6 @@ test('WB9h the swap: a nearer stranger takes the farthest stranger\'s body only 
   assert.equal(pb._bodies.get('s0')?.goneAt != null, true, 's0 gone from the room: its body lingers');
   const late = peer('late', 2, -2);
   sync([...stay, late]);
-  // PIN MOVED (MW-CROWD, FIELD BUGS 2026-10-01 #8): a lingering body's rig is KEPT as a spare (SPARE_MS, SPARE_MAX) - its
   // peer mounted or left the list a moment and came back to a whole rebuild (test/net/peer/fb1001_mwcrowd.test.js)
   assert.equal(s0rig.unloaded, false, 'a lingering body\'s rig is kept, a spare for its peer\'s return');
   assert.ok(pb._spares.some((x) => x.rig === s0rig));

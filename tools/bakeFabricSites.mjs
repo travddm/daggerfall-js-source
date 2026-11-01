@@ -1,5 +1,4 @@
-// QUEST-FABRIC (2026-10-26, the owner, asked whether quests may land in BLD-3's buildings: "Let quests use them";
-// bible/06-Systems/Quest-Arc.md QUEST-FABRIC) - THE IMPERIAL CITY'S FABRIC AS A SITES INDEX READS IT, BAKED.
+// QUEST-FABRIC - THE IMPERIAL CITY'S FABRIC AS A SITES INDEX READS IT, BAKED.
 //
 //     ARENA2_PATH=... node tools/bakeFabricSites.mjs           write src/world/imperialFabricSites.js
 //     ARENA2_PATH=... node tools/bakeFabricSites.mjs --check   say whether it is the plan's and BLOCKS.BSA's

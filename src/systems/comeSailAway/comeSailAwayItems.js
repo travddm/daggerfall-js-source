@@ -1,4 +1,4 @@
-// CSA-H (2026-09-27) - COME SAIL AWAY'S TWO ITEMS: ItemBoatParts (1320) and ItemBoatDeed (1321), the custom classes
+// CSA-H - COME SAIL AWAY'S TWO ITEMS: ItemBoatParts (1320) and ItemBoatDeed (1321), the custom classes
 // Start registers (ComeSailAway.cs:1079-1080, ItemHelper.RegisterCustomItem(index, UselessItems2, type)).
 //
 // THE ROWS are the bundle's ItemTemplates.json, carried here field for field: the vendored file keeps the author's
@@ -11,7 +11,7 @@
 // row), each saves under its own class name (GetSaveData: the port's save copies the record whole), and each has a
 // UseItem - the runtime's (systems/comeSailAway/comeSailAway.js useBoatParts / useBoatDeed), which the host hands the item-use
 // door. RegisterCustomItem's group put both on DFU's shelves (the shelf's second loop stocked them at the rarity's
-// chance, DaggerfallLoot.cs:255-287) until SHIPYARDS (2026-10-11) took them off every shelf: a port town's shipyard
+// chance, DaggerfallLoot.cs:255-287) until SHIPYARDS took them off every shelf: a port town's shipyard
 // sells every hull now (systems/shipyards.js) - a DECLARED departure.
 //
 // AN ITEM'S UID. DFU gives every item one at construction (DaggerfallUnity.NextUID) and the mod keys two things off
@@ -43,7 +43,7 @@ const csaLoaded = () => {
   if (latched !== undefined) return latched;
   try { return modSetting('come-sail-away', 'Enabled') !== false; } catch { return false; }
 };
-// SHIPYARDS (2026-10-11, Mac: "Shipyard only"): THE TWO ROWS ON NO SHELF. A port town's shipyard sells every hull and
+// SHIPYARDS: THE TWO ROWS ON NO SHELF. A port town's shipyard sells every hull and
 // buys them back (systems/shipyards.js), so RegisterCustomItem's group no longer stocks them on a General Store's or a
 // Pawn Shop's shelf (the shelf's second loop, DaggerfallLoot.cs:255-287), and no shop buys them (systems/shopStock.js
 // shopBuysItem) - a DECLARED departure from the mod (Ledger A, SHIPYARDS), as MERCHANT-YARDS took DFU's horse and cart
@@ -71,7 +71,7 @@ export const boatItemName = (name, hull, variant) => `${name} ${at(HULL_NAMES, h
 export const boatItemMessage = (hull, variant) => hull * 10 + variant;
 
 /**
- * SHIP-CLAIM (2026-10-01, the port's own - bible/03-World/Naval-Combat.md SHIP-CLAIM): A DEED TO ONE HULL AND VARIANT,
+ * SHIP-CLAIM: A DEED TO ONE HULL AND VARIANT,
  * minted as the shelf mints a deed - ItemBuilder.CreateItem (`mintBoatItem`, the host's UID) given the deed arm's
  * message and name (AssignVariantsToShopItems: `hull * 10 + variant`, "Deed to Small Ship 'I'") - at `value` gold: a
  * prize claimed at sea (scenes/naval/navalHost.js claimPrize; her value navalPlunder.js prizeDeedValue). Its weight is the
@@ -86,7 +86,7 @@ export function mintDeed(hull, variant, uid, value) {
 }
 
 /**
- * SHIPYARDS (2026-10-11, the port's own - bible/03-World/Shipyards.md): A BOAT'S PARTS OF ONE HULL AND VARIANT, minted as
+ * SHIPYARDS: A BOAT'S PARTS OF ONE HULL AND VARIANT, minted as
  * the shelf's parts were (AssignVariantsToShopItems' parts arm: `hull * 10 + variant`, the hull's price and weight,
  * "Parts of Rowboat 'I'") - the shipyard's Rowboat (systems/shipyards.js). A hull or variant the C#'s arrays would
  * throw on throws here too.
@@ -133,7 +133,7 @@ export function mintShelfBoatUids(items, uid) {
  * (systems/inventorySession.js remoteTarget) - `items()`, the live list the pack takes from and stows into (the helm's
  * cargo weight reads the same list); `containerImage()`, the remote panel's picture, the cargo's Merchant (6);
  * `playerOwned`, which the mod sets. Its TextureArchive is nought, so the pack's drop-icon arms stand down, as DFU's do.
- * CARGO-ANYWHERE (2026-10-17, bible/03-World/Naval-Refit.md): `storage` - the player's own (SHIP-STORE's word,
+ * CARGO-ANYWHERE: `storage` - the player's own (SHIP-STORE's word,
  * ui/enhanced/enhancedInventory.js remoteModel): the Enhanced skins opened a hold TAKE-ONLY, the pile's frame alone, so
  * nothing could be stowed in it there; the classic skin was always two-way, as the mod's own window is.
  */

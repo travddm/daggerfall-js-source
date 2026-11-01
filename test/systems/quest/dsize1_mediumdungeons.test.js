@@ -9,11 +9,11 @@
 // three (world/smallerDungeons.js); online the stamp is the room's size (E4); a quest whose markers were chosen
 // through another quest's link takes that link's size where the medium size is either side (E5); a quest frozen at
 // another size crossing online is re-laid on the room's build (E1, quest/questRepair.js). SD-ONLINE (PINS MOVED -
-// bible/11-Multiplayer/Super-Dungeons.md section 13; test/systems/sdonline.test.js holds the law itself): online every
+// test/systems/sdonline.test.js holds the law itself): online every
 // dungeon has the world's own size now - small, medium or large by its map id - where it was the whole dungeon. And
 // DETECT-FINDS: a
-// searched object's find is in the one loot walk (scenes/shared.js). bible/03-World/Delve-Arc.md, DSIZE1 and
-// DETECT-FINDS; bible/01-Overview/audits/Audit-Delve.md.
+// searched object's find is in the one loot walk (scenes/shared.js)., DSIZE1 and
+// DETECT-FINDS;.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -190,7 +190,7 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   m.startQuestImmediate(q);
   q.smallerDungeonsState = ONLINE_DUNGEONS_STATE;   // chosen on the world's sizes, before INSTANCES
   // the dungeon whole (the quest's world answers it - online, world.js questWorld asks dungeonLocationFor for it whole,
-  // INSTANCES - PIN MOVED: it was the room's world-sized build):
+  // INSTANCES
   // two blocks, a spawn marker in each, at block (0,0) and (1,0)
   const flat = (record, x) => ({ type: RDB_RESOURCE_TYPES.Flat, position: x, xPos: x, yPos: 0, zPos: 0, resources: { flatResource: { textureArchive: 199, textureRecord: record } } });
   const blockData = { W1: { position: 100, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 1), flat(18, 2)] }] } }, B1: { position: 200, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 3)] }] } } };

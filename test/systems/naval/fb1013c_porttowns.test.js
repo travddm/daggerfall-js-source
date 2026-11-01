@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-13c (PORT-TOWNS) - the owner: "Even the port quests sending you to non port places".
+// FIELD BUGS 2026-10-13c (PORT-TOWNS).
 //
 // The harbourmaster's board (CAPT-BOARD) read Travel Options' port table as "every port of the map" (world.js
 // navalPortList). That table is every place a ship may put in at: MAPS.BSA's 343 locations flagged PortTownAndUnknown
@@ -39,13 +39,12 @@ function hostPorts({ dict, maps, here = { x: 0, y: 0 }, openSea = () => true }) 
   const list = /\n {2}(let _navalPortList = null;\n {2}const navalPortList = \(\) => \{\n[\s\S]*?\n {2}\};)\n/.exec(W);
   const near = /\n {2}(let _navalPortHereAt = null;\n {2}const navalPortHere = \(\) => \{\n[\s\S]*?\n {2}\};)\n/.exec(W);
   assert.ok(list && near, 'the host\'s port list or its port-here moved');
-  // PIN MOVED (FIELD BUGS 2026-10-14 INLAND-PORTS): the list asks the open sea too (seaBears over the host's openSea) -
   // all sea here unless a test hands its own; test/systems/naval/fb1014_inlandports.test.js asks it of a capital in the hills
   // eslint-disable-next-line no-new-func
   return new Function('mapDict', 'maps', 'PORT_LOCATION_IDS', 'isPortTownType', 'getPixelFromPixelID', 'navalCrownOf', 'navalCapitals',
     'playerTravelPixel', 'etherSea', 'inEther', 'etherPortNear', 'etherPortOf', 'seaBears', 'openSea', 'boardPortAt', 'onTheBay', 'arenaPortNear', 'arenaPortOf', 'worldPorts',
     `${list[1]}\n${near[1]}\nreturn { navalPortList, navalPortHere };`)(dict, maps, PORT_LOCATION_IDS, isPortTownType, getPixelFromPixelID, crownOf, () => [],
-    () => here, false, () => false, () => null, () => null, seaBears, openSea, boardPortAt, () => true, () => null, () => null, NO_WORLD_PORTS);   // PIN MOVED (WORLD-WIDE folded in): WW3's world ports after the Bay's (none here), TESA6's Arena ports past it;   // PIN MOVED (FB1020c BERTH-RING): the port-here's ring is SEA_RING; PIN MOVED (TESA6, at the merge of main into TESA): past the Bay an Arena port answers first - the Bay's pixels here; PIN MOVED (FIELD BUGS 2026-10-21b VOYAGE-HOLD): the port law's boardPortAt holds it
+    () => here, false, () => false, () => null, () => null, seaBears, openSea, boardPortAt, () => true, () => null, () => null, NO_WORLD_PORTS);
 }
 
 /** Eight of Travel Options' harbours, each given a kind of place: three towns, five that are no port of anyone's. */
@@ -86,7 +85,6 @@ const TWO_OFF = { key: '110,99', name: 'Daggerfall', px: 110, py: 99, region: 17
 const THREE_OFF = { key: '112,98', name: 'Tulune', px: 112, py: 98, region: 17, crown: 'Daggerfall' };   // FB1020c BERTH-RING: three off it
 const INLAND = { key: '90,80', name: 'Wrothgaria', px: 90, py: 80, region: 16, crown: 'Wayrest' };
 
-// PIN MOVED (FB1020c BERTH-RING): a port the sea bears on within SEA_RING takes a cargo - the berth names a port within it
 // now (scenes/world.js navalPortHere) - so a capital two pixels off the sea does; three off, none
 test('PORT-TOWNS: a cargo goes only to a port the sea bears on - its own pixel or one within SEA_RING of it, never a town three pixels off the sea or in the mountains; a board with no such port far enough posts no cargo (mutants: the sea not asked, the sea anywhere; FB1020c: the ring a pixel)', () => {
   assert.equal(SEA_RING, 2);
@@ -164,7 +162,6 @@ test('PORT-TOWNS: the void is said in the player\'s language - the text core\'s 
 });
 
 test('PORT-TOWNS: the world hands the harbour office its port list and the sea it sets its sites by', () => {
-  // PIN MOVED (FIELD BUGS 2026-10-14 INLAND-PORTS, Mac: "Fix harbour seaAt too"): the sea it sets its sites by is the open
   // sea (world.js openSea - B10's edge its own; run by test/systems/naval/fb1014_inlandports.test.js)
   assert.match(W, /\n {4}ports: \(\) => navalPortList\(\),\n {4}seaAt: openSea, {3}\/\//);
 });
@@ -182,7 +179,6 @@ test('PORT-TOWNS (ARENA2): on the real map - 378 harbours on Travel Options\' ta
   assert.equal(woods.load(new Uint8Array(readFileSync(join(ARENA2, 'WOODS.WLD')))), true);
   const dict = buildMapDict(maps);
   const sea = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500 && isWaterPixel(maps.getClimateIndex(x, y), woods.getHeightMapValue(x, y));   // the world's seaAt, the Bay's map
-  // PIN MOVED (FIELD BUGS 2026-10-14 INLAND-PORTS): the board's ports and the shipyard law's towns are the ones the open
   // sea bears on - 155 towns on the table, 106 of them on the open sea (test/systems/naval/fb1014_inlandports.test.js names the 49)
   const mask = openSeaOf(sea, 1000, 500), openSea = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500 && mask[y * 1000 + x] === 1;
   assert.equal(hostPorts({ dict, maps }).navalPortList().length, 155, 'the towns among them, the sea not asked');

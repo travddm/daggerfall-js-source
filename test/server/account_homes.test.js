@@ -1,11 +1,10 @@
-// ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound" and "Deleted
-// characters should remove their houses from online"): A HOME IS ITS ACCOUNT'S. Every character of the owning account
+// ACCOUNT-HOMES: A HOME IS ITS ACCOUNT'S. Every character of the owning account
 // walks in, keeps it, furnishes and paints it, rents its rooms out and collects the rent, stocks its trader and sells it -
 // the gold of each act its own record's; the character that BOUGHT it is still the one its cap counts and its delete
 // takes; a deed the realm gave (KNIGHT-HOUSE) stays its knight's; a guild's hall is never its guildmaster's account's.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs); migration 0163 on a
 // database built to the migration before it; the client's sweep of the homes a save keeps things in that its account
-// holds no more; the hosts by source. bible/06-Systems/Online-Arc.md ACCOUNT-HOMES.
+// holds no more; the hosts by source. ACCOUNT-HOMES.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

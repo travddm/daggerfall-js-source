@@ -1,6 +1,4 @@
-// CAPTAIN-TREE and REFIT-ORES (2026-10-17, the owner: "A firmament styled captain skill tree along with making improvements
-// to the ship upgrade system" - a player's ask beside it: "levels unlock upgrading with ores from steel to Ebony and beyond",
-// "connect current stats to ship behaviour"; bible/03-World/Naval-Refit.md CAPTAIN-TREE, REFIT-ORES).
+// CAPTAIN-TREE and REFIT-ORES.
 //
 // The captain's level off the log and the stars it buys (systems/naval/captainTree.js), kept in the captain's ledger
 // (systems/naval/captainLedger.js); where each star is read - her refits (scenes/fleetHost.js refit: Come Sail Away's way,
@@ -235,7 +233,7 @@ test('REFIT-ORES a piece melted down: a weapon\'s metal, or a piece of plate\'s 
   assert.equal(refitMetalOf(piece('Weapons', 12)), null);
   assert.equal(meltable(piece('Weapons', 1)), true);
   for (const guard of [{ equipSlot: 3 }, { questItem: true }, { artifact: true }, { sigil: { set: 'x' } }, { enchantments: [{ type: 1 }] },
-    // AUDIT (2026-10-17): the refit melts unasked, so a plain piece alone - never locked, bound, a player's make, enchanted
+    // AUDIT: the refit melts unasked, so a plain piece alone - never locked, bound, a player's make, enchanted
     // by the item maker, graded past Common (its tier, its affixes, a Legendary's record, DFU's magic mark) or socketed
     { locked: true }, { bound: true }, { provenance: 'p:1' }, { customEnchantments: [{ type: 'x' }] }, { rarity: 'magic' },
     { rarity: 'legendary', legendary: 'l1', affixes: [{ id: 'a' }] }, { affixes: [{ id: 'a' }] }, { legendary: 'l1' }, { magic: true },

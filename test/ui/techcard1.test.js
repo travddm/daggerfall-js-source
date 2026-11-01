@@ -1,5 +1,4 @@
-// TECH-CARD (2026-10-10, the owner, of the card's two technique lines: "it needs its own unique glyph as its own
-// element. Like how set pieces and sigils get their own sections") - bible/05-Combat/Weapon-Techniques.md "The card's
+// TECH-CARD  "The card's
 // block". The parts (combat/technique/techniqueRoster.js techniqueParts), the view (systems/loot/lootRarity.js techniqueCardView), the
 // tier list that leaves the line to the block, the block in its two dresses (ui/techniqueCard.js) on the fake document
 // (test/invdrag.mjs), the glyph (ui/techniqueGlyph.js), and the pack's card, its Info box and the HUD's chip EXECUTED.

@@ -1,6 +1,5 @@
 // @ts-check
-// RVN1 (bible/12-Enhanced-AI/Feud-Arc.md section 12; Mac, 2026-10-04: "more complex, less easy to accomplish and more
-// detailed", then "Go"): THE LEDGER OF WOUNDS - how the player fought a foe that may become (or already is) a revenant,
+// RVN1 (;, then "Go"): THE LEDGER OF WOUNDS - how the player fought a foe that may become (or already is) a revenant,
 // kept for the length of the fight and folded into its record's SCARS at the deed (systems/revenant/revenant.js revenantDeed).
 //
 // A LEAF: it imports nothing, because the brain (ai/tactics.js - its staggers and the blows dodged at me), the magic
@@ -36,7 +35,7 @@ export function setFeudClock(fn) { _clock = typeof fn === 'function' ? fn : null
 /** RVN3: systems/revenant/revenant.js's word on whether a blow is of a body's weakness - `info` `{ cls, metal }` as the ledger's
  *  writers know it, or `{ kind, weapon, element, attacker }` as a door does - and what follows a blow of it (`onWeak`). */
 export function setFeudWeakTest(fn, onWeak = null) { _weak = typeof fn === 'function' ? fn : null; _onWeak = typeof onWeak === 'function' ? onWeak : null; }
-/** RVN13 (bible/12-Enhanced-AI/Feud-Arc.md 25): a PEER's blow of its weakness (the relayed hit's `wc`) - revealed to me as
+/** RVN13 (25): a PEER's blow of its weakness (the relayed hit's `wc`) - revealed to me as
  *  my own would be (the reveal's own once-a-stand and first-found law). */
 export function feudRevealWeak(entity) {
   if (!entity?.revenant || !_onWeak) return;
@@ -73,7 +72,7 @@ export function noteFeudHarm(entity, cls, n, { silver = false, metal = null } = 
   const l = feudOf(entity);
   if (!l) return;
   l.dmg[FEUD_CLASSES.includes(cls) ? cls : 'other'] += n;
-  l.last = FEUD_CLASSES.includes(cls) ? cls : 'other';   // UNQUIET (bible/06-Systems/Revenants.md section 46): the blow that broke it
+  l.last = FEUD_CLASSES.includes(cls) ? cls : 'other';   // UNQUIET: the blow that broke it
   if (silver) l.silver += n;
   if (feudWeakBlow(entity, { cls, metal })) {
     l.weak++;

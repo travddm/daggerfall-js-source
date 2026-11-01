@@ -1,6 +1,6 @@
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE TIDES ON THE SEAT TAB - this week's
+// SEASON1 part two: THE TIDES ON THE SEAT TAB - this week's
 // Tide in the seat's land and what it does, the coming week's, after the Season's line; none where no Season is counted;
-// the Edict form pricing a Festival at the coming week's Tide (bible/11-Multiplayer/Seats-Arc.md 9.3, 7.9).
+// the Edict form pricing a Festival at the coming week's Tide (9.3, 7.9).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ test('SEASON1 THE SEAT TAB\'S TIDE: the Marches\' Tide this week and what it doe
   await tick();
   const lines = byClass(host, 'notice-seat-week').map((n) => n.textContent);
   assert.equal(lines[0], 'Week 3 of 8 of the Season of Morning Star.');
-  assert.equal(lines[1], 'The Tide in the Marches this week: Daedric Incursion - gate kills give double influence and double silver. Next week: Plague.');   // AUDIT SEATS-2 L7: and the Drakes 9.3 doubles (PIN MOVED); SILVER: silver
+  assert.equal(lines[1], 'The Tide in the Marches this week: Daedric Incursion - gate kills give double influence and double silver. Next week: Plague.');   // AUDIT SEATS-2 L7: and the Drakes 9.3 doubles (
   assert.match(lines[2], /^The Muster/);
   host = mount({ season: null, tides: null });
   await tick();

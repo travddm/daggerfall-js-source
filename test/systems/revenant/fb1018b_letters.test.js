@@ -1,4 +1,4 @@
-// LETTERS-HOME (FIELD BUGS 2026-10-18b - bible/01-Overview/bugs/Field-Bugs-2026-10-18b.md; shaman, "Letter of Credit
+// LETTERS-HOME (FIELD BUGS 2026-10-18b; shaman, "Letter of Credit
 // vanishing from wallet": "I LOST NEARLY 2 million worth of GOLD in letter of credits, they simply VANISHED from my
 // wallet"). A revenant that kills me takes one piece - never gold (RVN8, Feud-Arc.md section 19) - but "gold" was the coin
 // alone, so a letter of credit (its worth is gold) was takeable, and the pack's most valuable piece by far. Pinned: no

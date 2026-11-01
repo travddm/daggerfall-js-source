@@ -1,5 +1,4 @@
-// EVENT-TIP (2026-09-28, Mac: "I also want to add a tooltip to the map for these type of events. I think we should
-// fold in the raid PR in the repo, since it has a new type of world event also"): the world's events on the held map -
+// EVENT-TIP: the world's events on the held map -
 // the Oblivion Gate's ring and the towns under a raid - each answering a hover with its card (ui/eventMapMarks.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

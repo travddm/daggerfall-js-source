@@ -1,4 +1,4 @@
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md) - THE LANDS PAST THE BAY: the ground's dress (world/tamriel/groundDress.js),
+// TESA-LANDS - THE LANDS PAST THE BAY: the ground's dress (world/tamriel/groundDress.js),
 // the zones' table (world/tamriel/tamrielLands.js) and the ground sets' door to a dressed set (scenes/groundSets.js,
 // scenes/pixelBuild.js). Synthetic sets: no ARENA2 is read here.
 import { test } from 'node:test';

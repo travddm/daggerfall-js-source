@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - THE GIZMO: THE HANDLES A BUILDER DRAGS, AS GEOMETRY.
+// POI-3 - THE GIZMO: THE HANDLES A BUILDER DRAGS, AS GEOMETRY.
 //
-// The editor's move, turn and size handles (bible/06-Systems/POI-Editor-Arc.md POI-3), pure: which handle a screen ray
+// The editor's move, turn and size handles (POI-3), pure: which handle a screen ray
 // is over, and what a drag on it means - the editor (poi/poiEdit.js) applies the answer, the gizmo pass
 // (render/poiGizmoPass.js) draws the same handles from `gizmoShape`. Everything is in WORLD metres round the gizmo's
 // origin, at a size that keeps it the same on screen (`gizmoSize`), its axes the world's or the thing's own (`axes`).

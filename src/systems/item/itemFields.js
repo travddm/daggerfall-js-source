@@ -1,4 +1,4 @@
-// RF5 (2026-09-14, Mac's refactor pass, the fifth): THE ITEM FIELD
+// RF5: THE ITEM FIELD
 // SCHEMA - one declaration of every field an item record may carry,
 // with its kind and its bounds.
 //
@@ -114,22 +114,22 @@ export const ITEM_FIELDS = Object.freeze({
   gilded: str(),   // GILDED1: a Gilded piece's record (systems/gilded.js)
   affixes: list(validAffix),
   qlNamed: bool(),   // AUDIT QUESTLINES REWARD-5: a questline's named piece - its name stands without a metal before it (itemInfo.js withholdsMaterialPrefix)
-  exalted: bool(),   // LOOT2 (bible/06-Systems/Loot-Arc.md section 4): a Legendary minted Exalted - one line more, true or absent
-  untaken: bool(),   // LOOT8 (bible/06-Systems/Loot-Arc.md section 10): a piece a source door rolled that no player has taken - true or absent; its first take clears it and counts for the drought
-  reforged: int({ min: 0, max: 15 }),   // LOOT9 (bible/06-Systems/Loot-Arc.md section 11): the one line the Reforge had rolled again (its index) - REFORGE-REPLACE: an old piece's, read as one reforge taken (lootRarity.js reforgeCount), never a lock; a reforge folds it into `reforges`
+  exalted: bool(),   // LOOT2: a Legendary minted Exalted - one line more, true or absent
+  untaken: bool(),   // LOOT8: a piece a source door rolled that no player has taken - true or absent; its first take clears it and counts for the drought
+  reforged: int({ min: 0, max: 15 }),   // LOOT9: the one line the Reforge had rolled again (its index) - REFORGE-REPLACE: an old piece's, read as one reforge taken (lootRarity.js reforgeCount), never a lock; a reforge folds it into `reforges`
   reforges: int({ min: 1, max: REFORGES_MAX }),   // REFORGE-REPLACE (Loot-Arc.md section 11): the reforges a piece has taken - what the next costs (reforge.js reforgePrice, temperLaw.js reforgeEssence), or absent
-  imprint: str(),   // LOOT10 (bible/06-Systems/Loot-Arc.md section 12): a Rare's imprinted power - a Legendary record's id of its own group (loot.js validLootItem: lootRarity.js validImprint)
+  imprint: str(),   // LOOT10: a Rare's imprinted power - a Legendary record's id of its own group (loot.js validLootItem: lootRarity.js validImprint)
   imbued: bool(),   // LOOT-GATE: a piece whose tier the Reforge's Imbue raised (reforge.js imbuePiece) - a counter pays for the piece it was, true or absent
   imbueWorth: int({ min: 0 }),   // AUDIT UPDATE L5: the price the Imbue added (reforge.js imbuePiece) - what a counter takes off (lootRarity.js craftedRarityWorth), or absent
-  honed: int({ min: 1, max: 63 }),   // LOOT17 (bible/06-Systems/Loot-II-Arc.md section 9): the hones a piece has taken - what the next costs (reforge.js honePrice), or absent
-  cursed: rec(validEnchantment),   // LOOT16 (bible/06-Systems/Loot-II-Arc.md section 8): a cursed find's drawback - the enchantment the temple lifts, or absent (loot.js validLootItem: lootRarity.js validCurse)
-  socket: oneOf(SOCKET_VALUES),   // LOOT20 (bible/06-Systems/Loot-II-Arc.md section 12): a piece's socket - 'empty' or the gem set in it, or absent (loot.js validLootItem: lootRarity.js validSocket)
-  sockets: list((v) => SOCKET_VALUES.includes(v)),   // GEM1 (bible/06-Systems/Gem-Sockets.md section 6): a piece's sockets in order, each 'empty' or the gem set in it, or absent - LOOT20's `socket` is still read (lootRarity.js socketsOf; validSocket: never both, never past its socketCap)
+  honed: int({ min: 1, max: 63 }),   // LOOT17: the hones a piece has taken - what the next costs (reforge.js honePrice), or absent
+  cursed: rec(validEnchantment),   // LOOT16: a cursed find's drawback - the enchantment the temple lifts, or absent (loot.js validLootItem: lootRarity.js validCurse)
+  socket: oneOf(SOCKET_VALUES),   // LOOT20: a piece's socket - 'empty' or the gem set in it, or absent (loot.js validLootItem: lootRarity.js validSocket)
+  sockets: list((v) => SOCKET_VALUES.includes(v)),   // GEM1: a piece's sockets in order, each 'empty' or the gem set in it, or absent - LOOT20's `socket` is still read (lootRarity.js socketsOf; validSocket: never both, never past its socketCap)
   // SIGIL1: an online win's sigil (systems/sigil/sigil.js) - its power, the fight that won it, what it has drunk
   sigil: rec(validSigil),
   // LOCK1: the player's lock (systems/item/itemLock.js) - true, or absent
   locked: bool(),
-  // LOOT18 (bible/06-Systems/Loot-II-Arc.md section 10): the player's junk mark (systems/item/itemJunk.js) - true, or absent
+  // LOOT18: the player's junk mark (systems/item/itemJunk.js) - true, or absent
   junk: bool(),
   // SS4: a piece bound to its owner by how it was won (systems/item/itemBound.js - the Sigil Broker's wares) - true, or absent
   bound: bool(),
@@ -188,14 +188,14 @@ export const ITEM_FIELDS = Object.freeze({
   // Stone - put above a found piece's mark, a third of which an online counter's sale credits (item/foundMark.js); never
   // what a smith's paid repair did
   selfMended: int({ min: 0 }),
-  // INT4 (bible/06-Systems/Integrity-Arc.md): a valuable piece's id (systems/item/itemIds.js) - 16 hex, minted at a realm
+  // INT4: a valuable piece's id (systems/item/itemIds.js) - 16 hex, minted at a realm
   // checkpoint and the piece's from then on: the wire carries it (never the receiver's, as `acquired` is), and the
   // service's ledger reads it (server-account/src/verdict.js ledgerStep)
   uid: str(),
-  // ACQUIRE1 (bible/10-UI/Loot-Banner.md): the piece has stood in the player's own keeping (systems/acquireWatch.js) - true,
+  // ACQUIRE1: the piece has stood in the player's own keeping (systems/acquireWatch.js) - true,
   // or absent. The RECEIVER's mark, as equipSlot and questItem are: loot.js validLootItem strips it off the wire
   acquired: bool(),
-  // WAGONS1/WAGONS2 (bible/06-Systems/Wagons.md): which wagon a Small Cart item is (systems/wagon/wagonKinds.js - absent, the
+  // WAGONS1/WAGONS2: which wagon a Small Cart item is (systems/wagon/wagonKinds.js - absent, the
   // cart) and its paint (systems/wagon/wagonLooks.js: `{ o, w, f, c }`, each one of six - absent, as built)
   wagonKind: oneOf(['cart', 'openWagon', 'caravan']),
   wagonLook: rec((l) => Object.keys(l).every((k) => ['o', 'w', 'f', 'c'].includes(k) && Number.isInteger(l[k]) && l[k] >= 0 && l[k] < 6)),
@@ -208,12 +208,12 @@ export const ITEM_FIELDS = Object.freeze({
   horsePattern: int({ min: 1, max: 4 }),
   horseLegs: int({ min: 1, max: 2 }),
   horseSeed: int({ min: 1, max: 65535 }),
-  // STEED1 (bible/06-Systems/Horse-Care.md): a horse's bond with its owner, in tenths (systems/steedCare.js - absent,
+  // STEED1: a horse's bond with its owner, in tenths (systems/steedCare.js - absent,
   // none) - the OWNER's mark, never carried to the next (net/realm/realmTradeLaw.js RECEIVER_MARKS); and the minute of its
   // owner's clock its food runs out (absent, never seen fed - it comes fed)
   horseBond: int({ min: 1, max: 1000 }),
   horseFed: int({ min: 1 }),
-  // APPEARANCES (bible/04-Characters/Wardrobe.md): the look a worn piece is drawn in (net/appearanceLaw.js) - `{ t, m, v }`, a
+  // APPEARANCES: the look a worn piece is drawn in (net/appearanceLaw.js) - `{ t, m, v }`, a
   // look there is, or absent. The WEARER's mark (net/realm/realmTradeLaw.js RECEIVER_MARKS): stripped off the wire
   appearance: rec(validAppearanceField),
 });

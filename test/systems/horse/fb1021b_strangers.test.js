@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-21c, the record's Left ("the road's stranger teams and the standing horses, still stepped every
-// frame"; bible/07-Rendering/Performance-Priority.md HORSE-VIEW II): THE ROAD'S AND THE STANDING HORSES ARE POSED AS
+// frame"; HORSE-VIEW II): THE ROAD'S AND THE STANDING HORSES ARE POSED AS
 // THE POOL'S ARE. HORSE-VIEW posed the Horse Cart pool's 3D horses where they are seen; the road's strangers' teams
 // (world/road/roadTeams.js) still posed every horse every frame, out of the view and at any range, and the standing
 // horses (world/standingHorses.js) every one in the view at any range - and one out of it stood still on its clock. Now

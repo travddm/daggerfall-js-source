@@ -1,4 +1,4 @@
-// DEX4b (2026-10-20, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION'S COMBAT HOOKS.
+// DEX4b - DAGGERFALL ENEMY EXPANSION'S COMBAT HOOKS.
 // The FormulaHelper overrides its Start registers and its OnLootSpawned handler's forced gender
 // (systems/enemyExpansion/dexCombat.js): OnMonsterHit as a chain over DFU's nine arms (systems/diseases.js) and four of
 // its own that ready its spells; the Skeletal Warrior's rule for a row it says is skeletal (combat/formulas.js

@@ -1,7 +1,5 @@
 // @ts-check
-// CREW-COMPANIONS (2026-09-30, Mac: "introduce the ability to take them along as companions in the world that travel
-// with you and can fight by your side" - "Up to 2", "Knocked out", and through every door: "maybe this is a time for a
-// refactor?") - THE PARTY ASHORE, pure. Which of the player's named hands (shipCrew.js) walk with the player, which
+// CREW-COMPANIONS - THE PARTY ASHORE, pure. Which of the player's named hands (shipCrew.js) walk with the player, which
 // rest aboard after a knock, and what each carries between places (his health). The host (scenes/naval/navalHost.js) keeps
 // one and saves it beside the crews; the world's companion layer (scenes/crewAshore.js) stands the party in whatever
 // place the player is - the street, a building, a dungeon - and hands every change back here. DECLARED - Daggerfall
@@ -15,19 +13,19 @@
 //  - A HAND THAT FALLS (the roster shorter, the boat gone) leaves the party and the rest with him (`prune`).
 //  - His health rides with him through every door (`hurt`): null is whole, and a new place stands him as he left
 //    the last.
-//  - COMPANION-KIT (2026-10-01, Mac: "act as storage"): HIS PACK - the things the player hands him (`pack`, the live
+//  - COMPANION-KIT: HIS PACK - the things the player hands him (`pack`, the live
 //    list the storage window takes from and stows into), saved with the party through the host's item codec; sent back
 //    aboard, knocked out or fallen, he gives it up (`takePack`) and the host stows it in her hold.
 //  - COMPANION-DROP (FIELD BUGS 2026-10-19f) kept him at my side in the open zone, since a death there dropped his pack
-//    with mine; STORE-KEEPS (2026-10-26, the owner: "anything stored" is never lost on death) made his pack storage no death
+//    with mine; STORE-KEEPS made his pack storage no death
 //    takes, and he is sent back aboard - his pack to her hold - in the zone as anywhere.
 
 import { entityMaxEncumbrance, maxEncumbrance } from '../../combat/formulas.js';   // COMPANION-WEIGHT: DFU's MaxEncumbrance
 import { companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';   // COMPANION-SLOTS: the crew and the sworn revenants share the player's side
 
-/** How many hands walk ashore with the player at once (Mac: "Up to 2"). */
+/** How many hands walk ashore with the player at once. */
 export const COMPANION_MAX = 2;
-/** COMPANION-WEIGHT (2026-10-01, the field: "make the crew companions have a balanced inventory weight"): HIS PACK
+/** COMPANION-WEIGHT: HIS PACK
  *  CARRIES WHAT A PERSON OF HIS STRENGTH CAN - Daggerfall's own MaxEncumbrance over his body's live strength (1.5 kg a
  *  point, and any weight allowance he wears or is cast; combat/formulas.js entityMaxEncumbrance): by his class's
  *  CLASS*.CFG strength 67-97 kg (a Bard's 45 67, a Monk's 50 75, a Warrior's 60 90, a Barbarian's 65 97), a Fortify

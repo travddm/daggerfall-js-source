@@ -178,7 +178,7 @@ test('audit24 wave30: OnMonsterHit rides EVERY monster melee door and no other',
   for (const s of monsterMelee) {
     assert.ok(s.call.includes('onMonsterHit: (att, tgt, hit) => onMonsterHit(att, tgt, hit, {'),
       `${s.file}:${s.line} must pass the special-attack rider`);
-    assert.ok(s.call.includes('readySpell: (index) =>'), `${s.file}:${s.line} carries the spider/scorpion free-cast`);   // PIN MOVED (DEX4b): SetReadySpell for any standard spell - a mod's riders ready theirs through it
+    assert.ok(s.call.includes('readySpell: (index) =>'), `${s.file}:${s.line} carries the spider/scorpion free-cast`);
     // InflictDisease stamps the entry's lastDay, and the classic day is
     // elapsed minutes / 1440 (PlayerEntity.cs:263) - both hosts, one unit.
     assert.ok(/currentDay: Math\.floor\([^\n]*\/ MINUTES_PER_DAY\)/.test(s.call),
@@ -196,7 +196,7 @@ test('audit24 wave30: the host ticker exposes the ONE set of player sinks, exhau
   // The rider's nymph/lamia arm is FatigueDamage - "every 1 pt of health
   // damage = 2 pts of fatigue damage" - and a pool that minted its own drain
   // would write the field and miss DaggerfallEntity's OnExhausted.
-  // AUDIT C&C N5 (PIN MOVED): a body with its stats, as every producer mints one - the drain lands inside the pool
+  // AUDIT C&C N5 (
   // (SetFatigue's clamp), and a stat-less fixture's pool is nought; 500 points was past any pool there is (200 x 64)
   const entity = { health: 20, maxHealth: 20, fatigue: 200 * 64, stats: { strength: 100, endurance: 100 }, level: 2, skills: {}, isPlayer: true, activeEffects: [] };
   let collapsed = 0;

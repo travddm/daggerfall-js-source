@@ -46,7 +46,7 @@ test('startingGear: a male Warrior begins dressed, armed and funded', () => {
   assert.ok(weapon, 'Warrior: Broadsword');
   assert.equal(weapon.material, 0, 'iron');
   assert.equal(goldAmount(e), STARTING_GOLD);
-  // MODS-ON (2026-09-14, Mac: "all mods should be on by default"):
+  // MODS-ON:
   // PlayerTorchFromItems is the port's default now, so the kit carries
   // DFU's five torches and two candles - which is the point, since a
   // player who cannot find a torch cannot light one. The setting is

@@ -1,5 +1,4 @@
-// AUDIT REST II, the quest clocks (2026-10-03; bible/06-Systems/Rest-Arc.md section 8, Online-Time-Arc.md 6.3d,
-// 01-Overview/audits/Audit-Timefree.md). THE RULE, decided: a quest clock the quest's own text presents to the player as a
+// AUDIT REST II, the quest clocks. THE RULE, decided: a quest clock the quest's own text presents to the player as a
 // TIME LIMIT - a window to act, to return, to fetch something before it is lost - is a DEADLINE, kept at its days of
 // played time online; a clock that only makes the player WAIT is a delay (the short wait). Offline, DFU's clock whole.
 //  Q1 R0C11Y03 "The Heartless Daedra": AUDIT TIMEFREE T1's closings table held `_2ndparton_` as a closing after a

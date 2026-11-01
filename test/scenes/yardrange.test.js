@@ -1,6 +1,4 @@
-// YARD-RANGE (2026-10-11, a player: "browser version for me is unplayable nowadays I get like 20-40 fps in cities" -
-// 19 fps, 1,523 draws, 61 ms of script; the owner: "look into limiting and improving performance with player's exterior
-// decor items"). Other players' yards are drawn only as far as the Other players card says (net/yardRange.js, `yardRange`
+// YARD-RANGE. Other players' yards are drawn only as far as the Other players card says (net/yardRange.js, `yardRange`
 // - Off stands none of them at all), one's own always; a yard's flats are cut by that distance as its models are (they
 // had no cut: every standing yard's every flat, the whole streamed grid's); a piece too small to see is skipped
 // (decorRoom.js decorPieceSeen); and the half-second sync no longer writes out every piece of every town to learn nothing

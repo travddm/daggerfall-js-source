@@ -1,9 +1,9 @@
-// PORT-MAP (2026-10-04, Mac: "Also ports don't show on my map") - the held map's harbours. MAP2 drew a port's anchor
+// PORT-MAP - the held map's harbours. MAP2 drew a port's anchor
 // at the mid and near bands only, and only while Travel Options restricts ships to ports; the map opens on the whole
 // bay, in the far band, and Travel Options' ship restriction is off by default - so the ports the quays stand at
-// (bible/03-World/Holdings.md 7) were on no map a player opened. An anchor at EVERY band (beside the mark the band
+// (7) were on no map a player opened. An anchor at EVERY band (beside the mark the band
 // inks, on the place where it inks none), haloed then inked in the full pen, whenever there are ports to show; the
-// Ports filter and its key stay the mod's. bible/10-UI/Held-Map-Arc.md MAP2.
+// Ports filter and its key stay the mod's. MAP2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

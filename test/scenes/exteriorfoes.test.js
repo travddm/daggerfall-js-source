@@ -78,7 +78,7 @@ test('exteriorfoes: the world host - the cadence loop, the travel reset, the fac
     'fast travel suppresses the traveled window, as DFU does');
   // encounter foes are spell targets and the sinks route by pool
   assert.ok(s.includes('[...cityGuards.guards, ...exteriorFoes.foes]'), 'magic.foes() sees both pools');
-  assert.ok(s.includes("g._encounter ? exteriorFoes.damageFoe(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null }) : cityGuards.hurtGuard(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', round: !!o?.round })"),   // PIN MOVED (RVN3: a landing's element)   // PIN MOVED (TELL1: the kind reaches the watch, and whether a tick is a later round)   // AUDIT WORLD6b-iii(a) B2: with the engine's provenance; AUDIT PSCALE1 DOORS-1: and a kill's flag
+  assert.ok(s.includes("g._encounter ? exteriorFoes.damageFoe(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null }) : cityGuards.hurtGuard(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', round: !!o?.round })"),
     'the spell sink routes to the right damage door');
   // the melee chain: the watch, then encounters, then civilians
   const watch = s.indexOf('cityGuards.resolvePlayerHit(weaponRig.playerWeapon');
@@ -93,7 +93,6 @@ test('exteriorfoes: the world host - the cadence loop, the travel reset, the fac
   // ROAD-H tail (review): ...and the shaft carries `aimFoe`, the foe the
   // archer selected (null for the player) - the flight's damage gate
   // (DaggerfallMissile.cs:669) reads it at contact.
-  // PIN MOVED (TELL6d, bible/12-Enhanced-AI/Feud-Arc.md 8.1): an aimed shot's word rides the same shaft
   assert.ok(s.includes("arrows.fire(from, dir, { enemy: true, shooterFoe: f, weapon: f.entity.weapon, aimFoe, ...(extra ?? {}) })"),
     'the shoot frame looses a real hunting arrow');
   assert.ok(s.includes('audio.play3d(SOUND.ArrowShoot, from'), 'the loose rings from the archer');
@@ -129,7 +128,7 @@ test('exteriorfoes X4: the PLAYER-side rolls are UNIFORM - DFRandom bytes never 
   assert.ok(src('cityGuards.js').includes('playerAttackGrunt(playerEntity, false, rand)'), 'the guards pool threads its own');
 });
 
-// ROAD-G TAIL (2026-09-05): the fixed-city route's two Wave G leftovers.
+// ROAD-G TAIL: the fixed-city route's two Wave G leftovers.
 test('exteriorfoes: the FIXED-CITY host carries the catch-up loop too, both hosts skip the roll while swimming, and the watch transforms', () => {
   const e = src('exterior.js');
   const w = src('world.js');
@@ -142,7 +141,7 @@ test('exteriorfoes: the FIXED-CITY host carries the catch-up loop too, both host
   assert.ok(fn.includes('Math.min(now - _lastEncMinutes, 1440)'), 'the catch-up is bounded');
   assert.ok(fn.includes('const span = playerEntity.preventEnemySpawns ? 0 : Math.min(now - _lastEncMinutes, 1440);'), 'the suppression flag gates the whole loop (:482)');
   assert.ok(fn.includes('if (playerEntity.preventEnemySpawns) playerEntity.preventEnemySpawns = false;'), 'and clears at the tail (:524-525)');
-  // REP1 (the reputation overhaul, "Challenged on sight"): PIN MOVED - the two passive-guard rolls (:498-511) are retired
+  // REP1 (the reputation overhaul, "Challenged on sight"):
   // here as in world.js; the fixed-city host's watch stops a known criminal a guard sees (scenes/standingHost.js)
   assert.ok(!fn.includes('passiveGuardSpawns('), 'no passive levy in the loop');
   assert.ok(!fn.includes('CRIMES.Criminal_Conspiracy'), 'and no Conspiracy levied by it');

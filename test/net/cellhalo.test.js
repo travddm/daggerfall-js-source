@@ -1,4 +1,4 @@
-// COST-2 (2026-10-24; bible/11-Multiplayer/Scale-Arc.md COST-2): THE PAGE'S HALO NAMES ITS OWN ROOM, AND TAKES "SAME
+// COST-2: THE PAGE'S HALO NAMES ITS OWN ROOM, AND TAKES "SAME
 // ROOM" AS A WAIT. A halo's socket asks for its neighbouring cell with `?of=<the cell this page stands in>`
 // (wire.js HALO_OF_PARAM), so the Worker can tell when both are one node's object (server/src/cellNodes.js); a halo it
 // closes CLOSE_SAME_ROOM is asked again HALO_WAIT_MS later - never weighed as a drop, never backed off. Through the real

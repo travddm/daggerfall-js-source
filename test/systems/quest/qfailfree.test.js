@@ -1,4 +1,4 @@
-// QFAIL-FREE (2026-10-02, Mac: "Soften failure cost"): online a quest that ends unfinished costs its faction nothing -
+// QFAIL-FREE: online a quest that ends unfinished costs its faction nothing -
 // TIME3 put the countdowns on the character's clock, so journeys and rests spend them, and DFU's propagated -2 bled
 // every standing a player held. Offline DFU's -2 stands; a success's +5 is DFU's on both lanes.
 import '../../modsOff.js';

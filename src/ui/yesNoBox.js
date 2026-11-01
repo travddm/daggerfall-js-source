@@ -1,6 +1,5 @@
 // @ts-check
-// UXB1-M (2026-09-25, the UX backlog: "Private Property uses daggerfall's default Y/N prompt. Make the options
-// clickable at least or convert to new UI."): DaggerfallMessageBox WITH ITS YES AND NO -
+// UXB1-M: DaggerfallMessageBox WITH ITS YES AND NO -
 // CommonMessageBoxButtons.YesNo (DaggerfallMessageBox.cs:630-632) - as a window any host's overlay slot can hold.
 //
 // PlayerActivate asks "This looks like private property..." with DFU's own YesNo box (PlayerActivate.cs:902-925):

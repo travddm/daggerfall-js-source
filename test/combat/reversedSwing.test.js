@@ -1,9 +1,6 @@
-// MS1 - THE BACKHAND (2026-09-12).
+// MS1 - THE BACKHAND.
 //
-// Mac: "classic Daggerfall has a swing animation for left and right
-// while Morrowind only has the animation that swings right to left.
-// Could we insert a mirrored swing so you're able to swing all
-// directions?" - and of a mirror that changed hands: "There must be a
+// and of a mirror that changed hands: "There must be a
 // way to keep it correctly in the correct hand. I'm not okay with the
 // honest cost."
 //

@@ -8,7 +8,7 @@
 // collider (player/lateSolid.js) - a piece that would close on the body draws and is withheld from the collider until
 // the body is clear of it, asked every frame by the room's decor draw. Driven on the REAL motor and collider, the pieces
 // minted by the service's own law (net/decorLaw.js decorPieceOf), the room's own by its build's key.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-19f.md DECOR-CLEAR; bible/06-Systems/Online-Arc.md DECOR1c.
+// DECOR-CLEAR; DECOR1c.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

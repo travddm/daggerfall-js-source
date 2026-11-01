@@ -1,4 +1,4 @@
-// WORLD6b-iii(b) (Mac, 2026-09-14: "Continue" after AUDIT WORLD6b-iii(a)): THE CELL SEAM. D9 recorded it: two players
+// WORLD6b-iii(b) (after AUDIT WORLD6b-iii(a)): THE CELL SEAM. D9 recorded it: two players
 // a pixel apart astride a cell edge were in two rooms and never saw each other - the cell is sixteen pixels, the
 // range three, so the seam was a strip three pixels wide on every edge. The HALO pays it: a player hellos into every
 // neighbouring cell room whose nearest pixel is within the relay's range (one to three of them), poses into each
@@ -35,7 +35,6 @@ test('WORLD6b-iii(b): the wire - the halo is the neighbouring cells whose neares
   assert.deepEqual(cellHaloFor(60, 207), [cell(3, 13)], 'the bottom edge');
   assert.deepEqual(cellHaloFor(48, 192), [cell(2, 11), cell(3, 11), cell(2, 12)], 'a corner: the three neighbours that touch it');
   assert.deepEqual(cellHaloFor(63, 207), [cell(4, 12), cell(3, 13), cell(4, 13)], 'the other corner');
-  // PIN MOVED (TV-BEYOND): the map's edge is no wall - the cells past the Bay are the world's (fb1009_beyond)
   assert.deepEqual(cellHaloFor(0, 0), [cell(-1, -1), cell(0, -1), cell(-1, 0)], 'the map\'s corner: the three cells past it');
   assert.deepEqual(cellHaloFor(0, 200), [cell(-1, 12)], 'the map\'s left edge: the cell past it (mid-cell in y)');
   assert.deepEqual(cellHaloFor(NaN, 200), []); assert.deepEqual(cellHaloFor(48, undefined), []);
@@ -167,8 +166,6 @@ test('WORLD6b-iii(b): the pool - a frame keyed to a cell I hold across the seam 
 });
 
 // ── AUDIT FOES FOE3: THE PRIMARY SOCKET IS NOT THE ONLY WAY OUT ──
-// (2026-09-15, Mac relaying players: "during online play, certain
-// enemies cant be damaged".)
 //
 // `sendHit` asked `!this._ws || this.status !== 'open'` BEFORE the
 // routing loop that picks the owner's socket - so while my own cell's

@@ -1,4 +1,4 @@
-// INCIDENT (2026-09-04, Mac: "bat enemies stuck in the ceiling") - WHERE
+// INCIDENT - WHERE
 // A FOE'S SPRITE AND CAPSULE SIT RELATIVE TO THE POSITION DFU HANDS IT.
 //
 // DFU places an enemy's TRANSFORM (RDBLayout.cs:1537 for a marker,

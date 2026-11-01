@@ -1,11 +1,11 @@
-// GUIDE8 (the delve arc, 2026-10-05; bible/06-Systems/Quest-Guide-Arc.md GUIDE8, DECISIONS 3: "a player who cannot read
+// GUIDE8 (the delve arc, 2026-10-05; GUIDE8, DECISIONS 3: "a player who cannot read
 // a dungeon should be able to ask for it").
 //
 // THE GUIDANCE TIERS, and the Exact tier underground: every quest resource standing in the dungeon on the held map's
 // dungeon sheet (its floor on the strip, listed before it is walked) and the followed quest's nearest on the compass -
 // off by default, its own row (systems/quest/questGuidance.js, scenes/worldModes.js dungeonQuestMarksHere,
 // scenes/dungeonContext.js, ui/automap/automapSheet.js, ui/ink/inkAutomap.js). And ECHO1's mark on the same sheet.
-// bible/03-World/Delve-Arc.md, GUIDE8.
+// GUIDE8.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

@@ -1,5 +1,4 @@
-// REVENANT-VOICE (2026-10-02, Mac: "They should have their own unique personalities that affect their speach. One could
-// be humorous, or witty, etc"): ten personalities, one per revenant drawn from its id and leaning by its kind, and every
+// REVENANT-VOICE: ten personalities, one per revenant drawn from its id and leaning by its kind, and every
 // moment it has a word for said in that voice - a beast's in its temperament.
 
 import '../../modsOff.js';
@@ -16,7 +15,6 @@ globalThis.localStorage = {
 const N = await import('../../../src/systems/revenant/revenant.js');
 const { setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
 
-// PIN MOVED (RVN12a, bible/12-Enhanced-AI/Feud-Arc.md 23): FEUD's last stand and betrayal are key moments too (three each)
 const KEY_MOMENTS = ['taunt_slew', 'taunt_fled', 'yield', 'executed', 'spared', 'laststand', 'betrayed'];
 
 test('REVENANT-VOICE the bank: ten personalities, every moment two lines or more in each (three for the returns, the yield, the execution and the oath), each short enough for the card, nothing unfilled but the player (mutants: a moment emptied)', () => {
@@ -31,7 +29,7 @@ test('REVENANT-VOICE the bank: ten personalities, every moment two lines or more
       assert.equal(new Set(lines).size, lines.length, `${id}.${ev}: no line twice`);
       for (const l of lines) {
         assert.ok(l.length > 0 && l.length <= 96, `${id}.${ev}: "${l}" fits the card`);
-        assert.doesNotMatch(l.replace(/\{(p|how|item|move|ally)\}/g, ''), /[{}]/, `${id}.${ev}: "${l}" has nothing unfilled`);   // PIN MOVED (RVN12a): the widened placeholders, exactly
+        assert.doesNotMatch(l.replace(/\{(p|how|item|move|ally)\}/g, ''), /[{}]/, `${id}.${ev}: "${l}" has nothing unfilled`);
       }
     }
   }

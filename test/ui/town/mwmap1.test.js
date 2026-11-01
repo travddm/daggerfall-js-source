@@ -1,5 +1,4 @@
-// MW-MAP1 (2026-09-22, a player through Mac: "the morrowind map isnt
-// showing"): THE HELD MAP'S HOLDER, IN ONE PLACE, ON EVERY DOOR. MAP3
+// MW-MAP1: THE HELD MAP'S HOLDER, IN ONE PLACE, ON EVERY DOOR. MAP3
 // gave the enhanced held map a holder - the Morrowind arm's four doors -
 // and wrote it inline in world.js's TRAVEL map builder alone. EM3/EM4
 // then gave the same window its M-key doors (the town plan, the dungeon

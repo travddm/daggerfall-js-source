@@ -1,5 +1,4 @@
-// LEGACY7 part five (2026-10-06, bible/06-Systems/Legacy-Arc.md section 10b; Mac, LEGACY-HOME: "if a house is owned
-// should live in the house"): THE LINE LIVES IN ITS ONLINE HOMES. The code's last "until LEGACY7": online the realm's
+// LEGACY7 part five: THE LINE LIVES IN ITS ONLINE HOMES. The code's last "until LEGACY7": online the realm's
 // homes were the account service's and no house of the line's. The realm keeps the line now, and a realm character's
 // online homes (HOME1) are its houses - learned with the save as a deed is offline, a list not read yet learning nothing
 // and dropping nothing; the registry tells the world when a home of mine changed (systems/online/onlineHomes.js onWrote); the
@@ -82,7 +81,7 @@ test('LEGACY7 part five the registry tells when a home of mine changed - a claim
   assert.equal((await loud.claim({ mapId: HALL.mapId, buildingKey: HALL.buildingKey, region: 20, price: 1000 })).ok, true, 'the claim stands');
 });
 
-// ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound"): online a home is its
+// ACCOUNT-HOMES: online a home is its
 // ACCOUNT's - every member of the line owns each - so the line learns them WHOLE: a row another member learned goes once
 // the account no longer holds it (another of its characters sold it), where a member's own rows alone moved before.
 test('ACCOUNT-HOMES online the line learns the account\'s homes whole - a home another member learned leaves once the account holds it no more; offline a member\'s deeds as before, another member\'s kept (mutants: whole unread by the law; the host never asking it)', () => {

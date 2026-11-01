@@ -1,10 +1,9 @@
-// AUDIT INSTALL (2026-09-29, Mac: "Yes please and audit what we have so
-// far"): the install, update and first-run work of PR #429 (REL4, REL5,
+// AUDIT INSTALL: the install, update and first-run work of PR #429 (REL4, REL5,
 // DA8, DA9, DA10), read by five independent lanes - security, the update
 // lifecycle, the release pipeline, ARENA2 detection, and the tests, docs
 // and the player's eye. Every finding a lane verified is fixed at its root
 // and pinned here or beside the slice it belongs to; the record, finding
-// by finding, is bible/01-Overview/audits/Audit-Install.md.
+// by finding, is.
 //
 // Pure halves are driven by execution; the shell's wiring and the release
 // workflow are pinned by source (they run in Electron and on GitHub); the
@@ -33,7 +32,6 @@ const fresh = (over = {}) => L.initialState({ current: '0.1.4684', transport: 'u
 test('L1-1/L1-5/L3-2/L3-5/L3-6: the release workflow - no token left behind, a tag of digits, nothing re-cut in place, "latest" never by default', () => {
   const wf = rd('.github/workflows/release-desktop.yml');
   const checkouts = wf.match(/- uses: actions\/checkout@v4/g) ?? [];
-  // PIN MOVED (REL-FAST): the gate's checkout is verify.yml's now - its three checkouts held to the same law
   assert.equal(checkouts.length, 3);
   assert.equal((wf.match(/persist-credentials: false/g) ?? []).length, checkouts.length, 'EVERY checkout - nothing here pushes, and the publish job holds contents: write');
   const v = rd('.github/workflows/verify.yml');

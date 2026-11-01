@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b RENDERER-GONE (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md, BLACK-SCREEN; app/lib/rendererGone.cjs):
+// FIELD BUGS 2026-10-21b RENDERER-GONE (, BLACK-SCREEN; app/lib/rendererGone.cjs):
 // "Crashing every minute - No message just black". A desktop page that died after its version's trial was met by nothing -
 // gameStore.rollback answered null and the handler returned, the window standing on its background colour. The pure
 // halves are driven by execution; the shell's wiring is pinned by source (it runs in Electron), as AUDIT INSTALL pins it.

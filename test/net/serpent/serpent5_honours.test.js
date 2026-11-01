@@ -1,5 +1,4 @@
-// SERPENT5 (2026-10-15; bible/11-Multiplayer/Sea-Serpent.md section 17; Mac: "A gilded weapon to the serpent + a rare
-// chance of a title/aura drop") - THE OLD COIL'S HONOURS: the title COILBREAKER one dealing ship's serpent kill in twenty
+// SERPENT5 - THE OLD COIL'S HONOURS: the title COILBREAKER one dealing ship's serpent kill in twenty
 // and the aura THE MAELSTROM one in fifty, rolled by the account service on the kill's first write off its own draw (the
 // Hour's law, server-account/src/sds.js), laid on the row (`serpent_honours`, migration 0119) and held for good; said and
 // popped by the claim's carrier (net/serpent/serpentClaims.js); worn as every aura is, and drawn by the aura pass's ninth look

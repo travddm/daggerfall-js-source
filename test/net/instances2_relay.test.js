@@ -1,4 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "You and your party"; bible/11-Multiplayer/Instances.md): THE RELAY'S DOOR, through the
+// INSTANCES: THE RELAY'S DOOR, through the
 // door a player runs through - a real signed token at the real Room's hello (test/fakeRoom.mjs), the hub a real Room over
 // its own fake storage (fakeRooms). An instance room admits its owner, the owner's party (the hub's word, asked by the
 // owner's digest) and nobody else; the hub silent is busy; the party pose carries the member's instance; an instance

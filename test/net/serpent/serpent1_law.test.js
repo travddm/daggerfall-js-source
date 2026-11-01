@@ -1,5 +1,4 @@
-// SERPENT1 (2026-10-04, Mac: "A new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean"; "You make the decisions and online only ... make this something truly special"): SETHRAKUL'S
+// SERPENT1: SETHRAKUL'S
 // LAW, BODY AND BRAIN. The schedule and its words (net/serpent/serpentLaw.js - the dawn watch every other game day, never beside
 // the gate); the body as law (net/serpent/serpentBody.js - the head's legs, the track the body lies along, how it rides the sea,
 // the coil, what a ball may strike); the relay's brain over a seeded rng and a fake clock (net/serpent/serpentBrain.js - the
@@ -137,7 +136,6 @@ test('SERPENT1 words: the boss table, and each line the event, where and when (m
   assert.equal(serpentBossById('nobody').id, 'sethrakul');
   const w = { near: 'Sentinel', boss: 'Sethrakul', at: '14:32', left: '4m 07s' };
   assert.equal(sightingLine(w), 'Bells ring in the harbors: a great serpent is sighted off Sentinel. Sethrakul rises at 14:32 your time.');
-  // PIN MOVED: SERPENT4 - its waters open until it dives: the rising counts to the dive, the storm says a ship may still join
   assert.equal(risingLine(w), 'Sethrakul rises off Sentinel. It dives in 4m 07s. Sail out and join the fight.');
   assert.equal(sealLine(w), 'A storm breaks over Sethrakul\'s waters off Sentinel, but every ship may still join the fight. It dives at 14:32 your time.');
   assert.equal(soundLine(w), 'Sethrakul dives off Sentinel and is gone into the deep.');
@@ -210,7 +208,6 @@ test('SERPENT1 body: the coil - the head looming over her deck, the loop round h
   const b = { legs, modes: [{ at: 0, m: MODE.coil }], coil: c };
   const pts = bodyAt(b, 1000 + COIL_BLEND_MS);
   assert.equal(pts.length, SEG_N + 1);
-  // PIN MOVED (AUDIT SHIPS B6, 2026-10-06): the coil drawn turns with its head (coilAngleAt) - DRIFT_V round COIL_R since
   // it wound on, counter-clockwise, held where it lets go
   assert.ok(Math.abs(pts[5].x - coilPoint(c, 35, coilAngleAt(c, 1000 + COIL_BLEND_MS)).x) < 1e-9, 'wound on, the body IS the coil');
   assert.ok(Math.abs(coilAngleAt(c, 1000 + COIL_BLEND_MS) - (c.th - (DRIFT_V * COIL_BLEND_MS) / 1000 / COIL_R)) < 1e-12, 'turned with its head');
@@ -313,7 +310,6 @@ test('SERPENT1 brain: the join - a ship brings its share at the CURRENT fraction
   assert.ok(Math.abs(f.hp / f.max - frac2) < 1e-12, 'at the fraction it stands at');
   assert.equal(f.players.s2.bucket, 0, 'its bucket empty');
   assert.equal(f.players.s2.lv, 30, 'the first level kept');
-  // PIN MOVED (AUDIT 2 XB9, 2026-10-06): a smaller warship of her own is her ship now too - her share down to hers, at the
   // fraction it stands at, her bucket kept (spendPurse holds it to her depth): never shrunk, a captain sailing one was
   // no ship of the fight at all (AUDIT SHIPS C1's `aboard`), and a true pair read as one. Her rowboat or a friend's
   // deck still takes her share out whole until she is aboard again (C1)
@@ -405,7 +401,6 @@ test('SERPENT1 brain: THE TURNS - at 66% its ward and Satakal\'s Call then a coi
   assert.deepEqual(w2.filter((o) => o.k === 'atk').map((o) => SERPENT_ATTACK_BY_ID[o.a].key).slice(0, 2), SERPENT_PHASE_TURN[3]);
   const m = w2.find((o) => o.k === 'mael');
   const forming = w2.find((o) => o.k === 'atk' && o.a === SERPENT_ATTACK_TABLE.mael.id);
-  // PIN MOVED (SERPENT3): the whirl forms where it swims - where its word said it would, its round inside its waters -
   // no longer at the waters' heart, where its head leapt onto the round
   assert.deepEqual([m.x, m.z], forming.tg[0], 'where its word said it forms');
   assert.ok(Math.hypot(m.x, m.z) <= ARENA_R - MAEL_ORBIT_R + 0.01, 'its round inside its waters');
@@ -459,7 +454,6 @@ test('SERPENT1 brain: A COIL BROKEN by the ships\' fire lets go and lies SERPENT
   const hp = f.hp;
   let t = T0 + 700, broke = null;
   while (!broke && t < T0 + 20_000) { for (const o of applySerpentHit(f, 's2', 40, ZONES.coil, { x: 150, z: 0 }, t)) if (o.k === 'cb') broke = o; t += 300; }
-  // PIN MOVED (AUDIT SHIPS D2, 2026-10-06): stunned from the break, its letting go said SERPENT_SAY_AHEAD_MS on (the
   // word's moment is the coil's `off`, which every screen unwinds it from)
   assert.ok(broke && broke.n === 'P2' && broke.su === broke.at - SERPENT_SAY_AHEAD_MS + SERPENT_STUN_MS);
   // AUDIT SERPENT T3: the coil's health first - and SERPENT_COIL_PASS of every blow on it off its own
@@ -485,7 +479,7 @@ test('SERPENT1 brain: THE END - the kill stamps its fall once with its three bes
   assert.ok(!serpentEarned(f, 's3'), 'nobody before the fall');
   surfaced(f, T0 + 60_000);   // up again, round the heart, for the blows
   f.shieldUntil = 0;
-  applySerpentHit(f, 's2', SERPENT_PART_SHARE * f.players.s2.share * 0.5, ZONES.body, { x: -40, z: 0 }, T0 + 60_000);   // PIN MOVED: SERPENT4 - a part, the least that earns
+  applySerpentHit(f, 's2', SERPENT_PART_SHARE * f.players.s2.share * 0.5, ZONES.body, { x: -40, z: 0 }, T0 + 60_000);
   let t = T0 + 60_100;
   for (let n = 0; !f.fell && n < 5000; n++) { f.shieldUntil = 0; for (const o of applySerpentHit(f, 's1', 5000, ZONES.body, { x: 30, z: 0 }, t)) if (o.k === 'fell') assert.equal(o.top[0], 'P1'); t += 200; }
   assert.ok(f.fell, 'felled');
@@ -503,7 +497,6 @@ test('SERPENT1 brain: THE END - the kill stamps its fall once with its three bes
   const out = stepSerpentBrain(g, SOUND, [body('s1', 30, 0)], rng);
   assert.equal(out.at(-1).k, 'gone');
   assert.ok(g.gone && !g.fell && !serpentEarned(g, 's1'));
-  // PIN MOVED (AUDIT SHIPS B5, 2026-10-06): its dive said SERPENT_SAY_AHEAD_MS on, as every turn of its swim is
   assert.equal(depthAt(g.modes, 0, SOUND + SERPENT_SAY_AHEAD_MS + MODE_BLEND_MS), DEEP_Y, 'gone into the deep');
 });
 

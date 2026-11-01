@@ -1,4 +1,4 @@
-// DISC19 (2026-09-24, Discord through Mac: "I want to fix these issues + enhance guard interaction"), each report
+// DISC19, each report
 // reproduced in node before it was touched, fixed at its root and pinned BY EXECUTION where the seam is a function.
 //   A - "leaving the game undoes your lycanthropy/vampirism" and "Playing online makes my vampire character human
 //       again": the curse entry (and the infection before it) carried neither `permanent` nor a round count, so
@@ -66,7 +66,7 @@ const reload = (p, minutes) => { const q = { isPlayer: true }; restorePlayer(q, 
 const live = (e) => liveLycanthropy(e) ?? liveVampirism(e);
 
 test('DISC19-A: a werewolf and a vampire who have lived a round come back from a load still cursed - through the next rounds offline, and through the online arrival', () => {
-  for (const make of [(p) => { const e = createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: T0 }); morphSelf(p, { force: true, nowMinutes: T0 }); return e; }, (p) => createVampirismCurse(p, VAMPIRE_CLANS.Lyrezi, { now: T0 })]) {   // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the werewolf's mods are the beast's - it changes before it lives its rounds
+  for (const make of [(p) => { const e = createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: T0 }); morphSelf(p, { force: true, nowMinutes: T0 }); return e; }, (p) => createVampirismCurse(p, VAMPIRE_CLANS.Lyrezi, { now: T0 })]) {
     setWorldMinutes(T0); resetMagicRoundMarker(null);
     const p = mortal();
     const racial = make(p).racial;
@@ -399,5 +399,5 @@ function staticClosure(entry) {
 
 test('DISC19-D: a chunk gone mid-session is said on the screen, not swallowed - and the log names what really failed', () => {
   assert.equal(isStaleChunk(new TypeError('Failed to fetch dynamically imported module: https://daggerfalljs.dev/play/assets/enhancedMotor-CPTnjkkD.js')), true);
-  assert.match(STALE_CHUNK_IN_PLAY_TEXT, /\bReload\b/);   // PIN MOVED (VOICE2): 'The game was updated. Reload to see the enemies.' - a sentence, no dash aside (Voice.md rule 5)
+  assert.match(STALE_CHUNK_IN_PLAY_TEXT, /\bReload\b/);
 });

@@ -668,8 +668,7 @@ export class TopicTree {
         this.listTopicLocation.push(itemBuildingTypeGroup);
       }
     }
-    // PROF-FOUND (2026-10-12, Mac: "Ensure all the professions new stores are flagged on the town map and you can ask
-    // NPCs where they are"; Ledger A): the shops the port opened that C#'s skip list keeps off this page - the Furniture
+    // PROF-FOUND: the shops the port opened that C#'s skip list keeps off this page - the Furniture
     // Store, Carpentry's workbench (world/buildingNames.js OPENED_SHOP_TYPES) - a group each after DFU's, asked as any
     // building is (LocalBuilding). Their own variable, as the yards' below: the shared one's flow is C#'s, untouched
     for (const buildingType of OPENED_SHOP_TYPES) {
@@ -680,7 +679,7 @@ export class TopicTree {
       for (const s of shops) shopGroup.listChildItems.push(newListItem({ questionType: QUESTION_TYPE.LocalBuilding, caption: s.name, buildingKey: s.buildingKey }));
       this.listTopicLocation.push(shopGroup);
     }
-    // YARDS-FOUND (2026-10-10, from play: "Ensure these locations appear when talking to NPCs"; Ledger A): the town's
+    // YARDS-FOUND: the town's
     // Stable and Wagon Yard - the port's own, rows of the directory under a key no building holds and a type no DFU
     // group takes (systems/merchantYards.js yardDirectoryRows) - each its own group after the shops, asked and answered
     // as a building is (LocalBuilding: the knowledge roll, "%di of here", the map's mark). Their own variable: the

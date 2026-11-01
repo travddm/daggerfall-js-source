@@ -14,7 +14,7 @@
 // under every cell - y = 0 for its arenas, or the terrain when a ground
 // is given. A dungeon has neither: its floors are its own triangles and
 // a plane at y = 0 across the whole level would be a floor that is not
-// there. So none is laid (2026-09-27; bakeSoup says why): the ground the
+// there. So none is laid: the ground the
 // height layer falls back to still sits ten metres below the lowest
 // triangle, where no real floor can step onto it.
 
@@ -24,7 +24,7 @@ import {
   buildPolyMesh, buildPolyMeshDetail, findPath,
 } from './navmesh.js';
 
-/** THE SOUP AGENT (2026-09-27): AGENT with ONE ring of erosion (radius =
+/** THE SOUP AGENT: AGENT with ONE ring of erosion (radius =
  *  cs). Every classic dungeon doorway is 1.25 m (frames 55000-55005; the
  *  1.2 m door fills it), and AGENT's 0.4 m radius erodes two 0.25 m cells
  *  off each jamb on top of the conservative wall stamp: 0 of 12 grid
@@ -129,7 +129,7 @@ export function landAnchors(chf, anchors, tol = ANCHOR_Y_TOLERANCE) {
  */
 export function bakeSoup(positions, indices, { floor, anchor, anchors = null, agent = SOUP_AGENT }) {
   const t0 = (globalThis.performance ?? Date).now();
-  // NO COARSENING (2026-09-27). coarsenAgent is his rule for OPEN TERRAIN
+  // NO COARSENING. coarsenAgent is his rule for OPEN TERRAIN
   // ("open terrain does not need fine cells"), and it sizes by the soup's
   // BOX: every classic dungeon's block box is three blocks (153.6 m) or
   // more a side, so all 4232 coarsen - to 0.54-1.05 m cells, at which no
@@ -162,7 +162,7 @@ export function bakeSoup(positions, indices, { floor, anchor, anchors = null, ag
   // the walls read as walkable - and routes ran straight through them.
   // Real dungeons are not at 0. Mac's report: foes into walls, clumped,
   // gone.
-  // EVERY PLACE AGENTS LIVE (2026-09-27): his anchor UNION (FOUNDRY S3 ->
+  // EVERY PLACE AGENTS LIVE: his anchor UNION (FOUNDRY S3 ->
   // the experiment integration) - the player's feet and each foe's. A
   // classic dungeon is legitimately segmented for a walker: ledges dropped
   // off one way, flooded halls, locked doors. With the fixes above the

@@ -1,5 +1,4 @@
-// DISC22-E (2026-09-24, Tony H. on Discord: "When using Classic UI or GrimoireUI I'm not able to increase the speed
-// from 10x in accelerated travel ... online").
+// DISC22-E.
 //
 // THE BUG: 10x is not a cap - it is the spinner's start value, and the spinner never heard the click. AUDIT-TO1 I2
 // gated the classic strip's clicks on DFU's `cursorActive` flag, but online the pointer is freed WITHOUT that flag:
@@ -9,7 +8,7 @@
 // skins (Classic and GrimoireUI) draw this strip; the enhanced one is DOM and was never affected.
 //
 // The gate is the lock now: driven through the predicate world.js calls and the real strip.
-// RATE-LAW (2026-10-04, Mac: "Remove travel options dials"): the spinner itself is gone - the gate stands for Map,
+// RATE-LAW: the spinner itself is gone - the gate stands for Map,
 // Camp and Exit, and the recess shows the rate the journey's ground runs at.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

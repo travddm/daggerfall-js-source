@@ -1,5 +1,4 @@
-// THE 2026-09-04 CEILING BATS INCIDENT, pinned. Mac: "In the first
-// dungeon I notice some bat enemies stuck in the ceiling." Three laws:
+// THE 2026-09-04 CEILING BATS INCIDENT, pinned. Three laws:
 //
 //   1. WHERE THE MARKER IS. RDBLayout.cs:1537 stands the enemy
 //      TRANSFORM on the flat marker, and the mobile billboard hangs on
@@ -204,7 +203,7 @@ test('bats review 2: a FOE target\'s transform is feet + ITS centreOffset, in ev
 test('bats review 2: the spell sweep, the touch pick and the occupancy sphere sit at the FOE\'s capsule centre', () => {
   const giant = { ai: { feet: [0, 0, 0], height: 3 } };
   assert.deepEqual(sweepFoes([0, 1.5, 0], 0.2, [giant]), [giant], 'a burst at chest height catches a 3-tall foe (0.9 would miss)');
-  // ROAD-H H2 (2026-09-07) restates this half. The law it pinned - the
+  // ROAD-H H2 restates this half. The law it pinned - the
   // sweep measures the FOE's own body, never the player's 0.9 - is
   // still the law, but DoAreaOfEffect is an OverlapSphere against the
   // CharacterController CAPSULE (DaggerfallMissile.cs:481), so a burst

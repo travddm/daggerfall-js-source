@@ -1,5 +1,4 @@
-// BASE-HIDE (2026-09-26, Mac: "Remove bought houses decor - the base game decor isnt easy to decorate around when u
-// want more in depth house"): what Daggerfall furnished a room with - its prop models and its flats - the room's owner
+// BASE-HIDE: what Daggerfall furnished a room with - its prop models and its flats - the room's owner
 // may TAKE OUT and put back, free. A furnishable room (an online home, anyone's; the player's house or ship) stands its
 // own furniture piece by piece so one piece can go (scenes/decor/decorBase.js); the list of what is out is the save's offline
 // and the account service's online (migration 0015), and a sale brings the furniture back. The law, the room's pool,
@@ -168,7 +167,7 @@ test('BASE-HIDE the service: a home\'s list of what is out is read with its piec
   const stranger = await call('/v1/homes/decor/hidden', at([]), mara);
   assert.deepEqual([stranger.status, stranger.body.error], [404, 'no-home'], 'another player clears nothing');
   assert.equal((await call('/v1/homes/decor/hidden', at([], 'char-mara'), mara)).body.error, 'no-home');
-  // ACCOUNT-HOMES (PIN MOVED - it was `no-home`, "nor the owner's other character"): the home is its account's, any character
+  // ACCOUNT-HOMES (
   // of it writes the list (the same list again here, so the room stands as it was)
   assert.deepEqual((await call('/v1/homes/decor/hidden', at(['m12:41000', 'f3:210.4'], 'char-second'), aldric)).body, { ok: true, hidden: ['f3:210.4', 'm12:41000'] }, 'the owner\'s other character writes it too');
   const bad = await call('/v1/homes/decor/hidden', at(['m12:41000', 'a chair']), aldric);

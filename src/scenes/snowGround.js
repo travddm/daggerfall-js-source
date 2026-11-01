@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -15,13 +15,13 @@ export function createSnowGround(host) {
   const {
     blocks, locationIndex, maps, terrainGen
   } = host;
-  // SNOWFALL1 (Mac: "These should be on by default and integrate into our enhanced environments seamlessly"): SNOWFALL -
+  // SNOWFALL1: SNOWFALL -
   // the enhanced outdoors' snow (scenes/snowfallHost.js) on the streamed ground as it is DRAWN: each pixel's own
   // surface at its stride and its TileMap (the cap's, where Deep Waters patched one), the sea it carved bare, the roads
   // Basic Roads'. Ticked on every frame, outdoors and in; told each pixel published (OnPromoteTerrainData); drawn after
   // the ground by the ground's own program - its sun, its shadows, its lights and its fog. The adapter reads the
   // stream's bindings when it is asked, never here (they are declared below).
-  // BAY-LEFT-GROUND (bible/03-World/Landforms.md "BAY-LEFT-GROUND", the snow's part; the audit "no system left behind in
+  // BAY-LEFT-GROUND ("BAY-LEFT-GROUND", the snow's part; the audit "no system left behind in
   // the Bay", D3): THE SNOW ON THE WHOLE WORLD'S GROUND. A pixel off the Bay's 1000 x 500 stood no ground for the snow
   // (pixelOn's bound, and its `px * 1000 + py` key aliased two pixels a thousand apart past it), so Skyrim's winter laid
   // its cover and its caps but no snow to wade, no footprint, no track and no berm. Every pixel of the world's grid now,

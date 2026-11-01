@@ -1,4 +1,4 @@
-// SD25 (2026-10-08, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md): the rebuilt fidelity's pins,
+// SD25: the rebuilt fidelity's pins,
 // a slice at a time. SD-FLASH (S0): the Beat step's warning blinks under the project's flash ceiling.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,7 +27,6 @@ test('SD-FLASH: a Beat step\'s warning falters at most three times a second (TEL
       for (let k = 0; k < 24; k++) {
         steps.ride(from + (k + 0.5) / 60, 1 / 60, null);
         assert.equal(steps.steps[i].solid, true, `step ${i}: warning, still there`);
-        // PIN MOVED (SD-LOOK S9): the falter is the plate's light (its falter frame, a draw's texRemap), never the plate -
         // it stays seen while it holds, dissolving out
         assert.ok(steps.steps[i].matrix.some((x) => x !== 0), `step ${i}: seen while it holds`);
         const remap = steps.steps[i].remap;
@@ -362,7 +361,6 @@ function veilPage({ reduce = false, noHour = false } = {}) {
         if (k === 'shaderSource') sources.set(a[0], a[1]);
         if (k === 'attachShader') { if (!attached.has(a[0])) attached.set(a[0], []); attached.get(a[0]).push(a[1]); }
         if (k === 'getShaderParameter') return !failed(a[0]);
-        // PIN MOVED (PERF-COMPILE1): as WebGL does it - a shader that would not compile fails its program's link, and the
         // build reads the link (glProgram.js's one sync point) before it asks a stage why
         if (k === 'getProgramParameter') return !(attached.get(a[0]) ?? []).some(failed);
         if (k === 'getUniformLocation') return a[1];

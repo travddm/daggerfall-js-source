@@ -1,7 +1,4 @@
-// EL6 - ENHANCED LIGHTING, THE FIELD'S FOUR (2026-09-17, Mac: "1. Some
-// shadows (like campfire) are wonky 2. Textures in the dark look weird
-// 3. All lighting sources can be seen through walls 4. Need to
-// comprehensively make this where it doesnt tank performance").
+// EL6 - ENHANCED LIGHTING, THE FIELD'S FOUR.
 //   - a flame flat (the lights archive) never casts from a lantern;
 //   - the SSAO's rotation is ordered to its blur, both encodes dithered;
 //   - an emitter discards behind the frame's depth;

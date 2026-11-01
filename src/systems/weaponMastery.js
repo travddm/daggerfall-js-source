@@ -1,5 +1,5 @@
 // @ts-check
-// MARTIAL2 (2026-10-17) - THE WEAPON PAST 100. bible/05-Combat/Martial-Specialisations.md section 4.
+// MARTIAL2 - THE WEAPON PAST 100.
 //
 // Measured first (the page's section 2): past 100 a weapon skill bought its TO-HIT alone - PCAAO's `ceil(skill * 1.5)`
 // and DFU's `skill` - against a chance clamped at 97, so a Long Blade mastered to 200 struck an armoured Orc Warlord no
@@ -76,10 +76,9 @@ export function weaponClimb(entity, skill, { online = isOnlinePage() } = {}) {
  *  RELAY-SHARE: the one law (combat/healthShare.js) - such a body now reads the relay's own word of its health (its
  *  stand-in's owner's reader), so each half pays its own there too, and the mean only where no word is heard. */
 const shareOf = healthShare;
-/** WEAPON-GEAR (2026-10-27, mob: "Bow and weapon fix"; Martial-Specialisations.md section 4): the climb above reads the
+/** WEAPON-GEAR: the climb above reads the
  *  trained skill, so gear bought a weapon no damage while the fists' roll read it whole. So each point of gear on a
- *  weapon skill adds 0.44% to its blow, from the first point (GEAR-ADDS, mob: "they should both just stack
- *  additively", "help the begingin"): the percent here, 0 to 320. Online, mine, never the fists. */
+ *  weapon skill adds 0.44% to its blow, from the first point (GEAR-ADDS,, "help the begingin"): the percent here, 0 to 320. Online, mine, never the fists. */
 export function weaponGearPct(entity, skill, { online = isOnlinePage() } = {}) {
   if (!online || !entity?.isPlayer || entity.peer || entity._mentor || entity.isInBeastForm || !Number.isInteger(skill) || skill === SKILLS.HandToHand) return 0;
   const gear = skillModOf(entity, skill);

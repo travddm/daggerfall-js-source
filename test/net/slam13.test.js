@@ -1,4 +1,4 @@
-// SLAM13 (2026-09-16, AUDIT SLAM): THE FINAL LENS'S RELAY FINDINGS - five, each a hole a modified client or a large
+// SLAM13: THE FINAL LENS'S RELAY FINDINGS - five, each a hole a modified client or a large
 // room could put a full room through, and each in law the slams before it wrote.
 //
 // A1 THE ACT FAN'S BORROW WAS ONE SENDER'S TO HOLD. SLAM11 let the room's act bucket borrow so a big door lands whole.

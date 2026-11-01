@@ -1,4 +1,4 @@
-// QL12-QL16 (bible/06-Systems/Questlines-Arc.md section 4): THE QUESTLINES. Each line's steps are the port's own scripts
+// QL12-QL16: THE QUESTLINES. Each line's steps are the port's own scripts
 // (systems/questlines/quests/<QUEST>.txt) on DFU's machine, so the pins hold each as the sheets' pins hold DFU's: it is
 // in the pack, it parses with every line claimed by a template, its title is its step's, every message it names is
 // written, every act it waits on is one the features say (qlActs.js). A step the service witnesses waits on the act its
@@ -24,7 +24,7 @@ import { QUEST_FILES, packMachine, parsedQuest } from '../../qlSources.mjs';
 /** The act a witness's receipt is, and how many of it the step asks (the script's `ql act <kind> <n>`). */
 const WITNESS_ACT = Object.freeze({
   rite: ['rite-broken', 1], breach: ['breach-closed', 1], hour: ['hour-broken', 1], serpent: ['serpent-slain', 1],
-  star: ['star-held', 1], stars3: ['star-held', 3],   // PIN MOVED (STAR8): the fallen stars
+  star: ['star-held', 1], stars3: ['star-held', 3],
 });
 
 const scriptText = (name) => readFileSync(QUEST_FILES.get(name.toUpperCase()).path, 'utf8');
@@ -460,11 +460,11 @@ test('QL1/QL12 an outcome settles at the end its script names: a failure clock\'
 // ═══ AUDIT QUESTLINES (LINES, ACTS-2): the runner's gates, its stalls and its order ═══
 
 test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switch that is off, or the Renown a revenant comes at, waits and says so - never started to fail every day; each need is one the runner can read (mutants: the needs unread; the line begun regardless; the Renown)', () => {
-  assert.deepEqual(Object.keys(NEED_CHECKS).sort(), ['lootRarity', 'naval', 'renown', 'starfall']);   // PIN MOVED (STAR8): the Starfall running
+  assert.deepEqual(Object.keys(NEED_CHECKS).sort(), ['lootRarity', 'naval', 'renown', 'starfall']);
   for (const l of QL_LINES) for (const s of l.steps) for (const n of s.needs ?? []) assert.ok(n in NEED_CHECKS, `${s.quest} needs ${n}`);
   assert.deepEqual(QL_LINES.flatMap((l) => l.steps.filter((s) => s.needs).map((s) => `${s.quest}:${s.needs.join('+')}`)),
-    ['QLTF01:starfall', 'QLTF03:starfall', 'QLIG01:lootRarity', 'QLIG02:lootRarity', 'QLIS01:naval', 'QLIS02:naval', 'QLIS03:naval', 'QLIW02:renown']);   // PIN MOVED (STAR8): the Festival line's star steps
-  // Loot rarity off: the Smith's Secrets is not on offer - never taken to fail; PIN MOVED (QL-OFFERED): a line its gate
+    ['QLTF01:starfall', 'QLTF03:starfall', 'QLIG01:lootRarity', 'QLIG02:lootRarity', 'QLIS01:naval', 'QLIS02:naval', 'QLIS03:naval', 'QLIW02:renown']);
+  // Loot rarity off: the Smith's Secrets is not on offer - never taken to fail
   // shuts is no row (UI-Calm's law - nothing drawn that cannot be taken), and its take is refused
   setPref(LOOT_RARITY_KEY, false);
   try {
@@ -615,7 +615,7 @@ test('AUDIT QUESTLINES UI-7, UI-14: the rows say a failed step is offered again 
   const q2 = [...machine.quests.values()].find((q) => q.questName === 'QLIG02' && !q.questComplete);
   q2.shelvedAt = 5;
   assert.deepEqual([row().state, row().steps[1].state], ['shelved', 'current'], 'set aside in the journal');
-  // offline: the endgame lines and the online introductions are not drawn - unless begun; PIN MOVED (QL-OFFERED): nor a
+  // offline: the endgame lines and the online introductions are not drawn - unless begun
   // line its gate shuts (the Harbormaster's Word at level 4 - level 5)
   const ids = runner.rows().map((l) => l.id);
   assert.ok(!ids.includes('burningDoors') && !ids.includes('introCrafts') && ids.includes('introGear') && !ids.includes('introSea'));

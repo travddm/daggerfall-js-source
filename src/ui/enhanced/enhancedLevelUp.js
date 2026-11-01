@@ -123,7 +123,7 @@ function meterRow(label, now, max, fill) {
  * builds one, because which one it is is ui/charSheetDoor.js's
  * question and the answer carries a mod's law behind it.
  *
- * GROWTH3 (bible/10-UI/Growth.md section 4): `embed` draws it IN the pause window's Growth tab (ui/growth/growthStage.js)
+ * GROWTH3: `embed` draws it IN the pause window's Growth tab (ui/growth/growthStage.js)
  * - the stage's size, not the screen's, and no overlay or Escape of its own: the window's back stack is the way out, and
  * a level owed and left stays owed (its bonus points remembered on the character - advancement.js bonusPoolFor), to be
  * spent here or wherever a level-up opens next. The OK still commits, and `onExit` follows it.

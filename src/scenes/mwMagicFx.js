@@ -1,4 +1,4 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): MORROWIND'S
+// MW-SPELLFX1: MORROWIND'S
 // SPELL EFFECTS IN THE WORLD.
 //
 // With Morrowind data attached, a spell is drawn as Morrowind draws it: its casting effects about the caster as the

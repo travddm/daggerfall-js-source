@@ -1,5 +1,4 @@
-// AUDIT MERGE-PLUS, lens B (2026-09-26, the pre-merge audit of the Enhanced Plus patch: the online fx, the quickslots,
-// the pad). What the audit found, each pinned on the code it was found in. A blow I struck in a dungeon or a building
+// AUDIT MERGE-PLUS, lens B. What the audit found, each pinned on the code it was found in. A blow I struck in a dungeon or a building
 // went out through the OVERWORLD's map and landed millions of units from anyone who could have seen it (B1). A torch
 // slot whose last torch had burnt out, pressed under a raised shield, took the shield off, refused, put it back - and
 // billed the swap's three seconds without a swing, said by nothing (B2). A party mate back from a dungeon replayed the
@@ -112,7 +111,6 @@ test('AUDIT MERGE-PLUS B2 a torch slot whose last torch is gone, pressed under a
 });
 
 test('AUDIT MERGE-PLUS B2 a light that will not light - a Lantern with no oil, the one light a dead flame leaves in the pack - takes the shield off, puts it back, and leaves the equip pause what it was before the press; a torch that lights is a real swap and still pays for it (mutants: the refusal leaves the pause billed)', () => {
-  // PIN MOVED (FIELD BUGS 2026-10-21b BELT-WAIST): a lantern hung at the waist takes no hand, so its slot never moves the
   // shield (test/systems/fb1021b_beltwaist.test.js) - this law is a HELD light's: the lantern held in the hand, the waist
   // switch off
   setModSetting('handheld-torches', 'Handling.LanternsAtWaist', false);

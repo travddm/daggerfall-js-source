@@ -1,4 +1,4 @@
-// DISC22-A (2026-09-24, Mac: "repair magical items should be enabled by default and required online").
+// DISC22-A.
 //
 // DFU ships Controls/AllowMagicRepairs False - a smith turns an enchanted item away (RepairsObjects' magic arm,
 // systems/repairService.js repairRefusal). The port's default mends it now (settings.js PORT_DEFAULTS, over the

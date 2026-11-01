@@ -1,4 +1,4 @@
-// AUDIT SCALE II (2026-10-11, the audit of pull request #757 - Mac: "Lets do an audit on everything. Ensure perfection."):
+// AUDIT SCALE II:
 // THE RELAY'S HALF - SCALE5b's second wire, its settings and its referee word, and SCALE5d's layers. Each finding was
 // reproduced on the real Room over the pins' fake object (test/fakeRoom.mjs) against the pull request's head (e729cea7)
 // and each pin below fails there:
@@ -229,7 +229,7 @@ test('AUDIT SCALE II R1-5 double13 is the sockets refused `room full`: a full la
     const KEY = 'world:5,5';
     fill(KEY); fill(layerName(KEY, 1));
     assert.equal(await said(await page(`/room/${KEY}`)), `admitted ${layerName(KEY, 2)}`);
-    const counts = () => Object.fromEntries([...W.made].filter(([n]) => n !== CELL_DIRECTORY && n !== SOCIAL_ROOM).map(([n, r]) => [n, r.room._metrics.c.full]));   // PIN MOVED (COST-2 part two): nor the hub, which the directory asks for the cellSeed setting (server/src/cellNodes.js directoryTree); PIN MOVED (COST-2): the cell directory the Worker asks is no layer of the place
+    const counts = () => Object.fromEntries([...W.made].filter(([n]) => n !== CELL_DIRECTORY && n !== SOCIAL_ROOM).map(([n, r]) => [n, r.room._metrics.c.full]));
     assert.deepEqual(counts(), { [KEY]: 0, [layerName(KEY, 1)]: 0, [layerName(KEY, 2)]: 0 }, 'one socket seated next door: nobody refused');
     assert.equal(await said(await page(`/room/${KEY}`, { [LAYER_LAST_HEADER]: '1' })), `admitted ${layerName(KEY, 2)}`);
     assert.equal(W.room(KEY).room._metrics.c.full, 0, 'the page\'s word of a last try is not believed');

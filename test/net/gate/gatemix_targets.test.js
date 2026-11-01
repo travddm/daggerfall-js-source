@@ -1,5 +1,5 @@
-// GATE-MIX (2026-10-20): a cue at its targets, thinned - world/gate/gateBoss.js cueTargetPlaces, played by the court's
-// `sound` (scenes/gate/gateCourt.js). Design: bible/11-Multiplayer/World-Bosses.md, "GATE-MIX".
+// GATE-MIX: a cue at its targets, thinned - world/gate/gateBoss.js cueTargetPlaces, played by the court's
+// `sound` (scenes/gate/gateCourt.js). Design:, "GATE-MIX".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ATTACKS } from '../../../src/net/gate/gateBrain.js';
@@ -94,7 +94,6 @@ test('GATE-MIX: the court\'s passes are compiled as I stand in it - one a frame,
   inside = true;
   const per = [];
   for (let i = 0; i < 5; i++) { clock.t += 16; const was = linked(); if (i === 2) veil = false; c.frame(); per.push(linked() - was); }
-  // PIN MOVED (SHADER-STALL, render/glProgram.js compiledPass): one pass a frame where the driver cannot compile beside the
   // frames; where it can, the three passes' six programs started in the first frame I stand here
   assert.deepEqual(per, parallel ? [6, 0, 0, 0, 0] : [2, 2, 2, 0, 0], parallel ? 'the three passes\' compiles started together' : 'the sparks and the meteor, then the crystals, then the way home\'s fire - two programs a pass, one pass a frame');
   if (parallel) gl.finish();

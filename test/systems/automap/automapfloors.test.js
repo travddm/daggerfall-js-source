@@ -1,6 +1,4 @@
-// EM2 - THE FLOOR MODEL (2026-09-21, Mac: "The automap should become a
-// 2d map and floor based instead of the current 3D implementation,
-// streamlining it").
+// EM2 - THE FLOOR MODEL.
 //
 // A Daggerfall dungeon HAS NO FLOORS. The block record parses x and z
 // and no y (formats/mapsFile.js), every block is laid at y zero

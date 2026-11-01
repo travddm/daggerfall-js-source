@@ -1,6 +1,4 @@
-// CHAT-SCROLL (2026-09-23, Starempire42 on Discord: "Make it so when you open the chat it automatically scrolls to
-// the newest message ... Currently when you open the chat it just stays idle so you have to manually scroll down to
-// the newest message every single time").
+// CHAT-SCROLL.
 //
 // node has no layout engine, so chat1's fake DOM reports whatever it is told. This file's fake LAYS OUT: a line is
 // as tall as its text wraps (18px a row of 44 characters, badge parts included), the list's scrollHeight is the sum

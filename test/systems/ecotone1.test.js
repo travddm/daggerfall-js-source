@@ -1,5 +1,4 @@
-// ECOTONE1 (2026-10-07, Mac: "Making it where bione transitions are insta t and instead fade and transition naturally
-// into each other") - BLENDED CLIMATES: where map pixels of two climates meet, one wandering, patchy border (world/
+// ECOTONE1 - BLENDED CLIMATES: where map pixels of two climates meet, one wandering, patchy border (world/
 // ecotone.js) in place of the pixel's straight edge - the ground's tile sets sampled across it in both terrain programs
 // (render/ecotoneGlsl.js, renderer.drawTerrain's `eco`), the wild's flats laid by the climate that owns each tile
 // (world/terrain/terrainNature.js), the grass grown by the ground under it (scenes/world.js).
@@ -153,7 +152,7 @@ test('ECOTONE1: the GLSL is the JS - the hash bit for bit, the lattice noise and
     let blended = 0;
     const corners = [[0, 160, 0, 160], [660, PIXEL, 0, 160], [0, 160, 660, PIXEL], [660, PIXEL, 660, PIXEL]];
     for (const [x, z] of [...points(200), ...corners.flatMap(([x0, x1, z0, z1]) => points(80, x0, x1, z0, z1))]) {
-      const w = fns.ecoWeights([x, z]);   // AUDIT PRECIP GROUND-6 (PIN MOVED): the shares once, the blend by them
+      const w = fns.ecoWeights([x, z]);   // AUDIT PRECIP GROUND-6 (
       assert.ok(Math.abs(w[0] + w[1] + w[2] + w[3] - 1) < 1e-9, 'the shares sum to one');
       const got = fns.ecotone([0, 0, 0], w, [0.5, 0.5, 2], [0.01, 0], [0, 0.01]);
       const want = bySlot(ecotoneShares(PX, PY, x, z));
@@ -169,10 +168,8 @@ test('ECOTONE1: the GLSL is the JS - the hash bit for bit, the lattice noise and
 });
 
 test('ECOTONE1: both terrain programs sample their neighbours right after their own tile - the lane decoding them as it decodes its own; the clip variant still the plain program and one line; the units free in both (mutants: the call dropped from either; the lane\'s neighbours undecoded)', () => {
-  // AUDIT PRECIP GROUND-6 (PIN MOVED): the weights asked once, the blend by them - the snow crosses the border by the same
-  // PIN MOVED (ROAD-LOOK): a road's edge blends into its ground on the own tile first (render/roadEdgeGlsl.js), so the
+  // AUDIT PRECIP GROUND-6 (
   // neighbours' weights follow that one line - the road's edge then crosses a climate's border as any ground does
-  // PIN MOVED (COAST-LOOK, render/groundEdgeGlsl.js): a transition is drawn as its two kinds' base records, and each
   // takes its neighbours' share by its own record before they meet; every other tile as before - its road's edge, then
   // the neighbours' share
   const ECO_AFTER = String.raw`(?: {2}(?:\/\/|highp uint geA, geB;|bool ge = groundMix\(|vec2 dux = )[^\n]*\n)+ {2}vec4 ew = ecoWeights\(vLocalXZ\);[^\n]*\n {2}if \(ge\) tex = mix\(ecotone\(geBase\(geA, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geA\)\), dux, duy\), ecotone\(geBase\(geB, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geB\)\), dux, duy\), geS\);\n {2}tex = roadEdge\(tex, data, unwrapped, gx, gy, t\);[^\n]*\n {2}if \(!ge\) tex = ecotone\(tex, ew, vec3\(tuv, float\(layer\)\), gx, gy\);`;

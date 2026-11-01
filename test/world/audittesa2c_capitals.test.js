@@ -1,4 +1,4 @@
-// AUDIT TESA II, lane C (2026-10-25; bible/03-World/Arena-Provinces.md TESA10 to TESA11, TESA-LORE, IC-RING) - the
+// AUDIT TESA II, lane C - the
 // capitals' fixes, pinned: the rim Daggerfall's own cities leave the land (C1), the shore capitals at the sea's floor and
 // over the sea pixel off their harbour (C2), the Imperial City's causeways to its compounds' gates (C3), Falinesti's
 // walkway clear to every platform (C4), the city's laws worked once (C5), Helstrom's gates on its hummocks (C6), every
@@ -23,7 +23,7 @@ import {
   IMPERIAL, IMPERIAL_SPAN, polar, causewayLines, bridgeLine, prisonAt, prisonGates, universityGates, compoundGateAt, imperialClosed,
   divinesAt, divinePlinths, universityTowerAt, universityHallAt, imperialPartId, IMPERIAL_CELLS, imperialSliceName,
 } from '../../src/world/imperialCity.js';
-import { imperialOpenAt, imperialOwnLaws } from '../../src/world/imperialBlocks.js';   // PIN MOVED (IC-GRAND): the arrivals' law with the city's blocks
+import { imperialOpenAt, imperialOwnLaws } from '../../src/world/imperialBlocks.js';
 import { buildGrahtOak, spiralAt, spiralInner, hutAngle, platformOpen, PLATFORM_SIDES } from '../../src/world/capitalFalinesti.js';
 import { installCapitals, capitalFootprint, vanillaTexels } from '../../src/world/capitalModels.js';
 import { customModelFor } from '../../src/world/customModels.js';
@@ -51,18 +51,17 @@ const planAt = (cap, dx, dz) => [cap.anchor[0] * BLOCK_M + dx, cap.anchor[1] * B
 
 test('AUDIT TESA II C1: a capital leaves Daggerfall\'s rim to the land - its outer eleven tiles no ground of its own, closed and treeless, on the span\'s outer sides alone (the Imperial City\'s inner seams level ground) - in every block it lays, its own, its gardens and its ring\'s lakes', () => {
   assert.deepEqual([CAPITAL_RIM_TILES, CAPITAL_RIM_M], [11, 70.4]);
-  const ic = CAPITALS[0], W = IMPERIAL_CELLS * BLOCK_M;   // PIN MOVED (IC-GRAND): its plan a law, two hundred cells a side
+  const ic = CAPITALS[0], W = IMPERIAL_CELLS * BLOCK_M;
   assert.ok(inCapitalRim(ic, 70.3, 900) && !inCapitalRim(ic, 70.5, 900) && inCapitalRim(ic, W - 70.3, 900) && inCapitalRim(ic, 900, 1) && inCapitalRim(ic, 900, W - 1));
   for (const seam of [8 * BLOCK_M, 16 * BLOCK_M]) assert.ok(!inCapitalRim(ic, seam, 900) && !inCapitalRim(ic, 900, seam), `the slices' seam at ${seam} no rim`);
   const blocks = capitalPortBlocks();
   let laid = 0, roads = 0;
   for (const cap of CAPITALS) {
-    if (cap.family) continue;   // PIN MOVED (IC-GRAND): the Imperial City's blocks a family's, each its rim by the same law (test/world/icgrand_lod.test.js)
-    // PIN MOVED (ROAD-FOLLOW, 03-World/Town-Shapes.md ROAD-FOLLOW): but where its approach's road runs in from its gate pixel, over the rim too
+    if (cap.family) continue;
     const way = onCapitalApproach(cap, capitalDims(cap));
     cap.plan.forEach((row, r) => row.forEach((cell, cx) => {
       const own = Object.hasOwn(cap.blocks, cell) ? cap.blocks[cell].name : null;
-      const name = own ?? (cell === 'G' ? capitalGardenName(cap, cx, r) : cell === 'L' && (onCapitalRing(cap, cx, r) || cap.ground) ? capitalLakeName(cap, cx, r) : null);   // PIN MOVED (SOLITUDE-RELIEF): every lake of a capital on its own ground its own
+      const name = own ?? (cell === 'G' ? capitalGardenName(cap, cx, r) : cell === 'L' && (onCapitalRing(cap, cx, r) || cap.ground) ? capitalLakeName(cap, cx, r) : null);
       if (!name) return;
       const b = blocks.find((x) => x.name === name), g = b.json.RmbBlock.FldHeader.GroundData, A = b.json.RmbBlock.FldHeader.AutoMapData;
       g.GroundTiles.forEach((t, i) => {
@@ -89,8 +88,7 @@ test('AUDIT TESA II C1: no landmark stands in the rim on a side of land - every 
   let bridgeEnd = Infinity;
   const bridge = new Set([CAPITAL_MODELS.talosBridge, ...Array.from({ length: IMPERIAL_SPAN ** 2 }, (_, s) => imperialPartId(CAPITAL_MODELS.talosBridge, s))]);   // TS5: carried in its parts
   for (const cap of CAPITALS) {
-    const W = (cap.plan ? cap.plan[0].length : cap.cells) * BLOCK_M, H = (cap.plan ? cap.plan.length : cap.cells) * BLOCK_M, water = new Set(cap.sea ?? []);   // PIN MOVED (IC-GRAND): the Imperial City's plan a law
-    // PIN MOVED (SOLITUDE-RELIEF): a capital on a relief of its own stands its whole pixel on it, its rim too - only the
+    const W = (cap.plan ? cap.plan[0].length : cap.cells) * BLOCK_M, H = (cap.plan ? cap.plan.length : cap.cells) * BLOCK_M, water = new Set(cap.sea ?? []);
     // relief's edge band is the land's (world/terrain/capitalRelief.js), and its models stand clear of that
     const relief = cap.relief ? CAPITAL_RELIEFS[cap.relief] : null, rim = relief ? (relief.band * relief.side) / 128 : CAPITAL_RIM_M;
     for (const id of cap.models) {
@@ -102,7 +100,6 @@ test('AUDIT TESA II C1: no landmark stands in the rim on a side of land - every 
       }
     }
   }
-  // PIN MOVED (TS5): on seven pixels the land past the round lake stands between its far shore and the rim - the bridge
   // comes down on it, its landing short of the rim (on TESA11's three the rim's inner edge was the far shore)
   const end = IMPERIAL_CELLS / 2 * BLOCK_M - IMPERIAL.lake - IMPERIAL.bridge.landing;
   assert.ok(Math.abs(bridgeEnd - end) < 1e-3 && bridgeEnd >= CAPITAL_RIM_M, `the bridge to its landing, short of the rim: ${bridgeEnd}`);
@@ -133,9 +130,7 @@ test('AUDIT TESA II C2: a shore capital stands at the sea\'s floor - every slice
     for (let s = 0; s < D.w * D.h; s++) {
       const px = 100 + (s % D.w), py = 100 + Math.floor(s / D.w), loc = synthesizeCapitalLocation({ cap, k, s }, { base, names, blockOf: () => fh, px, py });
       const f = loc.capital.flattenAt;
-      // PIN MOVED (RUMARE-WATER, world/terrain/capitalSea.js): and the seam with its sea slice water on both its sides
       const seaEdges = D.sea ? (s === 0 ? { N: false, E: false, S: true, W: false } : { N: true, E: false, S: false, W: false }) : null;
-      // PIN MOVED (SOLITUDE-RELIEF): and a capital on a relief of its own names it - its ground the relief's (world/terrain/capitalRelief.js)
       if (cap.shore) assert.deepEqual(f, { px: 100 + D.mx, py: 100 + D.my, sea: true, ...(seaEdges ? { seaEdges } : {}), ...(cap.relief ? { relief: cap.relief } : {}) }, `${cap.key} slice ${s}`);
       else assert.equal(f?.sea, undefined, `${cap.key}: inland, its own ground`);
     }
@@ -145,7 +140,6 @@ test('AUDIT TESA II C2: a shore capital stands at the sea\'s floor - every slice
   assert.equal(woods.load(syntheticWoodsBytes()), true);
   const job = (flattenAt) => generatePixelTerrain({ woods, px: 400, py: 200, tilemap: new Uint8Array(128 * 128), locationRect: { xMin: 11, xMax: 117, yMin: 11, yMax: 117 }, hasLocation: true, climateType: 0, flattenAt });
   const sea = job({ px: 400, py: 200, sea: true }), land = job({ px: 400, py: 200 });
-  // PIN MOVED (RUMARE-WATER): its land CAPITAL_FREEBOARD over the clamp - the carve's headroom and the hull's line past
   assert.equal(sea.avg, CAPITAL_LAND);
   assert.equal(CAPITAL_LAND, Math.fround((SCALED_OCEAN_ELEVATION + CAPITAL_FREEBOARD) / MAX_TERRAIN_HEIGHT));
   assert.notEqual(land.avg, sea.avg, 'a land of its own height');
@@ -236,12 +230,10 @@ test('AUDIT TESA II C5: the Imperial City\'s closed law asks its fixed points wo
   const I = IMPERIAL;
   const plain = (x, z) => {   // the law as it stood, every point worked at every call
     if (Math.hypot(x, z) < I.tower.plinthR + 1) return true;
-    // PIN MOVED (IC-GRAND's palace district): each tomb's podium in its own frame, turned to face Green Emperor Way
     for (let i = 0; i < I.tombs.n; i++) {
       const b = ((22.5 + i * (360 / I.tombs.n)) * Math.PI) / 180, [tx, tz] = polar(22.5 + i * (360 / I.tombs.n), I.tombs.r), f = (x - tx) * Math.sin(b) - (z - tz) * Math.cos(b), s = (x - tx) * Math.cos(b) + (z - tz) * Math.sin(b);
       if (Math.abs(f) < I.tombs.w / 2 + I.tombs.podium && Math.abs(s) < I.tombs.w / 2 + I.tombs.podium) return true;
     }
-    // PIN MOVED (IC-GRAND): the Colosseum's stands retired with it (Daggerfall's arena's block closes its own); the Elven
     // Gardens' pool closed
     const [qx, qz] = polar(I.pool.b, I.pool.r);
     if (Math.hypot(x - qx, z - qz) < I.pool.r0) return true;
@@ -290,7 +282,6 @@ test('AUDIT TESA II C7: every slice of a capital carries its own start markers o
   const fp = Object.fromEntries(CAPITALS.map((c) => [c.key, capitalFootprint(c)]));
   for (const cap of CAPITALS) {
     const D = capitalDims(cap);
-    // PIN MOVED (IC-GRAND): of six hundred and twenty-five slices one in seven asked (each slice's markers worked when its
     // carrier is first built) - the centre among them
     for (const [s] of [...capitalSliceCarriers(cap)].filter(([q]) => !cap.family || q % 7 === 0 || q === capitalCentre(cap))) {
       const markers = capitalSliceMarkers(cap, s);
@@ -299,11 +290,11 @@ test('AUDIT TESA II C7: every slice of a capital carries its own start markers o
       if (cap.family && imperialSliceName(s) === 'Lake Rumare') { assert.ok(markers.length === 0 || markers.length >= 2, `${cap.key} slice ${s}`); continue; }
       assert.ok(markers.length >= (s === capitalCentre(cap) ? 3 : 2), `${cap.key} slice ${s}`);
       for (const [dx, dz] of markers) {
-        const B = BLOCK_M, own = cap.family ? imperialOwnLaws(Math.floor(dz / B + IMPERIAL_CELLS / 2), Math.floor(dx / B + IMPERIAL_CELLS / 2)) : Object.values(cap.blocks)[0];   // PIN MOVED (IC-GRAND): its cell's own laws
+        const B = BLOCK_M, own = cap.family ? imperialOwnLaws(Math.floor(dz / B + IMPERIAL_CELLS / 2), Math.floor(dx / B + IMPERIAL_CELLS / 2)) : Object.values(cap.blocks)[0];
         assert.ok(own.tile(dx, dz) !== 0 && !own.closed(dx, dz) && !fp[cap.key](dx, dz), `${cap.key} slice ${s}: ${dx},${dz} on open ground`);
         assert.ok(!inCapitalRim(cap, ...planAt(cap, dx, dz)), `${cap.key} slice ${s}: ${dx},${dz} off the rim`);
         if (cap.key === 'imperial-city') {
-          const S = 8 * BLOCK_M, x0 = (s % IMPERIAL_SPAN) * S - IMPERIAL_CELLS / 2 * BLOCK_M, z0 = Math.floor(s / IMPERIAL_SPAN) * S - IMPERIAL_CELLS / 2 * BLOCK_M;   // PIN MOVED (TS5): seven pixels a side; PIN MOVED (IC-GRAND): twenty-five
+          const S = 8 * BLOCK_M, x0 = (s % IMPERIAL_SPAN) * S - IMPERIAL_CELLS / 2 * BLOCK_M, z0 = Math.floor(s / IMPERIAL_SPAN) * S - IMPERIAL_CELLS / 2 * BLOCK_M;
           assert.ok(dx >= x0 && dx < x0 + S && dz >= z0 && dz < z0 + S, `its own slice's: ${dx},${dz}`);
           assert.ok(imperialOpenAt(dx, dz), 'the city\'s open ground');
         }
@@ -369,7 +360,6 @@ test('AUDIT TESA II C14: a quad is mapped on one plane - no planar quad of any c
   const map = (n) => vanillaTexels({ ...wall, normals: new Float32Array(Array(6).fill(n).flat()) }).uvs;
   const toZ = map([s, 0, s + 1e-4]), toX = map([s + 1e-4, 0, s]);
   assert.deepEqual([toZ[4], toZ[5]], [toZ[8], toZ[9]], 'the shared corner one way');
-  // PIN MOVED (TS5): read from its first corner - each coordinate counts from a whole number of pictures nearest the model's middle
   assert.ok(Math.abs((toZ[2] - toZ[0]) * 1.6 - 3 * s) < 1e-4 && Math.abs((toX[2] - toX[0]) * 1.6 + 3 * s) < 1e-4, 'its normal\'s plane, never its rounding\'s');
 });
 
@@ -468,13 +458,11 @@ test('AUDIT TESA II C1/C2 with ARENA2: every capital meets the land round it lev
         if (own) inner = Math.max(inner, w); else outer = Math.max(outer, w);
         // DFU's rect on an outer side: its city's ground ends CAPITAL_RIM_TILES in
         const lim = { W: r.rect.xMin, E: 128 - r.rect.xMax, N: 128 - r.rect.yMax, S: r.rect.yMin }[side];
-        if (!own) assert.equal(lim, capitalRimTiles(cap), `${cap.key} ${p.x},${p.y}: its ${side} rect`);   // PIN MOVED (SOLITUDE-RELIEF): a relief's capital's its relief's band and a tile
+        if (!own) assert.equal(lim, capitalRimTiles(cap), `${cap.key} ${p.x},${p.y}: its ${side} rect`);
       }
     }
     assert.ok(outer < 0.01 && inner < 0.01, `${cap.key}: its seams ${outer.toFixed(3)} m to its neighbours, ${inner.toFixed(3)} m inside`);
     const flat = gen(pix[0].x, pix[0].y).avg * M;
-    // PIN MOVED (RUMARE-WATER): its land a freeboard over the sea's floor - and the Imperial City's, its canal standing
-    // PIN MOVED (SOLITUDE-RELIEF): a capital on a relief of its own at its streets' level over the sea (its water the sea's,
     // test/world/solitude_relief.test.js)
     if (cap.relief) assert.ok(Math.abs(flat - SCALED_OCEAN_ELEVATION * STREAMING_TERRAIN_SCALE - CAPITAL_RELIEFS[cap.relief].flat) < 0.01, `${cap.key} at ${flat.toFixed(2)} m, its streets' level`);
     else if (cap.shore || cap.harbour) assert.ok(Math.abs(flat - (SCALED_OCEAN_ELEVATION + CAPITAL_FREEBOARD) * STREAMING_TERRAIN_SCALE) < 0.01, `${cap.key} at ${flat.toFixed(2)} m, a freeboard over the sea's floor`);
@@ -506,7 +494,7 @@ test('AUDIT TESA II C10/R2 with ARENA2: a gate\'s lane is clear - no building of
   const { hash32 } = await import('../../src/world/spawnedDungeons.js');
   const names = tc.cityBlockNames(rows);
   const building = (cap, k, X, Z) => {   // a classic block's automap byte at a plan point (capitalBlockNames' law)
-    const cx = Math.floor(X / BLOCK_M), r = Math.floor(Z / BLOCK_M), cell = cap.cellAt ? cap.cellAt(r, cx) : cap.plan[r]?.[cx];   // PIN MOVED (IC-GRAND): the Imperial City's plan a law
+    const cx = Math.floor(X / BLOCK_M), r = Math.floor(Z / BLOCK_M), cell = cap.cellAt ? cap.cellAt(r, cx) : cap.plan[r]?.[cx];
     if (!cell || cell === 'L' || cell === 'G' || cell === 'O' || (cap.family ? !/^[A-Z]{4}$/.test(cell) : Object.hasOwn(cap.blocks, cell))) return 0;
     const list = [cell, 'RESI', 'GENR'].map((kd) => (cap.shore ? names : tc.dryKinds(names, (n) => blocks.getBlockByName(n))).get(kd)).find((l) => l?.length);
     const b = blocks.getBlockByName(list[hash32(tc.CAPITAL_SALT, k, cx, r) % list.length]), am = b.rmbBlock.fldHeader.autoMapData;

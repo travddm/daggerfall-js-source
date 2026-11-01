@@ -142,7 +142,7 @@ export const houseSellPrice = (meshRadius) => Math.trunc(housePrice(meshRadius) 
 /** MapFileReader.RegionCount - four BSA records per region, which is
  *  62 in the shipping MAPS.BSA. The accounts array is sized from the
  *  reader where one is in scope and from this where none is; a save
- *  restores its own length either way. WW-R (bible/03-World/World-Wide.md
+ *  restores its own length either way. WW-R (
  *  WW-R): and the provinces' past the Bay after the Bay's (formats/mapsTables.js
  *  REGION_NAMES) - a save's 62 padded on its restore (padRegionTable). */
 export const BANK_REGION_COUNT = REGION_NAMES.length;
@@ -190,7 +190,7 @@ export const ownsHouse = (houses, regionIndex) => regionDeeds(houses, regionInde
 /** The region's FIRST deed's key - its slot's own (HOUSES-3: a region holds three; regionDeeds names them all). */
 export const ownedHouseKey = (houses, regionIndex) => houses?.[regionIndex]?.buildingKey ?? 0;
 /**
- * HOUSES-3 (2026-10-27, the owner: "Up the house ownership limit to 3 houses per region"): A REGION HOLDS THREE HOUSES.
+ * HOUSES-3: A REGION HOLDS THREE HOUSES.
  * DaggerfallBankManager keeps one house a region (OwnsHouse :136, BuyHouseButton's ALREADY_OWN_HOUSE :417-436); the
  * port keeps HOUSES_PER_REGION, the online homes' own cap (net/homeLaw.js HOME_CAP: a character's homes in a region). The
  * region's slot stays its first deed, so a save keeps its shape: the others stand beside it in the slot's `more`, each a
@@ -250,7 +250,7 @@ export function dropDeed(houses, regionIndex, deed) {
  * and DFU's (region, key) law owned them all with one deed. Asked in a town (`mapId`, its map id) that is a capital's,
  * the deed stands there only if it was bought there (its slot's `mapId`, allocateHouseToPlayer's); anywhere else - and
  * asked with no town - DFU's law, the region's one house by its key. A departure (Port-Ledger A, IC-GRAND).
- * BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" item 32): AND EVERY PLACE THE PORT MADE. A
+ * BAY-LEFT-B: AND EVERY PLACE THE PORT MADE. A
  * province past the Bay is one region (WW-R) over a hundred towns - the Arena towns, the countryside's, the capitals -
  * many of them clones of one Bay town, their keys the same keys: by DFU's law one deed owned a building of its key in
  * every one of them, so no house was sold past the Bay at all. A town the port made (world/placeIds.js isMadePlaceId - its
@@ -540,8 +540,7 @@ const mustValidate = (accounts, regionIndex) => {
 };
 
 // ── EMPIRE-ACCOUNT: online, every branch keeps one account ──────────
-/** EMPIRE-ACCOUNT (2026-10-01, the field - maya: "i deposited alot of letters of credit in a random bank somewhere but
- *  theyre gone in the daggerfall bank"; Mac chose "2": online, merge every region into one Empire-wide account):
+/** EMPIRE-ACCOUNT:
  *  ONLINE, EVERY BRANCH KEEPS ONE ACCOUNT, the Empire's, held at Daggerfall's index (EMPIRE-BANK: the bank of Daggerfall
  *  became the bank of the Empire). Gold paid in at any branch is drawn at any branch, and every deed, sale and wallet
  *  pays from it and into it. A LOAN STILL STANDS WHERE IT WAS TAKEN - its due date, its default and the reputation a
@@ -648,8 +647,7 @@ export const calculateBankLoanRepayment = (amount) => Math.trunc(amount + amount
 
 // ── RESTORE: what came through customs is never bought back online ──
 
-/** RESTORE (2026-09-29, Mac: "I want people to get their stuff back", and of what customs does with a house, a ship and
- *  their pieces: "Keep all, can't sell"): CUSTOMS KEEPS EVERY DEED AND MARKS IT - a house's slot `crossed`, the ship's
+/** RESTORE: CUSTOMS KEEPS EVERY DEED AND MARKS IT - a house's slot `crossed`, the ship's
  *  `shipCrossed` (systems/realmCustoms.js crossDeeds) - and, online, the bank of the Empire buys none of them back, so a
  *  deed carries no gold into the realm past the allowance and customs has no reason to take one. (AUDIT REALM2 T3 took
  *  them off the copy instead - a house and every piece in its room, for an excess the purse could often pay.) A house
@@ -669,8 +667,7 @@ export function crossedDeedLines(kind, { houses = null, regionIndex = 0, player 
 }
 
 // ── REALM P0.3: online, the Empire is one lender ───────────────────
-/** REALM P0.3 (2026-09-28, Mac: "I want to make sure players cant take an offline character and bring in massive
- *  resources"; bible/06-Systems/Realm-Arc.md "The Empire is one lender"). Daggerfall lends region by region: sixty-two
+/** REALM P0.3. Daggerfall lends region by region: sixty-two
  *  lenders, each blind to the rest, and a default costs one region's reputation. ONLINE THE EMPIRE IS ONE LENDER:
  *  one loan a character, wherever it stands; a default anywhere shuts every branch, and the Empire then takes from
  *  every account and every deposit; a character joining with more debt than the Empire would lend has the rest
@@ -756,8 +753,7 @@ export function callInEmpireDebt(accounts, player, { cap = 0, nowMinutes = 0, on
 }
 
 /**
- * LOAN-AMNESTY (2026-09-29, Mac: "Can we reset the loans for everyone online. The bank of the empire has decided to
- * forgive everyone's loans"): THE EMPIRE FORGIVES EVERY LOAN ONCE. A save's `loanAmnesty` says which amnesty it has had;
+ * LOAN-AMNESTY: THE EMPIRE FORGIVES EVERY LOAN ONCE. A save's `loanAmnesty` says which amnesty it has had;
  * one older than LOAN_AMNESTY has every loan struck off - the debt, its due date and the mark of a default, so the
  * Empire lends again and nothing is garnished - and is marked with it. The gold borrowed stays where it is; what was
  * already repaid, garnished or drawn stays paid; the reputation a default cost stays lost (it recovers as reputation

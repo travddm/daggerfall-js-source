@@ -1,6 +1,6 @@
 // @ts-check
 // FB1013d REMAINS-STAND (FIELD BUGS 2026-10-13d, TheHalfinStream: "Died of fatigue in wayrest palace, character aged
-// past limit and remains did not appear"; bible/06-Systems/Legacy-Arc.md section 7): THE REMAINS ARE SEEN WHERE THEY LIE.
+// past limit and remains did not appear"): THE REMAINS ARE SEEN WHERE THEY LIE.
 //
 // AUDIT LEGACY H1 made the remains a list the RECORD owns - a world pile laid again at every visit handed the heirloom
 // out twice - and the pile's picture went with it: nothing stood where the fallen fell. The list opened by itself within

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GRAHT1 (bible/03-World/Graht-Oaks.md): THE GRAHT-OAK'S PICTURES, PAINTED - the port's own, every texel a function of
+// GRAHT1: THE GRAHT-OAK'S PICTURES, PAINTED - the port's own, every texel a function of
 // its seed (no file, nobody's picture, nothing of the player's data): its BARK (deep vertical furrows, grey-brown, moss
 // in the cracks), its LEAVES (the crown's masses - a mottle of greens, low in contrast so a far crown never sparkles)
 // and its CARDS (one picture, two halves: a spray of leaves on twigs, cut by its alpha, and a liana hung with leaves).

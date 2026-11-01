@@ -1,9 +1,8 @@
-// JUNGLE-WOODS (2026-10-19, the owner: "The forest region we recently implemented should be a large tree gathering spot.
-// Moreso than other places within daggerfall"): a map pixel of the Jungle of Bantha - the owner's area
+// JUNGLE-WOODS: a map pixel of the Jungle of Bantha - the owner's area
 // (world/jungle/banthaArea.js) - stands JUNGLE_TREE_SLOTS trees a day, four times the richest woods' anywhere else, and
 // every one of them stands: a slot whose wood waits on the witnesses (an unconfirmed Rainforest's Teak and Mahogany)
 // stands Pine there, where elsewhere it stands nothing. The law is the area's, never the switch's - the service
-// recomputes every tree from it. bible/06-Systems/Professions-Arc.md (JUNGLE-WOODS), bible/03-World/Bantha-Jungle.md.
+// recomputes every tree from it. (JUNGLE-WOODS),.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

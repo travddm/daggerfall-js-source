@@ -1,9 +1,9 @@
-// PROF2 (2026-09-28, Mac: "Go") - MINING'S CLIENT: the Pick-Axe's act (the strikes, the glint that counts double and
+// PROF2 - MINING'S CLIENT: the Pick-Axe's act (the strikes, the glint that counts double and
 // moves, the clean finish, Gentle acts), where a node stands (a rock field's piece, else a stone tile, else nature's
 // ground; a boulder a piece itself), the plan the prompt says, the one gathering host every profession is a kind in,
 // the new materials as items (DFU's own metals and gems, the registered ores, ingots and stone on DFU's dyed pictures),
 // the forge's arithmetic - and the done-when, driven through the real Worker: VEINS PLACED ON ROCK FIELDS; SIGNATURES BY
-// KINGDOM. Then the hosts' wiring. bible/06-Systems/Professions-Arc.md 23.
+// KINGDOM. Then the hosts' wiring. 23.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -189,7 +189,6 @@ test('PROF2 plan: what E does at a vein or a boulder, and what it needs - worked
   assert.equal(minePlan({ ...base, storesFull: () => true }).rest, 'Stores full - Lodestone');
   assert.deepEqual([minePlan({ ...base, taken: true }).verb, minePlan({ ...base, taken: true }).ready], ['Lodestone - worked today', false]);
   assert.equal(minePlan({ ...base, counting: true }).rest, 'being counted');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): sixty today was no ready plan
   assert.equal(minePlan({ ...base, today: 600, cap: 60 }).ready, true, 'a day past the old sixty: ready');
   const b = minePlan({ ...base, node: { what: 'boulder', tier: 1, material: 'stone:rough' } });
   assert.deepEqual([b.harvest, b.verb], ['stone', 'Quarry the stone']);
@@ -197,7 +196,7 @@ test('PROF2 plan: what E does at a vein or a boulder, and what it needs - worked
   assert.deepEqual([pickHandFrame(1).frame, pickHandFrame(0.5).frame, pickHandFrame(0.01).frame], [0, 2, 4], 'StrikeDown\'s frames over the swing');
   assert.deepEqual({ ...PICK_HAND }, { group: 'Weapons', templateIndex: 126, material: 0 });
   assert.equal(templateByIndex(126).name, 'Warhammer', 'the Pick-Axe in the hand is DFU\'s Warhammer (PROF0 5.1)');
-  assert.equal(PROSPECT_M, 500);   // PIN MOVED (MINE-PERKS, Professions-Arc 43): 200 beside everyone's 150 was "only a 50m difference"
+  assert.equal(PROSPECT_M, 500);
 });
 
 // ─── THE ONE HOST ────────────────────────────────────────────────────
@@ -358,7 +357,7 @@ test('PROF2 forge: what the Stores can smelt of a recipe - every input\'s units 
   // DAEDRIC-SMELT: and over the pack's embers where the work spends any - unknown (no pack in the book), its inputs alone
   const daedric = smeltRecipe('ingot:daedric'), all = () => 1000;
   assert.deepEqual([smeltable(daedric, all, 3), smeltable(daedric, all, 0), smeltable(daedric, all, null), smeltable(smeltRecipe('ingot:iron'), all, 0)], [3, 0, 100, 100]);
-  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);   // PIN MOVED (DECOR-USE): the cooking station   // PROF4: the workbench, a fifth; PROF7: the loom, a sixth; PIN MOVED (PROF11): the mason's bench, a seventh; PIN MOVED (PROF10): the jeweller's bench, an eighth; PIN MOVED (HOME-VENDOR): the hired trader, a ninth
+  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);
   assert.deepEqual([DECOR_STATION_FEES.forge, DECOR_STATION_NAMES.forge], [50_000, 'Forge']);
 });
 

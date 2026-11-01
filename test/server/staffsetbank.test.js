@@ -1,5 +1,4 @@
-// STAFF-SET-BANK (2026-10-23, mob: "we need a set bank setting"; asked before, "how to i adjust a lpayers bank?", and
-// nothing could) - THE STAFF PANEL SETS A REALM CHARACTER'S BANK: /v1/staff/fix/bank { id, ticket, was, gold, note }, an
+// STAFF-SET-BANK - THE STAFF PANEL SETS A REALM CHARACTER'S BANK: /v1/staff/fix/bank { id, ticket, was, gold, note }, an
 // Admin's (server-account/src/staffRealm.js), the review's `bank` act (review.js bankAct, the repair's and the mend's
 // machinery - staffMend) over its law (net/repairLaw.js bankSetOf, applyBankSet, bankTotalOf).
 //
@@ -144,7 +143,7 @@ test('STAFF-SET-BANK THE SET ON A SAVE: the total the profile says (one sum), st
   assert.equal(bankTotalOf(save), 9_000);
   assert.equal(saveViewOf(save).banks, 9_000, 'the profile says the bank set');
   assert.equal(foldEmpireAccounts(save), null, 'the boot\'s fold finds nothing to move');
-  // REVIEW (2026-10-23): a bank past every safe integer - or summed past every number - is said at the bound, a total the
+  // REVIEW: a bank past every safe integer - or summed past every number - is said at the bound, a total the
   // profile can send (JSON has no Infinity) and the act's row can hold, and a set from it lands
   for (const [why, g, total] of [['past every safe integer', [1e16], Number.MAX_SAFE_INTEGER], ['summed past every number', [1e308, 1e308], Number.MAX_SAFE_INTEGER],
     ['below every safe integer', [-1e308, -1e308], -Number.MAX_SAFE_INTEGER], ['a fraction', [5_000.5], 5_000.5]]) {
@@ -282,7 +281,7 @@ test('STAFF-SET-BANK ONCE A TICKET: the same ticket again is the set it was - an
   assert.deepEqual(recordOf(s.env, c.id), once.rec);
   assert.deepEqual(s.faucet(), once.faucet);
   assert.deepEqual([s.repairs(c.id).length, s.findings(c.id).filter((f) => f.kind === 'staff').length], [1, 1]);
-  // REVIEW (2026-10-23): the repeat's audit row says it was one, with what the ticket's row holds - never the body asked again
+  // REVIEW: the repeat's audit row says it was one, with what the ticket's row holds - never the body asked again
   assert.deepEqual(s.audits('fix-bank').map((a) => [a.outcome, a.detail.note, a.detail.was, a.detail.gold, a.detail.repeat]), [['ok', NOTE, 5_700, 6_000, false], ['ok', 'asked twice', 5_700, 6_000, true]]);
   // the bank set's ticket, asked as a mend and as a repair
   assert.deepEqual(await s.admin('/v1/staff/fix/mend', { id: c.id, ticket: TICKET, was: -500, gold: 500, note: NOTE }), { status: 409, body: { error: 'repair-ticket' } });

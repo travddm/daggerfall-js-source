@@ -1,4 +1,4 @@
-// RAID2 (2026-09-27, Mac on World Events - Raiding Parties online: "1. Server 2. Keep 3. ... 4. 4 5. Yes"): THE RAIDS
+// RAID2: THE RAIDS
 // ON THE ONLINE WORLD. One player in a raided town runs the raid (the first to claim it keeps it - WOD7's law; with no
 // claim, the smallest id in the town claims), its raiders ride its cell stream tagged with the raid (`rz`) and stand at
 // every reader under an allowance of their own, its defenders ride named as its allies (`al`) and stand as a reader's

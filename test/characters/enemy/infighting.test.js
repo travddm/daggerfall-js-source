@@ -1,5 +1,4 @@
-// IF1 - THE INFIGHTING AUDIT (2026-08-29, Mac: "I noticed in the
-// dungeon, that enemies don't attack each other").
+// IF1 - THE INFIGHTING AUDIT.
 //
 // The audit found the machinery COMPLETE at every layer that can be
 // measured off the tree, and these pins are that audit made permanent -

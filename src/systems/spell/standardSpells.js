@@ -1,4 +1,4 @@
-// DEX4a (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 8) - THE STANDARD SPELLS AS DFU BUILDS THEM:
+// DEX4a - THE STANDARD SPELLS AS DFU BUILDS THEM:
 // EntityEffectBroker.RebuildClassicSpellsDict (EntityEffectBroker.cs:736-756) reads SPELLS.STD, merges every enabled
 // mod's `SpellRecords.json` into that list (TextAssetReader.Merge, AssetInjection/TextAssetReader.cs:132-181, matched
 // by index), and folds it first-wins. The port read SPELLS.STD and folded it, in two places (the hosts' magic

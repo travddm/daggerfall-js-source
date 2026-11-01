@@ -1,6 +1,5 @@
-// GUIDE1 (2026-09-29, Mac: "How can we set the foundation and improve the quest system substantially? Like really
-// modernize it, make it more accessible") - THE QUEST LENS, the Quest Guide arc's foundation (ui/quest/questLens.js,
-// bible/06-Systems/Quest-Guide-Arc.md). Its three laws, each over the real producers:
+// GUIDE1 - THE QUEST LENS, the Quest Guide arc's foundation (ui/quest/questLens.js,
+// ). Its three laws, each over the real producers:
 //
 //   THE MACHINE NEVER KNOWS - the quiet read over every message of the vendored corpus leaves the quest's latches,
 //     the DFRandom seed, the quest's rolls, the talk topics and the quest's save data where they were, and prints what
@@ -271,7 +270,6 @@ test('GUIDE1 THE MACHINE NEVER KNOWS - every one of the 3,817 messages of the 26
   assert.equal(messages, 3817);
   // Read from a quest that has not run, every message reaching %di before any Place is referenced threw - DFU's own NRE
   // (LastPlaceReferenced.Scope before the null check) - fifteen of them, the Daedra summonings' offers among them.
-  // PIN MOVED (QUEST-AUDIT III DI-UNREF): nothing referenced answers "...never mind...", and every message reads.
   assert.deepEqual(unread, []);
   // What the journal's own read moves, from the same states - the
   // quiet read moved none of it. logId was the fifteen (a throwing expansion left the id latched); none throws now, and

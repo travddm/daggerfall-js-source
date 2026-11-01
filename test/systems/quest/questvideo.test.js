@@ -1,4 +1,4 @@
-// QV1 - THE QUEST VIDEO DOOR (2026-08-28). PlayVideo's parse law was
+// QV1 - THE QUEST VIDEO DOOR. PlayVideo's parse law was
 // pinned at Q2b (questactions.test.js) and the machine's playVideo
 // hook has carried the name since Q4-v - into a console.warn saying
 // the seam "pends". TEN corpus quests write `play video N` (the

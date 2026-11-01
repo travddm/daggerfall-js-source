@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-F (2026-09-27): COME SAIL AWAY'S WAVES - ComeSailAway.cs's
+// CSA-F: COME SAIL AWAY'S WAVES - ComeSailAway.cs's
 // UpdateWaveMesh (2145-3477, its body from 2797), InitializeWaveTextures
 // (1811-1819), the wave object Start builds (1030-1037) and the material it
 // wears (the bundle's CurrentMaterial.mat, Models/materials.json), as data
@@ -88,7 +88,7 @@ export const BAYER_8X8 = Object.freeze([
 ]);
 
 /**
- * FIELD BUGS 2026-09-29 (the sea) #4 (the Discord, through Mac: "Water flickers from a distance"): THE FRAMES FROM
+ * FIELD BUGS 2026-09-29 (the sea) #4 (the Discord, through): THE FRAMES FROM
  * AFAR. The mod's 32 frames ship as one level each, point-filtered (the bundle's Texture2Ds: m_MipCount 1,
  * m_FilterMode 0 - vendor/come-sail-away/Textures/textures.json), and a frame is tiled ten times over a strip hundreds
  * of metres long: from a few hundred metres off a screen pixel covers dozens of its texels and picks one, a different

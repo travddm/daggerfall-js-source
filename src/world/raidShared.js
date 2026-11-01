@@ -1,5 +1,5 @@
 // @ts-check
-// RAID2 (2026-09-27, Mac, on World Events - Raiding Parties online: "1. Server 2. Keep ..."): A TOWN'S RAID,
+// RAID2: A TOWN'S RAID,
 // SHARED. The day's raids were already the same on every client (RAID1 rolls them off the day's own generator), but
 // each client would have stood its own raiders, so RAID1 stood down online. Now ONE player runs a raid - WOD7's law
 // for a marker two players sprang: the first to claim it keeps it, two claims inside RAID_CLAIM_WINDOW_MS go to the
@@ -19,7 +19,7 @@ import { STAFF_EVENT_KEY_RE, STAFF_BOSS_SIZE_MIN, STAFF_BOSS_SIZE_MAX } from '..
 /** A raid's key, or a staff event's (net/staffEvent/staffEventLaw.js - it runs as a raid: its raiders tagged, its words
  *  said, its runner elected by the raid's own law). @param {unknown} key */
 const raidLikeKey = (key) => typeof key === 'string' && (RAID_KEY_RE.test(key) || STAFF_EVENT_KEY_RE.test(key));
-/** WW6 (bible/03-World/World-Wide.md WW6): IS A RAID THIS TOWN'S - the town the host's GPS names (FindCurrentRaid's
+/** WW6 (WW6): IS A RAID THIS TOWN'S - the town the host's GPS names (FindCurrentRaid's
  *  `{ regionIndex, locationIndex }`, the location the player stands outdoors in): on the Bay its region and its MAPS.BSA
  *  location, as RAID1 asked; past the Bay its town's own location index alone - a place of the port's own, one index a
  *  place of the world (world/arenaLocations.js, world/tamrielCapitals.js), whose stood record's region is its pixel's as
@@ -66,7 +66,7 @@ export function validRaidWords(raw) {
   return out;
 }
 
-/** RAID5 (bible/03-World/Raiding-Parties.md RAID5): the kinds a raid's objective word names (systems/raidKinds.js
+/** RAID5 (RAID5): the kinds a raid's objective word names (systems/raidKinds.js
  *  RAID_KIND_ORDER - classic 0 says none), and the most either of its two numbers says (a standard's per cent; refugees). */
 export const RAID_OBJ_KINDS = 4;
 export const RAID_OBJ_MAX = 100;

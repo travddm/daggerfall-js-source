@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE WORDS BETWEEN THE BATCHES, IN THE PLAYER'S LANGUAGE. The five part-2 batches each routed the
+// L10N3d: THE WORDS BETWEEN THE BATCHES, IN THE PLAYER'S LANGUAGE. The five part-2 batches each routed the
 // words of their own DFU windows; the lines a batch found in another's file - or in no one's - were routed after the
 // merge, and are pinned here through the port's own functions: the exhausted swimmer's line and the sick body's alert
 // (their readers beside their constants), the over-encumbered swimmer's latch, the weapon hand's switch line (said by the

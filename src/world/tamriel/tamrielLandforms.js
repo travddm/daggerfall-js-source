@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BREATHTAKER3 (2026-10-26, bible/03-World/Tamriel.md BREATHTAKER; KPbICA's spec, forwarded by the owner: "Make small
-// landscapes that can't be seen on a Tamriel's heightmap more diverse. Now it's just a very monotonous noise.") - THE
+// BREATHTAKER3 - THE
 // LAND PAST THE BAY BELOW THE HEIGHTMAP'S OWN GRAIN.
 //
 // The heightmap (TAMRIEL-RELIEF) says how high the land stands to about 6 km; under that the land past the Bay wore the

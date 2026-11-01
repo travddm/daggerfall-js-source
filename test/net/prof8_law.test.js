@@ -1,8 +1,8 @@
-// PROF8 (2026-09-30, Mac: "Continue the arc"; "XP follows your rank") - FISHING'S LAW: a haul's key in its one spelling;
+// PROF8 - FISHING'S LAW: a haul's key in its one spelling;
 // its fish in PROF0 6's order (the roll, a full net's x1.5, a march, a school's fish - a Netter's two - and a
 // Slaughterfish's weight); its finds (the sea's Pearl and Slaughterfish only at sea on confirmed ground, each spec's
 // multiplier; a trophy anywhere); the rank's own tier for its XP; the act's numbers (Appendix B); the day's two schools;
-// the Pearl a Stores material. bible/06-Systems/Professions-Arc.md 5.2, 6, 30.
+// the Pearl a Stores material. 5.2, 6, 30.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ test('PROF8 law: a haul\'s key - `haul:<x>:<y>:<day>:<id>`, twelve hex digits; r
   assert.equal(k, 'haul:412:188:20724:0123456789ab');
   assert.deepEqual(parseNodeKey(k), { kind: 'haul', x: 412, y: 188, day: 20724, id: '0123456789ab' });
   for (const bad of ['haul:0412:188:20724:0123456789ab', 'haul:412:188:020724:0123456789ab', 'haul:412:188:20724:0123456789AB', 'haul:412:188:20724:0123456789a',
-    'haul:8192:188:20724:0123456789ab', 'haul:412:8192:20724:0123456789ab', 'haul:412:188:20724', 'haul:-8192:188:20724:0123456789ab']) {   // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): on the world's grid - a province's sea past the Bay's map is ground
+    'haul:8192:188:20724:0123456789ab', 'haul:412:8192:20724:0123456789ab', 'haul:412:188:20724', 'haul:-8192:188:20724:0123456789ab']) {
     assert.equal(parseNodeKey(bad), null, bad);
   }
 });

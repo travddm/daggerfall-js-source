@@ -1,6 +1,4 @@
-// PCORPSE1 (2026-09-23, Discord: "add dead corpses to players that died against mobs, based on the class they play -
-// right now they just disappear. The corpse should stay for 1 minute ... and give it the player's death sound
-// depending on whether it's a woman or a man").
+// PCORPSE1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { RemotePlayers, corpseTextureFor, peerDeathSound, CORPSE_MS } from '../../src/net/remotePlayers.js';

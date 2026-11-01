@@ -1,6 +1,5 @@
 // @ts-check
-// SET7 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 7; Mac: "Sigil stones become a currency to
-// trade for daily reset sigil items at a new NPC vendor that stands outside the oblivion gate"): THE BROKER'S WINDOW.
+// SET7: THE BROKER'S WINDOW.
 //
 // The day's six offers (systems/sigil/sigilBroker.js brokerStock), each a row: the piece's picture in its tier's frame with its
 // set's rune (the pack's own markItemFrame), its name in its tier's colour, its set and tier, its price in Sigil Stones,
@@ -56,8 +55,7 @@ export const purseText = (have, locked = 0) => (locked > 0 ? `${stonesText(have)
 export const BROKER_SOLD = (name, price) => `Bought: ${name}, for ${stonesText(price)}.`;   // AUDIT SET U6: no article of its own - a Legendary's name brings one ("The Warden"), a Regalia piece's is a possessive
 /** How often the window re-reads the world while it stands: the turn's clock, and a stone won or dropped meanwhile. */
 export const BROKER_REPAINT_MS = 30_000;
-/** WB9g (2026-09-30, Mac: "Add a brand new title to the broker and a new addition (the aura) ... These items should be
- *  expensive and sought after"): THE INSIGNIA'S WORDS - its heading, each piece's line, and its card. */
+/** WB9g: THE INSIGNIA'S WORDS - its heading, each piece's line, and its card. */
 export const INSIGNIA_HEAD = 'Insignia';
 export const INSIGNIA_SUB = 'Account-wide. Bought once.';   // WB13b: each line says one thing
 export const INSIGNIA_LINE = Object.freeze({
@@ -85,7 +83,7 @@ export function buyLabel(s) {
   return 'Gone';
 }
 
-/** MENU-ORDER (bible/10-UI/Menu-Order.md; bible/10-UI/Plain-Words.md law 5, A FINGER HAS NO HOVER): A REFUSED PRESS SAYS
+/** MENU-ORDER (; law 5, A FINGER HAS NO HOVER): A REFUSED PRESS SAYS
  *  WHY WHEN PRESSED. Never `disabled` - a disabled button takes no tap, and its whole reason stood in the hover (`title`)
  *  alone, which a finger never sees. It reads refused (`aria-disabled`, BROKER_CSS's grey), keeps the title for the
  *  pointer, and a press of it hands the reason to `tell` - the window's note line - and does nothing else: it replaces

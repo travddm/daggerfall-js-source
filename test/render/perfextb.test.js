@@ -1,13 +1,10 @@
-// PERF-EXT (2026-09-25, two players via Mac: "fps issues in the exterior
-// but fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600"; Mac: "I am not getting another player to do the work that youre
-// suppose to do"). The flats and the frame's CPU - the pass the hunters
+// PERF-EXT. The flats and the frame's CPU - the pass the hunters
 // measured on the synthetic town and the provers measured again. Each slice
 // here is a cost the frame paid in JavaScript or in GL calls for a value
 // that could not change, and each pin is on the thing that made it cheaper:
 // one shape, one upload, no object, one block - never on a clock (a timing
 // assertion on a shared runner is what broke this repo's deploy, STREAM1).
-// The record is `bible/07-Rendering/Performance-Exterior.md`.
+// The record is ` `.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -196,7 +193,6 @@ test('PERF-EXT10 (the review): the shadow record writes every batch\'s fractiona
  *  drawElements under a billboard program - the main pass's (classic or the lane's) or the shadow replay's - the held
  *  uSize and uOrigin must be the drawn batch's own. Returns how many draws it checked. */
 function assertEveryFlatDrawSeesItsOwn(calls, programs, batches) {
-  // PIN MOVED (PERF-ARENA): a still batch draws a RANGE of its arena's indices - the draw is named by the VAO and the
   // offset together (many batches share one VAO now)
   const byVao = new Map();
   for (const b of batches) { if (!byVao.has(b.vao)) byVao.set(b.vao, new Map()); byVao.get(b.vao).set(b._ibOff | 0, b); }
@@ -423,13 +419,13 @@ test('PERF-EXT13: every visible pixel\'s water in ONE call - ten water pixels th
     r.drawWaterSurfaces(rows, rows.length, 6.4, wu);
     const n = (k) => H.byName[k] ?? 0;
     for (const u of ['uView', 'uProj']) assert.equal(n(`uniformMatrix4fv:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);
-    for (const u of ['uTime', 'uLift', 'uSunScale', 'uSwell']) assert.equal(n(`uniform1f:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);   // PIN MOVED (WATER-NEXT 2): the one opacity is gone, the swell is the frame's
+    for (const u of ['uTime', 'uLift', 'uSunScale', 'uSwell']) assert.equal(n(`uniform1f:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);
     assert.equal(n('polygonOffset'), 1, 'the offset once');
     assert.equal(n('uniformMatrix4fv:uModel'), 10, 'a matrix a pixel');
     assert.equal(H.draws.length, 10, 'a draw a pixel');
     assert.equal(n('bindTexture:1000/TEXTURE_2D_ARRAY'), 6, 'the ground array on unit 0 once a run of one climate (none, A A, B B B, A A, B, A)');
     assert.equal(n('bindTexture:1002/TEXTURE_2D'), 10, 'a tilemap a pixel, on unit 2');
-    assert.ok(H.count() <= 152, `${lane ? 'lane' : 'classic'}: ${H.count()} GL calls for ten water pixels`);   // PIN MOVED (OW-HORIZON, 2026-10-20): +1 the cloud deck's far law (uCloudShadowFar), once a frame with the map; (COAST-LOOK) +1 the sheet's switch (uGroundEdge), once a list
+    assert.ok(H.count() <= 152, `${lane ? 'lane' : 'classic'}: ${H.count()} GL calls for ten water pixels`);
     H.reset();
     r.drawWaterSurfaces(rows, 0, 6.4, wu);
     assert.equal(H.count(), 0, 'no water in sight: not one GL call, as when no pixel called');

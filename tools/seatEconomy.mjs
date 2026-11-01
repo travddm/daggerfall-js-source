@@ -1,4 +1,4 @@
-// SEAT1d (2026-10-01, Mac: "Finish the seats"; "Continue") - THE ECONOMY MODEL, AS A TOOL (bible/06-Systems/
+// SEAT1d - THE ECONOMY MODEL, AS A TOOL (bible/06-Systems/
 // Professions-Arc.md Appendix C: "SEAT1d ships the model as a tool reading townSeatLaw.js and professionLaw.js
 // directly, so every later balance pass is re-run, not re-guessed"; Seats-Arc 13: "the model re-runs Appendix C's
 // table").

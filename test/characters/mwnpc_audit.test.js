@@ -1,5 +1,4 @@
-// AUDIT MW-NPC (2026-10-10, Mac: "Do a deep audit and ensure perfection" - bible/04-Characters/Morrowind-NPCs.md
-// section 21): the findings of four cold lanes over the arc at 1fd44c83ad, each pinned where the code that fixes it
+// AUDIT MW-NPC: the findings of four cold lanes over the arc at 1fd44c83ad, each pinned where the code that fixes it
 // lives - the GPU skin and the body service, the lanes and the frame budget, the populations and their hosts, the
 // creatures and the special foes.
 import { test } from 'node:test';
@@ -233,7 +232,6 @@ test('AUDIT MW-NPC D2: a Daedra Seducer in her mortal guise keeps her sprite - t
   assert.equal(creatureLook(her), null, 'in her guise: no body');
   assert.equal(isBodyFoe(her), false);
   her.mobile.specialTransformationCompleted = true;
-  // PIN MOVED (AUDIT MW-NPC II K5): transformed she flies - her look asks a record that flies (mwnpc_audit2.test.js K5)
   assert.deepEqual(creatureLook(her), { creature: ['winged twilight'], flies: true });
   assert.equal(isBodyFoe(her), true);
   assert.deepEqual(creatureLook({ mobileType: M.DaedraSeducer }), { creature: ['winged twilight'], flies: true });
@@ -306,7 +304,6 @@ test('AUDIT MW-NPC C4: a living resident walking the street is ONE person - thei
 });
 
 test('AUDIT MW-NPC C5: a watchman\'s look follows his number on the wire once he rides - the look a peer\'s puppet of him wears; a foe of the encounter pool is its number from its spawn, its owner\'s and its puppets\' alike', () => {
-  // PIN MOVED (AUDIT MW-NPC II K3/K4): one man on both machines by the OWNER'S WORD - the seed is minted once at his own
   // foe and rides the record (`ls`), a person's kit with it (`lw`); a copy stood off a record (`_mwWire`) takes them
   const man = (id, seq) => ({ id, seq, mobileType: GUARD_MOBILE_TYPE, gender: 'male', entity: { isClass: true, items: [] }, ai: { feet: [0, 0, 0], yaw: 0 } });
   const mine = man(3, null);

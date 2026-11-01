@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT7 (2026-10-01) — CHAMPION FOES.
+// LOOT7 — CHAMPION FOES.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 9; Mac: "Do you
-// wanna turn this into an arc and do all of the above?" - "Champion foes.
+// The Loot arc (; - "Champion foes.
 // Single named foes with visible traits (Fiery, Swift, Vampiric) and a
 // guaranteed Rare"). About one foe in fourteen of level 3 or more stands as
 // a CHAMPION with one TRAIT: twice its health and its blows a quarter
@@ -38,8 +37,7 @@ import { enemyDisplayName } from '../characters/enemy/enemyBasics.js';   // LOOT
 import { popupMessage } from './notify.js';   // LOOT7-CHECK CHAMP-SAID: DaggerfallUI.PopupMessage, the live host's line
 import { markUnquiet } from './revenant/unquietMark.js';   // UNQUIET (Revenants.md section 46): one champion in four carries the mark - its own, never a puppet's
 
-/** Per mille of the foes that may be one that stand as a champion (CHAMP-RATE, 2026-10-03, Mac: "buff champion rates
- *  slightly": 70, was 50 - about one in fourteen, was one in twenty). */
+/** Per mille of the foes that may be one that stand as a champion (CHAMP-RATE, 2026-10-03,: 70, was 50 - about one in fourteen, was one in twenty). */
 export const CHAMPION_PER_MILLE = 70;
 /** A champion is a foe of this level or more. */
 export const CHAMPION_MIN_LEVEL = 3;
@@ -108,7 +106,7 @@ export function rollStreetChampion(feet = null, mobileType = 0) {
 export function _resetStreetChampionsForTests() { _streetN = 0; }
 
 /** The trait a champion's mark stands as on this entity, or null - applyChampion's gate: no trait, a foe under
- *  CHAMPION_MIN_LEVEL, the city watch, an ally, or the switch off. CHAMP-BASE (bible/01-Overview/bugs/Field-Bugs-2026-10-25b.md):
+ *  CHAMPION_MIN_LEVEL, the city watch, an ally, or the switch off. CHAMP-BASE:
  *  a class foe stands at its builder's level, so a room's shared base asks it again at the room's
  *  (scenes/roomLootHost.js roomBodyBase). */
 export function championTraitFor(entity, traitIndex) {

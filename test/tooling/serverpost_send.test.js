@@ -1,4 +1,4 @@
-// SERVER-POST (2026-10-08, Mac: "... First use is to utilize it for players being granted items.") and HOURS-FIRST
+// SERVER-POST and HOURS-FIRST
 // ("... and each the gilded gun"): THE POST, SENT BY THE OPERATOR - tools/sendServerPost.mjs writes the statements,
 // .github/workflows/server-post.yml runs them by hand (a dry run, then the send), and the post's first send, the
 // Hourlock to the thirteen of the first clear, is migration 0094 - this file's statement, held to the tool's.
@@ -109,7 +109,6 @@ test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to t
   assert.ok(pieces.every((p) => p.batch === 'hours-first-hourlock'));
   assert.ok(pieces.every((p) => p.item === HOURS_FIRST_RECORD), 'the frozen record, as the migration wrote it');
   const box = await postBoxOf({ db: svc.env.DB }, { id: thirteen[0].id });
-  // PIN MOVED (guns removed): the Hourlock's template (560) left the game, so the box reads the piece as words alone
   // (server-account/src/post.js recordOf) - nothing to claim, and the piece may be thrown away
   assert.deepEqual([box.post.length, box.post[0].subject, box.post[0].item, box.unread, box.unclaimed], [1, "Hour's First", null, 1, 0]);
   assert.equal((await postBoxOf({ db: svc.env.DB }, { id: other.id })).post.length, 0, 'no one else');

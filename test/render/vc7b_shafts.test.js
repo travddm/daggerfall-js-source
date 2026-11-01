@@ -1,5 +1,4 @@
-// VC7b - LIGHT SHAFTS (2026-09-23, Mac: "I really want to improve the
-// volumetric cloud system to be more immersive" - "All of the above").
+// VC7b - LIGHT SHAFTS.
 //   - the beams: EL3's screen-space mask carries the sky map's own
 //     transmittance, so a bank cuts the beams into spokes and a gap lets
 //     them through; VC6c's covered-sun gate is untouched;

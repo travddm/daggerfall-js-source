@@ -1,6 +1,5 @@
 // @ts-check
-// OW-DUNGEONS (2026-10-08, Mac: "with dungeons on the overworld it doesnt show a dungeon model"; asked where: "Overworld
-// view"; which: "Check it all"; asked the look: "Its own model, enlarged"; bible/06-Systems/Travel-View.md OW-DUNGEONS):
+// OW-DUNGEONS:
 // EACH DUNGEON'S OWN MODEL, ENLARGED, UNDER THE OVERWORLD. A dungeon's exterior is a block or four of Daggerfall's -
 // most often one small ruin, crypt or tower - and from the view's eye, about 450 m up, its entrance is a speck; past
 // the streamed grid nothing stands at all, only TV6's plate or its "?". Now the dungeons about the traveller each stand
@@ -17,8 +16,7 @@ import { subMeshDoorType, DOOR_TYPE } from '../../world/meshReader.js';
 
 /** How many dungeons stand as models at once - the nearest, as TV6 marks twelve. */
 export const TV_DUNGEON_MODELS_MAX = 12;
-/** OW-DUNGEON-SIZE (2026-10-19, the owner: "shrink dungeons slightly, and ensure their size doesnt grow or shrink based
- *  on distance"): THE HEIGHT EVERY DUNGEON'S MODEL STANDS AT, metres - one size in the world, as the land is. It was
+/** OW-DUNGEON-SIZE: THE HEIGHT EVERY DUNGEON'S MODEL STANDS AT, metres - one size in the world, as the land is. It was
  *  TV_DUNGEON_ICON_K (0.09) of the eye's distance, so a dungeon stood the same size on the screen at every zoom and grew
  *  as the eye drew back from it: about 30 m at the view's default (260 m up at 52 degrees, 330 m from the traveller -
  *  player/travelCamera.js), 51 m at its top (450 m up at the default tilt; AUDIT OW-REVISITED L5-9). Four fifths of that

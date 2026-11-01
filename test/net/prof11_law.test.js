@@ -1,10 +1,10 @@
-// PROF11 (2026-10-01) - MASONRY'S LAW (src/net/professionLaw.js, recipeLaw.js, marketLaw.js, decorLaw.js, writLaw.js;
+// PROF11 - MASONRY'S LAW (src/net/professionLaw.js, recipeLaw.js, marketLaw.js, decorLaw.js, writLaw.js;
 // systems/chiselAct.js, profTemplates.js): Mortar (675) registered beside the stone; the mason's bench's two works - the
 // cut (Rough Stone 2 : 1, a Quarryman's 1 : 1) and the mix (Mortar ten at a time) - with a craft's law (their rank, their
 // XP at the rank's own tier, the clean chisel's half again, the first time's 500); the bench's fee and its home station;
 // the specialisations (the Quarryman's and the Sculptor's the bench's; the Builder's and the Fortifier's named for SEAT2b,
 // their helpers pinned here); the Sculptor's four stone pieces (696-699) and their one DFU model each; the chisel's
-// numbers and its machine. bible/06-Systems/Professions-Arc.md 3.2, 3.3, 4.5, 4.8, 9.3, 9.4.
+// numbers and its machine. 3.2, 3.3, 4.5, 4.8, 9.3, 9.4.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -82,7 +82,7 @@ test('PROF11 law: the mason\'s bench\'s works (4.5) - the cut, two Rough Stone a
 
 test('PROF11 law: the bench\'s XP - 20 a tier a unit of work at the RANK\'s own tier (XP follows the rank: the stone is tiers 1-2, and at its own tier a quarter would hold Masonry from 40), half again for a clean chisel (the Stores keep no quality - Mining\'s clean act at the rock), 500 the first time; a Quarryman\'s second Cut Stone earns nothing more', () => {
   assert.equal(CRAFT_XP_PER_TIER, 20);
-  assert.deepEqual(MASON_RECIPES.map((w) => workFirstXp(w)), [1823, 1823]);   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp, brewFirstXp, workFirstXp), no longer a flat 500 - both works Building's 1,823
+  assert.deepEqual(MASON_RECIPES.map((w) => workFirstXp(w)), [1823, 1823]);
   for (const rank of [0, 9, 10, 24, 25, 40, 55, 70, 89, 90, 99, 100]) {
     assert.equal(masonTier(rank), topTierOf(rank), `rank ${rank}`);
     assert.equal(masonXp(3, rank), 20 * topTierOf(rank) * 3, `rank ${rank}: never quartered`);
@@ -101,27 +101,26 @@ test('PROF11 law: the bench\'s XP - 20 a tier a unit of work at the RANK\'s own 
   assert.equal(firstCraftPays(MASON_RECIPES[0]), true, 'quarried stone is the world\'s, never a counter\'s');
   assert.equal(firstCraftPays(MASON_RECIPES[1]), true);
   // the crafter's limit stands over Masonry as over every craft
-  assert.equal(craftXpCap('masonry', { smithing: 60, provisioning: 70 }), xpForRank(51) - 1);   // PIN MOVED (CRAFT3): Carpentry is Building's with Masonry now - the two other crafts past 50 are tracks (Smithing, Provisioning)
-  assert.equal(craftXpCap('masonry', { building: 70, smithing: 60 }), xpForRank(PROF_RANK_MAX), 'Masonry raises Building - its own track is none of the two');   // PIN MOVED (CRAFT3): the ranks are the tracks'
+  assert.equal(craftXpCap('masonry', { smithing: 60, provisioning: 70 }), xpForRank(51) - 1);
+  assert.equal(craftXpCap('masonry', { building: 70, smithing: 60 }), xpForRank(PROF_RANK_MAX), 'Masonry raises Building - its own track is none of the two');
   assert.equal(craftXpCap('masonry', { smithing: 60, mining: 90 }), xpForRank(PROF_RANK_MAX));
 });
 
 // ─── THE SPECIALISATIONS (3.3) ───────────────────────────────────────
 
 test('PROF11 law: Masonry\'s four (3.3) - the Quarryman (50) and the Sculptor (100) chosen now, the bench\'s; the Builder (50) and the Fortifier (100) chosen since SEAT2b built the fortifications they act on (AUDIT 29 A17, the Siegewright\'s law, until then)', () => {
-  // PIN MOVED (CRAFT3): Masonry's choices stand under the Building track, after Carpentry's two - four a rank, one chosen
   assert.deepEqual(SPECIALISATIONS.building[50].map((s) => [s.id, s.name, s.text, s.later ?? null]), [
     ['bowyer', 'Bowyer', 'Bows +1 quality step (arrows take none).', null], ['joiner', 'Joiner', 'Furniture at half the planks.', null],
-    ['quarryman', 'Quarryman', 'Rough Stone cuts 1:1, not 2:1.', null], ['builder', 'Builder', 'Fortification projects need 10% less stone.', null],   // PIN MOVED (SEAT2b): chosen now
+    ['quarryman', 'Quarryman', 'Rough Stone cuts 1:1, not 2:1.', null], ['builder', 'Builder', 'Fortification projects need 10% less stone.', null],
   ]);
   assert.deepEqual(SPECIALISATIONS.building[100].map((s) => [s.id, s.name, s.text, s.later ?? null]), [
     ['siegewright', 'Siegewright', 'Rams +50% vitality; siege works a day sooner.', null], ['master-joiner', 'Master Joiner', 'Furniture carries the maker\'s mark.', null],
     ['fortifier', 'Fortifier', 'Once a Season a seat\'s Walls skip their drop on capture.', null], ['sculptor', 'Sculptor', 'Stone decor pieces.', null],   // PIN MOVED (SEAT2b)
   ]);
-  assert.equal(SPECIALISATIONS.masonry, undefined, 'no track of its own');   // PIN MOVED (CRAFT3): a discipline, not a track
+  assert.equal(SPECIALISATIONS.masonry, undefined, 'no track of its own');
   assert.deepEqual([specOk('masonry', 50, 'quarryman'), specOk('masonry', 50, 'builder'), specOk('masonry', 100, 'fortifier'), specOk('masonry', 100, 'sculptor'), specOk('masonry', 50, 'sculptor')],
-    [true, true, true, true, false]);   // PIN MOVED (SEAT2b): the Builder and the Fortifier chosen
-  assert.equal(specOf('masonry', 100, 'fortifier').later, undefined);   // PIN MOVED (SEAT2b): the fortifications stand
+    [true, true, true, true, false]);
+  assert.equal(specOf('masonry', 100, 'fortifier').later, undefined);
   assert.equal(SCULPTOR, 'sculptor');
 });
 
@@ -174,7 +173,7 @@ test('PROF11 law: the Sculptor\'s four (9.3) - a column, a bench, a font, a stat
     ['font:stone', 'font', 'Stone Font', 'furniture', 'stonework', 'masonry', 698, 0, 2, 10, 'sculptor', '10 stone:cut,3 stone:mortar'],
     ['plinth:stone', 'plinth', 'Statue Plinth', 'furniture', 'stonework', 'masonry', 699, 0, 2, 10, 'sculptor', '6 stone:cut,2 stone:mortar'],
   ]);
-  assert.deepEqual(RECIPES.slice(-4 - 7 - 504, -7 - 504), [...MASONRY_RECIPES]);   // PIN MOVED (CLOTH-GEMS): the jeweller's 504, every grade of every gem   // PIN MOVED (PROF9): the fire's seven dishes come after the Sculptor's four; PIN MOVED (PROF10): and the jeweller's 120 pieces after them
+  assert.deepEqual(RECIPES.slice(-4 - 7 - 504, -7 - 504), [...MASONRY_RECIPES]);
   assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length, 'every id its own');
   assert.equal(recipeById('font:stone'), MASONRY_RECIPES[2]);
   assert.deepEqual(STONE_DECOR_ROWS.map((r) => [r.index, r.name, r.baseWeight, r.basePrice, r.hitPoints, r.stackable, r.rarity, r.worldTextureArchive, r.worldTextureRecord]), [
@@ -197,7 +196,7 @@ test('PROF11 law: the Sculptor\'s four (9.3) - a column, a bench, a font, a stat
   assert.equal(firstCraftPays(col), true);
   assert.deepEqual(qualityOdds(100 - col.rank), [0, 0, 40, 52, 8], 'a Master\'s margin, 90: the finest row');
   // the market lists them (Stonework) and a commission may name them
-  assert.deepEqual(CRAFTED_FAMILIES.at(-3), ['stonework', 'Stonework']);   // PIN MOVED (PROF9): the fire's dishes list after it; PIN MOVED (PROF10): and the jeweller's pieces after them
+  assert.deepEqual(CRAFTED_FAMILIES.at(-3), ['stonework', 'Stonework']);
   assert.deepEqual(MASONRY_RECIPES.map((r) => pieceListable(r.id)), [true, true, true, true]);
   assert.deepEqual([commissionable('column:stone'), commissionTakesQuality('plinth:stone')], [true, true]);
 });

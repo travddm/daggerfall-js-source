@@ -1,5 +1,5 @@
 // @ts-check
-// WB1 (2026-09-25): WHERE THE GATE STANDS - the client's half of the site, over the world's own data.
+// WB1: WHERE THE GATE STANDS - the client's half of the site, over the world's own data.
 //
 // net/gate/gateLaw.js rolls a day's region and pixel over LISTS; this module makes the lists, once a session, from the map
 // files every client holds alike (MAPS.BSA's locations, the climate and politic pages) - so every client finds the

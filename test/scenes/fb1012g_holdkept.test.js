@@ -5,7 +5,7 @@
 // the last record (written over at the next save); and what a storage piece held stayed keyed to a piece the service no
 // longer has (one taken away while the room looked empty), where no piece would ever stand for it again. The chest
 // records (scenes/chestRecords.js), the room's taking of what an unserved piece held (decorRoom.js takeUnserved) and the
-// host's wiring. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// host's wiring..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,5 +1,4 @@
-// CG2 (2026-09-08, Mac: "some bugs with character creation and being
-// unable to type in your name or make selections").
+// CG2.
 //
 // THE ROOT: the enhanced wizard's name boxes are real <input>s over the
 // canvas. Its capture keydown steps aside for a field (the field must

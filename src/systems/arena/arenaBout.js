@@ -1,8 +1,7 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "Players can choose to watch AI fights ... and climb esclating tiers of opponents"; "I want
-// this to be extremely detailed and authentic"): THE BOUT LAW - every bout on the arena's sand runs this one law, an
+// ARENA2: THE BOUT LAW - every bout on the arena's sand runs this one law, an
 // exhibition between two AI fighters on the city floor, a ladder bout in the floor's instance, and (ARENA4) a bout the
-// relay referees. Design: bible/11-Multiplayer/Arena.md "2. The fights".
+// relay referees. Design: "2. The fights".
 //
 // PURE. No clock, no dice, no game: `now` is handed to every call and the dice (`rng`) to the one that rolls (an AI's
 // temper at the yield line), so the relay can run the same law on its own clock, a test can drive a whole bout in a

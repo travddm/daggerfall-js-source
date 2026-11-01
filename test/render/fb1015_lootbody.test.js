@@ -1,5 +1,4 @@
-// FB1015 (2026-10-15, the owner: "When looting dead marrowind enemies, they turn to a sprite. The models also clip
-// through geometry") - bible/04-Characters/Morrowind-NPCs.md section 29.
+// FB1015
 //
 // LOOT-BODY: both dungeon hosts return before drawFoes under a window, and AUDIT MW-NPC C6 showed every corpse flat
 // there - so the loot window, opened on a body, stood its classic corpse in its place. The window's frame now draws the

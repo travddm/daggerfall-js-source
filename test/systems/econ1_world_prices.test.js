@@ -1,4 +1,4 @@
-// ECON1 (Mac, 2026-09-17: "Economy slice next" - the STOP list's "one economy"): THE REGION'S PRICES ARE THE WORLD'S.
+// ECON1 (- the STOP list's "one economy"): THE REGION'S PRICES ARE THE WORLD'S.
 // DFU walks each region's price index once a day on the player's own state, tilted by The Merchants' power against
 // the region's; WORLD6b made the day's rolls the world's and left the state each player's, so two players who
 // arrived on different days read different prices in one shop. Under the shared clock the index is now a pure

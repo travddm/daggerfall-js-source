@@ -1,4 +1,4 @@
-// AUDIT LIGHTING (2026-09-23, Mac: "Before we do that can we audit everything so far"): three lenses over the day's
+// AUDIT LIGHTING: three lenses over the day's
 // five arcs - LIGHT-NEAR1, QL-WEIGHT1, LC1, SC1 and HQ1 - and the findings paid here, pinned by execution.
 //
 // SC1: the motion memory was one matrix PER MESH, and the hosts draw one GPU mesh at many matrices (a dungeon's

@@ -1,4 +1,4 @@
-// COST-1 (2026-10-24, the owner's Cloudflare bill; bible/11-Multiplayer/Scale-Arc.md COST-1): A DRAINED ROOM LEAVES
+// COST-1: A DRAINED ROOM LEAVES
 // NOTHING ARMED. A pending timer keeps a Durable Object from hibernating, and a cell armed windows that waited up to ten
 // minutes - the spawn grant's measure, the staff traffic and reaction feeds, the reviewer's feed - so a player who crossed
 // a cell left it billed after they walked on. The last leave (server/src/index.js _leave) posts every open window now

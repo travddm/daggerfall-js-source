@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10c (bible/03-World/Arena-Provinces.md TESA10c) - MOURNHOLD'S LANDMARKS: the port's own models of the city's
+// TESA10c (TESA10c) - MOURNHOLD'S LANDMARKS: the port's own models of the city's
 // signatures (world/capitalPlans.js MOURNHOLD says where each stands) - TESA-LORE, on Tribunal's plan: Plaza Brindisi
 // Dorom in the south, a garden behind its low ring wall round the great statue of Almalexia in battle with Mehrunes
 // Dagon; the High Fane's great dome and its four pavilions in the Temple Courtyard at the north, its pools and braziers;
@@ -172,8 +172,7 @@ export function mournholdTowers(W = MOURNHOLD.wall) {
 }
 
 /**
- * CAPITAL-TREES (bible/03-World/Arena-Provinces.md CAPITAL-TREES; KPbICA, forwarded by the owner: "The main trees in
- * Falinesti and Mournhold should get some love. They are too draftish for now"): MOURNHOLD'S GARDENS - the city's own
+ * CAPITAL-TREES (CAPITAL-TREES; KPbICA, forwarded by): MOURNHOLD'S GARDENS - the city's own
  * trees in their planters, where its plaza had stood the Bay's scenery trees (a fir and an oak of the Iliac Bay's woods):
  * Tribunal's Mournhold grows its plants in planters (UESP's Tribunal ingredients - Noble Sedge, Golden Sedge, Timsa-Come-By,
  * Meadow Rye and Nirthfly "found growing in various planters in Mournhold", Plaza Brindisi Dorom's among them), and its

@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07) - A DEATH IN THE OPEN ZONE: WHAT STAYS, WHAT DROPS, WHAT A KILLER MAY TAKE - THE LAW
-// (bible/11-Multiplayer/Wild-Zone.md; systems/wild/wildDeath.js says the owner's words and re-exports every member here).
+// WILD1 - A DEATH IN THE OPEN ZONE: WHAT STAYS, WHAT DROPS, WHAT A KILLER MAY TAKE - THE LAW
+// (; systems/wild/wildDeath.js says the owner's words and re-exports every member here).
 //
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md): ITS HOME SINCE, A LEAF THE ACCOUNT
+// INT9: ITS HOME SINCE, A LEAF THE ACCOUNT
 // WORKER BUNDLES. A death in the zone drops what the ACCOUNT SERVICE takes off the fallen character's judged record
 // (server-account/src/wild.js), never what the fallen's own game hands over - so the drop, the purse's share and the
 // killer's worn piece are one law at both ends: the fallen's game takes the same out of its own pack as the service takes
@@ -11,8 +11,7 @@
 // trade's refusals over plain data - net/realm/realmTradeLaw.js tradeableRecord, the pack's own refusal's law - never the
 // pack's module).
 //
-// STORE-KEEPS (2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death"; asked,
-// "Wagon + companions' packs"): A DEATH TAKES THE BAG ALONE. The wagon's cargo and every companion's pack and kit are
+// STORE-KEEPS: A DEATH TAKES THE BAG ALONE. The wagon's cargo and every companion's pack and kit are
 // storage, and no death in the zone takes storage - neither a piece nor a share of its coin, wherever the wagon stands
 // and whoever stands at the side. So the take reads `items` and the purse, and nothing else (CART-AWAY's word and
 // COMPANION-DROP's packs retired with it); wildTakeTook still takes out of any list a take names, for an answer from
@@ -50,11 +49,11 @@ export function keptOnWildDeath(item) {
  *  that is not worn (its `isEquipped` arm is the only one that asks where the piece is), and the kept-back list. */
 export function wildCanLose(item) {
   if (!item || keptOnWildDeath(item)) return false;
-  // LETTERS-DROP (the owner: "letter of credits should be dropped"): a letter of credit is the one piece of the wallet's
+  // LETTERS-DROP: a letter of credit is the one piece of the wallet's
   // that a death in the zone takes, as a coin of the purse is - the Embers and the Shards stay
   if (item.group === 'MiscItems' && item.templateIndex === TEMPLATES.Letter_of_credit && !item.questItem) return tradeableRecord({ ...item, equipSlot: undefined });
   if (WILD_NEVER_GROUPS.has(item.group) || DECOR_OWN_KEPT_BACK.has(item.templateIndex) || item.templateIndex === TEMPLATES.Spellbook) return false;
-  // KEEP-WALLET (2026-10-09, the owner: "the wallet shouldnt drop in the zone"): the wallet is an organizer - its pieces
+  // KEEP-WALLET: the wallet is an organizer - its pieces
   // lie in the pack itself; the Deadlands Embers and the Welkynd Shards stay with the fallen, as the wallet does (bound
   // already) - the letters of credit drop (LETTERS-DROP, above)
   if (isWalletItem(item) || walletHolds(item)) return false;
@@ -81,8 +80,7 @@ export function takeWildDrop(items) {
 }
 
 /** WILD GOLD: a death at another player's hand in the zone drops a share of the gold carried - each purse's whole
- *  pieces divided by this, floored (no usual death penalty) - into the remains. FOE-KEEPS (2026-10-24, the owner: "I dont
- *  want people to lose everything they have"; asked, "The usual tenth"): a tenth, the usual death's own share
+ *  pieces divided by this, floored (no usual death penalty) - into the remains. FOE-KEEPS: a tenth, the usual death's own share
  *  (deathPenalty.js DEATH_GOLD_DIVISOR, pinned equal - this leaf is the account Worker's and the penalty's module is
  *  not); it was half. A divisor because `g / 10` is exact for every whole purse, where `g * 0.1` is a hair over a tenth
  *  (AUDIT DEATH-TENTH's own reason). A death to a foe drops none: it takes the usual penalty, and nothing else
@@ -166,10 +164,10 @@ const dropWorth = (/** @type {any} */ it) => { const l = liquidWorthOf(it); retu
  * that order, whether the first is the killer's, and the gold taken `{ purse }`. The account service runs it on the
  * record (server-account/src/wild.js) and answers what it took; the fallen's game takes out exactly that (wildTakeTook) -
  * it never guesses what the ledger kept.
- * STORE-KEEPS (2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death"): the bag
+ * STORE-KEEPS: the bag
  * and the purse alone. The cart's pieces and coin (CART-AWAY's `cart`, 2026-10-15) and every companion's pack, kit and
  * coin (COMPANION-DROP's `packs`, 2026-10-19) are storage, and stay whole.
- * WILD-INSURE (2026-10-26, the owner chose "Kept, policy spent"): `insured` - a piece a policy keeps stays where it lies,
+ * WILD-INSURE: `insured` - a piece a policy keeps stays where it lies,
  * worn or in the bag - systems/wild/wildInsureLaw.js wildInsuredBy. AUDIT PVP-EASE L1-3, L2-2 (the owner: spent "only when
  * it saved the piece"): `saved` the ledger keys of the insured pieces THIS death would have taken without them - the
  * killer's pick landed on one, or the bag's drop would have carried it into the remains (a dry run of this same law
@@ -289,9 +287,7 @@ export const wildPacksOf = (save) => wildPacks(save?.modData?.[NAVAL_VENDOR]?.pa
  *  reads no such word; it is still true of this game, which applies an answer from before the word (a fall asked again). */
 export const WILD_FALL_PACKS = 1;
 
-/** AUDIT FOE-KEEPS LETTERS-TENTH (2026-10-24; the owner, asked whether a kill should take a letter of credit whole, a tenth
- *  of its worth, or none: "Your choice" - LETTERS-DROP's "letter of credits should be dropped" and FOE-KEEPS' "I dont want
- *  people to lose everything they have" both kept): THE FALLEN'S OWN WORD on /v1/wild/fall that its game takes a letter's
+/** AUDIT FOE-KEEPS LETTERS-TENTH: THE FALLEN'S OWN WORD on /v1/wild/fall that its game takes a letter's
  *  share out of the letter itself (wildTakeTook's `gold.letters`). With it a kill takes a tenth of each letter's worth
  *  into the remains' one gold pile, as it takes the purse's coin, and the letter stays (a 50,000 letter cost 50,000 at a
  *  kill, the same gold as coin 5,000). A tab from before the word is answered as before - the letters drop whole - since

@@ -1,4 +1,4 @@
-// AUDIT TESA II Z2 and Z6 (2026-10-25, lane Z; bible/03-World/World-Wide.md "Folded into TESA"): THE WORLD-WIDE RELAY.
+// AUDIT TESA II Z2 and Z6: THE WORLD-WIDE RELAY.
 // The arc put four words past the Bay on the wire - a gate's lanes, a province's channels, a hall of Cyrodiil's and (AUDIT
 // TESA-BIOME F2) a spawn grant's world pixel - and they shipped in one relay. Three gates stood as literals at 256 after
 // the merge with main renumbered that relay to world260, and passed main's world256-world259, which read none of it; the
@@ -26,7 +26,6 @@ test('AUDIT TESA II Z2 THE WORLD-WIDE RELAY IS ONE NUMBER, ITS LAW ROW\'S: the f
   assert.equal(WORLD_WIDE_RELAY_MIN, ww[0], 'the one number is the world-wide relay\'s own row - a merge that renumbers the row moves it');
   assert.ok(num(RELAY_VERSION) >= WORLD_WIDE_RELAY_MIN, 'this relay reads the world');
   const before = Math.max(...rows.filter((n) => n < WORLD_WIDE_RELAY_MIN));
-  // PIN MOVED (AUDIT RELEASE R3, the merge of main into TESA): the row before it is main's newest at the merge, whatever
   // its number - ASK-LONGER's world259 at the audit, GATE-COURTS' world265 at the trial merge - never a literal a merge must find
   assert.equal(before, WORLD_WIDE_RELAY_MIN - 1, 'the row before it: main\'s newest - the world-wide relay is the next past it');
   assert.deepEqual([GATE_LANES_RELAY_MIN, PROVINCE_REGIONS_RELAY_MIN, WDUN_WORLD_RELAY_MIN, GRANT_WORLD_RELAY_MIN], Array(4).fill(WORLD_WIDE_RELAY_MIN));

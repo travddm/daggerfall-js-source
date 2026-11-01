@@ -1,5 +1,4 @@
-// SD14b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7 and section 16's SD14b;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S AIR (scenes/superDungeon/sdAir.js) - four beds and four
+// SD14b: THE HOUR'S AIR (scenes/superDungeon/sdAir.js) - four beds and four
 // kinds of far event where the Deadlands have three and three. The beds: the void's wind breathing on the Hour's clock,
 // the Hour's works (a tick and a tock a second, made out of the player's own clunk and grind) everywhere, the Orrery's
 // hum (the bell slowed to a drone, made) in the hall, the arena's gears under its floor - all four let go the frame I
@@ -22,7 +21,7 @@ import { SOUND } from '../../src/systems/soundClips.js';
 const rms = (x) => Math.sqrt(x.reduce((a, v) => a + v * v, 0) / x.length);
 const voice = (n, hz = 440, rate = 11025) => Float32Array.from({ length: n }, (_, i) => Math.sin((2 * Math.PI * hz * i) / rate) * Math.exp(-i / (n / 3)));
 
-/** An engine that keeps its beds and hears its one-shots. AUDIT SD III (A3, PIN MOVED): the beds are named native loops
+/** An engine that keeps its beds and hears its one-shots. AUDIT SD III (A3
  *  (systems/audio.js setBed, setBed3d) - they were setLoop's re-armed one-shots. */
 function engine({ archive = true } = {}) {
   const loops = new Map(), loops3d = new Map(), shots = [], reg = [];
@@ -43,7 +42,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   assert.equal(air.on, true);
   assert.deepEqual([...e.loops.keys()].sort(), [SD_AIR_VOID.loop, SD_AIR_WORKS.loop].sort());
   assert.deepEqual([...e.loops3d.keys()].sort(), [SD_AIR_GEARS.loop, SD_AIR_HUM.loop].sort());
-  assert.equal(e.loops.get(SD_AIR_VOID.loop).clip, SD_AIR_VOID.clip, 'the void made');   // AUDIT SD III (A3, PIN MOVED): it was the one moan looped
+  assert.equal(e.loops.get(SD_AIR_VOID.loop).clip, SD_AIR_VOID.clip, 'the void made');   // AUDIT SD III (A3
   assert.equal(SD_AIR_VOID.voice, SOUND.AmbientWindMoanDeep, 'of the deep moan');
   assert.ok(SD_AIR_VOID.pitch < 0.74, 'lower than the Deadlands\' own moan');
   assert.deepEqual(e.loops3d.get(SD_AIR_HUM.loop).pos, SD_AIR_HUM_AT);
@@ -52,7 +51,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   const [gx, , gz] = dungeonToRealm(...SD_AIR_GEARS_AT);
   assert.ok(Math.hypot(gx - SD_ARENA.x, gz - SD_ARENA.z) < 0.01, 'under the arena');
   assert.ok(SD_AIR_HUM.maxDistance < SD_ARENA.z - SD_ORRERY.z, 'the hum never reaches the arena');
-  assert.deepEqual(e.reg.map((r) => r[0]).sort(), [SD_AIR_GEARS.clip, SD_AIR_HUM.clip, SD_AIR_VOID.clip, SD_AIR_WORKS.clip].sort());   // AUDIT SD III (A3, PIN MOVED): all four made
+  assert.deepEqual(e.reg.map((r) => r[0]).sort(), [SD_AIR_GEARS.clip, SD_AIR_HUM.clip, SD_AIR_VOID.clip, SD_AIR_WORKS.clip].sort());   // AUDIT SD III (A3
   air.frame(10.1, [0, 1, 0]); air.frame(10.2, [0, 1, 0]);
   assert.equal(e.reg.length, 4, 'made once');
   air.stop();
@@ -62,7 +61,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   const n = engine({ archive: false });
   const a2 = createSdAir(n);
   a2.frame(5, [0, 0, 0]);
-  assert.equal(n.loops.size + n.loops3d.size, 0);   // AUDIT SD III (A3, PIN MOVED): the wind and the gears stood unmade
+  assert.equal(n.loops.size + n.loops3d.size, 0);   // AUDIT SD III (A3
   assert.equal(n.reg.length, 0);
   // a later engine's air silences the old one's
   const e3 = engine(), old = createSdAir(e3);
@@ -126,7 +125,7 @@ test('SD14b HEARD FROM ITS QUARTER: each event played as it falls in a frame, fa
   air.frame(first.t + 0.01, ear);
   assert.equal(e.shots.length, 1);
   assert.deepEqual(e.shots[0].at, airSourceAt(ear, first.az, first.lift));
-  assert.equal(e.shots[0].far, SD_AIR_FAR); assert.equal(e.shots[0].clip, first.clip);   // PIN MOVED (AUDIT SD IV A5): far under the Hour's name, which its stop lets go
+  assert.equal(e.shots[0].far, SD_AIR_FAR); assert.equal(e.shots[0].clip, first.clip);
   air.frame(first.t + 0.01 + AIR_BACKLOG_S + 60, ear);
   assert.equal(e.shots.length, 1, 'a tab put away: nothing of what it passed');
   let lo = Infinity, hi = -Infinity;

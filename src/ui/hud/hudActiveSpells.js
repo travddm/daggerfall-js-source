@@ -151,12 +151,12 @@ export function activeSpellIcons(entity) {
       bundleId: bundle.bundleId,         // BUFF-END: the bundle a right-click ends...
       endable: canEndBundle(bundle),     // ...when it is the player's to end (ui/hud/hudLarge.js routeSpellIconClick)
     };
-    // SPELL-GIFT (2026-09-27, Tabitha: "the feedback for buffing other players is non-existent"): a GIFT - another
+    // SPELL-GIFT: a GIFT - another
     // player's beneficial spell (ALLY-CAST's bundleAlly, only ever the beneficial families) - is a buff, and sorts with
     // the buffs. DFU's null-caster arm sent it to the debuff row, where only a foe's spell has ever landed in DFU.
     (bundle.selfCast || bundle.ally ? self : other).push(item);
   }
-  // TELL6e (bible/12-Enhanced-AI/Feud-Arc.md 8.2): a sweep's BLEED is no spell's bundle, but it is shown as one, with
+  // TELL6e (8.2): a sweep's BLEED is no spell's bundle, but it is shown as one, with
   // the debuffs, its rounds its ticks left. TELL9: drawn from its own glyph (two drops of blood - ui/hud/hudStatus.js), its
   // index the atlas's first as an iconless bundle's (what a reader of DFU's shape finds)
   const bleed = entity?.bleed;

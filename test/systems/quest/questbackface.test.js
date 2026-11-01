@@ -1,5 +1,4 @@
-// QUEST-BACKFACE (2026-10-14, Dudey's dev with a spawn debugger: "there isnt even a spawn point ... its just droping the
-// spawn location in general instead of find a spot"): placeFoeFreely's env passes through a back-face hit, as Unity's
+// QUEST-BACKFACE: placeFoeFreely's env passes through a back-face hit, as Unity's
 // raycast does - a floor probe in the rock above a hall never stands a foe on the top of its ceiling.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

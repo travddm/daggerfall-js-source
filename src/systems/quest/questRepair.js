@@ -1,7 +1,5 @@
 // @ts-check
-// QREPAIR (2026-09-24, Mac: "Add a quest refresh option to settings" - asked what it should do, Mac chose "Repair
-// active quests: re-places the people, items, foes and map markers of your active quests that went missing, keeping
-// your progress"): THE REPAIR, one pass over every quest still running.
+// QREPAIR: THE REPAIR, one pass over every quest still running.
 //
 // WHAT IT PUTS BACK - only what the quest's OWN script placed and a fault took away, derived from the quest's own state:
 //   1. A PLACEMENT A MARKER LOST. Every `place npc|item|foe` action that has run names where its resource belongs; a
@@ -149,7 +147,7 @@ const markerAddresses = (list) => (list ?? []).map((m) => `${m?.dungeonX},${m?.d
  * agrees, and nothing moves). A quest one of whose dungeons could not be read here (no world, no such location, a
  * throw) keeps its stamp: the size its markers there still know.
  *
- * INSTANCES (2026-10-15, bible/11-Multiplayer/Instances.md): AND THAT SIZE IS THE DUNGEON WHOLE NOW. Online a quest's
+ * INSTANCES: AND THAT SIZE IS THE DUNGEON WHOLE NOW. Online a quest's
  * markers are chosen on Daggerfall's own layout (the quest's world asks smallerDungeons.js dungeonSizeFor for it whole),
  * the layout its instance builds - so every stamp but DFU's Disabled is re-laid on the whole dungeon at the load, the
  * world's sizes' ONLINE_DUNGEONS_STATE among them, and stamped Disabled. A re-laid public room stands none of a quest's
@@ -202,9 +200,7 @@ function relayDungeonPlaces(quest, { only = null } = {}) {
 }
 
 /**
- * QUEST-VOID (2026-10-12, a player online: the Dust of Restful Death's mummy in Ruins of Old Barbara's Place, "he cant
- * find anything about it in the dungeon"; Mac: "the enemy is not marked on the map. i prob spawned the mob somewhere
- * in the void"): THE NET UNDER THE MOUNT. The load's re-lays (relayOnlineDungeons, relayMovedLayouts) answer the drifts
+ * QUEST-VOID: THE NET UNDER THE MOUNT. The load's re-lays (relayOnlineDungeons, relayMovedLayouts) answer the drifts
  * they know by the quest's stamp; this answers any other, at the one moment it costs the player: the dungeon as BUILT
  * is in hand. `location` the built dungeon (its sized blocks, what the player walks); every quest linked to it whose
  * Place there holds a target on a marker this build has not - a block address (dungeonX, dungeonZ) and flat
@@ -242,7 +238,7 @@ export function relayBuiltDungeon(machine, location, env = {}, mapId = location?
 }
 
 /**
- * MEDIUM-DISTINCT (2026-10-08, Mac: "Medium dungeons just copy and paste 2 layouts together"): A LAYOUT THE LAW MOVED.
+ * MEDIUM-DISTINCT: A LAYOUT THE LAW MOVED.
  * A medium build no longer lays one interior block twice (world/smallerDungeons.js distinctInterior), so a dungeon whose
  * draws repeated is another layout now, and a running quest that chose its markers on the old one holds a marker in
  * its second interior block that addresses a block no longer there - its item in rock, its foe in the void. At every

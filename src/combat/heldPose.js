@@ -3,9 +3,7 @@
 // MAP3 — THE HELD POSE: the Morrowind first-person arms holding a
 // sheet of paper, and the sheet itself.
 //
-// Mac (2026-09-18, the Held Map arc): "Morrowind will need its own
-// handcrafted map with hand placement just like the sprite. Our first
-// custom rig change." This is that change, and it is the FIRST pose in
+// This is that change, and it is the FIRST pose in
 // this port that is not one of Morrowind's own animations: a set of
 // hand-authored rotations laid over the idle, and a paper quad placed
 // in front of the eye for the hands to hold.
@@ -28,7 +26,7 @@
 // forty degrees more" means the same thing on both. The default deltas
 // are ZERO: the session had the fixture arm only, and the pose is tuned
 // on the retail arm through the live surface the host exposes
-// (window.__heldPose - bible/10-UI/Held-Map-Arc.md, MAP3).
+// (window.__heldPose, MAP3).
 //
 // QUATERNIONS ARE [w, x, y, z] HERE, because they are everywhere the
 // rig reads them: mwAnim.js's sampler answers [w,x,y,z] and mwSkin.js's

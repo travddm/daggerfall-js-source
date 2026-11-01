@@ -1,11 +1,10 @@
 // @ts-check
-// SEASON-BOOK (2026-10-22, the owner: "I think we need a new pause menu icon, like we did for the timers and mail. A
-// condensed place to see season related content and descriptions"; bible/10-UI/UI-Arc.md SEASON-BOOK) - THE LAUREL'S
+// SEASON-BOOK - THE LAUREL'S
 // READS IN THE WORLD: the board the season window shows a standing off. The law is systems/seasonBook.js; the window
 // ui/enhanced/enhancedSeason.js; this is the host's half, reaching the world only through `world`, so a test drives it
 // headless.
 //
-// AUDIT SEASON-BOOK R1 (bible/01-Overview/audits/Audit-Season-Book.md): A STANDING CANNOT MOVE WHILE THE GAME IS PAUSED, so
+// AUDIT SEASON-BOOK R1: A STANDING CANNOT MOVE WHILE THE GAME IS PAUSED, so
 // the board is asked when the window OPENS (`opening` - its first read), at most once a minute however often it is
 // opened, and never again while it stays open; never on a hidden page, while the account service says it is overloaded
 // (BUSY-GATE's hold), for a guest or for no one signed in. The window reads the kept answer every second; the service

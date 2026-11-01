@@ -1,5 +1,4 @@
-// PSCALE1 (2026-09-25, Mac: "I want enemy difficulty, enemy numbers, etc to scale approriately with party size";
-// asked: "+50% HP, +10% dmg", "One roll per group", "Everyone in it" - and at AUDIT PSCALE1, "Whoever fights it"):
+// PSCALE1:
 // A FIGHT WEIGHS WHAT ITS FIGHTERS WEIGH (systems/party/partyScale.js). The law's numbers; the outdoor pool driven - a
 // shared foe's toughness at its owner's damage door by the players striking it, the remainder carried, the foes
 // nobody else can help with left alone, a shared foe's hit on me harder; and the hosts by source. The audit's own

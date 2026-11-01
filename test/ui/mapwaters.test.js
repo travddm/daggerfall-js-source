@@ -1,5 +1,4 @@
-// MAP-WATERS (2026-10-26, the coordinator: "The held map should draw G's Cyrodiil rivers and smoothed lake shores";
-// bible/03-World/Arena-Provinces.md MAP-WATERS) - stream G's rivers and lakes (world/tamriel/tamrielWaters.js) on the held
+// MAP-WATERS - stream G's rivers and lakes (world/tamriel/tamrielWaters.js) on the held
 // map off the terrain worker's copy (world/tamriel/watersInk.js), in the shore's hand, a tile's paint like the roads';
 // Cyrodiil's lakes at the ground's own smooth shore; and the middle ring's water where G's rivers run. Pinned with no game
 // data; with ARENA2 on the freeware's own trace.
@@ -104,7 +103,6 @@ test('MAP-WATERS on the sheet: the rivers and the lakes a tile\'s paint, under t
   assert.deepEqual(ringChain(Float32Array.from([1, 2, 3, 4])), [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 1, y: 2 }], 'a ring closed');
 });
 
-// PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): CYRODIIL-SHORES' own lake ink (lakeShoreChains, LAKE_INK_SS) is
 // gone - every shore the held map draws is the land's one smooth law's (tamrielInk.js tracedChains), a lake's as the sea's
 test('MAP-WATERS a lake\'s shore on the held map is the land\'s smooth law\'s: one closed chain round each lake - Cyrodiil\'s (the zone\'s line) and High Rock\'s alike - of many points, within the lake\'s own pixels and a pixel of them, and none the picture\'s staircase (mutant: the ink back on the picture\'s pixels)', () => {
   // Cyrodiil a block of land with a 6 x 4 lake in it; High Rock's block beside with a lake of its own

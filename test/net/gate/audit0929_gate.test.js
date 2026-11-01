@@ -1,7 +1,6 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - WB8's half: a Soul-Hungry Warden fed only by a fall with a
+// AUDIT PRE-MERGE 0929 - WB8's half: a Soul-Hungry Warden fed only by a fall with a
 // real part behind it, and never more than GATE_FEEDS_MAX times a fight; a Colossal Warden's Cleave reaching wherever he
-// chooses it; the marks found once, not re-read every frame. The record: bible/01-Overview/audits/Audit-PreMerge-0929.md and
-// bible/11-Multiplayer/World-Bosses.md section 13.
+// chooses it; the marks found once, not re-read every frame. The record: and
 //
 // Each test failed on the unfixed tree for its finding's reason: twenty-five throwaway accounts healed him from a fifth to
 // all but full (W1-1); a still fighter 9.1 m from a Colossal Warden was cleaved at 39 times in two minutes and struck by

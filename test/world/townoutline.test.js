@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS3 (2026-10-25, the owner: "IC should be round, give other towns unique shapes. Its time to move away from
-// perfect squares"; the mixed way: "#1 but players cant own a home yet outside the bay?"; bible/03-World/Town-Shapes.md TS3):
+// TOWN-SHAPES TS3:
 // a town past the Bay keeps a blob of its template's cells on its own seed - one piece, one of each kind of its buildings
 // kept - and every other cell is open land; the buildings those cells drew leave its list, every kept one keeps its own.
 import { test } from 'node:test';

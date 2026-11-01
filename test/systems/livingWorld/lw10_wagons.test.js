@@ -1,4 +1,4 @@
-// LW10 (bible/06-Systems/Living-World-II.md "LW10"): THE WAGON TRAIN - who has a team (a merchant's wagon, two from a
+// LW10 ("LW10"): THE WAGON TRAIN - who has a team (a merchant's wagon, two from a
 // great house; a noble's baggage wagon; a pedlar's or a carter's pack horse), the train in file along its way (the van
 // before, the leader at the first horse's head, each wagon on its shafts the mod's hitch behind its horse, the rest
 // behind), the park at camp, the cargo by the trip, the wheels by the distance walked; the teams drawn with Horse Cart
@@ -80,7 +80,6 @@ test('LW10 the train in file: the van (the first half of the armed) before the l
   const bt = { ...trip, way: bend, from: { blocks: 4 } };
   for (const s of [10000, 20000, 33000, 40000, 50000, 60000]) {
     const t = trainOf(bt, { phase: 'out', s }, [leader], 0);
-    // PIN MOVED (AUDIT LW-III): on the way's line - rounded at a corner (trips.js laneAt, LANE_EASE_N either side)
     const w = t.wagons[0], on = laneAt(bend, w.s, 0);
     assert.ok(Math.hypot(w.x - on.x, w.z - on.z) < 1e-6, `the axle on the way at ${s}`);
   }
@@ -120,7 +119,7 @@ test('LW10 the teams drawn: each horse its own billboard batch posed by the pool
     horseArt: { ensureStationary: () => true, ensureWalk: () => {}, hasWalk: () => true },
     poseHorse: (b, eye, horse) => { posed.push(horse); b.size = { w: 3, h: 2 }; },
     wagonParts: () => ({ wheelRadius: 0.4, bounds: { min: [-1, 0, -2], max: [1, 1.5, 2] } }),
-    drawWagon: (r, tex, pos, rot, tier, turn, grow, kind, hitched) => { drawnWagons.push({ pos, rot, tier, angle: turn.angle, grow, kind, hitched }); return true; },   // PIN MOVED (WAGONS1 x LW10): WAGONS2's draw - `turn` an object, the kind, hitched
+    drawWagon: (r, tex, pos, rot, tier, turn, grow, kind, hitched) => { drawnWagons.push({ pos, rot, tier, angle: turn.angle, grow, kind, hitched }); return true; },
   };
   const col = { addMesh: (k) => buckets.set(k, true), removeBucket: (k) => buckets.delete(k) };
   const teams = createRoadTeams({ renderer, presentation: () => pres, collider: () => col });
@@ -222,7 +221,6 @@ test('AUDIT LW-II LW10: the wheels turn forward on the way home - the distance w
   const walking = find(12, (at, tr) => !at.camp && tr.party.length > 1);
   assert.ok(walking, 'a caravan on the march');
   const w = lay(walking);
-  // PIN MOVED (AUDIT LW-III): the train in its lane - the layer's own (roadLanes), right of the road's middle
   const lanes = roadLanes(w.walking, HITCH_N);
   assert.ok(lanes.get(walking.tr.id) >= LANE_N, 'in a lane right of the road\'s middle');
   const train = trainOf(walking.tr, walking.at, membersAt(walking.tr, walking.t), walking.t, HITCH_N, lanes.get(walking.tr.id));

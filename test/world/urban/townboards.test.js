@@ -1,5 +1,5 @@
-// TOWN-BOARDS (the owner's field report, 2026-10-27, item 3: "Random wooden board placement in smaller towns on the ground";
-// bible/03-World/Urban-Fabric.md section 9) - THE BOARDS ON THE GROUND, and the two rules of URBANIZER's fabric that laid
+// TOWN-BOARDS (;
+// ) - THE BOARDS ON THE GROUND, and the two rules of URBANIZER's fabric that laid
 // them:
 //   - THE PAVEMENT ROUND THE CARRIAGEWAY. A main street's pavement had been its cells between FABRIC.carriage and 3.5 of
 //     the walk in straight lines - a band a cell wide that met its next cell at a corner alone at every step of the walk
@@ -13,7 +13,7 @@
 //     top rail (a board on the ground) or hung - at a village's and a hamlet's edges (a city past the Bay stands on its
 //     wall's round, its whole inside its ground). Now a cell past the town's ground is off the town (world/townShape.js
 //     onTownTile - the walkers' own law): its yard fenced where the ground ends.
-//   - THE PAVEMENT IS A WALK (TOWN-BOARDS 2, the owner: "No band aids or half assed work"). The ring left pavements a few
+//   - THE PAVEMENT IS A WALK (TOWN-BOARDS 2). The ring left pavements a few
 //     cells long - before a short house front, between two of Daggerfall's props, two pavements meeting at a corner where
 //     a street squeezes between two houses - each a lone flag, or a lone board on the forest floor in the planks' styles.
 //     Now two pavements meeting at a corner across the street's ground are joined there, and a pavement shorter than

@@ -1,5 +1,4 @@
-// FOE-FORGE (2026-10-17; a horde of forty Elite Daedroths round one player in a hamlet, reported on the Discord; bible/06-Systems/Integrity-Arc.md
-// section 8). A cell's foes are their owner's word - each socket streams its own, the relay reads none of it - so a
+// FOE-FORGE. A cell's foes are their owner's word - each socket streams its own, the relay reads none of it - so a
 // modified client could stand foes of any kind at every reader near it: each of the reader's allowances was its own (a
 // forged frame filled all of them), a foe taken over left its owner's count (records naming the reader heir stood foes
 // without end), and a record's `z`, `gg` and `nm` stood any foe as an elite, a Greater Giant or a revenant, at three to

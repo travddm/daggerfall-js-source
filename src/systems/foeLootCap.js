@@ -1,13 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FOE-CAP (2026-10-03, Mac: "normal enemies that are non Elite or Enemies
-// that have something infront of their real name (like thorned) should
-// never drop more then 3 items in total max. Gold included. Bosses/
-// worldbosses are not affected" ... "dropchances of those normal enemies
-// should whites, rare = blue items, very rare = yellow, almost impossible
-// = orange" ... "The exception for the rarity changes are elite dungeons.
-// And max drop 5 items in Elite dungeons"; and, asked whether a champion
-// counts: "champions are not normal").
+// FOE-CAP.
 //
 // THE PORT'S OWN, not DFU's: DFU caps nothing and has no ladder.
 //
@@ -25,7 +18,7 @@
 // every OnEnemyDeath handler has added its own (food, a mod's find) - so
 // "never more than three" holds for what the body actually carries.
 //
-// LOOT-EASE (2026-10-05, bible/06-Systems/Loot-Arc.md section 19): the
+// LOOT-EASE: the
 // ladder eased, the cap keeping a supply before a Common piece
 // (CAP-SUPPLIES), and a plain foe's kit rolled at its death (KIT-ROLL) -
 // the same stamp read a third time, by every body door.
@@ -53,7 +46,7 @@ export const ELITE_DUNGEON_FOE_LOOT_CAP = 5;
 /** THE PLAIN FOE'S LADDER (per mille of reaching AT LEAST the tier, lootRarity.js RARITY_WEIGHTS' shape). White is the
  *  rule; Magic (blue) rare - 5% at level 0, 19% at most; Rare (yellow) very rare - 0.6% to 3.8%; Legendary (orange)
  *  almost impossible - 0.015% to 0.3%. Aetheric and Artifact are never rolled by a ladder at all.
- *  LOOT-EASE (2026-10-05): a quarter more blue, half again the yellow and the orange, than FOE-CAP's first numbers
+ *  LOOT-EASE: a quarter more blue, half again the yellow and the orange, than FOE-CAP's first numbers
  *  (4-15%, 0.4-2.5%, 0.01-0.2%) - the ladder Mac named kept in its order, the drought it made eased. */
 export const PLAIN_FOE_RARITY_WEIGHTS = Object.freeze({
   magic:     Object.freeze({ base: 50,   perTier: 5,     cap: 190 }),
@@ -113,7 +106,7 @@ export function isLootSupply(item) {
   return false;
 }
 /** The cap's order, best first: a Magic-or-better piece by its tier, then a supply, then the rest. */
-// LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): a GARMENT below Legendary ranks under a supply
+// LOOT14 (the Loot arc II): a GARMENT below Legendary ranks under a supply
 // and over a plain piece - a Magic shirt never pushes a Potion of Healing off a three-piece body (LOOT-EASE's call)
 const GARMENT_UNDER_SUPPLY = 0.5;
 // AUDIT LOOT II A9: with the ladder on - off, a garment ranks as it always did (a DFU magic shirt, Magic by its
@@ -121,7 +114,7 @@ const GARMENT_UNDER_SUPPLY = 0.5;
 const garmentRank = (it) => (lootRarityOn() && isGarment(it) && rarityRank(it) > 0 && rarityRank(it) < RARITIES.legendary.rank ? GARMENT_UNDER_SUPPLY : null);
 const capRank = (it) => { const r = rarityRank(it); const g = garmentRank(it); if (g != null) return g; return r > 0 ? 1 + r : (isLootSupply(it) ? 1 : 0); };
 
-/** STUCK-ARROWS (bible/05-Combat/Arrow-Supply.md, Mac: "Allow arrows to sometimes be retrieved from enemies"): AN ARROW
+/** STUCK-ARROWS (): AN ARROW
  *  IS NO FIND. The shafts the player put into a body (combat/arrowFlight.js playerArrowHitFoe) and an archer's own quiver
  *  are ammunition, not the body's loot - and the cheapest Common thing on it, so the cap threw them away FIRST: a plain
  *  foe at its three pieces gave back none of the arrows it was shot with. They ride past the cap now, uncounted. */
@@ -231,7 +224,7 @@ export function capFoeLoot(entity) {
 }
 
 /**
- * KIT-ROLL (LOOT-EASE, 2026-10-05, Mac: "Players are reporting only recieving steel items also"). LR4 rolls a foe's
+ * KIT-ROLL (LOOT-EASE, 2026-10-05). LR4 rolls a foe's
  * ladder over what it CARRIES and never what it WEARS - a piece the ladder made would be fought with
  * (lootRarity.js rollCorpseLoot) - and a humanoid's droppable kit is 85-98% of the gear its body leaves: measured
  * through the spawn chain, that gear was Common 99 times in 100 at every level, the Iron and Steel blades and the
@@ -241,7 +234,7 @@ export function capFoeLoot(entity) {
  * type), the player's luck, the finders, the door's last pass. Every body door calls it BEFORE anything reads the
  * body's tiers - the chime (LR3), the sigil (SIGIL1), the cap. Off, nothing. Answers the pieces it laddered.
  *
- * AUDIT 625 (2026-10-05):
+ * AUDIT 625:
  *  - L1, THE KIT IS WHAT THE SPAWN'S ROLL LEFT UNMARKED. It was found by the foe's table (`equipTableOf`), object by
  *    object - and every restore lays the save's COPIES over a foe's list and leaves its table alone (the dungeon's
  *    in-place patch, the street's and the watch's re-spawn and overlay), so after any load no foe standing rolled its
@@ -252,7 +245,7 @@ export function capFoeLoot(entity) {
  *    hand (`entity.weapon`), and a foe brought back to life in place (the save's rewind, the stream's un-death) fought
  *    on with the piece its death had laddered - LR4's own rule broken. The body now holds a marked copy; the table's
  *    piece is what it was minted.
- *  - L3, EVERY FOE (Mac: "The plain ladder"). It was a plain foe's alone, and that flipped the order it was meant to
+ *  - L3, EVERY FOE. It was a plain foe's alone, and that flipped the order it was meant to
  *    keep: a champion's, an Elite Dungeon foe's and a boss's kit stayed Common - every humanoid's from level 18, when a
  *    class foe stands a boss (lootRarity.js BOSS_LEVEL) - so they left less colour than a plain foe of their kind. Every
  *    foe's kit rolls the plain ladder now, never a boss's multiplied one (`boss: false`) or an Elite Dungeon's quality;
@@ -284,7 +277,7 @@ function rollKitPieces(entity, { rolls = Math.random, luck = 50, quarters = unde
   lastPass(minted, rolls);
   return minted;
 }
-/** LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): THE KIT'S GARMENTS - the shirt, the breeches, the
+/** LOOT14 (the Loot arc II): THE KIT'S GARMENTS - the shirt, the breeches, the
  *  cloak a foe wore, on the same ladder and source as its kit (AUDIT 625's laws whole: unmarked is kit, a COPY laddered,
  *  every foe's, never a revenant's), each copy marked; then their own last pass. After every draw the kit made. */
 function rollKitGarments(entity, { rolls = Math.random, luck = 50, quarters = undefined, find: findIn = undefined } = {}) {   // PARTY-LOOT: as rollKitPieces

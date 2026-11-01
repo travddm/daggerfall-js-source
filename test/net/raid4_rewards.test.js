@@ -1,5 +1,4 @@
-// RAID4 (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): THE TOWNS DEFENDED - the first of the rewards. A raid's receipt the relay signed (net/raid/raidReceipt.js) is
+// RAID4: THE TOWNS DEFENDED - the first of the rewards. A raid's receipt the relay signed (net/raid/raidReceipt.js) is
 // honoured by the account service over the real migrations (one row a (raid, account), the day's bound, a guest's not
 // counted, another's refused; the character that fought it paid its Renown in the same transaction, once, whoever
 // claims it twice at once - the ACCOUNT's for a day under RENOWN-ACCOUNT, the character's again since RENOWN-CHAR); the worker's route behind a session, the order a rise earns, the count on /v1/account and
@@ -192,7 +191,7 @@ test('RAID4 the worker: /v1/raid/claim behind a session and never open - the ses
   const MINE = (await seatRealm(env, me.secret, 'Ann')).id, THEIRS = (await seatRealm(env, them.secret, 'Tam')).id;
   const r = await raidFor(me.id, `3:7:${DAY}`, priv, T0);
   assert.equal((await call('POST', '/v1/raid/claim', { receipt: r, character: MINE })).status, 401, 'a stranger claims nothing');
-  assert.deepEqual(await call('POST', '/v1/raid/claim', { receipt: r, character: CH, name: 'Ann' }, me.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id claims nothing');   // PIN MOVED (INT16, Integrity-Arc section 7): a claim names the account's seated realm character - an offline id is refused before the receipt is read
+  assert.deepEqual(await call('POST', '/v1/raid/claim', { receipt: r, character: CH, name: 'Ann' }, me.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id claims nothing');
   const ok = await call('POST', '/v1/raid/claim', { receipt: r, character: MINE, name: 'Ann' }, me.secret);
   assert.equal(ok.status, 200);
   assert.equal(ok.body.recorded, true); assert.equal(ok.body.defended, 1); assert.equal(ok.body.renown.rose, true);
@@ -248,7 +247,7 @@ test('RAID4 the device\'s queue: a signed receipt is kept with the character tha
   await q.flush();
   assert.deepEqual(asked.at(-1), { r: ra, ch: CH, nm: 'Ann' });
   assert.deepEqual(said, [RAID_CLAIM_TEXT.recorded(3, 780)]);
-  assert.equal(said[0], 'The town will remember you. Towns defended: 3. +780 toward your Renown.');   // PIN MOVED (VOICE2): no XP in a sentence (Voice.md rule 3)
+  assert.equal(said[0], 'The town will remember you. Towns defended: 3. +780 toward your Renown.');
   assert.equal(heard[0].d.renown.credited, 780);
   assert.deepEqual(q.kept(), [], 'counted: let go');
   // a guest - kept, said once

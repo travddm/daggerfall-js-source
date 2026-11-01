@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// SCALE4h (2026-10-11, the plan's eighth slice - "10k writes, by the metrics"; Mac: "I wanna do every single slice";
-// bible/11-Multiplayer/Scale-Arc.md SCALE4h): WHAT ONE PLAYER-HOUR WRITES TO THE ACCOUNT PRIMARY, BY TABLE.
+// SCALE4h: WHAT ONE PLAYER-HOUR WRITES TO THE ACCOUNT PRIMARY, BY TABLE.
 //
 //   node tools/hotWritesBench.mjs                    a walker and a fighter, an hour each
 //   node tools/hotWritesBench.mjs --xp 40 --renown 20 --minutes 60 --json

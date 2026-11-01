@@ -1,7 +1,5 @@
 // @ts-check
-// SERVER-POST (2026-10-08, Mac: "Let's develop an ingame server mailbox that goes next to the hourglass in the pause
-// menu. It should show notifications whenever players have a message. First use is to utilize it for players being
-// granted items.").
+// SERVER-POST.
 //
 // THE MAILBOX. An envelope beside the hourglass over the paused game (ui/enhanced/enhancedTimers.js's mark, measured as it is)
 // wears a count while anything waits - a message unread, or an item not yet claimed - and opens a window in the pause
@@ -9,7 +7,7 @@
 // that lands it in the pack of the online character being played (net/serverPost.js PostBox.claim). The box is the
 // host's (scenes/world.js), looked at on the letterbox's clock; both the count and the window follow its `version` on a
 // tick of their own, since the pause face draws itself only when it is opened, closed or Escaped.
-// PRIVATE-REPORT (2026-10-17): and the door to a private report - every player's, under the post - and, for a reader of
+// PRIVATE-REPORT: and the door to a private report - every player's, under the post - and, for a reader of
 // the reports, their inbox (ui/enhanced/enhancedReport.js), in this same window.
 import { REFUSALS } from '../../net/accountClient.js';
 import { placeBeside } from './enhancedTimers.js';

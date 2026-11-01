@@ -1,5 +1,4 @@
-// RVN12a - THE WORDS (bible/12-Enhanced-AI/Feud-Arc.md section 23; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). Ten new moments in every personality's voice - what it learned, its
+// RVN12a - THE WORDS (;, then "Go"). Ten new moments in every personality's voice - what it learned, its
 // signature, its last stand, what it took, its festering, its return after felling a companion or routing me, a sworn
 // one's desertion and betrayal, a Devoted one's warning - two lines or more each (three for the last stand and the
 // betrayal), and a beast's deed for each. The placeholders widen, exactly, to {p}, {how}, {item}, {move}, {ally}; a line
@@ -92,7 +91,6 @@ test('RVN12a THE TAUNT\'S MOMENT: its newest deed against me first - a felling (
   // its card: a theft's taunt is its own kicker, the piece named
   const t = N.revenantTauntEvent(rec({ history: [{ deed: 'slew', at: 3 }], took: [sword] }), 'Ayla Stormwind', { rolls: () => 0 });
   assert.deepEqual([t.kind, t.kicker], ['stole', 'It took']);
-  // PIN MOVED (AUDIT FEUD: no verb takes a number - "Your {item} remains" read "Your Leather Gauntlets remains")
   assert.equal(t.speech, `I still hold your ${itemLongName(sword)}.`);
   assert.equal(N.revenantTauntEvent(rec(), 'Ayla', { rolls: () => 0 }).kind, 'taunt');
 });

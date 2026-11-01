@@ -1,6 +1,5 @@
 // @ts-check
-// INTRO3 (2026-10-14, Mac: "With the main menu music, is there anyway to recreate it using the sound system daggerfall's
-// music uses", then "you do it and it's for both"): THE MAIN THEME, WRITTEN AS NOTES - the film's score and the menu's
+// INTRO3: THE MAIN THEME, WRITTEN AS NOTES - the film's score and the menu's
 // music, played by the game's own song player and FM voice bank (systems/song/songPlayer.js, gmSynth.js) as every MIDI.BSA
 // song is, in place of the recorded master (INTRO2's assets/intro/theme.mp3) that played through a decoder of its own.
 //
@@ -8,7 +7,7 @@
 // (formats/hmiFile.js - tick-ordered `events`, one tempo, notes that carry their own durations), so it sounds like the
 // rest of the soundtrack, follows MusicVolume and the mute by the same master, and loops on its bar line.
 //
-// TRANSCRIBED, NOT INVENTED. The notes are the recording's, read off it bar by bar (2026-10-14): its stems split
+// TRANSCRIBED, NOT INVENTED. The notes are the recording's, read off it bar by bar: its stems split
 // (htdemucs), each transcribed (basic-pitch), its beats tracked, its harmony read from beat-synchronous chroma and the
 // bass stem, and every bar's melody checked against its chord. What the recording is, as this file plays it:
 //   G minor; 129 BPM through the opening, 127 after it (one tempo here, set by the film's two landmarks - below).
@@ -28,8 +27,7 @@
 // is the one that puts those two bar lines exactly there (128.76 BPM, a hair over the recording's opening), after a
 // lead of INTRO_LEAD_TICKS of quiet - so the film's cue sheet stands as it was, and the score answers to it.
 //
-// INTRO3b (2026-10-23, the owner: "I want to make this music better. Currently its not really good and too flat. I
-// really need you to put work into this and make it truely amazing"). MEASURED FIRST, against the recording's first
+// INTRO3b. MEASURED FIRST, against the recording's first
 // 27 s: the dry render's presence (2-6 kHz) stood 12 dB under the recording's share and its air (6 kHz up) 14 dB under,
 // its spectral centroid 265 Hz to the recording's 552, its spectral flatness 0.003 to 0.090 (a few pure tones, not an
 // orchestra) - and it was all but mono, L/R correlation 0.985 to the recording's 0.33. Flat, literally: dull, thin and
@@ -132,8 +130,7 @@ export const INTRO_VOICES = Object.freeze({
   hit: Object.freeze({ index: 4.5, decay: 0.5, release: 0.35, unison: 2, cents: 15, sub: 0.35, spread: 0.4 }),
   halo: Object.freeze({ saw: 1, cutoff: 6, attack: 0.35, release: 1, gain: 0.6, unison: 3, cents: 5, spread: 0.8, vibrato: 14, vibRate: 6.1, arc: 0.5, body: [[3000, 5, 1.6]], air: -5, ensemble: 0.45, ensembleRate: 0.9, ensembleMs: 9 }),
 });
-// INTRO3c (2026-10-24, the owner: "I dont like the high pitch whine"; "It still has that whine. Its not natural"; "Now
-// it just sounds like static. Stop band aid fixing and be as detailed as possible"): THE WHINE WAS THE MODEL. Measured
+// INTRO3c: THE WHINE WAS THE MODEL. Measured
 // against the recording over the opening's held chord: two-operator FM at 1:1 put the chord's 4th and 6th harmonics as
 // loud as its fundamentals with the 7th and the 9th 50 dB under them - isolated pure lines 6-12 cents wide where a
 // string section has a dense series with a plateau from the 5th harmonic (-20 dB) and every partial 20-50 cents wide -
@@ -367,7 +364,7 @@ function writer() {
 
 /** A swell: a suspended cymbal's roll into (bar, 0) - soft mallets in sixteenths over the last `beats` of the bar before,
  *  rising from a whisper to its loudest at the last stroke before the line, where the crash and the hit take over.
- *  INTRO3c (the owner: "Theres still a high pitch whine in the build up leading to the title drop"): this was the
+ *  INTRO3c: this was the
  *  bank's reverse cymbal, then INTRO3b's riser - the Spire's inharmonic FM shimmer on G5 and D6 under a 2.76 modulator,
  *  whose sidebands (2.9, 4.4, 5.1 and 7.6 kHz) stood 14 to 17 dB over their surroundings through both build-ups where
  *  the recording has none. A cymbal's roll is a band of noise: no line in it to whine. */

@@ -2,10 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC3 — WHAT A PLAYER HOLDS, AND WHAT A PLAYER WEARS.
 //
-// Mac (2026-09-22): "Player titles appear above a player name. We will
-// develop 2 titles to start out. 1st title is Founder with a gold
-// color, 2nd title is Developer with a red color. All current players
-// should be granted the founder title." And beside them, glyphs: "a
+// And beside them, glyphs: "a
 // sprouting green plant, attached to new accounts for 2 weeks" and "a
 // developer glyph specifically for developers".
 //
@@ -24,7 +21,7 @@
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
 //             your handle is in that title's own list in the config;
 //             each list grants the title AND its glyph. PATREON-LINK
-//             (2026-10-01): or, for the three Patreon tiers, the Patreon
+//             or, for the three Patreon tiers, the Patreon
 //             account you linked is an active patron entitled to that
 //             tier now (patreon.js) - Patreon's word, stored as WB9g's
 //             sale is, and read against the config at every ask.
@@ -73,8 +70,7 @@
 //
 // ═══ HOLDING IS NOT WEARING ════════════════════════════════════════
 //
-// A player may hold two titles and wears at most one - Mac: "equip 1
-// feature". The WORN one is the only thing stored (`players.title`),
+// A player may hold two titles and wears at most one. The WORN one is the only thing stored (`players.title`),
 // because it is the only thing that is a choice. Equipping validates
 // against the derived set, so a title that lapses cannot go on being
 // worn by a row nobody has looked at since.
@@ -97,8 +93,7 @@ import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MAR
  *  registers after does, and no migration had to walk a table to say
  *  so. 2026-09-23T00:00:00Z - the end of the day he asked.
  *
- *  FOUNDER2 (2026-09-24, Mac: "I want to grant all current accounts the
- *  founder title if they dont have it already"): the SAME statement made
+ *  FOUNDER2: the SAME statement made
  *  again at a later moment, so the cutoff moves to the end of THIS day -
  *  2026-09-25T00:00:00Z - and every account registered since TITLE-R
  *  closed it is a founder too, with no row written. After it the title is
@@ -106,24 +101,17 @@ import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MAR
  *  compare, and a founding title on a row one storage clear from gone was
  *  never anybody's.
  *
- *  FOUNDER3 (2026-09-27, Mac: "we still need to grant everyone the founder
- *  title befire the original cut off date. A lot of people are missing
- *  it"): the SAME instant, read off when the account FIRST PLAYED rather
+ *  FOUNDER3: the SAME instant, read off when the account FIRST PLAYED rather
  *  than when it registered (`firstPlayed`, below). The instant does not
  *  move, in either direction: nobody who holds it loses it.
  *
- *  FOUNDER4 (2026-10-04, Mac: "We need to find a way to grant the founder
- *  title to everyone before the previous cut off date. Since people are
- *  still missing their founders title"; asked how, "Link shared
- *  characters"): the SAME instant again, and when the account first
+ *  FOUNDER4: the SAME instant again, and when the account first
  *  played may now be proven by ANOTHER row - one it shares a character
  *  with (migration 0078 `first_played_at`): a guest in one browser who
  *  registered in another place, the desktop app's own storage above all,
  *  first played when that guest did.
  *
- *  FOUNDER5 (2026-10-07, Mac: "Can we grant every account before sept 25th
- *  the founder title. Ive tried this multiple times and its never worked";
- *  asked how, "Time zone + name list"): BEFORE THE 25TH WHEREVER THE PLAYER
+ *  FOUNDER5: BEFORE THE 25TH WHEREVER THE PLAYER
  *  WAS. 00:00Z on the 25th is 8pm on the 24th in New York and 5pm in Los
  *  Angeles, so a player in the Americas who first played that evening -
  *  before the 25th on their own clock - held nothing. The instant moves to
@@ -148,8 +136,7 @@ export const isNamedFounder = (player, env) =>
   typeof player?.handle === 'string' && !!player.handle
   && founderHandles(env).has(player.handle.toLowerCase());
 
-/** HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant them a unique different version of the aura,
- *  a title named Hour's First, and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
+/** HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
  *  accounts the first clear's claims name (sd_kills, slot 1; .github/workflows/sd-clears.yml read them). A list in config,
  *  the developers' law (FOUNDER5's): held while listed, and a guest - no handle - never is. It grants the title Hour's
  *  First and its aura, The First Hour, and no glyph (TIER_LISTS would owe one). */
@@ -191,7 +178,7 @@ export function handleList(raw) {
   return new Set(raw.split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
 }
 
-/** ═══ TITLE-N (2026-09-24, Mac) ═══════════════════════════════════
+/** ═══ TITLE-N ═══════════════════════════════════
  *
  * "Dungeon Master is an orange title with its own glyph. This title
  * allows the user to use the /dm to message chat with orange text
@@ -231,8 +218,7 @@ export const TIER_AURA = Object.freeze({});
  *  next token's glyphs all read it at once. @param {any} player */
 export const staffSuspended = (player) => player?.staff_suspended === 1;
 
-/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK (2026-10-01,
- *  Mac: "having to manually hand out titles ... its really hard to keep up with it"): AND a Patreon tier's title is held
+/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK: AND a Patreon tier's title is held
  *  by the pledge too - the account's linked Patreon membership, read against PATREON_TIERS (patreon.js) - so a patron
  *  needs no line here, and the lists stay for the titles Mac grants by name. */
 export const holdsTier = (title, player, env) =>
@@ -306,8 +292,7 @@ export function titlesHeld(player, env) {
   // derived from the account's characters' seats (npcChapters.js chapterTitlesOfAccount), laid on the row as
   // `chapterTitles` for this request alone, while CHAPTER_TITLES is on
   if (Array.isArray(player?.chapterTitles)) for (const t of player.chapterTitles) if (CHAPTER_TITLES.includes(t) && !held.includes(t)) held.push(t);
-  // ARENA4 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title. Being the #1 pvp arena player comes
-  // with it's own temporary title/glyph"): THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
+  // ARENA4: THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
   // read onto the row (`arena`, server-account/src/arena.js arenaHonoursOf) where a token is minted or a wardrobe shown.
   // The Grand Champion holds for good (a row only a relay-signed climb writes); the Arena Champion while the account is
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.
@@ -342,7 +327,7 @@ export const HEARTHKEEPER_TITLE = 'hearthkeeper';
 /** WITCH1: the keys of one kind among the festival's account wares a row bought (festivalLaw.js FESTIVAL_WARES). */
 const festivalKeys = (/** @type {any} */ player, /** @type {string} */ kind) => festivalWaresHeld(player?.fest_wares).filter((id) => id.startsWith(`${kind}:`)).map((id) => id.slice(kind.length + 1));
 
-/** SERAPH-WINGS (2026-10-05, Mac: "I want to build an aura for the developers ... Golden Angel wings that flow"): THE
+/** SERAPH-WINGS: THE
  *  DEVELOPERS' AURA - held while the handle is in DEVELOPER_HANDLES, as the developer title and glyph are, and gone on
  *  the next token once it is not. */
 export const DEVELOPER_AURA = 'seraphwings';
@@ -365,7 +350,7 @@ export function aurasHeld(player, env) {
   return held;
 }
 
-/** WITCH1 (bible/06-Systems/Witches-Festival.md): THE PROFILE ICONS THIS PLAYER HOLDS - the festival's bought from a Wyrd
+/** WITCH1: THE PROFILE ICONS THIS PLAYER HOLDS - the festival's bought from a Wyrd
  *  Sister (`fest_wares`), and the Soul Cake once the account has taken SOULCAKE_TAKEN cakes from other players' offerings
  *  (`fest_taken`). A registered account's alone. In ICONS's order. */
 export const SOULCAKE_ICON = 'soulcake';
@@ -411,7 +396,7 @@ export function glyphsOf(player, env, nowS) {
   return on;
 }
 
-/** GLYPH-WEAR (2026-10-02, Mac: "can we make it where players can also equip/unequip their glyphs"): THE GLYPHS THIS
+/** GLYPH-WEAR: THE GLYPHS THIS
  *  PLAYER HAS TAKEN OFF - the stored choice (`glyphs_off`, 0068), read against what is true now, so a glyph that has
  *  lapsed is not "hidden" and one granted later shows until it is taken off. In glyphsOf's order. */
 export function glyphsHidden(player, env, nowS) {

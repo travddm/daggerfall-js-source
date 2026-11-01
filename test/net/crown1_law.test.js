@@ -1,5 +1,5 @@
-// CROWN1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE CROWN TIER'S LAW - kingdom reach,
-// the Marches' share, the Free Lands' Watch, and the Conscription Edict (bible/11-Multiplayer/Seats-Arc.md 4.3, 4.4,
+// CROWN1 part one: THE CROWN TIER'S LAW - kingdom reach,
+// the Marches' share, the Free Lands' Watch, and the Conscription Edict (4.3, 4.4,
 // 7.6). Pure: src/net/townSeatLaw.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -102,7 +102,7 @@ test('CROWN1 A CONSCRIPTED SEAT\'S STANDING (7.3, 7.6): -5 in its week\'s rows, 
 test('CROWN1 THE CHRONICLE\'S CONSCRIPTION ROWS: at the crown, what it brought; at each seat that paid, what it paid and to whom (mutants: the kinds; the sums)', () => {
   const seat = { key: 17, name: 'Daggerfall', tier: 'crown', region: 17 };
   assert.equal(chronicleLine({ kind: 'conscription', week: 4, data: { guild: { name: 'The Silver Hand', tag: 'SH' }, from: { name: 'Oath', tag: 'OA' }, marks: 1200 } }, seat),
-    'In week 4, the crown\'s Conscription brought the Silver Hand <SH> 1,200 silver of its kingdom\'s Tithe.');   // PIN MOVED (AUDIT-SEATS L7): Drakes, the players' word; SILVER: silver
+    'In week 4, the crown\'s Conscription brought the Silver Hand <SH> 1,200 silver of its kingdom\'s Tithe.');
   assert.equal(chronicleLine({ kind: 'conscripted', week: 4, data: { guild: { name: 'Oath', tag: 'OA' }, crown: { name: 'The Silver Hand', tag: 'SH' }, marks: 300 } }, { ...seat, name: 'Tulune', tier: 'palace' }),
     'In week 4, Oath <OA> paid 300 silver of its Tithe to the Silver Hand <SH>\'s Conscription.');
 });

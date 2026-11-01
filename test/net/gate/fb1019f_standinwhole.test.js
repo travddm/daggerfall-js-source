@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-19f STAND-IN-WHOLE (a player's private report: a Disintegrate on an online breach's boss popped a huge
-// number, and his bar never moved) - bible/11-Multiplayer/World-Bosses.md, STAND-IN-WHOLE.
+// number, and his bar never moved), STAND-IN-WHOLE.
 //
 // Every body a relay runs is struck on this machine against a stand-in (world/gate/gateBoss.js bossStandIn, hostStandIn,
 // crystalStandIn) whose health stood at 1e9; a Disintegrate deals its target the health it has left, so it claimed 1e9 -
@@ -51,7 +51,7 @@ const atLevel = (lv, fn) => { const was = playerEntity.level; playerEntity.level
 
 test('STAND-IN-WHOLE THE WHOLE (world/gate/gateBoss.js STAND_IN_WHOLE): the most one blow lands at any relay - HIT_CAP_X times the reference at the level cap - at least every relay\'s one-blow cap (the gate\'s, the Abyss\'s, the serpent\'s, a bout\'s) and carried by every wire (the bout\'s 10,000 the least), each relay landing its whole cap on it; 1e9 refused by every one (mutants: 1e9 back; past the bout\'s ceiling)', () => {
   assert.equal(STAND_IN_WHOLE, HIT_CAP_X * dpsRef(LV_MAX));
-  assert.equal(STAND_IN_WHOLE, 780);   // PIN MOVED (EG removal): no Elite Breach bucket grows it past the gate's cap
+  assert.equal(STAND_IN_WHOLE, 780);
   assert.equal(dpsRef(999), dpsRef(LV_MAX), 'no level reads past the cap');
   // AT LEAST every relay's one-blow cap
   const bout = Math.max(arenaBlowCap({ r: ARENA_HIT.Spell }), arenaBlowCap({ r: ARENA_HIT.Melee }),

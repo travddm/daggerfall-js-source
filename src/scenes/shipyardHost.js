@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11): THE SHIPMASTER'S WINDOW'S HOST HALF. The window (ui/shipyardWindow.js) reads a model and asks
+// SHIPYARDS: THE SHIPMASTER'S WINDOW'S HOST HALF. The window (ui/shipyardWindow.js) reads a model and asks
 // acts; this builds the one and carries out the other over the world host's runtimes - the Fleet's host half
 // (scenes/fleetHost.js: the ledger, where each ship lies, her summoning and laying up, her refits and her name), the sea
 // fight's state of each (scenes/naval/navalHost.js: the shipwright's model, her named hands, the recruits signed on and paid

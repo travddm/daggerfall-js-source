@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Bot check) - THE BOT CHECK'S REACTIONS, KEPT
+// STAFF-PANEL5-FEEDS - THE BOT CHECK'S REACTIONS, KEPT
 // AND READ, Admins alone.
 //
 // mob (03:51Z): the player's game must not be able to tell it is a check, "or thats worthless"; so (04:47Z) the check

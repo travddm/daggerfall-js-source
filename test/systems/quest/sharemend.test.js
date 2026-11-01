@@ -1,5 +1,4 @@
-// SHARE-MEND (2026-09-27, Discord - Tabitha: "Fix sharing Guild & Temple quests - It says the quests don't match up,
-// can't share, etc.").
+// SHARE-MEND.
 //
 // THREE FAULTS BEHIND ONE SENTENCE. A guild's or a temple's quest sends the party to a dungeon, and a dungeon Place
 // carries every quest marker in it - three hundred markers were over the share's byte cap on their own, and the Share

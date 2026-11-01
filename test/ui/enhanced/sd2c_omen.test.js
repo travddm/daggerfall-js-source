@@ -1,9 +1,9 @@
-// SD2c (2026-10-06, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 4): THE HOLLOW SEEN AND
+// SD2c: THE HOLLOW SEEN AND
 // HEARD OF (systems/superDungeon/sdOmen.js, render/superDungeon/sdOmenPass.js, scenes/superDungeon/sdHost.js) - before it is found, a column of brass-gold light
 // over its pixel seen from SD_OMEN_PX round and a word in the taverns of its city; once found, its ring on the held map,
 // its mark on the compass inside SD_COMPASS_M, its row in the Timers window and its note under the red seal, until it
 // is gone.
-import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';   // SD18c (PIN MOVED): a Hollow's Ending in its words
+import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';   // SD18c (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -63,7 +63,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   const f = sdFind(r, T0 + H, 'Mara');
   const m = sdMapMark(f, HOLLOW, T0 + H + 1000);
   assert.deepEqual({ ...m, tip: null }, { day: 1, cx: 303.5, cy: 202.5, r: SD_RING_R, label: 'The Stopped Bell - fades in 1d 22h', phase: 'found', tip: null });
-  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });   // SD18c (PIN MOVED): the Ending it keeps
+  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });   // SD18c (
   assert.equal(sdStateWords(f, T0 + H + 1000), 'fades in 1d 22h');
   const k = sdFell(f, T0 + 3 * H, { top: 'Mara', n: 2 });
   assert.equal(sdMapMark(k, HOLLOW, T0 + 3 * H + 1000).label, 'The Stopped Bell - collapsing');
@@ -76,7 +76,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   assert.deepEqual(read.tip.lines, m.tip.lines);
   assert.notEqual(gateMarkKey(read), gateMarkKey(readGateMark(() => sdMapMark(f, HOLLOW, T0 + 3 * H), { width: 1000, height: 500 })), 'its words tick: a new key, a repaint');
   assert.equal(SD_RING_MAP_CSS, SD_MAP_INK.ring);
-  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');   // ABYSS-NAME (PIN MOVED): the player's word, here and below
+  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');   // ABYSS-NAME (
 });
 
 test('SD2c the note under the red seal: the ring\'s own words - its name, its city, its state; none without a ring; the board hangs it after the gate\'s (mutants: the state dropped; hung without a ring)', () => {
@@ -99,7 +99,7 @@ test('SD2c the Timers row: none while it has only risen, its fading once found, 
   const [c] = rows(k, T0 + 3 * H + M);
   assert.equal(c.title, 'The Stopped Bell collapses');
   assert.equal(c.until, k.fellAt + SD_COLLAPSE_MS);
-  // SD19 (PIN MOVED): gone - its own row with it; the next one's rise counted (never where), until it may rise
+  // SD19 (
   assert.deepEqual(rows(k, k.fellAt + SD_COLLAPSE_MS).map((x) => [x.id, x.title, x.where, x.live, x.at]), [['sd:2', 'An Abyss Dungeon rises', null, false, k.next]], 'gone');
   assert.deepEqual(rows(k, k.next), [], 'and none once it may');
   assert.deepEqual(rows(f, T0 + 2 * H, { name: null, place: null }).map((x) => [x.title, x.where]), [['The Abyss Dungeon stands', null]], 'its name and city not known yet');

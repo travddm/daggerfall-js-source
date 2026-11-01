@@ -1,5 +1,4 @@
-// AUDIT SCALE II (2026-10-11, the audit of PR #757 - Mac: "Lets do an audit on everything. Ensure perfection.";
-// bible/11-Multiplayer/Scale-Arc.md): THE CLIENT'S HALF. Each finding the reviewers reproduced against the frozen head
+// AUDIT SCALE II: THE CLIENT'S HALF. Each finding the reviewers reproduced against the frozen head
 // (e729cea7), pinned by its ID:
 //   C-1   the new client against a relay before the shards: `find` (a search, the Guild tab's ask) only of a relay that
 //         answers it - world191 closed the hub link 1008 on it, every frame the Guild tab was drawn;

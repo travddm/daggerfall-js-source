@@ -1,4 +1,4 @@
-// FEUD's MERGE OF MAIN (2026-10-05, bible/12-Enhanced-AI/Feud-Arc.md THE MERGE OF MAIN): the laws the merge itself
+// FEUD's MERGE OF MAIN: the laws the merge itself
 // composed, where main's AUDIT ARENA-LADDER and the arc's TELL8 had each taught the brain a new mark - a bout-mate on
 // the sand (judged here, where both fighters run) and a peer it hunts (judged on the peer's own screen). One aim law
 // now (ai/tactics.js targetFeet, judgedHere), and the sand's draw range reaching AUDIT TELL's shards as it reaches the

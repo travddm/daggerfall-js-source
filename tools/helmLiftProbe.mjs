@@ -4,9 +4,7 @@
 //         for each height of eye, the scalp-over-helm ratio at each raise of the head, and the raise that gives the
 //         ratio Mac's screenshot shows
 //
-// MW-STEEL5 (2026-10-09, Mac: "Theres also an issue where the helmet isnt positioned properly on the head but only for
-// the new integrated model", with a screenshot of the set worn, from behind: the scalp standing up through the closed
-// helm's crown). AUDIT MW-STEEL5: the probe that read HELM_LIFT ran off the tree, so the number could not be re-run;
+// MW-STEEL5. AUDIT MW-STEEL5: the probe that read HELM_LIFT ran off the tree, so the number could not be re-run;
 // this is it. It draws no game data: the set is the port's own (the shipped NIFs), the skeleton the vendored retail
 // hierarchy (RETAIL_SKELETON), and the head a STAND-IN - SCENE_BODY's box as an ellipsoid, the bounds of the Breton head
 // Mac's scene fitted the helms on, carried by the head bone as a rigid head is. The screenshot itself is the game's
@@ -26,7 +24,7 @@
 // WHAT IT DOES NOT RULE OUT. A head bigger than the scene's Breton (the screenshot's race is not recorded) would show
 // the same scalp at a smaller raise, and a shot from behind sees nothing of an offset front to back.
 //
-// MW-FIT1 (2026-10-09, a player's report: "the helmet elevation is too much", "the coif has to cover the neck"): the
+// MW-FIT1: the
 // closed helms hide the head now, as retail's closed helmets do, and stand where Mac fitted them, so what this reads is
 // the OPEN helm's lift alone - the one helm with a head under it. `wornSet('open')` wears it, and the shipped open helm
 // is what the head must stay inside.

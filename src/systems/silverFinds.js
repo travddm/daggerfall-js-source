@@ -1,7 +1,6 @@
 // @ts-check
-// SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in more forms of interactions like foraging and
-// different activities, also needs to be sometimes lootable"): A LOOT FIND - a foe's body, a treasure pile or a searched
-// thing, opened online, holds silver now and then. Design: bible/06-Systems/Professions-Arc.md 10.5 (SILVER-FINDS).
+// SILVER-FINDS: A LOOT FIND - a foe's body, a treasure pile or a searched
+// thing, opened online, holds silver now and then. Design: 10.5 (SILVER-FINDS).
 //
 // THE DEVICE ROLLS THE FIND, ONCE A CONTAINER. The service cannot see a body, so a find is bounded, not witnessed
 // (net/marksLaw.js SILVER-FINDS): the device rolls each container's chance once a session (findChanceOf - a body's, a

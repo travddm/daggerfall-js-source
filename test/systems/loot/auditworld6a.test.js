@@ -1,4 +1,4 @@
-// AUDIT WORLD6a (Mac, 2026-09-14: "Audit before we move on") - three opus
+// AUDIT WORLD6a - three opus
 // lenses over the building-as-a-world-room slice: the wire and the relay;
 // the interior's live wiring; the pure half and the gaps. THE ONE ROOT
 // (A1, CRITICAL): the building's memory was NEVER published - the interior
@@ -44,7 +44,7 @@ const ctxOf = () => ({
 test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE HANDS IN - minted by the pure half, its key spelled as the pure half reads it - so the building is published; the bag refuses to compose without a key, and an owned building has none', () => {
   const bag = mintInteriorShared(interiorLocationKey(187853213, 4));
   assert.equal(bag.locationKey, 'interior:m187853213.4');
-  assert.deepEqual(Object.keys(bag).sort(), ['applied', 'home', 'locationKey', 'net', 'openKey', 'openWin', 'owned', 'room', 'seen', 'stamp', 'tooBig', 'unreadable']);   // AUDIT SETS M2: `unreadable`   // HOME1: `home` - an online home's room carries no loot (home1.test.js)   // PIN MOVED (OUTDOOR-LOOT): `net` the host's wiring and `room` the cupboards' room law (null with no net: a bare bag, an offline page, a home)
+  assert.deepEqual(Object.keys(bag).sort(), ['applied', 'home', 'locationKey', 'net', 'openKey', 'openWin', 'owned', 'room', 'seen', 'stamp', 'tooBig', 'unreadable']);   // AUDIT SETS M2: `unreadable`   // HOME1: `home` - an online home's room carries no loot (home1.test.js)   //
   bag.seen.add('shelf:0');
   const shared = composeInteriorShared(ctxOf(), bag);
   assert.ok(shared, 'the memory composes - before A1 every publish answered null and no building was ever remembered');

@@ -1,4 +1,4 @@
-// EMOTE1 (2026-09-23, the community arc - Addison Knox: "Emotes, be it emojis or additional animations"): AN ACTION, A
+// EMOTE1: AN ACTION, A
 // GESTURE, AND AN EMOJI THAT STAYS WHOLE. Driven: the one sanitizer's joiner law (kept between two pictographs and
 // nowhere else, idempotent under a fuzz, whole at the bound); the action line over the wire, the real Room, the
 // session and the log; the gestures, `/me`, `/emotes` and the shortcodes; the bubble's cut between whole characters
@@ -63,7 +63,7 @@ test('EMOTE1 the action on the wire: `me: true` and nothing else - a truthy junk
   const r = fakeRoom(CHAT_WORLD_ROOM);
   const realNow = Date.now; let clock = 1e12; Date.now = () => clock;
   try {
-    const a = r.connect(); await r.hello(a, 'peer-a', null, { name: 'Ann', kind: 'linked' });   // PIN MOVED (AUDIT SAFE RELAY-11): a registered speaker - a guest's channel lines are paced now
+    const a = r.connect(); await r.hello(a, 'peer-a', null, { name: 'Ann', kind: 'linked' });
     const b = r.connect(); await r.hello(b, 'peer-b', null, { name: 'Bob' });
     a.sent.length = 0; b.sent.length = 0;
     await r.raw(a, JSON.stringify({ t: 'chat', text: 'waves at Bob.', me: true }));

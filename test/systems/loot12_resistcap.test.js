@@ -1,6 +1,4 @@
-// LOOT12 - HONEST RESISTANCE (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 4; Mac: "We also have a great solid
-// loot foundation, but what could we do to make it even more amazing, while also balancing everyrhing?", then "Lets go
-// all in").
+// LOOT12 - HONEST RESISTANCE.
 //
 // A rolled resistance line adds its points to the saving throw's 50, and 100 there is immunity before Willpower is read
 // (spellcast.js savingThrow, FormulaHelper.SavingThrow's own law). Measured through the real fold and the real throw, two
@@ -50,7 +48,6 @@ test('LOOT12: the rolled lines count to 45 an element - two Rares at +25 are 45 
     assert.equal(piece.rarity, 'aetheric');
     wear(e, piece);
     const line = crown.affixes.find((a) => a.id === 'resist' && a.param === 'fire').value;
-    // PIN MOVED (AUDIT LOOT II A8): the Aetheric line rides whole and the rolled ones fill to the cap BESIDE it - the cap
     // is the gear's whole (45 + its line made the Oathkeeper's Helm and a Rare ring a body immune to Magic)
     assert.equal(entityResistMod(e, ['fire']), 45, 'the Aetheric line whole, the rolled ones to the cap beside it');
     assert.deepEqual(LR.rolledResistOf(e, 'fire'), { worn: 65, counts: 45 - line }, 'and is never counted as a rolled line');

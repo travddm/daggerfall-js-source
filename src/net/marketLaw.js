@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET: what a listing, a
+// PROF5 - THE MARKET: what a listing, a
 // sale, a courier and a buy order are, and every bound both ends read.
-// The record is bible/06-Systems/Professions-Arc.md 10.2-10.5 and 26.
+// The record is 10.2-10.5 and 26.
 //
 // A LISTING is a Stores material (escrowed by the service - the units
 // leave the Stores at once) or a crafted piece with a provenance id (the
@@ -88,10 +88,9 @@ export const CRAFTED_FAMILIES = Object.freeze([
 export const MARKET_FAMILIES = MATERIAL_FAMILIES;
 
 // ─── BOARD-SIFT: PAGES, ORDERS, A SEARCH OF THE PIECES ───────────────
-// (2026-10-21, feature-feedback: "The notice board market also doesnt show everything if there are too many
-// weapons/armor/etc listed it stops after a certain number") - a view showed its first MARKET_SHOWN rows and nothing
+// a view showed its first MARKET_SHOWN rows and nothing
 // past them. The views of pieces and of buy orders turn pages of MARKET_SHOWN now, every filter read in the query
-// itself so a page is a page (bible/06-Systems/Professions-Arc.md 10.13).
+// itself so a page is a page (10.13).
 
 /** The views read a page at a time. Materials is not: its first look is the Bay's cheapest hundred of every material,
  *  and its search, family and tier reach any material - each to its own cheapest hundred, its market's front. */
@@ -181,7 +180,7 @@ export const saleTitheOn = (before, total, pct = MARKET_TITHE_PCT) => saleTithe(
 /** What the seller receives of a sale: the price less the tax and the Tithe (10.4). */
 export const sellerGets = (total, tithePct = MARKET_TITHE_PCT) => total - saleTax(total) - saleTithe(total, tithePct);
 
-// ─── GOLD-MARKET (2026-09-30, Mac: "Allow trading with gold or drakes on the marketplace"; "Gold listings, walled") ───
+// ─── GOLD-MARKET ───
 //
 // A listing names its currency: Drakes (`marks`, the code's name for them) as ever, or GOLD - a realm character's own
 // gold, paid off its record on the service and held for its seller until collected into a bank account. Buy orders,
@@ -309,7 +308,7 @@ export function marketCatalogue() {
  *  names three switches, and the market needs each). */
 export const marketOpen = (board, prof, marks) => board === true && prof === true && marks === true;
 
-// ─── PROF5b: TIMED AUCTIONS FOR MASTERWORKS (10.2, bible/06-Systems/Professions-Arc.md 27) ─────
+// ─── PROF5b: TIMED AUCTIONS FOR MASTERWORKS (10.2, 27) ─────
 
 /** An auction stands this long (10.2: 24 hours). */
 export const AUCTION_S = 24 * 3600;

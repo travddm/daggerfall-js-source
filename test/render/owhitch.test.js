@@ -1,5 +1,4 @@
-// OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld. Can you please fix this properly";
-// bible/07-Rendering/Performance-Priority.md OW-HITCH) - THE OVERWORLD'S HITCHES, MEASURED IN THE REAL GAME AND TAKEN OUT.
+// OW-HITCH - THE OVERWORLD'S HITCHES, MEASURED IN THE REAL GAME AND TAKEN OUT.
 // Each change is held here to its claim: what it no longer does, and that what it makes is what was made.
 //   1. the grass: a cleared cell uploads nothing, a written one its blades alone, and the field places into two cells'
 //      arrays where it made 343 KB a cell - the same bytes;
@@ -143,7 +142,6 @@ test('OW-HITCH blood: the sheet\'s prewarm asks with a wait, and on a page that 
 
 // ─── 3. THE SNOW UNDER A BLADE ──────────────────────────────────────
 
-// PIN MOVED (SNOW-FACE, FIELD BUGS 2026-10-21 - bible/01-Overview/bugs/Field-Bugs-2026-10-21.md; merged after this):
 // the snow has no slope now, so the host asks the stream neither a height nor a normal - this test's own end, no lookups
 // for a blade the grass places, held whole - and a cliff under a full cover is buried as level ground is (its tile has no
 // rock to shed to). The normalOf door this test pinned went with the slope.
@@ -285,7 +283,7 @@ test('OW-HITCH ground sets: a set is made ONCE a key while builds ask for it tog
   const holds = [];
   log.length = 0;
   await Promise.all([sets.loadGroundSet(302, { tileArray: (k) => holds.push(k) }), sets.loadGroundSet(302, { tileArray: (k) => holds.push(k) })]);
-  assert.deepEqual(holds, [302, 302, 302, 302], 'each build holds the set, and asks again once it stands');   // PIN MOVED (TESA-LANDS' second audit, lane C): a build whose place went while the set was made leaves it loose for the next sweep (scenes/placeHolds.js hold)
+  assert.deepEqual(holds, [302, 302, 302, 302], 'each build holds the set, and asks again once it stands');
   assert.equal(log.filter((c) => c[0] === 'texImage3D').length, 1, 'one array made for the two builds');
   assert.equal(log.filter((c) => c[0] === 'texSubImage3D').length, set.length, 'its layers uploaded once');
   assert.equal(log.filter((c) => c[0] === 'generateMipmap').length, 1);

@@ -1,4 +1,4 @@
-// DIAMOND-HB (2026-10-18): the 4-slot diamond as part of the hotbar, the Diamonds option for the ten-slot row, the
+// DIAMOND-HB: the 4-slot diamond as part of the hotbar, the Diamonds option for the ten-slot row, the
 // prefs migration, and hover/selection + slot key under a window.
 import '../../modsOff.js';
 import { test } from 'node:test';

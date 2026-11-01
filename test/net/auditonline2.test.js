@@ -1,4 +1,4 @@
-// AUDIT ONLINE 2 (2026-09-28, Mac: "Fix it and do another audit"): what AUDIT ONLINE left "not changed, said so", fixed
+// AUDIT ONLINE 2: what AUDIT ONLINE left "not changed, said so", fixed
 // and pinned here - beside RAID-ROLL (test/systems/raidroll.test.js: the relay reads the day's roll) and the corpse pile's way
 // back (test/net/world6biiic.test.js, F4):
 //   F2 a receipt's life is the RELAY's clock - a device a week ahead let every receipt go unasked;
@@ -6,7 +6,7 @@
 //      door asks again (a town's thanks, a load from before them, a save: the record cleared, the pieces in no pack);
 //   F5 a trade a peer's game refused says so - "your offer was not valid" blamed the wrong player, and the reader of an
 //      offer from a newer build is told to reload.
-// bible/03-World/Raiding-Parties.md, "AUDIT ONLINE 2".
+// "AUDIT ONLINE 2".
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -127,5 +127,5 @@ test('AUDIT ONLINE2 F5: AN OFFER THIS BUILD CANNOT READ ends the trade with the 
   assert.notEqual(said.A.at(-1), tradeWhyText('refused', 'Bran'), 'never "Bran\'s offer was not valid"');
   assert.deepEqual([packA.st.items.map((i) => i.id), packB.st.items.map((i) => i.id)], [['set-piece'], ['ring']], 'nothing moved');
   assert.equal(tradeUnreadableText('Ann'), 'Ann\'s offer has an item your game does not recognize. Reload for the newest version. The trade is off');
-  assert.match(tradeUnreadableText('Ann'), /Reload/);   // PIN MOVED (VOICE2): a sentence of its own, no dash aside (Voice.md rule 5)
+  assert.match(tradeUnreadableText('Ann'), /Reload/);
 });

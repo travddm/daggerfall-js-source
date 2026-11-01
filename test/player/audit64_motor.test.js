@@ -440,7 +440,6 @@ test('AUDIT 64 F5: CanStand sweeps camCrouchToStandDist upward, clearing only fe
 test('AUDIT 64 F5: a 1.6 ceiling PERMITS the stand where the old full-capsule probe refused it', () => {
   // 1.6 sits inside the 1.25..1.8 band the port used to refuse. DoStand
   // (:265-283) raises the capsule regardless and lets the head clip.
-  // PIN MOVED (RPT1026-WORLD STAND-THROUGH, test/player/rpt1026_world_standthrough.test.js): it stood under 1.4 - in the
   // band under feet + 1.45 where the standing head's centre stands past the ceiling's face, and is refused now
   const m = stood(ceiled(1.6));
   m.update(DT, still({ crouch: true }), 0);

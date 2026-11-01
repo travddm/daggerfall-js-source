@@ -1,7 +1,7 @@
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE TIDES IN THE SERVICE - each set
+// SEASON1 part two: THE TIDES IN THE SERVICE - each set
 // against a twin service counting no Season (where every land is Calm): a Daedric Incursion's gate kills and a Plague's
 // Watch in the standings, the week's and the coming week's Tide on the Seat tab, a Plague pricing the coming week's
-// Festival at the Turning (bible/11-Multiplayer/Seats-Arc.md 9.3). Driven through the real Worker over node:sqlite.
+// Festival at the Turning (9.3). Driven through the real Worker over node:sqlite.
 // The rolls are the law's (test/net/tide_law.test.js): around T0 the Marches roll a Daedric Incursion in week W and a Plague
 // in week W+1, pinned here.
 import { test } from 'node:test';

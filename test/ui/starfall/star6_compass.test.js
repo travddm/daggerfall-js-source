@@ -1,4 +1,4 @@
-// STAR6 (bible/11-Multiplayer/Starfall.md section 8): THE COMPASS AND THE MAP - the HUD's door forwards the event marks
+// STAR6: THE COMPASS AND THE MAP - the HUD's door forwards the event marks
 // the host hands it to the enhanced strip (the sea serpent's and a found Hollow's had been handed since SERPENT1 and
 // SD2c and dropped at drawHud, so neither ever showed; a fallen star's beside them), each at the gate's bearing law,
 // hidden and never removed; and the held map's ink for a fallen star. Driven on the real drawHud and enhanced HUD over

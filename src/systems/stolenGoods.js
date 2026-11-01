@@ -49,7 +49,7 @@ export function clearStolen(/** @type {any} */ item) {
   return item;
 }
 
-/** STOLEN-GOODS AUDIT (2026-10-16, S1): A THEFT IS OF THE OWNER'S PIECES. A theft target's host takes THE OWNER'S KEEPING
+/** STOLEN-GOODS AUDIT: A THEFT IS OF THE OWNER'S PIECES. A theft target's host takes THE OWNER'S KEEPING
  *  as its window opens - a Set of the records the target held then (`loot.stolenFrom`) - and the theft's own law reads
  *  that same Set at the close (systems/theft.js theftBasket: the owner's pieces gone out of the keeping), so the mark and
  *  the crime agree by construction. The mark had been written on every take through the window and cleared on every put:

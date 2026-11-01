@@ -1,5 +1,5 @@
 // @ts-check
-// SD7a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS' LAW -
+// SD7a: THE UNMOORED STEPS' LAW -
 // the course from the Orrery's first step to the Last Moment's arena, in the realm's frame (net/superDungeon/sdBrain.js): where each
 // step stands, how it moves on the realm's anchored clock, and what the void does with a body that falls. Pure: the
 // page (SD7b) stands, moves and judges them; the relay never does - a player who reaches the arena simply arrives.
@@ -22,7 +22,7 @@
 // walls are run UP, not along (the engine has no run along a wall); the gust moves the body itself (the motor's own push
 // stops at every edge); and the course needs 145 m, so the arena moves out to z 246.
 //
-// EG-H3 (2026-10-12, the Elite Gates arc; bible/11-Multiplayer/Elite-Gates.md sections 10.1 and 29, EG4): THE COURSE AS
+// EG-H3: THE COURSE AS
 // DATA - the course is no longer frozen by a function of this module's: it is SD_COURSE_SPEC, laid by the one course law
 // (net/superDungeon/egSpanLaw.js courseOf), byte for byte the course it was (test/net/egseam_law.test.js), and every reader takes a course
 // (the Hour's own by default). THE PLATFORM CLOCK lives in net/superDungeon/egSpanLaw.js, the Spire's pieces' own, and is said here

@@ -1,5 +1,4 @@
-// TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL; 2026-10-10, the owner: "lets do code driven design for each
-// technique, like real detail and ensure performance remains in tact"): WHAT A TECHNIQUE FEELS LIKE - the camera's
+// TECH-FX (THE FEEL; 2026-10-10): WHAT A TECHNIQUE FEELS LIKE - the camera's
 // springs, the hands' dip, the shake, the world's burst and the sound, at each of its moments.
 //
 // The runner (combat/techniques.js) cues a moment - `release`, `hit`, `loose`, `shaft`, `close` - with the host's door
@@ -57,7 +56,7 @@ const HANDS = new TechHands();
  * blade's travel: a StrikeLeft (Whirlwind) leans left into it and settles back past level; a StrikeRight (Cleave,
  * Shadowstep, Haymaker) winds up leaning left and lands leaning right. A bow's loose plays no layer of its own: the
  * host's bowSound plays the same ArrowShoot a tick earlier, so a second one
- * only doubled it. bible/05-Combat/Weapon-Techniques.md THE FEEL's table says each in words.
+ * only doubled it. THE FEEL's table says each in words.
  */
 const f = Object.freeze;
 export const TECH_FX = f({

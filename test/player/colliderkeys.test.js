@@ -1,6 +1,4 @@
-// PERF-EXT25 (2026-09-25, the players: "fps issues in the exterior but
-// fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600") - A COLLIDER CELL'S KEY IS A NUMBER. Every triangle a streamed
+// PERF-EXT25 - A COLLIDER CELL'S KEY IS A NUMBER. Every triangle a streamed
 // pixel files, and every cell a query reads, minted a `${gx},${gz}`
 // string; on a synthetic city pixel (300,000 triangles) the insert was
 // ~1 s of main thread across the build. The key is (gx + 2^20) * 2^21 +

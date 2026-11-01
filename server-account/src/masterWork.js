@@ -1,5 +1,5 @@
 // @ts-check
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57): A MASTER'S WORK, AS THE SERVICE DECIDES IT.
+// MASTER-ART: A MASTER'S WORK, AS THE SERVICE DECIDES IT.
 // The client says what it asks - the recipe, its three lines, the dye; the service decides the rest in one batch, as
 // craftAtAnvil does: the character's Master rank, the day's one work, the recipe's goods (a station's, loose too) and
 // the catalysts it counted (own or bought, never loose - src/net/masterLaw.js MASTER_CATALYSTS), the roll's seed and

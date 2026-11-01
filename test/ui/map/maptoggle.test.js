@@ -1,6 +1,4 @@
-// MAP-TOGGLE + MAP-FIELD8 (2026-09-22, Mac: "is the enhanced map a toggle?"
-// - "Yes needs to be a toggle. Along with this change, replace the
-// current paperdoll integration with this replacement"): the held sheet
+// MAP-TOGGLE + MAP-FIELD8: the held sheet
 // is a Features switch under the enhanced skin, read by the three map
 // doors through one gate, and the painting in the hands is the FOURTH.
 import { test, beforeEach } from 'node:test';
@@ -60,7 +58,7 @@ test('MAP-TOGGLE by source: the Features row - interface (FT18; sight before), e
   assert.ok(row, 'the row exists');
   assert.equal(row.group, 'interface'); assert.deepEqual([...row.kinds], ['enhanced']);   // FT18: a map is drawn over the world, not in it
   assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'heldMap', initial: true, online: 'player' });
-  assert.match(row.note, /Off uses the classic three map windows/, 'the note says what off is');   // PIN MOVED: BR5
+  assert.match(row.note, /Off uses the classic three map windows/, 'the note says what off is');
 });
 
 test('MAP-FIELD8: the FOURTH painting ships, and every constant that is a measurement of it was measured (tools/heldMapArtProbe.mjs, 20 checks) - wider than the third, the sheet inset on it, the thumbs where they rest, the art foot, the band in the cuff gap', () => {

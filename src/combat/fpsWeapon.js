@@ -166,7 +166,7 @@ export function getWeaponAnims(weaponType) {
   return GENERAL_ANIMS;
 }
 
-/** WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): the enchanted promotion UNDONE - the plain set a *_Magic type swings
+/** WEAPON-GLOW1: the enchanted promotion UNDONE - the plain set a *_Magic type swings
  *  while its weapon's element shows (systems/weaponGlow.js spriteGlow): the element's outline is drawn over the plain
  *  frames, never over the WEAPO1xx sheet's painted glow. Every other type is itself. A departure from
  *  ConvertItemToAPIWeaponType, named: DFU has no element to show. */

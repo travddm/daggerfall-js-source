@@ -1,6 +1,4 @@
-// TRAVEL-NAV1 (2026-09-25, Mac: "Improving travel options navigation to
-// properly route around objects and stopping before running into
-// buildings. Currently it could be so much better") - THE WALK GOES ROUND,
+// TRAVEL-NAV1 - THE WALK GOES ROUND,
 // AND STOPS SHORT.
 //
 // The autopilot (systems/travel/travelAutopilot.js, PlayerAutoPilot.cs) answers

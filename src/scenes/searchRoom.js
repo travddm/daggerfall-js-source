@@ -1,7 +1,6 @@
 // @ts-check
-// GRAVE-PARTY (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "objects in tombs are un
-// lootable"; Mac's SEARCH1-PARTY: "When one player in the party interacted with it no one else can again for 5 hours ...
-// visible for everyone in the party the same the looter sees"): A DUNGEON'S SEARCHED OBJECT IS ITS SEARCHER'S PARTY'S.
+// GRAVE-PARTY (FIELD BUGS 2026-10-16b,; the Discord's "objects in tombs are un
+// lootable"): A DUNGEON'S SEARCHED OBJECT IS ITS SEARCHER'S PARTY'S.
 //
 // SEARCH1-PARTY said every search to the WHOLE ROOM as its container (`srch:<i>`, WORLD4's word - scenes/dungeonContext.js
 // publishLoot), whatever it rolled, and every client that heard it started its five hours and took the find as its own -
@@ -18,7 +17,7 @@
 // THE ONE HOME for whose a `srch:` word is: the dungeon host constructs it once and asks it at applyLoot, at the search,
 // at its memory's composition and at its records.
 //
-// AUDIT GRAVE-PARTY (2026-10-16): G4 - a stranger's word kept is stamped NEVER AHEAD OF NOW (the WORLD7/8 C2 law
+// AUDIT GRAVE-PARTY: G4 - a stranger's word kept is stamped NEVER AHEAD OF NOW (the WORLD7/8 C2 law
 // applyLoot keeps for a landed word): its forged far-future `t` was kept as said, so it was never let go at the room's
 // hour and its 24 slots rode the room's memory for good. G5 - the word names its searching CHARACTER too (`bn`, the
 // session's issued name): the five hours are the account's, and another character of it is told whose search it was

@@ -1,5 +1,4 @@
-// URBANIZER U1 (2026-10-26; KPbICA's spec, forwarded by the owner: "Buildings assets should utilize more cut stones, bricks,
-// half-timbering"; bible/03-World/Urban-Fabric.md section 2): a town past the Bay wears its PROVINCE's building set -
+// URBANIZER U1: a town past the Bay wears its PROVINCE's building set -
 // Daggerfall's own stone, brick and half-timber sets (ClimateSwaps.ApplyClimate's bases) - its ground still its zone's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

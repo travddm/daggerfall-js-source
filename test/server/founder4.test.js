@@ -1,5 +1,4 @@
-// FOUNDER4 (2026-10-04, Mac: "We need to find a way to grant the founder title to everyone before the previous cut off
-// date. Since people are still missing their founders title"; asked how, "Link shared characters"). FOUNDER3 reads
+// FOUNDER4. FOUNDER3 reads
 // Founder off when an account FIRST PLAYED, its row's first contact - and could not reach a player whose play before the
 // cutoff is on ANOTHER row: a guest in one browser who registered in another place (the desktop app is its own origin,
 // so its own storage). Migration 0078 links the two through a character both rows hold - its id is minted on the
@@ -17,12 +16,12 @@ import { verifyToken, importPublicKeyB64 } from '../../src/net/identityToken.js'
 import { ACCEPTED } from '../../src/net/legalLaw.js';
 
 const DAY = 24 * 60 * 60;
-const CUT = Date.UTC(2026, 8, 25, 12) / 1000;   // FOUNDER5 (PIN MOVED): 00:00Z until the end of the 24th on every clock
+const CUT = Date.UTC(2026, 8, 25, 12) / 1000;   // FOUNDER5 (
 const FILE = '0078_founder_links.sql';
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 const sql = (f) => readFileSync(new URL(`../../server-account/migrations/${f}`, import.meta.url), 'utf8');
 const BEFORE = MIGRATIONS.slice(0, MIGRATIONS.indexOf(FILE));
-/** SERPENT1 (PIN MOVED at its merge): the migrations after 0078 - the service end to end serves a database that has them
+/** SERPENT1 (
  *  (its routes read their tables), all but the one under test. */
 const AFTER = MIGRATIONS.slice(MIGRATIONS.indexOf(FILE) + 1);
 
@@ -165,7 +164,7 @@ function d1Before() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

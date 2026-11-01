@@ -170,7 +170,6 @@ test('QUEST-ITEM-NAMED, the trace: O0A0AL00 stands its robes at the Moorham Mano
   assert.equal(clothing.daggerfallUnityItem.templateIndex, PRIESTESS_ROBES);
   assert.equal(itemLongName(clothing.daggerfallUnityItem), 'Priestess Robes');
   assert.match(mansion.buildingName, /^The .+ Residence$/, 'a House1 is "The <surname> Residence" (Place.GetBuildingName)');
-  // PIN MOVED (QUEST-AUDIT III HOUSE-HOUSE): the pack's directory names no House1, so the darts fall back - to any HOUSE now
   // (it took any building with markers: the author's farmhouse FARMAA09 #0 was the draw among them), the house the draw
   // lands on read off its key: a house of the author's grid, with its own item marker
   const [bx, by, rec] = [(mansion.buildingKey >> 16) & 0xff, (mansion.buildingKey >> 8) & 0xff, mansion.buildingKey & 0xff];

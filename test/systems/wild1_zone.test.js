@@ -1,4 +1,4 @@
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md): THE OPEN ZONE - its mask and edge, its foes, what a death in
+// WILD1: THE OPEN ZONE - its mask and edge, its foes, what a death in
 // it keeps and drops, the respawn's clear ground, the death screen's hold, and the maps' fog. WW-C2 (bible/03-World/
 // World-Wide.md WW-C): the zone is Cyrodiil's (test/world/worldWide/wwc2_zone.test.js), its mask a grid of cells laid on
 // the world; the Wrothgarian Mountains' cut and keep-out retired with their zone.
@@ -79,9 +79,9 @@ test('WILD1: a death keeps the consumables and what never changes hands, drops t
   const items = [potion, sword, loose, quest, cart, torch, book, helm];
   const wagon = [cargo];
   const drop = takeWildDrop(items, wagon);
-  assert.deepEqual(drop, [loose], 'the bag alone');   // PIN MOVED (STORE-KEEPS, 2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death"): it was [loose, cargo], the bag first, then the cart
+  assert.deepEqual(drop, [loose], 'the bag alone');
   assert.deepEqual(items, [potion, sword, quest, cart, torch, book, helm], 'the rest stays, in its order');
-  assert.deepEqual(wagon, [cargo], 'the cart is storage: its cargo stays');   // PIN MOVED (STORE-KEEPS): it was [], "it also loses all loot in it"
+  assert.deepEqual(wagon, [cargo], 'the cart is storage: its cargo stays');
   assert.deepEqual(wornOffer(items), [sword, helm], 'the killer\'s choice: the worn pieces a death lets go');
   const rec = wildRecord({ ...sword, questItem: true });
   assert.equal(rec.equipSlot, undefined); assert.equal(rec.questItem, undefined);
@@ -95,7 +95,7 @@ test('LETTERS-DROP and KEEP-WALLET (2026-10-09): a death in the zone drops a let
   assert.equal(wildCanLose(letter), true, '"letter of credits should be dropped"');
   const items = [wallet, letter, embers, quests, shards], wagon = [carted];
   const drop = takeWildDrop(items, wagon);
-  assert.deepEqual(drop, [letter], 'the bag\'s letter; the cart\'s stays');   // PIN MOVED (STORE-KEEPS, 2026-10-26): it was [letter, carted], the bag's letter, then the cart's
+  assert.deepEqual(drop, [letter], 'the bag\'s letter; the cart\'s stays');
   assert.deepEqual(wagon, [carted], 'the cart is storage');
   assert.deepEqual(drop.map((l) => wildRecord(l).value), [25000], 'at its whole value');
   assert.deepEqual(items, [wallet, embers, quests, shards], '"the wallet shouldnt drop in the zone" - nor what it holds');
@@ -121,7 +121,7 @@ test('WILD1: the death screen holds two minutes in the zone and takes no Enter; 
     assert.equal(s.respawnIn, 120);
     s.input('confirm');
     assert.equal(s.sequence.reset, false, 'Enter does not rise in the zone');
-    assert.deepEqual(wildDeathLines(wildDeath()), ['Ria may claim one piece of your worn gear.', '3 things you carried lie where you fell, for ten minutes.', 'In Cyrodiil the dead wait two minutes.']);   // PIN MOVED (WW-C2): Cyrodiil's
+    assert.deepEqual(wildDeathLines(wildDeath()), ['Ria may claim one piece of your worn gear.', '3 things you carried lie where you fell, for ten minutes.', 'In Cyrodiil the dead wait two minutes.']);
     setWildDeath({ killer: 'Ria', dropped: 0, claimed: 'Iron Helm' });
     assert.equal(wildDeathLines()[0], 'Ria took your Iron Helm.');
   } finally { setWildDeath(null); globalThis.document = realDoc; }

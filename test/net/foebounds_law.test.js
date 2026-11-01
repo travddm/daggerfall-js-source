@@ -1,5 +1,4 @@
-// FOE-BOUNDS (2026-10-19, Mac: the hand-off spec "LATTY: REJECT AND REMOVE INVALID ENEMY HANDOFFS; DO NOT RESCALE", then
-// "Spec + B + A" and "The game's own code"; bible/11-Multiplayer/Spawn-Grants.md section 19): THE MOST HEALTH A STREAMED
+// FOE-BOUNDS: THE MOST HEALTH A STREAMED
 // FOE CAN LEGALLY HAVE (net/foeBounds.js), held to the builders it copies - each constant equal to its home, each row to
 // the three profiles' most, and each bound EQUAL to what the game's own builders make of a foe at its worst (the spec's
 // "exact legal max and max+1": the maximum stands, one more is refused).

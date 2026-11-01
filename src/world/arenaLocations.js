@@ -1,5 +1,5 @@
 // @ts-check
-// TESA2 (2026-10-12, the owner: "Continue building"; bible/03-World/Arena-Provinces.md TESA2) - THE PLACES PAST THE BAY
+// TESA2 - THE PLACES PAST THE BAY
 // STAND (TESA12: the port's own - world/tamrielPlaces.js - where TESA2 stood Arena's). Each named place beyond the Bay
 // stands on its Bay pixel (world/arenaPlaces.js standArenaPixels) as a NON-MUTATING
 // CLONE of one of Daggerfall's own places - the Etheric Sea's and the spawned dungeons' law (world/etherPlaces.js,

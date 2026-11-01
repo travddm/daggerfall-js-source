@@ -1,5 +1,4 @@
-// MW-BRIG2 (2026-09-29, Mac on MW-BRIG1: "The texture was great, you just somehow moved the geometry in the
-// process"): THE STEEL BRIGANDINE, SKINNED FROM THE BODY UNDER IT.
+// MW-BRIG2: THE STEEL BRIGANDINE, SKINNED FROM THE BODY UNDER IT.
 //
 // MW-BRIG1 hung the brigandine rigid on the skeleton's Chest and Groin nodes. The body it covers is SKINNED to the
 // spine and pelvis by its own NiSkinData (Morrowind-Rules.md rule 20), so once anything animated the torso moved by

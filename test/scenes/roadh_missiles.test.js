@@ -1,4 +1,4 @@
-// ROAD-H MISSILES (2026-09-07) - the three DaggerfallMissile laws
+// ROAD-H MISSILES - the three DaggerfallMissile laws
 // AUDIT 62's foes lane fixed the AIM for and deferred the rest of:
 // where an arrow LEAVES the bow (both enemy pools and the player's own
 // four hosts), the crouch dip an enemy archer takes against a crouching
@@ -298,7 +298,6 @@ test('ROAD-H H1c: BOTH arrow spawn seams apply it, so every host inherits the bo
   // The fork is ONE function (systems/spellcast.js playerShotOrigin - a world origin a host hands over, or
   // GetAimPosition), and both seams call it; the claim is asserted at the fork's home and the two seams are held to the
   // call: a PLAYER shaft with no origin supplied takes GetAimPosition, and an ENEMY shaft takes its origin bare.
-  // PIN MOVED (guns removed): the lens muzzle (playerMuzzleOrigin) went with the guns; the fork keeps `{ world }` alone.
   assert.match(src('systems/spellcast.js'),
     /export function playerShotOrigin\(eye, lookDir, muzzle\) \{\n\s*if \(muzzle\?\.world\) return \[\.\.\.muzzle\.world\];\n\s*return playerArrowOrigin\(eye, lookDir\);\n\}/);
   assert.match(src('combat/arrowFlight.js'),
@@ -306,7 +305,6 @@ test('ROAD-H H1c: BOTH arrow spawn seams apply it, so every host inherits the bo
   assert.match(src('combat/arrowFlight.js'), /this\.arrows\.push\(\{ pos: origin,/);
   assert.match(src('scenes/dungeonContext.js'),
     /const pos = fromPlayer\s*\n\s*\? playerShotOrigin\(from, dir, muzzle\)[^\n]*\n\s*: \[\.\.\.from\];/);
-  // PIN MOVED (guns removed): the orb's flatArchive left the missile with the guns
   assert.match(src('scenes/dungeonContext.js'), /missiles\.push\(\{ arrow: true, weapon, fromPlayer, shooterFoe, aimFoe, pos,/);
   // FlipHorizontal is read LIVE at the loose, off the same stored
   // Controls/Handedness the screen weapon draws by (StartGameBehaviour

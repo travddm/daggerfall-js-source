@@ -1,4 +1,4 @@
-// DYE-ICON (2026-09-26, Mac, over the house's hung weapons: "others are daedric but show steel"): THE CLASSIC ICON IS
+// DYE-ICON: THE CLASSIC ICON IS
 // DYED. GetItemImage (ItemHelper.cs:463-478) draws an item with no replacement as the archive's own picture, its mask
 // stripped and then ChangeDye'd - a weapon's or a piece of armour's METAL swatch (never an artifact's), a garment's
 // CLOTH one, by the item's dye. The port stripped the mask and stopped, so every metal drew as the base picture: a
@@ -204,7 +204,7 @@ test('DYE-ICON: a real Daedric dagger\'s classic icon is dyed - its metal indice
   assert.ok([...dyed.data].filter((i) => METAL_TABLES.Daedric.includes(i)).length >= metal, 'every one of them Daedric');
 });
 
-// ── AUDIT DYE-ICON (2026-09-27): the audit of the three, fixed ─────────
+// ── AUDIT DYE-ICON: the audit of the three, fixed ─────────
 
 test('AUDIT DYE-ICON 1: the decorator\'s "In this room" preview of a hung blade is the pack\'s picture, dyed as it hangs - asked by the mount\'s dye and swatch, as the pack\'s own row asks, where it was asked bare (mutants: the shape without its item, the mount asked undyed)', async () => {
   const asks = [];

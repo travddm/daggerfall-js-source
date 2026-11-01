@@ -1,7 +1,6 @@
 // @ts-check
-// WALLET1 (2026-10-05, Mac: "We need to develop a wallet item that holds forms of currency and sits in the inventory"):
+// WALLET1:
 // THE WALLET - a piece every character carries in the pack that holds its currencies. Design and record:
-// bible/06-Systems/Wallet.md.
 //
 // AN ORGANIZER, NEVER A SECOND LIST. The pieces it holds - DFU's letters of credit (template 275), the gate's Deadlands
 // Embers (570) and the Welkynd Shards salvage gives (571) - stay in the pack's own collection (`entity.items`), so every
@@ -144,14 +143,12 @@ export function walletContents(items, entity, { silver = walletSilver(), here = 
 const num = (/** @type {number} */ n) => Number(n).toLocaleString('en-US');
 /** WALLET-WEIGHT: a weight as the pack's card and rows say one ("30.90 kg"). */
 export const walletKg = (/** @type {number} */ kg) => `${(Number(kg) || 0).toFixed(2)} kg`;
-/** TRADE-LOC II (2026-10-11, from play: "Cant see how much a letter of credit is worth when trading directly with
- *  players"): a LETTER OF CREDIT's worth as the gold it stands for ("12,500 gold"), or null for anything else - the line
+/** TRADE-LOC II: a LETTER OF CREDIT's worth as the gold it stands for ("12,500 gold"), or null for anything else - the line
  *  below's figure, for a surface that names it under its own word (the pack's card says it as its Worth pair). */
 export const letterWorthGold = (/** @type {any} */ item) => (item?.templateIndex === LETTER_OF_CREDIT_TEMPLATE
   ? `${num(Math.max(0, Math.trunc(Number(item.value) || 0)))} gold` : null);
 /** A LETTER OF CREDIT's worth, as a line - the gold it stands for (its `value`, the whole price it was minted at), or null
- *  for anything else. TRADE-LOC (Dudey: "when players trade in any ui the letter of credit doesnt show how many gold its
- *  worth when being clicked on it in the info box"): a letter is nothing but its worth, so a window that describes an item
+ *  for anything else. TRADE-LOC: a letter is nothing but its worth, so a window that describes an item
  *  without its price - the player trade's - says it here. */
 export const letterWorthLine = (/** @type {any} */ item) => { const g = letterWorthGold(item); return g == null ? null : `Worth ${g}`; };
 /** AUDIT 625 W5: the silver's words where no figure is counted, by why (walletContents' `silverWhy`): offline the
@@ -160,13 +157,12 @@ export const letterWorthLine = (/** @type {any} */ item) => { const g = letterWo
  *  words. */
 export const SILVER_WHY = Object.freeze({ offline: 'held in your online account', asking: 'checking your account', none: 'none' });
 /**
- * WALLET-UI (2026-10-07, Mac: "Polish and organize the ingame wallet item for ease of readability"): THE WALLET'S
+ * WALLET-UI: THE WALLET'S
  * LEDGER - its currencies in two parts, the coin (the purse's gold, the account's silver) and what the wallet holds (the
  * letters of credit, the Deadlands Embers, the Welkynd Shards), each a label and a figure: `none` for one it holds none
  * of (`none` true), null where the silver is not counted here (its `note` says why), and a `note` where the figure needs
  * one (what the letters are worth). The enhanced sheet draws the rows; the classic box says each as a line (walletLines) -
- * one set of words for both. WALLET-WEIGHT (2026-10-19, from play: "Are these supposed to be weighing us down even in the
- * wallet?"): a holding it holds any of says what it weighs (`weight`, null for none and for the coin - the gold is the
+ * one set of words for both. WALLET-WEIGHT: a holding it holds any of says what it weighs (`weight`, null for none and for the coin - the gold is the
  * purse's, the silver no piece) - the enhanced sheet's alone: the classic window keeps the pieces on DFU's tabs, each
  * piece's Info saying its own weight, and its box's words stand.
  * @param {ReturnType<typeof walletContents>} c

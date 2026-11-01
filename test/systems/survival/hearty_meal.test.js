@@ -1,5 +1,4 @@
-// HEARTY-MEAL (2026-10-23, the owner: "eating a meal in taverns should make you fed and not thirsty for a while (Well Fed
-// buff etc)"): A TAVERN MEAL IS A SIT-DOWN MEAL - quenched at the table, and held fed and quenched for HEARTY_MEAL_MINUTES
+// HEARTY-MEAL: A TAVERN MEAL IS A SIT-DOWN MEAL - quenched at the table, and held fed and quenched for HEARTY_MEAL_MINUTES
 // (survival/needs.js), the HUD's Well Fed tile counting its hours down (survival/status.js survivalHudChips).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -67,7 +66,7 @@ test('HEARTY-MEAL: the HUD wears a Well Fed buff tile on the hunger\'s glyph wit
   assert.equal(tip.foot, '5h left');
 });
 
-// AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): lane E's laws of the hold
+// AUDIT UPDATE: lane E's laws of the hold
 test('AUDIT UPDATE E3, E-N4, E-N5: a second meal never stacks the hold; no record holds longer than one meal; a journey past the replayed span still owes nothing for the hours the meal held (mutants: the holds summed; the record unbounded; the skipped hold lost)', () => {
   const s = { ...newSurvival(0) };
   heartyMeal(s, 100); heartyMeal(s, 200);

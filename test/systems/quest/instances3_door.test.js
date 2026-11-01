@@ -1,6 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "The player approaches, should be met with an enhanced UI popup that lets them select
-// public or instanced (if applicable)" - where: "Dungeons with your quest", "Privateer's Hold", "Building interiors";
-// bible/11-Multiplayer/Instances.md): THE DOOR. Its law (systems/instancePlaces.js) over the real QuestMachine and Place,
+// INSTANCES: THE DOOR. Its law (systems/instancePlaces.js) over the real QuestMachine and Place,
 // its page half (scenes/instanceDoor.js) with the real ChoiceWindow and the real digests, the modes host's funnel
 // executed from its source, and the sizes a quest's markers and an instance build at (world/smallerDungeons.js).
 import { test } from 'node:test';
@@ -281,7 +279,6 @@ test('INSTANCES every other way in (entryFor): NEVER a popup - a quest\'s place 
 
 test('QUEST-ELSEWHERE (FIELD BUGS 2026-10-16c, MD-Geist: "the Objective just did not want to spawn (I tried the dungeon in \'Public\' mode) even after \'Quest Repair\'"): a quest\'s dungeon the world lays smaller in public says so in the popup, before Public is chosen; a repair in that room says where its things are, never "nothing was missing" (mutants: relaid never read; the line never laid; the repair\'s word dropped)', async () => {
   // the site: `relaid` exactly where the world lays the public room smaller (onlineDungeonSize), never the Hold's or a hollow's
-  // PIN MOVED (AUDIT FB1019f B1): where it BUILDS it smaller - a dungeon of no more blocks than its size's threshold is
   // the dungeon whole (fb1019f_heirwhole.test.js) - so the ruin has thirteen blocks, which either smaller size lays anew
   const sizes = { full: null, medium: null, small: null };
   for (let id = CRYPT.mapId; Object.values(sizes).some((v) => v == null); id++) if (id !== PRIVATEERS_HOLD_MAP_ID) sizes[onlineDungeonSize({ mapTableData: { mapId: id } })] ??= id;
@@ -310,7 +307,7 @@ test('QUEST-ELSEWHERE (FIELD BUGS 2026-10-16c, MD-Geist: "the Objective just did
   questAt(m, CRYPT);
   const there = repairActiveQuests(m, { mountCurrentSite: () => 'elsewhere' });
   assert.deepEqual([there.elsewhere, there.text], [true, questElsewhereLine()]);
-  assert.match(questElsewhereLine(), /in your own instance/);   // PIN MOVED (VOICE2): no dash aside (Voice.md rule 5)
+  assert.match(questElsewhereLine(), /in your own instance/);
   const home = repairActiveQuests(m, { mountCurrentSite: () => undefined });
   assert.deepEqual([home.elsewhere, home.text], [false, 'Nothing was missing from your active quest.'], 'anywhere else: as before');
 });
@@ -531,7 +528,7 @@ test('INSTANCES the hosts, by source: the place\'s instance is the MODE\'s - set
   assert.match(WM, /dungeon: \{ \.\.\.\(placeInstance \? \{ ins: instanceWord\(placeInstance\) \} : \{\}\), whole: builtDungeonSize\(dungeonLoc\) === 'full' \} \};/, 'the anchor: room and layout');
   assert.doesNotMatch(fns.get('enterInteriorCore'), /choose|atDoor/, 'a building\'s entry never asks either');
   assert.match(fns.get('enterInteriorCore'), /place = entry \?\? \(restore\?\.ins != null && door \? await door\.entryFor\(/);
-  assert.match(fns.get('mountQuestResources'), /host\.instanceDoor\?\.questElsewhere\?\.\(dungeonLoc\); return 'elsewhere'; \}/);   // PIN MOVED (QUEST-ELSEWHERE, FIELD BUGS 2026-10-16c): the gate answers 'elsewhere', and a repair says so
+  assert.match(fns.get('mountQuestResources'), /host\.instanceDoor\?\.questElsewhere\?\.\(dungeonLoc\); return 'elsewhere'; \}/);
   assert.match(read('src/scenes/dungeonContext.js'), /mapId: mt\.mapId \?\? null, \.\.\.\(opts\.placeRecord\?\.\(\) \?\? \{\}\) \};/);
   const W = hostText('src/scenes/world.js');
   assert.match(W, /instance: ident\?\.instance \?\? null,/);
@@ -539,13 +536,12 @@ test('INSTANCES the hosts, by source: the place\'s instance is the MODE\'s - set
   assert.match(W, /if \(instanceDoor\.refused\(online\)\) modes\?\.forceExitToExterior\?\.\(\);/);
   assert.match(W, /landed = !!\(await modes\?\.startInDungeon\?\.\(\{ recorded: a\.dungeon \?\? \{\} \}\)\);/, 'a Recall');
   assert.match(W, /interior: inside\.interior, dungeon: inside\.dungeon \?\? null,/, 'the anchor is set with the dungeon\'s record');
-  assert.match(W, /startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/, 'a load');   // PIN MOVED (AUDIT STARTS W3): a start's own dungeon through the quest's entry
+  assert.match(W, /startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/, 'a load');
   assert.match(W, /startInDungeon\?\.\(\{ locationKey: d\.locationKey \?\? null, holdOpen: true, recorded: \{ ins: d\.ins \?\? null, whole: d\.whole === true, staff: true \} \}\)/, 'a staff landing in a dungeon');
   assert.match(W, /\.\.\.\(d\.ins \? \{ ins: d\.ins, staff: true \} : \{\}\) \}, null, \{ strictDoor: true \}\)/, 'and in a building');
   assert.match(W, /var modes = createWorldModes\(\{\n {4}climbFeel[,:][^\n]*\n {4}outsideView,[^\n]*\n {4}instanceDoor,/);
-  // PIN MOVED (START2): the quest layer's one sizing (questWorld.js questSized), its location doors through it
   assert.match(W, /const questSized = \(loc\) => dungeonLocationFor\(loc, \{ questMachine: (?:host\.)?questBridge\?\.machine, online: params\.has\('online'\), whole: params\.has\('online'\) \}\);/, 'the quest\'s world: the dungeon whole online');
-  assert.match(W, /getLocation: \{ value: \(r, l\) => questSized\(provinces && isProvinceRegion\(r\) \? provinces\.getLocation\(r, l\) : maps\.getLocation\(r, l\)\) \}/);   // PIN MOVED (AUDIT RELEASE R2-5): a province's region's place sized the same way
+  assert.match(W, /getLocation: \{ value: \(r, l\) => questSized\(provinces && isProvinceRegion\(r\) \? provinces\.getLocation\(r, l\) : maps\.getLocation\(r, l\)\) \}/);
 });
 
 test('INSTANCES the Recall anchor keeps a dungeon\'s room and layout (systems/teleportAnchor.js makeAnchor) - its instance\'s word and whether it stood whole; a building\'s rides its door identity, outside none; a malformed word is dropped', () => {

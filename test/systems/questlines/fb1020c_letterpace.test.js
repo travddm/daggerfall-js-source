@@ -5,7 +5,7 @@
 // "don't all arrive at once". The runner paced the lines' STARTS an hour apart (AUDIT QUESTLINES LINES-17), but every
 // line it began at night (online the sky's night is half of every real hour), indoors or in the wild held its letter,
 // and they all landed within a minute at the next town by day. LETTER-PACE made a line begin only when no begun line's
-// first letter was still on its way, and an hour after the last letter arrived. PIN MOVED (QL-OFFERED,
+// first letter was still on its way, and an hour after the last letter arrived.
 // 2026-10-25, Lord Rumpkin: "every town I enter there is some courier ramming quest letters into my hand"; the owner: a
 // questline is TAKEN, never SENT): no line begins unasked, and a first step's letter is in hand from the take - only a
 // LATER step of a line the player took comes by courier, so the pace is the couriers': a later step sets out only when
@@ -61,7 +61,7 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent
   // The Thirteenth of Frostfall opens IN PERSON - a Wyrd Sister hands her letter as she is met (QLTF01 `get item
   // _letter_`), or Morwen's raven its note once a star is held: neither at the start-up, neither by courier
   const IN_PERSON = new Set(['thirteenthFrostfall']);
-  assert.equal(QL_LINES.length, 12);   // PIN MOVED (Elite Gates removed): the Weir Road gone
+  assert.equal(QL_LINES.length, 12);
   const couriers = [];
   for (const l of QL_LINES) {
     const { quest } = parsedQuest(l.steps[0].quest, machine);
@@ -208,7 +208,7 @@ function play(ticks, { lines = null } = {}) {
   const warn = console.warn, realNow = Date.now;
   console.warn = () => {};
   // the wall clock the runner reads (qlLineRunner.js nowMs - the bridge hands it none) held out of the Witches' Festival
-  // (2026-07-01: starfallRuns false): on a festival day The Thirteenth of Frostfall opens among the lines, in person and
+  // on a festival day The Thirteenth of Frostfall opens among the lines, in person and
   // with no courier's letter, and this run's count was the calendar's (star8_frostfall.test.js holds that line)
   Date.now = () => OUT_OF_FESTIVAL_MS;
   try {

@@ -1,5 +1,5 @@
 // @ts-check
-// GHOSTFENCE (bible/03-World/Red-Mountain.md, The Ghostfence): its pylons and Ghostgate as models the pixel build stands
+// GHOSTFENCE (, The Ghostfence): its pylons and Ghostgate as models the pixel build stands
 // (scenes/ghostfenceBuild.js) - metres from a foot, x along the fence, z across it, y up - their solids,
 // and their pictures, painted here: GHOSTFENCE_ARCHIVE's records are the port's own, no Daggerfall art. A face winds so
 // its cross product points out of its solid (the meshes' law, render/renderer.js HANDEDNESS). Pure.

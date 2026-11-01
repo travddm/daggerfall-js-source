@@ -1,7 +1,6 @@
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE WHOLE OF TAMRIEL ROUND THE BAY, pinned.
+// TAMRIEL1 - THE WHOLE OF TAMRIEL ROUND THE BAY, pinned.
 //
-// Mac: "building the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used
-// and connected as a gigantic map that can be used for later use and be seen by players ingame", then "Performance
+// then "Performance
 // should also not be affected".
 //
 // Four modules, each pinned against its own law: the FRAME (world/tamriel/tamrielFrame.js - one offset, no scale, the Bay's
@@ -309,7 +308,6 @@ test('TAMRIEL1 ink: off the Bay the paint strokes the coast in the Bay\'s own pe
   assert.equal(strokes[1].strokeStyle, PEN.line, 'then the line');
   assert.equal(strokes[1].lineWidth, 1.3);
   assert.equal(strokes[2].strokeStyle, PEN.relief, 'the high ground\'s carets');
-  // PIN MOVED (REGION-LINES 2, 2026-10-25, the owner: "Each region distinctly separated"): the provinces' line solid on its
   // halo (PROVINCE_PEN), no longer the Bay's dash
   assert.ok(ctx.calls.some((c) => c.fn === 'stroke' && c.lineWidth === 2.6 && c.strokeStyle === PEN.line), 'the provinces\' line, solid');
   const dashes = ctx.calls.filter((c) => c.fn === 'setLineDash').map((c) => c.args[0]);
@@ -323,7 +321,6 @@ test('TAMRIEL1 ink: off the Bay the paint strokes the coast in the Bay\'s own pe
   const haloed = ctx.calls.filter((c) => c.fn === 'strokeText');
   assert.ok(haloed.length >= 8 && haloed.every((c) => c.strokeStyle === PEN.halo), 'every city name haloed in the parchment');
   const regionFont = ctx.calls.filter((c) => c.fn === 'fillText' && c.args[0] === spaced('Skyrim'))[0].font;
-  // PIN MOVED (REGION-LINES 2): out on the continent a province's name 18px on a halo, so one parted province reads from the next
   assert.match(regionFont, /^300 18px/, 'the continent\'s province name');
   assert.ok(ctx.calls.some((c) => c.fn === 'strokeText' && c.args[0] === spaced('Skyrim') && c.strokeStyle === PEN.halo), 'the province\'s name haloed');
   // in to the Bay's own fit: every city, and the names a size larger

@@ -1,4 +1,4 @@
-// START3 (2026-10-25, bible/06-Systems/Alternate-Starts-Arc.md section 12; the owner: "Fix the known gap"): A QUEST'S
+// START3: A QUEST'S
 // PLACE PAST THE BAY ON THE PLAYER'S MAP. The held map's quest marks, the street compass and the journal's find found a
 // quest's place through MAPS.BSA's tables alone, and MAPS.BSA holds no place off the Bay's table - a province's start
 // dungeon, an Arena town's guild job, any site TESA stands. A site past the Bay now keeps its own map pixel

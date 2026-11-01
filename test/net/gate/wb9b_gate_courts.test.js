@@ -1,5 +1,4 @@
-// WB9b (2026-09-30, Mac: "I want to add 2 more arena's of the same size that the boss leaps to between each phase. A
-// walkway should form to allow players to traverse through each arena."): THREE COURTS AND THE WALKWAYS LAID BETWEEN
+// WB9b: THREE COURTS AND THE WALKWAYS LAID BETWEEN
 // THEM. The Warden fights each phase in its own court - the first where the players arrive, then west, then north - and
 // at each phase's turn he BOUNDS across the fire to the next court's heart; the bound's word lays a walkway from the
 // court he leaves, stone by stone out of the fire, and he waits there under his ward for a challenger to cross it.
@@ -11,7 +10,7 @@
 //   the screen          the motor's clamp (world/gate/gateArena.js courtArena), the slabs rising (slabRise, slabMatrix), the
 //                       telegraph over the court it lands in, the braziers nearest first, the land clear of the floor
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9b).
+// Design: (WB9b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

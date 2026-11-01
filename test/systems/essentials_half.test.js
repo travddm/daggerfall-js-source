@@ -1,5 +1,4 @@
-// ESSENTIALS-HALF (2026-09-30, Discord: "things are way too expensive rn for money to be nerfed so heavily... cut the
-// cost of most essential items by half"). REALM P0.4 / MERC-RISE / MERC-CAP cut what a player earns online and left
+// ESSENTIALS-HALF. REALM P0.4 / MERC-RISE / MERC-CAP cut what a player earns online and left
 // what they pay: online now a tavern room, its food and drink, a temple's cure, a travel fare and a potion bought at
 // any counter cost half (rounded up, at least a gold, a free one kept free). Offline, DFU's prices stand; repairs,
 // training, spells, enchanting, houses and ships never move.

@@ -1,7 +1,5 @@
 // @ts-check
-// INSPECT1 (2026-09-23, the community arc - kurkku: "a profile page that you can bring up when you're near them"; Mac:
-// "a new enhanced UI element for the player inspect interaction. Showing their glyph, name, title, stats and worn
-// gear"): THE CARD A PLAYER HANDS OVER WHEN ASKED, and the law of when they hand it.
+// INSPECT1: THE CARD A PLAYER HANDS OVER WHEN ASKED, and the law of when they hand it.
 //
 // WHAT IS ON IT is what their own character sheet shows, read by the producers that sheet reads
 // (ui/enhanced/enhancedCharSheet.js sheetModel): the level, the eight attributes by liveStat over STAT_KEYS_ORDER, and the three

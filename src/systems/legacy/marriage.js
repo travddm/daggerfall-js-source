@@ -1,6 +1,5 @@
 // @ts-check
-// LEGACY5 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 8; Mac: "Surnames, Marriage, Children. Live through the
-// world of Daggerfall, passing down your legacy, and continuing your adventures through your bloodline."): COURTING,
+// LEGACY5: COURTING,
 // THE WEDDING AND CHILDREN - the law, pure. The host (scenes/legacyHost.js) asks it from a conversation's Tell me about
 // page, a temple's door and its slow tick; the Living World's census and regard are read through its deps.
 //
@@ -23,7 +22,7 @@ import { t } from '../textManager.js';   // TONE-TASTE: the cooled courtship's l
 
 export const AFFECTION_MAX = 100;
 /** A day's courtship: the base, a point per twenty of Personality and of Etiquette, and the tone's as the resident took
- *  it (TONE-TASTE, 2026-10-15, Mac: "someone who didnt like etiquette still went up" - talkTopics.js toneTaste):
+ *  it (TONE-TASTE, 2026-10-15, - talkTopics.js toneTaste):
  *  COURT_TASTE more for a tone they take kindly, nothing for the Normal tone - and a tone they take ill COSTS
  *  COURT_TASTE of the affection, the day's courtship spent on it. LEGACY5's COURT_TONE ([3, 0, -3], by the tone alone:
  *  Polite won everyone) is gone. */

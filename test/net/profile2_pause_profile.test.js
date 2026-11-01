@@ -1,4 +1,4 @@
-// PROFILE2 (2026-09-25, Mac: "Go ahead and make the profile icon visible somehow on the pause menu and allow changes").
+// PROFILE2.
 //
 // The profile mark - PROFILE1's portrait - stood on the front door alone, and the window it opens (the account and the
 // Skin card) could not be reached from a game in progress. It stands on the pause screen now, as the character being

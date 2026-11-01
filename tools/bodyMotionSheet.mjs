@@ -1,4 +1,4 @@
-// BODY-MOTION CONTACT SHEETS (bible/04-Characters/Body-Motion.md): the retail biped (test/fixtures/mw/retailRig.mjs - the
+// BODY-MOTION CONTACT SHEETS: the retail biped (test/fixtures/mw/retailRig.mjs - the
 // vendored skeleton, no Morrowind data in hand) posed by the body-motion layer through a scene of frames, drawn as a
 // skeleton from the side, the front, behind and three-quarters, and written as PNG pictures so a gait, a stance or a
 // blow can be SEEN, not trusted: a planted foot stands still on the ground line across a stride's frames, a blade goes

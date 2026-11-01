@@ -1,4 +1,4 @@
-// L10N3e (2026-09-27): THE PLACES, IN THE PLAYER'S LANGUAGE. DFU shows a location by GetLocalizedLocationName - the
+// L10N3e: THE PLACES, IN THE PLAYER'S LANGUAGE. DFU shows a location by GetLocalizedLocationName - the
 // pack's Internal_Locations row by the location's MapTableData.MapId (never its index), else the canonical MAPS.BSA
 // name - and a region by GetLocalizedRegionName, the `regionNames` row by index. Pinned here through the port's own
 // functions, one DFU site family at a time: talk (Where am I, the regional building's %fcn, the town host's %cn and its

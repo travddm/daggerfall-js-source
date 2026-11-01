@@ -1,5 +1,5 @@
-// AUDIT NAV2 (2026-09-30, Mac: "Let's do a deep comprehensive audit on everything developed thus far") - BOARDING, of
-// the sea's second pass (bible/01-Overview/audits/Audit-NAV2.md): the boarding's bodies shared with the room (Mac's call:
+// AUDIT NAV2 - BOARDING, of
+// the sea's second pass: the boarding's bodies shared with the room (Mac's call:
 // "Share it now") and never a save's; a Warm Ashes raid fought by my hands too; each man of hers stood as himself on a
 // spot of his own, and never on another body or the landing; a repel's boarders thrown back leaving her struck; a
 // raid's waves over my rail first; a hand that falls stays fallen. The real naval host over Come Sail Away's real pool

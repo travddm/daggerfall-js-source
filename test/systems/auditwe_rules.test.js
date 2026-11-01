@@ -1,5 +1,4 @@
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection", of EVENT-RULES, BOSS-TRAITS and RAID5;
-// bible/01-Overview/audits/Audit-World-Events.md) - THE EVENT RULES' FINDINGS, each pinned where it was found:
+// AUDIT WORLD-EVENTS - THE EVENT RULES' FINDINGS, each pinned where it was found:
 // L1-3 the three regenerations that healed whole inside a made level's pause; L1-9 one carried fraction for every body;
 // L1-10 the pause off a frame's health, not the hurt door.
 import '../modsOff.js';

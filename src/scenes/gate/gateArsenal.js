@@ -1,5 +1,5 @@
 // @ts-check
-// WB14a (2026-10-19, Mac: "More diabolical boss movesets"; bible/11-Multiplayer/Breach-Portents.md section 3): THE
+// WB14a: THE
 // WARDEN'S NEW ARSENAL ON MY SCREEN - the blows that strike by WHO they mark (the Chains, the Brand, the Torment) and the
 // one that strikes by where I LOOK (the Gaze), judged on my own machine as every blow of his is (co-op's law, World-Bosses.md
 // section 5): the relay says who is marked (the atk word's `pk`, peer ids, beside where each stood - `tg`), and this

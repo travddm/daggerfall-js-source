@@ -526,7 +526,7 @@ void main() {
   // End of Unity Code
 
   // Stars
-  // PERF-SKY1 (2026-10-10, the stars' part alone): THE STARS ARE A NIGHT'S. Their weight below is night * horizonValue,
+  // PERF-SKY1: THE STARS ARE A NIGHT'S. Their weight below is night * horizonValue,
   // and by day night is 0: mix(col, stars, 0) is col exactly for any stars a texture gives (saturated, so finite) - yet
   // every sky pixel paid three taps and the twinkle to be multiplied by nothing. night is the sun's light position's
   // alone, so the branch is the same in every fragment of the draw (dynamically the same: the taps' implicit
@@ -610,9 +610,7 @@ void main() {
   float newFadeEnd = -0.01;
   float cloudFadeHeight = 1.0 - saturate(Remap(dotWorldPos, vec2(newFadeStart, newFadeEnd), vec2(0.0, 1.0)));
 
-  // PERF-EXT30 (2026-09-25; two players via Mac, "fps issues in the
-  // exterior but fine in the interior" and "me too my friend.. don't
-  // know why. I got a RX6600"): A SHEET WHOSE WEIGHT IS 0 IS NOT DRAWN.
+  // PERF-EXT30: A SHEET WHOSE WEIGHT IS 0 IS NOT DRAWN.
   // Under the volumetric clouds - the default, DS2 - draw() uploads
   // _CloudTopOpacity and _CloudOpacity as 0, and each sheet ends in
   // mix(col.rgb, sheet, x * 0): the col it was handed. Every sky pixel
@@ -718,8 +716,7 @@ void main() {
     lerpScale = saturate(hsmoothstep(-_AtmosphereLerpDuration, 0.0, -normalSunPos.y) / _AtmosphereLerp);
     float lerpScale_pow = pow(lerpScale, 5.0);
 
-    // PS3 (2026-09-12, Mac: "there's these progressing circles in the sky
-    // when I want it to be a smooth sky transition"). THE CIRCLES ARE
+    // PS3. THE CIRCLES ARE
     // THIS BLOCK. It quantizes each channel with a bare ceil() and no
     // dither, in LINEAR light, at a step the sun's height drives - so
     // the sky's iso-luminance contours, which around the sun are

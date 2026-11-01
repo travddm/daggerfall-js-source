@@ -1,6 +1,5 @@
 // @ts-check
-// CAPITAL-TREES (2026-10-27, bible/03-World/Arena-Provinces.md CAPITAL-TREES; KPbICA, forwarded by the owner: "The main
-// trees in Falinesti and Mournhold should get some love. They are too draftish for now") - THE CAPITALS' TREES' KIT: the
+// CAPITAL-TREES - THE CAPITALS' TREES' KIT: the
 // shapes Falinesti's Great Graht-Oak (world/capitalFalinesti.js) and Mournhold's garden trees (world/capitalMournhold.js)
 // are built of, on the port's MeshBuilder (world/detStandIns.js), in metres, y up. No game data.
 //

@@ -1,4 +1,4 @@
-// PERF1 (2026-09-11, RookieG via Mac: "its like 45fps on the outside").
+// PERF1.
 // The frame clock EXECUTES; the counter's script line runs against a
 // stub document; the hosts, the grass, the clouds and the pane are
 // text-pinned. Every pin names its mutant.

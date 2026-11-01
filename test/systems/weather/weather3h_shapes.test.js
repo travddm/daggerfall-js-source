@@ -1,6 +1,4 @@
-// WEATHER3 slice H (2026-09-23, Mac: "they look too much like blobs and
-// blots" ... "make them irregular" ... "the goal is not being overbearing
-// on the map. It needs to be more subtle"): SHAPES AND REGIONS. A system is
+// WEATHER3 slice H: SHAPES AND REGIONS. A system is
 // no longer a disc: its outline is its radius times a few harmonics of the
 // bearing, normalised to enclose exactly the disc's area, so the table's
 // shares (Campbell over areas) hold unchanged; the sky's shader reads the
@@ -8,8 +6,7 @@
 // it reads the worn word off the law at every cell of the bay, traces each
 // word's land into loops and draws them lightly - a faint tint, a sparse
 // hatch where something falls, a thin outline where it helps - under the pen.
-// DISC17-C (2026-09-24, Mac: "Remove the enhanced map weather enhancements
-// entirely"): the map's field, its regions and its hand went with the travel
+// DISC17-C: the map's field, its regions and its hand went with the travel
 // map's weather; the shapes and every reader of them in the world stand.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

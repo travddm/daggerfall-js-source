@@ -204,7 +204,7 @@ test('RRI2 weaponBalance: the two damage overrides (:312-379) answer ahead of DF
   assert.equal(weaponMaxDamage(WEAPONS.Claymore), 19, 'on: the override (DFU says 18)');
   assert.equal(weaponMinDamage(WEAPONS.Arrow), 0, 'the override\'s default arm: 0');
   assert.equal(weaponMinDamage(513), 2, 'a custom class answers its own GetBaseDamageMin ahead of the formula');
-  // GetMeleeWeaponAnimTime: speed 50, strength 50, a 4 kg weapon. SWING-LAW (2026-09-28): the adjusted speed is the Speed
+  // GetMeleeWeaponAnimTime: speed 50, strength 50, a 4 kg weapon. SWING-LAW: the adjusted speed is the Speed
   // the swing is read at; the port's law turns it into time (its bounded curve, the weapon's handling), not the mod's
   // `3 * (115 - speed)`
   installSwingLaw();
@@ -476,7 +476,7 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/loot/loot.js'), /randomlyAddPotionRecipe\(2, items, rolls\);\n  \}\n[\s\S]{0,900}?if \(lootTableKey !== '-'\) raiseTabledLootSpawned\(\{ locationIndex, key: lootTableKey, items, rolls, luck, where, quarters \}\);\n  return items;\n\}/, 'the pile: LootTables.OnLootSpawned after the J..O tail - for every key GenerateLoot finds (AUDIT OH-F B3: the rolling host rides along)');
   assert.match(rd('src/systems/loot/loot.js'), /const _tabledLootHandlers = new Map\(\[\n  \[RRI_VENDOR, \(\{ items, rolls \}\) => \{ if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(items, rolls\); \}\],\n\]\);/, 'RRI\'s the first subscriber');
   const hc = rd('src/scenes/hostCombat.js');
-  assert.match(hc, /addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n[\s\S]{0,1100}?if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(\[\.\.\.new Set\(\[\.\.\.entity\.items, \.\.\.\(eq\?\.worn \?\? \[\]\)\]\)\], rolls\);\n  enemyLootSpawned\.raise\([^\n]*\n(?:  (?:\/\/|const plain = plainFoeLootRule\(|if \(plain\) entity\.lootCap = )[^\n]*\n)*  rollCorpseLoot/, 'the corpse: EnemyEntity.OnLootSpawned after the trio, before the port\'s arm (RRI\'s own subscriber, then the list - OH-E)');   // PIN MOVED (PARTY-LOOT): the extras take the roll's Renown share, and the keep's line names what it let go
+  assert.match(hc, /addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n[\s\S]{0,1100}?if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(\[\.\.\.new Set\(\[\.\.\.entity\.items, \.\.\.\(eq\?\.worn \?\? \[\]\)\]\)\], rolls\);\n  enemyLootSpawned\.raise\([^\n]*\n(?:  (?:\/\/|const plain = plainFoeLootRule\(|if \(plain\) entity\.lootCap = )[^\n]*\n)*  rollCorpseLoot/, 'the corpse: EnemyEntity.OnLootSpawned after the trio, before the port\'s arm (RRI\'s own subscriber, then the list - OH-E)');
   assert.match(hc, /const worn = eq\.worn \?\? all;\n  eq\.worn = worn;/, 'the assigner\'s worn subset is what the table takes');
   assert.match(hc, /for \(const it of worn\) \{\n    const slot = getEquipSlot\(entity, it\);/, 'and only that');
   const wm = rd('src/scenes/worldModes.js');
@@ -489,7 +489,6 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingSpells\(setIndex, spellsByIndex, result\.career\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingEquipment\(playerEntity, \{ classIndex: result\.careerIndex/);
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): the clone's own three fields, unless the rig hands its swing's
   // ctx (a hand of a pair: the striking hand and the strike's tempo - the clock the machine runs on)
   assert.match(rd('src/combat/weapon/weaponWidget.js'), /const animCtx = \(\) => ctx\?\.animCtx\?\.\(\) \?\? \(\{ entity: ctx\?\.entity \?\? null, weaponType: w\.currentWeaponType, usingRightHand: usingRightHand\(\) \}\);/);
   assert.equal((rd('src/combat/weapon/weaponWidget.js').match(/widgetAnimTickTime\(w\.currentWeaponType, liveSpeed\(\), w\.s\.swing, animCtx\(\)\)/g) ?? []).length, 4, 'every tick asks with the ctx');

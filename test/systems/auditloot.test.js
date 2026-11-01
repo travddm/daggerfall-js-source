@@ -1,5 +1,4 @@
-// AUDIT LOOT (2026-10-01; bible/06-Systems/Loot-Arc.md section 16, Mac: "let's do a deep comprehensive audit on this and
-// ensure it's perfection") - the whole Loot arc read end to end in seven lanes: the depth (LOOT1-3), the powers (LOOT4-5
+// AUDIT LOOT - the whole Loot arc read end to end in seven lanes: the depth (LOOT1-3), the powers (LOOT4-5
 // and the champions' traits), the chase (LOOT6-8), the loop (LOOT9-11), online (the item's fields, the relay, the mod
 // records, the seeded doors), the bible against the code, and the screens and keys. Every finding fixed is pinned here,
 // driven where it can be:

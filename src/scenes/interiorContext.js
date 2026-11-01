@@ -346,7 +346,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
   const seenFloorMaterials = new Set();
   const collider = new Collider(() => -Infinity);
   collider.cover = createCoverIndex();   // TACT1: the room's solid flats are cover, with the switch on
-  // BASE-HIDE (2026-09-26, Mac: "Remove bought houses decor"): A ROOM ITS OWNER MAY FURNISH (`opts.baseEditable` - an
+  // BASE-HIDE: A ROOM ITS OWNER MAY FURNISH (`opts.baseEditable` - an
   // online home, anyone's, or the player's own house or ship) STANDS ITS OWN FURNITURE PIECE BY PIECE - each prop model
   // its own draw (never the merge) and collider bucket, each flat its own batch and light - so a piece can be taken out
   // and put back while the room stands (scenes/decor/decorBase.js). Every other room is built as it always was. The ladder and
@@ -444,7 +444,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
     // model id alone (RoleplayRealism.cs:126-128), and DFU stands a custom-activation model on its own whatever its
     // ObjectType (the CombineRMB note above), so a bed written as scenery (ObjectType 0 or 4: a dormitory's, a ship's
     // bunks) rests as a prop's does. The furniture chain below stays the prop's alone.
-    // SIT1 (world/chairSeat.js; Mac: "Implement the ability to interact and sit on chairs"): a chair is the port's own
+    // SIT1 (world/chairSeat.js): a chair is the port's own
     // activation, keyed on the model id alone as a bed is (INN-BEDS), a prop or scenery; taken out of a furnished room
     // with its piece (BASE-HIDE - it is the piece's furniture)
     if (isChairModel(classicModelIdOf(p.modelIdNum))) {
@@ -624,7 +624,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
     return (async () => {
       const t = await getTexture(pn.drawArchive ?? pn.textureArchive);   // RR2: the re-materialised billboard, where a mod set one
       if (!t || (pn.drawRecord ?? pn.textureRecord) >= t.recordCount) return;
-      // LAMP-KEEPER (2026-09-26, Mac: "Shop keepers are lamp posts"): the mod's picture is registered LAZY (RR2 -
+      // LAMP-KEEPER: the mod's picture is registered LAZY (RR2 -
       // nothing fetched at install), and a lazy record is decoded only when something ASKS for it; getTexture's
       // archive preload skips lazy entries by design (AUDIT-DW F1). Nothing asked, so the upload below drew the
       // classic TEXTURE.197 record in its place - and record 6 of "Kludge Town" is a street lamp: every keeper of

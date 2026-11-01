@@ -1,4 +1,4 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S LAW, the one home both ends read
+// WITCH1: THE WITCHES' FESTIVAL'S LAW, the one home both ends read
 // (src/net/festivalLaw.js) - its days, its nights, the finds' odds, the offerings' bounds and the Wyrd Sister's wares - and
 // the token's vocabulary it grows (src/net/identityToken.js).
 import { test } from 'node:test';

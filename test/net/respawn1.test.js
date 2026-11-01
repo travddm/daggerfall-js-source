@@ -33,7 +33,7 @@ const REAL = {
   abyssDestroyed: true,   // AUDIT OH-F B1: the save's alone - sharedWorld strips it, and the door does not admit it
   noBody: true,   // REVENANT-FATE (the 2026-10-02 audit): a foe gone with no body - the save's alone too, stripped the same way
   bg: 2,   // AUDIT DEX D3: a body a mod's corpse prefab destroyed (1 risen, 2 burnt) - the memory carries it (validSharedFoe), on a dead record alone
-  eliteFoe: true,   // AUDIT BAL (bible/05-Combat/Balance-Arc.md section 10): the save's word on an elite - its alone, stripped the same way (every client's pick is the room's)
+  eliteFoe: true,   // AUDIT BAL: the save's word on an elite - its alone, stripped the same way (every client's pick is the room's)
 };
 
 test('RESPAWN1: the team pair is a NAME, not an ordinal - DFU writes the number, this port does not', () => {

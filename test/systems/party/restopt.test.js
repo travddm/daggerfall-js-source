@@ -1,4 +1,4 @@
-// REST-OPT (2026-09-27, Discord - Tabitha: "Allow party members to choose not to rest with their party").
+// REST-OPT.
 //
 // A MEMBER MAY REST ALONE. The switch is the player's own ("Rest with my party", uiPrefs `restWithParty`, default on,
 // the player's own online); off, the party pose says `nr` (net/wire.js validPartyPose) and the party's rest goes on

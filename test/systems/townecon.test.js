@@ -30,10 +30,8 @@ import { validLootList, createPotion } from '../../src/systems/loot/loot.js';
 import { potionRecipeKeys } from '../../src/systems/potions.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 
-// TOWN-ECON TE1 (2026-10-16, bible/06-Systems/Town-Economy-Arc.md; Mac: "give every city and village a dynamic economy
-// system, where even players can affect the influence. Allowing players to hover over towns and see an economy tooltip
-// along with guild control"): the law, the client's reading, and the wiring into the counters and both maps' cards.
-// AUDIT TOWN-ECON (2026-10-16, bible/01-Overview/audits/Audit-Town-Econ.md): each finding's pin names it (TOWNECON-AUDIT-<id>).
+// TOWN-ECON TE1: the law, the client's reading, and the wiring into the counters and both maps' cards.
+// AUDIT TOWN-ECON: each finding's pin names it (TOWNECON-AUDIT-<id>).
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const rd = (p) => readFileSync(join(root, p), 'utf8');
@@ -207,7 +205,7 @@ test('TOWN-ECON the card\'s words: the economy out of 100 and the market\'s tren
   assert.equal(townPriceLine(47), 'Shops here ask 2% more and pay 2% less than the region\'s usual prices.', 'AUDIT UI-7: 1.015 and 0.985 one number');
   assert.equal(townPriceLine(49), 'Shops here ask 1% more and pay 1% less than the region\'s usual prices.');
   assert.equal(townPriceLine(51), 'Shops here ask 1% less and pay 1% less than the region\'s usual prices.');
-  // AUDIT UI-4: Market Day is everyone's, so the card's ask carries it. PIN MOVED (AUDIT TOWN-ECON 2 PRICE-3, REC-1): and
+  // AUDIT UI-4: Market Day is everyone's, so the card's ask carries it.
   // since SEAT-LOOP its pay - a counter pays this player no more than it asks them (townShopFactor's Sell)
   assert.equal(townPriceLine(80, 0.9), 'Shops here ask 24% less and pay 24% less than the region\'s usual prices.', '0.85 x 0.9 = 0.765, and the sale held to it');
   assert.equal(townPriceLine(50, 0.9), 'Shops here ask 10% less and pay 10% less than the region\'s usual prices.');
@@ -353,7 +351,6 @@ test('TOWN-ECON LAW-3 (Town-Economy-Arc 7.4): WHAT THE COUNTER WAS PAID - online
     const asks = [buyItemPrice(sword, { quality: 10 }), buyItemPrice(wood, { quality: 10 })];
     const price = 1000;
     markCounterBought([sword, wood], { price });
-    // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-5): a lot that paid a gold a piece gives each piece one, and the rest by the asks
     assert.equal(sword[COUNTER_PAID_MARK], 1 + Math.floor(((price - 6) * asks[0]) / (asks[0] + asks[1])));
     assert.equal(wood[COUNTER_PAID_MARK], 1 + Math.floor(((price - 6) * asks[1]) / (asks[0] + asks[1]) / 5), 'a piece of the stack');
     assert.ok(sword[COUNTER_PAID_MARK] + 5 * wood[COUNTER_PAID_MARK] <= price, 'never more than the lot');
@@ -437,10 +434,10 @@ test('TOWN-ECON LAW-3: THE CARRY BETWEEN REGIONS NEVER PAYS - a blade, a Daedric
 });
 
 test('TOWN-ECON TE2 the players\' share\'s law (Town-Economy-Arc section 2): the sources, their weights, an account\'s caps a town a day, the decay, the days kept, the half and the most are TE0\'s; a town\'s activity weighs each day\'s acts by source and by the decay, the days kept alone; the share is PLAYERS_MAX x A / (A + HALF), half the most at the half, never the most; a town\'s report is canonical and read back only as written, its map id naming its own pixel (AUDIT TOWN-ECON 2 SVC-1), and an hour\'s reports a walk\'s (mutants: TOWNECON2-weights, TOWNECON2-decay, TOWNECON2-days, TOWNECON2-half, TOWNECON2-share-most, TOWNECON2-report-range, TOWNECON2-report-strict, TOWNECON-AUDIT2-SVC1-pixel-unread, TOWNECON-AUDIT2-SVC1-hour)', () => {
-  assert.deepEqual(TOWN_ECON_SOURCES, ['watch', 'trade', 'raid', 'sea']);   // PIN MOVED (SEA-TRADE): a captain's dealing
+  assert.deepEqual(TOWN_ECON_SOURCES, ['watch', 'trade', 'raid', 'sea']);
   assert.deepEqual(TOWN_ECON_WEIGHTS, { watch: 1, trade: 4, raid: 20, sea: 2 });
   assert.deepEqual(TOWN_ECON_CAPS, { watch: 30, trade: 10, raid: 1, sea: 10 });
-  assert.deepEqual([TOWN_ECON_DECAY, TOWN_ECON_DAYS, TOWN_ECON_HALF, TOWN_PLAYERS_MAX, TOWN_ECON_KEPT_S, TOWN_ECON_SHARE_LEAST, TOWN_WATCH_CLAIM_MAX, TOWN_WITNESS_KIND, TOWN_WITNESS_HOUR], [0.8, 14, 150, 30, 300, 1, 12, 'town', 12]);   // PIN MOVED (AUDIT TOWN-ECON 2 SVC-1): a walk's reports an hour, not 48
+  assert.deepEqual([TOWN_ECON_DECAY, TOWN_ECON_DAYS, TOWN_ECON_HALF, TOWN_PLAYERS_MAX, TOWN_ECON_KEPT_S, TOWN_ECON_SHARE_LEAST, TOWN_WATCH_CLAIM_MAX, TOWN_WITNESS_KIND, TOWN_WITNESS_HOUR], [0.8, 14, 150, 30, 300, 1, 12, 'town', 12]);
   const t = 1000;
   assert.equal(townActivity([], t), 0);
   assert.equal(townActivity([{ day: t, src: 'watch', n: 30 }, { day: t, src: 'trade', n: 10 }, { day: t, src: 'raid', n: 1 }], t), 30 + 40 + 20, 'a full day of one account');
@@ -454,7 +451,6 @@ test('TOWN-ECON TE2 the players\' share\'s law (Town-Economy-Arc section 2): the
   assert.equal(townPlayersShare(NaN), 0);
   assert.equal(townShareShown(12.345), 12.3);
   // the report
-  // PIN MOVED (AUDIT TOWN-ECON 2 SVC-1): a map id whose low 20 bits are its pixel's id (y x 1000 + x), as every MAPS row's are
   const MAP = (3 << 20) | (212 * 1000 + 207);
   assert.equal(townPixelIdOf(MAP), 212207);
   assert.equal(townPixelIdOf(0xfff00000 | 212207), 212207, 'unsigned');

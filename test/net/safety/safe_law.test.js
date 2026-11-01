@@ -1,4 +1,4 @@
-// SAFE1-SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE LAW BOTH ENDS AGREE ON, PURE - the relay's
+// SAFE1-SAFE7: THE LAW BOTH ENDS AGREE ON, PURE - the relay's
 // stamp on a line and the account service's check of it, the reviewer's feed batch, a report's shape, the chat commands,
 // the strike ladder and the ban order. Every signature here is a REAL Ed25519 one: a stamp that verified anything would
 // make every report evidence of nothing.
@@ -157,7 +157,7 @@ test('SAFE7 THE CODE OF CONDUCT is versioned by its date and names what it forbi
   assert.ok(rules.some((r) => /not even as a joke/.test(r) && /asexuality/.test(r)));
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE (2026-10-17) ═══════════════════════════════════════════════════════════════════════
+/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
  * The law's half of the audit's client findings: a report's lines out of their day dropped rather than the report
  * refused, a ban's own sentence, a report's note and a ban's reason in the commands, a moderator's look at the reports,
  * and a ban said as a ban in every language. Each pin failed on the arc as it merged. */

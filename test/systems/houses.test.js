@@ -222,7 +222,6 @@ test('H1: ReceiveHouse - four refusals in order, then a grant', () => {
     { kind: 'refuse', line: ALREADY_GIVEN_HOUSE });
   // 3. you already own one FROM ANY SOURCE - a different refusal on
   //    purpose: the flag is the order's record, the registry is yours.
-  //    PIN MOVED (HOUSES-3): the region's THREE, in the bank's words counted to three
   assert.deepEqual(receiveHouseDecision(at(9), { ...opts, housesFull: true }),
     { kind: 'refuse', result: TRANSACTION_RESULT.ALREADY_OWN_HOUSE, line: housesFullText() });
   // 4. nothing on the market
@@ -255,10 +254,8 @@ test('H1: the four consumers are wired, and each goes through the law', () => {
   // The point of the lane. A rule per consumer, because three of the
   // four are host code with no node coverage.
   const modes = code('scenes/worldModes.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt) - the law itself, once
-  // PIN MOVED (BAY-LEFT-B): an Arena town's and a country place's again - each held to its own town (banking.js deedHeldIn)
-  assert.match(modes, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\);/, 'the one reading of the law');   // PIN MOVED (TESA2): nor an Arena town's; PIN MOVED (TESA7): nor a country place's; PIN MOVED (AUDIT RELEASE R2-9): the town asking named - a capital's slice's deed its own slice's
-  assert.match(modes, /houseOwned: !interiorHome && houseOwnedAt\(b, b\?\.buildingKey \?\? 0\), homeBed: homeBedIsMine\(interiorHome, /, 'CanRest sleeps in a house you own (V5 left this false)');   // HOME1 re-aim: online, in my online home too; HOME-RENT re-aim: and a room I rent in one; PIN MOVED (FIELD BUGS 2026-10-01 RENT-REST): an online home's bed rides as `homeBed`, the offline house as ever
+  assert.match(modes, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\);/, 'the one reading of the law');
+  assert.match(modes, /houseOwned: !interiorHome && houseOwnedAt\(b, b\?\.buildingKey \?\? 0\), homeBed: homeBedIsMine\(interiorHome, /, 'CanRest sleeps in a house you own (V5 left this false)');   // HOME1 re-aim: online, in my online home too; HOME-RENT re-aim: and a room I rent in one
   assert.match(modes, /isHouseOwned: \(key\) => houseOwnedAt\(bd, key\),/, 'the lock ladder knows your own front door');
   assert.match(modes, /ownsHouse: \(\) => ownsHouse\(/, 'the bank window asks the registry');
   // AUDIT 68 S22: ...and ONLY there - place.js reads `world.isHouseOwned`; the bridge's ctx forward reached a
@@ -448,7 +445,6 @@ test('H2: a refused purchase closes the list too - the message shows over the BA
 
 test('H2: the bank routes BUY HOUSE to the window, and the refusals stay the law\'s', () => {
   const bank = code('ui/bankWindow.js');
-  // PIN MOVED (HOUSES-3): the region's three answered in the bank's words counted to three (`lines`), nothing for sale DFU's
   assert.match(bank, /if \(d\.kind === 'refuse'\) \{ if \(d\.lines\) this\._lines\(d\.lines\); else this\._popup\(d\.result\); return; \}/,
     'the region\'s three and nothing-for-sale still answer through buyHouseDecision');
   assert.match(bank, /this\.hooks\.openPurchase\?\.\(\)/, 'and a pick opens the purchase window');

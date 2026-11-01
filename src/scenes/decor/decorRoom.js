@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1c (2026-09-25) — THE PIECES STANDING IN A ROOM.
+// DECOR1c — THE PIECES STANDING IN A ROOM.
 //
 // Mac: decor "Gold per placement"; the catalogue "Everything Daggerfall
 // furnishes"; offline "kept in the save". The room's own furniture is
@@ -61,12 +61,11 @@ export const DECOR_REACH = DEFAULT_ACTIVATION_DISTANCE;
 export const DECOR_MODEL_RETRY_MS = 2000;
 export const decorKeyOf = (id) => `decor:${id}`;
 export const decorIdOfKey = (key) => (typeof key === 'string' && key.startsWith('decor:') ? key.slice(6) : null);
-/** PERF-YARD (2026-10-10, the owner: "prob caused by placed objects by players"): a host's verdict on a placed model's box
+/** PERF-YARD: a host's verdict on a placed model's box
  *  in the world (`draw`'s `cull`) - drawn, cast into the shadow maps alone, or neither. */
 export const DECOR_DRAW = 0, DECOR_SHADOW = 1, DECOR_SKIP = 2;
 /**
- * YARD-RANGE (2026-10-11, a player: "browser version for me is unplayable nowadays I get like 20-40 fps in cities"; the
- * owner: "look into limiting and improving performance with player's exterior decor items"): WHETHER A PIECE IS BIG
+ * YARD-RANGE: WHETHER A PIECE IS BIG
  * ENOUGH TO SEE - its half-size `half` (metres) at the offset (dx, dy, dz) from the eye, no smaller than `minAngle` (half
  * over distance, radians near enough). A town of full yards is two thousand pieces; past a few pixels a cup or a
  * flowerpot is a draw call and a shadow record for nothing. Pure.
@@ -104,9 +103,7 @@ export function drawSeen(r, cull, box, mesh, m, remap = null, o = undefined) {
 }
 
 /**
- * YARD-MERGE (2026-10-12, a capture standing in Daggerfall: 1,878 draw calls a frame, about 360 of them the yards' pieces,
- * every piece a draw a texture of its model; and 185 of the yards' flats handed to the billboard pass, 86 pictures among
- * them, each its own draw): A POOL'S MODELS MERGED INTO ONE MESH - PERF4's static batch over the pieces standing, one
+ * YARD-MERGE: A POOL'S MODELS MERGED INTO ONE MESH - PERF4's static batch over the pieces standing, one
  * draw a texture for the whole pool - AND ITS FLATS OF ONE PICTURE INTO ONE BATCH (decorFlatMergeKey), as a town's flats
  * of one record are one batch of many quads. A pool its host lets merge (`merge` - the town's yards; a room's host
  * gives none) merges once it has stood unchanged DECOR_MERGE_SETTLE_MS (a town's yards stand piece by piece as their
@@ -201,7 +198,7 @@ export function loadMountArt({ getTexture, uploadRecord, renderer }, a, r, dye, 
     // (ui/item/itemScroller.js preloadIconRecord). A lazy one (Diverse Weapons' metals, Roleplay Realism Items' archives) is
     // never decoded by the archive's preload: a mount hung before any list drew its record hung as the classic
     // picture, or as nothing where the mod's picture is the only one, and a ghost put up before the decode landed was
-    // not the picture that then stood (Mac, the house: "changes after placment", "disapeared").
+    // not the picture that then stood (, "disapeared").
     await preloadTextureRecord(a, r, 0, 'Albedo', dye);
     const variant = uploadRecord?.(a, r, { mips: false, removeMask: true, dye, dyeTarget });   // DYE-ICON: the pack's picture, its metal dyed
     const tex = renderer?.textures?.get?.(`${a}_${r}${variant ?? '#ui'}`) ?? null;
@@ -225,7 +222,7 @@ export function loadMwMountArt({ mwPicture, renderer }, item, archive = 'mw-moun
   }).catch(() => null);
 }
 
-/** MW-ASSIGN (2026-09-27, Discord: "Some sprites not assigned morrowind skin"): the archive a STANDING thing's Morrowind
+/** MW-ASSIGN: the archive a STANDING thing's Morrowind
  *  picture goes up under - one's own item set down (a garment), drawn on the room's billboard pass as its flats are. */
 export const MW_STAND_ARCHIVE = 'mw-stand';
 /** Whether a piece is one's own thing STANDING (not hung): the kind whose picture may be its Morrowind one. */
@@ -606,7 +603,7 @@ export function createDecorRoom({
 
   /** The models, in the host's interior world pass - the room's texture remap, so a piece wears the climate the
    *  room's own furniture wears. Answers how many were drawn.
-   *  PERF-YARD (2026-10-10): `cull`, where a host gives one, is its view test of a piece's box in the world - the town's
+   *  PERF-YARD: `cull`, where a host gives one, is its view test of a piece's box in the world - the town's
    *  yards are culled as the town's own models are (scenes/world.js, the pixel walk: off screen and out of every
    *  shadow's reach, nothing; off screen in a shadow's reach, the maps alone). Every piece of every yard within reach
    *  was a draw a frame, behind the eye or not, and a recorded caster for every shadow walk. A piece whose model has no
@@ -847,7 +844,7 @@ export function createDecorRoom({
 }
 
 /**
- * MWNPC18 (bible/04-Characters/Morrowind-NPCs.md section 26): THE FIGURES A PLAYER PLACED, OFFERED THEIR BODIES - on the
+ * MWNPC18: THE FIGURES A PLAYER PLACED, OFFERED THEIR BODIES - on the
  * host's people lane (characters/npcBodies.js createPopulationLane: `lane.offer(actor, batch)`), as its own standing
  * people are, before the flats draw (cast-only where one stands - and since MWNPC16 casting nothing: the body casts).
  * Each stands where its picture stands (its piece's base: the room's origin and its place in it), turned to the eye at a person's pace (peopleBodies.js

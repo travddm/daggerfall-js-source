@@ -5,7 +5,7 @@
 // stores (Land view distance: the pref and DFU's TerrainDistance), and
 // the Settings pane draws a moved key NOT AT ALL (FT13).
 //
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): the home is the
+// ORG2: the home is the
 // Settings screen's tabs now, so this walks THAT screen - every registry row drawn once across the tabs, each wearing a
 // label; the kind filters; the Graphics tab's quality preset writing the rows through their own doors (Low's view
 // distance lands in both stores) and reading Custom when a row leaves it; the one search finding a row on another tab

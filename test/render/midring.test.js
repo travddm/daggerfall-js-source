@@ -1,5 +1,4 @@
-// MID-RING (2026-10-26, the owner: "we need to find a way to expand the overworld view distance without killing
-// performance. Currently tiles visibly load in with distance"; bible/06-Systems/Travel-View.md MID-RING) -
+// MID-RING -
 // THE MIDDLE RING: the streamed kernel's own ground past the streamed grid, between it and the far ring
 // (world/terrain/midRingGrid.js, render/midRing.js, render/farRing.js, the terrain worker's 'midring' job). Pinned with no
 // game data, on the landforms' synthetic world (test/landformWorld.mjs).
@@ -167,7 +166,6 @@ test('MID-RING the far ring asks the middle ring of the terrain\'s worker once, 
   for (let y = 145; y <= 155; y++) for (let x = 195; x <= 205; x++) built.set(`${x},${y}`, {});
   ring.build(inputs, 200, 150, 5, built);
   assert.equal(asks.length, 1, 'asked at the first hole');
-  // PIN MOVED (FAR-FLORA): the near law's woods asked beside the heights (Land View 5: the knob's on); PIN MOVED
   // (TESA-LANDS, AUDIT): and with the lands' row the forest field's own value (a zone's woods its own edge on it)
   assert.deepEqual(asks[0], { baseX: 200, baseY: 150, radius: MID_RADIUS, sub: MID_SUB, landform: false, flora: true, lands: true });
   const before = ring.ringCount;
@@ -262,14 +260,13 @@ test('MID-RING / FAR-FIELD the worker\'s grounds: by id and by band, transferred
     globalThis.onmessage({ data: { t: 'farfield', id: 11, baseCX: 40, baseCY: 25, radius: 2, cell: 8, seaByte: 3, rows: [0, 5] } });   // a slope: every row its own
     const f = posted.at(-1);
     assert.equal(f.m.t, 'far');
-    assert.deepEqual(f.t, [f.m.high.buffer, f.m.low.buffer, f.m.clim.buffer, f.m.ground.buffer]);   // PIN MOVED (RELIEF-PEAKS): and the ground
+    assert.deepEqual(f.t, [f.m.high.buffer, f.m.low.buffer, f.m.clim.buffer, f.m.ground.buffer]);
     assert.ok(f.m.clim.every((c) => c === FAR_CLIMATE_ASK), 'no continent installed here: every climate the main thread\'s to read');
     const ref = buildFarFieldBytes({ woods, baseCX: 40, baseCY: 25, radius: 2, cell: 8, seaByte: 3 });
     assert.deepEqual([[...f.m.high], [...f.m.low], [...f.m.ground]], [[...ref.high], [...ref.low], [...ref.ground]]);
     const [m0, n0, , g0] = farFieldCell(woods, 38, 23, 8, 3);
     let n = 0;
     for (const v of FAR_SAMPLES) for (const u of FAR_SAMPLES) { const byte = woods.getHeightMapValue(38 * 8 + u, 23 * 8 + v); if (byte <= 3) n++; }
-    // PIN MOVED (RELIEF-PEAKS): a cell's vertex stands on the byte whose node is its centre (the byte north-west of it) and
     // the kernel's ground there (nodeGroundAt) - it stood the highest of its samples' bytes, by the far ring's law
     const byteAt = (x, y) => woods.getHeightMapValue(x, y);
     assert.deepEqual([m0, n0, g0], [byteAt(38 * 8 + 3, 23 * 8 + 3), n, nodeGroundAt(byteAt, 38 * 8 + 3, 23 * 8 + 3, false) * STREAMING_TERRAIN_SCALE], 'a cell: its vertex\'s byte, how many samples are the sea\'s floor, its vertex\'s ground');
@@ -333,7 +330,7 @@ test('MID-RING / FAR-FIELD the worker\'s grounds: by id and by band, transferred
   const p2 = client.midRing(job);
   w.onmessage({ data: { t: 'midError', id: sent.at(-1).id, message: 'x' } });
   assert.equal(await p2, null);
-  // the far field a band of FAR rows at a time, its four answers assembled (PIN MOVED, RELIEF-PEAKS: and its ground)
+  // the far field a band of FAR rows at a time, its four answers assembled (
   const pf = client.farField({ baseCX: 0, baseCY: 0, radius: 10, cell: 8, seaByte: 3 }), fside = 21;
   for (let k = 0; k < 4; k++) {
     const at = sent.filter((x) => x.t === 'farfield').at(-1);

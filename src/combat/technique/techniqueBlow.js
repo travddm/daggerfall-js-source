@@ -1,5 +1,5 @@
 // @ts-check
-// TECH1 (bible/05-Combat/Weapon-Techniques.md): A TECHNIQUE'S BLOW - the shape and the weight a weapon's technique
+// TECH1: A TECHNIQUE'S BLOW - the shape and the weight a weapon's technique
 // carries into the two resolutions every host already shares: the swing (combat/playerWeapon.js resolveHit - every
 // host's melee pool resolves through it) and the shaft (combat/arrowFlight.js playerArrowHitFoe - every host's player
 // arrow lands through it). Neither grows a second performer: the swing still runs DFU's CalculateAttackDamage on every
@@ -80,7 +80,7 @@ export function blowMult(blow, foe) {
 /** The formula's number weighed by the technique: a blow that landed lands for at least 1, a miss stays a miss. */
 export const scaleBlowDamage = (damage, mult) => (damage > 0 ? Math.max(1, Math.round(damage * mult)) : damage);
 
-// MARTIAL3 (bible/05-Combat/Martial-Specialisations.md section 6): A TECHNIQUE'S BLOW LANDED - NAMED listeners
+// MARTIAL3: A TECHNIQUE'S BLOW LANDED - NAMED listeners
 // `fn({ blow, foe, damage })`, told by the two resolutions every host shares, once for each foe a technique's blow reached
 // (its weighed number, a miss its 0), before the pool's own door lands it: the swing (combat/playerWeapon.js resolveHit)
 // and the shaft (combat/arrowFlight.js playerArrowHitFoe). Never a player's body - neither resolution weighs one by a

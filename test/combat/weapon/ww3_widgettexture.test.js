@@ -1,4 +1,4 @@
-// WW3 (2026-09-14, Mac's live crash on daggerfalljs.dev):
+// WW3:
 //
 //     TypeError: can't access property "buffer", l is undefined
 //       k@renderer.js            <- asBytes

@@ -1,4 +1,4 @@
-// SD6b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md sections 8 and 14): THE RELAY JUDGES
+// SD6b: THE RELAY JUDGES
 // THE ORRERY - a turn of an Ending-stone (`pz`) goes to the Hollow's realm, which judges it by the Orrery's law
 // (net/superDungeon/sdBrain.js orreryStep) from where the socket's own pose stands, keeps the hall, and says it to every soul there:
 // after each turn and to each at its hello. The page's half: a turn sent down my own socket in the realm, the hall heard
@@ -61,8 +61,8 @@ async function withHall(fn) {
 }
 
 test('SD6b the wire: `pz` each way - a turn (which stone, which way, its number) and the hall (six hours, the fray, the dial, the Concord, the turn and its turner, the snap); its numbers the Orrery\'s own, pinned equal (the wire imports no law) (mutants: a seventh stone believed; a turn of two hours; a hall of five stones; the fray past its most)', () => {
-  assert.deepEqual([...SD_KINDS].slice(0, 2), ['found', 'pz']);   // SD8b (PIN MOVED): the fight's words after them
-  assert.deepEqual([...SD_OUT_KINDS].slice(0, 2), ['ev', 'pz']);   // SD8b (PIN MOVED): the fight's words after them
+  assert.deepEqual([...SD_KINDS].slice(0, 2), ['found', 'pz']);   // SD8b (
+  assert.deepEqual([...SD_OUT_KINDS].slice(0, 2), ['ev', 'pz']);   // SD8b (
   assert.equal(SD_PZ_STONES, SD_STONES.length); assert.equal(SD_PZ_HOURS, SD_HOURS); assert.equal(SD_PZ_FRAY_MAX, SD_FRAY_MAX); assert.equal(SD_PZ_HZ, SD_TURN_HZ);
   assert.deepEqual(validSdIn({ k: 'pz', i: 5, a: -1, q: 7, junk: 1 }), { k: 'pz', i: 5, a: -1, q: 7 });
   for (const bad of [{ i: 6, a: 1, q: 1 }, { i: -1, a: 1, q: 1 }, { i: 0, a: 2, q: 1 }, { i: 0, a: 0, q: 1 }, { i: 0, a: 1, q: -1 }, { i: 0, a: 1, q: 1.5 }, { i: 0, a: 1 }, { i: '0', a: 1, q: 1 }, { i: 0, a: 1, q: SD_PZ_Q_MAX + 1 }])
@@ -71,7 +71,7 @@ test('SD6b the wire: `pz` each way - a turn (which stone, which way, its number)
   assert.equal(parseClient(JSON.stringify({ t: 'sd', k: 'pz', i: 9, a: 1, q: 3 }), { hasHello: true }).error, 'bad sd');
   const hall = { k: 'pz', s: 4, st: [0, 11, 3, 4, 5, 6], f: 48, lit: 6, ok: true };
   assert.deepEqual(validSdOut(hall), hall);
-  // AUDIT SD II (PIN MOVED, L7 H2): a snap names the peers its lash falls on - a snap without a list lashes nobody, and a
+  // AUDIT SD II (
   // name that is no peer id is dropped; a refused turner's word (`w`) is 1 or nothing
   assert.deepEqual(validSdOut({ ...hall, ok: false, f: 0, i: 1, a: -1, id: 'peer-ann', q: 9, x: 1 }), { ...hall, ok: false, f: 0, i: 1, a: -1, id: 'peer-ann', q: 9, x: 1, ls: [] });
   assert.deepEqual(validSdOut({ ...hall, ok: false, f: 0, i: 1, a: -1, id: 'peer-ann', q: 9, x: 1, ls: ['peer-ann', 'x', 7, 'peer-bo'] }).ls, ['peer-ann', 'peer-bo']);
@@ -140,7 +140,7 @@ test('SD6b THE FRAY AND THE CONCORD: the 48th turn snaps the hall back and says 
     for (let k = 0; k < SD_FRAY_MAX; k++) { await turnAt(0, 1); last = orreryStep(o, want, 0, 1); want = last; if (want.ok) break; }
     assert.ok(!want.ok, 'one stone alone never makes it');
     const snap = halls(at[5]).at(-1);
-    // AUDIT SD II (PIN MOVED, L7 H2): and names whom it lashes - the one who turned this thread and brought it no nearer
+    // AUDIT SD II (
     assert.deepEqual(snap, { t: 'sd', k: 'pz', s: rec.s, st: [...o.start], f: 0, lit: orreryLit(o, o.start), ok: false, i: 0, a: 1, id: 'peer-s0', q: SD_FRAY_MAX, x: 1, ls: ['peer-s0'] });
     // now the way: each stone the short way round to its share, the stone no other turn moves first
     const t = orrerySolve(o, o.start);

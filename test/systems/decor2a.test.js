@@ -1,5 +1,4 @@
-// DECOR2a (2026-09-25, Mac: "rare misc artifacts and other items in the world can also be placed"; asked, placing one
-// is "Free and can be picked back up", and a home, house or ship sold with them standing gives them "Back to pack"):
+// DECOR2a:
 // YOUR OWN THINGS IN A ROOM. The piece's law (net/decorLaw.js: which item, as the game's own numbers; free; holding
 // nothing), what of the pack can stand and as what (systems/decor/decorItems.js), the room and the scene keeping the thing
 // itself (scenes/decor/decorRoom.js, systems/sceneCache.js), the panel's "Your things" (ui/decorPanel.js), the tool setting

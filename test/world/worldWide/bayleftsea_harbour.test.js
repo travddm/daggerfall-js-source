@@ -1,10 +1,9 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 30 - C5; the owner's call taken: "Every
-// single thing here needs to be addressed. No exceptions."): A HARBOURMASTER AT EVERY PORT PAST THE BAY - a port past the
+// BAY-LEFT-SEA: A HARBOURMASTER AT EVERY PORT PAST THE BAY - a port past the
 // Bay keeps the nearest Bay crown's office (navalShips.js crownOf over the three capitals: the law a Bay port's crown is
 // read by, the crown whose colours its navy already flies), so its board, contracts, letter of marque and Admiralty
 // carrack stand there. The Eltheric freeports stay crownless - ETHER-PORTS' recorded design (bible/03-World/
 // Eltheric-Ocean.md, "No crown's: ... THE FREEPORT'S HARBOURMASTER is the tab instead"). On the freeware: the 29 ports
-// past the Bay, each with its crown and a board (bible/03-World/Captains-Sea.md BAY-LEFT-SEA).
+// past the Bay, each with its crown and a board (BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

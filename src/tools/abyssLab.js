@@ -1,5 +1,4 @@
-// THE ABYSS LAB (SD-LAB, 2026-10-08, Mac: "I want to do a detailed pass on all the visuals for the inside of the Rift,
-// the portal that leads to the rift, mechanics, etc"). The Shattered Hour and the Rift drawn by the game's own renderer
+// THE ABYSS LAB (SD-LAB, 2026-10-08). The Shattered Hour and the Rift drawn by the game's own renderer
 // and the Hour's own parts, with no game data - everything the Hour is, is made in code (world/superDungeon/sdRealm.js and its art,
 // render/superDungeon/sdSky.js, render/superDungeon/sdMotes.js, scenes/superDungeon/sdHall.js, scenes/superDungeon/sdSteps.js, scenes/superDungeon/sdRemnant.js, scenes/superDungeon/sdEnd.js). The
 // frame is the dungeon arm's for the realm (scenes/worldModes.js: the realm's trilight and key, its haze, its lamps,
@@ -45,7 +44,7 @@
 //                    Remnant (or, with no ?fight, where it waits), the Echoes in ?fight=break, the way home in ?fight=fell;
 //                    ?fight=reset&rt=<s> the lamps' and lanterns' dimming; ?fight=end the dials red; the bodies' marks on
 //                    the floor always; ?law the pillars' squares as wire too
-// `window.__frame` counts drawn frames (the probes frame-sync on it - bible/Home.md's Process); `window.__lab` moves the
+// `window.__frame` counts drawn frames (the probes frame-sync on it 's Process); `window.__lab` moves the
 // camera and the clock from a probe.
 import { Renderer, WORLD_FRAME, INTERIOR_CLEAR } from '../render/renderer.js';
 import { EL_LANE, dungeonFog, dungeonTrilight, dungeonAmbient, exposureFor } from '../render/enhancedLighting.js';

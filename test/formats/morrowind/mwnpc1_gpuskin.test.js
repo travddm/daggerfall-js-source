@@ -1,5 +1,5 @@
-// MWNPC1 (2026-10-09, Mac: "I wanna do everything and ensure that performance isnt affected"): THE SKIN ON THE
-// GPU - the first slice of the MW-NPC arc (bible/04-Characters/Morrowind-NPCs.md). Every third-person Morrowind body
+// MWNPC1: THE SKIN ON THE
+// GPU - the first slice of the MW-NPC arc. Every third-person Morrowind body
 // was skinned on the CPU per body per posed frame and its whole stream re-uploaded; it is laid out once now
 // (formats/morrowind/mwGpuSkin.js), a pose writes a palette, and the vertex shader blends (renderer.js CHAR_SKIN_VS).
 //
@@ -182,7 +182,7 @@ test('MWNPC1b the law: every vertex and every stream corner, by the shader\'s la
       const got = skinStreamCorner(packed.stream, packed.floats, L.pairs, c, L.palette);
       const o = c * FP_FLOATS, s = c * packed.floats;
       for (let k = 0; k < 3; k++) assert.ok(close(got[k], cpu.packed[o + k]), `t ${time} corner ${c}[${k}]: ${got[k]} vs ${cpu.packed[o + k]}`);
-      // the static lanes: the pack's diffuse (3-5), UV (9-10) and emission (11-13), bit for bit - PIN MOVED (MW-SMOOTH x
+      // the static lanes: the pack's diffuse (3-5), UV (9-10) and emission (11-13), bit for bit
       // MWNPC1): its normal lanes (6-8) hold the AUTHORED normal, which the shader turns
       assert.deepEqual([...packed.stream.subarray(s + 3, s + 6), ...packed.stream.subarray(s + 9, s + 14)], [...cpu.packed.subarray(o + 3, o + 6), ...cpu.packed.subarray(o + 9, o + 14)], `corner ${c}: the static floats are the pack's`);
       // the corner's normal by the shader's law: the pack's posed vertex normal - or zero where the pack lit the corner by
@@ -328,7 +328,6 @@ test('MWNPC1g the GLSL says what its JS law says: the blend, the post composed o
     'a0 += r0 * w; a1 += r1 * w; a2 += r2 * w;',
     'if (uSkin > 1.5) {',
     'skinEntry(aSkinPost, q0, q1, q2);',
-    // PIN MOVED (MW-SMOOTH x MWNPC1): the composed rows are made once and move both the position and the normal
     '  c0 = q0.x * a0 + q0.y * a1 + q0.z * a2 + vec4(0.0, 0.0, 0.0, q0.w);',
     '    p = vec3(dot(c0.xyz, aPos) + c0.w, dot(c1.xyz, aPos) + c1.w, dot(c2.xyz, aPos) + c2.w);',
     '    vec3 m = vec3(dot(c0.xyz, aNormal), dot(c1.xyz, aNormal), dot(c2.xyz, aNormal));',
@@ -346,7 +345,7 @@ test('MWNPC1g the GLSL says what its JS law says: the blend, the post composed o
     'return normalize(uSkinFlip * (uSkinNrm * nw));',
   ]) assert.ok(src.includes(line), `the face normal: ${line}`);
   assert.ok(src.includes('char: this._charSkinProgram(src.charFs),') && src.includes('const program = this._buildProgram(CHAR_SKIN_VS, skinFaceFs(fs));'), 'the world set builds its character program from the skin VS and the edited lane shader');
-  assert.ok(src.includes("vs: { mesh: VS, bb: BB_VS, terrain: TERRAIN_VS, char: CHAR_VS, charSkin: CHAR_SKIN_VS }"), 'the shadow pass keeps the unskinned CHAR_VS');   // PIN MOVED (MWNPC16): and takes the skinned one for a body's own shadow
+  assert.ok(src.includes("vs: { mesh: VS, bb: BB_VS, terrain: TERRAIN_VS, char: CHAR_VS, charSkin: CHAR_SKIN_VS }"), 'the shadow pass keeps the unskinned CHAR_VS');
   const classic = src.match(/const CHAR_FS = `([\s\S]*?)`;/)[1];
   for (const [name, fs] of [['classic', classic], ['lane', EL_CHAR_FS], ['classic-shadow lane', classicLook(EL_CHAR_FS)]]) {
     const out = skinFaceFs(fs);
@@ -360,7 +359,6 @@ test('MWNPC1g the GLSL says what its JS law says: the blend, the post composed o
 test('MWNPC1h drawCharacter: the palette sampler always reads a complete texture, the body\'s for its draw and the identity after; drawCharacter records no shadow under the sprite target - a body casts through recordShadowBody (MWNPC16, section 24)', () => {
   const src = rd('src/render/renderer.js');
   const draw = src.slice(src.indexOf('  drawCharacter(mesh, modelMatrix) {'), src.indexOf('  _charSpriteRT() {'));
-  // PIN MOVED (MWNPC16): the shadow door no longer turns a skinned body away - it casts through its own skinned depth
   // program (test/render/mwnpc16_bodyshadow.test.js) - but drawCharacter still records nothing under the sprite target, the one
   // place a skinned body is drawn: its shadow is recordShadowBody's, from drawThird
   assert.ok(draw.includes('if (this._casting && this._spriteDepth === 0 && this._studioDepth === 0) this._shadows.recordCharacter(mesh, modelMatrix);'), 'the sprite target records no shadow');

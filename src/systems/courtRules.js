@@ -1,6 +1,5 @@
 // @ts-check
-// WBX6 (2026-09-26, Swololo on Discord: "regeneration defeats the purpose if someone regenerates all the health back in
-// 5 seconds. instead of wiping buffs, maybe disable regen in oblivion"): THE DEADLANDS HELD REGENERATION. One switch
+// WBX6: THE DEADLANDS HELD REGENERATION. One switch
 // the world host sets every frame (scenes/world.js - beside arenaFrame: a made level stands under this player,
 // systems/madeLevel.js), read where each regeneration lives:
 //   - the Regenerate effect's round (systems/effects.js - the spell, the potion, the enchantment's cast),
@@ -10,7 +9,7 @@
 // HEALING IS NOT REGENERATION: a Heal spell, a potion of healing and a friend's cast land as they always did - the fight
 // still has its healers (World-Bosses.md section 6: standing the fight earns the spoils). Nothing is wiped.
 //
-// EVENT-RULES (2026-10-25, the owner, asked how regeneration should work in the world events: "Back, held in a fight"):
+// EVENT-RULES:
 // WBX6 turned every regeneration OFF in the made levels, silently - a Regenerate's tile still said "Restores health
 // every round" and healed nothing, and the Discord read it as broken. It is HELD now, not off: a regeneration heals
 // REGEN_HELD_SHARE of what it would (the fractions carried round to round, each source its own, so a +1 every fourth

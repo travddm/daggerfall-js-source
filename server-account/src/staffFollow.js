@@ -1,12 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow, and the weak spot "Follow isn't
-// audited and hears private talk": "A follow token names its target and is logged when minted, and entering a home is
-// logged") - THE FOLLOW TOKEN. One door, /v1/staff/follow { sub, room? }: a relay token for a hidden staff spectator
+// STAFF-PANEL5-FOLLOW - THE FOLLOW TOKEN. One door, /v1/staff/follow { sub, room? }: a relay token for a hidden staff spectator
 // (`hd` 1, the hidden builder's mark) that names the account it follows (`fo`), minted on a live staff session and
 // written to the audit log as it is minted.
 //
-// WHO (mob, 07:04Z: "Moderators may follow any player anywhere, as Admins do, and the audit log is the check"): an Admin
+// WHO: an Admin
 // or a Moderator, any registered or guest player but themselves.
 //
 // WHAT IT CARRIES: never the staff member's own account or name - a hidden socket on their own account would break the

@@ -1,10 +1,10 @@
-// AUDIT 30 (2026-09-29, Mac: "Do it") - THE MARKET'S AND THE SMITH'S SERVICE, AS THE AUDIT FOUND IT, through the real
+// AUDIT 30 - THE MARKET'S AND THE SMITH'S SERVICE, AS THE AUDIT FOUND IT, through the real
 // Worker over node:sqlite (test/accountDb.mjs): every ledger line under its own id (the stock's, a fill's tax), a spent id
 // refused (a pruned row's id reused), the tax on a listing's running total, a piece listed only when it is the seller's
 // to hand over (no delivery waiting, not standing in a home, a crafted family's), a settle past the rows that cannot
 // settle, the kind's own fields, the unyielded and the unbounded refused; the read by the search's materials, the
 // Stores it moved, the Marks each trade moved; the mark signed. Each pin failed on the code before its fix.
-// bible/06-Systems/Online-Arc.md AUDIT 30.
+// AUDIT 30.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -41,7 +41,7 @@ async function stand(extra = {}) {
   const fund = (who, marks) => raw.prepare('INSERT INTO marks (account, balance) VALUES (?, ?) ON CONFLICT (account) DO UPDATE SET balance = excluded.balance').run(who.id, marks);
   const line = (actor, r) => raw.prepare('SELECT kind, src_kind, dst_kind, amount FROM marks_ledger WHERE actor = ? AND rid = ?').get(actor, r);
   const burnt = (kind) => Number(raw.prepare('SELECT COALESCE(SUM(amount), 0) AS s FROM marks_ledger WHERE kind = ?').get(kind).s);
-  /** PIN MOVED (INT19, Integrity-Arc section 7): a crafted piece lists out of its seller's realm record - a realm
+  /**
    *  character's stands there too. */
   const piece = (who, provenance, recipe = 'longsword:mithril', { template = 120, material = 5, quality = 2 } = {}) => {
     raw.prepare(`INSERT INTO products
@@ -109,7 +109,7 @@ test('AUDIT 30 S3: an id whose row the market\'s prune took (SCALE4b: the hour\'
   const l = await s.call('/v1/market/list', list(mac, { units: 100, price: 50, rid: RL }), mac.secret);
   assert.equal((await s.call('/v1/market/buy', { character: ann.character, region: DF, listing: l.body.listing.id, units: 100, max: 5000, hubs: HUBS, rid: RB }, ann.secret)).status, 200);
   clock(_now + (MARKET_KEEP_DAYS + 1) * DAY);
-  await runCron(s.env, { cron: CRON_HOUR, nowS: _now });   // the prune - PIN MOVED (SCALE4b): the service's clock's each hour, no longer the History view's read
+  await runCron(s.env, { cron: CRON_HOUR, nowS: _now });   // the prune
   assert.equal(Number(s.raw.prepare('SELECT COUNT(*) AS n FROM market_orders').get().n), 0, 'the rows are gone, the ledger\'s lines are not');
   s.fund(mac, 1_000_000);
   const o2 = await s.call('/v1/market/order', { character: mac.character, region: DF, material: 'ore:mithril', units: 1000, price: 1000, hubs: HUBS, rid: RO }, mac.secret);
@@ -142,7 +142,7 @@ test('AUDIT 30 L6: the tax is taken on a listing\'s running total - two buys of 
 
 test('AUDIT 30 S5: a piece whose delivery waits is not listed; a delivery is collected only by the piece\'s owner - one id is never handed out twice', async () => {
   const s = await stand();
-  const mac = await s.seated('Mac'), ann = await s.seated('Ann'), bob = await s.registered('Bob');   // PIN MOVED (INT19): the sellers realm characters
+  const mac = await s.seated('Mac'), ann = await s.seated('Ann'), bob = await s.registered('Bob');
   for (const w of [mac, ann, bob]) s.fund(w, 100_000);
   const P = '0123456789abcdef';
   s.piece(mac, P);
@@ -169,7 +169,7 @@ test('AUDIT 30 S6 + S8/L2: a piece standing in a home is not listed, and stands 
   // house was bought for (seatHome seats it), so the table is crafted, its Stores kept and the piece listed from it
   mac.character = house.character;
   s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'building', ?, NULL, 'master-joiner', 1)`)
-    .run(mac.id, mac.character, xpForRank(100));   // PIN MOVED (CRAFT3): a table is Carpentry's, read from the Building track (a 'carpentry' row is read by nothing)
+    .run(mac.id, mac.character, xpForRank(100));
   s.give(mac, 'plank:oak', 'own', 3);
   const made = await s.call('/v1/prof/craft', { character: mac.character, recipe: 'table-small:oak', clean: false, name: 'Silverthorn', rid: rid() }, mac.secret);
   assert.equal(made.status, 200, JSON.stringify(made.body));
@@ -211,7 +211,7 @@ test('AUDIT 30 S7: a settle reaches past the rows that cannot settle - twenty re
 
 test('AUDIT 30 S9 + L7 + L8: a listing binds only its kind\'s fields; an order for a material nothing yields is refused; a listing worth more than any balance is a bad price', async () => {
   const s = await stand();
-  const mac = await s.seated('Mac');   // PIN MOVED (INT19): a realm character - its crafted piece lists out of its record
+  const mac = await s.seated('Mac');
   s.fund(mac, MARKS_MAX);
   s.give(mac, 'ore:mithril', 'own', 100);
   const w = await s.call('/v1/market/list', list(mac, { wear: 500 }), mac.secret);
@@ -220,7 +220,7 @@ test('AUDIT 30 S9 + L7 + L8: a listing binds only its kind\'s fields; an order f
   s.piece(mac, '0123456789abcdef');
   const p = await s.call('/v1/market/list', { character: mac.character, region: DF, kind: 'piece', provenance: '0123456789abcdef', wear: 900, price: 5, material: 'ore:mithril', hubs: HUBS, rid: rid() }, mac.secret);
   assert.equal(p.status, 200, JSON.stringify(p.body));
-  for (const m of ['part:daedra-heart']) {   // PROF7 moved it: the Bear Hide is Hunting's now; PIN MOVED (AUDIT-SEATS): the sieges' Spoils yield the Warforged ingot and the silk; PIN MOVED (DAEDRIC-SMELT): the forge smelts the Daedric ingot, and its heart - loose alone, no door counts one - is what nobody can bring: the loose door's, as CLOTH-GEMS' graded gems are, no order's material
+  for (const m of ['part:daedra-heart']) {   // PROF7 moved it: the Bear Hide is Hunting's now
     const o = await s.call('/v1/market/order', { character: mac.character, region: DF, material: m, units: 1, price: 10, hubs: HUBS, rid: rid() }, mac.secret);
     assert.equal(o.body.error, 'bad-material', `${m}: an escrow held a week for goods nobody can bring`);
   }
@@ -272,7 +272,7 @@ test('AUDIT 30 L4: a marked piece\'s record signs its mark (`a`), an unmarked on
   // Masterwork (qualityOdds(0)), whose mark is its own - so hers bears none
   for (const [w, rank, spec] of [[mac, 100, 'master-joiner'], [ann, 10, null]]) {
     s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'building', ?, NULL, ?, 1)`)
-      .run(w.id, w.character, xpForRank(rank), spec);   // PIN MOVED (CRAFT3): a table is Carpentry's, read from the Building track (a 'carpentry' row is read by nothing)
+      .run(w.id, w.character, xpForRank(rank), spec);
     s.give(w, 'plank:oak', 'own', 3);
   }
   const claims = async (w) => {

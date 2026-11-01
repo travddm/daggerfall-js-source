@@ -134,7 +134,6 @@ test('AUDIT 58: all three foe damage doors consult the Shield pool, and the zero
   // exactly as the player does. Only the player's door consumed it.
   for (const [file, sub] of [
     ['scenes/dungeonContext.js', 'const healthDamage = bypassShield ? damage : damageShieldPool(foe.entity, damage);'],
-    // PIN MOVED (STAR5): a master's circle wards the blow first (its share, scenes/starfall/starfallHost.js circleWard) - the
     // pool then consults what is left, at the subtraction as before
     ['scenes/exteriorFoes.js', 'const healthDamage = bypassShield ? warded : damageShieldPool(f.entity, warded);'],
     ['scenes/cityGuards.js', 'const healthDamage = bypassShield ? damage : damageShieldPool(g.entity, damage);'],
@@ -319,7 +318,6 @@ test('AUDIT 58: GetRandomFullName draws the gender - the talk fallback is not al
   assert.equal(wild, fullName(getNameBankOfRegion(-1), coin === 1 ? GENDERS.Female : GENDERS.Male));
   // ...and the talk MCP calls it, over PlayerGPS.CurrentRegionIndex
   const w = src('scenes/world.js');
-  // PIN MOVED (TESA3, bible/03-World/Arena-Provinces.md): through the one bank where the player stands - the region's
   // (GetNameBankOfRegion over PlayerGPS.CurrentRegionIndex) on the Bay, a province's past it - and getRandomFullName's own
   // draw from it (nameHelper.js getRandomFullNameOfBank, which getRandomFullName now calls)
   assert.match(w, /randomFullName: \(\) => getRandomFullNameOfBank\(nameBankHere\(\)\)/);

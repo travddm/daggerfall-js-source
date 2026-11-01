@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-BOUNTY (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - a freeport's
-// bounty board on the open sea's killers; bible/03-World/Eltheric-Ocean.md SEA-BOUNTY) - THE BOARD'S LAW, both ends'.
+// SEA-BOUNTY - THE BOARD'S LAW, both ends'.
 //
 // A WANTED CAPTAIN is a realm character who has killed another player at sea (a fall the relay refereed in a room of the
 // open sea - net/wild/wildReceipt.js `m`, net/wire.js seaRoomOf) within SEA_WANTED_DAYS, or one a bounty still stands on.

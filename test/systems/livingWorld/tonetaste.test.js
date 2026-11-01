@@ -1,5 +1,4 @@
-// TONE-TASTE (2026-10-15, bible/06-Systems/Living-World.md "TONE-TASTE"; Mac, of a stream: "someone who didnt like
-// etiquette still went up"): a question's tone counts as the one spoken to TOOK it, never by its name. DFU's own tables
+// TONE-TASTE: a question's tone counts as the one spoken to TOOK it, never by its name. DFU's own tables
 // (talkTopics.js ETIQUETTE_REACTION_MODS / STREETWISE_REACTION_MODS - a Commoner takes Polite ill and Blunt kindly, a
 // Noble the reverse) were read by the talk's answer alone; a Living World resident's regard (+1 a polite word, -6 a
 // blunt one) and a courtship (+3 Polite, -3 Blunt) went by the tone's name, so a Polite word raised a Commoner who

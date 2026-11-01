@@ -1,6 +1,4 @@
-// REVENANT (2026-10-02; systems/revenant/revenant.js, Mac: "the ability for these enemies that kill you, or a very small chance
-// to flee at low health. These enemies can return at a later time stronger, with a new name, a chance of more loot
-// and taunt the player"). The laws pinned here:
+// REVENANT. The laws pinned here:
 //   - WHO: a special foe (an elite, a champion, a revenant already) of level 3 or more - never the watch, an ally, a
 //     quest's foe; off (the loot-rarity row), none.
 //   - THE KILL: the blow that kills the player, through the real door - and not one a Stendarr's mercy undoes.
@@ -97,7 +95,7 @@ test('REVENANT THE KILL: the blow that kills me makes its foe a revenant through
   await tick();
   assert.equal(N.livingRevenants().length, 0, 'Stendarr\'s mercy: no death, no revenant');
   setAvoidDeathHook(null);
-  me.health = 99;   // PIN MOVED (FULL-GUARD, FIELD BUGS 2026-10-11b): a foe's blow from full health leaves me at 1 - a point short of full, it kills
+  me.health = 99;
   setStruck(killer, me, 500); hurtPlayer(me, 500);
   assert.equal(N.livingRevenants().length, 0, 'confirmed once the hurt is done, not inside it');
   await tick();

@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster "repo": the house around the code - the
+// AUDIT 68, cluster "repo": the house around the code - the
 // release workflow's gate and tag, the dev server's data door, the build's
 // page list, the lint's reach, the runner's glob and the
 // CDN scripts' integrity. Each pin failed on the tree before its fix.
@@ -27,7 +27,6 @@ test('AUDIT 68 X2-release-red-suite-ships: the suite is a JOB every packaging le
     return end < 0 ? rest : rest.slice(0, end + 1);
   };
   const gate = job('gate'), build = job('build');
-  // PIN MOVED (REL-FAST, Mac: "Yes, thats insanely slow"): the whole house check as verify.yml's parallel jobs - lint and
   // the types, every shard, the build - on the commit the legs build, not `npm run check` in series
   assert.match(gate, /\n {4}uses: \.\/\.github\/workflows\/verify\.yml\n {4}with:\n {6}ref: \$\{\{ github\.sha \}\}\n/, 'the gate job runs the whole house check');
   assert.doesNotMatch(gate, /build: false/, 'the build is a part of it, as it was of `npm run check`');
@@ -42,7 +41,6 @@ test('AUDIT 68 X2-release-tag-commit: a new release tag is cut at the built comm
   const wf = read('.github/workflows/release-desktop.yml');
   // REL4: the one step that attaches anything is the publish job's draft
   const attach = wf.slice(wf.indexOf('- name: Stage the release as a draft, every file attached'), wf.indexOf('- name: Publish it whole'));
-  // PIN MOVED (REL8): the release is named for the player's update (comments between) - the tag and the commit as ever
   assert.match(attach, /\n {10}tag_name: \$\{\{ needs\.version\.outputs\.tag \}\}\n(?: {10}#[^\n]*\n)* {10}name: \$\{\{ needs\.version\.outputs\.update != '' && format\('Update \{0\}', needs\.version\.outputs\.update\) \|\| needs\.version\.outputs\.tag \}\}\n {10}target_commitish: \$\{\{ github\.sha \}\}\n/,
     'without target_commitish GitHub cuts the tag at main\'s head at upload time');
   const uses = wf.split('\n').filter((l) => l.includes('${{ inputs.release_tag }}'));
@@ -112,7 +110,7 @@ test('AUDIT 68 X2 (books): the BOOKS fallback finds DFU\'s own lowercase `books`
 });
 
 test('AUDIT 68 X2-archive-sheet-orphan: every tracked root page is a build input', async () => {
-  // bible/Home.md: "Prototype HTMLs at repo root must register in
+  // "Prototype HTMLs at repo root must register in
   // vite.config.js rollupOptions.input" - held here, not by memory.
   const input = Object.values((await import('../../vite.config.js')).default.build.rollupOptions.input);
   const pages = tracked('*.html').filter((p) => !p.includes('/'));

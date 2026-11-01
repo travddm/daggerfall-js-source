@@ -1,5 +1,5 @@
 // @ts-check
-// MARTIAL (2026-10-17) - MARTIAL SPECIALISATIONS: A FIGHTER IS THE WEAPONS THEY MASTER. bible/05-Combat/Martial-Specialisations.md
+// MARTIAL - MARTIAL SPECIALISATIONS: A FIGHTER IS THE WEAPONS THEY MASTER.
 //
 // The owner: "we've properly balanced mages, added a specialization tree and added the firmament system. I want to do the
 // same for other weapon types/classes." Asked, the owner chose: the six weapon skills (Long Blade, Short Blade, Axe, Blunt
@@ -26,7 +26,7 @@
 // No judge's finding (the design page, section 7): a path acts only with both its masteries held, read here at every
 // ask, and the account service's judge reads no mastery - a finding would add a version and stop nothing.
 //
-// An arcane path and a martial path are two choices (the owner: "Yes, one of each") - neither reads the other, and the
+// An arcane path and a martial path are two choices - neither reads the other, and the
 // masteries they need come from the one 3 / 2 / 1 (masterSkills.js MASTERY_SLOTS).
 //
 // Everything a player reads is `t()`, read when it is read.

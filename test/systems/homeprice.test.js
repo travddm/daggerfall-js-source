@@ -117,7 +117,7 @@ test('HOME-PRICE the sale pays what was PAID, and the town tells it to the chara
   row(10, R.id, 1, 1);                   // AUDIT HOME-PRICE D6: a record that paid 1 under the old law - its share is nothing, and says so
   const town = async (w, character) => Object.fromEntries((await s.call('/v1/homes/town', { mapId: 77, character }, w.secret)).body.homes.map((h) => [h.buildingKey, h]));
   const mine = await town(who, R.id);
-  // ACCOUNT-HOMES (PIN MOVED): the home my other character bought is mine to sell too - its sum is said at my door
+  // ACCOUNT-HOMES (
   assert.deepEqual([3, 4, 5, 6, 10].map((k) => [mine[k].refund, mine[k].rentDue]), [
     [homeSaleRefund(600_100), 240], [undefined, undefined], [undefined, undefined], [homeSaleRefund(120_000), undefined], [0, undefined],
   ]);
@@ -198,7 +198,6 @@ test('HOME-PRICE a knightly order\'s free house, online (AUDIT HOME-PRICE C1): t
   assert.equal(priced(true)({ modelIdNum: 456 }), homeRefund(99_000), 'online: 120 m2 in an 8 x 8 city, its share');
   assert.equal(priced(false)({ modelIdNum: 456 }), houseSellPrice(400), 'offline: Daggerfall\'s');
   assert.equal(priced(true)(null), 0);
-  // PIN MOVED (HOUSES-3): each house the town resolves is an offer, priced at its own deed share; the sale the one offered
   assert.match(m, /houseOffers: \(\) => townHouses\(\)\.map\(\(\{ deed, summary \}\) => \(\{\n\s*price: deedSellPrice\(summary\),/);
   assert.match(m, /found: owned !== null, price: deedSellPrice\(owned\), deed: offered\?\.deed \?\? null \}/);
   // the grant

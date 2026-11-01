@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT11 (2026-10-01) — A LINE OF LIGHT OVER EVERY FIND.
+// LOOT11 — A LINE OF LIGHT OVER EVERY FIND.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 13; Mac: "Do you
-// wanna turn this into an arc and do all of the above?" - "tier beams on
+// The Loot arc (; - "tier beams on
 // Rare+ drops"). A body or a pile holding a Rare or better stands a thin
 // line of its BEST tier's colour - WBX3's form (a line out of the find's
 // own top, never a beam beside it), through the gate spoils' own renderer

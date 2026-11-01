@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-A (2026-09-25): THE DEEP BAY'S COASTLINE, BUILT FROM THE PLAYER'S
+// DW-A: THE DEEP BAY'S COASTLINE, BUILT FROM THE PLAYER'S
 // OWN WORLD. Iliac Puddle No More 1.2.2 (jet082) carves its sea against
 // a "distance bake" - DeepWaterDistanceBake.cs reads it, a Unity editor
 // tool (Tools > Deep Waters > Bake Distance Field, not in the mod's
@@ -8,7 +8,7 @@
 // render of game data is game data, so it does not enter this repo.
 // The port builds the same planes here, from the player's archive, by
 // the rules the file itself proves - every one checked against the
-// mod's own DistanceBakeVanilla (bible/03-World/Deep-Waters.md, "The
+// mod's own DistanceBakeVanilla (, "The
 // coastline is rebuilt, not carried"):
 //
 //   HEIGHTS    - the baker's MapPixelData: WOODS.WLD after

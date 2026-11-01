@@ -1,6 +1,5 @@
 // @ts-check
-// SOLITUDE-RELIEF (2026-10-27, the owner: "transform solitude to match this as close to 1:1 as possible", "solitude is the
-// first city where I want to really explore varied depths of terrain"; bible/03-World/Arena-Provinces.md) - Solitude's
+// SOLITUDE-RELIEF - Solitude's
 // ground: metres over the sea at any point of its pixel, the anchor's metres (x east, z south). Two tiers on the headland,
 // cliffs to the sea west and north and to the country east, the docks' shelf and the Docks Way under the north cliff, the
 // south slope and the Gate Road. Daggerfall's blocks stand on its tiers (capitalBlockLift), the landmarks at its heights

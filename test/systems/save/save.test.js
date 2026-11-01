@@ -29,7 +29,7 @@ test('save: round-trip restores everything; extras carried; deep copies', () => 
   // smallerDungeonsState joined the extras (both hosts already passed
   // them and snapshotPlayer dropped them in silence), so the exact
   // shape grew three keys - null/null/0 when the caller passes none.
-  assert.deepEqual(extras, { position: [1, 2, 3], pose: null, classicMinutes: 77.5, readiedSpellIndex: 97, world, locationKey: 'dungeon:42', quest: null, talk: null, interior: null, dungeon: null, travelMap: null, escortingFaces: null, quickslots: null, spawns: null, smallerDungeonsState: 0, modData: null, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW });   // PIN MOVED (BAY-LEFT-GROUND, D5): and its frame's law   // TERRAIN-SCALE1: the scale its heights stood on   // TTL1: `spawns` is the spawned-dungeon ledger, and `quickslots` is QS1's block, which this name list had never carried (so every save dropped it)   // S12: the world rides the envelope; Q4-v/TK-i: the quest + talk slots (null when the host passed none); IS1: the interior slot (null outside a building)
+  assert.deepEqual(extras, { position: [1, 2, 3], pose: null, classicMinutes: 77.5, readiedSpellIndex: 97, world, locationKey: 'dungeon:42', quest: null, talk: null, interior: null, dungeon: null, travelMap: null, escortingFaces: null, quickslots: null, spawns: null, smallerDungeonsState: 0, modData: null, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW });
   assert.equal(dst.name, 'Mac');
   assert.equal(dst.stats.luck, 60);
   assert.equal(dst.items[0].name, 'Short Bow');
@@ -58,7 +58,7 @@ test('save: F11 pierces the death screen (its hint is true) and no other window 
   assert.ok(routeKey({ key: 'F11', code: 'F11' }, ctx, 'APPLIER'));
   assert.ok(!routeKey({ key: 'F9', code: 'F9' }, ctx));      // save stays gated under overlays
   assert.deepEqual(calls, ['load:string']);
-  // DUPE-LOAD (PIN MOVED: it pierced any overlay): under the pack, a loot window or a counter, F11 is the window's
+  // DUPE-LOAD (
   ctx.overlayWindow = () => ({});
   routeKey({ key: 'F11', code: 'F11' }, ctx, 'APPLIER');
   assert.deepEqual(calls, ['load:string'], 'no load from under any other window');

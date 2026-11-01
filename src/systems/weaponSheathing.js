@@ -1,6 +1,5 @@
 // @ts-check
-// WS1 (2026-09-17, Mac: "Can we implement this for the morrowind model" -
-// Greatness7's WEAPON SHEATHING 1.6, the OpenMW archive). THE LAW, ONE
+// WS1. THE LAW, ONE
 // HOME. The mod is two things: ART (seventy-one `_sh` scabbard meshes
 // and three skeleton addons, vendored under vendor/weapon-sheathing/ -
 // the assets module serves them) and a MECHANISM, which on OpenMW is the

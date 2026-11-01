@@ -1,6 +1,5 @@
 // @ts-check
-// PORT-SHIPS (2026-10-27, the owner's field report, item 8: "I went to solitude and the ships at works were inside town
-// walls"; bible/03-World/Holdings.md section 7, PORT-SHIPS) - WHERE A PORT'S TOWN KEEPS ITS SHIPS OUT. A harbour is found off
+// PORT-SHIPS - WHERE A PORT'S TOWN KEEPS ITS SHIPS OUT. A harbour is found off
 // the water alone (shipLife.js findHarbour: a water tile, or Deep Waters' floor, beside land), and the water says nothing
 // of what the town stands on it. Solitude's walls were drawn round its blocks clear of every house (AUDIT-TESA A6-3), and
 // so 7 m out into the Karth on the west: its six berths were the river's shore at the terrace, each ship's hull through

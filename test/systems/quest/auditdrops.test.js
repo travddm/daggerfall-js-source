@@ -1,4 +1,4 @@
-// AUDIT DROPS (2026-09-22, Mac: "Lets do an audit before merging") - three
+// AUDIT DROPS - three
 // lenses over the four drops and the three additions, the findings paid
 // and PINNED BY EXECUTION here. A: the quest envelope is not trusted. B:
 // the trade's freeze and its reservation. C: the quest cooldowns. D: party

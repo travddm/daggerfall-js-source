@@ -1,4 +1,4 @@
-// MWNPC2 (2026-10-09, the MW-NPC arc's second slice - bible/04-Characters/Morrowind-NPCs.md section 7): ONE
+// MWNPC2: ONE
 // OFFSCREEN BIND FOR EVERY SEEN BODY. Every Morrowind body's picture took its own pass of the shared sprite target -
 // two framebuffer switches, a scissored clear and the character block a body a frame. A host opens a batch around its
 // body pass now: drawRigSpriteBox measures and QUEUES each picture, and the flush draws them all in one bind, each in

@@ -1,5 +1,4 @@
-// PR-BOW1 (2026-09-24, player report: "Equipping a bow enlarges your
-// character"): THE MORROWIND BODY'S SPRITE STANDS ON THE BODY, NOT ON
+// PR-BOW1: THE MORROWIND BODY'S SPRITE STANDS ON THE BODY, NOT ON
 // ITS GEAR. The third-person body is a true-size ortho picture on an
 // upright billboard quad (render/characterSprite.js drawRigSpriteBox),
 // so its size on screen is set by where the quad stands - and that was
@@ -154,7 +153,7 @@ test('PR-BOW1: the body is the SAME size on screen bare-handed, with a longsword
 test('PR-BOW1: the picture is OF the body - taken along the eye\'s ray to the actor\'s own axis at the body\'s mid-height (the drawn ranges less CARRIED_SLOTS), that point drawn exactly on itself, and every point of the body drawn where it is drawn bare-handed, whatever the hand holds (unfixed: the gear-inclusive box centre placed the picture)', async () => {
   const SAMPLES = [[0, 0, 0], [0, 0, 3.2], [1.5, 0.5, 2], [-0.4, 1.8, 3.2]];   // feet, shoulder, off-axis points of the fixture body
   const bare = await standBody();
-  // BODY-CROP (2026-10-22): the card - and so its ray and its anchor - stands under the Billboard Look; by default the
+  // BODY-CROP: the card - and so its ray and its anchor - stands under the Billboard Look; by default the
   // picture is the main camera's own, cut to the body's window, and the same points land the same way
   for (const card of [true, false]) {
     setPref('mwBillboardLook', card);
@@ -172,8 +171,8 @@ test('PR-BOW1: the picture is OF the body - taken along the eye\'s ray to the ac
           const got = drawnBody(body, cam);
           const at = `${what}, ${back}/${pitch}`;
           if (card) {
-            // lookAt's third row is -forward. BODY-FLAT (2026-10-23): along the ray's LEVEL part - the Billboard Look's
-            // card is a classic flat, its picture drawn level (PIN MOVED: it was the pitched ray)
+            // lookAt's third row is -forward. BODY-FLAT: along the ray's LEVEL part - the Billboard Look's
+            // card is a classic flat, its picture drawn level (
             const fwd = [-got.sprite.oview[2], -got.sprite.oview[6], -got.sprite.oview[10]];
             assert.ok(crossLen(fwd, [axis[0] - cam.eye[0], 0, axis[2] - cam.eye[2]]) < 1e-5, `${at}: the picture is taken along the eye's level ray to the body`);
           } else {
@@ -200,7 +199,7 @@ test('AUDIT OW3 J6: drawThird\'s `grow` (the travel view\'s OW-BIG - the Morrowi
   const { minZ, maxZ } = meshBounds(pieces);
   const midZ = (minZ + maxZ) / 2;
   const SAMPLES = [[0, 0, 0], [0, 0, 3.2], [1.5, 0.5, 2], [-0.4, 1.8, 3.2]];
-  // BODY-CROP (2026-10-22): the card's window grows with the body under the Billboard Look; the main camera's own picture
+  // BODY-CROP: the card's window grows with the body under the Billboard Look; the main camera's own picture
   // (the default) draws every grown point where the grown mesh itself stands on the screen
   for (const card of [true, false]) {
     setPref('mwBillboardLook', card);

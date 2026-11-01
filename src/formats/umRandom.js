@@ -50,7 +50,7 @@ export class UMRandom {
     return F32[0] - 1.0;
   }
 
-  /** Uniform float in [min, max). WATER-AUDIT (2026-09-08): float32 per
+  /** Uniform float in [min, max). WATER-AUDIT: float32 per
    *  operation, as `NextFloat() * (max - min) + min` is in C# - the
    *  double form disagreed with the reference in 17% of draws by a
    *  float32 ulp, and through the beach jitter's `fround(40 + j)` moved

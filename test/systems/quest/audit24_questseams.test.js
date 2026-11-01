@@ -43,12 +43,12 @@ const PENDING = new Map([
   // handlers answer the charter's null through optional reads until
   // the talk-news arc (the TalkManager getters, the lord names) and
   // the interior host (the building name, the tavern pick) mount them.
-  // TN1 (2026-08-28) MOUNTED the seven talk-news getters - the four
+  // TN1 MOUNTED the seven talk-news getters - the four
   // npcData faction names (TK-iv computed them; MacroHelper.cs:965-995
   // reads them), GetFactionName's HolyOrder deity arm,
   // GetLordNameForFaction and GetOldLeaderFateString. Removing a row
   // means mounting it, and it did.
-  // IH1 (2026-08-28) MOUNTED %cbd (the interior building's name
+  // IH1 MOUNTED %cbd (the interior building's name
   // regenerated through the ONE name bag) and %nt (the directory's
   // tavern pick).
   // QG1 MOUNTED getClassicSpellEffects (spellRecordOfIndex, the G4
@@ -77,7 +77,7 @@ const PENDING = new Map([
   // GetAnswerWhereIs' compass has used since T3c. Unmounted, every
   // directional answer expanded %di to '...never mind...'.
   //
-  // ROAD-E E7 (2026-09-02) completed MacroHelper's table to all 217
+  // ROAD-E E7 completed MacroHelper's table to all 217
   // rows, and fourteen of the new rows read seams THIS host does not
   // mount. Two groups, each with a real reason:
   //
@@ -262,8 +262,8 @@ test('audit24: a NEW CHARACTER starts the two hard-coded quests, main quest incl
   const { loadQuestTables } = await import('../../../src/systems/quest/tables.js');
   const { readFileSync, readdirSync, existsSync } = await import('node:fs');
 
-  // TUT1 (2026-10-11): DFO's own tutorial replaced _TUTOR__; the curse its close started (`start quest 977 977`)
-  // stands in its place. START1 (2026-10-24): the Bay's start quest stands in _BRISIEN's - its commission, opened,
+  // TUT1: DFO's own tutorial replaced _TUTOR__; the curse its close started (`start quest 977 977`)
+  // stands in its place. START1: the Bay's start quest stands in _BRISIEN's - its commission, opened,
   // starts the main quest in the city of Daggerfall (test/systems/starts/start1_bay.test.js)
   assert.deepEqual([...GAME_START_QUESTS], ['S0000977', '_STARTIB'],
     'the tutorial\'s curse in its place, and the Bay\'s start in the main quest\'s');

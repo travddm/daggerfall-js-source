@@ -1,4 +1,4 @@
-// CROWN-HALL (2026-10-02, Mac: "Build that next"): A CROWN'S CASTLE AS ITS HOLDER'S HALL - the throne room found by its
+// CROWN-HALL: A CROWN'S CASTLE AS ITS HOLDER'S HALL - the throne room found by its
 // ruler (the region's Province faction's first child, an Individual - MacroHelper.GetLordNameForFaction's law), its
 // pieces placed about them in the dungeon's own collider (src/systems/crownHall.js), and the hosts' seams
 // (src/scenes/worldModes.js crownHall, src/scenes/world.js seatHall.crown and drawDungeonBanners). bible/11-Multiplayer/

@@ -1,6 +1,4 @@
-// WX2 - THE FRONT REACHES THE GROUND (2026-09-03, Mac: rain and snow
-// should fade in and out slowly, as the grass prototype's front does,
-// and not always be a downpour - a sprinkle, a light snow). The pure
+// WX2 - THE FRONT REACHES THE GROUND. The pure
 // laws of systems/weather/weatherFront.js, the wind model's arrival, the
 // renderer's count, the hosts' wiring, and the classic path untouched.
 import { test } from 'node:test';
@@ -82,7 +80,7 @@ test('WX2 arrival gate: the rain holds off until the front is mostly in, then fi
   assert.equal(s.intensity, 0, 'dry until the window opens');
   // three quarters in: some rain, not all
   s = run(f, 'rain', 0.75, SETTLE);
-  assert.ok(s.intensity > s.peak * 0.2 && s.intensity < s.peak, `part way in, part of the peak (${s.intensity.toFixed(3)} of ${s.peak.toFixed(3)})`);   // PIN MOVED (RAIN-SPRINKLE): of its own peak - a seed may roll a sprinkle
+  assert.ok(s.intensity > s.peak * 0.2 && s.intensity < s.peak, `part way in, part of the peak (${s.intensity.toFixed(3)} of ${s.peak.toFixed(3)})`);
   assert.equal(s.shown, 'rain'); assert.equal(s.kind, 'rain');
   // landed: the peak, under the wander
   s = run(f, 'rain', 1, SETTLE);
@@ -97,7 +95,7 @@ test('WX2 arrival gate: the rain holds off until the front is mostly in, then fi
 test('WX2 first tick: a boot into rain is rain - the first sample snaps, every later one eases', () => {
   const f = createWeatherFront({ seed: 5 });
   const s = f.tick({ weather: 'rain', arrival: 1, tsec: 0 });
-  assert.ok(s.intensity > 0 && Math.abs(s.intensity - s.peak * wander(0, f.state().episode.phase)) < 1e-9, 'the first tick lands on its target whole');   // PIN MOVED (RAIN-SPRINKLE): its target, not 0.1 - a seed may roll a sprinkle
+  assert.ok(s.intensity > 0 && Math.abs(s.intensity - s.peak * wander(0, f.state().episode.phase)) < 1e-9, 'the first tick lands on its target whole');
   assert.equal(s.changed, false, 'the first word is not a cut');
   assert.equal(s.from, 'rain', 'and the terms have nothing to cross from');
   assert.equal(s.shown, 'rain');
@@ -144,7 +142,7 @@ test('WX2 a change of kind: the old kind thins out before the new fills in, and 
   assert.ok(at.intensity < 0.02, `the switch of kind starts the new count from nothing (${at.intensity})`);
   const late = run(f, 'snow', 1, SETTLE);
   assert.equal(late.shown, 'snow'); assert.equal(late.kind, 'snow');
-  assert.ok(late.intensity >= late.peak * WANDER_FLOOR - 0.02, 'the snow\u2019s own peak under its wander');   // PIN MOVED (RAIN-SPRINKLE): was > 0.1 - a seed may roll a light snow
+  assert.ok(late.intensity >= late.peak * WANDER_FLOOR - 0.02, 'the snow\u2019s own peak under its wander');
   assert.ok(late.intensity <= PRECIP_PEAK.snow[1] + 1e-9, 'a snow peak, not a rain one');
 });
 
@@ -311,7 +309,7 @@ test('AUDIT 57 F3 (front): a jumped change lands whole - no crossing, no taper, 
   assert.equal(s.changed, false, 'nothing to cross');
   assert.equal(s.from, 'rain'); assert.equal(s.to, 'rain');
   assert.equal(s.t, 1, 'the arrival is 1 by contract, whatever the model\u2019s last frame said');
-  assert.ok(s.intensity > 0 && Math.abs(s.intensity - s.peak * wander(0, f.state().episode.phase)) < 1e-9, 'the drops land whole on the frame');   // PIN MOVED (RAIN-SPRINKLE): was > 0.1 - a seed may roll a sprinkle
+  assert.ok(s.intensity > 0 && Math.abs(s.intensity - s.peak * wander(0, f.state().episode.phase)) < 1e-9, 'the drops land whole on the frame');
   assert.equal(s.shown, 'rain');
   assert.equal(f.state().outgoing, null, 'no episode tapers');
   // a jump with the SAME word changes nothing

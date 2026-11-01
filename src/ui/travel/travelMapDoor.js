@@ -7,7 +7,7 @@
 // TRAV0I00 window, the enhanced skin gets THE HELD MAP - Mac's own
 // sprite of two hands holding a parchment, with the Iliac Bay inked
 // onto the sheet at runtime (MAP1; ui/heldMap.js's header carries the
-// design, bible/10-UI/Held-Map-Arc.md the arc). It replaced the 3D
+// design, the arc). It replaced the 3D
 // relief map (ui/overworldMap.js, RETIRED 2026-09-18) whole.
 //
 // Both skins ride world.js's ONE construction seam
@@ -49,8 +49,7 @@ export function travelMapDoorReady() {
  * null where this build cannot draw a map - the classic arm without
  * its art - so the hosts' `if (win)` guards keep meaning.
  *
- * SOC6 (Mac: "Party members should be able to be seen on the world
- * map, regardless of their location"): the bag also takes an optional
+ * SOC6: the bag also takes an optional
  * `party: () => [{acct, name, px, py, in, loc, online, leader}]`, and
  * BOTH arms take it - the held map as green rings with names in ink,
  * the classic one as green dots on the region page. It is a FUNCTION, read

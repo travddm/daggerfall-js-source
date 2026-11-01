@@ -1,4 +1,4 @@
-// FAST-SUITE (2026-10-04, Mac: "Our workflow is extremely slow"): HOW A LIST OF TEST FILES IS RUN - tools/testShards.mjs
+// FAST-SUITE: HOW A LIST OF TEST FILES IS RUN - tools/testShards.mjs
 // runTests, the one home `npm test` (`1/1`), a CI shard and `npm run test:changed` share: the files longest first by the
 // recorded times (so the slowest no longer start last and run on alone), every core at once (Node's default leaves one
 // idle), each file in its own process as before. The spawn is stood in: what is asserted is what would be run.

@@ -1,4 +1,4 @@
-// HELM-WAY (2026-09-29, Mac: "Improve the overall mobility and maneuverability of ships") - the responsive helm, driven
+// HELM-WAY - the responsive helm, driven
 // on Come Sail Away's real runtime over the vendored hulls (test/csaScene.mjs) and on the sea's captains: the steerage
 // law and the hulls' own helms read off the prefab, the way on and off, the rudder at rest, the Carrack that could
 // neither make way nor turn, the Features row's choice (none handed is the mod to the letter), the captains' pace and
@@ -58,8 +58,6 @@ test('HELM-WAY the rudder answers at rest: with her sails set and no way on, the
     assert.equal(s.rt.state.TurnTarget, want, `${handling ?? 'none handed'}: ${s.rt.state.TurnTarget}`);
     s.rt.state.MoveVectorCurrent = [0, 0, 4];
     s.frame();
-    // PIN MOVED (SAIL-FREE, 2026-10-05): the responsive rudder reads her way at SAIL-FREE's gain - her swing at her new way
-    // - PIN MOVED (AUDIT SHIPS A5, 2026-10-06): her rig's own gain (a Large Boat's, sailFreeGain)
     const at4 = handling === 'responsive' ? f(f(f(steerage(4 / sailFreeGain(boat))) * f(boat.modifierRudder)) / 10) : f(f(4 * boat.modifierRudder) / 10);
     assert.equal(s.rt.state.TurnTarget, at4, `${handling ?? 'none handed'} at 4 m/s`);
   }
@@ -68,15 +66,13 @@ test('HELM-WAY the rudder answers at rest: with her sails set and no way on, the
 test('HELM-WAY her way on and off: under sail the responsive helm gathers way at HELM_WAY.sailAccel of the mod\'s rate and, sails struck, coasts at HELM_WAY.coast of it, each times SAIL-FREE\'s gain; the helm comes over at HELM_WAY.turnAccelSail of the mod\'s; the oars are the mod\'s own (mutants: the sail\'s rate, the coast, the helm\'s, the oars touched)', () => {
   const classic = helmOn(HULL.SmallShip, { handling: 'classic' });
   const quick = helmOn(HULL.SmallShip, { handling: 'responsive' });
-  // PIN MOVED (SAIL-FREE, 2026-10-05): her sail's rates times SAIL-FREE's gain - the same handling at her new way
   near(quick.s.rt.properties.moveAccel(), classic.s.rt.properties.moveAccel() * HELM_WAY.sailAccel * SAIL_FREE.gain, 1e-5, 'under sail');
   near(quick.s.rt.properties.turnAccel(), classic.s.rt.properties.turnAccel() * HELM_WAY.turnAccelSail, 1e-5, 'the helm');
-  // PIN MOVED (AUDIT SHIPS A5, 2026-10-06): the gain on a coast is a way her canvas made - she sails a beat first
   for (const h of [classic, quick]) { h.s.frame(); h.s.rt.LowerSails(); }
   near(quick.s.rt.properties.moveAccel(), classic.s.rt.properties.moveAccel() * HELM_WAY.coast * SAIL_FREE.gain, 1e-5, 'the coast, sails struck');
   for (const h of [classic, quick]) h.s.rt.state.oarThrottle = 1;   // HELM-LADDER: the oars pulling ahead at their rung
   near(quick.s.rt.properties.moveAccel(), classic.s.rt.properties.moveAccel(), 1e-9, 'the oars pulled: the mod\'s own');
-  // AUDIT SHIPS A5: and a way her oars made is lost at HELM-WAY's own coast, her rig's gain none of it. PIN MOVED (AUDIT 2
+  // AUDIT SHIPS A5: and a way her oars made is lost at HELM-WAY's own coast, her rig's gain none of it.
   // XA7, 2026-10-06): rowed from rest - a beat of sail and a frame of oars was the way her canvas made, all but a seventh
   const [cr, qr] = [helmOn(HULL.SmallShip, { handling: 'classic', raise: false }), helmOn(HULL.SmallShip, { handling: 'responsive', raise: false })];
   for (const h of [cr, qr]) { h.s.rt.state.oarThrottle = 1; h.s.frame(); h.s.rt.state.oarThrottle = 0; }

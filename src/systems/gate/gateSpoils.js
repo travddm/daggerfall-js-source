@@ -1,7 +1,6 @@
 // @ts-check
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot ... and have a sort of rarity glow
-// attached to it"): THE SPOILS OF A FALLEN BOSS - what one player's kill pays, rolled from the relay's receipt. Design:
-// bible/11-Multiplayer/World-Bosses.md section 7 ("The roll").
+// WB5: THE SPOILS OF A FALLEN BOSS - what one player's kill pays, rolled from the relay's receipt. Design:
+// ("The roll").
 //
 // PER PLAYER, AND THE SEED'S OWN. The receipt the relay signs for an account that earned the kill carries a loot seed
 // (`c`, 32 bits of the relay's CSPRNG - net/gate/gateReceipt.js), and everything here is rolled on `seededRng(c)`
@@ -19,8 +18,7 @@
 // THE SIGIL STONE IS ITS OWN TEMPLATE (SIGIL_STONE_TEMPLATE, 570 - past DFU's 288 and Climates & Calories'
 // 530-541), a gem by its group (bound, so no counter buys it - SS4) - and not a renamed gem: every
 // classic gem is an ingredient, an ingredient STACKS, and a Ruby renamed would merge into the Ruby already in the pack
-// and lose its name and its price. A custom row is no ingredient. SS1 (2026-09-27, Mac: "make sigil stones bound items
-// and stackable"): the row STACKS with its own kind alone - it says `stackable`, as the rations' row does
+// and lose its name and its price. A custom row is no ingredient. SS1: the row STACKS with its own kind alone - it says `stackable`, as the rations' row does
 // (inventory.js isStackable), and a stack merges only with the same template, so a stone never joins a Ruby nor a Ruby
 // a stone - and it is BOUND (`bound`, systems/item/itemBound.js): a stone is never handed to another player. A pack saved
 // before it stacked is folded on load (restackStones). It wears the gems' own art, the Ruby's red, and no shelf stocks
@@ -44,8 +42,7 @@ export const SPOILS_GOLD_PER_LEVEL = 250;
 export const SPOILS_LEGENDARY = 0.1;
 /** The source the two Magic-or-better pieces are laddered at: a boss, at the ladder's top tier, a player's even luck. */
 export const SPOILS_SOURCE = Object.freeze({ boss: true, tier: 21, luck: 50 });
-/** The gate's trophy: its template, its name and its price. WB12a (2026-10-01, Mac: "I'd like to rename the stones" -
- *  "Deadlands Ember"): a coal of the breach's fire, carried out when the Warden falls - only the NAME moved; the id, the
+/** The gate's trophy: its template, its name and its price. WB12a: a coal of the breach's fire, carried out when the Warden falls - only the NAME moved; the id, the
  *  binding and every key are the Sigil Stone's (bible World-Bosses.md section 19 A). */
 export const SIGIL_STONE_TEMPLATE = 570;
 export const SIGIL_STONE = Object.freeze({ name: 'Deadlands Ember', value: 5000 });
@@ -67,7 +64,7 @@ export const SIGIL_STONE_TEMPLATES = Object.freeze([{
 }]);
 registerCustomTemplates(SIGIL_STONE_TEMPLATES);
 export const isSigilStone = (item) => item?.templateIndex === SIGIL_STONE_TEMPLATE;
-/** LOOT9 (the Loot arc, bible/06-Systems/Loot-Arc.md section 11): THE WELKYND SHARD - a sliver of Ayleid
+/** LOOT9 (the Loot arc): THE WELKYND SHARD - a sliver of Ayleid
  *  magicka-crystal, what a laddered piece is salvaged into and the Reforge's only coin (systems/reforge.js). Its own row
  *  beside the Stone's, on the Stone's laws: it stacks with its own kind alone, and it is BOUND - never sold, traded,
  *  dropped or listed (systems/item/itemBound.js; net/realm/realmTradeLaw.js BOUND_TEMPLATES names it). The Sapphire's art
@@ -115,7 +112,7 @@ export const PORTAL_STONE_TEMPLATES = Object.freeze([{
 }]);
 registerCustomTemplates(PORTAL_STONE_TEMPLATES);
 export const isPortalStone = (item) => item?.templateIndex === PORTAL_STONE_TEMPLATE;
-/** PORTAL-GIFT (2026-10-04, the owner: "every current player should recieve x10 of these. They should stack"): EVERY
+/** PORTAL-GIFT: EVERY
  *  CHARACTER THAT ALREADY EXISTS IS GIVEN PORTAL_GIFT_STONES STONES, ONCE - LOAN-AMNESTY's shape (banking.js
  *  forgiveLoans). A character's `portalGift` says which gift it has had: a save written before the gift carries no mark
  *  (0), and every save written after carries the mark (save.js snapshotPlayer), so a character made after the gift is
@@ -229,30 +226,30 @@ export function rollSpoils(seed, level, p = 0) {
   const first = rolls() < SPOILS_LEGENDARY ? 'legendary' : 'rare';
   pieces.push(graded(spoilsBase(lv, rolls), first, rolls));
   for (let i = 0; i < 2; i++) pieces.push(graded(spoilsBase(lv, rolls), magicOrBetter(rolls), rolls));
-  // SET6 (Sigil Sets, bible/11-Multiplayer/Sigil-Sets.md section 6): a piece of the Warden's own Regalia, Aetheric, a
+  // SET6 (Sigil Sets): a piece of the Warden's own Regalia, Aetheric, a
   // sixth of the time - rolled LAST, so every spoils before it is what it was for its seed; it leaves him last
   const regalia = rollRegalia(rolls);
   if (regalia) pieces.push({ item: regalia, tier: regalia.rarity });
-  // LOOT2 (bible/06-Systems/Loot-Arc.md section 4): the ladder's last pass - a Legendary among them Exalted one time in
+  // LOOT2: the ladder's last pass - a Legendary among them Exalted one time in
   // ten - rolled after the Regalia, so every spoils before it is what it was for its seed
   lastPass(pieces.map((p) => p.item), rolls);
   // The Warden's card was drawn here before the card games were removed: its draw is still taken, so every spoils
   // after it is what it was for its seed
   rolls();
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the sockets' passes over the pieces - LOOT20's, then the
+  // GEM1/GEM2: the sockets' passes over the pieces - LOOT20's, then the
   // weapons' own - and the Warden's gem at a boss's grade, LAST of all, so every spoils before them is what it was for
   // its seed
   socketPass(pieces.map((p) => p.item), rolls);
   weaponSocketPass(pieces.map((p) => p.item), rolls);
   const gems = bossGems('gate', rolls);
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): a weapon's technique - after even the Warden's gem, so every spoils
+  // TECH1: a weapon's technique - after even the Warden's gem, so every spoils
   // before it is what it was for its seed (a piece with no technique family takes no draw)
   techniquePass(pieces.map((p) => p.item), rolls);
-  // GILDED2 (bible/06-Systems/Gilded.md section 7): THE DRAGONFIRE OATH - one draw more, LAST of all (after even the
+  // GILDED2: THE DRAGONFIRE OATH - one draw more, LAST of all (after even the
   // technique pass), so every spoils before it is what it was for its seed; a static roll, so no pass ever reaches it
   const oath = rollDragonfireOath(rolls);
   if (oath) pieces.push({ item: oath, tier: oath.rarity });
-  // WB14g (bible/11-Multiplayer/Breach-Portents.md section 11): WHAT A PORTENT PAYS - one more piece of Magic or better for each
+  // WB14g: WHAT A PORTENT PAYS - one more piece of Magic or better for each
   // portent the receipt says, after every draw before (the Oath's law: every spoils rolled before is what it was for its seed)
   // AUDIT WB14 (PLAY-7): and each such piece through the passes every other piece had - the ladder's last (an Exalted), the
   // sockets', the weapons' and the technique's - over them alone, after them, so nothing drawn before them moves
@@ -269,7 +266,7 @@ export function rollSpoils(seed, level, p = 0) {
 /** WB14g: the portents' bits a receipt's `p` may carry, in the order their pieces are drawn (net/gate/gateMods.js GATE_PORTENTS). */
 export const SPOILS_PORTENT_BITS = Object.freeze([1, 2, 4]);
 
-/** WB14e (bible/11-Multiplayer/Breach-Portents.md section 9): A TITHE-IMP'S TITHE for one who struck it - gold (TITHE_GOLD_PER_LEVEL
+/** WB14e: A TITHE-IMP'S TITHE for one who struck it - gold (TITHE_GOLD_PER_LEVEL
  *  a level, the seed varying it a fifth either way) and one gem of the classic eight (ItemBuilder's own CreateRandomGem), off
  *  its seed (the relay's `tithe` word): the same seed and level, the same tithe. In spoilsList's pieces, gold first. */
 export const TITHE_GOLD_PER_LEVEL = 60;

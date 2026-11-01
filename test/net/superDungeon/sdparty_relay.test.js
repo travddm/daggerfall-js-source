@@ -1,5 +1,4 @@
-// SD-PARTY (2026-10-28, the owner: "we need to make this a party instance ... to stop griefin on the bosses";
-// bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): EACH PARTY ITS OWN SHATTERED HOUR. A realm is `sd:<s>.<owner>`, and
+// SD-PARTY: EACH PARTY ITS OWN SHATTERED HOUR. A realm is `sd:<s>.<owner>`, and
 // its door admits the owner, staff and the owner's party alone - the hub's party word, through the real Room and hub.
 // One life and one win a Hollow hold across every copy: a death in one copy, or a receipt for the slot, shuts the rest.
 // And the page picks its party's copy (scenes/superDungeon/sdCopy.js). SD-BACK: a death keeps its own copy open to it.
@@ -138,7 +137,7 @@ test('SD-PARTY ONE WIN A HOLLOW: an account holding this slot\'s receipt is refu
 
 test('SD-PARTY THE HUB\'S DOOR: a realm\'s word is its slot, an account, may or down, and its copy\'s owner - anything else refused (mutants: a bad op believed; the owner unread)', () => {
   const o = '0123456789abcdef';
-  assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'down', o }), { s: 4, a: 'acct-peer-ann', op: 'down', o });   // PIN MOVED (SD-BACK): and the copy
+  assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'down', o }), { s: 4, a: 'acct-peer-ann', op: 'down', o });
   assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'may', o: 'p3' }), { s: 4, a: 'acct-peer-ann', op: 'may', o: 'p3' }, 'a shared Hour');
   for (const bad of [null, [], { s: 0, a: 'acct-peer-ann', op: 'may', o }, { s: 4, a: 'x', op: 'may', o }, { s: 4, a: 'acct-peer-ann', op: 'kill', o }, { s: 4, a: 'acct-peer-ann', op: 'up', o }, { s: 4, a: 'acct-peer-ann', op: 'may' }, { s: 4, a: 'acct-peer-ann', op: 'may', o: 'p99' }]) assert.equal(validSdAcct(bad), null, JSON.stringify(bad));
 });
@@ -158,7 +157,6 @@ test('SD-PARTY THE PAGE PICKS ITS PARTY\'S HOUR: the kept copy while it is this 
   assert.equal(await c.ownerFor(1), D);
   assert.deepEqual(store.get(SD_COPY_KEY), { s: 1, a: me, o: D, p: 'pt1' }, 'kept on the device');
   assert.equal(await createSdCopy({ social: () => null }).ownerFor(1), null, 'no account, no Hour');
-  // PIN MOVED (SD-SOLO): alone, the relay's walk names the shared Hour; no answer, my own
   const asked = [];
   const solo = (n, party = null) => createSdCopy({ social: () => ({ acct: me, party }), relay: () => 'wss://relay.test/', fetchImpl: async (u) => { asked.push(String(u)); return new Response(JSON.stringify({ n })); } });
   const M = await instanceOwnerOf(me);

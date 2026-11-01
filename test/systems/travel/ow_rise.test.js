@@ -1,5 +1,4 @@
-// OW-RISE (2026-10-17, the player: "the overworld travel randomly slows down from speed multiplier even without enemies
-// nearby"). A journey whose view has come down walks on the ground at x1 until the view rises again (world.js
+// OW-RISE. A journey whose view has come down walks on the ground at x1 until the view rises again (world.js
 // travelViewGovern, AUDIT OW4 J5), and tvJourneyUp - the rise - asked every hostile foe in classic spawn reach, where the
 // view's own `danger` asks only the ones WILD-ALERT lets through (wildSeen: never a foe that has not noticed a fast
 // traveller). So an unaware camp beside the road held the journey at x1 with no enemy coming. Pinned: the rise MOUNTED

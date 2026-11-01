@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -60,7 +60,7 @@ export function createRaidHost(host) {
     // RAID3: the relay's arm - does it keep this world's raids, and my word to the town's cell
     relayRaids: () => !!host.online?.raidOk,
     sendRaid: (w, cell) => !!host.online?.sendRaid(w, cell),
-    // WW6 (bible/03-World/World-Wide.md WW6): the towns past the Bay the lanes raid - the world's registry, as the boot keeps
+    // WW6 (WW6): the towns past the Bay the lanes raid - the world's registry, as the boot keeps
     // it (net/staffPlaces.js keptPlaces: `gamePlaces(createWorldPlaces())`), TESA's places on it where the land stands; a
     // capital one town, its centre (WW7-11)
     places: () => keptPlaces(),

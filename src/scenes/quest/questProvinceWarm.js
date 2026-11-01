@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT RELEASE R2-5d (2026-10-26; the owner: "Take care of exclusions and gaps") - A PROVINCE'S PLACES MADE READY IN IDLE
+// AUDIT RELEASE R2-5d - A PROVINCE'S PLACES MADE READY IN IDLE
 // TIME, so asking for work past the Bay does not stall the frame.
 //
 // A quest's remote draw (systems/quest/place.js - DFU's Place.SelectRemoteTownSite darts, NEARBY-QUESTS' pools) reads a

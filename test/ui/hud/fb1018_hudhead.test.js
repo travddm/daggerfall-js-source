@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-18 HUD-HEAD (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, found reading Anon-e-moose's "Gradual
+// FIELD BUGS 2026-10-18 HUD-HEAD (, found reading Anon-e-moose's "Gradual
 // FPS loss then crash" - not that report's proven cause, a leak on the way to it). With Morrowind's data attached the
 // large HUD's head is a Morrowind picture, each its own texture (ui/hud/hudLarge.js loadHudLargeHead, PORTRAIT3D), and
 // largeHudOptions loads a new one whenever the head's key moves - every helm put on or taken off. The picture it

@@ -1,4 +1,4 @@
-// URBANIZER U2 (2026-10-26; bible/03-World/Urban-Fabric.md section 3): the towns' own pictures - each province's paving,
+// URBANIZER U2: the towns' own pictures - each province's paving,
 // cobbles and walls, and the cut stone, brick and half-timbering of the capitals' landmarks - painted at vanilla's detail
 // (TESA-LORE's measure of the freeware's 475 wall and ground textures), and worn where the lore's stone is.
 import { test } from 'node:test';
@@ -90,7 +90,7 @@ test('URBANIZER U2 the capitals\' own buildings in cut stone, brick and half-tim
   assert.ok(wears(buildCastleDour()).has(key(urbanArt('ashlar'))));
   const docks = buildSolitudeDocks();
   assert.ok(wears(docks).has(key(urbanArt('halfTimber'))));
-  // the warehouse's framing above its stone storey: every half-timber face over WAREHOUSE_PLINTH (PIN MOVED, SOLITUDE-RELIEF:
+  // the warehouse's framing above its stone storey: every half-timber face over WAREHOUSE_PLINTH (
   // over the quay it stands on, at the water under the city's rock)
   const ht = docks.subMeshes.find((s) => s.textureArchive === URBAN_ARCHIVE && s.textureRecord === URBAN_ART.halfTimber);
   let low = Infinity;

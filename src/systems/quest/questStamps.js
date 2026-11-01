@@ -1,6 +1,6 @@
 // @ts-check
-// TIME3 (2026-10-01, Mac: "people have to wait insanely long" / "This needs to be perfect"): A QUEST'S STAMPS AND THE
-// CLOCKS THEY STAND ON. Design: bible/06-Systems/Online-Time-Arc.md section 6.3.
+// TIME3: A QUEST'S STAMPS AND THE
+// CLOCKS THEY STAND ON. Design:
 //
 // Online a quest reads three clocks where DFU's reads one (the machine's deps, quest/machine.js):
 //   - THE CHARACTER'S (nowSeconds - LIVED1's own clock): every countdown and every interval. A Clock's sample, a

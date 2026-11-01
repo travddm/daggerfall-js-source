@@ -1,5 +1,4 @@
-// AUDIT SD III, SD20g (2026-10-08, Mac: "a deep comprehensive audit over everything, ensuring absolute polish and
-// perfection"; bible/11-Multiplayer/Super-Dungeons.md "AUDIT SD III"): THE DELVE ARC AND THE DUNGEONS' SIZES - the
+// AUDIT SD III, SD20g: THE DELVE ARC AND THE DUNGEONS' SIZES - the
 // lens's findings, each reproduced and pinned here: a fall is one way on the way out (D1); the online split said as it
 // is built (D2); an ended quest marks nothing (D3); the way out never builds its whole field each second, nor asks two
 // thousand rays at once (D4); a quest shared online laid on this page's sizes (D5) and never re-stamped by a link
@@ -219,7 +218,6 @@ test('SD20g A QUEST SHARED ONLINE IS LAID ON THIS PAGE\'S SIZES, AND NO LINK RE-
     _enumerateDungeonQuestMarkers: () => markersOnline,
   };
   const world = { maps: { getRegion: () => ({ mapNameLookup: new Map([['Keep', 5]]) }), getLocation: () => ({ dungeon: { blocks: [{}] } }) } };
-  // PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): online a quest's markers are the dungeon WHOLE's (its
   // quest's world asks for it whole - the layout its instance builds), so the copy re-laid is one a page before INSTANCES
   // laid on the world's sizes; a copy laid whole is already right
   const quest = { smallerDungeonsState: ONLINE_DUNGEONS_STATE, hooks: { world }, resources: new Map([['dun', place]]), tasks: new Map() };
@@ -228,13 +226,10 @@ test('SD20g A QUEST SHARED ONLINE IS LAID ON THIS PAGE\'S SIZES, AND NO LINK RE-
   assert.equal(quest.smallerDungeonsState, SMALLER_DUNGEONS_STATE.Disabled, 'stamped the whole dungeon\'s');
   assert.equal(relayQuestOnline(quest), false, 'the whole\'s already: nothing');
   const share = read('src/systems/quest/questShare.js');
-  // PIN MOVED (MEDIUM-DISTINCT's audit, 2026-10-08): the relay lays the copy on the world's sizes online, and on this page's
   // medium layout where the copy's dungeon moved, online and off
   assert.match(share, /const relay = \(q\) => \{\n\s*const online = ctx\.online \?\? isOnlinePage\(\);\n\s*if \(online\) relayQuestOnline\(q, \{ carriesQuestItem: ctx\.carriesQuestItem \?\? null \}\);\n\s*relayQuestMovedLayout\(q, machine, \{ carriesQuestItem: ctx\.carriesQuestItem \?\? null \}, online\);\n\s*\};/);
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS): the resync notes its sender a holder of the copy, after the relay
   assert.match(share, /if \(quest\) \{ relay\(quest\); machine\.noteShareHolder\?\.\(questName, ctx\.from\); return \{ ok: true, quest, resync: true \}; \}/, 'kept in step: laid');
   assert.match(share, /if \(!quest\) return \{ ok: false, reason: 'restore' \};[^\n]*\n\s*relay\(quest\);/, 'arrived: laid');
-  // PIN MOVED (QUEST-AUDIT III SHELF-TWIN, itemTransfer.js keepsQuestItem): every keeping - the wagon's and the bag's too
   assert.match(read('src/scenes/world.js'), /carriesQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),[^\n]*\n\s*from: acct,[^\n]*\n\s*\}\);/, 'a quest item I carry never laid again');
   // D6: a link's older stamp, online - never taken
   const mine = { uid: 2, smallerDungeonsState: ONLINE_DUNGEONS_STATE, resources: new Map([['dun', { isPlace: true, siteDetails: { siteType: SITE_TYPES.Dungeon, mapId: 777 } }]]) };

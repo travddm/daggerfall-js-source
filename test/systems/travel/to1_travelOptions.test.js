@@ -1,6 +1,4 @@
-// TO1 (2026-09-17, Mac: "This is the next daggerfall mod we are to
-// implement 1:1", with "an enhanced version of the UI for enhanced
-// mode" and "ensure the compatibility is sound with basic roads") -
+// TO1 -
 // TRAVEL OPTIONS 1.11 (Hazelnut), against its own source.
 //
 // The arc of what is held here: the mod's SETTINGS as its own
@@ -78,7 +76,7 @@ import { LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
 import { mapPixelToWorldCoords } from '../../../src/world/streamingWorld.js';
 import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/systems/travel/travelPace.js';   // PACE-DIALS: the road's x100 is the player's dial
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2: the world host whole
-/** PACE-DIALS (2026-10-06): x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
+/** PACE-DIALS: x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 
@@ -98,7 +96,7 @@ test('TO1: the settings are the mod\'s own modsettings.json, key for key, type f
   // the port's own Enabled in front, then the mod's, section-dot-name
   assert.equal(Object.keys(ours)[0], 'Enabled');
   assert.equal(ours.Enabled.default, true, 'MO1: every vendored mod ships on');
-  // PLAIN-TEXT (2026-10-19): the one shipped key that does nothing here (no Real Grass in the game) says so - its words, exactly
+  // PLAIN-TEXT: the one shipped key that does nothing here (no Real Grass in the game) says so - its words, exactly
   const PLAIN = { 'GeneralOptions.AllowRealGrass': 'Has no effect here: Real Grass isn\u2019t included.' };
   let n = 0;
   const shippedNames = new Set();
@@ -108,7 +106,7 @@ test('TO1: the settings are the mod\'s own modsettings.json, key for key, type f
       const key = `${section.Name}.${k.Name}`;
       shippedNames.add(key);
       const def = ours[key];
-      // RATE-LAW (2026-10-04, Mac: "Remove travel options dials"): THE ONE SECTION THE PORT LEAVES OUT, named so a second
+      // RATE-LAW: THE ONE SECTION THE PORT LEAVES OUT, named so a second
       // cannot go quietly - the spinner's starting value, its always-start switch and its limit (systems/timeScale.js
       // travelRateOf: a journey runs at its ground's rate)
       if (RATE_LAW_RETIRED.includes(key)) { assert.equal(def, undefined, `${key} is retired, never declared`); continue; }
@@ -116,8 +114,7 @@ test('TO1: the settings are the mod\'s own modsettings.json, key for key, type f
       assert.equal(def.description, PLAIN[key] ?? k.Description, `${key}'s description is the mod's own, or its plain rewording`);
       const kind = k.$type.split('.').pop();
       if (kind === 'ToggleKey') {
-        // TO-FIELD2 (Mac, 2026-09-18: "travel options instantly
-        // transports you to a destination and theres no travel"). The
+        // TO-FIELD2. The
         // SECOND default the port ships differently, said here beside
         // the first so a third cannot ride in quietly.
         // IsPlayerControlledTravel is an AND over three toggles, and the
@@ -157,8 +154,6 @@ test('TO1: the settings are the mod\'s own modsettings.json, key for key, type f
   // TRAVEL-NAV1: plus the port's own steering switch - a key the mod does
   // not ship (HT-WAIST's shape on Handheld Torches), named so a third
   // cannot ride in unnoticed
-  // PIN MOVED (OW-TOGGLE): and its first-person switch (test/systems/travel/ow_toggle.test.js)
-  // PIN MOVED (TO-ROADS): and that switch's roads (test/systems/travel/fb0929d_toroads.test.js)
   assert.equal(Object.keys(ours).length, n - RATE_LAW_RETIRED.length + 4, 'and the port declares them all but the retired three, plus Enabled, its own AvoidObstacles, FirstPersonTravel and FirstPersonTravelFollowsRoads');
   assert.deepEqual(Object.keys(ours).filter((k) => !shippedNames.has(k)).sort(), ['Enabled', 'GeneralOptions.AvoidObstacles', 'GeneralOptions.FirstPersonTravel', 'GeneralOptions.FirstPersonTravelFollowsRoads'],
     'the port\'s four keys, and nothing else');
@@ -723,7 +718,7 @@ test('TO1: TravelControlUI - the rects are the mod\'s; RATE-LAW: no spinner - th
   assert.deepEqual(CONTROL_RECTS.camp, [230, 3, 45, 21]);
   assert.deepEqual(CONTROL_RECTS.exit, [279, 3, 38, 21]);
   assert.equal(MESSAGE_SECONDS, 3);
-  // RATE-LAW (Mac: "Roads now travel at x100 and non roads at x60")
+  // RATE-LAW
   assert.deepEqual([TRAVEL_ROAD_RATE, TRAVEL_OPEN_RATE, MAX_TIME_SCALE], [100, 60, 100]);
   assert.deepEqual([travelRateOf(true), travelRateOf(false)], [100, 60]);
   assert.deepEqual([...ROAD_LEG_KINDS], ['road', 'track'], 'a road or a track: travelRoute.js roadShare\'s own pair');
@@ -1483,11 +1478,9 @@ test('AUDIT-TO1 (mutant): a pixel carrying BOTH a road and a track shows the ROA
   assert.notEqual(buf[centre], packColor(TRACK_COLOR));
 });
 
-// ── TO-FIELD (2026-09-18) ────────────────────────────────────────
+// ── TO-FIELD ────────────────────────────────────────
 //
-// Mac, playing the shipped build: "Using travel options spawns you under
-// the maps, doesn't travel on the road and you instantly collapse from
-// exhaustion". Three defects, and none of them is the mod's model being
+// . Three defects, and none of them is the mod's model being
 // wrong - the port does run the mod's continuous accelerated journey, as
 // its own readme describes it, and never teleports on that path.
 test('TO-FIELD: the accelerated journey waits for the ground; TO-FIELD3 took the needs back off the mod\'s clock (mutants: travel-drive-ungated)', () => {

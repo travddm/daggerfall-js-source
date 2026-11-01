@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24) - cluster "dungeonctx", S19 src/scenes/dungeonContext.js. Mounted, not matched: the
+// AUDIT 68 - cluster "dungeonctx", S19 src/scenes/dungeonContext.js. Mounted, not matched: the
 // statements below are sliced out of the context's source and run against the real systems they call - a corpse
 // takes no blow, the exhaustion guard is the box, a rebuilt record takes its body with it, a Destroy()ed foe is no
 // container, a load and the teardown end this context's own flights, a magic round is nobody's blow unless its tick
@@ -36,7 +36,7 @@ import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';   // ARENA
 import { markOutCold } from '../../src/systems/survival/needs.js';   // AUDIT C&C N2: the dungeon's collapse marks its hour
 import { ROOM_LOOT_OFF } from '../roomLootOff.mjs';   // PARTY-LOOT: the room's seams with no room
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
-import { appliedOwnerTm } from '../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount
+import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };   // AUDIT WORLD-EVENTS
@@ -105,7 +105,7 @@ const foeRec = (over = {}) => ({
 function killHarness({ foes, foeDeps = null, getTexture = async () => ({ recordCount: 99 }) } = {}) {
   const log = { deaths: 0, chimes: 0, freed: [], minted: 0, hud: [] };
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes, foeDeps, ARENA_PUPPET_OWNER, blowClassOf, feudWeakBlow, _authority: true, _layoutFoes: foes.length, opts: {}, lastPlayerFeet: [0, 0, 0], _ecvT: 0, _ctxDead: false,
     playerEntity: { isPlayer: true, items: [], luck: 50 },
     markFoeStruck: () => {}, markConcealedHit: () => {}, makeEnemiesHostile: () => {}, peerCandidate: () => null, renownFoeStruck, renownFoeDied, reportPlayerKill,   // RENOWN1: the kill door's two stamps, the real ones (no handler: nothing paid)
@@ -184,7 +184,7 @@ test('AUDIT 68 S19-damagefoe-dead-reentry: a corpse takes no blow - a second hur
 function exhaustionHarness() {
   const log = { collapses: 0 };
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     playerEntity: { fatigue: 100, health: 50, maxHealth: 50, magicka: 0, maxMagicka: 0, stats: { strength: 50, endurance: 50 } },   // AUDIT C&C N5: a body's stats - its pool is live
     surfacePlayer: () => {}, areEnemiesNearby: () => false, foes: [], _activity: { swimming: false },
     exhaustionOutcome: () => { log.collapses++; return { kind: 'rest', textId: 1, health: 0, fatigue: 0, magicka: 0 }; },
@@ -324,7 +324,7 @@ test('AUDIT 68 S19-removed-foe-lootable: every corpse door asks the one predicat
 /** retireMissile + ensureMissileBatch + the local sweep, over one archive that may still be warming. */
 function missileHarness(getTexture) {
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     missiles: [], _pendingCasts: [], billboardBatches: [], dynamicDraws: [], freed: [],
     flatAnims: { remove: () => {} }, getTexture, missileArchive: () => 375, uploadRecord: () => {},
     billboardSize: () => ({ w: 1, h: 1 }), centredBase: (p) => p, armFlatAnim: () => {}, MISSILE_FPS: 5,
@@ -387,7 +387,6 @@ function roundHarness(foes) {
   const aggro = [];
   for (const f of foes) f.ai.makeEnemyHostileToAttacker = (t) => aggro.push({ foe: f, t });
   const h = killHarness({ foes, foeDeps: { PLAYER_TARGET, resetAllyTeamOnPlayerAttack, isLocalPlayerTarget, withinYaw: () => true } });
-  // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): the block now also calls the relay's bodies' rounds (scenes/gate/standInSpell.js
   // standInRound) between the foes' rounds and the kill - none here, so its door answers nothing
   Object.assign(h.state, { runMagicRoundsFor, killIfAnyLiveStatZero, standInRound: () => {}, dt: 1 / 60, foeSinks: h.foeSinks });
   const block = foeRoundBlock();
@@ -435,7 +434,7 @@ test('AUDIT 68 S19-rest-alert-decay-wrong-clock (LIVED1): the rest decays the al
   const rolled = [];
   let own = 5000 + ALERT_DECAY_MINUTES;   // the character's clock: eight hours of rested night since the alert
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     classicMinutesRef: { get value() { return own; }, set value(v) { own = v; } },   // the dungeon's clock view: the character's own
     advanceOwnMinutes: (n) => { own += n; },   // TIME3: the rest's minutes, a counted raise of the same clock
     playerEntity: { level: 1, restAsks: 1 },
@@ -443,7 +442,7 @@ test('AUDIT 68 S19-rest-alert-decay-wrong-clock (LIVED1): the rest decays the al
     sharedClockOn: () => false, worldMinutes: () => own,   // AUDIT LIVED1 A: the arm hands its rounds the world's sky
     survivalFeed: () => null, survivalEnvNow: () => null, runSurvivalMinutes: () => {}, foes: [], foeSinks: () => ({}),
     decayEnemyAlert, dfLocation: { mapTableData: { dungeonType: 0 } }, _spawnEncounter: () => {},
-    onlineRoom: () => false, restInLair: () => false,   // PIN MOVED (RVN7d: the rest's first roll asks after a revenant at home - none here)
+    onlineRoom: () => false, restInLair: () => false,
     intermittentEnemySpawn: (ctx) => { rolled.push(ctx.enemyAlertActive); return null; },
     camps: { tend: () => { state.tended = (state.tended ?? 0) + 1; } },   // AUDIT REST II H3: the arm tends my Campfire through the night
   };
@@ -483,7 +482,7 @@ test('AUDIT SET P-M3: a joiner\'s killing blow, applied at the host, is named on
   const rec = mount(`${declSrc('foeMaxOf')} ${fnSrc('roomRecord')} return { roomRecord };`, { q2: (x) => x, q3: (x) => x, FOE_HEALTH_MAX, FOE_LEVEL_MAX, KILLED_BY_MS, _sharedFoe: () => false, fightN: () => 1, isClassEnemyId, ...TRAIT_DOORS });
   const r = rec.roomRecord(rat, 0, true);
   assert.equal(r.v, 'peer-7');
-  assert.ok(rat._sentKey.split(',').includes('peer-7'), 'the name rides the key');   // PIN MOVED (RVN13, Feud-Arc.md 25: a revenant's own ride the key after it)
+  assert.ok(rat._sentKey.split(',').includes('peer-7'), 'the name rides the key');
   assert.equal('v' in rec.roomRecord(bat, 1, true), false, 'the host\'s kill names nobody');
   assert.equal('v' in rec.roomRecord(foeRec(), 2, true), false, 'a live foe names nobody');
   // AUDIT FINAL F7: for KILLED_BY_MS after the death, never for as long as the body lies - 453 elite corpses named by
@@ -507,12 +506,12 @@ test('AUDIT SET P-M3: a joiner\'s killing blow, applied at the host, is named on
   const joiner = (self) => {
     const foes = [foeRec(), foeRec()];
     const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
       foes, _layoutFoes: 2, _retyping: new Set(), _authority: false, validFoeRecord, ...TRAIT_DOORS, opts: { selfId: () => self },
-      appliedOwnerTm,   // PIN MOVED (OWNER-CLOCK): the stream door's frame clock (net/ownerClock.js) - null outside a frame
-      renownFoeDied: () => {}, reportPlayerKill: (e, info) => kills.push([self, e, info]), egFindStruck: async () => false,   // PIN MOVED (EG-E3): the joiner's door asks the dungeon's find beside the kill report (systems/eliteGates/egFind.js)
+      appliedOwnerTm,
+      renownFoeDied: () => {}, reportPlayerKill: (e, info) => kills.push([self, e, info]), egFindStruck: async () => false,
       rollCorpseKit: () => [], addCorpseFood: () => {}, stampWonWeapons: () => {}, capFoeLoot: () => [],
-      dropFoeCard: () => null,   // PIN MOVED (AUDIT CARDS-6 A3): the copy's own card, drawn at the copy door - not this seam
+      dropFoeCard: () => null,
       sayEnemyDied, hudText: { add: () => {} },   // LOOT7-CHECK DUNGEON-DIED: the striker's notice (test/systems/loot7check.test.js reads its line)
       liveStat: () => 50, playerEntity: { isPlayer: true, items: [] }, setFoeDead: (f, d) => { f.dead = d; }, retypeFoe: async () => false,
     };

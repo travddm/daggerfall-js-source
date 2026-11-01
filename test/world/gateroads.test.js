@@ -1,6 +1,4 @@
-// GATE-ROADS (2026-10-28, the owner: "With cities, roads still do not like up properly with gates and pathways in the
-// town. Gates can lead to a bunch of buildings and it just doesnt make any sense"; "No band aids or half assed work";
-// bible/03-World/Town-Shapes.md GATE-ROADS).
+// GATE-ROADS.
 //  - EVERY GATE ON ITS ROAD (world/road/gateRoads.js, the terrain kernel's): from the town's nearest street inside, through
 //    the gate, out to the nearest road the painter laid - round every house, never over water or the wall, along the
 //    town's own paving where it leads out; the painter's tiles and the town's paving kept as they lie.

@@ -142,7 +142,7 @@ export async function runMenu(canvas, renderer, status) {
 /** Is there a game to load? The menu shows Load unconditionally, as
  *  DFU does; this is for the host that has to act on the press.
  *
- *  AUDIT (2026-08-25) F2: this asked readQuicksave, which parses the
+ *  AUDIT F2: this asked readQuicksave, which parses the
  *  blob and does not test its VERSION - so F3's own guard passed on an
  *  envelope restorePlayer would refuse, and Load came up on the chargen
  *  wizard. The question is "can this build restore it", and that

@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-25i BOUGHT-YOURS (#bug-reports, "Can't buy this piece", Paofrenetico: "I did dismantle the other
-// chest i bought days ago, but still i cant buy this one"; bible/11-Multiplayer/Sigil-Sets.md section 7). The report's
+// chest i bought days ago, but still i cant buy this one"). The report's
 // Broker, minted by the real stock off its own day: the window's six rows, its turn and its insignia's word as the
 // screenshot shows them; the two Wardens - 2026-10-22's (Malacath's) and 2026-10-25's (Mora's), two offers of one name -
 // and the law over them: a sale of another day's never marks today's, a dismantle frees nothing, a refused sale marks

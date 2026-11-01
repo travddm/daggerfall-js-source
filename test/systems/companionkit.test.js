@@ -1,5 +1,4 @@
-// COMPANION-KIT (2026-10-01, Mac: "crew member companions need the ability to gain the players healing spells/buffs, act
-// as storage, improved detailed health bar with buffs and their name, and also an integration into the party UI"):
+// COMPANION-KIT:
 //
 //   THE GIFTS (scenes/hostMagic.js) - a beneficial spell (ALLY-CAST's own test) reaches my companion as it reaches a
 //   party mate - under the crosshair, armed near, by touch, in a blast - applied HERE as ALLY-CAST's receiver's record

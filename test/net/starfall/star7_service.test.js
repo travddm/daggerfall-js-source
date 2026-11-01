@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM - a star's `j1`
+// STAR7: THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM - a star's `j1`
 // receipt counted once a (star, account), nine a UTC day of its fall, paid in Renown to the character that fought it and
 // in silver under the day's combat cap, its spoils given once a device, a guest thanked and never counted, the cards'
 // count. The real Worker over node:sqlite with every migration applied (test/accountDb.mjs). tools/mutants/star7.json.

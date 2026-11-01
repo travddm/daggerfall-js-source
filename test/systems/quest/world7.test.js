@@ -1,6 +1,5 @@
-// WORLD7 (Mac, 2026-09-14: "quests dont seem to work in online. I brought a newly created and saved character over and
-// the journal is empty"): THE QUEST CLOCKS RUN ONLINE, CHARGING PLAYED TIME. WORLD5 stood every quest clock down
-// online (Mac, WORLD1: "time limits on quest ... naturally disabled while online"), and a Daggerfall clock is a DELAY
+// WORLD7: THE QUEST CLOCKS RUN ONLINE, CHARGING PLAYED TIME. WORLD5 stood every quest clock down
+// online, and a Daggerfall clock is a DELAY
 // as often as a limit: Brisienna's letter waits on a 7-14 day clock (the journal's first entry is removed at the
 // door of Privateer's Hold and the letter restarts it), the tutorial's pages on clocks of minutes, every "come back in
 // three days" on one - so online the letter never came, the journal stayed empty and the main quest never began.

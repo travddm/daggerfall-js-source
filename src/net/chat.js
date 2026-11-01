@@ -1,8 +1,5 @@
 // @ts-check
-// CHAT1 (2026-09-12, Mac: "I want to add a new UI element. The live chat
-// in enhanced format. Players will be able to type and chat live with
-// other players. Currently I just want one world tab with the ability
-// to add more tabs at a later time"): THE LOG - pure, DOM-free.
+// CHAT1: THE LOG - pure, DOM-free.
 //
 // THE SHAPE. A tab is a channel: a label, the relay room it rides
 // (net/wire.js CHAT ROOMS - the World tab is chat:world), the lines it
@@ -13,7 +10,7 @@
 // else changes shape: the sessions, the tab bar and the unread badges
 // are all iterations over this list.
 //
-// CHAT-CHAN (2026-09-23): a tab is a CHANNEL, not a session - the World
+// CHAT-CHAN: a tab is a CHANNEL, not a session - the World
 // and the Region tabs ride rooms of their own (one session each), the
 // Party tab rides the World tab's hub session and the Local tab the
 // presence session's room (see CHAT_TABS). A line the GAME says to the
@@ -47,7 +44,7 @@ import { REPORT_PICK_AGE_MS, REPORT_LINES_MAX } from './safety/safetyLaw.js';   
  *  `link`: the tab rides a room of its OWN, so the host opens one channel session for it (CHAT1's one session per
  *  tab, now per tab that has a room) - the World tab and the Region tab; the Party and Local tabs ride others'.
  *
- *  CHAT-P (2026-09-24, Mac: "Party chat should only show if in a party"): `hidden` is a tab that starts OFF the bar
+ *  CHAT-P: `hidden` is a tab that starts OFF the bar
  *  and is put on it by the host while it has something to say - the Party tab while the player sits in a party
  *  (ChatLog.setShown). `peekAll` (CHAT-W): a line on this tab stands over the world whatever tab the chat opens on -
  *  a party's line is said to the player, where every other tab's is said to a room they happen to be in. */
@@ -56,18 +53,18 @@ import { REPORT_PICK_AGE_MS, REPORT_LINES_MAX } from './safety/safetyLaw.js';   
 export const CHAT_TABS = Object.freeze([
   Object.freeze({ id: 'world', label: 'World', room: CHAT_WORLD_ROOM, link: true, hint: 'Everyone online' }),
   Object.freeze({ id: 'region', label: 'Region', room: null, link: true, hint: 'Everyone in your region' }),
-  // CHAT-LANG (2026-10-11, the players: "More chat channels per-language"): the Region tab's shape - a room of its own
+  // CHAT-LANG: the Region tab's shape - a room of its own
   // (net/wire.js chatLangRoom), its channel the language the player CHOSE (`chatLang`; /lang), and on the bar only while
   // one is chosen
   Object.freeze({ id: 'lang', label: 'Lang', room: null, link: true, hint: 'Everyone in your language channel. /lang picks one.', hidden: true }),
-  // CHAT-TRADE (2026-10-14, Mac: "New channels: Trading, LFG" - "without introducing clutter"): the Language tab's shape
+  // CHAT-TRADE: the Language tab's shape
   // twice - a room of its own each (net/wire.js CHAT_TRADE_ROOM, CHAT_LFG_ROOM), on the bar only while the player has
   // JOINED it (`chatTrade`, `chatLfg`; /join, /leave), so a player who never joins sees no new tab and holds no new socket
   // (each hint a getter, read when the log is made - after the player chose a language - never at the boot's import)
   Object.freeze({ id: 'trade', label: 'Trade', room: null, link: true, get hint() { return t('net.chat.tradeHint', 'Everyone in the Trade channel: buying, selling and swapping'); }, hidden: true }),
   Object.freeze({ id: 'lfg', label: 'LFG', room: null, link: true, get hint() { return t('net.chat.lfgHint', 'Everyone in the LFG channel: looking for a group or more players'); }, hidden: true }),
   Object.freeze({ id: 'party', label: 'Party', room: null, link: false, hint: 'Only your party', hidden: true, peekAll: true }),
-  // GUILD1c (Mac: "Do guild1c" - the guild's chat): the Party tab's shape - its lines ride the hub's link with
+  // GUILD1c (- the guild's chat): the Party tab's shape - its lines ride the hub's link with
   // `ch: 'guild'` and reach the guild's members online alone, and the tab is on the bar while the character is in one
   Object.freeze({ id: 'guild', label: 'Guild', room: null, link: false, hint: 'Only your guild', hidden: true, peekAll: true }),
   Object.freeze({ id: 'local', label: 'Local', room: null, link: false, hint: 'Players near enough to hear you. Speak in character here, and put out-of-character remarks in (( )).' }),
@@ -122,7 +119,7 @@ export const optLeftText = (id) => t('net.chat.left', '{name} channel left.', op
 export const alreadyJoinedText = (id) => t('net.chat.already', 'You are already in the {name} channel. /leave {id} leaves it.', optArgs(id));
 /** CHAT-TRADE: a line said to a channel joined but not open yet (the World link's welcome not heard, the socket opening). */
 export const optWaitText = (id) => t('net.chat.wait', 'The {name} channel is still opening. Try again in a moment.', optArgs(id));
-/** PING1 (2026-10-11, the players: "A unique color or alert for @name pings"): does `text` name `name` with an @ - the
+/** PING1: does `text` name `name` with an @ - the
  *  whole name, any case, not run on into more of a word ("@Bran" pings Bran, "@Brandon" does not). A name of one letter
  *  or none pings nobody. */
 export function mentions(text, name) {
@@ -142,7 +139,7 @@ export const CHAT_SAY_RANGE = 60;
 export const isOocText = (text) => /^\(\(/.test(String(text ?? '').trim());
 /** CHAT-CHAN: `/ooc text`'s line - the text in the mark. */
 export const oocText = (text) => `((${String(text ?? '').trim()}))`;
-/** CHAT-RP (2026-10-14, Mac: "/rp Italicizes and makes text color green. For roleplay purposes"): a line wrapped in
+/** CHAT-RP: a line wrapped in
  *  single asterisks is ROLEPLAY - OOC's kind of mark, the speaker's own, read off their text and never off a field, so
  *  no relay has to carry it and an older client still reads the line as the tabletop writes it: `*draws her blade*`.
  *  The whole line: an asterisk at each end, and just inside the last something that is neither one nor a space
@@ -195,7 +192,7 @@ export function tagOf(id) {
   return (h % (36 ** 4)).toString(36).padStart(4, '0');
 }
 
-/** CHAT-FIND (2026-10-11, the owner: "search for a player's name in the chat in every ui"): THE SEARCH, pure. A query
+/** CHAT-FIND: THE SEARCH, pure. A query
  *  is a piece of a name, case and the spaces round it ignored, at most CHAT_FIND_MAX characters; '' is no search. A
  *  query that starts with '#' is a TAG - the four characters drawn beside a name (tagOf), the one way to tell two
  *  players of one name apart. The panel (ui/chatPanel.js) is the one surface that draws it, and it is the same panel
@@ -245,7 +242,7 @@ export class ChatLog {
     this.active = this.tabs.find((t) => t.shown)?.id ?? null;
     this.open = false;        // the panel's state, as the log counts unread by it
     this.version = 0;         // bumps on every change the panel would show; the panel repaints on a new number, never per frame
-    /** AUDIT SAFE CLIENT-4 (2026-10-17): bumps when lines are taken out of a tab's MIDDLE (forgetSpeaker) - the open panel's
+    /** AUDIT SAFE CLIENT-4: bumps when lines are taken out of a tab's MIDDLE (forgetSpeaker) - the open panel's
      *  repaint drops rows off the front and adds them at the back, and a block from the open panel left the blocked
      *  account's rows drawn between the others'. A new number here is a list rebuilt (ui/chatPanel.js paintList). */
     this.removed = 0;
@@ -376,7 +373,7 @@ export class ChatLog {
    *  before each on its tab for context, up to `max` in all (net/safety/safetyLaw.js REPORT_LINES_MAX). `seq` narrows it
    *  to one line and the lines before it (a line's own Report). Lines the relay did not stamp cannot be carried.
    *
-   *  AUDIT SAFE CLIENT-5 (2026-10-17): AND NOTHING OUT OF ITS DAY. The service takes lines no older than
+   *  AUDIT SAFE CLIENT-5: AND NOTHING OUT OF ITS DAY. The service takes lines no older than
    *  REPORT_LINE_AGE_MS, and a quiet tab or a page left open overnight keeps yesterday's: a line heard more than
    *  REPORT_PICK_AGE_MS ago by this page's own clock (`t`, when it was kept - the relay's `at` is another machine's) is
    *  not picked, as context or as theirs. AUDIT SAFE CLIENT-6: a line's words go as the relay stamped them (`raw`). */
@@ -473,8 +470,7 @@ export class ChatLog {
    *  1 through three quarters of the window, then down to 0 - so a line
    *  arrives, stands, and goes.
    *
-   *  CHAT-W (2026-09-24, Mac: "Messages sent in world chat shouldnt carry
-   *  over to region chat"): from THE TAB THE CHAT OPENS ON, and from a
+   *  CHAT-W: from THE TAB THE CHAT OPENS ON, and from a
    *  tab whose lines are said to the player (`peekAll`, the Party tab
    *  while it is on the bar). CHAT-CHAN drew every tab's here, so a World
    *  line stood over the screen of a player reading Region - the open

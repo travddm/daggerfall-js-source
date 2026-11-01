@@ -1,5 +1,4 @@
-// RETRO1 (2026-09-24, Mac: "Can we get retro mode from DFU ported
-// over?") - DFU's retro mode: the world drawn into a 320x200 or 640x400
+// RETRO1 - DFU's retro mode: the world drawn into a 320x200 or 640x400
 // texture (a 320x154 / 640x308 twin over a docked large HUD), presented
 // point-sampled through the 640x400 presentation target, posterized or
 // palettized on the way (-sky variants leave the far plane alone), the

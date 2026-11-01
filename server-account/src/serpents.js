@@ -1,15 +1,14 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SERPENT1 (2026-10-04) — THE SERPENTS SLAIN, AS THE SERVICE KEEPS THEM.
+// SERPENT1 — THE SERPENTS SLAIN, AS THE SERVICE KEEPS THEM.
 //
-// Mac: "A new world event that requires players with a ship to meet up
-// and take on a large scale sea serpent in the ocean." The relay holds
+// The relay holds
 // Sethrakul's fight in the cell its site stands in and, at the kill, signs
 // a receipt for each account that took a real part in it (src/net/
 // serpentReceipt.js - `l1`, under the relay's GATE_SIGNING_KEY). This file
 // is where that receipt is honoured: counted once, and paid in Renown to
-// the character that fought it. Design: bible/11-Multiplayer/Sea-Serpent.md
-// section 8. The raids' claim (raids.js) rung for rung - SERPENT-SET (2026-10-05):
+// the character that fought it. Design:
+// section 8. The raids' claim (raids.js) rung for rung - SERPENT-SET:
 // and its silver now, a combat strike under the day's cap (marks.js
 // serpentStrikeStatement), and the gate's currency on its row: the
 // embers its hoard paid (`stones`, migration 0083 - SERPENT_EMBERS), which
@@ -39,8 +38,7 @@
 //
 // ═══ THE OLD COIL'S GRANTS, ON THE FIRST WRITE ALONE ═══════════════
 //
-// SERPENT5 (2026-10-15, Mac: "A gilded weapon to the serpent + a rare
-// chance of a title/aura drop"; Sea-Serpent.md section 17): the title
+// SERPENT5: the title
 // COILBREAKER one dealing ship's kill in twenty, the aura THE MAELSTROM
 // one in fifty - the Hour's grants' law (sds.js claimSd) rung for rung:
 // rolled HERE, off a draw this service makes (never the receipt's seed,

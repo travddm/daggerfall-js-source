@@ -1,5 +1,4 @@
-// WB14d (2026-10-19, Mac: "the boss splitting and players having to split and navigate to beat both sides and then merging at
-// the end for its final stand (chance based encounter modifer)", then "This is all yours to take on"): THE SUNDERING - on a
+// WB14d: THE SUNDERING - on a
 // Sundering night the second phase's turn tears him in two: Ruhn's Blade (his body) and Ruhn's Flame (a body of its own),
 // in two courts with four or more challengers, side by side in one with fewer; each half a pool of what he has above
 // SUNDER_LAST; a half brought down kneels, rises past the pair law, and both down together they rejoin at the first
@@ -12,7 +11,7 @@
 //   the screen       net/gate/gateLink.js (the fold), scenes/gate/gateFlame.js (its body, its blows, its words),
 //                    scenes/gate/gateCourt.js (the cards, the targets, the bar's halves - ui/gate/gateBossBar.js)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md sections 5 and 6.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

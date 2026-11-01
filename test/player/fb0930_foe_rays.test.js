@@ -1,5 +1,4 @@
-// FB0930-FOE-RAYS (2026-09-30, player report: hundreds of "requestAnimationFrame handler took <N>ms" in a dungeon,
-// CPU at 100%, far fewer once every foe was dead): every foe's sight ray and obstacle probe run through
+// FB0930-FOE-RAYS: every foe's sight ray and obstacle probe run through
 // Collider.raycastHit, and the probe's capsuleCast is 27 of them. The ray now marks triangles with a stamp, skips a
 // cell's triangles whose Y extent misses the ray's in that cell, and the capsule's spokes reach only to the nearest
 // hit so far. These pin that the answers are the ones the plain walk gives.

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RUMARE-WATER (2026-10-26, the owner: "City lake needs to be apart of the overall water structure. Not just a flattened
-// land. Make this work and be detailed about it"; bible/03-World/Tamriel.md RUMARE-WATER) - THE IMPERIAL CITY'S LAKE IS
+// RUMARE-WATER - THE IMPERIAL CITY'S LAKE IS
 // THE SEA'S. NIBEN-SEA joined Lake Rumare to the Topal Bay down the Niben and cut the Waterfront canal from the city's
 // south edge to the river's arm (world/tamriel/tamrielLand.js waterfrontCanal); the city's own lake - IC-GRAND's ring
 // between City Isle and its far shore (world/imperialCity.js IMPERIAL.isle, .lake) - was still the location's ground,

@@ -1,14 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07) - A DEATH IN THE OPEN ZONE: WHAT STAYS, WHAT DROPS, WHAT A KILLER MAY TAKE
-// (bible/11-Multiplayer/Wild-Zone.md).
+// WILD1 - A DEATH IN THE OPEN ZONE: WHAT STAYS, WHAT DROPS, WHAT A KILLER MAY TAKE
 //
 // The owner, of a player's death at another's hand: "cant get looted all of the items they have, except campfires,
 // torches, potions etc ... players can choose 1 item of the equipped ones the killed player has"; asked what else is
 // lost, "the bags" too (the mob death's law) "and the players can take the cart in to the zone and it also loses all
 // loot in it". And of a death to a foe: "drops the loot he has in his bags ... (you dont drop your equipped stuff)".
 //
-// SO, EITHER DEATH (FOE-KEEPS, 2026-10-24 - the owner: "I dont want people to lose everything they have"; asked, "Only
+// SO, EITHER DEATH (FOE-KEEPS, 2026-10-24; asked, "Only
 // PvP deaths drop": a death to a foe now drops nothing, and pays the usual tenth at the rise):
 //   KEPT, always: the consumables the owner named and their kin - potions, light sources (a torch, a lantern, a candle),
 //     the camp's kit and its fire (Climates & Calories' gear, food and water), the rest consumables (REST6), arrows and
@@ -17,12 +16,11 @@
 //     and Shards it holds - the trade's refusals and the decor's kept-back list, read, not rewritten).
 //   DROPPED, AT ANOTHER PLAYER'S HAND ALONE: every other thing in the bag - into the room's remains (net/wild/wildLaw.js),
 //     where anyone may take it for ten minutes. A letter of credit pays a tenth of its worth (LETTERS-TENTH).
-//     STORE-KEEPS (2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death";
-//     asked, "Wagon + companions' packs"): the cart's cargo and coin and every companion's pack and kit are storage, and
+//     STORE-KEEPS: the cart's cargo and coin and every companion's pack and kit are storage, and
 //     no death takes them, wherever the wagon stands (it retired CART-AWAY's word and COMPANION-DROP's drop).
 //   WORN: kept on a death to a foe. On a death at another player's hand the killer may take ONE worn piece the same
 //     rules let go (`wornOffer`) - the fallen's own game gives it (net/wild/wildFight.js).
-//   INSURED (WILD-INSURE, 2026-10-26, the owner: "being able to insure gear on death"; asked, "Kept, policy spent" at "20%
+//   INSURED (WILD-INSURE, 2026-10-26,; asked, "Kept, policy spent" at "20%
 //     of worth"): a piece under a policy in force stays, worn or in the bag, and is never offered - the death spends the
 //     policy (systems/wild/wildInsureLaw.js).
 // The purse: a kill drops a tenth of it into the remains in place of the death penalty (WILD GOLD, wildDropLaw.js
@@ -65,7 +63,7 @@ export function wildChunks(list, size = WILD_ITEMS_MAX, bytes = Infinity) {
 }
 
 /**
- * THE RESPAWN'S CLEAR GROUND (the owner: "make sure it doesnt stuck the player when he spawns and other players"): a
+ * THE RESPAWN'S CLEAR GROUND: a
  * spot near `centre` (a scene point, the start marker) for a player and the team that follows them - no other body
  * within `room` metres, and ground behind it (the way the horse and the wagon stand) that `clear(from, yaw)` says is
  * open. Rings of `step` metres out to `reach`, eight bearings a ring, the centre first. Answers `{ pos, yaw }`, or the
@@ -93,9 +91,8 @@ export function wildSpawnSpot(centre, { bodies = [], clear = () => true, yaw = 0
 
 /** THE RISE'S TOWNS in the order they are asked (world.js wildRiseSite: the first `nearestSafeLocationAnywhere` finds) -
  *  `mask` the zone's, `px` where the body fell, `inDungeon` a hall's death, `kill` a death at another player's hand.
- *  WILD1 (the owner: "when the players respawns in a town near the zone the cart comes with him"): a kill rises at the
- *  nearest town or temple OUTSIDE the zone and its band. PVPDUNGEONS (the owner: "Dying in a dungeon respawns you in city
- *  near the dungeon"): a hall's death in the zone at the town nearest the hall. AUDIT FOE-KEEPS E1 (the owner, 2026-10-24,
+ *  WILD1: a kill rises at the
+ *  nearest town or temple OUTSIDE the zone and its band. PVPDUNGEONS: a hall's death in the zone at the town nearest the hall. AUDIT FOE-KEEPS E1 (the owner, 2026-10-24,
  *  asked: "Rise inside the zone"): since FOE-KEEPS a death to a foe drops nothing, so its rise outside made dying the
  *  zone's free way out - where fast travel out is refused and the walk out an hour and more; it rises at the nearest town
  *  or temple INSIDE the zone in the ring it fell in, else anywhere inside, else outside as a kill does.

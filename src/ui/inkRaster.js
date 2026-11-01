@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MAP-WHOLE (2026-10-26, the owner: "The held map still struggles to load everything at once";
-// bible/03-World/Arena-Provinces.md MAP-WHOLE): THE CONTINENT'S DOTS RASTERISED BY HAND.
+// MAP-WHOLE: THE CONTINENT'S DOTS RASTERISED BY HAND.
 //
 // Out on the continent the held map draws each road's and track's pixel past the Bay as a dot of the far pen's width
 // (ui/tamrielInk.js DOTS_BELOW) - on the freeware's continent 300,000 rects in one tile's path, and the canvas's

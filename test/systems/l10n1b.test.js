@@ -1,4 +1,4 @@
-// L10N1b (2026-09-27, Mac: "for as many languages as we possibly can and do this right"): THE LANGUAGE SETTING. The
+// L10N1b: THE LANGUAGE SETTING. The
 // catalog of languages the port offers and its pure laws (the saved choice resolved, the browser's own list matched,
 // a build path read), the English catalog read off the source and in step with it, every language's draft file held
 // to the English one (DFU's format, every key, every argument, every pattern readable), the rail's English unchanged

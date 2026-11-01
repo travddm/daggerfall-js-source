@@ -1,5 +1,4 @@
-// WB14c (2026-10-19, Mac: "adding the chance of a gate to spawn with platforms of wave based adds that need to be defeated
-// before encountering the boss", then "This is all yours to take on"): THE VANGUARD - on a Vanguard night the fighters
+// WB14c: THE VANGUARD - on a Vanguard night the fighters
 // arrive on the Bridgehead; its three waves, then the Muster's three (the last the Markynaz's), each platform cleared
 // laying the walkway onward; the Markynaz down, the way to the Warden opens, and his opening begins as the first
 // challenger stands before him.
@@ -10,7 +9,7 @@
 //   the wire         the state's `vg`, the `vgw` word (its walkway laid at its own moment on every screen), six host kinds
 //   the screen       scenes/gate/gateVanguard.js (its words), the bar's line, the host's looks and its silence on its waves
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md section 4.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -52,14 +51,14 @@ const words = (out, e) => out.filter((o) => o.k === 'vgw' && (e === undefined ||
 // ═══ THE TABLES ══════════════════════════════════════════════════════════════════════════════════════════════════════
 
 test('WB14c the kinds and their blows: the Brute (a Daedroth), the Caster (a Daedra of his aspect) and the Markynaz (a Daedra Lord) beside the Imp, none outrunning a runner, each blow a disc a runner leaves in under half its wind-up; the Bolt his element\'s (mutants: a kind faster than a run; a blow past escape)', () => {
-  assert.deepEqual(HOST_KINDS.slice(3, 6).map((k) => [k.id, k.key]), [[3, 'brute'], [4, 'caster'], [5, 'markynaz']]);   // PIN MOVED (WB14e): the Vanguard's three, the Tithe-Imp after them
+  assert.deepEqual(HOST_KINDS.slice(3, 6).map((k) => [k.id, k.key]), [[3, 'brute'], [4, 'caster'], [5, 'markynaz']]);
   for (const K of HOST_KINDS) assert.ok(K.speed < RUN, K.key);
-  assert.deepEqual(HOST_BLOWS.slice(3, 6).map((b) => [b.kind, b.key, b.r]), [[3, 'smash', 3], [4, 'bolt', 3], [5, 'rend', 4.5]]);   // PIN MOVED (WB14e): the Tithe-Imp's none after them
+  assert.deepEqual(HOST_BLOWS.slice(3, 6).map((b) => [b.kind, b.key, b.r]), [[3, 'smash', 3], [4, 'bolt', 3], [5, 'rend', 4.5]]);
   for (const B of HOST_BLOWS.slice(3, 6)) assert.ok((B.r / RUN) * 1000 < B.windup / 2, B.key);
   assert.deepEqual(HOST_BLOWS.slice(3, 6).map((b) => b.name), ['Smash', 'Bolt', 'Rend']);
   assert.equal(hostBlowUnder(HOST.caster, BASE_PROFILE).el, 'fire');
   assert.equal(hostBlowUnder(HOST.brute, BASE_PROFILE).el, null);
-  assert.deepEqual(HOST_RISE_MS.slice(3, 6), [1500, 1500, 2500]);   // PIN MOVED (WB14e): the Tithe-Imp's after them
+  assert.deepEqual(HOST_RISE_MS.slice(3, 6), [1500, 1500, 2500]);
   assert.equal(GATE_HOST_KINDS, HOST_KINDS.length);
   assert.ok(VG_STANDING_MAX <= GATE_HOST_MAX && HOST_STANDING_MAX === VG_STANDING_MAX);
   assert.ok(GATE_HZ_MAX >= 2 * (VG_STANDING_MAX + 1), 'two swings a second through the whole Vanguard and him pass the frame bucket');
@@ -297,7 +296,7 @@ test('WB14c on my screen: the Vanguard\'s words - its first wave, each clearing,
   assert.equal(vanguardLine({ e: VG_WORD.wave, s: 1, w: 1 }), null);
   assert.equal(vanguardLine({ e: VG_WORD.clear, s: 0 }), 'The Bridgehead is clear.');
   assert.equal(vanguardLine({ e: VG_WORD.lord, s: 1 }), 'The Markynaz rises.');
-  assert.equal(vanguardLine({ e: VG_WORD.broken, s: 1 }), 'The Vanguard is broken. The way to the Warden opens.');   // PIN MOVED (AUDIT WB14 TEXT-4): said as the Muster empties - a Brute may outlive the Markynaz
+  assert.equal(vanguardLine({ e: VG_WORD.broken, s: 1 }), 'The Vanguard is broken. The way to the Warden opens.');
   assert.equal(vanguardLine({ e: VG_WORD.patience }, 'Valkynaz Ruhn'), 'Valkynaz Ruhn tires of waiting.');
   assert.equal(vanguardLine({ e: VG_WORD.open }), null);
   assert.ok(vanguardOut({ vg: [1, 2] }) && !vanguardOut({ vg: [2, 0] }) && !vanguardOut({ vg: null }));

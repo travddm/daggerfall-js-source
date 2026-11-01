@@ -1,6 +1,4 @@
-// ENH-NOTICE3 (2026-09-21, Mac: "the new enhanced pop up system isn't
-// working for everything. All mods, including climates and calories
-// need to utilize the enhanced notification popup") - THE ONE DOOR,
+// ENH-NOTICE3 - THE ONE DOOR,
 // PINNED.
 //
 // systems/notify.js is the port's DaggerfallUI.MessageBox /

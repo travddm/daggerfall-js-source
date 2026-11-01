@@ -1,5 +1,5 @@
 // @ts-check
-// WB1 (2026-09-25, Mac: "a large area would be shown on the map"): THE GATE'S RING ON BOTH MAPS.
+// WB1: THE GATE'S RING ON BOTH MAPS.
 //
 // The host hands the maps a FUNCTION (`gate: () => mark|null`, beside SOC6's `party`) and neither map learns what a
 // gate is: the mark is a ring in map pixels - `{day, cx, cy, r, label, phase}` from systems/gate/gateOmen.js mapMark() -
@@ -29,7 +29,7 @@ export function readGateMark(fn, size) {
   return readGateMarkIn(fn, { x0: 0, y0: 0, w: size.width, h: size.height });
 }
 
-/** BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): ONE RING over a BOX of map pixels (`box` {x0, y0, w, h} - the held map's
+/** BAY-LEFT-MAPS: ONE RING over a BOX of map pixels (`box` {x0, y0, w, h} - the held map's
  *  sheet: the continent's frame while it is shown, world/tamriel/tamrielFrame.js tamrielFrameInBay; the Bay's own
  *  rectangle else), as each of WW2's rings is read (readGateMarks). The held map read the serpent's ring, a Super dungeon's,
  *  and an arch's against the Bay's 1000 x 500 (readGateMark), so a ring past the Bay was never drawn; the
@@ -45,7 +45,7 @@ export function readGateMarkIn(fn, box) {
   return { day: Number.isFinite(m.day) ? m.day : 0, cx, cy, r, label: String(m.label ?? GATE_LEGEND_TEXT).slice(0, 80), phase: String(m.phase ?? ''), tip: readTip(m.tip) };
 }
 
-/** WW2 (bible/03-World/World-Wide.md): THE RINGS OF THE GATES PAST THE BAY - the host's `gates` (scenes/gate/gateLanes.js
+/** WW2: THE RINGS OF THE GATES PAST THE BAY - the host's `gates` (scenes/gate/gateLanes.js
  *  mapMarks: a ring a lane, the Bay's own is `gate`), each read as one ring is (readGateMark), over the box the sheet
  *  pans (`box` {x0, y0, w, h} - the continent's frame, TAMRIEL1's, the Bay's own rectangle while it is not shown), and
  *  at most GATE_MARKS_MAX of them.

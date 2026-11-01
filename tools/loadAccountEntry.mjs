@@ -1,4 +1,4 @@
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE ACCOUNT SERVICE AS THE LOAD HARNESS RUNS IT. Never deployed -
+// SCALE3: THE ACCOUNT SERVICE AS THE LOAD HARNESS RUNS IT. Never deployed -
 // tools/loadHarness.mjs hands this file to `wrangler dev` as the entry, over server-account/wrangler.toml's own bindings.
 //
 // It is the real Worker (server-account/src/index.js), unchanged, with two things kept in the isolate that a deploy sends
@@ -15,7 +15,7 @@
 // returned - the same row, and the only door D1 opens on a statement's meta.
 import service from '../server-account/src/index.js';
 import { DB_ROOT } from '../server-account/src/service.js';
-// AUDIT SCALE II L2 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): AND EVERY DURABLE OBJECT CLASS
+// AUDIT SCALE II L2: AND EVERY DURABLE OBJECT CLASS
 // THE SERVICE'S ENTRY EXPORTS. wrangler.toml binds them by class name from the entry it runs - this file, here - and
 // `wrangler dev` refuses an entry that does not export one ("Your Worker depends on the following Durable Objects, which
 // are not exported in your entrypoint file: AdmitGate"): from ADMIT-LINE on, the harness could not boot the service at

@@ -1,6 +1,4 @@
-// EM4 - THE TOWN SHEET AND ITS INK (2026-09-21, Mac: "we're going to
-// put our own spin on the automap and town map themselves, enhancing
-// the look like how we did we the world map").
+// EM4 - THE TOWN SHEET AND ITS INK.
 //
 // The shipped town map paints the FLD bytes as four flat colours and
 // rotates the result under a camera. That is faithful, and it is a
@@ -205,9 +203,6 @@ test('EM-BUG3: the field is laid in SHEET space, and a grid row runs AGAINST +Z,
 });
 
 test('EM-BUG3: the plan, the plates, the rings and the caret all stand in ONE space - the bug Mac saw was them standing in two', () => {
-  // Mac, from play (2026-09-21): "enhanced local town maps are rotated
-  // wrong... I was in the corner of town and It thinks entirely
-  // different buildings are there."
   //
   // This is the pin the slice is FOR, and it is deliberately not about
   // arithmetic: it puts a building and the player on the SAME spot in
@@ -328,8 +323,6 @@ test('EM4: the plan is TRACED - the built-up pixels are an island and the street
 });
 
 test('EM7: the four QUARTERS go under the WALL, each in classic\'s own hue for it', () => {
-  // Mac (2026-09-21): "keep our own version of the colored buildings
-  // that classic uses".
   //
   // The first cut washed every ENTERABLE pixel in one flat sepia and
   // left a house as outline alone. Legible, and it threw away the one
@@ -640,8 +633,6 @@ test('EM4: the names are haloed, in the sheet\'s own hand, and a quest\'s is in 
 });
 
 test('EM8: a name is lettered in ITS OWN QUARTER\'S ink - the same ladder its pixels went through', () => {
-  // Mac (2026-09-21): "let's enhance the location names on the
-  // buildings more."
   //
   // A town plan is read to FIND something. The wash already says a
   // tavern is green; the WORD saying so too is what lets a player pick

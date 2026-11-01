@@ -1,7 +1,6 @@
-// FLORA-GROUND, THE RINGS (FIELD BUGS 2026-10-27, the owner: "Plus floating flora and reflective flora can be seen off
-// the ground in first person", "No band aids or half assed work"; the coordinator: "Fix it at the root in the terrain's
+// FLORA-GROUND, THE RINGS (FIELD BUGS 2026-10-27,, "No band aids or half assed work"; the coordinator: "Fix it at the root in the terrain's
 // level of detail, so the coarse surface the player sees and the ground the plants stand on agree at every ring") - A
-// BUILT PIXEL'S PLANTS DRAWN ON THE GROUND IT DRAWS (bible/03-World/World-Arc.md, Milestone 8 FLORA-GROUND).
+// BUILT PIXEL'S PLANTS DRAWN ON THE GROUND IT DRAWS (, Milestone 8 FLORA-GROUND).
 //
 // EV4 draws a pixel three or more out at stride 4 (scenes/world.js strideFor): 33 x 33 vertices, every fourth sample of
 // the near grid's 129 x 129, one quad over sixteen. Every plant is PLACED on the ground the player walks

@@ -1,6 +1,5 @@
-// NAME1 (2026-09-16, Mac: "Player names clip and cut off the top of the sprite head and additionally grow in size
-// the further away + are able to be seen through walls") and
-// BUBBLE1 (2026-09-16, Mac: "I want to introduce chat bubbles above the player when they chat"):
+// NAME1 and
+// BUBBLE1:
 // THE NAMES OVER THE OTHERS AND WHAT THEY SAY, driven headless.
 //
 // THREE LAWS AND A FACE. The anchor (a label's BOTTOM edge sits a fixed gap above the head point, at every

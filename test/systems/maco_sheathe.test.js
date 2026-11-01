@@ -1,6 +1,4 @@
-// MAC-O1 - THE READYWEAPON KEY (Mac, 2026-09-16: "Problems
-// sheathing/unsheathing weapon. This also causes issues holding
-// lanterns or torches.").
+// MAC-O1 - THE READYWEAPON KEY.
 //
 // DFU has TWO doors onto WeaponManager.ToggleSheath and the port had
 // wired both to the same one:

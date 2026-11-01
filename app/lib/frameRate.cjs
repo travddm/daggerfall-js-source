@@ -1,4 +1,4 @@
-// FPS-VSYNC (2026-09-28, Mac, asked whether the desktop app should run above the screen's refresh: "Yes").
+// FPS-VSYNC.
 //
 // DFU's own law (StartGameBehaviour.cs:238-250): VSync ON, every frame waits for the screen and the Frame Rate Cap
 // does nothing; VSync OFF, frames do not wait, and the cap is what holds them (under 30 it is off: they run free). A

@@ -1,5 +1,5 @@
 // @ts-check
-// HCC-IL (2026-09-23): THE EMBEDDED RESOURCES OF A .NET ASSEMBLY.
+// HCC-IL: THE EMBEDDED RESOURCES OF A .NET ASSEMBLY.
 //
 // Horse Cart and Cargo ships its horse art INSIDE `TrailingWagon.dll` -
 // 45 PNGs as manifest resources (`TrailingWagon.Horse.horse1..5.png`,

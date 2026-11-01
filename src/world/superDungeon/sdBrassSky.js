@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT SD III (V8, 2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's SD20c): THE
+// AUDIT SD III (V8, 2026-10-07, the Super Dungeons arc; 's SD20c): THE
 // BRASS AIR'S GRADE, for the land's haze AND the sky over it. SD19 graded the fog toward the brass near a standing
 // Hollow and left the sky as it was: at the skyline the fogged land met the sky a step apart - 15/-4/-34 on a clear
 // noon's horizon, 23/-6/-48 under an overcast dusk. The live event's dread is graded on both (world/dreadSky.js

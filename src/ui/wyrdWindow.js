@@ -1,7 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, the owner: "A new vendor that stands outside of each tavern in which offers new seasonal items. A
-// new armor set, a new weapon, a new title and aura, a brand new item (profile icon), new cards"; bible/06-Systems/
-// Witches-Festival.md): THE WYRD SISTER'S WINDOW - the Witches' Festival's wares for Soul Cakes.
+// WITCH1: THE WYRD SISTER'S WINDOW - the Witches' Festival's wares for Soul Cakes.
 //
 // Three parts, each a heading and its rows: THE INSIGNIA (the Witchwarden title, the Witchfire aura, three profile icons -
 // the account's, bought once - and the two the festival gives: Hearthkeeper, for cakes given from an offering, and the

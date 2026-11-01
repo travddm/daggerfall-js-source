@@ -9,8 +9,7 @@ import {
   collectArmTextures, resolveWeaponParts, weaponPartPaths,
 } from '../../../src/combat/fpArm.js';
 
-// MW-LOAD (2026-09-08, Mac: "improve the load time when Morrowind assets
-// are enabled"): THE ARM READS A LAZILY OPENED ARCHIVE.
+// MW-LOAD: THE ARM READS A LAZILY OPENED ARCHIVE.
 //
 // dataSource no longer pulls each stored .bsa out of IndexedDB as one
 // whole ArrayBuffer (150-300 MB apiece, one to three seconds each, three

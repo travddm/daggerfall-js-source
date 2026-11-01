@@ -69,7 +69,7 @@ export function npcKnowsAboutItem(npcSeed, buildingKey, socialGroup = 0, questio
 // Furniture stores, which classic never offers. The list is built in
 // BUILDING_TYPES enum order (DFU walks the enum), and three captions
 // were paraphrased rather than taken from DFU's strings. PROF-FOUND
-// (2026-10-12): the Furniture Store, Carpentry's workbench, is asked
+// the Furniture Store, Carpentry's workbench, is asked
 // after again under its own group AFTER these (world/buildingNames.js
 // OPENED_SHOP_TYPES; scenes/townTalk.js, systems/topicTree.js) - this
 // list stays DFU's.
@@ -170,7 +170,7 @@ export function drawNamedBuildings(exteriorBuildings, blocks, { locationIndex = 
   const out = new Map();   // block -> merged buildingDataList copy
   for (const b of blocks) {
     const list = b.dfBlock.rmbBlock.fldHeader.buildingDataList.map((d) => ({ ...d }));
-    // BLD (bible/03-World/Arena-Provinces.md IC-GRAND, BLD; Port-Ledger section A, IC-GRAND): A BLOCK THAT NAMES ITS OWN
+    // BLD (IC-GRAND, BLD; Port-Ledger section A, IC-GRAND): A BLOCK THAT NAMES ITS OWN
     // BUILDINGS - the Imperial City's fabric (world/imperialFabricBuildings.js withFabricBuildings) - keeps its records and
     // draws none of the location's list: the outcome that list would give carrying them in grid order, and a classic
     // block's draw after it untouched
@@ -470,7 +470,7 @@ export const QUESTION_TYPE_REACTION_MODS = Object.freeze([5, 0, 0, 0, 5, 0, 0, 0
 export const ETIQUETTE_REACTION_MODS = Object.freeze([-10, 5, 10, 15, -15]);
 export const STREETWISE_REACTION_MODS = Object.freeze([10, 5, -10, -15, 15]);
 
-/** TONE-TASTE (2026-10-15, Mac: "someone who didnt like etiquette still went up"): how the one spoken to takes a
+/** TONE-TASTE: how the one spoken to takes a
  *  tone - 1 a tone their group takes kindly (its row in the tables above over nought: Polite with Merchants, Scholars
  *  and Nobles, Blunt with Commoners, Merchants and the Underworld), -1 one it takes ill, 0 the Normal tone. The
  *  reaction's own fold (sgroup 5 and above is a Merchant's); a group off the tables takes nothing. The port's, read

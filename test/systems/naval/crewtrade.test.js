@@ -1,5 +1,4 @@
-// CREW-TRADE (2026-10-23, the owner: "If you could, please add crew as a resource that can be sold and traded"; asked, the
-// owner chose "Exchange good only", "Headcount only" and "Port price, varies"; bible/03-World/Captains-Sea.md CREW-TRADE) -
+// CREW-TRADE -
 // crew is a row of every port's exchange: a port has sailors to spare, is short of them or neither, a man is priced as
 // a good by that stand and the day's drift, and the exchange signs men on to the ship at the quay and takes them off her
 // by the head. Never above the shipwright's price for a man, never her last man, never a hand ashore's place, never a
@@ -123,7 +122,6 @@ test('CREW-TRADE SIGNED ON: men bought at the port\'s price into her crew - as m
   const r = q.x().buy('crew', 10);
   const joined = q.s.host.crewHands(q.s.boat).filter((h) => !had.has(h.name));
   assert.equal(joined.length, 2, 'two named hands joined her');
-  // PIN MOVED (AUDIT CREW-TRADE H3): the hands who joined her named, as the shipwright's hire names them
   assert.deepEqual(r, { ok: true, text: `${CREW_TRADE_TEXT.bought(10, 10 * row.sell)} ${CREW_TRADE_TEXT.signedOn(handsNamed(joined))}` });
   assert.match(r.text, new RegExp(`Signed on: ${joined[0].name} \\(${joined[0].role}\\), ${joined[1].name} \\(${joined[1].role}\\)\\.$`));
   assert.equal(q.model.ship().crew, 16);

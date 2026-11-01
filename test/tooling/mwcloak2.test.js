@@ -1,4 +1,4 @@
-// MW-CLOAK2 (2026-10-09, Mac: "I dont like how the cloak isnt smooth around the shoulders"): THE CLOAK SMOOTHED - two
+// MW-CLOAK2: THE CLOAK SMOOTHED - two
 // levels of Loop subdivision at bake time (tools/meshSubdivide.mjs), and the fit over the armour eased round each
 // point that comes through rather than moving a triangle's three corners (src/formats/morrowind/mwCloakFit.js).
 //
@@ -149,7 +149,6 @@ test('MW-CLOAK2: the fit over the armour eases the cloak round each point that c
   };
   const eased = await slope(CLOAK_EASE_RADIUS);
   assert.equal(CLOAK_EASE_RADIUS, 8);
-  // PIN MOVED (MW-CAPE-RIGID): on the chest alone the cloak sits at rest where the chest carries it, the ebony
   // pauldrons 1.3 through it (2.6 hung over the spine and clavicles) - 720 vertices eased, the furthest 2.3 (it was 3.6)
   assert.ok(eased.fit.pushed > 500 && eased.fit.most > 2.1 && eased.fit.most < 2.5, `${eased.fit.pushed} vertices eased, the furthest ${eased.fit.most.toFixed(2)}`);
   assert.ok(eased.steepest < 0.8, `the push slopes at most ${eased.steepest.toFixed(2)} a unit`);

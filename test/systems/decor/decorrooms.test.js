@@ -1,4 +1,4 @@
-// DECOR-ROOMS (2026-09-27, Discord: "For a house with multiple connects, add room switching tabs").
+// DECOR-ROOMS.
 //
 // THE ROOMS OF A HOUSE, found in its own collider (systems/decor/decorRooms.js): floors a body stands on - headroom over
 // them and a ceiling above - joined to their neighbours where the rise is a step and nothing stands between them at

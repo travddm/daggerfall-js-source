@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow; the weak spot "Follow isn't
-// audited and hears private talk") - THE FOLLOW TOKEN (server-account/src/staffFollow.js), driven through the real Worker
+// STAFF-PANEL5-FOLLOW - THE FOLLOW TOKEN (server-account/src/staffFollow.js), driven through the real Worker
 // on the node:sqlite database every account pin stands on (test/accountDb.mjs): an Admin's and a Moderator's follow
 // token, what it signs and what it never does, the audit rows, and every refusal.
 import { test } from 'node:test';

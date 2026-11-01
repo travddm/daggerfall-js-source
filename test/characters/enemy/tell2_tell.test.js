@@ -1,5 +1,4 @@
-// TELL2 - THE TELL: BODY, EAR AND GROUND (bible/12-Enhanced-AI/Feud-Arc.md section 4; Mac, 2026-10-04: "breath more
-// depth into it", then "Go" on every call). Before it a telegraphed blow's wind-up was a mark on the ground and a foe
+// TELL2 - THE TELL: BODY, EAR AND GROUND (;, then "Go" on every call). Before it a telegraphed blow's wind-up was a mark on the ground and a foe
 // standing still; its swing began at the landing. Now THE WIND-UP IS THE SWING, HELD: the sprite raises its arm as the
 // wind-up begins and stands there (`MobileUnit` `hold`); the landing releases it, and its strike frame is the blow. A
 // break drops it. The body GLINTS in the blow's colour (both billboard shaders), the ear hears it WIND, RELEASE and
@@ -384,7 +383,7 @@ test('TELL2: the glint on the batch - written only when it changes, cleared at n
   setBatchGlint(b, [1, 0.4, 0.1, 0.5]);
   assert.equal(b.glint, g, 'the same glint is not rewritten');
   setBatchGlint(b, [1, 0.4, 0.1, 0.6]);
-  assert.deepEqual(b.glint, [1, 0.4, 0.1, 0.6]);   // PIN MOVED (AUDIT TELL U9): rewritten in place, no array a frame
+  assert.deepEqual(b.glint, [1, 0.4, 0.1, 0.6]);
   assert.equal(b.glint, g, 'the same array');
   setBatchGlint(b, [1, 0.4, 0.1, 0]);
   assert.equal(b.glint, undefined, 'strength 0 is none');
@@ -462,18 +461,17 @@ test('TELL2: the ground\'s mark takes the boss\'s line from a leaf - premultipli
 test('TELL2: all three pools wire it - the hold into the sprite, the strike clip held for the WIND, the cues after the sprite, the glint beside the hit flash (mutants: any pool unwired)', () => {
   const pools = [
     ['src/scenes/exteriorFoes.js', 'f', 'hold: f.ai._blowHold,'],
-    ['src/scenes/dungeonContext.js', 'f', 'hold: _puppet ? (_pb?.hold ?? false) : f.ai._blowHold,'],   // PIN MOVED (TELL8: a puppet's on its host's word)
+    ['src/scenes/dungeonContext.js', 'f', 'hold: _puppet ? (_pb?.hold ?? false) : f.ai._blowHold,'],
     ['src/scenes/cityGuards.js', 'g', 'hold: g.ai._blowHold,'],
   ];
   for (const [file, v, hold] of pools) {
     const src = rd(file);
     assert.ok(src.includes(hold), `${file}: the hold`);
     assert.ok(src.includes(`${v}.ai._blowHold !== true`), `${file}: the strike clip held`);
-    const upd = src.indexOf(hold), cue = src.indexOf(`tellCues(${v}, audio, acuteHearingMultiplier(playerEntity));`, upd);   // PIN MOVED (TELL8: a puppet's cues stand in its own branch too - the owner's are the first after its sprite)
+    const upd = src.indexOf(hold), cue = src.indexOf(`tellCues(${v}, audio, acuteHearingMultiplier(playerEntity));`, upd);
     assert.ok(cue > upd && cue - upd < 400, `${file}: the cues right after the sprite`);
-    assert.ok(src.includes(`setBatchGlint(${v}.batch, foeGlint(${v}.ai, undefined, prefersReducedMotion())`), `${file}: the glint`);   // PIN MOVED (RVN4: else phase two's rim, after it)
+    assert.ok(src.includes(`setBatchGlint(${v}.batch, foeGlint(${v}.ai, undefined, prefersReducedMotion())`), `${file}: the glint`);
   }
-  // PIN MOVED (TELL8: a puppet's cues are its own - its owner's wind-up rides the wire, ai/puppetBlows.js)
   assert.ok(!/if \(!_puppet\) tellCues\(f, audio/.test(rd('src/scenes/dungeonContext.js')), 'a puppet\'s cues play here');
   assert.match(rd('src/scenes/exteriorFoes.js'), /const _pb = f\.ai\._tac\?\.puppet \? puppetBlowTurn\(f\.ai, playerFeet\) : NO_PUPPET_BLOW;[\s\S]{0,4000}tellCues\(f, audio, acuteHearingMultiplier\(playerEntity\)\);   \/\/ TELL8/);
 });

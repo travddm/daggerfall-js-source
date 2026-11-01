@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.5, Professions-Arc.md section 58): A MOUNTED TROPHY
+// HUNTERS-MARK: A MOUNTED TROPHY
 // MINTED - a named mark's at its payday (scenes/huntersMark.js), a Trophy Hunter's at a clean pelt of a tier 5+ body
 // (scenes/huntHost.js). The item carries its beast (`message`) and a mark's name (`variant`), and its own picture: the
 // beast's own front frame of the player's data, which the pack lists and the decorator hangs on a plaque drawn at runtime

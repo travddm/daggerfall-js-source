@@ -1,9 +1,5 @@
-// PX31 - THE PACK'S PAGES (2026-09-12).
+// PX31 - THE PACK'S PAGES.
 //
-// Mac: "For the enhanced inventory, I think we need more tabs/sections
-// for items. Like books currently go in clothing which doesn't make
-// sense. Armor and weapons should be separate. Just take some autonomy
-// and properly sort out everything."
 //
 // DFU's inventory has FOUR tabs - Weapons & Armor, Magic, Clothing &
 // Misc, Ingredients (DaggerfallInventoryWindow's AddLocalItem, the law

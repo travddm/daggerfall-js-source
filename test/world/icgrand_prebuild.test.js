@@ -1,7 +1,5 @@
-// IC-GRAND's PERF PASS (2026-10-26, the coordinator: "A DISTRICT'S NINE NEAR SLICES NEVER FINISHED within 900 s ... make
-// arrival and crossing workable ... off-main-thread work"; bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's
-// thread") - THE CITY'S OWN MADE AHEAD ON A WORKER, pinned: a slice's pieces in the order its build asks them; the worker's
-// blocks, the landmarks' footprint laid there (PIN MOVED, IC-FOOTPRINT-OFF-THREAD: it was laid on the page), the page's
+// IC-GRAND's PERF PASS - THE CITY'S OWN MADE AHEAD ON A WORKER, pinned: a slice's pieces in the order its build asks them; the worker's
+// blocks, the landmarks' footprint laid there (
 // own blocks to the byte, the landmarks' parts the model door's, and its models the family's;
 // each piece handed over once, the worker told what the page made itself; the door and the family asking it first; the
 // sweep telling it the slices coming, the player's own first, and letting it go out of the city's reach.

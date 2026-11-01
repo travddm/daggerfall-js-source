@@ -95,7 +95,7 @@ function thin(list, max, rand) {
  * map files answer); `day` the relay's day. Returns `[{ x, y, ring, key }]` - each hall on the middle pixel of its cell
  * (WW-C2: the mask's grid laid on the world, wildZone.js maskWorld) - the outer tier's first.
  *
- * WILD-FREE (2026-10-11, a player's load captured from the live client: 8.1 s of a 14.5 s frozen frame): `free` is the
+ * WILD-FREE: `free` is the
  * host's dearest question (world.js wildHallFree - the spawns' plateau, a whole heightmap kernel summed for a pixel), and
  * it was asked of every pixel of every ring before the band was cut. It is asked where an answer is read, once a cell:
  * the deepest free level, the band and its widenings, the whole ring only when the band cannot hold the count - and
@@ -188,8 +188,7 @@ export const wildHallAt = (halls, x, y) => halls?.find((h) => h.x === x && h.y =
  *  cemetery's own dungeon type (18). */
 export const wildHallTemplateOk = (loc) => loc?.mapTableData?.locationType !== 12 && loc?.mapTableData?.dungeonType !== 18 && !/cemetery|graveyard/i.test(String(loc?.name ?? ''));
 
-// ── THE HALLS' FOES (the owner: "THE DUNGEONS IN THE ZONE HAVE TO HAVE ONLY HIGH TIER ENEMIES! NO RATS/BATS OR OTHER LOWTIER
-// ENEMIES!") ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── THE HALLS' FOES ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 // A hall's layout draws its foes from its template's own tables (characters/dungeonEnemies.js), which are rats and bats as
 // often as not. Every monster of the low tiers is swapped for one of its ring's high tier - a pure pick by the hall's id
 // and the foe's index, so every client builds the same hall. A water marker keeps a water foe (the Dreugh, the Lamia). The

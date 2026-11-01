@@ -1,8 +1,8 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE RELAY'S HALF, pinned over the real Room and its fake
+// AUDIT WB: THE RELAY'S HALF, pinned over the real Room and its fake
 // sockets - a room filled with silence (A1), a court held by one account's many sockets (A1), a fight full of seats left
 // idle (A1), a write a frame from `in` said again (A3), a kill said before it was kept and a hub told once or never
 // (A10), a receipt only a hub hello at the right moment ever saw (A4), a late joiner's burst (A8), and a day's gate times
-// made again every frame (C7, net/gate/gateLaw.js - the relay's bundle). Design: bible/11-Multiplayer/World-Bosses.md
+// made again every frame (C7, net/gate/gateLaw.js - the relay's bundle). Design:
 // section 11.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

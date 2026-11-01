@@ -1,4 +1,4 @@
-// AURA-LIVE (2026-10-05, Mac: "Ensure other players can see all auras") - AN AURA WORN MID-SESSION REACHES THE ROOM.
+// AURA-LIVE - AN AURA WORN MID-SESSION REACHES THE ROOM.
 //
 // The relay reads a badge (the aura, the title, the glyphs) off the TOKEN alone, and a token rides a hello - so an aura
 // put on at the account card or the Broker was drawn at my own feet at once and at nobody else's until I changed area

@@ -1,10 +1,9 @@
-// SHIPYARDS-FOUND (2026-10-11, Mac: "Everything should show on the map/overworld and be able to be asked by NPCs"): A
+// SHIPYARDS-FOUND: A
 // PORT'S PLACES FOUND AS THE YARDS ARE - rows of the town's talk directory (systems/portPlaces.js portDirectoryRows),
 // their groups on the Where-is page after the yards' (systems/topicTree.js over FOUND_KIND_ORDER), answered as a building
 // is (the compass, the map's mark); the shipyard and the lighthouse on both town maps (world/merchantYards/merchantYardMap.js
 // yardTownBlocks, ui/town/townMapDoor.js); the shipyard, the lighthouse and the docks on the Overworld (scenes/portHost.js,
 // scenes/quayPool.js overworldMarks, ui/travel/travelViewHud.js portGlyph); and the four hosts' wiring. Design:
-// bible/03-World/Shipyards.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

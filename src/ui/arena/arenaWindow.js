@@ -1,11 +1,10 @@
 // @ts-check
-// ARENA3 (2026-10-02, Mac: "Joining a team comes with it's own enhanced UI where you can view your ranking and even
-// player leaderboards"; "All UI elements and text must be enhanced UI plus"): THE ARENA WINDOW - six pages over the
+// ARENA3: THE ARENA WINDOW - six pages over the
 // arena as this save knows it: BOUTS (the hour's exhibition with its fighters, records and prices - Watch, Wager; the
 // players' bouts, online; your next ladder bout - Fight), LADDER (the ten tiers as a column, each opened whole beside
 // it), TEAM (your banner, its season against the other, the laurel, the roster's top ten), LEADERBOARDS (the highest
 // tier, the fastest Grand Champion, the season's rating, the banners by season - your row pinned under the top ten),
-// RECORDS (your record, the last twenty bouts, your wagers) and RULES. Design: bible/11-Multiplayer/Arena.md "5. The
+// RECORDS (your record, the last twenty bouts, your wagers) and RULES. Design: "5. The
 // Arena window".
 //
 // THE HOUSE'S SHAPE, the Notice Board's and the Broker's before it: a lazy chunk the door (ui/arena/arenaDoor.js) mounts in its

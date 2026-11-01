@@ -1,9 +1,5 @@
-// PX31 - THE PACK'S PAGES (2026-09-12).
+// PX31 - THE PACK'S PAGES.
 //
-// Mac: "For the enhanced inventory, I think we need more tabs/sections
-// for items. Like books currently go in clothing which doesn't make
-// sense. Armor and weapons should be separate. Just take some autonomy
-// and properly sort out everything."
 //
 // Nine pages for the enhanced pack, a PARTITION of what DFU's four
 // tabs hold; the classic pack keeps DFU's four.
@@ -61,7 +57,6 @@ test('PX31: where things live - the pages a player looks for', () => {
   assert.equal(p('Gems', 0), 'valuables', 'a ruby is an ingredient to DFU and a valuable to a player');
   assert.equal(p('Jewellery', 135), 'valuables');
   assert.equal(p('Currency', 276), 'valuables', 'the Currency group (276 is DFU\'s Gold Pieces, were it ever an item - E4\'s counter)');
-  // PIN MOVED (WALLET1): the line above called itself "a letter of credit", a shape no producer mints - DFU's letter is
   // MiscItems 275, and its group alone filed it under misc. The producer's own letter, here (TEST THE SHAPE THE PRODUCER MINTS)
   assert.equal(pageOf(letterOfCredit(5000)), 'valuables', 'a letter of credit, as the bank and the counter mint it');
   assert.equal(p('MiscItems', 276), 'misc', 'the letter\'s group alone is misc\'s');
@@ -84,7 +79,6 @@ test('PX31: the pack draws the pages; the classic keeps DFU\'s four', () => {
   const src = read('src/ui/enhanced/enhancedInventory.js');
   assert.match(src, /import \{ PACK_PAGES, PAGE_IDS, pageOf, filterByPage \} from '\.\.\/packPages\.js';/);
   assert.doesNotMatch(src.replace(/^\s*(\/\/|\*|\/\*).*$/gm, ''), /filterByTab\(|\bTABS\b/, 'the pack no longer reads the four (its prose may still name them)');
-  // PIN MOVED (WALLET1): the pages are drawn from the pack less what its wallet holds (`paged` - systems/walletItem.js)
   assert.match(src, /tabs: PACK_PAGES\.map\(\(\[tab, label\]\) => \(\{ tab, label, items: filterByPage\(paged, tab\) \}\)\)/);
   assert.match(src, /const paged = held\.size \? items\.filter\(\(it\) => !held\.has\(it\)\) : items;/);
   assert.match(src, /for \(const \{ tab: t, label, items: rows \} of model\.tabs\) \{\s*\n\s*const n = rows\.length;\s*\n(?:\s*\/\/[^\n]*\n)*\s*const b = el\('button', `packtab\$\{t === tab \? ' on' : ''\}\$\{n \? '' : ' tabempty'\}`, label\);/, 'each page by its label, dimmed when empty');

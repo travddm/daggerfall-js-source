@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW7-7 (2026-10-26, the owner: "Yes travellers to need to travel everywhere. Same for ships."; bible/03-World/World-Wide.md
-// WW7-7): THE WAYS PAST THE BAY - the road a town's travellers walk to another town past the Bay, on the roads past the Bay
+// WW7-7: THE WAYS PAST THE BAY - the road a town's travellers walk to another town past the Bay, on the roads past the Bay
 // (TESA14's layer, world/arenaRoads.js - the Bay's own road law laid at the Bay's scale over every place past it) and the
 // land past the Bay's ground.
 //
@@ -32,7 +31,7 @@
 // roads past the Bay laid whole (the host's epoch: no pair is asked while a region is still to land), the ground the
 // land's: every client that stands the land past the Bay walks every pair alike.
 //
-// WW7-9 (2026-10-26, the coordinator: trips across the Bay's edge, the land past the Bay waking region by region):
+// WW7-9:
 //  - ACROSS THE EDGE (`plan(a, b, true)`): a pair of a Bay town and a town past the Bay is planned on the same window,
 //    its Bay pixels the Bay's own ground (`bay()` - the drawn network's roads and tracks, the crossings' joins over them as
 //    the Travel Options planner reads them, and the Bay's table's water), so its way walks the Bay's roads out to a

@@ -1,6 +1,4 @@
-// IC-PROPS (2026-10-27, the owner: "Random placements on the wagon/other vendors all over the Imperial city", then "the
-// issues I mentioned for the imperial city for stables/doors/etc are a world wide issue. They have no logical
-// placements"; bible/03-World/Merchant-Yards.md IC-PROPS) - EACH YARD WHERE ITS KIND BELONGS, ON THE TOWN'S OWN GROUND:
+// IC-PROPS - EACH YARD WHERE ITS KIND BELONGS, ON THE TOWN'S OWN GROUND:
 // never on a way, past the town or in a house's garden while the town has room elsewhere; its gate onto a way; the Stable
 // at the town's edge by the road out, the Wagon Yard and the joinery on a street's side nearest the middle; and the
 // Imperial City - one town over 625 slices - its own yards at its gates, none on any slice by the law

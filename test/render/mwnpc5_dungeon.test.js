@@ -1,4 +1,4 @@
-// MWNPC5b (2026-10-09, the MW-NPC arc's fifth slice - bible/04-Characters/Morrowind-NPCs.md section 10b): THE DUNGEON'S
+// MWNPC5b: THE DUNGEON'S
 // FOES IN THEIR BODIES. The dungeon context (both dungeon hosts' one frame function) stands its class foes in the NPC
 // lane each frame - alive dressed as their billboards are (concealed, flashing, their tells), dead from the kill until
 // the corpse is freed - syncs it, draws the bodies in one bind, and turns every offered foe's billboard CAST-ONLY where

@@ -1,5 +1,4 @@
-// WW-GATES-EVERYWHERE (2026-10-26, the owner after the audit "no system left behind in the Bay": "Every single thing here
-// needs to be addressed. No exceptions."; bible/03-World/World-Wide.md WW-GATES-EVERYWHERE): AN OBLIVION GATE IN EVERY
+// WW-GATES-EVERYWHERE: AN OBLIVION GATE IN EVERY
 // PROVINCE - the lanes of the eight provinces past the Bay stand (net/wire.js GATE_LANES_OPEN), Cyrodiil's never; a gate
 // stands, is entered and falls past the Bay through the real modules (the theatres' scans over the registry with TESA's
 // places on the freeware, the omen, the relay's Room, the account service); a province's kill counts at its own

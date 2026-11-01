@@ -1,6 +1,4 @@
-// WILD-INSURE (2026-10-26, the owner: "Overhauling the open PvP to be a bit more palatable, being able to insure gear on
-// death ... while retaining its punishment"; asked, "Kept, policy spent" at "20% of worth" - bible/11-Multiplayer/
-// Wild-Zone.md section 4b): A POLICY ON A PIECE OF GEAR, WRITTEN AGAINST ITS PREMIUM OFF THE RECORD.
+// WILD-INSURE: A POLICY ON A PIECE OF GEAR, WRITTEN AGAINST ITS PREMIUM OFF THE RECORD.
 //
 // The law is the leaf both ends read (src/systems/wild/wildInsureLaw.js): what may be insured, its premium, when it is in
 // force. This service keeps the policies (`wild_insurance`, migration 0182 - 0181 until main's WOVEN-PAYS took 0177) - never the record, which its own tab writes:

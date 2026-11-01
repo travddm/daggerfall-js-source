@@ -1,9 +1,9 @@
-// GUILD-HALL-SALE (2026-10-06, asked: "Guild houses should be able to be sold, like regular houses"): A GUILD'S HALL SOLD
+// GUILD-HALL-SALE: A GUILD'S HALL SOLD
 // AT ITS OWN DOOR, AS A HOME IS. The sale stood on the Guild tab alone (GUILD1d); the hall's door now lists "Sell it" to
 // whom the service lets sell it (`hallSell` on the town's answer - its guildmaster), on the plaque and in Info's menu,
 // asks first at what it pays the treasury, and sells THAT building: the service refuses a hall standing anywhere else
 // (`guild-hall-moved`). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs),
-// the door's law, the client's registry and the guild book's door; the hosts by source. bible/06-Systems/Online-Arc.md
+// the door's law, the client's registry and the guild book's door; the hosts by source.
 // GUILD-HALL-SALE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,6 +1,6 @@
-// AUDIT CHAP3 (2026-10-08, Mac: "Let's audit everything we have so far before we continue") - a pin a fix: CHAP0 to
+// AUDIT CHAP3 - a pin a fix: CHAP0 to
 // CHAP3c read again through six lenses (the service, the economy, the client, Daggerfall's law, the record, the pins).
-// bible/01-Overview/audits/Audit-Chapters-3.md is the record; each test names the findings it holds.
+// is the record; each test names the findings it holds.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,4 @@
-// FONT1 (2026-09-16, Mac: "Enhanced mode UI ... Ambient Text mod also
-// doesnt use it. Any enhanced UI or text must be our enhanced
-// version"): THE HUD'S TEXT, IN THE ENHANCED FACE.
+// FONT1: THE HUD'S TEXT, IN THE ENHANCED FACE.
 //
 // DaggerfallHUD owns the text surfaces a player READS without opening
 // a window: the popup column (PopupText - AddHUDText), the mid-screen
@@ -16,8 +14,7 @@
 // this renderer the FRAME they would have painted. A second timer here
 // would be a second model, and two of them drift.
 //
-// ENH-NOTICE3 (2026-09-21, Mac: "All mods, including climates and
-// calories need to utilize the enhanced notification popup"): THE
+// ENH-NOTICE3: THE
 // POPUP COLUMN LEFT THIS MODULE. FONT1 drew PopupText's rows as a DOM
 // column at the top of the screen, under the compass block, one
 // `.hudtext` per model inside one `.hudtext-stack` (AUDIT FONT F1 keyed

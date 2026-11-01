@@ -1,7 +1,7 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1d (2026-10-01, Mac: "Finish the seats"; "Continue") - A HELD SEAT
-// AS THIS CLIENT LIVES IT (bible/11-Multiplayer/Seats-Arc.md 7.2, 7.3,
+// SEAT1d - A HELD SEAT
+// AS THIS CLIENT LIVES IT (7.2, 7.3,
 // 7.6): the seat town's shops priced for its holder's members and on
 // Market Day; the town's news after its arrival line (Unrest, the Edict
 // that rules); the Festive buff a Festival gives everyone who comes into

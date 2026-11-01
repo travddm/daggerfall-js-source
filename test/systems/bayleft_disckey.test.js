@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS C7 = E2 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed.
-// No exceptions."; bible/03-World/Arena-Provinces.md BAY-LEFT-MAPS C7) - A TOWN'S BOOK OF DISCOVERED BUILDINGS BY ITS OWN KEY.
+// BAY-LEFT-MAPS C7 = E2 - A TOWN'S BOOK OF DISCOVERED BUILDINGS BY ITS OWN KEY.
 //
 // The building half of the discovery store was filed under `<regionIndex>:<name>` by every writer and reader (the door, the
 // town map, the talk's reveals, the guild halls' reveals, the lockpick's anti-grind record, the quest re-stamps, a deed's

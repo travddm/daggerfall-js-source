@@ -1,4 +1,4 @@
-// OWS1 (2026-09-28, the player's ask: "being able to see other players sailing in the overworld") - THE SHIPS ON THE
+// OWS1 - THE SHIPS ON THE
 // MAP. A traveller at a helm, or aboard a boat (CSA-K), sends the region the mark's way the TV3 frame always carried and
 // nothing sent - `ship`, TRAV_MODES' fourth - headed as the boat's bow; the Overworld draws a mark whose way is the sea
 // as a ship (a hull under a sail, where the dot stood), riding the sea's top, and the held map inks it so.

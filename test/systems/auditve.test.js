@@ -1,4 +1,4 @@
-// AUDIT VE (2026-10-05, Mac: "Audit this. Ensure this is on by default. And performance isn't affected") - the audit of
+// AUDIT VE - the audit of
 // Vanilla Enhanced, VE1-VE4 (`01-Overview/audits/Audit-VE.md`). Every pin here fails on the code as it stood before its fix:
 //   D1 - THE DEFAULT: the shipped Base is on until the player chooses otherwise, its add-ons off; a choice either way is
 //        kept, through a boot and under a copy the player attaches.
@@ -32,7 +32,7 @@ import { createDataPipeline } from '../../src/scenes/dataPipeline.js';
 const BASE = 'dfmod/vanilla enhanced - base.dfmod';
 const MASKED = 'dfmod/vanilla enhanced - masked roads.dfmod';
 const SNOWLESS = 'dfmod/vanilla enhanced - snowless swamps and jungles.dfmod';
-// ALIKR1 / SNOWFALL1 (2026-10-08): the two environment packs ship through the same door, on by default and built on the
+// ALIKR1 / SNOWFALL1: the two environment packs ship through the same door, on by default and built on the
 // Base (test/systems/environs_texturePacks.test.js holds their own law); a pin over the whole door names them in their places
 const SANDS = 'dfmod/sands of the alikr.dfmod';
 const SNOWFALL = 'dfmod/snowfall.dfmod';

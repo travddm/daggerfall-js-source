@@ -1,5 +1,4 @@
-// REST1 (2026-10-03, bible/06-Systems/Rest-Arc.md; Mac: "Resting is no longer time based online with campfires, beds,
-// camping sets, being the main way to rest", then "Go") - THE REST ACT ONLINE.
+// REST1 - THE REST ACT ONLINE.
 //
 // Online a rest is no longer hours on a dial. It is an ACT at a REST POINT - a lit fire (a placed Campfire, a tent's
 // fire, a world brazier or hearth), a bed where DFU lets you sleep indoors - and it is ONE NIGHT: the character's own
@@ -195,9 +194,7 @@ export function topUpRest(entity, kind, rules, { night = true, maxFatigueOf = (e
   if (Number.isFinite(entity.maxMagicka)) entity.magicka = fill(entity.magicka, entity.maxMagicka, frac);
 }
 
-/** REST-CHANNEL-HEAL (2026-10-04, from play: "make it so when you rest on the campfire the loading bar you see also
- *  heals you so you dont wake up with 1% stamina bar as example when it gets canceled half way through"; "not only
- *  stamina all other magicka and health aswell"): THE BAR HEALS AS IT FILLS. The channel paid nothing until its end, so
+/** REST-CHANNEL-HEAL: THE BAR HEALS AS IT FILLS. The channel paid nothing until its end, so
  *  a hold broken at its fifth second - a foe in reach, the fire gone out, Stop pressed - left the sleeper exactly as
  *  they sat down. Now health, fatigue and magicka rise with the bar toward what the rest gives at its end - topUpRest's
  *  yield: full where the tier prices the rest whole, half of what was missing where it does not (Hard's rough ground,
@@ -244,8 +241,7 @@ export function channelHealTick(opened, deps, t, mark) {
   return Number.isFinite(hp) ? hp : mark;
 }
 
-/** REST-SLEEP1 (2026-10-04, from play: "if you have to wait for night to pass you cannot rest again to remove the
- *  tiredness/drowsy debuffs until the time passes"): A SHORT REST SLEEPS. Inside the night interval a rest paid nothing
+/** REST-SLEEP1: A SHORT REST SLEEPS. Inside the night interval a rest paid nothing
  *  of the sleep need, and the need has no other payer (the arc's census, row 9) - so a night that left its sleeper
  *  Tired or Drowsy (a foe's break in its first hour, which still stamps the interval; a rough night's third of a bed's
  *  rate; a debt past the twelve hours a night pays) held the attributes down for the whole ten real minutes, at the
@@ -284,7 +280,7 @@ export function spendRoomNight(room, nowMinutes) {
   if (room.nights === 0 && Number.isFinite(nowMinutes)) room.expiryMinutes = Math.min(room.expiryMinutes, Math.floor(nowMinutes));
 }
 
-/** REST5 (bible/06-Systems/Rest-Arc.md 2.6): THE NIGHT IS HEARD. A host that shares the night (world.js, the party's
+/** REST5 (2.6): THE NIGHT IS HEARD. A host that shares the night (world.js, the party's
  *  pose) listens here; createRestDeps' restNight calls it after a night slept whole - never a carried one (a member's
  *  night carried for me is theirs, and is not passed on again). One listener: the page has one party. AUDIT REST-PARTY:
  *  it hears WHERE - the rest kind of the spot the night was slept at (survival/rest.js REST_KIND), so the party sleeps
@@ -341,7 +337,7 @@ export const nightKindOf = (t) => {
 };
 export const isNightStamp = (t) => nightKindOf(t) !== null;
 
-/** CAMP-ROLL (2026-10-04): THE CAMP'S TWO MARKS, on the same field and the same law as a night's - `open`, my act's
+/** CAMP-ROLL: THE CAMP'S TWO MARKS, on the same field and the same law as a night's - `open`, my act's
  *  channel opened on a night (I may roll the camp's night), and `done`, it ended with no night heard (a short rest, a
  *  stop, a foe, a prevent-rest condition). Neither is a night: nightKindOf answers null for both, so the party's night
  *  watch never carries anyone on one. An older build's window open lands on `open` one time in a thousand, and costs a

@@ -1,5 +1,4 @@
-// TIER1 (2026-10-05, Mac: "Along with this change will be a simplier addition, visible showing dungeons difficulty as
-// Regular, Elite or Super"; bible/11-Multiplayer/Super-Dungeons.md section 12): A DUNGEON'S TIER, IN ONE WORD -
+// TIER1: A DUNGEON'S TIER, IN ONE WORD -
 // and, with SD-ONLINE, its size beside it.
 //
 // One law (systems/dungeon/dungeonTier.js, a leaf): 'super' for a Hollow, 'elite' for an Elite spawn, 'regular' for every
@@ -35,7 +34,7 @@ const loc = (n, mapId, extra = {}) => ({
 
 test('TIER1: the law - three tiers, their words, read off the location; null without a dungeon', () => {
   assert.deepEqual([...DUNGEON_TIERS], ['regular', 'elite', 'super']);
-  assert.deepEqual({ ...DUNGEON_TIER_TEXT }, { regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME (PIN MOVED): the player's word for the tier the code calls super
+  assert.deepEqual({ ...DUNGEON_TIER_TEXT }, { regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME (
   assert.deepEqual({ ...DUNGEON_SIZE_TEXT }, { small: 'Small', medium: 'Medium', large: 'Large' });
   for (const t of [DUNGEON_TIERS, DUNGEON_TIER_TEXT, DUNGEON_SIZE_TEXT]) assert.ok(Object.isFrozen(t));
   assert.equal(dungeonTier(loc(10, 1)), 'regular');
@@ -109,7 +108,7 @@ test('TIER1: the words on the overworld - the sight line names the tier, the pla
 test('TIER1: the plaque - a named tier titles the mouth, the way in and the size beneath; no tier, the mod\'s own', () => {
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold', tier: 'regular', size: 'Large' }), { title: 'Regular Dungeon', subs: ['To Privateer\'s Hold', 'Large'] });
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Elite Old Ruin (10,20)', tier: 'elite', size: 'Small' }), { title: 'Elite Dungeon', subs: ['To Old Ruin (10,20)', 'Small'] });
-  assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'The Brass Hollow', tier: 'super', size: null }), { title: 'Abyss Dungeon', subs: ['To the Brass Hollow'] });   // AUDIT SD II (L6 F20, PIN MOVED): its article small after "To"
+  assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'The Brass Hollow', tier: 'super', size: null }), { title: 'Abyss Dungeon', subs: ['To the Brass Hollow'] });   // AUDIT SD II (L6 F20
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold' }), { title: 'To\nPrivateer\'s Hold' }, 'offline: the mod\'s own');
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold', tier: 'toString' }), { title: 'To\nPrivateer\'s Hold' }, 'a tier is one of the three, never the prototype\'s');
   assert.deepEqual(staticDoorName('buildingExit', { locationName: 'Daggerfall', tier: 'regular' }), { title: 'To\nDaggerfall' }, 'a tier is a dungeon mouth\'s alone');

@@ -1,7 +1,5 @@
-// ACC3b — THE TITLE AND THE GLYPHS, ON A PLAYER'S SCREEN (2026-09-22).
+// ACC3b — THE TITLE AND THE GLYPHS, ON A PLAYER'S SCREEN.
 //
-// Mac: "Player titles appear above a player name... 1st title is
-// Founder with a gold color, 2nd title is Developer with a red color",
 // and "name glyphs... appear on the right side of the player name."
 //
 // ACC3a proved the badge is GRANTED and SIGNED; nothing in it reached a

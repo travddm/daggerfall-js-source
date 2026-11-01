@@ -1,5 +1,4 @@
-// TOWN-MARKS (2026-09-29, Mac: "For the notice boards in town. Can we physically mark them on the town map, and also mark
-// owned player housing"; bible/10-UI/UI-Arc.md TOWN-MARKS): THE TOWN MAP'S NOTICE BOARDS AND PLAYER HOUSING. The data
+// TOWN-MARKS: THE TOWN MAP'S NOTICE BOARDS AND PLAYER HOUSING. The data
 // (ui/town/townMapMarks.js: which boards, which houses, what each is called), the ink (ui/ink/inkTown.js paintBoardMark,
 // paintHomeMark - under the names, lifted above their place), the sheet (ui/town/townSheet.js: into sheet space by the
 // plates' and the party's own seams, answered under the pointer, a repaint when the homes answer), and the wiring

@@ -1,4 +1,4 @@
-// LOCKPICK (AUDIT LOCKPICK A1, A8 - bible/06-Systems/Lockpicking.md): a minimal DOM for the lock's real door and window
+// LOCKPICK (AUDIT LOCKPICK A1, A8): a minimal DOM for the lock's real door and window
 // (ui/lockpickDoor.js, ui/lockpickWindow.js) in Node - elements, a body, the window's keydown listeners (dispatched capture
 // first) and a hand-pumped requestAnimationFrame. Install it BEFORE the scene modules load, as test/chargenDom.mjs is.
 class El {

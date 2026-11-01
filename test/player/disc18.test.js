@@ -1,5 +1,5 @@
-// DISC18 (2026-09-24, Mac: "my characterless [character's legs] are in the ground", unsure whether it was the save).
-// bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC18.
+// DISC18.
+// DISC18.
 //
 // Not the save. The hosts drew the third-person body - the Morrowind body and Eye Of The Beholder's sprite alike,
 // both through mwViewDrawBody - at player.feetAt(), the height the CAMERA rides: EV1's interpolation with MAC1's

@@ -1,5 +1,5 @@
-// AUDIT TESA II, lane M (2026-10-25) - THE HELD MAP PAST THE BAY'S PAINT AND ITS READS, pinned where the audit found them
-// wrong (ui/tamrielTiles.js, ui/tamrielInk.js, ui/ink/inkMap.js; bible/03-World/Arena-Provinces.md TESA15, MAP-LINES):
+// AUDIT TESA II, lane M - THE HELD MAP PAST THE BAY'S PAINT AND ITS READS, pinned where the audit found them
+// wrong (ui/tamrielTiles.js, ui/tamrielInk.js, ui/ink/inkMap.js; TESA15, MAP-LINES):
 //   M1  a still view that wants more tiles than TILES_KEPT settles - it never lets go a tile it draws;
 //   M3  a stand-in is found at every level (the level an integer of quarter-doublings, not a float an ulp off);
 //   M10 a dense tile is painted a step at a time under the frame's budget, owed and partial meanwhile, its last paint
@@ -205,7 +205,7 @@ test('AUDIT TESA II M12: a far tile strokes every step that crosses it - a strai
   }
 });
 
-// ── M13: withdrawn with the zones' borders (REGION-LINES 2, the owner: "Those are just random lines") - the provinces' ends
+// ── M13: withdrawn with the zones' borders (REGION-LINES 2) - the provinces' ends
 // snap to the coast as they did (provinceLines) ──
 
 // ── M7, M6, M14: THE CITIES PAST THE BAY ────────────────────────

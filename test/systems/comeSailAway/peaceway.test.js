@@ -1,5 +1,4 @@
-// PEACE-WAY (2026-10-17, the owner: "When out of combat, the ship should traverse 15% faster"; bible/03-World/Naval-Refit.md
-// PEACE-WAY) - her way out of a fight, on Come Sail Away's real runtime over the vendored hulls (test/csaScene.mjs): the
+// PEACE-WAY - her way out of a fight, on Come Sail Away's real runtime over the vendored hulls (test/csaScene.mjs): the
 // law's own numbers, her way under sail and under oars and its coming on, the journey's estimates of both, the seam
 // bounded, the bonus shed when a fight begins - and the world host's word for "out of a fight".
 // tools/mutants/peaceway.json.

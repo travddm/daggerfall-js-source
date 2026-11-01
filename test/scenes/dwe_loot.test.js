@@ -1,4 +1,4 @@
-// DW-E5 (2026-09-26) - ILIAC PUDDLE NO MORE 1.2.2's SUNKEN LOOT (jet082), PINNED: UnderwaterLootSpawner's
+// DW-E5 - ILIAC PUDDLE NO MORE 1.2.2's SUNKEN LOOT (jet082), PINNED: UnderwaterLootSpawner's
 // constants and its two static tables against the assembly; the pulse's rolls (a wreck, the stray piles), the
 // spot (the fog-ahead point, the forward-biased angle, the 48 m cells), the seafloor under a pile, the wreck's
 // depth, the cluster's spots, the rubble round a pile and a wreck, FillRandomItem's seven kinds; the spawner through

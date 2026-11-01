@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW1 (2026-10-24, bible/03-World/World-Wide.md) - THE WORLD'S PLACES: the one door the systems read the world's places
+// WW1 - THE WORLD'S PLACES: the one door the systems read the world's places
 // through, wherever they stand.
 //
 // Every system that walked the world's places walked MAPS.BSA - `for (let r = 0; r < maps.regionCount; r++)` - and filed

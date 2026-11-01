@@ -1,5 +1,4 @@
-// REL4 + REL5 (2026-09-29, Mac: "How can we drastically improve the
-// install experience? ... I really want to make it AAA grade").
+// REL4 + REL5.
 //
 // REL4 - THE RELEASE IS PUBLISHED WHOLE, ONCE. Every release on GitHub
 // carried its generated notes two or three times over (one copy per OS
@@ -16,8 +15,7 @@
 // The names are a contract (app/lib/downloads.cjs): the build config must
 // produce them and the publish job refuses a set without them.
 //
-// REL6 (2026-10-01, Mac: "Remove patch notes from the codebase and somehow
-// refrain from patch notes filling up the codebase") - THE NOTES COME OFF
+// REL6 - THE NOTES COME OFF
 // THE PULL REQUEST. A release's notes are the `## Patch notes` sections of
 // the pull requests merged since the previous release, read off GitHub;
 // the PATCH-NOTES-*.md files they used to be read from are gone from the
@@ -83,14 +81,12 @@ test('REL5: a download link names the file under releases/latest/download, which
 
 test('REL4: a release is the four downloads, the three manifests and two blockmaps (DA13: and the game\'s manifest and pack) - one short publishes nothing', () => {
   assert.deepEqual([...EXPECTED_RELEASE_FILES].sort(), [
-    // PIN MOVED: DA13 - the game a file at a time: the manifest every copy reads first, and the pack it takes ranges of
     'DFO-Online-game.json.gz', 'DFO-Online-game.pack',
     'DFO-Online-linux-x86_64.AppImage',
     'DFO-Online-mac-arm64.dmg', 'DFO-Online-mac-arm64.dmg.blockmap',
     'DFO-Online-win-x64-portable.exe',
     'DFO-Online-win-x64-setup.exe', 'DFO-Online-win-x64-setup.exe.blockmap',
     'latest-linux.yml', 'latest-mac.yml', 'latest.yml',
-    // PIN MOVED: BR5 (AUDIT BR5) - and the four again, under the names a copy from before the rename asks for
     ...Object.values(LEGACY_DOWNLOAD_FILES),
   ].sort());
   assert.deepEqual(missingReleaseFiles([...EXPECTED_RELEASE_FILES, 'extra.txt']), [], 'a whole set passes');

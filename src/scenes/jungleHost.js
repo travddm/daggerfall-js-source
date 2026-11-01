@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (bible/03-World/Bantha-Jungle.md): THE JUNGLE'S HOST - Bantha's jungle in the streamed world, a module the
-// world host wires (HOST-SPLIT, bible/01-Overview/Host-Split.md: scenes/fishHost.js is the shape) and never grows
+// BANTHA1: THE JUNGLE'S HOST - Bantha's jungle in the streamed world, a module the
+// world host wires (HOST-SPLIT,: scenes/fishHost.js is the shape) and never grows
 // into bootWorld. It owns:
 //   - THE FIELD: where the jungle is (world/jungle/jungleRegion.js), built from the map the first time it is asked;
 //   - THE JOB: the terrain kernel's jungle for a pixel (`job` - its 3x3 of distances; world/terrain/jungleNature.js

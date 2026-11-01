@@ -1,5 +1,4 @@
-// PERF-ON4 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"; bible/07-Rendering/Performance-Online.md): THE PROBES' EDITS STAND IN THE TREE. tools/frameProbe.mjs and
+// PERF-ON4: THE PROBES' EDITS STAND IN THE TREE. tools/frameProbe.mjs and
 // tools/onlineFrameProbe.mjs measure the real game through a few probe-only edits of its source (the stream's build
 // slice, the grass's fill, the account base, `?shot` online, the composer's hook) - each a needle they replace. A probe
 // is not in the suite (it needs a browser, the game's data and minutes), so a change that moved a needle was found by

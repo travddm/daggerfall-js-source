@@ -1,8 +1,8 @@
-// CHAP3a (2026-10-08, Mac: "Keep going with the arc/slices") - MERIT: what a member did for its chapter this week, from
+// CHAP3a - MERIT: what a member did for its chapter this week, from
 // witnessed acts alone - its OWN writ for the chapter (one a member a chapter a day, drawn over the character, its
 // owner's alone, inside the account's three a day, paid as a hall writ) filled with its own units, and a receipt in the
 // chapter's region. 100 a writ for its own units' share, 50 a receipt; after seven days in the guild; one chapter of a
-// guild an account a week; 600 an account a chapter a week. bible/11-Multiplayer/Chapters-Arc.md section 5.1 (CHAP3a).
+// guild an account a week; 600 an account a chapter a week. (CHAP3a).
 //
 // The law against literals; the service through the real board, gate and raid routes over the real migrations; the
 // Merit line's every bound against the real schema; the card in a DOM; the host's wiring.
@@ -226,10 +226,8 @@ test('CHAP3a only its owner delivers it, and Merit waits on the week in the guil
   const w = (await s.list()).writs.find((x) => x.kind === 'member');
   const mallory = await s.seated('Mallory');
   s.give(mallory, s.R.id, w.material, w.qty);
-  // PIN MOVED (INT16, Integrity-Arc section 7): a character that is not the caller's seat is refused at the seat, before the route's own no-writ
   assert.deepEqual((await s.deliver(w.id, { by: mallory })).body, { error: 'progress-seat' }, 'another account, naming the character');
   s.give(s.who, s.who.character, w.material, w.qty);
-  // PIN MOVED (INT16, Integrity-Arc section 7): the account's other character (not its seat) is refused at the seat, before the route's own no-writ
   assert.deepEqual((await s.deliver(w.id, { character: s.who.character })).body, { error: 'progress-seat' }, 'its account\'s other character');
   // the route's own law past the door (the owner, the player): asked of the route itself, each is still no writ
   const direct = async (by, character) => deliverWrit({ db: s.env.DB, nowS: _now, rand: (u) => u.fill(7) }, { ...s.raw.prepare('SELECT * FROM players WHERE id = ?').get(by.id) },
@@ -255,7 +253,7 @@ test('CHAP3a a receipt\'s Merit: its 50 shared among the chapters its own line c
   assert.deepEqual(b.body.chapters.merit, [{ f: 41, amount: 25 }, { f: 368, amount: 25 }], 'the receipt writ filled: the receipt\'s own Merit still');
   const week = meritWeekOf(_now);
   assert.deepEqual(s.merit().map((m) => [m.faction, m.source, m.ref, m.amount, m.week, m.region]), [
-    [41, 'gate', `gate:${gameDayAt(_now * 1000)}`, 25, week, ANTICLERE], [368, 'gate', `gate:${gameDayAt(_now * 1000)}`, 25, week, ANTICLERE],   // PIN MOVED (AUDIT CHAP3 E1)
+    [41, 'gate', `gate:${gameDayAt(_now * 1000)}`, 25, week, ANTICLERE], [368, 'gate', `gate:${gameDayAt(_now * 1000)}`, 25, week, ANTICLERE],
     [41, 'raid', `raid:${ANTICLERE}:7:${day}`, 25, week, ANTICLERE], [368, 'raid', `raid:${ANTICLERE}:7:${day}`, 25, week, ANTICLERE],
     [41, 'raid', `raid:${ANTICLERE}:8:${day}`, 25, week, ANTICLERE], [368, 'raid', `raid:${ANTICLERE}:8:${day}`, 25, week, ANTICLERE],
   ]);
@@ -346,7 +344,7 @@ test('CHAP3a the member\'s own card: "Your writ", yours to fill for the guild, i
   byClass(host, 'notice-tab')[1].click();
   for (let i = 0; i < 3; i++) await tick();
   const [card] = byClass(host, 'notice-writ');
-  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Your chapter writ');   // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - a chapter's writ, the member's own
+  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Your chapter writ');
   assert.equal(byClass(card, 'writ-need')[0].textContent, `Yours to fill: 4 ${materialCountLabel('p1:23', 4)}, for the Fighters Guild in Anticlere`);
   assert.equal(byClass(card, 'writ-pay')[0].textContent, 'Pays 24 silver, 37 Renown, standing and Merit with the Fighters Guild');
   assert.ok(card.className.includes('seal-guild'));

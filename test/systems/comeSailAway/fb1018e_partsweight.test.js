@@ -1,4 +1,4 @@
-// PARTS-WEIGHT (FIELD BUGS 2026-10-18e, bible/01-Overview/bugs/Field-Bugs-2026-10-18e.md; the report: "large galley ship is
+// PARTS-WEIGHT (FIELD BUGS 2026-10-18e,; the report: "large galley ship is
 // too damn heavy to even move outta storage into inventory after stripping all carry weight items"). A packed boat's parts
 // carried her hold's weight (Come Sail Away's PackBoat sum, and the hold door's weighing as its window shut), and since
 // CARGO-ANYWHERE a packed ship's hold opens from anywhere with no gate on a stow - so the parts grew past what the

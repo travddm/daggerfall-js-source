@@ -1,4 +1,4 @@
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT ON THE
+// SD8c: THE BRASS REMNANT ON THE
 // PAGE - the fight as the page holds it (net/superDungeon/sdFightLink.js: the realm's words folded, my place in the fight), the arena's
 // set (scenes/superDungeon/sdRemnant.js: the bodies where the realm says, my `in`, my blows through the gate's three seams), its bar
 // (ui/superDungeon/sdRemnantBar.js on the gate's own), its bodies made (world/superDungeon/sdRemnantModel.js, world/superDungeon/sdRemnantArt.js), the arena's
@@ -27,7 +27,7 @@ import {
 import { remnantBarModel, sdBarNear, SD_BAR_TEXT, SD_BAR_NEAR_M, SD_ENDS_WARN_MS, SD_ENDS_NEAR_MS } from '../../../src/ui/superDungeon/sdRemnantBar.js';
 import { drawGateBossBar, destroyGateBossBar, FELL_HOLD_MS, FELL_FADE_MS } from '../../../src/ui/gate/gateBossBar.js';
 import { buildRemnantModel, buildHeartModel, remnantMatrix, remnantScale, SD_REMNANT_WEAR, SD_REMNANT_HEART_RECORD, SD_REMNANT_EYE_RECORD } from '../../../src/world/superDungeon/sdRemnantModel.js';
-import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';   // SD17 (PIN MOVED): the bodies' parts
+import { SD_RIG_PARTS } from '../../../src/scenes/superDungeon/sdRemnantRig.js';   // SD17 (
 import { remnantArt, echoMetalArt, SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, SD_REMNANT_ART_SIZE, SD_ECHO_METALS } from '../../../src/world/superDungeon/sdRemnantArt.js';
 import { realmPillarTris, realmFloorTris, realmColliderTris, realmLampTris, SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD, SD_REALM_ARCHIVE } from '../../../src/world/superDungeon/sdRealm.js';
 import { SD_STEPS_CRACKED_RECORD, SD_STEPS_BEAT_RECORD } from '../../../src/world/superDungeon/sdStepsArt.js';
@@ -197,7 +197,7 @@ test('SD8c MY PLACE IN THE FIGHT: my `in` is due standing in the arena until the
   assert.equal(L.joined(), false, 'a whole state fanned to everyone is no answer');
   L.word(st({ me: 1 }));
   assert.equal(L.joined(), true, 'the realm\'s answer: I am in it');
-  assert.equal(L.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'and say no more');   // PIN MOVED (AUDIT SD IV 8): while the fight is heard - a minute of silence is a fight lost unheard, and the `in` is due again (sd26_net)
+  assert.equal(L.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'and say no more');
   L.word(validSdOut({ k: 'lost', at: clock }));
   assert.equal(L.joined(), false, 'a fight lost');
   assert.equal(L.inDue(clock + 60_000), true, 'the next `in` makes a fresh one');
@@ -212,7 +212,7 @@ test('SD8c MY PLACE IN THE FIGHT: my `in` is due standing in the arena until the
   L.word(st());
   L.word(validSdOut({ k: 'no', m: SD_NO_WORDS[2] }));
   assert.deepEqual([said.at(-1), refused.at(-1)], [SD_FIGHT_TEXT.no['the arena is full'], 'the arena is full']);
-  assert.equal(L.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'the arena full: not into this fight');   // PIN MOVED (AUDIT SD IV 8): while it is heard - a refusal lapses with a fight gone silent
+  assert.equal(L.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'the arena full: not into this fight');
   L.word(validSdOut({ k: 'lost', at: clock }));
   assert.equal(L.inDue(clock + 60_000), true, 'its loss lapses it');
   L.word(validSdOut({ k: 'no', m: SD_NO_WORDS[3] }));
@@ -231,7 +231,7 @@ test('SD8c MY PLACE IN THE FIGHT: my `in` is due standing in the arena until the
   assert.equal(L2.inDue(clock + 60_000), false, 'fallen');
   f.fell = null; f.ended = { at: T0 }; f.fi = 7;
   L2.word(st());
-  assert.equal(L2.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'past its Hour');   // PIN MOVED (AUDIT SD IV 8): while it is heard - an Hour Ended gone silent was lost unheard
+  assert.equal(L2.inDue(clock + SD_FIGHT_HEARD_MS - 1), false, 'past its Hour');
   // the turns said once each, live alone
   const words = [];
   const L3 = createSdFightLink({ now: () => clock, say: (t) => words.push(t) });
@@ -244,7 +244,7 @@ test('SD8c MY PLACE IN THE FIGHT: my `in` is due standing in the arena until the
   L3.word(validSdOut({ k: 'ec', e: [[4, 9, T0 + 9, 0], [9, 9, T0, 0]], r: 0, at: T0 + 2 }));
   L3.word(validSdOut({ k: 'ph', n: 3, at: T0 + 3, up: T0 + 4 }));
   L3.word(validSdOut({ k: 'stun', until: T0 + 9, at: T0 + 5 }));
-  assert.deepEqual(words, [SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), SD_FIGHT_TEXT.echoFell('Ann', 0), SD_FIGHT_TEXT.echoRose(0), SD_FIGHT_TEXT.lastMoment, SD_FIGHT_TEXT.stunned]);   // AUDIT SD III (T14, PIN MOVED): the Dragon Break says its window
+  assert.deepEqual(words, [SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), SD_FIGHT_TEXT.echoFell('Ann', 0), SD_FIGHT_TEXT.echoRose(0), SD_FIGHT_TEXT.lastMoment, SD_FIGHT_TEXT.stunned]);   // AUDIT SD III (T14
 });
 
 // ── the realm's `me` ──────────────────────────────────────────────────
@@ -275,7 +275,7 @@ async function withRealm(fn) {
       const mara = cell.connect(); await cell.hello(mara, 'peer-mara', doorPose(10), { name: 'Mara' });
       await cell.raw(mara, JSON.stringify({ t: 'sd', k: 'found', s: rec.s, px: PX, py: PY }));
       const realm = world.room(sdTestKey(rec.s));
-      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (PIN MOVED)
+      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (
       const beat = async (ms) => { const end = clock + ms; while (realm.alarm.at != null && realm.alarm.at <= end) { clock = Math.max(clock, realm.alarm.at); await realm.fire(); } clock = end; };
       await fn({ realm, rec, beat });
     });
@@ -339,19 +339,19 @@ const feetAt = (x, z) => arenaToDungeon(x, z);
 
 test('SD8c THE SET STANDS THE BODIES: the Remnant, the two Echoes and the most Hearts a Reset raises, each a draw hidden until the fight stands it; their metals uploaded; with no fight to fight the Remnant waits where a fight begins it, facing the way in; it walks where the realm says, kneels stunned, is gone outside time and rises at the centre for the Last Moment, and sinks where it fell; an Echo rises out of the floor and sinks where it fell; a Heart stands while the Reset winds up (mutants: a body drawn outside time; no kneel; the fall left standing)', () => {
   const { set, draws, r, L, at } = rig();
-  assert.equal(draws.length, 1 + 2 + SD_HEARTS[1] + 3 * SD_RIG_PARTS.length + SD_GEAR_DRAWS + SD_DECOR_DRAWS.length);   // PIN MOVED (SD17): each body's turned parts and the gears after the Hearts; PIN MOVED (SD-LOOK S8): the decor after the gears
+  assert.equal(draws.length, 1 + 2 + SD_HEARTS[1] + 3 * SD_RIG_PARTS.length + SD_GEAR_DRAWS + SD_DECOR_DRAWS.length);
   assert.ok(draws.every(hidden), 'hidden until the first frame');
   assert.ok(r.up.some(([a, rec]) => a === SD_REALM_ARCHIVE && rec === SD_REMNANT_GOLD_RECORD) && r.up.some(([, rec]) => rec === SD_REMNANT_SILVER_RECORD), 'the Echoes\' metals uploaded');
   set.frame(0.016, null);
   assert.deepEqual(translation(draws[0]).map((v) => Math.round(v * 100) / 100), arenaToDungeon(...SD_REM_START).map((v) => Math.round(v * 100) / 100), 'waiting at its start');
-  assert.ok(draws.slice(1, 3 + SD_HEARTS[1]).every(hidden) && draws.slice(3 + SD_HEARTS[1] + SD_RIG_PARTS.length, 3 + SD_HEARTS[1] + 3 * SD_RIG_PARTS.length + SD_GEAR_DRAWS).every(hidden), 'no Echo, no Heart');   // PIN MOVED (SD17): the Remnant's own parts stand with it; PIN MOVED (SD-LOOK S8): and its decor
+  assert.ok(draws.slice(1, 3 + SD_HEARTS[1]).every(hidden) && draws.slice(3 + SD_HEARTS[1] + SD_RIG_PARTS.length, 3 + SD_HEARTS[1] + 3 * SD_RIG_PARTS.length + SD_GEAR_DRAWS).every(hidden), 'no Echo, no Heart');
   // pure: where it stands, and how
   const s0 = L.state();
   assert.deepEqual(remnantPose(SD_FIGHT_EMPTY, T0), { x: SD_REM_START[0], z: SD_REM_START[1], yw: Math.PI, sink: 0, shown: true }, 'no fight: waiting');
   const walking = foldSdFight(s0, validSdOut({ k: 'mv', b: 0, x: 0, z: 8, tx: 0, tz: 0, v: 2, at: T0 + 9000 }), T0 + 9000);
   assert.deepEqual([remnantPose(walking, T0 + 10_000).x, remnantPose(walking, T0 + 10_000).z], [0, 6]);
   assert.equal(remnantPose({ ...walking, su: T0 + 15_000 }, T0 + 10_000).sink, SD_KNEEL_M, 'kneeling, stunned');
-  // AUDIT SD III (V6, PIN MOVED): down and up over SD_KNEEL_EASE_MS - it dropped and stood in a frame
+  // AUDIT SD III (V6
   const stunAt = T0 + 10_000, su = stunAt + SD_STUN_MS;
   assert.equal(remnantPose({ ...walking, su }, stunAt).sink, 0, 'as the stun begins');
   assert.ok(Math.abs(remnantPose({ ...walking, su }, stunAt + SD_KNEEL_EASE_MS / 2).sink - SD_KNEEL_M / 2) < 1e-9, 'half down');
@@ -388,11 +388,11 @@ test('SD8c THE SET STANDS THE BODIES: the Remnant, the two Echoes and the most H
   L.word(validSdOut({ k: 'cxb', i: 7, c: 1, n: 'A', at: T0 + 94_000 }));
   at(T0 + 95_000);
   set.frame(0.016, null);
-  assert.deepEqual(draws.slice(3, 3 + SD_HEARTS[1]).map(hidden), [false, true, false, true, true, true, true, true], 'the two standing Hearts');   // PIN MOVED (SD17)
+  assert.deepEqual(draws.slice(3, 3 + SD_HEARTS[1]).map(hidden), [false, true, false, true, true, true, true, true], 'the two standing Hearts');
   assert.ok(near(translation(draws[3])[0], arenaToDungeon(10, 0)[0], 1e-4) && near(translation(draws[3])[2], arenaToDungeon(10, 0)[2], 1e-4), 'at its spot');
   at(T0 + 100_000);
   set.frame(0.016, null);
-  assert.ok(draws.slice(3, 3 + SD_HEARTS[1]).every(hidden), 'gone as the Reset lands - the law says no word for it');   // PIN MOVED (SD17)
+  assert.ok(draws.slice(3, 3 + SD_HEARTS[1]).every(hidden), 'gone as the Reset lands - the law says no word for it');
   set.clear();
 });
 
@@ -500,7 +500,7 @@ test('SD8c THE BAR: the Brass Remnant\'s name over the phase it fights in, its h
   // the Hour's own first
   const P = SD_BLOWS.pulse;
   const pulse = foldSdFight(hand, validSdOut({ k: 'atk', b: SD_BODY.hour, i: 4, a: P.id, at: at + 500, x: 0, z: 0, yw: 0, tg: [], n: 0 }), T0);
-  // AUDIT SD II (L6 F1, PIN MOVED): a body's blow still winding up over the Hour's own (the Pulse took the callout from
+  // AUDIT SD II (L6 F1
   // what could be dodged); once it has landed, the Pulse
   assert.equal(remnantBarModel(pulse, at - 100).callout.text, A.name, 'its own blow, still winding up, over the Pulse');
   assert.equal(remnantBarModel(pulse, at + 100).callout.text, P.name, 'landed: the Pulse');
@@ -508,7 +508,7 @@ test('SD8c THE BAR: the Brass Remnant\'s name over the phase it fights in, its h
   let brk = foldSdFight(s0, validSdOut({ k: 'ph', n: 2, at: T0 + 20_000, up: T0 + 22_500 }), T0 + 20_000);
   brk = foldSdFight(brk, validSdOut({ k: 'ec', e: [[25, 50, T0 + 22_500, 0], [0, 50, T0 + 22_500, T0 + 30_000]], d: 1, n: 'A', at: T0 + 30_000 }), T0 + 30_000);
   const b = remnantBarModel(brk, T0 + 31_000);
-  // AUDIT SD II (L6 F6, PIN MOVED): a fallen Echo's rising counted, in the callout and its chip (it said "fallen")
+  // AUDIT SD II (L6 F6
   assert.deepEqual([b.warded, b.callout.text, b.host, b.hostNear, b.spent, b.title], [true, SD_BAR_TEXT.rises(1, 14), SD_BAR_TEXT.echoes('50%', 'rises in 14s'), false, [true, false], SD_PHASE_NAMES[1]]);
   const V = SD_BLOWS.volley, vat = T0 + 34_000;
   const gv = foldSdFight(brk, validSdOut({ k: 'atk', b: SD_BODY.gold, i: 8, a: V.id, at: vat, x: -9, z: 2, yw: 0, tg: [[1, 1]] }), T0);
@@ -597,7 +597,7 @@ test('SD8c THE BODIES MADE: the Remnant its own height from its feet, its body w
   assert.ok(det > 0, 'a proper turn - never a mirror');
   assert.ok(near(Math.atan2(fwd[0] - 5, fwd[2] + 3), Math.PI / 2), 'the law\'s bearing: atan2(dx, dz)');
   // the metals
-  assert.deepEqual(remnantArt().map(([rec]) => rec), [SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, 25, 26, 27, 28, 29, 30]);   // SD18c (PIN MOVED): and each Ending's light
+  assert.deepEqual(remnantArt().map(([rec]) => rec), [SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, 25, 26, 27, 28, 29, 30]);   // SD18c (
   const others = [SD_STEPS_CRACKED_RECORD, SD_STEPS_BEAT_RECORD, ...Object.values(SD_HALL_GLOW_RECORD), SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD];
   assert.ok([SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD].every((r) => !others.includes(r)), 'records of their own');
   const g = echoMetalArt('gold'), s = echoMetalArt('silver');
@@ -617,7 +617,7 @@ test('SD8c THE PILLARS STAND: the arena\'s four pillars on the collider, their s
   const p = realmPillarTris();
   assert.equal(p.length, 4 * 5 * 2 * 9, 'four pillars, four sides and a top each, two triangles a face');
   const all = realmColliderTris(), floors = realmFloorTris(), lamps = realmLampTris();
-  assert.equal(all.length, floors.length + p.length + lamps.length);   // AUDIT SD II (L2 F14 - PIN MOVED): and the lamps' posts after them
+  assert.equal(all.length, floors.length + p.length + lamps.length);   // AUDIT SD II (L2 F14
   assert.deepEqual([...all.slice(floors.length, floors.length + p.length)], [...p]);
   for (let i = 0; i < p.length; i += 3) {
     const [x, y, z] = dungeonToRealm(p[i], p[i + 1], p[i + 2]);

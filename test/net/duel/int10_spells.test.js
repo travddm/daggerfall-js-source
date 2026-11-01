@@ -1,5 +1,4 @@
-// INT10 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): SPELLS BETWEEN PLAYERS CAPPED BY THE REFEREE, AS THE ARENA'S ARE. DUEL1 and WILD1 handed a player's
+// INT10: SPELLS BETWEEN PLAYERS CAPPED BY THE REFEREE, AS THE ARENA'S ARE. DUEL1 and WILD1 handed a player's
 // spell to its target's own machine (the whole spell, at the caster's claimed level) - a crafted client's Damage Health
 // was whatever it said, and a target that never applied one never took it. Since INT8 and INT9 every place one player's
 // spell meets another's is a referee's: the caster's own machine counts the harm on a stand-in - a neutral one since
@@ -44,7 +43,7 @@ test('INT10 ONE CAP: a cast between players is clipped to one cast\'s most and b
   wildZone(z, 'acct-a', { id: 'peer-a', lv: 10 }, true, near(-1), 0);
   wildZone(z, 'acct-b', { id: 'peer-b', lv: 10 }, true, near(1), 0);
   // both in the zone a mend's length first (AUDIT INT9: a fighter mends only once it has stood there as long), so every
-  // blow below is a mend's moment - the striker unstruck, and its own casts' window never cleared by it - PIN MOVED
+  // blow below is a mend's moment - the striker unstruck, and its own casts' window never cleared by it
   // (ZONE-GRACE, 2026-10-26): and past the safe passage their entry gave them, whichever is longer
   const t0 = Math.max(WILD_REF.mendMs, WILD_GRACE.ms) + 1000;
   const w = [0, 1, 2, 3].map((k) => wildBlow(z, 'acct-a', 'acct-b', { d: 9999, r: SIEGE_HIT.Spell, rid: `00000000000${k}` }, t0 + k * 100));

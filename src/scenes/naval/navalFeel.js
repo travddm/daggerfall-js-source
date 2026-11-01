@@ -1,6 +1,5 @@
 // @ts-check
-// COMBAT-FEEL (2026-10-17, the owner: "Improve and polish combat and visuals"; bible/03-World/Naval-Refit.md
-// COMBAT-FEEL) - WHAT A SEA FIGHT FEELS LIKE AT MY RAIL: the moments the sea fight had no word for, wired by the naval
+// COMBAT-FEEL - WHAT A SEA FIGHT FEELS LIKE AT MY RAIL: the moments the sea fight had no word for, wired by the naval
 // host (scenes/naval/navalHost.js) and drawn by its effects (systems/naval/navalEffects.js) and sounds
 // (systems/naval/navalSounds.js). Each is the port's own - Daggerfall has no sea.
 //

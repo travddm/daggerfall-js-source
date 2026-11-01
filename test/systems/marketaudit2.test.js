@@ -1,4 +1,4 @@
-// MARKET-AUDIT, the rest (2026-10-05, Mac: "Fix everything") - WHAT THE AUDIT NAMED AND LEFT, FIXED. Every realm act's
+// MARKET-AUDIT, the rest - WHAT THE AUDIT NAMED AND LEFT, FIXED. Every realm act's
 // reserve gives back exactly what its payment took (net/realm/realmGoldLaw.js walletReserve over court.js payUndoable): the
 // guild's founding and deposit, a room's rent, a home's claim, a decor piece and its change, as the market's gold buy -
 // each gave back its whole cost as `credit`, coins or the bank's, whatever had paid. The account door: a 2xx whose body

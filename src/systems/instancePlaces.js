@@ -1,8 +1,5 @@
 // @ts-check
-// INSTANCES (2026-10-15, Mac: "For quests and other uses, including future work, lets implement an instanced system ...
-// The player approaches, should be met with an enhanced UI popup that lets them select public or instanced (if
-// applicable)"; asked where: "Dungeons with your quest", "Privateer's Hold", "Building interiors"; who: "You and your
-// party"; bible/11-Multiplayer/Instances.md): THE DOOR'S LAW - pure, no page. Which quests point at a place, what its
+// INSTANCES: THE DOOR'S LAW - pure, no page. Which quests point at a place, what its
 // door offers, and where a quest's things stand online - and (HEIR-WHOLE) which of the line's remains lie in it whole.
 //
 // The room is net/instanceRoom.js's; the popup and the digests are scenes/instanceDoor.js's; the hosts only ask.
@@ -139,7 +136,7 @@ export function partnerInstances(members, base, ownerOf = () => null, stood = nu
  *   { kind: 'join', name, acct, owner, epoch }      a party member's instance standing here now, or the one I last stood
  *                                                   in here (partnerInstances' `stood`, WIPE-RETURN)
  *   { kind: 'mine' }                                my instance - a quest of mine names the place, or the Hold
- *   { kind: 'castle', owner, epoch }             DOMAIN2: my guild's own castle (bible/11-Multiplayer/Domains.md 6) -
+ *   { kind: 'castle', owner, epoch }             DOMAIN2: my guild's own castle (6) -
  *                                                   `castle` the door's `{ owner, epoch }`, the guild's digest and the
  *                                                   epoch the guild's view names
  * Offline, or at a relay that keeps no instance, there is nothing to choose. A place with no instance to offer has no

@@ -1,7 +1,5 @@
 // @ts-check
-// START1 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md; Mac: "Each of these quests should tie into the main
-// story seamlessly but allow for the main quest to be started on the player's watch", "Keep privateers hold, give it a
-// new quest", "A letter they open"): THE STARTS - the quest a new character begins in, and the main quest it hands on to.
+// START1: THE STARTS - the quest a new character begins in, and the main quest it hands on to.
 // A leaf: the bridge (scenes/quest/questBridge.js gameStartQuests), the machine's protected list (quest/machine.js
 // PROTECTED_QUESTS), the main quest's name test (quest/questLists.js isMainQuestName), the questlines' layer
 // (questlines/qlLayer.js), the places' rows (starts/startPlaces.js), the start-choice page (ui/startChoice.js) and the
@@ -24,16 +22,14 @@
 // Emperor's quest") is the classic start's, and no start shows it now: the port's patch takes its `say` out
 // (quest/questPatches.js). A departure, Port-Ledger section A.
 //
-// START2 (2026-10-24, the owner: "Each new region will each have their own unique starting quest/dungeon within that
-// region"): THE PROVINCES' STARTS - one a province past the Bay, each in a dungeon of the province's own near its
+// START2: THE PROVINCES' STARTS - one a province past the Bay, each in a dungeon of the province's own near its
 // capital (TESA8's lairs: the nearest of the kinds its story wants, scenes/startsHost.js), each under the same
 // contract. The new character chooses where their story begins on the page character creation ends with
 // (ui/startChoice.js), their race's homeland chosen for them first. A character born anywhere else - a family's heir at
 // its seat (LEGACY1), the test room's outdoor presets (AUDIT STARTS W7: its others keep `?classic`, and the Bay's start)
 // - is handed the commission at once (HAND_START_QUEST).
 
-/** The Iliac Bay's start: Privateer's Hold, the wreck, and the commission the tide carried in (Mac: "Keep privateers
- *  hold, give it a new quest"). */
+/** The Iliac Bay's start: Privateer's Hold, the wreck, and the commission the tide carried in. */
 export const BAY_START_QUEST = '_STARTIB';
 /** START2: the start of a character born at no start - the commission in their pack from the first moment. */
 export const HAND_START_QUEST = '_STARTHD';
@@ -78,7 +74,7 @@ export const isStartQuestName = (questName) => {
   const n = String(questName ?? '').toUpperCase();
   return START_QUESTS.some((s) => s.toUpperCase() === n);
 };
-/** THE WRIT (bible/03-World/Passage.md "The writ"): does this start's commission carry the Crown's writ of passage? A
+/** THE WRIT ("The writ"): does this start's commission carry the Crown's writ of passage? A
  *  province's does and the commission in hand does (their letters, 1030: "This letter is Our writ of passage"); the Bay's
  *  carries none (its 1030: "to be opened in the Iliac Bay and nowhere else") - AUDIT STARTS V3. */
 export const carriesWrit = (questName) => isStartQuestName(questName) && String(questName).toUpperCase() !== BAY_START_QUEST.toUpperCase();

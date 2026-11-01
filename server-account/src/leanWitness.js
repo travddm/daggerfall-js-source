@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LEAN-WITNESS (2026-10-19, the account database overloaded again: "D1 DB
-// is overloaded. Requests queued for too long." on the harvest and the
-// pixels; bible/11-Multiplayer/Scale-Arc.md LEAN-WITNESS; migration 0135)
+// LEAN-WITNESS
 // - A WITNESSED KEY'S ANSWERS, READ AS FAR AS THEY CAN MATTER.
 //
 // A hall's and a seat's facts are the first answer three accounts agree on

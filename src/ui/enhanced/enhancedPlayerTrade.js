@@ -102,7 +102,7 @@ export function mountEnhancedPlayerTrade(hostEl, { session, deps }) {
   };
   const unstage = (item) => { if (session.phase === 'open' && !session.myConfirm) applyOffer(entries().filter((e) => e.item !== item)); };   // AUDIT DROPS B1
 
-  // TRADE-VIRT (bible/07-Rendering/Performance-Priority.md TRADE-VIRT): A PICTURE INTO ITS TILE (ui/enhanced/landingTiles.js).
+  // TRADE-VIRT (TRADE-VIRT): A PICTURE INTO ITS TILE (ui/enhanced/landingTiles.js).
   // Its `onReady` was a fresh function a row, so the fitted door woke up to eight a picture, each a whole repaint that
   // signed more rows up for the pictures still coming: 2,160 repaints of a cold 300-piece pack, 200 s to settle.
   const tiles = landingTiles((line, landed) => {

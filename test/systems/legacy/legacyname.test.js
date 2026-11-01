@@ -1,4 +1,4 @@
-// LEGACY-NAME (2026-10-06, bible/06-Systems/Legacy-Arc.md section 5's naming; found re-reading LEGACY-SHEET's own title):
+// LEGACY-NAME:
 // A HOUSE IS NAMED FOR ITS SEAT WHEN ITS FOUNDER HAS NO SURNAME - EVEN WHEN THE SEAT COMES LATER. The law: "the family's
 // surname is the founder's (their name's last word, or 'of <seat>' when they have none)". It was applied only AT THE
 // FOUNDING, and a new character founds in Privateer's Hold, where no town stands: the seat was noted at the first town and
@@ -118,7 +118,7 @@ test('LEGACY-NAME the words: a seat\'s house says itself once - the pages, the s
   noteNews(f, 'died', 'Janome of Sentinel', 10, SENTINEL.mapId);
   const [item] = newsFor(f, SENTINEL.mapId, 20);
   assert.equal(item.house, 'Sentinel', 'the news says House Sentinel, never House of Sentinel');
-  // no line of the house's news says "{who} {house}" - "Tlist Sentinel" for a seat's house. PIN MOVED (AUDIT LEGACY III
+  // no line of the house's news says "{who} {house}" - "Tlist Sentinel" for a seat's house.
   // A16/F2): `{who}` is filled as the renderer fills it, with the member's FIRST name (meetups.js firstNameOf) - this pin
   // filled the whole name, which no town passes, and the record called the old line a doubled surname
   for (const [kind, scripts] of Object.entries(KIN_NEWS)) {

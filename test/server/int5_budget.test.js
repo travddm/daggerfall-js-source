@@ -1,6 +1,5 @@
-// INT5 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "Measure 7 days, then enforce"): THE
+// INT5: THE
 // WEALTH BUDGET - a gain no witness explains, against a bucket the time played fills.
-// PIN MOVED (its audit, the same day): the first judgement CHARGES what a save adds to the realm's baseline (its stored
 // record at the cutover, a newborn's purse, customs' allowance) - it was the baseline itself, and any save could be;
 // a win's spoils past the cap are never clamped away; the bucket keeps no debt while it only measures; a crafted or
 // market-bought piece's arrival is witnessed once; the level the budget reads is the one the realm trusts; a change of
@@ -126,7 +125,7 @@ test('INT5 service: enforce on (staff) - a gain past the bucket holds the trade 
     assert.deepEqual(t.kinds(), ['staff', 'budget'], 'and nothing new found - the hold stands until it is paid');
     t.play(3_600);
     assert.equal(await t.put(100 + 80_000), null, 'an hour of play pays it back');
-    // the save claims level 45 (PIN MOVED: LEVEL-45, the judge's top - it claimed 1000); the realm trusts what its play reached - and a win's grant reads that one
+    // the save claims level 45 (
     t.play(LEVEL_RISE_S * 2);
     await t.put(100 + 80_000, { level: 45 });
     assert.equal(t.row().level_seen, 1 + Math.floor((3_600 + LEVEL_RISE_S * 2) / LEVEL_RISE_S), 'the level its play reached');

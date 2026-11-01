@@ -1,4 +1,4 @@
-// SPAWN-HOLE (AUDIT LEFT IN THE BAY A1, bible/06-Systems/Systems-Arc.md SPAWN-HOLE): online with the land past the Bay, the
+// SPAWN-HOLE (AUDIT LEFT IN THE BAY A1, SPAWN-HOLE): online with the land past the Bay, the
 // pixel build asks the ground's place of every pixel (scenes/pixelBuild.js spawnGroundPlace.groundLocationAt), and where
 // the spawn roll stood a dungeon on dry, empty land the host cloned it - and the clone's id (world/spawnedDungeons.js
 // spawnedMapId) threw for a pixel past the Bay. The build failed, BUILD-RETRY asked again, and the pixel never stood: no
@@ -45,7 +45,6 @@ function rolled(x0, y0, w, h) {
   return out;
 }
 
-// PIN MOVED (SPAWN-WORLD, the fix's next commit): the guard SPAWN-HOLE stood was the stop-gap - past the Bay the spawn now
 // stands under its own id, the world's spawn lane (world/worldWide/worldLanes.js), so the pin is that the build's ask
 // answers, and answers the spawn
 test('SPAWN-HOLE: past the Bay the ground\'s place never throws - a pixel the roll stands a spawn on builds, its ground the spawn\'s, under its world id - and the Bay\'s spawns stand as they did (mutants: the world lane gone from spawnedMapId)', () => {

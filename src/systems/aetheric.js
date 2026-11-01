@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SET6 (2026-09-26) — AETHERIC, AND RUHN'S REGALIA.
+// SET6 — AETHERIC, AND RUHN'S REGALIA.
 //
-// Mac: "Boss kills has the chance of dropping a rare boss themed
-// weapon/armor set with the rarity Atheric (new)". Design, and the
-// record of every slice: bible/11-Multiplayer/Sigil-Sets.md section 6.
+// . Design, and the
+// record of every slice:
 //
 // ═══ AETHERIC ══════════════════════════════════════════════════════
 //
@@ -40,10 +39,9 @@
 // to the last Magic piece, stays exactly what it was for its seed: a
 // Regalia piece REGALIA_CHANCE of the time, which one by the same seed.
 //
-// ═══ RAID4b: THE RAIDING PARTIES' OWN (2026-09-28) ════════════════
+// ═══ RAID4b: THE RAIDING PARTIES' OWN ════════════════
 //
-// Mac, on World Events - Raiding Parties online: "3. We can also add
-// renown and it's own atheric + armor sets". Three more Aetheric sets,
+// . Three more Aetheric sets,
 // one a raiding party (systems/sigil/sigilSets.js 'oath', 'thieftaker',
 // 'orcsbane'), nine fixed records each - the nine places, a one-handed
 // weapon and a shield worn together - of the party's own make: the
@@ -55,10 +53,9 @@
 // the Legendary band's floor too. EVERY RECORD NAMES ITS MAKE, and the
 // wire's check (validSetMarks) holds each to its own.
 //
-// ═══ SERPENT-SET: THE OLD COIL'S OWN (2026-10-05) ═════════════════
+// ═══ SERPENT-SET: THE OLD COIL'S OWN ═════════════════
 //
-// Mac: "The serpent boss needs to use the currency from oblivion gate
-// and have its own equipment rewards". One more Aetheric set,
+// . One more Aetheric set,
 // Sethrakul's Coilscale (systems/sigil/sigilSets.js 'coilscale'): nine fixed
 // records of Ebony - the deep's own black - a one-handed Katana and a
 // shield among them. Its affixes and its blow stand at the Legendary
@@ -68,7 +65,7 @@
 // (systems/serpent/serpentSpoils.js), rolled after everything the hoard rolled
 // before; no drop, shelf or Broker carries it, as no raid set's is.
 //
-// SD9d (2026-10-07, the Super Dungeons arc): and THE BRASS OF NUMIDIUM
+// SD9d: and THE BRASS OF NUMIDIUM
 // (systems/sigil/sigilSets.js 'numidium'), what the Warp kept of the Walking
 // Brass: nine fixed records of Dwarven make - the Dwemer's brass - a
 // round shield and a one-handed Longsword among them, every number at
@@ -98,7 +95,7 @@ export const REGALIA_SET = 'ruhn';
 
 /** The top of the Legendary band, per affix kind - every Regalia number is one, but the gate's fire. */
 const top = (id) => AFFIX_RANGES[id].legendary[1];
-/** AUDIT FINAL (Mac: "Lower per piece"): THE GATE'S FIRE, +10 A PIECE - not the band's top. At +50 an armour piece, any
+/** AUDIT FINAL: THE GATE'S FIRE, +10 A PIECE - not the band's top. At +50 an armour piece, any
  *  two worn made a fire saving throw of 100 (spellcast.js: total immunity), and the Burning Gate tier's own +15 to +45
  *  meant nothing. Eight pieces now carry +80, and the tier's fire is what takes a full Regalia past immunity. */
 export const REGALIA_FIRE_RESIST = 10;
@@ -232,7 +229,7 @@ export const SERPENT_SET_PIECES = Object.freeze([
     'A fang of the Old Coil, ground to an edge by a Hammerfell smith who would not say how.'),
 ]);
 // ── SD9d: THE BRASS OF NUMIDIUM ─────────────────────────────────────
-/** SD9d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): the Brass Remnant's own,
+/** SD9d: the Brass Remnant's own,
  *  nine in the places' order - the seven body pieces, a round shield (a gear's face) and a ONE-HANDED Longsword, so all
  *  nine are worn at once - Dwarven, the Dwemer's brass. The hardest fight in the game pays what the gate's Warden does:
  *  every affix at the Legendary band's TOP (the Regalia's), the blow the sigil's greatest. One resistance of an element at
@@ -261,7 +258,7 @@ export const NUMIDIUM_SET_PIECES = Object.freeze([
     'Broken from the colossus\'s heart-clock. It points at what is about to end.'),
 ]);
 // ── WITCH1: THE WYRD'S RAIMENT ──────────────────────────────────────
-/** WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): what the Glenmoril Wyrd wear to the Witches' Festival - nine
+/** WITCH1: what the Glenmoril Wyrd wear to the Witches' Festival - nine
  *  in the places' order (the seven body pieces, a round shield and a ONE-HANDED dagger, the Witchmoon Athame, so all nine
  *  are worn at once), LEATHER - a witch's, and a caster's: the Mage, the Sorcerer, the Nightblade and their kind wear eight
  *  of the nine (never the shield), every one but the Burglar, the Monk and the Knight reaches Soul Harvest (AUDIT WITCH1
@@ -291,7 +288,7 @@ export const WYRD_SET_PIECES = Object.freeze([
     'Quenched in the light of both moons on the 13th of Frostfall.'),
 ]);
 // ── STAR7: THE STARSPUN WEAVE ───────────────────────────────────────
-/** STAR7 (2026-10-20, bible/11-Multiplayer/Starfall.md section 6): the Witches' Festival's own - the thread Mephala's covens
+/** STAR7: the Witches' Festival's own - the thread Mephala's covens
  *  wind about a fallen star, cut from the stars they lost and laid over pale plate - nine in the places' order (the seven
  *  body pieces, a buckler and a ONE-HANDED Shortsword, so all nine are worn at once), Elven, light as the thread is. A
  *  star is held three times an hour while the festival runs, so its numbers are the raiding parties' measure: every affix
@@ -320,7 +317,7 @@ export const STARSPUN_SET_PIECES = Object.freeze([
     'Ground from the spindle a coven wound its thread on. It still turns in the hand.'),
 ]);
 // ── SEA-SET: THE ELTHERIC TIDEMAIL ──────────────────────────────────
-/** SEA-SET (2026-10-22, bible/11-Multiplayer/Sigil-Sets.md section 6h): the deep sea's own - every piece taken off one of the
+/** SEA-SET: the deep sea's own - every piece taken off one of the
  *  Eltheric Ocean's legends or out of the deep's vaults - nine in the places' order (the seven body pieces, a round shield
  *  and a ONE-HANDED Saber, so all nine are worn at once), Adamantium, the one metal no other set wears: the sea's blue.
  *  The deep is a world boss's ground (the Old Coil's measure): every affix at the Legendary band's MIDDLE, the blow the

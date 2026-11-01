@@ -1,5 +1,4 @@
-// CARDS2b (2026-10-07, bible/11-Multiplayer/Tavern-Cards.md section 12; Mac: "a sort of table enviroment where you can
-// see other players sprites"): THE SEATED BODY. Driven: the seated request's every point (player/seatPose.js) at two
+// CARDS2b: THE SEATED BODY. Driven: the seated request's every point (player/seatPose.js) at two
 // facings, its mapping into the rig's space (the climb rig's climbRequestToRig), and the pose SOLVED on retail's own
 // biped - the hips level with the knees, the shins standing, the feet and the hands on their marks, the head lowered to
 // the seated eye; the wire's `st` (bounded, omitted standing, sent at once, eased whole); the peer's seat request and its

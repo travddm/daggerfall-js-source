@@ -14,7 +14,6 @@ import { ARCHIVE_FOOT, ARCHIVE_HORSE, frameTime, TABLE_FRAMES } from '../../../s
 import { setModSetting, _resetModSettings } from '../../../src/systems/modSettings.js';
 
 const MOD = 'eye-of-the-beholder';
-// PIN MOVED (LAYERED-GEAR-ON: Layered Gearing is on by default, the owner 2026-10-19): these pins are Eye of the
 // Beholder's own body, 1:1 with PlayerBillboard, so they wear its sets - Skins, Graphics.LayeredGear 0. The layered
 // body has its own pins (worn_armour.test.js, skinmode_toggle.test.js).
 const resetSettings = () => { _resetModSettings(); setModSetting(MOD, 'Graphics.LayeredGear', 0); };
@@ -497,7 +496,7 @@ test('EOTB5: the mod\u2019s art is EXCLUDED from Vite\u2019s inlining - and sinc
   const m = /assetsInlineLimit: \(filePath\) => \((.*?)\),/.exec(viteConfig);
   assert.ok(m, 'and it is a callback, not a number');
   assert.match(m[1], /\?\s*false\s*:\s*undefined/, 'false for a mod\u2019s file, UNDEFINED for everything else');
-  // INLINE1 (2026-09-20): this pin used to hold "every other vendor asset keeps
+  // INLINE1: this pin used to hold "every other vendor asset keeps
   // the default" and named dynamic-skies as the example. That was the premise
   // that failed - the allow-list of three folders was an enumeration, twenty
   // vendor folders landed after it and none joined, and Shield Widget's 275
@@ -554,10 +553,9 @@ test('OW-BIG (Mac: "The player sprite needs to appear larger"): under the travel
   assert.notEqual(big, plain, 'a batch of its own at the step');
   assert.deepEqual([big.size.w, big.size.h].map((v) => Number(v.toFixed(6))), [plain.size.w * 6, plain.size.h * 6].map((v) => Number(v.toFixed(6))), 'six times the sprite');
   assert.equal(big.selfCard, false, 'not the player\'s own card at the lamps');
-  // PIN MOVED (AUDIT OW5 R2): the giant casts nothing - noShadow, which every shadow replay skips; selfCard off was never that
   assert.equal(big.noShadow, true, 'no giant\'s shadow');
   assert.ok(!plain.noShadow, 'the sprite at its own size casts as ever');
-  assert.match(readFileSync(new URL('../../../src/render/shadowPass.js', import.meta.url), 'utf8'), /if \(b\.noShadow \|\| b\.castOnly \|\| SHADOW_NO_CAST_ARCHIVES\.has\(b\.archive\)/, 'the replay skips a noShadow batch in every pass');   // PIN MOVED (MWNPC16): and a cast-only one - its Morrowind body casts
+  assert.match(readFileSync(new URL('../../../src/render/shadowPass.js', import.meta.url), 'utf8'), /if \(b\.noShadow \|\| b\.castOnly \|\| SHADOW_NO_CAST_ARCHIVES\.has\(b\.archive\)/, 'the replay skips a noShadow batch in every pass');
   const n = r.batches.length;
   draw({ yaw: 0.3, up: [0, 1, 0], grow: 6 });
   assert.equal(r.batches.length, n, 'the same step: the same batch');

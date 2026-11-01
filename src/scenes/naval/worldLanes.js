@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW3 (2026-10-24, bible/03-World/World-Wide.md WW3): THE WORLD'S PACKET LANES - the Bay's lanes as they always were,
+// WW3: THE WORLD'S PACKET LANES - the Bay's lanes as they always were,
 // and the lanes of the sea past it between the world's ports (world/worldWide/worldPorts.js), one book of both.
 //
 // Out of scenes/world.js (HOST-SPLIT: the host wires it). SEA-LANES (systems/naval/seaLanes.js) ran its packets between
@@ -97,7 +97,7 @@ export function pictureSeaMask(trace) {
     && !(x + 1 > bay.x0 && x < bay.x1 && y + 1 > bay.y0 && y < bay.y1);
 }
 
-/** SMOOTH-LAND (bible/03-World/Tamriel.md): how far (picture cells) a roadstead looks for the cell its lane leaves from. */
+/** SMOOTH-LAND: how far (picture cells) a roadstead looks for the cell its lane leaves from. */
 export const MOOR_REACH = 2;
 
 /** SMOOTH-LAND: THE CELL A ROADSTEAD MOORS OFF - its own picture cell when that is the picture's open sea; else (the land's
@@ -215,7 +215,7 @@ export function beyondLaneWay(lane, openNative) {
   return { pts, len };
 }
 
-// ── WW7-10 (bible/03-World/World-Wide.md WW7-10): THE LANES ACROSS THE BAY'S EDGE ─────────────────────────────────────
+// ── WW7-10 (WW7-10): THE LANES ACROSS THE BAY'S EDGE ─────────────────────────────────────
 // "Same for ships" and "the sea is one sea" (WW3): the Bay's lanes keep to the Bay's water and the lanes past it to the sea
 // past it, so no packet sailed between a Bay port and a port past the Bay. A CROSSING LANE does: each port past the Bay
 // runs packets to its LANE_NEIGHBOURS nearest of the Bay's ports within BEYOND_LANE_MAX_PX (SEA-LANES' own law, read

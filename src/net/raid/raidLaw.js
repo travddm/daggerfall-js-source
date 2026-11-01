@@ -1,7 +1,6 @@
 // @ts-check
-// RAID3 (2026-09-27, Mac, on World Events - Raiding Parties online: "1. Server" - the relay tracks each raid's kill
-// count, kept even if everyone leaves, the cleanse and the participants, and signs the rewards): A TOWN'S RAID, AS THE
-// RELAY KEEPS IT. Design: bible/03-World/Raiding-Parties.md, "The relay holds the raid (RAID3)".
+// RAID3: A TOWN'S RAID, AS THE
+// RELAY KEEPS IT. Design:, "The relay holds the raid (RAID3)".
 //
 // THE LEDGER lives in the raided town's CELL (net/wire.js worldRoom - the room every player standing in the town is
 // in), one a raid, in the cell object's storage for the raid's window and RAID_KEEP_MS past it: so a raid's count
@@ -32,7 +31,7 @@
 
 /** A raid's key - RaidEnemyName's bracket [IL_13cc]: `region:location:day` (systems/raidingParties.js raidKey).
  *  AUDIT RAID R5: CANONICAL - no leading zero (`3:07:0600` was forty spellings of one raid, at the relay and at the
- *  account service's primary key alike). WW6 (bible/03-World/World-Wide.md WW6): EVERY REGION OF THE WORLD, 0..70 - a Bay
+ *  account service's primary key alike). WW6 (WW6): EVERY REGION OF THE WORLD, 0..70 - a Bay
  *  region (0..61) with its town's MAPS.BSA location (0..9999, as it always was), a province's region past the Bay (62..70,
  *  WW-R) with its town's OWN location index, negative (world/arenaLocations.js arenaLocationIndex,
  *  world/tamrielCapitals.js capitalLocationIndex - no MAPS.BSA row holds a place past the Bay; the town economy's
@@ -209,9 +208,7 @@ export function raidTop(earned) {
  *  R1) its signature - the client hears it only of the raid it holds. */
 export const raidLedgerState = (led) => ({ k: 'st', key: led.key, n: led.n, tg: led.tg, st: led.st, c: led.cl ? led.cl.at : 0, g: raidSig(led) });
 
-// ═══ RAID-ROLL (2026-09-28, Mac: "Fix it" - AUDIT RAID's "not changed": the relay held no copy of the day's schedule,
-// so a modified client could name a raid the day never rolled, stand on its own pixel and be paid for it, and a
-// many-socket griefer could fill a cell's places with raids it kept "fought"). THE DAY'S ROLL IS THE RELAY'S TOO. ═══
+// ═══ RAID-ROLL. THE DAY'S ROLL IS THE RELAY'S TOO. ═══
 //
 // A raid is five draws of the day's own generator - its region, its town, its start, its party, its target - and the
 // last three are the GENERATOR'S ALONE: no game data decides them. So the relay reads every word against the day's
@@ -261,8 +258,7 @@ export const RAID_SLOTS_MAX = raidsPerDay(RAID_REGIONS_MAX);
  *  slots the relay reads. @param {number} groups */
 export const raidLaneCount = (groups) => Math.min(RAID_SLOTS_MAX, raidsPerDay(groups));
 
-// ═══ WW6 (2026-10-27, bible/03-World/World-Wide.md WW6 - the owner's call taken: "Every single thing here needs to be
-// addressed. No exceptions."): THE RAIDS PAST THE BAY - A LANE A THEATRE. ═══
+// ═══ WW6: THE RAIDS PAST THE BAY - A LANE A THEATRE. ═══
 //
 // The Bay's raids are lane 0, the roll they always were, to the byte. Each province past the Bay is a lane of its own (its
 // theatre, world/worldWide/worldGrid.js - its region 61 + its theatre, formats/mapsTables.js regionOfTheatre): its own day's
@@ -277,8 +273,7 @@ export const RAID_BAY_REGIONS = 62;
 /** The lanes: the Bay's, then the nine provinces' (world/worldWide/worldGrid.js THEATRE_COUNT - pinned equal). */
 export const RAID_LANES = 10;
 /** The open zone's lane - Cyrodiil (systems/wild/wildZone.js WILD_REGION 70, its theatre 9): it stands no raid, the gates'
- *  recorded law (the open zone stands no site-bound world event - PVPDUNGEONS, the owner: "Do not spawn world events in the
- *  PVP zone!"). */
+ *  recorded law (the open zone stands no site-bound world event - PVPDUNGEONS). */
 export const RAID_ZONE_LANE = 9;
 /** A region's lane: 0 for a Bay region, a province's theatre past it, -1 for none. @param {unknown} r */
 export const raidLaneOfRegion = (r) => {
@@ -311,7 +306,7 @@ export function raidSideOk(w) {
 }
 /**
  * WW6: THE PARTIES A LANE'S DAY DRAWS - the mod's three (0 knights, 1 bandits, 2 orcs) on the Bay, as it always was; past it
- * those its province's OWN FAUNA stands (TESA-BIOME, bible/03-World/Tamriel-Biomes.md): a party whose kinds - the Knight;
+ * those its province's OWN FAUNA stands (TESA-BIOME): a party whose kinds - the Knight;
  * the Rogue, the Thief or the Burglar; an orc - some roster of the province names, by day, by night or in its towns
  * (systems/tamrielFauna.js ROSTERS and TOWN_ROSTERS - pinned equal). Black Marsh stands no orc (its Recorded choice 4), so no
  * orc war band raids it; the Wrothgarian Mountains' Orsinium and Malabal Tor's Wood Orcs do. The relay draws a lane's slots

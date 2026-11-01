@@ -1,5 +1,5 @@
 // @ts-check
-// GALLEON (2026-10-01, Mac: "the sails and ropes"): THE NEW GALLEON'S RIG - her yards, her five sails, and her rope.
+// GALLEON: THE NEW GALLEON'S RIG - her yards, her five sails, and her rope.
 //
 // Mac's scene stands two bare masts, a crow's nest and a bowsprit; the rig is built here over them, in the boat's frame
 // (Unity's: +x starboard, +y up, +z the bow - world/ships/galleonModel.js says where every measurement comes from).

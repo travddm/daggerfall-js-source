@@ -4,7 +4,7 @@
 // drawVeiled3d (a concealed peer's 3D horses, AUDIT COATS3D A5) opened the renderer's one body batch for a horse and
 // flushed it only if one drew: a horse out of view left it open, and two opens met one flush. Every later body pass
 // joined the open batch and no Morrowind picture drew again. The real batch doors, drawRigSpriteBox, the horse rig and
-// the pool; GL alone is stubbed. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// the pool; GL alone is stubbed..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

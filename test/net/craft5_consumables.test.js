@@ -1,8 +1,7 @@
-// CRAFT5 (2026-10-07, Mac: "How could we enhance the profession element of the game while reducing complexity and
-// making crafting more viable"; then "Lets do it") - THE CONSUMABLES, LEANED INTO: a Superior or Masterwork Repair Kit
+// CRAFT5 - THE CONSUMABLES, LEANED INTO: a Superior or Masterwork Repair Kit
 // mends up to nine tenths of a piece's condition (KIT_CEILING's three quarters for the rest) - a kit's craft rolls a
 // quality now, its reach; a dish's buff and a Potent potion stand together (MEASURED: they already did - pinned); arrows a
-// Building product (CRAFT3 made them so - pinned). bible/06-Systems/Professions-Arc.md 41.8.
+// Building product (CRAFT3 made them so - pinned). 41.8.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

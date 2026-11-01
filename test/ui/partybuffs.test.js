@@ -1,6 +1,4 @@
-// PARTY-BUFFS (2026-09-27, Discord - Tabitha, who plays paladins, clerics and mages: "Allow us to see buff timers or
-// SOME sort of indicator that we have placed a buff on a party teammate [preferably on their party portrait, maybe?]
-// ... I'd also like floating Heal numbers").
+// PARTY-BUFFS.
 //
 // A PARTY MATE'S EFFECTS ARE THEIRS TO SAY: each member's party pose carries its own live spell effects (net/wire.js
 // validPartyPose `fx`, composed by net/partyBuffs.js composePartyFx from the same bundles the HUD rows), and every

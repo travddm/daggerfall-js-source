@@ -1,4 +1,4 @@
-// PORT-SHIPS (bible/03-World/Holdings.md section 7, PORT-SHIPS) - EVERY PORT ON THE GROUND THE GAME BUILDS, off the player's own
+// PORT-SHIPS (PORT-SHIPS) - EVERY PORT ON THE GROUND THE GAME BUILDS, off the player's own
 // ARENA2 (tools/fetch-data.sh; ARENA2_PATH): the Bay's port towns (the port law's - world/portSites.js portTownOnSea over the
 // open sea, as test/portTerrain.mjs and the harbour board read it) and every port past the Bay (the capitals' harbour
 // slices a port to their own byte, and Arena's ports - BAY-LEFT-SEA's 29), each location read as the game reads it (the

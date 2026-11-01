@@ -1,4 +1,4 @@
-// WEATHER3 slice D (2026-09-22): THE STORMS AT A DISTANCE - a thunderstorm
+// WEATHER3 slice D: THE STORMS AT A DISTANCE - a thunderstorm
 // on the horizon flashes its own cloud, and its thunder arrives its
 // distance over the speed of sound later, quieter the further off
 // (systems/distantStorms.js; the clouds' composite takes the bolt).

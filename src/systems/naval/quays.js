@@ -1,9 +1,8 @@
 // @ts-check
-// QUAYS (2026-10-03, Mac: "Completely revamp port towns with actual piers and docking ports. I want these places to feel
-// alive and connected with the oceans of daggerfall, along with having them appear when sailing and close to a port") -
+// QUAYS -
 // THE PORT'S OWN QUAYS AND ITS DOCKING. Pure: the host hands a harbour's berths (shipLife.js findHarbour), the sea's top
 // and the ground, and gets back where each berth's quay stands, what stands on it, and whether a ship of the player's
-// is warped in to it or lies made fast at it. Design: bible/03-World/Holdings.md section 7.
+// is warped in to it or lies made fast at it. Design:
 //
 // NO DOCK DATA EXISTS (shipLife.js's header): Daggerfall's port towns stand no piers, and a harbour is found from the
 // terrain. So is its quay, berth by berth, in THE BERTH'S FRAME (`quayFrame`): its origin the berth's place on the sea's
@@ -20,7 +19,7 @@
 // at each landward corner (lit in the lanterns' hours), and the port's cargo on its back - crates and barrels, off the
 // harbour's key and the berth's number on QUAY_SALT, so every player in the port sees the same quay.
 //
-// THE PIER'S DRESS (SHIPYARDS, 2026-10-11, Mac: "This should also come with a detailed overhaul to piers"): what a
+// THE PIER'S DRESS (SHIPYARDS, 2026-10-11): what a
 // working quay stands besides - each pair of neighbouring piles in a row crossed by two braces down to the water
 // (`braces`), the face hung with fender piles every FENDER_STEP (`fenders`) and two ladders down into the sea
 // (`ladders`), iron cleats at its ends and by its ladders (`cleats`), a coil of rope by each bollard (`coils`), a cargo

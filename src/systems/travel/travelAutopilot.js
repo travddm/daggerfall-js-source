@@ -77,7 +77,7 @@ export function rectCentre(rect) {
   };
 }
 
-/** OW-ROAD-TRUE (2026-10-19, the owner: "Routes should always follow the road if planned, it should never offset"):
+/** OW-ROAD-TRUE:
  *  THE ROAD'S LANE, PURSUED. The mod aims a leg ONCE a map pixel (Update re-aims only when the pixel under the player
  *  changes, :92-96) - a bearing from wherever the body stood as it crossed, straight at the leg's middle. With Avoid
  *  Obstacles off, whatever then turned the body off the road's line was carried at that bearing for up to a pixel - 819 m

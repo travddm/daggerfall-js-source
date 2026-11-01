@@ -1,8 +1,8 @@
-// SHIPYARDS (2026-10-11): THE LAWS - systems/portPlaces.js (a port town's places, their keepers, names and keys),
+// SHIPYARDS: THE LAWS - systems/portPlaces.js (a port town's places, their keepers, names and keys),
 // systems/shipyards.js (what the shipyard sells and buys back, at what price, and when it will not), systems/crewHall.js
 // (the day's named recruits, their fees, signing on and paying off) and what they lean on: a ship's named hands enlisted
 // and released (naval/shipCrew.js), her crew discharged (naval/navalDamage.js), the shelf's parts minted
-// (comeSailAwayItems.js mintParts) and no counter buying a ship (shopStock.js). Design: bible/03-World/Shipyards.md.
+// (comeSailAwayItems.js mintParts) and no counter buying a ship (shopStock.js). Design:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -59,7 +59,7 @@ test('SHIPYARDS THE TOWNS: a city, a town or a village the port\'s harbour law c
 });
 
 test('SHIPYARDS-FOUND THE KEYS: the found places\' one order - the yards\' two, then the port\'s four - each a directory key no Daggerfall building holds; the Stable and the Wagon Yard keep the keys they had (mutants: the order or the base moved)', () => {
-  assert.deepEqual([...FOUND_KIND_ORDER], [...YARD_KIND_ORDER, ...PORT_PLACE_ORDER, 'carpenter']);   // PIN MOVED (CARP-YARD, 2026-10-12): the joinery after the port's four - every key before it kept
+  assert.deepEqual([...FOUND_KIND_ORDER], [...YARD_KIND_ORDER, ...PORT_PLACE_ORDER, 'carpenter']);
   assert.deepEqual(YARD_KIND_ORDER.map(foundBuildingKey), [YARD_KEY_BASE, YARD_KEY_BASE + 1], 'the yards\' own keys');
   assert.deepEqual(PORT_PLACE_ORDER.map(foundBuildingKey), [2, 3, 4, 5].map((i) => YARD_KEY_BASE + i));
   assert.equal(foundBuildingKey('tavern'), -1);
@@ -186,7 +186,6 @@ test('SHIPYARDS THE CREW HALL\'S ROSTER: RECRUITS_A_DAY named sailors a town\'s 
   assert.deepEqual(recruitsOf({ mapId: 4242, day: 100, regionIndex: 17 }), a, 'the same hall the same day');
   assert.notDeepEqual(recruitsOf({ mapId: 4242, day: 101, regionIndex: 17 }).map((r) => r.name), a.map((r) => r.name), 'the next day\'s');
   assert.notDeepEqual(recruitsOf({ mapId: 4243, day: 100, regionIndex: 17 }).map((r) => r.name), a.map((r) => r.name), 'another town\'s');
-  // PIN MOVED (AUDIT SHIPYARDS L2-9): the serving are their hall ids - a hand who merely shares a recruit's name hides nobody
   const less = recruitsOf({ mapId: 4242, day: 100, regionIndex: 17, serving: [a[2].id] });
   assert.deepEqual(less.map((r) => r.id), a.filter((_, i) => i !== 2).map((r) => r.id), 'one signed on: off the roster');
   assert.deepEqual(recruitsOf({ mapId: 4242, day: 100, regionIndex: 17, serving: [a[2].name] }).map((r) => r.id), a.map((r) => r.id), 'a name is no hall id');
@@ -232,7 +231,6 @@ test('SHIPYARDS THE FEES: a grade\'s ground times the trade\'s premium, to ten g
 
 test('SHIPYARDS SIGNING ON: a recruit takes a place on her deck - her crew raised to the share that stands one more named hand, never past her whole, the men it raises said; a deck already standing every man her whole crew can is FULL (a recruit signs on in a hand\'s place); a boat with no crew none; paid off, a man\'s share less - never the last of her crew (mutants: the deck\'s count unread, the cap gone, the raise unsaid, full unread, the last man paid off)', () => {
   const S = hullBuild(2).crew;
-  // PIN MOVED (AUDIT SHIPYARDS L2-2, L7-2): the plan says the men it raises, and whether her deck is full
   assert.deepEqual(enlistPlan({ hull: 2, crew: 12, maxCrew: S, hands: 2 }), { ok: true, full: false, crew: 3 * CREW_PER_HAND, raise: CREW_PER_HAND });
   assert.equal(playerCrewCount(2, 3 * CREW_PER_HAND), 3);
   assert.deepEqual(enlistPlan({ hull: 2, crew: 20, maxCrew: S, hands: 3 }), { ok: true, full: false, crew: Math.min(S, 24), raise: Math.min(S, 24) - 20 }, 'never lowered');
@@ -246,12 +244,10 @@ test('SHIPYARDS SIGNING ON: a recruit takes a place on her deck - her crew raise
   // syncs her named hands first (navalHost.js crewHands), and a plan handed them behind refuses rather than guess
   assert.deepEqual(enlistPlan({ hull: 3, crew: 60, maxCrew: 60, hands: 2 }), { ok: false, full: false, why: CREW_HALL_TEXT.noPlace }, 'her named hands behind her deck');
   assert.equal(enlistPlan({ hull: 1, crew: 0, maxCrew: hullBuild(1).crew, hands: 0 }).ok, CREW_SHOWN[1] > 0 && playerCrewCount(1, Math.min(hullBuild(1).crew, CREW_PER_HAND)) === 1);
-  // PIN MOVED (AUDIT SHIPYARDS L2-1): the last of her crew is never paid off - nobody aboard, she strikes
   assert.deepEqual(releasePlan({ crew: 20 }), { ok: true, crew: 20 - CREW_PER_HAND });
   assert.deepEqual(releasePlan({ crew: CREW_PER_HAND + 1 }), { ok: true, crew: 1 });
   assert.deepEqual(releasePlan({ crew: CREW_PER_HAND }), { ok: false, crew: CREW_PER_HAND, why: CREW_HALL_TEXT.lastMan });
   assert.deepEqual(releasePlan({ crew: 0 }), { ok: false, crew: 0, why: CREW_HALL_TEXT.lastMan });
-  // PIN MOVED (AUDIT SHIPYARDS L2-7): no possessive on a ship's name ("Small Ship 'I''s")
   assert.equal(CREW_HALL_TEXT.signed('Anna Voss', 'Gunner', 'The Kestrel'), 'Anna Voss signs on to The Kestrel as Gunner.');
   assert.equal(CREW_HALL_TEXT.swapped('Anna Voss', 'Gunner', 'The Kestrel', 'Bram'), 'Anna Voss signs on to The Kestrel as Gunner, replacing Bram. Bram is paid off.');
   assert.equal(CREW_HALL_TEXT.steppedUp('Bram', 'The Kestrel', 'Odo'), 'Bram is paid off and leaves The Kestrel. Odo takes the open place on deck.');
@@ -264,8 +260,6 @@ test('SHIPYARDS A NAMED HAND ENLISTED AND RELEASED (shipCrew.js): he joins at hi
   const old = crew.hands.find((x) => x.role === FIRST_MATE);
   const before = crew.morale;
   const h = crew.enlist({ name: 'Anna Voss', role: FIRST_MATE, mobile: MOBILE.Rogue, gender: 'female', fights: 7, boardings: 3, hall: '9:100:2' }, 4);
-  // PIN MOVED (AUDIT SHIPYARDS L2-4, L2-9): her hall id and the spirits she actually lifted ride her
-  // PIN MOVED (AUDIT CAPTAIN'S SEA C8, at the merge): her record her deeds, and no service kept apart (`prior` 0)
   assert.deepEqual(h, { name: 'Anna Voss', role: FIRST_MATE, mobile: MOBILE.Rogue, gender: 'female', fights: 7, boardings: 3, prior: 0, hall: '9:100:2', lift: 4 });
   assert.equal(crew.hands.at(-1), h, 'at her roster\'s end');
   assert.equal(crew.hands.filter((x) => x.role === FIRST_MATE).length, 1, 'one First Mate');

@@ -1,13 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP1 (2026-10-07) — THE ROLL, AS THE PLAYING TAB KEEPS IT: a realm
+// CHAP1 — THE ROLL, AS THE PLAYING TAB KEEPS IT: a realm
 // character's standing with Daggerfall's guilds read from the account
 // service as it comes online, and what moves claimed back.
 //
-// Mac: "Server-owned" (bible/11-Multiplayer/Chapters-Arc.md section 3).
 // net/npcChapterLaw.js holds the law; server-account/src/npcRoll.js keeps
 // the Roll; this file decides WHEN to ask and what to hold. Its audit is
-// bible/01-Overview/audits/Audit-Chapters.md (AUDIT CHAP).
+// (AUDIT CHAP).
 //
 // ═══ THE SERVICE'S WORD IS THE STANDING ════════════════════════════
 //

@@ -1,5 +1,5 @@
 // @ts-check
-// SD-PARTY (2026-10-28, bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): the relay's half of a party's own Hour,
+// SD-PARTY: the relay's half of a party's own Hour,
 // the room `sd:<s>.<owner>` (sdLaw.js sdRoomKey). The door lets in the owner, staff and the owner's party (the hub's
 // word, _instanceKinOf); the hub silent is busy. The hub keeps one life and one win an account a Hollow across copies:
 // a realm asks it before a newcomer and tells it each death, kept with the copy it was in - SD-BACK: that copy takes the

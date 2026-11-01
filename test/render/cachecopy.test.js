@@ -1,6 +1,4 @@
-// CACHE-COPY (2026-10-07, Mac: "instead of one of my developers fixing the flickering shadow issue, they just turned on
-// the non-baked version on by default, which really really kill performance. Instead of such a half baked fix, I want to
-// fix the flickering issue properly"; bible/07-Rendering/Enhanced-Lighting-Arc.md CACHE-COPY).
+// CACHE-COPY.
 //
 // SC1's static shadow cache reached the live layers by six blitFramebuffer(DEPTH_BUFFER_BIT) calls a lamp, out of a layer
 // of one depth array into a layer of another. On Windows - ANGLE over Direct3D 11, every browser's WebGL there - that blit
@@ -123,7 +121,7 @@ test('CACHE-COPY: the cache reaches the live layers BY A DRAW - one triangle a f
       },
     });
     assert.equal(copied.size, 2, `frame ${f}: both lamps copied their caches (the man near both)`);
-    // PERF-FACE (PIN MOVED): the faces that held the man, not six - a face that holds the cache is left as it is
+    // PERF-FACE (
     for (const [k, faces] of copied) assert.equal(faces, [0, 1, 2, 3, 4, 5].reduce((m, i) => m | (held[k * 6 + i] ? 1 << i : 0), 0), `slot ${k}: every face that held more than the cache, and no other`);
     assert.ok([...copied.keys()].some((k) => k > 0), 'a slot past the first, where a layer without its slot is another lamp\'s');
   }
@@ -186,7 +184,7 @@ test('CACHE-COPY: the copy binds its empty vertex array through the renderer\'s 
         assert.notEqual(s.vao, sp._copyVao, `frame ${f}: a replay draw on the copy's array - the tracker skipped its bind`);
       },
     });
-    assert.ok(copies >= 2 && draws > 0, `frame ${f}: two lamps copied and the man drawn over them (${copies} copies, ${draws} draws)`);   // PERF-FACE (PIN MOVED): a lamp copies the faces that held him, not six
+    assert.ok(copies >= 2 && draws > 0, `frame ${f}: two lamps copied and the man drawn over them (${copies} copies, ${draws} draws)`);   // PERF-FACE (
   }
   assert.ok(man.vao, 'the man has an array of his own');
 });

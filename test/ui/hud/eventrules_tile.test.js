@@ -1,5 +1,4 @@
-// EVENT-RULES (2026-10-25, the owner: "A lot of people are unhappy with the world event restrictions including the regen
-// not working"; asked, "Back, held in a fight" and "Resurrect allowed"): A WORLD EVENT'S RULES, SAID. The made levels
+// EVENT-RULES: A WORLD EVENT'S RULES, SAID. The made levels
 // (systems/madeLevel.js) hold regeneration now instead of turning it off, and the status widget's first tile says every
 // rule the place holds - its name the place's, its tip the law's own table in plain words, its foot the regeneration's
 // pause while it runs - and a Regenerate's own tip no longer promises what the place breaks.
@@ -47,7 +46,7 @@ test('EVENT-RULES THE TIP: every rule the level holds, said off its own row - th
   assert.ok(!has(court, /Recall/));
   assert.ok(has(hour, /Mark and Recall/));
   assert.ok(has(court, /casts you out before the gate/));
-  assert.ok(has(hour, /final for this Abyss Dungeon - unless a party member raises you within 60 seconds/));   // PIN MOVED (AUDIT WORLD-EVENTS L1-5): the body's minute
+  assert.ok(has(hour, /final for this Abyss Dungeon - unless a party member raises you within 60 seconds/));
   assert.ok(!has(hour, /potions/), 'the Hour counts none');
   assert.ok(has(hour, /^No Levitate\.$/));
   assert.ok(!has(court, /technique/));

@@ -28,12 +28,11 @@ const EOTB_VIEWS = lazyWords(() => t('mods.eyeOfTheBeholder.option.dontChange', 
 /** Every vendored mod that has switches, by vendor key. Names, defaults
  *  and descriptions are the mod's own (Basic Roads 1.3.1 modsettings).
  *  `author` is the manifest's ModAuthor (Basic Roads: its README's),
- *  and the Mods pane puts it IN THE TITLE (Mac, 2026-09-08: "place each
- *  creator's name in the mod title").
+ *  and the Mods pane puts it IN THE TITLE.
  *  L10N4: every key's `description` is a getter over `t('mods.<vendor>.<Key>.description', ...)` and every list of
  *  option names (or labels) a `lazyWords`, so each reads in the player's language at the moment it is read - the
  *  English is the mod's own, byte for byte. Titles and authors are names, and stay as they are.
- *  PLAIN-TEXT (2026-10-19, the owner: "Remove overexplaining text and replace it with proper palatable descriptions"):
+ *  PLAIN-TEXT:
  *  a description that read as a note to a developer (the port's codes, "INERT", engine terms, a typo, "|| Default =
  *  True") is reworded for a player - an inert key says "Has no effect" and why. A description that already read plainly
  *  is still the mod's own; the tests pin each reworded one by its words. */
@@ -44,12 +43,12 @@ export const MOD_SETTINGS = Object.freeze({
   // `Enabled`, which is the port's: DFU enables a mod by listing it, and
   // the port has no mod list, so the whole sky is one switch here. A
   // key with `min`/`max` is a SliderIntKey and reads as an integer.
-  // VC1 (2026-09-07, Mac: "remove the pixelated sky look"): OFF by
+  // VC1: OFF by
   // default. The mod's look - 512-pixel cloud sheets drawn nearest and
   // its own colour posterise - is the pixelation Mac named, and it is
   // the mod's to keep; the port's own dome is the enhanced lane's sky
   // and the mod is a choice in the Mods pane (Ledger row DS1).
-  // MO1 (2026-09-12, Mac: "All mods should be enabled by default"):
+  // MO1:
   // every mod's `Enabled` defaults TRUE - this one, Meaner Monsters,
   // the Physical Combat And Armor Overhaul and Unleveled Loot alike -
   // and the Mods pane is where a player turns one off. While this one
@@ -65,7 +64,7 @@ export const MOD_SETTINGS = Object.freeze({
       ActivatePixelSnow: Object.freeze({ default: false, get description() { return t('mods.dynamicSkies.ActivatePixelSnow.description', 'Turn the pixel snow replacement on or off'); } }),
       MinParticleSize: Object.freeze({ default: 100, min: 100, max: 800, get description() { return t('mods.dynamicSkies.MinParticleSize.description', 'Minimum snow particle size'); } }),
       MaxParticleSize: Object.freeze({ default: 300, min: 100, max: 800, get description() { return t('mods.dynamicSkies.MaxParticleSize.description', 'Maximum snow particle size'); } }),
-      // AUDIT 61: the value is read and logged by the mod and never applied; carried as it ships. PLAIN-TEXT (2026-10-19): the pane says so - it read as the author wrote it, a slider that did nothing.
+      // AUDIT 61: the value is read and logged by the mod and never applied; carried as it ships. PLAIN-TEXT: the pane says so - it read as the author wrote it, a slider that did nothing.
       MaxParticles: Object.freeze({ default: 20, min: 15, max: 20, get description() { return t('mods.dynamicSkies.MaxParticles.description', 'Has no effect: the mod never uses this setting.'); } }),
     }),
   }),
@@ -118,9 +117,9 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // LPT1 (2026-10-05): LOW POLY TREES 5 (SquidKamer). No modsettings of its own - 253 prefabs - so one switch: the
+  // LPT1: LOW POLY TREES 5 (SquidKamer). No modsettings of its own - 253 prefabs - so one switch: the
   // port's Enabled, read once when the world loads (a flip reaches it as it next loads). The player's own online: it
-  // changes how the trees are drawn, never where they stand (bible/07-Rendering/Low-Poly-Trees.md).
+  // changes how the trees are drawn, never where they stand.
   'low-poly-trees': Object.freeze({
     title: 'Low Poly Trees',
     author: 'SquidKamer',
@@ -132,8 +131,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // AUDIT BASIC ROADS (BR3, 2026-09-13, Mac: "can you do an audit on
-  // basic roads, I dont think its working"). THIS MOD HAD NO `Enabled`
+  // AUDIT BASIC ROADS (BR3, 2026-09-13). THIS MOD HAD NO `Enabled`
   // AND NO GATE - the only one of the six. MO1 gave every mod the
   // switch and defaulted it TRUE; this one was missed, so Basic Roads
   // was not enabled-by-default, it was UNCONDITIONAL: world.js called
@@ -174,8 +172,7 @@ export const MOD_SETTINGS = Object.freeze({
             + 'across the Iliac Bay, with bandits, bears and treasure, and a camp outside Privateer’s Hold.');
         },
       }),
-      // WOD-PEAKS (2026-10-09, the owner of the pyramid massifs in the Wrothgarian Mountains: "i actually would prefer
-      // [them removed everywhere] BUT can you place more rounded not SUPER HUGE mountains?"): the port's own switch, off -
+      // WOD-PEAKS: the port's own switch, off -
       // the mod's Mountains layouts are ARCH3D pebbles stretched by hundreds and thousands into faceted spires up to 1.4 km
       // tall (world/worldOfDaggerfall/wodRockUv.js). The rounded mountains the land stands instead are the landforms' (world/landforms.js
       // LANDFORM8). Online the room's (onlineLane.js): the layouts level the ground and stand collidable rock.
@@ -185,7 +182,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // AS1 (2026-09-25): AQUATIC SPRITES 1.0 (Cliffworms). No modsettings of
+  // AS1: AQUATIC SPRITES 1.0 (Cliffworms). No modsettings of
   // its own - three world-data blocks, so one switch: the port's Enabled,
   // the gate DFU's mod list is (a mod that is off is a mod DFU never
   // loaded; scenes/modWorldData.js reads it at the door).
@@ -202,7 +199,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // DS1 (2026-09-25): DETAILED SHIPS 1.0.0 (Cliffworms). No modsettings of
+  // DS1: DETAILED SHIPS 1.0.0 (Cliffworms). No modsettings of
   // its own - two building records and thirteen pictures - so one switch.
   'detailed-ships': Object.freeze({
     title: 'Detailed Ships',
@@ -218,7 +215,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // WD3 (2026-10-01): BEAUTIFUL VILLAGES OF DAGGERFALL 1.4.2 and BEAUTIFUL
+  // WD3: BEAUTIFUL VILLAGES OF DAGGERFALL 1.4.2 and BEAUTIFUL
   // CITIES OF DAGGERFALL 0.5.0 (carademono). No modsettings of their own -
   // 7,317 and 410 places laid out again, their blocks with them - so one
   // switch each: the port's Enabled, read once when the game loads
@@ -246,7 +243,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // WA1 (2026-09-25): WARM ASHES - SHIPS 1.1 (Kamer). No modsettings of its
+  // WA1: WARM ASHES - SHIPS 1.1 (Kamer). No modsettings of its
   // own - a travel hook, a quest action and six world-data variants - so
   // one switch.
   'warm-ashes-ships': Object.freeze({
@@ -262,7 +259,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // RAID1 (2026-09-27): WORLD EVENTS - RAIDING PARTIES 1.1 (Kamer, made for
+  // RAID1: WORLD EVENTS - RAIDING PARTIES 1.1 (Kamer, made for
   // this port). No modsettings of its own - one script - so one switch.
   'world-events-raiding-parties': Object.freeze({
     title: 'World Events - Raiding Parties',
@@ -278,7 +275,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // FORAGE1 (2026-09-28): FORAGING 1.7 (Harbinger451). No modsettings of
+  // FORAGE1: FORAGING 1.7 (Harbinger451). No modsettings of
   // its own - six tools, five foods, a quest pack - so one switch.
   'foraging': Object.freeze({
     title: 'Foraging',
@@ -295,7 +292,7 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // DW-A (2026-09-25): ILIAC PUDDLE NO MORE 1.2.2 (jet082). Its one section,
+  // DW-A: ILIAC PUDDLE NO MORE 1.2.2 (jet082). Its one section,
   // General, restated flat with the section in front of each name (the
   // Immersive Footsteps convention), in the shipped order with the shipped
   // defaults, ranges and descriptions - the typo in "Spawn underwate
@@ -317,8 +314,7 @@ export const MOD_SETTINGS = Object.freeze({
       'General.SpawnWaterSurfaces': Object.freeze({ default: true, get description() { return t('mods.iliacPuddleNoMore.General.SpawnWaterSurfaces.description', 'Show the water surface'); } }),
       'General.SpawnUnderwaterEnemies': Object.freeze({ default: true, get description() { return t('mods.iliacPuddleNoMore.General.SpawnUnderwaterEnemies.description', 'Spawn underwater enemies'); } }),
       'General.EnemyFrequency': Object.freeze({ default: 0.3, min: 0.0, max: 1.0, float: true, step: 0.05, get description() { return t('mods.iliacPuddleNoMore.General.EnemyFrequency.description', 'Enemy frequency rate'); } }),
-      // SEA-CAP (2026-09-26, SquidKamer: "puddle no more is too aggressive ... it summoned an army of everything"; Mac:
-      // "Yes, cap at 32"): THE PORT'S DEFAULT IS 32, not the 128 the mod ships (vendor modsettings.json). The pulse
+      // SEA-CAP: THE PORT'S DEFAULT IS 32, not the 128 the mod ships (vendor modsettings.json). The pulse
       // fills every sea pixel within 200 m of an outdoor player from nothing to the cap in about two seconds, each foe
       // hostile and told where the player is, and in a browser a hundred and twenty-eight of them is a crowd the AI
       // cannot carry. The range is the mod's own - a player offline may still raise it to 256. Ledger A.
@@ -344,7 +340,7 @@ export const MOD_SETTINGS = Object.freeze({
       'General.ArgonianInfiniteBreath': Object.freeze({ default: true, get description() { return t('mods.iliacPuddleNoMore.General.ArgonianInfiniteBreath.description', 'Argonians never drown'); } }),
     }),
   }),
-  // OH-A (2026-09-26): THERE'S A HOLE IN THE BOTTOM OF THE OCEAN 1.1.0
+  // OH-A: THERE'S A HOLE IN THE BOTTOM OF THE OCEAN 1.1.0
   // (jet082). Listed AFTER Iliac Puddle No More, its one non-optional
   // dependency (DFU Awakes a dependency first). Its one section, General,
   // restated flat in the shipped order with the shipped defaults, ranges
@@ -372,7 +368,7 @@ export const MOD_SETTINGS = Object.freeze({
       'General.DungeonVisualDarkness': Object.freeze({ default: 0.5, min: 0.0, max: 1.0, float: true, step: 0.05, get description() { return t('mods.oceanHoles.General.DungeonVisualDarkness.description', 'How dark the fog and light are in flooded dungeons'); } }),
     }),
   }),
-  // CSA-A (2026-09-27): COME SAIL AWAY 2.1 (RedRoryOTheGlen). Its ten
+  // CSA-A: COME SAIL AWAY 2.1 (RedRoryOTheGlen). Its ten
   // sections as the shipped modsettings.json carries them, section and
   // name joined with a dot, the shipped defaults and ranges; the four
   // unnamed spacer sections ("---", "----", "-", "--") carry no keys and
@@ -440,7 +436,7 @@ export const MOD_SETTINGS = Object.freeze({
       'SailingAssist.AutoStowSquareSails': Object.freeze({ default: true, get description() { return t('mods.comeSailAway.SailingAssist.AutoStowSquareSails.description', 'Stow the square sails for you when you head into the wind.'); } }),
       'SailingAssist.AutoStowGaffSails': Object.freeze({ default: true, get description() { return t('mods.comeSailAway.unread.description', 'Has no effect: the mod never uses this setting.'); } }),
       'Compatibility.AnimatedWaterVertexWaves': Object.freeze({ default: false, get description() { return t('mods.comeSailAway.Compatibility.AnimatedWaterVertexWaves.description', 'Has no effect here: Animated Water isn’t included, so the mod’s own waves are always drawn.'); } }),
-      // KEEP-BOATS (2026-09-30, Mac: ship ownership "less punishing" - "Keep boats & cargo"): A DEPARTURE FROM THE
+      // KEEP-BOATS: A DEPARTURE FROM THE
       // MOD'S SHIPPED DEFAULT. The mod ships it off, and off a boat placed in a dungeon was destroyed once the player
       // was back outside - a packable one and its hold for good, a crewed one's hold with it (UpdateBoatVisibility).
       // The port ships it ON; the switch stays the player's. Pinned: test/systems/csa_registration.test.js DEPARTED.
@@ -477,8 +473,7 @@ export const MOD_SETTINGS = Object.freeze({
   // PCO1: PHYSICAL COMBAT AND ARMOR OVERHAUL 1.44 (Kirk.O). Its seven
   // Modules keys, names and descriptions as modsettings.json ships them
   // (all seven on, as shipped), plus the port's `Enabled` (DFU enables
-  // a mod by listing it). MM1 (Mac: "there shouldn't be compatibility
-  // switches between mods"): the two arms DFU derives from OTHER mods
+  // a mod by listing it). MM1: the two arms DFU derives from OTHER mods
   // being loaded - Roleplay Realism's advancedArchery and the presence
   // of Meaner Monsters - are no longer switches here; combat/pcaao.js
   // reads the other mod's own switch, as DFU asks ModManager.
@@ -494,8 +489,7 @@ export const MOD_SETTINGS = Object.freeze({
             + 'damage. Off uses Daggerfall Unity’s combat.');
         },
       }),
-      // WEAR-VANILLA (2026-10-01, the repair triage: "Disable the modded feature that increases durability loss.
-      // Vanilla values work fine"): the mod ships its two wear modules ON, the port ships them OFF - a blow wears gear
+      // WEAR-VANILLA: the mod ships its two wear modules ON, the port ships them OFF - a blow wears gear
       // at Daggerfall Unity's own rate (combat/formulas.js damageEquipment) and a broken enchanted piece stays,
       // repairable. Online the room reads these defaults (onlineLane.js ONLINE_WHOLE_MODS); offline they stay the
       // player's. A value saved under the old default is let go once (SWITCH_RESETS). Port-Ledger, WEAR-VANILLA.
@@ -536,8 +530,7 @@ export const MOD_SETTINGS = Object.freeze({
       })])),
     }),
   }),
-  // WW1 (2026-09-14, Mac: "This is our next mod I want to add 1:1 while
-  // also having it work with morrowind's first person view"): WEAPON
+  // WW1: WEAPON
   // WIDGET 1.6 (RedRoryOTheGlen). Its nine sections as modsettings.json
   // ships them - Modules' nine toggles, then each module's own knobs -
   // the key named section-dot-name because four names repeat across
@@ -545,7 +538,7 @@ export const MOD_SETTINGS = Object.freeze({
   // is a SliderFloatKey and reads as a number on its range; `step` is
   // the Mods pane's stepper for it. Descriptions are the mod's own where
   // it wrote one. Plus the port's `Enabled` (MO1: on).
-  // SW1 (2026-09-19) - SHIELD WIDGET 1.6, RedRoryOTheGlen. The mod's own
+  // SW1 - SHIELD WIDGET 1.6, RedRoryOTheGlen. The mod's own
   // eight sections restated flat, section and name joined with a dot, in
   // the bundle's own order with the bundle's own defaults, ranges and
   // descriptions. The six keys the mod ships with no description carry
@@ -574,7 +567,7 @@ export const MOD_SETTINGS = Object.freeze({
         },
       }),
       WeaponWidgetPreset: Object.freeze({
-        default: false,   // DISC16-B (2026-09-24, Mac: "I just want it how it was before diverse weapons"): OFF, as at DW1 - the mod's sprites move with Weapon Widget's own defaults, as every weapon did before the mod; the preset (its step, inertia, true size and 142 bob) is the player's to choose. DW-CLIP ("mod should be defaulted on") had it on, DISC14-B off with two departures of its own
+        default: false,   // DISC16-B: OFF, as at DW1 - the mod's sprites move with Weapon Widget's own defaults, as every weapon did before the mod; the preset (its step, inertia, true size and 142 bob) is the player's to choose. DW-CLIP ("mod should be defaulted on") had it on, DISC14-B off with two departures of its own
         get description() {
           return t('mods.diverseWeapons.WeaponWidgetPreset.description', 'Uses Diverse Weapons’ own Weapon Widget settings while on: larger idle poses, inertia, recoil and '
             + 'its own bob. Your Weapon Widget settings come back when you turn this off.');
@@ -628,26 +621,26 @@ export const MOD_SETTINGS = Object.freeze({
       advancedArchery: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.advancedArchery.description', 'Alters to-hit and damage done by arrows depending on the length of draw.'); } }),
       encumbranceEffects: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.encumbranceEffects.description', 'Provides speed and fatigue penalties when carrying too much weight.'); } }),
       bandaging: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.bandaging.description', 'Allows bandages to be used for healing based on medical skill.'); } }),
-      shipPorts: Object.freeze({ default: false, get description() { return t('mods.roleplayRealism.shipPorts.description', 'Player can only board their ship when in a port town.'); } }),   // SHIP-PORTS (2026-09-23, Sir McMobdon on Discord: "cant access my boat anymore"): the mod ships this ON, the port ships it OFF - a restriction nobody chose took the boat away from every owner the day the mod landed, and the switch was nowhere a player could reach; recorded on the RR page
+      shipPorts: Object.freeze({ default: false, get description() { return t('mods.roleplayRealism.shipPorts.description', 'Player can only board their ship when in a port town.'); } }),   // SHIP-PORTS: the mod ships this ON, the port ships it OFF - a restriction nobody chose took the boat away from every owner the day the mod landed, and the switch was nowhere a player could reach; recorded on the RR page
       underworldExpulsion: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.underworldExpulsion.description', 'Enables underworld guilds to expel members for poor performance... with prejudice.'); } }),
       climbingRestriction: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.climbingRestriction.description', 'Prevents climbing with a weapon drawn.'); } }),
       weaponSpeed: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.weaponSpeed.description', 'Lowers weapon damage per second for characters with high Speed.'); } }),
       weaponMaterials: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.weaponMaterials.description', 'Moderates the to-hit bonuses of weapon materials so skill remains key factor'); } }),
-      equipDamage: Object.freeze({ default: false, get description() { return t('mods.roleplayRealism.equipDamage.description', 'Increases equipment damage proportional to max condition.'); } }),   // WEAR-VANILLA (2026-10-01): the mod ships it ON (armour x5), the port OFF - see the overhaul's wear modules above; the room's too (onlineLane.js)
+      equipDamage: Object.freeze({ default: false, get description() { return t('mods.roleplayRealism.equipDamage.description', 'Increases equipment damage proportional to max condition.'); } }),   // WEAR-VANILLA: the mod ships it ON (armour x5), the port OFF - see the overhaul's wear modules above; the room's too (onlineLane.js)
       enemyAppearance: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.enemyAppearance.description', 'Remixes human enemy appearance based on class'); } }),
       purificationPotion: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.purificationPotion.description', 'Changes purification potion to cure poison rather than grant invisibility'); } }),
       autoExtinguishLight: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.autoExtinguishLight.description', 'Automatically extinguish any light sources when you exit a dungeon'); } }),
       classicStrengthDamageBonus: Object.freeze({ default: false, get description() { return t('mods.roleplayRealism.classicStrengthDamageBonus.description', 'Shows the strength damage bonus at half, as the classic game did.'); } }),
       variantNpcs: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.variantNpcs.description', 'Enable variant NPC sprites in shops & taverns'); } }),
       variantResidents: Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.variantResidents.description', 'Fills 80% of houses with the townsfolk you see walking around, instead of random adventurers'); } }),
-      // fightersTeachHandToHand RETIRED (FGH2H-R, 2026-09-24, Mac: "retire it") - see RETIRED_KEYS below
+      // fightersTeachHandToHand RETIRED (FGH2H-R, 2026-09-24) - see RETIRED_KEYS below
       loanAmountPerLevel: Object.freeze({ default: 4, options: Object.freeze(['2000', '4000', '6000', '8000', '10000', '20000', '30000', '40000', '50000']), get description() { return t('mods.roleplayRealism.loanAmountPerLevel.description', 'Sets the maximum amount per level that can be borrowed from banks'); } }),
       // EnhancedRiding (RR2)
       'EnhancedRiding.enhancedRiding': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.enhancedRiding.description', 'Enable enhanced horse riding module, improving presentation and allowing galloping.'); } }),
       'EnhancedRiding.RealisticMovement': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.RealisticMovement.description', 'Makes the horse and cart movement backwards and sideways more realistic and limited.'); } }),
       'EnhancedRiding.followTerrainEnabled': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.followTerrainEnabled.description', 'Enables terrain following when riding.'); } }),
       'EnhancedRiding.followTerrainSoftenFactor': Object.freeze({ default: 8, min: 0, max: 32, get description() { return t('mods.roleplayRealism.EnhancedRiding.followTerrainSoftenFactor.description', 'How much the ride smooths out slopes, from 0 (none) to 32 (most).'); } }),
-      'EnhancedRiding.GallopingInTowns': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.GallopingInTowns.description', 'Enables galloping (sprinting) while riding horses in towns.'); } }),   // TOWN-GALLOP (2026-10-13, Mac: "Remove forced horse walking in towns"): the mod ships this OFF, the port ships it ON - off, the mod's CanRun refused the run in every town, and horse care's horse walked there with Run held (HORSE-WALK); the room's too (onlineLane.js ONLINE_WHOLE_MODS reads this default); no tile ever reached the switch (FT14), so no saved off stands to reset; TrampleCivilians, the mod's own, rides with it; recorded on the RR page
+      'EnhancedRiding.GallopingInTowns': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.GallopingInTowns.description', 'Enables galloping (sprinting) while riding horses in towns.'); } }),   // TOWN-GALLOP: the mod ships this OFF, the port ships it ON - off, the mod's CanRun refused the run in every town, and horse care's horse walked there with Run held (HORSE-WALK); the room's too (onlineLane.js ONLINE_WHOLE_MODS reads this default); no tile ever reached the switch (FT14), so no saved off stands to reset; TrampleCivilians, the mod's own, rides with it; recorded on the RR page
       'EnhancedRiding.TrampleCivilians': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.EnhancedRiding.TrampleCivilians.description', 'Enables the crime of trampling innocent townsfolk when galloping in a town. Be careful!'); } }),
       // RefinedTraining (RR2)
       'RefinedTraining.refinedTraining': Object.freeze({ default: true, get description() { return t('mods.roleplayRealism.RefinedTraining.refinedTraining.description', 'Enable refined skill training service.'); } }),
@@ -759,7 +752,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Miscellaneous.MirrorTwoHandedBlunts': Object.freeze({ default: false, get description() { return t('mods.weaponWidget.Miscellaneous.MirrorTwoHandedBlunts.description', 'Draws a two-handed staff, hammer or flail mirrored in the right hand.'); } }),
     }),
   }),
-  // HT1 (2026-09-14): HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), ported
+  // HT1: HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), ported
   // 1:1 - the shipped modsettings.json (vendor/handheld-torches/) key
   // for key, section and name joined with a dot. Two kinds are new
   // here: a TextKey (a Unity KeyCode name - `text`), and the two Tuple
@@ -778,8 +771,7 @@ export const MOD_SETTINGS = Object.freeze({
             + 'keeps burning, lights the room and can be picked up again.');
         },
       }),
-      // SOC5 (2026-09-16, Mac: "Players should be able to interact with others
-      // in the world upon encountering them by pressing F on their body"): THE
+      // SOC5: THE
       // SECOND DEPARTURE FROM THE MOD'S SHIPPED KEYS, and the same shape as
       // HT4's below. Handheld Torches ships F, and in Daggerfall Unity that is
       // free. It is not free here any more: SOC5 spends F on the port's own
@@ -793,8 +785,7 @@ export const MOD_SETTINGS = Object.freeze({
       // SHIPS. test/systems/ht1_handheldtorches.test.js HT4 is the gate that caught it.
       'Handling.ToggleLightInput': Object.freeze({ default: "O", text: true, get description() { return t('mods.handheldTorches.Handling.ToggleLightInput.description', 'Button used to quickly ignite or douse your light source'); } }),   // KB1: not read by the mod any more - the key is the registry's action (inputActions.js MOD_ACTIONS); a player's saved value is carried there once (migrateKeyBinds)
       'Handling.RememberLastLightSource': Object.freeze({ default: true, get description() { return t('mods.handheldTorches.Handling.RememberLastLightSource.description', 'Igniting with the key re-lights the light you last doused, if you still carry one.'); } }),
-      // HT4 (2026-09-15, Mac: "Pressing tab drops torches, tab is reserved
-      // for the menu"): THE ONE DEPARTURE FROM THE MOD'S SHIPPED KEYS.
+      // HT4: THE ONE DEPARTURE FROM THE MOD'S SHIPPED KEYS.
       // Handheld Torches ships Tab, and in Daggerfall Unity that is free.
       // It is not free here: PX15 gave Tab to the port's own pixel dial
       // (ui/input.js, the radial menu DFU has not got), so the mod's
@@ -804,7 +795,7 @@ export const MOD_SETTINGS = Object.freeze({
       // own defaults (inputActions.js DEFAULT_BINDINGS) and unused by the
       // mod's other two keys, and it stays the player's to rebind.
       'Handling.ManualDropInput': Object.freeze({ default: "G", text: true, get description() { return t('mods.handheldTorches.Handling.ManualDropInput.description', 'Button used to manually drop a light source'); } }),   // KB1: not read by the mod any more - the key is the registry's action (inputActions.js MOD_ACTIONS); a player's saved value is carried there once (migrateKeyBinds)
-      // HT7 (2026-09-17, Mac: "Take care of both") - THE ONE DEFAULT THIS
+      // HT7 - THE ONE DEFAULT THIS
       // PORT MOVES, and it is an owner decision rather than a misread.
       //
       // Handheld Torches ships `OnStow = Drop` (1), and the port kept it
@@ -830,10 +821,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Handling.StowWhenSwimming': Object.freeze({ default: true, get description() { return t('mods.handheldTorches.Handling.StowWhenSwimming.description', 'Swimming puts the light away to free your hand.'); } }),
       'Handling.RelaxedTwoHandedWeapons': Object.freeze({ default: false, get description() { return t('mods.handheldTorches.Handling.RelaxedTwoHandedWeapons.description', 'Two-handed weapons will only occupy your off-hand when attacking'); } }),   // 3ARMS: the mod ships true; the port ships false - see the departure in Handheld-Torches.md
       'Handling.RelaxedLanterns': Object.freeze({ default: false, get description() { return t('mods.handheldTorches.Handling.RelaxedLanterns.description', 'If enabled, will not stow lanterns when both hands are occupied'); } }),
-      // HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung
-      // at the waist instead of having to be held" - and, asked how, a
-      // switch on THIS pane, off by default; HT-WAIST-ON, the same day: "Have
-      // the lantern change on by default" - it ships ON): A DEPARTURE ON THIS PANE, AND
+      // HT-WAIST: A DEPARTURE ON THIS PANE, AND
       // THE FIRST KEY THE MOD DOES NOT SHIP AT ALL. Every earlier one
       // (MODS-ON Sprite, HT4 Tab, SOC5 F, HT5 Bob, HT7 OnStow, 3ARMS) moves
       // a shipped default; this one is the port's own switch, sitting beside the
@@ -861,7 +849,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Throwing.Magnitude': Object.freeze({ default: Object.freeze([1, 2]), tuple: 'int', get description() { return t('mods.handheldTorches.Throwing.Magnitude.description', 'Fire damage per round, lowest and highest.'); } }),
       'Throwing.Emission': Object.freeze({ default: true, get description() { return t('mods.handheldTorches.Throwing.Emission.description', 'A burning foe gives off light.'); } }),
       'Throwing.EmissionShadows': Object.freeze({ default: false, get description() { return t('mods.handheldTorches.Throwing.EmissionShadows.description', 'Has no effect here: a burning foe’s light casts no shadows in this game.'); } }),
-      // MODS-ON (2026-09-14, Mac: "all mods should be on by default"): the
+      // MODS-ON: the
       // shipped modsettings.json carries `Sprite = False`, so the mod itself
       // ships its first-person hand switched off - and the hand is the mod's
       // whole subject. The HT2 audit measured what that costs: everything
@@ -869,8 +857,7 @@ export const MOD_SETTINGS = Object.freeze({
       // torch is lit) and `draw()` still answers false, so a player lights a
       // torch and sees nothing. This ONE default departs; Ledger A row MODS-ON.
       'Modules.Sprite': Object.freeze({ default: true, get description() { return t('mods.handheldTorches.Modules.Sprite.description', 'Sprite: a first-person hand holding the lit torch or lantern.'); } }),
-      // HT5 (2026-09-16, Mac: "the torch when being held isn't affected by
-      // the weapon bob like everything else"): THE THIRD DEPARTURE FROM THE
+      // HT5: THE THIRD DEPARTURE FROM THE
       // MOD'S SHIPPED KEYS. The mod ships its three motion modules OFF -
       // they restate Weapon Widget's Bob, Inertia and Step laws so the hand
       // can move WITH the weapon, and the mod leaves it to the player to
@@ -940,7 +927,7 @@ export const MOD_SETTINGS = Object.freeze({
   // the bundle's modsettings.json ships, under its own section name, as
   // it ships them - plus the port's own `Enabled`. Mac's ruling on why
   // a port that already has third person carries a second one
-  // (2026-09-15): "This is moreso for those who opt out of using
+  // "This is moreso for those who opt out of using
   // morrowind." The Morrowind body needs Morrowind data; this one does
   // not, and `player/mwView.js` says in its own head that a player
   // without it "has no third person at all". Three defaults depart from
@@ -966,8 +953,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Camera.Dampen': Object.freeze({ default: 1.0, min: 0, max: 5, float: true, get description() { return t('mods.eyeOfTheBeholder.Camera.Dampen.description', 'How much the camera lags behind a sudden move.'); } }),
       'Camera.Auto-Switch': Object.freeze({ default: true, get description() { return t('mods.eyeOfTheBeholder.Camera.AutoSwitch.description', 'Moves the camera to your other shoulder when there isn’t room'); } }),
       'Camera.SwitchResetTime': Object.freeze({ default: 3.0, min: 0, max: 6, float: true, get description() { return t('mods.eyeOfTheBeholder.Camera.SwitchResetTime.description', 'Seconds before the camera switches back. 0 keeps it switched'); } }),
-      // EOTB4 (2026-09-15, Mac: "instead of numpad being used to change
-      // views, I want it scrollable like how we handle morrowind").
+      // EOTB4.
       // THE MOD'S OWN KEY, KEPT AND SUPERSEDED. The wheel is the only
       // way in and out now, so this binding does nothing - listed all
       // the same, because the pane is a record of what the mod ships
@@ -1015,15 +1001,13 @@ export const MOD_SETTINGS = Object.freeze({
       'AutoTogglePerspective.OnTransitionInterior': Object.freeze({ default: 0, options: EOTB_VIEWS, get description() { return t('mods.eyeOfTheBeholder.AutoTogglePerspective.OnTransitionInterior.description', 'Which view to take on stepping indoors.'); } }),
       'AutoTogglePerspective.OnTransitionExterior': Object.freeze({ default: 0, options: EOTB_VIEWS, get description() { return t('mods.eyeOfTheBeholder.AutoTogglePerspective.OnTransitionExterior.description', 'Which view to take on stepping back outside.'); } }),
       'Graphics.Enable': Object.freeze({ default: true, get description() { return t('mods.eyeOfTheBeholder.Graphics.Enable.description', 'Show your character sprite'); } }),
-      // DISC23-B (2026-09-24, Gryphoth and Scratchie on Discord: "EOTB comes with 16 ground models and different
-      // mounted models, it would be nice to be able to change our models like in the original mod" / "the game is not
-      // allowing us to choose between the different index slots"): the mod's two SLIDERS, kept sliders (0-15, 0-4, as
+      // DISC23-B: the mod's two SLIDERS, kept sliders (0-15, 0-4, as
       // modsettings.json declares them), each index NAMED - the pane drew a bare number, and "7" is not a sprite anyone
       // can choose by. The names are the mod's own preset titles (modpresets.json: Light Fighters 0, Medium Fighters 2,
       // Heavy Fighter F 4 and M 5, Mage F 6 and M 7, Thief Mage 8/9, Fighter Mage 10/11, Thief 12/13, Fighter Thief
       // 14/15), and the art says the rest: every even set is a woman and every odd set a man, and the five riders are
       // the fighters by their helms and boots (green-booted women, cyan-booted men - the on-foot sets' own colours).
-      // SKIN2 (2026-09-25, Mac: "Implement these as new skin options"): Daggerfall's own classes follow the mod's
+      // SKIN2: Daggerfall's own classes follow the mod's
       // sixteen as 16 onwards (player/classSkins.js) - the mod's range kept as its own, the port's past it.
       'Graphics.OnFoot': Object.freeze({ default: 0, min: 0, max: FOOT_SKIN_COUNT - 1, get description() { return t('mods.eyeOfTheBeholder.Graphics.OnFoot.description', 'Sprite when on foot'); },
         labels: lazyWords(() => t('mods.eyeOfTheBeholder.skin.lightFighterFemale', 'Light Fighter (female)'), () => t('mods.eyeOfTheBeholder.skin.lightFighterMale', 'Light Fighter (male)'),
@@ -1039,11 +1023,10 @@ export const MOD_SETTINGS = Object.freeze({
         labels: lazyWords(() => t('mods.eyeOfTheBeholder.skin.lightFighterFemale', 'Light Fighter (female)'), () => t('mods.eyeOfTheBeholder.skin.mediumFighterMale', 'Medium Fighter (male)'),
           () => t('mods.eyeOfTheBeholder.skin.mediumFighterFemale', 'Medium Fighter (female)'), () => t('mods.eyeOfTheBeholder.skin.heavyFighterMale', 'Heavy Fighter (male)'),
           () => t('mods.eyeOfTheBeholder.skin.heavyFighterFemale', 'Heavy Fighter (female)')) }),
-      // LAYERED-GEAR (2026-10-18, the owner: "add a option between those two thats also called On foot Layered Gearing
-      // Skin (WIP) Female and Male"): the on-foot body drawn in the helmet, chest and legs armor it wears
+      // LAYERED-GEAR: the on-foot body drawn in the helmet, chest and legs armor it wears
       // (player/eyeOfTheBeholder/layeredArmor.js), as a woman or a man - a skin the player chooses on the profile
       // (ui/skinCard.js, its Look toggle), not a feature's dial. 0 off (Skins), 1 female, 2 male, 3 the character's own
-      // body - the default (LAYERED-GEAR-ON, 2026-10-19, the owner: "Make sure this is on by default"; layeredArmor.js
+      // body - the default (LAYERED-GEAR-ON, 2026-10-19,; layeredArmor.js
       // LAYERED_OWN). The look carries the body as `lg` (net/remotePlayers.js composeLook, wire.js validLook), so other
       // players see it too.
       'Graphics.LayeredGear': Object.freeze({ default: 3, min: 0, max: 3, get description() { return t('mods.eyeOfTheBeholder.Graphics.LayeredGear.description', 'On foot Layered Gearing Skin (WIP): drawn on foot in the helmet, chest and leg armor you wear'); },
@@ -1069,7 +1052,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Debug.ShowMessages': Object.freeze({ default: true, get description() { return t('mods.eyeOfTheBeholder.Debug.ShowMessages.description', 'Shows a message when the view or shoulder changes.'); } }),
     }),
   }),
-  // IF1 (2026-09-16, Mac: "Next mod we will be adding 1:1"): IMMERSIVE
+  // IF1: IMMERSIVE
   // FOOTSTEPS 1.01 (Kirk.O). The shipped modsettings.json's four sections
   // and ten keys, section and name joined with a dot, the port's own
   // `Enabled` in front (MO1: on by default). The mod ships its clips in
@@ -1097,7 +1080,7 @@ export const MOD_SETTINGS = Object.freeze({
       'ErrorLoggingAndCompatibilitySettings.DoNotSpamExceptionsLogs': Object.freeze({ default: true, get description() { return t('mods.immersiveFootsteps.ErrorLoggingAndCompatibilitySettings.DoNotSpamExceptionsLogs.description', 'Has no effect here: this game keeps no error log.'); } }),
     }),
   }),
-  // BA1 (2026-09-16, Mac: "Next mod to integrate 1:1 ensuring compatibility"):
+  // BA1:
   // BETTER AMBIENCE 0.1.4 (Joshua Steinhauer). The shipped modsettings.json's
   // six sections and twenty keys, section and name joined with a dot (the
   // section names carry spaces, as the mod wrote them: 'Better Footsteps.enable'),
@@ -1110,9 +1093,7 @@ export const MOD_SETTINGS = Object.freeze({
   // disabled", and it posts a warning box at every game start until you do.
   // This port ships the pair the way that author says a player should run
   // them, and ports his warning for the player who turns both on anyway.
-  // BA2 (2026-09-17, Mac: "before any lighting work/the ambient mod that was
-  // introduced I really liked how the dungeons were properly dark ... is
-  // there any way to reintroduce that properly?"): THE SECOND DEPARTURE.
+  // BA2: THE SECOND DEPARTURE.
   // `Dungeon Lighting.enableFogAmbientEffect` ships OFF. The mod ships it
   // on, and on it replaces DFU's flat 0.12 dungeon ambient with a Trilight
   // grey of ~0.40 tinted toward the dungeon's fog colour - three times the
@@ -1156,7 +1137,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Better Rain.enableBetterSnow': Object.freeze({ default: true, get description() { return t('mods.betterAmbience.BetterRain.enableBetterSnow.description', 'Makes snow particles look a bit better'); } }),
     }),
   }),
-  // ORL1 (2026-09-17): OBLIVION-REMASTER-LIKE LEVELING 0.5.3 - the
+  // ORL1: OBLIVION-REMASTER-LIKE LEVELING 0.5.3 - the
   // first MORROWIND mod in this store, and the only one whose switches
   // come out of OpenMW `I.Settings.registerGroup` calls rather than a
   // `modsettings.json`. The mod's own two groups are `levelUpSettings`
@@ -1201,8 +1182,7 @@ export const MOD_SETTINGS = Object.freeze({
       miscSkillsImpact: Object.freeze({ default: 2, min: 0, max: 100, get description() { return t('mods.oblivionRemasterLeveling.miscSkillsImpact.description', 'Points given by a Misc Skill level up (100 points required to level up)'); } }),
     }),
   }),
-  // TO1 (2026-09-17, Mac: "This is the next daggerfall mod we are to
-  // implement 1:1"): TRAVEL OPTIONS 1.11 (Hazelnut). Its twelve sections
+  // TO1: TRAVEL OPTIONS 1.11 (Hazelnut). Its twelve sections
   // as modsettings.json ships them, the key named section-dot-name;
   // descriptions are the mod's own, verbatim. The shipped file's five
   // unnamed spacer sections ("__", "-", "_", "--", ".") carry no keys
@@ -1232,8 +1212,7 @@ export const MOD_SETTINGS = Object.freeze({
       'CautiousTravel.MaxChanceToAvoidEncounter': Object.freeze({ default: 95, min: 60, max: 100, get description() { return t('mods.travelOptions.CautiousTravel.MaxChanceToAvoidEncounter.description', "Maximum chance to avoid an encounter when travelling cautiously, as a percentage"); } }),
       'CautiousTravel.HealthMinimumPercentage': Object.freeze({ default: 5, min: 0, max: 25, get description() { return t('mods.travelOptions.CautiousTravel.HealthMinimumPercentage.description', "Level of health that will automatically pause the journey when travelling cautiously, as a percentage"); } }),
       'CautiousTravel.FatigueMinimumValue': Object.freeze({ default: 5, min: 0, max: 50, get description() { return t('mods.travelOptions.CautiousTravel.FatigueMinimumValue.description', "Level of fatigue that will automatically pause the journey when travelling cautiously, absolute value"); } }),
-      // TO-FIELD2 (Mac, 2026-09-18): "travel options instantly transports
-      // you to a destination and theres no travel". DEPARTURE FROM THE
+      // TO-FIELD2 (. DEPARTURE FROM THE
       // MOD'S SHIPPED DEFAULT, on Mac's word, and it is the whole of that
       // report. IsPlayerControlledTravel is an AND over three toggles
       // (travelPopUp.js:"export function isPlayerControlledTravel"): `(cautiousTravel || !speedCautious) &&
@@ -1254,16 +1233,13 @@ export const MOD_SETTINGS = Object.freeze({
       'GeneralOptions.AllowWeather': Object.freeze({ default: false, get description() { return t('mods.travelOptions.GeneralOptions.AllowWeather.description', "Allows weather effects during time accelerated travel"); } }),
       'GeneralOptions.AllowAnnoyingSounds': Object.freeze({ default: false, get description() { return t('mods.travelOptions.GeneralOptions.AllowAnnoyingSounds.description', "Allows footstep and hoof sounds during time accelerated travel"); } }),
       'GeneralOptions.AllowRealGrass': Object.freeze({ default: false, get description() { return t('mods.travelOptions.GeneralOptions.AllowRealGrass.description', 'Has no effect here: Real Grass isn’t included.'); } }),
-      // TRAVEL-NAV1 (2026-09-25, Mac: "Improving travel options navigation
-      // to properly route around objects and stopping before running into
-      // buildings"): THE PORT'S OWN KEY on the mod's pane, as HT-WAIST's is
+      // TRAVEL-NAV1: THE PORT'S OWN KEY on the mod's pane, as HT-WAIST's is
       // on Handheld Torches' - the vendored modsettings.json does not carry
       // it and its words say so. ON: a journey steers round buildings,
       // walls and rocks and pauses short of what it cannot pass
       // (systems/travel/travelSteer.js). OFF: the mod's own beeline, exactly.
       'GeneralOptions.AvoidObstacles': Object.freeze({ default: true, get description() { return t('mods.travelOptions.GeneralOptions.AvoidObstacles.description', 'Steers time accelerated travel around buildings, walls and rocks, and pauses the journey before walking into something it can’t get round.'); } }),
-      // OW-TOGGLE (2026-09-28, Mac: "bring back the original travel option as a toggle. Off by default." - "The normal
-      // first person travel accelerated was removed in favor of the overworld travel"): THE PORT'S OWN KEY on the mod's
+      // OW-TOGGLE: THE PORT'S OWN KEY on the mod's
       // pane, as AvoidObstacles is. ON: a journey is the mod's own, walked in first person as before OW-ONLY - a map
       // pick begins it on the ground, the view does not rise with it and coming down does not stop it
       // (scenes/world.js tvOwnsJourneys, which reads it live - AUDIT OW5 T1). OFF, the default: OW-ONLY.
@@ -1275,7 +1251,7 @@ export const MOD_SETTINGS = Object.freeze({
       // its refusals (scenes/world.js tvRoutesJourneys) - walked in first person, the view not raised. OFF, the default:
       // First-Person Travel is the mod's own straight journey, the original travel option Mac asked back.
       'GeneralOptions.FirstPersonTravelFollowsRoads': Object.freeze({ default: false, get description() { return t('mods.travelOptions.GeneralOptions.FirstPersonTravelFollowsRoads.description', 'With First Person Travel on, journeys follow the roads and tracks as Overworld journeys do, and a place with no way there by land can’t be picked. Off, you head straight for your destination. Takes effect at once.'); } }),
-      // RATE-LAW (2026-10-04, Mac: "Remove travel options dials" / "Roads now travel at x100 and non roads at x60"): the
+      // RATE-LAW: the
       // mod's TimeAcceleration section (DefaultStartingAcceleration, AlwaysUseStartingAcceleration, AccelerationLimit)
       // is not declared - the spinner it started and bounded is gone, and a journey runs at its ground's rate
       // (systems/timeScale.js travelRateOf). The vendored modsettings.json keeps the three; test/systems/travel/to1_travelOptions.test.js
@@ -1334,7 +1310,7 @@ export const MOD_SETTINGS = Object.freeze({
       'LocationColours.Village': Object.freeze({ default: '#a56446ff', color: true, get description() { return t('mods.travelOptions.LocationColours.description', "The colour shown on the travel map"); } }),
     }),
   }),
-  // IT1 (2026-10-04, the owner: "Actually lets let this be the next mod we integrate 1:1"): IMMERSIVE TRAVEL - kkgobkk's
+  // IT1: IMMERSIVE TRAVEL - kkgobkk's
   // carriages outside the city gates, 1.5, its three sections restated verbatim (vendor/immersive-travel/modsettings.json),
   // the author's own words and spellings, a null or empty description carried as empty. Read live: the map reads them
   // as it opens (systems/immersiveTravel.js readImmersiveTravelSettings), the calculator as it bills - where the mod's
@@ -1376,12 +1352,12 @@ export const MOD_SETTINGS = Object.freeze({
       'AllowedDestinations.Villages': Object.freeze({ default: true, description: '' }),
     }),
   }),
-  // PI1 (2026-10-07, Mac: "This is the next mod I would like to integrate (permission has been granted)"): PHYSICAL ITEMS
+  // PI1: PHYSICAL ITEMS
   // - demifiend000's items in the world as themselves, 0.1.29, its five sections the port reads restated verbatim
   // (vendor/physical-items/modsettings.json), the author's own words. Read live by the layer (systems/physicalItems.js
   // readPhysicalItemsSettings, again whenever this store changes) - the mod reads them at its load and on a settings
   // change (ApplySettings). NOT DECLARED: the Interaction section's four keys (the placement keys P, O and LeftControl,
-  // and Character Item Collision) - their placement is not ported (bible/06-Systems/Physical-Items.md), and a key the
+  // and Character Item Collision) - their placement is not ported, and a key the
   // port never reads is a switch that does nothing.
   'physical-items': Object.freeze({
     title: 'Physical Items',
@@ -1457,8 +1433,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Armor Sizes.Tower Shield': Object.freeze({ default: 0.0, min: 0.0, max: 1.5, float: true, step: 0.01, description: 'Size of a tower shield on the ground. 0 uses the Armor size.' }),
     }),
   }),
-  // HAZE1 / WINDFALL1 / SNOWFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the
-  // codebase. These should be on by default and integrate into our enhanced environments seamlessly"): demifiend000's
+  // HAZE1 / WINDFALL1 / SNOWFALL1: demifiend000's
   // three environment mods, their modsettings restated verbatim (vendor/heat-haze/, vendor/windfall/ and
   // vendor/snowfall/ modsettings.json) - every name, default, range and description the mod's, section and name joined
   // with a dot. Each mod's own Enabled (Heat Haze's in its one section, Windfall's and Snowfall's in General) IS the
@@ -1587,8 +1562,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Refill.SnowfallRefillHours': Object.freeze({ default: 1.5, min: 0.1, max: 12.0, float: true, step: 0.1, description: 'About how many hours tracks take to fill in while snow falls.' }),
     }),
   }),
-  // HCC (2026-09-23, Mac: "Next mod I want to implement 1 to 1 and also
-  // enhance its online integration functionality"): HORSE CART AND CARGO -
+  // HCC: HORSE CART AND CARGO -
   // demifiend000's persistent horse and wagon, 1.0.0-rc12, its five
   // sections restated verbatim (vendor/horse-cart-and-cargo/modsettings.json).
   // The two TextKeys are Unity KeyCode names. THE PORT SHIPS THEM ON 5 AND 6
@@ -1627,7 +1601,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Hotkeys.SummonTransport': Object.freeze({ default: 'Alpha6', text: true, get description() { return t('mods.horseCartAndCargo.Hotkeys.SummonTransport.description', 'Brings your horse and wagon to you when you’re outdoors. Click it and press a key to change it; \u2715 clears it.'); } }),   // KB1: not read by the mod any more - the key is the registry's action (inputActions.js MOD_ACTIONS); a player's saved value is carried there once (migrateKeyBinds)
     }),
   }),
-  // LEGACY1 (2026-10-05, bible/06-Systems/Legacy-Arc.md, Mac: "this is actually my DFU mod that I want to integrate"):
+  // LEGACY1:
   // PROJECT LEGACY 0.4.1 (Lattymoy, Ghð§† and Positronico). The mod's own "Family" section, its names and descriptions
   // as modsettings.json ships them (vendor/project-legacy/modsettings.json) - but B14: the mod shipped Max Siblings 0
   // and Siblings Probability 0, so a fresh install never rolled a sibling; the port ships 2 and 50. Its "Input" section
@@ -1650,7 +1624,7 @@ export const MOD_SETTINGS = Object.freeze({
       'Legacy.Model': Object.freeze({ default: 0, options: Object.freeze(['Enduring', 'Bloodline']), description: 'The kind of family a character made before this mod gets. Enduring: a death costs years. Bloodline: a death is final.' }),
       'Legacy.Toll': Object.freeze({ default: 1, options: Object.freeze(['Light', 'Standard', 'Heavy']), description: 'How many years a death takes in an Enduring family (Arkay\u2019s toll): 4%, 6% or 10% of a lifespan.' }),
       'Legacy.Heirloom Chance': Object.freeze({ default: 50, min: 0, max: 100, description: 'The chance a Bloodline death leaves an heirloom for the heir to recover.' }),
-      // LEGACY-HOME (Legacy-Arc section 10b; Mac: "itll be default on but can be toggled off").
+      // LEGACY-HOME (Legacy-Arc section 10b).
       'Legacy.Family In World': Object.freeze({ default: true, description: 'Family members you aren’t playing go about their day at the family home, or in your town if the family has no house. Talk to one to play as them.' }),
     }),
   }),
@@ -1699,8 +1673,7 @@ export const KEY_MIGRATIONS = Object.freeze([
   Object.freeze({ vendor: 'horse-cart-and-cargo', key: 'Hotkeys.QuickMountDismount', was: 'F7' }),
   Object.freeze({ vendor: 'horse-cart-and-cargo', key: 'Hotkeys.SummonTransport', was: 'F10' }),
 ]);
-/** DISC20-E (2026-09-24, Mac: "The weapon widget default toggle under diverse weapons should be set to off by
- *  default"): A SWITCH WHOSE DEFAULT MOVED, RESET ONCE. Diverse Weapons' Weapon Widget Preset has shipped off since
+/** DISC20-E: A SWITCH WHOSE DEFAULT MOVED, RESET ONCE. Diverse Weapons' Weapon Widget Preset has shipped off since
  *  DISC16-B, but a default only answers for a player who never touched the switch, and every player who turned it on
  *  while DW-CLIP shipped it on (or tried it) holds a SAVED value and still sees it on. So a stored value WITHOUT this
  *  entry's stamp is let go on load and the file written back, and the shipped off applies. setModSetting stamps the
@@ -1708,12 +1681,12 @@ export const KEY_MIGRATIONS = Object.freeze([
  *  KEY_MIGRATIONS, which can only match a value. A file that never mentioned the mod is not grown one. */
 export const SWITCH_RESETS = Object.freeze([
   Object.freeze({ vendor: 'diverse-weapons', key: 'WeaponWidgetPreset', stamp: 'WeaponWidgetPreset@DISC20' }),
-  // WEAR-VANILLA (2026-10-01): the three wear switches that moved to off
+  // WEAR-VANILLA: the three wear switches that moved to off
   Object.freeze({ vendor: 'pcaao', key: 'equipmentDamageEnhanced', stamp: 'equipmentDamageEnhanced@WEAR-VANILLA' }),
   Object.freeze({ vendor: 'pcaao', key: 'fadingEnchantedItems', stamp: 'fadingEnchantedItems@WEAR-VANILLA' }),
   Object.freeze({ vendor: 'roleplay-realism', key: 'equipDamage', stamp: 'equipDamage@WEAR-VANILLA' }),
 ]);
-/** FGH2H-R (2026-09-24, Mac: "retire it"): A SWITCH TAKEN OFF THE PANE. Roleplay & Realism's
+/** FGH2H-R: A SWITCH TAKEN OFF THE PANE. Roleplay & Realism's
  *  fightersTeachHandToHand swapped Giantish for HandToHand in the Fighters Guild's lists; FGH2H put HandToHand in the
  *  base lists beside Giantish, which left the switch one effect - taking Giantish away - so it is retired whole (the
  *  Port-Ledger's FGH2H row). A player who turned it on holds a SAVED true for a key nothing declares, so the stored

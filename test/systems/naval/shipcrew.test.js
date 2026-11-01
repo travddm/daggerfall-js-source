@@ -1,4 +1,4 @@
-// SHIP-CREW and SEA-REPAIR (2026-09-30, Mac: "Let's do #1 and a way to repair ships on the high seas" - named crew
+// SHIP-CREW and SEA-REPAIR (2026-09-30, - named crew
 // with morale ("Gentle") and deck orders; "Carpenter's stores"). The pure laws (systems/naval/shipCrew.js, navalYard.js
 // seaRepair and provisionOffer, navalStores.js), the living crew's answer to them (crewLife.js), and the real naval host
 // (test/navalSea.mjs) - her hands named and fallen, her spirits, her orders, her repairs at sea, the yard's provisions,
@@ -175,7 +175,6 @@ test('SEA-REPAIR on the host: MAKE REPAIRS mends her to whole out of the fight\'
   assert.ok(h.log.say.includes(`${mate}: ${ORDER_TEXT.repair.said}`), 'her First Mate answers');
   for (let t = 0; t < FIELD_QUIET_S + 5; t += 0.1) h.host.frame(0.1);   // a save's hurts: quiet first
   assert.equal(h.host.hudModel().ship.repairing, true);
-  // PIN MOVED (QUICK-REPAIRS): a pirate near - DAMAGE CONTROL, the work goes on under her guns at SEA_REPAIR_UNDER_FIRE of the
   // pace (it stood still while she threatened), and at the full pace once she is gone
   const pid = h.host.spawnShip('pirateBrig', { range: 200, temper: 'bold' });
   for (let t = 0; t < 1; t += 0.1) h.host.frame(0.1);
@@ -222,7 +221,7 @@ test('SHIP-CREW on the host: A HAND LOST FALLS BY NAME and wears their spirits; 
   const e = w.host._sea.get(id);
   w.host.frame(0.1);
   const m0 = w.host.crewOf(w.boat).morale;
-  for (let left = Math.floor(e.ship.damage.hull - 1); left > 0; left -= NAVAL_HIT_MAX) w.host.applyPeerHit('local', navalHitData('local', { n: e.n, hull: Math.min(left, NAVAL_HIT_MAX) }));   // PIN MOVED (TOUGHER-SHIPS): her hull past one hit's most
+  for (let left = Math.floor(e.ship.damage.hull - 1); left > 0; left -= NAVAL_HIT_MAX) w.host.applyPeerHit('local', navalHitData('local', { n: e.n, hull: Math.min(left, NAVAL_HIT_MAX) }));
   w.host.frame(0.1);
   assert.equal(e.ship.damage.state, 'struck');
   assert.equal(w.host.crewOf(w.boat).morale, m0 + MORALE_EVENT.win, 'she struck to us: spirits up');

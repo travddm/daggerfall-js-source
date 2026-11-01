@@ -1,7 +1,7 @@
 // AUDIT TESA II Z8 (AUDIT TESA-BIOME Z8, OWED): the landforms' hills past the Bay wear their zone's land - a node off the
 // Bay's map past its seam band reads the continent's climate (world/tamriel/tamrielGround.js tamrielClimateAt), where every
 // one had been held to the nearest edge pixel's (86% of the land past the Bay wore another land's hills); the Bay and its
-// seam band keep the table's own, to the bit. bible/03-World/Tamriel-Biomes.md, bible/01-Overview/audits/Audit-Tesa-Biome.md.
+// seam band keep the table's own, to the bit.,.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,7 +1,4 @@
-// CHAT1 (2026-09-12, Mac: "I want to add a new UI element. The live chat
-// in enhanced format. Players will be able to type and chat live with
-// other players. Currently I just want one world tab with the ability
-// to add more tabs at a later time"): THE PANEL - the enhanced skin's
+// CHAT1: THE PANEL - the enhanced skin's
 // DOM chat, top-left over the world, under the touch layer's corner
 // buttons.
 //
@@ -35,7 +32,7 @@
 // its ring, and a press begun on the canvas and let go over the box
 // must still let go, or the weapon swings until the next click.
 //
-// AUDIT CHAT (2026-09-12, before the merge). The open key is the
+// AUDIT CHAT. The open key is the
 // ActivateCursor binding (Enter by default), resolved through the
 // registry, not a literal (C4: the panel was eating DFU's cursor key
 // at the window, and its own key could not be rebound); opening frees
@@ -53,9 +50,7 @@
 // name carries a tag from the guarded id (A5); the dial counts as an
 // overlay (C1, in pixelDial.js) and an open overlay hides the panel.
 //
-// CHAT-FIT (2026-09-22, Mac: "names sometimes take up 2 rows, the
-// list isnt scrollable and continues to grow, enlarging the chat.
-// Glyphs should also show on chat names in the chat itself"): THREE
+// CHAT-FIT: THREE
 // DEFECTS, and the first two have one cause. The roster column was a
 // flex child that CONTRIBUTED ITS HEIGHT: `.dfchat-cols` has no height
 // of its own, so a column of nineteen rows stretched the row, the box
@@ -74,15 +69,10 @@
 // answer for me, a peer, or a peer this session once met) on the same
 // pass that asks the name's colour, so a glyph shown or hidden
 // mid-conversation reaches the lines already said. (CHAT-FIT laid the
-// author's title before the name too; TITLE-C, 2026-10-12, Mac: "remove
-// titles from appearing in the chat", took it off - a line wears no
+// author's title before the name too; TITLE-C, 2026-10-12,, took it off - a line wears no
 // title, as the roster has worn none since TITLE-R.)
 //
-// SOC3 (2026-09-16, Mac: "A social button next to the chat UI, that
-// when tapped opens the new friends list + party interface ... be able
-// to invite friends or other individuals to the new 4 person party
-// system. Party system: Upon joining a party, the players name who are
-// in a party together should turn green"): THREE SEAMS, AND NO NET.
+// SOC3: THREE SEAMS, AND NO NET.
 //
 // This file still imports no socket and no social module. What SOC3
 // adds is three OPTIONS the host fills from the picture it already
@@ -106,8 +96,7 @@
 // A host that passes none of the three gets the chat it had, byte for
 // byte: no button is built, no colour is asked for, no row is a door.
 //
-// CHAT-SIZE (2026-09-23, Mac: "I want to implement the ability to click and
-// drag the chat to resize/along with the text"): THE CORNER. A grip at the
+// CHAT-SIZE: THE CORNER. A grip at the
 // box's bottom-right corner drags it from there: the WIDTH is
 // the text's scale (width / 440, the sheet's own width, between 0.8 and
 // 1.8 - every size the chat's TEXT is drawn at is `calc(Npx * scale)`:
@@ -125,10 +114,7 @@
 // panel was placed off the chat's old fixed size (AUDIT SOC C13) and a
 // resized chat would have slid under it.
 //
-// CHAT-SCROLL (2026-09-23, Starempire42 on Discord: "Make it so when you
-// open the chat it automatically scrolls to the newest message ...
-// Currently when you open the chat it just stays idle so you have to
-// manually scroll down to the newest message every single time"): AN
+// CHAT-SCROLL: AN
 // OPEN LANDS ON THE NEWEST LINE, and the list stays there while it is
 // read at the bottom. Two causes, one law. (1) The follow rule asked the
 // LIST where the reader was - "at the bottom, within 8px" - on the first
@@ -209,7 +195,7 @@ export const CHAT_STYLE_ID = 'dagger-chat-style';
 
 /** The panel's sheet: the enhanced tokens (enhancedStyle.js) where they exist, a fallback where the skin's sheet is not loaded.
  *
- *  FONT1 (2026-09-16, Mac: "Especially the new online interfaces font use our enhanced font"): THE FACE IS THE
+ *  FONT1: THE FACE IS THE
  *  SKIN'S, NOT THE LAUNCHER'S. This sheet set `--data` (Barlow Semi Condensed) - which is the MENU's face, the one
  *  the boot screens and the settings pages are set in - so the chat stood over an enhanced world in a font nothing
  *  else in that world uses. In-game the enhanced skin is the pixel stack (ui/pixelifyFive.js PIXEL_STACK, the same
@@ -308,7 +294,7 @@ ${Object.entries(CHANNEL_COLOURS).map(([ch, c]) => `.dfchat[data-colours="on"] .
    colour, the one a refusal already wears. */
 .dfchat-line.red .dfchat-text { color: #e2453a; font-style: normal; font-weight: 600;
   letter-spacing: .01em; }
-/* TITLE-N (Mac: "/dm to message chat with orange text (similar to /red)"): the Dungeon Master's line - /red's weight,
+/* TITLE-N: the Dungeon Master's line - /red's weight,
    in the Dungeon Master title's own orange (ui/playerBadge.js TITLE_RGBA.dungeonmaster). */
 .dfchat-line.dm .dfchat-text { color: ${cssRgba(TITLE_RGBA.dungeonmaster)}; font-style: normal; font-weight: 600;
   letter-spacing: .01em; }
@@ -338,8 +324,7 @@ ${Object.entries(CHANNEL_COLOURS).map(([ch, c]) => `.dfchat[data-colours="on"] .
 .dfchat-box { container-type: inline-size; }
 .dfchat-tablist { display: flex; gap: 2px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; }
 .dfchat-tablist::-webkit-scrollbar { display: none; }
-/* TAB-WHEEL (2026-10-12, Mac: "if there are too many you cant click em aynmore and they get cut off hovering over the
-   bars and scrolling would help, dont add a scrollbar up there"): the strip turns under the mouse wheel (panel: the
+/* TAB-WHEEL: the strip turns under the mouse wheel (panel: the
    strip's wheel), still with no bar; where tabs stand past an edge that edge fades out, so the cut-off tab reads as
    "more this way" and not as a broken label. */
 .dfchat-tablist[data-more="right"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); }
@@ -379,7 +364,7 @@ ${Object.entries(CHANNEL_COLOURS).map(([ch, c]) => `.dfchat[data-colours="on"] .
 .dfchat.touch .dfchat-find-clear { min-width: 44px; min-height: 44px; }
 .dfchat-hit { background: rgba(192, 138, 62, .38); color: inherit; border-radius: 2px; }
 .dfchat-find-none { color: var(--dim, #9a9486); font-style: italic; }
-/* CHAT-FIND: AT THE TOP OF THE ROSTER COLUMN (the owner: "above the player list for better visibility") - the field the
+/* CHAT-FIND: AT THE TOP OF THE ROSTER COLUMN - the field the
    column's width, the clear beside it, the count on its own line under them. Where the column is not drawn (a screen
    under 560px, a host with no roster) the strip stands over the conversation instead (placeFind), 180px wide. */
 .dfchat-who .dfchat-find { flex: none; flex-wrap: wrap; gap: 2px 4px; padding: 6px 6px 4px; }
@@ -460,7 +445,7 @@ ${Object.entries(CHANNEL_COLOURS).map(([ch, c]) => `.dfchat[data-colours="on"] .
 .dfchat-social-out { display: inline-flex; pointer-events: auto; margin-top: 4px; }
 .dfchat[data-state="open"] .dfchat-social-out { display: none; }
 .dfchat-social-tab { display: inline-flex; margin: 2px 4px 4px auto; }
-/* CHAT-TRADE (Mac: "There must be a better way to handle the new channels instead of a text command"): THE CHANNEL
+/* CHAT-TRADE: THE CHANNEL
    PICKER - one small + beside the tabs, before Social, so the bar a new player sees gains a single glyph and no tab; it
    opens a short list of the channels joined by choice, each a row with its mark, a click joining or leaving it. */
 .dfchat-tabs { position: relative; }
@@ -481,14 +466,12 @@ ${Object.entries(CHANNEL_COLOURS).map(([ch, c]) => `.dfchat[data-colours="on"] .
 /* a request waiting on YOU is not an unread line: its own colour, so the two badges never read as one count */
 .dfchat-social .dfchat-badge { background: #c8503c; color: #f6efe2; }
 
-/* SOC3: A ROSTER ROW IS A DOOR (Mac: "invite friends or other
-   individuals"). The "other individuals" are the names in this column,
+/* SOC3: A ROSTER ROW IS A DOOR. The "other individuals" are the names in this column,
    so a click on one opens a small menu of what can be done with that
    peer; what cannot carries the reason as its title rather than
    vanishing, because a missing button teaches nothing.
 
-   MAC-J (2026-09-17, Mac: "the online section where player's names are
-   shown are too large and shouldn't be large rectangles"): the marker
+   MAC-J: the marker
    class is dfchat-act, and the prefix is the whole fix. It was a bare
    "act" - and .act is the ENHANCED SKIN'S BUTTON (ui/enhanced/enhancedStyle.js:
    padding 12px 20px, a 1px iron border, min-height 46px), which is
@@ -657,7 +640,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
     b.addEventListener('click', () => { insertAtCaret(ch); setEmojiOpen(false); });
     emojiGrid.append(b);
   }
-  // STAFF-CHAT-RED (mob, 2026-10-23: "give me a option next to chat to chat as /red or myself at all times"): THE VOICE
+  // STAFF-CHAT-RED: THE VOICE
   // SWITCH, built only when the host hands `voice` - Me and Red, two toggle buttons in a group before the field. A press is
   // the voice's (`pick`: Me while hidden asks first), and the caret goes back to the field; `paintVoice` draws it.
   const voiceBox = voice ? el('div', 'dfchat-voice') : null;
@@ -1051,8 +1034,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
    *  document has no SVG door: such a document draws NO glyph rather than throwing under somebody's name. */
   const glyphSvg = (g, cls) => glyphSvgNode(doc, g, cls);   // INSPECT1: the one drawing, ui/playerBadge.js - shared with the name over a head and the profile card
   /** CHAT-FIT: the badge nodes a chat line's author wears AFTER the name - the guild's tag, then the glyphs, the roster
-   *  row's own order (ACC3c) - for a { glyphs, gt } record, or none for null. TITLE-C (2026-10-12, Mac: "remove titles
-   *  from appearing in the chat"): nothing BEFORE the name - a line wears no title, as a roster row wears none (TITLE-R);
+   *  row's own order (ACC3c) - for a { glyphs, gt } record, or none for null. TITLE-C: nothing BEFORE the name - a line wears no title, as a roster row wears none (TITLE-R);
    *  a title is worn over the head (ui/nameLayer.js, net/remotePlayers.js) and on the inspect card (ui/profileWindow.js). */
   const badgeNodes = (peer, prefix) => {
     const after = [];
@@ -1111,7 +1093,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
     if (at < text.length) out.push(plain(text.slice(at)));
     return out;
   };
-  /** SAFE1 + SAFE3 (bible/11-Multiplayer/Chat-Safety-Arc.md): A SPOKEN LINE'S OWN MENU - the host's `lineActions(line)`
+  /** SAFE1 + SAFE3: A SPOKEN LINE'S OWN MENU - the host's `lineActions(line)`
    *  (Report, with its reasons; Block or Unblock), opened by pressing the speaker's name under the line and closed by
    *  pressing it again, by a choice, or by opening another line's. Never on my own line, nor on one nobody spoke. */
   let lineMenu = null;
@@ -1126,7 +1108,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
       const acts = lineActions(line) ?? [];
       if (!acts.length) return;
       const menu = el('div', 'dfchat-rowmenu dfchat-linemenu');
-      // STAFF-PANEL2-CHATMENU (2026-10-22): a row with its own `menu` opens that level in place of this one (a mute's
+      // STAFF-PANEL2-CHATMENU: a row with its own `menu` opens that level in place of this one (a mute's
       // lengths, a ban's and its confirm) and closes nothing; `title` is the row's tooltip
       const fill = (rows) => menu.replaceChildren(...rows.map((a) => {
         const b = el('button', 'dfchat-rowbtn', String(a.label ?? ''));
@@ -1193,8 +1175,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
   };
 
   /**
-   * SOC3 (Mac: "the players name who are in a party together should
-   * turn green"): THE COLOUR PASS.
+   * SOC3: THE COLOUR PASS.
    *
    * Who is in my party is the HUB's word (net/social.js isPartyPeer),
    * which this file cannot see and must not cache - a seat can change
@@ -1340,7 +1321,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
    */
   const rowMenu = (peerId) => {
     const menu = el('div', 'dfchat-rowmenu');
-    // ROSTER-STAFF (2026-10-24): a row with its own `menu` opens that level in place of this one (a staff member's mute
+    // ROSTER-STAFF: a row with its own `menu` opens that level in place of this one (a staff member's mute
     // lengths, a ban's and its confirm), as a line's menu does; `title` is a row's tooltip
     const fill = (rows) => menu.replaceChildren(...rows.map((a) => {
       const b = el('button', 'dfchat-rowbtn', String(a.label ?? ''));
@@ -1395,7 +1376,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
     if (key === whoKey) return;
     whoKey = key;
     whoHead.textContent = query ? `${label} \u2014 ${rows.length} of ${total}` : rosterTitle(total, label);   // CHAT-FIND: how many the search found, of the room (one line, as the heading always is)
-    // ROSTER-G (Mac: "the roster naming itself seems hardcoded"): the #tag is the tie-breaker for two players with ONE
+    // ROSTER-G: the #tag is the tie-breaker for two players with ONE
     // name (net/roster.js's second sort clause, the chat line's own suffix), and it read as a fixed code stuck to every
     // name. It is drawn only where it does that work - beside a name another row shares.
     const dup = new Set(); const seen = new Set();
@@ -1413,8 +1394,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
       // CHAT-FIT: the row's ONE LINE - name, glyphs, tag in a nowrap flex line the name gives way in; the row itself
       // stays a block so SOC3's menu opens under it.
       const line = el('div', 'dfchat-who-line');
-      // TITLE-R (2026-09-24, Mac: "Titles shouldnt show in the online panel. Only glyphs. Titles should remain over
-      // names and within chat itself"): the roster is a list of who is here - the glyphs AFTER the name are what is
+      // TITLE-R: the roster is a list of who is here - the glyphs AFTER the name are what is
       // true of each; the title a player chose to wear is theirs to show over their head (TITLE-C, 2026-10-12, Mac:
       // "remove titles from appearing in the chat" - and no longer beside their lines).
       line.append(nameEl);
@@ -1738,7 +1718,7 @@ export function createChatPanel({ log, onSend, roster = null, canOpen = () => tr
       clearSuggest();
       return true;
     },
-    /** AUDIT SAFE CLIENT-12 (2026-10-17): A LINE THE RELAY REFUSED, BACK IN THE FIELD - a new voice's public line too soon
+    /** AUDIT SAFE CLIENT-12: A LINE THE RELAY REFUSED, BACK IN THE FIELD - a new voice's public line too soon
      *  for its pace (`slowed`) left the field when it was sent, and the relay's word on it is said once in a while
      *  (scenes/chatSafetyHost.js), so inside the quiet window it vanished. Put back only into an EMPTY field: whatever the
      *  player has typed since is theirs. True when it went back. */

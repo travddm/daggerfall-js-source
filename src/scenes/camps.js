@@ -169,9 +169,7 @@ export function createCamps({
    * of them - the menu, the warmth and the rest a fire makes - which is
    * every door that reads `shown()`.
    *
-   * SURV-OFFSIGHT (2026-09-23, Mac: "No, not off.. theres no reason to
-   * have it in off, really only being able to see other people's
-   * campfires makes sense"). WHAT OFF SEES IS NOT WHAT IT USES. Another
+   * SURV-OFFSIGHT. WHAT OFF SEES IS NOT WHAT IT USES. Another
    * player's camp is part of the world the room shares - they sit at
    * that fire and sleep in that tent - so the doors of SIGHT read
    * `seen()`: every camp with the arc on, and with it Off every camp that
@@ -182,11 +180,10 @@ export function createCamps({
    * player's own camps, stood while the arc was on, stay out of sight
    * with the rest of the arc.
    */
-  // REST2 (bible/06-Systems/Rest-Arc.md section 3): ONLINE THE FIRES ARE EVERYONE'S. A rest online is an act at a fire
+  // REST2: ONLINE THE FIRES ARE EVERYONE'S. A rest online is an act at a fire
   // or a bed (systems/rest/restAct.js), so the Campfire, the camps it stands and the world's braziers are the rest's, not the
   // arc's alone: online every door below opens with the arc Off too. Offline Off is SURV-OFFSIGHT's, unchanged.
-  // ENDLESS PROVISIONS (2026-10-04, Mac: the Campfire Kit and Rations for everyone - "i can use and find all those without
-  // climates and calories"): A CAMP IS EVERY TIER'S. It is placed, seen, named, rested at, cooked at, stoked and packed with
+  // ENDLESS PROVISIONS: A CAMP IS EVERY TIER'S. It is placed, seen, named, rested at, cooked at, stoked and packed with
   // the arc Off, offline too - `seen` is every camp, and the ray, the menu and the click read it. What stays the arc's offline
   // is the WARMTH: `shown` (byFire, the felt temperature's fire) and a world hearth's menu - there is no felt temperature
   // to warm. This supersedes SURV-OFFSIGHT's "Off sees, never uses".
@@ -202,8 +199,7 @@ export function createCamps({
     if (isFirewood(item)) return feedFire(item, list);
     if (isBedroll(item)) return layBedroll(item, list);
     // ENDLESS PROVISIONS: no arc gate - a camp is stood in every tier (`seen`, above); the camp law's own checks below
-    // CAMP-SILENT (2026-09-22, DragynDance on Discord: "camp kits don't
-    // work for me"). USING AN ITEM ALWAYS SAYS SOMETHING. Every other
+    // CAMP-SILENT. USING AN ITEM ALWAYS SAYS SOMETHING. Every other
     // arm below refuses with words - in town, indoors, foes near, no
     // ground, worn out - and this one returned false with NO message at
     // all, so a player whose host could not answer for the ground got
@@ -217,8 +213,7 @@ export function createCamps({
     const col = collider?.();
     const r = placeCampItem(item, list, {
       now: now(), owner: selfId?.() ?? null, feet: cam.feet, yaw: cam.yaw ?? 0,
-      // CAMP-GROUND (2026-09-22, Mac: "camping not working in the world
-      // because of flat terrain"). THE PROBE WAS ASKING THE WRONG DOOR.
+      // CAMP-GROUND. THE PROBE WAS ASKING THE WRONG DOOR.
       // `raycast` walks the collider's TRIANGLE BUCKETS alone, and
       // outside the ground is not a mesh - it is `heightAt`, the
       // terrain sampler. So a ray cast straight down from a player
@@ -668,8 +663,7 @@ export function createCamps({
   /**
    * The needs law's `byFire`: within BY_FIRE_REACH of a lit fire.
    *
-   * HEARTH1 (Mac: "Does this version of C&C not let you use braziers as
-   * extra campfires to cook from?"): anyone's CAMP, and now the world's
+   * HEARTH1: anyone's CAMP, and now the world's
    * own braziers and fire bowls with them. A fire is a fire - it warms
    * you, dries you and makes a rest a camp's rest (SURV4 reads this
    * through `restKind`), and a player standing over a roaring brazier

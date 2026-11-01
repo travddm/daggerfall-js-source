@@ -1,5 +1,4 @@
-// L10N1 (2026-09-27, the request: "a proper localization/translation integration for our game ... for as many
-// languages as we possibly can and do this right"). DFU's text core, ported: TextManager's lookups, lists and name
+// L10N1. DFU's text core, ported: TextManager's lookups, lists and name
 // helpers, StringTableCSVParser's reader (quirks and all - every DFU translation pack is authored against it),
 // StringTablePatcher's merge and the grammar hook; and the port's locales on top - a chain per locale, the constants
 // the port holds as the English, its own strings in an ICU MessageFormat subset, and a pseudo-locale. Driven over

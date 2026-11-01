@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE RASTER: the continent as the Bay's own kind of data.
+// TAMRIEL1 - THE RASTER: the continent as the Bay's own kind of data.
 //
-// Mac: "a gigantic map that can be used for later use". The streamed world reads the Bay as three byte planes -
+// . The streamed world reads the Bay as three byte planes -
 // WOODS.WLD's height (byte * 8 metres, the sea at 3 and under), CLIMATE.PAK's climate (formats/mapsTables.js CLIMATES)
 // and POLITIC.PAK's region - at one byte a map pixel. This lays the authored continent (world/tamriel/tamrielGeography.js) out
 // in that shape over the whole frame (world/tamriel/tamrielFrame.js), at a cell size the caller picks, and then COMPOSES the

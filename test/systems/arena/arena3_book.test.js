@@ -1,4 +1,4 @@
-// ARENA3 (2026-10-02; bible/11-Multiplayer/Arena.md "1. The gate" - "the bookmaker - wagers on the bout on the floor
+// ARENA3 (2026-10-02; "1. The gate" - "the bookmaker - wagers on the bout on the floor
 // (gold, house edge, odds from the fighters' records)"): THE BOOKMAKER (systems/arena/arenaBook.js, scenes/arena/arenaGate.js).
 // Pinned here: each exhibition fighter's record and strength from the bout's own seed; the chances from the strengths;
 // the price shaded by the house's tenth and rounded DOWN the bookmaker's ladder; the payout in whole gold; the wager's

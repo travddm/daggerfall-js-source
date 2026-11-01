@@ -1,6 +1,5 @@
 // @ts-check
-// SD2 (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most";
-// bible/11-Multiplayer/Super-Dungeons.md sections 3 and 5): WHERE THE HOLLOW STANDS, AND WHAT STANDS THERE - the
+// SD2: WHERE THE HOLLOW STANDS, AND WHAT STANDS THERE - the
 // client's half of the site, over the world's own data, the gate's own way (systems/gate/gateSite.js).
 //
 // The relay chose the REGION (net/superDungeon/sdLaw.js pickSdRegion - the census of its players) and knows nothing more; every
@@ -139,7 +138,7 @@ export const pickSdTemplate = (s, templates) => (templates?.length ? templates[s
 
 // ═══ WW5: A HOLLOW PAST THE BAY ═══════════════════════════════════════
 //
-// (bible/03-World/World-Wide.md WW5) A province's lane raises its own Hollow (net/superDungeon/sdLaw.js): its census its
+// (WW5) A province's lane raises its own Hollow (net/superDungeon/sdLaw.js): its census its
 // province's region, else its great cities - the province's own, off the world's registry of places (TESA's - WW7-1),
 // ranked by the hubs' own claim as the Bay's rows are; its site the gate's own suitable pixels of its theatre
 // (systems/gate/theatreGateSite.js scanTheatreGate - the registry's places, the land's own water) whose nearest town is

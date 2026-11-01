@@ -1,11 +1,11 @@
-// AUDIT PRECIP HOST-7 (the owner: "Audit this and ensure perfection. No band aids"): ON THE SNOW LANE A SEASON'S TURN
+// AUDIT PRECIP HOST-7: ON THE SNOW LANE A SEASON'S TURN
 // RE-SKINS WHAT STANDS, IN PLACE. The snow turns a pixel at the weather's rate (scenes/snowCoverHost.js sweep), and each
 // turn was the classic flip's whole teardown - the terrain, the collider, the doors, the street's people and the grass
 // rebuilt, and the motor held on the player's own pixel through the build - though nothing it took depended on the snow.
 // DFU re-skins in place (DaggerfallLocation.ApplyClimateSettings): scenes/pixelBuild.js reskinPixelNow re-makes the
 // season's parts alone - the climate table (world/texRemap.js reskinRemap) and the merge through it, the homes' looks, the
 // mills' bodies, the flats' groups with their forest, cover and far pictures - aside, and trades them in one step. Run
-// here on a standing pixel through the build's own code; the record is bible/01-Overview/audits/Audit-Precip.md.
+// here on a standing pixel through the build's own code; the record is.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

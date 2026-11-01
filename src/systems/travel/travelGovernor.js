@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV2 - THE LOAD GOVERNOR (bible/06-Systems/Travel-View.md).
+// TV2 - THE LOAD GOVERNOR.
 //
-// Mac's call on the speed: "Cap it to what loads cleanly." From the
+// From the
 // travel view a journey is WATCHED - the ground two and three leagues
 // ahead is on the screen - and Travel Options will drive a traveller at
 // up to a hundred times walking pace, faster than the streaming grid
@@ -122,8 +122,7 @@ export function unbuiltAround(center, radius, isBuilt, out = null) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// OW-LEAD (2026-10-17, the player: "the overworld travel randomly slows down from speed multiplier even without enemies
-// nearby ... it almost always [goes] down to 1x and after a while it goes up again"). THE LAND'S HOLD IS HOW NEAR THE
+// OW-LEAD. THE LAND'S HOLD IS HOW NEAR THE
 // HOLE IS, NOT HOW LONG IT HAS STOOD. The halving above cut the clock again every TV_GOV_SETTLE_S while ANY pixel of the
 // counted grid was still building - and a slower clock builds nothing faster, so a crossing's row that took the pump
 // eight seconds (a town or two in it: a second or more each) took every journey from x100 to x1 (50, 25, 10, 5, 1), and

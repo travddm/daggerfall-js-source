@@ -1,5 +1,5 @@
 // @ts-check
-// SAFE1-SAFE4 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md): THE LAW BOTH ENDS AGREE ON
+// SAFE1-SAFE4: THE LAW BOTH ENDS AGREE ON
 // - the client that asks, and the account service that decides. A player's block list (SAFE1), a report's shape
 // (SAFE3), the ladder a strike climbs and a ban's bounds (SAFE4), and the chat commands that ask for them.
 //
@@ -41,7 +41,7 @@ export const REPORT_LINE_AGE_MS = 24 * 3600 * 1000;
 /** AUDIT SAFE DOC-17: how far AHEAD of the service's clock a line's stamp may say it was said, ms - the relay's clock and
  *  the service's are two machines, and a minute is more than they drift; a line further on is no line of now. */
 export const REPORT_LINE_AHEAD_MS = 60_000;
-/** AUDIT SAFE CLIENT-5 (2026-10-17): THE CLIENT'S OWN BOUND, an hour under the service's - a line this page heard more
+/** AUDIT SAFE CLIENT-5: THE CLIENT'S OWN BOUND, an hour under the service's - a line this page heard more
  *  than this long ago (by its own clock, net/chat.js reportLines) is not picked. The hour is the room between the page's
  *  clock and the relay's, and the moments a report spends on the wire. */
 export const REPORT_PICK_AGE_MS = REPORT_LINE_AGE_MS - 3600 * 1000;
@@ -54,7 +54,7 @@ export const REPORT_NOTE_MAX = 200;
  * lines come back in the order they were said. `{ error }` names what is wrong in the service's refusal words. The
  * stamps are the service's to verify (chatStamp.js verifyStamp) - this is the shape alone.
  *
- * AUDIT SAFE CLIENT-5 / DOC-7 (2026-10-17): A LINE OUT OF ITS DAY IS DROPPED, NOT REFUSED. A line older than
+ * AUDIT SAFE CLIENT-5 / DOC-7: A LINE OUT OF ITS DAY IS DROPPED, NOT REFUSED. A line older than
  * REPORT_LINE_AGE_MS - or stamped more than REPORT_LINE_AHEAD_MS after now (DOC-17) - refused the WHOLE report as
  * `report-stale`, and the client picked lines by nothing but the tab they were on: a quiet tab (a guild's, a party's, a
  * language's) or a page left open overnight keeps yesterday's lines, so a line said a minute ago, reported from its own
@@ -116,7 +116,7 @@ export const banRangeText = () => t('net.safety.banRange', 'A ban is 1 to {max} 
 /** When a mute or a ban ends, as a player reads it: the date in the player's language (the text core's, not the
  *  browser's - AUDIT SAFE CLIENT-13), or "for good". @param {number} s epoch seconds */
 export const untilText = (s) => (s >= BAN_FOREVER ? t('net.safety.forGood', 'for good') : t('net.safety.until', 'until {when}', { when: new Date(s * 1000).toLocaleString(intlLocale()) }));
-/** AUDIT SAFE CLIENT-2 (2026-10-17): A BAN, AS ITS PLAYER IS TOLD IT - banRangeText's way: one sentence with one home,
+/** AUDIT SAFE CLIENT-2: A BAN, AS ITS PLAYER IS TOLD IT - banRangeText's way: one sentence with one home,
  *  said by the game when the relay says the account is banned (scenes/chatSafetyHost.js) and by the account card when
  *  the service refuses a sign-in or a recovery for it (accountClient REFUSALS 'banned' - the service's 403 carries the
  *  end and the moderator's reason). @param {number} until epoch seconds @param {unknown} [reason] */
@@ -151,7 +151,7 @@ const USAGE = Object.freeze({
   case: () => t('net.safety.usageCase', 'Usage: /case <name> - the open case on that player.'),
   dismiss: () => t('net.safety.usageDismiss', 'Usage: /dismiss <name> - closes their open case with no action.'),
 });
-/** AUDIT SAFE DOC-4 (2026-10-17): THE MODERATORS' OWN LINES - /modhelp. MOD1's /mute and /unmute (net/moderation.js), this
+/** AUDIT SAFE DOC-4: THE MODERATORS' OWN LINES - /modhelp. MOD1's /mute and /unmute (net/moderation.js), this
  *  file's /ban, /unban and /strikes, and the reports' queue read in the game: the service answers each for a moderator
  *  alone (MODERATOR_HANDLES), so a player who asks reads what they could not do. */
 export const modHelpLines = () => [
@@ -170,7 +170,7 @@ const COMMAND_RE = new RegExp(`^/(${SAFETY_COMMANDS.join('|')})(?:\\s+([\\s\\S]*
  * a command typed wrong - said, never sent as chat. A NAME MAY HAVE A SPACE IN IT (a guest's always does), so a report's
  * reason and a ban's length are the LAST word, and only when that word is one; everything before it is the name.
  *
- * AUDIT SAFE DOC-13 + SERVICE-10 (2026-10-17): AND WHAT FOLLOWS THE FIRST COLON IS THE REPORTER'S OR THE MODERATOR'S OWN
+ * AUDIT SAFE DOC-13 + SERVICE-10: AND WHAT FOLLOWS THE FIRST COLON IS THE REPORTER'S OR THE MODERATOR'S OWN
  * WORDS - a report's note (`/report <name> [reason]: <note>`, at most REPORT_NOTE_MAX, which the moderators read beside
  * the lines) and a ban's reason (`/ban <name> [days|perm]: <reason>`, which the banned player is shown). The service
  * took both and no client ever sent either. A name with a colon in it is reported or banned from a line's own menu.

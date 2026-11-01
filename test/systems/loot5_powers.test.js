@@ -1,6 +1,4 @@
-// LOOT5 - EVERY LEGENDARY A POWER (2026-10-01; bible/06-Systems/Loot-Arc.md section 7, Mac: "Do you wanna turn this
-// into an arc and do all of the above?" - "Legendary powers. Give each Legendary one effect that shapes a build. The
-// hooks Sigil Sets already use ... would carry them. They'd work offline, like Legendaries do now"). The laws pinned:
+// LOOT5 - EVERY LEGENDARY A POWER. The laws pinned:
 //   - THIRTY POWERS: one a record, a name, a brief inside CARD-FIT's 32, a sentence; the card says it.
 //   - WHO: MY entity's worn pieces, ONE count a power; a weapon's power rides that weapon's blows; asleep in a duel;
 //     nothing with the switch off; offline as online.

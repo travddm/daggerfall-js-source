@@ -1,6 +1,4 @@
-// CUSTOMS-ELSEWHERE (2026-09-30, FIELD BUGS 2026-09-30 - Dwarfblood in #dev-chat: the Online door's "The realm has no
-// record of this character from before it opened ... so it cannot come in", of Tabby the Sneaky, "And yes, I did go
-// online with this one in an older build"; bible/01-Overview/bugs/Field-Bugs-2026-09-30.md). The census (realm_census) counts
+// CUSTOMS-ELSEWHERE. The census (realm_census) counts
 // a character under the ACCOUNT it went online with - and a player with a guest on one browser and a handle on another,
 // or the desktop app beside the web, played one character on two accounts. Customs asked this account's census alone and
 // said "no record" of a character the realm DID count, on the other account: the one refusal that sent the player to the

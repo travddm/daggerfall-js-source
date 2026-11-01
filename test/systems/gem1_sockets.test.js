@@ -1,6 +1,4 @@
-// GEM1-GEM3 - GEM SOCKETS (2026-10-09; bible/06-Systems/Gem-Sockets.md; Mac: "Id like to have and show weapons with
-// physical gem slots that can be slotted into, along with introducing new gem items into the world loot pool and world
-// bosses").
+// GEM1-GEM3 - GEM SOCKETS.
 //
 // GEM1: a socket LIST (`sockets`) where LOOT20 wrote one string - a weapon holds its size's (a short blade one, a
 // one-handed weapon two, a two-handed one three), the weapons' own pass gives the rest after every draw a door made, a
@@ -38,7 +36,6 @@ import { mountEnhancedInventory } from '../../src/ui/enhanced/enhancedInventory.
 import { UNSET_ASK } from '../../src/ui/reforgeWindow.js';
 import { withDom } from '../invdrag.mjs';
 
-// PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, after the gem
 // arc's - where a socket drew, the two runs' techniques differ, so a piece's technique line and its worth are set aside on
 // both sides
 const noTech = (x) => { const t = LR.techniqueLineOf(x); return t ? { ...x, affixes: x.affixes.filter((a) => a !== t), value: x.value - LR.affixesWorth([t], x) } : x; };
@@ -202,7 +199,7 @@ test('GEM1 the weapons\' own pass: a Magic weapon a socket 120 in a thousand and
       const none = list(); LR.rollLootRarity(none, src, { rolls: lcg(seed) });
       assert.equal(all.length, none.length, `seed ${seed}: the late finds the seed's own`);
       all.forEach((it, i) => {
-        const strip = (x) => { const { sockets, ...rest } = noTech(x); return rest; };   // PIN MOVED (TECH1): and its technique
+        const strip = (x) => { const { sockets, ...rest } = noTech(x); return rest; };
         assert.deepEqual(strip(it), strip(none[i]), `seed ${seed}: piece ${i} the same but its sockets`);
         if (it.group === 'Weapons' && LR.socketCap(it)) { assert.equal(LR.socketsOf(it).length, LR.socketCap(it), 'every chance: its whole size'); if (LR.socketsOf(none[i]).length !== LR.socketCap(it)) differed++; }
       });
@@ -281,7 +278,7 @@ test('GEM2 the graded gems: thirty-two rows of the port\'s own at 1900-1931, eac
 test('GEM2 the world\'s gem find: 10 in a thousand and 2 a tier to 50 (GEM-RARE, a third of GEM2\'s), a pile 1.3 times and a boss 2.5, luck the ladder\'s own; the grade the source\'s band, a boss four tiers deeper; at every door, its very last draw; off nothing', () => {
   on();
   try {
-    assert.deepEqual(G.GEM_FIND, { base: 10, perTier: 2, cap: 50 });   // PIN MOVED (GEM-RARE, bible/06-Systems/Gem-Sockets.md): GEM2's 30 + 5 a tier to 150, a third
+    assert.deepEqual(G.GEM_FIND, { base: 10, perTier: 2, cap: 50 });
     assert.deepEqual([0, 10, 19, 20, 30].map((tier) => G.gemFindChance({ tier })), [10, 30, 48, 50, 50]);
     assert.deepEqual([G.gemFindChance({ tier: 10, kind: 'pile' }), G.gemFindChance({ tier: 4, boss: true }), G.gemFindChance({ tier: 10, luck: 100 }), G.gemFindChance({ tier: 10, luck: 0 })], [39, 45, 45, 15]);
     assert.deepEqual(JSON.parse(JSON.stringify(G.GEM_GRADE_BANDS)), [
@@ -308,7 +305,7 @@ test('GEM2 the world\'s gem find: 10 in a thousand and 2 a tier to 50 (GEM-RARE,
     // at the door: the find its very last draw - nothing after it - and the weapons' pass before it: at every chance, each
     // socket the pass gives is one draw more before the find
     const src = { kind: 'pile', tier: 18, boss: false, family: null };
-    LR._setTechniqueForTests({});   // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's draw after the find - off here (no chance, no draw), so the find is this door's last; test/systems/tech1_roster.test.js holds the technique pass after it
+    LR._setTechniqueForTests({});
     const door = (seed, t) => {
       const base = lcg(seed);
       let n = 0, at = -1;
@@ -374,7 +371,7 @@ test('GEM2 the world bosses: the Warden one gem, the Old Coil one to a ship that
     const bare = rollSpoils(k, 9);
     LR._setSocketForTests(null); LR._setWeaponSocketsForTests(null);
     const full = rollSpoils(k, 9);
-    const strip = (h) => JSON.parse(JSON.stringify({ gold: h.gold, card: h.card, pieces: h.pieces.filter((p) => p.tier !== 'gilded').map((p) => { const { sockets, ...rest } = noTech(p.item); return { ...p, item: rest }; }) }));   // PIN MOVED (TECH1): and its technique; (GILDED2) and the Dragonfire Oath, the very last draw, set aside
+    const strip = (h) => JSON.parse(JSON.stringify({ gold: h.gold, card: h.card, pieces: h.pieces.filter((p) => p.tier !== 'gilded').map((p) => { const { sockets, ...rest } = noTech(p.item); return { ...p, item: rest }; }) }));
     assert.deepEqual(strip(full), strip(bare), `seed ${k}`);
   }
   // the hosts carry the rows: the world tick, every host's shared module and the headless law import them

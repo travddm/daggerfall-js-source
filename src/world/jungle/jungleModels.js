@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (2026-10-18, the owner: "Bantha, north of daggerfall is going to be the first region in the continent to
-// recieve a biome expansion. Using the attached file, populate the area in a dense jungle like format ... This needs to
-// be insanely detailed and not hurt performance. No band aids") - THE JUNGLE'S TREES, READ. bible/03-World/
+// BANTHA1 - THE JUNGLE'S TREES, READ. bible/03-World/
 // Bantha-Jungle.md is the design and the record.
 //
 // The owner's five trees (src/assets/jungle/source/, their Blender 5.2 exports as they handed them over: an OBJ, its MTL and

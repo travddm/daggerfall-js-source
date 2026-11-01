@@ -71,8 +71,7 @@ test('court: rep loss, and the surrender gates (REP2: the coin and the -20 line 
   const p = { health: 30, items: [], skills: 30, stats: { personality: 50 } };
   lowerRepForCrime(p, 17, CRIMES.Pickpocketing);
   assert.equal(legalRepOf(p, 17), -REPUTATION_LOSS_PER_CRIME[12]);   // -2
-  // REP2 (the reputation overhaul, Mac's signed shape: "Surrender is always honoured, unless you killed a watchman during
-  // that chase"): PIN MOVED - DFU's involuntary surrender rode the DFRandom coin in -20..0 (odd refused) and was refused
+  // REP2 (the reputation overhaul):
   // outright below -20; both are retired (test/scenes/rep2_sentences.test.js). SetHealth(1) still fires first.
   assert.equal(surrenderToCityGuards(p, 17, false), true);
   assert.equal(p.health, 1, 'SetHealth(1) fires before the answer');
@@ -133,7 +132,7 @@ test('court: the not-guilty pleas - free, and the never-charged guilty-verdict q
     const c4 = startCourt(p4, 17, CRIMES.Murder, { rolls: seq(0.99, 0.99), dfRand: () => 1 });
     c4.daysInPrison = 0;
     assert.equal(resolveGuiltyVerdict(c4, p4).outcome, 'released');
-    // REP2: PIN MOVED - the credit is the charge less a Murder's mark: 20 - 10 (DFU: half(20) - 1 = 9)
+    // REP2:
     assert.equal(legalRepOf(p4, 17), 10, 'the state-2 release CREDITS the sentence: the charge less the mark');
   } else {
     assert.equal(legalRepOf(p2, 17), repBefore, 'the prison arm credits later, from the flow');
@@ -148,7 +147,7 @@ test('court: the not-guilty pleas - free, and the never-charged guilty-verdict q
   assert.equal(pleaGuilty(c5, p5).outcome, 'released');
   assert.equal(legalRepOf(p5, 17), 10, 'the zero-day guilty PLEA credits the sentence too (REP2: 20 less the mark)');
 
-  // REP2: PIN MOVED - serving gives the charge back (Pickpocketing: its whole 2) and a Murder keeps half as its mark (+10);
+  // REP2:
   // DFU gave half the loss - 1 (Pickpocketing 0, Murder 9). test/scenes/rep2_sentences.test.js holds every crime's row.
   const p3 = mk();
   raiseRepForSentence(p3, { crime: CRIMES.Pickpocketing, regionIndex: 17 });
@@ -224,7 +223,7 @@ test('save: AUDIT 20 - the faction store and guild memberships ride the envelope
   joinGuild(entity.guildMemberships, GUILDS.FightersGuild, { year: 405, dayOfYear: 3 });
 
   const snap = snapshotFactionRep(entity.factionRep);
-  assert.equal(snap.ids.length, ff.factionDict.size + PROVINCE_FACTION_IDS.length, 'every faction travels');   // PIN MOVED (PROVINCE-COURTS): the provinces' own courts and people with FACTION.TXT's
+  assert.equal(snap.ids.length, ff.factionDict.size + PROVINCE_FACTION_IDS.length, 'every faction travels');
 
   // a LOAD rebuilds the store from FACTION.TXT, then writes the save in
   const loaded = { factionRep: createFactionRep(ff.factionDict) };
@@ -418,7 +417,7 @@ test('AUDIT 21 F11: the court clamps, at both ends', () => {
   // At legalRep -200 both thresholds are 75. FailedRoll(t) is `roll >= t`,
   // so a roll of 74 PASSES both and the sentence is banishment (type 0);
   // without the cap threshold2 would be 100 and 74 would fail it.
-  // REP3: PIN MOVED - only a Murder or a Treason can be banished now (court.js BANISHABLE_CRIMES), so the cap is read on
+  // REP3:
   // a Murder; the thresholds are the same numbers for every crime
   const deep = mk(-200);
   assert.equal(startCourt(deep, 17, CRIMES.Murder,

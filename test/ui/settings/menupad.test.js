@@ -1,6 +1,4 @@
-// PAD-DOOR + PAD-SETTINGS (2026-09-27, Discord - an AYN Thor: "i can login get to the main screen but im unable to
-// select online, load game anything" - "doesnt seem to let me change controller sensitivity either, i press the 1.0
-// to try and change it but it doesnt register"). The front door answers a controller (ui/menu/menuPad.js - walked in a
+// PAD-DOOR + PAD-SETTINGS. The front door answers a controller (ui/menu/menuPad.js - walked in a
 // real page by tools/menuPadProbe.mjs), and the four gamepad settings are numbers with steppers, not readouts.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

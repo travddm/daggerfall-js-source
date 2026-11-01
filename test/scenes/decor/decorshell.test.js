@@ -1,5 +1,4 @@
-// DECOR-SHELL (2026-09-26, a player over the house decorator, relayed by Mac: "decor they go poof", "They are there /
-// But its model disappearing / Placing models is different then the ones after"): A PLACED PIECE STAYS IN THE ROOM.
+// DECOR-SHELL: A PLACED PIECE STAYS IN THE ROOM.
 //
 // The free camera flew through walls, floor and ceiling - nothing but the forty-metre leash held it - and a room's
 // faces are one-sided, so from outside it the room is an open dollhouse: a piece set on the ceiling's top or behind a
@@ -12,7 +11,7 @@
 // every face and slides along it; a model aimed at a ceiling hangs from it, its top at the face; a flat cannot hang;
 // a failed load is asked again; and the host's gate by source.
 //
-// AUDIT DECOR-SHELL (2026-09-27): the skin was measured along the step - a glide a degree down rested 3.5 mm over the
+// AUDIT DECOR-SHELL: the skin was measured along the step - a glide a degree down rested 3.5 mm over the
 // floor, and under 1e-4 the next step went through it - so the end of a step is pushed off every face (flyKeep), and
 // where the eye cannot stand it stays; a failed list opened the decorator, and the first piece taken out wiped the
 // service's list - the list is asked until it stands, and waited for ten seconds at most; the decorator's own model

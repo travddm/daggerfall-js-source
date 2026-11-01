@@ -1,6 +1,5 @@
 // @ts-check
-// MAIN-SPINE (2026-10-26, Discord #feature-feedback "Main quest borked" - Blu3cak3: "Level 8 and still no letter from
-// Morgiah ... Other people having issues too"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): THE MAIN QUEST'S
+// MAIN-SPINE: THE MAIN QUEST'S
 // BACKBONE IS KEPT. S0000999 ("Main Quest Backbone") sends every royal letter of the opening - Morgiah's at level 3
 // (`_S.46_ when _S.11_ and _S.18_`), Lhotun's at 5 - and starts each court's first quest. Nothing else starts it: the
 // main quest's opener, _BRISIEN, does once, `start quest 999 999` in its `until _exitstarter_ performed` block, on the

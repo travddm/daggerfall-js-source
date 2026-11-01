@@ -1,4 +1,4 @@
-// WEATHER2a (Mac, 2026-09-14: "it can rain when theres snow on the ground"): NO RAIN OVER SNOW, ENHANCED LANE.
+// WEATHER2a: NO RAIN OVER SNOW, ENHANCED LANE.
 // The Chronicles' table (DFU's, digit for digit) rolls rain and thunder in Winter for every climate but the mountains,
 // and the terrain wears its snow archive for the whole of Winter in every climate but a Desert base - so DFU, and the
 // classic lane, draw rain over a white field. The enhanced lane funnels every write of the sim's word through the

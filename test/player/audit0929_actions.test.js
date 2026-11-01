@@ -1,11 +1,11 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - DISC29-A's half: OnCharacterCollided WHOLE
+// AUDIT PRE-MERGE 0929 - DISC29-A's half: OnCharacterCollided WHOLE
 // (DaggerfallActionCollision.cs:62-89). The port read "beneath the player" as "within 0.15 of the top of the object's
 // BOX", and DISC29-A added a standing ray under the capsule's centre: a staircase trap took 2 hits for 16 steps walked
 // down (N0000007), and a body crossing a MultiTrigger's floor under its walls was bumping INTO it - Orsinium's castle
 // hostile at the first steps (S0000020 object 10406, a DoorText with a trespass on it). Now the contact is the
 // collider's (capsuleContact, the nearest point of the object's own triangles within the capsule's skin), WalkOn is
 // its direction from the controller's centre (dir.y < -0.9) for every flag, a Collision01 casts its ray, and a side is
-// heard only while the body moves into it. The record: bible/01-Overview/audits/Audit-PreMerge-0929.md.
+// heard only while the body moves into it. The record:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -80,7 +80,6 @@ test('AUDIT PRE-MERGE 0929 D1/D2: a contact beneath the controller is WalkOn for
 });
 
 test('AUDIT PRE-MERGE 0929 D1/D2: the pass hands the contact the direction the body presses - the motor\'s own sin and cos of forward and strafe - from the yaw the motor moved it by, which the one motion bag carries (mutants: the press unread; the motor keeping no yaw)', () => {
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online ?world's dungeon frame runs under a window, and walks no trigger while one is up
   for (const [host, moved] of [['src/scenes/worldModes.js', '!dungeonCtx\\.uiOverlayActive && '], ['src/scenes/dungeon.js', '']]) {
     const h = readFileSync(new URL(`../../${host}`, import.meta.url), 'utf8');
     assert.match(h, new RegExp(String.raw`rawFoes\(dt, canvas, proj, view, cam\.pos, player\.pos, ${moved}anyMove\(moveHeld\(keys\)\), player\.height, !!player\.isSneaking, motionBagOf\(player\)`), `${host}: the one motion bag`);

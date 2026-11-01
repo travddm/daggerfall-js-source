@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT WORLD-EVENTS L1-1, L1-4 (bible/01-Overview/audits/Audit-World-Events.md): MY RESURRECT, SAID TO THE ROOM THAT
+// AUDIT WORLD-EVENTS L1-1, L1-4: MY RESURRECT, SAID TO THE ROOM THAT
 // KEEPS THE DEATH. A made level's room records a raise itself - the Hour's realm (net/superDungeon/sdLaw.js
 // sdMayRaise) - so a body rises there only
 // when a living friend's spell was cast at it; anywhere else this says nothing, and the party pose's call (systems/

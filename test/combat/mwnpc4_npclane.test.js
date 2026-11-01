@@ -1,4 +1,4 @@
-// MWNPC4 (2026-10-09, the MW-NPC arc's fourth slice - bible/04-Characters/Morrowind-NPCs.md section 9): THE NPC LANE
+// MWNPC4: THE NPC LANE
 // AND WHAT AN NPC'S BODY DOES THAT A PEER'S NEVER DID - IT IS HIT, AND IT DIES. The rig plays OpenMW's hit recoil
 // (refreshHitRecoilAnims: "hit" + chooseRandomGroup, Priority_Hit, once, a recoil playing taking no other) and its death
 // (playRandomDeath/playDeath: "death" + chooseRandomGroup, Priority_Death, held at its stop, every other state reset and
@@ -142,7 +142,7 @@ test('MWNPC4d the lane: the NPCs as synthetic peers under the tier\'s caps - Off
   assert.equal(npcPeerId('foe', 7), 'npc:foe:7');
   assert.deepEqual(npcShown({ feet: [1, 2, 3], yaw: 0.5, moving: true, running: true, drawn: true, swings: 4, strike: 2, casts: 1, castRange: 3, hits: 2, dead: 1 }),
     { x: 1, y: 2, z: 3, yaw: 0.5, pitch: 0, mv: 2, wd: 1, an: 4, as: 2, cn: 1, cr: 3, ht: 2, dd: 1, wb: 0 });
-  assert.deepEqual(npcShown({ feet: [NaN, 0, 0] }), { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, wd: 0, an: 0, as: 0, cn: 0, cr: 0, ht: 0, dd: 0, wb: 0 }, 'nothing known: standing, unhurt');   // PIN MOVED (MWNPC15, Morrowind-NPCs.md section 20): the wolf bit, 0 for a person on two legs
+  assert.deepEqual(npcShown({ feet: [NaN, 0, 0] }), { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, wd: 0, an: 0, as: 0, cn: 0, cr: 0, ht: 0, dd: 0, wb: 0 }, 'nothing known: standing, unhurt');
   let tier = 'near';
   const rigs = [];
   const lane = createNpcBodies({ renderer: {}, tier: () => tier, createRig: reacting(rigs), now: () => 1000 });

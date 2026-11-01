@@ -185,7 +185,7 @@ export const DF_ARMOR_ROWS = Object.freeze({
   [ARMOR_ENUM.Tower_Shield]: { tokens: ['towershield'] },
 });
 
-/** MW-ASSIGN (2026-09-27, Discord: "Some sprites not assigned morrowind skin"): THE ARMOUR A MOD ADDS, against the
+/** MW-ASSIGN: THE ARMOUR A MOD ADDS, against the
  *  classic row of its shape - Roleplay & Realism Items' chain set (hauberk, chausses, spaulders, sollerets) and light
  *  set (jerkin, cuisse, helmet, boots, gloves, vambraces), templates 515-526 (systems/roleplayRealismItems/rriItems.js RRI_CLASSES). A
  *  vambrace is a forearm's guard, so it asks for Morrowind's bracer before its gauntlet, one side each. Their material
@@ -564,7 +564,7 @@ export function dfWornEquipment(slots, EQUIP_SLOTS, ARMOR_ENUM_) {
 export function dfWornArmor(slots, EQUIP_SLOTS, ARMOR_ENUM) {
   const worn = [];
   const take = (piece) => {
-    const item = drawnPiece(piece);   // APPEARANCES (bible/04-Characters/Wardrobe.md): a piece wearing a look dresses the body as the look - the player's and every peer's
+    const item = drawnPiece(piece);   // APPEARANCES: a piece wearing a look dresses the body as the look - the player's and every peer's
     if (item && typeof item.templateIndex === 'number' && armorRowOf(item.templateIndex)) {   // MW-ASSIGN: a mod's pieces are worn too
       worn.push({ templateIndex: item.templateIndex, material: item.material ?? 0 });
     }
@@ -722,7 +722,7 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
     // AUDIT 30 F1: A HELMET HIDES THE HAIR - an engine rule, not a
     // part reference (npcanimation.cpp:615), prior to the refs.
     if (armorRowOf(piece.templateIndex) === DF_ARMOR_ROWS[HELM_TEMPLATE]) hairHidden = Math.max(hairHidden, prio);   // MW-ASSIGN: any helm-shaped piece (a mod's helmet)
-    // IG3 (Mac: "shields when equipped do not appear"): a SHIELD is the
+    // IG3: a SHIELD is the
     // one worn piece whose ladder ends at the item's own GROUND MESH -
     // getShieldMesh (actoranimation.cpp:108-139) tries the PRT_Shield
     // body part first (the sexed pick with NO male-to-female fallback

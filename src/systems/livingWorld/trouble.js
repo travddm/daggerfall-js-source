@@ -1,5 +1,5 @@
 // @ts-check
-// LW4 (2026-10-04, bible/06-Systems/Living-World.md): TROUBLE ON THE ROAD - what a party meets between two towns, and
+// LW4: TROUBLE ON THE ROAD - what a party meets between two towns, and
 // what comes of it. Mac: NPCs "can encounter enemies in the overworld". Pure, like the trips it falls on (LW0 decision
 // 2): a trip's trouble is a function of the trip, its party and the world's own data - every reader sees the same
 // caravan beset at the same bend of the same road, by the same foes, with the same end.
@@ -20,7 +20,7 @@
 // party that won walks on and makes up the halt by its arrival (`partyAt`'s catch-up); one turned home walks back from
 // where it stood, and never comes to the town it set out for.
 //
-// LW12 (bible/06-Systems/Living-World-II.md "LW12"): THE OUTLAWS - a trouble within reach of a band's hideout is the
+// LW12 ("LW12"): THE OUTLAWS - a trouble within reach of a band's hideout is the
 // band's in its share of them (the host's `bandAt`, outlaws.js bandTrouble - its own draw, never this stream): its foes
 // the band's people at their levels, its name on the encounter (`band`, `bandName`). A party under ROB_RATIO of the
 // band's strength yields - ROBBED, no blood, held HALT_MIN.robbed, then walking on without its goods (`robbed` on the

@@ -226,7 +226,7 @@ test('worldModes exit caches the cabin, tears down the room, and lands at deck h
     say: (s) => actions.push(s), exteriorLanding: () => assert.fail('cabin must return through its boat'), exitReturn: null,
     player: { pos: [0, 0, 0], spawn: (...p) => actions.push(p) }, cam: { yaw: 0 },
     unleveledLootPreTransition: noop, cacheInteriorScene: () => actions.push('cache'), teardownQuestFlats: noop,
-    interiorLootLeave: noop,   // PIN MOVED (OUTDOOR-LOOT D-1): the building's cupboards hear of the leave ahead of the bag's drop
+    interiorLootLeave: noop,
     interiorCtx: { destroy: () => actions.push('destroy') }, _intShared: null, interiorFoes: null, interiorGuards: null,
     interiorDropped: { restorePiles: noop }, interiorHitEffects: { clear: noop }, interiorBloodMarks: { clear: noop },
     interiorCamps: { destroyAll: noop }, interiorHearths: [], interiorBuilding: {}, interiorHome: null, interiorSeatHall: null,
@@ -239,10 +239,10 @@ test('worldModes exit caches the cabin, tears down the room, and lands at deck h
     interiorTorches: { destroyAll: noop }, interiorDecor: { destroyAll: noop }, _decorVisit: 0, decorTool: { close: noop },
     questBridge: null, npcSession: null, unleveledLootExteriorTransition: noop, console: { log: noop, error: assert.fail },
     standFromChair: noop,   // SIT1: and stands you off a chair
-    peopleBodies: { destroy: noop },   // PIN MOVED (MWNPC8a): the room's people's Morrowind bodies leave with it
+    peopleBodies: { destroy: noop },
     isCaravanRoom: (room) => room?.kind === 'caravan', CARAVAN_TEXT: { notHere: 'Your caravan is not here.' },   // WAGONS1: the caravan's room shares the slot
     dropViewOut: () => actions.push('view out dropped'),   // RW1 (AUDIT): the view out goes with the building
-    interiorNav: { release: noop },   // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): the room's navmesh leaves with it
+    interiorNav: { release: noop },
   };
   const exit = new Function(...Object.keys(scope), `return (${functionSource('exitInteriorNow')});`)(...Object.values(scope));
   assert.equal(exit(), true);
@@ -327,10 +327,9 @@ test('actual indoor transition keeps the fleet active only for a sailing cabin, 
 test('the shipped boat producer sends a stationary cabin fleet and publishes both cabin edges immediately', () => {
   const r = rig(); r.boat(3);
   const modes = { sailingCabin: null };
-  // PIN MOVED (TOUGHER-SHIPS + HOLDINGS' merge of main's #574): the producer reads each boat's name through the Fleet's host
   // (HOLDINGS - her name on the boats' word); none named here
   const args = { csaRuntime: r.s.rt, csaOn: () => true, gamePaused: () => false, worldTimeScale: () => 1,
-    csaAnimatorOf: animatorOf, campToWire: (p) => p, modes, csaWireRecord, csaRecordKey, fleetHost: null, shipFlags: { wireFlag: () => null }, fleetShip: () => null };   // PIN MOVED (SHIP-COLOURS: no flag flown; SHIP-LIVERY: no paint)
+    csaAnimatorOf: animatorOf, campToWire: (p) => p, modes, csaWireRecord, csaRecordKey, fleetHost: null, shipFlags: { wireFlag: () => null }, fleetShip: () => null };
   const producer = new Function(...Object.keys(args), `let _csaWordKey = null; return (${worldFunction('csaWord')});`)(...Object.values(args));
   const deck = {}; assert.equal(producer(deck, true), true); assert.equal(deck.sa.cabin, undefined);
   modes.sailingCabin = { uid: 101 }; const cabin = {};
@@ -424,7 +423,6 @@ test('existing bank Transport callback enters the launched deed boat through the
     _teleportToPixel: async (x, y) => calls.push(['pixel', x, y]), state: { worldCoords: (p) => ({ x: p[0], z: p[2] }), compensation: [0, 0, 0] },
     csaSyncColliders: () => {}, CSA_TRIGGER_MODEL: TRIGGER_MODEL, player, cam, csaLocalOf: localOf, csaDeckPose: deckPose, townTalk: { say: (line) => said.push(line) },
     navalHostileNear: () => false, CABIN_REFUSAL,   // FB1020c CABIN-FOES: no hostile ship near
-    // PIN MOVED (AUDIT SEA VENTURES C1): the cabin is a teleport to her boat's pixel like any - here neither the open zone's
     // refusal nor the Veil's (each says its own); refused, it asks nothing further and boards nothing
     wildTeleportRefused: (px) => { assert.deepEqual(px, { x: boat.MapPixel.X, y: boat.MapPixel.Y }, 'asked of her boat\'s pixel'); return false; }, veilRefused: () => false,
     boatPixelOf: (b) => ({ x: b.MapPixel.X, y: b.MapPixel.Y }) };

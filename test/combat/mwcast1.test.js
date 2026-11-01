@@ -1,4 +1,4 @@
-// MW-CAST1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): THE MORROWIND
+// MW-CAST1: THE MORROWIND
 // CAST, PLAYED.
 //
 // MW-D39 gave the arm a spellcast stance and a cast, and none of it reached the screen: in first person a readied spell

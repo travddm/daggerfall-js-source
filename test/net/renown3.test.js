@@ -1,10 +1,9 @@
-// RENOWN3 (2026-09-25, Mac: "Whats the solution to this? Like a high level character shouldnt blow through online
-// levels" - and, offered a foe read at most three levels above the character's Renown, "Yes"): A FOE PAYS BY YOUR
+// RENOWN3: A FOE PAYS BY YOUR
 // RENOWN. A career foe stands at the character's own Daggerfall level and a quest is sized to it, so a character that
 // levelled offline fought level-30 foes from its first minute online and took Renown 10 in 19 kills. Both are now read
 // no higher than RENOWN_OVER_MAX above the character's Renown (net/renown.js renownCeiling), which rises with every
 // level; a character new to Daggerfall fights at or under the ceiling almost from its first kill and earns what it did.
-// RENOWN-ACCOUNT (2026-09-28) paid every source three quarters of it (net/renown.js renownRate), and read the ceiling
+// RENOWN-ACCOUNT paid every source three quarters of it (net/renown.js renownRate), and read the ceiling
 // against the ACCOUNT's Renown - the numbers below are at that rate. `06-Systems/Accounts-And-Cloud-Saves-Arc.md` RENOWN3.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

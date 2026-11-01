@@ -1,5 +1,4 @@
-// DISC7 (2026-09-23, Mac: "fix the known gaps" - DISC6's "a torch stowed from inside an open inventory keeps its
-// sound until the window closes"): THE LIGHT IN HAND HAS ONE DOOR, AND IT SAYS WHEN IT CHANGES.
+// DISC7: THE LIGHT IN HAND HAS ONE DOOR, AND IT SAYS WHEN IT CHANGES.
 //
 // PlayerEntity.LightSource is a single slot, and six places wrote it bare: the Use arm (light, douse, swap), the
 // transfer that takes a lit torch out of the pack, the burn-out, the load, and Handheld Torches' own hand law. The

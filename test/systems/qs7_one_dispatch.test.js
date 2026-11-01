@@ -1,7 +1,5 @@
 // ---------------------------------------------------------------------------
-// QS7 - ONE MODE, ONE DISPATCH (2026-09-17, Mac: "if you go into a tavern
-// with a lit torch, pressing 4 does not actually make it go out, it just
-// goes thru the 'douse' and 'ignite' motions").
+// QS7 - ONE MODE, ONE DISPATCH.
 //
 // TWO LADDERS ANSWERED ONE KEY. The world and exterior hosts each run a
 // keydown ladder, and each MOUNTS worldModes over itself - which runs a

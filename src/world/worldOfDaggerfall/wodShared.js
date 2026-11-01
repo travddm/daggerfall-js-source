@@ -1,5 +1,5 @@
 // @ts-check
-// WOD7 (2026-09-23, Mac: "and all the enemies are synced online?" ... "yes dude"): WORLD OF DAGGERFALL'S CAMPS,
+// WOD7: WORLD OF DAGGERFALL'S CAMPS,
 // SHARED. Every client of a room stands the same sites in the same places (the list is the room's, WOD2), but each
 // ran its own markers, so a camp sprang once per player and each fought a private copy (AUDIT BRANCH M1 kept the
 // copies home because they took a peer's puppet slots). Now the FIRST player to spring a marker owns what it made:
@@ -20,7 +20,7 @@ export const WOD_SITE_RE = /^-?\d{1,5},-?\d{1,5}:(?:\d{1,10}(?:\.\d{1,3})?|hold|
 export const riteSiteId = (px, py, day) => `${px},${py}:rite.${day}`;
 /** AUDIT WB12d (C5): a breach's faithful - today's site, or one a save from before the day joined the id held. */
 export const isRiteSite = (site) => typeof site === 'string' && /:rite(?:\.\d{1,9})?$/.test(site);
-/** STAR5 (bible/11-Multiplayer/Starfall.md section 4): a fallen star's sites in pixel (px, py) - night `n`, star `k`: its
+/** STAR5: a fallen star's sites in pixel (px, py) - night `n`, star `k`: its
  *  coven's waves, its master (`m`) and its master's circle (`c`), one owner's all (the first to spring the waves'), so every
  *  screen tells the master and its circle among the foes it sees. */
 export const starSiteId = (px, py, n, k, part = '') => `${px},${py}:star.${n}.${k}${part ? `.${part}` : ''}`;

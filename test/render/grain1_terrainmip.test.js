@@ -1,4 +1,4 @@
-// GRAIN1 (2026-09-19, Mac: "distance terrian has a weird grain look") -
+// GRAIN1 -
 // THE DISTANT GROUND WAS UNFILTERED, AND THE REASON IT WAS UNFILTERED IS
 // IN THE SHADER.
 //
@@ -38,7 +38,6 @@ test('GRAIN1: every tile-array sample takes its footprint from the UNWRAPPED coo
   // the water pass samples the same array, with the same wrap
   const fs = waterSurfaceFs('');
   assert.match(fs, /vec2 wgx = dFdx\(unwrapped\), wgy = dFdy\(unwrapped\);/, 'the water pass measures from the unwrapped coordinate too');
-  // PIN MOVED (WATER-NEXT 2): the scrolled classic texel is gone - the water's body is the texel's mip-chain average
   // (an explicit LOD: no footprint at all), and the one footprinted read left is the puddle art's
   assert.match(fs, /textureGrad\(uTileArr, vec3\(puv, float\(rec\)\), PUDDLE_ROT\[turn\] \* wgx, PUDDLE_ROT\[turn\] \* wgy\)/, 'and hands it over');
   assert.doesNotMatch(fs, /texture\(uTileArr,/, 'no implicit-derivative read of the array');
@@ -140,9 +139,9 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   assert.equal(r2._anisoExt, false);
   assert.deepEqual(calls(log2, 'texParameteri').filter((c) => c[2] === 'TEXTURE_MIN_FILTER').map((c) => c[3]).slice(-2), ['LINEAR_MIPMAP_LINEAR', 'LINEAR_MIPMAP_LINEAR'], 'the filter is still the tier\u2019s');
   // the hosts: both call the re-apply at their world load, AFTER the tile-array guard
-  for (const host of ['src/scenes/groundSets.js', 'src/scenes/exterior.js']) {   // PIN MOVED (OW-HITCH): the streaming host's ground sets are scenes/groundSets.js's
+  for (const host of ['src/scenes/groundSets.js', 'src/scenes/exterior.js']) {
     const h = read(host);
-    const guard = Math.max(h.indexOf('if (!renderer.tileArrays.has(groundArchive)) {'), h.indexOf('if (!renderer.tileArrays.has(key)) {'));   // AUDIT PRECIP GROUND-2 (PIN MOVED): world.js guards the set's key - its twin's on the snow lane
+    const guard = Math.max(h.indexOf('if (!renderer.tileArrays.has(groundArchive)) {'), h.indexOf('if (!renderer.tileArrays.has(key)) {'));   // AUDIT PRECIP GROUND-2 (
     const apply = h.indexOf('renderer.applyGroundSharpness();', guard);
     assert.ok(guard > 0 && apply > guard && apply - guard < 1200, `${host}: the tier is re-applied right after the guard, cached or not`);
   }

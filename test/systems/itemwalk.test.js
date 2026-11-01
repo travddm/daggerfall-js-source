@@ -1,9 +1,9 @@
-// ITEM-WALK (2026-10-07, Mac: "Do them now within this PR"): the two follow-ups AUDIT WEAPON-POOL recorded and left
+// ITEM-WALK: the two follow-ups AUDIT WEAPON-POOL recorded and left
 // for their own pass, done in its pull request. A - the load's one-time item repairs (DISC21-A, WEAPON-POOL, DISC29-B,
 // WB12a, RARITY-WEAR) run over every list a save holds, by one walk (systems/save/save.js savedItemLists) and one runner
 // (repairItemLists). B - Project Legacy runs the same repairs on what leaves the line's record by no load: a bequest as
 // it is paid, a fallen member's remains as they open (scenes/legacyHost.js). C - customs counts a sworn revenant's pack
-// (net/realm/realmGoldLaw.js stashedItemLists). bible/05-Combat/Physical-Combat-Overhaul.md, ITEM-WALK.
+// (net/realm/realmGoldLaw.js stashedItemLists)., ITEM-WALK.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,17 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PACE-DIALS (2026-10-06, the player: "Revert back to the overworld timer multiplier for ppl to set to 60x and 100x on
-// roads and the nearby enemy timer to set to 60x max. Those options should also be available when the player stands
-// still on the overworld map."; then: "speed settings should be 5x 10x 20x 30x 40x 60x and 100x should be only setable
-// when on a road and it has to go to 60 instantly again when leaving the road. Same for enemies nearby multiplier and
-// same rules. The multipliers ... should have the same rules in other uis in online mode").
+// PACE-DIALS.
 //
 // TWO DIALS, ONE LADDER (PACE_STEPS: 5, 10, 20, 30, 40, 60, 100):
 //   speed - the rate a fast journey (and the Overworld's own walk) runs at
 //   foe   - the slowest the clock runs while an enemy holds it (ENEMY-PACE's floor)
 // THE ROAD RULE, for both: x100 may be chosen only while the traveller stands on a road or a track; the moment they
 // leave it, a dial at x100 runs (and reads) x60. Off the road the ladder ends at x60.
-// PACE-KEEP (2026-10-12, Mac: "sometimes your multiplier slows down randomly without an enemy nearby"): the player's
+// PACE-KEEP: the player's
 // x100 is KEPT and comes back on the next road. It was written down to x60 the moment the ground said "off the road" -
 // and a journey by the road says so for a moment wherever its route crosses one pixel of open ground between two road
 // pixels (a gap in the network, a corner the search cut), so a x100 journey dropped to x60 for the rest of the trip with
@@ -62,7 +58,7 @@ export function clampPace(n, onRoad = false) {
 
 let pace = null;
 let ground = false;   // the host's last word: on a road or a track
-/** WILD3 (the owner: "Youre also slower in this zone max 20x in the wilds and 40x on the roads"): THE ZONE'S CAP - while
+/** WILD3: THE ZONE'S CAP - while
  *  the host says the traveller stands in the open PvP zone, the ground's top is the zone's (`WILD_PACE_CAP`). A cap,
  *  never a write: the dials keep the player's choice and run under it, and leaving the zone gives it back at once. */
 export const WILD_PACE_CAP = Object.freeze({ road: 40, open: 20 });

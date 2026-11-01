@@ -1,4 +1,4 @@
-// LEVEL-45 (2026-10-26, the owner: "Also bring the level cap to 45"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md):
+// LEVEL-45:
 // the character's level stops at 45, on Daggerfall's sum and on the virtue bar alike, and every readout says so.
 // AUDIT FB1026d (C1, C2, C4, C5, E3): a level latched before the cap is let go at it - the load, the crossing online,
 // both checks, the sheet's door and its rollout - and the windows are driven, not just the law.
@@ -167,7 +167,6 @@ test('LEVEL-45 THE CLASSIC SHEET HANDS OUT NO POOL AT THE CAP, AND A LEVEL OWED 
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(latchedVirtue())));
   assert.equal(crossLeveling(snap), true);
   assert.equal(snap.readyToLevelUp, false, 'no level owed online');
-  // PIN MOVED: LEVEL-45 online (2026-10-27, mob: "everyone is converting"; systems/levelClimb.js) - the switch's anchor at
   // the level it has (50, never the one past it) is no roll's start, so the conversion that follows it at the same door
   // gives the average roll's and the level its skills earn, never above the cap.
   assert.equal(snap.startingLevelUpSkillSum, ROLLED_START_AVERAGE);

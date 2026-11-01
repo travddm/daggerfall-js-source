@@ -1,7 +1,6 @@
-// WB2 (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area, a gate
-// of oblivion"): THE GATE IN THE WORLD - its stone (world/gate/gateModel.js), its art (world/gate/gateArt.js), its fire and beacon
+// WB2: THE GATE IN THE WORLD - its stone (world/gate/gateModel.js), its art (world/gate/gateArt.js), its fire and beacon
 // (render/gate/gatePass.js), the pool the world host stands it with (scenes/gate/gatePool.js), the banner, the activation race
-// and the world host's seams. Design: bible/11-Multiplayer/World-Bosses.md section 3.
+// and the world host's seams. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -313,8 +312,7 @@ test('WB2 the pass: beacons added, fires premultiplied, faded gates skipped and 
   pass.draw([], I, I, [0, 0, 0], 1);
   assert.equal(calls.length, 0, 'nothing to draw, nothing touched');
   const g = (fade, x = 0) => ({ origin: [x, 0, 0], yaw: 0.3, open: 1, fade });
-  // PIN MOVED (EG-F, 2026-10-12): GATE_PASS_MAX rose from 2 to 4 (the day's gate and the Elite Breaches' arches in one view,
-  // bible/11-Multiplayer/Elite-Gates.md section 6.3) - so six gates stand here, one faded, and the cap still bites
+  // ) - so six gates stand here, one faded, and the cap still bites
   pass.draw([g(0, 5), g(1), g(0.5, 30), g(1, 60), g(1, 90), g(1, 120)], I, I, [0, 0, 0], 12.5);
   assert.ok(!calls.some((c) => c[0] === 'uniform3f' && c[2] === 5), 'the faded gate is not the one drawn - it is skipped before the cap');
   const draws = calls.filter((c) => c[0] === 'drawArrays');
@@ -497,16 +495,16 @@ test('WB2 the seams: online alone, stood before the lights, the stone in the wor
   assert.match(w, /ready: \(\) => !!online\?\.gateOk,   \/\/ WB3b/, 'the door opens at a relay that runs a gate\'s boss room (WB3b; it said "not yet" to every relay until then)');
   const frameAt = w.indexOf('try { if (gatePool?.frame(dt)) warmGateVeil(); }'), lightsAt = w.indexOf('const wodLit = wod ? _wodLitCount() : 0;');   // AUDIT WB D5: and the step's veil warmed when a gate stands
   assert.ok(frameAt > 0 && frameAt < lightsAt, 'stood before the lights read it');
-  assert.equal((w.match(/\.\.\.\(gatePool\?\.lights\(\) \?\? \[\]\), \.\.\.\(riteHost\?\.lights\(\) \?\? \[\]\), \.\.\.\(starfall\?\.lights\(\) \?\? \[\]\), \.\.\.camps\.lights\(\), \.\.\.droppedTorches\.lights\(\)\);/g) ?? []).length, 2,   // WB12d: the rite's braziers beside it; STAR4 (PIN MOVED): a fallen star's beacon and its camp's braziers after them
+  assert.equal((w.match(/\.\.\.\(gatePool\?\.lights\(\) \?\? \[\]\), \.\.\.\(riteHost\?\.lights\(\) \?\? \[\]\), \.\.\.\(starfall\?\.lights\(\) \?\? \[\]\), \.\.\.camps\.lights\(\), \.\.\.droppedTorches\.lights\(\)\);/g) ?? []).length, 2,   // WB12d: the rite's braziers beside it; STAR4 (
     'its fire lights the ground by night and by day - after the hand lights, before the camps and the dropped torches the renderer\'s cap cuts first');
-  assert.match(w, /gatePool\?\.draw\(renderer\);[^\n]*\n(?:\s*ketch\?\.drawSky\(renderer\);[^\n]*\n)?\s*camps\.draw\(renderer, null, yardCull\);/, 'the stone in the world pass beside the tents (before them: the tents and the wagon keep their HCC pair)');   // PIN MOVED (KETCH): the Sky-Ketch's hull in the same world pass, after the stone; PIN MOVED (PERF-WAGON): the tents by the street's view test
+  assert.match(w, /gatePool\?\.draw\(renderer\);[^\n]*\n(?:\s*ketch\?\.drawSky\(renderer\);[^\n]*\n)?\s*camps\.draw\(renderer, null, yardCull\);/, 'the stone in the world pass beside the tents (before them: the tents and the wagon keep their HCC pair)');
   const duel = w.indexOf('duelWall.draw(rings'), pass = w.indexOf('gatePool.drawPass(proj, view');
   assert.ok(duel > 0 && pass > duel, 'the fire after the duel wall');
   assert.match(w, /if \(_race\.gateWins\) \{ if \(_gatePick\.distance > _gatePick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else if \(!riteHost\?\.activate\(_gatePick\.key\)\) gatePool\.activate\(_gatePick\.key\); \}/, 'the press\'s arm, refusing out loud past its reach (WB12d: the faithful\'s casket rides its slot)');
   assert.match(w, /gate: _gatePick,   \/\/ WB2/);
   assert.match(w, /gate: gatePool \? pickActivatableHit\(cam\.pos, _hd, \[\.\.\.gatePool\.targets\(\), \.\.\.\(riteHost\?\.targets\(\) \?\? \[\]\)\], collider\) : null,/, 'the plaque races it too');
   assert.match(w, /\(key\) => gatePool\?\.hoverName\(key\) \?\? null,/);
-  assert.match(w, /if \(\(gatePool \|\| sdHost\) && \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) drawGateBanner\(null\);/, 'the countdown leaves with the street');   // SD19 (PIN MOVED): a Hollow's door's banner too
+  assert.match(w, /if \(\(gatePool \|\| sdHost\) && \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) drawGateBanner\(null\);/, 'the countdown leaves with the street');   // SD19 (
   assert.match(read('src/player/activationRace.js'), /firmFirst\(\[gate, broker, camp, water,/, 'the gate heads the tie order (SET7: the Broker who stands beside it right after)');
   assert.ok(PORTAL_CENTRE_Y > ARCH_Y0 && PORTAL_CENTRE_Y < ARCH_Y1);
 });

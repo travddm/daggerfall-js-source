@@ -1,5 +1,4 @@
-// RAID3 (2026-09-27, Mac, on World Events - Raiding Parties online: "1. Server" - the relay tracks each raid's kill
-// count, kept even if everyone leaves, the cleanse and the participants, and signs the rewards): THE RELAY HOLDS THE
+// RAID3: THE RELAY HOLDS THE
 // RAID. The ledger's law in node (net/raid/raidLaw.js: the window, the first word keeps, the cap, each account's share, the
 // target, who earned it); the raid's receipt (net/raid/raidReceipt.js: the gate's ladder, never mistaken for a gate's
 // receipt or an identity); the `raid` frame both ways (net/wire.js); the relay over the real Room (server/src/index.js:
@@ -188,7 +187,6 @@ test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a fra
   for (const bad of [{ k: 'x' }, { key: '3:7' }, { st: -1 }, { st: 1.5 }, { tg: RAID_TARGET_MIN - 1 }, { tg: RAID_TARGET_MAX + 1 }, { ty: RAID_TYPES }, { px: 8192 }, { py: -8192 }, { px: 1.5 }, { n: RAID_WORD_KILLS_MAX + 1 }, { n: -1 }, { s: 2 }]) {
     assert.equal(validRaidIn(word(bad)), null, JSON.stringify(bad));
   }
-  // PIN MOVED (WW6): the town's pixel is the world's (net/wire.js worldPixelOk) - a raid past the Bay is a word too; which
   // side of the Bay's edge a key's town stands on is the ledger's own law (net/raid/raidLaw.js raidSideOk)
   assert.deepEqual([validRaidIn(word({ px: 1000 }))?.px, validRaidIn(word({ py: 500 }))?.py, validRaidIn(word({ px: -1 }))?.px, validRaidIn(word({ px: 8191, py: -8191 }))?.py], [1000, 500, -1, -8191]);
   assert.equal(validRaidIn(word({ tg: RAID_TARGET_MAX, ty: RAID_TYPES - 1, px: 999, py: 499, n: RAID_WORD_KILLS_MAX })).n, RAID_WORD_KILLS_MAX, 'every top end is in');
@@ -590,7 +588,7 @@ test('RAID3 client: standing in a raided town at a relay that keeps raids, I say
   assert.equal(log.words.at(-1).w.n, 2, 'a word the session refused is said again');
   const n = log.words.length;
   at.town = null;
-  at.pixel = { x: 201, y: 100 };   // FIELD BUGS 2026-10-11g RAID-WORD (PIN MOVED): past the rect ON the town's pixel a raid I fought is still said
+  at.pixel = { x: 201, y: 100 };   // FIELD BUGS 2026-10-11g RAID-WORD (
   frame(1);
   assert.equal(log.words.length, n, 'out of the town: nothing');
   at.town = { regionIndex: 3, locationIndex: 7 };

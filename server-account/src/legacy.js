@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LEGACY7 (2026-10-06; bible/06-Systems/Legacy-Arc.md section 9) - PROJECT LEGACY ONLINE, SERVICE SIDE. Mac: "online
-// integration with permadeath (Bloodline) or non-permadeath (Enduring)".
+// LEGACY7 - PROJECT LEGACY ONLINE, SERVICE SIDE..
 //
 // THE LINE (`lineages`, migration 0084): a family an account founded online, its record the client's JSON - the family
 // law is the client's (src/systems/legacy/), and the service keeps the copy every device reads. A write lands only on
@@ -115,7 +114,7 @@ export async function putLineage({ db, nowS }, playerId, { id, record: sent, bas
   if (rec.bytes > LINEAGE_MAX_BYTES) return { error: 'lineage-too-large' };
   if (had) {
     if (had.model !== rec.model) return { error: 'lineage-model' };
-    // INT18 (bible/06-Systems/Integrity-Arc.md section 7): THE FAMILY'S OWN LAW (src/systems/legacy/legacyLaw.js) - a
+    // INT18: THE FAMILY'S OWN LAW (src/systems/legacy/legacyLaw.js) - a
     // member's blood and hearth and the waiting estate on every copy, and the facts store.js mergeFacts only ever adds
     // (a member, a death, a retirement, a fallen's remains) beside the stored copy WHEN THIS WRITE WAS MADE FROM IT: a copy
     // made from an older one is answered stale with the stored copy to merge into, as ever - refused here it would never

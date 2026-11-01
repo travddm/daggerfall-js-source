@@ -1,4 +1,4 @@
-// SUMMON-OFFER (bible/01-Overview/bugs/Field-Bugs-2026-10-14.md; a player on the Discord, "Daedra Summoning bugged":
+// SUMMON-OFFER (; a player on the Discord, "Daedra Summoning bugged":
 // "Summoned Hermaeus Mora at the Mages Guild online, paid 100k. No video, no offer, no message. The save now has
 // Hermaeus Mora (faction 8) flags = 65 (Summoned set), and quest W0C00Y00 is not among the active quests" - and, after:
 // "trying to summon Mora in the Dak'Fron region - which does not meet the requirements for the quest").

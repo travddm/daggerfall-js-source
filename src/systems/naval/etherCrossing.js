@@ -1,6 +1,5 @@
 // @ts-check
-// ETHER-CROSSING (2026-10-11, the owner: "Sail far enough and you are prompted to travel into the open sea";
-// bible/03-World/Eltheric-Ocean.md ETHER-CROSSING) - THE CROSSING: when it is offered, what it asks, what it takes. Pure: the
+// ETHER-CROSSING - THE CROSSING: when it is offered, what it asks, what it takes. Pure: the
 // world host (scenes/world.js) asks it of the helm's pixel and sails the voyage.
 //
 // OFFERED at a helm, under way or not, with no enemy near and no other player aboard: OUT on the open Abecean - the
@@ -84,7 +83,7 @@ export function questionRows(text, width = ROW_CHARS) {
 }
 /** The widest row of the question's own (its first lines' measure). */
 export const ROW_CHARS = 56;
-/** The question, in rows (ui/yesNoBox.js). ETHER-WILD (2026-10-21): `pvp` - online, where the open sea past Veilhaven's
+/** The question, in rows (ui/yesNoBox.js). ETHER-WILD: `pvp` - online, where the open sea past Veilhaven's
  *  peace is an open PvP zone (systems/wild/etherWild.js) - says so before the way out is taken. */
 export function crossingRows(way, { days = CROSS_DAYS, pvp = false } = {}) {
   const time = `${days} ${days === 1 ? 'day' : 'days'}`;

@@ -1,8 +1,8 @@
-// PVP-REF (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE REFEREE IN THE
+// PVP-REF: THE REFEREE IN THE
 // RELAY, pinned over the real Room and its fake sockets (test/fakeRoom.mjs) - a siege's room admits the developers alone
 // until SEAT2a opens it, makes an account a fighter at its token's Renown, judges every blow on the striker's look and
 // both last good poses, clips it, says the vitality left to the whole room, fells, raises at the wave, pulls a step too
-// fast back, and keeps one fighter an account. bible/11-Multiplayer/Seats-Arc.md 6.1; `06-Systems/Online-Arc.md` PVP-REF.
+// fast back, and keeps one fighter an account. 6.1; `06-Systems/Online-Arc.md` PVP-REF.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, siegeBlowMax } from '../../../src/net/siege/siegeRef.js';
@@ -15,7 +15,7 @@ const M = SIEGE_UNITS_PER_M;
 const at = (x, z = 0) => ({ x: x * M, y: 0, z: z * M, yaw: 0, pitch: 0 });
 const where = (p) => p && [p.x, p.y, p.z];
 /** A fighter's look: a Daedric Dai-Katana in hand. */
-const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // PIN MOVED (AUDIT-SEATS): R8 - the weapon in the right hand (EquipSlots.RightHand 19); slot 0 is an amulet's, and a weapon there is held no more
+const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };
 const sieges = (ws, k) => ws.sent.filter((m) => m.t === 'siege' && (!k || m.k === k));
 async function withSiege(fn, start = 1_800_000_000_000) {
   const realNow = Date.now; let clock = start; Date.now = () => clock;
@@ -82,7 +82,7 @@ test('PVP-REF THE BLOW IN THE ROOM: judged on the striker\'s look and both last 
     await say(a, { k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 10, r: 0 });
     assert.equal(sieges(b, 'hp').length, 1, 'out of reach at 8 m');
     await r.pose(b, at(3)); step(1000);
-    for (let i = 0; i < 24 && !r.room._siege.fighters['acct-peer-0002'].down; i++) { await say(a, { k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 500, r: 0 }); step(500); }   // PIN MOVED (BAL8, bible/05-Combat/Balance-Arc.md section 14): the referee's harm ceiling, 180 in any 5 s - the fall takes longer than four blows
+    for (let i = 0; i < 24 && !r.room._siege.fighters['acct-peer-0002'].down; i++) { await say(a, { k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 500, r: 0 }); step(500); }
     assert.deepEqual(sieges(eye, 'fell').at(-1), { t: 'siege', k: 'fell', id: 'peer-0002', by: 'peer-0001' });
     const f = r.room._siege.fighters['acct-peer-0002'];
     assert.deepEqual([f.hp, f.down], [0, true]);

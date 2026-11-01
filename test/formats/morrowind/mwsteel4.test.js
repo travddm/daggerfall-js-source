@@ -1,5 +1,4 @@
-// MW-STEEL4 (2026-10-07, Mac: "I think the prior session to rig the new steel set on the morrowind model really
-// fucked it up. How hard is it to switch it out?", and asked how: "You do it properly"): THE STEEL PLATE RIGGED AS
+// MW-STEEL4: THE STEEL PLATE RIGGED AS
 // RETAIL'S ARMOUR IS.
 //
 // Every piece ships skinned - weighted at bake time to Morrowind's own Bip01 bones in the pose retail's skins are

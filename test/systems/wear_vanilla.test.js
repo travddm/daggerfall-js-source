@@ -1,5 +1,4 @@
-// WEAR-VANILLA (2026-10-01, the repair triage: "Disable the modded feature that increases durability loss. Vanilla
-// values work fine. Weapon degradation done improperly is extremely agitating if done wrong"). The default game wore
+// WEAR-VANILLA. The default game wore
 // gear through Physical Combat And Armor Overhaul's wear module (~2.8x DFU on a weapon per landed hit, ~15x on armour,
 // and armour worn by a monster's claws, which DFU never wears) or Roleplay Realism's equipDamage (armour x5), with
 // BALANCE1's 0.6 on top; and the overhaul's fading module DESTROYED a player's broken enchanted piece. The port ships
@@ -214,7 +213,6 @@ test('WEAR-VANILLA: through the core, an armed Knight\'s blow on an iron-clad pl
       assert.ok(pieces.includes(seen[1].item), 'the struck piece is mine');
       if (dfuWear(d) > 0) { assert.deepEqual([armour, weapon], [portWear(d), portWear(d)], `${d} damage: DFU's ${dfuWear(d)}`); exact++; } else { assert.ok([0, DFU_WEAR_MULTIPLE].includes(armour) && [0, DFU_WEAR_MULTIPLE].includes(weapon), 'under 5: the 20% floor roll\'s 1, or nothing'); floor++; }
     }
-    // PIN MOVED (BAL2, bible/05-Combat/Balance-Arc.md section 4): the Knight hits and crits by the player's rule now, so
     // fewer of his blows fall under 5 - of these 300, 29 or 52 by the spawn's own Math.random draw (it was 80 or 105);
     // both kinds still land, the floor's at 20
     assert.ok(exact >= 100 && floor >= 20, `both kinds of blow land (${exact} worn by the amount, ${floor} by the floor roll)`);

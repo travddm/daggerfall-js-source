@@ -1,4 +1,4 @@
-// NAME-KEPT (FIELD BUGS 2026-10-25i item 1, `bible/01-Overview/bugs/Field-Bugs-2026-10-25i.md`). SaberGGaming, in
+// NAME-KEPT (FIELD BUGS 2026-10-25i item 1, ` `). SaberGGaming, in
 // #bug-reports: "if you've renamed your item it will revert it back into its original name like 'Sabers mule's ring
 // of ...'". The Reforge (lootRarity.js reforgeAffix, one roll at the Mages Guild and with Essence) named the piece
 // again from its TEMPLATE: a name the Item Maker gave (RenameItem) was lost, a Masterwork's own name (its maker's

@@ -1,4 +1,4 @@
-// AUDIT 32 (2026-09-30, Mac: "Audit this") - PROF7'S BOOKS AND HOSTS AS THE AUDIT FOUND THEM (src/scenes/huntHost.js,
+// AUDIT 32 - PROF7'S BOOKS AND HOSTS AS THE AUDIT FOUND THEM (src/scenes/huntHost.js,
 // gatherHost.js, world.js, worldModes.js, dungeonContext.js, exteriorFoes.js; src/net/profBook.js): a body lapses at the
 // UTC day's turn, as the service lets its key (B1/H1); a refusal that says the account's rare hides are spent raises the
 // book's count to them (B2; CAP-OFF: the day's thirty, the other refusal it said, is gone); an answer heard after a character switch is its own character's (B5); a dungeon with no identity is
@@ -8,7 +8,7 @@
 // and the wiring - a flyer's body where its corpse lies (H3), no click through an act (H5), the dungeon's foes to the
 // knife's check (H6), no host under the travel view (H10), the counters' balance told to the market (B3), each station
 // its busy word (B4), the choice key's label (R1), the Worker's route table (S6).
-// bible/06-Systems/Online-Arc.md "AUDIT 32"; bible/06-Systems/Professions-Arc.md 29.
+// "AUDIT 32"; 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -138,7 +138,6 @@ test('AUDIT 32 B2: a refusal that says the account\'s rare hides are spent raise
     const ctx = { rank: () => 100, keyLabel: () => 'R' };
     assert.equal(kind.plan(bodyAt(MOBILE_TYPES.Harpy, 5, '0123456789ac'), ctx).ready, false, 'the next rare body says the day is full');
     assert.equal(kind.plan(bodyAt(MOBILE_TYPES.Rat, 1, '0123456789ad'), ctx).ready, true, 'a body below the rare: ready');
-    // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): `prof-hunt-cap` raised the hides to the day's
     // thirty and every next body said the day was full; a service not yet redeployed may still say it - it moves nothing
     const old = await ready(doorOf({ harvest: async () => ({ ok: false, error: 'prof-hunt-cap' }) }));
     assert.equal((await old.harvest({ node: `body:${TODAY}:0123456789ae`, kind: 'hide', act: { clean: false }, at: TODAY * 86_400 + 3600, foe: MOBILE_TYPES.Rat })).error, 'prof-hunt-cap');

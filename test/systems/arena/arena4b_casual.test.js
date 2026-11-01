@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, the audit's last ARENA4 gap): THE CASUAL BOUT (Arena.md 7: "A casual bout (unranked) may run under
+// ARENA4b: THE CASUAL BOUT (Arena.md 7: "A casual bout (unranked) may run under
 // DUEL1's defender-resolved law"). Built refereed rather than defender-resolved - the hall's queue word with `u`, paired
 // only with another casual seeker (net/arena/arenaLaw.js pairQueue), its offer, call, listing and `st` saying so, its room
 // owing no receipt (net/arena/arenaBrain.js receiptsOwed) - so a casual bout is PVP-REF's bout all the same and counted nowhere:

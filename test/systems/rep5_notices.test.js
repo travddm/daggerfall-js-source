@@ -1,5 +1,4 @@
-// REP5 (2026-09-29, the reputation overhaul) - THE LAW YOU CAN SEE. The shape Mac signed: "Visible: legal standing per
-// region on the Standing page, a notice on every change". DFU moved a legal standing in silence and showed it only as one
+// REP5 - THE LAW YOU CAN SEE. The shape. DFU moved a legal standing in silence and showed it only as one
 // word for the current region in the status box; the enhanced Standing page left it out because "the window does not
 // know where you stand".
 import { test } from 'node:test';

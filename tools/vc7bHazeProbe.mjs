@@ -1,7 +1,6 @@
-// VC7b (2026-09-23): THE SUN IN THE HAZE, AND THE BEAMS THROUGH THE GAPS, ON A REAL GPU.
+// VC7b: THE SUN IN THE HAZE, AND THE BEAMS THROUGH THE GAPS, ON A REAL GPU.
 //
-// Mac: "I really want to improve the volumetric cloud system to be more
-// immersive" - light shafts. Two terms join EL3's shaft image, and no pin
+// light shafts. Two terms join EL3's shaft image, and no pin
 // can see either (the pins run on a fake GL that draws nothing; the sky
 // lab has no air pass). So: the real renderer on a real WebGL2 context
 // (headless Chromium over SwiftShader), a wide ground under the game's own

@@ -1,6 +1,4 @@
 // PCO1 - PHYSICAL COMBAT AND ARMOR OVERHAUL 1.44, THE MOD, 1:1
-// (2026-09-12, Mac: "I want to implement this as our next integrated
-// mod. The goal is 1:1 with complete parity").
 //
 // What is pinned: the module ladder InitMod decides; Unity's half-to-
 // even round; every hit helper against a hand-worked cell of the C#;
@@ -114,7 +112,6 @@ test('PCO1: the hit\'s helpers - armour, adrenaline, stat diffs, skills, adjustm
   const critter = mkPlayer({ skills: skillsAll(90) });
   assert.equal(pcaaoSkillsToHit(critter, dodger, fixed(0.1), modsOf({ criticalStrikesIncreaseDamage: false })), -25 + 30, 'without the module: the player rolls crit/3 (30) for +crit/3');
   const critMon = monster(0); critMon.skills = skillsAll(90);
-  // PIN MOVED (BAL2, bible/05-Combat/Balance-Arc.md section 4): one roll for every striker - a monster rolls the player's crit/3 for +crit/3
   assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.29), modsOf({ criticalStrikesIncreaseDamage: false })), -25 + 30, 'a monster rolls crit/3 (30) for +crit/3, as the player does');
   assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.3), modsOf({ criticalStrikesIncreaseDamage: false })), -25, 'and misses it over');
   assert.equal(pcaaoAdjustmentsToHit(mkPlayer({ biographyAvoidHitMod: 5 })), -55);
@@ -159,7 +156,6 @@ test('PCO1: CriticalStrikeHandler - luck bends the divisor, the clamp is discard
   assert.equal(pcaaoCriticalStrike(plain, fixed(0.24)), true, '50 luck: 100 / 4 = 25%');
   assert.equal(pcaaoCriticalStrike(plain, fixed(0.25)), false);
   const mon = monster(0); mon.skills = skillsAll(90); mon.stats = stats({ luck: 100 });
-  // PIN MOVED (BAL2, bible/05-Combat/Balance-Arc.md section 4): a monster rolls the player's divisor
   assert.equal(pcaaoCriticalStrike(mon, fixed(0.44)), true, 'a monster: 90 / (4 - 2) = 45%, as the player');
   assert.equal(pcaaoCriticalStrike(mon, fixed(0.45)), false);
 });
@@ -505,7 +501,7 @@ test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worl
   const manifest = JSON.parse(rd('vendor/pcaao/physicalcombatandarmoroverhaul.dfmod.json'));
   assert.equal(m.author, manifest.ModAuthor); assert.equal(manifest.ModVersion, '1.44');
   const shipped = JSON.parse(rd('vendor/pcaao/modsettings.json')).Sections[0].Keys;
-  // PLAIN-TEXT (2026-10-19): the seven module lines (Title Case, "!!!!", a DFU version number) said plainly for a player - their words, exactly
+  // PLAIN-TEXT: the seven module lines (Title Case, "!!!!", a DFU version number) said plainly for a player - their words, exactly
   const PLAIN = {
     'equipmentDamageEnhanced': 'Your equipment wears out much faster, depending on its material, what hit it and more.',
     'fadingEnchantedItems': 'Enchanted weapons and armor are destroyed when they break in combat. Needs Equipment Damage Enhanced.',
@@ -530,7 +526,7 @@ test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worl
   assert.ok(SKILLS.CriticalStrike === 34 && SKILLS.Dodging === 20, 'the skill ids the C# numbers');
 });
 
-// ═══ AUDIT PCO1 (2026-09-12) - the 1:1 audit, method for method against
+// ═══ AUDIT PCO1 - the 1:1 audit, method for method against
 // the decompiled 1.44. Two findings, both pinned here.
 test('AUDIT PCO1: the archery arm registers on the STOCK path too - InitMod registers AdjustWeaponHitChanceMod/AdjustWeaponAttackDamage whatever the armour module says (mutant: the hooks missing from formulas.js, or gated on armorHitFormulaRedone)', () => {
   uninstallPcaao();

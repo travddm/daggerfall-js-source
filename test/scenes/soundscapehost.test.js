@@ -1,5 +1,4 @@
-// SOUNDSCAPE (2026-10-24, the owner: "enhancing sound and ambience, different music and ambience sounds for sailing ... and
-// whatever else we could improve"; bible/08-Audio/Audio.md SOUNDSCAPE): THE SOUNDSCAPE'S HOST HALF (scenes/soundscapeHost.js).
+// SOUNDSCAPE: THE SOUNDSCAPE'S HOST HALF (scenes/soundscapeHost.js).
 // The shore's edge found on rings and bearings of the sea's depth from either side of it - from the land or from the sea
 // - placed by halvings, standing at the sea's surface; land near a map pixel for the gulls, the sea beside one for a far
 // surf; a door's building type off its block; the winter's climates. The host against fakes: nothing with Enhanced
@@ -8,7 +7,7 @@
 // the town, the season's climates, the smithies; at a helm the sea's songs registered once and played, held before the
 // director and let go by a fade the frame I sail no more, the fight's held through a boarding; on land the world's
 // air, the smithies' and taverns' doors read off the host's own list at their doorways. And the world host's own text:
-// the three calls where they belong. AUDIT SOUNDSCAPE (2026-10-24): W1, W2, W3, W8, W10, S2, S3, S4, S7, M1, M2, P2, P3.
+// the three calls where they belong. AUDIT SOUNDSCAPE: W1, W2, W3, W8, W10, S2, S3, S4, S7, M1, M2, P2, P3.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

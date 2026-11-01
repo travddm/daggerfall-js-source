@@ -1,6 +1,4 @@
-// TIMERS1 (2026-10-02, Mac: "we need to create a new unique UI element for reset times like the Sunday wars, oblivion
-// gates, town raids, and anything else so the player can keep track of when things are and watch countdowns. Im
-// thinking maybe an enhanced plus button on the pause menu next to the profile icon").
+// TIMERS1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

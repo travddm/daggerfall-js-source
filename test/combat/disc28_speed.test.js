@@ -1,5 +1,4 @@
-// DISC28-D (2026-09-28, Discord: "the speed attribute only affects the third-person animation, not the first-person
-// swing rate", pointing at weaponStates.js's formula).
+// DISC28-D.
 //
 // The formula was right - GetMeleeWeaponAnimTime is 3*(115-LiveSpeed)/980 a frame (FormulaHelper.cs:830-838) - and
 // never saw the player. The rig built its PlayerWeapon with no speed, the weapon took the default 50 as a NUMBER once,

@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03): HER PREFAB, HER PICTURES, HER MESHES AND HER LOADER, read a second time (the first:
+// AUDIT GALLEON-2: HER PREFAB, HER PICTURES, HER MESHES AND HER LOADER, read a second time (the first:
 // test/world/ships/auditgalleon_prefab.test.js). Each pin failed on the code as it stood (57baee705) or, where the law was right and
 // unpinned, on its mutant (tools/mutants/auditgalleon2_prefab.json); each fix carries an `AUDIT GN2-<id>` comment.
 //   PF3  her pictures painted and her glass's glow cut at the preload, never at her first draw

@@ -1,4 +1,4 @@
-// GRANT3-GRANT4 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 13 and 14): THE POOL
+// GRANT3-GRANT4: THE POOL
 // STANDS ON GRANTS AND READS THEM - over FOE-FORGE's rig (two real encounter pools), each with its own grants' host
 // (scenes/grantHost.js) and a fake relay that signs real grants with a test key: a turn's stands of a kind are one ask;
 // the grant's marks stand in place of the street's rolls; a record names its grant and member, a frame carries the grant

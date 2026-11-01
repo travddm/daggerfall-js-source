@@ -1,5 +1,4 @@
-// AUDIT WARDEN1 (2026-10-11, Mac: "Audit this" - five cold lanes over PR #753: the relay and the wire's law, the client's
-// law, host and save, the show and the pool's hold, the records, the whole play). BY EXECUTION, each finding pinned where
+// AUDIT WARDEN1. BY EXECUTION, each finding pinned where
 // it broke: one account is one team in a town's crowd (R1); a team's spot is its wagon's, near enough (R2); only a wagon
 // carries a landing, measured from the wagon (R3, R5); a failed round is the round's alone (R4); a landing kept in its own
 // pixel, else its cell (R6); a thrown caravan's visitor walks in where it landed (R9); a horse is thrown only standing by
@@ -164,7 +163,6 @@ test('AUDIT WARDEN1 C6/D8: the cell\'s word to the owner names whose team (`k`),
     const a1 = await join(X, 'ann1', 'acct-ann1'), bob = await join(X, 'bob1');
     const k = await parkKeyOf('acct-ann1', 'char-ann-0001');
     await park(X, a1, { c: 'char-ann-0001', a: [AX, AZ], r: { w: W(), ly: LY, tw: 77, rd: 1 } });
-    // PIN MOVED (ONE-BODY, FIELD BUGS 2026-10-15c): this stood her two characters' sockets in the cell at once - the first
     // told of its team's throw, the second (her account, another character) not, and the first alone told again as it
     // re-said the spot. A cell stands one body an account now (server/src/index.js the hello's one-socket law): her
     // second tab's hello closes the first (CLOSE_REPLACED). The watch's word is still the socket's that speaks for the

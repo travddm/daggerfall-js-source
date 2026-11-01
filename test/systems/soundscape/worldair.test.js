@@ -1,4 +1,4 @@
-// WORLD-AIR (2026-10-24, the owner: "... and whatever else we could improve"; bible/08-Audio/Audio.md SOUNDSCAPE): THE OPEN
+// WORLD-AIR: THE OPEN
 // WORLD'S AIR past DFU's four presets (systems/soundscape/worldAir.js). The shore: the surf's reach and its breaker's
 // clock, the lap close in on a quiet sea. The wild: each climate's voices by day and by night as the weather, the winter
 // and a town's walls leave them; a marsh's insects. The town: its murmur by the hour, its size and the weather; a smith
@@ -7,7 +7,7 @@
 // crash, its loudness the sea's and the distance the panner's, nothing past its reach; the wild's calls `far` where its
 // voices are, further off in a town; the town's beds made of the player's own people (never shipped), the murmur two
 // loops, the tavern and the anvil at their doors within their reach, the smith by day only; a pause holding every
-// clock; stop lets everything go. AUDIT SOUNDSCAPE (2026-10-24): W5, W6, W7, W9, W10, W12, W13, W14; every number the
+// clock; stop lets everything go. AUDIT SOUNDSCAPE: W5, W6, W7, W9, W10, W12, W13, W14; every number the
 // record states pinned to its literal (P6).
 import '../../modsOff.js';
 import { test } from 'node:test';

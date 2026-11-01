@@ -1,4 +1,4 @@
-// COMPANION-VOL (2026-10-23, the owner: "add companion moaning random screaming in idle volume option"): THE AUDIO TAB'S
+// COMPANION-VOL: THE AUDIO TAB'S
 // COMPANION IDLE VOLUME (systems/monsterVolume.js companionVolume) - how loud a companion's idle call is, over Monster
 // Volume; a foe's call and a companion's swing keep Monster Volume alone.
 import { test } from 'node:test';

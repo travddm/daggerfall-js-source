@@ -1,6 +1,5 @@
 // @ts-check
-// RVN-ERRAND (2026-10-17, the owner: "Add the ability to send revnants off on timed missions to anywhere within tamriel
-// (They disappear and come back brining rewards like loot, crafting materials, currency, etc)") - A SWORN ONE ABROAD.
+// RVN-ERRAND - A SWORN ONE ABROAD.
 // From the Companions page (ui/companionRoster.js) the player sends a sworn revenant on an errand to one of Tamriel's
 // nine provinces (world/tamriel/tamrielGeography.js PROVINCES - a city of it named for the errand, drawn on its seed),
 // for one of three ventures: PLUNDER (loot first), FORAGE (crafting materials first) or SELL-SWORD (gold first). It

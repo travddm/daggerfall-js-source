@@ -1,7 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, the owner: "players with housing can place an object on the outside in which players can give
-// candy or whatever is lore appropriate"; "A new vendor that stands outside of each tavern"; bible/06-Systems/
-// Witches-Festival.md): THE WITCHES' FESTIVAL IN THE STREETS - the Hearth Offerings at the homes' doors, the Wyrd
+// WITCH1: THE WITCHES' FESTIVAL IN THE STREETS - the Hearth Offerings at the homes' doors, the Wyrd
 // Sister's window, and the festival's doors to the world (systems/festival/festivalClient.js bindFestival).
 //
 //   THE OFFERINGS. The town the player stands in is asked for its offerings (festivalClient townOfferings - one ask in

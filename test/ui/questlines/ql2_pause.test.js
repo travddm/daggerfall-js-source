@@ -1,4 +1,4 @@
-// AUDIT QUESTLINES UI-9 (bible/06-Systems/Questlines-Arc.md section 6): THE QUESTS TAB, DRAWN. The window's questline
+// AUDIT QUESTLINES UI-9: THE QUESTS TAB, DRAWN. The window's questline
 // parts are pinned one by one (ql2_journal.test.js), and nothing drew the pause window's Quests tab with them wired in
 // (ui/enhanced/enhancedMenu.js pauseQuests): the rewards waiting above the quests, a stamped quest with no journal entry
 // yet as a row (unloggedRail), the Questlines and their pages, the Take that hands a piece over, the archive's outcome.

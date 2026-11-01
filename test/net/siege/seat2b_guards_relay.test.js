@@ -1,8 +1,8 @@
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE RELAY'S OWN FIGHTERS IN ITS ROOM,
+// SEAT2b part two (c): THE RELAY'S OWN FIGHTERS IN ITS ROOM,
 // pinned over the real Room and its fake sockets (test/fakeRoom.mjs) - the pass's Barracks fields the guards and the field's
 // frame carries them; a fighter's blow on one is the referee's, the sides kept, its fall said and credited; a guard's own
 // blow lands on the room's held vitality at its beat and its fall is said by it; a revolt's room raises its Captain and
-// rebels, and his fall ends it, the receipts carrying no Honours (bible/11-Multiplayer/Seats-Arc.md 7.5, 7.7;
+// rebels, and his fall ends it, the receipts carrying no Honours (7.5, 7.7;
 // server/src/index.js `_siegeNpcBlow`, `_siegeTick`; net/siege/siegeRef.js). `06-Systems/Online-Arc.md` SEAT2b part two (c).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

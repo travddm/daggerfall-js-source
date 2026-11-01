@@ -1,9 +1,9 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): WHAT THE CLIENT HOLDS OF THE SERPENT'S FIGHT -
+// SERPENT1: WHAT THE CLIENT HOLDS OF THE SERPENT'S FIGHT -
 // the cell's words (net/wire.js validSerpentOut) folded into one state: its health, its swim (the legs its body lies
 // along - net/serpent/serpentBody.js bodyAt draws it from this state as the relay does from its own), how it rides the sea, the
 // attack in flight, its phase and ward, the coil and the maelstrom, the kill and the sounding, and this account's
-// receipt. The gate's link's twin (net/gate/gateLink.js). Design: bible/11-Multiplayer/Sea-Serpent.md section 6.
+// receipt. The gate's link's twin (net/gate/gateLink.js). Design:
 //
 // PURE in its fold (`foldSerpent`): a state and a word in, the next state out. The link around it keeps the state, the
 // falls by day and site (the hub says each site's kill to everyone online - AUDIT SERPENT S1: a forged site's is not

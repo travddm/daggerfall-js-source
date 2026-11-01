@@ -1,5 +1,5 @@
 // @ts-check
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE BANNER RIBBON (bible/
+// SEASON1 part two: THE BANNER RIBBON (bible/
 // 11-Multiplayer/Seats-Arc.md 9.1) - a thin band in the guild's colours under the name tag of every member of a guild
 // that kept a seat a whole Season, worn through the next Season. Written at the Turning that ends a Season
 // (seatTurning.js settleWeek, `town_seat_ribbons`); read here at the token's mint, the named character's alone.

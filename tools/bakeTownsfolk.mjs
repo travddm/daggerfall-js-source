@@ -3,8 +3,7 @@
 //     node tools/bakeTownsfolk.mjs
 //         re-make the shipped NIFs and DDSs from the committed export, its fourteen paintings and retail's skeleton
 //
-// MW-FOLK1 (2026-10-13, the owner: "This is for the Townspeople outfits", with clothes.fbx and the paintings; asked how
-// townspeople wear them: each walker sprite's own outfit, in that sprite's colours - bible/04-Characters/Townsfolk-Outfits.md).
+// MW-FOLK1.
 // Daggerfall's townspeople are pictures - four outfits a race and a sex (characters/mobile/mobilePerson.js PERSON_TEXTURES) -
 // and the export is those outfits made for the Morrowind body: all four Redguard men's (381-384), all four Nord men's
 // (387-390), the Bretons' 385 and 386, and the hooded Redguard woman's (398). Each sprite's body wears its picture's
@@ -189,7 +188,7 @@ export function checkObject(tree, name) {
  * How far the symmetric pack's arm falls from the shoulder joint to the wrist joint (units; retail's bind falls 1.83) -
  * read off the export's own tubes with its clavicle level: the wraps over 386's and 387's wrists stand on its line (to
  * 0.07 - 0.066), 385's long sleeve to 0.39; the bell sleeves sit 0.4 to 1.0 under it and 382's cuffs within 1.2 either
- * side (AUDIT MW-FOLK1 L1-F7: the record had them all on it at once; bible/04-Characters/Townsfolk-Outfits.md).
+ * side (AUDIT MW-FOLK1 L1-F7: the record had them all on it at once).
  */
 export const PACK_ARM_FALL = 0.5;
 

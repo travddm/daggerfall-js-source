@@ -4,7 +4,7 @@
 //
 // A sailing cabin is an interior: its door runs the world's interior transition (worldModes.js enterSailingCabin ->
 // interiorTransition -> host.onTransitionInterior), and that empties the sea (world.js navalTransition -> naval.clear():
-// every ship of it dropped, a boarding's raid withdrawn - NAV-H, "a building has no sea"). SAILING-CABINS (2026-10-03)
+// every ship of it dropped, a boarding's raid withdrawn - NAV-H, "a building has no sea"). SAILING-CABINS
 // opened that door on the deck with no word of the sea, so a pirate alongside - or her boarders on the deck - was taken
 // off the sea for good by stepping below and back up. The rest, the journey, the time scale and the yard already
 // refuse with a hostile ship near (navalHost.js hostileNear, HOSTILE_NEAR_M); the door asks it now, on the deck's door

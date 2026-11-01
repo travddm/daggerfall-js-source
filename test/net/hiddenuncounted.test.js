@@ -1,10 +1,10 @@
-// HIDDEN-UNCOUNTED (2026-10-24, Mac: "Invisible players dont count towards the online count") - A HIDDEN STAFF MEMBER IS
+// HIDDEN-UNCOUNTED - A HIDDEN STAFF MEMBER IS
 // IN NO ONE'S COUNT, THEIR OWN INCLUDED. The relay already leaves a hidden socket out of every roster and count
 // (server/src/staffHidden.js, NAMED BY NOBODY - test/net/staffpanel5hidden_relay.test.js pins it), so every other game's
 // "Online - N" left them out; the hidden game's own list still drew its own row and counted it, one higher than everyone
 // else's. Over the real relay (the harness of staffmap_e2e.test.js): the session notes its hello's hidden mark
 // (net/online.js `hidden`) and the roster leaves its own row out (net/roster.js rosterRows), in every tab's source.
-// AUDIT HIDDEN-UNCOUNTED (bible/01-Overview/audits/Audit-Hidden-Uncounted.md): and every count the relay says after the
+// AUDIT HIDDEN-UNCOUNTED: and every count the relay says after the
 // welcome is read without a seat of mine (a join elsewhere, a count of nobody), the mark follows the socket the relay
 // holds (Hide me and Show myself mid-session, a halo promoted at a crossing), and the harness hands the game the relay's
 // own closes and the count each room says each HUB_COUNT_MS (`sayCounts`), as a browser and a deployed room would.

@@ -1,6 +1,5 @@
 // @ts-check
-// RW1 (2026-10-09, Mac: "The implementation of the real window overhaul, allowing players to see inside/outside of
-// house windows"): THE ROOMS BEHIND THE GLASS, PAINTED FROM NUMBERS. Every house window seen from the street shows a
+// RW1: THE ROOMS BEHIND THE GLASS, PAINTED FROM NUMBERS. Every house window seen from the street shows a
 // room behind it (render/realWindows.js lays the room out and lights it - interior mapping on the glass's own
 // texels); this file is what the rooms are MADE of: the port's own palettes and patterns, no ARENA2 picture and no
 // raster - the shader paints them texel by texel at ROOM_TEXELS_PER_M, square and low like Daggerfall's own walls.

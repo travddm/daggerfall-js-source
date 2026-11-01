@@ -3,9 +3,8 @@
 // REALM P1 — THE REALM'S CHARACTERS, SERVICE SIDE. The row in D1, the
 // save in R2, and the lease that says which tab may write it.
 //
-// Mac: "A true separation while allowing people to still play offline",
 // and, asked where an online character's save lives: "Account service".
-// The plan is bible/06-Systems/Realm-Arc.md, sections 1 and 2.
+// The plan is, sections 1 and 2.
 //
 // ═══ HERE THE SERVICE IS THE TRUTH ═════════════════════════════════
 //
@@ -160,7 +159,7 @@ export async function listRealm({ db, nowS }, /** @type {string} */ playerId) {
 export const REALM_LEVEL_CLAIM_MAX = 45;
 
 /** WHAT THE IDENTITY MINT SIGNS OF THE CHARACTER IT IS MINTED FOR - `{ rc, cl, wa, house, name }`, one read of its row.
- *  - `rc` REALM-DOOR (2026-09-29, the field): IS THIS ONE OF THE ACCOUNT'S REALM CHARACTERS? The relay's door refuses a
+ *  - `rc` REALM-DOOR: IS THIS ONE OF THE ACCOUNT'S REALM CHARACTERS? The relay's door refuses a
  *    0, so online is the realm's at the servers, not only in the new build's boot. A realm id of this account's own,
  *    standing - LEGACY7: never a tombstone - and INT9 (AUDIT): IN PLAY, a lease held (the token's `ci` is whose record a
  *    death in the zone drops from, and its `cl` and `wa` what a referee reads: a tab playing one character named a poor
@@ -175,12 +174,11 @@ export const REALM_LEVEL_CLAIM_MAX = 45;
  *  - `house` LEGACY7 part two: ITS HOUSE (src/net/houseLaw.js) - its line's surname, the member's given name, a
  *    Bloodline's mark, the generation's numeral (legacy.js houseOn: null for a character of no line, and for a name the
  *    name filter refuses - a house is shown to every player, as an account's name is).
- *  - `name` NAME-AS (2026-10-12): ITS OWN NAME, as its row keeps it (realmNameOf's) - the name the mint signs where the
+ *  - `name` NAME-AS: ITS OWN NAME, as its row keeps it (realmNameOf's) - the name the mint signs where the
  *    account chose its character's (accounts.js wornNameOf, which asks whether the wire can carry it). A fifth answer of
  *    the same read, never a second statement: test/server/scale4f.test.js holds it to its own read beside the four.
  *  The four are read only for a character that is the realm's (`rc` 1), as the mint signs them only then.
- *  SCALE4f (2026-10-10, Mac: "really future proof our archetecture while also increasing performance"; bible
- *  11-Multiplayer/Scale-Arc.md SCALE4f): THE FOUR READS OF ONE ROW, IN ONE. These were four functions and four
+ *  SCALE4f: THE FOUR READS OF ONE ROW, IN ONE. These were four functions and four
  *  statements of the same realm_characters row (realmCharacterHeld, realmLevelOf, realmArmsOf, legacy.js realmHouseOf),
  *  asked by every mint - and a relay deploy's wave asks the mint of every player at once. One statement answers exactly
  *  what the four answered: test/server/scale4f.test.js holds it to them, as they stood at acct106, over every state a row can be
@@ -253,8 +251,7 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
 /** THE TABLES CUSTOMS CARRIES from the offline id to the realm's: the Renown track (renownTracks.js) - the plan's
  *  "Renown starts from its existing track" - and the character's online homes (homes.js) and its guild place
  *  (guilds.js).
- *  CUSTOMS-CARRY (2026-09-29, Mac, of the two AUDIT REALM2 S2 weighed - "only what stood before the realm, or none":
- *  "Carry them"): what an offline id holds IS what stood before the realm, because since the realm a claim, a placement
+ *  CUSTOMS-CARRY: what an offline id holds IS what stood before the realm, because since the realm a claim, a placement
  *  and a founding are a realm character's alone (S2's rule, which stands), and it pays out nothing that was not the
  *  realm's - a house from before the realm sells for its `paid` (0), a piece gives back half its `paid` (0), and a
  *  guild's realm withdrawal takes from `realm_gold` alone (migration 0020, L1-F3). S2 left them under the offline id,
@@ -272,7 +269,7 @@ export const CHARACTER_TABLES = Object.freeze(['renown_tracks', 'homes', 'guild_
 const customsCarry = (/** @type {any} */ db, /** @type {string} */ playerId, /** @type {string} */ originId, /** @type {string} */ id) =>
   CHARACTER_TABLES.map((table) => db.prepare(`UPDATE OR IGNORE ${table} SET char_id = ? WHERE player = ? AND char_id = ?`).bind(id, playerId, originId));
 
-// ═══ CUSTOMS-PASS (2026-09-29, the field - Mac, asked, "Staff customs pass") ══════════════════════════════════════════
+// ═══ CUSTOMS-PASS ══════════════════════════════════════════
 //
 // The census is frozen at the realm's start (L1-F5: a Copy to offline's new id gathers traces too), and REALM-DOOR keeps
 // every character made since off the relay unless the realm made it. But until REALM-DOOR a build from before the realm
@@ -330,7 +327,7 @@ export async function grantCustomsPass({ db, nowS }, actor, env, { name, account
  * only if the realm saw it before the realm began. AUDIT REALM L1-F5 / L3-F2: that is the CENSUS (`realm_census`),
  * taken at the realm's start - never a trace written since: any session files a track for any id, and a Copy to
  * offline's new id, one report, brought the realm character in a second time. Migration 0020 took it of the Renown
- * tracks; CUSTOMS-CARRY (migration 0022, Mac 2026-09-29: "Any pre-realm trace") widened it to every trace stamped before
+ * tracks; CUSTOMS-CARRY (migration 0022) widened it to every trace stamped before
  * the realm - an online home, a guild place, a raid fought, a cloud backup - since a track needs a first online kill.
  * And "once" is the character's, on every account: a customs SPENDS its character's census rows everywhere
  * (customsRealm), so a character copied onto two accounts before the realm, or a realm character deleted, never brings
@@ -517,7 +514,7 @@ export async function realmHoldOf(/** @type {any} */ db, /** @type {string} */ p
 export const holdStandsSql = (/** @type {string} */ a, /** @type {string} */ now) => `(${a}.held IS NOT NULL AND NOT (${a}.dead_at IS NOT NULL
   AND ${a}.held = 'law' AND ${a}.held_until IS NOT NULL AND ${a}.held_until <= ${now} AND ${a}.law_sig IS NULL))`;
 
-/** CRAFT-HOLD (2026-10-11, the exploit audit): INT3's hold on a crafted piece follows THE PIECE - the hold of the
+/** CRAFT-HOLD: INT3's hold on a crafted piece follows THE PIECE - the hold of the
  *  account's realm character its maker's record names (`products.char_id` - or, for a piece made before customs, the
  *  offline character it brought in: `origin_id`), whatever character the act names. realmHoldOf asks the acting character
  *  alone and answers null for an id that is no realm id, so a held character's craft listed, auctioned, filled a
@@ -539,7 +536,7 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
  * write's object is dropped. The save two back goes; the one before stays, and (INT6) the last one judged clean.
  * INT2: AND EVERY CHECKPOINT IS READ - the judge's verdict (verdict.js verdictOn: the character law, the item law, the
  * id ledger, the budget, the hold) lands in the batch that moves the row. A verdict never refuses the save: it holds the
- * character's trade (Mac: "Freeze trading"). Answers `{ ok, seq, tradeHeld }` - the hold standing (null for none), said
+ * character's trade. Answers `{ ok, seq, tradeHeld }` - the hold standing (null for none), said
  * so the tab can tell its player, and (AUTO-HOLD) `locked`, the keys of the copies the record shows, locked piece by
  * piece (ledger.js), for the tab to name - `[]` for none, every answer (AUDIT AUTO-HOLD: a tab hearing none from a service
  * mid-deploy keeps the ones it has, never unbinds them) - or `{ error }`:
@@ -552,8 +549,7 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
 export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
   if (!bucket) return { error: 'no-storage' };
   if (!REALM_ID_RE.test(id) || typeof lease !== 'string' || !LEASE_RE.test(lease) || !Number.isSafeInteger(seq) || /** @type {number} */ (seq) < 1) return { error: 'body' };
-  // SAVE-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/
-  // Scale-Arc.md SAVE-BATCH): the record's row, the ledger's two reads of the character's own rows and (where this isolate
+  // SAVE-BATCH: the record's row, the ledger's two reads of the character's own rows and (where this isolate
   // kept none) the budget's config, in ONE batch - each was a round trip of its own, and checkpoints were a third of the
   // primary's statements. One snapshot, read before anything is judged, as the reads were
   const keptConfig = budgetKept(db);
@@ -846,8 +842,7 @@ export async function leaveRealm({ db }, /** @type {string} */ playerId, /** @ty
  *  - then the row: saves.js's order, so a failure halfway leaves a row whose bytes lie rather than objects nothing
  *  names. AUDIT REALM L1-F7 / L3-F5: AND ITS ONLINE LIFE WITH IT, as the door promises ("its home and its guild place
  *  with it"): the row's delete carries its homes (their pieces and hidden furniture go by the tables' own cascade), its
- *  guild place and its Renown track in ONE batch. ACCOUNT-HOMES (2026-10-06; asked: "Deleted characters should remove
- *  their houses from online", beside "House ownership should be account bound"): the homes are the ones it BOUGHT -
+ *  guild place and its Renown track in ONE batch. ACCOUNT-HOMES: the homes are the ones it BOUGHT -
  *  every character of the account owns them while it stands, and they go with it, whatever another of them placed in
  *  them; goods another stocked at their traders wait ('home-vendor-stocked'). They stood under a dead id: a house nobody could buy again nor its
  *  owner sell, a guild whose master could never be succeeded, a track that counted against the account's sixty
@@ -860,7 +855,7 @@ export async function leaveRealm({ db }, /** @type {string} */ playerId, /** @ty
  *  AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED ('dead') - it is the realm's only word on a Bloodline's death, and
  *  its row the person's claim (realm_characters_person): deleted, the death was gone and the person could be born again
  *  once the line's record forgot it. It holds no roster slot and is never listed, so no door offers its delete.
- *  PROF-DELETE (2026-09-29, Mac's choice: "Goes with it; wait on trades"): AND ITS PROFESSIONS WITH IT - its Stores and
+ *  PROF-DELETE: AND ITS PROFESSIONS WITH IT - its Stores and
  *  its professions' tracks go in the same batch, as its Renown does; they stood under a dead id where nothing could
  *  reach them (MERGE 2's open question 3). What another player is part of waits: while the character has market
  *  business open ('realm-market-open', REALM_MARKET_OPEN_SQL) the delete is refused, since the goods or the piece it
@@ -893,7 +888,7 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   // out, kept from going by them (guildKeepsSql), its name and tag held for good (guilds.js disband and leave ask it too)
   if (master?.vault) return { error: 'guild-vault' };
   if (Number((await db.prepare(REALM_MARKET_OPEN_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'realm-market-open' };
-  // ACCOUNT-HOMES (2026-10-06): the homes it bought go with it ("Deleted characters should remove their houses from
+  // ACCOUNT-HOMES: the homes it bought go with it ("Deleted characters should remove their houses from
   // online"), and any character of the account may stock a trader in one now - so goods another of them has standing at
   // one wait, as a sale waits for them (homes.js releaseHome): the delete would leave them for sale at a trader gone
   if (Number((await db.prepare(HOME_VENDOR_STOCK_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
@@ -918,7 +913,7 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   const late = await homeHeld();
   if (late) return late;
   await dropCharacterObjects(bucket, playerId, id, [row.obj, row.prev]);
-  // QUEST-HOME (Mac, 2026-10-15: "Close both"): the homes the delete takes, a house again to every page online - read
+  // QUEST-HOME: the homes the delete takes, a house again to every page online - read
   // with the delete in one batch, so the answer names exactly what went
   const [gone] = await db.batch([
     db.prepare('SELECT map_id, building_key FROM homes WHERE player = ? AND char_id = ? ORDER BY map_id, building_key').bind(playerId, id),
@@ -947,7 +942,7 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   return { ok: true, ...(towns.size ? { moved: [...towns].flatMap(([mapId, keys]) => homeMoved(mapId, [], keys)) } : {}) };
 }
 
-/** HOME-RENT (2026-09-30): THE TENANCIES STILL RUNNING in a character's homes - a sale (homes.js) or the character's
+/** HOME-RENT: THE TENANCIES STILL RUNNING in a character's homes - a sale (homes.js) or the character's
  *  delete waits for them: another player paid for those days. `?1` the account, `?2` the character, `?3` now; `n`. */
 export const HOME_TENANTS_SQL = `SELECT COUNT(*) AS n FROM home_rooms r JOIN homes h ON h.map_id = r.map_id AND h.building_key = r.building_key
   WHERE h.player = ?1 AND h.char_id = ?2 AND r.tenant IS NOT NULL AND r.until > ?3`;
@@ -990,8 +985,7 @@ async function dropCharacterObjects(/** @type {any} */ bucket, /** @type {string
 }
 
 /**
- * HOUSE-LOSS (2026-09-29, the field through Mac: "GarySoup lost his house and furniture. I suspect a lot of people lost a
- * ton of belongings"): A CUSTOMS THAT NEVER LANDED IS UNDONE BY ITS DELETE, never a delete of what it carried. Customs
+ * HOUSE-LOSS: A CUSTOMS THAT NEVER LANDED IS UNDONE BY ITS DELETE, never a delete of what it carried. Customs
  * carries the origin's home, guild place and track to the realm's id in the census's own batch, before the first save is
  * sent (CUSTOMS-CARRY), and a first save can fail - refused, too large, lost on the way. The door then showed a "Never
  * saved" tile whose one live button was Delete, and said "Delete it and make it again"; the delete took the home, its

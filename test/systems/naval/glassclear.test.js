@@ -1,5 +1,4 @@
-// GLASS-SPOT / GLASS-CLEAR (2026-10-11, the owner: "You can spot ships before you even decide to use the spyglass and
-// the ship blocks your view most of the time when using your spyglass") - bible/03-World/Captains-Sea.md "GLASS-SPOT and
+// GLASS-SPOT / GLASS-CLEAR  "GLASS-SPOT and
 // GLASS-CLEAR". A sail not yet made out gives no card - not under the look, not under the laid guns - so nothing names
 // her, or ranges her, at a glance. And the glass focuses past the ship I stand aboard: as its lens comes on the world's
 // near plane stands out to just past her extent along the look (ui/spyglassView.js glassClearDepth, glassNear), so her

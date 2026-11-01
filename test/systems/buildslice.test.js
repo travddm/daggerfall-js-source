@@ -1,6 +1,4 @@
-// PERF-EXT24 (2026-09-25, the players: "fps issues in the exterior but
-// fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600") - THE BUILD SLICE IS WHAT THE FRAME LEFT. The stream's breather
+// PERF-EXT24 - THE BUILD SLICE IS WHAT THE FRAME LEFT. The stream's breather
 // resumes inside its own animation-frame callback, in the same rendering
 // opportunity as the frame, so a flat 6 ms slice sat on top of a frame that
 // had already spent its budget: every streaming frame over ~8.7 ms of

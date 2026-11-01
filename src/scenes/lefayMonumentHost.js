@@ -1,5 +1,5 @@
 // @ts-check
-// LEFAY1 (2026-10-08): THE MONUMENT TO JULIAN LEFAY, WHERE IT STANDS - the exterior hosts' pool on the runtime pools'
+// LEFAY1: THE MONUMENT TO JULIAN LEFAY, WHERE IT STANDS - the exterior hosts' pool on the runtime pools'
 // shape (scenes/sigilBrokerPool.js, scenes/gate/gatePool.js): its stone drawn in the host's world pass, its collider bucket,
 // the eye's box and its name, the press on it, and the flowers - thrown, in flight, and laid.
 //
@@ -18,7 +18,7 @@
 //
 // NOTHING HERE IS SENT: each character keeps its own pile.
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (the pixel's build finds the spot and carves the people's
+// THE FOUR HOSTS: scenes/world.js - WIRED (the pixel's build finds the spot and carves the people's
 // navgrid where there is one; the pool is made beside the Sigil Broker, framed, drawn, its flats on the live axis, taken down at a change
 // of place, a re-anchor and a load). scenes/exterior.js - WIRED (the bench's Privateer's Hold: the same pool on its fixed
 // frame). scenes/worldModes.js - WIRED for the press both exterior hosts share (`monumentTargets` in the street's one

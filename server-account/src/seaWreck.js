@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - broadsides
-// between captains, a ship wrecked and boarded, her hold a prize; bible/03-World/Eltheric-Ocean.md SHIP-PVP) - A WRECK AT
+// SHIP-PVP - A WRECK AT
 // SEA, the service's half. The relay referees the guns and signs the wreck (src/net/sea/seaRef.js, net/wild/wildReceipt.js
 // `n1`); the prize's law is both ends' (src/net/sea/seaPrizeLaw.js); the tables migrations/0148_sea_wreck.sql's.
 //

@@ -1,11 +1,9 @@
-// LOOT9 - SALVAGE, AND THE REFORGE (2026-10-01; bible/06-Systems/Loot-Arc.md section 11, Mac: "Do you wanna turn this
-// into an arc and do all of the above?" - "Salvage and reroll: break unwanted Magic+ items into a crafting material ...
-// spend it at the Mages Guild to reroll one affix"). The laws pinned here:
+// LOOT9 - SALVAGE, AND THE REFORGE. The laws pinned here:
 //   - THE SHARD: template 571 beside the Sigil Stone - stacking with its own kind, BOUND (the realm's list names it).
 //   - SALVAGE: Magic 1, Rare 3, Legendary 8, Exalted 15 - only a piece the ladder graded; never an Aetheric piece, an
 //     artifact, a quest's, a bound, worn or locked one; all of it or none of it.
 //   - THE REFORGE: a Magic's or Rare's every line, an Exalted Legendary's own extra line, never a record's. REFORGE-REPLACE
-//     (2026-10-25, the owner: "Replace, price rises"): any line, however often (an old piece's one-line mark a reforge
+//     any line, however often (an old piece's one-line mark a reforge
 //     counted, never a lock); the line REPLACED from its tier's pool - never its own kind, never a kind or param another
 //     line carries, a proc a proc, any name slot (the name follows) - the price following, and each reforge on a piece
 //     twice the last; paid in shards then gold, nothing taken when refused.

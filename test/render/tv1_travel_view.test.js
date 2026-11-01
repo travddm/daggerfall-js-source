@@ -1,6 +1,4 @@
-// TV1 (2026-09-27, bible/06-Systems/Travel-View.md, Mac: "a sort of zoom out to an overworld style that utilizes
-// travel options ... When opening the map, there should be a toggle to go to the overworld style map. Every detail like
-// weather patterns, should be 1:1 in this mode"; his call on the height: below the clouds).
+// TV1.
 //
 // THE VIEW'S CAMERA IS A RENDER EYE: `cam.pos` stays on the traveller's head, so the world streams, the weather is
 // read and the rain falls where they stand, and the picture is taken from under the cloud deck, 150-450 m up. Pinned
@@ -34,13 +32,12 @@ const deg = (d) => (d * Math.PI) / 180;
 
 test('TV1 camera: Mac\'s band - 150 to 450 m over the traveller, 15 to 75 degrees down, and never into the cloud deck (its base less 60 m, a lid weather\'s floor 40 m)', () => {
   assert.deepEqual([TV_HEIGHT_MIN, TV_HEIGHT_MAX, TV_HEIGHT_DEFAULT], [150, 450, 260]);
-  // PIN MOVED (OW-HORIZON, 2026-10-20): the floor 15 (it was 30, so as not to show the haze's wall inside the grid) - the horizon in the picture
   assert.ok(near(TV_TILT_MIN, deg(15)) && near(TV_TILT_MAX, deg(75)) && near(TV_TILT_DEFAULT, deg(52)));
   assert.deepEqual([TV_CLOUD_MARGIN, TV_HEIGHT_FLOOR, TV_GROUND_CLEAR], [60, 40, 25]);
   // the deck, per the weather the clouds are drawn for (render/volumetricClouds.js VC_PROFILE) - the view reads the
   // same table the sky does, so the camera is under the very clouds the player sees
   const ceilings = Object.fromEntries(Object.entries(VC_PROFILE).map(([w, r]) => [w, ceilingFor(r.base)]));
-  assert.deepEqual(ceilings, { sunny: 450, cloudy: 450, overcast: 450, fog: 90, rain: 450, snow: 450, thunder: 440, sandstorm: 40, ashfall: 390 });   // PIN MOVED (ASHFALL1, 2026-10-27): the ash's pall, base 450
+  assert.deepEqual(ceilings, { sunny: 450, cloudy: 450, overcast: 450, fog: 90, rain: 450, snow: 450, thunder: 440, sandstorm: 40, ashfall: 390 });
   assert.equal(ceilingFor(null), 450, 'no deck: the band\'s top');
   assert.equal(ceilingFor(Number.NaN), 450);
   assert.deepEqual(heightBand(450), [150, 450]);
@@ -572,7 +569,7 @@ test('AUDIT DEEP T1-7/X-1/X-2/T1-5: a look key let go in a text box still stops 
   assert.match(eh, /const aim = !opts\.reticleHidden;\n\s*const showCross = aim && /);
   assert.match(eh, /const showCentreWord = aim && /);
   assert.match(eh, /const showCorner = aim && /);
-  assert.match(frame, /if \(frameHeld\(\)\) \{ frameAbort\(\); hideWorldPlaque\(\); last = now; requestAnimationFrame\(frame\); drawGateBanner\(null\); drawGateMarksCard\(null\); drawGateDamageChart\(null\); drawGateGround\(null\); travelView\?\.exit\('video', true\); if \(spyglass\.up\) lowerGlass\(\); return; \}/, 'the video hold cuts the view on its own return');   // PIN MOVED (AUDIT CAPTAIN'S SEA S15): the captain's glass lowered on it too   // WB9a / WB9d: the marks card and the ground's rim go down on it too
+  assert.match(frame, /if \(frameHeld\(\)\) \{ frameAbort\(\); hideWorldPlaque\(\); last = now; requestAnimationFrame\(frame\); drawGateBanner\(null\); drawGateMarksCard\(null\); drawGateDamageChart\(null\); drawGateGround\(null\); travelView\?\.exit\('video', true\); if \(spyglass\.up\) lowerGlass\(\); return; \}/, 'the video hold cuts the view on its own return');
 });
 
 test('TV1 host: the readout - the traveller\'s ring on the projected feet, the chevron along the heading, the compass on the view\'s heading, the place line, the hints by hand', () => {
@@ -660,7 +657,7 @@ test('TV1 host wiring: the frame draws from the view\'s eye risen out of the bod
   const setAt = w.indexOf('renderer.setFocus(tvf ? cam.pos : null, !!tvf && tvf.blend >= 0.5);');
   assert.ok(setAt > 0 && setAt < w.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), 'AUDIT TV B1: BEFORE beginFrame - its lane replay and its sun maps read the focus (AUDIT DEEP2: and the line must be there - a -1 passed this)');
   assert.match(w, /lookAt\(mwv\.eye, \[mwv\.eye\[0\] \+ viewFwd\[0\], mwv\.eye\[1\] \+ viewFwd\[1\], mwv\.eye\[2\] \+ viewFwd\[2\]\], \[0, 1, 0\]\)/);
-  assert.match(w, /sky\.draw\(tvf \? tvf\.yaw : cam\.yaw, tvf \? tvf\.pitch : cam\.pitch \+ climbFeel\.pitch\(\), glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\),/);   // PIN MOVED (SPYGLASS): the glass's lens
+  assert.match(w, /sky\.draw\(tvf \? tvf\.yaw : cam\.yaw, tvf \? tvf\.pitch : cam\.pitch \+ climbFeel\.pitch\(\), glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\),/);
   assert.match(w, /const _bbYaw = tvf \? tvf\.yaw : cam\.yaw;/);
   assert.match(w, /const bbUp = tvf \? tvf\.up : UP_Y;/);
   assert.equal((w.match(/renderer\.drawBillboards\(.*, camRight, bbUp\);/g) ?? []).length, 3, 'the flats, the missiles, the townsfolk');
@@ -672,7 +669,7 @@ test('TV1 host wiring: the frame draws from the view\'s eye risen out of the bod
   assert.match(w, /travelView\?\.drawHud\(\);/);
   assert.match(w, /audio\.setListener\(cam\.pos, tvf \? \[viewFwd\[0\], 0, viewFwd\[2\]\] : fwd\);/);
   // the cursor toggle cannot take the view's free cursor back, and the loop's death takes the view with it
-  assert.match(w, /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active \|\| !!poiEditor\?\.active\(\),/);   // PIN MOVED (AUDIT POI E1): the POI editor's keys its own too
+  assert.match(w, /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active \|\| !!poiEditor\?\.active\(\),/);
   // P0's guard stays the plaque's one line (four pins hold it); the view goes on its own heartbeat, asking the same token
   assert.match(w, /if \(!frameAlive\(_frameToken\)\) \{ destroyWorldPlaque\(\); return; \}/);
   assert.match(w, /alive: \(\) => frameAlive\(_frameToken\),/);
@@ -799,8 +796,8 @@ test('AUDIT DEEP2 A1/A2/A5/A8/A9 by source: the travel panel keeps its presses; 
   assert.match(panel, /bar\.addEventListener\('mousedown', \(e\) => \{ if \(e\.target\?\.closest\?\.\('\[data-act\]'\)\) e\.stopPropagation\(\); \}\);/);
   assert.doesNotMatch(panel, /addEventListener\('mouseup', \(e\) => \{ if \(e\.target\?\.closest/, 'never the release (AUDIT CHAT C5)');
   const w = rd('src/scenes/world.js');
-  assert.match(w, /overlayActive: \(\) => townTalk\.overlayActive \|\| !!travelView\?\.active \|\| !!modes\?\.overlayHeld,/);   // PIN MOVED (FIELD BUGS 29h TOUCH-HELD): and the modes' own stacks
-  assert.match(w, /overlayUp: \(\) => overlayOpen\(\) \|\| travelViewConfirmOpen\(\) \|\| waypointMenuOpen\(\),/);   // PIN MOVED (OW-CONFIRM): and the view's own question has the keys; WAYPOINTS (2026-10-06): and its right-click menu (its Escape is its own)
+  assert.match(w, /overlayActive: \(\) => townTalk\.overlayActive \|\| !!travelView\?\.active \|\| !!modes\?\.overlayHeld,/);
+  assert.match(w, /overlayUp: \(\) => overlayOpen\(\) \|\| travelViewConfirmOpen\(\) \|\| waypointMenuOpen\(\),/);
   assert.match(w, /if \(act === 'Escape' && e\.repeat\) return true;[^\n]*\n\s*if \(act === 'Escape' && pauseDoorReady\(\)\) \{ hudCtx\.togglePause\(\); return true; \}/);
 });
 

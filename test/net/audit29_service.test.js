@@ -1,11 +1,11 @@
-// AUDIT 29 (2026-09-28, Mac: "Lets audit everything so far before we continue") - THE PROFESSIONS' SERVICE, AS THE
+// AUDIT 29 - THE PROFESSIONS' SERVICE, AS THE
 // AUDIT FOUND IT, through the real Worker over node:sqlite (test/accountDb.mjs): a node taken once whatever its
 // spelling; the day's harvests bounded an account as well as a character (RETIRED by CAP-OFF - neither is bounded now,
 // the pin turned to say so); the dungeons nobody vouched for four veins a
 // day; a dissent on confirmed ground written down; a signature's own slot; a region's ground by its pixels' facts;
 // the XP answered as credited; a paid change of specialisation one track's, asked as the client saw it; a free one
 // answered again after the switch; Motherlode Sense refused; a writ's same-id race and a writ one filled oneself.
-// Each pin failed on the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 29.
+// Each pin failed on the code before its fix. AUDIT 29.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -112,7 +112,6 @@ test('AUDIT 29 A3, RETIRED by CAP-OFF (2026-10-07, Mac: "Remove the cap on life 
   for (let i = 0; i < 120; i++) ins.run(today(), `vein:1:1:${today()}:${i}`, mac.id, `alt-${String(i % 4).padStart(4, '0')}`, _now, `seed-${i}-xxxx`);
   const v = tier1Vein();
   const r = await s.call('/v1/prof/harvest', ore(mac, v.key, WOODS, GLENUMBRA), mac.secret);
-  // PIN MOVED (CAP-OFF): a fifth character, never used today, was refused - `prof-account-cap`
   assert.deepEqual([r.status, r.body.today], [200, 1], JSON.stringify(r.body));
   assert.equal((await s.call('/v1/prof/harvest', { ...ore(mac, herbNode(), WOODS, GLENUMBRA), kind: 'herbs' }, mac.secret)).status, 200, 'another profession\'s day as ever');
 });
@@ -124,7 +123,7 @@ function herbNode() {
 test('AUDIT 29 A5: a dungeon nobody has vouched for gives an account four veins a day - its id the client\'s word, so invented dungeons buy four deep veins, not the day (DEEP-OPEN: each of the whole deep table, where it was Silver)', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
-  s.setXp(mac, xpForRank(70));   // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): an unvouched dungeon's vein draws tiers 3-6 now - rank 70 opens them all
+  s.setXp(mac, xpForRank(70));
   assert.equal(DEEP_UNCONFIRMED_PER_DAY, 4);
   clock(secondAt(today() * DAY + 60, 2));
   for (let i = 0; i < DEEP_UNCONFIRMED_PER_DAY; i++) {
@@ -205,8 +204,8 @@ test('AUDIT 29 A7 + A14: a smelt\'s Smithing XP keeps the quarter at the smith\'
   assert.equal(r.body.xp, 25, 'Iron (tier 1) at Smithing 40: a quarter of 100');
   // two crafts past Journeyman: Smithing stops at 50
   const ann = await s.seated('Ann');
-  s.setXp(ann, xpForRank(60), 'provisioning');   // PIN MOVED (CRAFT3): Alchemy's rank is the Provisioning track's
-  s.setXp(ann, xpForRank(60), 'building');   // PIN MOVED (CRAFT3): Carpentry's rank is the Building track's
+  s.setXp(ann, xpForRank(60), 'provisioning');
+  s.setXp(ann, xpForRank(60), 'building');
   s.setXp(ann, xpForRank(51) - 3, 'smithing');
   s.give(ann, 'metal:iron', 'own', 20);
   const c = await s.call('/v1/prof/smelt', { character: ann.character, recipe: 'ingot:iron', count: 10, rid: rid() }, ann.secret);
@@ -230,7 +229,7 @@ test('AUDIT 29 A2: a paid change is its own track\'s - the same id raced for two
   ]);
   release();
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE kind = 'respec'").get().n, 1, 'one burn');
-  const pending = s.raw.prepare('SELECT profession FROM prof_tracks WHERE player = ? AND respec_at IS NOT NULL').all(mac.id).map((r) => r.profession);   // PIN MOVED (PERK-TRIAL): a change lands at once, its track locked - no change waits
+  const pending = s.raw.prepare('SELECT profession FROM prof_tracks WHERE player = ? AND respec_at IS NOT NULL').all(mac.id).map((r) => r.profession);
   assert.equal(pending.length, 1, 'one change for the one burn');
   const changed = s.raw.prepare("SELECT profession FROM prof_tracks WHERE player = ? AND spec50 IN ('botanist', 'deep-delver')").all(mac.id).map((r) => r.profession);
   assert.deepEqual(changed, pending, 'and that one track changed');

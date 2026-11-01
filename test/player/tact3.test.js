@@ -1,6 +1,4 @@
-// TACT3 - THE CROWD AND THE DOOR (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Players can grief others with
-// guards by bringing them into interiors and blocking doorways. We need to reduce enemy clumping and also have enemies
-// aware of each other"; his calls: the fixes are ALWAYS ON, the classic lane too). Every version of the grief, each
+// TACT3 - THE CROWD AND THE DOOR (;; his calls: the fixes are ALWAYS ON, the classic lane too). Every version of the grief, each
 // over the real collider:
 //   a. foes of DIFFERENT pools (the watch and a street's encounters, a building's own foes and the watch called in)
 //      keep apart as each pool keeps its own;

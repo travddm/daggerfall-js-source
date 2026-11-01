@@ -1,10 +1,9 @@
 // AUDIT BRANCH (WoD) - THE WHOLE WORLD OF DAGGERFALL BRANCH, READ BY FIVE LENSES BEFORE THE MERGE.
 //
-// Mac: "Lets do a comprehensive audit before we decide to merge. This needs to be a perfect integration and
-// hopefully bug free". Every finding was reproduced by execution first; each is pinned here as it now stands,
+// . Every finding was reproduced by execution first; each is pinned here as it now stands,
 // by behaviour wherever the code can be run - the world host's own WoD code is sliced out of scenes/world.js and
 // run against stubs, the lens rigs' own technique - and by source where the line lives inside a scene closure.
-// The mutants are tools/mutants/auditwod.json; the page is bible/03-World/World-Of-Daggerfall.md, AUDIT BRANCH.
+// The mutants are tools/mutants/auditwod.json; the page is, AUDIT BRANCH.
 
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -315,7 +314,6 @@ test('AUDIT BRANCH (WoD) M2: a pack fetch is abandoned after a stall and tried t
 
 test('AUDIT BRANCH (WoD) M2: the build\'s pick can cost a pixel its site, never the pixel; with the mod off no frame walks the pixels for its lights', () => {
   const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G8): the pick asked on the Bay alone - its sites are the Bay's
   assert.match(w, /if \(wod && onTheBay\(px, py\) && await wodOpened\) \{[^\n]*\n[^\n]*\n[^\n]*\n      try \{\n        const here = host\.state\.current \?\? \{ x: px, y: py \};[\s\S]{0,900}\} catch \(e\) \{\n        console\.warn\(`\[wod\] pixel \$\{key\}: the loader failed here[^\n]*\n        wodPicks = null;\n      \}/);
   assert.match(w, /const wodLit = wod \? _wodLitCount\(\) : 0;/);
   assert.match(rd('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /if \(!b\) return;\n[^\n]*\n[^\n]*\n      await new Promise\(\(r\) => setTimeout\(r, 0\)\);[\s\S]{0,400}decodeRegionPack\(b\)/, 'one decode a task');
@@ -355,9 +353,8 @@ const WORLD = hostText('src/scenes/world.js');
 function sliceWorld() {
   const cut = (a, b) => { const i = WORLD.indexOf(a); const j = WORLD.indexOf(b, i); assert.ok(i >= 0 && j > i, `slice ${a}`); return WORLD.slice(i, j); };
   const wodCode = cut('  const wodCarry = new Map();', '  const tickCityGates = ');
-  const dpStart = WORLD.indexOf('  function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {}) {');   // PIN MOVED (IC-SWAP-BEHIND): its carry's two doors
+  const dpStart = WORLD.indexOf('  function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {}) {');
   const dpEnd = WORLD.indexOf('\n  }\n', dpStart) + 4;
-  // PIN MOVED (IC-SWAP-BEHIND): under the pixel's own key (`pkey`; `key` the build's, behind a standing view)
   const pubA = WORLD.match(/    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};/);
   const pubB = WORLD.match(/    for \(const pile of wodKept\.piles \?\? \[\]\) standWodPile\(pkey, wodLife, pile\);/);
   assert.ok(pubA && pubB, 'the publish lines stand where the rig reads them');
@@ -572,7 +569,6 @@ test('WOD6 (audit): a pixel is the arrival\'s until its first frame - a marker m
   try { h.tick(); } finally { Math.random = orig; }
   assert.deepEqual([q.wodSpawners[0].spawner.started, q.wodSpawners[0].spawner.active], [true, false], 'Start from the player, within 300: stood down, never sprung at their feet');
   assert.equal(h.droppedLoot.piles?.length ?? 0, 0);
-  // PIN MOVED (BUILD-RETRY, test/scenes/ow_buildretry.test.js): the key let go through the stream's `fail`, which asks for it again on its own wait
   assert.match(WORLD, /destroyPixel\(next\.px, next\.py, \{ collectLoose: false \}\);\n      _wodArrival\.keys\.delete\(`\$\{next\.px\},\$\{next\.py\}`\);\n(?:      \/\/[^\n]*\n)*      state\.fail\(next\.px, next\.py, performance\.now\(\)\);/, 'a build that failed is torn down with its key, and is no longer the arrival\'s');
   assert.match(WORLD, /reposition: REPOSITION\.RandomStartMarker \}\);\n[^\n]*\n          \{ const s = walkMode && playerSpawned; const f = s \? player\.pos : cam\.pos; wodOnLoad\(/, 'the online underground wake is a load: OnLoad last');
 });
@@ -618,7 +614,6 @@ test('WOD6: the pixels a late region names are built again on the list in its or
   const loader = WORLD.indexOf('  // LocationLoader.cs:146-151', i), sweeps = WORLD.indexOf('  const { swap, _arenaRoadsStale', i);   // PIN MOVED (IC-SWAP-BEHIND): the swap first among what it hands back
   const j = sweeps > i && sweeps < loader ? sweeps : loader;   // TESA's merge: the sweeps past the Bay (scenes/tamrielSweepsHost.js) are constructed after it, before the loader's
   assert.ok(i > 0 && j > i);
-  // PIN MOVED (IC-SWAP-BEHIND): the sweep builds them again through the swap (scenes/swapBehind.js) - with its switch off as it
   // always did, torn down and held; on, behind their standing views
   const rig = (off) => {
     const wod = {};
@@ -665,8 +660,6 @@ test('AUDIT BRANCH (WoD) m4: a sweep while a rebuild is in flight is heard - the
   h.sweep(100, 100);   // a load at the same spot, the rebuild still in flight
   assert.equal(h.publish(100, 100, [[10, 5, 10]]).wodSpawners[0].spawner.active, true, 'fresh, as ClearStreamingWorld re-promotes');
   assert.doesNotMatch(WORLD, /const carried = wodCarry\.get\(key\) \?\? null;   \/\/ WOD3\/WOD4: what a rebuild/, 'no build reads the carry at its start');
-  // PIN MOVED (MID-RING, found at IC-GRAND's merge of the streams' head): the pixel's fade stamped between, as synchronous
-  // PIN MOVED (IC-SWAP-BEHIND): the carry under the pixel's own key, the fade a fresh pixel's alone, published through the swap
   assert.match(WORLD, /    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};[^\n]*\n    if \(!wodKept\.life\) wodForgetPeerSites\(pkey\);[^\n]*\n(?:    if \(key === pkey && isEnhanced\(\) && !midRingDisabled\(\)\) stampPixelFade\([^\n]*\n)?    if \(_building\.get\(key\) === made\) _building\.delete\(key\);[^\n]*\n    swap\.publish\(px, py, key, made, \{/, 'nothing awaited between the adoption and built.set (BUILD-FAIL1\'s hand-over, WOD7\'s forget and MID-RING\'s fade are the lines between)');
 });
 

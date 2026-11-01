@@ -7,7 +7,7 @@
 // travel machine does (world/road/roadBand.js, the jungle's roadside pairs); systems/travel/travelPaths.js re-exports
 // every name, and its follow machine reads them from here.
 //
-// BAY-LEFT-MAPS (2026-10-27, bible/06-Systems/Travel-Options.md BAY-LEFT-MAPS): PAST THE TABLE, THE ROADS PAST THE BAY. The
+// BAY-LEFT-MAPS: PAST THE TABLE, THE ROADS PAST THE BAY. The
 // mod's arrays are the Bay's 1000 x 500, and every read past them answered 0 - so on every road past the Bay Follow Paths
 // said there was none, the junction map was blank and a walk on a road ran at the open ground's rate. Past the table a
 // pixel's road and track bytes are TESA's layer's (world/arenaRoads.js arenaRoadByte - ROADS 1's compass, the same bits the
@@ -70,7 +70,7 @@ export function pathsDataPoint(net, mapPixelX, mapPixelY) {
 
 /** BAY-LEFT-MAPS: roads OR tracks on the mod's own table alone - 0 past it, as the reads all were. The jungle's roadside
  *  pairs (world/jungle/jungleRoadside.js) stand astride the table's straight lanes; past the Bay a road is drawn as a
- *  curve (bible/03-World/Roads.md VOYAGER2), and a pair stood on a straight arm there would stand on the road's bend. */
+ *  curve (VOYAGER2), and a pair stood on a straight arm there would stand on the road's bend. */
 export function tablePathsDataPoint(net, mapPixelX, mapPixelY) {
   if (!onTable(mapPixelX, mapPixelY)) return 0;
   return pathsDataPoint(net, mapPixelX, mapPixelY);

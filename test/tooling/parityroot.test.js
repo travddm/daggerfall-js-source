@@ -1,4 +1,4 @@
-// PY1 - THE PARITY PINS WERE BLIND (2026-08-28). Fourteen pins across
+// PY1 - THE PARITY PINS WERE BLIND. Fourteen pins across
 // eight files REGENERATE a port table from Daggerfall Unity's own C#
 // and compare it cell for cell - ENEMY_BASICS off EnemyBasics.cs,
 // LOOT_MATRICES off LootTables.cs, the ingredient ITEM_GROUPS and the

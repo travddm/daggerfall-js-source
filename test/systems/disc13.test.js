@@ -1,7 +1,7 @@
-// DISC13 - four Discord reports (2026-09-23, Mac: "Got some bugs for you"). Each was reproduced against the real
+// DISC13 - four Discord reports. Each was reproduced against the real
 // modules before it was touched, and every pin here fails at a40d13e0 and passes with its fix - except A's first,
 // which measures the cause through the motor's own law and stands either way
-// (bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC13).
+// (, DISC13).
 //
 // ── DISC13-A: "The shadows seem to flicker when i move" (icebreyker, a torch in a dungeon) ──
 // The camera draws from the motor's INTERPOLATED eye (motor.js eyeAt, EV1) and every host built the lights in the
@@ -188,7 +188,7 @@ test('DISC13-B: the Bandage card offers Use, and Use heals Min(medical/3, MaxHea
   const e = medic([bandage()]);
   withBandageCard(e, ({ acts, press }) => {
     // PLUS10: Enhanced Plus - the default dress since PLUS-DEFAULT - adds Info to every card, last; LOCK1 the lock before it;
-    // HB-LYCFREE: the hotbar, the default since, its Add to hotbar before the lock (PIN MOVED)
+    // HB-LYCFREE: the hotbar, the default since, its Add to hotbar before the lock (
     assert.deepEqual(acts(), ['Drop', 'Use', 'Add to hotbar', 'Lock', 'Info'], 'the card icebreyker saw showed Drop alone');
     press('Use');
   });
@@ -348,7 +348,7 @@ function shipLocationOf({ loc = null, travelOptions = false, ports = [], onShip 
   const line = rd('src/scenes/world.js').split('\n').find((l) => l.includes('shipLocation: () => {'));
   assert.ok(line, 'world.js answers shipLocation');
   const src = line.slice(line.indexOf('() => {'), line.lastIndexOf('; },') + 3);
-  // SEAT2b part two (PIN MOVED): the host asks hasPortFor - HasPort, or a members' Harbour at a seat
+  // SEAT2b part two (
   const make = new Function('_questLoc', 'modSetting', 'hasPortFor', 'isOnShip', 'playerEntity', 'playerTravelPixel', `return (${src});`);
   return make(() => loc, (v, k) => (v === 'travel-options' && k === 'Enabled' ? travelOptions : undefined),
     (mapId) => ports.includes(mapId), () => onShip, { boardShipPosition: null }, () => ({ x: 0, y: 0 }))();

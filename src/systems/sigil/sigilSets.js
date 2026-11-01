@@ -1,16 +1,14 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SET1 (2026-09-26) — SIGIL SETS: ARMOUR THAT ANSWERS TO A DAEDRIC PRINCE.
+// SET1 — SIGIL SETS: ARMOUR THAT ANSWERS TO A DAEDRIC PRINCE.
 //
-// Mac: "I wanna talk about making sigil armor sets that also come with
-// set builds (think having multiple of one set type grants detailed
-// abilities)". Asked, Mac chose: sets "come from any source, just like
+// . Asked, Mac chose: sets "come from any source, just like
 // weapons", a boss's own set at a new rarity (Aetheric), Sigil Stones
 // as a currency at a vendor beside the gate; tiers at 2 / 4 / 6 pieces;
 // "Grow together" - the bonuses scale with the LOWEST stage among the
 // worn pieces; online only, never in duels. Then: "I want you to go all
 // out on this, just like you did with the World Boss". Design, and the
-// record of every slice: bible/11-Multiplayer/Sigil-Sets.md.
+// record of every slice:.
 //
 // ═══ THIS FILE IS THE LAW ══════════════════════════════════════════
 //
@@ -103,7 +101,7 @@ export const STRAND_SECONDS = 8;
 /** STAR7, The Starspun Weave (6): Mephala's Veil wakes when a foe's blow takes me below this share of my health. */
 export const VEIL_BELOW = 0.3;
 
-/** CARD-FIT (2026-09-28, Discord - Cruor: "New sigil items descriptor is a bit long!"): a tier's BRIEF - what it does in
+/** CARD-FIT: a tier's BRIEF - what it does in
  *  a few words, one line of the card's row, and every line a tooltip, a trade or a chat post prints of it; `text` stays
  *  the whole sentence, which the Info box and a row's hover read. A recovery is never in the brief - it is the tier's
  *  `recover` number, which the card draws as its own tag and a line says after the brief. No brief runs past BRIEF_MAX
@@ -194,8 +192,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Under ${Math.round(WRATH_BELOW * 100)}%: Nova ${v.nova}, +${v.more}% damage`),
     ]),
   }),
-  // RAID4b (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-  // armor sets"): THE RAIDING PARTIES' OWN - three Aetheric sets no world drop, shelf or Broker rolls; a town defended
+  // RAID4b: THE RAIDING PARTIES' OWN - three Aetheric sets no world drop, shelf or Broker rolls; a town defended
   // pays a piece of the set of the party it was defended against (systems/raidSpoils.js). Their Prince is the Bay's
   // towns: a raid is fought for them, not for a Daedra.
   oath: Object.freeze({
@@ -243,8 +240,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `A kill: a ${v.ward}-point ward`),
     ]),
   }),
-  // SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own
-  // equipment rewards"): THE OLD COIL'S OWN - an Aetheric set no world drop, shelf or Broker rolls; a ship that dealt
+  // SERPENT-SET: THE OLD COIL'S OWN - an Aetheric set no world drop, shelf or Broker rolls; a ship that dealt
   // Sethrakul its share may find a piece in its hoard (systems/serpent/serpentSpoils.js). Its patron is no Daedra: Satakal, the
   // World-Skin the Redguards say sheds the world as a snake sheds its skin (net/serpent/serpentLaw.js SERPENT_BOSSES).
   coilscale: Object.freeze({
@@ -255,14 +251,14 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `+${v.frost} frost resistance, +${v.endurance} Endurance`,
         (v) => `+${v.frost} frost resist, +${v.endurance} Endurance`),
       tier(4, 'constrict', 'Constrict', { stack: [3, 8] },
-        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,   // AUDIT 625 P3 (Mac: "A coil per foe")
+        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,   // AUDIT 625 P3
         (v) => `+${v.stack}% per hit on a foe, up to ${COIL_STACKS}`),
       tier(6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] },
         (v) => `When a hit drops you below ${Math.round(SHED_BELOW * 100)}% health, you shed your skin and heal ${v.heal}% of your health. Recovers in ${v.recover} s`,
         (v) => `Under ${Math.round(SHED_BELOW * 100)}%: shed skin, heal ${v.heal}%`),
     ]),
   }),
-  // SD9d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS OF NUMIDIUM -
+  // SD9d: THE BRASS OF NUMIDIUM -
   // an Aetheric set no world drop, shelf or Broker rolls; the Brass Remnant's spoils carry a piece one time in three
   // (systems/superDungeon/sdSpoils.js). Its patron is no Daedra: Kagrenac, the Tonal Architect who built the Walking Brass. Its colour
   // the Hourbreaker's brass (ui/playerBadge.js HOUR_BRASS).
@@ -281,7 +277,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Death turned back, heal ${v.heal}%`),
     ]),
   }),
-  // WITCH1 (2026-10-20, the owner: "A new armor set, a new weapon"; bible/06-Systems/Witches-Festival.md): THE WYRD'S
+  // WITCH1: THE WYRD'S
   // RAIMENT - what the Glenmoril Wyrd wear to the Witches' Festival, sold by the Wyrd Sisters at the taverns' doors for
   // Soul Cakes (systems/aetheric.js WYRD_SET_PIECES), never a drop. Its tiers answer the festival's night: the sight that
   // sees the summoned, the tallow that wards off the dead, and the souls a kill sends home.
@@ -300,7 +296,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `A kill: +${v.heal}% health, magicka`),
     ]),
   }),
-  // STAR7 (2026-10-20, bible/11-Multiplayer/Starfall.md section 6): THE STARSPUN WEAVE - an Aetheric set no world drop,
+  // STAR7: THE STARSPUN WEAVE - an Aetheric set no world drop,
   // shelf or Broker rolls; a held star's spoils carry a piece a quarter of the time, the Heart-Star's every time
   // (systems/starfall/starSpoils.js). Its patron Mephala, the Webspinner, whose covens wind their black thread about a fallen
   // star to draw its light home: the Weave is that thread, cut from the stars the coven lost. Its colour the star's violet
@@ -320,8 +316,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Under ${Math.round(VEIL_BELOW * 100)}%: Chameleon ${v.rounds * ROUND_SECONDS}s`),
     ]),
   }),
-  // SEA-SET (2026-10-22, the owner: "Build ever single bit of this" - the sea past the Veil's Abyss-only gear;
-  // bible/11-Multiplayer/Sigil-Sets.md section 6h, the sea's page's SEA-SET): THE TIDEMAIL - an Aetheric set
+  // SEA-SET: THE TIDEMAIL - an Aetheric set
   // no world drop, shelf or Broker rolls; the Deep Aether's and the Abyss's own: a legend taken or sunk there, a vault of
   // the deep and a ruin's hoard there carry a piece (systems/aetheric.js rollElthericPiece). Its patron is no Daedra: the
   // Drowned Queen, Maraveth, Thrice Drowned - the sea's legends are its makers, and every piece was taken off one of them.

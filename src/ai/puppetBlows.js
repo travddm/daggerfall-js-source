@@ -1,5 +1,5 @@
 // @ts-check
-// TELL8 (bible/12-Enhanced-AI/Feud-Arc.md section 10; Mac, 2026-10-04: "breath more depth into it", then "Go" - OPEN 9:
+// TELL8 (;, then "Go" - OPEN 9:
 // wind-ups at peers, each client judging its own feet): A WIND-UP ON THE WIRE. Before it a telegraphed blow lived on
 // its owner's machine alone - no peer saw its mark, its glint or its held arm, and a foe never wound up at a peer. Now:
 //   THE OWNER'S WORD (`blowWire`) - each foe record carries its live wind-up: `wk` the shape (0-6, WIRE_KINDS) +8 for

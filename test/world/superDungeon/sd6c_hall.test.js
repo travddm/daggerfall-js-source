@@ -1,4 +1,4 @@
-// SD6c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 8): THE ORRERY'S HALL ON THE
+// SD6c: THE ORRERY'S HALL ON THE
 // PAGE - world/superDungeon/sdHall.js (where its parts stand, the meshes they are), world/superDungeon/sdHallArt.js (what they wear),
 // scenes/superDungeon/sdHall.js (the dungeon host's set: stood, heard, turned, pressed), and the hosts' wiring - the turn sent, the
 // realm's word read, the snap's lash on whoever stands in the hall, the edge widened by the Concord.
@@ -46,7 +46,7 @@ test('SD6c the layout: each stone faces the hall\'s centre, its right the right 
     const toCentre = [SD_ORRERY.x - at[0], 0, SD_ORRERY.z - at[2]], l = Math.hypot(toCentre[0], toCentre[2]);
     assert.ok(near(n, [toCentre[0] / l, 0, toCentre[2] / l]), 'facing the centre');
     assert.ok(near(cross([0, 1, 0], R), n), 'up x R = n: a face across R and up looks along n');
-    // AUDIT SD II (L2 F1 - PIN MOVED): one who faces it looks along -n, and the game's camera's right for that eye is
+    // AUDIT SD II (L2 F1
     // (cos yaw, 0, -sin yaw) with its look (sin yaw, 0, cos yaw) (scenes/worldModes.js) - n x up, which mat4's one mirror
     // puts on screen-RIGHT. This pin read lookAt's right, up x n - the right BEFORE the mirror, the screen's left.
     const yaw = Math.atan2(-n[0], -n[2]);
@@ -95,7 +95,7 @@ test('SD6c THE HAND: on its dial, standing off the face, the twelfth hour straig
 test('SD6c the models: the hall\'s standing parts by record - each stone\'s dial and sign facing the hall, the plaques, the first step; the dial\'s light in its six segments clockwise from the twelfth; the fray a step a turn round the rim; the bridge from the rim to the first step, facing up (mutants: the lit ring at the wrong hours; the fray backwards)', () => {
   const hall = buildHallModel();
   const recs = hall.subMeshes.map((s) => s.textureRecord);
-  for (const r of [SD_HALL_ATLAS_RECORD, 0, 1, 2]) assert.ok(recs.includes(r), `record ${r}`);   // PIN MOVED (SD-LOOK S10): the signs, dials and plaques one atlas's cells
+  for (const r of [SD_HALL_ATLAS_RECORD, 0, 1, 2]) assert.ok(recs.includes(r), `record ${r}`);
   assert.ok(hall.subMeshes.every((s) => s.textureArchive === SD_REALM_ARCHIVE));
   for (let k = 0; k < hall.normals.length; k += 3) assert.ok(Math.abs(Math.hypot(hall.normals[k], hall.normals[k + 1], hall.normals[k + 2]) - 1) < 1e-5);
   // each sign faces the hall: its relief's face (the atlas's emblem cell) looks along its stone's n, on its own stone
@@ -121,14 +121,13 @@ test('SD6c the models: the hall\'s standing parts by record - each stone\'s dial
       const p = dungeonToRealm(lit.positions[k], lit.positions[k + 1], lit.positions[k + 2]), r = Math.hypot(p[0] - SD_ORRERY.x, p[2] - SD_ORRERY.z);
       assert.ok(r >= SD_LIT_RING.r0 - 1e-3 && r <= SD_LIT_RING.r1 + 1e-3);
       seen.add(Math.floor(bearing(p[0], p[2]) / 60));
-      if (p[1] > SD_LIT_RING.rise - 1e-6) assert.ok(lit.normals[k + 1] > 0.99 || Math.abs(lit.normals[k + 1]) < 1e-6, 'its top facing up, its sides upright');   // PIN MOVED (SD-LOOK S10): a plate risen, its sides too
+      if (p[1] > SD_LIT_RING.rise - 1e-6) assert.ok(lit.normals[k + 1] > 0.99 || Math.abs(lit.normals[k + 1]) < 1e-6, 'its top facing up, its sides upright');
     }
     assert.equal(trisOfModel(lit).filter((t) => t.P.every((p) => Math.abs(p[1] - SD_LIT_RING.rise) < 1e-6)).length, n * 16, 'each plate\'s top, up');
     assert.deepEqual([...seen].sort(), [...Array(n).keys()], `the first ${n} segments, clockwise from the twelfth`);
   }
   // the fray
   assert.equal(buildFrayModel(0), null);
-  // PIN MOVED (SD-LOOK S10): the fray's 48 tabs, one up a turn - the ones up in its ember, clockwise from the twelfth
   for (const f of [1, 12, 47]) {
     const fr = buildFrayModel(f), up = trisOfModel(fr).filter((t) => t.rec === SD_HALL_GLOW_RECORD.fray);
     assert.equal(up.length, f * 10, 'a tab a turn');
@@ -170,7 +169,6 @@ test('SD6c THE FLOORS: the bridge and the first step stand in the collider from 
 });
 
 test('SD6c THE ART: a dial of twelve equal hours; six signs, each its own; plaques numbered in pips; glows their own light - every picture drawn y up (mutants: a sign the same as another; a plaque\'s pips miscounted)', () => {
-  // PIN MOVED (SD-LOOK S10): the dial, the signs and the plaques' pips are cells of the hall's one atlas (records 5-20 its)
   const recs = hallArt().map(([r]) => r);
   assert.deepEqual(recs, [SD_HALL_ATLAS_RECORD, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
   const atlas = hallAtlasArt().albedo, S = SD_HALL_ATLAS.size;
@@ -226,13 +224,12 @@ test('SD6c THE SET: stood once - the hall, a hand on each dial, the bridge hidde
   assert.equal(r.hall.stand({ dynamicDraws: r.draws, collider: r.collider }), true);
   assert.equal(r.hall.stand({ dynamicDraws: r.draws, collider: r.collider }), false, 'once');
   assert.ok(r.uploads.length >= 16 && r.uploads.every(([a]) => a === SD_REALM_ARCHIVE));
-  // PIN MOVED (SD-LOOK S10): and the crown gears, the bezels, the banners, the rings, the hub and its gem, the dial's flash,
   // the Concord's band and the bridge's twelve plates (hidden until theirs)
   const STOOD = 1 + 3 * SD_STONES.length + 1 + SD_STONES.length + 1 + 1 + 1 + SD_BRIDGE_PLATES.n + 1;
   assert.equal(r.draws.length, STOOD, 'the hall, six hands, six gears, six bezels, the banners, six rings, the hub, the flash, the band, the plates, the bridge');
   const bridge = r.draws[r.draws.length - 1];
   assert.ok(bridge.object.matrix.every((v) => v === 0) && bridge.hidden === true, 'the bridge hidden');   // AUDIT SD II (L2 F11): and says so - no draw
-  assert.deepEqual(r.floors, [['sd:hall', hallFloorTris().length + hallSolidTris().length]]);   // AUDIT SD II (L2 F2 - PIN MOVED): the stones and plaques solid with the floors
+  assert.deepEqual(r.floors, [['sd:hall', hallFloorTris().length + hallSolidTris().length]]);   // AUDIT SD II (L2 F2
   // the first word: where the stones ARE
   const st0 = [3, 11, 5, 0, 7, 9];
   r.hall.frame(0.016, atStone(0), { k: 'pz', s: 1, st: st0, f: 4, lit: 2, ok: false });
@@ -255,10 +252,10 @@ test('SD6c THE SET: stood once - the hall, a hand on each dial, the bridge hidde
   assert.ok(SD_HAND_RATE >= 1 / (SD_STONE_SETTLE_MS / 1000), 'an hour inside the gear\'s settling');
   assert.deepEqual(r.hall.counts, { lit: 3, fray: 5 });
   assert.ok(r.dropped.length >= 2, 'the old dial and fray freed');
-  // the snap - AUDIT SD II (L2 F16 - PIN MOVED): the arc all the way round for a moment, then empty
+  // the snap - AUDIT SD II (L2 F16
   r.hall.frame(0.016, atStone(0), { k: 'pz', s: 1, st: st0, f: 0, lit: 2, ok: false, i: 0, a: 1, id: 'peer-x', q: 2, x: 1 });
   assert.ok(r.sounds.some((x) => x.rec === SD_HALL_SOUNDS.toll), 'the toll');
-  assert.equal(r.hall.counts.fray, o.fray, 'full at the snap');   // PIN MOVED (SD-LOOK S10): every tab up - its Hollow's own count
+  assert.equal(r.hall.counts.fray, o.fray, 'full at the snap');
   r.tick(SD_FRAY_FULL_MS);
   r.hall.frame(0.016, atStone(0), null);
   assert.equal(r.hall.counts.fray, 0);
@@ -271,8 +268,8 @@ test('SD6c THE SET: stood once - the hall, a hand on each dial, the bridge hidde
   assert.equal(r.hall.concord, true);
   assert.ok(r.sounds.some((x) => x.rec === SD_HALL_SOUNDS.chime));
   assert.deepEqual(r.said, [SD_HALL_TEXT.concord]);
-  // AUDIT SD III (V10, PIN MOVED): LAID out across the void from the hall's rim over SD_BRIDGE_LAY_MS, then whole - it
-  // stood whole in a frame. PIN MOVED (SD-LOOK S10): its twelve plates flip into place from the rim out, once the rings
+  // AUDIT SD III (V10
+  // stood whole in a frame.
   // have locked (SD_CONCORD_MS.bridgeFrom); then the one bridge, whole
   const { plates } = r.hall.parts;
   assert.ok(bridge.hidden && plates.every((p) => p.hidden), 'not yet: the rings swing first');
@@ -339,19 +336,19 @@ function worldHall({ slot = 4, at = [0, 0, SD_ORRERY.z], health = 80, max = 100 
   const env = {
     modes: { sdRealmSlot: () => slot }, player: { pos: realmToDungeon(...at) }, playerEntity,
     hurtPlayer: (e, n, o) => { log.push(['hurt', n, !!o?.bypassShield]); e.health -= n; }, flashPlayerDamage: (n) => log.push(['flash', n]),
-    setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), sdDungeonToRealm: dungeonToRealm, inOrreryHall, SD_FRAY_LASH, SD_HALL_TEXT,   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice
-    sdHallNamed, sdSnapLine, peerName: (id) => ({ 'peer-x': 'Xan' })[id] ?? null,   // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the word kept with its turner and the lashed named, the snap's line naming them
-    online: { id: 'peer-me' }, SD_TURN_WAIT_LINE: 'wait',   // AUDIT SD II (PIN MOVED, L7 H2): the lash falls on whom the snap names
+    setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), sdDungeonToRealm: dungeonToRealm, inOrreryHall, SD_FRAY_LASH, SD_HALL_TEXT,   // AUDIT SD II (SD11d
+    sdHallNamed, sdSnapLine, peerName: (id) => ({ 'peer-x': 'Xan' })[id] ?? null,
+    online: { id: 'peer-me' }, SD_TURN_WAIT_LINE: 'wait',   // AUDIT SD II (
   };
   const body = `let _sdHall = null;\n${fn('sdHallHeard')}\n${line(/ {2}const sdHallWord = [^\n]*\n/)}${line(/ {2}const sdConcordHere = [^\n]*\n/)}return { sdHallHeard, sdHallWord, sdConcordHere };`;
   return { ...new Function(...Object.keys(env), body)(...Object.values(env)), log, playerEntity };
 }
 
 test('SD6c the world host\'s hall, run from its own text: the realm\'s word kept for the realm I stand in; the snap lashes me in the hall a quarter of my health, no shield taking it, and says so; outside the hall it only says so; the Concord widens the edge (mutants: the lash on everyone; the lash shielded; another realm\'s word taken)', () => {
-  const word = { k: 'pz', s: 4, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 1, ok: false, i: 0, a: 1, id: 'peer-x', q: 9, x: 1, ls: ['peer-me'] };   // AUDIT SD II (PIN MOVED): naming me
+  const word = { k: 'pz', s: 4, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 1, ok: false, i: 0, a: 1, id: 'peer-x', q: 9, x: 1, ls: ['peer-me'] };   // AUDIT SD II (
   const inHall = worldHall();
   inHall.sdHallHeard(word);
-  assert.deepEqual(inHall.log, [['hurt', 25, true], ['flash', 25], ['said', SD_HALL_TEXT.snapLashes(SD_HALL_TEXT.you, 0)]]);   // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the snap names me
+  assert.deepEqual(inHall.log, [['hurt', 25, true], ['flash', 25], ['said', SD_HALL_TEXT.snapLashes(SD_HALL_TEXT.you, 0)]]);
   assert.deepEqual(inHall.sdHallWord(), { ...word, by: 'Xan', lsn: [SD_HALL_TEXT.you] }, 'the word kept, its turner and the lashed named');
   assert.equal(inHall.sdConcordHere(), false);
   inHall.sdHallHeard({ ...word, x: undefined, ok: true });

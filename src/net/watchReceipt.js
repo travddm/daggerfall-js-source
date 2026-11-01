@@ -1,6 +1,6 @@
 // @ts-check
-// SEAT1b (2026-09-30, Mac: "Finish the seats"): THE WATCH'S RECEIPT - the relay's third signature, the gate's and the
-// raid's receipts' twin (net/gate/gateReceipt.js, net/raid/raidReceipt.js). Design: bible/11-Multiplayer/Seats-Arc.md 4.2, "The
+// SEAT1b: THE WATCH'S RECEIPT - the relay's third signature, the gate's and the
+// raid's receipts' twin (net/gate/gateReceipt.js, net/raid/raidReceipt.js). Design: 4.2, "The
 // Watch": "Relay-witnessed socket; the position is the client's own claim, so it is bounded ... 1 per 2 minutes,
 // capped 60 an account a day".
 //
@@ -53,7 +53,7 @@ export const WATCH_VEIL_BOX = Object.freeze({ x0: 64, x1: 8128, y0: -7680, y1: -
  *  them (server/src/index.js `_watchTick`) and the account service takes them (watchReceiptValid). One home: a
  *  Motherlode's site must be a pixel a Watch can vouch for (net/motherlodeLaw.js motherlodeSites), or nobody can strike
  *  it - ETHER-NODES' isles were witnessed and confirmed past the Veil, where no receipt is ever minted. WW7-5
- *  (bible/03-World/World-Wide.md WW7-5): and the land past the Bay - the world's grid (net/wire.js worldPixelOk), never
+ *  (WW7-5): and the land past the Bay - the world's grid (net/wire.js worldPixelOk), never
  *  the Veil's box, so a town, a seat and a node past the Bay are watched and the isles still are not. */
 export const watchPixelOk = (x, y) => Number.isSafeInteger(x) && Number.isSafeInteger(y) && worldPixelOk(x) && worldPixelOk(y)
   && !(x >= WATCH_VEIL_BOX.x0 && x < WATCH_VEIL_BOX.x1 && y >= WATCH_VEIL_BOX.y0 && y < WATCH_VEIL_BOX.y1);

@@ -1,7 +1,5 @@
 // @ts-check
-// LONE-SLEEP (2026-10-26, the owner choosing among AUDIT RELEASE R4's levers - bible/01-Overview/audits/Audit-Release-R4.md
-// R4-3, lever 2: "Idle lone cells" - a player with nobody near sends their position only on the heartbeat, so their cells
-// can sleep; full rate the moment someone comes near. No visible change to players). bible/11-Multiplayer/Scale-Arc.md
+// LONE-SLEEP.
 // LONE-SLEEP is the record; test/net/lonesleep.test.js and tools/mutants/lonesleep.json the pins.
 //
 // A world cell is a Durable Object, billed while it is awake, and a moving player's POSE_HZ poses never let it sleep - nor

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ACQUIRE1 (2026-10-09, Mac: "I want to develop a popup for when you obtain something of rarity including weapons,
-// armor, the new cards, etc - something akin to a destiny loot popup notification"; bible/10-UI/Loot-Banner.md) -
+// ACQUIRE1 -
 // WHAT ARRIVED IN THE PLAYER'S KEEPING, AND IN WHAT TIER.
 //
 // THE PROBLEM. There is no one door an item comes through. A take from a body or a chest tells the LOOT8 listeners

@@ -1,11 +1,11 @@
-// JUNGLE-GRASS (2026-10-19, the owner: "Grass isnt showing within the new jungle region"). BANTHA2's floor carpets the
+// JUNGLE-GRASS. BANTHA2's floor carpets the
 // jungle's ground with a second field of the grass system - the owner's tall tuft and archive 500's sedge, ferns, fronds,
 // broad leaves, palmlets and blooms - and keeps the meadow's own grass out of every point it claims (the meadow's colour law
 // would take the jungle's red earth's hue: render/jungleFloorArt.js). The owner thinned that floor from 2.5 plants a square
 // metre to 1.8 ("Reduce the amount of ground flora. Its a little too much"), and at 1.8 its tufts and sedge stood 0.88 a
 // square metre - two fifths of the 2.27 the meadow stands everywhere else - so the jungle read as leaves on bare mud. Now
 // the floor's FLORA stands at the rate the owner judged, plant for plant, and its GRASS at the meadow's own rate.
-// bible/03-World/Bantha-Jungle.md "The floor".
+// "The floor".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JUNGLE_FLOOR_PLANTS, JUNGLE_FLOOR_JUDGED, JUNGLE_FLOOR_GRASS, JUNGLE_FLOOR_PLANTS_M2, floorPick } from '../../src/render/jungleFloorArt.js';

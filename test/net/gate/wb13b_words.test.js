@@ -1,5 +1,5 @@
-// WB13b (2026-10-01, Mac: "Also clean up text to be less explanatory and less AI"): THE WORDS - every line the breach,
-// the court and the Broker say, rewritten to say one thing and stop (bible/11-Multiplayer/World-Bosses.md section 20,
+// WB13b: THE WORDS - every line the breach,
+// the court and the Broker say, rewritten to say one thing and stop (
 // WB13b). The style held as a law over the tables, and the design changes beyond the wording pinned.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

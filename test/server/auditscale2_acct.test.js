@@ -1,5 +1,5 @@
-// AUDIT SCALE II (2026-10-11, Mac: "Lets do an audit on everything. Ensure perfection") - the audit of SCALE4d-SCALE5d
-// on pull request #757 (bible/11-Multiplayer/Scale-Arc.md). This file is lane A's: the account service, the client's
+// AUDIT SCALE II - the audit of SCALE4d-SCALE5d
+// on pull request #757. This file is lane A's: the account service, the client's
 // doors to it and the load harness. Every finding fixed here was reproduced first against a snapshot of the pushed head
 // (e729cea7), and each pin below fails on the code as it stood (tools/mutants/auditscale2_acct.json). The modules whose
 // exports the audit added are imported whole (`* as`), so on the code as it stood each pin fails by itself rather than
@@ -133,7 +133,6 @@ test('AUDIT SCALE II A-2 a call that is no bookmark read forgets the page\'s boo
     L.sync();
     const lost = { ...io, fetch: async (u, i) => { await S.fetch(u, i); throw new TypeError('Failed to fetch'); } };   // the sale lands, its answer does not
     const items = [Object.assign(sigilStone(), { stackCount: 30 })];
-    // PIN MOVED (BROKER-RID, AUDIT FB1024): a lost answer is asked after by the press's request id (/v1/broker/settle), as world.js's door does
     const r = await insigniaSale(insigniaById('title:gatebreaker'), { items, buy: (id, rid) => buyInsignia(lost, id, rid), settle: (b) => settleBrokerSale(io, b), account: who.id, save: () => {} });
     const row = S.env.DB._raw.prepare('SELECT insignia, insignia_spent FROM players WHERE id = ?').get(who.id);
     assert.deepEqual({ ...row }, { insignia: 'title:gatebreaker', insignia_spent: 30 }, 'the service kept the sale');

@@ -1,5 +1,5 @@
 // @ts-check
-// INTRO4 (2026-10-26, the owner: "zoom out into the entire map of tamriel"; bible/10-UI/UI-Arc.md INTRO4) - THE
+// INTRO4 - THE
 // CONTINENT THE FILM PULLS BACK TO. Data-free, as INTRO2's bay was: the front door runs before the ARENA2 picker, so
 // this is the authored Tamriel of world/tamriel/tamrielGeography.js (Daggerfall's own continent, drawn by hand - its
 // rings, ranges and rivers) and, inside the Bay's rectangle the geography leaves a hole for, INTRO2's authored Iliac

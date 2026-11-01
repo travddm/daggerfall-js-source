@@ -1,5 +1,4 @@
-// AUDIT HIDDEN-UNCOUNTED C1 (2026-10-25, the owner, asked how a hidden staff member reads in their guild: "Last seen when
-// hid"; bible/01-Overview/audits/Audit-Hidden-Uncounted.md) - THE GUILD'S "N ONLINE" COUNTS NO HIDDEN STAFF MEMBER. The
+// AUDIT HIDDEN-UNCOUNTED C1 - THE GUILD'S "N ONLINE" COUNTS NO HIDDEN STAFF MEMBER. The
 // Members page read each member's play beat (guilds.js viewOf, GUILD-SEEN), which a hidden staff member's game knocks as
 // any game does (the seat, Renown and the play clock read it), so the Members tile said "2 online" and the row "Online" -
 // to the staff member and to every guildmate. Over the real Worker on node:sqlite (test/accountDb.mjs): Hide me pressed

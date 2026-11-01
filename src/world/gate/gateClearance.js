@@ -1,6 +1,5 @@
 // @ts-check
-// GATE-CLEAR (2026-09-28, Mac: "the gate can spawn inside the rock geometry from world of daggerfall"; the field, on
-// Discord: "gate under the rock didnt go away stayed there") - World of Daggerfall's pieces keep off the Oblivion Gate.
+// GATE-CLEAR - World of Daggerfall's pieces keep off the Oblivion Gate.
 //
 // The gate's site is the clock's and the map files' (net/gate/gateLaw.js rolls it; systems/gate/gateSite.js keeps it off every
 // location's neighbourhood and every spawned dungeon), and World of Daggerfall stands a site on 114,087 of the pixels left
@@ -25,7 +24,7 @@
 // - the frame world/streamingWorld.js pixelTranslation, the WoD placements and the gate's spot share (north is the row
 // ABOVE: py - 1). Pure; a leaf apart from the two constants' homes.
 //
-// EG-F (2026-10-12): A SET OF CLEARINGS. The sweep tracked one key, the clock's gate; a fallen star keeps its own
+// EG-F: A SET OF CLEARINGS. The sweep tracked one key, the clock's gate; a fallen star keeps its own
 // clearing (STAR_ROCK_M about its heart), keyed by its id `star:<s>`, for as long as it stands - the gate's and every
 // standing star's at once (`gateClearSet`). A clearing is the gate's (gateClearFor) or a set of them ({ key, list }):
 // every question here asks each member of a set, the gate's own its own way (its rite with it) and a star's by its `r`.
@@ -33,8 +32,7 @@
 // what changed - a clearing gone that had cost it a site or a piece, or one come that something it stands reaches - and
 // a gate alone keeps the one key it always had, so the gate's sweep is what it was.
 //
-// STAR-CLEAR (2026-10-24, the owner: "The star fall world event has the tendency to fall into mountains and become
-// inaccesable"): A FALLEN STAR KEEPS ONE TOO. A night's stars fall on the gate's own suitable pixels (systems/starfall/
+// STAR-CLEAR: A FALLEN STAR KEEPS ONE TOO. A night's stars fall on the gate's own suitable pixels (systems/starfall/
 // starfallSites.js) at a spot the law alone names (net/starfall/starfallLaw.js starSpotLocal, the relay's too), and the mod
 // stands its rock fields there as it did at the gate: of the festival's 1,366 stars (the player's own map, the room's
 // lists), 381 had a piece's mesh box reach within STAR_ROCK_M of the heart and 31 a piece's very position - boulders

@@ -23,7 +23,7 @@ for (const line of corpus) {
   try { ok = computeFaceUVCoordinates(pin, pout); } catch (e) { ok = false; }
   const p = `faceuv.${pad(caseIndex, 5)}.`;
   out(p + 'ok', ok);
-  // FU1 (2026-09-11): the C# side prints EVERY point whether or not the
+  // FU1: the C# side prints EVERY point whether or not the
   // tool succeeded - its `pout` is a fresh struct array, zeros where
   // nothing was written (Dump.cs DumpFaceUV) - and this side printed
   // nothing on a false, so every singular face counted 2n "differing

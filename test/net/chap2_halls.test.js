@@ -1,9 +1,9 @@
-// CHAP2a (2026-10-07, Mac: "Do it") - THE CHAPTERS' HALLS AND THEIR WRITS: a town's guild halls witnessed as a seat is
+// CHAP2a - THE CHAPTERS' HALLS AND THEIR WRITS: a town's guild halls witnessed as a seat is
 // (three registered accounts a week old agree), a region's chapters the guilds its confirmed towns name; each chapter
 // posts its own writs on the Notice Board beside the Court's, from the Court's law and the guild's own kinds, sharing the
 // Court's three a day; a hall writ pays as a Court writ does and its guild remembers it on the Roll (+2, outside the
 // claims' pace); and the Roll records a new membership only where its standing meets DFU's join.
-// bible/11-Multiplayer/Chapters-Arc.md section 4 (CHAP2a).
+// (CHAP2a).
 //
 // The law (src/net/npcChapterLaw.js) against literals; the client's halls (src/net/npcHallBook.js) against a fake
 // faction file and door; the service (server-account/src/npcHalls.js, professions.js, npcRoll.js) over the real
@@ -69,7 +69,7 @@ test('CHAP2a a hall report: a map id, a region and the twenty-two alone, each on
     { key: 1234, region: ANTICLERE, factions: [] }, { key: 1234, region: ANTICLERE, factions: [40, 40] },
     { key: 1234, region: ANTICLERE, factions: [510] }, { key: -1, region: ANTICLERE, factions: [40] },
     { key: 2 ** 32, region: ANTICLERE, factions: [40] }, { key: 1.5, region: ANTICLERE, factions: [40] },
-    { key: 1234, region: 71, factions: [40] },   // PIN MOVED (WW7-5)
+    { key: 1234, region: 71, factions: [40] },
  { key: 1234, region: ANTICLERE, factions: ['40'] }, null,
   ]) assert.equal(hallReportOf(bad), null, JSON.stringify(bad));
   const h = hallReportOf({ key: 1234, region: ANTICLERE, factions: [108, 40] });
@@ -236,7 +236,7 @@ test('CHAP2a witnessing a town: a guest 403, the Chapters shut 403, a malformed 
   assert.deepEqual((await s.call(WITNESS, { hall }, young.secret)).body, { ok: true, counted: true });
   await s.call(WITNESS, { hall: { ...hall, factions: [40] } }, young.secret);
   assert.deepEqual(s.raw.prepare("SELECT key, report, region FROM world_witness WHERE kind = 'npchall'").all().map((r) => ({ ...r })),
-    [{ key: '1:1234', report: '[1234,21,[40,41]]', region: ANTICLERE }], 'the first answer stands');   // PIN MOVED (AUDIT CHAP2 E7): keyed by the hall law's version
+    [{ key: '1:1234', report: '[1234,21,[40,41]]', region: ANTICLERE }], 'the first answer stands');
   const shut = await stand('off');
   const w = await shut.registered('Shut');
   shut.age(w, 8);
@@ -279,8 +279,7 @@ test('CHAP2a a region\'s chapters: the guilds its confirmed towns name - three a
   assert.deepEqual(await regionChapters(db, 17, _now * 1000), [368, 409]);
   assert.deepEqual(await regionChapters(db, ANTICLERE, _now * 1000), [40, 41, 108], 'never here');
   // THE ISOLATE KEEPS IT A MINUTE: a row written behind the service's back is read after
-  s.raw.prepare("DELETE FROM world_witness WHERE kind = 'npchall' AND key = '1:2'").run();   // PIN MOVED (AUDIT CHAP2 E7)
-  // PIN MOVED (AUDIT CHAP3 S3): a row taken behind the service's back is no change its region's row hears - told so (as a
+  s.raw.prepare("DELETE FROM world_witness WHERE kind = 'npchall' AND key = '1:2'").run();
   // witness's and a strike's own writes tell it: its version moved), the region is computed again past the minute
   s.raw.prepare('UPDATE npc_hall_regions SET ver = ver + 1 WHERE region = ?').run(ANTICLERE);
   assert.deepEqual(await regionChapters(db, ANTICLERE, _now * 1000 + 1000), [40, 41, 108]);
@@ -325,7 +324,6 @@ test('CHAP2a hall writs on the board: none until a chapter, then two a chapter b
   // and to one not its member a hidden guild's writ is no writ at all
   const db0 = member.find((w) => w.faction === 108);
   s.give(dev, dev.character, db0.material, db0.qty);
-  // PIN MOVED (INT16, Integrity-Arc section 7): the account's other character (not its seat) is refused at the seat, before the route's own no-writ
   assert.deepEqual((await s.call('/v1/writs/deliver', { character: dev.character, id: db0.id, rid: rid() }, dev.secret)).body, { error: 'progress-seat' });
   // the route's own law, asked by the seat itself: its membership taken above, the Brotherhood's writ is no writ to it, its goods in hand
   s.give(dev, R.id, db0.material, db0.qty);

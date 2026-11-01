@@ -1,12 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CRAFT1 (2026-10-07) — THE CHAIN: a station plans the refining a craft
-// needs (bible/06-Systems/Professions-Arc.md section 41, CRAFT0). Pure:
+// CRAFT1 — THE CHAIN: a station plans the refining a craft
+// needs (CRAFT0). Pure:
 // no clock, no DOM, no network.
 //
-// Asked (2026-10-07, Mac: "How could we enhance the profession element
-// of the game while reducing complexity and making crafting more
-// viable"; then, of the five proposals, "Lets do it"). A Steel
+// Asked. A Steel
 // Longsword asks 3 Steel Ingots, 1 Copper and 1 Cured Leather - and
 // from what a gatherer holds that was four works at two stations
 // before the anvil: smelt the Iron, burn the Charcoal, smelt the Steel,

@@ -1,6 +1,6 @@
 // PICKUP-FEED - WHAT A PRESS PUT IN THE PACK, AS CARDS AT THE CENTRE OF THE SCREEN, DRIVEN.
 //
-// (2026-10-01, Mac: "a better center screen notification for pickups".) A quick-loot take said a line - "You take the
+// A quick-loot take said a line - "You take the
 // Longsword.", "You take 3 items." - and named nothing in a take-all. On the enhanced skin each thing that moved is a
 // card under the crosshair (ui/pickupFeed.js); on the classic skin Daggerfall's line is said exactly as before; a
 // refusal is said on both. This file drives the queue's law, the layout's arithmetic, the take's seam (`took`), the DOM
@@ -353,7 +353,6 @@ test('PICKUP-FEED: off a document the face answers false and the line is said (a
 test('PICKUP-FEED: the ENHANCED skin shows the cards - one node on the body, one sheet, a card per pickup in its tier, "+N Gold" with no second "+", and the take says nothing; a piece new to the player in Rare or better is the loot banner\'s and takes no card (mutants: the node never appended; the sheet injected twice; the tier not worn; the banner\'s piece carded twice)', () => withPage((pg) => withQuickLoot(() => {
   setPref(LOOT_RARITY_KEY, true);
   try {
-    // PIN MOVED (LOOT-BANNER, ui/lootBanner.js): a Rare or better piece new to the player is announced by its banner at
     // the right edge, so the tier this card wears is the feed's own top one - Magic
     const items = [item('Stormcaller', { rarity: 'magic', identified: true }), gold(35)];
     foldQuickLoot(frameOf('pile:1', items));
@@ -526,7 +525,7 @@ test('PICKUP-FEED: the sheet is the skin\'s - the pixel face, the plaque\'s veil
   assert.match(css, /\.pickfeed-card\[data-rarity\] \.pickfeed-name \{ color: var\(--rar\); \}/, 'the name in its tier');
   assert.match(css, /scale\(var\(--hud-scale, 1\)\)/, 'the HUD\'s scale');
   assert.match(css, /\.pickfeed \{[^}]*z-index: 4;/, 'the HUD\'s own layer - every window stands over it');
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.pickfeed-card, \.pickfeed-count, \.pickfeed-name, \.pickfeed-plus, \.haul-fill \{ animation: none !important; transition: none !important; \} \}/);   // HAUL-CARDS (PIN MOVED): a haul card's "+N" pop and its bar's slide too
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.pickfeed-card, \.pickfeed-count, \.pickfeed-name, \.pickfeed-plus, \.haul-fill \{ animation: none !important; transition: none !important; \} \}/);   // HAUL-CARDS (
   assert.match(css, /\.pickfeed-card\.pf-over \{ display: none; \}/);
 });
 

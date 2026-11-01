@@ -1,4 +1,4 @@
-// WD3 (2026-10-01, Mac: "For anything missing I need you to curate, like textures") - THE PIECES THE TWO TOWN MODS
+// WD3 - THE PIECES THE TWO TOWN MODS
 // BORROW, STOOD IN BY THE PORT (src/world/townStandIns.js, detStandIns.js, townPictures.js, standInSprites.js,
 // flatFields.js; systems/detailedShips.js's shared pictures). Beautiful Villages and Beautiful Cities place pieces of five
 // peer mods the port does not carry and eighteen beds whose prefabs point at nothing; DFU without the peers draws
@@ -224,7 +224,6 @@ test('WD3 stand-ins, every built piece is sound - Rosy\'s hangings and rugs, the
     const { lo, hi, tex } = box[id];
     assert.ok(tex.has(`${a}_${r}`) && tex.has('67_1'), `${id}: its awning, ${a}_${r}`);
     // TEMPLE-STEPS: the mesh as Unity imports it (x mirrored - its high back on -x, its counter at the origin) at the prefab's 0.75
-    // PIN MOVED (FIELD BUGS 2026-10-16b STALL-SHAPE): the second mesh (53113 on) the frame 0.2 m back, 0.206 up, 0.066 across,
     // its front the front posts' (no counter)
     const [dx, dy, dz] = Number(id) >= 53113 ? [-0.2, 0.206, 0.066] : [0, 0, 0], front = Number(id) >= 53113 ? 0.118 : 0.4;
     assert.ok(near(lo[0], (-2.75 + dx) * 0.75, 1e-5) && near(hi[0], (front + dx) * 0.75, 1e-5) && near(hi[1], (4.4 + dy) * 0.75, 1e-5) && near(lo[2], (-2.48 + dz) * 0.75, 1e-5) && near(hi[2], (2.4 + dz) * 0.75, 1e-5), id);
@@ -432,7 +431,7 @@ function loadArena2() {
   return { blocks, maps, arch, palette, texture };
 }
 
-/** What neither the port nor Daggerfall stands, and why (bible/03-World/Beautiful-Towns.md, "Not stood in"). */
+/** What neither the port nor Daggerfall stands, and why (, "Not stood in"). */
 const NOT_STOOD_IN = Object.freeze({
   models: [43756, 45179, 45181, 45198, 45205, 45206, 52991, 53129, 53130, 53132, 53134, 69465],
   flats: ['10025_1', '1200_4', '1200_9', '1210_13', '1210_16', '1210_24', '1230_11', '1230_15', '1230_2', '1230_22', '1230_3', '1230_5', '1230_6', '1230_9'],

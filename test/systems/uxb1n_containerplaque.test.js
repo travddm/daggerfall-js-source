@@ -1,6 +1,4 @@
-// UXB1-N / UXB1-O (2026-09-25, the UX backlog: "If trivial, highlight private property titles with a different color
-// to distinguish them from shop items for quick readability" and "If trivial, flag objects with generated loot since
-// sometimes there can be tons in a scene and 'your character' would know which ones have open lids").
+// UXB1-N / UXB1-O.
 //
 // World Tooltips names a Chest a Chest whoever owns it, so in a shop the owner's furniture read exactly like the
 // stock beside it - and only the furniture is somebody's private property (PlayerActivate asks before it opens,

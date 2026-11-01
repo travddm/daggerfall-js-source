@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP2a (2026-10-07, Mac: "Do it") — THE CHAPTERS' HALLS, AS THE SERVICE
+// CHAP2a — THE CHAPTERS' HALLS, AS THE SERVICE
 // KNOWS THEM: which of Daggerfall's guilds keeps a hall in which town, and
-// so which chapters a region has. bible/11-Multiplayer/Chapters-Arc.md
+// so which chapters a region has.
 // section 4; the law is src/net/npcChapterLaw.js.
 //
 // ═══ WITNESSED, NEVER HELD ═════════════════════════════════════════
@@ -36,7 +36,7 @@
 // the strike is asked inside the witness's own write, so a report racing a
 // strike lands nowhere.
 //
-// LEAN-WITNESS (2026-10-19, migration 0135, leanWitness.js): A REGION READ
+// LEAN-WITNESS: A REGION READ
 // AS FAR AS IT CAN MATTER. A witness read every report of its region's towns
 // to ask whether its account was ignored (24,327 in the Daggerfall region,
 // some 48,000 rows a witness), and every counted report moved the region's
@@ -71,7 +71,7 @@ export const forgetChapters = () => _kept.clear();
 /** AUDIT CHAP3 S3: the statement that moves the version of every region a town's reports name - `keySql` the town's
  *  key test over world_witness (?1 its value), ?2 now, `guard` an SQL condition the statement asks (the witness's:
  *  that its own insert changed something). */
-// HALL-PLAN (2026-10-16, bible/11-Multiplayer/Scale-Arc.md HALL-PLAN): `+region` - SQLite answered `DISTINCT region` off
+// HALL-PLAN: `+region` - SQLite answered `DISTINCT region` off
 // the (kind, region) index, walking every hall report of every town (some 19,000 rows a witness on the live database)
 // where the key's own rows are a handful; the unary plus leaves the index on (kind, key) the planner's, the answer the same
 // (the key's whole rows - a late row names its confirmation's region, which its confirmers name already; AUDIT LEAN-READS

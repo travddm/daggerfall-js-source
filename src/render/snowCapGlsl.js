@@ -1,5 +1,5 @@
 // @ts-check
-// PEAKS1 (2026-10-26, the owner: "... snow capped ..."; bible/03-World/Peaks.md) - THE BARE FACE, in both terrain programs
+// PEAKS1 - THE BARE FACE, in both terrain programs
 // (renderer.js TERRAIN_FS and the lane's EL_TERRAIN_FS), right after the snow's cover (render/snowCoverGlsl.js). The law is
 // world/peaks/snowcap.js: the cap's snow is in the frame's snowlines already (scenes/snowCoverHost.js merges it into each
 // lattice point's lines), and its own line rides their alpha; here a steep face near and over that line sheds the snow to

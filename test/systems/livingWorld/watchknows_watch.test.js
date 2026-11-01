@@ -1,6 +1,4 @@
-// WATCH-KNOWS (2026-10-06, Mac: "improve the guards" - asked, "The watch knows you": guards greet or warn you by your
-// legal standing, and a first minor offence draws a "Hold!" warning before an arrest; bible/06-Systems/Living-World.md
-// WATCH-KNOWS): THE LIVING WORLD'S WATCH KNOWS YOU. Before it a watchman on duty greeted the player with the street's
+// WATCH-KNOWS: THE LIVING WORLD'S WATCH KNOWS YOU. Before it a watchman on duty greeted the player with the street's
 // stranger lines whatever the law thought of them (no greeting read a legal standing: the REP1 stop was the only time
 // the watch spoke by it, and only to a known criminal), and the watch came for a pocket picked as for a murder - the
 // arrest box at its first blow. Pinned on the synthetic town (test/lwTown.mjs) and the arrest flow's own rig.

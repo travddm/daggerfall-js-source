@@ -1,7 +1,4 @@
-// MAC-U (2026-09-18, Mac, with the screenshot: "any directions I get
-// look like two messages at once, like it changes mid-sentence" -
-// "It's really easy. You'll want to go The Greensley Residence is
-// south of where we're standing.").
+// MAC-U.
 //
 // THE TABLE A DFU PLAYER READS. Daggerfall Unity does not read
 // TEXT.RSC first. TextProvider.GetRSCTokens (TextProvider.cs:167-188)

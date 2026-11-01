@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - THE NODES' LAW: which nodes a map
+// PROF1 - THE NODES' LAW: which nodes a map
 // pixel holds on a UTC day, what an herb patch grows, what the season
 // does to it, what a harvest yields, what the witnessed world says a
 // pixel is, and what a region's Court writs may ask. The record is
-// bible/06-Systems/Professions-Arc.md (PROF0) 4.3, 6, 11 and 22.
+// (PROF0) 4.3, 6, 11 and 22.
 //
 // THE NODES ARE THE CLOCK'S (PROF0 law 4). A pixel's nodes on a day are
 // a hash of the pixel and the UTC day - the gate's own mix (gateLaw.js
@@ -25,7 +25,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { gateHash } from './gate/gateLaw.js';   // the one mix every clock-law in the world rolls with
-import { skyClassicMinutes } from './skyLaw.js';   // TIME1: a UTC day's season and month are the SKY's (bible/06-Systems/Online-Time-Arc.md section 4)
+import { skyClassicMinutes } from './skyLaw.js';   // TIME1: a UTC day's season and month are the SKY's
 import { CLIMATES, REGION_NAMES, BAY_REGION_COUNT, MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y, isProvinceRegion, theatreOfRegion } from '../formats/mapsTables.js';
 import { SEASONS, seasonValue, dateFromClassicMinutes } from '../systems/gameDate.js';
 import { basketBlock, BASKET_BLOCKS } from '../systems/foraging/foragingCore.js';   // the Basket's blocks and foods - the IL's, one home
@@ -53,7 +53,7 @@ export const NODE_KINDS = Object.freeze({ tree: 1, herb: 2, vein: 3, boulder: 4,
 const counts = (tree, herb, vein, boulder) => Object.freeze({ tree, herb, vein, boulder });
 /** A wilderness pixel's nodes a day, by climate. The sea has none (Fishing's alone). BOULDERS (FIELD BUGS 2026-10-01, the
  *  service's acct47): the boulders 3 / 4 / 5 where they were 1 / 2 / 3 - a field's pieces hold one on each side now.
- *  MORE-NODES (2026-10-02, Mac: "increase all profession nodes", "Double"; acct48): the trees, the herb patches and the
+ *  MORE-NODES: the trees, the herb patches and the
  *  veins twice what they were - the walk between nodes halves (CAP-OFF: and with no day's cap, the nodes and the walk
  *  between them are the day's whole bound). */
 export const NODE_COUNTS = Object.freeze({
@@ -194,8 +194,7 @@ export const dayMonth = (day) => dayDate(day).month;
 
 // ─── A NODE'S ID ─────────────────────────────────────────────────────
 
-/** Whether (x, y) is a pixel of the world's ground: the Bay's map, ETHER-NODES (2026-10-12, the owner: "We also need
- *  to implement gathering nodes within the area") the Eltheric Ocean's box (world/ethericSea.js inEther) - its isles
+/** Whether (x, y) is a pixel of the world's ground: the Bay's map, ETHER-NODES the Eltheric Ocean's box (world/ethericSea.js inEther) - its isles
  *  stood the day's nodes and its open water the schools, and the law knew the Bay's 1000 x 500 alone: every id there
  *  was refused (`bad-node`), and every ask after its pixels' witnesses (`bad-pixels`) - and WW-C1 (bible/03-World/
  *  World-Wide.md WW-C) the provinces past the Bay: the world's whole grid (net/wire.js worldPixelOk, the Bay's map and the
@@ -205,11 +204,11 @@ export const pixelOk = (x, y) => Number.isSafeInteger(x) && Number.isSafeInteger
  *  province's richness would pay: the Bay's ground claimed Cyrodiil's). Past the map any region the client derived
  *  (the provinces', the sea's and the Ether's own reads) - the witnesses settle which. */
 export const regionOnPixel = (region, x, y) => !(isProvinceRegion(region) && x >= 0 && y >= 0 && x < MAX_MAP_PIXEL_X && y < MAX_MAP_PIXEL_Y);
-/** Whether `r` is a region index - WW-R (bible/03-World/World-Wide.md WW-R): the Bay's and the provinces' past it
+/** Whether `r` is a region index - WW-R (WW-R): the Bay's and the provinces' past it
  *  (formats/mapsTables.js REGION_NAMES), the ground a node reads. */
 export const regionOk = (r) => Number.isSafeInteger(r) && r >= 0 && r < REGION_NAMES.length;
 /** WW-R: whether `r` is one of the Bay's own regions - the books a TOWN keeps were the Bay's 62, their tables' CHECKs';
- *  WW7-5 (bible/03-World/World-Wide.md WW7-5) opened them to every region (regionOk; migration 0181 the CHECKs - 0170 before main's own took it), so no
+ *  WW7-5 (WW7-5) opened them to every region (regionOk; migration 0181 the CHECKs - 0170 before main's own took it), so no
  *  town book reads this - kept for what is the Bay's own. */
 export const bayRegionOk = (r) => Number.isSafeInteger(r) && r >= 0 && r < BAY_REGION_COUNT;
 /** A node's id: `herb:412:188:20724:2` - its kind, its pixel, its UTC day and its slot. A dungeon's vein names its
@@ -425,7 +424,7 @@ export const dungeonVeinCount = (dungeon, day) => 1 + (nodeRoll('dvein', dungeon
 /**
  * ONE DUNGEON VEIN of a day: its tier (3-6 by the weights), its metal, and where it stands - `marker` in [0, 1) picks one
  * of the dungeon's foe markers, `bearing` in [0, 2 pi) the ray's heading from it.
- * DEEP-OPEN (Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): a dungeon nobody has witnessed draws over the
+ * DEEP-OPEN (Professions-Arc.md section 53): a dungeon nobody has witnessed draws over the
  * deep veins' WHOLE table - Silver, Gold, Dwarven Scrap, Platinum, Adamantium - where it was held to UNCONFIRMED_VEIN_TIER
  * (3: Silver, and Dwarven Scrap in no dungeon over 32,249 dungeon-days of play); the account's four veins a day in such
  * dungeons are the bound (professionLaw.js DEEP_UNCONFIRMED_PER_DAY, the service's decision). Only the climate's own ore
@@ -462,16 +461,15 @@ export const WOOD_TABLES = Object.freeze({
 /** The rare woods (4.2): one tree in twenty of their climate's, on a confirmed pixel only. */
 export const RARE_WOODS = Object.freeze({ [CLIMATES.Rainforest]: 'log:ironwood', [CLIMATES.HauntedWoodlands]: 'log:ghostwood' });
 export const RARE_WOOD_CHANCE = 1 / 20;
-/** PINE-SHARE (2026-09-30, Mac: "2 in 5 trees Pine"): the one tier-1 wood (4.2), and its share of a forest whose own
+/** PINE-SHARE: the one tier-1 wood (4.2), and its share of a forest whose own
  *  woods hold no tier 1 - section 6's tier-1 weight, 2 trees in 5. Woodlands, Haunted Woodlands and Swamp stood only
  *  Oak (Logging 10) and Rainforest and Subtropical nothing unconfirmed, so a Novice logger there could never chop. */
 export const PINE_WOOD = 'log:pine';
 export const PINE_SHARE = NODE_TIER_WEIGHTS[0] / 100;
 /** Whether a climate's own woods hold no tier-1 wood (so PINE_SHARE of its trees stand as Pine). */
 const needsPine = (table) => !!table && !table.some((k) => tierOfKey(k) === 1);
-/** JUNGLE-WOODS (2026-10-19, the owner: "The forest region we recently implemented should be a large tree gathering
- *  spot. Moreso than other places within daggerfall"): a map pixel of the Jungle of Bantha - the owner's area
- *  (world/jungle/banthaArea.js, bible/03-World/Bantha-Jungle.md) - stands this many trees a day: four times the richest
+/** JUNGLE-WOODS: a map pixel of the Jungle of Bantha - the owner's area
+ *  (world/jungle/banthaArea.js) - stands this many trees a day: four times the richest
  *  woods' anywhere else (the Woodlands' and the Rainforest's twelve), so the next tree stands about half as far. The
  *  area's, never the switch's: the service recomputes every tree from this law, and a room has one jungle. */
 export const JUNGLE_TREE_SLOTS = 48;
@@ -557,8 +555,7 @@ export function gemOf({ kind, climate }, u) {
  * A STRIKE'S GEM (PROF0 4.6, 23): each strike on the glint a chance - GEM_CHANCE, x PROSPECTOR_GEM for a Prospector -
  * on ground the witnesses confirmed; one gem at most, beside the ore. `dice()` the service's, a unit a call.
  * DEEP-OPEN (Professions-Arc.md section 53): a dungeon vein's on anyone's word - its gem is the Diamond in every dungeon
- * (DUNGEON_GEM), no climate's claim, and the witnesses wait only on the climate's (the owner: "witnesses remain only for
- * the climate claim"); the four veins a day in unwitnessed dungeons bound it with the ore.
+ * (DUNGEON_GEM), no climate's claim, and the witnesses wait only on the climate's; the four veins a day in unwitnessed dungeons bound it with the ore.
  * @param {{ kind: string, climate: number, glints: number, confirmed: boolean, prospector?: boolean }} p
  * @param {() => number} dice
  */

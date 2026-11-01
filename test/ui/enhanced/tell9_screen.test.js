@@ -1,4 +1,4 @@
-// TELL9 - ON SCREEN (bible/12-Enhanced-AI/Feud-Arc.md section 11; Mac, 2026-10-04: "breath more depth into it", then
+// TELL9 - ON SCREEN (;, then
 // "Go" on every call). The fight the ground and the ear tell, read where the player looks:
 //   THE BAR'S FOE ON A THREAT - a foe that winds up at me takes the target bar (ui/hud/hudFoeTarget.js markFoeThreat) unless
 //     I struck another in the last 2 s;
@@ -69,7 +69,6 @@ test('TELL9: the poise track - none without the switch or a brain; empty outside
   assert.deepEqual(poiseTrack({ _tac: { state: 'windup', blow: blow({ guard: 'iron' }) } }), { state: 'iron', fill: 1, word: 'Iron' });
   assert.deepEqual(poiseTrack({ _tac: { state: 'staggered' } }), { state: 'staggered', fill: 1, word: 'Staggered' });
   assert.deepEqual(poiseTrack({ _tac: { state: 'overreach' } }), { state: 'open', fill: 0, word: 'Open' });
-  // PIN MOVED (AUDIT TELL: a charge's run is its landing - a blow on it is DFU's, so the track claims no poise for it)
   assert.deepEqual(poiseTrack({ _tac: { state: 'dash', dash: { blow: blow({ poise: 20, taken: 5 }) } } }), { state: 'empty', fill: 0, word: '' }, 'a charge running: its landing');
   assert.deepEqual(poiseTrack({ _tac: { state: 'dash', dash: { blow: blow({ guard: 'iron' }) } } }).state, 'empty');
   assert.deepEqual(poiseTrack({ _tac: { state: 'windup', seen: -5, blow: blow({ guard: 'iron' }) } }), { state: 'empty', fill: 0, word: '' }, 'AUDIT TELL B1: a wind-up nobody steps tells nothing');
@@ -348,7 +347,7 @@ test('TELL9: the bleed\'s own icon - two drops of blood on the kit\'s 16px grid,
 
 test('TELL9: the Enhanced AI note gains its line - wound-up blows, the stagger, the punish, iron that cannot be stopped - and stays inside its budget', () => {
   const row = FEATURES.find((x) => x.id === 'enhanced-ai');
-  assert.match(row.note, /Big attacks are marked on the ground: hit hard to stagger them or dodge\. Red, hatched attacks can’t be stopped\./);   // PIN MOVED (PLAIN TEXT SWEEP)
+  assert.match(row.note, /Big attacks are marked on the ground: hit hard to stagger them or dodge\. Red, hatched attacks can’t be stopped\./);
   assert.ok(row.note.length <= 450, `${row.note.length}`);
 });
 

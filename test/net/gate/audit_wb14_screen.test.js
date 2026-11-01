@@ -1,6 +1,5 @@
-// AUDIT WB14 (2026-10-20, Mac: "Please audit this and ensure perfection"): THE SCREEN'S HALF OF THE PORTENTS ARC, pinned -
+// AUDIT WB14: THE SCREEN'S HALF OF THE PORTENTS ARC, pinned -
 // each finding of the six cold lanes a client owns, reproduced as its lane found it and held fixed
-// (bible/01-Overview/audits/Audit-Breach-Portents.md).
 //
 //   the court        scenes/gate/gateCourt.js hostTargets (SCREEN-1), judge's first frame (SCREEN-2), perilAt's Wheel
 //                    (SCREEN-7); scenes/gate/gateHost.js hostShapes nearest first (SCREEN-3); scenes/gate/gateCaptive.js
@@ -14,7 +13,7 @@
 //   the door         net/wire.js relaySupportsPortents, net/online.js portentsOk, scenes/world.js gateRefusal, and the relay
 //                    letting go a fight from before the portents (WIRE-1 / SCREEN-8)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md.
+// Design:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

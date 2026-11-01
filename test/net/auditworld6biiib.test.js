@@ -1,4 +1,4 @@
-// AUDIT WORLD6b-iii(b) (2026-09-14, Mac: "Audit"): three opus lenses over the cell seam - the session's halo, the
+// AUDIT WORLD6b-iii(b): three opus lenses over the cell seam - the session's halo, the
 // geometry / the relay / the world host, the pool and the hits. The critical: the world host CLOSED the halo of the
 // cell it was entering on the crossing frame (the wanted list is the new pixel's, which names neither the old cell -
 // my own - nor the new one - the pixel's), so the promotion never fired from the shipped host and every crossing was

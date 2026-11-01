@@ -1,6 +1,5 @@
 // BOW-CLOCK (FIELD BUGS 2026-10-09g, a player's "Archery is weird when turning off 'draw weapon' animation and double
-// shot bug", and the owner beside it: "the arrow on the morrowind weapon isnt shown be drawn and shot, or it's
-// misalligned"). Under the Morrowind arm a shot's hit waits for the arm's "shoot release" (MW-D42), and the machine's
+// shot bug", and). Under the Morrowind arm a shot's hit waits for the arm's "shoot release" (MW-D42), and the machine's
 // cycle could end while the arm was still drawing: the next click started a shot the arm refused to draw, its arrow rode
 // the last draw's release (two arrows, one draw) or the 1.2s ceiling (an arrow mid-draw), and the release left over then
 // loosed the next draw's arrow at its click. One click is one draw and one arrow now; the arm's leftover release is

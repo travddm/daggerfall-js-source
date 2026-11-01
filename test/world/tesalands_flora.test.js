@@ -1,4 +1,4 @@
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md) - A ZONE'S OWN FLATS AND ITS WOODS AFAR: the recipes laid by the terrain's
+// TESA-LANDS - A ZONE'S OWN FLATS AND ITS WOODS AFAR: the recipes laid by the terrain's
 // kernel (world/terrain/terrainNature.js layoutLands, ECOTONE1's border between two zones), and the far views reading the
 // same law (world/terrain/floraCover.js landsFloraSpec, bandTreesPixel; render/farFlora.js the zone's art and ground;
 // render/farTrees.js a band tree's own archive). The continent past the Bay is the authored one (its ground no file's), so

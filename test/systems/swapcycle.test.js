@@ -1,5 +1,4 @@
-// SWAP-CYCLE (2026-10-20, Mac: "REPEC BREAKING LEVEL LIMIT ... How far it goes: about level 224 / this is the problem
-// lol"; bible/01-Overview/bugs/Field-Bugs-2026-10-20g.md): SKILL-SWAP moved both stored level sums by whatever a swap
+// SWAP-CYCLE: SKILL-SWAP moved both stored level sums by whatever a swap
 // moved the class's sum, a drop as well as a rise - so a trained class skill given up for an untrained one kept its
 // training on the level, and its place earned the same levels again. One class cycled through every skill reached level
 // 223 where its own lists top out at 31. The stored current sum is now the sum the level stands on: no swap and no raise
@@ -49,7 +48,6 @@ const sums = (p) => ({ starting: p.startingLevelUpSkillSum, current: p.currentLe
 test('SWAP-CYCLE THE REPORT: every skill outside the class cycled through a primary place and trained to 100 takes the level no further than the class\'s own lists hold - 31, not 223 (mutants: a drop moving the starting sum; a raise lowering the stored sum)', () => {
   const p = made();
   const start = p.startingLevelUpSkillSum;
-  // PIN MOVED: LEVEL-45 online (2026-10-27, systems/levelClimb.js) - online the climb is shared out to 45 at the six-skill
   // top (800), and the class's sum at 100 stands at 31 there as Daggerfall's 15 a level says; the law is unchanged
   const ceiling = onlineLevelFor(start, 600);   // six counted skills at 100: the most the class's sum can be
   assert.equal(ceiling, 31);
@@ -65,7 +63,7 @@ test('SWAP-CYCLE THE REPORT: every skill outside the class cycled through a prim
   }
   assert.equal(swaps, 35 - 12, 'every skill outside the class has had its turn');
   assert.equal(p.level, ceiling, 'the cycle earned no level');
-  assert.equal(onlineLevelFor(p.startingLevelUpSkillSum, p.currentLevelUpSkillSum), ceiling);   // PIN MOVED: LEVEL-45 online, the shared climb
+  assert.equal(onlineLevelFor(p.startingLevelUpSkillSum, p.currentLevelUpSkillSum), ceiling);
   assert.equal(p.startingLevelUpSkillSum, start, 'nothing brought in above the sum the level stood on');
   assert.equal(p.currentLevelUpSkillSum, 600);
 });

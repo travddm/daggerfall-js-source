@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-12b WALL-CLEAR - "a lot of stuff just clips through walls, even with grid on and changing size"
 // (a Mounted torch, catalogue flat 210.17, set on an interior wall). A piece the eye sets on a wall stood its origin on
 // the wall's point: half a model's box and half a turning flat's width inside the wall, the more the bigger it was
-// scaled, and the grid rounded world x and z - into the wall as often as out of it. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// scaled, and the grid rounded world x and z - into the wall as often as out of it..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,6 @@
 // @ts-check
-// WB3b (2026-09-25, Mac: "a gate of oblivion which takes place in a large boss arena"): THE BURNING COURT - the place
-// the gate opens onto. Design: bible/11-Multiplayer/World-Bosses.md section 4.
+// WB3b: THE BURNING COURT - the place
+// the gate opens onto. Design:
 //
 // NOT A FIFTH HOST. The four-hosts law (11-Multiplayer/Multiplayer.md "Constraints") exists because every host has
 // been missed at least once, and an arena that needs combat, spells, the HUD, the inventory, other players, a death and
@@ -17,8 +17,7 @@
 //     COURT_ARCHIVE), added to the context the way the runtime pools add theirs, its floor to the collider
 //     (`courtFloorTris`), its braziers to the light list (`courtLights`, `withCourtLights`). WB6a: the sea of fire under
 //     it and the sky over it are not its mesh - the Deadlands' own passes draw both, first in the frame
-//     (render/deadlands.js). GATE-FBX (2026-10-09, Mac: "remove the portal that players walk through on the inside and
-//     just use a portal that opens and closes. Like at the end of the fight"): THE BRIDGE'S MEMBRANE IS GONE - its two
+//     (render/deadlands.js). GATE-FBX: THE BRIDGE'S MEMBRANE IS GONE - its two
 //     posts, its lintel, its sheet of fire and its exit door. The court's portals are the gate's own fire, opening and
 //     closing (scenes/gate/gateCourt.js, render/gate/gatePass.js): THE WAY IN at the bridge's foot (WAY_IN_Z), open as a fighter
 //     steps out of it and closing behind them (`wayInStep`), and THE WAY HOME where he fell (`portalDoor`, WBX2's),
@@ -398,7 +397,7 @@ export function courtFloorTris(pt = null) {
 /** AUDIT SS: how far either side of a court exit's fire its press box reaches, metres. */
 export const COURT_DOOR_DEPTH = 0.3;
 /**
- * AUDIT SS (2026-09-27, the audit of SS1-SS5): THE COURT'S WAY HOME IS PRESSED WHERE ITS FIRE STANDS. A dungeon
+ * AUDIT SS: THE COURT'S WAY HOME IS PRESSED WHERE ITS FIRE STANDS. A dungeon
  * door's press box (player/enterExit.js doorWorldAabb) is a square padded round any facing - 4.9 m across for these -
  * and a press from INSIDE a box counts only where a collider surface meets the ray in it (player/activate.js, CASTLE1),
  * which a sheet of fire has not: from 0.6 to 2.4 m before the portal, looking at it, a press did nothing (and the same
@@ -526,12 +525,11 @@ export function buildWalkSlabModel() {
 }
 
 /**
- * WBX2 (2026-09-26, Mac: "The oblivion portal on the inside should spawn inside at the end of the fight. Currently
- * there's no way to leave after ending"): THE WAY HOME, TORN OPEN WHERE HE FELL. Once his body is gone (world/gate/gateBoss.js
+ * WBX2: THE WAY HOME, TORN OPEN WHERE HE FELL. Once his body is gone (world/gate/gateBoss.js
  * FALL_MS and a breath - PORTAL_AFTER_MS after his fall) the gate's own fire (render/gate/gatePass.js, the arch's opening and
  * its beacon, without the stone - no pillar rises over the spoils) stands on the floor where he fell and rises over
  * PORTAL_RISE_MS; pressing it is the way home (scenes/worldModes.js gateWayHome, through the court's exit doors). SS3
- * (2026-09-27, "Oblivion gate exit on touch prevents looting"): it is never walked through - it stands where his spoils
+ * it is never walked through - it stands where his spoils
  * land, and a player going for them walked out of the court. It is where the fighters are when the fight ends, and seen
  * from anywhere on the floor by its beacon. GATE-FBX: it is the court's one way home (the bridge's membrane is gone), and
  * it closes over PORTAL_CLOSE_MS as the court comes apart (`portalFade`).
@@ -561,7 +559,7 @@ export const WAY_IN_NEAR_M = 6;
  *  door until he falls, a relay that stalled, a room that would not answer or a socket that never came back held them in
  *  an empty court until the collapse. A frame this long after the last counts no silence (a screen asleep). */
 export const COURT_SILENT_MS = 20000;
-/** GATE-DOOR (bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000): A DOOR THAT ANSWERS IS NOT A SILENCE - a court that
+/** GATE-DOOR (THE PLAN PAST 1,000): A DOOR THAT ANSWERS IS NOT A SILENCE - a court that
  *  refuses me busy (its door full in the seconds the gate opens) is a room answering, so each refusal counts as a word of it
  *  for this long after I stepped in; past it a court that still only refuses casts me out as a silent one does. At the
  *  court's door (net/wire.js GATE_HELLO_HZ_MAX) a court's crowd (256 within 5 s) is in as it arrives, and four courts'

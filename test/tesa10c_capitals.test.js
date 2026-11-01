@@ -1,5 +1,4 @@
-// TESA10c (2026-10-13, the owner: "Can we redesign each capital city as close to 1:1 with other games"; bible/03-World/
-// Arena-Provinces.md TESA10c) - THE OTHER CAPITALS, BUILT BY HAND, pinned: Mournhold, Alinor, Falinesti, Torval and
+// TESA10c - THE OTHER CAPITALS, BUILT BY HAND, pinned: Mournhold, Alinor, Falinesti, Torval and
 // Helstrom - each its plan, its districts, its own blocks' laws, its landmarks and its pixel on its own province's land.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +28,6 @@ const bounds = (m) => { const lo = [Infinity, Infinity, Infinity], hi = [-Infini
 const sane = (m) => {
   assert.ok(m.positions.every(Number.isFinite) && m.uvs.every(Number.isFinite));
   for (let i = 0; i < m.normals.length; i += 3) assert.ok(Math.abs(Math.hypot(m.normals[i], m.normals[i + 1], m.normals[i + 2]) - 1) < 1e-4, 'unit normals');
-  // PIN MOVED (URBANIZER U2): a landmark's pictures the capitals' own or the towns' (cut stone, brick, half-timbering)
   assert.ok(m.subMeshes.every((s) => (s.textureArchive === CAPITAL_ARCHIVE && Object.values(CAPITAL_ART).includes(s.textureRecord)) || (s.textureArchive === URBAN_ARCHIVE && Object.values(URBAN_ART).includes(s.textureRecord))));
   assert.equal(m.subMeshes.reduce((n, s) => n + s.primitiveCount * 3, 0), m.indices.length);
 };
@@ -64,7 +62,7 @@ test('TESA10c the five: Mournhold, Alinor, Falinesti, Torval and Helstrom after 
     assert.ok(cap.models.length > 0);
   }
   assert.deepEqual(CAPITALS.map((c) => c.province), ['Imperial', 'Skyrim', 'Morrowind', 'Sumurset', 'Valenwood', 'Elsweyr', 'BlackMarsh']);
-  const ids = CAPITALS.flatMap((c) => c.drawn ?? c.models);   // PIN MOVED (TOWN-SHAPES TS5): the Imperial City's drawn whole, carried in parts
+  const ids = CAPITALS.flatMap((c) => c.drawn ?? c.models);
   assert.equal(new Set(ids).size, ids.length, 'no model two capitals\'');
   assert.deepEqual([...ids].sort(), Object.values(CAPITAL_MODELS).sort(), 'every model a capital\'s');
 });
@@ -98,7 +96,7 @@ test('TESA10c the plans: 8 x 8 as a map reads (AUDIT TESA II C2: Alinor\'s and T
     assert.ok(P.slice(8).flat().every((c) => c === 'L' || c === 'S0') && P[8][3] === 'S0', 'AUDIT TESA II C2: the sea slice all water, its own block its carrier');
   }
   assert.deepEqual(HELSTROM_PLAN[4], ['L', 'L', 'L', 'H0', 'L', 'L', 'L', 'L']);
-  assert.deepEqual([MOURNHOLD_PLAN[3][3], MOURNHOLD_PLAN[4][4], FALINESTI_PLAN[3][3], FALINESTI_PLAN[4][4]], ['R0', 'R3', 'T0', 'T3']);   // PIN MOVED (TESA-LORE): Mournhold's palace at the middle
+  assert.deepEqual([MOURNHOLD_PLAN[3][3], MOURNHOLD_PLAN[4][4], FALINESTI_PLAN[3][3], FALINESTI_PLAN[4][4]], ['R0', 'R3', 'T0', 'T3']);
   assert.equal(capitalDistrict(capOf('mournhold'), 3, 3), 'Royal Palace');
   assert.equal(capitalDistrict(capOf('mournhold'), 3, 5), 'Plaza Brindisi Dorom');
   assert.equal(capitalDistrict(capOf('torval'), 5, 3), 'Temple of the Two Moons');
@@ -110,10 +108,7 @@ test('TESA10c the port blocks: every capital\'s own after the lake and the garde
   assert.deepEqual(b.slice(0, 2).map((x) => x.name), [CAPITAL_BLOCKS.lake, CAPITAL_BLOCKS.garden]);
   assert.equal(new Set(b.map((x) => x.name)).size, b.length);
   assert.deepEqual(b.map((x) => x.index), b.map((_, i) => CAPITAL_BLOCK_INDEX + i));
-  // PIN MOVED (SOLITUDE-RELIEF): a capital on its own ground (`ground`) lays every lake cell its own, on its relief
   const ring = (c) => c.plan.flatMap((row, r) => row.map((x, cx) => x === 'L' && (onCapitalRing(c, cx, r) || !!c.ground))).filter(Boolean).length;
-  // PIN MOVED (IC-GRAND, test/world/icgrand_lod.test.js): the Imperial City's blocks a family on the door, none here
-  // PIN MOVED (ROAD-FOLLOW, 03-World/Town-Shapes.md ROAD-FOLLOW): and, last, the open cells an approach crosses (the Imperial City's four)
   const approachOpen = CAPITALS.reduce((n, c) => n + capitalApproachCells(c, capitalDims(c)).filter(([r, cx]) => planCell(c, r, cx) === 'O').length, 0);
   assert.equal(approachOpen, 4);
   assert.equal(b.length, 2 + CAPITALS.filter((c) => !c.family).reduce((n, c) => n + Object.keys(c.blocks).length + c.plan.flat().filter((x) => x === 'G').length + ring(c), 0) + approachOpen, 'AUDIT-TESA A6-2: and every capital\'s gardens after them; AUDIT TESA II C1: and its ring\'s lakes (SOLITUDE-RELIEF: all of a capital\'s on its own ground)');
@@ -123,7 +118,7 @@ test('TESA10c the port blocks: every capital\'s own after the lake and the garde
   assert.deepEqual([tile('torval', 0, TORVAL.quay.edge - 1), tile('torval', 0, TORVAL.quay.edge + 1)], [3, 0]);
   assert.deepEqual([tile('helstrom', HELSTROM.hist.x, HELSTROM.hist.z), tile('helstrom', 150, 150), tile('helstrom', 0, 0)], [2, 0, 3]);
   assert.deepEqual([tile('falinesti', 10, 10), tile('falinesti', 90, 0)], [1, 2]);
-  const MP = MOURNHOLD.plaza;   // PIN MOVED (TESA-LORE): the palace at the middle, the plaza south of it
+  const MP = MOURNHOLD.plaza;
   assert.equal(closed('mournhold', 0, 0), true, 'the palace');
   assert.equal(closed('mournhold', MP.x, MP.z), true, 'the statue');
   assert.equal(closed('mournhold', MP.x + Math.cos(0.3) * MP.r, MP.z + Math.sin(0.3) * MP.r), true, 'the plaza\'s ring');
@@ -139,9 +134,9 @@ test('TESA10c the port blocks: every capital\'s own after the lake and the garde
   assert.equal(closed('falinesti', 0, 0), true, 'the oak');
   assert.equal(closed('falinesti', FALINESTI.foot + 1, 0), false);
   // a block's own metres to the anchor's, through the law every capital's blocks are laid by
-  const mh = capOf('mournhold'), [cx, r] = [3, 5], blk = b.find((x) => x.name === mh.blocks.P0.name);   // PIN MOVED (TESA-LORE): the plaza's first block
+  const mh = capOf('mournhold'), [cx, r] = [3, 5], blk = b.find((x) => x.name === mh.blocks.P0.name);
   const A = blk.json.RmbBlock.FldHeader.AutoMapData, T = blk.json.RmbBlock.FldHeader.GroundData.GroundTiles;
-  for (let ay = 0; ay < 64; ay++) for (let ax = 0; ax < 64; ax++) { const [x, z] = autoCentre(ax, ay); assert.equal(A[ay * 64 + ax], mh.blocks.P0.closed(...anchorMetres(mh, cx, r, x, z)) ? CAPITAL_CLOSED_BYTE : 0); }   // PIN MOVED (AUDIT-TESA A6-5)
+  for (let ay = 0; ay < 64; ay++) for (let ax = 0; ax < 64; ax++) { const [x, z] = autoCentre(ax, ay); assert.equal(A[ay * 64 + ax], mh.blocks.P0.closed(...anchorMetres(mh, cx, r, x, z)) ? CAPITAL_CLOSED_BYTE : 0); }
   for (let ty = 0; ty < 16; ty++) for (let tx = 0; tx < 16; tx++) { const [x, z] = tileCentre(tx, ty); assert.equal(T[ty * 16 + tx].TileBitfield, mh.blocks.P0.tile(...anchorMetres(mh, cx, r, x, z))); }
   void BLOCK_M;
 });
@@ -204,7 +199,6 @@ test('TESA10c Falinesti: the Great Graht-Oak - its trunk narrowing up its levels
   let roots = 0;
   for (let i = 0; i < m.positions.length; i += 3) if (m.positions[i + 1] < 0 && Math.hypot(m.positions[i], m.positions[i + 2]) > F.rootOut - 3) roots++;
   assert.ok(roots >= F.roots, 'the roots to their reach');
-  // PIN MOVED (CAPITAL-TREES): probed at 4.25 rad - off the landing (the walkway's own deck there), off the boughs that
   // carry the deck and the one over it, off the houses
   for (const y of F.platforms) { const a = 4.25, d = trunkRadius(y) + 4; assert.equal(crosses(m, [Math.cos(a) * d, y + 3, Math.sin(a) * d], [Math.cos(a) * d, y - 3, Math.sin(a) * d]), true, `a platform at ${y}`); }
 });
@@ -213,7 +207,6 @@ test('TESA10c Torval: the palace\'s dome over its roof and its four minarets; th
   const T = TORVAL, palace = buildManePalace(), temple = buildTwoMoonsTemple(), quay = buildTorvalQuay(), wall = buildTorvalWall();
   for (const m of [palace, temple, quay, wall]) sane(m);
   const P = T.palace, pb = bounds(palace);
-  // PIN MOVED (TESA-LORE): the domes' finials crescent moons - the palace's the top, over its dome's axis
   const domeTop = P.h + P.drumH + P.domeH - 0.4;
   assert.ok(pb.hi[1] > domeTop + 2.6 && pb.hi[1] < domeTop + 2.6 * 1.4, `its moon over its dome: ${pb.hi[1].toFixed(2)}`);
   let ptop = 1;

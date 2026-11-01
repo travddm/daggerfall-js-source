@@ -1,4 +1,4 @@
-// BOUNTY1 (2026-09-28): the town's bounty boards - the law (systems/bounty/bountyBoard.js), the piece (systems/bounty/bountyReward.js),
+// BOUNTY1: the town's bounty boards - the law (systems/bounty/bountyBoard.js), the piece (systems/bounty/bountyReward.js),
 // the host's hunt from Take to payday (scenes/bountyHost.js) and the party pose's `bq` (net/wire.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

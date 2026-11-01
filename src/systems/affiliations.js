@@ -1,6 +1,5 @@
 // @ts-check
-// GUILD-REP (2026-09-22, Mac: "we need to add guild reputation to our
-// enhanced pause menu, its missing"): THE AFFILIATIONS BOOK, READ ONCE.
+// GUILD-REP: THE AFFILIATIONS BOOK, READ ONCE.
 //
 // DaggerfallCharacterSheetWindow.ShowAffiliationsDialog (:327-364) is
 // DFU's only reading of it: one row a membership, the guild's

@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS10 (2026-10-26, the owner: "Sometimes locations like the horse stable, etc can be placed on pathways";
-// bible/03-World/Town-Shapes.md TS10): the roads the terrain painted through a town's ground (an arm of the pixel's road or
+// TOWN-SHAPES TS10: the roads the terrain painted through a town's ground (an arm of the pixel's road or
 // track across a cell a town past the Bay leaves open, or a Bay city's old wall ring) are roads of its grid - a yard stands
 // beside them, never on them. Pinned on the grid's paving, on a town's yards placed over it, on the host's wiring, and on
 // the cities and towns past the Bay with roads every way (ARENA2).

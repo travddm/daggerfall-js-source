@@ -1,4 +1,4 @@
-// LW4 (2026-10-04, bible/06-Systems/Living-World.md, Mac: NPCs "can encounter enemies in the overworld"): TROUBLE ON
+// LW4: TROUBLE ON
 // THE ROAD - the lives (who holds a traveller's place: the dead, the empty places, the newcomers), the trouble a party
 // meets (its foes, its end, the halt, the turn home), what the towns see of it (the away windows, the visitors, the
 // news, the fallen on the road), the character's own turns of fate, and the seams that carry them - on the synthetic
@@ -18,7 +18,7 @@ import {
 import { mintResident, travellerRoster } from '../../../src/systems/livingWorld/census.js';
 import { createRelations, TURN_KINDS, TURNS_MAX } from '../../../src/systems/livingWorld/relations.js';
 import { ROAD_NEWS, NEWS_SHARE, newsScript, foeWord, fillLine } from '../../../src/systems/livingWorld/lines.js';
-import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - the news told in an exchange
+import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { lwRoll, lwRng, lwSeed } from '../../../src/systems/livingWorld/seed.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
@@ -118,7 +118,6 @@ test('LW4 trouble on the road: at most one encounter a trip, its chance the walk
   assert.deepEqual({ ...GROUND_RISK }, { road: 0.6, track: 0.9, open: 1.4 });
   assert.equal(RISK_MAX, 0.55);
   assert.equal(FOES_MAX, 6);
-  // PIN MOVED (LW12): a band's hold-up, robbed
   assert.deepEqual({ ...HALT_MIN }, { driven: 25, won: 60, fled: 15, fell: 45, robbed: 30 });
   assert.deepEqual({ ...FIGHT_MIN }, { driven: 10, won: 25, fled: 8, fell: 20, robbed: 10 });
   assert.ok(strengthOf({ cls: 140, level: 10 }) > strengthOf({ job: 'merchant' }) && strengthOf({ job: 'merchant' }) > strengthOf({ job: 'pedlar' }));
@@ -247,18 +246,17 @@ test('LW4 the towns see the trouble: a turned party never visits; one fallen on 
   let shown = 0;
   for (const town of lm.towns) {
     for (const place of lm.world.rosterOf(town)) {
-      const chance = TRIP_CHANCE[place.job] ?? ROAD_TRIP_CHANCE[place.job];   // PIN MOVED (AUDIT LW-II F2): the road's new traffic too
+      const chance = TRIP_CHANCE[place.job] ?? ROAD_TRIP_CHANCE[place.job];
       if (!(chance > 0)) continue;
       for (let k = 40; k < 140; k++) {
         if (!lm.world.fated(place, k) || !lm.world.holderOf(place, k)) continue;
-        // PIN MOVED (LW13): a company's place rides its first's trip - the fated among them send the company out
         const lead = leaderOf(place, lm.world.rosterOf(town));
         const holder = lead ? lm.world.holderOf(lead, k) : lm.world.holderOf(place, k);
         if (!holder) continue;
         if (lwRng(holder.town, holder.slot, k, 0x74726970)() < chance) continue;   // its chance would have sent it anyway
         const own = ownTrip(holder, town, k, { ...lm.world, fated: () => false }, O());
         const forced = ownTrip(holder, town, k, lm.world, O());
-        if (own?.holy) { assert.deepEqual(forced, own); continue; }   // PIN MOVED (AUDIT LW-II F7): a holy day's cycle goes on its own draw, whatever the cycle's chance said
+        if (own?.holy) { assert.deepEqual(forced, own); continue; }
         assert.equal(own, null, 'its own chance said stay');
         assert.ok(forced, `${holder.id}@${k}: the road keeps its appointment all the same`);
         assert.equal(lm.world.holderOf(place, k + 1), null, 'and the place stands empty after');
@@ -302,7 +300,7 @@ test('LW4 the towns see the trouble: a turned party never visits; one fallen on 
 test('LW4 what the town says: its own parties\' troubles, known from when they were home (none home: when they were due), for NEWS_DAYS, newest first - the fallen first named; a town meeting tells one NEWS_SHARE of the time, the news\'s own script by its end with `{who}`, `{foe}`, `{place}` filled; never on the road; a foe\'s word, many or one (mutants: the knowing, the days, the share, the tokens, the road, the plurals)', () => {
   assert.equal(NEWS_DAYS, 3);
   assert.equal(NEWS_SHARE, 0.4);
-  assert.deepEqual(Object.keys(ROAD_NEWS), ['driven', 'won', 'fled', 'fell', 'robbed']);   // PIN MOVED (LW12): a band's hold-up
+  assert.deepEqual(Object.keys(ROAD_NEWS), ['driven', 'won', 'fled', 'fell', 'robbed']);
   const base = { leader: { name: 'Ada Lark' }, to: { name: 'Far' }, party: [] };
   const trips = [
     { ...base, id: 'a', enc: { kind: 'won', foes: [7] }, fallen: [], backT1: 1000 },
@@ -323,7 +321,7 @@ test('LW4 what the town says: its own parties\' troubles, known from when they w
   while (!newsScript(seed, news)) seed++;
   const s = newsScript(seed, news);
   assert.ok(ROAD_NEWS.fell.includes(s.script));
-  // LW-TALK: PIN MOVED - the news told in an exchange, on the exchange's own draw (meetups.js exchangeScript), its opener
+  // LW-TALK:
   // the slot's
   const members = [{ id: 'm1', name: 'Cal Ash', job: 'smith' }, { id: 'm2', name: 'Dee Oak', job: 'baker' }];
   let circle = null, k = -1, tells = null;

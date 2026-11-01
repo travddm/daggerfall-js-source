@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 8): THE STEPS' GHOSTS - one additive draw
+// SD-LOOK S9: THE STEPS' GHOSTS - one additive draw
 // for the whole course: a gone Beat plate, and a Crumble pin my own foot broke, hang as a thin gold outline exactly
 // where the law will stand them again (the law's own box at the law's own anchored time - world/superDungeon/sdStepsModel.js
 // stepEdges), each with its hand running back to XII as the return comes, brightening over its last moments.

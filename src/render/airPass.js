@@ -1,5 +1,5 @@
 // @ts-check
-// EL3 (2026-09-17, the Enhanced Lighting arc, tier three - DEPTH AND AIR).
+// EL3.
 //
 // WHAT THIS IS. Three screen-space effects the lane adds on top of EL1's
 // light and EL2's shadows, all fed by ONE depth: THE FRAME'S OWN (EL6 -
@@ -39,8 +39,7 @@
 // which is where the 2D pass begins and the world pass has ended for every
 // host, foreign passes included) over the world viewport.
 //
-// EL4 (same day, Mac: "Polished and exceptional detail. Proper darker
-// dungeons. The goal isn't a half visioned system"): THE FRAME. EL3 had
+// EL4 (same day): THE FRAME. EL3 had
 // recorded a departure - the world stayed on the canvas because "six
 // foreign passes restore bindFramebuffer(null)". The survey that followed
 // found TWO restore sites in the tree (render/renderTarget.js's withTarget
@@ -76,8 +75,7 @@
 // both encodes (the lane's, the resolve's) are DITHERED at the byte
 // (orderedDither.js's bayer4, zero-mean) - a lantern's falloff on a dark floor was bands.
 //
-// LA-POST (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look
-// for flickering issues"): the chain audited, every finding measured first
+// LA-POST: the chain audited, every finding measured first
 // (07-Rendering/Enhanced-Lighting-Arc.md, LA-POST). The bright pass reads its
 // whole block (AIR_BRIGHT_TAPS); the glare's taps are soft, filtered and off
 // the flat's edge, its size held against the light's flicker (AIR_GLARE_TAPS,
@@ -118,7 +116,7 @@ export const AIR_BLOOM_SCALE = 0.25;
  *  count, the strength (1 = a fully occluded crevice loses all ambient),
  *  and the depth bias against self-occlusion.
  *
- *  HQ1 (2026-09-23, Mac: "make some insane improvements to our lighting system"): HORIZON-BASED. EL3's occlusion
+ *  HQ1: HORIZON-BASED. EL3's occlusion
  *  scattered twelve points through a hemisphere and counted the ones the depth image put behind a surface - a
  *  coin toss per sample, so a crevice's darkness was a speckle the blur then smeared, and a flat floor beside a
  *  wall took as much as the corner itself. This is the ground-truth form (GTAO, Jimenez 2016): in each of
@@ -136,7 +134,7 @@ export const AIR_AO_STORE = 0.5;       // AUDIT HQ1: the AO image holds a pixel'
 export const AIR_AO_FALLOFF = 0.6;     // AUDIT HQ1: the share of the radius over which a step's claim eases to nothing (the reference's 0.615)
 export const AIR_AO_STRENGTH = 1.0;
 export const AIR_AO_BIAS = 0.02;
-/** LA-POST5 (2026-09-27, Mac: "look for flickering issues"): the AO blur's depth window is a SHARE of the centre's
+/** LA-POST5: the AO blur's depth window is a SHARE of the centre's
  *  view distance (VOL1's blur's own rule), never under AIR_AO_RADIUS. EL7's window was the radius in absolute units:
  *  the ground's view distance climbs ~d^2/(eye height) per pixel up the screen, so past ~20 units the tile's upper and
  *  lower rows fell outside it, the blur averaged only across, and the ordered rotation's pattern stood in 8-pixel
@@ -160,7 +158,7 @@ export const AIR_GLARE_SIZE = 0.25;   // EL7: a glare the size of a flame, not a
  *  floating in air (the torch in the player's hand, the Light spell's
  *  candle, a lantern placed above its flat) drew a bright ball "not
  *  connected to the source". */
-export const AIR_GLARE_SLACK = 0.25;   // F4 (2026-09-17, Mac: "bloom circle disconnected from light sources and still reports of light bloom balls appearing behind floors/ceilings"): a QUARTER unit, either side. At a unit the band took a ceiling 0.4 in front of a hanging lantern and a wall 0.5 behind a bare light for "a flame" - the ball through the floor above, the ball beside a light with no flat. A flame flat is a camera-facing quad THROUGH the light, so its opaque texels sit at the light's own planar depth: a quarter unit holds the flat and nothing else
+export const AIR_GLARE_SLACK = 0.25;   // F4: a QUARTER unit, either side. At a unit the band took a ceiling 0.4 in front of a hanging lantern and a wall 0.5 behind a bare light for "a flame" - the ball through the floor above, the ball beside a light with no flat. A flame flat is a camera-facing quad THROUGH the light, so its opaque texels sit at the light's own planar depth: a quarter unit holds the flat and nothing else
 /** EL8: SCREEN-SPACE CONTACT SHADOWS - for every lantern that has no caster
  *  slot (the forty-two past the six), a march from the fragment toward the
  *  light through the PREVIOUS frame's depth, reprojected by the previous
@@ -180,7 +178,7 @@ export const AIR_CONTACT_UNIT = 12;
  *  and a contact shadow on it is invisible; a town's forty lanterns each
  *  reached every fragment in their window with four depth taps. */
 export const AIR_CONTACT_RANGE_FRACTION = 0.7;
-/** LA-POST6 (2026-09-27, Mac: "look for flickering issues"): THE MARCH'S OWN TOLERANCES.
+/** LA-POST6: THE MARCH'S OWN TOLERANCES.
  *  - AIR_CONTACT_SELF: F3's check - the surface was in the previous frame where it stands - held its depth there to
  *    the occluder THICKNESS (0.8), so a wall revealed within 80 cm behind a pillar, a townsman or a door's edge passed
  *    it, marched through the pillar's frame-old depth and wore its shadow for the frames of the reveal. The surface's
@@ -192,7 +190,7 @@ export const AIR_CONTACT_RANGE_FRACTION = 0.7;
  *    door), and the next frame marches against no previous depth at all. */
 export const AIR_CONTACT_SELF = 0.05;
 export const AIR_CONTACT_SLOPE_MAX = 16;
-/** LA-AUDIT B1 (2026-09-27, the audit before LA's merge; lens B measured it): THE LIFT IS IN THE TOLERANCE. The march
+/** LA-AUDIT B1: THE LIFT IS IN THE TOLERANCE. The march
  *  starts this far off the surface along its normal, and the self-check reprojects that lifted point - which, seen
  *  along its own ray, stands about AIR_CONTACT_LIFT / cos(slope) nearer than the surface the previous depth holds there
  *  (0.12 on the ground ten units off, the eye 1.7 up). LA-POST6's tolerance had no term for it, and its texel term
@@ -212,7 +210,7 @@ export const AIR_GLARE_MAX_RANGE = 120;
 /** The shafts: taps along the ray, the per-tap decay, the gain, the
  *  angular reach of the sun's mask (in the shaft image's UV). */
 export const AIR_SHAFT_TAPS = 32;
-/** VOL1 (2026-09-23, Mac: "Continue" - the second arc's last step): THE LANTERNS' GLOW THROUGH THEIR SHADOWS.
+/** VOL1: THE LANTERNS' GLOW THROUGH THEIR SHADOWS.
  *  EL1's glow was one closed-form integral per lantern per FRAGMENT in every world shader, and it knew nothing of
  *  what stood between the lantern and the air: a lamp behind a pillar glowed through it. The glow is the air
  *  pass's now, at the bloom's size: per pixel, each lantern's overlap with the view ray is walked in AIR_VOL_STEPS
@@ -225,7 +223,7 @@ export const AIR_VOL_BLUR_SHARE = 0.15;   // VOL1: a blur tap counts while its v
 export const AIR_SHAFT_DECAY = 0.96;
 export const AIR_SHAFT_STRENGTH = 0.35;
 export const AIR_SHAFT_REACH = 0.35;
-/** VC7b (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive" - light shafts): THE SUN IN THE
+/** VC7b: THE SUN IN THE
  *  HAZE. The air under a broken deck is lit where the sun reaches it and not where a bank shades it, and that is seen
  *  from any direction, not only toward the sun. Per shaft pixel the view ray is walked AIR_HAZE_STEPS jittered steps
  *  out to AIR_HAZE_REACH metres; each step's sunlight is the cloud shadow map read where its sun ray meets the ground
@@ -261,7 +259,7 @@ export const AIR_ADAPT_MIN = 0.7;
 export const AIR_ADAPT_MAX = 1.8;
 export const AIR_ADAPT_OPEN = 0.6;
 export const AIR_ADAPT_CLOSE = 3.0;
-/** FLICKER-FIX (2026-10-02): THE CALMER EYE. With Steady shadows on the eye adapts at this share of its usual rate, in both
+/** FLICKER-FIX: THE CALMER EYE. With Steady shadows on the eye adapts at this share of its usual rate, in both
  *  directions: a shadow that pops for a few frames moves the scene's mean luminance, and the eye (closing in a third of a
  *  second) rippled with it, which read as the whole picture breathing. The rates are uniforms, so this is no shader change.
  *  shadowPass.js sets `calm` once a frame from the Calmer eye switch (STEADY-BALANCE: its own chip, off by default - it
@@ -279,7 +277,7 @@ export const AIR_VIGNETTE = 0.28;
 export const AIR_CONTRAST = 1.04;
 /** EL4: the longest step the adaptation integrates (a hitch is not a second). */
 export const AIR_ADAPT_MAX_DT = 0.1;
-/** LA-POST4 (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues"): THE EYE IN
+/** LA-POST4: THE EYE IN
  *  SIXTEEN BITS. The adapted multiplier lived in ONE byte of log2 over AIR_ADAPT_LOG_RANGE - 4/255 of a stop a step -
  *  and a frame's step under half of one rounded back to where it stood. Opening (0.6/s) at 60 Hz moves 1% of the gap a
  *  frame, so the eye stopped dead unless the target stood 55% away; at 144 Hz (0.4% a frame) it never opened at all, and
@@ -367,7 +365,7 @@ export function glareSize(range) {
   return AIR_GLARE_SIZE * Math.sqrt(Math.max(range, 0));
 }
 
-/** LA-POST2 (2026-09-27, Mac: "look for flickering issues"): THE GLARE'S TAPS, in half-sizes of the glare about the
+/** LA-POST2: THE GLARE'S TAPS, in half-sizes of the glare about the
  *  light (view space, x right, y up). EL7's seven - the centre, one and two half-sizes above and below (a city light
  *  sits at the TOP of its flat, a dungeon light at its base), one either side - were each a binary answer off one
  *  NEAREST texel, so the glare moved in sevenths. Worse, three of them stood ON THE LIGHT'S OWN ROW, which is exactly
@@ -408,7 +406,7 @@ export function glareKey(x, y, z) {
   return (q(x) * GLARE_KEY_SPAN + q(y)) * GLARE_KEY_SPAN + q(z);
 }
 
-/** LA-POST1 (2026-09-27, Mac: "look for flickering issues"): THE BRIGHT PASS'S TAPS, in full-resolution pixels off a
+/** LA-POST1: THE BRIGHT PASS'S TAPS, in full-resolution pixels off a
  *  bloom texel's centre. The bloom image is a quarter of the frame each way, so its texel's centre is the CORNER where
  *  the middle four pixels of a 4x4 block meet, and one bilinear read there averaged those four alone: twelve pixels in
  *  sixteen were never read, and a flame, a glint or a window under ~4 pixels bloomed only while it stood on the middle
@@ -616,7 +614,7 @@ void main() {
 /** EL4: the bright pass - what the decoded frame holds above the threshold, over the world rect. PERF-EXT31: built
  *  with the glow's read and without it, as the resolve is (resolveFs says why).
  *
- *  LA-POST1 (2026-09-27, Mac: "look for flickering issues"): THE WHOLE BLOCK, EACH QUARTER THRESHOLDED. The one read
+ *  LA-POST1: THE WHOLE BLOCK, EACH QUARTER THRESHOLDED. The one read
  *  at the texel's centre averaged the middle four pixels of its 4x4 block and nothing else (AIR_BRIGHT_TAPS says why
  *  that popped). Four bilinear reads at the block's four inner corners average its four 2x2 quarters - every pixel
  *  once, a sixteenth each - and each quarter is thresholded BEFORE the four are averaged, so a highlight that fills a
@@ -660,8 +658,7 @@ void main() {
 /** EL4: THE RESOLVE - the frame to the canvas: decoded, the bloom and the
  *  shafts added over the world rect, the vignette, the contrast, encoded.
  *
- *  PERF-EXT31 (2026-09-25; two players via Mac, "fps issues in the exterior but fine in the interior" and "me too my
- *  friend.. don't know why. I got a RX6600"): BUILT FOR WHAT THE FRAME DREW. The glow is cleared black on every frame
+ *  PERF-EXT31: BUILT FOR WHAT THE FRAME DREW. The glow is cleared black on every frame
  *  it was not marched (no lantern lit - every day outside without a torch - the door shut, a frame the pass was not
  *  prepared for), and the shafts on every frame with neither the beams nor the haze (every night). A black read adds
  *  exactly nothing - airDecode(0) is 0, and 0 * uGrade.y is 0 - yet every world pixel paid a tap and a decode (three
@@ -1003,8 +1000,7 @@ void main() {
   outColor = vec4(acc, 1.0);
 }`;
 
-// VC6c (2026-09-18, Mac: "when the sun is covered by clouds, there
-// shouldnt be sky rays or sky rays coming through trees/flora"). The
+// VC6c. The
 // mask was SKY DEPTH ALONE - anything at the far plane near the sun's
 // screen position was a light source - so a sun standing behind a bank
 // still threw full-strength rays, and the ones through a tree's canopy
@@ -1243,7 +1239,7 @@ void main() {
       float sum = 0.0;
       for (int k = 0; k < ${AIR_GLARE_TAPS.length}; k++) sum += flame(vc + vec4(GLARE_TAP[k] * s, 0.0, 0.0), lantern);
       vis = sum / ${glslFloat(AIR_GLARE_TAPS.length)};
-      // JAN1 (2026-09-18, Janome: "lights still shining thru attics at certain angles" - BUGS-5 F4's remainder).
+      // JAN1.
       // Presence alone takes a FLOOR for the flame: an oblique surface sweeps a wide range of depths across the
       // footprint's taps, and at some pitches one tap lands within the slack of the light's own depth - a halo painted
       // on the floor above a lamp in the room below. The other half of the law: a surface NEARER than the light at
@@ -1405,7 +1401,7 @@ export class AirPass {
     // EL6: no depth image of its own - the frame's depth is the one every pass reads
     const aw = Math.max(1, Math.round(w * AIR_AO_SCALE)), ah = Math.max(1, Math.round(h * AIR_AO_SCALE));
     const bw = Math.max(1, Math.round(w * AIR_BLOOM_SCALE)), bh = Math.max(1, Math.round(h * AIR_BLOOM_SCALE));
-    // LA-POST3 (2026-09-27, Mac: "look for flickering issues"): THE BLOOM AND THE SHAFTS IN HALF FLOATS, where the GL
+    // LA-POST3: THE BLOOM AND THE SHAFTS IN HALF FLOATS, where the GL
     // renders to them (the glow's own test, volLinear). They hold LINEAR light, and a byte of linear light is coarsest
     // exactly where the eye is finest: a halo's tail fell to 0 below half a step (about 0.002 - four display levels
     // once the resolve adds it at 0.6 and encodes), so every halo in the dark ended in a hard ring, and the ring jumped
@@ -1488,7 +1484,7 @@ export class AirPass {
     if (k.uwFbo) { gl.deleteTexture(k.uwColor); gl.deleteTexture(k.uwDepth); gl.deleteFramebuffer(k.uwFbo); }   // WATER-NEXT 2
   }
   /**
-   * GRASS-LIT (2026-10-01): THE OCCLUSION'S DEPTH, TAKEN BEFORE THE GRASS. The AO is read off the frame's depth at the
+   * GRASS-LIT: THE OCCLUSION'S DEPTH, TAKEN BEFORE THE GRASS. The AO is read off the frame's depth at the
    * resolve (EL6), and the grass writes that depth - so every blade, a sixty-centimetre card standing out of the
    * ground, read as a crease: the AO darkened the field and the ground round each tuft by its 0.75 resolve, and with
    * `?air=off` the same tufts drew the ground's own colour (tools/grassLookProbe.mjs photographs both). The host takes
@@ -1522,7 +1518,7 @@ export class AirPass {
     return true;
   }
   /**
-   * WATER-NEXT 2 (2026-10-07): WHAT LIES UNDER THE WATER. The water refracts the scene behind its surface and measures
+   * WATER-NEXT 2: WHAT LIES UNDER THE WATER. The water refracts the scene behind its surface and measures
    * the water's depth off it - and the frame's colour and depth are the very images it draws into, which no program
    * may sample while they are bound. So, once a world frame, before its first water draw: one blit of both into a
    * copy of the frame's own formats (the colour LINEAR, the depth NEAREST - a blit of depth must be). The water reads
@@ -1677,7 +1673,7 @@ export class AirPass {
    * could not see it (they drive no frame), and only the field probe did.
    */
   setCloudShadow(deck) { this.cloudShadow = deck ?? null; }
-  /** SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md "The shared kit"): THE SCENE'S GRADE for the resolve
+  /** SD-LOOK: THE SCENE'S GRADE for the resolve
    *  about to run - `{ adaptKey, adaptMax, bloom, vignette, contrast }`, each optional; null (or a field left out) is the
    *  lane's default (AIR_ADAPT_KEY, AIR_ADAPT_MAX, AIR_BLOOM_STRENGTH, AIR_VIGNETTE, AIR_CONTRAST). The renderer hands it
    *  every resolve, so a frame that never asked gets the defaults back. The Shattered Hour holds the eye down (its void
@@ -1687,7 +1683,7 @@ export class AirPass {
     this.adaptParams[1] = g?.adaptKey ?? AIR_ADAPT_KEY; this.adaptParams[3] = g?.adaptMax ?? AIR_ADAPT_MAX;
   }
 
-  /** LA-POST6 (2026-09-27, Mac: "look for flickering issues"): THE FLOATING ORIGIN MOVED by `offset` - the host's
+  /** LA-POST6: THE FLOATING ORIGIN MOVED by `offset` - the host's
    *  recentre, every world position p now p + offset (ShadowPass.shiftOrigin's convention: a record's matrix[12] +=
    *  offset[0]). The view-projections the contact march reprojects by map the OLD world, so each is rebased:
    *  VP' = VP * translate(-offset) - its fourth column less offset[0..2] times its first three - which maps a moved
@@ -1896,7 +1892,7 @@ export class AirPass {
       } else if (r.kind === 2) {
         for (const b of r.batches) {
           if (!b?.vao || b._dead || b.conceal || b.castOnly || b.emissionOff) continue;   // MWNPC5b: a cast-only flat (a foe in its body) blooms nothing either   // CSA-B: a flat whose emission is black has nothing to bloom
-          // PERF-ORDER (2026-10-11): the emission map asked FIRST - Knightstale by night handed this loop 636 flats a frame
+          // PERF-ORDER: the emission map asked FIRST - Knightstale by night handed this loop 636 flats a frame
           // and 3 had one; each of the three tests only skips, so the flats drawn are the same, and the sphere is asked of three
           const key = billboardKey(b);
           const emis = f.emissionTextures.get(key);

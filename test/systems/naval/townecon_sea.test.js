@@ -1,5 +1,4 @@
-// SEA-TRADE (2026-10-18, Mac: "Ensure the sea trade routes plug into this system also"; bible/06-Systems/Town-Economy-Arc.md
-// section 8) - THE SEA'S TRADE IN THE TOWN ECONOMY: a port town's sea lanes in its Prosperity, its exchange priced by its
+// SEA-TRADE - THE SEA'S TRADE IN THE TOWN ECONOMY: a port town's sea lanes in its Prosperity, its exchange priced by its
 // town's economy (the pay never above the ask), a good bought there carrying what it cost and the counter's mark (no
 // patron takes it; no shop buys it, B2's), and every dealing told to the players' share. tools/mutants/townecon4.json.
 import '../../modsOff.js';
@@ -44,7 +43,7 @@ test('SEA-TRADE the law: a port town\'s lanes each TOWN_SEA_LANE, TOWN_SEA_LANES
   assert.equal(townReasonLine({ lanes: 0 }), null);
   assert.equal(townReasonLine({ lanes: 2, players: 3 }), TOWN_REASONS.players, 'the players\' share nearer');
   assert.equal(townReasonLine({ lanes: 2, raided: true }), TOWN_REASONS.raid);
-  assert.equal(TOWN_REASONS.harbour, 'Its harbor brings trade.');   // PIN MOVED (VOICE2): American spelling (Voice.md rule 8)
+  assert.equal(TOWN_REASONS.harbour, 'Its harbor brings trade.');
   assert.ok(townTipOf({ name: 'Wayrest', p: 60, prev: 60, area: null, lanes: 1 }).lines.includes(TOWN_REASONS.harbour));
   for (const p of PS) {
     const f = townExchangeFactors(p);
@@ -132,7 +131,7 @@ test('SEA-TRADE the harbour office: online its exchange priced by the port town\
   const x = o.exchange({ uid: 1, cargo: hold });
   assert.deepEqual(x.rows.map(({ have, ...r }) => r), exchangeOf(WAYREST, 3, {}, 0, townExchangeFactors(95)));
   assert.equal(x.band, 'Booming');
-  assert.match(exchangeText(x).lede, / Port economy: Booming\. Exchange prices follow it\.$/);   // PIN MOVED (VOICE2, in PLAIN-SWEEP's words): no dash aside (Voice.md rule 5)
+  assert.match(exchangeText(x).lede, / Port economy: Booming\. Exchange prices follow it\.$/);
   assert.equal(x.buy('wine', 3).ok, true);
   assert.deepEqual(told, ['100,100']);
   assert.equal(x.sell('wine', 1).ok, true);
@@ -150,7 +149,6 @@ test('SEA-TRADE the harbour office: online its exchange priced by the port town\
 });
 
 test('SEA-TRADE the host module: a port town\'s lanes counted off the map\'s lane network once it stands (each lane at its two ports) and read into its Prosperity and card; the lanes asked again while they do not stand (BOOT-TDZ II); a port\'s exchange factors and band its town\'s, none past the Veil or where no town stands; a dealing told to the book at the port\'s pixel; the world host hands it the MAPS location and the lanes (mutants: TOWNECON4-host-lanes-once, TOWNECON4-host-lanes-cached-empty, TOWNECON4-host-ether, TOWNECON4-host-deal-unbooked)', async () => {
-  // PIN MOVED (WW7-10, bible/03-World/World-Wide.md): the lanes asked at every reading (the world's lanes move as its ports
   // do) and counted again only when they moved - the count kept while the same lanes stand, counted each time they do not
   const towns = new Map([[11, { name: 'Wayrest', px: 100, py: 100, region: 23, type: 0, location: 5 }], [12, { name: 'Inland', px: 50, py: 50, region: 23, type: 1, location: 6 }]]);
   const locAt = (x, y) => { for (const [id, t] of towns) if (t.px === x && t.py === y) return { mapId: id, locationType: t.type }; return null; };

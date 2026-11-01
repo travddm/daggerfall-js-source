@@ -1,4 +1,4 @@
-// BROKER-RID (AUDIT FB1024, 2026-10-25; bible/01-Overview/bugs/Field-Bugs-2026-10-24.md) - THE BROKER'S SALES BY THEIR
+// BROKER-RID (AUDIT FB1024, 2026-10-25) - THE BROKER'S SALES BY THEIR
 // REQUEST IDS, on the service's side (server-account/src/brokerSales.js, migration 0174): a press with a request id writes
 // it beside its sale, in its own batch; the same press asked again answers its sale; /v1/broker/settle answers the sale an
 // id wrote - and which ask came first - or fences the id, so the press can never write after. A press without an id (a

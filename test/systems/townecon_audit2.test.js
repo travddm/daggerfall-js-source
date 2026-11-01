@@ -1,5 +1,4 @@
-// AUDIT TOWN-ECON 2 (2026-10-18, Mac: "Lets audit everything and ensure perfection"; bible/01-Overview/audits/
-// Audit-Town-Econ-2.md) - THE PRICE LANE'S FIXES: LAW-3's share by the purchase's own asks (PRICE-1), never a 0 where the
+// AUDIT TOWN-ECON 2 - THE PRICE LANE'S FIXES: LAW-3's share by the purchase's own asks (PRICE-1), never a 0 where the
 // lot paid a gold a piece (PRICE-5), an improvement the player's own (PRICE-6); a counter's piece never laundered through
 // the Stores (PRICE-2: kept out of every put-in but a station's own) nor through a socket (its mark kept on the socket and
 // given back with the stone). tools/mutants/townecon5.json.

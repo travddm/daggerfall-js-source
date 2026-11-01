@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF-SCENES (2026-10-01, Mac: "all minigames should be overhauled to
-// be more detailed and use the enhanced plus UI look"): THE ACTS'
+// PROF-SCENES: THE ACTS'
 // SOUNDS. Professions-Arc.md's accessibility law - every cue is a shape
 // and a sound as well as a colour - had its shapes and colours, and no
 // act made a sound. One table of Daggerfall's own clips

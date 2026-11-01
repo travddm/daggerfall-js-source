@@ -1,5 +1,4 @@
-// SHIP-COLOURS (2026-10-17, the owner: "Finally, a fully customizable flag with the option to use your guild insignia";
-// bible/03-World/Naval-Refit.md SHIP-COLOURS) - A SHIP'S FLAG: its door, its design put right as it is chosen, the guild's
+// SHIP-COLOURS - A SHIP'S FLAG: its door, its design put right as it is chosen, the guild's
 // arms flown in its shape, its key and its wire code (systems/naval/shipFlag.js); its drawing in the heraldry's hand
 // (ui/flagArt.js); the cloth at her masthead, the law of its vertex shader run in JS (render/shipFlagPass.js, test/glsl.mjs);
 // the flags flown over Come Sail Away's real runtime (scenes/shipFlagHost.js); the ledger that keeps hers and its save

@@ -1,5 +1,4 @@
-// STAFF-PANEL3-PLAYERS (2026-10-22, mob: "do all 6"; design doc "DFO Staff Panel: design", build step 3, "Players and
-// nameplates") - THE PANEL'S PLAYERS (server-account/src/staffPlayers.js), driven through the real Worker on the
+// STAFF-PANEL3-PLAYERS - THE PANEL'S PLAYERS (server-account/src/staffPlayers.js), driven through the real Worker on the
 // node:sqlite database every account pin stands on (test/accountDb.mjs): the search, a profile's card and badges and each
 // tab, the devices and Sign out everywhere, and the rename of a handle or a character's name - Admins alone, every read
 // and act written down.

@@ -1,4 +1,4 @@
-// JAN1 (2026-09-18, Janome's play report on the deployed build, relayed by Mac): three crashes and a NaN.
+// JAN1: three crashes and a NaN.
 //
 // (1) "got this while toggling between F5 and F6 menus" - CRASH `openCharSheet is not a function` in the enhanced
 //     pack. The CharacterSheet key arm called `onExit()` (which unmounts and clears the module's `deps` to `{}`) and
@@ -67,7 +67,6 @@ test('JAN1 (2): a save with no bank accounts restores the FULL table (and the ho
   const snap = snapshotPlayer(played, {});
   const again = fresh();
   restorePlayer(again, snap);
-  // PIN MOVED (WW-R, bible/03-World/World-Wide.md): a short table is padded to the world's regions, the rows it held kept as they were
   assert.equal(again.bankAccounts.length, BANK_REGION_COUNT); assert.equal(again.bankAccounts[2].accountGold, 777, 'restored as saved');
   assert.deepEqual(again.bankAccounts[17], { regionIndex: 17, accountGold: 0, loanTotal: 0, loanDueDate: 0, hasDefaulted: false }, 'a region it lacked opened empty');
   assert.notEqual(again.bankAccounts[2], played.bankAccounts[2], 'a copy');

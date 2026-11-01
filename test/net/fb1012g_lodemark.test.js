@@ -4,7 +4,7 @@
 // minutes (a Sense's thirty) before anything stood to be marked; an account whose Motherlode today was found was told the
 // same of lodes that stood for it nowhere; and the far mark was Mining's copper, under every vein and boulder in reach.
 // The book's marks (net/motherlodeBook.js markedAll), the compass's colour (ui/nodeMarks.js) and the world host's
-// wiring. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// wiring..
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

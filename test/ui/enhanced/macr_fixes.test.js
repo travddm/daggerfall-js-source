@@ -12,7 +12,7 @@ import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { mountEnhancedInventory } from '../../../src/ui/enhanced/enhancedInventory.js';
 import { withDom } from '../../invdrag.mjs';
 
-// ═══ MAC-R (2026-09-17): FOUR UNRELATED BUGS, MAC'S LIST ═══════════
+// ═══ MAC-R: FOUR UNRELATED BUGS, MAC'S LIST ═══════════
 //
 //   1. "Morrowind weapons that go above the screen show their blade
 //      clipped off" - the arm's frame was exactly the screen and the
@@ -20,7 +20,7 @@ import { withDom } from '../../invdrag.mjs';
 //      top edge cut a raised blade. MAC-R1: the frame was padded above
 //      the screen while a transform was set (an off-centre frustum over
 //      the same lens), and the composite extended up by the same share.
-//      DISC13-C (2026-09-23) found the SIDES had the same cut (a torch in
+//      DISC13-C found the SIDES had the same cut (a torch in
 //      the left hand) and replaced the pad with a frame window (fpArm.js
 //      fpFrameWindow): the pass renders the lens's own pixel grid wherever
 //      the moved rect shows it on the screen, so no edge can cut, the top

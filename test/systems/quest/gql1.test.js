@@ -1,6 +1,4 @@
-// GQL1 (2026-09-21, Discord, kurkku, playing online: "Are guild quests
-// not in this? I get a message saying "this service isn't available"
-// when I try to get one"). The guild popup's Quests service runs the
+// GQL1. The guild popup's Quests service runs the
 // offer flow's guild door and boxes the step it answers for the
 // ServiceFlowWindow. With Choose Guild Jobs ON
 // (Enhancements/GuildQuestListBox, the Features screen's own row) the

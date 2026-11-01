@@ -1,5 +1,4 @@
-// LOOT19 - SCRYING (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 11; Mac: "what could we do to make it even more
-// amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT19 - SCRYING.
 //
 // The codex says where an unfound Legendary is said to be - among a family of foes, whose dungeon kinds weigh its
 // records at their piles (LOOT6). At the Reforge the guild's scryers turn the hint into a place: name a family and, for 3

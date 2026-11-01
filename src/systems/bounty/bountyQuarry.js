@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// QUARRY-WORLD (2026-10-27, bible/06-Systems/Bounty-Boards.md section 13, QUARRY-WORLD; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 37 -
-// "a note; Bay-wide too"; the owner: "Every single thing here needs to be addressed. No exceptions.") - THE LAND'S OWN WILD
+// QUARRY-WORLD - THE LAND'S OWN WILD
 // ABOUT A BOUNTY BOARD'S TOWN.
 //
 // A board's beasts were one global ladder by level (systems/bounty/bountyBoard.js BOUNTY_TIERS), so a Black Marsh board

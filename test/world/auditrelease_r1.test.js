@@ -1,4 +1,4 @@
-// AUDIT RELEASE R1 (2026-10-26; bible/01-Overview/audits/Audit-Release-R1.md) - the seams between TESA's eleven streams,
+// AUDIT RELEASE R1 - the seams between TESA's eleven streams,
 // pinned where a finding was fixed:
 //  R1-1  a town's wall model and the Imperial City's cells: TS4/TS7's walls ran their model ids from 3,000,000 + a map id's
 //        low 20 bits, and IC-GRAND's fabric family owns 3,000,000 to 3,039,999 (world/imperialBlocks.js) - a model registered

@@ -1,4 +1,4 @@
-// AUDIT TACT (2026-10-02, Mac: "Audit this and ensure perfection"): four lenses over TACT1-TACT4 - the brain (A), cover
+// AUDIT TACT: four lenses over TACT1-TACT4 - the brain (A), cover
 // (B), the crowd and the door (C), the hosts, the ground and the records (D). Every finding reproduced on the TACT4
 // head and pinned here red, then fixed. Driven on the real motor, attack component, collider and arrow flight.
 import '../modsOff.js';
@@ -163,7 +163,6 @@ test('AUDIT TACT A4/D5: a bow foe mid-wind-up neither shoots nor casts; its land
   assert.equal(f.ai._tacShoot, false, 'no shot, no spell mid-wind-up');
   const shots0 = f.shots;
   player[2] = f.ai.feet[2] - 8;
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.1): the swing BEGAN with the wind-up and stands held at its raised
   // arm; the landing RELEASES it - at once, never parked, no second swing - and the brain sees its blow then
   let swungAt = null, landedAt = null;
   const seq0 = f.atk.swingSeq, tac0 = f.ai._tacSwung ?? 0;
@@ -365,7 +364,7 @@ test('AUDIT TACT C3: the indoor watch spreads from a REAL door - whose centre st
 
 test('AUDIT TACT C5: my companion and a pickpocket\'s mark are asked of HIM; the pass is for a DOOR, never the shelf behind', () => {
   const peaceful = { ai: { isHostile: false } };
-  // FB1012d ALLY-YIELDS (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): the door pass is still never his - his own yield is
+  // FB1012d ALLY-YIELDS: the door pass is still never his - his own yield is
   // `allyYields`, to what the LADDER would take behind him (test/scenes/fb1012d_allyyields.test.js), asked before this one
   assert.equal(yieldsToDoor({ ...peaceful, companion: 'me' }, 2), false, 'my companion\'s pack: the peaceful\'s door pass is not his');
   assert.equal(yieldsToDoor(peaceful, 2, 'steal'), false, 'a pickpocket');
@@ -416,7 +415,6 @@ test('AUDIT TACT D (coverage): the ground pass adds onto the frame, writes no de
   const names = calls.map((c) => c[0]);
   const draw = names.indexOf('drawArrays');
   assert.ok(draw > 0);
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.4): premultiplied over the frame - the keyline darkens what it lies on
   assert.deepEqual(calls.filter((c) => c[0] === 'blendFunc').map((c) => c.slice(1)), [[gl.ONE, gl.ONE_MINUS_SRC_ALPHA]]);
   assert.deepEqual(calls.filter((c) => c[0] === 'depthMask').map((c) => c[1]), [false, true], 'no depth written, then written again');
   assert.ok(calls.some((c, i) => i > draw && c[0] === 'disable' && c[1] === gl.BLEND), 'blend off after');

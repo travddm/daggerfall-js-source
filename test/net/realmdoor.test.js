@@ -1,4 +1,4 @@
-// REALM-DOOR (2026-09-29, the field - bible/01-Overview/bugs/Field-Bugs-2026-09-29b.md). Gryphoth, on the Discord, to Mac:
+// REALM-DOOR. Gryphoth, on the Discord, to Mac:
 // "I was playing online on a new character, went to trade with someone and it said my client was outdated. So I logged
 // out, updated and when I logged back in my character was no longer online, and when I go to bring him online it says
 // he has no renown or guilds and cant be brought online."

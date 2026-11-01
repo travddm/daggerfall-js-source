@@ -1,7 +1,5 @@
 // @ts-check
-// PARTY-LOOT (2026-10-14, the field - "Loot | Data Sync Bug?": "In a dungeon with multiple people OR party, each of us
-// DO NOT see the same loot on Mobs/Containers/Floor etc." - and Mac, asked: "I want a delicate balance... the best of
-// both worlds", then "Shared base + personal bonus"): A ROOM'S CONTAINER IS ONE LIST FOR EVERYONE IN IT, AND EACH
+// PARTY-LOOT: A ROOM'S CONTAINER IS ONE LIST FOR EVERYONE IN IT, AND EACH
 // PLAYER'S OWN LUCK AND RENOWN ADD A LAYER ONLY THEY SEE.
 //
 // WHY IT WAS BROKEN. WORLD4 let every client roll a dungeon's containers on its own dice and its own player
@@ -10,7 +8,7 @@
 // container nobody had opened: every player saw their own roll, and the first take sent the taker's leftover list to the
 // room, which replaced everyone else's whole.
 //
-// THE LAW NOW (bible/06-Systems/Online-Arc.md PARTY-LOOT, and WORLD4's LAW rewritten):
+// THE LAW NOW (PARTY-LOOT, and WORLD4's LAW rewritten):
 // - THE BASE. A room's container - a layout pile (`loot:<i>`), a layout body (`corpse:<i>`), a rest encounter's body
 //   (`enc:<n>`) - has ONE base list, which every client COMPUTES: the container's chain run on dice seeded by its NAME
 //   (the room, the container's key and its generation - roomContainerName) and on the room's TERMS, never a player's:
@@ -27,7 +25,7 @@
 //   M2's unreadable word, never as a list to land. The room's memory is the exception on its host: a remembered word
 //   was the room's own, an earlier visit's, so the host starts that container over one generation on
 //   (scenes/roomLootHost.js restartStaleContainer).
-// - THE CLAIMS (Mac, 2026-10-15: "Host arbitrates"). A take of a shared piece is a claim the room's host grants, first
+// - THE CLAIMS. A take of a shared piece is a claim the room's host grants, first
 //   come first served; the loser is told so and the piece reaches the winner's pack alone. The takes, the stored pieces
 //   and the verdicts are the HOST's word; a claimer says only its claims and its puts (below, validRoomWord's `q`, `a`
 //   and `y`).
@@ -482,7 +480,7 @@ export const claimWord = (/** @type {string} */ k, /** @type {any} */ state, /**
 export const recentAnswers = (/** @type {any} */ state) => [...state.answers].slice(-ROOM_ANSWERS_KEPT);
 
 // ---- the player's hands: a claim's lift and its give ----------------------------------------------------------------
-// OUTDOOR-LOOT (2026-10-17): roomLootHost.js's roomLift and roomGive, parameterised by the ENTITY whose hands they are - the
+// OUTDOOR-LOOT: roomLootHost.js's roomLift and roomGive, parameterised by the ENTITY whose hands they are - the
 // dungeon's block holds the module's one player, the street's pool its own (a test's, a second pool's) - so the street's
 // bodies and a building's cupboards claim by the dungeon's own law. A take of a shared piece is read out of the pack and
 // held as a claim until its verdict: lifted now, given on the grant.

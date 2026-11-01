@@ -1,6 +1,4 @@
-// PERF-EXT23 (2026-09-25, the players: "fps issues in the exterior but
-// fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600") - THE PUBLISH TAIL BREATHES. A streamed pixel's build breathed
+// PERF-EXT23 - THE PUBLISH TAIL BREATHES. A streamed pixel's build breathed
 // between its models (PERF7) and then ran its tail in one piece: the flats
 // loop (every texture a cached promise, a microtask that gives no frame
 // back), StaticBatchBuilder.finish and createMesh's spheres - on a

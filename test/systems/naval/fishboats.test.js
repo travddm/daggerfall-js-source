@@ -1,4 +1,4 @@
-// FISH-BOATS (2026-10-27; bible/03-World/Naval-Combat.md, FISH-BOATS) - a port's fishing boats: the day's fleet off its
+// FISH-BOATS - a port's fishing boats: the day's fleet off its
 // harbour's key (systems/naval/fishingBoats.js), the water each keeps, her day sailed by the real captains (navalAI.js
 // stepCaptain over shipLife.js stepErrand), stood by the real naval host over Come Sail Away's pool (test/navalSea.mjs)
 // and in a room (test/navalRoom.mjs), her hold and her word - on SHIP-LIFE's own coast (shiplife.test.js's).
@@ -286,7 +286,7 @@ test('FISH-BOATS her hold is her catch: a fishing boat taken gives up fish - FIS
     assert.deepEqual(flotsamKeys(classById(id), 7), [], 'her catch goes down with her');
   }
   assert.ok(flotsamKeys(classById('merchantCoaster'), 7).length > 0, 'a merchantman\'s still floats');
-  // the word: her class row the last two, read back - PIN MOVED (AUDIT HORIZONTAL C4): on `h`, the later classes' key
+  // the word: her class row the last two, read back
   const word = navalWireRecord({ ships: [{ n: 3, classId: 'fishingSmack', variant: 0, pos: [10, 0, 20], yaw: 0.5, speed: 1, sails: 0.4, hull: 1, sail: 1, crew: 1, state: 'afloat', heel: 0, seed: 77, fire: false, runOut: 0, gen: 0, region: 17 }] });
   assert.equal(word.h[0][1], SHIP_CLASSES.length - 1);
   assert.equal(validNavalRecord(JSON.parse(JSON.stringify(word))).ships[0].classId, 'fishingSmack');

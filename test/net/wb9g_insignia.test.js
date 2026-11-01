@@ -1,9 +1,8 @@
-// WB9g (2026-09-30, Mac: "Add a brand new title to the broker and a new addition (the aura), an animated burning ground
-// aura that circles the ground where your character stands. These items should be expensive and sought after"): THE
+// WB9g: THE
 // BROKER'S INSIGNIA - the Gatebreaker title and Dagon's Fire, bought with Deadlands Embers and kept by the ACCOUNT (the
 // sale recorded on the row, the account's closed gates paying), signed into the token and read off it by the relay;
 // the fire drawn at the feet of whoever wears it (render/auraRing.js), its shader RUN here rather than its text pinned.
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9g).
+// Design: (WB9g).
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -644,7 +643,7 @@ test('WB9g the account card and its flow: an Aura row beside the titles when the
 
 // ── THE WORLD HOST ──────────────────────────────────────────────────
 
-// ── AUDIT WB9 (2026-09-30, before the merge): the insignia's findings ──
+// ── AUDIT WB9: the insignia's findings ──
 
 test('AUDIT WB9 insignia F1/F2 - the sale\'s two halves (systems/sigil/sigilBroker.js insigniaSale): the pack\'s price taken BEFORE the service is asked, so a ware bought meanwhile cannot leave it untaken (35 stones bought the title AND a 12-stone Regalia); a sale the service holds saved at once (a page closed before the next checkpoint kept the stones as well); the service\'s refusal gives the stones back; a lost answer (unreached, a 5xx) asked after - held, it is the sale; not held, or not heard either, the stones back; a short pack asks nothing (mutants: the stones never given back; a lost answer taken for a refusal; a 5xx taken for a refusal; the sale never saved; the price never held)', async () => {
   const OFFER = INSIGNIA[0];
@@ -678,7 +677,6 @@ test('AUDIT WB9 insignia F1/F2 - the sale\'s two halves (systems/sigil/sigilBrok
   pack = [stack(35)]; saved = 0;
   r = await insigniaSale(OFFER, { items: pack, save, account: 'acct-1', settle: async () => ({ ok: true, data: { held: false } }), buy: async () => { throw new Error('reset'); } });
   assert.deepEqual([r, count(pack), saved], [{ ok: false, error: 'offline' }, 35, 0]);
-  // PIN MOVED (EMBERS-OWED, FB1024; BROKER-RID): not heard either - OWED, never given back blind (test/systems/fb1024_embersowed.test.js)
   for (const settle of [async () => ({ ok: false, error: 'offline' }), async () => { throw new Error('offline'); }]) {
     _resetOwed(); pack = [stack(35)]; saved = 0;
     r = await insigniaSale(OFFER, { items: pack, save, account: 'acct-1', settle, buy: async () => { throw new Error('reset'); } });

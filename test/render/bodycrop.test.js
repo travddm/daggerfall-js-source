@@ -1,6 +1,4 @@
-// BODY-CROP x MW-DETAIL (2026-10-22, a player's report: "when the player's camera gets too close to a morrowind 3d character
-// model, the model starts to stretch in weird ways and it gets shorter", and "morrowind 3d models are always pixelated ...
-// this should probably be optional") - bible/04-Characters/Morrowind-NPCs.md section 32.
+// BODY-CROP x MW-DETAIL
 //
 // BODY-CROP: a Morrowind body's picture was an ortho down the eye's ray, laid on one quad square to that ray - the reverse
 // of a perspective up close. It is now the main camera's own picture, cut to the window the body's box covers on the

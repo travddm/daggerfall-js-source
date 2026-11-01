@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 7 - B2 = E1; the owner: "Every single
-// thing here needs to be addressed. No exceptions.") - THE MARKET'S HUBS, THE PROVINCES' TOO
-// (bible/06-Systems/Professions-Arc.md BAY-LEFT-SEA).
+// BAY-LEFT-SEA - THE MARKET'S HUBS, THE PROVINCES' TOO
+// (BAY-LEFT-SEA).
 //
 // The courier's road runs hub to hub (PROF0 26, net/marketLaw.js roadPixels): every market request hands the service
 // the hubs this client derived, `{ [region]: [x, y] }`, and the service takes the witnesses' answer for a region, else

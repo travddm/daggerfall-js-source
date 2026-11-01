@@ -1,7 +1,4 @@
-// OVH1 (2026-09-24, Mac: "A new option on the main menu that opens to show 3 large panels. These panels will have
-// directional arrows allowing you to switch being different feature sets ... 1. Texture Overhaul 2. Sound Overhaul
-// 3. UI Overhaul ... Our first overhaul option will be the file attached. Along with this classic options and
-// enhanced options should be in") - THE OVERHAULS: three panels, each ONE choice out of a set.
+// OVH1 - THE OVERHAULS: three panels, each ONE choice out of a set.
 //
 // An option is a WHOLE LOOK, not a new switch. Texture holds the texture packs - Classic, and Vanilla Enhanced (VE3,
 // systems/vanillaEnhanced/vanillaEnhanced.js), which ships with the port since VE4 (systems/vanillaEnhanced/vanillaEnhancedPack.js; Port-Doctrine
@@ -111,8 +108,8 @@ const textureOption = (id, name, { by, blurb, isOn, wear, addons = null, vendor 
 
 const G = UI_PACKS.grimoire;
 export const OVERHAUL_PANELS = Object.freeze([
-  // OVH1b (2026-09-24, Mac: "Currently there are no texture packs, it should be empty"): the panel stood empty until the
-  // first texture pack - it is a pack's door, not a second face on the Features switches. VE3 (2026-10-05): Vanilla
+  // OVH1b: the panel stood empty until the
+  // first texture pack - it is a pack's door, not a second face on the Features switches. VE3: Vanilla
   // Enhanced is that pack, beside Classic.
   Object.freeze({
     id: 'texture', title: 'Texture Overhaul',
@@ -147,11 +144,11 @@ export const OVERHAUL_PANELS = Object.freeze([
     online: 'Online, chat, friends, party and trading keep their own panels with any of these.',
     options: Object.freeze([
       uiOption('classic', SKIN_NAMES.classic, 'classic', UI_PACK_NONE, { by: 'The original game', blurb: 'The original game\u2019s own interface, for the classic feel.' }),
-      // PLUS1 (2026-09-25): the enhanced screens in the refreshed dress. PLUS-ONLY (2026-09-26): and the only enhanced
+      // PLUS1: the enhanced screens in the refreshed dress. PLUS-ONLY: and the only enhanced
       // option - plain Enhanced, which stood beside it, is retired (systems/uiSkin.js isEnhancedPlus).
       uiOption('enhanced-plus', SKIN_NAMES.enhanced, 'enhanced', UI_PACK_NONE, { by: 'DFO Online', blurb: 'A modern interface built for mouse and keyboard, controller or phone. You can adjust some settings and the controller bindings.' }),
       uiOption(G.id, G.title, 'classic', G.id, { by: `${G.author}, version ${G.version}`, blurb: 'The classic interface with improvements: 3 times the detail, a new font, a spellbook for all your spells, and parchment and wood in place of the original stone.' }),
-      // GRIM1 (2026-10-09, Discord: "I want some of the features of enhanced+ just not the overall look of it"): DFO
+      // GRIM1: DFO
       // GRIMOIRE - the enhanced skin, every window and feature it carries, dressed in GrimoireUI's own parchment, wood,
       // red presses, glass vials and lettering (ui/grimoireDress.js). Its art is the pack's, so it names the pack.
       uiOption('dfo-grimoire', 'DFO Grimoire', 'enhanced', UI_PACK_NONE, { dress: 'grimoire', vendor: G.vendor, by: `DFO Online, in ${G.author}'s GrimoireUI ${G.version}`, blurb: 'GrimoireUI\u2019s parchment, wood and red-and-gold buttons on every window, with everything Enhanced Plus has: the hotbar, camps and tents, resting, the maps, trading and every online panel. Your vitals show as glass vials.' }),

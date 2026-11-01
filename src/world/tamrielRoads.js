@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA14 (2026-10-24, bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN
+// TESA14 - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN
 // SCALE.
 //
 // The owner, of the land past the Bay: "there's no pathways like daggerfall has" - asked, "Full Daggerfall network".

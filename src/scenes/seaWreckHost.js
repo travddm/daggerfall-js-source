@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - a ship wrecked
-// and boarded, her hold a prize; bible/03-World/Eltheric-Ocean.md SHIP-PVP) - A WRECK'S SERVICE HALF on the page: the
+// SHIP-PVP - A WRECK'S SERVICE HALF on the page: the
 // receipt the relay signed (net/wild/wildReceipt.js `n1`, handed here by scenes/naval/seaBroadsides.js) carried to the
 // account service (server-account/src/seaWreck.js, net/accountClient.js accountSeaWreck). Built by the sea's host
 // (scenes/seaVenturesHost.js).

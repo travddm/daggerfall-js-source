@@ -1,5 +1,4 @@
-// HT2 (2026-09-14, Mac: "So you cant equip the torch in your offhand,
-// you can only drop it on the ground").
+// HT2.
 //
 // THE ENHANCED PACK COULD NOT LIGHT A TORCH. Its detail card offered
 // `Wear` on everything unworn, and `wear` goes to `equipItem` ->

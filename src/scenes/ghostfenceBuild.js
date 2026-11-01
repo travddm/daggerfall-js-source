@@ -1,5 +1,5 @@
 // @ts-check
-// GHOSTFENCE (bible/03-World/Red-Mountain.md, The Ghostfence): the fence where it crosses a pixel, stood by the pixel
+// GHOSTFENCE (, The Ghostfence): the fence where it crosses a pixel, stood by the pixel
 // build (scenes/pixelBuild.js) on the pixel's own ground - its pylons and Ghostgate in the pixel's batch, their orbs their
 // own light, and the pylons, the gate's towers and the curtain between the pylons solid through the world's one gate
 // (player/lateSolid.js) - no body passes the Ghostfence but by Ghostgate. Each foot and curtain point is noted for the glow.

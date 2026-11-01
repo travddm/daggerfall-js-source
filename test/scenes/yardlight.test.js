@@ -1,5 +1,4 @@
-// YARD-LIGHT (2026-10-07, Discord through Mac - a lamp post and a torch standing in a yard at night, dark: "i wish lights
-// worked outside.."; Mac: "I guess enhanced lighting isnt shown lantern light anymore?"). The town's own lanterns still
+// YARD-LIGHT. The town's own lanterns still
 // lit; what stood dark was a YARD's lamp. A yard's piece carries no light of its own (net/decorLaw.js decorYardPieceOf -
 // "an outdoor lamp is the town's"), and nothing lit it as the town either. Now a TEXTURE.210 flat standing in a yard
 // lights as Daggerfall lights every one standing in a town block (RMBLayout.AddLight - world/city/cityLights.js): the town's

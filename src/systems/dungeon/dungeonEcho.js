@@ -14,7 +14,7 @@
 //   - THE EXAMINE: in Info mode - Daggerfall's examining stance - the plaque over a lever or a wheel adds the way its
 //     work lies ("Works something to the north-east"), read off the same chain without playing it. Never when the
 //     World Tooltips author's HideDefaultInteractTooltip asks for the puzzles to be kept.
-// AUDIT DELVE (bible/01-Overview/audits/Audit-Delve.md): an echo is of a mover that MOVED (echoMoved - a chained UnlockDoor, an
+// AUDIT DELVE: an echo is of a mover that MOVED (echoMoved - a chained UnlockDoor, an
 // OpenDoor on an open door, a relay, moved nothing and said "A door swings"); a secret wall is heard as stone, not a
 // door (isActionDoorObject - the plaque's own law); the examine says where the work lies from the lever ("above it");
 // the ways and the chain depth are read from their one homes.

@@ -1,5 +1,4 @@
-// YARD-SHED (2026-10-06, the account service down for everyone - "D1_ERROR: D1 DB is overloaded. Requests queued for too
-// long."): the accounts database answered 17.4 million reads the day before, 3.0 million of them a town's yards (43 rows
+// YARD-SHED: the accounts database answered 17.4 million reads the day before, 3.0 million of them a town's yards (43 rows
 // each) behind their callers' session and player rows, and in 45 s of the outage 577 of the 930 requests the Worker saw
 // were `/v1/homes/yards`. A town's yards are every caller's alike: the service answers them before a session, from one
 // isolate's kept answer (server-account/src/decor.js yardsKept), and the client asks a town only while one of its homes is
@@ -65,7 +64,6 @@ test('YARD-SHED the service: a town\'s yards are answered with no session at all
 test('YARD-SHED the kept answer: kept YARDS_KEPT_S and asked again after, forgotten by a decor write here - an answer asked before that write never kept - and every decor route forgets its town (mutants: the age, the forgetting, the write count)', async () => {
   _resetYardsKept();
   let reads = 0, rows = [];
-  // PIN MOVED (YARD-SNAP): the town's built row first - stale here, so the rows are read as before
   const stale = async () => ({ ver: 1, built: 0, rows: null });
   const ctx = { db: { prepare: () => ({ bind: () => ({ first: stale, all: async () => { reads++; return { results: rows }; } }) }) } };
   await yardsKept(ctx, 7, 1000);
@@ -82,7 +80,7 @@ test('YARD-SHED the kept answer: kept YARDS_KEPT_S and asked again after, forgot
   forgetYards(7);
   const flying = yardsKept(slow, 7, 2000);
   forgetYards(7);
-  while (!release) await Promise.resolve();   // PIN MOVED (YARD-SNAP): the rows asked after the town's built row
+  while (!release) await Promise.resolve();
   release();
   await flying;
   await yardsKept(ctx, 7, 2000);

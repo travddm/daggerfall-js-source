@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW6 - CAMPS ON THE OVERWORLD, THE SAME FOR EVERY PLAYER (bible/06-Systems/Travel-View.md, OW6; 2026-09-29, the
+// OW6 - CAMPS ON THE OVERWORLD, THE SAME FOR EVERY PLAYER (, OW6; 2026-09-29, the
 // player: "If a camp is spawned, it should show in the overworld"; "Everything needs that persistence between players
 // in the overworld").
 //

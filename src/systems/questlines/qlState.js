@@ -1,5 +1,5 @@
 // @ts-check
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.4): A STAMPED QUEST'S STATE - its one home, a leaf with no imports,
+// QL1: A STAMPED QUEST'S STATE - its one home, a leaf with no imports,
 // because the quest itself (systems/quest/quest.js) saves and restores it and the quest must not pull the layer's
 // world in behind it. The stamp's meaning, the switch and every reader of the state are systems/questlines/qlLaw.js's.
 

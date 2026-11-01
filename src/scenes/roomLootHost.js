@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/dungeonContext.js's buildDungeonContext (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/dungeonContext.js's buildDungeonContext by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -33,7 +33,7 @@ export function createRoomLoot(host) {
     _deepCleared, _deepFoeCleared, _sharedFoe, _wildDungeon, _wildRing, eliteLootOpts, fightN, foes, lootKeyOf,
     lootableBody, opts, respawnDue, rollPileItems, roomLootKey, searchHeard, searchables, settleLootFlat, dfLocation
   } = host;
-  // ── PARTY-LOOT (2026-10-14, the field: "each of us DO NOT see the same loot"; Mac: "Shared base + personal bonus") ──
+  // ── PARTY-LOOT ──
   // A ROOM'S CONTAINER IS ONE BASE LIST FOR EVERYONE IN IT (systems/roomLoot.js says the law whole). WORLD4 made a
   // container the room's at its first open, with the opener's OWN roll - and the plaque and Quick Loot showed and took
   // from containers nobody had opened, so each player saw their own roll and the first take's leftovers replaced
@@ -507,7 +507,7 @@ export function createRoomLoot(host) {
     composeRoomContainer(canon);
     return 1;
   }
-  // ── THE CLAIMS (Mac, 2026-10-15: "Host arbitrates") ──
+  // ── THE CLAIMS ──
   // A TAKE OF A SHARED PIECE IS A CLAIM, AND THE ROOM'S HOST GRANTS IT. Two players taking the same piece in the same
   // breath both kept it while each machine took on its own word. Now the room's host - WORLD2's, the seat that runs its
   // foes (`_authority`) - is the one that says who has it: a claim reaching it takes what is left of the piece, the first

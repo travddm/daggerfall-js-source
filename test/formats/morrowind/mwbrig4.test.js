@@ -1,6 +1,4 @@
-// MW-BRIG4 (2026-10-09, Mac: "Also for the integrated brigadine chest piece, we need each of these textures
-// implemented", nine paintings of the brigandine's unwrap; asked which metal wears which, he took the map offered - one
-// per metal): EVERY METAL OF THE BRIGANDINE JERKIN WEARS THE BRIGANDINE, IN ITS OWN PAINTING.
+// MW-BRIG4: EVERY METAL OF THE BRIGANDINE JERKIN WEARS THE BRIGANDINE, IN ITS OWN PAINTING.
 //
 // Roleplay & Realism Items' Jerkin is a Brigandine in every plate material, Iron to Daedric (rriItems.js lightWord);
 // MW-BRIG1 dressed the Steel one alone. The one mesh is baked once and written once per metal, each NIF naming its

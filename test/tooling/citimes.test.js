@@ -1,4 +1,4 @@
-// CI-TIMES (2026-10-19, Mac: "Do it" - the shards' times recorded by CI, not re-taken by hand): every shard records
+// CI-TIMES: every shard records
 // each of its files' wall time (tools/fileTimes.mjs, through the summary's reporter), a green run's eight records are
 // merged onto the times it was split by and saved in the Actions cache (tools/testTimes.mjs --merge, test-times.yml),
 // and every later run's shards are split by the newest saved - all eight by the same one (verify.yml's `times`).

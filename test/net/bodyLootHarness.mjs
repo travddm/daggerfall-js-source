@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT (2026-10-17): THE SHARED HARNESS of test/net/bodyloot.test.js (phase 1: what a party member's press on
+// OUTDOOR-LOOT: THE SHARED HARNESS of test/net/bodyloot.test.js (phase 1: what a party member's press on
 // ANOTHER player's foe's body must do, through the doors the code has today) and test/net/bodyloot_protocol.test.js
 // (slice 1: the body protocol the fix adds - the digest, the peek, the claim, the verdict - and the mixed builds, pinned
 // BLACK-BOX: through the frames the relay stand-in captures and through the pools' existing doors, never a module that

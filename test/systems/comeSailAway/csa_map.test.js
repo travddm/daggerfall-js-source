@@ -1,4 +1,4 @@
-// CSA-I (2026-09-27) - COME SAIL AWAY'S POSITION READING AND THE WATER WALK: the position box and its coroutine
+// CSA-I - COME SAIL AWAY'S POSITION READING AND THE WATER WALK: the position box and its coroutine
 // (ComeSailAway.cs 5525-5541, 5589-5780), OnGUI's map and debug values (4089-4182, systems/comeSailAway/comeSailAwayMap.js), and
 // LateUpdate's water walk (4963-4982, 5044-5051; StartWaterwalking / EndWaterwalking 5966-6029) - over the real
 // SpawnBoat and the vendored models, every host door scripted.
@@ -397,8 +397,7 @@ test('CSA-I: WaterWalkingSilent on the port\'s effect list - its own kind (no st
 
 // ── the host's seams ─────────────────────────────────────────────────────────────────────────────────────────────
 
-// ── BAY-LEFT-MAPS C12 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/03-World/Come-Sail-Away.md BAY-LEFT-MAPS) - THE READING PAST THE BAY ──────────────────────────────────
+// ── BAY-LEFT-MAPS C12 - THE READING PAST THE BAY ──────────────────────────────────
 // The mod's picture is the Bay's, so a boat past it had no cross. Past the Bay's map the reading is drawn on Daggerfall's
 // painting of Tamriel (TMAP00I0.IMG), the cross where the frame's fit puts the pixel; the markers are their sheet's.
 

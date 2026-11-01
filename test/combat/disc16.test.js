@@ -1,4 +1,4 @@
-// DISC16 (2026-09-24, Mac). bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC16.
+// DISC16., DISC16.
 //
 // ── DISC16-A: "I notice my character is sunken into the ground on hills" ──
 // DFU's body is Unity's CharacterController, a capsule, and a capsule on a slope rests on its rounded bottom: the

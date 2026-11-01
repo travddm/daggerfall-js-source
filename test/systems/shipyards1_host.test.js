@@ -1,7 +1,7 @@
-// SHIPYARDS (2026-10-11): THE SHIPMASTER'S WINDOW - its host half (scenes/shipyardHost.js: each page's model and every
+// SHIPYARDS: THE SHIPMASTER'S WINDOW - its host half (scenes/shipyardHost.js: each page's model and every
 // act over the Fleet's host, the sea fight's, Come Sail Away's runtime and the purse), the window itself
 // (ui/shipyardWindow.js: its tabs, its two-press sale and pay-off, a summons handing the water to the host), and its door
-// (ui/naval/navalPlunderDoor.js's third slot). Design: bible/03-World/Shipyards.md.
+// (ui/naval/navalPlunderDoor.js's third slot). Design:.
 import { byClass, keydown, Node_ } from '../chargenDom.mjs';   // the suite's minimal DOM (its side effect: the globals)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -196,7 +196,7 @@ test('SHIPYARDS THE CREW HALL: the day\'s roster less the names already serving,
   const r = rig();
   const all = recruitsOf({ mapId: SITE.mapId, day: 100, regionIndex: SITE.regionIndex });
   own(r, 701, 2, 'here', { hands: [all[0].name, 'Bram'] });
-  r.st.hands.get(701)[0].hall = all[0].id;   // PIN MOVED (AUDIT SHIPYARDS L2-9): a recruit serving her is known by his hall id
+  r.st.hands.get(701)[0].hall = all[0].id;
   own(r, 702, 4, 'laidup');
   own(r, 703, 1, 'here');   // a Large Boat: no crew
   const m = r.host.model(SITE, { page: 'crew', uid: 702 });
@@ -261,7 +261,7 @@ test('SHIPYARDS THE WINDOW MOUNTED: its tabs page the model; a ship bought, a sh
   const tab = (id) => byClass(host, 'dfyard-tab').find((b) => b.getAttribute('data-tab') === id);
   const selected = () => byClass(host, 'dfyard-tab').find((b) => b.getAttribute('aria-selected') === 'true')?.getAttribute('data-tab');
   assert.equal(byClass(host, 'dfyard-card').length, SHIPYARD_HULLS.length);
-  // MENU-ORDER (bible/10-UI/Menu-Order.md f): each page its picture, each ship's card a ship
+  // MENU-ORDER (f): each page its picture, each ship's card a ship
   assert.deepEqual(byClass(host, 'dfyard-tab').map((b) => b.getAttribute('data-dficon')), SHIPYARD_TABS.map((t) => SHIPYARD_TAB_ICONS[t.id]));
   assert.ok(byClass(host, 'dfyard-card').every((c) => byClass(c, 'dfyard-pic')[0]?.getAttribute('data-dficon') === 'ship'), 'a ship on every card');
   assert.deepEqual(pics.map(([h]) => h), SHIPYARD_HULLS, 'her own picture asked, once a hull');
@@ -352,7 +352,7 @@ test('CREW-SIGNED THE HALL ONLINE (through the real account service): a sailor a
   const day = crewDayAt(Date.now());
   const r = rig();
   r.st.day = day;
-  const host = createShipyardHost({ ...r.deps, signs: createCrewSignBook({ live: () => true, character: () => me.character, door: doorOf(me) }) });   // PIN MOVED (AUDIT HORIZONTAL C8): the book asks as the character, as every direct ask below
+  const host = createShipyardHost({ ...r.deps, signs: createCrewSignBook({ live: () => true, character: () => me.character, door: doorOf(me) }) });
   own(r, 702, 4, 'laidup');
   const all = recruitsOf({ mapId: SITE.mapId, day, regionIndex: SITE.regionIndex });
   assert.equal((await theirs.sign({ id: all[0].id, character: them.character })).ok, true, 'another player holds the first');

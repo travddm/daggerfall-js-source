@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-5 (2026-10-14) - THE UV EDITOR'S HANDS: WHAT IS SELECTED, WHAT A PRESS DOES, AND EVERY STEP BACK.
+// POI-5 - THE UV EDITOR'S HANDS: WHAT IS SELECTED, WHAT A PRESS DOES, AND EVERY STEP BACK.
 //
-// Mac: "Full UV editor" (bible/06-Systems/POI-Editor-Arc.md POI-5). Over one part's mesh as poi/uv/uvMesh.js holds it, one
+// (POI-5). Over one part's mesh as poi/uv/uvMesh.js holds it, one
 // material's faces at a time (the submesh its picture is drawn on), pure - the panel (ui/poi/poiUvPanel.js) draws it and
 // hands it the presses, a test drives it alone:
 //

@@ -1,6 +1,4 @@
-// FLIGHT-FIRST (bible/06-Systems/Revenants.md section 38; Mac, 2026-10-07: "revenants often can easily be killed and
-// recruited at rank 1 and player death advances their rank. Player death shouldnt be the common way of revenant growth,
-// it should be more common for revenants to flee instead of being easily captured"). Measured before (tools/tellDuel.mjs,
+// FLIGHT-FIRST (). Measured before (tools/tellDuel.mjs,
 // a Longsword, 300 fights a rank): ranks 1 and 2 knelt in every fight, and the one in ten that ran was brought down
 // as it ran - no flight ever escaped, so the only deed that ranked a young revenant up was killing the player. Three
 // causes: its roll (15%, at a fifth of its health a blow often carried it past), its run (its walk, 4.5-6 m/s, under a
@@ -31,9 +29,8 @@ const fights = (opts, n) => SEEDS(n).map((seed) => H.revenantFight({ weapon: 'Lo
 
 test('FLIGHT-FIRST THE ROLL AND THE LINE (UNQUIET, Revenants.md section 46): a marked elite or champion runs at 35% on 50% - an unmarked one never; a revenant under its will\'s rank (rank 1) at 35% on 80%; from its will\'s rank (2) at a fifth on 35% (mutants: the young roll the old one\'s; the young line the old one\'s; the will\'s rank read as young)', () => {
   assert.deepEqual([N.REVENANT_FLEE_HEALTH, N.REVENANT_FLEE_HEALTH_YOUNG], [0.2, 0.35]);
-  // PIN MOVED (UNQUIET, Revenants.md section 46 - the owner: "more of a chance to flee instead of relying on player
   // death"): a MARKED foe runs at the young line on 75% (it was 5% at a fifth); the will from rank 2 (it was 3), and a
-  // revenant past it on 35% (it was 15%). PIN MOVED again (AUDIT UNQUIET, section 49): a marked foe on 50%, at a bolt's
+  // revenant past it on 35% (it was 15%).
   // pace - at 75% and the old pace births were the chaser's Speed, not the roll's
   assert.deepEqual([N.REVENANT_FLEE_CHANCE, N.REVENANT_FLEE_CHANCE_YOUNG, N.REVENANT_FLEE_CHANCE_REVENANT], [0.5, 0.8, 0.35]);
   assert.equal(F.WILL_RANK, 2);

@@ -1,5 +1,4 @@
-// NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-// name or character name for ingame use"): THE CLIENT'S HALF. The profile card's toggle asks the service (the choice is
+// NAME-AS: THE CLIENT'S HALF. The profile card's toggle asks the service (the choice is
 // the account row's, and the mint signs it), and the device keeps the two names apart: its stored session is the
 // ACCOUNT's picture (the profile mark's name), the live sessions take the name the ROOM reads. A choice made here is
 // stamped on the stored session, and the world host says hello again when the stamp moves, so the room reads the new

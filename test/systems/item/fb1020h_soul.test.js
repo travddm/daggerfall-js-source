@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-20h (SOUL-LAW, TRADE-WHOLE; bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md) - the Discord's "Soul
+// FIELD BUGS 2026-10-20h (SOUL-LAW, TRADE-WHOLE) - the Discord's "Soul
 // Trap (Ogre)" report: a Soul Gem holding an Ogre's soul, and the realm's word that its trapper's trading was frozen.
 // The Ogre is one of Daggerfall Enemy Expansion's fifty (DEX1, on by default the day of the report), mobile id 282. The
 // soul trap's kill door fills a gem with the foe's mobile id (mysticism.js attemptSoulTrap, as EnemyEntity.cs:217 hands

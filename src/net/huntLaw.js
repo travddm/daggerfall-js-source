@@ -1,6 +1,5 @@
 // @ts-check
-// HUNTERS-MARK and MARKS-OF-MASTERY (2026-10-27; a player, handed on by the owner: "Add more horizontal progression
-// please!"; bible/06-Systems/Bounty-Boards.md section 12): THE HUNT'S LAW, both ends'. A paid bounty is reported to the
+// HUNTERS-MARK and MARKS-OF-MASTERY: THE HUNT'S LAW, both ends'. A paid bounty is reported to the
 // account service and kept in its ledger; the hunter's rank is read off a character's clears, and its rewards are
 // sideways - titles, a weekly named beast, a trophy, a little seat influence - never gear. Pure: no clock, no DOM.
 import { BOUNTY_TIERS, BOUNTY_FULL_PURSE, BOUNTY_LEVEL_MAX, bountyTierIndex, parseBountyId, bountyHash, MINUTES_PER_DAY } from '../systems/bounty/bountyBoard.js';
@@ -44,7 +43,7 @@ export const huntGameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) /
 export const huntWeekAt = (nowMs) => seatWeekOf(nowMs);
 
 /** A named mark's id: `m.<week>.<px>.<py>.<level>` - the week, the board's town and the taker's level. SHIP AUDIT
- *  (2026-10-27): the town's pixel the world's (net/wire.js worldPixelOk), as a board notice's (bountyBoard.js LAIR-WORLD) -
+ *  the town's pixel the world's (net/wire.js worldPixelOk), as a board notice's (bountyBoard.js LAIR-WORLD) -
  *  a board past the Bay posted no mark, its id read as none. */
 export const HUNT_MARK_ID_RE = /^m\.(\d{1,5})\.(-?\d{1,4})\.(-?\d{1,4})\.(\d{1,2})$/;
 const clampLevel = (level) => Math.max(1, Math.min(BOUNTY_LEVEL_MAX, Math.trunc(Number(level) || 1)));

@@ -1,5 +1,5 @@
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - the audit of PR #502
-// (SHIP-WATCH, COMPANION-KIT; bible/01-Overview/audits/Audit-Watch-Kit.md). This suite pins THE SEA BY NIGHT (lens N) and the
+// AUDIT WATCH-KIT - the audit of PR #502
+// (SHIP-WATCH, COMPANION-KIT). This suite pins THE SEA BY NIGHT (lens N) and the
 // host's side of THE WATCH ABOARD (lens W): who a gun's flashes show, the night's hearing and running, the lanterns a
 // hull carries, the dark's own hours, my lookout's cry and my crew's alarm by the night's law, another player's lamps
 // and her hands' work. Each test fails on the code as #502 stood, for its finding's reason.
@@ -90,7 +90,7 @@ test('AUDIT WK-N3 by night a merchantman that ran from a dark pirate runs on RUN
 // ── N4: the lanterns a hull carries ────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT WK-N4 a hull is lit only by lanterns she carries: Come Sail Away\'s carrack prefab has none, so a merchant carrack sails dark by night - her contact unlit, a dark ship to every captain - while a galleon at the lights\' hour is lit (mutants: the lanterns unasked, the unbuilt carrack lit)', async () => {
-  // SHIPS-2 (2026-10-07): the carrack without lanterns is the mod's own - hull 4 as the game stands it when Mac's
+  // SHIPS-2: the carrack without lanterns is the mod's own - hull 4 as the game stands it when Mac's
   // carrack's model will not load (test/navalSea.mjs modShipsPool); Mac's carries seven, and is lit
   const mod = await modShipsPool();
   try {

@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster formats_c - src/formats skyFile..
+// AUDIT 68, cluster formats_c - src/formats skyFile..
 // worldDataReplacement. A truncated stored UnityFS block refused rather
 // than zero-filled; a reader error from a live bundle worker is the
 // answer, not a dead worker to fall back from; SPELLS.STD's gate and

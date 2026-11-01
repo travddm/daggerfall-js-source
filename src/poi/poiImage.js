@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-1 (2026-10-14) - A POI'S TEXTURE, KNOWN BY ITS OWN HEADER.
+// POI-1 - A POI'S TEXTURE, KNOWN BY ITS OWN HEADER.
 //
 // A texture is stored as the image the editor imported (a glTF's PNG, JPEG or WebP - poi/gltfImport.js), by its sha256,
 // and decoded by the browser that draws it (createImageBitmap). The account service never decodes pixels; it reads the

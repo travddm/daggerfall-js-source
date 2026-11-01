@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11): A PORT TOWN'S SHIPYARD AND LIGHTHOUSE, WHERE THEY STAND - the exterior host's pool on the
+// SHIPYARDS: A PORT TOWN'S SHIPYARD AND LIGHTHOUSE, WHERE THEY STAND - the exterior host's pool on the
 // yards' shape (scenes/merchantYardsHost.js): each place's timber and stone drawn in the host's world pass and standing
 // in its collider, its people on the flats' axis, the eye's boxes and their names, the press - the shipmaster's window
 // and the climb - and the lighthouse's lamp: a scene light in the lanterns' hours, and its glow and its sweeping beams as
@@ -46,7 +46,7 @@
 //
 // NOTHING HERE IS SAVED OR SENT: where a place stands is the town's layout, who keeps it its map id.
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (each port town's build places them; the pool is made beside
+// THE FOUR HOSTS: scenes/world.js - WIRED (each port town's build places them; the pool is made beside
 // the yards', framed, drawn - in the street and in the view out of a window - its people on the flats' axis and in
 // bodies, its lamp in the lights and its beams in the added pass, taken down at a re-anchor and a load; the Overworld's
 // marks, the town map and the talk directory are handed its sites). scenes/worldModes.js - WIRED for the press both

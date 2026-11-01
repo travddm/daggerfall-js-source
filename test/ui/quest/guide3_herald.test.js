@@ -1,6 +1,5 @@
-// GUIDE3 (2026-09-29, Mac: "How can we set the foundation and improve the quest system substantially? Like really
-// modernize it, make it more accessible", then, of the Quest Guide arc: "This is your baby. Take your time") - THE
-// HERALD (ui/quest/questHerald.js, bible/06-Systems/Quest-Guide-Arc.md): a quest's news as a notice in the enhanced stack.
+// GUIDE3 - THE
+// HERALD (ui/quest/questHerald.js): a quest's news as a notice in the enhanced stack.
 // Its laws, each over the real producers:
 //
 //   WHAT IT SAYS - the kind, the title, and one line: the newest entry's opening (the date header dropped, the

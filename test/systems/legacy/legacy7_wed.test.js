@@ -1,5 +1,4 @@
-// LEGACY7 part three (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9; Mac: "online integration with permadeath
-// (Bloodline) or non-permadeath (Enduring)" - the design's "two players' characters may wed: both in the same temple,
+// LEGACY7 part three (2026-10-06,; - the design's "two players' characters may wed: both in the same temple,
 // both asking the priest, the service records the union (each family names the other's member as spouse)"): TWO
 // PLAYERS WED. The account service's union (server-account/src/legacy.js realmWed - the REAL Worker over the REAL
 // migrations), the `wed` frame's law (net/wire.js validWedData) and the relay's arm over the real Room, the handshake's
@@ -124,7 +123,6 @@ test('LEGACY7 part three the service\'s refusals: a character of no line weds no
   const g = await houseOf(S, 'fam-k8-hhhhhh', 'Indoril', 'Gilvas');
   assert.equal((await f.half('wedFell01', g.g.id)).body.wed, false);
   await f.call('/v1/realm/die', { id: f.id, lease: f.lease });
-  // PIN MOVED (AUDIT LEGACY III O5): her half went with her tombstone (legacy.js afterTomb) - his waits on nobody
   assert.equal(S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM realm_wed_halves WHERE player = ?').get(f.g.id).n, 0, 'a dead woman\'s word is nobody\'s');
   assert.deepEqual([(await g.half('wedFell01', f.g.id)).body, (await unionsOf(g)).length], [{ ok: true, wed: false }, 0]);
   // the shape
@@ -153,7 +151,7 @@ test('LEGACY7 part three the service\'s refusals: a character of no line weds no
 test('LEGACY7 part three the union\'s end: a death ends it (died, by whose); a retirement keeps it - the elder lives on, wed; a delete ends it (gone); either may wed again', async () => {
   const S = await standService();
   const a = await houseOf(S, 'fam-k1-aaaaaa', 'Hlaalu', 'Ysolde');
-  const b = await houseOf(S, 'fam-k2-bbbbbb', 'Dres', 'Iszara', { model: 'enduring' });   // PIN MOVED (AUDIT LEGACY III O6): a retirement is an Enduring line's
+  const b = await houseOf(S, 'fam-k2-bbbbbb', 'Dres', 'Iszara', { model: 'enduring' });
   await a.half('wedEnd001', b.g.id);
   await b.half('wedEnd001', a.g.id);
   // a retirement keeps it
@@ -193,8 +191,6 @@ test('LEGACY7 part three the wire: a wed frame carries a peer, a kind and the ha
   }
   assert.equal(validWedData(null), null);
   assert.equal(validWedData([]), null);
-  // PIN MOVED (TEXT-F1): the relay moved on to world175 with no wed change - world174, LEGACY7's, stays the first that routes it;
-  // PIN MOVED (SUPER-DUNGEONS): and on past it to world176 (the arc's one version, renumbered past TEXT-F1) - this relay routes it still
   assert.equal(WED_RELAY_MIN, 174, 'the LEGACY7 relay is the first that routes it');
   assert.ok(Number(/^world(\d+)$/.exec(RELAY_VERSION)[1]) >= WED_RELAY_MIN, 'and this relay routes it');
   assert.equal(relaySupportsWed(RELAY_VERSION), true);
@@ -565,7 +561,7 @@ test('LEGACY7 part three the law beneath: wedPlayer and its end held to their ow
   const v = house();
   v.host.deathOutcome();
   await settle(2);
-  assert.deepEqual(v.tombs, ['fell', 'fell'], 'a fall, held at the door and its window closed at the reset');   // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE AUDIT R1)
+  assert.deepEqual(v.tombs, ['fell', 'fell'], 'a fall, held at the door and its window closed at the reset');
   // and the session carries it
   const asked = [];
   const fetch = async (url, init) => { asked.push(JSON.parse(init.body)); return { ok: true, status: 200, headers: { get: () => 'application/json' }, json: async () => ({ ok: true, deadAt: 5 }) }; };
@@ -582,7 +578,6 @@ test('LEGACY7 part three the inspect card: the Propose button beside the Challen
   assert.equal(profileView({ name: 'Iszara', peer: {} }).wed, null);
   assert.deepEqual(profileView({ name: 'I', peer: {}, wed: { label: 'Propose marriage', enabled: true, why: 'x' } }).wed, { label: 'Propose marriage', enabled: true, why: null });
   const w = rd('src/scenes/world.js');
-  // PIN MOVED (AUDIT LEGACY III O1): the relay's character stamp (`sc`) rides the frame to the wedding's law, and a half names it
   assert.match(w, /online\.onWed = \(id, d, sub = null, sc = null\) => \{ wedMgr\.onFrame\(id, d, sub, sc\); \};/);
   assert.match(w, /onWed: \(peerId\) => wedPropose\(peerId\),/);
   assert.match(w, /wed: wedButtonFor\(peerId\),/);
@@ -590,7 +585,6 @@ test('LEGACY7 part three the inspect card: the Propose button beside the Challen
   assert.match(w, /onWed: \(union\) => \{ legacyHost\?\.wedPlayer\(union\); \},/);
   assert.match(w, /peerCan: \(id\) => !!online\?\.peers\.get\(id\)\?\.house,/);
   assert.match(w, /wedFrame\(\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE): the tombstone carries its options - `keepalive` as the page goes
   assert.match(w, /tombstone: \(why, o\) => \(realmSession \? realmSession\.die\(why, o\) : false\),/);
   assert.match(w, /realmId: \(\) => realmSession\?\.id \?\? null,/);
   assert.match(w, /realmUnions\(realmIoNow\(\)\)\.then\(\(r\) => \{ if \(r\.ok\) legacyHost\?\.unionsHeard\(r\.unions\); \}\)/);

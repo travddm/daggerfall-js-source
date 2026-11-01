@@ -1,5 +1,5 @@
-// SEASON1 part two, the client's Tides (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE ORC RAIDS AND
-// THE STORM SEASON'S SEA (bible/11-Multiplayer/Seats-Arc.md 9.3) - the law (an Orc Raid's camps in an account's week,
+// SEASON1 part two, the client's Tides: THE ORC RAIDS AND
+// THE STORM SEASON'S SEA (9.3) - the law (an Orc Raid's camps in an account's week,
 // 250 at most); through the real Worker, a camp cleared in the Marches' Orc Raids against a twin counting no Season, its
 // caps (five camps a UTC day, 250 a week, a camp once a day) and the standings it lands in; the client's book (the Tide
 // it reads, the camp it claims), the Edicts' camps (a raid's foes doubled, its influence said) and the travel clock's
@@ -92,7 +92,6 @@ test('SEASON1 THE ORC RAIDS\' DAY: five camps a UTC day across the weeks it span
   for (const site of ['nope', '402,151', '1000,10:1', '402,151:1;drop', 7]) assert.equal((await five.camp(site)).error, 'bad-orc-camp', String(site));
   assert.equal((await five.camp('402,151:1', 999)).error, 'bad-orc-camp');
   const guest = await five.svc.guest();
-  // PIN MOVED (INT16, Integrity-Arc section 7): a camp is asked of the account's seated realm character first - a guest
   // naming a character it does not sit in is refused 'progress-seat' before the seats read it; seated, it reaches the
   // seats' own door
   assert.equal((await five.svc.call('/v1/seats/orc-camp', { character: 'c', site: '402,151:1', region: 21 }, guest.secret)).body.error, 'progress-seat');

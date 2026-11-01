@@ -1,5 +1,4 @@
-// WB9f (2026-09-30, Mac: "Improve the loot drops that emit on his death and have them spread out more. The player should
-// be able to inspect and pick up the ground item, not just walk over it"): HIS SPOILS, SPREAD AND HANDLED, DRIVEN. The
+// WB9f: HIS SPOILS, SPREAD AND HANDLED, DRIVEN. The
 // throw (world/gate/gateSpew.js - a slot of a wider fan a piece, harder, and each launch kept on the court's floor); the floor
 // (scenes/spoilsPool.js - a resting piece an activation target, named, listed and taken by the press, its rest told);
 // the court (scenes/gate/gateCourt.js - the floor it keeps them on, the gold out of his chest, each landing's sparks); the
@@ -175,7 +174,7 @@ test('WB9f inspected and pressed: a piece\'s word is its own name and its tier, 
   assert.equal(h.pack.length, 1);
   assert.equal(h.p.pick(`${SPOIL_GOLD_KEY}${g}`), true);
   assert.equal(h.said.at(-1), SPOILS_TEXT.gold(list[g].gold));
-  // GATE-UX (Mac: "Loot at the end can still be walked over and picked up"): walking over takes nothing, however long
+  // GATE-UX: walking over takes nothing, however long
   const me = { at: null }, w = pool({ feet: () => me.at });
   w.p.spew({ day: 702, seed: 7, level: 3, at: [0, 3.1, 0], bearing: 0 });
   w.run(4000);

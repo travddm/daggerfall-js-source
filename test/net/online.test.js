@@ -1,4 +1,4 @@
-// ONLINE1 (2026-09-12, Mac: "the basic bones of multiplayer"), re-pinned
+// ONLINE1, re-pinned
 // by AUDIT ONLINE (the deep audit before the merge). THE CLIENT
 // EXECUTES: the room key from what a host knows (the world's cell, a
 // town, a dungeon, an interior by MAP ID, null when the host does not
@@ -113,7 +113,7 @@ test('ONLINE1: the session over a fake socket, on its own clock - hello on open,
   assert.equal(s.status, 'open'); assert.equal(s.statusLine(), null);
   assert.deepEqual(sockets[0].sent[0], { t: 'hello', id: 'mac-0001', secret: 'shh-shh-shh-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, pose: { ...pose(1), ts: now % POSE_TS_MOD }, gl: GROUND_LAW, gv: GRANT_HELLO_LAW, cv: CELL_HELLO_LAW, ll: LOOT_HELLO_LAW, ls: 1, fv: 1 }, 'PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: and, to a loot room, the loot it reads - test/net/lootdoor.test.js); PIN MOVED (COST-2 part two: and, to a cell, the cell law it stands on - test/net/cellrepartition.test.js); PIN MOVED (STAFF-PANEL5-FREEZE: and that it shows the freeze screen); PIN MOVED (LEASE1, net/roomLease.js: and that it hands its hub\'s lease on, to a lease room); PIN MOVED (GRANT-DOOR, Spawn-Grants section 20: and the spawn grants it stands on, to a room whose foes ride): the hello carries the id, its secret and the latest pose - stamped with when it is said (SCALE2b) - and, to a cell, the ground this build stands on (PIN MOVED: GROUND-GATE, Field-Bugs-2026-10-17f)');
   assert.equal(s.sendPose(pose(2)), false, 'SD-HELLO (PIN MOVED): nothing past the hello until the room welcomes the socket');
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (PIN MOVED): welcomed - the pose's law below as it was
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (
   assert.equal(s.sendPose(pose(2)), true); now += 20; assert.equal(s.sendPose(pose(3)), false, 'twenty ms later: throttled');
   now += 100; assert.equal(s.sendPose(pose(3)), true, 'a tenth of a second: sent'); now += 100; assert.equal(s.sendPose(pose(3)), false, 'unmoved: not sent');
   assert.equal(sockets[0].sent.filter((m) => m.t === 'pose').length, 2); assert.equal(POSE_HZ, 10);
@@ -219,7 +219,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   sockets[5].open(); sockets[5].drop(CLOSE_REPLACED);
   assert.equal(s.terminal, true); assert.match(s.error, /another tab, window or device/);
   now += BACKOFF_MAX_MS * 4; s.tick(); assert.equal(sockets.length, 6, 'replaced: not retried, or two tabs would evict each other forever');
-  // ONE-SEAT (2026-09-27): and STICKY - no room joins until the player takes the seat back (test/net/oneseat.test.js)
+  // ONE-SEAT: and STICKY - no room joins until the player takes the seat back (test/net/oneseat.test.js)
   s.join('town:m6', pose(0)); assert.equal(sockets.length, 6, 'a crossing joins nothing while another tab has the seat');
   s.resume();
   // busy (1013): not terminal, but a hard backoff
@@ -235,7 +235,7 @@ test('ONLINE1: the look and the stub - the equipped items\' doll fields off the 
   const entity = { race: 'Redguard', gender: 'female', faceIndex: 4, equip: createEquipTable() };
   entity.equip.slots[3] = { templateIndex: 102, group: 'Armor', material: 2, dye: 3, variant: 1, equipSlot: 3, currentCondition: 40, name: 'x' };
   entity.equip.slots[10] = { templateIndex: 20, group: 'MensClothing', equipSlot: 10, uid: 99 };
-  const look = composeLook(entity, { layered: null });   // PIN MOVED (LAYERED-GEAR-ON): the doll's fields; the layered body's `lg`, on by default, is pinned in worn_armour.test.js
+  const look = composeLook(entity, { layered: null });
   assert.deepEqual(look, { race: 'Redguard', gender: 'female', faceIndex: 4, items: [{ templateIndex: 102, group: 'Armor', material: 2, dye: 3, variant: 1, equipSlot: 3 }, { templateIndex: 20, group: 'MensClothing', equipSlot: 10 }] }, 'the doll\'s fields, nothing else');
   assert.deepEqual(LOOK_ITEM_FIELDS, ['templateIndex', 'group', 'material', 'dye', 'variant', 'equipSlot']);
   assert.deepEqual(composeLook(null, { layered: null }), { race: 'Breton', gender: 'male', faceIndex: 0, items: [] });
@@ -304,7 +304,7 @@ test('ONLINE1: the others drawn through a fake renderer - the figure cropped to 
   const rect = { x: 0, y: 0, w: 1, h: 0.77 };
   const [n] = rp.namePoints(proj, view, 1600, 900, [0, 1.7, 0], undefined, rect);
   assert.equal(n.name, 'BOB');
-  // NAME1 (2026-09-16, Mac: "Player names clip and cut off the top of the sprite head..."): the anchor is the head
+  // NAME1: the anchor is the head
   // top EXACTLY - `feet + height`. The `+ 0.25` world lift this pin used to carry was half of the clip Mac reported:
   // a quarter of a unit is many pixels at arm's length and barely one at forty, so the clearance it bought swung
   // with depth. The clearance is NAME_GAP_PX now, in screen pixels, taken by the drawing pass.
@@ -319,8 +319,7 @@ test('ONLINE1: the others drawn through a fake renderer - the figure cropped to 
   rp.destroy(); assert.equal(rp.batches().length, 0); assert.equal(renderer.log.releases.length, renderer.log.uploads.length, 'every doll released');
 });
 
-// OD1 (2026-09-12) - Mac: "Paperdoll is upside down when viewing other
-// players in multiplayer." The compositor's buffer is a UI image, row 0
+// OD1  The compositor's buffer is a UI image, row 0
 // at the top; the billboard shader samples GL's bottom-up order (every
 // other billboard arrives from TextureFile.getColor32 already so). The
 // crop the doll uploads is written bottom-up.

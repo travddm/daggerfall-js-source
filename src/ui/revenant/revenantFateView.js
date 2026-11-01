@@ -1,5 +1,5 @@
 // @ts-check
-// REVENANT-FATE (2026-10-02, Mac: "the choice popup should reuse the loot menu") - THE CHOICE, IN THE LOOT WINDOW. A
+// REVENANT-FATE - THE CHOICE, IN THE LOOT WINDOW. A
 // beaten revenant opens the window a body opens (ui/enhanced/enhancedInventory.js mountEnhancedInventory, its `fate` remote
 // side): the same frame (`.loot-win`), the same head (`.remotehead` - the revenant's name over what it is), the same
 // rows (`.itemrow` - KILL a row of the very weapon it will drop, its tile and its rarity's colour; SPARE a row of its
@@ -133,7 +133,7 @@ export function fateKey(e, fate, picked, { onPick, onChoose }) {
   const k = String(e?.key ?? '').toLowerCase();
   const byKey = fate.options.find((o) => o.key.toLowerCase() === k && !o.disabled);
   if (byKey) { if (picked === byKey.id) onChoose(byKey.id); else onPick(byKey.id); return true; }
-  // AUDIT (2026-10-02): Enter on a focused button is that button's (Back, the other row) - never the pick's confirmation
+  // AUDIT: Enter on a focused button is that button's (Back, the other row) - never the pick's confirmation
   if (k === 'enter' && picked && !e?.target?.closest?.('button')) { onChoose(picked); return true; }
   if (k === 'escape' && picked) { onPick(null); return true; }
   return false;

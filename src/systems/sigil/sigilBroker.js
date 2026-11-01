@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SET7 (2026-09-26) — THE SIGIL BROKER: SIGIL STONES BUY THE DAY'S STOCK.
+// SET7 — THE SIGIL BROKER: SIGIL STONES BUY THE DAY'S STOCK.
 //
-// Mac: "Sigil stones become a currency to trade for daily reset sigil
-// items at a new NPC vendor that stands outside the oblivion gate".
 // Design, and the record of every slice: bible/11-Multiplayer/
 // Sigil-Sets.md section 7.
 //
@@ -64,8 +62,7 @@ export const brokerDay = (nowMs) => Math.floor(Number(nowMs) / BROKER_DAY_MS);
 /** The milliseconds until the stock turns over. */
 export const brokerTurnsIn = (nowMs) => BROKER_DAY_MS - (((Number(nowMs) % BROKER_DAY_MS) + BROKER_DAY_MS) % BROKER_DAY_MS);
 
-/** The prices, in Sigil Stones: a Rare set piece, a Legendary one, a set weapon, a piece of the Regalia. SS2 (2026-09-27,
- *  Mac: "raise the prices on the new boss vendor"): twice SET7's 2 / 3 / 3 / 6, the four in the same proportion. A
+/** The prices, in Sigil Stones: a Rare set piece, a Legendary one, a set weapon, a piece of the Regalia. SS2: twice SET7's 2 / 3 / 3 / 6, the four in the same proportion. A
  *  receipt is a gate's and a gate opens every two hours - twelve stones a day to a player at every one, two thirds of
  *  SET7's whole stock; and the Regalia now costs twice the kills its own drop (a sixth of them) takes on average. */
 export const BROKER_PRICES = Object.freeze({ rare: 4, legendary: 6, weapon: 6, regalia: 12 });
@@ -117,7 +114,7 @@ export function brokerStock(day) {
   const d = Math.trunc(Number(day)) || 0;
   const rolls = seededRng(gateHash(d >>> 0, BROKER_SALT));
   const offers = [];
-  // SS4 (Mac: "make the items sold by the oblivion vendor bound also"): every ware is BOUND - the shown piece and the
+  // SS4: every ware is BOUND - the shown piece and the
   // sale's fresh mint alike (the sale mints it off this same list) - so what the stones bought stays with its buyer;
   // SS5: and it carries its price (`stonesPaid`), what its dismantle gives a share of back
   const offer = (kind, set, price, item) => { item.bound = true; item.stonesPaid = price; offers.push({ id: `${d}:${offers.length}`, day: d, slot: offers.length, kind, set, price, item }); };
@@ -227,7 +224,7 @@ export function spendStones(items, price) {
 }
 
 /**
- * DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): THE PACK'S HALF OF A WORK THAT SPENDS EMBERS - the
+ * DAEDRIC-SMELT: THE PACK'S HALF OF A WORK THAT SPENDS EMBERS - the
  * Daedric smelt's (net/professionLaw.js workEmbers) - on the insignia's own law (insigniaSale): `held()` the unlocked
  * embers the pack (`entity()`'s items) holds, `take(n)` n of them out, all of them or none (spendStones), with the
  * `back` that puts them back as one stack (the service refused the work, or its answer never came - net/profBook.js
@@ -296,7 +293,7 @@ function takeFromPack(items, take) {
   }
 }
 
-// ── BROKER-RID (AUDIT FB1024, 2026-10-25, the owner: "Audit this", of FIELD BUGS 2026-10-24's EMBERS-OWED - #bug-reports:
+// ── BROKER-RID (AUDIT FB1024, 2026-10-25,, of FIELD BUGS 2026-10-24's EMBERS-OWED - #bug-reports:
 // "the transaction never went through, the embers were not taken out and I didn't get the piece ... I now have 52 deadlands
 // embers on me, and it will not let me buy the aura, it says I have too few") ──
 // A sale is two ledgers: the pack's embers, and the account's purse the service spends. A sale whose answer was lost and
@@ -428,8 +425,7 @@ registerModSaveData(BROKER_SAVE_VENDOR, {
 });
 
 // ── SS5: the dismantle - a ware given back for stones ──
-/** SS5 (2026-09-27, Mac: "The ability to dismantle in the inventory and recieve back sigil stones", the Broker's wares
- *  alone for now): the share of a ware's price its dismantle gives back - half, rounded down: a Rare piece's 4 give 2,
+/** SS5: the share of a ware's price its dismantle gives back - half, rounded down: a Rare piece's 4 give 2,
  *  a Legendary's or a weapon's 6 give 3, the Regalia's 12 give 6 - so a ware is never a free try of the day's stock. */
 export const BROKER_DISMANTLE_SHARE = 0.5;
 /** A count of stones in the Broker's words - "1 Deadlands Ember", "4 Deadlands Embers" (his window's purse and sale,
@@ -481,8 +477,7 @@ export const DISMANTLED = (name, n) => `Dismantled: ${name}, for ${stonesText(n)
 /** The words a refused offer wears, and the set an offer belongs to by name. FIELD BUGS 2026-10-25i BOUGHT-YOURS
  *  (#bug-reports, "Can't buy this piece": "I did dismantle the other chest i bought days ago, but still i cant buy this
  *  one"): 'bought' says whose sale it was and that it is the day's. "Bought today" read as "you have one already" - a
- *  Legendary wears its base record's name, so another day's offer comes back under it (2026-10-22's Warden was
- *  Malacath's, 2026-10-25's Mora's), and a press just after a sale said it over the sale's own word. */
+ *  Legendary wears its base record's name, so another day's offer comes back under it, and a press just after a sale said it over the sale's own word. */
 export const BROKER_REFUSALS = Object.freeze({ bought: 'You bought this one today. You can buy each piece once a day.', stones: 'Not enough Deadlands Embers', gone: 'No longer in stock', heavy: 'Too heavy to carry' });
 export const offerSetName = (offer) => setById(offer?.set)?.name ?? '';
 export { SIGIL_STONE_TEMPLATE };

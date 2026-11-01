@@ -1,4 +1,4 @@
-// MEADOW1 (2026-10-06): THE MEADOW, PHOTOGRAPHED ON A REAL GPU.
+// MEADOW1: THE MEADOW, PHOTOGRAPHED ON A REAL GPU.
 //
 //     node tools/meadowProbe.mjs            shots in tools/shots/meadow-*.png
 //
@@ -16,7 +16,7 @@
 // guess. SwiftShader's milliseconds are not a player's and are never
 // reported; the counts are exact.
 //
-// AUDIT MEADOW1 (2026-10-06): and in a clear day's wind (`wind`: the sky's
+// AUDIT MEADOW1: and in a clear day's wind (`wind`: the sky's
 // sunny record through windDrive's mapping, 11.2 m/s - the probe's own
 // 0.01 never leaned a card) and edge-on (`grazing`, where a card's level
 // was the GPU's); and THE FILL each style costs - the shipped vertex

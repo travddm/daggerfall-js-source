@@ -1,4 +1,4 @@
-// SET-CATCHUP (POWER-CEILING, 2026-10-27; bible/11-Multiplayer/Sigil-Sets.md section 5, bible/05-Combat/Power-Ceiling.md;
+// SET-CATCHUP (POWER-CEILING, 2026-10-27; ;
 // the player: "Add more horizontal progression please!"): GOING SIDEWAYS COSTS LESS. Mac's "grow together" stands - a
 // set's stage is its lowest worn piece's - but a piece below the highest stage the set has stood at for this character
 // (two of its pieces worn at that stage, or the save's record of it) drinks three times the XP until it gets there,
@@ -56,7 +56,6 @@ test('SET-CATCHUP THE REACH: the second-best rank among a set\'s WORN pieces - a
   const e = player();
   wear(e, piece(107, 'dagon', XP[3]), piece(106, 'dagon', XP[1]));
   e.items.push(piece(105, 'dagon', XP[4]), piece(102, 'mora', XP[2]));
-  // PIN MOVED (AUDIT HORIZONTAL D1): the pack counted - a lent Ascendant pair carried for one kill made a reach for good
   assert.deepEqual([...wornSetRanks(e)], [['dagon', [3, 1]]], 'the worn pieces, by set - the pack\'s never');
   assert.equal(setReachOf(e, 'dagon'), 1, 'the Radiant one and the Bright one worn: Bright - the Ascendant one in the pack is no part of it');
   assert.equal(setReachOf(e, 'mora'), -1);

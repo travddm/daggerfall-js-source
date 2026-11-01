@@ -1,5 +1,5 @@
 // @ts-check
-// POI-2 (2026-10-14): A POI'S PICTURE, DECODED BY THE BROWSER THAT DRAWS IT - a PNG, JPEG or WebP (poi/poiImage.js knew
+// POI-2: A POI'S PICTURE, DECODED BY THE BROWSER THAT DRAWS IT - a PNG, JPEG or WebP (poi/poiImage.js knew
 // it by its header before it was stored) to an RGBA raster, TOP row first, as a browser decodes one; poi/poiRuntime.js
 // bakeAlbedo turns it to the port's color32 order. The pixels as stored: no premultiplied alpha (a cutout's edge and a
 // glass's alpha are the file's own) and no colour-space conversion (the file's numbers are the material's).

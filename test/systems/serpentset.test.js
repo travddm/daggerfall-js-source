@@ -1,12 +1,11 @@
-// SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own equipment
-// rewards"): THE SEA SERPENT PAYS THE GATE'S CURRENCY, AND HAS A SET OF ITS OWN - the hoard's Deadlands Ember
+// SERPENT-SET: THE SEA SERPENT PAYS THE GATE'S CURRENCY, AND HAS A SET OF ITS OWN - the hoard's Deadlands Ember
 // (systems/serpent/serpentSpoils.js, net/serpent/serpentHoardLaw.js), Sethrakul's Coilscale: its law (systems/sigil/sigilSets.js), its nine
 // Aetheric records and the wire's check of them (systems/aetheric.js), each power driven through the REAL seams SET2
 // opened (systems/sigil/sigilSetPowers.js - the fold, the blow, the strike, the hurt, the kill, the round, the HUD's chips)
 // with a stand-in for the running host's door and a clock of the test's own, the hoard's roll off a receipt's seed, the
 // one heal a power gives (systems/playerHeal.js), the Broker's shelf that never carries it, and the host's wiring by
-// source (scenes/world.js, net/serpent/serpentClaims.js). Design: bible/11-Multiplayer/Sigil-Sets.md section 6c;
-// bible/11-Multiplayer/Sea-Serpent.md section 8. The service's half: test/net/serpent/serpentset_service.test.js.
+// source (scenes/world.js, net/serpent/serpentClaims.js). Design:;
+// The service's half: test/net/serpent/serpentset_service.test.js.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -118,7 +117,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
     }
   }
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], 0)), 'Under 35%: shed skin, heal 10%');
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+8% per hit on a foe, up to 5');   // PIN MOVED (AUDIT 625 P3): each foe its own coil
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+8% per hit on a foe, up to 5');
 });
 
 test('SERPENT-SET the records: nine in the places\' order - the seven body pieces, a kite shield and a ONE-HANDED Katana (so all nine are worn at once) - Ebony, the set\'s own; every affix at the Legendary band\'s middle (over a town\'s thanks, under the Warden), the blow the band\'s middle too; never a frost resistance and one resistance of an element at most; AETHERIC_RECORDS the Regalia, the raids\' and then these (mutants: a number off the middle; a frost piece; the make; the order)', () => {
@@ -199,16 +198,14 @@ test('SERPENT-SET the hoard: every hoard - a ship that dealt and one that stood 
     assert.equal(list[list.length - 2].item, ember[0].item, 'the embers just before it');
   }
   // the seed's own, pinned whole: a dealer's seed 2 at level 12 - the hoard's own two, the broadsword carrying CAST-SPEED's
-  // line off its last pass (PIN MOVED (CAST-SPEED): that draw moved the Coilscale roll after it, which found Constrictor's
+  // line off its last pass (
   // Grip before; seed 12345 at level 20 finds the set piece now - serpent1_client's hoard pin)
-  // PIN MOVED (AFFIX-LINES, 2026-10-25): every line drawn over the lines moved seed 2's stream - its broadsword takes no
   // last-pass line now and its amulet Strength where carrying capacity ("Porter's Amulet") was - so the pin's shape,
   // a Rare piece's last-pass line and then its technique as the hoard's last draw, is seed 6's
   const h = rollSerpentSpoils(6, 12, 'dealt');
   assert.deepEqual([h.gold, h.pieces.map((p) => [p.item.name, p.tier])], [1940, [
     ["Warrior's Flail of Skill", 'rare'], ['Torc of Warding', 'magic'],
   ]]);
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the hoard's very last draw, after the
   // gem arc's - this seed's broadsword rolls Leap Strike there, its line after the last pass's
   assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 10 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
   assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 18 }, 'TECH1: and the technique\'s, last');
@@ -256,7 +253,6 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   assert.equal(coiledFoe(10), RAT);
   assert.equal(swing(e, s, WOLF), 100, 'another foe: its own coil, nothing yet');
   assert.equal(coiledFoe(10), WOLF, 'the states say the foe struck last');
-  // PIN MOVED (AUDIT 625 P3, Mac: "A coil per foe"): the first foe's coil was let go - it is its own now, and holds
   assert.equal(swing(e, s, RAT), 115, 'the first foe keeps its own five');
   at(10 + COIL_SECONDS - 0.01);
   assert.equal(coilStacks(), COIL_STACKS, 'held to the window\'s end');

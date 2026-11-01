@@ -1,8 +1,8 @@
-// SEAT2b part two (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS AT PEACE AS THE SERVICE KEEPS
+// SEAT2b part two: THE WORKS AT PEACE AS THE SERVICE KEEPS
 // THEM - a Siegewright's project a day sooner; the Shrine's 50 a gate felled in the region to its holder, at the board
 // and at the Turning, and its Standing a week; the Watchtowers' word to the holder's members alone; the crafting halls'
 // steps for the holder's members crafting in its town; the Ram Kit made into the Stores and carried by a Siege Camp's
-// writ alone; each seat's works on the seats' list (bible/11-Multiplayer/Seats-Arc.md 7.5; Professions-Arc 3.3, 4.8;
+// writ alone; each seat's works on the seats' list (7.5; Professions-Arc 3.3, 4.8;
 // server-account/src/seatForts.js, seatInfluence.js, seatTurning.js, professions.js, writs.js). Driven through the real
 // Worker over node:sqlite with every migration applied (test/accountDb.mjs). `06-Systems/Online-Arc.md` SEAT2b part two.
 import { test } from 'node:test';
@@ -97,7 +97,7 @@ test('SEAT2b part two THE SIEGEWRIGHT\'S PROJECT: begun by a Siegewright, a met 
   const sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
   s.hold(ANTICLERE, sh.gid);
   s.treasury(sh.gid, 20_000);
-  s.setXp(sh.gm, 'building', xpForRank(100), { spec100: 'siegewright' });  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.setXp(sh.gm, 'building', xpForRank(100), { spec100: 'siegewright' });
   s.stock(ANTICLERE.key, 'stone:cut', 400);
   s.stock(ANTICLERE.key, 'plank:oak', 100);
   const a = await s.fund(sh.gm, ANTICLERE.key, 'walls');
@@ -119,7 +119,7 @@ test('SEAT2b part two THE SIEGEWRIGHT\'S PROJECT: begun by a Siegewright, a met 
   assert.deepEqual([b.body.tier, b.body.siegewright], [2, false]);
   assert.equal(b.body.forts.works.walls.standsAt, T0 + DAY + 4 * DAY);
   // a Siegewright's project building when the seat is taken: cleared with it
-  s.setXp(off, 'building', xpForRank(100), { spec100: 'siegewright' });  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.setXp(off, 'building', xpForRank(100), { spec100: 'siegewright' });
   assert.equal((await s.fund(off, ANTICLERE.key, 'shrine')).status, 200);
   assert.equal(s.raw.prepare("SELECT siegewright FROM town_seat_forts WHERE key = ? AND work = 'shrine'").get(ANTICLERE.key).siegewright, 1);
   const db = s.svc.env.DB;
@@ -210,7 +210,7 @@ test('SEAT2b part two THE CRAFTING HALLS: a holder\'s member crafting in its tow
   assert.equal(await craft(stranger, 'longsword:mithril', ANTICLERE.key), 0, 'not the holder\'s');
   assert.equal(await craft(smith, 'longsword:mithril', ASHFIELD.key), 0, 'a town the guild does not hold');
   assert.equal(await craft(smith, 'longsword:mithril', -1), 0, 'a bad word is none');
-  s.setXp(smith, 'building', xpForRank(recipeById('chair:oak').rank));  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.setXp(smith, 'building', xpForRank(recipeById('chair:oak').rank));
   assert.equal(await craft(smith, 'chair:oak', ANTICLERE.key), 1, 'the Workshop at tier 1: a carpenter\'s step');
   s.raw.prepare("DELETE FROM town_seat_forts WHERE key = ? AND work = 'workshop'").run(ANTICLERE.key);
   assert.equal(await craft(smith, 'chair:oak', ANTICLERE.key), 0, 'the Forge steps no carpenter');
@@ -219,7 +219,7 @@ test('SEAT2b part two THE CRAFTING HALLS: a holder\'s member crafting in its tow
 test('SEAT2b part two THE RAM KIT MADE: at Carpentry 60, its 40 Oak Planks, 20 Iron Ingots and 4 Bear Hides spent - the kit into the Stores (own, or bought where a bought unit went in), never a piece; refused where its Stores are full, nothing spent; the origin read in the kit\'s own write (AUDIT PROF-541 R2-S5) (mutants: the Stores; the origin; the room)', async (t) => {
   const s = await stood(t);
   const mac = await s.svc.seated('Mac');
-  s.setXp(mac, 'building', xpForRank(60));  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.setXp(mac, 'building', xpForRank(60));
   const inputs = (plankOrigin = 'own') => { s.give(mac, 'plank:oak', plankOrigin, 40); s.give(mac, 'ingot:iron', 'own', 20); s.give(mac, 'hide:bear', 'own', 4); };
   const craft = async () => (await s.svc.call('/v1/prof/craft', { character: mac.character, recipe: 'ramkit:oak', clean: false, name: null, rid: rid() }, mac.secret));
   inputs();

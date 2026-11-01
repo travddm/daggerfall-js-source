@@ -1,11 +1,9 @@
-// LR1-LR3 - LOOT RARITY (2026-09-14, Mac: "building on unleveled loot.
-// My goal is to transform things into a diablo style system with
-// rarity ... Make this the most detailed and best that it can be").
+// LR1-LR3 - LOOT RARITY.
 //
 // The port's own item ladder over Daggerfall's loot
 // (src/systems/loot/lootRarity.js): Common, Magic, Rare, Legendary, with
 // DFU's artifacts as the ceiling. An ENHANCED row, ON by default
-// (LR5, 2026-09-15, Mac: "I want to mod on by default") and forced on
+// (LR5, 2026-09-15) and forced on
 // online. The laws pinned here:
 //   - OFF IS DFU EXACTLY: no field written, no read moved, no tint.
 //   - ONE LADDER: every enchanted item derives Magic, an artifact is
@@ -18,8 +16,7 @@
 //     enchantment and so drops unidentified under tradeModes'
 //     itemIsIdentified; a Magic with numbers only reads at once.
 //   - FOUR HOSTS: every list the hosts mint rolls at its source.
-//   - AUDIT-LR (2026-09-15, Mac: "audit the loot rarity mod and
-//     ensure its working properly for both offline and online"):
+//   - AUDIT-LR:
 //     THE LADDER SURVIVES THE WIRE. Online is the lane that forces
 //     the switch on for everyone, so a rolled item crosses it twice
 //     - as a room's word about a container (WORLD4/WORLD6a: the
@@ -92,7 +89,6 @@ test('LR5: the switch - ON by default (the ladder is the port\'s own game), forc
   // turns it red for nothing. The claim is that the note names the three tiers in
   // order, not that it punctuates them a particular way.
   assert.match(row.note, /Magic\b[\s\S]*Rare\b[\s\S]*Legendary\b/, 'the note names the ladder, in order');
-  // PIN MOVED (AUDIT UPDATE L8): LOOT-GATE holds the top tiers back by the roller's level - the note says so in its own
   // words and never its numbers (CLAUDE.md LOOT-GATE: no level, factor or chance in anything a player reads)
   assert.match(row.note, /what you killed, where, and your luck/, 'and the source law');
   assert.match(row.note, /rarer early on and becomes more common as you grow/, 'and the gate, in the words it may be told in');
@@ -150,7 +146,7 @@ test('LR1: the odds follow the SOURCE - monotone in tier, luck and boss, capped,
   const top = LR.rarityChances({ kind: 'pile', tier: 21, boss: true, luck: 100 });
   assert.deepEqual(top, { magic: LR.RARITY_WEIGHTS.magic.cap, rare: LR.RARITY_WEIGHTS.rare.cap, legendary: LR.RARITY_WEIGHTS.legendary.cap }, 'the caps hold at the ceiling');
   assert.ok(top.legendary <= top.rare && top.rare <= top.magic, 'the ladder never inverts');
-  // LOOT13 (bible/06-Systems/Loot-II-Arc.md section 5): luck MULTIPLIES now - luck 0 halves the floor, it never zeroes it
+  // LOOT13: luck MULTIPLIES now - luck 0 halves the floor, it never zeroes it
   // (an additive 2 per mille a point took a Legendary's whole threshold away at Luck 44, and the drought's x3 with it)
   assert.deepEqual(LR.rarityChances({ kind: 'corpse', tier: 0, luck: 0 }), { magic: 50, rare: 7.5, legendary: 0.5 }, 'LOOT13: luck 0 at tier 0 finds half the floor');
   // the roll: one draw in [0, 1000), highest tier first
@@ -168,13 +164,13 @@ test('LR1: the odds follow the SOURCE - monotone in tier, luck and boss, capped,
 });
 
 test('LR2: the affix kinds - six, each banded per tier, each with a word for the name and a line for the tooltip', () => {
-  // LOOT4 (bible/06-Systems/Loot-Arc.md section 6): the six numbers LR1 shipped, and five that DO something after them
-  // LOOT14 (bible/06-Systems/Loot-II-Arc.md section 6): and the wardrobe's own three, after every kind before them
+  // LOOT4: the six numbers LR1 shipped, and five that DO something after them
+  // LOOT14: and the wardrobe's own three, after every kind before them
   assert.deepEqual(LR.AFFIX_IDS.filter((id) => !LR.AFFIX_KINDS[id].proc), ['damage', 'armor', 'weight', 'stat', 'resist', 'skill', 'standing', 'warmth', 'dry']);
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): a weapon's technique is a kind after every kind, and in no pool - never
+  // TECH1: a weapon's technique is a kind after every kind, and in no pool - never
   // drawn by the numbers' pass, the proc line, the Exalted, a curse or the Reforge (its door's own pass)
   assert.deepEqual(Object.keys(LR.AFFIX_KINDS).filter((id) => !LR.AFFIX_IDS.includes(id)), ['technique']);
-  assert.deepEqual(LR.AFFIX_IDS.filter((id) => LR.AFFIX_KINDS[id].proc), ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring']);   // CAST-SPEED: after every kind before it; PIN MOVED (BAL9c): the caster's two after it
+  assert.deepEqual(LR.AFFIX_IDS.filter((id) => LR.AFFIX_KINDS[id].proc), ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring']);   // CAST-SPEED: after every kind before it
   for (const id of LR.AFFIX_IDS) {
     const k = LR.AFFIX_KINDS[id];
     assert.ok(['prefix', 'suffix'].includes(k.slot));
@@ -219,7 +215,6 @@ test('LR2: rollAffixes - the count per tier, no kind or param repeated, only the
           else assert.equal(a.param, undefined);
         }
         if (tier === 'rare') {
-          // PIN MOVED (AFFIX-LINES, 2026-10-25: carrying capacity on four Rare pieces in five - the last pick held to the
           // empty slot, and a jewel's one prefix is it): no slot forced - a suffix always (no group has three prefixes to
           // give), a prefix as the lines fall
           assert.ok(has(out, 'suffix'), 'a Rare has a suffix');
@@ -490,11 +485,11 @@ test('LR3: the Test Room\'s loot ladder - one door, thirty items (a Magic and a 
   assert.equal(LR.lootRarityOn(), true, 'the door turns the ladder on');
   // LR6: the ladder, plus the unidentified pair - one Rare and one
   // Legendary left on the floor's own reading.
-  assert.equal(added.length, 20 + LR.LEGENDARIES.length + 2 + AETHERIC_RECORDS.length + 1 + 4 + LR.WARDROBE_LEGENDARIES.length + 2 + 2 + 2 + 1 + 4 + 1 + TECHNIQUE_IDS.length + LR.ARCANE_LEGENDARIES.length + 2);   // PIN MOVED (guns removed): -2, the Hourlock and its shot gone from the room; PIN MOVED (GILDED2): and the world's two Gilded, last; PIN MOVED (BAL9c): and the arcane three; LOOT2: and one Exalted; LOOT14/LOOT15: the wardrobe's two bases at two tiers and its six; LOOT16: a cursed Rare and a cursed Legendary; LOOT20: a socketed Rare and a Ruby; LOOT21: the two Ayleid stones; GEM1/GEM2: a three-socket Rare bow and four graded gems; TRUE-CURSE (PIN MOVED): a damned Legendary weapon   // PIN MOVED (TECH1): and one Rare a weapon technique
+  assert.equal(added.length, 20 + LR.LEGENDARIES.length + 2 + AETHERIC_RECORDS.length + 1 + 4 + LR.WARDROBE_LEGENDARIES.length + 2 + 2 + 2 + 1 + 4 + 1 + TECHNIQUE_IDS.length + LR.ARCANE_LEGENDARIES.length + 2);
   assert.deepEqual(added.filter((i) => i.rarity === 'gilded').map((i) => i.gilded), ['the-dragonfire-oath', 'the-sunken-sovereign'], 'GILDED2: the world\'s two, whole (GILDED1\'s Hourlock went with the guns)');
   assert.deepEqual(added.filter((i) => i.rarity === 'aetheric').map((i) => i.aetheric), AETHERIC_RECORDS.map((r) => r.id), 'SET6: the nine Regalia pieces, once each; RAID4b: then the raids\' twenty-seven');
   assert.equal(added.filter((i) => i.rarity === 'magic').length, 12);   // LOOT14: and the wardrobe's two
-  assert.equal(added.filter((i) => i.rarity === 'rare').length, 16 + TECHNIQUE_IDS.length);   // LOOT16: and the cursed one; LOOT20: and the socketed one; GEM1: and the three-socket bow; PIN MOVED (TECH1): and one a weapon technique
+  assert.equal(added.filter((i) => i.rarity === 'rare').length, 16 + TECHNIQUE_IDS.length);   // LOOT16: and the cursed one; LOOT20: and the socketed one; GEM1: and the three-socket bow
   const legs = added.filter((i) => i.rarity === 'legendary' && i.isIdentified && !i.exalted && !i.cursed);   // LOOT2: the Exalted is the room's one extra; LOOT16: and the cursed one
   assert.deepEqual(legs.map((i) => i.legendary).sort(), [...LR.LEGENDARIES, ...LR.WARDROBE_LEGENDARIES, ...LR.ARCANE_LEGENDARIES].map((l) => l.id).sort(), 'every record once - LOOT15: the wardrobe\'s six too; BAL9c: and the arcane three');   // PIN MOVED (BAL9c)
   for (const it of legs) { const rec = LR.legendaryById(it.legendary); assert.ok(!rec.templates || rec.templates.includes(it.templateIndex), `${rec.id} on a fitting base`); }
@@ -504,8 +499,6 @@ test('LR3: the Test Room\'s loot ladder - one door, thirty items (a Magic and a 
 
 // ═══ LR6: THE SHOWCASE SHOWS ══════════════════════════════════════
 //
-// (2026-09-15, Mac: "when I open the loot test character, nothing on
-// the character has rarity in the inventory.")
 //
 // It was all there - and two thirds of it was INVISIBLE, by DFU's own
 // law working exactly as ported. A Rare and a Legendary carry a real
@@ -707,7 +700,7 @@ test('AUDIT-LR: OFF is still DFU exactly on both sides of the wire - the fields 
   // A player who rolled online and plays offline with the switch off keeps the item and its name
   // (the feature's own copy says so) - and folds NOTHING from it.
   on();
-  const online = LR.applyRarity(cuirass(), 'rare', lcg(293));   // PIN MOVED (AFFIX-LINES): seed 17's piece moved and drew carrying capacity's DFU flavour, which folds off as DFU's own - 293 carries the armour, Strength and carrying-capacity lines that must rest
+  const online = LR.applyRarity(cuirass(), 'rare', lcg(293));
   assert.ok(['armor', 'weight'].every((id) => online.affixes.some((a) => a.id === id)) && online.affixes.some((a) => a.id === 'stat' && a.param === 'strength'), 'the lines that must rest');
   const crossed = validLootList(JSON.parse(JSON.stringify([online])))[0];
   off();

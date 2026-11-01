@@ -1,5 +1,4 @@
-// REALM P1.3-P1.5 (2026-09-28, Mac: "A true separation while allowing people to still play offline"; decisions 1-3;
-// bible/06-Systems/Realm-Arc.md): THE DOOR, THE BOOT AND CUSTOMS.
+// REALM P1.3-P1.5: THE DOOR, THE BOOT AND CUSTOMS.
 //   P1.3 - the Online door lists the realm's characters; its Play boots ?online&load&realm=<id>, and the boot joins the
 //          character and reads its save from the service - never a local slot. Every save of a realm character is the
 //          service's checkpoint (the composers' sink), a lost lease takes the player to the door with the reason, and a
@@ -174,7 +173,7 @@ test('REALM P1.3: a notice crosses the reload once; the boot\'s address carries 
   assert.equal(takeRealmNotice(s), null, 'once');
   assert.equal(takeRealmNotice(null), null);
   const q = new URLSearchParams(realmBootSearch('?online=1&loadkey=4&test=x&classic=1&keep=1', 'r' + 'b'.repeat(20), BOOT_DOOR_KEYS));
-  // REALM-BIRTH (FIELD BUGS 2026-09-30, PIN MOVED): the address is the Online door's Play - its classic start set again, and
+  // REALM-BIRTH (FIELD BUGS 2026-09-30
   // `world`, the scene door main.js boots the world host on; without one a born character's reload was the front door's
   assert.deepEqual(Object.fromEntries(q), { keep: '1', online: '1', load: '1', realm: 'r' + 'b'.repeat(20), classic: '1', world: '1' }, 'no stale door key rides in');
   assert.ok(BOOT_DOOR_KEYS.includes('realm') && BOOT_DOOR_KEYS.includes('realmnew'));

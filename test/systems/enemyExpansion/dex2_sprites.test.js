@@ -1,4 +1,4 @@
-// DEX2 (bible/04-Characters/Enemy-Expansion.md section 6): DAGGERFALL ENEMY EXPANSION'S SPRITES ON THE TEXTURE DOOR - every
+// DEX2: DAGGERFALL ENEMY EXPANSION'S SPRITES ON THE TEXTURE DOOR - every
 // picture the tables draw registered from its one place (the authors' own, the fourth exception's repaints, or rebuilt
 // from the player's files), a stand-in's frames the registry's, the xml's scale ungated on a stand-in, a frame's
 // emission map beside it, and DFU's two import rules held of the data.

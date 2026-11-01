@@ -1,9 +1,9 @@
 // @ts-check
-// MWNPC9 (2026-10-09, the MW-NPC arc's ninth slice - bible/04-Characters/Morrowind-NPCs.md section 14b): DAGGERFALL'S
+// MWNPC9: DAGGERFALL'S
 // CREATURES, MATCHED TO MORROWIND'S. Every creature mobile (characters/mobile/mobileTypes.js, 0-42) is either matched to the
 // Morrowind creature that stands for it - an ordered list of CREA ids, the first the attached masters carry building
 // its body (combat/fpArm.js buildCreatureBody) - or a DECLARED MISS with its reason, keeping its Daggerfall sprite. The
-// ids are the records' own, read off UESP's creature tables (2026-10-09), never recalled: Morrowind.esm's, Tribunal's
+// ids are the records' own, read off UESP's creature tables, never recalled: Morrowind.esm's, Tribunal's
 // (lich) and Bloodmoon's (BM_spriggan, BM_bear_black, bm_frost_giant, draugr); a master that lacks one refuses the
 // build and the sprite stands, as for any refused body.
 import { MOBILE_TYPES as M } from './mobile/mobileTypes.js';
@@ -65,7 +65,7 @@ export const CREATURE_MATCH = Object.freeze({
   [M.Lamia]: { miss: 'no lamia' },
 });
 
-/** MWNPC13 (bible/04-Characters/Morrowind-NPCs.md section 18): A SPECTRAL'S VEIL - its body drawn translucent through
+/** MWNPC13: A SPECTRAL'S VEIL - its body drawn translucent through
  *  the lanes' veiled pass (INVIS-LOOK: blended after the opaque world, ECV1's record) at the opacity Daggerfall's own
  *  spectral sprite is drawn (BaseImageFile.SPECTRAL_ALPHA of 255 - dataPipeline.js's spectral arm): mode 3, no tint, no
  *  clock. A look carries it, so every lane standing the look veils it (characters/npcBodies.js `stand`). */
@@ -76,7 +76,7 @@ const lookOf = (m) => Object.freeze({ creature: Object.freeze([...m.creature]), 
 /** The looks, one a mobile type. */
 const LOOKS = new Map(Object.entries(CREATURE_MATCH).filter(([, m]) => m.creature).map(([t, m]) => [Number(t), lookOf(m)]));
 
-/** DEX7 (bible/04-Characters/Enemy-Expansion.md section 10): A MOD'S CREATURES, matched by the classic table's law - a
+/** DEX7: A MOD'S CREATURES, matched by the classic table's law - a
  *  mod that adds monsters past the classic ids (characters/enemy/enemyBasics.js registerEnemyRows) registers a row for
  *  each here, a match or a declared miss, and creatureLook reads them after the classic table. CREATURE_MATCH stays the
  *  census of DFU's own; a mod names only its own mobiles. A row is refused where the classic table's audits would refuse

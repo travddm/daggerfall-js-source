@@ -1,5 +1,5 @@
 // @ts-check
-// A NODE'S ROWS HANDED OVER (bible/11-Multiplayer/Scale-Arc.md, COST-2). When the cell tree moves - a node split into its
+// A NODE'S ROWS HANDED OVER (, COST-2). When the cell tree moves - a node split into its
 // four children, or four siblings merged into their parent - what the departing node stores goes to the nodes that hold
 // it now, by pixel (net/cellTree.js partitionRows), before its sockets are closed. Every key a node can hold has a class:
 //   part  - addressed by a pixel, so partitioned by the receiving nodes' squares: the parked teams (`park:`) and the

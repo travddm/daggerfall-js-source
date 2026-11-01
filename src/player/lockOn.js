@@ -1,6 +1,4 @@
-// TI1 - LOCK-ON: the touch layer's targeting (Mac, 2026-09-05: "touch
-// to lock on to enemy using a dark souls like dot over your targeted
-// foe"). NO DFU ORIGINAL. Daggerfall Unity has no lock-on and no touch
+// TI1 - LOCK-ON: the touch layer's targeting. NO DFU ORIGINAL. Daggerfall Unity has no lock-on and no touch
 // input at all - zero Input.touch / TouchPhase reads anywhere under
 // Assets/Scripts/Game - so this is the port's own, recorded in the
 // Ledger's section A (MOBILE TOUCH INPUT, TI1).

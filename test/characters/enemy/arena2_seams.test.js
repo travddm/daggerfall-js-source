@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02): THE TWO SEAMS THE FIGHTERS NEED, AND THE CITY'S PEACE. (1) THE BOUT TEAM - an isolation seam
+// ARENA2: THE TWO SEAMS THE FIGHTERS NEED, AND THE CITY'S PEACE. (1) THE BOUT TEAM - an isolation seam
 // beside the camp's in the targeting law (characters/enemy/enemyTargets.js boutGate): a bout's fighters target only each
 // other across their sides, whatever their kinds and whatever the infighting setting; nobody outside the bout joins it;
 // a fighter takes the player only when the player is its bout's opponent; nobody is a target before the word or once

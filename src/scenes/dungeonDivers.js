@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW6 (2026-10-05, bible/06-Systems/Living-World.md): THE DIVERS MET - a party of the living world's adventurers inside
-// the dungeon the player is in. Mac: "You can find them dungeon diving, make friends or enemies".
+// LW6: THE DIVERS MET - a party of the living world's adventurers inside
+// the dungeon the player is in..
 //
 // A dive is pure (systems/livingWorld/trips.js diveTrip, diversAt): every reader's world holds the same company in the
 // same dungeon for the same hours, and the deep's fated end (trouble.js diveTrouble). A player in that dungeon during
@@ -20,7 +20,7 @@
 // none hostile, its ENEMIES keep away (no word for the player, no blade beside them) and the rest stand with the player;
 // a company all enemies passes the player by.
 //
-// LW14 (2026-10-09, bible/06-Systems/Living-World-II.md "LW14"): THE DEEP'S OWN. Where the dungeon's stops are known
+// LW14: THE DEEP'S OWN. Where the dungeon's stops are known
 // (`route` - systems/livingWorld/deepRoute.js: the company's way through its rooms), a company is MET WHERE ITS ROUTE
 // HAS IT, not behind the player: stood about its stop (or the floor between two) once the player is within DEEP_NEAR_M
 // of it, or within DEEP_SEE_M with a clear line - and HOLDING there, fighting what it fights (a classic motor walks no

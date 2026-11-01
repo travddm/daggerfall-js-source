@@ -14,7 +14,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createSpawnLedger, GENERAL_TTL_MINUTES, CLEARED_TTL_MINUTES } from '../../src/world/spawnedDungeons.js';
 
-// PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the two left world.js - tvSpawnGone for scenes/spawnGroundHost.js,
 // _locationToBuild for scenes/spawnStandHost.js - their live names read through `host`
 const W = ['../../src/scenes/spawnGroundHost.js', '../../src/scenes/spawnStandHost.js'].map((p) => readFileSync(new URL(p, import.meta.url), 'utf8')).join('\n');
 const lift = (re, what) => { const m = re.exec(W); assert.ok(m, `${what} moved`); return m[1]; };
@@ -27,10 +26,9 @@ function host() {
   const built = new Map();
   const env = { clock: 0, inside: null };
   // eslint-disable-next-line no-new-func
-  // PIN MOVED (ETHER-PLACES): the builder answers an Eltheric pixel by its isle first (world.js etherPlaceAt) - with the
   // Eltheric Ocean off (`etherSea` false) it never asks, and the Bay's pixels are this pin's
   const make = new Function('_spawnLedger', '_spawnClock', '_insideSpawn', 'built', 'locationIndex', 'spawnedDungeonAt', 'bump',
-    `const etherSea = false; const _arenaTemplates = null; const _countryTemplates = null; const _capitalBase = null; let _locIndexGen = 0; const host = { built, _spawnClock, get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; } }; ${GONE}\n${TO_BUILD}\nreturn { tvSpawnGone, _locationToBuild };`);   // PIN MOVED (TESA2): Arena's places off too - the Bay's pixels are this pin's; PIN MOVED (TESA7): and the countryside past it
+    `const etherSea = false; const _arenaTemplates = null; const _countryTemplates = null; const _capitalBase = null; let _locIndexGen = 0; const host = { built, _spawnClock, get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; } }; ${GONE}\n${TO_BUILD}\nreturn { tvSpawnGone, _locationToBuild };`);
   const fns = make(ledger, () => env.clock, (key) => key === env.inside, built, locationIndex, () => null);
   /** the pixel built (world.js buildPixel: `location: dfLocation ? dfLocation.name : null`) */
   const build = (px, py) => { const loc = fns._locationToBuild(px, py); built.set(`${px},${py}`, { location: loc ? loc.name : null }); return loc; };

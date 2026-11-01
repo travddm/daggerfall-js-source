@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -48,7 +48,7 @@ export function createHarbourHost(host) {
     // (systems/naval/harbourKeep.js)
     return _navalHarbourAt.towns.map((t) => { const h = harbourOf(t, { state, built: csaPixelAt, woods: host.woods }); return { ...h, keep: harbourKeep(t.loc, h.rect) }; });
   };
-  // HARBOUR-BOOK (systems/naval/harbourBook.js; bible/03-World/Holdings.md section 7): THE HARBOURS NEAR THE PLAYER -
+  // HARBOUR-BOOK (systems/naval/harbourBook.js): THE HARBOURS NEAR THE PLAYER -
   // this host's, sounded off the port near the player every exterior frame whatever runs on the water, moved with the
   // floating origin and emptied at a transition, a jump and a load; the quays stand off it and the naval host reads it.
   // It was the naval host's own and sounded only in its frame: with Naval Combat or Come Sail Away off, no port stood a quay.

@@ -1,5 +1,4 @@
-// RESTORE C (2026-09-29, Mac: "I want people to get their stuff back"; of the homes a deleted customs character took
-// with it: "To the offline character"). The houses, pieces, hidden lists, guild places and tracks the door's Delete took
+// RESTORE C. The houses, pieces, hidden lists, guild places and tracks the door's Delete took
 // with a customs character - between CUSTOMS-CARRY and HOUSE-LOSS - exist only in D1's history. The operator's workflow
 // (.github/workflows/realm-restore.yml) reads a snapshot from before the loss and the database as it stands, and
 // tools/realmRestore.mjs plans them back. These pins build both over the REAL migrations, run the plan, apply its SQL to

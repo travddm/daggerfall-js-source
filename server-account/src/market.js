@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET, AS THE SERVICE KEEPS
+// PROF5 - THE MARKET, AS THE SERVICE KEEPS
 // IT: listings of Stores materials and crafted pieces, their sales and
 // couriers, buy orders and their fills, the prices' history, reports and
-// removal (bible/06-Systems/Professions-Arc.md 10.2-10.5 and 26; the
+// removal (10.2-10.5 and 26; the
 // numbers are src/net/marketLaw.js, which the client reads too).
 //
 // ═══ OPEN WHERE THE BOARD, THE PROFESSIONS AND THE MARKS ARE ═══════
@@ -300,7 +300,7 @@ const orderView = (o, me) => ({
  * (where there is room). One row a batch; SETTLE_MAX rows a read.
  */
 /**
- * MARKET-SPEED (2026-10-11, Mac: "look at ... how the server affects it/slows down, same with the market"): WHAT A SETTLE
+ * MARKET-SPEED: WHAT A SETTLE
  * READS, AS STATEMENTS - whether a listing or an order is past its time (SCALE4b), and each row it would settle: the
  * listings' goods back, the auctions back, the bids' escrow, the orders' escrow, the couriers' loads. They were six round
  * trips in a row on every market read, nearly always all empty; a read sends them in its first batch (marketRead), and a
@@ -340,7 +340,7 @@ async function settle(ctx, player, read = null) {
   const touched = new Set();
   // MARKET-SPEED: the reads one batch (settleReads) - or the read's own first batch's, handed in
   let [due, back, unsold, outbid, shutOrders, loads] = read ?? await readAll(db, settleReads(db, me, nowS));
-  // SCALE4b (2026-10-08): ASKED BEFORE IT IS WRITTEN. Both updates went on every market read, nearly always changing
+  // SCALE4b: ASKED BEFORE IT IS WRITTEN. Both updates went on every market read, nearly always changing
   // nothing - two writes on the market's every look, which a read replica can never serve. One read says whether any
   // of the account's listings or orders is past its time; only then do the same two updates go, word for word (a race
   // that closes one meanwhile leaves its update nothing to change, as before). MARKET-SPEED: the rows they close read
@@ -528,7 +528,7 @@ export async function closeAuctions(ctx, read = null, env = null) {   // DOMAIN3
 }
 /**
  * THE MARKET'S HISTORY KEPT MARKET_KEEP_DAYS (section 20: 90 days) - every price and fill past it, and every listing,
- * order, delivery, bid and auction long closed and settled (and, LW15, every patron's sale). SCALE4b (2026-10-08): the
+ * order, delivery, bid and auction long closed and settled (and, LW15, every patron's sale). SCALE4b: the
  * service's clock's (server-account/src/cron.js, each hour); the History view pruned first, nine writes on a read. AUDIT
  * SCALE A5: each table's delete takes `rows` at most, and the clock asks again while one took a full page - one
  * unbounded batch, a backlog's worth, could outrun D1's thirty seconds a batch, roll back, and only grow (the auctions'
@@ -663,7 +663,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   if (!MARKET_VIEWS.some(([v]) => v === view)) return { error: 'bad-act' };
   if (!currencyOk(currency)) return { error: 'bad-act' };   // GOLD-MARKET: the Materials and Crafted views show one currency at a time
   const me = player.id;
-  // MARKET-SPEED (2026-10-11, Mac: "look at ... how the server affects it/slows down, same with the market"): A READ IS
+  // MARKET-SPEED: A READ IS
   // THREE ROUND TRIPS - its settle's reads and the auctions past their end (one batch), the view's rows and the account's
   // own (a second), and what the rows ask after: their couriers' hubs, their medians, a moderator's reports (a third).
   // It was eighteen to twenty-two, one after another, every one the whole way to the database's primary and back.
@@ -1147,7 +1147,7 @@ async function listGood(ctx, player, env, { character, region, item, pick, price
   const closed = shut(player, env);
   if (closed) return closed;
   // HOME-VENDOR: a piece stocked at the seller's own trader - its home's region the listing's, its stall its only door.
-  // ACCOUNT-HOMES (2026-10-06): a trader of a home of the seller's ACCOUNT, any character of it (homes.js; a hall's none)
+  // ACCOUNT-HOMES: a trader of a home of the seller's ACCOUNT, any character of it (homes.js; a hall's none)
   const vend = vendor == null ? null : vendorOf(vendor);
   if (vendor != null && !vend) return { error: 'bad-vendor' };
   if (vend) {
@@ -2212,7 +2212,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
   const closed = shut(player, env);
   if (closed) return closed;
   if (!regionOk(region)) return { error: 'bad-region' };
-  // VENDOR-BOARD (2026-10-19; bible/11-Multiplayer/Scale-Arc.md VENDOR-BOARD; migration 0137): THE REGION'S BOARD, EVERY
+  // VENDOR-BOARD: THE REGION'S BOARD, EVERY
   // CALLER'S ALIKE, IS ONE ROW (vendorBoard), and the caller's own door - its own house, its guild's, a room it rents -
   // is read off two of its own rows, where the board's two statements asked them of every listing
   // AUDIT LEAN-READS D5: the caller's own rows read first - the board may keep its row last, and on a replica's session a
@@ -2224,7 +2224,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
       GROUP BY map_id, building_key`).bind(player.id, me, nowS),
   ]) : [null, null];
   const board = await vendorBoard(ctx, region);
-  // ACCOUNT-HOMES (2026-10-06): a house is its ACCOUNT's, so the door's guildmate is a guild shared with any character of
+  // ACCOUNT-HOMES: a house is its ACCOUNT's, so the door's guildmate is a guild shared with any character of
   // the owner's account - the accounts of the caller's guildmates, not their characters
   const mate = new Set((mates?.results ?? []).map((/** @type {any} */ m) => m.player));
   const rent = new Map((rooms?.results ?? []).map((/** @type {any} */ r) => [`${r.map_id}:${r.building_key}`, Number(r.until)]));
@@ -2249,9 +2249,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
 }
 
 /**
- * VENDOR-BOARD (2026-10-19, the account database overloaded again: the region's traders the read most asked again in
- * the 18:05 overload - 1,517 asks in five minutes where 330 was the rate; bible/11-Multiplayer/Scale-Arc.md VENDOR-BOARD;
- * migration 0137): THE REGION'S TRADERS AS EVERY CALLER READS THEM - `{ newest, houses, patrons }`, the rows the board's
+ * VENDOR-BOARD: THE REGION'S TRADERS AS EVERY CALLER READS THEM - `{ newest, houses, patrons }`, the rows the board's
  * three reads answer, before any caller's own door. Its kept row while it is its version's (the database moves it on
  * every trader listing, trader, trader's house and patron sale written - in a row of its own, AUDIT LEAN-READS 2 B3; no
  * such row, no board kept: B4), its shape's (these reads' and their bounds' - keptBoard.js) and the caller's second is
@@ -2262,7 +2260,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
  * is still the one it read, so a slow reader never puts an older board over a newer one, and only where no board kept
  * meanwhile serves its second or a later one already, so readers that missed together write it once (B2).
  *
- * PATRON-LOAD (2026-10-10, Mac: "the newest update account service keeps failing"): THE REGION'S READ RECKONS NOTHING.
+ * PATRON-LOAD: THE REGION'S READ RECKONS NOTHING.
  * Every online client standing in a living town reads it each PATRON_READ_S (scenes/world.js livingPatronsRead), and its
  * lazy reckoning - up to PATRON_READ_STATEMENTS statements a read - backed the database's writes up until D1 refused as
  * overloaded. The hour's cron reckons the towns waiting longest; a trader opened (/vendor) and a seller's own page
@@ -2335,7 +2333,7 @@ export function vendorBoardOf(/** @type {unknown} */ text) {
  * HOME-VENDOR: MY TRADERS - `{ character }`: the Vendor page's read (the pause window's, beside the Professions). Every
  * trader of this character's homes (where it stands), the pieces standing at them, the pieces they have SOLD (newest
  * first, while the market keeps the sale's listing), and the gold the sales hold to collect at any board.
- * ACCOUNT-HOMES (2026-10-06): the traders are the ACCOUNT's homes' (every character of it owns them); what stands at
+ * ACCOUNT-HOMES: the traders are the ACCOUNT's homes' (every character of it owns them); what stands at
  * them, what they sold and the gold held stay this character's - a listing is its seller character's goods.
  */
 export async function marketMyVendors(ctx, player, env, { character } = {}) {
@@ -2375,7 +2373,7 @@ export async function marketMyVendors(ctx, player, env, { character } = {}) {
   };
 }
 
-// ─── LW15: THE PATRONS (bible/06-Systems/Living-World-II.md "LW15") ─
+// ─── LW15: THE PATRONS ("LW15") ─
 
 /** The towns one firing of the hour's cron reckons (the rest the next, or their next read). */
 export const PATRON_CRON_TOWNS = 40;

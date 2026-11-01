@@ -1,4 +1,4 @@
-// FT5 - ENHANCED AI, THE ROW MOVES (2026-09-14, the Features arc).
+// FT5 - ENHANCED AI, THE ROW MOVES.
 //
 // The navmesh-driven enemy motor's switch (12-Enhanced-AI) left the
 // Enhanced category for the home. The audit found its words still true
@@ -25,8 +25,6 @@ test('FT5: the registry row - Enhanced only, over the pref, on by default (BAL4)
   const f = FEATURES.find((x) => x.id === 'enhanced-ai');
   assert.ok(f);
   assert.deepEqual(f.kinds, ['enhanced'], 'the port\'s own; DFU\'s EnhancedCombatAI is a different thing and wears no label here');
-  // PIN MOVED (TELL9: the row carries the telegraph contrast as its one part - the player's, online too)
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6: ON by default offline, as it always was online)
   assert.deepEqual(f.control, { store: 'prefs', key: 'enhancedAI', initial: true, online: true,   // RF4: the row declares its default and the lane's answer
     also: [{ store: 'prefs', key: 'telegraphContrast', initial: false, online: 'player' }], parts: [{ key: 'telegraphContrast', label: 'Telegraph contrast' }] });
   assert.equal(PREF_DEFAULTS.enhancedAI, true, 'BAL4: on by default - the classic motor one choice away');
@@ -40,7 +38,7 @@ test('FT5: the note says what ships and names what it is not', () => {
   assert.equal(f.note, 'Enemies take turns, back off when hurt, and archers keep their distance. Big attacks are marked on the '
     + 'ground: hit hard to stagger them or dodge. Red, hatched attacks can’t be stopped. Trees, rocks and crates block '
     + 'sight and missiles. Pathfinding works in dungeons only for now; towns, interiors and doors come later. Off keeps '
-    + 'the classic behavior.');   // PIN MOVED (PLAIN TEXT SWEEP): the note in plain words; DFU's "Smarter Enemies" stays unrowed below
+    + 'the classic behavior.');
   // ...and the DFU key it names IS unavailable, in Settings, under that label
   assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'unavailable');
   assert.equal(featureForControl('settings', 'Enhancements/EnhancedCombatAI'), null, 'not rowed on the home - a row for a feature the port does not run would be a lie with a switch');

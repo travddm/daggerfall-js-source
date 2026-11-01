@@ -1,8 +1,4 @@
-// BR1 - DAGGERFALL ENHANCED (2026-09-13, Mac: "I want to rebrand across
-// the board as Daggerfall Enhanced ... Daggerfall Enhanced / An
-// open-source reimplementation of The Elder Scrolls II: Daggerfall. We
-// need to tackle any javascript mention across the website, game, and
-// note this in the bible").
+// BR1 - DAGGERFALL ENHANCED.
 //
 // THE NAME HAD NO PIN AT ALL. The rebrand touched nine surfaces - the
 // landing page's title, wordmark and cards, the game page, the PWA
@@ -28,20 +24,12 @@
 // tree, so each is pinned as deliberately unchanged rather than left to
 // look like an oversight.
 //
-// BR4 - DAGGERFALL ONLINE (2026-09-27, Mac: "I want to rebrand Daggerfall:
-// Enhanced to Daggerfall Online across every surface of the game and
-// website. The logo attached is the new temporary logo ... (Don't forget
-// about the intro video also)"). The same surfaces again, pinned HERE
+// BR4 - DAGGERFALL ONLINE. The same surfaces again, pinned HERE
 // again: NAME below is the only line that says what the product is called,
 // and the old name is swept for in both its whole and its split forms.
 // The logo is Mac's own transparent cut, drawn with no blend mode.
 //
-// BR5 - DFO ONLINE (2026-10-11, Mac: "So next up I want to replace the current
-// daggerfall online logo anywhere it's present with this logo. I want to
-// comprehensively scan the repo, ingame, etc for any mentions of
-// daggerfall/daggerfall online and change it to DFO Online/DFO. We are
-// rebranding for our own sake and I want to do this right"; asked how far, he
-// chose to MINIMIZE the original game's name too). Three laws now, each
+// BR5 - DFO ONLINE. Three laws now, each
 // pinned below: the PRODUCT is DFO Online (DFO where a label is short); the
 // ORIGINAL GAME is named only where it must be - the files a player brings,
 // the credits and the licence, the trademark notice, and the world's own
@@ -98,11 +86,9 @@ test('BR1: no surface still says the old name', () => {
 });
 
 test('BR4: no surface still says the old name - whole, or split across a wordmark', () => {
-  // The BR1 sweep, for the name BR1 gave it. Case-sensitive, so Mac's
-  // lower-case "keep the daggerfall Enhanced title" (the landing page's
-  // and its test's quote of him) is no hit; the capitalised survivors are
-  // named below. The bible is the record of what the project was called
-  // when, and is not swept.
+  // The BR1 sweep, for the name BR1 gave it. Case-sensitive; the one
+  // capitalised survivor is named below. The bible is the record of what
+  // the project was called when, and is not swept.
   let hits = '';
   try {
     // Nor are the mutant records: a record's `new` is the old name ON
@@ -112,18 +98,12 @@ test('BR4: no surface still says the old name - whole, or split across a wordmar
   } catch (e) {
     assert.equal(e.status, 1, `git grep failed: ${e.stderr || e.message}`);
   }
-  // THE SURVIVORS ARE WORDS SOMEONE SAID OR WROTE DOWN AT THE TIME, each
-  // named: a player's Discord question (REL2), Mac's BR3 ruling as the
-  // landing test quotes it, and REL2's record of the file the release
-  // actually carried. None is a surface. (The patch notes announcing the
-  // rename were a fourth until REL6 took notes out of the tree. The sweep
-  // reads git's INDEX: the first run of this pin went green with those
-  // notes and br4.json on disk but not yet added, and red in CI on the
-  // commit that carried them.)
+  // THE SURVIVOR IS A RECORD, not a surface: REL2's note of the file name
+  // the release actually carried. It is matched by its text, not its line
+  // number, so a comment edit above it does not break the sweep. The sweep
+  // reads git's INDEX, so a file on disk but not yet added is not seen.
   const SAID = [
-    /^test\/tooling\/relwin1\.test\.js:[23]:\/\/ /,
-    /^test\/tooling\/relwin1\.test\.js:9:\/\/ `artifactName`, so both wrote DaggerfallEnhanced-<v>-win-x64\.exe/,
-    /^test\/ui\/enhanced\/landing\.test\.js:\d+:\s*\/\/ logo to the original Daggerfall Enhanced text"\)/,
+    /^test\/tooling\/relwin1\.test\.js:\d+:\/\/ `artifactName`, so both wrote DaggerfallEnhanced-<v>-win-x64\.exe/,
   ];
   const survivors = hits.split('\n').filter((l) => l && !SAID.some((re) => re.test(l))).join('\n');
   assert.equal(survivors, '', `the old name survives:\n${survivors}`);

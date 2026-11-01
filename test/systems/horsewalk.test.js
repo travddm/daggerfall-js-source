@@ -1,5 +1,4 @@
-// HORSE-WALK (2026-10-12, the owner: "when youre riding a horse, it walks by default and to gallop you must shift to
-// sprint, just like when you are walking as a character") - THE WALK (bible/06-Systems/Horse-Care.md THE WALK): horse
+// HORSE-WALK - THE WALK (THE WALK): horse
 // care's horse walks unless the run gallops it. The law (player/motor.js - the walk on DFU's walk base, its base for
 // IsMovingLessThanHalfSpeed, the gallop on the ride base as ever; systems/transport.js setRideWalk; systems/upkeep/upkeepRuntime.js
 // rideWalks), and everything that reads the gait: the riding sprite and its clop (systems/riding.js, player/mountRig.js),
@@ -9,7 +8,7 @@
 // Features row, the Horses tutorial and the four hosts.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (PIN MOVED): the upkeep is handed a tier's rules - these pins pin the system as it stood, Hard
+import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { PlayerMotor } from '../../src/player/motor.js';
@@ -212,7 +211,7 @@ test('HORSE-WALK x THE OVERWORLD (the owner: "Ensure the overworld speed isnt af
   m.transportMode = TRANSPORT_MODES.Horse;
   setCanRunOverride(null);
   setGallopGate((mode, mods) => upkeep.gallopGate(mode, mods));
-  // HORSE-TIERS (PIN MOVED): the panel reads the walk the motor TOOK, handed by the host's frame (saddleHost.motion's
+  // HORSE-TIERS (
   // `walk`, the motor's rideWalking) - so each step hands it, as the hosts do
   const step = (input) => { ride(m, input); saddle.motion(1 / 60, m.speed / 60, !!input?.run, m.rideWalking); };
   try {
@@ -285,7 +284,7 @@ test('HORSE-WALK THE 3D HORSE UNDER ITS RIDER: a slow ride (gallops false - the 
   rig.release(h);
   // the player's horse holds to the host's slow ride, a peer's to its pose's hs
   assert.match(rd('src/player/mwView.js'), /look: horse\.look \| 0, gallops: !horse\.slow \}\);/);
-  assert.match(rd('src/net/peer/peerBodies.js'), /look: shown\.rc \| 0, gallops: !shown\.hs, pose: false \}\);/);   // PIN MOVED (HORSE-VIEW): the gait alone stepped here - the pose waits for the rider's
+  assert.match(rd('src/net/peer/peerBodies.js'), /look: shown\.rc \| 0, gallops: !shown\.hs, pose: false \}\);/);
 });
 
 test('HORSE-WALK THE SADDLE PANEL SAYS IT: Walking where horse care walks the horse, Galloping on the run, Trotting at DFU\'s ride (care off, or on the road), Rolling on a bench, Standing still; the host reads the very walk the motor took (its rideWalking, handed by the host\'s frame - HORSE-TIERS, PIN MOVED: the motor alone knows a gallop asked and refused), and the panel draws it (mutants: HORSEWALK-saddle-trots, -saddle-cart-walks, -saddle-host-unread, -saddle-panel-unread)', () => {
@@ -321,7 +320,7 @@ test('HORSE-WALK THE HOSTS (world.js, exterior.js): the walk installed beside th
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(host);
     assert.match(s, /import \{ setGallopGate, setRideWalk \} from '\.\.\/systems\/transport\.js';/, host);
-    // HORSE-TIERS (PIN MOVED): the run asked rides with the question
+    // HORSE-TIERS (
     const install = host.endsWith('world.js') ? 'setRideWalk\\(\\(mode, runAsked\\) => !rideOnTheRoad\\(\\) && upkeep\\.rideWalks\\(mode, runAsked\\)\\);' : 'setRideWalk\\(\\(mode, runAsked\\) => upkeep\\.rideWalks\\(mode, runAsked\\)\\);';
     assert.match(s, new RegExp(`\\n\\s*${install}[^\\n]*\\n\\s*setGallopGate\\(\\(mode, mods\\) => upkeep\\.gallopGate\\(mode, mods\\)\\);`), `${host}: the walk beside the gallop (world.js never on the road - the Overworld's view and the journeys are its alone)`);
     assert.match(s, /\{ look: riddenHorseLook\(playerEntity\.items \?\? \[\]\), slow: player\.slowRide \}/, `${host}: the 3D horse held on a slow ride`);

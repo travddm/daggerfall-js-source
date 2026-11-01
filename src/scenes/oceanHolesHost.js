@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// OH-B / OH-C (2026-09-26): THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN
+// OH-B / OH-C: THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN
 // THE STREAMED WORLD. The host half of OceanHoles' tile work (jet082's
 // 1.1.0): every terrain promoted is given an OceanPitTileState and queued;
 // one a frame is processed (ProcessOneTerrain), and a pixel the hash picks
@@ -284,7 +284,7 @@ export function createOceanHoles({ deepWaters, decor = null, built, pixelTransla
       return;
     }
     const v = version(entry);
-    // PITS-WORLD (bible/03-World/World-Wide.md WORLD-LANES): the pits are the world's. ETHER-DEEP held them to the Bay's
+    // PITS-WORLD (WORLD-LANES): the pits are the world's. ETHER-DEEP held them to the Bay's
     // map because a pit's drowned dungeon was named by its pixel's id's low twenty bits (GetAbyssMapId), which the Bay's
     // 1000 x 500 alone keeps apart; past the Bay an abyss is named in the world's abyss lane now, so every pixel of the
     // world's grid may open one - the continent's sea (TAMRIEL-DEEP) and the Eltheric Ocean's (ETHER-DEEP) as the Bay's

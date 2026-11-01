@@ -1,5 +1,4 @@
-// SD18c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18c;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE ENDING'S LIGHT AND WORD - a Hollow's Remnant, its
+// SD18c: THE ENDING'S LIGHT AND WORD - a Hollow's Remnant, its
 // Echoes and its Reset's Hearts burn with the light of the Ending it keeps (world/superDungeon/sdRemnantArt.js, records 25-30: its
 // colour and as much again its own light), its Hearts' and its stun's sparks in it; the taverns tell the omen its Ending
 // sends, and its card on the held map says which Ending it keeps.

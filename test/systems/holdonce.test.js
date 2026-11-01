@@ -1,4 +1,4 @@
-// HOLD-ONCE (2026-10-12, asked: "Let's make it where players outside of privateers hold cannot re enter"):
+// HOLD-ONCE:
 // online, Privateer's Hold is entered once - by the new game's start, or a save made inside it, or staff landing by a
 // player there. Its door, a Recall to an anchor set inside, and a quest's transfer are refused, at the one funnel every
 // dungeon entry takes (worldModes.js tryEnterDungeon). Offline, DFU's. `06-Systems/Online-Arc.md` HOLD-ONCE.
@@ -74,13 +74,13 @@ test('HOLD-ONCE: online, the Hold\'s door (and every way in through the funnel) 
 });
 
 test('HOLD-ONCE: the ways in - startInDungeon hands `holdOpen` to the funnel; the world host marks the new game\'s start and the staff landing alone, never a Recall, a quest\'s transfer or the cemetery', () => {
-  assert.match(fns.get('startInDungeon'), /async function startInDungeon\(\{ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined \} = \{\}\)/);   // PIN MOVED (INSTANCES' audit): and what was recorded of the place
-  assert.match(fns.get('startInDungeon'), /return tryEnterDungeon\(hit, entries, \{ preferEnterMarker: true, fromLoad, holdOpen, recorded \}\);/);   // PIN MOVED (INSTANCES' audit): and what was recorded of the place
-  assert.match(WM, /if \(hit\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\) return enterDungeonDoor\(hit, entries\);[^\n]*\n[\s\S]*?const enterDungeonDoor = [^\n]*tryEnterDungeon\(hit, entries, \{ entry \}\)/, 'the door: the funnel, no holdOpen');   // PIN MOVED (INSTANCES' audit): the door through its own entry - the entry its popup chose, still no holdOpen
+  assert.match(fns.get('startInDungeon'), /async function startInDungeon\(\{ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined \} = \{\}\)/);
+  assert.match(fns.get('startInDungeon'), /return tryEnterDungeon\(hit, entries, \{ preferEnterMarker: true, fromLoad, holdOpen, recorded \}\);/);
+  assert.match(WM, /if \(hit\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\) return enterDungeonDoor\(hit, entries\);[^\n]*\n[\s\S]*?const enterDungeonDoor = [^\n]*tryEnterDungeon\(hit, entries, \{ entry \}\)/, 'the door: the funnel, no holdOpen');
   const W = read('src/scenes/world.js');
   const calls = [...W.matchAll(/startInDungeon\??\.?\(([^)]*)\)/g)].map((m) => m[1]);
   assert.deepEqual(calls.filter((c) => /holdOpen/.test(c)).sort(), ['{ holdOpen: true }', '{ locationKey: d.locationKey ?? null, holdOpen: true, recorded: { ins: d.ins ?? null, whole: d.whole === true, staff: true } }'], 'the new game\'s start and the staff landing');   // PIN MOVED (INSTANCES' audit): the staff landing in the player's own room (the relay admits staff)
   assert.match(W, /status\('entering the dungeon'\);\n {4}const entered = await modes\.startInDungeon\(\{ holdOpen: true \}\);/, 'the new game\'s start');
-  assert.match(W, /else if \(d\.kind === 'dungeon'\) \{\n {6}entered = await modes\?\.startInDungeon\?\.\(\{ locationKey: d\.locationKey \?\? null, holdOpen: true, recorded: \{ ins: d\.ins \?\? null, whole: d\.whole === true, staff: true \} \}\);/, 'the staff landing');   // PIN MOVED (INSTANCES' audit): and the player's room
-  assert.match(W, /if \(plan\.arrive === 'dungeon'\) \{[\s\S]{0,400}landed = !!\(await modes\?\.startInDungeon\?\.\(\{ recorded: a\.dungeon \?\? \{\} \}\)\);/, 'a Recall: no holdOpen');   // PIN MOVED (INSTANCES' audit): the room and layout the anchor recorded - still no holdOpen
+  assert.match(W, /else if \(d\.kind === 'dungeon'\) \{\n {6}entered = await modes\?\.startInDungeon\?\.\(\{ locationKey: d\.locationKey \?\? null, holdOpen: true, recorded: \{ ins: d\.ins \?\? null, whole: d\.whole === true, staff: true \} \}\);/, 'the staff landing');
+  assert.match(W, /if \(plan\.arrive === 'dungeon'\) \{[\s\S]{0,400}landed = !!\(await modes\?\.startInDungeon\?\.\(\{ recorded: a\.dungeon \?\? \{\} \}\)\);/, 'a Recall: no holdOpen');
 });

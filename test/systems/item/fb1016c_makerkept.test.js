@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-16c (MAKER-KEPT) - Flylighter, "Grandfathered Items triggering trade lock": "Enchanted a few pieces
 // of Ruhn's set back before the change that disallowed enchanting them. Now, I'm getting a trade lock notice on account
-// of my gear!", then "I've been wrongly trade-locked for a week". AETHERIC-MAKER (2026-10-03) closed the item maker to an
+// of my gear!", then "I've been wrongly trade-locked for a week". AETHERIC-MAKER closed the item maker to an
 // Aetheric piece and promised "A piece enchanted before keeps its rows" (Field-Bugs-2026-10-03b); INT1's item law (law 5)
 // held every Aetheric piece to no rows at all, so the realm's judge read those pieces as forged and held their owners'
 // trade. Law 6: a piece of a record the maker took then (Ruhn's Regalia, the raiding parties' three sets) keeps the
@@ -35,7 +35,7 @@ const MAKER_ERA = [
 ];
 
 test('MAKER-KEPT: the report, answered - every piece of the maker\'s era, enchanted as the maker did then, carries no finding in the save or on the market; law 6 (mutants: the kept rows refused; the maker\'s law refusing the era)', () => {
-  assert.equal(ITEM_LAW_VERSION, 14);   // PIN MOVED (AFFIX-LINES and REFORGE-REPLACE): law 14 - the Reforge's count a mark of the tiers it takes alone; PIN MOVED (KETCH): law 13 - the Gilded rung's Ketch pair (Volendrung's Echo, the Ketchmaster's Word) lawful; PIN MOVED (GUNS-UNFOUND): law 12 - the Hourlock lawful as a gilded Dwarven Long Bow and as the Thunderlock minted before, the Sunken Sovereign as the Ebony Saber again and as the Pistolet minted between; PIN MOVED (SEA-SET): law 11 - the Eltheric Tidemail's nine records lawful (law 10 on its branch, renumbered past PISTOLET's at the merge); PIN MOVED (PISTOLET, AUDIT PISTOLET): law 10 - the Pistolet known, the Sunken Sovereign lawful as a gilded Pistolet and as the saber minted before; PIN MOVED (SOUL-LAW, FIELD BUGS 2026-10-20h): law 9 - a soul of Daggerfall Enemy Expansion's fifty lawful in a Soul Gem or Azura's Star; PIN MOVED (WITCH1): law 8 - the Soul Cake and the Hearth Offering; PIN MOVED (KEY-LAW): law 7 - the Weir Key known to the service's law; the era's pieces lawful from law 6 on
+  assert.equal(ITEM_LAW_VERSION, 14);
   assert.deepEqual([...REGALIA, ...RAID_SET_PIECES].map((r) => r.id), MAKER_ERA, 'the era\'s records, as they stood');
   for (const r of [...REGALIA, ...RAID_SET_PIECES]) {
     assert.deepEqual(itemFindings(mintAetheric(r)), [], `${r.id}: fresh`);

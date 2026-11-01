@@ -27,9 +27,7 @@
 // IsPlayerInSunlight/IsPlayerInHolyPlace host seam registered by the
 // hosts).
 //
-// VAMP-DAY (2026-09-26, Mac: "do vampires have a negative??? ...
-// instead of constant damage taken they should get reduced stats in
-// day and get the bonus at night"; asked, "Day -20 / night +20"): THE
+// VAMP-DAY: THE
 // PORT'S DEPARTURE. The sun no longer burns a vampire. The curse's
 // stat advantages are the NIGHT's; from 06:00 to 18:00, in the sun the
 // burn struck in - never under a roof or underground (FIELD BUGS
@@ -40,9 +38,7 @@
 // flag still keys (no fast travel by day, arriving by night) stand
 // as DFU has them - for a bare head (VAMP-HOOD, below).
 //
-// VAMP-HOOD (2026-09-29, #suggestions, Starempire42: "adds the ability
-// to travel during the day if you a wearing a cloak or robe with a hood
-// up"; Sir McMobdon: "nice, good idea"; sent in by Mac): THE SECOND DEPARTURE.
+// VAMP-HOOD: THE SECOND DEPARTURE.
 // The flag's travel rules ask racialSunAverse, never the flag: under
 // a raised hood - a cloak drawn hood up, or plain robes with theirs,
 // survival/temperature.js cloakState, the felt temperature's one hood
@@ -54,7 +50,7 @@
 // street's sun on the stats (indoors and underground there is none -
 // FIELD BUGS 2026-10-01b), and a raised hood keeps that sun off too.
 //
-// HOOD-SUN (2026-10-07, Mac: "The vampire cloak and hood doesn't work ingame for shielding against the sun"): THE HOOD SHIELDS THE STATS. VAMP-HOOD let a hood lift the
+// HOOD-SUN: THE HOOD SHIELDS THE STATS. VAMP-HOOD let a hood lift the
 // travel rules alone, so a hooded vampire in the street at noon still
 // stood 20 down - the sun's only bite since VAMP-DAY, and the one the
 // player could see. vampirismMagicRound asks racialSunAverse, the one
@@ -105,7 +101,7 @@ export const VAMPIRISM_CURSE_KEY = 'Vampirism-Curse';
 export const VAMPIRE_STAT_MOD = 20;
 /** VAMP-DAY: the curse's stat mod at a clock minute - DFU's +20 out of the sun, the same 20 DOWN in it (06:00-18:00,
  *  outside).
- *  FIELD BUGS 2026-10-01b (Mac: "Sunlight debuff applies in interior (Should be buffed in interiors) (Vampires)"): THE
+ *  FIELD BUGS 2026-10-01b: THE
  *  DAY'S -20 IS THE SUN'S, NEVER THE HOUR'S ALONE. It read isDayFromMinutes - "the hour, never the sky or a roof" - so
  *  at noon a vampire in a tavern, a guild hall or a crypt was 20 down where DFU gives him 20 up. The -20 took the
  *  burn's place, and the burn was DamageFromSunlight (PassiveSpecialsEffect.cs:149-172), which strikes only
@@ -115,7 +111,7 @@ export const VAMPIRE_STAT_MOD = 20;
  *  registers (passiveSpecials.js playerInSunlight: worldModes for the street and its buildings, dungeonContext for a
  *  dungeon), and out of the sun - indoors, underground, in a cell, or by night - the vampire has what DFU gives him at
  *  every hour: ApplyVampireAdvantages' +20 (VampirismEffect.cs:349-359). No bonus past it.
- *  BAL6 (bible/05-Combat/Balance-Arc.md section 12; asked, "Hood only shields"): THE HOOD SHIELDS, IT DOES NOT MAKE IT
+ *  BAL6 (; asked, "Hood only shields"): THE HOOD SHIELDS, IT DOES NOT MAKE IT
  *  NIGHT. HOOD-SUN gave a raised hood in the street by day the full +20 - the night's bonus at noon, so with a hood the
  *  curse stood +20 at every hour and everywhere (the measurement's x1.67-2.07 a mortal's damage a second, x0.80-0.89 of
  *  what it takes). Under a hood in the sun the vampire is neither burned nor blessed: 0. Out of the sun (indoors,

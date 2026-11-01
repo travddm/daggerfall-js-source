@@ -1,7 +1,5 @@
-// GATE-FBX (2026-10-09, Mac, sending Oblivion_Gate.fbx: "I want to replace the oblivion gate model with this handcrafted
-// model which also needs texturing. Additionally, on the onside of the oblivion gate, remove the portal that players walk
-// through on the inside and just use a portal that opens and closes. Like at the end of the fight"); and AUDIT GATE-FBX
-// (2026-10-09, Mac: "Audit this"). Design: bible/11-Multiplayer/World-Bosses.md sections 3, 4 and 22.
+// GATE-FBX; and AUDIT GATE-FBX
+// . Design: 4 and 22.
 //
 //   THE BAKE          tools/bakeGate.mjs over tools/shipBake.mjs: the one object of Mac's scene, re-made to the byte,
 //                     through the port's handedness mirror

@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -19,7 +19,7 @@ export function createWildSeizeHost(host) {
       _wildSeize.delete(r);
       if (host.wildRemains.has(r)) continue;   // their tab took it: its remains stand (or stood)
       const p = s.p ?? campToWire(player.feetAt());   // AUDIT INT9: where the body fell, in its room's frame
-      wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then((a) => {   // MAC (2026-10-14): my piece in escrow where the room signs my collect
+      wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then((a) => {   // MAC: my piece in escrow where the room signs my collect
         const d = a?.ok ? a.data : null;
         if (d?.order && Array.isArray(d.items) && d.items.length) { wildDeposit({ r: d.r, items: d.items, o: d.order, p, room: s.room, mine: null }); return; }
         // AUDIT INT9: a word that says nothing of the fall (offline, the service's own error, the rate, a record that moved

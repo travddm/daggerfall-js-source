@@ -1,7 +1,5 @@
 // @ts-check
-// LEGACY-HOME (2026-10-05, bible/06-Systems/Legacy-Arc.md section 10b; Mac: "I think your bloodline should be visible
-// when not playing, and if a house is owned should live in the house ... With the ability to switch by interacting with
-// them or by using the ui"): THE BLOODLINE IN THE WORLD - the law, pure. Who of the line stands in the world, in which
+// LEGACY-HOME: THE BLOODLINE IN THE WORLD - the law, pure. Who of the line stands in the world, in which
 // house, as which Living World resident (systems/livingWorld/census.js's Resident shape, so the town's own day plans,
 // walkers, rooms and talk carry them), and what they call the one played.
 //
@@ -79,7 +77,7 @@ export function syncHouses(family, personId, held, taken = [], { whole = false }
   // AUDIT LEGACY II A5: the rows keep their places - one sold leaves its place, one bought joins at the end. Rebuilt
   // with the one played's rows last, "the first house" (the family home with none marked and none in the seat) was
   // always another member's, and the line moved house at every switch
-  // ACCOUNT-HOMES (2026-10-06): `whole` - the held are every house of the line (online: the account's homes, each every
+  // ACCOUNT-HOMES: `whole` - the held are every house of the line (online: the account's homes, each every
   // member's), so a row any member learned goes once it is not among them (another character of the account sold it)
   const was = family.houses ?? [];
   const next = [];
@@ -97,8 +95,7 @@ export function syncHouses(family, personId, held, taken = [], { whole = false }
 }
 
 /**
- * PERMADEATH-HOUSES (2026-10-09, the owner: "what happens to houses owned by dead permadeath characters" - the heir
- * inherits): THE DEAD'S DEEDS DUE TO `p` - every house of the line's whose holder is dead and which `p`'s save has not
+ * PERMADEATH-HOUSES: THE DEAD'S DEEDS DUE TO `p` - every house of the line's whose holder is dead and which `p`'s save has not
  * taken up. Whoever carries the line takes them: the Succession's heir, or the one played when one of the line dies in
  * the street. Rows, copied.
  * @param {any} family @param {any} p

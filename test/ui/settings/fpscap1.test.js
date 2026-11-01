@@ -1,4 +1,4 @@
-// FPS-CAP1 (2026-09-25, Mac: "Add FPS limiter to settings"). DFU's Video/TargetFrameRate had been in the store since
+// FPS-CAP1. DFU's Video/TargetFrameRate had been in the store since
 // the settings screen shipped - labelled "Frame Rate Cap" on the Video page and read by nothing. It is live now:
 // systems/frameCap.js is StartGameBehaviour's two lines (:244-250) over SettingsManager's GetInt(0, 300) (:414), the
 // four hosts hold a frame back at the top of their rAF callback, and the FPS counter counts the frames the game drew.

@@ -2,9 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC3 — WHAT A TITLE AND A GLYPH LOOK LIKE. One home, both faces.
 //
-// Mac (2026-09-22): "Player titles appear above a player name... 1st
-// title is Founder with a gold color, 2nd title is Developer with a
-// red color", and "name glyphs... appear on the right side of the
+// and "name glyphs... appear on the right side of the
 // player name. Sprouting green plant. Attached to new accounts for 2
 // weeks. Developer glyph specifficaly for developers."
 //
@@ -76,12 +74,12 @@ export function cssRgba(rgba) {
 export const TITLE_TEXT = Object.freeze({
   founder: 'Founder',
   developer: 'Developer',
-  dungeonmaster: 'Dungeon Master',   // TITLE-N (2026-09-24, Mac)
+  dungeonmaster: 'Dungeon Master',   // TITLE-N
   disciple: 'Disciple',              // TITLE-N: the Patreon tiers, lowest first
   apostle: 'Apostle',
   hierophant: 'Hierophant',
-  gatebreaker: 'Gatebreaker',        // WB9g (2026-09-30, Mac): the Sigil Broker's, bought
-  herald: 'Herald',                  // HERALD (2026-10-01, Mac): the Patreon tier between Disciple and Hierophant
+  gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
+  herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
   // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
   // (townSeatLaw.js seatTitleText: "Warden of Anticlere"), and these words alone where it does not
   warden: 'Warden',
@@ -89,31 +87,31 @@ export const TITLE_TEXT = Object.freeze({
   crowned: 'Crowned',
   keeper: 'Keeper',
   champion: 'Champion',
-  grandchampion: 'Grand Champion',   // ARENA4 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title")
+  grandchampion: 'Grand Champion',   // ARENA4
   arenachampion: 'Arena Champion',   // ARENA4: "Being the #1 pvp arena player comes with it's own temporary title/glyph"
-  hourbreaker: 'Hourbreaker',        // SD9b (2026-10-07, the Super Dungeons arc): one Brass Remnant's kill in four grants it
+  hourbreaker: 'Hourbreaker',        // SD9b: one Brass Remnant's kill in four grants it
   hoursfirst: "Hour's First",       // HOURS-FIRST (2026-10-08, Mac: "a title named Hour's First"): the first group to break an Abyss Dungeon, by name
-  // CHAP4c (2026-10-08, the Chapters arc): a chapter's seats' - worded off their claim (npcChapterLaw.js chapterTitleText,
+  // CHAP4c: a chapter's seats' - worded off their claim (npcChapterLaw.js chapterTitleText,
   // "Master of the Fighters Guild, Anticlere"); these where the claim names no chapter this client knows
   chaptermaster: 'Chapter Master',
-  chapterofficer: 'Chapter Councillor',   // GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md): a chapter's rank 8 sits on its council - "Officer" is a player guild's rank
+  chapterofficer: 'Chapter Councillor',   // GUILD3a: a chapter's rank 8 sits on its council - "Officer" is a player guild's rank
   formermaster: 'Former Master',
   highmaster: 'High Master',      // CHAP6e: a Master's in its chapter's Ascendancy - GUILD3e: while its chapter stands Ascendant
   seasonmaster: 'Season Master',  // CHAP6e: a Season's Master's, kept for good
-  ilovelamp: 'I Love Lamp',       // LAMP-KEEPER II (2026-10-14, Mac: "the 'I Love Lamp' title"): a lamp keeper spoken to
-  coilbreaker: 'Coilbreaker',     // SERPENT5 (2026-10-15, Sea-Serpent.md section 17): one dealing ship's serpent kill in twenty grants it
-  // QL12 (2026-10-19, bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' FOUR, a title a line, in the lines'
+  ilovelamp: 'I Love Lamp',       // LAMP-KEEPER II: a lamp keeper spoken to
+  coilbreaker: 'Coilbreaker',     // SERPENT5: one dealing ship's serpent kill in twenty grants it
+  // QL12: THE QUESTLINES' FOUR, a title a line, in the lines'
   // order (net/questlineClaims.js QL_TITLES) - paid by the account service on the line's last witnessed step, held for good
   doorwarden: 'Doorwarden',                // the Burning Doors
   covenbane: 'Covenbane',                  // the Covens' Hoard
   hourwitness: 'Witness of the Hour',      // the Hour That Was Not
   satakalwitness: "Satakal's Witness",     // the Old Coil
   starwarden: 'Starwarden',                // STAR8: the Thirteenth of Frostfall
-  // WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S TWO - bought from a Wyrd Sister, and
+  // WITCH1: THE WITCHES' FESTIVAL'S TWO - bought from a Wyrd Sister, and
   // earned by an account's Hearth Offerings giving 25 cakes; both held for good
   witchwarden: 'Witchwarden',
   hearthkeeper: 'Hearthkeeper',
-  // HUNTERS-MARK, MARKS-OF-MASTERY (2026-10-27): the hunt's four by the account's board clears, a profession's Master
+  // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's four by the account's board clears, a profession's Master
   // each, the sea's two by the serpents slain (net/huntLaw.js MASTERY_MARKS)
   bloodhound: 'Bloodhound',
   beastbane: 'Beastbane',
@@ -133,7 +131,7 @@ export const TITLE_TEXT = Object.freeze({
   deepbane: 'Bane of the Deep',
 });
 
-/** WB9g (2026-09-30, Mac: "an animated burning ground aura that circles the ground where your character stands"): AN
+/** WB9g: AN
  *  AURA'S WORD, as a player reads it - the Broker's offer and the account card's button. */
 export const AURA_TEXT = Object.freeze({
   dagonfire: "Dagon's Fire",
@@ -144,20 +142,20 @@ export const AURA_TEXT = Object.freeze({
   witchfire: 'Witchfire',   // WITCH1: a coven's green fire round the feet, tallow candles in its ring, bought from a Wyrd Sister
 });
 
-/** WB9g (2026-09-30, Mac: "a brand new title to the broker ... expensive and sought after"): THE GATEBREAKER, the
+/** WB9g: THE GATEBREAKER, the
  *  Oblivion Gate's own fire - a coal's crimson, burning through the fire's orange into an ember's gold. */
 const GATEBREAKER_CRIMSON = Object.freeze([0.62, 0.05, 0.07, 1]);  // #9e0d12
 const GATEBREAKER_FIRE = Object.freeze([1, 0.42, 0.08, 1]);        // #ff6b14
 const GATEBREAKER_EMBER = Object.freeze([1, 0.82, 0.32, 1]);       // #ffd152
 
-/** SD9b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): HOURBREAKER - the
+/** SD9b: HOURBREAKER - the
  *  Brass Remnant's title, one kill in four on its first write. Drawn in the Hour's own colours: the Remnant's brass into
  *  its bar's gold (ui/gate/gateBossBar.js's brass theme, `.wb-boss-name`) into the light of its heart; its one colour the
  *  bar's gold, for a face that draws no gradient - yellower and darker than the Founder's, warmer than the Champion's silver. */
 export const HOUR_BRASS = Object.freeze([0.71, 0.525, 0.184, 1]);   // #b5862f
 export const HOUR_GOLD = Object.freeze([0.91, 0.753, 0.376, 1]);    // #e8c060 - SD9c: The Turning Hour's light (render/auraRing.js TURNING_RGB reads all three from here)
 export const HOUR_LIGHT = Object.freeze([1, 0.945, 0.769, 1]);      // #fff1c4
-/** HOURS-FIRST (2026-10-08, Mac: "a unique different version of the aura, a title named Hour's First"): THE FIRST
+/** HOURS-FIRST: THE FIRST
  *  DAWN'S COLOURS - the Hour broken for the first time, and the light that came back into it. Hour's First is drawn rose
  *  gold into pearl into the dawn's white; its one colour the rose gold - redder and paler than the Hourbreaker's gold and
  *  the Grand Champion's bronze, oranger than the Hierophant's rose. The First Hour's wheel is cast in them
@@ -165,14 +163,14 @@ export const HOUR_LIGHT = Object.freeze([1, 0.945, 0.769, 1]);      // #fff1c4
 export const HOUR_DAWN = Object.freeze([0.902, 0.553, 0.443, 1]);   // #e68d71
 export const HOUR_PEARL = Object.freeze([1, 0.851, 0.659, 1]);       // #ffd9a8
 export const HOUR_SUN = Object.freeze([1, 0.969, 0.918, 1]);         // #fff7ea
-/** SERPENT5 (2026-10-15; bible/11-Multiplayer/Sea-Serpent.md section 17): COILBREAKER - the Old Coil's title, one dealing
+/** SERPENT5: COILBREAKER - the Old Coil's title, one dealing
  *  ship's kill in twenty on its first write. Drawn in the sea Sethrakul is fought in: the open water's blue into the
  *  tide's green into the foam; its one colour the tide's - greener and deeper than the Disciple's teal. The Maelstrom is
  *  cast in all three (render/auraRing.js MAELSTROM_RGB reads them from here). */
 export const COIL_SEA = Object.freeze([0.165, 0.561, 0.651, 1]);    // #2a8fa6
 export const COIL_TIDE = Object.freeze([0.122, 0.682, 0.549, 1]);   // #1fae8c
 export const COIL_FOAM = Object.freeze([0.847, 0.976, 0.937, 1]);   // #d8f9ef
-/** WITCH1 (2026-10-20): THE WITCHES' FESTIVAL'S PAINT - Witchwarden out of the moor's moss into the coven's green fire
+/** WITCH1: THE WITCHES' FESTIVAL'S PAINT - Witchwarden out of the moor's moss into the coven's green fire
  *  into its pale heart; Hearthkeeper the tallow's warm amber, a lantern's light at a door. */
 export const WITCH_MOSS = Object.freeze([0.18, 0.4, 0.157, 1]);       // #2e6628
 export const WITCH_FIRE = Object.freeze([0.49, 0.839, 0.329, 1]);     // #7dd654
@@ -196,7 +194,7 @@ export const TITLE_RGBA = Object.freeze({
   hierophant: Object.freeze([0.910, 0.451, 0.749, 1]), // #e873bf
   // WB9g: the fire at the gradient's middle - the colour a face that cannot draw a gradient uses
   gatebreaker: GATEBREAKER_FIRE,
-  // HERALD (2026-10-01, Mac: "you'll need to develop the herald title/glyph"; no colour named): AZURE, heraldry's own
+  // HERALD: AZURE, heraldry's own
   // blue - a herald wears the arms he cries. Between the Disciple's teal and the Apostle's violet on the tiers' rise,
   // and brighter and bluer-violet than the moderator's shield, which is a shield and never a trumpet. Chosen over a
   // periwinkle (lost on a day sky), a silver (read as a bare name) and a purple (the Apostle's) on five grounds.
@@ -208,7 +206,7 @@ export const TITLE_RGBA = Object.freeze({
   crowned: Object.freeze([1, 0.886, 0.541, 1]),       // #ffe28a
   keeper: Object.freeze([0.471, 0.706, 0.443, 1]),    // #78b471
   champion: Object.freeze([0.851, 0.867, 0.890, 1]),  // #d9dde3
-  // ARENA4 (2026-10-02; no colour named): the GRAND CHAMPION in a champion's BRONZE - the cup on the Hall of Champions'
+  // ARENA4: the GRAND CHAMPION in a champion's BRONZE - the cup on the Hall of Champions'
   // wall, darker and browner than the Dungeon Master's bright orange and the Gatebreaker's fire, and no gold (the
   // Founder's); the ARENA CHAMPION in the LAUREL's own green - the wreath the season's #1 wears, the glyph's colour too
   grandchampion: Object.freeze([0.804, 0.498, 0.196, 1]),   // #cd7f32

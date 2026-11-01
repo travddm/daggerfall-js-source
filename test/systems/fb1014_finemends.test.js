@@ -1,9 +1,9 @@
 // FIELD BUGS 2026-10-14 FINE-MENDS (Dweme... on the Discord: "I was stopped by the guards and paid a fine of 560 gold.
 // After that, I was stopped again and had to pay the same 560 gold, even though I hadn't committed any new crimes. Now
-// it's happening for the third time"; Mac: "Fine raises standing"). REP1's fine bought a day's grace and nothing else: the
+// it's happening for the third time"). REP1's fine bought a day's grace and nothing else: the
 // standing that stopped the player was the standing that stopped them again, for the same sum. A fine paid on the spot
 // mends the name a temple penance's step, never past the watch's line. Through the real watch (REP1's rig) and the
-// real legal-notice line. bible/01-Overview/bugs/Field-Bugs-2026-10-14.md.
+// real legal-notice line..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { settleChallenge, banish, knownCriminal, PENANCE_POINTS, KNOWN_CRIMINAL_BELOW, CHALLENGE_GRACE_MINUTES } from '../../src/systems/standing.js';

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MENU-ORDER (2026-10-12) — A PIECE'S PICTURE FOR A MENU'S ROW.
+// MENU-ORDER — A PIECE'S PICTURE FOR A MENU'S ROW.
 //
 // The owner, of the stores and the crafting menus: "I just feel like text lists are too much". A material in the
 // Stores, a row on the Market and a trader's piece show the game's own item picture beside their name: the picture of

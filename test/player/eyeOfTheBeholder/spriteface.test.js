@@ -1,7 +1,6 @@
-// SPRITE-FACE — AN AURA ON A SPRITE FACES AS ITS PICTURE DOES (2026-10-05).
+// SPRITE-FACE — AN AURA ON A SPRITE FACES AS ITS PICTURE DOES.
 //
-// Mac: "For the wing aura we implemented for developers. The sprite rotation on character input is a little finicky and
-// make the aura misallign". An Eye of the Beholder sprite is drawn from one of eight pictures, 45 degrees apart about the
+// . An Eye of the Beholder sprite is drawn from one of eight pictures, 45 degrees apart about the
 // line from the figure to the eye (eotbBillboard.js orientationFor), and a change of facing reaches the picture only when
 // the mod's delayed repaint lands (UpdateBillboardDelayed, DELAYED_FRAMES; UpdateOrientation's ORIENTATION_TIME gate).
 // The Seraph Wings (and the Shadow Cloak) were hung on the facing the walk WANTS - `lastMoveDirection`, a peer's pose -

@@ -85,7 +85,7 @@ export function injectVendorStatsCss() {
   document.head?.append(st);
 }
 
-/** The words the stall and the board say. BOARD-UI (Mac: "Reduce overusage of bloated text"): short, and plain. */
+/** The words the stall and the board say. BOARD-UI: short, and plain. */
 export const VENDOR_TEXT = Object.freeze({
   boardEmpty: 'No trader in this region has anything for sale.',
   searchEmpty: 'No trader\'s goods match that search.',

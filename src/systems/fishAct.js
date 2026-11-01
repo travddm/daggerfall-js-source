@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF8 (2026-09-30, Mac: "Continue the arc") - FISHING'S ACT, the net
-// (bible/06-Systems/Professions-Arc.md 5.2, 30). A pure machine, as
+// PROF8 - FISHING'S ACT, the net
+// (5.2, 30). A pure machine, as
 // herbAct.js and traceAct.js are: the gathering host ticks it with the
 // Interact key's level and the attack's edge, and reads its state for the
 // meter (ui/professions/profHud.js) and its report for the harvest.

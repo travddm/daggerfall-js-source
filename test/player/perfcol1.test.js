@@ -1,6 +1,4 @@
-// PERF-COL1 - THE SPHERE RESOLVE WALKED EVERY BUCKET (2026-09-21, SquidKam on
-// Discord: "Guards kill the framerate too / I think thats a sound issue right?
-// cause the guards have some null sounds").
+// PERF-COL1 - THE SPHERE RESOLVE WALKED EVERY BUCKET.
 //
 // It was not the sounds: a missing DAGGER.SND record is cached as null once
 // and the attract cadence fires every 3-9 s. tools/guardCostProbe.mjs stood

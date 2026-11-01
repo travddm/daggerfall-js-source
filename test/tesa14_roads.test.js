@@ -1,6 +1,4 @@
-// TESA14 (2026-10-24; the owner, of the land past the Bay: "some of the roads cut off the map, theres no pathways like
-// daggerfall has and roads intersect with some of the capital cities water sources", then "Full Daggerfall network";
-// bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN SCALE, pinned. The
+// TESA14 - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN SCALE, pinned. The
 // builder's two new inputs (a region's own nodes, the pixels no route crosses) and its two faster searches; the regions'
 // lattice, their nearness, a region's network - its places in one order, its seams meeting, its capitals' gates; the roll
 // carried to a worker as numbers and answering as the host's does; the build's print and key; the roads' worker, its
@@ -120,7 +118,7 @@ test('TESA14 the builder\'s searches: nearestWithin answers the brute force\'s l
 // ── THE REGIONS ─────────────────────────────────────────────────
 
 test('TESA14 the lattice: cores REGION_CORE_W x REGION_CORE_H from the frame\'s north-west pixel, a grid the builder\'s 1000 x 500 with REGION_APRON round its core - wider than a road\'s and a track\'s reach (mutant: the apron, the core, the lattice\'s count)', () => {
-  assert.deepEqual([REGION_APRON, REGION_CORE_W, REGION_CORE_H, LAND_LOOK, TAMRIEL_ROADS_VERSION], [100, 800, 300, 8, 8]);   // TESA15: 2, a region's places in its answer; PIN MOVED (AUDIT TESA II R7, R9): 3; PIN MOVED (VOYAGER1, VOYAGER-CYRODIIL): 4, the land's law and the named roads; PIN MOVED (RIVER-FORDS): 5, the carved rivers crossed as fords; PIN MOVED (ROAD-GAPS): 6, a region's networks linked; PIN MOVED (EXACT-PIECES): 7, a region's land's pieces in its answer; PIN MOVED (ROAD-LOOK): 8, the carved lakes' water no route crosses
+  assert.deepEqual([REGION_APRON, REGION_CORE_W, REGION_CORE_H, LAND_LOOK, TAMRIEL_ROADS_VERSION], [100, 800, 300, 8, 8]);   // TESA15: 2, a region's places in its answer
   assert.equal(REGION_CORE_W + 2 * REGION_APRON, MAP_W);
   assert.equal(REGION_CORE_H + 2 * REGION_APRON, MAP_H);
   assert.ok(REGION_APRON > ROAD_DIALS.roadReach && REGION_APRON > ROAD_DIALS.trackLink, 'an owned edge\'s far end in view');
@@ -202,7 +200,6 @@ test('TESA14 the capitals\' gates: each plan\'s own sides, the pixel just past i
     ['falinesti', ['N', 'E', 'S', 'W']], ['torval', ['N', 'E', 'W']], ['helstrom', ['N', 'S']],
   ]);
   assert.deepEqual(GATE_STEPS, { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] });
-  // PIN MOVED (AUDIT TESA II, lane R's R2): the pixel just past the span at the side's middle where the roads walk it, its
   // step into the city one of the city's own pixels - on the authored shape, on open ground everywhere
   CAPITALS.forEach((cap, k) => {
     const span = capitalSpanPixels(k), on = (x, y) => span.some((p) => p.x === x && p.y === y);

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-GIVE (2026-10-24, mob: "add yes we will work on add as well"; the card's pick "Pick from the item list"; "include
-// enchants") - ADD AN ITEM TO A PLAYER, the Remove from a player's twin. Admins alone (staffRealm.js asks the role before
+// STAFF-GIVE - ADD AN ITEM TO A PLAYER, the Remove from a player's twin. Admins alone (staffRealm.js asks the role before
 // any door); OFFLINE ONLY until mob tries it live.
 //
 // The item is MINTED HERE, never written by the panel: staff name a template from the game's own list, a material where

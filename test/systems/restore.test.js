@@ -1,4 +1,4 @@
-// RESTORE (2026-09-29, Mac: "I want people to get their stuff back"; of the deeds: "Keep all, can't sell"). Customs
+// RESTORE. Customs
 // used to take whole deeds off the realm's copy - a house's slot emptied, the ship gone, the pieces bought for the room
 // taken out (AUDIT REALM2 T3) - and HOUSE-LOSS only narrowed when. Now:
 //   A. customs never takes a deed: every one crosses, marked (a house's slot `crossed`, the ship's `shipCrossed`), its
@@ -92,7 +92,6 @@ test('RESTORE B: only the evidence gives back - a house the realm character sold
   realm.sceneCache.permanentScenes = realm.sceneCache.permanentScenes.filter((n) => n !== interiorSceneName(1017, 5));
   realm.sceneCache.permanentScenes = realm.sceneCache.permanentScenes.filter((n) => n !== interiorSceneName(SHIP_INTERIOR_MAP_IDS[SHIP_TYPES.Small], BUILDING_KEY_0));
   assert.deepEqual(reclaimCustomsDeeds(realm, offline), { houses: [], ship: false, pieces: 0 });
-  // PIN MOVED (HOUSES-3: three houses a region): a house of its own in that region now leaves room - the kept one comes
   // back beside it; THREE of its own there, and a ship of its own: kept, nothing taken, nothing doubled
   const realm1 = strippedByOldCustoms(offline);
   allocateHouseToPlayer(realm1.houses, 17, { buildingKey: 88, mapId: 2017, location: 'Wayrest' });

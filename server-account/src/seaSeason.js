@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-SEASON (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-SEASON) - THE ELTHERIC OCEAN'S SEASON BOARDS, the service's half: the deepest voyage and the
+// SEA-SEASON - THE ELTHERIC OCEAN'S SEASON BOARDS, the service's half: the deepest voyage and the
 // legends ended, each a season's (net/arena/arenaLaw.js arenaSeasonOf). The law is both ends' (src/net/sea/
 // seaSeasonLaw.js); the table migrations/0147_sea_season.sql's.
 //

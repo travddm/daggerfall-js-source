@@ -1,5 +1,4 @@
-// DW-F (2026-09-26) - ILIAC PUDDLE NO MORE 1.2.2's SEA AT A DISTANCE (jet082), PINNED. Mac: "at a distance,
-// the ocean seems to look like large square panels". Two causes, both the port's own: (1) EV4's strided far
+// DW-F - ILIAC PUDDLE NO MORE 1.2.2's SEA AT A DISTANCE (jet082), PINNED.. Two causes, both the port's own: (1) EV4's strided far
 // ground kept its whole perimeter skirt through the clip, so every far coastal pixel hung 40 m of pale curtain
 // in the carved sea along its edges, a hand under the surface; (2) the sea's top took no world fog, so the
 // carved sea stood out of the fogged world and far ring as dark squares to the horizon. The laws: a skirt

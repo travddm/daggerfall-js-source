@@ -54,7 +54,7 @@ const claymores = (n) => Array.from({ length: n }, () => createWeapon(CLAYMORE, 
 
 /** THE FIELD'S SALE: 150 Daedric claymores at a quality-10 counter - the price the counter pays now, and what 0.0.235 paid.
  *  Costed as 0.0.235's Sell arm costed them, each at its whole value (CalculateCost of itemValueOf, the counter's value of
- *  a plain piece then): DAEDRIC-SALE (2026-10-26) halves what a counter pays for Daedric gear now, and the field's sale
+ *  a plain piece then): DAEDRIC-SALE halves what a counter pays for Daedric gear now, and the field's sale
  *  was made before it - the record a mend is reckoned from is that sale's. */
 function fieldSale() {
   const cost = claymores(150).reduce((n, it) => n + calculateCost(itemValueOf(it), 10), 0);

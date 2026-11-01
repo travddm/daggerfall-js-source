@@ -1,4 +1,4 @@
-// MWNPC8b (2026-10-09, the MW-NPC arc's eighth slice - bible/04-Characters/Morrowind-NPCs.md section 13b): THE
+// MWNPC8b: THE
 // DUNGEON'S AND THE STREET'S STANDING PEOPLE IN THEIR BODIES. Both hosts batched their StaticNPC flats together (the
 // dungeon with the level's flats, the street per sprite over a pixel's active NPCs), and one billboard in a shared
 // batch cannot step aside for one body. Each person's flat now stands ALONE - its own batch - and each host offers its

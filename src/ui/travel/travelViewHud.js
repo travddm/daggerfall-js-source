@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV1 - THE TRAVEL VIEW'S READOUT (bible/06-Systems/Travel-View.md).
+// TV1 - THE TRAVEL VIEW'S READOUT.
 //
 // What stands over the raised camera: the traveller's own mark (a ring
 // at the feet and a chevron for the heading - from 450 m a body is a
@@ -224,8 +224,7 @@ function build(doc, hooks) {
   you.append(ring, chev);
   // PERF-TV: every mark is drawn on ONE canvas (drawMarks) - pointer-free: a click on a plate is found by position
   const canvas = el('canvas', 'tview-canvas');
-  // OW-BLOCK (2026-09-29, the player: "the whole bar in the top is too much ... a light weight block menu ... as much free
-  // screen as possible", "put the overworld block to the right"): ONE COMPACT COLUMN in the bottom-right corner - where, the journey (or
+  // OW-BLOCK: ONE COMPACT COLUMN in the bottom-right corner - where, the journey (or
   // none), the path and the map, the filters, the way back - the rest of the screen left to the land
   const bar = el('div', 'tview-bar');
   const text = el('div', 'tview-text');
@@ -264,7 +263,7 @@ function build(doc, hooks) {
   modes.append(el('div', 'tview-label', TRAVEL_PATH_TEXT.label), moderow);
   // OW-DECK: the journey's bar docks here while both are up (syncDock) - one strip at the top, the foot left to the vitals
   const dock = el('div', 'tview-dock');
-  // OW-IDLE (2026-09-29, the player: "half of the upper window gets removed when i dont move"): the journey's bar lives
+  // OW-IDLE: the journey's bar lives
   // only while a journey runs - standing still, its half of the strip went and the strip shrank to the other. Now the
   // dock holds this in its place: no journey, how to set out, and the map.
   const idle = el('div', 'tview-idle');
@@ -287,12 +286,11 @@ function build(doc, hooks) {
   tools.append(modes, idleMap);
   const foot = el('div', 'tview-foot');
   foot.append(back);
-  // PACE-DIALS (2026-10-06, the player: "Those options should also be available when the player stands still on the
-  // overworld map"): the travel speed dials, in the block whether a journey runs or not (the docked journey bar's own
+  // PACE-DIALS: the travel speed dials, in the block whether a journey runs or not (the docked journey bar's own
   // copy is hidden under the view - one set on the screen)
   const pace = buildPaceControls(doc, 'tview');
   // OW-FILTER: THE CORNER'S SWITCHES - one per group of marks, a dot in the mark's own colour and how many there are.
-  // FILTERS-LEFT (2026-10-06, the player: "move the filters for the overworld to the left bottom side"): they stand in a
+  // FILTERS-LEFT: they stand in a
   // block of their own in the bottom-LEFT corner now (`side`), apart from the right's journey block
   const filters = el('div', 'tview-filters');
   filters.setAttribute?.('role', 'group');
@@ -348,7 +346,7 @@ function build(doc, hooks) {
     wpBtns[k] = { b, num };
     filters.append(b);
   }
-  // PLUS-PICK (2026-10-06, the player: "the buttons do not look the same as enhanced ui plus"): the dropdown is the kit's
+  // PLUS-PICK: the dropdown is the kit's
   // own - a switch like the others that unfolds the waypoints as switches under it (a browser <select> wears no stone)
   const wpPick = /** @type {HTMLButtonElement} */ (el('button', 'tview-filter tview-cycle tview-cycle-wide tview-wp-pick on'));
   wpPick.type = 'button';
@@ -422,8 +420,7 @@ export function showTravelViewHud(hooks = {}, doc = globalThis.document) {
 
 /** Hide it (kept for the next open - the view is entered and left often). */
 /**
- * OW-CONFIRM (2026-09-29, the player: "the question of attacking an enemy doesnt stay in overworld it zooms back to your
- * character; the question window's yes and no are not the same buttons as roads and free in the block"): THE VIEW'S OWN
+ * OW-CONFIRM: THE VIEW'S OWN
  * QUESTION. A box of the Overworld's own - in its layer, over the map, the view left up under it - its rows and two
  * presses in the block's own faces (the Path switch's buttons, .tview-mode, and the block's stone). Enter or Y answers
  * yes, Escape or N no; while it stands the view's keys are its (the host's overlayUp asks travelViewConfirmOpen), and a
@@ -678,7 +675,7 @@ function paintModes(m) {
 }
 
 /**
- * OW-DECK (2026-09-29, the player: the Overworld's two bars into one): THE JOURNEY'S BAR, DOCKED. While a journey runs
+ * OW-DECK: THE JOURNEY'S BAR, DOCKED. While a journey runs
  * under the view, ui/enhanced/enhancedTravelControl.js's bar (its time, Map, Camp and Exit - its own listeners stand on the bar)
  * and its word are moved into this strip; when the view goes, they go home to the top of the screen. The panel's root
  * wears `data-docked` so its junction disc hangs under the strip. Asked each frame - one lookup by id.
@@ -755,7 +752,7 @@ export function updateTravelViewHud(f) {
   style(root, 'op', 'opacity', fade.toFixed(3));
   if (f.feet?.front) {
     style(parts.you, 'you-d', 'display', '');
-    // TV-SMOOTH (2026-10-12, Mac: "the overworld traveling at high speed looks stuttery on the character and the circle"):
+    // TV-SMOOTH:
     // a tenth of a pixel, never a whole one - the ring rounded to the pixel hopped a pixel at a time beside a body drawn
     // smoothly (a 3d transform: the compositor moves it, no layout)
     style(parts.you, 'you-t', 'transform', `translate3d(${f.feet.x.toFixed(1)}px, ${f.feet.y.toFixed(1)}px, 0)`);
@@ -800,7 +797,7 @@ export function updateTravelViewHud(f) {
 }
 
 /**
- * PERF-TV (bible/06-Systems/Travel-View.md): THE MARKS ARE DRAWN, NOT BUILT. Every mark - a traveller, a place's
+ * PERF-TV: THE MARKS ARE DRAWN, NOT BUILT. Every mark - a traveller, a place's
  * plate, a far place (TV5), the journey's end - is painted on ONE canvas under the bar, a shape and a cached label
  * image each; a click on one that takes it (`pick`) is found here (travelViewHudPickAt) and the pointer's hover is
  * followed here. As DOM nodes each moving mark cost a style recalculation every frame - 20 plates and 64 travellers
@@ -859,7 +856,7 @@ export const TV_WHEEL_R = 5.5;
 /** OWS1: how far a ship's sail stands over its point (px) - a name worn above it stands above the sail. */
 export const SHIP_MARK_RISE = 9;
 /**
- * OWS1 (2026-09-28, the player's ask: "being able to see other players sailing in the overworld"): A SHIP'S MARK - a
+ * OWS1: A SHIP'S MARK - a
  * hull under a sail, upright as a map draws its ships (Mount & Blade's parties at sea), in the look's colour, where the
  * dot stands. A traveller whose kind says `ship` (their region mark's way) is drawn so, in the picture; one held at an
  * edge keeps the arrow that points to them.
@@ -898,7 +895,7 @@ export const TV_HIDEOUT_R = 11;
  *  Yard's wheel (the carriage towns' own, a little smaller: OW-HUBS' wheelPath), the Stable's horseshoe with its opening
  *  up for luck and its nail holes - in `color` on the marks' black edge, about (x, y). */
 export const TV_YARD_R = 4.5;
-/** SHIPYARDS-FOUND (2026-10-11, Mac: "Everything should show on the map/overworld"): a port's places by their own
+/** SHIPYARDS-FOUND: a port's places by their own
  *  marks - the shipyard's anchor (its signboard's, world/portArt.js), the lighthouse's tower under its light, the docks'
  *  bollard on its quay - in `color` on the marks' black edge, about (x, y). Each ink's two strokes, black then colour. */
 const inked = (g, color, width) => {
@@ -965,8 +962,7 @@ export function yardGlyph(g, x, y, kind, color) {
   g.fillStyle = fill;
 }
 /**
- * OW-GLYPHS (2026-10-12, Mac: "give all the symbols the red dots (monsters and dungeons), green dots, logging nodes etc
- * fitting symbols"): THE OVERWORLD'S MARKS BY WHAT THEY ARE - each in the marks' own art (its colour as the fill, the
+ * OW-GLYPHS: THE OVERWORLD'S MARKS BY WHAT THEY ARE - each in the marks' own art (its colour as the fill, the
  * black one-pixel edge, details cut dark), about (x, y) and no taller than the dots were wide by much, so a label under
  * or over one stands where it stood: a roaming band (monsters) a skull, a dungeon a stone arch round its dark door (an
  * unfound lair in its red, a found one in brass), a player and my party a bust - a crowd two - a party on the road its
@@ -1016,7 +1012,7 @@ export function packGlyph(g, x, y) {
   g.fill(); g.stroke();   // the sack
   cutDark(g, () => { g.fillRect(x - 4.5, y - 0.4, 9, 1); g.fillRect(x - 0.6, y - 0.4, 1.2, 3); });   // the flap and its buckle
 }
-/** OW-CROSS (2026-10-12, Mac: "where you click a cross mark not a circle"): THE JOURNEY'S END - an X, as a map marks the
+/** OW-CROSS: THE JOURNEY'S END - an X, as a map marks the
  *  spot: its shadow on the ground, two brush strokes crossed (the black rim, the gold, a pale stroke of light down
  *  each), `r` its arms' reach. The spot a click walks to (`target`) and the place a journey ends at (`dest`, the
  *  larger) wear it; the brush is handed back. */
@@ -1034,7 +1030,7 @@ export function crossGlyph(g, x, y, r = TV_CROSS_R) {
   g.lineCap = 'butt';
   g.fillStyle = f; g.strokeStyle = k; g.lineWidth = w;
 }
-/** OW-QUEST (2026-10-19): A QUEST'S PLACE - the held map's own diamond (ui/heldMap.js's legend: the followed quest's
+/** OW-QUEST: A QUEST'S PLACE - the held map's own diamond (ui/heldMap.js's legend: the followed quest's
  *  filled, the rest hollow) in the journal's gold on the dots' black edge, `r` its half-height; the brush handed back. */
 export const TV_QUEST_R = 7;
 export function questGlyph(g, x, y, filled, r = TV_QUEST_R) {
@@ -1100,7 +1096,7 @@ const lookOf = (m) => {
   if (k === 'quest') return k;   // OW-QUEST: a quest's place
   return k === 'place' || k === 'far' || k === 'dest' || k === 'target' || k === 'party' || k === 'lair' || k === 'band' || k === 'raider' || k === 'camp' ? k : 'traveller';
 };
-/** OW-THEME (2026-09-28, Mac: "The overworld ui needs to follow enhanced ui theme"): the plates' stone - the Enhanced
+/** OW-THEME: the plates' stone - the Enhanced
  *  (Plus) theme's own `--slate`, at the plates' alpha; the kit's plate where the page names none. */
 export function themePlate(doc) {
   const v = doc?.defaultView?.getComputedStyle?.(doc.documentElement)?.getPropertyValue?.('--slate')?.trim?.() ?? '';
@@ -1110,7 +1106,7 @@ export function themePlate(doc) {
   return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, 0.78)`;
 }
 let plateFill = /** @type {string} */ (TRAVEL_VIEW_MARK_COLORS.plate);
-/** OW-PLUS-FACE (2026-09-29, the player: "the fonts of the pois need to be enhanced plus fonts"): under Enhanced Plus
+/** OW-PLUS-FACE: under Enhanced Plus
  *  (its sheet on the page, ui/enhanced/enhancedPlusStyle.js PLUS_STYLE_ID) the plates, labels and distances wear the kit's pixel
  *  face (PIXEL_STACK - the names beside them already did) with its hard one-pixel shadow, not the serif and the blur. */
 export const TV_PLUS_SHEET_ID = 'enhanced-plus-style';
@@ -1180,7 +1176,7 @@ export const TRAVEL_VIEW_ARMS = Object.freeze({ back: 'rgba(14,16,19,0.78)', shi
 /** AUDIT-SEATS: a Season's banner ribbon under the row - its field's band and its border's edge, px. */
 export const TRAVEL_VIEW_RIBBON = Object.freeze({ band: 2, edge: 1, gap: 1 });
 /**
- * OVERWORLD NAMES (2026-09-28, Mac: "Full, like in play"): A PLAYER'S NAME AS IT READS OVER THEIR HEAD IN PLAY - the
+ * OVERWORLD NAMES: A PLAYER'S NAME AS IT READS OVER THEIR HEAD IN PLAY - the
  * title its own line above, in its own colour (a gradient title across its letters); under it one row centred as the
  * DOM face centres it: the Renown in its amber box, the name (my party's in its green), the guild's tag in steel,
  * the glyphs in theirs. One image, made once and kept by what it shows.
@@ -1323,7 +1319,7 @@ function drawMarks(marks, vw, vh, dpr, feet = null) {
     if (q.side === 2) q.y = Math.round(Math.max(TV_EDGE_MARGIN, d));
     else q.y = Math.round(vh - Math.max(TV_EDGE_MARGIN, d));
   }
-  // OW-EDGES (2026-09-29, the player: "i hope the floating pois marker dont float into that compass"): a mark IN the picture
+  // OW-EDGES: a mark IN the picture
   // whose box meets the HUD's compass or its hotbar and bars (a notch) is drawn faint - it is where its place is, and still
   // takes its click, but it never lies over the compass's letters or the slots; clear of them, whole again
   const N = furniture.notice;
@@ -1383,7 +1379,7 @@ function drawMarks(marks, vw, vh, dpr, feet = null) {
       g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.lineWidth = 1; g.strokeStyle = C.bountyRim; g.fill(); g.stroke();
     } else if (look === 'gather') {   // GATHER-OW: a profession's group in its colour - OW-GLYPHS: by its work's glyph
       gatherGlyph(g, x, y, (m.kind ?? '').split(' ')[1] ?? '', color);
-    } else if (look === 'stranger') {   // STRANGER-HELM (the owner: "a stranger should have a knights helmet in the same art as the dots"): a great helm - its fill the stranger's red, the dots' black edge, the eye slit and the breaths cut dark
+    } else if (look === 'stranger') {   // STRANGER-HELM: a great helm - its fill the stranger's red, the dots' black edge, the eye slit and the breaths cut dark
       strangerHelm(g, x, y);
     } else if (look === 'camp') {   // OW6: a camp - a tent's peak, not a band's dot
       g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x + 6, y + 5); g.lineTo(x - 6, y + 5); g.closePath(); g.fill(); g.stroke();
@@ -1436,8 +1432,7 @@ function drawMarks(marks, vw, vh, dpr, feet = null) {
   if (unmade) canvasSig = [];
 }
 /**
- * OW-CROWD (2026-10-02, Mac: "reduce the overwhelming player markers that flood the screen ... I like it, dont get me
- * wrong, but there must be a way to make it where its not overwhelming"): THE REGION'S TRAVELLERS, DECLUTTERED, as they
+ * OW-CROWD: THE REGION'S TRAVELLERS, DECLUTTERED, as they
  * are placed on the screen. Travellers drawn within TV_CROWD_PX of one another are one mark, a dot named for how many
  * ("4 travellers"), at their middle; arrows held at the screen's edge within TV_CROWD_EDGE_PX of one another one arrow,
  * the nearest's, named the same; and of the travellers still drawn alone in the picture, only the TV_BADGES_MAX nearest
@@ -1547,8 +1542,7 @@ const furniture = { top: TV_EDGE_MARGIN, foot: TV_EDGE_MARGIN, lTop: TV_EDGE_MAR
   rFoot: TV_EDGE_MARGIN, topLo: TV_EDGE_MARGIN, topHi: 0, footLo: TV_EDGE_MARGIN, footHi: 0, bar: BAR_FOOT, side: BAR_FOOT, at: -Infinity, vw: 0, vh: 0,
   topNotch: [], footNotch: [], notice: null };
 /**
- * OW-EDGES (2026-09-29, the player: "all the markers floating around can be more to the screen edges, respect the hotbar
- * and other bars"): THE NOTCHES. A piece across the top or the foot (the HUD's compass, its hotbar and vitals) held EVERY
+ * OW-EDGES: THE NOTCHES. A piece across the top or the foot (the HUD's compass, its hotbar and vitals) held EVERY
  * mark along that edge clear of its whole depth - the hotbar's 150 px lifted a town at the screen's far left as high as
  * one straight over it. Each such piece is now a notch: its own span [x0, x1] and depth `d` (px from its edge). A mark at
  * that edge stands at the edge, and steps in only where its box meets a notch; a point in the picture UNDER a notch (it
@@ -1574,7 +1568,7 @@ function clearBands(a, b, n) {
   return [a * k, b * k];
 }
 /**
- * EDGE-FURNITURE (2026-09-28, Mac: "Fix this bug"; AUDIT DEEP2 E1/E2/E4/E6/E7): WHAT STANDS AT THE EDGES, MEASURED - a
+ * EDGE-FURNITURE: WHAT STANDS AT THE EDGES, MEASURED - a
  * layout read, so at most every FURNITURE_EVERY_MS, when the screen changes size and when the view opens; never per
  * frame, never per mark. A piece whose middle is in the screen's middle third is a BAND across its edge (the compass,
  * the vitals, the travel panel): the marks held at that edge stand clear of it. One in a side third is a CORNER piece
@@ -1584,7 +1578,7 @@ function clearBands(a, b, n) {
  * buttons stood over its Return.
  */
 /**
- * OW-NOTICES (2026-09-29, the player: "the notifications on the right side go into the box they need to be adjusted"):
+ * OW-NOTICES:
  * THE BLOCK'S EDGES, TOLD TO THE PAGE. The notice stack (ui/enhanced/enhancedNotice.js) stands at the right edge, centred - over
  * the Overworld's block. While the view is up the root wears `data-tview-block` ('foot' or 'top', where the block
  * stands) and `--tview-block-top` / `--tview-block-bottom` (px); the style sheet sets the stack above the block, or under
@@ -1644,8 +1638,7 @@ function measureFurniture(doc, vw, vh) {
   // FILTERS-LEFT: the filter block in the bottom-left corner, lifted as the right's block is - over whatever stands under
   // its span in the foot half (the quick slots, a phone's buttons, the right's block on a narrow screen), never past the
   // screen's middle - then a piece the marks keep clear of like the rest
-  // SIDE-CORNER (2026-10-06, the player: "the whole filter block is not properly in the left corner ... if there are
-  // issues with the buffs ... just place them next right to the filter block"): the block STAYS in the corner (the sheet's
+  // SIDE-CORNER: the block STAYS in the corner (the sheet's
   // left and bottom, never lifted); the HUD's quick-slot block and its buffs, when they stand in its way, step to its right
   // while the view is up (`translate`, so the HUD's own place and the layout editor's move are left as they are)
   const side = parts?.side, sr = side?.getBoundingClientRect?.();
@@ -1709,7 +1702,7 @@ function heldSide(q, vw) {
   return h.y < (furniture.vh || 2 * h.y + 2) / 2 ? 2 : 3;   // OW-EDGES: the top or the foot by which half it is held in (a notch's edge is no longer the band's)
 }
 /**
- * EDGE-DECLUTTER (2026-09-28, Mac: "Just #1"): THE MARKS HELD AT ONE EDGE, SPREAD so none lies over another. Two towns
+ * EDGE-DECLUTTER: THE MARKS HELD AT ONE EDGE, SPREAD so none lies over another. Two towns
  * (or a town and a rider) in much the same direction were held at the same spot, one plate hiding the other and its
  * click. Each edge's marks keep their order along it and slide apart - down a side (by their boxes' heights), along
  * the top or the foot (by their widths) - just enough, each run of them centred on where its marks would stand; each

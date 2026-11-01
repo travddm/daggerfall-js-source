@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY1 (2026-10-05, bible/06-Systems/Legacy-Arc.md): THE FAMILY - Project Legacy's record, as the port keeps it.
+// LEGACY1: THE FAMILY - Project Legacy's record, as the port keeps it.
 //
 // Mac's own mod (vendor/project-legacy/, read off `Project Legacy.dll`'s IL) keeps its line as FIVE parallel lists in
 // one save (`Project_Legacy_Data`: CharacterData, StatsData, SkillsData by id, plus the current three) and pours one
@@ -35,8 +35,7 @@ export const FAMILY_VERSION = 1;
 export const MODELS = Object.freeze({ bloodline: 'bloodline', enduring: 'enduring' });
 export const isModel = (m) => m === MODELS.bloodline || m === MODELS.enduring;
 
-/** LEGACY-CHOICE (2026-10-06, Mac: "a enhanced plus UI popup for online when creating a character. Perma Death, the
- *  regular option, or the option that skips the liniage system entirely"): THE THIRD ANSWER - a character who founds no
+/** LEGACY-CHOICE: THE THIRD ANSWER - a character who founds no
  *  house. Never a family's model: the character's own answer (`entity.legacyChoice`, saved with them), and Project
  *  Legacy sits them out for good - at their birth and at every load, in either lane. */
 export const NO_LINEAGE = 'none';

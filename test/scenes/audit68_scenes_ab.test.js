@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster "scenes_ab" (src/scenes: the watch, the data door, the
+// AUDIT 68, the whole-tree sweep - cluster "scenes_ab" (src/scenes: the watch, the data door, the
 // dropped torches, the mesh pipeline, the town talk slot, the host magic and enchant doors, the interior people).
 // Each pin EXECUTES the real module over the shape its producer mints, and each failed on the base it fixes: a
 // watchman who died twice, a drop that walked one item, a Morrowind read that landed in the next attach's cache,

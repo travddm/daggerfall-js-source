@@ -1,7 +1,4 @@
-// BODY-MOTION (2026-10-18, Mac: "Weapon specific walking/running animations ... (running with a 2 hander by the hip)
-// (1 hand idle animation, holding down away from side. Running with it using the same format) (Duelhand idle away from
-// sides, running with them behind you) - Improved melee 3rd person attack animations"; bible/04-Characters/
-// Body-Motion.md) - THE CARRY, THE BLOWS AND THE WIRING, on the vendored retail biped with the pair's Weapon Bone Left
+// BODY-MOTION - THE CARRY, THE BLOWS AND THE WIRING, on the vendored retail biped with the pair's Weapon Bone Left
 // made as the build makes it (combat/twoHands/mirrorRig.js offWeaponBoneAddon).
 //
 // What is pinned: every weapon type and hands mode to its carry class; the stances Mac named, measured on the solved
@@ -78,7 +75,7 @@ test('BODY-MOTION THE CLASSES: each weapon type and hands mode to the carry it i
   ];
   assert.deepEqual(rows.map(([w]) => carryClassOf(w)), rows.map(([, c]) => c));
   assert.deepEqual(['one', 'dual', 'two', 'wide', 'spear', 'fists', 'free', 'clip'].map(meleeFamilyOf), ['one', 'one', 'two', 'two', 'two', 'fists', null, null]);
-  assert.deepEqual({ ...TWO_HAND_GRIP }, { two: -0.4, wide: 0.5, spear: 0.55 });   // PIN MOVED (AUDIT BODY-MOTION CARRY-1): a fifth down, the left fist sat inside the right forearm
+  assert.deepEqual({ ...TWO_HAND_GRIP }, { two: -0.4, wide: 0.5, spear: 0.55 });
   assert.equal(blowName('slash', true), 'back');
   assert.equal(blowName('chop', true), 'chop');
 });
@@ -110,7 +107,6 @@ test('BODY-MOTION A ONE-HANDER, HELD DOWN AND AWAY FROM THE SIDE (Mac\'s stance)
   assert.ok(b[1] > 0.5 && b[2] < -0.4 && b[0] > 0.1, `forward, down and out (${b.map((v) => v.toFixed(2))})`);
   // running
   const runB = [], runOut = [], freeSwing = [];
-  // PIN MOVED (AUDIT BODY-MOTION CARRY-4/6): the carry's gait shares follow the gait's on a spring now, the blade brought
   // round the outside of the body - the last hundredth of the run's share comes in after the first second, from above
   play({ weapon: MW_WEAPON_TYPE.LongBladeOneHand, forward: 1, speed: 8.1, running: true }, 2.2, (m, mo, t) => {
     if (t < 1.2) return;

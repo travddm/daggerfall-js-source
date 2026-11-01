@@ -1,5 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "lets implement an instanced system ... select public or instanced (if applicable)";
-// bible/11-Multiplayer/Instances.md): THE LAW - an instance is its place's public world room with an owner and an
+// INSTANCES: THE LAW - an instance is its place's public world room with an owner and an
 // epoch after it (net/instanceRoom.js), a world room like its twin (net/wire.js WORLD_ROOM, worldTtlMsFor), keyed by
 // roomKeyFor from an identity's `instance` (net/online.js), and admitted to its owner, staff and the party of its owner alone.
 import { test } from 'node:test';

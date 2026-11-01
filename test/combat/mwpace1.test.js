@@ -1,5 +1,4 @@
-// MW-PACE1 (2026-10-07, Mac: "Morrowind attack animations don't scale with attack speed/multiple attacks when attack
-// speed is high"): THE MORROWIND BLOW IS PACED BY DAGGERFALL'S.
+// MW-PACE1: THE MORROWIND BLOW IS PACED BY DAGGERFALL'S.
 //
 // The classic machine owns every blow (characters/weaponStates.js; rule 24's note in Morrowind-Rules.md: the hit
 // frame is FPSWeapon's, not the .kf's). The Morrowind arm drew each blow at its WEAP record's pace and refused a strike

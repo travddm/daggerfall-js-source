@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster "tools": tools/ and
+// AUDIT 68, the whole-tree sweep - cluster "tools": tools/ and
 // scripts/, the dev tooling, the bakes, the cite and mutant tools. Each pin
 // failed on the base (ad238de0) and passes on the fix. Most run the real tool
 // on a scratch tree, so none of them can write the checkout; the cite

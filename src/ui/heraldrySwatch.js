@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work") — A
+// HERALDRY-SHOWN — A
 // GUILD'S HERALDRY AS A SWATCH, the one DOM door of Seats-Arc 8.1's
 // small faces: "the frame of the guild tag, the siege HUD ... and the
 // Chronicle".

@@ -1,4 +1,4 @@
-// COATS1 (2026-10-11): THE HORSE'S LOOK (bible/06-Systems/Horse-Coats.md, systems/horse/horseCoats.js) - the law (coat,
+// COATS1: THE HORSE'S LOOK (, systems/horse/horseCoats.js) - the law (coat,
 // pattern, legs and the horse's own seed), its birth, the dye and its markings, the item's fields, the wire's three
 // doors (the pool's word, the parked word, the pose), the pictures that wear it (the riding sprite, the pool's
 // billboards, Eye Of The Beholder's rider - mine and the others', the road's strangers), their letting go, and the Stable.
@@ -372,7 +372,6 @@ test('COATS1 the pool: past HORSE_LOOKS_KEPT looks, the one longest undrawn is l
   assert.ok(evicted.every((k) => k.endsWith(`~${first}`)), 'that look alone');
 });
 
-// PIN MOVED (AUDIT FB1022d D1): a look is let go by the store's once-a-frame sweep (createEotbArt sweep, the riders'
 // settle), never inside a draw - so each ensure here is a frame, swept
 test('COATS1 the others\' riders: each rider\'s horse look is its own dyed pictures, let go once RIDER_LOOKS_KEPT others were drawn since', async () => {
   const evicted = [], uploads = [];

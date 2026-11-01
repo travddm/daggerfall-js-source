@@ -106,7 +106,7 @@ const bank = {
     // banking.js, THE STORE IS PER REGION), and nothing online said so - the teller in another region read "Account
     // balance 0" under "Bank of the Empire". The row names the region whose account it is, and each other region that
     // holds gold stands beneath it (CreateBankingStatusBox's list, which only the classic sheet's gold button opens).
-    // EMPIRE-ACCOUNT (2026-10-01): online every branch keeps ONE account, the Empire's - the row is that account, and
+    // EMPIRE-ACCOUNT: online every branch keeps ONE account, the Empire's - the row is that account, and
     // beneath it only a branch a character has not yet folded into it (banking.js foldEmpireAccounts, at its next boot)
     const here = REGION_NAMES[w.region];
     const gold = goldRegion(w.accounts ?? [], w.region), one = empire && gold === EMPIRE_ACCOUNT_REGION;
@@ -363,8 +363,7 @@ const spellMaker = {
 };
 
 // ── THE SPELL SHOP ─────────────────────────────────────────────────
-// SHOP-PLUS (Mac: "the buy spells vendors UI in guild halls is still in classic this must be reworked to enhanced
-// plus"). The guilds' and temples' Buy Spells is DFU's spellbook in BUY MODE (worldModes guildServiceSpellbook) -
+// SHOP-PLUS. The guilds' and temples' Buy Spells is DFU's spellbook in BUY MODE (worldModes guildServiceSpellbook) -
 // ported, not rewritten: every price is the window's own tradePrice (the building's quality against the player's
 // Mercantile and Personality, the Witches Festival half), the buy is its own buyButton (the spellbook check, the
 // gold check, the haggle line and the Yes/No, which take their enhanced faces), and an effect's full description is

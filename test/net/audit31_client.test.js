@@ -1,11 +1,11 @@
-// AUDIT 31 (2026-09-29, Mac: "let's first do a comprehensive audit and ensure everything so far is perfect") - THE
+// AUDIT 31 - THE
 // MARKET'S AND THE WRITS' BOOKS AND THEIR HOSTS, AUDITED: no piece taken with no account to keep it under (B1); a kept
 // act's slot the one it was pressed in (B2); an act's id its slot's (B4); a writ act's balance told to the market's
 // book and its reads let go (B5); the Work list per slot and in order (B7); the auction words that move a view (B8);
 // a settle asked while an act is out waits for it (B10); a piece one book keeps never taken by the other, and a piece
 // the service says is elsewhere never put back (H1); the guild Stores read at each look, a refused read said with Try
 // again, and a member's own deposit taken back (H2, R1, U8); every list a piece can lie in (H5); a piece's recipe
-// stamped at its mint (H3); worn is never whole (H9). bible/06-Systems/Online-Arc.md "AUDIT 31".
+// stamped at its mint (H3); worn is never whole (H9). "AUDIT 31".
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -72,7 +72,6 @@ test('AUDIT 31 B1: with no account signed in, nothing is taken - a listing, an a
   assert.ok(REFUSALS['piece-held']);
 });
 
-// PIN MOVED (INT19, Integrity-Arc section 7): a fill goes through the realm act, which holds the record for its length and
 // keeps nothing - the slot law is the kept fills' a tab from before INT19 left, each settled in its own character alone
 test('AUDIT 31 B2: a kept act is its press\'s slot\'s - a refusal heard after a quick-load to another character is never put back into that one; the first character\'s settle answers it', async () => {
   const storage = memStorage();
@@ -194,12 +193,10 @@ test('AUDIT 31 H1: a piece one book keeps an act on is never taken by the other;
   let up = false;
   const door = {
     account: () => 'acct-1',
-    // PIN MOVED (FIELD BUGS 2026-10-01, MARKET-KEEP): the piece stands LISTED elsewhere - a record naming another owner
     // is no proof the save's piece is a copy (a trade hands a crafted piece on and never its record), so it is put back
     list: async () => (up ? { ok: false, error: 'market-listed' } : { ok: false, error: 'offline' }),
     fulfil: async () => ({ ok: true, data: {} }),
   };
-  // PIN MOVED (INT19): the books keep no new act on a piece (the record is the truth) - the kept list here is a tab's from
   // before INT19, whose piece came back into the pack when the save was restored (the tab died before it was kept)
   storage.setItem(MARKET_KEPT_KEY, keptFrom('list'));
   let writs = null;
@@ -234,7 +231,7 @@ test('AUDIT 31 H1: a piece one book keeps an act on is never taken by the other;
   const back = [];
   await w2.settle((it) => back.push(it), (it) => { const i = two.pack.findIndex((x) => x.provenance === it.provenance); if (i >= 0) two.pack.splice(i, 1); });
   assert.deepEqual([back.length, two.pack.length, w2.pending], [0, 0, 0]);
-  assert.deepEqual([...PIECE_GONE].sort(), ['market-listed', 'market-standing', 'market-uncollected']);   // PIN MOVED (MARKET-KEEP): never 'market-not-yours'
+  assert.deepEqual([...PIECE_GONE].sort(), ['market-listed', 'market-standing', 'market-uncollected']);
   assert.ok(REFUSALS[PIECE_KEPT_ERROR] && REFUSALS['market-no-record']);
 });
 
@@ -277,7 +274,7 @@ test('AUDIT 31 H2, R1, U8: the Guild tab reads the guild Stores at each look, pe
   const doc = { ...document, createElement: (t) => Object.assign(document.createElement(t), { dataset: {} }) };
   doc.head.dataset ??= {}; doc.body.dataset ??= {};
   const panel = createSocialPanel({ social: new SocialState({ acct: 'acct-a' }), guild: book, doc, win: { addEventListener() {}, removeEventListener() {} }, overlay: () => false, touch: false });
-  panel.openGuild('stores');   // GUILD2 (PIN MOVED): the guild Stores are the Guild tab's Stores page
+  panel.openGuild('stores');   // GUILD2 (
   await ticks(6); panel.render(); await ticks(6); panel.render();
   assert.match(panel.root.textContent, /The guild Stores cannot be read now/);
   const btn = (label) => byClass(panel.root, 'dfsocial-btn').find((b) => b.textContent.startsWith(label));
@@ -285,7 +282,7 @@ test('AUDIT 31 H2, R1, U8: the Guild tab reads the guild Stores at each look, pe
   btn('Try again').click();
   await ticks(6); panel.render(); await ticks(6); panel.render();
   assert.match(panel.root.textContent, /120 Oak Logs20 of them yours/);
-  const units = () => byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (PIN MOVED): empty is all of it
+  const units = () => byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (
   const type = (v) => { const u = units(); u.value = v; u.dispatch('input', {}); };
   type('21');
   assert.equal(btn('Take out').disabled, true, 'past their own 20');

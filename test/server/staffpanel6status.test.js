@@ -1,4 +1,4 @@
-// STAFF-PANEL6-STATUS (2026-10-22; design doc "DFO Staff Panel: design", build step 6) - THE PANEL'S SERVER STATUS, ITS
+// STAFF-PANEL6-STATUS - THE PANEL'S SERVER STATUS, ITS
 // ADMIN-SET LIMITS AND HOME (server-account/src/staffStatus.js), driven through the real Worker on the node:sqlite
 // database every account pin stands on (test/accountDb.mjs): the tiles from what the game already records, kept for their
 // windows; a tile amber or red only past a limit an Admin set; health red on a failed cron job, a relay or service that
@@ -380,7 +380,7 @@ test('STAFF-PANEL6-STATUS: HOME - the top n of each watch the caller may see, wo
   assert.deepEqual(admin.watches.find((x) => x.id === 'boom'), { id: 'boom', label: 'boom', items: [], high: 0, total: 0, more: 0, failed: true });
   const mod = await homeOf({}, {}, { player: {}, role: 'moderator' }, 10, list);
   assert.ok(!mod.watches.some((x) => x.id === 'admins'), 'an Admin\'s watch is not a Moderator\'s');
-  assert.deepEqual(HOME_WATCHES.map((x) => [x.id, x.role]), [['reports', 'moderator'], ['economy', 'admin'], ['gains', 'admin'], ['contested', 'admin'], ['bursts', 'admin'], ['monsters', 'admin'], ['freeze', 'admin'], ['watchlist', 'moderator'], ['status', 'admin']]);   // every staff module's watch, the design's Home order (PIN MOVED, STAFF-PANEL5: the feeds' two and the freeze's)
+  assert.deepEqual(HOME_WATCHES.map((x) => [x.id, x.role]), [['reports', 'moderator'], ['economy', 'admin'], ['gains', 'admin'], ['contested', 'admin'], ['bursts', 'admin'], ['monsters', 'admin'], ['freeze', 'admin'], ['watchlist', 'moderator'], ['status', 'admin']]);   // every staff module's watch, the design's Home order (
   assert.equal(HOME_WATCHES[0], REPORTS_WATCH);
 });
 

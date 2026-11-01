@@ -1,4 +1,4 @@
-// FIRM-RETRY (2026-10-25; bible/06-Systems/Firmament.md section 6) - THE BOOK READS AGAIN BY ITSELF
+// FIRM-RETRY - THE BOOK READS AGAIN BY ITSELF
 // (src/net/firmament/firmamentBook.js): a read or a change the service never answered is followed by a read of the book's
 // own, the wait doubling to its ceiling, until a read is answered. The world host reads once, at the first Renown, and
 // only the enhanced HUD asked again, so a classic-HUD character whose first read failed played with no stars.

@@ -25,7 +25,7 @@
 // rather than dead of the time they were not playing. The tick itself
 // owes at most MAX_CATCHUP_MINUTES per reading.
 //
-// SURV-TIERS (2026-09-23): THE COUNTERS ARE THE WORLD'S, THE COSTS ARE
+// SURV-TIERS: THE COUNTERS ARE THE WORLD'S, THE COSTS ARE
 // THE TIER'S. Everything above moves the same way in Casual and Hard;
 // what a minute CHARGES - the stamina, the attributes, the health, the
 // rust - is read off the tier's rules (survival/difficulty.js), handed in
@@ -34,7 +34,7 @@
 // repays (Casual) keeps one more field, `borrowed`: the stamina each need
 // took, returned when that need is met.
 //
-// SURV-BOONS (2026-10-12): AND A TIER THAT REWARDS (Boons) KEEPS TWO MORE -
+// SURV-BOONS: AND A TIER THAT REWARDS (Boons) KEEPS TWO MORE -
 // `wellRested`, the minutes of Well rested a night in a bed or by a fire
 // banked (paySleep), spent a waking minute at a time; and `boons`, the
 // boons the last minute granted (survivalBoons), which the strip and the
@@ -83,8 +83,7 @@ export const HEALTH_FLOOR = 5;
 /** AUDIT SURV A: the well-fed hour - a point of fatigue back for every hour spent fed (the mod's 500-tally was minutes and paid twenty). */
 export const WELL_FED_MINUTES = 60;
 /**
- * HEARTY-MEAL (2026-10-23, the owner: "eating a meal in taverns should make you fed and not thirsty for a while (Well Fed
- * buff etc)"): A TAVERN MEAL IS A SIT-DOWN MEAL. It fills the stomach and quenches the thirst (the table pours with it),
+ * HEARTY-MEAL: A TAVERN MEAL IS A SIT-DOWN MEAL. It fills the stomach and quenches the thirst (the table pours with it),
  * and for HEARTY_MEAL_MINUTES after it neither need moves: the hunger stays Fed and the thirst stays at nought - the HUD's
  * Well Fed tile says so, its hours left on its foot (status.js survivalHudChips). `s.mealUntil`, the classic minute it
  * ends; it moves with the needs' own markers wherever the clock is stood still (pauseSurvival). A ration, a skin or a
@@ -134,7 +133,7 @@ export const WELL_RESTED_MAX_MINUTES = 12 * 60;
 // `stamina.floor`, the share of the pool the needs may not take - none
 // in Hard, half in Casual.
 export const MAX_CATCHUP_MINUTES = 2 * MINUTES_PER_DAY;
-/** AUDIT C&C (2026-10-12): a ROAD - a jump of more than this that is not a rest (a fast travel, a training, a span the
+/** AUDIT C&C: a ROAD - a jump of more than this that is not a rest (a fast travel, a training, a span the
  *  clock was moved over) - is felt under a fair sky (runSurvivalMinutes): the weather it met is nobody's to know. */
 export const ROAD_MINUTES = 60;
 /** The sleep-debt stage a tier's rough night cannot pay below (difficulty.js `roughSleepFloor`), as hours of debt. */
@@ -544,7 +543,7 @@ export function survivalMinute(entity, now, env = {}, deps = {}) {
   const hungerNow = vampire || beast ? 'fed' : hungerStage(hunger);   // AUDIT C&C N4: the beast's too, as the mod's
   let refunded = 0;   // AUDIT SURV-TIERS (the third pass): the fed hour's refund is a refill the loan is settled by (loanPool)
   if (hungerNow === 'fed' && !vampire) { s.fed += 1; if (s.fed >= WELL_FED_MINUTES) { s.fed = 0; sinks.restoreFatigue?.(DRAIN.wellFed); refunded = DRAIN.wellFed; } }
-  // RATIONS-HUNGRY (2026-10-03, Mac: "With C&C let it auto consume any rations in inventory when hungry"): a sack in
+  // RATIONS-HUNGRY: a sack in
   // the pack is eaten as the player turns Hungry, not left until they starve - the Hungry line never said over food
   if (AUTO_EAT_STAGES.includes(hungerNow) && autoEat) {
     const sack = items.find((i) => i.templateIndex === TEMPLATE.Rations && isFood(i));
@@ -569,14 +568,13 @@ export function survivalMinute(entity, now, env = {}, deps = {}) {
       if (thirstNow === 'parched') tire(DRAIN.parched, 'thirst');
       else if (thirstNow === 'dehydrated') tire(DRAIN.dehydrated, 'thirst');
     }
-    // SURV-THIRST1 (2026-09-19, Mac: "You should also should die on
-    // dehydration"). THE DEPARTURE, and the only one in this block.
+    // SURV-THIRST1. THE DEPARTURE, and the only one in this block.
     //
     // Climates & Calories bleeds you for thirst only in HEAT - this line
     // read `s.thirst >= 120 && temp.felt > NEED.EXPOSURE_AT`, so a cool
     // dungeon taxed fatigue for ever and never a drop of blood. Water is
     // not a climate: a body past dehydrated fails wherever it stands, and
-    // the port says so. (bible/06-Systems/Climates-Calories.md carries the
+    // the port says so. (carries the
     // departure; it is NOT the mod's law and must not be tidied back.)
     //
     // The shape is AUDIT SURV E's, not a new one. A harm that can kill
@@ -821,7 +819,7 @@ export function runSurvivalMinutes(entity, from, to, env, deps) {
   // - and a blackout night drank from the skin while its drinker was out cold. The replay's lines are gathered, each
   // said once when the walk reaches the minute the player stands in; the stage lines wait for that minute
   // (stageNote), which says the net change.
-  // AUDIT C&C (2026-10-12, E5): A JUMP'S MINUTES ARE FELT AT THEIR OWN SKY. The host reads the air once a frame, BEFORE
+  // AUDIT C&C: A JUMP'S MINUTES ARE FELT AT THEIR OWN SKY. The host reads the air once a frame, BEFORE
   // the clock moves, so a fast travel or a night's rest was felt whole at the hour it set out in - three days set out at
   // a mountain midnight froze at -60 every minute, set out at noon never met a night. Where the sky is this clock
   // (`skyFollows`: offline, worldTick.js) EVERY minute of a jump - the one it lands in too (AUDIT C&C N1/H4/R1: the
@@ -867,7 +865,7 @@ export function runSurvivalMinutes(entity, from, to, env, deps) {
 }
 
 /**
- * AUDIT C&C (2026-10-12, N2): THE COLLAPSE'S HOUR IS A NIGHT ON THE GROUND. DFU's CollapseFromExhaustion raises the clock
+ * AUDIT C&C: THE COLLAPSE'S HOUR IS A NIGHT ON THE GROUND. DFU's CollapseFromExhaustion raises the clock
  * an hour with the body out cold (RaiseTime), and the four hosts' hour (CAMP-REST: "the forced hour is a rest") reached
  * the needs as an hour AWAKE - the debt that had collapsed the body grew by it, and in Hard the exhaustion drained the
  * hour through. A host marks the hour as it raises it: the `minutes` after the minute in hand (the character's own

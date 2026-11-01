@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SP1 (2026-09-21, a player on Discord: "my saves its all gone", and
-// Mac: "we need parity between browser and the install"): SAVES MOVE
+// SP1: SAVES MOVE
 // BETWEEN THE WEBSITE AND THE APP.
 //
 // The website keeps a save in the browser's storage for its origin;

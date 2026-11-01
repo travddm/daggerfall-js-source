@@ -3,7 +3,7 @@
 // QuickDial answered it, so wherever the dial did not answer (the classic skin, the status readout's slot, a key rebound,
 // the boot's last await), the browser walked the page's focus onto the first control drawn over the world. Online, with the
 // chat shut, that control is the chat's Social button. Its focus ring showed, and the next Space (the game's Jump) pressed
-// it. A mouse press on the button left it the focus the same way. bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md.
+// it. A mouse press on the button left it the focus the same way..
 //
 // Driven on the real modules: the chat panel (ui/chatPanel.js createChatPanel, its real ChatLog, its Social button the way
 // scenes/world.js asks for it) and the hosts' one swallow (ui/input.js swallowBrowserKey), run in world.js's order - the

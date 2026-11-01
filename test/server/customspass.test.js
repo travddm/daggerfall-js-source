@@ -1,7 +1,7 @@
-// CUSTOMS-PASS (2026-09-29, the field - bible/01-Overview/bugs/Field-Bugs-2026-09-29b.md). Gryphoth's character was made and
+// CUSTOMS-PASS. Gryphoth's character was made and
 // played online on a build from before the realm, after the census froze, so the realm never saw it before it began and
 // customs refuses it - by the census law (L1-F5), and rightly. REALM-DOOR stops that happening again; for the characters
-// it already happened to, Mac chose, asked: "Staff customs pass" - a developer grants ONE account a single-use pass, and
+// it already happened to, - a developer grants ONE account a single-use pass, and
 // that account's next Bring online of a character the census does not count is admitted once, through customs as any
 // is (the loans called in, the wealth capped at the level's allowance). No self-service door: the census stays frozen
 // for everyone else, and a pass never admits a character already in, from any account - so no Copy to offline comes

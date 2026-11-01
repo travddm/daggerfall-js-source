@@ -215,7 +215,6 @@ test('WORLD-HOVER: an itemised frame carries the rows, the tail and the empty fl
   const f = resolveHover(hit('loot:1'), { contents: () => many, name: () => ({ title: 'Loot Pile' }) });
   assert.equal(f.kind, 'items');
   assert.equal(f.title, 'Loot Pile', 'the namer\'s title, not a kind label');
-  // PIN MOVED (FIELD BUGS 2026-10-11g LOOT-SCROLL): the frame carries EVERY row - the wheel and the take reach them all -
   // and the plaque draws HOVER_MAX of them, the rest its tail
   assert.equal(f.rows.length, HOVER_MAX + 3);
   assert.equal(f.rest, 0);
@@ -286,7 +285,6 @@ test('WORLD-HOVER: the signature changes when the LIST does, under a constant ke
   }));
   const six = resolveHover(hit('loot:1'), { contents: () => Array.from({ length: HOVER_MAX + 1 }, (_, i) => ({ name: `Item${i}` })), name: PILE });
   const seven = resolveHover(hit('loot:1'), { contents: () => Array.from({ length: HOVER_MAX + 2 }, (_, i) => ({ name: `Item${i}` })), name: PILE });
-  // PIN MOVED (LOOT-SCROLL): the visible rows are the plaque's window over the frame
   assert.deepEqual(plaqueWindow(six).frame.rows.map((r) => r.name), plaqueWindow(seven).frame.rows.map((r) => r.name), 'the same six rows are visible');
   assert.notEqual(plaqueWindow(six).frame.rest, plaqueWindow(seven).frame.rest, '...and the tails differ');
   assert.notEqual(many(HOVER_MAX + 1), many(HOVER_MAX + 2), 'a changed TAIL under the same visible rows repaints');
@@ -1441,9 +1439,7 @@ test('AUDIT-WH2 L5-F9: the gate memo is asked INSIDE a frame, which is the only 
 
 // ── QUICK-LOOT-STATS: THE LIT ROW'S NUMBERS, BESIDE THE LIST ─────
 //
-// (2026-09-22, a player relayed by Mac: "can it show the stats of the
-// items next to the quickloot window? So i dont have to pick up
-// everything to check in my inventory if its worth keeping".) These two
+// These two
 // live here rather than in test/systems/quicklootstats.test.js because they
 // need the fake document above - that file holds the parts that can be
 // driven without one, which is most of it.

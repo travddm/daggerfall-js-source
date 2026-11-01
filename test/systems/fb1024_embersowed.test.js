@@ -7,7 +7,7 @@
 // honest sale answering for a press that never landed - pieces without end; the week turning; a save loaded again minting
 // the piece again). So every press carries a request id, the service writes it beside the sale or FENCES it
 // (server-account/src/brokerSales.js), and the owed sale is settled by that id alone (systems/sigil/sigilBroker.js).
-// Record: bible/01-Overview/bugs/Field-Bugs-2026-10-24.md.
+// Record:.
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';

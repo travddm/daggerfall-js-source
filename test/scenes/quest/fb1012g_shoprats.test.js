@@ -3,7 +3,7 @@
 // not in shops?" M0B00Y15 and M0C00Y14 (`Place _house_ local random` - any building, shops among them) `create foe` at
 // the house: DFU's interior arm is PlaceFoeFreely alone, a bearing just outside the view with 5 m + 1.25 m clear, and a
 // shop's counter and shelves leave it none - the wave waited forever. Over the real Collider in a shop-shaped room, the
-// ring alone and the host's law (questFoeHost.js placeRoomQuestFoe). bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// ring alone and the host's law (questFoeHost.js placeRoomQuestFoe)..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

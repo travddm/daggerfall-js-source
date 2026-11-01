@@ -1,7 +1,7 @@
-// DECK-CAMP (2026-10-04, from the field: "Campfires placed on a boat dont attach to a boat") - a camp placed on a boat's
+// DECK-CAMP - a camp placed on a boat's
 // deck carries her number and its point in her frame (systems/survival/camp.js), and the pool poses it off her every
 // frame (scenes/camps.js ride): hidden with her, packed back into the pack once she is gone, saved and said on the wire
-// by its place on her. bible/06-Systems/Rest-Arc.md, bible/03-World/Come-Sail-Away.md.
+// by its place on her.,.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

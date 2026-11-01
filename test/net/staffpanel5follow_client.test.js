@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow; the weak spot "Follow can't
-// learn the target's next room") - THE RELAY'S HALF (server/src/staffFollow.js, server/src/staffTeleport.js) and the law
+// STAFF-PANEL5-FOLLOW - THE RELAY'S HALF (server/src/staffFollow.js, server/src/staffTeleport.js) and the law
 // both ends run (src/net/staffFollow.js): the where note kept outside a party and read for staff alone, the seat it must
 // not move, a follow's spectator told `on`, the note, `in`/`out` and `gone`, the rooms' word to the bus only for an
 // account someone follows, and a staff /tp answered from the note - with what it costs the bus, measured.
@@ -63,8 +62,7 @@ test('STAFF-PANEL5-FOLLOW law: the note\'s pace, its room, its place, the frames
   assert.equal(validPartyPose(note('interior:m12.345')).rk, 'interior:m12.345');
   assert.equal('rk' in validPartyPose(note('owned:abc.m1.2')), false);
   assert.equal('rk' in validPartyPose(note('chat:world')), false);
-  // STAFF-PANEL5-FOLLOW-FIX (finding 2): a home, a boat's cabin and a caravan are rooms a follow enters (mob: "ANY player
-  // ANYWHERE (homes too)") - the note keeps them, and names them
+  // STAFF-PANEL5-FOLLOW-FIX (finding 2): a home, a boat's cabin and a caravan are rooms a follow enters - the note keeps them, and names them
   const bk = (5 << 16) + (9 << 8) + 42, owner = `owned:${'a'.repeat(32)}.${'b'.repeat(16)}`;
   for (const rk of [`${owner}:1291010263.${bk}`, `${owner}:boat.77`, `caravan:${'c'.repeat(24)}`]) {
     assert.equal(validPartyPose(note(rk, { in: 2, bk })).rk, rk, rk);

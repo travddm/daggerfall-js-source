@@ -1,6 +1,5 @@
 // @ts-check
-// RAM-RETURN (2026-10-26, the owner: "I would like to reintegrate it in a thoughtful way. The major issue was that you
-// could easily instability ships just by ramming"; bible/03-World/Naval-Refit.md RAM-RETURN and its AUDIT) - THE RAMS AT
+// RAM-RETURN - THE RAMS AT
 // SEA, wired by the naval host (scenes/naval/navalHost.js frame, stepSea, applyPeerHit, clear - HOST-SPLIT: the module
 // the host wires, as navalHaul.js is) over the ram's own law (systems/naval/navalRam.js: the face, the closing way, the
 // blow, the line, the recoil and what pays for it). The port's own - Daggerfall has no sea.

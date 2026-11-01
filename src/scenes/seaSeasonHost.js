@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-SEASON (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-SEASON) - THE SEA'S SEASON BOARDS, the page's half: the harbourmaster's tab's section of the
+// SEA-SEASON - THE SEA'S SEASON BOARDS, the page's half: the harbourmaster's tab's section of the
 // season's captains (ui/naval/navalYardWindow.js seasonText) over the service's boards (server-account/src/seaSeason.js,
 // net/accountClient.js accountSeaSeason). Built by the sea's host (scenes/seaVenturesHost.js) - HOST-SPLIT: the world
 // wires it there. The figures themselves go with the record: the captain's ledger keeps them (systems/naval/

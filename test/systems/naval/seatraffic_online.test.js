@@ -1,4 +1,4 @@
-// SEA-TRAFFIC (2026-09-30, Mac: "players arent seeing boats") - online, the sea's traffic is launched by one player of
+// SEA-TRAFFIC - online, the sea's traffic is launched by one player of
 // those near each other: the lowest id - but only a player ON THE WATER launches any (the director runs for a player at
 // a helm, on a deck or swimming). The election counted every player near, so a lower id ashore - still in the port
 // town - was elected and launched nothing, and the player sailing out within NAVAL_SHARE_RADIUS of them, not elected,
@@ -22,10 +22,8 @@ test('SEA-TRAFFIC a player sailing near a lower id ashore meets the sea\'s traff
   assert.equal(all(A).filter((e) => !e.owner).length, 0, 'a, ashore, launched none');
   assert.ok(all(B).every((e) => !e.owner), 'b launched them');
   // and a player on the water with a lower id near launches for both - one launcher, never two. AUDIT SHIP-LIFE F1
-  // (PIN MOVED): the director's count is a running total that never falls, and b's already stood above nought - the
   // pin read it and passed whatever a did. Now: from a's swim on, b launches none, and the shared sea keeps its traffic
   A.s.view.feet = [0, 0, -300];   // a swims out
-  // PIN MOVED (SEA-EASE, 2026-10-01): the sea's ships are fewer and slower to come - b's sea stood full at "Some", so it
   // launched nothing whether it was the launcher or not. Its own ships taken off and two rolls' time: a b that still
   // thought itself the launcher would launch again
   for (const e of all(B)) if (!e.owner) B.s.host._sea.delete(e.id);

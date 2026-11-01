@@ -1,5 +1,5 @@
-// STEED-UI (2026-10-11, the owner: "Proper UI elements for the horse + wagon/cart (Enhanced plus)") - THE SADDLE PANEL
-// (bible/10-UI/Controls.md, THE SADDLE PANEL): the horse ridden and the wagon driven on screen in Enhanced Plus, the
+// STEED-UI - THE SADDLE PANEL
+// (, THE SADDLE PANEL): the horse ridden and the wagon driven on screen in Enhanced Plus, the
 // helm panel's kind (ui/enhanced/enhancedHelm.js). The panel's pure reads (ui/enhanced/enhancedSaddle.js - its gait, its meters, its
 // buttons, its line), the panel on a page, the upkeep's read (systems/upkeep/upkeepRuntime.js saddle), the hosts' one glue
 // (scenes/saddleHost.js), Horse Cart and Cargo's Cargo door (systems/horse/horseCart.js openWagonCargo), the view's own word
@@ -7,7 +7,7 @@
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS / WAGON-TIERS (PIN MOVED): the upkeep is handed each tier's rules - these pins pin the system as it stood, Hard
+import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS / WAGON-TIERS (
 import { readFileSync } from 'node:fs';
 import {
   saddleGait, saddleSpeedText, saddleTitle, saddleMeters, saddleButtons, saddleHint, fedText, drawEnhancedSaddle, hideEnhancedSaddle,

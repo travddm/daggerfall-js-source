@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL6-STATUS (2026-10-22; design doc "DFO Staff Panel: design", build step 6 - "Server status tiles and Admin-set
-// limits"; sections Home, What goes first, Server status and Server load) - THE PANEL'S SERVER STATUS, ITS LIMITS AND
+// STAFF-PANEL6-STATUS - THE PANEL'S SERVER STATUS, ITS LIMITS AND
 // ITS HOME.
 //
 // ═══ SERVER STATUS (Admins only): ONE READ, ASKED EVERY 10 SECONDS ═══

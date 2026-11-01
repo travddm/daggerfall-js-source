@@ -1,5 +1,4 @@
-// SHIELD-OUT (2026-09-27, SlipperyPeasant on Discord: "My shield is fully repaired and looks as such inside, but once
-// I'm out in the open world it visually appears as if its broken"). Every host builds its own weapon rig, and each rig
+// SHIELD-OUT. Every host builds its own weapon rig, and each rig
 // its own Shield Widget; only the host on screen steps its rig. The street's widget sat out the whole visit to the
 // smith and resumed on the battered sprite it last read - its template key had not moved, and only a DOWNWARD crossing
 // (hitShield) repoints the sheet. The mod has ONE component, which sees the shield come off for the repair and re-reads

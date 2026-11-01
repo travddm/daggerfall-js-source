@@ -1,5 +1,4 @@
-// YARDS-FOUND (2026-10-10, from play: "The new stable and transport merchant shops dont show on town maps/overworld",
-// "Ensure these locations appear when talking to NPCs"; bible/03-World/Merchant-Yards.md YARDS-FOUND). THE YARDS FOUND
+// YARDS-FOUND. THE YARDS FOUND
 // AS A SHOP IS: rows of the town's talk directory under a key no building holds (systems/merchantYards.js
 // yardDirectoryRows), their own groups on the Where-is page (systems/topicTree.js), answered as a building is (the
 // compass, the knowledge roll, the map's mark); their ground and their names on both town maps (world/merchantYards/merchantYardMap.js
@@ -69,7 +68,7 @@ test('YARDS-FOUND THE DIRECTORY\'S ROWS: each yard a row of its town\'s talk dir
   assert.notEqual(rows[0].buildingKey, rows[1].buildingKey);
   assert.deepEqual(yardDirectoryRows([{ kind: 'barn', x: 1, z: 1 }, null]), []);
   assert.deepEqual(yardDirectoryRows(null), []);
-  assert.deepEqual(YARD_TALK_GROUPS, { stable: 'Stables', transport: 'Wagon yards', carpenter: 'Carpenters' });   // PIN MOVED (CARP-YARD, 2026-10-12): the joinery's group
+  assert.deepEqual(YARD_TALK_GROUPS, { stable: 'Stables', transport: 'Wagon yards', carpenter: 'Carpenters' });
 });
 
 test('YARDS-FOUND THE WHERE-IS PAGE: the town\'s Stable and Wagon Yard each their own group after the shops\' - its Previous List head, its yard asked as a building (LocalBuilding, its key) - and before the General section and Regional; a town with none has neither group, and the palace still joins General (mutants: the yards ungrouped)', () => {

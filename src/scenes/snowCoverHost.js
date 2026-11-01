@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PRECIP4 (2026-10-19, the owner: "If its snowing in one area and raining in the next, the transition should be seamless
-// both in ground texture and everything else. This needs to be accurate and as detailed as possible") - THE SNOW ON THE
-// GROUND, about the player: a module the world host wires (HOST-SPLIT, bible/01-Overview/Host-Split.md: scenes/fishHost.js
-// is the shape), never grown into bootWorld. bible/07-Rendering/Biome-Precipitation.md is the record.
+// PRECIP4 - THE SNOW ON THE
+// GROUND, about the player: a module the world host wires (HOST-SPLIT,: scenes/fishHost.js
+// is the shape), never grown into bootWorld. is the record.
 //
 // DFU dresses the whole world in its winter archive on the calendar (TerrainMaterialProvider's +1, the climate swaps'
 // winter textures, the nature sets' winter records - climateSwaps.js) and the streaming host re-skins every pixel at the
@@ -166,7 +165,7 @@ export function createSnowCoverHost({ renderer, climateAt, mapHeight, stateOf, b
     l.build[0] = _line[0]; l.build[1] = _line[1]; l.build[2] = _line[2];
     if (!l.shown) l.shown = Float32Array.from(l.target);
   };
-  /** SNOW-BUDGET (2026-10-20, a player via the owner: "something about our weather system affecting fps"): ONE BUDGET A
+  /** SNOW-BUDGET: ONE BUDGET A
    *  FRAME, WHOEVER ASKS. The frame's tick, the feet (`winterAt`, three a frame) and the Snowfall mod's winter
    *  (`winterNear`) each integrated the window for a budget of its own - and while a window caught up its year each ran a
    *  whole step at the least (snowpack.js advance), four steps a frame. Now the asks within SNOW_COVER.frameMs of the
@@ -234,8 +233,7 @@ export function createSnowCoverHost({ renderer, climateAt, mapHeight, stateOf, b
     const [x, z] = fieldOf(px, py, lx, lz);
     return coverAt(x, z, altitude, 'build') >= draw ? SEASON.Winter : SEASON.Summer;
   };
-  /** SNOW-SWEEP (2026-10-23, after OW-HITCH's re-measure: "spread snowCoverHost's sweep across frames under the snow
-   *  budget"): THE SWEEP IN HAND. The frame's sweep checked every flat of every standing pixel in one frame - 40-70 ms
+  /** SNOW-SWEEP: THE SWEEP IN HAND. The frame's sweep checked every flat of every standing pixel in one frame - 40-70 ms
    *  on an i9 at each lattice cell the window moved, the most frequent hitch of a fast Overworld journey. Now a sweep is
    *  begun (the standing pixels the snow dresses, nearest first) and walked to a deadline: each pixel found due is
    *  re-skinned as it is found, so the nearest are still the first marked. `sweepKeys` null when none is in hand. */

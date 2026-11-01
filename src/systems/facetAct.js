@@ -1,5 +1,5 @@
 // @ts-check
-// PROF10 (2026-10-02) - THE FACET, Jewelcrafting's act at the jeweller's bench (bible/06-Systems/Professions-Arc.md 9.4:
+// PROF10 - THE FACET, Jewelcrafting's act at the jeweller's bench (9.4:
 // "The facet: a slow turn stopped where the gem catches the light (a 10-degree window)"). A piece is cut in recipeLaw
 // facetCount facets (three; a gemmed piece five), each a slow turn of the stone from 0 degrees at FACET_ACT.degPerS toward
 // the light, which stands at a bearing the bench draws for that facet (FACET_ACT.lightLo to lightHi - never where the turn

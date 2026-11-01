@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b SNOW-HOLD (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md, BLACK-SCREEN): "Crashing every minute -
+// FIELD BUGS 2026-10-21b SNOW-HOLD (, BLACK-SCREEN): "Crashing every minute -
 // No message just black", "traveling overworld especially". The Snowfall mod's blanket queue drained only while the local
 // tier was not recentring - a player on the move keeps it recentring - and was never pruned, so every map pixel the
 // world built and destroyed behind a travelling player stood in it, its whole entry held by the host's SnowTerrain

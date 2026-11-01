@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VOTE (2026-10-10) — A TOWN'S WORD ON A PLAYER'S HOUSE.
+// HOME-VOTE — A TOWN'S WORD ON A PLAYER'S HOUSE.
 //
 // The owner: "I want to implement a house voting system within vicinity
 // of player houses. If the house votes run negative, the exterior
@@ -47,8 +47,7 @@ export const homeVoteOwnerOk = (o) => typeof o === 'string' && o.length > 0 && o
 export const homeScoreOf = (raw) => (Number.isSafeInteger(raw) ? raw : 0);
 /** An account's own vote on a home as the service answers it - -1, +1, or 0 for none. */
 export const homeMyVoteOf = (raw) => (raw === HOME_VOTE_DOWN || raw === HOME_VOTE_UP ? raw : 0);
-/** HOME-SHUN (2026-10-12, from play: "-1 is a bit crazy since you START at 0 when you buy a house... hide placements
- *  from everyone starting at like -5, -10"): THE SCORE AT WHICH A HOME IS SHUNNED - five votes down, net. One account's
+/** HOME-SHUN: THE SCORE AT WHICH A HOME IS SHUNNED - five votes down, net. One account's
  *  down-vote on a new house nobody had seen yet hid it, and a hidden house is one nobody sees to vote up; a home now
  *  hides only when the town's word against it outweighs it by five. */
 export const HOME_SHUN_AT = -5;

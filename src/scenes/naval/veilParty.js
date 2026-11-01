@@ -1,5 +1,5 @@
 // @ts-check
-// VEIL-PARTY (2026-10-27; bible/03-World/Eltheric-Ocean.md VEIL-PARTY) - A PARTY CROSSES THE VEIL TOGETHER. The
+// VEIL-PARTY - A PARTY CROSSES THE VEIL TOGETHER. The
 // crossing is the captain's (world.js etherCross). Her party aboard never holds it back (`kin`); a stranger still does.
 // A member aboard her (`step`) keeps her captain, their side of the Veil and the pixel her deck last carried them in;
 // when the captain's party pose stands across it within VEIL_FOLLOW_MS of stepped time, a member still where she left

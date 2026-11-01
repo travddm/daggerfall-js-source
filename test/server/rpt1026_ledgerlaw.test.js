@@ -1,4 +1,4 @@
-// RPT1026-LEDGERLAW (2026-10-26, the private report inbox - bible/06-Systems/Integrity-Arc.md, RPT1026-LEDGERLAW): the account
+// RPT1026-LEDGERLAW: the account
 // service's ledger and law, driven through the real Worker over node:sqlite with every migration applied and R2 beside it
 // (test/accountDb.mjs, test/realmSeat.mjs).
 //   - A CRAFTED PIECE TRADED AWAY STAYS WITH ITS BUYER: the ledger settled a contested claim on a crafted piece for

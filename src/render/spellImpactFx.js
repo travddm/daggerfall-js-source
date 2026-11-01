@@ -1,7 +1,5 @@
 // @ts-check
-// IMPACTFX (2026-10-05, the player: "give it a high quality effect that suits the game and the spell that sprays to the
-// ground based on the element, you have to see that it is shock and fire, water and heal like green heal lineish
-// sparkles that rise up"): A LANDING SPELL, SEEN. The classic impact flash (record 1 of the element's own archive,
+// IMPACTFX: A LANDING SPELL, SEEN. The classic impact flash (record 1 of the element's own archive,
 // scenes/hostMagic.js showImpactFlash) still plays - this is drawn OVER it, in light:
 //
 //   FIRE    a fireball bloom, ember streaks thrown out and up that fall, land and smoulder before they go out, licks of
@@ -57,7 +55,7 @@ export const FX_LOOK = Object.freeze({
 
 const TAU = Math.PI * 2;
 
-/** TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL): a weapon technique's two looks - its ENERGY, in the
+/** TECH-FX (THE FEEL): a weapon technique's two looks - its ENERGY, in the
  *  technique's own blue (combat/techniques.js TECH_COLOR, the marks' and the HUD chip's), and the STONE-DUST its blows
  *  throw off the ground, warm and short-lived (the pass is additive, so it reads as glowing grit, never grey). Not
  *  elements: no art replaces them and `artColours` never lists them. */
@@ -480,7 +478,7 @@ export class SpellImpactFx {
   }
 
   /**
-   * TECH-FX: A WEAPON TECHNIQUE'S BURST (bible/05-Combat/Weapon-Techniques.md THE FEEL). `recipe` one of TECH_FX_RECIPES,
+   * TECH-FX: A WEAPON TECHNIQUE'S BURST (THE FEEL). `recipe` one of TECH_FX_RECIPES,
    * `at` where (scene frame): the feet for a ring, the blow's point for a star, the eye for a tracer, the start of a
    * trail. `ground` the floor's height (default `at`'s), `yaw` the facing (forward on the floor is [sin, 0, cos]), `r` a
    * ring's reach, `dir` a shot's or a punch's unit direction, `len` a tracer's length, `to` a trail's end, `spin` +1 (a

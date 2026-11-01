@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// REST6 (2026-10-03, bible/06-Systems/Rest-Arc.md section 6; Mac: "introduce other type of consumables that can fill
-// in the gaps when a campfire isn't available"): THE SEVEN THAT FILL THE GAPS. Each answers one gap and none replaces
+// REST6: THE SEVEN THAT FILL THE GAPS. Each answers one gap and none replaces
 // the fire. Port templates in their own block, 1700-1706, in DFU's miscellany (UselessItems2) as Foraging's are,
 // registered at import - and imported by the save (systems/save/save.js), so a saved one always has its name, its picture
 // and its weight in every scene.
@@ -24,7 +23,7 @@
 // REST_ITEMS_ONLINE is that release's switch. Offline there is no older client to meet one: they are on now, with
 // Climates & Calories, as its provisions are.
 //
-// REST-LOOT (LOOT-EASE, 2026-10-05, Mac: "the new resting items we added ... should be more common loot drops"). The
+// REST-LOOT (LOOT-EASE, 2026-10-05). The
 // templates shipped with the arc's merge (#554, 2026-10-03) and every release since has carried them, so the switch is
 // ON: online the shelves, the piles and the foes carry them, and customs lets a character's own walk in. And the
 // loot is wider and commoner: a looting foe five of the seven (it was the Ember Jar alone, 2 in 100), a J-O pile six

@@ -1,4 +1,4 @@
-// FT10 - DFU'S OWN DUNGEON ENHANCEMENTS (2026-09-14, the Features arc):
+// FT10 - DFU'S OWN DUNGEON ENHANCEMENTS:
 // Enemies Fight Each Other, Varied Dungeon Monsters, Torches Light Your
 // Way - three of the Enhancements section's switches, DFU Classic. Each
 // is read by the port at its point of use as DFU reads it, and each

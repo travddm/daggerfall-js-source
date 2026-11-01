@@ -1,7 +1,5 @@
 // @ts-check
-// MAC-L3 (2026-09-16, Mac relaying Orion: "right click in general seems
-// to cause either a new window to open, or for the page to refresh to
-// the menu, causing unsaved progress to be lost").
+// MAC-L3.
 //
 // ═══ THE HALF THAT IS NOT THE RIGHT BUTTON ════════════════════════
 //

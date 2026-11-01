@@ -1,5 +1,4 @@
-// WATCH-PROTECTS (2026-10-06, Mac: "improve the guards" - asked, "The watch protects people": a monster attacking
-// townspeople draws the watch to defend them; bible/06-Systems/Living-World.md WATCH-PROTECTS): A TOWNSPERSON AS A
+// WATCH-PROTECTS: A TOWNSPERSON AS A
 // MONSTER'S QUARRY. DFU's enemy senses weigh other enemies and the player alone - "Civilian Mobile NPCs are not handled
 // here" (EnemySenses.cs:739-741) - so no monster ever turned on a townsperson, and the watch never had one to defend.
 // In the living world's lane one on the street, not of the watch, stands for the target machine as a body of their own:

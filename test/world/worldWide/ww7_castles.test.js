@@ -1,5 +1,4 @@
-// WW7-4 (2026-10-25, the owner: "The tower in the middle needs an interior, ensure all castles have interiors";
-// bible/03-World/World-Wide.md WW7-4): every capital's castle its halls - a Bay palace's blocks under the port's own
+// WW7-4: every capital's castle its halls - a Bay palace's blocks under the port's own
 // names, the Bay's court stood down - entered by its palace's door; a province's castle a guild's to buy, the White-Gold
 // Tower's open to all and never one.
 import { test } from 'node:test';
@@ -56,7 +55,6 @@ test('WW7-4 the court stood down: a person\'s flat goes but the castle\'s bards,
   const objects = [model(1, 90), flat(334, 19, 364, 2), flat(334, 11, 511, 3), flat(184, 15, 514, 4), flat(357, 0, 501, 5), flat(346, 20, 0, 6), flat(184, 1, 385, 7),
     flat(199, 16, 1425, 8), flat(199, 10, 1, 9), flat(199, 11, 0, 10), flat(199, 18, 70, 11), flat(210, 16, 0, 12), flat(334, 5, 500, 90), { type: RDB_RESOURCE_TYPES.Light, position: 13, resources: {} }];
   const kept = objects.filter((o) => castleKeeps(o)).map((o) => o.position);
-  // PIN MOVED (PROVINCE-COURTS, World-Wide.md): the court's people are re-seated as the capital's own court (capitalCastles.js
   // CASTLE_SEATS) - Gothryd's throne kept, under Random Ruler and a generic ruler's look; Lady Northbridge, Charvek-si and a
   // quest's marker go as before
   assert.deepEqual(kept, [1, 2, 3, 4, 6, 8, 9, 12, 13], 'Gothryd\'s seat re-seated; no Lady Northbridge, no Charvek-si, no quest; the bard, the child, a nameless one, the guard, the start, a lamp');
@@ -65,7 +63,7 @@ test('WW7-4 the court stood down: a person\'s flat goes but the castle\'s bards,
   const copy = castleBlockOf(bay, { name: 'SC000160.RDB', index: 900700 });
   assert.equal(JSON.stringify(bay), snap, 'the Bay\'s block untouched');
   assert.deepEqual([copy.name, copy.servedName, copy.index, copy.position], ['SC000160.RDB', 'SC000160.RDB', 900700, 512]);
-  assert.deepEqual(copy.rdbBlock.objectRootList[0].rdbObjects.map((o) => o.position), [1, 2, 3, 4, 6, 8, 9, 12, 90, 13], 'the flat at 90 a chain names stays');   // PIN MOVED (PROVINCE-COURTS): Gothryd's seat with them
+  assert.deepEqual(copy.rdbBlock.objectRootList[0].rdbObjects.map((o) => o.position), [1, 2, 3, 4, 6, 8, 9, 12, 90, 13], 'the flat at 90 a chain names stays');
   const seat = copy.rdbBlock.objectRootList[0].rdbObjects[1].resources.flatResource;
   assert.deepEqual([seat.factionOrMobileId, seat.textureArchive, seat.textureRecord], [852, 183, 6], 'no King Gothryd in the Blue Palace: Random Ruler\'s seat, a generic ruler\'s look');
   assert.equal(copy.rdbBlock.objectRootList[1].rdbObjects, null);
@@ -90,7 +88,6 @@ test('WW7-4 the port\'s block made of another: registered at its own index, made
 test('WW7-4 the castle is the capital\'s centre\'s dungeon: its blocks, its map id its dungeon\'s id, a crown castle\'s type; no other slice one; never shrunk online (mutants: every slice a castle; the castle shrunk)', () => {
   // tesa10_capitals.test.js's fixture: a town row, every plan's classic kinds two blocks each, each block one named house
   const base = { name: 'Base', regionIndex: 1, mapTableData: { mapId: 5, locationType: 0, dungeonType: 0 }, exterior: { exteriorData: { blockNames: ['X'], width: 1, height: 1 }, buildings: [] }, climate: { worldClimate: 230 }, hasDungeon: false, dungeon: null };
-  // PIN MOVED (IC-GRAND): the Imperial City's plan a law, read a slice at a time; its own blocks by its law
   const planOf = (cap) => cap.plan ?? Array.from({ length: capitalSpan(cap) ** 2 }, (_, s) => cap.slicePlan(s)).flat();
   const kinds = [...new Set(CAPITALS.flatMap((cap) => planOf(cap).flat().filter((c) => c !== 'L' && c !== 'G' && c !== 'O' && !ownBlockOf(cap, c))))];
   const names = new Map(kinds.map((c) => [c, [`${c}AA00.RMB`, `${c}AA01.RMB`]]));
@@ -114,7 +111,7 @@ test('WW7-4 every castle\'s door: one dungeon entrance on its palace\'s dark doo
   const builds = [[IMPERIAL_MODELS.whiteGoldTower, buildImperialTower], [CAPITAL_MODELS.bluePalace, buildBluePalace], [CAPITAL_MODELS.mournholdPalace, buildMournholdPalace], [CAPITAL_MODELS.alinorPalace, buildAlinorPalace],
     [CAPITAL_MODELS.grahtOak, buildGrahtOak], [CAPITAL_MODELS.manePalace, buildManePalace], [CAPITAL_MODELS.xanmeer, buildXanmeer]];
   builds.forEach(([id, build], k) => {
-    assert.ok((CAPITALS[k].drawn ?? CAPITALS[k].models).includes(id), `${CAPITALS[k].key} stands the model`);   // PIN MOVED (TOWN-SHAPES TS5): the Imperial City's drawn whole, carried in parts
+    assert.ok((CAPITALS[k].drawn ?? CAPITALS[k].models).includes(id), `${CAPITALS[k].key} stands the model`);
     const m = build();
     assert.equal(m.doors.length, 1, CAPITALS[k].key);
     const [d] = m.doors, c = { x: (d.vert0.x + d.vert2.x) / 2, y: (d.vert0.y + d.vert2.y) / 2, z: (d.vert0.z + d.vert2.z) / 2 };

@@ -1,11 +1,11 @@
-// PROF11 (2026-10-01) - MASONRY AS THE SERVICE KEEPS IT: the mason's bench's works on the forge's route (/v1/prof/smelt) -
+// PROF11 - MASONRY AS THE SERVICE KEEPS IT: the mason's bench's works on the forge's route (/v1/prof/smelt) -
 // the cut (Rough Stone 2 : 1, a Quarryman's 1 : 1) and the mix (Mortar ten at a time) - with a craft's law: their rank
 // asked, their XP Masonry's at the rank's own tier, half again for a clean chisel (read only where the work has the act),
 // 500 the first time, kept with the row (0060's `first` and `clean`) and answered so, asked twice one; the Stores'
 // debits and credits, bought first and their origin carried; the crafter's limit; and the Sculptor's stone decor on the
 // craft route (/v1/prof/craft) - refused to all but a Sculptor (`prof-sculptor`), a piece with its signed record among
 // the products. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Professions-Arc.md 3.2, 3.3, 4.5, 9.3, 9.4.
+// 3.2, 3.3, 4.5, 9.3, 9.4.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -50,17 +50,17 @@ test('PROF11 service: the cut - two Rough Stone a Cut Stone, own; Masonry XP 20 
   const first = await s.call('/v1/prof/smelt', ask, mac.secret);
   assert.equal(first.status, 200, JSON.stringify(first.body));
   assert.deepEqual([first.body.recipe, first.body.count, first.body.own, first.body.bought, first.body.first, first.body.clean], ['cut:stone', 3, 3, 0, true, false]);
-  assert.equal(first.body.xp, 3 * 20 * 1 + 1823);   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp, brewFirstXp, workFirstXp), no longer a flat 500
+  assert.equal(first.body.xp, 3 * 20 * 1 + 1823);
   assert.equal(first.body.xp, masonXp(3, 0) + FIRST_WORK);
-  assert.deepEqual([first.body.track.profession, first.body.track.xp], ['building', 60 + 1823]);   // PIN MOVED (CRAFT3): a cut is Masonry's work, credited to the Building track
+  assert.deepEqual([first.body.track.profession, first.body.track.xp], ['building', 60 + 1823]);
   assert.deepEqual([s.stores(mac, 'stone:cut'), s.stores(mac, 'stone:rough')], [[['own', 3]], [['own', 14]]]);
   assert.deepEqual(first.body.stores.map((st) => [st.material, st.own]), [['stone:cut', 3], ['stone:rough', 14]], 'the Stores of the product and its stone answered');
   const row = s.raw.prepare('SELECT first, clean, xp, count FROM prof_smelts WHERE rid = ?').get(ask.rid);
-  assert.deepEqual([row.first, row.clean, row.xp, row.count], [1, 0, 60 + 1823, 3]);   // PIN MOVED (FIRST-BUDGET): Building's share
+  assert.deepEqual([row.first, row.clean, row.xp, row.count], [1, 0, 60 + 1823, 3]);
   const again = await s.call('/v1/prof/smelt', ask, mac.secret);
   assert.deepEqual([again.body.repeat, again.body.first, again.body.xp, again.body.own], [true, true, 60 + 1823, 3], 'asked twice: the row\'s answer');
-  assert.deepEqual([s.stores(mac, 'stone:cut'), s.stores(mac, 'stone:rough'), s.xpOf(mac, 'building')], [[['own', 3]], [['own', 14]], 60 + 1823], 'nothing moved twice');   // PIN MOVED (CRAFT3): the Building track's row
-  s.setXp(mac, 0, 'building');   // PIN MOVED (FIRST-BUDGET): the cut's 1,823 lifts the mason to rank 13 (the bench's XP follows the rank) - back to a Novice, so the next cuts read at tier 1 as they did
+  assert.deepEqual([s.stores(mac, 'stone:cut'), s.stores(mac, 'stone:rough'), s.xpOf(mac, 'building')], [[['own', 3]], [['own', 14]], 60 + 1823], 'nothing moved twice');
+  s.setXp(mac, 0, 'building');
   const second = await s.work(mac, 'cut:stone', 2);
   assert.deepEqual([second.body.first, second.body.xp, second.body.clean], [false, 40, false], 'the second cut: no 500');
   const clean = await s.work(mac, 'cut:stone', 2, { clean: true });
@@ -68,7 +68,7 @@ test('PROF11 service: the cut - two Rough Stone a Cut Stone, own; Masonry XP 20 
   assert.equal(s.raw.prepare('SELECT clean FROM prof_smelts WHERE player = ? ORDER BY at DESC, rowid DESC LIMIT 1').get(mac.id).clean, 1);
   const notTrue = await s.work(mac, 'cut:stone', 1, { clean: 'yes' });
   assert.deepEqual([notTrue.body.clean, notTrue.body.xp], [false, 20], 'only `true` is clean');
-  assert.equal(s.xpOf(mac, 'building'), 40 + 60 + 20);   // PIN MOVED (FIRST-BUDGET): from the Novice set back above   // PIN MOVED (CRAFT3): the Building track's row
+  assert.equal(s.xpOf(mac, 'building'), 40 + 60 + 20);
   assert.deepEqual(s.stores(mac, 'stone:rough'), [['own', 4]]);
   assert.deepEqual(s.stores(mac, 'stone:cut'), [['own', 8]]);
 });
@@ -77,14 +77,14 @@ test('PROF11 service: XP follows the rank - a cut at rank 55 is 20 x tier 5, nev
   const s = await stand();
   const mac = await s.seated('Mac');
   s.give(mac, 'stone:rough', 'own', 40);
-  s.setXp(mac, xpForRank(55), 'building');   // PIN MOVED (CRAFT3): a cut reads the Building track's rank
+  s.setXp(mac, xpForRank(55), 'building');
   const r = await s.work(mac, 'cut:stone', 4);
-  assert.deepEqual([r.status, r.body.own, r.body.xp], [200, 4, 4 * 20 * topTierOf(55) + FIRST_WORK]);   // PIN MOVED (FIRST-BUDGET)
+  assert.deepEqual([r.status, r.body.own, r.body.xp], [200, 4, 4 * 20 * topTierOf(55) + FIRST_WORK]);
   assert.equal(topTierOf(55), 5);
-  s.setXp(mac, xpForRank(50), 'building', { spec50: 'quarryman' });   // PIN MOVED (CRAFT3): the Quarryman stands under Building
+  s.setXp(mac, xpForRank(50), 'building', { spec50: 'quarryman' });
   const q = await s.work(mac, 'cut:stone', 5);
   assert.deepEqual([q.body.own, q.body.xp, s.stores(mac, 'stone:rough')], [10, 5 * 20 * 4, [['own', 22]]], 'a Quarryman\'s 1 : 1');
-  s.setXp(mac, xpForRank(100), 'building', { spec50: 'quarryman', spec100: 'sculptor' });   // PIN MOVED (CRAFT3): the Building track
+  s.setXp(mac, xpForRank(100), 'building', { spec50: 'quarryman', spec100: 'sculptor' });
   const m = await s.work(mac, 'cut:stone', 1);
   assert.deepEqual([m.body.own, m.body.xp, s.xpOf(mac, 'building')], [2, 0, PROF_XP_MAX], 'a Master\'s track is full: credited none, answered so');   // PIN MOVED (CRAFT3): the Building track's row
 });
@@ -100,10 +100,10 @@ test('PROF11 service: the mix - Mortar asks rank 10 (refused below it, nothing m
   const low = await s.work(mac, 'mix:mortar', 1);
   assert.deepEqual([low.status, low.body], [403, { error: 'prof-rank' }]);
   assert.deepEqual([s.stores(mac, 'stone:rough'), s.stores(mac, 'stone:mortar'), s.raw.prepare('SELECT COUNT(*) AS n FROM prof_smelts').get().n], [[['own', 10]], [], 0], 'refused before anything moved');
-  s.setXp(mac, xpForRank(10), 'building');   // PIN MOVED (CRAFT3): the mix reads the Building track's rank
+  s.setXp(mac, xpForRank(10), 'building');
   const mix = await s.work(mac, 'mix:mortar', 2);
   assert.equal(mix.status, 200, JSON.stringify(mix.body));
-  assert.deepEqual([mix.body.own, mix.body.bought, mix.body.first, mix.body.xp], [20, 0, true, 2 * 20 * 2 + FIRST_WORK]);   // PIN MOVED (FIRST-BUDGET)
+  assert.deepEqual([mix.body.own, mix.body.bought, mix.body.first, mix.body.xp], [20, 0, true, 2 * 20 * 2 + FIRST_WORK]);
   assert.deepEqual([s.stores(mac, 'stone:mortar'), s.stores(mac, 'stone:rough'), s.stores(mac, 'metal:sulphur'), s.stores(mac, 'metal:lead')], [[['own', 20]], [], [['own', 1]], [['own', 1]]]);
   // bought Rough Stone: spent first, and a mix it went into is bought
   s.give(mac, 'stone:rough', 'bought', 5);
@@ -131,20 +131,20 @@ test('PROF11 service: a clean report is read only where the work has the chisel 
   assert.deepEqual({ ...s.raw.prepare('SELECT first, clean FROM prof_smelts WHERE recipe = ?').get('ingot:iron') }, { first: 0, clean: 0 });
   s.give(mac, 'log:pine', 'own', 1);
   const saw = await s.work(mac, 'saw:pine', 1, { clean: true });
-  assert.deepEqual([saw.body.xp, saw.body.own, s.xpOf(mac, 'building')], [0, 2, 0]);   // PIN MOVED (CRAFT3): the chisel's works credit the Building track - a 'masonry' row is read by nothing
+  assert.deepEqual([saw.body.xp, saw.body.own, s.xpOf(mac, 'building')], [0, 2, 0]);
 });
 
 test('PROF11 service: the crafter\'s limit holds Masonry at 50 while two other crafts stand past it - credited to the cap, answered so', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
   s.setXp(mac, xpForRank(60), 'smithing');
-  s.setXp(mac, xpForRank(70), 'provisioning');   // PIN MOVED (CRAFT3): Carpentry is Building's with Masonry now - the second other craft past 50 is Provisioning
-  s.setXp(mac, xpForRank(51) - 50, 'building');   // PIN MOVED (CRAFT3): Masonry's XP is the Building track's
+  s.setXp(mac, xpForRank(70), 'provisioning');
+  s.setXp(mac, xpForRank(51) - 50, 'building');
   s.give(mac, 'stone:rough', 'own', 20);
   const r = await s.work(mac, 'cut:stone', 5);
-  assert.deepEqual([r.status, r.body.xp, s.xpOf(mac, 'building')], [200, 49, xpForRank(51) - 1], 'one short of 51');   // PIN MOVED (CRAFT3): the Building track's row
+  assert.deepEqual([r.status, r.body.xp, s.xpOf(mac, 'building')], [200, 49, xpForRank(51) - 1], 'one short of 51');
   const more = await s.work(mac, 'cut:stone', 1);
-  assert.deepEqual([more.body.xp, s.xpOf(mac, 'building')], [0, xpForRank(51) - 1]);   // PIN MOVED (CRAFT3): the Building track's row
+  assert.deepEqual([more.body.xp, s.xpOf(mac, 'building')], [0, xpForRank(51) - 1]);
 });
 
 // ─── THE SCULPTOR'S STONE DECOR (3.3, 9.3) ───────────────────────────
@@ -156,11 +156,11 @@ test('PROF11 service: the stone decor is a Sculptor\'s - refused (`prof-sculptor
   s.give(mac, 'stone:mortar', 'own', 10);
   const novice = await s.carve(mac, 'column:stone');
   assert.deepEqual([novice.status, novice.body], [403, { error: 'prof-sculptor' }]);
-  s.setXp(mac, PROF_XP_MAX, 'building', { spec50: 'quarryman', spec100: 'fortifier' });   // PIN MOVED (CRAFT3): the choices stand under the Building track
+  s.setXp(mac, PROF_XP_MAX, 'building', { spec50: 'quarryman', spec100: 'fortifier' });
   const fortifier = await s.carve(mac, 'column:stone');
   assert.deepEqual([fortifier.status, fortifier.body], [403, { error: 'prof-sculptor' }], 'a Master is not a Sculptor by rank');
   assert.deepEqual([s.stores(mac, 'stone:cut'), s.raw.prepare('SELECT COUNT(*) AS n FROM prof_crafts').get().n], [[['own', 30]], 0], 'nothing spent, nothing written');
-  s.setXp(mac, PROF_XP_MAX, 'building', { spec50: 'quarryman', spec100: 'sculptor' });   // PIN MOVED (CRAFT3): the Sculptor stands under the Building track
+  s.setXp(mac, PROF_XP_MAX, 'building', { spec50: 'quarryman', spec100: 'sculptor' });
   const ask = { character: mac.character, recipe: 'column:stone', clean: true, name: 'Silverthorn', rid: rid() };
   const col = await s.call('/v1/prof/craft', ask, mac.secret);
   assert.equal(col.status, 200, JSON.stringify(col.body));

@@ -1,10 +1,10 @@
-// PROF7 (2026-09-29, Mac: "Do it") - HUNTING, THE SKINNING KNIFE AND OUTFITTING AS THE SERVICE KEEPS THEM: a body's
+// PROF7 - HUNTING, THE SKINNING KNIFE AND OUTFITTING AS THE SERVICE KEEPS THEM: a body's
 // harvest (`body:<day>:<id>`, the foe the client names - Hunting bounded, not witnessed: no ground, no hours, the
 // account's day of 3 hides of tiers 5-6 decided in the harvest's own INSERT (CAP-OFF: its 30 of any tier gone); the knife's report bounded - a clean
 // pelt x1.5, a torn one its part lost; the DFU part one body in four; the butchery beside it, a Butcher's two); the
 // loom's cures (a Tanner's at 50) and its weave; Outfitting's crafts and a garment's dye, signed into its record and
 // carried by the market's pieces; and the day's harvests rebuilt over rows that stood before. Driven through the real
-// Worker over node:sqlite with every migration applied (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 29.
+// Worker over node:sqlite with every migration applied (test/accountDb.mjs). 29.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -143,7 +143,6 @@ test('PROF7 service: Hunting\'s day is the account\'s - 3 hides of tiers 5-6 acr
   assert.deepEqual([s.rows(mac), s.stores(mac, 'hide:harpy')], [before, []], 'nothing written, nothing stored');
   const rat = await s.call('/v1/prof/harvest', skin(mac, MOB.Rat), mac.secret);
   assert.deepEqual([rat.status, rat.body.hunt], [200, { hides: HIGH_HIDES_PER_DAY + 1, high: HIGH_HIDES_PER_DAY }], 'a low hide still');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the day held thirty hides - a thirty-first was
   // `prof-hunt-cap`, refused in the INSERT. Now a hide below the rare is counted, not bounded
   s.hunted(mac, 30 - HIGH_HIDES_PER_DAY - 2, 1, 'char-mac-alt');
   const last = await s.call('/v1/prof/harvest', skin(mac, MOB.Rat), mac.secret);
@@ -190,7 +189,6 @@ test('PROF7 service: the tanning rack cures two hides to a leather (a Tanner\'s 
 test('PROF7 service: a garment sewn in the dye the crafter chose - signed into its record (`u`), kept on the craft and the piece, answered; a dye asked of anything else or past the ten refused (AUDIT 32 L3: DFU\'s unchangeable shirts take one); Outfitting\'s rank and XP; boots a bolt and a Cured Leather', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
-  // PIN MOVED (CLOTH-GEMS): the Weavers' Linen, bought - S1 judges the units; (WOVEN-PAYS, AUDIT WOVEN-PAYS): bought at the
   // counter, through the real route, so its ten count against the cloth's firsts (a bought row written by hand is no silver)
   s.fund(mac, 100);
   assert.equal((await s.call('/v1/prof/stock', { character: mac.character, material: 'cloth:linen', qty: 10, rid: rid() }, mac.secret)).status, 200);
@@ -198,7 +196,7 @@ test('PROF7 service: a garment sewn in the dye the crafter chose - signed into i
   const ask = craft(mac, 'garment-141:linen', { dye: 3 });
   const g = await s.call('/v1/prof/craft', ask, mac.secret);
   assert.equal(g.status, 200, JSON.stringify(g.body));
-  // AUDIT 32 S1 (Mac: "Whatever you think is best"): Straps are wholly the Weavers' Linen - the craft's XP, its first
+  // AUDIT 32 S1: Straps are wholly the Weavers' Linen - the craft's XP, its first
   // recorded, and no first-craft bonus (a boot's Cured Leather keeps it, test/net/audit32_service.test.js; CLOTH-GEMS: the
   // loom's own Linen pays it, test/net/clothgems_service.test.js)
   assert.deepEqual([g.body.dye, g.body.xp, g.body.first, g.body.track.profession], [3, craftXp(1, 0), true, 'outfitting']);
@@ -234,7 +232,7 @@ test('PROF7 service: the market carries a garment\'s dye - a dyed shirt listed i
   const g = await s.call('/v1/prof/craft', craft(mac, 'garment-165:linen', { dye: 8 }), mac.secret);
   assert.equal(g.status, 200, JSON.stringify(g.body));
   const provenance = g.body.pieces[0].provenance;
-  holdPieces(s.env, mac.character, [{ provenance }]);   // PIN MOVED (INT19): the piece the pack took, in the record the listing takes it out of
+  holdPieces(s.env, mac.character, [{ provenance }]);
   s.fund(mac, 100);   // the listing's fee
   const l = await s.call('/v1/market/list', { character: mac.character, region: DF, kind: 'piece', provenance, wear: 1000, price: 5, hubs: HUBS, rid: rid() }, mac.secret);
   assert.equal(l.status, 200, JSON.stringify(l.body));
@@ -271,7 +269,7 @@ test('PROF7 service: the day\'s harvests rebuilt for a body\'s hide keep every r
   assert.throws(() => db.exec(`UPDATE node_harvests SET tier = 8 WHERE rid = 'rid00002'`), /CHECK/);
   assert.throws(() => db.exec(`UPDATE node_harvests SET extra_qty = 0 WHERE rid = 'rid00002'`), /CHECK/);
   assert.deepEqual(db.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'node_harvests' AND name LIKE 'idx_%' ORDER BY name").all().map((r) => r.name),
-    ['idx_node_harvests_account', 'idx_node_harvests_carry_day', 'idx_node_harvests_char_day', 'idx_node_harvests_day', 'idx_node_harvests_today']);   // SCALE1 (0043_scale_indexes.sql): and the sweep's day; PIN MOVED (AUDIT2 BAG1 S1, 0076_materials_bag.sql): and the carried rows' own sweep; PIN MOVED (STORM-SHED, 0085_storm_shed.sql): and the character's day, covering
+    ['idx_node_harvests_account', 'idx_node_harvests_carry_day', 'idx_node_harvests_char_day', 'idx_node_harvests_day', 'idx_node_harvests_today']);   // SCALE1 (0043_scale_indexes.sql): and the sweep's day
   assert.equal(db.prepare('SELECT dye FROM products').get().dye, null, 'a piece before it undyed');
   db.exec(`UPDATE products SET dye = 9`);
   assert.throws(() => db.exec(`UPDATE products SET dye = 10`), /CHECK/, 'a dye is one of the ten');

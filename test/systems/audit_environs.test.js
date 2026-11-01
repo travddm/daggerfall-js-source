@@ -1,6 +1,5 @@
-// AUDIT ENVIRONS (2026-10-08, Mac: "Lets do a comprehensive audit on everything and ensure perfection and performance
-// doesnt take a hit") - THE FOUR ENVIRONMENT MODS AUDITED: Snowfall, Windfall, Heat Haze and Sands of the Alik'r, each
-// lens reading the port against the mods' own assemblies and shaders (bible/01-Overview/audits/Audit-Environs.md). Every fix
+// AUDIT ENVIRONS - THE FOUR ENVIRONMENT MODS AUDITED: Snowfall, Windfall, Heat Haze and Sands of the Alik'r, each
+// lens reading the port against the mods' own assemblies and shaders. Every fix
 // here carries its `AUDIT ENVIRONS <id>` in the code and is mutated in tools/mutants/audit_environs.json; the pins it
 // moved in the arcs' own files say so where they stand.
 import { test } from 'node:test';

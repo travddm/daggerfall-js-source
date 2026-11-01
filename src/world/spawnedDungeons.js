@@ -10,7 +10,7 @@
 // THE ID keeps DFU's own law: MapId & 0xfffff IS the map pixel (systems/map/mapDirectory.js, systems/discovery.js key
 // on it), so the low 20 bits are this pixel's id and the high 12 are the salt - unique per (salt, pixel), an unsigned
 // 32-bit number the relay's room law admits (wire.js WORLD_ROOM, `dungeon:m<1-10 digits>`), and it cannot equal a real
-// location's id because a spawn only ever stands on a pixel that has no location. SPAWN-WORLD (2026-10-26): past the
+// location's id because a spawn only ever stands on a pixel that has no location. SPAWN-WORLD: past the
 // Bay a pixel id names no one pixel, so a spawn there is named in the world's spawn lane (world/worldWide/worldLanes.js
 // SPAWN_WORLD_LANE over the pixel's world key) - never a Bay pixel id, unique per world pixel, as the zone halls are.
 
@@ -44,7 +44,7 @@ export const SPAWN_CHANCE = 0.30;
 export const ELITE_CHANCE = 0.10;
 /** Either kind: the chance a pixel's roll falls in a spawn band. SPAWN-THIN (below) then keeps three quarters of those. */
 export const ANY_SPAWN_CHANCE = SPAWN_CHANCE + ELITE_CHANCE;
-/** SPAWN-THIN (2026-10-19, the owner: "Reduce the density of spawning dungeons by 25%"): a second roll, on its own
+/** SPAWN-THIN: a second roll, on its own
  *  hash lane, keeps this share of the pixels the band already chose. The band is not narrowed, so a dungeon that
  *  remains is the same kind on the same pixel - a normal stays normal, an elite stays elite - and one the keep
  *  drops is simply absent. Changing WORLD_SALT would have moved every dungeon; this does not. */
@@ -85,7 +85,7 @@ export function spawnsDungeon(salt, px, py, chance = ANY_SPAWN_CHANCE) {
   return spawnKept(salt, px, py);
 }
 
-/** SPAWN-ROADS (2026-09-25, Mac: "Anyway to have things avoid being on a road?"): does no path cross this pixel?
+/** SPAWN-ROADS: does no path cross this pixel?
  *  Every path in the network runs from its pixel's CENTRE out to the edges its compass byte names
  *  (travelPaths.js), and the centre is where a spawned ruin flattens its plateau - so a pixel with any
  *  road, track, river or stream bit stands no ruin, and a pixel with none has no path inside it at all.
@@ -100,7 +100,7 @@ export function pathFreePixel(net, px, py) {
   return true;
 }
 
-/** SPAWN-SHORE (2026-09-29, Shabalako: "An elite dungeon spawned like this on a beach/sea"): the Ocean-climate gate
+/** SPAWN-SHORE: the Ocean-climate gate
  *  alone let ruins onto the sea. The boot spreads land climates two pixels out into it (terrainHelper.js
  *  dilateCoastalClimate, StreamingWorld.ReadyCheck's repair), so a coast's first sea pixels READ as land. And a
  *  location is flattened to its WHOLE pixel's average height (terrainGen.js: calcAvgMaxHeight then
@@ -155,9 +155,7 @@ export function plateauDry(woods, px, py) {
 }
 
 /**
- * WILD-DRY (2026-10-12, a player's live client: the map's first open froze 6.7 s - the zone's giants' walking ground,
- * systems/wild/wildGiants.js cellsOf, asks every pixel of the zone whether it is dry, and each answer read the whole
- * 129 x 129 kernel): WHETHER THE PLATEAU ON (px, py) STANDS OVER SPAWN_DRY_ELEVATION - `spawnPlateauFloor(...) >
+ * WILD-DRY: WHETHER THE PLATEAU ON (px, py) STANDS OVER SPAWN_DRY_ELEVATION - `spawnPlateauFloor(...) >
  * SPAWN_DRY_ELEVATION` to the bit, read only until it is certain. Every sample is in [0, 1] (sampleKernel's clamp01),
  * so the running sum never falls - and a float sum of non-negatives never falls either, nor do the division and the
  * product by positive constants - so once the column's running average is over the line, the whole one is; and a pixel
@@ -259,12 +257,7 @@ export function spawnTemplates(locations, isMain = () => false) {
 
 // ---------------------------------------------------------------- SPAWNED-DUNGEONS3
 //
-// THE PLAYER'S OWN PIXEL, AT A DISTANCE (2026-09-24, Mac: "Dungeons that
-// currently spawn on the player's exact pixel or up to 2 pixels away
-// should now always spawn directly on the player's pixel. Additionally,
-// the nearby direction message should display the distance/direction in
-// meters. The dungeon has to spawn 300+ meter away from the player in
-// the same pixel/chunk.")
+// THE PLAYER'S OWN PIXEL, AT A DISTANCE
 //
 // WHERE A SPAWN STANDS IN ITS PIXEL is the same place every location
 // stands: CENTRED (terrainTiles.js getLocationTerrainTileOrigin -
@@ -308,7 +301,7 @@ export function dungeonSightLine(metres, direction, tier = 'regular') {
   const what = tier === 'super' ? 'an Abyss Dungeon' : tier === 'elite' ? 'an Elite Dungeon' : 'a Dungeon';
   return sightLineOf(what, metres, direction);
 }
-/** EG-F (bible/11-Multiplayer/Elite-Gates.md section 2, the sight line): the line's law for any thing seen - `what` (its
+/** EG-F (the sight line): the line's law for any thing seen - `what` (its
  *  article with it), the distance to the nearest ten metres (never under ten), the host's compass word. An Elite Breach's
  *  arch says it (scenes/eliteGates/egArch.js): "You see an Elite Breach 140 metres to the North!" */
 export function sightLineOf(what, metres, direction) {
@@ -319,9 +312,7 @@ export function sightLineOf(what, metres, direction) {
 // ---------------------------------------------------------------- TTL1
 //
 // THE TWO LIVES OF A SPAWNED DUNGEON (2026-09-20, the creator's rule
-// relayed by Mac): "Spawned Dungeons should expire/removed after 2
-// ingame days when cleared when there is no player in it - and after 7
-// ingame days in general when there is no player in it."
+// relayed by
 //
 // So there are TWO clocks and a spawn dies on whichever runs out first:
 // a SHORT one that starts when the place is emptied, and a LONG one
@@ -347,8 +338,7 @@ export const GENERAL_TTL_MINUTES = GENERAL_TTL_DAYS * MINUTES_PER_DAY;
 
 // ---------------------------------------------------------------- SPAWN-REBIRTH
 //
-// THE LOCKOUT (2026-10-12, a player's report, "Overworld Persistence Causes Permanent Regional Depletion of Procedural &
-// Elite Dungeons", and Mac: "Do all 3"). Three laws together emptied a region for good:
+// THE LOCKOUT. Three laws together emptied a region for good:
 //   1. the long clock started when a pixel STREAMED IN (spawnedDungeonAt noted every spawn within the terrain distance),
 //      so walking a road started seven days - fourteen real hours online, at the shared clock's 12x - on every dungeon
 //      three pixels either side of it, entered or not;
@@ -411,7 +401,7 @@ export function spawnExpired(rec, now) {
  * expiry is a fact about TIME PASSING, which their clocks do not share,
  * so two players could disagree about whether one is gone. Making them
  * agree needed the relay to own the ledger, and it did not have a
- * message for it. OW6L (2026-09-29) GAVE IT ONE: a cell room keeps a row
+ * message for it. OW6L GAVE IT ONE: a cell room keeps a row
  * a pixel (net/overworldLaw.js - `[px, py, seen, cleared?]`, the clocks
  * in shared classic minutes) and MIN-MERGES what its players say, the
  * `dg` word of net/wire.js's `ow` frame. This client says its own row

@@ -1,4 +1,4 @@
-// IH1 - THE LAST FOUR PENDING SEAMS (2026-08-28). audit24_questseams'
+// IH1 - THE LAST FOUR PENDING SEAMS. audit24_questseams'
 // PENDING map is EMPTY of M-X rows now: %cbd (the current building's
 // name), %nt (the random tavern), Place's isHouseOwned residence
 // filter and its buildingNameOpts bag all answered by the world host.

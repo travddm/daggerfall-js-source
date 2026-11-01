@@ -1,5 +1,5 @@
-// FORAGE4 (2026-09-28, Mac: "Continue! Remember, this is your baby"):
-// FORAGING'S ONLINE WAIT - bible/06-Systems/Foraging.md 13.1. Online the
+// FORAGE4:
+// FORAGING'S ONLINE WAIT 13.1. Online the
 // shared clock is nobody's to move, so Quest Actions Extension's `raise
 // time by` is a wait on the wait page (ui/waitWindow.js - C&C's hunt page
 // until the text hunt was removed, 2026-10-04; its busy page is what

@@ -1,4 +1,4 @@
-// GP2 - THE JOYSTICK CONTROLS WINDOW (2026-09-11).
+// GP2 - THE JOYSTICK CONTROLS WINDOW.
 // DaggerfallJoystickControlsWindow.cs (MIT, Daggerfall Workshop;
 // original author jefetienne), the JOYSTICK tab's destination
 // (DaggerfallControlsWindow.cs:107-109, :279-286), the last of DFU's

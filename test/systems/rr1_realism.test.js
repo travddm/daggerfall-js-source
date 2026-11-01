@@ -61,7 +61,7 @@ test('RR1 the record: the manifest, the switches (27 keys - 26 on the pane, figh
   assert.equal(vendored.GUID, RR_MOD.guid); assert.equal(vendored.ModVersion, '1.8');
   const settings = JSON.parse(rd('vendor/roleplay-realism/modsettings.json'));
   const keys = MOD_SETTINGS[V].keys;
-  // PLAIN-TEXT (2026-10-19): five of the mod's lines (a typo, "DPS", "DFU") said plainly for a player - their words, exactly
+  // PLAIN-TEXT: five of the mod's lines (a typo, "DPS", "DFU") said plainly for a player - their words, exactly
   const PLAIN = {
     'underworldExpulsion': 'Enables underworld guilds to expel members for poor performance... with prejudice.',
     'weaponSpeed': 'Lowers weapon damage per second for characters with high Speed.',
@@ -139,7 +139,7 @@ test('RR1 climbingRestriction: a drawn weapon that is not bare hands answers 0 w
 
 test('RR1 weaponSpeed: the speed/strength blend by hands (:350-387), behind Roleplay & Realism: Items\' weaponBalance; weaponMaterials: the material x3 (:389-392)', () => {
   reset();
-  // SWING-LAW (2026-09-28): the blend is the Speed the swing is read at; the port's law turns it into time (its bounded
+  // SWING-LAW: the blend is the Speed the swing is read at; the port's law turns it into time (its bounded
   // curve and the weapon's handling - characters/weaponStates.js swingFrameSeconds), not the mod's `3 * (115 - blend)`
   installSwingLaw();
   const t = (o) => rrMeleeWeaponAnimTime(o);
@@ -283,8 +283,7 @@ test('RR1 encumbranceEffects: past 75% of MaxEncumbrance the excess x2 takes spe
   reset();
 });
 
-// ENC-CEIL (2026-09-27, Discord: "a max of 502 encumbrance it sees me as overweight when I hit past whatever my base
-// is ... as soon as I hit 105 it's giving me full weight penalties"). The C# divides by `playerEntity.MaxEncumbrance`
+// ENC-CEIL. The C# divides by `playerEntity.MaxEncumbrance`
 // (RoleplayRealism.cs:590) - the PROPERTY, GetMaxEncumbrance (DaggerfallEntity.cs:272, :501-507), live strength x1.5
 // plus IncreasedWeightAllowance's share - and the port divided by the bare formula. The fixture's allowance is the real
 // producer's: an equipped item enchanted IncreasedWeightAllowance (param 1, the half) through computeEnchantmentMods.
@@ -404,7 +403,7 @@ test('RR1 underworldExpulsion: the two guild classes - expulsion allowed, the jo
   // the expulsion: the squad through the host's seam, the lines on the outcome
   const spawned = [];
   setRrHostSeams({ spawnFoe: (mt, opts) => spawned.push([mt, opts.minDistance, opts.maxDistance]) });
-  // REP6 (the reputation overhaul: "probation below 0, and expulsion only below -10, with a warning first"): PIN MOVED -
+  // REP6 (the reputation overhaul: "probation below 0, and expulsion only below -10, with a warning first"):
   // the expulsion is a review that finds the member already on probation and below -10 (DFU's: any review below zero)
   const store3 = createFactionRep(new Map([[tg.factionId, { id: tg.factionId, rep: -11 }]]));
   const m = { [tg.guildGroup]: { guild: tg.name, rank: 0, lastRankChange: -100, probation: true } };

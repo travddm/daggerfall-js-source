@@ -1,4 +1,4 @@
-// EXACT-PIECES (2026-10-26, the owner: "No band aids"; bible/06-Systems/Travel-View.md EXACT-PIECES) - THE LAND'S PIECES AT
+// EXACT-PIECES - THE LAND'S PIECES AT
 // THE PIXEL. FAST-REFUSAL's pieces are the trace's; a strait narrower than two of its centres is one piece there, and
 // Mournhold to Ebonheart still spent the planner's whole count before "no way". The roads' regions label their cores' dry
 // pixels by the planner's own water law as they are laid (world/tamrielLandPieces.js labelLand, world/tamrielRoads.js

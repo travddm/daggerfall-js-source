@@ -1,8 +1,7 @@
-// DOMAIN1 (2026-10-24, the owner: "Allowing guild mates to contribute to town material storage with gathered items/their
-// store"): A GIFT TO THE TOWN - a member's fortification materials from its Stores into its guild's stockpile where it
+// DOMAIN1: A GIFT TO THE TOWN - a member's fortification materials from its Stores into its guild's stockpile where it
 // holds the seat, or its Siege Camp where it pledged it this week; bought units first, never gold's or loose; the works
 // supplied; the influence a seat writ's delivery's (own at value, bought at Tribute's rate); one request one gift; every
-// rank, the Guildmaster's too (bible/11-Multiplayer/Domains.md section 5; server-account/src/seatGifts.js,
+// rank, the Guildmaster's too (; server-account/src/seatGifts.js,
 // src/net/seatGiftLaw.js, src/ui/seatWorks.js drawSeatGifts). Driven through the real Worker over node:sqlite with every
 // migration applied (test/accountDb.mjs), as seat2b_peace_service.test.js.
 import { test } from 'node:test';
@@ -136,7 +135,7 @@ test('DOMAIN1 WHAT A GIFT MAY SPEND: bought units go first and count at Tribute\
   assert.equal((await s.gift(mem, { region: ANTICLERE.region, material: 'p1:19', units: 1 })).body.error, 'bad-material');
   assert.equal((await s.gift(mem, { region: ANTICLERE.region, material: 'nothing', units: 1 })).body.error, 'bad-material');
   assert.equal((await s.gift(mem, { region: ANTICLERE.region, material: 'plank:oak', units: 0 })).body.error, 'bad-units');
-  assert.equal((await s.gift(mem, { region: 71, material: 'plank:oak', units: 1 })).body.error, 'bad-region');   // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): 62-70 the provinces'
+  assert.equal((await s.gift(mem, { region: 71, material: 'plank:oak', units: 1 })).body.error, 'bad-region');
   assert.deepEqual(s.stockpile(ANTICLERE.key), [['plank:oak', 10]], 'no refusal moved a unit');
 });
 

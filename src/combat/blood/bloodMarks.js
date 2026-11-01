@@ -116,9 +116,7 @@ export const GIB_QUAD = Object.freeze({ w: 0.28, h: 0.28 });
 export const GIB_FRAME = 0;
 
 /**
- * BLOOD5 - THE DROPS FLY (2026-09-30, Mac: "make it where blood
- * droplets emit and fall on the exact locations where the texture will
- * be").
+ * BLOOD5 - THE DROPS FLY.
  *
  * Every mark of a spray but the pool is now CARRIED THERE: a droplet
  * leaves the wound, arcs under gravity, and the mark is laid the frame
@@ -477,7 +475,7 @@ export function createBloodMarks({ renderer = null, collider = null, settings = 
           continue;
         }
       }
-      // MAC-BUG W5 (Mac: "blood doesn't work outside"). THIS RAY WAS
+      // MAC-BUG W5. THIS RAY WAS
       // THE WHOLE BUG, and it is the fault class this month has been
       // made of: `raycastHit` walks the collider's TRIANGLE BUCKETS,
       // which is the entire world indoors and underground - a floor

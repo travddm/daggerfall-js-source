@@ -1,8 +1,8 @@
-// AUDIT SETS (2026-09-28, Mac: "1. Audit this properly 2. Ensure online functionality is perfect"): the Sigil Sets'
+// AUDIT SETS: the Sigil Sets'
 // powers and the Aetheric pieces, audited online against RAID4b's tree and each finding pinned here. The powers are
 // driven through the real seams (systems/sigil/sigilSetPowers.js) with a stand-in host door and the test's own clock; the
 // wire's foe record and a building's loot word through their own pure doors; the hosts' wiring by source.
-// bible/11-Multiplayer/Sigil-Sets.md, "AUDIT SETS".
+// "AUDIT SETS".
 //   M1 a foe's MAXIMUM health rides its record - "under half" is its owner's word, not this machine's roll;
 //   M2 a room's loot word this build cannot read is never opened, claimed or closed over;
 //   L1 No Escape's mark ends with its foe;  L2 "The Broken Oath brightens", never "Your The ...";
@@ -100,7 +100,7 @@ test('AUDIT SETS L5: "READY AGAIN" ONLY FOR A POWER WORN AND AWAKE - never with 
   door([], e);
   at(100);
   reportPlayerKill(RAT);
-  assert.deepEqual(v.said, ['Iron Hide! The next 10 damage is blocked.']);   // PIN MOVED (VOICE2): no dash aside (Voice.md rule 5)
+  assert.deepEqual(v.said, ['Iron Hide! The next 10 damage is blocked.']);
   at(200);
   setRound(e);
   assert.equal(v.said.length, 1, 'the ward still stands: nothing to be ready for');

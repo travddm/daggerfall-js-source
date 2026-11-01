@@ -1,4 +1,4 @@
-// OT1 (2026-09-10) - THE SAVES PICKER'S PHONE PATH: Ledger row :601's
+// OT1 - THE SAVES PICKER'S PHONE PATH: Ledger row :601's
 // last residue.
 //
 // `pickClassicSaveFiles` (scenes/menu.js) was a directory picker and a

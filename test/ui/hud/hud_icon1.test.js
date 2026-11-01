@@ -1,5 +1,4 @@
-// HUD-ICON1 (2026-09-24, Mac: "the classic interaction (grab, info etc) ui element is missing the sprite and is just
-// large text").
+// HUD-ICON1.
 //
 // THE BUG: U38 drew the interaction mode as its NAME in the HUD font, standing in for DFU's icon pictures, which live
 // in Unity's Resources folder and were not in the sparse clone. Under the shipped style ("classic", displayScale 3)

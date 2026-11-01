@@ -1,8 +1,8 @@
-// WB13d (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE BLOWS - his
+// WB13d: THE BLOWS - his
 // body and his host's flash when struck (whole for mine, lightly for the court's), a blow into his ward says Warded, his
 // elemental blows shake the camera as his physical ones do and his landings shake it by how near they fall, each landing
 // lights the floor where it lands, a release sound before each landing with his wind-ups spread apart, his fire cast and
-// not swung, and the meteor seen falling longer and lower (bible/11-Multiplayer/World-Bosses.md section 20, WB13d).
+// not swung, and the meteor seen falling longer and lower (WB13d).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA13 (2026-10-24, bible/03-World/Arena-Provinces.md TESA13) - THE LAND PAST THE BAY'S SMALL PLACES, READ A TILE AT A
+// TESA13 - THE LAND PAST THE BAY'S SMALL PLACES, READ A TILE AT A
 // TIME.
 //
 // The countryside (TESA7) and the lairs (TESA8) are rolled a pixel at a time by the world host as it builds

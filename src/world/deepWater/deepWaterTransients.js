@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E1 (2026-09-25): TransientObjectTracker.cs (Iliac Puddle No More
+// DW-E1: TransientObjectTracker.cs (Iliac Puddle No More
 // 1.2.2, jet082) - the list a spawner keeps of what it stood in the world
 // (the fish, the foes, the sunken loot), and the four things it does with
 // it. An object is anything with `destroyed()` (Unity's `== null`: killed,

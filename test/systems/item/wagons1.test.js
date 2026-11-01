@@ -1,4 +1,4 @@
-// WAGONS1 (2026-10-09, Mac's three wagons): the kinds' law (systems/wagon/wagonKinds.js), their pictures (world/wagonArt.js),
+// WAGONS1: the kinds' law (systems/wagon/wagonKinds.js), their pictures (world/wagonArt.js),
 // their parts (world/wagonModels.js), the cart's pool drawing them by kind (scenes/horseCartPool.js), the online word
 // saying which (systems/horse/horseCartWire.js, net/wire.js's park record) and the capacity each carries (itemTransfer.js).
 import '../../modsOff.js';
@@ -34,7 +34,7 @@ const flush = async (n = 8) => { for (let i = 0; i < n; i++) await tick(); };
 test('WAGONS1 THE KINDS: three, their names, capacities, values, hitches and seats as the law says (the Small Cart DFU\'s 750 kg at its template\'s 150) - a pack drives its best wagon, and a cart item unmarked is the Small Cart (mutants: a rank flipped, a capacity moved, the mark unread)', () => {
   assert.deepEqual(WAGON_KIND_ORDER, ['cart', 'openWagon', 'caravan']);
   assert.deepEqual(WAGON_KIND_ORDER.map((k) => [WAGON_KINDS[k].name, WAGON_KINDS[k].kg, WAGON_KINDS[k].value, WAGON_KINDS[k].hitch, WAGON_KINDS[k].seats, WAGON_KINDS[k].enterable, WAGON_KINDS[k].rank]),
-    [['Small Cart', 750, 150, 3.8, 0, false, 0], ['Open Wagon', 1500, 9000, 7.1, 4, false, 1], ['Caravan', 2000, 25000, 7.7, 0, true, 2]]);   // WAGON-PRICE (2026-10-10): 900 and 2500 ten times over
+    [['Small Cart', 750, 150, 3.8, 0, false, 0], ['Open Wagon', 1500, 9000, 7.1, 4, false, 1], ['Caravan', 2000, 25000, 7.7, 0, true, 2]]);   // WAGON-PRICE: 900 and 2500 ten times over
   assert.deepEqual(WAGON_KIND_ORDER.map((k) => WAGON_KINDS[k].floor), [150, 900, 2500], 'WAGON-PRICE: each floor the price it was first shelved at');
   assert.equal(SMALL_CART_KG, 750); assert.equal(WAGON_KG_LIMIT, SMALL_CART_KG, 'itemTransfer.js reads the one 750');
   const cart = newWagonItem('cart'), open = newWagonItem('openWagon'), caravan = newWagonItem('caravan');
@@ -190,7 +190,7 @@ test('WAGONS1 THE POOL: the wagon drawn is the kind driven - its statics and eve
   await flush();
   const parts = pool.partsOf('caravan');
   assert.ok(parts?.gpu?.body && parts.gpu.wheels.length === 4);
-  assert.equal([...r.textures.keys()].filter((k) => k.startsWith(`${WAGON_ARCHIVE}_`)).length, 21);   // PIN MOVED (WAGONS3): and the harness
+  assert.equal([...r.textures.keys()].filter((k) => k.startsWith(`${WAGON_ARCHIVE}_`)).length, 21);
   assert.deepEqual([...r.textures.entries()].filter(([, t]) => !t.o?.opaque).map(([k, t]) => [k, !!t.o?.cutout]), [11, 12, 15, 16].map((rec) => [`${WAGON_ARCHIVE}_${rec}`, true]), 'the glass is cut out (WAGONS2), every other picture opaque');
   r.draws.length = 0;
   assert.equal(pool.draw(r), 1);

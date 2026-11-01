@@ -1,4 +1,4 @@
-// AUDIT LEGACY III (2026-10-06, bible/01-Overview/audits/Audit-Legacy-III.md): Project Legacy - Mac's own DFU mod, integrated -
+// AUDIT LEGACY III: Project Legacy - Mac's own DFU mod, integrated -
 // audited whole a third time, through six lenses (A the law and the host, O online and the server, W the world's
 // wiring, U the windows in a browser, P persistence and the tests' truth, F fidelity and the records). Every finding is
 // pinned here by its id, each through the real doors it was found through: the account Worker over its real migrations
@@ -180,7 +180,6 @@ test('AUDIT LEGACY III O11: THE TOKEN\'S BODY BOUND IS ONE - the relay\'s hello 
   };
   const house = { hn: 'H'.repeat(HOUSE_NAME_MAX), hc: 'G'.repeat(HOUSE_GIVEN_MAX), hb: 1, hg: HOUSE_GEN_MAX };
   // INT7: and the arms (`wa`, at their widest) - every claim the realm signs, the house still inside the hello's bound
-  // PIN MOVED (AUDIT RELEASE R3-8, bible/01-Overview/audits/Audit-Release-R3.md): WW7-3's seven province crowns joined the
   // glyphs, so every claim at once - every glyph, a crown of each province's too - beside a house at its bounds is 948,
   // past the hello's 864: the mint then leaves the house unsaid (the rule this test reads below), and the token it makes
   // is the one checked here. Without the province crowns the house still fits beside every other claim (855).
@@ -247,7 +246,6 @@ test('AUDIT LEGACY III O12: A TOMBSTONE ACTS IN NOTHING - its last open item, dr
   assert.equal((await call('/v1/prof/state', { character: fallen.id }, bran)).status, 200, 'no word of whose character is dead');
   // one door, before every route
   const src = rd('server-account/src/index.js');
-  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the tombstone is the door's one statement's first read (door.js doorReads)
   assert.ok(src.indexOf('if (door.dead) return no(\'dead\', 410, origin);') > 0 && src.indexOf('if (door.dead) return no(\'dead\', 410, origin);') < src.indexOf("if (path === '/v1/auth/token' && request.method === 'POST')"), 'asked before the first route');
 });
 
@@ -1345,7 +1343,6 @@ test('AUDIT LEGACY III P8: ONLINE, A DEVICE THAT REFUSES THE LINE\'S WRITE STILL
   shared.storage.setItem = () => { throw new Error('QuotaExceededError'); };
   pushed.length = 0;
   X.host.onDeath();
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE AUDIT R1): online the door WRITES the fall again - the realm holds it
   // for a party's Resurrect (its tombstone's hold), never this page's memory, which a killed tab took with it
   assert.ok(X.said.includes(LEGACY_TEXT.notStored), 'the device said so');
   assert.ok(pushed.length > 0, 'the fall went to the realm all the same, at the door');
@@ -1619,11 +1616,9 @@ test('AUDIT LEGACY III A11/F10/U7/U9/P17: THE CARD SAYS WHAT THE HOUSE KEEPS - n
   assert.equal(factsOf(oc).Died, undefined, 'one gone from the realm died on no day of ours');
   assert.ok(chipsOf(oc).includes('Gone from the realm'));
   // one pose for every window: the meeting's card asks it too (ui/legacy/legacySuccession.js face)
-  // PIN MOVED (PORTRAIT3D): and their census id beside it - the seed their Morrowind head is walked off, as their body's
   assert.deepEqual(facePose(spouse), { race: 'Breton', gender: 'male', face: 0, common: 20, resident: 'L120.9' });
   assert.deepEqual(facePose(me), { race: me.race, gender: me.gender, face: me.face });
   assert.match(rd('src/ui/legacy/legacySuccession.js'), /faces\(facePose\(who\)\)/);
-  // PIN MOVED (MW-HEADS2): and whether they are the one played - a member not played is one of the people
   assert.match(rd('src/ui/familyPages.js'), /faces\(facePose\(p, \{ currentId: _provider\?\.family\?\.\(\)\?\.currentId \?\? null \}\)\)/);
   // the loader draws it from the talk window's own CommonFaces archive
   assert.equal(COMMON_FACES_FILE, PORTRAIT_ARCHIVE.CommonFaces);
@@ -1770,7 +1765,7 @@ test('AUDIT LEGACY III P16: THE WEDDING HANDSHAKE\'S GUARDS - at most WED_INCOMI
 
 // ─── THE WORLD'S WIRING ────────────────────────────────────────────────────────────────────────────────────────────
 // world.js cannot boot headless (no ARENA2): what can run is lifted out of its own text and run (lens W's way); the rest
-// is pinned by source, its reproduction driven in Chromium (bible/01-Overview/audits/Audit-Legacy-III.md says how).
+// is pinned by source, its reproduction driven in Chromium (says how).
 
 /** world.js's own text from the line matching `from` to the first line matching `to` after it. */
 function liftWorld(from, to) {
@@ -1785,10 +1780,9 @@ function liftWorld(from, to) {
 test('AUDIT LEGACY III W1: THE LIVING WORLD\'S INDICES READ THE GAME\'S ROWS, AND AN ONLINE HOME IS NAMED - the boot emptied the rows before either index was built, so every town and dungeon index was empty (LW3\'s roads, LW6\'s deep) and every home of the line reached it with no town name: the rows go once BOTH indices stand, and a home is named off the boot\'s own complete table', async () => {
   const src = hostText('src/scenes/world.js');
   assert.equal((src.match(/_hubRows\.length = 0/g) ?? []).length, 1, 'emptied in one place');
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the indices read the world's registry (scenes/livingWorld/livingIndex.js),
   // which takes the rows at the boot - so the rows go there, AFTER the registry has them, and both indices are built from
   // it whenever they are first asked, in either order. The boot's own lines, lifted and run over the real modules.
-  const boot = liftWorld(/^  const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);$/, /^  _hubRows\.length = 0;$/);   // PIN MOVED (AUDIT RELEASE R2-7): the registry handed to the Staff Panel's picker as it is made (net/staffPlaces.js gamePlaces)
+  const boot = liftWorld(/^  const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);$/, /^  _hubRows\.length = 0;$/);
   const { createWorldPlaces } = await import('../../../src/world/worldWide/worldPlaces.js');
   const { bayPlaceRows, BAY_SOURCE } = await import('../../../src/world/worldWide/bayPlaces.js');
   const { createLivingIndex } = await import('../../../src/scenes/livingWorld/livingIndex.js');
@@ -1803,8 +1797,7 @@ test('AUDIT LEGACY III W1: THE LIVING WORLD\'S INDICES READ THE GAME\'S ROWS, AN
     assert.equal(idx[order[0]]().size, 1, `${order[0]} first: built from the rows`);
     assert.equal(idx[order[1]]().size, 1, `${order[1]} second: built from the rows too`);
   }
-  // a home of the account, as the line is handed it - ACCOUNT-HOMES (2026-10-06, PIN MOVED: "mine alone", this realm
-  // character's rows, before): a home is its account's, every member's, so every row of the account's list is the line's
+  // a home of the account, as the line is handed it - ACCOUNT-HOMES: a home is its account's, every member's, so every row of the account's list is the line's
   const read = liftWorld(/^  let _legacyOnlineHomes = null;$/, /^  }$/);
   const mk = new Function('homesApi', 'realmSession', '_townOfMapId', `${read}\nreturn { read: legacyOnlineHomesRead, get homes() { return _legacyOnlineHomes; } };`);
   const w = mk({ mine: async () => ({ ok: true, data: { homes: [{ mapId: 5001, buildingKey: 66051, region: 17, character: 'r-me' }, { mapId: 5002, buildingKey: 7, region: 17, character: 'r-other' }, null] } }) },
@@ -1852,10 +1845,9 @@ test('AUDIT LEGACY III O2/P1 (the world host, by source): a line the realm refus
 
 test('AUDIT LEGACY III U1/U2 (the pause window, by source - driven in Chromium): a held Enter or Space presses nothing (the Succession\'s own rule: Play as and Pass the mantle armed and fired on one held press); the keyboard comes into the window - a Tab from outside lands on its first control, and the window takes the focus as it mounts', () => {
   const src = rd('src/ui/pauseDoor.js');
-  // PIN MOVED (AUDIT PRIVATE-REPORT UI-10): never in a field - a held Space or Enter in the report form's words types
   assert.match(src, /host\.addEventListener\?\.\('keydown', \(e\) => \{\n(?:    \/\/[^\n]*\n)*    if \(e\.repeat && \(e\.key === 'Enter' \|\| e\.key === ' '\) && !isTextEntryTarget\(e\.target\)\) \{ e\.preventDefault\(\); e\.stopPropagation\(\); \}\n  \}, true\);/, 'U1');
   assert.match(src, /document\.addEventListener\?\.\('keydown', tabIn, true\);/, 'U2: the Tab from outside');
-  assert.match(src, /const close = \(\) => \{\n    if \(fired\) return;\n    rvnStars\.drop\(\);[^\n]*\n    document\.removeEventListener\?\.\('keydown', tabIn, true\);/, 'U2: gone with the window');   // PIN MOVED (GROWTH3): the Ascension and the Firmament are drawn in the window now - only a sworn revenant's stars (RVN-STARS) stand over it
+  assert.match(src, /const close = \(\) => \{\n    if \(fired\) return;\n    rvnStars\.drop\(\);[^\n]*\n    document\.removeEventListener\?\.\('keydown', tabIn, true\);/, 'U2: gone with the window');
   assert.match(src, /view = mountEnhancedMenu\(host, \{ mode: 'pause', hooks, onAction: act, at: hooks\.at \?\? null \}\);\n      focusIn\(\);   \/\/ AUDIT LEGACY III U2/, 'U2: the focus taken as it mounts');
   assert.match(src, /const to = host\.querySelector\?\.\('\.px-tabs button\.on'\) \?\? host\.querySelector\?\.\('button:not\(\[disabled\]\)'\);/);
 });

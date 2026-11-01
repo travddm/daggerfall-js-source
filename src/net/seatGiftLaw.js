@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN1 (2026-10-24, the owner: "Allowing guild mates to contribute to
-// town material storage with gathered items/their store") - A GIFT TO THE
+// DOMAIN1 - A GIFT TO THE
 // TOWN: a member's fortification materials put into the guild's stockpile
 // where it holds the seat, or its Siege Camp where it pledged it this
-// week (bible/11-Multiplayer/Domains.md section 5).
+// week.
 //
 // A GIFT IS A DELIVERY WITH NO PAY (Domains law 2): what a seat writ may
 // ask (fortLaw.js FORT_MATERIALS, a Ram Kit a camp's alone), from the

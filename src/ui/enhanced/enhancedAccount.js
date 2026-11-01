@@ -2,7 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1e — THE ACCOUNT CARD, DRAWN.
 //
-// Mac: "please be detailed and match the enhanced aesthetic".
 //
 // THIS FILE DECIDES NOTHING. Every stage, every field, every refusal
 // and every rule about what may be pressed lives in ui/accountFlow.js,
@@ -39,7 +38,7 @@ import { serpentRecordText } from '../../net/serpent/serpentClaims.js';   // AUD
 import { sdRecordText } from '../../net/superDungeon/sdClaims.js';   // SD9b: and its Hours-broken row
 import { starRecordText } from '../../net/starfall/starClaims.js';   // STAR7: and its stars-held row
 
-/** RENOWN-CHAR (Mac: "Can we make renown per character again"): the card's Renown tracks as the service sends them -
+/** RENOWN-CHAR: the card's Renown tracks as the service sends them -
  *  its characters', the most recently played first - or none: none earned yet, or a service from RENOWN-ACCOUNT's day
  *  (which sent the account's one, `{ xp, level }`, not a list - no character's Renown, so none is drawn). */
 export function renownTracksOfCard(r) {
@@ -108,8 +107,7 @@ const ACCOUNT_TAG = 'Account';
 const accountTag = () => t('account.card.tag', ACCOUNT_TAG);
 
 export const STAGE_COPY = Object.freeze({   // L10N4: the words are getters, read when the card is drawn
-  // THE BLURBS WERE CUT (Mac: "there's uneeded text explaining what an
-  // account is"). A sign-in window is not a place to be taught what an
+  // THE BLURBS WERE CUT. A sign-in window is not a place to be taught what an
   // account is - the two buttons say it. What survives is only what a
   // player CANNOT guess and would be hurt by not knowing: that recovery
   // signs every device out, and that the codes are shown once.
@@ -326,16 +324,14 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   /**
    * ACC3c — THE WARDROBE, and it is a PICKER rather than a list.
    *
-   * Mac: "Players can tap the account icon to equip 1 feature along
-   * with signing out." So it sits on the signed-in card beside Sign
+   * So it sits on the signed-in card beside Sign
    * out, which is where he put it.
    *
    * IT DRAWS NOTHING WHERE THERE IS NOTHING TO CHOOSE. A player who
    * holds no title sees no picker - not an empty box with a heading
    * over it - because ACC1e's own correction was Mac's ("there's
    * uneeded text explaining what an account is") and a control with
-   * no options is exactly that. GLYPH-WEAR (2026-10-02, Mac: "can we
-   * make it where players can also equip/unequip their glyphs"): each
+   * no options is exactly that. GLYPH-WEAR: each
    * glyph is a button too - pressed off, pressed back on - though it
    * stays TRUE of the player: hiding one is paint, and what it grants
    * stays.
@@ -467,8 +463,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-   * name or character name for ingame use") - THE NAME THE ROOM READS, a toggle of two: the account's (the plate's own
+   * NAME-AS - THE NAME THE ROOM READS, a toggle of two: the account's (the plate's own
    * name) or the character's being played. A press asks the flow (chooseName: the service keeps the choice and every
    * later mint signs it), and the one chosen is pressed - `worn`, aria-pressed - as a title worn is, in the wardrobe's own
    * vocabulary (this card brings no design language of its own). One line under it says what the other players see: the
@@ -500,8 +495,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * PATREON-LINK — THE PATRON'S OWN LINK (Mac: "having to manually hand out titles ... its really hard to keep up with
-   * it"). A registered account, on a service with linking on, gets one row: Link Patreon, or Linked with what the
+   * PATREON-LINK — THE PATRON'S OWN LINK. A registered account, on a service with linking on, gets one row: Link Patreon, or Linked with what the
    * pledge holds, a Refresh (the same link - Patreon asked again) and an Unlink.
    *
    * THE LINK IS A LINK, not a button that asks for one: the service put it in the account read, so the press opens it
@@ -550,7 +544,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   /** PATREON-LINK: BACK FROM THE BROWSER, the account is read again - a link that landed, or a pledge that moved, is on
    *  the card the player comes back to. One listener a card, gone on the first focus after the card is. */
   const win = doc.defaultView;
-  let off = () => {};   // MEM-AUDIT (2026-10-23): the card's owner lets it go when it draws the next - a repaint makes a card a render
+  let off = () => {};   // MEM-AUDIT: the card's owner lets it go when it draws the next - a repaint makes a card a render
   if (win && typeof win.addEventListener === 'function') {
     const onFocus = () => {
       if (!root.isConnected) { win.removeEventListener('focus', onFocus); return; }
@@ -563,7 +557,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   function build(stage) {
     const copy = STAGE_COPY[stage];
 
-    // PROFILE-MENU (2026-10-07, Mac: "organize and detail the player profile (the top right icon section)"): SIGNED
+    // PROFILE-MENU: SIGNED
     // IN, THE CARD IS A PROFILE, not a list. It was one centred column of eleven key-and-value rows - who you are, what
     // you have done and what your account is, all at one weight, the Renown rows wrapping to three lines on a phone. Now
     // it reads in the order a player looks: WHO (the plate - the portrait the corner mark wears, the name with its
@@ -589,7 +583,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     // a different sentence; "Account" over "Your account" is the same
     // one twice.
     if (copy.tag !== accountTag()) root.append(el('span', 'tag', copy.tag));
-    // RENOWN1 (Mac: "having their level appear on the left side of character name and profile main menu"): the
+    // RENOWN1: the
     // Renown of the character most recently played online, left of the name - the service's tracks come most
     // recently played first (AUDIT RENOWN1 UI-10: "earned" was never what it measured - a report the hour had spent
     // still marks its character played). None for an account that has not earned any yet, or a service before it.
@@ -647,7 +641,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       // THE RECORD - what the account has done, a tile a deed. A service from before a deed says nothing of it, and a
       // section with nothing in it is not drawn (ACC1e: no heading over an empty box).
       const record = section(t('account.card.record', 'Record'), 'acctrecord');
-      // DUEL1 (Mac: "Add a dueling K/D to the profile menu"): the account's record, the service's count of the duels
+      // DUEL1: the account's record, the service's count of the duels
       // it won and lost (net/duel/duelRecord.js says whose word each result is). A service from before it says nothing.
       const duels = duelRecordText(flow.account.duels);
       if (duels) row(t('account.card.duels', 'Duels'), duels);
@@ -707,7 +701,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       if (flow.account.handle) row(t('account.card.username', 'Username'), flow.account.handle);
       else row(t('account.card.name', 'Name'), t('account.card.guestName', '{name} (a guest)', { name: flow.account.guestName ?? flow.account.name }));
       if (flow.account.kind) row(t('account.card.kind', 'Kind'), flow.account.kind === 'linked' ? t('account.card.kindRegistered', 'Registered') : t('account.card.kindGuest', 'Guest'));
-      // ACC4 (Mac: "registered date and time played"). A guest has no
+      // ACC4. A guest has no
       // registered date and gets no row for it, rather than a dash - the
       // Kind row above already says why. Time played is every account's,
       // guest time included: registering upgrades the same row.

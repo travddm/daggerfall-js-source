@@ -1,6 +1,4 @@
-// GUILD1 (2026-09-25, Mac, of the holdings: "future ownership for online guilds"; asked, founding takes "Gold and
-// Renown", a guild is joined "Per character", its ranks are "Four, renamed by the guildmaster", and the treasury is the
-// "Guildmaster only" to take from): THE GUILDS. The law both ends read (net/guild/guildLaw.js), the account service's guilds
+// GUILD1: THE GUILDS. The law both ends read (net/guild/guildLaw.js), the account service's guilds
 // driven through the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js), and the
 // client's door (net/accountClient.js accountGuilds). `06-Systems/Online-Arc.md` GUILD1.
 import { test } from 'node:test';
@@ -125,7 +123,7 @@ test('GUILD1 the law: founding costs 10,000 gold and Renown 10; a guild holds 75
   // the powers
   assert.deepEqual(Object.fromEntries(Object.entries(GUILD_POWERS).map(([k, v]) => [k, [...v]])), {
     invite: [0, 1], remove: [0, 1], promote: [0, 1], deposit: [0, 1, 2, 3], withdraw: [0], renameRanks: [0], handOver: [0], disband: [0],
-    rename: [0], vaultGrant: [0],   // GUILD2 (PIN MOVED): the guild's own new name and the vault's grants, the guildmaster's alone
+    rename: [0], vaultGrant: [0],   // GUILD2 (
   });
   assert.deepEqual([guildMay(0, 'withdraw'), guildMay(1, 'withdraw'), guildMay(3, 'deposit'), guildMay(2, 'invite'), guildMay(0, 'nonsense')], [true, false, true, false, false]);
   assert.deepEqual([guildOutranks(1, 2), guildOutranks(1, 1), guildOutranks(2, 1), guildOutranks(0, 4)], [true, false, false, false]);
@@ -315,7 +313,7 @@ test('GUILD1 the treasury: any member puts gold in; the guildmaster alone takes 
 
 test('GUILD1 leaving and handing on: a member leaves; the guildmaster leaves only a guild with nobody else in it, and only once its treasury is empty - it goes; handed on, another member is guildmaster and the old one an officer; a guild whose guildmaster\'s account went is given its highest rank\'s longest-standing member; disbanding is the guildmaster\'s once the treasury is empty, and a guild nobody is left in gives its name and tag to the next founder (mutants: the guildmaster walking out on members, the treasury left to vanish, succession skipped, an orphaned name held)', async () => {
   const { env, call, registered, gm, officer, member, recruit, id } = await guildOfThree();
-  assert.deepEqual(await call('/v1/guilds/leave', { character: gm.character }, gm.secret), { status: 409, body: { error: 'guild-master-leaves', keeps: ['guild-master-leaves'] } });   // PIN MOVED: GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md) - the whole list beside the first
+  assert.deepEqual(await call('/v1/guilds/leave', { character: gm.character }, gm.secret), { status: 409, body: { error: 'guild-master-leaves', keeps: ['guild-master-leaves'] } });
   assert.deepEqual(bare((await call('/v1/guilds/leave', { character: recruit.character }, recruit.secret)).body), { ok: true });
   assert.equal(await mine(call, recruit), null);
   // handed on
@@ -328,7 +326,7 @@ test('GUILD1 leaving and handing on: a member leaves; the guildmaster leaves onl
   // disband: the treasury first
   await call('/v1/guilds/deposit', { character: officer.character, gold: 10 }, officer.secret);
   assert.deepEqual(await call('/v1/guilds/disband', { character: officer.character }, officer.secret), { status: 403, body: { error: 'guild-rank' } });
-  assert.deepEqual(await call('/v1/guilds/disband', { character: gm.character }, gm.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });   // PIN MOVED: GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md) - the whole list beside the first
+  assert.deepEqual(await call('/v1/guilds/disband', { character: gm.character }, gm.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });
   await call('/v1/guilds/withdraw', { character: gm.character, gold: 10 }, gm.secret);
   assert.deepEqual(bare((await call('/v1/guilds/disband', { character: gm.character }, gm.secret)).body), { ok: true });
   assert.deepEqual([await mine(call, gm), await mine(call, officer)], [null, null], 'everything of it went');
@@ -336,7 +334,7 @@ test('GUILD1 leaving and handing on: a member leaves; the guildmaster leaves onl
   const solo = await registered('Solo');
   await oldGuild(env, call, solo, 'Lone Wolf', 'WOLF');   // AUDIT REALM2 S2
   await call('/v1/guilds/deposit', { character: solo.character, gold: 5 }, solo.secret);
-  assert.deepEqual(await call('/v1/guilds/leave', { character: solo.character }, solo.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });   // PIN MOVED: GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md) - the whole list beside the first
+  assert.deepEqual(await call('/v1/guilds/leave', { character: solo.character }, solo.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });
   await call('/v1/guilds/withdraw', { character: solo.character, gold: 5 }, solo.secret);
   assert.deepEqual(bare((await call('/v1/guilds/leave', { character: solo.character }, solo.secret)).body), { ok: true, disbanded: true });
   // an orphaned guild's name and tag go to the next founder

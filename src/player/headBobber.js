@@ -86,7 +86,7 @@ export class HeadBobber {
     cam.pitch += this.nod[0] * DEG;
     cam.yaw -= this.nod[1] * DEG;
     this.nod = [0, 0];
-    // TWO-HANDS (AUDIT, bible/05-Combat/Two-Hands.md): the timer, handed out for the running hands' stride - the same clock
+    // TWO-HANDS (AUDIT): the timer, handed out for the running hands' stride - the same clock
     // the eye bobs to, so the hands pump with the feet the camera sways over; null with head bobbing off (no clock then)
     if (out) out.bobTimer = enabled ? this.timer : null;
     if (!enabled || health < 1 || paused || climbing || !grounded) return this.offset;

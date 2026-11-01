@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-GAPS (2026-10-26, the owner: "Take care of exclusions and gaps"; bible/06-Systems/Travel-View.md ROAD-GAPS) - THE
+// ROAD-GAPS - THE
 // LINKS A REGION'S ROADS LAY WHERE TWO OF ITS NETWORKS MEET UNJOINED. A region's build (world/tamrielRoads.js) routes its
 // places a route at a time, and some of what it lays stands as pieces of its own that no bit joins to the rest: on the
 // freeware's Hammerfell (regions (2, 3) and (2, 4) laid fresh) 339 pieces, 52 pairs of them within three pixels of each

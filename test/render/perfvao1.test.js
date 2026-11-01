@@ -1,5 +1,4 @@
-// PERF-VAO1 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"; PERF-NEXT item 6, bible/07-Rendering/Performance-Online.md): ONE bindVao FOR THE LIFE OF THE RENDERER. The
+// PERF-VAO1: ONE bindVao FOR THE LIFE OF THE RENDERER. The
 // world frame handed the shadow pass and the air pass a `bindVao` closure minted that frame (renderer.js _renderPasses),
 // so their `f.bindVao(vao)` met a new call target every frame - V8 deoptimized the shadow replay on it ("wrong call
 // target"). The same call, one identity: pinned by identity across frames and by what it does (the renderer's own

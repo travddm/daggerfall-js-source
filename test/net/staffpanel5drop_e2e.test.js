@@ -1,4 +1,4 @@
-// FOLLOW-OWN-ID (2026-10-24, mob: "need the follow dropping me to stop", "says im in another tab...", "i didnt do that") -
+// FOLLOW-OWN-ID -
 // A FOLLOW NEVER PUTS THE STAFF MEMBER'S OWN GAME OFFLINE. Over the real relay and its hub shards (the harness of
 // staffpanel5live_e2e.test.js): the target's game, the staff member's own game (its room and its World tab's hub link) and
 // the real createStaffHook, whose sessions take the TAB's id when they name none - as a browser's do (online.js peerId,
@@ -128,7 +128,6 @@ for (const leaves of [false, true]) for (const hide of ['shown', 'hidden', 'reli
     const st = (s) => `${s.room}/${s.status}/${s.error ?? ''}`;
     assert.deepEqual(closes, [], `the staff game is never put offline: room ${st(smain)}, World ${st(shub)}`);
     assert.equal(hook.locked(), true, 'the follow holds');
-    // PIN MOVED (LONE-SLEEP): a target with nobody near but hidden watchers is LONE - the hidden law has no side channel, so
     // its own cell hears it once a minute (net/loneSleep.js LONE_POSE_MS, the owner's accepted cost) and the follow draws it
     // where its last pose put it; with the staff game standing in its cell, shown, where it stands, a frame behind at most
     assert.equal(main._loneWas, leaves || hidden, 'lone exactly when no shown player stands near it');

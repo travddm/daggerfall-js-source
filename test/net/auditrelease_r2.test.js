@@ -1,4 +1,4 @@
-// AUDIT RELEASE R2 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md): THE BAY-ONLY ASSUMPTIONS PAST THE BAY - the
+// AUDIT RELEASE R2: THE BAY-ONLY ASSUMPTIONS PAST THE BAY - the
 // owner: "ensure everything is perfect and that everything is covered for a smooth release that expands our world
 // seamlessly". Each pin is the finding's own: it fails on the head before its fix, and on its mutants
 // (tools/mutants/auditrelease_r2.json).

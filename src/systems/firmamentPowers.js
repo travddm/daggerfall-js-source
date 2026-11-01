@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; bible/06-Systems/Firmament.md) - WHAT THE FIRMAMENT DOES. The law (net/firmament/firmamentLaw.js) sums and
+// FIRM1 - WHAT THE FIRMAMENT DOES. The law (net/firmament/firmamentLaw.js) sums and
 // caps every channel the stars allocated carry; the tree in force is firmamentLive.js's; this file lays those channels
 // onto the seams the Sigil Sets, the loot and the Arcane paths opened - registered here at import, each a no-op for
 // anyone but MY entity, the tree in force:
@@ -110,7 +110,7 @@ export function firmamentFold(entity) {
   // a key star's raw points, and a small star's share of the character's own (its permanent value: Ascend's points in it)
   // - AUDIT UICALM-FIRM1 L1 H1: the two TOGETHER held to the channel's budget (an attribute +15, a combat skill +15):
   // capped apart they made +21 Strength and a mastered Stealth +53
-  // FIRM-MAX (2026-10-15, asked of the port: "all nodes should also work on maxed out stats"): a gain lifts the attribute's
+  // FIRM-MAX: a gain lifts the attribute's
   // live ceiling by itself too, so +2% Speed on a 100 reads 102 - liveStat had held it at MAX_STAT_VALUE, and a star
   // did nothing for a maxed stat. A departure from GetLiveStatValue's ceiling for the sky's gains alone.
   for (const a of ATTRIBUTES) {

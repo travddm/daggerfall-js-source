@@ -71,8 +71,7 @@ test('mwbsa: retail Morrowind.bsa opens and looks sane', { skip: skipReal }, () 
   for (const n of names) assert.ok(bsa.get(n).byteLength >= 0);
 });
 
-// ── MW-LOAD (2026-09-08, Mac: "improve the load time when Morrowind assets
-// are enabled"): THE ARCHIVE OPENS OFF A BLOB, BY RANGE. The store used to
+// ── MW-LOAD: THE ARCHIVE OPENS OFF A BLOB, BY RANGE. The store used to
 // hand back each archive as a whole ArrayBuffer - a structured clone of
 // 150-300 MB per archive, one to three seconds each measured - before a
 // mesh was asked for. Off a Blob the directory is a few-megabyte range

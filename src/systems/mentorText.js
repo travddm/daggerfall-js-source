@@ -1,4 +1,4 @@
-// MENTOR2 (2026-10-27; bible/06-Systems/Mentor-Mode.md): what mentoring says to the player - the chat, the sheet, the
+// MENTOR2: what mentoring says to the player - the chat, the sheet, the
 // party tab, the HUD's tile and its card. Every word through the text core; mentorMode.js stays import-free.
 
 import { t } from './textManager.js';

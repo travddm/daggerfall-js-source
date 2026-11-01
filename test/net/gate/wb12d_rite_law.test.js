@@ -1,7 +1,7 @@
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"; then "Btw I want to do all 4. We're going balls deep with this"):
+// WB12d:
 // THE FAITHFUL'S RITE - its law (net/gate/gateRite.js: where the circle stands, who stands at it, when it holds), the wire's
 // word (net/wire.js), the receipt's rite (net/gate/gateReceipt.js) and the account service's ember (migration 0066) -
-// bible/11-Multiplayer/World-Bosses.md section 19 D.
+// D.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -138,7 +138,6 @@ function d1() {
         async first() { return stmt.get(...args) ?? null; },
         async all() { return { results: stmt.all(...args) }; },
         async run() { const r = stmt.run(...args); return { meta: { changes: Number(r.changes) } }; },
-        // PIN MOVED (AUDIT FB1024, BROKER-RID): a batch's statement answers its rows as D1's does (a D1Result each - an
         // UPDATE ... RETURNING's rows in `results`; egSink read them so already, and the insignia's sale rides one now)
         _d1() { const results = stmt.all(...args); return { results, meta: { changes: Number(db.prepare('SELECT changes() AS c').get().c) } }; },
       };

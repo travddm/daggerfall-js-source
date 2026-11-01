@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// REALM-GZIP (2026-09-30, the field: Thoryn's tile said "This
-// character's save is too big for the realm to take"): A REALM SAVE
+// REALM-GZIP: A REALM SAVE
 // RIDES GZIPPED. The law both ends read - the playing tab packs its
 // checkpoint with it (systems/realmSaves.js realmPut) and opens what a
 // join reads; the service opens a record it must read (server-account/

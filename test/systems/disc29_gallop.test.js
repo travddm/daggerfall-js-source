@@ -1,5 +1,4 @@
-// DISC29-F (2026-09-28, Skibbster on Discord: ride into a building without stopping and the gallop keeps playing
-// inside) - A MODE CHANGE STOPS THE RIDING LOOP, AS UPDATEMODE DOES.
+// DISC29-F - A MODE CHANGE STOPS THE RIDING LOOP, AS UPDATEMODE DOES.
 //
 // The riding sound is one named channel, `audio.setLoop('riding', ...)`, re-armed at every clip's end; only
 // mountRig.frame ever wrote it null. The door dismounts through mountRig.setMode (TransportManager.HandleTransition ->

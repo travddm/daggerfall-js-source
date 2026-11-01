@@ -282,7 +282,6 @@ export function dungeonEntranceLanding(entranceDoors) {
  * not let a player fall through. The port's spawn is the FEET, and
  * both exits handed it the door centre (about a body-half up), so the
  * player stood ~0.9u in the air at every exterior door and dropped.
- * Mac, 2026-08-27: "spawns in the air and drops".
  */
 export function repositionFeetY(terrainY, centreY, height = CAPSULE_HEIGHT) {
   const minFeet = (Number.isFinite(terrainY) ? terrainY : -Infinity) + 0.15;   // terrain + height/2 + 0.15, as feet
@@ -300,7 +299,7 @@ export const LADDER_HALF = 1.6;
  * top teleports TO the top, else above the bottom teleports to the
  * bottom. Markers arrive as {type, x, y, z} (interiorLayout).
  *
- * IC-INTERIORS (2026-10-27; bible/03-World/Arena-Provinces.md IC-INTERIORS) - DEPARTURE (named; Port-Ledger section A):
+ * IC-INTERIORS - DEPARTURE (named; Port-Ledger section A):
  * where the host hands over the ladder climbed (`ladder`, its world matrix), the markers are that ladder's own - the top
  * nearest its head and the bottom nearest its foot. DaggerfallLadder.ClimbLadder takes the two nearest the player, which
  * is the same pair wherever an interior stands one ladder (1,683 of Daggerfall's) and wherever its two ladders stand far
@@ -358,8 +357,7 @@ export function exteriorLanding(playerPos, buildingDoors) {
  * landing unchanged - gravity remains the fallback.
  */
 export function floorLanding(collider, pos, maxDist = 10, extraHeight = 0) {
-  // TL1 (Mac: "you don't remain on the ground after traveling, you
-  // spawn in the air and drop"): the ARRIVAL raw is the location's
+  // TL1: the ARRIVAL raw is the location's
   // flattened height, and the edge landing stands ten units OUTSIDE the
   // location, on terrain the blend has not fully flattened. A steep site
   // puts that terrain more than ten units below the raw - the ray found
@@ -381,7 +379,7 @@ export function floorLanding(collider, pos, maxDist = 10, extraHeight = 0) {
   // is the CharacterController's footprint sweep, not a point probe.
   const bestFloorY = footprintFloorY(collider, pos, maxDist);
   if (bestFloorY === -Infinity) {
-    // TSR4c (Mac: "Now I spawn in mid air after hitting ride out"):
+    // TSR4c:
     // THE RAY ONLY SEES MESHES. The exterior collider carries the
     // terrain as its `heightAt` callback - "floor beneath everything",
     // read by move() and never by raycastHit - so over bare ground
@@ -428,7 +426,7 @@ export function openGroundNear(collider, x, z, { rings = OPEN_GROUND_RINGS, step
   }
   return null;
 }
-/** PORTAL-ANYWHERE (bible/06-Systems/Portal-Stone.md; the owner, 2026-10-26: "Anywhere on land"): LEVEL GROUND - the
+/** PORTAL-ANYWHERE (): LEVEL GROUND - the
  *  terrain LANDING_LEVEL_REACH out on each of four sides of a spot within LANDING_STEEP of its floor (`floor`, the feet's
  *  height): a cliff's face or its lip, or the top of a rock standing over the terrain, is none (metres). */
 export const LANDING_LEVEL_REACH = 2;
@@ -461,7 +459,7 @@ export function heldInSolid(collider, feet, height = CAPSULE_HEIGHT) {
   return collider.insideSolid([feet[0], feet[1] + CAPSULE_RADIUS, feet[2]]) || collider.insideSolid([feet[0], feet[1] + height - CAPSULE_RADIUS, feet[2]]);
 }
 
-/** PACK-OPEN (mob 2026-10-26: "make sure they dont spawn in houses", "or building"): whether a raid's or a staff event's
+/** PACK-OPEN (, "or building"): whether a raid's or a staff event's
  *  monster may stand at `spot` ({ x, y, z }, its feet) - not held in a static solid (a closed building's shell, a rock)
  *  and no solid over its head within RAID_SPOT_ROOF_M (a roof: a shell open below, a porch, an arch). Pure over the
  *  collider's queries. */

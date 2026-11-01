@@ -1,5 +1,5 @@
 // FB1020h ESSENCE-LOOSE (FIELD BUGS 2026-10-20h, report 5 - the Discord's #bug-reports, "the Arcana Essence marked
-// 'bought with gold'"; bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md ESSENCE-LOOSE). A piece crafted at a station with
+// 'bought with gold'"; ESSENCE-LOOSE). A piece crafted at a station with
 // any unit the service never handed out - a looted, traded or shop-bought stack, put in LOOSE by the station's own put-in
 // (AUDIT BAG-CRAFT A1, bagLaw.js LOOSE_ORIGIN) - is walled to gold on its products row (`bought_with` 'gold': it lists
 // for gold alone, as a pack's piece does). The disenchant read that column as the piece's last purchase (migration 0041's

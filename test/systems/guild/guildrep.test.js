@@ -1,5 +1,4 @@
-// GUILD-REP (2026-09-22, Mac: "we need to add guild reputation to our
-// enhanced pause menu, its missing"). The enhanced pause menu's Stats >
+// GUILD-REP. The enhanced pause menu's Stats >
 // Standing page drew only the five social groups; the guilds a player
 // belongs to, their rank and their standing with each were on the
 // classic sheet's Affiliations box alone. ShowAffiliationsDialog's model
@@ -17,7 +16,6 @@ const fighters = GUILDS.FightersGuild;
 const hero = (extra = {}) => ({ name: 'Aldric Vane', stats: {}, level: 10, ...extra });
 
 test('GUILD-REP: the book - affiliation, rank title and live reputation, one row a membership', () => {
-  // PIN MOVED (AUDIT GUILD-WORDS II A-7): a Swordsman with every guild skill at 0 is one the next review puts on
   // probation, and the book now says so - the hero holds the skills its rank asks
   const e = hero({
     skills: Object.fromEntries(fighters.skills.map((s) => [s, 40])),
@@ -33,8 +31,8 @@ test('GUILD-REP: the book - affiliation, rank title and live reputation, one row
   });
   const book = affiliations(e);
   assert.equal(book.length, 2, 'a membership naming no guild is no row');
-  // REP6: PIN MOVED - the row carries the probation too (the Standing page tags a member on it)
-  assert.deepEqual(book[0], { affiliation: 'The Fighters Guild', title: 'Swordsman', rep: 37, factionId: fighters.factionId, probation: false, owed: 0, warnings: [] });   // PIN MOVED (STANDING-WORDS, AUDIT GUILD-WORDS L1-2): the owed and the review's warnings
+  // REP6:
+  assert.deepEqual(book[0], { affiliation: 'The Fighters Guild', title: 'Swordsman', rep: 37, factionId: fighters.factionId, probation: false, owed: 0, warnings: [] });
   assert.equal(book[1].affiliation, 'Julianos');
   assert.equal(book[1].rep, -4);
   assert.deepEqual(affiliations(hero({ guildMemberships: {} })), [], 'no memberships, no rows');

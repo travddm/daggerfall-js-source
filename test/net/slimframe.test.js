@@ -1,5 +1,4 @@
-// SLIM-FRAME (2026-10-11, the owner: "I notice some players look like they are walking off the ground";
-// bible/11-Multiplayer/Scale-Arc.md SLIM-FRAME): THE SECOND WIRE'S PLACE, IN ITS OWN UNITS. SCALE5b's slimPose rounded
+// SLIM-FRAME: THE SECOND WIRE'S PLACE, IN ITS OWN UNITS. SCALE5b's slimPose rounded
 // a pose's x, y and z to whole units, reading all three as MapsFile's world unit (2.5 cm). A pose's HEIGHT is the scene's
 // metres in every room (scenes/world.js sheds only the floating origin from it), and off the overworld its x and z are
 // metres too - so every peer heard on the second wire stood on a whole metre of height, up to half a metre over the

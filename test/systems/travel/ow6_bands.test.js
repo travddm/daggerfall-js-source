@@ -1,5 +1,4 @@
-// OW6 - THE BANDS VARY AND ROAM MORE, THE SAME FOR EVERY PLAYER (2026-09-29, the player: "Enemies should spawn in varying
-// numbers and roam more often"; "Everything needs that persistence between players in the overworld"). The law
+// OW6 - THE BANDS VARY AND ROAM MORE, THE SAME FOR EVERY PLAYER. The law
 // (systems/travel/travelBands.js: a band's own number and level, the chance and pace), the themed group taking a caller's size
 // (systems/campEncounters.js rollGroupComposition: a band of one may be a solitary kind), and the host's make lifted out
 // of scenes/world.js and RUN: online every player reads one band, whatever their own level.

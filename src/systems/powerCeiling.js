@@ -1,5 +1,5 @@
 // @ts-check
-// POWER-CEILING (bible/05-Combat/Power-Ceiling.md): THE TWO COMPOSITE CEILINGS. A blow's powers multiply (the sigil, the
+// POWER-CEILING: THE TWO COMPOSITE CEILINGS. A blow's powers multiply (the sigil, the
 // sets, the loot, the sky, mastery, the paths) and a hurt's guards compose, so each registry asks this leaf for its room:
 // its own measured top first, then the product of every top (tools/powerCeiling.mjs). AUDIT HORIZONTAL D4: the product
 // alone cut whichever registry the import graph asked last (a loot power past 240 took a martial path from 40 to 8), so

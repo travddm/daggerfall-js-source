@@ -1,5 +1,4 @@
-// COST-2 (b) (2026-10-24, the owner's session: no leave and join on a crossing inside a node; bible/11-Multiplayer/
-// Scale-Arc.md COST-2): A SOCKET COVERS ITS NODE. The Worker puts a page's cell in the node that holds it; the object
+// COST-2 (b): A SOCKET COVERS ITS NODE. The Worker puts a page's cell in the node that holds it; the object
 // keeps that node on the socket's attachment (`nd`) and says the fine cells it covers in the welcome (`cells`); every
 // cell-scoped law compares against that cover (net/cellTree.js coversCell) where it compared against the socket's key -
 // a word's pixel, a grant's `q`, a park's anchor, a ledger row. The page keeps the cover its welcome said: a crossing
@@ -70,7 +69,7 @@ test('COST-2 (b) THE RELAY: an object told a coarse node keeps it on the socket\
     const a = r.connect();
     a.att = { ...a.att, nd: NODE };
     r.room._adopt(a, a.att);
-    await r.hello(a, 'peer-0001', null, { cv: 1 });   // PIN MOVED (COST-2 part two): a coarse node's hello says the cell law (cv), or the cell door refuses it - test/server/cellmoves.test.js
+    await r.hello(a, 'peer-0001', null, { cv: 1 });
     assert.deepEqual(a.sent.find((m) => m.t === 'welcome')?.cells, [24, 8, 26, 10], 'the welcome: the cells the socket covers');
     const there = band(205, 174);   // map pixel (410, 151): world:25,9
     await r.raw(a, JSON.stringify({ t: 'ow', k: 'sp', ids: [there] }));

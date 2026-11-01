@@ -1,5 +1,4 @@
-// INT7 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE ARMS AND THE LEVEL SIGNED. Every referee of a blow between players clipped it to the weapon the
+// INT7: THE ARMS AND THE LEVEL SIGNED. Every referee of a blow between players clipped it to the weapon the
 // striker's own word named (the arena) or its own look carried (a siege, a Royal Tourney) - a client's claim either way,
 // so a Daedric Dai-Katana struck as one from a pack that never held it. Now each checkpoint's judge reads the most reach
 // of the pack's LAWFUL weapons and whether a lawful bow is among them (net/siege/siegeRef.js armsOf), the identity mint signs
@@ -21,7 +20,7 @@ import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { standService, T0 } from '../../accountDb.mjs';
 import { seatRealm } from '../../realmSeat.mjs';
-import { realmMintFacts } from '../../../server-account/src/realm.js';   // PIN MOVED (SCALE4f): realmArmsOf is realmMintFacts' `wa`
+import { realmMintFacts } from '../../../server-account/src/realm.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
 
 const { subtle } = globalThis.crypto;
@@ -33,7 +32,6 @@ test('INT7 THE LAW: a weapon\'s reach is its DFU top and its material\'s modifie
     for (let m = 0; m <= 9; m++) assert.equal(armsTop(t, m), weaponMaxDamage(t) + weaponMaterialModifier(m), `${t}/${m}`);
   }
   assert.equal(armsTop(9999, 0), null, 'no weapon this table names');
-  // PIN MOVED (guns removed): the bound was the Thunderlock's 32; with the guns gone the most reach is a Daedric Dai-Katana's (21 + 6).
   assert.deepEqual([ARMS_TOP_MAX, TOKEN_ARMS_TOP_MAX, ARENA_ARMS_TOP_MAX], [27, 27, 27], 'one bound, at the token, the siege and the arena');
   assert.equal(ARMS_TOP_MAX, Math.max(...Object.keys(SIEGE_WEAPON_MAX).map((t) => armsTop(Number(t), 9))));
   const dai = { group: 'Weapons', templateIndex: 123, material: 9 };
@@ -48,7 +46,7 @@ test('INT7 THE LAW: a weapon\'s reach is its DFU top and its material\'s modifie
   for (const ok of [armsOk, arenaArmsOk, armsIssuable]) {
     assert.equal(ok([27, 1]), true);
     assert.equal(ok([0, 0]), true, 'a fist alone is a claim');
-    for (const bad of [null, [27], [27, 1, 0], [28, 0], [-1, 0], [1.5, 0], [27, 2], ['27', 1], { 0: 27, 1: 1, length: 2 }]) assert.equal(ok(bad), false, JSON.stringify(bad));   // PIN MOVED (guns removed): one past the bound is 28 now, was 33
+    for (const bad of [null, [27], [27, 1, 0], [28, 0], [-1, 0], [1.5, 0], [27, 2], ['27', 1], { 0: 27, 1: 1, length: 2 }]) assert.equal(ok(bad), false, JSON.stringify(bad));
   }
 });
 

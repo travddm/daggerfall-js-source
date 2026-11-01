@@ -1,4 +1,4 @@
-// TELL6b - THE CHARGE (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into it",
+// TELL6b - THE CHARGE (;,
 // then "Go" on every call). The gap-closer, and the answer to the archer and the kiter: TACT4 only ever wound up in
 // reach; a charger of the whole set (the Grizzly, the Sabertooth, the Wereboar, the Centaur, the Orc Warlord) now winds
 // one up from 5-12 m, its lane (9 m by 1.6 m) free of walls and cover, tracking through the first half of its wind-up.
@@ -49,7 +49,7 @@ test('TELL6b: the charge - a 9 m by 1.6 m lane from its feet, 0.9 s, x1.5, run i
   assert.ok(H >= BLOW.charge.len + 0.5);
   assert.equal(punishSeconds('charge'), 1.4);
   assert.ok(TELL.TRACKERS.includes('charge'));
-  assert.ok(GAP_CLOSERS.includes('charge'));   // PIN MOVED (TELL6c: the leap joins it)
+  assert.ok(GAP_CLOSERS.includes('charge'));
 });
 
 test('TELL6b: who and when - a charger of the whole set, from 5-12 m, its lane free of walls and of cover; never in reach (mutants: the band; the wall; the cover)', () => {

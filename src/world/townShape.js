@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-SHAPES (2026-10-25, the owner: "IC should be round, give other towns
-// unique shapes. Its time to move away from perfect squares. Ensure nobody's
-// home is removed. This needs to be perfection"; bible/03-World/Town-Shapes.md)
+// TOWN-SHAPES
 // - A TOWN'S OWN OUTLINE.
 //
 // DFU's reference: a town is a rectangle of RMB blocks, and the ground under

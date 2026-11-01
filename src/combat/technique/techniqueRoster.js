@@ -1,9 +1,6 @@
 // @ts-check
-// TECH1 (2026-10-10, the owner: "detailed weapon skill affixes for each weapon type. For example, a bow could roll with
-// an attack that allows you to aim and place a telegraph that shoots a volley of arrows, or a sword attack that allows
-// you to leap and attack your opponent, etc. This would have its own keybinding"; then "This is your baby. I want you
-// to be as detailed as possible and take your time. No exceptions"): THE WEAPON TECHNIQUES, AS DATA - the design and
-// its laws are bible/05-Combat/Weapon-Techniques.md.
+// TECH1: THE WEAPON TECHNIQUES, AS DATA - the design and
+// its laws are.
 //
 // A technique is a LINE ON THE WEAPON (systems/loot/lootRarity.js AFFIX_KINDS.technique): `{ id: 'technique', param: <a
 // technique's id>, value: <+% power> }`, rolled at a loot door's end, read by the card, reforged and honed like every

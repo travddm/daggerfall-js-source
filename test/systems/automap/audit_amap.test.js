@@ -1,5 +1,4 @@
-// AUDIT-AMAP (2026-09-21, Mac: "audit the dungeon automap for me,
-// ensure it's bug free and working properly"): four Opus lanes over the
+// AUDIT-AMAP: four Opus lanes over the
 // discovery law, the window, the hosts and the pins. Every finding that
 // changed a law is pinned here against the C# it comes from; the pins
 // the lanes found missing (a tie-break, a boundary, a pitched camera, a

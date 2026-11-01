@@ -1,6 +1,4 @@
-// CRAFT-WORTH (2026-10-11, the exploit audit the owner asked for: "insane gold farms"; Economy-Arc principle 5, "What an
-// NPC pays for a crafted piece is capped, or smithing prints gold", and its Phase 2, "Cap what an NPC pays for a crafted
-// piece"). A crafted piece's quality rolls a tier onto it (smithItems.js mintPiece: a Superior's Magic, a Masterwork's
+// CRAFT-WORTH. A crafted piece's quality rolls a tier onto it (smithItems.js mintPiece: a Superior's Magic, a Masterwork's
 // Rare) whose lines applyRarity priced into its value - and every counter paid that value, at a shop whose gold never
 // runs out: a Masterwork staff of three pine planks sold for ~1,280 gold where the plain staff fetches 6 (~79k gold an
 // hour of chopping, sawing and crafting; ~320k at the service's own throttle), and a patron's cap paid ~1,200 of the

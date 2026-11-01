@@ -100,7 +100,7 @@ export function elementalResistanceChance(target, element) {
 /** LR2/RF1: the effect flags the resistance channel names (lootRarity RESIST_ELEMENTS). */
 const RESIST_NAMES = Object.freeze([[EFFECT_FLAGS.Fire, 'fire'], [EFFECT_FLAGS.Frost, 'frost'], [EFFECT_FLAGS.Shock, 'shock'], [EFFECT_FLAGS.Poison, 'poison'], [EFFECT_FLAGS.Magic, 'magic']]);
 
-/** STATS-RESIST (2026-10-08, the owner: "Resistances on the stat screen please"): the saving throw's chance BEFORE its
+/** STATS-RESIST: the saving throw's chance BEFORE its
  *  roll - `{ immune, chance }`, the chance 5..95 (100 when immune) - the whole of savingThrow's law but the dice, so the
  *  Stats page and the throw can never disagree. The Elemental Resistance effects' own chance (elementalResistanceChance)
  *  is tested ahead of it, apart. */
@@ -153,7 +153,7 @@ export function savingChance(element, effectFlags, target, modifier = 0, pierce 
   // MagicResist = floor(LIVE willpower / 10) - fortify-aware (audit F9).
   // U10: through the FormulaHelper home, not a fourth inline copy.
   saving += magicResist(liveStat(target, 'willpower'));
-  // BAL9 (bible/05-Combat/Balance-Arc.md section 15): the port's PIERCE - points a player's damage spell takes off the
+  // BAL9: the port's PIERCE - points a player's damage spell takes off the
   // throw (systems/spell/spellPower.js spellPierce). After the immunity above, so a foe immune stays immune; DFU's clamp after.
   saving -= Math.max(0, Number.isFinite(pierce) ? pierce : 0);
   saving = Math.max(5, Math.min(95, saving));

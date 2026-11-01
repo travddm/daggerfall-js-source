@@ -3,10 +3,6 @@
 // EM3 — THE AUTOMAP'S INK: a dungeon floor drawn by the hand that drew
 // the Iliac Bay.
 //
-// Mac (2026-09-21): "we're going to put our own spin on the automap and
-// town map themselves, enhancing the look like how we did we the world
-// map. The automap should become a 2d map and floor based instead of
-// the current 3D implementation, streamlining it."
 //
 // `systems/automap/automapFloors.js` answers WHAT to draw - the storeys a
 // Daggerfall dungeon does not record, and one storey's walkable area as

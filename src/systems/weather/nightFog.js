@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// NIGHT-FOG (2026-10-26; bible/07-Rendering/Weather-Arc.md NIGHT-FOG; the owner: "In foggy biomes, when its dark, you can
-// barely see anything") - THE AIR IS LIT BY THE LIGHT THE LAND IS LIT BY. A leaf the sky's controller hands every frame's
+// NIGHT-FOG - THE AIR IS LIT BY THE LIGHT THE LAND IS LIT BY. A leaf the sky's controller hands every frame's
 // fog colour through (scenes/shared.js fogColorFor), so the land, the far ring, the water, the sky's haze and the jungle's
 // haze (world/jungle/jungleHaze.js hazeColorOf takes its colour from this one, and the closed canopy dims it) close into
 // one lit air.

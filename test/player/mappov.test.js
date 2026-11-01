@@ -1,6 +1,4 @@
-// MAP-POV (2026-09-20, Mac: "If you're in 3rd person and decide to use the
-// map, it should transition you to first person and then open the map.
-// Both for the morrowind/non morrowind").
+// MAP-POV.
 //
 // What Mac saw: the enhanced map on the Morrowind model showed the painted
 // sprite. Driven through the REAL weapon rig with the world host's holder

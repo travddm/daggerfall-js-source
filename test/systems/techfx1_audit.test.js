@@ -1,5 +1,4 @@
-// AUDIT TECH-FX (2026-10-10, the owner: "Please audit everything and ensure perfection"; bible/05-Combat/Weapon-Techniques.md
-// AUDIT TECH-FX) - one test a finding, on the real classes: the bursts the motor's own feet dropped, the hands' dip and the
+// AUDIT TECH-FX - one test a finding, on the real classes: the bursts the motor's own feet dropped, the hands' dip and the
 // Morrowind arm's frame window, the roll through the hosts' mirrored lens, the hit off the machine's own event (and not
 // under a climb that swallows it), a recentre in a Lunge or a Volley, the chip's key and the bindings' index, the
 // renderer's offset in place, and the one MISSILE_SPEED.

@@ -1,6 +1,5 @@
 // @ts-check
-// UNQUIET (bible/06-Systems/Revenants.md section 46; the owner, 2026-10-17: "They need to become harder, rarer, revenants
-// need more of a chance to flee instead of relying on player death"): THE MARK - the one thing that lets a special foe
+// UNQUIET (): THE MARK - the one thing that lets a special foe
 // become a revenant. Every elite and every LOOT7 champion was one before (a kill by any of them made one); now one special
 // foe in four carries the mark - "Unquiet" before its title (systems/foeTitle.js) - and only a marked foe, or a revenant
 // already, may rise (systems/revenant/revenant.js revenantCandidate). The rest die where they fall, whatever they do.

@@ -1,4 +1,4 @@
-// AUDIT QA3 (2026-10-23, the owner: "Audit this", of QUEST-AUDIT III; bible/01-Overview/audits/Quest-Audit-III.md): the
+// AUDIT QA3: the
 // quest's life, its actions and its stands, held to what the audit found. Each pin is red on the change it audited:
 //
 // - A2: RESTART-PAID refused quests that had paid nothing a restart could pay again - four quests from their first tick

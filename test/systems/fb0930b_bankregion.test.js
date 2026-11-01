@@ -63,7 +63,7 @@ test('BANK-REGION the report: a teller in Wayrest names Wayrest\'s account and l
     lane(online, () => {
       const away = teller(p, WAYREST, 'Wayrest');
       assert.equal(away.title, online ? 'Bank of the Empire' : 'Bank of Wayrest', 'EMPIRE-BANK\'s name stands');
-      // EMPIRE-ACCOUNT (2026-10-01): online every branch keeps the Empire's one account (Daggerfall's index), and only a
+      // EMPIRE-ACCOUNT: online every branch keeps the Empire's one account (Daggerfall's index), and only a
       // branch not yet folded into it stands beneath; offline each region's own, as BANK-REGION shipped it
       assert.deepEqual(rows(away), online
         ? [['Empire account', '12345'], ['Banked in Daggerfall Bluffs', '777'], ['Gold carried', '300']]

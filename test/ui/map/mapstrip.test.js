@@ -1,5 +1,4 @@
-// EM1 - THE TAB STRIP AND THE SLOT (2026-09-21, Mac: "adding a tab
-// toggle on the map itself").
+// EM1 - THE TAB STRIP AND THE SLOT.
 //
 // The strip is INKED on the parchment in paper coordinates rather than
 // laid over it as DOM, because paper coordinates are the only space

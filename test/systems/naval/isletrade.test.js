@@ -1,5 +1,4 @@
-// ISLE-TRADE (2026-10-17, the owner: "Can you make it so each island does sell atleast one normal exchange product so you
-// could feasibly live and trade out in the veil"; bible/03-World/Naval-Refit.md ISLE-TRADE) - every Eltheric isle's
+// ISLE-TRADE - every Eltheric isle's
 // freeport makes a good of the Bay of its own and sells it as made: the isles about Veilhaven as the world host stands
 // them (scenes/world.js etherPortOf's port), each one's good its key's, spread over the eight; a trade from isle to isle
 // that pays without crossing the Veil; the harbour office selling it from the hold's own exchange and listing it on the

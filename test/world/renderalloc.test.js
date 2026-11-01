@@ -126,7 +126,7 @@ test('EV2: drawMesh resolves each sub-mesh texture ONCE per generation, not per 
 });
 
 test('EV2 HOTFIX: a FROZEN model draws and caches - createMesh copies the sub-meshes it stamps', () => {
-  // Field crash (2026-08-31, Firefox): "can't define property _evTex:
+  // Field crash: "can't define property _evTex:
   // Object is not extensible". The windmill bake ships its sub-meshes
   // as FROZEN module constants, createMesh reused them by reference,
   // and EV2's cache write threw on the first mill drawn, taking the

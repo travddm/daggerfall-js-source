@@ -1,8 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac: "Theres an open wagon which I want to implement as a new type of cart with increased
-// storage and the ability for players to request to sit in the back of the cart ... Is a closed wagon varient that also
-// increases storage but also acts as an enterable and customizable interior"; asked, they are "Bought like the Small
-// Cart", the capacity stepping 750 -> 1500 -> 2000 kg, and companions ride in the back too): THE WAGON KINDS - THE LAW.
+// WAGONS1: THE WAGON KINDS - THE LAW.
 //
 // DFU has one cart, Transportation.Small_cart (template 93), and owning one IS having it in the pack - every
 // "has a cart" in the port asks for that template (systems/inventorySession.js, scenes/world.js hasTransport, the
@@ -29,11 +26,10 @@ export const SMALL_CART_KG = 750;
  * least value a lawful one carries (systems/item/itemLaw.js) - the price it was first shelved at, so a wagon bought before
  * WAGON-PRICE stays lawful.
  *
- * WAGON-PRICE (2026-10-10, asked: "Raise the price", then "More" - ten times): the Open Wagon 900 -> 9000, the Caravan
+ * WAGON-PRICE: the Open Wagon 900 -> 9000, the Caravan
  * 2500 -> 25000. The Small Cart keeps DFU's template value.
  *
- * WAGONS3 (2026-10-10, Mac: "sit on the wagon itself, the ledge its built for and requiring 2 horses to use"; asked,
- * "Open Wagon + Caravan"): `horses` how many horses pull it - the two built with a front bench take a pair, the driver
+ * WAGONS3: `horses` how many horses pull it - the two built with a front bench take a pair, the driver
  * on the bench (world/wagonModels.js driverSeatFor); the Small Cart keeps one between its shafts.
  */
 export const WAGON_KINDS = Object.freeze({

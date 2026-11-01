@@ -1,6 +1,4 @@
-// PORTAL-BAY (2026-10-26, bible/06-Systems/Portal-Stone.md PORTAL-BAY; the owner, playing the branch: "attempting to
-// teleport anywhere outside the bay with the portal stone leads to a black screen and a prompt telling you cannot
-// travel", and "it wasnt letting the user teleport to a city either"). A TELEPORT IS NO JOURNEY: AUDIT TESA II P4 put
+// PORTAL-BAY. A TELEPORT IS NO JOURNEY: AUDIT TESA II P4 put
 // TESA-NO-FAST's journey law (systems/travel/pastBayTravel.js pastBayJourney) at the gate every journey passes
 // (scenes/world.js wildTravelGate), and the guild's teleport (teleportTo), the stone's step into it and Recall passed it
 // too - the stone spent at the pick, the screen blacked at the step, then "No road the Bay knows leads there". These pins
@@ -300,7 +298,7 @@ test('PORTAL-BAY the wiring: the world host constructs the stone\'s host where i
   assert.match(W_SRC, /const wildTrip = wildTravelGate\(pick\.pixel, computed\?\.piecesCost \?\? 0\);/, 'fast travel: the journey\'s law');
 });
 
-// ── PORTAL-ANYWHERE (2026-10-26; the owner, asked whether the stone should reach any point past the Bay: "Anywhere on land") ──
+// ── PORTAL-ANYWHERE ──
 /** A pixel of bare land past the Bay beside three capitals, off its city's reach (the land's own law, no trace: the
  *  authored shape the suite runs on), and a pixel of sea east of Alinor. */
 const LAND = [{ x: 1734, y: -545, name: 'Skyrim' }, { x: 2359, y: 890, name: 'Imperial Province' }, { x: -223, y: 2006, name: 'Sumurset Isle' }];

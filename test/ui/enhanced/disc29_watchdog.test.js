@@ -1,5 +1,4 @@
-// DISC29-D (2026-09-28, Skeptikali on Discord: a dungeon at 99.9% CPU, frames of 68-203 ms, DOM nodes climbing from
-// ~1,700 past 3,000) - A DRAW'S WATCHDOG COUNTS FRAMES, NOT MILLISECONDS.
+// DISC29-D - A DRAW'S WATCHDOG COUNTS FRAMES, NOT MILLISECONDS.
 //
 // Eight per-frame DOM faces took themselves down when a wall-clock timer outlived the gap between two draws; a frame
 // slower than the timer read as "the draws stopped", so at slow frame rates each face was torn down and built again

@@ -1,4 +1,4 @@
-// MINE-PERKS (bible/06-Systems/Professions-Arc.md 43) - the players' feature-feedback thread "Mining perks need buff",
+// MINE-PERKS (43) - the players' feature-feedback thread "Mining perks need buff",
 // handed over as screenshots: the Prospector's compass was "only a 50m difference" from everyone's 150 m ("Maybe change
 // this to where on the overhead travel it shows all the individual veins in the area?"); the Deep Delver's +50% was "kinda
 // meh" when a dungeon's veins "like to spawn halfway in the wall so its hard to see not to mention actually finding one in
@@ -302,7 +302,7 @@ test('MINE-PERKS the Surveyor at the service: an unwitnessed Mountain pixel\'s v
     const sg = await s.call('/v1/prof/harvest', { character: mac.character, node: nodeKey({ kind: 'vein', x: 600, y: 200, day, slot: sigSlot }), kind: 'ore', climate: C.Mountain, region: WAYREST, act: { glints: 0, clean: false }, at: now - 2, rid: 'ore-000003' }, mac.secret);
     assert.equal(sg.body.error, 'bad-node', 'no signature on the Surveyor\'s word');
     // AUDIT MINE-PERKS: and never a dungeon's - its id the client's word: a Surveyor's strike in a dungeon nobody vouched
-    // for is anyone's there. PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53; the owner: "FULL ORE TABLE", witnesses
+    // for is anyone's there.
     // "only for the climate claim"): anyone's there is the deep table's whole draw now - it was Silver and no gem - and its
     // Diamond, no climate's claim, on the dice; the account's four such veins a day the bound
     const dv = await s.call('/v1/prof/harvest', { character: mac.character, node: dveinKey({ dungeon: 4242, day, slot: 0 }), kind: 'ore', climate: C.Mountain, region: MARCH, act: { glints: 3, clean: true }, at: now - 2, rid: 'ore-000004' }, mac.secret);

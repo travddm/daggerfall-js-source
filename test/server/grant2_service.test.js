@@ -1,4 +1,4 @@
-// GRANT2 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md section 12): THE SPAWN GRANTS'
+// GRANT2: THE SPAWN GRANTS'
 // MEASURE, KEPT AND READ (server-account/src/grants.js) - a cell's window posted to /v1/mod/grant-feed under the relay's
 // signature, kept once; refused unsigned, under another key, stale or misshapen; read by a developer from
 // /v1/mod/realm-grants - per kind, an account's asks an hour, what the buckets and the ceiling would have refused, the

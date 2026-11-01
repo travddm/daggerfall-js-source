@@ -1,5 +1,5 @@
-// PERF-V8 (2026-10-10, the owner: "performance must be highest priority now, it even runs shoppy on my nasa pc"):
-// THE WORLD HOST'S FRAME IS A FUNCTION V8 WILL OPTIMIZE (bible/07-Rendering/Performance-Priority.md; PERF-NEXT item 22).
+// PERF-V8:
+// THE WORLD HOST'S FRAME IS A FUNCTION V8 WILL OPTIMIZE (; PERF-NEXT item 22).
 //
 // V8 never optimizes a function whose bytecode is over --max-optimized-bytecode-size (61,440 bytes): it runs in the
 // interpreter and the baseline compiler for the page's whole life - its arithmetic boxed, its for-of loops allocating an
@@ -16,7 +16,7 @@
 // statement that declares nothing, returns nothing out of the frame and hoists no `var` out of it (the frame exits early
 // by `return`; a `return` moved into a closure would leave the closure alone and run the rest of the frame).
 //
-// AUDIT PERF-V8 (2026-10-10, the owner: "Lets do an audit on this"): the first cut measured `frame` alone (the motor's
+// AUDIT PERF-V8: the first cut measured `frame` alone (the motor's
 // closure, 16 KB, unmeasured), counted "20 or more" closures (one folded back passed) and read the rules once over the
 // parse, by hand; they are read over the parse here, every run.
 import { test } from 'node:test';

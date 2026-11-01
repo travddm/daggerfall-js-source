@@ -1,5 +1,4 @@
-// DISC25-B (2026-09-25, kurkku on Discord: "hands on the enhanced map sprite go over the black bars in retro mode" -
-// "1996 Fantasy ruined", with a shot of the held map's gauntlets and its top row standing out over the pillars).
+// DISC25-B.
 //
 // DFU lays every window out in DaggerfallUI.CustomScreenRect while the retro pillarbox is up - `new Rect(pillarWidth,
 // 0, Screen.width - pillarWidth * 2, Screen.height)` (ViewportChanger.cs:139-140). The port's 2D kept the whole

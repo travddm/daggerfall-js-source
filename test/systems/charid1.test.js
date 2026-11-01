@@ -1,5 +1,4 @@
-// CHARID1 (2026-09-21, a player on Discord: "he created a new character
-// and it overwrote his save"): A CHARACTER IS AN ID, NOT A NAME. The
+// CHARID1: A CHARACTER IS AN ID, NOT A NAME. The
 // identity of a save was (characterName, saveName), so a new character
 // with an old one's name wrote its first QuickSave over the old one's.
 // Every character carries an id now - minted at chargen, carried in the

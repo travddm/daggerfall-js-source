@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY2 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 6): THE SPAN AND ARKAY'S TOLL - the Enduring model,
+// LEGACY2: THE SPAN AND ARKAY'S TOLL - the Enduring model,
 // Mac's "an option that isn't permadeath (not sure how to handle this)".
 //
 // A death in an Enduring family is not final, and it is not free: it costs YEARS. Every member has an age and a span
@@ -47,7 +47,7 @@ export const isSpent = (person, lived) => ageOf(person, lived) >= spanOf(person?
  * still rise this once (Arkay grants the last breath; the NEXT death is final), with `final` false and `spent` true.
  */
 export function payToll(person, share, lived, { ageless = false } = {}) {
-  // AGELESS-CURSE (2026-10-09, the owner: "can you exclude vampires and werewolves of this please?"): the curse in the
+  // AGELESS-CURSE: the curse in the
   // blood - a vampire's, a werewolf's or a wereboar's - holds Arkay's hand: no years are taken and no span is spent; the
   // cursed always rise. Cured, the toll is theirs again from the next death.
   if (ageless) return { final: false, years: 0, age: ageOf(person, lived), spent: false, ageless: true };

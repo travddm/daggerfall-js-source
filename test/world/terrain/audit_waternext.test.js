@@ -1,7 +1,6 @@
-// AUDIT WATER-NEXT (2026-10-07, Mac: "I want you to do a comprehensive audit ensuring this is perfection and performance is
-// unaffected"): WATER-NEXT 2-4 and PUDDLE-DRY (#674) audited - three lenses (the GL and the shader, the hosts and the
+// AUDIT WATER-NEXT: WATER-NEXT 2-4 and PUDDLE-DRY (#674) audited - three lenses (the GL and the shader, the hosts and the
 // world's lifecycle, the record and the pins) and a performance lens measured against main. One test a finding group;
-// each names the ids it holds (bible/01-Overview/audits/Audit-WATER-NEXT.md). Mutants: tools/mutants/audit_waternext.json.
+// each names the ids it holds. Mutants: tools/mutants/audit_waternext.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -178,7 +177,7 @@ test('AUDIT WATER-NEXT H2: the sheet\'s own depths - a vertex the carve reaches 
   for (let z = 1; z < 16; z++) assert.equal(s[z * 17 + 13], Math.fround(SHEET_NO_BED), `the stream's vertex ${z} is uncarved water (a Float32Array's)`);
   assert.equal(SHEET_NO_BED, -NO_BED_DEPTH);
   assert.equal(NO_BED_DEPTH, 1.2);
-  assert.match(WATER_SURFACE_VS, /float grow = uOpen == 1 \? 1\.0 : \(aDepth < 0\.0 \? 0\.0 : smoothstep\(1\.668, 4\.168, aDepth\)\);/);   // PIN MOVED (BANK-FLUSH): the swell grows past the shelf the carve leaves
+  assert.match(WATER_SURFACE_VS, /float grow = uOpen == 1 \? 1\.0 : \(aDepth < 0\.0 \? 0\.0 : smoothstep\(1\.668, 4\.168, aDepth\)\);/);
   assert.match(WATER_SURFACE_VS, /vDepth = max\(abs\(aDepth\) \+ lift, 0\.0\);/);
 });
 

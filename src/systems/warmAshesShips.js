@@ -1,5 +1,4 @@
-// WA1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - WARM ASHES - SHIPS 1.1 (Kamer): "Encounters on Ships
+// WA1 - WARM ASHES - SHIPS 1.1 (Kamer): "Encounters on Ships
 // and Ocean Fast Travel". The mod's code, ported off its IL
 // (vendor/warm-ashes-ships/il/Warm_Ashes_Ships.il.txt; the ILSpy reading
 // agrees line for line):
@@ -122,7 +121,7 @@ export function onPreFastTravel({ oceanPixels = 0, travelShip = false } = {}) {
   if (!(oceanPixels > 0)) return 'no-water';   // "WA High Seas: No Water Detected on Travel"
   const h = host();
   if (rangeInt(0, 100, h.random ?? Math.random) < WA_PEACEFUL_PERCENT || tempShip) return 'peace';
-  // RAID-ASHORE (the port's own - bible/03-World/Naval-Refit.md): ONE RAID AT A TIME holds the fast travel too. The IL
+  // RAID-ASHORE (the port's own): ONE RAID AT A TIME holds the fast travel too. The IL
   // arms its ambush whatever runs, and a voyage made while a raid's quest still ran started a second over the first
   // (raidAtSea and the sea fight's boarders already ask raidRefusal); its blocks are left as the running raid set them
   if (travelShip) return raidRefusal() === 'busy' ? 'busy' : armRaid();
@@ -145,7 +144,7 @@ function armRaid() {
 }
 
 /**
- * OWS3 (the port's own - bible/06-Systems/Travel-View.md "OWS - the sea"; the player's ask: "The pirate quest system
+ * OWS3 (the port's own "OWS - the sea"; the player's ask: "The pirate quest system
  * should work like how we're changing enemies and nearby dungeons. Like mount and blade"): THE RAID, SEEN COMING. A
  * raider that comes alongside a traveller at sea on the Overworld (systems/seaRaiders.js) makes the mod's own ambush:
  * the sailing arm of OnPreFastTravel arms it (armRaid) and CheckforEncounters starts its coroutine, so
@@ -174,7 +173,7 @@ export function raidRefusal() {
   return null;
 }
 /**
- * THE MERGE of NAV-D and OWS3 (2026-09-28): ONE RAID AT A TIME, WHOEVER STARTS IT. Beside the mod's own fast travel,
+ * THE MERGE of NAV-D and OWS3: ONE RAID AT A TIME, WHOEVER STARTS IT. Beside the mod's own fast travel,
  * two starters make Warm Ashes' raid - a raider alongside on the Overworld (raidAtSea) and the sea fight's boarders on a
  * crewed Come Sail Away deck (scenes/naval/navalHost.js beginFight) - and neither saw the other's: a raid on the deck with
  * the mod's ship boarded under it, or a flagship's raid over an armed ambush. So each asks this one answer: an ambush
@@ -227,7 +226,7 @@ export class LeaveShip extends ActionTemplate {
     if (!this.test(source)) return null;
     return new LeaveShip(parentQuest);
   }
-  /** Update [IL_0540]. NAV-D (DECLARED, bible/03-World/Naval-Combat.md): the host's `leaveShipGate` is asked first -
+  /** Update [IL_0540]. NAV-D (DECLARED): the host's `leaveShipGate` is asked first -
    *  'naval', a raid the sea fight started on the player's own boat: done, nothing sailed (the IL would lend a ship and
    *  set the player on it); 'wait', a voyage's raid whose raiders' hold is open: not yet; 'proceed' (or no gate): the
    *  IL's own body. */
@@ -249,7 +248,7 @@ export class LeaveShip extends ActionTemplate {
         this.setComplete();
       }
     } else {
-      // RAID-ASHORE (DECLARED, bible/03-World/Naval-Refit.md; scenes/raidAshore.js): fought where the player stands - a
+      // RAID-ASHORE (DECLARED,; scenes/raidAshore.js): fought where the player stands - a
       // linked cabin's ship at her quay, the land - no ship sails them off it, so the raid ends HERE: its crew and its
       // last raiders withdrawn (the host's `raidAshore`), the ship blocks back to their base, and the quest ended as its
       // own `end quest` ends one - or its crew stood on, passive, called back five at a time for the rest of its hour

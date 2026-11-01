@@ -1,8 +1,8 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE LOOK AND THE SOUND, pinned - the fanfare cut by a
+// AUDIT WB: THE LOOK AND THE SOUND, pinned - the fanfare cut by a
 // clock that was not its own (D2), a Warden who never grunted in a big fight (D3), war songs silent a second at every
 // loop (D4), a veil that counted its own ticks (D5) and flashed a frame late (D6), a sky clock that drifted after a sleep
 // (D7), falls of fire that jumped at the wrap (D8), ridges worked out at the zenith (D9), and what the court made every
-// frame (D10). Design: bible/11-Multiplayer/World-Bosses.md section 11.
+// frame (D10). Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

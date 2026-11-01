@@ -1,4 +1,4 @@
-// DEX3 (2026-10-20, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION'S ENCOUNTER TABLES.
+// DEX3 - DAGGERFALL ENEMY EXPANSION'S ENCOUNTER TABLES.
 // BestiaryMod.ParseEncounterTables (systems/enemyExpansion/dexTables.js) line for line, the first Update's defaults, and
 // the picks (dexEncounters.js) - a dungeon's by its seed at the transition, a climate's on PlayerGPS's events
 // (world/playerGps.js) - on the port's encounter table door (characters/encounterTableDoor.js), which every reader asks:

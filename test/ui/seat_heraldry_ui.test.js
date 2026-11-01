@@ -1,4 +1,4 @@
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work") - THE HERALDRY ON THE SMALL FACES (Seats-Arc 8.1: "It is
+// HERALDRY-SHOWN - THE HERALDRY ON THE SMALL FACES (Seats-Arc 8.1: "It is
 // drawn on banners (3.4), the map ring, the frame of the guild tag, the siege HUD, the board and the Chronicle"): the one
 // swatch (ui/heraldrySwatch.js over ui/heraldryArt.js shieldSvg), the index by tag the client builds from what it holds
 // (net/heraldryIndex.js heraldryByTag), the name tag's frame (ui/nameLayer.js), the siege HUD's two shields

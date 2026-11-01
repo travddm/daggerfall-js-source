@@ -1,5 +1,5 @@
-// FIELD BUGS 2026-10-18f WOD-SEA-TEST (bible/01-Overview/bugs/Field-Bugs-2026-10-18f.md, found tracing æther's "Weird
-// objects in the ocean, north east of Tlactrn Manor"; Mac: "Yes fix WOD"). World of Daggerfall refuses a site on the sea
+// FIELD BUGS 2026-10-18f WOD-SEA-TEST (, found tracing æther's "Weird
+// objects in the ocean, north east of Tlactrn Manor"). World of Daggerfall refuses a site on the sea
 // (LocationLoader.cs:117-121: regions 31, 3, 29, 28, 30 with a WOODS height of 2 or less) - but it asks MapPixelData's
 // mapRegionIndex, which GetMapPixelData fills from the pixel's LOCATION alone, and a pixel with one has already left the
 // loop. So the arm never fired, in DFU or here, and every site its lists name on the sea stood there. The arm now asks the

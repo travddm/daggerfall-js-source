@@ -1,6 +1,5 @@
 // @ts-check
-// CABIN-LOOK (2026-10-17, the owner: "Letting players customize the exterior and interior textures of the ship";
-// bible/03-World/Naval-Refit.md SHIP-LIVERY) - A SHIP'S CABIN STAINED: every picture of the room built below her deck (the
+// CABIN-LOOK - A SHIP'S CABIN STAINED: every picture of the room built below her deck (the
 // bank ship's interior, scenes/sailingCabin.js) given a stained twin of its own (systems/naval/shipLivery.js stainPicture,
 // at CABIN_STAIN), drawn by the room's own remap over the climate's (scenes/interiorContext.js `restyle`) - her walls,
 // floor, beams and built furniture one wood, its grain kept. A picture that is glass (a window's mask) is left as built,

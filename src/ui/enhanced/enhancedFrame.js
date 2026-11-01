@@ -64,7 +64,7 @@ export const FRAME_ROLES = {
     '.px-support',   // SUPPORT1: the door's asks - the About plaque's and the profile mark's carved frame
     // PLUS8: the journey's bar (ui/enhanced/enhancedTravelControl.js) - carved stone, brass fittings, the theme's ground
     '.travelpanel-bar',
-    // OW-THEME (2026-09-28, Mac: "The overworld ui needs to follow enhanced ui theme"): the Overworld's bar - the
+    // OW-THEME: the Overworld's bar - the
     // journey bar's own carved stone and brass, in the theme's ground
     '.tview-bar', '.tview-side', '.tview-confirm', '#wp-menu', '#travel-pace-box',   // OW-BLOCK: the Overworld's block; FILTERS-LEFT: its filters, their own block at the bottom left; OW-CONFIRM: its question; WAYPOINTS: the right-click menu; PACE-DIALS: the other skins' dials
     // CSA-L: the helm's bar (ui/enhanced/enhancedHelm.js) - the journey bar's kind, under the compass where it stands
@@ -73,7 +73,7 @@ export const FRAME_ROLES = {
     '.saddlepanel-bar',
     // PLUS-MAP: the 3D dungeon map's control bar - the journey bar's carved stone, the same fittings
     '.hmroot .hmtools',
-    // PLUS-DRESS (2026-09-26, Mac: "ensure any of the new UI elements are also a part of how enhanced plus looks"): the
+    // PLUS-DRESS: the
     // decorator (HOME2/DECOR1) is a whole window over the room - the pack's own carved frame, not a rounded card
     'body .dfdecor-card',
     // SET7: the Sigil Broker's window - a shop over the world, the pack's own carved frame
@@ -181,7 +181,7 @@ export const FRAME_ROLES = {
     'body .dfpage-btn', 'body .dfpeer-btn:not(.cancel)', 'body .dfduel-btn', 'body .dfprofile-duel', 'body .dfdecor-btn', 'body .dfdecor-open',
     'body .dfprofile-wed',   // LEGACY7 part three: the inspect card's Propose
     'body .dfnaval-btn',   // NAV-F: the plunder window's presses
-    // PLUS-MENU (2026-10-07, Mac: "give the main menu the enhanced plus UI treatment"): the front door's doors - stone
+    // PLUS-MENU: the front door's doors - stone
     // slabs that go brass under the pointer, as every other Plus press does (AUDIT PLUS-MENU M3: the System tab's list
     // named beside them was `.px-menu.px-compact`, which nothing builds - that list is the rail's rows, the qrow role)
     '.px-menu .doorbtn',
@@ -629,7 +629,7 @@ export function scopeRules(css, keep) {
 }
 
 /**
- * PLUS2 (2026-09-25): THE COLOURS - Enhanced Plus's grounds in other stones. The kit above is Slate; a theme repaints
+ * PLUS2: THE COLOURS - Enhanced Plus's grounds in other stones. The kit above is Slate; a theme repaints
  * the SURFACES only (windows, panels, buttons, tiles, chips, inputs, and the enhanced sheet's own ink/slate/iron), never
  * a frame, a width or a word's colour, so every screen keeps its shape and its brass. Worn as
  * <html data-plus-theme="…">, set from the `plusTheme` pref (ui/enhanced/enhancedStyle.js) and changed live on the UI Overhaul
@@ -750,7 +750,7 @@ ${THEME_CSS}
 `;
 
 /**
- * PLUS-SITE (2026-10-07, Mac: "do the same thing for our website. A proper detailed overhaul"): THE KIT, FOR THE PAGE
+ * PLUS-SITE: THE KIT, FOR THE PAGE
  * THAT RUNS NO SCRIPT AND CARRIES NO PICTURE.
  *
  * The website (index.html) wears the game's tokens, faces and night, injected at serve and build by

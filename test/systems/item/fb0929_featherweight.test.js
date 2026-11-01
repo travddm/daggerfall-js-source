@@ -1,6 +1,4 @@
-// FB 2026-09-29 (Discord #bug-reports, Cruor, relayed by Mac): "Bugged
-// Mark item with an error! I have no idea what this does but it scares
-// me." - an Enhanced card for a MARK OF FEATHERWEIGHT whose one power
+// FB 2026-09-29 (Discord #bug-reports, Cruor, relayed by - an Enhanced card for a MARK OF FEATHERWEIGHT whose one power
 // line read "Cast when used: ERROR".
 //
 // THE ITEM IS DFU'S OWN AND IT IS WHOLE. MAGIC.DEF's *%it of

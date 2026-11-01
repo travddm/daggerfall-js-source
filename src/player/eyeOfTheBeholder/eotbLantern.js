@@ -1,6 +1,4 @@
-// HT-WAIST-BACK (2026-09-24, Mac, looking at screenshots of the lantern hung at the sprite's right hip - seen from
-// the front, the side, walking and behind: "Just have it show on the back of the sprite, not all angles. Make sure
-// all the eye of the Beholder sprites get this change"): THE LANTERN ON AN EYE OF THE BEHOLDER SPRITE, ONE HOME.
+// HT-WAIST-BACK: THE LANTERN ON AN EYE OF THE BEHOLDER SPRITE, ONE HOME.
 //
 // HT-WAIST hung Daggerfall's lantern picture from the local sprite's right hip (player/eyeOfTheBeholder/eotbBody.js). DISC23-B draws
 // the other players on foot as the EOTB set they chose (net/peer/peerRiders.js createPeerWalkers), and HT-WAIST-NET put
@@ -15,7 +13,7 @@
 //   shoulder blades, the seat, the heels) and +4 the back - read off archives 112364 (idle 0-4, walk 5-9, armed
 //   walk 20-24) and 112372 (idle 0-4), which every on-foot set shares by the wheel. The rear view is the one whose
 //   record is +4: orientation 4 alone. The back diagonals 3 and 5 (record +3) draw none - HT-WAIST-BACK first let
-//   them in, and Mac, seeing it there: "It still shows on the back side angle" - nor do the front, the front
+//   them in, and - nor do the front, the front
 //   diagonals and the sides (0, 1, 2, 6, 7). The rule reads the view the sprite is DRAWN from this frame (the
 //   local body's painted orientation; a peer's viewOf), so the lantern and the picture under it always agree.
 //

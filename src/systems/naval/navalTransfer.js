@@ -26,7 +26,7 @@ export function giveNavalItems(items, boat, entity, { force = false } = {}) {
   return { left, over };
 }
 
-/** CAPT-LOG (bible/03-World/Captains-Sea.md): what plunder is worth to the captain's log - gold pieces their count, every
+/** CAPT-LOG: what plunder is worth to the captain's log - gold pieces their count, every
  *  other thing its value (itemTemplates.js itemValueOf) a piece of its stack. */
 export function navalLootWorth(items) {
   let worth = 0;

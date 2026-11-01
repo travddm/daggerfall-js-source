@@ -1,4 +1,4 @@
-// TIME4 (2026-10-01, Mac: "Let's do it. This needs to be perfect"): THE WORDS. Design: bible/06-Systems/Online-Time-Arc.md
+// TIME4: THE WORDS. Design:
 // section 7. What the player is told about online time is the law's own numbers: the Online pane's sentence (true when
 // it opens, before the sky's switch and after), the patch notes' figures, and the bible's switch instant - each held
 // here to the law it states, so a dial turned in net/skyLaw.js without its words fails.

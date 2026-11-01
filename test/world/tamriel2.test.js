@@ -1,6 +1,6 @@
-// TAMRIEL2 (2026-10-08, bible/03-World/Tamriel.md) - THE LAND MASS BEYOND THE BAY, pinned.
+// TAMRIEL2 - THE LAND MASS BEYOND THE BAY, pinned.
 //
-// Mac: "Lets worry about this later and only implement the land mass." The streamed world goes on past the Bay's
+// The streamed world goes on past the Bay's
 // edge over the authored continent (world/tamriel/tamrielGround.js): the ground law, the composition of the Bay's reader
 // with the continent round it, the seam that keeps the Bay to the byte, the frame the stream grows to
 // (world/streamingWorld.js streams), the far ring's bytes past the map, the worker's own composition, the switch and
@@ -65,7 +65,6 @@ const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 // ── THE GROUND LAW ──────────────────────────────────────────────
 
 test('TAMRIEL2 ground: the sea is 0, the shore SHORE_BYTE rising to INLAND_BYTE over PLAIN_REACH from the coast, a range lifted toward SNOW_BYTE by its gain - over the snowline at Red Mountain - and the noise rides but never below the shore', () => {
-  // PIN MOVED (AUDIT TESA II R1, bible/03-World/Tamriel.md TAMRIEL-RELIEF): the shore over the roads' beach line, WATER_BYTE + 1
   assert.equal(SHORE_BYTE, 6); assert.equal(INLAND_BYTE, 22); assert.equal(SNOW_BYTE, 112); assert.equal(PLAIN_REACH, 6);
   assert.ok(SNOW_BYTE > SNOWLINE_BYTE);
   assert.equal(authoredHeightByte(10, 100), 0, 'the Eltheric');
@@ -103,10 +102,8 @@ test('TAMRIEL2 ground: a pixel past the Bay answers the law at its centre, cache
   assert.equal(tamrielClimateAt(-2000, 100), CLIMATES.Ocean);
   assert.equal(tamrielClimateAt(1350, 1837), CLIMATES.Rainforest, 'Falinesti\'s ground: Valenwood\'s');
   assert.equal(provinceByKey('Valenwood').climate, CLIMATES.Rainforest);
-  // PIN MOVED (TAMRIEL-DEEP, bible/03-World/Deep-Waters.md): the detail on the land - Skyrim's, above - and none at sea,
   // as WOODS.WLD's own sea carries none
   const lm = tamrielLargeMap(2200, -300);
-  // PIN MOVED (RELIEF-PEAKS, test/world/reliefpeaks.test.js): no "small detail" of 0..9 - WOODS.WLD's own law of the small
   // byte (largeOfByte), about 1.18 times it: a third of the ground's height
   assert.equal(lm.length, 5); assert.ok(lm.every((col) => col.length === 5 && col.every((v) => v >= 0 && v <= 120)));
   assert.ok(lm.some((col) => col.some((v) => v > 0)), 'detail on the land');
@@ -169,7 +166,7 @@ test('TAMRIEL2 composition: a pixel beyond the Bay builds through the whole kern
   const bayClimate = (x, y) => (x === 5 && y === 6 ? CLIMATES.Swamp : CLIMATES.Desert);
   const read2 = groundClimateIndex(bayClimate);
   assert.equal(read2(5, 6), CLIMATES.Swamp); assert.equal(read2(999, 499), CLIMATES.Desert, 'the Bay\'s own, dilation and all');
-  assert.equal(read2(2200, -300), CLIMATES.MountainWoods); assert.equal(read2(-1, 6), tamrielClimateAt(-1, 6));   // PIN MOVED (TESA-BIOME): the zone's
+  assert.equal(read2(2200, -300), CLIMATES.MountainWoods); assert.equal(read2(-1, 6), tamrielClimateAt(-1, 6));
 });
 
 test('TAMRIEL2 composition: the raster and the streamed ground are one law - a land cell\'s byte is authoredHeightByte at its centre, the sea 0', () => {
@@ -222,7 +219,6 @@ test('TAMRIEL2 ring: the far ring reads the map\'s bytes as ever and, handed byt
   const side = 13;
   const yOf = (grid, i, j) => grid.positions[(j * side + i) * 3 + 1];
   assert.equal(yOf(clamped, 6, 6), yOf(past, 6, 6), 'the player\'s own pixel (pixel 2, its window on the map) unchanged');
-  // PIN MOVED (RELIEF-PEAKS): the vertex the kernel's ground at its pixel's centre, off the bytes of its window (two west of
   // it, one east) - pixel 0's reaches the continent's bytes west of the edge, as the kernel's does
   assert.ok(yOf(past, 4, 6) > yOf(clamped, 4, 6), 'pixel 0, on the map: its window past the edge');
   assert.notEqual(yOf(clamped, 2, 6), yOf(past, 2, 6), 'pixel -2: the continent\'s byte');
@@ -258,7 +254,7 @@ test('TAMRIEL2 switch: the Features row `tamriel-land` is on by default in the w
   } finally { _resetForTests(); }
 });
 
-// TAMRIEL2-WORKER (2026-10-08, the field: "game freezes when I go outside"): THE WORKER'S WHOLE GRAPH IS PURE. EV7's
+// TAMRIEL2-WORKER: THE WORKER'S WHOLE GRAPH IS PURE. EV7's
 // pin holds the shell's direct imports; the ground beyond the Bay reached net/wire.js and twenty modules with it
 // through two "one home" imports (the gate's PIXEL_M, the strike's segmentDistance) three modules deep, and the
 // terrain worker's bundle went with them. This walks every import the shell reaches and holds all of them to world/
@@ -279,13 +275,10 @@ test('TAMRIEL2-WORKER: every module the terrain worker reaches, at any depth, li
   const outside = [...seen].filter((f) => !/^src\/(world|formats)\//.test(f));
   assert.deepEqual(outside, [], `the worker reaches ${outside.join(', ')}`);
   assert.ok(seen.has('src/world/tamriel/tamrielGround.js') && seen.has('src/world/tamriel/tamrielGeography.js') && seen.has('src/world/segment.js'), 'the ground, through the pure homes');
-  // PIN MOVED (RUMARE-WATER): 62 - the Imperial City's water law where its canal stands (world/rumareWaters.js), the plan
   // it reads (world/imperialCity.js, its mix and block a leaf of their own, world/blockHash.js) and a capital at the sea's
   // ground (world/terrain/capitalSea.js), all pure
-  // PIN MOVED (the folds into #1184, 2026-10-28): 70 - TESA-LANDS' lands (world/tamriel/tamrielLands.js, world/lands/landProps.js,
   // world/lands/landPropMesh.js), RED-MOUNTAIN's cone (world/tamriel/redMountain.js) and SOLITUDE-RELIEF's rock
   // (world/solitudeRelief.js, world/terrain/capitalRelief.js), each fold under the ceiling alone and the three at it - all pure.
-  // PIN MOVED (GATE-ROADS): 72 - a gate's road (world/road/gateRoads.js) and Daggerfall's paving records' one home it reads
   // (world/road/roadEdge.js), both pure
   assert.ok(seen.size > 20 && seen.size < 73, `${seen.size} modules`);
 });

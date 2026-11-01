@@ -1,5 +1,4 @@
-// LOOT17 - THE HONE (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 9; Mac: "what could we do to make it even more
-// amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT17 - THE HONE.
 //
 // At the Reforge, beside each line's Reforge: HONE - the line rolled again within its own band, from one above its value
 // to the band's top: never lower and never the same, its kind and its param kept, so its name stands. The price doubles

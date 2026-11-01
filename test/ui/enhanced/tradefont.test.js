@@ -1,5 +1,4 @@
-// DROPS-FONT (2026-09-22, Mac: "Ensuring enhanced font gets integrated
-// with the new ui changes"): the surfaces the three drops added or
+// DROPS-FONT: the surfaces the three drops added or
 // touched wear the enhanced skin's own pixel face (FONT1's law:
 // PIXEL_STACK, unsmoothed, ligatures off) and nothing under them says a
 // face of its own. The trade window's root is a `.px-home` (the one

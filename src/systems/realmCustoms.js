@@ -2,8 +2,8 @@
 // ═══════════════════════════════════════════════════════════════════
 // REALM P1.5 — CUSTOMS: an offline character comes into the realm ONCE.
 //
-// Mac, decision 3: "Migrate once via customs". The plan is
-// bible/06-Systems/Realm-Arc.md, "Customs": loans settled from bank and
+// . The plan is
+// "Customs": loans settled from bank and
 // purse; liquid wealth - purse, letters of credit, banks - capped at an
 // allowance for the level; Renown from its existing track (the service
 // carries the track to the realm's id - server-account/src/realm.js
@@ -25,8 +25,7 @@
 // setting, named so it can be moved in one place.
 //
 // AUDIT REALM2 T3: A DEED IS WEALTH TOO - the realm's bank buys a ship, a
-// house and the pieces placed in them back for gold. RESTORE (Mac: "Keep
-// all, can't sell"): so every deed crosses marked, and the realm's bank
+// house and the pieces placed in them back for gold. RESTORE: so every deed crosses marked, and the realm's bank
 // never buys a crossed one back; customs takes none. applyCustoms says
 // the rule, and reclaimCustomsDeeds gives back what it once took.
 // ═══════════════════════════════════════════════════════════════════
@@ -64,7 +63,7 @@ const lists = (/** @type {any[]} */ ...ls) => ls.filter(Array.isArray);
  * AUDIT REALM2 T3 counted each deed - the ship, a house, the pieces bought for their rooms - at what the realm's bank
  * pays for it, since customs had counted the purse, the letters and the banks alone and a rich character brought its
  * ship, a house in every region and their pieces in uncounted, to sell there; and it took whole deeds off the copy when
- * the total was over. RESTORE (2026-09-29, Mac: "I want people to get their stuff back" - "Keep all, can't sell"): a
+ * the total was over. RESTORE: a
  * deed now crosses whole and is never bought back in the realm (banking.js sellHouse, sellShip), so it carries no gold
  * past the allowance and there is nothing to take. T3's counting stands for a deed the realm's bank would buy (deedsOf);
  * a crossed one is none. (HOUSE-LOSS had first kept a deed only while the deeds by themselves fit - a house alone is
@@ -111,7 +110,7 @@ export function applyCustoms(snap) {
   // (restItems.js restItemsOnline: the templates ship a release before any shelf, pile or trade carries one, so a
   // client a build behind never meets one) - customs is a door too, and an offline shelf's Bedroll walked in through it,
   // usable, droppable and tradeable online. The offline character keeps them: customs runs on the realm's copy.
-  // REST-LOOT (2026-10-05): the sources are open, so a character's own walk in; this stands behind the switch.
+  // REST-LOOT: the sources are open, so a character's own walk in; this stands behind the switch.
   let restKept = 0;
   if (!restItemsOnline()) {
     const strip = (/** @type {any[]} */ list) => {
@@ -154,8 +153,7 @@ export function applyCustoms(snap) {
 const REST_ITEM_IDS = new Set(Object.values(REST_ITEM));
 
 /**
- * LEVEL-ONLINE (2026-09-30), REVERSED BY LEVEL-ONLINE-2 (2026-10-06, Mac: "Oblivion should be locked. Currently players
- * are forced into oblivion"): A CHARACTER COMING IN IS A NEW ONLINE CHARACTER, so it crosses onto the online law's
+ * LEVEL-ONLINE, REVERSED BY LEVEL-ONLINE-2: A CHARACTER COMING IN IS A NEW ONLINE CHARACTER, so it crosses onto the online law's
  * system - Daggerfall's - the one law a new character's system goes through (oblivionLeveling.js
  * newCharacterLevelingSystem). It is run at the Bring online door beside applyCustoms, not inside it - customs is the
  * gold and the deeds, and its report keeps saying only that (ui/enhanced/enhancedMenu.js bringOnline/customsNow say this line
@@ -164,8 +162,7 @@ const REST_ITEM_IDS = new Set(Object.values(REST_ITEM));
  * several levels at once or owe them; a level-up already earned is kept (the anchor is the pending level's, and the
  * Daggerfall window takes the same readyToLevelUp and pendingLevel). Customs runs on the realm's COPY, so the offline
  * character keeps Oblivion's leveling offline. A Daggerfall character (or a save from before ORL1, which reads as
- * one) crosses untouched. LEVEL-ONLINE-3 (2026-10-06, Mac: "Can we somehow switch people who have oblivion leveling
- * online"): THE REALM BOOT runs it too (scenes/world.js `releveled`, beside the loan amnesty), so a character born
+ * one) crosses untouched. LEVEL-ONLINE-3: THE REALM BOOT runs it too (scenes/world.js `releveled`, beside the loan amnesty), so a character born
  * online on Oblivion's bar under LEVEL-ONLINE is switched at its next join, its first checkpoint keeping it; once
  * switched it reads as Daggerfall's and passes untouched. Answers whether it switched.
  * @param {any} snap
@@ -217,7 +214,7 @@ export function crossDeeds(snap) {
 }
 
 /**
- * RESTORE (2026-09-29, Mac: "I want people to get their stuff back"): WHAT CUSTOMS KEPT BACK, GIVEN BACK. Before the
+ * RESTORE: WHAT CUSTOMS KEPT BACK, GIVEN BACK. Before the
  * deeds crossed, customs took them off the realm's copy - a house's slot emptied, the ship gone, the pieces bought for
  * the room taken out - and left the room itself among the copy's permanent scenes, where a sale never leaves one
  * (banking.js sellHouse and sellShip drop it). So a deed customs took is one the OFFLINE character still owns - its own
@@ -300,7 +297,7 @@ export const LEVELING_CROSS_LINE = Object.freeze({
   switched: 'Online characters now level the classic way: you will level by your skills from here on, starting from your current level.',
 });
 
-/** CUSTOMS-CARRY (2026-09-29): what the door promises before customs runs, whatever it finds - what crosses beside the
+/** CUSTOMS-CARRY: what the door promises before customs runs, whatever it finds - what crosses beside the
  *  save (the service carries the home and the guild place, realm.js CHARACTER_TABLES), what stays, and the once. */
 export const CUSTOMS_PROMISE = Object.freeze([
   'Your online homes and your guild place come with you.',

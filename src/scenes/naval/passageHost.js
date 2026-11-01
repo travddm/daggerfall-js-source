@@ -1,6 +1,5 @@
 // @ts-check
-// PASSAGE (2026-10-19, the owner: "Add the ability to buy and ride a friendly boat (if one is docked) at any port. You
-// can have the ability to choose where you want to sail. A new form of immersive travel") - THE VOYAGE'S HOST HALF.
+// PASSAGE - THE VOYAGE'S HOST HALF.
 // The law is systems/naval/passage.js; the ship at her berth and her boat are scenes/naval/navalHost.js's (passageShip,
 // charter); the voyage itself is the Overworld's crossing (OWS2, world.js travelViewRouteTo) - this module owns the
 // booking and the passage's life, and the world host constructs it once and calls it (HOST-SPLIT: fishHost.js's shape).

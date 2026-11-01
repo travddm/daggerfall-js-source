@@ -1,4 +1,4 @@
-// AUDIT-DW (2026-09-23, Mac: "a proper audit of your previous work") -
+// AUDIT-DW -
 // the audit of DW1 (the law and the two first-person lanes), DW2 (the
 // shipped sprites) and DW3 (the icons and the dye in the ask), three
 // lenses: DFU's law re-read (FPSWeapon.cs, WeaponBasics.cs, ItemHelper.cs,

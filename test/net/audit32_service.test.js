@@ -1,12 +1,12 @@
-// AUDIT 32 (2026-09-30, Mac: "Audit this") - PROF7 AS THE SERVICE KEEPS IT, AUDITED: Hunting's day counts HIDES - a
+// AUDIT 32 - PROF7 AS THE SERVICE KEEPS IT, AUDITED: Hunting's day counts HIDES - a
 // clean pelt's second among them - and the last skinning of the rare hides is cut to their room (L2; CAP-OFF: the day's
 // thirty of any tier, whose room the last skinning was cut to as well, are gone - the pin turned to say so);
 // a body's ground is never read nor witnessed, so a hand-built one is no 500 (S2); a second find is kept where one of it
 // fits, its count cut to its room - a Butcher's two at 4,999 Raw Meat were both lost (S3); a body's foe is refused before
 // the hour's acts are spent (S4); a weave answers no track, where it answered Smithing's (S5); the Weavers' cloth alone
-// lays on no first-craft XP (S1, Mac: "Whatever you think is best"). Driven through the real
+// lays on no first-craft XP (S1). Driven through the real
 // Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Online-Arc.md "AUDIT 32"; bible/06-Systems/Professions-Arc.md 29.
+// "AUDIT 32"; 29.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -76,7 +76,6 @@ test('AUDIT 32 L2: Hunting\'s day counts hides, a clean pelt\'s second among the
   const s = await stand();
   const mac = await s.seated('Mac');
   s.setXp(mac, xpForRank(100), 'hunting');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): 29 hides taken, a clean pelt that rolled its
   // second was cut to the one the day had room for, and the next refused (`prof-hunt-cap`). No room is the day's now
   s.hunted(mac, 29);
   const last = await steered(0, () => s.call('/v1/prof/harvest', skin(mac, MOB.Rat, { act: { clean: true } }), mac.secret));
@@ -167,7 +166,7 @@ test('AUDIT 32 S1 (Mac: "Whatever you think is best"): a Linen garment, a Wool r
   const mac = await s.seated('Mac');
   const xp = () => Number(s.raw.prepare('SELECT xp FROM prof_tracks WHERE player = ? AND char_id = ? AND profession = ?').get(mac.id, mac.character, 'outfitting')?.xp ?? 0);
   const craft = (recipe) => s.call('/v1/prof/craft', { character: mac.character, recipe, clean: false, name: 'Mac', rid: rid() }, mac.secret);
-  await s.buy(mac, 'cloth:linen', 10);   // PIN MOVED (WOVEN-PAYS, AUDIT WOVEN-PAYS): bought at the counter, counted against the cloth's firsts
+  await s.buy(mac, 'cloth:linen', 10);
   s.give(mac, 'cloth:linen', 'own', 10);   // CLOTH-GEMS: the loom weaves it now - but the ten bought with silver count first, and they pay none
   s.give(mac, 'leather:cured', 'own', 5);
   const straps = await craft('garment-141:linen');
@@ -177,7 +176,7 @@ test('AUDIT 32 S1 (Mac: "Whatever you think is best"): a Linen garment, a Wool r
   const net = await craft('fishingnet:linen');
   assert.deepEqual([net.status, net.body.xp, net.body.first], [200, 20, true]);
   const boots = await craft('garment-149:linen');
-  assert.deepEqual([boots.status, boots.body.xp, boots.body.first, xp()], [200, 20 + 511, true, 571], 'a bolt and a Cured Leather: its first laid on');   // PIN MOVED (FIRST-BUDGET, Professions-Arc 52): Outfitting's first-make share, 511 - the least that brings Outfitting to Master in Smithing's 172 crafts
+  assert.deepEqual([boots.status, boots.body.xp, boots.body.first, xp()], [200, 20 + 511, true, 571], 'a bolt and a Cured Leather: its first laid on');
   const again = await craft('garment-149:linen');
   assert.deepEqual([again.body.xp, again.body.first], [20, false], 'and once');
   s.setXp(mac, xpForRank(10), 'outfitting');

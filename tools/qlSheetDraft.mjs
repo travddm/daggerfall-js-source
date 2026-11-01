@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.2): A QUEST'S BRIEF, FOR ITS SHEET'S WRITER - what the script holds
+// QL1: A QUEST'S BRIEF, FOR ITS SHEET'S WRITER - what the script holds
 // that a sheet may name, read the way the game reads it (test/qlSources.mjs: the port's patches and, `--on`, the
 // questlines' branch): its list row, its resources by kind, every task with its lines and whether anything can set it,
 // every journal step with its words, the prompts, the rewards and the ends - and a first draft of the sheet, an objective

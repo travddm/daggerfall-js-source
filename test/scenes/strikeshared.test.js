@@ -1,4 +1,4 @@
-// STRIKE-SHARED (2026-09-29, Mac: "Do #1" - FIELD BUGS 29g's For Mac 4): A "CAST WHEN STRIKES" SPELL REACHES A FOE
+// STRIKE-SHARED: A "CAST WHEN STRIKES" SPELL REACHES A FOE
 // ANOTHER PLAYER RUNS. Online, a foe someone else spawned is a PUPPET on my machine - a copy its owner's next frame
 // overwrites - and the strike spell landed on that copy: the damage crossed (as a blow, through the one divert) and
 // every other effect (paralysis, sleep, drains, pacify, soul trap) was gone a frame later. Now the whole spell rides

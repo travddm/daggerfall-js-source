@@ -1,5 +1,4 @@
-// TESA5 (2026-10-12, the owner: "Do it" - "joining Arena's roads to the Bay's roads at its edge"; bible/03-World/
-// Arena-Provinces.md TESA5) - THE CROSSINGS, pinned. Where the Bay's own roads come to its edge and the land goes on past
+// TESA5 - THE CROSSINGS, pinned. Where the Bay's own roads come to its edge and the land goes on past
 // it (world/arenaRoads.js arenaJoins), a crossing: a gate a little past the edge that Arena's network takes as a road
 // node, and the straight run from the Bay's road out to it - the run's Bay pixels the layer's `join`, the one part of it
 // a pixel on the Bay reads (the painter, the verge); the host hands them over with the Bay's network.
@@ -46,13 +45,13 @@ function bayWith(points) {
 const everywhere = () => true;
 
 test('TESA5 the crossings: a Bay road within JOIN_DEPTH of an edge, one crossing a run of the edge (runs nearer than JOIN_SPACING one), at the road nearest the edge - of those the nearest the run\'s middle - its gate JOIN_OUT straight past it, on all four edges; never a track; none where the run crosses water (mutant: the depth, the spacing, the nearest, the middle, the gate\'s reach, the land)', () => {
-  assert.deepEqual([JOIN_DEPTH, JOIN_SPACING, JOIN_OUT], [8, 12, 8]);   // PIN MOVED (ROAD-GAPS): JOIN_SPACING 60 -> 12
+  assert.deepEqual([JOIN_DEPTH, JOIN_SPACING, JOIN_OUT], [8, 12, 8]);
   const bay = bayWith([
     [300, 3], [310, 2],                                   // one run: the nearer road, at 310
     ...Array.from({ length: 41 }, (_, i) => [400 + i, 1]),   // a road along the edge, 400-440: its middle
     [500, 8],                                             // too deep
     [700, 0, DIR.N | DIR.S, 'tracks'],                    // a track: never a crossing
-    [800, 1], [811, 1],                                   // 11 apart: one run (PIN MOVED, ROAD-GAPS: 59 at JOIN_SPACING 60)
+    [800, 1], [811, 1],                                   // 11 apart: one run (
     [823, 1],                                             // 12 past 811: its own
     [600, 497],                                           // the south edge
     [3, 100],                                             // the west edge
@@ -74,7 +73,7 @@ test('TESA5 the crossings: a Bay road within JOIN_DEPTH of an edge, one crossing
 
 test('TESA5 the drawing: a crossing\'s run - its Bay pixels the layer\'s join, the step on both ends of each; its pixels past the Bay the roads\'; no Bay pixel among the roads, none past it in the join (mutant: the join\'s keep, the run unstamped)', () => {
   const [j] = arenaJoins(bayWith([[310, 2]]), everywhere);
-  const layer = joinLayer([j]);   // PIN MOVED (TESA14): the crossings' runs a layer of their own, the regions' merged over it
+  const layer = joinLayer([j]);
   assert.deepEqual([...layer.join].map(([k, v]) => [...keyXY(k), v]).sort((a, b) => b[1] - a[1]), [[310, 2, DIR.N], [310, 1, DIR.N | DIR.S], [310, 0, DIR.N | DIR.S]]);
   assert.deepEqual([...layer.roads].map(([k, v]) => [...keyXY(k), v]).sort((a, b) => b[1] - a[1]), [
     ...Array.from({ length: 7 }, (_, i) => [310, -1 - i, DIR.N | DIR.S]), [310, -8, DIR.S],
@@ -178,7 +177,6 @@ test('TESA5 the worker: the crossings\' layer merged into the one it installs - 
     globalThis.onmessage({ data: { t: 'init', woodsBytes: syntheticWoods(MAP_WIDTH, MAP_HEIGHT) } });
     globalThis.onmessage({ data: { t: 'roads', net: bayNet() } });
     const [j] = arenaJoins(bayWith([[310, 2]]), everywhere);
-    // PIN MOVED (TESA14): the worker builds nothing - the client's layer is merged into the one it holds
     globalThis.onmessage({ data: { t: 'arena-roads', epoch: 3, reset: true, layer: packArenaRoads(joinLayer([j])) } });
     globalThis.onmessage({ data: { t: 'job', px: 310, py: 1, stride: 1, tilemap: new Uint8Array(128 * 128), locationRect: null, hasLocation: false, climateType: 302 } });
     const done = posted.at(-1);
@@ -223,6 +221,5 @@ test('TESA5 with ARENA2: on Basic Roads\' own network fourteen crossings - seven
     const joins = arenaJoins(bay, land);
     assert.deepEqual(joins.map((j) => j.side), ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'S', 'S', 'S', 'S', 'S', 'E', 'E']);
     assert.equal(joinLayer(joins).join.size, 47);
-    // PIN MOVED (TESA14): the network a gate is on is a region's now - test/tesa14_roads.test.js lays one on this data
   } finally { setTamrielTrace(null); setTamrielFit(null); }
 });

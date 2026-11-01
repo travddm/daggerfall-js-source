@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// CSA-A (2026-09-27): COME SAIL AWAY 2.1 (RedRoryOTheGlen) - THE VENDORED
+// CSA-A: COME SAIL AWAY 2.1 (RedRoryOTheGlen) - THE VENDORED
 // PICTURES AND SOUNDS, OUT OF THE SHIPPED BUNDLE AND THE PLAYER'S OWN ARENA2.
 //
 //   node tools/comeSailAwayExtract.mjs "<path-to>/come sail away.dfmod" [outDir] --arena2 <ARENA2>
 //
 // Default outDir is vendor/come-sail-away. Every picture is measured before
 // anything is written, because a render of game data is game data
-// (Port-Doctrine) and never enters the tree - bible/03-World/Come-Sail-Away.md
+// (Port-Doctrine) and never enters the tree
 // "The bundle" has the measurements:
 //
 // - `Textures/112395_0-0.png`, `Textures/112395_1-<frame>.png` - the splash

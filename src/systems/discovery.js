@@ -21,8 +21,7 @@ import { isProvinceRegion } from '../formats/mapsTables.js';   // BAY-LEFT-MAPS:
 import { BAY_PIXEL_IDS } from '../world/placeIds.js';   // AUDIT TESA II P6: the Bay's pixel ids, under its 1000 x 500 (BAY-LEFT-B: the leaf's, the deeds' too)
 
 /**
- * BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
- * exceptions."; its C7 = E2; bible/03-World/Arena-Provinces.md BAY-LEFT-MAPS C7): A TOWN'S BOOK OF DISCOVERED BUILDINGS,
+ * BAY-LEFT-MAPS: A TOWN'S BOOK OF DISCOVERED BUILDINGS,
  * BY ITS OWN KEY - the one key-maker every writer and reader of the building half calls (the door, the town map, the
  * talk's reveals, the guild halls' reveals, the lockpick's anti-grind record, the quest re-stamps, a deed's residence). A
  * Bay place keeps the key every save holds, `<regionIndex>:<name>`, byte for byte (DFU's PlayerGPS files the record by

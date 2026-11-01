@@ -1,6 +1,4 @@
-// ONLINE IS THE ENHANCED LANE, WHOLE (OL1, Mac, 2026-09-14: "with
-// online ... I definitely think I want any current and future
-// enhancements/mods enabled on for online").
+// ONLINE IS THE ENHANCED LANE, WHOLE (OL1).
 //
 // AUDIT WORLD5 recorded that the classic and enhanced lanes diverge
 // under one shared seed (the weather's hourly evolution is the enhanced
@@ -14,8 +12,7 @@
 // the moment they play offline.
 //
 // THE VENDORED MODS ARE NOT IN THAT SENTENCE ANY MORE (MODS-ONLINE-2,
-// 2026-09-22, Mac: "Is it possible to allow all mods to be toggled on
-// and off for online?"). Every mod's `Enabled` is the player's now,
+// 2026-09-22). Every mod's `Enabled` is the player's now,
 // online as offline; the lane forces exactly the two switches the
 // room's GROUND depends on. The reading that got there - why a
 // damage formula, a foe's stats, a loot roll and a block were never
@@ -56,8 +53,7 @@ export const isOnlinePage = (search = globalThis.location?.search ?? '') => page
 export const BOOT_DOOR_KEYS = Object.freeze(['load', 'online', 'loadkey', 'test', 'classic', 'classicload', 'realm', 'realmnew', 'legacyborn', 'region', 'loc', 'seat', 'start']);   // BAY-LEFT-B: a birth's seat by its map id   // HOUSE-WAITS (FIELD BUGS 2026-10-09f): a waiting house's birth, decided by the Online page   // REALM P1.3: the realm character's id, and a character born online
 
 /**
- * MAC-N3 (2026-09-16, Mac: "Chat UI not visable with classic in online
- * mode"): THE BOOT'S PARAMS ARE THE URL, or the lane reads nothing.
+ * MAC-N3: THE BOOT'S PARAMS ARE THE URL, or the lane reads nothing.
  *
  * main.js builds `params` from location.search, and the front door
  * SETS `online` on it for Play Online - on the in-memory copy. Nothing
@@ -93,7 +89,7 @@ export function publishBootParams(params, { history = globalThis.history, locati
   return search;
 }
 
-/** REALM P0.1 (2026-09-28, Mac: "eliminate duping, eliminate true overpowered builds online"): THE URL'S POWERS STAY
+/** REALM P0.1: THE URL'S POWERS STAY
  *  OFFLINE. F304 left the shipped build's URL flags ungated ("URL flags are fine, no need"), because a single-player
  *  game's cheats are the player's business. Online they are every other player's too:
  *  - `?shot` installs the probe seams, `window.__addGold` among them;
@@ -102,7 +98,7 @@ export function publishBootParams(params, { history = globalThis.history, locati
  *  - `?spawn`, `?region` and `?loc` choose where a fresh character stands;
  *  - `?tod`, `?timescale`, `?weather`, `?wseed` and `?season` stand against the shared clock and sky.
  *  An online boot drops every one of them before anything reads them (scenes/world.js, beside the Test Room's refusal),
- *  and publishes the drop so every later reader of the URL agrees. Offline, F304 stands (bible/06-Systems/Realm-Arc.md). */
+ *  and publishes the drop so every later reader of the URL agrees. Offline, F304 stands. */
 export const ONLINE_REFUSED_FLAGS = Object.freeze(['shot', 'fly', 'nofoes', 'tp', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'timescale', 'weather', 'wseed', 'season', 'editor']);   // POI-3: the POI editor's free eye and its map jump are powers too - a builder edits offline
 /** Drops the refused flags from an online boot's params, in place. Answers the flags it dropped (none offline). */
 export function refuseOnlinePowerFlags(params) {
@@ -120,8 +116,7 @@ export function refuseOnlinePowerFlags(params) {
  *  declareOnlinePrefs at the registry's load - this table holds only
  *  the two the registry has no row for. */
 export const ONLINE_FORCED_PREFS = {
-  // OVH3 (2026-09-24, Mac: "These overhauls need to adapt to online with ease. Online specific UI's will need to
-  // remain"): THE SKIN IS THE PLAYER'S, ONLINE TOO. It was forced to 'enhanced' because the online panels - the chat,
+  // OVH3: THE SKIN IS THE PLAYER'S, ONLINE TOO. It was forced to 'enhanced' because the online panels - the chat,
   // the friends and party, the F-menu, the names over heads, player trade - were built only under that skin. They
   // mount on either skin now (scenes/world.js chatStart; ui/playerTradeDoor.js) and keep their own face over the
   // classic screens, so the UI Overhaul a player chose (systems/overhauls.js) is the one they play online. Nothing
@@ -170,7 +165,7 @@ export const ONLINE_PLAYERS_OWN_PREFS = [
   'reducedMotion',   // whether THIS player's title cards stand still (ui/gate/gateTitleCard.js) - an accessibility choice, nothing the room agrees on
 ];   // (RF4: grown by declareOnlinePrefs with the registry's 'player' answers - the dials)
 
-/** DISC22-A (2026-09-24, Mac: "repair magical items should be enabled by default and required online"): THE DFU
+/** DISC22-A: THE DFU
  *  SETTINGS THE ROOM PLAYS BY - the fourth read path (settings.js getData asks here first, as getPref and
  *  modSetting do). AllowMagicRepairs is a rule of the economy every player meets at the same smith: one player able
  *  to mend an enchanted blade and another turned away at the same counter is two games in one town. Its OFFLINE
@@ -186,7 +181,7 @@ export function onlineForcedSetting(section, key, search) {
 }
 
 /** The forced value of a uiPrefs key on an online page, else undefined.
- *  PERF-URL2 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
+ *  PERF-URL2:
  *  THE TABLE FIRST, as onlineForcedSetting above has asked it since AUDIT RETRO1 G2. getPref asks this on every read - hundreds a frame
  *  - and the page test reads `location.search`, a DOM getter, before PERF-URL's memo can answer; the table forces a
  *  handful of keys (the Features registry's own switches, RF4 - AUDIT 637 C5: not the mods'), so every other read paid the page for nothing
@@ -199,9 +194,7 @@ export function onlineForcedPref(key, search) {
 /**
  * THE MOD KEYS THE ONLINE LANE FORCES - AND THEY ARE THE GROUND.
  *
- * MODS-ONLINE-2 (2026-09-22, Mac: "Is it possible to allow all mods to
- * be toggled on and off for online?" / "So all mods can now be
- * toggled?"). The first answer was half of one: eight mods freed, eight
+ * MODS-ONLINE-2. The first answer was half of one: eight mods freed, eight
  * left forced because they sounded like world state. This is the other
  * half, and it is a READING of the port rather than a reading of the
  * names.
@@ -255,7 +248,7 @@ export function onlineForcedPref(key, search) {
  * paintRoads), so a river painted tiles and never moved a height. It
  * was paint, and paint is the player's.
  *
- * LANDFORM3 (2026-10-06, Mac: "Yes rivers should be online"): IT IS
+ * LANDFORM3: IT IS
  * GROUND NOW. The landforms (world/landforms.js - the room's ground,
  * forced on below) cut every painted river and stream into the land,
  * so the river switch decides where the ground IS beside every river
@@ -265,7 +258,7 @@ export function onlineForcedPref(key, search) {
  * what Mac asked to see online. (The smoother still moves no river's
  * height; the kernel's cut does - test/systems/landform.test.js measures it.)
  *
- * MODS-ONLINE-4 (2026-09-22, Mac: "What about player balance?"): AND
+ * MODS-ONLINE-4: AND
  * THE READING ABOVE ANSWERED THE WRONG QUESTION FOR THREE OF THEM.
  *
  * "Does it desync?" and "does my switch reach another player?" are not
@@ -311,14 +304,14 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
     SmoothRoads: true,    // whether the beds are smoothed at all - the dial that gave the floor away
     RiversAndStreams: true,   // LANDFORM3: whether rivers are painted, and so cut into the land - on, past the mod's shipped off (above)
   }),
-  // WOD1 (2026-09-23): the second floor. World of Daggerfall levels the
+  // WOD1: the second floor. World of Daggerfall levels the
   // ground under every camp and rock field it stands (LocationLoader.cs
   // lerps the heightmap toward the site's mean) and stands collidable
   // rock in it, so two players who disagree walk two terrains and pass
   // through each other's boulders - the roads' own reason, word for
   // word. Its one switch is the room's.
   'world-of-daggerfall': Object.freeze({ Enabled: true, Mountains: false }),   // WOD-PEAKS: and its spires the room's too - they level the ground and stand rock
-  // DS1 (2026-09-25): the third floor. Every owner's ship stands at the SAME
+  // DS1: the third floor. Every owner's ship stands at the SAME
   // map pixel - (2,2) for the small, (5,5) for the large (banking.js
   // SHIP_COORDS) - so a room's sailors share one deck, and Detailed Ships
   // stands collidable railings, crates, tenders and rigging on it. Two
@@ -326,20 +319,19 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
   // other's crates; the switch is the room's. (Below decks opens no room -
   // worldModes' ship interior is the player's own.)
   'detailed-ships': Object.freeze({ Enabled: true }),
-  // WD3 (2026-10-01, Mac: "ensure this doesn't conflict or regress anything (For example housing customization)"): the
+  // WD3: the
   // towns themselves. Beautiful Villages and Beautiful Cities lay 7,727 of Daggerfall's places out again - new streets,
   // new walls, every building where its block now stands - so two players who disagree walk two towns, one through the
   // other's houses, and a building KEY (an online home's, a shared quest's) names two different buildings. The switch is
   // the room's. The homes bought before them keep the towns they were bought in, for everyone (net/homeLaw.js WD3).
   'beautiful-villages': Object.freeze({ Enabled: true }),
   'beautiful-cities': Object.freeze({ Enabled: true }),
-  // RAID2 (2026-09-27, Mac on World Events - Raiding Parties online: "1. Server 2. Keep"): the towns' raids are the
+  // RAID2: the towns' raids are the
   // WORLD's - the day's roll is the shared day's, one player runs each raid and every other stands its raiders as
   // puppets and fights them, and a raid's deaths are every owner's summed. A player with the switch off would walk a
   // raided town the others fight in, unable to see the raiders striking him; the switch is the room's.
   'world-events-raiding-parties': Object.freeze({ Enabled: true }),
-  // TRAVEL-ONLINE (2026-10-03, Mac: "Remove instant travel online"; and TO-ONLINE's own words, 2026-09-19: "travel
-  // options uses instant travel for the online mod, which shouldn't be the case"): online a trip on the map is TRAVELLED -
+  // TRAVEL-ONLINE: online a trip on the map is TRAVELLED -
   // the mod's journey, or the Overworld's on the enhanced skin - never Daggerfall's fast travel, which online is a
   // teleport (it arrives at the world's present: no world time to spend). Three switches reached that teleport: the mod
   // off, and either of the two dials that send a Cautious or an Inns trip down the journey (ui/travel/travelPopUp.js
@@ -353,9 +345,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
     'StopAtInnsTravel.PlayerControlledInnsTravel': true,
     'ShipTravel.OnlyFromPorts': true,
   }),
-  // IT1 (2026-10-04, the owner, on instant travel online "as an option but with a cost", then "let this be the next mod
-  // we integrate 1:1" - and the choice put to them, "a driver's trip is Daggerfall's fast travel online ... the map's own
-  // trips stay walked"): IMMERSIVE TRAVEL. Its switch is the room's for the floor's reason: it stands a carriage, two
+  // IT1: IMMERSIVE TRAVEL. Its switch is the room's for the floor's reason: it stands a carriage, two
   // horses and a driver at every city gate (its four gate blocks, laid onto Beautiful Cities' as well), collidable
   // models a player without them would walk through. And DisableNormalTravel is the room's, OFF - the port's shipped
   // default (IT1's recorded departure: the mod ships it on) - so online the travel map's trips stay Travel Options'
@@ -366,7 +356,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
     Enabled: true,
     'General.DisableNormalTravel': false,
   }),
-  // DW-A to DW-D (2026-09-25): the fourth floor, and more than a floor. Iliac
+  // DW-A to DW-D: the fourth floor, and more than a floor. Iliac
   // Puddle No More carves the sea out from under the terrain - the switch
   // and the depth decide where the seafloor stands, so two players who
   // disagree would swim over two floors (one walking on water where the
@@ -383,7 +373,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
     'General.MaxLiveTreasureClusters': 12, 'General.TreasureCove': false,
     'General.SwimSpeedMultiplier': 1.0, 'General.EnableSwimStroke': true, 'General.ArgonianInfiniteBreath': true,
   }),
-  // OH-A (2026-09-26): the fifth floor, cut into the fourth. There's a Hole in
+  // OH-A: the fifth floor, cut into the fourth. There's a Hole in
   // the Bottom of the Ocean sinks a pit into Iliac Puddle No More's seafloor
   // at the pixels its hash picks, and stands the pit's way in - a dungeon, a
   // world room of its own (roomKeyFor's `dungeon:m<id>`: the abyss's map id is
@@ -413,9 +403,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
   // - and rewrites the host's foes' behaviour (enemyAppearance: a
   // Sorcerer that casts); every other switch is the player's own run.
   'roleplay-realism-items': Object.freeze({ Enabled: true, newWeapons: true, newArmor: true, lootRebalance: true, realisticEnemyEquipment: true }),
-  // MODS-ONLINE-5 (2026-09-23, Mac, asked which of RR's switches to
-  // force "especially when it comes to balance", then: "Yeah its the
-  // reason we forced PCAAO"): ONE RULESET PER ROOM. PCAAO was forced
+  // MODS-ONLINE-5: ONE RULESET PER ROOM. PCAAO was forced
   // whole - its player-side formulas with its foe-side ones - and RR's
   // six combat overrides are the same kind of thing (FormulaHelper
   // overrides on the striker's own blow, the wearer's own armor, the
@@ -429,7 +417,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
   // Forced OFF, which is what the mod ships anyway.
   'roleplay-realism': Object.freeze({
     Enabled: true, enemyAppearance: true,
-    advancedArchery: true, weaponSpeed: true, weaponMaterials: true, classicStrengthDamageBonus: false, equipDamage: false, encumbranceEffects: true,   // WEAR-VANILLA (2026-10-01): armour x5 off, the port's default (modSettings.js)
+    advancedArchery: true, weaponSpeed: true, weaponMaterials: true, classicStrengthDamageBonus: false, equipDamage: false, encumbranceEffects: true,   // WEAR-VANILLA: armour x5 off, the port's default (modSettings.js)
     'RefinedTraining.intensiveTraining': false,
   }),
 });
@@ -451,7 +439,7 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   // AUDIT-WH R8: a readout is the player's - it stands nothing, rolls
   // nothing, writes nothing and is not on the wire.
   'world-tooltips',
-  // MODS-ONLINE (2026-09-22): what draws on your own screen and nowhere else.
+  // MODS-ONLINE: what draws on your own screen and nowhere else.
   'dynamic-skies',         // the sky dome over a weather the room already shares (WORLD5 rolls it; this only paints it)
   'seasons-iliac-bay',     // which texture archives load for the season - a swap in front of the same terrain
   'weapon-widget',         // the first-person weapon's own motion; no damage, no timing, no attack state
@@ -460,7 +448,7 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   'ambient-text',          // flavour lines on your own screen
   'immersive-footsteps',   // your own footstep audio
   'better-ambience',       // ambient audio and the dungeon's darkness, both drawn locally
-  // MODS-ONLINE-2 (2026-09-22): what the port already resolves at the
+  // MODS-ONLINE-2: what the port already resolves at the
   // machine that owns the actor, so the wire carries the result and
   // never the rule - and which MODS-ONLINE-4 then re-asked "does my
   // switch reach another player?", moving three of them back.
@@ -482,12 +470,11 @@ export const ONLINE_PLAYERS_OWN_MODS = [
 ];
 
 /**
- * REALM P0.2 (2026-09-28, Mac: "eliminate true overpowered builds online, and overall bring the experience more in
- * line with a balanced MMO"): THE BALANCE MODS ARE THE ROOM'S WHOLE, NOT THEIR ENABLE SWITCH.
+ * REALM P0.2: THE BALANCE MODS ARE THE ROOM'S WHOLE, NOT THEIR ENABLE SWITCH.
  *
  * MODS-ONLINE-4/5 forced these mods on and left their DIALS the player's, reading each dial as the player's own run.
  * A realm with one ruleset has no "own run" for power and loot. The dials left free were exactly the holes the REALM
- * research found (bible/06-Systems/Realm-Arc.md):
+ * research found:
  *   - Unleveled Loot's material remaps: Iron -> Daedric turns a 300-gold cuirass into a 153,600-gold one, handed to
  *     peers through corpses, shared piles and shop shelves;
  *   - PCAAO's modules: `fixedStrengthDamageModifier` off doubles the strength bonus (`fadingEnchantedItems` stood
@@ -524,7 +511,7 @@ export function onlineForcedModSetting(vendor, key, search) {
   return isOnlinePage(search) ? room[key] : undefined;
 }
 /**
- * PARTY-LOOT (2026-10-14, Mac: "Shared base + personal bonus"): A ROOM'S SHARED BASE IS ROLLED UNDER THE ROOM'S RULES.
+ * PARTY-LOOT: A ROOM'S SHARED BASE IS ROLLED UNDER THE ROOM'S RULES.
  * Every client in a dungeon room computes the same base list for a container (systems/roomLoot.js), and a take names
  * a piece of it by its place in that list - so a draw that reads ONE player's switch is a different list on that
  * player's machine, and the take lands on another piece. MODS-ONLINE-2 left a vendored mod's switches the player's

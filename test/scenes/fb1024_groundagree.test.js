@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-24 (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md) - "players seeing other players underneath the
+// FIELD BUGS 2026-10-24 - "players seeing other players underneath the
 // ground", and the foes those players spawn out of reach, mostly at world events outside the breach portals with a crowd
 // about. A pose and a foe record carry a height on their sender's own ground, so two clients that build one pixel on two
 // grounds see each other sunk or floating. Two of a client's own beliefs moved the ground on the same build:
@@ -82,12 +82,10 @@ test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands,
   const [ex, ey] = rolledPixel(ETHER_BOX.x0 + 10, ETHER_BOX.y0 + 10);
   ({ law } = makeLaw());
   assert.equal(law.groundLocationAt(ex, ey, null), null, 'past the Veil the isles stand their own places');
-  // PIN MOVED (SPAWN-HOLE, then SPAWN-WORLD): past the Bay a spawn's id is the world's spawn lane's, so with no Eltheric
   // Ocean the box stands the roll's spawn again, as it did before SPAWN-HOLE's stop-gap guard
   ({ law } = makeLaw({ etherSea: false }));
   assert.deepEqual(law.groundLocationAt(ex, ey, null), { name: `Spawn ${ex},${ey}` }, 'with no Eltheric Ocean that box is no isle\'s');
 
-  // PIN MOVED (AUDIT RELEASE R3-7, the merge of main into TESA): the open zone is Cyrodiil's (WW-C2), its mask the host's
   // (zoneMask - scenes/world.js hands systems/wild/cyrodiilZone.js cyrodiilMask); here a zone over the whole fake map
   const zoneMaps = { getClimateIndex: () => CLIMATES.Woodlands };
   const mask = buildWildMask({ width: 1000, height: 500, inZone: () => true });

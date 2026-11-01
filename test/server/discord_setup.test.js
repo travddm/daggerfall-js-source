@@ -1,9 +1,8 @@
-// DISCORD-SETUP (2026-10-17, Mac: "Can you set the discord end up for me"; bible/11-Multiplayer/Chat-Safety-Arc.md
-// section 9): THE DISCORD END FROM THE TOKEN ALONE - tools/discordModCommands.mjs --setup reads the application's id and
+// DISCORD-SETUP: THE DISCORD END FROM THE TOKEN ALONE - tools/discordModCommands.mjs --setup reads the application's id and
 // public key from Discord, the server from the moderators' channel, points the Interactions Endpoint URL at the service
 // only when it differs (offered again while an old instance answers the PING), writes the commands, and says which step
 // Discord refused - never the token.
-// DISCORD-CODE (2026-10-17, Mac: "Do it"): Discord is code - the commands declared once beside the service that answers
+// DISCORD-CODE: Discord is code - the commands declared once beside the service that answers
 // them (server-account/src/discordCommands.js), the WHOLE list written, every declared command and subcommand held to a
 // handler, the bot's permissions in the moderators' channel computed as Discord computes them, and the deploy's path
 // filter holding the tool's own import graph.

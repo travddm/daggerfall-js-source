@@ -1,4 +1,4 @@
-// QG1 - THE LAST RETIRABLE GUARDS (2026-08-28). CastEffectDo,
+// QG1 - THE LAST RETIRABLE GUARDS. CastEffectDo,
 // ClickedFoe and PromptMulti become real ActionTemplates on the Q5
 // harness, and the READY-SPELL DOORS go live: the machine has declared
 // notifyNewReadySpell/notifyCastReadySpell and the two world reads

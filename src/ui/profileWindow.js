@@ -1,6 +1,4 @@
-// INSPECT1 (2026-09-23, the community arc - kurkku: "a profile page that you can bring up when you're near them"; Mac:
-// "For the profile suggestion. I think we develop a new enhanced UI element for the player inspect interaction.
-// Showing their glyph, name, title, stats and worn gear"): THE PROFILE - a card in the middle of the screen for the
+// INSPECT1: THE PROFILE - a card in the middle of the screen for the
 // player the F key found, opened from the F-menu's Inspect row.
 //
 // WHAT IT SAYS, AND WHOSE WORD EACH PART IS:
@@ -71,7 +69,7 @@ export const GEAR_ROWS = Object.freeze([
   [EQUIP_SLOTS.Crystal0, 'Crystal'], [EQUIP_SLOTS.Crystal1, 'Crystal'],
 ]);
 
-/** PROFILE-UI (2026-10-07, Mac: "Lets only organize and polish the player profile. Its a mess"): WHAT THEY WEAR IN ITS
+/** PROFILE-UI: WHAT THEY WEAR IN ITS
  *  PARTS, in the order a reader looks for them - what is in their hands (a shield with the sword), their armour, their
  *  clothes, their jewellery - each piece by its own group (net/wire.js LOOK_GROUPS: every piece the look carries names
  *  one), a hand's piece in hand whatever it is. */
@@ -176,7 +174,7 @@ export function profileView({ name = null, peer = null, look = null, card = null
   const worn = card?.look ?? look ?? null;
   const race = typeof worn?.race === 'string' ? raceDisplayName(worn.race) : null;
   const klass = typeof worn?.class === 'string' ? worn.class : null;
-  // RENOWN1 (Mac: "having their level appear on the left side of character name and ... ingame profile"): the level the
+  // RENOWN1: the level the
   // relay stamped off their signed token - never the card's own word (the card's "Level" is their Daggerfall level)
   const lv = Number.isSafeInteger(peer?.lv) ? peer.lv : null;
   return {
@@ -194,7 +192,7 @@ export function profileView({ name = null, peer = null, look = null, card = null
     gear: gearRows(worn),
     note: profileNote(PROFILE_STATES.includes(state) ? state : 'silent', who),
     state,
-    // DUEL1 (Mac: "When inspecting a player, they should be able to send an invite to duel"; "Add a dueling K/D to the
+    // DUEL1 (; "Add a dueling K/D to the
     // ... player inspect profile"): the Challenge button's state as the host's duel law says it ({ label, enabled, why }
     // - null: no button, offline or on a relay that cannot carry a duel), and their record's line - the account
     // service's count, read by the account the relay stamped on their card (net/duel/duelRecord.js), never the card's word
@@ -319,7 +317,7 @@ export function createProfileWindow({ canOpen = () => true, onOpen = null, onClo
     nm.append(el('span', 'dfprofile-nametext', v.name));
     if (v.guild) nm.append(el('span', 'dfprofile-guild', v.guild));   // GUILD1c: right of the name
     head.append(nm);
-    // PROFILE-UI (Mac: "Its a mess"): the glyphs on a row of their own under the name, wrapping - beside it, a player's
+    // PROFILE-UI: the glyphs on a row of their own under the name, wrapping - beside it, a player's
     // eighteen squeezed the name to a letter a line
     if (v.glyphs.length) {
       const glyphs = el('div', 'dfprofile-glyphs');

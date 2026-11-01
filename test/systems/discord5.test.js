@@ -1,5 +1,4 @@
-// DISCORD5 (2026-09-22, five reports off the bug-reports channel, through
-// Mac): five root causes, each pinned by EXECUTION where the seam can be
+// DISCORD5: five root causes, each pinned by EXECUTION where the seam can be
 // driven and by source where it lives inside a host closure.
 //
 //   BLACK-ARMS  "Weapon and torch are blacked out" (Revverie) - the
@@ -30,8 +29,8 @@ import { modDials } from '../../src/systems/features.js';
 import { ITEM_HANDS } from '../../src/characters/equipTable.js';
 import { spellCandidates, cycleQuickslot, clearQuickslots, spellQuickslot, setSpellQuickslot } from '../../src/systems/quickslots.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
-// HB-LYCFREE (2026-09-30): the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
-// diamond was the default, so it chooses the diamond (PIN MOVED: the environment it always ran in, now said).
+// HB-LYCFREE: the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
+// diamond was the default, so it chooses the diamond (
 setPref('quickbarStyle', 'quickbar');
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');

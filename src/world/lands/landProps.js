@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The landmarks"): THE LANDMARKS' LAW - where the land's own features past
+// TESA-LANDS (, "The landmarks"): THE LANDMARKS' LAW - where the land's own features past
 // the Bay stand and what each is. A zone names its kinds and looks (LAND_LOOKS), each a rate, a where (woods, plains, any,
 // the water's edge) and maybe a patch; a site is a cell of its kind's size on the WORLD's lattice, every draw a hash of its
 // world tile, so every client and the worker lay the same. Its foot stands wholly on land a landmark may, at the lowest

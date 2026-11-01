@@ -1,5 +1,4 @@
-// AUDIT GATHER (2026-10-26, Mac: "Audit the harvesting and gathering systems ensuring perfection and that nothing is
-// broken"; bible/06-Systems/Professions-Arc.md section 55): THE AUDIT'S CLIENT PINS, each failing on the code before its
+// AUDIT GATHER: THE AUDIT'S CLIENT PINS, each failing on the code before its
 // fix. The service's two (F2 the Motherlode's clock, F3 the school's bound) are test/net/auditgather_service.test.js.
 //   F1 - a CARRIED harvest refused at the seat (progress-seat, trade-held) is kept, asked again with its own rid; one
 //        that is not carried, and a carried one refused for anything else, is let go as before.

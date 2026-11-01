@@ -8,8 +8,7 @@
 //     node tools/bakeSteelPlate.mjs --open-helm=<an export carrying Sphere.002>
 //         take the open helm, alone, out of an export into its committed source
 //
-// MW-STEEL1 (2026-10-06, Mac: "These 2 files are for the armor replacement of the morrowind steel armor with a varient
-// to toggle the helmet type"). The third of the port's own Morrowind models, and the first SET: a whole suit of steel
+// MW-STEEL1. The third of the port's own Morrowind models, and the first SET: a whole suit of steel
 // plate, a piece for every one of Daggerfall's seven, worn on the Morrowind body by Daggerfall's Steel armour in place of
 // retail's steel_* records (Mac, asked: Steel only - Silver and Elven keep retail's steel). Two helms: the open one, a
 // nasal helm over a mail aventail with the face showing, and the closed one, the same shell without the nasal, a
@@ -35,8 +34,7 @@
 //   Those are Bethesda's meshes, so --import strips them (fbxStrip.mjs - every other record copied byte for byte) and
 //   keeps only their BOUNDS (SCENE_BODY) - the evidence the scene's frame is read against, below.
 //
-//   THE SKIRT CAME WITH ITS PAINTING (MW-STEEL2, 2026-10-07, Mac: "This is the missing texture for the morrowind steel
-//   armor's skirt"). The scene keeps a skirt of plates under the breastplate (`Imperial_Silver_Cuirass_67_Male.011`,
+//   THE SKIRT CAME WITH ITS PAINTING (MW-STEEL2, 2026-10-07). The scene keeps a skirt of plates under the breastplate (`Imperial_Silver_Cuirass_67_Male.011`,
 //   modelled from the same cuirass mesh as the breastplate, `.009`), painted from a "steelpelvis" texture that MW-STEEL1
 //   never had - so it was stripped at --import then, Mac having said "That was never apart of the set". The painting
 //   came, and the skirt is a piece now: `Steel_Plate_Skirt.png` is Mac's steelpelvis picture, and the skirt is baked
@@ -49,8 +47,7 @@
 //
 // ═══ MW-STEEL4: RIGGED HERE, AS RETAIL'S ARMOUR IS ═══════════════════
 //
-// (2026-10-07, Mac: "I think the prior session to rig the new steel set on the morrowind model really fucked it up.
-// How hard is it to switch it out?", and asked how: "You do it properly".) Every piece ships SKINNED - a NiSkinInstance
+// Every piece ships SKINNED - a NiSkinInstance
 // over Morrowind's own Bip01 bones and a NiSkinData of their inverse binds and weights, the shape of a retail armour
 // piece - so the game takes it on the path it takes Morrowind's own (rule 12: rebound onto the wearer's skeleton by
 // the bones' names; rule 20: drawn by skinBatch). MW-STEEL1-3 shipped static meshes and rigged them at runtime against
@@ -74,9 +71,6 @@
 //
 // ═══ MW-STEEL5: MAC'S UPDATE, AND THE HELM ON THE GAME'S HEAD ═══════════
 //
-// (2026-10-09, Mac: "Heres an updated fix for the integrated steel armor for the morrowind model. Theres also an issue
-// where the helmet isnt positioned properly on the head but only for the new integrated model", with steel_armor.fbx
-// and a screenshot of the set worn, from behind.)
 //
 //   ONE EXPORT NOW. steel_armor.fbx is the whole set with the closed helm, and no Morrowind head or neck in it: the
 //   greaves, boots, gauntlets and skirt the same to the vertex; the breastplate's shoulders widened (54 of its vertices,
@@ -97,8 +91,7 @@
 //
 // ═══ MW-FIT1: THE CLOSED HELM IS THE HEAD ════════════════════════════
 //
-// (2026-10-09, a player's report Mac passed on: "the helmet elevation is too much", "the coif has to cover the
-// neck".) Lifted onto the game's head, a helm rises off the body Mac hung it on - its rim HELM_LIFT over the collar, a
+// Lifted onto the game's head, a helm rises off the body Mac hung it on - its rim HELM_LIFT over the collar, a
 // band of neck under it - and a head that stands lower than Mac's screenshot read sees the whole helm ride high. A
 // closed helm needs no head under it: retail's closed helmets fill the head's slot and the head is not drawn
 // (characters/ownModels/ownArmorModels.js hides it). So the closed helm stands where Mac fitted it on the body, no lift; only the
@@ -297,8 +290,7 @@ const piece = (id, file, shapes, lift = 0) => Object.freeze({ id, file, shapes: 
  * MW-STEEL5: HOW FAR UP THE HEAD BONE THE GAME'S HEAD STANDS OVER THE SCENE'S (units) - and so how far the open helm is
  * raised over where Mac fitted it on the scene's Breton head (MW-STEEL1's export, the shell from 112.88 to 131.82); the
  * closed helm hides the head and is not raised (MW-FIT1).
- * Read off Mac's screenshot (2026-10-09, the set worn, from behind, the scalp standing up through the closed helm's
- * crown) by tools/helmLiftProbe.mjs: the set worn on retail's skeleton in its idle, with a stand-in for the scene's
+ * Read off Mac's screenshot by tools/helmLiftProbe.mjs: the set worn on retail's skeleton in its idle, with a stand-in for the scene's
  * head (SCENE_BODY's box, an ellipsoid) on the head bone, drawn from behind at three heights of eye, shows the
  * screenshot's scalp - its height 0.39 of the helm's under it - with the head 3.24, 3.70 and 4.25 higher
  * (test/tooling/mwsteel5.test.js holds HELM_LIFT inside that span). Up the head bone is the scene's +Z: the bind stands it

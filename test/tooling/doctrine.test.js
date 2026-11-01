@@ -34,11 +34,11 @@ const tracked = (dir) => execFileSync('git', ['ls-files', '-z', dir], { cwd: roo
  *  that keeps the original silhouette answers yes. */
 const PUBLIC_ALLOWLIST = new Map([
   ['public/README.md', 'documentation'],
-  // STUDIO1 (2026-10-17): the studio's guide and its roster - text, the port's own. Its pictures answer to the roster
+  // STUDIO1: the studio's guide and its roster - text, the port's own. Its pictures answer to the roster
   // (studioArt below), not to rows here.
   ['public/art/studio/README.md', "STUDIO1: the studio's guide for the game's artists - documentation"],
   ['public/art/studio/artists.json', "STUDIO1: the studio's roster - each artist's folder, name and the word that approved them"],
-  // TI2 (2026-09-11): THE HOME-SCREEN APP. The manifest is text; the
+  // TI2: THE HOME-SCREEN APP. The manifest is text; the
   // three icons are drawn by scripts/makeIcons.mjs from the enhanced
   // skin's own colour tokens (a block-letter D over a seeded star
   // field) - no ARENA2 pixel, no screenshot, nothing derived. Re-run
@@ -47,10 +47,10 @@ const PUBLIC_ALLOWLIST = new Map([
   ['public/icons/icon-192.png', 'TI2: home-screen icon, drawn by scripts/makeIcons.mjs from the skin\'s tokens'],
   ['public/icons/icon-512.png', 'TI2: home-screen icon, drawn by scripts/makeIcons.mjs from the skin\'s tokens'],
   ['public/icons/icon-512-maskable.png', 'TI2: home-screen icon (maskable), drawn by scripts/makeIcons.mjs from the skin\'s tokens'],
-  // INTRO2 (2026-09-18): restored at Mac's explicit request. The credit
+  // INTRO2: restored at Mac's explicit request. The credit
   // marks and score are the identical U65 assets, not ARENA2-derived data.
   // Credit marks identify their respective projects; no new rights claimed.
-  // INTRO-REVERT (2026-10-25, the owner): the recording is back with its row.
+  // INTRO-REVERT: the recording is back with its row.
   ['src/assets/intro/interkarma.webp', 'U65 credit artwork identifying Interkarma / Daggerfall Unity; recovered unchanged'],
   ['src/assets/intro/nexus.webp', 'U65 credit artwork identifying Nexus Mods; recovered unchanged'],
   ['src/assets/intro/theme.mp3', 'U65 original theme recording; recovered unchanged at Mac\'s request'],
@@ -68,21 +68,21 @@ const PUBLIC_ALLOWLIST = new Map([
   // the question this list exists to ask. They are the first character
   // texture in the project that ships rather than loading through the data
   // door, and the reason viewer.html no longer needs ARENA2 for its skin.
-  // MAP0 (2026-09-18): THE HELD MAP'S SPRITE. Mac's own painting - two
+  // MAP0: THE HELD MAP'S SPRITE. Mac's own painting - two
   // gauntleted hands holding a blank parchment, 1448x1086 - and the
   // only picture the enhanced map will ship; the map itself is drawn
   // onto the paper at runtime from MAPS and WOODS data (10-UI/Held-Map-Arc.md).
   ['public/art/climb-grip.png', "OURS - Mac's own painting of the climbing fist, drawn for the right hand and mirrored for the left (CLIMB-HANDS, 2026-10-02); no ARENA2 pixel in it"],
   ['public/art/climb-reach.png', "OURS - Mac's own painting of the arm reaching for a hold, mirrored for the left (CLIMB-HANDS, 2026-10-02); no ARENA2 pixel in it"],
   ['public/art/held-map.png', "OURS - Mac's own painting of the held parchment (MAP0, 2026-09-18; the fourth painting, MAP-FIELD8, 2026-09-22); no ARENA2 pixel in it"],
-  // DISC22-C (2026-09-24): THE GRIMOIRE LOOT SHEET. Mac's own parchment for the classic skins' quick-loot panel under
+  // DISC22-C: THE GRIMOIRE LOOT SHEET. Mac's own parchment for the classic skins' quick-loot panel under
   // the GrimoireUI pack ("The screenshot of the parchment is a spritesheet to be used for the loot menu (grimoire
   // UI)"), 106x180, cut at its two gold rules by ui/classicLootPanel.js.
   ['public/art/grimoire-loot-parchment.png', "OURS - Mac's own parchment for the GrimoireUI loot panel (DISC22-C, 2026-09-24); no ARENA2 pixel in it"],
   ['public/art/grimoire-wood.jpg', "WOOD-HD (2026-10-10): the DFO Grimoire boards' wood, cut from the empty desk beside the book in Mac's own screenshot of the DFO Grimoire character sheet, its light flattened and made seamless; [Mac: record where that build's desk painting came from and its permission here]"],
   ['public/art/grimoire-desk.jpg', "DESK-HD (2026-10-10): the DFO Grimoire front door's desk as an earlier build drew it, lifted from Mac's own screenshot of that build (\"it looks way better use this one\"), its doors' words and the wordmark taken off; [Mac: record where that build's desk painting came from and its permission here]"],
   ['public/art/grimoire-dial-chest.png', "GRIM7 (2026-10-10): the treasure chest Dudey supplied for the DFO Grimoire dial's Items door (made with ChatGPT, handed over in the GRIM pass), cut from its dark ground along its outline; no ARENA2 pixel in it"],
-  // TEXT-FONT (2026-10-11): the Dyslexic choice of the enhanced skin's Text font (ui/textFont.js) - not art, a typeface
+  // TEXT-FONT: the Dyslexic choice of the enhanced skin's Text font (ui/textFont.js) - not art, a typeface
   ['public/fonts/opendyslexic/opendyslexic-latin-400-normal.woff2', "TEXT-FONT: OpenDyslexic (Abbie Gonzalez), SIL Open Font License 1.1 - its latin regular, as @fontsource/opendyslexic 5.3.0 ships it; no ARENA2 pixel in it"],
   ['public/fonts/opendyslexic/opendyslexic-latin-700-normal.woff2', "TEXT-FONT: OpenDyslexic's latin bold, the same package and licence"],
   ['public/fonts/opendyslexic/OFL.txt', 'TEXT-FONT: the font\'s SIL Open Font License, which travels with it'],
@@ -379,7 +379,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // or a lantern (110x138), the 112358 sheets are dropped lights with
   // their emission twins and three doused frames, all drawn in
   // Daggerfall's idiom rather than cut from it (the account:
-  // bible/06-Systems/Handheld-Torches.md, 'The textures, and the doctrine').
+  // 'The textures, and the doctrine').
   ['vendor/handheld-torches/Textures/112359_0-0.png', "THIRD-PARTY - Handheld Torches 1.4.1 (RedRoryOTheGlen), carried on the author's permission; the mod's own pixel art - the first-person hand holding a lit torch, frame 0"],
   ['vendor/handheld-torches/Textures/112359_0-1.png', "THIRD-PARTY - Handheld Torches 1.4.1 (RedRoryOTheGlen), carried on the author's permission; the mod's own pixel art - the first-person hand holding a lit torch, frame 1"],
   ['vendor/handheld-torches/Textures/112359_0-2.png', "THIRD-PARTY - Handheld Torches 1.4.1 (RedRoryOTheGlen), carried on the author's permission; the mod's own pixel art - the first-person hand holding a lit torch, frame 2"],
@@ -443,7 +443,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['vendor/climates-calories/Textures/539_0-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the waterskin"],
   ['vendor/climates-calories/Textures/50_7-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the tent's canvas (SURV-TENT)"],
   ['vendor/climates-calories/Textures/67_10-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the tent's pole (SURV-TENT)"],
-  // DS1 (2026-09-25): DETAILED SHIPS 1.0.0 (Cliffworms) - the four of its
+  // DS1: DETAILED SHIPS 1.0.0 (Cliffworms) - the four of its
   // thirteen pictures that NO classic record is, measured against every
   // record of every TEXTURE file at every offset (tools/detailedShipsAssets.mjs);
   // the nine that are classic records ship as specs over the player's
@@ -452,7 +452,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['vendor/detailed-ships/Textures/1210_11-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme ('may be distributed ... as long as I am credited'); the author's own 7x15 drawing - a blue bottle"],
   ['vendor/detailed-ships/Textures/1210_12-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme ('may be distributed ... as long as I am credited'); the author's own 7x15 drawing - an amber bottle"],
   ['vendor/detailed-ships/Textures/1230_30-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme; the Kynareth statue the readme credits to King of Worms and Zoran ('for the deity statues'), credited beside him"],
-  // FOEBAR1 (2026-09-17): THE TARGET BAR'S BLADE FACE. Two pictures a
+  // FOEBAR1: THE TARGET BAR'S BLADE FACE. Two pictures a
   // friend of Mac's drew for this port and sent through him to be its
   // alternate enemy health bar - a twin-bladed shape with a skull hub,
   // the dark one the empty bar, the red one the fill. Original art on
@@ -463,7 +463,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // alone; Vite bundles them with the page (the workers' pattern).
   ['src/ui/assets/foe-blade-empty.png', "FOEBAR1: the blade face's empty bar - a friend's original art, given for the port, cropped by us"],
   ['src/ui/assets/foe-blade-full.png', "FOEBAR1: the blade face's fill - a friend's original art, given for the port, cropped by us"],
-  // MW-BRIG1 (2026-09-29): the Steel Brigandine, the port's own worn
+  // MW-BRIG1: the Steel Brigandine, the port's own worn
   // model, supplied by Mac for the Morrowind body. It carries a
   // PAINTED texture (the FBX names it
   // Steel.png), so the DDS is that image mip-chained rather than grown
@@ -474,7 +474,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/source/Brigandine_Steel.png', "SUPPLIED - the brigandine's texture as Mac supplied it with the mesh (the FBX's Steel.png), committed as the DDS's source"],
   ['src/assets/mw/meshes/brigandine_steel.nif', 'SUPPLIED - the brigandine, baked to a Morrowind NIF by tools/bakeBrigandine.mjs (skinned from the body at bind time, MW-BRIG2); a Bethesda format, no Bethesda data'],
   ['src/assets/mw/textures/brigandine_steel.dds', 'SUPPLIED - Brigandine_Steel.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
-  // MW-BRIG4 (2026-10-09): Mac's nine paintings of the brigandine's unwrap, one per metal the jerkin is a brigandine in
+  // MW-BRIG4: Mac's nine paintings of the brigandine's unwrap, one per metal the jerkin is a brigandine in
   ['src/assets/mw/source/Brigandine_Iron.png', "SUPPLIED - the Iron brigandine's painting as Mac sent it (2026-10-09, his 1 of nine - tan with dark rivets), committed as its DDS's source"],
   ['src/assets/mw/meshes/brigandine_iron.nif', 'SUPPLIED - the brigandine mesh written naming the Iron painting by tools/bakeBrigandine.mjs (MW-BRIG4); a Bethesda format, no Bethesda data'],
   ['src/assets/mw/textures/brigandine_iron.dds', 'SUPPLIED - Brigandine_Iron.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
@@ -502,18 +502,18 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/source/Brigandine_Daedric.png', "SUPPLIED - the Daedric brigandine's painting as Mac sent it (2026-10-09, his 4 of nine - red with dark rivets), committed as its DDS's source"],
   ['src/assets/mw/meshes/brigandine_daedric.nif', 'SUPPLIED - the brigandine mesh written naming the Daedric painting by tools/bakeBrigandine.mjs (MW-BRIG4); a Bethesda format, no Bethesda data'],
   ['src/assets/mw/textures/brigandine_daedric.dds', 'SUPPLIED - Brigandine_Daedric.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
-  // MW-STEEL1 (2026-10-06): Mac's steel plate, the whole classic set for the Morrowind body, supplied as two Blender
+  // MW-STEEL1: Mac's steel plate, the whole classic set for the Morrowind body, supplied as two Blender
   // exports of one scene (New_Ship.fbx, the open helm; New_Ship1.fbx, the closed). His scene also carried the body it
   // was fitted on - Morrowind's own Breton head and neck, out of a "Morrowind_TPose_Models" pack - and those are
   // Bethesda's meshes, so they are NOT committed: tools/fbxStrip.mjs took them out, every other record byte for byte,
-  // and only their bounds are kept (tools/bakeSteelPlate.mjs SCENE_BODY). MW-STEEL2 (2026-10-07): the plate
+  // and only their bounds are kept (tools/bakeSteelPlate.mjs SCENE_BODY). MW-STEEL2: the plate
   // skirt under the breastplate, stripped with them while its painting was missing, is kept since Mac sent the picture
   // ("This is the missing texture for the morrowind steel armor's skirt"), and baked like the rest. The armour itself is Mac's export
   // as given; three of its objects are named for the meshes they were modelled from (Imperial_Silver_Cuirass_67_Male,
   // Imperial_Steel_Left_Gauntlet_20_Male, Breton_Male), so whether the geometry and the paintings are his own work or
-  // carry a licence of their own is Mac's to confirm (bible/04-Characters/Steel-Plate.md). tools/bakeSteelPlate.mjs
+  // carry a licence of their own is Mac's to confirm. tools/bakeSteelPlate.mjs
   // re-makes every mesh and texture below from these sources, and test/tooling/mwsteel1.test.js holds it to the bytes. MW-STEEL4
-  // (2026-10-07): every mesh is skinned at the bake to Morrowind's Bip01 bones, its inverse binds the bind of the vendored
+  // every mesh is skinned at the bake to Morrowind's Bip01 bones, its inverse binds the bind of the vendored
   // retail skeleton (vendor/weapon-sheathing, Greatness7's, credited) - numbers of a skeleton, no Bethesda geometry.
   ['src/assets/mw/source/Steel_Plate.fbx', "SUPPLIED - Mac's Blender export of the steel plate with the closed helm (steel_armor.fbx, 2026-10-09 - MW-STEEL5), committed as it came: it carries no Morrowind head or neck; committed so the files below are a DERIVATION the gate can re-run"],
   ['src/assets/mw/source/Steel_Plate_Open_Helm.fbx', "SUPPLIED - the open helm alone out of Mac's first export (New_Ship.fbx, 2026-10-06), every other object - and the Morrowind Breton head and neck it was fitted on - stripped by tools/fbxStrip.mjs (MW-STEEL5); a DERIVATION's source"],
@@ -545,7 +545,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/textures/steel_plate_helm.dds', 'SUPPLIED - Steel_Plate_Helm.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
   ['src/assets/mw/textures/steel_plate_visor.dds', 'SUPPLIED - Steel_Plate_Visor.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
   ['src/assets/mw/textures/steel_plate_skirt.dds', 'SUPPLIED - Steel_Plate_Skirt.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
-  // MW-EBONY1 (2026-10-09): Mac's ebony plate - one Blender export with nothing of Bethesda's in it, seven paintings
+  // MW-EBONY1: Mac's ebony plate - one Blender export with nothing of Bethesda's in it, seven paintings
   ['src/assets/mw/source/Ebony_Plate.fbx', "SUPPLIED - Mac's Blender export of the ebony plate (ebony_armor.fbx, 2026-10-09), committed as it came: it carries no Morrowind head or neck; committed so the files below are a DERIVATION the gate can re-run"],
   ['src/assets/mw/source/Ebony_Plate_Cuirass.png', "SUPPLIED - the ebony cuirass's painting as Mac sent it (his ebonybreastplate texture, matched to its piece by the UV islands it traces), committed as its DDS's source"],
   ['src/assets/mw/source/Ebony_Plate_Skirt.png', "SUPPLIED - the ebony skirt's painting as Mac sent it (his EBONYPELVIS texture, matched to its piece by the UV islands it traces), committed as its DDS's source"],
@@ -597,12 +597,12 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/textures/cloak_light_brown.dds', 'SUPPLIED - Cloak_Light_Brown.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
   ['src/assets/mw/textures/cloak_white.dds', 'SUPPLIED - Cloak_White.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
   ['src/assets/mw/textures/cloak_green.dds', 'SUPPLIED - Cloak_Green.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds; no ARENA2 or Morrowind pixel in it'],
-  // MW-HEADS1 (2026-10-13): the Breton men's three heads and three hairs, the port's own in place of Morrowind's for every
+  // MW-HEADS1: the Breton men's three heads and three hairs, the port's own in place of Morrowind's for every
   // Breton man, supplied by the owner as one Blender export of three objects (each a face and a hair, two paintings) and
   // six paintings sent as nameless attachments, each matched to the material the export names it on. The objects are
   // named for the Morrowind head they were modelled from (b_n_breton_m_head_05), so whether the geometry is the owner's
   // own work or carries a licence of its own is the owner's to confirm, as the steel plate's is
-  // (bible/04-Characters/Own-Heads.md). tools/bakeHeads.mjs re-makes every mesh and texture below from these sources and
+  // . tools/bakeHeads.mjs re-makes every mesh and texture below from these sources and
   // test/tooling/mwheads1.test.js holds it to the bytes. Rigid parts: no skeleton's numbers in them.
   ['src/assets/mw/source/Breton_Heads.fbx', "SUPPLIED - the owner's Blender export of the Breton men's three heads and hairs (daggerwind.fbx, 2026-10-13 - MW-HEADS1), committed as it came so the files below are a DERIVATION the gate can re-run; its objects are named for the Morrowind head they were modelled from, so the geometry's provenance is the owner's to confirm"],
   ['src/assets/mw/source/Breton_Head_H04.png', "SUPPLIED - the h04 face's painting as the owner sent it (the export's tx_b_n_breton_m_h04.png, matched to its material by what it is drawn for), committed as its DDS's source; a painting for a Morrowind head's UV layout, no ARENA2 pixel in it - whether it is wholly the owner's own work is the owner's to confirm"],
@@ -623,7 +623,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/textures/breton_m_hair_widow.dds', 'SUPPLIED - Breton_Hair_Widow.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
   ['src/assets/mw/textures/breton_m_hair_01.dds', 'SUPPLIED - Breton_Hair_01.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
   ['src/assets/mw/textures/breton_m_hair_0111.dds', 'SUPPLIED - Breton_Hair_0111.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
-  // MW-FOLK1 (2026-10-13): the townsfolk's outfits - each walker sprite's own outfit made for the Morrowind body (all four
+  // MW-FOLK1: the townsfolk's outfits - each walker sprite's own outfit made for the Morrowind body (all four
   // Redguard men's and all four Nord men's, the Bretons' 385 and 386, the hooded Redguard woman's 398), supplied by the
   // owner as one Blender export of nine objects (clothes.fbx) and fourteen paintings sent as nameless attachments, each
   // matched to the material the export names it on (two outfits wear another of them - bakeTownsfolk.mjs RECOLOURS).
@@ -631,7 +631,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // Morrowind's tx_b_n_generic_m_g00 - Bethesda's mesh: tools/fbxStrip.mjs cut them out before the export was
   // committed, every other record byte for byte (MW-STEEL1's law). The outfits were made on a Morrowind body - 385's
   // hose is that body's leg repainted - so whether every piece's geometry is the owner's own work is the owner's to
-  // confirm, as the heads' is (bible/04-Characters/Townsfolk-Outfits.md). tools/bakeTownsfolk.mjs re-makes every mesh
+  // confirm, as the heads' is. tools/bakeTownsfolk.mjs re-makes every mesh
   // and texture below from these sources and retail's skeleton, and test/tooling/mwfolk1.test.js holds it to the bytes.
   ['src/assets/mw/source/Townsfolk.fbx', "SUPPLIED - the owner's Blender export of the townsfolk's outfits (clothes.fbx, 2026-10-13 - MW-FOLK1), committed less the 61 polygons of Morrowind's own groin one object carried (tools/fbxStrip.mjs --cut=Breton_Male.018:6), so the files below are a DERIVATION the gate can re-run; made on a Morrowind body, its geometry's provenance is the owner's to confirm"],
   ['src/assets/mw/source/Townsfolk_Tunic_Bretonnpc.png', "SUPPLIED - the painting of 385's tunic, as the owner sent it (the export's bretonnpc/Material.019, matched to its material by what it is drawn for), committed as its DDS's source; a painting for the outfit's own UV layout, no ARENA2 pixel in it - whether it is wholly the owner's own work is the owner's to confirm"],
@@ -673,7 +673,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/mw/textures/townsfolk_robe_redguard3.dds', 'SUPPLIED - Townsfolk_Robe_Redguard3.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
   ['src/assets/mw/textures/townsfolk_robe_redguard4.dds', 'SUPPLIED - Townsfolk_Robe_Redguard4.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
   ['src/assets/mw/textures/townsfolk_dress_redguardwoman1.dds', 'SUPPLIED - Townsfolk_Dress_Redguardwoman1.png mip-chained to an uncompressed DDS by tools/meshTexture.mjs writeDds'],
-  // GALLEON (2026-10-01): the new galleon, Mac's own model of hull 2 (the
+  // GALLEON: the new galleon, Mac's own model of hull 2 (the
   // Small Ship), supplied as three Blender exports of one scene - the same
   // geometry, only their creation stamps differ, so one is committed. The
   // FBX is the source; tools/bakeGalleon.mjs re-makes galleon.json from it
@@ -683,7 +683,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // nothing but numbers - no ARENA2 pixel.
   ['src/assets/galleon/source/New_Ship.fbx', "SUPPLIED - Mac's Blender export of the new galleon (2026-10-01; his second, New_Ship_Even_EVEN_newer.fbx, over it 2026-10-02), committed so galleon.json is a DERIVATION the gate can re-run"],
   ['src/assets/galleon/galleon.json', 'SUPPLIED - New_Ship.fbx baked to the boat\'s frame by tools/bakeGalleon.mjs; geometry only, no ARENA2 or Come Sail Away data'],
-  // SHIPS-2 (2026-10-07, Mac: "implement both of these new ship placement models"): MAC'S CARRACK AND HIS TINY SHIP,
+  // SHIPS-2: MAC'S CARRACK AND HIS TINY SHIP,
   // supplied as three Blender exports - New_Ship_2.fbx, New_Ship_2_Shutter.fbx and Tiny_Ship.fbx, the newest holding
   // both ships and the shutter in their places, so it alone is committed. tools/bakeCarrack.mjs and
   // tools/bakeLargeBoat.mjs re-make their JSON from it (tools/shipBake.mjs), and test/tooling/ships2_bake.test.js holds both
@@ -691,13 +691,13 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/ships/source/Tiny_Ship.fbx', "SUPPLIED - Mac's Blender export of the new carrack and the new large boat in one scene (2026-10-07; the newest of the three he sent), committed so carrack.json and largeBoat.json are DERIVATIONS the gate can re-run"],
   ['src/assets/ships/carrack.json', 'SUPPLIED - Tiny_Ship.fbx\'s carrack baked to the boat\'s frame by tools/bakeCarrack.mjs; geometry only, no ARENA2 or Come Sail Away data'],
   ['src/assets/ships/largeBoat.json', 'SUPPLIED - Tiny_Ship.fbx\'s large boat baked to the boat\'s frame by tools/bakeLargeBoat.mjs; geometry only, no ARENA2 or Come Sail Away data'],
-  // GATE-FBX (2026-10-09, Mac: "replace the oblivion gate model with this handcrafted model which also needs texturing"):
+  // GATE-FBX:
   // MAC'S OBLIVION GATE, supplied as one Blender export of his whole "Oblivion Models" scene - the gate one object of
   // it, committed whole as the ships' scenes are. tools/bakeGate.mjs re-makes the JSON from it (tools/shipBake.mjs), and
   // test/tooling/gatefbx.test.js holds it to the bytes. Its pictures carry no file: world/gate/gateArt.js paints them at load.
   ['src/assets/gate/source/Oblivion_Gate.fbx', "SUPPLIED - Mac's Blender export of his Oblivion models' scene, the gate (Cube.1688) among them (2026-10-09), committed so oblivionGate.json is a DERIVATION the gate can re-run"],
   ['src/assets/gate/oblivionGate.json', 'SUPPLIED - Oblivion_Gate.fbx\'s gate baked to the gate\'s frame by tools/bakeGate.mjs; geometry only, no ARENA2 data'],
-  // WAGONS1 (2026-10-09, Mac: "Here are 3 new models that will need to be textured"): MAC'S THREE WAGONS, supplied as
+  // WAGONS1: MAC'S THREE WAGONS, supplied as
   // four saves of one Blender scene ("wagons.blend") - the newest committed whole, as the ships' scenes are.
   // tools/bakeWagons.mjs re-makes the three JSONs from it (tools/shipBake.mjs), and test/tooling/wagons1_bake.test.js holds them
   // to the bytes. Their pictures carry no file: world/wagonArt.js paints them at load.
@@ -705,7 +705,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/wagons/cart.json', "SUPPLIED - Wagon_Cart_Tiny_1.fbx's Wagon Cart baked to the wagon's frame by tools/bakeWagons.mjs; geometry only, no ARENA2 or Horse Cart and Cargo data"],
   ['src/assets/wagons/openWagon.json', "SUPPLIED - Wagon_Cart_Tiny_1.fbx's Open Wagon baked to the wagon's frame by tools/bakeWagons.mjs; geometry only, no ARENA2 or Horse Cart and Cargo data"],
   ['src/assets/wagons/caravan.json', "SUPPLIED - Wagon_Cart_Tiny_1.fbx's Caravan baked to the wagon's frame by tools/bakeWagons.mjs; geometry only, no ARENA2 or Horse Cart and Cargo data"],
-  // MEADOW1 (2026-10-06, Mac: "These are 4 textures I want to blend into our grass system", then a bush): THE
+  // MEADOW1: THE
   // MEADOW'S FIVE SPRITES, supplied by Mac as indexed PNGs and committed as he supplied them. Nothing ships them:
   // tools/bakeMeadow.mjs bakes them into render/meadowArt.js, and test/render/grassmeadow.test.js holds that module to
   // them texel for texel. Their colours are not looked up in any palette at runtime - the sprites carry their own.
@@ -715,12 +715,12 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/grass/source/flowers.png', "SUPPLIED - Mac's flower tuft for the meadow grass (MEADOW1, 2026-10-06), 32x32 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],
   ['src/assets/grass/source/tuft-dry.png', "SUPPLIED - Mac's dry grass tuft for the meadow grass (MEADOW1, 2026-10-06), 32x32 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],
   ['src/assets/grass/source/bush.png', "SUPPLIED - Mac's bush for the meadow grass (MEADOW1, 2026-10-06), 64x64 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],
-  // BANTHA1 (2026-10-18, the owner: "Using the attached file, populate the area in a dense jungle like format"): THE
+  // BANTHA1: THE
   // JUNGLE'S FIVE TREES, supplied as jungle_trees.zip - each a Blender 5.2 OBJ, its MTL and its one 252x164 picture -
   // committed as the owner handed them over, byte for byte. They ship as they are: systems/jungleTreesAssets.js fetches
   // them and world/jungle/jungleModels.js reads them at run time (no bake), and test/world/bantha1_jungle.test.js reads
   // the same bytes. The owner's own art for their biome - the pictures included, recorded 2026-10-18 at the audit's
-  // opening (the owner: "These textures are ours"; bible/03-World/Bantha-Jungle.md): no pixel of them is ARENA2's.
+  // opening (): no pixel of them is ARENA2's.
   ['src/assets/jungle/source/jungle_tree.obj', "SUPPLIED - the owner's banyan for the Jungle of Bantha (BANTHA1, 2026-10-18), the owner's Blender 5.2 OBJ export as handed over - geometry only, read at run time by world/jungle/jungleModels.js"],
   ['src/assets/jungle/source/jungle_tree.mtl', "SUPPLIED - the owner's banyan's material (BANTHA1, 2026-10-18), as handed over - it names the picture its tree is cut from"],
   ['src/assets/jungle/source/jungle_tree_252w.png', "SUPPLIED - the owner's banyan picture for the Jungle of Bantha (BANTHA1, 2026-10-18), 252x164 RGBA cut by its alpha, the owner's own PNG bytes as handed over - the owner's art (the owner, 2026-10-18: \"These textures are ours\" - no ARENA2 pixel)"],
@@ -736,8 +736,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/jungle/source/jungle_tree5.obj', "SUPPLIED - the owner's mahogany for the Jungle of Bantha (BANTHA1, 2026-10-18), the owner's Blender 5.2 OBJ export as handed over - geometry only, read at run time by world/jungle/jungleModels.js"],
   ['src/assets/jungle/source/jungle_tree5.mtl', "SUPPLIED - the owner's mahogany's material (BANTHA1, 2026-10-18), as handed over - it names the picture its tree is cut from"],
   ['src/assets/jungle/source/jungle_tree5_252w.png', "SUPPLIED - the owner's mahogany picture for the Jungle of Bantha (BANTHA1, 2026-10-18), 252x164 RGBA cut by its alpha, the owner's own PNG bytes as handed over - the owner's art (the owner, 2026-10-18: \"These textures are ours\" - no ARENA2 pixel)"],
-  // JUNGLE-ROADSIDE (2026-10-23, the owner, through Mac: "These trees are meant for the jungle biome and roadside. Making
-  // it more like a jungle with the vines stringing across the roads"): THE ROADSIDE PAIRS, three Blender 5.2 OBJs and
+  // JUNGLE-ROADSIDE: THE ROADSIDE PAIRS, three Blender 5.2 OBJs and
   // their MTLs committed as handed over, byte for byte (their own names - Blender's file was pine.blend). Each is two of
   // the trees above and lianas between them, and wears only the pictures above - no picture of their own. They ship as
   // they are: systems/jungleTreesAssets.js fetches them and world/jungle/jungleRoadside.js reads them at run time (no
@@ -748,7 +747,7 @@ const PUBLIC_ALLOWLIST = new Map([
   ['src/assets/jungle/source/pine-1.mtl', "SUPPLIED - the fig pair's materials (JUNGLE-ROADSIDE, 2026-10-23), as handed over - they name the fig's and the mahogany's pictures above"],
   ['src/assets/jungle/source/pine2.obj', "SUPPLIED - the owner's roadside pair for the Jungle of Bantha (JUNGLE-ROADSIDE, 2026-10-23): the mahogany and a kapok sunk 2 m into its ground, lianas strung between them - the owner's Blender 5.2 OBJ export as handed over, geometry only, read at run time by world/jungle/jungleRoadside.js"],
   ['src/assets/jungle/source/pine2.mtl', "SUPPLIED - the sunk pair's materials (JUNGLE-ROADSIDE, 2026-10-23), as handed over - they name the kapok's, the fig's and the mahogany's pictures above"],
-  // COATS3D (2026-10-11, the owner: "The first image is for the horse itself and the second is for the tail"): THE
+  // COATS3D: THE
   // COURSER, a rigged horse supplied as five saves of one Blender rig and two pictures painted for its own UV layout -
   // the newest whole save committed, as the ships' and the wagons' scenes are. tools/bakeHorse.mjs re-makes
   // courser.json from it, and test/formats/morrowind/coats3d_horse3d.test.js holds it to the bytes. The pictures ship as supplied: the
@@ -831,7 +830,7 @@ const LAYERED_DERIVED = "Port-Doctrine's third exception (the owner, 2026-10-19)
 /** DEX0: the fourth exception's mark (the third on its branch, renumbered past LAYERED-GEAR's at the merge) - Daggerfall's own enemy and class sprites under the authors' paint, its own approval. */
 const DEX_DERIVED = "Port-Doctrine's fourth exception (Mac, 2026-10-19): Daggerfall's own enemy and enemy-class sprites, repainted by the mods' authors, carried on Mac's approval";
 const BUNDLE_ART = new Map([
-  // FORAGE1 (2026-09-28): Foraging's seven pictures - the author's own
+  // FORAGE1: Foraging's seven pictures - the author's own
   // pixel art (tools, a wood bundle, an egg), no Daggerfall record - taken
   // out of the bundle's Texture2D objects. A directory row: membership is
   // derived from the shipped manifest's Files, so it cannot widen.
@@ -854,7 +853,7 @@ const BUNDLE_ART = new Map([
   ['vendor/travel-options/Textures/',
     { manifest: 'vendor/travel-options/travel-options.dfmod.json',
       why: "THIRD-PARTY - Travel Options 1.11 (Hazelnut, MIT); the mod's own UI chrome - the 320x27 control strip and the two ports-filter buttons - re-encoded from the bundle's Texture2D objects by tools/travelOptionsAssets.mjs (see the vendor README: these are the PIXELS, not the author's file bytes)" }],
-  // SW1b (2026-09-19, the deep audit): the 600 shield sprites landed and
+  // SW1b: the 600 shield sprites landed and
   // this row did not, so the wider raster rule reddened on 600 files the
   // moment they were tracked. The art itself is fine and is WHY they are
   // vendored at all rather than read from the player's own .dfmod the way
@@ -865,8 +864,7 @@ const BUNDLE_ART = new Map([
   ['vendor/shield-widget/Textures/',
     { manifest: 'vendor/shield-widget/shield-widget.dfmod.json',
       why: "THIRD-PARTY - Shield Widget 1.6 (RedRoryOTheGlen, animation art by WilhelmBlack); the mod's own first-person shield sprites - four shield shapes x twelve materials x three condition tiers x five animation frames - re-encoded from the bundle's Texture2D objects as indexed PNG (lossless for every drawn pixel; see the vendor README)" }],
-  // DW2 (2026-09-23, Mac: "this needs to be in the codebase, not an
-  // attachable file"): the 12,624 Diverse Weapons sprites. Under public/
+  // DW2: the 12,624 Diverse Weapons sprites. Under public/
   // rather than vendor/ because that many files through the bundler's
   // `new URL` glob is a 12,624-entry map in a chunk - public/ is served
   // as it is - so the public sweep below accepts a derived row too. The
@@ -881,14 +879,14 @@ const BUNDLE_ART = new Map([
   ['public/art/roleplay-realism/',
     { manifest: 'vendor/roleplay-realism/roleplay-realism.dfmod.json',
       why: "THIRD-PARTY - Roleplay & Realism 1.8 (Hazelnut); the mod's own seven variant shop and tavern keeper sprites (197_0-0 .. 197_6-0, the XML scale beside each under vendor/) and its seventeen BUTTONS.RCI records 21-37 (the training window's '5 Days' and the rest of its index) - the PNGs the mod ships in its Textures/ folder, byte for byte (see the vendor README)" }],
-  // OVH2 (2026-09-24, Mac: "Our first overhaul option will be the file attached"): GrimoireUI's 139 pictures - the
+  // OVH2: GrimoireUI's 139 pictures - the
   // mod's own hand-drawn UI (parchment, wood and new lettering over Daggerfall's screen layouts), vendored byte for
   // byte the way Roleplay & Realism's BUTTONS.RCI repaints are. A LOOSE-FILE pack ships no .dfmod, so its authority is
   // the archive's own listing, generated from the zip (sha256 recorded beside it) - the same both-ways derivation.
   ['public/art/grimoire-ui/',
     { manifest: 'vendor/grimoire-ui/grimoire-ui.files.json',
       why: "THIRD-PARTY - GrimoireUI 1.2 (LordSquacquerone, Nexus Daggerfall Unity mod 1222); the pack's own StreamingAssets pictures - 93 redrawn IMG screens, BUTTONS.RCI 0-37 and the save window's eight panel and button textures - byte for byte from the archive Mac supplied (see vendor/grimoire-ui/README.md)" }],
-  // HUD-ICON1 (2026-09-24): Daggerfall Unity's OWN interaction-mode icons - DFU-authored art out of Unity's
+  // HUD-ICON1: Daggerfall Unity's OWN interaction-mode icons - DFU-authored art out of Unity's
   // Resources folder (Assets/Resources/Icons), MIT like the C# the port translates, never ARENA2 data. The listing
   // is generated from the pinned commit, not written by hand.
   ['public/art/dfu-icons/',
@@ -899,14 +897,14 @@ const BUNDLE_ART = new Map([
   ['public/art/dfu-cursor/',
     { manifest: 'vendor/dfu-cursor/dfu-cursor.files.json',
       why: "THIRD-PARTY - Daggerfall Unity (Daggerfall Workshop, MIT); the defaultCursor ProjectSettings names, Assets/Resources/Cursor2.png, byte for byte at the commit the listing pins (see vendor/dfu-cursor/README.md)" }],
-  // SKIN2 (2026-09-25, Mac: "Implement these as new skin options"): Mac's ExistingClasses archive, twenty redrawn
+  // SKIN2: Mac's ExistingClasses archive, twenty redrawn
   // enemy-class sheets worn as on-foot skins. A LOOSE-FILE pack (no .dfmod), so GrimoireUI's way: the listing
   // generated from the archive is the authority - and these names were changed on the way in (three port archive
   // numbers, a gap renumbered, a stray underscore), so the listing maps each file to its archive path and
   // tools/classSkinsListing.mjs proves the bytes. The first cut of this slice ran the suite BEFORE `git add` and
   // shipped without this row - AUDIT-TO1 F3's trap again; the art is not ARENA2's (redrawn at twice the size, under
   // archive numbers past TEXTURE.511 that the mods' art uses).
-  // DEX0 (2026-10-19, Mac: "Bring under 3rd exception"): the row above said these were redrawn at twice the size and not
+  // DEX0: the row above said these were redrawn at twice the size and not
   // ARENA2's. Measured silhouette for silhouette against every TEXTURE record (the way tools/dexExtract.mjs measures the
   // enemy mod's), most of them are Daggerfall's own enemy-class sprites (TEXTURE.477-490) at their own size, under the
   // artists' paint - the bounty hunter (1504) is the very sheet Daggerfall Enemy Expansion ships. So the row says what
@@ -917,7 +915,7 @@ const BUNDLE_ART = new Map([
   ['public/art/diverse-weapons/',
     { manifest: 'vendor/diverse-weapons/diverse-weapons.dfmod.json',
       why: "THIRD-PARTY - Diverse Weapons 1.7.3 (RealAKP); the mod's own first-person weapon sprites - eighteen weapons x ten metals, plain and enchanted, every record and frame, Weapon Widget's double-scale idles and the icons - re-encoded from the bundle's Texture2D objects by tools/diverseWeaponsExtract.mjs as indexed PNG where the picture fits one (lossless for every drawn pixel; see the vendor README)" }],
-  // CSA-A (2026-09-27): Come Sail Away's pictures - AUDIT-TO1 F3's trap a third time: the slice ran its suite BEFORE
+  // CSA-A: Come Sail Away's pictures - AUDIT-TO1 F3's trap a third time: the slice ran its suite BEFORE
   // `git add`, pushed, and the next gate reddened on 27 files. The bundle's own manifest cannot be the authority here,
   // because the port carries LESS than it names and under other names for part: record 3 is Daggerfall's travel map
   // (never carried), the 32 wave frames are Daggerfall's snow under the author's paint and ride as two paints with
@@ -931,7 +929,7 @@ const BUNDLE_ART = new Map([
   ['vendor/iliac-puddle-no-more/Flats/',
     { manifest: 'vendor/iliac-puddle-no-more/iliac-puddle-no-more.dfmod.json',
       why: "THIRD-PARTY - Iliac Puddle No More 1.2.2 (jet082); the mod's own seven fish, decoded from the bundle's Texture2D objects (DXT5, the first mip - the pixels the game samples) by tools/iliacPuddleAssets.mjs (see the vendor README)" }],
-  // VE4 (2026-10-05, Mac: "Approved and yes", then "Put it in the codebase"): VANILLA ENHANCED - THE ONE DERIVED PACK.
+  // VE4: VANILLA ENHANCED - THE ONE DERIVED PACK.
   // Every row above carries a modder's OWN art, and several say so against this very rule. These carry Daggerfall's
   // textures repainted, which A RENDER OF GAME DATA IS GAME DATA forbids - and which Mac approved: Port-Doctrine records
   // the exception and names its directory. So each row says it is derived, and the pins below hold the mark to the
@@ -947,8 +945,7 @@ const BUNDLE_ART = new Map([
   ['public/art/vanilla-enhanced/snowless-swamps-and-jungles/',
     { manifest: 'vendor/vanilla-enhanced/snowless-swamps-and-jungles.files.json', derived: VE4_DERIVED,
       why: "THIRD-PARTY - Vanilla Enhanced - Snowless Swamps and Jungles 3.4.7 (carademono), carried on Mac's word of the author's permission; the swamps' and jungles' ground and buildings without snow - the 160 PNGs its manifest names, byte for byte (see vendor/vanilla-enhanced/README.md)" }],
-  // ALIKR1 / SNOWFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These
-  // should be on by default and integrate into our enhanced environments seamlessly"): THE SECOND EXCEPTION - two more
+  // ALIKR1 / SNOWFALL1: THE SECOND EXCEPTION - two more
   // packs of Daggerfall's ground repainted, each directory answering to the listing tools/environmentModsExtract.mjs
   // writes from the archive (every file and its sha256), each row carrying the second exception's own mark.
   ['public/art/sands-of-the-alikr/',
@@ -957,13 +954,13 @@ const BUNDLE_ART = new Map([
   ['public/art/snowfall/',
     { manifest: 'vendor/snowfall/snowfall.files.json', derived: ENVIRONS_DERIVED,
       why: "THIRD-PARTY - Snowfall 1.0.5 (demifiend000), carried on Mac's word of the author's permission; the 168 winter ground records its bundle packages (TEXTURE.103, .303, .403 - Daggerfall's winter tiles under the author's snow), its snow albedo and its three surface masks, decoded losslessly from the bundle's Texture2D and TextAsset objects (see vendor/snowfall/README.md)" }],
-  // LAYERED-GEAR (2026-10-19, the owner: "Approve as an exception"): THE THIRD EXCEPTION - the worn-armor strips, the
+  // LAYERED-GEAR: THE THIRD EXCEPTION - the worn-armor strips, the
   // cloak layer and the hood fixes, DFO's own work but drawn from Daggerfall's sprites, so derived. No bundle ships a
   // manifest for them: the folder answers to the listing tools/layered-armor/listing.mjs writes (every picture, its sha256).
   ['vendor/layered-armor/',
     { manifest: 'vendor/layered-armor/layered-armor.files.json', derived: LAYERED_DERIVED,
       why: "OURS - Layered Gearing (DFO, made for the game), carried under the owner's third exception; the worn-armor strips of both bodies, the cloak layer and the hood fixes, drawn from Daggerfall's class sprites 1540/1541 and the enemy frames of TEXTURE.475-490 - the 7,369 PNGs its listing names (see vendor/layered-armor/README.md)" }],
-  // DEX0 (2026-10-19, Mac: "I want to implement this as our next mod 1:1"): DAGGERFALL ENEMY EXPANSION's pictures, in two
+  // DEX0: DAGGERFALL ENEMY EXPANSION's pictures, in two
   // directories by what they are, each answering to the listing tools/dexExtract.mjs writes (every name and its sha256)
   // after measuring every picture against every TEXTURE record: the authors' own renders, and the repaints the fourth
   // exception carries. The 858 that ARE Daggerfall's records are in neither - the player's own files rebuild them.
@@ -992,7 +989,7 @@ const bundleNames = (dir) => {
 };
 // ── STUDIO1: THE GAME'S OWN ARTISTS' PICTURES ANSWER TO THE STUDIO'S ROSTER ──
 //
-// public/art/studio/ (bible/07-Rendering/Studio-Art.md) is where the game's artists paint. It is no vendored bundle - no
+// public/art/studio/ is where the game's artists paint. It is no vendored bundle - no
 // manifest names its pictures, and it grows as they paint, with nobody keeping a list (that is its point) - so its
 // membership is the studio's own rule, the one the build serves by (scripts/studioArtIndex.mjs studioListing): a PNG
 // under the folder of an artist the roster (artists.json) names, named for what it replaces, within the studio's limits.

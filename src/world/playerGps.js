@@ -1,4 +1,4 @@
-// DEX3 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 7) - PLAYERGPS'S EVENTS, for a module that listens
+// DEX3 - PLAYERGPS'S EVENTS, for a module that listens
 // to them as a mod's handler does (Daggerfall Enemy Expansion picks its climate tables on them, BestiaryMod.cs:1784-1871).
 // PlayerGPS.Update raises OnClimateIndexChanged (RaiseEvents, PlayerGPS.cs:561-576), then OnEnterLocationRect or
 // OnExitLocationRect (PlayerLocationRectCheck, :669-716), each on an edge of the player's own reading. The port's

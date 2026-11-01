@@ -1,5 +1,4 @@
-// RVN11b - DESERTION (bible/12-Enhanced-AI/Feud-Arc.md section 22.2, OPEN 18; Mac, 2026-10-04: "more complex, less
-// easy to accomplish and more detailed", then "Go"). A sworn one under 20 loyalty, once a day, one time in 0.15, leaves:
+// RVN11b - DESERTION (OPEN 18;, then "Go"). A sworn one under 20 loyalty, once a day, one time in 0.15, leaves:
 // no longer sworn - a living revenant again, its rank kept, the `deserted` deed, "the Oathbreaker" - due in one to three
 // days; it keeps the more valuable half of its pack (on its record, as a theft is kept), the rest and its gold come back.
 // Pinned: the numbers and the split; the day's roll (after its loyalty's move; never at 20, never on the first count,
@@ -95,7 +94,6 @@ test('RVN11b THE DESERTER: no longer sworn - a living revenant, its rank kept, "
   assert.equal(x.epithet, 'the Oathbreaker');
   assert.equal(x.name, `${x.given} the Oathbreaker`);
   assert.deepEqual(x.history.at(-1), { deed: 'deserted', at: DAY * 11 });
-  // PIN MOVED (UNQUIET, Revenants.md section 46): due by its ambition's days - vengeance one to two, any other two to four
   assert.equal(ambitionOf(x.personality), 'vengeance');
   const [lo, hi] = AMBITION.VENGEANCE_DUE;
   assert.ok(x.dueAt >= DAY * 11 + lo && x.dueAt <= DAY * 11 + hi);

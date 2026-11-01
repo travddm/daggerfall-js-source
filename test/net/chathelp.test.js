@@ -1,5 +1,4 @@
-// CHAT-HELP (2026-09-23, Mac: "a non-intrusive greeting message that says something along the lines of (use /help
-// for commands)"). The chat has had /help since CHAT-CHAN, and nothing pointed a player at it. Each time the player
+// CHAT-HELP. The chat has had /help since CHAT-CHAN, and nothing pointed a player at it. Each time the player
 // goes online the chat greets them with one line that is theirs alone and is never counted unread - it is there when
 // they open the chat, and no badge asks them to.
 import { test } from 'node:test';

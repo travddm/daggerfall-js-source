@@ -1,4 +1,4 @@
-// WB14a (2026-10-19, Mac: "More diabolical boss movesets", then "This is all yours to take on"): THE WARDEN'S NEW
+// WB14a: THE WARDEN'S NEW
 // ARSENAL - six attacks more he chooses, each with a cooldown of its own: Chains of the Warden, Dagon's Brand, Shared
 // Torment, the Scything Wheel, the Burning Gaze and the Unmaking.
 //
@@ -14,7 +14,7 @@
 //   the screen           scenes/gate/gateArsenal.js - the marked blows and the Gaze judged on my feet and my camera, the
 //                        order under the crosshair (ui/gate/gateGroundView.js), the Gaze's white
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md sections 3, 6 and 10.
+// Design: 6 and 10.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -58,7 +58,7 @@ const word = (A, over = {}) => ({ i: 7, a: A.id, at: T0, x: 0, z: 0, yw: 0, tg: 
 
 test('WB14a the arsenal: six attacks more, ids 11 to 16, each a cooldown of its own (none of the eleven before has one) - the Brand asks a court of two, the Torment (AUDIT WB14 PLAY-3) three; the Chains and the Gaze are the struck screen\'s alone (mutants: an id moved; a cooldown dropped; the Gaze counted by the relay; the Torment between two)', () => {
   assert.deepEqual(NEW.map((k) => ATTACKS[k].id), [11, 12, 13, 14, 15, 16]);
-  assert.deepEqual(ATTACK_BY_ID.map((a) => a.id), [...Array(19).keys()]);   // PIN MOVED (WB14d): and the Sundering and the Rejoining, 17 and 18
+  assert.deepEqual(ATTACK_BY_ID.map((a) => a.id), [...Array(19).keys()]);
   assert.deepEqual(NEW.map((k) => ATTACKS[k].cd), [22_000, 28_000, 28_000, 30_000, 35_000, 45_000]);
   for (const A of ATTACK_BY_ID) if (!NEW.includes(A.key)) assert.equal(A.cd, undefined, `${A.key} keeps none`);
   assert.deepEqual(NEW.map((k) => ATTACKS[k].nMin ?? 1), [1, 2, 3, 1, 1, 1]);   // AUDIT WB14 (PLAY-3): the Torment three - between two it was half a fighter's health each

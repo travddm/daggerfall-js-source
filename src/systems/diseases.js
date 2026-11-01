@@ -172,7 +172,7 @@ export function startDisease(target, diseaseType, currentDay, rolls = Math.rando
  *  is money and not decoration. */
 export const diseaseCount = (entity) =>
   (entity?.activeEffects ?? []).filter((a) => a.kind === 'disease' && !a.ended).length;
-/** DISEASE-UNWELL (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Unnamed 'Unwell' tile"): a PLAIN disease still in
+/** DISEASE-UNWELL (FIELD BUGS 2026-10-19f): a PLAIN disease still in
  *  its incubation - caught, live, a classic type, its first symptom day (the day's turn on the character's own clock,
  *  updateDiseases) not come. DFU says nothing of one (CreateHealthStatusBox reads IncubationOver; no disease shows a HUD
  *  icon, ShowSpellIcon false) while its travel popup counts it; the port's HUD shows it unnamed - "Unwell" - and the

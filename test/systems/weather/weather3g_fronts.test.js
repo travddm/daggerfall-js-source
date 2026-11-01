@@ -1,5 +1,4 @@
-// WEATHER3 slice G (2026-09-23, Mac on the first real render of the
-// travel map: "this needs more clarity"): FRONTS, NOT A RASH. The bay was
+// WEATHER3 slice G: FRONTS, NOT A RASH. The bay was
 // ~1,900 systems, two-thirds of them thunderstorms a few map pixels
 // across, in pigments that all came out one grey-blue. Now a rain system
 // is a FRONT tens of kilometres across and a thunderstorm is a CELL of a

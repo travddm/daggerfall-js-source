@@ -1,7 +1,5 @@
-// HM1 - THE HELM'S BLACK BOX (2026-09-12).
+// HM1 - THE HELM'S BLACK BOX.
 //
-// Mac: "some armor (mostly helmets) have a black background (paperdoll
-// not morrowind)."
 //
 // Index 0xFF is Daggerfall's MASK: the halo around a helm that erases
 // the hair. ItemHelper.cs GetInventoryImage -> GetItemImage(item,

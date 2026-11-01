@@ -1,6 +1,5 @@
-// ROAD-LOOK (2026-10-27, KPbICA on the DFO Online Discord, forwarded by the owner: "1) Texture blending for road tiles and
-// surroundings", "4) No bridges across the big rivers (like this one that starts around IC and goes south)"; the owner:
-// "No band aids or half assed work"; bible/03-World/Roads.md ROAD-LOOK).
+// ROAD-LOOK No bridges across the big rivers (like this one that starts around IC and goes south)"; the owner:
+// "No band aids or half assed work"; ROAD-LOOK).
 //  - A ROAD'S EDGE BLENDS INTO ITS GROUND (world/road/roadEdge.js, its GLSL twin render/roadEdgeGlsl.js): the share of road
 //    the bilinear of the four nearest cells, wandered and drawn across a soft rim; the other kind's picture the nearest
 //    cell's, mirrored about its own square - continuous across every seam between a road and the ground, never a larger

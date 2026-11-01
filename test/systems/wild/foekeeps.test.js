@@ -1,6 +1,4 @@
-// FOE-KEEPS (2026-10-24, bible/11-Multiplayer/Wild-Zone.md section 4 - the owner: "I feel like the eltheric sea can be too
-// punishing. I dont want people to lose everything they have. Espcially the fact you can lose your spellbook?
-// Ridiculous"; asked, "Only PvP deaths drop", "The usual tenth", "Both zones"). A death in the open zone - the Wrothgarian
+// FOE-KEEPS. A death in the open zone - the Wrothgarian
 // Mountains and the Eltheric Ocean alike - drops what it carries only at another player's hand. A death to a foe (a
 // monster, a ship, the sea) drops nothing and pays the usual death's tenth of the purse at the rise; the account service
 // refuses its fall (test/net/int9_wild_ref.test.js FOE-KEEPS THE SERVICE). A kill drops a tenth of the purse, the usual
@@ -33,7 +31,6 @@ test('FOE-KEEPS THE SHARE (wildDropLaw.js WILD_GOLD_LOSS, takeWildGold): a kill 
   assert.equal(WILD_GOLD_LOSS, 1 / WILD_GOLD_DIVISOR, 'the share and its divisor one number');
   const e = { goldPieces: 1009, items: [], wagonItems: [coin(455)] };
   const pile = takeWildGold(e);
-  // PIN MOVED (STORE-KEEPS, 2026-10-26): the purse's tenth alone - the cart's coin and a companion's are storage
   assert.equal(pile.stackCount, 100, 'one pile: the purse\'s tenth, floored');
   assert.equal(1009 - e.goldPieces, deathGoldLoss(1009), 'the purse pays what any death pays');
   assert.deepEqual([e.goldPieces, e.wagonItems[0].stackCount], [909, 455], 'nine tenths and the odd coins stay, and the cart\'s whole');
@@ -56,10 +53,9 @@ test('AUDIT FOE-KEEPS P4 THE WORDS READ WHEN SAID: the mountains\' entry and chi
   tm.patchLocaleTable('de', 'Port_Strings', tm.loadStringTableCsv(rd('locales/de/Port_Strings.csv')));
   try {
     tm.setLocale('de');
-    // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the zone Cyrodiil (WW-C2), named bare in every language
     assert.equal(WILD_TEXT.enter, 'Du betrittst Cyrodiil, eine offene PvP-Zone. Gegner sind hier viermal so stark. Tötet dich ein anderer Spieler, lässt du fallen, was du trägst.');
     assert.match(WILD_TEXT.chipTip, /^Cyrodiil: Andere Spieler dürfen dich angreifen\..*Tötet dich ein anderer Spieler, lässt du fallen, was du trägst\.$/);
-    assert.equal(WILD_TEXT.deathKept(), 'Nichts fällt zu Boden. Was du trägst, fällt nur, wenn dich ein Spieler tötet.');   // PIN MOVED (AUDIT FOE-KEEPS O1)
+    assert.equal(WILD_TEXT.deathKept(), 'Nichts fällt zu Boden. Was du trägst, fällt nur, wenn dich ein Spieler tötet.');
   } finally { tm.setLocale(tm.BASE_LOCALE); }
   assert.match(WILD_TEXT.enter, /^You enter Cyrodiil/, 'English again');
 });
@@ -70,10 +66,10 @@ test('FOE-KEEPS THE WORDS (wildZone.js WILD_TEXT, etherWild.js ETHER_WILD_TEXT, 
     assert.match(w, kill, name);
     assert.doesNotMatch(w, /can lose what you carry|If you die, you drop/, `${name}: never any death`);
   }
-  assert.match(WILD_TEXT.enter, /^You enter Cyrodiil, an open PvP zone\./);   // PIN MOVED (WORLD-WIDE folded into TESA, #1184)
+  assert.match(WILD_TEXT.enter, /^You enter Cyrodiil, an open PvP zone\./);
   assert.ok(ZONE_RULES.some((l) => l.startsWith('If another player kills you, what you carry drops')), 'the zone map\'s legend');
   setWildDeath({ killer: null, dropped: 0 });
-  assert.deepEqual(wildDeathLines(), ['Nothing dropped. Only another player\'s kill drops what you carry.', WILD_TEXT.deathHold], 'a foe\'s death: kept');   // PIN MOVED (AUDIT FOE-KEEPS O1, H5): "You keep what you carry" stood over the tenth the death claims
+  assert.deepEqual(wildDeathLines(), ['Nothing dropped. Only another player\'s kill drops what you carry.', WILD_TEXT.deathHold], 'a foe\'s death: kept');
   setWildDeath({ killer: 'Borin', dropped: 3 });
   assert.deepEqual(wildDeathLines(), [WILD_TEXT.deathPvp('Borin'), WILD_TEXT.deathDrop(3), WILD_TEXT.deathHold], 'a kill: no kept line');
   setWildDeath(null);

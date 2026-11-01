@@ -1,4 +1,4 @@
-// STAR3 (bible/11-Multiplayer/Starfall.md sections 5, 6 and 9): THE RELAY HOLDS THE STAR - a word at a fallen star, its
+// STAR3 (6 and 9): THE RELAY HOLDS THE STAR - a word at a fallen star, its
 // cell's ledger, the waves moved by the owner's word alone, the hold said once with its earners' receipts, the hub's
 // half (everyone told, the night's held stars and each account's receipts kept for a hello), dawn, the cell's places, a
 // hibernation's wake, and the session's doors. Driven through the real Room (test/fakeRoom.mjs) and the real session.
@@ -120,7 +120,7 @@ test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its dea
   assert.equal(validStarOut({ k: 'hd', n: N, s: K, px: PX, py: PY, at: 5, top: ['Ann', 'Bran'], c: 1 }).c, 2, 'never fewer than it names');
   assert.equal(validStarOut({ k: 'hd', n: N, s: K, px: PX, py: PY, at: 0, top: [], c: 0 }), null, 'a hold has its moment');
   assert.deepEqual(validStarOut({ k: 'hds', l: [[N, K, PX, PY, 9], [N, 3, PX, PY, 9], 'x', [N, 1, PX, PY, 0]] }), { k: 'hds', l: [[N, K, PX, PY, 9]] });
-  assert.equal(validStarOut({ k: 'hds', l: Array.from({ length: STAR_HELD_MAX + 8 }, () => [N, K, PX, PY, 9]) }).l.length, STAR_HELD_MAX);   // PIN MOVED (WW5): the bound is every lane's nights (60), so the list that overruns it is longer
+  assert.equal(validStarOut({ k: 'hds', l: Array.from({ length: STAR_HELD_MAX + 8 }, () => [N, K, PX, PY, 9]) }).l.length, STAR_HELD_MAX);
   assert.equal(validStarOut({ k: 'rc', r: 'w1.abc.def' }), null, 'another shape\'s receipt');
   assert.equal(validStarOut({ k: 'rc', r: `j1.${'a'.repeat(STAR_RECEIPT_WIRE_MAX)}.` }), null, 'bounded');
   assert.deepEqual(validStarOut({ k: 'rc', r: 'j1.abc.' }), { k: 'rc', r: 'j1.abc.' }, 'unsigned is a real answer');

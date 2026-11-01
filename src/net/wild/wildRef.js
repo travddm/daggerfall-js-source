@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE OPEN ZONE REFEREED.
+// INT9: THE OPEN ZONE REFEREED.
 //
 // WILD1 left a blow between two players in the zone to the defender's own machine and a fall to the fallen's own health
 // - so a client that never took a blow never fell, and one that fell handed over what it chose. Now the relay that
@@ -12,7 +11,7 @@
 //     stands in it, and leaves it (`zone`). A blow lands only where BOTH fighters said so - a crafted client can opt out
 //     of the zone's fights, never into another's: an honest player outside the zone is nobody's target. And never on KIN
 //     (wildKin, below): a party member or one under the party's truce (the hub's word), the fighter's own duel opponent
-//     (the duel's referee holds that one), or - Mac's decision, 2026-10-14: "Guildmates are friends" - one of its guild.
+//     (the duel's referee holds that one), or - one of its guild.
 //   - THE VITALITY is the Royal Tourney's (300 + 2 x the Renown the token signs) - the zone's fights are the referee's
 //     bar, as a siege's and a duel's are; the save's health is the foes' alone. A fighter no player has struck for
 //     WILD_REF.mendMs is whole again.
@@ -26,8 +25,7 @@
 //     systems/wild/wildDropLaw.js wornOffer); then the relay signs the fall (net/wild/wildReceipt.js `f1`) and hands it to both, and
 //     the account service takes the drop and that piece off the fallen's judged record against it.
 //
-//   - SAFE PASSAGE (ZONE-GRACE, 2026-10-26 - the owner: "making the experience more palatable while retaining its
-//     punishment"; asked, "Entry/rise grace"): for WILD_GRACE.ms after a fighter enters the zone or rises from its fall,
+//   - SAFE PASSAGE (ZONE-GRACE, 2026-10-26; asked, "Entry/rise grace"): for WILD_GRACE.ms after a fighter enters the zone or rises from its fall,
 //     no player's blow or cast lands on it, and its own blow or cast on a player ends it at once. An entry grants it only
 //     to one that has been away from the zone WILD_GRACE.awayMs and in no fight for WILD_GRACE.fightMs - so a step out
 //     and back is no way out of a fight, and a cell crossed inside the zone (a new room's fighter, its carry fresh) is no
@@ -49,17 +47,17 @@ import { SIEGE_HIT, newFighter, refereeBlow, refereeCast, refereeStep } from '..
  *  referee did not see (systems/wild/wildZone.js WILD_KILL_CREDIT_MS, pinned equal - "the player who brought you down"). */
 export const WILD_REF = Object.freeze({ mendMs: 30_000, pickMs: 60_000, truceMs: 10 * 60_000, riseMs: 120_000, jumpMs: 2_000, fightersMax: 200, fallsMax: 64, creditMs: 10_000 });
 
-/** ZONE-GRACE (2026-10-26, the owner chose "Entry/rise grace"): safe passage's length (the owner's sixty seconds), and what
+/** ZONE-GRACE: safe passage's length (the owner's sixty seconds), and what
  *  an entry asks first - away from the zone this long, and no blow landed by or on the fighter this long. */
 export const WILD_GRACE = Object.freeze({ ms: 60_000, awayMs: 30_000, fightMs: 60_000 });
 
-/** MAC'S DECISION (2026-10-14, "Guildmates are friends"): ONE GUILD - two guilds' marks, each present and the same. A
+/** MAC'S DECISION: ONE GUILD - two guilds' marks, each present and the same. A
  *  mark is the relay's verified guild id (the token's `gi`) or a client's guild tag (`gt` - a tag is one guild's alone,
  *  UNIQUE in the service's `guilds`), never one of each. */
 export const sameGuild = (/** @type {unknown} */ a, /** @type {unknown} */ b) => typeof a === 'string' && a.length > 0 && a === b;
 
 /**
- * MAC'S DECISION (2026-10-14): WHO IS KIN IN THE ZONE - never a fair foe, struck by nobody: one of my party or under its
+ * MAC'S DECISION: WHO IS KIN IN THE ZONE - never a fair foe, struck by nobody: one of my party or under its
  * truce (`party` - the hub's word at the relay, the social picture and the truce book on a client), my own duel's
  * opponent (`duel` - its blows are the duel's), or one of my guild (`guilds`, the two guilds' marks - sameGuild). ONE LAW,
  * BOTH ENDS: the referee asks it of every blow and cast (server/src/index.js `_wildBlow`, before wildBlow below), every
@@ -98,8 +96,7 @@ export function wildZone(st, sub, { id, lv = 1, ci = '', carry = null, died = fa
   if (z && x.down && now - x.downAt >= WILD_REF.riseMs) { x.f = newFighter(lv, now); x.down = false; x.struckAt = -Infinity; x.graceUntil = now + WILD_GRACE.ms; }   // ZONE-GRACE: a rise
   if (z && !x.zone) {
     if (now - x.outAt >= WILD_REF.riseMs && !x.down) { x.f.hp = x.f.max; x.struckAt = -Infinity; }
-    // ZONE-GRACE: an entry - away long enough, and out of every fight long enough. AUDIT PVP-EASE L3-6 (the owner: "Yes,
-    // every rise"): or a rise from a death the referee did not keep (a foe's - `died` on its way out, `dd` carried)
+    // ZONE-GRACE: an entry - away long enough, and out of every fight long enough. AUDIT PVP-EASE L3-6: or a rise from a death the referee did not keep (a foe's - `died` on its way out, `dd` carried)
     if (!x.down && x.diedAt > -Infinity) { x.graceUntil = Math.max(x.graceUntil, now + WILD_GRACE.ms); x.diedAt = -Infinity; }
     else if (!x.down && now - x.outAt >= WILD_GRACE.awayMs && now - Math.max(x.fightAt, x.struckAt) >= WILD_GRACE.fightMs) x.graceUntil = Math.max(x.graceUntil, now + WILD_GRACE.ms);
     x.zoneAt = now;
@@ -168,7 +165,7 @@ export const wildCarry = (st, sub, now) => {
   const pass = { ...(Number.isFinite(x.fightAt) ? { fa: x.fightAt } : {}), ...(x.zone ? { in: 1 } : {}), ...(x.diedAt > -Infinity ? { dd: x.diedAt } : {}) };
   return { hp: Math.max(0, x.f.hp), max: x.f.max, down: x.down, downAt: Number.isFinite(x.downAt) ? x.downAt : 0, at: now, ...grace, ...pass };
 };
-/** AUDIT PVP-EASE L3-4 (the owner: "Any take ends passage"): a fighter that takes from a remains - its own or another's -
+/** AUDIT PVP-EASE L3-4: a fighter that takes from a remains - its own or another's -
  *  loses its safe passage, as its own blow ends it. Answers whether one ended. */
 export function wildGraceTaken(st, sub, now) {
   const x = st.fighters.get(sub);
@@ -245,7 +242,7 @@ function fallOf(/** @type {any} */ st, /** @type {string} */ rid, /** @type {str
   return { fall, evicted };
 }
 
-/** AUDIT FOE-KEEPS E2 (the owner, 2026-10-24, asked: "Credit the last player"): A DEATH THE REFEREE DID NOT SEE - the
+/** AUDIT FOE-KEEPS E2: A DEATH THE REFEREE DID NOT SEE - the
  *  fighter's own word that it died (`zone` 0 with `dd`: a foe, a fall, the sea, a hall's trap) - is the kill of the last
  *  fair player whose blow landed on it within WILD_REF.creditMs, as the duel's referee counts a fighter fallen to
  *  something else its opponent's win and the sea's credits a wreck to a captain's shot: its fall made as a blow's is, in

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md) - THE ROOM'S REMAINS, AS THE RELAY KEEPS THEM.
+// WILD1 - THE ROOM'S REMAINS, AS THE RELAY KEEPS THEM.
 //
 // The owner: "the items lay around for 10 minutes and are marked for you to get them back and other players can take
 // em". A player killed by another player in the open zone (FOE-KEEPS: a foe's kill drops nothing) drops what their bag and their cart held (never their worn gear, never the
@@ -17,7 +17,7 @@
 // PURE: nothing here touches a socket or storage. The relay (server/src/index.js `_wild*`) reads and writes; this is
 // the law both its arms and the pins read. It imports wire.js alone (already in the bundle).
 //
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md): AND WHAT A REMAINS HOLDS IS THE
+// INT9: AND WHAT A REMAINS HOLDS IS THE
 // ACCOUNT SERVICE'S WORD. The fallen's own game handed its records over, so a crafted one deposited whatever it liked
 // for its friends to take. Now the service takes the drop off the fallen's judged record (server-account/src/wild.js)
 // and signs it - a `remains` order (net/identityToken.js): the remains' id, how many records and their digest, and the
@@ -35,8 +35,7 @@ export const wildRemainsKey = (r) => `${WILD_REMAINS_PREFIX}${r}`;
 
 /** A new remains - nothing in it yet; its first `fall` fills it. INT9: `wh`, `wn` the order's digest and count (the room
  *  opens it to takes only when its records match), `wk`, `wi` the killer and its piece's place (theirs alone); `lastAt`
- *  its carrier's last chunk (a deposit stalled half-way is another carrier's to lay - remainsTakeover). MAC (2026-10-14,
- *  the two-phase handoff): `we` the order's word that the service holds the killer's piece in escrow (its take is a
+ *  its carrier's last chunk (a deposit stalled half-way is another carrier's to lay - remainsTakeover). MAC: `we` the order's word that the service holds the killer's piece in escrow (its take is a
  *  collect - collectAsk), `wc` the collect this room signed for it (said again to its killer, never minted twice). */
 export function newRemains({ r, os = null, oid = null, nm = '', p, now, gi = null, wh = null, wn = 0, wk = null, wi = -1, we = false }) {
   return { r, gi: typeof gi === 'string' && gi ? gi : null, os: typeof os === 'string' && os ? os : null, oid: typeof oid === 'string' && oid ? oid : null, nm: sanitizeName(nm ?? ''), p: [p[0], p[1], p[2]], at: now, lastAt: now, open: true, items: [],
@@ -123,7 +122,7 @@ export function foldFall(rec, { oid, items, last }, now = null) {
 export const remainsNamedFor = (rec, i) => (rec?.wk && i === rec.wi ? rec.wk : null);
 
 /**
- * MAC'S DECISION (2026-10-14, "Yes, build it" - the two-phase handoff): THE KILLER'S COLLECT. Where the service holds the
+ * MAC'S DECISION: THE KILLER'S COLLECT. Where the service holds the
  * named piece in ESCROW (`we` - server-account/src/wild.js), the fallen loses it only once its killer has it: the room
  * hands no record for it, it signs the killer's collect (net/wild/wildReceipt.js `g1`), and the killer's tab carries that to
  * the service, which commits the piece to the killer's record once. Answers what a take of record `i` by account `sub` is:
@@ -187,12 +186,12 @@ export function remainsOf(v) {
   if (!v || typeof v !== 'object' || typeof v.r !== 'string' || !Array.isArray(v.items) || !Array.isArray(v.p) || v.p.length !== 3 || !Number.isFinite(v.at)) return null;
   return { r: v.r, gi: typeof v.gi === 'string' && v.gi ? v.gi : null, os: typeof v.os === 'string' ? v.os : null, oid: typeof v.oid === 'string' ? v.oid : null, nm: typeof v.nm === 'string' ? v.nm : '', p: [Number(v.p[0]) || 0, Number(v.p[1]) || 0, Number(v.p[2]) || 0], at: v.at, lastAt: Number.isFinite(v.lastAt) ? v.lastAt : v.at, open: v.open === true, items: v.items.map((it) => (it && typeof it === 'object' ? it : null)),   // INT9 (AUDIT): the guild kept too - a woken room let the fallen's guildmates take
     wh: typeof v.wh === 'string' ? v.wh : null, wn: Number.isSafeInteger(v.wn) ? v.wn : 0, wk: typeof v.wk === 'string' ? v.wk : null, wi: Number.isSafeInteger(v.wi) ? v.wi : -1, ok: v.ok === true,   // INT9
-    we: v.we === true, wc: typeof v.wc === 'string' && v.wc ? v.wc : null };   // MAC (2026-10-14): the escrow's word and its collect, kept through a restart
+    we: v.we === true, wc: typeof v.wc === 'string' && v.wc ? v.wc : null };   // MAC: the escrow's word and its collect, kept through a restart
 }
 
 
 // ═══════════════════════════════════════════════════════════════════
-// PVPDUNGEONS (2026-10-08) - THE ZONE'S HALLS, AS THE HUB KEEPS THEM.
+// PVPDUNGEONS - THE ZONE'S HALLS, AS THE HUB KEEPS THEM.
 //
 // One record in the hub's storage (WDUN_KEY), small and bounded: `{ locks, inside, empty, crows, piles }`.
 //   locks  { acct: { hall: until } }  - an account may not enter a hall it left (or fell in) for WDUN_LOCK_MS...
@@ -301,7 +300,7 @@ export function wdunState(st, acct, now) {
 }
 export const wdunCrows = (st, now) => Object.entries(st.crows).filter(([, u]) => u > now).map(([h, u]) => [h, u - now]);
 /**
- * AUDIT TESA III E2-5 (2026-10-26; the owner: "Take care of exclusions and gaps"): WHAT ONE SOCKET CAN MAKE THE HUB KEEP,
+ * AUDIT TESA III E2-5: WHAT ONE SOCKET CAN MAKE THE HUB KEEP,
  * BOUNDED. A hall is any world map pixel (`wdunHall` - the relay cannot see the map), and every word a socket said about
  * one was kept - its epoch two days, its emptiness a day, a lock an hour - and the whole record written at each word: one
  * signed-in socket at WDUN_HZ_MAX grew it 69 bytes a word, past Durable Object storage's 2 MB value in four hours. So:
@@ -369,7 +368,7 @@ export function wdunBound(st) {
   return moved;
 }
 
-// ── ZONE-GIANTS (2026-10-08, the owner: "always spawn 2 giants per tier and make em show on the map"): the hub keeps which
+// ── ZONE-GIANTS: the hub keeps which
 // of the zone's eight giants (systems/wild/wildGiants.js - their walks are every client's own pure pick) is down, and until
 // when, so a giant killed is gone for everyone and walks again for everyone at once.
 export const WDUN_GIANTS = 8;
@@ -386,7 +385,7 @@ export function wdunGiantDie(st, g, now) {
 /** The giants down: `[[g, msLeft]]`. */
 export const wdunGiants = (st, now) => Object.entries(st.giants ?? {}).filter(([, u]) => u > now).map(([g, u]) => [Number(g), u - now]);
 
-// ── SEA-EVENTS (2026-10-22, the owner: "Build ever single bit of this"; bible/03-World/Eltheric-Ocean.md SEA-EVENTS): the hub
+// ── SEA-EVENTS: the hub
 // keeps which treasure fleet's flagship is down (systems/sea/seaEvents.js - its route and its ships are every client's own
 // pure pick off the sailing's number), so a fleet scattered is scattered for everyone.
 /** A treasure fleet's flagship sunk: sailing `n` - only while she is under way by the hub's own clock, or SEA_FLEET_LATE_MS

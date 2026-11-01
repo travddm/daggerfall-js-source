@@ -1,5 +1,4 @@
-// AUDIT REALM2 (2026-09-28, the trade-and-customs lane of the audit of REALM - bible/06-Systems/Realm-Arc.md sections 3,
-// 4 and 6): T1-T7, each reproduced before it was fixed and pinned here. T4 (a boat's parts crossing a trade without
+// AUDIT REALM2: T1-T7, each reproduced before it was fixed and pinned here. T4 (a boat's parts crossing a trade without
 // their cargo) is closed by T1; T6 is another lane's. The service is driven through the REAL Worker over the REAL
 // migrations (node:sqlite behind a D1-shaped face whose batch is one transaction, and R2's calls), as
 // test/systems/auditrealm.test.js stands it.

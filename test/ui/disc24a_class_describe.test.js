@@ -1,6 +1,4 @@
-// DISC24-A (2026-09-24, Quest on Discord, "Class selection UI bug": "When left clicking other classes the description
-// stays the same for the original class that was double clicked previously but the `Play as a <insertClass>` changes and
-// the class name also change at the top. Double clicking works as intended though").
+// DISC24-A.
 //
 // THE BUG: DFU's class description is a MODAL box over the list (CreateCharClassSelect.cs :70-96) - the selection under
 // it cannot move. The enhanced skin lays the list BESIDE the box, so a single click moved `classListIndex` (the header and

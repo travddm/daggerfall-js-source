@@ -1,7 +1,7 @@
 // @ts-check
-// WB6c (2026-09-25, Mac: "the transition and the arena needs to be an oblivion masterpiece"): THE GATE'S VEIL ON THE
+// WB6c: THE GATE'S VEIL ON THE
 // PAGE - the canvas the step through an Oblivion gate is drawn on (render/gate/gateVeil.js: the law and the fire), its loop,
-// and its sounds. Design: bible/11-Multiplayer/World-Bosses.md section 4 ("The step through").
+// and its sounds. Design: ("The step through").
 //
 // A CANVAS OF ITS OWN, over the game's, made the first time a gate is stepped through and kept: the fire needs nothing
 // of the world's frame, so it rides no pass of the renderer's (no seam to mark, no state to hand back), and it keeps
@@ -42,7 +42,7 @@ export const VEIL_CUES = Object.freeze({
   open: Object.freeze([Object.freeze({ clip: 350, volume: 0.8, pitch: 0.72 }), Object.freeze({ clip: SOUND.Burning, volume: 0.7, pitch: 0.45 })]),
 });
 /** AUDIT SD II (L6 F8): THE SHATTERED HOUR'S VEIL - every step into and out of the Hour was Dagon's fire and its roar
- *  (Mac, of the Hour: "not oblivion, something different"): the same whirl in brass, the Mantella's green its eye
+ * : the same whirl in brass, the Mantella's green its eye
  *  (render/gate/gateVeil.js `uTheme`); as it closes, the Orrery's toll (the ship's bell, low) over the Warp's deep wind; as it
  *  opens, a gear's clunk and the Concord's chime (scenes/superDungeon/sdHall.js SD_HALL_SOUNDS). The fire's stays the default. */
 export const VEIL_THEMES = Object.freeze({ fire: 0, brass: 1, hourIn: 2, hourBack: 3, hourHome: 4, hourCast: 5 });
@@ -51,7 +51,7 @@ export const VEIL_BRASS_CUES = Object.freeze({
   open: Object.freeze([Object.freeze({ clip: 433, volume: 1.0, pitch: 0.55 }), Object.freeze({ clip: 364, volume: 0.6, pitch: 0.7 })]),
 });
 const themeOf = (name) => VEIL_THEMES[name] ?? VEIL_THEMES.fire;
-/** SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 3): THE HOUR'S OWN VEIL - the Hour's four
+/** SD-LOOK: THE HOUR'S OWN VEIL - the Hour's four
  *  themes drawn by render/superDungeon/sdVeil.js (twelve brass blades closing on the Rift into a dial; the brass whirl stays for a
  *  caller that names 'brass'), each its mode there. Its canvas a third of the device's pixels, drawn pixelated - the
  *  Hour's pixel art. */

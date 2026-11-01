@@ -1,6 +1,4 @@
-// AUTO-HOLD (2026-10-16, Mac on the Discord reports - "copies of an item were found. Trading is frozen until staff have
-// looked": "We need to figure out a better system for trade banning. I dont want to have to manually review";
-// bible/06-Systems/Integrity-Arc.md AUTO-HOLD). Pinned here:
+// AUTO-HOLD. Pinned here:
 //   - A COPY LOCKS ITS PIECE, NEVER THE CHARACTER: however many copies a record shows it trades on, each copied piece
 //     locked (item_dupes) and counted once a checkpoint, never a piece at a time;
 //   - A CONTESTED CLAIM IS NO STRIKE: a piece handed through a chest whose giver's game died before its record saw the give
@@ -155,7 +153,7 @@ test('AUTO-HOLD service: a contested claim - a piece through a chest, its giver\
     assert.deepEqual(s.findings(R.R.id, 'dupe'), [{ keys: [k], count: 1, contested: true }]);
     const next = await s.put(R, [withId(k), withId('b2b2b2b2b2b2b2b2')]);
     assert.deepEqual([next.tradeHeld, next.locked], [null, [k]], 'named in the answer');
-    assert.deepEqual((await s.put(R, [])).locked, [], 'gone from the record: nothing to name');   // PIN MOVED: AUDIT AUTO-HOLD - said as none, never left unsaid
+    assert.deepEqual((await s.put(R, [])).locked, [], 'gone from the record: nothing to name');
   } finally { s.done(); }
 });
 
@@ -203,7 +201,7 @@ test('AUTO-HOLD service (AUDIT): an answer names at most LOCKED_SAID_MAX locked 
     const keys = Array.from({ length: LOCKED_SAID_MAX + 2 }, (_, i) => `a${i.toString(16).padStart(15, '0')}`);
     const r = await s.put(A, keys.flatMap((k) => [withId(k), withId(k)]));
     assert.equal(r.locked.length, LOCKED_SAID_MAX);
-    assert.equal(LOCKED_SAID_MAX, 200);   // PIN MOVED: AUDIT AUTO-HOLD - 40 left a record's 41st copy free on the client (the service refuses it still)
+    assert.equal(LOCKED_SAID_MAX, 200);
   } finally { s.done(); }
 });
 
@@ -319,7 +317,7 @@ test('AUTO-HOLD client: the realm session - a timed hold heard with its end and 
     { tradeHeld: 'law', tradeHeldWhy: { code: 'until', t: null, until: U1 }, locked: [k1] },
     { tradeHeld: 'law', tradeHeldWhy: { code: 'until', t: null, until: U2 }, locked: [k1, k2] },
     { tradeHeld: 'law', tradeHeldWhy: { code: 'crafted', t: 135 }, locked: [k1, k2] },
-    { tradeHeld: null, locked: [] },   // PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+    { tradeHeld: null, locked: [] },
   ], storage);
   const held = [], told = [], sets = [];
   session.onTradeHeld = (prev, now, why) => held.push([prev, now, why]);
@@ -340,9 +338,9 @@ test('AUTO-HOLD client: the realm session - a timed hold heard with its end and 
   assert.equal(session.landedText, JSON.stringify({ n: 4 }), 'the last save the realm took');
   // what the player hears of those moves
   assert.equal(tradeHeldNotice(null, 'law', held[0][2]), tradeHeldUntilNotice(U1, 'Ring'));
-  assert.match(tradeHeldNotice(null, 'law', held[0][2]), /the last over a Ring it carries\. Its trading, gathering and crafting are frozen until .*, and after that until the Ring is gone\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID): what a hold freezes, said
+  assert.match(tradeHeldNotice(null, 'law', held[0][2]), /the last over a Ring it carries\. Its trading, gathering and crafting are frozen until .*, and after that until the Ring is gone\.$/);
   assert.equal(tradeHeldNotice('law', 'law', held[1][2]), tradeHeldUntilNotice(U2), 'a timed hold re-said with its new end');
-  assert.match(tradeHeldUntilNotice(U2), /^This character has been held 3 times\. Its trading, gathering and crafting are frozen until .*, then reopen on their own\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID)
+  assert.match(tradeHeldUntilNotice(U2), /^This character has been held 3 times\. Its trading, gathering and crafting are frozen until .*, then reopen on their own\.$/);
   assert.equal(tradeHeldNotice(null, 'law', held[2][2]), tradeHeldLawNotice('Ring'));
   assert.equal(tradeHeldNotice(null, 'law', { code: 'until', t: null, until: 'soon' }), TRADE_HELD_NOTICES.law, 'an end that is no time is no timed hold');
   // a second join on this device: what it told is told no more
@@ -425,7 +423,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
   assert.deepEqual([isRealmLocked(b), [...carriedPieces(entity).stowed], notCarried([b, b]).length], [false, [], 2], 'offline: nothing locked, nothing stowed, nothing filtered');
   // and every door a peer's word lands a piece through asks it (by source): a body's grant, a room's give, a body restored
   const src = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
-  assert.match(src('../../src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/);   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's, the line as it was
+  assert.match(src('../../src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/);
   assert.match(src('../../src/scenes/roomLootHost.js'), /function roomGive\(item, n\) \{\n    if \(n <= 0\) return;\n    if \(!notCarried\(\[item\]\)\?\.length\) return;/);
   assert.match(src('../../src/scenes/dungeonContext.js'), /else if \(sf\.items != null\) \{ const li = notCarried\(peerHanded\(validLootList\(sf\.items\)\)\); if \(li\) f\.entity\.items = li; \}/);
   // its end, written the game's language's way (the tests' English) - its own clock, never the wire's milliseconds
@@ -433,7 +431,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
   // AUDIT: no refusal says a review will come
   const refusal = accountRefusalText('trade-held');
   assert.equal(typeof refusal === 'function' ? refusal() : refusal, 'This character\'s trading, gathering and crafting are frozen. The notice shown when it froze says why, and until when.');   // PIN MOVED (RPT1026-MARKET HOLD-SAID): offline, no hold heard - what a hold freezes
-  assert.match(TRADE_HELD_STRIKES, /^ Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID)
+  assert.match(TRADE_HELD_STRIKES, /^ Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that\.$/);
 });
 
 test('AUTO-HOLD client (AUDIT): A PIECE THE REALM LOCKED STAYS WITH ITS HOLDER - bound while it is, every door a binding closes closed to it (a counter, a trade, the ground, a room\'s container, a peer\'s word), in its own words; the wagon and the player\'s own storage still take it', () => {

@@ -15,11 +15,9 @@ import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { setWorldMinutes } from '../../src/systems/worldTick.js';
 import { SKILLS } from '../../src/systems/skills.js';
 
-// ═══ SURV4 (2026-09-18): THE REST LAW ═══════════════════════════════
+// ═══ SURV4: THE REST LAW ═══════════════════════════════
 //
-// Mac: "Campfires in dungeons/outside + beds should act as the go-to
-// rest options ... Resting toggle both offline/online should always be
-// a last resort option that comes with a cost." A bed or a fire sleeps
+// A bed or a fire sleeps
 // whole; the window alone is ROUGH - half the hour's recovery, the
 // resting roll asked twice, a stiff morning - and the felt temperature
 // can refuse the sleep outright.

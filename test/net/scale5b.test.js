@@ -1,5 +1,4 @@
-// SCALE5b (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance", then "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md SCALE5b): THE
+// SCALE5b: THE
 // RELAY'S HYGIENE AND THE WIRE'S SECOND FORM. Part one, the second wire's poses: a socket whose hello says `w2` hears
 // the room's poses batched (wire.js POSE_BATCH_MS) and slim (wire.js slimPose); a socket that says nothing hears every
 // pose as it always has, byte for byte. Held here over the real Room on the pins' fake object (test/fakeRoom.mjs) and
@@ -464,10 +463,8 @@ test('SCALE5b the foes fan, a method of its own with the budget asked before its
         await R.hello(ws, `f-${String(i).padStart(4, '0')}`, { x: (BX + far + rnd()) * PIXEL_UNITS, y: 0, z: (499 - BY + rnd()) * PIXEL_UNITS, yaw: 0, pitch: 0 });
         socks.push(ws);
       }
-      // PIN MOVED (FOES-FIRST, Scale-Arc.md FOES-FIRST): every frame here is FULL and comes a second or more after its
       // sender's last, so it goes first - its floor is minus FOES_FULL_RESERVE, and the bucket stands that far lower
       // (it read byteGate's law, the floor at 0, for every frame alike). test/net/fb1021_foesfirst.test.js holds the rest.
-      // PIN MOVED (FOES-HOLD, Scale-Arc.md FOES-HOLD): a full frame the budget refuses is HELD for its turn, not dropped -
       // each round here starts with an empty hold (the turns are test/net/fb1021b_foeshold.test.js's), and a refusal is
       // counted held.
       const { floorGate, inRange, FOES_ROOM_BYTES_PER_S, FOES_FULL_RESERVE } = relay;
@@ -574,8 +571,8 @@ test('SCALE5b the metrics point: a socket refused \'room full\' is counted - the
 
 test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most RELAY_CFG_VALUE_MAX, or null (handed back to the var); the one in force is the hub\'s, else the var; a developer alone may set one; /relay\'s words (mutants: a name not a setting\'s; the bound unasked; null refused; the var over the hub\'s; a Dungeon Master let in)', async () => {
   const C = await import('../../src/net/relayCfg.js');
-  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'gateRole', 'serpentRole', 'sdRole', 'gateThread', 'serpentThread', 'sdThread', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);   // PIN MOVED (SD-PARTY, world275: sdCollapse - on, a party's win collapses the Hour for everyone); PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor - a loot room refuses a build that reads less loot, off until the site serves it); PIN MOVED (COST-2 part two, world262: cellSeed - the level the cell directory seeds its tree at, off until the site serves the build that says cv); PIN MOVED (HERALD-CARDS, net/herald/heraldCard.js: the four heralds' threads, beside the roles); PIN MOVED (LEASE1, net/roomLease.js: leaseDoor - a lease room refuses a build that hands on no lease, off until the site serves it); PIN MOVED (GRANT-DOOR, Spawn-Grants.md section 20: grantDoor); PIN MOVED (GRANT8-GRANT9, Spawn-Grants.md section 16: grantRoll and grantStrip, each off until a developer sets it); PIN MOVED (GRANT2, bible/11-Multiplayer/Spawn-Grants.md section 12: grantMode, the spawn grants' law); PIN MOVED (GROUND-GATE, bible/01-Overview/bugs/Field-Bugs-2026-10-17f.md): the old ground's door - a ground room refuses a build on an older ground while it is on; PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 22): THE DRAIN's switch - the Spire's road shut while a deploy drains it
-  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GATE_DISCORD_ROLE', 'SERPENT_DISCORD_ROLE', 'SD_DISCORD_ROLE', 'GATE_DISCORD_THREAD', 'SERPENT_DISCORD_THREAD', 'SD_DISCORD_THREAD', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);   // PIN MOVED (SD-PARTY): sdCollapse's var; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): lootDoor's var; PIN MOVED (COST-2 part two): its var; PIN MOVED (HERALD-CARDS): their vars; PIN MOVED (LEASE1): its var; PIN MOVED (GRANT-DOOR): its var; PIN MOVED (GRANT8-GRANT9): their vars; PIN MOVED (GRANT2): GRANT_MODE, the spawn grants' law; PIN MOVED (GROUND-GATE): the old ground's door's var
+  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'gateRole', 'serpentRole', 'sdRole', 'gateThread', 'serpentThread', 'sdThread', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);
+  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GATE_DISCORD_ROLE', 'SERPENT_DISCORD_ROLE', 'SD_DISCORD_ROLE', 'GATE_DISCORD_THREAD', 'SERPENT_DISCORD_THREAD', 'SD_DISCORD_THREAD', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);
   assert.deepEqual(C.validRelayCfgIn({ k: 'gateRole', v: '1555589839825670258' }), { k: 'gateRole', v: '1555589839825670258' });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: null }), { k: 'bossBody', v: null });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: 'x'.repeat(C.RELAY_CFG_VALUE_MAX) })?.v.length, C.RELAY_CFG_VALUE_MAX);

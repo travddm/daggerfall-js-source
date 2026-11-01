@@ -1,4 +1,4 @@
-// WEAPON-GLOW1 probe (bible/05-Combat/Weapon-Glow.md): renders the element glows through the REAL renderer, headless,
+// WEAPON-GLOW1 probe: renders the element glows through the REAL renderer, headless,
 // on art that is NOT game data - a pixel sword drawn here, and a sword mesh built here - so the looks can be seen and
 // tuned without ARENA2 or the Morrowind archives. Top row: the classic sprite's outline (drawScreenQuadGlow), fire,
 // frost, shock, and fire again on the same sword painted at three texels a pixel (an HD frame); bottom row: the Morrowind pass (drawCharacter's _drawWeaponGlow in the sprite

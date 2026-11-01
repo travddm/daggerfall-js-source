@@ -1,5 +1,4 @@
-// SEA-SET (2026-10-22, the owner: "Build ever single bit of this" - the Eltheric Ocean's Abyss-only gear;
-// bible/11-Multiplayer/Sigil-Sets.md section 6h, bible/03-World/Eltheric-Ocean.md SEA-SET): THE ELTHERIC TIDEMAIL - its law,
+// SEA-SET: THE ELTHERIC TIDEMAIL - its law,
 // its nine pieces, its three powers through SET2's seams and its own ship's door, and where the deep gives it up: a legend
 // ended, a ruin's or a vault's pile (systems/sea/seaSpoils.js). tools/mutants/seaset.json.
 import '../../modsOff.js';
@@ -106,7 +105,7 @@ test('SEA-SET THE RECORDS: nine in the places\' order - the seven body pieces, a
 });
 
 test('SEA-SET MINTED AND CHECKED: each record mints Adamantium, Aetheric, known, its set\'s sigil fresh at Faint (the saber\'s with its blow), passes the wire\'s check and item law 11; an affix past its record, another set\'s sigil or another make is no item (mutants: the material; the check; the law\'s records)', () => {
-  assert.equal(ITEM_LAW_VERSION, 14);   // PIN MOVED (AFFIX-LINES and REFORGE-REPLACE): law 14 - the Reforge's count a mark of the tiers it takes alone; PIN MOVED (KETCH): law 13 - the Gilded rung's Ketch pair (Volendrung's Echo, the Ketchmaster's Word) lawful; PIN MOVED (GUNS-UNFOUND): law 12 - the Hourlock lawful as a gilded Dwarven Long Bow and as the Thunderlock minted before, the Sunken Sovereign as the Ebony Saber again and as the Pistolet minted between; PIN MOVED: law 11 (10 on its branch, renumbered past PISTOLET's at the merge)
+  assert.equal(ITEM_LAW_VERSION, 14);
   for (const r of ELTHERIC_SET_PIECES) {
     const it = mintAetheric(r);
     assert.equal(it.material, aethericMaterial(r));
@@ -130,7 +129,7 @@ test('SEA-SET MINTED AND CHECKED: each record mints Adamantium, Aetheric, known,
 });
 
 test('SEA-SET THE DEEP\'S SHARES: a legend\'s - the Deep Aether\'s a quarter, the Abyss\'s every time; a vault\'s a quarter and half; a ruin\'s a twentieth and a tenth; the fleet\'s every time; the Shallows and the Reaches none - and the roll: one draw when nothing drops, two when a piece does, one at a share of 1, none at 0, the same seed choosing which (mutants: a share; the always; the draw)', () => {
-  assert.deepEqual(JSON.parse(JSON.stringify(ELTHERIC_CHANCE)), { legend: { deep: 0.25, abyss: 1 }, vault: { deep: 0.25, abyss: 0.5 }, ruin: { deep: 0.05, abyss: 0.1 }, fleet: { deep: 1, abyss: 1 }, storm: { deep: 1 / 40, abyss: 1 / 20 } });   // PIN MOVED (SEA-EVENTS): the storm's wrack
+  assert.deepEqual(JSON.parse(JSON.stringify(ELTHERIC_CHANCE)), { legend: { deep: 0.25, abyss: 1 }, vault: { deep: 0.25, abyss: 0.5 }, ruin: { deep: 0.05, abyss: 0.1 }, fleet: { deep: 1, abyss: 1 }, storm: { deep: 1 / 40, abyss: 1 / 20 } });
   for (const src of ['legend', 'vault', 'ruin', 'fleet']) for (const band of ['shallows', 'reaches']) assert.equal(elthericChance(src, band), 0, `${src} in ${band}`);
   assert.equal(elthericChance('nope', 'abyss'), 0);
   assert.equal(elthericChance('constructor', 'abyss'), 0, 'an own key alone');
@@ -229,7 +228,6 @@ test('SEA-SET THE SEAMS by source: the naval host\'s every ball of mine over her
   const n = src('src/scenes/naval/navalHost.js');
   assert.match(n, /const k = \(Number\.isFinite\(refit\) && refit > 0 \? refit : 1\) \* captainsDue\(\)\.guns;/);
   assert.match(n, /const hurt = dueOnHull\(shotDamage\(gun, zone, \{ braced: st\.guns\.braced/);
-  // PIN MOVED (AUDIT SEA VENTURES D1, D12): her piece out of the host (navalSeaSet.js), and only with her purse
   assert.match(n, /if \(legend\) legendTidemail\(legend, s\.seed, deps\.ether\?\.legendEnded\?\.\(legend\.id, act\), \{ give: \(items\) => deps\.board\?\.giveItems\?\.\(items, boatInPlay\(\) \?\? null, \{ force: true \}\), say: \(text, n\) => deps\.say\?\.\(text, n\) \}\);/);
   assert.match(src('src/scenes/naval/navalSeaSet.js'), /if \(!\(Number\(paid\) > 0\)\) return null;\n  const piece = rollElthericPiece\(mulberry32\(\(\(seed >>> 0\) \^ TIDEMAIL_SALT\) >>> 0\), elthericChance\('legend', legend\.band\)\);\n  if \(!piece\) return null;\n  give\(\[piece\]\);/);
   const d = src('src/scenes/dungeonContext.js');

@@ -1,8 +1,8 @@
-// L10N1b (2026-09-27, Mac: "for as many languages as we possibly can and do this right"). THE LANGUAGES THE PORT
+// L10N1b. THE LANGUAGES THE PORT
 // OFFERS: each one's BCP 47 tag, its name in its own language and in English, the script it is written in, and where
 // its words come from. A language is offered when the build holds its text (`locales/<tag>/`, scenes/localeData.js);
 // until a human translation is bundled or installed, the port's own strings in it are Claude's drafts, and the picker
-// says so (Mac: "AI drafts, labeled"). English is the port's own and lives in the code. The right-to-left and complex
+// says so. English is the port's own and lives in the code. The right-to-left and complex
 // scripts (Arabic, Hebrew, Persian, Thai, the Indic scripts) wait for L10N7's shaping; Chinese is tagged by script,
 // not by region, because the script is what a reader reads. The laws here are pure - the build's files are
 // scenes/localeData.js's.

@@ -1,5 +1,4 @@
-// VOYAGER2.1 (2026-10-26, KPbICA's spec forwarded by the owner: "Roads at current state does not behave like roads for
-// Pathfinding system in Overworld view"; bible/06-Systems/Travel-View.md VOYAGER2.1) - THE ROADS PAST THE BAY ARE WALKED AS
+// VOYAGER2.1 - THE ROADS PAST THE BAY ARE WALKED AS
 // ROADS. The Overworld's planner (systems/travel/travelRoute.js planRoute) read no road's byte past the Bay's table
 // (TV-BEYOND: "a step past the table reads no road's byte"), so a click past the Bay walked the open ground beside every
 // road there at three and a half times a road's price. Now routeGround carries the layer's reader (world/arenaRoads.js -

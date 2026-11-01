@@ -1,8 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // WM1 — THE WINDMILL'S TURN: what makes the blades go round.
 //
-// WM3 (2026-09-15, Mac: "the windmills of daggerfall is missing from
-// credits and the feature menu"): THE SWITCH. Every other vendored mod
+// WM3: THE SWITCH. Every other vendored mod
 // carries one, and `features.js` builds a mod's tile FROM its switch
 // (`modFeature` reads the vendor's own `Enabled` key), so a pack
 // without one could not have a row at all - the features page said so
@@ -34,7 +33,7 @@
 //
 // "Windmills of Daggerfall" (Kamer, DFU mod, v2.0). WM1 shipped this
 // module treating the mod as a reference only, on the roads' precedent
-// (that arc is live again - bible/03-World/Roads.md - and it ended up
+// (that arc is live again - and it ended up
 // vendoring his data with permission, which is the same conclusion
 // this module reached; the reasoning it set is what mattered here)
 // ("instead of taking their mod, I want us to develop our own and

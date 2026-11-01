@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-01 #7 (MOVE-BANK) - "Running jumping climbing dint work passed 100"; Mac: "I dont care about DFU.
-// We're our own thing now".
+// FIELD BUGS 2026-10-01 #7 (MOVE-BANK) - "Running jumping climbing dint work passed 100";.
 //
 // The report reproduces whole on the code before MOVE-REAL (#475): there the spam counter let ten minutes of running at
 // Running 110 count 41 uses (~2% of the run), a jump about a quarter of the jumps and a climb a quarter of its checks.
@@ -68,7 +67,7 @@ function realRun() {
 }
 
 test('MOVE-BANK: a level-30 master runs 100 minutes and rests - the pass banks the whole run, not the 20000 bucket', () => {
-  const p = runner(30, 150);   // PIN MOVED: LADDER-CUT (2026-10-28: "1.5 2 4") - at 100's 1.5x the run lands a point; 150's 4x keeps it a bank
+  const p = runner(30, 150);
   const { odometer, speed } = realRun();
   assert.ok(speed > 8, `the real run covers ${speed.toFixed(2)} m/s`);
   let cm = p.lastSkillCheckTime;
@@ -84,12 +83,12 @@ test('MOVE-BANK: a level-30 master runs 100 minutes and rests - the pass banks t
   assert.deepEqual(raiseSkills(p, Math.floor(cm), () => 0.5, () => {}), [], 'no point yet');
   const banked = p.skillProgress[RUN];
   assert.ok(Math.abs(banked - ran / cost(p)) < 2 / cost(p), `the pass banked ${banked.toFixed(3)} of a point, the run is ${(ran / cost(p)).toFixed(3)}`);
-  assert.ok(banked > 20000 / cost(p) + 0.05, 'more than the 20000 bucket held');   // PIN MOVED: LADDER-CUT - 150's price is dearer, so the run's 4,000 uses past the bucket are 0.09 of a point, was 0.14
+  assert.ok(banked > 20000 / cost(p) + 0.05, 'more than the 20000 bucket held');
   assert.equal(p.skillUses[RUN], 0, 'spent');
 });
 
 test('MOVE-BANK: a pass lands one point and keeps the rest whole, so the next passes land it with no more running', () => {
-  const p = runner(20, 150);   // PIN MOVED: LADDER-CUT - from 150, so the bank is still two points of its own cost
+  const p = runner(20, 150);
   const { odometer } = realRun();
   p._odometer = odometer;   // what the tick puts there from the host's activity
   for (let i = 0; i < 60000; i++) { odometer.h += 2.4; tallyMovementSkill(p, RUN); }   // a long day's running, no rest

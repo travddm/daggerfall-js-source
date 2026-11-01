@@ -1,5 +1,4 @@
-// DA9 (2026-09-29, Mac: "How can we drastically improve the install
-// experience? ... I really want to make it AAA grade"): THE SHELL LOOKS
+// DA9: THE SHELL LOOKS
 // BEFORE IT ASKS (app/lib/arena2Detect.cjs), AND HOLDS EVERY FOLDER TO
 // THE GAME'S OWN SEVEN FILES.
 //
@@ -164,7 +163,7 @@ test('DA9: the walk is bounded - a vast folder costs at most SEARCH_DIRS_MAX ope
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
-// ---- AUDIT INSTALL, lane 4 (2026-09-29): where the files really are, and a search that cannot freeze the app ----
+// ---- AUDIT INSTALL, lane 4: where the files really are, and a search that cannot freeze the app ----
 
 test('L4-3: a zip unpacked with "Extract Here" (a bare arena2 in Downloads), the shell\'s own folder names, links and junctions - all found', () => {
   const home = tmp();

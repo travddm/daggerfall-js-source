@@ -1,6 +1,4 @@
-// WEAR-UI + DBLEQUIP + LOCK1 (2026-09-26, the players: "can you give us durability bars inside the inventory also?
-// same way they are visible on hotbar, so we dont need to mouse-over that much, especially us loot goblins";
-// "Double click to equip/unequip"; "A way to lock/favorite items"). The pack is MOUNTED on the fake document
+// WEAR-UI + DBLEQUIP + LOCK1. The pack is MOUNTED on the fake document
 // (test/invdrag.mjs) and clicked - the bar counted, the pair timed, the lock refused - and the two trade windows'
 // halves are source pins, and say so.
 import { test } from 'node:test';

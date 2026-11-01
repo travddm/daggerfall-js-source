@@ -1,4 +1,4 @@
-// TN1 - THE TALK-NEWS GETTERS (2026-08-28). Seven seams the machine
+// TN1 - THE TALK-NEWS GETTERS. Seven seams the machine
 // and the macro table declared and nothing production-side answered:
 // the four npcData faction names (TK-iv computed them in every arm of
 // getGreetingIndex and recorded "the names nobody reads" - stale: the

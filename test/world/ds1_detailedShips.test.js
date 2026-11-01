@@ -1,5 +1,4 @@
-// DS1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - DETAILED SHIPS 1.0.0 (Cliffworms).
+// DS1 - DETAILED SHIPS 1.0.0 (Cliffworms).
 //
 // Held here: the vendored files against the shipped manifest (the xml
 // scales read back, the author's own pictures pixel for pixel, the nine

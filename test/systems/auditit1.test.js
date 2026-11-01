@@ -1,7 +1,7 @@
-// AUDIT IT1 (2026-10-04, the owner: "Lets audit this") - Immersive Travel 1.5 audited after its integration: five
+// AUDIT IT1 - Immersive Travel 1.5 audited after its integration: five
 // lenses (the laws against the IL, the classic window and popup, the enhanced sheet, the host and the online lane, the
 // gate world data), every finding verified, pinned here red first and fixed. The record is
-// bible/01-Overview/audits/Audit-IT1.md; the mutants are tools/mutants/auditit1.json.
+// the mutants are tools/mutants/auditit1.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

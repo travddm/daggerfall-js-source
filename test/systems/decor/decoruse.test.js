@@ -1,9 +1,8 @@
-// DECOR-USE (2026-10-24, Discord - "Make bed decor and firepit decor actually funtional": "the beds dont actually let you
-// sleep in it and firepit doesnt actually let you cook on it"; "Cooking station is not an option in decorate") - WHAT A
+// DECOR-USE - WHAT A
 // PLACED PIECE IS FOR: a placed bed is slept in, a placed fire one stands over is one of the room's hearths (it warms, a
 // rest by it is a camp's, it is cooked on), and the cooking station makes any piece that fire. The law is
 // systems/decor/decorUse.js; the room's half scenes/decor/decorRoom.js `hearths`; the host's worldModes.js activateDecor
-// and its interior camps' `hearths`. Recorded in bible/06-Systems/Online-Arc.md DECOR-USE.
+// and its interior camps' `hearths`. Recorded in DECOR-USE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

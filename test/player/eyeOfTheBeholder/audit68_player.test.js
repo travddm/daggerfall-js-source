@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster player - src/player: the EOTB sprite
+// AUDIT 68, cluster player - src/player: the EOTB sprite
 // count, the look filter's zero-length frame, the EOTB settings going
 // live (and a new rig not being a settings change), the parked action
 // object's box, and the lock-on's owed look. Every pin drives the real

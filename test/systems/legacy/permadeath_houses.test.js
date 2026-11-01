@@ -1,6 +1,5 @@
-// PERMADEATH-HOUSES (2026-10-09, the owner: "now all that needs to be looked at is what happens to houses owned by dead
-// permadeath characters and I can go back to playing my family"; asked, he chose "Heir inherits"): A DEAD MEMBER'S
-// HOUSE PASSES TO WHOEVER CARRIES THE LINE (bible/06-Systems/Legacy-Arc.md section 10c). Until it did, a fallen
+// PERMADEATH-HOUSES: A DEAD MEMBER'S
+// HOUSE PASSES TO WHOEVER CARRIES THE LINE. Until it did, a fallen
 // member's deed stayed in a save the line refuses to play: the family lived in the house, and the heir found its door
 // locked at night, no bed of theirs and no cupboard - online a tombstone held the building out of the world for good.
 // The law (systems/legacy/household.js deedsDue, syncHouses' `taken`) and the host (scenes/legacyHost.js takeDeeds)

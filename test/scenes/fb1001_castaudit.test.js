@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - CAST-USE, on the real engines (two createPlayerMagic, the street's and
+// AUDIT 2026-10-01 part five - CAST-USE, on the real engines (two createPlayerMagic, the street's and
 // the dungeon's, over one player), the real createEnchantCtx mounted through liveCastEngine, the real useItem:
 //   CU1 a ready held when the mode flips was still on the other engine - one taken down the stairs (a touch ready lets the
 //      dungeon door through) fired at the first click back outside, one held at the way out died with the dungeon's

@@ -663,7 +663,7 @@ export class CharSheet {
       for (let i = 0; i < STAT_KEYS_ORDER.length; i++) {
         if (!inRect([se.x, se.y + se.step * i, se.w, se.h], vx, vy)) continue;
         audio.playOneShot(SOUND.ButtonClick, 1);
-        // ATTRMACRO1 (2026-09-18, Mac: "none of the attribute explanations show actual values"): DFU's line here
+        // ATTRMACRO1: DFU's line here
         // is `SetTextTokens((int)sender.Tag, playerEntity.Stats)` - the record AND a macro source - and the comment
         // above has said so since AUDIT 58 while the code handed the rows straight to the box. So every one of the
         // eight showed `%str`, `%ark`, `%dam`, `%enc` and their siblings as literal tokens. The source is the
@@ -851,7 +851,7 @@ export class CharSheet {
     const showHth = ids.includes(SKILLS.HandToHand);
     const lines = (twoColumn ? Math.ceil(ids.length / 2) : ids.length) + (showHth ? 1 : 0);
     // SCHOOLS1: the Specialisation row under it, while Master Skills is in force and a path is chosen or open
-    // GROWTH4 (bible/10-UI/Growth.md section 7): where the guide opens (the enhanced pause's Growth tab - a document), the
+    // GROWTH4: where the guide opens (the enhanced pause's Growth tab - a document), the
     // row stands whenever this class can ever meet a path: S reads them all, opened or not
     // AUDIT GROWTH LANE3-2: never while the rollout stands (_growth); LANE3-12: a chosen path's row only while it is in
     // force - asleep (Master Skills off), the guide's row says so
@@ -911,7 +911,7 @@ export class CharSheet {
     }
   }
 
-  /** GROWTH4 (bible/10-UI/Growth.md section 7; the owner, asked: the classic skin reaches the Growth tab): THE GUIDE
+  /** GROWTH4 (; the owner, asked: the classic skin reaches the Growth tab): THE GUIDE
    *  FROM THE CLASSIC SHEET - the enhanced pause window on its Specialisations page (the family's), pushed as this
    *  sheet's child: it draws over the sheet, and when it goes the sheet is back. A host with no document (node) has no
    *  hook, and the rows ask in DFU's boxes as before. Answers whether it opened.
@@ -926,7 +926,7 @@ export class CharSheet {
     return true;
   }
 
-  /** MARTIAL1 (bible/05-Combat/Martial-Specialisations.md section 3): the Martial row, classic face - the Specialisation
+  /** MARTIAL1: the Martial row, classic face - the Specialisation
    *  row's own law. A path chosen: DFU's OK box says what it does. None yet: each open path is asked about in DFU's Yes/No
    *  box - chosen on Yes (given up only by SPEC-RESET); No, then W, offers the next (the plate stays behind the box, AUDIT
    *  SCHOOLS L4 H1). */
@@ -945,7 +945,7 @@ export class CharSheet {
     });
   }
 
-  /** SCHOOLS1 (bible/06-Systems/Arcane-Specialisations.md section 3): the Specialisation row, classic face. A path chosen:
+  /** SCHOOLS1: the Specialisation row, classic face. A path chosen:
    *  DFU's OK box says what it does. None yet: each open path is asked about in DFU's Yes/No box - chosen on Yes (given
    *  up only by SPEC-RESET); No, then S, offers the next. */
   _pathPrompt() {

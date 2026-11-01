@@ -1,5 +1,4 @@
-// LOOT20 - SOCKETS (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 12; Mac: "what could we do to make it even more
-// amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT20 - SOCKETS.
 //
 // A Rare (150 in a thousand) or a Legendary (300) that a body or a pile mints may carry one empty SOCKET - on a weapon, a
 // piece of armour or a jewel, never a garment. At the Reforge one of DFU's eight gems from the pack is set in it for 100
@@ -12,7 +11,7 @@
 // what it never is; the door's pass (its rates over 40,000 seeded bodies, never a garment, after every draw, a kit too,
 // off nothing); the Reforge's presses and their refusals; the wire; the Sockets page and the hosts' hooks.
 //
-// GEM1 (bible/06-Systems/Gem-Sockets.md, PINS MOVED): the socket is a LIST now (`sockets`, LOOT20's `socket` still
+// GEM1 (, PINS MOVED): the socket is a LIST now (`sockets`, LOOT20's `socket` still
 // read), setting is free and works on a worn piece (its wearer folded again), and the Reforge EXTRACTS a gem whole for
 // gold by its grade. The weapons' own pass and the graded gems are test/systems/gem1_sockets.test.js's.
 
@@ -80,7 +79,6 @@ test('LOOT20: DFU\'s eight gems and their lines - a weapon\'s blow, every other 
   assert.deepEqual(it.affixes.at(-1), line);
   assert.equal(it.affixes.length, before.lines + 1);
   assert.deepEqual([it.sockets, LR.socketGem(it), LR.hasSocket(it)], [['ruby'], 'ruby', true]);
-  // PIN MOVED (AUDIT GEM, bible/06-Systems/Gem-Sockets.md section 9): the price by the GEM's own worth - what it sold for
   // loose - never its line's (free setting and law 6 made the line's worth a faucet)
   assert.equal(it.value, before.value + itemBaseValue({ group: 'Gems', templateIndex: LR.gemTemplateOf('ruby') }));
   assert.notEqual(itemBaseValue({ group: 'Gems', templateIndex: LR.gemTemplateOf('ruby') }), LR.affixesWorth([line], it), 'and the two differ, so the pin can tell');
@@ -175,7 +173,6 @@ test('LOOT20: the door\'s pass - a Rare 150 in a thousand, a Legendary 300, neve
       const all = list(); LR.rollLootRarity(all, src, { rolls: lcg(seed) });
       LR._setSocketForTests(0);
       const none = list(); LR.rollLootRarity(none, src, { rolls: lcg(seed) });
-      // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, after the
       // socket's (which costs no draw at no chance) - where a socket drew, the two runs' techniques differ, so a piece's
       // technique line and its worth are set aside on both sides
       const noTech = (x) => { const t = LR.techniqueLineOf(x); return t ? { ...x, affixes: x.affixes.filter((a) => a !== t), value: x.value - LR.affixesWorth([t], x) } : x; };
@@ -235,7 +232,7 @@ test('LOOT20: the Reforge\'s presses - a gem from the pack, every refusal taking
   assert.equal(RF.setGemRefusal(piece, 'sapphire', me), 'set');
   assert.deepEqual(RF.setGemPiece(piece, 'sapphire', me), { ok: false, reason: 'set' });
   assert.deepEqual([held(me.items), me.goldPieces], [{ sapphire: 1 }, 150], 'nothing taken');
-  // GEM1 (PIN MOVED): a worn piece is filled where it is worn, and its wearer folded again at once
+  // GEM1 (
   const worn = player();
   const wp = socketed(ring, 'rare', 12);
   wp.affixes = [{ id: 'stat', param: 'agility', value: 6 }];

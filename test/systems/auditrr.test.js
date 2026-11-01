@@ -1,4 +1,4 @@
-// AUDIT-RR (2026-09-23, Mac: "Lets do one more audit") - the adversarial
+// AUDIT-RR - the adversarial
 // audit of the six Roleplay & Realism slices: RRI1 (the fourteen item
 // classes), RRI2 (the nine modules past the items), RR1 (the formula
 // overrides and rule modules), RR2 (the sprite variants, EnhancedRiding,

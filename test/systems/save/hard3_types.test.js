@@ -1,6 +1,4 @@
-// HARD3 - TYPES AT THE SEAMS THAT CRASH (2026-09-14, Mac: "make
-// everything clean, hardened and not spaghetti ... refactor where
-// absolutely needed").
+// HARD3 - TYPES AT THE SEAMS THAT CRASH.
 //
 // WHAT THIS SLICE IS, AND WHAT IT DELIBERATELY IS NOT.
 //

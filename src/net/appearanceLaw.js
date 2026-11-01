@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; a player: "Add more horizontal progression please!"; bible/04-Characters/Wardrobe.md): THE
+// APPEARANCES: THE
 // WARDROBE'S LAW. A look is what a piece draws as - its template, material and style (the variant). A character collects
 // every look it holds; a shop lays a collected look over a worn piece of the same kind. Only the drawing changes: every
 // number still reads the piece itself. Both ends read this file - the client draws a look, the relay keeps one on a

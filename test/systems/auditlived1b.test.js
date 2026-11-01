@@ -1,5 +1,5 @@
-// AUDIT LIVED1b (2026-09-29, Mac: "Lets do a comprehensive audit on this") - the second audit of LIVED1 (your own time
-// online) and of the first audit's fixes: eleven lanes over the frozen tree 322b1735 (bible/01-Overview/audits/Audit-Lived1b.md).
+// AUDIT LIVED1b - the second audit of LIVED1 (your own time
+// online) and of the first audit's fixes: eleven lanes over the frozen tree 322b1735.
 // Each test pins one fix, driving the real modules the way the lane that found it reproduced it; each fix is also
 // mutation-proven (tools/mutants/auditlived1b.json).
 import { test, afterEach } from 'node:test';
@@ -140,7 +140,6 @@ test('AUDIT LIVED1b S1 (F2, K2): an online checkpoint waits while a raise waits 
   // each gate by its own line - AUDIT C&C (the list's run): the zone's death checkpoint (WILD1) copied the gate, and one
   // pattern held either copy, so the realm checkpoint's could lose its walk under a pin that still passed
   const world = rd('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES review): the two copies are one gate now (checkpointGateOpen), which carries the walk, asked at both doors
   assert.match(world, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/, 'the gate carries the walk');
   assert.match(world, /if \(!checkpointGateOpen\(\)\) return false;/, 'the host asks');
   assert.match(world, /const allowed = checkpointGateOpen\(\);/, 'and the zone\'s death checkpoint, the same gate');
@@ -237,7 +236,7 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   assert.equal(snapshotPlayer(e, { classicMinutes: Math.floor(ownMinutes()) }).worldMinutes, left, '...the composer\'s stamp');
   t.offset = 0;   // the welcome: the relay's offset
   hearSharedClock();
-  // REP4 (the reputation overhaul): PIN MOVED - the recovery is weekly, so the true 112 days away are sixteen points
+  // REP4 (the reputation overhaul):
   // (DFU's one boundary: -79); a machine clock months fast still buys nothing
   assert.equal(e.legalRep[0], -64, 'the true span\'s sixteen weeks, paid on the relay\'s clock');
   assert.equal(worldMinutesToSave(), Math.floor(worldMinutes()), 'and the save stamps the world\'s now');
@@ -486,7 +485,7 @@ test('AUDIT LIVED1b P1: a party mirror\'s night walks the follower\'s own watch 
   try {
     let watched = 0, asks = 0, burst = 0;
     for (let r = 0; r < 20; r++) { const o = night('mirror', 1000 + r); if (o.watch > 0) watched++; asks += o.spawnAsks; burst += o.burst; }
-    // REP1 (the reputation overhaul, "Challenged on sight"): PIN MOVED - the minute loop rolls no conspiracy any more, so
+    // REP1 (the reputation overhaul, "Challenged on sight"):
     // a hated member's night is not watched, mirrored or alone (the watch stops a known criminal a guard SEES, on the
     // street - scenes/standingHost.js); the night's other two laws stand, the burst now read off the loop's own asks
     assert.equal(watched, 0, 'no night of a hated member draws the old levy');

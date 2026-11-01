@@ -1,4 +1,4 @@
-// AUDIT MARTIAL (2026-10-17; bible/01-Overview/audits/Audit-Martial.md). The owner, of PR #990 (MARTIAL + BAL10): "Please
+// AUDIT MARTIAL. The owner, of PR #990 (MARTIAL + BAL10): "Please
 // audit and ensure everything is perfection". Five cold lanes read a frozen snapshot (3866fefae) - the law and the powers,
 // the engine's edits, online integrity, the surface and its words, the pins and the record - and every finding fixed here
 // is pinned by execution through the producers that mint the shapes in play: real foes (makeEnemyEntity), the real save,
@@ -752,7 +752,7 @@ test('AUDIT MARTIAL L5 L4: the box counts the OTHER open paths only - none with 
   const rows1 = MP.martialChoiceRows(fighter([LB, AR], 100), 'ranger');
   assert.equal(rows1.some((r) => /other martial/.test(r)), false);
   const rows3 = MP.martialChoiceRows(fighter([LB, AR, SB], 100), 'ranger');
-  assert.equal(rows3.at(-1), '2 other martial specializations are open to you.');   // PIN MOVED (VOICE2): specialization (Voice.md rule 8)
+  assert.equal(rows3.at(-1), '2 other martial specializations are open to you.');
 }));
 
 test('AUDIT MARTIAL L5 H2: THE ONE ASK (scenes/shared.js raisePlayerSkills), DRIVEN - one path open is asked in the martial words and Yes chooses it; several are named in an OK box choosing none; asked once; with the arcane ask due on the same pass, the arcane box first and the martial on the next (mutants: the ask forgets it asked; one open given the OK box; Yes chooses the arcane)', () => clean(() => {
@@ -818,7 +818,6 @@ test('AUDIT MARTIAL L5 H2: THE CLASSIC SHEET\'S W ROW, DRIVEN - drawn under the 
   assert.deepEqual([sheet.child.okOnly, sheet.child.rows[0], sheet.child.rows.at(-1)], [true, 'Blademaster - Long Blade and Short Blade', 'Use your Weapon Technique key while holding one of its weapons. A weapon with its own technique uses that instead.']);
 }));
 
-// PIN MOVED (GROWTH2, bible/10-UI/Growth.md section 5): the enhanced model is the Growth tab's guide (ui/growth/specGuide.js)
 test('AUDIT MARTIAL L5 H2: THE ENHANCED MODEL - each open path with its pair; the box\'s rows the martial ask\'s; a chosen one its powers (mutants: the arcane rows asked; the chosen state lost; the choice the arcane\'s)', () => clean(async () => {
   const { specGuideModel } = await import('../../src/ui/growth/specGuide.js');
   const fam = (e) => specGuideModel(e).families.find((f) => f.id === 'martial');
@@ -834,7 +833,6 @@ test('AUDIT MARTIAL L5 H2: THE ENHANCED MODEL - each open path with its pair; th
 }));
 
 // LAST in the file: the pause window's document globals stand for the rest of it (audit_schools.test.js's own law)
-// PIN MOVED (GROWTH1/GROWTH2): the Stats page's Growth door counts the path waiting; the guide names it, asks and chooses
 test('AUDIT MARTIAL L5 H2: THE ENHANCED PAUSE WINDOW, DRIVEN - the Stats page\'s Growth door counts the waiting martial specialisation, the Growth tab\'s guide names the path and its pair, Choose asks in the skin\'s Yes/No card in the martial words, and Yes chooses it (mutants: the door\'s count; Choose the arcane; the ask the arcane\'s rows)', () => clean(async () => {
   await import('../chargenDom.mjs');
   const { mountEnhancedMenu } = await import('../../src/ui/enhanced/enhancedMenu.js');

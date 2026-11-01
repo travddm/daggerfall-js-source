@@ -1,9 +1,7 @@
 // @ts-check
-// ARENA4 (2026-10-02, Mac: "Players can choose to watch AI fights, player fights, join a team (red and blue) and climb
-// esclating tiers of opponents, or choose to matchmake for a real opponent to take on in real time"; "Joining a team
-// comes with it's own enhanced UI where you can view your ranking and even player leaderboards"): THE ARENA ONLINE ON
+// ARENA4: THE ARENA ONLINE ON
 // THIS SCREEN - one home for the hosts that stand the colosseum (scenes/world.js), between the relay's rooms, the
-// account service and the bout driver. Design: bible/11-Multiplayer/Arena.md "7. Online".
+// account service and the bout driver. Design: "7. Online".
 //
 //   THE HALL      a socket of its own (`arena:hall`, a presence-less session the host makes), opened while the Arena
 //                 window is up or a match is sought: the queue, the offer (Accept / Decline), the bout it sends me to,
@@ -22,7 +20,7 @@
 // Nothing here decides a bout: the relay referees, the account service keeps. Offline (no session, a relay before the
 // arena's rooms; AUDIT PRE-MERGE 1003 O9: a seat given up) `live()` is false and every host keeps ARENA3's offline arena.
 // FIELD BUGS 2026-10-16b ARENA-WAIT: but on the online lane before the relay has said either (`waiting()` - no session
-// yet, or none welcomed), the arena is neither: every door waits, as it does for the board. AUDIT (2026-10-16): and on
+// yet, or none welcomed), the arena is neither: every door waits, as it does for the board. AUDIT: and on
 // that lane the offline arena runs for ONE word alone - a relay that said it opens no arena room; a seat given up (O9)
 // and a session no welcome can answer (terminal) shut the doors too, each saying why (`shutText`).
 //
@@ -143,7 +141,7 @@ export function createArenaOnline(deps) {
    *  load had none to keep, so for those seconds every door read `live()` false as offline - the Herald offered Fight off
    *  the save's ladder (the online climb never writes it), the local bout paid its purse, and the window drew the save's
    *  season and record over a Grand Champion's. Waiting, a door waits as it does for the board.
-   *  AUDIT (2026-10-16, A3/A4): ON THE ONLINE LANE THE OFFLINE ARENA NEVER RUNS, but for one word: a relay that SAID it
+   *  AUDIT: ON THE ONLINE LANE THE OFFLINE ARENA NEVER RUNS, but for one word: a relay that SAID it
    *  opens no arena room (`arenaHeard`, `arenaOk` false - an older relay), the session neither superseded nor terminal.
    *  Every other state on the lane shuts the doors, each with its own why (`shut`): 'seat' - this tab's seat is another's
    *  (O9: a seat given up ran the save's ladder, its purses paid into the realm's save - 47,950 gold over 40 bouts - and the

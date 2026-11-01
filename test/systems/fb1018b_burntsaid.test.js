@@ -1,10 +1,10 @@
-// BURNT-SAID (FIELD BUGS 2026-10-18b - bible/01-Overview/bugs/Field-Bugs-2026-10-18b.md; shaman, "Letter of Credit
+// BURNT-SAID (FIELD BUGS 2026-10-18b; shaman, "Letter of Credit
 // vanishing from wallet"). A death in the open zone drops every letter of credit (LETTERS-DROP), and a record the judge
 // holds still loses its drop while the room is given none of it (Integrity-Arc, Lane 1's freeze: `burnt`, no order). The
 // fallen's game took the drop out of the pack and said it as nothing at all - `dropped: d.order ? n : 0`, and the death
 // screen prints no line for none. So a held character's letters left the wallet with no word. Now the screen says what
 // was lost and why, and any death in the zone names the letters it took by their worth. Through the real account service:
-// a held record and a clean one, each dying at another player's hand (PIN MOVED, FOE-KEEPS - bible/11-Multiplayer/Wild-Zone.md
+// a held record and a clean one, each dying at another player's hand (
 // section 4: it was a foe's, whose death takes nothing now) with letters the shop's own sellProceeds pays; the fallen's game
 // takes out what the service took (wildTakeTook) and its death screen reads the answer as world.js wildDropTaken hands it on.
 import { test } from 'node:test';
@@ -90,7 +90,7 @@ test('BURNT-SAID THE WORDS AND THE HOST: one letter, none, a forged worth; world
   assert.equal(WILD_TEXT.deathBurnt(1), '1 thing you carried was lost where you fell. This character\'s trading is frozen, so nothing is left for anyone to take.');
   assert.equal(WILD_TEXT.deathBurnt(0), '');
   setWildDeath({ killer: 'Ria', dropped: 3 });
-  assert.deepEqual(wildDeathLines(), ['Ria may claim one piece of your worn gear.', '3 things you carried lie where you fell, for ten minutes.', 'In Cyrodiil the dead wait two minutes.'], 'a death with no letters reads as it did');   // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the zone is Cyrodiil
+  assert.deepEqual(wildDeathLines(), ['Ria may claim one piece of your worn gear.', '3 things you carried lie where you fell, for ten minutes.', 'In Cyrodiil the dead wait two minutes.'], 'a death with no letters reads as it did');
   setWildDeath(null);
   assert.match(WILD_TEXT.burntLate(), /trading is frozen, so it was lost\.$/);
 });

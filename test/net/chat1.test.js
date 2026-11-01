@@ -1,7 +1,4 @@
-// CHAT1 (2026-09-12, Mac: "I want to add a new UI element. The live chat
-// in enhanced format. Players will be able to type and chat live with
-// other players. Currently I just want one world tab with the ability
-// to add more tabs at a later time"), re-pinned by AUDIT CHAT (Mac:
+// CHAT1, re-pinned by AUDIT CHAT (Mac:
 // "Lets do an audit on this before merging"). THE CHAT EXECUTES: the
 // wire's chat law at both ends (the line sanitized the same way the
 // relay sanitizes it - every format character, the variation selectors,
@@ -55,7 +52,7 @@ test('CHAT1 / AUDIT CHAT: the wire - the constants once and literally, one home 
   assert.equal(CHAT_MAX, 240); assert.equal(CHAT_HZ_MAX, 2); assert.equal(CHAT_STRIKES_MAX, 20); assert.equal(CHAT_SOCKETS_MAX, 2048);
   assert.equal(CHAT_HELLO_HZ_MAX, 50); assert.equal(CHAT_ROOM_HZ_MAX, 20);
   assert.equal(CHAT_WORLD_ROOM, 'chat:world');
-  // CHAT-CHAN: the World channel and the 62 region channels, ENUMERATED - the whitelist stays a list (AUDIT CHAT A1); PIN MOVED (WW-R, bible/03-World/World-Wide.md): and the provinces' nine; PIN MOVED (PROVINCE-SLEEP, bible/11-Multiplayer/Scale-Arc.md): the Bay's regions' shards alone - a province is one channel
+  // CHAT-CHAN: the World channel and the 62 region channels, ENUMERATED - the whitelist stays a list (AUDIT CHAT A1)
   assert.deepEqual([...CHAT_ROOMS], ['chat:world', ...Array.from({ length: 71 }, (_, i) => `chat:region.${i}`), ...Array.from({ length: 16 }, (_, k) => `chat:world.${k}`), ...Array.from({ length: 62 * 4 }, (_, i) => `chat:region.${Math.floor(i / 4)}.${i % 4}`),
     ...['en', 'de', 'fr', 'es', 'pt', 'it', 'nl', 'pl', 'ru', 'fi', 'sv', 'tr', 'ja', 'zh', 'ko'].map((c) => `chat:lang.${c}`), 'chat:trade', 'chat:lfg'], 'the whitelist: the World channel and one per politic region (PIN MOVED, SCALE5c: and the hub\'s sixteen shards; part two: and each region\'s four; CHAT-LANG: and one per language; CHAT-TRADE: and the Trade and LFG channels)');
   for (const k of ['sanitizeChat', 'isChatRoom', 'chatGate']) assert.equal(relay[k], { sanitizeChat, isChatRoom, chatGate }[k], `${k}: the same function object at both ends`);
@@ -125,7 +122,7 @@ test('CHAT1 / AUDIT CHAT: the Room as a CHANNEL - a hello keeps the secret and n
   const r = fakeRoom(CHAT_WORLD_ROOM, { now: () => clock });
   const a = r.connect(), b = r.connect(), c = r.connect();
   await r.hello(a, 'aaaa-0001'); await r.hello(b, 'bbbb-0002', at(3, 3));
-  // ROSTER-G (Mac: "Players dont show in online"): a channel HAS a roster now - names alone, with the true count -
+  // ROSTER-G: a channel HAS a roster now - names alone, with the true count -
   // and says its joins, because the roster beside the chat is everyone online and the channel is where everyone is
   assert.deepEqual(a.sent[0], { t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION, now: a.sent[0].now, ldo: 0 });   // SRV-N: and the deploy's name, on a channel's welcome too - the only welcome a chat link ever gets; AUDIT SOC B7: and the relay's clock
   assert.equal(typeof a.sent[0].now, 'number');
@@ -191,7 +188,7 @@ test('CHAT1 / AUDIT CHAT: the Room as a CHANNEL - a hello keeps the secret and n
     assert.equal((await place.room.fetch(upgrade('/room/town:m9'))).status, 503, 'a place still fills at SOCKETS_MAX');
   } finally { globalThis.WebSocketPair = hadPair; }
   let minted = 0;
-  const env = { ROOMS: { idFromName: (name) => { if (name !== CELL_DIRECTORY) minted++; return 'id'; }, get: () => ({ fetch: async () => new Response('ok') }) } };   // PIN MOVED (COST-2): a cell's door asks the cell directory (cellNodes.js) - no room's object
+  const env = { ROOMS: { idFromName: (name) => { if (name !== CELL_DIRECTORY) minted++; return 'id'; }, get: () => ({ fetch: async () => new Response('ok') }) } };
   assert.equal((await worker.fetch(upgrade('/room/chat:junk'), env)).status, 404, 'AUDIT CHAT A1: a chat: key the port does not run is no room');
   assert.equal((await worker.fetch(upgrade('/room/chat:' + 'z'.repeat(70)), env)).status, 404);
   assert.equal(minted, 0, 'and no object is minted for it');
@@ -226,7 +223,7 @@ test('CHAT1 / AUDIT CHAT: the Room - a line in a PLACE room reaches as far as a 
   // the gate's strikes
   const fresh = fakeRoom(CHAT_WORLD_ROOM);
   const t = fresh.connect(), l = fresh.connect();
-  await fresh.hello(t, 'talk-0001', null, { kind: 'linked' }); await fresh.hello(l, 'list-0002');   // PIN MOVED (AUDIT SAFE RELAY-11): a registered talker - a guest's channel lines are paced now
+  await fresh.hello(t, 'talk-0001', null, { kind: 'linked' }); await fresh.hello(l, 'list-0002');
   for (let i = 0; i < CHAT_HZ_MAX + 3; i++) await fresh.chat(t, `line ${i}`);
   assert.equal(chats(l).length, CHAT_HZ_MAX, 'the burst is relayed, the rest dropped');
   assert.equal(t.meters.cdrops, 3, 'three strikes'); assert.equal(t.closed, null, 'not yet an offence');
@@ -278,7 +275,7 @@ test('CHAT1 / AUDIT CHAT: the session as a CHANNEL (presence: false) - the hello
   assert.equal(ws.sent[0].t, 'hello'); assert.equal(ws.sent[0].pose, null, 'a channel\'s hello carries no pose whatever the join was handed');
   assert.equal(ws.sent[0].id, 'mac-0001'); assert.equal(ws.sent[0].secret, 'secret-of-mac-0001');
   assert.equal(s.sendChat('early'), false, 'SD-HELLO (PIN MOVED): nothing past the hello until the room welcomes the socket');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (PIN MOVED): welcomed - the channel's law below as it was
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (
   assert.equal(s.sendPose({ x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 1 }), false, 'AUDIT CHAT D3: a channel session refuses a pose');
   assert.equal(s.sendChat('   '), false, 'nothing to say sends nothing');
   assert.equal(s.sendChat('\u200b'), false);
@@ -341,7 +338,7 @@ test('CHAT1 / AUDIT CHAT: the session as a CHANNEL (presence: false) - the hello
   const pw = sockets[4]; pw.open();
   const { ts: helloTs, ...helloPose } = pw.sent[0].pose;   // SCALE2b: and stamped with when it was said
   assert.deepEqual(helloPose, { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 1 }); assert.ok(Number.isInteger(helloTs));
-  pw.receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (PIN MOVED): welcomed - a socket says nothing past its hello until then
+  pw.receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (
   assert.equal(p.sendPose({ x: 2, y: 2, z: 3, yaw: 0, pitch: 0, mv: 1 }), true, 'a presence session sends its pose');
   // RELAY-H1 re-aimed this: a presence session now ALSO pings (PING_MS, runtime-answered in the object's sleep) so the
   // socket's liveness no longer costs a wake; its proof of life to the PEERS is still the pose, which a ping never delays.
@@ -356,7 +353,7 @@ test('CHAT1 / AUDIT CHAT: the session as a CHANNEL (presence: false) - the hello
 test('CHAT1 / AUDIT CHAT: the log - the World tab from CHAT_TABS (one today, each a room the relay whitelists); a line kept on its tab under the cap; unread unless the panel is open ON that tab; select and open read it; the version bumps on what the panel would show; the peek holds then fades on the log\'s own clock; the tag from the id', () => {
   // CHAT-CHAN: four tabs - two ride rooms of their own (`link`), the World's fixed and the Region's set as the player moves
   // GUILD1c: and a fifth, the Guild's, riding the hub's link as the Party's does
-  // CHAT-TRADE: and the Trade and LFG tabs after the Language's, each riding a room of its own (PIN MOVED)
+  // CHAT-TRADE: and the Trade and LFG tabs after the Language's, each riding a room of its own (
   assert.deepEqual(CHAT_TABS.map((t) => [t.id, t.label, t.room, t.link]), [['world', 'World', 'chat:world', true], ['region', 'Region', null, true], ['lang', 'Lang', null, true], ['trade', 'Trade', null, true], ['lfg', 'LFG', null, true], ['party', 'Party', null, false], ['guild', 'Guild', null, false], ['local', 'Local', null, false]]);
   assert.ok(CHAT_TABS.every((t) => t.room === null || CHAT_ROOMS.has(t.room)), 'every room a tab starts on is a channel the relay runs (AUDIT CHAT A1)');
   assert.ok(CHAT_TABS.every((t) => typeof t.hint === 'string' && t.hint.length > 0), 'and each says who it reaches');
@@ -649,9 +646,6 @@ test('CHAT1 / AUDIT CHAT: the panel - built once over the document with the shee
 
 // ═══ CHAT2: THE LIST HOLDS ITS ROWS ══════════════════════════════════
 //
-// (2026-09-15, Mac relaying a player: "The chat UI when accumulating
-// messages scrunched together and makes history unreadable and after
-// some time, chat history disappears altogether.")
 //
 // Both halves were one bug, and it is the reason the pins above could
 // not see it: node HAS NO LAYOUT ENGINE, so this file's fake document
@@ -829,9 +823,7 @@ test('CHAT-G: the console says it ONCE - a flood must not become its own flood',
   } finally { console.warn = warn; }
 });
 
-// ── FONT1 (2026-09-16, Mac: "Enhanced mode UI. Especially the new
-// online interfaces font use our enhanced font ... Any enhanced UI or
-// text must be our enhanced version") ───────────────────────────────
+// ── FONT1 ───────────────────────────────
 
 test('FONT1: the chat is set in the ENHANCED face, not the launcher\'s - unsmoothed, with Silkscreen\'s five in the sheet', () => {
   // The panel stood over an enhanced world in `--data` (Barlow Semi

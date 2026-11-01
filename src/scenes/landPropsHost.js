@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "Their host"): THE LANDMARKS' HOST, a module the trees' host builds and
+// TESA-LANDS (, "Their host"): THE LANDMARKS' HOST, a module the trees' host builds and
 // frames (HOST-SPLIT; scenes/grahtHost.js is its shape). The GPU is made at the first landmark framed, a mesh or a picture
 // a breath, in Low Poly Trees' own buffers; the frame culls each built pixel's set to the view, the fog and its kind's
 // `far`, at its LOD, on the renderer's fourth tree slot, the nearest bodied ones the sun's casters. Off the lands' row

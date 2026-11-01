@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-SEA1 (2026-10-10, Mac, from the top of a mountain over the sea: "Anyway we can fix the draw distance for oceans
-// without affecting performance?"): THE HORIZON'S HAZE, ONE LAW. The streamed sea faded to the world fog's colour at
+// FAR-SEA1: THE HORIZON'S HAZE, ONE LAW. The streamed sea faded to the world fog's colour at
 // the fog's end (4000 units at the default Land view distance), stood fully fogged out to the streamed grid's square
 // edge, and past it the far ring's sea (EV8) came back at its haze hold, 85% - a shade DARKER than the band in front
 // of it. A flat sea shows that step whole: dark water, a pale band, a hard square edge, a darker plane to the horizon.
@@ -111,7 +110,7 @@ vec3 ringSea(vec3 ambient, vec3 sunColor, vec3 moonColor, float sunScale) {
   return seaSky(lit, V.y, uSkyZenith, uSkyHorizon, uSeaF0) + seaGlints(sunColor, seaSunLobe(H.y) * sunScale, moonColor, seaMoonLobe(Hm.y) * uMoonScale);
 }`;
 
-/** FAR-FLORA (2026-10-26, bible/06-Systems/Travel-View.md FAR-FLORA): THE CANOPY - the far views' woods are their trees'
+/** FAR-FLORA: THE CANOPY - the far views' woods are their trees'
  *  own colour (`vCanopy`) over the share of the ground their crowns hide (`vFlora`; render/farFlora.js,
  *  world/terrain/floraCover.js), LIT AS THE TREES ARE NEAR (floraLight: the flats' light, render/renderer.js BB_FS - the
  *  ambient and half the moon, half the sun under the clouds' shadow - so a wood on the horizon is the band's trees'

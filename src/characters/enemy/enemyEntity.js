@@ -117,7 +117,7 @@ export function skillsLevel(level) {
  *                  foe's spell magnitudes, loot and gear are not scaled a
  *                  second time through it.
  * `skillOverrides` (a caster's pinned magic skills) are left alone.
- * BAL11 (bible/05-Combat/Balance-Arc.md section 17): the hero's threat rides the same two channels (its share is in
+ * BAL11: the hero's threat rides the same two channels (its share is in
  * healthMult and damageMult), and its health is stood on `healthMult` too - what ai/tells.js kindHealth divides out, so
  * a high level's foe staggers as its kind does.
  */

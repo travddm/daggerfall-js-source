@@ -1,5 +1,4 @@
-// ARENA3, SEEN (2026-10-02, Mac: "join a team (red and blue)"; "Joining a team comes with it's own enhanced UI where you
-// can view your ranking and even player leaderboards"): the banners, the Arena window and the bookmaker over the real
+// ARENA3, SEEN: the banners, the Arena window and the bookmaker over the real
 // game on the world host - the Red Banner's recruiter at the gate and his choice, joining (the window opening on its
 // Team page), the window's every page over the real save, the bookmaker's stall and a wager paid from the purse, the
 // Herald's choice with the window's door, the pause window's Arena door once joined, and a ladder bout under the

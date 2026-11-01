@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 2 - THE BED'S FACE (2026-10-07): UNDER CLEAR WATER, THE GROUND IS A BED, NOT A PAINTING OF WATER. The water
+// WATER-NEXT 2 - THE BED'S FACE: UNDER CLEAR WATER, THE GROUND IS A BED, NOT A PAINTING OF WATER. The water
 // carves its bed (world/water/waterBed.js) and looks through to it - and the first shots from the real game (Daggerfall's
 // moat, tools/waterLookProbe.mjs) showed the same flat blue as before: the ground under the water wore Daggerfall's
 // WATER TILE, so the look through clear water was a look at more painted water. Where the enhanced water lies over the

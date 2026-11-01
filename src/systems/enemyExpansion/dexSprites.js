@@ -1,4 +1,4 @@
-// DEX2 (2026-10-20; Mac, 2026-10-19: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
+// DEX2 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
 // Kab), THE SPRITES ON THE TEXTURE DOOR.
 //
 // DFU draws a custom enemy from its archive's imported textures (TextureReplacement.GetMobileBillboardMaterial): every

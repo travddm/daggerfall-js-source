@@ -1,5 +1,4 @@
-// RESOURCE-HIGHLIGHTS (2026-10-26, the owner: "Reintroduce resource highlights as an option" - bible/06-Systems/
-// Professions-Arc.md section 54). NODE-OUTLINE's ring (section 46, retired by NODE-GLINT on 2026-10-20) back as a choice:
+// RESOURCE-HIGHLIGHTS. NODE-OUTLINE's ring (section 46, retired by NODE-GLINT on 2026-10-20) back as a choice:
 // the Resource highlights row (systems/features.js, the player's own pref) lights a gathering node with the glints (the
 // default), the ring round its own picture in its profession's colour, or both - one pass, one mask, read each frame
 // (render/nodeGlint.js). AUDIT GATHER F9 rides here too: a build that fails lets go of every program it made or started.

@@ -1,5 +1,5 @@
-// AUDIT SCHOOLS (2026-10-13; bible/01-Overview/audits/Audit-Schools.md). The owner: "Lets do a comprehensive audit on
-// everything" - five lanes read SCHOOLS (bible/06-Systems/Arcane-Specialisations.md) at 2c40b7f5: the law and the powers,
+// AUDIT SCHOOLS. The owner: "Lets do a comprehensive audit on
+// everything" - five lanes read SCHOOLS at 2c40b7f5: the law and the powers,
 // the spell engine's edits, online integrity, the player's surface and its words, and the pins and the record. Every
 // finding the audit fixed is pinned here BY EXECUTION through the producers that mint the shapes in play - the real cast
 // engine (scenes/hostMagic.js createPlayerMagic: its release, its missiles, its doors), real foes (characters/
@@ -567,7 +567,7 @@ test('AUDIT SCHOOLS L3 F2: A SAVE AN OLDER BUILD CARRIED KEEPS ITS PATH - no `ar
   p.spells = [signatureSpell('seer')];
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(p)));
   const { arcanePath: _a, pathPrompted: _b, ...older } = snap;
-  older.career = { ...older.career }; delete older.career.arcaneMirror;   // PIN MOVED (AUDIT SPEC-RESET L2-1): a save from before the mirror - the book alone bears witness
+  older.career = { ...older.career }; delete older.career.arcaneMirror;
   const back = (s) => { const e = structuredClone(playerEntity); restorePlayer(e, s); return [e.arcanePath, e.pathPrompted]; };
   assert.deepEqual(back(older), ['seer', true], 'the book bears witness');
   assert.deepEqual(back({ ...older, spells: [signatureSpell('seer'), signatureSpell('necromancer')] }), [null, false], 'two paths\' spells');
@@ -653,9 +653,8 @@ test('AUDIT SCHOOLS L4 M1 / L5 H3: THE ONE ASK (scenes/shared.js raisePlayerSkil
   three.masterSkillsInfoSeen = true;
   raisePlayerSkills(three, { ask, rolls: () => 0.99 });
   assert.equal(asks.length, 2);
-  // PIN MOVED (GROWTH4, bible/10-UI/Growth.md section 7): the enhanced skin's box sends the player to the Growth tab; the
   // classic skin's to the skill screen, whose S row opens the same guide
-  assert.deepEqual(asks[1].rows, ['Specialization', '', '3 specializations are open to you:', 'Riftwalker, Warden, Necromancer', '', 'See them all and choose one on the Growth tab of the pause menu.', 'Resetting it later costs 200,000 gold.']);   // PIN MOVED (SPEC-RESET; AUDIT SPEC-RESET L4-5: the price a row of its own)
+  assert.deepEqual(asks[1].rows, ['Specialization', '', '3 specializations are open to you:', 'Riftwalker, Warden, Necromancer', '', 'See them all and choose one on the Growth tab of the pause menu.', 'Resetting it later costs 200,000 gold.']);
   assert.equal(AP.pathsOpenRows([AP.PATH_BY_ID.warden]).at(-2), 'Choose one in your skill screen.', 'the classic skin\'s');
   assert.deepEqual([asks[1].okOnly, asks[1].onYes, three.arcanePath ?? null, three.pathPrompted], [true, null, null, true], 'named, none chosen');
   // one box a pass: a mastery waiting is asked first, the path on the next quiet pass
@@ -701,7 +700,6 @@ test('AUDIT SCHOOLS L4 H1 / L5 H3: THE CLASSIC SHEET\'S S ROW - drawn on a skill
 });
 
 test('AUDIT SCHOOLS L4 8 / L5 H3: THE ENHANCED MODEL - each path names its two schools; a chosen one its schools too; a class whose career holds fewer than two schools can never meet one (pathPossible), and its sheet says so by showing nothing (mutants: the schools unnamed; pathPossible always true)', async () => {
-  // PIN MOVED (GROWTH2, bible/10-UI/Growth.md section 5): the enhanced model is the Growth tab's guide (ui/growth/specGuide.js)
   const { specGuideModel } = await import('../../src/ui/growth/specGuide.js');
   const fam = (e) => specGuideModel(e).families.find((f) => f.id === 'arcane');
   const m = fam(mage([ALT, RES, MYS], 100));
@@ -729,12 +727,11 @@ test('AUDIT SCHOOLS L5 H3: THE ENHANCED PAUSE WINDOW, DRIVEN - its Master Skills
     const host = globalThis.document.createElement('div');
     const menu = mountEnhancedMenu(host, { mode: 'pause', hooks: {}, onAction: () => {}, at: 'stats' });
     try {
-      // PIN MOVED (GROWTH1/GROWTH2): the Stats page's Growth door counts the path waiting; the guide names it, asks, chooses
       const btn = (text) => host.querySelectorAll('button').find((b) => b.textContent.startsWith(text));
       const door = btn('Growth');
       assert.equal(door?.textContent, 'Growth (1)', 'the door counts the specialisation waiting');
       door.onclick();
-      host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();   // PIN MOVED (VOICE2): the rail's American spelling
+      host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();
       const bar = host.querySelectorAll('button').find((b) => String(b.className).includes('gr-pathbar') && b.textContent.startsWith('Necromancer'));
       assert.ok(bar, 'the guide\'s Necromancer');
       assert.match(bar.textContent, /Restoration and Mysticism/);
@@ -754,7 +751,6 @@ test('AUDIT SCHOOLS L5 H3: THE ENHANCED PAUSE WINDOW, DRIVEN - its Master Skills
     const host2 = globalThis.document.createElement('div');
     const menu2 = mountEnhancedMenu(host2, { mode: 'pause', hooks: {}, onAction: () => {}, at: 'stats' });
     try {
-      // PIN MOVED (GROWTH2): the guide says it - no arcane path for a class with no two schools, the Brute's weapons meet the martial
       host2.querySelectorAll('button').find((b) => b.textContent.startsWith('Growth')).onclick();
       host2.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();
       const head = () => host2.querySelectorAll('div').find((d) => String(d.className).includes('gr-headline'))?.textContent ?? '';

@@ -1,4 +1,4 @@
-// DECOR-LPT (FIELD BUGS 2026-10-05b, the owner: "elements should recieve the low poly overhaul style like trees got";
+// DECOR-LPT (FIELD BUGS 2026-10-05b,;
 // asked which, "Placed trees & plants"). A yard's placed tree stood as its classic picture wherever Low Poly Trees stood
 // the town's own as 3D trees. Now a placed tree or plant the mod has a tree for stands as the world's do: its 3D tree near
 // the eye - turned by the piece's turn, sized by its scale - and the same tree's far picture beyond, giving way to it; the

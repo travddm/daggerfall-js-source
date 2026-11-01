@@ -1,12 +1,11 @@
-// SNOWFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be
-// on by default and integrate into our enhanced environments seamlessly") - SNOWFALL 1.0.5 (demifiend000), ported off
+// SNOWFALL1 - SNOWFALL 1.0.5 (demifiend000), ported off
 // its assembly (vendor/snowfall/). THE MODEL (systems/snowfall.js): SnowpackState, SnowDepthRules.Resolve,
 // SnowCoverageData over the mod's own three masks (public/art/snowfall/), SnowContactRamp, PersistentTrackField and its
 // save, the masks' rasterizers, the statics' encodings, BasicRoadsClassifier and BasicRoadsTerrain, and the field's
 // eviction - pinned against a C# reference that runs the decompiled method bodies themselves (the session's harness:
 // the mod's own sources on .NET 8, its float arithmetic and its DeflateStream): nine trace hashes, float bits and all,
 // one LCG run through them in order, so the sections below run in the reference's order and share its generator.
-// bible/03-World/Snowfall.md is the record.
+// is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';

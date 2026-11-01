@@ -1,8 +1,8 @@
-// CHAP3c (2026-10-08, Mac: "Continue", on "Keep going with the arc/slices") - THE BANDS ON THE HALLS: online, a guild
+// CHAP3c - THE BANDS ON THE HALLS: online, a guild
 // hall's training, a spell bought and a spell made cost a quarter more where its chapter is Failing and a tenth less
 // where it is Thriving or Ascendant, and its shelf is stocked as a hall four qualities poorer or richer - DFU's own price
 // and stock laws the base, the band laid over them; offline, and for a chapter the sheet does not name, DFU's own.
-// bible/11-Multiplayer/Chapters-Arc.md 5.2 and 5.3 (CHAP3c).
+// 5.2 and 5.3 (CHAP3c).
 //
 // The law against literals; the sheet the playing tab holds, over a fake door; DFU's training, spellbook and spellmaker
 // with the factor and without; the shelf's count; the hosts' wiring.
@@ -30,7 +30,7 @@ const tick = () => new Promise((r) => setImmediate(r));
 // ── THE LAW ─────────────────────────────────────────────────────────
 
 test('CHAP3c a hall\'s factor by its chapter\'s band - a quarter more Failing, a tenth less Thriving, a fifth less Ascendant (GUILD3e), DFU\'s own Steady and where no Strength is known (mutants: each band, the unknown)', () => {
-  assert.deepEqual([0, 19, 20, 69, 70, 89, 90, 100].map(chapterPriceFactor), [1.25, 1.25, 1, 1, 0.9, 0.9, 0.8, 0.8]);   // PIN MOVED: GUILD3e - Ascendant a fifth off
+  assert.deepEqual([0, 19, 20, 69, 70, 89, 90, 100].map(chapterPriceFactor), [1.25, 1.25, 1, 1, 0.9, 0.9, 0.8, 0.8]);
   assert.deepEqual([null, undefined, NaN, '80', Infinity].map(chapterPriceFactor), [1, 1, 1, 1, 1]);
   assert.deepEqual(CHAPTER_BANDS.map((b) => b.shelf), [-4, 0, 4, 4]);
 });

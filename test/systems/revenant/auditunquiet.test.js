@@ -1,5 +1,4 @@
-// AUDIT UNQUIET (bible/06-Systems/Revenants.md section 49; the owner, 2026-10-18: "Audit everything and ensure absolute
-// perfection"): five read-only lanes over UNQUIET I-III, every finding fixed or decided. Pinned here, each against the
+// AUDIT UNQUIET (): five read-only lanes over UNQUIET I-III, every finding fixed or decided. Pinned here, each against the
 // fix it needs: the birth's gate (a peer's puppet, a forgotten one, the cap read after the mirror, a rite's faithful);
 // one Dread, not counted; the tear-away's count; the blood a rank spends; a slip never ascending; the trail only to the
 // den its escape chose; the Dread's drop and hoard; an heir's clocks; the clocks held to the character's; a forgotten

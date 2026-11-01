@@ -1,6 +1,4 @@
-// SD-THROUGH (2026-10-21, the owner: "So the abyss dungeon. When someone finds and enters the portal. I want a portal to
-// show up for anyone in the dungeon and anyone entering that automatically leads them there."; bible/11-Multiplayer/
-// Super-Dungeons.md section 6, SD-THROUGH and AUDIT SD-THROUGH): THE FIRST SOUL THROUGH, ON THE RELAY. A Hollow's realm
+// SD-THROUGH: THE FIRST SOUL THROUGH, ON THE RELAY. A Hollow's realm
 // (`sd:<s>`) tells the hub at an admission (SD_INTERNAL_IN - unawaited, a hello never waits on it); a tell that does not
 // land is OWED and told again on the realm's alarm (AUDIT SD-THROUGH A1), never once the realm's own Remnant has fallen
 // (A4), a 400 the hub's last word (A5); the hub stamps its record's `inAt` once (net/superDungeon/sdLaw.js sdEnter) and says

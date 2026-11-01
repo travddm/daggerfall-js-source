@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // A FOUND PIECE'S MARK, AND WHAT ITS OWNER MENDED PAST IT - the one home of the law a sale reads a found piece's
-// condition by (SELL-AS-FOUND, AUDIT ECON O1; MEND-THIRD and AUDIT MEND-THIRD, 2026-10-19; bible/06-Systems/Economy-Arc.md).
+// condition by (SELL-AS-FOUND, AUDIT ECON O1; MEND-THIRD and AUDIT MEND-THIRD, 2026-10-19).
 //
 // A piece the world hands over worn carries `foundCondition`, the condition it was handed over at: Roleplay & Realism:
 // Items' rolls on a pile, a body and a shelf, Unleveled Loot's death drops, a bounty, a foe's worn kit and a new
@@ -18,8 +18,7 @@
 
 import { conditionPercentage } from './itemTemplates.js';
 
-/** MEND-THIRD (2026-10-19, the Discord's #feature-feedback "Bring back loot price based on the condition!", through Mac:
- *  "Do it"; AUDIT MEND-THIRD, Mac: "Only your own mends", "Keep a third"): the share of its owner's own mends past a
+/** MEND-THIRD: the share of its owner's own mends past a
  *  piece's mark that a sale credits. */
 export const MEND_SALE_SHARE = 1 / 3;
 

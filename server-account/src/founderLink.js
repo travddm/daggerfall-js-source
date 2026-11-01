@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // FOUNDER5 — THE LINK, KEPT LIVE.
 //
-// Mac (2026-10-07): "Can we grant every account before sept 25th the
-// founder title" - and then, "I want to do this without my input".
+// and then, "I want to do this without my input".
 //
 // FOUNDER4's migration (0078) wrote `players.first_played_at` ONCE: the
 // earliest first play of a row an account shares a character with. Its

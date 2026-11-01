@@ -1,5 +1,4 @@
-// AUDIT GRANT (2026-10-18, Mac: "Audit this real quick", then "Yes fix them"; bible/11-Multiplayer/Spawn-Grants.md
-// section 17): THE CLIENT'S HALF OF THE AUDIT'S FIXES - the session hears a world room's answers and the law each says
+// AUDIT GRANT: THE CLIENT'S HALF OF THE AUDIT'S FIXES - the session hears a world room's answers and the law each says
 // (A1, A10); the grants' host (scenes/grantHost.js) asks nothing of a socket that is not open (A9), keeps the relay's
 // clock (A6), carries the grants longest unsaid first (A2), sweeps each pool's watchmen alone (A3), asks a refused
 // watchman again (A12), carries again a crossing never answered (A13), and falls back to an encounter for an `encr`
@@ -101,7 +100,7 @@ test('AUDIT GRANT A11 A RECORD JUDGED ONCE IS TALLIED ONCE: the same record on t
   const h = createGrantHost({ session: () => null, climateAt: () => 231, fetchKey: async () => R.publicKey, verdictWait: 30 });
   const g0 = gr({ g: 21, o: 'zzz-0009', n: 2, e: 0, c: [-1, -1] });
   const signed = { ...g0, sg: await signGrant({ ...g0, sg: undefined }, R.privateKey, { subtle }) };
-  assert.equal(await h.check('zzz-0009', CELL, { i: 3, t: 0, gr: [21, 0] }), 'ungranted', 'not heard yet');   // PIN MOVED (GRANT-UNHEARD): unheard, never `unsigned`
+  assert.equal(await h.check('zzz-0009', CELL, { i: 3, t: 0, gr: [21, 0] }), 'ungranted', 'not heard yet');
   h.heard('zzz-0009', [signed]);
   assert.equal(await h.check('zzz-0009', CELL, { i: 3, t: 0, gr: [21, 0] }), null, 'heard since: judged anew, and honest');
   const forged = { i: 4, t: 0, z: 1, gr: [21, 1] };

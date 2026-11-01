@@ -88,7 +88,7 @@ test('AUDIT39 #64: the impact recovers the arrow whatever the damage, and never 
   const said = [];
   const dmg = playerArrowHitFoe(
     { weapon: { material: 0 }, pos: [0, 1, 0], dir: [0, 0, 1] }, foe,
-    { playerEntity: { isPlayer: true }, playerFeet: [0, 0, -1], dealDamage: (f, d) => dealt.push(d), say: (l) => said.push(l), rolls: () => 0 });   // PIN MOVED (ARROW-LODGE): the shaft survives its strike - under ARROW_LODGE_CHANCE
+    { playerEntity: { isPlayer: true }, playerFeet: [0, 0, -1], dealDamage: (f, d) => dealt.push(d), say: (l) => said.push(l), rolls: () => 0 });
   assert.equal(dmg, 0);
   assert.deepEqual(dealt, [], 'no damage, no door - the pool owns the death chain');
   assert.equal(foe.entity.items.length, 1, 'the arrow is recoverable from the TARGET, damage or not');
@@ -138,7 +138,7 @@ const shoot = (opts, rolls) => {
 test('AUDIT39 #64: a LANDED arrow runs the melee ladder - the swing mods and the backstab ride it', () => {
   // the plain shot, facing the foe, no screen weapon out
   const [plain, log] = shoot({ playerFeet: [0, 0, 5] }, seq(0, 0.99, 0.05, 0.999, 0.99));
-  assert.equal(plain, 18, 'Long Bow max, str bonus, iron: the weapon ladder ran');   // PIN MOVED (BAL-ARCHERY, Balance-Arc.md section 18): the Long Bow's top is 19, so 17 is 18 throughout
+  assert.equal(plain, 18, 'Long Bow max, str bonus, iron: the weapon ladder ran');
   // and the payload rings in DFU's order - sound and splash BEFORE the
   // pool's damage door, which is the only thing that writes health
   assert.deepEqual(log, ['sound', ['blood', 2], ['deal', 18]],
@@ -217,8 +217,6 @@ test('AUDIT39r R16: a player arrow bleeds its TARGET, not its own tip', () => {
 });
 
 // ── FOE1: THE OPTS A CALL REALLY PASSES ──────────────────────────
-// (2026-09-15, Mac relaying players: "during online play, certain
-// enemies cant be damaged".)
 //
 // THE BUG WAS A COMMENT. HT1 appended `// HT1: the torch keys` to the
 // end of the physical line that already carried

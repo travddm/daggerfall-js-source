@@ -1,7 +1,7 @@
-// AUDIT WB12d (2026-10-02, Mac: "Audit this. Its needs to be detailed and perfection. AAA grade"): THE FAITHFUL ON THE
+// AUDIT WB12d: THE FAITHFUL ON THE
 // CAMPS' LAW, END TO END - the real exteriorFoes pool, the world host's own WOD7 law sliced from scenes/world.js (the
 // WOD7 pin's own way), and the real rite host on the world's deps: a teleport and back, an owner who leaves, a race and
-// its winner gone, a handover, a save and its load, a Wabbajack, the opening - bible/11-Multiplayer/World-Bosses.md
+// its winner gone, a handover, a save and its load, a Wabbajack, the opening
 // section 19 D, AUDIT WB12d C1, C2, C3, C5, C11.
 import '../../modsOff.js';
 import { test } from 'node:test';

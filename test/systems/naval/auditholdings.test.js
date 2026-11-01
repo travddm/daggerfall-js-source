@@ -1,5 +1,4 @@
-// AUDIT HOLDINGS (2026-10-03, Mac: "Audit this, ensure its perfection", of PR #549's HOLDINGS arc - the Holdings tab,
-// the Stable, the Fleet, refits, names, crew roles and the ports' quays; bible/01-Overview/audits/Audit-Holdings.md). Every
+// AUDIT HOLDINGS. Every
 // finding re-run before it was fixed, and pinned here: each pin fails on the build it fixes.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -256,7 +255,6 @@ test('AUDIT HOLDINGS C5/C6: a horse never named, renamed with nothing, keeps no 
   owns = false;
   assert.deepEqual(p.stableAct('rename', 'X'), { ok: false, text: 'You do not own a horse.' });
   const menu = read('src/ui/enhanced/enhancedMenu.js');
-  // PIN MOVED (AUDIT COLLECTIONS-II, lanes 2 and 5): the rail is never empty - the Collections page is every player's, so a
   // host with no holdings opens on it, never on the Stable's "you own no horse"; the empty rail's branch went with it
   assert.doesNotMatch(menu, /if \(!secs\.length\) \{/);
   assert.match(menu, /\.\.\.\(collectionsPageShown\(playerEntity\) \? COLLECTION_PAGE_SECTIONS : \[\]\)\];/);
@@ -312,13 +310,11 @@ test('AUDIT HOLDINGS O1: a harbour is sounded only once every pixel its scan rea
   ready = true;
   h.run(0.2);
   assert.deepEqual(h.host.harbourList().map((x) => x.harbour.berths.map((b) => b.pos)), [HARBOUR.berths.map((b) => b.pos)], 'sounded once it is built - the berths every client finds');
-  // PIN MOVED (RPT1026-WORLD FAR-QUAY): the readiness moved out of world.js navalHarbourNear to systems/naval/harbourBook.js
   // harbourOf, and a pixel it reads is known built - or dry for certain (harbourKnown: no build stands water there)
   const world = read('src/systems/naval/harbourBook.js');
   assert.ok(world.includes('for (let i = 0; i <= nx; i++) for (let k = 0; k <= nz; k++) if (!harbourKnown(built, state, woods, x0 + Math.min(sx * i / nx, sx - EDGE_IN), z0 + Math.min(sz * k / nz, sz - EDGE_IN))) return false;'), 'every point of the scan box known');
-  assert.match(world, /return \{ key: `port:\$\{t\.id\}`, name: t\.name \?\? null, rect, ready, reach \};/);   // PIN MOVED (AUDIT CAPTAIN'S SEA H1): and the reach it is sounded to - an isle port's its shore
-  assert.match(hostText('src/scenes/world.js'), /return \{ \.\.\.h, keep: harbourKeep\(t\.loc, h\.rect\) \};/);   // PIN MOVED (PORT-SHIPS): each town's keep beside its harbour (scenes/harbourHost.js, systems/naval/harbourKeep.js)
-  // PIN MOVED (FB1020c HARBOUR-REACH): any reach the book asks it at - its own, or the port law's ring's - every pixel built
+  assert.match(world, /return \{ key: `port:\$\{t\.id\}`, name: t\.name \?\? null, rect, ready, reach \};/);
+  assert.match(hostText('src/scenes/world.js'), /return \{ \.\.\.h, keep: harbourKeep\(t\.loc, h\.rect\) \};/);
   assert.match(world, /const reach = t\.reach \?\? HARBOUR_REACH;[^\n]*\n\s+const ready = \(r = reach\) => \{[^\n]*\n\s+const x0 = rect\.minX - r, z0 = rect\.minZ - r, sx = rect\.maxX - rect\.minX \+ 2 \* r, sz = rect\.maxZ - rect\.minZ \+ 2 \* r;/, 'every pixel of that reach built');
 });
 
@@ -348,10 +344,8 @@ test('AUDIT HOLDINGS Q1: the gangway runs square to her side at her waist and to
     const f = quayFrame(b, h.harbour.hull), x0 = f.halfWidth + QUAY_GAP;
     const [fx, fz] = sceneToQuay(f, g.foot[0], g.foot[2]), [hx, hz] = sceneToQuay(f, g.head[0], g.head[2]);
     assert.ok(Math.abs(fz - hz) < 1e-9, `hull ${hull}: square to her`);
-    // PIN MOVED (SHIPS-2, 2026-10-07): hull 1 is Mac's Tiny Ship - her gunwale 2.25 m over the sea, over the quay's kerb
     // (1.75), so her plank climbs from the deck as a ship's (onto her cap's outer edge: quays.js GANGWAY_SIDE)
     if (hull >= 1) {
-      // PIN MOVED (GALLEON-HOLDINGS): a ship's climbs from the deck at GANGWAY_SLOPE - but a head too high for that on the
       // quay (Mac's galleon's at 6.7 m wants 8.8 m of run, and the quay is 4.5 m deep) stops GANGWAY_BACK short of its back
       // and climbs steeper: hers alone of the hulls that dock
       // (SHIPS-2: a head as low as the Tiny Ship's, 0.66 m over the deck, wants 1.14 m of run - its foot GANGWAY_CLEAR in

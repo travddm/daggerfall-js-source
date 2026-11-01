@@ -1,4 +1,4 @@
-// WAGONS2 (2026-10-09, Mac: "6. Real wheel movement"): EACH WHEEL ROLLS ON ITS OWN, AND THE FOUR-WHEELERS STEER,
+// WAGONS2: EACH WHEEL ROLLS ON ITS OWN, AND THE FOUR-WHEELERS STEER,
 // pinned by execution. Horse Cart and Cargo turns both wheels of its wagon by one angle off the wagon's travel and
 // stands a parked wagon's at 0; Mac's wagons now turn each wheel by its own contact's travel along its own heading over
 // its own radius (systems/horse/horseCart.js wheelContacts / rolledAngles), the open wagon's and the caravan's front axle,
@@ -100,7 +100,7 @@ test('WAGONS2 THE PARTS: each wheel carries its own radius, a four-wheeler\'s fr
     close(parts.bogie.wheelbase, 3.8659, 1e-9, `${kind}: the wheelbase`);
     close(parts.bogie.steerLimit, 6.849695, 1e-5, `${kind}: the lock`);
     const [blo, bhi] = zs(g.bogie.geometry);
-    close(bhi, WAGON_KINDS[kind].hitch + TEAM.poleTip + 0.2, 1e-5, `${kind}: the bogie reaches the pole's iron between the pair's collars`);   // PIN MOVED (WAGONS3)
+    close(bhi, WAGON_KINDS[kind].hitch + TEAM.poleTip + 0.2, 1e-5, `${kind}: the bogie reaches the pole's iron between the pair's collars`);
     assert.ok(blo > 3.7 && blo < 3.8, `${kind}: and back to the front axle (${blo})`);
     close(zs(g.statics)[1], MEASURED[kind].frontZ, 1e-2, `${kind}: the body ends at its own front`);
     close(parts.bounds.max[2], Math.max(zs(g.statics)[1], parts.bogie.reach?.max?.[2] ?? -Infinity), 1e-6, `${kind}: the bounds stop at the body - the pole and its team outside the parked box (PIN MOVED, WAGONS3)`);
@@ -348,7 +348,7 @@ test('WAGONS2 x OW-BIG: under the Overworld each of my grown wheels keeps its ow
   const drawn = () => { r.draws.length = 0; pool.draw(r, null, { selfGrow: 8 }); return r.draws.slice(2, 6).map((d) => wheelTurnOf(d.m)); };
   closeAll(drawn(), [10, 20, 30, 40], 1e-4, 'grown from where they stood');
   wheel.angles = [10 + 80, 20 + 40, 30 - 16, 40 + 8];
-  const g = rigGrowOf(8, 'openWagon');   // PIN MOVED (WAGONS3): the rig's own grow, not the traveller's eight
+  const g = rigGrowOf(8, 'openWagon');
   closeAll(drawn(), [10 + 80 / g, 20 + 40 / g, 30 - 16 / g, 40 + 8 / g], 1e-4, 'each its own step, over the rig\'s grow');
 });
 

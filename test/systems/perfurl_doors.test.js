@@ -1,4 +1,4 @@
-// PERF-URL (2026-09-29, Mac: "I'm receiving reports after some updates, performance seems to be worse") - THE PAGE'S
+// PERF-URL - THE PAGE'S
 // QUERY IS PARSED ONCE A SEARCH, AND NO DOOR PARSES ON ITS OWN.
 //
 // Counted in the real game (Knightstale in the rain, the world host settled): 84 URLSearchParams minted a frame - 54

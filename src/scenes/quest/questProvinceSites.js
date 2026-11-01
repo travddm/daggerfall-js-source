@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT RELEASE R2-5 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-5; bible/06-Systems/Quest-Arc.md
-// "A province's region"; the owner, for the release that carries TESA: "expand our world seamlessly. All systems should be
-// integrated precisely") - A PROVINCE'S REGION FOR THE QUEST LAYER: where a quest giver past the Bay sends the player.
+// AUDIT RELEASE R2-5 - A PROVINCE'S REGION FOR THE QUEST LAYER: where a quest giver past the Bay sends the player.
 //
 // DFU draws a remote site from the questor's region's MAPS.BSA rows (Place.SelectRemoteTownSite :790-870,
 // SelectRemoteDungeonSite :880-935, SelectRemoteLocationExteriorSite :940-985 - systems/quest/place.js ports each whole).
@@ -18,7 +16,7 @@
 //    PROVINCE_LAIR_REACH, on the pixels the build stands them (no capital, Arena place or countryside place first). A lair
 //    is a pixel's roll and a province holds thousands (some 250 within a Bay region's span, each read a few milliseconds),
 //    so the table holds the nearest, reading at most PROVINCE_LAIR_ROLLS cells nearest first (each read once, kept).
-//  - A CAPITAL OF MANY SLICES IS A DESTINATION SLICE BY SLICE (the owner, 2026-10-26: "Take care of exclusions and gaps";
+//  - A CAPITAL OF MANY SLICES IS A DESTINATION SLICE BY SLICE (;
 //    R2-5b): the Imperial City's 625 slices (TESA11, IC-GRAND) are 625 locations under fourteen names, which DFU's name
 //    lookup (DFRegion.MapNameLookup, a name to one index) reads as fourteen. Each slice is its row under a QUEST NAME of
 //    its own (capitalQuestNames: its district's name, and where the district spans several slices ", quarter N" - N its
@@ -125,7 +123,7 @@ export function questView(loc) {
 }
 
 /**
- * R2-5c: A CAPITAL IS ONE TOWN (WW7-11 capitalStreet; the owner: "Take care of exclusions and gaps") - the other slices of
+ * R2-5c: A CAPITAL IS ONE TOWN (WW7-11 capitalStreet) - the other slices of
  * the capital a location is a slice of, nearest first (the travel reckoning's longest axis from it, a tie by slice index -
  * the same on every client), each as the quest layer sees it (questView), stood only as a search reaches it (a generator);
  * none past the slices no site may stand in (isUnsitedSlice), none for any other location. A local site the questor's own

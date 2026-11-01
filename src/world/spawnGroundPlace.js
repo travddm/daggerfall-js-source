@@ -1,5 +1,5 @@
 // @ts-check
-// GROUND-AGREE (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): THE PLACE A PIXEL'S GROUND IS SHAPED FOR.
+// GROUND-AGREE: THE PLACE A PIXEL'S GROUND IS SHAPED FOR.
 //
 // A location levels its whole pixel (DFU's BlendLocationTerrain, world/terrain/terrainTiles.js blendLocationTerrain), and
 // online a spawned dungeon is a location. Whether a spawn STANDS is each client's clocks (TTL1, SPAWN-REBIRTH: seven days
@@ -10,7 +10,7 @@
 //
 // The gates are spawnedDungeonAt's (scenes/spawnStandHost.js), which stands the spawn: none offline, none past the Veil
 // (the isles stand their own places), none in the open zone (its halls are stood, by the day), and none where the roll
-// stands no spawn, on the sea, on a wet plateau or on a pixel a path crosses - and SPAWN-WORLD (2026-10-26): past the Bay
+// stands no spawn, on the sea, on a wet plateau or on a pixel a path crosses - and SPAWN-WORLD: past the Bay
 // none on a place (a capital, an Arena place, the countryside's or a lair - they stand first, `placeAt`), its path the
 // roads past the Bay's (world/spawnedDungeons.js pathFreePixel). The host hands in what it holds; this module reads
 // nothing else of it.

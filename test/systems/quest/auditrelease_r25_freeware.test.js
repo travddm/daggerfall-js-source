@@ -1,5 +1,4 @@
-// AUDIT RELEASE R2-5 ON THE FREEWARE (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-5;
-// bible/06-Systems/Quest-Arc.md "AUDIT RELEASE R2-5"): where ARENA2_PATH names the freeware, a questor in each of three
+// AUDIT RELEASE R2-5 ON THE FREEWARE: where ARENA2_PATH names the freeware, a questor in each of three
 // provinces end to end over the world the build stands (test/systems/quest/r25World.mjs) - the law's own pins are
 // test/systems/quest/auditrelease_r25.test.js. Split from it so a mutant its fixtures kill runs in seconds.
 import '../../modsOff.js';
@@ -143,7 +142,7 @@ test('R2-5 with ARENA2: a Fighters Guild, a Mages Guild, a temple, a social give
         const sd = place.siteDetails, p = sd.worldPixel;
         assert.equal(sliceQuestName(p.x, p.y), sd.locationName, `${name} ${place.symbol.name}: a slice of the city, under its quest name`);
         // the first slice, nearest the centre first, whose own search gives the site's kind (the order itself is pinned on
-        // its fixture: auditrelease_r25.test.js R2-5c). PIN MOVED (AUDIT SHIP-READY S11): the search leaves out a building a
+        // its fixture: auditrelease_r25.test.js R2-5c).
         // quest holds (_isBuildingAssigned, Place.cs's), this quest's own site among them, so the site's slice gives its kind
         // by holding it - IC-STAIRS' doors left quarter 34 one Mages Guild hall, and the search walked on past it
         const law = place.declaredSiteLaw();

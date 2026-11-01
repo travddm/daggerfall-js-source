@@ -1,4 +1,4 @@
-// COST-2 (2026-10-24; bible/11-Multiplayer/Scale-Arc.md COST-2): THE CELL TREE (src/net/cellTree.js) - a quadtree over
+// COST-2: THE CELL TREE (src/net/cellTree.js) - a quadtree over
 // the open country's 16-pixel grid. L0 is today's cell under today's `world:` key; a coarse node is `cell:<L>:<nx>,<ny>`;
 // the tree is the set of split nodes around a base level, and a fine cell's node is the walk down from its L4 node while
 // the node it stands in is split. L0_TREE is today's partition exactly.

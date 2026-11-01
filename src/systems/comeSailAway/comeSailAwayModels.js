@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): COME SAIL AWAY'S BOATS, READ BACK - the files
+// CSA-B: COME SAIL AWAY'S BOATS, READ BACK - the files
 // tools/comeSailAwayExtract.mjs wrote out of the mod's bundle
 // (vendor/come-sail-away/Models/) as what the port instances and draws.
 //
@@ -70,10 +70,10 @@ export const CSA_MODEL_URLS = Object.freeze({
   materials: new URL('../../../vendor/come-sail-away/Models/materials.json', import.meta.url).href,
   animation: new URL('../../../vendor/come-sail-away/Models/animation.json', import.meta.url).href,
 });
-/** GALLEON (2026-10-01): the new galleon's model, baked from Mac's export (tools/bakeGalleon.mjs) - the port's own, not
+/** GALLEON: the new galleon's model, baked from Mac's export (tools/bakeGalleon.mjs) - the port's own, not
  *  the mod's, so never among its files above: hull 2 is built on it (comeSailAwayModels' `galleon`). */
 export const GALLEON_MODEL_URL = new URL('../../assets/galleon/galleon.json', import.meta.url).href;
-/** SHIPS-2 (2026-10-07): the new carrack's model and the new large boat's, baked from Mac's Tiny_Ship.fbx
+/** SHIPS-2: the new carrack's model and the new large boat's, baked from Mac's Tiny_Ship.fbx
  *  (tools/bakeCarrack.mjs, tools/bakeLargeBoat.mjs) - the port's own, as the galleon's is. */
 export const CARRACK_MODEL_URL = new URL('../../assets/ships/carrack.json', import.meta.url).href;
 export const LARGE_BOAT_MODEL_URL = new URL('../../assets/ships/largeBoat.json', import.meta.url).href;
@@ -153,11 +153,11 @@ export async function loadComeSailAwayModels(fetchFn = globalThis.fetch, urls = 
 /**
  * The files as the port reads them. `geometry(key)` decodes a mesh once.
  *
- * GALLEON (2026-10-01): with `galleon` (src/assets/galleon/galleon.json) the new galleon STANDS IN FOR HULL 2 - prefab
+ * GALLEON: with `galleon` (src/assets/galleon/galleon.json) the new galleon STANDS IN FOR HULL 2 - prefab
  * 112412 is her tree (world/ships/galleonModel.js galleonPrefab), her components join the shared table after the mod's, her
  * meshes answer `geometry` (decoded already - she is built, not extracted) and `meshes` their boxes, and her clips and
  * overrides join the mod's animation. Without it every file reads as the mod shipped it (the mod's own pins read that).
- * SHIPS-2 (2026-10-07): with `carrack` the new carrack stands in for hull 4 (prefab 112414) and with `largeBoat` the new
+ * SHIPS-2: with `carrack` the new carrack stands in for hull 4 (prefab 112414) and with `largeBoat` the new
  * large boat for hull 1 (112411), each so - their components after the galleon's, each built on the place in the table
  * its components take (PORT_SHIPS' order), their meshes marked with the ship they are (`port`; the galleon's `galleon`
  * too, as they were).

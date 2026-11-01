@@ -1,5 +1,4 @@
-// EM3-3D MAP CHOICE (2026-09-27, Mac: "The dungeon map becomes the new default option, the current 2d enhanced
-// becomes an option, not removed"). The 3D dungeon map (the patch's solid sheet) ships ON; the flat Enhanced plan is
+// EM3-3D MAP CHOICE. The 3D dungeon map (the patch's solid sheet) ships ON; the flat Enhanced plan is
 // the Features row's Off; `?dungeonmap=flat` stays the kill door. Driven through the real door and window: the sheet
 // the held map builds for a dungeon is solid or flat by the switch, read at each open.
 import { test, beforeEach } from 'node:test';

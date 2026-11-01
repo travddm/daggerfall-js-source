@@ -1,5 +1,4 @@
-// REGION-VIEWS (2026-10-20, the owner: "do your own performance pass ... go deep"; bible/07-Rendering/Performance-Priority.md
-// REGION-VIEWS) - A REGION'S FOUR RECORDS READ WHERE MAPS.BSA HOLDS THEM. MapsFile keeps one region resident
+// REGION-VIEWS - A REGION'S FOUR RECORDS READ WHERE MAPS.BSA HOLDS THEM. MapsFile keeps one region resident
 // (autoDiscard, as MapsFile.cs does), so every walk over the regions - the boot's map dictionary and index, a quest's
 // places, the ports, the sea lanes, the raids - read every region again, and each read COPIED its four records (357 KB a
 // region on the mean, 22 MB a walk): 364 regions read by a boot's 40th frame, half a second of copying and its

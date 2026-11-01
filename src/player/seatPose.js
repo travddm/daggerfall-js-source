@@ -1,6 +1,5 @@
 // @ts-check
-// CARDS2b (2026-10-07, bible/11-Multiplayer/Tavern-Cards.md section 12; Mac: "a sort of table enviroment where you can
-// see other players sprites"): THE SEATED BODY'S REQUEST - pure. Morrowind has no sitting animation, so the seat is
+// CARDS2b: THE SEATED BODY'S REQUEST - pure. Morrowind has no sitting animation, so the seat is
 // posed the way CLIMB6 poses a climb: a request in the WORLD (metres, Y up, the body facing `yaw`) that
 // combat/climbRig.js's climbRequestToRig maps into the rig and applyClimbRig solves on the skeleton's own bones - the
 // hips lowered onto the chair, the feet planted on the floor before it with the knees forward, the hands on the table.
@@ -112,8 +111,7 @@ export function seatRequestFor(seat, { unitsPerMetre, weight = 1, height = 1 }) 
 
 // ── COATS3D: the saddle ──────────────────────────────────────────────────────────────────────────────────────────────
 //
-// COATS3D (2026-10-11, the owner: "These are to be applied to horses for people using morrowind with the character
-// properly rigged when riding"): THE BODY ASTRIDE. Morrowind has no riding animation either (RIDE-POV kept the body in
+// COATS3D: THE BODY ASTRIDE. Morrowind has no riding animation either (RIDE-POV kept the body in
 // the head for it), so the saddle is posed as the chair is: a world request the climb rig solves on the skeleton's own
 // bones - the hips on the 3D horse's seat (world/horseRig.js HORSE_SEAT, riding its back's stride), each foot in a
 // stirrup down the horse's side with the knee forward and out round its barrel, each hand on the reins over the

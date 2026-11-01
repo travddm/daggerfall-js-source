@@ -1,10 +1,10 @@
 // ═══════════════════════════════════════════════════════════════════
-// FORAGE1-FORAGE2 (2026-09-28): FORAGING 1.7 (Harbinger451) - THE
+// FORAGE1-FORAGE2: FORAGING 1.7 (Harbinger451) - THE
 // INSTALL. What ForagingMain.Init/Awake/Start do (IL_0251-IL_0513): the
 // twelve templates, the author's seven pictures, the quest list, the six
 // tools' and five foods' UseItem, the console command, and (FORAGE3) the
 // three loot hooks' subscriptions. The law is
-// systems/foraging/foragingLaw.js; the record is bible/06-Systems/Foraging.md.
+// systems/foraging/foragingLaw.js; the record is.
 //
 // THE TEMPLATES register at import, whatever the switch says (FORAGE0
 // law 6): a saved tool never vanishes, and with the switch off it is an
@@ -129,7 +129,7 @@ function wear(item, collection, entity) {
 /** PROF1 (FORAGE0 14.3): the checks a profession's act runs first, with Foraging's own line for `templateIndex` (the
  *  Sickle's for an herb, the Basket's for its food) - never asking Foraging's switch (law 6: the acts are the
  *  server's). Null where every check passes.
- *  ANY-HOUR (2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"): NEVER
+ *  ANY-HOUR: NEVER
  *  FORAGING'S DAYLIGHT - a profession's act keeps no hours, by night as by day (the service asks none either,
  *  server-account/src/professions.js harvestNode). Foraging's own Use (useForagingTool: offline, a guest's lane) keeps
  *  the mod's day. */
@@ -149,7 +149,7 @@ export const wearForagingTool = (item, entity) => { if (item && entity) wear(ite
 // changing", "using my sickle ... I dont get any exp", "I fish, or use the axe and I get no exp ... I just physically get
 // lumber in the misc tab. Is using the tools in the wilderness via use/hotkey not how you gain exp?". Online, a tool's
 // Use from the pack or the hotbar was Foraging's own gesture (FORAGE0 law 4) - its yields into the pack, its quest, no
-// profession - and TOOL-SAID only said so after the mod's words. The owner (2026-09-30): "I dont care about DFU. We're
+// profession - and TOOL-SAID only said so after the mod's words. The owner: "I dont care about DFU. We're
 // our own thing now" - laws 1 and 4 give way online. TOOL-USE: while the professions are this account's, the Wood-Axe,
 // the Pick-Axe, the Sickle, the Basket and the Fishing-Net are the professions' - their Use at a node of their own kind
 // is E there (the gathering host's act, or its need), and anywhere else, or from the open pack, it gives none of the
@@ -164,7 +164,7 @@ export const PROFESSION_TOOL_HOW = Object.freeze({
   [FT.Sickle]: (k) => `Herbalism is done at an herb patch in the wilderness: walk up to one until its acts show, then press ${k} (or use the Sickle).`,
   [FT.Basket]: (k) => `The Basket searches an herb patch in the wilderness for food: walk up to one until its list shows, then use the Basket (or choose Search with the Basket on the list and press ${k}).`,   // PROF-MENU: the node's list, not the act choice key
   [FT.FishingNet]: (k) => `Fishing is done in water: stand or swim in it, or be at sea, until its acts show, then press ${k} (or use the Fishing-Net).`,   // ANY-HOUR: at any hour
-  // TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use"): the knife's Use at a body is E there, and it
+  // TOUCH-HOLD: the knife's Use at a body is E there, and it
   // holds the knife for the line as the Sickle's holds the steady hand (scenes/huntHost.js)
   [SKINNING_KNIFE.templateIndex]: (k) => `Hunting is done at a body you killed: walk up to it until its acts show, then press ${k} (or use the Skinning Knife).`,
 });

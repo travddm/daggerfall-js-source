@@ -1,4 +1,4 @@
-// DISC17 (2026-09-24, Mac). bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC17.
+// DISC17., DISC17.
 //
 // ── DISC17-A: "I really want to give the wisps more opacity and reduce the amount of wind wisps" ──
 // Half as many (WISP_MAX 240 -> 120, a calm 19 -> 10), each twice as dark (WISP_LOOK's alpha 0.10/0.12 -> 0.20/0.24).
@@ -32,8 +32,8 @@ test('DISC17-A: half the wisps, each twice as dark - 120 at a gale and 10 in a c
   assert.equal(WISP_MAX, 120);
   assert.deepEqual([wispCount(1), wispCount(0)], [120, 10], 'a gale and a dead calm (the floor is the same share)');
   assert.equal(WISP_FLOOR, 0.08);
-  assert.deepEqual([...WISP_LOOK.alpha], [0.09, 0.11]);   // SWAY-SOFT (2026-10-21): under half DISC17-A's 0.20, 0.24
-  // WISPS-RETURN (2026-09-25): a wisp is a streak again, and its darkest is the look's own alpha at the strength - read
+  assert.deepEqual([...WISP_LOOK.alpha], [0.09, 0.11]);   // SWAY-SOFT: under half DISC17-A's 0.20, 0.24
+  // WISPS-RETURN: a wisp is a streak again, and its darkest is the look's own alpha at the strength - read
   // off a frame the renderer draws, through both shaders' main()s, at the height of a wisp's life, over its length and
   // across its width
   const fract = (x) => x - Math.floor(x);

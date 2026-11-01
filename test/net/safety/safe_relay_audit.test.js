@@ -1,4 +1,4 @@
-// AUDIT SAFE, THE RELAY'S LANE (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md sections 3, 5, 6 and 7): the
+// AUDIT SAFE, THE RELAY'S LANE: the
 // findings the audit's probes proved against the relay's half of the chat safety arc, each pinned here against a REAL
 // Room (test/fakeRoom.mjs) and REAL Ed25519 keys - a ban that only silenced (RELAY-4), the ban and the mute sharing one
 // row (RELAY-5), an order older than a socket's token (RELAY-6), a ban a wake forgot (RELAY-7), a socket's pace meter

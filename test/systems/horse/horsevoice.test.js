@@ -1,5 +1,4 @@
-// HORSE-VOICE (2026-10-24, the owner: "more varied horse sounds"; bible/08-Audio/Audio.md HORSE-VOICE,
-// bible/06-Systems/Horse-Care.md): THE HORSE HEARD (systems/horse/horseVoice.js) - the enhanced skin's own, behind the
+// HORSE-VOICE: THE HORSE HEARD (systems/horse/horseVoice.js) - the enhanced skin's own, behind the
 // port's own sounds (ES1). The clips (tools/horseSfx.mjs: fifteen, DAGGER.SND's format, the hoof loops on the classic
 // clops' own lengths and cadence, the tool writing the shipped bytes); the ground's table off the stride's kind and the
 // riding loop's clip on it (DFU's clop on hard ground, a cart, a kind not known, a loop not loaded); the voices - the

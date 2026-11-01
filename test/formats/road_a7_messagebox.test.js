@@ -91,7 +91,7 @@ test('ROAD-A7: an image makes the box taller and moves the label to the BOTTOM',
   // VerticalAlignment.Bottom: yMax - BottomMargin - labelH
   const labelH = 18 + BUTTON_TEXT_DISTANCE;
   assert.equal(withImg.textY, withImg.y + withImg.h - MARGIN - labelH);
-  // ROAD-Ar R14 - PIN MOVED, DELIBERATELY. This used to read
+  // ROAD-Ar R14
   // `withImg.y + MARGIN + IMAGE_PANEL_Y` and assert IMAGE_PANEL_Y === 5,
   // taking DaggerfallInventoryWindow.cs:1622-1623's
   // `VerticalAlignment = None; Position = (0,5)` as final. It is not:

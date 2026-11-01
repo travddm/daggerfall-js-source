@@ -1,6 +1,6 @@
 // LOOP SUBDIVISION, for a baked mesh too coarse for its own curve.
 //
-// MW-CLOAK2 (2026-10-09, Mac: "I dont like how the cloak isnt smooth around the shoulders"). The cloak's export is
+// MW-CLOAK2. The cloak's export is
 // 140 vertices about five units apart; over the shoulders, where the sheet turns from the back over the top, a face
 // normal stands up to 35 degrees off its corners' - the silhouette is the polygon, and the straps' ends a ragged run of
 // small triangles. Lighting cannot round a polygon's edge. Loop's scheme (Loop 1987) does: each level splits every

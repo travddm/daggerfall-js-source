@@ -101,7 +101,6 @@ test('effects: S8 buff families - kinds, incumbent renew, the query', async () =
   assert.equal(t.activeEffects[0].roundsRemaining, 4);       // 3 + 1*2, round 1 consumed at cast (F17)
   tickActiveEffects(t, {});
   assert.equal(t.activeEffects[0].roundsRemaining, 3);
-  // PIN MOVED (STACK-CAP): a re-cast RENEWS the incumbent - topped up to
   // a fresh cast's 4, never stacked (F12's 3 + 5 = 8), still one entry
   applySpell({ element: 4, rangeType: 0, effects: [slow] }, 2, t, {}, seq(0));
   assert.equal(t.activeEffects.length, 1);
@@ -187,7 +186,6 @@ test('effects: FortifyAttribute (type 9) - live mod, like-kind renews, unlike co
   assert.equal(t.activeEffects[0].roundsRemaining, 2);  // 3, round 1 consumed at cast (F17)
   assert.equal(liveStat(t, 'strength'), 60);            // base 50 + fortify 10
   assert.equal(liveStat(t, 'agility'), 0);              // untouched stat -> base (absent -> 0)
-  // PIN MOVED (STACK-CAP): a like-kind re-cast (same stat + SAME settings)
   // RENEWS the incumbent's rounds (F12 stacked them) and keeps its magnitude
   tickActiveEffects(t, {}, seq(0.99));                  // fort: 1
   applySpell({ element: 4, rangeType: 0, effects: [fort] }, 1, t, {}, seq(0.99));
@@ -313,7 +311,7 @@ test('effects: Regenerate (18,255) heals per round; settings-keyed incumbent ren
   assert.equal(t.activeEffects[0].roundsRemaining, 2);
   tickActiveEffects(t, sinks, seq(0));                 // magnitude rolls FRESH per round
   assert.equal(healed, 8);
-  // a same-settings re-cast renews rounds (CompareSettings like-kind; PIN MOVED, STACK-CAP)
+  // a same-settings re-cast renews rounds (CompareSettings like-kind
   applySpell({ element: 4, rangeType: 0, effects: [reg] }, 1, t, sinks, seq(0));
   assert.equal(t.activeEffects.length, 1);
   assert.equal(t.activeEffects[0].roundsRemaining, 2); // a fresh cast's 2 - never 1 + 3
@@ -373,7 +371,7 @@ test('effects: S19 Paralyze (0,255) - chance, the full-save gate, the AddState-f
   assert.equal(t3.activeEffects[0].roundsRemaining, 3);
   // The AddState-first quirk: AddState merges rounds INSIDE Start,
   // BEFORE AssignBundle's chance and save gates - a re-cast with a
-  // FAILED chance still renews (and rolls no save). PIN MOVED (STACK-CAP):
+  // FAILED chance still renews (and rolls no save).
   // renewed to a fresh cast's 3, never stacked (3 + 4 = 7)
   t3.activeEffects[0].roundsRemaining = 1;
   rolls = 0;

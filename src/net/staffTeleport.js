@@ -20,7 +20,7 @@ const token = (v) => typeof v === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(v);
 const finite = (v) => Number.isFinite(v) && Math.abs(v) <= 1e9;
 const integer = (v, max = 0xffffffff) => Number.isSafeInteger(v) && v >= 0 && v <= max;
 const point = (v, length = 3) => Array.isArray(v) && v.length === length && v.every(finite);
-/** AUDIT RELEASE R2-1 (bible/01-Overview/audits/Audit-Release-R2.md): a destination's map pixel is the WORLD's (net/wire.js
+/** AUDIT RELEASE R2-1: a destination's map pixel is the WORLD's (net/wire.js
  *  worldPixelOk - the Bay's map and every province past it, TAMRIEL2's streamed land), not the Bay's 0..999 x 0..499 - staff
  *  could not /tp to a player past the Bay (Cyrodiil's open zone among them): the target's game answered `unavailable`, and a
  *  where note there was a note this build "could not place". */

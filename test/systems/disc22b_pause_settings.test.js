@@ -1,5 +1,4 @@
-// DISC22-B (2026-09-24, kurkku on Discord, over a screenshot of the classic pause window: "could replace the controls
-// button here with the full settings menu").
+// DISC22-B.
 //
 // DFU's CONTROLS button opens its controls grid alone, and on the classic skin that grid was the only settings a player
 // could reach from a game in progress. It now opens the port's whole settings screen on its Settings page (Controls is

@@ -1,5 +1,5 @@
 // @ts-check
-// STEED-UI - THE SADDLE PANEL (2026-10-11, the owner: "Proper UI elements for the horse + wagon/cart (Enhanced plus)").
+// STEED-UI - THE SADDLE PANEL.
 // Horse care (STEED1) gave the horse a breath, a hunger and a bond; wagon upkeep (WAGONS4) gave the wagon a condition
 // that wears to breaking - and the only places to read them were the Stable page, a pause away, and the grip bar's
 // one meter. This is the saddle on screen, in Enhanced Plus, the helm panel's kind (ui/enhanced/enhancedHelm.js, CSA-L - the
@@ -31,8 +31,7 @@
 // other piece is, placed where the player put it the moment it is built (the leaf, ui/hud/hudPlacer.js), and stood as a
 // preview while the HUD is unlocked and nobody rides (buildSaddlePreview).
 //
-// UI-CALM (2026-10-14, a player: "Why is there a huge, unmovable panel showing horse/cart info at the top of my screen?
-// It's intrusive and ruins immersion. Put that info in a separate menu ... Show information when it's relevant."):
+// UI-CALM:
 // THE PANEL STANDS WHEN IT IS WANTED, AND LOW (saddleShown). The whole panel - the meters, the presses - stands when its
 // key puts it up (F2, SADDLE_PANEL_ACTION) or the choice is Always; its presses take a click only with the mouse free
 // (the hint says how). Away, only what needs the rider stands, as ONE LINE (`note`: winded, short of breath, hungry,

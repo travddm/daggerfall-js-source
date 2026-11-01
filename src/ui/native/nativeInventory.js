@@ -478,7 +478,7 @@ export class NativeInventoryWindow {
     // exactly what TransferItem polls (:1516).
     this.inputBox = null;
     this._controlDown = false;
-    // SHIFT-STOW (2026-10-04, Mac: "shift click to deposit items (like materials) needs to be a thing"): Shift held as
+    // SHIFT-STOW: Shift held as
     // Control is - a state from its down edge to its up edge, per key, and the pointer's own word on every move (hover);
     // read through `_shiftDown`
     this._shiftKeys = new Set();
@@ -743,7 +743,7 @@ export class NativeInventoryWindow {
       this.infoItem = it;
       return;
     }
-    // APPEARANCES-II (bible/04-Characters/Wardrobe.md section 5): a look worn over the piece is the record's last line, in
+    // APPEARANCES-II: a look worn over the piece is the record's last line, in
     // its alignment - the pack's picture is the piece's own, so the box says what the body shows. A box of its own would
     // wait behind a click; the Enhanced Plus pack says it too (enhancedInventory.js itemInfoBoxes)
     const look = lookLine(it);
@@ -1093,7 +1093,7 @@ export class NativeInventoryWindow {
     if (refusal.text) this.boxes = [{ rows: [{ text: refusal.text, center: true }] }];
   }
 
-  /** SS5 (Mac: "The ability to dismantle in the inventory and recieve back sigil stones"): THE DISMANTLE, ON THIS SKIN.
+  /** SS5: THE DISMANTLE, ON THIS SKIN.
    *  Its six buttons are DFU's art, so the question comes where the player tries to be rid of a ware - Remove over the
    *  ground, which its binding refuses: the refusal and the offer in DFU's own Yes/No box (ui/yesNoBox.js, pressed or
    *  keyed). Yes dismantles it (systems/sigil/sigilBroker.js dismantleWare) and says so; No leaves it in the pack. */

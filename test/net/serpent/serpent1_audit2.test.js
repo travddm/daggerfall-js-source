@@ -1,5 +1,5 @@
-// AUDIT SERPENT 2 (2026-10-04, the owner: "audit it and make sure it's perfect"): the pins of the second audit's findings
-// (bible/01-Overview/audits/Audit-Sea-Serpent.md, AUDIT SERPENT 2) - each a law that failed before its fix. THE WIRE AND THE
+// AUDIT SERPENT 2: the pins of the second audit's findings
+// (, AUDIT SERPENT 2) - each a law that failed before its fix. THE WIRE AND THE
 // LINK: every word of a fight names its site, and a client folds its own site's alone - a forged site in the next cell,
 // heard on an honest ship's socket there, never reads as her serpent (F1). THE TIMELINE: a word that changes nothing is
 // never kept twice, on the relay or a client (F2). THE CLIENT: a refusal never mutes a ship (F3); a landing judged on its

@@ -1,5 +1,4 @@
-// JOURNAL-CLEAN (2026-09-30, Discord: "Should there be a way to clean both finished and unfinished quests from your
-// journal for a cleaner look?"): the enhanced journal's tidy-ups - remove an archived entry, clear the archive, hide an
+// JOURNAL-CLEAN: the enhanced journal's tidy-ups - remove an archived entry, clear the archive, hide an
 // active quest (it keeps running) and unhide it - and the notebook's hidden list riding the save.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -87,7 +86,6 @@ test('JOURNAL-CLEAN: the rail leaves hidden quests out of `active` and hands the
 
 test('JOURNAL-CLEAN: the bridge walk hands `hidden` beside `active` (rows stay for the lens) and journalClean acts on the notebook', () => {
   const src = read('src/scenes/quest/questBridge.js');
-  // PIN MOVED (QUEST-SHELF, 2026-10-08): and the quests set aside, beside them
   assert.match(src, /return \{ active, finished: notebook\?\.getFinishedQuests\(\) \?\? \[\], ended, hidden: notebook\?\.getHiddenQuests\?\.\(\) \?\? \[\], shelved(?:, [^}]*)? \};/);
   assert.match(src, /notebook\?\.unhideQuest\?\.\(q\.uid\);/, 'an ended quest (even one that filed nothing) is unhidden by the walk');
   // journalClean driven off the shipped source over a real notebook

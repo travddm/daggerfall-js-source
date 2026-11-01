@@ -93,7 +93,7 @@
 // it without letting it near the motor - which is what
 // `motorSwimming: false` beside it has always said.
 //
-// MAC2 (2026-09-11) - THE PLAYER SWIMS WHERE THE SURFACE IS DRAWN
+// MAC2 - THE PLAYER SWIMS WHERE THE SURFACE IS DRAWN
 // (Ledger A). DFU's record law above is kept whole, and ONE arm rides
 // ahead of it in exteriorWaterMethod: where the enhanced surface's own
 // corner table (world/water/waterCorners.js) puts water under the feet - the
@@ -251,8 +251,7 @@ export function onExteriorStaticGeometryMethod({ inside = false, probe = null } 
  * @param {boolean} p.waterWalking  PlayerEntity.IsWaterWalking.
  */
 export function exteriorWaterMethod({ onGround = false, tileIndex = -1, waterWalking = false, coverage = null } = {}) {
-  // MAC2 (2026-09-11, Ledger A: THE PLAYER SWIMS WHERE THE SURFACE IS
-  // DRAWN): DFU's answer is by RECORD - tile 0 swims, its water-majority
+  // MAC2: DFU's answer is by RECORD - tile 0 swims, its water-majority
   // shore records wade (OnShallowWaterTile :551-563), the rest are dry
   // - and the port's enhanced surface draws water by CORNER, so a
   // stream, a bank, a shore or a moat read as water and were walked

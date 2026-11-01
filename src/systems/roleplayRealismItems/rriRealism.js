@@ -225,7 +225,7 @@ export const rriWeaponMaxDamage = (weapon) => (weaponBalanceOn() ? (RRI_WEAPON_M
  *  speed capped at 98 as `speed * reduction / 90`. Truncations are
  *  the C# int casts. `weaponWeight` is the ItemTemplate's baseWeight;
  *  `melee` is `weaponType == WeaponTypes.Melee`.
- *  SWING-LAW (2026-09-28, Mac: "swing speed is insane"): the adjusted speed
+ *  SWING-LAW: the adjusted speed
  *  is the Speed the swing is read at, and the port's law turns it into
  *  time - its bounded curve and the handling of `weaponType` (two-handed
  *  or not; characters/weaponStates.js swingFrameSeconds) - where the mod's

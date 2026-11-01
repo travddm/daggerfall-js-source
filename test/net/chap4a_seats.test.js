@@ -1,4 +1,4 @@
-// CHAP4a (2026-10-08, Mac: "Your decision", on "Whats next") - THE SEATS: ranks 8 and 9, each chapter's one Master and
+// CHAP4a - THE SEATS: ranks 8 and 9, each chapter's one Master and
 // three officers, placed at its Turning by its Eligible members' Merit over four weeks (bible/11-Multiplayer/
 // Chapters-Arc.md sections 3.5 and 6). The law against literals; the Turning through the real service over the real
 // migrations; the Roll's answer and its recorded rank; a deleted character's seats.
@@ -26,7 +26,7 @@ const TURNING = seatWeekStartMs(WEEK + 1) / 1000;
 
 test('CHAP4a the seats\' numbers: a Master and three officers a chapter, ranks 9 and 8; the book stops at 7; fourteen days in the guild, an account seven days old, four weeks of Merit - no holder\'s carry since AUDIT CHAP4 E1 (mutants: each number)', () => {
   assert.deepEqual([CHAPTER_SEAT_KINDS, CHAPTER_SEATS, SEAT_RANK], [['master', 'officer'], { master: 1, officer: 3 }, { master: 9, officer: 8 }]);
-  assert.deepEqual([ROLL_BOOK_RANK_MAX, SEAT_TENURE_S, SEAT_ACCOUNT_AGE_S, SEAT_MERIT_WEEKS], [7, 14 * DAY, 7 * DAY, 4]);   // PIN MOVED (AUDIT CHAP4 E1): the carry's 1.2 gone
+  assert.deepEqual([ROLL_BOOK_RANK_MAX, SEAT_TENURE_S, SEAT_ACCOUNT_AGE_S, SEAT_MERIT_WEEKS], [7, 14 * DAY, 7 * DAY, 4]);
   assert.equal(ROLL_SEAT_LINE, 80);
 });
 
@@ -64,7 +64,6 @@ test('CHAP4a the plan: a Master and three officers by Merit, a seat no one has M
   // ties: the longer tenure, then the lower character id
   assert.deepEqual(seatsOf(chapterSeatPlan([c(41, 21, 'b', 'B', 300, 50), c(41, 21, 'a', 'A', 300, 90), c(41, 21, 'c', 'C', 300, 50)])),
     ['41|21|master|b', '41|21|officer|c', '41|21|officer|a']);
-  // PIN MOVED (AUDIT CHAP4 E1): the holder keeps an EQUAL standing - before a longer tenure - and one Merit more takes it
   assert.deepEqual(seatsOf(chapterSeatPlan([c(41, 21, 'new', 'N', 100, 10), c(41, 21, 'old', 'O', 100, 90)], [{ faction: 41, region: 21, char: 'old', seat: 'officer' }])),
     ['41|21|master|old', '41|21|officer|new']);
   assert.deepEqual(seatsOf(chapterSeatPlan([c(41, 21, 'new', 'N', 101, 10), c(41, 21, 'old', 'O', 100, 90)], [{ faction: 41, region: 21, char: 'old', seat: 'officer' }])),
@@ -108,7 +107,6 @@ test('CHAP4a what a Turning changed: each character whose seat moved, from and t
 async function stand(extra = {}) {
   const s = await standService({ CHAPTERS_OPEN: 'on', ...extra });
   const raw = s.env.DB._raw;
-  // PIN MOVED (AUDIT CHAP4 E3): the seats only at a chapter confirmed now - each chapter a Merit line names, confirmed as it is
   const kept = new Map();
   const confirm = (faction, region) => { kept.set(region, new Set([...(kept.get(region) ?? []), faction])); confirmChapters(raw, [region], [...kept.get(region)]); };
   let n = 0;
@@ -166,7 +164,7 @@ test('CHAP4a the next Turning: a holder keeps its seat against a newcomer\'s equ
   s.merit(a, 41, ANTICLERE, 500);
   s.merit(b, 41, ANTICLERE, 400);
   await settleChapterWeek(s.env.DB, WEEK, NOW);
-  // a newcomer's 500 meets the Master's 500 - the holder keeps it (PIN MOVED, AUDIT CHAP4 E1: its 1.2 carried it past 560)
+  // a newcomer's 500 meets the Master's 500 - the holder keeps it (
   s.merit(c3, 41, ANTICLERE, 500, { week: WEEK + 1 });
   await settleChapterWeek(s.env.DB, WEEK + 1, NOW + 7 * DAY);
   assert.deepEqual(s.seats().map((r) => [r.char_id, r.seat, r.since, r.week]), [

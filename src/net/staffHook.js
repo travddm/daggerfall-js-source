@@ -1,7 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow, In game: the staff view, and
-// the weak spots "The panel must not lean on game internals that change between builds" and "No camera looks through the
-// player's eyes yet") - THE GAME'S STAFF HOOK. Small, versioned, and the only door the Staff Panel uses into the game.
+// STAFF-PANEL5-FOLLOW - THE GAME'S STAFF HOOK. Small, versioned, and the only door the Staff Panel uses into the game.
 //
 // It carries no combat and no movement code: it follows one player, by their account, and lets go. Following, it holds
 // two sockets of its own - a hub link and, once the hub has said where, a link to the target's room - both on follow
@@ -20,7 +18,7 @@
 //   { dfoStaff: 'unlock' }                         let go
 //   the hook asks { dfoStaff: 'token', sub, room } and the panel answers { dfoStaff: 'token', sub, room, tok } - a
 //   follow token for that room (a token opens each room once), or tok null when the staff session refuses it.
-//   { dfoStaff: 'relink' }                         STAFF-HIDE-TOGGLE (2026-10-23, mob: "need hide to be a toggle"): Hide
+//   { dfoStaff: 'relink' }                         STAFF-HIDE-TOGGLE: Hide
 //                                                  me or Show myself was just pressed - the game leaves every room it holds
 //                                                  and opens each again on a fresh token (scenes/staffFollowHost.js
 //                                                  relinkGame), so the switch holds from now, not from its next connection.
@@ -30,15 +28,14 @@
 //   the game asks { dfoStaff: 'hide', on: false } and the panel answers { dfoStaff: 'hide', on: false, ok } - Hide me
 //   turned off on the staff session, the panel's own Show myself (STAFF-CHAT-RED, `staffShowMe` below). Optional: a
 //   panel older than it ignores the ask, and the game hears no answer.
-// STAFF-VIEW1 (2026-10-23, mob: "np player esp in staff panel?", "i need staff panel to have esp"; design doc, In game:
-// the staff view - the staff tags, scenes/staffViewHost.js). Two more, and no version bump: an existing message keeps
+// STAFF-VIEW1. Two more, and no version bump: an existing message keeps
 // its meaning, and a panel that does not know these leaves them unanswered (tags then name the player alone):
 //   the hook asks { dfoStaff: 'tags?' }            when the staff view turns on, on Shift+M and every 60 s while on
 //   and the panel answers { dfoStaff: 'tags', dist, list: [{ sub, level, why, watch }] } - kept as validTags reads it:
 //                                                  known fields only, ID_RE subs, TAGS_MAX rows, a why of TAG_WHY_MAX
 //   the host posts { dfoStaff: 'act', act: 'follow', sub, name } after a tag click followed - the chat menu's act shape,
 //   so the panel opens its card on the player the game follows (the panel acts on nothing it carries)
-// STAFF-MAP (2026-10-24, mob: "also need the map done as well cant see players far"; net/staffMap.js). Two more, no version
+// STAFF-MAP. Two more, no version
 // bump, as STAFF-VIEW1's:
 //   { dfoStaff: 'regions?' }                       -> { dfoStaff: 'regions', names } - the politic map's region names, in order
 // STAFF-EVENT (net/staffPlaces.js): the Events page's place picker - `places?` a region's named places, `here?` where I stand
@@ -84,8 +81,7 @@ export const hiddenSeat = (WS) => WS && class extends WS {
   constructor(url, ...more) { super(`${url}${url.includes('?') ? '&' : '?'}hd=1`, ...more); }
 };
 
-/** FOLLOW-OWN-ID (2026-10-24, mob: "need the follow dropping me to stop" - a follow put the staff member's own game
- *  offline, "online in another tab" on its room and its World tab): A FOLLOW'S LINKS ARE PEERS OF THEIR OWN. A session
+/** FOLLOW-OWN-ID: A FOLLOW'S LINKS ARE PEERS OF THEIR OWN. A session
  *  given no id takes the TAB's (online.js peerId, kept in the tab's storage) and its secret with it - the game's own
  *  links' - so the hook's hub link said hello on the hub with the game's id and the relay replaced the game's World tab
  *  (CLOSE_REPLACED, a reconnect's rule), and its eye did the same to the game's room wherever the two met; a game shown
@@ -131,8 +127,7 @@ export function createStaffHook({ main, askToken, Session = OnlineSession, WS = 
   }
   return {
     version: STAFF_HOOK_VERSION,
-    /** Follow `sub` at once - another pick lets the last go. False for no account. FOLLOW-GROUND-HINT (2026-10-24, mob:
-     *  "following from ground does not work", "panel open said locked never moved"): a pick off the staff member's own
+    /** Follow `sub` at once - another pick lets the last go. False for no account. FOLLOW-GROUND-HINT: a pick off the staff member's own
      *  ground knows the room the target stands in and their socket there (`hint`), so the eye goes there at once instead
      *  of waiting on the hub's word of where they are - which never comes for a room a note cannot name (a dungeon, a
      *  building), nor before the target's game sends its first note. The hub's later word leads as ever.
@@ -167,7 +162,7 @@ export function createStaffHook({ main, askToken, Session = OnlineSession, WS = 
     /** STAFF-VIEW1: the players the room I watch from draws - while a follow is locked the host has left its own room
      *  (its session's peers cleared), so these are the only players the staff view can tag. */
     peers: () => eye?.drawable?.() ?? [],
-    /** FOLLOW-BODIES (mob, 2026-10-24: "cant see other players bodys"): the players around the target, for the scene to
+    /** FOLLOW-BODIES: the players around the target, for the scene to
      *  draw while the follow is locked - the room's draw less the target, whose eyes the camera is. */
     others: () => (eye?.drawable?.() ?? []).filter((/** @type {any} */ p) => !(p?.sub === target || (pid && p?.id === pid))),
     /** Every frame: the hub link held, and the room link where the hub says, standing on the target for range. */
@@ -181,7 +176,7 @@ export function createStaffHook({ main, askToken, Session = OnlineSession, WS = 
         // (as chatSafetyHost does for the game's own links) - with leaseDoor on, a lease room hears nothing else from it
         h.onLease = (/** @type {string} */ l) => { h.sendLease(l); eye?.sendLease(l); };
       }
-      // STAFF-FOLLOW-SHARD (mob, 2026-10-23: "follow does not work"): the bus hops a hub link to its own shard
+      // STAFF-FOLLOW-SHARD: the bus hops a hub link to its own shard
       // (net/hubShards.js), and a link on its shard is the hub's - asked back to the bus each frame, it hopped and came back
       // for ever, a token a hop, and was never told `on`
       if (!isSocialRoom(hub.room)) hub.join(SOCIAL_ROOM, null);
@@ -279,7 +274,7 @@ export function staffHookDoor(win, hookOf, { setTimer = setTimeout, clearTimer =
   return { askToken, panel: () => seen, tags: () => tags, askTags: () => post({ dfoStaff: 'tags?' }), post };
 }
 
-/** STAFF-CHAT-RED (2026-10-23, mob: "give me a option next to chat to chat as /red or myself at all times"): THE GAME'S
+/** STAFF-CHAT-RED: THE GAME'S
  *  ASK THAT HIDE ME GO OFF - an Admin hidden by the Staff Panel picked Me on the chat's switch (net/chatVoice.js) and
  *  said yes, and only the panel holds the staff session that can say Show myself (/v1/staff/hide { on: false }). Posted
  *  on this window to its own origin, as the door's own words are; the panel answers { dfoStaff: 'hide', on: false, ok }
@@ -288,8 +283,7 @@ export function staffHookDoor(win, hookOf, { setTimer = setTimeout, clearTimer =
  *  @param {any} [win] @param {{ setTimer?: typeof setTimeout, clearTimer?: typeof clearTimeout }} [t] @returns {Promise<boolean>} */
 export function staffShowMe(win = globalThis.window, t = {}) { return staffHide(false, win, t); }
 
-/** STAFF-HIDE-IN-GAME (2026-10-24, mob: "when i ment hide button for chat i ment for invisble", "and hide me and unlock
- *  button?"): Hide me ON or OFF asked from the game (its staff bar, ui/staffFollowBar.js), as staffShowMe asks it off -
+/** STAFF-HIDE-IN-GAME: Hide me ON or OFF asked from the game (its staff bar, ui/staffFollowBar.js), as staffShowMe asks it off -
  *  the panel's worker says it on the staff session (/v1/staff/hide { on }), audited there, and every game tab relinks.
  *  Resolves the panel's ok. @param {boolean} on @param {any} [win] @param {{ setTimer?: typeof setTimeout, clearTimer?: typeof clearTimeout }} [t] @returns {Promise<boolean>} */
 export function staffHide(on, win = globalThis.window, { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {

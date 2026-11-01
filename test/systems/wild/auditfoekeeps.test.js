@@ -1,4 +1,4 @@
-// AUDIT FOE-KEEPS (2026-10-24, bible/01-Overview/audits/Audit-Foe-Keeps.md - the owner, of FOE-KEEPS: "Audit this").
+// AUDIT FOE-KEEPS.
 // Five cold lanes on frozen snapshots of 099949918; each finding fixed here is pinned under its id.
 //   H1 (L1, P1, E5): a kill whose referee word came late - a hidden tab hears its socket and runs no frame, or a foe's
 //     blow killed me on my own machine while a player's, in flight, reached the referee first - was read as a foe's
@@ -65,10 +65,9 @@ test('AUDIT FOE-KEEPS O1 H5 O4 O5 N6 THE WORDS: a foe\'s death says nothing drop
   assert.doesNotMatch(WILD_TEXT.deathKept(), /keep/i, 'never "you keep" - the same death claims a tenth of the purse');
   const page = () => TUTORIALS.find((p) => p.id === 'wild-zone');
   assert.deepEqual(page().body, [
-    // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the zone Cyrodiil, in English and German alike
     'Players may fight one another in Cyrodiil and on the open Eltheric Ocean, where monsters are tougher and spoils richer.',
     'If another player kills you there, your bag drops with a tenth of your gold, and they may take one worn item. Your cart, companions\' packs and insured gear are kept. Any other death costs the usual tenth.',
-  ]);   // PIN MOVED (STORE-KEEPS, WILD-INSURE, 2026-10-26): the cart and the packs are storage, kept; insured gear kept - PIN MOVED (TUT1): "companions' packs", the page under sixty words
+  ]);
   tm.patchLocaleTable('de', 'Port_Strings', tm.loadStringTableCsv(rd('locales/de/Port_Strings.csv')));
   try {
     tm.setLocale('de');
@@ -85,7 +84,6 @@ test('AUDIT FOE-KEEPS O1 H5 O4 O5 N6 THE WORDS: a foe\'s death says nothing drop
 });
 
 test('AUDIT FOE-KEEPS E1 THE RISE (the owner, asked: "Rise inside the zone"): over the zone\'s real mask, a death to a foe in every ring rises at a town or temple inside the zone in the ring it fell in - never the zone\'s free way out - and a kill outside the zone and its band; a hall\'s death at the city nearest it (mutants: a foe\'s rise outside; the ring unread; the kill\'s rise inside)', () => {
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the open zone is Cyrodiil (WW-C2 retired the Wrothgarian Mountains').
   // The law read over the zone's real mask with towns stood in it, as the rise's search finds them (AUDIT TESA II P3: the
   // world's towns, scenes/tamrielPlacesHost.js nearestTownOf): a few in every ring, and the land's outside the zone's
   // band. The real map's rise is the next test's.
@@ -187,7 +185,7 @@ test('AUDIT FOE-KEEPS LETTERS-TENTH (the owner left it to the audit: "Your choic
   const keep = (it) => it.uid === '00000000000000c4';
   const e = sheet(), twin = sheet();
   const d = takeWildDeath(e, -1, keep, null, { letters: true });
-  assert.deepEqual(d.gold, { purse: 100, letters: { '00000000000000c1': 5_000 } });   // PIN MOVED (STORE-KEEPS): no cart's share to say
+  assert.deepEqual(d.gold, { purse: 100, letters: { '00000000000000c1': 5_000 } });
   assert.deepEqual(d.taken.map((it) => [it.group, it.stackCount]), [['Currency', 100 + 5_000]], 'one pile: the purse\'s tenth and the letter\'s - no letter taken');
   assert.deepEqual(e.items.map((it) => it.value), [45_000, 7, 9_000, 20_000], 'the letter lowered by its tenth, the rest whole, every one still in the wallet');
   // the game's own take: exactly that, by the letter's id
@@ -205,7 +203,7 @@ test('AUDIT FOE-KEEPS LETTERS-TENTH (the owner left it to the audit: "Your choic
   assert.deepEqual(od.taken.filter((it) => it.uid).map((it) => [it.uid, it.value]), [['00000000000000c1', 50_000], ['00000000000000c2', 7]], 'dropped whole');
   // my game says the word
   assert.equal(WILD_FALL_LETTERS, 1);
-  assert.equal(wildFallWords().letters, WILD_FALL_LETTERS);   // PIN MOVED (STORE-KEEPS): the words carry no wagon
+  assert.equal(wildFallWords().letters, WILD_FALL_LETTERS);
 });
 
 test('AUDIT FOE-KEEPS LETTERS-TENTH THROUGH THE SERVICE: the fallen\'s own ask with the word takes the letter\'s tenth off the record and answers it by the letter\'s id; asked again, the same; without the word, the letter whole; a seizure - which no game applies - takes the tenth (mutants: the service\'s word unread; the answer\'s letters unsaid; a seizure taking it whole)', async () => {

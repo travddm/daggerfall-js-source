@@ -97,7 +97,7 @@ const MODE_LABEL = Object.freeze({
 const TAB_LABEL = Object.freeze({
   weapons: 'Weapons & Armor', magic: 'Magic Items', clothing: 'Clothing & Misc', ingredients: 'Ingredients',
 });
-/** MENU-ORDER (2026-10-12): the counter's title says the mode whole - a counter that buys magic alone says so, where
+/** MENU-ORDER: the counter's title says the mode whole - a counter that buys magic alone says so, where
  *  the button's verb is plain "Sell". */
 export const TRADE_TITLE = Object.freeze({ ...MODE_LABEL, get SellMagic() { return t('trade.counter.title.sellMagic', 'Sell magic items'); } });
 /** MENU-ORDER: the player's own column, named as the shop's is ("On the shelf"). */
@@ -657,7 +657,7 @@ function quickSellSelected() {
   render();
 }
 
-/** LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): THE JUNK THIS COUNTER WOULD TAKE NOW - every
+/** LOOT18 (the Loot arc II): THE JUNK THIS COUNTER WOULD TAKE NOW - every
  *  junk piece of the pack (systems/item/itemJunk.js) the Sell list shows on any tab (not worn, a piece this shop's counter
  *  accepts, not yet on it), whose sale is not refused (locked, bound) and that the counter's own click would stage (a
  *  summoned piece, a quest's, the click's own refusals - AUDIT LOOT II B3: the footer counted what the press then passed
@@ -748,7 +748,7 @@ function close() {
 function setTab(t) { tab = t; render(); }
 
 // ── UXB1-K: THE REPAIR COUNTER'S CLOCK ─────────────────────────────
-// (2026-09-25, the UX backlog: "Countdown timer/estimate for repairs when not instant.") DFU labels every item at the
+// DFU labels every item at the
 // repair counter "DONE" or "%d days" (RepairItemLabelTextHandler :282-288, the remote scroller's LabelTextHandler
 // :244); the port had the law (repairService.js repairStatusLabel) and no skin drew it, so a player who left a sword
 // had no way to know when to come back. The estimate for an item only staged is the scheduler's own pass
@@ -790,7 +790,7 @@ export function repairReadyLine(c) {
 
 // ── ROWS ──────────────────────────────────────────────────────────
 
-/** TRADE-VIRT (bible/07-Rendering/Performance-Priority.md TRADE-VIRT): a row's picture is put into its tile when it lands
+/** TRADE-VIRT (TRADE-VIRT): a row's picture is put into its tile when it lands
  *  (ui/enhanced/landingTiles.js) - its `onReady` was `render`, and a cold counter of 300 pieces repainted itself 273
  *  times while its pictures came in, every row each time. */
 const tiles = landingTiles((t, landed) => drawTile(t.line, t.grid, landed), { alive: () => !!host });
@@ -1077,8 +1077,7 @@ function render() {
   const lists = el('div', 'packlists');
   lists.append(localCol(), remoteCol());
   body.append(lists);
-  // TRADE-STEADY (2026-10-08, the owner: "when you click on an item a bar with info appears.... its super annoying when you
-  // try to sell the buttom items cause clicking them causes the bar to appear over them"): the strip's room is ALWAYS
+  // TRADE-STEADY: the strip's room is ALWAYS
   // kept under the lists - empty until a click, filled after - so a click never shrinks the lists and moves the row
   // under the pointer away (the double click that sells it then landed on another row, or on nothing)
   const detail = detailStrip() ?? (() => { const b = el('div', 'trade-detail trade-detail-empty'); b.append(el('p', 'meta', 'Click an item to see it and its price here. Double-click to move it.')); return b; })();

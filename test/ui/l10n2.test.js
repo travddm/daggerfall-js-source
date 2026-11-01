@@ -1,4 +1,4 @@
-// L10N2 (2026-09-27): THE CLASSIC SCREENS DRAW ANY SCRIPT. The face that grows (ui/glyphFace.js: DFU's dynamic SDF
+// L10N2: THE CLASSIC SCREENS DRAW ANY SCRIPT. The face that grows (ui/glyphFace.js: DFU's dynamic SDF
 // asset - a glyph rasterised the first time it is asked, a control code missing and remembered, shelves that never
 // overlap, a page uploaded before its first draw and again only after it grew), the localized font ahead of every
 // other (ui/text.js sdfOf: DaggerfallUI.GetFont's priority) and measured and drawn by code point, English's pixel

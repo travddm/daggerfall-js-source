@@ -1,5 +1,4 @@
-// UI1 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "make the actual inventory plots have
-// the rarity frame with sprites enlarged properly, instead of the inventory icon just plopping into a slot") - THE
+// UI1 - THE
 // SLOTS, DRAWN FROM THE REAL ARENA2 AND MEASURED.
 //
 // A pin can say the tile asks for a fitted picture and the sheet sizes the well; only a layout engine with the real

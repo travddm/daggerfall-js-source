@@ -1,5 +1,4 @@
-// SD-CLEARS (2026-10-08, Mac: "The first group clear of the new abyss dungeon is done. Can you pull up all of their
-// names?") - who broke an Abyss Dungeon, read by the operator. `tools/sdClears.mjs` writes the statements and
+// SD-CLEARS - who broke an Abyss Dungeon, read by the operator. `tools/sdClears.mjs` writes the statements and
 // `.github/workflows/sd-clears.yml` runs them by hand: every Abyss Dungeon broken, then the names of one - the first
 // ever broken unless a slot is asked. It reads only.
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md "The shared kit"): THE HOUR'S HALOS - the classic set's
+// SD-LOOK: THE HOUR'S HALOS - the classic set's
 // bloom, and the lane's soft core: up to SD_HALO_MAX camera-facing quads added onto the frame in one draw from one
 // dynamic buffer, their falloff posterized to four steps through the ordered dither (the pixel law), depth-tested and
 // never written, fogged as the world is. For a light's core that must read edge-on and through the classic set's lack of

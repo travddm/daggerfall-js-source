@@ -1,10 +1,8 @@
-// ENDLESS PROVISIONS (2026-10-04, Mac: "campfires should be unlimited, rations should be available in stores where it
-// makes sense and unlimited as well", then "i can use and find all those without climates and calories" -> "do that";
-// the Plenty-Rations-Campfirekits handoff, ported onto ENDLESS-STOCK and REST2): a General Store's and a Pawn Shop's
+// ENDLESS PROVISIONS: a General Store's and a Pawn Shop's
 // counter shelf has a Campfire Kit and a stack of 99 Rations in every tier, Climates & Calories Off and offline too
 // (shopStock.js, survival/items.js ensureEndlessProvisions); online a purchase stands them again (restockEndless, Rations
 // now among isEndlessStock's rows) and no shop buys them back; offline they sell out until the day's restock
-// (ENDLESS-STOCK F4, the owner's call 2026-10-04: "Online only"). An Off meal is eaten, never refused for hunger, and
+// (ENDLESS-STOCK F4). An Off meal is eaten, never refused for hunger, and
 // gives stamina back (eatFood's offMeal; useItem.js passes it with the arc Off). A camp is every tier's (camps.js:
 // auditsurv, survtiers and survtiers3 pin it).
 import '../modsOff.js';

@@ -1,6 +1,5 @@
-// HALT-ONE (2026-10-05, Mac: "with the living world we take it further and improve the guards and also reduce the HALT
-// noise"; asked how often the watch should call, "Once, then rarely"): THE WATCH CALLS AS ONE in the living watch's lane
-// (bible/06-Systems/Living-World.md HALT-ONE). DFU's EnemySounds.FixedUpdate gives every watchman within 16 m his own
+// HALT-ONE: THE WATCH CALLS AS ONE in the living watch's lane
+// (HALT-ONE). DFU's EnemySounds.FixedUpdate gives every watchman within 16 m his own
 // attract clock - "Halt!" every 3 to 9 seconds, 80% of the time, hostile or not: eight a minute a watchman, forty from
 // a crime's five, a squad arriving in chorus, allies and other players' watch among them, under the surrender box too.
 // Here the watch has one voice: one Halt as it first comes for the player, then at most one every HALT_GAP_S from the

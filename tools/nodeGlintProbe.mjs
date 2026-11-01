@@ -389,7 +389,7 @@ try {
     }
   }
   check('far, at night, no sheen crosses it (at every moment it crossed by day)', crossing.length >= 4 && nightBest <= 8, `the most lit row's median ${nightBest} over the day's ${crossing.length} crossing moments`);
-  // RESOURCE-HIGHLIGHTS (2026-10-26): NODE-OUTLINE's ring, back as a choice - round each picture in its profession's colour,
+  // RESOURCE-HIGHLIGHTS: NODE-OUTLINE's ring, back as a choice - round each picture in its profession's colour,
   // never over it, within its width of it, hidden by a wall, the glints off; and with both, the ring and the glints
   const RING = { glint: false, ring: true }, BOTH = { glint: true, ring: true };
   const ringed = await draw({ seconds: 1.5, highlight: RING });

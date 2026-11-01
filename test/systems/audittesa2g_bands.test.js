@@ -1,7 +1,7 @@
 // AUDIT TESA II F6 (AUDIT TESA-BIOME F6, RECORDED latent): the roaming bands past the Bay - the world host's bandOk admitted
 // the Bay's map and the Eltheric Ocean's box alone, so no band was born past the Bay and its make's `fauna` (the zone's wild)
 // never ran. Now land a zone answers, once the trace stands, off every place (systems/tamrielFauna.js bandGroundPastBay).
-// bible/03-World/Tamriel-Biomes.md (the hosts).
+// (the hosts).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

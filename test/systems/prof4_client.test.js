@@ -1,4 +1,4 @@
-// PROF4 (2026-09-28, Mac: "Continue") - LOGGING AND CARPENTRY AS THE CLIENT MAKES THEM: the ring (the Wood-Axe's act) and
+// PROF4 - LOGGING AND CARPENTRY AS THE CLIENT MAKES THEM: the ring (the Wood-Axe's act) and
 // the plane (the workbench's); the forest's own trees as the nodes (the nearest tree flat, sunk when felled, stood again
 // at the day's turn), the fall and the stump and the logs, the War Axe in the hand, through the one gathering host; the
 // woods as items; Carpentry's pieces (a staff and a bow at their wood's material, arrows a quiver, furniture among the
@@ -66,7 +66,7 @@ test('PROF4 DONE WHEN: DECOR places a crafted table - an Oak felled, its logs sa
   const track = (prof, xp, spec100 = null) => raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT (player, char_id, profession) DO UPDATE SET xp = excluded.xp, spec100 = excluded.spec100`).run(mac.id, mac.character, prof, xp, spec100, NOON);
   track('logging', xpForRank(10));
-  track('building', xpForRank(100), 'master-joiner');   // PIN MOVED (CRAFT3): a workbench's table reads the Building track (Carpentry's craft) - seeded under the craft's id
+  track('building', xpForRank(100), 'master-joiner');
   const door = accountProf({ fetch: s.fetch, storage: sessionStorageOf(SESSION_KEY, mac) });
   const book = createProfBook({ door, storage: memStorage(), character: () => mac.character, now: () => NOON * 1000, sleep: noWait });
   assert.equal((await book.refresh()).ok, true);
@@ -229,7 +229,6 @@ test('PROF4 trees: a pixel\'s trees stand at the forest\'s own tree flats, the n
   const node = stood.find((q) => q.material === 'log:oak');
   const plan = (o) => treePlan({ node, taken: false, counting: false, rank: 10, axe: true, storesFull: () => false, ...o });
   assert.deepEqual(plan({}), { harvest: 'logs', verb: 'Chop Oak', rest: `Logging 10 - ${chopsFor(2)} chops`, ready: true });
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): sixty today said 'Logging done for today (60)'
   assert.deepEqual([plan({ rank: 9 }).rest, plan({ axe: false }).rest, plan({ taken: true }).rest, plan({ today: 600, cap: 60 }).ready], ['needs Logging 10', 'needs a Wood-Axe', 'felled today', true]);
   assert.deepEqual({ ...AXE_HAND }, { group: 'Weapons', templateIndex: 128, material: 0 });
   assert.deepEqual([axeHandFrame(0), axeHandFrame(1), axeHandFrame(0.01)], [{ state: 'Idle', frame: 0 }, { state: 'StrikeDownRight', frame: 0 }, { state: 'StrikeDownRight', frame: 4 }]);
@@ -300,7 +299,7 @@ test('PROF4 host: the tree targeted, E starts the Wood-Axe\'s ring (DFU\'s War A
     assert.deepEqual([asked[0].node, asked[0].kind, asked[0].act.clean, asked[0].act.cuts, asked[0].act.chops], [n.key, 'logs', true, 3, 3], 'three Clean Cuts: a clean ring');
     assert.equal(axe.currentCondition, 49, 'the Wood-Axe worn by one');
     assert.ok(said.includes('+3 Oak Logs and Resin to your Stores'), 'the Resin said with the logs (GATHER-SAID: one line)');
-    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last chop's blow lands - the tree falls then
+    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
     for (let i = 0; i < 4; i++) { host.tick(0.016); await tick(); }
     const fall = made.find((b) => b.tip);
     assert.ok(fall, 'the tree falls');
@@ -366,7 +365,6 @@ test('PROF4 pages: the Workbench at a Furniture Store - the saws for the logs he
   const { setPref } = await import('../../src/systems/uiPrefs.js');
   setPref('gentleActs', false);
   const held = new Map([['log:oak', 2], ['plank:oak', 7], ['wood:heartwood', 1]]);
-  // PIN MOVED (CRAFT3): the book holds the ten tracks - Carpentry's is Building's - and `track` maps a discipline through trackOf, as profBook's own does
   const tracks = new Map([['building', { profession: 'building', xp: xpForRank(10), rank: 10, specs: { 50: null, 100: null } }], ['smithing', { profession: 'smithing', xp: xpForRank(50), rank: 50, specs: { 50: null, 100: null } }]]);
   const book = {
     state: { open: true, day: 1, character: 'c', account: 'a', readAt: Date.now(), stores: new Map(), tracks, today: {}, caps: null }, stale: () => false, refresh: async () => ({ ok: true }),
@@ -403,13 +401,12 @@ test('PROF4 pages: the Workbench at a Furniture Store - the saws for the logs he
   assert.ok(anvilRecipes('tools', 'ingot:iron').every((r) => r.profession === 'smithing'), 'the Basket is the workbench\'s');
   assert.deepEqual(benchRecipes('furniture', 'plank:oak').map((r) => r.id), ['table-large:oak', 'table-small:oak', 'chair:oak', 'bed-plain-double:oak']);
   press('Furniture');
-  // PIN MOVED (CRAFT2): the workbench lists its patterns, the wood chosen in the box - the bed is Oak's alone
   const bed = buttons().find((b) => b.textContent.startsWith('Plain Double Bed'));
   assert.match(bed.textContent, /needs materials/, 'no Linen');
   bed.onclick();
   await press('Buy 2 from the furnisher - 4 silver');
   assert.deepEqual(bought, [['cloth:linen', 2]]);
-  press('Small Table');   // PIN MOVED (CRAFT2): the pattern - in the wood the last craft here was made of, held
+  press('Small Table');
   assert.match(text(), /Small Oak Table - rank 10/);
   assert.match(text(), /Quality chances: Crude 20% \| Standard 60% \| Fine 20%\. They get better the further your rank \(10\) is above the recipe's \(10\)\. Draw the plane true to the grain to raise the result one quality\./);   // PLAIN-ODDS
   assert.match(text(), /Use a Heartwood for a plank one grade better \(1 stored\)/);
@@ -450,7 +447,7 @@ test('PROF4 pages: the Workbench at a Furniture Store - the saws for the logs he
   assert.match(text(), /Your workbench/);
   bench = null;
   draw();
-  assert.match(text(), /Carpentry is done at a workbench: a Furniture Store's or a joinery's \(50 gold a craft or a saw\)/);   // PIN MOVED (CARP-YARD, 2026-10-12): a joinery's bench too
+  assert.match(text(), /Carpentry is done at a workbench: a Furniture Store's or a joinery's \(50 gold a craft or a saw\)/);
   // the Professions page: Smithing practised - its cards chosen at 50 (PROF4's FOUND)
   root.remove(); root = el('div'); document.body.append(root);
   drawProfessionsPage(root, () => {}, kit);

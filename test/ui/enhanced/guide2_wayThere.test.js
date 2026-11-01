@@ -1,4 +1,4 @@
-// GUIDE2 (2026-09-29, Mac: "This is your baby. Take your time") - THE WAY THERE: the enhanced journal's where line and
+// GUIDE2 - THE WAY THERE: the enhanced journal's where line and
 // DFU's own logbook click (HandleQuestClicks) on the default skin, which never had it. Over the real producers - the
 // quest bridge's walk, producer-minted Places, the lens's target - and the two faces mounted headless and driven:
 //

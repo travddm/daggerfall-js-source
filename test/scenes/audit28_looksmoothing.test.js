@@ -109,7 +109,6 @@ test('AUDIT 28 W7: all four hosts route all three look sites (mouse, touch, keyb
     // MAC-O2: the swing arm's own line now ends in a comment naming
     // the one seam it asks (player/lookFilter.js's swingSuppressesLook),
     // so the line break is `[^\n]*\n`, not `\s*\n`.
-    // PIN MOVED (MWNPC19): the world host's look step is a PERF-V8 closure, made on the line before it (`frameLook`)
     assert.match(s, /const dt = Math\.min\(0\.1, \(now - last\) \/ 1000\);\n(\s*\/\/[^\n]*\n)*(\s*gamepad\?\.tick\(dt\);[^\n]*\n)?(\s*\/\/[^\n]*\n)*(\s*const frameLook = \(\) => \{   \/\/ PERF-V8[^\n]*\n)?\s*if \(![^\n]*\) \{\s*\n\s*if \([^\n]*\) lookFilter\.settle\(\);[^\n]*\n\s*else lookFilter\.tick\(dt, cam\);/, `${host}: the tick rides the frame's dt`);
     assert.match(s, /const lookFilter = new LookFilter\(\);/, `${host}: one filter per camera`);
   }
@@ -139,7 +138,7 @@ test('AUDIT 28 F-C1/F-C2: settle drops the owed look (SetFacing -> Init), and ev
     // among them) are pinned in test/scenes/maco_lookswing.test.js, and what
     // stays here is that every host still asks it and still answers
     // Update's three cases in this order.
-    // NAV-H re-pinned (2026-09-28): world.js's swing half gained `&& !naval?.atGuns` - at a helm with guns the held
+    // NAV-H re-pinned: world.js's swing half gained `&& !naval?.atGuns` - at a helm with guns the held
     // attack is the broadside's aim, never a swing (navalHost.js attackInput eats the press), and the aim is laid BY
     // the look, so it is never dropped there. Everywhere else the swing drops the owed look exactly as it did.
     'src/scenes/world.js': ['gamePaused()', "swingSuppressesLook({ swingHeld: rightHeld || swipeHeld || swingKeyLatch, weaponIsBow: weaponRig.playerWeapon.machine?.isBow }) && walkMode && modeNow() === 'exterior' && !naval?.atGuns"],

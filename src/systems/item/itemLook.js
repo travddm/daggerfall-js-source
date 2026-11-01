@@ -1,8 +1,8 @@
 // @ts-check
-// PACK-PICK (2026-10-26, feature-feedback "SELLING ITEMS ON THE MARKET IS A PAIN!"): A PIECE LOOKED AT, AWAY FROM THE PACK.
+// PACK-PICK: A PIECE LOOKED AT, AWAY FROM THE PACK.
 //
 // The look the home traders' rows showed a picked piece (scenes/vendorHost.js vendorItemStats, HOME-VENDOR), moved here so
-// the Market's List form and the trader's stall read ONE presenter over the same producers (bible/Home.md, ONE DFU
+// the Market's List form and the trader's stall read ONE presenter over the same producers (, ONE DFU
 // MEMBER, ONE EXPORT; THE ONE CONSTRUCTION SEAM): the look panel's own stat rows (itemInfo.js itemStatRows - damage,
 // armour, hands, material, condition, weight) and the magic as the trade window says it (its tier with its affixes and
 // set, and an enchanted piece's powers - or "powers unknown" unidentified). No value row, for itemStatRows' own reason:

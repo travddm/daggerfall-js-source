@@ -140,7 +140,7 @@ export class QuestResourceBehaviour {
     // Foe while the `killed N _x_` trigger read the new one, so the last kill never fired its task - no popup, no
     // log. A target the quest no longer holds is let go and resolved again, the enemy re-read with it.
     this.relinkToLiveQuest();
-    // QUEST-SHELF (2026-10-08): a quest set aside stands none of its people or things in a scene - put out of sight here,
+    // QUEST-SHELF: a quest set aside stands none of its people or things in a scene - put out of sight here,
     // each frame, and shown again by its first tick once reclaimed (QuestResource.tick: not hidden, active) - but its
     // questor stands (the guild's own NPC - their door is open now), and its foes stand and still count their deaths (a
     // foe put away would leave its wave's `killed` unreachable once reclaimed). Its audit: nor is a named NPC's HOME copy

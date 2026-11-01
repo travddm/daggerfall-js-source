@@ -1,5 +1,4 @@
-// WS1 (2026-09-17, Mac: "Can we implement this for the morrowind model" -
-// Greatness7's Weapon Sheathing 1.6): the bone addon joins the skeleton,
+// WS1: the bone addon joins the skeleton,
 // the scabbard's subtrees, the holster's decisions, the quiver's count,
 // the vendored tree, the hide law - and the wiring, by source.
 import { test } from 'node:test';
@@ -366,10 +365,8 @@ test('WS1: the vendored archive duck and its canonical paths; the bone-source li
 test('WS1: the wiring, by source - the third-person build takes the addons and the holster, the swap re-resolves it, the three hide sites, the options, the pref, the card, the data path, the build', () => {
   const fp = rd('src/combat/fpArm.js');
   assert.match(fp, /const boneSourcePaths = werewolf \? \[\] : boneSourcesFor\(TP_BASE_MODEL, skeletonPath, archives\);/);
-  // PIN MOVED (MWNPC3): the binder takes the shared parse too
-  // PIN MOVED (TWO-HANDS AUDIT): and asks for the left hand's weapon bone - made by the mirror after the addons, where the
   // skeleton (with them) has none
-  assert.match(fp, /let arm = await assembleFirstPersonArm\(\{ skeletonBytes, parts: partBytes, boneSources, parseNif: parseNifOnce, offWeaponBone: true \}\);/);   // PIN MOVED (HEAD-HELD, FIELD BUGS 2026-10-12b): `let` - a helm that bound nothing assembles it again
+  assert.match(fp, /let arm = await assembleFirstPersonArm\(\{ skeletonBytes, parts: partBytes, boneSources, parseNif: parseNifOnce, offWeaponBone: true \}\);/);
   assert.match(fp, /hasBone: boneProbe\(skeletonBytes, boneSources\), parseNif: parseNifOnce,/);
   assert.match(fp, /ammoCount: ammoCount \?\? \(hasAmmo \? Number\.MAX_SAFE_INTEGER : 0\),/g);
   assert.equal((fp.match(/ammoCount: ammoCount \?\? \(hasAmmo \? Number\.MAX_SAFE_INTEGER : 0\),/g) || []).length, 2, 'the build and the swap');
@@ -383,7 +380,7 @@ test('WS1: the wiring, by source - the third-person build takes the addons and t
   assert.match(rig, /sheathing: getPref\('mwSheathing'\),/); assert.match(rig, /ammoCount: ammoCountFor\(entity\.items, worn\),/);
   const feat = rd('src/systems/features.js');
   assert.match(feat, /id: 'mod-weapon-sheathing',/);
-  // MODS-ONLINE-3 (2026-09-22, Mac): the online answer is the PLAYER's
+  // MODS-ONLINE-3: the online answer is the PLAYER's
   // now. It was forced "so every body a peer sees wears its blade the
   // same way" - a claim about how MY machine DRAWS someone else, which
   // is `peerClassSprites`'s category and has always been the player's.
@@ -405,7 +402,7 @@ test('WS1: the wiring, by source - the third-person build takes the addons and t
   const bsaPush = ds.indexOf('archives.push(await MwBsaFile.open(blob));');
   assert.ok(loosePush > 0 && vendPush > loosePush && bsaPush > vendPush, 'loose, then vendored, then the .bsa archives');
   assert.match(ds, /'animations\/'\]/);
-  // INLINE1 (2026-09-20): this pin matched the allow-list's literal text -
+  // INLINE1: this pin matched the allow-list's literal text -
   // `eye-of-the-beholder|immersive-footsteps|weapon-sheathing` - which is the
   // enumeration INLINE1 retired. Re-aimed at what it MEANS: this mod's art is
   // never inlined, through the real rule; and a folder no list has ever named

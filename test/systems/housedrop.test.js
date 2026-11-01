@@ -1,5 +1,4 @@
-// HOUSE-DROP (2026-09-27, Mac relaying reports: "In houses, players can drop items and the owner cannot see them";
-// asked how it should work, "Block visitor drops"). A drop is the dropper's own (AUDIT WORLD B3) and an online home's
+// HOUSE-DROP. A drop is the dropper's own (AUDIT WORLD B3) and an online home's
 // room carries no loot (HOME1), so what a VISITOR left on another's floor stood on the visitor's screen alone. A visitor
 // now drops nothing in someone else's online home: both inventory skins refuse the ground (never a wagon, a chest, a
 // corpse or a merchant) with the line said, gold too; a light dropped or thrown is refused the same way; and anything
@@ -78,7 +77,7 @@ test('HOUSE-DROP executed: a light dropped or thrown on a floor that refuses it 
   assert.equal(free.pool.spawned.length, 1, 'no word: the light lands as ever');
 });
 
-// ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): the torch's two refusals, driven through the
+// ---- AUDIT (the pre-merge audit, 2026-09-27): the torch's two refusals, driven through the
 // component's own frame (the auditor's rig): the hand law and the throw key.
 const KEY = Object.fromEntries(DEFAULT_BINDINGS.map(([code, action]) => [action, code]));
 function torchRig(over = {}, dropRefusal = () => NO) {

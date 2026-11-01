@@ -1,6 +1,5 @@
 // @ts-check
-// IC-GRAND x THE LIVING WORLD (2026-10-26, the owner walking the city: "Seems like NPCs arent navigating the entirety of
-// the city"; bible/03-World/Arena-Provinces.md IC-GRAND, "The fabric's homes") - THE FABRIC'S HOMES. The living town makes
+// IC-GRAND x THE LIVING WORLD - THE FABRIC'S HOMES. The living town makes
 // its people from its slice's buildings (systems/livingWorld/census.js townCensus: households from its houses, trades
 // from its shops, its tavern's keeper) and walks them between their doors (places.js townPlaces) - and the city's own
 // blocks carry none: their buildings are the fabric's (world/imperialFabric.js), facades without a door, so 425 of the

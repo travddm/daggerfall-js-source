@@ -1,5 +1,4 @@
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): A DEATH IN THE OPEN ZONE, TAKEN OFF THE RECORD.
+// INT9: A DEATH IN THE OPEN ZONE, TAKEN OFF THE RECORD.
 //
 // WILD1 left a death's drop to the fallen's own game: it took its bag, its cart and half its purse out of its pack, saved
 // without them and sent the records to the room - and its killer's worn piece the same way. A client that never fell
@@ -18,12 +17,11 @@
 // when the relay signed the fall with the fallen gone from its room (WILD-REJOIN: `g` 1, wildFallGraceS) - as a
 // SEIZURE (seizeRealmRecord: the record moved where it stands, its lease cleared - a fallen that never says it fell plays
 // a record that moved under it). Once a fall (`wild_falls`, its remains' id): a second asking is answered the first's
-// records with a fresh order. A death to a foe, no receipt, takes nothing (FOE-KEEPS, 2026-10-24 - the owner: "I dont want
-// people to lose everything they have"): refused, 'foe'; one taken before it is still answered as it was, its remains' id the
+// records with a fresh order. A death to a foe, no receipt, takes nothing (FOE-KEEPS, 2026-10-24): refused, 'foe'; one taken before it is still answered as it was, its remains' id the
 // service's (a digest of the character and the tab's own nonce - never a relay's id). A record the
 // judge holds (lane 1's freeze) still loses its drop, and the room is given none of it.
 //
-// MAC'S DECISION (2026-10-14, "Yes, build it"): THE TWO-PHASE HANDOFF. The fallen loses the worn piece its killer picked
+// MAC'S DECISION: THE TWO-PHASE HANDOFF. The fallen loses the worn piece its killer picked
 // only once the killer has it. The fall takes that piece off the fallen's record INTO ESCROW - `wild_escrow`, in the fall's
 // own batch, its ledger key the service's (ledger.js ledgerMoves `escrow`) - where a room that signs collects lays it
 // (the tab says so: `collect` 1, its relay's version - net/wire.js relaySupportsWildCollect). The killer's take of it in
@@ -35,23 +33,21 @@
 // record - never two, never none - and an end asked twice moves nothing twice. A record the judge holds keeps the piece
 // (it can never reach its killer, so it is never lost).
 //
-// STORE-KEEPS (2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death"; asked,
-// "Wagon + companions' packs"): A DEATH TAKES THE BAG AND THE PURSE ALONE. The cart's cargo and coin and every companion's
+// STORE-KEEPS: A DEATH TAKES THE BAG AND THE PURSE ALONE. The cart's cargo and coin and every companion's
 // pack, kit and coin are storage, and no fall takes them (src/systems/wild/wildDropLaw.js takeWildDeath). It retired two
 // words this service read: CART-AWAY's `cart` (FIELD BUGS 2026-10-15d - the cart dropped while the wagon was with its
 // fallen, and the fallen's tab said when it was away) and COMPANION-DROP's `packs` (FIELD BUGS 2026-10-19f - a take of
 // the packs was refused a tab that did not say its game applied one). A tab from before the word still says both; they
 // are read by nothing. A fall taken before it and asked again is answered its first take, packs and cart as they were.
 //
-// WILD-INSURE (2026-10-26, the owner: "being able to insure gear on death"; asked, "Kept, policy spent" at "20% of
-// worth"): A PIECE UNDER A POLICY IN FORCE AT THE FALL STAYS. The policies are this service's (`wild_insurance`, written
+// WILD-INSURE: A PIECE UNDER A POLICY IN FORCE AT THE FALL STAYS. The policies are this service's (`wild_insurance`, written
 // by wildInsure.js against the premium off the record); one in force at the fall's signing (wildInsureLaw.js
 // wildPolicyInForce over the receipt's `i`) keeps its piece as the ledger keeps a barred one - never taken - and the
 // policy of each piece this death would have TAKEN is SPENT in the fall's own batch (AUDIT PVP-EASE L1-3: the killer's
 // pick landed on it, or the bag's drop would have carried it - takeWildDeath's `saved`); a policy on a piece nothing named
 // stays in force. Its answer names the keys kept (`insured`), for the death screen.
 //
-// REPEAT-SHIELD (2026-10-26, the owner chose "Repeat-kill shield"): THE SAME HAND TAKES NOTHING TWICE IN HALF AN HOUR. A
+// REPEAT-SHIELD: THE SAME HAND TAKES NOTHING TWICE IN HALF AN HOUR. A
 // fall whose killer felled the same character within WILD_REPEAT_S takes nothing at all - no worn piece, no bag, no gold
 // - and spends no policy; it is written as a fall all the same (`tk.shield`), so a killer camping the rise keeps the
 // shield up for as long as they camp. Its answer says so (`shield`). The half hour is between the KILLS - each fall's
@@ -79,7 +75,7 @@ export const WILD_NONCE_RE = /^[0-9a-f]{16}$/;
 
 /** The most a room key may be (the relay's own keys are far shorter). */
 export const WILD_ROOM_MAX = 64;
-/** MAC (2026-10-14): THE ESCROW'S LAST COLLECT - the latest a room may still hold the remains its order laid: the order's
+/** MAC: THE ESCROW'S LAST COLLECT - the latest a room may still hold the remains its order laid: the order's
  *  minute (a deposit never left inside it lays nothing) and the remains' life after it. A collect signed after it is late. */
 export const WILD_ESCROW_HOLD_S = ORDER_TTL_S + Math.ceil(WILD_REMAINS_MS / 1000);
 /** When the escrow may go back to its fallen: past its last collect, and a collect signed at that moment spent. */
@@ -162,7 +158,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   const had = await ctx.db.prepare('SELECT player, killer, items, kept, burnt, wi, wm, oi, wg, tk FROM wild_falls WHERE r = ?1').bind(r).first();
   if (had) {
     if (had.player !== fallen) return { error: 'not-yours' };
-    const escrow = await ctx.db.prepare('SELECT * FROM wild_escrow WHERE r = ?1').bind(r).first();   // MAC (2026-10-14): its escrow, as the first asking made it
+    const escrow = await ctx.db.prepare('SELECT * FROM wild_escrow WHERE r = ?1').bind(r).first();   // MAC: its escrow, as the first asking made it
     const read = (/** @type {any} */ t, /** @type {any} */ none) => { try { return JSON.parse(t) ?? none; } catch { return none; } };
     const list = (/** @type {any} */ t) => { const v = read(t, []); return Array.isArray(v) ? v : []; };
     // AUDIT INT9: the fallen's own tab asking again (its first answer lost) is told where its record stands - the act's
@@ -174,8 +170,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
     }
     return answerOf(ctx, signing, { r, fallen, killer: had.killer, records: list(had.items), kept: list(had.kept), burnt: had.burnt === 1, killerFirst: had.wi === 0, wm: had.wm, oi: had.oi, wg: had.wg, tk: read(had.tk, {}), seq, escrow });
   }
-  // FOE-KEEPS (2026-10-24, the owner: "I dont want people to lose everything they have"; asked, "Only PvP deaths drop",
-  // in the mountains and at sea): a death to a foe takes nothing - no receipt, no take. Asked by a tab from before the
+  // FOE-KEEPS: a death to a foe takes nothing - no receipt, no take. Asked by a tab from before the
   // word, it is refused and nothing moves; a foe's fall taken before it is answered as it was taken (above).
   if (body?.receipt === undefined) return { error: 'foe' };
   // REPEAT-SHIELD: the same hand inside WILD_REPEAT_S takes nothing - the fall written, the record untouched. AUDIT
@@ -192,7 +187,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   try { stored = JSON.parse(/** @type {string} */ (await realmSaveTextOf(await ctx.bucket.get(row.obj)))); } catch { stored = null; }
   if (!stored || typeof stored !== 'object') return { error: 'no-data' };
   // LANE 1's FREEZE (Integrity-Arc 3.1): a record the judge holds hands no value to another player - its death still costs
-  // it the drop, and the room is given none of it (no order, nothing deposited). MAC (2026-10-14): and it keeps the worn
+  // it the drop, and the room is given none of it (no order, nothing deposited). MAC: and it keeps the worn
   // piece its killer picked - that one goes only to its killer, who can never have it from a held record
   const burnt = !!holdRefusal(row);
   if (burnt) { w = -1; wt = null; }
@@ -206,7 +201,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   const barred = await piecesBarred(ctx.db, charId, wildDropCandidates(stored, w, wt, { insured }).map(ledgerKeyOf).filter((k) => k != null));
   const keep = (/** @type {any} */ it) => { const k = ledgerKeyOf(it); return k != null && barred.has(k); };
   /** @type {any} */ let drop = null;
-  // MAC (2026-10-14): the killer's piece, where the tab's room collects, into escrow - its ledger key the service's
+  // MAC: the killer's piece, where the tab's room collects, into escrow - its ledger key the service's
   const collect = body?.collect === 1;
   /** @type {Set<string>} */ const escrowKeys = new Set();
   const change = (/** @type {any} */ save) => {
@@ -225,7 +220,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
   // same - its fallen taking it back from its own remains holds it as a copy too, worn but never traded.
   const dropped = [];
   const records = drop.records.map((/** @type {any} */ rec, /** @type {number} */ i) => {
-    if (escrowed && i === 0) return rec;   // MAC (2026-10-14): the escrowed piece is no new piece - the same one, the service's until it ends
+    if (escrowed && i === 0) return rec;   // MAC: the escrowed piece is no new piece - the same one, the service's until it ends
     const key = ledgerKeyOf(drop.taken[i]);
     if (key == null) return rec;
     dropped.push(key);
@@ -242,7 +237,7 @@ export async function wildFall(ctx, player, body, { gateKey, signing }, again = 
     ...knownCopySteps(ctx.db, charId, dropped, ctx.nowS),
     ctx.db.prepare('INSERT INTO wild_falls (r, char_id, player, killer, at, items, kept, burnt, wi, wm, oi, wg, tk, ki) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?5, ?11, ?12, ?13)')
       .bind(r, charId, fallen, killer, ctx.nowS, JSON.stringify(records), JSON.stringify(kept), burnt ? 1 : 0, killerFirst ? 0 : -1, room, wg, JSON.stringify(tk), fallAt),
-    // MAC (2026-10-14): the killer's piece, held - in the batch that took it off the record, or neither lands
+    // MAC: the killer's piece, held - in the batch that took it off the record, or neither lands
     ...(escrow ? [ctx.db.prepare("INSERT INTO wild_escrow (r, player, char_id, killer, rec, at, until_s, state) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 'held')")
       .bind(escrow.r, escrow.player, escrow.char_id, escrow.killer, escrow.rec, escrow.at, escrow.until_s)] : []),
     // SEA-BOUNTY (seaBounty.js): a fall at sea at another's hand - the bounties on the fallen claimed for its killer, in the

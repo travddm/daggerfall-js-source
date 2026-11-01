@@ -70,9 +70,7 @@ const ARROW_TEMPLATE = 131;
  *  Books through CreateRandomBook, everything else is the bare
  *  group/index record.
  *
- *  DISC21-A (2026-09-24, Satranath on Discord: "Started a new character this morning with an ebony dagger. when I try
- *  to equip it, it says it's broken and cannot be worn. tried to get an NPC to repair it and they say it isn't
- *  damaged"): EVERY ONE OF THOSE MINTS ITS CONDITION. CreateWeapon and CreateArmor run SetItemPropertiesByMaterial -
+ *  DISC21-A: EVERY ONE OF THOSE MINTS ITS CONDITION. CreateWeapon and CreateArmor run SetItemPropertiesByMaterial -
  *  `maxCondition = maxCondition * conditionMultipliersByMaterial[material] / 4; currentCondition = maxCondition`
  *  (ItemBuilder.cs) - and the bare record is `new DaggerfallUnityItem(group, index)`, whose SetItem takes the
  *  template's hitPoints for both. This arm built the record by hand and minted none of it, so a biography item had no

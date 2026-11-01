@@ -1,5 +1,4 @@
-// TELL6e - WHAT A LANDING DOES TO YOU (bible/12-Enhanced-AI/Feud-Arc.md section 8.2; Mac, 2026-10-04: "breath more depth
-// into it", then "Go" on every call). A telegraphed blow that lands on the local player does more than its damage, by
+// TELL6e - WHAT A LANDING DOES TO YOU (;, then "Go" on every call). A telegraphed blow that lands on the local player does more than its damage, by
 // its shape: the lunge and the charge PUSH (3 and 5 m/s, decaying at 12, along the collider, never over a drop of more
 // than 2 m); the slam, the ring and the leap RATTLE (0.6 s at 60% of the walk, the camera dipping); the sweep makes
 // you BLEED (30% again over 3 s in three ticks, its foe's mark on each, any healing ending it, shown with the debuffs);

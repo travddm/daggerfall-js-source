@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT RELEASE R2-6 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md; the owner: "Take care of exclusions and
-// gaps") - A CEMETERY PAST THE BAY.
+// AUDIT RELEASE R2-6 - A CEMETERY PAST THE BAY.
 //
 // DFU's GetRandomCemetery (PlayerGPS.CurrentRegionIndex's map table, its DungeonType.Cemetery rows, one drawn by
 // UnityEngine.Random - VampirismInfection's transfer to a crypt when the turn completes) reads MAPS.BSA, which holds no

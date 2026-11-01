@@ -1,7 +1,7 @@
-// PLUS1 (2026-09-25): THE ENHANCED PLUS SHEET - everything the refresh dresses the enhanced skin in, as ONE sheet
+// PLUS1: THE ENHANCED PLUS SHEET - everything the refresh dresses the enhanced skin in, as ONE sheet
 // injected after the enhanced one (systems/uiSkin.js isEnhancedPlus). Plus is the enhanced sheet with this laid over
 // it, which is why every rule here is written to win by ORDER over the enhanced rule it replaces. PLUS-ONLY
-// (2026-09-26): plain Enhanced is retired, so every enhanced page wears this sheet - a new enhanced surface is dressed
+// plain Enhanced is retired, so every enhanced page wears this sheet - a new enhanced surface is dressed
 // HERE (or given a role in ui/enhanced/enhancedFrame.js), never left in the plain sheet's look.
 //
 // The pieces keep their homes - the kit (ui/enhanced/enhancedFrame.js), the dialog (enhancedDialogStyle.js), the ported
@@ -79,8 +79,7 @@ export const VITALS_CSS = `
    no stray sliver. */
 .hud-vital .hud-fill::after { content: ''; position: absolute; top: 0; bottom: 0; right: 0;
   width: min(2px, 100%); background: var(--v-hi); opacity: 0.85; }
-/* GHOST-DIM (2026-10-02, Discord "Fatigue Bar": "the pending change on the fatigue bar is white ... Please lower the
-   opacity for the damaged part of the bar"): the strip where the bar WAS is the bar's own body tone, faint - it was
+/* GHOST-DIM: the strip where the bar WAS is the bar's own body tone, faint - it was
    its palest tone under a cream line at 0.55, which on fatigue's mint read as a white bar still full. Lost reads as
    lost: darker than any band of the fill, never brighter. */
 .hud-vital .hud-ghost { position: absolute; inset: 0; width: 0; display: block; z-index: -1;
@@ -281,7 +280,7 @@ body .dfchat-form .dfchat-close { min-width: 32px; padding: 4px 8px; }
 .trade-shell .itemrow .itemwt { color: #c9bfa4; }
 .trade-shell .itemrow .tile { width: 34px; height: 34px; border: 2px solid; border-color: #25221b #7a7260 #9a9079 #3a352a;
   background: rgba(0,0,0,0.28); box-shadow: 0 0 0 1px #050608;
-  /* LIST-FIT (2026-09-27, kurkku on Discord: "Equipment sprites too big for the boxes"): a FLEX room, as the loot
+  /* LIST-FIT: a FLEX room, as the loot
      window's tile is. The base tile is a grid, and a grid's auto row gives a picture's max-height: 100% (the tier
      frame's cap, D2 below) nothing to resolve against - only the width was held, and a tall picture (a pauldron, a
      dai-katana) hung out of the box into the rows beneath. The shop and a player trade (a trade-shell too). */
@@ -528,7 +527,7 @@ body .dfchat-form .dfchat-close { min-width: 32px; padding: 4px 8px; }
 @media (min-width: 1300px) {
   .pack-shell .equipped .wornpair { gap: 8px; }
 }
-/* UI1 (bible/10-UI/Slots-Hotbar-Status.md): THE BODY'S PICTURES GROW TOO, where the map has the room - a desktop's
+/* UI1: THE BODY'S PICTURES GROW TOO, where the map has the room - a desktop's
    pack, whose five rows stand 64px and more. A worn panel's picture has a room up to 56px square (a 48px box: the
    grid's own, so the pack's slot and the body's are one picture), a half panel's up to 44 (a 36px box) over its name;
    a short window's row shrinks the room with it, and the picture inside shrinks whole (ui/textureCanvas.js
@@ -574,7 +573,7 @@ body.draglock .pack-shell .wornsock { touch-action: none; }
 `;
 
 
-/** PLUS8 (2026-09-25): THE JOURNEY BAR (ui/enhanced/enhancedTravelControl.js), dressed for Enhanced Plus. It was plain
+/** PLUS8: THE JOURNEY BAR (ui/enhanced/enhancedTravelControl.js), dressed for Enhanced Plus. It was plain
  *  Enhanced's slim brass-lined strip - the display serif, a hairline border, flat blue-grey buttons - and it stood
  *  at top 14px, which is ON the compass (the HUD's top block starts at 18), so the compass's points showed through
  *  it. Now it is a window of the kit: the carved stone frame with the brass fittings (window role), the theme's own
@@ -597,7 +596,7 @@ body:has(.hud-foe.on.blade) .travelpanel { --tp-top: calc(18px + 28px * var(--hu
 .hmroot .hmtools { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); z-index: 2;
   display: flex; align-items: stretch; max-width: calc(100vw - 32px); box-sizing: border-box; border: 2px solid; border-radius: 0;
   pointer-events: auto; ${PIXEL_FONT_CSS} }
-/* PLUS-MAP (Mac: "the fonts dont look like this ... make sure its enhanced plus"): the bar speaks the Plus pixel face
+/* PLUS-MAP: the bar speaks the Plus pixel face
    outright - the map's root is lettered in the body face, and the bar inherited it */
 .hmroot .hmtools button, .hmroot .hmtools .hmfloor, .hmroot .hmtools .dlg-key { ${PIXEL_FACE_CSS} }   /* AUDIT FONT3 F2: the face alone - the trio's reading pair (0.5px) outranked .hmtool's own 0.12em here, at (0,2,1) over (0,2,0); the weight and spacing inherit */
 .hmroot .hmtoolgroup { display: flex; align-items: center; gap: 6px; padding: 7px 12px; }
@@ -774,9 +773,7 @@ body:has(.hud-foe.on.blade) .travelpanel { --tp-top: calc(18px + 28px * var(--hu
 :root[data-plus-theme="stone"] .tview-bar > * + * { border-top-color: rgba(5,6,8,0.5); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16); }
 `;
 
-/** RARITY-UI + SIGIL-UI (2026-09-26, Mac: "Rarity needs to be more noticable in the UI with the icon borders being
- *  color coded"; "sigil weapons need a visible indicator within the info section, something that makes it stand out,
- *  along with progress as you use it"). An item's FRAME wears its tier: the pack's tiles, the worn panels' icons, the
+/** RARITY-UI + SIGIL-UI. An item's FRAME wears its tier: the pack's tiles, the worn panels' icons, the
  *  shelf's sockets, the loot list's and the shop's icons, the hotbar's slots, the quickslot diamond's cells - every
  *  one bevelled in the tier's colour (lit top-left, shaded bottom-right, the kit's light) with the colour's glow sunk
  *  inside, brighter under the pointer. NEVER BY COLOUR ALONE (AUDIT INV2 A8/A9's law): a tile carries its tier's
@@ -789,8 +786,7 @@ body:has(.hud-foe.on.blade) .travelpanel { --tp-top: calc(18px + 28px * var(--hu
  *  own black outline (a masked glyph's drop shadow is clipped by its mask, so the outline is drawn in). */
 export const LOCK_GLYPH_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -1 12 12' shape-rendering='crispEdges'><path fill='#f3cf86' stroke='#050608' stroke-width='2' paint-order='stroke' fill-rule='evenodd' d='M2 0H8V1H9V4H7V2H3V4H1V1H2ZM0 4H10V10H0ZM4 6V8H6V6Z'/></svg>`;
 const LOCK_GLYPH_URL = `url("data:image/svg+xml,${encodeURIComponent(LOCK_GLYPH_SVG)}")`;
-/** GILDED-RED (2026-10-22, Mac: "change the gilded rarity to red instead of gold (keep the gold skins) and give it a better
- *  indicator than 2 stars"): the Gilded rung's pips - a gold crown set with three crimson jewels, its own black outline
+/** GILDED-RED: the Gilded rung's pips - a gold crown set with three crimson jewels, its own black outline
  *  drawn in as the padlock's is. A picture, not a glyph: a font's star took the tier's colour and read as the Artifact's
  *  one doubled; the crown keeps the leaf's gold beside the rung's crimson. 11px, the size of the pips beside it. */
 export const GILDED_CROWN_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12' shape-rendering='crispEdges'><path d='M1 10.5V3l2.5 3L6 1l2.5 5L11 3v7.5Z' fill='#f6c945' stroke='#050608' stroke-width='1.4' paint-order='stroke' stroke-linejoin='round'/><rect x='5' y='7' width='2' height='2' fill='#ff3b4a'/><rect x='2' y='8' width='1.2' height='1.2' fill='#ff3b4a'/><rect x='8.8' y='8' width='1.2' height='1.2' fill='#ff3b4a'/></svg>`;
@@ -805,7 +801,7 @@ const RARITY_VARS = Object.freeze({
   artifact: `--rar: #b57bee; --rar-hi: #dcbcf8; --rar-lo: #683a9c; --rar-rgb: 181,123,238; --rar-pips: '\\2726';`,
   gilded: `--rar: #ff3b4a; --rar-hi: #ff7480; --rar-lo: #8e1622; --rar-rgb: 255,59,74; --rar-pips: ${GILDED_CROWN_URL};`,   // GILDED-RED: crimson (its light short of pink, so the bevel reads red), the crown for pips
 });
-/** LOOT2 (bible/06-Systems/Loot-Arc.md section 4): an EXALTED Legendary's pips - its three diamonds and a star. */
+/** LOOT2: an EXALTED Legendary's pips - its three diamonds and a star. */
 export const EXALTED_PIPS = `--rar-pips: '\\25c6\\25c6\\25c6\\2605';`;
 /** The tiers' custom properties as rules - under `scope` (a descendant selector with its space) or everywhere. LOOT2: and
  *  the Exalted's pips after them, so its rule outranks the Legendary's at the same weight. */
@@ -974,7 +970,7 @@ export const TECH_BLOCK_CSS = `.techbox { --tech: #59c7ff; --tech-hi: #c4ecff; -
 .inv-tip.tip-compact .techbox .tech-note, .pack-shell .packtip.packdetail .card.card-compact .techbox .tech-note { display: none; }
 .inv-tip.tip-tight .techbox .tech-foot, .pack-shell .packtip.packdetail .card.card-tight .techbox .tech-foot { display: none; }
 .inv-tip.tip-tight .techbox.compact p.tech-effect, .pack-shell .packtip.packdetail .card.card-tight .techbox.compact p.tech-effect { margin: 0; }`;
-/** AUDIT LOCKPICK C1 (bible/06-Systems/Lockpicking.md section 4): THE LOCK'S WINDOW (ui/lockpickWindow.js) - the layout
+/** AUDIT LOCKPICK C1: THE LOCK'S WINDOW (ui/lockpickWindow.js) - the layout
  *  alone; the kit dresses its frame, header, well, presses and chips by role (ui/enhanced/enhancedFrame.js FRAME_ROLES), so a
  *  Plus colour and the DFO Grimoire dress repaint it as they repaint the Broker. The classic skin lays it with the kit cut
  *  to its own selectors (lockpickWindow.js lockSkinCss), as AUDIT SET U1 laid the Broker's. */
@@ -1126,7 +1122,7 @@ export const REFORGE_CSS = `/* ── LOOT9/LOOT10: THE REFORGE'S WINDOW (ui/ref
 .broker-offer.codex-gilded.found .broker-name { color: #ff3b4a; }
 .broker-offer.scry-row > .broker-offer-body { grid-column: 1 / span 2; }   /* AUDIT LOOT II B2: a family's row has no picture - its words take the frame's column too (a phone's as well), its price and press where his stand */
 .broker-offer.scry-row .broker-set { white-space: normal; }   /* the haunts read whole */
-/* SCRY-FIT (2026-10-12, a player: "the text is all scrunched - so you cannot purchase any of the actual scry readings"):
+/* SCRY-FIT:
    the price of a reading - "3 Welkynd Shards and 500 gold" - is twice the Broker's 124px price column, and it ran on
    over the press beside it: the Scry word (or its "Need 378 more gold") drawn on top of the price, neither readable.
    A row of the Reforge's sizes its price and its press to their words, and the row's own words give way. A family's row
@@ -1150,12 +1146,12 @@ export const REFORGE_CSS = `/* ── LOOT9/LOOT10: THE REFORGE'S WINDOW (ui/ref
   .reforge-tabs { padding: 6px 12px 0; }
   .broker-offer > .reforge-keep { grid-column: 3; grid-row: 3; }   /* the Broker's phone rule spans every press over two rows: Keep sat on Break it */
 }
-/* MENU-ORDER (2026-10-12): a piece's name whole, on two lines if it needs them - SCRY-FIT's price sized to its words and
+/* MENU-ORDER: a piece's name whole, on two lines if it needs them - SCRY-FIT's price sized to its words and
    a press's column kept for a row with no press had cut every name on the Reforge's page to "Warrior..." - so a row with
    no press of its own gives that column to its name */
 .reforge-shell .broker-offer:not(.codex-row):not(.codex-set):not(.codex-gilded):not(.scry-row):not(:has(> button)) { grid-template-columns: 48px minmax(0, 1fr) max-content; }
 .reforge-shell .broker-name { white-space: normal; line-height: 1.25; }`;
-/** APPEARANCES (bible/04-Characters/Wardrobe.md): THE WARDROBE'S WINDOW (ui/wardrobe/wardrobeWindow.js) - the Broker's shape,
+/** APPEARANCES: THE WARDROBE'S WINDOW (ui/wardrobe/wardrobeWindow.js) - the Broker's shape,
  *  so his sheet lays it; these are its own rules: a worn piece's row with no price, and the card's looks, a line each.
  *  Geometry and the words' colours alone - the kit dresses the rest. APPEARANCES-II: the preview at the card's head (the
  *  figure beside its name, a doll's pixels kept square) and a look's picture and name as one press that tries it on. */
@@ -1187,7 +1183,7 @@ export const WARDROBE_CSS = `/* ── APPEARANCES: THE WARDROBE ── */
   .wardrobe-shell .wardrobe-look .wardrobe-press { grid-column: 2; grid-row: 1 / span 2; }
   .wardrobe-shell .wardrobe-figure { height: 160px; }
 }`;
-/** BOUNTY1 (2026-09-28): THE BOUNTY BOARD'S WINDOW and the payday notice (ui/bounty/bountyWindow.js) - the Broker's kind: a
+/** BOUNTY1: THE BOUNTY BOARD'S WINDOW and the payday notice (ui/bounty/bountyWindow.js) - the Broker's kind: a
  *  stone window over the world, the town's notices in a list, the one pressed read whole beside it (under it on a
  *  phone). The kit dresses the window, the card, the rows, the header and the presses (ui/enhanced/enhancedFrame.js); this is
  *  the layout and the notice's own ink. */
@@ -1267,7 +1263,7 @@ export const BOUNTY_CSS = `/* ── BOUNTY1: THE BOUNTY BOARD ── */
  *  grid, a pin at each card's head and a wax seal at its foot whose colour says who posted it (the town bone, the server
  *  red, a player amber, a guild steel, the bounty board black), opened large on a press. The kit dresses the window, the
  *  header and the presses (ui/enhanced/enhancedFrame.js); this is the cork and the parchment.
- *  BOARD-UI (2026-10-06, Mac: "overhaul the notice boards to enhance readability"): the cards stand straight (a tilted
+ *  BOARD-UI: the cards stand straight (a tilted
  *  pixel face blurs), each as tall as its own words (a row stretched every card to its tallest), the type a step larger;
  *  words that sit on the cork sit on a dark panel (`.notice-panel`); the tabs scroll sideways on a phone (the last two
  *  ran off its edge), each with its count. */
@@ -1392,7 +1388,7 @@ export const NOTICE_CSS = `/* ── NOTICE1: THE NOTICE BOARD ── */
 .seat-guide ol { margin: 0; padding: 0 0 0 20px; }
 .seat-guide li { margin: 0 0 6px; }
 .seat-guide b { color: #f3cf86; font-weight: normal; }
-/* PLAIN-UI (bible/10-UI/Plain-Words.md): what the seat is and the reader's next step, first; the board's words under the
+/* PLAIN-UI: what the seat is and the reader's next step, first; the board's words under the
    guide, each word in brass over its meaning. The chapters' guide and words on the Work tab wear the same (board-) */
 .seat-about { margin: 0 0 8px; }
 .seat-next { margin: 0; padding: 6px 10px; color: #f3ead8; background: rgba(243,207,134,0.1); border-left: 2px solid #f3cf86; }
@@ -1735,7 +1731,7 @@ export const PROF_CSS = `/* ── PROF1: THE PROFESSIONS ── */
 .notice-merit + .notice-chapter, .notice-worktoday + .notice-chapter { margin-top: -8px; }
 .notice-chapter { margin: 0 4px 12px; padding: 4px 10px; font-size: 14px; letter-spacing: 0.03em; color: #d8cfbb;
   background: rgba(12,10,8,0.5); border-left: 2px solid rgba(79,111,143,0.5); }
-/* GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): a chapter's card - one panel a chapter, its lines on the panel's
+/* GUILD3d: a chapter's card - one panel a chapter, its lines on the panel's
    own dark ground (no strip of their own), its band's effects the brightest line, its duties the quietest */
 .notice-chapter-card { border-left: 2px solid rgba(79,111,143,0.6); }
 .notice-chapter-card .notice-chapter, .notice-chapter-card .notice-merit { margin: 0 0 6px; padding: 0; background: none; border-left: 0; }
@@ -1779,7 +1775,7 @@ export const PROF_CSS = `/* ── PROF1: THE PROFESSIONS ── */
 .prof-mat.on { border-color: var(--brass, #c08a3e); background: rgba(192,138,62,0.16); }
 .prof-count { color: #f3cf86; font-variant-numeric: tabular-nums; }
 .prof-split { grid-column: 1 / -1; font-size: 11px; color: var(--bone); }
-/* MENU-ORDER (2026-10-12): THE STATIONS AS TILES - a picture, a name, Here (lit) or Away; an away station's words under
+/* MENU-ORDER: THE STATIONS AS TILES - a picture, a name, Here (lit) or Away; an away station's words under
    the tiles while its tile is pressed */
 .prof-stations { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; margin: 16px 0 8px; }
 .prof-stile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 84px; padding: 10px 4px 8px;
@@ -1801,7 +1797,7 @@ export const PROF_CSS = `/* ── PROF1: THE PROFESSIONS ── */
 .prof-works > .prof-smelt.prof-locked { border-color: rgba(192,138,62,0.1); }
 .prof-recipes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 6px; margin: 4px 0 10px; }
 .prof-recipes > .prof-recipe { margin: 0; grid-template-columns: minmax(0, 1fr); align-content: center; min-height: 46px; }
-/* CRAFT-HALL (2026-10-26): a track's header - its name and rank, its bar, its XP and its first-time bonuses - over every
+/* CRAFT-HALL: a track's header - its name and rank, its bar, its XP and its first-time bonuses - over every
    station worked and in the Crafting page's strip (a button there, opening it on the Professions page); a station's
    shows (All, Can make now, First-time bonus); a card's or a row's first-time bonus, owed (lit) or made (quiet); the
    owed list; Craft x N */
@@ -1992,7 +1988,7 @@ button.prof-track:hover, button.prof-track:focus-visible { border-color: var(--b
 .market-views { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; }
 .market-viewgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
 .market-viewpart { margin-right: 4px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #a89a84; }
-/* MENU-ORDER (2026-10-12): the market's views are pictured chips, never a second row of the board's tabs; a row's name
+/* MENU-ORDER: the market's views are pictured chips, never a second row of the board's tabs; a row's name
    wears its piece's picture (the host's, from the player's data) */
 .market-views .market-view { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 13px; letter-spacing: 0.06em;
   border: 1px solid rgba(192,138,62,0.22); background: rgba(10,8,6,0.4); }
@@ -2224,8 +2220,7 @@ ${rarityVarsCss()}
 .pack-shell .walletpieces .itemrow[data-rarity]::before, .pack-shell .pack-dock .itemrow[data-rarity]::before { content: var(--rar-pips); position: absolute; left: 3px; bottom: 1px;
   font-size: 8px; line-height: 1; letter-spacing: 1px; color: var(--rar); pointer-events: none;
   text-shadow: 1px 1px 0 #050608, 0 0 4px rgba(var(--rar-rgb),0.7); }
-/* UI1 (bible/10-UI/Slots-Hotbar-Status.md): THE SLOT IS THE FRAME, AND ONLY IT (Mac: "rarity outlines ... the
-   UI/Hotbar border itself instead of it being an icon within an icon") - the sprite, fitted to the slot's 52px room
+/* UI1: THE SLOT IS THE FRAME, AND ONLY IT - the sprite, fitted to the slot's 52px room
    (ui/iconFit.js), stands straight on the slot's own ground under the tier's border, in no second box. The stack's
    count takes the slot's last corner. */
 .pack-shell .walletpieces .itemrow .count, .pack-shell .pack-dock .itemrow .count { right: 4px; bottom: 3px; z-index: 2; font-size: 11px; line-height: 1; color: #efe8d6;
@@ -2241,7 +2236,7 @@ ${rarityVarsCss()}
 .pack-shell .loot-win .itemrow[data-rarity]:hover .tile, .trade-shell .itemrow[data-rarity]:hover .tile,
 .ptrade-shell .itemrow[data-rarity]:hover .tile {
   box-shadow: 0 0 0 1px #050608, 0 0 8px rgba(var(--rar-rgb),0.55), inset 0 0 10px rgba(var(--rar-rgb),0.35); }
-/* UI1b (Mac: "rarity outlines actually [on] the UI/Hotbar border itself instead of it being an icon within an icon"):
+/* UI1b:
    A WORN PANEL IS ITS PIECE'S FRAME, as a grid slot and a shelf socket are - the tier on the panel's own border, lit
    from the top left, its glow behind the picture; the picture stands in no second box. It had been the list's rule: a
    small framed tile inside the big panel. */
@@ -2434,7 +2429,7 @@ const OUTLINED = '-1px 0 0 #050608, 1px 0 0 #050608, 0 -1px 0 #050608, 0 1px 0 #
 /** PLUS-DRESS: a brass clasp at each end of a bar, the vitals' own (VITALS_CSS .hud-vital::before). */
 const CLASP = 'linear-gradient(180deg, #f3cf86 0 2px, transparent 2px), linear-gradient(90deg, #e2b064 0 2px, #c08a3e 2px 4px, #7a5424 4px 6px)';
 
-/** PLUS-DRESS (2026-09-26, Mac: "just ensure any of the new UI elements are also apart of how enhanced plus looks"):
+/** PLUS-DRESS:
  *  the online lane's newer screens, dressed. Most of it is the kit's by ROLE (ui/enhanced/enhancedFrame.js FRAME_ROLES - the
  *  journal page, the F-menu, the decorator, the duel strip, the party invitation, the Guild tab's heads and rows, and
  *  the blood-edged WARN role for a press that costs something). This block is what a role cannot say. Every rule
@@ -2707,7 +2702,7 @@ export const ARMOUR_CSS = `
 /** The layers that stand OVER the kit on purpose, in order - each outranks the kit's stone at the same weight. */
 export const OVER_KIT_CSS = [ITEM_FRAME_CSS, ONLINE_DRESS_CSS];
 
-/** PLUS-MENU (2026-10-07, Mac: "give the main menu the enhanced plus UI treatment"): THE FRONT DOOR IN STONE AND BRASS.
+/** PLUS-MENU: THE FRONT DOOR IN STONE AND BRASS.
  *  The door was the one enhanced screen the kit never reached - eight words floating on the night, the About plaque and
  *  the profile mark carved while the doors themselves were bare. The doors play the kit's BUTTON role now
  *  (ui/enhanced/enhancedFrame.js: raised stone, brass under the pointer and the pad, sunk while held, every Plus colour's

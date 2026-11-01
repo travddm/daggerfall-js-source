@@ -1,5 +1,4 @@
-// LAIR-WORLD (2026-10-26, the owner: "with revenants and their lairs, this will work everywhere correct?"; asked, "Fix both
-// in this PR" - bible/06-Systems/Revenants.md RVN7a, bible/06-Systems/Bounty-Boards.md LAIR-WORLD). A revenant's lair and a
+// LAIR-WORLD. A revenant's lair and a
 // board's underground hunt were the Bay's alone: the world host's dungeon index was MAPS.BSA's rows, so past the Bay a
 // revenant's deed found no dungeon in its ring and roamed - no hunt, no rumour, no circle, no trail - and the lair door's
 // mend, the boards' rings, a bounty's id and the wire's copy of it stopped at the Bay's 1000 x 500. Past the Bay the
@@ -197,7 +196,6 @@ test('LAIR-WORLD on the player\'s data: THE DOOR - the ring about a pixel past t
   assert.ok(!ring.some((d) => d.name === 'The Cassius Vaults'), 'its doorless graveyard never offered');
   const graves = P.lairsNear(2069, 658, 200).filter((r) => r.type === LOCATION_TYPES.Graveyard);
   const shut = graves.filter((r) => !door().enterable(r.px, r.py));
-  // PIN MOVED (NIBEN-SEA, TAMRIEL-DEEP, bible/03-World/Tamriel.md): 364 and 13 on the tamriel branch - thirteen stood on
   // the Niben's course, the sea's now, one of them doorless; and The Galgulus Burial Ground on Lake Rumare's east shore
   // (2171, 649) is no place once the sea beside it carries no large-map detail
   assert.deepEqual([graves.length, shut.length], [350, 12]);

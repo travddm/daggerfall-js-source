@@ -1,6 +1,4 @@
-// LEGACY-HOME (2026-10-05, bible/06-Systems/Legacy-Arc.md section 10b; Mac: "I think your bloodline should be visible
-// when not playing, and if a house is owned should live in the house ... With the ability to switch by interacting with
-// them or by using the ui ... itll be default on but can be toggled off"): THE BLOODLINE IN THE WORLD - the household
+// LEGACY-HOME: THE BLOODLINE IN THE WORLD - the household
 // law, the host's residents, the town's day carrying them, the meeting, and the wiring.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -60,7 +58,6 @@ test('LEGACY-HOME: a family resident\'s id is never a census id, and reads back'
   assert.equal(familyResId('fam-h', 7), 'Ffam-h.7');
   assert.deepEqual(familyResOf('Ffam-h.7'), { familyId: 'fam-h', personId: 7 });
   assert.equal(familyResOf('L5001.3'), null, 'a census resident');
-  // PIN MOVED (LEGACY5): the TAG says whose they are - a spouse who wed in keeps their census id
   assert.equal(isFamilyRes({ id: 'Ffam-h.7', legacy: { familyId: 'fam-h', personId: 7 } }), true);
   assert.equal(isFamilyRes({ id: 'Ffam-h.7' }), false, 'no tag, none of the line');
   assert.equal(isFamilyRes({ id: 'L1.2', legacy: {} }), false, 'a tag that names no one');

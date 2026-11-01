@@ -1,4 +1,4 @@
-// PERF-VOL (2026-10-11, Mac: "Lets do the biggest remaining lever"): THE PLACED BATCHES' VOLUME ANSWERS, KEPT. The
+// PERF-VOL: THE PLACED BATCHES' VOLUME ANSWERS, KEPT. The
 // shadow pass asks every swaying placed batch of a lantern's reach whether any of its quads stands in each face
 // (bounds.js placementsInVolume) - and under Steady shadows every face is redrawn every frame. Captured in the real game
 // (Knightstale by night, the freeware ARENA2): 542 asks a frame, every one the frame before's to the bit. The planes are
@@ -10,7 +10,7 @@
 // the pixel walk the box and the shadow's reach before the far-flat rule (655 of 1,361 batches a frame then dropped), the
 // air pass the sphere before the emission map (3 of 636 have one). Each test only skips, so the order is free; the last
 // pin holds the air pass's emitters to the oracle and its sphere to the lit flats. The record is
-// `bible/07-Rendering/Performance-Arena.md` (PERF-VOL, PERF-ORDER).
+// ` ` (PERF-VOL, PERF-ORDER).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';

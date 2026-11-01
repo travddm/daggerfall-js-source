@@ -1,4 +1,4 @@
-// TOWN-SHAPES TS7 (2026-10-25, the owner: "Do all the open items"; bible/03-World/Town-Shapes.md TS7): the Bay's walled
+// TOWN-SHAPES TS7: the Bay's walled
 // cities walled on their outline as the door reads them (their ring open, their wall's carrier in its corner, every
 // building kept), the places past the Bay cloning them as they were; what stood at Daggerfall's gates - the two bulletin
 // boards, Immersive Travel's carriage and driver - carried to each new gate and stood clear of its towers; a town's yards

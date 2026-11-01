@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-09-30b (SWIM-SPENT) - Mac: "Also you can get instakilled when fishing", and on the batch's answer
+// FIELD BUGS 2026-09-30b (SWIM-SPENT), and on the batch's answer
 // that the collapse in the water was left as DFU's: "I dont care about DFU. We're our own thing now".
 //
 // A swimmer pays the swim's fatigue even holding still (worldTick.js; FATIGUE-IDLE spares dry ground only), and DFU's
@@ -40,12 +40,11 @@ test('SWIM-SPENT: the law - in the water a drain to nothing is a tenth of the he
   const e = swimmer();
   const wet = exhaustionOutcome({ enemiesNearby: false, swimming: true, entity: e });
   assert.deepEqual({ kind: wet.kind, damage: wet.damage, line: wet.line, inWater: wet.inWater }, { kind: 'drown', damage: 10, line: EXHAUSTED_SWIMMING_LINE, inWater: true });
-  assert.equal(EXHAUSTED_SPENT_SHARE, 0.1);   // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): renamed - the water's share and the shore's, one constant
+  assert.equal(EXHAUSTED_SPENT_SHARE, 0.1);
   assert.equal(exhaustionOutcome({ enemiesNearby: true, swimming: true, entity: e }).kind, 'drown', 'foes about change nothing in the water');
   assert.equal(exhaustionOutcome({ swimming: true, entity: { ...e, maxHealth: 7 } }).damage, 1, 'rounded up - never nothing');
   assert.equal(exhaustionOutcome({ swimming: true, entity: { ...e, maxHealth: 0 } }).damage, 1, 'never nothing');
   assert.equal(exhaustionOutcome({ enemiesNearby: false, swimming: false, entity: e }).kind, 'rest');
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): foes about on dry feet no longer kill - the water's share, its own
   // line (test/systems/fb1013e_spentashore.test.js)
   const near = exhaustionOutcome({ enemiesNearby: true, swimming: false, entity: e });
   assert.deepEqual([near.kind, near.damage, near.line, near.inWater], ['spent', 10, EXHAUSTED_FIGHTING_LINE, false]);

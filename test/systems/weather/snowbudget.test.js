@@ -1,5 +1,4 @@
-// SNOW-BUDGET (2026-10-20, a player via the owner: "something about our weather system affecting fps"; bible/07-Rendering/
-// Performance-Priority.md SNOW-BUDGET) - THE SNOW KEEPS ITS FRAME BUDGET. The snowpack's window (121 points) was
+// SNOW-BUDGET - THE SNOW KEEPS ITS FRAME BUDGET. The snowpack's window (121 points) was
 // integrated a whole step at a time whatever the budget (snowpack.js advance read its deadline between steps), every one
 // of a frame's readers - the tick, the feet, the Snowfall mod's winter - ran a budget of its own, and the ground's slope
 // was read for every grass blade whether snow lay there or not. Held here: a call keeps its deadline between a step's
@@ -89,7 +88,6 @@ test('SNOW-BUDGET a frame\'s asks share one budget: the tick spends the frame\'s
   } finally { setAirGround(null); }
 });
 
-// PIN MOVED (SNOW-FACE, FIELD BUGS 2026-10-21): the ground's cover reads no slope (render/snowCoverGlsl.js SNOW_GROUND), so
 // what SNOW-BUDGET held to the snow alone - the stream's heights, four a blade - the host asks never: it takes no
 // `heightAt` (AUDIT FB1021 L1-8: a counter handed to it could only fail if the dependency came back, so it is gone).
 test('SNOW-BUDGET the grass and the feet answer from the drawn cover alone - no snow, no blade buried and no white underfoot; a full cover, every blade and the feet (SNOW-FACE: the cover reads no slope, so the host asks the stream nothing)', async () => {

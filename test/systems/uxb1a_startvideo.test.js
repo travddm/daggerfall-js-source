@@ -1,5 +1,4 @@
-// UXB1-A (2026-09-25, the UX backlog: '"Skip Start Video" in the options. Watching it once is great, having to skip
-// it every time is tedious. Disabled by default, of course.'): THE PLAYER'S OWN SKIP.
+// UXB1-A: THE PLAYER'S OWN SKIP.
 //
 // Both start videos were skippable only by the press a player makes EVERY launch (the film's Skip intro, Escape; any
 // key on the classic splash) or by an address-bar flag a player never sees (?nointro, ?novideo - and the desktop app
@@ -48,7 +47,7 @@ function fakeDoc() {
 }
 const settle = () => new Promise((r) => setImmediate(r));
 
-// TITLE-DOOR (2026-10-27): the held title is the front door now, so the player's skip lands there too - the film's last
+// TITLE-DOOR: the held title is the front door now, so the player's skip lands there too - the film's last
 // frame with no film before it, the menu at once on it - and the music law is unchanged
 test('UXB1-A: a skip by the pref lands on the title with no film before it, the menu at once on it, and the first gesture starts the menu\'s music at the menu\'s level - once', async () => {
   const theme = fakeTheme();

@@ -54,7 +54,7 @@ test('CRAFT-PROCS: the report\'s jewel - a Superior and a Masterwork take the la
     for (let i = 0; i < N; i++) {
       const r = jewels[i % jewels.length];
       const seed = seedOf(i + q * 100_000);
-      const now = mint(r, q, seed, MINT_V_LAST_PASS);   // PIN MOVED (AFFIX-LINES): the last pass's own version - MINT_V_LINES moves the numbers too (affixlines_reforge.test.js)
+      const now = mint(r, q, seed, MINT_V_LAST_PASS);
       const was = mint(r, q, seed, 0);
       assert.equal(now.rarity, tier);
       assert.equal(procsOf(was).length, 0, 'the old law: no line that does something');
@@ -117,7 +117,7 @@ test('CRAFT-PROCS: a crafted weapon takes a weapon\'s kinds and armour thorns - 
   assert.ok(thorns > 300 * 0.2, `${thorns} pieces of armour of 300 carry thorns`);
   // a garment: its group carries no such kind - the pass's chance draws, and nothing follows it
   for (const [i, r] of recipesOf('garment').slice(0, 60).entries()) {
-    for (const q of [3, 4]) assert.deepEqual(mint(r, q, seedOf(i), MINT_V_LAST_PASS), mint(r, q, seedOf(i), 0), `${r.id} q${q}`);   // PIN MOVED (AFFIX-LINES): the pass's version - the lines' moves a garment's numbers
+    for (const q of [3, 4]) assert.deepEqual(mint(r, q, seedOf(i), MINT_V_LAST_PASS), mint(r, q, seedOf(i), 0), `${r.id} q${q}`);
   }
   // THE SWITCH: the piece is its record's on every client - Loot Rarity off mints it the same (the line sleeps in its
   // reader, systems/loot/lootPowers.js), as the quality's roll always was
@@ -148,8 +148,7 @@ test('CRAFT-PROCS: the record says the law - the service stamps the mint version
   };
   const lined = { 3: [], 4: [] };
   let n = 0;
-  for (let b = 0x60; b < 0x100; b += 2) {   // PIN MOVED (AFFIX-LINES): every second byte - version 2's roll moved the stream, and the fourth bytes' Masterworks drew no line
-    // PIN MOVED (AUDIT FB1026d C3): the craft names the version its client mints, as net/accountClient.js craft does
+  for (let b = 0x60; b < 0x100; b += 2) {
     const res = await steered(b, () => s.call('/v1/prof/craft', { character: mac.character, recipe: r.id, clean: false, name: 'Silverthorn', rid: `craftprocs-${String(++n).padStart(6, '0')}`, mint: MINT_VERSION }, mac.secret));
     assert.equal(res.status, 200, JSON.stringify(res.body));
     const [{ record, provenance }] = res.body.pieces;
@@ -196,7 +195,6 @@ test('CRAFT-PROCS: a piece made before is minted again as it was, and a new one 
       raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
         VALUES (?, ?, ?, 'Silverthorn', ?, ?, ?, ?, ?, ?, 1)`).run(provenance, who.id, who.character, sword.id, sword.templateIndex, sword.material, quality, seed, record);
       const minted = mintPiece({ recipe: sword.id, quality, seed, maker: 'Silverthorn', version: mintVersionOf(record) }, provenance);
-      // PIN MOVED (INT19, Integrity-Arc section 7): the pack's piece is its record's too - a listing takes it out of there
       const save = recordOf(s.env, who.character);
       layRecord(s.env, who.character, { ...save, items: [...(save.items ?? []), JSON.parse(JSON.stringify(minted))] });
       return minted;
@@ -222,7 +220,7 @@ test('CRAFT-PROCS: a piece made before is minted again as it was, and a new one 
     const bought = await s.call('/v1/market/buy', { character: ann.character, region: DF, listing: ln.body.listing.id, max: 500, hubs: HUBS, rid: rid() }, ann.secret);
     assert.equal(bought.status, 200, JSON.stringify(bought.body));
     assert.deepEqual(mintPiece(bought.body.piece, bought.body.piece.provenance), after, 'the new piece arrives with its line');
-    // cancelled: the seller's piece comes back as it was - PIN MOVED (INT19): as the very record that left, collected into
+    // cancelled: the seller's piece comes back as it was
     // the seller's record, never minted again at the pack
     const back = await s.call('/v1/market/cancel', { character: mac.character, listing: lo.body.listing.id, rid: rid() }, mac.secret);
     assert.equal(back.status, 200, JSON.stringify(back.body));

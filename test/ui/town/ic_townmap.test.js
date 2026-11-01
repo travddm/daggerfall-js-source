@@ -1,4 +1,4 @@
-// IC-TOWNMAP (2026-10-26; the owner: "Curious how the town map will look"). A render audit of the town map in the
+// IC-TOWNMAP. A render audit of the town map in the
 // Imperial City found two release bugs, both from the capitals' closed byte (world/tamrielCapitals.js CAPITAL_CLOSED_BYTE,
 // 0xFE - a wall, a tower, a court the walkers may not cross, in no quarter and no show-all byte):
 //

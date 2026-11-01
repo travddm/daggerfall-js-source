@@ -1,4 +1,4 @@
-// CSA-G (2026-09-27) - COME SAIL AWAY'S TIME AND SOUNDS: systems/comeSailAway/comeSailAway.js's time scale (the helm's three keys,
+// CSA-G - COME SAIL AWAY'S TIME AND SOUNDS: systems/comeSailAway/comeSailAway.js's time scale (the helm's three keys,
 // IncreaseTimeScale, DecreaseTimeScale, the enemies' gates, Update's unpause reset and Travel Options' isTravelActive),
 // the oars' three animation events through the rudder's listener, the two loops as Unity keeps them, UpdateAudioSource,
 // the sails' and the door's DFU clips - over the vendored hulls - and world/unityAnimator.js's clip events,
@@ -423,7 +423,7 @@ test('CSA-G: the boat\'s bed is Roleplay Realism\'s - the Small Ship\'s and the 
 
 // ── the borrowed ship's scenes ─────────────────────────────────────────────────
 
-// ── HELM-TIME-ONLINE (2026-10-04, Mac: "Remove the time dial from ships online") ──────────────────────────────────────
+// ── HELM-TIME-ONLINE ──────────────────────────────────────
 
 test('HELM-TIME-ONLINE: online the helm\'s time dial is retired - each of the three keys says why and moves nothing, and the panel\'s state says there is no dial; offline the keys walk the steps as ever (mutants: the gate dropped, the line unsaid, the state\'s flag wrong)', () => {
   assert.deepEqual([...BOAT_TIME_ACTIONS], [BOAT_ACTIONS.timeScaleUp, BOAT_ACTIONS.timeScaleDown, BOAT_ACTIONS.timeScaleReset]);

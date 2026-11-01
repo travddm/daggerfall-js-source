@@ -1,8 +1,8 @@
-// AUDIT 29 (2026-09-28, Mac: "Lets audit everything so far before we continue") - THE PROFESSIONS' LAWS, AS THE AUDIT
+// AUDIT 29 - THE PROFESSIONS' LAWS, AS THE AUDIT
 // FOUND THEM: a node's id read only in its one spelling; the signatures beside a pixel's veins, never in their place;
 // the unconfirmed patch held to tier 2 by the weights, as a vein is; a dispute only after the confirmation; the day's
 // first writ the highest tier; the smelt's XP under the record's quarter; Motherlode Sense locked until its Motherlodes.
-// Each pin failed on the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 29.
+// Each pin failed on the code before its fix. AUDIT 29.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

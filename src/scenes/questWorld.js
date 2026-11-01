@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -69,7 +69,7 @@ export function createQuestWorld(host) {
    *  doors' and START2's start seam's one sizing. The page flag off `params`, not `onlineOn` - that const is declared
    *  far below, and a quest parsed at chargen asks for its dungeon before it is ("Parsing quest FAILED! Cannot access
    *  'onlineOn' before initialization"). INSTANCES: online a quest's markers are chosen on the dungeon whole - its
-   *  instance's layout (bible/11-Multiplayer/Instances.md); AUDIT WORLD34 B2: online, the room's one layout. */
+   *  instance's layout; AUDIT WORLD34 B2: online, the room's one layout. */
   const questSized = (loc) => dungeonLocationFor(loc, { questMachine: host.questBridge?.machine, online: params.has('online'), whole: params.has('online') });
   const questWorld = {
     // AUDIT 28 W4 SELF-AUDIT (F-B2): DFU's smaller-dungeon law lives
@@ -89,7 +89,7 @@ export function createQuestWorld(host) {
       // MAPS.BSA record of its own (readClassicLocation: the town mods took nothing there)
       getRegion: { value: (r) => (provinces && isProvinceRegion(r) ? provinces.getRegion(r) : maps.getRegion(r)) },
       readClassicLocation: { value: (r, l) => (isProvinceRegion(r) ? null : maps.readClassicLocation(r, l)) },
-      getLocation: { value: (r, l) => questSized(provinces && isProvinceRegion(r) ? provinces.getLocation(r, l) : maps.getLocation(r, l)) },   // INSTANCES: online a quest's markers are chosen on the dungeon whole - its instance's layout (bible/11-Multiplayer/Instances.md)   // AUDIT WORLD34 B2: online, the room's one layout (SD-ONLINE: the world's size for it)
+      getLocation: { value: (r, l) => questSized(provinces && isProvinceRegion(r) ? provinces.getLocation(r, l) : maps.getLocation(r, l)) },   // INSTANCES: online a quest's markers are chosen on the dungeon whole - its instance's layout // AUDIT WORLD34 B2: online, the room's one layout (SD-ONLINE: the world's size for it)
       getLocationByName: { value: (rn, ln) => questSized(placeByName(rn, ln)) },   // AUDIT-TESA A2-1: the clock's travel time to a site past the Bay
     }),
     getBlock: (name) => blocks.getBlockByName(name),
@@ -183,7 +183,7 @@ export function createQuestWorld(host) {
     isHouseOwned: (buildingKey) => isHouseOwned(playerEntity.houses ?? [], _questRegionIndex(), buildingKey, _questLoc()?.mapTableData?.mapId ?? null),   // AUDIT RELEASE R2-9: the town asking
     // HOME1: nor a player's online home - a quest must not send its player into a house its owner keeps shut. FIELD BUGS 2026-10-14 QUEST-HOME: in ANY town - the boot's read of every town's homes beside the towns this page has asked (systems/online/onlineHomes.js homeStands); the asked towns alone left every remote residence unguarded.
     isPlayerHome: (mapId, buildingKey) => onlineHomes?.homeStands(mapId, buildingKey) ?? false,
-    // QUEST-HOME (Mac, 2026-10-15: "Close both"): a site chosen again because its building became a player's home - its
+    // QUEST-HOME: a site chosen again because its building became a player's home - its
     // map mark moves with it: the old house's quest stamp undiscovered (Quest.cs:655's own undiscover), and where the
     // player had it on the map, the new one discovered under the quest's name
     questSiteMoved: (quest, place, was) => questSiteMovedHere(place, was),
@@ -218,7 +218,7 @@ export function createQuestWorld(host) {
       && ((e.subType ?? 0) & 0xff) === ((effect.subType ?? 0) & 0xff)),
     currentClimateIndex: () => maps.getClimateIndex(playerTravelPixel().x, playerTravelPixel().y),
     currentLocationType: () => _questLoc()?.mapTableData?.locationType ?? null,
-    // AUDIT RELEASE R2-4 (bible/01-Overview/audits/Audit-Release-R2.md): PlayerGPS.CurrentRegionName - the loaded region's
+    // AUDIT RELEASE R2-4: PlayerGPS.CurrentRegionName - the loaded region's
     // name on the Bay (an empty region's '' as DFU's empty DFRegion), and past it the province's region's (WW-R), which no
     // MAPS.BSA record holds: '' there kept every NPC past the Bay from knowing a quest's place or person there (the place's
     // site names its province - scenes/tamrielPlacesHost.js), and "Where am I?" in a lair said "in ."

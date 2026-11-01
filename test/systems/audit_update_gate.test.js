@@ -1,4 +1,4 @@
-// AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md) P3: LOOT-GATE AS THE GAME RUNS IT - the
+// AUDIT UPDATE P3: LOOT-GATE AS THE GAME RUNS IT - the
 // registry lootPowers.js keeps (the live player's level once a host publishes the door - MENTOR2: the real one while mentoring), every door
 // that reads it (rollRarity, rollLootRarity's own `level`, the drought, an elite's share, a revenant's), and the Imbue's
 // purse, its refusals and its marks - the laws lootgate1.test.js named and nothing ran. Its own file: importing

@@ -1,6 +1,6 @@
-// AUDIT WHERE-ROBES (2026-10-04, Mac: "Audit this"): the pins for what the audit of FIELD BUGS 2026-10-04c found -
+// AUDIT WHERE-ROBES: the pins for what the audit of FIELD BUGS 2026-10-04c found -
 // three readers (the surface law; the click, the name and the resync; the suite, the docs and the merges), each finding
-// reproduced against the real modules before it was fixed (bible/01-Overview/bugs/Field-Bugs-2026-10-04c.md, "The audit").
+// reproduced against the real modules before it was fixed (, "The audit").
 // Every fixture from its producer: O0A0AL00 on the real QuestMachine, a real Collider, the enhanced pack mounted.
 import '../modsOff.js';
 import { test } from 'node:test';

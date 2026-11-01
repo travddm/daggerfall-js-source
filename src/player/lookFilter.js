@@ -32,9 +32,7 @@ export const SMOOTHING_MAX = 0.9;
 // exact divergence MW-D30 removed from the four hosts.
 export { PITCH_LIMIT };
 
-/** MAC1 (Mac, 2026-09-10): "Looking straight down and moving is
- *  jarring. Add a stopper so the player's camera can not go down past a
- *  certain threshold." DFU's PlayerMouseLook clamps both ways at 90
+/** MAC1 (DFU's PlayerMouseLook clamps both ways at 90
  *  degrees (PitchMinLimit / PitchMaxLimit); the port keeps the
  *  reference CEILING (PITCH_LIMIT above) and takes the owner's FLOOR:
  *  75 degrees below the horizon, which keeps the ground under a walk in
@@ -91,8 +89,7 @@ let _frameYaw = 0, _framePitch = 0;
 export function takeFrameLook() { const v = [_frameYaw, _framePitch]; _frameYaw = 0; _framePitch = 0; return v; }
 
 /**
- * MAC-O2 - THE SWING SUPPRESSION, ONE LAW (Mac, 2026-09-16: "Can't
- * look around when holding right click").
+ * MAC-O2 - THE SWING SUPPRESSION, ONE LAW.
  *
  * PlayerMouseLook.Update :246-248, whole:
  *

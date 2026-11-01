@@ -1,6 +1,4 @@
-// SWING-LABEL (2026-09-22, Mac: "Can you also please look into why some
-// players arent able to attack and ensure this isnt an issue with
-// keybindings"). The controls screens named the three mouse buttons by
+// SWING-LABEL. The controls screens named the three mouse buttons by
 // Unity's KeyCode - Mouse0 left, Mouse1 RIGHT, Mouse2 middle - so Swing
 // Weapon read "MOUSE1" and Auto Run "MOUSE2". Nearly every PC game names
 // MOUSE1 the LEFT button and MOUSE2 the right, so the screen told players

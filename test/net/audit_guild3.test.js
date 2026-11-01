@@ -1,8 +1,8 @@
 // @ts-nocheck
-// AUDIT GUILD3 (2026-10-11, the owner: "Do a comprehensive audit and ensure absolute perfection") - THE GUILDS MADE
-// PLAIN, AUDITED: six lanes read GUILD3 (bible/11-Multiplayer/Guilds-Made-Plain.md) cold on a frozen snapshot (a55a74c1b)
+// AUDIT GUILD3 - THE GUILDS MADE
+// PLAIN, AUDITED: six lanes read GUILD3 cold on a frozen snapshot (a55a74c1b)
 // - the service, the Chapters' law, the client, the words, the pins, the record - and each finding is pinned here under
-// its id. The record: bible/01-Overview/audits/Audit-Guild3.md.
+// its id. The record:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

@@ -1,5 +1,4 @@
-// SEA-COLOURS (2026-10-17, the owner: "enemies and merchants should have their own unique liveries, flags hosted, etc";
-// bible/03-World/Naval-Refit.md SEA-COLOURS) - every ship of the sea in her own paint and under her own flag of cloth:
+// SEA-COLOURS - every ship of the sea in her own paint and under her own flag of cloth:
 // the law (a navy's crown, a merchant house, a pirate crew, a legend's own; a pirate under false colours painted and
 // flagged as the house she passes for; colours down once struck), every table's flag through the flag's door, the pick
 // off her seed, the frame's flags nearest first; the flag host taking them after the players' to the pass's cap; and the

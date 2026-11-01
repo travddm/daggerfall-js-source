@@ -1,4 +1,4 @@
-// SD11c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's AUDIT SD II): THE
+// SD11c: THE
 // HOSTS, THE PAGE AND THE REWARDS, AUDITED AGAIN - each finding reproduced before it was fixed. The Hollow's end cast a
 // resting player out with the rest window still holding `isResting`; a player dead at the end and raised where they lay
 // was latched as cast out, and stood in an ended Hollow for good; a step under the veil could land in a Hollow or an Hour
@@ -10,7 +10,7 @@
 // the way back from the Hour stood a player on the Return's own foot; a mark or save in a Hollow gone since entered the
 // nearest dungeon. With them, the page's untested arms (the lens on the tests): the whole state folded in the shadow, the
 // world host's fight seams run from their own text, the End in the Dragon Break, and the smaller gaps.
-import { sdMarksLine } from '../../src/systems/superDungeon/sdOmen.js';   // SD19 (PIN MOVED): its marks said with its find
+import { sdMarksLine } from '../../src/systems/superDungeon/sdOmen.js';   // SD19 (
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -71,7 +71,7 @@ const fnOf = (name) => fnIn(W, name);
 const constOf = (name) => { const at = W.indexOf(`\n  const ${name} = `); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  };\n', at) + 5); };
 /** A property of world.js's Hollow host (createSdHost's own arguments), its arrow's text - one line, or a block. */
 function hostProp(name) {
-  const from = W.indexOf('const sdHost = params.has(\'online\') ? createSdLanes({');   // PIN MOVED (WW5): the Hollow host a lane at a time (scenes/superDungeon/sdLanes.js) - the Bay's lane's host takes these same arguments
+  const from = W.indexOf('const sdHost = params.has(\'online\') ? createSdLanes({');
   assert.ok(from > 0, 'the Hollow host');
   const at = W.indexOf(`\n    ${name}: `, from);
   assert.ok(at > 0, name);
@@ -246,10 +246,10 @@ test('SD11c THE END JUDGED WHERE I STAND (L1 F3): a step under the veil - into t
 
 // ── L1 F3 (the step), the latent site guard, L6 F17 (the Rift's memory) ─
 
-/** world.js's Rift memory over `storage` (SD-ONELIFE (PIN MOVED): one memory for the slots entered and died in; PIN MOVED (WITCH1): systems/superDungeon/sdSlots.js, out of world.js whole). */
+/** world.js's Rift memory over `storage` (SD-ONELIFE ( */
 function enteredOf(storage) {
   assert.match(W, /\n  const _sdEntered = sdSlotsKept\(SD_ENTERED_KEY, \(\) => _accountSds\.me\(\)\);\n/);
-  return sdSlotsKept(SD_ENTERED_KEY, () => null, () => storage);   // AUDIT SD III (H1, PIN MOVED): the signed-in account's - none here, the device's
+  return sdSlotsKept(SD_ENTERED_KEY, () => null, () => storage);   // AUDIT SD III (H1
 }
 const memStorage = () => { const m = new Map(); return { m, getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
 
@@ -263,11 +263,11 @@ function riftHost({ rec, hollow, storage = memStorage(), entered = true } = {}) 
     forceExitToExterior: () => log.push('out'), enterSdRealm: async () => { log.push('realm'); return entered; },
   };
   const env = {
-    sdHost: { record: () => h.rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 },   // SD-THROUGH (PIN MOVED): the word says whether one went through
-    INTERIOR_SEASON: 3, SD_REALM_TEXT, setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), _sdEntered: enteredOf(storage), _sdFallen: new Set(),   // SD-ONELIFE (PIN MOVED)
+    sdHost: { record: () => h.rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 },   // SD-THROUGH (
+    INTERIOR_SEASON: 3, SD_REALM_TEXT, setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), _sdEntered: enteredOf(storage), _sdFallen: new Set(),   // SD-ONELIFE (
     _teleportToPixel: async () => { log.push('pixel'); if (h.onWalk) h.rec = h.onWalk; },
     sdVeilCentre: () => null, standBeforeHollowDoor: () => true,   // SD-LOOK S5: the veil's centre; AUDIT SD IV (F40): before its door
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (PIN MOVED): my party's own Hour
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (
   };
   const body = `${constOf('sdRiftOf')}\n${fnOf('sdEnterRealm')}\nreturn { sdRiftOf, sdEnterRealm };`;
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -500,7 +500,7 @@ test('SD11c THE SPENT WORD IS OWED UNTIL IT GOES (L5 F4): a spend whose word cou
   const w = strip(W);
   assert.match(w, /onSpent: \(day\) => socialLink\(\)\?\.sendGateSpent\?\.\(day\) === true,\s*\n\s*me: _accountGates\.me,/);
   assert.match(w, /onSpent: \(day\) => \{ const s = sdSpoilsSlot\(day\); return s == null \|\| socialLink\(\)\?\.sendSdSpent\?\.\(s\) === true; \},\s*\n\s*me: _accountGates\.me,/);
-  assert.match(w, /gateClaims\?\.tick\(\);\s*\n\s*if \(gateOmen\) reportGateSite\(\);\s*\n\s*resendSpentWords\(\);/, 'on the gate frame');   // (PIN MOVED: after DISCORD-GATES' report, whose own pin holds its line to the claims' tick)
+  assert.match(w, /gateClaims\?\.tick\(\);\s*\n\s*if \(gateOmen\) reportGateSite\(\);\s*\n\s*resendSpentWords\(\);/, 'on the gate frame');
 });
 
 // ── L5 F6: a week for each account ─────────────────────────────────────
@@ -572,17 +572,17 @@ function fightHost() {
     _sdReceipts: new Map(), sdReceiptsLeft: () => log.push('receipts'),
     sdSpoilsBurst: { leave: () => log.push('floor.leave'), frame: () => log.push('floor.frame') }, saveSoon: { changed: () => log.push('save') },
     sdBlows: { leave: () => log.push('blows.leave'), frame: () => log.push('blows.frame') },
-    sdRemVoice: { leave: () => log.push('voice.leave'), frame: () => log.push('voice.frame') },   // SD14a (PIN MOVED): its voice beside its blows
-    sdFx: { leave: () => log.push('fx.leave'), frame: () => log.push('fx.frame'), away() {} },   // SD16 (PIN MOVED): its sparks beside its voice; AUDIT SD V (L5, PIN MOVED): told every frame out of the Hour
+    sdRemVoice: { leave: () => log.push('voice.leave'), frame: () => log.push('voice.frame') },   // SD14a (
+    sdFx: { leave: () => log.push('fx.leave'), frame: () => log.push('fx.frame'), away() {} },   // SD16 (
     sdDungeonToRealm: () => [0, 0, 0], player: { pos: [0, 0, 0] }, sdBarNear: () => false, remnantBarModel: () => null,
     drawGateBossBar: () => log.push('bar'), gamePaused: () => false, townTalk: {},
-    // SD15 (PIN MOVED): the arena read beside the bar - nothing to read in an empty fight
+    // SD15 (
     playerEntity: { health: 10 }, SD_ARENA: { x: 0, z: 0 }, cam: { yaw: 0 }, sdPerilAt: () => null, sdGroundModel: () => null,
     sdBeats: { frame: () => null, leave: () => {} }, titleCardModel: () => null, drawGateGround: () => log.push('ground'), drawSdTitleCard: () => log.push('card'),
-    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard: () => log.push('marks'), performance: { now: () => 0 },   // SD18b (PIN MOVED): the Hour's marks card - none to draw
-    gateVeil: null,   // AUDIT SD III (T18, PIN MOVED): the veil the Hour's readouts wait under - none here
+    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard: () => log.push('marks'), performance: { now: () => 0 },   // SD18b (
+    gateVeil: null,   // AUDIT SD III (T18
   };
-  const body = `let _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${fnOf('sdFightHeard')}\n${constOf('sdFightFrame')}\nreturn { sdFightHeard, sdFightFrame, held: () => _sdFightHeld };`;   // AUDIT SD III (V13, PIN MOVED): the passes already warm
+  const body = `let _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${fnOf('sdFightHeard')}\n${constOf('sdFightFrame')}\nreturn { sdFightHeard, sdFightFrame, held: () => _sdFightHeld };`;   // AUDIT SD III (V13
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
   return { ...api, log, at: (s) => { slot = s; }, receipts: env._sdReceipts };
 }
@@ -599,12 +599,12 @@ test('SD11c THE WORLD HOST\'S FIGHT, RUN FROM ITS OWN TEXT (L8 G3, L5 F5): in th
   assert.equal(h.held(), true);
   h.log.length = 0;
   h.sdFightFrame(); h.sdFightFrame();
-  assert.deepEqual(h.log, ['blows.frame', 'voice.frame', 'fx.frame', 'floor.frame', 'blows.frame', 'voice.frame', 'fx.frame', 'floor.frame'], 'in the Hour: each frame');   // SD14a (PIN MOVED): and its voice   // SD16 (PIN MOVED): and its sparks
+  assert.deepEqual(h.log, ['blows.frame', 'voice.frame', 'fx.frame', 'floor.frame', 'blows.frame', 'voice.frame', 'fx.frame', 'floor.frame'], 'in the Hour: each frame');   // SD14a (
   h.log.length = 0;
   h.receipts.set(4, 'r');
   h.at(null);
   h.sdFightFrame();
-  assert.deepEqual(h.log, ['receipts', 'floor.leave', 'save', 'link.leave', 'blows.leave', 'voice.leave', 'fx.leave'], 'out: the receipts, the floor gathered, a checkpoint asked, the fight left');   // SD14a (PIN MOVED): its voice too   // SD16 (PIN MOVED): its sparks
+  assert.deepEqual(h.log, ['receipts', 'floor.leave', 'save', 'link.leave', 'blows.leave', 'voice.leave', 'fx.leave'], 'out: the receipts, the floor gathered, a checkpoint asked, the fight left');   // SD14a (
   h.log.length = 0;
   h.receipts.clear();
   h.sdFightFrame(); h.sdFightFrame();
@@ -617,7 +617,7 @@ test('SD11c THE WORLD HOST\'S FIGHT, RUN FROM ITS OWN TEXT (L8 G3, L5 F5): in th
 test('SD11c A DEATH IN THE HOUR IS THE HOUR\'S, AND THE FLOOR\'S LAST WORDS GO TO THE CHAT (L6 F4, F14): the respawn reads the Hour before it leaves it, and wakes under the veil with the Hour\'s own words (it woke with a plain dungeon\'s); what the floor still held, gathered as I leave, is said in the chat - over the screen it took the place of the way home\'s line or the cast-out\'s a frame after (mutants: read after the exit; the dungeon\'s words; the gathered line over the screen)', () => {
   assert.equal(SD_REALM_TEXT.died, 'The Shattered Hour casts you out. You wake before the Abyss Dungeon\'s door.');   // PIN MOVED (SD-BACK, 2026-10-28): no longer for good - its Rift takes you back to your own Hour; SD-ONELIFE (PIN MOVED): one life; AUDIT SD III (T15, PIN MOVED): the player's word for it, Abyss Dungeon
   const w = strip(W);
-  const at = w.indexOf("const diedInHour = madeRuleHere('death') === 'final';");   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): a death in the Hour is final for its Hollow
+  const at = w.indexOf("const diedInHour = madeRuleHere('death') === 'final';");
   const go = w.indexOf('Promise.resolve().then(async () => {', at);
   const out = w.indexOf('if (mode !== \'exterior\') modes?.forceExitToExterior();', go);
   assert.ok(at > 0 && go > at && out > go, 'read before the exit');
@@ -627,7 +627,7 @@ test('SD11c A DEATH IN THE HOUR IS THE HOUR\'S, AND THE FLOOR\'S LAST WORDS GO T
   // the Hour's pool's voice, from its own text
   const from = W.indexOf('const sdSpoilsPool = createSpoilsPool({');
   const line = W.slice(from, W.indexOf('\n  });', from)).split('\n').find((l) => l.includes('say: (text) =>'));
-  const sayText = /say: (\(text\) => \(text === SD_SPOILS_TEXT\.gathered \? chatNotice\(text\) : sdSay\(text, SD_VOICE_RANK\.note\)\))/.exec(line)?.[1];   // (SD11d, PIN MOVED): the rest through the Hour's voice
+  const sayText = /say: (\(text\) => \(text === SD_SPOILS_TEXT\.gathered \? chatNotice\(text\) : sdSay\(text, SD_VOICE_RANK\.note\)\))/.exec(line)?.[1];   // (SD11d
   assert.ok(sayText, 'its say');
   const log = [];
   const say = evalIn(sayText, { SD_SPOILS_TEXT, SD_VOICE_RANK: { note: 1 }, chatNotice: (t) => log.push(['chat', t]), sdSay: (t) => log.push(['screen', t]) });

@@ -1,6 +1,6 @@
 // GR3 - THE WIND THAT NEVER REACHED THE GRASS.
 //
-// Mac: "the wind still isn't working ingame" - after GR2 had rescaled
+// after GR2 had rescaled
 // it, documented it, and measured a million blades placed. Nobody
 // measured a blade MOVING, and the value that reaches the shader was
 // never pinned.
@@ -33,8 +33,7 @@ test('GR3: a blade actually MOVES - the shader\'s lean on real placer output', (
   // The vertex law evaluated in JS on blades the real placer lands:
   // over half a gust the tip must travel a visible fraction of the
   // blade's height. GR2 measured a million blades placed; this
-  // measures one moving. SWAY-SOFT (2026-10-21, Mac: "make the grass sway more
-  // subtle"): about 9% of the height now, where it was over 15% - the floor is
+  // measures one moving. SWAY-SOFT: about 9% of the height now, where it was over 15% - the floor is
   // for a field that moves at all, so it sits under the softer sway.
   const gen = placeLabGrassSteps({ centre: [1000, 1000], keep: () => 0 });
   let r; do { r = gen.next(); } while (!r.done);

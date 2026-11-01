@@ -1,6 +1,5 @@
 // @ts-check
-// LOOT18 (2026-10-07, the Loot arc II - bible/06-Systems/Loot-II-Arc.md section 10; Mac: "what could we do to make it
-// even more amazing, while also balancing everyrhing?", then "Lets go all in"): JUNK - A MARK FOR WHAT GOES.
+// LOOT18: JUNK - A MARK FOR WHAT GOES.
 //
 // The lock's twin (systems/item/itemLock.js, LOCK1). One flag on the item (`junk: true`, declared in systems/item/itemFields.js,
 // so it rides the save and the wire as every other field does), set and cleared from the item's own card. Where the

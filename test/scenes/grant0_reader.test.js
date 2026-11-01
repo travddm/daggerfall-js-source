@@ -1,5 +1,4 @@
-// GRANT0 (2026-10-18; bible/11-Multiplayer/Spawn-Grants.md sections 1 and 8; the owner, asked what to build first: "Quick
-// fixes first"). Three things a reader believed of a peer's foe that FOE-FORGE's bounds did not reach, closed by the
+// GRANT0. Three things a reader believed of a peer's foe that FOE-FORGE's bounds did not reach, closed by the
 // reader's law alone (no relay change): the wind-up's signature bit (x2) on any foe, where an honest owner sets it only
 // on a revenant's blow (ai/tactics.js sigBlow); a champion's trait on every record, past what an owner rolls and its
 // revenants wear; and the dungeon's copies taking a peer's cast from the whole spell table and its revenant fields
@@ -64,7 +63,7 @@ const lootOn = () => { _resetForTests(); setPref('lootRarity', true); };
 
 test('GRANT0: the bounds - a champion\'s trait for the elites\' allowance and the revenants\' bound; what a foe casts is assignEnemySpells\' own list, at any level asked', () => {
   assert.equal(PEER_CHAMPION_PUPPETS_MAX, PEER_ELITE_PUPPETS_MAX + PEER_REVENANT_PUPPETS_MAX, 'an owner\'s capped spawns roll one in fourteen, and each of its revenants may wear its trait');
-  assert.equal(PEER_CHAMPION_PUPPETS_MAX, 17);   // PIN MOVED (UNQUIET, #1008): the revenants' bound is nine now (REVENANT_MAX three), so eight and nine
+  assert.equal(PEER_CHAMPION_PUPPETS_MAX, 17);
   // DFU EnemyEntity.cs's lists, as indices: a monster's its career's; a class caster's EnemyClassSpells[min(6, level / 3)]
   assert.deepEqual(enemySpellIndices({ isClass: false, careerIndex: 27 }), [0x16, 0x17, 0x1F], 'a Daedroth\'s');
   assert.deepEqual(enemySpellIndices({ isClass: false, careerIndex: 0 }), [], 'a rat casts nothing');

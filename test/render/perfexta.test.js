@@ -1,13 +1,9 @@
-// PERF-EXT (2026-09-25, two players via Mac: "fps issues in the exterior
-// but fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600"; Mac: "I am not getting another player to do the work that youre
-// suppose to do"). THE SHADOWS - the pass's cluster A: the lanterns' and the
+// PERF-EXT. THE SHADOWS - the pass's cluster A: the lanterns' and the
 // sun's replays, the static signature, the recorded meshes, the sun's kernel.
 // Each pin is on the thing that made the frame cheaper - a draw not made, a
 // walk not repeated, a tap not taken - and on the picture it must not move:
 // never on a clock (a timing assertion on a shared runner is what broke this
 // repo's deploy, STREAM1). The record is
-// `bible/07-Rendering/Performance-Exterior.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
@@ -164,7 +160,7 @@ test('PERF-EXT1: EVERY BATCH A REPLAY SKIPS BY ITS PLACEMENTS RASTERISES NOTHING
   }
   const lights = new Float32Array(8 * 4);
   for (let i = 0; i < 8; i++) lights.set([(rand() * 2 - 1) * 60, 1 + rand() * 4, (rand() * 2 - 1) * 60, 8 + rand() * 20], i * 4);
-  const vaoOf = new Map(batches.map((b) => [`${b.vao.id}:${b._ibOff | 0}`, b]));   // PIN MOVED (PERF-ARENA): a still batch's draw is its arena's VAO and its range's offset together
+  const vaoOf = new Map(batches.map((b) => [`${b.vao.id}:${b._ibOff | 0}`, b]));
   // every replay the pass makes: its matrix, its light, its texel and filter, and the batches it drew
   const reps = [];
   const replay = sp.replay.bind(sp);
@@ -872,7 +868,7 @@ test('PERF-EXT (the review): ONE HOME EACH - the flat\'s half-height lift is wri
   assert.deepEqual(count(/size\??\.h(?: \?\? 0\))? \* 0\.5/g), ['bounds.js'], 'one lift: half the height, at its home');
   assert.deepEqual(count(/Math\.hypot\([\w.]*size\.w, [\w.]*size\.h\)/g), ['bounds.js'], 'one half-diagonal, at its home');
   const b = src['bounds.js'];
-  for (const fn of ['batchSphere', 'placementsInCubeOf', 'placementsInVolume']) {   // PIN MOVED (PERF-ALLOC2): placementsInCube hands its cube to placementsInCubeOf, which asks the lift
+  for (const fn of ['batchSphere', 'placementsInCubeOf', 'placementsInVolume']) {
     const body = b.slice(b.indexOf(`export function ${fn}(`), b.indexOf('\n}', b.indexOf(`export function ${fn}(`)));
     assert.match(body, /batchLift\(b\)/, `${fn} lifts by the home`);
   }

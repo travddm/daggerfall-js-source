@@ -1,6 +1,4 @@
-// DISPLAY-REPLICA (2026-10-13, the account database's primary capped near 150 requests a second from 14:11 UTC - against
-// 287 at 02:00 the same day - its own statements fast and every route waiting on it; bible/11-Multiplayer/Scale-Arc.md
-// DISPLAY-REPLICA): the display reads and the arena's board run on a D1 session (server-account/src/service.js
+// DISPLAY-REPLICA: the display reads and the arena's board run on a D1 session (server-account/src/service.js
 // REPLICA_ROUTES, the client's D1_BOOKMARK_READS) - every statement a replica's with the bookmark the tab carries, and
 // with none (a page from before this, or the read after a write, which the client forgets its bookmark for) the session's
 // lookup the primary's and every read after it a replica's at least as new. The three reads an isolate keeps for every
@@ -20,7 +18,7 @@ const DISPLAY_READS = [
   ['/v1/homes/decor', 'POST', { mapId: 1, buildingKey: 1 }], ['/v1/prof/pixels', 'POST', { pixels: [[402, 151]] }],
   ['/v1/market/vendors', 'POST', { region: 17 }], ['/v1/marks/balance', 'POST', {}], ['/v1/guilds/invites', 'POST', {}],
   ['/v1/realm/lineages', 'POST', {}], ['/v1/realm/unions', 'POST', {}], ['/v1/saves', 'GET', null], ['/v1/arena/board', 'POST', {}],
-  ['/v1/festival/town', 'POST', { mapId: 1 }],   // PIN MOVED (WITCH1): and a town's Hearth Offerings
+  ['/v1/festival/town', 'POST', { mapId: 1 }],
 ];
 const send = (S, path, { method = 'POST', secret, body = {}, mark = null } = {}) => S.fetch(`https://accounts.invalid${path}`, {
   method, headers: { authorization: `Bearer ${secret}`, ...(method === 'POST' ? { 'content-type': 'application/json' } : {}), ...(mark ? { 'x-d1-bookmark': mark } : {}) }, body: method === 'POST' ? JSON.stringify(body) : undefined,
@@ -39,7 +37,6 @@ test('DISPLAY-REPLICA: the display reads and the arena\'s board are replica rout
     assert.ok(raw._sessions.at(-1).statements.length > 0, `${path}: its statements the session's`);
     if (r.status === 200) assert.ok(r.headers.get('x-d1-bookmark'), `${path}: its session's position back`);
     await send(S, path, { method, secret: who.secret, body: body ?? {} });
-    // PIN MOVED (BOOKMARK-SPIRAL, 2026-10-16; test/server/bookmark_spiral.test.js): the polled ones with none start at any instance
     assert.equal(raw._sessions.at(-1).constraint, ANY_REPLICA_ROUTES.get(path) === method ? 'first-unconstrained' : 'first-primary', `${path} with no bookmark: the primary first - the caller's own writes read - or, polled, any instance`);
   }
   const fake = { withSession: () => { throw new Error('opened'); } };
@@ -56,7 +53,7 @@ test('DISPLAY-REPLICA: a seat read asked from a request already on a session (a 
   for (const w of [await svc.guest(), await svc.guest(), await svc.guest()]) base._raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(anticlere.key), w.id, seatReportText(anticlere), anticlere.region, T0 - 86400);
   const request = replicaDb(base, d1Position(base));
   const player = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * 86400 };
-  const seatSessions = () => base._sessions.filter((s) => s.statements.some((q) => /world_witness (?:INDEXED BY \w+ )?WHERE kind = 'seat'/.test(q))).map((s) => s.constraint);   // PIN MOVED (AUDIT LEAN-READS 2 A3): the judged read names its index
+  const seatSessions = () => base._sessions.filter((s) => s.statements.some((q) => /world_witness (?:INDEXED BY \w+ )?WHERE kind = 'seat'/.test(q))).map((s) => s.constraint);
   const first = await listSeats({ db: request, nowS: T0 }, player, ENV);
   assert.deepEqual(first.seats.map((s) => s.key), [anticlere.key]);
   assert.deepEqual(seatSessions(), [SEAT_ROWS_FROM], 'its own session, off the binding - not the request\'s');

@@ -1,5 +1,5 @@
 // @ts-check
-// CURSE-REPAIR1 (2026-09-24, the contributor's report: players "getting lycanthropy or vampirism and losing it again") -
+// CURSE-REPAIR1 -
 // GIVE BACK THE CURSE THE ROUND CLOCK TOOK.
 //
 // THE BUG (CURSE-PERSIST1, systems/effects.js tickActiveEffects): the curse entry - and the infection before it -

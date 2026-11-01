@@ -1,4 +1,4 @@
-// YARD-SWEEP (2026-10-11, the owner: "remove any decor items that currently go above the height limit"). YARD-HEIGHT
+// YARD-SWEEP. YARD-HEIGHT
 // refused a yard's piece placed or moved past DECOR_YARD_HIGH and left every one standing from before it where it stood;
 // migration 0109 deletes them, the service's town read never serves one (server-account/src/decor.js yardsOf), and the
 // client never stands one an older service still answers (scenes/homeYards.js ensure). A room's pieces are never asked.

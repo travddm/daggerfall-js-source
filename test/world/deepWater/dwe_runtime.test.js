@@ -1,4 +1,4 @@
-// DW-E1 (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2's RUNTIME PLUMBING (jet082), PINNED:
+// DW-E1 - ILIAC PUDDLE NO MORE 1.2.2's RUNTIME PLUMBING (jet082), PINNED:
 // DeepWaterRuntime's transient reset, post-transition refresh and work gates, and TransientObjectTracker - what the
 // fish, the foes, the loot and the decorations hang off. The expectations are the C#'s (clean/puddle/
 // DeepWaterRuntime.cs, TransientObjectTracker.cs), spelled out here.

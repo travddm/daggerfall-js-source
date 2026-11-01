@@ -1,6 +1,5 @@
-// AUDIT 625 (2026-10-05, Mac: "Lets do a comprehensive audit on this"), the SILVER lens: PR #625's SILVER-FINDS, audited
+// AUDIT 625, the SILVER lens: PR #625's SILVER-FINDS, audited
 // - the client's half (the service's are test/net/silverfinds_service.test.js's AUDIT 625 S1 and S6).
-// bible/01-Overview/audits/Audit-625.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

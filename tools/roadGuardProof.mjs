@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FAST-SUITE (2026-10-04): THE ROAD PAINTER'S SKIP GUARD, PROVEN - world/road/roadPainter.js paintRoads passes by every tile
+// FAST-SUITE: THE ROAD PAINTER'S SKIP GUARD, PROVEN - world/road/roadPainter.js paintRoads passes by every tile
 // no painter can reach (off the centre cross, the two diagonals and the location rect). This runs the painter as it is
 // against the painter as it stood BEFORE the guard - taken from git, `--ref` (default the guard's parent commit) - over
 // every road, track, river and stream pixel of the shipped map (vendor/roads-hazelnut), water on and off, a location

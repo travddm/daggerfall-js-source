@@ -98,7 +98,7 @@ export function rrClimbingChance(base, { climbing = 0, luck = 0, khajiit = false
  *  ItemHands ('Both' for a two-hander); `weaponType` DFU's WeaponTypes
  *  (Dagger 4, Dagger_Magic 5, Melee 15). Registered only when Roleplay &
  *  Realism: Items' weaponBalance is off (:171).
- *  SWING-LAW (2026-09-28, Mac: "swing speed is insane"): the blend is the
+ *  SWING-LAW: the blend is the
  *  Speed the swing is read at, and the port's law turns it into time -
  *  its bounded curve and the weapon's handling (characters/weaponStates.js
  *  swingFrameSeconds) - where the mod's `3 * (115 - blend)` over the
@@ -328,7 +328,7 @@ export const RR_UNDERWORLD = Object.freeze({
 export const rrUnderworldRule = (guildName) => (rrModule('underworldExpulsion') ? RR_UNDERWORLD[guildName] ?? null : null);
 
 // ---- fightersTeachHandToHand (FightersGuildRR.cs) - RETIRED -------------------------
-// FGH2H-R (2026-09-24, Mac: "retire it"): FGH2H put HandToHand in the Fighters Guild's
+// FGH2H-R: FGH2H put HandToHand in the Fighters Guild's
 // base lists beside Giantish, so this module's lists (HandToHand in Giantish's place)
 // only took Giantish away. The switch is off the pane (modSettings.js RETIRED_KEYS) and
 // the guild reads its own lists; the Port-Ledger's FGH2H row records the departure.

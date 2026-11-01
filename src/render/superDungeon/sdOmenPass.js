@@ -1,5 +1,5 @@
 // @ts-check
-// SD2c (2026-10-06, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 4): THE HOLLOW'S OMEN,
+// SD2c: THE HOLLOW'S OMEN,
 // DRAWN - a column of brass-gold light straight up over a Super dungeon's pixel from the moment it rises, seen from
 // SD_OMEN_PX map pixels round (systems/superDungeon/sdOmen.js). It is the gate's beacon in its own colours: the gate's column - its
 // shaders and its geometry, exported by render/gate/gatePass.js - built again here under this pass's own program, so the

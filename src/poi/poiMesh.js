@@ -1,10 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-1 (2026-10-14) - A POI'S MESH, AS THE REALM STORES IT AND THE GAME DRAWS IT.
+// POI-1 - A POI'S MESH, AS THE REALM STORES IT AND THE GAME DRAWS IT.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... Allowing not just the creation of POI's using models, but also
-// the ability to import models, texture, UV map, and even placement onto our actual map ... No short cuts or band aids"
-// (bible/06-Systems/POI-Editor-Arc.md).
 //
 // A model the editor imports (glTF 2.0, poi/gltfImport.js) is written ONCE into this binary - the shape the renderer's
 // createMesh takes, already in the game's own frame - and stored by its sha256 (server-account/src/poi.js). Every reader

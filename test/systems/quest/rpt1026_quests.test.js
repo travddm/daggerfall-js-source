@@ -422,7 +422,6 @@ const zoneRolls = (seed) => { let s = seed * 7919; return () => { s = (s * 11035
 test('QUEST-ZONE: online a quest\'s remote dungeon is never one the open zone seals - forty draws, the stronghold inside the cut never drawn, the one outside always; offline DFU\'s draw takes either (mutants: the seal unread; read offline too)', (t) => {
   t.after(() => setWildMask(null));   // the host's zone left as it was
   const world = zoneWorld();
-  // PIN MOVED (the fourth merge of main into #1184 - WW-C2): the zone the host's (wildMask), stood here over the fixture's cut
   setWildMask(zoneMask());
   const mask = wildMask();
   assert.equal(wildInside(mask, 145, 70), true, 'the setup: inside the zone');
@@ -444,7 +443,7 @@ test('QUEST-ZONE: a save whose remote dungeon the zone seals has it drawn again 
   t.after(() => setWildMask(null));   // the host's zone left as it was
   const found = [];
   const world = zoneWorld(found);
-  setWildMask(zoneMask());   // PIN MOVED (WW-C2): the host's zone
+  setWildMask(zoneMask());
   const build = (online) => {
     const m = new QuestMachine({ nowSeconds: () => 0, world, playerLevel: () => 1, sharedClock: () => online });
     const q = quiet(() => m.scheduleQuest(zoneQuest(['Place _lair_ remote dungeon2', '', 'Foe _vamp_ is Vampire', '', ' reveal _lair_', ' place foe _vamp_ at _lair_']), 0, { rolls: zoneRolls(3) }));

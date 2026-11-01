@@ -274,7 +274,7 @@ test('QS1 swap: equipItem does the work, the leaver becomes the swap, and the pa
   assert.equal(said.at(-1), QUICKSLOT_TEXT.swapGone('Iron Longsword'));
 });
 
-// QS2 (2026-09-17): THE GAP THE WIRING FOUND. Every case QS1 pinned above has
+// QS2: THE GAP THE WIRING FOUND. Every case QS1 pinned above has
 // the off hand FULL - a shield, or a two-hander that clears both - so
 // `equipItem` evicted the main hand and the swap swapped. With the off hand
 // EMPTY, which is how most characters walk around, GetEquipSlot's weapon arm is
@@ -401,7 +401,7 @@ test('HB1: one kind per slot, a press goes through the diamond\'s door and leave
   assert.equal(HB.hotbarKindOf(p), 'consumable');
   assert.equal(HB.hotbarKindOf(d), 'weapon');
   assert.equal(HB.hotbarKindOf(torch()), 'light');
-  assert.equal(HB.hotbarKindOf(shield()), 'shield');   // SHIELD1 (2026-09-25): a shield goes on the bar now - test/systems/shield1.test.js
+  assert.equal(HB.hotbarKindOf(shield()), 'shield');   // SHIELD1: a shield goes on the bar now - test/systems/shield1.test.js
   HB.setHotbarSlot(0, HB.hotbarEntryForItem(p));
   HB.setHotbarSlot(4, HB.hotbarEntryForItem(p));   // a MOVE, not a copy
   assert.equal(HB.hotbarEntry(0), null);

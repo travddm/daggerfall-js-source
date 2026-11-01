@@ -1,4 +1,4 @@
-// WILD2 + WILD3 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md sections 2, 6, 9-11): THE ZONE'S FOUR RINGS and their
+// WILD2 + WILD3: THE ZONE'S FOUR RINGS and their
 // loot, the zone map's ink, the fast journeys' law, the pace's cap, the giants and the strangers' names.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -75,7 +75,7 @@ test('WILD3: a fast journey - never into or out of the zone; inside it 2,500 gol
   const inA = { x: 20, y: 20 }, inB = { x: 12, y: 8 }, out = { x: 2, y: 2 };   // PVPTIERS: inB in the foothills - the fee is the tier it lands in
   assert.deepEqual(wildJourney({ from: out, to: { x: 55, y: 2 }, mask }), { ok: true, fee: 0 });
   assert.equal(wildJourney({ from: out, to: inA, mask, gold: 1e6 }).ok, false, 'not in');
-  assert.match(wildJourney({ from: inA, to: out, mask, gold: 1e6 }).text, /out of Cyrodiil/, 'not out');   // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): Cyrodiil's
+  assert.match(wildJourney({ from: inA, to: out, mask, gold: 1e6 }).text, /out of Cyrodiil/, 'not out');
   assert.deepEqual(wildJourney({ from: inA, to: inB, mask, gold: WILD_TRAVEL_FEE }), { ok: true, fee: 2500 });
   assert.equal(wildJourney({ from: inA, to: inB, mask, gold: WILD_TRAVEL_FEE - 1 }).ok, false, 'the fee in coin');
   // PVPTIERS: deeper costs more - 2.5k, 5k, 10k, 15k by the tier it lands in

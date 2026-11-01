@@ -87,7 +87,7 @@ export const isOutdoorWaterTile = (rawTile) => playerTileMapIndex(rawTile) === W
 export const TERRAIN_SKIRT_DEPTH = 40;
 
 /**
- * GRASS3 (2026-09-18): THE HEIGHT OF THE SURFACE THAT IS ACTUALLY DRAWN,
+ * GRASS3: THE HEIGHT OF THE SURFACE THAT IS ACTUALLY DRAWN,
  * at any point inside a pixel - pixel-local x/z, the same frame
  * `buildTerrainGrid` builds in.
  *
@@ -151,7 +151,7 @@ export function surfaceHeightAt(heightmapData, lx, lz, stride = 1) {
 }
 
 /**
- * FLORA-GROUND (FIELD BUGS 2026-10-27, the owner: "floating flora ... can be seen off the ground in first person"; the
+ * FLORA-GROUND (FIELD BUGS 2026-10-27,; the
  * coordinator: "Make the flora's height and the walk height one law"): THE GROUND'S ONE LAW - the height of the streamed
  * ground at a pixel-local point, for everything that stands on it: the player's walk floor (scenes/world.js heightAt, the
  * capsule's), every plant the kernel and the build stand (world/terrain/terrainNature.js, jungleNature.js, the jungle's
@@ -181,7 +181,7 @@ export const walkGroundAt = (heightmapData, lx, lz) => surfaceHeightAt(heightmap
  * in the near ring. The far ring cannot carry the near ring's relief (a 25.6 m quad over sixteen of 6.4 m): on the real
  * data the walk ground under 18.8% of the Bay's plants stood more than 25 cm over it and under 16.9% more than 25 cm
  * below it, the worst 6.6 m, until they were drawn on it; no coarse vertex can hold them all (each the highest fine
- * sample about it buried 92% of them a metre or more - bible/03-World/World-Arc.md FLORA-GROUND, THE RINGS).
+ * sample about it buried 92% of them a metre or more FLORA-GROUND, THE RINGS).
  * @param {Float32Array} heightmapData sample(x, z) = data[x*hDim+z], normalized
  * @param {number} lx pixel-local x, 0..TERRAIN_SIZE
  * @param {number} lz pixel-local z, 0..TERRAIN_SIZE
@@ -197,7 +197,7 @@ export function drawnGroundAt(heightmapData, lx, lz, stride = 1, carve = null) {
 }
 
 /**
- * GRASS-LIT2 (2026-10-02): THE GROUND'S NORMAL WHERE A BLADE STANDS - the
+ * GRASS-LIT2: THE GROUND'S NORMAL WHERE A BLADE STANDS - the
  * drawn surface's own, as the terrain's fragment stage receives it: the
  * stride-1 grid's vertex normals (buildTerrainGrid's central differences,
  * ghost rows and all) interpolated over the triangle under (lx, lz), cut on
@@ -230,7 +230,7 @@ export function surfaceNormalAt(normals, lx, lz, out = [0, 0, 0]) {
 }
 
 /**
- * SNOWFALL1 (2026-10-08): THE DRAWN GROUND'S NORMAL, FROM ITS SAMPLES ALONE - surfaceNormalAt's interpolation, over the
+ * SNOWFALL1: THE DRAWN GROUND'S NORMAL, FROM ITS SAMPLES ALONE - surfaceNormalAt's interpolation, over the
  * grid's vertex normals as buildTerrainGrid makes them at the pixel's stride (central differences at the stride's own
  * span, the pixel's edge one-sided: a pixel keeps no ghost rows), for a pixel that keeps no normals of its own (a
  * pixel's groundNormals are the grass's, stride 1, and only while the grass is on). The snow's surfaces light by it.
@@ -270,7 +270,7 @@ export function surfaceNormalFromSamples(heightmapData, lx, lz, stride = 1, out 
 }
 
 /**
- * SNOWFALL1 (2026-10-08): A GRID'S VALUE ON THE DRAWN TRIANGLE - a per-vertex value of a grid laid in the terrain's
+ * SNOWFALL1: A GRID'S VALUE ON THE DRAWN TRIANGLE - a per-vertex value of a grid laid in the terrain's
  * order (x fastest, `gx` vertices a row, `cell` world units apart: buildTerrainIndices' and flatGrid's) read on the
  * triangle under (lx, lz), cut on surfaceHeightAt's diagonal. WATER-NEXT's bed depths through it are what the carve
  * took off the drawn ground there - for what is laid ON that ground (the snow).
@@ -293,8 +293,7 @@ export const unityHeightmapStep = (h) => Math.round(Math.min(1, Math.max(0, h)) 
 const UNITY_HEIGHT_PER_STEP = Math.fround((MAX_TERRAIN_HEIGHT * STREAMING_TERRAIN_SCALE) / UNITY_HEIGHTMAP_MAX_HEIGHT);
 
 /**
- * FIELD-CSA2 (2026-09-29, the Discord through Mac: "I can't get my boat to
- * work", "Ports are bugged for player boats"): TERRAIN.SAMPLEHEIGHT, AT THE
+ * FIELD-CSA2: TERRAIN.SAMPLEHEIGHT, AT THE
  * PRECISION UNITY HOLDS A HEIGHTMAP IN.
  *
  * DFU hands each terrain its heights as floats (DaggerfallTerrain's
@@ -353,8 +352,7 @@ export function terrainSampleHeightAt(heightmapData, lx, lz, stride = 1) {
 }
 
 /**
- * NATURE-GROUND (2026-09-26, Ilvi on the Discord: "I encountered a lot of
- * floating sprites across Illiac Bay"): HOW FAR THE DRAWN GROUND AT
+ * NATURE-GROUND: HOW FAR THE DRAWN GROUND AT
  * (lx, lz) LIES OFF A LOCATION'S PLANE - up (+) or down (-). A location
  * stands on the pixel's average height (world.js `locLocal`), and
  * blendLocationTerrain writes that average only inside the location's
@@ -378,8 +376,7 @@ export function groundOffPlane(heightmapData, avg, lx, lz) {
 export const GROUND_UNDER_INSET = 0.25;
 
 /**
- * WOD-BUSH (2026-10-01, Mac: "World of daggerfall bush props float above the
- * ground in bandit camps"): THE LOWEST DRAWN GROUND UNDER A BOX - over the
+ * WOD-BUSH: THE LOWEST DRAWN GROUND UNDER A BOX - over the
  * middle of its footprint (GROUND_UNDER_INSET off each side), read at its
  * corners, its centre lines and every sample line that crosses it, so no
  * quad under it is skipped. The footprint is held to the pixel: the ground

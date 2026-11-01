@@ -1,7 +1,4 @@
-// DISC25-A (2026-09-25, tannim and kurkku on Discord, through Mac: "the plane you are on + stairs going down and had
-// the ability to press down to advance the plane displayed down a step (or up to go up)", "If no plane one step up,
-// just show the ramp going up or down", "clicking stairs to move up or down a level is good though"; Mac: "making
-// comprehensive improvements to it").
+// DISC25-A.
 //
 // WHAT A REAL DUNGEON SHOWED (tools/ run over the freeware data, not committed): Privateer's Hold derived THIRTEEN
 // storeys, because Daggerfall lays its rooms on a 3.2 m grid and every step of it is a headroom apart. Each sheet was

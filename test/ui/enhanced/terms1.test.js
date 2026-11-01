@@ -1,4 +1,4 @@
-// TERMS1 (2026-09-28) — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
+// TERMS1 — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
 // AGREED TO BEFORE AN ACCOUNT EXISTS.
 //
 // "Here is our terms of service and privacy policy. I wanna make sure
@@ -72,9 +72,9 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
   // this reddens: if the change is material, move the Last Updated date
   // and its version in src/net/legalLaw.js; either way, re-hash.
   const HASH = {
-    // BR5 (2026-10-11): the operator renamed DFO Online in both, and nothing else - not material, so the
+    // BR5: the operator renamed DFO Online in both, and nothing else - not material, so the
     // version stands and only the words are re-hashed (AUDIT BR5: a new version refuses every older build's sign-up)
-    // SAFE (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): material in both - the Terms name hate by what it
+    // SAFE: material in both - the Terms name hate by what it
     // attacks and make the in-game Code of Conduct part of them; the Policy says the stamped messages, the reports, the
     // automated review by a third-party AI provider and how long each is kept - so a new version, 2026-10-17
     // AUDIT SAFE (the same day, unreleased - the version stands): the Policy made true of the code - a report shown in the
@@ -370,7 +370,7 @@ test('TERMS1: the card draws each box UNTICKED, its document linked beside it an
   // ...and no other stage draws one.
   for (const stage of STAGES.filter((s) => s !== 'register')) {
     flow.stage = stage;
-    if (stage === 'code') flow.recoveryCodes = ['A-B'];   // PIN MOVED: RECOVERY-SET
+    if (stage === 'code') flow.recoveryCodes = ['A-B'];
     if (stage === 'in') flow.account = { name: 'N', handle: 'N', kind: 'linked' };
     card.paint();
     assert.ok(!card.root.all.some((n) => n.type === 'checkbox'), `${stage} drew a box`);
@@ -400,7 +400,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

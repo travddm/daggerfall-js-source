@@ -18,9 +18,9 @@ import { survivalInfoTokens, itemInfoRows } from '../../../src/systems/item/item
 import { TavernWindow } from '../../../src/ui/tavernWindow.js';
 import { NOT_ENOUGH_GOLD_ID } from '../../../src/systems/tavern.js';
 import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
-import { CLIMATES } from '../../../src/formats/mapsFile.js';   // MENU-CLIMATE (FIELD BUGS 2026-09-30, PIN MOVED): the menus read by the enum's names
+import { CLIMATES } from '../../../src/formats/mapsFile.js';   // MENU-CLIMATE (FIELD BUGS 2026-09-30
 
-// ═══ SURV5 (2026-09-18): WHAT THE PLAYER IS TOLD, AND THE TAVERN ═══
+// ═══ SURV5: WHAT THE PLAYER IS TOLD, AND THE TAVERN ═══
 //
 // The HUD's needs strip and the status page's third box
 // (survival/status.js); the survival items' own info box; the mod's
@@ -31,8 +31,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
 test('SURV5: the menus - the mod\'s keys (the climate\'s where the region names none), three tiers by quality, breakfast from six to ten and a closed kitchen at five; every dish priced; the drinks\' alcohol by their place', () => {
-  // MENU-CLIMATE (FIELD BUGS 2026-09-30, PIN MOVED): the keys are the CLIMATES enum's, each read by its name.
-  // PIN MOVED (AUDIT C&C I8): the table is the mod's own climate fallback now (regionMenuDay's second switch, the region
+  // MENU-CLIMATE (FIELD BUGS 2026-09-30
   // first - test/systems/survival/auditcc_tavern.test.js): it names nine climates, the Ocean is its default's, the mountains eat the
   // North's and the subtropics the South's; quality 5 is a mid tavern; every meal is worth 240; the dishes, the
   // drinks and their alcohol are the mod's own lists (TAVERN_DISHES, TAVERN_DRINKS, DRINK_ALCOHOL), not keys of the port's
@@ -73,12 +72,10 @@ test('SURV5: the meal and the drink - the mod\'s marker law (too full under the 
   assert.equal(tavernEat({ lastAte: 990 }, 1000, 120).text, TAVERN_MENU_TEXT.tooFull);
   const far = { lastAte: 0, notes: {} };
   tavernEat(far, 2000, 200);
-  // PIN MOVED (AUDIT C&C I3): at the meal's END - its half hour passes first, as TavernFood passes it
   assert.equal(far.lastAte, 2000 + MEAL_MINUTES - NEED.PECKISH_AT + 200, 'past worth + 240 the marker starts four hours back');
   const d = { ...newSurvival(0), thirst: 60, drunk: 0 };
-  // PIN MOVED (AUDIT C&C I6): a soft drink refreshes - five fatigue, no magicka - where "fortifies" was said over the milk
   assert.deepEqual(tavernDrink(d, 0, { endurance: 50 }), { text: TAVERN_MENU_TEXT.refreshed, blackout: false, minutes: DRINK_MINUTES, fatigue: 5, magicka: 0 }); assert.equal(DRINK_MINUTES, 15);
-  // TAVERN-DRINK (FIELD BUGS 2026-09-30, PIN MOVED): 20 -> 0 - a tavern drink quenches the thirst whole, whatever its kind (test/systems/survival/fb0930_cc_drink.test.js)
+  // TAVERN-DRINK (FIELD BUGS 2026-09-30
   assert.equal(d.thirst, 0, 'a drink quenches the thirst whole'); assert.equal(d.drunk, 0, 'a soft drink counts nothing');
   assert.equal(tavernDrink(d, 35, { endurance: 50 }).text, TAVERN_MENU_TEXT.gettingDrunk); assert.equal(d.drunk, 35);
   d.drunk = 41; assert.equal(tavernDrink(d, 0, { endurance: 50 }).text, TAVERN_MENU_TEXT.veryDrunk, 'past endurance - 10');
@@ -107,22 +104,21 @@ test('SURV5: the strip and the page - one chip a felt need, nothing while every 
   e.survival = { ...newSurvival(0), lastAte: 0, thirst: 90, wet: 40, sleepDebt: 5, drunk: 45, felt: -35, stiffUntil: 5000 };
   assert.deepEqual(survivalHudChips(e, 800).map((c) => `${c.key}:${c.text}:${c.level}`),
     ['hunger:Hungry:warn', 'thirst:Parched:danger', 'sleep:Tired:warn', 'wet:Wet:warn', 'temp:Freezing:danger', 'stiff:Stiff:warn', 'drunk:Very drunk:danger']);
-  assert.equal(HUD_NEED_WORDS.hunger.starving, 'Starving');   // PIN MOVED (AUDIT C&C S5): the table is words; the level is the tier's (needLevel)
-  assert.equal(needLevel('hunger', 'starving'), 'warn', 'Starving costs nothing in the default tier - Boons since BOONS-DEFAULT');   // PIN MOVED
+  assert.equal(HUD_NEED_WORDS.hunger.starving, 'Starving');
+  assert.equal(needLevel('hunger', 'starving'), 'warn', 'Starving costs nothing in the default tier - Boons since BOONS-DEFAULT');
   assert.equal(needLevel('hunger', 'starving', { rules: SURVIVAL_RULES.casual }), 'danger', 'and costs in Casual');
   assert.deepEqual(survivalStatusLines(e, 800, { endurance: 50 }), [
     STATUS_TEXT.hunger.hungry, STATUS_TEXT.thirst.parched, STATUS_TEXT.sleep.tired, STATUS_TEXT.wet.wet, 'You feel freezing.',
-    'Felt temperature: -35 (comfortable from -10 to +10).',   // PIN MOVED (TEMP-UI): the number under the word
+    'Felt temperature: -35 (comfortable from -10 to +10).',
     STATUS_TEXT.stiff, STATUS_TEXT.veryDrunk,
   ]);
   assert.equal(STATUS_TEXT.hunger.hungry, 'You could do with a decent meal.', 'the mod\'s own line');
   e.survival.drunk = 30; assert.equal(survivalStatusLines(e, 800, { endurance: 50 }).at(-1), STATUS_TEXT.drunk, 'past half the endurance: drunk');
   e.survival.drunk = 20; assert.equal(survivalStatusLines(e, 800, { endurance: 50 }).some((l) => /drunk/.test(l)), false);
-  // PIN MOVED (AUDIT SURV-BOONS C12): the vampire's one line in the needs' place, then the body's own - the wet and the
   // temperature the strip shows a vampire too (the drink at 20 is under the band)
   assert.deepEqual(survivalStatusLines(e, 800, { vampire: true }), [STATUS_TEXT.vampire, STATUS_TEXT.wet.wet, 'You feel freezing.', 'Felt temperature: -35 (comfortable from -10 to +10).', STATUS_TEXT.stiff]);
   const fed = { survival: { ...newSurvival(0), lastAte: 1000 - 30, felt: 0 } };
-  assert.deepEqual(survivalStatusLines(fed, 1000), [STATUS_TEXT.invigorated, STATUS_TEXT.thirst.fine, STATUS_TEXT.sleep.rested, 'You are comfortable.', 'Felt temperature: 0 (comfortable from -10 to +10).']);   // PIN MOVED (TEMP-UI)
+  assert.deepEqual(survivalStatusLines(fed, 1000), [STATUS_TEXT.invigorated, STATUS_TEXT.thirst.fine, STATUS_TEXT.sleep.rested, 'You are comfortable.', 'Felt temperature: 0 (comfortable from -10 to +10).']);
   assert.deepEqual(survivalStatusRows(fed, 1000)[0], { text: STATUS_TEXT.invigorated, center: true });
   // the felt reading rides the record from the minute law, so the strip needs no env
   const p = { stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, items: [], activeEffects: [], health: 50, fatigue: 3000, raceId: 1 };
@@ -172,7 +168,7 @@ test('SURV5: the tavern window - the survival menu in the one picker: a meal cha
   assert.equal(a.w.flow.top.onPick(picker.indexOf(TAVERN_MENU_TEXT.drinksHeader))?.[0]?.picker, a.w.flow.top.picker, 'the header picks nothing - the picker stands (AUDIT SURV C: a divider is not a door out)');
   const wine = picker.indexOf('30 gold   Nereid Wine');
   a.w.flow.top.onPick(wine);
-  assert.equal(a.entity.survival.drunk, 40); assert.equal(a.entity.goldPieces, 60); assert.deepEqual(a.passed, [MEAL_MINUTES, DRINK_MINUTES]);   // PIN MOVED (AUDIT C&C I8): Nereid Wine is the mod's alcoHigh[8], 40 (the port's name guess made it a wine's 20)
+  assert.equal(a.entity.survival.drunk, 40); assert.equal(a.entity.goldPieces, 60); assert.deepEqual(a.passed, [MEAL_MINUTES, DRINK_MINUTES]);
   const poor = mk({ gold: 3 });
   poor.w._food();
   assert.equal(poor.w.flow.top.onPick(0)[0].rows[0].text, `r${NOT_ENOUGH_GOLD_ID}`, 'not enough gold');

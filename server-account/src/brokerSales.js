@@ -1,5 +1,4 @@
-// AUDIT FB1024 (2026-10-25, the owner: "Audit this", of FIELD BUGS 2026-10-24's EMBERS-OWED; bible/01-Overview/bugs/
-// Field-Bugs-2026-10-24.md, BROKER-RID) - THE BROKER'S SALES BY THEIR REQUEST IDS.
+// AUDIT FB1024 - THE BROKER'S SALES BY THEIR REQUEST IDS.
 //
 // A press of the Broker's insignia (accounts.js buyInsignia) may carry a
 // request id (`rid`, src/net/insignia.js BROKER_RID_RE). The sale writes `broker_sales` (migration 0174) in its own

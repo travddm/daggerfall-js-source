@@ -1,5 +1,5 @@
 // @ts-check
-// WB2 (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area"):
+// WB2:
 // THE GATE'S FIRE AND ITS BEACON, DRAWN - the two things the stone (world/gate/gateModel.js) cannot be.
 //
 // THE MEMBRANE. The portal between the pillars: a slow vortex of fire, masked to the arch's own opening

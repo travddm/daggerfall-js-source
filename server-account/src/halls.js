@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") - A GUILD'S HALL AND ITS
+// GUILD1d - A GUILD'S HALL AND ITS
 // HERALDRY, AS THE SERVICE KEEPS THEM (bible/11-Multiplayer/
 // Seats-Arc.md 8; the law both ends read is src/net/hallLaw.js and
 // src/net/heraldryLaw.js).
@@ -141,7 +141,7 @@ export async function buyHall(ctx, player, body = {}) {
  * and the deed share of what the treasury paid (homeLaw.js homeSaleRefund) with half of what records paid for its pieces
  * paid back into the treasury - into what records paid in - in the same batch, both or neither. The batch holds the
  * hall and its pieces as they were read, so a piece placed between the read and the sale is never sold unpaid.
- * GUILD-HALL-SALE (2026-10-06, asked: "Guild houses should be able to be sold, like regular houses"): sold at its own
+ * GUILD-HALL-SALE: sold at its own
  * door too, as a home is - the door names the building it sells (`mapId`, `buildingKey`), and a guild's hall that
  * stands anywhere else is not the one its guildmaster was shown (`guild-hall-moved`: look again). The Guild tab's sale
  * names none and sells the guild's one hall, as before.

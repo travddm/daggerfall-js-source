@@ -1,7 +1,5 @@
 // @ts-check
-// UNQUIET (bible/06-Systems/Revenants.md section 46; the owner, 2026-10-17: "With revenants becoming a full fledge game
-// loop. They need to become harder, rarer, revenants need more of a chance to flee instead of relying on player death, we
-// need to go deeper on the experience and make it something insanely deep."): THE UNQUIET - revenants that live by
+// UNQUIET (): THE UNQUIET - revenants that live by
 // getting away. systems/revenant/revenant.js keeps the record and its deeds (and the flight's own numbers - REVENANT_FLEE_*);
 // this sibling keeps what UNQUIET adds to them, its numbers and every law pure but the flight's (it moves a live foe):
 //
@@ -46,7 +44,7 @@ import { isClassEnemyId } from '../../characters/enemy/enemyBasics.js';   // DEX
 
 // ── born of flight, ranked by surviving ─────────────────────────────
 /** A revenant's kill of the player (or a companion it fells) ranks it up only every this many times - an escape ranks
- *  it every time (the owner: "more of a chance to flee instead of relying on player death"). */
+ *  it every time. */
 export const BLOOD_RANK = 2;
 /** The deeds that rank a revenant up each time: it got away (an escape, the will's tear-away, a slip from the choice -
  *  the `fled` deed), or the player got away from it (`routed`). */

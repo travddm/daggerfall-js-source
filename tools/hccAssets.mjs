@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// HCC (2026-09-23): HORSE CART AND CARGO'S OWN FILES, OUT OF ITS OWN BUNDLE.
+// HCC: HORSE CART AND CARGO'S OWN FILES, OUT OF ITS OWN BUNDLE.
 //
 // The mod ships one file - `horse cart and cargo.dfmod`, a Unity
 // 2019.4.40f1 AssetBundle - carrying five text assets: the manifest

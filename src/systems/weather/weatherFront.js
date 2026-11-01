@@ -1,9 +1,5 @@
 // WX2 - THE FRONT REACHES THE GROUND.
 //
-// Mac: "Instead of rain/snow starting and stopping immediately, I want
-// it to fade in and out slowly, how the grass prototype handles it. For
-// example snow and rain shouldn't always be a downpour. It can sprinkle,
-// or lightly snow, etc."
 //
 // Before this slice the sim flipped its word between two ticks -
 // Daggerfall's own once-a-day cut, WeatherManager's law, untouched here -

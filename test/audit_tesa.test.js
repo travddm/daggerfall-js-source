@@ -1,5 +1,4 @@
-// AUDIT-TESA (2026-10-13, the owner: "Lets do a comprehensive audit across everything so far"; bible/01-Overview/
-// Audit-TESA.md) - the fixes the audit of the Arena arc (TESA1 to TESA10d) found, pinned: Arena's names off the wire and
+// AUDIT-TESA - the fixes the audit of the Arena arc (TESA1 to TESA10d) found, pinned: Arena's names off the wire and
 // out of saves, a quest's site past the Bay found, the capitals' start markers, and the rest of its waves.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -28,7 +27,6 @@ test('AUDIT-TESA A1-1: an Arena place\'s automap key names it by its map id - ne
   assert.equal(automapKeyOf({ ...arena, capital: { key: 'solitude', k: 1 }, name: 'Solitude' }), automapDungeonKey(0, 'Solitude'), 'a capital is the port\'s, its name too');
   assert.equal(automapKeyOf({ regionIndex: 17, name: 'Daggerfall' }), automapDungeonKey(17, 'Daggerfall'));
   assert.equal(automapKeyOf({ regionIndex: 0, name: 'Ulrik\'s Hold', country: { dungeon: true }, mapTableData: { mapId: 5 } }), `${automapDungeonKey(0, 'Ulrik\'s Hold')}#5`);
-  // PIN MOVED (TESA12): the places are the port's own, every client's the same - the wire names one like any town
   assert.match(W, /loc: ident\?\.kind === 'dungeon' \? \(ident\.name \?\? ''\) : \(loc\?\.name \?\? ''\),/);
 });
 
@@ -40,7 +38,7 @@ test('AUDIT-TESA A1-2: entering an Arena place, and a quest revealing one, disco
 test('AUDIT-TESA A2-1: a quest\'s site past the Bay is found by name - an isle\'s, an Arena town\'s, a country place\'s or a lair, a capital - in the index it stands in; MAPS.BSA\'s first; the reveal, the clock and the respawn all ask it', () => {
   const i = W.indexOf('  const placeByName = ');
   assert.ok(i > 0);
-  const src = W.slice(i, W.indexOf('\n  const { questWorld } = createQuestWorld({', i));   // PIN MOVED (HOST-SPLIT, at the merge of main): questWorld is scenes/questWorld.js's, constructed where it stood
+  const src = W.slice(i, W.indexOf('\n  const { questWorld } = createQuestWorld({', i));
   const placeByName = new Function('maps', 'locationIndex', `${src}\nreturn placeByName;`);
   const bay = { name: 'Daggerfall', regionName: 'Daggerfall', loaded: true };
   const maps = { getLocationByName: (rn, ln) => (rn === 'Daggerfall' && ln === 'Daggerfall' ? bay : null) };
@@ -57,7 +55,7 @@ test('AUDIT-TESA A2-1: a quest\'s site past the Bay is found by name - an isle\'
   assert.equal(find('Eltheric', 'Mistle'), isle);
   assert.equal(find('Alik\'r Desert', 'Nowhere'), null);
   assert.match(W, /const loc = placeByName\(regionName, locationName\);/, 'the reveal');
-  assert.match(W, /getLocationByName: \{ value: \(rn, ln\) => questSized\(placeByName\(rn, ln\)\) \}/, 'the clock and every quest reader through the adapter');   // PIN MOVED (START2): the quest layer's one sizing
+  assert.match(W, /getLocationByName: \{ value: \(rn, ln\) => questSized\(placeByName\(rn, ln\)\) \}/, 'the clock and every quest reader through the adapter');
   assert.match(W, /const loc = placeByName\(sd\.regionName, sd\.locationName\);/, 'the respawn');
 });
 
@@ -67,8 +65,7 @@ test('AUDIT-TESA A6-1: every capital carries start markers - editor flats on its
   for (const cap of CAPITALS) {
     assert.ok(cap.markers?.length >= 3, cap.key);
     assert.equal(capitalSliceCarriers(cap).get(capitalCentre(cap)), capitalCarrier(cap), `${cap.key}: its own slice's carrier the anchor's`);
-    if (cap.family) continue;   // PIN MOVED (IC-GRAND): the Imperial City's blocks a family on the world-data door - its slices' markers pinned on its carriers there (test/world/icgrand_lod.test.js)
-    // PIN MOVED (AUDIT TESA II C7): every slice's carrier its slice's markers - the capital's own on its own slice's
+    if (cap.family) continue;
     const carriers = new Set();
     for (const [s, code] of capitalSliceCarriers(cap)) {
       const markers = capitalSliceMarkers(cap, s), blk = blocks.find((b) => b.name === cap.blocks[code].name);
@@ -94,7 +91,6 @@ test('AUDIT-TESA A6-1: every capital carries start markers - editor flats on its
 test('AUDIT-TESA A3-1: a town on the shore whose own pixel reads as the sea is routed all the same - its pixel its land (TESA14: the region\'s own law, world/tamrielRoads.js)', async () => {
   const { buildTamrielRegion, regionLattice, regionOf } = await import('../src/world/tamrielRoads.js');
   const { beyondKey } = await import('../src/world/arenaRoads.js');
-  // PIN MOVED (TESA14): TESA4's window cell retired - a town is its own pixel now. Two cities past the Bay (y < 0) on the
   // shore, their pixels' bytes the sea's, the strip of land just south of them the one way between
   const region = regionOf(regionLattice({ x0: 2000, y0: -1000, w: 800, h: 300 }), 0, 0);
   const heightAt = (x, y) => (y === -899 && x >= 2090 && x <= 2150 ? 40 : 0);
@@ -107,9 +103,8 @@ test('AUDIT-TESA A3-1: a town on the shore whose own pixel reads as the sea is r
 
 test('AUDIT-TESA A2-5: past the Bay a town\'s walkers, a building\'s people and a tavern\'s regulars are named by the province\'s people (TESA3\'s bank), the region\'s only on the Bay', () => {
   const wm = read('src/scenes/worldModes.js');
-  // PIN MOVED (HOST-SPLIT, at the merge of main): the pixel's build is src/scenes/pixelBuild.js's
   assert.match(read('src/scenes/pixelBuild.js'), /nameBank: provinceNameBank\(provinceAt\(px, py\)\?\.key\) \?\? getNameBankOfRegion\(dfLocation\.regionIndex\),/, 'the streets');
-  assert.match(W, /var modes = createWorldModes\(\{\n\s+climbFeel[,:][^\n]*\n\s+outsideView,[^\n]*\n\s+instanceDoor,[^\n]*\n\s+provinceBank: \(\) => provinceBankHere\(\),/, 'the interior host told');   // PIN MOVED (at the merge of main): after INSTANCES' door and RW1's view, which main's own pins read first
+  assert.match(W, /var modes = createWorldModes\(\{\n\s+climbFeel[,:][^\n]*\n\s+outsideView,[^\n]*\n\s+instanceDoor,[^\n]*\n\s+provinceBank: \(\) => provinceBankHere\(\),/, 'the interior host told');
   assert.match(wm, /const currentNameBank = \(\) => host\.provinceBank\?\.\(\) \?\? getNameBankOfRegion\(/, 'a building\'s people');
 });
 
@@ -126,7 +121,7 @@ test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, n
   assert.equal(new Set(all.map((b) => b.name)).size, all.length, 'names apart');
   CAPITALS.forEach((cap, k) => {
     assert.match(cap.tag, /^[A-Z]{2}$/);
-    if (cap.family) return;   // PIN MOVED (IC-GRAND): the Imperial City lays no garden (its park and courts the fabric's own ground)
+    if (cap.family) return;
     const names = capitalBlockNames(cap.plan, k, new Map([...new Set(cap.plan.flat())].map((c) => [c, [`${c}AA00.RMB`]])));
     cap.plan.forEach((row, r) => row.forEach((cell, x) => {
       if (cell !== 'G') return;
@@ -136,7 +131,7 @@ test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, n
       assert.ok(all.some((b) => b.name === name), `${name} registered`);
     }));
   });
-  const { imperialSlicePlan } = await import('../src/world/imperialCity.js');   // PIN MOVED (IC-GRAND): the plan by its law, its centre's slice
+  const { imperialSlicePlan } = await import('../src/world/imperialCity.js');
   assert.ok(!capitalBlockNames(imperialSlicePlan(312), 0, new Map([...new Set(imperialSlicePlan(312).flat())].map((c) => [c, [`${c}AA00.RMB`]])), undefined, [96, 96]).includes(CAPITAL_BLOCKS.garden), 'the shared garden none of theirs');
   // built when read: a footprint asked of no capital until one of its blocks is, and of each once
   const asked = [];
@@ -147,10 +142,7 @@ test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, n
   assert.deepEqual(asked, ['solitude'], 'once for its every block');
   const first = lazy.find((b) => b.name.startsWith('TESASO'));
   assert.equal(first.json, first.json, 'built once, kept');
-  // PIN MOVED (WW7-4): a block made of another (registerPortBlockOf, world/capitalCastles.js) made by its own maker
-  // PIN MOVED (ROAD-FOLLOW): the same law in four lines - and a provisional block (a wall still waiting) not kept
   assert.match(read('src/formats/worldData/worldDataReplacement.js'), /if \(b\.block\) return b\.block;\n {2}if \(b\.make\) return \(b\.block = b\.make\(_blocksFile\)\);\n {2}const json = typeof b\.json === 'function' \? b\.json\(\) : b\.json;\n {2}const block = blockFromJson\(json, b\.index\);/);
-  // PIN MOVED (AUDIT TESA II C8): the door handed `make`, which keeps nothing - no JSON beside the block it reads into
   assert.match(read('src/world/capitalModels.js'), /for \(const b of capitalPortBlocks\(\{ footprint: \(cap\) => capitalFootprint\(cap\) \}\)\) registerPortBlock\(b\.name, b\.make \?\? \(\(\) => b\.json\), b\.index\);/);
   assert.notEqual(first.make(), first.make(), 'AUDIT TESA II C8: `make` builds anew, keeps none');
 });
@@ -185,7 +177,6 @@ test('AUDIT-TESA A6-2: where a capital\'s models stand - a wall over a garden or
   installCapitals({ addTextures: () => 0 });
   const open = (fp, a, b) => { for (let k = 0; k <= 60; k++) if (fp(a[0] + ((b[0] - a[0]) * k) / 60, a[1] + ((b[1] - a[1]) * k) / 60)) return false; return true; };
   const fp = Object.fromEntries(CAPITALS.map((c) => [c.key, capitalFootprint(c)]));
-  // PIN MOVED (TESA11): the Imperial City's city wall's four gates and its palace wall's six, walled between; PIN MOVED
   // (IC-GRAND): its nine gates at twenty-five pixels
   const R = IMPERIAL.cityWall.r, rp = IMPERIAL.palaceWall.r;
   for (const b of IMPERIAL.cityWall.gates) assert.ok(open(fp['imperial-city'], polar(b, R - 8), polar(b, R + 8)), `the Imperial City's gate at ${b}`);
@@ -209,24 +200,23 @@ test('AUDIT-TESA A6-2: where a capital\'s models stand - a wall over a garden or
   const blocks = capitalPortBlocks({ footprint: (cap) => fp[cap.key] });
   let crossed = 0;
   for (const cap of CAPITALS) {
-    if (cap.family) continue;   // PIN MOVED (IC-GRAND): the Imperial City's blocks closed by their slice's footprint on the door (test/world/icgrand_lod.test.js)
+    if (cap.family) continue;
     cap.plan.forEach((row, r) => row.forEach((cell, cx) => {
       const own = Object.hasOwn(cap.blocks, cell) ? cap.blocks[cell] : null;
       if (cell !== 'G' && !own) return;
       const blk = blocks.find((b) => b.name === (own ? own.name : capitalGardenName(cap, cx, r)));
-      const G = own ? null : cap.ground?.garden ?? null;   // PIN MOVED (SOLITUDE-RELIEF): a garden on a capital's own ground its ground's - closed and bare where it is not grass
+      const G = own ? null : cap.ground?.garden ?? null;
       const A = blk.json.RmbBlock.FldHeader.AutoMapData, trees = blk.json.RmbBlock.FldHeader.GroundData.GroundScenery;
       let shut = 0;
       for (let ay = 0; ay < 64; ay++) for (let ax = 0; ax < 64; ax++) {
         const [x, z] = autoCentre(ax, ay), [dx, dz] = anchorMetres(cap, cx, r, x, z), under = fp[cap.key](dx, dz);
-        const rim = inCapitalRim(cap, cx * BLOCK_M + x, (r + 1) * BLOCK_M - z);   // PIN MOVED (AUDIT TESA II C1): the rim closed, no ground of its own
+        const rim = inCapitalRim(cap, cx * BLOCK_M + x, (r + 1) * BLOCK_M - z);
         assert.equal(A[ay * 64 + ax], (own?.closed(dx, dz) || G?.closed(dx, dz) || under || rim) ? CAPITAL_CLOSED_BYTE : 0, `${blk.name} ${ax},${ay}`);
         if (under && !own && !rim) { shut++; const tx = Math.floor(x / 6.4), ty = 15 - Math.floor(z / 6.4); assert.equal(trees[ty * 16 + tx].TextureRecord, -1, `${blk.name}: a tree in the wall at ${tx},${ty}`); }
       }
       if (shut) crossed++;
-      // PIN MOVED (ROAD-FOLLOW, 03-World/Town-Shapes.md ROAD-FOLLOW): its approach's road, rim or none
       const way = onCapitalApproach(cap, capitalDims(cap)), roadAt = (i) => way(...anchorMetres(cap, cx, r, ...tileCentre(i % 16, Math.floor(i / 16))));
-      const grass = (x, z) => (G ? G.tile(...anchorMetres(cap, cx, r, x, z)) : 2);   // PIN MOVED (SOLITUDE-RELIEF): a garden on a capital's own ground its ground's
+      const grass = (x, z) => (G ? G.tile(...anchorMetres(cap, cx, r, x, z)) : 2);
       if (!own) assert.ok(blk.json.RmbBlock.FldHeader.GroundData.GroundTiles.every((t, i) => t.TileBitfield === (roadAt(i) ? APPROACH_TILE : inCapitalRim(cap, cx * BLOCK_M + tileCentre(i % 16, Math.floor(i / 16))[0], (r + 1) * BLOCK_M - tileCentre(i % 16, Math.floor(i / 16))[1]) ? CAPITAL_NO_GROUND : grass(...tileCentre(i % 16, Math.floor(i / 16))))), 'a garden\'s grass (its ground\'s, on a capital\'s own), its rim none, its approach the road');
     }));
   }
@@ -235,7 +225,6 @@ test('AUDIT-TESA A6-2: where a capital\'s models stand - a wall over a garden or
 });
 
 test('AUDIT-TESA A7-1/A5-F1/A2-6: a load waits for the trace whenever a place past the Bay stands - a capital or the countryside, Arena or none; the land moving rolls the countryside\'s and the lairs\' pixels again; their ground\'s reads kept a fit and a land', () => {
-  // PIN MOVED (TESA12): one wait - the town past the Bay's beside the capitals' and the countryside's
   const i = W.indexOf('if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has(\'load\')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);');
   assert.ok(i > 0, 'the wait');
   assert.match(W, /const rolled = moved && !!\(host\._countryTemplates \|\| host\._lairTemplates\) && !cap && !had\?\.capital && !had\?\.arena;\n\s+if \(rolled \|\| cap !== !!had\?\.capital\) again\.push/, 'the sweep');
@@ -266,31 +255,23 @@ test('AUDIT-TESA A4-F2/A4-F3: a capital\'s pixel is the capital\'s - never clone
   assert.match(W, /if \(had\?\.capital\) return capitalLocationAt\(px, py\);/);
   // A2-2: a portal's end past the Bay named by the place standing there, else its province
   assert.match(W, /const here = locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? capitalLocationAt\(x, y\) \?\? \(_arenaTemplates \? arenaLocationAt\(x, y\) : null\);\n\s+const province = provinceByKey\(provinceKeyBeyondBay\(x, y\)\);\n\s+return here\?\.name \? \{ pixel: \{ x, y \}, name: here\.name \} : province \? \{ pixel: \{ x, y \}, name: province\.name \} : null;/);
-  // PIN MOVED (BAY-LEFT-SEA): and its harbour's port word - a kept slice whose word moved (its canal opened) cloned again
   assert.match(W, /\(had\.arena\?\.provinceIndex \?\? null\) === \(slot\?\.provinceIndex \?\? null\)\n\s+&& !!had\.arena\?\.port === !!slot\?\.port   \/\/ AUDIT-TESA A4-F2: its place made a port, its slot too\n\s+&& \(had\.exterior\?\.exteriorData\?\.portTownAndUnknown !== 0\) === capitalSlicePort\(at\.k, at\.s, capitalPinPort\(at\.k\)\)\) return had;/);
   assert.match(W, /const aloc = aq \? capitalLocationAt\(aq\.bx, aq\.by\) \|\| arenaLocationAt\(aq\.bx, aq\.by\) : null;/);
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the port's id is WORLD-WIDE's own (world/worldWide/worldPorts.js portIdOfLocation)
-  // PIN MOVED (the fourth merge of main into #1184): the towns are one list, kept by id (RPT1026-WORLD FAR-QUAY's ring beside it)
   assert.match(W, /if \(aloc\?\.exterior\?\.exteriorData\) add\(\{ id: portIdOfLocation\(aloc\), loc: aloc,/);
 });
 
 test('AUDIT-TESA A2-3: a pixel id past the Bay aliases a Bay row (y * 1000 + x) - every read by it asks the Bay\'s pixels alone; past the Bay the place the world stands there answers, once discovered', () => {
-  // PIN MOVED (HOST-SPLIT, at the merge of main): the pixel's build is src/scenes/pixelBuild.js's
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the living towns are WORLD-WIDE's world-keyed index (WW1,
   // scenes/livingWorld/livingIndex.js townAt - the registry's place on that pixel), so no Bay row is aliased; past the Bay
   // it answers only where a provider stands
   assert.match(read('src/scenes/pixelBuild.js'), /const livingTown = livingTownAt\(px, py\) \?\? \{/);
   for (const re of [
     /if \(!csaIsPortTown\(p\.x \+ dx, p\.y \+ dy\)\) continue;\n\s+\/\/ AUDIT-TESA A2-3: the Bay's rows by the Bay's ids alone/,
-    // PIN MOVED (BAY-LEFT-MAPS, test/scenes/bayleft_places.test.js): the junction map's dot reads the Bay's row on the Bay
     // alone and past it the place found there (scenes/mapPlacesHost.js junctionPlaceAt)
     /if \(onTheBay\(x, y\)\) \{\n\s+const summary = travelLocationSummaryAt\(mapDict, x, y\);/,
     /const summary = onTheBay\(pixel\.x, pixel\.y\) \? travelLocationSummaryAt\(mapDict, pixel\.x, pixel\.y\) : null;/,
     /locationSummary: \(\) => \(onTheBay\(to\.x, to\.y\) \? travelLocationSummaryAt\(mapDict, to\.x, to\.y\) : null\),/,
-    // PIN MOVED (BAY-LEFT-MAPS): past the Bay a place found - or one a quest names (`named`, OW-QUEST's press)
     /return loc\.name && id && \(named \|\| hasDiscoveredLocationId\(id\)\) \? \{ pixel: \{ x: px, y: py \}, name: loc\.name, mapId: id,/,
   ]) assert.match(W, re);
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the harbour's loop no longer bounds itself - WW3's directory answers no
   // row off the Bay's map (systems/map/mapDirectory.js locationSummaryAt), so a pixel past the Bay aliases none
   assert.match(read('src/systems/map/mapDirectory.js'), /return onMap\(mapPixelX, mapPixelY\) \? mapDict\?\.get\(getMapPixelID\(mapPixelX, mapPixelY\)\) \?\? null : null;/);
 });
@@ -310,9 +291,7 @@ test('AUDIT-TESA A7-8: the capitals\' and the countryside\'s kill doors shut off
 });
 
 test('AUDIT-TESA A4-F4/A5-F3: past the Bay a ship is asked by its Arena place\'s port whatever Travel Options lists; and no deed is read in a place the port made', () => {
-  // PIN MOVED (BAY-LEFT-SEA): by its own port byte - an Arena place's TESA6 word, a capital's harbour's (its Waterfront's too)
   assert.match(W, /portTown: \(loc\.ether \? loc\.etherKind === 'port' : loc\.arena \|\| loc\.capital \? \(loc\.exterior\?\.exteriorData\?\.portTownAndUnknown \?\? 0\) !== 0 : modSetting\('travel-options', 'Enabled'\) === true/);
-  // PIN MOVED (BAY-LEFT-B, bible/03-World/Arena-Provinces.md): a deed is read in a place the port made - held to its own
   // town (banking.js deedHeldIn by the town's map id), so the town asking is named
   assert.match(W, /ownsHouse: \(buildingKey\) => \{ const id = _questLoc\(\)\?\.mapTableData\?\.mapId \?\? 0; return !isEtherPlaceId\(id\) && isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \},/);
 });
@@ -325,7 +304,6 @@ test('AUDIT-TESA A4-F5/A7-5: a capital\'s pixel walks each ring\'s own cells - t
     const [x, y] = pictureToBay(cap.at[0] + 0.5, cap.at[1] + 0.5);
     const own = (bx, by) => !inBay(bx, by) && provinceKeyBeyondBay(bx, by) === cap.province;
     const sea = (bx, by) => !inBay(bx, by) && provinceKeyBeyondBay(bx, by) === null;
-    // PIN MOVED (AUDIT TESA II C2/C9): the law's own - every land slice its province's, every sea slice the sea, and every
     // side its plan's water faces the sea along its whole edge (a shore capital of no plan's side: any side)
     const D = capitalDims(cap);
     const ok = (bx, by) => {
@@ -352,7 +330,6 @@ test('AUDIT-TESA A4-F5/A7-5: a capital\'s pixel walks each ring\'s own cells - t
   }
   // a capital moved off its land walks the rings: the same answer
   for (const cap of CAPITALS) { const far = { ...cap, at: [cap.at[0] + 9, cap.at[1] - 7] }; assert.deepEqual(capitalPixel(far), square(far), `${cap.key} moved`); }
-  // PIN MOVED (AUDIT TESA II C9): answers on a ring's east and west sides - the side law stands these there on the shape
   setTamrielFit(null);
   for (const [key, ox, oy] of [['alinor', -6, 0], ['helstrom', -24, -18], ['torval', -12, 6], ['solitude', -6, -6]]) {
     const cap = CAPITALS.find((c) => c.key === key), far = { ...cap, at: [cap.at[0] + ox, cap.at[1] + oy] };
@@ -369,7 +346,6 @@ test('AUDIT-TESA A6-3: no landmark stands in one of Daggerfall\'s blocks a capit
   for (const cap of CAPITALS) {
     const [AX, AR] = cap.anchor;
     for (const id of cap.models) {
-      // PIN MOVED (SOLITUDE-RELIEF): Solitude's terraces' works stand in its Daggerfall blocks' edge strips by design - the
       // retaining wall's body under the upper blocks' lifted edge, its stairs in the lower blocks' streets - never deeper
       // than the terrain's cell, and only where those blocks' own automaps hold no house (the ARENA2 pin,
       // test/world/solitude_relief.test.js)
@@ -378,7 +354,7 @@ test('AUDIT-TESA A6-3: no landmark stands in one of Daggerfall\'s blocks a capit
       for (let i = 0; i < p.length; i += 3) {
         const x = p[i], y = p[i + 1], z = -p[i + 2];
         if (y < 0.5 || y > 30) continue;
-        const cx = Math.floor(x / BLOCK_M + AX), r = Math.floor(z / BLOCK_M + AR), cell = cap.cellAt ? cap.cellAt(r, cx) : cap.plan[r]?.[cx];   // PIN MOVED (IC-GRAND): the Imperial City's plan by its law
+        const cx = Math.floor(x / BLOCK_M + AX), r = Math.floor(z / BLOCK_M + AR), cell = cap.cellAt ? cap.cellAt(r, cx) : cap.plan[r]?.[cx];
         if (!cell || cell === 'L' || cell === 'G' || cell === 'O' || (cap.family ? /^I[0-9a-z]{4}$/.test(cell) : Object.hasOwn(cap.blocks, cell))) continue;
         const lx = x - (cx - AX) * BLOCK_M, lz = z - (r - AR) * BLOCK_M, depth = Math.min(lx, BLOCK_M - lx, lz, BLOCK_M - lz);
         assert.ok(depth <= strip, `${cap.key} model ${id} ${depth.toFixed(2)} m into ${cell} at ${cx},${r}`);
@@ -415,9 +391,7 @@ test('AUDIT-TESA A6-5: a closed cell\'s byte is no building\'s - in no quarter o
 
 test('AUDIT-TESA A7-4: a place on a capital\'s pixel is inked on that pixel - its pin\'s, or the capital\'s where Arena\'s places do not stand - never its own point a pixel away', () => {
   const ink = read('src/ui/tamrielInk.js');
-  // PIN MOVED (BAY-LEFT-MAPS C11, test/ui/bayleft_find.test.js): and its port as it stands (a lore port only on its shore, TESA6)
   assert.match(ink, /stood\.set\(`\$\{p\.provinceIndex\}\|\$\{p\.id\}`, \{ x: p\.bx, y: p\.by, pinned: !!p\.pinned, port: !!p\.port \}\);/);
   assert.match(ink, /const on = pixel && \(st\?\.pinned \|\| !st\) \? \[pixel\.x \+ 0\.5, pixel\.y \+ 0\.5\] : \[x, y\];/);
-  // PIN MOVED (BAY-LEFT-MAPS C11): and its port, the anchor's and the Ports filter's word
-  assert.match(ink, /kind: p\.kind, x: on\[0\], y: on\[1\], pixel, mapId: k >= 0 \? capitalPlaceId\(k, 0\) : arenaPlaceId\(p\), port \}\);/);   // PIN MOVED (WW7-6): with its map id - the seat ring's key (ww7_seatrings)
+  assert.match(ink, /kind: p\.kind, x: on\[0\], y: on\[1\], pixel, mapId: k >= 0 \? capitalPlaceId\(k, 0\) : arenaPlaceId\(p\), port \}\);/);
 });

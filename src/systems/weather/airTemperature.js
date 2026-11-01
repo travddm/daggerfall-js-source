@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PRECIP1 (2026-10-19, the owner: "I also want to begin giving each biome their own precipitation. It shouldnt snow
-// everywhere or rain everywhere when the season is winter, etc. It should truly be dynamic just like how we have a dynamic
-// cloud and weather system. If its snowing in one area and raining in the next, the transition should be seamless both in
-// ground texture and everything else. This needs to be accurate and as detailed as possible") - THE AIR: a temperature
+// PRECIP1 - THE AIR: a temperature
 // (degrees Celsius) at every place, height and minute, pure in the three - the same on every client, offline and online,
-// as the weather map is (weatherMap.js). bible/07-Rendering/Biome-Precipitation.md is the record.
+// as the weather map is (weatherMap.js). is the record.
 //
 // DFU has no temperature. Its weather table rolls Snow for a climate in Winter and never otherwise; its ground swaps
 // to the winter archive for every climate but a Desert base on the calendar; the port's WEATHER2a funnelled rain over

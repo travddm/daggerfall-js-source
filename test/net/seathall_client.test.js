@@ -1,8 +1,8 @@
-// SEAT-HALL (2026-10-02, Mac: "Please do" - the palace as the holder's guild hall): THE CHARTER ROOM IN THE CLIENT -
+// SEAT-HALL: THE CHARTER ROOM IN THE CLIENT -
 // the law's words and numbers (src/net/townSeatLaw.js), the decorator's rule in the palace (src/scenes/decor/decorTool.js
 // charterWhyNot: the largest room, two metres from the court; a room's own cap), the account door's `seat`
 // (src/net/accountClient.js accountDecor) and the hosts' seams (src/scenes/worldModes.js interiorSeatHall, world.js
-// seatHall). bible/11-Multiplayer/Seats-Arc.md 7.2; `06-Systems/Online-Arc.md` SEAT-HALL.
+// seatHall). 7.2; `06-Systems/Online-Arc.md` SEAT-HALL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

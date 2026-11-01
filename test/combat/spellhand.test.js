@@ -1,6 +1,4 @@
-// SPELL-HAND (2026-10-23, the owner: "Using the spell hand and any 1 handed weapon in tandem. Basically being able to cast
-// one handed spells and visually seeing the one handed spell sprite hand/morrowind"; "Make the best decisions";
-// bible/05-Combat/Two-Hands.md "The spell hand"). A readied spell in the free hand beside a drawn one-handed weapon: the law
+// SPELL-HAND. A readied spell in the free hand beside a drawn one-handed weapon: the law
 // (combat/twoHands/spellHand.js spellHandOf), the live word the cast's doors read, the swing button the weapon's and the
 // cast's own press the spell's (scenes/hostMagic.js interceptAttack, firePending - THE FOUR HOSTS RULE: every host's cast
 // press says so), and the classic lane through the real rig: the weapon up, ONE of FPSSpellCasting's hands on the free
@@ -384,7 +382,7 @@ test('SPELL-HAND THE BUSY WORD IS THE HANDS\' WHOLE STRIKE: a blow begun this fr
   } finally { arm.restore(); _resetSpellHand(); }
 });
 
-// ---- AUDIT SPELL-HAND (bible/01-Overview/audits/Audit-Mixed-Pair-Spell-Hand.md) ---------------------------------------
+// ---- AUDIT SPELL-HAND ---------------------------------------
 
 const audPlayer = () => ({ isPlayer: true, level: 1, magicka: 1000, maxMagicka: 1000, skills: new Array(35).fill(30), stats: { intelligence: 50, willpower: 50 }, items: [], activeEffects: [] });
 /** A magic engine whose cast's hands are the rig's (`rigOf().r.castSpellAnim`), as every host wires it; `casts` counts them. */

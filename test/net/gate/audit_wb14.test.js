@@ -1,6 +1,6 @@
-// AUDIT WB14 (2026-10-20, Mac: "Please audit this and ensure perfection"): THE RELAY'S HALF OF THE PORTENTS ARC, pinned -
+// AUDIT WB14: THE RELAY'S HALF OF THE PORTENTS ARC, pinned -
 // each finding of the six cold lanes the relay's brain or Room owns, reproduced as its lane found it and held fixed
-// (bible/01-Overview/audits/Audit-Breach-Portents.md - the lanes, the findings, the verdicts).
+// (- the lanes, the findings, the verdicts).
 //
 //   the brain        net/gate/gateBrain.js applyHit (LAW-1 the stun his whole's; LAW-3 no blow with every share out, no fall
 //                    sundered), credit (LAW-3), kneel (LAW-4), payTithe and applyHostHit's `rng` (LAW-5, WIRE-4), stepTithe's
@@ -11,7 +11,7 @@
 //                    risen level with the other, PLAY-4 a Vanguard night's health); systems/gate/gateSpoils.js (PLAY-7)
 //   the relay        server/src/index.js _gateFanKept (WIRE-2 - a tithe kept before it is said)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md.
+// Design:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -424,7 +424,7 @@ test('AUDIT WB14 WIRE-6 the account: a portent night\'s receipt fills the wealth
   assert.match(read('server-account/src/accounts.js'), /if \(recorded\) return \{ recorded, day: c\.d, stones: embers, \.\.\.\(c\.p > 0 \? \{ portent: c\.p \} : \{\}\),/);
   const svc = read('server-account/src/index.js');
   assert.match(svc, /if \(r\.recorded === true\) await grantSpoils\(ctx\.db, who\.player\.id, portentPieces\(r\.portent\)\);/);
-  assert.match(svc, /delete answer\.portent;/);   // PIN MOVED (Elite Gates removed): the Weir Key's row no longer rides the answer
+  assert.match(svc, /delete answer\.portent;/);
 });
 
 // ═══ PLAY: the balance by simulation ══════════════════════════════════════════════════════════════════════════════

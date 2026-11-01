@@ -1,4 +1,4 @@
-// L10N3g (2026-09-28): THE GRAMMAR WHERE DFU RUNS IT. "DFU en français" writes its text with grammar tokens -
+// L10N3g: THE GRAMMAR WHERE DFU RUNS IT. "DFU en français" writes its text with grammar tokens -
 // {.le}{.FS}..., {IsPlural?..#..}, {masc/fem} - and DFU runs GrammarManager.grammarProcessor.ProcessGrammar at a fixed
 // set of display sites: the HUD's popup text, every message box label, each tooltip row as drawn, the exterior
 // automap's plates, the history window, the character sheet's race, chargen's class list and questions, the court's

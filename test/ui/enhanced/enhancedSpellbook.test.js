@@ -39,7 +39,7 @@ test('PX23 book: it borrows every law and invents none', () => {
   assert.ok(rows[0].effects[0].group.length > 0);
 });
 
-// ── PX23b: THE SAME LOVE (Mac: "revisit the spell UI") ────────────
+// ── PX23b: THE SAME LOVE ────────────
 // The chronicle's two lessons, applied here: an effect carries NUMBERS
 // the first draft never read, and the classic can RENAME while the
 // first draft could not.
@@ -50,7 +50,7 @@ test('PX23b: an effect carries magnitude, duration and chance - and the first dr
   // spellEffects hands back the effect RECORDS; the cast engine
   // resolves a live effect from exactly these eleven fields.
   //
-  // SB-FX: THIS PIN MOVED, DELIBERATELY. It asserted '8-20 +2/level' and
+  // SB-FX: THIS
   // '6 +1/level rounds' for a Continuous Damage Health record and
   // '40% +2/level' for a chance that effect does not have: it read
   // magnitudeLevelBase (MagnitudePlusMin) as a per-level step, and its
@@ -90,8 +90,7 @@ test('PX23b: the two icons the classic only shows on HOVER are printed as words'
     'an index off the end is nothing, not a blank chip');
 });
 
-// ── SB-FX (2026-10-14, a player on Discord: "The spell details panel in the Spellbook shows placeholder values
-// instead of what the spell actually does") ─────────────────────────────────────────────────────────────────────────
+// ── SB-FX ─────────────────────────────────────────────────────────────────────────
 // Built from the PRODUCER, not a literal: the spell the real SpellMakerWindow inscribes, through its own clicks and
 // its own typed spinner field, then saved and restored the way a player's book is.
 import { SpellMakerWindow, SPELL_MAKER_RECTS, EDITOR_RECTS } from '../../../src/ui/spell/spellMakerWindow.js';

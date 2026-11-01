@@ -36,7 +36,7 @@ export const PREF_DEFAULTS = Object.freeze({
   // to scale - so it belongs in the port's own prefs, beside the other
   // things only this port has.
   hudScale: 1,
-  // L10N1b (2026-09-27, Mac: "a proper localization/translation integration"): the language the game's text is shown
+  // L10N1b: the language the game's text is shown
   // in - a systems/localeCatalog.js tag, 'en' the port's own. Read at boot (scenes/localeData.js initLocale; ?lang=
   // overrides it for one visit). `languageOffered`: the front door has offered the browser's own language once and
   // the player answered, so it asks no more.
@@ -47,21 +47,20 @@ export const PREF_DEFAULTS = Object.freeze({
   mapScale: 'auto',
   // EVERY-STANDING (FIELD BUGS 2026-10-09e, "Could we have a setting to see our reputation with every guild/kingdoms?"):
   // the character sheet's Standing page lists every organization's standing, not only the player's memberships
-  // (systems/faction/factionStanding.js). STANDING-ON (2026-10-11, Mac: "should be on by default"): on - the shelf writes no
+  // (systems/faction/factionStanding.js). STANDING-ON: on - the shelf writes no
   // default (PREF1), so a player who never pressed the row moves with it, and one who pressed it off keeps their Off.
   standingAll: true,
-  // HUD-MOVE (2026-10-01, Mac: "make chat, hp mana stamina bar segment and all the element moveable and add a reset UI
-  // and lock UI in the settings (lock should be on by default)"): the Enhanced Plus HUD's own layout. `hudLocked` is the
+  // HUD-MOVE: the Enhanced Plus HUD's own layout. `hudLocked` is the
   // lock (on: nothing moves, the HUD is pointer-transparent as ever); `hudLayout` is { id: { x, y } }, each piece's
   // nudge in screen pixels from where the sheet stands it (ui/hud/hudLayout.js). null is every piece where the sheet puts it.
   hudLocked: true,
   hudLayout: null,
-  // HUD-MOVE (Mac: "an option to move the magicka, health and fatigue bar separately"): off, the three bars move as
+  // HUD-MOVE: off, the three bars move as
   // one piece; on, each moves on its own.
   hudBarsSplit: false,
   // HUD-SNAP: while moving a piece, its edges and centre catch on the other pieces' and the screen's
   hudSnap: true,
-  // FOEBAR1 (2026-09-17, Mac, from a friend's pictures): the target bar's
+  // FOEBAR1: the target bar's
   // face - 'bar' is the plain track under the compass, 'blade' the
   // twin-bladed picture whose fill recedes toward its hub. The port's own,
   // like hudScale: DFU draws no enemy health at all.
@@ -70,32 +69,32 @@ export const PREF_DEFAULTS = Object.freeze({
   // uiSkin.js rather than here - that module resolves the ?skin
   // override on top of this and is the one place the vocabulary lives.
   skin: 'enhanced',
-  // OVH2 (2026-09-24): the UI pack worn over the CLASSIC skin - 'none' or a systems/uiPack.js UI_PACKS id
+  // OVH2: the UI pack worn over the CLASSIC skin - 'none' or a systems/uiPack.js UI_PACKS id
   // (GrimoireUI). Read it through uiPack.js activeUiPack, which answers the URL and the skin on top of it.
   uiPack: 'none',
-  // PLUS1 (2026-09-25): Enhanced Plus - the refreshed dress over the enhanced skin (systems/uiSkin.js isEnhancedPlus).
-  // PLUS-ONLY (2026-09-26): `enhancedPlus`, the switch between it and plain Enhanced (PLUS-DEFAULT turned it on), is
+  // PLUS1: Enhanced Plus - the refreshed dress over the enhanced skin (systems/uiSkin.js isEnhancedPlus).
+  // PLUS-ONLY: `enhancedPlus`, the switch between it and plain Enhanced (PLUS-DEFAULT turned it on), is
   // RETIRED - plain Enhanced is gone and Plus is simply the enhanced skin. A stored value is read by nothing.
   // PLUS2: Enhanced Plus's colours - a ui/enhanced/enhancedFrame.js PLUS_THEMES id; 'slate' is the kit as it ships.
   plusTheme: 'slate',  plusCursor: true,   // PLUS6: the gauntlet cursor - off gives the system pointer back
   plusItemHover: true,   // PLUS7: the inventory's hover card - off keeps the right-click menu, drops the card
-  // GRIM1 (2026-10-09): THE DFO GRIMOIRE DRESS over the enhanced skin ('none' or 'grimoire' - ui/grimoireDress.js), and
+  // GRIM1: THE DFO GRIMOIRE DRESS over the enhanced skin ('none' or 'grimoire' - ui/grimoireDress.js), and
   // its card's two choices: the page the windows are written on ('cream' | 'scroll') and what the front door and the
   // full screens stand on ('desk' | 'map'), and the vitals' vials upright in the corner or lying in a row ('upright' |
   // 'row'). While the dress is worn `plusTheme` stays the player's, unworn.
   plusDress: 'none', grimoirePages: 'cream', grimoireBackdrop: 'desk', grimoireVitals: 'upright', grimoireSpellbook: 'book',
-  grimoireDial: 'classic',   // DIAL-PACK (2026-10-12): the Tab dial's doors - Daggerfall's own art ('classic') or the pack's paintings ('pack')
-  // TEXT-FONT (2026-10-11): the face the enhanced skin's words are written in ('game' | 'sans' | 'mono' | 'dyslexic' |
+  grimoireDial: 'classic',   // DIAL-PACK: the Tab dial's doors - Daggerfall's own art ('classic') or the pack's paintings ('pack')
+  // TEXT-FONT: the face the enhanced skin's words are written in ('game' | 'sans' | 'mono' | 'dyslexic' |
   // 'system', ui/textFont.js) and the installed font 'system' names.
   textFont: 'game', textFontSystem: '',
-  // CHAT-LANG (2026-10-11): the language channel this player chose ('' none, else a net/wire.js CHAT_LANGS code - /lang).
+  // CHAT-LANG: the language channel this player chose ('' none, else a net/wire.js CHAT_LANGS code - /lang).
   // CHAT-COLOURS: each channel's lines in its own colour (World white, Region green, Guild purple, Local grey ...). PING1:
   // a line naming me with an @ chimes.
   chatLang: '', chatChannelColours: true, chatPingSound: true,
-  // CHAT-TRADE (2026-10-14): the Trade and LFG channels this player joined (/join, /leave) - off until they choose one,
+  // CHAT-TRADE: the Trade and LFG channels this player joined (/join, /leave) - off until they choose one,
   // so a player who never does sees no new tab.
   chatTrade: false, chatLfg: false,
-  // STAFF-CHAT-RED (2026-10-23, mob: "give me a option next to chat to chat as /red or myself at all times"): the voice an
+  // STAFF-CHAT-RED: the voice an
   // Admin's chat lines go out in - 'me' (as themselves) or 'red' (each as /red would say it, net/chatVoice.js) - kept
   chatAs: 'me',
   packPhoneDoll: false,   // PACK-PHONE (FIELD BUGS 2026-09-30): the pack's body on a phone - hidden until the header's Body shows it
@@ -108,7 +107,7 @@ export const PREF_DEFAULTS = Object.freeze({
   // PAD-CURSOR: the controller cursor's assisted feel (systems/padCursor.js) - its curve, ramp, boost and the pull to
   // a control; off is DFU's linear cursor, on both skins
   padCursorAssist: true,
-  // TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL): how much a weapon technique moves the screen - its camera
+  // TECH-FX (THE FEEL): how much a weapon technique moves the screen - its camera
   // springs, its shake and the hands' dip (combat/technique/techniqueFx.js techniqueMotion); 0 moves nothing on the screen (its
   // burst and its sound stay). GATHER-FEEL II: and a gathering tool's landed blow (systems/gatherBlow.js gatherBlowFeel)
   techniqueMotion: 1,
@@ -121,22 +120,20 @@ export const PREF_DEFAULTS = Object.freeze({
   // PEERMENU1: the player menu's two binds, keyboard and controller, each { code, hold } (null = the defaults: hold E,
   // hold A - systems/peerMenuBind.js). Online only.
   peerMenuKey: null, peerMenuPad: null,
-  // ONLINE1 (2026-09-12): the Online door's two fields - the name over the
+  // ONLINE1: the Online door's two fields - the name over the
   // player's head and the relay to join (net/online.js DEFAULT_SERVER when empty).
   onlineServer: '',
-  // CHAT-R2 (2026-09-16, Mac: "a hide chat button"): the chat put
+  // CHAT-R2: the chat put
   // away, across sessions. A player who hid it wants it hidden next
   // launch too - the panel is still built and still counting unread,
   // so bringing it back finds the room where they left it.
   chatHidden: false,
-  // CHAT-SIZE (2026-09-23, Mac: "the ability to click and drag the chat to resize/along with the text"): the chat
+  // CHAT-SIZE: the chat
   // box's width and its list's height in CSS pixels, as the player dragged them - null is the sheet's own default
   // (min(440px, 100vw - 28px) wide, min(220px, 34vh) of list). The text's scale follows the width (ui/chatPanel.js).
   chatWidth: null,
   chatListHeight: null,
-  // TI2: THE PHONE IN HAND, TUNED (2026-09-11, Mac: "enhance the mobile
-  // element... camera movement, character movement and a more phone
-  // built feel"). The touch layer's own knobs - DFU has no touch input
+  // TI2: THE PHONE IN HAND, TUNED. The touch layer's own knobs - DFU has no touch input
   // (Ledger A, TI1) so none of these is a DFU setting and none may go
   // in the baked catalog. Read at the point of use by ui/touch/touch.js; set
   // from the Enhanced pane's Touch card, which mounts only where the
@@ -148,20 +145,20 @@ export const PREF_DEFAULTS = Object.freeze({
   touchGyroSensitivity: 1,   // 1 = a degree of phone is a degree of camera
   touchHaptics: true,        // a short vibration on a button, an armed swipe and a lock
   touchFullscreen: true,     // the first touch asks for fullscreen and a landscape lock where the browser allows it
-  // TOUCH-BUTTONS (2026-09-27): the corner's three slots, from the corner in (ui/touch/touchButtons.js) - TI1's two, and
-  // TOUCH-HOLD's Interact (2026-10-01 part four: the professions' E, which a phone never had)
+  // TOUCH-BUTTONS: the corner's three slots, from the corner in (ui/touch/touchButtons.js) - TI1's two, and
+  // TOUCH-HOLD's Interact
   touchButton1: 'Jump',
   touchButton2: 'ReadyWeapon',
   touchButton3: 'Interact',
-  // SPELL-GIFT (2026-09-27): whether a player OUTSIDE my party may cast the stranger's list of spells on me (Heal,
+  // SPELL-GIFT: whether a player OUTSIDE my party may cast the stranger's list of spells on me (Heal,
   // Regenerate, Cure, Fortify, Shield, resistances, Jumping, Water Breathing - systems/allyCast.js). On: Tabitha's ask.
   acceptStrangerSpells: true,
   restWithParty: true,   // REST-OPT: off - I rest alone, and the party rests without me
-  // PROF1 (bible/06-Systems/Professions-Arc.md 5.1, 22): GENTLE ACTS - an accessibility choice, the port's own: every
+  // PROF1 (5.1, 22): GENTLE ACTS - an accessibility choice, the port's own: every
   // profession's act completes at a plain result, with no clean bonus and no bruise. Set on the Professions page.
   gentleActs: false,
   showToTravellers: true,   // TV3: off - the region's travellers do not see where I am (my party always does)
-  // MWA4 (2026-09-25): `mwArms` (MWA1's arms switch) is retired - the attached Morrowind files are the switch, and
+  // MWA4: `mwArms` (MWA1's arms switch) is retired - the attached Morrowind files are the switch, and
   // Remove data the off (combat/weapon/weaponRig.js autoBuildArms, ui/enhanced/enhancedMenu.js morrowindCard). A stored value is
   // read by nothing.
   // 2026-09-17 (per-request): a peer without a Morrowind body is drawn as their class's animated sprite by default
@@ -176,19 +173,19 @@ export const PREF_DEFAULTS = Object.freeze({
   horseVolume: 1,   // HORSE-VOL: every horse's neigh and hooves, 0..1 (systems/animalVolume.js)
   animalVolume: 1,   // ANIMAL-VOL: the town's dogs, cats, pigs and cows, 0..1 (systems/animalVolume.js)
   peerFootsteps: true,   // PEER-FS1: other players' footstep sounds - on by default
-  // GATE-CROWD (2026-10-07, Mac: "some type of filter when there are too many people"): how many other players are drawn
+  // GATE-CROWD: how many other players are drawn
   // at once - the nearest, the party and the duel's opponent always; everywhere but where a stranger can fight me since
-  // CROWD-WIDE (2026-10-23), a gate's court alone before it (net/gate/gateCrowd.js GATE_CROWD_TIERS; 0 everyone,
-  // the default - Mac: "The default other setting should be everyone"). Its GATE_CROWD_DEFAULT, pinned equal by
+  // CROWD-WIDE, a gate's court alone before it (net/gate/gateCrowd.js GATE_CROWD_TIERS; 0 everyone,
+  // the default). Its GATE_CROWD_DEFAULT, pinned equal by
   // test/systems/gatecrowd.test.js and not imported: the shelf is on the boot path, and the import made net/gate/gateCrowd.js the
   // entry's 69th file, past BOOT2's ceiling (test/render/boot2.test.js)
   gateCrowd: 0,
-  // PEER-RANGE (2026-10-10, the owner: "the rendering of players far out is contributing to poor performance"): how far
+  // PEER-RANGE: how far
   // out, in metres on the ground, other players are drawn - my party and the one I duel always (net/peer/peerRange.js
   // PEER_RANGE_TIERS; 0 everyone the relay sends). The default 300, past a player's shot (200 m); its PEER_RANGE_DEFAULT, pinned
   // equal by test/systems/peerrange.test.js and not imported, for GATE-CROWD's reason above
   peerRange: 300,
-  // YARD-RANGE (2026-10-11, a player: "20-40 fps in cities"): how far out, in metres on the ground, other players' yards are
+  // YARD-RANGE: how far out, in metres on the ground, other players' yards are
   // drawn - one's own always (scenes/homeYards.js YARD_RANGE_TIERS; 0 none). The default 300, the distance every yard was
   // drawn at before; its YARD_RANGE_DEFAULT, pinned equal by test/scenes/yardrange.test.js and not imported, for GATE-CROWD's reason
   yardRange: 300,
@@ -197,34 +194,33 @@ export const PREF_DEFAULTS = Object.freeze({
   // WS1: `mwSheathing` (Weapon Sheathing on the third-person body) is
   // declared on its Features row (systems/features.js), RF4's law - it
   // arrives through FEATURE_PREF_DEFAULTS below.
-  // FPS1 (2026-09-11, RookieG via Mac: "we need an ingame fps counter").
+  // FPS1.
   // The overlay in ui/fpsCounter.js: frames a second and the frame's
   // milliseconds, worst frame of the second beside it. ?fps forces it
   // on for a probe; this is the player's own switch on the Enhanced
   // pane. Off by default - a number over the game is a diagnostic.
   showFps: false,
-  // TUT1 (2026-10-11, Mac: "our own custom tutorial ... popups for whenever you are interacting with a new system"): the
+  // TUT1: the
   // tutorial's popups (on unless turned off, from the menu's Tutorials tab) and the pages read - ids of
   // systems/tutorialCatalogue.js, in its order; null is none read. The player's, not the character's
   // (systems/tutorials.js says why).
   tutorialPopups: true,
   tutorialsSeen: null,
-  // UXB1-A (2026-09-25, the UX backlog: '"Skip Start Video" in the options. Watching it once is great, having to skip
-  // it every time is tedious. Disabled by default, of course.'): open straight onto the menu - no INTRO2 film at the
+  // UXB1-A: open straight onto the menu - no INTRO2 film at the
   // front door, and on the classic skin no ANIM0001 splash before the title (main.js). ?nointro and ?novideo do the
   // same for one visit. Off by default: the film is how the game introduces itself.
   skipStartVideo: false,
-  // LOAD1 (2026-10-05): the PrintScreen key's download - on, the PNG is saved as KB1 always saved it; off, the shot is
+  // LOAD1: the PrintScreen key's download - on, the PNG is saved as KB1 always saved it; off, the shot is
   // kept in the gallery alone (ui/screenshot.js). The Screenshots pane's own switch, so it is no Features row.
   shotDownload: true,
-  // MIDI-OUT1 (2026-10-11, a player asking for MIDI out): the Web MIDI output the music plays on, by its name - '' is
+  // MIDI-OUT1: the Web MIDI output the music plays on, by its name - '' is
   // none, the game's own synth (systems/midiOut.js). A device, not a taste, so it is no Features row.
   midiOut: '',
-  // FT18 (Mac: "Add option to set all mods/enhancements off"): what the Features home's All off moved, tile id ->
+  // FT18: what the Features home's All off moved, tile id ->
   // the segment it had, so Restore can put it back - across launches. null is nothing to restore.
   featuresRestore: null,
   proceduralSky: true,   // LEGACY: read only by the migration in loadPrefs
-  // RF4 (2026-09-14, Mac's refactor pass, the fourth): THE PORT'S OWN
+  // RF4: THE PORT'S OWN
   // FEATURE SWITCHES ARE DECLARED ONCE, ON THEIR ROWS. The Features
   // registry (systems/features.js) is the one declaration of an
   // enhanced switch - its default (`initial`) and the online lane's
@@ -266,7 +262,7 @@ export function loadPrefs() {
         // including pressing it back off - differs from the default
         // and is persisted as the choice it is.
         //
-        // BAL4 (2026-10-10, 05-Combat/Balance-Arc.md section 6) adds
+        // BAL4 adds
         // `enhancedAI` on the same reasoning: the row shipped OFF on
         // 2026-09-14 (FT5), one day before this stamp, so an unstamped
         // shelf's `false` is the shelf's writing of that default, not a
@@ -277,23 +273,23 @@ export function loadPrefs() {
             if (p[k] !== undefined && p[k] !== PREF_DEFAULTS[k]) _prefs[k] = PREF_DEFAULTS[k];
           }
         }
-        // HB-LYCFREE (2026-09-30, Mac: "want to make the hotbar the default on option"): THE HOTBAR BECAME THE
+        // HB-LYCFREE: THE HOTBAR BECAME THE
         // DEFAULT on `quickbarStyle`, and a shelf written before it stored nothing there - 'quickbar' was the default
         // and this shelf writes no default. A player who turned the quick slots Off stored `quickslots: false` alone,
         // and the new default would put a bar up over that answer; a shelf older than rev 2 holding it keeps the
         // diamond's style, and so stays Off. Diamond was the old default and left no trace: it moves to the hotbar
         // with everyone who never chose.
         if ((p[SHELF_STAMP] ?? 0) < 2 && p.quickbarStyle === undefined && p.quickslots === false) _prefs.quickbarStyle = 'quickbar';
-        // DIAMOND-HB (2026-10-18): Diamond is now its own style ('diamond'). An old save with 'quickbar' and the switch on
+        // DIAMOND-HB: Diamond is now its own style ('diamond'). An old save with 'quickbar' and the switch on
         // had chosen Diamond, so it moves to 'diamond'. Off ('quickbar' with the switch off) stays as it was.
         if (_prefs.quickbarStyle === 'quickbar' && _prefs.quickslots !== false) _prefs.quickbarStyle = 'diamond';
-        // AUDIT BAL (bible/05-Combat/Balance-Arc.md section 10): ALL OFF STAYS ALL OFF. The Enhanced AI's default turned
+        // AUDIT BAL: ALL OFF STAYS ALL OFF. The Enhanced AI's default turned
         // On (BAL4), and a shelf that pressed the Features page's All off while it shipped Off stored nothing for it - Off
         // was its default, and this shelf writes no default - so the flip would stand the AI up over "everything off".
         // While the All-off keep stands (`featuresRestore`, spent by Restore) and the shelf holds no word of its own on
         // the AI, it stays Off; Off differs from the default now, so the next save writes it as the choice it is.
         if (p.featuresRestore && typeof p.featuresRestore === 'object' && p.enhancedAI === undefined) _prefs.enhancedAI = false;
-        // GRASS-ON (2026-10-07, Mac: "Can you please turn grass on by default"): THE GRASS IS FULL BY DEFAULT AGAIN
+        // GRASS-ON: THE GRASS IS FULL BY DEFAULT AGAIN
         // (features.js 'grass', grassDensity 0 to 1), and AUDIT MEADOW1's adoption that stood here - an unstamped
         // shelf's `grassDensity: 1` moved to its Off - went with the Off: that Full is the default again. Nothing stored
         // moves back. The shelf writes no default, so a stored Off, Half or Quarter was pressed while Full was the
@@ -306,7 +302,7 @@ export function loadPrefs() {
         if (p.enhancedEnvironments === undefined && p.proceduralSky !== undefined) {
           _prefs.enhancedEnvironments = !!p.proceduralSky;
         }
-        // SURV-TIERS (2026-09-23): THE SURVIVAL SWITCH BECAME THREE TIERS
+        // SURV-TIERS: THE SURVIVAL SWITCH BECAME THREE TIERS
         // ON THE SAME KEY (survival/difficulty.js SURVIVAL_STORED). Off is
         // stored as the old switch's own `false`, so a shelf written before
         // needs nothing - and it can only hold `false`, since `true` was
@@ -318,18 +314,17 @@ export function loadPrefs() {
         // tier and is dropped HERE, so
         // the Features bar - which matches a stored value by its string -
         // and the laws read the one default rather than two answers.
-        // SURV-BOONS (2026-10-12): a fourth tier, Boons, stored by name -
+        // SURV-BOONS: a fourth tier, Boons, stored by name -
         // isStoredTier reads the table, so it is kept like the others.
         if (p.survival !== undefined && !isStoredTier(p.survival)) _prefs.survival = PREF_DEFAULTS.survival;
-        // HORSE-TIERS (2026-10-15, Mac: "Allow turn off. Rework this system to be more in line with how we handle
-        // climates and calories boons."): HORSE CARE BECAME THREE TIERS ON THE SAME KEY (upkeepTiers.js
+        // HORSE-TIERS: HORSE CARE BECAME THREE TIERS ON THE SAME KEY (upkeepTiers.js
         // HORSE_CARE_STORED), SURV-TIERS' way. Off is stored as the old switch's own `false`, so a player who turned
         // horse care off is on Off with nothing converted. The old default, On, was never stored (PREF1), so a player
         // who never touched the switch stored nothing and plays the new default - Boons, BOONS-DEFAULT's reading. An On
         // written to the shelf all the same chose the system as it stood, and lands on Hard (HORSE_CARE_OLD_ON); any
         // other value names no tier and is dropped here, as the survival key's is, so the bar and the laws agree.
         if (p.horseCare !== undefined && !isStoredHorseCare(p.horseCare)) _prefs.horseCare = p.horseCare === HORSE_CARE_OLD_ON ? HORSE_CARE_OLD_ON_TIER : PREF_DEFAULTS.horseCare;
-        // WAGON-TIERS (2026-10-15, Mac: "Yes, same tiers"): WAGON UPKEEP THE SAME WAY, on its own key - a stored Off
+        // WAGON-TIERS: WAGON UPKEEP THE SAME WAY, on its own key - a stored Off
         // (the old switch's `false`) stays Off, nothing stored plays the new default (Boons), an On written to the
         // shelf lands on Hard (WAGON_UPKEEP_OLD_ON), and any other value is dropped here.
         if (p.wagonUpkeep !== undefined && !isStoredWagonUpkeep(p.wagonUpkeep)) _prefs.wagonUpkeep = p.wagonUpkeep === WAGON_UPKEEP_OLD_ON ? WAGON_UPKEEP_OLD_ON_TIER : PREF_DEFAULTS.wagonUpkeep;
@@ -340,7 +335,7 @@ export function loadPrefs() {
   }
   return _prefs;
 }
-/** PREF1 (2026-09-15, found auditing LR5): THE SHELF CARRIES THE PLAYER'S
+/** PREF1: THE SHELF CARRIES THE PLAYER'S
  *  CHOICES, NOT A SNAPSHOT OF THE DEFAULTS.
  *
  *  It used to write `_prefs` whole - and `_prefs` is

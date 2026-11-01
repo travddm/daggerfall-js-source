@@ -1,6 +1,5 @@
 // @ts-check
-// SPEC-RESET (2026-10-18, the owner: "Lets allow players to reset their ingame builds for a high cost"; asked, the owner
-// chose the specialisations and 200k; bible/10-UI/Growth.md section 10) - A SPECIALISATION GIVEN UP, FOR GOLD. An arcane
+// SPEC-RESET - A SPECIALISATION GIVEN UP, FOR GOLD. An arcane
 // path (systems/arcanePaths.js) or a martial one (systems/martialPaths.js) had been chosen once and for good; this is
 // the one way back: the family's path is cleared, so the guide (ui/growth/specGuide.js) offers every path the
 // character's masteries open again. The masteries stay - a mastery is still permanent (masterSkills.js) - and so does

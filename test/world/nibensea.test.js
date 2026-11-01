@@ -1,6 +1,4 @@
-// NIBEN-SEA (2026-10-26, the owner, with the lore map: "the ocean that connects to the imperial city is missing from our
-// map" and "The port that connects to the imperial city should allow for AI/player ship voyages through this canal";
-// bible/03-World/Tamriel.md NIBEN-SEA): Lake Rumare joined to the Topal Bay down the Niben on the trace (ui/tamrielTrace.js
+// NIBEN-SEA: Lake Rumare joined to the Topal Bay down the Niben on the trace (ui/tamrielTrace.js
 // openNiben), the Imperial City's Waterfront cut through to its lake's arm at the Bay's scale (world/tamriel/tamrielLand.js
 // waterfrontCanal), its harbour a port of the sea named for the city (world/tamrielCapitals.js, world/pastBayRows.js,
 // world/worldWide/worldPorts.js), its packets' reach its own and their way off the canal (systems/naval/seaLanes.js,
@@ -125,7 +123,6 @@ test('NIBEN-SEA THE WATERFRONT CANAL: from the row past the Imperial City\'s spa
 test('NIBEN-SEA THE CITY\'S HARBOUR: the Imperial City\'s port on the middle line below the city (RUMARE-WATER: the Waterfront\'s own slice) - open where its canal meets it; every other capital\'s its centre, as before (mutants: the harbour the centre; the canal unasked)', () => {
   const ic = CAPITALS.findIndex((c) => c.key === 'imperial-city');
   const n = IMPERIAL_SPAN, r = (n - 1) / 2;
-  // PIN MOVED (RUMARE-WATER, test/world/rumarewater.test.js): the Waterfront's own slice, row 22 - its quay and its piers'
   // ends - where it was the bottom row's middle, on the far shore
   assert.equal(capitalHarbourSlice(CAPITALS[ic]), 22 * n + r, 'the Waterfront\'s slice on the middle line');
   for (const cap of CAPITALS.filter((c) => c.key !== 'imperial-city')) assert.equal(capitalHarbourSlice(cap), capitalCentre(cap), cap.name);
@@ -266,7 +263,6 @@ test('NIBEN-SEA (ARENA2): on the player\'s own picture the Niben joins Lake Ruma
   places.register('tesa', pastBayPlaceRows({ pixels: arenaPixels(), templateOf: () => ({ exterior: { exteriorData: { width: 1, height: 1 } } }), capitals: true }));
   const ports = createWorldPorts({ places, openSea: (x, y) => water(x, y) && !pastBayLakeAt(x, y) }).list();
   const ic = ports.find((p) => p.name === 'Imperial City');
-  // PIN MOVED (RUMARE-WATER): the harbour the Waterfront's slice (2069, 668), where it was the span's south edge's (670)
   assert.deepEqual([ic?.px, ic?.py, ic?.reach], [2069, 668, CANAL_PORT_REACH_PX], 'the harbour\'s slice, the Waterfront\'s');
   const lane = laneNetwork(ports, lw.open, BEYOND_LANE_MAX_PX).find((l) => [l.a.id, l.b.id].includes(ic.id) && [l.a.name, l.b.name].includes('Senchal'));
   assert.ok(lane, 'a lane to Senchal');

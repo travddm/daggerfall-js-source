@@ -1,5 +1,4 @@
-// AUDIT NAVAL-REFIT 2 (2026-10-17, the owner: "Please once more audit everything and ensure perfection"; bible/03-World/
-// Naval-Refit.md AUDIT 2) - what the second audit of the refit found, each on the real module it lives in: the Fleet's
+// AUDIT NAVAL-REFIT 2 - what the second audit of the refit found, each on the real module it lives in: the Fleet's
 // stars over a ship laid up, conjured steel, a keystone's price in the fight, the stores taken in the order that pays, the
 // captain's sky asked before the QuickDial key lets it go, the exchange never buying at what it sells; the word's men
 // rounded on the ball's roll, the wheel's quiet, a near miss told where it passed nearest, the tally's men as her stander

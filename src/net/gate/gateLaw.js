@@ -1,7 +1,6 @@
 // @ts-check
-// WB1 (2026-09-25, Mac: "at any point in the world, on the timer, a large area would be shown on the map, also in
-// chat ... A gate model would be spawned with a timer that leads to a completely different area, a gate of oblivion"):
-// THE GATE'S LAW - when it comes, where, and which room it opens onto. Design: bible/11-Multiplayer/World-Bosses.md.
+// WB1:
+// THE GATE'S LAW - when it comes, where, and which room it opens onto. Design:.
 //
 // A FUNCTION OF THE CLOCK, AND NOTHING ELSE. The online world's clock is wall time (WORLD5: wire.js
 // sharedClassicMinutes, TimeScale 12, a game day every two real hours), so a gate a game day at dusk is a set of
@@ -41,8 +40,7 @@ export const gameDayAt = (nowMs, lane = 0) => Math.floor((sharedClassicMinutes(n
 
 // ═══ WW2: THE LANES - A GATE A GAME DAY IN EVERY THEATRE ═══════════════════════════════════════
 //
-// (2026-10-24, bible/03-World/World-Wide.md WW2; the owner: "we can expand world events to happen more than once at a
-// time since the world will be massive".) The world's THEATRES (world/worldWide/worldGrid.js - the Iliac Bay, and each
+// The world's THEATRES (world/worldWide/worldGrid.js - the Iliac Bay, and each
 // province beyond its rectangle) each hold their own gate a game day: LANE `t` is theatre `t`'s. Lane 0 is the Bay's,
 // the gate every client and the relay have always known, to the instant and the roll.
 //
@@ -149,8 +147,7 @@ export const gateStands = (phase) => phase === 'rising' || phase === 'sealed' ||
 export const gateMarked = (phase) => phase !== 'quiet' && phase !== 'gone';
 
 /** What a countdown on the gate counts toward, and says: to the opening while it is sealed or rising, to the seal
- *  while it is open, and to the collapse once it has sealed for the night; nothing otherwise. GATE-COLLAPSE (2026-09-28,
- *  the field: "gate under the rock didnt go away stayed there" - "Never left"; Mac: "Count down to collapse"): the sealed
+ *  while it is open, and to the collapse once it has sealed for the night; nothing otherwise. GATE-COLLAPSE: the sealed
  *  hours said nothing - no countdown on the plaque, the banner or the map - so a gate still standing after "has sealed"
  *  read as one that would never go. It goes at the wrath (a kill inside ends it sooner, and then it is collapsing). */
 export function gateCountdown(t, nowMs, phase = gatePhase(t, nowMs)) {
@@ -306,7 +303,7 @@ function shuffledRound(round, key, n) {
 const marksApart = (x, y) => x.a !== y.a && !x.t.some((k) => y.t.includes(k));
 
 /**
- * WB8b (2026-09-28, Mac: "give him unique and different modifers on every 2 hour spawn"): THE CYCLE OF MARKS - every
+ * WB8b: THE CYCLE OF MARKS - every
  * aspect with every pair of trials, ONCE EACH, in an order where no two gates running share an aspect or a trial, each
  * round of four gates (gates 4k to 4k+3) brings all four aspects and two trials a gate, and a pair of trials rests a
  * long while before it comes back, under another aspect each time. (AUDIT PRE-MERGE 0929 W1-4: this said "every four
@@ -317,7 +314,7 @@ const marksApart = (x, y) => x.a !== y.a && !x.t.some((k) => y.t.includes(k));
  * ones under the next, and so on. Each round's gates stand in its own shuffled order, its first and last chosen, depth
  * first, so the seam between two rounds shares nothing either - the cycle's last gate and its first included, for it
  * comes round again. The same cycle on every client and the relay; made once.
- * WB11a (2026-10-01, Mac: "4. Trial rotation" - the ninth trial, Legion-Lord): NINE TRIALS. An odd count cannot be
+ * WB11a: NINE TRIALS. An odd count cannot be
  * paired whole, so the circle method sits one out: a BYE takes the last seat, and the trial a matching pairs with it
  * RESTS that round - nine matchings of four real pairs, 4 x 36 = 144 gates (twelve real days); each round brings every
  * aspect and eight of the nine trials, the ninth a different one each round; a pair rests 33 gates at least. (Eight
@@ -377,7 +374,7 @@ export function gateModsOf(day) {
 
 // ═══ WB14b: THE PORTENTS' BAG ═════════════════════════════════════════
 //
-// (2026-10-19, bible/11-Multiplayer/Breach-Portents.md section 1.) A night's portents are drawn by its place among the
+// A night's portents are drawn by its place among the
 // gates that can carry one - every gate but a Legion-Lord night (his host is tied to his courts and phases: the Vanguard
 // would put two hosts in one fight, the Sundering two of him for his Sappers to walk at). Every other one of those
 // carries one, so no two gates running ever share a portent and none is lost to the trial that excludes it; WHICH one is
@@ -419,7 +416,7 @@ export function gatePortentsOf(day) {
 const _onePortent = new Map();
 const _portentOne = (id) => { let a = _onePortent.get(id); if (!a) { a = Object.freeze([id]); _onePortent.set(id, a); } return a; };
 
-/** WB14e: THE TITHE-IMP - one night in TITHE_ONE_IN, unannounced (bible/11-Multiplayer/Breach-Portents.md section 9). */
+/** WB14e: THE TITHE-IMP - one night in TITHE_ONE_IN, unannounced. */
 export const TITHE_ONE_IN = 5;
 /** WB14e: it rises this long after his wake at the soonest, and up to TITHE_SPREAD_MS later, by the day's roll. */
 export const TITHE_AFTER_MS = 50_000;
@@ -444,7 +441,7 @@ export const portentsLine = (pt) => {
 // World-Bosses.md section 2). `near` is the town ("Copperham"); `left` a countdown ("4:07"). TIME1: the three that
 // named a time (the omen, the opening, the seal) are systems/gate/gateOmen.js's, in local time alone; WB12's relay deploy
 // (world151) retired them here.
-// WB13b (2026-10-01, Mac: "clean up text to be less explanatory and less AI"): each line the event, where and when -
+// WB13b: each line the event, where and when -
 // the map's ring, the banner and the countdowns say the rest
 export const riseLine = ({ near, left }) => `Dagon's Breach rises near ${near}. It opens in ${left}.`;
 export const wrathLine = ({ near, boss }) => `The Covenant tears Dagon's Breach near ${near} shut. ${boss} is cast back into the Deadlands.`;

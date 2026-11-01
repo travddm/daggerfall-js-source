@@ -1,4 +1,4 @@
-// AUDIT RPT1026 lane B (CHESTGOLD; bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md, RPT1026-CHESTGOLD): the shared
+// AUDIT RPT1026 lane B (CHESTGOLD;, RPT1026-CHESTGOLD): the shared
 // chest's settle law and both skins' chest window, read cold. Everything here is the real thing: the account worker over
 // SQLite, the realm session over it (systems/realmSaves.js createRealmSession, its checkpoint the realm's own PUT), the
 // host's door (decorGrants.js bindDecorHouseFrom), the classic window (NativeInventoryWindow) and the enhanced pack

@@ -1,5 +1,5 @@
 // @ts-check
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE REMNANT'S ART - what
+// SD8c: THE REMNANT'S ART - what
 // the Brass Remnant's Echoes wear that the Remnant itself does not (it wears the Hour's own brass, world/superDungeon/sdRealmArt.js):
 // the GOLD Echo's gilt and the SILVER Echo's, made in code as the realm's are (the realm's pseudo-archive, world/superDungeon/sdRealm.js
 // SD_REALM_ARCHIVE, records after the Steps'): nothing ships, the same pixels every boot. Each `{ albedo, emission }` in the

@@ -1,6 +1,5 @@
 // @ts-check
-// PROP-BODIES (2026-10-19, the owner: "Implement collision for all props", after "walking through trees and objects is
-// very immersion breaking"). DFU's flats are billboards with no collider (DaggerfallBillboard: a quad and a material),
+// PROP-BODIES. DFU's flats are billboards with no collider (DaggerfallBillboard: a quad and a material),
 // so a player walked through every tree, rock, barrel and statue. Here a SOLID flat stands a BODY - an upright cylinder
 // at its foot - and the player, on foot or mounted, is kept out of it (player/bodyClamp.js, after the collider's move).
 //
@@ -22,7 +21,7 @@
 //   - at least a step tall (the motor's STEP_OFFSET: what the feet step over is no wall), and never a person, a town
 //     animal, a light, the editor's markers or treasure (cover's own NOT_COVER_ARCHIVES), nor the flora Windfall sways
 //     Low or Medium (grass, flowers, ferns, bushes - a jungle of solid ferns could not be walked).
-// bible/03-World/Player-Arc.md (PROP-BODIES), bible/12-Enhanced-AI/Tactics-Arc.md (the index it rides).
+// (PROP-BODIES), (the index it rides).
 import { NOT_COVER_ARCHIVES, COVER_RADIUS_FRAC, COVER_HEIGHT_FRAC, COVER_TRUNK_R, COVER_CROWN_FROM } from '../ai/cover.js';
 import { responseByte, RESPONSE } from '../systems/windfall.js';
 import { JUNGLE_MEASURES } from './jungle/jungleModels.js';

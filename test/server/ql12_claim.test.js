@@ -1,5 +1,4 @@
-// QL12 (2026-10-19, the owner: "New questlines tying into and introduced the oblivion gates, abyss dungeons, elite
-// dungeons and elite breaches"; bible/06-Systems/Questlines-Arc.md sections 1 (decision 8) and 5.3): THE QUESTLINES'
+// QL12 (2026-10-19,; (decision 8) and 5.3): THE QUESTLINES'
 // CLAIM, as the account service pays it - `POST /v1/ql/claim` (server-account/src/questlines.js claimQl). Pinned here:
 // a step opened by its first claim and witnessed by a later one only against the place's own receipt row written at or
 // after the opening (each witness kind - the rite, the breach, an Hour, the Sea Serpent); a line's title once, and only
@@ -96,7 +95,7 @@ test('QL12 THE LAW: every step the service pays is witnessable - by a kind this 
   assert.deepEqual(qlTitleSteps('covensHoard'), [2]);
   assert.deepEqual(qlTitleSteps('hourThatWasNot'), [1]);
   assert.deepEqual(qlTitleSteps('oldCoil'), [2]);
-  assert.deepEqual(qlTitleSteps('thirteenthFrostfall'), [0, 2], 'STAR8: the first star, then the three');   // PIN MOVED (STAR8)
+  assert.deepEqual(qlTitleSteps('thirteenthFrostfall'), [0, 2], 'STAR8: the first star, then the three');
   assert.deepEqual(qlTitleSteps('nope'), []);
   // AUDIT STARFALL B2: the witnessed steps an end waits on - its line's before it, the law's own numbers
   assert.deepEqual([qlStepsBefore('thirteenthFrostfall', 0), qlStepsBefore('thirteenthFrostfall', 2), qlStepsBefore('burningDoors', 3), qlStepsBefore('covensHoard', 2), qlStepsBefore('nope', 1)], [[], [0], [2], [], []]);
@@ -142,13 +141,12 @@ test('QL12 THE BURNING DOORS: an `open` writes the step\'s opening; an `end` rea
   await gate(me, 'dealt');
   assert.deepEqual((await ql(me, 'burningDoors', 3)).body, { witnessed: true, title: 'doorwarden' }, 'the last witnessed step pays the title');
   assert.equal(row(me).ql_titles, qlTitleBit('doorwarden'));
-  // PIN MOVED (AUDIT QUESTLINES SERVICE-7 (c)): laid once; a title step's later end answers it HELD, never paid again -
   // a retry of an answer lost after the commit is how the page hears it (the runner tells it once)
   assert.deepEqual((await ql(me, 'burningDoors', 3)).body, { witnessed: true, titleHeld: 'doorwarden' }, 'laid once, held after');
   assert.deepEqual((await ql(me, 'burningDoors', 2)).body, { witnessed: true, titleHeld: 'doorwarden' }, 'on any of its steps');
   assert.equal(row(me).ql_titles, qlTitleBit('doorwarden'), 'the bit laid once');
   assert.deepEqual(steps(me).map((s) => [s.step, s.done_at, s.seen_at]), [[2, T0 + 300, T0 + 300], [3, T0 + 400, T0 + 400]], 'each step the receipt that witnessed it');
-  // A RECEIPT AT THE LINE'S OPENING'S OWN SECOND IS AFTER IT (PIN MOVED, AUDIT STARFALL B2: on the rite's step - the
+  // A RECEIPT AT THE LINE'S OPENING'S OWN SECOND IS AFTER IT (
   // breach's end waits on the rite's step, so it was the rite's own second it read)
   const me2 = await S.registered('Doorward2');
   at(T0 + 500);
@@ -168,7 +166,7 @@ test('QL12 THE BURNING DOORS: an `open` writes the step\'s opening; an `end` rea
   at(T0 + 800);
   await gate(f, 'dealt');
   assert.deepEqual((await ql(f, 'burningDoors', 3)).body, { witnessed: true, title: 'doorwarden' });
-  // IN THE LINE'S ORDER, WHICHEVER END IS ASKED FIRST (PIN MOVED, AUDIT STARFALL B2): the breach's end before the rite's is
+  // IN THE LINE'S ORDER, WHICHEVER END IS ASKED FIRST (
   // not witnessed - the rite's step is not done, and its receipt is the breach's floor - and asked again after the rite's
   // end, it is, and pays the title
   const o = await S.registered('OutOfOrder');
@@ -204,7 +202,7 @@ test('QL12 THE BURNING DOORS: an `open` writes the step\'s opening; an `end` rea
   assert.deepEqual((await ql(late, 'burningDoors', 3)).body, { witnessed: true, title: 'doorwarden' }, 'the line\'s window');
   // THE CEILING (SERVICE-5's order): a step's witness is older than the receipt that witnessed a later step - which only a
   // row written before B2's order can hold now (acct159-164 witnessed a later step first): a rite broken after that
-  // breach's receipt witnesses no step before it (PIN MOVED, AUDIT STARFALL B2: the breach's end was asked first)
+  // breach's receipt witnesses no step before it (
   const c = await S.registered('Ceiling');
   at(T0 + 1100);
   await open(c, 'burningDoors', 2);
@@ -380,7 +378,7 @@ test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burnin
   assert.deepEqual((await open(me, 'covensHoard', 2)).body, { opened: true });
   assert.deepEqual((await ql(me, 'covensHoard', 2, 'keep')).body, { witnessed: false }, 'the Burning Doors not yet witnessed');
   assert.deepEqual(row(me), { ql_titles: 0 }, 'nothing paid');
-  // ONE STEP IS NOT THE LINE WHOLE (AUDIT QUESTLINES SERVICE-4) - PIN MOVED (AUDIT STARFALL B2): the breach's end asked
+  // ONE STEP IS NOT THE LINE WHOLE (AUDIT QUESTLINES SERVICE-4)
   // before the rite's is not witnessed at all now; the rite's alone is, and the Doorwarden still not held
   await open(me, 'burningDoors', 2);
   at(T0 + 120);
@@ -460,8 +458,6 @@ test('QL12 THE ROUTE (AUDIT FIVE-ASKS A1\'s lesson): /v1/ql/claim is listed, beh
 });
 
 test('QL12 THE VOCABULARY: the five join TITLES last, in QL_TITLES\' order; a registered row holds each by its bit and a guest none; their words; their colours - each its own, more than 40 from every title\'s; a title\'s loot banner (mutants: the order; the guest; a word)', () => {
-  // PIN MOVED (STAR8): the five and the Starwarden of the Thirteenth of Frostfall, its bit the sixth (63 every one)
-  // PIN MOVED (Elite Gates removed): the Weirwalker left - the four and the Starwarden, its bit the fifth (31 every one),
   // and the Spire's thirteen left the titles before them
   assert.deepEqual([...TITLES.slice(TITLES.indexOf(QL_TITLES[0]), TITLES.indexOf(QL_TITLES[0]) + QL_TITLES.length)], [...QL_TITLES]);
   assert.deepEqual([...QL_TITLES], ['doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden']);
@@ -522,7 +518,7 @@ function runnerOn(S, who, lines) {
   R.wait = (s, ms = 0) => { R.clock.s += s; R.clock.ms += ms; };
   /** A load: the runner remade from its own save. */
   R.load = () => { const save = R.runner.snapshot(); R.runner = R.make(); R.runner.restore(save); };
-  /** PIN MOVED (QL-OFFERED - a questline is taken, never sent): the player takes `id`, and a tick starts its first step
+  /**
    *  (AUDIT QUESTLINES LINES-17's hour between the runner's own beginnings is gone with them). */
   R.begin = async (id) => { assert.equal(R.runner.takeLine(id).ok, true, `${id} taken`); await R.tick(); };
   /** The session's kind changed - a guest registered in place. */
@@ -537,7 +533,6 @@ test('AUDIT QUESTLINES SERVICE-1/-3, LINES-2: a guest\'s page begins no line the
   const R = runnerOn(H.S, g, ['oldCoil']);
   for (let i = 0; i < 14; i++) { await R.tick(); R.wait(STEP_GAP_S); }
   assert.equal(R.runner.lineState('oldCoil'), null, 'a guest\'s page: the line not begun');
-  // PIN MOVED (QL-OFFERED): not on offer to a guest - no row (a line its gate shuts is not drawn), and no take
   assert.equal(R.runner.rows().find((l) => l.id === 'oldCoil'), undefined);
   assert.equal(R.runner.takeLine('oldCoil').reason, 'closed');
   assert.deepEqual(R.wire, [], 'nothing asked');

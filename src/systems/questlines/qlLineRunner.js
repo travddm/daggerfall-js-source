@@ -1,13 +1,11 @@
 // @ts-check
-// QL12-QL16 (bible/06-Systems/Questlines-Arc.md section 4): THE LINES, RUN - made by the layer (qlLayer.js) over the
+// QL12-QL16: THE LINES, RUN - made by the layer (qlLayer.js) over the
 // machine. A line (qlLines.js) whose gate holds is OFFERED; the player TAKES it (takeLine - at a notice board, a giver's
 // door or the Quests tab) and its first step's quest starts then; a step that ends well starts the next, a later step
 // that ends badly is offered again a day later; the last step's outcome is the line's. It never decides a quest: each
 // step is a script on the machine like any other, its objectives a sheet like any other's.
 //
-// QL-OFFERED (2026-10-25, Lord Rumpkin: "every town I enter there is some courier ramming quest letters into
-// my hand ... Random quests like that should be picked up in the tavern, or notice board"; the owner: "No band aids",
-// and his decision: A QUESTLINE IS TAKEN, NEVER SENT). QL0 began every line whose gate held, unasked, and its first
+// QL-OFFERED. QL0 began every line whose gate held, unasked, and its first
 // letter came by courier at the next town by day. DFU sends a letter unasked only where the story is already the
 // player's (the main quest's, a guild's invitation, a vampire clan's) and puts every other quest behind a questor's
 // accept or refuse (DaggerfallQuestOfferWindow, the guild popup's GetQuest - quest/offerFlow.js); so does this now. A

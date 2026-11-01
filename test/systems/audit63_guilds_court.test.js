@@ -201,13 +201,13 @@ test('AUDIT 63 F9: a Thieves Guild member\'s hideout is revealed under its FACTI
 
 test('AUDIT 63 F9: BOTH exterior hosts drive the reveal, at DFU\'s own moments', () => {
   const world = read('../../src/scenes/world.js');
-  assert.ok(/const revealMemberGuildHalls = \(\{ witness = false \} = \{\}\) =>/.test(world));   // PIN MOVED (CHAP2a): and, at the entry edge online, the town's halls witnessed off the same buildings
+  assert.ok(/const revealMemberGuildHalls = \(\{ witness = false \} = \{\}\) =>/.test(world));
   // Join (ThievesGuild.cs:168-173) - guildInitiationQuestEnded is the
   // port's only door into either guild
   assert.ok(/initiated\.length\) revealMemberGuildHalls\(\)/.test(world));
   // and the location-rect entry the same host already edges on (F062)
   const rect = world.slice(world.indexOf('_inRect && !_wasInLocationRect'));
-  assert.ok(rect.slice(0, 900).includes('revealMemberGuildHalls({ witness: onlineOn })'),   // PIN MOVED (CHAP2a)
+  assert.ok(rect.slice(0, 900).includes('revealMemberGuildHalls({ witness: onlineOn })'),
     'the enter-rect edge is where RegisterEvents subscribed (:200)');
   // review round: the name is GetAffiliation's FACTION.TXT read
   // (Guild.cs:170-176), whose "unknown-guild" fallback (:175) answers a
@@ -218,14 +218,14 @@ test('AUDIT 63 F9: BOTH exterior hosts drive the reveal, at DFU\'s own moments',
   assert.ok(/ensureFactions\?\.\(\)/.test(body),
     'the streaming host reveals before FACTION.TXT is read - the plate saves as unknown-guild');
   const ext = read('../../src/scenes/exterior.js');
-  assert.ok(/revealGuildHallsOnMap\(revealingMemberships\(playerEntity\)/.test(ext),   // PIN MOVED (AUDIT CHAP2 D4): either book's registration
+  assert.ok(/revealGuildHallsOnMap\(revealingMemberships\(playerEntity\)/.test(ext),
     'the fixed-city host arms it at load - its one location becomes available exactly once');
   // the pool is the FULL building set, not the talk directory
   assert.ok(/buildingSummaries\(dfLocation\.exterior\?\.buildings/.test(ext));
   // the streaming host's pool is the FULL set too, resolved inside the
   // one reveal (the wait between the two is a microtask, not a re-read)
   assert.ok(/buildingSummaries\(dfLoc\.exterior\?\.buildings/.test(reveal.slice(0, reveal.indexOf('};'))));
-  assert.ok(/revealGuildHallsOnMap\(revealingMemberships\(playerEntity\)/.test(reveal.slice(0, reveal.indexOf('};'))));   // PIN MOVED (AUDIT CHAP2 D4)
+  assert.ok(/revealGuildHallsOnMap\(revealingMemberships\(playerEntity\)/.test(reveal.slice(0, reveal.indexOf('};'))));
 });
 
 // ── F33: PlayerActivate.cs:800-841 + :1611-1673 ───────────────────
@@ -279,7 +279,7 @@ test('AUDIT 63 F33: the Steal arm - the level difference reaches the chance, and
   const mugged = thief();
   const twin = pickpocket(mugged, { rolls: seq(0.74, 0.5, 0.5) });   // no target: the :1655 arm
   assert.equal(twin.success, false);
-  // GUARD1 (2026-09-15): the VALUE, not just the arm. This pin read
+  // GUARD1: the VALUE, not just the arm. This pin read
   // back the string the law used to write, so it locked in the one
   // place in the port where `crimeCommitted` was not the enum id every
   // other writer and every reader uses (systems/crimes.js's header).

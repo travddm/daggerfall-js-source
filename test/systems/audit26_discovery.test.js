@@ -240,14 +240,13 @@ test('F209: the latch and the owned-house guard are wired', () => {
   // worldModes stocks on first access - and an OWNED house never
   // stocks (PlayerActivate.cs:905-913: your own furniture is empty).
   const wm = src('scenes/worldModes.js');
-  // PIN MOVED at A2 (ROAD TO 1:1), deliberately: the stock-once `??=`
   // was never DFU's test. PlayerActivate compares stockedDate against
   // CreateStockedDate(now) (:911-915), so the container restocks when
   // the game DAY moves on and not once per interior build. The claim
   // this pin makes is unchanged - worldModes stocks the container, and
   // an owned house never reaches that call - only the shape of the
   // stocking line moved.
-  assert.ok(wm.includes('rolled = stockHouseContainer({ buildingType: b?.buildingType, record: containerTextureRecord(c.modelIdNum) }, playerEntity);'));   // PIN MOVED (OUTDOOR-LOOT): the roll is held a moment (`rolled`) - the room, online, mints it at the Yes
+  assert.ok(wm.includes('rolled = stockHouseContainer({ buildingType: b?.buildingType, record: containerTextureRecord(c.modelIdNum) }, playerEntity);'));
   const arm = wm.slice(wm.indexOf("if (key.startsWith('container:')) {"));
   // HC1 grew the arm (the ship guard, the Yes/No box, the loot-target
   // open) - the window widens with it, the guards themselves stand.

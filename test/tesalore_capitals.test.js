@@ -1,5 +1,4 @@
-// TESA-LORE (2026-10-24, the owner: "polishing and refining each capital city design and bringing them more in line with
-// lore and the mainline games"; bible/03-World/Arena-Provinces.md TESA-LORE) - THE CAPITALS, REFINED TOWARD THE LORE, pinned:
+// TESA-LORE - THE CAPITALS, REFINED TOWARD THE LORE, pinned:
 // each refinement against the reading it came from (UESP's), the place it stands, its ground and its walkers' way.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -28,7 +27,6 @@ import { CAPITAL_CUT_RECORDS, flatTriangles } from '../src/world/capitalShapes.j
 const sane = (m) => {
   assert.ok(m.positions.every(Number.isFinite) && m.uvs.every(Number.isFinite));
   for (let i = 0; i < m.normals.length; i += 3) assert.ok(Math.abs(Math.hypot(m.normals[i], m.normals[i + 1], m.normals[i + 2]) - 1) < 1e-4, 'unit normals');
-  // PIN MOVED (URBANIZER U2): a landmark's pictures the capitals' own or the towns' (cut stone, brick, half-timbering)
   assert.ok(m.subMeshes.every((s) => (s.textureArchive === CAPITAL_ARCHIVE && Object.values(CAPITAL_ART).includes(s.textureRecord)) || (s.textureArchive === URBAN_ARCHIVE && Object.values(URBAN_ART).includes(s.textureRecord))));
   assert.equal(m.subMeshes.reduce((n, s) => n + s.primitiveCount * 3, 0), m.indices.length);
 };
@@ -60,10 +58,10 @@ const capOf = (key) => CAPITALS.find((c) => c.key === key);
 // ── THE IMPERIAL CITY ───────────────────────────────────────────
 
 const IC = capOf('imperial-city'), B = BLOCK_M, HALF = IMPERIAL_CELLS / 2;
-/** The slice (from the north-west, a row of IMPERIAL_SPAN) and the plan's cell a point of the city stands in. PIN MOVED
+/** The slice (from the north-west, a row of IMPERIAL_SPAN) and the plan's cell a point of the city stands in.
  *  (TOWN-SHAPES TS5): seven pixels a side, the anchor the plan's middle. */
 const sliceAt = (x, z) => Math.floor((z + HALF * B) / (8 * B)) * IMPERIAL_SPAN + Math.floor((x + HALF * B) / (8 * B));
-const cellAt = (x, z) => imperialCell(Math.floor(z / B + HALF), Math.floor(x / B + HALF));   // PIN MOVED (IC-GRAND): the plan by its law
+const cellAt = (x, z) => imperialCell(Math.floor(z / B + HALF), Math.floor(x / B + HALF));
 const isOwn = (cell) => !!imperialCodeCell(cell);
 /** IC-GRAND: the city wall's runs near a point alone (a long wall's part is built so - world/capitalModels.js imperialPartBuild). */
 const wallNear = ([x, z], m = 80) => buildCityWall(undefined, nearRect([x - m, z - m, x + m, z + m], 40));
@@ -74,9 +72,8 @@ test('TESA-LORE the Imperial City\'s Prison on the isle\'s north-eastern shore (
   const [px, pz] = prisonAt();
   assert.ok(Math.abs(imperialBearing(px, pz) - 45) < 1e-9, 'north-east');
   assert.equal(imperialDistrictAt(px, pz), 'Prison District');
-  const s = sliceAt(px, pz);   // PIN MOVED (TS5): the north-east pixel of seven a side
+  const s = sliceAt(px, pz);
   assert.ok(s % IMPERIAL_SPAN > (IMPERIAL_SPAN - 1) / 2 && Math.floor(s / IMPERIAL_SPAN) < (IMPERIAL_SPAN - 1) / 2, 'the north-east pixel');
-  // PIN MOVED (IC-GRAND): its compound 600 m across over the corner of four slices of twenty-five a side - a slice of it
   // named for it (the rest the Market District's or the isle's, whichever holds the more)
   const h = IMPERIAL.prison.half, slices = [[-h, -h], [h, -h], [h, h], [-h, h]].map(([dx, dz]) => sliceAt(px + dx, pz + dz));
   assert.ok(slices.some((q) => imperialSliceName(q) === 'Prison District'), slices.map(imperialSliceName).join());
@@ -87,7 +84,6 @@ test('TESA-LORE the Imperial City\'s Prison on the isle\'s north-eastern shore (
   const W = IMPERIAL.cityWall;
   assert.ok(W.gates.includes(IMPERIAL.prison.b), 'a gate on its bearing');
   assert.equal(crosses(wallNear(polar(IMPERIAL.prison.b, W.r)), P3(IMPERIAL.prison.b, W.r - 10, W.gateH / 2), P3(IMPERIAL.prison.b, W.r + 10, W.gateH / 2)), false, 'open');
-  // PIN MOVED (TS5 with AUDIT TESA II C3): the causeway from the wall's gate to the compound's own gate - off its bearing on
   // seven pixels, where the compound's half is a sixth of the way out
   const [[ax, az], [bx, bz]] = causewayLines()[0];
   for (const t of [0.25, 0.5, 0.75]) assert.equal(imperialTile(ax + (bx - ax) * t, az + (bz - az) * t), 3, `its causeway at ${t}`);
@@ -127,12 +123,11 @@ test('TESA-LORE the Arboretum\'s Nine Divines (UESP: "statues of the Nine Divine
   assert.ok(m.positions[top] > D.talosPlinthH + D.talos + 3 && Math.hypot(m.positions[top - 1] - cx, m.positions[top + 1] - cz) < D.talosPlinth, 'Talos\'s blade the top, over the middle');
   for (const [x, z] of plinths) assert.ok(!crosses(m, [x, D.plinthH + D.figure + 1.5, z - 4], [x, D.plinthH + D.figure + 1.5, z + 4]), 'the eight below him');
   assert.equal(imperialTile(cx, cz), 3, 'the court paved');
-  // PIN MOVED (IC-GRAND): off the Arboretum's avenue and its ring road, both of which cross the court (its heart)
   const a = ((D.b - 45) * Math.PI) / 180, [px, pz] = [cx + Math.sin(a) * (D.court + 12), cz - Math.cos(a) * (D.court + 12)];
   assert.equal(imperialOwnLaws(Math.floor(pz / B + HALF), Math.floor(px / B + HALF)).tile(px, pz), 2, 'the park round it (PIN MOVED, IC-GRAND: its grass the cell\'s own laws\' - the landmarks\' tile says none there, the Arboretum\'s ground the fabric\'s)');
   for (let x = cx - D.court + 2; x < cx + D.court - 2; x += 3.2) for (let z = cz - D.court + 2; z < cz + D.court - 2; z += 3.2) if (Math.hypot(x - cx, z - cz) < D.court - 2) assert.equal(imperialTree(x, z), -1);
   for (const [dx, dz] of [[0, 0], [D.court - 4, 0], [0, D.court - 4], [-(D.court - 4), 0], [0, -(D.court - 4)]]) assert.ok(isOwn(cellAt(cx + dx, cz + dz)), 'the court the city\'s own');
-  assert.ok(IC.drawn.includes(IMPERIAL_MODELS.nineDivines) && CAPITAL_MODELS.nineDivines === IMPERIAL_MODELS.nineDivines);   // PIN MOVED (TS5): drawn whole, carried in parts
+  assert.ok(IC.drawn.includes(IMPERIAL_MODELS.nineDivines) && CAPITAL_MODELS.nineDivines === IMPERIAL_MODELS.nineDivines);
   assert.ok(IC.models.includes(partIn(IMPERIAL_MODELS.nineDivines, sliceAt(cx, cz))));
   assert.equal(IMPERIAL_CARRY[partIn(IMPERIAL_MODELS.nineDivines, sliceAt(cx, cz))], sliceAt(cx, cz), 'carried in its pixel');
   _resetCapitals();
@@ -206,7 +201,6 @@ test('TESA-LORE Mournhold\'s Plaza Brindisi Dorom "a public garden dominated by 
   const M = MOURNHOLD, P = M.plaza, S = M.statue, own = MOURNHOLD_BLOCKS.P0;
   assert.equal(own.tile(P.x + 40, P.z + 40), 2, 'the garden\'s grass');
   assert.deepEqual([own.tile(P.x, P.z + 50), own.tile(P.x + 50, P.z), own.tile(P.x + 10, P.z + 10), own.tile(0, 0), own.tile(M.fane.x, M.fane.z + 60)], [3, 3, 3, 3, 3], 'its paths, its court, the stone beyond');
-  // PIN MOVED (CAPITAL-TREES): the garden's trees are the city's own in their planters - its gardens' model
   // (world/capitalMournhold.js buildMournholdGardens, test/world/capitaltrees.test.js) - and its own blocks plant none of
   // the Bay's scenery trees (a fir and an oak of the Iliac Bay's woods, one tile in five of its grass, they were)
   for (const code of Object.keys(MOURNHOLD_BLOCKS)) assert.equal(MOURNHOLD_BLOCKS[code].tree, undefined, `${code} plants no scenery tree`);
@@ -316,12 +310,12 @@ test('TESA-LORE Falinesti, the city in the boughs (UESP: "Bosmer live ... coaxin
   const forks = limbForks(), wood = m.subMeshes.find((sm) => sm.textureRecord === CAPITAL_ART.timber), timber = { ...m, indices: m.indices.slice(wood.startIndex, wood.startIndex + wood.primitiveCount * 3) };
   assert.equal(forks.length, F.limbs);
   for (const [x, y, z] of forks) {
-    assert.equal(crosses(timber, [x, y + 0.3, z], [x, y - 0.9, z]), true, `a deck at the fork ${x.toFixed(0)},${z.toFixed(0)}`);   // PIN MOVED (CAPITAL-TREES): its timber - the limb runs under it now
+    assert.equal(crosses(timber, [x, y + 0.3, z], [x, y - 0.9, z]), true, `a deck at the fork ${x.toFixed(0)},${z.toFixed(0)}`);
     assert.ok(housesAt((p) => Math.hypot(p[0] - x, p[2] - z) < F.forkDeck && p[1] >= y - 0.01) >= 16, 'its two houses on it');
   }
   assert.deepEqual(spiralAt(0), [0, 0], 'from the ground');
   F.platforms.forEach((y, k) => assert.ok(Math.abs(spiralAt((k + 1) / F.platforms.length)[1] - y) < 1e-9 && Math.abs(spiralAt((k + 1) / F.platforms.length)[0] - (k + 1) * Math.PI * 2) < 1e-9, `a turn to the platform at ${y}`));
-  for (let i = 0; i < 40; i++) {   // PIN MOVED (AUDIT TESA II C4): between the turns' ends - a landing's floor the walkway's own now, the platform's deck open over it
+  for (let i = 0; i < 40; i++) {
     const [a, y] = spiralAt((i + 0.5) / 40), r = spiralInner(y) + F.spiral.w / 2;
     assert.equal(crossesUp(m, [Math.cos(a) * r, y + 0.6, Math.sin(a) * r], [Math.cos(a) * r, y - 0.6, Math.sin(a) * r]), true, `the walkway's floor at ${y.toFixed(1)}`);
   }
@@ -424,8 +418,8 @@ test('TESA-LORE the capitals\' pictures at vanilla\'s detail (the owner: "fall i
   const art = capitalArt();
   assert.equal(CAPITAL_ART_SIZE, 64);
   for (const [name, record] of Object.entries(CAPITAL_ART)) {
-    if (CAPITAL_CUT_RECORDS.includes(record)) continue;   // PIN MOVED (CAPITAL-TREES): a tree's flats, cut by their alpha, are a flat's size and detail (test/world/capitaltrees.test.js)
-    const img = art.get(record), h = TALL.has(name) ? 128 : 64;   // PIN MOVED (IC-GRAND): the street walls 64 x 128, vanilla's own wall's
+    if (CAPITAL_CUT_RECORDS.includes(record)) continue;
+    const img = art.get(record), h = TALL.has(name) ? 128 : 64;
     assert.deepEqual([img.width, img.height], [64, h], name);
     const d = detail(img.data, 64, h);
     if (name !== 'dark') {
@@ -441,14 +435,13 @@ test('TESA-LORE vanilla\'s texel density on every capital model (the freeware\'s
   const full = CAPITAL_ART_SIZE / CAPITAL_TEXEL_METRES;
   assert.ok(Math.abs(full - 40) < 1e-9, 'a 64-texel picture across 1.6 m');
   const quad = vanillaTexels({ positions: [0, 0, 0, 2, 0, 0, 2, 3, 0], indices: [0, 1, 2] });
-  // PIN MOVED (BLD): v RISES up the wall - MeshReader's law (v = -(texel row / height)); it had fallen, every capital's
   // masonry upside down on the GL's bottom-up pictures
   assert.deepEqual([...quad.uvs].map((v) => +v.toFixed(4)), [0, 0, 1.25, 0, 1.25, 1.875], 'a wall facing z: x across, y up (v rising up it, MeshReader\'s)');
   _resetCapitals();
   installCapitals({ addTextures: () => 0 });
   let faces = 0;
   for (const id of Object.values(CAPITAL_MODELS)) {
-    const m = customModelFor(id), flats = flatTriangles(m);   // PIN MOVED (CAPITAL-TREES): a tree's flats on their own coordinates, at the density of Daggerfall's trees' flats (test/world/capitaltrees.test.js)
+    const m = customModelFor(id), flats = flatTriangles(m);
     for (let t = 0; t < m.indices.length; t += 3) {
       if (flats?.[t / 3]) continue;
       const ix = [0, 1, 2].map((k) => m.indices[t + k]);
@@ -456,7 +449,6 @@ test('TESA-LORE vanilla\'s texel density on every capital model (the freeware\'s
       const e1 = P[1].map((x, k) => x - P[0][k]), e2 = P[2].map((x, k) => x - P[0][k]);
       const wa = Math.hypot(e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]) / 2;
       if (wa < 0.01) continue;
-      // PIN MOVED (IC-GRAND): a sliver under 5 cm on a side read off float32 kilometres out (a cone's tip 2.3 km from the middle) is no face to measure
       if (Math.min(Math.hypot(...e1), Math.hypot(...e2), Math.hypot(...P[2].map((x, k) => x - P[1][k]))) < 0.05) continue;
       const ta = Math.abs((U[1][0] - U[0][0]) * (U[2][1] - U[0][1]) - (U[2][0] - U[0][0]) * (U[1][1] - U[0][1])) / 2, dens = Math.sqrt(ta / wa);
       assert.ok(dens >= full * Math.sqrt(1 / Math.sqrt(3)) - 0.05 && dens <= full + 0.05, `model ${id}: ${dens.toFixed(2)} texels a metre`);

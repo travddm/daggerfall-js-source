@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-B (2026-09-25): ILIAC PUDDLE NO MORE IN THE STREAMED WORLD. The
+// DW-B: ILIAC PUDDLE NO MORE IN THE STREAMED WORLD. The
 // host half of DeepWaterFloorBuilder, DeepWaterTerrainCapRenderer and
 // WaterSurfaceManager (jet082's 1.2.2): when a pixel is promoted - the
 // port's publish of a built pixel - its Deep Waters are built from what
@@ -126,7 +126,7 @@ export function deepWatersLootSettings() {
   };
 }
 
-/** DEEP-SHARE (2026-09-26, Mac: "Yes" - one player standing the sea's creatures for everyone near). Online, the
+/** DEEP-SHARE. Online, the
  *  players within DEEP_SHARE_RADIUS of each other stand ONE deep: the lowest id among them, the camps' own election
  *  (systems/campEncounters.js amGroupRollOwner); the rest see its foes through the stream, under their own allowance
  *  (scenes/exteriorFoes.js DEEP_PUPPETS_MAX). The radius is the mod's populate radius, so a player that near the one standing

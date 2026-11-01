@@ -1,4 +1,4 @@
-// AUDIT ETHER-OW (2026-10-13, the owner: "Lets audit everything and ensure perfection"; bible/01-Overview/audits/Audit-Ether-OW.md)
+// AUDIT ETHER-OW
 // - the audit of ELTHERIC, ETHER-DEEP, ETHER-NODES and ETHER-OW, its three lanes' code findings pinned here as the game
 // runs them: C2-1 a Motherlode's site a pixel the Watch can vouch for (ETHER-NODES' isle witnesses confirmed ground past
 // the Veil, where no receipt is ever minted - a Motherlode there could never be struck); C2-2 an isle charted is a plate
@@ -36,7 +36,6 @@ const DAY0 = utcDay(T0);
 // ─── C2-1: THE MOTHERLODES' GROUND ─────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT ETHER-OW C2-1, the law: the Watch\'s ground is the Bay\'s map, one home - the relay mints on it, the service takes a receipt on it, and a Motherlode is sited on it alone: an isle\'s witnessed mountain past the Veil is never a site, the Bay\'s beside it are (mutants: the site\'s pixel unread, the Watch\'s ground the world\'s)', () => {
-  // PIN MOVED (WW7-5, World-Wide.md WW7-5): the land past the Bay is the Watch's too - never the Veil's box, the isles' still none
   assert.deepEqual([watchPixelOk(0, 0), watchPixelOk(999, 499), watchPixelOk(1000, 0), watchPixelOk(0, 500), watchPixelOk(-1, 0), watchPixelOk(0, -1), watchPixelOk(1.5, 2), watchPixelOk(H.px, H.py)],
     [true, true, true, true, true, true, false, false]);
   const claims = { s: 'a'.repeat(16), x: 10, y: 20, c: 1, i: 1000, e: 1060 };
@@ -100,7 +99,7 @@ test('AUDIT ETHER-OW C2-2: an isle charted while the captain stands on one pixel
     wildHallAt: () => false, wildActiveNow: () => null, wildHallStand: () => null, spawnedHallMapId: () => 0, maps: { getClimateIndex: () => 223 },
     travelLocationSummaryAt: () => null, mapDict: new Map(), travelCheckDiscovered: () => false,
     playerTravelPixel: () => at, state: { terrainDistance: 6 }, tvPlaceRect: (s) => ({ cx: s.pixel.x, cz: s.pixel.y }), farPlaces, settlementPixels, etherPlaceRows, TV_FAR_RANGE,
-    provinceQuestPlaces: null, pendingSummary: () => null, onTheBay: inBay, MAX_MAP_PIXEL_X: 1000, MAX_MAP_PIXEL_Y: 500, worldPlaces: null, pastBayPlacesIn: () => [], TV_FAR_TYPES, isCapitalPlaceId: () => false,   // PIN MOVED (BAY-LEFT-MAPS): `named`; TV5's near query (scenes/mapPlacesHost.js)
+    provinceQuestPlaces: null, pendingSummary: () => null, onTheBay: inBay, MAX_MAP_PIXEL_X: 1000, MAX_MAP_PIXEL_Y: 500, worldPlaces: null, pastBayPlacesIn: () => [], TV_FAR_TYPES, isCapitalPlaceId: () => false,
   };
   assert.equal(ledger.chartIsle(H.key), true);
   assert.equal(ledger.chartIsle(far.key), true);

@@ -1,5 +1,4 @@
-// AUDIT FOE-KEEPS E2 (2026-10-24, bible/01-Overview/audits/Audit-Foe-Keeps.md - the owner, asked: "Credit the last
-// player"). Lane E: the referee named a killer only when its own bar reached none, and a fighter's save health is the
+// AUDIT FOE-KEEPS E2. Lane E: the referee named a killer only when its own bar reached none, and a fighter's save health is the
 // foes' alone - so a player losing a fight denied its winner everything by dying to a foe, a fall or the sea first, and
 // since FOE-KEEPS such a death drops nothing ("You keep what you carry", where it once laid the bag for any taker).
 // WILD_KILL_CREDIT_MS stood in systems/wild/wildZone.js for exactly this ("a foe's last swing after a player's - the
@@ -25,7 +24,7 @@ test('AUDIT FOE-KEEPS E2 THE LAW (wildRef.js wildCredit): a death the referee di
   assert.equal(WILD_REF.creditMs, WILD_KILL_CREDIT_MS, 'one number at both ends');
   const stand = () => {
     const st = newWildRef();
-    wildZone(st, 'acct-a', { id: 'peer-a', lv: 10, ci: 'r-a' }, true, at(-1), -WILD_GRACE.ms);   // PIN MOVED (ZONE-GRACE): entered a whole safe passage before the fight
+    wildZone(st, 'acct-a', { id: 'peer-a', lv: 10, ci: 'r-a' }, true, at(-1), -WILD_GRACE.ms);
     wildZone(st, 'acct-b', { id: 'peer-b', lv: 10, ci: 'r-b' }, true, at(1), -WILD_GRACE.ms);
     return st;
   };
@@ -85,7 +84,7 @@ test('AUDIT FOE-KEEPS E2 THE RELAY: a player\'s blow, then my word that I left t
       const join = async (id, x, ci) => { const ws = r.connect(); await r.hello(ws, id, P(x), { lv: 10, look: LOOK, rc: 1, ci }); return ws; };
       const a = await join('peer-0001', -1, 'r00000000000000000a02'), b = await join('peer-0002', 1, 'r00000000000000000a01'), c = await join('peer-0003', 30, 'r00000000000000000a03');
       for (const ws of [a, b]) await say(ws, { k: 'zone', z: 1 });
-      clock += 300 + WILD_GRACE.ms;   // PIN MOVED (ZONE-GRACE): past the safe passage both took at their entry
+      clock += 300 + WILD_GRACE.ms;
       await say(a, { k: 'strike', to: 'peer-0002', n: 1, by: 'melee', p: W(-1), d: 999 });
       assert.equal(refs(b, 'hp').length, 1, 'the blow landed');
       assert.equal(refs(b, 'fell').length, 0, 'and felled nobody');

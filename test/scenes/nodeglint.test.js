@@ -1,8 +1,7 @@
-// NODE-GLINT (2026-10-20, the owner: "Lets just bring the glint back but better", of NODE-OUTLINE's ring - which players
-// found unimmersive).
+// NODE-GLINT.
 //
 // EVERY GATHERING NODE CATCHING THE LIGHT ON ITS OWN PICTURE. NODE-MARKS lit a node with a card before it - a halo, a
-// shimmer and motes - which the eye read as a faint sparkle near the node, not as the node; NODE-OUTLINE (2026-10-19)
+// shimmer and motes - which the eye read as a faint sparkle near the node, not as the node; NODE-OUTLINE
 // ringed the picture in its profession's colour, which read as a line painted on the world. Now (render/nodeGlint.js):
 //   - the gathering host's marks carry each node's PICTURES (scenes/gatherHost.js, NODE-OUTLINE's): the flats it stood
 //     for the node (a herb patch's, a vein's, a boulder's, a school's - which flats of which batch, and their centres), a
@@ -14,10 +13,10 @@
 //     and a sheen crossing the silhouette, faded out near; at the picture's depth pulled toward the eye (a wall before
 //     the node hides it), in a warm light with a hint of the profession's colour;
 //   - a node with no picture (a body drawn as a 3D character) keeps the glow; the node an act works is quiet.
-// AUDIT NODE-GLINT (the owner: "Audit this"): a node behind the eye no full-screen pass; the spots once a node, held off
+// AUDIT NODE-GLINT: a node behind the eye no full-screen pass; the spots once a node, held off
 // a leaf's edge; the clock's wrap moving no glint; a small tree's own box; a batch not yet placed where its mark stands;
 // the act's node quiet; the sea's murk; the constants pinned by value. tools/nodeGlintProbe.mjs draws it in a real WebGL2.
-// bible/06-Systems/Professions-Arc.md, NODE-GLINT.
+// NODE-GLINT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -344,7 +343,6 @@ test('NODE-GLINT the programs: the mask\'s vertex stage is the billboard program
   assert.match(NODE_MASK_FS, /bayer4\(gl_FragCoord\.xy\) \+ 0\.03125 >= vFade/, 'the handover\'s screen-door');
   const vs = NODE_GLINT_VS, fs = NODE_GLINT_FS;
   assert.ok(vs.startsWith('#version 300 es') && fs.startsWith('#version 300 es'));
-  // PIN MOVED (FIELD BUGS 2026-10-25i NODE-CROWN, AUDIT FB1025i C1): a glint's life is one law both stages read (the
   // vertex stage its spot, the fragment stage its turn - no turn handed on, a big crown's twelve in a herb's six's varyings)
   for (const st of [vs, fs]) {
     assert.ok(st.includes('uint glintSeed() { return uint(uSeed * 1009.0 + 0.5) * 2654435761u; }') && st.includes('  uint seed = glintSeed();'), 'each node its own seed');
@@ -493,7 +491,6 @@ test('NODE-GLINT the draw over a fake GL: nothing to light touches nothing; each
   assert.deepEqual(u('uSheen').map((v) => +v[0].toFixed(9)), want.map((v) => +v.toFixed(9)), 'the sheen by its distance');
   assert.ok(want[0] < want[1], 'nearer, fainter');
   const reach = u('uGlint').map((v) => v[0]), shares = u('uInner'), holds = u('uHold').map((v) => v[0]);
-  // PIN MOVED (FIELD BUGS 2026-10-25i NODE-CROWN, AUDIT FB1025i C1): the herb's six at its picture's reach, as they were;
   // the 3D tree's grown by its crown on screen - its standing width (6 m) and height (10 m) at its root, 12 m off
   const crown = NG.crownSidePx(PROJ, 12, 6, 10, 640, 480);
   assert.deepEqual(u('uCount'), [[GLINT_COUNT], [NG.glintCrownCount(480, crown)]], 'a flat\'s six; a big crown\'s more');
@@ -528,7 +525,7 @@ test('NODE-GLINT the draw over a fake GL: nothing to light touches nothing; each
   assert.deepEqual(far, [glintPx(480, side)]);
   assert.ok(far[0] < glintPxMax(480) - 0.5 && Math.abs(far[0] - GLINT_SHARE * side) < 1e-9, `its share of its picture (${far[0]} px of a ${side} px picture)`);
   r.dispose();
-  assert.ok(calls.some((x) => x[0] === 'deleteFramebuffer') && calls.some((x) => x[0] === 'deleteTexture') && calls.filter((x) => x[0] === 'deleteProgram').length === 3, 'EVERY ALLOCATION HAS AN OWNER');   // PIN MOVED (RESOURCE-HIGHLIGHTS): the mask's, the light's and the ring's
+  assert.ok(calls.some((x) => x[0] === 'deleteFramebuffer') && calls.some((x) => x[0] === 'deleteTexture') && calls.filter((x) => x[0] === 'deleteProgram').length === 3, 'EVERY ALLOCATION HAS AN OWNER');
 });
 
 test('GLINT-LIGHT the draw: each node\'s light asked where it stands, at the flats\' floor, into the pass\'s one array - its glints as bright as that light, its sheen out in the dark and part in a dim one; a renderer that answers none lights it as the day (the draw above) (mutants: the light unread; the sheen lit in the dark; the floor not asked; the node\'s place not handed; an array a node)', () => {
@@ -570,7 +567,6 @@ test('AUDIT NODE-GLINT the boxes: a node behind the eye draws nothing (it was a 
   const frame = { eye: [0, 1.6, 0], radius: 140, band: 20, gpu: { vb: 'vb', ib: 'ib' }, cut: new Set([handle]), runs: [{ run: { handle }, scale: [1, 1.2, 1], size: [6, 10], sway: 0, subs: [] }] };
   const set = { trees: new Float32Array([0, ...c, 1.5, 0]), centers: [c], handles: [handle], ox: 0, oy: 0, oz: 0 };
   r.draw([{ alpha: 1, seed: 0.5, at: c, rgb: [1, 1, 1], mark: { pictures: [{ batch: { ...forest, size: { w: 30, h: 40 }, lptProto: handle }, first: 0, count: 1, centers: [c], center: c, entry: { lowPolyTrees: set } }] } }], fakeRenderer(gl, [frame]), 0);   // a far picture larger than its crown: had its box stood, it would show
-  // PIN MOVED (FIELD BUGS 2026-10-25i NODE-CROWN): the run's size is its prototype's standing size, its own scale (1.2
   // up) in it already (world/lowPolyTrees.js readLowPolyTrees) - its height the size at the row's scale, never the 1.2 again
   const reach = 6 * GLINT_TREE_REACH * 1.5, h = 10 * 1.5;
   assert.deepEqual(got(r), expect([2 - reach, 0, -20 - reach, 2 + reach, h, -20 + reach]), 'the crown at its row\'s scale, the far flat\'s box none');

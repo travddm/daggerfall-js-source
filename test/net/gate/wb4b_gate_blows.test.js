@@ -1,4 +1,4 @@
-// WB4b (2026-09-25, Mac: "a large boss arena with an oversized enemy"): THE BOSS IS FOUGHT, DRIVEN. The entity a blow on
+// WB4b: THE BOSS IS FOUGHT, DRIVEN. The entity a blow on
 // him is computed against (world/gate/gateBoss.js bossStandIn - the game's own formula, measured: a level-1 iron longsword
 // lands about half its swings, a level-20 blade nearly all); where a swing meets him (bossReach - his skin, not his
 // middle); the spell engine's helpers for a body that states its own radius (systems/spellcast.js - the touch swept
@@ -34,7 +34,6 @@ test('WB4b his stand-in: his own mobile\'s entity, every metal biting where a Da
   assert.equal(e.minMetalToHit, 0, 'every metal bites');
   assert.equal(e.armor, BOSS_ARMOR); assert.deepEqual(e.armorValues, new Array(7).fill(BOSS_ARMOR));
   assert.ok(ENEMY_BASICS[31].armorValue * 5 < 0, 'the Daedra Lord\'s own armour is a wall');
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE): his whole is the count the wire carries (STAND_IN_WHOLE - 1e9 was
   // past every wire's ceiling, and a Disintegrate's claim of it was refused whole); nothing local empties it still
   assert.deepEqual([e.health, e.maxHealth, e.relayHealth], [STAND_IN_WHOLE, STAND_IN_WHOLE, true], 'nothing local empties him - the relay holds his health');
   assert.notEqual(bossStandIn(look, 'x'), e, 'one a fight, made fresh');

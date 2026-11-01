@@ -1,5 +1,5 @@
-// GATE-MIX (2026-10-20): the night's bodies' sprites made ready as I stand in the court - scenes/gate/gateSpriteWarm.js,
-// wired by scenes/gate/gateCourt.js. Design: bible/11-Multiplayer/World-Bosses.md section 28.
+// GATE-MIX: the night's bodies' sprites made ready as I stand in the court - scenes/gate/gateSpriteWarm.js,
+// wired by scenes/gate/gateCourt.js. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { profileOf } from '../../../src/net/gate/gateBrain.js';

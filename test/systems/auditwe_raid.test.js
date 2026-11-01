@@ -1,5 +1,4 @@
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection", of EVENT-RULES, BOSS-TRAITS and RAID5;
-// bible/01-Overview/audits/Audit-World-Events.md) - THE RAID KINDS' FINDINGS, each pinned where it was found: the motor
+// AUDIT WORLD-EVENTS - THE RAID KINDS' FINDINGS, each pinned where it was found: the motor
 // that froze a follower whose leader is not the player (L4-1); the refugees culled and counted lost, stood on one point,
 // harmed by the player and kept by a runner gone (L4-2, L4-5, L4-9); the way no city ever found and the square in a
 // pocket (L4-3, L4-8); the site read once off the player's feet (L4-4); the bearer the watch dismissed and healed by a

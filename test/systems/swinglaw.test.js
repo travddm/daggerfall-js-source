@@ -1,5 +1,4 @@
-// SWING-LAW (2026-09-28, Mac: "swing speed is insane", then "Do whatever is the most detailed. I dont care about departure,
-// especially if we can do it better") - THE PLAYER'S SWING IS THE PORT'S OWN LAW.
+// SWING-LAW - THE PLAYER'S SWING IS THE PORT'S OWN LAW.
 //
 // DFU's line (FormulaHelper.GetMeleeWeaponAnimTime, `3 * (115 - LiveSpeed) / 980` a frame, five frames a blow) is a
 // hyperbola in the rate: a second a blow at Speed 50, four blows a second at 100. DISC28-D gave the rig the live Speed
@@ -100,7 +99,7 @@ test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fp
 
 test('SWING-LAW: the reader - the item in the swinging hand, its template\'s weight, both hands or one, the live Strength; bare hands and claws weigh nothing; no wielder, nothing', () => {
   const e = fighter({ strength: 70 }, WEAPONS.Claymore);
-  assert.deepEqual(readSwing({ entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true }), { weaponType: WEAPON_TYPES.LongBlade, weight: 7.5, strength: 70, twoHanded: true, family: 'longBlade', shortBlade: false });   // PIN MOVED (BAL10): the reader names the swing's family
+  assert.deepEqual(readSwing({ entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true }), { weaponType: WEAPON_TYPES.LongBlade, weight: 7.5, strength: 70, twoHanded: true, family: 'longBlade', shortBlade: false });
   const left = fighter({}, WEAPONS.Dagger, EQUIP_SLOTS.LeftHand);
   equipTableOf(left)[EQUIP_SLOTS.RightHand] = weapon(WEAPONS.Claymore);
   assert.equal(readSwing({ entity: left, weaponType: WEAPON_TYPES.Dagger, usingRightHand: false }).weight, 0.5, 'the left hand\'s blade when the left hand swings');

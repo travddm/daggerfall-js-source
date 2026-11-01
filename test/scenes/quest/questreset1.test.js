@@ -1,6 +1,4 @@
-// QUEST-RESET (2026-10-13, LostMyLeg on Discord: the Dust of Restful Death's mummy "wont spawn in the dungeon choosen by
-// the quest ... the queststate itself is borked. We prob need to add an option that can fully reset a quest";
-// bible/06-Systems/Quest-Arc.md QUEST-RESET). RESTART (quest/machine.js restartQuest): the quest thrown away and started
+// QUEST-RESET. RESTART (quest/machine.js restartQuest): the quest thrown away and started
 // again from its own script - the new copy parsed while the old still holds its sites, so it chooses afresh away from
 // them; the old copy goes the way an error-terminated quest goes (its quest items leave the pack, its links go, no
 // journal entry, no reputation). Refused where a restart would do harm: a questor's quest, the world's own, a `run
@@ -112,7 +110,6 @@ test('QUEST-RESET refusals: gone, set aside, ending, the world\'s own, a questor
   q.shelvedAt = 5;
   assert.equal(m.restartRefusal(q.uid), 'shelved');
   q.shelvedAt = null;
-  // PIN MOVED (QUEST-AUDIT III, the questor rung): the rung reads a questor the click bound, its questorData the clicked NPC's
   const person = { isPerson: true, isQuestor: true, symbol: { name: 'qg' }, questorData: { hash: 0x51, nameSeed: 7, mapID: 5000, buildingKey: 3 } };   // QUEST-AUDIT III: a questor the click bound (questaudit3.test.js holds the named one)
   q.resources.set('qg', person);
   assert.equal(m.restartRefusal(q.uid), 'questor');

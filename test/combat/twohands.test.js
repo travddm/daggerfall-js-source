@@ -1,4 +1,4 @@
-// TWO-HANDS (2026-10-16, bible/05-Combat/Two-Hands.md): both fists up, a pair of weapons, the hands that run - the law
+// TWO-HANDS: both fists up, a pair of weapons, the hands that run - the law
 // (combat/twoHands/handsLaw.js), the swing it times and the blow it lands (combat/playerWeapon.js, characters/weaponStates.js),
 // and the sprite lane's two hands drawn through a real weapon rig (combat/twoHands/twoHands.js, combat/weapon/weaponRig.js) on a
 // synthetic WEAPON CIF. The Morrowind lane's pins are test/combat/twohands_mw.test.js.
@@ -201,7 +201,7 @@ test('TWO-HANDS law: the guard, the run - the guard\'s follower eased in fast an
   assert.deepEqual(guardOffset(1, 'right'), [-GUARD.IN, GUARD.DOWN], 'a right-side hand draws in to its left, and down');
   assert.deepEqual(guardOffset(1, 'left'), [GUARD.IN, GUARD.DOWN]);
   assert.deepEqual(guardOffset(0, 'right'), [-0, 0]);
-  // a pair's resting WEAPON lowers by a share of its own height (Mac: "the other weapon in hand should lower slightly")
+  // a pair's resting WEAPON lowers by a share of its own height
   assert.deepEqual(guardOffset(1, 'right', { height: 143 }), [0, GUARD.LOWER * 143], 'a dagger\'s picture, 143 design pixels tall - straight down');
   assert.deepEqual(guardOffset(0.5, 'left', { height: 86 }), [0, GUARD.LOWER * 86 * 0.5], 'a katana\'s, half way, never in: its cut side stays on the view\'s edge');
   assert.ok(GUARD.LOWER * 86 > GUARD.DOWN, 'a weapon dips past the fists\' nine pixels - the tuck did not read on a weapon');
@@ -219,7 +219,7 @@ test('TWO-HANDS law: the guard, the run - the guard\'s follower eased in fast an
   const top = pumpOf(Math.PI / 2, 'R'), back = pumpOf(Math.PI / 2, 'L');
   assert.deepEqual([top.s, back.s], [1, -1], 'out of step by half a stride');
   // THE RUNNING ARM IS THE ART'S OWN: the rise's lowest frame, its foot on the view's edge at the top of the stroke - never
-  // a lift; PIN MOVED (TWO-HANDS FIELD, Mac: "Too high, like uppercuts"): one frame, not the rise's 1-3 by how far up the
+  // a lift
   // stroke is (2 and 3 are the punch's own peak, half the view high - the real-art pin below), on an even sine
   assert.deepEqual([top.dx, top.dy, top.frame], [RUN_PUMP.IN, 0, RUN_PUMP.ARM_FRAME], 'the top: in toward the middle, the foot on the edge - no lift');
   assert.deepEqual([back.dx, back.dy, back.frame], [-RUN_PUMP.OUT, RUN_PUMP.DROP, RUN_PUMP.ARM_FRAME], 'the bottom: out, down past the view');
@@ -532,7 +532,7 @@ test('TWO-HANDS (AUDIT 2): THE OFF HAND\'S BLOW IS 0.8 OF A BLOW IN EVERYTHING I
   for (let i = 0; i < 600 && pw.machine.state !== 'Idle'; i++) pw.update(1 / 60);
   pw.applyWeapon(); pw.clickAttack(() => 0.5);
   assert.ok(pw.offStrike && pw.blowWeight === DUAL.OFF_DAMAGE, 'the off hand\'s, its share');
-  // every tally a host makes hands the swing's weight on; techniques are the lead's. PIN MOVED (AUDIT PISTOLET A2): the
+  // every tally a host makes hands the swing's weight on; techniques are the lead's.
   // ranged arm's tallies in world.js and exterior.js hand it on too (THE FOUR HOSTS RULE); a bow never strikes off (DFU's
   // line), so its weight there is always one
   for (const [file, rig, n] of [['worldModes', 'interiorWeapon.playerWeapon', 2], ['dungeonContext', 'playerWeapon', 2], ['world', 'weaponRig.playerWeapon', 4], ['exterior', 'weaponRig.playerWeapon', 3], ['cityGuards', 'playerWeapon', 1]]) {
@@ -649,7 +649,7 @@ async function rigWith({ right = null, left = null, widget = false, run = false,
  *  mirror. */
 const shownArm = (x) => { const p = MELEE_PAINTED_ARM[Number(x.rec)]; return x.mirrored ? otherHand(p) : p; };
 const STATE_REC = { Idle: '0', StrikeDown: '1', StrikeDownLeft: '2', StrikeLeft: '3', StrikeRight: '4', StrikeDownRight: '5', StrikeUp: '6' };
-/** The running arm's record (RUN_PUMP.ARM_STATE's) - PIN MOVED (TWO-HANDS FIELD): the pins named record 5, the uppercut. */
+/** The running arm's record (RUN_PUMP.ARM_STATE's) */
 const RUN_REC = STATE_REC[RUN_PUMP.ARM_STATE];
 const meleePainted = (state) => MELEE_PAINTED_ARM[Number(STATE_REC[state])];
 
@@ -708,7 +708,6 @@ test('TWO-HANDS rig, the guard: the hand that is not striking draws toward the m
   const back = await frame();
   for (const hand of ['R', 'L']) {
     const b = back.find((x) => shownArm(x) === hand).rect;
-    // PIN MOVED (TWO-HANDS AUDIT 2): the bounce only lowers a fist, by up to twice BOUNCE_PX (it swung about the rest)
     assert.ok(Math.abs(b.x - restOf[hand].x) < 1 && Math.abs(b.y - restOf[hand].y) <= 2 * GUARD.BOUNCE_PX + 0.5, `${hand} back to its rest: ${b.y} from ${restOf[hand].y}`);
   }
 });
@@ -756,7 +755,7 @@ test('TWO-HANDS rig, the pair: a katana and a dagger - both drawn, the katana le
   assert.equal(r.playerWeapon.leadHand, 'L');
   assert.equal(r.switchHand(), true);
   assert.deepEqual(said.slice(-1), ['Leading with the right hand.']);
-  // THE RESTING WEAPON LOWERS (Mac: "When attacking with a weapon, the other weapon in hand should lower slightly"): by
+  // THE RESTING WEAPON LOWERS: by
   // GUARD.LOWER of its own drawn height while the other strikes, eased - on the classic sprite and the Weapon Widget alike
   for (const widget of [false, true]) {
     const p2 = await rigWith({ right: KATANA, left: DAGGER, widget });
@@ -826,7 +825,7 @@ test('TWO-HANDS rig, the running hands: running with nothing in either hand - dr
 });
 
 test('TWO-HANDS rig, the running hands, AUDITED: THE ARM IS THE ART\'S OWN - its frame, the foot on the view\'s edge, never lifted, the rest down and out before the arm comes up (one art a hand a frame), the top of the stroke in toward the middle; the sheathed run up from below the view, ON THE HEAD BOB\'S CLOCK (its timer, every frame); a hand TAKEN mid-run (a weapon, the beast) yields the run at once to the picture that takes it, and with nothing in its place (a spell readied with no hands drawn, a swap\'s pause) eases it out - never a frame of fists over a picture, never an empty one; a lantern at the waist takes no hand; no bounce in a walk', async () => {
-  // THE RUNNING ARM IS THE ART'S OWN (Mac: "theres no arm portion of the sprite, so it looks like floating hands"): the
+  // THE RUNNING ARM IS THE ART'S OWN: the
   // run draws the art's own arm (RUN_PUMP.ARM_STATE's frame), its FOOT ON THE VIEW'S BOTTOM EDGE or below - never lifted;
   // the fists' rest goes down out of the view first and the arm comes up from under it, one art a hand a frame
   const up = await rigWith({ run: true });
@@ -907,7 +906,7 @@ test('TWO-HANDS rig, the running hands, AUDITED: THE ARM IS THE ART\'S OWN - its
     for (let i = 0; i < 30; i++) { const p0 = bobOff.r.twoHands.state.run.phase; await bobOff.frame({ move: 7 }); offSteps.push(bobStepOf(p0, bobOff.r.twoHands.state.run.phase)); }
     assert.ok(bobOff.r.twoHands.running && offSteps.every((d) => Math.abs(d - bobWalk) < 1e-9), `head bobbing off: the stride's own step a frame (${offSteps.slice(0, 3).map((d) => d.toFixed(4))}, a step ${bobWalk.toFixed(4)})`);
   } finally { setValue('Controls', 'HeadBobbing', true); }
-  // A HAND TAKEN MID-RUN (PIN MOVED, TWO-HANDS AUDIT 2 - the first audit ended the run at once, which emptied the view
+  // A HAND TAKEN MID-RUN (
   // in a frame where nothing took the hands' place): the run yields AT ONCE to a picture that takes the hands, and with
   // nothing in their place eases out under the view - never an empty frame
   const armsOf = (q) => q.filter((x) => x.rec === RUN_REC);   // the running arm: WEAPON10's jab across (RUN_PUMP.ARM_STATE)
@@ -1002,7 +1001,7 @@ test('TWO-HANDS rig, AUDITED: a fist and a shield is DFU\'s one hand (the shield
     if (s?.hand === 'R' && w.r.playerWeapon.machine.frame >= 2) tucked = qq.find((x) => x.rec === '0' && shownArm(x) === 'L')?.rect ?? null;
   }
   assert.ok(tucked && tucked.x > L.rect.x + GUARD.IN * 0.4, `the left clone tucks in toward the middle under the right's blow: ${JSON.stringify([tucked, L.rect])}`);
-  // THE SWAY, TWO RULES (PIN MOVED, TWO-HANDS AUDIT 2 - the first audit swayed both hands one way, Bob too, which sent
+  // THE SWAY, TWO RULES (
   // the left hand's cut outer side into the view on every step): BOB GOES OUTWARD, as the mod's own mirrored sprite
   // takes it - walking, the two hands swing apart and together, the left the right's exact mirror on every frame (so
   // its outer side does what the mod's own right hand's does, never more)...
@@ -1247,7 +1246,7 @@ test('TWO-HANDS rig (AUDIT 2): THE SPRITE LANE, AUDITED AGAIN - the guard never 
 
 test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own (after the climb\'s return, before the arm\'s seam, never behind the held map) and the one-hand ladder below it is untouched; the hosts carry none of it', () => {
   const rig = rd('src/combat/weapon/weaponRig.js');
-  const branch = rig.indexOf('if (c && !eotbHidesWeapon() && !fpArm.active() && !sheetWindowUp() && (runDrawn || (pairUp() && shown()))) {');   // PIN MOVED (AUDIT 2): the run as drawn this frame
+  const branch = rig.indexOf('if (c && !eotbHidesWeapon() && !fpArm.active() && !sheetWindowUp() && (runDrawn || (pairUp() && shown()))) {');
   assert.ok(branch > 0, 'the branch, under the lanes\' vetoes');
   assert.ok(branch > rig.indexOf('if (!armsClimb && (_climbLower >= CLIMB_LOWER_GONE'), 'below the climb\'s lowering');
   assert.ok(branch < rig.indexOf('_armDrewLast = !eotbHidesWeapon() && fpArm.active();'), 'above the arm\'s seam');
@@ -1268,7 +1267,7 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   const world = rd('src/scenes/world.js');
   assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 3, 'the duel, the battle and the wild zone');
   assert.match(world, /\.\.\.\(weaponRig\.playerWeapon\.offStrike \? \{ off: true \} : \{\}\) \}, duelStandIn\(playerEntity\)\);$/m, 'and the siege\'s works');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the stand-in struck by me
-  assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 3, 'each strike-out hands it to the roll');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS)
+  assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 3, 'each strike-out hands it to the roll');
   assert.match(rd('src/scenes/dungeonContext.js'), /opts\.wildStrike\(best, playerWeapon\.strikingWeapon, playerWeapon\.machine\?\.state, \{ off: playerWeapon\.offStrike \}\)/, 'the dungeon\'s own rig too');
   // AUDIT 2: AND THE RELAY BETWEEN THEM - the streamed world's dungeon (worldModes.js builds its context, the only live
   // builder) hands the dungeon's `{ off }` on to the host's door, which had dropped it: the arrows' own source, chained

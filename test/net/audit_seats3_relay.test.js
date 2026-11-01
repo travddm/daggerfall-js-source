@@ -1,4 +1,4 @@
-// AUDIT SEATS-3 (2026-10-02, Mac: "Audit everything") - THE RELAY'S LANE: a fighter is
+// AUDIT SEATS-3 - THE RELAY'S LANE: a fighter is
 // held to the field's ground - its steps, its blows and casts, and a blow on the relay's own fighters (B1); a fighter back
 // from a drop is put at its camp at the door, never only at its `in` (B2); a contender back is counted with the room's
 // contenders (B3); an `in` answered once each SIEGE_IN_MS a socket, the roll call one pass over the sockets (B4); a

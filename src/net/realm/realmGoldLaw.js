@@ -7,7 +7,7 @@
 // pays the same way (systems/court.js deductGold, and the region's bank
 // account for what that leaves), pinned equal by test/net/realm5.test.js.
 //
-// Mac: "eliminate duping". The plan is bible/06-Systems/Realm-Arc.md
+// . The plan is
 // section 3: "One D1 transaction debits the character and credits the
 // treasury. A withdrawal is the reverse." Before this, the client moved
 // its own purse and the service moved the treasury, in two writes: a tab
@@ -34,7 +34,7 @@ export const REALM_LETTER_TEMPLATE = 275;
 export const realmLetterOfCredit = (/** @type {number} */ value) => ({ group: 'MiscItems', templateIndex: REALM_LETTER_TEMPLATE, name: 'Letter of Credit', value, stackCount: 1 });
 
 const whole = (/** @type {unknown} */ v) => (Number.isSafeInteger(v) && /** @type {number} */ (v) > 0 ? /** @type {number} */ (v) : 0);
-/** EMPIRE-ACCOUNT (2026-10-01, Mac: "2" - online, every region one Empire-wide account): A REALM CHARACTER KEEPS ONE
+/** EMPIRE-ACCOUNT: A REALM CHARACTER KEEPS ONE
  *  BANK ACCOUNT, the Empire's, at Daggerfall's index (systems/banking.js EMPIRE_ACCOUNT_REGION, pinned equal - the
  *  Worker does not bundle banking.js). Whatever region a wallet names, its gold is that account's. */
 export const REALM_EMPIRE_ACCOUNT = 17;
@@ -166,7 +166,7 @@ export const REVENANT_VENDOR = 'Revenant';
  * storage, systems/naval/crewCompanions.js), saved with the party in the sea's record (navalHost.js getSaveData `party`,
  * each companion's `items`): a container like the hold beside it, which customs and the service's first save never
  * read - a million gold in his pack crossed whole while the same million in the hold was capped.
- * ITEM-WALK C (2026-10-07, Mac: "Do them now within this PR"): AND A SWORN REVENANT'S PACK - each sworn one's
+ * ITEM-WALK C: AND A SWORN REVENANT'S PACK - each sworn one's
  * `companion.items` in the feud's record (revenant.js getSaveData `list`), the storage the player fills as the crew's
  * (revenantCompanions.js packOf: "Its pack (the companion's storage), as the crew's is"). WK-P1 read the crew's packs
  * and not this one, so gold and letters in it crossed uncapped. Only a record the load keeps a pack for counts: sworn
@@ -222,7 +222,7 @@ const interiorSceneName = (/** @type {number} */ mapId, /** @type {number} */ bu
  *  half of each one's `paid`, on its removal or the sale; the owner's own things cost nothing). A room no deed of the
  *  character's stands for pays nothing: nobody can take a piece out. (T3 sorted them dearest first, the order it took
  *  them in; RESTORE takes none, so no order is asked.)
- *  RESTORE (Mac: "Keep all, can't sell"): A DEED THAT CAME THROUGH CUSTOMS IS NONE OF THEM - its slot `crossed`, or the
+ *  RESTORE: A DEED THAT CAME THROUGH CUSTOMS IS NONE OF THEM - its slot `crossed`, or the
  *  ship's `shipCrossed` (systems/realmCustoms.js crossDeeds): the realm's bank buys it back for nothing (banking.js
  *  sellHouse, sellShip), and the pieces bought for its room were set to pay nothing back as it crossed.
  *  @param {any} snap @returns {{ slot: any, room: any, value: number }[]} */
@@ -253,7 +253,7 @@ export function liquidWealthOf(/** @type {any} */ snap) {
 }
 
 /**
- * MARKET-AUDIT (2026-10-04): A REALM ACT'S RESERVE OVER A WALLET - `reserve` pays `n` at once (the wallet's `pay`: the
+ * MARKET-AUDIT: A REALM ACT'S RESERVE OVER A WALLET - `reserve` pays `n` at once (the wallet's `pay`: the
  * purse, its letters, then a bank account) and answers `back`, which gives back EXACTLY what that payment took - the undo
  * the wallet's `pay` answers (systems/court.js payUndoable) - and only for a wallet that answers none, its `credit` of the
  * whole. Once, whoever asks: a refusal (systems/realmSaves.js realmGoldAct runs the reserve's answer) or a `repeat` that

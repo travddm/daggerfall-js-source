@@ -1,4 +1,4 @@
-// WORLD6a (Mac, 2026-09-14: "Lets tackle #1 next" - towns, cells and
+// WORLD6a (- towns, cells and
 // buildings keep nothing) - SLICE 6a: THE BUILDING IS A WORLD ROOM. A
 // building interior has had a relay room of its own since ONLINE1 and
 // carried presence alone, because the wire's world-room law admitted

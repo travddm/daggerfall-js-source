@@ -1,9 +1,7 @@
 // @ts-check
-// WB2 (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area, a gate
-// of oblivion"): THE GATE'S SHAPE. Design: bible/11-Multiplayer/World-Bosses.md section 3.
+// WB2: THE GATE'S SHAPE. Design:
 //
-// GATE-FBX (2026-10-09, Mac: "replace the oblivion gate model with this handcrafted model which also needs
-// texturing"): MAC'S OWN GATE, baked out of his Blender scene (src/assets/gate/oblivionGate.json, tools/bakeGate.mjs) -
+// GATE-FBX: MAC'S OWN GATE, baked out of his Blender scene (src/assets/gate/oblivionGate.json, tools/bakeGate.mjs) -
 // two pillars of black volcanic stone on clawed feet, a lintel flaring over them, the opening's top corners cut in, three
 // spines down each pillar's outside. WB2's gate, two horns swept along a cubic over a stepped plinth in code, is gone
 // with it. The portal hangs between the pillars (the membrane is a pass of its own - render/gate/gatePass.js - never this

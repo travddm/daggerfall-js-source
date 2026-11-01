@@ -1,6 +1,4 @@
-// LOOT10 - THE CODEX, AND THE IMPRINT (2026-10-01; bible/06-Systems/Loot-Arc.md section 12, Mac: "Do you wanna turn
-// this into an arc and do all of the above?" - "Legendary codex: a collection log of every Legendary you've found ...
-// a reason to keep hunting"). The laws pinned here:
+// LOOT10 - THE CODEX, AND THE IMPRINT. The laws pinned here:
 //   - THE CODEX: every Legendary record and every Aetheric piece taken, with the day first found; the first find said
 //     and heard, once; a take seen at the take, everything else at the round's sweep; a save without the codex filled
 //     silently; the character's mod record, a forged one cleaned.

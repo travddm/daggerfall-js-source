@@ -1,11 +1,10 @@
-// PEER-RANGE (2026-10-10, the owner: "So for online performance, I believe the rendering of players far out is
-// contributing to poor performance"): THE OTHERS, DRAWN AS FAR AS THEY CAN BE SEEN. A world cell hands the screen every
+// PEER-RANGE: THE OTHERS, DRAWN AS FAR AS THEY CAN BE SEEN. A world cell hands the screen every
 // player within the relay's three map pixels (up to 3.3 km along an axis), and every one was drawn. Past the distance on
 // the Other players card a player now stands nowhere on this screen - GATE-CROWD's cut, by distance (net/peer/peerRange.js;
 // the online frame's drawn list): the party and the one I duel always, nobody cut under the travel view, a drawn player
 // held a little past the edge. AUDIT PEER-RANGE + HALO-THIN: me off the origin on both axes, the held set forgotten on
 // every way the cut stands down, the room's whole list for a resurrection and a cut peer's sprite. Design:
-// bible/07-Rendering/Performance-Priority.md PEER-RANGE.
+// PEER-RANGE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

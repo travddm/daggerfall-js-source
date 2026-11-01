@@ -134,7 +134,7 @@ export { clampArmorVariant };
 /** GetItemImage(forPaperDoll) resolution: {archive, record, dye,
  *  target} or null for groups with no paperdoll layer. */
 export function paperdollItemImage(worn, { gender = 'male', race = 'Breton' } = {}) {
-  const item = drawnPiece(worn);   // APPEARANCES (bible/04-Characters/Wardrobe.md): a piece wearing a look is drawn as the look - the player's doll and every peer's
+  const item = drawnPiece(worn);   // APPEARANCES: a piece wearing a look is drawn as the look - the player's doll and every peer's
   const morph = raceByKey(race)?.morphologyIndex ?? HUMAN_MORPHOLOGY;
   const t = getTemplate(item.templateIndex);
   if (!t) return null;
@@ -232,8 +232,7 @@ let _ident = null;
 export const paperDollIdentityKey = ({ race = 'Breton', gender = 'male', faceIndex = 0, context = 'town', where = null } = {}) =>
   `${race}|${gender}|${faceIndex}|${context}|${where?.region ?? -1}`;
 
-/** THE ART FOLLOWS THE ENTITY (Mac, 2026-09-16: "Characters face and
- *  gender completely changed after a few hours of playtime").
+/** THE ART FOLLOWS THE ENTITY.
  *
  *  DFU has no art set to keep in step: DaggerfallPaperDoll.Refresh
  *  hands the LIVE PlayerEntity to PaperDollRenderer.Refresh, and
@@ -778,7 +777,7 @@ export function slotAtPaperDoll(px, py) {
 export const paperDollPixels = () => _pixels;
 
 
-/** APPEARANCES-II (bible/04-Characters/Wardrobe.md section 4): THE PLAYER'S DOLL ON A STAND-IN - the Wardrobe's preview
+/** APPEARANCES-II: THE PLAYER'S DOLL ON A STAND-IN - the Wardrobe's preview
  *  of a look not yet worn (systems/appearances.js previewWearer). The inventory's own art set and deps, composed PURE of
  *  the singleton: its composite, click mask and identity are untouched. `{ width, height, rgba }`, or null before a host
  *  has loaded the art; a stand-in of another identity takes the peers' door. */

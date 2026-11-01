@@ -1,4 +1,4 @@
-// TITLE-DOOR (2026-10-27): a page small enough to hold the film (src/ui/intro/introScreen.js runIntro) and drive it the
+// TITLE-DOOR: a page small enough to hold the film (src/ui/intro/introScreen.js runIntro) and drive it the
 // way a browser does - its nodes, clicks that bubble, a window whose frames and timers the test turns by hand, and no
 // WebGL (the film's own ground stands, as on a machine without it). Nothing global: every page is the test's own.
 class El {

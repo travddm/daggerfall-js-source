@@ -55,12 +55,12 @@ export const OCCLUDED_VOLUME_SCALE = 0.25;
 export const MOVE_SOUND_THRESHOLD = 0.8;
 /** :108 - "Play attack sound only about half the time". */
 export const ATTACK_SOUND_THRESHOLD = 0.5;
-/** QUIET-COMPANIONS (FIELD BUGS 2026-10-04b, Mac: "Reduce companion noises, they are way too persistant"): a
+/** QUIET-COMPANIONS (FIELD BUGS 2026-10-04b): a
  *  companion's attract wait, as a multiple of the one it rolled - 18 to 54 s where DFU's foe waits 3 to 9. DFU's
  *  cadence is a foe announcing itself while it is near you, and a companion is near you always: a sworn revenant
  *  barked every six seconds on average for as long as it walked with the player. Its attack sound is DFU's. */
 export const COMPANION_ATTRACT_SCALE = 6;
-/** MONSTER-QUIET (2026-10-20, Dudey: "decrease the monster scream frequenzy by 60% please"): a MONSTER's attract clock
+/** MONSTER-QUIET: a MONSTER's attract clock
  *  runs at 1 / FOE_ATTRACT_SCALE of the game's at the host's one seam (scenes/hostCombat.js tickEnemySound) - 7.5 to
  *  22.5 s between calls where DFU's waits 3 to 9, so it calls 40% as often. This source stays DFU's, clock and all; a
  *  class foe (the city watch's Halt) and a companion (COMPANION_ATTRACT_SCALE, already quieter) keep their cadence. */
@@ -166,7 +166,7 @@ export class EnemySoundSource {
 export const HALT_GAP_S = 15;
 
 /**
- * HALT-ONE (2026-10-05, Mac: "reduce the HALT noise"; asked, "Once, then rarely"): THE WATCH CALLS AS ONE - the living
+ * HALT-ONE: THE WATCH CALLS AS ONE - the living
  * watch's lane (scenes/cityGuards.js `oneVoice`), a recorded departure from FixedUpdate above. DFU gives every
  * watchman his own attract clock: each within 16 m of the player says "Halt!" every 3 to 9 seconds, eight times a
  * minute, whatever he is doing - five of them forty times a minute, a squad arriving together in chorus. Here the

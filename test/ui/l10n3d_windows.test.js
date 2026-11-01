@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE WINDOWS' OWN WORDS, IN THE PLAYER'S LANGUAGE. Every Internal_Strings word DFU's windows
+// L10N3d: THE WINDOWS' OWN WORDS, IN THE PLAYER'S LANGUAGE. Every Internal_Strings word DFU's windows
 // ask TextManager for - the pack, the save and pause doors, the spellbook, the spell and item makers, the icon picker,
 // the journal, the rest windows, the character creator and sheet, the potion maker, the travel map, the prison screen
 // and the guild bookshelf - is read through the text core where the port shows it. Pinned, through each window's own

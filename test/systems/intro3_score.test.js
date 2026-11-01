@@ -1,8 +1,7 @@
-// INTRO3 (2026-10-14, Mac: "With the main menu music, is there anyway to recreate it using the sound system daggerfall's
-// music uses", then "you do it and it's for both"): THE MAIN THEME, WRITTEN AS NOTES (systems/introScore.js) and played
+// INTRO3: THE MAIN THEME, WRITTEN AS NOTES (systems/introScore.js) and played
 // by the game's own song player for the film and the menu (systems/introTheme.js). What the ear needs - the render's
-// loudness, its peaks, the landmarks heard where the cue sheet puts them - is tools/introScoreProbe.mjs's, in a real
-// browser; this file holds what node can: the song's shape as the producer mints it, the film's two landmarks on its
+// loudness, its peaks, the landmarks heard where the cue sheet puts them - needs a real browser; this file holds what
+// node can: the song's shape as the producer mints it, the film's two landmarks on its
 // bar lines, and the transcription as it was read off the recording. Mutants: tools/mutants/intro3.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -216,7 +215,7 @@ test('INTRO3c: no whine - the bed is BOWED: every string section, the pad and th
   for (const m of [-3, -1, 0, 1, 4, 5]) assert.equal(halo(m).length, 0, `bar ${m} is bare of the halo`);
   assert.deepEqual(halo(CLOUD_BAR).map((e) => e.note).sort((a, b) => a - b), CHORDS.C.choir.map((n) => midiNote(n) + 12).sort((a, b) => a - b), 'over the cloud break still');
   assert.ok(halo(14).length > 0 && halo(14).every((e) => e.velocity === 72), 'the halo at 72 where the band opens out, under the choir');
-  // the hum (the owner: "too constant ... too overpowering"): the bed breathes - a bow's arc on every held voice, a sway
+  // the hum: the bed breathes - a bow's arc on every held voice, a sway
   // on the pad, the strings and the choir - and the low end's weight is in the drums, not the drone
   for (const voice of ['strings', 'violins', 'choir', 'pad', 'halo', 'contrabass']) assert.ok(INTRO_VOICES[voice].arc >= 0.4, `${voice} has the bow's arc`);
   assert.ok(INTRO_VOICES.contrabass.arc >= 0.8 && INTRO_VOICES.pad.arc >= 0.6, 'the pedal and the pad arc deepest');

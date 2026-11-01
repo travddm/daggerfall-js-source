@@ -1,5 +1,5 @@
-// THE HORSE'S SOUNDS, SYNTHESISED AND BAKED (HORSE-VOICE, 2026-10-24, the owner: "more varied horse sounds" -
-// bible/08-Audio/Audio.md HORSE-VOICE, bible/06-Systems/Horse-Care.md).
+// THE HORSE'S SOUNDS, SYNTHESISED AND BAKED (HORSE-VOICE, 2026-10-24, -
+// HORSE-VOICE).
 //
 // OURS, the climb's and the gathering's way (tools/climbSfx.mjs, tools/gatherSfx.mjs): built here from noise and sine
 // with the shared kit (tools/sfxSynth.mjs) and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own

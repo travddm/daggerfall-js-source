@@ -1,4 +1,4 @@
-// PVPDUNGEONS (2026-10-08, the owner: "THOSE HAVE TO WORK!"): the zone's halls as the relay keeps them - the day by the
+// PVPDUNGEONS: the zone's halls as the relay keeps them - the day by the
 // relay's clock, an account's hour lock (lifted while its own remains lie in the hall), the empty hall's reset (its world
 // room wiped), the crows told to everyone online, and no party member taking a fallen friend's remains.
 import { test } from 'node:test';
@@ -14,7 +14,6 @@ import { fakeRooms } from '../fakeRoom.mjs';
 
 test('PVPDUNGEONS wire: a hall is a pixel, its room a world room of its own lane; the words in and out are bounded', () => {
   assert.equal(wdunHall('512,88'), '512,88');
-  // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): a hall is a WORLD map pixel's - Cyrodiil's past the Bay; past the
   // world's grid none
   assert.equal(wdunHall('1000,1'), '1000,1');
   assert.equal(wdunHall('2400,900'), '2400,900');

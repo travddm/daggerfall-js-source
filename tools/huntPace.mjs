@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// AUDIT HORIZONTAL F3 (HUNTERS-MARK, bible/06-Systems/Bounty-Boards.md 12.1): THE CLEARS AN HONEST HUNTER CAN MAKE IN A UTC
+// AUDIT HORIZONTAL F3 (HUNTERS-MARK, 12.1): THE CLEARS AN HONEST HUNTER CAN MAKE IN A UTC
 // DAY, MEASURED. The ceiling read "four held a game day", but four held is not four cleared: a hunter clears, rides to the
 // next city's board and takes four more. This walks the game's own map - the 410 cities whose blocks place a bounty board,
 // each day's four notices where the board posts them - at the fastest legal gallop with no time spent fighting, the next

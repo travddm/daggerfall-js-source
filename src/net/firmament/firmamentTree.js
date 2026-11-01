@@ -1,10 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; the lead dev, on Discord: "with the POE tree stuff, i would recommend almost 1to1 copy pasting its
-// structure and then attach everything you can do in daggerfall online to it, Magic, Phys based attacks and skills,
-// trading, gathering, hunting, ship controls/ocean stuff in general ... So ppl can be a awesome trader, or a better
-// gatherer crafter etc ... guilds will also benefit from it ... make sure the tree looks awesome and investing points in
-// there feels rewarding. Must suit DFO Grimoire and Enhanced plus ui"). bible/06-Systems/Firmament.md is the record.
+// FIRM1. is the record.
 //
 // THE FIRMAMENT - THE TREE ITSELF: every star (node), where it stands and what it is joined to. Path of Exile's shape,
 // one for one, laid on Tamriel's sky:
@@ -28,7 +24,7 @@
 // firmament row). A key never changes once shipped and is never reused for another star; a star removed from this table
 // is simply refunded (firmamentLaw.js cleanKeys drops a key no table holds). New stars take new keys.
 //
-// BAL10 (2026-10-17, bible/05-Combat/Balance-Arc.md section 16; the owner chose "Firmament weapon keystones"): EVERY WEAPON
+// BAL10: EVERY WEAPON
 // FAMILY TWO NOTABLES OF ITS OWN, each raising its skill - Blade Dancer and Iron Knuckles took the Long Blade's and the
 // fist's second; Headsman and Bonebreaker the Axe's and the Blunt Weapon's (the thinnest two, one skill notable each, in the
 // one sign); and Carnage (the Warrior's) and the Ritual's Templar's Mace (Battlemage's Focus until then)

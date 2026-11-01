@@ -1,8 +1,5 @@
 // @ts-check
-// ORE-MAP (2026-10-11, from play - "Arbitrary mining conditions to 'unlock' higher nodes. Why is this a thing? Also how
-// are we supposed to tell if higher tier veins have been unlocked in an area?", then "If at all possible can you please
-// add something to the overworld map like 'this area is known for X ore' so its easier to know which locations have
-// which ore"): THE HELD MAP'S CARD FOR A PIXEL'S ORE - what its ground's veins can be (its climate's table,
+// ORE-MAP: THE HELD MAP'S CARD FOR A PIXEL'S ORE - what its ground's veins can be (its climate's table,
 // net/nodeLaw.js VEIN_TABLES), what its dungeons' deep veins can be (dungeonVeinTable), the ore its kingdom holds as its
 // own (regionSignature), and whether the witnesses have vouched for this ground: on ground fewer than WITNESS.confirm
 // accounts have worked, a vein is held to UNCONFIRMED_VEIN_TIER and no signature stands (UNWITNESSED-ORE), and nothing
@@ -10,7 +7,7 @@
 // so the card cannot promise an ore the ground would not give. The host hands it the pixel's witnessed state as the
 // account answers it (net/profBook.js pixel) - null where it has not been asked today.
 //
-// DEEP-OPEN (bible/06-Systems/Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): a dungeon's deep veins draw
+// DEEP-OPEN (): a dungeon's deep veins draw
 // their whole table on anyone's word now (nodeLaw.js dungeonVein - DUNGEON_VEINS), so the Dungeons line names that table,
 // and the one deep ore that still waits on a dungeon's own witnesses - its climate's (deepClimateOres: a woodland
 // dungeon's Moonstone) - is said on the state line, which had read the surface table alone: a HauntedWoodlands card
@@ -63,7 +60,7 @@ export function oreMapTip({ climate, region = null, fact = null, surveyed = fals
   const words = (keys) => keys.map(oreWord).join(', ');
   // DEEP-OPEN: the deep veins' table every dungeon draws on anyone's word - its climate's own ore apart (below)
   const lines = [t('ore.tip.veins', 'Veins: {ores}', { ores: words(own) }), t('ore.tip.dungeons', 'Dungeons: {ores}', { ores: words(DUNGEON_VEINS) })];
-  // WW-C1 (bible/03-World/World-Wide.md WW-C): a province's richness on witnessed ground beside its own ore - Cyrodiil's
+  // WW-C1 (WW-C): a province's richness on witnessed ground beside its own ore - Cyrodiil's
   // every province's ores and metals (nodeLaw.js veinTable: their tables merged), said in a line the card holds whole
   const rich = at !== null ? richness(at, 'vein') : 1;
   const times = rich > 1 ? ` (${rich}x the veins)` : '';

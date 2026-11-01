@@ -1,4 +1,4 @@
-// AUDIT BRANCH-0925 PS-A4 (2026-09-25): THE FPS COUNTER'S BOX, MEASURED.
+// AUDIT BRANCH-0925 PS-A4: THE FPS COUNTER'S BOX, MEASURED.
 //
 // PERF-SCALE gave the counter two more lines - the GPU the browser names and the
 // frame's size - so one screenshot answers a slow-exterior report. The box was

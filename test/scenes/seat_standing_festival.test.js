@@ -1,5 +1,5 @@
-// STANDING-TREND and FESTIVAL-STAGE (2026-10-02, Mac: "lets finish the build work"): two of the Seats arc's NOT YETs
-// (bible/11-Multiplayer/Seats-Arc.md 7.9, 7.6).
+// STANDING-TREND and FESTIVAL-STAGE: two of the Seats arc's NOT YETs
+// (7.9, 7.6).
 //
 // STANDING-TREND: the Seat tab's holder line says which way its Standing moved - "Standing 55, up 7 since the last
 // Turning." (net/townSeatLaw.js seatHolderLine). Each Turning writes every held seat's Standing as it found it and as it
@@ -233,7 +233,6 @@ test('AUDIT FESTIVAL S1 the book\'s frame tick reads the list again ONCE when th
   let now = turning - 60_000;
   let edicts = ['festival', 'curfew'];   // week W's, then W+1's
   const door = turningDoor(() => (now < turning ? edicts[0] : edicts[1]));
-  // PIN MOVED (D1-LOAD): each client reads at its own share of SEAT_TURN_READ_SPREAD_MS past the Turning - this one's
   // half of it (rand 0.5), never every client in one second
   const book = createTownSeatBook({ door, nowMs: () => now, rand: () => 0.5 });
   const READ = turning + SEAT_TURN_READ_SPREAD_MS / 2 + 1000;

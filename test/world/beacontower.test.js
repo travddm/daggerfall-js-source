@@ -1,9 +1,9 @@
-// BEACON-TOWER (2026-10-11, Mac: "The lighthouse model is insanely good but way too modern for daggerfall's lore") - THE
+// BEACON-TOWER - THE
 // ILIAC BAY'S LIGHT IS A BEACON: world/lighthouseModel.js's tower of bare stone, its corbel table and battlemented
 // parapet, its open arched lantern under a slate cone, the brazier's coals and the flames over them; world/portArt.js's
 // flame (a cutout) and embers (their own light); scenes/portHost.js's draw, collider, upload and words. Each pinned on the
 // producer's own output - the built model, the host's own frames, the real collider's rays (TEST THE SHAPE THE PRODUCER
-// MINTS). bible/03-World/Shipyards.md, BEACON-TOWER.
+// MINTS)., BEACON-TOWER.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

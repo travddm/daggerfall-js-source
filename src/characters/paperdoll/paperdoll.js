@@ -41,8 +41,7 @@ export { ITEM_TEMPLATES };
 
 /** Template by classic index (templates are index-keyed but sparse-safe).
  *
- *  FIELD-GUN5 (Mac, from play: "The paperdoll doesn't equip the
- *  texture"). A map built ONCE from the frozen DFU JSON is blind to
+ *  FIELD-GUN5. A map built ONCE from the frozen DFU JSON is blind to
  *  `registerCustomTemplates` - and the doll's compose filters `worn`
  *  on `getTemplate` answering, so the port's own weapon was dropped
  *  from the draw list before anything could fail further down. A

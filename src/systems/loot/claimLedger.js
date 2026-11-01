@@ -1,5 +1,5 @@
 // @ts-check
-// OUTDOOR-LOOT (2026-10-17, test-harness/outdoor-loot/DESIGN.md 6.3, DESIGN-REVIEW D-1/D-1a/R-2): THE CLAIMER'S LEDGER - the
+// OUTDOOR-LOOT: THE CLAIMER'S LEDGER - the
 // half of PARTY-LOOT's claim law that a take of a shared piece leaves in the TAKER'S hands, free of any transport, so a
 // peer's foe's body (net/bodyLoot.js, scenes/bodyLootHost.js) and a building's cupboard use one.
 //

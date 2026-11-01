@@ -1,6 +1,4 @@
-// AUDIT RELEASE R4 (2026-10-26, the owner: "ensure everything is perfect and that everything is covered for a smooth
-// release that expands our world seamlessly", and before it "ensuring this new integration doesnt implode the server or
-// insanely skyrocket our server cost"; bible/01-Overview/audits/Audit-Release-R4.md) - THE RELAY'S BILL, HELD BY COUNT.
+// AUDIT RELEASE R4 - THE RELAY'S BILL, HELD BY COUNT.
 // What a Durable Object is billed for is its time awake and its storage's rows, so the two budgets the release leans on
 // are pinned as counts, never as a clock:
 //   R4-1 the relay arms a timer at exactly the sites it armed before the land past the Bay opened - a timer pending is
@@ -36,7 +34,6 @@ const TIMERS = Object.freeze([
   ['server/src/index.js', 'this._downFlush(); }, HUB_BATCH_MS'],
   ['server/src/index.js', 'this._pollAnswer(hub, p), HUB_POLL_MS'],
   ['server/src/index.js', 'void this._feedFlush(); }, FEED_WAIT_MS'],
-  // PIN MOVED (AUDIT RELEASE R3, the merge of main into TESA): the staff panel's two windows armed no timer on main's
   // HIBERNATE (they post on their next frame, and COST-1's drain posts what is left - server/src/drainWindows.js), so
   // their rows are gone; COST-1's and COST-2's files are counted beside the rest
 ]);

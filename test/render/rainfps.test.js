@@ -1,5 +1,4 @@
-// RAIN-FPS (2026-09-25, Mac: "some ... are reporting fps drops. I myself have flawless performance. One user said
-// they turned off the rain and it fixed it") - THE SWEEP TAKES AS MANY FRAMES AS THE SKY COSTS, PINNED. On a
+// RAIN-FPS - THE SWEEP TAKES AS MANY FRAMES AS THE SKY COSTS, PINNED. On a
 // software GPU the whole of rain's drop was the volumetric clouds' march (clouds off, rain costs a clear day), a
 // covered sky's texel about twice a fair one's and each weather cell about a sixth more; the map was re-marched
 // every eight frames whatever it held. Now a sweep takes the sky's cost in frames - 8 fair, 16 covered, 32

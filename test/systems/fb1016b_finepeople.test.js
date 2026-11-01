@@ -1,4 +1,4 @@
-// FINE-PEOPLE (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "Possible bug: Repeated
+// FINE-PEOPLE (FIELD BUGS 2026-10-16b,; the Discord's "Possible bug: Repeated
 // ..." thread again, after FINE-MENDS: "I paid 2 x 600 gold today, and even though it said +5 reputation, my reputation
 // didn't go up at all ... why I still have a penalty"; another: "It didn't work for me either"). A charge costs two names
 // (court.js lowerRepForCrime, PlayerEntity.cs:2294-2298): the law's, and half of it off the region's People - spread up to
@@ -51,7 +51,6 @@ function watchRig(p) {
   return { t, shown, said, look: () => { t.ms += STANDING_LOOK_MS; return watch.frame(); } };
 }
 
-// PIN MOVED (FINE-PEOPLE AUDIT S5, 2026-10-16): each answer's half was `trunc(points / 2)` alone - +2 a fine of five, so
 // the steps never summed to the charge's half and every road left the People short (the four cases below). The step is the
 // People's half of what the law was owed before the answer less its half of what it is owed after: from -28, a fine to
 // -23 gives 14 - 11 = 3, the next to -18 gives 11 - 9 = 2.

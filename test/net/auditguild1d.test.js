@@ -1,4 +1,4 @@
-// AUDIT GUILD1d (2026-09-30, Mac: "let's do an audit on this"): three lanes read GUILD1d adversarially - the service's
+// AUDIT GUILD1d: three lanes read GUILD1d adversarially - the service's
 // money, state and races; who can reach a hall and what a visit does; the client's book, the Guild tab, the drawing and
 // the banner pass. Every finding was checked against the code before it was fixed, and each fix is pinned here (the
 // service's through the real Worker over node:sqlite, a race by landing the other request between a read and its
@@ -237,7 +237,6 @@ test('AUDIT GUILD1d S8 + R5: the restore reads a hall as its guild\'s, never a h
 });
 
 test('AUDIT GUILD1d A1-A9: members rest (the online bed its own permanence), use the forge, workbench and loom, see their chest and cast in their hall; a visitor\'s drop and spell in a hall\'s own words; the plaque-less offer carries the hall; one buy out a house; the doors read again when the guild is known; the decorator neither pays a hall\'s half to the purse nor says it does (mutants: each by source; the offer\'s label; the bump)', () => {
-  // PIN MOVED (the merge of main's RENT-REST, FIELD BUGS 2026-10-01): A1's online bed is RENT-REST's one rule now - the
   // home's bed (homeRent.js homeBedIsMine) rides the rest's bag as `homeBed`, its own permanence and its own ownership
   // (restSession.js interiorRestPlace) - and a hall's member is one of its sleepers
   assert.deepEqual([homeBedIsMine({ hall: { name: 'H' }, member: true }, 0), homeBedIsMine({ hall: { name: 'H' }, member: false }, 0), homeBedIsMine({ own: false }, 0)], [true, false, false], 'A1');
@@ -332,7 +331,7 @@ function rig(first) {
 }
 
 test('AUDIT GUILD1d R10-R14: a heraldry draft is one guild\'s; a pick changes the picture and the button in place, never the page (GUILD2c: a swatch, a select before it); with Drakes shut the reason says so; the sale says the service\'s own sum; an older answer never clears a newer choice\'s id (mutants: the draft\'s key; the repaint on change; the Drakes reason; the sale\'s words; the rid compared)', async () => {
-  // GUILD2c (PIN MOVED): the arms are their own page, and the choices swatches and tiles, not selects. A pick draws the
+  // GUILD2c (
   // arms' box again in place - the page around it (its strip, its header) never repainted - and the keyboard's focus
   // lands on the picked swatch's new self, so a player walking the swatches with Tab and Enter keeps their place.
   const r = rig(guildView({ marks: 900 }));

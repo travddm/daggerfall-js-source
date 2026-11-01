@@ -1,5 +1,4 @@
-// CHAT-FIND-ALL (2026-10-14, Dudey: "searching players in chat looks like it only finds the ones that are shown in the
-// list"): rosterRows answers every known row, sorted and uncut, beside the column's first ROSTER_ROWS_MAX - and the
+// CHAT-FIND-ALL: rosterRows answers every known row, sorted and uncut, beside the column's first ROSTER_ROWS_MAX - and the
 // panel's search filters that.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

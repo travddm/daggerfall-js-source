@@ -5,7 +5,7 @@
 // through the prefs shelf, and it imports the shelf and NOTHING ELSE so
 // the combat leaves can ask without a cycle.
 //
-// Blood is the port's own (bible/05-Combat/Blood-Arc.md) - no mod is
+// Blood is the port's own - no mod is
 // vendored for it - so the row is an ENHANCED one rather than a mod
 // row, and the key is the port's.
 //

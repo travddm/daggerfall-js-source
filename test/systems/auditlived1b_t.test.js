@@ -1,4 +1,4 @@
-// AUDIT LIVED1b, lane T (bible/01-Overview/audits/Audit-Lived1b.md, T1-T11) - the pins for the laws LIVED1 (1e12a3e6) and
+// AUDIT LIVED1b, lane T (, T1-T11) - the pins for the laws LIVED1 (1e12a3e6) and
 // AUDIT LIVED1 (322b1735) wrote and nothing held: lane T wrote 237 new mutants over every line the two commits changed
 // in src/, ran each against every test that imports, reads or (by coverage) executes the mutated text, and 53 survived.
 // Each test below fails on the survivors its title names (tools/mutants/auditlived1b.json, the T records). Driven

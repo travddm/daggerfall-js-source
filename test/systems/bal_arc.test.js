@@ -1,6 +1,4 @@
-// BAL1-BAL4 - THE BALANCE ARC (2026-10-10; bible/05-Combat/Balance-Arc.md; Mac, 2026-10-09: "I also want to talk about
-// general balance to bring up the difficulty without implementing a band aid fix", then, 2026-10-10: "Do everything and
-// be extremely detailed").
+// BAL1-BAL4 - THE BALANCE ARC.
 //
 // BAL1: the overhaul's sharp edge (a blade over 75% condition at x1.3 / x1.1, a piece of armour at 0.85 / 0.95) rides the
 // mod's own wear module - the port ships it off, so the edge was every fight's; the worn bands stand whatever the wear.
@@ -262,7 +260,7 @@ const wildsPool = (inLocation = () => false) => createExteriorFoes({
   fetchBytes: async (n) => { if (n === 'MONSTER.BSA') return BSA; throw new Error(`no ${n} in this pin`); },
   getTexture: async () => stubTex, uploadRecordFrame: () => {},
   currentMinute: () => 0, currentPixelKey: () => '3,12',
-  playerEntity: { level: 10, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: stats() },   // PIN MOVED (BAL11): level 10, where the hero's threat pays nothing - the place alone (test/systems/bal11_hero.test.js runs this pool past it)
+  playerEntity: { level: 10, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: stats() },
   audio: null, onPlayerHurt: () => {}, rolls: () => 0.01, rand: () => 0.01,
   inLocation,
 });
@@ -351,7 +349,7 @@ test('BAL4 a real cost for dying offline: a death Project Legacy will raise stat
   assert.deepEqual(deathKeys('ENTER end   F11 load', true, true).map((k) => k.word), ['Rise now']);
 });
 
-// ── AUDIT BAL (2026-10-10, Mac: "We need to audit this and ensure perfection"; Balance-Arc.md section 10) ──────────────
+// ── AUDIT BAL ──────────────
 // the dungeon context's own functions, mounted over a scope of their free names (test/systems/quest/fb1004d_cratefree.test.js's harness)
 function sliced(path) {
   const S = rd(path);

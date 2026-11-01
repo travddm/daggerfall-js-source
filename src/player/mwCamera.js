@@ -77,9 +77,7 @@ export const CAMERA_OBSTACLE_LIMIT = 5;
 export const FOCAL_OBSTACLE_LIMIT = 10;
 
 /**
- * MW-SHOULDER (FIELD BUGS 2026-10-26c; feature-feedback via Mac: "add an option to move camera a bit to the side ... for
- * morrowind 3rd person models ... because crosshair is located on top of character's head and it is inconvenient to
- * target something with ranged attacks"): THE REFERENCE'S VIEW OVER THE SHOULDER, the player's option
+ * MW-SHOULDER (FIELD BUGS 2026-10-26c; feature-feedback via): THE REFERENCE'S VIEW OVER THE SHOULDER, the player's option
  * (systems/features.js 'mw-shoulder-camera'). The focal point - the head the camera turns about - stands off the
  * actor's line: settings.lua:45-46's [x, y] behind the chosen shoulder (third_person.lua:39-40 - the left the right's
  * mirror), and while a weapon or a spell is out, or the actor swims, centred and raised (third_person.lua:27, :89-92).
@@ -201,7 +199,7 @@ export function createMwCamera() {
       const obstacleDelta = preferredDistance() - cameraDistance;
       // #3: past the reference's far end, at a helm, a notch is a ratio - out from the far end, or in down to it (and
       // the reference's own ladder below it); out while pinned by more than one such notch is its no-op (camera.lua:153)
-      // HELM-ZOOM (Mac: "increase the sensitivity ... when on the wheel"): at a helm the WHOLE range is by the ratio, the
+      // HELM-ZOOM: at a helm the WHOLE range is by the ratio, the
       // reference's nearest ring to the hull's reach - its ten-unit ladder took sixty notches from its base to its far end
       if (seaFar > MAX_DISTANCE && !(delta > 0 && baseDistance === MIN_DISTANCE)) {
         // AUDIT HELM-ZOOM E1: in from where the camera STANDS when pinned (the reference's own debt, camera.lua:151) - in
@@ -332,8 +330,7 @@ export function createMwCamera() {
      * vanilla's centered-behind camera (no shoulder offset by default,
      * settings.lua:44).
      *
-     * MAC-A (2026-09-17, Mac: "Going in some interiors with roof
-     * pillars interacts negatively with the 3rd person camera").
+     * MAC-A.
      *
      * BOTH GUARDS ARE SPHERE CASTS, because both of the reference's
      * are: `rayCasting->castSphere(...)` at camera.cpp:186 and :200,
@@ -371,7 +368,7 @@ export function createMwCamera() {
         return { eye: fpEye, thirdPerson: false, distance: 0, focal: null };
       }
       const u = 1 / MW_UNITS_PER_METER;
-      // BENCH-CAM (2026-10-10): on a wagon's bench the focal stands at least at the host's `pivotFloor` (over the wagon's
+      // BENCH-CAM: on a wagon's bench the focal stands at least at the host's `pivotFloor` (over the wagon's
       // roof) - over the caravan's room by 12 cm it stood, and any look up cast the camera into it and back to the
       // focal; under the open wagon's tilt it stood inside the canvas. A departure from camera.cpp, Ledger A.
       const focal = [feet[0], Math.max(feet[1] + FOCAL_HEIGHT * heightScale * u, pivotFloor ?? -Infinity), feet[2]];

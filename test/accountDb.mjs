@@ -107,7 +107,7 @@ export async function standService(extra = {}) {
   const gatePub = Buffer.from(new Uint8Array(await subtle.exportKey('raw', gk.publicKey))).toString('base64url');
   const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', GATE_PUBLIC_KEY: gatePub, ...extra };   // MERGE 2: SAVES, the realm's records (R2)
   const call = async (path, body, bearer = null) => {
-    // INT19 (bible/06-Systems/Integrity-Arc.md section 7): A CRAFTED ACT NAMES WHERE ITS RECORD STANDS - a listing's, an
+    // INT19: A CRAFTED ACT NAMES WHERE ITS RECORD STANDS - a listing's, an
     // auction's or a commission fill's piece leaves the realm record (server-account/src/craftedPiece.js), and the client's
     // realm act names the record as it asks (net/marketBook.js realmPieceAct). A pin's act for a realm character that names
     // none is named it here, off the row as it stands; `realm: null` asks with none (the route's own refusal).
@@ -134,7 +134,7 @@ export async function standService(extra = {}) {
     }
     return { secret: g.secret, id: g.id, character, handle };
   };
-  /** INT16 (bible/06-Systems/Integrity-Arc.md section 7): A REGISTERED ACCOUNT PLAYING A REALM CHARACTER - the seat every
+  /** INT16: A REGISTERED ACCOUNT PLAYING A REALM CHARACTER - the seat every
    *  progression claim is asked of (server-account/src/progress.js progressRefusal: Renown, a raid's cleanse, a camp, the
    *  Watch, a silver find, a profession's XP). `registered`'s account, seated as a realm character the way the realm makes
    *  one (test/realmSeat.mjs, the realm pins' one home); `character` is its id, `at()` where its record stands, and a

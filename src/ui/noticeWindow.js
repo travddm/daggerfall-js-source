@@ -1,6 +1,5 @@
 // @ts-check
-// NOTICE1 (2026-09-28, Mac: "The new notice board should be a physical object that houses quests, the player auction
-// house, etc"): THE NOTICE BOARD'S WINDOW - a corkboard of pinned parchment in the Enhanced Plus stone and brass
+// NOTICE1: THE NOTICE BOARD'S WINDOW - a corkboard of pinned parchment in the Enhanced Plus stone and brass
 // (PROF0 10.1). Each note is a card with a pin and a wax seal whose colour says who posted it; a press opens it large.
 //
 // WHAT HANGS THERE, top to bottom (the Notices tab; the Work tab beside it holds PROF1's Court writs, and the others come
@@ -11,35 +10,33 @@
 //   3. the server's word under the red seal - today's Oblivion Gate while it stands, a found Super dungeon while it
 //      stands (SD2c), and the developers' notices;
 //   4. the players' notes, newest first - a guild's recruitment under its own seal.
-// QL-OFFERED (2026-10-25, the owner: a questline is TAKEN, never SENT): between the news and the players' notes, "Help
+// QL-OFFERED: between the news and the players' notes, "Help
 // wanted" - the questlines' introductions on offer, each its giver's letter under the town seal with a Take that begins
 // it (scenes/quest/questlineOffers.js board, read once an opening: the letter read is the letter taken).
 // A note's one button answers its author through a door that already stands (net/boardLaw.js NOTE_BUTTONS); the host
 // decides which (`answer`).
 //
-// PROF1 (2026-09-28, Mac: "Begin!"): THE WORK TAB - the region's Court writs under the Court's purple seal, each with
+// PROF1: THE WORK TAB - the region's Court writs under the Court's purple seal, each with
 // its need, its pay and Renown, its time left, what the Stores hold of it and a Take that fills it from them (PROF0 11,
 // 21, 22: a Court writ is filled whole by the first to deliver, so taking it is delivering it); under them "Court writs
 // today: 1 of 3" (CHAP2a: and the region's chapters' hall writs under their guilds' seals; AUDIT CHAP2 C5: the line
 // "Writs today", one allowance for both). Shown only while the professions are this account's (`work`, the host's).
 //
-// GUILD1e (2026-09-30, Mac: "Finish the seats"): THE GUILDS TAB (PROF0 10.1: "Recruitment posters (each guild's heraldry
+// GUILD1e: THE GUILDS TAB (PROF0 10.1: "Recruitment posters (each guild's heraldry
 // and a line); a guild's own notes, members only") - the town's recruitment notes hung as their guilds' posters, and
 // the reader's own guild's board (net/noticeBook.js readGuild), which its members pin to and its Officers keep. The
 // board standing in a guild's hall opens this tab alone (`guildOnly`): the hall's private board, Seats-Arc 8.2.
 //
-// PROF5 (2026-09-29, Mac: "Continue"): THE MARKET TAB beside them (ui/marketTab.js) - the Bay's listings, the Bay's
+// PROF5: THE MARKET TAB beside them (ui/marketTab.js) - the Bay's listings, the Bay's
 // buy orders (GLOBAL-MARKET: every board's), this account's own and the History - shown while the market is this account's (`market`, the host's: the
 // board, the professions and the Marks all open to it). Its region is handed to it on its own, not through Work's.
 //
-// BOARD-UI (2026-10-06, Mac: "overhaul the notice boards to enhance readability, Including each of the tabs"; "Reduce
-// overusage of bloated text"): the Notices tab in two parts - the town's and the server's word ("News"), then the
+// BOARD-UI: the Notices tab in two parts - the town's and the server's word ("News"), then the
 // players' notes under their count; each tab names its count where it has one (the notes not yet read, the writs
 // open); the Work tab's day stands above its cards, not under the last; the cards straight; the words cut to what the
 // reader needs.
 //
-// BOARD-SIFT (2026-10-21, feature-feedback: "Definitely need sorting/filtering functions for work writs considering
-// there are thousands of them"; "The notice board in general needs some TLC. The writs especially."): the Work tab's
+// BOARD-SIFT: the Work tab's
 // cards - the Court's, the chapters', the guilds' and the commissions' - under one bar that sifts and orders them, a
 // page of them at a time (ui/workSift.js), the work first and the region's chapters under their own head after it.
 //
@@ -131,7 +128,7 @@ export const BOARD_WORDS = Object.freeze({
   noticeTip: 'Goes up on every board, under the red seal.',
 });
 
-/** PLAIN-UI (bible/10-UI/Plain-Words.md; a player: "Same issue with the new guild chapter systems"): the Work tab's fold
+/** PLAIN-UI (; a player: "Same issue with the new guild chapter systems"): the Work tab's fold
  *  over the chapters' cards. */
 export const CHAPTER_GUIDE_TITLE = 'How chapters work';
 /**
@@ -311,7 +308,7 @@ export function mountNoticeBoard(host, deps) {
   const seatHost = guildOnly ? null : (deps.seat ?? null);
   const seatShown = () => !!seatHost && seatHost.book?.open === true;
   let seatBusy = false, seatOpened = false;
-  // DOMAIN1 (bible/11-Multiplayer/Domains.md 5): a member's gift reads the Stores and the bag as the market's listing does
+  // DOMAIN1 (5): a member's gift reads the Stores and the bag as the market's listing does
   // (its host's own reads) and puts the bag's units in the Stores first - nothing given where the market is not open
   const mk = deps.market ?? null;
   const giving = mk ? {
@@ -531,7 +528,7 @@ export function mountNoticeBoard(host, deps) {
 
   /** A Court writ's card: its need, pay and Renown, its time left, what the Stores hold of it, and Take. CHAP2a: a hall
    *  writ's the same, under the guild's seal and name (npcChapterLaw.js hallPosterName) - its pay its guild's standing too.
-   *  CHAP3a: a member's own writ its own, its pay Merit too. GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md, ONE WORD,
+   *  CHAP3a: a member's own writ its own, its pay Merit too. GUILD3a (, ONE WORD,
    *  ONE THING): a "Chapter writ" and "Your chapter writ" - "hall" is a guild's hall, never a card's kind. */
   function writNode(w) {
     const poster = isChapterWrit(w.kind) ? hallPosterName(w.faction) ?? 'guild' : null;
@@ -584,7 +581,7 @@ export function mountNoticeBoard(host, deps) {
       ends: Number(w.expiresAt) || 0, name, words: wordsOf(name, work.countName(w.material, 1), writKindText(w), chapter ? hallPosterName(w.faction) : null), card: () => writNode(w) };
   }
 
-  /** CRAFT-WRITS (bible/06-Systems/Professions-Arc.md section 49): A CRAFTING WRIT'S CARD - the guild's ask, what fills it,
+  /** CRAFT-WRITS: A CRAFTING WRIT'S CARD - the guild's ask, what fills it,
    *  its pay, its time left, what the character holds toward it (craftWritHost.js held) and Deliver, waiting with its
    *  reason where something is short or the day's are filled. @param {any} w */
   function craftNode(w) {
@@ -640,7 +637,7 @@ export function mountNoticeBoard(host, deps) {
     return accountRefusalText(r?.error);
   }
 
-  /** GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): A CHAPTER'S CARD - every line of one chapter of the region in one
+  /** GUILD3d: A CHAPTER'S CARD - every line of one chapter of the region in one
    *  panel under its guild's name and band, where they stood loose above the cards: its Strength and what its band does to
    *  its halls (chapterBandEffectsLine), the reader's Merit there (CHAP3a), its Master's Focus (CHAP4d), its Season and
    *  the sides a member may back (CHAP6c), its patron and the guildmaster's bid (CHAP7b), and its Duties - CHAP2b's
@@ -1171,7 +1168,7 @@ export function mountNoticeBoard(host, deps) {
 
   render();
   load(false);
-  // BOARD-UI (Mac: "Enhance the speed at which the notice board and market loads"): the Market's first view read as the
+  // BOARD-UI: the Market's first view read as the
   // board opens, beside the board's own read - its tab answers from the minute's cache, or joins the read under way
   if (market && marketShown()) market.prefetch?.();
   return {

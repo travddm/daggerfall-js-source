@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02, Mac: "During fights, the crowd is present and can cheer/boo you"): THE CROWD - its mood moved by
+// ARENA2: THE CROWD - its mood moved by
 // the bout's events and settling back (systems/arena/arenaCrowd.js), its favour (the darling, the villain, the home crowd, the
 // beast tier's sympathy), the cues it sounds and the barks it shouts (never the same twice running, one every gap), how
 // it moves (the gesturers' rate, the hop, what it throws), how many come, who sits where; THE SOUND built at runtime out

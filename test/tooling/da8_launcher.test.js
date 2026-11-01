@@ -1,7 +1,4 @@
-// DA8 (2026-09-29, Mac: "How can we drastically improve the install
-// experience? Is there anyway to send a notification that a new update is
-// available and just overall improve the experience? A launcher? I really
-// want to make it AAA grade").
+// DA8.
 //
 // THE LAUNCHER IS THE SHELL'S FIRST WINDOW, not a second program: a
 // separate launcher would make no update smaller - it would only add a
@@ -140,7 +137,6 @@ test('DA8: the notes a player reads are the patch notes - never the list of pull
 
 test('DA8: in the game - the update is a HUD line saying what the player can do; a browser tab hears nothing', () => {
   assert.equal(updateReadyText({ version: '0.1.4684', manual: false }),
-    // PIN MOVED: DA13 - the next start is when both kinds play: the installer's (run at quit) and the game channel's
     'DFO Online 0.1.4684 is ready. It runs the next time you start, or now from File > Restart to Update. Save first.');
   assert.equal(updateReadyText({ version: '0.1.4684', manual: true }),
     'DFO Online 0.1.4684 is out. Download it from the File menu when you are ready. Your saves stay where they are.');

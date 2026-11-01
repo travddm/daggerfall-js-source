@@ -1,4 +1,4 @@
-// SD1 - THE LOOSE FOE STANDS WHERE DFU STANDS IT (2026-08-29).
+// SD1 - THE LOOSE FOE STANDS WHERE DFU STANDS IT.
 //
 // SoulBound's break release and the Sanguine Rose's Daedroth are the
 // two enchantments that put a foe in the world. Both dropped it at the

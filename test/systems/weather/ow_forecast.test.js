@@ -1,4 +1,4 @@
-// OW-FORECAST (2026-10-19, the owner: "I like this idea, but do it right"; bible/06-Systems/Travel-View.md OW-FORECAST):
+// OW-FORECAST:
 // THE WEATHER AHEAD, ON THE OVERWORLD - the way's while a journey runs, here while standing, a place's on its card; every
 // word the world weather map's own for its place and the minute it names (TV4's rule: nothing invented). Pinned on the
 // law (systems/weather/owForecast.js: the samples, the way's answer and its words, here's, the pace measured), on the
@@ -25,7 +25,7 @@ test('OW-FORECAST the words: every word a traveller is told of said as a travell
   for (const w of PRIORITY.filter((w2) => FORECAST_NOTABLE.has(w2))) assert.ok(FORECAST_WORDS[w], `the map's ${w} said`);
   assert.deepEqual(Object.keys(FORECAST_WORDS).sort(), [...FORECAST_NOTABLE].sort(), 'the words told of: what is met, no more');
   assert.equal(FORECAST_WORDS.thunder, 'Thunderstorm');
-  assert.deepEqual([...FORECAST_NOTABLE].sort(), ['ashfall', 'fog', 'rain', 'sandstorm', 'snow', 'thunder']);   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall is met
+  assert.deepEqual([...FORECAST_NOTABLE].sort(), ['ashfall', 'fog', 'rain', 'sandstorm', 'snow', 'thunder']);
   assert.equal(etaWords(0), 'now');
   assert.equal(etaWords(3), 'in 5 min');
   assert.equal(etaWords(22), 'in 20 min');

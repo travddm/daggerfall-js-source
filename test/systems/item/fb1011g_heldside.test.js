@@ -5,7 +5,7 @@
 // own lockout, and a player who was held was never told why at the trade. The service keeps the held side with its word
 // now (server-account/src/realmTrade.js: `trade-held:a`), each side is told whose it was (`held`: 'mine' or 'theirs'),
 // and the client says it - mine with my hold's reason (net/realm/realmTradeLaw.js TRADE_HELD_NOTICES, the one home
-// systems/item/itemIds.js re-exports). Against the real Worker over the real migrations. bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
+// systems/item/itemIds.js re-exports). Against the real Worker over the real migrations..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../../../server-account/src/index.js';
@@ -62,7 +62,7 @@ test('HELD-SIDE: the held side FIRST - the side that settles is told the hold is
 
 test('HELD-SIDE: the words - mine says my hold\'s reason, the same sentence the hold\'s notice said; the other\'s says it is the other\'s, and that mine is open when my last checkpoint held nothing; a service before it says what it always said (mutants: mine unsaid; the reason unread; theirs unsaid)', () => {
   assert.equal(NOTICES_OF_IDS, TRADE_HELD_NOTICES, 'one home: itemIds re-exports the trade law\'s');
-  for (const why of ['law', 'budget', 'staff']) {   // PIN MOVED (AUTO-HOLD, 2026-10-16): 'dupe' retired - no verdict writes it, no notice says it
+  for (const why of ['law', 'budget', 'staff']) {
     assert.equal(realmTradeRefusalText('trade-held', 'mine', why), `${TRADE_HELD_NOTICES[why]} Nothing was traded.`);
     assert.equal(tradeHeldNotice(null, why), TRADE_HELD_NOTICES[why], 'the notice that said the hold began, word for word');
   }

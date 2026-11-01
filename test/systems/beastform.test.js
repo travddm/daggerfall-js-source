@@ -64,7 +64,7 @@ test('V4: setCrimeCommitted is the ONE crime write, and a transformed lycanthrop
   setCrimeCommitted(p, 4);
   assert.equal(p.crimeCommitted, 4, 'back in human form the law returns');
   // and no scene writes the field directly - but for DFU's own one: WERE-LEVY (FB 2026-09-29g), the passive levy of
-  // PlayerEntity.cs:502/:509 assigns the FIELD, SuppressCrime never asked. REP1 (the reputation overhaul): PIN MOVED -
+  // PlayerEntity.cs:502/:509 assigns the FIELD, SuppressCrime never asked. REP1 (the reputation overhaul):
   // the levy is retired from both hosts, and its Conspiracy is the watch's stop's now: refused (standingHost.js) or
   // answered by coming quietly (arrestFlow.js surrenderToChallenge) - the field, as the levy wrote it (the stop itself
   // never asks a transformed beast)

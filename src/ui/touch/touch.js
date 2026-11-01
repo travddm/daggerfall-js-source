@@ -1,7 +1,4 @@
-// Mobile touch layer (2026-08-13, Mac-directed mobile test build;
-// TI1 2026-09-05, Mac: "swipe based combat... touch based to
-// interact... touch to lock on to enemy... a button to bring up the
-// radial UI... remove all the unneeded buttons from mobile").
+// Mobile touch layer.
 // One module, zero engine changes in the 1:1 lane: it SPEAKS THE
 // DESKTOP INPUT LANGUAGE instead of adding a second input system.
 //
@@ -54,9 +51,7 @@
 //
 // Activates only when the device reports touch; desktop is untouched.
 //
-// TI2 - THE PHONE IN HAND, TUNED (2026-09-11, Mac: "enhance the mobile
-// element... camera movement, character movement and a more phone
-// built feel where it doesnt seem so non-native"). The same layer, the
+// TI2 - THE PHONE IN HAND, TUNED. The same layer, the
 // same seams, six things done the way a phone game does them - every
 // knob on the port's own prefs shelf (systems/uiPrefs.js, the touch*
 // keys; the Enhanced pane's Touch card sets them):
@@ -184,7 +179,7 @@ export function attachTouch(canvas, hooks = {}) {
 
   const ui = document.createElement('div');
   ui.id = 'touch-ui';
-  // FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our enhanced version"): under the enhanced skin the layer's
+  // FONT1: under the enhanced skin the layer's
   // buttons, entry field and nav are in the pixel face (ui/pixelifyFive.js PIXEL_FONT_CSS - one home); the classic skin
   // keeps the system face it always drew. The skin cannot change without a reload, so the boot-time hook is exact.
   const face = hooks.enhanced ? `${PIXEL_FONT_CSS}font-weight:500;font-size:15px;` : 'font:600 15px system-ui,-apple-system,"Segoe UI",sans-serif';
@@ -267,7 +262,7 @@ export function attachTouch(canvas, hooks = {}) {
   const held = new Set();      // codes currently synthesized DOWN
   const down = (code) => { if (!held.has(code)) { held.add(code); synth('keydown', code); } };
   const up = (code) => { if (held.has(code)) { held.delete(code); synth('keyup', code); } };
-  // ROAD-H H8 (2026-09-07): A MOMENTARY CONTROL NEVER LIFTS A KEY A
+  // ROAD-H H8: A MOMENTARY CONTROL NEVER LIFTS A KEY A
   // HELD CONTROL STILL OWNS. AUDIT 62 F8's review gave the two HELD
   // paths that invariant (`upCode(code, liveNeeds())` - "the held set
   // is the UNION of what the live controls want, and a release
@@ -344,8 +339,7 @@ export function attachTouch(canvas, hooks = {}) {
   // what the live controls want, and a release subtracts only its own.
   // The code is cleared BEFORE the lift so `liveNeeds()` does not count
   // the control that is letting go.
-  // TOUCH-BUTTONS (2026-09-27, Discord: "I haven't been able to remap the android "buttons" on the bottom right of the
-  // screen. I would much rather use a button to attack"): TI1's two - Jump and Ready Weapon (held-style, so the
+  // TOUCH-BUTTONS: TI1's two - Jump and Ready Weapon (held-style, so the
   // per-frame edge reads it) - are the first two of THREE SLOTS the player fills from ui/touch/touchButtons.js's table on
   // the Touch card, Attack among them. A HOLD slot is the action's key down while the finger is; a TAP slot one press
   // of it; the ATTACK slot a swing through the swipe's own seam (a readied spell fires first, as the swipe's press
@@ -654,8 +648,7 @@ export function attachTouch(canvas, hooks = {}) {
         // key (the stick's dead zone) and it is how a foe left of centre
         // gets locked.
         if (e.type !== 'touchcancel' && stickTravel < TAP_PX && (e.timeStamp - stickStart) <= TAP_MS) {
-          // TS1 (2026-09-12, Mac: "walking into the exit door puts you
-          // outside without interaction"): LOCK-ONLY. This tap exists so
+          // TS1: LOCK-ONLY. This tap exists so
           // a foe left of centre can be locked; it went down the hosts'
           // whole activation ladder, so a thumb re-placed on the stick
           // beside a door, a chest or a townsperson opened it - the exit

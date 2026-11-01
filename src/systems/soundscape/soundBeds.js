@@ -1,6 +1,5 @@
 // @ts-check
-// SOUNDSCAPE (2026-10-24, the owner: "enhancing sound and ambience, different music and ambience sounds for sailing ...
-// and whatever else we could improve"): THE BEDS THE PORT MAKES - the sea's swell, the water past a hull, the wind in
+// SOUNDSCAPE: THE BEDS THE PORT MAKES - the sea's swell, the water past a hull, the wind in
 // the rigging and the surf on a shore, each a few seconds of seeded noise cut by a chain of filters, made the way
 // FIELD-WIND1 made the wind's (systems/wind/windAudio.js windBedSamples) and for its reason: Daggerfall has no water bed
 // to loop (DAGGER.SND's WaterGentle is a one-shot lap, AmbientRaining the rain's), and a recording looped end to end is

@@ -220,7 +220,7 @@ function stubClassCfg() {
 }
 
 test('guards G3 (un-gated): the id is MINTED at the spawn, and the loot key survives the prune', async () => {
-  // AUDIT VC6 (2026-09-18): THIS PIN USED TO FAIL ONE RUN IN EIGHT.
+  // AUDIT VC6: THIS PIN USED TO FAIL ONE RUN IN EIGHT.
   // SURV2 registers a death handler that puts the body's food on it,
   // and this pool raised the death with no roll of its own - so the
   // drop fell to Math.random and about fifteen per cent of kills grew

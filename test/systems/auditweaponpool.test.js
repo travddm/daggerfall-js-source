@@ -1,6 +1,6 @@
-// AUDIT WEAPON-POOL (2026-10-06, Mac: "Audit this"): WEAPON-POOL read again before it merges - three independent lanes
+// AUDIT WEAPON-POOL: WEAPON-POOL read again before it merges - three independent lanes
 // (who mints and reads a weapon's condition; the migration's reach; what the change says and pins). Each fix below is
-// pinned through the real producer. bible/05-Combat/Physical-Combat-Overhaul.md, AUDIT WEAPON-POOL.
+// pinned through the real producer., AUDIT WEAPON-POOL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

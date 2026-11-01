@@ -1,7 +1,4 @@
-// TI1 - MOBILE TOUCH INPUT (2026-09-05, Mac: "swipe based combat...
-// touch based to interact... touch to lock on to enemy using a dark
-// souls like dot... a button to bring up the radial UI... remove all
-// the unneeded buttons from mobile"). The pure halves are executed;
+// TI1 - MOBILE TOUCH INPUT. The pure halves are executed;
 // the DOM layer and the hosts are text-pinned. Every pin names the
 // mutant that kills it.
 import { test } from 'node:test';

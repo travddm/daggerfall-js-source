@@ -1,4 +1,4 @@
-// AUDIT RELEASE R1-2 (2026-10-26; bible/01-Overview/audits/Audit-Release-R1.md) - the Travel View's ground past the table
+// AUDIT RELEASE R1-2 - the Travel View's ground past the table
 // and the land that lands after it: routeGround (systems/travel/travelRoute.js) kept its answers past the Bay's table for
 // the session (`dryBeyond`, dropped only past BEYOND_CACHE_MAX) and the sea lanes kept their water by the ground's
 // `isWater` (planSeaLanes' _laneGround), while the host makes one ground a session (scenes/world.js tvRouteGround) and the

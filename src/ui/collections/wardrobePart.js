@@ -1,5 +1,5 @@
 // @ts-check
-// COLLECTIONS-II (2026-10-22; bible/10-UI/Collections.md): THE WARDROBE'S PARTS of the Collections page - Titles, Auras,
+// COLLECTIONS-II: THE WARDROBE'S PARTS of the Collections page - Titles, Auras,
 // Icons and Glyphs, one kind a part, every thing of its kind listed whether the account holds it or not (the catalogue:
 // ui/collections/wardrobeCatalogue.js), grouped by where it comes from, each row pressed open to say how it is had, whether
 // it can be had now, what comes with it - and, held, worn from here as the account card wears it.

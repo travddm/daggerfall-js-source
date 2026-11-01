@@ -1,4 +1,4 @@
-// CLOCK-REFUSAL (2026-09-22) - THE NO-OP NOBODY COULD SEE.
+// CLOCK-REFUSAL - THE NO-OP NOBODY COULD SEE.
 //
 // `advanceWorldMinutes` is refused under the shared clock (WORLD5: the
 // world's time is not this player's to move) and it answers a NUMBER
@@ -18,7 +18,7 @@
 // have to. The list may shrink and never grow silently - a new caller
 // fails here.
 //
-// LIVED1 (2026-09-29) removed the trap at its root: a caller that MEANS
+// LIVED1 removed the trap at its root: a caller that MEANS
 // the passage of time - a sentence, a turn, a cure, a quest's RaiseTime -
 // moves the CHARACTER's own clock (worldTick.js advanceOwnMinutes), which
 // is theirs online and the one clock offline, and is never refused. No

@@ -1,5 +1,4 @@
-// FIX-E (2026-09-08, Mac: "When dying and returning to the main menu, the
-// game bugs and you're unable to make selections"). The death seam killed
+// FIX-E. The death seam killed
 // the host loop FIRST and then waited, unbounded, on a video and a fetch
 // before it navigated - a promise that never settles (a backgrounded tab's
 // rAF, a stalled audio clock, a fetch with no timeout) left a frozen frame
@@ -33,7 +32,7 @@ test('FIX-E: the death seam HOLDS the frame (the host waits, and lives), and rel
   assert.equal(frameHeld(), false);
 });
 
-// DEATH1 (2026-09-15, Mac: "Black screen after death and pressing enter").
+// DEATH1.
 // holdFrame stops the host drawing, and it was taken FIRST - then two
 // dynamic imports and an archive read of ANIM0012.VID ran before the video
 // painted anything. Every frame of that load was black: the host held, the
@@ -74,7 +73,7 @@ test('FIX-E: a video that never settles is a BOUNDED wait - the watchdog navigat
   assert.ok(DEATH_VIDEO_WATCHDOG_MS >= 15000 && DEATH_VIDEO_WATCHDOG_MS <= 60000, `a real death video ends well inside it (${DEATH_VIDEO_WATCHDOG_MS} ms)`);
 });
 
-// AUDIT DEATH1 F7 (2026-09-15): THE WATCHDOG IS A RACE, NOT A CANCEL.
+// AUDIT DEATH1 F7: THE WATCHDOG IS A RACE, NOT A CANCEL.
 // Every DEATH1 assertion above either injects a `play` that settles or
 // reads the source as text; none drove the one order that matters -
 // the watchdog fires, the seam returns, and THEN the load settles and

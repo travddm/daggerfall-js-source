@@ -67,8 +67,7 @@ export const SKILL_RAISE_CHECK_INTERVAL = 360;   // classic minutes
 export const LEVELUP_BONUS_POOL_MIN = 4;         // FormulaHelper.BonusPool
 export const LEVELUP_BONUS_POOL_MAX = 6;
 
-/** LEVEL-45 (2026-10-27, a player through mob: "-4% exp/level to apply even to people who stuck to lvl 1 - could u level
- *  skill and not level up?"): THE LEVEL A RAISE IS PRICED AT. A level owed is never taken until the player opens the
+/** LEVEL-45: THE LEVEL A RAISE IS PRICED AT. A level owed is never taken until the player opens the
  *  window (LV2), and the 1.04^level above read the level TAKEN - so a character that left every level owed trained at
  *  level 1's price for good. Online the price reads the level its skills have earned (levelClimb.js), owed or not; offline
  *  it is DFU's `Level`. */
@@ -226,7 +225,7 @@ export function raiseSkills(entity, classicTimeMinutes, rolls = Math.random, onL
       if (entity.skills[i] === 100 && entity.career.primarySkills.includes(i)) onMastery?.(i);
     }
   }
-  // SWAP-CYCLE (2026-10-20): the stored sum is the sum the level stands on, and a raise never lowers it. DFU's never could
+  // SWAP-CYCLE: the stored sum is the sum the level stands on, and a raise never lowers it. DFU's never could
   // fall (a permanent skill only rises), so for a class as made nothing changes; a class skill given up for a less
   // trained one (skillSwap.js) lowers the class's sum, and its ground is made up before the level moves again - stored
   // where it fell, the swap undone would lose that ground for good, and the bar would read a lower level's fraction.
@@ -254,10 +253,7 @@ export function raiseSkills(entity, classicTimeMinutes, rolls = Math.random, onL
 }
 
 /**
- * SKILL-TICK (2026-10-19, Discord #suggestions "Show current XP towards skill/next skill level up ticker", Cruor: "An
- * EXP ticker when you mouse over a skill that shows out of whatever XP is needed for the skill, to improve it on rest
- * ... 'your skills can be improved' notification to let players know they should probably rest, since XP does not hang
- * over"). Where skill `i` stands against raiseSkills' own test, read the way the next pass will read it - the uses as
+ * SKILL-TICK. Where skill `i` stands against raiseSkills' own test, read the way the next pass will read it - the uses as
  * Reflexes scales them, against GetSkillAdvancementRequirement's number (past 100 a mastered skill's banked progress and
  * the ladder's price, MOVE-BANK's units). Answers `{ have, need, ready, held, wait }`: `ready`, the next pass raises it;
  * `held`, why a pass will not however many uses it counts - 'cap' (the hard cap, or 100 with no mastery to be had),
@@ -353,7 +349,7 @@ export function checkForLevelUp(entity) {
  * became one keystroke away and a player would find it without looking.
  *
  * AUDIT LV2 recorded that rather than fixing it, on the grounds that
- * the re-roll is DFU's own shape. Mac's answer: "Yes fucking fix it."
+ * the re-roll is DFU's own shape.
  * So the draw is the LEVEL'S, not the WINDOW'S. It is taken on the
  * first screen that needs one, remembered on the entity beside
  * `pendingLevel`, handed to every screen after that, saved with the

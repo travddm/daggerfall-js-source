@@ -1,4 +1,4 @@
-// GRANT2 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md section 12): THE RELAY TAKES
+// GRANT2: THE RELAY TAKES
 // THE ASKS AND MEASURES - a cell's `grant` frame over a real Room (test/fakeRoom.mjs): the grant minted, signed and made
 // out to its asker as the relay reads it; the welcome's mode; the gate counted while measuring and said only while
 // enforcing; the window posted to the service, signed, and read back by the service's own half.

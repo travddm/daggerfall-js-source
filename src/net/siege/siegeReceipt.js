@@ -1,7 +1,7 @@
 // @ts-check
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE SIEGE'S RECEIPT -
+// SEAT2a: THE SIEGE'S RECEIPT -
 // the relay's fourth signature, the gate's, the raid's and the Watch's twin (net/gate/gateReceipt.js, net/raid/raidReceipt.js,
-// net/watchReceipt.js). Design: bible/11-Multiplayer/Seats-Arc.md 6.8 ("Every fighter who stood half the siege or felled
+// net/watchReceipt.js). Design: 6.8 ("Every fighter who stood half the siege or felled
 // a foe earns a signed receipt (`s1.`, the gate's Ed25519 shape), claimed at the account service") and 17 ("its result
 // and Honours are signed receipts the relay keeps").
 //

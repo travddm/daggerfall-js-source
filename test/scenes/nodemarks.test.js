@@ -1,5 +1,4 @@
-// NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass. The node itself should
-// also stand out with a detailed slight glow or something").
+// NODE-MARKS.
 //
 // EVERY PROFESSION'S NODES ON THE COMPASS, AND LIT WHERE THEY STAND. Before, the compass marked a Prospector's veins and
 // a Tracker's animals alone, in one copper; a herb patch, a tree, a school or an ordinary character's vein stood nowhere
@@ -12,7 +11,7 @@
 //     Hunting's;
 //   - each glows in the same colour (render/nodeGlow.js): a halo low on the node, a shimmer climbing it, motes rising
 //     out of it, kindling as it first stands near and fading out with distance; added onto the frame, fogged.
-// bible/06-Systems/Professions-Arc.md, NODE-MARKS.
+// NODE-MARKS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -162,7 +161,6 @@ test('NODE-MARKS the host: a Prospector\'s veins are marked from PROSPECT_M off 
   const kind = mineKind({ book: { taken: () => false } });
   const specs = () => ({ 50: 'prospector', 100: null });
   assert.equal(kind.mark({ key: 'b', what: 'boulder' }, { specs }).reach, undefined, 'a boulder is quarried, not prospected');
-  // PIN MOVED (AUDIT MINE-PERKS, Professions-Arc 43): a dungeon's vein keeps PROF2's 200 m - PROSPECT_M's 500 would mark
   // nearly every dungeon's every vein, the Deep Delver's own perk
   assert.equal(kind.mark({ key: 'd', what: 'dvein' }, { specs }).reach, PROSPECT_DEEP_M, 'a dungeon\'s vein is a vein, at PROF2\'s reach');
 });

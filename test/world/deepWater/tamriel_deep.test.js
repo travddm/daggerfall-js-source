@@ -1,5 +1,4 @@
-// TAMRIEL-DEEP (2026-10-26, the owner: "Overhaul coastlines to properly have sand/dirt and arc into the deep, with the
-// ability to slightly see through water and actually see the depth"; bible/03-World/Deep-Waters.md TAMRIEL-DEEP) - THE
+// TAMRIEL-DEEP - THE
 // CONTINENT'S SEA CARVED BY ITS OWN BAKE. Past the Bay's edge the sea was the kernel's water over a bed a few metres down;
 // the continent's frame is a bake's own now (world/tamrielWatersBake.js), built by the Bay's rules from the composed
 // ground: its flood a cell at a time, seeded from the trace's own open sea (a lake the picture draws never), the Bay's
@@ -205,7 +204,7 @@ test('TAMRIEL-DEEP (ARENA2): on the player\'s own picture the Topal Bay is carve
   b.prepare(2441, 1500);
   assert.equal(b.sampleDistanceMeters(2441, 1500, 0.5, 0.5), BAKE_DISTANCE_CAP * BAKE_DISTANCE_SCALE_METERS);
   assert.ok(all(2160, 720) && all(2300, 1000), 'Lake Rumare\'s ring and the Niben');
-  assert.ok(all(2069, 676), 'the Waterfront canal');   // under IC-GRAND's twenty-five (bible/03-World/Tamriel.md NIBEN-SEA)
+  assert.ok(all(2069, 676), 'the Waterfront canal');   // under IC-GRAND's twenty-five (NIBEN-SEA)
   assert.ok(none(1216, 224), 'Hammerfell\'s lake');
   assert.ok(!all(2441, 1441) && !none(2441, 1441), 'the coast\'s pixel part sea');
   assert.ok(TAMRIEL_CELL_PX >= 16);

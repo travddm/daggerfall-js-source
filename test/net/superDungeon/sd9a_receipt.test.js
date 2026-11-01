@@ -1,4 +1,4 @@
-// SD9a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE HOUR'S RECEIPT - the
+// SD9a: THE HOUR'S RECEIPT - the
 // relay's signature on the Brass Remnant's fall (net/superDungeon/sdReceipt.js, an `h1`), minted in the realm for each fighter who
 // earned it (the gate's `earned`) before the fall is said, handed to them there and again at a late `in`, kept by the hub
 // for its life (held from a realm fighter's hellos while its floor spends it; handed at once to every other earner's
@@ -133,7 +133,7 @@ async function withRealm(fn) {
       const mara = cell.connect(); await cell.hello(mara, 'peer-mara', doorPose(10), { name: 'Mara' });
       await cell.raw(mara, JSON.stringify({ t: 'sd', k: 'found', s: rec.s, px: PX, py: PY }));
       const realm = world.room(sdTestKey(rec.s));
-      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (PIN MOVED)
+      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (
       const beat = async (ms) => { const end = clock + ms; while (realm.alarm.at != null && realm.alarm.at <= end) { clock = Math.max(clock, realm.alarm.at); await realm.fire(); } clock = end; };
       await fn({ world, hub, realm, rec, beat, step: (ms) => { clock += ms; }, now: () => clock });
     });

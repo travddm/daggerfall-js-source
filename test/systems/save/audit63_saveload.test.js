@@ -193,7 +193,7 @@ test('AUDIT 63 F25: both save hosts write the hand and land it, and neither re-r
   // the law is RUN here and what stays matched is the WIRING: which rig
   // each host offers, and that world.js lands the pair in the interior
   // rig as well because DFU sets ONE manager.
-  assert.match(WORLD, /const wp = host\.modes\?\.weaponPose\?\.\(\) \?\? null;/, 'the world host asks the mode seam for the live rig');   // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): the composer is scenes/worldQuickSave.js's, the mode host read live
+  assert.match(WORLD, /const wp = host\.modes\?\.weaponPose\?\.\(\) \?\? null;/, 'the world host asks the mode seam for the live rig');
   assert.match(WORLD, /\.\.\.mergeWeaponPose\(wp, weaponPoseOf\(weaponRig\.playerWeapon\)\),/,
     'per field: the mode seam, else this host\'s own rig');
   assert.deepEqual(mergeWeaponPose({ usingRightHand: false }, { weaponDrawn: true, usingRightHand: true }),

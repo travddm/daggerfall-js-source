@@ -225,10 +225,7 @@ export function createArrestFlow({
   let surrenderBox = null;
 
   /**
-   * ARREST-SHIELD (2026-09-22, Revverie: "when guards come to arrest
-   * you and you go to trial, you still can die ... idk if a guard
-   * continue to aggro me or if it was a bandit of sorts ... the game
-   * ... just froze and I had to kill it"): THE QUESTION, ONCE.
+   * ARREST-SHIELD: THE QUESTION, ONCE.
    *
    * The clause below was written for a GUARD and it was right about
    * the situation and too narrow about the attacker. Online the court
@@ -245,9 +242,7 @@ export function createArrestFlow({
    * second copy of "am I in a trial" is a second chance to disagree
    * with the first, so `onGuardHit` reads THIS and nothing of its own.
    *
-   * JAIL-HIT (2026-09-27, Discord: "Guards will still chase you down
-   * and kill you, even if you have already been to prison for the
-   * crime committed"). The shield was ONLINE-only on the belief that
+   * JAIL-HIT. The shield was ONLINE-only on the belief that
    * offline the court "already reads as a pause" - true in DFU, whose
    * surrender box and court are pushed windows that stop the world
    * (UserInterfaceManager.cs:183-184) until ReleaseFromPrison clears
@@ -343,8 +338,7 @@ export function createArrestFlow({
   }
 
   /**
-   * WERE-FRIGHT (2026-09-29, Mac: "being a werewolf has a different interaction with guards ... you cannot
-   * surrender, but instead a chance to frighten"): THE BEAST'S HALT. The surrender question's own box in every way
+   * WERE-FRIGHT: THE BEAST'S HALT. The surrender question's own box in every way
    * but its answers - it withholds the blow while it stands, a load or a cleared crime withdraws it, and it is shown
    * once a watch - and its answers are the beast's: F roars at the watch, N fights on.
    *
@@ -531,7 +525,7 @@ export function createArrestFlow({
       // AUDIT 17e F22: state 4 (Banished) does NOT call
       // RaiseReputationForDoingSentence (DaggerfallCourtWindow.cs:263-278)
       // - being run out of the region repairs nothing.
-      // REP3 (Mac: "Timed or pardoned"): the bit DFU sets, and its term - thirty days of the world's calendar, or a
+      // REP3: the bit DFU sets, and its term - thirty days of the world's calendar, or a
       // pardon bought at a temple (systems/standing.js). DFU's bit alone was for ever.
       banish(playerEntity, region(), trustedWorldMinutes());   // AUDIT REP F2: an unheard relay stamps no term - the first trusted read does
       // ":276 - Refill player vitals after banishment, otherwise player
@@ -632,7 +626,7 @@ export function createArrestFlow({
           // SENTENCE-MENDS (FIELD BUGS 2026-10-21d): and the name it was priced by - AUDIT FB1021d SM-1: once the days are
           // served, never at the sentence: a save under the prison screen (a tab closed) kept a mend no day had paid for
           sentenceMends(playerEntity, court.regionIndex, { from: court.from, ownNow: ownMinutes() });
-          // AUDIT C&C (2026-10-12, N3/H2): AND THE NEEDS LEAVE PRISON FED, WATERED AND RESTED. The days above are a bare
+          // AUDIT C&C: AND THE NEEDS LEAVE PRISON FED, WATERED AND RESTED. The days above are a bare
           // move of the clock, so the first frame out walked the sentence's last two days (the needs' catch-up) AFTER this
           // refill, awake and unfed, in the street's weather: a Hard ten-day sentence let out into snow left 5 health, no
           // stamina, -20 from every attribute, Starving, Exhausted and Drenched. The prison kept its prisoner (as DFU's
@@ -788,7 +782,7 @@ export function createArrestFlow({
    * DFU never loads under the court: InputManager.Update returns before it reads any action while a window pauses
    * the game - the surrender box and DaggerfallCourtWindow both do - and admits QuickLoad there only while
    * PlayerDeath.DeathInProgress. The port took a load from under any window (world.js's FIX-E arm) until DUPE-LOAD
-   * (2026-10-11) narrowed it to the death screen's; the flow is still told, as every load still ends the game it was in. Offline, F11 under the plea box carried the trial into
+   * narrowed it to the death screen's; the flow is still told, as every load still ends the game it was in. Offline, F11 under the plea box carried the trial into
    * the loaded game: `arrested` stood, the old sentence was served on the loaded clock, and its release cleared the
    * loaded save's own crime. Under the surrender box it asked the loaded character the departed guard's question.
    *

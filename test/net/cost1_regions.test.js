@@ -1,4 +1,4 @@
-// COST-1 (2026-10-24, the owner's Cloudflare bill; bible/11-Multiplayer/Scale-Arc.md COST-1): A REGION'S CHANNEL IS
+// COST-1: A REGION'S CHANNEL IS
 // WHOLE AGAIN. Since HUB-PULL a shard holding a socket keeps a call open at its bus, so a populated region kept up to five
 // objects awake all day. By default a region link says hello to the region's channel itself (net/hubShards.js shardOf
 // answers no shard for it), the channel holds its players' real sockets and runs its lines, marks, census and list over

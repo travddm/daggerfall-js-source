@@ -1,5 +1,4 @@
-// CURSE-PERSIST1 + CURSE-REPAIR1 (2026-09-24, the contributor's report: players "getting lycanthropy or vampirism
-// and losing it again").
+// CURSE-PERSIST1 + CURSE-REPAIR1.
 //
 // Driven through the real doors: the curse is made by its own constructor, saved by snapshotPlayer, carried through
 // JSON as the slot stores it, loaded by restorePlayer and ticked by runMagicRoundsFor - the path that pruned it.

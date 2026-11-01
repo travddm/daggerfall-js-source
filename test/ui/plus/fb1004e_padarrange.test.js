@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - PAD-BINDS and PAD-ARRANGE (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, report 1).
+// FIELD BUGS 2026-10-04e - PAD-BINDS and PAD-ARRANGE (, report 1).
 //
 // Discord (Sir Timbers): "Overworld and Quick Dial are missing from the controller binding options ... Additionally,
 // rearranging the hot bar icons on controller is not possible. Only current workaround is to swap to M&K hotbar,

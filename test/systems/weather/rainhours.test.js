@@ -1,5 +1,4 @@
-// RAIN-HOURS and RAIN-HEART (Mac, 2026-10-13: "I feel like it rains too much, also sometimes instead of downpours it
-// should just sprinkle"). Measured on the world weather map (systems/weather/weatherMap.js, the enhanced lane's weather, on by
+// RAIN-HOURS and RAIN-HEART. Measured on the world weather map (systems/weather/weatherMap.js, the enhanced lane's weather, on by
 // default and always online) before the change: a woodland spring under falling rain or a storm 36% of every hour, a
 // swamp's 41%, a jungle's 54% - the Chronicles' odds of a DAY's word, which DFU wears all day, taken as the share of
 // TIME - and half of that wet time drawn at half the rain's profile or more, because the place's intensity (WEATHER3b,
@@ -66,7 +65,7 @@ test('RAIN-HOURS: a wet day rains for half its hours - rain and thunder worn for
 });
 
 test('RAIN-HEART: a rain front is born with its own strength - evenly from the heaviest front\'s edge to the whole downpour, drawn from its id alone - and every other system, a storm cell among them, falls whole (mutants: every front pours; the floor at nothing)', () => {
-  assert.deepEqual(STRENGTH, { rain: [EDGE_INTENSITY, 1], ashfall: [0.35, 1] });   // PIN MOVED (ASHFALL1, 2026-10-27): an ashfall from a dusting to the heavy fall
+  assert.deepEqual(STRENGTH, { rain: [EDGE_INTENSITY, 1], ashfall: [0.35, 1] });
   assert.equal(EDGE_INTENSITY, 0.2, 'the weakest front\'s heart is the heaviest one\'s edge');
   const fronts = springFronts();
   assert.ok(fronts.length > 400, `a spring's fronts over the woodlands (${fronts.length})`);

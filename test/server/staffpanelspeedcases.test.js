@@ -1,4 +1,4 @@
-// STAFF-PANEL-SPEED (2026-10-23, mob: "slow when moving in menus", "The click takes a while before the new page shows
+// STAFF-PANEL-SPEED (2026-10-23,, "The click takes a while before the new page shows
 // (it's waiting on the server)") - THE REPORTS' DOORS (server-account/src/staffCases.js) PINNED TO THEIR D1 ROUND TRIPS:
 // what a click waits on is each statement awaited after the last, times the network to D1, so the reads a door makes
 // together share one trip (a batch, a Promise.all) and the audit row lands in the batch of its page's last statements.

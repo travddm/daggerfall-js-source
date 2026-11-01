@@ -1,4 +1,4 @@
-// IC-GRAND (2026-10-26, bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY, MEASURED AND SEEN in the real game:
+// IC-GRAND - THE IMPERIAL CITY, MEASURED AND SEEN in the real game:
 // the world host boots in Daggerfall, the land past the Bay lands, the probe jumps to the city's centre pixel (a fast
 // travel's landing, `__tesaJump`) and times the stream to idle, then stands the camera at each station - a point of the
 // city's own metres (x east, z south of its middle, `polar` bearings for the districts) at a height, looking a way - waits

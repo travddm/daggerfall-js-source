@@ -1,5 +1,4 @@
-// REVIVE (2026-10-14, Mac, of TheHalfinStream: "I want to roll back this specific account", then "Undo the death",
-// then "Full revive"; bible/06-Systems/Legacy-Arc.md REVIVE) - A DEATH TAKEN BACK, AND IT HOLDS.
+// REVIVE - A DEATH TAKEN BACK, AND IT HOLDS.
 //   - the law (src/systems/legacy/revived.js): a death taken back is stamped `revived: [diedAt]`, and every copy that
 //     meets the stamp drops THAT death with its remains row and its Succession - the client's merges and the realm's
 //     write (legacy.js putLineage) alike;

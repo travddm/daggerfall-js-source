@@ -1,6 +1,5 @@
 // @ts-check
-// INT11 (2026-10-10, the INTEGRITY arc's lane 3 - bible/06-Systems/Integrity-Arc.md section 6; Mac: "I want to do
-// everything and do it properly", and of the healing the relay cannot see: "Measure, then enforce"): THE BODY COUNTED -
+// INT11: THE BODY COUNTED -
 // the relay's own count of each fighter's body in a boss fight (a gate's, an Abyss Dungeon's) and of each ship's hull
 // in a serpent's, kept beside the client's.
 //
@@ -17,7 +16,7 @@
 // a second). A word that says less claims nothing: a hurt the relay never counted (an element's, a pool's, a fall's) is
 // the client's own, and healing it back is no claim on the budget.
 //
-// MEASURE FIRST (Mac, 2026-10-10: "Measure, then enforce" - lane 1's wealth budget's law, INT5): BODY_DEFAULT.enforce
+// MEASURE FIRST (- lane 1's wealth budget's law, INT5): BODY_DEFAULT.enforce
 // is off. The count runs, and each fighter's measure (`bodyMeasure`: what it counted, what it believed, what was claimed
 // past the line, how often the count fell, whether the receipt would have stood had its first fall been a fall) rides
 // the fighter's receipt to the account service for staff to read. Nobody falls by it. Staff set the line and turn

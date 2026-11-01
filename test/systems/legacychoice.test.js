@@ -1,7 +1,4 @@
-// LEGACY-CHOICE (2026-10-06, Mac: "I want to add a enhanced plus UI popup for online when creating a character. Perma
-// Death, the regular option, or the option that skips the liniage system entirely. Current characters already created
-// start without this system and requires a new game"; "how a new character starts and how current characters online
-// dont recieve this"; bible/06-Systems/Legacy-Arc.md section 6).
+// LEGACY-CHOICE.
 //
 // THE QUESTION: online the model question - its Enhanced Plus face the popup - offers three answers: Enduring (the
 // regular one, first: Enter without reading never costs a character), Bloodline (permadeath), and no lineage, which

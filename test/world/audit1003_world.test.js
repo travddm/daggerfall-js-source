@@ -1,5 +1,5 @@
-// AUDIT PRE-MERGE 1003, lens W - the arena in the world and on screen (bible/01-Overview/audits/Audit-PreMerge-0929.md's form;
-// bible/11-Multiplayer/Arena.md the design). Each finding pinned by a test that failed on the unfixed tree for the
+// AUDIT PRE-MERGE 1003, lens W - the arena in the world and on screen ('s form;
+// the design). Each finding pinned by a test that failed on the unfixed tree for the
 // finding's reason; the mutants in tools/mutants/audit1003_world.json.
 //
 //   W1 the floor's instance had no ground where the city's terrain is the colosseum's floor - a watcher who walked down

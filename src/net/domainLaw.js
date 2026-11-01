@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN3 (2026-10-24, the owner: "A transition to tamriel region control
-// instead of just city control"; asked, "Replace seats") - THE REGION'S
-// CHARTER, one home for every end (bible/11-Multiplayer/Domains.md section
+// DOMAIN3 - THE REGION'S
+// CHARTER, one home for every end (section
 // 7).
 //
 // ONE REGION, ONE CHARTER (Domains law 1). From the seat week the service's

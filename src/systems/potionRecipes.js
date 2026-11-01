@@ -5,7 +5,7 @@
 // systems/potions.js, which imports and re-exports them, so every
 // reader's import stands and the table keeps one home.
 //
-// PROF12 (bible/06-Systems/Professions-Arc.md 9.3, 37): WHY A LEAF. The
+// PROF12 (9.3, 37): WHY A LEAF. The
 // profession's door to Alchemy is the brewing act, and the account
 // service brews by DFU's own recipe law - "POTION_RECIPES, imported, the
 // order-independent ingredient hash DFU keys it by" (9.3; law 1's "ONE

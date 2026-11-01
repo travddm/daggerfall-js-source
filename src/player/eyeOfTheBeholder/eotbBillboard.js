@@ -5,7 +5,7 @@
 // IL. This file is the LOGIC: which sprite, facing which way, on what
 // clock. The drawing is `eotbBody.js`'s.
 //
-// ═══ EOTB-IL (2026-09-17): THE ASSEMBLY, READ ══════════════════════
+// ═══ EOTB-IL: THE ASSEMBLY, READ ══════════════════════
 //
 // Mac handed the shipped archive over ("it needs to be 1:1 with the
 // uploaded file. No exceptions") and the port's own UnityFS reader
@@ -209,8 +209,7 @@ export function orientationFor(facing, toCamera) {
 }
 
 /**
- * SPRITE-FACE (2026-10-05, Mac: "For the wing aura we implemented for developers. The sprite rotation on character input
- * is a little finicky and make the aura misallign"): THE FACING A FRAME PORTRAYS - `orientationFor` run backwards. The
+ * SPRITE-FACE: THE FACING A FRAME PORTRAYS - `orientationFor` run backwards. The
  * sprite is drawn from one of ORIENTATIONS pictures, ANGLE_PER_ORIENTATION apart about the line from the figure to the
  * camera, so the way it is SEEN to face is that line's bearing turned back by the picture's angle - the middle of the
  * picture's bucket, whatever facing chose it. An aura hung on the sprite (render/auraRing.js - the Seraph Wings) faces
@@ -411,8 +410,7 @@ export const LYCAN_TICK = 0.125;
 export const DEATH_TICK = 0.5;
 
 /**
- * ONE-STROKE (2026-10-07, Mac: "can we make it where attacking plays only one animation. Like for example the base
- * sprite when attacking plays an entire 2 swing follow-through"): A BLOW PLAYS ONE STROKE. Every swing record the
+ * ONE-STROKE: A BLOW PLAYS ONE STROKE. Every swing record the
  * bundle ships - the mod's sixteen sets and the class skins alike, all six frames - is TWO strokes, frames 0-2 and 3-5:
  * a slash then an overhead chop on the swords, two chops on the axes and hammers, a sweep and its return on the
  * staves, a slash then a stab on the daggers. The mod plays all six for every blow (PlayAnimationCoroutine), or under

@@ -1,7 +1,4 @@
-// KEPT-KILL (2026-10-01, Discord #bug-reports: "Does anybody know if the tiger from the 'runaway pet' quest respawns? ...
-// Somebody entered the dungeon where the tiger was and I think it was killed"; Mac: "If someone kills a quest target
-// regardless of relation then it should ping the quest for the players involved regardless ... party only sync with
-// quest entities"). A quest's foes are its player's alone, and a shared quest's ride to the party only (QUEST-PARTY) -
+// KEPT-KILL. A quest's foes are its player's alone, and a shared quest's ride to the party only (QUEST-PARTY) -
 // a stranger never sees, strikes or is hunted by one. The one kill no copy of the quest counted: a foe its owner HANDED
 // (a death, a door out) to a party member whose copy holds no such quest (AUDIT DISC28 QS-J keeps it on the partner's
 // word, `_keptTag`), killed with no linked copy in the room to see it fall - the owner came back to a fresh foe at the
@@ -17,7 +14,7 @@ import * as acorn from 'acorn';
 import { validPartyPose, validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, CELL_LOOSE_PUPPETS, FOES_FRAME_MAX,
   KEPT_KILL_POSE_MAX, KEPT_KILL_QUEST_RE, KEPT_KILL_SYMBOL_RE } from '../../../src/net/wire.js';
 import { validQuestTags, questMarkerYields, QUEST_PUPPETS_MAX, validLooseSeqs, companionNames } from '../../../src/scenes/exteriorFoes.js';
-import { summonedWord, summonedRecord, markSummoned } from '../../../src/systems/foeLootCap.js';   // PIN MOVED (RPT1026-PROGRESS, test/scenes/rpt1026_progress_peersummon.test.js): the own lane names its summons and marks their puppets
+import { summonedWord, summonedRecord, markSummoned } from '../../../src/systems/foeLootCap.js';
 import { KeptKillLedger, creditKeptKills, KEPT_KILL_HOLD_MS, KEPT_KILL_MEMORY_MS } from '../../../src/scenes/quest/questFoeHost.js';
 import { QuestMachine } from '../../../src/systems/quest/machine.js';
 import { loadQuestTables } from '../../../src/systems/quest/tables.js';

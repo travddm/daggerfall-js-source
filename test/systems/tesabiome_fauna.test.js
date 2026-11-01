@@ -1,4 +1,4 @@
-// TESA-BIOME (2026-10-24, bible/03-World/Tamriel-Biomes.md) - the fauna past the Bay: each biome's three encounter
+// TESA-BIOME - the fauna past the Bay: each biome's three encounter
 // tables, made from its lore roster, on DFU's encounter-table door. AUDIT TESA-BIOME (bible/01-Overview/audits/
 // Audit-Tesa-Biome.md): no aquatic creature on land, the repeat window, the levels as the game loaded them, every table
 // held to DFU's own band through the real roll, a classic look-alike only where it reads true.

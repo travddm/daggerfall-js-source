@@ -1,7 +1,5 @@
 // LV1 — THE ASCENSION: the enhanced skin's level-up window.
 //
-// Mac, 2026-09-18: "the next enhanced UI window... a replication of the
-// skyrim level up UI in our own constellation vision."
 //
 // WHAT THESE PINS ARE FOR. The window writes nothing: it READS a live
 // rollout screen and presses that screen's own buttons. So the pins
@@ -12,7 +10,7 @@
 // teaches a player about their own advancement is the sentence
 // PlayerEntity.SetCurrentLevelUpSkillSum actually computes.
 //
-// A PIN MUST FAIL (bible/Home.md): every assertion below was checked
+// A PIN MUST FAIL: every assertion below was checked
 // against a one-character mutation of the law it claims to pin -
 // noted at the pin where the mutation is not obvious.
 import { test } from 'node:test';
@@ -252,7 +250,6 @@ test('LV1: ALL-MAX IS THE OTHER TERM OF CheckIfDoneLeveling, and the first cut h
   assert.ok(rolloutRows(w).every((r) => !r.canRaise), 'and nothing can take a point of it');
   assert.equal(allMaxed(w), true);
   assert.equal(canAscend(w), true, 'so the way out is open');
-  // PIN MOVED (AUDIT GROWTH LANE5-1): the line is read when drawn (allMaxLine), and says it plainly
   assert.equal(corneredHint(w), allMaxLine(), 'and it says THAT, not "take a point back" - there is no elsewhere');
   assert.equal(allMaxLine(), 'Every attribute is at its maximum. Leftover points can\'t be spent.');
   const level = p.level;
@@ -347,12 +344,11 @@ test('LV1: the ribbon\'s roles RECONSTRUCT levelUpSkillSum exactly, over every s
   // ...and the four roles each say something different, so a player
   // reading the ribbon is reading four distinct facts.
   assert.equal(new Set(Object.values(ROLE_NOTE)).size, 4);
-  // PIN MOVED (AUDIT GROWTH LANE5-1): the notes say the rule in the player's terms - "dropped from the sum" named a sum
   // the window never defines - so each role is held to the skill it names and what that skill does for the level
   assert.deepEqual({ ...ROLE_NOTE }, {
     [ROLE_COUNTS]: 'Every point counts toward your next level.',
     [ROLE_DROPPED]: 'Your lowest major skill. It doesn\'t count toward your next level.',
-    [ROLE_BEST]: 'Your highest minor skill, the only minor skill that counts toward your next level.',   // PIN MOVED (VOICE2): no dash aside (Voice.md rule 5)
+    [ROLE_BEST]: 'Your highest minor skill, the only minor skill that counts toward your next level.',
     [ROLE_IDLE]: 'Doesn\'t count toward your next level.',
   });
 });

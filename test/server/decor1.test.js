@@ -1,7 +1,4 @@
-// DECOR1 (2026-09-25, Mac: "building our own unique version instead of porting" Kaedius's Decorator; decor "Gold per
-// placement"; asked, the catalogue "Everything Daggerfall furnishes", priced "By size", opened from "A UI element that
-// can be clicked to open the decorate panel. Allows free cam mode for placement and an intuitive scrolling menu with
-// filters", and "kept in the save" offline): A PIECE OF DECOR. The law both ends read (net/decorLaw.js), the account
+// DECOR1: A PIECE OF DECOR. The law both ends read (net/decorLaw.js), the account
 // service's store of an online home's pieces driven through the real Worker over node:sqlite with every migration
 // applied (server-account/src/decor.js), the client's door to it, and the deploy's wiring; DECOR1c: the pieces standing
 // in a room (scenes/decor/decorRoom.js), the scene that keeps them, and the host that stands them (worldModes.js).
@@ -164,7 +161,7 @@ test('DECOR1 the service: a home\'s pieces are any session\'s to read (a guest\'
   // realm character's record is its account's alone
   const namedPlace = await call('POST', '/v1/homes/decor/place', named({ piece: piece() }), mara);
   assert.deepEqual([namedPlace.status, namedPlace.body.error], [400, 'realm-needed'], 'another player naming the owner\'s character pays with no record of it');
-  // ACCOUNT-HOMES (2026-10-06, PIN MOVED - it was `no-home`, "the owner's OTHER character does not own it"): a home is its
+  // ACCOUNT-HOMES (2026-10-06
   // ACCOUNT's, so the owner's other character furnishes it too - on its OWN record, placed and taken out again
   const a2at = await realmJoinAt(env, aldric, A2.id);
   const otherChar = await call('POST', '/v1/homes/decor/place', { ...HOME, character: A2.id, realm: a2at, piece: piece({ id: 'a2' }) }, aldric);
@@ -234,13 +231,12 @@ test('DECOR1e a home sold takes its placed pieces, and its release answers how m
   assert.deepEqual([stranger.status, stranger.body], [404, { error: 'no-home' }], 'another player\'s release answers no sum');
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 4, 'and takes nothing');
   const sold = await call('POST', '/v1/homes/release', HOME, aldric);
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and the sale's home order, for every page online
   assert.deepEqual({ ...sold.body, homeOrders: undefined }, { ok: true, price: 42000, decorCount: 3, decorBack: 90 + 20 + 10, homeOrders: undefined }, 'each half truncated - never the half of the sum (121)');
   assert.equal(sold.body.homeOrders?.length, 1);
   assert.equal(sold.body.decorBack, decorSaleBack(pieces), 'the service\'s sum is the law\'s');
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 0, 'and they went with it');
   house();
-  const bare = (await call('POST', '/v1/homes/release', HOME, aldric)).body;   // PIN MOVED (QUEST-HOME): with its home order
+  const bare = (await call('POST', '/v1/homes/release', HOME, aldric)).body;
   assert.deepEqual({ ...bare, homeOrders: undefined }, { ok: true, price: 42000, decorCount: 0, decorBack: 0, homeOrders: undefined }, 'none placed, none back');
 });
 

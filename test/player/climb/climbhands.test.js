@@ -1,6 +1,4 @@
-// CLIMB-HANDS (2026-10-02, Mac: "Here are two textures for the first person view (not morrowind)" / "whenever you look
-// away from the wall" / "mirrored" / "Definitely animate the arms for when you are climbing, or shifting left to right
-// climbing/on a ledge"): THE CLASSIC LANE'S HANDS ON THE WALL. Design: bible/03-World/Parkour-Arc.md (CLIMB-HANDS).
+// CLIMB-HANDS: THE CLASSIC LANE'S HANDS ON THE WALL. Design: (CLIMB-HANDS).
 // THE LAW EXECUTES: which climbs draw hands, the two fists (the painting a left hand, the right its mirror - thumbs in),
 // never a cut sleeve, the look off the wall (the angled arm alone - CLIMB-HANDS II: the right arm, mirrored, looked right;
 // the left as painted looked left), a stopped shimmy's hand onto its stone, the free climb's one hand at a time, a
@@ -53,12 +51,10 @@ test('CLIMB-HANDS the hold: two fists come up from below, the left as painted an
 test('CLIMB-HANDS looking away: past LOOK_FROM_DEG the hand on that side lets go and the reaching arm alone comes up there - the right arm (mirrored) looked right, the left as painted looked left', () => {
   const near = settle(new ClimbHands(), hang(), { yaw: (HANDS.LOOK_FROM_DEG - 5) * DEG });
   assert.equal(near.reach, null, 'a glance along the wall is no reach');
-  // PIN MOVED (CLIMB-HANDS II, Mac: "the hands should stay on whatever your climbing"): the fists are on the wall, so a
   // glance this far along it has carried the far one's stone out of the view - the near one holds on (was: both, fixed)
   assert.deepEqual(near.grips.map((g) => g.side), ['R'], 'the near fist still on its stone, the far one\'s gone off the side');
   const right = settle(new ClimbHands(), hang(), { yaw: 85 * DEG });
   assert.ok(right.reach, 'turned right: the reach');
-  // PIN MOVED (CLIMB-HANDS II, Mac: "The single arm out is also inverted for both directions"): looked right, the RIGHT
   // arm - the painting (a left arm) mirrored - up from the right edge (was: the left arm, as painted, from the left edge)
   assert.deepEqual([right.reach.side, right.reach.flip], ['R', true]);
   assert.ok(right.reach.x + right.reach.w <= NATIVE_W && right.reach.x + right.reach.w > NATIVE_W - 10 && right.reach.x + right.reach.w / 2 > NATIVE_W / 2, 'looked right: at the right edge');
@@ -161,7 +157,7 @@ test('CLIMB-HANDS the draw: Mac\'s two paintings, loaded once, each box a screen
   assert.equal(uploads.length, 1, 'only what is drawn is asked for');
   assert.equal(quads.length, 1, 'the reach alone');
   const reach = quads.find((q) => q.tex.key.includes('reach'));
-  assert.deepEqual(reach.uv, { u0: 1, v0: 0, u1: 0, v1: 1 }, 'looked right: the right arm, the painting mirrored');   // PIN MOVED (CLIMB-HANDS II): was as painted
+  assert.deepEqual(reach.uv, { u0: 1, v0: 0, u1: 0, v1: 1 }, 'looked right: the right arm, the painting mirrored');
   for (let i = 0; i < 60; i++) hands.update(1 / 60, hang(), { yaw: 0 });
   hands.draw(canvas);
   await new Promise((r) => setTimeout(r, 0));

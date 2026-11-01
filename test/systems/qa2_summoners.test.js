@@ -1,4 +1,4 @@
-// QUEST-AUDIT II TEMPLE-SUMMONER (bible/01-Overview/audits/Quest-Audit-II.md; the owner: "Restore the summoner"): every
+// QUEST-AUDIT II TEMPLE-SUMMONER (): every
 // Daggerfall temple stands its deity's Daedra summoner, and all 24 of Beautiful Villages' temple designs leave it out
 // (1,855 temples). Each design's summoner - Daggerfall's own of the temple's deity - stands at a floor spot measured over
 // the player's data (tools/templeSummoners.mjs: the walk's nearest clear floor to the priest), put in where the block

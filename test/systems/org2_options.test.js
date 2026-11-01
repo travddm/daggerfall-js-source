@@ -1,4 +1,4 @@
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SETTINGS
+// ORG2: ONE SETTINGS
 // SCREEN FOR EVERY OPTION. Settings (DFU's 171 keys) and the Features home (the port's rows and the mods) were two doors
 // over one subject; one map (ui/settings/settingsMap.js) now places everything in a TAB, then a SECTION, and the screen draws
 // every option as a row of one shape. These pins hold the map total and disjoint over all three kinds of option, the
@@ -54,12 +54,12 @@ function withRows(fn) {
 }
 
 const SPECIAL = ['preset:graphics', 'link:overhauls', 'bindings', 'mods-index'];
-const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];   // PIN MOVED (TESA1): the Arena card; TESA12: gone with Arena
+const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];
 
 test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s keys, each Features row and each of the port\'s own rows stands in exactly one section of one tab (mutant: a row dropped, or placed twice)', () => {
   const seen = new Map();
   for (const t of CATEGORIES) {
-    // Mac, on ORG2's first cut: "Wayyyy too much overexplaining" - a tab and a section are their titles, nothing more
+    // a tab and a section are their titles, nothing more
     assert.deepEqual(Object.keys(t), ['id', 'title', 'sections'], `${t.id} is a title and sections`);
     assert.ok(t.title && t.sections.length, `${t.id} has a title and sections`);
     assert.equal(new Set(t.sections.map((s) => s.id)).size, t.sections.length, `${t.id}'s sections are named once`);

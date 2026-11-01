@@ -1,4 +1,4 @@
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection"; bible/01-Overview/audits/Audit-World-Events.md)
+// AUDIT WORLD-EVENTS
 // - THE BOSS TRAITS' FINDINGS (lane L2, and L5-4/L5-6/L5-12), each run through the real pools, the real stand-in spell door
 // and the real save where it was found: a peer's strike spell and a stand-in's rounds unresisted; the ward sized before the
 // health was; the owner's half on a fall, the wrath's clock on any wound and the wall; a raid leader's drop and its two

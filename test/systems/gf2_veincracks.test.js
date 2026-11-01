@@ -1,5 +1,5 @@
-// GATHER-FEEL II - VEIN-CRACKS (2026-10-13, Mac: "Do the not done" - GATHER-FEEL's open "the vein's crack decals and shed
-// chunks (5.2) are still unbuilt"; bible/06-Systems/Professions-Arc.md 5.2's Mining row and section 45): A WORKED VEIN
+// GATHER-FEEL II - VEIN-CRACKS (2026-10-13, - GATHER-FEEL's open "the vein's crack decals and shed
+// chunks (5.2) are still unbuilt"; 5.2's Mining row and section 45): A WORKED VEIN
 // CRACKS AND SHEDS ITS CHUNKS. The batch's field and the crack's law on the shader's own code (test/glsl.mjs - whole at
 // nought, only ever opening, the heart first, a seam's shade); both billboard programs composing it and the renderer
 // sending it a batch at a time; the chunks' law (the struck face, the arc, the floor, the lie and the sink, the box); and
@@ -126,7 +126,6 @@ function stateGl() {
 
 test('GF2-VEINCRACKS V3: both billboard programs compose the crack - its uniform declared beside the burn\'s, its block after the burn\'s, the albedo taken down by it before the light - and the renderer sends it a batch at a time: a cracked vein\'s draw reads its share and seed, every other draw whole, on the classic program and the lane\'s; the batch is born with the field (mutants: the send dropped, the reset dropped, the lane\'s hook missed)', () => {
   assert.ok(EL_BB_FS.indexOf(FLAT_CRACK_GLSL) > EL_BB_FS.indexOf('float dissolveGrain('), 'the lane: its block after the burn\'s');
-  // PIN MOVED (AUDIT GATHER-FEEL V4): the shade is of the display's colour - taken there, then decoded into the lane's light
   assert.match(EL_BB_FS, /vec3 albedo = max\(elDecode\(tex\.rgb \* veinCrackShade\(uv\)\) - emission, vec3\(0\.0\)\);/, 'the lane: the same law, in its linear light');
   assert.ok(EL_BB_FS.includes(FLAT_CRACK_GLSL), 'the lane composes the one block');
   for (const lane of [null, EL_LANE]) {
@@ -177,7 +176,6 @@ test('GF2-VEINCRACKS V4: the chunks\' law - a blow sheds three, one on the glint
     }
   }
   // the arc at any frame rate: the same place after the same time, in one step or sixty
-  // PIN MOVED (AUDIT GATHER-FEEL V3): the ground a chunk comes down on is its own, found as it is shed - handed to shedChunks
   const one = shedChunks(at, eye, 1, dice(0.5), -100)[0], many = shedChunks(at, eye, 1, dice(0.5), -100)[0];
   stepChunk(one, 0.3);
   for (let i = 0; i < 60; i++) stepChunk(many, 0.005);

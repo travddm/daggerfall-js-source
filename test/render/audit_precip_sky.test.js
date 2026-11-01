@@ -1,10 +1,10 @@
-// AUDIT PRECIP - THE SKY (the owner: "Audit this and ensure perfection. No band aids"): the faults the audit's sky lane
+// AUDIT PRECIP - THE SKY: the faults the audit's sky lane
 // found past SKY-ARC, each pinned on the shaders' own code (test/glsl.mjs, test/cloudSky.mjs) - SKY-BAND (the far slab
 // the walk never reached left bare to the dome: a stair-stepped band at the horizon on the map's lane at dusk), SKY-HZN
 // (the clouds faded into the clear base's horizon, not the sky's), SKY-CAP (a sun-coloured cap in the far haze: the
 // shadow map's square clamped in metres, and a crossing's strips left all light), SKY-2 (the curtains faded by where a
 // veil begins), SKY-3 (a wet cell's envelope lost) and SKY-POP (its deck swapped at the share's half). The record is
-// bible/01-Overview/audits/Audit-Precip.md, the SKY-ARC section of bible/07-Rendering/Volumetric-Clouds-Arc.md beside it.
+// the SKY-ARC section of beside it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

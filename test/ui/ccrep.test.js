@@ -1,6 +1,5 @@
 // CC-REP + CC-GRID + CC-STEP (2026-09-16, Ember on the Discord, relayed
-// by Mac): "Class creation menu seems to be missing a reputation
-// setting" - "the custom class building menu being in a list is a bit
+// by - "the custom class building menu being in a list is a bit
 // clunky ... having to scroll around to see all the options" - "the +
 // and - symbols on the buttons seem a bit small".
 //

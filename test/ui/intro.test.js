@@ -10,16 +10,15 @@ import { seaDistance, BALFIERA } from '../../src/ui/intro/introMap.js';
 import { brandMark } from '../../src/ui/brandMark.js';
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url));
-/** INTRO-REVERT II (the owner, 2026-10-26: "Intro music currently isnt working. We need to revert before we started
- *  tinkering with this"): systems/introTheme.js as INTRO2 left it, before INTRO3's #906 and THEME-BUFFER. */
+/** INTRO-REVERT II: systems/introTheme.js as INTRO2 left it, before INTRO3's #906 and THEME-BUFFER. */
 const INTRO2_THEME_SHA256 = '6954cf4c01f2a32e098a08c4ae4edb81b00823573076fd1c74c2f9c5ac24c8ec';
 
 test('INTRO2: supplied logo and Mac\u2019s remastered recording are byte-exact; timing cannot drift behind a replacement track', () => {
-  // BR4 (2026-09-27) shipped Mac's earlier cut as he supplied it
+  // BR4 shipped Mac's earlier cut as he supplied it
   // (real alpha; INTRO2's JPEG had a black backing to screen away). BR5
-  // (2026-10-11): his DFO Online logo, its 800 x 600 file cut to the 526 x 322
+  // his DFO Online logo, its 800 x 600 file cut to the 526 x 322
   // its paint covers - every pixel inside his, unchanged, and none outside
-  // with any alpha. BR6 (2026-10-26): his dragon mark - its 2000 x 1434
+  // with any alpha. BR6: his dragon mark - its 2000 x 1434
   // file cut to the 1680 x 1410 its paint covers, then scaled to 1232 x 1034
   // at his word (the same 56:47; 785 KB where the cut was 1.28 MB).
   assert.equal(createHash('sha256').update(read('src/assets/branding/dfo-online.png')).digest('hex'), 'bf7a6bca77b6f29f31738a85545cd7fb51c3e91dce4df985a93c7874804b57a7');
@@ -45,7 +44,7 @@ test('INTRO2: supplied logo and Mac\u2019s remastered recording are byte-exact; 
 
 test('INTRO4: the 19 s beat (decoded sample 230016 / 12000) is the crest; the logo lands on bar 16 at sample 592128 / 12000, and one frame earlier it is still out in front', () => {
   assert.ok(Math.abs(CREST_TIME - 230016 / 12000) < 1e-9, 'Mac\u2019s beat is the one around 19 seconds - INTRO2\u2019s landing, INTRO4\u2019s crest');
-  const measured = 592128 / 12000; // reproduced by tools/introAudioCheck.mjs, independently of the cue
+  const measured = 592128 / 12000;
   assert.ok(measured > 49.3 && measured < 49.4, 'the third phrase\u2019s downbeat, sixteen bars after the 19 s beat');
   assert.ok(Math.abs(TITLE_IMPACT_TIME - measured) < 1e-6);
   const before = introTitleAt(measured - 1 / 60), at = introTitleAt(measured + 1e-8);

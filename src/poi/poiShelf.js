@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-4b (2026-10-14) - THE LIBRARY'S SHELF: AN ENTRY MADE, ITS PICTURE DRAWN, AND IT KEPT.
+// POI-4b - THE LIBRARY'S SHELF: AN ENTRY MADE, ITS PICTURE DRAWN, AND IT KEPT.
 //
-// Mac: "Allowing not just the creation of POI's using models, but also the ability to import models ... a tool my
-// developers can use without having to access the codebase" (bible/06-Systems/POI-Editor-Arc.md POI-4b). A model a
+// (POI-4b). A model a
 // builder imported or made is kept on the library's shelf, shared with every builder, to stand again anywhere without
 // its file: an ENTRY is its parts (each the law's own - its mesh and materials by their hashes, its offset, turn and size
 // from the model's origin, its solidity and shadow) and its lights, a name, tags, words, and a picture of it.

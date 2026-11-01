@@ -1,10 +1,10 @@
 // @ts-check
-// TWO-HANDS (2026-10-16, Mac: "Duel wielding and bare hand improvements" - "When bare handed, the fist should be
+// TWO-HANDS (2026-10-16, - "When bare handed, the fist should be
 // mirrored on the other side of the screen (like 2 hands). Attacking should utilize both hands in a detailed way",
 // "When bare handed, or with nothing equipped, sprinting should show the hands in a running motion", "Weapons should
 // now be able to be duel wielded instead of using a hand swap. With 2 weapons equipped, both weapons can be seen and
 // animated in view", "With duel wielding, we need to balance this to not be overpowered and make sense"). THE LAW OF THE
-// TWO HANDS. Design and record: bible/05-Combat/Two-Hands.md.
+// TWO HANDS. Design and record:.
 //
 // DFU is the reference and has none of this: WeaponManager fights with ONE hand at a time - `usingRightHand`, flipped by
 // ToggleHand (WeaponManager.cs:702-729) - and FPSWeapon draws one sprite, mirrored only for a left-handed player
@@ -169,7 +169,7 @@ export function strikePicture(hand, state, { leftHanded = false, painted = () =>
  * into its swing - four ticks of five, the hit a tick sooner - which is 0.8 of one weapon's time at ANY frame rate; and
  * (AUDIT 2) the off weapon's burden is whole ticks held at its blows' end (offHandHold), never a factor on the tick.
  *
- * Measured through the machine and the formula, not on paper (bible/05-Combat/Two-Hands.md "The balance"): a held button
+ * Measured through the machine and the formula, not on paper ("The balance"): a held button
  * swings 1.25 times as often as one light weapon; a matched pair lands about 9% more damage a second than one of its
  * weapons when they are light and about 4% when heavy (a longsword pair: the off arm's burden), at any frame rate and
  * Speed, for a quarter more fatigue a second (DFU's per-swing cost) and the shield. A lighter off weapon trades its
@@ -237,7 +237,7 @@ export const OFF_HAND_BLOW = Object.freeze({ blowShare: offHandDamage, blowWeigh
 /** While one hand strikes, the other draws in: toward the middle of the view and down, the shoulder turned behind the
  *  blow - eased in fast, back out slower (ClimbPose's limb law: no pop between states). IN and DOWN are design pixels on
  *  DFU's 320x200 surface - the fists' tuck. A pair's resting WEAPON lowers by LOWER of its own drawn height, and only
- *  lowers (Mac: "When attacking with a weapon, the other weapon in hand should lower slightly"; then, of the tuck, "The
+ *  lowers (; then, of the tuck, "The
  *  sprite on the right moves ... and exposes where it clips off"): a weapon's picture is several fists tall (a dagger's
  *  143 design pixels, a katana's 86), so the fists' nine pixels did not read on it - a share of its own height lowers
  *  every weapon alike; and every weapon a pair holds is painted with its hand leaving the frame through its OUTER side
@@ -283,8 +283,7 @@ export function guardOffset(g, side, { time = 0, bounce = 0, hand = 'R', height 
 
 // ---- THE SPREAD (a pair in the Morrowind arm's first person) --------------------------------------------------------
 
-/** TWO-HANDS SPREAD (2026-10-17, Mac: "For the morrowind first person, when duel wielding can we spread out the arms a
- *  bit more sense it can make the weapons overlap"). The first-person pair holds its left arm as the right's mirror
+/** TWO-HANDS SPREAD. The first-person pair holds its left arm as the right's mirror
  *  across the picture's middle (mirrorRig.js pictureMirrorArm), and Morrowind's one-handed stance holds its weapon
  *  leaning in toward that middle - so the glass alone crossed a long pair's blades there. Both arms are turned OUTWARD,
  *  each about the upright line through its own top joint (mirrorRig.js's `spread`: the left still the right's mirror,
@@ -327,7 +326,7 @@ export function pairSpreadAngle(innerAt, fov) {
 export const RUN_STEP_M = 2.5;
 
 /**
- * The pump. THE RUNNING ARM IS THE ART'S OWN (Mac: "theres no arm portion of the sprite, so it looks like floating hands").
+ * The pump. THE RUNNING ARM IS THE ART'S OWN.
  * The bare hand's idle (WEAPON10.CIF record 0, 63x53) is a fist cut at the wrist, painted to stand on the view's bottom
  * edge - lifted, its cut floats. So a running hand is a frame of the bare hand's art that holds a fist on its own grey
  * forearm from the frame's foot, drawn as FPSWeapon draws a frame - its foot on the view's bottom edge (OnGUI's
@@ -340,8 +339,7 @@ export const RUN_STEP_M = 2.5;
  * peak, an upright forearm 98 pixels high, half the screen, held at the top by a snap; and then, its lowest frame alone,
  * "Why is the underhand showing when extended and not the fist": an uppercut shows the fist's INSIDE, curled fingers
  * toward the eye, in every frame. THE CUT STAYS OFF THE SCREEN: record 2's frame 1 leaves its frame through its FOOT
- * alone (measured on the shipped file: no row cut down either side; record 5's frame 0 had 15 down its right - Mac: "The
- * sprite on the right moves to the right and exposes where it clips off").
+ * alone (measured on the shipped file: no row cut down either side; record 5's frame 0 had 15 down its right).
  *   ARM_STATE / ARM_FRAME - the record (by its state) and its frame: the fist's back, leaving only at the foot;
  *   DROP      - the back of the stroke, down, of the frame's height (past the view's edge: the hand passing the hip);
  *   IN/OUT    - toward the middle at the top (the arm across the chest) and out at the bottom, of the view's width;
@@ -448,8 +446,7 @@ export function pumpOf(phase, hand) {
  * (combat/climbRig.js), its fist clenched (`CURL` radians, each finger's share), its palm turned in, its elbow out and
  * back. The top of the stroke is the bottom of the picture, before the hand's own shoulder; the bottom is under the
  * frame - the hand passing the hip. The same stride, the same stroke, the same weight as the sprite lane's (pumpOf,
- * runWeightStep). RUN-WIDE (2026-10-19, Mac: "The hands are way too close together when running both in third and first
- * person"): the top stood 0.36 of the half-frame out - 14 cm across at its 0.42 m, inside the shoulder joint's 15.5 (the
+ * runWeightStep). RUN-WIDE: the top stood 0.36 of the half-frame out - 14 cm across at its 0.42 m, inside the shoulder joint's 15.5 (the
  * retail biped's) - so each fist came up toward the middle; 0.6 is 21 cm, before and just outside its own shoulder.
  */
 export const RUN_3D = Object.freeze({

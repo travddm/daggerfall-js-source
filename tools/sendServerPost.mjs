@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-// SERVER-POST (2026-10-08, Mac: "Let's develop an ingame server mailbox that goes next to the hourglass in the pause
-// menu. It should show notifications whenever players have a message. First use is to utilize it for players being
-// granted items."): THE POST, SENT BY THE OPERATOR. No route a player can reach writes a piece of the server's post
+// SERVER-POST: THE POST, SENT BY THE OPERATOR. No route a player can reach writes a piece of the server's post
 // (server-account/src/post.js only reads, claims and throws away), so a piece is written here, by hand, through
 // .github/workflows/server-post.yml:
 //   1. a dry run reads the accounts the names find, and whether each already holds this send - and nothing is written;
@@ -18,7 +16,7 @@
 // game's own code, never typed into a workflow; `message` takes `\n` for a line break. Every word reaches the statement
 // through sqlText, quotes doubled.
 //
-// HOURS-FIRST (2026-10-08): the post's first use - HOURS_FIRST, the thirteen of the first clear. That send is migration
+// HOURS-FIRST: the post's first use - HOURS_FIRST, the thirteen of the first clear. That send is migration
 // 0094 (`--migration hours-first` prints it). Its names and its record are FROZEN here, never read off the config's list
 // or the game's mint, because an applied migration never changes. The item it holds, the Hourlock, is no longer in the
 // game: a claim of it drops the item as an unknown one.
@@ -55,8 +53,7 @@ export const HOURS_FIRST = Object.freeze({
 /** HOURS-FIRST: the Hourlock's record as 0094 sent it, frozen. */
 export const HOURS_FIRST_RECORD = "{\"group\":\"Weapons\",\"templateIndex\":560,\"material\":4,\"flags\":0,\"variant\":0,\"message\":0,\"stackCount\":1,\"name\":\"The Hourlock\",\"value\":39740,\"maxCondition\":4800,\"currentCondition\":4800,\"rarity\":\"gilded\",\"gilded\":\"the-hourlock\",\"affixes\":[{\"id\":\"damage\",\"value\":40},{\"id\":\"stat\",\"param\":\"agility\",\"value\":15},{\"id\":\"skill\",\"param\":33,\"value\":30},{\"id\":\"elemental\",\"param\":\"shock\",\"value\":10}],\"isIdentified\":true}";
 
-/** TAMRIEL-POST (2026-10-28, the owner: "Send a heartfelt, non-ai like message to players in their inbox and attach 10
- *  portal stones"): the Tamriel update's letter, to every registered account, ten Portal Stones in one stack. Migration
+/** TAMRIEL-POST: the Tamriel update's letter, to every registered account, ten Portal Stones in one stack. Migration
  *  0188 (`--migration tamriel`) sends it with the deploy; its words and record are FROZEN here, as HOURS_FIRST's. */
 export const TAMRIEL_POST = Object.freeze({
   batch: 'tamriel-portal-stones',

@@ -1,7 +1,5 @@
 // @ts-check
-// TESA10 (2026-10-12, the owner: "Can we redesign each capital city as close to 1:1 with other games. For example,
-// oblivion's capital, skyrims solitude, etc"; asked, "You build them yourself. No files needed"; bible/03-World/
-// Arena-Provinces.md TESA10) - THE CAPITALS, BUILT BY HAND. A capital past the Bay is no clone of a Bay city: its block
+// TESA10 - THE CAPITALS, BUILT BY HAND. A capital past the Bay is no clone of a Bay city: its block
 // grid is laid out here, its districts of Daggerfall's own city blocks (the player's BLOCKS.BSA - a house, a shop, a
 // guild, a temple, each with its interior and its people) round landmarks of the port's own (world/capitalModels.js: the
 // White-Gold Tower, the Imperial City's walls and its bridges), each capital's signature in a layout of its own - never a
@@ -99,7 +97,7 @@ export const CAPITAL_MODELS = Object.freeze({
   manePalace: 910150, twoMoonsTemple: 910151, torvalQuay: 910152, torvalWall: 910153, maneEstate: 910154,   // TESA-LORE: the estate
   xanmeer: 910160, hist: 910161, helstromWalks: 910162, palisade: 910163,
 });
-/** BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 31 - C6): IS A MODEL ONE OF A CAPITAL'S
+/** BAY-LEFT-SEA: IS A MODEL ONE OF A CAPITAL'S
  *  LANDMARKS - a CAPITAL_MODELS model, or an Imperial City part its slices carry (IMPERIAL_PARTS). Its FOOTPRINT is its
  *  blocks' own: every block it stands over closes its automap where its faces stand (capitalPortBlocks' `footprint`,
  *  world/capitalModels.js capitalFootprint and imperialSliceFootprint - a wall to the walkers, not ground to cross), so the
@@ -442,7 +440,7 @@ export function capitalCanalOpen(k) {
   const D = capitalDims(cap);
   return canalAt(at.px + cap.harbour[0] - D.mx, at.py + D.h - D.my);
 }
-/** BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 31 - C6): A CAPITAL SLICE'S PORT WORD - its
+/** BAY-LEFT-SEA: A CAPITAL SLICE'S PORT WORD - its
  *  harbour's slice (capitalHarbourSlice) where the place of its name pinned on its centre is a port (`pinPort`, TESA6's
  *  coastal word) or its harbour meets its canal (capitalCanalOpen): the registry's row (world/pastBayRows.js) and the
  *  slice's own PortTownAndUnknown byte (synthesizeCapitalLocation), one law - so the harbour the sea's systems call a port

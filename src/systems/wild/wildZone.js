@@ -1,15 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07) - THE OPEN ZONE: THE WROTHGARIAN MOUNTAINS (bible/11-Multiplayer/Wild-Zone.md).
+// WILD1 - THE OPEN ZONE: THE WROTHGARIAN MOUNTAINS.
 //
 // The owner: "Wrothgarian mountains need to be turned into a open pvp zone ... The zone needs to be marked on the map
 // players cant see each others near and in that zone. Mobs are 4x stronger (even elites and champions) and drop 100%
 // better loot. Same goes for dungeons." - and, asked what "100% better" is: "twice gold and twice the dropchance for
 // rarity items and double drops".
 //
-// WHAT THE ZONE IS: WW-C2 (2026-10-24, bible/03-World/World-Wide.md WW-C; the owner: "Cyrodil becomes the new open PvP
-// area with the wrothgarian mountain area being retired in favor of this. Cryodil will be home to all abundent resources
-// and everything else from the wrothgarian zone") - CYRODIIL, the Imperial Province past the Bay: every map pixel of its
+// WHAT THE ZONE IS: WW-C2 - CYRODIIL, the Imperial Province past the Bay: every map pixel of its
 // land (systems/wild/cyrodiilZone.js, the province's own picture), and every place in it. It was the Wrothgarian
 // Mountains (region 16 of the Bay, the owner's cut, Wrothgaria kept out) from WILD1 to WW-C2: that zone is retired, the
 // mountains Daggerfall's own again. NEAR it: within WILD_NEAR_PX map pixels of its edge (the maps' hiding reaches that
@@ -42,8 +40,7 @@ export const WILD_LOOT_GOLD_MULT = 2;
 export const WILD_LOOT_DROP_MULT = 2;
 export const WILD_LOOT_RARE_MULT = 2;
 /**
- * WILD2 (2026-10-07, the owner: "give the zone 4 levels from the outerside to the inside 25% of the zone are 25% more
- * loot when you go in deeper 50% more loot then 75 and when youre in the middle 25% 100% more loot"): THE RINGS. A
+ * WILD2: THE RINGS. A
  * pixel's depth is its distance from the zone's edge over the deepest pixel's; the outer quarter of that depth is ring
  * 1, the heart's quarter ring 4. A ring's loot is every multiplier above at `WILD_RING_LOOT[ring - 1]` - the heart's
  * the owner's "twice" exactly. The foes are four times as strong in every ring.
@@ -63,8 +60,7 @@ export const WILD_KILL_CREDIT_MS = 10_000;
 /** How far from the zone's edge the maps still hide a player, in map pixels (one is ~820 m). */
 export const WILD_NEAR_PX = 6;
 
-/** WILD3 (2026-10-07, the owner: "fast traveling via carriage inside the zone costs 2,5k gold and has a 10minute cool
- *  down. you cant fast travel out and into the zone. Same for all other fast travel options except the overworld map"):
+/** WILD3:
  *  the fee and the wait of every fast journey that starts and ends inside the zone. */
 export const WILD_TRAVEL_FEE = 2500;
 /** PVPTIERS: a fast journey inside the zone costs by the tier it lands in - 2.5k, 5k, 10k, 15k. */
@@ -72,8 +68,7 @@ export const WILD_TRAVEL_FEES = Object.freeze([2500, 5000, 10000, 15000]);
 export const wildTravelFee = (ring) => WILD_TRAVEL_FEES[Math.max(1, Math.min(4, ring | 0 || 1)) - 1];
 export const WILD_TRAVEL_COOLDOWN_MS = 10 * 60_000;
 
-/** WILD3 (the owner: "Giants you meet there are also 4 times bigger (not in dungeons only outside). i hope there are
- *  giants to meet"): Daggerfall's Giant (MobileTypes 16) stands four times its size in the zone's open country, and a
+/** WILD3: Daggerfall's Giant (MobileTypes 16) stands four times its size in the zone's open country, and a
  *  wanderer the zone's roll stands is one WILD_GIANT_CHANCE of the time - so there are giants to meet. */
 export const WILD_GIANT = 16;
 export const WILD_GIANT_SIZE = 4;
@@ -88,19 +83,18 @@ export const WILD_GIANT_DAMAGE_MULT = 4;
 export const ZONE_WATCH_SCALE = 10;
 /** A body's size over its sprite's: a giant of the zone's open country's four, anyone else's one. */
 export const wildGiantSize = (entity) => (entity?.wildGiant ? WILD_GIANT_SIZE : 1);
-/** GREATER-GIANT (2026-10-08, the owner: "Name the giant Greater Giant which spawns 10 normal gants when half health"): the
+/** GREATER-GIANT: the
  *  zone's own giants are GREATER GIANTS - their name; at half their health, once a life, they call GREATER_GIANT_CALL
  *  giants of the ordinary kind (the zone's four times, never an elite or a champion) about them. */
 export const GREATER_GIANT_NAME = 'Greater Giant';
 export const GREATER_GIANT_CALL = 10;
 export const GREATER_GIANT_CALL_AT = 0.5;
 
-/** WILD3 (the owner: "when other players are near you they are counted as enemies bright red and its called stranger when
- *  you near them Like 600m away. and when youre near them like 200m it slows you down like normal enemies"): a STRANGER
+/** WILD3: a STRANGER
  *  is another player in the zone outside my party and my guild - marked within WILD_STRANGER_M, slowing a journey within
  *  WILD_STRANGER_SLOW_M, in WILD_STRANGER_RGBA. */
 export const WILD_STRANGER_M = 600;
-/** STRANGER-SEE (2026-10-08, the owner: "make strangers visible at 1,5km"): a stranger is marked (the Overworld's helmet,
+/** STRANGER-SEE: a stranger is marked (the Overworld's helmet,
  *  the red) this far; the warning stays at WILD_STRANGER_M. */
 export const WILD_STRANGER_SEE_M = 1500;
 export const WILD_STRANGER_SLOW_M = 200;
@@ -214,7 +208,7 @@ export function fillEnclosed(inside, width, height) {
 export const PIXEL_CELL_MAX = 4;
 
 /**
- * ZONE-LINE (2026-10-26, the owner: "Also ensure the pvp border outlines cyrodil perfectly, currently it doesnt"): THE
+ * ZONE-LINE: THE
  * PIXEL'S OWN LAW ON THE CELLS' GRID. `pixelIn(x, y)` answers a whole world map pixel; each cell keeps its pixels as
  * bits (bit `sy * cell + sx`), so the zone is its law's to the pixel and every ask is one bit. A cell of four had stood
  * whole where its middle pixel stood - a 3.3 km staircase about the province's own line, 9,012 pixels of the two apart.
@@ -586,7 +580,7 @@ export function createPartyTruce(ms = WILD_PARTY_TRUCE_MS) {
 
 // ── the words ─────────────────────────────────────────────────────────────────────────────────────────────────────────
 export const WILD_TEXT = Object.freeze({
-  // FOE-KEEPS (2026-10-24, the owner: "I dont want people to lose everything they have"): only another player's kill drops
+  // FOE-KEEPS: only another player's kill drops
   // what you carry (a foe's takes the usual tenth of the purse) - said so where the zone is entered, on its chip and at a
   // foe's death; through the text core (L10N4), read when they are said (a getter: a string where the callers read one).
   // WW-C2: the zone is Cyrodiil's - a name, said with no article
@@ -608,7 +602,7 @@ export const WILD_TEXT = Object.freeze({
   deathLettersTenth: (gold) => (gold > 0 ? t('wild.death.lettersTenth', 'A tenth of your letters of credit, {gold} gold, lies where you fell.', { gold: Number(gold).toLocaleString('en-US') }) : ''),
   deathLetters: (n, gold) => (n > 0 ? t('wild.death.letters', '{n, plural, one {A letter} other {# letters}} of credit worth {gold} gold left your wallet.', { n, gold: Number(gold).toLocaleString('en-US') }) : ''),
   deathClaim: (name, item) => `${name || 'Another player'} took your ${item || 'gear'}.`,
-  // MAC (2026-10-14, the two-phase handoff): the piece claimed is held in escrow until its killer collects it - its words
+  // MAC: the piece claimed is held in escrow until its killer collects it - its words
   // through the text core (L10N4), read when they are said
   deathHeld: (name, item) => (name
     ? t('wild.escrow.deathHeld', '{name} claimed your {item}. It is held until they collect it, and comes back to you if they do not.', { name, item: item || t('wild.escrow.gear', 'gear') })
@@ -649,8 +643,7 @@ export const WILD_TEXT = Object.freeze({
   travelWait: (min) => `The carriages of ${WILD_NAME} run every ten minutes. The next leaves in ${min} minute${min === 1 ? '' : 's'}.`,
   travelPoor: (fee) => `A journey inside ${WILD_NAME} costs ${fee.toLocaleString('en-US')} gold here.`,
   travelPaid: (fee) => `You pay ${fee.toLocaleString('en-US')} gold for the Imperial road.`,
-  // WILD-INSURE (2026-10-26, the owner: "being able to insure gear on death"; asked, "Kept, policy spent" at "20% of
-  // worth" - systems/wild/wildInsureLaw.js): the pack's card and menu (net/wild/wildInsureBook.js) and the death screen -
+  // WILD-INSURE: the pack's card and menu (net/wild/wildInsureBook.js) and the death screen -
   // through the text core (L10N4), read when they are said
   insureAct: (gold) => t('wild.insure.act', 'Insure ({gold} gold)', { gold: Number(gold).toLocaleString('en-US') }),
   insuredLine: () => t('wild.insure.line', 'Insured. A player\'s kill in an open PvP zone will not take it, and the policy is spent when it saves this piece.'),
@@ -659,9 +652,9 @@ export const WILD_TEXT = Object.freeze({
   insureInZone: () => t('wild.insure.inZone', 'No one writes insurance inside an open PvP zone. Insure your gear before you go in.'),
   insureOffline: () => t('wild.insure.offline', 'Insurance is written online, for a realm character.'),
   deathInsured: (n) => (n > 0 ? t('wild.death.insured', 'Insurance kept {n, plural, one {# piece} other {# pieces}} of your gear. Each policy that saved a piece is spent.', { n }) : ''),
-  // REPEAT-SHIELD (2026-10-26, the owner chose "Repeat-kill shield"): a kill by the same hand inside half an hour takes nothing
+  // REPEAT-SHIELD: a kill by the same hand inside half an hour takes nothing
   deathShield: () => t('wild.death.shield', 'The same player killed you less than half an hour ago, so nothing was taken.'),
-  // ZONE-GRACE (2026-10-26, the owner chose "Entry/rise grace" - systems/wild/wildGrace.js): safe passage, begun, ended, and
+  // ZONE-GRACE: safe passage, begun, ended, and
   // a blow of mine it kept off
   graceOn: (s) => t('wild.grace.on', 'Safe passage: no player can harm you for {s, plural, one {# second} other {# seconds}}, or until you attack one.', { s }),
   graceOff: () => t('wild.grace.off', 'Your safe passage has ended. Other players can attack you.'),
@@ -707,8 +700,7 @@ export function applyWildFoe(entity, { own = true, ring = WILD_RINGS } = {}) {
   if (!entity || entity.wildFoe) return false;
   entity.wildFoe = true;
   entity.wildRing = Math.max(1, Math.min(WILD_RINGS, ring | 0 || WILD_RINGS));   // WILD2: its loot's ring
-  // PVPDUNGEONS (the owner: "With the tier, enemies also get stronger on top of what they are in the zone based on the tier
-  // percentage"): the ring's own share - +25% in the foothills to +100% in the heart - over the zone's four times
+  // PVPDUNGEONS: the ring's own share - +25% in the foothills to +100% in the heart - over the zone's four times
   const tier = wildRingLoot(entity.wildRing);
   entity.wildTierMult = tier;
   if (own) {
@@ -735,7 +727,7 @@ let _killed = false;
 let _fell = null;
 /** The world host's word at a death in the zone - `{ killer, dropped, claimed, held, burnt, letters, insured, shield }` (the
  *  last two: WILD-INSURE's count of pieces my policies kept, and REPEAT-SHIELD's word that nothing was taken) (the killer's name or
- *  null, how many things were left where the body fell, the worn piece the killer took - `held`: MAC (2026-10-14), held in
+ *  null, how many things were left where the body fell, the worn piece the killer took - `held`: MAC, held in
  *  escrow until they collect it - BURNT-SAID: how many were taken and laid nowhere, a held record's, and `letters` the
  *  pieces the death took out of the pack, of which the letters of credit are counted, and `served` the seconds it lay
  *  before this page heard of it) - or null when the death screen goes. The screen holds WILD_DEATH_HOLD_S less `served`

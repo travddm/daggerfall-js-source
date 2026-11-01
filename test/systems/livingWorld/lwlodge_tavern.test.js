@@ -1,5 +1,4 @@
-// LW-LODGE (2026-10-06, bible/06-Systems/Living-World.md "LW-LODGE"; Mac: NPCs should "use tavern rooms" - "Lodgers in
-// their rooms"): A LODGER HAS A ROOM. One who lodges at a tavern - a visitor, a ship's hand ashore, one of the town whose
+// LW-LODGE: A LODGER HAS A ROOM. One who lodges at a tavern - a visitor, a ship's hand ashore, one of the town whose
 // home is its rooms - was stood in its common room whenever their day had them up at home there (the first cut stood
 // every one inside a building on the ground floor's spots), and their evening's tavern was the nearer of the two
 // nearest home, theirs or the next. Now they breakfast in the common room after waking and sup there in the evening, and
@@ -268,7 +267,7 @@ test('LW-LODGE in the tavern: a lodger up in their room (their day\'s home there
   assert.equal(lone.layer.stood()[0]?.bed, bedA, 'in view: still up there');
   lone.layer.frame(0.016, [0, 0, 0], toward + Math.PI, [0, 1.6, 0]);
   lone.layer.frame(0.016, [0, 0, 0], toward + Math.PI, [0, 1.6, 0]);
-  // AUDIT LW-ROOMS: PIN MOVED - looked away from, they leave their room; and come down where the player is not looking
+  // AUDIT LW-ROOMS:
   // (the room's walk deals the common room's first free place in the half the player looked into: they wait for it)
   assert.ok(lone.layer.stood().every((s) => s.bed !== bedA), 'looked away from: gone from their room');
   const down = tavernRig({ inside: [[a, 'tavern']], lodgers: [a] });

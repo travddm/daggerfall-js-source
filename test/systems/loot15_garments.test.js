@@ -1,4 +1,4 @@
-// LOOT15 - SIX LEGENDARY GARMENTS (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 7; Mac: "Lets go all in").
+// LOOT15 - SIX LEGENDARY GARMENTS.
 //
 // The wardrobe's own records, beside the first arc's thirty and in a table of their own (WARDROBE_LEGENDARIES), so the
 // thirty - and every pin and seed that reads them: the Sigil Broker's day, the gate's spoils, a town's thanks - stand as
@@ -105,7 +105,6 @@ const twin = (id) => ({ ...legendary(id), legendary: null });
 test('LOOT15: the powers through their own readers - the degrees in the felt temperature, the standing, the hood\'s Stealth, the fatigue and the fall; once however many carry one; never another\'s; off nothing', () => {
   on();
   const felt = (env, e, ctx = {}) => feltTemperature(env, e.equip.slots, { ...ctx, ...wardrobeCtx(e._mods) }).felt;
-  // PIN MOVED (AUDIT LOOT II A2, Loot-II-Arc.md section 15): the degrees come off the felt number itself, toward
   // comfortable and never past it, on their own side alone - laid on the fire resistance, the robes' twenty resisted
   // the outfit's own warmth too, and a cold night was colder in them
   // Desert-Born: the heat felt twenty less

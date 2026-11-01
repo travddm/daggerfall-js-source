@@ -1,5 +1,4 @@
-// ACC1a - THE IDENTITY TOKEN (2026-09-21, Mac: "the account name would
-// be used for online").
+// ACC1a - THE IDENTITY TOKEN.
 //
 // The hole this closes exists TODAY: the hello carries a `name` the
 // client wrote and wire.js only sanitises. These pins hold the thing
@@ -366,8 +365,6 @@ test('ACC1d/F8: A TOKEN IS SPENT ONCE - the same token presented twice is refuse
 });
 
 test('ACC1g: a hello with NO token is REFUSED - a name cannot be typed any more (mutants: the old admit-unvouched arm back; the refusal downgraded to a name off the frame)', async () => {
-  // Mac: "You shouldnt be able to just type a name and enter
-  // anymore.... this is what the account system is for."
   //
   // ACC1d admitted this hello and said out loud that it was the wall
   // not yet standing. THE WHOLE ARC TURNS ON THIS LINE: while it

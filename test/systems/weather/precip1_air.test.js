@@ -1,11 +1,9 @@
-// PRECIP1 / PRECIP2 (2026-10-19, the owner: "I also want to begin giving each biome their own precipitation. It shouldnt
-// snow everywhere or rain everywhere when the season is winter ... If its snowing in one area and raining in the next,
-// the transition should be seamless"): THE AIR (systems/weather/airTemperature.js, its map airGround.js) and WHAT FALLS IN
+// PRECIP1 / PRECIP2: THE AIR (systems/weather/airTemperature.js, its map airGround.js) and WHAT FALLS IN
 // IT - the phase law in the sim (weatherSim.js precipLawOn, snowShareAt, phaseWord, phaseRound, systemWordOf), one air per
 // place (weatherMap.js wornAmong), the front's snow share and its two looks' levels (weatherFront.js), the mixed fall
 // (render/precipitation.js drawFall) and the sky's cells at their own place's share (volumetricClouds.js cellOfField,
-// rainCurtains.js). AUDIT PRECIP (the owner: "Audit this and ensure perfection. No band aids") re-pinned every law it
-// moved. bible/07-Rendering/Biome-Precipitation.md is the record, bible/01-Overview/audits/Audit-Precip.md the audit's.
+// rainCurtains.js). AUDIT PRECIP re-pinned every law it
+// moved. is the record, the audit's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -248,7 +246,7 @@ test('PRECIP2 THE FRONT\'S SNOW SHARE: off the law the mode\'s own, on it the si
     assert.deepEqual([currentSnowShare(), weatherSystemStamp(), weatherPhaseFlip()], [0, 0, false], 'forgotten');
   } finally { setPrecipLaw(null); setWeatherFieldLaw(null); setWeatherMapLaw(null); setAirGround(null); resetWeatherSim(); }
   const src = readFileSync('src/systems/weather/weatherFront.js', 'utf8');
-  assert.match(src, /const fallOf = \(mode\) => \(mode && !isDryFall\(mode\) && precipLawOn\(\) \? 'wet' : precipKind\(mode\)\);/);   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls, the sand and the ash
+  assert.match(src, /const fallOf = \(mode\) => \(mode && !isDryFall\(mode\) && precipLawOn\(\) \? 'wet' : precipKind\(mode\)\);/);
   assert.match(src, /const id = systemWordOf\(weather\);/);
 });
 
@@ -332,7 +330,7 @@ test('PRECIP2 THE SKY\'S CELLS at their own place\'s share: a wet cell\'s air re
   for (let i = 0; i < 3; i++) near(mid[i], (CURTAIN_RAIN_COLOR[i] + CURTAIN_SNOW_COLOR[i]) / 2, 1e-6, 'between');
   const src = readFileSync('src/render/rainCurtains.js', 'utf8');
   assert.match(src, /kind: c\.fallKind \?\? 0,/);
-  assert.match(src, /gl\.uniform3fv\(U\.uColor, mixColor\(CURTAIN_RAIN_COLOR, CURTAIN_SNOW_COLOR, c\.kind, c\.tint\)\);/);   // PIN MOVED (ASHFALL1, 2026-10-27): in its cell's tint
+  assert.match(src, /gl\.uniform3fv\(U\.uColor, mixColor\(CURTAIN_RAIN_COLOR, CURTAIN_SNOW_COLOR, c\.kind, c\.tint\)\);/);
   assert.equal(typeof curtainsOf, 'function');
 });
 

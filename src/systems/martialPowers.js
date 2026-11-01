@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MARTIAL3/4 (2026-10-17) — WHAT THE MARTIAL PATHS DO. bible/05-Combat/Martial-Specialisations.md sections 5-6.
+// MARTIAL3/4 — WHAT THE MARTIAL PATHS DO.
 //
 // The law (systems/martialPaths.js) says which path a fighter chose and when it is AWAKE; the signature technique is the
 // runner's (combat/techniques.js - the key's answer with no line on the weapon); this file does what each path's passive
@@ -68,7 +68,7 @@ import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';
 import { healthShare } from '../combat/healthShare.js';   // FIELD BUGS 2026-10-18f RELAY-SHARE: a body's share of its health, the one law
 import { hudText } from './notify.js';
 import { t } from './textManager.js';
-// MENTOR2 (bible/06-Systems/Mentor-Mode.md): every number here acts at the mentor's power scale (1 outside mentoring) -
+// MENTOR2: every number here acts at the mentor's power scale (1 outside mentoring) -
 // a percent, a chance, a heal, a rider's share; a window's seconds and a recovery stay whole.
 import { mentorPowerScale, mentorScaled } from './mentorMode.js';   // MENTOR2: the paths at the mentor's share
 

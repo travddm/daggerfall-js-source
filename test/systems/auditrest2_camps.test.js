@@ -1,4 +1,4 @@
-// AUDIT REST II (2026-10-03, bible/06-Systems/Rest-Arc.md "AUDIT REST II"): the Campfire's lifecycle across the hosts,
+// AUDIT REST II: the Campfire's lifecycle across the hosts,
 // the saves and the shops, each finding pinned by execution where it can be. H1: a Recall out of a dungeon carries my
 // Campfire out (only a load drops it), and the room hears a dropped fire go.
 import { test, afterEach } from 'node:test';
@@ -191,7 +191,7 @@ test('AUDIT REST II H8: a General Store sells two to four Campfires, on the coun
 test('AUDIT REST II H9: "Bring online" keeps a supply left with a repairer offline too - the counter\'s list crosses with the character (save.js otherItems), so customs strips it there as from the pack, the wagon and the stashes (mutant: the counter unread)', () => {
   _resetForTests(); setPref('survival', true);
   const sword = { templateIndex: 113, group: 'Weapons', value: 10 };
-  // REST-LOOT (2026-10-05): the sources are open, so this is the switch's way back - pinned with the switch shut
+  // REST-LOOT: the sources are open, so this is the switch's way back - pinned with the switch shut
   _setRestItemsOnlineForTests(false);
   try {
     const snap = { level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], otherItems: [createRestItem(REST_ITEM.Bedroll), sword] };
@@ -244,7 +244,7 @@ test('AUDIT REST II H12: online a cold camp offers no Rest - it is no rest point
   const litFire = { ...coldFire, litUntil: 99 };
   const coldTent = { kind: CAMP_KIND.Tent, wear: 30, litUntil: 5 };
   const keys = (rows) => rows.map((r) => r.key);
-  // AUDIT C&C I11 (PIN MOVED): a cold fire offers no Cook - the cooking list only refused at it - so each cold list
+  // AUDIT C&C I11 (
   // below is the one it was less its Cook; a lit one keeps it
   assert.deepEqual(keys(campMenu(coldFire, 10, true, { online: true })), ['stoke', 'pack'], 'my cold Campfire: Relight first');
   assert.equal(campMenu(coldFire, 10, true, { online: true })[0].text, CAMP_TEXT.menuRelight);

@@ -1,4 +1,4 @@
-// WB14f (2026-10-19, Mac: "And whatever else you can cook up", then "This is all yours to take on"): THE CAPTIVE - on a
+// WB14f: THE CAPTIVE - on a
 // Captive night a knight of the Covenant kneels at the Pen's heart, chained to his gaolers (WB11's Ward-Bearer's body and
 // Pulse under another name). At the Warden's wake the walkway to the Pen rises, and the gaolers as the first challenger
 // stands in it (AUDIT WB14 LAW-8: sized for the fight then - at his wake it is the first few to come); the last one down,
@@ -18,7 +18,7 @@
 //                    floor it stands on), ui/gate/gateBossBar.js (the gaolers, then the ward), world/gate/gateBoss.js (the
 //                    gaoler's look, the knight's)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md section 7.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

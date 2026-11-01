@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
 // UNLEVELED LOOT 1.1.2 (Ralzar, MIT) - THE MOD, 1:1 (UL1, 2026-09-12,
-// Mac: "Heres the next mod unleveled loot. Again 1:1").
 //
 // "Makes loot and shop stock materials not scale to your level." A
 // MonoBehaviour that REPLACES FormulaHelper.RandomMaterial and
@@ -238,8 +237,7 @@ export function unleveledGoldLootPiles(lootItems, { rolls = Math.random, level =
 }
 
 // ── OnEnemyDeath ───────────────────────────────────────────────────
-// ASF-DEATH (2026-10-19, Discord #suggestions "Weapon/Armor Materials": "tens of thousands of gold by vendoring off the
-// daedric armor"): A DEPARTURE in both drops below - each leaves the condition it rolls as `foundCondition`, the mark
+// ASF-DEATH: A DEPARTURE in both drops below - each leaves the condition it rolls as `foundCondition`, the mark
 // SELL-AS-FOUND (AUDIT ECON O1) gave Roleplay & Realism's rolls, so online a mended drop sells as it fell and a third of
 // the mend (MEND-THIRD). The mod's own rolls, and the draws they take, are unchanged.
 /** A weapon drop: CreateItem(Weapons, Range(Dagger, Long_Bow + 1)),
@@ -268,9 +266,7 @@ function dropArmor(loot, material, rolls) {
   return item;
 }
 const named = setItemFields;   // MAC-N1: was a second copy of loot.js's `named`; ONE DFU MEMBER, ONE EXPORT
-// METAL-RAMP (2026-10-19, Discord #suggestions "Weapon/Armor Materials": "any new character can wander outside, kill
-// some easy orcs on the overworld, and get orcish gear right from the get-go ... Newbies are skipping 90% of the gear
-// material progression"; Mac: "Level ramp"): A DEPARTURE from AddDaedric and AddOrcish, which ignore the level. A drop
+// METAL-RAMP: A DEPARTURE from AddDaedric and AddOrcish, which ignore the level. A drop
 // the mod's roll grants is its race's metal at the killer's level over METAL_RAMP_FULL (`Range(0, 20) < level`, one draw
 // more, and none at 20 and up, where the mod stands as it was); a drop the ramp withholds is the level's own rung of the
 // middle metals instead (`rampMetal`: Elven at 1-4, Dwarven 5-8, Mithril 9-12, Adamantium 13-16, Ebony 17-19), so the
@@ -333,7 +329,7 @@ export function unlevelDroppedLoot(entity, { rolls = Math.random, r = null, luck
  *  overrides, the dead third, the death handler. Each reads `Enabled`
  *  live and declines when off, so DFU's own rolls stand. */
 export function installUnleveledLoot({ read: r = null } = {}) {
-  // MO1 (2026-09-12): the mod is on by default now, so its arms can be
+  // MO1: the mod is on by default now, so its arms can be
   // asked before any world has handed in a player (a shelf minted at
   // boot, a foe spawned in a host that never mounts the reader, every
   // test that never did). DFU's PlayerEntity always exists; the port's

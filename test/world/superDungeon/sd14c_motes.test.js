@@ -1,5 +1,4 @@
-// SD14c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7 and section 16's SD14c;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MOTES (render/superDungeon/sdMotes.js) - over a thousand
+// SD14c: THE HOUR'S MOTES (render/superDungeon/sdMotes.js) - over a thousand
 // where the Deadlands carry 896: the hall's brass dust turning with the Orrery, the void's sparks rising under the
 // Steps and gone by a body's height, the Hour's gold-green motes orbiting the arena against the clock, the shards' dust
 // falling out of the sky. Their law (sdMoteAt) keeps each kind in its place, whole over the sky's period, every jump at
@@ -70,7 +69,7 @@ test('SD14c ON THE HOUR\'S CLOCK: every mote whole over the sky\'s period (the s
       if (d > 0.5) assert.ok(Math.min(m0.alpha, m1.alpha) < 0.02, `kind ${k} jumped ${d.toFixed(2)} m seen (${m0.alpha.toFixed(3)}, ${m1.alpha.toFixed(3)})`);
     }
   }
-  // AUDIT SD III (V7, PIN MOVED): the sense AS THE EYE SEES IT from above, through the game's own camera - its one
+  // AUDIT SD III (V7
   // mirror (world/mat4.js mirrorProjectionX) turns a falling angle clockwise on screen. The pin read the raw angle, and the
   // two turned the other way round on every screen
   const turnSeen = (kind, centre) => {

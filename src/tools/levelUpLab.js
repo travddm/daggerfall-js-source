@@ -21,7 +21,7 @@ import { VirtueLevelUpScreen } from '../ui/virtueLevelUp.js';
 // to see what a player sees between the level-up landing and the
 // window arriving.
 import { createCharSheetWindow } from '../ui/charSheetDoor.js';
-// HOTFIX (2026-09-19): STATIC, AND THE REASON IS A BLACK SCREEN.
+// HOTFIX: STATIC, AND THE REASON IS A BLACK SCREEN.
 //
 // This lane used to `await import('../ui/enhanced/enhancedHud.js')`. A DYNAMIC
 // import makes the bundler build a NAMESPACE OBJECT for the target, and

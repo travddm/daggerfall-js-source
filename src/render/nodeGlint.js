@@ -1,10 +1,9 @@
 // @ts-check
-// NODE-GLINT (2026-10-20, the owner: "Lets just bring the glint back but better", of NODE-OUTLINE's ring - which players
-// found unimmersive): A NODE'S GLINT - every gathering node standing near the player (a herb patch, a vein, a boulder, a
+// NODE-GLINT: A NODE'S GLINT - every gathering node standing near the player (a herb patch, a vein, a boulder, a
 // school, a tree - its flat or its 3D tree) catching the light ON ITS OWN PICTURE: sparkles that flash on the picture
 // and go dark, and a soft sheen that crosses it now and then - in a warm light with a hint of its profession's colour
 // (ui/nodeMarks.js, the colour its compass mark wears), never a line drawn round it.
-// It takes the place of NODE-OUTLINE's ring (2026-10-19), and before it of NODE-MARKS' glow card (render/nodeGlow.js: a
+// It takes the place of NODE-OUTLINE's ring, and before it of NODE-MARKS' glow card (render/nodeGlow.js: a
 // halo, a shimmer and motes on a card before the node - a sparkle NEAR the node, a tree's a patch at its root under its
 // crown) wherever the node has a picture; a node with none (a body drawn as a 3D character) keeps the glow.
 //
@@ -35,8 +34,7 @@
 // no sheen crosses; the fog and the jungle's haze fade it as they fade the node; and it is as bright as the light where
 // the node stands, never under the flats' own floor, its sheen out in the dark (GLINT-LIGHT). Not a DFU member.
 //
-// RESOURCE-HIGHLIGHTS (2026-10-26, the owner: "Reintroduce resource highlights as an option"; Professions-Arc section
-// 54): NODE-OUTLINE's RING, BACK AS A CHOICE. The Resource highlights row (systems/features.js, the player's own pref
+// RESOURCE-HIGHLIGHTS: NODE-OUTLINE's RING, BACK AS A CHOICE. The Resource highlights row (systems/features.js, the player's own pref
 // `resourceHighlights`) picks what lights a node: the glints (the default - NODE-GLINT, as above), the OUTLINE (section
 // 46's ring: a fragment outside the silhouette within OUTLINE_PX of it, in the profession's compass colour at the depth of
 // the picture it borders, stood OUTLINE_RING_BACK behind it - a wall before the node hides it, the ground behind shows it,
@@ -112,7 +110,7 @@ export const GLINT_SHEEN_HZ = 0.15;
 export const GLINT_SHEEN_SHARE = 0.5;
 export const GLINT_SHEEN_NEAR_M = 6;
 export const GLINT_SHEEN_FULL_M = 18;
-/** GLINT-LIGHT (the owner, 2026-10-20, at night and underground: "Follow the light"): the light levels (glintLightLevel of
+/** GLINT-LIGHT: the light levels (glintLightLevel of
  *  the light a node's flat takes) the sheen goes out over - none at GLINT_SHEEN_DARK and under: every night (a moonless
  *  one 0.25, both moons full 0.39), a storm's noon (0.35 - "a storming noon reads near-night", world/worldClock.js
  *  exteriorAmbient), a mine with no lamp near; whole from GLINT_SHEEN_LIT: a clear day's from its first hour (0.59), an

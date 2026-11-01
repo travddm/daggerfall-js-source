@@ -1,7 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"; "make this something truly special"): SETHRAKUL,
+// SERPENT1: SETHRAKUL,
 // DRAWN. The port's own pass, in the foreign-pass convention (render/navalRender.js's): the renderer's own matrices,
-// light and fog, and `markForeignPass` after. Design: bible/11-Multiplayer/Sea-Serpent.md section 9.
+// light and fog, and `markForeignPass` after. Design:
 //
 // NO ASSET. Daggerfall has no sea serpent and the port ships none: the body is MADE here each frame from the relay's
 // own law (net/serpent/serpentBody.js bodyAt, through scenes/serpentHost.js drawFrame) - its spine's points smoothed (a

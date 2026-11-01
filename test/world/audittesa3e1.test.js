@@ -1,5 +1,4 @@
-// AUDIT TESA III lane E1 (2026-10-26, the owner: "Comprehensive audit on everything to ensure perfection";
-// bible/01-Overview/audits/Audit-Tesa-III-E1.md): the pins of the findings fixed in the lane's own files.
+// AUDIT TESA III lane E1: the pins of the findings fixed in the lane's own files.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -71,7 +70,6 @@ test('AUDIT TESA III E1-2 with ARENA2: Daggerfall, Wayrest and Sentinel on the b
       const { width: w, height: h, blockNames } = loc.exterior.exteriorData;
       const own = (bx, by) => { const n = blockNames[by * w + bx]; return isWallCarrier(n) || n === TOWN_OUTLINE_BLOCK ? new Uint8Array(4096) : blocks.getBlockByName(n).rmbBlock.fldHeader.autoMapData; };
       const cells = townWallCellsOf(loc);
-      // PIN MOVED (TS8, bible/03-World/Town-Shapes.md): a bend's tower its body alone, its two open stubs gone - Daggerfall's
       // wall 9,610 cells where it was 12,513 (Sentinel's 9,439, Wayrest's 9,591), each still one ring
       assert.ok(cells.reduce((n, v) => n + v, 0) > 9000, `${loc.name}: its wall`);
       const nav = navOf(w, h, own, (bx, by, raw) => wallLaidBytes(loc, bx, by, raw));

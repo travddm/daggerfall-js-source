@@ -1,6 +1,4 @@
-// PERF-EXT26 (2026-09-25, the players: "fps issues in the exterior but
-// fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600") - STREAM1'S PROMOTIONS ON THE TERRAIN WORKER. A crossing
+// PERF-EXT26 - STREAM1'S PROMOTIONS ON THE TERRAIN WORKER. A crossing
 // promotes five pixels to stride 1, and STREAM1 paid them one a frame on
 // the main thread - ~1.8 ms of grid a frame for five frames. The worker
 // already builds this very grid for every pixel; now it answers the

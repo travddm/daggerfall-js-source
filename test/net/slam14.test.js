@@ -1,4 +1,4 @@
-// SLAM14 (2026-09-16, AUDIT SLAM FINAL): THE FINAL LENS'S CLIENT FINDINGS - lens B's "ready with one clause", the
+// SLAM14: THE FINAL LENS'S CLIENT FINDINGS - lens B's "ready with one clause", the
 // clause and its neighbours paid.
 //
 // B1 `heardIn` was stamped ONCE, on the pose that stood a stranger, so a peer first heard through my own cell and

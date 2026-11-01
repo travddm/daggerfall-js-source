@@ -1,6 +1,5 @@
 // @ts-check
-// RENOWN1 (2026-09-24, Mac: "What if the leveling system was something seperate unique to online but compatible"; asked,
-// the online health and magicka go "On top" of Daggerfall's): THE ONLINE LAYER - Renown's health and
+// RENOWN1: THE ONLINE LAYER - Renown's health and
 // magicka, added to the character's own while it plays online, and never anywhere else.
 //
 // WHERE IT SITS. Two plain fields on the entity, `renownHp` and `renownMp`, read by the two live accessors
@@ -22,7 +21,7 @@
 // half comes online at half. Scaling both ways is its own inverse, so going online, leveling, saving and coming back
 // never makes or loses health beyond a rounding unit - and a character with 0 health stays at 0.
 //
-// EG15 (2026-10-12): A SECOND ONLINE TERM, the folds'
+// EG15: A SECOND ONLINE TERM, the folds'
 // magicka (systems/entityMods.js's `magicka` channel - a Sigil Set's, so awake online alone).
 // It rides the same accessor beside Renown's (foldMpOf), and every reader that takes the online layer off takes it too
 // (onlineMpOf): a save keeps the vitals as they would stand without either (offlineVitals, and save.js's test for
@@ -84,7 +83,7 @@ export function setRenownLayer(entity, level) {
 const _extras = new WeakMap();
 const _levels = new WeakMap();
 /**
- * FIRM1 (bible/06-Systems/Firmament.md): THE FIRMAMENT'S HEALTH AND MAGICKA, laid on the online layer beside Renown's -
+ * FIRM1: THE FIRMAMENT'S HEALTH AND MAGICKA, laid on the online layer beside Renown's -
  * the same two fields, so the same never-saved, fraction-kept law holds for them (offlineVitals takes the whole layer
  * off). `extra` `{ hp, mp }`, whole and never negative; laid on at once where the layer is on, and kept for when it
  * goes on. Answers the layer's bonus as it now stands.

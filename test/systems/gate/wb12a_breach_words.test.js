@@ -1,5 +1,4 @@
-// WB12a (2026-10-01, Mac: "getting feedback that our oblivion gates arent lore friendly to the current daggerfall
-// timeline" - then "Dagon's Breach", and "I'd like to rename the stones" - "Deadlands Ember"): THE BREACH AND ITS WORDS.
+// WB12a: THE BREACH AND ITS WORDS.
 // The game is 3E 417: the Covenant bars a Prince's door forced from without, never one opened from within, so the gates
 // are Dagon's Breaches - torn open by his mortal faithful, sealed and torn shut by the Covenant. Every player-facing
 // line that named an Oblivion Gate says so; the Sigil Stone is the Deadlands Ember, its NAME alone moved, and every
@@ -94,7 +93,7 @@ test('WB12a the names on screen: the plaque, the banner and the map\'s legend sa
   assert.equal(MARKS_CARD_TEXT.gate('Valkynaz Ruhn', 'the Rime-Wrought'), 'Valkynaz Ruhn comes the Rime-Wrought tonight', 'WB13b: one subtitle near the gate and inside');
   assert.equal(GATE_CLAIM_TEXT.recorded(4), 'Breach recorded. Breaches closed: 4.');
   assert.equal(GATE_CLAIM_TEXT.guest, 'Breach not recorded. Add a username within a week to keep it.');
-  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.');   // SILVER: the currency's name; PIN MOVED (SILVER-WAYS): the day's cap the gates' and the raids'; PIN MOVED (STAR7): and the held stars'
+  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.');   // SILVER: the currency's name
   assert.equal(profileGateLine({ gates: { closed: 3 } }), 'Breaches closed: 3');
   assert.equal(accountRefusalText('short'), 'Your account has too few embers for that.');   // AUDIT WB12d (A4): a rite's ember counts
   assert.deepEqual([BROKER_TEXT.trade, BROKER_TEXT.steal, BROKER_TEXT.gone], ['Trades in Deadlands Embers', 'The Broker\'s eyes never leave her embers.', 'The Sigil Broker leaves for the night.']);   // BROKER-CAGE: midnight takes her, not the breach (a Warden fallen early leaves her standing)

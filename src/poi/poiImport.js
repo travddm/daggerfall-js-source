@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-4 (2026-10-14) - A MODEL INTO THE STORE: FROM THE FILE A BUILDER CHOSE TO PARTS THE EDITOR PLACES.
+// POI-4 - A MODEL INTO THE STORE: FROM THE FILE A BUILDER CHOSE TO PARTS THE EDITOR PLACES.
 //
-// Mac: "the ability to import models, texture, UV map" (bible/06-Systems/POI-Editor-Arc.md POI-4). The glTF reader
+// (POI-4). The glTF reader
 // (poi/gltfImport.js) reads the file and bakes its parts in the game's frame; this takes them the rest of the way:
 //
 //   - PREPARED (`prepareImport`): each part's mesh held to the realm's law (poi/poiMesh.js encodePoiMesh) - a part past

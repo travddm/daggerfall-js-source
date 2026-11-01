@@ -1,4 +1,4 @@
-// SPAWN-ROADS (2026-09-25, Mac: "Anyway to have things avoid being on a road?") - no spawned ruin on a pixel a
+// SPAWN-ROADS - no spawned ruin on a pixel a
 // road, track, river or stream crosses. The audit of the EliteDungeons drop counted 7,547 road pixels holding a
 // ruin's flattened plateau at their centre once the rate went to 40% (1,921 at 10%); every path in the network runs
 // through its pixel's centre, so the pixel's own compass byte is the whole question.

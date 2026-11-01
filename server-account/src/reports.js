@@ -2,8 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // PRIVATE-REPORT - THE SERVICE'S SIDE OF A PLAYER'S PRIVATE REPORT.
 //
-// Mac (2026-10-17): "Can we add a private disclosure method for
-// exploits/bugs with the client".
 //
 // What a report is - its kinds, its bounds, its states - is
 // src/net/reportLaw.js. This file is what its two sides do with one:

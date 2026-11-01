@@ -1,6 +1,5 @@
 // @ts-check
-// DISC29-D (2026-09-28, Skeptikali on Discord: a dungeon at 99.9% CPU, its animation-frame handlers taking 68-203 ms
-// and the DOM node count climbing from ~1,700 past 3,000) - A DRAW'S WATCHDOG COUNTS FRAMES, NOT MILLISECONDS.
+// DISC29-D - A DRAW'S WATCHDOG COUNTS FRAMES, NOT MILLISECONDS.
 //
 // Eight DOM faces are drawn per frame by their owners and have no close of their own for a host that simply stops
 // drawing them - the notice stack (message boxes and HUD toasts), the Yes/No dialog and the keyed choice menu, the

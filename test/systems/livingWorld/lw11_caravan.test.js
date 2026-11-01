@@ -1,4 +1,4 @@
-// LW11 (bible/06-Systems/Living-World-II.md "LW11"): THE CARAVAN'S DOOR - the counter a caravan's merchant, a pedlar or
+// LW11 ("LW11"): THE CARAVAN'S DOOR - the counter a caravan's merchant, a pedlar or
 // a carter keeps on the road (its kind, quality, purse; its roll the same all trip, what the character bought or took
 // gone from it for good), the deeds against a party reported and charged to the road's region when a witness reaches a
 // town (void when none lives to), the hold-up (a party whose armed are all down yields), the escort (hired on, kept by
@@ -108,7 +108,6 @@ test('LW11 the hold-up: a party whose armed the road left it are all down by the
   assert.equal(yields(trip, 10), false, 'all standing');
   assert.equal(yields(trip, 10, beaten), true, 'its armed beaten');
   assert.equal(yields(trip, 10, (m) => m.id === 'A'), false, 'one armed still up');
-  // PIN MOVED (AUDIT LW-II C4): the trip's own fallen are the road's - a party whose guards the dice took had nobody for
   // the player to beat, and yielded to whoever passed
   assert.equal(yields({ ...trip, fallen: [{ res: a, t: 5 }, { res: b, t: 6 }] }, 10), false, 'its guards the road\'s: nothing beaten');
   assert.equal(yields({ ...trip, fallen: [{ res: a, t: 5 }, { res: b, t: 6 }] }, 10, beaten), false);
@@ -125,7 +124,6 @@ test('LW11 the road offered: a merchant\'s caravan, from ESCORT_OFFER_MIN before
   assert.equal(escortOffer(trip, 5000 - ESCORT_OFFER_MIN), true);
   assert.equal(escortOffer(trip, 6999), true);
   assert.equal(escortOffer(trip, 7000), false, 'in');
-  // PIN MOVED (AUDIT LW-III): a caravan the road turns home is offered until it turns (troubledTrip's outT1 the turn's
   // minute) - never refused for a fate it has not met yet
   assert.equal(escortOffer({ ...trip, turned: true, outT1: 6500 }, 6000), true, 'fated to turn: offered till it does');
   assert.equal(escortOffer({ ...trip, turned: true, outT1: 6500 }, 6500), false, 'turned: none');
@@ -203,7 +201,7 @@ function hostOver(trip, { now, rel = createRelations(), dead = new Set(), slain 
     goldItem: (n) => ({ gold: n }),
     online: () => online,
     travelWith: (tr, until) => { log.travelled.push(until); return true; },
-    travelFree: () => true,   // PIN MOVED (AUDIT LW-II-2 C6): R offered only where a journey may go - the host says so (outdoors, nothing near)
+    travelFree: () => true,
   };
   return { host: createCaravanHost(deps), log, clock, rel, dead, slain, deps };
 }
@@ -284,7 +282,7 @@ test('LW11 a deed reported: a hand caught in the goods turns the party against t
   log.trades[0].caught();
   assert.ok(rel.regard(trip.leader.id, Math.floor(t / 1440)) < 0, 'the party\'s regard');
   assert.equal(rel.reports().length, 1);
-  assert.deepEqual({ ...rel.reports()[0], witnesses: undefined }, { crime: CRIMES.Theft, region: 17, at: trip.outT1, who: trip.leader.name, witnesses: undefined, trip: trip.id });   // PIN MOVED (LW16): the one robbed named, for the tale; PIN MOVED (AUDIT LW-II C10): its trip, its own fallen read at the town
+  assert.deepEqual({ ...rel.reports()[0], witnesses: undefined }, { crime: CRIMES.Theft, region: 17, at: trip.outT1, who: trip.leader.name, witnesses: undefined, trip: trip.id });
   host.step();
   assert.deepEqual(log.charged, [], 'not before the town');
   clock.t = trip.outT1;
@@ -331,7 +329,7 @@ test('LW11 the hold-up: the party\'s armed all down, its leader standing - it yi
   const t = walkingOut(raw);
   const trip = handsOn(raw, (m) => (m.cls != null ? t - 1 : null));   // AUDIT LW-II-2 C1: the trip as the host mints it - its guards' hand deaths on it (world.js fate, trips.js handsOn)
   const at = partyAt(trip, t);
-  const { host, log, rel, slain, deps } = hostOver(trip, { now: t, here: { x: at.x, z: at.z } });   // PIN MOVED (AUDIT LW-II C4): there, its armed by the player's hand
+  const { host, log, rel, slain, deps } = hostOver(trip, { now: t, here: { x: at.x, z: at.z } });
   for (const m of trip.party) if (m.cls != null) slain.add(m.id);
   host.step();
   assert.equal(rel.wares(trip.id).robbed, t);
@@ -421,13 +419,13 @@ test('LW11 the escort: hired on at the pay of the walk, the fights won counted, 
   const won = { ...trip, enc: { id: 'enc-w', t0: t - 100, t1: t - 50, foes: [1, 2, 3] } };
   const w = hostOver(won, { now: t, here: () => near() });
   clock = w.clock;
-  w.rel.setEscort({ trip: trip.id, t: t - 200, pay: 10, fights: 0, leader: trip.leader.id, to: 902 });   // PIN MOVED (AUDIT LW-II C5e): hired before the fight
+  w.rel.setEscort({ trip: trip.id, t: t - 200, pay: 10, fights: 0, leader: trip.leader.id, to: 902 });
   w.host.step();
   assert.equal(w.rel.escort().fights, 0, 'a fight not won counts nothing');
   w.rel.turn('won', 'enc-w');
   w.host.step();
   assert.equal(w.rel.escort().fights, 3);
-  for (let x = t; x < trip.outT1; x += 30) { w.clock.t = x; w.host.step(); }   // PIN MOVED (AUDIT LW-II C5b): walked beside it to the town - a jump there is a stretch behind
+  for (let x = t; x < trip.outT1; x += 30) { w.clock.t = x; w.host.step(); }
   w.clock.t = trip.outT1;
   w.host.step();
   assert.deepEqual(w.log.paid, [10 + 3 * ESCORT_FIGHT]);
@@ -452,7 +450,7 @@ test('LW11 the session forgotten with its character: another character\'s record
 
 test('LW11 the host\'s wiring: the road\'s trade window (its counter\'s discount on Buy - and, AUDIT TOWN-ECON 2 PRICE-4, on a sale: what it pays never above what it asks -, the purse\'s refusal returning the goods, its steal the road\'s crime and no city guard), the talk\'s door before the words, the roads reading a robbed caravan, the hand caught on the road no town\'s crime, the step once a second (mutants: each wire, TOWNECON-AUDIT2-PRICE4-road-sale)', () => {
   const modes = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(modes, /if \(b\?\.roadDiscount && \(mode === 'Buy' \|\| mode === 'Sell' \|\| mode === 'SellMagic'\)\) return Math\.round\(adj \* f \* \(1 - b\.roadDiscount\)\);/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-4): the friend's price both ways - what it pays held to what it asks
+  assert.match(modes, /if \(b\?\.roadDiscount && \(mode === 'Buy' \|\| mode === 'Sell' \|\| mode === 'SellMagic'\)\) return Math\.round\(adj \* f \* \(1 - b\.roadDiscount\)\);/);
   assert.match(modes, /if \(road\.allow\?\.\(m, staged, price\) === false\) \{ if \(m === 'Sell' \|\| m === 'SellMagic'\) \(playerEntity\.items \?\?= \[\]\)\.push\(\.\.\.staged\); return false; \}/);
   assert.match(modes, /crimeTheft: \(\) => road\.caught\?\.\(\),\n\s+spawnCityGuards: \(\) => \{\},/);
   assert.match(modes, /return !!mountServiceWindow\(openTradeWindow\(o\.shelf, o\.b, tradeMode, \{\}, o\)\);/);
@@ -461,9 +459,9 @@ test('LW11 the host\'s wiring: the road\'s trade window (its counter\'s discount
   const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
   assert.match(world, /if \(livingWorldOn\(\) && \(_caravanT -= dt\) <= 0\) \{ _caravanT = 1; caravanHostOf\(\)\.step\(\); \}/);
   assert.match(world, /\n {4}caravanStep\(dt\);   \/\/ LW11: the hold-ups/, 'the open world\'s');   // PIN MOVED (AUDIT LW-II C5b): one step, two frames
-  assert.match(world, /offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\)/);   // PIN MOVED (LW14): and a company below   // PIN MOVED (AUDIT LW-II-2 D4): below alone
+  assert.match(world, /offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\)/);
   assert.match(world, /robbed: \(tripId\) => caravanHostOf\(\)\.robbed\(tripId\),/);
-  assert.match(world, /if \(p\?\.living\?\.res\) caravanHostOf\(\)\.caught\(p\.living\.res, skyMinutes\(\)\);\n/);   // PIN MOVED (AUDIT LW-II-2 C15): the road's door clears no crime flag - townTalk puts back the one standing before the pickpocket
+  assert.match(world, /if \(p\?\.living\?\.res\) caravanHostOf\(\)\.caught\(p\.living\.res, skyMinutes\(\)\);\n/);
   assert.match(world, /const livingRoadSlay = \(res, t, seen\) => \{ livingSlay\(res, t, seen\); caravanHostOf\(\)\.slain\(res, t\); \};/);
   assert.match(world, /charge: \(region, crime\) => \{ lowerRepForCrime\(playerEntity, region, crime\); tallyCrimeGuildRequirements\(playerEntity, false, 1\); \}/);
   // the Overworld's mark of a caravan the character robbed
@@ -476,7 +474,7 @@ test('LW11 the host\'s wiring: the road\'s trade window (its counter\'s discount
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT LW-II (2026-10-10): THE CARAVAN'S DOOR, AUDITED - each finding reproduced, fixed, and pinned below.
+// AUDIT LW-II: THE CARAVAN'S DOOR, AUDITED - each finding reproduced, fixed, and pinned below.
 
 test('AUDIT LW-II C1: at the game\'s epoch every place is a newcomer\'s - a witness and an escort\'s leader found by their place, the newcomer minted as the lives mint them; a murder carried in is charged, an escort kept and paid; a trip\'s trips waiting answer undefined (mutants: the newcomer, the place, the pending)', () => {
   const a = town(901, 100, 100, 24), b = town(902, 108, 100, 20);
@@ -572,7 +570,7 @@ test('AUDIT LW-II C4: the hold-up is the player\'s for armed the player\'s own h
 });
 
 test('AUDIT LW-II C5: the escort paid for the road walked beside it - hired late, the share of the walk ahead; the clock past the town in one step with the party never near, broken; a rest beside its camp kept, one slept through its leaving broken; travelled on with them kept; a caravan turned back unpaid from its trouble; its leader fallen to the road; a fight won before the hire none of it; never the road of a party the character robbed (mutants: each)', () => {
-  assert.equal(ESCORT_SAMPLE_MIN, 5);   // PIN MOVED (AUDIT LW-II C5b, on review): ESCORT_STILL_M gone - every gap read back
+  assert.equal(ESCORT_SAMPLE_MIN, 5);
   const trip = armedCaravan();
   const t = walkingOut(trip);
   const level = 20;
@@ -764,7 +762,7 @@ test('AUDIT LW-II C10: a report\'s crime is the law\'s and its region the map\'s
   assert.equal(r.report({ crime: 999, region: 3, at: 1, witnesses: ['a'] }), false);
   assert.equal(r.report({ crime: CRIMES.None, region: 3, at: 1, witnesses: ['a'] }), false);
   assert.equal(r.report({ crime: CRIMES.Theft, region: -1, at: 1, witnesses: ['a'] }), false, 'the sea is no region');
-  assert.equal(r.report({ crime: CRIMES.Theft, region: 71, at: 1, witnesses: ['a'] }), false);   // PIN MOVED (WW-R, bible/03-World/World-Wide.md): 62..70 the provinces', 71 none
+  assert.equal(r.report({ crime: CRIMES.Theft, region: 71, at: 1, witnesses: ['a'] }), false);
   assert.equal(createRelations().report({ crime: CRIMES.Theft, region: 64, at: 1, witnesses: ['a'] }), true, 'a crime in Skyrim is Skyrim\'s');
   assert.equal(r.report({ crime: CRIMES.Theft, region: 0, at: 1, witnesses: ['a'] }), true);
   // the witnesses fall on the way (the trip's own fallen, the road's - no hand death): void at the town
@@ -832,7 +830,6 @@ test('AUDIT LW-II C1/C4/C5b: the host\'s wiring - the traveller by place, the tr
   assert.match(world, /tripById: \(id, t\) => tripOfId\(id, t, livingTownOfId, \(town, at\) => tripsOfTown\(town, at, livingTripWorld, livingTripO\(\)\)\),/);
   assert.match(world, /resOf: livingTravellerOf, slainAt: livingSlainAt,/);
   assert.match(world, /const h = slain\.get\(turnKey\(res, livingCycleOf\(res, Math\.floor\(\(t - 240\) \/ 1440\)\)\)\);\n\s*return h != null && h\.t <= t;/);
-  // PIN MOVED (AUDIT LW-II C5b, on review): below nowhere near a party; indoors at the building - an interior stands at
   // its building's world matrix, and the night at the inn a party lodges at is beside it
   assert.match(world, /here: \(\) => \(playerSpawned && _mode\(\) !== 'dungeon' \? state\.worldCoords\(walkMode \? player\.pos : cam\.pos\) : null\),   \/\/ AUDIT LW-II C5b/);
   const modal = world.slice(world.indexOf('    if (modes.frame(dt, now)) {'), world.indexOf('    // Q4-v: the quest machine\'s EXTERIOR tick'));

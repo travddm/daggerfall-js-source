@@ -1,4 +1,4 @@
-// EC1 - THE ENCHANT CTX READS THE LIVE FOE POOL (2026-08-29).
+// EC1 - THE ENCHANT CTX READS THE LIVE FOE POOL.
 //
 // world.js's enchant mount answered `[]` for its foe pool in every
 // mode but exterior - which is the mode the player does not fight in.

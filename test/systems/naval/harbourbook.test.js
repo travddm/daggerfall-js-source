@@ -1,7 +1,7 @@
-// HARBOUR-BOOK (2026-10-04, from the field: the port towns' new docks "missing" for some players) - the harbours near
+// HARBOUR-BOOK - the harbours near
 // the player kept by the world, not the sea fight (systems/naval/harbourBook.js): sounded whatever runs on the water,
 // read by the quays and the naval host alike; and the quay's jetty a pier across Iliac Puddle's shore-fitted shelf to
-// the land (systems/naval/quays.js JETTY_MAX). bible/03-World/Holdings.md section 7.
+// the land (systems/naval/quays.js JETTY_MAX).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

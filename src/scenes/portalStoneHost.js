@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -18,7 +18,7 @@ export function createPortalStoneHost(host) {
     hccRuntimeOn, navalHostileNear, player, playerTravelPixel, portalGates, teleportTo, townTalk, walkMode,
     worldMoveBusy
   } = host;
-  /** PORTAL-BAY (bible/06-Systems/Portal-Stone.md): THE TELEPORT'S GATE, asked where a refusal still costs nothing - the
+  /** PORTAL-BAY: THE TELEPORT'S GATE, asked where a refusal still costs nothing - the
    *  pick (before a stone is spent) and the step (before the black): teleportTo's own three in its order (scenes/world.js
    *  - the open zone's, the Veil's, and the zone's journey under the teleport's law past the Bay, pastBayTravel.js
    *  teleportJourney), each said where it refuses. True when refused. */
@@ -60,7 +60,7 @@ export function createPortalStoneHost(host) {
       : list === playerEntity.items || !Array.isArray(list) ? () => playerEntity.items : () => list;
     const win = buildTravelMapWindow({
       travelOptions: () => null,   // the stone is the fare - never Travel Options' teleport fee
-      portalLandPastBay: true,   // PORTAL-ANYWHERE (the owner: "Anywhere on land"): the stone's map picks any land past the Bay - the guild's keeps TESA13's cities
+      portalLandPastBay: true,   // PORTAL-ANYWHERE: the stone's map picks any land past the Bay - the guild's keeps TESA13's cities
       onTeleport: (pick) => { standPortal(pick, item, live); },
     });
     if (!win) return refuse(PORTAL_TEXT.noMap);

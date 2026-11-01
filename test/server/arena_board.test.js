@@ -1,5 +1,4 @@
-// ARENA-BOARD (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md ARENA-BOARD;
-// migration 0139) - THE ARENA'S BOARD READ AS ONE ROW A SEASON: its ten counts, every caller's alike, kept at a version the
+// ARENA-BOARD - THE ARENA'S BOARD READ AS ONE ROW A SEASON: its ten counts, every caller's alike, kept at a version the
 // database moves on every bout, void, account gone and banner joined or left; the caller's own rows read after them.
 //
 // The proof is an oracle: ladder and players' bouts across seasons and banners, runs voided, banners joined and left and

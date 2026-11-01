@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20): THE HOLIDAY TABLES, A LEAF - FormulaHelper.GetHolidayId's two tables (:1823-1833) and
+// WITCH1: THE HOLIDAY TABLES, A LEAF - FormulaHelper.GetHolidayId's two tables (:1823-1833) and
 // DFLocation.Holidays (:286-343), moved here from holidays.js byte for byte so a reader that cannot load the game's
 // readers can ask them: the account service's festival law (net/festivalLaw.js) reads the holiday of a sky's
 // day without holidays.js's mapsFile.js import. holidays.js re-exports every name, so its readers are unchanged.

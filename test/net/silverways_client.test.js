@@ -1,4 +1,4 @@
-// SILVER-WAYS (2026-10-03, Mac: "Do it"): SILVER OUTSIDE THE CRAFTS, AS THE GAME SAYS IT - a counted claim's silver lines
+// SILVER-WAYS: SILVER OUTSIDE THE CRAFTS, AS THE GAME SAYS IT - a counted claim's silver lines
 // in the book's own words (net/marksBook.js claimLines: a raid's or a gate's strike, the day's cap named, a guild deed,
 // a contract's pay); the raid's and the gate's carriers saying every line (net/raid/raidClaims.js, net/gate/gateClaims.js); the
 // Work tab's guild contracts (ui/workTab.js: a card under its guild, what it pays, the posters told they are not paid,
@@ -154,7 +154,6 @@ test('SILVER-WAYS the Work tab\'s contracts: each a card under its guild - what 
   await ticks();
   const cards = byClass(host, 'notice-writ');
   assert.equal(cards.length, 2);
-  // PIN MOVED (BOARD-SIFT): the work ends soonest first - C2's two days before C1's five
   const [c2, c1] = cards;
   assert.match(c1.textContent, /Guild contractThe Silver Hand \[SH\] pays the defenders of Daggerfall's towns against raiders/);
   assert.match(c1.textContent, /40 silver each - 7 defenders left of 10/);

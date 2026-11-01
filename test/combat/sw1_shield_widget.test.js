@@ -1,5 +1,5 @@
 // SW1 - SHIELD WIDGET 1.6, RedRoryOTheGlen, ported 1:1 off the shipped
-// DLL's IL (bible/05-Combat/Shield-Widget.md). These pin the arithmetic
+// DLL's IL. These pin the arithmetic
 // the IL states, the bugs kept bug for bug, and the gate ladder -
 // the part of the mod a reader is most likely to "tidy" into something
 // that is no longer the mod.
@@ -331,8 +331,7 @@ test('SW1: the 600 sprites are VENDORED, and every one is on disk under the name
 
 // ---- SW4: WHICH WAY UP ------------------------------------------------
 //
-// SW4 (2026-09-19, Mac: "the new shield mod we integrated shows the
-// shields upside down") - THE ART WAS MIRRORED, NOT THE CODE.
+// SW4 - THE ART WAS MIRRORED, NOT THE CODE.
 //
 // The door reads `toScreenOrder`, which is right: a screen quad hands
 // p.y = 0 (the rect's TOP) the pair `v0`, nothing flips at upload, so

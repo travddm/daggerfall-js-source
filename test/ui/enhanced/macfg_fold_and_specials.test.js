@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-F + MAC-G - TWO READING SCREENS (2026-09-17).
+// MAC-F + MAC-G - TWO READING SCREENS.
 //
 // Mac, with a screenshot of the Chronicle's Quests tab and an arrow at
 // MAIN QUEST BACKBONE:

@@ -1,5 +1,4 @@
-// WITCH1 (2026-10-20, the owner: "We should decorate each town with its own lore appropriate decorations"; bible/06-Systems/
-// Witches-Festival.md): THE TOWNS DRESSED (src/world/witchesDecor.js) - each people's kit, the pieces at a tavern's door
+// WITCH1: THE TOWNS DRESSED (src/world/witchesDecor.js) - each people's kit, the pieces at a tavern's door
 // and a temple's, the Wyrd Sister beside the tavern, a house's step, every home's offering spot kept clear - and the build
 // that logs them with the block's own flats (src/scenes/pixelBuild.js).
 import { test } from 'node:test';

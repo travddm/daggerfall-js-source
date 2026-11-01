@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md "The pixel law"): THE HOUR'S
+// SD-LOOK: THE HOUR'S
 // PAINT BOX - what every picture the Hour paints in code is painted with, so all of it reads as one hand's Daggerfall
 // pixel art: a seeded rng and tileable noise (the helpers each art module kept a copy of), a ramp sampled through a 4x4
 // ordered dither (never a smooth blend - a ramp's steps ARE the picture), 1-px bevels lit top-left, dark outlines, 3x3
@@ -101,7 +101,7 @@ export function quantize(img, palette) {
   }
   return img;
 }
-/** KETCH-LOOK KL2 (bible/11-Multiplayer/Sky-Ketch-Look.md section 2, the palette contract): `quantize` over INDEXED ramps -
+/** KETCH-LOOK KL2 (the palette contract): `quantize` over INDEXED ramps -
  *  each `{ idx, fallback }`, an ART_PAL index a step and the port's own colour for it. Every texel forced to its nearest
  *  step's fallback (squared distance in sRGB) and that step's index written beside it: the picture stays drawable with no
  *  game data, and the index image resolves through the player's own palette at upload. Returns the index image (one byte

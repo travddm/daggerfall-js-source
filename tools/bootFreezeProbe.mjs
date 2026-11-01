@@ -1,6 +1,6 @@
-// BOOT-FREEZE (2026-10-20, the owner: "do your own performance pass ... install the freeware and go deep"): THE BOOT'S
+// BOOT-FREEZE: THE BOOT'S
 // FREEZES, MEASURED IN THE REAL GAME. tools/frameProbe.mjs reads a frame of a scene that stands settled; a player's
-// complaint since HOLY-DAYS and TRIP-PICKS (bible/07-Rendering/Performance-Priority.md) is the other half - the frames
+// complaint since HOLY-DAYS and TRIP-PICKS is the other half - the frames
 // that freeze while the world comes in. This boots a scene over the freeware ARENA2 under one CPU profile, from the page's
 // first byte until the stream stands idle FRAMES frames after the first world frame (or MAX_S seconds), and reads the
 // main thread's LONG TASKS off the profile itself: a task is a run of samples that are not `(idle)`, closed by a gap of

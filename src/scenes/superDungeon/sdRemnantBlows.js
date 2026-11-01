@@ -1,5 +1,5 @@
 // @ts-check
-// SD8d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S BLOWS
+// SD8d: THE BRASS REMNANT'S BLOWS
 // ON ME - the arena's half of the fight on this screen, as scenes/gate/gateCourt.js is the court's. ONE SOURCE: the fight as
 // the page holds it (net/superDungeon/sdFightLink.js). Nothing here is sent: a strike's verdict is this machine's own (co-op's law -
 // net/superDungeon/sdStrike.js), and it lands through `strike` - the dungeon context's door (the hurt, the flash, the cry).

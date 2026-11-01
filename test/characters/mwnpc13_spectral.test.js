@@ -1,4 +1,4 @@
-// MWNPC13 (2026-10-10, the MW-NPC arc's thirteenth slice - bible/04-Characters/Morrowind-NPCs.md section 18): THE
+// MWNPC13: THE
 // SPECTRAL DEAD IN THEIR BODIES. The ghost and the wraith were declared misses because a body's textures are alpha-
 // tested - but every foe host already draws a CONCEALED body translucent after its opaque world (INVIS-LOOK). So they
 // stand as Morrowind's ancestor ghost under a standing veil at the opacity Daggerfall's own spectral sprite is drawn,

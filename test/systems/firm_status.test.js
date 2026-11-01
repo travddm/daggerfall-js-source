@@ -1,4 +1,4 @@
-// FIRM-STATUS (2026-10-25; bible/06-Systems/Firmament.md section 7) - WHETHER MY STARS ACT NOW, AND WHY NOT
+// FIRM-STATUS - WHETHER MY STARS ACT NOW, AND WHY NOT
 // (src/systems/firmamentLive.js firmamentStatus), the word the Firmament window's side panel says above its sums. Driven
 // through the flags the world host sets: online or out of the seat, the tree the book heard, mentoring (the live share
 // and the entity's own profile, set together by scenes/mentorHost.js - MENTOR2), a duel. Each status is checked against what the stars

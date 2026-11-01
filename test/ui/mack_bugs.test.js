@@ -170,8 +170,7 @@ test('MAC-K3: the picker refuses AIRBORNE in silence, and opens grounded', () =>
 });
 
 test('MAC-K3: setMode is the ONE motor call, and it drops the art before it loads the new mount', () => {
-  // HC1 (2026-09-14, Mac: "audit the horse and cart ... the sprites
-  // actually show"): the art loads where the MODE changes, not on the
+  // HC1: the art loads where the MODE changes, not on the
   // T-key pick alone - three other paths set it (a loaded save on
   // horseback, the Test Room's ride out, the ship's landing) and each
   // used to leave a rider with no horse under them.

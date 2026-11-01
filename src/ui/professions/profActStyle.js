@@ -1,5 +1,5 @@
 // @ts-check
-// PROF-RETICLE (2026-10-01, Mac: "use the mechanics on something that doesnt cover the screen"): THE ACT ON THE
+// PROF-RETICLE: THE ACT ON THE
 // CROSSHAIR, DRESSED - no plate, no frame, no picture: thin marks in the kit's own tones (enhancedFrame.js FRAME_TONES)
 // round the crosshair's middle (ui/professions/profReticle.js), each edged in the outline ink so it reads over snow and night alike,
 // the count's pips and one line of hint under it in the pixel face, the hint fading once it has stood. Appended to

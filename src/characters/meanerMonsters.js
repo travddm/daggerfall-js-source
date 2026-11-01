@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // MEANER MONSTERS 1.5.2 (Ralzar; "Author: Hazelnut & Ralzar", MIT) -
-// THE MOD, 1:1 (MM1, 2026-09-12, Mac: "Next is this mod to integrate
-// 1-1").
+// THE MOD, 1:1 (MM1, 2026-09-12).
 //
 // What the mod is: a MonoBehaviour whose InitMod walks an EnemyData
 // array at Awake and writes each row's fields that are not -1 over
@@ -32,7 +31,7 @@
 // RandomEncounters.EncounterTables[21] and [36] when that mod is
 // loaded) - that mod is not in the port; when it is integrated its
 // own switch is the arm's condition (Mac: no compatibility switches
-// between mods). MUDEX1 (2026-10-20): the DEX arm is carried as the
+// between mods). MUDEX1: the DEX arm is carried as the
 // swap its boxes ask for ("Please switch to MUDEX", :159-164) - beside
 // Daggerfall Enemy Expansion this mod's switch is MUDEX's, its author's
 // form of it for that mod (systems/enemyExpansion/dexSwitches.js), and

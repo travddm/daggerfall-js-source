@@ -1,4 +1,4 @@
-// MENTOR2 (2026-10-27; bible/06-Systems/Mentor-Mode.md): mentoring beside the party, steadied, gentler, paid, and said.
+// MENTOR2: mentoring beside the party, steadied, gentler, paid, and said.
 // Each law here is pinned on both sides of its line, so a one-character change to its number fails a test.
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';

@@ -1,4 +1,4 @@
-// DAEDRIC-SMELT (2026-10-25; bible/06-Systems/Professions-Arc.md section 53) - THE DAEDRIC SMELT AS THE ACCOUNT SERVICE
+// DAEDRIC-SMELT - THE DAEDRIC SMELT AS THE ACCOUNT SERVICE
 // KEEPS IT: a looted heart into the Stores by a station's put-in alone, loose (never by the Stores page's counted order,
 // never onto the market); the smelt's decision asks the account's purse for the ember (its gates', serpents' and
 // Redoubts' embers less what its insignia, the Panoply and the forge took - accounts.js insigniaPurse) and spends it in

@@ -155,7 +155,6 @@ test('audit18 hosts: applyMotorEffectFlags - the EFFECT owns the flag (Levitate.
 // 4. Platform riding was wired only into the standalone dungeon scene.
 // ---------------------------------------------------------------------
 
-// PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the ride is the movers' own - the action system carries the body its
 // step meets as it steps (world/actionSystem.js _standMover, player/moverBody.js), and shared.js's ridePlatform, a
 // host-side delta applied the next frame, is gone; test/world/fb1019f_moverbody.test.js holds the law whole.
 test('audit18 hosts: the mover carries its rider by its own step, the rider\'s own stance through the resolver - and a body on the static shell beside it is no rider', async () => {
@@ -429,7 +428,7 @@ test('audit18 hosts: a rainy or snowy night shows the DAY sky at frame 0', () =>
 
 test('audit18 hosts: BOTH exterior hosts thread the weather style into the sky', () => {
   for (const host of EXTERIOR_HOSTS) {
-    // ES1 (2026-08-27) gave the call a fourth argument - the weather and
+    // ES1 gave the call a fourth argument - the weather and
     // the classic clock, which the ENHANCED sky needs for its clouds and
     // its moons - so the night-sky flag is no longer the last thing on
     // the line. It is still the third argument and still the weather's. SEA-EVENTS: world.js's violence the Aether
@@ -514,7 +513,7 @@ test('audit18 hosts: interior point lights carry their PER-LIGHT range in both h
   // colorOf - per-light colour x intensity - so the pin asserts BOTH
   // per-light channels ride the one call.
   for (const host of ['src/scenes/worldModes.js', 'src/scenes/interior.js']) {
-    assert.match(src(host), /nearestLights\([A-Za-z.]+\.lights, cam\.pos, renderer\.maxPointLights, [A-Za-z.]+\.lights\.map\(\(l\) => l\.range\),[^\n]*\n\s*\(l\) => interiorLightColor\(!!renderer\.lightingLane, l\.color, l\.intensity\)\)/,   // EL1: the installed set's cap; PIN MOVED (INTERIOR-DIM): colour x intensity through the lane's law
+    assert.match(src(host), /nearestLights\([A-Za-z.]+\.lights, cam\.pos, renderer\.maxPointLights, [A-Za-z.]+\.lights\.map\(\(l\) => l\.range\),[^\n]*\n\s*\(l\) => interiorLightColor\(!!renderer\.lightingLane, l\.color, l\.intensity\)\)/,   // EL1: the installed set's cap
       `${host} must pass per-record range AND colour x intensity to the shader`);
   }
 });

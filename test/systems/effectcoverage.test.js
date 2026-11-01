@@ -1,5 +1,5 @@
 // EF1 - THE EFFECT LIBRARY ANSWERS EXACTLY DAGGERFALL UNITY'S KEYS
-// (2026-08-28). applySpell walks a spell's effect records and dispatches
+// . applySpell walks a spell's effect records and dispatches
 // each to its family; a record no arm claims falls through to
 // `out.skipped++`. That line carried the sentence "the library grows one
 // family at a time" from the port's first magic slice to this one, and

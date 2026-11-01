@@ -1,6 +1,4 @@
-// ARROW-SUPPLY (2026-10-11, Mac: "allow arrows to stick in walls/ground wherever shot and be retrieved", "Allow arrows to
-// sometimes be retrieved from enemies", "Allow crafting of arrows", "Buff the shop's stock of arrows";
-// bible/05-Combat/Arrow-Supply.md). STUCK-ARROWS, the lodge and the cap, FLETCH and SHOP-ARROWS - each by execution
+// ARROW-SUPPLY. STUCK-ARROWS, the lodge and the cap, FLETCH and SHOP-ARROWS - each by execution
 // through its real producer, the four hosts by their source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -233,7 +231,6 @@ test('SHOP-ARROWS ON THE COUNTER, FROM NO ROLL: the counter holds DFU\'s own dra
     const counter = run(0), next = run(1);
     const rows = counter.items.filter((it) => it.templateIndex === ARROW_TEMPLATE);
     assert.equal(rows.length, 1, `building ${b}: one arrow stack`);
-    // PIN MOVED (ENDLESS-ARROWS): a General Store's quiver is a whole one at any quality (test/systems/endless_arrows.test.js)
     assert.equal(arrowCount(counter.items), arrowCount(next.items) + (endlessArrowsAt(b) ? GENERAL_STORE_ARROWS : shopArrowStack(b, q)), `building ${b}: DFU's draw and the quiver`);
     assert.deepEqual([rows[0].group, rows[0].material, rows[0].currentCondition, rows[0].value], ['Weapons', 0, 0, 2], 'CreateWeapon\'s arrow');
     if (b === B.WeaponSmith || b === B.Armorer) assert.equal(counter.n, next.n, `building ${b}: the same draws`);

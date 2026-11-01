@@ -1,8 +1,8 @@
-// COST-0 (2026-10-24, the owner's bill: about $90 a day, $50 of it Durable Objects compute duration) - HOW MANY ROOMS
+// COST-0 - HOW MANY ROOMS
 // ARE AWAKE, READ BY THE OPERATOR: tools/doActive.mjs walks Cloudflare's GraphQL schema to durableObjectsPeriodicGroups,
 // builds its questions from what the schema says it has, and draws each day's objects awake, the always-awake count, the
 // object-days and their cost; .github/workflows/do-active.yml runs it by hand, writing nothing. Over a fake endpoint in the
-// real one's shape (test/fixtures/doActiveGraphql.mjs). bible/11-Multiplayer/Scale-Arc.md COST-0.
+// real one's shape (test/fixtures/doActiveGraphql.mjs). COST-0.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, writeFileSync, chmodSync } from 'node:fs';

@@ -7,7 +7,7 @@
 // cloth earns none (ui/craftXpWords.js craftXpLine, read by ui/professions/profPages.js), and the craft's word says a first, and why
 // none came (craftXpText, read by scenes/world.js's `craft`). Built from the producers: the recipe tables, the account
 // service's craft answer through the real Worker (test/accountDb.mjs), and a book that reads it (net/profBook.js).
-// bible/06-Systems/Professions-Arc.md 41.9.
+// 41.9.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -56,13 +56,12 @@ test('CRAFT-FIRST-SHOWN the law the words say: the patterns whose first lays on 
   assert.equal(none.some((r) => r.id === 'fishingnet:linen'), true, 'the Fishing-Net, the report\'s, never paid');
   assert.deepEqual(MASON_RECIPES.map((w) => [w.id, !!w.act && firstCraftPays(w)]), [['cut:stone', true], ['mix:mortar', true]], 'the bench\'s line says both');
   assert.deepEqual(COOKING_RECIPES.filter((r) => !firstCraftPays(r)).map((r) => r.id), [], 'the fire\'s line stands for every dish');
-  // the box's line, at the rank the craft is read at. PIN MOVED (CLOTH-GEMS, Professions-Arc 50): S1 judges the units -
+  // the box's line, at the rank the craft is read at.
   // the cloth's line says bought cloth goes first and earns none (`own` unsaid or false), and the made cloth's 500 (`own`).
-  // PIN MOVED (WOVEN-PAYS, FIELD BUGS 2026-10-26b): the wall named silver - cloth bought with it, never "cloth you did not
   // weave"; AUDIT WOVEN-PAYS: by the cloth's silver count (`silver`) - none standing, the condition said; one standing, the
   // count said, and no first
   const COUNTED = (n) => `20 Outfitting experience. Bolts of this cloth bought with silver and not yet used: ${n}. Until you have used that many, no piece of it earns a first-time bonus.`;
-  const CONDITION = '20 Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver.';   // PIN MOVED (FIRST-BUDGET): Outfitting's share
+  const CONDITION = '20 Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver.';
   assert.equal(craftXpLine(recipeById('garment-165:linen'), 0, 'Outfitting'), CONDITION, 'no count said: the condition');
   assert.equal(craftXpLine(recipeById('fishingnet:linen'), 0, 'Outfitting', {}, 0), CONDITION);
   assert.equal(craftXpLine(recipeById('fishingnet:linen'), 0, 'Outfitting', {}, 1), COUNTED(1));
@@ -78,7 +77,6 @@ test('CRAFT-FIRST-SHOWN the law the words say: the patterns whose first lays on 
 test('CRAFT-FIRST-SHOWN the craft\'s word, from the real Worker\'s answer through the book: Linen Straps\' first says it was a first and that the Weavers\' cloth earns no first-time bonus; Linen Boots\' first (a bolt and a Cured Leather) says the bonus came with it; the Boots\' second its XP alone, the Straps\' second the first still owed (WOVEN-PAYS); in French the French; world.js says it with one call (mutants: the first unread; the cloth\'s why on every first or on none; the host\'s old word)', async (t) => {
   t.mock.method(Date, 'now', () => NOON * 1000);
   const { give, book, raw, mac } = await standBook();
-  // PIN MOVED (WOVEN-PAYS, AUDIT WOVEN-PAYS): the Weavers' Linen bought at their counter, through the book - counted against
   // the cloth's firsts (a bought row written by hand is no silver)
   raw.prepare('INSERT INTO marks (account, balance) VALUES (?, 100)').run(mac.id);
   give('leather:cured', 'own', 5);
@@ -91,7 +89,7 @@ test('CRAFT-FIRST-SHOWN the craft\'s word, from the real Worker\'s answer throug
     return [r.data.xp, r.data.first, craftXpText(recipeById(id), r.data, 'Outfitting')];
   };
   assert.deepEqual(await word('garment-141:linen'), [20, true, '(+20 Outfitting experience. Cloth bought with silver earns no first-time bonus, so this piece\'s is still yours to earn)']);   // PIN MOVED (CLOTH-GEMS): the answer's `firstPaid` said; (WOVEN-PAYS): the wall named silver
-  assert.deepEqual(await word('garment-149:linen'), [531, true, '(+531 Outfitting experience, with the first-time bonus)']);   // PIN MOVED (FIRST-BUDGET): 20 and Outfitting's 511
+  assert.deepEqual(await word('garment-149:linen'), [531, true, '(+531 Outfitting experience, with the first-time bonus)']);
   assert.deepEqual(await word('garment-149:linen'), [20, false, '(+20 Outfitting experience)'], 'once');
   assert.deepEqual(await word('garment-141:linen'), [20, true, '(+20 Outfitting experience. Cloth bought with silver earns no first-time bonus, so this piece\'s is still yours to earn)'], 'PIN MOVED (WOVEN-PAYS): the bought cloth\'s second - the first laid on none, so the pattern is not made and its first is still owed');
   // in the player's language: the drafts, read when said
@@ -102,8 +100,8 @@ test('CRAFT-FIRST-SHOWN the craft\'s word, from the real Worker\'s answer throug
   try {
     tm.setLocale('fr');
     const shop = craftXpText(recipeById('garment-141:linen'), { xp: 20, first: true, firstPaid: false }, 'Outfitting');
-    assert.equal(shop, tm.formatMessage(fr.get('prof.craft.xpFirstBought'), { xp: 20, profession: 'Outfitting' }));   // PIN MOVED (CLOTH-GEMS): the bought cloth's word
-    assert.match(shop, /acheté avec de l’argent/);   // PIN MOVED (WOVEN-PAYS): the wall named silver
+    assert.equal(shop, tm.formatMessage(fr.get('prof.craft.xpFirstBought'), { xp: 20, profession: 'Outfitting' }));
+    assert.match(shop, /acheté avec de l’argent/);
     assert.equal(craftXpLine(recipeById('garment-149:linen'), 0, 'Outfitting'), tm.formatMessage(fr.get('prof.page.craft.xpFirst'), { xp: 20, more: 511, profession: 'Outfitting' }));
   } finally {
     tm.setLocale('en');
@@ -144,17 +142,12 @@ test('CRAFT-FIRST-SHOWN the stations say it, read off the real book: the loom\'s
   const box = (title) => {
     const b = station(title).querySelector('.prof-craft');
     assert.ok(b, `${title}: a box`);
-    // PIN MOVED (MASTER-ART): the craft's own lines - a Master's work section, its own at Master, aside
     const master = new Set(b.querySelector('.prof-master')?.querySelectorAll('p') ?? []);
     return [b.children[0].textContent, [...b.querySelectorAll('p')].filter((p) => !master.has(p)).map((p) => p.textContent)];
   };
-  // PIN MOVED (FIRST-BUDGET, Professions-Arc 52): the first's XP its track's share - Smithing's 500, Outfitting's 511,
   // Building's 1,823 (each the least that brings its track to Master in Smithing's crafts)
-  // PIN MOVED (CRAFT-HALL): the real Worker says what the character has made (profState's `made`), so a station says
   // the bonus is still to earn, not the rule (craftXpLine's `owed`)
   const FIRST = (xp, prof, more = 500) => `${xp} ${prof} experience, plus a ${more.toLocaleString('en')} first-time bonus.`;
-  // PIN MOVED (CLOTH-GEMS, Professions-Arc 50): with no bought cloth held the loom says the made cloth's 500 (ownSpend)
-  // PIN MOVED (WOVEN-PAYS, FIELD BUGS 2026-10-26b): the wall named silver
   const SHOP = (xp) => `${xp} Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver.`;
   try {
     draw();
@@ -187,10 +180,10 @@ test('CRAFT-FIRST-SHOWN the stations say it, read off the real book: the loom\'s
     assert.equal(jewel[0], 'Silver Ring - rank 0');
     assert.ok(jewel[1].includes('Quality chances: Crude 20% | Standard 60% | Fine 20%. They get better the further your rank (0) is above the recipe\'s (0). Stop every turn where the stone catches the light to raise the result one quality.'), jewel[1].join('|'));
     assert.equal(jewel[1].at(-1), FIRST(20, 'Smithing'));
-    // THE WORKBENCH, Building 100. PIN MOVED (FIELD BUGS 2026-10-18f CRAFT-LIMIT-SAID): a Master's track takes no more XP -
+    // THE WORKBENCH, Building 100.
     // the service credits MIN(earned, PROF_XP_MAX - held), none - so the Staff, the works and a Sculptor's carving say so
     // (it said "5 Building XP, and 500 more", which the Worker never paid); the quarter and the 500 at Building 99, below
-    const TOP = 'No Building experience: Building is at Master.';   // PIN MOVED (VOICE2): experience, not XP; no dash aside (the craft-limit lines in the voice)
+    const TOP = 'No Building experience: Building is at Master.';
     press('The Workbench', 'Staff');
     assert.deepEqual([box('The Workbench')[0], box('The Workbench')[1].at(-1)], ['Pine Staff - rank 0', TOP]);
     // THE MASON'S BENCH: the works' first, and a Sculptor's carving
@@ -199,12 +192,11 @@ test('CRAFT-FIRST-SHOWN the stations say it, read off the real book: the loom\'s
     assert.deepEqual([box('The Mason\'s Bench')[0], box('The Mason\'s Bench')[1].at(-1)], ['Stone Column - a Sculptor\'s', TOP]);
     // THE FIRE: a dish's first, beside the pans' XP
     press('The Fire', 'Hunter\'s Stew');
-    assert.equal(box('The Fire')[1].at(-1), 'First time cooking this: 3,155 more Provisioning experience.');   // PIN MOVED (FIRST-BUDGET): Provisioning's share; PIN MOVED (CRAFT-HALL): still to earn
+    assert.equal(box('The Fire')[1].at(-1), 'First time cooking this: 3,155 more Provisioning experience.');
     // THE ALCHEMY STATION: a potion wholly of the Apothecaries' goods says why it pays no first (AUDIT 32 S1's law, brewFirstPays)
     press('The Alchemy Station', 'Water Breathing');
     assert.match(box('The Alchemy Station')[1].join('|'), /60 Provisioning experience\. It is made only from the Apothecaries' goods, so it earns no first-time bonus\./);
-    // PIN MOVED (CRAFT-LIMIT-SAID): Building 99, an Expert's top tier 7 with room to take it - a Pine Staff, tier 1, is a
-    // quarter (5) and its first still the 500; the mason's works their first. PIN MOVED (FIRST-BUDGET): Building 90 - the
+    // quarter (5) and its first still the 500; the mason's works their first.
     // first is Building's share now (1,823), a Master's room past it at 90
     track('building', xpForRank(90));
     assert.equal((await book.refresh({ force: true })).ok, true);

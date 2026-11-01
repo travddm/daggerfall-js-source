@@ -1,7 +1,4 @@
-// BUFF-END (2026-09-27, Leafen on Discord: "Could there be a way to dispel magic for non-magic users? It's a bit of a
-// buzzkill just having something on me that will take irl months of game time to wear off" - a Shield Group at 11397
-// rounds; "Or maybe have a hard limit for the number of ticks"; Zerofyre: "An option to right click cancel buffs on
-// yourself like most RPGs would be incredibly nice"). Never DFU's - its one way off is Dispel Magic - and the stacking
+// BUFF-END. Never DFU's - its one way off is Dispel Magic - and the stacking
 // law stands: a player ENDS a spell of theirs, with a right-click on its HUD icon (the mouse freed) on either skin, or
 // the End on the pause window's Stats page, Effects. What may be ended is a spell of the kinds that only help.
 import { test } from 'node:test';

@@ -1,10 +1,7 @@
-// BOARD-UI (2026-10-06, Mac: "Some towns have double notice boards"; "overhaul the notice boards to enhance readability,
-// Including each of the tabs"; "Enhance the speed at which the notice board and market loads"; "Enhance organization of
-// the market"; "Reduce overusage of bloated text. Less AI like text"; "Enhance the guild war tab of the board for better
-// organization, instruction and readability"): ONE NOTICE BOARD A TOWN (systems/bounty/bountyBoard.js noticeBoardIndex, read by
+// BOARD-UI: ONE NOTICE BOARD A TOWN (systems/bounty/bountyBoard.js noticeBoardIndex, read by
 // every seam of the hosts - REVERTED 2026-10-07: every board BOUNTY1 did not take a Notice Board again, the helper the
 // siege field's alone), the board's tabs laid out to be read (ui/noticeWindow.js, ui/marketTab.js, ui/seatTab.js),
-// the reads set out early and side by side, the words cut. The record: bible/06-Systems/Professions-Arc.md 10.11.
+// the reads set out early and side by side, the words cut. The record: 10.11.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -92,7 +89,7 @@ test('BOARD-UI the Work tab: the day\'s count stands over the cards, not under t
   await tick();
   const cork = byClass(host, 'notice-cork')[0];
   assert.equal(cork.children[0].className, 'notice-worktoday');
-  assert.equal(cork.children[0].textContent, 'Writs today: 1 of 3');   // PIN MOVED (AUDIT CHAP2 C5): the Court's and the halls' one count
+  assert.equal(cork.children[0].textContent, 'Writs today: 1 of 3');
   assert.equal(byClass(host, 'notice-tab')[1].textContent, 'Work1', 'the writ open, never the one taken');
 });
 
@@ -187,7 +184,7 @@ test('BOARD-UI the Seat tab: its parts each on a panel under its name, in order 
   answer({ data, error: null });
   await tick();
   const named = byClass(host, 'notice-panel').map((p) => (['H3', 'SUMMARY'].includes(p.children[0]?.tagName) ? p.children[0].textContent : null)).filter(Boolean);
-  // PLAIN-UI (PIN MOVED, bible/10-UI/Plain-Words.md): what the seat is, how its war works and its words stand first -
+  // PLAIN-UI (
   // the guide stood folded under the whole tab, past every number it explains
   assert.deepEqual(named, [SEAT_PANELS.about, SEAT_PANELS.guide, SEAT_PANELS.words, SEAT_PANELS.week, SEAT_PANELS.battle, SEAT_PANELS.standings, SEAT_PANELS.mine, SEAT_PANELS.chronicle]);
   assert.match(byClass(host, 'seat-head')[0].textContent, /^The Charter of Anticlere: held by the Silver Hand <SH>Held by the Silver Hand <SH> since week 3\./);
@@ -210,7 +207,7 @@ test('BOARD-UI the Seat tab: its parts each on a panel under its name, in order 
   const n = (x) => x.toLocaleString('en-US');
   assert.match(steps[0][1], new RegExp(`in up to ${SEAT_PLEDGE_REGIONS_MAX} regions\\. Pledges lock at the Reckoning, Friday 18:00 UTC\\.`));
   assert.match(steps[1][1], new RegExp(`at most ${n(ACCOUNT_SEAT_WEEK_CAP)} a week at a seat`));
-  // AUDIT 657 B9 (PIN MOVED): the law's taker - the strongest past the line whose treasury can pay the fee
+  // AUDIT 657 B9 (
   assert.match(steps[2][1], new RegExp(`the strongest guild with at least ${n(CLAIM_THRESHOLD.palace)} influence whose treasury can pay ${n(CLAIM_FEE.palace)} silver\\. Two guilds within 10% of each other meet in a Tourney`));
   assert.match(seatGuide({ tier: 'crown' })[2][1], new RegExp(`${n(CLAIM_THRESHOLD.crown)} influence whose treasury can pay ${n(CLAIM_FEE.crown)} silver`));
   assert.match(steps[3][1], new RegExp(`at least ${n(CLAIM_THRESHOLD.palace)}: the strongest challenger wins a Right of Siege`));

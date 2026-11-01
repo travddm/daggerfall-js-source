@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-HIDDEN (2026-10-22, mob: "true invis not lattys invis"; design doc "DFO Staff Panel: design", Invisible
-// follow, and Weak spots: "entering a home is logged") - A HIDDEN STAFF SPECTATOR SEEN ENTERING A PRIVATE HOME, carried from
+// STAFF-PANEL5-HIDDEN - A HIDDEN STAFF SPECTATOR SEEN ENTERING A PRIVATE HOME, carried from
 // the relay to the account service, which writes it in the staff audit log (server-account/src/staffHidden.js takeHiddenSeen).
 //
 // A hidden socket's subject is a staff session's, never an account's id (identityToken.js `hd`), so the relay cannot say

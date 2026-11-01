@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-4 (2026-10-14) - A glTF 2.0 MODEL, READ BY THE PORT ITSELF.
+// POI-4 - A glTF 2.0 MODEL, READ BY THE PORT ITSELF.
 //
-// Mac, asked which formats the POI editor imports: "glTF / GLB" (bible/06-Systems/POI-Editor-Arc.md). The port draws
+// . The port draws
 // with no engine (Port-Doctrine: hand-rolled WebGL2), so the reader is its own, written to the Khronos specification
 // (glTF 2.0, https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html) and pure - no DOM, no fetch - so the editor,
 // the tests and a Node tool read a file the same way.

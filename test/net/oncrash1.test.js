@@ -1,4 +1,4 @@
-// ONCRASH1 (2026-09-15, Mac: "Receiving reports of player browser crashing when online"): THE TWO WAYS A RELAY
+// ONCRASH1: THE TWO WAYS A RELAY
 // FRAME ENDED SOMEBODY ELSE'S RUN.
 //
 // 1. THE SEAM. `_receive` runs inside the WebSocket's `onmessage`, and the handlers it calls are the port's whole

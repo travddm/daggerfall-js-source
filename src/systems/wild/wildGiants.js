@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ZONE GIANTS (2026-10-08, the owner: "can you always spawn 2 giants per tier and make em show on the map where they
-// wander around? dont use the 15% anymore if this is possible")
+// ZONE GIANTS
 //
 // The zone's giants are no longer a wanderer's roll. Every tier keeps TWO giants, always - eight in the zone - and each
 // one WANDERS: its place at any moment is a pure function of the time (the relay's clock, the same skew the halls read)
@@ -59,7 +58,7 @@ const mix = (a, b) => { let h = (a ^ Math.imul(b + 0x7f4a7c15, 0x9e3779b1)) >>> 
 export const wildGiantRing = (g) => Math.floor((g | 0) / WILD_GIANTS_PER_RING) + 1;
 
 const _cells = new WeakMap();
-/** GIANT-FIELDS (the owner: "make sure the giants dont spawn on top of mounts only in a free field"): a home is the
+/** GIANT-FIELDS: a home is the
  *  lowest of the free cells its draw asks (the height map's byte), and a waypoint one of the LOWER half of the cells
  *  about the home - the valleys and the open fields, never the peaks. WW-C2: the low half the home's own ground's, where it
  *  was the whole tier's (a province's tier is too wide a ground to rank, and too varied for one median). */
@@ -166,7 +165,7 @@ export function wildGiantsAt(mask, free, now, dead = () => false, heightAt = nul
     const a = waypointOf(c, g, leg), b = waypointOf(c, g, leg + 1);
     if (!a || !b) continue;
     let cx = a.x + 0.5 + (b.x - a.x) * f, cy = a.y + 0.5 + (b.y - a.y) * f;
-    // GIANT-LEASH (the owner: "giant should not be able to walk out of the zone"): a straight line between two waypoints
+    // GIANT-LEASH: a straight line between two waypoints
     // of its tier that cuts over the zone's edge (a bay in the border) is not walked out there - the giant waits at the
     // nearer waypoint until the line comes back in
     if (!giantIn(mask, cx, cy)) { const p = f < 0.5 ? a : b; cx = p.x + 0.5; cy = p.y + 0.5; }   // ZONE-LINE: the zone's own pixel too

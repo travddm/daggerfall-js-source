@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT HCC U5 (2026-09-23, Mac: "any new notifications or UI elements are enhancified"; FONT1: "Any enhanced UI or
-// text must be our enhanced version"): THE FIELD'S OWN WINDOW, IN THE SKIN'S FACE.
+// AUDIT HCC U5: THE FIELD'S OWN WINDOW, IN THE SKIN'S FACE.
 //
 // DaggerfallInputMessageBox (ui/inputMessageBox.js) drew the SPOP parchment in the bitmap font on both skins, so
 // Horse Cart and Cargo's "Name your horse:" - and every other line of text a raiser asks for - stood as a 1996

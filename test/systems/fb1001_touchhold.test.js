@@ -1,4 +1,4 @@
-// TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use", the audit's question answered). No Interact
+// TOUCH-HOLD. No Interact
 // existed on a phone or in the pad's shipped layouts, and E is the professions' start and their hold: there a common
 // herb (no tool picks it) could not be started, Hunting could not be started at all (the Skinning Knife had no Use) nor
 // its line held, and the net's haul could not hold its band (299 of 300 seeded hauls slipped to a plain net). Now:

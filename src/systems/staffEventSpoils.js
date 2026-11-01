@@ -1,15 +1,13 @@
 // @ts-check
-// STAFF-EVENT THE REWARD (2026-10-24, mob: "what should we do for the mini bosses drop for loot?", "something like dagons
-// leaderboard", "but not his ghear", "build that base", "but we will tweak the drop table"): A STAFF EVENT'S SPOILS -
+// STAFF-EVENT THE REWARD: A STAFF EVENT'S SPOILS -
 // what one fighter's part in an event pays when its mini boss first falls, rolled from the relay's receipt. Design:
-// bible/11-Multiplayer/Staff-Events.md section 9.
 //
 // PER PLAYER, AND THE SEED'S OWN - the gate's spoils' law (systems/gate/gateSpoils.js) and a town's thanks' makers
 // (systems/raidSpoils.js): the receipt the relay signs for each earner (net/staffEvent/staffEventReceipt.js `e1`) carries
 // a seed (`c`) and the earner's rank on the board (`r`), and everything here is rolled on `seededRng(c)`. NONE OF DAGON'S
 // OWN: no Sigil Stone, no Regalia, no Dragonfire Oath, nothing gilded.
 //
-// THE DROP TABLE IS STAFF_SPOILS_TABLE, the one place to tweak it (mob: "we will tweak the drop table").
+// THE DROP TABLE IS STAFF_SPOILS_TABLE, the one place to tweak it.
 //
 // GIVEN ONCE A RECEIPT, straight into the pack, through the spoils pool a town's thanks use (scenes/spoilsPool.js under
 // RAID_SPOILS_KEYS, keyed `sev:<id>` - never a raid's `raid:<key>`): the relay hands the same receipt again after a

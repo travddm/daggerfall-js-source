@@ -1,10 +1,10 @@
-// PRECIP4 (2026-10-19, the owner: "the transition should be seamless both in ground texture and everything else"): THE
+// PRECIP4: THE
 // SNOW ON THE GROUND - the cover's chunk (render/snowCoverGlsl.js) run through test/glsl.mjs against the law
 // (systems/weather/snowpack.js) and against its own twin on the CPU, the renderer's frame of snowlines and its draws, a
 // set's twin, the host about the player (scenes/snowCoverHost.js) and its wiring: the builds' seasons (scenes/
 // pixelBuild.js), the world's draws, its sweep, its grass, its feet and the Snowfall mod's surface on it. AUDIT PRECIP
-// (the owner: "Audit this and ensure perfection. No band aids") re-pinned every law GROUND-1..9 and HOST-1..10 moved.
-// bible/07-Rendering/Biome-Precipitation.md is the record, bible/01-Overview/audits/Audit-Precip.md the audit's.
+//  re-pinned every law GROUND-1..9 and HOST-1..10 moved.
+// is the record, the audit's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -169,12 +169,10 @@ test('PRECIP4 BOTH TERRAIN PROGRAMS: the border\'s weights once, the snow\'s cov
   const r = read('src/render/renderer.js');
   const classic = r.slice(r.indexOf('const TERRAIN_FS = `'), r.indexOf('}`;', r.indexOf('const TERRAIN_FS = `')));
   for (const [name, fs] of [['classic', classic], ['lane', EL_TERRAIN_FS]]) {
-    // PIN MOVED (PEAKS1, bible/03-World/Peaks.md): the bare face sheds the cover between the cover and the ground's snow - a
     // steep face over the cap's line is rock (render/snowCapGlsl.js); the cover is still read once, after the border
-    // PIN MOVED (COAST-LOOK, render/groundEdgeGlsl.js): the border's share is a transition's two kinds' or the tile's, and
     // the snow's winter twin by the same - each kind's record at its share
     assert.match(fs, /\n {2}vec4 ew = ecoWeights\(vLocalXZ\);[^\n]*\n {2}if \(ge\) tex = mix\(ecotone\([^\n]*\n {2}tex = roadEdge\([^\n]*\n {2}if \(!ge\) tex = ecotone\(tex, ew, vec3\(tuv, float\(layer\)\), gx, gy\);[^\n]*\n {2}float snowC = snowCover\(vLocalXZ, vWorldPos\.y, gx, gy\);[^\n]*\n {2}snowC = snowFace\(tex, snowC, vLocalXZ, vWorldPos\.y, normalize\(vNormal\), tuv, gx, gy\);[^\n]*\n {2}tex = ge \? mix\(snowGround\(tex, ew, snowC, vec3\(tileUV, float\(geA\)\), dux, duy\), snowGround\(tex, ew, snowC, vec3\(tileUV, float\(geB\)\), dux, duy\), geS\) : snowGround\(tex, ew, snowC, vec3\(tuv, float\(layer\)\), gx, gy\);\n/, `${name}: after the border`);
-    const bed = Math.max(fs.indexOf('vec2 bedK = bedCover(data, tileUV, unwrapped, vec3(tuv, float(layer)), gx, gy, snowC, ge);'), fs.indexOf('${waterBedMix()}'));   // the lane's text evaluated, the classic's its source (PIN MOVED, COAST-LOOK: the bed's call)
+    const bed = Math.max(fs.indexOf('vec2 bedK = bedCover(data, tileUV, unwrapped, vec3(tuv, float(layer)), gx, gy, snowC, ge);'), fs.indexOf('${waterBedMix()}'));   // the lane's text evaluated, the classic's its source (
     assert.ok(bed > 0 && fs.indexOf('tex = ge ? mix(snowGround(') < bed, `${name}: before the bed, which reads its cover`);
   }
   assert.match(EL_TERRAIN_FS, /vec3 white = elDecode\(textureGrad\(uTileArr, vec3\(tl\.xy, tl\.z \+ float\(uSnowArr\.x\)\), gx, gy\)\.rgb\);/, 'the lane decodes its winter');
@@ -301,7 +299,7 @@ test('PRECIP4 A SET\'S TWIN IS THE SET (AUDIT PRECIP GROUND-2): its summer recor
   assert.equal(t[TWIN_LAYERS + 7], winter[7], 'a set at the size kept whole');
   assert.equal(t[3].colors[(1 * 4 + 1) * 4 + 3], summer[3].colors[0 * 4 + 3], 'a texel repeated, its alpha its own');
   assert.equal(t[3].colors[(3 * 4 + 3) * 4 + 3], summer[3].colors[(1 * 2 + 1) * 4 + 3]);
-  const w = read('src/scenes/groundSets.js');   // PIN MOVED (OW-HITCH): the world host's ground sets' home (HOST-SPLIT), uploading a few layers a breath
+  const w = read('src/scenes/groundSets.js');
   assert.match(w, /const layers = winter == null \? own\.layers : twinLayers\(own\.layers, \(await groundLayersOf\(winter, await getTexture\(winter\)\)\)\.layers\);\n\s+await stepsBreathing\(renderer\.uploadTileArraySteps\(key, layers\), breathe\);/);
   assert.equal(typeof RENDER.Renderer.prototype.makeTwinArray, 'undefined', 'no blit');
 });
@@ -338,7 +336,7 @@ test('PRECIP4 THE HOST: the lane asked each frame (a pixel built under the other
   host.tick({ px: 200, py: 100 });
   assert.deepEqual(rebuilt, [], 'a pixel built off the lane: not before the window stands (no clock here - AUDIT FB1021 L1-1; fb1021_snowface.test.js turns it once it does)');
   lane.on = false; host.tick({ px: 200, py: 100 });
-  assert.deepEqual(rebuilt, ['200,100'], 'the lane turned off: the one built on it, at once');   // PIN MOVED (LANE-TURN): it was sent to the skin, which refused it
+  assert.deepEqual(rebuilt, ['200,100'], 'the lane turned off: the one built on it, at once');
   host.tick({ px: 200, py: 100 });
   assert.deepEqual(rebuilt, ['200,100'], 'once');
   assert.deepEqual(marked, [], 'and never sent to the skin');
@@ -561,15 +559,13 @@ test('PRECIP4 THE WIRING: a build settles the snow, then keeps every season it t
   const skin = b.slice(b.indexOf('  async function reskinPixelNow('), b.indexOf('  _reskin.skinWith(reskinPixelNow);'));
   assert.match(skin, /const pixelSeason = rec\.pixel\(sk\.groundMid - SEA_LEVEL_M, host\.season\);/);
   assert.equal((skin.match(/host\.season\b(?!sReady|sActive)/g) ?? []).length, 1, 'no re-skin line reads the host\'s season past it');
-  // PIN MOVED (TESA-LANDS): the pixel's set its zone's dress of it past the Bay (scenes/pixelBuild.js landSetOf)
   assert.match(b, /const groundArchive = landSetOf\(px, py, snowCover \? snowCover\.groundArchive\(climate, pixelSeason\) : getTerrainGroundArchive\(climate, pixelSeason\)\);/);
-  // PIN MOVED (TESA-LANDS, AUDIT): the pixel's set and its neighbours' loaded together, each with its winter twin, every
   // one awaited before the pixel is drawn
   assert.match(b, /const ownSet = loadGroundSet\(groundArchive, pipeline, snowCover\?\.winterOf\(climate\) \?\? null\);/);
   assert.match(b, /await Promise\.all\(\[ownSet, \.\.\.archives\.map\(\(a\) => loadGroundSet\(a, pipeline, snowCover\?\.winterOf\(near\[groundNear\.indexOf\(a\)\]\) \?\? null\)\)\]\);/);
   assert.match(b, /\n\s+\} else await ownSet;\n/);
   assert.match(b, /const fSeason = snowRec \? snowRec\.flat\(f\.x, f\.z, f\.y - SEA_LEVEL_M, pixelSeason\) : pixelSeason;/);
-  assert.match(b, /const archive = getNatureArchive\(base, fSeason\);/);   // PIN MOVED (AUDIT PRECIP HOST-7): one law for every wild flat - the re-skin's own (getNatureArchive(f.wild, ...))
+  assert.match(b, /const archive = getNatureArchive\(base, fSeason\);/);
   assert.match(b, /const snowSeen = snowRec\?\.done\(models\.length > 0 \|\| dfLocation != null\) \?\? null;[^]*?_snow: snowSeen,/);
   const w = read('src/scenes/world.js');
   assert.match(w, /const snowCover = createSnowCoverHost\(\{ renderer, climateAt, mapHeight: MAP_H, stateOf: \(\) => state, builtOf: \(\) => built, owns: precipLawOn, markReskin: \(key\) => _reskin\.skin\(key\), markRebuild: \(key\) => _reskin\.mark\(key\), now: /);   // LANE-TURN: a lane's turn rebuilt
@@ -583,5 +579,5 @@ test('PRECIP4 THE WIRING: a build settles the snow, then keeps every season it t
   assert.match(w, /p\._stride === 1 && p\.tilemapBytes && \(snowCover\.on \|\| p\.season !== SEASON\.Winter\)/);
   assert.match(w, /seasons, siegeFieldsByTown, snowCover, snowfall, standPixelNpcs,/);
   assert.match(b, /seasons, siegeFieldsByTown, snowCover, snowfall, standPixelNpcs,/);
-  assert.equal(SNOWPACK.levels.count, 45);   // PIN MOVED (RED-MOUNTAIN, bible/03-World/Red-Mountain.md): the levels reach over the volcano's rim, 8,200 m (with RELIEF-PEAKS' large map)
+  assert.equal(SNOWPACK.levels.count, 45);
 });

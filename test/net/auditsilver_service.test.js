@@ -1,10 +1,10 @@
-// AUDIT SILVER-WAYS (2026-10-03, Mac: "Audit this") - THE SERVICE'S FINDINGS, each pinned through the real Worker over
+// AUDIT SILVER-WAYS - THE SERVICE'S FINDINGS, each pinned through the real Worker over
 // node:sqlite with every migration applied (test/accountDb.mjs): A1 one account one guild an event (a gate's re-claim in
 // its own second marked a second guild); A2 a deed struck by a counted claim alone; A3 the day's deeds in the guild's
 // view; B1 a party's claims all paid by a contract (the tax reckoned in the batch); B2 an officer paid by another
 // guild's contract; B3 a guild with a contract standing answers 409; C1 the Watch no later than the act's end; C2 a
-// repeat's silver as it was; C3 the day's Motherlodes picked once. bible/06-Systems/Online-Arc.md SILVER-WAYS (the
-// audit); bible/06-Systems/Professions-Arc.md 38.
+// repeat's silver as it was; C3 the day's Motherlodes picked once. SILVER-WAYS (the
+// audit); 38.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

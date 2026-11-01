@@ -1,4 +1,4 @@
-// AUDIT WORLD4 (Mac, 2026-09-13: "Lets do an audit on thid") - four opus
+// AUDIT WORLD4 - four opus
 // lenses over WORLD4 (the wire and the budgets; the projection and its
 // readers; the dungeon host's claim, land and settle; the memory and the
 // record), each finding refuted by its own finder and then by adversaries,

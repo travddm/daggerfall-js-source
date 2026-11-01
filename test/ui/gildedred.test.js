@@ -1,5 +1,4 @@
-// GILDED-RED (2026-10-22; bible/06-Systems/Gilded.md section 8; Mac: "Can we change the gilded rarity to red instead of
-// gold (keep the gold skins) and give it a better indicator than 2 stars"). The owner chose from sheets rendered in the
+// GILDED-RED. The owner chose from sheets rendered in the
 // real Enhanced pack: Crimson for the rung, a gold crown with red jewels for its pips. The laws pinned:
 //   - THE RUNG IN CRIMSON: the ladder's table, and the Plus sheet's vars in its colour - its light only 30% of the way
 //     to white, so the bevel's lit edge reads red and not pink (the other tiers' lights stand nearer white).

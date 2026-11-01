@@ -1,5 +1,4 @@
-// DA8 (2026-09-29, Mac: "Is there anyway to send a notification that a new
-// update is available?"): THE DESKTOP APP'S UPDATE, TOLD IN THE GAME.
+// DA8: THE DESKTOP APP'S UPDATE, TOLD IN THE GAME.
 //
 // The shell's launcher installs an update before play; this is for the
 // one that lands AFTER - the player chose "Play now" while it downloaded,

@@ -59,7 +59,7 @@ const partRows = (cmp) => cmp.parts.map((r) => [PART_NAMES[r.part], r.before, r.
 
 test('AC-COMPARE the character\'s armour at a glance: the doll\'s seven numbers are the classic doll\'s own law (the material, the shield on its three parts, a Magic helm\'s armour affix), in BodyParts order under the enum\'s own names; the overall figure weighs them by the struck-part table of the core in force - FormulaHelper\'s twenty (2/3/3/4/4/3/1), the combat overhaul\'s (1/3/3/4/3/4/2) while its redone formula is on, FormulaHelper\'s again when that is off or the overhaul uninstalled; a bare character reads DFU\'s "no armour" (mutants: a struck-table entry moved; the counts not counted; the figure over seven parts, not twenty blows; the figure unweighted; the overhaul\'s table never registered, registered off its switch, or left behind by the uninstall; the formulas read the wrong name; the doll without its modifier channel; the part names off their enum; the tenth a whole)', () => {
   const { e, k } = kitted();
-  assert.deepEqual(k.helm.affixes, [{ id: 'armor', value: 6 }, { id: 'stat', param: 'intelligence', value: 5 }], 'the roll gives the helm its armour affix');   // PIN MOVED (AFFIX-LINES): its second line drawn over the lines - frost resistance where carrying capacity was; PIN MOVED (ARMOR-LEAN): and on plate's lean - Intelligence where frost resistance was
+  assert.deepEqual(k.helm.affixes, [{ id: 'armor', value: 6 }, { id: 'stat', param: 'intelligence', value: 5 }], 'the roll gives the helm its armour affix');
   assert.deepEqual(PART_NAMES, ['Head', 'Right arm', 'Left arm', 'Chest', 'Hands', 'Legs', 'Feet']);
   assert.deepEqual(dollArmour(e), [13, 0, 3, 9, 3, 10, 7], 'iron 7 + the affix 6; steel 9; the kite 3; iron 7 + the kite 3; iron 7');
   assert.deepEqual(dollArmour(hero()), [0, 0, 0, 0, 0, 0, 0], 'nothing worn: ArmorValues 100, the doll 0');
@@ -129,7 +129,7 @@ test('AC-COMPARE what a wear would change, and the wear then does exactly that: 
   };
   let { e, k } = kitted();
   const rare = magic(armour(102, ARMOR_MATERIAL.Iron));
-  assert.deepEqual(rare.affixes, [{ id: 'armor', value: 6 }, { id: 'stat', param: 'intelligence', value: 5 }]);   // PIN MOVED (AFFIX-LINES): the second line over the lines; PIN MOVED (ARMOR-LEAN): on plate's lean
+  assert.deepEqual(rare.affixes, [{ id: 'armor', value: 6 }, { id: 'stat', param: 'intelligence', value: 5 }]);
   let cmp = check(e, carry(e, rare), [['Chest', 9, 13]]);
   assert.deepEqual([cmp.replaces, cmp.damage], [[k.cuirass], null]);
   ({ e, k } = kitted());
@@ -211,7 +211,7 @@ test('AC-COMPARE the pack draws it: each part\'s number on the panel for its slo
         const b = n.querySelector('.wornac');
         onPanels[txt(n.querySelector('.wornslot'))] = b ? [b.textContent, b.classList.contains('nil'), b.title] : null;
       }
-      assert.deepEqual(onPanels, {   // PIN MOVED (VOICE2): each part's title says "armor" (Voice.md rule 8, American spelling)
+      assert.deepEqual(onPanels, {
         Head: ['13', false, 'Head: armor 13'], Cloaks: null,
         'Chest armor': ['9', false, 'Chest: armor 9'], Shirt: null,
         'Left arm': ['3', false, 'Left arm: armor 3'], 'Right arm': ['0', true, 'Right arm: armor 0'],
@@ -221,7 +221,7 @@ test('AC-COMPARE the pack draws it: each part\'s number on the panel for its slo
       });
       const plaque = host.querySelector('.wornac-total');
       assert.deepEqual(plaque.children.map(txt), ['Armour', '6.0']);
-      assert.equal(plaque.parent.className, 'wornplaques');   // PIN MOVED (AUDIT C&C S1): the plaques' own row
+      assert.equal(plaque.parent.className, 'wornplaques');
       assert.equal(plaque.parent.style.gridArea, '1 / 2 / 2 / 3', 'the head of the figure\'s column, its cell named whole');
       assert.match(plaque.title, /head 2, right arm 3, left arm 3, chest 4, hands 4, legs 3, feet 1 in 20\)$/);
       const tab = (id) => host.querySelector('.packtabs').querySelectorAll('.packtab')[PAGE_IDS.indexOf(id)].onclick({});

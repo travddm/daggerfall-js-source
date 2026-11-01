@@ -1,5 +1,4 @@
-// STAFF-PANEL5-MESSAGE (2026-10-22, mob, 04:14Z: a message in the middle of one player's screen; design doc "DFO Staff
-// Panel: design", Message on screen) - THE RELAY'S AND THE GAME'S HALVES: the order of its own kind ('smsg'), the hub's
+// STAFF-PANEL5-MESSAGE - THE RELAY'S AND THE GAME'S HALVES: the order of its own kind ('smsg'), the hub's
 // nudge to one account's own sockets and its count back through the door (server/src/staffMessage.js), the hello's `sm`
 // (a build that shows the box), the session's frame arm, the box (ui/staffMessageBox.js) and the game's half
 // (net/staffMessages.js) - and the whole chain, from the panel's send to "they pressed OK", over the real relay and the

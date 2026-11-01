@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// LAMP-KEEPER II (2026-10-14, Mac: "Reimplement an old bug that was previously removed. A chance of finding a vendor
-// NPC as a lamp model. Anybody that interacts with the lamp model should earn the 'I Love Lamp' title"): THE LAMP'S
+// LAMP-KEEPER II: THE LAMP'S
 // TITLE, KEPT ON THE ROW.
 //
 // A shop's keeper stands as a lamp now and then (src/systems/lampKeeper.js - the room's own pick, every client's), and

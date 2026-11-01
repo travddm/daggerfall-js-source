@@ -1,5 +1,5 @@
 // AUDIT RPT1026 (lane K, the client): the audit of FIELD BUGS 2026-10-26r's RPT1026-CLIENT, each finding driven through
-// the real modules (bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md, RPT1026-CLIENT's AUDIT rows).
+// the real modules (, RPT1026-CLIENT's AUDIT rows).
 //   K2 - the lost graphics context's report, the page's one way back, carried the new Dismiss: dismissed, the dead
 //        canvas was left with nothing to say how to reload. Driven through main.js's own three statements.
 //   K3 - the pins of PEER-SHAKE did not hold the Motion row's own values: driven through the one cast engine

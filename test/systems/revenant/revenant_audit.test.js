@@ -1,4 +1,4 @@
-// REVENANT AUDIT (2026-10-02, Mac: "Audit everything and ensure perfection") - every finding of the five-way audit of
+// REVENANT AUDIT - every finding of the five-way audit of
 // the Revenants (the records and their words, the kill-or-spare flow, the sworn companions, the UI, the burn and the
 // portals), pinned by what it does where it can be run, and by its source where it is a host's wiring.
 
@@ -60,7 +60,7 @@ test('AUDIT A1/A6: a judged revenant does no deed - executed, released or sworn,
   assert.equal(N.allRevenants().length, before, 'and no second record under its id');
   assert.equal(N.revenantById(r2.id).fate, 'executed');
   // the cap: the living full, one of them out in the world - a deserter coming back past it buries the weakest that is
-  // NOT out (PIN MOVED, UNQUIET - Revenants.md section 46: none rises past the cap, so the cap buries only for one turned
+  // NOT out (
   // back from the sworn)
   fresh();
   RC.setRetinuePlayer(me);

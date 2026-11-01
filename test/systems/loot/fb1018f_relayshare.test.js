@@ -117,7 +117,7 @@ test('RELAY-SHARE THE ONE LAW (combat/healthShare.js healthShare): an entity\'s 
   assert.equal(healthShare({ name: 'rat' }), 1, 'no health to read: whole');
   assert.equal(healthShare(null), 1);
   const placeholder = bossStandIn({ mobile: 31 }, 'the Warden');
-  assert.deepEqual([placeholder.health, placeholder.maxHealth, placeholder.relayHealth], [STAND_IN_WHOLE, STAND_IN_WHOLE, true], 'nothing here empties him');   // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE): the count the wire carries, 1e9 before
+  assert.deepEqual([placeholder.health, placeholder.maxHealth, placeholder.relayHealth], [STAND_IN_WHOLE, STAND_IN_WHOLE, true], 'nothing here empties him');
   assert.equal(healthShare(placeholder), null, 'no word heard: unknown, never his placeholder\'s 1');
   assert.equal(healthShare(relayBody(0.2)), 0.2, 'his word');
   assert.equal(healthShare(relayBody(1.7)), 1);
@@ -142,7 +142,7 @@ test('RELAY-SHARE THE REPORT: a Rare imprinted at the Reforge with Sweet Mother\
   // the gate's Warden: his stand-in's placeholder is whole (STAND_IN_WHOLE - 1e9 before STAND-IN-WHOLE); the relay's word (the bar's) says 200 of 1000
   const h = court(fight({ hp: 200, max: 1000 }));
   const warden = h.c.target().entity;
-  assert.equal(warden.health, STAND_IN_WHOLE, 'his placeholder');   // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE)
+  assert.equal(warden.health, STAND_IN_WHOLE, 'his placeholder');
   const plain = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, sword(), ROLL);
   assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain / 2), 'the Warden under a quarter: +50%');
   const shot = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, bow(), ROLL);

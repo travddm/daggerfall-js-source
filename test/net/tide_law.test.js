@@ -1,8 +1,8 @@
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE TIDES' LAW - the roll (a Tide a
+// SEASON1 part two: THE TIDES' LAW - the roll (a Tide a
 // land a week off the week and a salt, by the gate's own mix), the lands, the weights, Calm where no Season is counted;
 // the numbers; the seat-side effects (a Plague's Watch and Festival, a Daedric Incursion's gates, a Royal Wedding's
 // Festival and Standing, a Tax Revolt's Tithe) in influence, the Edict's cost, the week's Standing and the Turning's
-// plan; the Seat tab's words (bible/11-Multiplayer/Seats-Arc.md 9.3). Pure: src/net/tideLaw.js, src/net/townSeatLaw.js.
+// plan; the Seat tab's words (9.3). Pure: src/net/tideLaw.js, src/net/townSeatLaw.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { TIDE_SALT, TIDES, TIDE_LANDS, TIDE_EFFECTS, TIDE_WORDS, tideOf, tideAt, tideLandOf, tideLandName, tideName, tideLine } from '../../src/net/tideLaw.js';

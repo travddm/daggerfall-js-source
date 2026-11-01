@@ -1,5 +1,4 @@
-// WINDFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be
-// on by default and integrate into our enhanced environments seamlessly") - WINDFALL 1.0.0 (demifiend000, vendored at
+// WINDFALL1 - WINDFALL 1.0.0 (demifiend000, vendored at
 // vendor/windfall/), ported off its assembly: WindNaturalPlanner and WindRecordWeights whole, and WindMod's state -
 // its settings, the day's context and plan, the presentation state, the gusts and the profile the flora sway by, its
 // save record and its console command. Pure: the hosts hand it the frame, the renderer draws what it answers (render/
@@ -22,7 +21,7 @@
 // Single precision as the C# runs it (Math.fround at every float operation the assembly makes in float) - pinned
 // against the reference harness's trace (test/systems/windfall1_model.test.js).
 //
-// ENHANCED ENVIRONMENTS (Mac: "integrate into our enhanced environments seamlessly"): Windfall is the enhanced
+// ENHANCED ENVIRONMENTS: Windfall is the enhanced
 // outdoors' - the hosts tick it under the enhanced sky only (sky.enhanced), as WIND1's wind and every consumer of it
 // are - and it does not stand beside the port's own sway, it IS the sway while it is on (render/renderer.js BB_VS
 // takes one law or the other, never both). ONE WIND, ONE WAY: the heading the trees lean and the leaves blow is the

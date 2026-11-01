@@ -1,10 +1,9 @@
 // @ts-check
-// DUNGEON-RESPAWN (2026-10-08, the owner: "normal dungeons outside the zone 20mins respawn timer (which timer doesnt reset
-// when someone was in and left) for everything and the same for elite dungeons 40 mins respawn timer for everything"):
+// DUNGEON-RESPAWN:
 // WORLD8's respawn (net/wire.js respawnDue - a dead foe and an emptied container each come back on their OWN clock, from
 // the moment it fell or was emptied, whoever comes and goes) at the dungeon's own pace: a normal dungeon twenty minutes,
 // an elite one forty. The zone's halls keep WORLD8's own (their own reset is the hub's - net/wild/wildLaw.js), and so does a
-// Super dungeon - an hour until RESPAWN-30 (2026-10-14, Mac: "I meant the chest and foe respawn") made it half of one. Pure.
+// Super dungeon - an hour until RESPAWN-30 made it half of one. Pure.
 import { RESPAWN_MS } from '../../net/wire.js';
 
 export const DUNGEON_RESPAWN_MS = 20 * 60_000;

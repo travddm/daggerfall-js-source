@@ -1,7 +1,4 @@
-// WW7-11 and WW7-12 (2026-10-26, the owner on the report's two calls: passages past the Bay rare - "Make them longer";
-// the sea serpent kept to the Bay's lanes because moving it moves the relay's law - "Fucking do it"; and the coordinator
-// at IC-GRAND's merge: the Imperial City's 625 slices are places, "keep your near lists and wake bounded over them";
-// bible/03-World/World-Wide.md WW7-11, WW7-12): THE LONG PASSAGES AND THE SERPENT ON THE WORLD'S LANES - a far lane's
+// WW7-11 and WW7-12: THE LONG PASSAGES AND THE SERPENT ON THE WORLD'S LANES - a far lane's
 // passage taking the cycles it needs (its block, its room, the cycles it spends at sea, the Bay's passages as they were),
 // a capital one town to the living world, and the serpent's site rolled over every lane of the world, the hub telling
 // every game where the accounts agree it lies. Each pin mutation-checked (tools/mutants/ww7_longer.json).

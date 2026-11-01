@@ -1,4 +1,4 @@
-// SEASON1 part three (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE HALL OF RECORDS (bible/
+// SEASON1 part three: THE HALL OF RECORDS (bible/
 // 11-Multiplayer/Seats-Arc.md 9.2: "A Hall of Records book in every seat's palace ... read it as prose, from templates in
 // the law module ... The book is read through the enhanced book window the port already has") - the law (a row's week in
 // its Season's words, the book's chapters), the book (its tokens through the reader's one door), the service's read

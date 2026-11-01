@@ -1,8 +1,7 @@
-// TOWN-SHAPES TS5 (2026-10-25, the owner: "This needs to be the scale of the Imperial City with the outskirt locations being
-// circular also"; asked, "7x7 pixels"; bible/03-World/Town-Shapes.md TS5): the Imperial City over many pixels - its lake a
+// TOWN-SHAPES TS5: the Imperial City over many pixels - its lake a
 // round ring, the land past it its own; its landmarks carried in parts, a part a slice; the towns of its outskirts laid
-// round. PIN MOVED (IC-GRAND, 2026-10-26, the owner: "Imperial city needs to be larger. Im thinking 10km.", then "Lets do
-// 20km"; bible/03-World/Arena-Provinces.md IC-GRAND): twenty-five pixels a side (TS5's seven), every law the same.
+// round.
+// 20km"; IC-GRAND): twenty-five pixels a side (TS5's seven), every law the same.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

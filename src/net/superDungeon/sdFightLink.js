@@ -1,5 +1,5 @@
 // @ts-check
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): WHAT THE PAGE HOLDS OF
+// SD8c: WHAT THE PAGE HOLDS OF
 // THE LAST MOMENT'S FIGHT - the realm's words (net/wire.js validSdOut's fight kinds) folded into one state, as
 // net/gate/gateLink.js folds a gate's: the Remnant's health and phase, where each body stands and walks (the Remnant, and in
 // the Dragon Break the GOLD and SILVER Echoes), the blow each has in flight and the Hour's own, the Reset's Hearts, the

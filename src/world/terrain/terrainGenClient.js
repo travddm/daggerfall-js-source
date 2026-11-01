@@ -209,7 +209,7 @@ export class TerrainGenClient {
     this._worker.postMessage({ t: 'landform-tables', sites: s, climates: c }, [s, c].filter(Boolean).map((a) => a.buffer));
   }
 
-  /** BAY-LEFT-GROUND (bible/03-World/Landforms.md "BAY-LEFT-GROUND"): THE SITES PAST THE BAY (world/landforms.js
+  /** BAY-LEFT-GROUND ("BAY-LEFT-GROUND"): THE SITES PAST THE BAY (world/landforms.js
    *  landformSitesBeyond - the places past the Bay every client stands alike, by the world's key) - kept here for the
    *  same-thread kernel, a copy posted to the worker, which takes it before any job posted after it (its messages in
    *  order). Made again whenever the places past the Bay move (scenes/landformSitesHost.js); null clears it. */
@@ -245,7 +245,7 @@ export class TerrainGenClient {
     // TO1: WHOSE NETWORK THIS IS, on the object itself. The port draws
     // roads either way - Hazelnut's vendored arrays when Basic Roads is
     // on, its OWN generated network when it is off or his files cannot
-    // be read (bible/03-World/Roads.md, the deliberate inversion) - and
+    // be read (, the deliberate inversion) - and
     // until now nothing the network was handed to could tell the two
     // apart. Travel Options must: path FOLLOWING is his mod's feature,
     // gated on his mod being enabled, and a follower that walked the
@@ -290,9 +290,7 @@ export class TerrainGenClient {
   get threaded() { return !!this._worker; }
 
   /**
-   * PERF-EXT26 (2026-09-25, the players: "fps issues in the exterior but
-   * fine in the interior", "me too my friend.. don't know why. I got a
-   * RX6600"): a built pixel's grid at `stride` (terrainGen.js
+   * PERF-EXT26: a built pixel's grid at `stride` (terrainGen.js
    * restrideGrid), off this thread when a worker is up. The samples are
    * CLONED to it - the pixel keeps its own, for the grass, the ground
    * under the feet and a fallback. Always resolves: a worker failure or

@@ -1,4 +1,4 @@
-// TELL5 - PATTERNS: LENGTH, TRACKING, FEINTS, CHAINS (bible/12-Enhanced-AI/Feud-Arc.md section 7; Mac, 2026-10-04:
+// TELL5 - PATTERNS: LENGTH, TRACKING, FEINTS, CHAINS (; Mac, 2026-10-04:
 // "breath more depth into it", then "Go" on every call). Before it every wind-up of a shape was one length, aimed once,
 // honest and alone - learnt in a fight and beaten by rote. Now its length is drawn (an elite's quicker, a revenant's
 // by its rank, never under 0.55 s); a lunge turns after its target through the first half of its wind-up; a blade of
@@ -107,7 +107,6 @@ function run(foes, secs, player, each = null) {
     noteLocalPlayer(player, [0, 0, 1]);
     for (const f of foes) {
       f.ai.update(DT, player); f.atk.update(DT, f.ai, player);
-      // PIN MOVED (AUDIT TELL B9: a chain waits for its first blow's verdict to be spent) - the host's door spends it at
       // the sprite's strike, a frame step after the landing (this rig has no sprite)
       if (f.ai._blowVerdict != null && T - (f.ai._blowAt ?? T) >= 0.1) blowConnects(f.ai, false, T);
     }

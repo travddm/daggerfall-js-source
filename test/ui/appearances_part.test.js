@@ -1,4 +1,4 @@
-// APPEARANCES (2026-10-27; bible/10-UI/Collections.md section 9): THE APPEARANCES PART of the Collections page - its tile
+// APPEARANCES: THE APPEARANCES PART of the Collections page - its tile
 // (the character's looks over every look there is, the kit's meter of it), how a look is had, its filters, each kind's group
 // under its divider with its own count and meter, a row a look (Worn, Held, or dimmed), and a row opened saying how it is
 // had and where it is worn for how much.
@@ -52,8 +52,7 @@ test('APPEARANCES THE PART: a tile of its own after the account\'s four, every c
   for (const it of [sword, chest]) equipItem(me, it);
   noteHeldLooks(me);
   wearAppearance(me, sword, lookOfKey('121.7.0'));
-  assert.deepEqual(collectionParts(me).map(([id]) => id), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'trophies', 'fish'], 'every character\'s, after the account\'s four');   // PIN MOVED (HUNTERS-MARK, at the merge): the gathered parts after it, always shown
-  // PIN MOVED (AUDIT HORIZONTAL E3): 473 looks - chain boots' second style is none
+  assert.deepEqual(collectionParts(me).map(([id]) => id), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'trophies', 'fish'], 'every character\'s, after the account\'s four');
   assert.deepEqual(partCount('appearances', null, me), { held: 3, total: 473 }, 'the character\'s - no account read');
   setCollectionsPart('appearances');
   let p = page(me);
@@ -79,13 +78,12 @@ test('APPEARANCES THE PART: a tile of its own after the account\'s four, every c
   focus(p.root, 'looks-filter-missing').onclick();
   p = page(me);
   const missing = cls(p.root, 'coll-row');
-  assert.equal(missing.length, 470, 'every look not held');   // PIN MOVED (AUDIT HORIZONTAL E3): of 473
+  assert.equal(missing.length, 470, 'every look not held');
   assert.ok(missing.every((r) => !r.classList.contains('held')), 'each dimmed');
   assert.equal(heads(p.root).length, 19, 'every kind, its whole count');
   assert.equal(heads(p.root)[0], 'Head - 0 / 72');
   missing[0].onclick();
   p = page(me);
-  // PIN MOVED (AUDIT HORIZONTAL E4): no "Hold a" before a name, and a shop's style said as the shop's
   assert.equal(all(cls(p.root, 'coll-whole')[0], (x) => x.tag === 'p')[1].textContent, 'To collect Leather Helm, style 1: buy it, find it or make it.');
   focus(p.root, 'looks-filter-all').onclick();
   p = page(me);

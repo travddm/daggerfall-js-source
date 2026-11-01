@@ -1,5 +1,4 @@
-// WATCH-PROTECTS (2026-10-06, Mac: "improve the guards" - asked, "The watch protects people": a monster attacking
-// townspeople draws the watch to defend them; bible/06-Systems/Living-World.md WATCH-PROTECTS): THE WATCH PROTECTS THE
+// WATCH-PROTECTS: THE WATCH PROTECTS THE
 // TOWN'S PEOPLE. Before it no monster could turn on a townsperson - DFU's enemy senses weigh other enemies and the
 // player alone ("Civilian Mobile NPCs are not handled here", EnemySenses.cs:739-741) - and the watch's defenders came
 // only to a monster hunting the player (systems/town/townWatch.js isTownThreat); a townsperson stood on beside a monster's
@@ -182,7 +181,7 @@ test('WATCH-PROTECTS the street runs: one on the street a hostile monster comes 
 
 test('WATCH-PROTECTS cornered: one whose straight way from a monster is a wall turns along it, every stride on the street - never through the wall (mutants: the street)', () => {
   const dangers = { list: [] };
-  // LW-SPREAD: PIN MOVED - the town built solid to its lanes (a wall beside every one standing): the open town's people
+  // LW-SPREAD:
   // stand off its walls now, spread over its spots
   const t = makeTown(100 * DAY_MIN + 13 * 60, dangers, closeTown());
   const { p: victim, reach, dir } = standingAbout(t)[0];
@@ -229,7 +228,7 @@ const farWalker = (t) => t.town.update(0, t.at, 0, t.at, true, () => false).map(
   .find((p) => p.moving && Math.hypot(p.pos[0] - t.at[0], p.pos[2] - t.at[2]) > 30 && !t.town._inCircle.has(p.living.res.id));
 
 test('WATCH-PROTECTS the frightened say nothing: a circle with any of it frightened is silent - a pair one of whom took fright and the other did not (its twin town, no monster, talks on) - and a greeting goes with the fright: none said while it lasts (said unseen, it would rest them GREET_REST_MIN past it), one said before it gone from over their head (mutants: the circle, the greeting, the speaker)', () => {
-  // LW-SPREAD: PIN MOVED - the evening (at seven: its people out over the town's spots, a pair standing together in view)
+  // LW-SPREAD:
   const twin = makeTown(100 * DAY_MIN + 19 * 60, { list: [] });
   const dangers = { list: [] };
   const t = makeTown(100 * DAY_MIN + 19 * 60, dangers);

@@ -1,5 +1,4 @@
-// PAD-DOOR (2026-09-27, Discord - an AYN Thor, an Android handheld with a controller built in: "i can login get to
-// the main screen but im unable to select online, load game anything"). THE FRONT DOOR ANSWERS A CONTROLLER.
+// PAD-DOOR. THE FRONT DOOR ANSWERS A CONTROLLER.
 //
 // The game's pad layer (ui/gamepadInput.js) attaches with a scene (world.js, dungeon.js, exterior.js, interior.js),
 // so before one there was no pad at all: the intro, the menu, its sign-in window and the boot settings took a finger
@@ -12,7 +11,7 @@
 //   - B is Escape - the menu's own back (enhancedMenu.js onKey), the popups' own close;
 //   - left and right on a focused list box or slider step its value, as they would on a keyboard.
 //
-// PAD-CURSOR (2026-10-08, the player: "a sort of navigatable cursor? Like destiny? For all the menus"): THE LEFT
+// PAD-CURSOR: THE LEFT
 // STICK IS A CURSOR HERE TOO - the game's own (ui/gamepadInput.js), with the same feel (systems/padCursor.js: the
 // curve, the ramp, the boost, the slow over a control and the pull to its centre). A presses what it stands on; the
 // d-pad still walks the focus and carries the cursor onto the control it lands on, so there is one pointer. A real

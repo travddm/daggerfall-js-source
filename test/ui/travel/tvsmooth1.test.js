@@ -1,6 +1,4 @@
-// TV-SMOOTH / ROAD-BRIDGE / PACE-KEEP (2026-10-12, Mac with a video: "the overworld traveling at high speed looks
-// stuttery on the character and the circle and the line where he walks to can be visually improved", "sometimes your
-// multiplier slows down randomly without an enemy nearby").
+// TV-SMOOTH / ROAD-BRIDGE / PACE-KEEP.
 //   1. the motor's snap guard scales with the step: a x100 step (8-17 m) is a walk, lerped - a teleport still snaps
 //   2. one open leg between two road legs is the road's to the rate - a longer open run is still the open ground's
 //   3. the Overworld's route line leaves from the DRAWN feet, the ring sits on them by the tenth of a pixel

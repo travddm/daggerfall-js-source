@@ -1,5 +1,5 @@
 // @ts-check
-// YARDS-FOUND (2026-10-10, from play: "The new stable and transport merchant shops dont show on town maps/overworld"):
+// YARDS-FOUND:
 // THE YARDS ON THE TOWN MAP. Both town maps draw a town off its blocks' own automap bytes (the classic window -
 // ui/exteriorAutomapWindow.js buildExteriorLayout; the held map's sheet - ui/ink/inkTown.js townBytes) and letter the
 // buildings of its list, and a yard is neither: its ground is open street to the bytes (a navgrid cell is open only
@@ -11,7 +11,7 @@
 // took them (systems/shopStock.js) - so both maps wash it in the shop quarter's colour; and its name stands over its
 // middle by the plate law, always, as the colosseum's does (a block row's `places`, beside its `landmark`).
 //
-// SHIPYARDS-FOUND (2026-10-11, Mac: "Everything should show on the map/overworld and be able to be asked by NPCs"): a
+// SHIPYARDS-FOUND: a
 // port town's shipyard and lighthouse are drawn the same way - the shipyard in the shop's byte (a counter, as the yards
 // are), the lighthouse in a house's (PORT_MAP_TYPE), each lettered by its own name (`site.name`, systems/portPlaces.js
 // portPlaceName). The docks lie out on the water past the town's blocks, which is all a town map draws (the Overworld

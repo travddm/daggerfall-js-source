@@ -1,6 +1,5 @@
 // @ts-check
-// WB8b (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified, continue to refine and add detail to
-// his encounters, and give him unique and different modifers on every 2 hour spawn"): THE WARDEN'S MARKS - what each
+// WB8b: THE WARDEN'S MARKS - what each
 // gate's Warden comes marked with. Every gate (one a game day, every two real hours - net/gate/gateLaw.js) he wears ONE
 // ASPECT - which of Oblivion's powers his elemental blows carry - and TWO TRIALS - what else the court asks of his
 // challengers. The day's marks are its place in the cycle of marks (net/gate/gateLaw.js gateModsOf, marksCycle): no two gates
@@ -67,7 +66,7 @@ export const GATE_TRIALS = Object.freeze([
   Object.freeze({ id: 'soulhungry', name: 'Soul-Hungry', text: 'Each challenger who falls heals him 3%', heal: 0.03, feeds: GATE_FEEDS_MAX }),
   Object.freeze({ id: 'favoured', name: 'Dagon\'s Favoured', text: 'Hellfire and meteors from the first phase, the Spokes from the second' }),
   Object.freeze({ id: 'echoing', name: 'Echoing', text: 'Every meteor falls twice' }),
-  // WB11a (2026-10-01, Mac: "1. All three ... 4. Trial rotation"): THE NINTH - his host fights beside him (net/gate/gateBrain.js
+  // WB11a: THE NINTH - his host fights beside him (net/gate/gateBrain.js
   // HOST_KINDS: the Harriers of the first phase, the Sappers of the second, the Ward-Bearers of each new court). The
   // rotation is built for nine (net/gate/gateLaw.js marksCycle - a bye beside an odd count of trials)
   Object.freeze({ id: 'legion', name: 'Legion-Lord', text: 'His Imps, Atronachs and Ward-Bearers fight beside him', legion: true }),
@@ -112,13 +111,9 @@ export function gateModsWords(md) {
 
 // ═══ WB14b: THE PORTENTS ═══════════════════════════════════════════════════════════════════════════════════════════
 //
-// (2026-10-19, Mac: "adding the chance of a gate to spawn with platforms of wave based adds that need to be defeated
-// before encountering the boss ... the boss splitting and players having to split and navigate to beat both sides and
-// then merging at the end for its final stand (chance based encounter modifer)", then "This is all yours to take on"):
 // THE THIRD KIND OF MARK - beside his aspect and his trials, what else a night's breach holds. Drawn by the day
 // (net/gate/gateLaw.js gatePortentsOf - a shuffle bag over the nights that are not the Legion-Lord's), kept on the fight
 // (net/gate/gateBrain.js newFight's `pt`) and said in its every state. Names and numbers here; the law is the brain's.
-// bible/11-Multiplayer/Breach-Portents.md.
 
 /**
  * @typedef {{id: string, name: string, line: string, tip: string, bit: number}} GatePortent

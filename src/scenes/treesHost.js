@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOST-SPLIT (BANTHA1, bible/03-World/Bantha-Jungle.md): THE NEAR 3D TREES' HOST - out of bootWorld (scenes/world.js),
-// a module the world host wires (bible/01-Overview/Host-Split.md: scenes/fishHost.js is the shape). It owns the two
-// doors that stand a 3D tree where a flat stands - Low Poly Trees' (LPT1, bible/07-Rendering/Low-Poly-Trees.md) and
+// HOST-SPLIT (BANTHA1): THE NEAR 3D TREES' HOST - out of bootWorld (scenes/world.js),
+// a module the world host wires (: scenes/fishHost.js is the shape). It owns the two
+// doors that stand a 3D tree where a flat stands - Low Poly Trees' (LPT1) and
 // the jungle's (BANTHA1, scenes/jungleHost.js's) - and each frame's near sets of both:
 //   - THE DOORS, built once for the session (the world holds them, as it holds the mills' parts);
 //   - THE NEAR SETS: a pixel's tree set is made as it comes into the eye's 3x3 and let go past its 5x5 (AUDIT LPT B10),

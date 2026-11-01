@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEAT1 (2026-09-30, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges") - THE SEATS' LAW, ONE HOME FOR EVERY END: the numbers of
-// bible/11-Multiplayer/Seats-Arc.md Appendix B, the seat's shape as a
+// SEAT1 - THE SEATS' LAW, ONE HOME FOR EVERY END: the numbers of
+// Appendix B, the seat's shape as a
 // client derives and reports it, the witnessed registry's rule (3.2),
 // the Charter's and the arrival's words (3.3), the map's marks (3.3),
 // and the seat week's clock (5.1). The record decided every number;
@@ -680,7 +679,7 @@ export function chronicleLine(row, seat, zero = null) {
     default: return null;
   }
 }
-// ─── AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done") ───
+// ─── AUDIT-SEATS ───
 const ONES = Object.freeze(['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
   'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']);
 const TENS = Object.freeze(['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']);
@@ -698,7 +697,7 @@ export function countWords(n) {
 /** A siege's length, whole minutes (at least one), from its start to the end its receipt was signed at - or null. */
 export const siegeMinutes = (startS, endS) => (Number.isFinite(startS) && Number.isFinite(endS) && endS >= startS ? Math.max(1, Math.round((endS - startS) / 60)) : null);
 
-// ─── SEASON1 part three (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE HALL OF RECORDS (9.2) ───
+// ─── SEASON1 part three: THE HALL OF RECORDS (9.2) ───
 /** The weeks of a Season in words, as the Hall of Records reads them - "the third week". */
 const WEEK_ORDINALS = Object.freeze(['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth']);
 /** WHEN A CHRONICLE ROW HAPPENED (9.2: "In the third week of the Season of Hearthfire, ..."): the week of its Season while
@@ -1088,8 +1087,7 @@ export function bountySitePixel(site) {
 }
 
 /**
- * BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 20 - B8 = E3; the owner: "Every single
- * thing here needs to be addressed. No exceptions."): THE BOUNTY PAST THE BAY. World of Daggerfall's camps are the Bay's
+ * BAY-LEFT-SEA: THE BOUNTY PAST THE BAY. World of Daggerfall's camps are the Bay's
  * alone, so a province's seat could proclaim a Bounty that never paid. Past the Bay it pays for its bailiwick's foes' DENS
  * - an outlaws' hideout (LW12: its band struck down) and a lair (TESA8: a foe struck down in it) - by a camp's kind of
  * claim: the den's id names its map pixel (`"px,py:hideout"`, `"px,py:lair"`), paid once a UTC day whoever cleared it,
@@ -1121,7 +1119,7 @@ export const levyOf = (qty, roll) => {
 // The Turning names a Right of Siege (or a Tourney at a Contested seat) for the coming week; SEAT2a places each in the
 // week and signs its two sides. The battle itself is the relay's (net/siege/siegeRef.js, SEAT2a's next half).
 
-/** THE HOLDER'S WINDOW (6.3, Mac: "Yes"): a day Wednesday to Saturday (0-3) and a start hour 16:00 to 02:00 UTC, two
+/** THE HOLDER'S WINDOW (6.3): a day Wednesday to Saturday (0-3) and a start hour 16:00 to 02:00 UTC, two
  *  hours long - a start from 00:00 to 02:00 belongs to the night after its day ("Wednesday 01:00" is Thursday 01:00). */
 export const SIEGE_WINDOW_DAYS = Object.freeze(['Wednesday', 'Thursday', 'Friday', 'Saturday']);
 export const SIEGE_WINDOW_HOURS = Object.freeze([16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2]);

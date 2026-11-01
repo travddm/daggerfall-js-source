@@ -1,5 +1,4 @@
-// SOC4 (2026-09-16, Mac: "Party system: Upon joining a party, the players name who are in a party together should
-// turn green. Theyre character portrait + health/stamins/magicia stats displayed on a new party UI element"):
+// SOC4:
 // THE PARTY HUD AND THE GREEN NAMES, driven headless.
 //
 // TWO SURFACES, ONE PICTURE. The panel (src/ui/partyPanel.js) is DOM and is driven over a fake document of this
@@ -111,7 +110,7 @@ test('SOC4: the panel - one card per OTHER member in SEAT ORDER and never my own
   assert.equal(one(cards[1], 'dfparty-lead').attrs['aria-label'], 'Party leader', 'and says so in words, not in a glyph alone');
   assert.equal(root.style.display, '', 'a party with somebody else in it: drawn');
   // the green is the picture's, in one home
-  // FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our enhanced version"): 13px, not 14. The card is set
+  // FONT1: 13px, not 14. The card is set
   // in the skin's pixel face now, which measures about 1.29x the width of the launcher face it wore before
   // (tools/font1Probe.mjs), and at 14px only 18 of a 24-character name fitted the 138px name box. At 13 it is 20,
   // which is what the size is doing here - the GREEN is the half of this line the pin is about, and it is unchanged.
@@ -440,8 +439,7 @@ test('AUDIT SOC C21: the HUD\'s bar rows carry a ROLE with their label - a bare 
   assert.equal(panel.root.attrs['aria-label'], 'Party');
 });
 
-// ── FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our
-// enhanced version") ────────────────────────────────────────────────
+// ── FONT1 ────────────────────────────────────────────────
 
 test('FONT1: the party HUD is set in the enhanced face beside the HUD it stands next to, and the name keeps its room', () => {
   // This HUD draws over the world a few pixels from the enhanced HUD's

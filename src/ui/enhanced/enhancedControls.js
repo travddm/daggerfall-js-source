@@ -1,4 +1,4 @@
-// FIX-F (Mac: "changing keybinds in classic/enhanced do not work") —
+// FIX-F —
 // THE ENHANCED SKIN'S REBINDING PANE.
 //
 // The bug was not that rebinding was broken. It was that the DEFAULT
@@ -95,7 +95,7 @@ const el = (t, cls, txt) => {
   return n;
 };
 
-/** KB1 (2026-09-23, Mac: "ensuring keybinds are organized and working as intended"): THE PANE DRAWS THE STANDARD'S
+/** KB1: THE PANE DRAWS THE STANDARD'S
  *  GROUPS - systems/inputActions.js ACTION_GROUPS, every action once, in the group a player looks for it under, with
  *  a player's words for it. It used to draw the CLASSIC window's two faces (DFU's thirty-eight-button grid slice and
  *  the ADVANCED popup's six) and then the port's rows in four headings after them, so Jump sat beside Transport in
@@ -120,7 +120,7 @@ export const MULTIPLE_ASSIGNMENTS = 'You have multiple assignments...';
 export const SHARED_KEY_PREFIX = 'Also:';
 /** ConfirmDefaultsBox (:296-317). */
 export const DEFAULTS_PROMPT = 'Are you sure you want to set default controls?';
-/** UXB1-B (2026-09-25, the UX backlog: 'Change "Continue" in keybinds to "Submit" or "Confirm"'): the commit
+/** UXB1-B: the commit
  *  button's word. DFU's is ContinueButton (:69-79) because its window closes on it and the game goes on; this pane
  *  stays open and the press SAVES, so the word says what it does. The classic grid keeps the word baked in
  *  CNFG00I0's art. */
@@ -229,7 +229,7 @@ function bindCaptured(code, e) {
 function onCaptureKey(e) { bindCaptured(e.code, e); }
 
 /**
- * MAC-K1 (Mac: "Mouse keybindings not working properly"), and the
+ * MAC-K1, and the
  * half of WaitForKeyPress this pane never had.
  *
  * DFU's capture is `Input.GetKeyDown` walked over EVERY KeyCode, and
@@ -307,8 +307,7 @@ export function discardControlsStaging() {
 
 // ── THE ACTS ─────────────────────────────────────────────────────
 
-/** UXB1-C (2026-09-25, the UX backlog: "Disable the confirm button on clearing keys. It's not hard to rebind or
- *  simply revert your settings. Having to scroll back to your key is bad"): THE ✕ CLEARS - IT DOES NOT ASK.
+/** UXB1-C: THE ✕ CLEARS - IT DOES NOT ASK.
  *
  *  DFU's window asks (PromptRemoveKeybindMessage :290-320), because DFU's clear lands in a window that commits on
  *  close. Here a clear is STAGED like every other edit: nothing reaches the registry until Confirm, and leaving the
@@ -493,7 +492,7 @@ function promptCard(asTooltip = false) {
   return c;
 }
 
-/** UXB1-F (2026-09-25, the UX backlog: "Show keybinds for game features, even if they cannot be changed there"): THE
+/** UXB1-F: THE
  *  KEYS THIS PAGE CANNOT MOVE, after the ones it can - the HUD's three and the Transport window's letters
  *  (systems/controlsConfig.js fixedKeyRows), in the STAGED sets - primary, then secondary, the order a press
  *  resolves in - so a Transport key rebound on this page is the one its rows name. Words and keys only: nothing
@@ -588,9 +587,7 @@ export function paneControls(body, { render = () => {} } = {}) {
   for (const grp of shownGroups()) group(body, grp.title, grp.rows.map((r) => [r.action, r.label]));
   body.append(peerMenuBindCard(render));   // PEERMENU1: the player menu's press/hold bind (online only)
   body.append(fixedKeysCard());   // UXB1-F
-  // TORCH-BIND (2026-09-22, a player: "Keybind changes do not stick?" -
-  // the one Continue sat 53 rows above the row they had just bound, and
-  // leaving dropped the change): the head card is sticky now, and the
+  // TORCH-BIND: the head card is sticky now, and the
   // list closes on a second Confirm, the same applyAndSave.
   const foot = el('div', 'card ctl-foot');
   const cont2 = el('button', 'act primary ctl-continue ctl-continue-foot', CONFIRM_LABEL);

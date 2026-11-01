@@ -29,7 +29,7 @@ import { RACES, raceById } from '../../../src/systems/races.js';
 import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { withDom } from '../../invdrag.mjs';
 
-// ═══ TEMP-UI (2026-10-12): THE TEMPERATURE, SHOWN ═══════════════════════
+// ═══ TEMP-UI: THE TEMPERATURE, SHOWN ═══════════════════════
 //
 // The owner: "We also need to add a tempurature widget to the UI including allowing players to see their personal
 // tempurature in their inventory." These pins hold: the breakdown ADDS UP to the felt temperature (the natural
@@ -212,7 +212,7 @@ test('TEMP-UI: the HUD plate, executed - UI-CALM: in the bottom-left corner\'s c
   globalThis.document = { createElement: (t) => mk(t), createElementNS: () => mk(), getElementById: () => null, head: mk(), body: mk(), querySelector: () => null, querySelectorAll: () => [] };
   const { drawEnhancedHud, destroyEnhancedHud, TEMP_HUD_PREF } = await import('../../../src/ui/enhanced/enhancedHud.js');
   try {
-    const entity = { health: 40, maxHealth: 80, magicka: 0, maxMagicka: 10, fatigue: 100, items: [], equip: createEquipTable(), lightSource: null, activeEffects: [], survival: newSurvival(0) };   // PIN MOVED (AUDIT C&C R7): the equip table the game mints
+    const entity = { health: 40, maxHealth: 80, magicka: 0, maxMagicka: 10, fatigue: 100, items: [], equip: createEquipTable(), lightSource: null, activeEffects: [], survival: newSurvival(0) };
     setPref(SURVIVAL_PREF, 'casual');
     drawEnhancedHud(entity, 0, 0, {});
     const root = document.body.children.find((n) => n.className === 'hud');
@@ -239,7 +239,7 @@ test('TEMP-UI: the HUD plate, executed - UI-CALM: in the bottom-left corner\'s c
     drawEnhancedHud(entity, 0, 0, {});
     assert.equal(find(plate, 'hud-tempglyph').src, statusGlyphSrc('hot'), 'hot: the sun');
     entity.survival.felt = 4;
-    setPref(SURVIVAL_PREF, 'boons'); entity.survival.felt = -60;   // PIN MOVED (AUDIT C&C R7): the tier turned, the record not rewritten - the plate reads the live tier
+    setPref(SURVIVAL_PREF, 'boons'); entity.survival.felt = -60;
     drawEnhancedHud(entity, 0, 0, {});
     assert.equal(plate.dataset.level, 'warn', 'Boons: nothing costs, nothing red');
     setPref(TEMP_HUD_PREF, false);
@@ -277,7 +277,7 @@ test('TEMP-UI: the pack - the plaque says the live felt temperature, its word in
     assert.equal(p.className, 'worntemp-total');
     assert.deepEqual(p.children.map((c) => c.textContent), ['Felt', signedDegrees(r.felt)]);
     assert.deepEqual({ ...p.dataset }, { side: 'cold', level: 'danger' });
-    assert.equal(p.title, `Felt temperature ${signedDegrees(r.felt)}: deadly cold - it costs you (comfortable from -10° to +10°)\n${breakdownLines(r.rows).join('\n')}`);   // PIN MOVED (AUDIT C&C S14): and that it costs, in words
+    assert.equal(p.title, `Felt temperature ${signedDegrees(r.felt)}: deadly cold - it costs you (comfortable from -10° to +10°)\n${breakdownLines(r.rows).join('\n')}`);
     const rows = temperatureStatRows(e);
     assert.deepEqual(rows.at(-1).slice(0, 2), ['= Felt (deadly cold)', signedDegrees(r.felt)]);
     assert.equal(rows.length, r.rows.length + 1);
@@ -464,7 +464,6 @@ test('TEMP-UI: the HUD plate reads LIVE where the needs have run (AUDIT TEMP-UI 
     destroyEnhancedHud();
     globalThis.document = prev; globalThis.innerWidth = prevW;
   }
-  // PIN MOVED (AUDIT UICALM-FIRM1 L5 M10): the compass's plate, its compact and hung kinds, are gone from every sheet
   for (const f of ['src/ui/enhanced/enhancedStyle.js', 'src/ui/grimoireDress.js', 'src/ui/uiCalmStyle.js']) assert.doesNotMatch(read(f), /hud-temp\.compact|temp-hung|temp-aside|\.hud-temp \{[^}]*calc\(100% \+/, f);
 });
 

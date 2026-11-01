@@ -1,10 +1,10 @@
-// AUDIT-SEATS (2026-10-01, Mac: "Finish the seats"): THE SEATS ARC'S CLIENT, AUDITED - a battle and a Royal Tourney
+// AUDIT-SEATS: THE SEATS ARC'S CLIENT, AUDITED - a battle and a Royal Tourney
 // left (C1), one battle's mint at a time (C2), an unsettled field asked on a backing-off wait and said once (C3), the
 // first seat town of a session arrived at (C4), the receipts offered on their own clock (C5) by the relay's (C6), every
 // settling answer on the card (C7), the Seat tab's words, reloads and relinquish (C8, C9, C13), the Watch kept through a
 // session run out (C10), the Hall of Records read once at a time (C11), the frame's allocations (C12); the battles
 // announced in the server's voice (G1) and fought with shafts, spells and wards (G5).
-// bible/11-Multiplayer/Seats-Arc.md 6.1, 6.3, 6.6, 7.6, 7.9, 9.2, 19; `06-Systems/Online-Arc.md` SEAT2a part four,
+// 6.1, 6.3, 6.6, 7.6, 7.9, 9.2, 19; `06-Systems/Online-Arc.md` SEAT2a part four,
 // CROWN1 part two, SEASON1.
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
@@ -317,7 +317,7 @@ test('AUDIT-SEATS C7 EVERY SETTLING ANSWER REACHES THE CARD: claimed before, a v
   assert.deepEqual([t.hud.at(-1).card.claim, t.hud.at(-1).card.honour], [false, SIEGE_CLAIM_REFUSED['honours-twice']], 'never stuck on "claim it"');
   t.ses.claimed({ ok: true, honours: { marks: 50, xp: 2000 } }, mine);
   t.ses.tick();
-  assert.match(t.hud.at(-1).card.honour, /50 silver/);   // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - silver, as every sentence says it
+  assert.match(t.hud.at(-1).card.honour, /50 silver/);
   assert.match(hostText('src/scenes/world.js'), /onClaimed: \(a, r\) => siegeSession\?\.claimed\(a, r\)/);
 });
 
@@ -571,7 +571,7 @@ test('AUDIT-SEATS G5 A SHAFT, A SPELL AND THE WARDS: an arrow\'s blow is a shaft
   assert.deepEqual([siegeBlowKind('arrow'), siegeBlowKind('melee'), siegeBlowKind(undefined)], [SIEGE_HIT.Shaft, SIEGE_HIT.Melee, SIEGE_HIT.Melee]);
   assert.deepEqual([siegeCastClamp(500), siegeCastClamp(500, true), siegeCastClamp(12.4), siegeCastClamp(-3), siegeCastClamp('x', true)], [SIEGE_CASTS.damageMax, SIEGE_CASTS.healMax, 12, 0, 0]);
   const me = { level: 10, raceId: 1, stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, skills: new Array(40).fill(50), health: 100, maxHealth: 100, career: {}, activeEffects: [], items: [], equipTable: {} };
-  const stub = () => duelStandIn();   // PIN MOVED (AUDIT C&C H5): the stand-in the hosts hand - a stub of my own sheet, until then
+  const stub = () => duelStandIn();
   const fire = { name: 'Fire', element: 0, rangeType: 2, effects: [eff(4, 0, 25)] };
   const heal = { name: 'Heal', element: 4, rangeType: 1, effects: [eff(10, 8, 30)] };
   const lowRoll = () => 0.01;   // a roll that saves against a spell landed at range
@@ -681,9 +681,9 @@ test('AUDIT-SEATS G4 A SPECTATOR\'S FREE CAMERA: while the host says I watch a b
 
 test('AUDIT-SEATS G5 THE WORLD\'S BATTLE ARMS by source: the swing and the shaft one door with their kinds; the arrows and the cast engine see a battle\'s foes outside a duel; a heal on a side-mate goes to the referee; the wards and the saddle in a siege\'s room; the side-mates (mutants: each wire)', async () => {
   const w = hostText('src/scenes/world.js');
-  assert.match(w, /const duelStrikeOut = \(by, weapon, swing, drawMs = 0, to = null, \{ off = false \} = \{\}\) => \{[^\n]*\n\s*if \(!duelMgr\.fighting\) return siegeStrikeOut\(to, by, weapon, swing, drawMs, \{ off \}\);/);   // PIN MOVED (TWO-HANDS AUDIT): the off hand's blow rides along
+  assert.match(w, /const duelStrikeOut = \(by, weapon, swing, drawMs = 0, to = null, \{ off = false \} = \{\}\) => \{[^\n]*\n\s*if \(!duelMgr\.fighting\) return siegeStrikeOut\(to, by, weapon, swing, drawMs, \{ off \}\);/);
   assert.match(w, /const duelSpellOut = \(peerId, sp\) => \{\n\s*if \(!duelMgr\.fighting\) return siegeSpellOut\(peerId, sp\);/);
-  assert.match(w, /siegeStrikeOut\(best, 'melee', weaponRig\.playerWeapon\.strikingWeapon, weaponRig\.playerWeapon\.machine\?\.state, 0, \{ off: weaponRig\.playerWeapon\.offStrike \}\);/);   // PIN MOVED (TWO-HANDS AUDIT)
+  assert.match(w, /siegeStrikeOut\(best, 'melee', weaponRig\.playerWeapon\.strikingWeapon, weaponRig\.playerWeapon\.machine\?\.state, 0, \{ off: weaponRig\.playerWeapon\.offStrike \}\);/);
   assert.match(w, /battle\.blow\(to, \{ w: weapon \? weapon\.templateIndex : -1, m: held\?\.material \?\? 0, d: r\.dmg, r: siegeBlowKind\(by\) \}\);/);
   assert.match(w, /duelStrikeOut\('arrow', m\.weapon \?\? null, 'StrikeDown', weaponRig\.playerWeapon\?\.lastDrawMs \?\? 0, t\.id\)/);
   assert.match(w, /const duelArrowTargets = \(\) => \{\n\s*if \(!duelMgr\.fighting\) \{\n\s*const bodies = battleFoeBodies\(royalSession\?\.active\(\) \? royalSession : siegeSession\);/);
@@ -693,7 +693,7 @@ test('AUDIT-SEATS G5 THE WORLD\'S BATTLE ARMS by source: the swing and the shaft
   assert.match(w, /return heal > 0 && siegeSession\.cast\(id, siegeCastClamp\(heal, true\), true\);/);
   assert.match(w, /spellRefusal: \(sp\) => battleSpellRefusal\(sp\),/);
   assert.match(w, /const battleSpellRefusal = \(sp\) => \(inSiegeRoom\(\) && siegeSpellBarred\(sp\) \? SIEGE_SPELL_BARRED_TEXT : null\);/);
-  assert.match(w, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/);   // SD7b (PIN MOVED): and the Shattered Hour's - its Steps walked, not flown; PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
+  assert.match(w, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/);   // SD7b (
   assert.match(w, /if \(inSiegeRoom\(\) && isRiding\(player\.transportMode\)\) \{ setTransportModeHere\(TRANSPORT_MODES\.Foot\); townTalk\.say\(SIEGE_DISMOUNT_TEXT\); \}/);
   // the side-mates the heal reaches: standing, of my side, never me
   const t = siegeRig();

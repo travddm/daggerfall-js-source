@@ -1,5 +1,4 @@
-// DECOR2b (2026-09-25, Mac: decor "sold at shops not available in the world loot pool"; asked, the furniture shop sells
-// "DF's own, delivered", and a delivered piece takes its look from Daggerfall's own pieces of its kind - "You pick it"):
+// DECOR2b:
 // THE FURNISHER. The law's furniture on a model (net/decorLaw.js), the furnisher's pieces and how each stands
 // (systems/decor/decorFurnish.js), the Furniture Store's stock (systems/shopStock.js), the shop screens' carry gate and their
 // steal (ui/native/nativeTrade.js driven, ui/enhanced/enhancedTrade.js by source), the save's deliveries (systems/save/save.js), the panel's

@@ -1,4 +1,4 @@
-// DISC28-B (2026-09-28, Discord: "the game locks up if guards hit you the moment you fast travel").
+// DISC28-B.
 //
 // Online the world runs under every window (WORLD5), so a guard's blow can raise the surrender box as the travel map
 // commits the journey - and the arrival clears the crime (PostFastTravel, world.js) with the box still standing. The

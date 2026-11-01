@@ -1,5 +1,5 @@
-// POI-6 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - APPROVALS, HISTORY, AND POIS OUT AND BACK IN.
-// Mac: "I need to be able to approve changes"; "the ability to import models, texture, UV map ... a tool my developers
+// POI-6 - APPROVALS, HISTORY, AND POIS OUT AND BACK IN.
+// "the ability to import models, texture, UV map ... a tool my developers
 // can use without having to access the codebase".
 //   - what a submission changes (src/poi/poiDiff.js), in words (src/poi/poiText.js diffText);
 //   - a model back out as glTF (src/poi/gltfExport.js), read again by the editor's own importer to the same model;
@@ -110,7 +110,6 @@ test('POI-6 BACK OUT AS glTF: a part written as a node with its offset, turn and
   assert.equal(json.extensions.KHR_lights_punctual.lights[0].range, 6);
   assert.deepEqual(json.nodes[1].rotation, mirrorQuatX(r));
   const model = readGltf(glb);
-  // PIN MOVED (AUDIT POI G7): the importer reads a point light back now (gltfImport.js poiLightOf) - it was set aside,
   // said as `camera-light`
   assert.deepEqual(model.warnings, [], 'the light read back, nothing set aside');
   assert.equal(model.lights.length, 1);
@@ -140,7 +139,6 @@ test('POI-6 BACK OUT AS glTF: a part written as a node with its offset, turn and
   assert.deepEqual(m0.color, [1, 0, 0, 1]);
   assert.deepEqual([...model.images[m0.base.image].bytes], [...PNG], 'its picture embedded');
   assert.deepEqual([m1.alpha, m1.cutoff, m1.twoSided], ['cutout', 0.3, true]);
-  // PIN MOVED (AUDIT POI R10): the glow is written linear with its strength apart - the game's [4, 2, 0] is the POI
   // material poiMaterialOf turns it back to, not readGltf's factor
   assert.deepEqual(poiMaterialOf(m1).emissiveColor, [4, 2, 0], 'the glow past one, by its strength');
   // a WebP picture: the extension required (there is no fallback)
@@ -179,7 +177,6 @@ test('POI-6 A PACK: written with every asset it names, read back whole through t
   const lying = rest.map((e) => (e.name.endsWith('.png') ? { name: e.name, data: Uint8Array.from([...PNG.slice(0, -1), 0]) } : e));
   assert.equal((await readPack([entries.find((e) => e.name === 'pack.json'), ...lying])).code, 'pack-asset-hash');
   const junk = new TextEncoder().encode('not a mesh at all, but long enough to be read as one header..');
-  // PIN MOVED (AUDIT POI P11): a file no document names is no longer read at all, so the damaged mesh is one a POI wears
   assert.equal((await readPack([head({ v: 1, kind: 'poi-pack', pois: [docOf('poi-00000000beef', { parts: [part('tower', await sha256(junk))] })], shelf: [] }), { name: `assets/${await sha256(junk)}.mesh`, data: junk }])).code, 'pack-asset-bad');
   const short = await readPack([entries.find((e) => e.name === 'pack.json'), ...rest.filter((e) => !e.name.endsWith('.png'))]);
   assert.deepEqual([short.code, short.sha], ['pack-missing-asset', picSha]);
@@ -198,7 +195,6 @@ test('POI-6 INTO THE STORE: a pack\'s assets uploaded by name (those the store h
   const io = {
     putAsset: async (bytes, kind) => { calls.push(['put', kind]); return { ok: true, data: { sha: 'x', existed: kind === 'texture' } }; },
     history: async (id) => (id === doc.id ? { ok: true, data: { id, liveRev: 3, revs: [{ rev: 3, doc: live }, { rev: 4, doc }] } } : { ok: false, error: 'not-found' }),
-    // PIN MOVED (AUDIT POI P4): the shelf is asked before an entry is put - the store keeps another entry under its id,
     // so the pack's is put under a copy's id of its own, never over it (it was put over first, and minted afresh only
     // where the store refused that)
     shelfEntry: async (id) => (id === 'lib-00000000cafe' ? { ok: true, data: { id, item: { ...entry, name: 'Tower (theirs)' } } } : { ok: false, error: 'not-found' }),

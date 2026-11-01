@@ -1,4 +1,4 @@
-// TEX1 (2026-09-14) - ONE SHAPE FOR EVERY TEXTURE DOOR, and the crash that
+// TEX1 - ONE SHAPE FOR EVERY TEXTURE DOOR, and the crash that
 // proved the class.
 //
 // Mac's page died on daggerfalljs.dev with

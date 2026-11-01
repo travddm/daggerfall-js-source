@@ -1,4 +1,4 @@
-// GROWTH (bible/10-UI/Growth.md) - THE GROWTH TAB, in a real browser, over its lab (growth.html, src/tools/growthLab.js).
+// GROWTH - THE GROWTH TAB, in a real browser, over its lab (growth.html, src/tools/growthLab.js).
 //
 // PROVEN HERE - each of the tab's four pages draws at a wide screen and a phone with no page error and no sideways
 // scroll; on a wide screen the Ascension, the Firmament and the captain's stars stand IN the pane (their `embed` roots,

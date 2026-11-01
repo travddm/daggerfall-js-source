@@ -1,5 +1,4 @@
-// QUEST-VOID (2026-10-12, a player online: the Dust of Restful Death's mummy nowhere in Ruins of Old Barbara's Place;
-// Mac: "the enemy is not marked on the map. i prob spawned the mob somewhere in the void"). The net under the dungeon's
+// QUEST-VOID. The net under the dungeon's
 // mount (quest/questRepair.js relayBuiltDungeon): a quest target on a marker the dungeon AS BUILT has not is laid again
 // on that build before anything stands - whatever drift put it there.
 import { test } from 'node:test';

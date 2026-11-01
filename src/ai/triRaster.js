@@ -84,8 +84,7 @@ export function trianglesToColliders(positions, indices, { cs = AGENT.cs, maxSlo
   return out;
 }
 
-/** A FLAT RANGE IS A FLOOR, NOT NOTHING (2026-09-27, the degenerate bake
- *  of dungeon m1204685). A level triangle clipped to a cell is a zero-
+/** A FLAT RANGE IS A FLOOR, NOT NOTHING. A level triangle clipped to a cell is a zero-
  *  thickness range, y0 === y1, and buildNav's addSpan quantises a box to
  *  [floor((bottom - ymin) / ch), ceil((top - ymin) / ch)) and DROPS it when
  *  the two ends agree - which a flat range does whenever its height lands

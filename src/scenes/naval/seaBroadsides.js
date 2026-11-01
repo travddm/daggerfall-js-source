@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - broadsides
-// between captains in the open sea, a ship wrecked and boarded, her hold a prize; bible/03-World/Eltheric-Ocean.md
-// SHIP-PVP) - THE OPEN SEA'S GUNS, the page's naval half. Built by the sea's host (scenes/seaVenturesHost.js) and attached
+// SHIP-PVP - THE OPEN SEA'S GUNS, the page's naval half. Built by the sea's host (scenes/seaVenturesHost.js) and attached
 // to the naval host (scenes/naval/navalHost.js `pvp` - its seams: my ship as the referee is told of her, the referee's word
 // laid on her, her wreck). The relay referees every word (net/sea/seaRef.js); this module says them and lays its answers.
 //

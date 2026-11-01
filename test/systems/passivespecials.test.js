@@ -177,7 +177,7 @@ test('V2c: the sun burns the career flag, only in sunlight, 12 per 4th round - a
   passiveSpecialsMagicRound(p, { nowMinutes: noon4, sinks });
   assert.equal(log.hurt, 12, 'inside: the sun cannot reach');
   setPassiveSpecialsHost(null);
-  // the RACE arm (:159-161) - the vampire's compound race flag, no career bit. VAMP-DAY (2026-09-26, Mac): the port's
+  // the RACE arm (:159-161) - the vampire's compound race flag, no career bit. VAMP-DAY: the port's
   // departure - the vampire's day is its -20 on the stats (test/systems/vampday.test.js), and the sun no longer burns it
   const v = P();
   v.racialOverride = { sunDamage: true };

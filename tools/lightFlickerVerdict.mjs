@@ -1,4 +1,4 @@
-// LA-AUDIT F1 (2026-09-27, the audit before LA's merge; lens F measured it): THE FLICKER PROBE'S VERDICT, WHERE A
+// LA-AUDIT F1: THE FLICKER PROBE'S VERDICT, WHERE A
 // TEST CAN RUN IT. tools/lightFlickerProbe.mjs said OK over a black, frozen scene - world.js clearing the frame black
 // and the pose door a no-op, the probe stood at the spawn, never before a tavern, and every pass read 0 - because it
 // judged only the still passes' 12-level share, and black and frozen IS still. Its boot wait fell through after 300 s,

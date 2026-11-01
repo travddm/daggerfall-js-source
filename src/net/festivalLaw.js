@@ -1,6 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, the owner: "With Halloween on the horizon. I think its fair to develop our first live event.
-// Daggerfall lore style"; bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S LAW - the one home both ends
+// WITCH1: THE WITCHES' FESTIVAL'S LAW - the one home both ends
 // read: the client (the finds, the offerings, the Wyrd Sister's window) and the account service
 // (server-account/src/festival.js), which holds every Soul Cake an account has.
 //
@@ -84,7 +83,7 @@ export const HEARTHKEEPER_GIVEN = 25;
 export const SOULCAKE_TAKEN = 10;
 
 // ═══ THE STARWARDEN'S PURSE ══════════════════════════════════════════════════════════════════════════════════════════
-/** The Soul Cakes The Thirteenth of Frostfall's title pays beside it (bible/11-Multiplayer/Starfall.md section 7): laid on
+/** The Soul Cakes The Thirteenth of Frostfall's title pays beside it: laid on
  *  the account's count by the batch that lays Starwarden (server-account/src/questlines.js QL_PURSES), once an account,
  *  only while the festival is open for it, never to a guest. A quarter of a day's finds (FIND_CAKES_PER_DAY) - the line's
  *  four stars and its coven fight are the festival's longest deed. */

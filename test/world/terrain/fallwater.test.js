@@ -1,4 +1,4 @@
-// FD1 - THE OUTDOOR-WATER FALL EXEMPTION (2026-08-28).
+// FD1 - THE OUTDOOR-WATER FALL EXEMPTION.
 //
 // AcrobatMotor.CheckFallingDamage (:208-224), first statement after
 // clearing `falling`:

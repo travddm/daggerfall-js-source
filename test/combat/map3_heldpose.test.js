@@ -1,6 +1,4 @@
-// MAP3 - THE MORROWIND HELD POSE, pinned (2026-09-18; Mac: "Morrowind
-// will need its own handcrafted map with hand placement just like the
-// sprite. Our first custom rig change").
+// MAP3 - THE MORROWIND HELD POSE, pinned.
 //
 // Three modules and a seam. combat/heldPose.js is the pose (deltas over
 // the idle through the torch's track-map/sampler idiom) and the paper
@@ -510,8 +508,7 @@ test('MAP-WEAPON / EM-BUG1: EVERY host asks its own live slot, and the tag it as
   // taking the slot, or by a teardown, and a flag would have to be
   // lowered at every one of them.
   //
-  // EM-BUG1 (Mac: "your equipped weapon isnt stowed when the map is
-  // out"): AND THE TAG IS `holdsScreen`, NOT `isTravelMap`. This pin
+  // EM-BUG1: AND THE TAG IS `holdsScreen`, NOT `isTravelMap`. This pin
   // asserted the travel tag until the bug was reported, which is how
   // the regression got past it - EM4 narrowed `isTravelMap` to "the
   // bay is reachable from here", correctly, for the TRAVEL question,

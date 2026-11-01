@@ -50,8 +50,7 @@ import { paceRateOn, ROAD_PACE_MAX, OPEN_PACE_MAX } from './travel/travelPace.js
  *  a physics step of a second and a half. */
 export const MAX_TIME_SCALE = 100;
 
-/** RATE-LAW (2026-10-04, Mac: "Remove travel options dials" / "Roads now
- *  travel at x100 and non roads at x60"): A JOURNEY'S RATE IS ITS GROUND'S.
+/** RATE-LAW: A JOURNEY'S RATE IS ITS GROUND'S.
  *  The panel's spinner, the mod's starting acceleration, its limit dial,
  *  the half limit while a path is followed and the near-enemies stepper
  *  are gone; a fast traveller on a road or a track runs at the road's
@@ -62,8 +61,7 @@ export const MAX_TIME_SCALE = 100;
  *  (travelPaths.js MAX_CIRCUMNAVIGATION_ACCEL). */
 export const TRAVEL_ROAD_RATE = ROAD_PACE_MAX;   // PACE-DIALS: the dial's top (MAX_TIME_SCALE, pinned equal - test/systems/travel/pacedials.test.js)
 export const TRAVEL_OPEN_RATE = OPEN_PACE_MAX;
-/** The rate a fast traveller's ground asks for: a road or a track, or not. PACE-DIALS (2026-10-06, the player: "Revert
- *  back to the overworld timer multiplier for ppl to set to 60x and 100x on roads"): the two rates above are now the
+/** The rate a fast traveller's ground asks for: a road or a track, or not. PACE-DIALS: the two rates above are now the
  *  CEILINGS of the player's speed dial (systems/travel/travelPace.js: x100 a road's alone, x60 anywhere else). */
 export const travelRateOf = (onRoad) => paceRateOn(onRoad);
 

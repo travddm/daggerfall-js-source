@@ -1,5 +1,5 @@
-// POI-2 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE APPROVED POIS, STANDING IN THE GAME.
-// Mac: "POI Tool (General Map Editor) ... even placement onto our actual map"; "I need to be able to approve changes".
+// POI-2 - THE APPROVED POIS, STANDING IN THE GAME.
+// "I need to be able to approve changes".
 //   - the renderer's own new reach (render/meshAlpha.js): a translucent mesh draw, and a texture's wrap per axis and
 //     filter - run on a recording GL, the shader's law on the GLSL evaluator;
 //   - the runtime's arithmetic (poi/poiRuntime.js): looks, the pictures baked, the models, the matrices;
@@ -305,7 +305,6 @@ async function hostOver(entries, { ground = 50, feetAt = null, collideDrafts = u
     groundAt: () => ground, collider: () => collider, riding: (px, py) => `ride:${px},${py}`, feet: () => feet, now: () => t, log: null,
     ...(collideDrafts ? { collideDrafts } : {}),
   });
-  // PIN MOVED (AUDIT POI R8): the stand work is a time slice a frame and each wait (an asset, a look) ends in a frame of
   // its own - a POI stands a few frames after it is asked for, not at the next; settle runs frames until it has
   const settle = async () => { for (let f = 0; f < 12; f++) { host.frame(); for (let i = 0; i < 4; i++) await new Promise((res) => setImmediate(res)); } };
   return { host, renderer, collider, feed, meshSha, assets, settle, setBuilt: (b) => { built = b; }, setFeet: (f) => { feet = f; }, setNow: (v) => { t = v; } };

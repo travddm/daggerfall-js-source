@@ -1,4 +1,4 @@
-// DEEP-SHARE (2026-09-26, Mac: "Yes" - one player standing the sea's creatures for everyone near). Online, every
+// DEEP-SHARE. Online, every
 // client stood its own Iliac Puddle No More deep, and a reader stood at most CELL_PUPPETS_MAX (twelve) of another
 // player's foes, the deep's among them - so two players at sea together saw two different seas. Now the players within the mod's populate
 // radius of each other stand ONE deep (the lowest id, the camps' election), the deep's foes ride named in the frame's
@@ -114,7 +114,7 @@ test('DEEP-SHARE executed: an owner\'s twenty deep foes ride named and a reader 
   assert.equal(reader2.deepPuppetsNear([100, 0, 100], DEEP_SHARE_RADIUS), 0);
 });
 
-// ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): the sea's findings.
+// ---- AUDIT (the pre-merge audit, 2026-09-27): the sea's findings.
 test('AUDIT pre-merge P2: the election holds - one standing the deep keeps it until a lower id comes within the radius; one not standing it takes it only past DEEP_SHARE_HYSTERESIS radii (pose noise at the edge flipped it every tick)', () => {
   const me = [0, 0, 0];
   const at = (d) => [{ id: 'aaa-0001', feet: [d, 0, 0] }];

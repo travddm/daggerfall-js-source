@@ -1,6 +1,5 @@
 // @ts-check
-// HORSE CART AND CARGO - THE WIRE (HCC-ONLINE, 2026-09-23, Mac: "...and also enhance its online integration
-// functionality"). The mod is single-player: its wagon and its horse are objects in one Unity scene. Online, a
+// HORSE CART AND CARGO - THE WIRE (HCC-ONLINE, 2026-09-23). The mod is single-player: its wagon and its horse are objects in one Unity scene. Online, a
 // player's parked wagon, waiting horse, following horse and trailing team stand in a shared cell, so everyone
 // near should see them and the plaque should name whose they are. This is the record that says them - `hv` on
 // the cell's foes frame, beside the camps' `c` (scenes/camps.js), under the same owner law (an owner's word
@@ -23,7 +22,7 @@
 // ONLINE D5). The orientation the horse billboard shows is the READER's camera's, computed there
 // (horseCartLaw calculateHorseOrientation) - a sprite faces whoever looks at it.
 //
-// WAGONS1 (2026-10-09): AND WHICH WAGON. Mac's three wagons (systems/wagon/wagonKinds.js) are drawn by their owner's kind, so
+// WAGONS1: AND WHICH WAGON. Mac's three wagons (systems/wagon/wagonKinds.js) are drawn by their owner's kind, so
 // the word says it - `wk`, the kind's code (1 the Open Wagon, 2 the Caravan; absent, the Small Cart: every word before
 // WAGONS1 said a cart, and still reads as one) - and `wh` 1 when a horse is in a parked wagon's shafts (the cart is
 // borne level then, and rests tipped on its shafts without one - world/wagonModels.js). Both ride beside `w` at the
@@ -38,16 +37,16 @@ import { wagonLookCode, wagonLookOfCode, WAGON_LOOK_CODE_MAX } from '../wagon/wa
 import { caravanEntryCode, caravanEntryOfCode, caravanGuildTag, CARAVAN_GUILD_CODE } from '../caravanVisit.js';
 import { horseLookCode, horseLookOfCode, HORSE_LOOK_CODE_MAX } from './horseCoats.js';
 
-// COATS1 (2026-10-11): AND THE HORSES' LOOK. An owner's horses wear their look (systems/horse/horseCoats.js - coat, pattern,
+// COATS1: AND THE HORSES' LOOK. An owner's horses wear their look (systems/horse/horseCoats.js - coat, pattern,
 // legs and the horse's own seed), so the word says it - `hc`, the look's code, at the record's top beside `n` (absent:
 // the bay as drawn - every word before COATS1), for the horse standing and the team in the wagon's shafts alike; an
 // older reader drops it and draws a bay.
 
-// WAGONS2 (2026-10-09): AND ITS PAINT. A wagon's paint (systems/wagon/wagonLooks.js - its outside, and a caravan's inside)
+// WAGONS2: AND ITS PAINT. A wagon's paint (systems/wagon/wagonLooks.js - its outside, and a caravan's inside)
 // is one number, `wl`, beside `wk` at the record's top (absent: the wagon as built - every word before WAGONS2), folded
 // into `w` as `look`; an older reader drops it and draws the wagon as built.
 
-// WAGONS2-VISIT (2026-10-09): AND WHO MAY ENTER IT. A caravan's door is its owner's to open (systems/caravanVisit.js):
+// WAGONS2-VISIT: AND WHO MAY ENTER IT. A caravan's door is its owner's to open (systems/caravanVisit.js):
 // `we`, the entry's code (1 the owner's party, 2 anyone, 3 the owner's guild; absent, the owner alone - every word before
 // it), and with the guild's `wg`, the owner's guild tag - beside `wk` at the record's top, folded into `w` as `entry` and
 // `guild`; an older reader drops both, and to it every caravan is its owner's alone.

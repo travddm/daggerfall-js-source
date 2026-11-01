@@ -102,7 +102,6 @@ test('PT1: the tally does not wait for the roll', () => {
   assert.equal(clean.tally, true, 'the member tallies on its FIRST line, before it rolls anything');
 });
 
-// PIN MOVED (STOLEN-GOODS AUDIT S1, 2026-10-16): DFU's shelf is a COUNT comparison, and the port's was - so a piece of
 // the player's own put down hid one of the shop's taken, which the theft's mark (systems/stolenGoods.js) marked all the
 // same. The shelf reads the shop's keeping now (the Set the host takes as the window opens), as the private-property arm
 // reads the owner's: a departure, named in theft.js shopShelfTheft.

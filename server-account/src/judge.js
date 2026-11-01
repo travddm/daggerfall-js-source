@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT2 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and do it
-// properly"): THE JUDGE. Every checkpoint a realm character's tab writes is READ here - not only its first.
+// INT2: THE JUDGE. Every checkpoint a realm character's tab writes is READ here - not only its first.
 //
 // ═══ WHAT REALM-ARC SECTION 4 PROMISED, AND THE SAVE NEVER GOT ═════
 //
@@ -14,12 +13,12 @@
 //
 // ═══ THE VERDICT FREEZES TRADE, NEVER PROGRESS ═════════════════════
 //
-// Mac's call (2026-10-09, asked what a breach does): "Freeze trading". A checkpoint that breaks the law is STORED - the
+// . A checkpoint that breaks the law is STORED - the
 // player loses nothing they played, because a finding can be the law's mistake and "THE CLOUD IS A BACKUP" exists
 // because players lost games - and the character is HELD: every route that moves its value to another player refuses
 // it (realm.js holdRefusal) until a later checkpoint is clean or staff clear it. A character the law has found three
 // times is held for a time, whatever its next checkpoint says (STRIKES_FOR_TIMED, verdict.js LAW_HOLD_S): a client that
-// keeps writing impossible things is not an accident - and since AUTO-HOLD (2026-10-16) the hold lifts on its own when
+// keeps writing impossible things is not an accident - and since AUTO-HOLD the hold lifts on its own when
 // its time is out, never on a person's review.
 //
 // ═══ WHAT IS JUDGED ════════════════════════════════════════════════
@@ -27,7 +26,7 @@
 //   - THE CHARACTER: its level a whole number in the realm's range and the one its summary claims (the summary's level
 //     is the token's `cl`, which the ladder's health reads - arenaLaw.js ladderVitality); its eight attributes within
 //     MAX_STAT_VALUE (statMods.js, both leveling lanes' cap); its skills within SKILL_HARD_CAP (skillSoftcap.js); and
-//     SCHOOLS5 (bible/06-Systems/Arcane-Specialisations.md section 7) its specialisation, when it carries one - a path the
+//     SCHOOLS5 its specialisation, when it carries one - a path the
 //     table holds and both its schools mastered (arcanePaths.js pathFindings - no signature spell is judged).
 //   - EVERY ITEM IT HOLDS (possessedItemLists) - the pack, the wagon, the bag, the furnisher's and the repairer's lists,
 //     what it set out or stored in its own rooms, a rented room's and a deed's chests, a boat's hold, a companion's pack -
@@ -56,7 +55,7 @@ import { readProductRecord } from '../../src/net/productRecord.js';
 /** The judge's version: the item law's, and its own character law beside it. */
 export const JUDGE_VERSION = ITEM_LAW_VERSION;
 /** The highest level the realm reads (realm.js REALM_LEVEL_CLAIM_MAX, the summary's own bound - pinned equal). LEVEL-45
- *  (2026-10-27, mob: "juidge will need changed to lvl 45"): the online cap (src/systems/levelCap.js ONLINE_LEVEL_CAP,
+ *  the online cap (src/systems/levelCap.js ONLINE_LEVEL_CAP,
  *  pinned equal), which every realm character is converted to at its join before its next checkpoint. */
 export const JUDGE_LEVEL_MAX = 45;
 /** The holds the law has come to before a held character is held for a time (verdict.js LAW_HOLD_S), whatever its next

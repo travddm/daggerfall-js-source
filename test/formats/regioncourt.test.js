@@ -1,4 +1,4 @@
-// CQ1 - THE REGION'S NOBLE COURT (2026-08-29).
+// CQ1 - THE REGION'S NOBLE COURT.
 //
 // PlayerGPS.GetCourtOfCurrentRegion (PlayerGPS.cs:469-483) finds the
 // one Courts faction whose guild group is Region and whose region is

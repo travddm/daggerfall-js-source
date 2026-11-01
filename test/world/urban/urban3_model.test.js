@@ -1,4 +1,4 @@
-// URBANIZER U3 (2026-10-26; bible/03-World/Urban-Fabric.md section 5): a town's fabric made - its main streets' setts
+// URBANIZER U3: a town's fabric made - its main streets' setts
 // between their kerbs, its pavements of flags over them, a city's cobbles, its yards' fences (Daggerfall's own, stretched
 // along each run) or low walls with their gate pillars, its dead ends' walls and its woodpiles - one model, a submesh a
 // picture, its own faces at vanilla's texel density.

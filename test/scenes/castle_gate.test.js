@@ -1,5 +1,5 @@
-// CASTLE-GATE (2026-10-02, Mac: "lets finish the build work"): A CROWN'S FIELD AND BANNERS AT ITS CASTLE'S ENTRANCE IN
-// THE CITY (bible/11-Multiplayer/Seats-Arc.md 3.4 anchor 4, 6.2, 7.6). The city's host finds the castle's door - the
+// CASTLE-GATE: A CROWN'S FIELD AND BANNERS AT ITS CASTLE'S ENTRANCE IN
+// THE CITY (3.4 anchor 4, 6.2, 7.6). The city's host finds the castle's door - the
 // lowest of the pixel's dungeon-entrance doors (systems/siegeField.js castleEntranceOf; DFU lands a player leaving the
 // castle at its lowest, player/enterExit.js dungeonEntranceLanding) - and hands it, at a crown alone, to the battlefield
 // (siegeFieldOf's `castle`: the Throne, the Gatehouse, the defenders' camp, the Palace square and the Royal Tourney's ring)

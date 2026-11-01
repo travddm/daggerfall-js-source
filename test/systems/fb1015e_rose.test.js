@@ -4,7 +4,7 @@
 // when a shield is in the left (WeaponManager.cs:656), an empty right hand is the bare fist, and every landed fist strikes
 // again for half. ROSE-SEEN: the second blow lands through the struck foe's door, which runs no formula, so HN1's numbers
 // - a readout of the formula - showed the first blow alone and the Rose looked like nothing. It raises its own number now,
-// the power's name its tag. bible/01-Overview/bugs/Field-Bugs-2026-10-15e.md.
+// the power's name its tag..
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,5 +1,5 @@
 // @ts-check
-// TESA11 (bible/03-World/Arena-Provinces.md TESA11) - THE IMPERIAL CITY'S LANDMARKS: the port's own models of the city's
+// TESA11 (TESA11) - THE IMPERIAL CITY'S LANDMARKS: the port's own models of the city's
 // canon (world/imperialCity.js IMPERIAL says where each stands) - the White-Gold Tower in the Palace District among the
 // emperors' tombs inside the palace wall; the city wall round the six districts, a tower every `towerEvery` degrees, its
 // gates and (TESA-LORE) its six watch towers where the district walls meet it; the walls between the districts, their
@@ -35,8 +35,7 @@ function merlonRing(mb, tex, x, z, r, y, n, w = 2.4, h = 2.4) {
   for (let i = 0; i < n; i++) { const a = ((i + 0.5) / n) * Math.PI * 2; mb.box(tex, [x + Math.cos(a) * r, y + h / 2, z + Math.sin(a) * r], [w, h, w], 0.4); }
 }
 /**
- * THE WHITE-GOLD TOWER. IC-GRAND, the owner (2026-10-26, a reference picture of another game's tower beside it - shapes
- * of the port's own, nothing traced): *"the imperial city tower model needs to be much larger and taller like this with
+ * THE WHITE-GOLD TOWER. IC-GRAND, the owner: *"the imperial city tower model needs to be much larger and taller like this with
  * the surrounding gate have large pillars like the image shows"* - it overrides the team's spec (a 70 m shaft, 760 m):
  * ROUND (`sides` faces), TS5's 1360 m to its spire's tip. It rises out of the palace's ROTUNDA - a wide, low drum
  * (`plinthR` round, `plinthH` high) under a low dome (`domeH`), an arcade of `arches` round its wall and a ring of
@@ -285,7 +284,7 @@ export function buildImperialPalace(I = IMPERIAL) {
       }
     }
   }
-  // IC-GRAND, the owner: "the surrounding gate have large pillars like the image shows" - a great round PILLAR-TOWER at
+  // IC-GRAND, - a great round PILLAR-TOWER at
   // each corner and either side of each gate (palacePillars): its drum standing well over the wings, a corbelled band,
   // a crenellated top
   for (const [x, z] of palacePillars(I)) {

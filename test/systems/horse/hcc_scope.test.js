@@ -1,4 +1,4 @@
-// HCC (2026-09-23): WHAT IS AND IS NOT PORTED - the whole of TrailingWagon.dll, method by method.
+// HCC: WHAT IS AND IS NOT PORTED - the whole of TrailingWagon.dll, method by method.
 //
 // The mod's assembly is `TrailingWagon.dll` (vendored under vendor/horse-cart-and-cargo/ with its IL dumped by
 // tools/ilDump.py to il/TrailingWagon.il.txt, the same way Eye Of The Beholder's was - test/player/eyeOfTheBeholder/eotb_scope.test.js is

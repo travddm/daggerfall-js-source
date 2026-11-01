@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCALE1 (2026-09-30, the scaling audit - Mac: "set the stage for a
-// larger player base in the future"): WHAT THE SERVICE DOES, COUNTED.
+// SCALE1: WHAT THE SERVICE DOES, COUNTED.
 //
 // Until this the service logged one thing - an uncaught error - and
 // nobody could see a request rate, a latency, a 429, a 503 or the D1
@@ -30,8 +29,7 @@
 //   blob6   a heartbeat's parts, "beat,board,mail,post" - the ones its
 //           body asked (SCALE4h); "" for any other route
 //
-// SCALE4f (2026-10-10, Mac: "really future proof our archetecture"; bible
-// 11-Multiplayer/Scale-Arc.md SCALE4f): HOW BUSY THE ONE PRIMARY IS. The
+// SCALE4f: HOW BUSY THE ONE PRIMARY IS. The
 // statements a request ran said how much it asked of D1, never how long
 // D1 made it wait - and a primary going under shows first as that wait,
 // a queue nothing else exposes, before the 'overloaded' refusals begin.
@@ -41,7 +39,7 @@
 // `served_by_primary` false): SCALE4d put the mint's reads on a session a
 // replica may serve, and this is where it shows whether one does.
 //
-// SCALE4h (2026-10-11, "10k writes, by the metrics"; Scale-Arc.md SCALE4h):
+// SCALE4h:
 // WHICH ROWS. A `first()` answers a row with no meta, so its rows went
 // uncounted - and the play beat's write (accounts.js creditPlay) is one, so
 // the heartbeat's rows written never showed it. A `first()` is now run as
@@ -51,8 +49,7 @@
 // which hot row a route writes, not only how many; and a heartbeat says
 // which parts it carried, so the beat, the board and the box are apart.
 //
-// AUDIT SCALE II A-3 (2026-10-11; Mac: "Lets do an audit on everything.
-// Ensure perfection"): THE PARTS ARE THE SERVICE'S WORD, NEVER A SECOND
+// AUDIT SCALE II A-3: THE PARTS ARE THE SERVICE'S WORD, NEVER A SECOND
 // READ. SCALE4h read them off a copy of the request (`clone().json()`),
 // whole and unbounded, before the service had looked at a header - every
 // heartbeat, a stranger's included. That undid AUDIT 68 X8 (index.js

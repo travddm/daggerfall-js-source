@@ -1,4 +1,4 @@
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" B1; bible/06-Systems/Legacy-Arc.md BAY-LEFT-B):
+// BAY-LEFT-B:
 // PROJECT LEGACY'S HEIR PAST THE BAY. A birth whose family seat is past the Bay booted `?region=Skyrim&loc=Solitude`, the
 // named start read MAPS.BSA alone, and the page never booted ("location not found"). The start is booted the way a save
 // made past the Bay loads (scenes/bootStartHost.js): the world stands on the Bay, and once the land has its trace and the

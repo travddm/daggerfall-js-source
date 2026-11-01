@@ -1,7 +1,5 @@
-// JUNGLE-ROADSIDE (2026-10-23, the owner, through Mac, with pine.obj, pine-1.obj and pine2.obj: "These trees are meant
-// for the jungle biome and roadside. Making it more like a jungle with the vines stringing across the roads", "sunk into
-// the ground so they dont float") - bible/03-World/Bantha-Jungle.md, The roadside pairs; its audit
-// bible/01-Overview/audits/Audit-Jungle-Roadside.md. The owner's three pairs read off the files the game reads and cut in
+// JUNGLE-ROADSIDE , The roadside pairs; its audit
+// . The owner's three pairs read off the files the game reads and cut in
 // two halves, their measures held to them; the jungle's door carrying each half as a near-only prototype; the near set
 // turning each across its road; the law that stands them astride the roads - sunk to the lowest drawn ground under their
 // feet, their feet off every band, the road kept under their lianas - on ground made for it; the layout handing them

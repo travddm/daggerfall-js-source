@@ -1,4 +1,4 @@
-// TELL6c - THE LEAP (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into it", then
+// TELL6c - THE LEAP (;, then
 // "Go" on every call). A disc 1.8 m about the target's feet, up to 9 m off, locked at its start: the leaper of the
 // whole set (the Spider, the Werewolf, the Sabertooth, the Vampire) crouches through its wind-up, then jumps - its last
 // 0.35 s an arc to the point on the motor's own gravity - and the verdict is the point's at its landing. Begun 3-9 m

@@ -1,5 +1,4 @@
-// INT11-INT15 (2026-10-10, the INTEGRITY arc's lane 3 - bible/06-Systems/Integrity-Arc.md section 6; Mac: "I want to do
-// everything and do it properly", and of the healing the relay cannot see: "Measure, then enforce"): THE BODY COUNTED, AS
+// INT11-INT15: THE BODY COUNTED, AS
 // LAW. A boss's blow was judged on the struck player's machine alone, so a client that took none stood every fight out
 // and could carry one. Pinned here: the relay's count of a body or a hull (net/bossBody.js - the line, a blow, the
 // client's word as a mend out of a budget, the census, the measure a receipt carries, the margin, the client's pace) and
@@ -224,7 +223,7 @@ test('INT11 THE GATE JUDGED: his plain blow at its landing on each living body d
   ];
   assert.deepEqual(posAt(moving[0], t1), [0, 0]); assert.deepEqual(posAfter(moving[0], t1), [20, 0]);
   assert.deepEqual(posAt(bd('q', 5, 6), t1), [5, 6], 'no trail: where it stands');
-  assert.equal(posAt(bd('q', 5, 6, { tr: [[t1 + 1, 1, 1]] }), t1), null, 'all after: not known');   // PIN MOVED (AUDIT INT11): it read its first pose after - a body that stepped in after the landing, counted (test/net/int_lane3_audit.test.js)
+  assert.equal(posAt(bd('q', 5, 6, { tr: [[t1 + 1, 1, 1]] }), t1), null, 'all after: not known');
   assert.deepEqual(judgeGate(f, moving, t1 + BODY_AFTER_MS).map((h) => h.sub), ['s3'], 'only the one in it before and after');
   // an element's blow is the client's
   f.atk = { i: 3, a: ATTACKS.nova.id, at: at0 + 9000, x: 0, z: 0, yw: 0, tg: [], until: at0 + 12000 };

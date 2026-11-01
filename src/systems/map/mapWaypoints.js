@@ -72,7 +72,7 @@ export function cleanWaypointName(name, fallback = 'Waypoint') {
   return s || fallback;
 }
 
-/** A point of the world, checked: map pixels whose pixel the wire carries (BAY-LEFT-MAPS, bible/10-UI/Held-Map-Arc.md - net/wire.js
+/** A point of the world, checked: map pixels whose pixel the wire carries (BAY-LEFT-MAPS, - net/wire.js
  *  worldPixelOk, TV-BEYOND's WORLD_PIXEL_BOUND either side of the Bay's corner: the Bay's 1000 x 500 and every province
  *  past it). It held the Bay's 1000 x 500, so no flag - mine, my party's, my guild's, WILD-WAYPOINT's remains in the open
  *  zone, which is Cyrodiil's since WW-C2 - could stand past the Bay. A client from before reads a party's or a guild's
@@ -332,7 +332,7 @@ export function receiveWaypointLine(line) {
   return true;
 }
 
-// ── GROUP-LEAVE (2026-10-06, the player: "i hope the waypoints are removed when leaving party") ──
+// ── GROUP-LEAVE ──
 /** The group a new waypoint of this kind belongs to - the party's id, the guild's tag - or null. */
 const groupOf = (kind) => (kind === 'party' || kind === 'guild' ? (groups[kind] ?? null) : null);
 

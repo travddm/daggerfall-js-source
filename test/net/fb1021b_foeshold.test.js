@@ -1,4 +1,4 @@
-// FOES-HOLD (2026-10-21; bible/11-Multiplayer/Scale-Arc.md FOES-HOLD): A ROOM'S FIRST FRAMES WAIT THEIR TURN. Where a
+// FOES-HOLD: A ROOM'S FIRST FRAMES WAIT THEIR TURN. Where a
 // room's full frames alone are more than its foes budget (a Starfall's crowd), FOES-FIRST left them first-come and blind
 // to size - a refused frame dropped, the next to arrive taking what the bucket had refilled - so one large owner among
 // smaller ones heard none of its full frames (tools/foesFirstBench.mjs `stander`: 0%) and the owners the draw passed over
@@ -530,7 +530,7 @@ test('FOES-HOLD the metrics point: the frames held, the held sent, the held gone
   Object.assign(m.c, { frames: 1, hitDrops: 1, fullDrops: 2, fulls: 3, held: 4, heldSent: 5, heldGone: 6, heldMs: 7.4, beats: 8 });
   const got = [];
   m.flush({ writeDataPoint: (p) => got.push(p) }, 'world', 7, 'w', 1, true);
-  assert.deepEqual(got[0].blobs, ['world', 'w', '1', '2', '3', '4', '5', '6', '7', '8', '', '0', '0']);   // PIN MOVED (COST-2 part two: blob12 and blob13, the cell directory's moves - test/server/cellmoves.test.js); PIN MOVED (COST-2): and blob11, the node's level - '' for a room told none
+  assert.deepEqual(got[0].blobs, ['world', 'w', '1', '2', '3', '4', '5', '6', '7', '8', '', '0', '0']);
   assert.deepEqual([m.c.held, m.c.heldSent, m.c.heldGone, m.c.heldMs, m.c.beats], [0, 0, 0, 0, 0]);
   await onClock(async (clk) => {
     const { R, socks } = await cellOf(4, clk);

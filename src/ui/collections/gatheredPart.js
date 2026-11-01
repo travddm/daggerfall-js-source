@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/10-UI/Collections.md section 10): THE GATHERED PARTS - the trophies a character has
+// HUNTERS-MARK: THE GATHERED PARTS - the trophies a character has
 // taken and the fish its net has brought up (systems/hunt/gatheredLog.js, its save's). Each lists the whole set, held
 // or not, and says how the rest is had. A horse's coats are no part: the stable keeps the horses a character has now, never
 // the coats it has owned, so such a list would forget a coat sold.

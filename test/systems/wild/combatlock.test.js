@@ -1,5 +1,4 @@
-// AUDIT PVP-EASE L2-1 (2026-10-26, the owner: "Can we audit this"; asked how storage should work inside the open zone, the
-// owner chose "Combat lock" - bible/01-Overview/audits/Audit-PvP-Ease.md, bible/11-Multiplayer/Wild-Zone.md STORE-KEEPS):
+// AUDIT PVP-EASE L2-1:
 // STORE-KEEPS made the cart, a companion's pack, a ship's hold, a chest and a sworn one's kit storage no death in the zone
 // takes - and a fighter at 1 HP moved its whole bag and purse into them, so a player's kill cost it one worn piece at most.
 // For WILD_STORE_LOCK_MS after a player's blow - given or taken, a sword's or a ship's gun's - nothing may be stored; taking

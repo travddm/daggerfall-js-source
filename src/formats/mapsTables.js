@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - MAPSFILE'S PURE TABLES: the
+// PROF1 - MAPSFILE'S PURE TABLES: the
 // region names, the regions' races and the climates, moved out of
 // mapsFile.js (which re-exports them) so the account service can read
 // them without bundling a BSA reader. The professions' laws need two of
 // them on both ends: a pixel's climate chooses its herbs, and its
 // region's race chooses an herb's group - DFU's "(northern)" and
-// "(southern)" plants (bible/06-Systems/Professions-Arc.md 22).
+// "(southern)" plants (22).
 // Verbatim FALL.EXE / MapsFile.cs tables; nothing here reads a file.
 // ═══════════════════════════════════════════════════════════════════
 
@@ -17,7 +17,7 @@ export const MAX_MAP_PIXEL_Y = 500;
 /** The Iliac Bay's own regions: MAPS.BSA's, FALL.EXE's tables' (MapsFile.cs - 0..61). */
 export const BAY_REGION_COUNT = 62;
 
-/** WW-R (2026-10-24, bible/03-World/World-Wide.md WW-R; the owner: "Separate regions make sense"): THE PROVINCES PAST THE
+/** WW-R: THE PROVINCES PAST THE
  *  BAY, each a region of its own after the Bay's 62 - theatre t's (world/worldWide/worldGrid.js, the picker's numbering:
  *  1 High Rock beyond the Bay ... 9 the Imperial Province) region 61 + t. The Bay's regions are what they were
  *  (Daggerfall is High Rock's, Sentinel Hammerfell's); a province's region holds no MAPS.BSA location (its places are the

@@ -18,9 +18,7 @@
 // requestPointerLock needs; a refusal is covered by the hosts'
 // relock-on-gesture arms).
 //
-// ESC-LOCK (2026-09-27, Mac: "when you hit esc to leave a menu, your
-// cursor remains on the screen instead of returning to the game"; a
-// tester: "U have to hit escape 2 times to get pause menu up now").
+// ESC-LOCK.
 // TWO BROWSER RULES this file used to assume away. (1) While the
 // pointer is locked, the Escape press is the BROWSER's: it ends the
 // lock and the page never sees the key (Chrome consumes the keydown;
@@ -129,7 +127,7 @@ export function holdCursor() {
  *  the one module that reads it. */
 export const FREE_MOUSE_ACTION = 'FreeMouse';
 
-/** KB1 (Mac: "Enter = chat" online; "Y frees the cursor"): WHO OWNS ActivateCursor's KEY. Offline it is DFU's - Enter
+/** KB1 (online; "Y frees the cursor"): WHO OWNS ActivateCursor's KEY. Offline it is DFU's - Enter
  *  frees the mouse (PlayerMouseLook.cs:190). Online the chat panel opens on that same action (ui/chatPanel.js
  *  CHAT_OPEN_ACTION), and both listeners sit on the window's capture phase, so ONE Enter opened the chat AND flipped
  *  cursorActive - and the flag, left up, then refused the relock when the chat closed. A mounted chat CLAIMS the key;
@@ -158,9 +156,7 @@ export function cursorKeyClaimed(e = null) {
  *  ui/input.js's actionsOf) - or a single action, which reads the same. */
 export function bindCursorToggle(canvas, isWindowUp = () => false, actionsOf = null) {
   if (typeof addEventListener !== 'function' || !actionsOf) return () => {};
-  // PL3 (2026-09-12, Mac: "The mouse pointer can still get stuck outside
-  // of the game, not allowing you to interact with the game unless
-  // refreshing"). The flag is a module global that NOTHING reset: a
+  // PL3. The flag is a module global that NOTHING reset: a
   // host that booted after it had latched true (a new game from the
   // menu, a scene the last one left it in) had every relock arm refused
   // at requestLook's precedence line from its first frame. A host boot
@@ -203,8 +199,7 @@ export function bindCursorToggle(canvas, isWindowUp = () => false, actionsOf = n
     if (cursorToggleRefused()) return;
     toggleCursorActive(canvas);
   };
-  // PL2 (2026-09-12, Mac: "Pointer can detach from the game and you're
-  // unable to click back in"). The hosts' keydown ladders are bubble
+  // PL2. The hosts' keydown ladders are bubble
   // listeners registered BEFORE this one, and a window that closes on
   // Enter - a message box's Enter button, a conversation's, the rest
   // and level-up prompts - closes INSIDE that ladder. By the time the
@@ -355,12 +350,12 @@ export function requestLook(canvas) {
     document.addEventListener('pointerlockchange', () => { if ((_cursorActive || _cursorHolds.size) && document.pointerLockElement) releaseLook(); }, false);
     _errBound = true;
   }
-  // CLICK-STUTTER (2026-10-13): every world click lands here (the hosts' canvas pointerdown), and asking for a lock the
+  // CLICK-STUTTER: every world click lands here (the hosts' canvas pointerdown), and asking for a lock the
   // canvas already holds is not free - the browser answers each one with a pointerlockchange (every listener on it runs)
   // and, with unadjustedMovement, may re-take the lock, dropping that frame's mouse deltas. Held already: nothing to ask.
   if (typeof document !== 'undefined' && document.pointerLockElement === canvas) return;
   try {
-    // MAC1 (Mac, 2026-09-10: "camera turning being very jumpy"). The
+    // MAC1. The
     // bare request hands the look the OS pointer's ACCELERATED deltas
     // (Windows' "enhance pointer precision", the Mac's curve), so a slow
     // turn and a flick over the same mouse travel land different

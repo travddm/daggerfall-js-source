@@ -1,6 +1,5 @@
 // @ts-check
-// THE FLEET PAGE (HOLDINGS, 2026-10-03 - bible/03-World/Holdings.md; Mac: "Ships show their values, current health, and
-// option to repair if theres crew (even if youre away) etc"). On the pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
+// THE FLEET PAGE (HOLDINGS, 2026-10-03). On the pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
 // pauseHoldings): every ship the player holds, a card each -
 //  - her name (her captain's, else her hull's), her hull and rig, her worth, the bank's claim on her while it stands;
 //  - where she is: at the player's helm, lying near, afloat how far and which way, laid up at a port, in the pack;
@@ -9,7 +8,7 @@
 //    up), REPAIR (her hands, wherever she lies - with stores aboard), SHIPWRIGHT (the yard's window, at a port), REFIT
 //    (her four lines, timber, iron and pitch and gold - none while her loan stands), RENAME (the name every other
 //    player reads over her) and COLOURS (SHIP-COLOURS: the flag she flies - its shape, its field and division, its
-//    border, its device and that device's colour, or her captain's guild's arms - bible/03-World/Naval-Refit.md).
+//    border, its device and that device's colour, or her captain's guild's arms).
 // Each act's word is said under her card. The model and the acts are the host's (scenes/fleetHost.js), through the
 // Holdings provider (ui/holdingsPages.js setHoldingsProvider); dressed by the kit's roles as the Stable's cards are.
 

@@ -1,5 +1,4 @@
-// STATION-ROWS (2026-09-27, Discord - the crash box: "TypeError: m.rows.map is not a function", thrown from the
-// interior frame). A home's Spellmaking station opens the spell maker through the guild dispatcher, and the spell
+// STATION-ROWS. A home's Spellmaking station opens the spell maker through the guild dispatcher, and the spell
 // maker's arm hands its WINDOW back - a window that keeps the host's TEXT.RSC reader as `rows`. Every reader of the
 // dispatcher's answer took "has rows" for "is a box": the station mapped the reader as a list and threw on every press,
 // and the guild popup pushed the whole window onto itself as a message. One test now, systems/guild/guildServiceFlow.js

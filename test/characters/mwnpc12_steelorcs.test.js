@@ -1,4 +1,4 @@
-// MWNPC12 (2026-10-10, the MW-NPC arc's twelfth slice - bible/04-Characters/Morrowind-NPCs.md section 17): THE STEEL
+// MWNPC12: THE STEEL
 // THAT NEVER SHOWED, AND THE ORCS. Every look that dressed a body in steel without an equip table to read - the street's
 // guard (MWNPC7), a knightly order's standing person (MWNPC8a), the rosters' steel classes (MWNPC10b) - wrote its
 // material as 1, which names no armour material (systems/armorMaterials.js ARMOR_MATERIAL: steel is 0x0201), so
@@ -36,7 +36,6 @@ test('MWNPC12-1 every steel look is worn: the street\'s guard, a roster\'s steel
   const guard = folkLook({ archive: GUARD_TEXTURE, gender: GENDERS.Male, personFaceRecordId: 0, nameNPC: 'Gaius' }, 'Breton');
   const knight = personLook({}, { race: RACES.Nord, gender: GENDERS.Male, nameSeed: 77, hash: 5, factionID: 0, billboardArchiveIndex: 182, billboardRecordIndex: 1 },
     { type: FACTION_TYPES.Generic, sgroup: SOCIAL_GROUPS.Commoners, ggroup: GUILD_GROUPS.KnightlyOrder });
-  // PIN MOVED (MWNPC17, section 25): a knightly order's person wears a KNIGHT's plate - one metal, by his rank
   // (characters/wardrobe.js ARMOR_KITS.knight), steel among them; the guard, the roster's steel class and the watch steel
   const kp = armour(knight);
   assert.ok(kp.length >= 5 && new Set(kp.map((it) => it.material)).size === 1, 'the knight: whole plate, one metal');

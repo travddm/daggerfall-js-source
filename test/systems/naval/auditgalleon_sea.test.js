@@ -1,4 +1,4 @@
-// AUDIT GALLEON (2026-10-02, Mac: "Audit this. It must be perfect") - THE SEA: the branch's runtime changes to the sea's
+// AUDIT GALLEON - THE SEA: the branch's runtime changes to the sea's
 // captains and the pool her art rides in, each pinned where it had none. Each pin failed on its mutant (the record's
 // tools/mutants/auditgalleon_sea.json); the code as it stood (886da9b19) passes them - these laws were right, unpinned.
 //   T2    an errand held on its detour too takes the next abeam the other way, and an arriving ship shortens sail from

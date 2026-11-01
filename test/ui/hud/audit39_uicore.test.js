@@ -90,8 +90,7 @@ test('AUDIT 39 F126: a rail click pages by the thumb, and a click ON the thumb m
 });
 
 // ---------------------------------------------------------------
-// F127 - the touch attack hook nothing called (2026-08-14 to
-// 2026-09-05). REWRITTEN BY TI1: the drag hook is BACK and LIVE - the
+// F127 - the touch attack hook nothing called. REWRITTEN BY TI1: the drag hook is BACK and LIVE - the
 // swipe calls it (ui/touch/touchGestures.js classifies the drag, touch.js
 // routes a 'swipe' to hooks.attack), and the sword BUTTON is gone with
 // the E button and the rest. The original finding was a hook nothing

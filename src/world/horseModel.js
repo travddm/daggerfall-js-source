@@ -1,10 +1,5 @@
 // @ts-check
-// COATS3D (2026-10-11, the owner, sending the Courser - walk.fbx, idle.fbx, idle-1.fbx, gallop.fbx, trot.fbx - and two
-// pictures: "The first image is for the horse itself and the second is for the tail. These are to be applied to horses
-// for people using morrowind with the character properly rigged when riding. These also need to recieve the same
-// texture treatment we gave the sprites with parity between each"; asked, every horse of the Morrowind lane - the
-// ridden one with its rider astride, other riders, the standing and following horses and the wagon teams - and first
-// person on the 3D horse): THE 3D HORSE, ITS PURE HALF.
+// COATS3D: THE 3D HORSE, ITS PURE HALF.
 //
 // The horse is tools/bakeHorse.mjs's bake of the owner's rig (src/assets/horse/courser.json - its header says what is
 // in it): a skinned body and its mane and tail cards on a 33-bone skeleton, in its own frame (metres, Z up, +Y the way

@@ -277,7 +277,7 @@ test('HILL-SEAT: the pads ride the pixel\'s own static merge - one GPU mesh with
   const remap = new Map([['302_2', '102_2']]);   // a climate's grass
   const sb = new StaticBatchBuilder(), resolve = keyResolver(remap), hill = drawn(52758);
   sb.add(hill, multiply(origin, house(52758).matrix), resolve);   // the hill, merged as any model of the block is
-  sb.add(patch, origin, resolve);   // world.js's own call: addStatic(hillPatch, originMatrix, false) - staticBuilder.add through the pixel's table (PIN MOVED, AUDIT PRECIP HOST-7: the merge's models logged)
+  sb.add(patch, origin, resolve);   // world.js's own call: addStatic(hillPatch, originMatrix, false) - staticBuilder.add through the pixel's table (
   const merged = sb.finish();
   const batch = renderer.createMesh(merged);
   assert.equal(live.size, 1, 'one GPU mesh for the pixel\'s statics, pads and all');

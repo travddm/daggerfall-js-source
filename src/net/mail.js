@@ -274,7 +274,7 @@ export class MailBox {
   }
 
   /** SEND ONE - checked here by the letter's own law first, so a refusal the service would give is given at once.
-   *  NAME-AS (2026-10-12): `account`, a friend's account id - the letter goes to the account itself (the friends list's
+   *  NAME-AS: `account`, a friend's account id - the letter goes to the account itself (the friends list's
    *  name is the one the room reads, which may be their character's), and no username shape is asked of `to`. */
   async send({ to, account = null, subject, body }) {
     const toAccount = typeof account === 'string' && ID_RE.test(account) ? account : null;

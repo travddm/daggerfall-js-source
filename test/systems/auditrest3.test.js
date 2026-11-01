@@ -1,5 +1,4 @@
-// AUDIT REST III (2026-10-03, Mac: "Audit this and ensure its perfection" - bible/06-Systems/Rest-Arc.md "AUDIT REST
-// III"): six fresh lenses over every AUDIT REST II fix, each finding verified before it was fixed. The fixes a file of
+// AUDIT REST III: six fresh lenses over every AUDIT REST II fix, each finding verified before it was fixed. The fixes a file of
 // their own pins (the dungeon fires' E1 rides test/world/auditrest2_fires.test.js's harness, the H8 draw its own test) are
 // RUN here where they can be: the hosts' own statements sliced out of the source and mounted over stubs
 // (test/net/restsync.test.js's harness), the systems called.
@@ -67,7 +66,7 @@ test('AUDIT REST III B2: "Bring online" keeps a rest supply standing as the owne
     decor: [{ id: 'p1', pos: [0, 0, 0] }, { id: 'p2', pos: [1, 0, 0] }, { id: 'p3', pos: [2, 0, 0] }],
     decorOwn: { p1: createRestItem(REST_ITEM.Bedroll), p2: vase, p3: createRestItem(REST_ITEM.Candle) },
   });
-  // REST-LOOT (2026-10-05): the sources are open, so this is the switch's way back - pinned with the switch shut
+  // REST-LOOT: the sources are open, so this is the switch's way back - pinned with the switch shut
   _setRestItemsOnlineForTests(false);
   try {
     const scene = house();
@@ -94,7 +93,7 @@ test('AUDIT REST III B4: the line "Your rest supplies will stay..." is said of t
     sceneCache: { scenes: [{ lootContainers: [shelf] }] },
     world: { piles: [{ items: [createRestItem(REST_ITEM.EmberJar)] }], foes: [{ dead: true, items: [createRestItem(REST_ITEM.EmberJar)] }] },
   };
-  // REST-LOOT (2026-10-05): the sources are open, so this is the switch's way back - pinned with the switch shut
+  // REST-LOOT: the sources are open, so this is the switch's way back - pinned with the switch shut
   _setRestItemsOnlineForTests(false);
   try {
     const r = applyCustoms(snap);
@@ -147,7 +146,7 @@ test('AUDIT REST III A2, A3: a tent\'s Stoke is its owner\'s - a friend\'s cold 
   const { campMenu, CAMP_KIND } = await import('../../src/systems/survival/camp.js');
   const keys = (rows) => rows.map((r) => r.key);
   const coldTent = { kind: CAMP_KIND.Tent, wear: 30, litUntil: 5 };
-  // AUDIT C&C I11 (PIN MOVED): a cold camp offers no Cook (the cooking list only refused at it) - each cold list is
+  // AUDIT C&C I11 (
   // the one it was less its Cook
   assert.deepEqual(keys(campMenu(coldTent, 10, false, { online: true })), [], 'a friend\'s cold tent: nothing, as a friend\'s cold fire');
   assert.deepEqual(keys(campMenu(coldTent, 10, true, { online: true })), ['stoke', 'rest', 'pack'], 'mine: Stoke, then the Rest that stokes it');

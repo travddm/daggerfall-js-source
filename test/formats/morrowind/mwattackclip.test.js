@@ -544,7 +544,7 @@ const TWO_WEAPON_ESM = () => Uint8Array.from([
   ...wpdtRec('iron longsword', 'w/blade.nif', MW_WEAPON_TYPE.LongBladeOneHand),
   ...wpdtRec('iron battle axe', 'w/blade.nif', MW_WEAPON_TYPE.AxeTwoHand),
 ]);
-const WAR_AXE = { templateIndex: 128 };   // PIN MOVED (MW-AXES): Daggerfall's War Axe, the two-hander, draws Morrowind's battle axe
+const WAR_AXE = { templateIndex: 128 };
 
 test('MW-D19: build once empty-handed, swap live - the sword arrives, repeats no-op, leaves', async () => {
   const arm = createFpArm();

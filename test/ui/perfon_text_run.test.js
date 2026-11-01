@@ -10,8 +10,6 @@ import { Renderer } from '../../src/render/renderer.js';
 
 // ═══ PERF-ON: ONE DRAW A STRING ═══════════════════════════════════
 //
-// Mac, 2026-09-15: "improving online performance. I notice the more
-// people that are online, the worse fps becomes."
 //
 // MEASURED, not guessed. Every per-peer cost in net/ is bounded -
 // peerBodies caps at BODIES_MAX 8 and culls past BODY_RANGE, a doll is
@@ -282,7 +280,7 @@ test('PERF-ON: a 2D primitive LEAVES GL as it found it - the bracket balances, f
     fn(r); r._close2D();         // the FIRST call builds the program; the toggles are the same either way
     log.length = 0;
     fn(r);
-    // PERF-2D (2026-09-19): the bracket is a RUN's now - 43% of a
+    // PERF-2D: the bracket is a RUN's now - 43% of a
     // dungeon frame's GL calls were this pair, opened and shut around
     // every single quad. The LAW is untouched and so is this pin: GL
     // still goes back exactly as it was found, just at the end of the

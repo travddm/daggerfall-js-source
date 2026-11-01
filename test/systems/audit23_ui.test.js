@@ -33,7 +33,7 @@ test('AUDIT 23 ui-native-3: the talk ray reaches 76.8; each mode gates with the 
   assert.equal(RAY_DISTANCE, 3072 * 0.025);   // 76.8 in float (3072 * GlobalScale, the DFU expression)
   assert.equal(MOBILE_NPC_ACTIVATION_DISTANCE, 6.4);
   assert.equal(PICKPOCKET_DISTANCE, 3.2);
-  // LW3 (2026-10-04): the streaming host's persons are the town's and the road's (`_talkPersons()`), the same rival
+  // LW3: the streaming host's persons are the town's and the road's (`_talkPersons()`), the same rival
   for (const [f, persons] of [['src/scenes/world.js', '_talkPersons()'], ['src/scenes/exterior.js', '_livePersons']]) {
     assert.ok(src(f).includes(`townTalk.tryActivate(cam.pos, useFwd, ${persons}, _nonPersonRival)`),
       `${f} hands the person arm a rival with the persons left OUT of it`);

@@ -1,11 +1,11 @@
-// GOLD-MARKET (2026-09-30, Mac: "Allow trading with gold or drakes on the marketplace"; "Gold listings, walled") - THE
+// GOLD-MARKET - THE
 // SERVICE: a listing names its currency. A gold listing is a realm character's, of its own units and those gold bought;
 // it is bought off the buyer's realm record in the same batch that decides the sale (the record rolled back with a sale
 // that does not land), its tax and its fee burnt out of the sale, the seller's share held for its character until its
 // own record collects it into a bank account. THE WALL: what gold bought comes into the Stores as `gold` (a piece marked
 // `bought_with`) and goes to the pack or back on the market for gold - no station, craft, writ, fill or Drakes listing
 // takes it - and nothing Drakes bought lists for gold. Driven through the real Worker over node:sqlite with every
-// migration applied, and R2 beside it (test/accountDb.mjs, test/realmSeat.mjs). bible/06-Systems/Professions-Arc.md 10.8.
+// migration applied, and R2 beside it (test/accountDb.mjs, test/realmSeat.mjs). 10.8.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -47,7 +47,6 @@ async function stand() {
     who.at = R.at;
     return who;
   };
-  /** PIN MOVED (INT19, Integrity-Arc section 7): a crafted piece lists out of its seller's realm record - it stands there too. */
   const piece = (who, provenance, recipe = 'longsword:mithril') => {
     raw.prepare(`INSERT INTO products
       (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at) VALUES (?, ?, ?, 'Silverthorn', ?, 120, 5, 2, 4242, 'p1.x', ?)`)
@@ -283,7 +282,7 @@ test('GOLD-MARKET service: a piece bought with gold is marked - it lists again f
   assert.deepEqual((await s.list(tom, { kind: 'piece', material: undefined, units: 1, provenance: GP, wear: 1000, price: 500, currency: 'marks' })).body, { error: 'market-gold-goods' });
   assert.equal((await s.list(tom, { kind: 'piece', material: undefined, units: 1, provenance: GP, wear: 1000, price: 6000 })).status, 200, 'for gold again');
   // bought with Drakes: never for gold
-  const mac = await s.seated('Mac', {});   // PIN MOVED (INT19): a realm character - its piece leaves its record
+  const mac = await s.seated('Mac', {});
   s.fund(mac, 100);
   s.piece(mac, MP);
   const d = await s.list(mac, { kind: 'piece', material: undefined, units: 1, provenance: MP, wear: 1000, price: 50, currency: 'marks' });

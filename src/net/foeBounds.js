@@ -1,6 +1,5 @@
 // @ts-check
-// FOE-BOUNDS (2026-10-19, Mac: a hand-off spec, "LATTY: REJECT AND REMOVE INVALID ENEMY HANDOFFS; DO NOT RESCALE", then
-// "Spec + B + A" and "The game's own code"; bible/11-Multiplayer/Spawn-Grants.md section 19): THE MOST HEALTH A STREAMED
+// FOE-BOUNDS: THE MOST HEALTH A STREAMED
 // FOE CAN LEGALLY HAVE. Every stage that builds a foe's maximum rounds once and never lowers it (`Math.max(1,
 // Math.round(prev * mult))`), so the highest base and every highest multiplier, in the builders' own order and with their
 // rounding, is the exact legal maximum - for the inputs a reader cannot see taken at their worst: the owner's dice, its

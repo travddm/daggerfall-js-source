@@ -1,5 +1,4 @@
-// STATUS-TIPS (2026-10-20, Dudey: "make every other icon of debuffs, buffs, hunger etc hoverable when hovering over
-// it with the mouse so it tells you in a toolbox like in the inventory what it does") - WHAT A TILE OF THE STATUS WIDGET
+// STATUS-TIPS - WHAT A TILE OF THE STATUS WIDGET
 // SAYS UNDER THE POINTER. Pure: a tile (ui/hud/hudStatus.js statusTiles) and the entity in, a tip out -
 // `{ title, meta, lines, foot }`, which ui/hud/hudTip.js draws as the pack's own hover card.
 //
@@ -204,7 +203,7 @@ export function statusTip(tile, entity, extra = {}) {
   return { title, meta, lines, foot: tile.foot ?? null };
 }
 
-// ── EVENT-RULES: a world event's rules, said (2026-10-25) ─────────────────────────────────────────────────────────────
+// ── EVENT-RULES: a world event's rules, said ─────────────────────────────────────────────────────────────
 // The owner: "A lot of people are unhappy with the world event restrictions including the regen not working". The made
 // levels (systems/madeLevel.js - the Burning Court, the Shattered Hour) each hold a handful of
 // the game's ways, and said so only as each was refused - a regeneration not at all. Now one tile stands first on the

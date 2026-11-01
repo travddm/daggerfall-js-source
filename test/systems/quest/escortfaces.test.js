@@ -1,4 +1,4 @@
-// FE1 - THE HUD ESCORTING FACES (2026-08-28). AddFace/DropFace have
+// FE1 - THE HUD ESCORTING FACES. AddFace/DropFace have
 // carried machine hooks since Q4 into a world ctx that mounted
 // nothing, so every escort quest ran faceless. The panel is
 // HUDEscortingNPCFaces.cs verbatim (one module-level panel - DFU has

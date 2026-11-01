@@ -100,7 +100,7 @@ export function showNumber(n, { scatter01 = Math.random } = {}) {
   return node;
 }
 
-// ── TELL9: THE WORDS ON THE HIT (bible/12-Enhanced-AI/Feud-Arc.md 11.2) ──
+// ── TELL9: THE WORDS ON THE HIT (11.2) ──
 /** What a telegraphed blow's fight adds to a number: my blow on a wind-up that broke into a STAGGER, one that HOLDS, one
  *  on an overreached foe it could not stagger (OPEN); a PERFECT dodge, a word alone; a revenant's WEAKNESS (RVN3's). */
 export const HIT_TAGS = Object.freeze({ stagger: 'Stagger', hold: 'Holds', open: 'Open', perfect: 'Perfect', weakness: 'Weakness' });

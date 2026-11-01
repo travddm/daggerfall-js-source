@@ -1,5 +1,4 @@
-// RF4 - ONE FEATURE DECLARATION (2026-09-14, Mac's refactor pass, the
-// fourth). A new switch used to touch four places: the pref default on
+// RF4 - ONE FEATURE DECLARATION. A new switch used to touch four places: the pref default on
 // the uiPrefs shelf, the online lane's forced or player's-own list, the
 // registry row, and the count pins. The row is the one declaration now
 // - `initial` and `online` ride it - and the shelf and the lane DERIVE

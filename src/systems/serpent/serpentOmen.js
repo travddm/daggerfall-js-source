@@ -1,7 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE SIGHTING - what the clock's serpent says to
+// SERPENT1: THE SIGHTING - what the clock's serpent says to
 // one player: the chat's lines, the map's ring, the compass's mark. The gate's omen's twin (systems/gate/gateOmen.js).
-// Design: bible/11-Multiplayer/Sea-Serpent.md section 2.
+// Design:
 //
 // ONE CALL A FRAME from the online frame (scenes/world.js), reads for the maps and the HUD. Everything is a function of
 // the RELAY'S clock (`now` - the welcome's offset); before the host is ready (the relay's clock heard, the hub's

@@ -1,6 +1,4 @@
-// DEATH-PENALTY (2026-09-24, Mac: "add deathpenalty 25% of the gold you have with you" -
-// "online mode only ofc" - "and it should be shown in the death screen"). DEATH-TENTH (2026-10-03, Mac: "Reduce gold
-// loss on death"): a tenth of the purse.
+// DEATH-PENALTY. DEATH-TENTH: a tenth of the purse.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

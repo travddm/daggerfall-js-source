@@ -1,7 +1,4 @@
-// UI3 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "move buffs/debuffs/etc to their own
-// widget space somewhere on the side of the screen, where it doesn't interact with other UI elements, and use square
-// icons with glyphs for each effect (climates and calories included) which then gives more space for the XP bar and
-// being able to fit the XP amounts inside").
+// UI3.
 //
 // THE STATUS WIDGET (ui/hud/hudStatus.js, drawn by ui/enhanced/enhancedHud.js): the effects leave the HUD's foot for a column of
 // square tiles standing on the quickslot block's caption at the left edge - a spell's own ICON00I0 icon, a set power's
@@ -87,7 +84,7 @@ test('UI3 the spells, bundle by bundle (AUDIT UI C3/C5): a party mate\'s gift is
 });
 
 test('UI3 the needs\' glyphs: every need the strip can raise has one - the temperature\'s by the way it runs, the cold words (read off the chips\' own table) a snowflake and the warm ones the sun (mutants: every temperature a sun; a need left without a glyph)', () => {
-  for (const [w, text] of Object.entries(HUD_NEED_WORDS.temp)) {   // PIN MOVED (AUDIT C&C S5): the table is words alone
+  for (const [w, text] of Object.entries(HUD_NEED_WORDS.temp)) {
     assert.equal(needGlyph({ key: 'temp', text }), ['cold', 'freezing', 'deadly cold'].includes(w) ? 'cold' : 'hot', text);
   }
   for (const key of [...Object.keys(HUD_NEED_WORDS).filter((k) => k !== 'temp'), 'stiff', 'drunk']) {
@@ -111,7 +108,7 @@ test('UI3 the afflictions: the Status box\'s own law - one tile for being poison
     [[poison('active'), { ...poison('waiting'), poison: POISONS.Moonseed }, { ...poison('active'), poison: POISONS.Thyrwort }], ['Poisoned']],
     [[poison('complete', { statMods: { strength: -4 } })], ['Poisoned']],
     [[poison('active', { ended: true })], []],
-    [[disease(DISEASES.WitchesPox, false)], ['Unwell']],   // PIN MOVED (DISEASE-UNWELL): it showed nothing
+    [[disease(DISEASES.WitchesPox, false)], ['Unwell']],
     [[disease(DISEASES.WitchesPox, false), disease(DISEASES.Plague, false)], ['Unwell']],   // one tile, however many incubate
     [[disease(DISEASES.WitchesPox, false), disease(DISEASES.Plague, true), disease(DISEASES.Cholera, false)], ['Unwell', 'Plague']],   // where the first of them stands
     [[disease(DISEASES.WitchesPox, true)], ["Witches' Pox"]],
@@ -140,7 +137,7 @@ test('UI3 the diseases\' names are the seventeen the table carries, in its order
 // ── THE GLYPHS ──────────────────────────────────────────────────────
 
 test('UI3 the glyphs: sixteen (REST1 the Rested campfire; TELL9 the bleed\'s two drops; WILD1 the open zone\'s blades; SURV-BOONS Thriving\'s sparkle and the Hearth\'s flame; TEMP-UI the thermometer), each on the 16px grid the classic\'s spell icons use, every letter in its palette, every lit pixel outlined in the kit\'s black (no lit pixel touches the empty), drawn as runs, one source a name (mutants: a pixel unoutlined; a letter with no colour; the runs one rect a pixel)', () => {
-  assert.deepEqual(Object.keys(STATUS_GLYPHS).sort(), ['bleed', 'cold', 'disease', 'drunk', 'hearth', 'hot', 'hunger', 'poison', 'rested', 'skillup', 'firmstar', 'sleep', 'stiff', 'thermo', 'thirst', 'thriving', 'wet', 'wild', 'rules', 'mentor'].sort());   // MENTOR2: and the mentor's two figures   // EVENT-RULES: and a world event's bound heart   // SKILL-READY / FIRM-STARS: the two tiles beside the Renown bar   // SURV-BOONS: and Thriving's sparkle; TEMP-UI: and the HUD plate's thermometer   // WILD1: and the open zone's crossed blades   // REST1: and the Rested campfire; PIN MOVED (TELL9: the bleed's own icon)
+  assert.deepEqual(Object.keys(STATUS_GLYPHS).sort(), ['bleed', 'cold', 'disease', 'drunk', 'hearth', 'hot', 'hunger', 'poison', 'rested', 'skillup', 'firmstar', 'sleep', 'stiff', 'thermo', 'thirst', 'thriving', 'wet', 'wild', 'rules', 'mentor'].sort());   // MENTOR2: and the mentor's two figures   // EVENT-RULES: and a world event's bound heart   // SKILL-READY / FIRM-STARS: the two tiles beside the Renown bar   // SURV-BOONS: and Thriving's sparkle; TEMP-UI: and the HUD plate's thermometer   // WILD1: and the open zone's crossed blades   // REST1: and the Rested campfire
   for (const [name, g] of Object.entries(STATUS_GLYPHS)) {
     assert.equal(g.rows.length, 16, `${name}: 16 rows`);
     let lit = 0;
@@ -317,7 +314,7 @@ test('UI3 the HUD, executed: the widget is the quickslot block\'s first child, o
     drawEnhancedHud(entity, 0, 0, opts);
     const root = document.body.children.find((n) => n.className === 'hud');
     const quick = find(root, 'hud-quick');
-    // DIAMOND-HB (PIN MOVED): the block also holds the hotbar's dock for the Diamond style, last
+    // DIAMOND-HB (
     assert.deepEqual(quick.children.map((n) => n.className), ['hud-stat', 'hud-qcap', 'hud-qdiamond', 'hud-gemdock'], 'on the caption, in the block');
     assert.deepEqual(find(root, 'hud-bottom').children.map((n) => n.className), ['hud-hotdock', 'hud-breath', 'hud-breath hud-grip', 'hud-bars', 'hud-renown'], 'and not in the foot (CLIMB2: the grip beside the breath)');
     const stat = quick.children[0];
@@ -338,7 +335,7 @@ test('UI3 the HUD, executed: the widget is the quickslot block\'s first child, o
     assert.equal(find(stat.children[3], 'hst-pic').src, statusGlyphSrc('poison'));
     assert.equal(stat.children[4].dataset.glyph, 'disease');
     assert.equal(stat.style.gridTemplateRows, `repeat(5, ${STAT_TILE}px)`, 'five tiles in a band not yet measured (five rows): one column');
-    assert.equal(stat.classList.contains('stat-tight'), false);   // PIN MOVED (HUD-CLASS): the widget's states are its own words - the bare 'side' took the sheet's .side column
+    assert.equal(stat.classList.contains('stat-tight'), false);
     // unchanged: not rebuilt
     const first = stat.children[0];
     drawEnhancedHud(entity, 0, 0, opts);
@@ -520,7 +517,7 @@ test('UI3 the sheet: the tile, its picture, the rows\' gap and the lift are the 
   }
   assert.match(rule(C, '.hst-tile'), /border-color: var\(--hst-hi\) var\(--hst-lo\) var\(--hst-lo\) var\(--hst-hi\);/, 'lit from the top left');
   assert.match(C, /\n\.hst-cell\.item \.hst-tile \{ border-style: dashed; \}/);
-  assert.match(C, /\n\.hud-stat\.stat-tight \.hst-name \{ display: none; \}/);   // PIN MOVED (HUD-CLASS): the widget's states are its own words, stat-<state>
+  assert.match(C, /\n\.hud-stat\.stat-tight \.hst-name \{ display: none; \}/);
   assert.match(rule(C, '.hst-name'), new RegExp(`max-width: ${STAT_NAME_MAX}px;`), 'the name\'s widest the module counts');
   assert.match(rule(C, '.hst-cell'), new RegExp(`gap: ${STAT_NAME_GAP}px;`), 'and the gap beside it');
   // a short screen: the sheet's numbers are the module's short metrics, under the module's own query
@@ -530,8 +527,8 @@ test('UI3 the sheet: the tile, its picture, the rows\' gap and the lift are the 
   assert.ok(C.includes(`@media (max-width: 640px), ${STAT_SHORT_QUERY} { .hud-stat .hst-name { display: none; } }`), 'the names go on a phone and a short screen');
   assert.match(rule(C, '.hud-stat'), new RegExp(`gap: ${STAT_GAP}px ${STAT_METRICS.full.colGap}px;`), 'the full column gap the module counts');
   // beside the diamond, stepped aside, the fold
-  assert.equal(rule(C, '.hud-stat.stat-side'), '.hud-stat.stat-side { position: absolute; left: 100%; top: 0; margin: 0 0 0 8px; }');   // PIN MOVED (HUD-CLASS)
-  assert.equal(rule(C, '.hud-stat.stat-noroom'), '.hud-stat.stat-noroom { display: none; }');   // PIN MOVED (HUD-CLASS)
+  assert.equal(rule(C, '.hud-stat.stat-side'), '.hud-stat.stat-side { position: absolute; left: 100%; top: 0; margin: 0 0 0 8px; }');
+  assert.equal(rule(C, '.hud-stat.stat-noroom'), '.hud-stat.stat-noroom { display: none; }');
   assert.match(C, /\n\.hst-cell\.more \.hst-foot \{ position: static; transform: none;/);
   assert.match(C, /\n@media \(max-width: 640px\), \(max-height: 500px\) \{ \.hud-stat \.hst-name \{ display: none; \} \}/);
   assert.match(C, new RegExp(`\\n\\.hst-cell\\.blink \\.hst-pic \\{ animation: hst-blink ${BLINK_INTERVAL * 2}s steps\\(1, end\\) infinite; \\}\\n@keyframes hst-blink \\{ 50% \\{ opacity: 0; \\} \\}`), 'a quarter second off, a quarter on');

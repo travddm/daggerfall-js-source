@@ -1,5 +1,4 @@
-// AUDIT GATHER-FEEL (2026-10-13, Mac: "audit everything" - GATHER-FEEL and GATHER-FEEL II, PR #868;
-// bible/01-Overview/audits/Audit-Gather-Feel.md): THE AUDIT'S PINS, each failing on the code the lanes read (a frozen worktree
+// AUDIT GATHER-FEEL: THE AUDIT'S PINS, each failing on the code the lanes read (a frozen worktree
 // at 5c345face) and passing on the fix.
 //   LANDING (F1, F2, F3, R11, R4, W2, R12) - a blow lands on ONE clock, its machine's count of blows landed: the clack,
 //     the kick, the chunks and the node's going on one frame at any frame length, a new act begun under it or not; a blow

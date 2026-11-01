@@ -1,5 +1,5 @@
 // @ts-check
-// QL5-QL10 (bible/06-Systems/Questlines-Arc.md sections 3 and 9): THE FAMILIES the sheets and the branches are filed by
+// QL5-QL10: THE FAMILIES the sheets and the branches are filed by
 // - one file of each a family (sheets/<family>.json, patches/<family>.json) - and which quests each holds. A leaf (it
 // reads the starts' names, another leaf, and nothing else): the sheets' and the patches' registries read it, and the pins (test/systems/questlines/ql1_sheets.test.js) hold every
 // quest a player can be given to exactly one family's sheet.

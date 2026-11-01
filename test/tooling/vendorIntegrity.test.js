@@ -1,4 +1,4 @@
-// MODS AUDIT (2026-09-08): THE VENDORED MODS, BYTE FOR BYTE. Three mods
+// MODS AUDIT: THE VENDORED MODS, BYTE FOR BYTE. Three mods
 // ship files that are the authors' own, carried verbatim with their
 // permission - Hazelnut's four path arrays, Kamer's five Collada
 // exports, and Dynamic Skies' shader, includes, presets, settings and

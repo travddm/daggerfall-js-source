@@ -1,5 +1,5 @@
 // @ts-check
-// SNOWFALL1 (2026-10-08): THE MOD'S SNOW SURFACE, AS GLSL - Daggerfall/Mods/DynamicSnow (vendor/snowfall/shaders/
+// SNOWFALL1: THE MOD'S SNOW SURFACE, AS GLSL - Daggerfall/Mods/DynamicSnow (vendor/snowfall/shaders/
 // DynamicSnow.glsl, read back from its DXBC), its one pass's vertex and fragment programs, with every constant the DXBC
 // carries. One program draws the three tiers the runtime stands (systems/snowfallRuntime.js): the local window, the
 // middle ring and the streamed blanket, told apart by their uniforms as the mod's three materials are.
@@ -32,7 +32,7 @@ export const SNOW_UNITS = Object.freeze({ dynamic: 16, static: 17, context: 18, 
  *  (render/waterSurface.js WATER_LAYER_UNITS), a layer of the one stack. */
 export const SNOW_LAYER = Object.freeze({ factor: -0.25, units: -0.25 });
 
-/** SNOW-TELL (2026-10-11, from play: "Can't see any boss ground attack overlays with heavy snow"): the most a tier's
+/** SNOW-TELL: the most a tier's
  *  surface stands over the ground under it, from the tier's own uniforms (systems/snowfallRuntime.js depthUniforms and
  *  its tier's `radius`) - snowResolve's highest answer (the wild's depth or the settlement's, whichever is deeper, and
  *  a road's berm over it; the caps and the path only pull it down), never more than SNOW_VS lifts it (the slope's

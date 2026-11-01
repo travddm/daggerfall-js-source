@@ -93,9 +93,7 @@ test('GROUND1-W a mod tile set takes each puddle record\'s shape from the classi
   const a = (x, y) => out[rec].colors[(y * 4 + x) * 4 + 3];
   assert.deepEqual([a(0, 0), a(3, 0), a(0, 3), a(3, 3)], [255, 0, 0, 255]);
   assert.equal(out[rec - 1 >= 0 ? 0 : rec], out[0], 'a record that is not a puddle is left as the mod paints it');
-  // PIN MOVED (AUDIT PRECIP GROUND-2): the streaming host's layers are made in one home (groundLayersOf - the set and its
   // twin's winter both), the puddles marked there
-  // PIN MOVED (OW-HITCH): that home is scenes/groundSets.js (HOST-SPLIT), the classic marked once, a mod's set carried from it - a record a breath
   assert.match(src('scenes/groundSets.js'), /const marked = await stepsBreathing\(markPuddleWaterSteps\(classic\), breathe\);[\s\S]{0,200}?layers: modLayers \? await stepsBreathing\(carryPuddleMaskSteps\(modLayers, marked\), breathe\) : marked \};/, 'scenes/groundSets.js');
   assert.match(src('scenes/exterior.js'), /const layers = modLayers \? carryPuddleMask\(modLayers, markPuddleWater\(classic\)\) : classic;/, 'scenes/exterior.js');
 });

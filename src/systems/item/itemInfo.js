@@ -224,8 +224,7 @@ export function armourModString(item) {
 }
 
 /**
- * MAC-M1 (2026-09-17, Mac: "Damage values arent showing on weapon tool
- * tips. Also, not sure if armor has values either"): THE TWO NUMBERS A
+ * MAC-M1: THE TWO NUMBERS A
  * PLAYER PICKS A WEAPON BY, for a surface that has no TEXT.RSC record.
  *
  * `weaponDamageString` and `armourModString` above have existed since
@@ -253,8 +252,7 @@ export const itemDamageLine = (item) => (
     ? weaponDamageString(item) : null);
 
 /**
- * MAC-M2 (Mac: "The Tooltip of weapons should also show if the weapon
- * is 1h or 2h"): THE OTHER THING A PLAYER PICKS A WEAPON BY, for the
+ * MAC-M2: THE OTHER THING A PLAYER PICKS A WEAPON BY, for the
  * same surface MAC-M1 gave the damage to.
  *
  * NO NEW TABLE. Which weapons take both hands is `getItemHands`
@@ -586,7 +584,7 @@ const shownSoulName = (soul) => getLocalizedEnemyName(soul, enemyDisplayName(sou
  *  item's before MAGIC.DEF is registered. A missing name answers as it
  *  is (undefined), for the callers' own fallbacks.
  *
- *  TEXT-F1 (2026-10-07, Mac: "Any human input elements need filtering"): AN ITEM'S OWN NAME AS IT MAY BE SHOWN. A name
+ *  TEXT-F1: AN ITEM'S OWN NAME AS IT MAY BE SHOWN. A name
  *  a player gave a piece (the Item Maker's - DFU's own window, untouched) travels with it to every holder, every shelf
  *  and every market, so its words are starred as a chat line's (net/nameFilter.js maskText) wherever it is named; a
  *  game's own name reads through unchanged (every name the port carries - the pin's), so the starring comes first and
@@ -731,7 +729,7 @@ function namePartsOf(item, { getQuest = null, differentiatePlantIngredients = tr
     if (item?.group === 'PlantIngredients2' && item.templateIndex < 18) return { name: formatText(localizedText('ingredientFormatString', '{0} {1}'), base, localizedText('southern', '(southern)')), material: '' };
   }
   let material = gearMaterialText(item);
-  // PROF3: a Masterwork's name is its maker's mark (bible/06-Systems/Professions-Arc.md 9.2) - "Silverthorn's Mithril
+  // PROF3: a Masterwork's name is its maker's mark (9.2) - "Silverthorn's Mithril
   // Longsword", the mark before the material, one name; PROF4: and a Master Joiner's furniture at any quality (`marked`)
   // AUDIT 30 C7: only a mark the law would write (a peer's, the wire's or an old save's text is not a name), on a piece
   // with a real provenance - the tooltip's and DECOR's own tests
@@ -972,10 +970,7 @@ export function infoPanelShorten(rows) {
 }
 
 /**
- * QUICK-LOOT-STATS (2026-09-22, a player to Mac: "i love the quick loot
- * but can it show the stats of the items next to the quickloot window?
- * So i dont have to pick up everything to check in my inventory if its
- * worth keeping"): THE ROWS AN ITEM SAYS ABOUT ITSELF, ORDERED.
+ * QUICK-LOOT-STATS: THE ROWS AN ITEM SAYS ABOUT ITSELF, ORDERED.
  *
  * A THIRD PRESENTER OVER THE SAME PRODUCERS, which is the law MAC-M1
  * set above and the reason this is here rather than in the plaque: the

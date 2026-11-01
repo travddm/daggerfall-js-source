@@ -118,7 +118,7 @@ function build(doc, hooks) {
   // OW-DECK: the listeners stand on the BAR, not the root - every [data-act] is in it, and the Overworld's strip docks
   // the bar in itself (ui/travel/travelViewHud.js): a press there must still reach these hooks
   const bar = root.querySelector('.travelpanel-bar');
-  // PACE-DIALS (2026-10-06, the player: "Revert back to the overworld timer multiplier"): the two dials beside the
+  // PACE-DIALS: the two dials beside the
   // time readout - Speed and Near enemies, 5-60 and x100 on a road alone (systems/travel/travelPace.js)
   const pace = buildPaceControls(doc, 'travelpanel');
   bar.querySelector('.travelpanel-speed')?.after(pace.root);
@@ -256,7 +256,7 @@ export function drawEnhancedTravelControl(state = {}, hooks = {}) {
   cls(parts.accel, 'accelClass', held != null ? 'travelpanel-accel held' : 'travelpanel-accel');
   // PVPNEAR: the nearby stranger's timer, in this box just under the actual one
   if (parts.stranger) {
-    // STRANGER-LINE (the owner: "Stranger nearby looks totaly missplaced"): in the time box itself, in the ground line's
+    // STRANGER-LINE: in the time box itself, in the ground line's
     // place and face (the held rate above it already says the pace) - red, while a stranger holds the journey
     const sr = state.stranger ? 'stranger near' : '';
     if (last.strangerTxt !== sr) { last.strangerTxt = sr; parts.stranger.textContent = sr; parts.stranger.style.display = sr ? '' : 'none'; if (parts.ground) parts.ground.style.display = sr ? 'none' : ''; }

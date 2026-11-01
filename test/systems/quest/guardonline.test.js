@@ -1,5 +1,4 @@
-// GUARD-ONLINE (2026-09-26, Mac: "Guard the guild quest (mages guild) - wait time for this should be alot shorter";
-// asked, "Starts ~1 min after you arrive"): online the world clock is the shared one, a game day two real hours and a
+// GUARD-ONLINE: online the world clock is the shared one, a game day two real hours and a
 // rest no way past it (RESTX2), so N0B10Y03's `daily from 00:00 to 03:00` came round once every two hours. Online, for
 // that quest alone, the window is the player's ARRIVAL's - it opens ten game minutes after they are first in the
 // hall and stands an hour; leaving after it closes and coming back opens it again, staying keeps it shut so the

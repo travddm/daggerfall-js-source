@@ -1,11 +1,9 @@
-// TO-LIVE (2026-10-02, Discord: "Whether or not I have the first setting for the Travel Options mod switched on or off,
-// both cautious and reckless travel initiate time accelerated travel. The only way to use vanilla fast travel is to
-// have the mod turned off entirely, and this requires a relog") - the mod's settings were read ONCE at the world's load,
+// TO-LIVE - the mod's settings were read ONCE at the world's load,
 // so the tile's "Cautiously" dial answered its boot value all session; and Inns, the other half of the mod's rule
 // (TO-FIELD2 turned it on), was on no screen, so a trip stopping at inns - Recklessly's too - was always a journey. Now
 // the live half is read again on every change of the mod settings (DFU re-runs LoadSettings on a change), the starred
 // restart half carried from the load; Inns is on the tile beside Cautiously; the panel's Acceleration Limit followed its
-// dial - RATE-LAW (2026-10-04, Mac: "Remove travel options dials") retired both the dial and the limit: a journey runs at
+// dial - RATE-LAW retired both the dial and the limit: a journey runs at
 // its ground's rate. Each pin is red on the record's code (42e50765).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

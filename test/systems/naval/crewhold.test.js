@@ -1,6 +1,5 @@
-// CREW-HOLD and GALLEON-WEIGHT (2026-10-06, Mac: "Crew depletes too fast"; "The galleon has less cannons, so it needs a
-// buff to account for that") - A PLAYER'S CREW STANDS TWICE WHAT A CAPTAIN'S DOES, AND A PLAYER'S GALLEON THROWS SIX GUNS'
-// WEIGHT FROM HER FIVE PORTS (bible/03-World/Naval-Combat.md). The men every blow on a player's ship takes - a ball's, her
+// CREW-HOLD and GALLEON-WEIGHT - A PLAYER'S CREW STANDS TWICE WHAT A CAPTAIN'S DOES, AND A PLAYER'S GALLEON THROWS SIX GUNS'
+// WEIGHT FROM HER FIVE PORTS. The men every blow on a player's ship takes - a ball's, her
 // fire's, the serpent's - over PLAYER_CREW_TOUGHNESS, the captains' crews as they were; her broadside's
 // weight of metal from her guns to each ball's hit and the captains' reckoning of her fire, the captains' galleons as they
 // were tuned. Each pin failed on the build before it. tools/mutants/crewhold.json.
@@ -75,7 +74,7 @@ function emptying(hull, cls) {
 test('CREW-HOLD measured, on strikeTime\'s own terms: every ship of the line\'s fire leaves a player\'s galleon and Carrack their crews when their hulls are gone - a brigantine takes a galleon\'s men in 292 s and her hull in 176 (at SHIP_TOUGHNESS her men went in 146); a swivel boat\'s balls still thin a crew first, its trade, at half the pace (mutants: the toughness)', () => {
   for (const hull of [HULL.SmallShip, HULL.Carrack]) {
     for (const cls of SHIP_CLASSES) {
-      if (!batteriesOf(cls.hull).length) continue;   // PIN MOVED (FISH-BOATS): a ship of the line's fire - a Fishing Skiff carries no gun
+      if (!batteriesOf(cls.hull).length) continue;
       const t = emptying(hull, cls);
       if (cls.hull === HULL.LargeBoat) assert.ok(t.crew < t.timber, `${cls.id}'s swivels on hull ${hull}: her men first (${t.crew.toFixed(0)} s against ${t.timber.toFixed(0)})`);
       else assert.ok(t.crew > t.timber * 1.5, `${cls.id} on hull ${hull}: her crew outlasts her hull (${t.crew.toFixed(0)} s against ${t.timber.toFixed(0)})`);
@@ -93,7 +92,7 @@ test('GALLEON-WEIGHT the law: a player\'s galleon\'s broadside throws the mod\'s
   for (const side of ['starboard', 'port']) assert.equal(playerBatteryWeight(HULL.SmallShip, side), 6 / 5);
   for (const side of ['bow', 'stern']) assert.equal(playerBatteryWeight(HULL.SmallShip, side), 1, `her ${side}: as it was`);
   for (const hull of [HULL.Rowboat, HULL.LargeBoat, HULL.LargeGalley]) for (const side of ['starboard', 'port', 'bow', 'stern']) assert.equal(playerBatteryWeight(hull, side), 1);
-  // SHIPS-2 (2026-10-07): Mac's carrack's five ports throw the mod's carrack's seven (7/5), her chasers and barrels their
+  // SHIPS-2: Mac's carrack's five ports throw the mod's carrack's seven (7/5), her chasers and barrels their
   // own, the mod's own carrack standing in its own seven - and a captain's carrack the same (shipBatteryWeight: her duels
   // were measured with the mod's seven), where a captain's galleon keeps her five's (hers were measured with them)
   assert.equal(hullBuild(HULL.Carrack).broadside.length, 5, 'Mac\'s carrack: a gun a port');
@@ -146,7 +145,7 @@ test('GALLEON-WEIGHT the captains\' reckoning: a player\'s galleon makes a ship 
 
 test('CREW-HOLD and GALLEON-WEIGHT on the host, by source: a captain\'s ball on my boat takes her men as a player\'s crew stands them and strikes with its weight; the serpent\'s blow through playerMen; my volley and a peer\'s own boat\'s carry the weight, a captain\'s none (SHIPS-2: but a captain\'s carrack\'s, the mod\'s seven); my boat\'s measure a player\'s (mutants: each seam)', () => {
   const n = src('scenes/naval/navalHost.js');
-  assert.match(n, /const hurt = dueOnHull\(shotDamage\(gun, zone, \{ braced: st\.guns\.braced, roll: random\(\), tough: PLAYER_CREW_TOUGHNESS, weight: e\.weight \}\)\);/, 'a ball on my boat');   // PIN MOVED (SEA-SET): under the Tidemail's Captain's Due
+  assert.match(n, /const hurt = dueOnHull\(shotDamage\(gun, zone, \{ braced: st\.guns\.braced, roll: random\(\), tough: PLAYER_CREW_TOUGHNESS, weight: e\.weight \}\)\);/, 'a ball on my boat');
   assert.match(n, /const hurt = shotDamage\(gun, zone, \{ roll: random\(\), weight: e\.weight \}\);/, 'a ball on a captain\'s ship: her men a captain\'s');
   assert.match(n, /hull: gun\.hull \* \(e\.weight \?\? 1\) \* \(0\.85 \+ 0\.3 \* random\(\)\)/, 'a ball in the serpent');
   assert.match(n, /const men = playerMen\(hurt\.crew \?\? 0, random\(\)\);\n\s+const change = st\.damage\.apply\(\{ \.\.\.hurt, crew: men,/, 'the serpent\'s blow');

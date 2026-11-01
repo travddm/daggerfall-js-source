@@ -1,4 +1,4 @@
-// AUDIT 39 - TERRAIN & LAYOUT (2026-09-01).
+// AUDIT 39 - TERRAIN & LAYOUT.
 //
 // Seven findings over the world-assembly lane: the exterior ambient's
 // weather term, the storm strobe on the sun, a production-dead sky

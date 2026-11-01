@@ -1,8 +1,8 @@
-// MARKS1 (2026-09-28, Mac: "New currency"; "continue"): MARKS, THE SERVER'S CURRENCY - the law both ends read
+// MARKS1: MARKS, THE SERVER'S CURRENCY - the law both ends read
 // (src/net/marksLaw.js), the account service's balances, the one ledger that moves them, the first faucet (the gate's
 // receipts), the Bank's one-way exchange, a guild's Marks treasury and the developers' weekly report, driven through the
 // real Worker over node:sqlite with every migration applied (server-account/src/marks.js, 0025_marks.sql).
-// bible/06-Systems/Professions-Arc.md 10.5.
+// 10.5.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -105,7 +105,7 @@ const rid = () => `req-${String(++_rid).padStart(6, '0')}`;
 
 test('MARKS1 the law: a balance holds 10,000,000; the gate strikes 50 (SILVER-WAYS: under the day\'s combat cap, test/net/silverways_service.test.js); the Bank pays 8 gold a Mark, 300 Marks a day; the switch is off, dev or on (anything else off); the caps count by the UTC day', () => {
   assert.equal(MARKS_MAX, 10_000_000);
-  assert.deepEqual(MARKS_FAUCETS.gate, { amount: 50 });   // PIN MOVED (SILVER-WAYS): two a UTC day of its own became the gates' and the raids' one combat cap
+  assert.deepEqual(MARKS_FAUCETS.gate, { amount: 50 });
   assert.deepEqual(MARKS_BANK, { goldPerMark: 8, perDay: 300 });
   assert.deepEqual(MARKS_SWITCH, ['off', 'dev', 'on']);
   assert.deepEqual(['on', 'dev', 'off', 'ON', undefined, 'yes'].map(marksSwitchOf), ['on', 'dev', 'off', 'off', 'off', 'off']);
@@ -154,7 +154,6 @@ test('MARKS1 the gate\'s receipt: 50 Marks for a gate counted, under the day\'s 
   const { env, registered, guest, claim, balance, call } = await stand();
   const a = await registered('Anna');
   const first = await claim(a, 700, T0);
-  // PIN MOVED (SILVER-WAYS): the strike answers the day's combat silver beside it, and the cap is the gates' and the
   // raids' 150 together (three gates), where it was the gate's own two
   const combat = (earned) => ({ earned, max: 150 });
   assert.deepEqual(first.body, { recorded: true, stones: 1, closed: 1, marks: { struck: 50, balance: 50, combat: combat(50) } });   // WB12d: the row's embers said (AUDIT WB12d A1)
@@ -219,7 +218,7 @@ test('MARKS1 the balance\'s cap: a gate that would carry a balance past 10,000,0
   const a = await registered('Anna');
   env.DB._raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('mint', NULL, 'account', ?, 'test', ?, 1, 1, ?, NULL, 'seed-0001')`).run(a.id, MARKS_MAX - 10, a.id);
-  assert.deepEqual((await claim(a, 700, T0)).body.marks, { struck: 0, balance: MARKS_MAX - 10, combat: { earned: 0, max: 150 }, why: 'full' });   // PIN MOVED (SILVER-WAYS): the day's combat silver beside it
+  assert.deepEqual((await claim(a, 700, T0)).body.marks, { struck: 0, balance: MARKS_MAX - 10, combat: { earned: 0, max: 150 }, why: 'full' });
 });
 
 test('MARKS1 the switch: off, nothing strikes and nothing answers; dev, the developers alone; on, every account', async (t) => {
@@ -231,7 +230,7 @@ test('MARKS1 the switch: off, nothing strikes and nothing answers; dev, the deve
   const dev = await stand({ open: 'dev', developers: 'Devra' });
   const d = await dev.registered('Devra');
   const p = await dev.registered('Pell');
-  assert.deepEqual((await dev.claim(d, 700, T0)).body.marks, { struck: 50, balance: 50, combat: { earned: 50, max: 150 } }, 'a developer strikes');   // PIN MOVED (SILVER-WAYS): the day's combat silver beside it
+  assert.deepEqual((await dev.claim(d, 700, T0)).body.marks, { struck: 50, balance: 50, combat: { earned: 50, max: 150 } }, 'a developer strikes');
   assert.equal((await dev.claim(p, 700, T0)).body.marks, null, 'everyone else waits for "on"');
   assert.match(src('server-account/wrangler.toml'), /^MARKS_OPEN = "on"$/m, 'shipped at dev - opened to everyone by one line (SWITCH-ON, Mac: "Fuck it lets switch everything on")');
 });
@@ -316,7 +315,7 @@ test('MARKS1 the weekly report: a developer\'s alone - struck by faucet, burnt b
   const { registered, claim, call } = await stand({ developers: 'Devra' });
   const d = await registered('Devra');
   const a = await registered('Anna');
-  await claim(a, 700, T0); await claim(a, 701, T0); await claim(a, 702, T0); await claim(d, 700, T0);   // PIN MOVED (SILVER-WAYS): three gates reach the combat cap
+  await claim(a, 700, T0); await claim(a, 701, T0); await claim(a, 702, T0); await claim(d, 700, T0);
   await call('/v1/marks/exchange', { marks: 40, rid: rid() }, a.secret);
   assert.deepEqual(await call('/v1/marks/report', {}, a.secret), { status: 403, body: { error: 'not-developer' } });
   const r = (await call('/v1/marks/report', {}, d.secret)).body;
@@ -324,7 +323,7 @@ test('MARKS1 the weekly report: a developer\'s alone - struck by faucet, burnt b
   assert.deepEqual([r.mintedTotal, r.burntTotal, r.ratio], [200, 40, 5]);
   assert.deepEqual(r.circulation, { accounts: 160, guilds: 0, escrow: 0, holders: 2 });   // PROF5: the buy orders' escrow beside the balances
   assert.deepEqual(r.days, [{ day: utcDay(T0), minted: 200, burnt: 40 }]);
-  assert.deepEqual(r.capped, { combat: 1, bank: 0, gather: 0, find: 0 });   // PIN MOVED (SILVER-WAYS): the accounts at the day's combat cap, the gates' and the raids'; PIN MOVED (AUDIT 625 S6): and SILVER-FINDS' two faucets'
+  assert.deepEqual(r.capped, { combat: 1, bank: 0, gather: 0, find: 0 });
   assert.equal(r.to - r.from, 6, 'seven UTC days');
 });
 

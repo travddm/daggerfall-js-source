@@ -1,5 +1,4 @@
-// GATE-DOOR (2026-10-18, from play at a thousand online: "Server is kinda breaking down near oblivion gate cause so many ppl
-// lol"; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, GATE-DOOR): A GATE'S COURT ADMITS ITS OPENING'S CROWD. Its
+// GATE-DOOR: A GATE'S COURT ADMITS ITS OPENING'S CROWD. Its
 // door admitted HELLO_HZ_MAX (10) hellos a second, and a player standing in a court that had said nothing for
 // COURT_SILENT_MS was cast out of it - so at the opening a share of the crowd was thrown out of the court it was waiting to
 // enter. Now a court and its copies admit GATE_HELLO_HZ_MAX a second (still before the token is read, a busy refusal leaving

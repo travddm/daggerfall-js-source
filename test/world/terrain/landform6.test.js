@@ -1,5 +1,4 @@
-// LANDFORM6 (2026-10-07, Mac, asked whether the land varies between environments: "Shit, dude go all out with this. I
-// trust you") - THE LAND WEARS ITS CLIMATE (world/landforms.js): each climate's hills their own shape and height - the
+// LANDFORM6 - THE LAND WEARS ITS CLIMATE (world/landforms.js): each climate's hills their own shape and height - the
 // Alik'r's dune seas, Dak'fron's mesas, the ranges' ridgelines, the rainforest's karst towers, the subtropics' soft domes,
 // the swamps' near-flat hummocks, the haunted woods' ravines, the woodlands' rolling hills - blended across a climate's
 // border, one function of world position still. Pinned with no game data: a climates table filled as each test needs.
@@ -45,7 +44,7 @@ const LAND = Object.fromEntries(Object.entries(CLIMATES).map(([k, c]) => [k, sta
 
 test('LANDFORM6: every climate wears its own land - CLIMATE.PAK\'s ten values, any other the woodlands\'; the tallest hill is the mountains\', and the ceiling counts it', () => {
   const tops = Object.fromEntries(Object.entries(CLIMATES).map(([k, c]) => [k, hillsTopOf(c)]));
-  const top = (land) => land.high * land.upland + (land.peaks ? land.peaks.high : 0), L = LANDFORM_DIALS.lands;   // PIN MOVED (LANDFORM8): a mountain land's tallest is a peak on its tallest hill
+  const top = (land) => land.high * land.upland + (land.peaks ? land.peaks.high : 0), L = LANDFORM_DIALS.lands;
   assert.deepEqual(tops, {
     Ocean: top(L.ocean), Desert: top(L.desert), Desert2: top(L.desert2), Mountain: top(L.mountain), Rainforest: top(L.rainforest),
     Swamp: top(L.swamp), Subtropical: top(L.subtropical), MountainWoods: top(L.mountainWoods), Woodlands: top(L.woodlands), HauntedWoodlands: top(L.haunted),
@@ -188,7 +187,6 @@ test('LANDFORM6: the climates ride every kernel - the worker keeps the posted ta
 test('LANDFORM8 (WOD-PEAKS) + MOUNTAINS-SHARP: the mountain woods stand rounded peaks where World of Daggerfall\'s spires stood - a bell from summit to foot - and the mountains (the Dragontail and the Wrothgarian) SHARP ones twice as tall, (1 - q)^2 from summit to foot; 550 m to a kilometre across their radius, centred so each land\'s mean is its own, and no other land wears one', () => {
   const L = LANDFORM_DIALS.lands;
   assert.deepEqual(Object.keys(L).filter((k) => L[k].peaks), ['mountainWoods', 'mountain'], 'the mountains and their woods alone');
-  // PIN MOVED (MOUNTAINS-SHARP, 2026-10-14, the owner: "Mountains shape (Dragontail/Wrothgarian). More pointy, less rounded (sharp), more height"): the mountains' peaks 400 m and sharp
   // (they were 200 m bells - LANDFORM8's "not super huge"), their ridges 1.4 times as tall; the woods' 140 m bells stand
   assert.equal(L.mountain.peaks.high * 1.25, 400, 'the mountains\' peaks 400 m at the most');
   assert.equal(L.mountain.high, 112, 'on ridges 1.4 times as tall');

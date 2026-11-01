@@ -1,5 +1,4 @@
-// AUDIT HCC (2026-09-23, Mac: "Let's do an audit on this, ensure online is handled properly and any new
-// notifications or UI elements are enhancified"): three lenses over Horse Cart and Cargo - the online lane, the
+// AUDIT HCC: three lenses over Horse Cart and Cargo - the online lane, the
 // notifications and UI, the hosts' lifecycle - and the findings paid. The online lane's pins are in
 // test/systems/horse/hcc_pool.test.js (O1-O9, by execution); the hosts' adjacency in test/player/hcc_hosts.test.js; the input box's
 // enhanced window in test/ui/enhancedNotice.test.js (ENH-NOTICE1). This file holds the rest: the keys, the save slot,

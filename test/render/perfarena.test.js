@@ -1,7 +1,6 @@
-// PERF-ARENA (2026-10-10, Mac: "Exterior performance is really bad" - "Interior is fine. It's exterior that's the
-// issue"): the still flats share their buffers. A billboard batch built still takes a range of an arena's quads - one
+// PERF-ARENA: the still flats share their buffers. A billboard batch built still takes a range of an arena's quads - one
 // VAO, one vertex buffer and one index buffer for thousands of batches - and its draws name the range by the index
-// offset, so a town's flats no longer bind a VAO a draw. The record is `bible/07-Rendering/Performance-Arena.md`.
+// offset, so a town's flats no longer bind a VAO a draw. The record is ` `.
 // These pins hold it to the picture: a GL that keeps what is written into its buffers resolves every triangle a draw
 // rasterises, and the arena's draws resolve to the very triangles the per-batch buffers did, draw for draw.
 import { test } from 'node:test';

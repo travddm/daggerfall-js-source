@@ -1,8 +1,6 @@
 // @ts-check
-// EL1 (2026-09-17, the Enhanced Lighting arc, tier one - FOUNDATIONS).
-// Mac, on the fog Better Ambience brought into the dungeons: "we might
-// need to update our enhanced lighting ... or we can take it a step
-// further and enhance our lighting system tenfold". This is the floor
+// EL1.
+// . This is the floor
 // every later tier stands on.
 //
 // WHAT THE CLASSIC LANE DOES, and why it cannot simply be tuned: the
@@ -107,7 +105,7 @@ export const EL_SCATTER = 0.35;
  *  underwater murk (UnderwaterFog, exp 0.25 - a visibility fog, ten times this) integrated at its own density put
  *  the light in the hand as a near-white disc over the whole view. Thinner fogs are untouched. */
 export const EL_SCATTER_DENSITY_MAX = 1 / 40;
-// BOUNCE1 (2026-09-23), WITHDRAWN THE SAME DAY BY ITS AUDIT. A per-lantern bounce - a share of the light's attenuated
+// BOUNCE1, WITHDRAWN THE SAME DAY BY ITS AUDIT. A per-lantern bounce - a share of the light's attenuated
 // colour weighted by facing the ground - was tried two ways and neither is sound: unshadowed it leaks through walls
 // (a lantern in the next room bounced onto this room's wall, and every lantern past the eight casters has no map to
 // shadow it by, so walls popped as lanterns took and lost their slots); shadowed by the lantern's cube map, a reach
@@ -132,7 +130,7 @@ export const EL_LIGHT_KNEE = 16;
  *  terrain and character shaders (a flat has no normal). */
 export const EL_SPEC_GLOSS = 24;
 export const EL_SPEC_STRENGTH = 0.12;
-/** LA-COST4 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): x^n BY
+/** LA-COST4: x^n BY
  *  REPEATED SQUARING, as a GLSL function named `name` - the lantern glint's lobe at EL_SPEC_GLOSS, which was
  *  `pow(x, 24.0)` for every light in range of every lit fragment: a log2, a multiply and an exp2, where x^24 is
  *  x^16 * x^8 - four squarings and one multiply. Generated from the gloss, so the constant keeps its one home and a
@@ -152,7 +150,7 @@ export function powChainGlsl(name, n) {
   }
   return `float ${name}(float x) { ${lines.length ? `${lines.join(' ')} ` : ''}return ${terms.reverse().join(' * ')}; }`;
 }
-/** LA-COST5 (2026-09-27, Mac: "look for flickering issues"): WHERE THE CONTACT MARCH BEGINS TO FADE, a share of the
+/** LA-COST5: WHERE THE CONTACT MARCH BEGINS TO FADE, a share of the
  *  light's range. EL8/BUGS-5 F5 marched a lantern's contact shadow out to AIR_CONTACT_RANGE_FRACTION (0.7) of its
  *  range and dropped it there in one step - a hard shell - and a flickering lamp's range steps 0.4 at 14 Hz, so the
  *  fragments on that shell went from contact-shadowed (down to AIR_CONTACT_FLOOR) to unshadowed and back fourteen
@@ -240,7 +238,7 @@ export function elTonemap(x, white = EL_WHITE) {
   if (!(x > 0)) return 0;
   return x * (1 + x / (white * white)) / (1 + x);
 }
-/** HQ1 (2026-09-23, Mac: "make some insane improvements to our lighting system"): THE COLOUR THROUGH THE CURVE.
+/** HQ1: THE COLOUR THROUGH THE CURVE.
  *  Per-channel Reinhard bends HUE as it compresses: a torch's warm light (r > g > b) has its red channel on the
  *  shoulder while its blue is still on the slope, so the brighter the flame the more it went yellow-white and
  *  then flat white, and a sunlit red wall lost its red before it lost its light. This is the luminance-preserving
@@ -514,8 +512,7 @@ vec3 elInScatter(vec3 wp) {
 vec3 elFinish(vec3 lit, vec3 wp) {
   float ex = uELExposure * elAdapt();   // EL4: the eye's own multiplier rides the scene's exposure
   vec3 tm = elTonemapRGB(lit * ex);   // HQ1: the colour through the curve
-  // EL-DISTANCE (2026-09-25, Mac: "It almost gives this weird darkness/foggy look to distant terrian which I really
-  // dont like"): THE FOG IS BLENDED WHERE THE CLASSIC LANE BLENDS IT. This mixed the decoded fog colour into the
+  // EL-DISTANCE: THE FOG IS BLENDED WHERE THE CLASSIC LANE BLENDS IT. This mixed the decoded fog colour into the
   // LINEAR surface and encoded the sum. The ramp is the same fogFactorAt, but a mix in linear lands far nearer the
   // fog colour once encoded - a surface at display 60 under a mid-grey-blue fog, 42% fogged, read 115 on the
   // classic lane and ~140 here - so the lane's distant ground went to the fog's colour a long way before the
@@ -594,8 +591,7 @@ ${RW_MAIN_DERIVS}
   vec4 tex = texture(uTex, vUV);
 ${RW_MAIN_CUTOUT}
   vec3 n = normalize(vNormal);
-  // PERF-SUN2 (2026-09-19, Mac: "over 1000 calls and looking up in the sky
-  // restores frame rate"): THE SUN'S SHADOW IS NOT READ WHERE THE SUN
+  // PERF-SUN2: THE SUN'S SHADOW IS NOT READ WHERE THE SUN
   // CANNOT REACH. This was one flat product, and GLSL evaluates every
   // operand of one: a surface whose normal faces AWAY from the sun paid
   // nine hardware-PCF compares and a cloud-deck sample, and then
@@ -711,7 +707,7 @@ ${LPT_FS_TEXEL}  if (tex.a < ((uSpectral == 1 || uConceal.x > 0.0) ? 0.1 : 0.5))
   // TREES1: sunShadowSOFTat - a flat reads its shadow ONCE for the whole
   // sprite, so the kernel is the only gradation it gets and the far
   // cascade's one-tap trade does not apply to it.
-  // LA-COST3 (2026-09-27, Mac: "performance improvements"): ONCE FOR THE
+  // LA-COST3: ONCE FOR THE
   // WHOLE SPRITE WAS THE LAW AND NOT THE COST. The point is one per quad,
   // and every fragment of the quad still ran the read - the cascade pick, a
   // mat4 and four compare taps - for the same answer: a tree's hundreds of
@@ -737,7 +733,7 @@ ${LPT_FS_TEXEL}  if (tex.a < ((uSpectral == 1 || uConceal.x > 0.0) ? 0.1 : 0.5))
   outColor = vec4(dwColumn(elFinish(lit, vBBWorld), vBBWorld), alpha);
 }`;
 
-/** LA-COST3 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): THE
+/** LA-COST3: THE
  *  FLAT'S SUN, READ WHERE THE QUAD IS - the lane's additions to the renderer's billboard vertex shader
  *  (renderer.js bbVertexShader: `head` goes in before main, `main` at its end, after every line that places the
  *  vertex, so a corner lands exactly where BB_VS lands it). EL_BB_FS used to read the sun map at the flat's base in
@@ -763,7 +759,7 @@ ${SHADOW_GLSL}`,
   vBBSunVis = dot(uBBSun, uBBSun) > 0.0 ? (uMesh > 0.5 ? sunShadowAt(sunAt, vec3(0.0, 1.0, 0.0)) : sunShadowSoftAt(sunAt, vec3(0.0, 1.0, 0.0), uSize.y)) : 1.0;   // LA-COST3: EL2's point, TREES1's kernel, PERF-SUN2's gate; AUDIT FLICKER S1: its height, off its own card; AUDIT LPT B4: a low-poly tree's every VERTEX runs this, so one tap at its root`,
 });
 
-/** MAC-BUG W6 (2026-09-20, Mac: "super dark coloring instead of red") -
+/** MAC-BUG W6 -
  *  THE DECAL FRAGMENT SHADER OF THE LANE: the classic DECAL_FS's every
  *  term (renderer.js - MAC-BUG W4's flat model, term for term with the
  *  billboard pass), lit on the lane's pipeline.
@@ -834,7 +830,7 @@ void main() {
   // A DEGENERATE SLOT still rasterises nothing, but a live one whose
   // texel is fully clear must not draw a black square either.
   if (t.a < 0.01) discard;
-  // BLOOD3 (Mac: "the blood is too shiny and flat"): THE MARK IS A
+  // BLOOD3: THE MARK IS A
   // FILM. The atlas's alpha is a THICKNESS - its shapes fall off at
   // their rims because there is less blood there - and the albedo read
   // it as coverage alone, so every texel of a pool was the same red and
@@ -870,7 +866,7 @@ void main() {
   vec3 albedo = elDecode(vColor.rgb)
     * exp(vec3(${glslFloat(BLOOD_ABSORB[0])}, ${glslFloat(BLOOD_ABSORB[1])}, ${glslFloat(BLOOD_ABSORB[2])}) * (1.0 - thick))
     * mix(1.0, ${glslFloat(WET_DARKEN)}, clamp(vWet, 0.0, 1.0));
-  // WEAPON-MOUNT (2026-09-26, Mac: "weapons dont show in houses properly"): a picture's albedo IS its texel,
+  // WEAPON-MOUNT: a picture's albedo IS its texel,
   // decoded as every texel on this lane is - and it is flat: no film, no relief, no sheen. The blood law above read a
   // hung sword's red channel as a thickness and drew it as a pale silhouette of itself.
   if (uPicture > 0.5) { albedo = elDecode(t.rgb * vColor.rgb); thick = 0.0; }
@@ -1023,7 +1019,7 @@ void main() {
   int t = int(data & 3u);
   vec2 tileUV = fract(unwrapped);
   vec2 tuv = ROT[t] * tileUV + TRANS[t];
-  // GRAIN1 (2026-09-19, Mac: "distance terrian has a weird grain look"):
+  // GRAIN1:
   // THE TILE ARRAY IS MIPMAPPED, AND THE GRADIENT IS THE UNWRAPPED ONE.
   //
   // The grain is minification aliasing: past a few tiles out a screen
@@ -1059,8 +1055,7 @@ void main() {
   ${waterBedMix((t) => `elDecode(${t})`)}
   tex = mix(tex, uFadeTint.rgb, uFadeTint.a);   // MID-RING: out of the middle ring's tint, a just-built pixel's
   vec3 n = normalize(vNormal);
-  // PERF-SUN2 (2026-09-19, Mac: "over 1000 calls and looking up in the sky
-  // restores frame rate"): THE SUN'S SHADOW IS NOT READ WHERE THE SUN
+  // PERF-SUN2: THE SUN'S SHADOW IS NOT READ WHERE THE SUN
   // CANNOT REACH. This was one flat product, and GLSL evaluates every
   // operand of one: a surface whose normal faces AWAY from the sun paid
   // nine hardware-PCF compares and a cloud-deck sample, and then
@@ -1120,8 +1115,7 @@ void main() {
   vec4 texel = uUseTex > 0.5 ? texture(uTex, vUV) : vec4(1.0);
   if (uAlphaCut > 0.0 && texel.a < uAlphaCut) discard;
   vec3 albedo = elDecode(vColor * texel.rgb);
-  // PERF-SUN2 (2026-09-19, Mac: "over 1000 calls and looking up in the sky
-  // restores frame rate"): THE SUN'S SHADOW IS NOT READ WHERE THE SUN
+  // PERF-SUN2: THE SUN'S SHADOW IS NOT READ WHERE THE SUN
   // CANNOT REACH. This was one flat product, and GLSL evaluates every
   // operand of one: a surface whose normal faces AWAY from the sun paid
   // nine hardware-PCF compares and a cloud-deck sample, and then
@@ -1272,8 +1266,7 @@ export function lanternColor(on, classic) {
   return new Float32Array([EL_FLAME_COLOR[0] * k, EL_FLAME_COLOR[1] * k, EL_FLAME_COLOR[2] * k]);
 }
 
-/** INTERIOR-DIM (2026-10-11, Mac, of a player's screenshot of a guild hall - two hanging lanterns, warm pools on the
- *  floor, dark walls between them: "I want to improve interior lighting to be more like this and less bright"). A
+/** INTERIOR-DIM. A
  *  BUILDING'S OWN LAMPS ON THE LANE burn at this share of the intensity AddLight's second switch gives them. The lane
  *  reads that intensity in linear: a lantern's 1.4 decodes to 2.16, about four times the street's flame (lanternColor
  *  at the city's 1), and every lamp's range (15 for most) covers a tavern, so a room was lit flat from wall to wall.

@@ -1,4 +1,4 @@
-// RECOVERY-SET (2026-10-14) - EIGHT RECOVERY CODES, EACH SPENT ALONE, AND A NEW SET FROM THE PROFILE.
+// RECOVERY-SET - EIGHT RECOVERY CODES, EACH SPENT ALONE, AND A NEW SET FROM THE PROFILE.
 //
 // The request: "I want players to be able to click and see their account recovery code in their profile instead of it
 // being a one off thing" - and, of the three ways offered, "Lets just do #1": a set of codes the profile shows how many
@@ -44,7 +44,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

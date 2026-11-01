@@ -1,4 +1,4 @@
-// CSA-F (2026-09-27) - COME SAIL AWAY'S EFFECTS IN THE RUNTIME: systems/comeSailAway/comeSailAway.js's wake arm (Update 4737-4755),
+// CSA-F - COME SAIL AWAY'S EFFECTS IN THE RUNTIME: systems/comeSailAway/comeSailAway.js's wake arm (Update 4737-4755),
 // the two loops' play state and their fades (6527-6600), the rudder's drops at the helm, the wake and the oars' splashes
 // carried by a floating-origin shift, LateUpdate's bob and flag, and RotateWind's rain and snow - over the vendored hulls
 // (the real SpawnBoat and its real particle systems) and a scripted scene. Every expectation is worked out here from

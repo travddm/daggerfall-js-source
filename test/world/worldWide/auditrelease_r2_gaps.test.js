@@ -1,5 +1,4 @@
-// AUDIT RELEASE R2 - THE EXCLUSIONS AND GAPS (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md; the owner: "Take
-// care of exclusions and gaps"): what lane R2 recorded past the Bay, closed - R2-6 a vampire's crypt in a province. Each
+// AUDIT RELEASE R2 - THE EXCLUSIONS AND GAPS: what lane R2 recorded past the Bay, closed - R2-6 a vampire's crypt in a province. Each
 // pin fails on the head before its fix, and on its mutants (tools/mutants/auditrelease_r2_gaps.json).
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -74,7 +73,6 @@ test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s p
   const EV = { id: 'ab12cd34ef', rg: 64, loc: -1, px: WHITERUN.x, py: WHITERUN.y, nm: 'Whiterun', ct: 0, mt: [7, 12], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' };
   assert.deepEqual(validStaffEvent(EV), { ...EV, hp: 0 }, 'an area past the Bay');
   assert.equal(isAreaEvent(validStaffEvent(EV)), true);
-  // PIN MOVED (WW6, bible/03-World/World-Wide.md WW6): the raids stand past the Bay, and a town's event with them - where its
   // town does: a Bay location's index at a pixel past the Bay is refused by name (`town`), a town past the Bay's own index
   // there taken (test/world/worldWide/ww6_raids.test.js)
   assert.equal(staffEventFault({ ...EV, loc: 3, ct: 1 }), 'town', 'a Bay town\'s location at a pixel past the Bay: two sides of the edge');

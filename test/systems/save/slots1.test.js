@@ -1,5 +1,4 @@
-// SLOTS1 (Mac, 2026-09-12: "multiple save slots and then the ability
-// to choose which save to use in online"). THE LIST EXECUTES: every
+// SLOTS1. THE LIST EXECUTES: every
 // restorable slot most recent first, the stale-version one skipped,
 // the most-recent question riding the same walk; the front door's
 // pick seams hand a key and a name over ONCE; the doors that act on
@@ -51,8 +50,7 @@ test('SLOTS1: the pick seams hand a key and a name over once (mutant: a pick tak
   // the panes set them beside the verb the census pins
   const online = menu.slice(menu.indexOf('function paneOnline(body)'), menu.indexOf('function paneLoad(body)'));
   assert.match(online, /const saves = savedGames\(\);/);
-  // TILE2: a TILE per slot now, in one grid - Mac: "I want [this pane]
-  // reserved for a detailed tile based design for your saves". The
+  // TILE2: a TILE per slot now, in one grid. The
   // pressed one is still the character brought in.
   // REALM P1.5: the pressed slot is brought in through customs now (bringOnline) - a local slot never boots online
   assert.match(online, /body\.append\(tileGrid\(saves,[\s\S]*?onClick: \(\) => \{ if \(!realmBusy\) bringOnline\(save\); \},/,

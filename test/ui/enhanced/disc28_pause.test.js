@@ -1,5 +1,4 @@
-// DISC28-A (2026-09-28, EvoAva, Discord: "If you change the default pause key binding from escape to anything else,
-// it allows you to open pause menu with that key binding, but not close it").
+// DISC28-A.
 //
 // The host opens the enhanced pause screen on the PAUSE ACTION (inputActions 'Escape'), but the screen's own key
 // handler knew back only as overlayAction's literal Escape - so a pause rebound to P opened the screen and P then did

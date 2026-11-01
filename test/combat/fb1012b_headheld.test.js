@@ -2,7 +2,7 @@
 // above his collar and no head). composeWornArmor hides the head and the hair a helm takes (worn.shadows) before the
 // helm's own mesh is read or bound; a helm that then bound nothing - its mesh not in the archives, no shape its bone
 // takes, a parse that threw - was only a note, and the neck stood alone. The never-traps law ("every miss is a note and
-// the skin stands"): the rows a helm hid and never covered come back. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// the skin stands"): the rows a helm hid and never covered come back..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,9 +1,7 @@
 // @ts-check
 // THE HEADS AND HAIRS MORROWIND'S OWN DATA DOES NOT CARRY.
 //
-// MW-HEADS1 (2026-10-13, the owner: "Everything we are doing is for the morrowwind model. This batch is for breton",
-// with the export of three heads and their six paintings; asked who wears them: every Breton man - townspeople, NPCs
-// and a Breton player - in place of Morrowind's own Breton men's heads - bible/04-Characters/Own-Heads.md). The heads
+// MW-HEADS1. The heads
 // counterpart of ownArmorModels.js and ownClothingModels.js, and a leaf for the same reason: formats/morrowind/mwFirstPerson.js
 // asks it, and nothing it imports may reach back.
 //

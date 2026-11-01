@@ -1,6 +1,6 @@
-// HORSE-VOL, ANIMAL-VOL, SOUND-LIVE (2026-10-23): the Audio tab's Horse Volume and Animal Volume
+// HORSE-VOL, ANIMAL-VOL, SOUND-LIVE: the Audio tab's Horse Volume and Animal Volume
 // (systems/animalVolume.js) on every horse and animal the game plays, and the Sound Volume slider heard by the sounds
-// already playing (systems/audio.js _relevel). Design: bible/08-Audio/Audio.md, "HORSE-VOL, ANIMAL-VOL, SOUND-LIVE".
+// already playing (systems/audio.js _relevel). Design:, "HORSE-VOL, ANIMAL-VOL, SOUND-LIVE".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

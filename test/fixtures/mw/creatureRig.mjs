@@ -1,4 +1,4 @@
-// MWNPC9 (2026-10-09, bible/04-Characters/Morrowind-NPCs.md section 14): A CREATURE, AS MORROWIND SHIPS ONE. No
+// MWNPC9: A CREATURE, AS MORROWIND SHIPS ONE. No
 // committed fixture is a creature: every rig here is a skeleton with body parts worn on it. This writes one the way the
 // retail r/x*.nif files are built (tools/nifWrite.mjs, the reader's own field order) - a model that is its own
 // skeleton and its own body at once:

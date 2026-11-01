@@ -1,7 +1,6 @@
 // @ts-check
-// WB3 (2026-09-25, Mac: "an oversized enemy with telegraphed attacks (like wind ups, etc)", and Option B: the relay's
-// Durable Object is the authority over the boss): THE BOSS'S BRAIN - the whole of what the relay runs for a gate's
-// fight, as pure law. Design: bible/11-Multiplayer/World-Bosses.md sections 5-6.
+// WB3: THE BOSS'S BRAIN - the whole of what the relay runs for a gate's
+// fight, as pure law. Design:
 //
 // WHY THE RELAY CAN RUN THIS AND NOT A DUNGEON. Co-op's law is that the host's browser is the server, because a Durable
 // Object running the simulation would be a second copy of the game (11-Multiplayer/Multiplayer.md). The arena is built
@@ -46,15 +45,14 @@ export const BOSS_SPEED = 3.2;
 
 // ── WB9b: THE THREE COURTS ──────────────────────────────────────────────
 /**
- * WB9b (2026-09-30, Mac: "I want to add 2 more arena's of the same size that the boss leaps to between each phase. A
- * walkway should form to allow players to traverse through each arena"): THE COURTS - three floors of one size over the
+ * WB9b: THE COURTS - three floors of one size over the
  * one sea of fire, fought in turn: the Warden in the first (where the players arrive - this frame's origin), the Burning
  * Court in the second, Dagon's Champion in the third. West, then north: clear of the great tower's window
  * (render/deadlands.js SIGIL_TOWER, a little east of north), so the arrival's sightline to it stays as WB6a left it.
  * Each rim is some 24 m from the next - a walkway's length.
  */
 //
-// WB14b (2026-10-19, bible/11-Multiplayer/Breach-Portents.md section 2): AND THE FLOORS A PORTENT STANDS - every floor a
+// WB14b: AND THE FLOORS A PORTENT STANDS - every floor a
 // night may hold is one table (all of COURT_R), its index its name: the three courts, then the Vanguard's Muster and
 // Bridgehead south of the first (off its bridge's line), then the Captive's Pen east of it. A night's PLAN says which
 // stand (nightPlan); a plain night's is WB9b's three.
@@ -90,7 +88,7 @@ export const WALK_HALF_W = 3.2;
 export const WALK_LEAD_MS = 1000;
 export const WALK_FORM_MS = 4000;
 export const WALK_SINK_M = 2;
-/** WB14b: each walkway's floors, [from, to] - by its index (bible/11-Multiplayer/Breach-Portents.md section 2). */
+/** WB14b: each walkway's floors, [from, to] - by its index. */
 export const WALK_ENDS = Object.freeze([[0, 1], [1, 2], [0, 2], [4, 3], [3, 0], [0, 5]].map((e) => Object.freeze(e)));
 /** WB14b: the walkways by name (their index in WALKS). */
 export const WALKWAY = Object.freeze({ second: 0, third: 1, rift: 2, muster: 3, warden: 4, pen: 5 });
@@ -113,7 +111,7 @@ export function walkFormed(xa, k, now) {
 
 // ── WB14b: THE NIGHT'S FLOOR PLAN ───────────────────────────────────────
 /**
- * WB14b (bible/11-Multiplayer/Breach-Portents.md section 2): A NIGHT'S PLAN - the floors and walkways its portents stand
+ * WB14b: A NIGHT'S PLAN - the floors and walkways its portents stand
  * (net/gate/gateMods.js GATE_PORTENTS), and its ROOT, where its fighters arrive: every night his three courts and the
  * walkway to the second; the walkway to the third unless he sunders (his halves leave the first court by the second's
  * and by the Rift Way); the Vanguard's two platforms and their walkways, its Bridgehead the root; the Captive's Pen and its
@@ -266,7 +264,7 @@ export const SHIELD_MS = 3000;
 /** Phase three's wind-ups, shortened by a fifth (AUDIT WB14 PLAY-5: never the Chains' - a run from his far side at the
  *  ring, with a reaction's 400 ms, came short of their hold in phase three; and never Dagon's or the bound's). */
 export const PHASE3_WINDUP = 0.8;
-/** WBX5 (2026-09-26, Mac: "The boss phases need to be more defined and more detailed mechanics"): EACH PHASE HAS A NAME
+/** WBX5: EACH PHASE HAS A NAME
  *  AND A SHAPE. The Warden fights with his blade and his weight alone (Cleave, Ground Slam, Charge); the Burning Court is
  *  fire and reach (Hellfire and the Meteor leave the floor burning, the Flame Nova, the Crushing Leap at whoever stands
  *  far off); Dagon's Champion adds the Spokes of Dagon - four lanes of fire from his feet, and then the four between
@@ -296,8 +294,7 @@ export const PHASE_NAMES = Object.freeze(Object.defineProperties([], {
 // is from the word to the landing, `active` the landing's own span (the charge's run), `recover` his stillness after it.
 // `pool` (WBX5): the burning ground its landing leaves (POOLS).
 //
-// WBX4 (2026-09-26, Swololo on Discord: "boss damage is way too low. people who were dying were under 150 health and got
-// hit by mechanic twice, should be hp % based maybe + base damage"): EVERY SHARE RAISED AND A BASE BESIDE IT. A blow was
+// WBX4: EVERY SHARE RAISED AND A BASE BESIDE IT. A blow was
 // a share of the struck player's own health alone, and the health came back as fast as he took it (the court now keeps
 // no regeneration - WBX6, systems/courtRules.js). Now each attack takes a larger share and `base` points more, so two of
 // his landings leave anyone low and a third ends them - still his words at every level, the base a little heavier on a
@@ -307,7 +304,7 @@ export const PHASE_NAMES = Object.freeze(Object.defineProperties([], {
  *  the saving throw answers it). Resolved on the standing player's machine, as every strike is; the relay never learns
  *  of it, because every screen that saw the landing knows where it burns. */
 export const POOL_TICK_MS = 1000;
-/** WB9d (2026-09-30, Mac: "ensure his ground affects actually cause damage and the player recieves proper feedback"):
+/** WB9d:
  *  the ground bites harder - half again what WBX5 set (a second in it was 5% and 2 points, easy to stand through). */
 export const POOLS = Object.freeze({
   hellfire: Object.freeze({ r: 3, ms: 6000, pct: 0.08, base: 3 }),
@@ -325,7 +322,7 @@ export const GAZE_HALF_DEG = 50;
 export const GAZE_RANGE_M = 60;
 export const GAZE_BLIND_MS = 2000;
 //
-// WB9e (2026-09-30, Mac: "Increase boss damage, further improve his telegraphs"): EVERY SHARE AND BASE RAISED AGAIN, by
+// WB9e: EVERY SHARE AND BASE RAISED AGAIN, by
 // about a third over WBX4's - two of his heavy landings now end anyone who has not healed between them, and the Meteor
 // or the Nova alone takes most of a body. Still his words at every level; still every one escaped by moving (the pins
 // hold it under every set of marks), none of them faster.
@@ -334,7 +331,7 @@ export const ATTACKS = Object.freeze({
   slam: Object.freeze({ id: 1, key: 'slam', name: 'Ground Slam', windup: 1600, active: 200, recover: 1700, shape: 'disc', r: 7, pct: 0.52, base: 14, el: null, aim: 'self', phase: 1, range: 4, w: 2, minGap: 0 }),
   charge: Object.freeze({ id: 2, key: 'charge', name: 'Charge', windup: 1200, active: 900, recover: 1200, shape: 'lane', w: 2, width: 3.5, len: 22, pct: 0.40, base: 12, el: null, aim: 'target', phase: 1, range: 40, minGap: 8 }),
   hellfire: Object.freeze({ id: 3, key: 'hellfire', name: 'Hellfire', windup: 2000, active: 300, recover: 900, shape: 'disc', r: 3.5, max: 5, pct: 0.40, base: 9, el: 'fire', aim: 'players', phase: 2, range: 40, w: 2, minGap: 0, pool: POOLS.hellfire }),
-  // WB13a (2026-10-01, Mac: "hone in telegraphs"): its ring to 16 m - it ran to 30 on a floor of 24, so with him at the
+  // WB13a: its ring to 16 m - it ran to 30 on a floor of 24, so with him at the
   // heart (every phase turn puts him there) 26% of the floor in phase two and 47% in phase three could not get out
   nova: Object.freeze({ id: 4, key: 'nova', name: 'Flame Nova', windup: 2200, active: 300, recover: 1900, shape: 'ring', r0: 4, r1: 16, pct: 0.58, base: 14, el: 'fire', aim: 'self', phase: 2, range: 40, w: 1, minGap: 0 }),
   wrath: Object.freeze({ id: 5, key: 'wrath', name: "Dagon's Wrath", windup: 6000, active: 500, recover: 0, shape: 'all', pct: 9.99, base: 0, el: 'fire', aim: 'self', phase: 99, range: 999, w: 0, minGap: 0 }),
@@ -352,7 +349,7 @@ export const ATTACKS = Object.freeze({
   // crystals of Oblivion grow across the floor (RECKON_*); break every one and the Reckoning breaks and stuns him (STUN_MS);
   // leave one standing and it lands on the whole arena - his fire answered by nothing (Dagon's, as the Wrath's)
   reckon: Object.freeze({ id: 10, key: 'reckon', name: "Dagon's Reckoning", windup: 22000, active: 600, recover: 1800, shape: 'all', pct: 9.99, base: 0, el: 'fire', aim: 'self', phase: 99, range: 999, w: 0, minGap: 0 }),
-  // WB14a (2026-10-19, Mac: "More diabolical boss movesets"; bible/11-Multiplayer/Breach-Portents.md section 3): THE
+  // WB14a: THE
   // WARDEN'S NEW ARSENAL - six more he chooses (each name read through the text core where it is read - L10N4), each waiting a cooldown of its own from its last use (`cd`, ms) and, where
   // it asks a court of more than one, `nMin` living challengers in it. None of the eleven before has either. `relay: false`
   // - a blow the relay cannot judge from the poses it holds (net/bossRef.js judgeGate): the struck screen's alone.
@@ -373,7 +370,7 @@ export const ATTACKS = Object.freeze({
   // THE UNMAKING: every other one of `n` wedges about his court's heart (`tg[0]`), the first centred on his facing, out to
   // `r`; then - a recovery and a breath later - the other half (a second cast turned a wedge on, the Spokes' own trick)
   unmake: Object.freeze({ id: 16, key: 'unmake', get name() { return t('gate.attack.unmake', 'The Unmaking'); }, windup: 3000, active: 300, recover: 1000, shape: 'wedges', n: 8, r: COURT_R + 1, pct: 0.45, base: 12, el: null, aim: 'point', phase: 3, range: 40, w: 1, minGap: 0, cd: 45_000 }),
-  // WB14d (bible/11-Multiplayer/Breach-Portents.md section 5): THE SUNDERING - on a Sundering night, at the second phase's
+  // WB14d: THE SUNDERING - on a Sundering night, at the second phase's
   // turn, at his court's heart he tears in two (SUNDER_TURN; never chosen); and THE REJOINING - the halves met again at the
   // first court's heart, where he stands whole for his last stand. Each a disc about his feet, judged as any plain blow.
   sunder: Object.freeze({ id: 17, key: 'sunder', get name() { return t('gate.attack.sunder', 'The Sundering'); }, windup: 2600, active: 300, recover: 600, shape: 'disc', r: 8, pct: 0.45, base: 12, el: null, aim: 'self', phase: 99, range: 999, w: 0, minGap: 0 }),
@@ -409,9 +406,8 @@ export const CROSS_WAIT_MAX_MS = 30_000;
  *  challenger in the court) sets it to his profile's ward from then. */
 export const CROSS_WARD_MAX_MS = 45_000;
 
-// ── WB14d: THE SUNDERING (bible/11-Multiplayer/Breach-Portents.md section 5) ─────────────────────────────────────────
-// (2026-10-19, Mac: "the boss splitting and players having to split and navigate to beat both sides and then merging at the
-// end for its final stand (chance based encounter modifer)".) On a Sundering night the second phase's turn is no bound: he
+// ── WB14d: THE SUNDERING ─────────────────────────────────────────
+// On a Sundering night the second phase's turn is no bound: he
 // leaps to his court's heart and tears in two - RUHN'S BLADE (his body: `f` itself) and RUHN'S FLAME (his aspect's fire made
 // flesh: `f.sd.fl`, a body of its own stepped by the same beat through a view of the fight - flameView). With
 // SUNDER_SPLIT_MIN living challengers in the room the Blade bounds to the second court and the Flame to the third over the
@@ -481,7 +477,7 @@ export const THREAT_DECAY = 0.1;
  *  the court this share of the fight. */
 export const RECEIPT_SHARE = 0.02;
 export const STOOD_SHARE = 0.5;
-/** AUDIT WBX R1 (2026-09-26, Mac: "Do a comprehensive audit on everything so far"): A SHARE LEAVES WITH ITS FIGHTER. The
+/** AUDIT WBX R1: A SHARE LEAVES WITH ITS FIGHTER. The
  *  health an account brought stayed in him after it left - twenty throwaway accounts that said `in` and went made the
  *  Warden unkillable before the Wrath for everyone who stayed. A fighter absent from the court (no socket, no pose)
  *  this long takes its share out of his health at the fraction he stands at, and brings it back at the fraction he
@@ -494,7 +490,7 @@ export const SEAT_KEEP_MS = 30_000;
  *  stood alive in the court. It keeps a seat in a full court, and (AUDIT PRE-MERGE 0929 W1-1) it is what a fall must
  *  have behind it to feed a Soul-Hungry Warden. */
 export const hasPart = (p) => p.dealt >= RECEIPT_SHARE * p.share || p.stoodMs >= SEAT_KEEP_MS;
-/** COURT-WATCH (bible/11-Multiplayer/World-Bosses.md section 24): a full court's watcher asks it for a seat again this often
+/** COURT-WATCH: a full court's watcher asks it for a seat again this often
  *  (scenes/gate/gateCourt.js askAgain). A seat frees only as freeSeat frees one - a fighter gone with no real part in the
  *  fight (hasPart): one who fought keeps its seat, and its claim, for the whole fight (AUDIT PLAN-1000 G2). Here, beside the
  *  seat's law, because the relay holds a socket's asks to it (AUDIT PLAN-1000 G7). */
@@ -517,7 +513,7 @@ export const SCAR_POOLS = Object.freeze({
 export const FAVOURED_PHASE = Object.freeze({ hellfire: 1, meteor: 1, spokes: 2, brand: 1, torment: 1 });   // WB14a: the fire's own questions of a court, a phase early
 
 /**
- * WB8b (2026-09-28, Mac: "give him unique and different modifers on every 2 hour spawn"): A FIGHT'S PROFILE - the
+ * WB8b: A FIGHT'S PROFILE - the
  * numbers the brain and every screen read in place of the constants above, made from the fight's marks (`md`,
  * net/gate/gateMods.js: the day's draw, net/gate/gateLaw.js gateModsOf, kept on the fight and said in its state - one law, both
  * ends). The Warden unmarked - no `md`, a fight checkpointed before WB8 - is BASE_PROFILE, the constants exactly. The
@@ -842,8 +838,7 @@ export function topDealers(f, k) {
     .sort((a, b) => b.dealt - a.dealt || a.joinedAt - b.joinedAt).slice(0, k).map((q) => q.name);
 }
 
-/** GATE-UX (2026-10-01, Mac: "Develop a detailed damage chart after the boss kill, showing and ranking everyone's
- *  damage"): the most rows the chart the kill carries holds (net/wire.js GATE_CHART_MAX - pinned equal). A court of more
+/** GATE-UX: the most rows the chart the kill carries holds (net/wire.js GATE_CHART_MAX - pinned equal). A court of more
  *  fighters says its count (`fell.n`) and its first DAMAGE_CHART_MAX. */
 export const DAMAGE_CHART_MAX = 32;
 /**
@@ -865,11 +860,10 @@ export function damageChart(f) {
 
 // ═══ GATE-HEAL: HEALING ON THE ROUND-UP ════════════════════════════════════════════════════════════════════════════
 //
-// (2026-10-01, Mac: "Can we add a line on the damage round up showing the amount healed?" - each challenger's; "Like
-// for healers" - allies only.) What a fighter's game says another's spell healed in it is credited to the CASTER, for the
+// What a fighter's game says another's spell healed in it is credited to the CASTER, for the
 // chart alone; a heal on oneself is no one's. Only the one healed knows what moved (ALLY-CAST's law: the receiver
 // decides), so the receiver says it; what it says is believed within its own heal bucket, so no healer's figure can be
-// made absurd. It buys nothing: no receipt, no share, no threat, no spoils. bible/11-Multiplayer/World-Bosses.md
+// made absurd. It buys nothing: no receipt, no share, no threat, no spoils.
 // section 18.
 
 /** A fighter's reference health at a level, for its heal bucket - generous (DFU's bars run lower). */
@@ -912,7 +906,7 @@ export function earned(f, sub) {
 }
 /** How `sub` earned it, for the receipt: 'dealt' first (it is the stronger claim), else 'stood'. */
 export const earnedBy = (f, sub) => (f.players[sub]?.dealt >= RECEIPT_SHARE * (f.players[sub]?.share ?? Infinity) ? 'dealt' : 'stood');
-/** WB14g (bible/11-Multiplayer/Breach-Portents.md section 11): THE PORTENTS A KILL'S RECEIPT SAYS (net/gate/gateReceipt.js `p`) -
+/** WB14g: THE PORTENTS A KILL'S RECEIPT SAYS (net/gate/gateReceipt.js `p`) -
  *  the night's, a bit each (net/gate/gateMods.js portentBits), the Captive's only where he went free; 0 a plain night. Pure. */
 export const receiptPortents = (f) => portentBits((f?.pt ?? []).filter((id) => id !== 'captive' || f.cp?.f > 0));
 
@@ -932,7 +926,7 @@ export function pickTarget(f, bodies, rng) {
   return live[Math.floor(rng() * live.length) % live.length];
 }
 
-/** WB13f (2026-10-01, Mac: "AAA grade polish"): no attack more than REPEAT_MAX times running - with the fighters spread,
+/** WB13f: no attack more than REPEAT_MAX times running - with the fighters spread,
  *  phase one was the Charge in 36 of 50 attacks, 28 of them back to back; past it he walks in instead. A walk-in of
  *  REPEAT_WALK_MS breaks the run: one who keeps away from him is charged again (in phase one the Charge alone reaches
  *  past 7 m - a cap with no end would leave a fighter at range untouched). */
@@ -1362,9 +1356,8 @@ export function applyCrystalHit(f, sub, c, d, r, pose, now, seq = null) {
 
 // ── WB11b: HIS HOST - the Legion-Lord trial ─────────────────────────────
 /**
- * WB11b (2026-10-01 - Mac, offered adds in three kinds and asked four questions: "1. All three 2. Your choice 3. Your
- * choice 4. Trial rotation"): HIS HOST - the bodies the relay runs beside him under the Legion-Lord trial (net/gate/gateMods.js
- * `legion`; bible/11-Multiplayer/World-Bosses.md section 17). Section 9 left it: "No adds ... the relay could own simple
+ * WB11b: HIS HOST - the bodies the relay runs beside him under the Legion-Lord trial (net/gate/gateMods.js
+ * `legion`). Section 9 left it: "No adds ... the relay could own simple
  * ones as it owns the boss - later". Simple, as he is: each a point on an open floor, a health, a walk said once and
  * carried by every screen, and a blow wound up and laid on the ground. By wire id:
  *   0 the HARRIER - an Imp: in waves in the first phase, it runs at the challenger who stands farthest from him, and Bites
@@ -1379,7 +1372,7 @@ export const HOST_KINDS = Object.freeze([
   Object.freeze({ id: 0, key: 'harrier', r: 0.5, h: 1.5, speed: 5 }),
   Object.freeze({ id: 1, key: 'sapper', r: 0.7, h: 2.3, speed: 1.6 }),
   Object.freeze({ id: 2, key: 'bearer', r: 0.6, h: 2.2, speed: 0 }),
-  // WB14c (bible/11-Multiplayer/Breach-Portents.md section 4): THE VANGUARD'S KINDS, beside the Harrier (its Imps) - never on a
+  // WB14c: THE VANGUARD'S KINDS, beside the Harrier (its Imps) - never on a
   // Legion-Lord night, so never beside his host:
   //   3 the BRUTE - a Daedroth: it walks at the nearest fighter on its platform and Smashes the ground about itself
   //   4 the CASTER - a Daedra of his aspect (a Fire Daedra, a Frost Daedra, a Daedra Seducer, a Lich): it keeps
@@ -1389,7 +1382,7 @@ export const HOST_KINDS = Object.freeze([
   Object.freeze({ id: 3, key: 'brute', r: 0.8, h: 2.4, speed: 2.8 }),
   Object.freeze({ id: 4, key: 'caster', r: 0.6, h: 2.2, speed: 2.0 }),
   Object.freeze({ id: 5, key: 'markynaz', r: 0.9, h: 3.0, speed: 3.0 }),
-  // WB14e (bible/11-Multiplayer/Breach-Portents.md section 9): 6 the TITHE-IMP - an Imp at 1.3 of its size, burning gold,
+  // WB14e: 6 the TITHE-IMP - an Imp at 1.3 of its size, burning gold,
   // carrying the coven's tithe to its master: it runs from the nearest challenger, strikes nobody, and dives into the fire
   // TITHE_LIFE_MS after it rose; caught, its tithe is theirs who struck it. Any night, one in five, unannounced
   Object.freeze({ id: 6, key: 'tithe', r: 0.65, h: 1.95, speed: 6.8 }),   // AUDIT WB14 (PLAY-6): a chase - at 6.2 a lone chaser caught it in 5 s of its 22
@@ -1700,8 +1693,7 @@ function stepHost(f, now, here, rng, out, P) {
 }
 
 // ── WB14c: THE VANGUARD ─────────────────────────────────────────────────
-/** WB14c (2026-10-19, Mac: "the chance of a gate to spawn with platforms of wave based adds that need to be defeated before
- *  encountering the boss"; bible/11-Multiplayer/Breach-Portents.md section 4): the Vanguard's beat. Its first wave rises
+/** WB14c: the Vanguard's beat. Its first wave rises
  *  VG_OPEN_MS after a fighter stands on the Bridgehead; each next one when VG_WAVE_LEFT of the last or fewer still stand,
  *  or VG_WAVE_MAX_MS after it rose - a wave due with nobody on its platform waits for somebody. A wave's health is its team
  *  seconds of the platform's living challengers' whole reference damage (the crystals' law), shared over its bodies by
@@ -1895,7 +1887,7 @@ function stepVanguard(f, now, bodies, rng, out, P) {
 }
 
 // ── WB14e: THE TITHE-IMP (section 9) ──────────────────────────────────────────────────────────────────────────────
-/** WB14e (2026-10-19, Mac: "And whatever else you can cook up"): one night in five (net/gate/gateLaw.js gateTitheOf - not in
+/** WB14e: one night in five (net/gate/gateLaw.js gateTitheOf - not in
  *  the omen: the arc's one surprise, and it costs nobody anything), its moment after his wake, while he is in his first or
  *  second phase and a challenger stands before him, a Tithe-Imp rises at his court's rim farthest from him and runs from
  *  the nearest challenger (HOST_KINDS' 6.2 m/s, under a runner's 7.6), until it dives into the fire TITHE_LIFE_MS after it
@@ -1964,7 +1956,7 @@ function titheBeat(a, now, here, C, moves) {
 }
 
 // ── WB14f: THE CAPTIVE (section 7) ────────────────────────────────────────────────────────────────────────────────
-/** WB14f (2026-10-19, Mac: "And whatever else you can cook up"): ON A CAPTIVE NIGHT a knight of the Covenant kneels at the
+/** WB14f: ON A CAPTIVE NIGHT a knight of the Covenant kneels at the
  *  Pen's heart (who he is - net/gate/gateLaw.js captiveNameOf - is the screens'; the relay knows his gaolers). At his wake the
  *  walkway to the Pen rises (WALKWAY.pen), and as the first living challenger stands in the Pen his gaolers rise (AUDIT WB14
  *  LAW-8: sized then, for the fight's living challengers - at his wake the fight is the first few to come):

@@ -1,5 +1,5 @@
 // @ts-check
-// WILD-ALERT (2026-10-04, Mac: "Enemies alerted are given an exclamation point"): THE MARK OVER AN ALERTED FOE - a "!" in
+// WILD-ALERT: THE MARK OVER AN ALERTED FOE - a "!" in
 // the HUD lines' own face (outlined gold, the pixel stack), over the head of each wilderness foe that has noticed the
 // player (systems/encounters.js foeAlerted; systems/wild/wildAlert.js says when). It pops in as the foe notices, holds while
 // a fast traveller's clock is held for it (the host decides how long it stands - WILD_MARK_S in play), and goes.

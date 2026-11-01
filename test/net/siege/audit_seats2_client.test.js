@@ -1,4 +1,4 @@
-// AUDIT SEATS-2 (2026-10-02, Mac: "Can we do a deep comprehensive audit on everything") - THE CLIENT'S LANE: the seat
+// AUDIT SEATS-2 - THE CLIENT'S LANE: the seat
 // halls known late (C1), a fallen one's fall kept (C2), no battle drawn for the dead or a tab out of the seat (C4), the
 // board's Hall of Records read after the board closed shown over nothing (C5), a Charter Room chest pressed by a visitor
 // says whose it is (C6). `06-Systems/Online-Arc.md` AUDIT SEATS-2.

@@ -1,5 +1,5 @@
-// AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done"): THE SEATS
-// ARC'S OPEN ITEMS, FINISHED - each test one item the bible had left NOT YET (bible/11-Multiplayer/Seats-Arc.md,
+// AUDIT-SEATS: THE SEATS
+// ARC'S OPEN ITEMS, FINISHED - each test one item the bible had left NOT YET (,
 // `06-Systems/Online-Arc.md` AUDIT-SEATS). Driven through the real Worker over node:sqlite where the service is
 // touched (test/accountDb.mjs).
 import { test } from 'node:test';

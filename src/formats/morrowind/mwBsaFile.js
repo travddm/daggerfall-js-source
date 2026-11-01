@@ -24,8 +24,7 @@ export function normalizeBsaPath(path) {
   return String(path).toLowerCase().replace(/\\/g, '/');
 }
 
-// MW-LOAD (2026-09-08, Mac: "improve the load time when Morrowind
-// assets are enabled"): THE ARCHIVE IS OPENED, NOT READ. A retail set is
+// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ. A retail set is
 // three archives of 150-300 MB and the store handed each one back as a
 // whole ArrayBuffer - a structured clone of every byte, one to three
 // seconds per archive measured, before a single mesh was asked for -

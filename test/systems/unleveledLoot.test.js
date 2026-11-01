@@ -1,5 +1,4 @@
-// UL1 (2026-09-12) - UNLEVELED LOOT 1.1.2 (Ralzar), THE MOD, 1:1.
-// Mac: "Heres the next mod unleveled loot. Again 1:1"
+// UL1 - UNLEVELED LOOT 1.1.2 (Ralzar), THE MOD, 1:1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -198,7 +197,7 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   assert.equal(formulaOverride('randomMaterial'), null);
   let seen = 0; registerEnemyDeathHandler('t', () => { seen++; }); raiseEnemyDeath({ items: [] }); registerEnemyDeathHandler('t', null); raiseEnemyDeath({ items: [] });
   assert.equal(seen, 1);
-  // AUDIT VC6 (2026-09-18): the three kills raise it WITH the raiser's
+  // AUDIT VC6: the three kills raise it WITH the raiser's
   // own terms now - a handler that ROLLS (SURV2's corpse food) was
   // falling to Math.random and to an invented luck of 50, which made a
   // guards pin fail one run in eight. The shapes are pinned in

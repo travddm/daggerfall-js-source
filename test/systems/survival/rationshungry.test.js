@@ -1,4 +1,4 @@
-// RATIONS-HUNGRY (2026-10-03, Mac: "With C&C let it auto consume any rations in inventory when hungry"). Climates &
+// RATIONS-HUNGRY. Climates &
 // Calories' rations in the pack were eaten by themselves only once the player was STARVING (a day without a meal, and
 // starving's fatigue and Hard's stat loss on the way); now a sack is eaten as the player turns HUNGRY (12 hours). Not at
 // Peckish - a sack is a full meal - and never for a vampire, nor with the host's autoEat off. Over a jump (a rest, a

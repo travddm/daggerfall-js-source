@@ -1,4 +1,4 @@
-// PEER-CADENCE (2026-09-22): THE FIXTURE BODY RIG, shared. The arm
+// PEER-CADENCE: THE FIXTURE BODY RIG, shared. The arm
 // fixtures under this directory (armfp.nif, armfpidle.kf, the hand and
 // upperarm meshes, armfp.esm) stand a whole `createFpArm()` rig with a
 // third-person body when the ESM is given the two BODY records and the
@@ -166,7 +166,7 @@ export function clotRec(id, model, type, refs) {
   return Uint8Array.from([...enc('CLOT'), ...u32(body.length), 0, 0, 0, 0, 0, 0, 0, 0, ...body]);
 }
 
-/** AUDIT C6 (2026-09-26): THE WOLF'S THIRD-PERSON SKELETON - armfp.nif's own nodes, where they are, and a Chest and a
+/** AUDIT C6: THE WOLF'S THIRD-PERSON SKELETON - armfp.nif's own nodes, where they are, and a Chest and a
  *  Head beside them, so the robe's chest and WerewolfHead and WerewolfHair have bones to BIND to (armfp.nif is an arm:
  *  the head, the hair and the chest were notes, never pieces, and no pin saw them drawn). The idle .kf drives the arms
  *  it always drove. */

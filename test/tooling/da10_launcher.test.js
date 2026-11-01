@@ -1,6 +1,4 @@
-// DA10 (2026-09-29, Mac: "So this is an actual launcher now? Like
-// warframe?" - and to the offer of one that stays open with a Play button,
-// the latest patch notes and the player's options: "Yes please").
+// DA10.
 //
 // THE LAUNCHER STAYS. DA8's window was a splash that went away by itself
 // whenever it had nothing to ask; now it is the game's front door. It opens

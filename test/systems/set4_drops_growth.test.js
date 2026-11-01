@@ -1,5 +1,4 @@
-// SET4 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md sections 4-5; Mac: sets "come from any source, just
-// like weapons", and "Grow together"): WHERE SET PIECES COME FROM, AND HOW THEY GROW. The win: every door SIGIL1 stamps
+// SET4: WHERE SET PIECES COME FROM, AND HOW THEY GROW. The win: every door SIGIL1 stamps
 // at (lootRarity.js stampWonWeapons) now also rolls a set sigil on every Magic-or-better piece of armour and every shield
 // by SIGIL1's own chance law, one of the four sets of the world at even odds, and a fresh weapon sigil joins a set one
 // time in three - after SIGIL1's own draws, so theirs stay what they were. The drink: every worn set piece drinks the
@@ -223,7 +222,6 @@ test('SET4 the rise: said ONCE FOR A SET when its own rank - its lowest piece\'s
   assert.equal(sigilRank(a.sigil), 2);
   assert.deepEqual(r, { lines: [], rose: false }, 'a and b rose to Bright, c is still Faint: the set did not rise');
   r = drinkWorn(e, null, XP[1] - 10);
-  // PIN MOVED (SET-CATCHUP, Sigil-Sets.md section 5): a and b stand at Bright, so c drinks three times the XP up to it
   assert.equal(sigilRank(c.sigil), 2);
   assert.deepEqual(r, { lines: ['Your Dagon\'s Brand brightens: Bright.'], rose: true }, 'c caught up to Bright: the set rose with it');
   // the weapon in hand, its own set's line said in its place

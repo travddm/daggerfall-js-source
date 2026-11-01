@@ -1,4 +1,4 @@
-// AUDIT LOCKPICK (2026-10-26, the owner: "Audit this" - bible/01-Overview/audits/Audit-Lockpick.md): THE MACHINE'S
+// AUDIT LOCKPICK: THE MACHINE'S
 // PINS the audit found missing - each one a mutant that survived the slice's own tests.
 //   A2 - at DFU's 5%, no one delay after a lift sets every rise, at any Agility band (a blind rhythm set every pin).
 //   A6 - after the rise: the hang ends at the chance's window and the pin falls, the fall's first grace still sets and

@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GRAHT1 (bible/03-World/Graht-Oaks.md; the owner, 2026-10-25: "Vardenfell needs proper super tall low poly tree sprites
-// with branchs/leaves that expand to cover the sky. The current simple skybox method is very low quality and band
-// aided"): THE GRAHT-OAKS' HOST - Valenwood's giant trees in the streamed world, a module the jungle's host builds and
-// the trees' host frames (HOST-SPLIT, bible/01-Overview/Host-Split.md: scenes/fishHost.js is the shape; no line of
+// GRAHT1 (): THE GRAHT-OAKS' HOST - Valenwood's giant trees in the streamed world, a module the jungle's host builds and
+// the trees' host frames (HOST-SPLIT,: scenes/fishHost.js is the shape; no line of
 // bootWorld's). It owns:
 //   - THE STAND (stand): a pixel's trees as the terrain worker laid them (world/jungle/grahtOaks.js grahtSites), kept
 //     whole or not at all off the gate's clearing and the rocks, as every flat - its set (pixel-local, held on the built

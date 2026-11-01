@@ -1,5 +1,4 @@
-// SD16 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD16;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BLOWS SEEN (scenes/superDungeon/sdFx.js) - the Hour's landings,
+// SD16: THE BLOWS SEEN (scenes/superDungeon/sdFx.js) - the Hour's landings,
 // turns and fall as bursts of sparks on the gate's own spark pass, the camera shaken by how near they fell, the floor
 // lit. More kinds than the Warden's court throws and more shakes than his landings give; a fight first seen taken as it
 // stands; each landing once, where the law puts it (the Stomp's ring's dust where its front rolls); the Hour's own blows
@@ -109,7 +108,7 @@ test('SD16 THE HAND\'S LIGHT OUT OF ITS CHEST, the Volley\'s gears where each la
   r.s.rem = { x: 2, z: -3, yw: 0, mv: null, atk: blow(SD_BLOWS.hand, 1, T0 + 10, { x: 2, z: -3 }) };
   r.step(20);
   let b = r.fx.bursts(r.at());
-  // AUDIT SD III (V3, PIN MOVED): out of its chest along the beam's first bearing, past its body - never in its heart crystal
+  // AUDIT SD III (V3
   const g = handAngleAt(r.s.rem.atk, r.s.rem.atk.at), out = SD_REM.r + SD_HAND_FLASH_OUT;
   assert.equal(b.length, 1); assert.ok(near(b[0].at, at(2 + Math.sin(g) * out, SD_REM.h * 0.55, -3 + Math.cos(g) * out))); assert.equal(b[0].color, SD_FX_COLOR.gold);
   assert.deepEqual(r.shakes, []);
@@ -175,7 +174,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
   const g = rig({ ph: 3 }); g.fx.frame();
   g.s.cx = { i: 41, m: 50, c: [[6, 0, 50]] }; g.step();
   g.s.cx = null; g.step();
-  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');   // AUDIT SD III (V10, PIN MOVED): it went from the air with nothing to show for it
+  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');   // AUDIT SD III (V10
   // the slip, once
   const sl = rig(); sl.fx.frame();
   sl.s.h = sl.s.m * SD_SLIP_FRAC - 1; sl.step(); sl.step();
@@ -185,7 +184,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
 });
 
 test('SD16 ITS FALL: a burst out of its chest, the arena flashed white-gold and shaken; a column of brass as its body sinks; the way home\'s pale light where the way home rises, as it rises; nothing more of the fight; forgotten as the Hour is left', () => {
-  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);   // AUDIT SD III (V4, PIN MOVED): in the arena - the whole arena's shakes are its own
+  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);   // AUDIT SD III (V4
   r.s.rem = { x: 11.3, z: 11.3, yw: 0, mv: null, atk: null };   // against a pillar (SD_PILLAR_R on the diagonal)
   r.s.fell = { at: r.at() + 5, top: [], n: 1 };
   r.step(10);

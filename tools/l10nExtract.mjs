@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// L10N1b (2026-09-27): THE ENGLISH CATALOG, READ OFF THE SOURCE.
+// L10N1b: THE ENGLISH CATALOG, READ OFF THE SOURCE.
 //
 // The port's own strings are written where they are used - `t('menu.rail.new', 'New Game')` - so the English is the
 // code's and cannot drift from what the game shows. Translators, the pipeline (L10N6b) and the catalog checks need

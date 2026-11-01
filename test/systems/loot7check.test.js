@@ -1,5 +1,4 @@
-// LOOT7-CHECK - THE CHAMPIONS CHECKED (2026-10-01; bible/06-Systems/Loot-Arc.md section 17). Mac: "I want to check and see
-// if the special enemy types from our recent loot commit is working properly", then "Yes and fix the smaller things.
+// LOOT7-CHECK - THE CHAMPIONS CHECKED., then "Yes and fix the smaller things.
 // Just want this to be as detailed as possible". LOOT7's champions were driven through the real combat formula (the
 // five traits each did what its sentence says) and four things were found and fixed - each pin below failed on the code
 // before it:
@@ -7,8 +6,7 @@
 //     onto the copy and thrown away - no body ever kept one, and a champion's body (its source four tiers up) was where
 //     it was likeliest. Since the guns' removal the door's unique finds are the Ayleid stones (systems/ayleidStones.js).
 //   - CHAMP-HOVER: the World Tooltips plaque never names a HOSTILE foe (the mod's .cs:304-312), so a living champion's
-//     name - its trait - was never on it; a champion was made the mod's one recorded exception. HOVER-PLAIN (2026-10-03,
-//     Mac: "remove the crosshair tooltip. They should only have names/modifiers under their healthbar") retired it.
+//     name - its trait - was never on it; a champion was made the mod's one recorded exception. HOVER-PLAIN retired it.
 //   - CHAMP-SAID: the plaque and the target frame are the ENHANCED skin's, so on the classic skin nothing said a
 //     champion stood until it died, and no screen said what a trait does; the first blow either way now says both on
 //     the line every skin draws (DaggerfallUI.PopupMessage).
@@ -41,7 +39,7 @@ import { setValue, resetToDefaults } from '../../src/systems/settings/settings.j
 import { validFoeRecord } from '../../src/net/wire.js';
 import { ROOM_LOOT_OFF } from '../roomLootOff.mjs';   // PARTY-LOOT: the room's seams with no room
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
-import { appliedOwnerTm } from '../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount
+import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };   // AUDIT WORLD-EVENTS
@@ -72,7 +70,6 @@ test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - an Ayleid stone - 
     assert.deepEqual(body.items.map(said), list.map(said), `seed ${seed}: the body is the list`);
     if (body.items.some(isStone)) finds++;
   }
-  // PIN MOVED (guns removed): the count is the Ayleid stones' (50 in 6,000 at this champion's tier 12), not the Pellets'
   assert.ok(finds >= 15, `the find comes to bodies (${finds} in 6,000)`);
   // A FORCED FIND ON A BODY THAT WEARS ITS KIT: onto the body, the worn pieces untouched; a body with no list gets one
   const kitted = { items: [], level: 21, mobileType: 7 };
@@ -222,10 +219,10 @@ const foeRec = (mobileType = 0, entity = {}) => ({
 function killDoor() {
   const hud = [];
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes: [], _authority: true, ARENA_PUPPET_OWNER, feudWeakBlow: () => false, blowClassOf: () => null, opts: {},   // AUDIT FEUD: the hit door asks a blow's weakness (none here)
     lastPlayerFeet: [0, 0, 0], _ecvT: 0, foeDeps: null, playerEntity: { isPlayer: true, items: [] }, audio: {},
-    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame,   /* PIN MOVED (EG-E3): the joiner's find door */ markFoeStruck: () => {}, markConcealedHit: () => {},
+    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
     handleAttackFromPlayer: () => {}, damageShieldPool: (e, n) => n, noteFighter: () => {}, PARTY_ME: 'me', _sharedFoe: () => false, partyFoeLoses: (f, n) => n, fightN: () => 1,
     peerSoulTrapOf: () => null, attemptSoulTrap: () => ({ allowDeath: true }), isAzurasStarEquipped: () => false, fillEmptyTrap: () => false,
     hudText: { add: (l) => hud.push(l) }, SOUL_TRAP_TEXT: {}, setEnemyAlert: () => {}, sayEnemyDied, isClassEnemyId,
@@ -238,11 +235,11 @@ function joiner(self) {
   const hud = [];
   const foes = [foeRec(0), foeRec(7, { champion: 'vampiric' })];
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes, _layoutFoes: 2, _retyping: new Set(), _authority: false, isClassEnemyId, enemyEntityType, validFoeRecord, ...TRAIT_DOORS, opts: { selfId: () => self },
-    appliedOwnerTm,   // PIN MOVED (OWNER-CLOCK): the stream door's frame clock (net/ownerClock.js) - null outside a frame
+    appliedOwnerTm,
     renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, rollCorpseKit: () => [], addCorpseFood: () => {}, stampWonWeapons: () => {}, capFoeLoot: () => [], liveStat: () => 50,
-    dropFoeCard: () => null,   // PIN MOVED (AUDIT CARDS-6 A3): the copy's own card, drawn at the copy door - not this seam
+    dropFoeCard: () => null,
     playerEntity: { isPlayer: true, items: [] }, setFoeDead: (f, d) => { f.dead = d; }, retypeFoe: async () => false,
     sayEnemyDied, hudText: { add: (l) => hud.push(l) },
   };

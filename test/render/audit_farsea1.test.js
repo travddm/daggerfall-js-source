@@ -1,4 +1,4 @@
-// AUDIT FAR-SEA1 (2026-10-11, Mac: "Audit this") - five lanes on the frozen branch (`01-Overview/audits/Audit-FAR-SEA1.md`).
+// AUDIT FAR-SEA1 - five lanes on the frozen branch (`01-Overview/audits/Audit-FAR-SEA1.md`).
 // What they found and the fix pinned here: the fill shaded most of the screen's sea to show in a hundredth of it (P1);
 // the ring's sea was not the water's - another body, the full sun, no glint - so a step stood at the grid's edge, worse
 // than before wherever the edge stood inside the fog's ramp (L1, L2); the hole's buffer was built twice a crossing (P4).

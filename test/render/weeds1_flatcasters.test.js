@@ -1,4 +1,4 @@
-// WEEDS1 (2026-09-19, Mac: "its better, what else can we do?") - EVERY
+// WEEDS1 - EVERY
 // WEED IN THE WORLD WAS CASTING INTO THE 240-UNIT CASCADE.
 //
 // F5 already culls a caster too small to shadow a texel of the cascade it

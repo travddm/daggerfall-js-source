@@ -1,5 +1,4 @@
-// RVN11a - LOYALTY (bible/12-Enhanced-AI/Feud-Arc.md section 22.1 and 22.4; Mac, 2026-10-04: "more complex, less easy
-// to accomplish and more detailed", then "Go"). A sworn one's `companion.loyalty` (0-100, its personality's start)
+// RVN11a - LOYALTY (;, then "Go"). A sworn one's `companion.loyalty` (0-100, its personality's start)
 // moves with how it is kept: +3 a fight won at my side, +2 a day with me, +10 called back after its rest; -1 a day sent
 // away (never resting), -8 knocked out, -10 sent away a second time in a day, -15 one of its own kind executed in its
 // sight. Its word: Devoted (90+), Loyal, Wavering, Restless (under 20). Devoted: its blows x1.1, and "Behind you,

@@ -1,8 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SHIP-PVP (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - broadsides
-// between captains in the open sea, a ship wrecked and boarded, her hold a prize; bible/03-World/Eltheric-Ocean.md
-// SHIP-PVP): THE OPEN SEA'S GUNS REFEREED - the relay's half, beside the zone's own referee (net/wild/wildRef.js), on the
+// SHIP-PVP: THE OPEN SEA'S GUNS REFEREED - the relay's half, beside the zone's own referee (net/wild/wildRef.js), on the
 // same room state (`st` - its fighters: who stands in the zone, where, and what kin).
 //
 //   - A SHIP is a captain's at her helm in the open zone, said by her captain (`helm`: her hull, her toughness, her uid,

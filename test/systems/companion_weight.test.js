@@ -1,8 +1,8 @@
-// COMPANION-WEIGHT (2026-10-01, the field: "make the crew companions have a balanced inventory weight"). A crew
+// COMPANION-WEIGHT. A crew
 // companion's pack carried anything (COMPANION-KIT: "no weight cap"); it carries what a person of his strength can
 // now - Daggerfall's own MaxEncumbrance over his body's live strength. Storing into it takes what fits and refuses the
 // rest in his name, gold clamped the way the wagon clamps it; a pack filled past the limit before it keeps what it holds
-// and takes nothing more; taking out is never gated by it. AUDIT ECON (2026-10-01): driven through both real windows
+// and takes nothing more; taking out is never gated by it. AUDIT ECON: driven through both real windows
 // with the items and the body the game mints; a refused store writes no quest drop (C1); the classic panel shows his
 // load (C2); his LIVE body is read by his key, and a companion gone from the party takes nothing (C5).
 import '../modsOff.js';

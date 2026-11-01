@@ -1,5 +1,4 @@
-// TRADE-VIRT (2026-10-20, a player's audit of the trading windows, handed on by the owner; bible/07-Rendering/
-// Performance-Priority.md TRADE-VIRT) - THE TRADE COUNTERS TAKE VIRT'S LAW: a landed picture goes into its own tile
+// TRADE-VIRT - THE TRADE COUNTERS TAKE VIRT'S LAW: a landed picture goes into its own tile
 // (ui/enhanced/landingTiles.js, the law's one home - the pack's too), and a long list draws the rows on screen
 // (ui/virtualRows.js). Measured in the browser over the freeware ARENA2's pictures (tools/tradePerfProbe.mjs): a cold
 // counter of 1,000 pieces repainted itself 292 times while its pictures came in (106 s), and the trade between players,
@@ -112,7 +111,7 @@ test('TRADE-VIRT the trade between players: a cold picture landing goes into its
   });
 });
 
-// AUDIT TRADE-VIRT (2026-10-20, the owner: "ensure this is perfect and fidelity isnt lost"): before any long pack draws its pictures
+// AUDIT TRADE-VIRT: before any long pack draws its pictures
 test('AUDIT TRADE-VIRT a hover on a row whose picture has landed takes the title off the tile it shows NOW - the landing swapped the tile in place, and the row\'s hover held the initials tile it was built with, so the browser\'s own tooltip stood over the hover card (mutants: the tile the row was built with)', async () => {
   await coldPictures([[115, 6], [118, 6], [119, 6]], async (rig) => {   // pieces no test before this one has drawn: their pictures cold
     const view = mountEnhancedTrade(rig.host, counterHooks(rig.e));
@@ -361,7 +360,7 @@ test('TRADE-VIRT the trade between players: a verb of mine paints the window onc
   });
 });
 
-// ── AUDIT TRADE-VIRT (2026-10-20, the owner: "ensure this is perfect and fidelity isnt lost") ──────────────────────
+// ── AUDIT TRADE-VIRT ──────────────────────
 
 test('AUDIT TRADE-VIRT a resize measures the long lists again and repaints nothing - in the shop counter (a repaint took the focus out of the How-many field and lost the next key) and between players (a repaint put a typed stack count back to the whole stack) (mutants: the resize repaints)', async () => {
   await coldPictures([[113, 3], [116, 3]], async (rig) => {

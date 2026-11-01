@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF12 (2026-10-02, Mac: "2 and 4"; "lets just finish out everything
-// before merge") - THE ALCHEMY AND ENCHANTING LAYERS, AND DISENCHANTING:
-// the law both ends read. bible/06-Systems/Professions-Arc.md 1, 2, 3.3,
+// PROF12 - THE ALCHEMY AND ENCHANTING LAYERS, AND DISENCHANTING:
+// the law both ends read. 1, 2, 3.3,
 // 4.1, 4.3, 4.5, 9.3, 9.4 and 37 (as built).
 //
 // LAW 1: DFU'S MAKERS STAY 1:1. "Alchemy and Enchanting are layers over
@@ -101,8 +100,7 @@ export const BREWER = 'brewer', DISTILLER = 'distiller', MASTER_ALCHEMIST = 'mas
  *  counter sells (!brewFirstPays: Water Breathing, Levitation) makes ONE whatever the rank or the Brewer, else the
  *  Apothecaries' silver (a fifth of DFU's price) brewed into three potions sold online at half the shop's would be gold
  *  past the Bank (11 silver to 165 gold).
- *  CRAFT-PAYS (2026-10-21, the Discord's #feature-feedback: "The profit margin is also extremely low or even a loss";
- *  Professions-Arc.md section 48): TWO BELOW JOURNEYMAN, not one. A Novice's brew was one potion for the station's fee and
+ *  CRAFT-PAYS: TWO BELOW JOURNEYMAN, not one. A Novice's brew was one potion for the station's fee and
  *  a cauldron of herbs - a loss against the drop it competed with, on the very rungs a brewer climbs by brewing. The rungs
  *  above stand (two at Journeyman, a Brewer's three, three at Master): `prof_brews.count` is CHECKed 1 to 3
  *  (migration 0070), so a fourth is a table's rebuild, not a number's change. The counter's goods still brew one. */
@@ -146,7 +144,7 @@ const CHANCE_FIELDS = Object.freeze(['chanceBase', 'chanceMod', 'chancePerLevel'
 const chanceOwn = (s) => CHANCE_FIELDS.some((f) => (s?.[f] ?? 1) !== 1);
 /**
  * A POTENT POTION AS IT IS DRUNK (9.3: "+25% magnitude"): its four magnitude fields raised by the share, rounded. AUDIT
- * PROF12 A3 (Mac, 2026-10-03: "Potent lasts longer"): an effect whose magnitude is DFU's default (magnitudeDefault) has none
+ * PROF12 A3: an effect whose magnitude is DFU's default (magnitudeDefault) has none
  * to raise - +25% of 1 rounds to 1, and the fourteen such potions' Potent did nothing - so its DURATION is raised by the
  * same share instead, and its CHANCE where it has one of its own (chanceOwn): each the rounds or the percent DFU would give
  * at `casterLevel` (effects.js rollDuration and chanceValue, verbatim), the share of it added to the base, rounded - the

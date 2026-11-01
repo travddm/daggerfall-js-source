@@ -53,7 +53,7 @@ import {
  * pair's rate spent, and the letter written only while the reader's box has room - in ONE statement, so two letters
  * racing for the last place cannot both land.
  *
- * NAME-AS (2026-10-12): OR BY ACCOUNT (`toAccount`, an account id) - a friend's letter. A friends list is accounts (the
+ * NAME-AS: OR BY ACCOUNT (`toAccount`, an account id) - a friend's letter. A friends list is accounts (the
  * hub's), but the name it shows is the one the room reads, which since NAME-AS may be a character's: sent as a
  * username, a friend who wears their character's name could not be written to, and a name that IS somebody else's
  * username would have reached them. So the friend's row addresses the account itself (ui/socialPanel.js); every other
@@ -83,7 +83,7 @@ export async function sendLetter({ db, rand, nowS }, sender, { to, toAccount, su
   if (reader.id === sender.id) return { error: 'to-self' };
   if (await overRate({ db, nowS }, `mail:${sender.id}>${reader.id}`, LETTERS_PAIR_MAX, LETTERS_SENT_WINDOW_S)) return { error: 'mail-rate' };
   const id = mintId(rand);
-  // AUDIT SAFE CLIENT-7 (bible/11-Multiplayer/Chat-Safety-Arc.md section 2): A READER WHO BLOCKED THE SENDER never gets
+  // AUDIT SAFE CLIENT-7: A READER WHO BLOCKED THE SENDER never gets
   // the letter - its subject was a line in their chat - and the sender is answered as if it went: a block is never told
   // to the blocked (safety.js SAFE1). The rates above are spent all the same.
   if (await db.prepare('SELECT 1 AS y FROM blocks WHERE player = ?1 AND blocked = ?2').bind(reader.id, sender.id).first()) return { ok: true, id, to: account ? displayName(reader) : reader.handle };

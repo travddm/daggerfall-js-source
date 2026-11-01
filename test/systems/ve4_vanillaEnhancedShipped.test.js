@@ -1,4 +1,4 @@
-// VE4 (2026-10-05, Mac: "Put it in the codebase") - VANILLA ENHANCED SHIPS WITH THE PORT.
+// VE4 - VANILLA ENHANCED SHIPS WITH THE PORT.
 //
 // VE3 had the player attach carademono's Vanilla Enhanced, because it is Daggerfall's own textures repainted and
 // Port-Doctrine's A RENDER OF GAME DATA IS GAME DATA kept it out. Mac approved carrying it; the doctrine records the one
@@ -41,7 +41,7 @@ const INDEX = json('vendor/vanilla-enhanced/vanilla-enhanced.index.json');
 const BASE = 'dfmod/vanilla enhanced - base.dfmod';
 const MASKED = 'dfmod/vanilla enhanced - masked roads.dfmod';
 const SNOWLESS = 'dfmod/vanilla enhanced - snowless swamps and jungles.dfmod';
-// ALIKR1 / SNOWFALL1 (2026-10-08): the two environment packs ship through the same door, on by default and built on the
+// ALIKR1 / SNOWFALL1: the two environment packs ship through the same door, on by default and built on the
 // Base (test/systems/environs_texturePacks.test.js holds their own law); a pin over the whole door names them in their places
 const SANDS = 'dfmod/sands of the alikr.dfmod';
 const SNOWFALL = 'dfmod/snowfall.dfmod';
@@ -132,7 +132,6 @@ test('VE4 the index: the shape an attached copy\'s index has, at the door\'s ver
 });
 
 test('VE4 the door: the shipped mods register beside the attached in one load order - the Base ON by default, its add-ons off (AUDIT VE), the player\'s choice either way on its own shelf entry; switched on, their names are on the doors and drawn from the port\'s files; an attached copy shadows one and its removal brings the shipped one back as it was; a clear of the attached leaves them (mutants: the Base off by default; the attached copy not shadowing; the shipped mod read from the store; the clear taking the shipped)', async () => {
-  // PIN MOVED (AUDIT VE, Mac: "Ensure this is on by default"): VE4 shipped every mod OFF until worn
   fresh();
   installVanillaEnhancedPack();
   assert.deepEqual(attachedDfmods().map((m) => [m.key, m.shipped, m.enabled]), [[BASE, true, true], [SANDS, true, true], [SNOWFALL, true, true], [MASKED, true, false], [SNOWLESS, true, false]], 'in load order: the Base on, its add-ons off; the environment packs, built on it, on');
@@ -192,7 +191,7 @@ test('VE4 the ground, over the real index: the Base\'s arrays dress the terrain 
   fresh();
   installVanillaEnhancedPack();
   setDfmodEnabled([SANDS, SNOWFALL], false);   // ALIKR1/SNOWFALL1: Vanilla Enhanced's law alone - the packs' over it is test/systems/environs_texturePacks.test.js
-  setDfmodEnabled(BASE, false);   // PIN MOVED (AUDIT VE): the Base is on by default - switched off, the classic set
+  setDfmodEnabled(BASE, false);
   assert.equal(await dfmodGroundLayers(302, classicTex(56)), null, 'off: the classic set');
   setDfmodEnabled(BASE, true);
   assert.deepEqual(groundSource(302), { kind: 'array', key: BASE, name: '302-TexArray', depth: 56 });
@@ -250,13 +249,12 @@ test('VE4 the client: a texture asked at the texture detail is the mip a bundle 
 });
 
 test('VE4 the card over the shipped pack: Vanilla Enhanced is a fresh game\'s look (AUDIT VE) - the Base alone, the add-ons off until picked on the card; an add-on picked is kept across a turn to Classic and worn again with the Base (mutants: the add-ons worn by default; the pick not kept; Classic forgetting the add-ons)', () => {
-  // PIN MOVED (AUDIT VE, Mac: "Ensure this is on by default"): VE4's fresh game was Classic
   fresh();
   const tex = OVERHAUL_PANELS.find((p) => p.id === 'texture');
   const [classic, ve] = tex.options;
   assert.equal(currentOption(tex), ve, 'a fresh game wears Vanilla Enhanced');
   // ALIKR1/SNOWFALL1: the environment packs are built on the Base, so the card offers them beside its own add-ons - on by
-  // default (Mac: "These should be on by default"), kept across Classic as the add-ons are
+  // default, kept across Classic as the add-ons are
   assert.deepEqual(ve.addons().map((m) => m.title), ['Sands of the Alik\'r', 'Snowfall', 'Vanilla Enhanced - Masked Roads', 'Vanilla Enhanced - Snowless Swamps and Jungles']);
   wearVanillaEnhanced();
   assert.ok(veWorn());
@@ -280,11 +278,9 @@ test('VE4 the card over the shipped pack: Vanilla Enhanced is a fresh game\'s lo
 });
 
 test('VE4 wiring: the store\'s one registration puts the pack in before the attached register, and the boot seam calls it; the packs card lists it before any host boots; the paper doll\'s HD compose waits for a mod carrying doll art (AUDIT VE R13)', () => {
-  // PIN MOVED (AUDIT VE R2): the boot seam's registration is the store's one, which puts the pack in first
   assert.match(src('scenes/shared.js'), /const textures = registerTextureStore\(\)/);
   assert.match(src('scenes/dataSource.js'), /installVanillaEnhancedPack\(\);   \/\/ VE4[^\n]*\n\s+const names = await storedTextureNames\(\);/);
-  assert.match(src('ui/enhanced/enhancedMenu.js'), /function packsCard\(\) \{\n[^\n]*\n\s+installVanillaEnhancedPack\(\);/);   // PIN MOVED (AUDIT VE R2): after the wait for the store
-  // PIN MOVED (AUDIT VE R13): a mod switched on that carries doll art, not any attached mod
+  assert.match(src('ui/enhanced/enhancedMenu.js'), /function packsCard\(\) \{\n[^\n]*\n\s+installVanillaEnhancedPack\(\);/);
   assert.match(src('ui/paperDoll.js'), /const composeScale = \(\) => \(dfmodCarriesDollArt\(\) \? PAPERDOLL_HD_SCALE : 1\);/);
   assert.match(src('systems/vanillaEnhanced/vanillaEnhanced.js'), /const doorMods = \(\) => \{ installVanillaEnhancedPack\(\); return attachedDfmods\(\); \};/);
 });

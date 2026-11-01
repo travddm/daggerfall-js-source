@@ -29,7 +29,7 @@
 // `typedChar` already reads both spellings of a character; the three
 // control keys are read both ways here, so one box serves every host.
 //
-// AUDIT-CM (2026-09-21) brought the class to the C# on four counts the
+// AUDIT-CM brought the class to the C# on four counts the
 // first cut had wrong: the TextBox has a CURSOR (Left/Right/Home/End,
 // Delete at it, Backspace before it, insertion at it - TextBox.cs
 // :352-409); a NUMERIC field takes a shifted digit by its key
@@ -168,7 +168,7 @@ export class InputMessageBoxWindow {
 
   draw(renderer, canvas, font, s = null) {
     const entry = this.entryText();
-    // AUDIT HCC U5 (Mac: "any new notifications or UI elements are enhancified"; FONT1: "Any enhanced UI or text must
+    // AUDIT HCC U5 (; FONT1: "Any enhanced UI or text must
     // be our enhanced version"): THE FACE IS THE SKIN'S, THE FIELD IS DFU'S. Under the enhanced skin the box is its
     // own window in the skin's face (ui/enhanced/enhancedInputBox.js - ENH-NOTICE1's law kept: a field is a decision, never a
     // click-anywhere notice) and nothing is painted here. The model does not move: the host still routes every key

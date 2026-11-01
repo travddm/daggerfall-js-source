@@ -359,7 +359,7 @@ test('MARKET-ANY client: the pack side offers what may go and says why the rest 
   const words = eve.goods.goods().map((g) => [g.item.templateIndex, g.why]);
   assert.deepEqual(words, [[weapon.templateIndex, null], [570, 'bound to you'], [ARROW_TEMPLATE, 'arrows go in a quiver'], [armour.templateIndex, 'locked - unlock it first'],
     [9999, 'not an item the market knows']]);
-  // INT1 (PIN MOVED): a piece of no template is one no honest client holds - the judge holds the trade of a character whose
+  // INT1 (
   // checkpoint carries one (server-account/src/judge.js) - so it says its word above and leaves the pack before the act
   eve.entity.items.splice(4, 1);
   const sword = eve.entity.items[0];
@@ -415,7 +415,6 @@ test('MARKET-ANY client: the pack side offers what may go and says why the rest 
 });
 
 test('MARKET-ANY client: a collected piece this game will not hold - or an answer that is a repeat - ends the session (a join reads the record), never a second piece (mutants: received regardless; the repeat received)', async () => {
-  // PIN MOVED (RPT1026-MARKET COLLECT-LANDED): a repeat that names the record's sequence is this ask's own collect, its
   // first answer lost, and is received (test/net/rpt1026_market_arrive.test.js) - the repeat the service answers a collect
   // made before this ask names none, and still ends the session
   for (const answer of [{ ok: true, status: 200, data: { item: { ...sigilStone() }, realm: { seq: 2 } } }, { ok: true, status: 200, data: { repeat: true, item: { templateIndex: 113, group: 'Weapons', name: 'Dagger' } } }]) {
@@ -439,8 +438,8 @@ test('MARKET-ANY tab: Goods after the Auctions - each piece its name, condition,
   const theirs = mintPiece({ recipe: 'dagger:iron', quality: 1, seed: 77, maker: 'Mac' }, 'fedcba9876543210');
   const eve = await playing(s, 'Eve', { items: [plain(weapon), sigilStone(), plain(armour), plain(own), plain(theirs)] });
   const mac = await s.registered('Mac');
-  // INT2 (PIN MOVED): each row the piece's own template - the judge reads a crafted piece's provenance against the template
-  // the service minted it for (server-account/src/judge.js judgeProducts); PIN MOVED (its audit): and its own quality -
+  // INT2 (
+  // the service minted it for (server-account/src/judge.js judgeProducts)
   // a piece claiming a quality past its row's is no craft
   for (const [who, piece] of [[eve.who, own], [mac, theirs]]) {
     s.raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at) VALUES (?, ?, ?, 'x', ?, ?, ?, ?, 1, 'p1.x', ?)`).run(piece.provenance, who.id, who.character, piece.recipe, piece.templateIndex, piece.material ?? 0, piece.quality, _now);
@@ -469,7 +468,6 @@ test('MARKET-ANY tab: Goods after the Auctions - each piece its name, condition,
   const selects = () => [...root.querySelectorAll('select')];
   buttons().find((b) => b.textContent === 'My listings').onclick();
   await until(read(tab, 'mine'), 'My listings read');
-  // PIN MOVED (PACK-PICK): the kinds are presses, the pack's first - and a realm character's form opens on it
   const kindPress = (k) => buttons().find((b) => b.getAttribute('data-kind') === k);
   assert.deepEqual(buttons().filter((b) => b.getAttribute('data-kind')).map((b) => b.getAttribute('data-kind')), ['item', 'material', 'piece', 'auction']);
   assert.equal(kindPress('item').getAttribute('aria-pressed'), 'true', 'the pack\'s form first');
@@ -479,13 +477,13 @@ test('MARKET-ANY tab: Goods after the Auctions - each piece its name, condition,
   // a crafted piece: Eve's own alone, the other named
   kindPress('piece').onclick();
   assert.deepEqual(tiles().map((b) => b.getAttribute('data-focus')), [`list-piece|piece|${own.provenance}`]);
-  assert.match(text(), /1 crafted piece you hold is made by another player, and only the maker can sell it as crafted\. List it from your pack for gold instead\./);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the words cut
+  assert.match(text(), /1 crafted piece you hold is made by another player, and only the maker can sell it as crafted\. List it from your pack for gold instead\./);   // AUDIT 657 D7: BOARD-UI (
   // a piece from the pack: the looted pieces and Mac's make; the stone and Eve's own make said, each on its own tile
   kindPress('item').onclick();
   assert.deepEqual(tiles().map((b) => named(b, 'packpick-name')), [eve.goods.goodName(weapon), eve.goods.goodName(armour), eve.goods.goodName(theirs)]);
   assert.deepEqual([...root.querySelectorAll('.packpick-refused')[0].querySelectorAll('.packpick-tile')].map((n) => [named(n, 'packpick-name'), named(n, 'packpick-why')]),
     [['Deadlands Ember', 'bound to you'], [eve.goods.goodName(own), 'made by you. List it as a crafted piece']]);
-  assert.match(text(), /No fee to list\. Up for 72 hours on every board\. If it sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\. It leaves your pack now and comes back if it does not sell\./);   // AUDIT 657 B9 (PIN MOVED): the 1% the sale's fee; BOARD-UI (PIN MOVED): its form says gold, its terms one line
+  assert.match(text(), /No fee to list\. Up for 72 hours on every board\. If it sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\. It leaves your pack now and comes back if it does not sell\./);   // AUDIT 657 B9 (
   assert.equal(selects().some((x) => x.getAttribute('aria-label') === 'Currency'), false, 'no Drakes to choose');
   // PACK-PICK: none chosen until a tile is pressed - a sale takes it out of the pack - and the one pressed looked at
   assert.equal(buttons().find((b) => b.textContent === 'List').disabled, true, 'nothing chosen yet');
@@ -505,7 +503,7 @@ test('MARKET-ANY tab: Goods after the Auctions - each piece its name, condition,
   await until(() => eve.entity.items.some((it) => it.templateIndex === weapon.templateIndex) && !eve.book.busy && read(tab, 'mine')(), 'the piece collected');
   assert.ok(eve.entity.items.some((it) => it.templateIndex === weapon.templateIndex), 'back in the pack');
   assert.ok(s.record(eve.who).save.items.some((it) => it.templateIndex === weapon.templateIndex), 'and the record');
-  // listed again for the Goods view below - PIN MOVED (PACK-PICK): its tile pressed, the form still on the pack
+  // listed again for the Goods view below
   assert.equal(kindPress('item').getAttribute('aria-pressed'), 'true');
   tiles().find((b) => named(b, 'packpick-name') === eve.goods.goodName(weapon)).onclick();
   const again = [...root.querySelectorAll('input')].find((i) => i.getAttribute('data-focus') === 'list-price');
@@ -560,10 +558,10 @@ test('MARKET-ANY service: a listing the decision cannot write - the thirtieth pl
 });
 
 test('MARKET-ANY wiring: the host builds the pack side over the live player (a piece another book keeps left out), hands the tab its goods, a piece\'s listing and a record\'s name, and the book the realm act\'s abandon and the collect\'s receive; the service routes the list and the collect with the realm\'s records (mutants: the keeper unasked; the tab\'s goods unwired; the routes without R2)', () => {
-  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');   // PIN MOVED (BAY-LEFT-SEA): HOST-SPLIT - the market's pieces and hubs moved out of bootWorld to scenes/marketPiecesHost.js
-  assert.match(w, /const marketGoods = createMarketGoods\(playerEntity, \{ kept: \(pv\) => pieceKept\(pv\), say: \(t\) => host\.townTalk\.say\(t\) \}\);/);   // PIN MOVED (BAY-LEFT-SEA): the moved module reads the HUD's talk live, as the host did
+  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');
+  assert.match(w, /const marketGoods = createMarketGoods\(playerEntity, \{ kept: \(pv\) => pieceKept\(pv\), say: \(t\) => host\.townTalk\.say\(t\) \}\);/);
   assert.match(w, /drop: marketDrop, goods: \(\) => marketGoods\.goods\(\), good: \(it\) => marketGoods\.good\(it\), goodName: \(rec\) => marketGoods\.goodName\(rec\),/);
-  assert.match(w, /abandon: \(why\) => realmSession\.abandon\(why\) \} : null, goods: realmSession \? \{ receive: \(rec, why\) => marketGoods\.receive\(rec, why\) \} : null,/);   // PIN MOVED (RPT1026-MARKET ARRIVE): the road's word handed through
+  assert.match(w, /abandon: \(why\) => realmSession\.abandon\(why\) \} : null, goods: realmSession \? \{ receive: \(rec, why\) => marketGoods\.receive\(rec, why\) \} : null,/);
   const index = src('server-account/src/index.js');
   assert.match(index, /'\/v1\/market\/list': \(\) => marketList\(mctx, who\.player, env, body\),/);
   assert.match(index, /'\/v1\/market\/collect': \(\) => marketCollect\(mctx, who\.player, env, body\),/);

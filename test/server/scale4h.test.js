@@ -1,5 +1,4 @@
-// SCALE4h (2026-10-11, the plan's eighth slice - "10k writes, by the metrics"; Mac: "I wanna do every single slice";
-// bible/11-Multiplayer/Scale-Arc.md SCALE4h): THE HOT ROWS, WRITTEN LESS. A fighter's Renown reported at the minute's
+// SCALE4h: THE HOT ROWS, WRITTEN LESS. A fighter's Renown reported at the minute's
 // pace only while its answer says what the page cannot (net/renownTracker.js renownReportSoon, the service's `room`),
 // nothing earned in an hour the bound has spent, a session touched once an hour, and the metrics that say which rows a
 // route writes (server-account/src/metrics.js: a first()'s rows, rows by table, a heartbeat's parts).
@@ -101,7 +100,7 @@ test('SCALE4h the service says what the hour still takes: after each report, the
   const g = await S.guest();
   // INT16 (Integrity-Arc section 7): a report is asked of the account's SEATED realm character - the guest seats one, and
   // the offline id this pin reported for is refused before the route reads a word
-  assert.deepEqual(await S.call('/v1/renown/xp', { character: 'char-cccc', xp: 250 }, g.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id earns nothing');   // PIN MOVED (INT16, Integrity-Arc section 7): this pin's guest was credited for an offline id; a report names the account's seated realm character now
+  assert.deepEqual(await S.call('/v1/renown/xp', { character: 'char-cccc', xp: 250 }, g.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id earns nothing');
   const C = (await seatRealm(S.env, g.secret, 'Cass')).id;
   const res = await S.call('/v1/renown/xp', { character: C, xp: 250 }, g.secret);
   assert.equal(res.status, 200);
@@ -114,7 +113,6 @@ test('SCALE4h the service says what the hour still takes: after each report, the
 test('SCALE4h a fighter\'s hour, measured: Renown reported far less often at the SCALE4h law, the rise still reported at the minute\'s pace (tools/hotWritesBench.mjs over the real Worker; mutants: the law unwired)', async () => {
   const quiet = console.warn; console.warn = () => {};
   try {
-    // PIN MOVED, AUDIT SCALE II D-8: the counts exactly, and each rise's report within RENOWN_REPORT_MS of the minute that
     // earned it - `<= 7`, `>= 5` and `level > 2` all held with the rise rule replaced by `return false` (bench's `rises`)
     const r = await playerHour({ role: 'fighter', minutes: 30, xp: 40, renown: 20 });
     assert.equal(r.routes['/v1/renown/xp'].requests, 6, `${r.routes['/v1/renown/xp'].requests} reports in half an hour (the minute's law made 29): the first, then every RENOWN_COALESCE_MS`);
@@ -181,7 +179,7 @@ test('SCALE4h the point says the tables written, the hot rows each as its own do
   let heard = null;
   const serve = async (req, env, said) => {
     heard = await req.json();
-    said.parts = heartbeatPartsOf(heard);   // PIN MOVED (AUDIT SCALE II A-3): the service says the parts of the body it read
+    said.parts = heartbeatPartsOf(heard);
     await env.DB.batch([env.DB.prepare('UPDATE players SET a = 1'), env.DB.prepare('UPDATE sessions SET b = 1'), env.DB.prepare('UPDATE realm_characters SET c = 1')]);
     return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } });
   };
@@ -191,7 +189,7 @@ test('SCALE4h the point says the tables written, the hot rows each as its own do
   assert.equal(points[0].blobs[4], 'realm_characters:3 sessions:2 players:1');
   assert.equal(points[0].blobs[5], 'beat,board,post', 'the parts asked, in the heartbeat\'s order - a part said false is not one');
   assert.deepEqual(points[0].doubles.slice(7), [1, 2, 0, 3], 'players, sessions, renown_tracks, realm_characters');
-  assert.equal(heartbeatPartsOf('not an object'), '');   // PIN MOVED (AUDIT SCALE II A-3): a body, not a request
+  assert.equal(heartbeatPartsOf('not an object'), '');
   assert.equal(heartbeatPartsOf(null), '');
   // over the real Worker: a heartbeat's beat - a first() write - is a row written on its point now
   const S = await standService();
@@ -203,5 +201,5 @@ test('SCALE4h the point says the tables written, the hot rows each as its own do
   assert.equal(p.blobs[5], 'beat');
   assert.ok(p.doubles[3] >= 1 && p.doubles[7] >= 1, `the beat's row written, and the account's row its hot row (${p.doubles[3]}, ${p.doubles[7]})`);
   assert.equal((await S.call('/v1/account/played', { beat: true }, g.secret)).status, 200);
-  assert.equal(live.at(-1).blobs[5], '', 'another route says none, whatever its body holds');   // PIN MOVED (AUDIT SCALE II A-3)
+  assert.equal(live.at(-1).blobs[5], '', 'another route says none, whatever its body holds');
 });

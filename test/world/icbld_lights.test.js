@@ -1,5 +1,4 @@
-// BLD (2026-10-26, the owner, having walked the Imperial City: "... and no lighting sources like the original layouts";
-// bible/03-World/Arena-Provinces.md IC-GRAND, BLD) - THE FABRIC'S LIGHTS, pinned: Daggerfall's own lamp-posts (TEXTURE.210
+// BLD - THE FABRIC'S LIGHTS, pinned: Daggerfall's own lamp-posts (TEXTURE.210
 // light flats) along its streets at its own blocks' density, in the block as a block's light flats are and lit by their
 // law; and its facades' glass handed to the window upload, lit after dark as Daggerfall's windows are.
 import { test } from 'node:test';

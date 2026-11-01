@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21 (bible/01-Overview/bugs/Field-Bugs-2026-10-21.md): the owner's screenshot - a snowy range under
+// FIELD BUGS 2026-10-21: the owner's screenshot - a snowy range under
 // its woods, and up its side a straight band of green ground with no snow and no tree on it.
 //   SNOW-FACE: on the snow lane a steep face shed its snow (SNOW_GROUND.slope, the normal's y 0.62 to 0.8), and what lay
 //   under it was the summer set's grass - Daggerfall's tiles have no rock face - while DFU's own TerrainNature refuses a

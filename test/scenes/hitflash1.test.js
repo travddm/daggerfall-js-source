@@ -1,4 +1,4 @@
-// HITFLASH1 (2026-09-26): a struck body flashes red (foes, peers, Morrowind bodies), and a puppet foe's hurt is held
+// HITFLASH1: a struck body flashes red (foes, peers, Morrowind bodies), and a puppet foe's hurt is held
 // until its sprite can take it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

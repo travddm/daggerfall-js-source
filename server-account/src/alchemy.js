@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF12 (2026-10-02, Mac: "2 and 4"; "lets just finish out everything
-// before merge") - ALCHEMY'S BREW AND ENCHANTING'S DISENCHANT, AS THE
-// SERVICE KEEPS THEM (bible/06-Systems/Professions-Arc.md 3.3, 4.3, 9.3,
+// PROF12 - ALCHEMY'S BREW AND ENCHANTING'S DISENCHANT, AS THE
+// SERVICE KEEPS THEM (3.3, 4.3, 9.3,
 // 37; the law is src/net/alchemyLaw.js, which the client reads too).
 //
 // TWO DOORS, ONE BOOK (9.3). DFU's own potion maker and item maker stay
@@ -299,7 +298,7 @@ async function reforgeAnswer(db, player, row, nowS, extra = {}) {
 /**
  * A REFORGE WITH ESSENCE (CRAFT4, Professions-Arc 41.2 and 41.7): `{ character, tier, count?, rid }` - an Enchanter of
  * rank 50 (temperLaw REFORGE_RANK; `prof-rank`) spends 2 Arcane Essence for a Magic piece's line or 5 for a Rare's the
- * first time - REFORGE-REPLACE (the owner: "Replace, price rises"): doubled for every reforge the piece has taken,
+ * first time - REFORGE-REPLACE: doubled for every reforge the piece has taken,
  * `count` (absent, none - a page from before the count) - (temperLaw reforgeEssence - Legendary and up, or a count no
  * piece holds, none: law 7, `prof-reforge`), never gold's units (FB1020h ESSENCE-LOOSE: a station's
  * spend - loose units first, then bought, then own, as a craft's), and is answered the seed the line

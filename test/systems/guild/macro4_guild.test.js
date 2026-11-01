@@ -1,4 +1,4 @@
-// MACRO-4 (2026-09-22, the macro audit): THE GUILD IS THE SOURCE.
+// MACRO-4: THE GUILD IS THE SOURCE.
 // DFU hands a guild's own GuildMacroDataSource to every box its popup
 // shows: %lev and %pct are the rank title (MacroHelper :128, one row),
 // a temple answers %god, %fon and %gdd off its deity

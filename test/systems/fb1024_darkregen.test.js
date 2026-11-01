@@ -3,7 +3,7 @@
 // inDarkness"): Regens Health: In Darkness healed nothing in any host. RegensHealth.cs:97-98 asks
 // PlayerEnterExit.IsPlayerInDarkness, which is `!isPlayerInSunlight` (PlayerEnterExit.cs:201). No pin had ever run
 // that arm (E1's fed the InSunlight arm a hand-built ctx - AUDIT FB1024 #15); these build the ctx from the producer
-// every host mounts (TEST THE SHAPE THE PRODUCER MINTS). Record: bible/01-Overview/bugs/Field-Bugs-2026-10-24.md.
+// every host mounts (TEST THE SHAPE THE PRODUCER MINTS). Record:.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 

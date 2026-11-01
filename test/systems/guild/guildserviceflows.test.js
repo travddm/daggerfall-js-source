@@ -101,7 +101,7 @@ test('U24 (X11b CORRECTED): the two buttons move the SELECTION by ONE, not a pag
 });
 
 test('U24 (ROAD-A7 CORRECTED): a click SELECTS the scrolled row; the DOUBLE click uses it', () => {
-  // THIS PIN MOVED, deliberately, and the law it now holds is DFU's.
+  // THIS
   // It used to assert that one click PICKED, because the port's
   // ListPickerWindow did - and ListBox.cs does not. MouseClick
   // (:465-505) only moves selectedIndex and raises OnSelectItem;
@@ -406,7 +406,7 @@ test('U24: ServiceFlowWindow closes only when its queue empties', () => {
   assert.deepEqual(closed, [1]);
 });
 
-// ── MAC-BUG2 (2026-09-20) ─────────────────────────────────────────
+// ── MAC-BUG2 ─────────────────────────────────────────
 test('MAC-BUG2: the service windows fill %cpn and %cn - a cure offer is a TRADE record, and those quote the shop and the town', async () => {
   // Mac, over a screenshot of the temple's cure box:
   //   "curing disease in temple gives this %cpn thing"

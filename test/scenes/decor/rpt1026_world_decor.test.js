@@ -1,4 +1,4 @@
-// RPT1026-WORLD (2026-10-27), the decorator's two private reports, driven through the real decorator (scenes/decor/
+// RPT1026-WORLD, the decorator's two private reports, driven through the real decorator (scenes/decor/
 // decorTool.js), its real bar and panel (ui/decorPanel.js) over the rig's DOM, and the real hover seam (ui/worldPlaque.js
 // worldHoverFrame, systems/quickLoot.js) - the input path a mouse click takes:
 //   - CONFIRM-REREAD: a home's room read that went unanswered as the draft opened left every Confirm of the visit
@@ -6,7 +6,7 @@
 //   - CONFIRM-ONCE: a second click on Confirm while the first is on its way sent the batch twice and paid twice.
 //   - DECOR-VERBS: where no plaque is drawn (a touch screen, the classic skin with quick loot off) and with World
 //     Tooltips off, a press on a placed piece never reached Move.
-// bible/06-Systems/Online-Arc.md, RPT1026-WORLD CONFIRM-REREAD, CONFIRM-ONCE, DECOR-VERBS, has the account.
+// RPT1026-WORLD CONFIRM-REREAD, CONFIRM-ONCE, DECOR-VERBS, has the account.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

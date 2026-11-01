@@ -1,4 +1,4 @@
-// SOFTCAP1 (2026-09-29): SKILLS PAST 100 - the softcap, the hard cap, the
+// SOFTCAP1: SKILLS PAST 100 - the softcap, the hard cap, the
 // milestones and the "real use" law. A LEAF (its one import, masterSkills.js, imports nothing), so
 // skills.js (itself a leaf the whole tree reads), advancement.js, the
 // combat formulas and the UI can all read it without closing a cycle.
@@ -6,7 +6,7 @@
 // THE FOUR NUMBERS A PLAYER IS TOLD, AND WHERE EACH LIVES
 //
 //   1..100    exactly DFU's law (advancement.js, untouched below 100)
-//   100..125  a point costs 1.5x the uses         SOFTCAP_TIERS (2026-10-28: 1.5 / 2 / 4, was 4 / 8 / 16)
+//   100..125  a point costs 1.5x the uses         SOFTCAP_TIERS
 //   125..150  a point costs  2x the uses
 //   150..200  a point costs  4x the uses          SKILL_HARD_CAP = 200
 //
@@ -94,8 +94,7 @@ export function effectiveSkill(v) {
 /** The highest effective value a skill can reach (a HUD bar's full width). */
 export const EFFECTIVE_SKILL_MAX = effectiveSkill(SKILL_HARD_CAP);
 
-// CLIMB-PAST (FIELD BUGS 2026-10-01 #7, "Running jumping climbing dint work passed 100"; Mac: "I dont care about DFU.
-// We're our own thing now"). The run, the swim and the jump read the effective value in their own speed laws, so their
+// CLIMB-PAST (FIELD BUGS 2026-10-01 #7, "Running jumping climbing dint work passed 100"). The run, the swim and the jump read the effective value in their own speed laws, so their
 // points past 100 move the body. Climbing drives one thing in Daggerfall - CalculateClimbingChance, which clamps the
 // skill to 5..95 and is certain at 95 (Luck 40 or more) - and GetClimbingSpeed reads no skill, so a Climbing mastered
 // to 200 climbed exactly as a 95. Past 100 its points go to the climb's SPEED: each effective point over 100 climbs this
@@ -184,8 +183,7 @@ export function overcapTallyWeight(entity, skillId, amount, skill, now = Date.no
 
 // ---- the movement skills (MOVE-REAL) --------------------------------------
 //
-// MOVE-REAL (Mac, 2026-09-30: "No spam protection, because running a lot is the normal way to use the skill. Instead,
-// only real movement counts past 100"). The spam counter above would stop a runner cold - Running tallies four times
+// MOVE-REAL. The spam counter above would stop a runner cold - Running tallies four times
 // a second against a utility burst of 6 a minute, about 2% of a run - so past 100 a MOTION tally (the run's, the
 // jump's, the swim's, the climb's check; skills.js tallyMovementSkill) takes no spam weight. It takes the ground the
 // body actually covered under its own power instead: the motor's odometer (player/motor.js), which counts its own
@@ -266,8 +264,7 @@ export function movementTallyWeight(entity, skillId, amount, skill) {
 // but in a low-tier dungeon the dungeon's 0 keeps it as it was.
 //     foeShare = class ? 1 : clamp((baseLevel - 4) / 8, 0, 1)
 //
-// HOW MUCH - TWO LAYERS (Mac, 2026-09-29: "players with lvl100 skills will
-// decimate those ... we need to double those minimum"). Both need Master
+// HOW MUCH - TWO LAYERS. Both need Master
 // Skills in force (always online; offline the player's switch) and neither
 // runs while mentoring. Every number lives in ENEMY_SCALING below.
 // BAL3 (the place's threat, below progressionScaling's header): the VETERAN
@@ -336,7 +333,7 @@ const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
 /** The combat edge, 0..EFFECTIVE_SKILL_MAX-100: the mean effective gain over
  *  100 of the three best combat/magic skills (REAL permanent values). */
-/** BAL9b (bible/05-Combat/Balance-Arc.md section 15): A SKILL'S CLIMB - its permanent value as a formula reads it (past
+/** BAL9b: A SKILL'S CLIMB - its permanent value as a formula reads it (past
  *  100 a mastered skill alone - SOFTCAP4 - at a quarter a point and the milestones), without what is worn or cast on it.
  *  What the foes' edge reads below, and what a school's potency reads (systems/spell/spellPower.js schoolPotency): the climb
  *  that raises the foes is the climb that pays the caster. */
@@ -350,7 +347,7 @@ export function combatEdge(entity) {
   return gains.reduce((a, g) => a + g, 0) / EDGE_TOP_N;
 }
 
-/** SOFTCAP5 (Mac, 2026-09-29: "do it the same way as dungeons"): THE WILDERNESS is an area too - by day like a
+/** SOFTCAP5: THE WILDERNESS is an area too - by day like a
  *  cemetery or a ruined castle (22%), at night like a prison or a harpy nest (44%), when night's worse things walk.
  *  Towns, cities and every other location's own ground stay unscaled (the host says where the player stands). */
 export const WILDERNESS_SHARE = Object.freeze({ day: 0.22, night: 0.44 });
@@ -383,7 +380,7 @@ export const combatStanding = (entity) => ({ veteran: veteranProgress(entity), e
 
 // ---- the place's threat (BAL3) ---------------------------------------
 //
-// BAL3 (bible/05-Combat/Balance-Arc.md section 5; Mac, 2026-10-10: "Do everything and be extremely detailed", of "let
+// BAL3 (;, of "let
 // the place set the threat, the way the source already sets loot"): THE PLACE SETS THE THREAT, NEVER THE PLAYER. The
 // loot ladder grades every place a foe stands in (lootRarity.js DUNGEON_RARITY_TIER: a Cemetery 3, a mine or a cave 4,
 // a Crypt 9, a Vampire Haunt 14, a Dragon's Den 18), and a corpse's or a pile's odds are that place's. The veteran

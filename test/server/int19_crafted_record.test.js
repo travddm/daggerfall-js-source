@@ -1,4 +1,4 @@
-// INT19 (2026-10-17, the INTEGRITY arc's lane 1, its open item - bible/06-Systems/Integrity-Arc.md section 7): A CRAFTED
+// INT19: A CRAFTED
 // PIECE HANDED ON LEAVES ITS SELLER'S REALM RECORD. The piece route - a listing and an auction (server-account/src/
 // market.js), a commission filled (writs.js) - decided on the craft's own record (`products`) alone, and the client took
 // the piece out of its pack only locally: a tab that had lost its seat to a second device (it sends no checkpoint, so it

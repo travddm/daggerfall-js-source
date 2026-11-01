@@ -1,5 +1,4 @@
-// BOOT-OVERLAP (2026-10-12, a player's launch into the world captured from the live client; bible/07-Rendering/
-// Performance-Priority.md BOOT-OVERLAP) - THE BOOT'S NETWORK, ASKED BESIDE ITS WORK. From the character's click to the
+// BOOT-OVERLAP - THE BOOT'S NETWORK, ASKED BESIDE ITS WORK. From the character's click to the
 // boot's last step the main thread waited on the network 7.5 s of 12.2: the realm's lines and then its roster one after
 // the other, the homes' layouts only after the data's read, and each town the boot builds waiting on its homes in turn.
 // The lines and the roster are asked at once and read behind the boot, waited for where Project Legacy's host is made;

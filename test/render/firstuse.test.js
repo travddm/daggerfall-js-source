@@ -1,4 +1,4 @@
-// FIRST-USE (#1144, bible/07-Rendering/Performance-Priority.md): THE PASSES STILL BUILT AT FIRST USE, THROUGH SHADER-STALL'S
+// FIRST-USE (#1144): THE PASSES STILL BUILT AT FIRST USE, THROUGH SHADER-STALL'S
 // DOOR. Each was built behind a try-once latch the first frame it was wanted, and its LINK_STATUS read held that frame for
 // the whole compile: Starfall's sky (at its idle warm), the rite's smoke, the Steps' ghosts and the halos. Each now lists
 // its programs beside its constructor and is built once they are done (render/glProgram.js compiledPass); the ones the

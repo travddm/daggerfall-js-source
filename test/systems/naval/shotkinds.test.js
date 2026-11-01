@@ -1,5 +1,4 @@
-// SHOT-KINDS (2026-10-17, the owner: "Different cannon shot types, for example a grape shot to thin out crew, Chain to try
-// to take down their sail, etc"; bible/03-World/Naval-Refit.md SHOT-KINDS) - WHAT A BATTERY IS LOADED WITH: the law's own
+// SHOT-KINDS - WHAT A BATTERY IS LOADED WITH: the law's own
 // numbers (systems/naval/shotKinds.js), the deck's loads and their reload (navalGunnery.js), the ball that keeps its load
 // and says it (navalShots.js), the blow it strikes on the real naval host (test/navalSea.mjs), the room's word (navalWire.js
 // `o`), the helm's choice (scenes/naval/navalLoads.js), the captains' grape (navalAI.js captainLoads), the HUD's words,
@@ -354,7 +353,7 @@ test('SHOT-KINDS the HUD and the picture: each battery\'s load under its count (
 });
 
 test('SHOT-KINDS the world: the key appended unbound in Combat (no mod\'s row - those ship keys) and a pad button\'s to choose; the wheel\'s rung before the camera\'s; the key read at the helm; the helm panel\'s Shot button with its label (mutants: the rung, the key unread, the button, the label)', () => {
-  assert.equal(ACTIONS.at(-3), 'ShotCycle');   // PIN MOVED (PARTY-PING: PartyPing appended after; Decorate after that)
+  assert.equal(ACTIONS.at(-3), 'ShotCycle');
   assert.ok(!DEFAULT_BINDINGS.some(([, a]) => a === 'ShotCycle'), 'no key ships on it');
   assert.ok(ACTION_GROUPS.find((g) => g.title === 'Combat').rows.some((r) => r.action === 'ShotCycle' && r.label === 'Shot (aboard)'));
   assert.ok(!Object.values(MOD_ACTIONS).flat().some((r) => r.action === 'ShotCycle'));

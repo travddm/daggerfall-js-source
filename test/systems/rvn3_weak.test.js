@@ -1,5 +1,4 @@
-// RVN3 - THE WEAKNESS AND THE WILL (bible/12-Enhanced-AI/Feud-Arc.md section 14; Mac, 2026-10-04: "more complex, less
-// easy to accomplish and more detailed", then "Go"). Every revenant hides one WEAKNESS, drawn on its id (RVN1): a blow
+// RVN3 - THE WEAKNESS AND THE WILL (;, then "Go"). Every revenant hides one WEAKNESS, drawn on its id (RVN1): a blow
 // of it lands x1.5 (a weapon class, a metal), an element's on the saving throw at -50, the daylight's x1.25 on every
 // blow while the sky reads day, and on a wind-up it weighs twice. The first blow of it REVEALS it (the "Weakness" word,
 // a hiss, the card); under half its health, unknown, it FLINCHES from it (a hint). From rank 3 its WILL must be broken
@@ -88,10 +87,9 @@ test('RVN3 THE LAW: a blow of its weakness - its class, its metal; the daylight\
   assert.equal(F.isWeakBlow('nonsense', 'nonsense'), false);
   assert.deepEqual([2, 3, 4, 1, 0].map((m) => F.metalOf({ material: m })), ['silver', 'elven', 'dwarven', null, null]);
   assert.equal(F.metalOf(null), null);
-  assert.equal(F.willMatters(1), false);   // PIN MOVED (UNQUIET, Revenants.md section 46 - the owner: "harder"): from rank 2
+  assert.equal(F.willMatters(1), false);
   assert.equal(F.willMatters(2), true);
   assert.equal(F.willBroken(null), false);
-  // PIN MOVED (FEUD BALANCE, Feud-Arc.md OPEN 22 - Mac: one stagger or one perfect dodge breaks it)
   assert.equal(F.willBroken({ weak: 0, staggers: 0, perfect: 0 }), false);
   assert.equal(F.willBroken({ weak: 0, staggers: 1 }), true);
   assert.equal(F.willBroken({ weak: 0, staggers: 0, perfect: 1 }), true);
@@ -252,7 +250,7 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   const pool = rig(p);
   const f = await pool.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r });
   frame(pool);
-  f._lastStood = true;   // PIN MOVED (RVN4: a rank-3 one's last stand comes first - stood already, the will alone is asked)
+  f._lastStood = true;
   assert.equal(FT.revenantWillHolds(f), true);
   pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.equal(f.yielded, undefined, 'it does not kneel');
@@ -285,7 +283,7 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   const g = await pool2.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r2 });
   frame(pool2);
   g._lastStood = true;
-  L.noteFeud(g.entity, 'staggers');   // PIN MOVED (AUDIT FEUD 2: one stagger - FEUD BALANCE's law; two told the laws apart from nothing)
+  L.noteFeud(g.entity, 'staggers');
   pool2.damageFoe(g, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(g.yielded, 'broken, it kneels');
   // its weakness struck: it kneels
@@ -298,13 +296,12 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   assert.ok(h.entity._feud.weak > 0);
   pool2.damageFoe(h, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(h.yielded, 'its weakness struck, it kneels');
-  // rank 1: the will is no matter (PIN MOVED - UNQUIET, Revenants.md section 46: it was rank 2)
+  // rank 1: the will is no matter (
   const r4 = revenantOf(p, 1);
   const k = await pool2.spawnFoe(2, [2, 0, 0], { feetGiven: true, level: 6, revenant: r4 });
   frame(pool2);
   pool2.damageFoe(k, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(k.yielded, 'rank 1 kneels');
-  // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
   const r5 = revenantOf(p, 3);
   const z = await pool2.spawnFoe(2, [3, 0, 0], { feetGiven: true, level: 6, revenant: r5 });
   frame(pool2);
@@ -321,6 +318,6 @@ test('RVN3 the page: its weakness as I know it - unknown, its kind, what it is; 
   assert.equal(weaknessWords({ weak: 'silver', weakKnown: 1 }), 'Weakness: A metal.');
   assert.equal(weaknessWords({ weak: 'daylight', weakKnown: 1 }), 'Weakness: The sun.');
   assert.equal(weaknessWords({ weak: 'axe', weakKnown: 2 }), 'Weakness: Axes.');
-  assert.equal(willWords({ rank: 1 }), '');   // PIN MOVED (UNQUIET, Revenants.md section 46): from rank 2
-  assert.equal(willWords({ rank: 2 }), 'Its will must be broken. Strike its weakness, stagger it, or evade its blow at the last moment.');   // PIN MOVED (FEUD BALANCE, OPEN 22)
+  assert.equal(willWords({ rank: 1 }), '');
+  assert.equal(willWords({ rank: 2 }), 'Its will must be broken. Strike its weakness, stagger it, or evade its blow at the last moment.');
 });

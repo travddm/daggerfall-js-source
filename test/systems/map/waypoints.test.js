@@ -2,7 +2,7 @@
 // Worldmap(V) with right mouseclick context menu players should also be able to rename them. They can be small flags with
 // different colors. Add the waypoints you want to mark (to follow) to the filter list on the overworld map with a dropdown
 // menu. Add Waypoints to the filter on the worldmap"; then "i hope the waypoints are removed when leaving party";
-// bible/01-Overview/handoffs/Waypoints-And-Pace.md). ONE STORE, BOTH MAPS (systems/map/mapWaypoints.js): a point on the bay in map
+// ). ONE STORE, BOTH MAPS (systems/map/mapWaypoints.js): a point on the bay in map
 // pixels, a name, a colour and a kind; a party's or a guild's said on the hub's own channel as one line the chat never
 // shows, moved only by its author; dropped when its group is left.
 import { test } from 'node:test';
@@ -37,7 +37,6 @@ test('WAYPOINTS: add, rename, recolour, follow and remove - names cleaned and bo
   assert.equal(a.waypoint.kind, 'personal');
   assert.equal(a.shared, null, 'a personal one is never said');
   assert.equal(nextWaypointName(), 'Waypoint 2');
-  // PIN MOVED (BAY-LEFT-MAPS): a flag stands anywhere on the world's grid (net/wire.js worldPixelOk) - the Bay's edge was
   // no edge of the map past the Bay; a point off the world is refused
   assert.equal(addWaypoint({ mx: 8192, my: 20 }), null, 'off the world');
   assert.equal(addWaypoint({ mx: 20, my: -8192.5 }), null);
@@ -95,7 +94,7 @@ test('WAYPOINTS: THE WIRE - a party\'s waypoint is said on the party channel as 
   assert.equal(isWaypointLine('hello there'), false);
   assert.deepEqual(decodeWaypointLine(line), { op: 'add', id: r.waypoint.id, mx: 123.457, my: 45.5, color: 'gold', name: 'Camp by the river' });
   assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add BAD! 1 1 red x`), null, 'an id of the wrong shape');
-  assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add abc 9000 1 red x`), null, 'off the world');   // PIN MOVED (BAY-LEFT-MAPS): 2000 is a point past the Bay now
+  assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add abc 9000 1 red x`), null, 'off the world');
   assert.equal(encodeWaypointLine(['del', 'abc']), `${WP_WIRE_PREFIX} del abc`);
   renameWaypoint(r.waypoint.id, 'Old camp');
   assert.equal(said.at(-1)[1], `${WP_WIRE_PREFIX} ren ${r.waypoint.id} Old camp`, 'mine and shared: the rename is said');
@@ -165,7 +164,7 @@ test('WAYPOINTS: kept on the device through the storage seam - the list, the fol
     toggleWaypointKind('guild');
     assert.deepEqual(heard, ['add', 'follow', 'show']);
     const raw = JSON.parse(store.get(WAYPOINT_STORE_KEY));
-    raw.list.push({ id: 'bad', kind: 'nope', mx: 1, my: 1 }, { id: 'far', kind: 'personal', mx: 9000, my: 1 });   // PIN MOVED (BAY-LEFT-MAPS): 5000 is a point past the Bay now; 9000 is off the world
+    raw.list.push({ id: 'bad', kind: 'nope', mx: 1, my: 1 }, { id: 'far', kind: 'personal', mx: 9000, my: 1 });
     store.set(WAYPOINT_STORE_KEY, JSON.stringify(raw));
     _resetWaypoints();
     assert.deepEqual(listWaypoints().map((x) => [x.id, x.name]), [[w.id, 'Keep']]);
@@ -266,6 +265,6 @@ test('WILD-WAYPOINT: my remains in the open zone plant one followed red flag, ke
   removeWaypoint(c);
   assert.equal(W.remainsMarkTick(0), true, 'removed by hand: the record goes too');
   assert.equal(W.remainsMark(), null);
-  assert.equal(W.markRemains({ mx: -9000, my: 3, until: 1e15 }), null, 'off the world: no flag');   // PIN MOVED (BAY-LEFT-MAPS): -5 is a point past the Bay, west of its corner, now
+  assert.equal(W.markRemains({ mx: -9000, my: 3, until: 1e15 }), null, 'off the world: no flag');
   fresh();
 });

@@ -1,6 +1,4 @@
-// DA13 (2026-10-14, Mac: "B only: per-file channel"; a player, Discord 2026-10-13: "Every update downloads around
-// 130 MB and overwrites the entire game folder. I believe only the files that have actually changed should be
-// updated"): THE GAME'S OWN UPDATE - ONLY THE FILES THAT CHANGED.
+// DA13: THE GAME'S OWN UPDATE - ONLY THE FILES THAT CHANGED.
 //
 // Measured off the published blockmaps before this: an update electron-updater fetched was 18-45 MB for one merge and
 // ~130 MB whenever the site's one archive (DA11) changed its header's length - every block of the archive after a file

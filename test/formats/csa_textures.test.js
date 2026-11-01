@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27) - COME SAIL AWAY'S PICTURES (vendor/come-sail-away/Textures/),
+// CSA-A - COME SAIL AWAY'S PICTURES (vendor/come-sail-away/Textures/),
 // what tools/comeSailAwayExtract.mjs wrote after measuring each against the
 // ARENA2: the author's own (the splash and the wind widget's 24 frames) as
 // indexed PNGs, the 32 wave frames as the author's two paints over the

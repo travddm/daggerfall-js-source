@@ -1,8 +1,8 @@
-// ONE-BAG (2026-10-04, Mac: "Right, you shouldnt be able to hold multiple gathering bags"). BAG-SHELF put the Materials
+// ONE-BAG. BAG-SHELF put the Materials
 // Bag on every General Store shelf and ENDLESS-STOCK made it never sell out, so a character could buy one after another.
 // A second bag is refused now wherever one is taken - the take ladder every pickup, quick loot and both trade windows'
 // Buy basket run (systems/item/itemTransfer.js planTake), and the keyed shelf's purchase (scenes/worldModes.js doBuy) - while
-// another is held in the pack, a trade's basket or the wagon (bible/01-Overview/bugs/Field-Bugs-2026-10-04.md).
+// another is held in the pack, a trade's basket or the wagon.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

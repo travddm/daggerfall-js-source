@@ -1,6 +1,4 @@
-// COAST-LOOK (2026-10-28, the owner: "Coastlines arent texture blended properly. They have hard edges", and, asked which
-// edge, "Both edges" - the water's and the beach's; "No band aids or half assed work"; bible/07-Rendering/Water-Arc.md
-// COAST-LOOK).
+// COAST-LOOK.
 //  - A TRANSITION TILE IS ITS TWO KINDS' OWN GROUND (world/terrain/groundEdge.js, its GLSL twin render/groundEdgeGlsl.js):
 //    its corners read back off the byte the marching squares wrote, the second kind's share their bilinear, wandered and
 //    drawn across a soft rim - continuous across every seam, a pure tile its own picture, past REACH of the line whole.

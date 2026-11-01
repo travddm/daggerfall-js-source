@@ -23,7 +23,7 @@
 // never one following me or left further off (AUDIT WARDEN1 C2) - and ends at once when its team is no longer the one
 // thrown (summoned, driven off or moved since - AUDIT WARDEN1 C7: a summoned wagon stayed held, drawn nowhere).
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (the stamp off its built towns, the word, the cell's two
+// THE FOUR HOSTS: scenes/world.js - WIRED (the stamp off its built towns, the word, the cell's two
 // words, the offline clock, the show framed, drawn and on the flats' axis, ended at a re-anchor and a load).
 // scenes/worldModes.js - its interiors park nothing; indoors online the player holds no socket on the wagon's cell, so a
 // throw made then is told as they step out and re-say the spot (and played, on the street), and offline the clock runs

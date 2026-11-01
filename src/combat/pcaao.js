@@ -1,7 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
 // PCO1 - PHYSICAL COMBAT AND ARMOR OVERHAUL v1.44, THE MOD, 1:1
-// (2026-09-12, Mac: "I want to implement this as our next integrated
-// mod. The goal is 1:1 with complete parity").
 //
 // Kirk.O's Physical Combat And Armor Overhaul (Nexus; source
 // github.com/magicono43/DFU-Mod_Physical-Combat-And-Armor-Overhaul)
@@ -177,7 +175,7 @@ const struckSlotItem = (e, part) => {
 };
 const isShield = (item) => item?.group === 'Armor' && isShieldTemplate(item?.templateIndex);
 /** The left hand's SHIELD, else null. THE SIXTH DEPARTURE (TWO-HANDS-SHIELD, 2026-10-17,
- *  bible/05-Combat/Physical-Combat-Overhaul.md): the C# takes whatever the hand holds
+ *  ): the C# takes whatever the hand holds
  *  (`ItemEquipTable.GetItem(EquipSlots.LeftHand)`) and never asks IsShield, so a weapon there - one waiting for H, or a
  *  pair's off weapon - rolled the shield's block at its weak spot, and an iron one (GetMaterialArmorValue reads its
  *  material 0 as leather's 3) blocked as a leather shield. A shield is DaggerfallUnityItem.GetIsShield (`isShield`). */
@@ -368,7 +366,7 @@ export function pcaaoStatDiffsToHit(attacker, target) {
 /** CalculateSkillsToHit: dodging halved (DFU quarters it), and WITHOUT
  *  the critical-strike module the classic crit roll - the player's at
  *  crit/3 for +crit/3, a monster's at crit for +crit/10.
- *  BAL2 (bible/05-Combat/Balance-Arc.md section 4): A DEPARTURE - one roll for every striker, the player's: crit/3 for
+ *  BAL2: A DEPARTURE - one roll for every striker, the player's: crit/3 for
  *  +crit/3 (a monster's every-blow roll for a tenth was a nudge the player's own third outclassed). */
 export function pcaaoSkillsToHit(attacker, target, rolls, modules, notes = null) {
   let mod = -int(skill(target, SKILLS.Dodging) / 2);
@@ -436,7 +434,7 @@ export function pcaaoBackstabDamage(damage, backstabbingLevel, rolls, say) {
 /** CriticalStrikeHandler: luck's term `Mathf.Floor((luck - 50) / 25f)`,
  *  its `Mathf.Clamp(num, -2, 2)` computed and discarded; the player rolls crit / (4 - luckTerm),
  *  a monster crit / (5 - luckTerm).
- *  BAL2 (bible/05-Combat/Balance-Arc.md section 4): A DEPARTURE - every striker rolls the player's crit / (4 - luckTerm):
+ *  BAL2: A DEPARTURE - every striker rolls the player's crit / (4 - luckTerm):
  *  a foe's Critical Strike is the same skill as the player's and lands as often. */
 export function pcaaoCriticalStrike(attacker, rolls) {
   const luckTerm = Math.floor(F((stat(attacker, 'luck') - 50) / 25));
@@ -480,7 +478,7 @@ export function pcaaoBonusOrPenaltyByEnemyType(attacker, target, rolls) {
  *  `damageModifier` IS its summed attack damage. BAL6-GAUNTLETS: the
  *  beast's claws add its gauntlets' metal where a weapon's material
  *  modifier stands (after Strength, before the floor - combat/clawMetal.js).
- *  BAL10 (bible/05-Combat/Balance-Arc.md section 16): AND THE PORT'S BLOW MODIFIERS for a player's fists - where the
+ *  BAL10: AND THE PORT'S BLOW MODIFIERS for a player's fists - where the
  *  weapon arm reads them (pcaaoWeaponAttackDamage: after the enemy-type term), never the beast's claws. `info` the host's
  *  word, the weapon arm's own. */
 export function pcaaoHandToHandAttackDamage(attacker, target, damageModifier, player, rolls, info = undefined) {
@@ -542,7 +540,7 @@ export function pcaaoWeaponAttackDamage(attacker, target, damageModifier, weapon
 // ── condition ─────────────────────────────────────────────────────
 /** AlterDamageBasedOnWepCondition: the weapon's condition band scales
  *  its damage - a blunt weapon loses less. Mathf.Round, half to even.
- *  BAL1 (bible/05-Combat/Balance-Arc.md section 3): THE SHARP EDGE IS THE MOD'S WEAR'S REWARD. The bands over 75% (a
+ *  BAL1: THE SHARP EDGE IS THE MOD'S WEAR'S REWARD. The bands over 75% (a
  *  blade x1.3 and x1.1, a blunt weapon x1.1) pay for keeping gear sharp against the mod's own fast wear; with that
  *  module off (WEAR-VANILLA, the port's default) and every weapon on the shared pool (WEAPON-POOL), a blade sat at
  *  x1.3 for hundreds of blows - a reward with no upkeep. `sharpEdge` (the mod's wear module) keeps them; without it
@@ -669,8 +667,7 @@ export function pcaaoSpecificWeaponConditionDamage(weapon, damageWep, materialVa
 }
 
 // ── the wear ──────────────────────────────────────────────────────
-/** RARE-BREAK1 (2026-09-25, a player's report: "blue items break, yellow items disappear. is this intended?"; Mac:
- *  "Rarity loot breaks, not destroyed"): a piece that ROLLED its tier on the port's rarity ladder (LR1, systems/rarityTier.js -
+/** RARE-BREAK1: a piece that ROLLED its tier on the port's rarity ladder (LR1, systems/rarityTier.js -
  *  Magic, Rare, Legendary) is not one of the mod's enchanted items. A Rare or Legendary carries ONE DFU enchantment as
  *  the ladder's flavour, and that made the fading module take it whole on breaking while a Magic (affixes, no
  *  enchantment) broke and stayed. It breaks and stays, repairable, like every other piece; DFU's own enchanted loot
@@ -1087,7 +1084,7 @@ export function pcaaoAttackDamage(attacker, target, {
   } else {
     skillID = SKILLS.HandToHand;
   }
-  // BAL2 (bible/05-Combat/Balance-Arc.md section 4): A DEPARTURE - ONE RULE FOR EVERY STRIKER. The mod gave the player
+  // BAL2: A DEPARTURE - ONE RULE FOR EVERY STRIKER. The mod gave the player
   // half his skill again to hit and a foe its skill alone, and the player's crit twice the foe's damage and two and a
   // half times its aim; a foe's Long Blade and Critical Strike are the same skills as the player's and are read the same
   // way now (a duel was always both players'). The armour term is NOT made one rule: the player's flat 100 is the mod's
@@ -1192,10 +1189,9 @@ export function pcaaoAttackDamage(attacker, target, {
   // num2, weapon, num10)` - the static, not FormulaHelper's), so the
   // overhaul always wears gear its way, PRE-reduction, whatever the
   // equipmentDamageEnhanced switch registered for DFU's own path.
-  // WEAR-VANILLA (2026-10-01, the repair triage: "Disable the modded feature that increases durability loss. Vanilla
-  // values work fine"): A DEPARTURE - only while that module is on. Off (the port's default, modSettings.js), the blow
+  // WEAR-VANILLA: A DEPARTURE - only while that module is on. Off (the port's default, modSettings.js), the blow
   // wears what FormulaHelper's DamageEquipment says, below the reduction.
-  // TWO-HANDS (AUDIT 2, bible/05-Combat/Two-Hands.md): THE OFF HAND'S SHARE (formulas.js `blowShare`), laid here ahead of
+  // TWO-HANDS (AUDIT 2): THE OFF HAND'S SHARE (formulas.js `blowShare`), laid here ahead of
   // either wear - the formula's tail shared the blow after this core had worn the gear by the whole roll - and said
   // (`notes.shared`), so the tail does not share it twice
   const shared = (d) => (blowShare && d > 0 ? blowShare(d) : d);

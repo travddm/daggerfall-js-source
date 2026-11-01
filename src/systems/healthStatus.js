@@ -42,8 +42,7 @@ export const STATUS_INFO_ID = 22;   // SetTextTokens(22) (DaggerfallUI.cs:1620)
  *  leaves each macro as its bracketed placeholder, which is exactly
  *  MacroHelper's own null-MCP posture, never a throw. */
 export function statusInfoRows(rows, questLike = null) {
-  // MAC-C1 (2026-09-16, the live crash "r.text.split is not a function"
-  // at showStatus): the hosts' `rows(id)` answer TWO shapes. The dungeon's
+  // MAC-C1: the hosts' `rows(id)` answer TWO shapes. The dungeon's
   // `rscLines` hands back plain strings; the three others hand back
   // `townTalk.lines`' formatted rows - `{ text, center }` from
   // TextRsc.linesById - and this wrapped each row WHOLE as a token's
@@ -59,7 +58,7 @@ export function statusInfoRows(rows, questLike = null) {
 
 export const YOU_ARE_HEALTHY_ID = 18;        // youAreHealthyID (:1632)
 export const YOU_HAVE_BEEN_POISONED_ID = 117;   // youHaveBeenPoisoned (:1633)
-/** DISEASE-UNWELL (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Unnamed 'Unwell' tile"): the box's line for a disease
+/** DISEASE-UNWELL (FIELD BUGS 2026-10-19f): the box's line for a disease
  *  still incubating - the house's own, naming none. */
 export const UNWELL_LINE_TEXT = 'You feel unwell.';
 

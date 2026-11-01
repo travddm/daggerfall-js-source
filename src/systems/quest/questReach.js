@@ -1,7 +1,5 @@
 // @ts-check
-// NEARBY-QUESTS (2026-10-04, Discord: "quests weren't made with this in mind and are randomized ... you can just get
-// unlucky and have one sending you far away, screwing you heavily"; "quests of the game you take from guilds and so on
-// need to be near you on overworld map"): WHERE A REMOTE QUEST SITE MAY STAND.
+// NEARBY-QUESTS: WHERE A REMOTE QUEST SITE MAY STAND.
 //
 // DFU picks a remote site (Place.cs SelectRemoteTownSite / SelectRemoteDungeonSite / SelectRemoteLocationExteriorSite)
 // uniformly over the player's whole REGION - a region runs to a hundred map pixels and more, a week's walk, and the

@@ -1,5 +1,4 @@
-// STAR-CLEAR (2026-10-24, the owner: "The star fall world event has the tendency to fall into mountains and become
-// inaccesable"; bible/11-Multiplayer/Starfall.md section 3, AS BUILT STAR-CLEAR) - World of Daggerfall's rock keeps off a
+// STAR-CLEAR - World of Daggerfall's rock keeps off a
 // fallen star. A star's spot is the law's alone (net/starfall/starfallLaw.js starSpotLocal, on the gate's own pixels), and
 // the mod stands its rock fields there - of the festival's 1,366 stars, 381 had a piece's mesh box reach within
 // STAR_ROCK_M of the heart. So each star keeps a clearing in the gate's own set (world/gate/gateClearance.js gateClearSet's
@@ -187,7 +186,6 @@ test('STAR-CLEAR over the shipped lists: a star\'s spot DOES land in the mod\'s 
     for (const p of pickLocations(tile(x, y), session, getPrefab, paths, null)) for (const o of p.prefab.obj) if (Math.abs(o.pos.y) <= 1000 && pointNearGate(clear, x, y, p.rect.x * 6.4 + o.pos.x, p.rect.y * 6.4 + o.pos.z)) within++;
     if (within) hit++;
     const ledger = { refused: false, reach: [] };
-    // PIN MOVED (GATE-AGREE, bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): the road alone picks, then the clearing asks
     // each pick - a held site keeps its pick (and its level ground) and stands none of its objects
     for (const p of pickLocations(tile(x, y), session, getPrefab, paths, (nm, pf, r) => wodSiteClear(net, x, y, nm, pf, r))) {
       if (!gateSiteTest(clear, x, y, ledger)(session.prefab[p.index], p.prefab, p.rect)) continue;

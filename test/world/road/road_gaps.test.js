@@ -1,4 +1,4 @@
-// ROAD-GAPS (2026-10-26, the owner: "Take care of exclusions and gaps"; bible/06-Systems/Travel-View.md ROAD-GAPS) - A
+// ROAD-GAPS - A
 // REGION'S NETWORKS JOINED WHERE THEY MEET. A region's build left pieces of its own network that no bit joins to the rest,
 // within a pixel or three of it (on the freeware's Hammerfell, laid fresh: 52 pairs of pieces within three pixels), and
 // the Overworld's planner, walking the roads as roads, went round. Now the build links them (world/road/roadGaps.js).

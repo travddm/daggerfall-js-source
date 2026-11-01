@@ -1,4 +1,4 @@
-// SLAM4 (2026-09-16, Mac: Daggerfall's 30th, a streamer's server slam): WHAT ONLY EVER GREW.
+// SLAM4: WHAT ONLY EVER GREW.
 //
 // Three maps in the online path had no way of shrinking. None of them matters in a twenty-minute test, which is
 // why none of them was caught: each is keyed by a peer id or a LOOK, and the case they were written for is a

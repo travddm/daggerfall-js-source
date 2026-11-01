@@ -1,4 +1,4 @@
-// BOSS-TRAITS (2026-10-25, bible/05-Combat/Boss-Traits.md): THE DOORS - a foe with traits met through the real open
+// BOSS-TRAITS: THE DOORS - a foe with traits met through the real open
 // world's pool (scenes/exteriorFoes.js damageFoe: the striker's half, then the owner's), an elite of my own standing with
 // its trait, its record carrying them to every puppet, and the dungeon host's and the stand-ins' doors by their source.
 import '../modsOff.js';

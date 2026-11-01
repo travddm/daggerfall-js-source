@@ -1,6 +1,5 @@
 // @ts-check
-// COMPANION-PORTAL (2026-10-02, Mac: "Companions when playing catch up, spawning in, or spawning out should use a unique
-// portal animation instead of just popping in and out") - THE PORTAL. A swirling violet gate that tears open where a
+// COMPANION-PORTAL - THE PORTAL. A swirling violet gate that tears open where a
 // companion steps through, holds while it gathers out of the light (systems/dissolve.js, on its own sprite) or burns
 // into it, and seals shut behind it.
 //

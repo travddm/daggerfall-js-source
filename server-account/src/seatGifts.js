@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN1 (2026-10-24, the owner: "Allowing guild mates to contribute to
-// town material storage with gathered items/their store") - A GIFT TO THE
-// TOWN, AS THE SERVICE KEEPS IT (bible/11-Multiplayer/Domains.md section
+// DOMAIN1 - A GIFT TO THE
+// TOWN, AS THE SERVICE KEEPS IT (section
 // 5; the numbers and words are src/net/seatGiftLaw.js, which the client
 // reads too).
 //

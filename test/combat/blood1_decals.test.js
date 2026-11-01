@@ -1,12 +1,8 @@
-// BLOOD1a - THE DECAL POOL (2026-09-19, Mac: "this mod we do not have
-// permission to integrate. So instead I really want to try and build
-// our own version as close to 1:1 as possible" / "I really want you to
-// read in how their module works so we can achieve our own type of
-// parity").
+// BLOOD1a - THE DECAL POOL.
 //
 // The port's own blood marks. The FEEL is measured off DaggerBlood
 // 1.0.6a (Excoriated) and nothing else is: no code, no art, no vendor
-// row (bible/05-Combat/Blood-Arc.md says so at length). These pins hold
+// row (says so at length). These pins hold
 // the FACTS that reading established - which are numbers and orderings,
 // not anybody's expression - and the port's own maths around them.
 import { test } from 'node:test';
@@ -682,7 +678,7 @@ test('BLOOD1a by source: FOUR HOSTS, one spelling - the switch bag, the draw und
     assert.ok(!/^\s*if \(/.test(h.slice(h.lastIndexOf('\n', d) + 1, d + line.length)), `${host}: no gate on the line`);
   }
 
-  // BLOOD1 AUDIT (2026-09-20) - EVERY POOL BUILT IS A POOL DRAWN, and
+  // BLOOD1 AUDIT - EVERY POOL BUILT IS A POOL DRAWN, and
   // this is the pin that was missing.
   //
   // The check above counts four draws and one of them is worldModes
@@ -1467,7 +1463,7 @@ test('BLOOD1b by source: a moved batch moves its BOUNDS, and the corner table ha
   // BOTH TERMS. The extent of the centres AND the quad's own
   // half-diagonal - a radius that forgot the first would cull a
   // spread-out flight the moment its centre left the frustum. PERF-EXT
-  // (2026-09-25, the review of the shadows): the half-diagonal from its
+  // the half-diagonal from its
   // one home, bounds.js quadHalfDiagonal, which the birth takes it from too.
   assert.match(fn, /bounds\[3\] = Math\.hypot\(hi0 - cx, hi1 - cy, hi2 - cz\) \+ quadHalfDiagonal\(batch\.size\);/,
     'the centres’ extent plus the quad’s own half-diagonal, as the birth does');
@@ -1482,7 +1478,7 @@ test('BLOOD1b by source: a moved batch moves its BOUNDS, and the corner table ha
   assert.match(fn, /const bounds = \(batch\.bounds && batch\.bounds\.length === 4\) \? batch\.bounds : \(batch\.bounds = new Float32Array\(4\)\);/,
     'minted once, on the first move only, and written in place after');
   // ...and it writes rather than reallocating
-  assert.match(fn, /gl\.bufferSubData\(gl\.ARRAY_BUFFER, batch\._arena \? batch\._q0 \* BB_QUAD_VERT_BYTES : 0, verts, 0, count \* 20\);/);   // PIN MOVED (PERF-ARENA): a still batch's corners are its arena's range - a gib's (dynamic) its own buffer's, from 0, as before
+  assert.match(fn, /gl\.bufferSubData\(gl\.ARRAY_BUFFER, batch\._arena \? batch\._q0 \* BB_QUAD_VERT_BYTES : 0, verts, 0, count \* 20\);/);
   assert.doesNotMatch(fn, /createBuffer|createVertexArray|bufferData\(/, 'nothing is rebuilt on a move');
   // ...and it cannot write past the buffer it was given
   assert.match(fn, /Math\.min\(centers\.length, batch\._quads \?\? 0\)/, 'bounded by the quads the batch actually holds');
@@ -1937,7 +1933,7 @@ test('BLOOD1 AUDIT 2: the blood goes with the world - a teleport clears the ring
   assert.equal(made.length, 1, 'on the ring it always had');
 });
 
-// ── MAC-BUG W4 (2026-09-20, Mac: "Also blood is black") ────────────
+// ── MAC-BUG W4 ────────────
 test('MAC-BUG W4: a MARK takes the same light a CHUNK takes - the two passes of one blow agree, term for term', () => {
   // ONE BLOW, TWO PASSES. `bloodMarks.draw` sends the marks through
   // `drawDecals` and the gibs through `drawBillboards` - and the decal
@@ -2030,7 +2026,7 @@ test('MAC-BUG W4: a MARK takes the same light a CHUNK takes - the two passes of 
   assert.match(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'), /"blood": "node tools\/bloodProbe\.mjs"/);
 });
 
-// ── MAC-BUG W6 (2026-09-20, Mac: "super dark coloring instead of red") ──
+// ── MAC-BUG W6 ──
 test('MAC-BUG W6 by source: the decal has a LANE TWIN, the flat’s model on the lane’s pipeline, and the renderer builds and feeds it as the set’s fifth program', async () => {
   // THE FAULT. The port ships with the Enhanced Lighting lane ON, and
   // under it the renderer DECODES every colour it uploads to linear
@@ -2059,7 +2055,7 @@ test('MAC-BUG W6 by source: the decal has a LANE TWIN, the flat’s model on the
   // it decodes on its own, because the curve is not linear.
   assert.match(EL_DECAL_FS, /vec3 albedo = elDecode\(vColor\.rgb\)\s*\n\s*\* exp\(vec3\([\d., ]+\) \* \(1\.0 - thick\)\)\s*\n\s*\* mix\(1\.0, [\d.]+, clamp\(vWet, 0\.0, 1\.0\)\);/, 'the tint decodes on its own (BLOOD1 AUDIT 3), the film rides it, and a wet mark darkens (AUDIT BLOOD3 F5)');
   assert.doesNotMatch(EL_DECAL_FS, /elDecode\(t\.rgb\)/, 'the ink is not a colour any more, so there is nothing of it left to decode');
-  assert.match(EL_BB_FS, /vec3 albedo = max\(elDecode\(tex\.rgb(?: \* veinCrackShade\(uv\))?\) - emission, vec3\(0\.0\)\);/, '(the flat decodes its texel - the comparison is against something real)');   // PIN MOVED again (AUDIT GATHER-FEEL V4): the crack's shade taken on the display colour the flat decodes   // PIN MOVED (GATHER-FEEL II, VEIN-CRACKS): a worked vein's crack takes the decoded albedo down after it (gf2_veincracks.test.js V3)
+  assert.match(EL_BB_FS, /vec3 albedo = max\(elDecode\(tex\.rgb(?: \* veinCrackShade\(uv\))?\) - emission, vec3\(0\.0\)\);/, '(the flat decodes its texel - the comparison is against something real)');
   // BLOOD AUDIT 4: the SURFACE's terms on the lane too - elPointLit and
   // elIndirectLit (N.L, the lantern's map, the contact shadow, the
   // glint), which is what the mesh under the mark takes
@@ -2103,7 +2099,6 @@ test('MAC-BUG W6 by source: the decal has a LANE TWIN, the flat’s model on the
   assert.match(fn, /const dCount = Math\.min\(this\._pointLights\.length >> 2, this\._decalLights\);/, 'the installed decal program’s cap: sixteen classic, forty-eight lane, sixteen for a foreign lane with no twin');
   assert.match(r, /decalLights: src\.decalFs \? \(src\.maxLights \?\? CLASSIC_MAX_LIGHTS\) : CLASSIC_MAX_LIGHTS,/, 'the set carries the cap its decal program declares');
   assert.match(r, /decal: elLocs\(set\.decal\)/, 'the decal’s lane uniforms are looked up with the set');
-  // PIN MOVED (OW-HORIZON, 2026-10-20): and the far law's third - the ground past the clouds' square (render/cloudShadow.js uCloudShadowFar)
   assert.match(r, /this\._csLoc\.decal = \[gl\.getUniformLocation\(set\.decal, 'uCloudShadowMap'\), gl\.getUniformLocation\(set\.decal, 'uCloudShadowRect'\), gl\.getUniformLocation\(set\.decal, 'uCloudShadowFar'\)\];/, 'and its cloud pair');
   assert.match(r, /this\.decalProgram = set\.decal;\s*\n\s*this\._decal = this\._decalLocs\(set\.decal\);/, 'the program and its table are the installed set’s');
   assert.match(r, /\.\.\.this\._fogLocs\(P\),/, 'the fog table is the one that knows the whole fog set the lane’s finish reads');
@@ -2121,10 +2116,7 @@ test('MAC-BUG W6 by source: the decal has a LANE TWIN, the flat’s model on the
   assert.match(probe, /OWN \$\{lane\}: dried blood at noon is a RUST, browner than fresh/, 'and reads the atlas under the real tints');
 });
 
-// ── BLOOD1 AUDIT 3 (2026-09-20, Mac: "I think this deserves a real audit.
-// I doubt there's only one issue" / "the blood system needs to be as
-// visceral and detailed as possible ... inconsistencies with blood with
-// the exterior") - three lenses, the findings paid ──────────────────
+// ── BLOOD1 AUDIT 3 - three lenses, the findings paid ──────────────────
 test('BLOOD1 AUDIT 3: the mark is the FOE’S even where the splash is record 0 - a skeleton’s fall stains nothing', () => {
   // EnemyMotor's fall damage shows record 0 for EVERY foe (its own
   // literal), and the two generic fall sites passed that 0 on to the
@@ -2367,7 +2359,7 @@ test('BLOOD1 AUDIT 3: a mark on streamed terrain lies on the DRAWN ground, and t
   assert.match(world, /return surfaceHeightAt\(p\.samples, lx, lz, p\._stride \?\? 1\) \+ t\[1\];/, 'the drawn ground is the grass placer’s own sampler, on the pixel the point is in');
   // the ray walk: one translation array a bucket, and no boxed origin
   // (HOST-SPLIT 2: the buckets are laid by the pixel build, src/scenes/pixelBuild.js, which reads the state live - host.state)
-  assert.equal((world.match(/\(\(o\) => \(\) => host\.state\.pixelTranslation\(px, py, o\)\)\(\[0, 0, 0\]\)/g) ?? []).length, 11, 'every bucket translation reuses its own array');   // PIN MOVED (GHOSTFENCE): the eleventh the Ghostfence's pylons, curtain and gate (scenes/ghostfenceBuild.js); PIN MOVED (ROAD-LOOK): the tenth is a pixel's bridges, solid in its bucket   // PIN MOVED (URBANIZER U3): the ninth is a town past the Bay's fabric, solid in its pixel's bucket   // FIELD BUGS 2026-10-13e HILL-SEAT (PIN MOVED): the eighth is a block's hill pads, solid in the pixel's bucket   // GOTHWAY-BOARDS: the seventh is a Gothway Garden board's mesh (one a board), the patch's own   // TACT1: the sixth is the pixel's cover, in the pixel's own frame   // WOD2: the fourth is World of Daggerfall's models, whose sites open the pixel's bucket (a location's pixel never has one); WOD4: the fifth is the camp at Privateer's Hold's
+  assert.equal((world.match(/\(\(o\) => \(\) => host\.state\.pixelTranslation\(px, py, o\)\)\(\[0, 0, 0\]\)/g) ?? []).length, 11, 'every bucket translation reuses its own array');
   assert.doesNotMatch(world, /\(\) => (?:host\.)?state\.pixelTranslation\(px, py\)[,)]/, 'no bucket allocates a translation per call');   // AUDIT HOST-SPLIT 2, the second read: the build's spelling too
   const col = read('src/player/collider.js');
   const box = col.slice(col.indexOf('export function segmentHitsBox('), col.indexOf('\n}', col.indexOf('export function segmentHitsBox(')));
@@ -2380,8 +2372,7 @@ test('BLOOD1 AUDIT 3: a mark on streamed terrain lies on the DRAWN ground, and t
   assert.match(classicFs, /uDecalSun \* \(diff \* cloudShadowAt\(vWorld\)\)/, 'on the sun term, as the mesh has it');
 });
 
-// ── BLOOD2a (2026-09-21, Mac: "make it even more visceral and detailed" /
-// "Lets do it") - blood on walls, and spatter stretched along its travel ──
+// ── BLOOD2a - blood on walls, and spatter stretched along its travel ──
 test('BLOOD2a: a basis ALONG a travel - right is the travel in the plane, the frame is the same right-handed frame, and no travel in the plane falls back', () => {
   // a floor, a drop that flew +x: right is +x, up closes the frame
   const b = basisAlong([0, 1, 0], [3, 0, 0]);
@@ -2460,7 +2451,7 @@ test('BLOOD2a: a spray’s spatter lies ALONG its travel and longer the further 
   assert.ok(ds.some((d) => d.normal[1] < 0 && d.stretch > 1), 'the ceiling’s drops are streaks too');
 });
 
-// ── BLOOD2b (2026-09-21) - the port's own blood art, made at boot, and marks that dry ──
+// ── BLOOD2b - the port's own blood art, made at boot, and marks that dry ──
 import {
   buildBloodAtlas, bloodAtlas, pickCell, bloodMarkKind, freshTint, freshShade, dryStage, driedTint, mulberry32,
   ATLAS_SIZE, ATLAS_CELLS, ATLAS_KINDS, BLOOD_BASE, FRESH_VARIANCE, DRIED_TINT, DRY_TIME, DRY_STAGES, DRY_TICK, BLOOD_ATLAS_ARCHIVE, BLOOD_ATLAS_RECORD,
@@ -2506,7 +2497,7 @@ test('BLOOD2b: the atlas is the kinds in four variants, every cell bordered so a
   const r = mulberry32(1); assert.ok(r() !== r(), 'the generator moves');
   // the base is a red, deeper than the splash's own - and it is the
   // TINT'S now, not the texel's (BLOOD AUDIT 4)
-  // BLOOD4: the base went DARKER (Mac: "a tad bit darker") and this pin
+  // BLOOD4: the base went DARKER and this pin
   // used to hold a bare threshold (`> 0.5`) that the new colour trips
   // while being exactly as red as before. The law is what it always
   // meant: a real red, every channel inside the curve, red dominant by
@@ -2527,9 +2518,6 @@ test('BLOOD2b: the atlas is the kinds in four variants, every cell bordered so a
 });
 
 test('BLOOD4: a wall of marks is not one picture stamped - sixteen faces a kind, and the mirror is free', async () => {
-  // Mac (2026-09-22), with a shot of a room: "youll notice in the screen
-  // shot the repetition of the wall splatter. I think we should
-  // introduce more variations."
   //
   // A wall mark is ALWAYS the drip kind and ALWAYS near-plumb - it has
   // to be, a run runs downward - so it has none of the freedom the
@@ -2786,7 +2774,7 @@ test('BLOOD2b: a mark wears a cell of its KIND, is born a fresh red of its own, 
   assert.equal(typeof marks.dry, 'function');
 });
 
-// ── BLOOD2c (2026-09-21) - a wounded body bleeds, a dead one bleeds out ──
+// ── BLOOD2c - a wounded body bleeds, a dead one bleeds out ──
 import {
   createBleedLedger, bleedShare, bleedDrops, poolSizeAt,
   BLEED_THRESHOLD, BLEED_WAIT, BLEED_DROPS_MAX, BLEED_RADIUS, BLEED_RATE, POOL_SIZE, POOL_SPREAD, POOL_STEPS,
@@ -2946,7 +2934,7 @@ test('BLOOD2c: the pool lays a drip at the feet and a corpse’s pool that sprea
   assert.match(fxSrc, /else if \(a\.kind === 'pool'\) \{ if \(marks\.spreadPool\?\.\(a\.bloodIndex, a\.pos\)\) n\+\+; \}/);
 });
 
-// ── BLOOD2d (2026-09-21) - tracked blood: a walker who treads in it leaves prints ──
+// ── BLOOD2d - tracked blood: a walker who treads in it leaves prints ──
 import { STRIDE } from '../../src/combat/blood/bloodBleed.js';
 import { TRACK_STEPS, TRACK_WET_STAGE, PRINT_SIZE, PRINT_SPREAD } from '../../src/combat/blood/bloodMarks.js';
 import { PLAYER_WALKER } from '../../src/scenes/hitEffects.js';
@@ -3036,7 +3024,7 @@ test('BLOOD2d: treading in wet blood tracks it - alternating prints along the wa
   assert.match(read('src/scenes/hitEffects.js'), /else if \(a\.kind === 'step'\) \{ if \(marks\.step\?\.\(a\.body, a\.pos, a\.forward\)\) n\+\+; \}/);
 });
 
-// ── MAC-BUG W5 (2026-09-20, Mac: "Also blood doesn't work outside")
+// ── MAC-BUG W5
 //
 // EVERY STUB IN THIS FILE ANSWERS A FLOOR, and one of them calls
 // itself "an outdoor fight". That is the indoor collider: indoors and
@@ -3153,9 +3141,8 @@ test('MAC-BUG W5: and the blood really lands - the whole ladder, on an outdoor c
   assert.equal(oldMarks.count(), 0, 'the bucket ray alone is the bug, reproduced');
 });
 
-// ── BLOOD AUDIT 4 (2026-09-21, Mac: "I just want to audit everything so
-// far before we continue") - four lenses over BLOOD2a..2d, every finding
-// verified here before it was paid (bible/05-Combat/Blood-Arc.md item 8).
+// ── BLOOD AUDIT 4 - four lenses over BLOOD2a..2d, every finding
+// verified here before it was paid (item 8).
 import { createBleedLedger as a4Ledger, TELEPORT_SPEED as A4_TELEPORT, BLEED_RATE as A4_BLEED_RATE, POOL_SPREAD as A4_POOL_SPREAD } from '../../src/combat/blood/bloodBleed.js';
 import { GIB_SPLASH_RATE as A4_GIB_RATE } from '../../src/combat/blood/bloodGibs.js';
 import { BLOOD_BASE as A4_BASE, FRESH_VARIANCE as A4_VAR, DRY_TIME as A4_DRY_TIME, DRY_TICK as A4_DRY_TICK, DRY_STAGES as A4_DRY_STAGES, mulberry32 as a4Rng } from '../../src/combat/blood/bloodArt.js';
@@ -3442,7 +3429,7 @@ test('BLOOD AUDIT 4: by source - the dungeon quickload clears the blood, every p
   assert.doesNotMatch(fn, /this\.stats\.texBinds\+\+/, 'counted once, by the bind');
 });
 
-// ── BLOOD2e (2026-09-21) - THE PLAYER'S OWN BLOOD: the reference's player
+// ── BLOOD2e - THE PLAYER'S OWN BLOOD: the reference's player
 // bleeding on the same ledger, its subtle flash, and blood on the lens ──
 import { playerDamageFlash, flashPlayerDamage, BLEED_FLASH_ALPHA, FLASH_ALPHA as E_FLASH_ALPHA } from '../../src/ui/damageFlash.js';
 import { createBloodScreen, screenDrops, screenDropAlpha, SCREEN_SPATTER_MIN, SCREEN_DROPS_MAX, SCREEN_DROPS_AT, SCREEN_DROPS_CAP, SCREEN_DROP_LIFE, SCREEN_FADE_SHARE, SCREEN_DROP_SIZE, SCREEN_DROP_SLIDE } from '../../src/ui/bloodScreen.js';
@@ -3578,7 +3565,7 @@ test('BLOOD2e: blood on the lens - a real blow throws drops that slide and fade,
 });
 
 
-// ── BLOOD2f (2026-09-21) - THE WET SHEEN: a fresh mark glints under the
+// ── BLOOD2f - THE WET SHEEN: a fresh mark glints under the
 // enhanced lane, and the glint goes before the colour does ──
 import { wetAt, WET_POWER } from '../../src/combat/blood/bloodArt.js';
 import { EL_WET_GLOSS, EL_WET_STRENGTH, EL_SPEC_GLOSS as F_SPEC_GLOSS, EL_SPEC_STRENGTH as F_SPEC_STRENGTH, EL_DECAL_FS as F_DECAL_FS } from '../../src/render/enhancedLighting.js';
@@ -3664,7 +3651,7 @@ test('BLOOD2f: the lane glints a wet mark - the lamp and the sun seen in it at t
 });
 
 
-// ── BLOOD2g (2026-09-21) - THE GORE DIAL: one tier for how much blood there is ──
+// ── BLOOD2g - THE GORE DIAL: one tier for how much blood there is ──
 test('BLOOD2g: the gore dial - one tier sets the amount and the count, the row names every tier and the default, a pool is sized by it', async () => {
   const { GORE_TIERS, GORE_DEFAULT, BLOOD_GORE_PREF, bloodGore, bloodCapacity, bloodDensity, bloodDecalDeps, BLOOD_CAPACITY_MAX } = await import('../../src/combat/blood/bloodSwitch.js');
   const { setPref } = await import('../../src/systems/uiPrefs.js');
@@ -3700,7 +3687,7 @@ test('BLOOD2g: the gore dial - one tier sets the amount and the count, the row n
 });
 
 
-// ── BLOOD AUDIT 5 (2026-09-21, Mac: "Lets audit this") - four lenses over
+// ── BLOOD AUDIT 5 - four lenses over
 // BLOOD2e..2g and AUDIT 4's own fixes, every finding paid (Blood-Arc item 12) ──
 import { createDamageFlash as a5Flash } from '../../src/ui/damageFlash.js';
 import { updateHudVitals as a5Vitals, resetVitalsDetector as a5Reset, lastHealthLostPercent as a5Lost, _resetHudVitals as a5Fresh } from '../../src/ui/hud/hudVitals.js';
@@ -3803,7 +3790,6 @@ test('BLOOD AUDIT 5: by source - the menu shows a row’s default for a stored v
 });
 
 // ── BLOOD3: THE MARK IS A FILM ───────────────────────────────────
-// (2026-09-21, Mac: "I think the blood is too shiny and flat.")
 // Two faults, one line of the decal shader each, and both laws are pure
 // functions here so a pin drives them rather than reading them.
 test('BLOOD3 flat: the film is the tint at full thickness and brightens - and DESATURATES - as it thins', async () => {

@@ -1,8 +1,7 @@
-// CRAFT-WRITS (2026-10-22) - THE CLIENT'S HALF: the host's goods out of the pack inside the realm act (scenes/
+// CRAFT-WRITS - THE CLIENT'S HALF: the host's goods out of the pack inside the realm act (scenes/
 // craftWritHost.js - the plain bottles before the Potent, a dish's own pieces, all back on a refusal), the book's
 // delivery (net/profBook.js craftDeliver) and the Work tab's crafting-writ cards (ui/noticeWindow.js) - what each asks,
 // pays and holds, Deliver waiting with its reason, a press said and the list read again - and the wiring.
-// bible/06-Systems/Professions-Arc.md section 49.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

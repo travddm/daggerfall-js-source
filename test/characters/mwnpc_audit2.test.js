@@ -1,5 +1,4 @@
-// AUDIT MW-NPC II (2026-10-10, Mac: "Please audit and ensure perfection" - bible/04-Characters/Morrowind-NPCs.md
-// section 23): the second audit's findings - five cold lenses over the arc at 154d59fd80 (the GPU skin, the lanes and
+// AUDIT MW-NPC II: the second audit's findings - five cold lenses over the arc at 154d59fd80 (the GPU skin, the lanes and
 // the budget, the hosts, the looks, the proof) and the merge of main's MERCHANT-YARDS - each pinned where the code that
 // fixes it lives, each red on the code before its fix (tools/mutants/auditmwnpc2.json).
 import '../modsOff.js';
@@ -10,7 +9,7 @@ import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
 import { foeLook, foeSeed, foeWireLook, applyWireLook } from '../../src/characters/foeBodies.js';
 import { validFoeRecord, LOOK_GROUPS } from '../../src/net/wire.js';
 import { residentWalkerActor, residentLook } from '../../src/characters/rosterBodies.js';
-import { wornByRole } from '../../src/characters/wardrobe.js';   // PIN MOVED (MWNPC17, section 25): a look is its role's, dressed off the seed
+import { wornByRole } from '../../src/characters/wardrobe.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { createMerchantYards } from '../../src/scenes/merchantYardsHost.js';
 import { PERSON_TEXTURES, GUARD_TEXTURE } from '../../src/characters/mobile/mobilePerson.js';

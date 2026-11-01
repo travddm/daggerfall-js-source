@@ -1,4 +1,4 @@
-// SET3 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): WHAT THE SETS DO (systems/sigil/sigilSetPowers.js),
+// SET3: WHAT THE SETS DO (systems/sigil/sigilSetPowers.js),
 // each power driven through the REAL seam SET2 opened - the entity fold through computeEntityMods and the formulas'
 // accessors, the blow through weaponBlowMods, Spite through the attack formula's struck tail, Unbroken and the Wrath
 // through hurtPlayer, the kills through reportPlayerKill, Mora through the cast price and the absorption roll, the
@@ -664,7 +664,6 @@ test('SET3 the round: each recovering power is said ready again at the first mag
 });
 
 test('SET3 the HUD\'s read of the powers: the Rampage\'s stacks and seconds, the halving, the fury and every recovery - whole seconds left, 0 for one not running (mutants: a window read past its end)', () => {
-  // PIN MOVED (STAR7): the Starspun Weave's join it - the strands on the foe I last struck, and the Veil's recovery
   fresh(); online(1);
   assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 });
   const e = wearSet(player(), 'dagon', 6);

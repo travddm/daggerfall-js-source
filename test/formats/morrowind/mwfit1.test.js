@@ -1,6 +1,4 @@
-// MW-FIT1 (2026-10-09, a player's report Mac passed on, over the paperdoll in both sets: "the upper arm is still
-// visible with the steel armor", "the ebony armor gets the same issue", "the helmet elevation is too much", "the coif
-// has to cover the neck"): WHAT THE PLATE COVERS.
+// MW-FIT1: WHAT THE PLATE COVERS.
 //
 // A pauldron of either set is a sleeve - it closes round the upper arm from the shoulder to the elbow, where the
 // gauntlet's cuff takes over - so it hides the upper arm's skin, as a gauntlet hides the forearm's; and only in the

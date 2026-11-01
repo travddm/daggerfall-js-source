@@ -1,6 +1,5 @@
 // @ts-check
-// CAPITAL-TREES (2026-10-27, bible/03-World/Arena-Provinces.md CAPITAL-TREES; KPbICA on the game's Discord, forwarded by
-// the owner: "The main trees in Falinesti and Mournhold should get some love. They are too draftish for now") - THE
+// CAPITAL-TREES - THE
 // CAPITALS' TREES' PICTURES: Falinesti's Great Graht-Oak's bark, its leaves and its leaf sprays, Mournhold's garden trees'
 // bark, leaves and sprays, and the bed of Mournhold's planters - painted by world/capitalModels.js's own laws (TESA-LORE:
 // a tone law dithered onto its material's ramp, every texel its own grain), so they stand in the capitals' one look. No

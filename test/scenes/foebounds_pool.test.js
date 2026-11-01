@@ -1,5 +1,4 @@
-// FOE-BOUNDS and GRANT-DOOR (2026-10-19, Mac: the hand-off spec "LATTY: REJECT AND REMOVE INVALID ENEMY HANDOFFS; DO NOT
-// RESCALE", then "Spec + B + A"; bible/11-Multiplayer/Spawn-Grants.md sections 19 and 20): THE READER'S HALF, over two real
+// FOE-BOUNDS and GRANT-DOOR: THE READER'S HALF, over two real
 // street pools (scenes/exteriorFoes.js) each with its own grants' host (scenes/grantHost.js) - a record no builder could
 // give is never built, never updated and never ADOPTED: a hand-off of it is refused before it is mine, its copy taken
 // down silently (no death, no body, no loot), tallied once against its SENDER and never against me; an ally is

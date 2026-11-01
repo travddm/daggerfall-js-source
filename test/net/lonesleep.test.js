@@ -1,6 +1,4 @@
-// LONE-SLEEP (2026-10-26, the owner choosing among AUDIT RELEASE R4's levers - R4-3 lever 2, "Idle lone cells": a player
-// with nobody near sends their position only on the heartbeat, so their cells can sleep; full rate the moment someone
-// comes near. No visible change to players). bible/11-Multiplayer/Scale-Arc.md LONE-SLEEP; net/loneSleep.js. Pins by
+// LONE-SLEEP. LONE-SLEEP; net/loneSleep.js. Pins by
 // count, never by the wall clock: a lone session's poses over N simulated seconds, the wake one notice after a peer, the
 // relay's readers over the lone gap, and a peer's first sight of the lone player. tools/mutants/lonesleep.json.
 import { test } from 'node:test';
@@ -53,7 +51,6 @@ test('LONE-SLEEP the interval and what bounds it: a minute - over the heartbeat,
 });
 
 test('LONE-SLEEP the gate: a relay at the release\'s own number or later - this release\'s, whose every pose reader was read - and nothing else (mutants: the gate open; another floor)', () => {
-  // PIN MOVED (LONE-SLEEP at the second merge with main): world260 on the branch is main's THE FOLD there - the gate is the
   // release's one number, WORLD_WIDE_RELAY_MIN (world269), and moves with it at a merge
   assert.equal(LONE_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
   assert.equal(loneSupported(RELAY_VERSION), true, 'this branch\'s relay');

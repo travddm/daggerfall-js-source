@@ -1,14 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP1 (2026-10-07) — THE ROLL, AS THE SERVICE KEEPS IT: a realm
+// CHAP1 — THE ROLL, AS THE SERVICE KEEPS IT: a realm
 // character's standing with Daggerfall's own guilds - its reputation with
 // the twenty-two guild factions, and the guilds it belongs to.
 //
-// Mac: "completely overhaul the NPC guild system and reputation system",
 // "This is mostly with online in mind", and asked who holds it online,
 // "Server-owned". The law and every bound are src/net/npcChapterLaw.js;
-// the record is bible/11-Multiplayer/Chapters-Arc.md, section 3, and its
-// audit bible/01-Overview/audits/Audit-Chapters.md (AUDIT CHAP).
+// the record is, section 3, and its
+// audit (AUDIT CHAP).
 //
 // ═══ ONE CHARACTER, UNDER ITS LEASE, IN THE WRITE ITSELF ═══════════
 //
@@ -257,7 +256,7 @@ export async function claimRoll({ db, nowS, rand }, player, body) {
   // sending ±1 on all twenty-two as fast as the account's door allowed wrote 22 record lines a claim. An honest tab sends
   // sixty an hour at most, and a hall writ's refresh three a day
   if (await overRate({ db, nowS }, `roll-claim:${who.character}`, ROLL_CLAIMS_HOUR, 3600)) return { error: 'roll-rate' };
-  // PRIMARY-FOLD (bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000): the head, the Roll's rows and the record's
+  // PRIMARY-FOLD (THE PLAN PAST 1,000): the head, the Roll's rows and the record's
   // word of this claim's id in one trip, each asked as it was alone
   const [headQ, rowsQ, takenQ] = await db.batch([
     db.prepare('SELECT seq, kseq, last_rid FROM npc_roll_heads WHERE char_id = ? AND player = ?').bind(who.character, player.id),
@@ -296,7 +295,7 @@ export async function claimRoll({ db, nowS, rand }, player, body) {
       line = { ...line, rep: c.rep, gainedDay: c.gainedDay, gained: c.gained, owed: c.owed };
     }
     if (ranks) {
-      // CHAP2a (AUDIT CHAP R1's line, Mac: "Approved"): a NEW membership is recorded only where the Roll's own standing
+      // CHAP2a (AUDIT CHAP R1's line): a NEW membership is recorded only where the Roll's own standing
       // with the guild meets DFU's join (`joinRecordable` - AUDIT CHAP2 S7: what it owes counted; D2: the underworld two
       // at any standing) - one already on the Roll stays, whatever its standing since
       // AUDIT GUILD-WORDS (L6): the standing before the claim's lines or after them - a join the client made at 0 and a loss

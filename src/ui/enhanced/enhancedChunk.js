@@ -1,6 +1,4 @@
-// MENU1 (2026-09-15, Mac relaying a player): "sometimes you're unable
-// to open the enhanced menus. For example a player might open the
-// radial and select the spellbook, but it will fail to open."
+// MENU1 (2026-09-15,
 //
 // THE ROOT CAUSE IS THE DEPLOY, AND THE BUG IS THE SILENCE.
 //
@@ -137,8 +135,7 @@ export async function mountEnhancedChunk({ load, mount, alive = () => true, host
   return false;
 }
 
-// ═══ MENU1-WARM (2026-09-19, Mac: "look for any elements of hitching,
-// or hiccups") ═══════════════════════════════════════════════════════
+// ═══ MENU1-WARM ═══════════════════════════════════════════════════════
 //
 // THE SAME SEVEN CHUNKS, AND THE OTHER HALF OF THEIR COST. MENU1 is
 // about a chunk that FAILS; this is about one that merely arrives late.

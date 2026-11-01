@@ -1,5 +1,4 @@
-// DUEL1 (2026-09-24, Mac: "...traps both players in a surrounding transparent holographic wall that keeps them from
-// going outside of the duel space"): THE RING, HELD AND DRAWN. The motor's clamp (player/motor.js _keepInArena - the
+// DUEL1: THE RING, HELD AND DRAWN. The motor's clamp (player/motor.js _keepInArena - the
 // body kept inside after every step, the outward half of a jump taken away, the ring shifted with the world and dropped
 // on any placement); the wall (render/duelWall.js - the cylinder placed by its uniforms, see-through by construction,
 // every rate whole cycles over its clock, fogged, its GL state restored); and the world host by source (the ring set on

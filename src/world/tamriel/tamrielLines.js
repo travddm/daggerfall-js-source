@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SMOOTH-LAND (2026-10-26, bible/03-World/Tamriel.md SMOOTH-LAND; the owner: "Whatever is most detailed") - THE LAW'S
+// SMOOTH-LAND - THE LAW'S
 // OWN LINES: every coast and every border past the Bay as the land's smooth law (world/tamriel/tamrielLand.js
 // landLabelAt) draws it, at the map's own pixel.
 //

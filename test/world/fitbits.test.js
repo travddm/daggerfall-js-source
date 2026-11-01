@@ -1,5 +1,4 @@
-// FIT-BITS (2026-10-20, the owner: "do your own performance pass ... go deep"; bible/07-Rendering/Performance-Priority.md
-// FIT-BITS) - THE BAY'S FIT ON THE PICTURE, COUNTED 32 CELLS A WORD. The boot fits the Bay's land on the player's own
+// FIT-BITS - THE BAY'S FIT ON THE PICTURE, COUNTED 32 CELLS A WORD. The boot fits the Bay's land on the player's own
 // picture of Tamriel (world/tamriel/tamrielLand.js fitBayToPicture) at its first world frame - 25 scales, 49 x 49
 // offsets, up to 2,178 cells each, a cell at a time: ~0.8 s of the frame in the profile of a boot into the world. The
 // inside's score is counted a word at a time now, off two bitsets of the picture (its 1s and its 0s). Every answer is

@@ -1,5 +1,4 @@
-// ROAD-FOLLOW (2026-10-27, the owner's field report, item 6: "Road travel is not following roads properly in overworld
-// travel"; bible/06-Systems/Travel-View.md ROAD-FOLLOW) - A ROAD PAST THE BAY IS WALKED AND DRAWN ON ITS CURVES. The
+// ROAD-FOLLOW - A ROAD PAST THE BAY IS WALKED AND DRAWN ON ITS CURVES. The
 // Overworld's walk and its drawn line ran pixel middle to pixel middle (Basic Roads' bands), and past the Bay the roads are
 // painted as VOYAGER2's curves (world/road/roadCurves.js): at every bend the party walked across the inside of it, up to a
 // fifth of a pixel off a road two tiles wide - 12 to 17 per cent of a road journey's walk past the Bay off the painted

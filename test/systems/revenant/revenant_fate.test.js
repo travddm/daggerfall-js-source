@@ -1,7 +1,4 @@
-// REVENANT-FATE + REVENANT-TROPHY (2026-10-02, Mac: "Players should have the option to kill or spare. Killing should
-// show a unique animation where you destroy your foe, which drops a unique weapon random rarity weapon specific to the
-// enemy, with their name included in the weapon name. Spare should allow you to free the enemy, which then adds them as
-// a companion"; "the choice popup should reuse the loot menu").
+// REVENANT-FATE + REVENANT-TROPHY.
 //
 // The trophy's law (its kind's or its own weapon, named for it, never Common, better with rank); the choice's model;
 // THE REAL OPEN-WORLD POOL on crafted careers: a beaten revenant yields (held at 1, untouchable, nobody's target), its
@@ -212,7 +209,6 @@ test('REVENANT-FATE no door, no yield; my own kill kneels it all the same; a pup
   const { pool: p2 } = rig(me);
   const g = await p2.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: revenantOf(me) });
   p2.damageFoe(g, 99999, [0, 0, 3], null, { fromPlayer: true, whole: true });
-  // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
   assert.equal(g.dead, false); assert.ok(g.yielded, 'my kill kneels it');
   assert.equal(F.revenantMayYield({ entity: { revenant: { id: 'x' } }, puppet: 'peer' }), false);
   assert.equal(F.revenantMayYield({ entity: { revenant: { id: 'x' } }, companion: 'rv:x' }), false);

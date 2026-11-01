@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-10 (bible/01-Overview/bugs/Field-Bugs-2026-10-10.md), REGIONAL-FOLK - the Discord's "Add Regional NPCs":
+// FIELD BUGS 2026-10-10, REGIONAL-FOLK - the Discord's "Add Regional NPCs":
 // DFU dresses a town's walkers by the climate's People and names them by the region (FALL.EXE's REGION_RACES), so
 // Sentinel and the Dragontail Mountains walked Breton and Nord bodies under Redguard names. A Redguard region's walkers
 // are Redguards now - on the street (both exterior hosts), in the living world's census, and in Roleplay & Realism's

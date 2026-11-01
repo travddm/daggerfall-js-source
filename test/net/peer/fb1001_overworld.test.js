@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-01 #9-#11 - the Overworld (the travel view, bible/06-Systems/Travel-View.md): "in the overworld,
+// FIELD BUGS 2026-10-01 #9-#11 - the Overworld (the travel view): "in the overworld,
 // weather is weird, it only happens around the player at small scale. Your sprite doesnt rotate based on direction,
 // and you cannot see other player's sprites".
 //   OW-WEATHER (#9): the sand, the rain, the snow and the wisps wrap their 42-90 m boxes round the eye handed in, and

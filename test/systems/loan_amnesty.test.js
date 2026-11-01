@@ -1,5 +1,4 @@
-// LOAN-AMNESTY (2026-09-29, Mac: "Can we reset the loans for everyone online. The bank of the empire has decided to
-// forgive everyone's loans"; bible/06-Systems/Online-Arc.md LOAN-AMNESTY): THE EMPIRE FORGIVES EVERY ONLINE LOAN, ONCE.
+// LOAN-AMNESTY: THE EMPIRE FORGIVES EVERY ONLINE LOAN, ONCE.
 // The law (systems/banking.js forgiveLoans, loanAmnestyLines, LOAN_AMNESTY), the mark the save carries
 // (systems/save/save.js), customs' mark (systems/realmCustoms.js applyCustoms) and the realm boot that applies it
 // (scenes/world.js).

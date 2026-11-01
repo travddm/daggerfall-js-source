@@ -1,5 +1,5 @@
 // @ts-check
-// URBANIZER U2 (bible/03-World/Urban-Fabric.md section 3) - THE TOWNS' PICTURES' RECORDS: their pseudo-archive, the
+// URBANIZER U2 - THE TOWNS' PICTURES' RECORDS: their pseudo-archive, the
 // styles a province's streets and walls are laid in, and each picture's record - a leaf (no import), so the capitals'
 // landmarks (world/capitalSolitude.js and its kin, which world/capitalModels.js builds) name these pictures without
 // reading the module that paints them (world/urban/urbanArt.js).

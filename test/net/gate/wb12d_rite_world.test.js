@@ -1,8 +1,8 @@
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE FAITHFUL'S RITE IN THE WORLD - the circle and its smoke
+// WB12d: THE FAITHFUL'S RITE IN THE WORLD - the circle and its smoke
 // (scenes/riteHost.js, world/riteModel.js, render/riteSmoke.js), its faithful shared by the World of Daggerfall camps'
 // law, the rite's word to its cell, the opening, the hub's broken word, the casket (systems/riteChest.js), the receipt's
 // rite in the spoils and the claim, the omen's order, the session and the world host's seams -
-// bible/11-Multiplayer/World-Bosses.md section 19 D. AUDIT WB12d (2026-10-02): every host finding pinned here by the
+// D. AUDIT WB12d: every host finding pinned here by the
 // host's own behaviour on a fake world; the camps' law end to end is test/net/gate/wb12d_rite_host.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -1099,7 +1099,7 @@ test('WB12d the world host by source: the host made beside the gate on the camps
   const w = read('src/scenes/world.js');
   const at = w.indexOf('const riteHost = gateOmen ? createRiteHost(');
   const deps = w.slice(at, w.indexOf('}) : null;', at));
-  assert.match(deps, /omen: \(\) => gateOmen\.nearCurrent\(\),/);   // PIN MOVED (WW2): the nearest gate's - its circle stands where the player is
+  assert.match(deps, /omen: \(\) => gateOmen\.nearCurrent\(\),/);
   assert.match(deps, /fellAt: \(day\) => gateLink\?\.fellAt\(day\) \?\? null,/);
   assert.match(deps, /online: \(\) => !!online\?\.riteOk,/);
   assert.match(deps, /return exteriorFoes\.spawnFoe\(career, \[x, y, z\], \{ yaw, placed: true, groundAlign: \{ hitDist: hitDistance\(hit\) \}, site, transient \}\);/);

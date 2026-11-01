@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-VAULTS (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Wrothgarian
-// Mountains' daily elite halls for the Eltheric Ocean's Deep Aether and Abyss; bible/03-World/Eltheric-Ocean.md SEA-VAULTS) -
+// SEA-VAULTS -
 // THE VAULTS OF THE DEEP: which ruin isles are vaults today.
 //
 // A VAULT is an isle's ruin of the Deep Aether or the Abyss that the day has chosen (the relay's day, WDUN_DAY_MS - every

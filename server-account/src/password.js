@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1c — THE PASSWORD, AND THE ONE WAY BACK IN.
 //
-// Mac (2026-09-21): "I want email completely optional. Username and
-// Password will be the main thing for the account" — and, asked what a
+// — and, asked what a
 // player does when they forget one: "Yes" to a recovery code.
 //
 // ═══ WHY A RECOVERY CODE EXISTS AT ALL ═════════════════════════════
@@ -309,7 +308,7 @@ export function canonicalCode(input) {
  *  player who types it without the dashes still gets in. */
 export const codeForHashing = (code) => canonicalCode(code);
 
-// ═══ RECOVERY-SET (2026-10-14) - EIGHT CODES, EACH SPENT ALONE ══════
+// ═══ RECOVERY-SET - EIGHT CODES, EACH SPENT ALONE ══════
 //
 // The request: "I want players to be able to click and see their
 // account recovery code in their profile instead of it being a one off

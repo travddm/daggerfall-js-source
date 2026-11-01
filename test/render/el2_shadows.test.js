@@ -1,5 +1,4 @@
-// EL2 - ENHANCED LIGHTING, TIER TWO: SHADOWS (2026-09-17, Mac: "enhance our
-// lighting system tenfold" - tiers 1, 2 and 3).
+// EL2 - ENHANCED LIGHTING, TIER TWO: SHADOWS.
 //
 // render/shadowPass.js records what the world pass draws and replays it
 // depth-only from the light at the top of the next frame: a two-cascade
@@ -194,12 +193,12 @@ test('EL2: the receiver block and the depth shaders - six uniforms, no dynamic m
   assert.ok(EL_BB_FS.includes(SHADOW_GLSL));
   assert.match(EL_BB_FS, /in vec3 vBBBase;/);
   assert.match(EL_BB_FS, /vec3 base = vBBBase \+ vec3\(0\.0, 0\.5, 0\.0\);/, 'a flat reads its shadow half a unit up its base');
-  // TREES1 (2026-09-19): a flat reads the SOFT lookup - the kernel at
+  // TREES1: a flat reads the SOFT lookup - the kernel at
   // every distance - because it samples once for a whole sprite and the
   // far cascade's one-tap trade is an antialiasing one that only holds
   // for a surface shading per fragment. EL2's own law here is unchanged:
   // the flat's sun term still wears both shadows, read at its base.
-  // LA-COST3 (2026-09-27): read by the lane's billboard VERTEX shader at
+  // LA-COST3: read by the lane's billboard VERTEX shader at
   // that same point (the quad's centre is the same at all four corners)
   // and handed on flat - the fragment wears it under the cloud's.
   assert.match(EL_BB_FS, /uBBSun \* cloudShadowAt\(vBBWorld\) \* vBBSunVis/);
@@ -261,7 +260,7 @@ test('EL2: the renderer builds the pass with the lane, records the three draw ki
   calls.length = 0;
   r.beginFrame(I, I, new Float32Array([0.45, 0.8, 0.35]), WORLD_FRAME);
   assert.equal(sp.kind, 'point'); assert.deepEqual([...sp.shadowIndex], [1, ...new Array(SHADOW_POINT_CASTERS - 1).fill(-1)], 'the eye\'s own light (carried) is skipped');
-  // PERF-FLICKER (2026-09-19): the w is the CUBE MAP's far plane, not the
+  // PERF-FLICKER: the w is the CUBE MAP's far plane, not the
   // lantern's live range - the light's range is animated (CityLightAnimator
   // wanders it inside a one-unit band, fourteen steps a second) and the
   // shadow pass compared that number to decide whether a slot had changed,

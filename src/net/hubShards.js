@@ -1,6 +1,5 @@
 // @ts-check
-// SCALE5c (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance", then "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md SCALE5c): THE HUB,
+// SCALE5c: THE HUB,
 // SIXTEEN WAYS. Every player online held one socket in ONE object, the hub (`chat:world`): 2,048 sockets at most, and
 // every hello, leave and world line walked all of them. A player's hub link now lands on one of HUB_SHARDS shards -
 // `chat:world.<k>`, k from the verified account (hubOfSubject) - which holds the sockets, their roster and their own
@@ -37,7 +36,7 @@ export function shardHash(s) {
  *  subject. */
 export const hubOfSubject = (sub) => (typeof sub === 'string' && sub ? chatHubRoom(shardHash(sub) % HUB_SHARDS) : null);
 
-/** SCALE5c part two (bible/11-Multiplayer/Scale-Arc.md SCALE5c): A REGION'S CHANNEL, SPLIT THE SAME WAY. The politic
+/** SCALE5c part two (SCALE5c): A REGION'S CHANNEL, SPLIT THE SAME WAY. The politic
  *  map's regions (wire.js CHAT_REGION_COUNT - REGION_CHANNELS here, pinned to it: wire.js imports this module) each have
  *  a channel, `chat:region.<r>`, which held every player standing in the region: 2,048 sockets, and a start region's
  *  every arrival at its one gate. A region link lands on `chat:region.<r>.<k>`, k from the verified account as the hub's
@@ -51,7 +50,7 @@ export const hubOfSubject = (sub) => (typeof sub === 'string' && sub ? chatHubRo
  *  as before. */
 export const REGION_SHARDS = 4;
 export const REGION_CHANNELS = 71;   // WW-R: the Bay's 62 and the provinces' nine (wire.js CHAT_REGION_COUNT)
-/** PROVINCE-SLEEP (2026-10-25, bible/11-Multiplayer/Scale-Arc.md PROVINCE-SLEEP): THE CHANNELS THAT ARE SPLIT - the
+/** PROVINCE-SLEEP: THE CHANNELS THAT ARE SPLIT - the
  *  Bay's 62 (wire.js CHAT_BAY_REGIONS, pinned equal: wire.js imports this module). A shard keeps a poll open at its bus
  *  while it holds a socket (HUB-PULL), so a split region with anyone in it keeps its bus and every shard its players
  *  land on awake, and billed, all day: on the live relay the region channels were 1.56 million of the 4.49 million GB-s
@@ -88,7 +87,7 @@ const shardedByVar = new Map();
 /** THE WAY BACK: the regions the relay keeps split, read off its `REGION_SHARDS` var (server/wrangler.toml [vars]) -
  *  region numbers separated by commas, or `all`; anything else names none. A start region whose reconnect wave through
  *  its one hello gate shows again (the reason the regions were split) is split again by the var, with no change to the
- *  code. PROVINCE-SLEEP x COST-1 (the merge of main into TESA, bible/01-Overview/audits/Audit-Release-R3.md R3-2): the
+ *  code. PROVINCE-SLEEP x COST-1 (the merge of main into TESA, R3-2): the
  *  var names the Bay's regions alone (REGION_SPLIT) - a province past the Bay has no shard key, so `all` is the Bay's 62
  *  and a province's number names nothing. */
 export function regionsSharded(raw) {
@@ -122,8 +121,7 @@ export const shardOf = (bus, sub, sharded = NO_REGIONS) => {
 };
 
 /**
- * SCALE5d part two (2026-10-11, the plan's "the gate's court ... as copies around one fight object that takes their blows
- * batched and fans the boss's state back"; bible/11-Multiplayer/Scale-Arc.md SCALE5d): A GATE'S COURT, COPIED. The court
+ * SCALE5d part two: A GATE'S COURT, COPIED. The court
  * (`gate:<n>`) keeps its fight and its first SOCKETS_MAX sockets as it always did; a crowd past them goes to its copies,
  * `gate:<n>#<k>` (net/wire.js layerName, k 1 to LAYERS_MAX - 1, found by the Worker's walk), each a crowd of its own - its
  * sockets see each other, never the court's - whose fight is the court's: each copy hands it its sockets' hellos, poses
@@ -147,7 +145,7 @@ export const upOf = (name) => busOf(name) ?? courtOfCopy(name);
 
 /** A shard's hello, frames and closes, to the bus. */
 export const HUB_INTERNAL_UP = '/internal/hub/up';
-/** HUB-PULL (2026-10-16): a shard asking the bus for its sockets' frames and closes - THE BUS NEVER CALLS A SHARD. It
+/** HUB-PULL: a shard asking the bus for its sockets' frames and closes - THE BUS NEVER CALLS A SHARD. It
  *  pushed them (`/internal/hub/down`) until the live relay showed what that costs: a Durable Object charges every call it
  *  makes to the newest call it is serving (workerd io-context.h, getCurrentIncomingRequest), so the bus's push rode the
  *  shard's hand-up it was serving and the shard's next hand-up rode that push, one hop deeper each round, until the

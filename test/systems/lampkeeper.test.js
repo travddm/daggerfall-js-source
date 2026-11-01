@@ -1,4 +1,4 @@
-// LAMP-KEEPER (2026-09-26, Mac: "Shop keepers are lamp posts - make only a hand full of them"): not a count - a
+// LAMP-KEEPER: not a count - a
 // picture. Roleplay & Realism's variant keepers (RR2) re-materialise a shop or tavern keeper onto archive 197, and
 // the mod's seven 197 sprites are registered LAZY (nothing fetched at install). A lazy record is decoded only when
 // something asks for it, and getTexture's archive preload skips lazy entries by design (AUDIT-DW F1) - so nothing

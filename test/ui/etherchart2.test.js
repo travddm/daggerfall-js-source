@@ -1,5 +1,4 @@
-// ETHER-CHART2 (2026-10-12, the owner: "I want to improve the [Eltheric] sea map, its icons, the highlight areas, etc and
-// improve readability"; bible/03-World/Eltheric-Ocean.md ETHER-CHART2) - THE CHART READ AT A GLANCE: its words in the
+// ETHER-CHART2 - THE CHART READ AT A GLANCE: its words in the
 // enhanced face and drawn last, either side of their isle, in layers; a shape for each kind's mark; the depths as waters
 // under a grid a scale bar long; the haunts washed and named in view; the ship ringed, and pointed to off the canvas; the
 // isle named ringed with its bearing and card; the key. tools/mutants/etherchart2.json.
@@ -234,7 +233,6 @@ test('ETHER-CHART2 the ship ringed on the canvas, and off it a pointer at the ed
 
 test('ETHER-CHART2 the isle named: ringed, its card its name and its kind and way from the ship; none for an isle off the canvas; the window\'s line held, the hover cleared, the zoom\'s ends and the buttons named (mutants: the pick, the line, the ends)', () => {
   const m = M.chartModel(word(), at(2), W, H, { pick: h.key });
-  // PIN MOVED (ISLE-TRADE, 2026-10-17): a port's card names the good of the Bay its exchange makes - Veilhaven's spice
   assert.deepEqual([m.pick.title, m.pick.words], ['Veilhaven', `A port - makes spices - ${M.wayWords({ px: h.px - 17.5, py: h.py + 3.5 }, h)}`]);
   assert.equal(m.pick.x, m.isles.find((i) => i.key === h.key).x);
   assert.equal(M.chartModel(word(), at(2, -400), W, H, { pick: h.key }).pick, null, 'off the canvas');

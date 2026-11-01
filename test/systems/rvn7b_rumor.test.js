@@ -1,5 +1,4 @@
-// RVN7b - THE RUMOUR (bible/12-Enhanced-AI/Feud-Arc.md section 18.2; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). "Any news?" asked within 20 px of a living, unsworn revenant's lair, or
+// RVN7b - THE RUMOUR (;, then "Go"). "Any news?" asked within 20 px of a living, unsworn revenant's lair, or
 // in its lair's region, one time in 0.35 is answered with it - built from its record ("They say a scarred orc called
 // Grushnak the Butcher has been seen near the Tomb of Vaness, a long walk to the east.") - spending the person's one
 // answer as the mill does, and marking its lair known. One rumour in two carries its weakness: hinted, or one time in

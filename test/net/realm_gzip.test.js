@@ -1,5 +1,4 @@
-// REALM-GZIP (2026-09-30, the field: Thoryn's tile said "This character's save is too big for the realm to take. The
-// realm keeps the last save it took."): A REALM SAVE RIDES PACKED. The save is the snapshot's JSON, a long life's grew
+// REALM-GZIP: A REALM SAVE RIDES PACKED. The save is the snapshot's JSON, a long life's grew
 // past the request's 4 MiB (REALM_MAX_BYTES), and every checkpoint after it was refused for good.
 //
 // Pinned here, through the REAL Worker over the REAL migrations and the client's own calls:

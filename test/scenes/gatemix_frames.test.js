@@ -1,5 +1,5 @@
-// GATE-MIX (2026-10-20): a frame already on the GPU is not decoded again - render/renderer.js heldTexture, asked by
-// scenes/dataPipeline.js uploadRecordFrame. Design: bible/11-Multiplayer/World-Bosses.md section 28.
+// GATE-MIX: a frame already on the GPU is not decoded again - render/renderer.js heldTexture, asked by
+// scenes/dataPipeline.js uploadRecordFrame. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

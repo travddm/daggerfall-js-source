@@ -1,5 +1,4 @@
-// RVN11c - BETRAYAL (bible/12-Enhanced-AI/Feud-Arc.md section 22.3, OPEN 19; Mac, 2026-10-04: "more complex, less
-// easy to accomplish and more detailed", then "Go"). A sworn one under 10 loyalty - and only an Unhinged, Craven or
+// RVN11c - BETRAYAL (OPEN 19;, then "Go"). A sworn one under 10 loyalty - and only an Unhinged, Craven or
 // Brutal one - turns on me once, when a hurt leaves me under a quarter of my health: out of the party first, then a
 // hostile revenant standing where it stood (the `betrayed` deed, "the Betrayer", rank +1). The rest never betray.
 // Pinned: the numbers and who may; the moment through the real hurt (the line, my death, one a hurt, at my side with a
@@ -101,7 +100,7 @@ test('RVN11c THE TURN: not sworn, its rank up (never past 5; its signature at 2)
   assert.ok(F.SIGNATURES.includes(x.sig), 'its signature drawn at rank 2');
   assert.equal(x.name, `${x.given} the Betrayer`);
   assert.deepEqual(x.history.at(-1), { deed: 'betrayed', at: DAY * 10 + 5 });
-  assert.equal(x.dueAt, DAY * 10 + 5 + AMBITION.VENGEANCE_DUE[0]);   // PIN MOVED (UNQUIET, Revenants.md section 46): a brutal betrayer wants vengeance - due by its ambition's days
+  assert.equal(x.dueAt, DAY * 10 + 5 + AMBITION.VENGEANCE_DUE[0]);
   assert.equal(party.party.some((y) => y.name === r.id), false);
   N.revenantSpared(me, { revenant: { id: r.id } }, { state: 'with' });
   assert.notEqual(party.party.find((y) => y.name === r.id), m, 'its member forgotten');

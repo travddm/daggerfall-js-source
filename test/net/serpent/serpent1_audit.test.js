@@ -1,5 +1,4 @@
-// AUDIT SERPENT (2026-10-04, Mac: "I definitely want to do a conprehensive audit on this and ensure its absolute
-// perfection"): the pins of the four lenses' findings (bible/01-Overview/audits/Audit-Sea-Serpent.md) - each one a law that
+// AUDIT SERPENT: the pins of the four lenses' findings - each one a law that
 // failed before its fix. THE BRAIN: one timeline on the relay and every client (S2), the coiled ship's word that comes
 // before its coil (S3), the coil let go at the kill and the sounding and the throes said (S4, M2), the yaw a word carries
 // (S6), a share kept only by being at the fight (S8, E2, T2), the coil a ship's alone (S10), the ships counted (B7), the
@@ -97,18 +96,15 @@ test('AUDIT SERPENT S2: a kill while a ram\'s run is still to come, and the soun
     now += 10;
     const go = now + SERPENT_SAY_AHEAD_MS, before = (xs) => xs.filter((x) => x.at > now && x.at < go).map((x) => ({ ...x }));
     const legsSaid = before(f.legs), modesSaid = before(f.modes);
-    // PIN MOVED (AUDIT 2 XB2, 2026-10-06): its ride said at its turn, SERPENT_SAY_AHEAD_MS on, though it rides it already
     if (end === 'gone') { f.soundAt = now; const said = stepSerpentBrain(f, now, b, rng); fold(said); assert.ok(f.gone, 'sounded'); assert.ok(said.some((w) => w.k === 'dv' && w.at === go && w.m === MODE.deep), 'its ride said, though it rides it already'); }
     else { f.hp = 1; f.shieldUntil = 0; fold(applySerpentHit(f, acct(0), 50, ZONES.body, b[0], now)); assert.ok(f.fell, 'slain as its dash begins'); }
     const inOrder = (xs) => xs.every((x, i) => !i || xs[i - 1].at <= x.at);
     assert.ok(inOrder(f.legs) && inOrder(f.modes), `the relay's in order (${end})`);
     assert.ok(inOrder(L.state().legs) && inOrder(L.state().modes), 'the client\'s in order');
-    // PIN MOVED (AUDIT 2 XB2, 2026-10-06): the client's track the relay's from its first leg on - the relay keeps the legs a
     // blow is judged back on a second longer (AUDIT SHIPS D3), as it keeps its modes
     assert.deepEqual(L.state().legs, f.legs.slice(-L.state().legs.length), 'one track');
     assert.deepEqual(L.state().modes, f.modes.slice(-L.state().modes.length), 'one ride');
-    // PIN MOVED (AUDIT SHIPS B5, 2026-10-06): nothing still to come after its end but its own throes or dive, said
-    // SERPENT_SAY_AHEAD_MS on. PIN MOVED (AUDIT 2 XB2, 2026-10-06): and what was said to come before then, swum as it was
+    // SERPENT_SAY_AHEAD_MS on.
     // said - let go AT the end (holdNow), the swim a screen a wire's time behind had begun was unsaid
     const after = (xs) => xs.filter((x) => x.at >= go);
     assert.deepEqual(after(f.legs).map((l) => l.at), [go], `nothing still to come after its end but its own swim (${end})`);
@@ -201,7 +197,6 @@ test('AUDIT SERPENT S4/M1/M2: the kill and the sounding let a holding coil go an
   const out = applySerpentHit(f, 's2', 50, ZONES.body, { x: 150, z: 0 }, T0 + 500);
   const kinds = out.map((w) => w.k);
   assert.ok(kinds.includes('cx') && kinds.includes('dv') && kinds.includes('sw') && kinds.at(-1) === 'fell', `the words at the fall: ${kinds}`);
-  // PIN MOVED (AUDIT SHIPS B5, 2026-10-06): its throes said SERPENT_SAY_AHEAD_MS on, what was to come let go at the kill
   assert.ok(out.some((w) => w.k === 'dv' && w.m === MODE.dying && w.at === T0 + 500 + SERPENT_SAY_AHEAD_MS), 'its throes said ahead');
   for (const w of out) L = foldSerpent(L, w, T0 + 500);
   assert.ok(L.coil.off > 0, 'let go');
@@ -211,7 +206,6 @@ test('AUDIT SERPENT S4/M1/M2: the kill and the sounding let a holding coil go an
   // the sounding
   const g = coilHeldFight();
   const gone = stepSerpentBrain(g, SOUND + 10, [], seeded(1));
-  // PIN MOVED (AUDIT SHIPS B5): the coil let go first and the gone last, its dive said SERPENT_SAY_AHEAD_MS on
   const ends = gone.filter((w) => ['cx', 'dv', 'sw', 'gone'].includes(w.k));
   assert.deepEqual([ends[0].k, ends.at(-1).k], ['cx', 'gone']);
   assert.ok(ends.some((w) => w.k === 'dv' && w.m === MODE.deep && w.at === SOUND + 10 + SERPENT_SAY_AHEAD_MS), 'its dive said ahead');
@@ -275,7 +269,7 @@ test('AUDIT SERPENT S8/E2/T2: a share stays in its health only while its ship is
 });
 
 test('AUDIT SERPENT E1/E2: standing counts only within SERPENT_STAND_R of its body, the serpent goes only at what it can reach, and dealing means SERPENT_RECEIPT_SHARE of one\'s share (mutants: a boat parked at 900 m standing; a target past its reach; one volley a dealer)', () => {
-  assert.ok(SERPENT_STAND_R < ENGAGE_R && SERPENT_TARGET_R < ENGAGE_R && SERPENT_PART_SHARE >= 0.02 && SERPENT_RECEIPT_SHARE > SERPENT_PART_SHARE);   // PIN MOVED: SERPENT4 - a part dealt earns a stander's, never one volley
+  assert.ok(SERPENT_STAND_R < ENGAGE_R && SERPENT_TARGET_R < ENGAGE_R && SERPENT_PART_SHARE >= 0.02 && SERPENT_RECEIPT_SHARE > SERPENT_PART_SHARE);
   const f = surfaced(fightOf([HULL.Carrack, -1, -1]));
   const rng = seeded(8);
   const bodies = [body('s1', 100, 0), body('s2', 120, 10), body('s3', 0, 880)];   // s3: a rowboat parked out at 880 m

@@ -1,4 +1,4 @@
-// LW13 (bible/06-Systems/Living-World-II.md "LW13"): THE COMPANIES - a town's adventurers dealt into companies (their
+// LW13 ("LW13"): THE COMPANIES - a town's adventurers dealt into companies (their
 // sizes, the mix of the three runs, the one left over alone), named, led by their first place's trip (one trip a cycle,
 // every place's holder walking it; a fated member sending the company out; a company the likelier to dive), hired on a
 // merchant's train with no sellsword; pilgrims in bands, and to a temple town's holy day; seen - in file by role, the
@@ -125,7 +125,7 @@ test('LW13 one trip a cycle: a company\'s places ride its first\'s (leaderOf, pl
       assert.deepEqual(tr.party.map((m) => m.slot), c.places.map((p) => p.slot), 'every place walking');
       assert.equal(tr.company.key, c.key);
       assert.equal(tr.company.name, namedIn(c, home.name).name);
-      for (const m of tr.party) assert.equal(awayOf(m, [tr])[0].t0, whenWalked(tr.outT0, 0), 'away with it');   // PIN MOVED (AUDIT LW-II-2 R5): out at the leg's first light - a company setting out at six is at home on the road till seven (AUDIT LW-II E5), and its town now has it gone then, not at six
+      for (const m of tr.party) assert.equal(awayOf(m, [tr])[0].t0, whenWalked(tr.outT0, 0), 'away with it');
     }
   }
   assert.ok(seen > 3, `${seen} company trips`);

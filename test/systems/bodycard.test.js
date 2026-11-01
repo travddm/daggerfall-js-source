@@ -1,11 +1,10 @@
-// BODY-CARD (2026-10-14, the owner: "Reimplement the billboard morrowind look as a toggle"; asked which, the upright card
-// BODY-LEAN replaced): THE BILLBOARD LOOK. Before BODY-LEAN every Morrowind body and 3D horse stood on an UPRIGHT card, as
+// BODY-CARD: THE BILLBOARD LOOK. Before BODY-LEAN every Morrowind body and 3D horse stood on an UPRIGHT card, as
 // Daggerfall's flats do, so it drew cos(pitch) of its height - shorter as the camera rose over it. BODY-LEAN leaned the
 // card by the picture's own up so a body keeps its true size from any eye. The Billboard Look (features.js
 // mw-billboard-look, `mwBillboardLook`, off by default) stands the card upright again, read where the card is stood
 // (render/characterSprite.js drawRigSpriteBox) - by the lone pass and the batch alike, at once. A lean the host hands
 // (the travel view's, AUDIT OW4 J6) stands as handed either way.
-// BODY-FLAT (2026-10-23, a player: "The billboard look still has the same issue"; asked, a true flat sprite): the upright
+// BODY-FLAT: the upright
 // card's picture is taken LEVEL, as a Daggerfall flat's art is drawn, so the body stands its true height from any eye -
 // it drew cos(pitch) of it, and a sliver up close. PINS MOVED here: the cos(pitch) law is the one retired.
 import { test, afterEach } from 'node:test';

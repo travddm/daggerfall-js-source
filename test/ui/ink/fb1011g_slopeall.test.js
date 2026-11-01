@@ -3,10 +3,9 @@
 // mostly not present without the use of the 'all' option"). The held map's All (ALL-FLOORS) cuts every placed model at
 // the slice of the storey it stands on, and spares a face that CLIMBS between storeys - a ramp, a flight's tread. FS_A
 // called a face a climb under a literal n.y < 0.97 (14.07 degrees), and Daggerfall's own ramp is 1:4: 14.04 degrees, n.y
-// 0.97014 - so every such ramp was cut at its lower storey's slice and its upper run vanished. RAMP-INK (2026-10-05c)
+// 0.97014 - so every such ramp was cut at its lower storey's slice and its upper run vanished. RAMP-INK
 // moved the climb's lower bound to the plan's floor law and left the upper one. The bound is one constant now
 // (ui/ink/inkDungeonGL.js CLIMB_NY, climbsOf), and the shader's own expression is read here and run.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

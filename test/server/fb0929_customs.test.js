@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-09-29 - CUSTOMS-CARRY (bible/01-Overview/bugs/Field-Bugs-2026-09-29.md). From the Discord, through Mac:
+// FIELD BUGS 2026-09-29 - CUSTOMS-CARRY. From the Discord, through Mac:
 // "Bring Online" answered "Only a character that has already played online can be brought into the realm" for characters
 // that had (EnragedBard, Tony H.) - the census (migration 0020) counted Renown tracks alone, and a track needs a first
 // online kill; and a vampire who came in found their guild gone and their gold taken by loans they were never warned of
@@ -161,7 +161,7 @@ test('CUSTOMS-CARRY 0022: every character customs already made takes its origin\
     { char_id: 'joiner001', guild_id: 'gold', rank: 3 },
   ], 'the master\'s place is carried; one guild a character, so the joiner keeps the one it founded');
   // a house from before the realm comes back as a house, never as gold (0020 `paid`, L1-F3) - and HOME-CROSSED (FIELD
-  // BUGS 2026-09-30, PIN MOVED): it is not sold at all, where it was sold for nothing and taken
+  // BUGS 2026-09-30
   const sold = await s.call('/v1/homes/release', { mapId: 4242, buildingKey: 7, realm: realmAt(s.env, vamp) }, A.secret);
   assert.deepEqual([sold.status, sold.body?.error], [409, 'home-crossed']);
   assert.ok(s.env.DB._raw.prepare('SELECT 1 FROM homes WHERE map_id = 4242 AND building_key = 7').get(), 'the house stands');
@@ -209,7 +209,7 @@ test('CUSTOMS-CARRY: the door says what customs will do BEFORE it runs - the loa
   const owing = { level: 1, classicMinutes: 7, goldPieces: 100, items: [], wagonItems: [], bankAccounts: createBankAccounts() };
   Object.assign(owing.bankAccounts[5], { loanTotal: 5_000, loanDueDate: 900_000 });
   assert.equal(customsLines(applyCustoms(owing), { before: true })[0], 'Customs will call in 5000 gold of loans; 4900 cannot be paid and falls due.');
-  // RESTORE (Mac: "Keep all, can't sell"): no deed stays behind now - the door says it comes, and that it never sells back
+  // RESTORE: no deed stays behind now - the door says it comes, and that it never sells back
   assert.equal(customsLines({ called: 0, owed: 0, taken: 0, crossed: ['house'] }, { before: true })[0], 'Your house will come with you, every piece in it; the realm\'s bank does not buy back what comes through customs.');
   assert.deepEqual(customsLines({ called: 0, owed: 0, taken: 0 }, { before: true }), ['Customs finds nothing to settle.', ...CUSTOMS_PROMISE]);
 });

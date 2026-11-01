@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TIME1 (bible/06-Systems/Online-Time-Arc.md section 4): WHEN THE SKY MAY SWITCH. A row in src/net/skyLaw.js's
+// TIME1: WHEN THE SKY MAY SWITCH. A row in src/net/skyLaw.js's
 // SKY_SEGMENTS turns the sky's dial at an instant; at an ALIGNED instant the sky's hour as it stands already equals the
 // new schedule's, so nothing skips at the switch and the new rate's midnights fall on whole fractions of the real day
 // for good. This lists them, after now or a given instant, for the last segment's rate or a given TimeScale.

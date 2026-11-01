@@ -1,11 +1,9 @@
-// ACCT-RATE-MEM (2026-10-04, the login outage - Mac: "You log in and it sends you straight to title screen", "We have
-// 300 people trying to log in at once") - AUDIT-ACC F12's per-account bound upserted an `acct:` row in D1 on EVERY
+// ACCT-RATE-MEM - AUDIT-ACC F12's per-account bound upserted an `acct:` row in D1 on EVERY
 // authenticated request, so every read the game makes was also a write to the one database: 4,783,193 runs of it on
 // the day in D1's own query insights, the most time of any statement. Two relay deploys sent every player back through
 // the door at once, D1 answered "overloaded. Requests queued for too long", the session read failed under it, the
 // service said 500 and the client went back to the title. The bound is counted in the isolate's memory
 // (server-account/src/accounts.js overAccountRate); the open doors' `login:` and `ip:` keys stay in D1.
-// bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';

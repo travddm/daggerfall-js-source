@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC5b (2026-10-09, the MW-NPC arc's fifth slice - bible/04-Characters/Morrowind-NPCs.md section 10b): A FOE, READ
+// MWNPC5b: A FOE, READ
 // FOR ITS BODY. The NPC lane (characters/npcBodies.js) stands an actor from a look and a few facts; this reads both off
 // a class foe as every foe host keeps it (dungeonContext.js's records, scenes/exteriorFoes.js's - the same shape: an
 // `entity` with its worn equip table, an `ai` motor with its feet, yaw and stride, the stream's attack and cast counts,
@@ -63,8 +63,7 @@ export function foeSeed(f) {
   }
   return (f._mwSeed = h);
 }
-/** FB1012d ALLY-RACE (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md; the owner: "companions when morrowind attached switches
- *  character race"): A PERSON OF THEIR OWN. foeSeed's stand law - its species and where it stood, or its number and
+/** FB1012d ALLY-RACE (): A PERSON OF THEIR OWN. foeSeed's stand law - its species and where it stood, or its number and
  *  feet - drew a companion afresh at every stand: every door, dungeon, fast travel, load and sweep stood him in a new
  *  body of the Bay's (a Breton hand a Nord through the next door, a Wood Elf through the one after). One whose person is
  *  their own is drawn as that person, wherever and however often a body stands for them: a companion the layer stood
@@ -100,7 +99,7 @@ function clothesUnder(items, W, h) {
 /** Is this foe one a Morrowind body stands for? A CLASS foe (Daggerfall's people - the mobiles past 127) - the
  *  creatures are MWNPC9's, with their own skeletons. */
 export const isClassFoe = (f) => !!f?.entity?.isClass;
-/** MWNPC12 (bible/04-Characters/Morrowind-NPCs.md section 17): THE ORCS - Daggerfall's monsters that are people (the
+/** MWNPC12: THE ORCS - Daggerfall's monsters that are people (the
  *  orc, its sergeant, its shaman, its warlord). Each stands as a person in Morrowind's Orc body, dressed and armed from
  *  its own equip table as a class foe is (DFU arms an orc as it arms a class - enemyEquipment.js equipmentVariantFor);
  *  never a creature (creatureBodies.js declares them misses). */
@@ -114,7 +113,7 @@ export const VAMPIRE_MOBILES = new Set([MOBILE_TYPES.Vampire, MOBILE_TYPES.Vampi
  *  hands PeerBodies as the wire's wolf bit, so it stands in Bloodmoon's wolf as a transformed player does (WEREWOLF1) -
  *  and where the data has no wolf, PeerBodies refuses it and the sprite stands. */
 export const WOLF_MOBILE = MOBILE_TYPES.Werewolf;
-/** DEX7 (bible/04-Characters/Enemy-Expansion.md section 10): A MOD'S PEOPLE, AND ITS CLASSES THAT KEEP THEIR SPRITES.
+/** DEX7: A MOD'S PEOPLE, AND ITS CLASSES THAT KEEP THEIR SPRITES.
  *  A mod's mobile past the classic ids registers here where the default - a class a person, a monster its creature row
  *  (creatureBodies.js registerCreatureMatches) - is wrong for it: `{ race }` a monster that is a person, drawn in that
  *  race's body as an orc is in the Orc's (dressed from its own equip table, MWNPC12's law); `{ sprite: reason }` a class
@@ -338,7 +337,7 @@ function orcKit(mobileType, h) {
 }
 
 /**
- * MWNPC10 (bible/04-Characters/Morrowind-NPCs.md section 15b): THE LOOK OF ONE A ROSTER DRIVES - a siege's fighter, a
+ * MWNPC10: THE LOOK OF ONE A ROSTER DRIVES - a siege's fighter, a
  * ship's hand - with no entity to read. A creature mobile is its creature (creatureBodies.js; null where there is no
  * match); a class mobile a person: a race of the Bay's and a face off `seed`, its gender, the clothes a foe wears under
  * its armour in their dyes, and steel for the classes that go in it (the watch helmed) - MWNPC10c: and its class's
@@ -389,7 +388,7 @@ export function foeFx(f, batch = f?.batch) {
 }
 
 /**
- * FB1015 LOOT-BODY (2026-10-15, the owner: "When looting dead marrowind enemies, they turn to a sprite"): THE BODIES UNDER
+ * FB1015 LOOT-BODY: THE BODIES UNDER
  * A WINDOW. Both dungeon hosts draw the level's flats under a window and return before drawFoes - the only place a foe's
  * body was drawn - so AUDIT MW-NPC C6 showed every corpse flat there instead, and the loot window, opened on a body, stood
  * the classic corpse in its place for as long as it was open. The lane's bodies stand as its last sync left them - no

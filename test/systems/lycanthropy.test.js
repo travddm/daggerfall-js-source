@@ -119,7 +119,6 @@ test('V2a: the advantages are +40/+30 through the live channels, re-applied per 
   const p = P();
   const entry = createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: QUIET });
   assert.ok(entry);
-  // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the advantages are the beast's - none in human form,
   // so the curse changes before they are read (test/systems/bal6_curses.test.js holds both forms)
   lycanthropyMagicRound(p, { nowMinutes: QUIET + 1 });
   assert.equal(liveStat(p, 'strength'), 50, 'BAL6: the man is his own');

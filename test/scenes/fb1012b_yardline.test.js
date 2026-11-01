@@ -1,9 +1,7 @@
 // FIELD BUGS 2026-10-12b YARD-LINE - "Unable to build in my yard. I am unable to build in about 50% of my yard. It says
-// that it belongs to another property no matter what I do." HOME-LINE (FIELD BUGS 2026-10-11b, Mac: "Split at the
-// midline") split the ground between two HOUSES' lots down its middle - and drew the line to every building of the town
+// that it belongs to another property no matter what I do." HOME-LINE (FIELD BUGS 2026-10-11b) split the ground between two HOUSES' lots down its middle - and drew the line to every building of the town
 // pixel: a shop, a temple, a tavern within twelve metres of the house took the half of the yard nearer it, though it holds
 // no yard to split with. The midline is now a lot's holder's alone; every building's ground is still never stood on.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

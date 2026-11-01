@@ -1,11 +1,6 @@
-// GRIM1 (2026-10-09, Discord "This usually happens when someho", CLEM: "Grimoir UI is almost amazing ... Sadly GrimUI
-// doesn't allow me pick up tents ... No Hotbar ... I want some of the features of enhanced+ just not the overall look of
-// it"; Skibbster: "More support for grimoire and classic UI in general"; Dudey: "Keep the style and soul of Grimoir UI
-// and make it offer everything enhanced plus has") - THE DFO GRIMOIRE DRESS'S PICTURES.
+// GRIM1 - THE DFO GRIMOIRE DRESS'S PICTURES.
 //
-// GRIM3 (2026-10-10, Dudey: "the scroll bar looks cheap the tab bar looks cheap ... the background in the main menue
-// looks blurry same for the board where to book looks in ... it needs to stay pixelated and keep the soul of grimoire
-// ui but it needs to be EXTREMELY HIGH QUALITY") - ONE PIXEL GRID. Every picture the dress paints with is brought back
+// GRIM3 - ONE PIXEL GRID. Every picture the dress paints with is brought back
 // to Daggerfall's own grid (the pack draws at 3x the game's 320 x 200: three of its pixels are one of the game's), lightly
 // sharpened there so a soft painting reads as pixel art rather than as a smear, and drawn at ONE whole-number scale for
 // the whole screen (`--gp`, the CSS size of one of the game's pixels; `--gq` its half, for the small presses). Nothing is
@@ -58,7 +53,7 @@ export const dialFileUrl = (file, doc = globalThis.document) => new URL(`art/${f
 const G = UI_PACKS.grimoire;
 /** The served URL of one of the pack's pictures, by its IMG name. */
 export const grimoireImg = (name) => packUrl(G, `Img/${name}.IMG.png`);
-/** DESK-HD (2026-10-10, Mac: "the background is still blurry as hell ... use this one"): the front door's desk as an
+/** DESK-HD: the front door's desk as an
  *  earlier build drew it - the detailed painting (the candle's drips, the inkwell's glass, the quill), 1515 x 947, its
  *  room's edges falling into the dark as that build lit them. The pack's own BIOG00I0 is a 960 x 600 copy of a
  *  320 x 200 picture, blocks at any size; this one is lifted from Mac's screenshot of that build, its doors' words
@@ -74,8 +69,7 @@ export const NATIVE = 3;
 /** Every crop the dress cuts, by name: the picture, the box [x, y, w, h] in the pack's pixels, and what is done to it.
  *  `crisp: false` keeps a picture as the pack drew it (the vials are pixel art already: sharpened they would ring);
  *  `clarity` (passes of [radius, amount, threshold]) and `contrast` work a painting the default would leave soft - the desk and
- *  its book, the pack's softest, drawn biggest: GRIM3, Dudey: "the main screen background looks like i have not glasses
- *  on". */
+ *  its book, the pack's softest, drawn biggest: GRIM3,. */
 export const GRIMOIRE_CROPS = Object.freeze({
   page: Object.freeze({ img: 'TALK01I0', box: [576, 207, 354, 369], make: 'tile' }),
   scroll: Object.freeze({ img: 'LGBK00I0', box: [72, 93, 816, 414], make: 'tile' }),
@@ -105,8 +99,7 @@ export const GRIMOIRE_SIZES = Object.freeze({
   MAP100I0: [1200, 750], OPTN00I0: [572, 322],
 });
 /** A crop's size on the game's grid - what the dress multiplies by `--gp`. */
-/** WOOD-HD (2026-10-10, Mac: "can every board wood background in DFO Grimoire UI in ALL windows and frames look like
- *  this that has that blurred wood?"): the boards' wood is the Ascend's own soft desk wood - even planks, no pixel
+/** WOOD-HD: the boards' wood is the Ascend's own soft desk wood - even planks, no pixel
  *  blocks - cut from Mac's screenshot of that sheet, its light flattened and made seamless (public/art/grimoire-wood.jpg,
  *  301 x 567; its doctrine row in test/tooling/doctrine.test.js). On the game's grid it is 100 x 189: at the usual three screen
  *  pixels to one, the size it was painted at. The INFO01I0 cut stands in only if the file cannot load. */
@@ -167,8 +160,7 @@ export const artVar = (name) => `--grim-${name}`;
  *  one. A WINDOW is a fixed size in CSS pixels (the pause window is 920 of them on any screen), so what is drawn in one
  *  is drawn at a fixed scale too - `gp` three CSS pixels to a game pixel (the pack's own 1:1), `gq` two (the small
  *  presses, the bars), `gk` one (the pack's own pixel) - each rounded to whole device pixels: a window looks the same
- *  on every screen, its book's edges, its tabs and its bars never thicker on a bigger one (GRIM3, Dudey: "the healt
- *  staming and mana bar in the stats screen a pretty thick we cant let those inconsistencies happen"). A FULL SCREEN
+ *  on every screen, its book's edges, its tabs and its bars never thicker on a bigger one (GRIM3). A FULL SCREEN
  *  (the Ascend) scales with the screen: `gs`, the screen read as 480 x 300 of the game's pixels, rounded, 2..8.
  *  `cover` is the scale that fills the screen with the whole 320 x 200 desk
  *  (rounded up: a full screen's picture is cropped by a few of its pixels, never scaled by a part); `fit` the biggest
@@ -181,7 +173,7 @@ export function grimoireGrid(w, h, dpr = 1) {
   const fit = Math.max(2, Math.floor(Math.min(w / 320, h / 200)));
   return { gp, gq, gk, gs, cover, fit };
 }
-/** DESK-FILL (2026-10-10, Mac, of the front door as an earlier build drew it: "it looks way better use this one"): the
+/** DESK-FILL: the
  *  desk's scale in CSS pixels - the WHOLE 320 x 200 desk as big as the screen holds it (its candle, inkwell and quill all
  *  on it, the book filling the middle), never rounded down to a whole number. GRIM3 rounded it so the picture's pixels
  *  stayed square; since GRIM6 the desk is drawn smooth at its own resolution, and rounding only shrank it into a dark
@@ -290,7 +282,7 @@ function gauss(data, w, h, sigma) {
  *  fine one each pixel its own), each with a THRESHOLD - a pixel that differs from its surround by less than it (the
  *  smooth paper, the soft glow) is left exactly as painted, one that differs by twice it gets the whole pass, with a soft
  *  knee between - then a slight lift of contrast round the middle grey. The edges come up; the paper never goes blotchy
- *  (GRIM3, Dudey: "cause of all the filter ... the book looks worse now"). */
+ *  (GRIM3). */
 function clarify(doc, src, passes, contrast = 1) {
   const w = src.width, h = src.height, g = ctx(src), d = g.getImageData(0, 0, w, h), p = d.data;
   for (const [radius, amount, thr = 0] of passes) {
@@ -310,7 +302,7 @@ function clarify(doc, src, passes, contrast = 1) {
   return src;
 }
 // ---- GRIM4: the dial's four symbols -----------------------------------------------------------------------------------
-/** THE DIAL'S SYMBOLS (Dudey: "instead of words give this fitting symbols, all in the style of grimoire"; and of a drawn
+/** THE DIAL'S SYMBOLS (; and of a drawn
  *  set, "not suiting at all ... this is not a happy pixel game"): each door of the Tab dial is a piece of the pack's own
  *  painting, cut along its outline - SKILLS the Empire's helm off the world map's banner, MAGIC the spellmaker's glowing
  *  spellbook off its desk, MAP the painted map of Tamriel itself, ITEMS the chest off the Options window's Save Game
@@ -325,7 +317,7 @@ function clarify(doc, src, passes, contrast = 1) {
  *    neither  the whole picture, its torn edge already clear (the map)
  *  `h` is the symbol's height in CSS pixels on the dial (a `cells` symbol is its own height). The chest is the pack's
  *  smallest painting - about 35 of its pixels - so it is brought up to the dial's size in sharpened doublings (`lift`),
- *  never one blurred stretch (Dudey: "the image quality of the chest must be the same as the other 3"). */
+ *  never one blurred stretch. */
 export const DIAL_ICONS = Object.freeze({
   skills: Object.freeze({ img: 'MAP100I0', h: 96, poly: Object.freeze([[603, 6], [607, 6], [608, 11], [620, 12], [632, 14], [641, 19], [648, 27], [652, 36], [655, 46], [659, 56], [660, 75], [659, 95], [657, 108], [653, 121], [647, 132], [638, 142], [626, 150], [614, 155], [600, 155], [588, 149], [576, 141], [566, 131], [558, 121], [553, 111], [552, 95], [552, 52], [555, 42], [560, 32], [566, 24], [573, 18], [584, 14], [596, 12], [602, 11]]) }),
   // the spellbook is the pack's pixel art (INFO01I0 at exactly 3 of its pixels to the game's): cut on its own grid, each
@@ -345,8 +337,7 @@ export const DIAL_ICONS = Object.freeze({
     '43-96', '49-95', '62-95', '70-95', '77-94', '85-93',
   ]) }),
   map: Object.freeze({ img: 'MAP100I0', h: 84, poly: null }),
-  // GRIM6 (Dudey: "the chest is still not fitting and looks too blurry and also badly cutout ... looks at this drawn style
-  // of the book and helmet it must match"); GRIM7: the chest Dudey supplied ("here this chest chatgpt made is great make
+  // GRIM6; GRIM7: the chest Dudey supplied ("here this chest chatgpt made is great make
   // sure it fits the other symbols"), cut from its dark ground along its outline once and shipped
   // (public/art/grimoire-dial-chest.png; its doctrine row in test/tooling/doctrine.test.js) - drawn DOWN to the dial's size here,
   // as the helm and the book are
@@ -469,7 +460,7 @@ function frame(doc, wood, page) {
   const w = page.width + m * 2, h = page.height + m * 2, c = canvas(doc, w, h), g = ctx(c);
   g.imageSmoothingEnabled = false;
   // the board is the wood REPEATED - the frame is taller than one cut of it, and a board that ran out of grain left a
-  // flat strip along the window's foot (GRIM3, Dudey: "the inventory has a not textured line on the bottom")
+  // flat strip along the window's foot (GRIM3)
   g.fillStyle = g.createPattern(wood, 'repeat'); g.fillRect(0, 0, w, h);
   g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(0, 0, w, h);
   g.fillStyle = 'rgba(255,214,150,0.32)'; g.fillRect(1, 1, w - 2, 1); g.fillRect(1, 1, 1, h - 2);
@@ -572,7 +563,7 @@ function longBody(doc, side) {
  *  bar is drawn at the vial's own pixels, the tube repeated, never one vial stretched along it. */
 /** GRIM5: and the vial's own HEAD (its cork and its lit shoulder, up to `tubeFrom`) and FOOT (from `footFrom` to its end),
  *  so a long bar is the HUD's vial drawn out - its own head, its glass, its own foot - never a run of tube that simply
- *  stops (Dudey: "the vial bars are toooshort in the stat screen"). */
+ *  stops. */
 export const VIAL_CUT = Object.freeze({ cork: 6, tubeFrom: 28, tubeLen: 32, footFrom: 76, bodyLen: 240 });
 /** A piece turned half round - the lying vial's piece as the UPRIGHT vial's track holds it (cork at the right, so the
  *  dress's quarter turn stands it on top). */
@@ -597,7 +588,7 @@ function vial(doc, src) {
     body: longBody(doc, side), bodyEmpty: longBody(doc, empty),
     foot: strip(doc, side, VIAL_CUT.footFrom, footLen), footEmpty: strip(doc, empty, VIAL_CUT.footFrom, footLen),
   };
-  // VIAL-LONG (2026-10-11: "when i use alt + u and try to make the bar ... longer it bugs out"): the UPRIGHT vial drawn out
+  // VIAL-LONG: the UPRIGHT vial drawn out
   // too - its head, its glass and its foot, each the lying one's turned half round, so a taller vial stands as the HUD's
   // own does: the cork on top, the foot on the floor, the glass drawn out between
   return Object.assign(v, {

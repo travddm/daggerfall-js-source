@@ -1,6 +1,6 @@
-// CACHE-COPY (2026-10-07, Mac: "I want to fix the flickering issue properly"): A TAVERN THROUGH THE STATIC SHADOW CACHE
+// CACHE-COPY: A TAVERN THROUGH THE STATIC SHADOW CACHE
 // ON A REAL GPU, frame by frame against the full replay - what the anti-flicker patch's player saw blink, built the way
-// they described it (bible/07-Rendering/Enhanced-Lighting-Arc.md CACHE-COPY).
+// they described it (CACHE-COPY).
 //
 // tools/shadowCacheProbe.mjs proves the cache on one room with a walker. This is the room the reports were about:
 // fourteen lamps (twelve full maps, the rest DISC15's lo tier - the host's everyLightCasts), townsfolk with an ORIGIN

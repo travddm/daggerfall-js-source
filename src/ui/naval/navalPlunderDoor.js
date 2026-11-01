@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-F (2026-09-28) - THE PLUNDER WINDOW'S DOOR: the one place a host opens a taken ship's window through (ui/
+// NAV-F - THE PLUNDER WINDOW'S DOOR: the one place a host opens a taken ship's window through (ui/
 // navalPlunderWindow.js), in the Sigil Broker's door's own shape (ui/brokerDoor.js): a lazy chunk mounted through the
 // one home (ui/enhanced/enhancedChunk.js - a chunk that will not arrive is a notice the player dismisses, MENU1), in a host of
 // its own, wrapped in the generic overlay every host's frame drives - `done` once it is shut, `dispose` to shut it, the
@@ -14,8 +14,8 @@
 //
 // AUDIT NAV1 (the helm): THE SHIPWRIGHT'S WINDOW (ui/naval/navalYardWindow.js) opens through the same door - one shape for the
 // sea fight's two windows (`openNavalWindow`), each its own host, chunk and slot. ETHER-CHART: and the chart of the
-// Eltheric Ocean (ui/etherChartWindow.js), the travel map's door past the Veil. SHIPYARDS (2026-10-11): and a port's
-// shipmaster's (ui/shipyardWindow.js) - a slot of its own, the same shape. CAPTAIN-TREE (2026-10-17): and the captain's stars
+// Eltheric Ocean (ui/etherChartWindow.js), the travel map's door past the Veil. SHIPYARDS: and a port's
+// shipmaster's (ui/shipyardWindow.js) - a slot of its own, the same shape. CAPTAIN-TREE: and the captain's stars
 // (ui/captainTreeWindow.js), the Captain page's door.
 import { mountEnhancedChunk } from '../enhanced/enhancedChunk.js';
 import { registerOverlay } from '../enhanced/enhancedOverlays.js';
@@ -45,21 +45,21 @@ const ETHER_CHART = {
   load: () => import('../etherChartWindow.js'),
   mount: ({ mountEtherChartWindow }, host, deps) => mountEtherChartWindow(host, deps),
 };
-/** SHIPYARDS (2026-10-11): the shipmaster's window (ui/shipyardWindow.js) - a port's shipyard's, through the same door. */
+/** SHIPYARDS: the shipmaster's window (ui/shipyardWindow.js) - a port's shipyard's, through the same door. */
 /** @type {NavalWindowSlot} */
 const SHIPYARD = {
   id: 'shipyard-host', label: 'shipyard', open: null,
   load: () => import('../shipyardWindow.js'),
   mount: ({ mountShipyardWindow }, host, deps) => mountShipyardWindow(host, deps),
 };
-/** CAPTAIN-TREE (2026-10-17): the captain's stars (ui/captainTreeWindow.js) - the Captain page's door, the same shape. */
+/** CAPTAIN-TREE: the captain's stars (ui/captainTreeWindow.js) - the Captain page's door, the same shape. */
 /** @type {NavalWindowSlot} */
 const CAPTAIN_STARS = {
   id: 'captain-stars-host', label: 'captain-stars', open: null,
   load: () => import('../captainTreeWindow.js'),
   mount: ({ mountCaptainTreeWindow }, host, deps) => mountCaptainTreeWindow(host, deps),
 };
-/** DECK-PROPS (2026-10-17): the plan of her deck (ui/deckPlanWindow.js) - the Fleet page's Deck, the same shape. */
+/** DECK-PROPS: the plan of her deck (ui/deckPlanWindow.js) - the Fleet page's Deck, the same shape. */
 /** @type {NavalWindowSlot} */
 const DECK_PLAN = {
   id: 'deck-plan-host', label: 'deck-plan', open: null,

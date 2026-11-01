@@ -23,7 +23,7 @@ const KYNARETH = templeOf('Kynareth').name;
  *  fortified-Endurance range - probed rank 0..9 x duration 0..120,
  *  float32 first drifts at rank 4 x 45 (63 vs 62).
  *  Lives here rather than beside the guild code: systems/guild/guilds.js is
- *  mid-flight in a parallel session (2026-08-19), and this is the
+ *  mid-flight in a parallel session, and this is the
  *  member's only export either way. */
 export function deepBreath(memberships, duration) {
   let d = duration;
@@ -33,7 +33,7 @@ export function deepBreath(memberships, duration) {
   return d;
 }
 
-// DW-D (2026-09-25): IsWaterBreathing is DaggerfallEntity's flag -
+// DW-D: IsWaterBreathing is DaggerfallEntity's flag -
 // cleared every frame (ClearConstantEffects) and set again by whatever
 // keeps it: the Water Breathing effect, and Iliac Puddle No More's
 // ApplyArgonianInfiniteBreath, which sets it for an Argonian player

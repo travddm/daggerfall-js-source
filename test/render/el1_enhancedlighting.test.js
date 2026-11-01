@@ -1,5 +1,4 @@
-// EL1 - ENHANCED LIGHTING, TIER ONE: FOUNDATIONS (2026-09-17, Mac: "enhance
-// our lighting system tenfold" - tiers 1, 2 and 3).
+// EL1 - ENHANCED LIGHTING, TIER ONE: FOUNDATIONS.
 //
 // The lane (render/enhancedLighting.js) replaces the renderer's four world
 // fragment shaders and the far ring's with a linear pipeline: sRGB decode,
@@ -183,8 +182,7 @@ test('EL1: the five lane shaders declare the 48-light arrays and the lane\'s two
     assert.match(fs, /uniform float uELExposure;/, `${name}: the exposure`);
     assert.match(fs, /uniform float uELScatter;/, `${name}: the in-scatter`);
     assert.match(fs, /elDecode\(/, `${name}: decodes`); assert.match(fs, /elEncode\(tm\)/, `${name}: encodes`);
-    // EL-DISTANCE (2026-09-25, Mac: "It almost gives this weird
-    // darkness/foggy look to distant terrian which I really dont like"):
+    // EL-DISTANCE:
     // the fog is blended with the ENCODED surface, in display space as the
     // classic lane blends it - a fogged fragment is still exactly the fog
     // colour, and the ground fades on the classic lane's ramp, not ahead of it.
@@ -222,7 +220,7 @@ test('EL1: the renderer builds the classic set alone, compiles the lane once on 
   r.setLightingLane(EL_LANE);
   assert.equal(count(calls, 'compileShader') - boot, 26, 'the same lane again compiles nothing');
   assert.equal(count(calls, 'getUniformLocation'), lookups, 'and looks nothing up');
-  // LA-COST7 (2026-09-27): a set installed again looks nothing up now either - its locations are memoized on it - so
+  // LA-COST7: a set installed again looks nothing up now either - its locations are memoized on it - so
   // the no-op is read off what an install still does: it forgets every frame block, and the stamp moves (LA-COST1)
   assert.equal(r._frameStamp, stamp, 'and moves no stamp: the same lane again is a no-op');
   r.setLightingLane(null);
@@ -247,7 +245,7 @@ test('EL1: the renderer builds the classic set alone, compiles the lane once on 
   assert.equal(r._pointLights.length, 48 * 4, 'the flash plus 47 of the host\'s');
   assert.equal(r._pointLights[0], 1);
   // the cloud-shadow slot the water surface adds survives every install
-  assert.ok(Array.isArray(r._csLoc.water) && r._csLoc.water.length === 3);   // PIN MOVED (OW-HORIZON, 2026-10-20): the map, its square and the far law past it
+  assert.ok(Array.isArray(r._csLoc.water) && r._csLoc.water.length === 3);
 });
 
 test('EL1: on the lane every colour goes up decoded and the lane\'s uniforms ride each program; on classic the colours go up as given and nothing of the lane is uploaded', () => {

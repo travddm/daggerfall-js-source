@@ -1,5 +1,5 @@
-// ROCK-SUNK (2026-10-02, the field: "Insane glitched geometry over at Hadus"; "yeahhh mountains be buggin rn").
-// WOD-BUSH (2026-10-01) stood World of Daggerfall's model 60610 on the drawn ground, for the bandit camps' shrubs - but
+// ROCK-SUNK.
+// WOD-BUSH stood World of Daggerfall's model 60610 on the drawn ground, for the bandit camps' shrubs - but
 // the rock fields build their outcrops of the same model: 157 of its 202 placements are boulders scaled 5.6 to 95 and
 // set into the piles on purpose, and standing those on their lowest corner raised them as dark shards up to 377 m tall round every
 // rock field (Hadus sits among them). The shrub alone is stood now: a Rocks or Mountains site keeps the mod's height

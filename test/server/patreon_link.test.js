@@ -1,5 +1,4 @@
-// PATREON-LINK (2026-10-01, Mac: "With patron and having to manually hand out titles. Im running into a workflow where
-// its really hard to keep up with it"; asked, "Patreon auto-link"). A registered player links their own Patreon from
+// PATREON-LINK. A registered player links their own Patreon from
 // the account card, and the tier their pledge pays for is a title they hold - upgraded, downgraded and lapsed by
 // Patreon's webhook, with no handle list to edit and no deploy per patron (server-account/src/patreon.js).
 //
@@ -503,7 +502,7 @@ test('PATREON-LINK: the card - Link Patreon is a LINK that opens at once in a ne
   assert.ok(all.some((n) => n.tag === 'button' && n.textContent === 'Unlink'));
   for (const c of rowClasses(all)) worn.add(c);
   ({ all } = draw({ on: true, linked: true, titles: [], link: LINK }));
-  assert.ok(all.some((n) => n.className === 'acctpatreonstate' && n.textContent === 'Linked. No rank yet'));   // PIN MOVED (VOICE2): no dash aside, a tier a rank (Voice.md rules 3, 5)
+  assert.ok(all.some((n) => n.className === 'acctpatreonstate' && n.textContent === 'Linked. No rank yet'));
 
   for (const [why, patreon, account] of [
     ['a guest', { on: true, linked: false, titles: [], link: null }, { ...ACCOUNT, handle: null, guestName: 'A B', kind: 'guest' }],

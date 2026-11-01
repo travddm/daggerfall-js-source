@@ -1,6 +1,6 @@
 // JEWEL-KIN (2026-10-26, Discord #feature-feedback "jewelcrafting, roll chances not equal (h2h, critical)": "i crafted
 // around 100 rare rings (gold and platinum, handcraft not auto) and h2h or critical not roll on them";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): jewellery's skill lines lean to Hand-to-Hand and Critical Strike
+// ): jewellery's skill lines lean to Hand-to-Hand and Critical Strike
 // beside the mind's thirteen. Measured through the real mint (systems/smithItems.js mintPiece) the report's own rings
 // went through - a record of MINT_V_JEWEL_KIN (4), as the service stamps for this build, and ones of 2 and 3 (ARMOR-LEAN's), as every ring made before.
 // AUDIT FB1026d (C3, C6, E9, E10, E11): the record is stamped with the version its client mints (a stale tab's ring is

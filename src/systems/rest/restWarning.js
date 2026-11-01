@@ -1,5 +1,5 @@
 // @ts-check
-// REST-WARN (2026-10-08, the owner: "Poison/Disease warning on rest, there should be one for when you attempt to rest"):
+// REST-WARN:
 // a rest begun while a poison or a disease is working on the player asks first. Neither ends with sleep - a poison keeps
 // doing its harm through the hours, a disease keeps its hold (DFU's own travel popup says as much, DaggerfallTravelPopUp
 // .cs:419, and nothing said it at the rest) - so the box says what is wrong and asks whether to rest anyway. A curse in

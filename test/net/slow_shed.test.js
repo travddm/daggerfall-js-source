@@ -1,5 +1,4 @@
-// SLOW-SHED (2026-10-19, the account database overloaded again, 18:05-18:25 UTC: the median request waited 10 s and D1
-// refused almost nothing; bible/11-Multiplayer/Scale-Arc.md SLOW-SHED) - A DATABASE TOO SLOW TO ANSWER IS SHED AS ONE
+// SLOW-SHED - A DATABASE TOO SLOW TO ANSWER IS SHED AS ONE
 // THAT REFUSES: each isolate hears its requests' D1 wait over their round trips (metrics.js measured) and, while its last
 // SLOW_SHED_SPAN_MS of them average SLOW_SHED_WAIT_MS a trip over SLOW_SHED_MIN requests, sheds the reads an overload
 // sheds; and the page's gate takes a display read that timed out as the overload's word, a stall once.

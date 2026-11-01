@@ -1,4 +1,4 @@
-// AUDIT 68 S11-colorkey-tbc (2026-09-24): THE KEYGROUP SAMPLER, ONE HOME.
+// AUDIT 68 S11-colorkey-tbc: THE KEYGROUP SAMPLER, ONE HOME.
 //
 // A NIF KeyGroup - {type, keys: [{time, value, inTan?, outTan?, tbc?}]},
 // readKeyGroupOf's shape (mwNifFile.js) - is sampled by one law, the

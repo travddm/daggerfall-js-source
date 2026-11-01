@@ -1,7 +1,5 @@
 // @ts-check
-// WAGONS2 (2026-10-09, Mac: "3. People should be able to use the interior just like houses ... 4. ... allowing players
-// to see inside/outside of house windows + the new wagon"; asked, the caravan's inside is "Caravan-shaped": built from
-// the caravan itself - its size, its windows and its door, turned with the wagon): THE CARAVAN'S ROOM, AS A MODEL.
+// WAGONS2: THE CARAVAN'S ROOM, AS A MODEL.
 //
 // WAGONS1 borrowed the small ship's cabin (Warm Ashes' SHIPAA00.RMB) for the caravan's room: a room of another shape,
 // stood axis-aligned on the wagon however it was parked, its windows nowhere near the caravan's. This is the caravan's

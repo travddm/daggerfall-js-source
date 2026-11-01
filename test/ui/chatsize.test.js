@@ -1,5 +1,4 @@
-// CHAT-SIZE (2026-09-23, Mac: "I want to implement the ability to click and drag the chat to resize/along with the
-// text"). The grip at the corner of the chat box: the width it gives is the text's scale, the height the list's lines;
+// CHAT-SIZE. The grip at the corner of the chat box: the width it gives is the text's scale, the height the list's lines;
 // the player's two numbers outlive the session; the friends panel moves with the box instead of sliding under it.
 import '../modsOff.js';
 import { test } from 'node:test';

@@ -1,7 +1,4 @@
-// MENU1 - THE ENHANCED MENUS THAT SOMETIMES DO NOT OPEN (2026-09-15,
-// Mac relaying a player: "sometimes you're unable to open the enhanced
-// menus. For example a player might open the radial and select the
-// spellbook, but it will fail to open").
+// MENU1 - THE ENHANCED MENUS THAT SOMETIMES DO NOT OPEN.
 //
 // THE ROOT CAUSE IS THE DEPLOY. Every enhanced menu builds to its own
 // content-hashed lazy chunk (`dist/assets/enhancedSpellbook-*.js` and
@@ -205,7 +202,6 @@ test('MENU1: and no door is left catching a mount failure by hand', () => {
 
 // ═══ MENU1-WARM: THE BYTES ARE ASKED FOR EARLY, NOT ON THE KEYPRESS ══
 //
-// Mac, 2026-09-19: "look for any elements of hitching, or hiccups."
 //
 // MENU1 is about a chunk that FAILS. This is its other half: one that
 // merely arrives LATE. Every door's `import()` is the first time its

@@ -104,7 +104,7 @@ export function charSheetDoorReady() {
 /** AUDIT GROWTH LANE1-8: entity -> the level whose fanfare a screen built here played. */
 const fanfared = new WeakMap();
 /**
- * GROWTH1 (bible/10-UI/Growth.md section 4): THE LEVEL-UP'S ROLLOUT for `entity`, one home - the screen a level OWED wants
+ * GROWTH1: THE LEVEL-UP'S ROLLOUT for `entity`, one home - the screen a level OWED wants
  * (ORL1's Virtue screen for a mod-law character, DFU's own for any other; the fanfare only while the notice still owes
  * it - LV2), or null with nothing owed (the view of the stars is the lazy chunk's - levelUp/levelUpView.js viewOnlyScreen,
  * never this boot door's import). This door's own level-up and the pause window's Growth tab (its Level page draws the
@@ -164,8 +164,7 @@ export function createCharSheetWindow(deps = {}) {
   // at five apiece with Luck at four is exactly thirty. ORL1's deep
   // audit.)
   //
-  // LV1 (Mac, 2026-09-18: "the next enhanced UI window... a replication
-  // of the skyrim level up UI in our own constellation vision"): AND
+  // LV1: AND
   // THE ENHANCED SKIN HAS A FACE FOR BOTH LAWS NOW. Until this slice
   // the skin fork stopped at the sheet: a level-up in the enhanced skin
   // mounted the CLASSIC LevelUpScreen - eight drawText rows on the
@@ -209,7 +208,7 @@ export function createCharSheetWindow(deps = {}) {
     // same hooks: PX25 built the Stats page to take them.
     return enhancedSheetPageOverlay(hooks, deps.entity, deps.pause ?? null);   // F5-QUESTS: and the host's pause bag
   }
-  // GROWTH4 (bible/10-UI/Growth.md section 7): the classic sheet's S and W rows open the Growth tab's guide - the enhanced
+  // GROWTH4: the classic sheet's S and W rows open the Growth tab's guide - the enhanced
   // pause window on either skin (pauseDoor.js growthPageAt), pushed as the sheet's own child with this host's pause bag;
   // its Resume comes back to the sheet. No document (node), no hook: the rows keep DFU's boxes.
   // AUDIT GROWTH LANE3-14: no relock on its Save or Load - the sheet still stands under it.
@@ -218,8 +217,7 @@ export function createCharSheetWindow(deps = {}) {
 }
 
 /**
- * ESC-BOOK (2026-09-27, Eterna on Discord: "if u enter the spellbook via the escape menue, instead of the chosen
- * keybind, the spellbook will open and stay persistent, behind all screens, making it unable to exit or play"):
+ * ESC-BOOK:
  * THE PAGE'S DOORS ARE THE HOST'S OWN ARMS. The sheet's hooks are FACTORIES - the classic sheet pushes what they build
  * as its own child - and this page called them, closed itself and dropped what they built. An enhanced spellbook or
  * pack mounts its screen the moment it is built, so it stood over the game with no host slot holding it: the pointer
@@ -280,11 +278,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   // once, the window kept, the arm laid again; the second press puts it away
   const dialClose = () => { if (view?.asksFirst?.()) { unregister = registerOverlay(dialClose); return; } close(); };
   unregister = registerOverlay(dialClose);
-  // MAC-C (2026-09-17, Mac: "you can exit out of the F6 menu
-  // (inventory) by pressing F6 again, but you cannot do the same for
-  // the F5 one (char sheet)" + "it would be extra cool if you could
-  // like, be on the F5 page, press F6 and then go straight from char
-  // sheet to inv").
+  // MAC-C.
   //
   // THE SHEET HAD NO KEY OF ITS OWN. PX27 made the enhanced sheet the
   // pause window's Stats page, and `enhancedMenu`'s capture handler
@@ -329,7 +323,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
    *  sworn one's stars closed over it (RVN-STARS - remountPage), on the
    *  page they were opened from. */
   function pageOpts() {
-    // F5-QUESTS (2026-09-26, Mac: "Cant see quest on f5 menu but can on tab menu"): THE HOST'S PAUSE BAG, under the
+    // F5-QUESTS: THE HOST'S PAUSE BAG, under the
     // sheet's own doors. This page IS the pause window opened on Stats, and it was handed those doors and nothing
     // else: its Quests tab said "The journal is not wired into this place yet" while the same window through Tab's
     // dial listed every quest, its Save and Load said there was no door, and its Exit did nothing. `pause` is the

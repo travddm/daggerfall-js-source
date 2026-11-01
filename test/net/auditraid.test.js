@@ -1,7 +1,7 @@
-// AUDIT RAID (2026-09-28, Mac: "1. Audit this properly 2. Ensure online functionality is perfect"): the raid's online
+// AUDIT RAID: the raid's online
 // arm, audited against its own tree (RAID3's relay ledger, RAID4a's claim, RAID4b's thanks) and each finding pinned
 // here - driven through the real Room (fakeRoom.mjs), the real account service over node:sqlite and its real
-// migrations, the real session and the real device queue. bible/03-World/Raiding-Parties.md, "AUDIT RAID".
+// migrations, the real session and the real device queue., "AUDIT RAID".
 //   R1 a raid is its whole tuple (key + signature), its ledger made only from its town's pixel, and a client hears only
 //      its own raid's words;
 //   R2 an earner's receipt kept by the hub - handed wherever the earner stands, and at a hello for a day;
@@ -439,7 +439,7 @@ test('AUDIT RAID wiring by source: the relay keeps receipts at the hub and hands
   assert.match(rp, /const raid = raidOfWord\(f\.key, f\.g\);/);
   const on = rd('src/net/online.js');
   assert.match(on, /r\.k === 'cl' \|\| r\.k === 'rc' \? isCellRoom\(room\) \|\| isSocialRoom\(room\)/);
-  assert.match(on, /if \(!\(this\._mine\(cell\) \? this\.raidOk : halo\?\.raidOk\)\) return false;/);   // PIN MOVED (COST-2): my own room, or a cell my socket covers
+  assert.match(on, /if \(!\(this\._mine\(cell\) \? this\.raidOk : halo\?\.raidOk\)\) return false;/);
   assert.match(on, /else \{ const h = this\._halo\.get\(room\); if \(h\) h\.raidOk = relaySupportsRaid\(relayV\); \}/);
   assert.match(rd('src/net/accountClient.js'), /claim: async \(receipt, character, name = null, cid = null\) =>/);
   assert.match(rd('server-account/src/index.js'), /cid: body\.cid \?\? null \}/);

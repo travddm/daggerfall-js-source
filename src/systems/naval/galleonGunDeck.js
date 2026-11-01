@@ -1,5 +1,5 @@
 // @ts-check
-// GALLEON (2026-10-01, Mac: "ensuring cannon fire shoots from the cannon holes properly"): THE GUN DECK AT WORK - a
+// GALLEON: THE GUN DECK AT WORK - a
 // ship's gunport shutters and the guns behind them, as a broadside is laid and fired.
 //
 // The new galleon (world/ships/galleonModel.js) carries a gun behind each of her ten ports (`Gun<Side><i>`, its frame's +x

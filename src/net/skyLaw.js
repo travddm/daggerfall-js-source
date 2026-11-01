@@ -1,7 +1,6 @@
 // @ts-check
-// TIME1 (2026-10-01, Mac: "people have to wait insanely long, werewolf forms last insanely long" / "I don't want a
-// band aid, I want a detailed way we can do this" / "Let's do it. This needs to be perfect"): THE SKY'S OWN CLOCK.
-// Design: bible/06-Systems/Online-Time-Arc.md.
+// TIME1: THE SKY'S OWN CLOCK.
+// Design:.
 //
 // Online two clocks are functions of wall time. WORLD5's (wire.js sharedClassicMinutes, TimeScale 12, a day every two
 // real hours) is THE EVENT CLOCK: the relay's gates, raids and rows, the economy, every term and every stamp - its rate

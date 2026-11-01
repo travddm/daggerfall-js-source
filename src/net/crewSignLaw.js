@@ -1,5 +1,5 @@
 // @ts-check
-// CREW-SIGNED (2026-10-27, the SEA-OPEN slice; bible/03-World/Shipyards.md CREW-SIGNED) - A CREW HALL'S RECRUIT SIGNED ONCE
+// CREW-SIGNED - A CREW HALL'S RECRUIT SIGNED ONCE
 // ONLINE, the law both ends read. A town's hall draws the same sailors for every client on the same day (systems/
 // crewHall.js recruitsOf: a seed of the town's map id and the day), so two players could sign one named man. Online, a
 // hire asks the account service first (server-account/src/crewSigns.js): the first account to sign a recruit holds him

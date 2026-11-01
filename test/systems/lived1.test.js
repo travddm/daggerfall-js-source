@@ -1,9 +1,7 @@
-// LIVED1 (2026-09-29, Mac, sharing the Discord - Dracula/Valentin: "my money, my guild and i cant even travel at day
-// anymore"; Subdon: "since we cant just import/export characters anymore, how we getting lycanthropy now? becuse we
-// need to wait 72 hours but the in game clock aint moving"): "Makes a good point. We need a better system for time
+// LIVED1: "Makes a good point. We need a better system for time
 // online instead of a band aid fix. Something detailed and that really makes sense".
 //
-// TWO CLOCKS (bible/06-Systems/Lived-Time.md). The WORLD's is WORLD5's shared clock, unchanged: the sky, the calendar
+// TWO CLOCKS. The WORLD's is WORLD5's shared clock, unchanged: the sky, the calendar
 // and everything every player shares read it, and nobody moves it. The CHARACTER's (worldTick.js ownMinutes) is the
 // world's offline - one variable, DFU byte for byte - and online it runs WITH the world while they play, AHEAD of it by
 // every RaiseTime (a rest, a journey, training, a sentence), and STANDS while they are away or dead. The body, its magic,
@@ -206,7 +204,7 @@ test('LIVED1: arrival and death move NOTHING of the character\'s - the clock tha
   // the save's door: the character left the world at N - 5 and comes back at 3N + 10 (three boundaries of the world's)
   const own = 2 * N + 100;   // [own, now) would cross one boundary; the world's [left, now) crosses three
   lane(true, { own, world: N - 5 });
-  // REP4 (the reputation overhaul): PIN MOVED - the recovery is weekly now, so the name starts deep enough (-100) for the
+  // REP4 (the reputation overhaul):
   // WORLD's span (thirty-three weeks) and the character's own (sixteen) to read differently, as DFU's 3 and 1 boundaries did
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(player({ legalRep: [-100], rentedRooms: [{ expiryMinutes: own + 600 }] }), { classicMinutes: own })));
   setSharedClock(() => 3 * N + 10);

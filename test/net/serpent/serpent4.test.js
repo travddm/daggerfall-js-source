@@ -1,9 +1,5 @@
-// SERPENT4 (2026-10-11, the players' thread "Serpent boss fight" in feature-feedback - "too slow and boring", "the snake
-// is way too strong for the small amount of people who do it", "make the wind go crazy where the serpent stands", "let
-// players on the ship be able to hurt it", "make it huge", "The fact they block ships getting in after a while is
-// stupid", "the game just pushed me away from the snake ... like sailing through molasse", "ships need some kind of
-// larger invisible box aura", "Rewards based on party or individual damage should be given on death"): THE SERPENT
-// REWORKED (bible/11-Multiplayer/Sea-Serpent.md section 16). Its waters open until it dives; a sixth off its health; its
+// SERPENT4: THE SERPENT
+// REWORKED. Its waters open until it dives; a sixth off its health; its
 // throws and the canvas they tear halved; its girth SERPENT_GIRTH times; a part dealt earns, a quarter of the fight
 // stood earns, and a party shares a dealer's kill; its gale; the ships' bumpers (retired by HULL-PASS - the pin below); a hand's own weapons on its hide. Each
 // pin failed on the build before it. tools/mutants/serpent4.json.
@@ -270,7 +266,7 @@ test('SERPENT4 a hand\'s weapons on the client: its segments are a hand\'s marks
   const magic = src('scenes/hostMagic.js');
   assert.ok(/if \(m\.duel\) \{\n {8}const hitBox = boxMarksFor\(m\.spell\)\.find\(\(q\) => missileInBox\(m\.pos, q\.box\)\);/.test(magic));
   const world = src('scenes/world.js');
-  for (const wired of ['boxMarks: () => serpentHost?.handBoxes?.() ?? null,', 'castAtBox: (sp, q, caster) => serpentSpell.cast(sp, q, caster),', 'boxTargets: serpentHost?.handBoxes?.() ?? null,', 'onPlayerArrowHitBox: (m, t) => serpentArrowOn(m, t),']) assert.ok(world.includes(wired), wired);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders; PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): the door in scenes/gate/standInSpell.js createSerpentSpell
+  for (const wired of ['boxMarks: () => serpentHost?.handBoxes?.() ?? null,', 'castAtBox: (sp, q, caster) => serpentSpell.cast(sp, q, caster),', 'boxTargets: serpentHost?.handBoxes?.() ?? null,', 'onPlayerArrowHitBox: (m, t) => serpentArrowOn(m, t),']) assert.ok(world.includes(wired), wired);
 });
 
 // ═══ the client rig ═══════════════════════════════════════════════════════════════════════════════

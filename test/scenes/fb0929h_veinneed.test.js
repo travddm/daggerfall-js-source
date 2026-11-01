@@ -1,12 +1,10 @@
-// VEIN-NEED (FIELD BUGS 2026-09-29h; Dunkitay on the Discord, through Mac: "how do i mine this, if i use the pick axe
-// it says 'you cannot mine in here!'"). A dungeon's Silver vein under the look, the prompt "[E] Mine Silver - needs
+// VEIN-NEED (FIELD BUGS 2026-09-29h; Dunkitay on the Discord, through). A dungeon's Silver vein under the look, the prompt "[E] Mine Silver - needs
 // Mining 25", the chip "Mining 0 - 0 / 60 today". Neither of the player's two gestures said why. E at a node that
 // cannot be worked passes the press on (AUDIT 29 C1: to the door, the chest or the foe it was meant for) - and with
 // nothing else under the ray it opened nothing and said nothing: the prompt's key a drawn door, PROF1's "an act
 // started, or what it needs said" without its second half. The pack's Pick-Axe is Foraging's own use, and "You cannot
 // mine in here!" is the mod's line (FORAGE0 law 1, Mac's) - kept, and left to Mac. VEIN-NEED: a press a node passed
 // on that opened nothing else has the node say what it needs, the player's own rank beside a rank that is short.
-// bible/01-Overview/bugs/Field-Bugs-2026-09-29h.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,7 +28,7 @@ const tick = () => new Promise((r) => setImmediate(r));
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 const WOODS = 231, GLENUMBRA = 59;
 const NOON = 20500 * 86_400 + 43_200;
-/** A dungeon nobody has confirmed whose first vein is Silver, tier 3 (PROF0 23), as the report's. PIN MOVED (DEEP-OPEN,
+/** A dungeon nobody has confirmed whose first vein is Silver, tier 3 (PROF0 23), as the report's.
  *  Professions-Arc.md section 53): such a dungeon draws its whole deep table now - every vein was Silver there, and 88's
  *  first is no longer - so the dungeon is the first from 88 whose first vein the report's is. */
 const DUNGEON = (() => {
@@ -181,7 +179,6 @@ test('VEIN-NEED: what a node says for each thing it lacks - the rank with the pl
   assert.equal(needLine(mine({ rank: 25 }), () => 25), '', 'ready: nothing to say');
   assert.equal(needLine(mine({ counting: true }), () => 0), 'That gathering is being counted.');
   assert.equal(needLine(mine({ taken: true }), () => 0), '', 'worked today: its prompt says so, and it is no target');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): sixty today said 'Mine Silver: Mining 25 - 60 of 60
   // today'; the plan asks no day now, so a day past it is no need
   assert.equal(needLine(mine({ rank: 25, today: 600, cap: 60 }), () => 25), '', 'a day past the old sixty: ready, nothing to say');
   assert.equal(needLine(mine({ rank: 25, storesFull: () => true }), () => 25), 'Mine Silver: Stores full - Silver');
@@ -233,7 +230,6 @@ test('VEIN-NEED: the hosts - each ladder hands the press back at its foot, only 
   const s0 = w.indexOf('const nodeTook = useEdge');
   const street = w.slice(s0, w.indexOf('}).catch((e) => console.error(e));', s0));
   const here = street.indexOf('gatherHost?.sayNeed()');
-  // PIN MOVED (AUDIT HOLDINGS Q4): the sea's arm is handed whether her own trigger wins the ray (the gangway yields to it)
   for (const arm of ['lockOn.toggle(_lockFoe)', 'plaquePeerAct(cam.pos, useFwd)', 'naval?.activate({ boatTrigger: !!_race.boatWins })', '_enemyArm(RAY_DISTANCE, _rivalDist)', 'townTalk.tryActivate(', '_race.gateWins', 'else if (lootKey)', 'quickLootTake(', 'modes.tryEnter()']) {
     assert.ok(street.indexOf(arm) >= 0 && street.indexOf(arm) < here, `${arm} has the press before the node's word`);
   }

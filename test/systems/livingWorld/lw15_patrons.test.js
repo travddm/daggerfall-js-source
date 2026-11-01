@@ -1,4 +1,4 @@
-// LW15 (bible/06-Systems/Living-World-II.md "LW15"): THE PATRONS - the living world's townsfolk buying from a player's
+// LW15 ("LW15"): THE PATRONS - the living world's townsfolk buying from a player's
 // hired trader. The law both ends read (src/net/patronLaw.js: the odds, the cap at worth, a crafted piece no dearer, the
 // town's share, the sellers' ceilings, the hours reckoned); the service's reckoning (server-account/src/market.js
 // reckonPatrons: the sales, the gold, the faucet, twice the same, late the same, a private home's trader none, the
@@ -307,14 +307,13 @@ test('LW15 drawn: the seed dealt to one of the town\'s households alike by every
   assert.equal(patronOf(1, residents).id, 'L1.3');
   assert.equal(patronOf(2, [...residents].reverse()).id, 'L1.1', 'every reader alike');
   assert.equal(patronOf(5, residents.slice(2)), null, 'never the watch, a visitor or a guardsman');
-  // PIN MOVED (AUDIT LW-II B1): a sale is walked PATRON_DELAY_DAYS living days after its own - online a living day is a
   // real hour, and a reader learns of a sale only after its whole hour (its own day) is gone
   assert.equal(PATRON_DELAY_DAYS, 2);
   const day = 100, D0 = day * DAY_MIN + 240, S = PATRON_DELAY_DAYS * DAY_MIN;
   const v = patronVisits([{ door: 7, t: D0 - S + 600, seed: 1 }, { door: 7, t: D0 - S - 5, seed: 1 }, { door: 7, t: D0 - S + DAY_MIN, seed: 1 }], day, residents);
   assert.deepEqual(v, [{ resId: 'L1.3', door: 7, from: D0 + 600, dur: PATRON_STAY_MIN }], 'a sale two days before, walked today');
   assert.deepEqual(patronVisits([{ door: 7, t: D0 + 600, seed: 1 }], day, residents), [], 'today\'s own sale: walked two days on');
-  // a sale outside the open hours: its patron comes in them, at its place in their fold - PIN MOVED (AUDIT LW-II B2): nine to five
+  // a sale outside the open hours: its patron comes in them, at its place in their fold
   assert.deepEqual(PATRON_OPEN_H, [9, 17]);
   const night = patronVisits([{ door: 7, t: day * DAY_MIN - S + 25 * 60, seed: 0 }, { door: 7, t: day * DAY_MIN - S + 6 * 60, seed: 0 }, { door: 7, t: day * DAY_MIN - S + 20 * 60, seed: 0 }], day, residents);
   assert.deepEqual(night.map((x) => x.from - day * DAY_MIN), [9 * 60, 14 * 60, 12 * 60], 'one in the morning comes at nine');
@@ -356,7 +355,7 @@ test('LW15 drawn: the seed dealt to one of the town\'s households alike by every
   assert.equal(h.digest('hex').slice(0, 16), '130ffff561ff4035', 'the plain plans LW14 laid');
 });
 
-// ─── AUDIT LW-II (2026-10-10): the service's findings, each through the real Worker over node:sqlite ───
+// ─── AUDIT LW-II: the service's findings, each through the real Worker over node:sqlite ───
 
 /** Weapons off the loot tables in the market's wire form, each one the loot law stands behind - a patron paying at least
  *  `minCap` for each. */
@@ -521,7 +520,6 @@ test('AUDIT LW-II P5: A READ\'S RECKONING BOUNDED - the law\'s dice asked before
   const reader = await a.registered('Reader');
   _now = T0 + 50 * 3600;
   const tally = counted(a);
-  // PIN MOVED (PATRON-LOAD): the region's read reckons nothing - a few statements and not a mark moved - and each town is
   // reckoned by its own trader's read, two statements a town (it was the region's read that reckoned them all)
   const marksBefore = towns.flatMap((m) => a.marks(m));
   assert.equal((await a.call('/v1/market/vendors', { region: DF }, reader.secret)).status, 200);
@@ -569,7 +567,7 @@ test('AUDIT LW-II P6, P9: THE SALES KEPT AND TOLD - each sale told once, at the 
   s.home(mal, 9001, 77, { entry: 'private', id: 'evetrader01' });
   for (const it of loot(10)) s.list(eve, v, it);
   _now = T0 + 20 * 3600;
-  assert.equal((await s.call('/v1/market/vendor', { vendor: v }, mal.secret)).status, 200);   // PIN MOVED (PATRON-LOAD): the trader's read reckons; the region's tells
+  assert.equal((await s.call('/v1/market/vendor', { vendor: v }, mal.secret)).status, 200);
   const r = await s.call('/v1/market/vendors', { region: DF }, mal.secret);
   assert.equal(r.status, 200);
   const sold = s.sales();
@@ -599,7 +597,7 @@ test('AUDIT LW-II P7: A DOOR OPENED OPENS ITS TRADER FROM NOW - set public throu
   const opened = Math.floor(_now / 3600);
   const e = await s.call('/v1/homes/entry', { mapId: 6001, buildingKey: 10, entry: 'public' }, eve.secret);
   assert.equal(e.status, 200, JSON.stringify(e.body));
-  assert.deepEqual(s.marks(6001), [opened], 'its hours to the one it opens in');   // PIN MOVED (AUDIT LW-II-2 S4): to the hour it opens IN - opened at :59, the hour before was paid whole
+  assert.deepEqual(s.marks(6001), [opened], 'its hours to the one it opens in');
   _now = T0 + 40 * 3600;
   await s.call('/v1/market/vendor', { vendor: shut }, eve.secret);
   assert.ok(s.sales().length >= 1, 'open, it sells');

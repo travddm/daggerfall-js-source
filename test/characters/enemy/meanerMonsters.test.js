@@ -1,7 +1,4 @@
-// MM1 (2026-09-12) - MEANER MONSTERS 1.5.2 (Ralzar), THE MOD, 1:1.
-// Mac: "Next is this mod to integrate 1-1. Additionally for mod options,
-// everything should be compatible across the board and there shouldn't
-// be compatibility switches between mods."
+// MM1 - MEANER MONSTERS 1.5.2 (Ralzar), THE MOD, 1:1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

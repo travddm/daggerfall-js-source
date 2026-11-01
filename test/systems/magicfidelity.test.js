@@ -35,7 +35,6 @@ test('magicfidelity magic-3: the buff landing gates - silence chance, the full s
   assert.ok(!hasActiveEffect(t3, 'silenced'));
   // the AddState quirk: an incumbent re-cast merges its rounds INSIDE
   // Start, BEFORE the chance gate - the fail message still fires.
-  // PIN MOVED (STACK-CAP): renewed to a fresh cast's, never stacked
   const t4 = mkTarget();
   applySpell({ rangeType: 0, element: 4, effects: [silence(90)] }, 1, t4, {}, seq(0.1));
   const rounds0 = t4.activeEffects.find((a) => a.kind === 'silenced').roundsRemaining;

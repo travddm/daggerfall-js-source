@@ -1,4 +1,4 @@
-// LW6 (2026-10-05, bible/06-Systems/Living-World.md, Mac: "You can find them dungeon diving, make friends or enemies"):
+// LW6:
 // THE DEEP - an adventurer's dives (a dungeon in reach, the hours inside in place of a stay), the deep's fated end (the
 // dungeon's own foes, the fallen lying inside, a fallen leader's company out at once), what the town says of a dive,
 // who is inside a dungeon now, and the companies met there - on the synthetic map with its dungeons and a mock pool.
@@ -32,7 +32,7 @@ test('LW6 the dives: an adventurer\'s cycle a DIVE now and then (DIVE_CHANCE, it
         if (res.job !== 'adventurer') { assert.ok(!t?.dive, 'none but an adventurer dives'); continue; }
         if (!t) continue;
         trips++;
-        const chance = companyOfPlace(res, deep.world.rosterOf(town)) ? COMPANY_DIVE_CHANCE : DIVE_CHANCE;   // PIN MOVED (LW13): a company's first, the company's chance
+        const chance = companyOfPlace(res, deep.world.rosterOf(town)) ? COMPANY_DIVE_CHANCE : DIVE_CHANCE;
         want += chance;
         const diving = lwRng(res.town, res.slot, k, 0x64697665)() < chance;
         if (!t.dive) {

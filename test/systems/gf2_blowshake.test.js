@@ -1,5 +1,4 @@
-// GATHER-FEEL II - BLOW-SHAKE (2026-10-13, Mac: "Do the not done" - GATHER-FEEL's open "a blow shakes no camera";
-// bible/06-Systems/Professions-Arc.md section 45): A LANDED BLOW MOVES THE VIEW. The table (systems/gatherBlow.js
+// GATHER-FEEL II - BLOW-SHAKE: A LANDED BLOW MOVES THE VIEW. The table (systems/gatherBlow.js
 // GATHER_BLOW_FEEL) under every technique's hit; its gates (the enhanced skin, the player's technique motion, the
 // system's reduced motion); the springs' one door (combat/technique/techniqueFx.js kickFx) - the peaks the table names, the
 // technique's own moments through it still; the clean blow off the real machines (landedBlow); and the host over the real
@@ -26,7 +25,6 @@ const ON = { enhanced: () => true, reduced: () => false, motion: () => 1 };
 
 test('GF2-BLOWSHAKE B1: the table - an axe\'s and a pick\'s blow, plain and clean, each a dip of the look, the eye and the hands, the clean one deeper on every channel, the pick\'s deeper than the axe\'s; no roll, no lens, no shake; every dip under the least any technique\'s hit dips its channel (mutants: a blow that looks up, a clean one no deeper, a shake on a tool)', () => {
   assert.deepEqual(Object.keys(GATHER_BLOW_FEEL).sort(), ['chop', 'mine']);
-  // PIN MOVED (AUDIT GATHER-FEEL F5/R1): every channel against the least a technique's hit moves it - the hands alone were
   // read, and three of the look's dips stood at or past cleave's; and the table's own numbers (a row at a tenth passed)
   const least = (read) => Math.min(...Object.values(TECH_FX).map((t) => read(t.hit ?? {})).filter((v) => v > 0));
   const lightest = least((h) => h.hands?.y ?? 0), look = least((h) => -(h.cam?.pitch ?? 0)), eye = least((h) => -(h.cam?.eye ?? 0));

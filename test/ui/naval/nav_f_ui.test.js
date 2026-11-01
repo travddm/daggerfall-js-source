@@ -1,6 +1,5 @@
-// NAV-F (2026-09-28, Mac: "All UI elements should follow enhanced plus UI. This task is to be extremely detailed,
-// authentic and easy to use") - THE UI: the helm's readout (the ship plate, the battery rose, the aim, the target card)
-// and the plunder window with its door, in the stone-and-brass kit on either skin (bible/03-World/Naval-Combat.md).
+// NAV-F - THE UI: the helm's readout (the ship plate, the battery rose, the aim, the target card)
+// and the plunder window with its door, in the stone-and-brass kit on either skin.
 // The readout's words and the window's are pure and pinned as words; both are then mounted on the suite's minimal DOM
 // and driven as a player drives them.
 import { byClass, keydown, windowListenerCount, Node_ } from '../../chargenDom.mjs';
@@ -61,7 +60,7 @@ test('NAV-F the ship plate\'s words: her name, the crown\'s waters and the ancho
   const b = Object.fromEntries(plate.batteries.map((x) => [x.side, x]));
   assert.equal(b.port.count, '6 long guns');
   assert.equal(b.starboard.count, '1 long gun');
-  assert.equal(b.bow.count, '2 chasers');   // PIN MOVED (SHOT-KINDS): chain shot is a load now, the bore its chasers
+  assert.equal(b.bow.count, '2 chasers');
   assert.equal(b.stern.count, '0 barrels');
   assert.equal(b.port.fill, 25);
   assert.equal(b.port.ready, false);
@@ -96,8 +95,8 @@ test('NAV-F the aim under the crosshair: the battery and its word - a broadside,
 
 test('NAV-F the target card: her name and colours, her class, captain and distance, her hull and canvas, and her state - hostile, colours struck (with the key that boards her when she is in reach), boarded, taken (her hold\'s key), going down (mutants: the board key offered for another ship, the prize state missed)', () => {
   const c = navalHudText(helm({ target: card() }), KEYS).card;
-  // SHIP-STANCE (2026-10-02) PIN MOVED: the card says how she stands - `friendly`, and her hostile state line its own red
-  assert.deepEqual(c, { id: 'The Red Wake', name: 'The Red Wake', faction: 'pirate', hostile: true, friendly: false, sub: 'Pirate Brigantine - Captain Irna Vosk - 142 m', hull: 30, sail: 75, crew: null, state: 'Hostile', stateKind: 'hostile' });   // PIN MOVED (COMBAT-FEEL CARD-CREW: her men - none known here)
+  // SHIP-STANCE
+  assert.deepEqual(c, { id: 'The Red Wake', name: 'The Red Wake', faction: 'pirate', hostile: true, friendly: false, sub: 'Pirate Brigantine - Captain Irna Vosk - 142 m', hull: 30, sail: 75, crew: null, state: 'Hostile', stateKind: 'hostile' });
   const st = (t, board = null) => { const x = navalHudText(helm({ target: card(t), board }), KEYS).card; return [x.state, x.stateKind]; };
   assert.deepEqual(st({ hostile: false }), ['', '']);
   assert.deepEqual(st({ state: 'struck' }), ['Colors struck', '']);
@@ -202,14 +201,14 @@ test('NAV-F the readout is ONE node made on the first word and UPDATED, never re
   assert.equal(port.className, 'dfnaval-gun port');
   assert.equal(byClass(port, 'dfnaval-gun-fill')[0].style.height, '25%');
   assert.equal(byClass(root, 'starboard').find((n) => n.className.startsWith('dfnaval-gun')).className, 'dfnaval-gun starboard ready active');
-  assert.equal(byClass(root, 'stern').find((n) => n.className.startsWith('dfnaval-gun')).className, 'dfnaval-gun stern gun-empty');   // PIN MOVED (HUD-CLASS): the battery's own word - the bare 'empty' took the enhanced sheet's .empty component
+  assert.equal(byClass(root, 'stern').find((n) => n.className.startsWith('dfnaval-gun')).className, 'dfnaval-gun stern gun-empty');
   // the next word updates the same nodes
   drawNavalHud(helm({ ship: { ...helm().ship, name: 'Carrack', hull: 0.2 }, aim: { side: 'port', range: 100, max: 180, hot: true } }), { keys: KEYS });
   assert.equal(byClass(body, 'dfnaval-hud').length, 1, 'one node');
   assert.equal(byClass(body, 'dfnaval-hud')[0], root);
   assert.equal(byClass(root, 'dfnaval-name')[0], name);
   assert.equal(name.textContent, 'Carrack');
-  assert.ok(byClass(root, 'dfnaval-track').some((t) => /^dfnaval-track hull low( hit-[ab])?$/.test(t.className)), 'a hull under a quarter pulses');   // PIN MOVED (COMBAT-FEEL HULL-BLOW: and the bite out of her bar flashes it a moment)
+  assert.ok(byClass(root, 'dfnaval-track').some((t) => /^dfnaval-track hull low( hit-[ab])?$/.test(t.className)), 'a hull under a quarter pulses');
   assert.equal(byClass(root, 'dfnaval-aim')[0].className, 'dfnaval-aim hot');
   assert.equal(byClass(root, 'dfnaval-aim')[0].style.display, '');
   assert.equal(byClass(root, 'dfnaval-card')[0].style.display, 'none', 'no ship in the look');

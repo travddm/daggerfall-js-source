@@ -1,4 +1,4 @@
-// AUDIT BODY-MOTION (2026-10-19, Mac: "Audit this"; bible/01-Overview/audits/Audit-Body-Motion.md) - THE AUDIT'S PINS
+// AUDIT BODY-MOTION - THE AUDIT'S PINS
 // on the vendored retail biped: each fix the author's pass made, held where the lanes (and the pass's own probes) found
 // it broken. The gait is fed its own travel, as the motor's travelAt hands it (player/motor.js), unless a pin says not.
 import { test } from 'node:test';

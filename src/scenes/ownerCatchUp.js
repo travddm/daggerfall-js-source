@@ -1,10 +1,10 @@
 // @ts-check
-// OWNER-CLOCK (2026-10-21, the field's enemy desync - net/ownerClock.js has the wire's half): MY FOES KEEP MY WORLD'S
+// OWNER-CLOCK: MY FOES KEEP MY WORLD'S
 // PACE WHILE ANYONE ELSE IS IN MY ROOM.
 //
 // A foe is its owner's to step, so a slow owner's foes are slow for everyone. Below 20 fps they are slower than the
 // owner's own world: the host clamps its frame at 0.1 s (world.js "const dt = Math.min(0.1") and the player takes that
-// whole frame, but FOE-CATCHUP (characters/enemy/enemyMotor.js FOE_MAX_FRAME_DT, 2026-09-26, Mac: "Yes, add the cap")
+// whole frame, but FOE-CATCHUP (characters/enemy/enemyMotor.js FOE_MAX_FRAME_DT, 2026-09-26)
 // hands a foe's body three FIXED_DT steps of it at most, 0.05 s - so below 10 fps an owner's foes walked at half its
 // player's pace, and its every reader watched them do it. That cap is the cure for a snowball: a step is the port's
 // dearest work, and a hitch that asked for more of them made the next frame dearer.
@@ -24,7 +24,7 @@
 // the page and only runs forward, and turning it back for a later pool would make the tokens a first pool's foes took
 // read as taken in the future.
 //
-// HOST-CLOCK (2026-10-21, OWNER-CLOCK's Left): ONE PLAN A FRAME, FOR EVERY POOL OF MINE. OWNER-CLOCK caught up the
+// HOST-CLOCK: ONE PLAN A FRAME, FOR EVERY POOL OF MINE. OWNER-CLOCK caught up the
 // street's encounter pool alone; a building's and a dungeon's foes kept FOE-CATCHUP's half of a slow host's frame, and the
 // town watch's bodies kept it while its brains - one tactics clock for the page - ran on with the street's. Every pool
 // FOE-CATCHUP caps now goes through the page's one catch-up (`ownerFoes`): the street's encounter pool and its watch

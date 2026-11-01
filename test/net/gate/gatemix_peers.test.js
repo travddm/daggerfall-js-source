@@ -1,5 +1,5 @@
-// GATE-MIX (2026-10-20): the peers' sounds COURT_PEER_DB down while I stand in the court - scenes/gate/gateCourt.js
-// peersHeard over net/peer/peerFx.js's one scope. Design: bible/11-Multiplayer/World-Bosses.md section 28.
+// GATE-MIX: the peers' sounds COURT_PEER_DB down while I stand in the court - scenes/gate/gateCourt.js
+// peersHeard over net/peer/peerFx.js's one scope. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createGateCourt, COURT_PEER_DB, courtPeerGain } from '../../../src/scenes/gate/gateCourt.js';

@@ -188,8 +188,7 @@ test('audit24 wave39: the pool registers with a persistent draw list when the ho
   assert.equal(list.length, 0, 'spliced out when the one-shot ends');
 
   assert.match(rd('src/scenes/dungeonContext.js'), /onSpawn: \(b\) => billboardBatches\.push\(b\)/);
-  // 2026-08-27 (Mac: "blood texture stays static in the air ... in
-  // dungeons"): this line used to pin the clock in dungeon.js - the dev
+  // 2026-08-27: this line used to pin the clock in dungeon.js - the dev
   // host - and said nothing about worldModes, the host the game is
   // played in, which never ran it. The clock is the CONTEXT's now, in
   // drawFoes, the one frame function both dungeon hosts call; neither

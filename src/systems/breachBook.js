@@ -1,8 +1,8 @@
 // @ts-check
-// WB12c (2026-10-01, Mac: "shops, libraries and the first breach" for the book): THE FIRST BREACH'S BOOK - the first
+// WB12c: THE FIRST BREACH'S BOOK - the first
 // Deadlands Ember into a character's pack brings a copy of On the Burning Doors (systems/portBooks.js), with a Mages
 // Guild courier's line. Once a character: the save's own record (systems/modSaveData.js), as the Broker's is. Design:
-// bible/11-Multiplayer/World-Bosses.md section 19 C.
+// C.
 //
 // Not a DFU member. Ledger A (WB).
 import { registerModSaveData } from './modSaveData.js';

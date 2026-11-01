@@ -1,4 +1,4 @@
-// HOME-YARD (2026-09-30, asked: "allowing for prop placement on the outside within the limits of their house"). PIECES
+// HOME-YARD. PIECES
 // OUTSIDE A HOME, ON ITS OWN LOT. The law (net/decorLaw.js decorYardPieceOf - a catalogue piece, holding nothing,
 // giving no light, within the yard's bound); the lot (scenes/homeYards.js - the footprint and its margin, never the
 // house nor another building's ground, its edge marked); the service through the real Worker (a yard's pieces and a
@@ -15,7 +15,7 @@ import {
 import { standService, T0 } from '../accountDb.mjs';
 import { decorWhyNot } from '../../src/ui/decorPanel.js';
 import { toolRig, fakeDoc, fakeWin, fakeBlocks, rmb, TOWN, settle } from '../decorFakes.mjs';
-import { DECOR_LOT_MARKS } from '../../src/scenes/decor/decorTool.js';   // FB1001 ROAD-LOT (PIN MOVED): the lot's edge is marked in as many bands as it has sides
+import { DECOR_LOT_MARKS } from '../../src/scenes/decor/decorTool.js';   // FB1001 ROAD-LOT (
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');

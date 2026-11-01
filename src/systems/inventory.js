@@ -51,7 +51,7 @@ export function isEnchanted(item) {
  *  Pieces" / "Gold pieces"), so the stack drew no icon at all and its
  *  label changed depending on who created it.
  *
- *  E4 (2026-09-02) RETIRED THE REPRESENTATION FLAG: gold is a COUNTER
+ *  E4 RETIRED THE REPRESENTATION FLAG: gold is a COUNTER
  *  now, `entity.goldPieces` (PlayerEntity.cs:64 `protected int
  *  goldPieces = 0`, :158 the GoldPieces property), and the PLAYER'S
  *  COLLECTION CAN NO LONGER HOLD CURRENCY - which is the invariant
@@ -260,7 +260,7 @@ export function stacksWith(a, b) {
 }
 
 /** ItemCollection.FindExistingStack (ItemCollection.cs:699-718): the first held stack `item` merges into - the one
- *  AddItem merges it into (:224-230) - or null. PORTAL-BULK (bible/06-Systems/Portal-Stone.md): one find, exported, so
+ *  AddItem merges it into (:224-230) - or null. PORTAL-BULK: one find, exported, so
  *  a sale that mints a stack asks how much room is left on the very stack it lands on (systems/portalStone.js
  *  portalStoneRoom). */
 export function findExistingStack(list, item) {
@@ -343,9 +343,7 @@ export function addItem(list, item, position = 'back') {
  * painting, but SetItem's law is stated whole here because the next
  * reader will ask.
  *
- * BOOK-SPLIT (2026-09-29, Janome on Discord: books put up for sale
- * "would appear under the wrong title", and taken back off the counter
- * seemed to "duplicate them") - THE IDENTITY RIDES THE SPLIT, a
+ * BOOK-SPLIT - THE IDENTITY RIDES THE SPLIT, a
  * Port-Ledger A departure. CreateItem knows a group and a template and
  * nothing else, so DFU's own split zeroes the three terms
  * FindExistingStack reads as identity beside them (:708-713): a book's
@@ -556,7 +554,7 @@ export function takeOneInto(entity, fromList, item) {
   }
   return item;
 }
-/** LOOT8 (the Loot arc, bible/06-Systems/Loot-Arc.md section 10): NAMED listeners told of every piece the player TAKES
+/** LOOT8 (the Loot arc): NAMED listeners told of every piece the player TAKES
  *  out of a container into the pack, once it has landed - the loot window's and quick loot's take (itemTransfer.js
  *  applyTransfer's `toPlayer`), a body's bulk take and a peer's grant (takeOneInto) - never gold. A name re-registered
  *  replaces, `null` removes; an answer is ignored, a throw swallowed (a listener is not the take's problem). */

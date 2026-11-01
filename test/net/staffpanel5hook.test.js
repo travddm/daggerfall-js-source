@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow, In game: the staff view; the
-// weak spots "No camera looks through the player's eyes yet" and "The panel must not lean on game internals") - THE GAME'S
+// STAFF-PANEL5-FOLLOW - THE GAME'S
 // HALF: the where note's pace on the session, the hub's `fol` door, the staff hook (net/staffHook.js) and its window
 // door, the host's follow (scenes/staffFollowHost.js), and a /tp answered from a note (net/staffTeleport.js notePlace,
 // followStaffPlayer, staffTpLine) - and the TP host's prepare, which loads a note's place without placing anyone.
@@ -704,7 +703,7 @@ test('STAFF-PANEL5-FOLLOW TP law: where a note puts staff, the line a TP says, a
   assert.deepEqual(validStaffDestination({ ...atHome, pos: [0, 0, 0] }).privateRoom, home, 'a destination the TP host takes');
   assert.equal(notePlace(p({ in: 2, bk: bk + 1, rk: home })), null, 'a home of another building does not match');
   assert.equal(notePlace(p({ in: 2, bk, rk: `${owner}:boat.7` })), null, 'a boat\'s cabin: no door to restore - their game is asked');
-  assert.equal(notePlace({ px: 8192, py: 1, in: 0 }), null, 'off the map');   // PIN MOVED (AUDIT RELEASE R2-1): the map is the world's grid (wire.js WORLD_PIXEL_BOUND) - pixel 5000 is Tamriel's east now
+  assert.equal(notePlace({ px: 8192, py: 1, in: 0 }), null, 'off the map');
   assert.equal(notePlace(null), null);
   assert.equal(staffDestinationKey(notePlace(p({ in: 2, bk, rk: `interior:m99.${bk}` }))), staffDestinationKey(notePlace(p({ in: 2, bk, rk: `interior:m99.${bk}`, h: 1 }))));
   // the line: the player can see it, every way
@@ -773,7 +772,7 @@ test('STAFF-PANEL5-FOLLOW host: outside a party the pose goes on as the where no
   assert.match(worldSource, /if \(socialLink\(\)\) socialLink\(\)\.solo = !social\.party;/, 'sent outside a party, at the note\'s pace');
 });
 
-// ═══ STAFF-HIDE-TOGGLE (2026-10-23, mob: "i cant talk in chat?", "need hide to be a toggle") - Hide me and Show myself take
+// ═══ STAFF-HIDE-TOGGLE - Hide me and Show myself take
 // effect at once: the panel's `relink` word (net/staffHook.js), the game's own links remade on a fresh token
 // (scenes/staffFollowHost.js relinkGame), and the minter letting go of a mint on its way (net/accountClient.js `forget`).
 // tools/mutants/staff-hide-toggle.json ═══

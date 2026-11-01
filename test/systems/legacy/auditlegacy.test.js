@@ -1,5 +1,5 @@
-// AUDIT LEGACY (2026-10-05, Mac: "Let's do a deep comprehensive audit on this. Needs to be perfection"): the five-lens audit
-// of Project Legacy (LEGACY1-LEGACY4) - bible/01-Overview/audits/Audit-Legacy.md, every finding pinned here by its id. The law
+// AUDIT LEGACY: the five-lens audit
+// of Project Legacy (LEGACY1-LEGACY4), every finding pinned here by its id. The law
 // end to end through the real host (scenes/legacyHost.js), the real save records (systems/modSaveData.js) and the real
 // death door (characters/playerEntity.js); the world host's wiring by source.
 import { test } from 'node:test';

@@ -1,7 +1,7 @@
 // @ts-check
-// THE LISTS A REALM CHARACTER HOLDS (INT2, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): what the item law
+// THE LISTS A REALM CHARACTER HOLDS (INT2, the INTEGRITY arc): what the item law
 // judges and the id ledger reads (server-account/src/judge.js ledgerPieces). Moved here from the judge by AUDIT AUTO-HOLD
-// (2026-10-16): the client's shelf asks the same question - which pieces does this character hold? - of the last save
+// the client's shelf asks the same question - which pieces does this character hold? - of the last save
 // that landed (scenes/realmHoldHost.js), so a piece stowed in a ship's hold or a room's chest never lands back off a
 // stale shop shelf as a second of itself. One home: the judge hands it on.
 import { deedsOf } from '../../net/realm/realmGoldLaw.js';

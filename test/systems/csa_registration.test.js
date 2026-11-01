@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27) - COME SAIL AWAY 2.1 (RedRoryOTheGlen), THE
+// CSA-A - COME SAIL AWAY 2.1 (RedRoryOTheGlen), THE
 // REGISTRATION against the shipped files (vendor/come-sail-away/, the
 // bundle's text assets verbatim and its assembly byte for byte): the
 // manifest, the settings restated key for key, the three keys the assembly
@@ -41,7 +41,7 @@ test('CSA-A: the vendored manifest is the bundle\'s own - the title, version, au
 });
 
 /** The shipped defaults the port moves, each a DEPARTURE recorded where it is declared (systems/modSettings.js):
- *  KEEP-BOATS (2026-09-30) keeps a boat placed in a dungeon, and her hold, when the player leaves it. */
+ *  KEEP-BOATS keeps a boat placed in a dungeon, and her hold, when the player leaves it. */
 const DEPARTED = Object.freeze({ 'Compatibility.PersistentDungeonBoats': true });
 
 test('CSA-A: every shipped key is declared - its section and name joined with a dot, its kind, range, default and options as shipped, the six descriptions the mod wrote verbatim - and nothing else is, but the port\'s Enabled (mutants: a default moved, a key dropped)', () => {
@@ -50,7 +50,7 @@ test('CSA-A: every shipped key is declared - its section and name joined with a 
   assert.equal(DEF.keys.Enabled.default, true, 'MO1: on by default');
   const shipped = [];
   let written = 0;
-  // PLAIN-TEXT (2026-10-19): the one line of the mod's that spoke of "the player", said to the player - its words, exactly
+  // PLAIN-TEXT: the one line of the mod's that spoke of "the player", said to the player - its words, exactly
   const PLAIN = { 'Controls.PortLocationSearchRange': 'How far from you a port can be found' };
   for (const s of SHIPPED) {
     if (/^-+$/.test(s.Name)) { assert.equal(s.Keys.length, 0, `the spacer "${s.Name}" carries no keys`); continue; }

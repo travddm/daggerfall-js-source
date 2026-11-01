@@ -1,5 +1,4 @@
-// WW7-7 and WW7-8 (2026-10-26, the owner: "Yes travellers to need to travel everywhere. Same for ships.";
-// bible/03-World/World-Wide.md WW7-7, WW7-8): THE LIVING WORLD'S PEOPLE AND THE SEA'S SHIPS PAST THE BAY - each trip on its own
+// WW7-7 and WW7-8: THE LIVING WORLD'S PEOPLE AND THE SEA'S SHIPS PAST THE BAY - each trip on its own
 // side of the Bay's edge; past the Bay the towns near by the roads' places, the ways the one planner's on a window of the world
 // on the roads past the Bay, every trip waiting on those roads laid whole; and every ship named past the Bay said so on the
 // wire, so every reader names her as her stander did. Each pin mutation-checked (tools/mutants/ww7_people.json).
@@ -83,7 +82,6 @@ test('WW7-7 THE INDEX PAST THE BAY: a square past the Bay is none while the road
   const g0 = w.idx.generation();
   w.setEpoch(1);
   assert.notEqual(w.idx.generation(), g0, 'the roads laid: the generation moves');
-  // PIN MOVED (WW7-9, bible/03-World/World-Wide.md): the square's own side the walk's, and across the edge the Bay's in it
   const all = w.idx.townsNear(500, -3, 6).map((t) => t.mapId), near = all.filter((id) => id !== 10 && id !== 11);
   assert.deepEqual(w.asked.sort(), ['496,-8', '501,-9', '502,-5'], 'the provider asked at the roads\' places alone - no walk of the square');
   const walk = w.places.near(500, -3, 6).filter((p) => !inBay(p.px, p.py) && populated(p.type)).map((p) => p.mapId).sort((a, b) => a - b);
@@ -91,7 +89,6 @@ test('WW7-7 THE INDEX PAST THE BAY: a square past the Bay is none while the road
   assert.deepEqual(near, [20, 21, 3000 + 502 * 7 + 65, 3000 + 496 * 7 + 104].sort((a, b) => a - b), 'the listed and the rolled');
   assert.deepEqual(all.filter((id) => id === 10 || id === 11), [10, 11], 'and the Bay\'s within the square, across the edge');
   assert.deepEqual(w.idx.dungeonsNear(500, -3, 8).map((d) => [d.dungeonType, d.dungeon]), [[4, true], [10, true]], 'a lair the roads rolled: a dive\'s (PIN MOVED, WW7-9: and the Bay\'s keep across the edge)');
-  // PIN MOVED (WW7-9, bible/03-World/World-Wide.md): a square of the Bay by the edge holds the towns past it once the land
   // there is laid (the land past the Bay standing - with none, the Bay's alone: ww7_cross.test.js)
   assert.deepEqual(w.idx.townsNear(500, 1, 6).map((t) => t.mapId), [10, 11, 20, 3000 + 502 * 7 + 65], 'a square of the Bay: the Bay\'s, and the land past the edge\'s in it');
   assert.deepEqual(w.idx.dungeonsNear(500, 1, 4).map((d) => d.mapId), [12]);
@@ -139,7 +136,6 @@ test('WW7-7 THE WAY BOOK PAST THE BAY: a pair past the Bay waits while the roads
   assert.deepEqual(ab.pixels, [{ x: 1200, y: -40 }, { x: 1210, y: -45 }], 'from the town asked first');
   assert.deepEqual(book.wayOf(B, A).pixels, [{ x: 1210, y: -45 }, { x: 1200, y: -40 }]);
   assert.equal(farAsked.length, 1, 'kept');
-  // PIN MOVED (WW7-9): over the edge the window planner's too, across it (ww7_cross.test.js) - never the Bay's planner's
   assert.ok(book.wayOf(Bay, A), 'over the edge: across');
   assert.deepEqual(farAsked.at(-1), [990, 10, 1200, -40], 'the lower id first');
   farAsked.pop();
@@ -285,7 +281,7 @@ test('WW7-7 THE LAND PAST THE BAY\'S WORD: the trips\' world waits a town past t
   assert.match(w, /, marketBandOf: townEcon\.marketBandOf, pastTheBay: _tamrielRoads \}\);/, 'the host hands the roads past the Bay\'s host');
   assert.ok(w.indexOf('const { _tamrielRoads,') < w.indexOf('= createLivingTrips({'), 'made before it');
   assert.doesNotMatch(w, /livingRoams|createLivingIndex\(|createWayBook\(/, 'the host builds neither the index nor the ways');
-  assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: pastTheBay \? \{ epoch, placesIn: pastBayPlacesIn, landedIn, landed: \(\) => landed \} : null \}\);/);   // PIN MOVED (WW7-9)
+  assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: pastTheBay \? \{ epoch, placesIn: pastBayPlacesIn, landedIn, landed: \(\) => landed \} : null \}\);/);
 });
 
 test('WW7-7 THE ROLL PAST THE BAY READS A ROADS\' PLACE AS DRY: a pixel the roads past the Bay rolled a place on stands on dry ground without its plateau summed again (the same answer: the roads\' workers rolled it on that plateau) (mutant: the vouch dropped)', () => {

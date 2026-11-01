@@ -1,4 +1,4 @@
-// SD11e (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's AUDIT SD II): THE
+// SD11e: THE
 // ARC'S SECOND AUDIT, THE PURE LAWS AND THE BALANCE - each fix as it stands. The Dragon Break's paired Hour-Hand never a
 // pincer (the escape search on the real law's worst geometry, at the weakest build); the End believing the blows of its
 // wind-up and nothing past its moment, beat or no beat; the Stomp's disc and ring each its own, its ring judged where its

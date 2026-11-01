@@ -136,8 +136,7 @@ export const hasAmbientText = (key, texts = AMBIENT_TEXTS) => Object.prototype.h
  *   ready()        DaggerfallUnity.Instance.IsReady && PlayerEnterExit exists
  *   paused()       GameManager.IsGamePaused
  *   say(text, s)   DaggerfallUI.AddHUDText(text, seconds). FONT1
- *                  (2026-09-16, Mac: "Ambient Text mod also doesnt use
- *                  it"): the mod says nothing about how its lines are
+ *                  the mod says nothing about how its lines are
  *                  DRAWN and never did - the host's `say` is
  *                  townTalk.say, which is HudText.add, which is
  *                  PopupText. Under the enhanced skin those rows are

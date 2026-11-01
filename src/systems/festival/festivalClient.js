@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
+// WITCH1: THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
 // of the client's half of the economy: the Soul Cakes this account holds (the service's count, the pack's stack its face),
 // the finds a kill and an act ask for, the Wyrd Sister's sales, and the moves on a Hearth Offering.
 //

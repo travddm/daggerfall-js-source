@@ -1,7 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// THE PEER CROWD PROBE (WB9h, 2026-09-30). Mac: "Further improve the
-// morrowind model performance as it's unplayable with so many players
-// around."
+// THE PEER CROWD PROBE (WB9h, 2026-09-30).
 //
 // tools/peerBodiesProbe.mjs measured a body walking past on its own.
 // A CROWD is the other case: forty players milling round you at a gate

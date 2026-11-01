@@ -1,4 +1,4 @@
-// PREF1 (2026-09-15) - THE SHELF CARRIES CHOICES, NOT A SNAPSHOT OF THE
+// PREF1 - THE SHELF CARRIES CHOICES, NOT A SNAPSHOT OF THE
 // DEFAULTS. Found auditing LR5, before it merged.
 //
 // THE DEFECT. `savePrefs` wrote `_prefs` whole, and `_prefs` is
@@ -60,7 +60,7 @@ test('PREF1: a value equal to the default is NOT written - the shelf holds overr
   assert.equal(shelf().lootRarity, undefined, 'no default rides along');
   // the pure half
   assert.deepEqual(P.overridesOf({ ...P.PREF_DEFAULTS, skin: 'classic', open: { 'a:b': true } }),
-    { skin: 'classic', open: { 'a:b': true }, _rev: 2 });   // HB-LYCFREE: rev 2 (PIN MOVED - the hotbar default's shelf, test/systems/hb_lycfree.test.js)
+    { skin: 'classic', open: { 'a:b': true }, _rev: 2 });   // HB-LYCFREE: rev 2 (
 });
 
 test('PREF1: reading is unchanged - an override beats the default, and a stored false beats a true default', () => {
@@ -84,7 +84,6 @@ test('PREF1: a player who presses the ladder OFF keeps it off, across any number
 
 test('PREF1: an UNSTAMPED shelf adopts the new default once - and never again', () => {
   // the shape every existing player has: the old default, materialised by some unrelated save
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI joined the list (it shipped Off the day
   // before this stamp, and turned On); the control is a key the port did NOT change its mind about
   withShelf({ skin: 'enhanced', showFps: true, lootRarity: false, enhancedAI: false, worldDungeonSizes: true });
   assert.equal(P.getPref('lootRarity'), true, 'LR5 reaches a player who never chose anything');
@@ -92,7 +91,7 @@ test('PREF1: an UNSTAMPED shelf adopts the new default once - and never again', 
   assert.equal(P.getPref('worldDungeonSizes'), true, 'and a key the port did NOT change its mind about is left alone');
 
   P.setPref('showFps', false);                       // any save stamps the shelf
-  assert.equal(shelf()._rev, 2, 'the shelf is stamped');   // HB-LYCFREE: rev 2 (PIN MOVED)
+  assert.equal(shelf()._rev, 2, 'the shelf is stamped');   // HB-LYCFREE: rev 2 (
   P.setPref('lootRarity', false);                    // NOW the player really chooses
   reload();
   assert.equal(P.getPref('lootRarity'), false, 'the adoption does not run a second time over a real choice');

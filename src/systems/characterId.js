@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHARID1 (2026-09-21, a player on Discord: "he created a new character
-// and it overwrote his save"): A CHARACTER IS AN ID, NOT A NAME.
+// CHARID1: A CHARACTER IS AN ID, NOT A NAME.
 //
 // A save's identity was (characterName, saveName) - SaveLoadManager's
 // FindSaveFolderByNames, taken verbatim. So a NEW character who took

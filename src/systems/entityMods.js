@@ -1,6 +1,4 @@
-// RF1 (2026-09-14, Mac: "is there anything in the codebase that can
-// benefit from a refactor. This is our first time going against parity
-// with DFU ... Lets tackle each one at a time"): ENTITY MODIFIER
+// RF1: ENTITY MODIFIER
 // CHANNELS - the one home for what a wearer carries, read once per
 // channel by DFU's formulas.
 //
@@ -59,7 +57,7 @@ import { addEquipChangeListener } from './equip.js';
 import { openBlowCeiling, closeBlowCeiling } from './powerCeiling.js';   // POWER-CEILING: the blow's powers multiplied, held under one product
 import { NUMBER_BODY_PARTS } from './armorMaterials.js';   // one home for the seven (audit24's one-home ratchet)
 export { NUMBER_BODY_PARTS };
-/** LOOT14/LOOT15 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md sections 6 and 7): the social groups a standing
+/** LOOT14/LOOT15 (the Loot arc II): the social groups a standing
  *  channel counts (FactionFile.SocialGroups 0..4), and the wardrobe's plain numbers, summed fold by fold. */
 export const STANDING_CHANNELS = 5;
 export const WARDROBE_CHANNELS = Object.freeze(['warmth', 'dry', 'coldDegrees', 'heatDegrees', 'fatigueLess', 'fallLess']);

@@ -1,5 +1,4 @@
-// SHIP-LIFE (2026-09-30, Mac's item 1 of the six-part sea ask: ships that berth at ports, depart, voyage and keep their
-// own errands; `01-Overview/handoffs/Handoff-Naval-Crew-and-Ship-Life.md` slice E) - systems/naval/shipLife.js driven directly on
+// SHIP-LIFE - systems/naval/shipLife.js driven directly on
 // a coast of its own (a shore along z = 200 with a town behind it, a headland to the east reaching 500 m out), the
 // real captains (navalAI.js stepCaptain) sailing its errands, and the real naval host over Come Sail Away's pool
 // (test/navalSea.mjs) and in a room (test/navalRoom.mjs) standing a port's harbour.
@@ -128,7 +127,6 @@ test('SHIP-LIFE THE LIFE OF A MERCHANTMAN, by the real captains: in from the sea
       if (k === 'moored' && at == null) at = t;
       if (k === 'moored' && at != null && t - at > 60 && !held) held = { pos: [...ship.pos], yaw: ship.yaw, t };   // eased on over MOOR_EASE_S
       if (k === 'moored' && held && t - held.t > 30 && t - held.t < 31) {
-        // PIN MOVED (QUAYS): alongside its quay for her own hull (shipLife.js alongside) - a coaster lies in by the
         // Carrack's beam less hers, where the berth's own point left her six metres off the quay's face
         const quayside = alongside(berth, ship.hull, harbour.hull);
         assert.ok(Math.hypot(ship.pos[0] - quayside[0], ship.pos[2] - quayside[1]) < 1, `${cls} alongside her berth`);
@@ -168,7 +166,7 @@ test('SHIP-LIFE A FIGHT COMES FIRST: a navy cutter moored at her berth answers a
     for (let t = 60; t < 1500 && !back; t += 0.1) {
       world.now = t; stepCaptain(ship, world);
       if (ship.errand?.kind === 'arrive' && ship.speed > 1) sailedBack = true;
-      const quayside = alongside(b, ship.hull, harbour.hull);   // PIN MOVED (QUAYS): alongside its quay for her hull
+      const quayside = alongside(b, ship.hull, harbour.hull);
       back = ship.errand?.kind === 'moored' && Math.hypot(ship.pos[0] - quayside[0], ship.pos[2] - quayside[1]) < 2;
     }
     assert.ok(sailedBack, 'she sails back to it - never slid across the water');
@@ -207,7 +205,7 @@ test('SHIP-LIFE A STALL: a ship coming in whose way a struck hulk lies across - 
     if (hd < 30) { ship.pos[0] = was[0]; ship.pos[2] = was[2]; ship.speed = 0; }
     const det = ship.errand?.detour ?? null;
     if (det) detoured = true;
-    // a detour that held her gives way to one on the other side. PIN MOVED (AUDIT GALLEON T2): the new galleon's first
+    // a detour that held her gives way to one on the other side.
     // detour clears this hulk, so none holds her here - the law, and the arrival's shortened sail, are pinned on their own
     // in auditgalleon_sea.test.js
     if (prev && det && det !== prev.det && prev.det) { if (ship.errand.side === prev.side) sameSide++; }
@@ -233,7 +231,7 @@ test('SHIP-LIFE THE HARBOUR ROLL, by the real host: ashore in a port town, its h
   assert.ok(m.length >= HARBOUR_ROLL[0] && m.length <= HARBOUR_ROLL[1], `moored: ${m.length}`);
   const harbour = findHarbour({ rect: TOWN, isWater: coast });
   for (const e of m) {
-    const b = alongside(harbour.berths[e.ship.errand.berth], e.ship.hull, harbour.hull);   // PIN MOVED (QUAYS): stood alongside its quay for her hull
+    const b = alongside(harbour.berths[e.ship.errand.berth], e.ship.hull, harbour.hull);
     assert.ok(Math.hypot(e.ship.pos[0] - b[0], e.ship.pos[2] - b[1]) < 0.5 && e.ship.sails === 0, 'at her berth, sails stowed');
     assert.notEqual(e.ship.hull, 3, 'no galley moors');
   }
@@ -246,12 +244,12 @@ test('SHIP-LIFE THE HARBOUR ROLL, by the real host: ashore in a port town, its h
   w.boat.GameObject.position = [0, 0, -150]; w.view.feet = [0, 0, -150];
   w.deps.harbourNear = () => PORT;
   w.run(200);
-  const open = [...w.host._sea.values()].filter((e) => e.ship.errand?.kind !== 'moored' && !e.ship.cls.fisher && e.ship.damage.state === SHIP_STATES.afloat);   // PIN MOVED (FISH-BOATS): a port's fishing boats are its own, as its moored ships are
+  const open = [...w.host._sea.values()].filter((e) => e.ship.errand?.kind !== 'moored' && !e.ship.cls.fisher && e.ship.damage.state === SHIP_STATES.afloat);
   assert.ok(open.length >= 1 && open.length <= DENSITY.few + 1, `the sea's traffic beside the harbour's: ${open.length}`);
   // far off and back
   const seeds = key(h);
   h.view.feet = [0, 0, 300 + HARBOUR_LEAVE + 800];
-  h.run(1 + SHIP_FADE_S);   // SHIP-FADE (2026-10-02) PIN MOVED: they fade as they go
+  h.run(1 + SHIP_FADE_S);   // SHIP-FADE
   assert.equal(moored().length, 0, 'gone once the port is far');
   h.view.feet = [0, 0, 300];
   h.run(1);
@@ -277,7 +275,7 @@ test('SHIP-LIFE THE SEA NEAR A PORT GOES SOMEWHERE: on the water off a port the 
   const kinds = new Map();
   for (let t = 0; t < 900; t += 30) {
     w.run(30);
-    for (const e of w.host._sea.values()) if (!e.fromHarbour && !e.fisher && e.ship.errand && !kinds.has(e.id)) kinds.set(e.id, `${e.ship.cls.faction}:${e.ship.errand.kind}`);   // PIN MOVED (FISH-BOATS): the port's fishing boats keep their own day
+    for (const e of w.host._sea.values()) if (!e.fromHarbour && !e.fisher && e.ship.errand && !kinds.has(e.id)) kinds.set(e.id, `${e.ship.cls.faction}:${e.ship.errand.kind}`);
   }
   const seen = new Set(kinds.values());
   assert.ok([...seen].some((k) => k === 'merchant:arrive' || k === 'merchant:moored'), `a merchantman comes in: ${[...seen]}`);
@@ -331,7 +329,7 @@ test('SHIP-LIFE A SHIP TAKEN OVER: her errand never rides the word - the heir wh
   assert.equal(onB().filter((e) => !e.owner).length, 0, 'b stands none of her own while a stands');
   A.present = false;
   r.run(OWNER_SWEEP_S + 1);
-  const adopted = onB().filter((e) => !e.owner && !e.ship.cls.fisher);   // PIN MOVED (FISH-BOATS): the moored ships here; the fishing boats are FISH-BOATS' own pin
+  const adopted = onB().filter((e) => !e.owner && !e.ship.cls.fisher);
   assert.equal(adopted.length, mine.length, 'b took every one over');
   for (const e of adopted) {
     const was = mine.find((x) => x.ship.seed === e.ship.seed);

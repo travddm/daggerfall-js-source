@@ -196,8 +196,7 @@ export function barFill(current, max) {
 
 /** Classic-UI integer scale: FIT the 320x200 virtual screen inside
  *  the canvas (min axis), never overflow it. Height-only scaling blew
- *  classic layouts past the edges on portrait phones (2026-08-14 -
- *  Mac's report); on landscape desktop min() picks the same value the
+ *  classic layouts past the edges on portrait phones; on landscape desktop min() picks the same value the
  *  old formula did. */
 export const hudScale = (canvasWidth, canvasHeight) =>
   Math.max(1, Math.floor(Math.min(canvasWidth / 320, canvasHeight / 200)));
@@ -685,13 +684,13 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   // it answers that itself (ui/quest/questHerald.js). Its clock is the frame's
   // real seconds and stops under the HUD's hide gate - DFU's HUD does not
   // Update under a window (DaggerfallUI.cs:429-433).
-  // EVENTS1 (bible/10-UI/Event-Board.md): and the event board just before it, under the herald's own gate and clock, on
+  // EVENTS1: and the event board just before it, under the herald's own gate and clock, on
   // every skin - the events' lines come to it instead of the chat, so the classic skin must show them too
   drawEventBoard({ hidden: cursorActive || !hudRenderEnabled(), dt });
   drawQuestHerald({ hidden: cursorActive || !hudRenderEnabled(), dt });
   drawQuestTracker({ hidden: cursorActive || !hudRenderEnabled() });   // GUIDE4: the tracker's card, the same gate and the same hide door
   drawRevenantCards({ hidden: cursorActive || !hudRenderEnabled(), dt });   // REVENANT-CARD: the same gate, its clock the frame's - no card stands on the classic skin, so this is outside its gate as the herald is
-  try { noteHeldLooks(vitals); } catch { /* a look missed this frame is read the next */ }   // APPEARANCES (bible/04-Characters/Wardrobe.md): every look held is collected, on every skin and in every host
+  try { noteHeldLooks(vitals); } catch { /* a look missed this frame is read the next */ }   // APPEARANCES: every look held is collected, on every skin and in every host
   // LOOT-BANNER: the same gate and clock, outside the skin's gate for a reason of its own - the watcher reads and marks the
   // pack on EVERY skin (the four hosts hand drawHud the player entity as `vitals`), so a piece found on the classic skin
   // is not announced when the player switches to Enhanced Plus; only Plus draws a banner
@@ -888,7 +887,7 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   drawSpellIconRows(renderer, canvas, vitals, dt, { font, cursorActive, largeHudRect: null, hover });
 }
 
-/** COMPASS-PARTY (2026-09-27, Discord - Ashley: "just lil green marks that point in that direction"): the party on
+/** COMPASS-PARTY: the party on
  *  the classic compass - the Detect marker's 5x3 triangle, its row over the box's top edge and its bearing law
  *  (compassMarkerLerp, clamped: a mate behind stands at the box's end on the side to turn toward), in the party's one
  *  green (net/social.js PARTY_GREEN). `points` are scene XZ (ui/partyMapMarks.js partyCompassPoints); `box` is the
@@ -959,7 +958,7 @@ export function escortBottomPx(canvas) {
   return native * hudScale(canvas.width, canvas.height) * (view / canvas.height);
 }
 
-/** NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass"): the professions'
+/** NODE-MARKS: the professions'
  *  nodes on the classic compass - the party's 5x3 triangle, its row over the box's top edge and its bearing law
  *  (compassMarkerLerp, clamped), each in its profession's colour (ui/nodeMarks.js nodeMarkRgb) at its own opacity, the
  *  nearer brighter. `points` are ui/nodeMarks.js NodeCompassPoints, the nearest last (drawn over the rest). Answers
@@ -986,7 +985,7 @@ export function drawNodeCompassMarks(renderer, points, playerXZ, heading01, { bx
   return drawn;
 }
 
-/** BOAT-MARK (2026-10-01, "I want to build a compass icon that tracks your boat"): my boats on the classic compass -
+/** BOAT-MARK: my boats on the classic compass -
  *  a little boat (ui/boatMarks.js BOAT_GLYPH_ROWS: a sail over a hull, BOAT_GLYPH_W native pixels across), its foot on
  *  the box's top edge as the Detect markers' row stands, by their bearing law (compassMarkerLerp, clamped: a boat
  *  behind stands at the box's end on the side to turn toward), in the boats' teal. `points` are scene XZ

@@ -1,4 +1,4 @@
-// VU1 - THE VAMPIRE TAKES THE UNDEAD MODIFIER (2026-08-28).
+// VU1 - THE VAMPIRE TAKES THE UNDEAD MODIFIER.
 //
 // GetBonusOrPenaltyByEnemyType (FormulaHelper.cs:1042-1054) has TWO
 // arms for a player target, and DFU comments the first itself:

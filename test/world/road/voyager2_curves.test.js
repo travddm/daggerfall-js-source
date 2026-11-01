@@ -1,5 +1,4 @@
-// VOYAGER2 (2026-10-26, KPbICA's spec forwarded by the owner: "Add slight curvatures for intersections and turns of the
-// roads to make them more natural"; bible/03-World/Roads.md VOYAGER2) - THE ROADS PAST THE BAY ARE DRAWN AS CURVES
+// VOYAGER2 - THE ROADS PAST THE BAY ARE DRAWN AS CURVES
 // (world/road/roadCurves.js): a way through a pixel one quadratic curve tangent to its steps, a junction its gentle pairs
 // curved and the rest straight in with the centre paved round, painted at the kernel's seam past the Bay alone (the
 // Bay's own roads are Basic Roads' painter's to the byte), and measured by the verge from the same curves.

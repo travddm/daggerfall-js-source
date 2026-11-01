@@ -1,8 +1,8 @@
-// FIELD BUGS 2026-10-18 PVP-BLOOD (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, found reading Anon-e-moose's
+// FIELD BUGS 2026-10-18 PVP-BLOOD (, found reading Anon-e-moose's
 // "Gradual FPS loss then crash" and left in its first pass). A duel's blow and the open zone's both splashed into the
 // street's pool (`hitEffects`), which only the street's frame ticks and draws, and whose marks are the street's ring on
 // the street's collider; a peer's blow already took the pool I stand in (`modes.liveHitEffects`, PEERFX2), and these
-// take it too. AUDIT FB1018 L3-5 (bible/01-Overview/audits/Audit-Field-Bugs-2026-10-18.md): neither could bleed off the
+// take it too. AUDIT FB1018 L3-5: neither could bleed off the
 // street - a duel is outdoors only, and in the zone's dungeons every peer was refused (wildFair read a dungeon-frame pose
 // as the map's corner pixel); fixed, the zone's halls fight and their blood is the dungeon's pool's. Source pins:
 // bootWorld is not run in Node.
@@ -40,7 +40,6 @@ test('PVP-BLOOD THE POOL I STAND IN: a duel\'s blow and the open zone\'s splash 
 test('PVP-BLOOD THE STREET\'S OWN: the only splashes world.js sends straight to the street\'s pool are on paths that run in the street alone - a road traveller struck down (livingStrikeRoad, refused off the exterior) and a horse\'s trample (rrRiding)', () => {
   const src = rd('src/scenes/world.js');
   const at = [...src.matchAll(BARE)].map((m) => m.index);
-  // PIN MOVED (FIELD BUGS 2026-10-25i ROAD-SPARE): the road's strike, its splash with it, is scenes/livingWorld/roadStrike.js -
   // its one splash past the host's `open()`, which is the exterior alone, into the pool the host hands it, the street's
   assert.equal(at.length, 1, 'a new splash straight into the street\'s pool - is its path the street\'s alone?');
   const road = rd('src/scenes/livingWorld/roadStrike.js');
@@ -60,10 +59,9 @@ test('PVP-BLOOD THE ZONE\'S HALLS (AUDIT FB1018 L3-5): in a dungeon a room\'s pe
   const src = rd('src/scenes/world.js');
   const fair = body(src, 'const wildFair = (peerId) => {');
   assert.match(fair, /if \(!peerId \|\| !wildCan\(\)\) return false;/, 'the place is the zone first (wildCan: wildHere, the door\'s pixel)');
-  assert.match(fair, /return modes\?\.mode === 'dungeon' \|\| \(wildAtWire\(duelWorldOf\(peerId\)\) && !settledAt\(duelWorldOf\(peerId\), locationIndex\)\);/);   // PIN MOVED (ZONE-SAFE, bible/11-Multiplayer/Wild-Zone.md section 26): and in the open never a body in a settlement's streets
+  assert.match(fair, /return modes\?\.mode === 'dungeon' \|\| \(wildAtWire\(duelWorldOf\(peerId\)\) && !settledAt\(duelWorldOf\(peerId\), locationIndex\)\);/);
   assert.match(src, /const nativeFrame = overworld \|\| !!privateInteriorOf\(key\);/, 'the frames the pose is sent in: a dungeon\'s is its own');
   // the cause, executed: a dungeon's own coordinates (blocks at 51.2 m, a few either side of its centre) are the map's corner
-  // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the conversion is FLOORED past the Bay's west and south edges, so
   // the corner is its four pixels about the map's (0, 0) - truncation folded both sides onto one
   for (const [x, z] of [[0, 0], [307.2, 307.2], [-307.2, -307.2], [100, -300]]) {
     const p = worldCoordToMapPixel(x, z);

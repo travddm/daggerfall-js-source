@@ -1,4 +1,4 @@
-// GALLEON-HOLDINGS (2026-10-04) - main's HOLDINGS (#549) on Mac's galleon, met at the merge of main into the Galleon arc.
+// GALLEON-HOLDINGS - main's HOLDINGS (#549) on Mac's galleon, met at the merge of main into the Galleon arc.
 // HER GANGWAY: QUAYS measured hull 2's off the mod's galleon (`[7.65, 4.14]`: her side 7.5 m out at her main deck's
 // port, 4.14 m up), which left the new galleon's plank there - its head 2.3 m off her side, 2.6 m under her main deck,
 // over the quay. Her own colliders read here (Come Sail Away's real pool, test/navalSea.mjs): the entry port in her
@@ -114,7 +114,6 @@ test('GALLEON-HOLDINGS: her Carpenter beside her hatch on her own deck - Mac\'s 
     const deck = pool.deckOf(hull, 0);
     const life = createCrewLife({ deck, roster, seed: 3 });
     life.step(0.05, { roles, lookout: 3 });
-    // PIN MOVED (SHIPS-2, 2026-10-07): Mac's carrack's hatch (her main deck's cell nearest its middle) stands beside her
     // mizzen's partner, to starboard of her deck there - her Carpenter to port of it, as the galleon's
     const h = life.hatch, c = life.postOf(2), port = hull === HULL.SmallShip || hull === HULL.Carrack;
     if (hull === HULL.Carrack) assert.ok(!deck.walkable(h[0] + 1.1, h[2]) && deck.walkable(h[0] - 1.1, h[2]), `the Carrack's hatch beside her mizzen's partner: ${h}`);

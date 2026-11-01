@@ -1,4 +1,4 @@
-// NPC-MARKS (2026-10-21): the bobbing marks over the Morrowind bodies whose click is a quest's, a merchant's or a guild's
+// NPC-MARKS: the bobbing marks over the Morrowind bodies whose click is a quest's, a merchant's or a guild's
 // (scenes/npcMarksHost.js, render/npcMarkPass.js). The law of who is marked rides the click's own route
 // (staticNpcRouteIn - one construction for both), the quest's own behaviour (a real QuestResourceBehaviour on a real
 // Quest), and the people lane's own answer of whose body stands (heightOf).
@@ -244,7 +244,7 @@ test('NPC-MARKS the quad stands square to the eye at the mark, never under MARK_
   close(fns.globals.gl_Position, [2 - MARK_HALF_M, 3, -10, 1], 'AUDIT NPC-MARKS R9: its bottom on the point, at any size - a far mark never sinks into the head');
 });
 
-// ═══ AUDIT NPC-MARKS (bible/04-Characters/Morrowind-NPCs.md section 31) ═══
+// ═══ AUDIT NPC-MARKS ═══
 
 test('AUDIT NPC-MARKS L1: while FACTION.TXT loads its dict is the producer\'s empty Map - a route read then is not kept, and the coin comes when the row does', () => {
   const loading = new FactionFile().factionDict;   // what townTalk.factionDict answers between `new FactionFile()` and its load
@@ -317,7 +317,7 @@ test('AUDIT NPC-MARKS L6: a mod\'s merchant service switched mid-session moves t
 });
 
 // AUDIT NPC-MARKS L7 lowered the mark under the Billboard Look to the upright card's cos(pitch) of the body. BODY-FLAT
-// (2026-10-23, render/characterSprite.js) takes that card's picture level, so the body stands its true height there too
+// takes that card's picture level, so the body stands its true height there too
 // and L7's law is retired: the mark hangs over the full height under either look.
 test('BODY-FLAT: under the Billboard Look a mark hangs over the body\'s full height, as it does off - the flat card stands the body true (L7\'s cos(pitch) retired)', () => {
   const f = fakePass();

@@ -215,7 +215,7 @@ test('ACC1d: TOKEN_WAIT_MS is the WHOLE budget - an account service that never a
     assert.equal(sockets[0].sent.length, 1, 'past it, the hello goes anyway');
     assert.equal('tok' in sockets[0].sent[0], false);
   } finally { mock.timers.reset(); }
-  // FIELD BUGS 29h (TOKEN-WAIT): PIN MOVED - ACC1g made the unsigned hello a refusal, so the budget covers the service's
+  // FIELD BUGS 29h (TOKEN-WAIT):
   // real answer and stays under the relay's HELLO_WAIT_MS (test/net/fb0929h_tokenwait.test.js holds why)
   assert.ok(TOKEN_WAIT_MS > 2500 && TOKEN_WAIT_MS < HELLO_WAIT_MS, 'past the old 2.5 s, under the relay\'s own wait for a hello');
 });
@@ -261,8 +261,8 @@ test('ACC1d: the wire checks the token\'s SHAPE and nothing else - kept, absent,
   assert.equal(none.t, 'hello', 'a hello with no token is still a hello');
   assert.equal('tok' in none, false, 'no token: the key is not invented');
   assert.equal(none.error, undefined);
-  // SEASON1 part two (world149, PIN MOVED): the body's bound is 640 - a body one past it is the malformed one, and the
-  // old bound's 513 now rides through. PIN MOVED again (AUDIT LEGACY III O11, world174 - world172 on its branch): TOKEN_BODY_MAX, 800 - every
+  // SEASON1 part two (world149
+  // old bound's 513 now rides through.
   // claim and a house were 739, minted and then refused here
   assert.equal(hello({ tok: `v1.${'a'.repeat(TOKEN_BODY_MAX)}.bbb` }).tok, `v1.${'a'.repeat(TOKEN_BODY_MAX)}.bbb`);
   for (const bad of ['', 'v1', 'v1.aaa', 'v1.aaa.bbb.ccc', 'v1.aa a.bbb', 'v1.aaa+bbb.ccc', `v1.${'a'.repeat(TOKEN_BODY_MAX + 1)}.bbb`, `v1.aaa.${'b'.repeat(129)}`, `${'v'.repeat(9)}.aaa.bbb`]) {
@@ -282,8 +282,7 @@ test('ACC1d: the wire checks the token\'s SHAPE and nothing else - kept, absent,
 // and three pins held every door on that road open. It was worth
 // holding while a name could be VERIFIED or TYPED.
 //
-// Mac closed the typed one: "You shouldnt be able to just type a name
-// and enter anymore.... this is what the account system is for." The
+// The
 // relay refuses a hello it cannot verify, so every name in every room
 // is a verified name and `v` said the same thing about all of them -
 // a field carrying no information. It leaves on the same deploy the

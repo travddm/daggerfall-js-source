@@ -2,7 +2,7 @@
 // THE ORDERED DITHER'S WORLD-FIXED CELL - what remains of the retro
 // pass after FT3.
 //
-// FT3 (2026-09-14, Mac: "Remove our version of pixelated sky"): the
+// FT3: the
 // port's pixelated sky - ES1e's angular pixel and 26-level posterise
 // over the dome, PS2's copy of it over the volumetric clouds' composite
 // and Dynamic Skies' skybox, PS1's switch, the `?sky=retro`/`?sky=smooth`
@@ -28,7 +28,7 @@
  *  Zero-mean use is bayer4(p) - BAYER_MEAN. */
 export const BAYER_GLSL = `
 // Bayer 4x4, the ordered dither a 256-colour gradient used.
-// LA-COST4 (2026-09-27, Mac: "performance improvements"): THE MATRIX BY ITS BITS, NOT BY A TABLE. This built a
+// LA-COST4: THE MATRIX BY ITS BITS, NOT BY A TABLE. This built a
 // sixteen-float local array in every fragment that dithers - the lane's five programs, the resolve, the AO's
 // rotation, the glow's jitter, the skies' band - to read one element of it. A 4x4 Bayer matrix IS a bit interleave:
 // with z = x ^ y its value's four bits, high to low, are z's low bit, y's low bit, z's high bit, y's high bit. The same
@@ -41,7 +41,7 @@ float bayer4(vec2 p) {
 }
 `;
 
-/** SHIP-FADE (2026-10-02, Mac: "If theyre going out to open sea, they should fade away"): A THING FADING IN OR OUT OF THE
+/** SHIP-FADE: A THING FADING IN OR OUT OF THE
  *  WORLD - a ship of the sea's - keeps a fragment where bayer4's threshold over the screen's 4x4 tile stands under its
  *  share (exactly k of 16 kept at k/16: no blending, no sorting, the depth written as any opaque's). The uniform is the
  *  share CUT, `uDissolveCut`, so nought - every uniform's own start - is whole: a program needs no word to draw all of
@@ -93,7 +93,7 @@ ${BAYER_GLSL}`;
  *  instead. */
 export const BAYER_MEAN = 0.46875;
 
-/** SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md "The pixel law"): THE HOUR'S SHADER SURFACES AS PIXEL
+/** SD-LOOK: THE HOUR'S SHADER SURFACES AS PIXEL
  *  ART - `sdPixel(c, cell, steps)` posterizes a display colour's brightness (its brightest channel, so its hue holds) to
  *  `steps` levels through the ordered dither at the integer `cell` (a texel of the surface's own grid, never the screen's
  *  pixel - a surface snapped to its texels dithers as one). Needs BAYER_GLSL beside it. */

@@ -1,5 +1,4 @@
-// BOOT-RECTS (2026-10-20, the owner: "do your own performance pass ... go deep"; bible/07-Rendering/Performance-Priority.md
-// BOOT-RECTS) - SetLocationTiles' rect for many locations in one walk (world/terrain/terrainTiles.js locationRectReader).
+// BOOT-RECTS - SetLocationTiles' rect for many locations in one walk (world/terrain/terrainTiles.js locationRectReader).
 // The boot's two walks - the Eltheric isles' 7,538 templates and the Bay's coastal towns for Deep Waters - parsed a block
 // again every time its name came round, because BlocksFile keeps one parsed block (autoDiscard). The walk keeps each
 // block's ground tiles for itself. Held here: the reader's rect is SetLocationTiles' own for every location of a mixed

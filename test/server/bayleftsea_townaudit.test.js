@@ -1,8 +1,8 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 23 - E4): STAFF `/town audit` FOR A
+// BAY-LEFT-SEA: STAFF `/town audit` FOR A
 // PROVINCE - a region's confirmed towns 400 a page in the law's order (net/townEconLaw.js townAuditOrderSql): the Bay's by
 // their location's index as ever; a province's capitals' slices first, then its places, then its countryside, where
 // `ORDER BY location` over its negative indices listed its farthest hamlets and never a capital. The real Worker over
-// node:sqlite (bible/06-Systems/Town-Economy-Arc.md BAY-LEFT-SEA).
+// node:sqlite (BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

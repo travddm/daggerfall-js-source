@@ -1,7 +1,6 @@
-// RENOWN-LOOT (2026-10-05, Mac: "Instead of a flat loot increase, lets also tie it to renoun level"; asked, Mac chose
-// "Half → all → half again", "The roller's own" Renown, and offline "Keep this PR's numbers"): LOOT-EASE's buff, grown
+// RENOWN-LOOT: LOOT-EASE's buff, grown
 // with the roller's Renown in the sigils' five stages - half at Renown 1, all at Renown 20, half again at Renown 40;
-// offline LOOT-EASE's whole. bible/06-Systems/Loot-Arc.md section 20; systems/renownLoot.js.
+// offline LOOT-EASE's whole.; systems/renownLoot.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -55,7 +54,7 @@ test('RENOWN-LOOT the stage: offline LOOT-EASE\'s buff whole; online the roller\
 
 test('RENOWN-LOOT the table Mac chose: each knob moves the same share of LOOT-EASE\'s own step - the keep, every tier of the plain ladder, the healing and Restore Power chances, the rest supplies (online from none) - and offline and at Renown 20 they ARE LOOT-EASE\'s numbers (mutants: a before moved; the step\'s share; the settling dropped)', () => {
   //                  quarters: keep    blue at 0  healing  Restore Power  a foe's Ember Jar
-  // POT-THIN (2026-10-21, PIN MOVED): the healing and Restore Power columns were 8-12 and 3-9
+  // POT-THIN (2026-10-21
   const rows = [[2, 0.625, 45, 3, 1, 1.5], [3, 0.6875, 47.5, 3.5, 1.5, 2.25], [4, 0.75, 50, 4, 2, 3], [5, 0.8125, 52.5, 4.5, 2.5, 3.75], [6, 0.875, 55, 5, 3, 4.5]];
   for (const [q, keep, blue, healing, magicka, jar] of rows) {
     assert.equal(plainFoeLootKeep(q), keep, `${q}: the keep`);

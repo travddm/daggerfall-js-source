@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW-C2 (2026-10-24, bible/03-World/World-Wide.md WW-C, bible/11-Multiplayer/Wild-Zone.md) - CYRODIIL, THE OPEN ZONE.
+// WW-C2 - CYRODIIL, THE OPEN ZONE.
 //
 // The owner: "Cyrodil becomes the new open PvP area with the wrothgarian mountain area being retired in favor of this.
 // Cryodil will be home to all abundent resources and everything else from the wrothgarian zone."
@@ -12,7 +12,7 @@
 // is. The province's border is the player's own traced picture (world/tamriel/tamrielLand.js), a picture unit some fifteen
 // to eighteen map pixels - and every client with the same files cuts the same zone, its rings and its halls with it.
 //
-// ZONE-LINE (2026-10-26, the owner: "Also ensure the pvp border outlines cyrodil perfectly, currently it doesnt"): THE
+// ZONE-LINE: THE
 // ZONE IS THE PROVINCE TO THE PIXEL. A cell had stood whole where its middle pixel stood, so the zone's edge was a 3.3 km
 // staircase about the province's own (9,012 map pixels of the two apart on the freeware's picture, 4,078 of the zone's
 // outside the province and 4,934 of the province's outside the zone), its red line that staircase smoothed, and the
@@ -70,7 +70,7 @@ export const inCyrodiil = (x, y) => theatreAt(Math.floor(x), Math.floor(y)) === 
 /** NIBEN-SEA: how far (picture units) a water pixel looks along its row and its column for the province's land each side. */
 export const PROVINCE_WATER_REACH = 12;
 /**
- * NIBEN-SEA (bible/03-World/Tamriel.md NIBEN-SEA; AUDIT TESA II Z4's law, kept): THE PROVINCE'S OWN WATER - a map pixel whose
+ * NIBEN-SEA (NIBEN-SEA; AUDIT TESA II Z4's law, kept): THE PROVINCE'S OWN WATER - a map pixel whose
  * picture pixel is water with the Imperial Province's land the nearest on both its sides, west and east or north and
  * south, within PROVINCE_WATER_REACH. Lake Rumare and the Niben were holes in the picture's land, and the zone took what
  * it enclosed (wildZone.js fillEnclosed); joined to the sea down the Niben (ui/tamrielTrace.js NIBEN_COURSE) they are
@@ -127,8 +127,7 @@ export function cyrodiilMask() {
 }
 
 /**
- * ZONE-LINE: CYRODIIL'S OUTLINE - the one line the maps draw for the zone and for the province. SMOOTH-LAND (2026-10-26,
- * bible/03-World/Tamriel.md SMOOTH-LAND): the land's smooth law's own pieces (world/tamriel/tamrielLines.js lawLines)
+ * ZONE-LINE: CYRODIIL'S OUTLINE - the one line the maps draw for the zone and for the province. SMOOTH-LAND: the land's smooth law's own pieces (world/tamriel/tamrielLines.js lawLines)
  * where the zone's pixels (the mask's: the Imperial Province's land and the water it encloses) meet the rest - each piece
  * of a square whose edge the zone changes across, the same crossings, the same points where three labels meet - so a map
  * pixel is the zone's exactly when its middle lies inside `chains`, and the held map's coast and border lines stop on

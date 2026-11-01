@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SIT1 (2026-10-14, Mac: "Implement the ability to interact and sit on chairs. Morrowind model should use the sitting
-// animation we use for the card game"): A CHAIR, AND THE SEAT ON IT - which of a room's models are sat on, and where on
+// SIT1: A CHAIR, AND THE SEAT ON IT - which of a room's models are sat on, and where on
 // one the sitter's body goes. Pure: the room's own probe is handed in (scenes/worldModes.js, the room's collider).
 //
 // THE CHAIRS: Daggerfall's own seats, by model id - the wooden chair (41100), the benches (41105, 41106 - the ones the

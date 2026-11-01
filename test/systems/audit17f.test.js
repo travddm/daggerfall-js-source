@@ -109,7 +109,6 @@ test('17f F12: item names come from the TEMPLATE, not a hand copy', () => {
   // E4: the kit's last row used to be a 'Gold Pieces' stack. Gold is
   // PlayerEntity.GoldPieces now (ItemHelper.cs:1354's `+= 100`), so
   // the bag ends at the arrows and the purse is a number.
-  // PIN MOVED (WALLET1): the port's own tail gives the wallet whatever the switches (startingGear.js addSurvivalProvisions)
   // - it is the kit's last piece, and DFU's bag is the rest
   assert.equal(e.items.at(-1)?.name, 'Wallet');
   assert.deepEqual(e.items.filter((i) => !isWalletItem(i)).map((i) => i.name),

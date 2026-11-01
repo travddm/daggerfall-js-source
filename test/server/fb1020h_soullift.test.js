@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-20h (SOUL-LAW; bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md) - the Discord's "Soul Trap (Ogre)":
+// FIELD BUGS 2026-10-20h (SOUL-LAW) - the Discord's "Soul Trap (Ogre)":
 // item law 8 found the soul of one of Daggerfall Enemy Expansion's fifty in a Soul Gem (template 274) or Azura's Star (an
 // amulet, 133) 'soul', and held its trapper's trade with a strike - three gems filled and sold, a week's hold. Law 9 takes
 // those souls; migration 0143 lifts what that finding alone made, read as 0130 read the Weir Key's (KEY-LIFT): the findings

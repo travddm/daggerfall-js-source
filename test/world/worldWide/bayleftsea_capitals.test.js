@@ -1,10 +1,10 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 31 - C6): THE FOUR CAPITAL HARBOURS -
+// BAY-LEFT-SEA: THE FOUR CAPITAL HARBOURS -
 // Solitude, Alinor, Torval and the Imperial City's Waterfront - a port to their own byte where the registry calls them one
 // (tamrielCapitals.js capitalSlicePort: the registry's row and the slice's PortTownAndUnknown, one law), so each stands its
 // shipyard, crew hall, lighthouse and Docks and its bank sells a ship; and a capital's landmarks measured by their
 // footprint, which their blocks' automap already closes (isCapitalLandmark) - by its box a ring wall closed the whole city.
 // On the freeware: every slice of the seven capitals, and the four harbours' shipyard and lighthouse each at the water
-// (bible/03-World/Arena-Provinces.md BAY-LEFT-SEA).
+// (BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -122,16 +122,14 @@ test('BAY-LEFT-SEA (ARENA2): on the freeware the registry\'s four capital harbou
     const sitesOf = new Map();
     const at = Object.fromEntries(ported.map(([n, x, y]) => [n, clone(x, y)]));
     assert.deepEqual(Object.fromEntries(Object.entries(at).map(([n, loc]) => [n, portsOf(loc, false).map((p) => p[0])])), {
-      // PIN MOVED (SOLITUDE-RELIEF): Solitude's none now - its cliffs' box the whole pixel
       'Waterfront District': ['shipyard', 'lighthouse'], Solitude: [], Alinor: ['lighthouse'], Torval: [],
-    }, 'by a landmark\'s box: a ring wall\'s box closes the city');   // PIN MOVED (IC-PROPS): the yards by their law (merchantYardSites.js yardLaw - never a way, the Stable by an exit) leave Alinor's lighthouse its room even so
+    }, 'by a landmark\'s box: a ring wall\'s box closes the city');
     assert.deepEqual(Object.fromEntries(Object.entries(at).map(([n, loc]) => [n, portsOf(loc, true)])), {
       // its own sea within a few cells of each one's back (its water: the lake, the Sea of Pearls, Topal Bay); Solitude's own
-      // blocks hold no sea a navgrid reaches (its outer ring is its rim's), so it stands by the bearing - PIN MOVED
+      // blocks hold no sea a navgrid reaches (its outer ring is its rim's), so it stands by the bearing
       // (SOLITUDE-RELIEF): on its quay at the water under the north cliff, the west end of the docks' shelf (anchor metres
       // about 54, -150 and 81, -152), its plateau's edges the cliffs' rock and the sea, closed (it stood on the plateau's
       // north-west corner, 46 m over the Sea of Ghosts)
-      // PIN MOVED (IC-PROPS): the Waterfront's yards placed by their law, the port's two along the same quay on what they left
       'Waterfront District': [['shipyard', 200, 316, 5], ['lighthouse', 246, 316, 5]],
       Solitude: [['shipyard', 161, 413, null], ['lighthouse', 178, 414, null]],
       Alinor: [['shipyard', 62, 93, 2], ['lighthouse', 105, 93, 2]],

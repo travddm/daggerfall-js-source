@@ -1,4 +1,4 @@
-// BOW-VOICE (2026-09-26, Mac: "Bow is still double shooting arrows"): ONE LOOSE, ONE SOUND. The bow's loose is
+// BOW-VOICE: ONE LOOSE, ONE SOUND. The bow's loose is
 // FPSWeapon's own frame-4 PlaySwingSound - the machine's `bowSound`, which every host plays as ArrowShoot - and the
 // Weapon Widget's clone played the same ArrowShoot again at ITS release. On the classic sprite the two landed a tick
 // apart; under the Morrowind arm (MW-D42d) the machine's is held for the arm's release key while the clone's went at

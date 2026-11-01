@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT 68 S17-fog-glsl-dup (2026-09-24): THE FOG LAW, ONE HOME. Every world
+// AUDIT 68 S17-fog-glsl-dup: THE FOG LAW, ONE HOME. Every world
 // pass fogs by the same factor - renderer.js's seven programs, the water
 // surface and the lighting lane's five - and it was pasted into nine of
 // them; DS1's exp2 mode had to be added to every copy. A leaf with no
@@ -9,7 +9,7 @@
 // uFogDensity, uFogRange, uCamPos); renderer.js's setFog/_uploadFog is
 // their one producer.
 //
-// DW-C (2026-09-25): AND THE SEA'S. Iliac Puddle No More 1.2.2 (jet082)
+// DW-C: AND THE SEA'S. Iliac Puddle No More 1.2.2 (jet082)
 // closes the view under its carved sea with a post effect of its own -
 // UnderwaterDistanceFog.shader, over the camera's image and depth: the
 // light absorbed per channel and scattered back in over the distance the
@@ -29,9 +29,8 @@
 // setWaterFog - a frame's, cleared by beginFrame).
 
 /**
- * TV1 (2026-09-27, bible/06-Systems/Travel-View.md): THE FOCUS - where the world is EXPERIENCED from, which is the
- * camera until the travel view lifts the camera hundreds of metres over the traveller. Mac: "Every detail like weather
- * patterns, should be 1:1 in this mode." The fog is the traveller's: a rain the traveller sees 300 m through is drawn
+ * TV1: THE FOCUS - where the world is EXPERIENCED from, which is the
+ * camera until the travel view lifts the camera hundreds of metres over the traveller. The fog is the traveller's: a rain the traveller sees 300 m through is drawn
  * as the rain it is where they stand - a clear round of ground about them closing to the weather's colour - and not as
  * a camera 450 m up in the same air. (The sun's cascades stand about the same point by their own word: the shadow
  * pass is rendered about it and hands the receivers `uSunOrigin` - render/shadowPass.js SHADOW_GLSL.) Everything else

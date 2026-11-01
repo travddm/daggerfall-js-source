@@ -1,5 +1,4 @@
-// SILVER (2026-10-02, Mac: "Can we change the name of Drakes to silver"; asked about the Silver metal, chose plain
-// "silver"; bible/06-Systems/Online-Arc.md SILVER): THE CURRENCY IS CALLED silver WHEREVER A PLAYER READS IT. A mass
+// SILVER: THE CURRENCY IS CALLED silver WHEREVER A PLAYER READS IT. A mass
 // noun, so no plural ("1 silver", "1,240 silver") and every sentence reworded to read right ("You do not hold that much
 // silver."). Only the words changed: the balances, the ledger, the routes, MARKS_OPEN, the constants and the code's own
 // name for them (marks, MARKS1) stand, so no account's balance moved and no stored row was touched. The metal keeps

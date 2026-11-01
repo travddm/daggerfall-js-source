@@ -1,9 +1,5 @@
-// MW-D50 - THE ARROW THE ARCHIVES CARRY (2026-09-12).
+// MW-D50 - THE ARROW THE ARCHIVES CARRY.
 //
-// Mac: "when wielding a Morrowind bow, the arrow isn't shown being
-// drawn and shot from the bow. The actual projectile is correct and
-// shoots properly, but on the bow itself, the arrow is never shown
-// being ready."
 //
 // The records come from every .esm attached and the meshes from
 // whichever .bsa files are, and the two need not agree: with an

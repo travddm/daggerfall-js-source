@@ -235,7 +235,7 @@ void main() {
   gl_Position = uProj * uView * world;
 }`;
 
-// MWNPC1 (2026-10-09, Mac: "I wanna do everything and ensure that performance isnt affected"): THE WORLD'S
+// MWNPC1: THE WORLD'S
 // CHARACTER VERTEX SHADER, AND THE SKIN IN IT. CHAR_VS above stays what it was and is the shadow pass's for every
 // unskinned rig (its depth program reads none of what this one adds; drawCharacter records none under the sprite
 // target) - MWNPC16: a skinned body casts through THIS shader's depth program, recorded by its draw (recordShadowBody).
@@ -414,7 +414,7 @@ vec3 charFaceNormal() {
   return normalize(uSkinFlip * (uSkinNrm * nw));
 }`;
 
-// MAC-Q (2026-09-17): THE PARTICLE QUAD, osgParticle's own (ParticleSystem
+// MAC-Q: THE PARTICLE QUAD, osgParticle's own (ParticleSystem
 // .cpp:360-403): a camera-facing quad of half-extent `size` on the view's
 // x and y axes, textured, times the particle's colour with its alpha. The
 // billboard is built HERE, off the rows of the model-view rotation, so the
@@ -474,7 +474,7 @@ const WORLD_IDENTITY = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 
 // the rig's vertex color instead of a texture (C4b - no alpha cutout: rig
 // faces are opaque solids).
 //
-// MWT2 (2026-09-17, Mac: the Morrowind model's torch "isnt lit"): C4b's
+// MWT2: C4b's
 // "no emission" was true of the VOXEL rigs this program was written for
 // and stopped being true at MW-D11, which brought real Morrowind meshes
 // through it. The reference resolves an emission per material and adds it
@@ -566,7 +566,7 @@ uniform vec3 uTip;        // PROF4: a felled tree's fall - x, z the way it falls
 uniform vec4 uFacePoint;  // DISC29-E: a lamp's position (w = 1) - each flat turns to face it; w = 0 in every other pass
 uniform vec4 uElitePad;   // ELITE FOES: the quad widened past the sprite (left, bottom, right, top, as fractions of it) - 0 in every other pass
 uniform sampler2D uTex;   // ELITE FOES: the sprite's own size, for the pad's floor in texels (the fragment shader's same sampler)
-// LPT1 (bible/07-Rendering/Low-Poly-Trees.md): A LOW-POLY TREE IS DRAWN BY THIS PROGRAM TOO, so it is lit, fogged and
+// LPT1: A LOW-POLY TREE IS DRAWN BY THIS PROGRAM TOO, so it is lit, fogged and
 // shadowed as the flats are, under either lane. uMesh 1: aCenter is its mesh's vertex, aCorner its uv; the instance's
 // root and turn ride aInst, its scale aScale (render/lowPolyTreesRender.js). uLptCut: the eye (xyz) and the radius
 // (w, 0 off) inside which the 3D tree stands for its far picture, uLptBand the crossfade past it. A submesh's material:
@@ -642,7 +642,7 @@ void main() {
     float top = aCorner.y + 0.5;
     world.xz += wdir * push * top * top * uSize.y;
   }
-  // PROF4 (bible/06-Systems/Professions-Arc.md 25): A FELLED TREE TIPS OVER. The quad turns about its root, the height
+  // PROF4 (25): A FELLED TREE TIPS OVER. The quad turns about its root, the height
   // up it laid along the fall's way by the angle; 0 for every batch but a falling tree's.
   if (uTip.z != 0.0) {
     float up = (cn.y + 0.5) * uSize.y;
@@ -699,7 +699,7 @@ void main() {
   if (gone) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);   // LPT1: wholly given way - off the clip volume, no fragment
 }`;
 
-/** LA-COST3 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): BB_VS
+/** LA-COST3: BB_VS
  *  WITH A LANE'S ADDITIONS - `ext.head` (declarations) before main, `ext.main` (statements) at main's end, after every
  *  line that places the vertex - or BB_VS itself with none. A lane computes a per-QUAD term where the quad is
  *  (enhancedLighting.js EL_BB_VS_EXT: the flat's sun, once a corner instead of once a fragment) and the vertex lands
@@ -720,7 +720,7 @@ import { cullDisabled } from './frustum.js';   // PERF-CROWD2: the billboard pas
 import { getPref } from '../systems/uiPrefs.js';   // GRAIN2: the ground-sharpness dial, read where the tile array is built
 
 /**
- * GRAIN2 (2026-09-19, Mac: "Why dont we crank it to 16?"): the
+ * GRAIN2: the
  * ground-sharpness tier as a max-anisotropy value, against what the
  * driver actually allows.
  *
@@ -742,8 +742,7 @@ export function anisotropyFor(tier, driverMax = 1) {
   return Math.min(4, cap);
 }
 /**
- * GRAIN AUDIT 1 (2026-09-21, Mac: "audit the filtering enhancement
- * ensuring it doesnt degrade performance"): THE TIER IS SAMPLER STATE,
+ * GRAIN AUDIT 1: THE TIER IS SAMPLER STATE,
  * AND THE FILTER IS PART OF IT.
  *
  * GRAIN1's `off` turned the anisotropy off and kept LINEAR_MIPMAP_LINEAR
@@ -769,7 +768,7 @@ export function groundSamplerFor(tier, driverMax = 1) {
 export function groundSharpnessTier(search = globalThis.location?.search ?? '') {
   return pageParam('ground', search) ?? getPref('groundSharpness');   // PERF-URL
 }
-/** PERF-SCALE (2026-09-25): THE GPU THE BROWSER DRAWS ON, as its driver names it - WEBGL_debug_renderer_info's
+/** PERF-SCALE: THE GPU THE BROWSER DRAWS ON, as its driver names it - WEBGL_debug_renderer_info's
  *  UNMASKED_RENDERER_WEBGL where the browser hands it out, gl.RENDERER otherwise (a browser that masks it answers
  *  a generic name there). A laptop's browser on its integrated GPU, or on SwiftShader, is the first thing a report
  *  of "fps issues in the exterior but fine in the interior" has to rule out, and nothing on screen said which it
@@ -1044,7 +1043,7 @@ void main() {
   int t = int(data & 3u);
   vec2 tileUV = fract(unwrapped);
   vec2 tuv = ROT[t] * tileUV + TRANS[t];
-  // GRAIN1 (2026-09-19, Mac: "distance terrian has a weird grain look"):
+  // GRAIN1:
   // THE TILE ARRAY IS MIPMAPPED, AND THE GRADIENT IS THE UNWRAPPED ONE.
   //
   // The grain is minification aliasing: past a few tiles out a screen
@@ -1110,8 +1109,7 @@ void main() {
   outColor = vec4(dwWaterFog(mix(uFogColor, lit, fogFactorAt(vWorldPos)), vWorldPos), 1.0);   // DW-C
 }`;
 
-// FAR-CLIP1 (2026-09-28, a player's report through Mac: "paneling in the
-// ocean and geometry just being hard squares"): ILIAC PUDDLE NO MORE'S
+// FAR-CLIP1: ILIAC PUDDLE NO MORE'S
 // CLIP IS A PROGRAM, NOT AN INDEX SET. The mod (1.2.2, jet082) clips the
 // carved sea out of a coastal terrain per TEXEL, in the terrain's own
 // shader: DeepWaterTerrainCapRenderer.ApplyWaterTexelClip swaps the
@@ -1179,8 +1177,7 @@ const BB_CORNERS = Object.freeze([
  *  of the batch's size, 0..1; a whole flat's corner is its own. */
 export const bbCornerX = (x, scale = 1) => x * scale;
 
-// PERF-ARENA (2026-10-10, Mac: "Exterior performance is really bad" - "Interior is fine. It's exterior that's the
-// issue"): THE STILL FLATS SHARE THEIR BUFFERS. Every billboard batch was born with a vertex array, a vertex buffer and
+// PERF-ARENA: THE STILL FLATS SHARE THEIR BUFFERS. Every billboard batch was born with a vertex array, a vertex buffer and
 // an index buffer of its own, so every draw of one bound its VAO - the real game at Knightstale (tools/frameProbe.mjs over
 // the freeware ARENA2): 942 bindVertexArray a frame by day, 905 by night, for ~1,000 draws, and the costliest WebGL
 // call the frame makes (1.5 us each on the main thread, 1.4 ms a frame - more than the draws themselves). A town's
@@ -1193,7 +1190,7 @@ export const bbCornerX = (x, scale = 1) => x * scale;
 /** Quads in the first arena (1.3 MB of corners, 393 KB of indices); each arena after it holds twice the last, to
  *  BB_ARENA_MAX_QUADS. */
 export const BB_ARENA_QUADS = 16384;
-/** PERF-ARENA2 (2026-10-11): the most quads a grown arena holds (21 MB of corners; the arenas' one index buffer is 6 MB at
+/** PERF-ARENA2: the most quads a grown arena holds (21 MB of corners; the arenas' one index buffer is 6 MB at
  *  this size). Knightstale's stream
  *  stood 620,000 quads in 38 arenas of BB_ARENA_QUADS each - the real game read back through `window.__renderer` - and
  *  the main pass, its batches sorted by texture, hopped between them on nearly every draw; doubling to this, a town that
@@ -1241,8 +1238,7 @@ uniform mat4 uProj, uView;
 out vec2 vUV; out vec4 vColor; out vec3 vWorld; out float vWet;
 void main() { vUV = aUV; vColor = aColor; vWorld = aPos; vWet = aWet; gl_Position = uProj * uView * vec4(aPos, 1.0); }`;
 /** The CLASSIC decal fragment shader - MAC-BUG W4's flat model, term for
- *  term with BB_FS above. MAC-BUG W6 (Mac: "super dark coloring instead
- *  of red"): this program has a LANE TWIN now, render/enhancedLighting.js's
+ *  term with BB_FS above. MAC-BUG W6: this program has a LANE TWIN now, render/enhancedLighting.js's
  *  EL_DECAL_FS, built into the lane's world set beside the other four -
  *  because under the lane every colour the renderer uploads arrives
  *  DECODED to linear, and a classic program handed linear light,
@@ -1285,7 +1281,7 @@ void main() {
   // A DEGENERATE SLOT still rasterises nothing, but a live one whose
   // texel is fully clear must not draw a black square either.
   if (t.a < 0.01) discard;
-  // MAC-BUG W4 (Mac: "Also blood is black"). THIS TOOK AMBIENT AND
+  // MAC-BUG W4. THIS TOOK AMBIENT AND
   // NOTHING ELSE, and the line that set it said what it was for - "the
   // scene's own light, so a mark on a dungeon floor is as dark as the
   // floor". It was darker than the floor by every term it left out: the
@@ -1332,7 +1328,7 @@ void main() {
   // set watched the ground go dark under a cloud while the blood on it
   // stayed bright - W4's fault with the sign reversed.
   vec3 lightAcc = ambient + uDecalSun * (diff * cloudShadowAt(vWorld)) + uDecalMoon * mdiff + pointAcc + (iAtt * iAtt * max(dot(n, iL / max(iD, 1e-4)), 0.0)) * uIndirectColor;
-  // BLOOD3 (Mac: "the blood is too shiny and flat"): THE MARK IS A
+  // BLOOD3: THE MARK IS A
   // FILM here too. The atlas's alpha is a thickness and the ink over it
   // is white, so a mark was one flat red; Beer-Lambert through the film
   // brightens a thinning rim toward orange and leaves the body the
@@ -1352,7 +1348,7 @@ void main() {
   // here than on the lane, which is W6's fault with the sign reversed.
   float thick = t.a * clamp((1.0 - t.r) / ${glslFloat(INK_DEPTH)}, 0.0, 1.0);
   vec3 rgb = vColor.rgb * exp(vec3(${glslFloat(BLOOD_ABSORB_ENCODED[0])}, ${glslFloat(BLOOD_ABSORB_ENCODED[1])}, ${glslFloat(BLOOD_ABSORB_ENCODED[2])}) * (1.0 - thick)) * lightAcc;
-  // WEAPON-MOUNT (2026-09-26, Mac: "weapons dont show in houses properly"): a picture's colour IS its texel. The
+  // WEAPON-MOUNT: a picture's colour IS its texel. The
   // film above reads the texel's red as a blood thickness and paints the tint through it, so a hung sword came out
   // a pale lit silhouette of itself - the pack's picture with its colours thrown away.
   if (uPicture > 0.5) rgb = t.rgb * vColor.rgb * lightAcc;
@@ -1369,7 +1365,7 @@ const EMISSION_WHITE = new Float32Array([1, 1, 1]);
 
 /** THE CHARACTER PIXELIZE STANDARD (Mac): characters and everything
  *  character-side render at this pixel size; the WORLD is excluded.
- *  9 -> 7 per Mac (2026-07-06). Single source - the engine character
+ *  9 -> 7 per Mac. Single source - the engine character
  *  pass and the viewer default both read this value. */
 import { TextureFile } from '../formats/textureFile.js';
 const isSpectralArchive = TextureFile.isSpectralArchive;   // single source (the formats layer owns the archive list)
@@ -1460,7 +1456,7 @@ export function asBytes(view) {
   return new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
 }
 
-/** WW3 (2026-09-14, Mac's live crash): the upload path's ONE contract,
+/** WW3: the upload path's ONE contract,
  *  said out loud. Every image that reaches the GL here is in the port's
  *  color32 shape - `{ width, height, colors }` (formats/color32Order.js
  *  toColor32) - and a door that hands a decoded PNG's `{ width, height,
@@ -1528,7 +1524,7 @@ export const LPT_SUN_FULL = 0.25;
 
 export function textureParams(gl, opts = {}) {
   if (opts.smooth) return { wrap: gl.CLAMP_TO_EDGE, filter: gl.LINEAR };
-  // HAND-SEAM (2026-10-09, the owner: "the spellcasting still has the lines"): a classic sprite drawn as ONE screen quad
+  // HAND-SEAM: a classic sprite drawn as ONE screen quad
   // that never tiles - the casting hands - stays pixel-exact (NEAREST) but does not wrap. Under REPEAT the column of
   // fragments on the quad's u=1 edge (the left hand's inner edge, and the mirrored right hand's) sampled a hair past 1
   // on some GPUs (ANGLE/D3D's interpolation, a large magnified quad) and wrapped onto the art's FIRST column - the glow
@@ -1690,7 +1686,7 @@ export class Renderer {
 
   constructor(canvas) {
     this.canvas = canvas;
-    // PERF-GPU1 (2026-10-10): `powerPreference: 'high-performance'` - on a machine with two GPUs (most gaming laptops)
+    // PERF-GPU1: `powerPreference: 'high-performance'` - on a machine with two GPUs (most gaming laptops)
     // the browser may otherwise draw the game on the integrated one; a player at 5 fps on every setting, playable only
     // at 800x600, is that shape. One GPU: no change. The desktop app asks Chromium the same at launch (app/main.cjs).
     const gl = canvas.getContext('webgl2', { antialias: false, powerPreference: 'high-performance' });
@@ -1833,7 +1829,7 @@ export class Renderer {
     this._perf = perfOn() ? setMeter(gl, new PerfMeter(gl, perfZones(), perfCpu())) : null;   // EL8: `?perf` - a GPU-timed line every PERF_EVERY world frames; VC6d: `?perf=zones` per pass, and the meter is findable by its context (the sky's march marks its own span); PERF-CPU: `?perf=cpu` tiles the same zones on the MAIN THREAD's clock, which is the one a script-bound frame is losing
     this._perfOpen = false;   // AUDIT 68 S16-perf-no-resolve-leak: a world frame's meter frame begun and not yet closed (_perfClose)
     this._frameStamp = 0;      // PERF3: bumped by beginFrame (and the state restores) - the terrain program's frame-constant block is uploaded once per stamp; LA-COST1: and the billboard's, the decal's and the character's, and bumped by every setter and seam that moves a value in any of the four (the law: test/render/la_cost.test.js)
-    // PERF-CROWD2 (2026-09-19): THE BILLBOARD PASS CULLS, so that no host
+    // PERF-CROWD2: THE BILLBOARD PASS CULLS, so that no host
     // has to remember to. PERF-ON2 found the peers submitted uncut and
     // PERF-CROWD found the whole town beside them - and then the same
     // shape turned up in every other host: the dungeon's mobiles, drops
@@ -1853,7 +1849,7 @@ export class Renderer {
     this._bbPv = new Float32Array(16);
     this._bbCullOff = cullDisabled();   // the ?cull=off door, read once
     this._tFrameStamp = -1;
-    // LA-COST1 (2026-09-27): the stamp each of the other three programs' frame blocks last went up under (drawBillboards,
+    // LA-COST1: the stamp each of the other three programs' frame blocks last went up under (drawBillboards,
     // drawDecals, drawCharacter) - PERF3's `_tFrameStamp`, three more times
     this._bbFrameStamp = -1;
     this._dFrameStamp = -1;
@@ -2354,7 +2350,7 @@ export class Renderer {
     return program;
   }
 
-  /** LA-COST7 (2026-09-27, Mac: "performance improvements"): THE SET'S LOCATIONS, LOOKED UP ONCE. _installWorldSet
+  /** LA-COST7: THE SET'S LOCATIONS, LOOKED UP ONCE. _installWorldSet
    *  runs on every lane swap and TWICE in every panel frame - AUDIT-EL F7 puts the classic set in for the automap's
    *  bracket or the bank's preview and the lane's back after it - and each time it asked GL again for 270 uniform
    *  locations (a string lookup and a fresh WebGLUniformLocation apiece) whose answers could not have changed: a
@@ -2920,7 +2916,7 @@ export class Renderer {
    *  were taken from. The mip chains follow the config (a no-op unless it
    *  changed); retro mode off frees the palette's LUT (E2).
    *
-   *  PERF-SCALE (2026-09-25): THE ONE HOME FOR A WORLD DRAWN SMALLER AND
+   *  PERF-SCALE: THE ONE HOME FOR A WORLD DRAWN SMALLER AND
    *  SHOWN. With retro off and the render scale below 1, the frame is a
    *  `kind: 'scale'` one on this same path: the image is the host's world
    *  rect (the canvas when none) x the scale, rounded, and its present is
@@ -3155,7 +3151,7 @@ export class Renderer {
    *  that opened its own beginFrame and draws no screen quad after it (the
    *  enhanced travel map's relief). A no-op with nothing owed. */
   resolveFrame() { this._compositeAir(); }
-  /** SD-LOOK (2026-10-08): THE SCENE'S GRADE for this frame - `{ adaptKey, adaptMax, bloom, vignette, contrast }` (render/
+  /** SD-LOOK: THE SCENE'S GRADE for this frame - `{ adaptKey, adaptMax, bloom, vignette, contrast }` (render/
    *  airPass.js setGrade); its resolve takes it, and a frame that does not call this gets the lane's defaults. Nothing on
    *  the classic set: there is no resolve to grade - its contrast is the art's own. */
   setSceneGrade(g) { this._sceneGrade = g ?? null; }
@@ -3262,7 +3258,7 @@ export class Renderer {
       // then lands inside it - so the one line a player sends names the draw that opened the run.
       if (!this._warned2dForeign) this._2dOpenedBy = new Error('PERF-2D: the 2D run opened here');
       gl.disable(gl.DEPTH_TEST);
-      // HANDEDNESS REGRESSION (2026-08-23, "the sky-blue screen"): a 2D
+      // HANDEDNESS REGRESSION: a 2D
       // blit has no facing, but with CULL_FACE left ON the global
       // frontFace(CW) swap culled EVERY screen quad - the whole UI
       // layer, title screen to fonts - leaving only the clear color.
@@ -3293,8 +3289,7 @@ export class Renderer {
    *  owns is a WRONG TEXTURE. That is the one thing a performance
    *  change may never cost.
    *
-   *  WHY IT IS A FUNCTION (AUDIT-AIR1, 2026-09-19, Mac: "sometimes
-   *  unsheathing, it spawns a weird water texture"). This block was
+   *  WHY IT IS A FUNCTION (AUDIT-AIR1, 2026-09-19). This block was
    *  COPIED at five seams and the sixth - `_compositeAir`, which runs
    *  the air pass and is as foreign as anything gets - was never given
    *  one. `airPass.composite()` binds units 0..4 (VOL1: the glow on 4) and ends on TEXTURE0, not
@@ -3314,7 +3309,7 @@ export class Renderer {
     (this._tEcoTex ??= [null, null, null]).fill(null);   // ECOTONE1: the neighbours' sets on units 3-5
     this._tEcoOn = null;   // ECOTONE1: and the border switch, a frame's like the tile size
     this._tSnowOn = null; this._tSnowArr = [-1, -1, -1, -1];   // PRECIP4: and the snow's
-    // LA-COST1 (2026-09-27): THE FOUR FRAME BLOCKS ARE A TEXTURE SHADOW TOO. Each binds the lane's images - the three
+    // LA-COST1: THE FOUR FRAME BLOCKS ARE A TEXTURE SHADOW TOO. Each binds the lane's images - the three
     // shadow arrays, the eye, the previous depth, the grid - on units 8 to 14 and then trusts them until the stamp
     // moves; a foreign pass binds its own there (the far ring its 1x1 on unit 11 when the air is off - LA-AUDIT C3: not
     // Dynamic Skies, whose 2D binds on 0 to 8 leave unit 8's 2D array, the lo tier, where it was) and the resolve
@@ -3372,7 +3367,7 @@ export class Renderer {
     return this._foeTelegraphLoad;
   }
 
-  /** PERF-COMPILE1 (2026-10-10, stutter): the renderer's OTHER on-demand programs, warmed at idle the same way
+  /** PERF-COMPILE1: the renderer's OTHER on-demand programs, warmed at idle the same way
    *  (warmPrograms) - kept apart from warmSteps, whose list its pins count: the foes' telegraph pass (built at the
    *  first wind-up a fight shows), the real windows' background (built at the first building with glass) and the weapon
    *  glow's two (WEAPON-GLOW1, built at the first glowing weapon in a hand). AUDIT SHADER-STALL: first, where the driver
@@ -3733,7 +3728,7 @@ export class Renderer {
     this._use(this.charProgram);
     this._uploadCloudShadow('char');   // VC4
     gl.uniformMatrix4fv(c.model, false, modelMatrix);
-    // LA-COST1 (2026-09-27, Mac: "performance improvements"): THE FRAME BLOCK, ONCE A STAMP - PERF3's terrain law on
+    // LA-COST1: THE FRAME BLOCK, ONCE A STAMP - PERF3's terrain law on
     // the character program. Every rig re-sent the camera, the sun, the moon, forty-eight lights and their colours,
     // the indirect, the fog and the lane's block (the three shadow arrays, the sun's matrices, the caster table, the
     // eye, the contact block, the grid) - about sixty calls a body, the model matrix the only one that is the body's.
@@ -3843,7 +3838,7 @@ export class Renderer {
   }
 
   /**
-   * WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): A MORROWIND WEAPON'S ELEMENT, inside drawCharacter's sprite pass -
+   * WEAPON-GLOW1: A MORROWIND WEAPON'S ELEMENT, inside drawCharacter's sprite pass -
    * `mesh.weaponGlow` is `{ look, code, level, ramp }` (systems/weaponGlow.js, set by combat/fpArm.js), and the ranges
    * it lights are the weapon's (`slot` 'weapon', shown). THE OUTLINE (`charge` false, before the body): every range
    * again per draw of glowRingDraws - shifted in screen space by glow units (a Daggerfall pixel at this pass's
@@ -3979,7 +3974,7 @@ export class Renderer {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      // BODY-DEPTH (2026-10-15, the owner: "The models also clip through geometry"): THE PICTURE'S DEPTH IS A TEXTURE,
+      // BODY-DEPTH: THE PICTURE'S DEPTH IS A TEXTURE,
       // not a renderbuffer - the composite quad reads it back (drawCharacterSpriteQuad `depth`), so a body is tested
       // against the world where each of its texels stands, never as one flat card through its middle.
       // BODY-CROP: 24-bit - a cropped picture's depth is the frame's own, over the frame's whole near-to-far, where 16 bits
@@ -4038,8 +4033,7 @@ export class Renderer {
    *  it (VC5 review), as the studio variant does for the panels. */
   renderCharacterSprite(mesh, modelMatrix, proj, view, pw, ph, { lensLocal = false, viewmodelLight = null, also = null } = {}) {
     const gl = this.gl;
-    // MAC-P (2026-09-17, Mac: "morrowind's first person view also doesn't
-    // receive lighting and is consistently dark"): THE VIEWMODEL'S LIGHT.
+    // MAC-P: THE VIEWMODEL'S LIGHT.
     //
     // He is right, and the reason is the space this pass runs in. A
     // lens-local arm sits at the ORIGIN of a camera-local space while
@@ -4176,7 +4170,7 @@ export class Renderer {
   }
 
   /**
-   * MWNPC2 (2026-10-09, the MW-NPC arc's second slice, `04-Characters/Morrowind-NPCs.md` section 7): ONE OFFSCREEN BIND
+   * MWNPC2: ONE OFFSCREEN BIND
    * FOR EVERY SEEN BODY. Every Morrowind body is a picture taken into the shared sprite target and composited as a
    * quad (render/characterSprite.js drawRigSpriteBox) - and every one took its own pass: the target bound, a corner
    * cleared, the body drawn, the frame's framebuffer and viewport put back, the character block re-sent. Two
@@ -4346,7 +4340,7 @@ export class Renderer {
 
   /** Composite the sprite into the world: camera-facing quad at the
    *  character's position, alpha-cut, fogged, depth-tested. */
-  /** INVIS-LOOK (2026-09-27): `conceal`, optional - ECV1's visual ({ mode, alpha, t, phase }, systems/combatVisuals.js)
+  /** INVIS-LOOK: `conceal`, optional - ECV1's visual ({ mode, alpha, t, phase }, systems/combatVisuals.js)
    *  for a CONCEALED peer's Morrowind body (net/peer/peerBodies.js drawVeiled): the billboard shader's own look on this
    *  quad (the blend's ripple and opacity, the shade's dark), BLENDED with no depth write, as the billboards' concealed
    *  phase draws a concealed foe. None, and the quad is the opaque cut-out it always was. */
@@ -4432,7 +4426,7 @@ uniform vec4 uConceal;   // INVIS-LOOK: ECV1's record - the mode, the opacity, t
 uniform vec2 uSpan;      // INVIS-LOOK: the sub-rect of the RT the picture fills
 uniform vec2 uOrigin;    // MWNPC2: where that sub-rect starts - a batched body's tile (0,0 for the corner every lone pass draws in)
 uniform float uHitFlash;   // HITFLASH1: a Morrowind body struck
-// MWNPC5 (bible/04-Characters/Morrowind-NPCs.md section 10): A FOE'S TELLS ON ITS BODY - the three the billboard shader
+// MWNPC5: A FOE'S TELLS ON ITS BODY - the three the billboard shader
 // draws on a foe that this quad did not: the wind-up's glint (TELL2), the elite's glow, outline and embers (ELITE FOES),
 // and the burn or the portal's gathering (DISSOLVE). The colour terms are the billboards' own (GLINT_GLSL,
 // ELITE_GLOW_GLSL); the texel reads - the outline, the embers, the grain - are their twins inside the picture's TILE, so
@@ -4650,7 +4644,7 @@ void main() {
    *  is one prefix and draws only the slots ever touched, a wrapped one
    *  is two so the oldest marks composite first. Without it the whole
    *  capacity is drawn, in slot order. */
-  /** WEAPON-MOUNT (2026-09-26): a hung PICTURE on the decal pass - the decorator's mounted weapons and armour. The
+  /** WEAPON-MOUNT: a hung PICTURE on the decal pass - the decorator's mounted weapons and armour. The
    *  pass's own program with its picture switch on, so a mount's texel is its colour and not a blood film's depth. */
   drawDecalPicture(batch, tex) {
     this._decalPicture = true;
@@ -4680,7 +4674,7 @@ void main() {
     const d = this._decal;
     this._bindTex0(tex);   // PERF-TEX3
     gl.uniform1f(d.picture, this._decalPicture ? 1 : 0);   // WEAPON-MOUNT: a mount is a picture (drawDecalPicture); every mark is a film - the CALL's, beside the atlas (LA-COST1's block below is the frame's)
-    // LA-COST1 (2026-09-27, Mac: "performance improvements"): THE FRAME BLOCK, ONCE A STAMP (PERF3's law). Every call
+    // LA-COST1: THE FRAME BLOCK, ONCE A STAMP (PERF3's law). Every call
     // re-sent the camera, the fog, the scene's light, forty-eight lights and their colours and the lane's block - and
     // an interior makes one call a hung weapon (DECOR2c's mounts) beside the blood pool's. The atlas above is the
     // call's own; everything below is the frame's.
@@ -4807,7 +4801,7 @@ void main() {
    *  alpha-cut - the FP viewmodel composite (E3d). Classic draws the
    *  weapon over everything. */
   /** Screen-space translation applied to every drawScreenQuad dst -
-   *  the overlay letterbox seam (2026-08-14): classic windows lay out
+   *  the overlay letterbox seam: classic windows lay out
    *  on a virtual 320x200*s screen and this centers that screen on
    *  the real canvas. Set, draw, reset - never leave it on. */
   setScreenOffset(x, y) {
@@ -4891,8 +4885,7 @@ void main() {
       q.cw = gl.drawingBufferWidth; q.ch = gl.drawingBufferHeight;
     }
     gl.uniform4f(this._screenQuad.src, src.u0, src.v0, src.u1, src.v1);
-    // BLACK-ARMS (2026-09-22, a player on Discord: "Weapon and torch are
-    // blacked out"): `color` is the shader's vec4, but the light a flat
+    // BLACK-ARMS: `color` is the shader's vec4, but the light a flat
     // takes (`flatLightAt`, MAC-I) is an RGB triple, and the classic
     // weapon, the torch hand and the casting hands all hand it here as
     // it is. `color[3]` was then undefined, `uniform4f` takes an
@@ -4942,7 +4935,7 @@ void main() {
   }
 
   /**
-   * WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): THE FOURTH 2D PRIMITIVE - a classic weapon sprite's element outline,
+   * WEAPON-GLOW1: THE FOURTH 2D PRIMITIVE - a classic weapon sprite's element outline,
    * drawn over the frame drawScreenQuad just drew, on the same rect (`dst`, before the screen offset, as drawScreenQuad
    * takes it) and source (`src`, its mirror). `glow` is systems/weaponGlow.js's spec (`win` render/weaponGlowGlsl.js
    * GLOW_SPRITE_WINDOW). `frame` measures the frame (AUDIT WEAPON-GLOW SPR-3/SPR-4): `art` its size in Daggerfall's
@@ -5352,7 +5345,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  the billboard shader discards on it - so one GL texture cannot carry
    *  both treatments and the -1 (mesh) and 0 (flat) uploads must key
    *  apart. The '#ui' variant is the same argument for the mip chain. */
-  /** GATE-MIX (2026-10-20, the owner: "the game hitches"): whether the PLAIN picture under (archive, record) - the key
+  /** GATE-MIX: whether the PLAIN picture under (archive, record) - the key
    *  uploadTexture makes when no option is asked - already stands, a real one and not a stand-in's placeholder; and when
    *  it does, it is held for the place asking exactly as an uploadTexture hit holds it (PLACE-LRU). A caller asks this
    *  before decoding a picture uploadTexture would only turn away (scenes/dataPipeline.js uploadRecordFrame: a hit's
@@ -5576,8 +5569,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     buf(gl.ARRAY_BUFFER, model.uvs);
     gl.enableVertexAttribArray(2);
     gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 0, 0);
-    // WBX1 (2026-09-26, Mac: "None of the 3D geometry that was built including the oblivion interior/exterior gate
-    // are visible"): THE ONE INDEX TYPE. Every draw of a bundle - drawMesh, the shadow replays - reads its elements as
+    // WBX1: THE ONE INDEX TYPE. Every draw of a bundle - drawMesh, the shadow replays - reads its elements as
     // gl.UNSIGNED_INT, so the element buffer holds 32-bit indices whatever the model handed in. The gate's stone, the
     // Burning Court and the Deadlands' land were built with a Uint16Array (under 65,536 vertices each): half the bytes
     // their draws asked for, so WebGL refused every one ("Insufficient buffer size") and the stone was never there -
@@ -6471,7 +6463,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  (DS1: 'exp2' is Unity's ExponentialSquared, exp(-(density*d)^2) -
    *  Dynamic Skies ships its overcast, rainy and snowy fog in it). LA-AUDIT C2: `color` kept, not copied (setPointLights'). */
   /**
-   * TV1 (bible/06-Systems/Travel-View.md): THE FOCUS the fog and the sun's cascades measure from - the travel view's
+   * TV1: THE FOCUS the fog and the sun's cascades measure from - the travel view's
    * traveller, or null for the camera (render/fogGlsl.js FOCUS_GLSL). A FRAME'S (AUDIT TV B1): the host sets it every
    * frame BEFORE beginFrame (whose lane replay and sun maps read it), and a beginFrame no setFocus came before clears it;
    * it moves the frame stamp like the fog, so every block that carries it is re-sent.
@@ -6508,7 +6500,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  floats world/deepWater/deepWaterLook.js distanceFogUniforms packs, or null for
    *  none. After beginFrame, which clears it: it is a frame's.
    *
-   *  LA-COST6 (2026-09-27, found by the audit of Mac's "a deep audit on the enhanced lighting system"): UNDER THE SEA,
+   *  LA-COST6: UNDER THE SEA,
    *  THE BUILDINGS HAD NO FOG. The mesh program takes its fog from beginFrame alone - and beginFrame CLEARS this (a
    *  frame's, as the deck is) and the world host sets it after, from the frame's own camera (beginDeepWatersFrame).
    *  The terrain, the flats and the rigs upload their fog at their draws, so they wore the sea's murk; every building,
@@ -6523,7 +6515,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (loc) { this._use(this.program); this.gl.uniform4fv(loc, this._dwFog); }
   }
 
-  /** BANTHA1 (bible/03-World/Bantha-Jungle.md): THE JUNGLE'S HAZE for this frame - the eight floats of
+  /** BANTHA1: THE JUNGLE'S HAZE for this frame - the eight floats of
    *  render/hazeGlsl.js uJungleHaze (world/jungle/jungleHaze.js hazeUniforms), or null for none (not the air pass's haze -
    *  setHaze). Set before or after beginFrame (the exterior host sets it beside the fog, before): it arms the frame's
    *  haze, which the next beginFrame no setJungleHaze armed clears; the mesh program takes it at once (setWaterFog's seam), the others at their
@@ -6592,7 +6584,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     }
   }
 
-  /** SHIP-FADE (2026-10-02): the share of the next meshes' fragments kept (1 = whole), uploaded at once - the boats'
+  /** SHIP-FADE: the share of the next meshes' fragments kept (1 = whole), uploaded at once - the boats'
    *  pool sets it about a fading ship's draws and puts it back to 1 after them. */
   setDissolve(v) {
     const k = Math.max(0, Math.min(1, Number.isFinite(v) ? v : 1));
@@ -6725,7 +6717,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   /** LT1: the vec3 array a frame uploads - the host's per-light colours
    *  when given, else the shared colour splatted across the count.
    *
-   *  LA-COST1 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): DECODED
+   *  LA-COST1: DECODED
    *  ONCE PER CHANGE. On the lane every program's upload decoded the whole list again - three Math.pow a light, 144 for
    *  forty-eight - at beginFrame, every terrain block, and every billboard, decal and character call: an interior's
    *  eight flat calls and a hung weapon's decal each paid it for the array the frame had set once. The decode is kept
@@ -6754,8 +6746,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   }
 
   /**
-   * MAC-I (2026-09-17, Mac: "The classic sprite should react to
-   * lighting (first person)"): THE LIGHT A FLAT WOULD TAKE AT A POINT.
+   * MAC-I: THE LIGHT A FLAT WOULD TAKE AT A POINT.
    *
    * The first-person sprites are screen quads, so nothing in the world
    * pass ever touched them - a torch hand, a weapon and a pair of
@@ -6923,7 +6914,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   }
 
   /**
-   * AUDIT PERF-ARENA A4 (2026-10-11): ONE INDEX BUFFER FOR EVERY ARENA. Quad q's six indices (b, b+2, b+1, b, b+3, b+2
+   * AUDIT PERF-ARENA A4: ONE INDEX BUFFER FOR EVERY ARENA. Quad q's six indices (b, b+2, b+1, b, b+3, b+2
    * from its first corner b = 4q) are the same in every arena, so a smaller arena reads a prefix of a larger one's - and
    * each arena uploaded its own copy: 6.3 MB of GPU memory an arena of the most, and ~6 ms of the frame that opened it
    * filling the array (a streamed walk at Knightstale's density opened fourteen, ten of the most). The arenas share one
@@ -7004,7 +6995,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 20, 0);
       gl.enableVertexAttribArray(1);
       gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 20, 12);
-      // MEM-AUDIT (2026-10-23): the quads' indices written for the batch that owns its buffers alone - an arena's batch reads
+      // MEM-AUDIT: the quads' indices written for the batch that owns its buffers alone - an arena's batch reads
       // the arena's (above), and every streamed pixel's still flats made this array to drop it
       const indices = new Uint32Array(count * 6);
       for (let f = 0; f < count; f++) {
@@ -7032,9 +7023,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // flat's own half-diagonal (a flat is drawn about its centre, any facing)
     const bounds = boundsOf(centers.flat());
     bounds[3] += quadHalfDiagonal(size);
-    // PERF-EXT10 (2026-09-25, two players via Mac: "fps issues in the
-    // exterior but fine in the interior", "me too my friend.. don't know
-    // why. I got a RX6600"): A BATCH IS BORN WITH EVERY FIELD IT WILL EVER
+    // PERF-EXT10: A BATCH IS BORN WITH EVERY FIELD IT WILL EVER
     // CARRY. This literal minted eleven, and the rest arrived later in
     // whatever order a path first touched them - a producer's `_box`,
     // `sway`, `conceal`, `noShadow`, `selfCard`; the shadow record's ten
@@ -7064,7 +7053,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // which need no box (`sway`'s fraction is written once, by the host).
     // A field a batch gains anywhere in src/ belongs here too -
     // test/render/perfextb.test.js sweeps the writes, and weighs the record.
-    // PERF-EXT1 (2026-09-25, the same players): `_place`, the placements on
+    // PERF-EXT1: `_place`, the placements on
     // a grid (bounds.js placementGrid), for a static batch of more than one
     // flat - a pixel-wide wood's sphere reaches every shadow in its pixel,
     // its trees do not. Never for one built dynamic: its centres move.
@@ -7420,7 +7409,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     for (;;) { const r = steps.next(); if (r.done) return r.value; }
   }
 
-  /** OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): uploadTileArray a few layers
+  /** OW-HITCH: uploadTileArray a few layers
    *  at a time - a generator that yields after every TILE_LAYERS_A_STEP layers (the streaming host breathes there:
    *  scenes/groundSets.js), the array registered only once every layer and its mips stand, so nothing draws a half
    *  array. A Vanilla Enhanced twin is 112 layers of 256 texels, 29 MB, that went up inside one build. Each step binds
@@ -7438,7 +7427,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
-    // GRAIN1 (2026-09-19, Mac: "distance terrian has a weird grain look"):
+    // GRAIN1:
     // THE MIPMAP, AND WHY THE MAGNIFIER DOES NOT MOVE.
     //
     // MIN was NEAREST, so a distant pixel covering a dozen texels picked
@@ -8052,8 +8041,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   }
 
   /**
-   * PERF-EXT13 (2026-09-25, the players' "fps issues in the exterior but
-   * fine in the interior"): EVERY VISIBLE PIXEL'S WATER IN ONE CALL. The
+   * PERF-EXT13: EVERY VISIBLE PIXEL'S WATER IN ONE CALL. The
    * streaming host drew each water pixel through its own drawWaterSurface,
    * and each call sent the whole frame block again - the matrices, the
    * clock and the wind, the sky, the fog, the shadow maps, the sun, the
@@ -8261,7 +8249,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
 
   /** Draw billboard batches facing the camera. Call after solid geometry. */
   /**
-   * LPT1 (bible/07-Rendering/Low-Poly-Trees.md): THE FRAME'S LOW-POLY TREES, or null for none - drawn by drawBillboards
+   * LPT1: THE FRAME'S LOW-POLY TREES, or null for none - drawn by drawBillboards
    * after its opaque flats, on the billboard program. `eye` and `radius`/`band` are the handover (a far picture whose
    * batch's `lptProto` is in `cut` - a handle whose 3D trees this frame draws - gives way inside the radius); `gpu` the trees'
    * buffers (render/lowPolyTreesRender.js); `runs` one handle's instances each - `drawStart` and `drawCount` its visible
@@ -8409,7 +8397,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // screen. The planes are recomputed rather than cached on the frame
     // stamp because the panel bracket swaps _proj/_view without bumping
     // it; one 4x4 multiply a call is nothing beside what it saves.
-    // GHOST1 (2026-09-19): the planes are SPHERE planes - normalised.
+    // GHOST1: the planes are SPHERE planes - normalised.
     // `frustumPlanes` leaves them unnormalised on purpose (frustum.js's
     // own note: the box test only asks for the sign, and normalising
     // would spend four square roots on nothing), and `sphereInPlanes`
@@ -8438,7 +8426,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (this.bbUFlatWind) gl.uniform4fv(this.bbUFlatWind, this._flatWind ?? ZERO_FLAT_WIND);   // WIND3: one upload a call; uSway is the batch's
     if (this.bbUWindfallAxis) { gl.uniform4fv(this.bbUWindfallSway, this._windfallSway); gl.uniform4fv(this.bbUWindfallAxis, this._windfallAxis); }   // WINDFALL1: the mod's law, one upload a call
     const wfLaw = windfallLawOn(this._windfall);   // WINDFALL1: a batch's share is its mask under the mod's law
-    // LA-COST1 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): THE
+    // LA-COST1: THE
     // FRAME BLOCK, ONCE A STAMP - PERF3's terrain law on the billboard program. Every call re-sent the camera, the fog,
     // the tint and the sun, forty-eight lights and their colours (decoded again: 144 Math.pow), the indirect, and the
     // lane's block - the three shadow arrays, the sun's matrices, the caster table, the eye, the contact block and the
@@ -8463,7 +8451,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
         // Lambert-average half the sun does - a scalar on the tint.
         // EL1: under the lane the two terms are decoded FIRST and added in
         // linear (_c3 on each, into the two scratch triples).
-        // AUDIT PERF-SUN/FOG F4 (2026-09-19, pre-existing): THREE COLOURS,
+        // AUDIT PERF-SUN/FOG F4: THREE COLOURS,
         // THREE SCRATCHES. `mc` and `sc` were both handed `_decB`, so they
         // were the SAME Float32Array - and `sc`'s decode overwrote `mc`'s
         // contents before the very next statement read `mc`. The billboard
@@ -8552,8 +8540,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     let lastSway = null;   // WIND3
     let lastFlash = null;   // HITFLASH1
     let lastGlow = null;   // ELITE FOES
-    // PERF-EXT11 (2026-09-25, the players' "fps issues in the exterior but
-    // fine in the interior"): THE SIZE AND THE ORIGIN GO UP WHEN THEY
+    // PERF-EXT11: THE SIZE AND THE ORIGIN GO UP WHEN THEY
     // CHANGE, as the sway and the key's textures already did. Both were
     // uploaded for every flat, and neither changes between most pairs:
     // the sort below puts one record's batches together, and they share

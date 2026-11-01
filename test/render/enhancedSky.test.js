@@ -1,6 +1,4 @@
-// ES1 - THE ENHANCED SKY (2026-08-27, Mac's call: "for the enhanced
-// version of the game, I want us to develop our own take on the
-// procedural sky system mod from DFU").
+// ES1 - THE ENHANCED SKY.
 //
 // The sky's PRESENTATION is ours and unpinnable by assertion - it is
 // judged by eye through tools/enhancedSkyProbe.mjs, which renders the
@@ -185,7 +183,7 @@ test('ES1 state: what the shader gets - the palette by elevation, the weather\'s
   assert.deepEqual(skyState({ minuteOfDay: at(12), weather: 'volcano' }).zenith, clear.zenith);
 });
 
-// ── ES1c: THE POLISH (2026-08-27, Mac: "how can we improve this") ──
+// ── ES1c: THE POLISH ──
 // Four of five taken: the banding, the clouds, the weather's snap, the
 // stars standing still. (The fifth - cloud shadow on the world - is a
 // world change, not a sky one, and stays on the board.)

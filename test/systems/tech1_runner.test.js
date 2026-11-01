@@ -1,4 +1,4 @@
-// TECH1 (bible/05-Combat/Weapon-Techniques.md): THE TECHNIQUE KEY AT WORK - the blow every host's swing and shaft resolve
+// TECH1: THE TECHNIQUE KEY AT WORK - the blow every host's swing and shaft resolve
 // through (combat/technique/techniqueBlow.js, PlayerWeapon.resolveHit, arrowFlight.js playerArrowHitFoe), the one runner every rig
 // steps (combat/techniques.js), the motor's flight (player/motor.js techniqueLaunch), the marks on the ground and the chip.
 import '../modsOff.js';

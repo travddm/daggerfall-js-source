@@ -1,5 +1,4 @@
-// WAGON-HITCH (2026-10-04, Mac: "the wagon when attached to the horse should show in the overworld if attached and
-// currently it sort of rubberbands and doesn't attach to the horse properly"): THE WAGON ON ITS SHAFTS, PINNED BY
+// WAGON-HITCH: THE WAGON ON ITS SHAFTS, PINNED BY
 // EXECUTION. The mod laid the moving wagon on a trail point and eased it there at 12 per second, so the gap to the
 // rider stretched with speed and frame time and sprang back on every stop (measured before the change: 2.5 m standing,
 // 3.07 m at the cart's 7.6 m/s, 3.031 / 3.038 on alternating frames; a following team's swung to 0.8 m off its horse
@@ -168,7 +167,6 @@ test('WAGON-HITCH x OW-BIG: under the Overworld my cart\'s wagon is drawn grown 
   assert.ok(Math.abs(scaleOf(renderer.draws[0].m) - 1) < 1e-9, 'off the view: its own size');
   renderer.draws.length = 0; pool.draw(renderer, null, { selfGrow: 8, grow: () => 99 });
   const body = renderer.draws[0].m;
-  // PIN MOVED (WAGONS3, Mac: "All the wagons/carts are oversized in the overworld"): grown by the rig's own law off the
   // traveller's step - a rig read as long as a rider on horseback (world/wagonModels.js rigGrowOf), the classic wagon's
   // hitch its length - not the traveller's eight
   const g = rigGrowOf(8, 'cart', L);
@@ -216,7 +214,7 @@ test('WAGON-HITCH: another player\'s cart wagon hangs from their rider as drawn 
   assert.ok(hgap(p.shownWagon, [40, 0, 40]) < 0.01 && p.hitch === null, `parked where its word stands: ${p.shownWagon}`);
 });
 
-// ── AUDIT WAGON-HITCH (2026-10-04): the four lenses' findings, each pinned
+// ── AUDIT WAGON-HITCH: the four lenses' findings, each pinned
 const sideSlope = (deg) => {
   const t = Math.tan((deg * Math.PI) / 180), n = Math.hypot(t, 1);
   return { raycastAll: (o, d, max) => { const y = -t * o[0]; return d[1] < 0 && o[1] >= y && o[1] - y <= max ? [{ point: [o[0], y, o[2]], distance: o[1] - y, normal: [t / n, 1 / n, 0] }] : []; } };
@@ -347,7 +345,7 @@ test('AUDIT WAGON-HITCH B1/B7: a grown wagon finds the ground up a hill its own 
   renderer.draws.length = 0; pool.draw(renderer, null, { selfGrow: 12 });
   const m = renderer.draws[0].m;
   const groundThere = -t * m[14];
-  assert.ok(Math.abs(m[13] - (groundThere + NORMAL_GROUND_OFFSET * rigGrowOf(12, 'cart', L))) < 1e-3, `on the hill ${groundThere.toFixed(2)} m up, not sunk into it: ${m[13]}`);   // PIN MOVED (WAGONS3): at the rig's grow
+  assert.ok(Math.abs(m[13] - (groundThere + NORMAL_GROUND_OFFSET * rigGrowOf(12, 'cart', L))) < 1e-3, `on the hill ${groundThere.toFixed(2)} m up, not sunk into it: ${m[13]}`);
   // the wheel clock: the small wagon's wheel turns 80 degrees, the twelve-times wheel a twelfth of it; the step is taken
   // the short way across the wrap
   let s = grownWheelStep(null, 100, 12);

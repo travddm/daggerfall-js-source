@@ -1,6 +1,5 @@
 // @ts-check
-// WB3b (2026-09-25, Mac: "a gate of oblivion which takes place in a large boss arena with an oversized enemy with
-// telegraphed attacks"): WHAT THE CLIENT HOLDS OF A GATE'S FIGHT - the relay's words (net/wire.js validGateOut, off the
+// WB3b: WHAT THE CLIENT HOLDS OF A GATE'S FIGHT - the relay's words (net/wire.js validGateOut, off the
 // court's room or the hub) folded into one state: the boss's health, where he stands and walks, the attack in flight,
 // his phase and shield, the kill and the wrath, and this account's receipt. The court draws from it (WB4 - the body,
 // the telegraphs, the bar); the gate in the world reads its `fellAt` (a gate whose boss fell collapses on every screen).
@@ -276,8 +275,7 @@ export const GATE_NO_TEXT = Object.freeze({
   'the court is full': 'The Burning Court is full.',
 });
 
-/** GATE-RELOAD (2026-09-26, volo on Discord: "the oblivion gate is bugged rn" - "you cant enter it" - "it kicks you out
- *  instantly"): what the room's refusal of my `in` MEANS when it says the gate is closed. The relay says that word in a
+/** GATE-RELOAD: what the room's refusal of my `in` MEANS when it says the gate is closed. The relay says that word in a
  *  `no` for one reason alone - AUDIT WBX R7, a game that does not know its brain's law (`bv` below GATE_BRAIN_MIN: a tab
  *  loaded before the relay's deploy, a desktop copy whose update waits for the app to quit) - while the gate stands open
  *  (a closed window is refused at the hello, as an `error`, and never gets this far). "The gate is closed." in front of
@@ -308,7 +306,7 @@ export function createGateLink({ now, say = () => {}, onFell = () => {}, onRecei
      *  moves the court for a kill of its own day alone. */
     word(g) {
       if (!g) return;
-      // COURT-WATCH (bible/11-Multiplayer/World-Bosses.md section 24): a full court keeps me as its watcher - its fight
+      // COURT-WATCH: a full court keeps me as its watcher - its fight
       // heard and seen, never fought - until the answer to an `in` asked again (gateBrain.js COURT_WATCH_ASK_MS) gives me a seat
       if (g.k === 'no' && WATCHED_NO[g.m] === true && watches()) { if (!watching) say(courtWatchText()); watching = true; return; }   // AUDIT PLAN-1000 G3: a relay that says `me` (relaySupportsCourtWatch)
       if (g.k === 'no') { say(gateRefusalText(g.m)); onRefused(g.m); return; }   // GATE-RELOAD: in what the word means

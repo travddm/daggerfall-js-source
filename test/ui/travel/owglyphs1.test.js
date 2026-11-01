@@ -1,5 +1,4 @@
-// OW-GLYPHS (2026-10-12, Mac: "give all the symbols the red dots (monsters and dungeons), green dots, logging nodes etc
-// fitting symbols"): the Overworld's marks by what they are - a band a skull, a dungeon an arch, a player a bust (a crowd
+// OW-GLYPHS: the Overworld's marks by what they are - a band a skull, a dungeon an arch, a player a bust (a crowd
 // two), a party on the road its pack, a profession's nodes by their work - in the colours the dots had, no bigger than
 // a label's room allows.
 import { test } from 'node:test';

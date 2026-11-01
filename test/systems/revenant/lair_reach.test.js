@@ -6,7 +6,7 @@
 // stood in one: a pocket no walk reaches (SD-REACH found the same of the Rift, 2026-10-08, and fixed the Rift alone). The
 // lair's stand and the Rift now ask the host's one end (scenes/dungeonContext.js dungeonEnd): the farthest of SD-REACH's
 // candidates (world/superDungeon/sdDungeon.js sdEndMarks - an interior block's enemy markers, out of the water where any
-// is). The record: bible/01-Overview/bugs/Field-Bugs-2026-10-19.md LAIR-REACH.
+// is). The record: LAIR-REACH.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

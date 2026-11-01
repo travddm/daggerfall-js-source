@@ -1,4 +1,4 @@
-// SAFE1, SAFE3, SAFE4, SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE ACCOUNT SERVICE'S HALF, driven
+// SAFE1, SAFE3, SAFE4, SAFE7: THE ACCOUNT SERVICE'S HALF, driven
 // end to end through the real Worker over a real schema - a block list, a report whose every line's stamp is the relay's
 // own signature (checked with GATE_PUBLIC_KEY, as the service checks it), the case it opens, the automatic mute three
 // credible reporters reach and a guest's reports never do, the ban a banned account meets on every door, the record of

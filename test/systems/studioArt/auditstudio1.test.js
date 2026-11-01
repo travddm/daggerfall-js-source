@@ -1,5 +1,4 @@
-// AUDIT STUDIO1 (2026-10-17, the owner: "Audit this and ensure perfection"; the record is
-// bible/01-Overview/audits/Audit-Studio1.md): five cold lanes over the studio's frozen tree, every finding reproduced
+// AUDIT STUDIO1: five cold lanes over the studio's frozen tree, every finding reproduced
 // before it was fixed. What the fixes hold:
 //
 //   S1  the stand-in the studio covers: its picture stands in for a studio picture that will not load (A1), and gives

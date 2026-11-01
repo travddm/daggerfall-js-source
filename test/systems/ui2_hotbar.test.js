@@ -1,5 +1,4 @@
-// UI2 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "The hotbar also is missing sprite
-// icons like spells, and you should be able to slot spells and different items").
+// UI2.
 //
 // THE HOTBAR: any item on a slot, its press the pack's own primary act (systems/quickslots.js - a worn piece put on
 // or taken off, anything else USED through the pack's Use and its three window doors, which every host now hands the
@@ -293,7 +292,7 @@ test('UI2 AUDIT UI B5: the diamond\'s cells are fitted again when the HUD\'s sca
   const { setPref, getPref } = await import('../../src/systems/uiPrefs.js');
   const was = getPref('hudScale');
   const style = getPref('quickbarStyle');
-  setPref('quickbarStyle', 'quickbar');   // HB-LYCFREE: the hotbar is the default now; these cells are the diamond's (PIN MOVED)
+  setPref('quickbarStyle', 'quickbar');   // HB-LYCFREE: the hotbar is the default now; these cells are the diamond's (
   try {
     HB.clearQuickslots();
     const sword = createWeapon(120, 3);

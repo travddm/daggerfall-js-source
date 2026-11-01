@@ -1,4 +1,4 @@
-// PERF-SAILS1 (2026-10-10, Dudey's `?perf=cpu` readout in a port at night: `sails` 5-7.6 ms a frame): THE BOATS' FRAME.
+// PERF-SAILS1: THE BOATS' FRAME.
 // Come Sail Away's pool (scenes/comeSailAway/comeSailAwayPool.js) over the vendored hulls, N ships standing in a row, its `frame`
 // (the walk, the holders' bakes, the lanterns, the flats) and its `draw` (to a stand-in renderer) timed over FRAMES frames after a warm-up. No GL: the
 // renderer and the picture pipeline are stand-ins (test/scenes/audit0928_online.test.js's), so the time is the pool's own.

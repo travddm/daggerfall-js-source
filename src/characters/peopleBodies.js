@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC8 (2026-10-09, the MW-NPC arc's eighth slice - bible/04-Characters/Morrowind-NPCs.md section 13): A STANDING
+// MWNPC8: A STANDING
 // PERSON, READ FOR THEIR BODY. Daggerfall's standing people - the shopkeeper, the guild's officer, the noble at court,
 // the drunk in the tavern - are StaticNPCs (characters/staticNpc.js staticNpcData): a race off their faction (else the
 // region's), a gender off their record's flags, a faction whose social group and guild say who they are. The body wears
@@ -88,8 +88,7 @@ export function personLook(pn, data, faction) {
 }
 
 /**
- * MWNPC18 (2026-10-11, a player's report via Mac: "Player decorations are not affected" - bible/04-Characters/
- * Morrowind-NPCs.md section 26): A FIGURE A PLAYER PLACED (net/decorLaw.js decorIsFigure - one of Daggerfall's people
+ * MWNPC18: A FIGURE A PLAYER PLACED (net/decorLaw.js decorIsFigure - one of Daggerfall's people
  * set down in a home or its yard, DECOR-FIGURE) stands in a Morrowind body as the room's own people do. It has no
  * StaticNPC record - no faction, no flags - so what it IS is read off its picture: its sex off FLATS.CFG's gender column
  * (formats/flatsFile.js flatGender), its role off FLATS.CFG's caption (figureRole - a judgement, words to a wardrobe

@@ -1,5 +1,4 @@
-// RF2 - THE ONE ENEMY-LOOT SEAM (2026-09-14, Mac's refactor pass: "Lets
-// tackle each one at a time" - the second).
+// RF2 - THE ONE ENEMY-LOOT SEAM.
 //
 // Four hosts stood the same four lines each - GenerateItems on the
 // player's level and gender, equipEnemy, the map/potion/recipe trio,

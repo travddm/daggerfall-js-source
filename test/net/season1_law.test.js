@@ -1,7 +1,7 @@
-// SEASON1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEASONS' LAW - the calendar from the
+// SEASON1 part one: THE SEASONS' LAW - the calendar from the
 // week Season 0 begins (four weeks, then eight), the names, the week a Season ends, the once-a-Season floor, a Pact to
 // its Season's end, the soft reset's Standing, the Season's titles, a Charter title's Season, the Chronicle's line and
-// the Seat tab's (bible/11-Multiplayer/Seats-Arc.md 9.1, 18). Pure: src/net/townSeatLaw.js.
+// the Seat tab's (9.1, 18). Pure: src/net/townSeatLaw.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

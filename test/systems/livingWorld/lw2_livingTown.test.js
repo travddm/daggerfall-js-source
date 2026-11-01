@@ -1,4 +1,4 @@
-// LW2 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING TOWN - the residents on the street, in the wandering
+// LW2: THE LIVING TOWN - the residents on the street, in the wandering
 // pool's own shape, and its wiring in the streaming host. The town is the synthetic one (test/lwTown.mjs); the bodies
 // are the real ResidentWalker; the clock is the calendar's (DFU's walking pace over CLASSIC_MINUTES_PER_SECOND).
 import test from 'node:test';
@@ -62,7 +62,7 @@ test('LW2 the body: a ResidentWalker is a MobilePerson (every seam that takes a 
   assert.equal(p.frame, 0);
   const g = new ResidentWalker({}, { archive: 399, guard: true, frameCount: () => 1, groundY: () => 0 });
   g.pos = [0, 0, 0];
-  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);   // LW-TALK: PIN MOVED - the gate's (standing, the walk wheel's still frame)
+  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);   // LW-TALK:
   assert.doesNotThrow(() => p.release(), 'nothing on the grid to release');
 });
 
@@ -127,7 +127,7 @@ test('LW2 a walk: the body walks its day\'s path at the day\'s pace - never slow
   run(t, 1);
   const moved = Math.hypot(p.pos[0] - at0[0], p.pos[2] - at0[2]);
   assert.ok(moved > PERSON_MOVE_SPEED * 0.8 && moved < PERSON_MOVE_SPEED * WALK_FAST * 1.1, `a second's walk (${moved.toFixed(2)} m)`);
-  // the gate: stood for two seconds, it does not move and owes the minutes - LW-SPREAD: PIN MOVED - the player stands
+  // the gate: stood for two seconds, it does not move and owes the minutes - LW-SPREAD:
   // beside it (the street's nearest: kept on it; at the square, a walker the street no longer kept went out of view)
   const before = [...p.pos];
   const beside = [p.pos[0] + Math.sin(p.yaw) * 1.5, 0, p.pos[2] + Math.cos(p.yaw) * 1.5];
@@ -152,7 +152,7 @@ test('LW2 coming onto the street: on ARRIVAL (the first frame, a jump of the clo
   run(t, 4);
   const seen = new Set(t.town.pool.filter((r) => r.visible && r.res).map((r) => r.res.id));
   let checked = 0, waited = 0;
-  for (let f = 0; f < 30 * 160; f++) {   // LW-TALK: PIN MOVED - the street keeps a circle whole: under a tight cap the churn waits on a round's turn (two minutes)
+  for (let f = 0; f < 30 * 160; f++) {   // LW-TALK:
     t.clock.t += RATE / 30;
     const seats = t.town.update(1 / 30, SQUARE, 0, SQUARE, true);
     const now = new Set();
@@ -165,7 +165,7 @@ test('LW2 coming onto the street: on ARRIVAL (the first frame, a jump of the clo
       checked++;
     }
     seen.clear(); for (const id of now) seen.add(id);
-    // LW-SPREAD: PIN MOVED - one wanted in plain sight, waiting to be unseen, counted through the churn (the square's
+    // LW-SPREAD:
     // morning is quieter: read at its last frame alone, nobody waited)
     for (const r of t.town.pool) if (r.active && r.res && !r.visible && r.scheduleEnable && inSight(r.person)) waited++;
   }

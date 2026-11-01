@@ -1,5 +1,4 @@
-// NATURE-GROUND (2026-09-26, Ilvi on the Discord: "I encountered a lot of floating sprites across Illiac Bay, and I
-// thought if there is a way to drop all of them to 0 z position"). A location stands on its pixel's average height, and
+// NATURE-GROUND. A location stands on its pixel's average height, and
 // blendLocationTerrain flattens the ground to that height only inside the location's rect - the band past it is EASED
 // toward it, out to the pixel's edge. The block's trees, bushes and rocks in that band stood on the plane, over ground
 // falling away under them or rising through them. They stand on the drawn ground now (world.js buildPixelNow, through

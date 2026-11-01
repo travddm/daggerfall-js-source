@@ -1,7 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18, Mac: "I want to build improved animations for the morrowind rig (3rd person)" - "Improved
-// running/walking for all races", "Weapon specific walking/running animations", "Improved melee 3rd person attack
-// animations", "I want to be as detailed as possible. No band aids"; bible/04-Characters/Body-Motion.md) - THE BODY'S
+// BODY-MOTION - THE BODY'S
 // MOTION, ONE PER RIG. The Morrowind body in third person walks, runs, creeps, stands, carries what is in its hands and
 // strikes with its whole body - the gait (gait.js), the carry (carry.js) and the blows (melee.js) joined into one request
 // and solved on the skeleton over the clip's pose (bodySolve.js), through poseAssembly's `motion` slot

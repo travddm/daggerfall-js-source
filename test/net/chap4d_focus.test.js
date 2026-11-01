@@ -1,4 +1,4 @@
-// CHAP4d (2026-10-09, Mac: "Continue", the Chapters arc's seats - bible/11-Multiplayer/Chapters-Arc.md section 6): THE
+// CHAP4d: THE
 // FOCUS AND THE CHRONICLE - a chapter's Master names the material family its hall writs ask more of this week (every
 // other writ, by the same slot's dice), on the Notice Board; and every change of a chapter's seats is read, in words, in
 // the Hall of Records of a palace in its region, after the seat's own Chronicle.
@@ -55,7 +55,6 @@ test('CHAP4d a focused chapter\'s writs: every other writ, from the first, of it
 
 test('CHAP4d the Chronicle in words: a seat taken, risen to, given up for an officer\'s, lost - a member gone since; never a hidden guild\'s, nor a row it has no words for (mutants: each arm, the hidden, the name)', () => {
   const row = (data, extra = {}) => ({ kind: 'seat', faction: FIGHTERS, week: 40, data, name: 'Alda', ...extra });
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Master's chair, the council, its Councillor; marked by AUDIT GUILD3 R4
   assert.deepEqual([
     chapterChronicleLine(row({ from: null, to: 'master' })), chapterChronicleLine(row({ from: null, to: 'officer' })),
     chapterChronicleLine(row({ from: 'officer', to: 'master' })), chapterChronicleLine(row({ from: 'master', to: 'officer' })),
@@ -121,7 +120,7 @@ async function stand(t) {
   const week = meritWeekOf(NOON);
   raw.prepare('INSERT INTO npc_chapter_weeks (week, active, target, chapters, open, at) VALUES (?, 0, 60, 0, ?, 0)').run(week - 1, 'on');   // nothing due
   raw.prepare('INSERT INTO npc_chapters (faction, region, strength, week, merit, at) VALUES (41, 21, 50, ?, 0, 0), (40, 21, 50, ?, 0, 0)').run(week - 1, week - 1);
-  const seat = (char, f, region, kind) => raw.prepare('INSERT INTO npc_chapter_seats (faction, region, char_id, account, seat, since, week, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(f, region, char, who.id, kind, week - 1, week - 1, NOON);   // PIN MOVED (AUDIT CHAP4 S4): the seats last week's Turning placed
+  const seat = (char, f, region, kind) => raw.prepare('INSERT INTO npc_chapter_seats (faction, region, char_id, account, seat, since, week, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(f, region, char, who.id, kind, week - 1, week - 1, NOON);
   return { ...s, raw, who, R, week, seat };
 }
 

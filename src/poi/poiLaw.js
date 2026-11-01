@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-1 (2026-10-14) - WHAT A POI IS: THE DOCUMENT THE EDITOR WRITES, THE REALM APPROVES AND THE GAME STANDS.
+// POI-1 - WHAT A POI IS: THE DOCUMENT THE EDITOR WRITES, THE REALM APPROVES AND THE GAME STANDS.
 //
-// Mac: "POI Tool (General Map Editor) ... the creation of POI's using models, ... import models, texture, UV map, and
-// even placement onto our actual map ... a tool my developers can use without having to access the codebase"; asked who
-// publishes, "I need to be able to approve changes" (bible/06-Systems/POI-Editor-Arc.md).
+// asked who
+// publishes, "I need to be able to approve changes".
 //
 // ONE LAW, THREE READERS. The editor checks a draft against it before it is saved, the account service refuses anything
 // it does not answer (server-account/src/poi.js), and the game stands only what it answers (poi/poiRuntime.js) - so a
@@ -49,7 +48,7 @@ export const POI_LIMITS = Object.freeze({
 
 /** The Bay's own map - MAPS.BSA's 1000 x 500 (formats/woodsFile.js MAP_WIDTH/HEIGHT): the pixels whose id is MapsFile's. */
 export const POI_MAP = Object.freeze({ w: 1000, h: 500 });
-/** AUDIT RELEASE R2-8 (bible/01-Overview/audits/Audit-Release-R2.md; the owner: "Take care of exclusions and gaps"): A POI
+/** AUDIT RELEASE R2-8 (): A POI
  *  STANDS ON ANY PIXEL OF THE WORLD - within the wire's WORLD_PIXEL_BOUND either side of the Bay's corner (net/wire.js;
  *  held equal here by its pin, so the law stands alone in the service), the land past the Bay as the Bay's own map. */
 export const POI_WORLD_BOUND = 8192;

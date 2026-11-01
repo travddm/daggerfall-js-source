@@ -1,5 +1,4 @@
-// ZONE-LINE (2026-10-26, the owner: "Also ensure the pvp border outlines cyrodil perfectly, currently it doesnt";
-// bible/11-Multiplayer/Wild-Zone.md section 27): THE ZONE IS THE PROVINCE TO THE PIXEL, AND ONE LINE DRAWS BOTH. A cell
+// ZONE-LINE: THE ZONE IS THE PROVINCE TO THE PIXEL, AND ONE LINE DRAWS BOTH. A cell
 // of four had stood whole where its middle pixel stood - the zone a 3.3 km staircase about the province (9,012 map pixels
 // of the two apart on the freeware's picture), its red line that staircase smoothed, and the province's own line on the
 // held map the picture smoothed another way. Now a pixel is the zone's by the province's own law (systems/wild/wildZone.js
@@ -191,7 +190,6 @@ function smallTrace() {
   return { w, h, land, province };
 }
 
-// PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): the outline is the land's smooth law's line where the zone's
 // pixels meet the rest (no longer the picture's pixel sides), the province's ink the same law's pieces with the outline's
 // left to it - so a neighbour's coast and border end where the law's three labels meet, by the picture's corner (6, 6)
 test('ZONE-LINE THE PROVINCE\'S INK IS THE ZONE\'S LINE: on a picture, Cyrodiil\'s coast and borders are the zone\'s outline - no smoothed copy of them beside it, the lake inside drawn as before, and a neighbour\'s coast and border ending on the outline where the law\'s three labels meet (mutants: the ink keeps Cyrodiil\'s border; the ink keeps its coast; a neighbour\'s coast stopped short)', () => {
@@ -244,7 +242,6 @@ test('ZONE-LINE ON THE PLAYER\'S OWN PICTURE: every pixel of Cyrodiil\'s box the
   assert.ok(m?.bits && m.line, 'the zone, to the pixel, and its line');
   const box = /** @type {any} */ (cyrodiilBox());
   const bx0 = box.x0 - 8, by0 = box.y0 - 8, bw = box.x1 - box.x0 + 17, bh = box.y1 - box.y0 + 17;
-  // PIN MOVED (NIBEN-SEA, bible/03-World/Tamriel.md): and the province's own water (provinceWaterAt) - Lake Rumare and the
   // Niben joined to the sea, the province encloses them no more, and its banks keep them the zone's
   const law = (x, y) => theatreAt(bx0 + x, by0 + y) === CYRODIIL_THEATRE || provinceWaterAt(bx0 + x, by0 + y);
   const z = expected(law, bw, bh);

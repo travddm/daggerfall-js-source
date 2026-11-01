@@ -1,5 +1,5 @@
 // @ts-check
-// FIELD BUGS 2026-10-21b SAIL-WIND (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md; the Discord's #bug-reports, Dûmorîkh:
+// FIELD BUGS 2026-10-21b SAIL-WIND (; the Discord's #bug-reports, Dûmorîkh:
 // "Sailing Vessels Sometimes Have No Propulsion" - "This is only with sails. Oars work fine.") - A LOAD THAT LANDS OUTDOORS
 // NEVER KEEPS THE INDOORS' WIND.
 //

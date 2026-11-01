@@ -1,5 +1,4 @@
-// HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at
-// the waist ... a separate animated item on movement"). THE MORROWIND BODY.
+// HT-WAIST. THE MORROWIND BODY.
 //
 // A lit lantern at the waist is drawn on the third-person Morrowind body:
 // a carriable LIGH record named lantern (pickLanternRecord, the torch

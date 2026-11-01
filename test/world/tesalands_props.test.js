@@ -1,4 +1,4 @@
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md) - THE LANDS' LANDMARKS: their meshes (world/lands/landPropMesh.js), their
+// TESA-LANDS - THE LANDS' LANDMARKS: their meshes (world/lands/landPropMesh.js), their
 // pictures (render/landPropArt.js), their law (world/lands/landProps.js - where each stands, what it is, its bodies) and
 // their host (scenes/landPropsHost.js - the GPU on the slice clock, the frame on the fourth tree slot, the casters), and
 // the wiring from the terrain's kernel through the pixel's build to the trees' host. No game data is read here.
@@ -402,7 +402,6 @@ test('TESA-LANDS THE WIRING: the kernel lays the landmarks past the Bay and keep
   assert.match(read('src/world/terrain/terrainGenWorker.js'), /if \(out\.landProps\?\.length\) transfer\.push\(out\.landProps\.buffer\);/);
   const pb = read('src/scenes/pixelBuild.js');
   assert.match(pb, /nature, withRoads, paths, landProps, wodAverages,/);
-  // PIN MOVED (LAVA-CLEAR): the landmarks stood off the fire's clearing first (scenes/ghostfenceBuild.js clearedLandProps)
   assert.match(pb, /const landStood = lands \? standLandProps\(px, py, fire \? clearedLandProps\(fire, landProps\) : landProps, \(x, z\) => !pointNearGate\(gateClear, px, py, x, z, WOD_FLAT_GATE_CLEAR_M\) && !insideRocks\(pixelRocks, x, z\)\) : null;\n\s+const offLand = landFeetOff\(landStood\?\.set\.props, TERRAIN_SIZE \/ WORLD_MAP_TILE_DIM\);\n\s+for \(const f of nature\) \{/, 'stood before the flats, which keep off the kept ones\' feet');
   assert.match(pb, /\n\s+if \(offLand\?\.\(f\.x, f\.z\)\) continue;/);
   assert.match(pb, /\n\s+if \(landStood\) coverItems\.push\(\.\.\.landStood\.bodies\);/);

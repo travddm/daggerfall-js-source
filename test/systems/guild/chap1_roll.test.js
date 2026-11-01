@@ -1,7 +1,5 @@
-// CHAP1 (2026-10-07, Mac: "how could we split away from DFU, completely overhaul the NPC guild system and reputation
-// system"; "This is mostly with online in mind"; asked who holds it online, "Server-owned"; on the rest, "You make the
-// best decisions"): THE ROLL - a realm character's standing with Daggerfall's own guilds (the twenty-two guild
-// factions' reputation and its memberships) kept by the account service. bible/11-Multiplayer/Chapters-Arc.md section 3.
+// CHAP1: THE ROLL - a realm character's standing with Daggerfall's own guilds (the twenty-two guild
+// factions' reputation and its memberships) kept by the account service.
 //
 // The law (src/net/npcChapterLaw.js) against literals; the leaf the service reads (src/systems/guild/guildFactions.js) as the
 // one home of DFU's ids; the service (server-account/src/npcRoll.js) over the real migrations - the switch, the seed
@@ -43,7 +41,6 @@ test('CHAP1 the twenty-two: the Roll keeps exactly DFU\'s four guilds, eight tem
   assert.deepEqual([MIN_REPUTATION, MAX_REPUTATION, leaf.MIN_REPUTATION, leaf.MAX_REPUTATION], [-100, 100, -100, 100]);
 });
 
-// PIN MOVED (AUDIT CHAP D2/D4): the day's NET rise is paced, and what the pace leaves is owed - a loss gives the day's room back
 test('CHAP1 the day\'s pace: a gain is credited what 15 a UTC day leaves and the rest owed, a new day opens it again, a loss is taken whole and gives its room back, both inside DFU\'s bounds (mutants: the bound, the rollover, a loss bounded, the clamp)', () => {
   assert.deepEqual([ROLL_GAIN_DAY_MAX, ROLL_CUSTOMS_CAP, ROLL_DELTA_MAX, ROLL_EPOCH_S], [15, 40, 200, 1_791_417_600]);
   assert.deepEqual(rollCredit({ rep: 10, gainedDay: 5, gained: 0 }, 10, 5), { rep: 20, gainedDay: 5, gained: 10, owed: 0, credited: 10 });
@@ -55,7 +52,6 @@ test('CHAP1 the day\'s pace: a gain is credited what 15 a UTC day leaves and the
   assert.deepEqual(rollCredit({ rep: -95, gainedDay: 5, gained: 2 }, -10, 5), { rep: -100, gainedDay: 5, gained: -3, owed: 0, credited: -5 });
 });
 
-// PIN MOVED (AUDIT CHAP C3): the cap is a customs crossing's from the epoch - one born online earned its standing online
 test('CHAP1 the seed: a customs crossing from the epoch is capped at 40, one before it and a character born online are taken whole; every faction seeded, a missing one at 0 (mutants: the epoch\'s side, the cap)', () => {
   assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: ROLL_EPOCH_S - 1 }), 100);
   assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: ROLL_EPOCH_S }), 40);
@@ -132,7 +128,7 @@ async function stand(open = 'on') {
   const R = await seatRealm(svc.env, who.secret, 'Rolla');
   const raw = svc.env.DB._raw;
   const born = (s, origin = 'off-rolla') => raw.prepare('UPDATE realm_characters SET created_at = ?, origin_id = ? WHERE id = ?').run(s, origin, R.id);
-  born(ROLL_EPOCH_S + DAY);   // PIN MOVED (AUDIT CHAP C3): a customs crossing after CHAP1 arrived, unless a pin says otherwise
+  born(ROLL_EPOCH_S + DAY);
   return { ...svc, who, R, raw, born };
 }
 
@@ -162,7 +158,7 @@ test('CHAP1 the first read: no seed, no Roll; the seed taken once, capped at 40 
   assert.deepEqual(first.body.roll.members.map((m) => [m.f, m.rank]), [[40, 6]]);
   const again = await call(ROLL, { character: R.id, lease: R.lease, seed: { factions: { 40: 10 }, members: [] } }, who.secret);
   assert.equal(again.body.seeded, undefined);
-  assert.equal(again.body.roll.factions[40], 69, 'the Roll stands; a second seed is nothing');   // PIN MOVED (AUDIT CHAP2 D3)
+  assert.equal(again.body.roll.factions[40], 69, 'the Roll stands; a second seed is nothing');
   // a character the realm made before CHAP1 arrived keeps what it earned online whole
   raw.prepare('DELETE FROM npc_roll WHERE char_id = ?').run(R.id);
   raw.prepare('DELETE FROM npc_roll_heads WHERE char_id = ?').run(R.id);
@@ -225,7 +221,7 @@ test('CHAP1 the tenure: the service stamps a member the first time it sees one, 
   const { env, who, R } = await stand();
   const ctx = (s) => ({ db: env.DB, nowS: s });
   const player = { id: who.id };
-  await readRoll(ctx(T0), player, { character: R.id, lease: R.lease, seed: { factions: { 41: 30 }, members: [{ f: 41, rank: 2 }] } });   // PIN MOVED (AUDIT CHAP S5): a rank needs its reputation on the Roll
+  await readRoll(ctx(T0), player, { character: R.id, lease: R.lease, seed: { factions: { 41: 30 }, members: [{ f: 41, rank: 2 }] } });
   const claim = (s, rid, members) => claimRoll(ctx(s), player, { character: R.id, lease: R.lease, rid, deltas: {}, members });
   let r = await claim(T0 + 10, 'tenure-001', [{ f: 41, rank: 2 }, { f: 40, rank: 0 }]);
   assert.deepEqual(r.roll.members, [{ f: 40, rank: 0, since: T0 + 10 }, { f: 41, rank: 2, since: T0 }]);
@@ -268,7 +264,7 @@ test('CHAP1 a realm character deleted takes its Roll with it - the head, the row
 // ── THE PLAYING TAB ─────────────────────────────────────────────────
 
 /** A door that answers as the service would, keeping its own Roll - or refusing as it is told. */
-/** PIN MOVED (AUDIT CHAP2 T: the fake answered no `seq`, `from` or `seeded`, and wrote a null book over the Roll's): shaped
+/**
  *  as the service answers - `seq` the claim sequence, moved by a claim that credits a line. */
 function fakeDoor() {
   const calls = [];
@@ -363,7 +359,6 @@ test('CHAP1 the tab: the day\'s bound cuts a gain, the service\'s number stands 
   assert.deepEqual(p.stops, ['chapters-closed']);
 });
 
-// PIN MOVED (AUDIT CHAP C1/T1): the page's last claim never went - the lease is given up first; what was not claimed rides
 // the save (test/net/audit_chap1.test.js holds the kept adoption)
 test('CHAP1 the tab: a membership that moves is claimed with no reputation line, and the tab has no claim as the page goes (mutants: a membership move unclaimed)', async () => {
   const door = fakeDoor();

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - THE KINGDOMS OF THE ILIAC BAY, as
-// SEAT0 drew them (bible/11-Multiplayer/Seats-Arc.md 4.3; Mac: "You").
+// PROF2 - THE KINGDOMS OF THE ILIAC BAY, as
+// SEAT0 drew them (4.3).
 //
 // FACT: nothing in DFU maps a region to a kingdom, and its borderRegions
 // table (systems/faction/factionRelations.js BORDER_REGIONS) is not laid out in
@@ -21,10 +21,8 @@
 
 const regions = (...r) => Object.freeze(r);
 
-/** The crowns and their regions (SEAT0 4.3) - the Bay's three, each named for its capital; WW7-3 (2026-10-25, the owner:
- *  "we need the same city nodes populating the entire map of tamriel", and asked whether each province's crown is a
- *  kingdom of its own: "Yes"; bible/03-World/World-Wide.md WW7) every province past the Bay's but High Rock's and
- *  Hammerfell's (whose crowns are the Bay's three - the owner: "Whatever makes sense"), its region WW-R's (formats/
+/** The crowns and their regions (SEAT0 4.3) - the Bay's three, each named for its capital; WW7-3 every province past the Bay's but High Rock's and
+ *  Hammerfell's (whose crowns are the Bay's three), its region WW-R's (formats/
  *  mapsTables.js regionOfTheatre), named for its province and SEATED at its capital (world/tamrielCapitals.js CAPITALS:
  *  `seat` the crown seat's own name, where the Bay's crowns' is their kingdom's). */
 export const KINGDOMS = Object.freeze({

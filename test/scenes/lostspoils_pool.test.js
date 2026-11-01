@@ -1,5 +1,4 @@
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss"; asked, "Mail the leftovers"): THE POOL'S SIDE - scenes/spoilsPool.js. Leaving a boss's floor, each item
+// LOST-SPOILS: THE POOL'S SIDE - scenes/spoilsPool.js. Leaving a boss's floor, each item
 // still on it is owed to the mailbox in ONE write of the spew's crash record (its `pieces` the pack's part, the rest its
 // `mail`), sent, asked again while the answer is not a yes, and given to the pack on a refusal that will never be one or
 // after LOST_OWED_MAX_MS; the gold goes to the purse as ever. And a new burst over a floor not yet left gathers it first.

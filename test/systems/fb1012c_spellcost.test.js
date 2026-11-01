@@ -1,5 +1,5 @@
 // SPELL-COST-PAST (FIELD BUGS 2026-10-12c, from the Discord: "dude is going around AoE buffing infinitely still -
-// creating negative spell costs which makes things only cost 5"; bible/01-Overview/bugs/Field-Bugs-2026-10-12c.md).
+// creating negative spell costs which makes things only cost 5").
 //
 // Both of DFU's cost formulas scale by (110 - skill): 10 at DFU's 100, nothing at 110, under nothing past it. A mastered
 // school reads up to 140 in a formula (SOFTCAP1) and worn gear adds on top without bound, so past 110 an effect priced

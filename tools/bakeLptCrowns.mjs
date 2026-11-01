@@ -2,8 +2,7 @@
 //
 //     node tools/bakeLptCrowns.mjs
 //
-// VERGE1 (2026-10-07, Mac: "Making sure objects, like trees, avoid pathways and roads. Currently they slightly
-// overlap"). A wilderness flat keeps its whole footprint off the roads (world/road/roadVerge.js), and where Low Poly Trees
+// VERGE1. A wilderness flat keeps its whole footprint off the roads (world/road/roadVerge.js), and where Low Poly Trees
 // stands a tree for it the footprint is that tree's crown - 5 to 11 metres about the trunk in the temperate woods,
 // against a classic picture's few. Where the flats stand must not hang on the mod's switch (it is the player's own
 // online: it draws the trees, it never moves them - systems/online/onlineLane.js), so the crowns are read here, off the

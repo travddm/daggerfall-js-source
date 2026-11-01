@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// URBANIZER U3 (bible/03-World/Urban-Fabric.md section 6) - A TOWN'S FABRIC STOOD: which towns are dressed, where their
+// URBANIZER U3 - A TOWN'S FABRIC STOOD: which towns are dressed, where their
 // main streets run, and the plan and model each is given, kept while it is near.
 //
 // WHICH: every town past the Bay - Arena's places (world/arenaLocations.js), the countryside's towns

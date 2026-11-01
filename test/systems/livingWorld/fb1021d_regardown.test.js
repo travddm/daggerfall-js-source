@@ -4,7 +4,7 @@
 // online are a real hour each and run while the player is away: an evening's friendship was nought by the next evening,
 // the Courtship row's +40 (legacy/marriage.js FRIEND_AT) never reached, a word counted once a real hour. Now the regard
 // counts the character's own days (systems/livingWorld/regardClock.js), which stand while they are away (LIVED1).
-// The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// The record:.
 //
 // The real street (LivingTown over the test town, its talk path handing the relations the sky's living day) on the real
 // online sky (net/skyLaw.js skyClassicMinutes at wall instants), beside the character's own clock: twelve of its minutes a

@@ -83,7 +83,7 @@ export const ENCHANTMENT_COSTS = Object.freeze({
   LowDamageVs: { costs: [-800, -900, -1000, -1200], labels: ['Undead', 'Daedra', 'Humanoid', 'Animals'] },
   PotentVs: { costs: [800, 900, 1000, 1200], labels: ['Undead', 'Daedra', 'Humanoid', 'Animals'] },
   RegensHealth: { costs: [4000, 3000, 3000], labels: ['all the time', 'in sunlight', 'in darkness'] },
-  // DRAGON-SOUL (FIELD BUGS 2026-10-11, the owner: "Fuck matching DFU."): the Dragonling every encounter spawns (34)
+  // DRAGON-SOUL (FIELD BUGS 2026-10-11): the Dragonling every encounter spawns (34)
   // binds as the quest's (40) does, -5000 - DFU priced it at nothing, a soul the trap took and the picker named
   // "Dragonling" beside the one worth five thousand. A departure (Port-Ledger A, DRAGON-SOUL); its SoulPts, the gold a
   // soul adds to a shop's price, stay DFU's
@@ -434,8 +434,7 @@ export const ITEM_MAKER_FLAGS = Object.freeze({
  *  the same thing. Those five plus SoulBound are the six that can
  *  appear on an item only ONCE.
  *
- *  SIDE-ONCE (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "One copy
- *  per setting") - A DEPARTURE, Port-Ledger A. DFU gives UserTakesDamage
+ *  SIDE-ONCE (FIELD BUGS 2026-10-19f) - A DEPARTURE, Port-Ledger A. DFU gives UserTakesDamage
  *  and ItemDeteriorates AllowMultipleSecondaryInstances beside the
  *  primary flag (UserTakesDamage.cs:35, ItemDeteriorates.cs:37), so the
  *  secondary picker never left a taken setting out

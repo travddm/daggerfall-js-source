@@ -198,7 +198,7 @@ export function findMostRecentSave(storage = store()) {
   return mostRecentKey;
 }
 
-/** AUDIT WBX S3 (2026-09-26): WHO IS TOLD A SAVE LANDED - `(characterId, key)` after the slot's info is written (its
+/** AUDIT WBX S3: WHO IS TOLD A SAVE LANDED - `(characterId, key)` after the slot's info is written (its
  *  presence is what makes the slot real). The gate's spoils clear their crash records on it (scenes/spoilsPool.js
  *  `saved`): a save that holds the pieces, by the event and never by comparing two clocks. Answers the unsubscribe. */
 const _slotSaved = new Set();
@@ -288,8 +288,7 @@ function slotsByRecency(storage) {
     .sort((a, b) => (b[1].dateAndTime?.realTime ?? 0) - (a[1].dateAndTime?.realTime ?? 0));
 }
 
-/** SLOTS1 (Mac, 2026-09-12: "multiple save slots and then the ability
- *  to choose which save to use in online"): EVERY slot this build can
+/** SLOTS1: EVERY slot this build can
  *  restore, most recent first - { key, info, snap } each. The front
  *  doors' lists (Load, Online) and the most-recent question below are
  *  one walk, so a stale-version save never hides a good one and the

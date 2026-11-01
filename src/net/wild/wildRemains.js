@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md) - THE ROOM'S REMAINS, ON MY SIDE.
+// WILD1 - THE ROOM'S REMAINS, ON MY SIDE.
 //
 // The room's object keeps every remains (net/wild/wildLaw.js) and says them to me (`ri` chunks at my hello and at each new
 // fall, `rm` as records leave, `gone` when one is no more). Here they become ordinary ground piles in whichever host I
@@ -24,7 +24,7 @@
 // alone. So it is no pile of anyone else's, and the killer's own game asks for it the moment the room says it: their
 // pick off the body was the choice, and this is the piece arriving.
 //
-// MAC'S DECISION (2026-10-14, "Yes, build it" - the two-phase handoff): where the service holds that piece in ESCROW, the
+// MAC'S DECISION: where the service holds that piece in ESCROW, the
 // room hands no record for it - it answers the killer's ask with its signed COLLECT (`cr`, net/wild/wildReceipt.js `g1`), and
 // this book hands that to the host (`collect`), whose tab carries it to the service: the piece arrives as the service's
 // answer, committed to the killer's record (server-account/src/wild.js wildCollect), never as the room's copy of it.
@@ -33,7 +33,7 @@
 // it with fakes. The pile's `items` are minted through the item law the host hands in (systems/loot/loot.js validLootList)
 // - all but the coin, minted by its count (REMAINS-GOLD, below).
 //
-// FIELD BUGS 2026-10-20h (bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md), "the PvP remains and gold pile":
+// FIELD BUGS 2026-10-20h, "the PvP remains and gold pile":
 //   - REMAINS-GOLD: the gold a kill drops is ONE pile, a tenth of the purse and of the cart's coin (FOE-KEEPS; it was half - wildDropLaw.js
 //     takeWildGold), and the host's mint is the stranger's projection, whose stack bound is the wire's 65,535
 //     (loot.js LOOT_STACK_MAX). A pile past it was no item there: it never stood, and the gold lay in the room for nobody.
@@ -69,7 +69,7 @@ export const WILD_NO_STORE = Object.freeze({ kg: 0, name: 'These remains' });
  * @param {() => number} [o.now]                            a monotonic clock, ms
  * @param {(item: any) => string} [o.nameOf]
  * @param {() => string|null} [o.me]                       my account, as the relay knows it (INT9: the killer's piece)
- * @param {(cr: string, at: { r: string, i: number, rec: any }) => void} [o.collect]   MAC (2026-10-14): the room's collect of
+ * @param {(cr: string, at: { r: string, i: number, rec: any }) => void} [o.collect]   MAC: the room's collect of
  *   my piece in escrow, for the host to carry to the service (once a remains)
  */
 export function createWildRemains({ send, pool, toScene, mine, pack, mint, addItem, stacksWith, unequip = () => {}, unpurse = () => 0, canTake = () => true, say = () => {}, now = () => Date.now(), nameOf = () => 'it', me = () => null, collect = () => {} }) {
@@ -193,7 +193,7 @@ export function createWildRemains({ send, pool, toScene, mine, pack, mint, addIt
 
   /** INT9 (AUDIT): every remains' id said here this life - a killer's seizure is never asked of one its fallen laid. */
   const saidIds = new Set();
-  /** MAC (2026-10-14): the remains whose collect this book has handed the host - once each, however often the room says it. */
+  /** MAC: the remains whose collect this book has handed the host - once each, however often the room says it. */
   const collected = new Set();
   /** INT9: the piece I picked off a fallen's body, asked of the room - the whole of it, once it has left. */
   const askMine = (/** @type {any} */ rec) => {
@@ -265,7 +265,7 @@ export function createWildRemains({ send, pool, toScene, mine, pack, mint, addIt
       }
       answered(`${w.r}:${w.i}`);
       if (w.k === 'cr') {
-        // MAC (2026-10-14): MY COLLECT - the piece the service holds in escrow is mine once the service commits it; the
+        // MAC: MY COLLECT - the piece the service holds in escrow is mine once the service commits it; the
         // room's record of it is nobody's to add
         const it = rec && w.i === rec.wi && rec.wk === me() ? rec.items[w.i] : null;
         if (rec && w.i === rec.wi && rec.wk === me()) rec.items[w.i] = null;   // never asked again

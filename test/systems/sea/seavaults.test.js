@@ -1,5 +1,4 @@
-// SEA-VAULTS (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Wrothgarian
-// Mountains' daily elite halls in the Eltheric Ocean's Deep Aether and Abyss; bible/03-World/Eltheric-Ocean.md SEA-VAULTS):
+// SEA-VAULTS:
 // the vaults of the deep - the wire's key and its room (net/wire.js), the hub's lock, reset and crows over a sea key end to
 // end, the day's picks (systems/sea/seaVaults.js), the world host's wiring (scenes/seaVenturesHost.js and its seams in
 // scenes/world.js), the chart's marks (ui/etherChartWindow.js). tools/mutants/seavaults.json.
@@ -39,7 +38,6 @@ test('SEA-VAULTS the wire: a vault of the deep is keyed by its cell, `"e<cx>,<cy
   assert.equal(wdunHall('e806,1'), null);
   for (const [cx, cy] of [[723, 240], [0, 0], [805, 498], [400, 13]]) {
     assert.equal(seaVaultMapId(cx, cy), etherPlaceId({ cx, cy }), `${cx},${cy}: the isle's own place's id`);
-    // PIN MOVED (AUDIT SEA VENTURES D7, D8): a vault's room is its isle's lane of its own - never the plain ruin's
     assert.equal(wdunRoomKey(seaVaultKey(cx, cy)), `dungeon:m${seaVaultRoomMapId(cx, cy)}`, 'its world room, the one its vault is stood in');
     assert.notEqual(seaVaultRoomMapId(cx, cy), etherPlaceId({ cx, cy }), 'never its plain ruin\'s');
   }
@@ -52,7 +50,7 @@ test('SEA-VAULTS the wire: a vault of the deep is keyed by its cell, `"e<cx>,<cy
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'cr', crows: [['e1,2', 5], ['1,2', 6], ['e9999,1', 3]] }), { k: 'cr', crows: [['e1,2', 5], ['1,2', 6]] });
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'ok', h: 'e1,2', ep: 3 }), { k: 'ok', h: 'e1,2', ep: 3 });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'wdun', k: 'in', h: 'e1,2' }), { hasHello: true }), { t: 'wdun', k: 'in', h: 'e1,2' });
-  assert.equal(WDUN_SEA_RELAY_MIN, 246);   // PIN MOVED: world246 (world241 on its branch, then world242 and world245, renumbered past SD-THROUGH, LEASE1, PARTY-PING, SPAWN-THIN and AUDIT PISTOLET at the merges)
+  assert.equal(WDUN_SEA_RELAY_MIN, 246);
   assert.ok(relaySupportsWdunSea(RELAY_VERSION), 'this relay reads it');
   assert.ok(!relaySupportsWdunSea('world245'), 'an older one closes the socket on it - never asked');
 });
@@ -75,7 +73,6 @@ test('SEA-VAULTS the hub, end to end over the fake relay: a sea key\'s lock an h
     assert.equal(got(a, 'lk').at(-1).left, WDUN_LOCK_MS, 'an hour\'s lock on the vault');
     await wd(a, { k: 'in', h: H }); clock += 700;
     assert.equal(got(a, 'no').at(-1).h, H, 'locked out');
-    // PIN MOVED (AUDIT SEA VENTURES D7, D8, A5): the vault's own room wiped, at every size it is laid at - never the plain ruin's
     const dun = world.room(`dungeon:m${seaVaultRoomMapId(723, 240)}`), med = world.room(`dungeon:m${seaVaultRoomMapId(723, 240)}.m`);
     const plain = world.room(`dungeon:m${etherPlaceId({ cx: 723, cy: 240 })}`);
     for (const r of [dun, med, plain]) r.store.set('world:snap', { foes: [1, 2, 3] });

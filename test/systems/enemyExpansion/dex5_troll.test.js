@@ -1,4 +1,4 @@
-// DEX5 (2026-10-20, Mac: "I want to implement this as our next mod 1:1") - THE TROLL THAT GETS BACK UP. Daggerfall
+// DEX5 - THE TROLL THAT GETS BACK UP. Daggerfall
 // Enemy Expansion's troll corpse prefab (1618_20) on the port's door for a mod's corpse prefab (scenes/corpseMarker.js
 // registerCorpsePrefab): the body no one loots, its ten seconds and the troll that stands again, the cheat that freezes
 // them, a spell's missile that burns it to ash through its own entity (the troll's career), and the save that keeps its
@@ -217,7 +217,7 @@ test('DEX5-5 THE MISSILE: my spell\'s missile meets the body\'s trigger and its 
   assert.equal(troll.corpsePrefab, null, 'the missile met the trigger and the fire burned it');
   // the melee and arrow doors read living foes alone: the body's prefab is never on them
   const ext = rd('src/scenes/exteriorFoes.js');
-  assert.match(ext, /function damageFoe\(f, damage[^\n]*\n\s*if \(f\.dead \|\| \(fromPlayer && !peer && sparedBySwing\(f\)\)\) return;/, 'a blade or an arrow on a body lands nothing (WeaponDamage passes an entity of type None by)');   // AUDIT WORLD-EVENTS: PIN MOVED - a shipmate is now one of the bodies `sparedBySwing` spares (combat/friendlyFire.js), a refugee the other
+  assert.match(ext, /function damageFoe\(f, damage[^\n]*\n\s*if \(f\.dead \|\| \(fromPlayer && !peer && sparedBySwing\(f\)\)\) return;/, 'a blade or an arrow on a body lands nothing (WeaponDamage passes an entity of type None by)');   // AUDIT WORLD-EVENTS:
   // the switch off: the prefab is the loaded mod's - a plain corpse, lootable, and it lies
   const off = await fallenTroll({ on: false });
   assert.equal(off.troll.corpsePrefab, null);

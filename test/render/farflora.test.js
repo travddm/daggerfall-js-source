@@ -1,5 +1,4 @@
-// FAR-FLORA (2026-10-26, the owner: "on top of distant view, no flora/trees show. Its just a plain green flat texture.
-// No band aids for any of this"; bible/06-Systems/Travel-View.md FAR-FLORA) - THE WOODS PAST THE STREAMED GRID: the near
+// FAR-FLORA - THE WOODS PAST THE STREAMED GRID: the near
 // law's Trees read where the far views stand a vertex (world/terrain/floraCover.js, on the terrain worker for the middle
 // ring), drawn as a canopy in the trees' own art over the near ground's own tiles (render/farFlora.js), raised to their
 // height and grained into crowns and groves by the far ring's program (render/horizonHaze.js FLORA_GLSL). Pinned with no

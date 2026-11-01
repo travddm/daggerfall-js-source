@@ -1,5 +1,4 @@
-// PROTECT-FIGHT (2026-09-30, FIELD BUGS 2026-09-30 - a player's list through Mac: "Protect bystanders needs to work again
-// - lost rep for no reason"; bible/01-Overview/bugs/Field-Bugs-2026-09-30.md). The menu's Protect Bystanders is DFU's
+// PROTECT-FIGHT. The menu's Protect Bystanders is DFU's
 // MeleeAttackFriendlyProtection ("Protect Friendlies and Neutrals"), which spares a pacified foe and an ally and, outside
 // a raid (RAID-GUARDS-NPC), never the street's walkers: a swing at a foe just past the reach landed on the townsperson on
 // the look ray - Murder, -20 of the region's law at the arrest - or on a walking guard, Assault and the watch. Under the
@@ -52,7 +51,6 @@ test('PROTECT-FIGHT the hosts: both street hosts ask the fight near the player (
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(f);
     const make = s.slice(s.indexOf('const cityGuards = createCityGuards({'), s.indexOf('\n  });', s.indexOf('const cityGuards = createCityGuards({')));
-    // PIN MOVED (AUDIT FB1025i D3): the fight is its own law - the rest's answer, or a hostile foe in the classic band of my
     // feet whatever its target, a peer's too (encounters.js fightNear; test/systems/livingWorld/fb1025i_roadspare.test.js)
     assert.match(make, /\n {4}fightHere: \(\) => fightNear\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\], player\.pos\),/, `${f}: the fight near the player`);
     assert.match(s, /livePersons: \(\) => _livePersons\.filter\(\(seat\) => !cityGuards\.playerSparesPerson\(seat\.person\)\),/, `${f}: the trample passes the spared walkers by`);

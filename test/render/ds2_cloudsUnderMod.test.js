@@ -1,5 +1,4 @@
-// DS2 (2026-09-08, Mac: "The procedural sky mod doesn't apply our enhanced
-// clouds"). VC3's design decision 1 stood the volumetric clouds on the
+// DS2. VC3's design decision 1 stood the volumetric clouds on the
 // port's dome ONLY - "the new clouds do not draw under it" - and the
 // controller built them off `enhancedSky &&`, so under Dynamic Skies the
 // player got the mod's two textured sheets and none of the port's field.

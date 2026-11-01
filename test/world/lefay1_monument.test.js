@@ -1,4 +1,4 @@
-// LEFAY1 (2026-10-08): THE MONUMENT TO JULIAN LEFAY - in the middle of Gothway Garden until HOLD-MONUMENT (2026-10-14)
+// LEFAY1: THE MONUMENT TO JULIAN LEFAY - in the middle of Gothway Garden until HOLD-MONUMENT
 // stood it outside Privateer's Hold - and the flowers laid at it -
 // world/lefayMonument.js (where, what, the flowers' law), world/lefayArt.js (its stone and its plaque),
 // scenes/lefayMonumentHost.js (the pool) and the wiring in the four hosts and the save.
@@ -49,7 +49,7 @@ test('LEFAY1: THE TOWN - HOLD-MONUMENT: Privateer\'s Hold in the Daggerfall regi
 });
 
 test('LEFAY1: THE SPOT - the open ground nearest the grid\'s middle, all of MONUMENT_CLEAR_M round it open, a road counted against it', () => {
-  assert.equal(MONUMENT_CLEAR_M, 5.8);   // PIN MOVED (AUDIT LEFAY1 C3): 4.0 -> 5.8, a ring round the carve
+  assert.equal(MONUMENT_CLEAR_M, 5.8);
   const disc = discCells(MONUMENT_CLEAR_M);
   assert.equal(disc.length, 45, 'the cells within 5.8 m of a cell\'s centre (3.625 cells)');
   // AUDIT LEFAY1 C3: every cell beside a carved one is in it - the people's way round the monument, wherever it stands

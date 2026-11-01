@@ -1,5 +1,4 @@
-// UI1 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "make the actual inventory plots have
-// the rarity frame with sprites enlarged properly, instead of the inventory icon just plopping into a slot").
+// UI1.
 //
 // THE SLOTS: a picture FITTED to its slot's box (ui/iconFit.js - the law, pure), made at exactly the device size it
 // is drawn at (ui/bitmapCanvas.js fitCanvas - the canvas; ui/textureCanvas.js requestFittedPicture - the cache and its

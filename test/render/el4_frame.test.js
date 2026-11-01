@@ -1,6 +1,4 @@
-// EL4 - ENHANCED LIGHTING, TIER FOUR: THE FRAME (2026-09-17, Mac: "Polished
-// and exceptional detail. Proper darker dungeons. The goal isnt a half
-// visioned system").
+// EL4 - ENHANCED LIGHTING, TIER FOUR: THE FRAME.
 //
 // The world drawn into a frame image every pass restores to (the
 // frame-target law in render/renderTarget.js), eye adaptation measured off
@@ -129,7 +127,7 @@ test('EL4: proper dark dungeons and the glints - the ambient scaled once under t
     // loop now - it was rebuilt per light, up to 48 times a fragment,
     // and the wet Fresnel below needs it by name anyway. Same value,
     // same half vector.
-    // LA-COST4 (2026-09-27): F5/F6 named it and left it one line above the
+    // LA-COST4: F5/F6 named it and left it one line above the
     // half vector, INSIDE the loop - still once a light. It stands before
     // the loop now, once a fragment, and only where the cell holds a light.
     assert.match(fs, /int cellCount = int\(cell\.y\);\n(?:  \/\/[^\n]*\n)*  vec3 V = cellCount > 0 \? normalize\(uCamPos - wp\) : vec3\(0\.0\);\n  for \(int j = 0;/, `${name}: one eye vector a fragment, before the loop`);

@@ -1,5 +1,4 @@
-// IF1 - IMMERSIVE FOOTSTEPS 1.01 (Kirk.O), THE MOD, 1:1 (2026-09-16, Mac:
-// "Next mod we will be adding 1:1").
+// IF1 - IMMERSIVE FOOTSTEPS 1.01 (Kirk.O), THE MOD, 1:1.
 //
 // The mod is two MonoBehaviours whose sources the author publishes under
 // MIT (vendored under vendor/immersive-footsteps/Scripts/), restated in
@@ -17,7 +16,7 @@
 // and the mod's own quirks kept verbatim (altStep never set, the chain
 // and plate re-rolls writing the LEATHER interval). Then the hosts.
 //
-// AUDIT-IF (2026-09-16): five findings pinned below (F1 the build's inlining, F2 the off-terrain tile,
+// AUDIT-IF: five findings pinned below (F1 the build's inlining, F2 the off-terrain tile,
 // F3 the concurrent load, F4 the null discovery record, F5 both inventory skins). Campaign:
 // tools/mutants/if1.json - 30 mutants, 28 killed, 2 equivalent as recorded; the two first-run
 // survivors were pins that measured a constant against itself, made literal.
@@ -100,7 +99,7 @@ test('IF1: the Mods pane entry is the shipped modsettings.json - every key, its 
   for (const f of manifest.Files.filter((f) => /\.cs$/.test(f))) assert.ok(rd(`vendor/immersive-footsteps/Scripts/${f.split('/').pop()}`).length > 10000, `${f} is vendored`);
   assert.match(rd('vendor/immersive-footsteps/Scripts/ImmersiveFootstepsMain.cs'), /License:\s+MIT License/, 'the main script carries the author\'s MIT header (the object script has none; the README says so)');
   const shipped = JSON.parse(rd('vendor/immersive-footsteps/modsettings.json'));
-  // PLAIN-TEXT (2026-10-19): every line the mod wrote in Title Case with "|| Default = True", said plainly for a player (the two logging keys say they do nothing here) - their words, exactly
+  // PLAIN-TEXT: every line the mod wrote in Title Case with "|| Default = True", said plainly for a player (the two logging keys say they do nothing here) - their words, exactly
   const PLAIN = {
     'AudioQualitySettings.SoundClipQuality': 'Quality of the footstep sounds',
     'FootstepSettings.AllowFootstepSounds': 'Your footsteps make a sound',
@@ -582,7 +581,7 @@ test('IF1: [verbatim] altStep is declared and never set - over a thousand steps 
   assert.equal(FOOTSTEP_SETS.length, 14);
 });
 
-// ═══ AUDIT-IF (2026-09-16, Mac: "Lets now do a comprehensive audit on this before merging") ═══
+// ═══ AUDIT-IF ═══
 
 test('AUDIT-IF F2: a tile of -1 (off terrain, StreamingWorld.PlayerTileMapIndex\'s answer) is no table\'s and lands the climate\'s own else arm - not tile 0\'s deep water', async () => {
   const r = rig();

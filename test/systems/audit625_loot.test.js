@@ -1,5 +1,5 @@
-// AUDIT 625 (2026-10-05, Mac: "Lets do a comprehensive audit on this"), the LOOT lens: PR #625's LOOT-EASE and
-// RENOWN-LOOT, audited. bible/01-Overview/audits/Audit-625.md.
+// AUDIT 625, the LOOT lens: PR #625's LOOT-EASE and
+// RENOWN-LOOT, audited..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

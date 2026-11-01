@@ -1,4 +1,4 @@
-// TESA2 (2026-10-12, the owner: "Continue building"; bible/03-World/Arena-Provinces.md TESA2) - THE PLACES PAST THE BAY
+// TESA2 - THE PLACES PAST THE BAY
 // STAND, pinned (TESA12: the port's own - world/tamrielPlaces.js - where TESA2 stood Arena's). Each named place beyond the
 // Bay on a Bay pixel of its own province's land; on that pixel, as it builds, a non-mutating clone of one of Daggerfall's
 // own places - a city, a hamlet or a village by the place's kind - under its own name, an id in a lane of its own and an
@@ -129,7 +129,6 @@ const row = (mapId, type, { dungeon = false, blocks = 1, extra = {} } = {}) => (
 });
 
 test('TESA2 the templates: a city-state a CITY, a town a HAMLET, a village a VILLAGE - the game\'s rows of that type with an exterior and no dungeon, never main-story nor a place the port made, in map-id order; the pick off the place\'s own hash; a kind with none none (mutant: a kind\'s type, the dungeon test, an exclusion, the order)', () => {
-  // PIN MOVED (TESA12): Arena's staff dungeons, a labyrinth and a keep, went with Arena
   assert.deepEqual(Object.fromEntries(Object.entries(ARENA_TEMPLATE_KINDS).map(([k, v]) => [k, v.type])), {
     'city-state': LOCATION_TYPES.TownCity, town: LOCATION_TYPES.TownHamlet, village: LOCATION_TYPES.TownVillage,
   });
@@ -209,10 +208,8 @@ test('TESA2 with ARENA2: on the player\'s own trace all 283 places past the Bay 
   setTamrielFit({ ox: 38 * 15.5, oy: 57 * 15.5, ppu: 15.5 });
   const px = arenaPixels();
   assert.deepEqual([px.stood.length, px.unstood.length, px.byPixel.size], [283, 0, 283], 'PIN MOVED (TESA12): the port\'s own places, not Arena\'s 248');
-  // PIN MOVED (AUDIT-TESA A7-2): a capital's place stands on the capital the port built (TESA10's pin); TESA12: a port on
   // its shore (tesa6_ports); every other under its own point
   const { capitalPin, CAPITALS } = await import('../src/world/tamrielCapitals.js');
-  // PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): under its own point where the land's smooth law puts that pixel
   // on its own province's land - else (its point by a coast or a border the smooth law moved off the picture's pixel
   // corners) on the nearest pixel of its own land, a few pixels off
   const { provinceKeyBeyondBay } = await import('../src/world/tamriel/tamrielLand.js');

@@ -1,5 +1,4 @@
-// RVN7c - THE MAP AND THE JOURNAL (bible/12-Enhanced-AI/Feud-Arc.md section 18.3; Mac, 2026-10-04: "more complex,
-// less easy to accomplish and more detailed", then "Go"). A lair the player has heard of is drawn on the travel maps - a
+// RVN7c - THE MAP AND THE JOURNAL (;, then "Go"). A lair the player has heard of is drawn on the travel maps - a
 // blood-red circle with its name, in the bounty circle's shape, read where the bounty circle is read (the held map, the
 // classic region page, the ink sheet) - and rides the quest log as a hunt ("Hunt: Grushnak the Butcher"), whose
 // Abandon forgets the lair.

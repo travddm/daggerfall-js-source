@@ -1,5 +1,5 @@
 // @ts-check
-// START2 (bible/06-Systems/Alternate-Starts-Arc.md section 8): A PROVINCE'S START DUNGEON - which of the land's own
+// START2: A PROVINCE'S START DUNGEON - which of the land's own
 // dungeons (TESA8's lairs, world/tamrielDungeons.js) a province's story begins in. The province's capital is the story's
 // landmark ("an old Nord tomb near Solitude"), so the dungeon is the nearest to it of the kinds the story wants, in the
 // order it wants them (starts.js STARTS `lair`), and the nearest lair of any kind where none of them stands in reach.

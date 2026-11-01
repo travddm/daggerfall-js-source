@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAY-LEFT-GROUND (2026-10-26, bible/03-World/Landforms.md "BAY-LEFT-GROUND"; the audit "no system left behind in the
-// Bay", D1 - LANDFORM4, Mac's "a town walled in by its own levelling") - THE LANDFORMS' SITES PAST THE BAY, kept with the
+// BAY-LEFT-GROUND - THE LANDFORMS' SITES PAST THE BAY, kept with the
 // places they are made of.
 //
 // LANDFORM4's sites are MAPS.BSA's rows, a 1000 x 500 table made once as the world mounts (world.js, landformSites), so
@@ -20,7 +19,7 @@
 // and one in flight as it publishes (the roads' own shape, tamrielSweepsHost.js arenaRoadsStale). `generation` moves
 // with the table, for the main thread's own readers of the shaped ground (a record's lift field, the gate's beacon).
 //
-// THE FOUR HOSTS RULE (bible/Home.md): world.js wires it - the streamed world is the one ground past the Bay.
+// THE FOUR HOSTS RULE: world.js wires it - the streamed world is the one ground past the Bay.
 // scenes/exterior.js (the Bay's fixed scene), scenes/worldModes.js (interiors), scenes/dungeonContext.js (dungeons) - not wired, by design: LANDFORM4's own table or no shaped ground at all
 // ═══════════════════════════════════════════════════════════════════
 import { landformSitesBeyond, SITE_REACH_PIXELS } from '../world/landforms.js';

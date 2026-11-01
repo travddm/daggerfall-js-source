@@ -1,5 +1,4 @@
-// STAFF-VIEW1 (2026-10-23, mob: "np player esp in staff panel?", "i need staff panel to have esp", "i told you to add the
-// opther parts to the menu?", "wtf u had all this build"; design doc "DFO Staff Panel: design", In game: the staff view) -
+// STAFF-VIEW1 -
 // THE STAFF TAGS, driven headless: scenes/staffViewHost.js over a fake follow (the page's, scenes/staffFollowHost.js
 // staffFollowOnPage's shape) and ui/staffTags.js over a fake document of this file's own - test/net/name1_bubbles.test.js's
 // shape, COPIED rather than shared, with the same write counter, because "one element per player, moved and never

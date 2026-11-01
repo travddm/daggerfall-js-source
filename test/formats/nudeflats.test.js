@@ -1,6 +1,4 @@
-// NUDE-FLATS (2026-09-27, Field-Bugs-2026-09-26b report 7, Twoddle on the Discord: "'show Nudity' off still has a few
-// nude characters around, i dont know all the areas but temples of kynareth is one. This can be an issue for people
-// wanting to stream."). Show Nudity reached the paperdoll and the adult quests and never the world's people: a Temple
+// NUDE-FLATS. Show Nudity reached the paperdoll and the adult quests and never the world's people: a Temple
 // of Kynareth stands TEXTURE.184 records 11 and 12 ("naked blonde woman", "naked brunette") as its own. The table and
 // the setting's door are driven here, every host that draws a person pinned by source (the hosts need a browser to
 // import), and under ARENA2_PATH the table is held to FLATS.CFG's own "?" mark and sexes.

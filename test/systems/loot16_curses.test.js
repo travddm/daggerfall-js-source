@@ -1,5 +1,4 @@
-// LOOT16 - CURSED FINDS, AND THE TEMPLE'S LIFTING (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 8; Mac: "what
-// could we do to make it even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT16 - CURSED FINDS, AND THE TEMPLE'S LIFTING.
 //
 // One Rare or Legendary in twelve that a body or a pile mints is cursed in the door's last pass: a line more - a number
 // kind its group may carry and it does not, from the top half of its tier's band - and ONE drawback from DFU's own
@@ -137,7 +136,7 @@ test('LOOT16: the doors - one Rare or Legendary in twelve a body or a pile mints
   const src = { kind: 'pile', tier: 14, boss: false, family: null };
   const list = () => [createWeapon(120, 1), cuirass(), amulet(), garment(155), garment(195)];
   let both = 0;
-  LR.registerGemFind(null);   // PIN MOVED (GEM2, bible/06-Systems/Gem-Sockets.md): the gem find is the door's last draw since - a curse's draw moves it, and its gem is no piece of the list
+  LR.registerGemFind(null);
   try {
     for (let seed = 1; seed < 80; seed++) {
       LR._setCurseForTests(1);
@@ -145,7 +144,6 @@ test('LOOT16: the doors - one Rare or Legendary in twelve a body or a pile mints
       LR._setCurseForTests(Infinity);
       const none = list(); LR.rollLootRarity(none, src, { rolls: lcg(seed) });
       LR._setCurseForTests(null);
-      // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, after the
       // curse's - where a curse drew, the two runs' techniques differ, so it is set aside on both sides
       const own = (x) => (x.affixes ?? []).filter((a) => !LR.isTechniqueAffix(a));
       all.forEach((it, i) => {

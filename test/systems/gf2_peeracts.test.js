@@ -1,5 +1,4 @@
-// GATHER-FEEL II - PEER-ACTS (2026-10-13, Mac: "Do the not done" - GATHER-FEEL's open "a peer neither sees an act ...
-// nor hears one"; bible/06-Systems/Professions-Arc.md 5.1 "Others see it" and section 45): ANOTHER PLAYER'S GATHERING,
+// GATHER-FEEL II - PEER-ACTS: ANOTHER PLAYER'S GATHERING,
 // SEEN AND HEARD. The wire (net/wire.js validPose's `ga`, `gb`, `gm` - world200) through the door, the relay and the
 // lerp, and end to end between two sessions over the real Room; the sender (net/peer/peerGather.js createGatherPose) off the
 // real act machines and through the gathering host over the real kinds (scenes/gatherHost.js poseAct - the last blow and
@@ -401,7 +400,7 @@ test('PEER-ACTS P7 the receiver\'s ear: the classic skin says the DFU cue the ga
   assert.equal(s.peers.has('p'), false);
   step(0.5); s.update('p', { yaw: 0, ga: code('mine'), gb: beat(5, 'blow') }, FEET);
   assert.equal(shots.length, before, 'a first sight again');
-  // the recentre: a blow in the air is a place on the land - PIN MOVED (AUDIT GATHER-FEEL W1): it moves with the land,
+  // the recentre: a blow in the air is a place on the land
   // where it was dropped with the old frame (and a net's water with it, heard at the body for the rest of its cast)
   const off = [-819.2, 0, 0], moved = [FEET[0] + off[0], FEET[1], FEET[2]];
   step(0.5); s.update('p', { yaw: 0, ga: code('mine'), gb: beat(6, 'blow') }, FEET);
@@ -441,7 +440,6 @@ test('PEER-ACTS P8 the peers\' sync hears every peer gathering - a body peer\'s,
     assert.equal(shots.length, 2, 'past the peers\' far edge: nothing made');
     frame({ ga: code('chop'), gb: beat(5, 'blow') }, { hidden: () => true });
     assert.deepEqual(sfx(shots).slice(2), ['swing'], 'a peer no lane stands is still heard');
-    // PIN MOVED (AUDIT GATHER-FEEL W1): the recentre carries the blow in the air with the land (rebaseSounds, the offset's door)
     rp.rebaseSounds([-819.2, 0, 0]);
     frame({ ga: code('chop'), gb: beat(5, 'blow') });
     assert.deepEqual(sfx(shots).slice(3), ['chop'], 'the blow in the air lands after the recentre');

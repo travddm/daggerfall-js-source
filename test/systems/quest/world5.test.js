@@ -1,4 +1,4 @@
-// WORLD5 (Mac, 2026-09-13: "Let's tackle slice 5 first") - SLICE 5: THE
+// WORLD5 - SLICE 5: THE
 // SHARED CLOCK AND WEATHER, AND THE QUEST CLOCKS STOOD DOWN. Online the
 // world's time is nobody's to keep: it is a FUNCTION OF WALL TIME (the wire's
 // own law, one home at both ends), the same on every client with no frame to
@@ -97,7 +97,7 @@ test('WORLD5: the ticker under the shared clock - worldMinutes reads the source,
     assert.equal(r.classicMinutes, 1003);
     r = tickPlayerMinutes({ entity, classicMinutes: 0, dt: 3000, sinks: sinks(), rolls: () => 0.5 });
     assert.equal(r.rounds, 0, 'a frame of 3000 real seconds owes nothing the clock did not move');
-    // the ticker's jump: the WORLD's RaiseTime is refused - and LIVED1 (2026-09-29): the hours are the CHARACTER's own
+    // the ticker's jump: the WORLD's RaiseTime is refused - and LIVED1: the hours are the CHARACTER's own
     const ticker = createPlayerTicker(entity, {});
     t = 1010;
     const j = ticker.advance(480);
@@ -158,10 +158,9 @@ test('WORLD5: the shared weather - two clients under one date roll one sky (the 
 });
 
 test('WORLD5 (RESTX2: retired): a session online paces on the WINDOW\'S OWN TIMER now, loiter included - the shared clock moving is not a sub-tick, the timer is, and an hour is six of its sub-ticks; offline is the same timer it always was', () => {
-  // WORLD5 paced every mode off the shared clock; RESTX1 (2026-09-15)
+  // WORLD5 paced every mode off the shared clock; RESTX1
   // took the rest modes off it (a free rest, one frame) and left loiter
-  // on it; RESTX2 (2026-09-17, Mac's BetterResting: monsters should
-  // interrupt an online wait, and the counter should tick down) retired
+  // on it; RESTX2 retired
   // both: one law, the window's timer, in every mode, online or off.
   // The shared clock is still refused every write (worldTick) - what
   // changed is only what PACES the session, and what the host is handed

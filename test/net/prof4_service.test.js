@@ -1,10 +1,10 @@
-// PROF4 (2026-09-28, Mac: "Continue") - LOGGING, CARPENTRY AND THE FURNITURE AS THE SERVICE KEEPS THEM: a tree's harvest
+// PROF4 - LOGGING, CARPENTRY AND THE FURNITURE AS THE SERVICE KEEPS THEM: a tree's harvest
 // (the law's tree, its logs, its Resin and a Clean Cut's Heartwood, the Wood-Axe's report bounded, Logging's XP); the
 // forge's burns and the workbench's saws (a unit's yield and the choices that raise it, no XP); the workbench's crafts
 // (Carpentry's rank, XP and limit, a Joiner's half the planks, a Heartwood for a plank and its step, a Master Joiner's
 // mark, arrows at no quality, the Ram Kit refused); the furnisher's Linen; and a crafted table set down in a home with
 // the mark the service's own row gives it. Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 25.
+// (test/accountDb.mjs). 25.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -101,7 +101,6 @@ test('PROF4 service: a tree felled - the law\'s wood\'s logs into the Stores, ow
   assert.deepEqual([top.body.qty, top.body.extra], [TREE_YIELD[1], undefined], 'the top: four logs, no Resin');
   const t3 = treeAt(WOODS, GLENUMBRA, OAK, { from: t2.x + 1 });
   assert.deepEqual((await s.call('/v1/prof/harvest', chop(mac, t3, { kind: 'herbs' }), mac.secret)).body, { error: 'prof-kind' });
-  // PIN MOVED (ANY-HOUR, 2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"):
   // 02:00 refused a tree (`prof-night`, "the wilderness keeps Foraging's day"); now it is felled as at noon
   const t4 = treeAt(WOODS, GLENUMBRA, OAK, { from: t3.x + 1 });
   clock(secondAt(today() * DAY + 60, 2));
@@ -178,7 +177,7 @@ test('PROF4 service: a log burnt to a Charcoal at the forge (a Charcoal Burner\'
   assert.deepEqual(s.stores(mac, 'log:oak'), [['own', 4]]);
   assert.deepEqual((await s.call('/v1/prof/smelt', sawBody, mac.secret)).body.repeat, true);
   assert.deepEqual(s.stores(mac, 'plank:oak'), [['own', 6]], 'once');
-  assert.equal(s.xpOf(mac, 'logging') + s.xpOf(mac, 'smithing') + s.xpOf(mac, 'building'), 0, 'a log\'s XP was its fall\'s');   // PIN MOVED (CRAFT3): Carpentry's XP is the Building track's row
+  assert.equal(s.xpOf(mac, 'logging') + s.xpOf(mac, 'smithing') + s.xpOf(mac, 'building'), 0, 'a log\'s XP was its fall\'s');
   s.setXp(mac, xpForRank(100), 'logging', { spec100: 'charcoal-burner' });
   const burner = await s.call('/v1/prof/smelt', { character: mac.character, recipe: 'burn:oak', count: 1, rid: rid() }, mac.secret);
   assert.equal(burner.body.own, 2, 'a Charcoal Burner\'s two');
@@ -196,14 +195,13 @@ test('PROF4 service: a log burnt to a Charcoal at the forge (a Charcoal Burner\'
 test('PROF4 service: a Small Oak Table made - three Oak Planks spent, the piece written (DFU\'s 225) with its record, Carpentry XP 20 x 2 and the first craft\'s 500; a Joiner\'s half the planks; a Heartwood for a plank and a step (one with nothing else); a Master Joiner\'s mark on every piece', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
-  // PIN MOVED (CRAFT3): a workbench's work reads and raises the Building track (Carpentry's craft) - every track seeded here is 'building', and the track answered names it
   s.setXp(mac, xpForRank(10), 'building');
   s.give(mac, 'plank:oak', 'own', 3);
   const r = await steered(0x00, () => s.call('/v1/prof/craft', craft(mac, 'table-small:oak'), mac.secret));
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.deepEqual([r.body.quality, r.body.xp, r.body.first, r.body.marked, r.body.track.profession], [0, 20 * 2 + firstCraftXp(recipeById('table-small:oak')), true, false, 'building'], 'margin 0, the roll\'s foot: Crude');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500 - Building's, 1,823;   // PIN MOVED (CRAFT3): the track answered is the craft's, Building
   assert.deepEqual(s.stores(mac, 'plank:oak'), []);
-  assert.equal(s.xpOf(mac, 'building'), xpForRank(10) + 40 + 1823);   // PIN MOVED (FIRST-BUDGET): Building's share   // PIN MOVED (CRAFT3): credited to the Building row
+  assert.equal(s.xpOf(mac, 'building'), xpForRank(10) + 40 + 1823);
   const [{ provenance, record }] = r.body.pieces;
   assert.match(provenance, PROVENANCE_RE);
   const row = s.raw.prepare('SELECT * FROM products WHERE provenance = ?').get(provenance);
@@ -246,9 +244,9 @@ test('PROF4 service: arrows are twenty at no quality (their record -1), one piec
   assert.deepEqual([a.body.quality, a.body.count, a.body.pieces.length, readProductRecord(a.body.pieces[0].record).q], [-1, 1, 1, -1]);
   assert.deepEqual(s.stores(mac, 'p1:8'), []);
   assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'arrows:south'), mac.secret)).body.error, 'stores-short', 'the southern Twigs are another material');
-  s.setXp(mac, xpForRank(RAM_KIT_RANK), 'building');   // PIN MOVED (CRAFT3): Carpentry's rank is the Building track's
-  assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'ramkit:oak'), mac.secret)).body, { error: 'stores-short' });   // SEAT2b part two (PIN MOVED): made now - refused for its inputs alone
-  s.setXp(mac, 0, 'building');   // PIN MOVED (CRAFT3): the Building track
+  s.setXp(mac, xpForRank(RAM_KIT_RANK), 'building');
+  assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'ramkit:oak'), mac.secret)).body, { error: 'stores-short' });   // SEAT2b part two (
+  s.setXp(mac, 0, 'building');
   s.give(mac, 'plank:oak', 'own', 3);
   assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'table-small:oak'), mac.secret)).body, { error: 'prof-rank' }, 'Oak asks Carpentry 10');
   // the furnisher's stock: Linen at two Marks, bought
@@ -282,7 +280,6 @@ test('PROF4 service: a crafted table set down in a home - its provenance kept wh
   // INT16 (Integrity-Arc section 7): a craft is a progression claim, asked of the SEATED realm character - the one the home
   // was claimed by; a crafted piece is the account's (products.owner), so it is set down in that character's home as before
   mac.character = house.character;
-  // PIN MOVED (CRAFT3): a workbench's work reads the Building track (Carpentry's craft) - every track seeded here is 'building'
   s.setXp(mac, xpForRank(100), 'building', { spec100: 'master-joiner' });
   s.give(mac, 'plank:oak', 'own', 3);
   const made = await s.call('/v1/prof/craft', craft(mac, 'table-small:oak'), mac.secret);

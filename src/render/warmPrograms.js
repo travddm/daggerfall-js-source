@@ -1,5 +1,5 @@
 // @ts-check
-// PERF-WARM (2026-09-19): THE COMPILE THAT HAPPENS MID-FRAME.
+// PERF-WARM: THE COMPILE THAT HAPPENS MID-FRAME.
 //
 // PERF-TEX/PERF-TEX2/PERF-UI took GL calls out of the steady frame.
 // This takes out a different kind of cost, and the one a player
@@ -42,7 +42,7 @@
  *  own scheduler). The latch is per-call, not per-session: a scene that
  *  boots a second renderer warms it too.
  *
- *  SHADER-STALL (2026-10-20): a step may NAME its programs - `{ start, run }`,
+ *  SHADER-STALL: a step may NAME its programs - `{ start, run }`,
  *  `start()` starting them and answering whether the driver is done
  *  (render/glProgram.js startPrograms) - and then runs only once it is,
  *  asked again at each idle wait (AUDIT SHADER-STALL: and `need`, when given, asked
@@ -50,7 +50,7 @@
  *  poll never starts a second compile). The idle alone moved a compile off the
  *  frame that needed it onto one that did not, and the main thread still
  *  waited the whole compile: the sea's programs were 9.7 s of one task in
- *  the real game's boot here (bible/07-Rendering/Performance-Priority.md
+ *  the real game's boot here (
  *  SHADER-STALL). A bare function runs as it always did.
  *  @param {ReadonlyArray<(() => void) | { start: () => () => boolean, run: () => void, need?: () => boolean }>} steps
  *  @param {{ idle?: (fn: (v?: any) => void) => any, alive?: () => boolean }} [opts] */

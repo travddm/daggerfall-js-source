@@ -1,12 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP1 (2026-10-07, Mac: "how could we split away from DFU, completely
-// overhaul the NPC guild system and reputation system"; "This is mostly
-// with online in mind"; his call, "Server-owned"; and on the rest, "You
-// make the best decisions") — THE ROLL: a realm character's standing with
+// CHAP1 — THE ROLL: a realm character's standing with
 // Daggerfall's own guilds, kept by the account service. The record is
-// bible/11-Multiplayer/Chapters-Arc.md, section 3 (CHAP0), and its audit
-// bible/01-Overview/audits/Audit-Chapters.md (AUDIT CHAP).
+// section 3 (CHAP0), and its audit
+// (AUDIT CHAP).
 //
 // WHAT IT HOLDS. A realm character's reputation with the twenty-two guild
 // factions - the four guilds, the eight temples, the ten knightly orders
@@ -158,7 +155,7 @@ export const rollDeltasOk = (/** @type {unknown} */ v) => factionMapOk(v, (x) =>
 export const ROLL_SEAT_LINE = RANK_REQ_REPUTATION[8];
 /** What a member's rank keeps through the seed's cap (AUDIT CHAP D1, AUDIT CHAP2 D3): its rank's band up to the next
  *  rank's line, so DFU's own drift does not demote it at the review after - and never past the seat's line less one
- *  (AUDIT CHAP2 E6, Mac: "You can decide whatever is best"): a rank 8 or 9 crossing keeps 79 and is reviewed to rank 7,
+ *  (AUDIT CHAP2 E6): a rank 8 or 9 crossing keeps 79 and is reviewed to rank 7,
  *  as section 3.5 holds everyone at CHAP4 - an offline grind buys no seat's reputation (CALL 3). */
 export function rollRankKeepOf(/** @type {unknown} */ rank) {
   const r = Math.min(ROLL_RANK_MAX, Math.max(0, whole(rank)));
@@ -471,7 +468,7 @@ export function receiptCreditsOf({ kind, id, day, members, chapters }) {
   return out;
 }
 
-/** GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): a duty in words. */
+/** GUILD3d: a duty in words. */
 const DUTY_WORDS = Object.freeze({ gate: 'hold a gate', raid: 'defend a raided town' });
 /**
  * GUILD3d: A CHAPTER'S DUTIES, the line its card on the board says - what its guild asks of its members in the region
@@ -574,7 +571,7 @@ export function parseHallReport(/** @type {unknown} */ text) {
   return h && hallReportText(h) === text ? h : null;
 }
 
-/** THE JOIN THE SERVICE RECORDS (AUDIT CHAP R1's line; Mac: "Approved"): a new membership only where the Roll's
+/** THE JOIN THE SERVICE RECORDS (AUDIT CHAP R1's line): a new membership only where the Roll's
  *  standing with the guild meets DFU's join (Guild.cs IsEligibleToJoin: rank 0's need, 0) - `rep` the reputation and
  *  what the Roll owes it (AUDIT CHAP2 S7: an initiation's own reward the day's pace cut is the Roll's already). AUDIT
  *  CHAP2 D2: the Thieves Guild and the Dark Brotherhood join by their initiation quests at ANY standing
@@ -690,7 +687,7 @@ export function strengthAfter(prev, merit, target) {
 /** A Season's end (Seats-Arc 9.1's soft reset): halfway back toward 50, rounded toward 50. */
 export const strengthSeasonEnd = (/** @type {number} */ s) => STRENGTH_START + Math.trunc((Number(s) - STRENGTH_START) / 2);
 /** THE BANDS (5.2's table), each from its floor: Failing 0-19, Steady 20-69, Thriving 70-89, Ascendant 90-100.
- *  GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md): Ascendant is its own - a fifth off, where it stood at Thriving's
+ *  GUILD3e: Ascendant is its own - a fifth off, where it stood at Thriving's
  *  tenth and the Season's Ascendancy event said the rest (the event folded into the band it repeated). */
 export const CHAPTER_BANDS = Object.freeze([
   Object.freeze({ band: 'failing', name: 'Failing', from: 0, price: 1.25, writs: 0.5, shelf: -4 }),
@@ -814,7 +811,7 @@ export const ROLL_BOOK_RANK_MAX = 7;
 export const rollBookRankOf = (/** @type {unknown} */ reported, /** @type {unknown} */ rep) => Math.max(0, Math.min(whole(reported), rollRankCapOf(rep), ROLL_BOOK_RANK_MAX));
 
 // ROLL-PACE (FIELD BUGS 2026-10-15f, a Discord report: "exploit where you do easy quests for a guild and then ask to join
-// it to farm 100 rep in 1 minute"; Mac, asked of four shapes: "Pace ranks from joining"). PROMO-NOW took DFU's 28 days
+// it to farm 100 rep in 1 minute"). PROMO-NOW took DFU's 28 days
 // off an online promotion on the word that the Roll's paced reputation paces the ranks - it paces the REPUTATION, and a
 // stranger's quests (DFU's +5 to the guild's faction, a member or not: Quest.cs EndQuest, GuildManager.GetGuildFactionId)
 // banked it before the membership began, so the hall's first review turned a week's standing into seven ranks at once.
@@ -1127,7 +1124,7 @@ export function chapterRollLines(/** @type {unknown} */ faction, /** @type {any}
 // end shuts its halls for the next, a Rivalry races two chapters of one region on the Season's Merit and the winner takes
 // 10 Strength from the loser. The Schism's and the Succession's choices are CHAP6b's; what the client shows of every
 // event CHAP6c's. No Season counted, no event: every chapter is Calm, as every land's Tide is.
-// GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
+// GUILD3e (, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
 // the Decline (2 Strength a week) said what the Failing band says, and the Ascendancy (a tenth off, a High Master) what
 // the Ascendant band should; the Ascendant band carries both now (CHAPTER_BANDS, chapterTitlesOf's `high`).
 

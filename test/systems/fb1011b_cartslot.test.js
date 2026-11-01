@@ -1,4 +1,4 @@
-// CART-SLOT (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; the Discord's "The caravan became a cart
+// CART-SLOT (FIELD BUGS 2026-10-11b,; the Discord's "The caravan became a cart
 // after the update"): the Enhanced inventory's Cart cell names the wagon the player drives. Every wagon is the Small
 // Cart's template (WAGONS1), and the cell drew the FIRST of them - a Small Cart kept beside a Caravan bought after it -
 // while the world drove the Caravan. Pinned on the real wagon items (wagonKinds.js newWagonItem) and the law the world's

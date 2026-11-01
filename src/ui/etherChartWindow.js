@@ -1,6 +1,5 @@
 // @ts-check
-// ETHER-CHART (2026-10-11, the owner: "A brand new open sea map that allows you to traverse to the etheric sea";
-// bible/03-World/Eltheric-Ocean.md ETHER-CHART) - THE CHART OF THE ELTHERIC OCEAN: the map a captain keeps past the Veil, the
+// ETHER-CHART - THE CHART OF THE ELTHERIC OCEAN: the map a captain keeps past the Veil, the
 // travel map's door's answer there (scenes/world.js toggleTravelMap) - the Bay's travel map has no sea past the Veil to
 // show, and no road to travel by. Drawn on a canvas in the naval windows' sheet (ui/naval/navalPlunderWindow.js's style, the
 // door's slot - ui/naval/navalPlunderDoor.js), off the world's word (scenes/etherHost.js chart): the ISLES CHARTED - a port's
@@ -14,14 +13,12 @@
 // and the chart's one way out to travel is the Overworld's door (ETHER-OW, below; AUDIT ETHER-OW D-5). AUDIT CAPTAIN'S
 // SEA X6/X7/X8/X12/X13/X14/X17/X18.
 //
-// ETHER-OW (2026-10-13, the owner: "Also allow the player to zoom out into the overworld like in the Iliac Bay for easy
-// travel") - THE DOOR UP: past the Veil this chart is the map's answer, and the held map's Overworld door (ui/heldMap.js,
+// ETHER-OW - THE DOOR UP: past the Veil this chart is the map's answer, and the held map's Overworld door (ui/heldMap.js,
 // TV1) was on no sheet a captain there could open - so the chart wears it, in its tools row and on its key, O, the
 // view's own words (scenes/travelView.js TRAVEL_VIEW_BUTTON): shown where the host can lift the camera (`overworld()`),
 // it shuts the chart with its own reason, 'overworld', and the host lifts the view once the chart is down.
 //
-// ETHER-CHART2 (2026-10-12, the owner: "I want to improve the [Eltheric] sea map, its icons, the highlight areas, etc and
-// improve readability") - THE CHART READ AT A GLANCE. Its words are the enhanced face (FONT1's law - every enhanced
+// ETHER-CHART2 - THE CHART READ AT A GLANCE. Its words are the enhanced face (FONT1's law - every enhanced
 // surface in the pixel face; the chart named "Cormorant Garamond", which no request loads, so every name on it was
 // Georgia), painted after every mark (an isle's mark painted after a name crossed it out) - each name under a hard halo,
 // on its isle's east side or its west, in layers that keep any two from standing over each other. Every isle's MARK is a
@@ -31,7 +28,7 @@
 // long; the world's edge drawn and hatched. A HAUNT is a washed square, a sunk legend's hatched and dashed, her name and
 // state on a plate in a clear corner of her square's part in view. The SHIP is a bone arrowhead in a brass ring and, off
 // the canvas, a pointer at the edge saying how far. The isle named is ringed, a bearing drawn to it from the ship and its
-// card beside it. AUDIT ETHER-CHART2 (bible/01-Overview/audits/Audit-Ether-Chart2.md) took the chart's own words off the map:
+// card beside it. AUDIT ETHER-CHART2 took the chart's own words off the map:
 // a DEPTH RULER over it names each water in view, the Veil's and the world's edge, and the scale stands in the KEY under
 // it, which says what each mark is.
 //
@@ -105,7 +102,7 @@ export const CHART_KEY = Object.freeze([
   keyRow('ship', () => t('sea.chart.key.ship', 'Your ship')), keyRow('haunt', () => t('sea.chart.key.haunt', 'A legend\'s haunt')),
   keyRow('sunk', () => t('sea.chart.key.sunk', 'A legend sunk')),
 ]);
-/** ETHER-WILD (2026-10-21): the key's row for Veilhaven's peace - shown while the chart's word says the open sea is an
+/** ETHER-WILD: the key's row for Veilhaven's peace - shown while the chart's word says the open sea is an
  *  open PvP zone (`pvp`: online, at a relay that raises it), beside CHART_KEY's marks. */
 export const CHART_PEACE_KEY = keyRow('peace', () => t('sea.chart.key.peace', 'Veilhaven\'s peace - past it, open PvP'));
 /** ETHER-WILD: the peace's colours - a safe harbour's green over the depths, apart from every isle's and haunt's. */
@@ -113,11 +110,11 @@ export const PEACE_FILL = 'rgba(110,214,170,0.13)';
 export const PEACE_LINE = 'rgba(140,232,190,0.85)';
 /** ETHER-WILD: the peace is named on the chart once its circle is this wide (screen pixels of radius). */
 export const PEACE_NAME_R = 40;
-/** SEA-VAULTS (2026-10-22): the key's row for the day's vaults of the deep - shown while the word carries any. */
+/** SEA-VAULTS: the key's row for the day's vaults of the deep - shown while the word carries any. */
 export const CHART_VAULT_KEY = keyRow('vault', () => t('sea.chart.key.vault', 'A vault of the deep, open today'));
 /** SEA-VAULTS: a vault's name is lettered under its mark from this zoom (x4). */
 export const VAULT_NAME_ZOOM = 2;
-/** SEA-EVENTS (2026-10-22): the key's rows for the Aether Storm blowing and the treasure fleet under way - each shown
+/** SEA-EVENTS: the key's rows for the Aether Storm blowing and the treasure fleet under way - each shown
  *  while the word carries it. */
 export const CHART_STORM_KEY = keyRow('storm', () => t('sea.chart.key.storm', 'The Aether storm, blowing now'));
 export const CHART_FLEET_KEY = keyRow('fleet', () => t('sea.chart.key.fleet', 'The treasure fleet, under way'));
@@ -351,7 +348,7 @@ export function chartModel(word, v, w, h, { measure = null, pick = null } = {}) 
   let card = null;
   if (named && isle) {
     const kind = capFirst(KIND_WORDS[named.kind] ?? t('sea.chart.anIsle', 'an isle')), way = wayWords(shipAt, isle);
-    // ISLE-TRADE (2026-10-17): a port isle's card names the good of the Bay its exchange makes (tradeGoods.js isleGood, off
+    // ISLE-TRADE: a port isle's card names the good of the Bay its exchange makes (tradeGoods.js isleGood, off
     // the key scenes/world.js etherPortOf gives its port - `"px,py"`), so a captain plans the Veil's own trade on the chart
     const made = named.kind === 'port' ? goodById(isleGood({ key: `${isle.px},${isle.py}` })) : null;
     const title = capFirst(named.name), words = made ? t('sea.chart.cardPortLine', '{kind} - makes {good} - {way}', { kind, good: made.name.toLowerCase(), way }) : t('sea.chart.cardLine', '{kind} - {way}', { kind, way });

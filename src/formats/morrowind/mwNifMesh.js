@@ -72,7 +72,7 @@ export function selectedChild(rec) {   // MW-SPELLFX1: exported - an effect's sw
  *  triangles. */
 export const GEOMETRY_TYPES = new Set(['NiTriShape', 'NiTriStrips']);   // MW-SPELLFX1: exported (formats/morrowind/mwVfx.js)
 
-/** MAC-Q (2026-09-17, Mac: "the torch doesn't emit fire"): the PARTICLE
+/** MAC-Q: the PARTICLE
  *  geometries. A batch here is a triangle list by contract, and a particle
  *  system is not one - it is an emitter and a law, drawn as quads that do
  *  not exist until the clock runs - so they do not become batches. They
@@ -342,7 +342,7 @@ export function diffuseAt(material, colors, i) {
 }
 
 /**
- * MWT2 (2026-09-17, Mac: the Morrowind model's torch "isnt lit") - THE
+ * MWT2 - THE
  * EMISSION, which this file has always RESOLVED and nobody has ever read.
  *
  * `resolveMaterial` above already ports the reference's two emissive laws

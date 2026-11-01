@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW6 - THE JOURNEY SLOWS AS ENEMIES CLOSE (bible/06-Systems/Travel-View.md, OW6; 2026-09-29, the player: "If a player
+// OW6 - THE JOURNEY SLOWS AS ENEMIES CLOSE (, OW6; 2026-09-29, the player: "If a player
 // is traveling very fast, they should slow if enemies become close").
 //
 // Travel Options drives a traveller at up to a hundred times their own pace, and the port runs the world's foes at
@@ -25,13 +25,11 @@
 
 import { paceNow } from './travelPace.js';   // PACE-DIALS: the near-enemies pace is the player's dial
 
-/** Real seconds of warning the traveller always has before an enemy's reach. OW6-LATE (2026-09-29, the player: "when you
- *  go near enemies it slows you down waaaay to early - its good that it does it but still"): 2, was 5 - the hold begins
+/** Real seconds of warning the traveller always has before an enemy's reach. OW6-LATE: 2, was 5 - the hold begins
  *  2.5x nearer at every pace (a rider at x40 held from 1.3 km short of a band's sight, not 3.2 km), and the traveller
  *  still meets the reach at walking pace. OW6-NEAR (FIELD BUGS 2026-09-29g, ! OG: "reduce the encounter speed slowing
  *  distance by like 40% to start"): 1.2 - the lead-in before every reach 40% shorter at every pace (a rider at x40 held
- *  from 768 m short of a band's sight, not 1280), no enemy's sight or chase moved. OW6-HALF (2026-10-01, Mac: "We also
- *  need to reduce the distance at which overworld enemies slow the user down"): 0.6 - the lead-in halved again at every
+ *  from 768 m short of a band's sight, not 1280), no enemy's sight or chase moved. OW6-HALF: 0.6 - the lead-in halved again at every
  *  pace (a rider at x40 held from 384 m short of a band's sight, not 768; on foot 84 m, not 168), the reach still met at
  *  walking pace. */
 export const THREAT_WARN_S = 0.6;
@@ -57,18 +55,16 @@ export function metresToReach(dx, dz, reach, heading) {
 /** Down to the old spinner's own ladder - 1, 2, 3, 4, 5, then fives - never under walking pace. */
 export const threatStep = (n) => (n >= 5 ? Math.floor(n / 5) * 5 : Math.max(1, Math.floor(n)));
 
-/** ENEMY-PACE (the player: "a second time multiplier for when you're near an enemy"), FIXED BY RATE-LAW (2026-10-04,
- *  Mac: "Remove travel options dials"): the slowest pace the clock runs at with an enemy holding it - the enemies' cap
+/** ENEMY-PACE (the player: "a second time multiplier for when you're near an enemy"), FIXED BY RATE-LAW: the slowest pace the clock runs at with an enemy holding it - the enemies' cap
  *  still eases a journey down toward them, never under this. It was the panel's second stepper, whose own default it
  *  keeps; the stepper is gone. */
 export const JOURNEY_FOE_PACE = 5;
 /** The enemies' cap on the rate asked (`want`), floored at the near-enemies pace and never over the ask. PACE-DIALS
- *  (2026-10-06, the player: "the nearby enemy timer to set to 60x max"): the floor is the player's dial again
+ *  the floor is the player's dial again
  *  (systems/travel/travelPace.js `foe`: 5..60, x100 on a road alone) - JOURNEY_FOE_PACE its default. */
 export const foePaced = (cap, want) => Math.min(want, Math.max(cap, paceNow('foe') ?? JOURNEY_FOE_PACE));
 
-/** TIME-DILATION (2026-10-17, the owner: "fix a pre existing issue where AI can actually use the overworld as time
- *  dilation"; bible/03-World/Naval-Refit.md TIME-DILATION): the rate an enemies' cap lets the clock run at - x1 while the
+/** TIME-DILATION: the rate an enemies' cap lets the clock run at - x1 while the
  *  traveller is inside a threat's HOLD (`threatCap`'s `held`: a hostile ship within HOSTILE_NEAR_M, navalHost.js
  *  threats), else `foePaced`'s, the near-enemy pace. The sea fight is stepped on the world's clock (land foes are not:
  *  TO1's departure), and the floor ran it at x5 - the 'foe' dial's x60, a road's x100 - while a won avoid roll carried a

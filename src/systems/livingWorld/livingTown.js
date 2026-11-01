@@ -1,5 +1,5 @@
 // @ts-check
-// LW2 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING TOWN - the residents on the street. It stands where
+// LW2: THE LIVING TOWN - the residents on the street. It stands where
 // DFU's wandering pool stood (systems/town/townPopulation.js TownPopulation) and answers the street's seams in the pool's own
 // shape - `pool` rows of { person, active, scheduleEnable, scheduleRecycle, visible }, `update()` the live seats,
 // `retire(person)`, `nav`, `maxPopulation` - so the talk ray, the watch's conversion, the trample, the probes and the
@@ -35,7 +35,7 @@
 //    to the exit facing the road, home again - dayPlan.js schedule), and walks it ARMED in their class's sprite
 //    (`o.armOf`, ResidentWalker.arm); a party of another town staying here is a VISITOR - in by the exit facing the road
 //    it came, lodged at a tavern, out by the same exit when it leaves.
-//  - LW7, THE DEEDS (bible/06-Systems/Living-World.md "LW7"). A resident the player STRUCK DOWN (`slain` - DFU's one-hit
+//  - LW7, THE DEEDS ("LW7"). A resident the player STRUCK DOWN (`slain` - DFU's one-hit
 //    civilian) is dead for good: the host makes the hand's turn (`o.slay`; lives.js takes the place from that minute -
 //    the town's people read `o.holderOf` and `o.deadAt`), their own - the household they live in, the party they came
 //    with, the crew they came ashore with - count the player their enemy for it, and every resident who saw it
@@ -195,8 +195,7 @@ export const WITNESS_M = LINE_RANGE;
  *  gone round). */
 export const DEED_KNOWN_MIN = 60;
 
-// LW-DAWN (2026-10-07, a screenshot in Daggerfall - 1 fps, "script 6179.8 ms" - and the ask: "Something is killing CPU
-// performance"): A DAY'S CACHE KEEPS THE DAY BESIDE IT.
+// LW-DAWN: A DAY'S CACHE KEEPS THE DAY BESIDE IT.
 // The plans (`_plans`), the roads' word (`_roads`), the people (`_people`) and the walks by their door (`_departures`)
 // each kept ONE day, and from the day's turn at four a reader asks two: WATCH-DAY's morning walk is today's first entry
 // and leaves before the turn, so a company's file (`_fileOf`) is read off yesterday's walks while everything else reads
@@ -253,8 +252,7 @@ export function townChapters(places, temples = false) {
  *  the constructor's and livingTownPlaces' one law. @param {{ town: { mapId: number } }} o */
 export const livingPlacesWay = (o) => ({ quarters: isCapitalPlaceId(o.town.mapId) });
 /**
- * IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
- * Arena-Provinces.md IC-STUTTER): A TOWN'S PLACES MADE A STEP AT A TIME - the constructor's own (townPlaces over the
+ * IC-STUTTER: A TOWN'S PLACES MADE A STEP AT A TIME - the constructor's own (townPlaces over the
  * town's grid, every quarter's again: 0.1-0.4 s of one task on a near slice of the Imperial City) through `breathe` (the
  * pixel's build's breather), handed to it as `o.places`. The same places.
  * @param {any} nav @param {{ town: { mapId: number }, doors: readonly any[], buildings: readonly any[] }} o
@@ -1896,7 +1894,7 @@ export class LivingTown {
     return this.residents.find((r) => r.id === place)?.home ?? null;
   }
 
-  /** PLAIN-UI (bible/10-UI/Plain-Words.md): a body's resident's regard of the character as the talk panel shows it -
+  /** PLAIN-UI: a body's resident's regard of the character as the talk panel shows it -
    *  `{ regard, standing }` on the day refuses() reads, or null for a body that is no resident or a character with no
    *  relations. */
   regardCard(person) {

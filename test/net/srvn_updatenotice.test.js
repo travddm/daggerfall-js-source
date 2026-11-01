@@ -1,6 +1,4 @@
-// SRV-N (2026-09-17, Mac: "One thing I want to add is a server restart
-// notice whenever we push server updates. Like a notice that pushes in
-// the chat window"). THE NOTICE EXECUTES, both halves and both ends:
+// SRV-N. THE NOTICE EXECUTES, both halves and both ends:
 // the relay names its deploy on EVERY welcome (a world room's and a
 // channel's, driven through a real Room over fake sockets, and the same
 // string /health reports); the session reads it off the wire above the

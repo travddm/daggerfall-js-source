@@ -1,7 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-A - THE CAMERA'S OBSTACLE GUARDS ARE SPHERE CASTS (2026-09-17, Mac:
-// "Going in some interiors with roof pillars interacts negatively with the
-// 3rd person camera").
+// MAC-A - THE CAMERA'S OBSTACLE GUARDS ARE SPHERE CASTS.
 //
 // The reference casts a SPHERE for both of them - `rayCasting->castSphere`
 // at camera.cpp:186 (the focal's ceiling guard, radius

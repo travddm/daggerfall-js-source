@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-2 (2026-10-14) - THE APPROVED POIS, AS THE GAME KNOWS THEM.
+// POI-2 - THE APPROVED POIS, AS THE GAME KNOWS THEM.
 //
 // The account service's open feed (server-account/src/poi.js poiLiveFeed: every POI's approved, live revision) and the
 // assets it names (GET /v1/poi/asset/<sha>, cached a day - AUDIT POI S4) - read by every game, signed in or not, online or offline
-// (bible/06-Systems/POI-Editor-Arc.md). Mac: "I need to be able to approve changes": what is here is what an approver
+// .: what is here is what an approver
 // let into the world, and nothing else.
 //
 //   - THE FEED: asked at start and every POI_FEED_POLL_MS after with the version it holds (If-None-Match: 304, nothing
@@ -168,7 +168,7 @@ export function createPoiFeed({ base, fetch = (u, i) => globalThis.fetch(u, i), 
     /**
      * Ask now, whatever the clock (the editor after a verdict or a put-back). AUDIT POI R13 (CONTRACTS C7): with an ask
      * already out - which may have left before the approval landed - asked AGAIN the moment it answers, never dropped
-     * (bible/Home.md ASYNC NEVER DROPS: the out ask used to set the next a minute off). Answers the ask that will carry it.
+     * (ASYNC NEVER DROPS: the out ask used to set the next a minute off). Answers the ask that will carry it.
      */
     refresh() {
       if (!asking) { nextAsk = 0; return tick(); }

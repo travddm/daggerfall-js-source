@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13) - THE FIRMAMENT'S LAW: what a star gives, what a character may spend, which allocations are
+// FIRM1 - THE FIRMAMENT'S LAW: what a star gives, what a character may spend, which allocations are
 // whole, what a refund costs, and THE BUDGET - the most the whole sky may ever add to a character, however it is spent.
-// The tree is firmamentTree.js; the record is bible/06-Systems/Firmament.md.
+// The tree is firmamentTree.js; the record is.
 //
 // ═══ THE TWO PURSES ═════════════════════════════════════════════════
 //

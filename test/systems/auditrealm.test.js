@@ -1,4 +1,4 @@
-// AUDIT REALM (2026-09-28, Mac: "finish up the audit" of the REALM branch - bible/06-Systems/Realm-Arc.md): the
+// AUDIT REALM: the
 // findings of the audit of REALM P0.1-P2.2b on the tree merged with main (#412, the Sigil Stones), each reproduced
 // before it was fixed and pinned here. The service is driven through the REAL Worker over the REAL migrations
 // (node:sqlite behind a D1-shaped face whose batch is one transaction, and R2's calls), as test/net/realm4.test.js does.
@@ -166,7 +166,7 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
     WALLET_ROW,   // WALLET1: the wallet - bound (and pack-only): it never changes hands
     ...AYLEID_STONE_TEMPLATES,   // LOOT21: the Welkynd and Varla Stones - neither bound: a stone changes hands
     ...GEM_GRADE_ROWS,   // GEM2: the 32 graded gems - none bound: a gem changes hands, as DFU's do
-    ...GOODS_ROWS, CHART_ROW,   // CAPT-TRADE, CAPT-CHARTS (PIN MOVED): the exchange's goods and the treasure chart - none bound: cargo and charts change hands
+    ...GOODS_ROWS, CHART_ROW,   // CAPT-TRADE, CAPT-CHARTS (
     ...UPKEEP_ITEM_ROWS,   // STEED1/WAGONS4: the Sack of Oats and the Wagon Repair Kit - neither bound: they change hands
     SOUL_CAKE_ROW, HEARTH_OFFERING_ROW,   // WITCH1: the Soul Cake and the Hearth Offering - bound: the cakes are the account's
     STARGLASS_ROW,   // STAR7: Starglass - not bound: a fallen star's glass changes hands, as a gem does
@@ -174,11 +174,6 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
   ];
   assert.deepEqual(rows.filter((t) => t.bound === true).map((t) => t.index).sort((a, b) => a - b), [...BOUND_TEMPLATES]);
   assert.ok(BOUND_TEMPLATES.includes(SIGIL_STONE_TEMPLATE));
-  // PIN MOVED (SEA-REPAIR): the carpenter's stores the ninth registrar - a tenth must join the list above, or its bound rows would pass the service unseen
-  // PIN MOVED (LOOT21): the Ayleid stones the fourteenth (systems/ayleidStones.js), their rows joined above
-  // PIN MOVED (GEM2): the graded gems the sixteenth (systems/gems.js), their rows joined above
-  // PIN MOVED (WITCH1): the Witches' Festival's two items (systems/festival/soulCake.js), their rows joined above
-  // PIN MOVED (LOCKPICK, bible/06-Systems/Lockpicking.md): the Lockpick (systems/lockpick/lockpickItem.js), its row joined above
   const registrars = [];
   const walk = (dir) => {
     for (const e of readdirSync(new URL(`../../${dir}`, import.meta.url), { withFileTypes: true })) {
@@ -188,7 +183,6 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
     }
   };
   walk('src');
-  // PIN MOVED (guns removed): systems/thunderlock.js and systems/pistolet.js left the registrars with the guns
   assert.deepEqual(registrars.sort(), ['src/systems/ayleidStones.js', 'src/systems/comeSailAway/comeSailAwayItems.js', 'src/systems/deepWater/deepWatersFishItems.js', 'src/systems/festival/soulCake.js', 'src/systems/foraging/foragingInstall.js', 'src/systems/gate/gateSpoils.js', 'src/systems/gems.js', 'src/systems/legacy/heirloom.js', 'src/systems/livingWorld/keepsake.js', 'src/systems/lockpick/lockpickItem.js', 'src/systems/naval/navalStores.js', 'src/systems/naval/tradeGoods.js', 'src/systems/naval/treasureCharts.js', 'src/systems/professions/profTemplates.js', 'src/systems/rest/restItems.js', 'src/systems/roleplayRealismItems/rriInstall.js', 'src/systems/starfall/starglass.js', 'src/systems/survival/items.js', 'src/systems/upkeep/upkeepItemRows.js', 'src/systems/walletItem.js']);   // SEA-REPAIR: the ninth, the carpenter's stores; REST6: the tenth, the rest supplies; LW6c: the eleventh, the keepsake; LEGACY4: the twelfth, an ancestor's remains; LOOT21: the fourteenth, the Ayleid stones
   // and the honest client never offers one: the window's pack refuses it before a half is ever written
   const holder = { items: [{ ...sigilStone(), stackCount: 2 }], goldPieces: 0 };
@@ -284,7 +278,7 @@ test('AUDIT REALM L1-F4 / L2-F1: a settle landing between the first side\'s read
   let armed = true;
   r.env.DB.prepare = (sql) => {
     const st = realPrepare(sql);
-    if (!/^SELECT seq, lease, bytes, obj, prev[a-z_, ]* FROM realm_characters/.test(sql)) return st;   // INT3 (PIN MOVED): the read asks the judge's hold beside
+    if (!/^SELECT seq, lease, bytes, obj, prev[a-z_, ]* FROM realm_characters/.test(sql)) return st;   // INT3 (
     let args = [];
     const wrap = { ...st, bind(...a) { args = a; st.bind(...a); return wrap; }, async first() {
       const row = await st.first();
@@ -387,18 +381,18 @@ test('AUDIT REALM L1-F3: a realm record is paid back only what realm records pai
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [], bankAccounts: new Array(20).fill(0).map(() => ({ accountGold: 0 })) });
   const at = () => ({ id: A.char, lease: A.lease, seq: A.session.seq });
   // (a) a house held by a character no record stands behind, at the price cap - the realm record's sale is refused. One
-  // from before the realm: a claim is a realm character's alone now (AUDIT REALM2 S2). HOME-PRICE (PIN MOVED): the cap is
+  // from before the realm: a claim is a realm character's alone now (AUDIT REALM2 S2). HOME-PRICE (
   // the online range's top - ten million, the old cap, is refused before the id is read; the row below was written at it
   assert.equal((await A.homes.claim({ mapId: 1234, buildingKey: 5, region: 17, character: 'an-offline-id-0001', price: HOME_PRICE_MAX })).error, 'realm-only');
   s.env.DB._raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (1234, 5, ?, 'an-offline-id-0001', 'Arthago', 17, 'private', 10000000, 1)").run(A.id);
   const sale = await A.homes.release(1234, 5, at());
-  // ACCOUNT-HOMES (PIN MOVED): the house is the account's, so its realm character may sell it - but no record paid for
+  // ACCOUNT-HOMES (
   // it, so it is no sale (HOME-CROSSED's word), and the cap's ten million never reaches the record
   assert.deepEqual([sale.ok, sale.error], [false, 'home-crossed'], 'a house no record paid for: no sale, whichever character asks');
   assert.ok(s.env.DB._raw.prepare('SELECT 1 FROM homes WHERE map_id = 1234 AND building_key = 5').get(), 'it stands, the account\'s');
   assert.equal((await s.saveOf(A)).bankAccounts[17].accountGold, 0);
   // (c) a house customs carried in from before the realm (no record paid for it): no gold - and HOME-CROSSED (FIELD BUGS
-  // 2026-09-30, PIN MOVED): no sale at all; it was sold for nothing and taken, house and pieces
+  // 2026-09-30
   s.env.DB._raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (77, 9, ?, ?, 'Arthago', 17, 'private', 10000000, 1)").run(A.id, A.char);
   s.env.DB._raw.prepare(`INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (77, 9, 'p1', 41000, '{"pos":[0,0,0],"rot":[0,0,0],"scale":1,"paid":400}', 1)`).run();
   const old = await A.homes.release(77, 9, at());
@@ -444,7 +438,7 @@ test('AUDIT REALM L1-F3: the purse takes only what the service paid the record -
   s.env.DB._raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (77, 9, ?, ?, 'Arthago', 17, 'private', 1000000, 1)").run(A.id, A.char);
   const credited = [];
   const sold = await sellOnlineHome(homes, { mapId: 77, buildingKey: 9, credit: (n) => credited.push(n), realm: { act } });
-  // HOME-CROSSED (FIELD BUGS 2026-09-30, PIN MOVED): refused, where it sold for nothing
+  // HOME-CROSSED (FIELD BUGS 2026-09-30
   assert.deepEqual([sold.ok, sold.error, credited], [false, 'home-crossed', []], `nothing - never homeRefund(1,000,000) = ${homeRefund(1_000_000)}`);
   // a house the record bought pays back the deed share of what it paid
   const purse = { gold: 50_000 };
@@ -453,7 +447,7 @@ test('AUDIT REALM L1-F3: the purse takes only what the service paid the record -
     pay: (n) => { purse.gold -= n; }, refund: (n) => { purse.gold += n; }, realm: { act },
   });
   assert.equal((await buy()).ok, true);
-  assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN);   // HOME-PRICE (PIN MOVED): the cheapest a home costs, where it was 1,000
+  assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN);   // HOME-PRICE (
   // pressed again once the first had answered: the service says `repeat` and moves nothing - nor does the purse
   assert.equal((await buy()).ok, true);
   assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN, 'paid once');
@@ -466,7 +460,7 @@ test('AUDIT REALM L1-F3: the purse takes only what the service paid the record -
 test('AUDIT REALM L1-F3: a placed piece pays back half of what records paid for it - placed by the record, half; shrunk, half of the part records paid; one from before the realm, nothing', { timeout: 60_000 }, async () => {
   const s = await registered();
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [] });
-  const bought = await A.homes.claim({ mapId: 55, buildingKey: 3, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (PIN MOVED): the range's floor, where it was 1,000
+  const bought = await A.homes.claim({ mapId: 55, buildingKey: 3, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (
   let seq = bought.data.realm.seq;
   const where = () => ({ id: A.char, lease: A.lease, seq });
   const piece = { id: 'd1', model: 41000, pos: [0, 0, 0], rot: [0, 0, 0], scale: 1, paid: 400 };
@@ -487,7 +481,7 @@ test('AUDIT REALM L1-F3: a placed piece pays back half of what records paid for 
 test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild place and its Renown with it - and a guildmaster with members hands the guild over first', { timeout: 60_000 }, async () => {
   const s = await registered();
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [] });
-  const claimed = await A.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (PIN MOVED): the range's floor, where it was 1,000
+  const claimed = await A.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (
   const founded = await A.guilds.found({ character: A.char, name: 'The Iron Oath', tag: 'IRON', realm: { id: A.char, lease: A.lease, seq: claimed.data.realm.seq } });
   assert.equal(founded.ok, true);
   const guildId = s.env.DB._raw.prepare('SELECT id FROM guilds').get().id;

@@ -1,5 +1,4 @@
-// BUSY-HEART (2026-10-16, the owner: "Fix this" - the account database overloaded from 13:50 UTC and staying so;
-// bible/11-Multiplayer/Scale-Arc.md BUSY-HEART): the heartbeat and the day's motherlodes stand back while the database is
+// BUSY-HEART: the heartbeat and the day's motherlodes stand back while the database is
 // overloaded, as the display reads do (net/busyLaw.js BUSY_READS) - held by the client's gate, shed by an isolate that
 // has just met an overload, not one statement asked. They spent the most of the database's time in the overload, asked
 // again on their own schedules. Each pin failed on the build before it. tools/mutants/busy_heart.json.

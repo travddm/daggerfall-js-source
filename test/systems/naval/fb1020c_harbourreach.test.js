@@ -100,7 +100,7 @@ test('FB1020c HARBOUR-REACH (ARENA2): every one of the 106 port towns sounds a h
     if (!book.get(town.name).harbour?.berths?.length) none.push(town.name);
   }
   assert.deepEqual(own.sort(), [...OWN_NONE], 'the field\'s report: 37 harbour towns with no harbour');
-  assert.deepEqual(none, [], 'out to the ring, every one');   // PIN MOVED (ALDBRUGH-QUAY): Aldbrugh's sea lies in the ring's corner, sounded now
+  assert.deepEqual(none, [], 'out to the ring, every one');
 });
 
 /** ALDBRUGH-QUAY: a town whose sea lies only in the port law's ring's corner - south-east of it, past the round reach. */

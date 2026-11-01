@@ -12,7 +12,7 @@
 // (diseases.js DISEASES: StomachRot 3, SwampRot 6, YellowFever 2 -
 // pinned in the test); the infliction is handed in by the caller.
 //
-// SURV-TIERS (2026-09-23): spoiling is the world's and runs the same in
+// SURV-TIERS: spoiling is the world's and runs the same in
 // every tier - a spoiled meal still feeds less, a putrid one still will
 // not go down. The SICKNESS is the tier's (`sickness`, survival/
 // difficulty.js - Hard's alone): in Casual a raw or spoiled meal is
@@ -52,7 +52,7 @@ export const DRINK_KG = 0.1;
 export const DRINK_RELIEF = 40;
 
 /**
- * PROF9 (2026-10-02, bible/06-Systems/Professions-Arc.md 35): THE FOODS ANOTHER ARC MAKES. Cooking's dishes (templates
+ * PROF9: THE FOODS ANOTHER ARC MAKES. Cooking's dishes (templates
  * 685-688) are food by this law - eaten by it, spoiled by it, named by their stage - and C&C's own table stays as the
  * mod wrote it: they come in through this door (systems/cookItems.js registers them, each on a row of this table's
  * own - the Stew on the Meat's, the Supper on the Cooked Fish's, the Tart on the Bread's). A template FOOD holds is never

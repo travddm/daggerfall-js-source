@@ -1,5 +1,4 @@
-// WEATHER2b (Mac, 2026-09-14: "a dynamic world space event system where weather can be traveled out of and into
-// instead of just starting and stopping in your location"): THE WEATHER FIELD - the day's words as places. The sim's
+// WEATHER2b: THE WEATHER FIELD - the day's words as places. The sim's
 // six zone words (DFU's roll, the shared day's online) are read as a field over the map on the enhanced lane: a rain,
 // thunder or snow word becomes cells scattered over the zone's land on a seeded, jittered lattice, drifting on the
 // day's wind, with the zone's base sky between them; the player's weather is what the field says at the player. A
@@ -60,7 +59,7 @@ test('WEATHER2b coordinates: field metres are the natives scaled to the pixel\'s
 });
 
 test('WEATHER2b the cells: three precipitating words with a spacing, a radius range, a coin and a base sky; the candidate is seeded by day, index and word; the drift is the day\'s heading times the minutes', () => {
-  assert.deepEqual(Object.keys(CELL_WORDS), ['rain', 'thunder', 'snow', 'sandstorm', 'ashfall']);   // WEATHER2d: the sandstorm, never a zone's word, seats on desert land   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall on the volcano's
+  assert.deepEqual(Object.keys(CELL_WORDS), ['rain', 'thunder', 'snow', 'sandstorm', 'ashfall']);   // WEATHER2d: the sandstorm, never a zone's word, seats on desert land   //
   for (const w of Object.values(CELL_WORDS)) { assert.ok(w.spacing > 2 * w.radius[0] && w.radius[1] > w.radius[0] && w.p > 0 && w.p < 1); assert.ok(['overcast', 'cloudy'].includes(w.base)); }
   assert.equal(baseWordOf('rain'), 'overcast'); assert.equal(baseWordOf('thunder'), 'cloudy'); assert.equal(baseWordOf('snow'), 'overcast');
   for (const w of ['sunny', 'cloudy', 'overcast', 'fog']) assert.equal(baseWordOf(w), w, 'a whole-sky word makes no cells');

@@ -1,5 +1,4 @@
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" B3-B7; bible/06-Systems/Quest-Arc.md and
-// Talk-Arc.md BAY-LEFT-B): THE QUEST LAYER'S TABLES PAST THE BAY, READ WHERE THE HOST READ MAPS.BSA. %di, the talk's
+// BAY-LEFT-B: THE QUEST LAYER'S TABLES PAST THE BAY, READ WHERE THE HOST READ MAPS.BSA. %di, the talk's
 // regional "Where is", the map item's and the guilds' reveals and the Mages Guild's scrying each read the host's raw
 // MAPS.BSA reader - null for a province's region (62..70) - and answered "...never mind...", "not found", nothing and
 // "nowhere" past the Bay; %lp said "Hammerfell". Each now reads the quest layer's maps (scenes/questWorld.js), a

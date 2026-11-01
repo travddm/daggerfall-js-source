@@ -1,4 +1,4 @@
-// AUDIT WORLD (Mac, 2026-09-12: "Lets audit everything so far") - four
+// AUDIT WORLD - four
 // opus lenses over MAC6, MAC7, OD1 and WORLD1 (the relay and the wire;
 // the client's world half; the peer's arm and the doll; the pins and
 // the record), every finding refuted twice and fixed on the PR. THE

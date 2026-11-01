@@ -1,5 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26; bible/06-Systems/Lockpicking.md): THE LOCKPICK'S OWN PICTURE - a hook pick with a leather-wrapped
+// LOCKPICK: THE LOCKPICK'S OWN PICTURE - a hook pick with a leather-wrapped
 // grip laid across an L-shaped tension wrench, painted here in code under a pseudo-archive of its own
 // (world/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): steel lit from the
 // top-left through the ordered dither, the grip's wraps banded, a dark outline, its ground clear. Nothing ships and nothing

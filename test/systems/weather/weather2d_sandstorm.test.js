@@ -1,5 +1,4 @@
-// WEATHER2d (Mac, 2026-09-14: "a new sand storm weather event for desert regions... being able to see a large wall of
-// sandstorm cloud in the distance"): THE SANDSTORM. The port's own eighth weather word, appended so DFU's seven keep
+// WEATHER2d: THE SANDSTORM. The port's own eighth weather word, appended so DFU's seven keep
 // their enum values, never rolled: the weather field stands it as cells over the desert tables' land on a cloudy or
 // thunder day. Its fog row, sun scale, sky row, cloud profile (a wall on the ground) and tint, wind violence, grass dim
 // and sand (the wisps' program in the sand's look, on the front's intensity) - every seam a word reaches, pinned here.
@@ -53,7 +52,7 @@ function stubGl() {
 }
 
 test('WEATHER2d the word: the eighth, appended - DFU\'s seven keep their enum; its fog row (denser than the heavy fog, the sky in it), sun scale, sand precipitation, the default sky offset', () => {
-  assert.equal(WEATHER_TYPES[7], 'sandstorm'); assert.equal(WEATHER_TYPES.length, 9); assert.equal(E.sandstorm, 7);   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall the ninth, after it
+  assert.equal(WEATHER_TYPES[7], 'sandstorm'); assert.equal(WEATHER_TYPES.length, 9); assert.equal(E.sandstorm, 7);
   assert.deepEqual(WEATHER_TYPES.slice(0, 7), ['sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow']);
   assert.deepEqual(FOG_SETTINGS.sandstorm, { mode: 'exp', density: 0.09, start: 0, end: 0, excludeSky: false });
   assert.ok(FOG_SETTINGS.sandstorm.density > FOG_SETTINGS.heavy.density);
@@ -71,7 +70,7 @@ test('WEATHER2d the sky, the clouds, the wind, the grass: a tan row; a wall on t
   assert.equal(Object.keys(WEATHER_SKY).length, WEATHER_TYPES.length);
   assert.ok(weatherRow('sandstorm').cover === 0.9, 'the eased row reads it');
   assert.deepEqual(VC_PROFILE.sandstorm, { base: 0, top: 900, density: 1.00, dark: 0.35, flat: 0.95, shear: 0.05, vary: 0.00 });   // VC6a: a wall is one thing everywhere
-  assert.deepEqual(CELL_TINT.sandstorm, [0.88, 0.72, 0.46]);   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall's tint beside it (test/systems/weather/ashfall1.test.js)
+  assert.deepEqual(CELL_TINT.sandstorm, [0.88, 0.72, 0.46]);
   assert.deepEqual(Object.keys(CELL_TINT).sort(), ['ashfall', 'sandstorm'], 'every other word white (ASHFALL1\'s second audit: the moved pin had let a tint on any other word through)');
   const c = cellOf('sandstorm', 10, 20, 9000);
   assert.deepEqual(c.tint, CELL_TINT.sandstorm); assert.equal(c.base, 0); assert.equal(c.cover, 0.9);

@@ -1,4 +1,4 @@
-// DISC10-E online (2026-09-23, Mac: "Do the still open stuff"): a werewolf's
+// DISC10-E online: a werewolf's
 // KilledInnocent on ANOTHER player's watchman.
 //
 // OnWeaponHitEntity reads the target dead after DecreaseHealth

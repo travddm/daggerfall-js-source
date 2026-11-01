@@ -1,8 +1,7 @@
-// QUARRY-WORLD (2026-10-27, bible/06-Systems/Bounty-Boards.md section 13; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 37 - "a
-// note; Bay-wide too"): a bounty board's beasts were one global ladder by level (systems/bounty/bountyBoard.js BOUNTY_TIERS), so
+// QUARRY-WORLD: a bounty board's beasts were one global ladder by level (systems/bounty/bountyBoard.js BOUNTY_TIERS), so
 // a Black Marsh board posted Orc Warlords and Centaurs and an Alik'r board Grizzly Bears. Now a tier hunts the land's own wild
 // about the board's town - the encounter law's day and night tables there (DFU's climates on the Bay, TESA-BIOME's zones past
-// it) - in its own band of levels. The owner: "Every single thing here needs to be addressed. No exceptions." (2026-10-26).
+// it) - in its own band of levels. The owner: "Every single thing here needs to be addressed. No exceptions.".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

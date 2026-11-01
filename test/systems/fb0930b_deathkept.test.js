@@ -1,5 +1,4 @@
-// DEATH-KEPT (2026-09-30, FIELD BUGS 2026-09-30b - Niwy's "If you cure a disease and die at the same time you will
-// became immortal", the HUD at HEALTH 0% MAGICKA 0% FATIGUE 3%; bible/01-Overview/bugs/Field-Bugs-2026-09-30b.md). The damage
+// DEATH-KEPT. The damage
 // door raises a death on the blow that crosses to zero and never again, so the death lives in its screen - and a window
 // written over a host's slot took it. The reported road: Talk to a temple's priest in a building (the popup comes down,
 // the talk goes up in townTalk's slot), a blow kills under the talk (the building's death screen lands in its own, empty

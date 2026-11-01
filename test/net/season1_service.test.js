@@ -1,8 +1,8 @@
-// SEASON1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEASONS IN THE SERVICE - a Season's
+// SEASON1 part one: THE SEASONS IN THE SERVICE - a Season's
 // last Turning (its titles to the guildmasters, every Standing halfway back toward 50, no Legacy carried, the Chronicle's
 // line), set against a twin service counting no Season; Season 0's last Turning wiping the seats and keeping what is
 // owed and earned; the Season on the standings and on every title's claim; a Pact to its Season's end; the pair's
-// Honours and a forfeit's Standing once a Season (bible/11-Multiplayer/Seats-Arc.md 9.1, 18). Driven through the real
+// Honours and a forfeit's Standing once a Season (9.1, 18). Driven through the real
 // Worker over node:sqlite with every migration applied.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -144,9 +144,7 @@ test('SEASON1 SEASON 0\'S END WIPES THE SEATS (18): its own week settled - the u
   assert.deepEqual([...SEASON_ZERO_WIPED], ['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence',
     'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_stockpile', 'town_seat_levies', 'town_seat_history',
     'guild_fealty', 'guild_pacts',
-    // PIN MOVED (SEAT2b): and the works - a beta's walls fall with its Charters
     'town_seat_forts', 'town_seat_fort_held', 'town_seat_fortifier', 'town_seat_camps',
-    // PIN MOVED (DOMAIN1): and the gifts that filled them
     'town_seat_gifts']);
   // Season 1 begins: the board says so
   const st = (await s.call('/v1/seats/standings', { key: ALCAIRE.key }, sh.gm)).body;
@@ -169,7 +167,6 @@ test('SEASON1 THE ONCE-A-SEASON RULES OVER THE SEASON ITSELF: a Pact runs to its
       const start = Math.floor(seatWeekStartMs(week) / 1000) + 3 * DAY;
       s.raw.prepare(`INSERT INTO town_seat_battles (week, key, kind, tier, attacker, defender, starts_at, ends_at, moved, state, at)
         VALUES (?, ?, 'siege', 'palace', ?, ?, ?, ?, 0, 'scheduled', ?)`).run(week, ALCAIRE.key, eo.gid, sh.gid, start, start + 1800, T0);
-      // PIN MOVED (AUDIT SEATS-3): A3 - Honours go to the character on the battle's roster, so the Guildmaster signs it
       s.raw.prepare("INSERT INTO town_seat_rosters (week, key, account, char_id, guild_id, side, at) VALUES (?, ?, ?, ?, ?, 'defend', ?)").run(week, ALCAIRE.key, sh.gm.id, sh.gm.character, sh.gid, T0);
       const before = s.held(ALCAIRE.key).standing;
       const receipt = await mintSiegeReceipt({ s: sh.gm.id, sk: ALCAIRE.key, sw: week, sd: 'defend', r: 'forfeit', a: 0, h: 1 }, s.svc.gateKey, { subtle, nowS: s.getNow() });

@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): A HELD STAR'S SPOILS ARE LAWFUL ON THE ACCOUNT SERVICE - the Weir Key's
+// STAR7: A HELD STAR'S SPOILS ARE LAWFUL ON THE ACCOUNT SERVICE - the Weir Key's
 // lesson (FIELD BUGS 2026-10-17 KEY-LAW): the item law runs on the service, which loads none of the game, so a template
 // only a client's home registers was no template there, and every realm character that carried one had its trading held.
 // A checkpoint carrying Starglass (template 576, read from its leaf) and a piece of the Starspun Weave holds nothing and

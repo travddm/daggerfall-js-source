@@ -1,11 +1,10 @@
-// DISC29-G (2026-09-28, Lynk on Discord, online: "Speed 55" and about four swings a second since the update, faster
-// still as a wolf) - FIXED BY SWING-LAW.
+// DISC29-G - FIXED BY SWING-LAW.
 //
 // What changed was DISC28-D (861462d2, the same morning): the rig gave the first-person swing the player's LIVE Speed,
 // which it had never read - every player had swung at the number 50, about a second a blow. A lycanthrope's live Speed
 // is its base plus the curse's 40, in both forms, every magic round (LycanthropyEffect.ApplyLycanthropeAdvantages) -
 // so a base-55 werewolf swung at live 95, and DFU's line (`3 * (115 - Speed) / 980` a frame) is a hyperbola in the
-// rate: 3.3 blows a second at 95, four at the cap. Mac: "swing speed is insane" - and then "Do whatever is the most
+// rate: 3.3 blows a second at 95, four at the cap. - and then "Do whatever is the most
 // detailed. I dont care about departure, especially if we can do it better". SWING-LAW is the port's own swing law
 // (characters/weaponStates.js swingFrameSeconds; its own pins are test/systems/swinglaw.test.js): the Speed still shows, bounded,
 // and the weapon in the hand is read. These pin the report's case on the real rig.
@@ -40,7 +39,7 @@ function werewolf(beast = true) {
     stats: { strength: 55, intelligence: 50, willpower: 50, agility: 55, endurance: 55, personality: 50, speed: 55, luck: 50 },
   };
   assert.ok(createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: QUIET }));
-  if (beast) morphSelf(p, { force: true, nowMinutes: QUIET });   // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the curse's +40 is the beast's
+  if (beast) morphSelf(p, { force: true, nowMinutes: QUIET });
   lycanthropyMagicRound(p, { nowMinutes: QUIET + 1 });
   return p;
 }

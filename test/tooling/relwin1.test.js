@@ -1,6 +1,4 @@
-// REL2 (2026-09-21, a player on Discord: "Is there a way to install
-// Daggerfall Enhanced to a specific directory, I notice the installer is
-// installing to Temp/3JbF0qpIzCVkNiHRDQuHljOnrjW/Daggerfall Enhanced.exe").
+// REL2.
 //
 // That path is the signature of electron-builder's PORTABLE target: the
 // exe unpacks itself into a random folder under %TEMP% and runs from

@@ -1,12 +1,10 @@
-// FLOW1, FLOW3, FLOW4 (2026-09-26, Mac: "Weve accumulated a lot of tests and I feel like its slowed down our ability to
-// iterate. If they help, I dont want things removed but is there a way to really ensure we have a faster workflow with
-// the same standards?"). FLOW1: CI's one serial check (~7 min, run twice for every change - the PR's, then main's before
+// FLOW1, FLOW3, FLOW4. FLOW1: CI's one serial check (~7 min, run twice for every change - the PR's, then main's before
 // the deploy) is verify.yml's parallel jobs - lint and the types, the suite in four shards balanced by recorded times
 // (tools/testShards.mjs), the build - which the PR's check and the deploy both call, the deploy publishing only once
 // every one passed, on one pinned commit. FLOW3: `npm run test:changed` runs the tests a change can move
 // (tools/testChanged.mjs), and ESLint keeps a cache. FLOW4: `node tools/mutate.mjs --jobs N` judges N mutants at once in
 // workspaces, the same verdicts. Nothing here removes or weakens a test: every file still runs on every PR and before
-// every deploy. Design: bible/09-Testing/Testing.md "How the suite runs".
+// every deploy. Design: "How the suite runs".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -74,16 +72,10 @@ test('FLOW1 the workflows: verify.yml is the one check - lint and the types, eve
   assert.match(d, /\n {2}deploy:\n {4}needs: \[verify, site\]\n[\s\S]*?uses: actions\/deploy-pages@v4/);
   assert.equal((d.match(/ref: main/g) ?? []).length, 1, 'only the pin reads main - every other job the commit it pinned');
   assert.equal((d.match(/actions\/deploy-pages/g) ?? []).length, 1);
-  // REL-FAST (2026-10-15, Mac: "Yes, thats insanely slow" - a release spent 27.4 of its 33 minutes on `npm run check` in
-  // series): the desktop release's gate is the same check, in parallel, on the commit its legs build
+  // REL-FAST: the desktop release's gate is the same check, in parallel, on the commit its legs build
   const r = read('.github/workflows/release-desktop.yml');
   assert.match(r, /\n {2}gate:\n {4}uses: \.\/\.github\/workflows\/verify\.yml\n {4}with:\n {6}ref: \$\{\{ github\.sha \}\}\n/);
   assert.doesNotMatch(r, /run: npm run check/, 'never the serial check again');
-  // INTRO3 (2026-10-23, the owner): the intro's workflow runs the intro's own tests before its probes - the serial check
-  // had outgrown its 25 minutes and cancelled every run before a probe ran; verify.yml is the whole gate
-  const iq = read('.github/workflows/intro-quality.yml');
-  assert.doesNotMatch(iq, /run: npm run check/, 'never the serial check in the intro\'s workflow');
-  assert.match(iq, /run: node --test test\/ui\/intro\.test\.js test\/ui\/intro4_film\.test\.js test\/systems\/intro3_score\.test\.js\n/);   // INTRO4: and the film's own
   assert.ok(d.indexOf('actions/deploy-pages') > d.indexOf('\n  deploy:\n'), 'the deploy step lives in the job that waits for the verification');
   // the local check is the whole check still, and the loop's scripts are there
   const pkg = JSON.parse(read('package.json'));

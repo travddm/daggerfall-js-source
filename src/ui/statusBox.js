@@ -1,7 +1,4 @@
-// STATUS-LIVE (2026-09-22, kurkku via Mac: "minor thing: would be nice
-// if the info panel that comes up when you press i didn't pause the
-// game, that way you could quickly check your status while walking
-// around"): THE STATUS READOUT, AND WHY IT IS THE ONE BOX THAT DOES
+// STATUS-LIVE: THE STATUS READOUT, AND WHY IT IS THE ONE BOX THAT DOES
 // NOT STOP THE WORLD.
 //
 // WHAT WAS ACTUALLY WRONG. DFU's Status action raises

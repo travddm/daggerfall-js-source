@@ -1,5 +1,4 @@
-// PERF-RIG1 + PERF-ZONE2 (2026-09-21, Mac: "continue looking into fixing
-// exterior performance issues"). PERF-TOWN1 left `world` as the other
+// PERF-RIG1 + PERF-ZONE2. PERF-TOWN1 left `world` as the other
 // spiky CPU zone (2.25 -> 8.51 ms). Reading what that zone covers found
 // the Morrowind rig's whole geometry pipeline running on the CPU every
 // frame for every body in view - the player's arm, the third-person body,

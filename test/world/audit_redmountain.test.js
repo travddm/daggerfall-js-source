@@ -1,4 +1,4 @@
-// AUDIT RED-MOUNTAIN (2026-10-27, bible/01-Overview/audits/Audit-Red-Mountain.md; the owner: "Audit this") - every finding
+// AUDIT RED-MOUNTAIN - every finding
 // the five lanes reproduced, pinned where it was fixed. The fire's (F): the far draw's hiding from a far eye, past the
 // built grid and over the crater's wander; one haze in both draws and an exact split between them; the plume's far side
 // first; its foot inside its crater; the rivers' clock; the summits' air eased in past the grid; the doors.

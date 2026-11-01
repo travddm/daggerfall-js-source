@@ -1,4 +1,4 @@
-// PEERMENU1 (2026-09-26): the player menu opens on a bind - a press or a hold, keyboard or controller.
+// PEERMENU1: the player menu opens on a bind - a press or a hold, keyboard or controller.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createPeerMenuReader, peerMenuBind, setPeerMenuBind, PEER_MENU_HOLD_S } from '../../src/systems/peerMenuBind.js';

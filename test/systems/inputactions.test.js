@@ -26,14 +26,13 @@ test('I1: the Actions enum, verbatim names and order (:324-384)', () => {
     'QuickSave', 'QuickLoad',
     'PrintScreen',
     'AutoRun',
-    // SOC5 (2026-09-16, Mac: "Players should be able to interact with others
-    // in the world upon encountering them by pressing F on their body"): the
+    // SOC5: the
     // ONE row past DFU's enum - the port's own, a Ledger A departure (ONLINE),
     // and APPENDED so every existing index keeps its meaning (ui/controlsWindow
     // .js indexes this list by number against fixed art). The pin above is
     // still DFU's list verbatim, in DFU's order, up to here.
     'SocialInteract',
-    // QS2 (2026-09-17, Mac's quickslot diamond): three more of the port's own,
+    // QS2: three more of the port's own,
     // appended for the same reason and under the same law - DFU's HUD has no
     // item slots, so these are Ledger A rows and every existing index still
     // means what it meant.
@@ -49,7 +48,7 @@ test('I1: the Actions enum, verbatim names and order (:324-384)', () => {
     'QuickLootAll', 'QuickLootOpen',
     // FREEMOUSE: appended past the plaque's two, like every port row.
     'FreeMouse',
-    // KB1 (2026-09-23, Mac: "formalize a solid solution" for the keybinds): every
+    // KB1: every
     // key that does something in the world is an action - E's activate, the
     // dial, the hotbar's slots past the diamond's four, the vendored mods' keys
     // (which each mod read off its own TextKey where no binding table could see
@@ -66,25 +65,25 @@ test('I1: the Actions enum, verbatim names and order (:324-384)', () => {
     // CSA-E: and its sails' four (Controls.ToggleSail, TrimRight, TrimLeft, TrimModifier).
     'BoatToggleSail', 'BoatTrimRight', 'BoatTrimLeft', 'BoatTrimModifier',
     'BoatTimeScaleUp', 'BoatTimeScaleDown', 'BoatTimeScaleReset',
-    // TV1 (2026-09-28, bible/06-Systems/Travel-View.md): the travel view from play - appended, shipped unbound (the
+    // TV1: the travel view from play - appended, shipped unbound (the
     // held map's Overworld door is the way in).
     'TravelView',
     'WalkMode',   // PADWALK
     'TogglePerspective',   // VIEW-TOGGLE
-    // PROF1: the act choice at an herb patch (bible/06-Systems/Professions-Arc.md 22) - appended, under the same law (MERGE 2: after VIEW-TOGGLE's)
+    // PROF1: the act choice at an herb patch (22) - appended, under the same law (MERGE 2: after VIEW-TOGGLE's)
     'ActChoice',
     // HELM-KEYS: Come Sail Away's helm on the arrows - more sail and less sail, appended under the same law
     'BoatSailUp', 'BoatSailDown',
     'Professions',   // CLASSIC-PAGES: the Professions and Stores pages on either skin, appended after HELM-KEYS' two
     'LegacyFamily',   // LEGACY3: Project Legacy's Family tab, appended after CLASSIC-PAGES'
     'ModeWheel',   // MODE-WHEEL: the interaction-mode wheel, held - appended after LEGACY3's
-    'WeaponTechnique',   // TECH1: the weapon's technique (bible/05-Combat/Weapon-Techniques.md) - appended
-    'Spyglass',   // SPYGLASS: the captain's glass (bible/03-World/Captains-Sea.md) - appended
-    'SaddlePanel',   // UI-CALM: the saddle panel's key (bible/10-UI/UI-Calm.md) - appended
-    'ShipHold',   // CARGO-ANYWHERE: the ship's hold, from anywhere (bible/03-World/Naval-Refit.md) - appended (PIN MOVED)
-    'ShotCycle',   // SHOT-KINDS: the guns' load (bible/03-World/Naval-Refit.md) - appended (PIN MOVED)
-    'PartyPing',   // PARTY-PING: a look's point for the party - appended (PIN MOVED)
-    'Decorate',   // the decorator, unbound - a player gives it a key; appended last (PIN MOVED)
+    'WeaponTechnique',   // TECH1: the weapon's technique - appended
+    'Spyglass',   // SPYGLASS: the captain's glass - appended
+    'SaddlePanel',   // UI-CALM: the saddle panel's key - appended
+    'ShipHold',   // CARGO-ANYWHERE: the ship's hold, from anywhere - appended (
+    'ShotCycle',   // SHOT-KINDS: the guns' load - appended (
+    'PartyPing',   // PARTY-PING: a look's point for the party - appended (
+    'Decorate',   // the decorator, unbound - a player gives it a key; appended last (
   ]);
   // ActionNameToEnum's sentinel: unknown parses to Unknown, and
   // Unknown itself is NOT a bindable action.
@@ -148,7 +147,7 @@ test('I1: ResetDefaults\' table, every row (:979-1032)', () => {
     'KeyB=ShoulderSwitch', 'NumpadAdd=AutoPerspective',
     'KeyK=FollowPaths',
     'Comma=HorseMount', 'Period=HorseSummon', 'F2=SaddlePanel',   // UI-CALM: the saddle panel (F2: Slash is the decorator's grid)
-    'F4=ShipHold',   // CARGO-ANYWHERE: the ship's hold (F4: F1 and F3 are the browser's) - PIN MOVED
+    'F4=ShipHold',   // CARGO-ANYWHERE: the ship's hold (F4: F1 and F3 are the browser's)
     // CSA-D: the mod's C and Period are Crouch's and the summon's, so the helm's two ship on free keys under the
     // right hand (the Port-Ledger's Come Sail Away row).
     'Quote=BoatDisembark', 'Semicolon=BoatToggleLight',
@@ -181,11 +180,10 @@ test('I1: ResetDefaults\' table, every row (:979-1032)', () => {
   // DebugOverlay ships unbound, a developer's key. CSA-D: two more appended, both bound; CSA-E four more, all bound;
   // CSA-G three more, all bound. PROF1: and the act choice, appended and bound (the up arrow). HELM-KEYS: less sail on
   // the down arrow; more sail owns no key - it SHARES the up arrow with the act choice (DEFAULT_SHARES).
-  assert.equal(DEFAULT_BINDINGS.length, 79);   // PARTY-PING: Mouse2 leaves AutoRun and the ping takes it, auto-run gains F3 (net +1); CARGO-ANYWHERE: plus the hold's (F4) - PIN MOVED; UI-CALM: plus the saddle panel's (F2); TECH1: plus the technique's (Mouse3); MODE-WHEEL: minus F1-F4 and Sneak's Alt, plus the wheel's; LEGACY3: plus the Family tab's; VIEW-TOGGLE: plus the view's toggle; PROF1: plus the act choice's; HELM-KEYS: plus less sail's
+  assert.equal(DEFAULT_BINDINGS.length, 79);   // PARTY-PING: Mouse2 leaves AutoRun and the ping takes it, auto-run gains F3 (net +1); CARGO-ANYWHERE: plus the hold's (F4)
   assert.equal(bound.size, 79, 'no action is defaulted twice');   // PARTY-PING: the ping's own
   // TV1: one more appended after them, and unbound - the travel view's door is the map's.
-  assert.equal(ACTIONS.length, 95);   // Decorate appended, unbound (PIN MOVED); PARTY-PING: + PartyPing (PIN MOVED); SHOT-KINDS: + ShotCycle (PIN MOVED); CARGO-ANYWHERE: + ShipHold (PIN MOVED); UI-CALM: + SaddlePanel, last (PIN MOVED); SPYGLASS: + Spyglass, last (PIN MOVED); TECH1: + WeaponTechnique; MODE-WHEEL: + ModeWheel, last; LEGACY3: + LegacyFamily, last; CLASSIC-PAGES: + Professions, last; PADWALK: + WalkMode, after them (main's indices are live); VIEW-TOGGLE: + TogglePerspective; PROF1: + ActChoice; HELM-KEYS: + BoatSailUp, BoatSailDown, last
-  // PIN MOVED (SPYGLASS, 2026-10-11): the glass owns no key - it shares K with the road's follow
+  assert.equal(ACTIONS.length, 95);   // Decorate appended, unbound (
   assert.deepEqual(ACTIONS.filter((a) => !bound.has(a)), ['ToggleConsole', 'Slide', 'StealMode', 'GrabMode', 'InfoMode', 'TalkMode', 'Sneak', 'QuickSwap', 'DebugOverlay', 'TravelView', 'WalkMode', 'BoatSailUp', 'Professions', 'Spyglass', 'ShotCycle', 'Decorate'], 'the fourteen without an owned key, named - more sail\'s, the Professions key\'s and the glass\'s are default shares; MODE-WHEEL: the four modes and Sneak; Decorate ships unbound');
   assert.deepEqual(DEFAULT_SHARES, [['ArrowUp', 'BoatSailUp', 'ActChoice'], ['ArrowDown', 'Professions', 'BoatSailDown'], ['KeyK', 'Spyglass', 'FollowPaths']], 'HELM-KEYS: the default shares - onto their partners\' own keys; CLASSIC-PAGES: the Professions key beside less sail; SPYGLASS: the glass beside the road\'s follow');
   const codes = DEFAULT_BINDINGS.map(([c]) => c);
@@ -231,7 +229,7 @@ test('I1: the two clears - by action walks all its codes, by code takes one (:80
 test('I1: a FULL reset clears primary and the removed list but NOT secondary (:956-960)', () => {
   const s = createBindings();
   resetDefaults(s);
-  assert.equal(s.primary.size, 79);   // PARTY-PING: plus the ping's Mouse2 and auto-run's F3, minus the old Mouse2 (net +1); CARGO-ANYWHERE: plus the hold's F4 (PIN MOVED); UI-CALM: plus the saddle panel's Slash; TECH1: plus the technique's Mouse3; MODE-WHEEL: minus F1-F4 and Sneak's Alt, plus the wheel's; LEGACY3: plus the Family tab's key; HELM-KEYS: plus less sail's (more sail's is a share - sharedPrimary); VIEW-TOGGLE: plus the view's toggle; PROF1: plus the act choice's key; CSA-D: plus the helm's two; CSA-E: the sails' four; CSA-G: the time scale's three; KB1: DFU's 42 (its console and Slide rows unbound) plus the port's 24; SOC5: DFU's 44 plus SocialInteract; QS2: plus the three quickslot rows; QS4: plus the off hand's; QUICK-LOOT B4: plus the plaque's two; FREEMOUSE: plus the mouse toggle's own key
+  assert.equal(s.primary.size, 79);   // PARTY-PING: plus the ping's Mouse2 and auto-run's F3, minus the old Mouse2 (net +1); CARGO-ANYWHERE: plus the hold's F4 (
   // a secondary binding on a code no default uses SURVIVES the reset;
   // one on a default's code is stolen back by SetBinding's alt-removal.
   // QUICK-LOOT B4: this was KeyP, chosen because no default used it -
@@ -239,7 +237,7 @@ test('I1: a FULL reset clears primary and the removed list but NOT secondary (:9
   // had gone. It moved to KeyY, the one letter DFU, the port and every
   // vendored mod all left alone.
   //
-  // FREEMOUSE (2026-09-22): AND THE SAME THING HAPPENED AGAIN, which
+  // FREEMOUSE: AND THE SAME THING HAPPENED AGAIN, which
   // is worth stating rather than quietly re-picking. This fixture
   // needs a code NO default uses, and every time the port spends its
   // last free letter this line is the first thing to notice - it is a
@@ -424,7 +422,7 @@ test('MAC-D1: an action the game cannot be played without is never left addressi
   const { readFileSync } = await import('node:fs');
 });
 
-// HELM-KEYS (2026-09-29): the default share - seated onto its partner's own key alone, and on a saved file only while the
+// HELM-KEYS: the default share - seated onto its partner's own key alone, and on a saved file only while the
 // action is keyless and not unbound on purpose
 test('HELM-KEYS the default share: More sail answers the up arrow beside ActChoice; an autofill seats it only onto the partner\'s own key, never onto a player\'s rebind of it, never back after a player unbinds it; the professions read no choice at a helm (mutants: the partner unread, the removal unread)', async () => {
   const { actionsForCode, dropBinding, addRemovedPrimaryAction } = await import('../../src/systems/inputActions.js');

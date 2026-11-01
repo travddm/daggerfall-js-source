@@ -1,4 +1,4 @@
-// AUDIT-RR2 (2026-09-23, Mac: "One more audit") - the second adversarial
+// AUDIT-RR2 - the second adversarial
 // pass over the six Roleplay & Realism slices AND the first audit's own
 // payments (AUDIT-RR, 0de4bd6f). Four reviewers again, the C# beside the
 // port; every finding re-read against the source before it was paid. The
@@ -91,7 +91,7 @@ test('AUDIT-RR2 G5/G24/G25: the charge voice plays on the foe with EnemySounds\'
   assert.equal(foe.entity.pickpocketAttempted, true, 'PickpocketByPlayerAttempted = true (G24)');
   assert.deepEqual(foe.ai.knockbackDir.map((v) => Math.round(v * 1000) / 1000), [0.385, 0, 0.923], 'the move direction (0.5, 1.2 normalised), not the look (G25)');
   assert.equal(rig.chargeFoe(foe, [0, 0, 1]), false, 'latched');
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(h), /playVoice: \(f, v\) => audio\.play3d\(v\.clip, \[f\.ai\.feet\[0\], f\.ai\.feet\[1\] \+ 0\.9, f\.ai\.feet\[2\]\], monsterVolume\(\), \{ maxDistance: 16, pitch: 1 \+ v\.pitchLift \}\)/, `${h}: EnemySounds.cs:172-175`);   // PIN MOVED (MONSTER-VOL): the cry at the Audio tab's Monster Volume, not 1
+  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(h), /playVoice: \(f, v\) => audio\.play3d\(v\.clip, \[f\.ai\.feet\[0\], f\.ai\.feet\[1\] \+ 0\.9, f\.ai\.feet\[2\]\], monsterVolume\(\), \{ maxDistance: 16, pitch: 1 \+ v\.pitchLift \}\)/, `${h}: EnemySounds.cs:172-175`);
   _resetModSettings();
 });
 

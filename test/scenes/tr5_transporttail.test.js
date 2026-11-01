@@ -50,7 +50,7 @@ test('TR5/MAC-K3: ONE place changes the mode - and it is ONE PLACE ACROSS THE PO
   // 2026-09-14: the one place loads the mount it just set, so a loaded
   // save, the Test Room's ride and the ship's landing draw a horse, not
   // only the T-key pick). MW-D42 once hung an enhanced-skin 3D-horse
-  // load off this tail; that horse was removed whole (2026-09-04), and
+  // load off this tail; that horse was removed whole, and
   // nothing but TR2's CFA load may grow back here unnoticed.
   // COATS1: the sprite load is the rig's `loadArt` (its riding mode's CFA, in the ridden horse's look), and the door
   // still ends on it

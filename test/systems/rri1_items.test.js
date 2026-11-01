@@ -1,5 +1,5 @@
 // RRI1 - ROLEPLAY & REALISM: ITEMS 1.3 (Hazelnut & Ralzar), THE ITEMS,
-// 1:1 (2026-09-23). The fourteen custom item classes read off the
+// 1:1. The fourteen custom item classes read off the
 // author's source (vendor/roleplay-realism-items/Scripts/), the template
 // rows and patches its ItemTemplates.json merges, the 280 sprites with
 // their <rect>s, and the mod's switches. The pins execute the classes

@@ -1,5 +1,5 @@
-// DRAGON-SOUL (FIELD BUGS 2026-10-11, bible/01-Overview/bugs/Field-Bugs-2026-10-11.md; Paofrenetico: "Soul Trap Dragonling is
-// not giving -5000 ep value"; the owner: "Fuck matching DFU."). DFU priced the Dragonling every encounter spawns (34) at
+// DRAGON-SOUL (FIELD BUGS 2026-10-11,; Paofrenetico: "Soul Trap Dragonling is
+// not giving -5000 ep value"). DFU priced the Dragonling every encounter spawns (34) at
 // nothing - the soulless general spawn - and only the quest B0B70Y16's (40) at -5000, and named both "Dragonling". A
 // player trapped the one the world gives them and the maker offered it for 0. Now it binds as the quest's does. Driven
 // on the real road: the service's empty soul trap, filled by the soul trap's own kill-time roll with a general-spawn

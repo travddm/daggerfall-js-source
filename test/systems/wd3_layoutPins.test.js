@@ -1,4 +1,4 @@
-// WD3 (2026-10-01, Mac: "ensure this doesn't conflict or regress anything (For example housing customization)") - THE
+// WD3 - THE
 // HOUSING PROMISE: a town keeps the layout a save's things were made in (src/systems/layoutPins.js). Beautiful Villages
 // and Beautiful Cities REPLACE Daggerfall's towns, and a building is known by its key - where it stands - so the house
 // bought, the room rented, the quest's building, the item at the smith, the anchor set indoors and the save made

@@ -1,7 +1,5 @@
 // @ts-check
-// WEAPON-GLOW1 (2026-10-16, Mac: "What if we designed our own sort of animated outline for each element? And even
-// introduced the same, more detailed design for the morrowind weapons?" ... "this is your baby. I want you to make the
-// decisions"): WHAT A WEAPON'S GLOW SAYS. bible/05-Combat/Weapon-Glow.md is the page.
+// WEAPON-GLOW1: WHAT A WEAPON'S GLOW SAYS. is the page.
 //
 // Daggerfall says one thing about a weapon in the hand: enchanted or not. ItemHelper.ConvertItemToAPIWeaponType
 // promotes an enchanted item to its *_Magic type and the rig swings the WEAPO1xx sheet, the same frames painted with a

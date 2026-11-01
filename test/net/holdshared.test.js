@@ -1,4 +1,4 @@
-// HOLD-SHARED (2026-10-12, asked: "I want to revert the change we made to privateers hold making it instanced"):
+// HOLD-SHARED:
 // HOLD-SOLO (FIELD BUGS 2026-10-07b) and AUDIT FB1007b's H1-H5 reverted. Online, Privateer's Hold keys its shared world
 // room by its map id - `dungeon:m187853213` (net/online.js roomKeyFor) - as every dungeon does: its memory, foes, doors,
 // loot and presence are the room's again. `01-Overview/bugs/Field-Bugs-2026-10-07b.md` HOLD-SOLO says what was reverted.
@@ -57,7 +57,7 @@ const props = new Map();
   for (const v of Object.values(n)) if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') walk(v);
 })(parse(WM, { ecmaVersion: 'latest', sourceType: 'module' }));
 const roomIdentityIn = (dungeonLoc) => Function('mode', 'dungeonLoc', 'isGateArena', 'isSdRealm', 'isEgHall', 'isArenaFloor', 'isStartDungeon', 'builtDungeonSize', 'host', 'placeInstance',
-  `return ({${props.get('roomIdentity')}}).roomIdentity();`)('dungeon', dungeonLoc, () => false, () => false, () => false, () => false, isStartDungeon, builtDungeonSize, {}, null);   // PIN MOVED (INSTANCES' audit): `placeInstance`, the mode's own - null, the public room   // INSTANCES: `host` - no door, so no instance (the public room this pins)
+  `return ({${props.get('roomIdentity')}}).roomIdentity();`)('dungeon', dungeonLoc, () => false, () => false, () => false, () => false, isStartDungeon, builtDungeonSize, {}, null);
 
 // world.js's key block, executed from its source - the one the frame names its room by
 const W = hostText('src/scenes/world.js');
@@ -69,7 +69,7 @@ function keyIn(ident) {
     state: { compensation: [0, 0, 0], localFromWorld: (x, z) => [x, z], worldCoords: (p) => ({ x: p[0], z: p[2] }) },
     player: { pos: [1, 2, 3] }, cam: { yaw: 0, pitch: 0 }, worldCoordToMapPixel, roomKeyFor, privateInteriorOf,
     _questLoc: () => null, privateRoomHere: () => assert.fail('a dungeon is never a private room'), siegeSession: null, royalSession: null, campToWire: (p) => p,
-    seaVaultRoomId, _wdunInside: null, seaVentures: { vaultHere: () => null },   // PIN MOVED (AUDIT SEA VENTURES D7, D8): a vault of the deep's room its own lane - a dungeon of the Bay its own map id, as before
+    seaVaultRoomId, _wdunInside: null, seaVentures: { vaultHere: () => null },
   };
   return new Function(...Object.keys(args), `let onlineToScene, sceneToOnline; ${W.slice(KEY_FROM, KEY_TO)} return key;`)(...Object.values(args));
 }

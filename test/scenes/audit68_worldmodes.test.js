@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster "worldmodes"
+// AUDIT 68, the whole-tree sweep - cluster "worldmodes"
 // (S23, src/scenes/worldModes.js): the mode host's door transitions (a
 // failed entry that left its latches, a build published after the world
 // moved, a forced exit the ambience never heard), the summoning

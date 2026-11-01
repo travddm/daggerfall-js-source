@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// IC-STAIRS (bible/03-World/Arena-Provinces.md IC-STAIRS; the owner, 2026-10-27: "Minecraft looking staircases in Imperial
-// city need to be completely redesigned", and "No band aids or half assed work") - EVERY WAY UP OF THE IMPERIAL CITY,
+// IC-STAIRS (IC-STAIRS;, and "No band aids or half assed work") - EVERY WAY UP OF THE IMPERIAL CITY,
 // VERIFIED: each block's stair over the whole plan (world/imperialFabric.js blockStair - every cell of the city's own, each
 // stair once, from the cell its block's middle stands in), held to every law test/world/icstairs.test.js pins on its
 // sample, and walked by the real PlayerMotor on a Collider of the cells' own models.

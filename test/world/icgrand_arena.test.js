@@ -1,5 +1,4 @@
-// IC-GRAND (2026-10-26, the owner: "The arena in daggerfall needs to replace the collisium we currently have in IC. Dont
-// remove it from daggerfall."; bible/11-Multiplayer/Arena.md IC-GRAND, bible/03-World/Arena-Provinces.md IC-GRAND) - THE
+// IC-GRAND - THE
 // IMPERIAL CITY'S ARENA DAGGERFALL'S, pinned: TESA11's Colosseum of the port's own gone (its model, its builder, its ground
 // law, its gate); Kamer's arena block (ARENADAG.RMB - his colosseum 864102, his props, his lights, the gate's people and
 // the 43600 stair) laid in the Arena District's heart cell, served by the same port block Daggerfall's is; its stair the

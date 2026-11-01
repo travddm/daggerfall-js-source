@@ -1,4 +1,4 @@
-// METAL-RAMP (2026-10-19, Discord #suggestions "Weapon/Armor Materials", through Mac; Mac: "Level ramp"): "any new
+// METAL-RAMP: "any new
 // character can wander outside, kill some easy orcs on the overworld, and get orcish gear right from the get-go ...
 // Newbies are skipping 90% of the gear material progression by accident". Unleveled Loot's AddOrcish and AddDaedric read
 // no level: an Orc Warlord's 19.8% at Luck 50 was Orcish at level 1 as at 40. A granted drop is now its race's metal on a

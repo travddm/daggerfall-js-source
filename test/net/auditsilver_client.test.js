@@ -1,8 +1,8 @@
-// AUDIT SILVER-WAYS (2026-10-03, Mac: "Audit this") - THE CLIENT'S FINDINGS, each pinned: D1 the day's turn read once a
+// AUDIT SILVER-WAYS - THE CLIENT'S FINDINGS, each pinned: D1 the day's turn read once a
 // retry, at the device's own moment in it; D2 a strike's refusal learned; D3 the Watch's words; D4 a Motherlode stood
 // where its heart cannot hold it; D5 the receipt asked at the act's end; D6 another account's receipts let go; D7 the
-// frame's costs (the account read once a second, the compass's list its own). bible/06-Systems/Online-Arc.md SILVER-WAYS
-// (the audit); bible/06-Systems/Professions-Arc.md 38.
+// frame's costs (the account read once a second, the compass's list its own). SILVER-WAYS
+// (the audit); 38.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

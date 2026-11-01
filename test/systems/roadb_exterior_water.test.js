@@ -1,5 +1,5 @@
 // ROAD-B (b3-exterior-water) - THE EXTERIOR SURFACE MODEL AND
-// UNDERWATER FOG (2026-09-01).
+// UNDERWATER FOG.
 //
 // Three items, and the first thing the C# settles is what the port is
 // NOT owed:
@@ -288,7 +288,7 @@ test('ROAD-B b3: the exterior swim latch clears submersion and the motor swim fl
 test('ROAD-B b3: no exterior host drives breathStep - drowning above ground is not a DFU law', () => {
   for (const host of ['scenes/world.js', 'scenes/exterior.js']) {
     let src = readFileSync(join(SRC, host), 'utf8');
-    // DW-D (2026-09-25): Iliac Puddle No More MAKES it one - its forge writes
+    // DW-D: Iliac Puddle No More MAKES it one - its forge writes
     // isPlayerSubmerged for the carved sea (ApplyWaterAudioState), and
     // PlayerEntity's breath clause reads that. The world host's one call
     // is the sea's, on the driver's head test; nothing else may drain.
@@ -511,7 +511,7 @@ test('MAC2: the player swims where the surface is drawn under the feet - the dep
   // DFU answers by RECORD (tile 0 swims, the water-majority shore records
   // wade, the rest are dry); the enhanced surface draws water by CORNER,
   // so a stream, a bank, a shore or a moat read as water and were walked
-  // across. Mac's call (2026-09-11): where the surface puts water under
+  // across. Mac's call: where the surface puts water under
   // the feet the player swims. MUTANTS: the coverage gate deleted (every
   // shore case below wades or dries as DFU has it); `>=` -> `>` (the
   // diagonal case); either host's `feet:` line dropped (the source pins).

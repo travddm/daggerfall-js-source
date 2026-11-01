@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-18 LOOT-FLATS (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, found reading Anon-e-moose's
+// FIELD BUGS 2026-10-18 LOOT-FLATS (, found reading Anon-e-moose's
 // "Gradual FPS loss then crash": "When in interior cells, and especially in combat, the FPS gradually slows down over 5
 // mins or so"). Not that report's cause - its cause is not proven - but a real leak on its path: five of the nine places
 // the loot pool freed a pile's batch (both restores - every room left and every load - and the scene's sweep of emptied

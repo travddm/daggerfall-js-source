@@ -93,7 +93,7 @@ const half = (n) => Math.trunc(n / 2);
  *  C#'s struct), and the children are relinked when one names a parent.
  *  `nameToId` is factionNameToIDDict where the caller keeps one. */
 export function addCustomFactions(dict, nameToId = null) {
-  // PROVINCE-COURTS (bible/03-World/World-Wide.md): THE PORT'S OWN FIRST - each province's Province, ruler, Court and
+  // PROVINCE-COURTS: THE PORT'S OWN FIRST - each province's Province, ruler, Court and
   // People (provinceFactions.js), on every dictionary this door fills (the store's Reset, the talk host's reader), so a
   // region past the Bay has its court and its people wherever FACTION.TXT's regions have theirs; then the registry's
   addProvinceFactions(dict, nameToId);

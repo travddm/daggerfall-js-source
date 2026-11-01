@@ -1,4 +1,4 @@
-// CLIMB5 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I really want you to go all in on this"):
+// CLIMB5 (the Enhanced Climbing arc):
 // THE CLIMB, SEEN AND HEARD BY THE OTHERS - and by the player in third person. The motor's facing on the wall and the
 // body's eased yaw (player/motor.js climbFacing, bodyYawFor), the pose's two fields (climbPoseOf -> net/wire.js
 // validPose `cl`/`cw`, poseChanged, online.js lerpPose), the peers' readings of them (net/peer/peerClimb.js: the facing, the
@@ -151,7 +151,7 @@ test('CLIMB5 C4: the others draw a climber facing the wall, off the ground, neve
 function peerEar({ on = () => true, rand = () => 0.5 } = {}) {
   const shots = [];
   const audio = { play3d: (k, at, v, opts) => shots.push([String(k).replace(/^climb:/, '').replace(/-\d$/, ''), v, opts.pitch, at, opts]) };
-  let t = 0;   // PIN MOVED (AUDIT CLIMB-ARC N6): a clock a second on per frame - the floors never bite an honest climb here
+  let t = 0;
   return { shots, law: new PeerClimbSounds({ audio, profile: PEER_SOUND_PROFILE, on, rand, install: false, now: () => (t += 1000) }) };
 }
 

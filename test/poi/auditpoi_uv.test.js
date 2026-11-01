@@ -1,4 +1,4 @@
-// AUDIT POI, lane F (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-5, and POI-4b's ITS PICTURE) - THE UV EDITOR'S
+// AUDIT POI, lane F - THE UV EDITOR'S
 // GEOMETRY AND THE THUMBNAIL, as the audit of the POI editor arc found them at 0c78d81a85:
 //   M1  a face with two corners on one welded vertex (a strip's stitch, a collapsed edge) sent the whole island to
 //       conjugate gradients - its second corner an unknown in no equation, a zero column the factor refused;

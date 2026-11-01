@@ -1,7 +1,7 @@
 // @ts-check
-// RAID3 (2026-09-27, Mac, on World Events - Raiding Parties online: "1. Server" - the relay ... signs the rewards): A
+// RAID3: A
 // RAID'S RECEIPT - the relay's second signature, the gate's receipt's twin (net/gate/gateReceipt.js). Design:
-// bible/03-World/Raiding-Parties.md, "The relay holds the raid (RAID3)".
+// "The relay holds the raid (RAID3)".
 //
 //     w1.<base64url({ w, s, c, y, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         w the raid's key (region:location:day)   s the account (the identity token's sub)

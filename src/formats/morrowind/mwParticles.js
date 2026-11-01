@@ -1,6 +1,4 @@
-// MAC-Q (2026-09-17, Mac: "the torch doesn't emit fire" - and, told this
-// port had never drawn a Morrowind particle system, "Please take care of
-// the morrowind torch flame"): THE PARTICLE SYSTEM, as OpenMW builds it
+// MAC-Q: THE PARTICLE SYSTEM, as OpenMW builds it
 // out of a NIF and osgParticle runs it.
 //
 // THE REFERENCE, file by file:

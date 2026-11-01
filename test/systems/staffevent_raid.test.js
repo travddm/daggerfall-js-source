@@ -1,6 +1,4 @@
-// STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use / ... / mini boss need to be a single
-// enlarges version of the mob spawns / instead of the blue elite glow lets make the mini boss have a yellow glow";
-// bible/11-Multiplayer/Staff-Events.md) - THE GAME'S HALF: the hub's book held as raids (systems/staffEvents.js), run by
+// STAFF-EVENT - THE GAME'S HALF: the hub's book held as raids (systems/staffEvents.js), run by
 // systems/raidingParties.js as a town's raid is - the staff's monsters stood to the event's total, no defenders, the word
 // to the place's cell, the mini boss stood when the cell calls it (promoted: yellow, its size, its health), its fall its
 // own word and never a kill on the meter, the end routing the monsters - and the boss's looks (systems/eliteFoes.js,
@@ -110,7 +108,7 @@ test('STAFF-EVENT: RUN AS A RAID - its own monsters, mixed, up to its total; no 
   assert.equal(staffLedgerOf(EV.id).bd, 1);
   assert.equal(raidRelayWord({ k: 'sev', sev: { k: 'st', id: EV.id, n: 5, bd: 1, bu: 0, bk: 0, fc: 0 } }, 'social'), false, 'a ledger from the social room is no cell\'s');
   assert.equal(staffBossWanted(raid), 0);
-  // BOSS-CLEAR (mob 2026-10-25: "make sure all those mob are dead not spawned befor the bosss"; BOSS-CLEAR-CALL: "no
+  // BOSS-CLEAR (; BOSS-CLEAR-CALL: "no
   // only the mini boss need to wait for everything to be dead"): three still stand - no boss until they are dead
   assert.ok((await run(3)).every((x) => x !== 'boss'));
   assert.ok(!log.said.some((l) => /A mighty/.test(l)), 'not said before it stands');

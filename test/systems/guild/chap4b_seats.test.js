@@ -1,6 +1,6 @@
-// CHAP4b (2026-10-08, Mac: "Your decision", on "Whats next") - THE SEATS ON THE CLIENT: online, while the Roll holds,
+// CHAP4b - THE SEATS ON THE CLIENT: online, while the Roll holds,
 // the book's own rank stops at 7 (held at the Roll's adoption, never passed by DFU's review) and a seat's rank is read at
-// its own chapter's halls alone (bible/11-Multiplayer/Chapters-Arc.md sections 3.5 and 6). The law against literals; the
+// its own chapter's halls alone. The law against literals; the
 // review's ceiling through DFU's own updateRank and the popup's push effects; a seat's rank at the service gate; the tab
 // holding the book and saying the seats; the hosts' wiring.
 import { test } from 'node:test';
@@ -60,7 +60,6 @@ test('CHAP4b the book held at 7: each Roll guild\'s row above 7, in both books, 
 });
 
 test('CHAP4b the seats said, worded without gender: every seat at the page\'s first word; then each one gained or moved, each one lost; the book\'s hold said by guild (mutants: each arm, the words)', () => {
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Master's CHAIR and a council chair, the Masters and councils; marked by AUDIT GUILD3 R4
   assert.equal(seatLineOf({ f: FIGHTERS, region: ANTICLERE, seat: 'master' }), 'You hold the Master\'s chair of the Fighters Guild in Anticlere.');
   assert.equal(seatLineOf({ f: MAGES, region: DAGGERFALL, seat: 'officer' }, false), 'You no longer hold a council chair of the Mages Guild in Daggerfall.');
   const m = { f: FIGHTERS, region: ANTICLERE, seat: 'master' }, o = { f: MAGES, region: DAGGERFALL, seat: 'officer' };

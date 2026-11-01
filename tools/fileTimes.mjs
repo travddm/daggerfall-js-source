@@ -1,4 +1,4 @@
-// CI-TIMES (2026-10-19, Mac: "Do it" - the shards' times recorded by CI): EACH TEST FILE'S WALL TIME, TAKEN WHERE IT
+// CI-TIMES: EACH TEST FILE'S WALL TIME, TAKEN WHERE IT
 // RUNS. The shards are balanced by tools/testTimes.json, and `npm run test:times` re-took it by running every file
 // again on its own - 500 of 3,557 files in an hour, so it was rarely run, and 1,327 files stood at the median and the
 // shards ran 6.7 to 13.6 minutes. The runner already reports one event a FILE - the file's own `test:complete` at

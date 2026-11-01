@@ -1,6 +1,4 @@
-// MAC-SWING1 (2026-09-21, a player on the desktop app: "can't swing my
-// weapon on the installed version, tried binding it to other keys
-// too"). The rebind was not a failed workaround - it was the mechanism.
+// MAC-SWING1. The rebind was not a failed workaround - it was the mechanism.
 // setBinding clears the Mouse1 row when a key takes SwingWeapon, and
 // nothing in src/ read the binding except as a MOUSE button
 // (swingButton() answered -1, every isSwingButton false, no reader of

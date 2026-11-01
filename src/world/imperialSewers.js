@@ -1,6 +1,5 @@
 // @ts-check
-// IC-GRAND (2026-10-26; the team's spec forwarded by the owner, URBANIZER 4: "(Imperial city only) Sewage system (that will
-// be used for creating Sewers in the future)"; bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY'S SEWERS,
+// IC-GRAND - THE IMPERIAL CITY'S SEWERS,
 // laid out as a law and its data now so a later slice can make them a place to walk: no tunnel stands yet, only the
 // covers in the streets (world/imperialFabricModels.js) and what this module answers.
 //

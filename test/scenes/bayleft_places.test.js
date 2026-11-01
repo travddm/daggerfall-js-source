@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS C3, C11 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed.
-// No exceptions."; bible/06-Systems/Travel-View.md BAY-LEFT-MAPS) - A PLACE PAST THE BAY BY ITS SUMMARY.
+// BAY-LEFT-MAPS C3, C11 - A PLACE PAST THE BAY BY ITS SUMMARY.
 //
 // Every "place past the Bay by its summary" (scenes/mapPlacesHost.js tvPlaceSummary, moved out of bootWorld by HOST-SPLIT)
 // read the location index alone, and the index holds a place past the Bay only once its pixel has built. So a booked

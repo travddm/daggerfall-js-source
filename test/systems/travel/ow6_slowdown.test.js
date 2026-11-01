@@ -1,5 +1,4 @@
-// OW6 - THE JOURNEY SLOWS AS ENEMIES CLOSE (2026-09-29, the player: "If a player is traveling very fast, they should slow
-// if enemies become close"). The law (systems/travel/travelThreat.js: an enemy's reach along the way, the cap that gives the
+// OW6 - THE JOURNEY SLOWS AS ENEMIES CLOSE. The law (systems/travel/travelThreat.js: an enemy's reach along the way, the cap that gives the
 // traveller THREAT_WARN_S of real time before it, the spinner's ladder); a journey flown frame by frame at x40 straight at
 // a band, with and without it; and the host's governor lifted out of scenes/world.js and RUN on both skins - the lower of
 // the ground's cap and the enemies' holds, the panel told why, a line said once.
@@ -12,7 +11,7 @@ import { TRAVEL_HELD_TEXT, TRAVEL_HELD_WHY } from '../../../src/ui/enhanced/enha
 import { foeHostile, foeAlerted, areEnemiesNearby } from '../../../src/systems/encounters.js';
 import { TRAVEL_VIEW_TEXT, travelWalkRate, TV_MOVE_ACTIONS } from '../../../src/scenes/travelView.js';
 import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/systems/travel/travelPace.js';   // PACE-DIALS: the road's x100 is the player's dial
-/** PACE-DIALS (2026-10-06): x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
+/** PACE-DIALS: x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 
@@ -31,9 +30,9 @@ test('OW6 law: AN ENEMY\'S REACH ALONG THE WAY - dead ahead, the distance to its
 });
 
 test('OW6 law: THE CAP - the highest rate that leaves THREAT_WARN_S of real time to the nearest reach, stepped down the spinner\'s own ladder, never under walking pace; a chaser from any side at its own pace too; nothing near, no cap (mutants: the warning, the ladder, the chaser\'s pace dropped, the worst threat not the one kept)', () => {
-  assert.equal(THREAT_WARN_S, 0.6);   // OW6-LATE: was 5 - the player: it slowed "waaaay to early"; OW6-NEAR (29g): 2 -> 1.2, "reduce ... by like 40%"; OW6-HALF (2026-10-01): 1.2 -> 0.6
+  assert.equal(THREAT_WARN_S, 0.6);   // OW6-LATE: was 5 - the player: it slowed "waaaay to early"; OW6-NEAR (29g): 2 -> 1.2, "reduce ... by like 40%"; OW6-HALF: 1.2 -> 0.6
   assert.deepEqual([0.2, 1.7, 3.9, 4.99, 5, 9.9, 10, 47, 100].map(threatStep), [1, 1, 3, 4, 5, 5, 10, 45, 100]);
-  assert.deepEqual(threatCap({ threats: [], heading: NORTH, speedMps: 16 }), { cap: Infinity, threat: null, metres: Infinity, held: false });   // PIN MOVED (TIME-DILATION: `held`, no hold)
+  assert.deepEqual(threatCap({ threats: [], heading: NORTH, speedMps: 16 }), { cap: Infinity, threat: null, metres: Infinity, held: false });
   const band = { dx: 0, dz: 2000, reach: 320 };
   assert.equal(threatCap({ threats: [band], heading: NORTH, speedMps: 0 }).cap, Infinity, 'standing: nothing to hold');
   // a rider (16 m/s) 1680 m from a band's sight: 1680 / (0.6 x 16) = 175 -> x175
@@ -166,7 +165,7 @@ test('OW6 x WILD-ALERT host run: UNDER THE VIEW A BAND HOLDS THE JOURNEY ONLY ON
   assert.equal(g.d.said.length, 1, 'once, not every frame');
   // the ground's cap, lower still, is the reason
   const both = governorHost({ chases: chase(), unbuilt: 3 });
-  for (let i = 0; i < 20; i++) both.govern(0.05);   // PIN MOVED (OW-LEAD): the hole underfoot holds the ground's cap to walking pace, below the enemies'
+  for (let i = 0; i < 20; i++) both.govern(0.05);
   assert.equal(both.held()[1], 'load');
   assert.ok(both.d.scale <= 20);
   for (const quiet of [{ camps: false }, { prevent: true }]) {
@@ -315,6 +314,5 @@ test('OW6 host wiring: the governor runs before the frame reads its scale, the p
   assert.match(W, /const foes = journey \|\| walk \? journeyThreatCap\(!!travelView\?\.active, !journey\) : null;/);
   assert.match(W, /const yaw = _travelDrive \? \(_travelDrive\.yaw \* Math\.PI\) \/ 180 : keys \? _tvWalkYaw : null;/);
   assert.match(W, /forward: 1 \}\) === 0\) \{ axes\.forward = 0; axes\.strafe = 0; \}\n\s*_tvWalkYaw = way;/, 'the keys\' way kept as they move the body');
-  // PIN MOVED (PVPNEAR/STRANGER-PACE): the cap kept, and a near stranger's own pace carried beside it
-  assert.match(W, /const r = threatCap\(\{ threats: journeyThreats\(up\), heading: yaw == null \? null : \{ x: Math\.sin\(yaw\), z: Math\.cos\(yaw\) \}, speedMps: travellerPace\(player, csaBoatUnderMe\(\)\) \}\);[^\n]*\n(?:[^\n]*\n){1,14}?\s*return sr \? \{ \.\.\.r, strangerRate: sr \} : r;/);   // PIN MOVED (PASSAGE-PACE): the traveller's own pace, a boat's way at her helm
+  assert.match(W, /const r = threatCap\(\{ threats: journeyThreats\(up\), heading: yaw == null \? null : \{ x: Math\.sin\(yaw\), z: Math\.cos\(yaw\) \}, speedMps: travellerPace\(player, csaBoatUnderMe\(\)\) \}\);[^\n]*\n(?:[^\n]*\n){1,14}?\s*return sr \? \{ \.\.\.r, strangerRate: sr \} : r;/);
 });

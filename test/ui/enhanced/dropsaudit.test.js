@@ -1,4 +1,4 @@
-// DROPS-AUDIT (2026-09-25, Mac: "Audit before we merge") - the audit of the two contributor drops (EliteDungeons-and-
+// DROPS-AUDIT - the audit of the two contributor drops (EliteDungeons-and-
 // more; Enhanced Plus PLUS6-PLUS8), each finding reproduced by its finder, verified against the code, and fixed here.
 // SPAWN-RATE (30% + 10% where the tree had 10%) is the owner's call and is not changed; SPAWN-ROADS answers its roads.
 import { test } from 'node:test';

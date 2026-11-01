@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MID-RING (2026-10-26, the owner: "we need to find a way to expand the overworld view distance without killing
-// performance. Currently tiles visibly load in with distance"; bible/06-Systems/Travel-View.md MID-RING):
+// MID-RING:
 // THE MIDDLE RING'S GROUND - the streamed kernel's own heights, coarse, past the streamed grid.
 //
 // Past the streamed grid (Land View 5: 4.5 km) the horizon was the far ring alone (render/farRing.js EV8): one vertex a
@@ -74,8 +73,7 @@ export function buildMidRingHeights({ woods, baseX, baseY, radius = MID_RADIUS, 
   return out;
 }
 
-/** FAR-FIELD (BREATHTAKER 1, KPbICA's spec through the owner, 2026-10-26: "render landscapes and landforms way further
- *  than actual distance to load. To see the mountain from 300km"): THE FAR FIELD past the far ring - the heightmap a cell
+/** FAR-FIELD (BREATHTAKER 1, KPbICA's spec through): THE FAR FIELD past the far ring - the heightmap a cell
  *  of FAR_CELL pixels at a time, out to FAR_RADIUS cells (393 km) round its base cell; its sea the majority's.
  *  RELIEF-PEAKS: a cell's vertex stands on the ground the kernel stands at its own point - its centre is the node of the
  *  byte north-west of it (`farFieldCell`'s `ground`, world/landforms.js nodeGroundAt). It stood at the highest of its nine

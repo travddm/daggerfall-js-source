@@ -1,5 +1,4 @@
-// AUDIT GALLEON (2026-10-02) - THE BAKE: the audit's bake lens on Mac's new galleon (Mac: "Audit this. It must be
-// perfect"), findings GN-B1 to GN-B7 pinned over tools/bakeGalleon.mjs, tools/fbxMesh.mjs's port of Blender's
+// AUDIT GALLEON - THE BAKE: the audit's bake lens on), findings GN-B1 to GN-B7 pinned over tools/bakeGalleon.mjs, tools/fbxMesh.mjs's port of Blender's
 // tessellation, the committed export (src/assets/galleon/source/New_Ship.fbx) and the file it bakes to
 // (src/assets/galleon/galleon.json). The source is the judge here: every pin reads the FBX itself - its polygons, the
 // mesh's own float coordinates Blender cuts them in, its objects' placements - beside the shipped bake, so a bake that

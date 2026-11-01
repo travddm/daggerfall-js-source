@@ -1,12 +1,11 @@
-// MW-FOLK1 (2026-10-13, the owner: "This is for the Townspeople outfits"; asked, each walker sprite's own outfit in that
-// sprite's colours): THE TOWNSFOLK'S OUTFITS FOR THE MORROWIND BODY.
+// MW-FOLK1: THE TOWNSFOLK'S OUTFITS FOR THE MORROWIND BODY.
 //
 // One export of nine objects, each a sprite's whole outfit, committed less the 61 polygons of Morrowind's own groin one
 // of them carried (tools/fbxStrip.mjs's cut); fourteen paintings; eleven outfits, each baked into one skinned part in the
 // pose the outfits were made in (the symmetric pack's - its clavicles level, its arms falling half a unit to the
 // wrist), each garment piece weighted by what it is, the hoods raised onto the game's head. A walker whose sprite has
 // an outfit wears it - hiding the skin it covers all round, as a gauntlet hides its forearm - and the wardrobe dresses
-// every other sprite as before. bible/04-Characters/Townsfolk-Outfits.md.
+// every other sprite as before..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, mkdtempSync, rmSync, readdirSync } from 'node:fs';
@@ -559,7 +558,7 @@ test('MW-FOLK1: a walker whose sprite has an outfit wears it - each of the eleve
   assert.deepEqual(all.filter((a) => townsfolkOutfitOf(a)).sort(), ARCHIVES, 'every outfit a walker\'s sprite');
   // AUDIT MW-FOLK1 (L3-F1): EVERY WALKER OF ONE PICTURE DRESSES ALIKE AND THEIR FACES DIFFER - a street of 385's Breton
   // men, read as the build reads them (the look's hint through peerBuildOpts to the walk), reaches every one of the
-  // heads-and-hairs. PIN MOVED (MW-HEADS2 - the owner: "only the player Britons should recieve the new heads, not npcs"):
+  // heads-and-hairs.
   // the data's, four heads and four hairs - the port's own nine are a player's
   const recs = [];
   for (let i = 0; i < 4; i++) for (const [slot, part] of [['head', 0], ['hair', 1]]) recs.push(bodyRec(`b_n_breton_m_${slot}_0${i}`, `b\\b_n_breton_m_${slot}_0${i}.nif`, 'Breton', part));

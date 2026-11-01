@@ -1006,7 +1006,7 @@ test('G5: the teleport box is its OWN field, so the save envelope never reads it
   } finally { _setTravelMapArtForTests(null); }
 });
 
-// ROADS 13 (2026-09-02): THE CLASSIC MAP DRAWS THE NETWORK. Same loop
+// ROADS 13: THE CLASSIC MAP DRAWS THE NETWORK. Same loop
 // as the dots, same texel-to-pixel law, same "this region only" rule,
 // written UNDER the dots, gated by the shared flags the enhanced map's
 // chips flip. A road pixel across the region border is not drawn - DFU

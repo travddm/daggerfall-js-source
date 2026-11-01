@@ -1,4 +1,4 @@
-// AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done") - THE SEATS'
+// AUDIT-SEATS - THE SEATS'
 // SERVICE, ITS AUDITED FINDINGS FIXED: a Bounty's refund that could hold the Turning back for good (S1) and the settle that
 // moved past a week that failed; a Sellsword's purse that could roll a result back (S2); a battle no result reached void at
 // its Turning, its escrow home and its Right carried, a late result refused (S3); a struck seat's Charter (S4) and the
@@ -7,7 +7,7 @@
 // Reckoning and heraldry in a siege week refused (S10); the standings summed in SQL, the Tithe's walk bounded by its days,
 // old rows pruned (S11); the Throne reached (T1); a disputed seat on the audit at once (T2).
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/11-Multiplayer/Seats-Arc.md 3.2, 4.2, 5.1, 5.2, 6.5-6.8, 7.3, 8.1, 9.2, 16, 17, 18, Appendix B.
+// 3.2, 4.2, 5.1, 5.2, 6.5-6.8, 7.3, 8.1, 9.2, 16, 17, 18, Appendix B.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -285,7 +285,6 @@ test('AUDIT-SEATS S3: A BATTLE NO RESULT REACHED BY ITS TURNING IS VOID - its Se
   // the carried siege is a siege like any other: its result taken in its own week
   s.setNow(S(siegeStartMs(W + 2, 1, 21)) + 1500);
   s.raw.prepare('INSERT OR IGNORE INTO town_seat_binds (week, account, guild_id, char_id, at) VALUES (?, ?, ?, ?, ?)').run(W + 2, a1.id, eo.gid, a1.character, T0);
-  // PIN MOVED (AUDIT SEATS-3): A3 - Honours go to the character on the battle's roster, so a1 signs the carried siege's
   s.raw.prepare("INSERT INTO town_seat_rosters (week, key, account, char_id, guild_id, side, at) VALUES (?, ?, ?, ?, ?, 'attack', ?)").run(W + 2, ANTICLERE.key, a1.id, a1.character, eo.gid, T0);
   const fought = await s.claim(a1, { sw: W + 2 });
   assert.deepEqual([fought.status, fought.body.result, s.holdOf().guild_id], [200, 'attack', eo.gid]);
@@ -409,7 +408,6 @@ test('AUDIT-SEATS S4: A HELD SEAT STRUCK - its Charter void in the strike\'s own
     { src_kind: 'mint', dst_kind: 'guild', dst_id: sh.gid, amount: CLAIM_FEE.palace, actor: 'seats' });
   const row = s.history('strike')[0];
   assert.deepEqual([row.data.by, row.data.guild, row.data.refund], ['Devra', { name: 'The Silver Hand', tag: 'SH' }, CLAIM_FEE.palace]);
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - silver, never Marks; marked by AUDIT GUILD3 R4
   assert.equal(chronicleLine(row, ANTICLERE), `In week ${W}, Anticlere was struck from the registry, and the Silver Hand <SH>'s Charter with it - its claim fee of 8,000 silver refunded.`);
   // the guild pledges in the region again; a claim on the struck seat's battle is refused
   assert.equal((await s.call('/v1/seats/pledge', { character: sh.gm.character, key: ASHFIELD.key }, sh.gm)).status, 200, 'no longer seat-held-here');

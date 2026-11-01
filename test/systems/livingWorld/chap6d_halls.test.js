@@ -1,5 +1,5 @@
 // @ts-nocheck
-// CHAP6d (2026-10-09, Mac: "continue", the Chapters arc's sixth slice - bible/11-Multiplayer/Chapters-Arc.md 7 and 9):
+// CHAP6d:
 // THE SEASON ON THE HALLS. The law: a hall's price factor by its chapter's band and Season (an Ascendancy's tenth on
 // training and spells, "cheaper training"'s tenth on training alone), its shelf (the band's step and "a deeper shelf"'s
 // two, inside the band's bounds), shut halls and their line. The living world: a shut hall keeps no evenings, and its
@@ -27,7 +27,6 @@ const TOWN = Object.freeze({ mapId: 4242, blocks: 36, region: 17, people: 3, por
 
 // ── THE LAW ─────────────────────────────────────────────────────────
 
-// PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md) - an Ascendancy's further tenth is the Ascendant band's
 // own now (a fifth off, CHAPTER_BANDS); the Season adds the training doctrine's tenth alone
 test('CHAP6d a hall\'s price factor: its band\'s - the Ascendant band a fifth off (GUILD3e) - and "cheaper training"\'s tenth on training alone; a retired Ascendancy on a sheet nothing; none known, DFU\'s own (mutants: the band, the doctrine, the service)', () => {
   assert.deepEqual(CHAPTER_HALL_SERVICES, ['training', 'spells']);

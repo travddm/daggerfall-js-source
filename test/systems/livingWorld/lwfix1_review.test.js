@@ -1,4 +1,4 @@
-// LW-FIX1 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX1"): THE REVIEW'S SIX - an independent read of LW6-LW8c
+// LW-FIX1: THE REVIEW'S SIX - an independent read of LW6-LW8c
 // found the dungeon the player is in read off a seam the context does not carry (LW6's companies and LW6b's remains never
 // stood), a keepsake handed by the talk's town and not the resident's, a walker's going judged at where they made for, a
 // table's talk re-dealt mid-round by one who came or went, the player's own dead laid again as the deep's, and an empty
@@ -15,7 +15,7 @@ import { createRelations } from '../../../src/systems/livingWorld/relations.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
 import { mintKeepsake } from '../../../src/systems/livingWorld/keepsake.js';
 import { createLivingIndoors, INDOOR_STIR_S, INDOOR_SEEN_M } from '../../../src/scenes/livingWorld/livingIndoors.js';
-import { ROUND_S, GATHER_BEAT_S, SLOT_LINES, lineMinutes, dealCircles, circleSlots, slotSpoken, exchangeScript, circleLine } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - a table's company
+import { ROUND_S, GATHER_BEAT_S, SLOT_LINES, lineMinutes, dealCircles, circleSlots, slotSpoken, exchangeScript, circleLine } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -79,7 +79,7 @@ const AWAY = [0, 0, -4.65];   // AUDIT LW-ROOMS: a step behind the door's row, l
 test('LW-FIX1 a walker whose day ends mid-walk goes where they are unseen - judged where they are, not where they make for (mutants: the place)', () => {
   const r = rig({ inside: [RES(1)], stays: false });
   r.layer.frame(0.016, [0, 0, -4.6], 0, [0, 1.6, -4.6]);
-  // AUDIT LW-ROOMS: PIN MOVED - a walk with over 4 m to go: the player stands halfway on, and the walker a second's
+  // AUDIT LW-ROOMS:
   // stroll on must not have passed them (the room's walk dealt this one a first walk of 1.6 m)
   const left = () => { const s = r.layer.stood()[0]; return s.walking ? Math.hypot(s.at[0] - r.synced[0].feet[0], s.at[2] - r.synced[0].feet[2]) : 0; };
   let k = 0;
@@ -114,7 +114,7 @@ test('LW-FIX1 a table\'s talk is never re-dealt mid-script - LW-TALK: PIN MOVED 
   r.layer.frame(0.016, [0, 0, -4.6], 0, [0, 1.6, -4.6]);
   // a third sits down at their table mid-exchange: the pair talk it out
   r.st.inside = [RES(1), RES(2), RES(3)];
-  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);   // AUDIT LW-ROOMS: PIN MOVED - looking away a step behind the door's
+  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);   // AUDIT LW-ROOMS:
   // row (the room's walk deals the pair's table a place in that row, square to the look, where the eye's own rounding saw it)
   assert.equal(r.layer.stood().filter((x) => x.table === a.table).length, 3, 'the third at their table');
   const ctx = { weather: null, hour: 20, news: null, room: 'tavern' };

@@ -1,10 +1,10 @@
-// GOLD-MARKET (2026-09-30, Mac: "Allow trading with gold or drakes on the marketplace"; "Gold listings, walled") - THE
+// GOLD-MARKET - THE
 // CLIENT: the market book's gold buy through the realm act (systems/realmSaves.js realmGoldAct over a session) - the
 // exact cost out of the purse as the service is asked, back on the service's refusal, kept on silence and asked again by
 // a settle (paid on the answer, a repeat paying nothing); the gold held collected into the board's bank account; a
 // view's currency its own cache; the Stores' third count (profBook, the Stores page); the Market tab's currency switch,
 // gold rows, gold Buy, the List form's "Priced in gold" and the Collect under My listings - a realm character's alone;
-// the host's wiring. bible/06-Systems/Professions-Arc.md 10.8.
+// the host's wiring. 10.8.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -271,7 +271,7 @@ test('GOLD-MARKET tab: My listings - a gold listing\'s price in gold; the List f
   cur.value = 'gold';
   cur.onchange();
   assert.deepEqual(matOptions(), ['Iron Ore (8)'], 'gold: own and gold\'s - Mithril bought with Drakes lists for none');
-  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);   // AUDIT 657 B9 (PIN MOVED): the 1% the sale's fee; BOARD-UI (PIN MOVED)
+  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);   // AUDIT 657 B9 (
   const list = t.buttons().find((b) => b.textContent === 'List');
   assert.equal(list.disabled, false, 'no Drakes fee asked');
   await list.onclick();
@@ -309,11 +309,10 @@ test('AUDIT PROF-541 R2-C7: a dish of your own make spoiled since it was cooked 
   await tab.open();
   [...root.querySelectorAll('button')].find((b) => b.textContent === 'My listings').onclick();
   await new Promise((r) => setTimeout(r, 0));
-  // PIN MOVED (PACK-PICK): the pack's kind a press (and a realm character's form opens on it), and each refused piece its
   // own tile under "Not for the market", its why beneath its name - never one sentence
   [...root.querySelectorAll('button')].find((b) => b.getAttribute('data-kind') === 'item').onclick();
   const off = [...root.querySelectorAll('.packpick-refused')[0].querySelectorAll('.packpick-tile')]
     .map((n) => [n.querySelectorAll('.packpick-name')[0].textContent, n.querySelectorAll('.packpick-why')[0].textContent]);
-  assert.deepEqual(off, [['Bread', 'made by you. List it as a crafted piece'], ['Mouldy Bread', SPOILED_DISH_WHY], [enchanted.name, CHANGED_PIECE_WHY]]);   // PIN MOVED (AUDIT MAKER-RARE B2): the enchanted Masterwork beside them
+  assert.deepEqual(off, [['Bread', 'made by you. List it as a crafted piece'], ['Mouldy Bread', SPOILED_DISH_WHY], [enchanted.name, CHANGED_PIECE_WHY]]);
   root.remove();
 });

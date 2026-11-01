@@ -1,5 +1,4 @@
-// BAY-LEFT-GROUND (2026-10-26, bible/03-World/Landforms.md "BAY-LEFT-GROUND"; the audit "no system left behind in the
-// Bay", D5) - A RECORD'S LIFT PAST THE BAY. `landformLiftAt` answered 0 off the Bay's 1000 x 500, so a height a record
+// BAY-LEFT-GROUND - A RECORD'S LIFT PAST THE BAY. `landformLiftAt` answered 0 off the Bay's 1000 x 500, so a height a record
 // wrote past the Bay was in the shaped frame, not DFU's: a save, a scene cache or an anchor loaded with the Landforms row
 // off kept the lift there (AUDIT LANDFORMS C1/B4's case - a fall of over 100 HP). It answers on every pixel of the world's
 // grid now (scenes/groundFrameHost.js), the frame's law is stamped beside the scale (`groundFrame`, GROUND_FRAME_LAW), and
@@ -55,7 +54,7 @@ test('BAY-LEFT-GROUND D5 the frame\'s law: past the Bay a record is DFU\'s frame
   assert.equal(plain.restandHeight(old, x, 0, 1.5, null), plainBay.restandHeight(old, x, 0, 1.5, null), 'the row off, a record of the prefab\'s scale past the Bay: stood again as on the Bay - no old law\'s step');
   assert.equal(plain.groundFrameHeight(ground + off, x, 0), ground + off);
   assert.deepEqual({ ...RECORD_GROUND_STAMP }, { terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW });
-  assert.equal(GROUND_FRAME_LAW, 3);   // PIN MOVED (RELIEF-PEAKS): 3 - DFU's own ground past the Bay moved (its large map's law); D5's own law is LIFT_FRAME_LAW, 2 (test/world/reliefpeaks.test.js)
+  assert.equal(GROUND_FRAME_LAW, 3);
   assert.equal(LIFT_FRAME_LAW, 2);
 });
 
@@ -125,7 +124,6 @@ test('BAY-LEFT-GROUND D5 a record past the Bay goes out and comes back over the 
   const { host, scene, town } = frameHost(3830, 760);
   const [x, z] = scene(town.px + 1, town.py, 20.5, 64.25);
   const dfu = 250, off = 2.25;
-  // PIN MOVED (RELIEF-PEAKS, GROUND_FRAME_LAW 3): DFU's own ground past the Bay moved since (its large map's law), so a
   // record written then stood DFU's ground of its day - today's less the move (test/world/reliefpeaks.test.js)
   const moved = host.groundMovedAt(x, z);
   assert.ok(Math.abs(moved) > 0.5, `DFU's own ground moved here (${moved.toFixed(2)})`);

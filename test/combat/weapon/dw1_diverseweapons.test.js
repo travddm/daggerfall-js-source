@@ -1,5 +1,4 @@
-// DW1 - DIVERSE WEAPONS 1.7.3 (2026-09-23, Mac: "Its a mod integration",
-// with the shipped zip over a Drive link).
+// DW1 - DIVERSE WEAPONS 1.7.3.
 //
 // THE MOD IS ONE LINE OF CODE AND 12,624 SPRITES. The line is
 // `FPSWeapon.moddedWeaponHUDAnimsEnabled = true` and everything it

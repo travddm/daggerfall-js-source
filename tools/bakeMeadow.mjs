@@ -2,10 +2,7 @@
 //
 //     node tools/bakeMeadow.mjs
 //
-// MEADOW1 (2026-10-06, Mac: "These are 4 textures I want to blend into our
-// grass system, all with varying sizes so its not monotonous everywhere" -
-// then a fifth, "specifically is a bush, so it should be of different
-// sizes"). Five pixel-art sprites, supplied as indexed PNGs: a tall green
+// MEADOW1. Five pixel-art sprites, supplied as indexed PNGs: a tall green
 // tuft, the same tuft cut short, a tuft of flowers, a dry tuft (32x32 each)
 // and a bush (64x64). They are committed as he supplied them under
 // src/assets/grass/source/ (test/tooling/doctrine.test.js rows), and this bake turns

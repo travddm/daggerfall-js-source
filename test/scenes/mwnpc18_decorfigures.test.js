@@ -1,5 +1,4 @@
-// MWNPC18 (2026-10-11, a player's report via Mac: "Player decorations are not affected" - bible/04-Characters/
-// Morrowind-NPCs.md section 26): A FIGURE A PLAYER PLACED STANDS IN A MORROWIND BODY. DECOR-FIGURE lets a home's owner
+// MWNPC18: A FIGURE A PLAYER PLACED STANDS IN A MORROWIND BODY. DECOR-FIGURE lets a home's owner
 // set down one of Daggerfall's people (net/decorLaw.js decorIsFigure); every room's own people stood in bodies and the
 // placed ones kept their pictures, because no census looked at a decor room. Now each is read for a look off its
 // picture - its sex FLATS.CFG's, its role FLATS.CFG's caption's, its race the region's, its seed its piece's id
@@ -152,11 +151,11 @@ test('MWNPC18c offerDecorFigures, through a real decor room: each figure with a 
 test('MWNPC18d EVERY DECOR ROOM\'S FIGURES ARE OFFERED - the rooms\' on the interior host\'s people lane, the yards\' on the street\'s, before the bodies draw; a new host of decor rooms fails here until it does the same (the census never saw a decor room: its people are flats, not mobiles)', () => {
   const hosts = walk('src').filter((p) => /[=(,]\s*createDecorRoom\(/.test(rd(p))).sort();   // a call, not its definition
   assert.deepEqual(hosts, ['src/scenes/homeYards.js', 'src/scenes/worldModes.js'], 'the hosts that stand decor rooms');
-  assert.match(rd('src/scenes/decor/decorRoom.js'), /const figures = \(\) => \{ figOut\.length = 0; for \(const e of figs\) if \(e\.batch && !e\.quiet\) figOut\.push\(e\); return figOut; \};/);   // PIN MOVED (DECOR-ACCESS): a piece held quiet while it is moved is offered by no host
+  assert.match(rd('src/scenes/decor/decorRoom.js'), /const figures = \(\) => \{ figOut\.length = 0; for \(const e of figs\) if \(e\.batch && !e\.quiet\) figOut\.push\(e\); return figOut; \};/);
   const modes = rd('src/scenes/worldModes.js'), world = hostText('src/scenes/world.js');
   const o = modes.indexOf('offerDecorFigures(interiorDecor.figures(), peopleBodies, _peopleOn, figureCtx, mwv.eye, dt);');
   assert.ok(o > 0 && o < modes.indexOf('    peopleBodies.draw(canvas, proj, view, mwv.eye, dt);'), 'a room\'s, before its people draw');
-  assert.match(rd('src/scenes/homeYards.js'), /figures: \(\) => \{\n      yardFigs\.length = 0;\n      const eye = deps\.eye\?\.\(\) \?\? null;\n      for \(const y of yards\.values\(\)\) if \(nearEye\(y, eye\)\) for \(const e of y\.pool\.figures\(\)\) yardFigs\.push\(e\);\n      return yardFigs;\n    \},/, 'one list kept; only a yard within its reach, as its flats are (YARD-RANGE)');   // PIN MOVED (main's YARD-RANGE merged: a yard's flats are drawn only within its reach, and its figures stand only there)
+  assert.match(rd('src/scenes/homeYards.js'), /figures: \(\) => \{\n      yardFigs\.length = 0;\n      const eye = deps\.eye\?\.\(\) \?\? null;\n      for \(const y of yards\.values\(\)\) if \(nearEye\(y, eye\)\) for \(const e of y\.pool\.figures\(\)\) yardFigs\.push\(e\);\n      return yardFigs;\n    \},/, 'one list kept; only a yard within its reach, as its flats are (YARD-RANGE)');
   // AUDIT MWNPC16-18 D2: a room's figure is of the race its building's region names (the yards' read) - the quest scene's
   // context names none, and every room's figure stood a Breton
   assert.match(modes, /get race\(\) \{ const i = interiorBuilding\?\.regionIndex \?\? host\.currentRegionIndex\?\.\(\) \?\? -1; return REGION_RACES\[i\] != null \? REGION_RACES\[i\] \+ 1 : null; \},/);

@@ -1,11 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md) - THE OPEN ZONE'S FIGHTS, AND A BODY'S ONE PIECE.
+// WILD1 - THE OPEN ZONE'S FIGHTS, AND A BODY'S ONE PIECE.
 //
 // The owner: "Wrothgarian mountains need to be turned into a open pvp zone ... players can choose 1 item of the
 // equipped ones the killed player has by clicking the dead body".
 //
-// INT9 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md): THE RELAY REFEREES THE ZONE
+// INT9: THE RELAY REFEREES THE ZONE
 // (net/wild/wildRef.js). WILD1 let THE DEFENDER resolve every blow on its own machine and THE FALLEN give its killer's piece -
 // so a client that never took a blow never fell, and one that fell gave what it chose. Now:
 //   - A BLOW goes out as before - a numbered `strike` or `spell` on the `wild` frame (net/wire.js validWildData), to the

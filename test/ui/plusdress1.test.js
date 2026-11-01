@@ -1,4 +1,4 @@
-// PLUS-DRESS (2026-09-26, Mac: "just ensure any of the new UI elements are also apart of how enhanced plus looks"):
+// PLUS-DRESS:
 // the online lane's newer screens in the stone-and-brass kit. The roles are the kit's table (ui/enhanced/enhancedFrame.js
 // FRAME_ROLES), read here against each screen's OWN sheet so a role can never name a class nothing draws; what a role
 // cannot say is ui/enhanced/enhancedPlusStyle.js ONLINE_DRESS_CSS, read as rules; the gate's bar and banner are BUILT on fake
@@ -65,10 +65,10 @@ test('PLUS-DRESS the roles: the journal page, the F-menu, the decorator (a whole
 
 test('PLUS-DRESS the WARN role: a press that costs something (leave, remove, disband, challenge) is edged in blood lit from the top left, brighter under the pointer and never brass, sunk while held - written BEFORE the disabled rule, so a warn that cannot be pressed goes flat like any other; paint only (mutants: the warn edge after the disabled rule, brass on a warn\'s hover)', () => {
   const at = (s) => FRAME_CSS.indexOf(s);
-  // NAV-F (2026-09-28) joined the role: scuttling a prize (`body .dfnaval-scuttle`, a `.dfnaval-btn` first)
+  // NAV-F joined the role: scuttling a prize (`body .dfnaval-scuttle`, a `.dfnaval-btn` first)
   // REVENANT-FATE / COMPANION-ROSTER (the 2026-10-02 audit): and an execution, and a release confirmed
   // FIRM1: and the Firmament's leave-without-saving (`body .fmt-btn.fmt-exit`)
-  // AUDIT LOCKPICK C6 (2026-10-26): and the lock's Auto attempt (`body .lk-acts .lk-auto`) - a failed roll snaps a pick. PIN MOVED
+  // AUDIT LOCKPICK C6: and the lock's Auto attempt (`body .lk-acts .lk-auto`) - a failed roll snaps a pick.
   const rest = at('body .lk-acts .lk-auto,\nbody .dfsocial-btn.warn,\nbody .dfprofile-duel,\nbody .dfnaval-scuttle,\n.pack-shell .fate-confirm .act.warn,\n.px-sys .cmp-acts .act.warn,\nbody .dfdecor-btn.warn,\n.trade-shell .act.trade-steal,\nbody .fmt-btn.fmt-exit { border-color: #e0584a #5a130f #3d0d0a #b83a2e;');
   assert.ok(rest > 0, 'the edge');
   const hover = at('body .lk-acts .lk-auto:hover:not(:disabled),\nbody .dfsocial-btn.warn:hover:not(:disabled),\nbody .dfprofile-duel:hover:not(:disabled),\nbody .dfnaval-scuttle:hover:not(:disabled),\n.pack-shell .fate-confirm .act.warn:hover:not(:disabled),\n.px-sys .cmp-acts .act.warn:hover:not(:disabled),\nbody .dfdecor-btn.warn:hover:not(:disabled),\n.trade-shell .act.trade-steal:hover:not(:disabled),\nbody .fmt-btn.fmt-exit:hover:not(:disabled), body .lk-acts .lk-auto:focus-visible,\nbody .dfsocial-btn.warn:focus-visible,\nbody .dfprofile-duel:focus-visible,\nbody .dfnaval-scuttle:focus-visible,\n.pack-shell .fate-confirm .act.warn:focus-visible,\n.px-sys .cmp-acts .act.warn:focus-visible,\nbody .dfdecor-btn.warn:focus-visible,\n.trade-shell .act.trade-steal:focus-visible,\nbody .fmt-btn.fmt-exit:focus-visible { border-color: #ff8a76 #7a1d16 #5a130f #e0584a;');
@@ -126,7 +126,7 @@ test('PLUS-DRESS the gate: the boss\'s bar and the countdown paint from CLASSES 
   drawGateBossBar(model, { doc });
   drawGateBossBar({ ...model, frac: 0.4 }, { doc });
   const root = doc.body.children[0];
-  assert.deepEqual(root.children.map((c) => c.className), ['wb-boss-name', 'wb-boss-sub', 'wb-boss-track', 'wb-boss-marks', 'wb-boss-callout', 'wb-boss-foot', 'wb-boss-halves']);   // PIN MOVED (WB14d): the halves' row, last; WB9a: the night's marks under his health (WB8b's trials line under his name, moved and drawn whole); WB13c: his epithet's line
+  assert.deepEqual(root.children.map((c) => c.className), ['wb-boss-name', 'wb-boss-sub', 'wb-boss-track', 'wb-boss-marks', 'wb-boss-callout', 'wb-boss-foot', 'wb-boss-halves']);
   const track = root.children[2];
   assert.deepEqual(track.children.map((c) => c.className), ['wb-boss-ghost', 'wb-boss-fill', 'wb-boss-mark', 'wb-boss-mark', 'wb-boss-ward']);   // WB13c: the trailing segment under the fill
   assert.equal(track.children[1].style.width, '40.0%');

@@ -1,5 +1,5 @@
 // @ts-check
-// WB9e (2026-09-30, Mac: "Further improve his effects ... Increase boss damage, further improve his telegraphs"): HIS
+// WB9e: HIS
 // BLOWS, SEEN LANDING. The telegraph says where a blow will fall (render/gate/gateTelegraph.js); this pass is the fall itself:
 //
 //   - THE BURST: every landing throws sparks out of the stone where it lands - his weight's grit and embers, his fire's
@@ -9,7 +9,7 @@
 //   - THE METEOR: through the last METEOR_FALL_MS of its wind-up a burning stone streaks down out of the Deadlands' sky
 //     onto its mark, its trail behind it - the fall the fighter it was called on has to beat.
 //
-// WB9f (Mac: "Improve the loot drops that emit on his death"): AND HIS SPOILS' - a gold burst out of his chest as his
+// WB9f: AND HIS SPOILS' - a gold burst out of his chest as his
 // spoils leave it, falling to the floor under it (a burst's `floor`: its sparks rest there, not at its origin's height),
 // and a small burst in its tier's colour where each piece comes to rest, a Rare-or-better's brighter (FX_KINDS.spoils,
 // spoilRest, spoilRestRare).
@@ -340,7 +340,7 @@ export class GateFxRenderer {
     gl.disable(gl.BLEND);
   }
 
-  /** AUDIT EG-FALL (L1-6; bible/Home.md, EVERY ALLOCATION HAS AN OWNER): its programs, arrays and buffers freed - once, then
+  /** AUDIT EG-FALL (L1-6;, EVERY ALLOCATION HAS AN OWNER): its programs, arrays and buffers freed - once, then
    *  nothing (render/gate/gateTelegraph.js destroy's shape). */
   destroy() {
     const gl = this.gl;

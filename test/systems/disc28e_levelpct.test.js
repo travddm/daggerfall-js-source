@@ -1,5 +1,4 @@
-// LEVEL-PCT (2026-09-28, Discord, dragonatg: "The level progress is inconsistent between the Uis. On GrimoireUi a
-// level progress of 93% is only 12/100 on EnhancedPlus."). GrimoireUI is the classic skin under an art pack, so its
+// LEVEL-PCT. GrimoireUI is the classic skin under an art pack, so its
 // Level box is the classic sheet's (ui/charsheet.js _showLevel), and that box always printed DFU's skill-sum fraction.
 // A character ORL1's bar levels (the mod's law, chosen at creation) still has that sum kept (advancement.js
 // raiseSkills) but it levels nothing: the Ascension's crown read the bar (12/100), the box the sum (93%). The box now
@@ -52,13 +51,13 @@ test('LEVEL-PCT: the report - a character the bar levels reads the bar on the cl
   const v = played(LEVELING_VIRTUE);
   assert.equal(v.currentLevelUpSkillSum - v.startingLevelUpSkillSum, 1, 'the sum moved one, as it does for everyone');
   assert.equal(v.levelProgress, 12, 'the bar took 8 + 2 + 2');
-  assert.deepEqual(levelProgress(v, viewOnlyScreen(v, true)), { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual(levelProgress(v, viewOnlyScreen(v, true)), { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });
   assert.deepEqual(box(v), ['Progress made to the next level: 12%'], 'the box reads the law that levels this character (was 93%)');
   // The same history on DFU's law: the bar never moved, and both screens read the sum - 93% and 14 of 15.
   const c = played(LEVELING_CLASSIC);
   assert.equal(c.levelProgress, 0);
   assert.deepEqual(box(c), ['Progress made to the next level: 93%']);
-  assert.deepEqual(levelProgress(c, viewOnlyScreen(c, false)), { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual(levelProgress(c, viewOnlyScreen(c, false)), { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });
 });
 
 test('LEVEL-PCT: the Oghma Infinium\'s window reads the bar too - the crown asks the character\'s law, not the screen\'s lane', () => {
@@ -70,12 +69,12 @@ test('LEVEL-PCT: the Oghma Infinium\'s window reads the bar too - the crown asks
   const w = createCharSheetWindow({ entity: v });
   const frame = levelUpFrame(v, w);
   assert.equal(frame.lane, LANE_OGHMA, 'the book\'s own window');
-  assert.deepEqual(frame.progress, { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual(frame.progress, { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });
   assert.deepEqual(box(v), ['Progress made to the next level: 12%'], 'the box and the crown, one number');
   // The same book on DFU's law reads the sum, as before.
   const c = played(LEVELING_CLASSIC);
   SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.OghmaInfinium).used({ entity: c, ctx: {} });
-  assert.deepEqual(levelUpFrame(c, createCharSheetWindow({ entity: c })).progress, { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual(levelUpFrame(c, createCharSheetWindow({ entity: c })).progress, { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });
 });
 
 test('LEVEL-PCT: the bar reads the same on both screens at its ends - held to 0..100, a full bar 100%', () => {

@@ -1,4 +1,4 @@
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md): THE `wild` FRAME - its law at both ends, and the relay that
+// WILD1: THE `wild` FRAME - its law at both ends, and the relay that
 // routes the directed half and keeps the room's remains.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,7 +14,6 @@ import { fakeRooms } from '../fakeRoom.mjs';
 const A = { lv: 5, r: 1, st: [50, 50, 50, 50, 50, 50, 50, 50], sk: [40, 30, 20, 10], cf: [0, 0, 0], h: [80, 100] };
 const item = (n) => ({ group: 'Armor', templateIndex: 100 + n, stackCount: 1 });
 
-// PIN MOVED (INT9, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): a blow carries the striker's rolled number
 // (`d`, INT8's duel law) and no sheet for a defender to read; the pick is the relay's (`r`, `w`), `gave` retired (the
 // service takes the piece), and a deposit carries the service's order on every chunk (test/net/int9_wild_ref.test.js).
 test('WILD1 wire: the blows are the duel\'s own, projected without its sid; the death\'s three and the room\'s two are bounded', () => {
@@ -49,7 +48,6 @@ test('WILD1 wire: the room\'s words back, and the relay that first carries the f
   assert.ok(relaySupportsWild(RELAY_VERSION));
 });
 
-// PIN MOVED (INT9): a remains is taken from and said only once its records digest to the service's order (`ok`, the
 // relay's check on its last chunk - test/net/int9_wild_ref.test.js)
 test('WILD1 law: a remains is filled by its maker alone, taken record by record (a stack by its count), and said in chunks', () => {
   const rec = newRemains({ r: 'rrrrrr01', os: 'acct', oid: 'peer-0001', nm: 'Ria', p: [1, 2, 3], now: 1000 });
@@ -78,7 +76,6 @@ const PX = 400, PY = 120, CELL = worldRoom(PX, PY);
 const ON = { x: PX * PIXEL_UNITS + 16384, y: 0, z: (499 - PY) * PIXEL_UNITS + 16384, yaw: 0, pitch: 0 };
 const wilds = (ws, k) => ws.sent.filter((m) => m.t === 'wild' && (!k || m.k === k));
 
-// PIN MOVED (INT9): a deposit is kept only on the account service's order over its records, and a blow is the relay's to
 // referee - routed to nobody (test/net/int9_wild_ref.test.js); a fallen's offer of its worn gear is the one frame routed now
 test('WILD1 relay: a deposit is kept and said to the room, the first take wins, a late hello hears what is left, a fallen\'s offer is routed with its account; an emptied remains goes from the room\'s word but stays its TOMBSTONE (PIN MOVED, AUDIT INT9: it was let go, and its order laid it again)', async () => {
   const world = fakeRooms();

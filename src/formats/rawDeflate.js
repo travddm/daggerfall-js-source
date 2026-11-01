@@ -1,4 +1,4 @@
-// SNOWFALL1 (2026-10-08): RAW DEFLATE (RFC 1951), both ways and in step - what .NET's DeflateStream reads and writes
+// SNOWFALL1: RAW DEFLATE (RFC 1951), both ways and in step - what .NET's DeflateStream reads and writes
 // with no zlib or gzip wrapper. Snowfall keeps its persistent tracks in its save record as deflated, base64 bytes
 // (PersistentTrackField.WriteSaveData / RestoreSaveData), and a save is written in step (systems/modSaveData.js
 // GetSaveData), so the platform's CompressionStream - which answers later - cannot pack it.

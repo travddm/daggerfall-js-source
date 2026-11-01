@@ -1,5 +1,4 @@
-// TIME2 (2026-10-01, Mac: "werewolf forms last insanely long" / "I don't want a band aid, I want a detailed way we can
-// do this" / "This needs to be perfect"): ONLINE THE FULL MOON IS A NIGHT. Design: bible/06-Systems/Online-Time-Arc.md
+// TIME2: ONLINE THE FULL MOON IS A NIGHT. Design:
 // section 6.1. DFU forces a lycanthrope's change for the whole calendar day either moon is full, and online that day was
 // two real hours no rest could shorten (the moon is the sky's, which no rest moves). Online the change is forced while
 // the full moon is UP - from the dusk of a full-moon date to the next dawn, thirty real minutes on TIME1's sky - and at

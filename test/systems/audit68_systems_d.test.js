@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster systems_d - src/systems (equip's one
+// AUDIT 68, cluster systems_d - src/systems (equip's one
 // act, Horse Cart and Cargo's runtime and pool, the ammunition registry,
 // the item info readers, Immersive Footsteps' loads, the one weight law).
 // Each pin drives the producer's own output and failed on the base.

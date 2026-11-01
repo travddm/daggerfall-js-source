@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac: "ensure it matches the love we gave the other new ship model we implemented"): THE
+// SHIPS-2: THE
 // SHIPWRIGHT'S KIT - what every ship of the port's builds her prefab with.
 //
 // The galleon (world/ships/galleonModel.js, world/ships/galleonRig.js) built hers on helpers of her own, and the carrack and the

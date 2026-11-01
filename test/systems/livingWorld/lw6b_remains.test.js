@@ -1,5 +1,4 @@
-// LW6b (2026-10-05, bible/06-Systems/Living-World.md "LW6b", Mac: "You can find them dungeon diving ... explore a
-// dynamic world"): THE FALLEN IN THE DEEP - the dead of a dive left in its dungeon to be found: the deep's word of them
+// LW6b: THE FALLEN IN THE DEEP - the dead of a dive left in its dungeon to be found: the deep's word of them
 // (trips.js fallenIn), the character's mark of what was laid (relations.js `laid`), the layer that lays them where the
 // dungeon's own foes stand and tells the player whose they are (scenes/livingWorld/deepRemains.js), the divers' word of who they
 // stood, and the dungeon's and the streaming host's parts by source. On the synthetic map's dungeons and mock decks.
@@ -50,7 +49,7 @@ test('LW6b the deep\'s word: the dead of the dives into a dungeon by the towns w
 });
 
 test('LW6b the character\'s mark: what the living world laid in this world (`laid`) kept as the turns are - written into the save only once there is one, read back from it; the turns as they were (mutants: the mark, the save, the read, the written-only-once)', () => {
-  assert.deepEqual([...MARK_KINDS], ['laid', 'heard', 'looted']);   // PIN MOVED (LW12): a band heard of, its chest looted
+  assert.deepEqual([...MARK_KINDS], ['laid', 'heard', 'looted']);
   assert.deepEqual([...TURN_KINDS], ['spared', 'fallen', 'won', 'lost']);
   const rel = createRelations();
   assert.equal(rel.snapshot().turns, undefined, 'nothing yet: no turns written');

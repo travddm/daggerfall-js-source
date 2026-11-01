@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac: "the ability for players to request to sit in the back of the cart and be transported across
-// daggerfall"; asked, "Players and companions"): THE SEATS IN THE BACK, ON THE WORLD HOST. systems/wagon/wagonSeats.js is
+// WAGONS1: THE SEATS IN THE BACK, ON THE WORLD HOST. systems/wagon/wagonSeats.js is
 // the law (the seats, the asks, the words); this runs both ends of it for one client:
 //
 //  - AS A RIDER: another player's wagon with seats lists "Ask to ride" on its plaque (scenes/horseCartPool.js `riders.acts`);

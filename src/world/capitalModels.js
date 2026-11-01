@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10 (bible/03-World/Arena-Provinces.md TESA10) - THE CAPITALS' LANDMARKS on their doors: every capital's models
+// TESA10 (TESA10) - THE CAPITALS' LANDMARKS on their doors: every capital's models
 // (TESA11: the Imperial City's, world/capitalImperial.js; Solitude's and the rest, their own modules) and their pictures,
 // made at boot from noise under a pseudo-archive of the port's own (world/lefayArt.js's law). No game data: nothing of them
 // comes from ARENA2 or from any other game. Shapes of the port's own in the spirit of each city's look - never another
@@ -65,8 +65,7 @@ function picture(fn, S = CAPITAL_ART_SIZE, H = S) {   // IC-GRAND: H, a picture 
   for (let y = 0; y < H; y++) for (let x = 0; x < S; x++) { const c = fn(x, y); const i = (y * S + x) * 4; img.data[i] = c[0]; img.data[i + 1] = c[1]; img.data[i + 2] = c[2]; img.data[i + 3] = 255; }
   return img;
 }
-// TESA-LORE (the owner: "ensure all new textures your adding fall in line with the detail of vanilla textures. Same
-// resolution and all") - DAGGERFALL'S OWN LOOK, BY ITS OWN NUMBERS. Measured on the freeware's 475 wall and ground
+// TESA-LORE - DAGGERFALL'S OWN LOOK, BY ITS OWN NUMBERS. Measured on the freeware's 475 wall and ground
 // textures 64 texels wide (TEXTURE.002 to .099): a few dozen colours a picture (median 42, the middle half 27 to 60) and
 // every texel apart from its neighbour (the mean |dL| to the next texel: median 10.9, the middle half 7.8 to 14.6) -
 // painted pixel art off a palette's ramp, never a smooth gradient. So every picture here is a tone law (0 its ramp's
@@ -249,7 +248,7 @@ const RANK = Object.freeze([1, 0, 2]);
  * model's middle (the University 2.4 km out had drifted to 40.5 texels a metre). AUDIT TESA II C14: the plane is its face's - the
  * normal both halves of a quad carry, and a quad's second half on its first's plane wherever that turns it at least as much
  * (1/sqrt(3) of it, the bound above) - so a quad is never mapped on two planes, a seam down its diagonal (230 planar quads
- * were: a face at 45 degrees, or a cone's sliver half, rounded each its own way). BLD (2026-10-26): v RISES up a wall,
+ * were: a face at 45 degrees, or a cone's sliver half, rounded each its own way). BLD: v RISES up a wall,
  * MeshReader's own law (v = -(texel row / height): 46,324 of the 46,856 wall triangles of the freeware's 434 house
  * models), because every picture reaches the GL bottom-up (formats/color32Order.js) - it had fallen, so every capital's
  * masonry stood on its head, its stones lit from below (world/imperialFabricModels.js's walls, BLD, the same finding).

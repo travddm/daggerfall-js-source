@@ -1,4 +1,4 @@
-// OFFER-ID (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; found re-reading the Discord's
+// OFFER-ID (FIELD BUGS 2026-10-11b,; found re-reading the Discord's
 // "Unidenitified items"): a valuable piece offered in a realm trade carries its id from the offer. The realm's checkpoint
 // gives every valuable piece its id (INT4, world.js realmCheckpoint -> itemIds.js stampItemIds), and the trade's hold
 // checkpoints AFTER the offer was written for the wire (tradeSession.js setOffer -> tradePack.js wire) - so a piece looted

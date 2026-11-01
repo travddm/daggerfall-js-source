@@ -1,5 +1,4 @@
-// CRUX1 (2026-09-22, a player through Mac: "the final dungeon mission
-// is unbeatable"): THE ROAD INTO THE MANTELLAN CRUX, MADE OF DFU'S
+// CRUX1: THE ROAD INTO THE MANTELLAN CRUX, MADE OF DFU'S
 // PARTS. The final quest (S0000016) rides `transfer pc inside` into a
 // dungeon nothing else can reach, and the port's respawn entered a
 // dungeon only through an entrance DOOR found in the loaded exterior -

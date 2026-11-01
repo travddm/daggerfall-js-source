@@ -1,4 +1,4 @@
-// SHIELD1 (2026-09-25): a shield on the hotbar straps on with one press and comes off with the next; a torch slot
+// SHIELD1: a shield on the hotbar straps on with one press and comes off with the next; a torch slot
 // takes the shield off first and lights the torch - and puts the shield back if the light will not light.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

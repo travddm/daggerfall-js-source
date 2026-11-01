@@ -1,5 +1,4 @@
-// GOLD-DROP (2026-09-26, a player on Discord: "Gold isnt able to be put in a container", "Cant put gold in
-// containers", "Can't drop gold at all"): THE GOLD BUTTON IS THE PACK'S. DFU keeps its goldButton on the player's
+// GOLD-DROP: THE GOLD BUTTON IS THE PACK'S. DFU keeps its goldButton on the player's
 // own panel (DaggerfallInventoryWindow.cs:47, :515-517) and GoldButton_OnMouseClick drops the amount into whatever the
 // window's remote list is - the ground, the wagon, a container (:1269-1316). The enhanced pack carried it on the
 // remote window's bar alone, and that window is built for the ground only once something lies on it (PX19c) and is
@@ -54,7 +53,7 @@ function withPack(fn, { deps = {}, items = () => [DAGGER()], gold = 1287, setup 
       input.oninput();
       f.onsubmit({ preventDefault() {} });
     };
-    /** The field's own submit, as the player reads it (AUDIT GOLD-DROP 5). PIN MOVED (GOLD-ALL): it stands in the
+    /** The field's own submit, as the player reads it (AUDIT GOLD-DROP 5).
      *  field's stack of presses now, over its "all" (`.goldacts`). */
     const acts = () => field()?.children.find((c) => c.classList?.contains('goldacts')) ?? null;
     const submit = () => acts()?.children.find((c) => c.tagName === 'BUTTON' && c.type === 'submit')?.textContent ?? null;
@@ -322,7 +321,7 @@ test('GOLD-DROP: with the wagon showing the button is Stow and the gold goes int
   }, { deps: { loot: { items: () => [DAGGER()] } } });
 });
 
-// AUDIT GOLD-DROP 1 (2026-09-27, the audit of GOLD-DROP): ON A PHONE THE BUTTON WAS OFF THE SCREEN. The footer is one
+// AUDIT GOLD-DROP 1: ON A PHONE THE BUTTON WAS OFF THE SCREEN. The footer is one
 // flex row never narrower than ~550px, the host clips and play/index.html will not zoom, so on a 393px Pixel 5 the
 // button stood at x=446..550 and "Can't drop gold at all" stayed true there. It was 32px under a finger where every
 // other button of this window is 44; and its field, a row of the window below the bar, took its ~110px out of the item
@@ -461,7 +460,7 @@ test('AUDIT GOLD-DROP 5: a press of the button clears a standing notice - the wa
   });
 });
 
-// AUDIT2 GOLD-DROP 1 and 3 (2026-09-27, the second audit of GOLD-DROP): THE WRAP COST A PHONE ITS ONE ROW. The first
+// AUDIT2 GOLD-DROP 1 and 3: THE WRAP COST A PHONE ITS ONE ROW. The first
 // audit's footer wrapped on a phone to bring the button on screen: 57px became 90, and the fixed-height window took
 // the difference from the list - 375x667 58 -> 25, a 390x664 iPhone 65 -> 32, a Pixel 5 128 -> 95, the one row of
 // tiles gone on the common small phones. And at 320 it still overran: three rows, the carry's meter 14-44px past the
@@ -592,8 +591,7 @@ test('AUDIT2 GOLD-DROP 2: ONE FLOATER AT A TIME - the field opening puts an item
   } finally { globalThis.location = prev; _resetForTests(); }
 });
 
-// GOLD-ALL (2026-10-23, the owner: "Stow all button under stow make stow smaller button and add the stow all button ...
-// with stow all i mean the money amount"): THE WHOLE PURSE IN ONE PRESS. The field's verb stands over its "all" - Stow
+// GOLD-ALL: THE WHOLE PURSE IN ONE PRESS. The field's verb stands over its "all" - Stow
 // and Stow all over the wagon, Store and Store all over storage, Drop and Drop all on the ground - and the "all" moves
 // every coin the purse holds, clamped by the wagon's room as a typed amount is, and said; an empty purse's "all" is
 // greyed. Both presses are the kit's `.act` in one stack (`.goldacts`), so Enhanced Plus and the DFO Grimoire dress
@@ -633,7 +631,7 @@ test('GOLD-ALL: the field stacks its verb over "<verb> all", and the "all" moves
   }, { gold: 1 });
 });
 
-// AUDIT UPDATE II (2026-10-25, bible/01-Overview/audits/Audit-Update-II-2026-10-25.md) B1
+// AUDIT UPDATE II B1
 test('AUDIT UPDATE II B1: no gold into a store that settles its own pieces - the hall\'s shared chest (decorGrants.js openSharedChest, `loot.commit`) shows no gold field and keeps the purse whole; a store without one still takes it (mutants: the commit unasked; the press ungated)', () => {
   const chest = [];
   withPack(({ e, button, act }) => {

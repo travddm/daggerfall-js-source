@@ -1,6 +1,6 @@
 // @ts-check
-// HORSE-VOICE (2026-10-24, the owner: "more varied horse sounds") - THE HORSE HEARD, the enhanced skin's own
-// (bible/08-Audio/Audio.md HORSE-VOICE; bible/06-Systems/Horse-Care.md).
+// HORSE-VOICE - THE HORSE HEARD, the enhanced skin's own
+// (HORSE-VOICE).
 //
 // DFU's TransportManager gives a horse one voice and one ground: the neigh (AnimalHorse, 99) on a clock that re-rolls to
 // 2-39 s and to 1-4 s on a mount, and the clop on its loop - HorseClop (97) slow, HorseClop2 (298) fast, HorseAndCart

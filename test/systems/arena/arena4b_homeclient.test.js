@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, Mac: "Move them to a new house"): AN ONLINE HOME THE ARENA DISPLACED, MOVED BY ITS OWNER'S
+// ARENA4b: AN ONLINE HOME THE ARENA DISPLACED, MOVED BY ITS OWNER'S
 // CLIENT - the pick (systems/arena/arenaMove.js arenaHomeFor), the boot's moves (systems/online/onlineHomes.js moveArenaHomes) driven
 // headless and over the real service (test/accountDb.mjs), the rooms a move carried as the client reads them
 // (systems/homeRent.js), and the host's wiring in scenes/world.js by source.

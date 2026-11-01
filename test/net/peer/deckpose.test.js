@@ -1,5 +1,4 @@
-// DECK-POSE (2026-10-23, the owner: "I notice with sailing. Players on board the ship jitter while sailing instead of
-// staying put. Other players also slide when on board your ship/npc ships"). A player aboard a boat - a passenger on
+// DECK-POSE. A player aboard a boat - a passenger on
 // another's, or at their own helm, a booked passage's ship among them - was stood on her deck by the foes frame's `ab`
 // alone (scenes/comeSailAway/comeSailAwayAboard.js glue): a word said at most five times a second (FOES_MS), only when it
 // changed, kept to the full frames (once in two seconds) by a crowded cell's relay, and eased toward at CSA_ABOARD_EASE.

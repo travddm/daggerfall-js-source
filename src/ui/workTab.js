@@ -1,6 +1,6 @@
 // @ts-check
-// PROF6 (2026-09-29, Mac: "continue"): THE WORK TAB'S GUILD WRITS AND COMMISSIONS, beside the Court's writs on the
-// Notice Board (bible/06-Systems/Professions-Arc.md 11, 21's wireframe, 28) - drawn inside the board's window
+// PROF6: THE WORK TAB'S GUILD WRITS AND COMMISSIONS, beside the Court's writs on the
+// Notice Board (11, 21's wireframe, 28) - drawn inside the board's window
 // (ui/noticeWindow.js), their cards in the Court's own grid (AUDIT 31 U14).
 //
 // THIS REGION'S GUILD WRITS (the guild blue, its tag - no guild's colours are stored until SEAT1c): what the guild needs
@@ -18,15 +18,15 @@
 // forms' drafts are the writs' book's, so a stray tap or Escape throws none away (AUDIT 31 U12); every field is
 // labelled, and a button the reader cannot press says why (AUDIT 31 U2, U10).
 //
-// BOARD-UI (2026-10-06, Mac: "Reduce overusage of bloated text. Less AI like text"): the cards straight, the forms'
+// BOARD-UI: the cards straight, the forms'
 // terms one short line each, a refusal's reason in a few words.
 //
-// SILVER-WAYS (2026-10-03, Mac: "Do it"): THIS REGION'S GUILD CONTRACTS beside them - a guild's pay to each defender of a
+// SILVER-WAYS: THIS REGION'S GUILD CONTRACTS beside them - a guild's pay to each defender of a
 // raid here, what is left of it, the time left; paid as the defender's raid is counted, never to its own Officers and
 // Guildmaster; Withdraw where the reader's rank may; and POST A CONTRACT (a Guildmaster's, or an Officer's within the one
 // writ budget). Offered while the service lists them (`contracts` on the list - silver's switch, not the professions').
 //
-// BOARD-SIFT (2026-10-21): each card handed to the board as an entry (`entries`) - its kind, whether it is open and
+// BOARD-SIFT: each card handed to the board as an entry (`entries`) - its kind, whether it is open and
 // fillable now, its silver, its end, its name and words - so the Work tab's bar sifts and orders it (ui/workSift.js).
 import { wordsOf } from './workSift.js';   // BOARD-SIFT: a card's words, as the bar searches them
 import { accountRefusalText } from '../net/accountClient.js';

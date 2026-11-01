@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - THE PIECE A CRAFT MADE
-// (bible/06-Systems/Professions-Arc.md 9.2, 24): minted as DFU mints
+// PROF3 - THE PIECE A CRAFT MADE
+// (9.2, 24): minted as DFU mints
 // it and the quality laid on it after.
 //
 // DFU'S OWN ITEM FIRST. A weapon is ItemBuilder.CreateWeapon's
@@ -24,17 +24,14 @@
 // pack holds. Its row is registered with the ores and ingots
 // (profTemplates.js), so any scene the save loads in knows it.
 //
-// MEND-AIM (2026-09-30, Discord suggestion, kurkku: "Allow targeting
-// field repair kit use" - "always repairing the most worn piece of
-// equipment means fixing arrows or random loot you picked up most of
-// the time"): A KIT IS AIMED. Used from either pack with more than one
+// MEND-AIM: A KIT IS AIMED. Used from either pack with more than one
 // piece to mend, it asks which (the classic window's list picker, the
 // enhanced pack's own list); the quick keys, which have no list to
 // show, take what is WORN first, then the pack's, each the most worn
 // first. An arrow is never mended - DFU mints a quiver at condition 0,
 // so it was always the "most worn" piece a kit could find.
 //
-// PROF4 (2026-09-28, Mac: "Continue"; Professions-Arc.md 25): AND THE
+// PROF4: AND THE
 // WORKBENCH'S. A staff or a bow is DFU's weapon at its wood's material,
 // its quality the smith's weapons'; arrows are CreateWeapon's arrow arm
 // at twenty, no quality and no provenance (DFU mints a quiver at
@@ -44,7 +41,7 @@
 // on every piece a Master Joiner makes (`marked`); the Basket Foraging's
 // own, its quality its life.
 //
-// PROF7 (2026-09-29, Mac: "Do it"; Professions-Arc.md 29): AND THE
+// PROF7: AND THE
 // LOOM'S. Leather armour is CreateArmor's at Leather (material 0), its
 // quality the smith's armour's; a garment is DFU's clothing template in
 // its group (the men's or the women's), its variant the record's seed's

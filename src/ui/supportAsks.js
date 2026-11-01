@@ -1,6 +1,5 @@
 // @ts-check
-// SUPPORT1 (2026-10-05, Mac: "I want to add the kofi link in addition to the patron on the website" and "I also want
-// to add the patron/kofi ingame on the main menu as 2 icons"): THE PROJECT'S ASKS, ONE HOME.
+// SUPPORT1: THE PROJECT'S ASKS, ONE HOME.
 //
 // Two doors ask for support now - the website's (index.html, the corner plaques U64 and PATREON1 built) and the game's
 // own front door (ui/enhanced/enhancedMenu.js, two icons in the top-left corner) - and they must ask at the same addresses under
@@ -9,7 +8,7 @@
 // menu's night - and test/ui/enhanced/landing.test.js holds the site's links, README.md, SUPPORT.md and the repository's Sponsor
 // button (.github/FUNDING.yml) to SUPPORT_ASKS.
 //
-// PATREON1 (2026-09-25, Mac: "Replace website KOFI with patreon") had made Patreon the only ask. Ko-fi is back beside
+// PATREON1 had made Patreon the only ask. Ko-fi is back beside
 // it at Mac's new page; U64's ko-fi.com/dfjs is no longer the project's.
 //
 // THE MARKS ARE DRAWN, NOT PICTURED. Each is a pixel list painted in box-shadow, as the site's corner mark has been since

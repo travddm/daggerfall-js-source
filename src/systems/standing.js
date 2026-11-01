@@ -1,8 +1,7 @@
-// REP (2026-09-29) - THE REPUTATION OVERHAUL: THE LAW'S TERMS, ONE HOME. Mac: "So I want to talk about overhauling the
-// reputation system. Something just much better and not as punishing, but still punishing." His four calls, from the
+// REP - THE REPUTATION OVERHAUL: THE LAW'S TERMS, ONE HOME. His four calls, from the
 // options put to him: the watch "Challenged on sight", a sentence "The charge, with a mark", banishment "Timed or
 // pardoned", a bad name "Earn it + faster drift". A declared departure from Daggerfall Unity's crime law (Port-Doctrine
-// lists crime/legal as ported 1:1): Port-Ledger A, REP1-REP6; bible/06-Systems/Standing-Arc.md.
+// lists crime/legal as ported 1:1): Port-Ledger A, REP1-REP6;.
 //
 // What each of DFU's laws became:
 //   - PlayerEntity.cs:498-511 rolled a 5% Criminal Conspiracy EVERY GAME MINUTE for a legal standing under -10 (10% more
@@ -43,8 +42,7 @@ export const CHALLENGE_GRACE_MINUTES = 1440;
  *  player sees (BANISH-SKY, banishmentEnd below). */
 export const BANISHMENT_MINUTES = 30 * 1440;
 /**
- * BANISH-SKY (2026-10-07, bible/06-Systems/Online-Waits.md WAIT4; Mac: "Take care of this", over the sweep of the waits
- * still long online). REP3's thirty days were counted on the world's event clock (TimeScale 12): sixty real hours. But
+ * BANISH-SKY. REP3's thirty days were counted on the world's event clock (TimeScale 12): sixty real hours. But
  * the calendar every menu shows online is the sky's (TIME1), whose day is one real hour since SKY-SLOW - so a player told
  * "banished for 28 more days" watched twenty-eight days go by on the calendar and was still banished for as long again.
  * The term is now thirty days of the calendar the player sees: stamped, as every term, in the event clock's minutes

@@ -1,4 +1,4 @@
-// LPT-FIT (2026-10-07, Mac: "roads still show on roads and pathways. You're not taking the entire model into account"):
+// LPT-FIT:
 // THE WHOLE TREE FITS ITS ROOM. VERGE1 kept the WILD flats' reach off the road band; a location's own trees (a town's,
 // a farm's, a tavern's RMB blocks) were never asked, nor the location's streets, nor the paved ring Basic Roads lays
 // round a town - and Low Poly Trees stands a 5-15 m crown on each. Every Low Poly tree is drawn no wider than the room

@@ -1,7 +1,5 @@
 // @ts-check
-// SERVER-POST (2026-10-08, Mac: "Let's develop an ingame server mailbox that goes next to the hourglass in the pause
-// menu. It should show notifications whenever players have a message. First use is to utilize it for players being
-// granted items."): THE SERVER'S POST, AS THIS CLIENT SEES IT - the box the pause face's mailbox draws
+// SERVER-POST: THE SERVER'S POST, AS THIS CLIENT SEES IT - the box the pause face's mailbox draws
 // (ui/enhanced/enhancedPost.js), looked at on the letterbox's clock (riding the heartbeat, net/heartbeat.js), a new piece said on
 // the world tab, and a piece's item CLAIMED into the online character being played.
 //

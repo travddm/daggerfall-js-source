@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should
-// appear on the compass. The node itself should also stand out with a
-// detailed slight glow or something"): A PROFESSION'S NODES, IN ITS
+// NODE-MARKS: A PROFESSION'S NODES, IN ITS
 // OWN COLOUR - every herb patch, vein, boulder, tree, school and body
 // standing near the player on the compass (both skins: ui/hud/hud.js
 // drawNodeCompassMarks, ui/enhanced/enhancedHud.js) and lit in the world by its
@@ -32,7 +30,7 @@ export const NODE_MARK_CSS = Object.freeze({
 });
 /** A profession no colour is named for is drawn in Mining's (the first the compass marked). */
 const FALLBACK = 'mining';
-/** REST3 (bible/06-Systems/Rest-Arc.md 4.4): a dungeon's campfire, in the flame's yellow - clear of every mark above by
+/** REST3 (4.4): a dungeon's campfire, in the flame's yellow - clear of every mark above by
  *  more than the 75 the nodes keep from each other (the quest's gold, the nearest, by 91). Not a profession: its own
  *  mark word, 'fire'. */
 export const FIRE_MARK_CSS = '#ffd000';
@@ -92,7 +90,7 @@ export function nodeCompassPoints(marks, animals = null) {
 const _fires = /** @type {NodeCompassPoint[]} */ ([]);
 const _firePool = /** @type {NodeCompassPoint[]} */ ([]);
 /**
- * THE DUNGEON'S CAMPFIRES ON THE STRIP (REST3; bible/06-Systems/Rest-Arc.md 4.4): every placed fire within
+ * THE DUNGEON'S CAMPFIRES ON THE STRIP (REST3; 4.4): every placed fire within
  * FIRE_MARK_REACH of `feet` as a 'fire' point, the nearer brighter, ahead of `points` (the nodes stay last, drawn over
  * them). `fires` are [x, y, z] in the scene's frame. `points` itself when no fire is in reach. Pure but for its pool.
  * @param {NodeCompassPoint[]|null} points

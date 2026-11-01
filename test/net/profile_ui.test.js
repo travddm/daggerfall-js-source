@@ -1,10 +1,10 @@
-// PROFILE-UI (2026-10-07, Mac: "Lets only organize and polish the player profile. Its a mess"): THE INSPECT CARD, IN
+// PROFILE-UI: THE INSPECT CARD, IN
 // ORDER. INSPECT1's card had gathered a part from every arc that touched a player - a Renown, a tag, a house, a duelling
 // record, the gates, the towns, the serpents - each one more line or one more mark beside the name, and a player showing
 // the eighteen glyphs the token can carry squeezed their name to a letter a line. Now: the name keeps its line, the
 // glyphs stand on a row of their own under it, the record is a row of plaques, the waiting or the silence is said under
 // the head, and what they wear stands in its parts - in hand, armour, clothing, jewellery - a pair one row under the
-// plural. tools/profileProbe.mjs stands it in Chromium. The record: bible/06-Systems/Online-Arc.md PROFILE-UI.
+// plural. tools/profileProbe.mjs stands it in Chromium. The record: PROFILE-UI.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

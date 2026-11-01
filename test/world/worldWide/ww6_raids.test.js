@@ -1,5 +1,4 @@
-// WW6 (2026-10-27, bible/03-World/World-Wide.md WW6 - the owner's call taken: "Every single thing here needs to be
-// addressed. No exceptions."): THE RAIDS PAST THE BAY, AND A STAFF TOWN EVENT WITH THEM.
+// WW6: THE RAIDS PAST THE BAY, AND A STAFF TOWN EVENT WITH THEM.
 //
 // Held here: the law (every region a key names, a province's town by its own index, the world's pixel in the tuple, the
 // side of the Bay's edge, a lane a theatre and the open zone's shut); the Bay's lane to the byte against the old law
@@ -444,7 +443,7 @@ test('WW6 the relay: a raid past the Bay is kept in its town\'s cell as the Bay\
 });
 
 test('WW6 the session: a raid past the Bay goes only to a relay that hears one (world274 on - an older relay refuses the word); a Bay raid to any raid relay as before; the halo says for itself (mutants: the gate unread; the version floor off)', () => {
-  assert.equal(RAID_WORLD_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): the gate is world275, past main's world274 (LADDER-CUT), which refuses; PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270
+  assert.equal(RAID_WORLD_RELAY_MIN, 276);
   assert.deepEqual([relaySupportsRaidWorld('world275'), relaySupportsRaidWorld('world276'), relaySupportsRaidWorld(RELAY_VERSION), relaySupportsRaidWorld('x')], [false, true, true, false]);
   const rigOf = (cell, v, pose) => {
     const { FakeWS, sockets } = fakeSocketClass();
@@ -504,7 +503,6 @@ test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by 
 // ═══ THE MAP AND THE HOST ════════════════════════════════════════════════════════════════════════
 
 test('WW6 the held map stands a raid past the Bay on the continent\'s sheet (the bounties\' law), the Bay\'s sheet the Bay\'s; the host\'s seams: the raids\' host hands the registry and the capital\'s street, the host constructs it (mutants: the sheet unread; the registry unhanded)', () => {
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): WW6's readRaidMarksIn and BAY-LEFT-MAPS' met, and the one kept bounds the
   // marks by the box itself - so the sheet is asked of a mark north of the Bay (Solitude's pixel, kept) and one past the
   // frame's east edge though under its width (dropped), which only the box's origin tells apart
   const marks = () => [{ key: 'a', px: 2425, py: 270, label: 'T', tip: null }, { key: 'b', px: 100, py: 100, label: 'B', tip: null }, { key: 'c', px: 9000, py: 0, label: 'X' }, { key: 'd', px: 1569, py: -430, label: 'S', tip: null }, { key: 'e', px: 5500, py: 10, label: 'E', tip: null }];

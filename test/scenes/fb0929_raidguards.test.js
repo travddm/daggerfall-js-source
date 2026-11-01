@@ -1,6 +1,4 @@
-// FB0929 RAID-GUARDS (2026-09-29, Discord #bug-reports through Mac - Satranath: "Defending vs raids impossible, guards
-// arrest you. Even with 'protect civilians from melee attacks' enabled, guards get hit in big battles and will arrest
-// you. Nuked my rep trying to protect a town from a raid."). The setting is DFU's MeleeAttackFriendlyProtection
+// FB0929 RAID-GUARDS. The setting is DFU's MeleeAttackFriendlyProtection
 // ("Protect Friendlies and Neutrals"; the menu's "Protect Bystanders"). The world host offered one swing to the watch
 // (its defenders spared), the monsters, then THE DEFENDERS ALONE (DISC19-F), and that last pass handed them to
 // PlayerWeapon.resolveHit, whose protected fallback takes the NEAREST protected body anywhere in reach and view -

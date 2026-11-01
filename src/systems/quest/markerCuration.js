@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-04d QUEST-MARKERS: THE TOWN PACKS' QUEST MARKERS NO PLAYER CAN REACH, STOOD ON THE FLOOR.
 //
 // A quest's person, foe or item stands at the building marker its Place picks (Place.cs AssignQuestResource ->
-// GetSiteMarker; a person snapped to the floor within 4 m, an item never). The town-mods audit (2026-10-04) measured
+// GetSiteMarker; a person snapped to the floor within 4 m, an item never). The town-mods audit measured
 // every quest marker (editor flats 199.11 and 199.18) of every interior both town packs lay out, against the interior the
 // port builds, and six of the packs' interior designs hold one no player can reach: a House2 one of whose two person
 // markers is 3.75 m under its floor; a House2 whose only one stands in the attic of the exterior model the author placed

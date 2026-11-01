@@ -1,7 +1,6 @@
-// NAV-D (2026-09-28, Mac: "actual sailing ships to the world that players can encounter and pillage, which should
-// also directly enhance and integrate into the pirate quest system") - BOARDING, PLUNDER, THE LAW AND THE QUESTS:
+// NAV-D - BOARDING, PLUNDER, THE LAW AND THE QUESTS:
 // the grapples and the berth, the musters, the fight's reckoning, a raid's win, the hold and the captor's choice, the
-// crowns' law and notoriety, and Warm Ashes' "Leave Ship" asking the sea fight first (bible/03-World/Naval-Combat.md).
+// crowns' law and notoriety, and Warm Ashes' "Leave Ship" asking the sea fight first.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

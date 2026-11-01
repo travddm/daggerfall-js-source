@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -251,8 +251,7 @@ export function createTamrielPlaces(host) {
     const place = _arenaTemplates ? arenaPlaceOnPixel(px, py) : null;
     return capitalCloneOf(at, px, py, place ? Object.freeze({ province: place.province, provinceIndex: place.provinceIndex, id: place.id, kind: place.kind, port: !!place.port }) : null);
   }
-  // WW7 (2026-10-25, the owner: "We also need to fully integrate our living world into the entirety of tamriel";
-  // bible/03-World/World-Wide.md WW7): TESA'S PLACES IN THE WORLD'S REGISTRY (world/worldWide/worldPlaces.js) - every
+  // WW7: TESA'S PLACES IN THE WORLD'S REGISTRY (world/worldWide/worldPlaces.js) - every
   // system that reads the world's places (the living world's index, its trips and lanes, the gates' scans, the zone's
   // halls) read none past the Bay, and a town there stood its LivingTown on a bare record. Four providers after the Bay's,
   // in the build's own order (_locationToBuild: a capital, an Arena place, the countryside, a lair): the capitals' slices
@@ -308,7 +307,7 @@ export function createTamrielPlaces(host) {
     arenaSaid = m;
     console.log(`[places] ${m.places.length} places past the Bay on the picture: ${m.places.filter((p) => p.kind === 'city-state').length} cities (${m.places.filter((p) => p.snapped > 0).length} snapped onto their province's land, ${m.lost.length} left off), ${m.places.filter((p) => p.kind !== 'city-state').length} towns and villages`);
   };
-  /** AUDIT TESA II P7 (bible/03-World/World-Wide.md "Folded into TESA"): THE PLACES PAST THE BAY ON THE WORLD'S REGISTRY -
+  /** AUDIT TESA II P7 ("Folded into TESA"): THE PLACES PAST THE BAY ON THE WORLD'S REGISTRY -
    *  the capitals and the model's places that stand a location (world/pastBayRows.js), a LIVE list (world/worldWide/
    *  worldPlaces.js registerLive): made again whenever the places' pixels, the fit or the land move under them, so every
    *  reader of the registry - the living world's towns, the world's ports, the zone's halls - sees the towns the build
@@ -388,8 +387,7 @@ export function createTamrielPlaces(host) {
     _lairCells.rows.set(c, row);
     return row;
   }
-  /** LAIR-WORLD (2026-10-26, the owner: "with revenants and their lairs, this will work everywhere correct?"; asked, "Fix
-   *  both in this PR"): THE LAIR A PIXEL PAST THE BAY HOLDS, as the build stands it - its cell's one site (lairSite), rolled
+  /** LAIR-WORLD: THE LAIR A PIXEL PAST THE BAY HOLDS, as the build stands it - its cell's one site (lairSite), rolled
    *  and planned, on a pixel no capital, Arena place or countryside place takes first (lairOfCell, lairsNear's own row):
    *  `{ mapId, name, px, py, type, dungeonType }`, or null - on the Bay, off a cell's site, or none stands. Kept with the
    *  cells, the same on every client. The revenants' lairs (scenes/lairHost.js) and the boards' dungeons (world.js
@@ -409,7 +407,7 @@ export function createTamrielPlaces(host) {
   const placeOnPixel = (px, py) => !lairFree(px, py) || !!lairAt(px, py);
   /** LAIR-WORLD: the stamp of what the places past the Bay stand on - a board keeps a town's ground and dungeons under it. */
   const placesVersion = () => `${tamrielLandVersion()}|${arenaPlacesVersion()}|${capitalsVersion()}`;
-  /** AUDIT RELEASE R2-5e (scenes/quest/questProvinceSites.js; the owner: "Take care of exclusions and gaps"): THE
+  /** AUDIT RELEASE R2-5e (scenes/quest/questProvinceSites.js): THE
    *  COUNTRYSIDE A QUEST PAST THE BAY MAY BE SENT TO - the nearest `count` places the countryside's roll stands (TESA7:
    *  its hamlets, villages, farms, homes, inns, temples and shrines; on a pixel no capital or Arena place takes - the build
    *  stands those first) within `reach` of a pixel, north-west first: `{ mapId, name, px, py, type }`. BOUNDED BY COUNT
@@ -450,7 +448,7 @@ export function createTamrielPlaces(host) {
   /** The place the build stands on a pixel past the Bay, stood now - its own order (world.js _locationToBuild): a capital,
    *  an Arena place, the countryside, a lair; null on the Bay or where none stands. */
   const standAt = (px, py) => (inBay(px, py) ? null : capitalLocationAt(px, py) || (_arenaTemplates && arenaLocationAt(px, py)) || countryLocationAt(px, py) || lairLocationAt(px, py) || null);
-  /** BAY-LEFT-MAPS (bible/06-Systems/Travel-View.md BAY-LEFT-MAPS): THE MAP IDS A PIXEL PAST THE BAY COULD HOLD, in the
+  /** BAY-LEFT-MAPS (BAY-LEFT-MAPS): THE MAP IDS A PIXEL PAST THE BAY COULD HOLD, in the
    *  build's own order - a capital's slice (synthesizeCapitalLocation's capitalPlaceId), an Arena place (arenaPlaceId), the
    *  countryside's (countryPlaceId of the pixel's ordinal), a lair on its cell's site (lairPlaceId) - each read off its own
    *  law with no roll: no plateau summed, no name drawn, nothing stood. None on the Bay. */

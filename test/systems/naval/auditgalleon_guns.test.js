@@ -1,4 +1,4 @@
-// AUDIT GALLEON (2026-10-02, Mac: "Audit this. It must be perfect") - THE GUNS: her broadside out of her own ports
+// AUDIT GALLEON - THE GUNS: her broadside out of her own ports
 // whatever the shooter did and whoever watches. Each pin failed on the code as it stood (886da9b19).
 //   G1 the port side's shutters keep their mirror and swing up outboard, as the starboard side's do;
 //   G2 a quick click (a release without a lay) still fires every ball from a gun run out through an open port;
@@ -9,7 +9,7 @@
 //   G6 her draft in the routing table is her keel's;
 //   G7 a fast sea's long frame runs her guns out as far as its time does;
 //   G8 my look lays no battery while it reloads.
-// AUDIT GALLEON-2 (2026-10-03): G2's and G3's frames run in world.js's order, the Animators before the sea (PF1); G5's
+// AUDIT GALLEON-2: G2's and G3's frames run in world.js's order, the Animators before the sea (PF1); G5's
 // captain heeled 8 deg and each ball held to its heeled muzzle's height (TS3: her own heel there was inside the slack).
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -77,7 +77,6 @@ test('AUDIT GALLEON G1: every gunport shutter on both her sides stands outboard 
   for (const lid of lids) {
     const sgn = lid.name.includes('Starboard') ? 1 : -1;
     const pts = meshInHull(boat, lid);
-    // PIN MOVED (AUDIT GALLEON P6, 2026-10-02): fitted to her side - a shut shutter's board lies on her planking (its
     // inner face 3 mm off it, bent to it: tools/galleonLidFit.mjs), so it is held to her side's own half-breadth under
     // each vertex, not to one plumb bound 12 cm inside her widest (5.739): port 4's foot follows her side where it falls
     // in under the sill toward the bow, to 5.390; the hinge's iron eyes sit on their pin on her side, let into it by
@@ -110,7 +109,6 @@ test('AUDIT GALLEON G1: every gunport shutter on both her sides stands outboard 
 
 /** A boat's starboard battery fired by a quick click (`holdS` of lay before the release) - each gun's x and its
  *  shutter's turn on the frame its own ball leaves (my shots shake my deck once a ball: the k-th shake is gun k's).
- *  PIN MOVED (AUDIT GALLEON-2 PF1): a frame in world.js's order - csaUpdate (Come Sail Away's animate: my boats'
  *  Animators) and then navalFrame; the host ran first here, an order the game never runs, and a Play left for the
  *  Animators' next update passed. */
 function quickClick(h, holdS) {
@@ -154,7 +152,7 @@ async function pair() {
     peerBoats: () => [{ id: 'a', pos: [0, 0, 0], vel: [0, 0, 0], speed: 0, hull: HULL.SmallShip, yaw: 0, boat: aOnB }] });
   B.view.feet = [30, 0, 0];
   const animsB = animatorsOf(aOnB), animsA = animatorsOf(A.boat);
-  /** A frame of both; A's word handed to B (older: without `g`, as an older build says it). PIN MOVED (AUDIT
+  /** A frame of both; A's word handed to B (older: without `g`, as an older build says it).
    *  GALLEON-2 PF1): in world.js's order - each world's Animators (csaUpdate: animate, csaPeers.frame), then its sea */
   const tick = ({ send = true, older = false } = {}) => {
     for (const a of animsA) a.update(1 / 30);

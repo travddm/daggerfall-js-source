@@ -111,7 +111,7 @@ export const VARIANT_CHANGEABLE = Object.freeze(new Set([
 /** NextVariant, verbatim: cycle to 0 at TotalVariants, which is the
  *  ITEM TEMPLATE's `variants` column. Returns true when the variant
  *  moved (the caller refreshes the doll or the list). */
-/** Mac (2026-09-18): "hide Use for non-usables". TRUE when the ladder below has an arm for the item that
+/** . TRUE when the ladder below has an arm for the item that
  *  does something - a quest item's watch, food and water and camp gear, a book, a potion, a map, the
  *  spellbook, a drug, a light source, oil, a Used enchantment, a garment with variants to cycle. The catch-all's
  *  "Nothing happens." and the recipe's "cannot use" are the two that are not a use. */

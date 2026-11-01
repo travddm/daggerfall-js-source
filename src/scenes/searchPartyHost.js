@@ -1,11 +1,10 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 //
-// GRAVE-PARTY (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "graveyard loot on
-// headstones are able to be looted by others"; Mac's SEARCH1-PARTY: "When one player in the party interacted with it no
-// one else can again for 5 hours"): THE STREAMING HOST'S HALF OF A SEARCH'S PARTY. A Graveyard location's headstone
+// GRAVE-PARTY (FIELD BUGS 2026-10-16b,; the Discord's "graveyard loot on
+// headstones are able to be looted by others"): THE STREAMING HOST'S HALF OF A SEARCH'S PARTY. A Graveyard location's headstone
 // (SEARCH1, the activateGrave moved here) was searched in its searcher's game alone - its five hours on this save's
 // ledger, its find a pile at this player's feet - so every partymate searched the same stone again. Now:
 //   - THE PARTY LENS (systems/searchables.js setSearchParty), registered here once: my account, my party's seats and
@@ -18,7 +17,7 @@
 //     stone, so a partymate who searched before I joined the party still locks it for me.
 //   - "Already searched by <name>." (systems/searchables.js searchedText) for a stone a partymate searched.
 // NOT SHARED, above ground: the FIND - the searcher's pile stays theirs (the cell keeps no container); a partymate is
-// told who searched it. Recorded in bible/06-Systems/Searchables.md, SEARCH1-PARTY.
+// told who searched it. Recorded in, SEARCH1-PARTY.
 import { ActionTextBox } from '../ui/actionText.js';
 import { droppedLootHooks } from './droppedLoot.js';
 import { dungeonFamily, dungeonRarityTier } from '../systems/loot/lootRarity.js';
@@ -42,7 +41,7 @@ export const GRAVE_OWED_KEEP_MS = 10 * 60 * 1000;
 export const GRAVE_OWED_MAX = 32;
 export const GRAVE_BOOK_MAX = 256;
 /** A stone's place - `g<px>,<py>`, world.js graveTargets' `loc` - read back to its map pixel. AUDIT RELEASE R2-3
- *  (bible/01-Overview/audits/Audit-Release-R2.md): the world's pixel (net/wire.js WORLD_PIXEL_BOUND, four digits and a
+ * : the world's pixel (net/wire.js WORLD_PIXEL_BOUND, four digits and a
  *  sign) - a lair's graveyard past the Bay stands at `g-150,1912`, and its stones were owed to no cell, so a partymate
  *  searched one again (GRAVE-PARTY's own field bug, past the Bay). */
 export const GRAVE_LOC_RE = /^g(-?\d{1,4}),(-?\d{1,4})$/;

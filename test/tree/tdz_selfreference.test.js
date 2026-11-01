@@ -4,7 +4,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// THE SELF-REFERENCE GUARD (2026-08-31). A `const X = { ...X }` is a
+// THE SELF-REFERENCE GUARD. A `const X = { ...X }` is a
 // TEMPORAL DEAD ZONE error the moment the module body runs - "can't
 // access lexical declaration 'X' before initialization" - and nothing
 // in the gate caught one: eslint's no-use-before-define does not look

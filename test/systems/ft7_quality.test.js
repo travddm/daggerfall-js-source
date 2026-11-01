@@ -1,5 +1,4 @@
-// FT7 - THE TWO QUALITY TIERS OF THE ENHANCED OUTDOORS (2026-09-14, the
-// Features arc): Grass density and Cloud quality (PERF1) leave the
+// FT7 - THE TWO QUALITY TIERS OF THE ENHANCED OUTDOORS: Grass density and Cloud quality (PERF1) leave the
 // Enhanced category for the home. The audit: both are the port's own
 // dials, both inert unless the outdoors row is on (world.js gates the
 // grass on enhancedEnvironments; the clouds ride the enhanced lane) -

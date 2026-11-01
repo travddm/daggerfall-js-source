@@ -1,5 +1,5 @@
 // HUD-SADDLE (FIELD BUGS 2026-10-14, Discord: "Riding Window is not able to be edited in the HUD Editor (Alt+U)" - and
-// "the horse care toggle in the settings menu doesn't seem to work"; bible/01-Overview/bugs/Field-Bugs-2026-10-14-riding-panel.md).
+// "the horse care toggle in the settings menu doesn't seem to work").
 //
 // THE RIDING PANEL IS A HUD PIECE. The saddle panel (ui/enhanced/enhancedSaddle.js, STEED-UI) shipped ten days after HUD-MOVE
 // (ui/hud/hudLayout.js) and never joined its registry, so Alt+U framed the compass, the boss bar, the target bar and the
@@ -7,7 +7,7 @@
 // over a page that answers the selectors HUD-MOVE asks (descendants among them - the panel's bar stands inside its
 // whole-screen layer) with the real sweep, the real panel and the real editor's key and handles.
 //
-// THE SWITCH. Horse care's tile was traced to every reader and found sound; Mac's word on it (2026-10-15) made it tiers
+// THE SWITCH. Horse care's tile was traced to every reader and found sound; Mac's word on it made it tiers
 // on the one key, each player's own online - HORSE-TIERS, pinned end to end by test/systems/horsetiers.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

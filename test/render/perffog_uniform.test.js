@@ -1,5 +1,4 @@
-// PERF-FOG (2026-09-19, the PERF-SUN sweep: Mac, "keep looking for
-// improvements") - A UNIFORM WAS BEING DECODED ONCE A FRAGMENT.
+// PERF-FOG - A UNIFORM WAS BEING DECODED ONCE A FRAGMENT.
 //
 // `elFinish` runs in every lane shader there is - the terrain, the meshes,
 // the rigs and every flat in the world - and it opened with
@@ -9,8 +8,7 @@
 // them. GLSL has nowhere to hoist a uniform-only expression to, so the
 // only place it can be computed once is the host.
 //
-// EL-DISTANCE (2026-09-25, Mac: "It almost gives this weird darkness/foggy
-// look to distant terrian which I really dont like") took the rest of the
+// EL-DISTANCE took the rest of the
 // way: the lane blends the fog in DISPLAY space now, as the classic lane
 // does, so the fog colour is used exactly as the host sends it and no
 // fragment - and no host - decodes it at all. PERF-FOG's law (never a

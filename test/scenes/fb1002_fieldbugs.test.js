@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-02 - the three that are not the climb (test/player/fb1002_climb.test.js holds those). The third,
-// HUNT-FOES (a foe come near the text hunt's box), retired with the hunt itself (2026-10-04); two stand:
+// HUNT-FOES (a foe come near the text hunt's box), retired with the hunt itself; two stand:
 //   HELM-NET  - Cruor: "New fishing context pop up clashes with come sail away! Gets in the way especially when trying
 //               to aim bow guns";
 //   HELM-HUSH - (relayed) "audio cutting when taking helm of a ship".

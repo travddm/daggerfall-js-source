@@ -153,7 +153,7 @@ test('mwnifmesh: skinned fixture emits as bind-pose preview, marked skinned', ()
   assert.equal(b.normals, null);
 });
 
-// ── MWT2 (2026-09-17, Mac: the Morrowind model's torch "isnt lit") ──────
+// ── MWT2 ──────
 //
 // THE EMISSION THIS FILE RESOLVED AND NOBODY READ. `resolveMaterial` has
 // always ported the reference's two emissive laws - LightMode_Emissive
@@ -209,7 +209,7 @@ test('MWT2 emissiveAt: the vertex colour IS the emission where the mode names it
   assert.deepEqual(diffuseAt_MWT2(null, colors, 0), [1, 1, 1]);
 });
 
-// AUDIT GATHER-FEEL II (2026-10-13, the re-judge of every record on the files GATHER-FEEL II moved): the by-source pin
+// AUDIT GATHER-FEEL II: the by-source pin
 // above matches `vertexAttribPointer(4, 3, gl.FLOAT, false, stride, 44)` ANYWHERE in the renderer, and MWNPC1's skinned
 // mesh (createSkinnedCharacterMesh) carries the same line - so the rigid mesh's own offset was unguarded, and
 // MWT2-the-attribute-is-never-enabled-so-the-channel-reads-the-constant survived (on the base commit too). Driven now.

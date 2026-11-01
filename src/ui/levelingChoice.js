@@ -1,5 +1,4 @@
-// ORL1 (2026-09-17, Mac: "On new game, I want the player to receive a
-// notification on which leveling system they would like to use") - THE
+// ORL1 - THE
 // LEVELING CHOICE, the last screen of making a character.
 //
 // ── WHY IT IS A SCREEN AND NOT A CHARGEN STAGE ────────────────────
@@ -183,7 +182,7 @@ export class LevelingChoiceScreen {
   }
 
   /** The answer, once, however many doors call it (the other half of
-   *  the law bible/Home.md states for a host slot's occupant). */
+   *  the law states for a host slot's occupant). */
   answer(id) {
     if (this._fired) return false;
     this._fired = true;
@@ -270,9 +269,7 @@ export class LevelingChoiceScreen {
    * A click on an option picks it AND answers, which is the one-press
    * behaviour every other picker in the wizard has.
    *
-   * LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down
-   * switches between the options instead of letting you hover and
-   * select"): THIS SEAM IS THE CANVAS FACE'S POINTER, AND ONLY ITS. The
+   * LEGACY-POINTER (FIELD 2026-10-06): THIS SEAM IS THE CANVAS FACE'S POINTER, AND ONLY ITS. The
    * hosts hand it every mousemove from a listener on the WINDOW
    * (world.js, exterior.js), so it fired over the Plus face as well and
    * mapped the pointer onto the canvas face's ROWS - which the Plus face

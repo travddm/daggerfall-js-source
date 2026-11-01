@@ -1,4 +1,4 @@
-// MAC1 (2026-09-10) - MAC'S PLAY REPORT, the fixes with a mechanism.
+// MAC1 - MAC'S PLAY REPORT, the fixes with a mechanism.
 //
 // The ledger's own note on yield: "Mac playing the game" finds the bugs
 // no audit finds, because each looks correct from its own module. Ten

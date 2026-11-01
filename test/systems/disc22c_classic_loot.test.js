@@ -1,5 +1,4 @@
-// DISC22-C (2026-09-24, Satranath on Discord: "no hotbar or quickloot on grimoire either, i think i will stick with
-// the enhanced ui"; Mac: "The screenshot of the parchment is a spritesheet to be used for the loot menu (grimoire UI)").
+// DISC22-C.
 //
 // THE GAP: quick loot's law never had DOM in it, but the one gate over the whole resolve (worldPlaqueOn - enhanced
 // and not touch) was the DOM plaque's, so on the classic skins no frame was resolved, no row was ever lit, and the

@@ -1,8 +1,6 @@
 // @ts-check
-// ARENA4 (2026-10-02, Mac: "Players can choose to watch AI fights, player fights, join a team (red and blue) and climb
-// esclating tiers of opponents, or choose to matchmake for a real opponent to take on in real time"; "Being the #1 pvp
-// arena player comes with it's own temporary title/glyph"): THE ARENA ONLINE, AS LAW - what the relay, the account
-// service and the game all read the same way. Design: bible/11-Multiplayer/Arena.md "7. Online".
+// ARENA4: THE ARENA ONLINE, AS LAW - what the relay, the account
+// service and the game all read the same way. Design: "7. Online".
 //
 //   THE ROOMS     `arena:hall` (the queue, the offers, the list of live bouts), `arena:b<16 hex>` (one bout's floor:
 //                 its fighters, its spectators, the relay's referee and, on the ladder, its AI fighters) and (ARENA4b)
@@ -42,8 +40,7 @@ export const isArenaExhibitionRoom = (key) => ARENA_EX_ROOM_RE.test(String(key ?
 export const arenaExhibitionRoom = (hour) => `arena:x${Math.max(0, Math.floor(Number(hour) || 0))}`;
 /** The hour out of an exhibition room's key, or null. */
 export const arenaExhibitionHourOf = (key) => { const m = ARENA_EX_ROOM_RE.exec(String(key ?? '')); return m ? Number(m[1]) : null; };
-/** ARENA6 (2026-10-03, the owner: "a way to simply host private matches ... a session where people can join, watch,
- *  participate, and allow the host of the session to choose who is fighting and who is in the crowd"): A PRIVATE
+/** ARENA6: A PRIVATE
  *  SESSION'S ROOM, `arena:p<code>` - six of an alphabet with no letter or digit read as another (no I, L, O, 0 or 1), so
  *  a code read off a stream is typed right. Its sessions' bouts stand on the floor as every other bout's do. */
 export const ARENA_PRIVATE_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -88,7 +85,7 @@ export const ARENA_SEASON_S = 8 * 7 * 24 * 3600;
 export const arenaSeasonOf = (nowS) => Math.max(1, Math.floor((Math.floor(Number(nowS) || 0) - ARENA_SEASON_EPOCH_S) / ARENA_SEASON_S) + 1);
 /** When a season ends (its last second's successor), epoch seconds. */
 export const arenaSeasonEndsS = (season) => ARENA_SEASON_EPOCH_S + Math.max(1, Math.floor(season)) * ARENA_SEASON_S;
-/** EG-E (bible/11-Multiplayer/Elite-Gates.md section 19): THE ARENA WEEK holding `nowS` - 0 the season epoch's first, seven
+/** EG-E: THE ARENA WEEK holding `nowS` - 0 the season epoch's first, seven
  *  days each, Monday 00:00 UTC to Monday; the week an Elite Breach's Redoubt pays once an account in (server-account/src/eg.js),
  *  the Spire's Proclamation's (net/eliteGates/egLaw.js egProclamationOf) and the Broker's Panoply sink's. Never before the epoch's. */
 export const ARENA_WEEK_S = 7 * 24 * 3600;
@@ -244,7 +241,7 @@ export function arenaLadderBout(tier, bout) {
 }
 
 // ── AUDIT ARENA-LADDER: THE RELAY'S TELEGRAPHED BLOWS ─────────────────────────────────────────────
-// (the owner, 2026-10-05: "Ensure AI enemies sometimes receive telegraphed attacks"). The relay's fighters throw the
+// . The relay's fighters throw the
 // foes' three shapes (ai/blowShapes.js - the leaf the relay reads) by the tactics' own law: of the tier that telegraphs
 // (ai/foeBlows.js BLOW_TIER_LEVEL, or an elite - a champion), its cooldown spent, a roll - at whoever it fights, a
 // player or another fighter. The constants are the brain's, pinned equal.
@@ -367,7 +364,7 @@ export const ARENA_SPELL_MAX = 60;
 export const ARENA_SPEED_MAX = 12.5;
 export const ARENA_SPEED_SLACK = 0.5;
 /** DFU's CalculateWeaponMaxDamage, verbatim case groups, by template (characters/weapons.js, pinned) - the bows one
- *  higher, BAL-ARCHERY's (bible/05-Combat/Balance-Arc.md section 18). */
+ *  higher, BAL-ARCHERY's. */
 export const ARENA_WEAPON_MAX = Object.freeze({ 113: 6, 114: 8, 115: 8, 116: 8, 117: 10, 118: 12, 119: 12, 120: 16, 121: 16, 122: 18, 123: 21, 124: 12, 125: 14, 126: 18, 127: 12, 128: 16, 129: 17, 130: 19 });
 /** DFU's weapon material modifier (combat/formulas.js WEAPON_MATERIAL_MODIFIER, pinned), by material 0..9. */
 export const ARENA_MATERIAL_MOD = Object.freeze([-1, 0, 0, 1, 2, 3, 3, 4, 5, 6]);

@@ -1,4 +1,4 @@
-// UNSAVED-MARK (FIELD BUGS 2026-10-11, bible/01-Overview/bugs/Field-Bugs-2026-10-11.md): "I am trying to set a hotkey for
+// UNSAVED-MARK (FIELD BUGS 2026-10-11): "I am trying to set a hotkey for
 // 'Overworld' ... It shows that my selected key is set, but when I close the UI and try to use the hotkey, it doesn't
 // work. Checking the settings page after shows that it just didn't save." Nothing in TravelView's road was broken: the
 // key pane STAGES until Confirm (FIX-F's law, kept), and the player never saw a Confirm owed - a staged key drew exactly

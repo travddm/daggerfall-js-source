@@ -1,6 +1,6 @@
 // UNSTUCK-OUT (FIELD BUGS 2026-10-08, SaberGGaming: "Invisible walls around mountains often gets you stuck. Using the
 // overhead map and traveling around caused this ... I had to end up dying to respawn somewhere else cause unstuck didnt
-// work"; Sahh: "I got stuck inside a mountain during fast travel"; bible/03-World/Player-Arc.md UNSTUCK-OUT). World of
+// work"; Sahh: "I got stuck inside a mountain during fast travel"; UNSTUCK-OUT). World of
 // Daggerfall's mountain rocks are meshes scaled by hundreds; the collider holds both faces of a skin and the renderer
 // culls the back ones, so from inside a rock its walls are invisible and hold the body in - and `/unstuck` refused
 // outdoors. The nearest open ground (player/enterExit.js openGroundNear) answers both: a fast-travel landing held in a

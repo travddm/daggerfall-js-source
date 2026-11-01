@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS C9, C11 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed.
-// No exceptions."; bible/10-UI/Held-Map-Arc.md BAY-LEFT-MAPS) - THE HELD MAP'S FIND BOX AND ITS SMALL GAPS PAST THE BAY.
+// BAY-LEFT-MAPS C9, C11 - THE HELD MAP'S FIND BOX AND ITS SMALL GAPS PAST THE BAY.
 //
 // C9: the Find box (the travel map's, the Portal Stone's, the teleport map's) indexed MAPS.BSA's 62 regions alone, so
 // Solitude, Whiterun, the Imperial City - every one of the 296 names past the Bay - was never found. It reads the

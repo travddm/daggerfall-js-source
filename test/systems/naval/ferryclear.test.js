@@ -1,9 +1,8 @@
-// FERRY-CLEAR (2026-10-24, Discord - "Ferrys still unstable": "Had several issues with the ferry ramming a neighbour ship
-// till it broke, or running ashore") - THE NAVAL HOST'S HALF: the sea's ships afloat are what the journey's hand steers
+// FERRY-CLEAR - THE NAVAL HOST'S HALF: the sea's ships afloat are what the journey's hand steers
 // round (a booked ship's master never rammed either - her stem in a neighbour's side broke one or the other, the passenger
 // charged with piracy for it - and since BOARD-MAGNET no stem rams at all: boardmagnet.test.js) (the host's `hullAlong`, over systems/naval/seaClearance.js). The hand's own half, lifted
 // from world.js over Come Sail Away's real runtime, is test/systems/auditships_sail.test.js FERRY-CLEAR. The law is
-// bible/03-World/Passage.md FERRY-CLEAR.
+// FERRY-CLEAR.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HULL } from '../../../src/systems/naval/navalShips.js';

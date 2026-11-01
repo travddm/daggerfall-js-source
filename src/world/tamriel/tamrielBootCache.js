@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT RELEASE R4-4 (bible/01-Overview/audits/Audit-Release-R4.md; the owner: "Take care of exclusions and gaps") - THE
+// AUDIT RELEASE R4-4 () - THE
 // BOOT'S CONTINENT, KEPT. Every boot, a returning one too, traced the picture (TMAP00I0 + TAMRIEL2), masked the
 // relief and fitted the Bay to the picture - the same answers from the same inputs, some 0.5-1 s of the page's thread.
 // They are kept in IndexedDB under a print of their inputs - the two pictures' bytes, the palette the trace reads them

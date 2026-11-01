@@ -1,5 +1,4 @@
-// MENU-RELOCK (2026-09-22, Fedu on Discord: a 1-3 second delay before
-// the camera answers the mouse again after closing a menu).
+// MENU-RELOCK.
 //
 // POINTER LOCK IS ONLY GRANTED INSIDE A USER GESTURE. The browser hands
 // `requestPointerLock` out on the keypress or click the player just

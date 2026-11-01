@@ -1,4 +1,4 @@
-// MWNPC9b (2026-10-09, the MW-NPC arc's ninth slice - bible/04-Characters/Morrowind-NPCs.md section 14b): A CREATURE'S
+// MWNPC9b: A CREATURE'S
 // BODY ON THE RIG. combat/fpArm.js builds a creature from its CREA record (buildCreatureBody: the last master's record,
 // rule 18's x-model, assembleCreature, its sources) and stands it in third person at once - a creature has no first.
 // A non-biped animates as OpenMW's CharacterController animates one: its bare idle and walk whatever it has drawn (no
@@ -148,7 +148,6 @@ test('MWNPC9b-8 THE MATCH, a census: every creature mobile named - a Morrowind c
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.Mummy].creature, ['draugr']);
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.Spriggan].creature, ['bm_spriggan']);
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.SkeletalWarrior].creature, ['skeleton warrior', 'skeleton']);
-  // PIN MOVED (MWNPC13, Morrowind-NPCs.md section 18): the translucent dead stand as Morrowind's ancestor ghost, veiled
   assert.ok(CREATURE_MATCH[MOBILE_TYPES.Ghost].veil && CREATURE_MATCH[MOBILE_TYPES.Wraith].veil, 'the translucent dead seen through');
   for (const t of [MOBILE_TYPES.Orc, MOBILE_TYPES.OrcSergeant, MOBILE_TYPES.OrcShaman, MOBILE_TYPES.OrcWarlord, MOBILE_TYPES.Vampire, MOBILE_TYPES.VampireAncient]) assert.ok(CREATURE_MATCH[t].miss, `${t}: a person, not a creature`);
   // the look: one frozen object a kind (a body key), none for a person or a miss

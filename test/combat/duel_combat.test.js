@@ -1,4 +1,4 @@
-// DUEL1 (2026-09-24, Mac: duels - asked, "Yes: weapons, bows, spells"; "Loser drops to 1HP"): THE BLOW BETWEEN TWO
+// DUEL1: THE BLOW BETWEEN TWO
 // DUELLISTS, DRIVEN. The stub the defender stands up from the wire's sheet IS the striker, to the formula - the same
 // damage roll for roll as the striker's own entity would deal, with DFU's formula and with the physical-combat
 // overhaul; its numbers never pop on the defender's HUD; the floor that stops a duel's blow at 1 health (and only a
@@ -32,7 +32,7 @@ const SWORD = 118;   // a Long Blade's template (characters/weapons.js weaponSki
 const AXE = 127;     // an Axe's - a weapon whose skill slot is NOT the long blade's
 
 /** The strike a striker's own game rolls (scenes/world.js duelStrikeOut, siegeStrikeOut): its sheet, its weapon, its
- *  swing. PIN MOVED (INT8, bible/06-Systems/Integrity-Arc.md lane 2): this was the frame a striker's host SENT, through
+ *  swing.
  *  the relay's law, for the DEFENDER to resolve - a sheet rides no wire now (the referee clips the striker's number), and
  *  the same strike is rolled on the striker's own machine against the neutral stand-in (AUDIT C&C H5: a stand-in of
  *  its own sheet, until then - combat/duelCombat.js duelStandIn). */
@@ -76,7 +76,6 @@ test('DUEL1 the sheet the wire carries: level and attributes clamped at the hone
   assert.equal(a.sk[0], 100, 'Long Blade, the longsword\'s, clamped');
   assert.equal(duelAttackerOf(big, null).sk[0], 20, 'a fist\'s first slot is HandToHand');
   assert.deepEqual(a.cf, [0, 0x00070000, 0]);
-  // PIN MOVED (INT8): 'clamped, it passes' the relay's law - a sheet rides no wire now; a strike carries its number
   assert.equal(validDuelData({ to: 'peer-0002', s: 'abc123def0', k: 'strike', n: 1, by: 'melee', p: [1, 1, 1], a }), null, 'a sheet and no number: refused');
   const w = createWeapon(SWORD, 3, () => 0.5);
   w.currentCondition = Math.round(w.maxCondition / 4);

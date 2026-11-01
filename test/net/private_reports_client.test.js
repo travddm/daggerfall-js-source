@@ -1,4 +1,4 @@
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): THE
+// PRIVATE-REPORT: THE
 // CLIENT'S SIDE - net/privateReport.js ReportDesk over the real service (a send, its rid, my list, a reader's inbox), the
 // PostBox's reader count and its notice, ui/enhanced/enhancedReport.js's panes in the mailbox's window, and `/bug`.
 import { test } from 'node:test';

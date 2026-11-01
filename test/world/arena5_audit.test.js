@@ -1,5 +1,5 @@
-// ARENA5 (2026-10-03): THE AUDIT'S FIXES - each open item the four records left that the audit closed, driven. The
-// audit itself (every slice re-read against bible/11-Multiplayer/Arena.md, the probes, the mutants) is its record there.
+// ARENA5: THE AUDIT'S FIXES - each open item the four records left that the audit closed, driven. The
+// audit itself (every slice re-read against, the probes, the mutants) is its record there.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { useSmallerDungeon, dungeonLocationFor } from '../../src/world/smallerDungeons.js';

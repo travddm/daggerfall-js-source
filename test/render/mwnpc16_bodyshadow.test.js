@@ -1,5 +1,4 @@
-// MWNPC16 (2026-10-11, a player's screenshot via Mac: "With morrowind assets attached. Old sprite shadows still show" -
-// bible/04-Characters/Morrowind-NPCs.md section 24): A MORROWIND BODY CASTS ITS OWN SHAPE. MWNPC1 turned a GPU-skinned
+// MWNPC16: A MORROWIND BODY CASTS ITS OWN SHAPE. MWNPC1 turned a GPU-skinned
 // body away at the shadow pass's door and MWNPC5b kept each NPC's classic billboard in the pass to cast for it
 // (`castOnly`) - so a man in Morrowind's steel threw a Daggerfall sprite's silhouette on the wall. The body now replays
 // through the world's own skinned vertex shader off its palette, a run of its ranges in one depth draw, and the flat
@@ -174,10 +173,9 @@ test('MWNPC16d the rig: drawThird records its body for the maps where it is aske
   arm.update(1 / 60, { pose: true });
   const proj = perspective(1, 1, 0.1, 100), view = lookAt([0, 1.6, 4], [0, 1, 0], [0, 1, 0]);
   const at = { proj, view, eye: [0, 1.6, 4], feet: [2, 0, -1], yaw: 0.7 };
-  const cv = { clientWidth: 480, clientHeight: 480 };   // PIN MOVED (BODY-CROP, 2026-10-22): the picture is cut to the screen, so the canvas has a size
+  const cv = { clientWidth: 480, clientHeight: 480 };
   assert.equal(arm.drawThird(cv, at), true);
   assert.equal(cast.length, 0, 'not asked: nothing recorded (the player\'s own, a peer\'s)');
-  // PIN MOVED (BODY-CROP, 2026-10-22): the sphere is measured against the card's quad - the box as it is pictured - under
   // the Billboard Look; the main camera's own picture is the box's window rounded out to whole texels, and a fixture body
   // a few centimetres tall is a texel or two of it
   setPref('mwBillboardLook', true);

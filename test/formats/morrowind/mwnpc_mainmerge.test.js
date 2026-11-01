@@ -1,4 +1,4 @@
-// MW-NPC x MAIN (2026-10-10, the arc's merge of main #723-#744 - bible/04-Characters/Morrowind-NPCs.md section 22):
+// MW-NPC x MAIN:
 // what main learned while the arc was on its branch, met on the merged tree. MWNPC1 moved every third-person body's
 // skin into the vertex shader, and three of main's slices since do per-pose work on the CPU skin that the GPU's pose
 // never ran: MW-SMOOTH lights a mesh by its own normals, posed (pinned with the stream's law in
@@ -130,7 +130,7 @@ test('MW-BOW1 x MWNPC1: the rig - a third-person body whose part moved on its ow
 
 const GEAR = [['w_claymore_daedric_sh.nif', 'Bip01 LongBladeTwoClose'], ['w_iron_longsword_sh.nif', 'Bip01 LongBladeOneHand']];
 // MW-CAPE-RIGID: the cloak rides the chest alone, so a stride moves none of it and turns no gear - the chest leant back
-// swings its hem onto the hip-hung sword (PIN MOVED: these were the two strides)
+// swings its hem onto the hip-hung sword (
 const LEANS = [{ 'bip01 spine2': -10 }, { 'bip01 spine2': -5 }];
 
 test('AUDIT MW-CLOAK x MWNPC1: a cloak whose batch was replaced skins by another batch, so its layout is not the old one\'s; and the gear goes with the cloak on a GPU pose as on a CPU one - placed by the palette where the CPU places it, the cloak alone skinned for it', async () => {
@@ -223,5 +223,5 @@ test('ORG2 x MWNPC5b: the Morrowind People row stands on the one Settings screen
   const at = whereIs('feat:mw-npc-bodies');
   assert.equal(at?.tab.id, 'combat');
   assert.equal(at.section.id, 'morrowind');
-  assert.deepEqual(at.section.items, ['feat:mod-weapon-sheathing', 'feat:steel-helm', 'feat:beast-footwear', 'feat:beast-helmets', 'feat:mw-spell-effects', 'feat:mw-body-motion', 'feat:mw-npc-bodies', 'feat:mw-billboard-look', 'feat:mw-model-detail', 'feat:npc-marks']);   // PIN MOVED (BEAST-BOOTS, 2026-10-24): Beast Footwear and Beast Helmets beside the Steel Helm; PIN MOVED (BODY-MOTION, 2026-10-18): the Morrowind Body Motion beside the spell effects; PIN MOVED (BODY-CARD): the Billboard Look beside Morrowind People; PIN MOVED (NPC-MARKS, 2026-10-21): the People Marks after them; PIN MOVED (MW-DETAIL, 2026-10-22): the Morrowind Model Detail beside the Billboard Look
+  assert.deepEqual(at.section.items, ['feat:mod-weapon-sheathing', 'feat:steel-helm', 'feat:beast-footwear', 'feat:beast-helmets', 'feat:mw-spell-effects', 'feat:mw-body-motion', 'feat:mw-npc-bodies', 'feat:mw-billboard-look', 'feat:mw-model-detail', 'feat:npc-marks']);
 });

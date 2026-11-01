@@ -45,9 +45,8 @@ import { spendOwnMends } from './item/foundMark.js';   // RPT1026-LEDGERLAW: a p
  *  rank scaling; every other guild returns the price unchanged).
  *  NOTE the condition/max pair gates the zero alone - DFU's repair
  *  price does NOT scale with how damaged the item is. */
-/** REPAIR-RATE (2026-10-01, the economy arc - bible/06-Systems/Economy-Arc.md, repairs "exist to limit outings and force
- *  planning. Their function is not to remove money from the economy"): every repair costs a THIRD of what Daggerfall's
- *  formula asks - REPAIR-EASE (2026-09-30, Mac: "nerf repair costs") had it at two thirds - offline and online, every
+/** REPAIR-RATE: every repair costs a THIRD of what Daggerfall's
+ *  formula asks - REPAIR-EASE had it at two thirds - offline and online, every
  *  shop and guild, applied after the guild discount, floored at 1. */
 export const REPAIR_COST_SCALE = 1 / 3;
 /** AUDIT REPAIR-EASE F4: and no instant-repair premium. Roleplay & Realism: Items prices an instant repair at 0.9 of
@@ -207,7 +206,7 @@ export function repairWhole(item) {
   return item;
 }
 
-/** UXB1-K (2026-09-25, the UX backlog: "Countdown timer/estimate for repairs when not instant."): WHEN A JOB IS READY.
+/** UXB1-K: WHEN A JOB IS READY.
  *  The done-time repairStatusLabel reads, as numbers a screen can count down: a BOOKED job's committed timeStarted +
  *  repairTime, or - for a job only staged at the counter - now plus the scheduler's own estimate (updateRepairTimes
  *  with commit false, the pass FilterRemoteItems ends with, :725). Null when nothing is owed: an unbooked item at full

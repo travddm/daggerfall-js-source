@@ -1,7 +1,4 @@
-// A2-WHOLE (2026-09-22, Discord - The Craziest Angel: "boot failed:
-// ARCH3D.BSA: 404 - not in the stored ARENA2 selection ... keep getting
-// this error even after uninstalling the daggerfall from steam and
-// reinstalling").
+// A2-WHOLE.
 //
 // The picker stored ANY folder holding one Daggerfall file as a complete
 // game, and the stored manifest then kept the picker from ever coming

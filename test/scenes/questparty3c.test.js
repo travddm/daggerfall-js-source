@@ -1,4 +1,4 @@
-// QUEST-PARTY phase 3c (2026-09-26, Mac: "Dungeons and buildings"). A quest foe past a dungeon's layout run was every
+// QUEST-PARTY phase 3c. A quest foe past a dungeon's layout run was every
 // client's private object - in no frame (the ONLINE-DUNGEON-FOES flag's NOT SYNCED) and blind to every peer (its NOT
 // REACTIVE) - so two party members on one dungeon quest each fought their own copy of the vampire, and neither could
 // strike the other's. A quest the party SHARES now streams its foes on the room's own lane (OWN1) to the party alone,
@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import * as acorn from 'acorn';
 import { validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, CELL_LOOSE_PUPPETS, FOES_FRAME_MAX } from '../../src/net/wire.js';
 import { validQuestTags, questMarkerYields, QUEST_PUPPETS_MAX, validLooseSeqs, companionNames } from '../../src/scenes/exteriorFoes.js';
-import { summonedWord, summonedRecord, markSummoned } from '../../src/systems/foeLootCap.js';   // PIN MOVED (RPT1026-PROGRESS, test/scenes/rpt1026_progress_peersummon.test.js): the own lane names its summons and marks their puppets
+import { summonedWord, summonedRecord, markSummoned } from '../../src/systems/foeLootCap.js';
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   // AUDIT MW-NPC II K3: the dungeon context's look seed, in the mounted scope
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the mounted scope
 import { bossClockS } from '../../src/systems/bossTraits.js';
@@ -87,7 +87,7 @@ function side(self, { layout = [], own = [] } = {}) {
     _layoutFoes: layout.length, foes, _authority: true, _encId: undefined, _ctxDead: false, _locationKey: 'dungeon:7',
     _ownSeq: 0, _ownFrameSeq: 0, _ownGen: 0, _ownPups: new Map(), _ownPending: new Map(), _ownOwners: new Map(), _ownPendLoose: new Set(), _ownAdopted: new Map(), _ownKept: new Map(),
     FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, QUEST_PUPPETS_MAX, CELL_LOOSE_PUPPETS, LOOSE_PUPPETS_MAX: 24, HIT_DMG_MAX: 10000, FOES_FRAME_MAX,
-    isClassEnemyId, enemyEntityType, validFoeRecord, validQuestTags, validLooseSeqs, companionNames, questMarkerYields, summonedWord, summonedRecord, markSummoned, GENDER_BIT: ['male', 'female'],   // PIN MOVED (AUDIT WK-U3, 2026-10-01): the own lane reads companions' names beside their places
+    isClassEnemyId, enemyEntityType, validFoeRecord, validQuestTags, validLooseSeqs, companionNames, questMarkerYields, summonedWord, summonedRecord, markSummoned, GENDER_BIT: ['male', 'female'],
     _sharedFoe: () => false, fightN: () => 1, canStandFoe: () => true,
     applyFoeRecord: (f, r) => { if (r.f) f.ai.feet = [...r.f]; if (Number.isFinite(r.h)) f.entity.health = r.h; if (r.d === 1) f.dead = true; f._pup = { feet: [...(r.f ?? f.ai.feet)], yaw: r.y ?? 0 }; },
     buildFoeAt: async (e) => { const f = foe({ mobileType: e.mobileType, gender: e.gender, ai: { feet: [e.x, e.y, e.z], yaw: 0, resumeLive() { this.resumed = true; } } }); built.push(f); foes.push(f); return f; },
@@ -325,7 +325,7 @@ test('QUEST-PARTY 3c by source: the blow on a party member\'s quest foe goes to 
   assert.match(W, /if \(ids\) modes\?\.pruneOwnOwners\?\.\(ids, now, FOES_STALE_MS\); \}/);
 });
 
-// ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): the own lane's findings, each executed
+// ---- AUDIT (the pre-merge audit, 2026-09-27): the own lane's findings, each executed
 // over the same mounted statements.
 
 test('AUDIT pre-merge D2: a handover names ONE heir - a member it did not name lets the owner\'s foe go when the owner leaves, never adopts it too; an owner gone quiet keeps what it stands; a foe I took is its owner\'s again when the owner streams it alive', async () => {

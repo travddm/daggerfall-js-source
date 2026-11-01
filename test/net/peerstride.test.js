@@ -1,5 +1,4 @@
-// PEER-BUZZ (2026-09-22, Discord through Mac: "footstep sounds are broken",
-// with a 52-second recording of a continuous buzz): a peer's stride
+// PEER-BUZZ: a peer's stride
 // machine was fed the WIRE's coordinates (AUDIT DROPS E5), and in the
 // overworld the wire's frame is world coordinates - 32768 per map pixel
 // against the scene's 819.2, forty scene units to one. Every 2.5 wire

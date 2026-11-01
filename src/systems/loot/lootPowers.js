@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT4 (2026-10-01) — THE KIT: WHAT A PIECE DOES.
+// LOOT4 — THE KIT: WHAT A PIECE DOES.
 //
-// The Loot arc (bible/06-Systems/Loot-Arc.md section 6; Mac: "Do you
-// wanna turn this into an arc and do all of the above?"). LR1's six
+// The Loot arc (). LR1's six
 // affix kinds are numbers a wearer carries, folded onto the entity
 // (systems/loot/lootRarity.js affixFold). Five more DO something, and they do
 // it here, through the seams the Sigil Sets opened (SET2) - registered at
@@ -80,7 +79,7 @@ import { KNIGHT_CITY_WATCH } from '../../characters/mobile/mobileTypes.js';
 import { healthShare } from '../../combat/healthShare.js';   // FIELD BUGS 2026-10-18f RELAY-SHARE: a body's share of its health, the one law
 import { regenShare } from '../courtRules.js';   // AUDIT WORLD-EVENTS L1-3: Hist-Sap is a natural regeneration - a made level holds it
 
-/** All the thorns a wearer's pieces sum to, at most, a blow. BAL5 (bible/05-Combat/Balance-Arc.md section 11): 10, the
+/** All the thorns a wearer's pieces sum to, at most, a blow. BAL5: 10, the
  *  top of a Legendary line's band and a Legendary sear's own most - it was 25, a whole endgame swing paid back on every
  *  blow that landed, past every foe's armour and the metal it asks of a weapon (an Ancient Lich killed by standing still). */
 export const THORNS_CAP = 10;
@@ -90,12 +89,12 @@ export const FOCUS_CAP = 30;
 export const SPELL_CUT_MOST = 50;
 /** CAST-SPEED: all the casting speed a wearer's pieces sum to, at most (%). */
 export const CAST_SPEED_CAP = 30;
-/** BAL7 (bible/05-Combat/Balance-Arc.md section 13): all the leech a weapon's lines and gems sum to, at most (%) - the
+/** BAL7: all the leech a weapon's lines and gems sum to, at most (%) - the
  *  top of a Legendary line's band, as THORNS_CAP is. Summed uncapped, an Exalted line and a Perfect Emerald healed 17% of
  *  every landed blow, and the heal grew with every point of offence: the measured kit without a guard went from 6.6
  *  Ancient Liches in a Dragon's Den before it fell to 49.7. */
 export const LEECH_CAP = 10;
-/** BAL9c (bible/05-Combat/Balance-Arc.md section 15): all the potency a wearer's pieces sum to, at most (%) - focus's and
+/** BAL9c: all the potency a wearer's pieces sum to, at most (%) - focus's and
  *  castSpeed's own 30. */
 export const POTENCY_CAP = 30;
 /** BAL9c: all the loot adds to a damage spell's landing, potency and powers together, at most (%) - SPELL_CUT_MOST's 50. */
@@ -108,7 +107,7 @@ const mine = (e) => !!e?.isPlayer && !e.peer;
 /** A piece's valid lines of one kind - none with the switch off (off is DFU exactly). */
 export function linesOf(item, id) {
   if (!lootRarityOn() || !Array.isArray(item?.affixes)) return [];
-  return readLines(item).filter((a) => a?.id === id && validAffix(a));   // GEM1: a piece's gems as law 6 holds them (bible/06-Systems/Gem-Sockets.md)
+  return readLines(item).filter((a) => a?.id === id && validAffix(a));   // GEM1: a piece's gems as law 6 holds them
 }
 /** What MY entity wears - the equip table's pieces. */
 export const wornPieces = (entity) => (entity ? equipTableOf(entity).filter(Boolean) : []);
@@ -544,7 +543,7 @@ export function lootFind() {
 }
 
 // ── LOOT15: the wardrobe's powers, folded ─────────────────────────
-/** LOOT15 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 7): THE ROAD'S AND THE COURT'S POWERS are FOLDED onto
+/** LOOT15 (the Loot arc II): THE ROAD'S AND THE COURT'S POWERS are FOLDED onto
  *  MY entity (systems/entityMods.js), so the leaves that read them stay import-free - survival's felt temperature (the
  *  degrees, survival/needs.js through wardrobeCtx), DRESS1's standing (clothingStanding.js), the shared fatigue and fall
  *  laws (scenes/shared.js), skillValue. A power counts once (wornPowers); nothing for anyone but me, with the switch off,

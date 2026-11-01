@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL3 (2026-10-08, bible/03-World/Tamriel.md) - THE LAND, FROM THE PLAYER'S OWN PICTURE.
+// TAMRIEL3 - THE LAND, FROM THE PLAYER'S OWN PICTURE.
 //
-// Mac: "Can we fix the map? It doesnt look like the map thats in daggerfall." It did not: TAMRIEL1's geography was
+// It did not: TAMRIEL1's geography was
 // drawn from memory of the lore map. Daggerfall carries its own map of Tamriel - TMAP00I0.IMG, the race screen's
 // picture, and TAMRIEL2.IMG, its picker, whose palette index IS the province - and the port already traces the
 // picker at runtime for the chargen's province map (ui/provinceMap.js). So the continent is TRACED from the player's
@@ -149,8 +149,7 @@ export function pictureLakes(trace) {
 const _lakes = new WeakMap();
 /** NIBEN-SEA: is a Bay pixel the Waterfront canal's. */
 export const canalAt = (bx, by) => { const c = waterfrontCanal(); return !!c && bx >= c.x0 && bx <= c.x1 && by >= c.y0 && by <= c.y1; };
-// ── SMOOTH-LAND (2026-10-26, bible/03-World/Tamriel.md SMOOTH-LAND; the owner, asked whether to smooth the coasts and the
-// borders: "Whatever is most detailed") ─────────────────────────────────────────────────────────────────────────────
+// ── SMOOTH-LAND ─────────────────────────────────────────────────────────────────────────────
 /**
  * THE LAND'S LAW, SMOOTH. The trace is the picture's 320 x 200 grid, a pixel of it fifteen and more of the map's: read a
  * pixel at a time, every coast and every border past the Bay was a staircase of 12.7 km steps - on the ground, on the
@@ -466,7 +465,7 @@ export function coastDepthAt(px, py) {
   const x = px - 0.5 + PAD, y = py - 0.5 + PAD, ix = Math.floor(x), iy = Math.floor(y);
   return at(L, L.FS, ix, iy, x - ix, y - iy);
 }
-/** TESA3 (bible/03-World/Arena-Provinces.md): the province a Bay pixel past the Bay stands on - its centre's
+/** TESA3: the province a Bay pixel past the Bay stands on - its centre's
  *  provinceKeyAt - or null: the Bay's own pixels (Daggerfall's regions answer there), and the sea. */
 export function provinceKeyBeyondBay(px, py) {
   if (inBay(px, py)) return null;
@@ -520,7 +519,7 @@ const popcount = (x) => {
 export function fitBayToPicture({ bayLand, trace, around = { ox: 46, oy: 52 }, span = 24, ppus = FIT_PPUS }) {
   let best = null, bestValue = -Infinity;
   const { w, land } = trace;
-  // FIT-BITS (2026-10-20, bible/07-Rendering/Performance-Priority.md FIT-BITS): the inside's score counted 32 cells a
+  // FIT-BITS: the inside's score counted 32 cells a
   // word - the picture's rows as two bitsets (its pixels that ARE 1, and that ARE 0: a cell agrees only with its own
   // value, whatever else a picture holds), a cell agreeing where the mask's bit meets the one and its clear bit the
   // zero. The same counts as a cell at a time, so the same fit: the boot paid ~0.8 s of its first world frame for the

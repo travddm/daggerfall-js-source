@@ -1,7 +1,6 @@
-// AUDIT PRE-MERGE 1003b (2026-10-03, the owner: "We're going to do one last deep audit on everything before we push this.
-// It needs to be perfection"): THE RELAY'S SIDE OF A PRIVATE SESSION (ARENA6), each finding red first on the real Room
+// AUDIT PRE-MERGE 1003b: THE RELAY'S SIDE OF A PRIVATE SESSION (ARENA6), each finding red first on the real Room
 // over fake sockets and fake objects (test/fakeRoom.mjs), as test/systems/arena/arena6_private.test.js drives it. The record:
-// bible/01-Overview/audits/Audit-PreMerge-1003.md, its second pass (1003b).
+// its second pass (1003b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRooms } from '../../fakeRoom.mjs';

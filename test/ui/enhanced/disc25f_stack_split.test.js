@@ -1,5 +1,4 @@
-// DISC25-F (2026-09-25, Satranath on Discord, crediting Starempire42: "It doesn't appear possible to split stacks
-// currently, either in inventory or in shops when making a purchase").
+// DISC25-F.
 //
 // DFU splits in TransferItem (DaggerfallInventoryWindow.cs:1515-1539): a stack whose planned amount is short of it,
 // or any stack under Control, pushes "Pick how many items (max N)?" and only its answer moves (:1546-1559). The trade

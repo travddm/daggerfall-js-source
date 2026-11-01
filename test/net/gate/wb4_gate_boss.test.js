@@ -1,4 +1,4 @@
-// WB4a (2026-09-25, Mac: "a large boss arena with an oversized enemy with telegraphed attacks (like wind ups, etc)"):
+// WB4a:
 // THE BOSS FIGHTS YOU, DRIVEN. The strike's law on the struck player's own machine (net/gate/gateStrike.js - each shape
 // against a point, the charge swept between frames, the verdict decided at the landing and never late, the share of
 // one's own health, fire through the saving throw and the Wrath through nothing); his look (world/gate/gateBoss.js - the

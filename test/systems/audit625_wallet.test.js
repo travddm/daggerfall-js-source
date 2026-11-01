@@ -1,5 +1,4 @@
-// AUDIT 625 (2026-10-05, Mac: "Lets do a comprehensive audit on this"), the WALLET lens: PR #625's WALLET1, audited.
-// bible/01-Overview/audits/Audit-625.md.
+// AUDIT 625, the WALLET lens: PR #625's WALLET1, audited.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

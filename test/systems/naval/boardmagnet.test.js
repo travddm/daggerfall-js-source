@@ -1,13 +1,11 @@
-// BOARD-MAGNET (2026-10-26, the owner: "I want to remove the ship ramming feature as its broken and instead with a ship
-// is damaged enough, a prompt to board should show within range and properly magnitize to the other ship";
-// bible/03-World/Naval-Refit.md BOARD-MAGNET) - THE RAM IS GONE, AND THE GRAPPLES DRAW HER IN, on the real naval host over
+// BOARD-MAGNET - THE RAM IS GONE, AND THE GRAPPLES DRAW HER IN, on the real naval host over
 // Come Sail Away's real pool (test/navalSea.mjs): no stem fouls a ship (RAM-RETURN brought the ram back as a blow alone,
 // test/systems/naval/ramreturn.test.js); a ship struck
 // within the grapples' reach is "E: board" at any way, never a heave-to first; the grapples' haul draws her to the ship
 // as it lies each frame while my way comes off under haulBrake, so she ends side by side where I came to rest - her hull
 // clear of mine, her middle level with mine; a captain's Long Lines and Grappling Irons reach farther; a sound ship being
 // boarded (a repel) is said afloat, her mode 'boarded'; an older build's ram blow is a blow alone. AUDIT BOARD-MAGNET
-// (2026-10-26, the owner: "Audit this"): the haul drawn out to her lane and along it, kept clear of my hull from every
+// the haul drawn out to her lane and along it, kept clear of my hull from every
 // start in reach (the eased line drove a galley 39.7 m into another); her side and heading kept against a turning helm;
 // the helm held under a haul thrown from rest.
 // tools/mutants/boardmagnet.json.

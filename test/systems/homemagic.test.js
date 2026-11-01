@@ -1,4 +1,4 @@
-// HOME-MAGIC (2026-09-27, Discord: "Players can use magic in player non owned houses").
+// HOME-MAGIC.
 //
 // A VISITOR CASTS NOTHING IN ANOTHER'S ONLINE HOME. The one cast engine (scenes/hostMagic.js) asks its host's word on
 // the place (`castRefusal`) at the ready, at the click - a spell readied outside is not fired inside - and at an item's

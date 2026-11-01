@@ -1,8 +1,7 @@
 // @ts-check
-// STAR4 (2026-10-20): THE FALLEN STAR'S ART - every picture its crater and its stone wear, painted in code on the
+// STAR4: THE FALLEN STAR'S ART - every picture its crater and its stone wear, painted in code on the
 // Super dungeon's pixel kit (world/superDungeon/sdPixelKit.js: seeded noise, ramps through the ordered dither, a palette
 // held), under a pseudo-archive of its own (world/pseudoArchives.js). No ARENA2 pixel is in it. Design:
-// bible/11-Multiplayer/Starfall.md section 3.
 //
 // Each record is `{ albedo, emission }`: what the surface is, and what of it glows of itself (black: nothing) - the
 // renderer's own pair (world/gate/gateArt.js). The crater is earth the star burned, cracked with its light; its rim the

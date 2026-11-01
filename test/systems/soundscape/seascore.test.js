@@ -1,4 +1,4 @@
-// SEA-SCORE (2026-10-24, the owner: "different music and ambience sounds for sailing"): THE SEA'S MUSIC
+// SEA-SCORE: THE SEA'S MUSIC
 // (systems/soundscape/seaScore.js) - six songs written as notes for the game's own player and FM bank, and the law of which
 // plays at a helm. The songs: their names beside MIDI.BSA's and every made score's, their tempos, bars and lengths, whole
 // bars that loop on their bar line with nothing past the end; every voice's program, level and place at their start;

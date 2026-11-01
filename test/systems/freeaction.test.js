@@ -29,7 +29,7 @@ test('freeAction: the key, the Restoration (20,8) cost, and AddState stacking', 
   t.activeEffects[0].roundsRemaining = 1;
   applySpell({ element: 4, rangeType: 0, effects: [FREE] }, 2, t, {}, seq(0));
   assert.equal(t.activeEffects.length, 1, 'incumbent - not a second entry');
-  assert.equal(t.activeEffects[0].roundsRemaining, r0, 'a recast renews the rounds, never stacks them');   // PIN MOVED (STACK-CAP): AddState stacked them
+  assert.equal(t.activeEffects[0].roundsRemaining, r0, 'a recast renews the rounds, never stacks them');
 });
 
 test('freeAction: the AssignBundle drop - an immune target sheds incoming Paralyze silently', () => {

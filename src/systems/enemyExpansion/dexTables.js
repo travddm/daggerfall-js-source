@@ -1,4 +1,4 @@
-// DEX1 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
+// DEX1 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
 // Kab), THE TABLES READ AS BestiaryMod.Start READS THEM.
 //
 // BestiaryMod.Start (BestiaryMod.cs:172-197) parses five kinds of table, in this order, with the helpers ported in

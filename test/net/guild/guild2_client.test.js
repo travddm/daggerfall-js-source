@@ -1,6 +1,6 @@
-// GUILD2 (2026-10-03) - THE GUILD PAGE'S OVERHAUL, ON THE CLIENT: a new name for a price, the vault and the
+// GUILD2 - THE GUILD PAGE'S OVERHAUL, ON THE CLIENT: a new name for a price, the vault and the
 // guildmaster's grants, the arms of forty devices on a divided field that every banner draws - and the Guild tab in
-// pages under the guild's own header (bible/11-Multiplayer/Guild-Overhaul.md). The service's half is
+// pages under the guild's own header. The service's half is
 // test/net/guild2_service.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -299,7 +299,6 @@ test('GUILD2 the tab in pages: the guild\'s header over every page - its banner,
   assert.deepEqual(strip.map((b) => b.attrs['aria-selected']), ['true', 'false', 'false', 'false', 'false', 'false']);
   const all = texts(t.panel.root);
   assert.ok(all.includes('The Hand [HND]'));
-  // PIN MOVED: GUILD-WINDOW (Guild-Overhaul.md) - GUILD1b's two lines are the window's tiles, each number under its name
   assert.deepEqual(find(t.panel.root, 'dfguild-stat').map((s) => s.children.map((c) => c.textContent)),
     [['Rank', 'Guildmaster'], ['Gold', '30,000'], ['Members', '1/75', '0 online'], ['Vault', '1/50'], ['Hall', 'None']]);
   strip[2].fire('click');
@@ -426,7 +425,7 @@ test('GUILD2b the Members page: the guildmaster sets each member\'s standing at 
   assert.equal(button(find(t.panel.root, 'dfsocial-grant')[0], 'Set').disabled, true, 'unchanged');
   access.value = 'withdraw'; access.fire('change');
   // AUDIT GUILD2: drawn again in place, the focus kept on the level; a member made a withdrawer starts at ten a day (the
-  // limit counts takes - PIN MOVED: "pieces a day")
+  // limit counts takes
   assert.equal(t.doc.activeElement, sel('Bran\'s vault access'), 'the focus on the level, drawn again');
   assert.equal(sel('Bran\'s takes a day').children.find((o) => o.selected)?.value, '10', 'an Officer\'s ten, never "Any number" unasked');
   t.panel.render();

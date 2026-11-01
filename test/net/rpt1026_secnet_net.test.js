@@ -1,4 +1,4 @@
-// RPT1026-SECNET, the relay and the session (bible/11-Multiplayer/Instances.md, Chat-Safety-Arc.md section 2):
+// RPT1026-SECNET, the relay and the session (, Chat-Safety-Arc.md section 2):
 // - ACT WAITS (from a private report, 2026-10-20): a door's act queued while the socket was away went out the frame the
 //   socket opened, ahead of its welcome; a party member's hello at an instance is held while the hub is asked, the room read the act
 //   first - refused by the relay's parseClient - and closed the socket for good. Driven through the REAL Room
@@ -108,7 +108,6 @@ async function hearing(blocks, peers = []) {
 const ASKS = [['trade', { k: 'ask', to: 'me-00001', s: 'abc123' }], ['page', { to: 'me-00001', page: { head: 'Morndas', lines: ['Meet me'] } }]];
 
 test('RPT1026-SECNET A REQUEST THAT NAMES NO ACCOUNT IS NOT HEARD AS NOBODY\'S: from a relay before the stamp, one no roster names is held back while the list blocks anyone and heard while it blocks nobody; a sender not blocked is heard (mutant: an unknown account heard)', async () => {
-  // PIN MOVED (AUDIT RPT1026 A2): a first case stood here on a welcome whose roster named each peer's account - a roster
   // no producer sends: a place room's names none (MOD1), so the session's fallback to the roster's account has none to
   // ask. Its pin through the real Room is test/net/audit_rpt1026_secnet.test.js A2.
   // nobody named the sender's account: held back while the list blocks anyone
@@ -191,7 +190,6 @@ test('RPT1026-SECNET A STALLED LINE\'S FOES WAIT TOO, AND ITS POSE TO ONE A HEAR
   quiet(() => s.join('world:3,12', POSE));
   const ws = sockets[0];
   ws.open();
-  // PIN MOVED (the merge of main into #1184): a peer in the cell - alone, LONE-SLEEP (net/loneSleep.js) says a pose a
   // LONE_POSE_MS, never a HEARTBEAT_MS, and the heartbeat this pins is the cell's own
   quiet(() => ws.receive({ t: 'welcome', id: 'host-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'host-0001', world: null, v: RELAY_VERSION }));
   const foes = { n: 1, f: [] };

@@ -1,9 +1,6 @@
-// ACC3 — PLAYER TITLES AND NAME GLYPHS (2026-09-22).
+// ACC3 — PLAYER TITLES AND NAME GLYPHS.
 //
-// Mac: "Player titles appear above a player name. We will develop 2
-// titles to start out. 1st title is Founder with a gold color, 2nd
-// title is Developer with a red color. All current players should be
-// granted the founder title." And beside the name: "Sprouting green
+// And beside the name: "Sprouting green
 // plant. Attached to new accounts for 2 weeks. Developer glyph
 // specifically for developers."
 //
@@ -74,7 +71,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -105,7 +102,7 @@ test('ACC3: the founder title is a CUTOFF, so a row inserted long after any migr
 
   // The cutoff is a real date and not a number somebody typed: the end
   // of the day Mac asked for this - asked again (FOUNDER2), so the later day;
-  // FOUNDER5 (PIN MOVED): its end on the last clock to reach the next, UTC-12.
+  // FOUNDER5 (
   assert.equal(new Date(FOUNDER_UNTIL * 1000).toISOString(), '2026-09-25T12:00:00.000Z');
 });
 

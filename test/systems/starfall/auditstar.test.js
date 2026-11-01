@@ -1,5 +1,5 @@
-// AUDIT STAR (2026-10-20, the owner: text and UI "enhanced plus + not AI-like and overexplanatory"): THE STARFALL'S WORDS,
-// ITS ITEM'S NAME AND ITS SET'S POWERS, read again - bible/11-Multiplayer/Starfall.md section 8 (AUDIT STAR) and
+// AUDIT STAR: THE STARFALL'S WORDS,
+// ITS ITEM'S NAME AND ITS SET'S POWERS, read again (AUDIT STAR) and
 // Sigil-Sets.md section 6f. Each master its own circle line; the fight's calls each their own; the claim's and the cap's
 // lines in the gate's and the festival's voice, the cap's number handed to the language; the Veil's effect said, its chip
 // and its spell named through the text core; Bound in Silk's held blow cuts the count whatever its weight; a chip

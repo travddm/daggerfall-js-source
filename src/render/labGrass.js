@@ -92,7 +92,7 @@ export const GRASS2_VS_EDITS = Object.freeze([
       + '  gRootY = uCellFrame.z + aPA.z * uCellFrame.w;\n'
       + '  vec2 root = aInst.xy;',
   }),
-  // GRASS6 (2026-09-21): the FIFTH edit - the tint pulled toward a
+  // GRASS6: the FIFTH edit - the tint pulled toward a
   // low-frequency world-space noise, so the field has patches - is gone
   // from the shader and lives in the placer (`bakedTint`). The clump is
   // a function of the blade's world position and nothing else, so it was
@@ -230,7 +230,7 @@ void main(){
   vec2 wdir = length(uWindV) > 1e-4 ? normalize(uWindV) : vec2(1.0, 0.0);
   float along = dot(root, wdir);
   float gust = sin(uTime*1.7 - along*0.35 + aInst.w*0.6) * 0.5 + 0.5;
-  // SWAY-SOFT (2026-10-21): a gentler gust and a subtler lean - 0.55 + 0.75 and 0.055 before (GRASS2_VS_EDITS)
+  // SWAY-SOFT: a gentler gust and a subtler lean - 0.55 + 0.75 and 0.055 before (GRASS2_VS_EDITS)
   float push = length(uWindV) * (0.6 + gust * 0.45);
   vec2 lean = aInst2.xy + wdir * push * 0.032;
   vec3 p;
@@ -303,7 +303,7 @@ void main(){
   // lit by the same sky and sun the ground is, so a blade at dusk is
   // the colour of dusk and not a green cut-out on an orange field.
   //
-  // WIND4 (2026-09-15, Mac: "grass doesnt get darker at night"). That
+  // WIND4. That
   // sentence was the INTENT and not the code: every other surface in
   // the world lights as ambient, plus the sun's colour times its SCALE
   // times the lambert, plus the moon's the same way (render/renderer.js,
@@ -357,8 +357,7 @@ export const GRASSPX_VS_EDITS = Object.freeze([
     to: 'out float vMoonLam;                     // WIND4: the moon\'s lambert, beside the sun\'s\n'
       + 'out vec2 vUV; flat out float vVar;      // GRASS-PX: the tuft\'s texel, and which tuft\n',
   }),
-  // GRASS-PX3 (2026-09-21, Mac: "I miss the way the grass flowed with
-  // the wind smoothly"): the pixel style's two SWAY edits are gone - the
+  // GRASS-PX3: the pixel style's two SWAY edits are gone - the
   // clock stepped at 8 Hz and the lean snapped to 24 poses. A tuft is a
   // sprite; how it MOVES is the lab's, in both styles, because the wind
   // is the one thing in the field that should never look drawn frame by
@@ -460,7 +459,7 @@ export function applyGrassEdits(text, edits) {
   }
   return out;
 }
-/** DISC20-A (2026-09-24, Mac: "Grass isnt affected by fog"): THE GROUND'S FOG, ON THE BLADES. The lab's grass
+/** DISC20-A: THE GROUND'S FOG, ON THE BLADES. The lab's grass
  *  program had no fog term, GR1 carried it byte for byte, and the renderer's fog reaches only its own programs - so
  *  every row the ground takes (a clear day's linear 2400, the rain's exp 0.003, the heavy fog's exp 0.05, the
  *  sandstorm's exp 0.09, Dynamic Skies' exp2 and colour) left the field drawn to its 300 m fade, dimmed by LAB_DIM
@@ -495,8 +494,7 @@ export const GRASSFOG_FS_EDITS = Object.freeze([
   }),
 ]);
 // ═══════════════════════════════════════════════════════════════════
-// GRASS-LIT (2026-10-01, Mac: "drastically improve the grass texture
-// that isn't super dark and blends well into the terrain"): THE GROUND'S
+// GRASS-LIT: THE GROUND'S
 // COLOUR, AND THE GROUND'S LIGHT.
 //
 // WHAT WAS WRONG, measured on the real tiles (TEXTURE.302 and its
@@ -744,9 +742,7 @@ export const GRASSLIT_FS_EDITS = Object.freeze([
 ]);
 
 // ═══════════════════════════════════════════════════════════════════
-// MEADOW1 (2026-10-06, Mac: "These are 4 textures I want to blend into our grass system, all with varying sizes so its
-// not monotonous everywhere" - and a bush - "instead of billboarding, these should have a sort of low poly look to
-// them, like the trees"): THE OWNER'S SPRITES ON CROSSED CARDS, the fifth list of declared edits, laid last. The
+// MEADOW1: THE OWNER'S SPRITES ON CROSSED CARDS, the fifth list of declared edits, laid last. The
 // meadow is a pixel style (uPixel 1: a hard alpha, the dithered fade, a share of each cell) that wears the owner's
 // atlas on the sheet's unit, and three things in it are its own, behind `uArt`: which sprite a blade wears and how big
 // its card is, the cards themselves - fixed in the world at the tuft's own yaw, each lit by its own face - and the
@@ -958,13 +954,12 @@ export function grassLit(ground, t, light, lane = false, adapt = 1, tones = null
   return lane ? elTonemapRGB(lit.map((v) => v * EL_EXPOSURE * adapt)).map(elEncode) : lit;
 }
 
-// GRASS2 (Mac: "I also want to shorten the grass length. Little too tall
-// for my liking"): the height was GR1's 54 and is 38. It is the one
+// GRASS2: the height was GR1's 54 and is 38. It is the one
 // number the blade law scales by - `(0.22 + rnd*0.42) * (height/34)` -
 // so a blade runs 0.25..0.72 world units now against 0.35..1.02, and
 // nothing else about the field moves.
 //
-// GRASS2 (Mac: "have it be seen at long ranges"): the range was the
+// GRASS2: the range was the
 // lab's 200 and is 300 - GRASS5's pack is what paid for it. `span`
 // follows it, because the window has to hold the range or the window's
 // edge is a visible wall, and stays a whole number of cells.
@@ -1054,8 +1049,7 @@ export function placeLabGrass(opts) {
  */
 // ── GR5: THE FIELD IS ANCHORED TO THE WORLD, NOT TO THE EYE ─────────
 //
-// Mac: "it sometimes hitches and switches while walking. There's also a
-// slight pop in/pop out issue." Both were one design: every blade was
+// Both were one design: every blade was
 // placed RELATIVE TO THE CENTRE from one seed, so when the eye moved
 // 60m and the scatter rebuilt, every blade in the field moved with it
 // - the switch - and the rebuild's finish uploaded all 1.2M blades in
@@ -1075,7 +1069,7 @@ export function placeLabGrass(opts) {
 export const GRASS_CELL = 30;
 
 
-/** PERF10 (2026-09-19): THE CELL'S KEY AS A NUMBER, pieceKey's law one
+/** PERF10: THE CELL'S KEY AS A NUMBER, pieceKey's law one
  *  level up. The field's `live` map was keyed by `${cx},${cz}` and the
  *  free-sweep ran `key.split(',').map(Number)` over EVERY live cell
  *  EVERY frame - four hundred odd cells, so a string split, an array and
@@ -1114,9 +1108,7 @@ export const cellKey = (cx, cz) => cx * 65536 + cz;
  *  which is the degenerate double column the peak lives on.
  *  Pure, so a pin can hold it against the fill loop.
  *
- *  PERF-EXT20 (2026-09-25, the players: "fps issues in the exterior
- *  but fine in the interior", "me too my friend.. don't know why. I
- *  got a RX6600"): AND IT IS SWEPT ONCE. The answer is a pure function
+ *  PERF-EXT20: AND IT IS SWEPT ONCE. The answer is a pure function
  *  of its three arguments - 394 for the shipped span, every time - and
  *  the sweep that finds it is 11-33 ms, paid by every createGrassField:
  *  the boot, every teleport and quickload, and until PERF-EXT21 every
@@ -1173,7 +1165,7 @@ export function grassCellSeed(cx, cz, seed = LAB_GRASS.seed) {
   return (h || 1) >>> 0;
 }
 
-/** GRASS5 (2026-09-19): THE BLADE, PACKED.
+/** GRASS5: THE BLADE, PACKED.
  *
  *  A blade was twelve floats on the GPU - 48 bytes - and almost none of
  *  it needed that much. The DRAW cost stopped tracking the field's area
@@ -1208,7 +1200,7 @@ export function grassCellSeed(cx, cz, seed = LAB_GRASS.seed) {
  *  whole reason 16 bits is enough for a position. */
 export const GRASS_PACK_BYTES = 16;
 /**
- * GRASS-LIT2 (2026-10-02): THE HEIGHT LANE, SHARED WITH THE GROUND'S SLOPE. GRASS5 gave the height a u16 and wrote that
+ * GRASS-LIT2: THE HEIGHT LANE, SHARED WITH THE GROUND'S SLOPE. GRASS5 gave the height a u16 and wrote that
  * it needed eight bits; it takes the high GRASS_HEIGHT_BITS now (7 mm over its 0.47 m span), and the ground normal's x
  * and z under the root take five each - codes 0..30 over +/-GRASS_SLOPE_SPAN, 15 the level, so level ground packs
  * exactly level; each code is stored XOR 15 (AUDIT A3), so a ZERO word - a pad blade, a cleared slot - decodes to the
@@ -1349,7 +1341,7 @@ export function grassVnoise(x, z) {
  *  hash is 0 there as well). The offsets are arbitrary fractions of a
  *  lattice cell, so no lattice corner of either octave lands on 0. */
 export function grassClump(x, z) {
-  // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): grassVnoise of each octave with
+  // OW-HITCH: grassVnoise of each octave with
   // its four grassHash corners written out in it - the same operations in the same order, so the same number to the
   // bit (test/render/owhitch.test.js holds it to `grassVnoise(...) * 0.66 + grassVnoise(...) * 0.34`). Asked once a
   // blade that stands, the ten calls under it were each a number made and dropped (a call's answer is an object unless
@@ -1398,9 +1390,7 @@ export function placeLabGrassCell(cx, cz, opts) {
 }
 
 /**
- * PERF-EXT22 (2026-09-25, the players: "fps issues in the exterior but
- * fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): A CELL CAN BE PLACED IN SLICES. A cell is 6,122 candidate
+ * PERF-EXT22: A CELL CAN BE PLACED IN SLICES. A cell is 6,122 candidate
  * blades - ~1.6-2 ms of keep() and ground() and noise - and a walking
  * eye brings one in on 5-9% of frames (17% at 15 m/s), each a spike of
  * 4-8 ms on the frame that pays it. The placer's whole state between two
@@ -1413,7 +1403,7 @@ export function placeLabGrassCell(cx, cz, opts) {
  * The arrays are the cell's own, handed to writeSlot when it is done,
  * exactly as placeLabGrassCell's were.
  *
- * OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): `reuse` - a cell's state whose
+ * OW-HITCH: `reuse` - a cell's state whose
  * arrays writeSlot has already packed and let go - is placed into again, zeroed first, so a cell begun on it is the
  * bytes a new one is. The five arrays are 343 KB a cell at the shipped density, and a field filling after a teleport or
  * the Overworld's landing places some 360 cells: 120 MB of garbage the collector then stopped frames for. The field
@@ -1443,7 +1433,7 @@ const _xs = new Uint32Array(1);
 export function stepGrassCell(st, budget, { keep, ground = null, slope = null, height = LAB_GRASS.height }) {
   const { inst, inst2, rootY, cell, originX, originZ } = st;
   const groundCol = st.ground;
-  // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): THE WORD IN A TYPED SLOT. A
+  // OW-HITCH: THE WORD IN A TYPED SLOT. A
   // `let` a closure writes lives in the closure's context, and a context holds a number past a small integer as an
   // object - so every step of the xorshift (four writes a draw, ten draws a candidate, 6,122 candidates a cell) made one:
   // some 2 MB a cell of garbage, a field's refill after the Overworld 0.7 GB of it. The word lives in a Uint32Array
@@ -1518,8 +1508,7 @@ export const GRASS_STEP = 250;
  */
 export function createGrassField(renderer, { keep, ground = null, slope = null, span = LAB_GRASS.span, density = LAB_GRASS.density, height = LAB_GRASS.height, seed = LAB_GRASS.seed, cell = GRASS_CELL, range = LAB_GRASS.range, perFrame = 2, slots: slotsOverride = 0, frameMs = GRASS_FRAME_MS, clock = () => performance.now() }) {   // FB1021B: `clock` a test seam - the game passes neither
   const perCell = grassPerCell(density);   // GRASS2: the RATE, off the lab's own span - `span` below is the window, and the two are not the same question
-  // PERF10 (2026-09-19, Mac: "when youre further out in the wilderniss
-  // it loaded many chunks and grass the performance still degrades"):
+  // PERF10:
   // THE WINDOW IS A DISC, and its two radii are the ones the field
   // already had a name for. `span` was the half-side of a SQUARE, so the
   // field held 484 cells of which the corners - out at 445m, half again
@@ -1545,9 +1534,7 @@ export function createGrassField(renderer, { keep, ground = null, slope = null, 
   const live = new Map();     // cellKey -> { slot, cx, cz }
   const free = [];
   for (let i = 0; i < slots; i++) free.push(i);
-  // PERF-EXT21 (2026-09-25, the players: "fps issues in the exterior
-  // but fine in the interior", "me too my friend.. don't know why. I got
-  // a RX6600"): THE FIELD HAS AN ORIGIN OF ITS OWN. The host threw the
+  // PERF-EXT21: THE FIELD HAS AN ORIGIN OF ITS OWN. The host threw the
   // field away at every floating-origin shift - every map-pixel crossing
   // - because its cells were keyed on SCENE coordinates, and 819.2 is not
   // a whole number of 30 m cells. So every crossing re-specified the
@@ -1601,8 +1588,7 @@ export function createGrassField(renderer, { keep, ground = null, slope = null, 
     },
     /** PERF-EXT22: the rim cell in progress, for a probe or a pin. */
     get pending() { return pending; },
-    // GRASS-STALE1 (2026-09-19, Discord: "grass is flying and not on the
-    // ground" around graveyards and other POIs): a cell, once placed, is
+    // GRASS-STALE1: a cell, once placed, is
     // never rebuilt unless it leaves render range entirely (the loop
     // below only queues a key that is NOT already in `live`) - by
     // design, cheap, and correct AS LONG AS `keep`/`ground`'s answer for
@@ -1674,7 +1660,7 @@ export function createGrassField(renderer, { keep, ground = null, slope = null, 
       //   GRASS_STEP candidates at a time.
       // A walk that keeps up is PERF-EXT22's walk to the candidate. A ride the slice cannot keep up with is paced to
       // the eye, frame for frame, and never two whole cells; a birth fills nearest first inside the frame's time.
-      // AUDIT FB1021B F1 (the owner: "no band aids and true improvements"): the cells due now took the frame's time
+      // AUDIT FB1021B F1: the cells due now took the frame's time
       // INSTEAD of the pace, and before the cells it was owed to - so one cell due now (a birth on the move: the jungle
       // floor's re-made meadow on a ride, an Overworld journey's end, a publish over the disc; a band cell re-read the
       // step leaves behind) turned the deadlines off, and where the frame's time placed less than the eye brought in
@@ -2032,8 +2018,7 @@ export class LabGrassRenderer {
       Object.freeze({ loc: 2, type: gl.UNSIGNED_BYTE, bytes: 4 }),
       Object.freeze({ loc: 4, type: gl.UNSIGNED_BYTE, bytes: 4 }),
     ]);
-    // GRASS-ON (2026-10-07, Mac: "Can you please turn grass on by default", then "People are also saying it really has
-    // bad performance"): THE FIELD DRAWS UNDER THE FIRST-VERTEX CONVENTION WHERE THE BROWSER OFFERS IT. vVar, vSun and
+    // GRASS-ON: THE FIELD DRAWS UNDER THE FIRST-VERTEX CONVENTION WHERE THE BROWSER OFFERS IT. vVar, vSun and
     // vPoint go down `flat`, read in each triangle's provoking vertex alone (GRASS-LIT's law) - GL's LAST, WebGL's
     // default. Direct3D provokes from the FIRST, so ANGLE on Windows (every browser there, and the desktop app) keeps
     // GL's convention for a program with a flat varying by drawing it through a geometry shader that copies the last
@@ -2246,7 +2231,7 @@ export class LabGrassRenderer {
       C[i * 4 + 3] = u8(ph / 6.283185307179586);
     }
     if (this.slotCardH) { this.slotCardH[slot] = cardH; this.slotCardRise[slot] = n > 0 ? Math.max(0, cardTop - y1) : 0; this.slotCardTilt[slot] = cardTilt; }   // AUDIT MEADOW1: over the box's own top, so a shift moves nothing here; and the steepest ground a card of it is sheared to
-    // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): ONLY THE BLADES THAT STOOD GO
+    // OW-HITCH: ONLY THE BLADES THAT STOOD GO
     // UP. A slot draws its first `slotCount` blades and never one past them (_drawVisibleSlots instances the count, and
     // the prefix inside it), so the pad behind them is bytes no draw reads - and a write into a buffer the last frame
     // drew from is one the driver may have to wait on or copy. A cell on a road or a shore is mostly pad; an empty one
@@ -2321,7 +2306,7 @@ export class LabGrassRenderer {
     gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.zeroField);
     gl.uniform1i(u.uGField, 3);
     gl.activeTexture(gl.TEXTURE0);
-    // AUDIT MEADOW1 (Mac: "have the wind sway effect the new foilage, like it does the trees"): THE FIELD SWAYS WHILE
+    // AUDIT MEADOW1: THE FIELD SWAYS WHILE
     // THE TREES DO - the host hands the trees' own switch (floraSwayOn and a sky with a wind, as setFlatWind takes it),
     // and a field it holds still takes no wind at all: its standing lean only, as a tree's crown. A host that hands none
     // sways. The wind is the lean's alone in the vertex stage (uWind and uWindDir are the lab's, and read nowhere)

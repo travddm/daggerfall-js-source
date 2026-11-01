@@ -1,5 +1,4 @@
-// BEAST-SELF (2026-09-26, Mac: "You dont see your self transform less your in paperdoll style (morrowind models need
-// their vampire/werewolf forms)"): the Morrowind lane has no beast - Morrowind's data holds no Daggerfall lycanthrope -
+// BEAST-SELF: the Morrowind lane has no beast - Morrowind's data holds no Daggerfall lycanthrope -
 // so a Morrowind-lane player who transformed stood in their HUMAN arms (the claws resolve to no Morrowind weapon: bare
 // fists) and their human body. The arm and the body STAND ASIDE while the curse holds them in the beast: the first
 // person is the classic claws (the weapon rig's own draw), the third Eye Of The Beholder's lycanthrope - what a player

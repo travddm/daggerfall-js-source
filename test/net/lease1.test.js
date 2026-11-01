@@ -1,5 +1,4 @@
-// LEASE1 (2026-10-22, mob of the staff panel's freeze and mute: "this need addressed"; design doc "DFO Staff Panel: design",
-// "Holding against a modded game: room leases"; net/roomLease.js): THE HUB'S WORD IN EVERY ROOM. The hub hands each socket a
+// LEASE1: THE HUB'S WORD IN EVERY ROOM. The hub hands each socket a
 // signed lease - its account, its mute and freeze, when it lapses - and the game hands it to every lease room it holds; a
 // lease room takes the hub's word from one newer than its own, and while `leaseDoor` is on, a build that hands on none is
 // turned away and a bound socket whose lease lapsed is closed `busy`. Over real Rooms (test/fakeRoom.mjs) and the session's
@@ -66,7 +65,6 @@ test('LEASE1 THE LEASE: minted with the relay\'s key and read back whole; anothe
   assert.equal(hello(1).ls, 1);
   for (const v of [undefined, 0, 2, '1', true]) assert.equal(hello(v).ls, undefined, String(v));
   // the rooms
-  // PIN MOVED (STAFF-PANEL5-FREEZE-FIX, mob: "freeze they can only talk to staff while frozen"): every room but the hub's
   // binds - a town, a home, a caravan, a siege, an arena, a gate, a breach and a Super dungeon realm too
   for (const key of [CHAT_TRADE_ROOM, CHAT_LFG_ROOM, chatRegionRoom(3), H.regionShardRoom(3, 1), chatLangRoom('de'), CELL, 'dungeon:m123', 'interior:m123456.7', 'town:m9', 'owned:x', 'caravan:x', 'siege:x', 'arena:x', 'gate:x', 'eg:x', 'sd:x', 'nowhere']) assert.equal(leaseRoom(key), true, key);
   for (const key of [CHAT_WORLD_ROOM, H.hubOfSubject('acct-mac-0001'), null, undefined]) assert.equal(leaseRoom(key), false, String(key));
@@ -303,7 +301,6 @@ test('LEASE1 THE DOOR: off, a build that hands on no lease is let in, and a boun
   await Promise.all([on.say(on.trade, fresh, { t: 'lease', l: renewal }), on.say(on.trade, fresh, { t: 'chat', text: 'back from idle' })]);
   assert.equal(fresh.closed, null, 'its renewal was waited on: not closed');
   assert.ok(lines(ear).includes('back from idle'), 'and its line heard');
-  // PIN MOVED (STAFF-PANEL5-FREEZE-FIX: every room but the hub's is a lease room): a town turns such a build away as a
   // cell does; the hub alone, the door on all the same, hears a build that hands on none
   const town = on.make('town:m9');
   const tOld = await on.join(town, 'old-0005');
@@ -331,7 +328,7 @@ test('LEASE1 THE LOAD (mob, 07:57Z: "we need to test if this affected load times
       const key = await leaseKeyOf(secret, { subtle });
       const join = async (R, id, extra, pose = null) => { const ws = R.connect(); clock += 300; await R.hello(ws, id, pose, extra); return ws; };
       const cell = room(CELL);
-      const cur = await join(cell, 'cur-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW }, P0);   // PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): a current build says the loot it reads - a cell is a loot room, and a hello without it asks the hub for the loot door
+      const cur = await join(cell, 'cur-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW }, P0);
       for (let s = 0; s < 300; s += 15) {   // five minutes of play: a pose every 15 s, the hub's lease handed on every 30
         clock += 15_000;
         if (s % 30 === 0) await cell.raw(cur, JSON.stringify({ t: 'lease', l: await mintLease({ s: 'acct-cur-0001', at: Math.floor(clock / 1000) }, key, { subtle }) }));
@@ -807,7 +804,6 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   now += LEASE_HAND_MIN_MS;
   cabin.tick(page.s, at, pixel, now);
   assert.equal(lanes.length, 1, 'the same lane');
-  // PIN MOVED (RPT1026-SECNET, LINE-STALL): a lane that has heard nothing for PING_MS is asked (its ping, which carries no
   // lease ahead of it), so the ping is read past
   assert.deepEqual(sent(lane).filter((f) => f.t !== 'ping').slice(-2).map((f) => f.l ?? f.t), ['page.mac2', 'pose'], 'and the page\'s newer lease, ahead of the next tick\'s pose');
   cabin.close();

@@ -1,6 +1,4 @@
-// CARDS2c (2026-10-08, bible/11-Multiplayer/Tavern-Cards.md section 34; section 12's open item: "Eye Of The Beholder has
-// no sitting art, so a sprite body - mine in that lane, a peer's walker or paperdoll - stands at its seat facing the
-// table"): THE SPRITE LANE SEATED (net/remotePlayers.js seatedSink). Driven: a pose that says a seat (`st`, CARDS2b's
+// CARDS2c: THE SPRITE LANE SEATED (net/remotePlayers.js seatedSink). Driven: a pose that says a seat (`st`, CARDS2b's
 // table top) sinks its sprite by the seat's own hip drop - the Morrowind body's (player/seatPose.js SEAT_HIP_DROP), so
 // the sprite's head stands where the seated rig's eye does - and a standing pose not at all; the paperdoll's billboard
 // drawn sunk on a fake renderer, its name brought down with it; my own sprite needs none (seated, my view is the seat's

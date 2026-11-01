@@ -1,4 +1,4 @@
-// ROAD-H - THE RESIDUE AND THE PINS (2026-09-07).
+// ROAD-H - THE RESIDUE AND THE PINS.
 //
 // AUDIT 62 closed with a list under "What was left, and by whose
 // decision". Three of its rows are code, not judgement calls, and this

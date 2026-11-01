@@ -1,11 +1,11 @@
 // @ts-check
-// IC-GRAND (2026-10-26, bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY'S BLOCKS, NEAR AND FAR: the city's
+// IC-GRAND - THE IMPERIAL CITY'S BLOCKS, NEAR AND FAR: the city's
 // own blocks a cell each (its ground, its walls, its walkers' grid, its trees, its models and its arrivals) and the far
 // view of every cell, both answered by law when a pixel's build first reads them (a family on the world-data door,
 // formats/worldData/worldDataReplacement.js registerPortBlockFamily - forty thousand cells register nothing up front), and
 // the models they place (world/customModels.js registerCustomModelFamily: a cell's fabric, a slice's skyline).
 //
-// NEAR AND FAR (the owner, at 20 km: "only near blocks get full detail, with a far LOD/impostor for the rest of the city"):
+// NEAR AND FAR:
 // a slice of the city within NEAR_RING pixels of the player's is built near - every own block's fabric whole and solid
 // (world/imperialFabricModels.js fabricCellModel; IC-PROPS: no block of Daggerfall's trade among them since 2026-10-27), its
 // walkers' grid and its trees; every other slice the stream holds is built far (imperialFarView) - its ground's stone and

@@ -1,5 +1,5 @@
-// POI-4 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE glTF 2.0 IMPORTER (src/poi/gltfImport.js).
-// Mac, asked which formats the POI editor imports: "glTF / GLB". Every file here is built byte by byte to the Khronos
+// POI-4 - THE glTF 2.0 IMPORTER (src/poi/gltfImport.js).
+// . Every file here is built byte by byte to the Khronos
 // specification, so each law is pinned by a file that exercises exactly it:
 //   - the containers: a GLB's JSON and BIN chunks; a .gltf with its .bin beside it and an image as a data URI;
 //   - accessors: interleaved (strided), normalized, sparse (with no buffer view under it);
@@ -106,7 +106,6 @@ test('POI-4 GLB: a textured quad read from its chunks and baked into the game\'s
   assert.deepEqual(part.materials, [0]);
   assert.ok('mesh' in decodePoiMesh(encodePoiMesh(m)));
   const mat = poiMaterialOf(model.materials[0]);
-  // PIN MOVED (AUDIT POI R10): the file's factors are glTF's LINEAR colours, the game's sRGB - [0.5, 0.6, 0.7] and the
   // glow [0.1, 0.2, 0.3] x its strength 2 were copied as they stood; now each colour turned, the glow's strength after
   assert.deepEqual(mat, {
     texture: 0, color: [...[0.5, 0.6, 0.7].map((c) => r6(srgb(c))), 1], emissive: null, emissiveColor: [0.1, 0.2, 0.3].map((c) => r6(srgb(c) * 2)), alpha: 'cutout', cutoff: 0.25,
@@ -254,7 +253,6 @@ test('POI-4 REFUSALS: not glTF 2.0; Draco and meshopt compression named and refu
   const json = (acc, nodes = [{ mesh: 0 }]) => ({ asset, scenes: [{ nodes: [0] }], nodes, meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }], buffers: [{ byteLength: bin.byteLength }], bufferViews: views, accessors: [acc] });
   assert.deepEqual(refusal(() => readGltf(glb(json({ bufferView: 0, componentType: 5126, count: 3, type: 'VEC3' }), bin))), { code: 'past-end', what: 'accessor', index: 0 });
   assert.deepEqual(refusal(() => readGltf(glb(json({ bufferView: 0, componentType: 5126, count: 1, type: 'VEC3' }, [{ children: [0] }]), bin))), { code: 'node-cycle', index: 0 });
-  // PIN MOVED (AUDIT POI G6): skins are read now (their saved pose baked), so the node's skin is one the file has - a skin
   // named and missing is refused `missing`, as a missing texture or node is
   const warned = readGltf(glb({ ...json({ bufferView: 0, componentType: 5126, count: 1, type: 'VEC3' }), meshes: [{ primitives: [{ attributes: { POSITION: 0, COLOR_0: 0 }, mode: 1 }, { attributes: { POSITION: 0, COLOR_0: 0 } }] }], animations: [{}], nodes: [{ mesh: 0, skin: 0 }], skins: [{ joints: [0] }] }, bin));
   assert.deepEqual(codes(warned), ['skin', 'animation', 'points-lines', 'vertex-colours']);

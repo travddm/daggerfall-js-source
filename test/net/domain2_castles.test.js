@@ -1,8 +1,7 @@
-// DOMAIN2 (2026-10-24, the owner: "Allowing the purchase of the actual castle in major cities (cyrodil excluded), using the
-// instancing system"; asked, "One owner per castle", "Silver", "Region holder buys it"): A GUILD'S CASTLE - bought in
+// DOMAIN2: A GUILD'S CASTLE - bought in
 // silver by the Guildmaster of the guild holding its crown region alone, one owner a castle, its own instance (an epoch
 // minted at the purchase); released with the region by any road, half its price home; given up while held, 85% home
-// (bible/11-Multiplayer/Domains.md section 6; src/net/castleLaw.js, server-account/src/castles.js, net/instanceRoom.js's
+// (; src/net/castleLaw.js, server-account/src/castles.js, net/instanceRoom.js's
 // `guild` arm). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -59,7 +58,6 @@ async function stood(t, env = {}) {
 }
 
 test('DOMAIN2 THE LAW: a castle is a crown region\'s - the Bay\'s three; 120,000 silver; 85% home given up (a hall\'s share, one home), half lost with the region; the Guildmaster buys and gives up; a guild may buy each crown it holds whose castle nobody keeps (mutants: the regions; the price; the shares; the rank; the offers)', () => {
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): every crown's region a castle's - the provinces' too
   assert.deepEqual(CASTLE_REGIONS, [17, 20, 23, 64, 65, 66, 67, 68, 69, 70]);
   assert.deepEqual(CASTLE_REGIONS, Object.keys(CROWN_SEAT_REGIONS).map(Number).sort((a, b) => a - b));
   for (const r of [17, 20, 23, 64, 70]) assert.equal(castleRegionOk(r), true);
@@ -207,11 +205,9 @@ test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - ne
     const k = instanceRoomOf(other, { owner: g, epoch: 'deadbeef' });
     if (k) assert.equal(await instanceAdmission(k, 'acct-ofelia', { guild: G }), null, other);
   }
-  // PIN MOVED (WW7-4): the provinces' capitals' castles after the Bay's (ww7_castles.test.js)
   assert.deepEqual(CASTLE_MAP_IDS.slice(0, 3), [6634853, 630439035, 1291010263], 'Sentinel, Wayrest and Daggerfall - measured on the freeware: the crown seats\' own keys, each a main-story dungeon');
   for (const k of CASTLE_MAP_IDS.slice(0, 3)) assert.ok(MAIN_STORY_DUNGEON_IDS.has(k));
   assert.deepEqual([castleKeyOk(630439035), castleKeyOk(5023), castleKeyOk('630439035')], [true, false, false]);
-  // PIN MOVED (AUDIT TESA III E2-4, bible/01-Overview/audits/Audit-Tesa-III-E2.md): the castle's relay is the LAW row of
   // test/net/relayversion.test.js that names DOMAIN2, as AUDIT TESA II Z2 holds the world-wide gates to theirs - a literal
   // here beside the literal in instanceRoom.js let a renumber leave the gate on a number the live relay holds with no
   // guild arm (main's world260 is THE FOLD), so a castle's members were offered a door that refused them
@@ -249,7 +245,6 @@ test('DOMAIN2 THE DOOR: the castle\'s dungeon door offers "Your guild\'s castle"
   // AUDIT DOMAINS C4: nine rows at most - the door's keys are 1-9; a castle, a quest of mine and a full party's seven partners
   const seven = Array.from({ length: 7 }, (_, i) => ({ name: `P${i}`, acct: `a${i}`, owner: castle.owner, epoch: `0000000${i}` }));
   const nine = instanceOffer({ online: true, instanceOk: true, questHere: true, partners: seven, castle: { owner: castle.owner, epoch: castle.epoch } });
-  // PIN MOVED (AUDIT RELEASE R3-4, the merge of main into TESA): main's order - the party's rooms before mine - under this
   // bound: six partners, then my own row on the ninth key (unbounded, my row was the tenth no key chose)
   assert.deepEqual([nine.length, INSTANCE_ROWS_MAX, nine.at(-2).name, nine.at(-1).kind], [9, 9, 'P5', 'mine']);
   let mine = { guild: G, epoch: 'aabbccdd', key: CASTLE_WAYREST, region: 23 };

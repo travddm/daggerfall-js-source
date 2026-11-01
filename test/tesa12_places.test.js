@@ -1,5 +1,4 @@
-// TESA12 (2026-10-13, the owner: "I want to make it where attaching the arena file isn't needed"; asked, "Canon +
-// generated" and "Remove it"; bible/03-World/Arena-Provinces.md TESA12) - THE PLACES PAST THE BAY, THE PORT'S OWN, pinned.
+// TESA12 - THE PLACES PAST THE BAY, THE PORT'S OWN, pinned.
 // TAMRIEL1's lore cities on their points (snapped onto their province's land), each province's towns and villages made
 // beside them on its land past the Bay and named by its people, the same on every client; the ink and the host on them;
 // and nothing of Arena read - no reader, no card, the store a copy was attached to emptied once. No file ships: the pins
@@ -156,7 +155,6 @@ test('TESA12 the installed set: none without a trace; one model a trace and a fi
 
 test('TESA12 the ink: on the trace the continent\'s cities are the places past the Bay - a capital where TAMRIEL1 names one, each its kind\'s glyph and word; off it TAMRIEL1\'s cities as ever (mutant: the kinds\' words, the glyphs, the Bay test)', () => {
   assert.deepEqual(ARENA_KIND_WORDS, { 'city-state': 'city-state', town: 'town', village: 'village' });
-  // PIN MOVED (REGION-LINES, 2026-10-25, the owner: "daggerfall's clustered icons need to be fixed amd standardized across tamriel"): one glyph a kind - a city-state the Bay's city, a town its hamlet
   assert.deepEqual(ARENA_KIND_GLYPHS, { 'city-state': 'city', town: 'hamlet', village: 'village' });
   const authored = buildTamrielInk();
   assert.equal(authored.arena, false);

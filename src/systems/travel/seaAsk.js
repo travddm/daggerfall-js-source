@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// The Overworld's crossing's two asks of the planner (OWS2, bible/06-Systems/Travel-View.md "OWS - the sea"; moved out of
+// The Overworld's crossing's two asks of the planner (OWS2, "OWS - the sea"; moved out of
 // scenes/world.js by PLAN-SLICES, HOST-SPLIT - the world host imports them by the same names).
 // ═══════════════════════════════════════════════════════════════════
 

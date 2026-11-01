@@ -1,7 +1,4 @@
-// QL-OFFERED (2026-10-25, Lord Rumpkin, "too many quests": "My quest log ... has become congested in a very
-// short span ... also every town I enter there is some courier ramming quest letters into my hand ... Random quests like
-// that should be picked up in the tavern, or notice board"; the owner: "No band aids", and his decision: A QUESTLINE IS
-// TAKEN, NEVER SENT - bible/06-Systems/Questlines-Arc.md section 4, THE RUNNER). QL0's runner began every line whose
+// QL-OFFERED. QL0's runner began every line whose
 // gate held, unasked, and its first letter came by courier at the next town by day; the quest log drew each running
 // step twice and every line, locked ones included. Now a line whose gate holds is OFFERED - posted on the notice board
 // (the introductions), at its giver's door (the story lines, DFU's own Yes and No) and on the Quests tab - and the TAKE

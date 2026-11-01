@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - WILD-ROAD (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, report 4; its HUNT-ROAD went with
+// FIELD BUGS 2026-10-04e - WILD-ROAD (, report 4; its HUNT-ROAD went with
 // HUNT-OUT's text hunt, removed on main).
 //
 // Discord (Private Joker, "Wilderness Encounter Chances"): "perhaps encounters can be scaled with player level or some

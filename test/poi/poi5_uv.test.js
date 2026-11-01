@@ -1,4 +1,4 @@
-// POI-5 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE UV EDITOR'S GEOMETRY.
+// POI-5 - THE UV EDITOR'S GEOMETRY.
 // Mac, asked what "UV map" covers: "Full UV editor" - select vertices, edges, faces and islands; move, rotate, scale;
 // seams; unwrap; pack.
 //   - the session (src/poi/uv/uvMesh.js): a mesh's corners welded into its surface, the model's own seams found, its
@@ -193,7 +193,6 @@ test('POI-5 PACKING AND DENSITY: every island inside the square with its margin,
 
 import { orderByDissection, cholesky, solveCholesky, upperCsc } from '../../src/poi/sparseCholesky.js';
 
-// PIN MOVED (AUDIT POI M13): the solver is HERMITIAN now - the conformal map's own complex form, one column a vertex
 // where the real form had two (four times the entries) - so the system below is complex (an off-diagonal coupling with an
 // imaginary part, its twin the conjugate), its answer complex, and upperCsc takes the imaginary parts beside the real and
 // conjugates what it mirrors. The pin is the same claim, made harder: a real symmetric system is the case Az = 0.

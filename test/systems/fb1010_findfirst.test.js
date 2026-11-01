@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-10 (bible/01-Overview/bugs/Field-Bugs-2026-10-10.md), FIND-FIRST - the Discord's "make 'Find me' the
+// FIELD BUGS 2026-10-10, FIND-FIRST - the Discord's "make 'Find me' the
 // standard functionality on the world map when I first open it": the player's own world map (the held map, ui/heldMap.js)
 // opens as a press of Find me does - the glide to my pixel and the red cross - unless the open was for somewhere else.
 import { test } from 'node:test';

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE GEOGRAPHY: the whole of Tamriel, authored, on the picture
+// TAMRIEL1 - THE GEOGRAPHY: the whole of Tamriel, authored, on the picture
 // grid of world/tamriel/tamrielFrame.js (320 x 200, Daggerfall's own Tamriel picture's grid; 15.36 km a unit).
 //
 // THIS IS OURS, AND IT IS DAGGERFALL'S TAMRIEL. The outlines below are drawn by hand from the lore map of
@@ -260,7 +260,7 @@ export const CITIES = Object.freeze([
   { name: "Ald'ruhn", province: 'Morrowind', at: [246, 40] },
   { name: 'Vivec', province: 'Morrowind', at: [252, 49], port: true },
   // the Imperial Province
-  { name: 'Imperial City', province: 'Imperial', at: [171, 99], capital: true },   // IC-RING (the owner: "in the middle of the circle river type landmark"): the isle inside Lake Rumare's ring on the trace
+  { name: 'Imperial City', province: 'Imperial', at: [171, 99], capital: true },   // IC-RING: the isle inside Lake Rumare's ring on the trace
   { name: 'Anvil', province: 'Imperial', at: [138, 112], port: true },
   { name: 'Kvatch', province: 'Imperial', at: [148, 108] },
   { name: 'Skingrad', province: 'Imperial', at: [156, 102] },
@@ -305,8 +305,7 @@ export const CITIES = Object.freeze([
   { name: 'Skywatch', province: 'Sumurset', at: [70, 128], port: true },
 ].map((c) => Object.freeze(c)));
 
-/** NIBEN-SEA (2026-10-26, bible/03-World/Tamriel.md NIBEN-SEA; the owner: "The port that connects to the imperial city
- *  should allow for AI/player ship voyages through this canal"): THE WATERFRONT CANAL - the Imperial City's harbour, on
+/** NIBEN-SEA: THE WATERFRONT CANAL - the Imperial City's harbour, on
  *  its south edge below the Waterfront, cut through to its lake's arm (ui/tamrielTrace.js NIBEN_COURSE), which the
  *  picture's pixels lay short of the city's edge. `city` the city it serves (CITIES' entry, the province's capital),
  *  `span` its pixels a side (world/imperialCity.js IMPERIAL_SPAN - IC-GRAND's twenty-five, pinned equal; this module reads

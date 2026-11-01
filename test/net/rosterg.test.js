@@ -1,4 +1,4 @@
-// ROSTER-G (2026-09-16, Mac: "Players dont show in online and the roster naming itself seems hardcoded").
+// ROSTER-G.
 //
 // TWO FINDINGS, one root. CHAT-R1 asked for "all currently online players" and wired the panel to the PRESENCE
 // session - the peers in the player's own map CELL - because the world channel, the one room every player is in, held
@@ -79,7 +79,6 @@ test('ROSTER-G: a channel link (presence: false) HOLDS the roster it is told - t
   rr = rosterRows(s); assert.equal(rr.total, 600, 'the count is the room\'s'); assert.ok(rr.rows.length <= ROSTER_ROWS_MAX);
   assert.equal(rosterTitle(rr.total), 'Online — 600');
   ws.receive({ t: 'leave', id: 'aaaa-0001' }); assert.equal(rosterRows(s).total, 599, 'a leave the channel says takes one off the count');
-  // PIN MOVED (SCALE5a): this said a leave for an id the list never held moves nothing - but the relay says a leave only for
   // a socket that said hello in the room, so an id this list never held is one the welcome CUT, counted in its 600; its
   // leave never came off, and past CHAT_ROSTER_MAX the header only climbed (the client audit of 2026-10-10)
   ws.receive({ t: 'leave', id: 'past-the-cut' }); assert.equal(rosterRows(s).total, 598, 'a leave for one past the cut takes one off too');

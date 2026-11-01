@@ -1,4 +1,4 @@
-// AUDIT SOC (2026-09-16, Mac: "Can we do an audit of everything just merged. Just want it to be perfection"): the
+// AUDIT SOC: the
 // pins for what the four lenses found in the merged social arc (PR #217). The hub's (A), the client link's and the
 // picture's (B), the second tab of one's own (C20), and the host's source (B4, B5, B7, B10, B17, B18). The DOM's (C)
 // and the maps' and input's (D) live beside the surfaces they pin (soc3, soc5, soc6). Every pin names the finding
@@ -32,7 +32,7 @@ async function withHub(fn, key = SOCIAL_ROOM) {
   // with a rise ten years off, so this harness's alarms are the sweep's and the heralds' alone (the director's own are
   // sd3_relay.test.js's)
   if (key === SOCIAL_ROOM) r.store.set(SD_KEY, { s: 0, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
-  if (key === SOCIAL_ROOM) for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });   // PIN MOVED (WW5): and every province lane's Hollow resting with it
+  if (key === SOCIAL_ROOM) for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
   const tick = (ms = 600) => { clock += ms; };
   const act = (ws, o) => r.raw(ws, JSON.stringify({ t: 'social', ...o }));
   const pose = (ws, p = P) => r.raw(ws, JSON.stringify({ t: 'party', p }));

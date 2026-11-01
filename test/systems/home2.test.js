@@ -1,5 +1,4 @@
-// HOME2 (2026-09-25, Mac: "We need to ensure any house can be bought"; offered the door's offer on any click but Steal
-// and House5/House6 counted as houses - "Recommended + should use our tooltip implementation"): ANY HOUSE, BOUGHT AT
+// HOME2: ANY HOUSE, BOUGHT AT
 // ITS DOOR THROUGH THE DOOR'S OWN TOOLTIP. HOME1 offered a house to a click in Info mode alone, so a player walking in
 // Grab or Talk never met the offer. Now every house type is a house (a guild's hideout aside); the door's plaque lists
 // its verbs - "Go in" lit, "Buy it" (two presses), or at my own home "Who may enter" and "Sell it" - as ACT-MENU lists a
@@ -61,18 +60,14 @@ test('HOME2 the plaque: a door naming its verbs is an actions frame - "Go in" li
 
 test('HOME2 the deploy: a smoke call that 404s is asked again, seven times five seconds apart, before the deploy is failed - an old instance answering mid-rollout failed PR #387\'s deploy after it had taken; every new route\'s call goes through it (mutants: no retry; a route called around it)', () => {
   const wf = src('.github/workflows/account-deploy.yml');
-  // PIN MOVED (INT16, Integrity-Arc section 7): the retry is `ask`, one loop every smoke call goes through - `post` and the
   // realm character's first save (`put`) each hand it their own curl words (the loop written twice was two sites of one law)
-  // PIN MOVED (SMOKE-LOST, 2026-10-18): `ask` clears and leaves `<out>.lost` - a try that went unanswered, which the first
   // beat's and the first report's checks read (test/server/smoke_lost.test.js runs them) - the retry's law unchanged
   assert.match(wf, /ask\(\) \{\n\s*local out=\$1 url=\$2 got=404\n\s*shift 2\n\s*rm -f "\$out\.lost"\n\s*for i in \$\(seq 1 7\); do\n\s*got=\$\(curl -sS --max-time 15 -o "\$out" -w '%\{http_code\}' "\$@" "\$url"\) \|\| got=000\n\s*if \[ "\$got" != "404" \] && \[ "\$got" != "000" \] && \[ "\$\{got#5\}" = "\$got" \]; then break; fi\n\s*if \[ "\$got" = "000" \]; then : > "\$out\.lost"; fi\n[^\n]*\n\s*sleep 5\n\s*done\n\s*echo "\$got"\n\s*\}/, 'DEPLOY-FLAKE: a 404 and a 5xx are asked again - PR #592\'s deploy read renown/xp -> 500 in the platform\'s first moments after its migration; SMOKE-HANG: no answer (000) too - #950\'s and #947\'s read homes/town and homes/decor as 15 s with nothing');
   for (const route of ['/v1/account/played', '/v1/mod/mute', '/v1/renown/xp', '/v1/homes/town', '/v1/homes/claim', '/v1/homes/decor', '/v1/homes/decor/place',
     '/v1/homes/yards', '/v1/arena/board', '/v1/market/vendors']) {
     assert.match(wf, new RegExp(`code=\\$\\(post /tmp/[a-z0-9]+\\.json "\\$base${route.replace(/\//g, '\\/')}" `), route);
   }
-  // PIN MOVED (INT16, Integrity-Arc section 7): a Renown report is its seat's - the smoke's guest takes a realm character
   // first (realm/create, a ninth post) and its first save through the same retry, a PUT (`put`)
-  // PIN MOVED (AUDIT LEAN-READS D7, 2026-10-20): the kept boards read on D1 itself - a town's yards, the arena's board and
   // the region's traders - three more posts, each through the retry
   assert.equal((wf.match(/code=\$\(post /g) ?? []).length, 12, 'the twelve smoke calls, the repeated report, the realm character and the kept boards among them');
   // AUDIT LEAN-READS (audit two, C3): a board's keep is caught where D1 refuses it, so the answer says nothing of it - the

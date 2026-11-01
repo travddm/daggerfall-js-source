@@ -1,4 +1,4 @@
-// AUDIT DISC28 (2026-09-28, before the merge), lane "arrest": DISC28-B (a surrender box never outlives its crime) and
+// AUDIT DISC28, lane "arrest": DISC28-B (a surrender box never outlives its crime) and
 // DISC28-D (the first-person swing reads the live Speed) read again on the batch merged with main.
 //
 // - AR-1: a LOAD carried the old game's arrest into the loaded one. DFU never loads under the court (InputManager.Update

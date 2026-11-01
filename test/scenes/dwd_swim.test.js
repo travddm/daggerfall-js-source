@@ -1,4 +1,4 @@
-// DW-D (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2'S SWIMMER (jet082), PINNED.
+// DW-D - ILIAC PUDDLE NO MORE 1.2.2'S SWIMMER (jet082), PINNED.
 //
 // The swim driver (OutdoorSwimDriver + OutdoorSwimDriverAfter), the swim
 // movement (OutdoorSwimMovementController), the load grace

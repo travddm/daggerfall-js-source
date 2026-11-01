@@ -1,5 +1,4 @@
-// DECOR-FIGURE (2026-10-10, the owner: "remove the scaling option for npc sprites with house decoration
-// interior/exterior"). One of Daggerfall's people placed as decor - a flat in a person's archive (RDBLayout.NPCFlatArchives,
+// DECOR-FIGURE. One of Daggerfall's people placed as decor - a flat in a person's archive (RDBLayout.NPCFlatArchives,
 // now in the leaf world/npcFlatArchives.js; the catalogue's Vendors), never one's own item - stands at its own size: the
 // placer takes no size step for it (systems/decor/decorPlacer.js decorEntrySized), the bar hides Smaller and Bigger and says no
 // Size key (ui/decorPanel.js createDecorBar `sized`), the room and the yard draw one grown before at its own size
@@ -127,12 +126,12 @@ test('DECOR-FIGURE the service: a figure placed at any size but its own is refus
   assert.equal((await place(figure({ scale: 0.5 }))).body.error, 'bad-decor', 'AUDIT HOME-VOTE II D7: shrunk: refused - a build from before still has Smaller');
   assert.equal((await place(figure({ id: 'book', flat: [209, 0], scale: 2 }))).status, 200, 'a book grown: stands');
   assert.equal((await place(figure())).status, 200, 'at its own size: stands');
-  assert.equal((await move('fig1', placeOf(figure({ scale: 1.5 })))).body.error, 'decor-figure', 'moved to another size: refused');   // PIN MOVED (AUDIT HOME-VOTE II C2): in its own word
+  assert.equal((await move('fig1', placeOf(figure({ scale: 1.5 })))).body.error, 'decor-figure', 'moved to another size: refused');
   // one grown before DECOR-FIGURE, as its row stands
   svc.env.DB._raw.prepare('UPDATE home_decor SET place = ? WHERE id = ?').run(JSON.stringify(placeOf(figure({ scale: 2 }))), 'fig1');
   const turned = await move('fig1', placeOf(figure({ scale: 2, rot: [45, 0, 0] })));
   assert.equal(turned.status, 200, `a turn of the old: kept (${JSON.stringify(turned.body)})`);
-  assert.equal((await move('fig1', placeOf(figure({ scale: 3 })))).body.error, 'decor-figure', 'grown further: refused');   // PIN MOVED (AUDIT HOME-VOTE II C2)
+  assert.equal((await move('fig1', placeOf(figure({ scale: 3 })))).body.error, 'decor-figure', 'grown further: refused');
   assert.equal((await move('fig1', placeOf(figure()))).status, 200, 'brought to its own size');
   assert.equal(JSON.parse(svc.env.DB._raw.prepare('SELECT place FROM home_decor WHERE id = ?').get('fig1').place).scale, 1);
   // AUDIT HOME-VOTE II C1: an own item said beside a person's flat is no item - refused, never stood at any size

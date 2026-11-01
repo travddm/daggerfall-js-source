@@ -1,4 +1,4 @@
-// HCC (2026-09-23): THE PRESENTATION AND THE WIRE, PINNED BY EXECUTION - scenes/horseCartPool.js over a fake
+// HCC: THE PRESENTATION AND THE WIRE, PINNED BY EXECUTION - scenes/horseCartPool.js over a fake
 // renderer, collider and mesh pipeline: the wagon's pieces built and drawn with turning wheels and the tier's cargo,
 // the horse billboard's view and mirror off the camera, the activation targets and their names, the parked wagon's
 // collider box, Physics.RaycastAll over the collider, and HCC-ONLINE's record round trip through validHccRecord.
@@ -340,7 +340,7 @@ test('AUDIT HCC O1/O3/O7/O8/O9: a peer\'s team is converted every frame, stands 
   await flush(12);
   pool.frame(1 / 30, [0, 1, 0]);
   assert.ok(pool.targets().some((t) => t.key === 'hccPeer:p1:h'), 'and it is, once its art stands');
-  // O3, reversed by PR-WAGON1 (Mac: "Others' wagons don't block"): a peer's parked wagon stands no box in my collider,
+  // O3, reversed by PR-WAGON1: a peer's parked wagon stands no box in my collider,
   // has no surface for the ray to meet, and - with its horse - yields the ray to anything behind it
   assert.deepEqual([...col.buckets.keys()], [], 'PR-WAGON1: another player\'s parked wagon is no wall');
   const pw = pool.targets().find((t) => t.key === 'hccPeer:p1:w');

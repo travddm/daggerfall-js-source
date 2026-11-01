@@ -1,6 +1,5 @@
-// RVN1 - THE LEDGER OF WOUNDS, AND EVERY NEW FIELD OF THE RECORD (bible/12-Enhanced-AI/Feud-Arc.md sections 12 and
-// 26; Mac, 2026-10-04: "I want to improve the revenant system to be more complex, less easy to accomplish and more
-// detailed", then "Go" on every call). A body that may become (or already is) a revenant keeps a LEDGER while the
+// RVN1 - THE LEDGER OF WOUNDS, AND EVERY NEW FIELD OF THE RECORD (and
+// 26;, then "Go" on every call). A body that may become (or already is) a revenant keeps a LEDGER while the
 // player fights it - what the player dealt, by weapon class and element, silver apart; the staggers, the blows dodged
 // (perfectly too), the blows at its back, a backstab; whether the fight began by night, and where - and its deed folds
 // the ledger into the record's SCARS: its leading source at 40% or more, else `mixed`, and its lessons. Every field
@@ -350,7 +349,6 @@ test('RVN1 THE VALIDATORS: a scar of no kind or no minute dropped, the latest si
     sworn: true, companion: { state: 'away', loyalty: 140 },
   })], []);
   assert.deepEqual(r.scars.map((s) => s.k), ['night', 'slew', 'mixed', 'back', 'arrow', 'silver']);
-  // PIN MOVED (RVN2: a revenant holds its rank's adaptations - at rank 1, one)
   assert.deepEqual(r.learned, ['patient'], 'its rank\'s (one), the latest, once each, only adaptations');
   const [r5] = N.mergeRevenants([older({ rank: 5, learned: ['mailed', 'mailed', 'nope', 'braced', 'watchful', 'patient'] })], []);
   assert.deepEqual(r5.learned, ['braced', 'watchful', 'patient'], 'at most three');

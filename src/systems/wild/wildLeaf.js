@@ -9,7 +9,7 @@
 /** The groups no death in the zone ever drops: a vehicle, a deed, a quest's own item. */
 export const WILD_NEVER_GROUPS = Object.freeze(new Set(['Transportation', 'Deeds', 'QuestItems', 'Currency']));
 
-/** PVPDUNGEONS (the owner: "Only 1 revenant allowed to summon in the zone"): how many sworn revenants stand at the
+/** PVPDUNGEONS: how many sworn revenants stand at the
  *  player's side in the open zone. */
 export const WILD_REVENANTS_MAX = 1;
 

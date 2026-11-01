@@ -1,6 +1,4 @@
-// EL8 - ENHANCED LIGHTING, CONTACT SHADOWS AND THE CADENCE (2026-09-17, Mac:
-// "1. Screen space contact shadows 2. Continue to find ways to improve
-// performance while retaining quality").
+// EL8 - ENHANCED LIGHTING, CONTACT SHADOWS AND THE CADENCE.
 //   - CONTACT SHADOWS off the PREVIOUS frame's depth, reprojected by the
 //     previous frame's view-projection: the frame ping-pongs two depth
 //     textures; every lantern without a caster slot marches toward its light.

@@ -13,7 +13,7 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// L10N3g (2026-09-27): THE FRENCH PACK'S GRAMMAR, PORTED. "DFU en français" writes its text with grammar tokens -
+// L10N3g: THE FRENCH PACK'S GRAMMAR, PORTED. "DFU en français" writes its text with grammar tokens -
 // {.le}{.FS}épée, {Number?niveau#niveaux}, {monsieur/madame}, {#ajusté#ajustés#ajustée#ajustées} - and ships this
 // processor (FrenchGrammarRules.cs, the pack's LanguageRules mod) to resolve them wherever DFU calls
 // GrammarManager.ProcessGrammar. The pack's TEXT is its authors' work under their own terms and is never bundled; this

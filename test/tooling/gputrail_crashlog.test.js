@@ -1,4 +1,4 @@
-// GPU-TRAIL (2026-10-24, app/lib/rendererGone.cjs trailFrom/trailLines): the shell's half of the GPU's last samples -
+// GPU-TRAIL: the shell's half of the GPU's last samples -
 // what the game's page hands over, kept field by field, and written to crash.log under a process gone's line. The pure
 // halves are driven by execution; the shell's wiring is pinned by source (it runs in Electron), as RENDERER-GONE's is
 // (fb1021b_renderergone.test.js). The page's half is test/render/gputrail.test.js.

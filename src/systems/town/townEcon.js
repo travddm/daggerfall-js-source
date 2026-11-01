@@ -1,6 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// TOWN-ECON TE1 (2026-10-16, bible/06-Systems/Town-Economy-Arc.md 3) - A
+// TOWN-ECON TE1 - A
 // TOWN'S ECONOMY AS THIS CLIENT READS IT: the Prosperity of a town by its
 // map id (net/townEconLaw.js townProsperity), the factor its counters
 // apply (townShopFactor, a seat's folded in), and its card for the Held

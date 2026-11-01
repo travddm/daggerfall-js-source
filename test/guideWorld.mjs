@@ -1,4 +1,4 @@
-// GUIDE (2026-09-29): THE QUEST GUIDE SUITES' ONE WORLD - moved out of test/ui/quest/guide1_questLens.test.js when GUIDE2 needed
+// GUIDE: THE QUEST GUIDE SUITES' ONE WORLD - moved out of test/ui/quest/guide1_questLens.test.js when GUIDE2 needed
 // the same producer-minted Places. Importing it loads the vendored quest tables (the machine's own parse needs them)
 // and hands over the crafted world, its region and a seeded rolls stream that counts its draws.
 import { readFileSync, readdirSync } from 'node:fs';

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-BOUNTY (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-BOUNTY) - A FREEPORT'S BOUNTY BOARD, the page's half: the harbourmaster's tab's Wanted section
+// SEA-BOUNTY - A FREEPORT'S BOUNTY BOARD, the page's half: the harbourmaster's tab's Wanted section
 // (ui/naval/navalYardWindow.js) over the service's board (server-account/src/seaBounty.js, net/accountClient.js
 // accountSeaBounty). Built by the sea's host (scenes/seaVenturesHost.js) - HOST-SPLIT: the world wires it there.
 //

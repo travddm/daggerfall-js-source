@@ -1,13 +1,13 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1d (2026-10-01, Mac: "Finish the seats"; "Continue") - HOLDING A
+// SEAT1d - HOLDING A
 // SEAT: the holder's levers on its board (the Tithe, the Edict), what a
 // Charter pays (the Tithe across its bailiwick, beside every sale that
 // takes one - market.js), what its Edicts do on the service (the Levy on
 // a harvest, the Bounty's camps paid, Open Gates' homes), and what the
 // Seat tab shows the holder (its Standing, Tithe, Edicts and upkeep).
 //
-// bible/11-Multiplayer/Seats-Arc.md 7.1-7.3, 7.6. The numbers are
+// 7.1-7.3, 7.6. The numbers are
 // src/net/townSeatLaw.js's; the week's reckoning of them is the Turning's
 // (seatTurning.js), in its one batch.
 //
@@ -127,7 +127,7 @@ export async function proclaimEdict({ db, nowS }, player, env, { character, key,
 export async function edictsOf(db, week) {
   return edictsFrom((await edictsRead(db, week).all()).results);
 }
-/** SEAT-BATCH (2026-10-16): edictsOf's statement and its answer apart, so the seats' list sends it in one batch. */
+/** SEAT-BATCH: edictsOf's statement and its answer apart, so the seats' list sends it in one batch. */
 export const edictsRead = (/** @type {any} */ db, /** @type {number} */ week) => db.prepare("SELECT key, edict, guild_id, set_aside, spent FROM town_seat_edicts WHERE week = ? AND state = 'law'").bind(week);
 export const edictsFrom = (/** @type {any[]} */ results = []) => new Map(results.map((e) => [Number(e.key), { edict: e.edict, guild: e.guild_id, setAside: Number(e.set_aside), spent: Number(e.spent) }]));
 
@@ -188,7 +188,7 @@ export async function levyAt(db, nowS, region, pixel, env = null) {
 
 /** OPEN GATES (SEAT0 7.6: "homes in the town may not be set private this week"): whether it rules at the town `mapId`
  *  this week - a row when it does. The town answer opens every home there (homes.js homesInTown), each home's own choice
- *  kept for after. HOMES-SHED (2026-10-13): the statement, not its answer - homesInTown sends it in the homes read's own
+ *  kept for after. HOMES-SHED: the statement, not its answer - homesInTown sends it in the homes read's own
  *  batch, so a town's homes cost the database one request where they cost two. */
 export const openGatesRead = (db, nowS, mapId) => db.prepare("SELECT 1 FROM town_seat_edicts WHERE key = ? AND week = ? AND state = 'law' AND edict = 'open-gates'")
   .bind(mapId, weekAt(nowS));

@@ -2,7 +2,7 @@
 // THE OARS FROM THE KEPT RUNG (systems/comeSailAway/comeSailAway.js updateSailing).
 //
 // The Overworld's crossing (OWS2, 2026-09-28: scenes/world.js tvSeaSail, systems/seaHelm.js) sails a boat through the
-// helm's keys alone - the rudder held, the sail key's edge, and the autorun for her oars. HELM-LADDER (2026-10-04) made
+// helm's keys alone - the rudder held, the sail key's edge, and the autorun for her oars. HELM-LADDER made
 // the oars a KEPT RUNG (`oarThrottle`: backing water, at rest, pulling ahead), reset only by a press, a sail raised or
 // the helm taken or left - and the crossing's hand never knew it. A journey begun at a helm left on her oars ("without
 // full sails": W once, or S from her last sail) kept the rung through the journey and past its end: the hand let go,

@@ -1,6 +1,4 @@
-// MACRO-ONE (2026-09-22, Mac: "some npc dialogue and ui prompts are
-// coming up with references instead of referenced items (%ra, %cr)" -
-// "a recurring issue with a lot of things"). THE ONE GAMEMANAGER.
+// MACRO-ONE. THE ONE GAMEMANAGER.
 //
 // DFU resolves a global macro (the player's race, the region, the date)
 // off singletons whoever shows the text. The port's table reads the same

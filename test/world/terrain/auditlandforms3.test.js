@@ -1,6 +1,6 @@
-// AUDIT LANDFORMS III (2026-10-07, Mac, of LANDFORM4-6: "Audit this. Must be perfection") - the audit of a town
-// standing in its land, the rolling hills and the land each climate wears (bible/03-World/Landforms.md, the record
-// bible/01-Overview/audits/Audit-Landforms.md). Every finding fixed here was reproduced first, on the real WOODS.WLD and on the
+// AUDIT LANDFORMS III - the audit of a town
+// standing in its land, the rolling hills and the land each climate wears (, the record
+// ). Every finding fixed here was reproduced first, on the real WOODS.WLD and on the
 // landforms' synthetic world, and each pin below fails on the code as it stood (tools/mutants/auditlandforms3.json).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

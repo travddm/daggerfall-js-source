@@ -1,6 +1,6 @@
-// AUDIT LIVED1 (2026-09-29, Mac: "Lets do an audit on this") - the six lanes' findings over LIVED1's frozen tree
+// AUDIT LIVED1 - the six lanes' findings over LIVED1's frozen tree
 // (1e12a3e6), each reproduced before it was fixed, pinned here by a test that FAILS on the unfixed tree for the
-// finding's reason, and mutation-proven (tools/mutants/auditlived1.json). The record: bible/01-Overview/audits/Audit-Lived1.md.
+// finding's reason, and mutation-proven (tools/mutants/auditlived1.json). The record:.
 // Lanes: K the clock core, R every reader's clock, S the save and the lifecycle, P party, sharing and exploits,
 // U the words and the UI, T the record, the pins and the mutants. A finding more than one lane found carries every ID.
 import { test, afterEach } from 'node:test';

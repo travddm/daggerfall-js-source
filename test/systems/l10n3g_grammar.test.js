@@ -1,4 +1,4 @@
-// L10N3g (2026-09-27): THE FRENCH PACK'S GRAMMAR. "DFU en français" writes its text with grammar tokens and ships an
+// L10N3g: THE FRENCH PACK'S GRAMMAR. "DFU en français" writes its text with grammar tokens and ships an
 // MIT processor (FrenchGrammarRules.cs, Daneel53) that DFU runs wherever it calls GrammarManager.ProcessGrammar; the
 // port carries it as src/systems/grammar/frenchGrammar.js. Pinned over made-up French (no pack text is committed):
 // the text core chooses the rules for French and only for French - English, and a language with no rules, read their

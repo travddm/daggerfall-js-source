@@ -1,11 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW4 / LW6 (bible/06-Systems/Living-World.md): THE FOES A PARTY ON THE ROAD MEETS - the host's `foesOf` for the living
+// LW4 / LW6: THE FOES A PARTY ON THE ROAD MEETS - the host's `foesOf` for the living
 // world's trouble (systems/livingWorld/trouble.js TroubleWorld): on the land the campers' themed group at the place the
 // trouble falls (campEncounters.js rollGroupComposition - CAMP1's), at the party's level, sized to it; inside a dive's
 // dungeon its type's own table (encounters.js chooseRandomEnemy, LW6).
 //
-// BAY-LEFT-GROUND (bible/06-Systems/Living-World-II.md; the audit "no system left behind in the Bay", D2): THE LAND'S OWN
+// BAY-LEFT-GROUND (; the audit "no system left behind in the Bay", D2): THE LAND'S OWN
 // WILD PAST THE BAY. Every other encounter path hands the encounter law the pixel's zone's wild (`fauna`, systems/
 // tamrielFauna.js faunaBandAt - TESA-BIOME's choice 4: a province's own beasts), and this one handed none, so a caravan in
 // Black Marsh was beset out of Daggerfall's climate tables - Orcs and Centaurs in the swamp. The trouble now hands the

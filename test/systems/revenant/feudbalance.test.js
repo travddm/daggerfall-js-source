@@ -1,4 +1,4 @@
-// FEUD BALANCE (bible/12-Enhanced-AI/Feud-Arc.md section 31's OPEN 22-24 and the FEUD BALANCE record; Mac, 2026-10-05,
+// FEUD BALANCE ('s OPEN 22-24 and the FEUD BALANCE record; Mac, 2026-10-05,
 // on AUDIT FEUD's measured misses: each as recommended). OPEN 22 - a revenant's will is broken by its weakness, or by ONE
 // stagger or ONE perfect dodge of its blow (two staggers came one rank-3 fight in nine). OPEN 23 - its last stand rises
 // to 30 / 35 / 40% of its health by rank (35 / 45 / 55%: a rank 5 was 3.25 times a rank 1's fight). OPEN 24 - dodging
@@ -55,7 +55,7 @@ test('FEUD BALANCE THE WILL, THROUGH THE LEDGER: a rank-3 one\'s will holds unti
   const g = stood(3);
   L.noteFeud(g.entity, 'staggers');
   assert.equal(FT.revenantWillHolds(g), false, 'my stagger broke it');
-  assert.equal(FT.revenantWillHolds(stood(1)), false, 'under rank 2 there is no will to break');   // PIN MOVED (UNQUIET, Revenants.md section 46): the will from rank 2
+  assert.equal(FT.revenantWillHolds(stood(1)), false, 'under rank 2 there is no will to break');
 });
 
 test('FEUD BALANCE THE PAGE: its will\'s rule says all three ways; its last stand its new share (mutants: the old words)', () => {
@@ -67,7 +67,6 @@ test('FEUD BALANCE THE HARNESS: dodging pays in the blows not taken - a tenth of
   const { FEUD_TARGETS } = await import('../../../tools/tellDuel.mjs');
   assert.equal(FEUD_TARGETS.DODGE_SPARES, 0.1);
   assert.equal('DODGE_PAYS' in FEUD_TARGETS, false, 'the old time share is gone');
-  // PIN MOVED (AUDIT FEUD 2: the verdict is its own function - its ratios from the cells' unrounded means)
   const { feudVerdict, measureFeud } = await import('../../../tools/tellDuel.mjs');
   const cell = (weapon, mode, weak, mean, hits, kneel = 0.5) => ({ weapon, mode, weak, kneel, raw: { mean, hitsOnMe: hits } });
   const ranks = ['trade', 'dodge'].flatMap((mode) => [1, 2, 3, 4, 5].map((rank) => ({ mode, rank, raw: { mean: 5 + rank, hitsOnMe: 0 } })));

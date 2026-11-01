@@ -1,4 +1,4 @@
-// QL-FRAME1 + LOOT-GONE1 (2026-09-24, the contributor's soft-lock report): activating a ground pile with QuickLoot on
+// QL-FRAME1 + LOOT-GONE1: activating a ground pile with QuickLoot on
 // ran `if (quickLootTake(...)) return;` INSIDE frame(), so a take - or its refusal, "You cannot carry any more stuff." -
 // left the frame before requestAnimationFrame(frame) at its foot and the game loop stopped: no look, no walk, no foes.
 // And a pile gone between the hover and the press (pileFor null) threw building its hooks, which ends a rAF loop too.

@@ -1,5 +1,5 @@
 // AUDIT RPT1026 (lane F, PROGRESS - an audit of FIELD BUGS 2026-10-26r's progression, spell and item fixes): the findings
-// the audit proved, each pinned on the producers the game runs. The record is bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md
+// the audit proved, each pinned on the producers the game runs. The record is
 // (the RPT1026-PROGRESS section's AUDIT RPT1026 lines). Each test failed on the batch's head (2dc8f31a2) and passes with
 // its fix:
 //   F1  Master Skills switched off and on again dropped the tough-foe practice a mastered skill had earned since its last

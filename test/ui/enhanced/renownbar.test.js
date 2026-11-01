@@ -1,6 +1,4 @@
-// RENOWN-BAR (2026-09-26, Mac: "with the new renown xp bar, I want to remove the xp amount on the lefthand side and
-// integrate it into the bar itself, then center the bar properly"; then, having seen the numbers in a taller bar:
-// "Actually lets just keep the other bar and remove the xp. Just have it visible in the player profile"): THE HUD'S
+// RENOWN-BAR: THE HUD'S
 // RENOWN ROW IS THE BOX AND THE THIN BAR, AND THE BAR IS ON THE MIDDLE. RENOWN4 drew box, bar, numbers - the numbers a
 // readout beside the bar, so the bar's middle stood 42px left of the vitals' (57px at the widest numbers,
 // tools/renownBarProbe.mjs). Now there are no numbers on the HUD - they are the profile menu's (ui/enhanced/enhancedAccount.js,
@@ -8,8 +6,7 @@
 // RENOWN4's own 8px, and the row is a grid of three columns - the box, the bar and an empty column the box's width -
 // so the bar's middle is the row's, and the row is as wide as the vitals' and centred under them. The probe measures it
 // in Chromium (centre off 0.0px at a desktop, a laptop and a phone both ways up); these hold the markup and the sheet.
-// UI3 (2026-09-27, Mac: the effects to "their own widget space ... which then gives more space for the XP bar and being
-// able to fit the XP amounts inside"): THE NUMBERS GO BACK IN THE BAR, now that nothing stands under it - the bar the
+// UI3: THE NUMBERS GO BACK IN THE BAR, now that nothing stands under it - the bar the
 // vitals' own 20px, the level's credit over its span inside it ("490 / 2,150 XP"), "Highest" at the cap; the row keeps
 // its three columns (so the bar stays on the middle) and its 22px (which the quickslot block's lifts count).
 import { test } from 'node:test';
@@ -65,7 +62,7 @@ test('RENOWN-BAR the HUD, executed: the row is the box and the bar and nothing e
     drawEnhancedHud(entity, 0, 0, { weapon: null, weaponSheathed: true });
     const root = document.body.children.find((n) => n.className === 'hud');
     const row = find(root, 'hud-renown');
-    // SKILL-READY / FIRM-STARS (2026-10-20): and the two tiles that stand outside its ends (ui/hud/hudAdvance.js), hidden until they count
+    // SKILL-READY / FIRM-STARS: and the two tiles that stand outside its ends (ui/hud/hudAdvance.js), hidden until they count
     assert.deepEqual(row.children.map(classes), [['hud-renownbox'], ['hud-track', 'hud-renowntrack'], ['hst-cell', 'hud-adv', 'hud-adv-skill'], ['hst-cell', 'hud-adv', 'hud-adv-firm']], 'the box and the bar, and the two tiles beside them');
     const track = row.children[1];
     assert.deepEqual(track.children.map(classes), [['hud-fill'], ['hud-renownghost'], ['hud-renownnum']], 'the fill, the ghost and (UI3) the words, over both');

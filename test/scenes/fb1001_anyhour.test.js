@@ -1,4 +1,4 @@
-// ANY-HOUR (2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"). The
+// ANY-HOUR. The
 // professions borrowed Foraging's checks for an act's start (FORAGE0 14.3) - daylight 07:00-17:59 among them - so from
 // 18:00 to 06:59 a vein, a boulder, an herb patch (the Sickle's or the Basket's), a tree and the net said "You need
 // daylight to mine effectively!" and the like, and the service refused any surface harvest whose act ended in those
@@ -135,7 +135,7 @@ test('ANY-HOUR: the words keep no hours - the Fishing-Net\'s line, the Fishing p
   assert.doesNotMatch(PROFESSION_TOOL_HOW[FT.FishingNet]('E'), /daylight|07:00|17:59/);
   assert.match(PROFESSION_TOOL_HOW[FT.FishingNet]('E'), /^Fishing is done in water: stand or swim in it, or be at sea, until its acts show, then press E \(or use the Fishing-Net\)\.$/);   // PROF-MENU: its acts - the list, or the prompt
   assert.doesNotMatch(FISHING_HOW, /daylight|07:00|17:59/);
-  assert.match(FISHING_HOW, /or aboard a ship, at any hour\./);   // VOICE1 (PIN MOVED): the same law in plain words
+  assert.match(FISHING_HOW, /or aboard a ship, at any hour\./);   // VOICE1 (
   assert.deepEqual([...NET_WHERE], ['inside', 'town'], 'the ground\'s words: inside and a settlement - never the hour');
   assert.deepEqual(Object.keys(NET_WHERE_WORDS), ['inside', 'town']);
 });

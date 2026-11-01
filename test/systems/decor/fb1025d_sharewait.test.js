@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-25d HOME-SHARE-WAIT ("Disappearing House Storage: Items placed inside house storage randomly
-// disappear"; bible/01-Overview/bugs/Field-Bugs-2026-10-25d.md). The owner's shared chest opened the save's window until
+// disappear"). The owner's shared chest opened the save's window until
 // the service said it was shared - and for the whole visit when that answer never came. A shared chest's goods are the
 // service's, so the window showed it empty, and what went in there was hidden behind the bin. The owner's chest in an
 // online home now opens only once the answer stands, and an answer for an earlier room is not this room's.

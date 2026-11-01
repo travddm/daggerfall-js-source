@@ -3214,7 +3214,7 @@ export const ENEMY_BASICS = ({
 
 /** DEX1: THE TABLE AS DFU SHIPS IT - EnemyBasics.Enemies' own initializer, copied before any mod writes a row (this
  *  module's evaluation ends before an importer runs) and frozen to the leaf. For the readers a mod's edit must never
- *  reach: King's Gambit's roster is one for every client and the relay (bible/11-Multiplayer/Kings-Gambit.md, "the
+ *  reach: King's Gambit's roster is one for every client and the relay (, "the
  *  vanilla rows, never a mod's overlay"), and a client evaluating it after Daggerfall Enemy Expansion's Start wrote its
  *  classic rows would build another. */
 const deepFreeze = (o) => { for (const v of Object.values(o)) if (v && typeof v === 'object') deepFreeze(v); return Object.freeze(o); };

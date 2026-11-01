@@ -1,5 +1,4 @@
-// CAPT-BOARD (2026-10-11, the owner: "giving a reason to players to experience it"; bible/03-World/Captains-Sea.md
-// CAPT-BOARD) - THE HARBOURMASTER'S BOARD: a port's contracts off its key and the world's day (a bounty, a hunt, a
+// CAPT-BOARD - THE HARBOURMASTER'S BOARD: a port's contracts off its key and the world's day (a bounty, a hunt, a
 // delivery, a salvage, the Admiralty's survey), their purses, terms and sites; a contract taken, come further, done,
 // failed or given up, and the crown's regard for each; the letters a rank buys; the harbour office the world stands
 // over the ledger; the naval host's sites (a bounty's quarry stood, a wreck's casks floated), its events, a rank's
@@ -96,7 +95,6 @@ test('CAPT-BOARD the board: BOARD_OFFERS a day and a rank\'s more, the same for 
   assert.ok(!nearOnly.some((o) => o.kind === 'delivery'), 'a port nearer than DELIVERY_PX_MIN: no cargo for it');
   assert.deepEqual(boardFor({ port: null, crown: 'Wayrest', day: 1 }), []);
   assert.equal(hashKey, wireHashKey, 'the board hashes with the wire\'s FNV-1a - one home');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA H24): FNV-1a's own values - the key compared with itself held for any hash
   assert.equal(hashKey(''), 2166136261, 'the offset basis');
   assert.equal(hashKey('100,100'), 115546219);
   assert.notEqual(hashKey('100,100'), hashKey('100,101'));

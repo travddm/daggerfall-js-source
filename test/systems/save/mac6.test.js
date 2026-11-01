@@ -1,5 +1,4 @@
-// MAC6 (Mac, 2026-09-12: "A bug. 1. When playing online it doesnt place
-// you where you last saved your account"). #1: THE DUNGEON SAVE COMES
+// MAC6. #1: THE DUNGEON SAVE COMES
 // HOME. A save taken inside a world-hosted dungeon is the dungeon
 // host's own envelope - keyed dungeon:<id>, a dungeon-local position,
 // no map pixel - and the world host's boot load (the Load door and the

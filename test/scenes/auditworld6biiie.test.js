@@ -1,4 +1,4 @@
-// AUDIT WORLD6b-iii(e) (Mac, 2026-09-14: "Continue" after WORLD6b-iii(e)): three opus lenses over the striker's rider and
+// AUDIT WORLD6b-iii(e) (after WORLD6b-iii(e)): three opus lenses over the striker's rider and
 // the roster's bound - A the pools' poison door and the hit, B the wire/relay/session `who`, C the dungeon twin, the
 // records and the merge. Paid here: the dose is the CALC's word, not the number's (A3: FormulaHelper doses on the
 // calc's damage and the Strikes payload can zero it after - LowDamageVs - so a poisoned, enchanted blade spent its

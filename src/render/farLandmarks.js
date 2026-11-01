@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-LANDMARK (2026-10-26, the coordinator for stream A's Imperial City at some 20 km: "Build the city-skyline hook ...
-// so stream A can hand in the Imperial City's silhouette"; bible/06-Systems/Travel-View.md FAR-LANDMARK): A LANDMARK ON
+// FAR-LANDMARK: A LANDMARK ON
 // THE HORIZON - a low-poly silhouette (a city's walls and towers) handed to the far ring and drawn in its pass, by its
 // program, under its light and its haze, where the stream has not built the landmark's pixel.
 //

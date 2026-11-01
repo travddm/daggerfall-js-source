@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VOTE (2026-10-10) - A TOWN'S WORD ON A PLAYER'S HOUSE, KEPT.
+// HOME-VOTE - A TOWN'S WORD ON A PLAYER'S HOUSE, KEPT.
 //
 // The owner: "I want to implement a house voting system within vicinity
 // of player houses. If the house votes run negative, the exterior

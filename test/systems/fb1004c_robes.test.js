@@ -1,7 +1,7 @@
 // WHERE-ROBES (FIELD BUGS 2026-10-04c, Balcony on Discord, "THE QUALIFYING EXAMINATION - Quest bug": "my letter says
 // for me to steel priests Robes from Hawkton residence and i did it.. i should give me another letter with were should i
 // go to bring the quest item and go on, but the didn't get the letter and nothing changed in quest dialog.. so i can't do
-// my Class guild promotion quest."; `bible/01-Overview/bugs/Field-Bugs-2026-10-04c.md`).
+// my Class guild promotion quest."; ` `).
 //
 // O0A0AL00's `_S.03_` is `clicked item _clothing_ say 1018` / `get item _note_`: the note that names the guild's man
 // rides the CLICK on the robes, and DFU sends that click from two places only - the stand in the world

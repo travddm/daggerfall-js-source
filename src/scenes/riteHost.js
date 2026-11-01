@@ -1,5 +1,5 @@
 // @ts-check
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"; then "Btw I want to do all 4. We're going balls deep with this"):
+// WB12d:
 // THE FAITHFUL'S RITE, IN THE WORLD. Each breach's circle (net/gate/gateRite.js riteLocalOf) stands from the omen until the
 // breach collapses: Dagon's sigil burned into the earth, its braziers alight, the altar and the faithful's casket
 // (world/riteModel.js), their tents and fire, and a pillar of smoke over it until the breach opens (render/riteSmoke.js).
@@ -22,14 +22,13 @@
 // believed for this screen's own circle alone (AUDIT WB12d R1), said once while the rite still holds, and opens the
 // faithful's casket for each character once a day (systems/riteChest.js) - its contents a pile the casket holds.
 //
-// BROKER-CAGE (2026-10-02, Mac: "she should be present at the site in a jailed gate, and the gate opens after all the
-// enemies are cleared"): the Sigil Broker is their prisoner, caged beside the circle (scenes/sigilBrokerPool.js). The
+// BROKER-CAGE: the Sigil Broker is their prisoner, caged beside the circle (scenes/sigilBrokerPool.js). The
 // rite's word says too whether this character has seen EVERY ONE of the faithful fall (net/gate/gateRite.js riteRosterFell -
 // the Summoner's fall the hub said counting as seen, AUDIT BROKER-CAGE C1); the hub's word that they all fell (`cl`) is
 // kept by circle like the broken one, and once it is said none of the faithful is stood again - for this screen, or a
 // page opened after - and copies of them standing are taken down (C13). `isCleared` is the cage's question.
 //
-// Online alone, on a relay that keeps the rite: offline there is no breach. Design: bible/11-Multiplayer/World-Bosses.md
+// Online alone, on a relay that keeps the rite: offline there is no breach. Design:
 // section 19 D.
 //
 // Not a DFU member. Ledger A (WB).

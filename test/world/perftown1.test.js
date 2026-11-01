@@ -1,6 +1,4 @@
-// PERF-TOWN1 (2026-09-20, Mac: "the exterior is really heavy rn", and
-// then "I'd rather not keep testing and go ahead and make performance
-// improvements").
+// PERF-TOWN1.
 //
 // WHAT THE READOUT SAID. `?perf=cpu`, outside, over seven lines:
 //

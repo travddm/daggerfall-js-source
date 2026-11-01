@@ -1,6 +1,5 @@
 // @ts-check
-// WATER-FOES (2026-10-04, from the field: "Enemies in the water on a boat shouldn't slow down your ship or prevent you
-// from resting when on board") - A FOE THAT CANNOT REACH THE PLAYER IS NO ENEMY NEARBY. GameManager.AreEnemiesNearby
+// WATER-FOES - A FOE THAT CANNOT REACH THE PLAYER IS NO ENEMY NEARBY. GameManager.AreEnemiesNearby
 // (systems/encounters.js areEnemiesNearby) counts a hostile foe that sees the player or stands in the classic spawn
 // band - and outdoors that band has no height test (enemyMotor.js wouldBeSpawnedInClassic), so a slaughterfish or a
 // dreugh anywhere under the sea within 102.4 m of a boat reset the helm's time scale, stopped a journey, slowed the

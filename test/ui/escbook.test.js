@@ -1,7 +1,4 @@
-// ESC-BOOK (2026-09-27, Eterna on Discord: "if u enter the spellbook via the escape menue, instead of the chosen
-// keybind, the spellbook will open and stay persistent, behind all screens, making it unable to exit or play" and
-// "if one goes to the escape menue and attempts to navigate to the notes or quests, via the butttons there ... one must
-// use keybinds exclusively to open both the note book and quest log"). On the enhanced skin F5 opens the pause window
+// ESC-BOOK. On the enhanced skin F5 opens the pause window
 // on its Stats page (PX27), and that page's Pack, Spellbook and Chronicle doors called the SHEET's factories, closed the
 // page and dropped what they built: the enhanced spellbook and pack mount their screens the moment they are built, so
 // one stood over the game with no host slot holding it (the pointer relocked, the game ran on, the pause opened over
@@ -61,7 +58,7 @@ test('ESC-BOOK: the page\'s doors are the host\'s arms - the page goes down FIRS
     questLog: () => 'not a door',
   };
   const doors = sheetPageDoors(bag, () => seen.push('close'));
-  // ARENA3 moved this pin: the Arena window is a fourth door of the page (bible/11-Multiplayer/Arena.md 5 - "from the
+  // ARENA3 moved this pin: the Arena window is a fourth door of the page (5 - "from the
   // pause menu's Arena entry once you have joined"), the host's arm like the other three
   assert.deepEqual(Object.keys(doors), ['openPack', 'openSpellbook', 'openChronicle', 'openArena']);
   doors.openSpellbook(); doors.openChronicle(); doors.openPack();

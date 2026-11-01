@@ -1,4 +1,4 @@
-// SPELL-HAND on THE MORROWIND ARM (bible/05-Combat/Two-Hands.md "The spell hand"; combat/twoHands/spellHandArm.js, wired
+// SPELL-HAND on THE MORROWIND ARM ("The spell hand"; combat/twoHands/spellHandArm.js, wired
 // by combat/fpArm.js). The fixture arm (mwcast1's: the longsword arm whose clips carry the spellcast group and IdleSpell):
 //   - the spell hand keeps the WEAPON's stance - the weapon in its hand, its left arm the Spell idle's; the cast plays the
 //     spellcast group with the weapon still in hand, its right arm the weapon's idle; the stance it latched lets go after.
@@ -128,7 +128,7 @@ test('SPELL-HAND THE LIVE ARM: with the spell in the free hand the arm keeps the
   a.unload();
 });
 
-// ---- AUDIT SPELL-HAND on the arm (bible/01-Overview/audits/Audit-Mixed-Pair-Spell-Hand.md) ----------------------------
+// ---- AUDIT SPELL-HAND on the arm ----------------------------
 
 test('AUDIT L3-11 THE ARM\'S LAWS IN THEIR MODULES (HOST-SPLIT): the spell hand\'s stance step (wait under an equip or an unequip, finish a cast, let a Spell stance go, keep), the draw into the spell hand, the striking weapon (mutants: each answer of each law)', () => {
   const U = UPPER_BODY;

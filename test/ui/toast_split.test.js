@@ -1,5 +1,4 @@
-// TOAST-SPLIT (2026-09-29, Mac: "So it seems like the enhanced plus UI regressed. The notifications arent enhanced plus
-// anymore"; bible/10-UI/UI-Arc.md TOAST-SPLIT): THE TOASTS AND THE NOTICE BOARD SHARE NO CLASS. The Notice
+// TOAST-SPLIT: THE TOASTS AND THE NOTICE BOARD SHARE NO CLASS. The Notice
 // Board (NOTICE1) drew its cork in `.notice-body` and its small italic lines in `.notice-hint` - the HUD toast stack's own
 // two classes (ui/enhanced/enhancedNotice.js, ui/enhanced/enhancedInputBox.js, ui/yesNoBox.js) - so the board's sheet (NOTICE_CSS, in the
 // Enhanced Plus sheet since MERGE 2, and laid on the classic skin when a board opens) put the cork behind every toast's

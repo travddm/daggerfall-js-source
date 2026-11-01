@@ -1,4 +1,4 @@
-// PEERLIGHT1 (2026-09-26): another player's lit torch lights my world - the pose's `lt`, and the light at their hand.
+// PEERLIGHT1: another player's lit torch lights my world - the pose's `lt`, and the light at their hand.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// L10N4 (2026-09-28): THE PORT'S OWN ENGLISH STILL WRITTEN INTO THE CODE, COUNTED.
+// L10N4: THE PORT'S OWN ENGLISH STILL WRITTEN INTO THE CODE, COUNTED.
 //
 // A player reads the port's own words - menus, the enhanced interface, the online game, every notice DFU does not have -
 // only in English until each goes through the text core (`t(key, en, args)`, Port_Strings). This finds the words that
@@ -43,7 +43,7 @@ export function isProse(s) {
   if (/^[a-z]+(-[a-z0-9]+)+( [a-z]+(-[a-z0-9]+)*)*$/.test(s)) return false;   // class lists
   const english = /\s(a|an|the|of|to|is|in|on|and|or|you|your)\s/i.test(` ${s} `);
   if (/^[\w$.-]+( [\w$.-]+)*$/.test(s) && !/[A-Z]/.test(s[0]) && !english) return false;   // identifier runs
-  // CARDS-PLUS (2026-10-13): a selector naming an id, an attribute or a pseudo-class (`#wp-menu input.wpm-name`,
+  // CARDS-PLUS: a selector naming an id, an attribute or a pseudo-class (`#wp-menu input.wpm-name`,
   // `body .dfiliac button[data-kind="warn"]`, `:scope > .px-tabs button`) - the identifier runs above read only words
   // and dots, so a kit role written this way was counted as a sentence. AUDIT CARDS-PLUS D1: every part a compound of
   // CSS identifiers AND a class among them - without the class, "press [E] when ready", "[locked] needs more gold" and

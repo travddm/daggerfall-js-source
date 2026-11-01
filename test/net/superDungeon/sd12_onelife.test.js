@@ -1,8 +1,7 @@
-// SD-ONELIFE (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md sections 7 and 16; Mac: "A death
-// within the rift casts you out and youre unable to re enter. You get one life to prove your worth"): ONE LIFE A HOLLOW.
+// SD-ONELIFE: ONE LIFE A HOLLOW.
 // A death in the Shattered Hour casts the player out (SD5a) and is final for that Hollow: the realm keeps the account
 // its dying pose came from and refuses its every hello after ("The Hour will not take you back."); the page keeps the
-// slot on the device, its Rift refuses it. SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed"): a death is DOWN
+// slot on the device, its Rift refuses it. SD-REZ (EVENT-RULES, 2026-10-25): a death is DOWN
 // first - a friend's Resurrect inside SD_REZ_MS raises the body and the realm lets it back; past the window, for good.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -65,7 +64,7 @@ test('SD-ONELIFE / SD-REZ THE REALM REMEMBERS A DEATH: the dying pose (PCORPSE1\
     assert.deepEqual(kept.down.map(([x]) => x), ['acct-peer-ann'], 'down, kept with the realm');
     // inside the window: a friend raised her - her hello is her rise
     step(SD_REZ_MS - 1000);
-    await realm.raw(bo, JSON.stringify({ t: 'sd', k: 'rz', to: 'acct-peer-ann' }));   // PIN MOVED (AUDIT WORLD-EVENTS L1-1): the raise is the realm's to record - Bo, beside her body
+    await realm.raw(bo, JSON.stringify({ t: 'sd', k: 'rz', to: 'acct-peer-ann' }));
     realm.room._sdRealm = undefined;   // a fresh instance reads it from storage
     const raised = await hello('peer-ann', inArena(0, -12));
     assert.equal(raised.closed, null, 'raised: back in the Hour');
@@ -74,7 +73,6 @@ test('SD-ONELIFE / SD-REZ THE REALM REMEMBERS A DEATH: the dying pose (PCORPSE1\
     await realm.raw(raised, JSON.stringify({ t: 'pose', p: inArena(0, -12, { dd: 1 }) }));
     assert.deepEqual(realm.store.get(SD_REALM_KEY).down.map(([x]) => x), ['acct-peer-ann'], 'down again');
     step(SD_REZ_MS + 1);
-    // PIN MOVED (SD-BACK, 2026-10-28, the owner: "let them go back in if they die to that partys instance"): past the
     // window her own Hour takes her back - a rise, off the lying and the dead (it was SD_NO_FALLEN, one life a Hollow);
     // the hub keeps every other copy shut to her (sdparty_relay.test.js)
     const again = await hello('peer-ann', inArena(0, -12));
@@ -101,9 +99,9 @@ test('SD-ONELIFE / SD-REZ THE REALM REMEMBERS A DEATH: the dying pose (PCORPSE1\
 });
 
 test('SD-REZ THE WINDOW\'S LAW, pure: dead for good is fallen; down inside SD_REZ_MS is a rise, past it fallen; neither is null (mutants: the edge moved; the dead read as down; the count blind to a rise)', () => {
-  const realm = { dead: ['a'], down: [['b', 1000]], raised: [['b', 1200]] };   // PIN MOVED (AUDIT WORLD-EVENTS L1-1): a rise is a raise the realm recorded
+  const realm = { dead: ['a'], down: [['b', 1000]], raised: [['b', 1200]] };
   assert.deepEqual([sdDownWord(realm, 'a', 0), sdDownWord(realm, 'b', 1000 + SD_REZ_MS), sdDownWord(realm, 'b', 1001 + SD_REZ_MS), sdDownWord(realm, 'c', 5)], ['fallen', 'rise', 'fallen', null]);
-  assert.equal(SD_REZ_MS, 70_000, 'the body\'s minute for a friend to reach it, and the page\'s ten seconds for its hello');   // PIN MOVED (AUDIT WORLD-EVENTS L1-5): it said two minutes; the body was gone at one
+  assert.equal(SD_REZ_MS, 70_000, 'the body\'s minute for a friend to reach it, and the page\'s ten seconds for its hello');
   assert.equal(sdDownWord({ dead: [] }, 'b', 0), null, 'a realm kept before SD-REZ has no `down`');
 });
 
@@ -122,7 +120,7 @@ test('SD-ONELIFE THE RIFT\'S WORD: a slot whose Hour this player died in is refu
 test('SD-ONELIFE THE PAGE, from the world host\'s own text: the slot of the Hour I die in kept on the device (its own key, the last few, once each), the Rift asked with it, a friend\'s Resurrect raising me in the Hour only inside its realm\'s window (SD-REZ - the slot let go when it does), and the death\'s words say it is for good (mutants: the death unkept; kept in the session alone; the Rift blind to it; a Resurrect past the window; the slot kept at a rise; a rise past the window letting it go)', () => {
   const store = new Map();
   const appStorage = () => ({ getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) });
-  const make = (key) => sdSlotsKept(key, () => null, appStorage);   // AUDIT SD III (H1, PIN MOVED): the signed-in account's - none here, the device's. PIN MOVED (WITCH1): out of the world host whole, to systems/superDungeon/sdSlots.js
+  const make = (key) => sdSlotsKept(key, () => null, appStorage);   // AUDIT SD III (H1
   const fallen = make(SD_FALLEN_KEY);
   fallen.add(7); fallen.add(7);
   assert.equal(fallen.has(7), true);

@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, the audit of ARENA4's ladder trust): A LADDER FIGHTER'S VITALITY IS THE RELAY'S. ARENA4 let the
+// ARENA4b: A LADDER FIGHTER'S VITALITY IS THE RELAY'S. ARENA4 let the
 // `in` word's client-claimed `lv` and `mh` win over anything signed, so a modified client could fight the Grand Champion
 // with the health it named. Now the token signs the character's level (`cl`, net/identityToken.js claimsValid - the
 // account service mints it, another stream's), the relay carries it onto the socket (server/src/index.js `_named`),

@@ -75,8 +75,7 @@ function build(screen) {
   const title = el('h1', 'dth-title', t('death.youDied', 'You Died'));
   const rule = el('div', 'dth-rule');
   rule.append(el('i'), el('span', 'dth-gem'), el('i'));
-  // DEATH-PENALTY (Mac: "remove the tale line and use the same fonts for the gold loss message in online
-  // mode"): a death that costs gold says so IN the line's place, in the line's own italic serif, rather than
+  // DEATH-PENALTY: a death that costs gold says so IN the line's place, in the line's own italic serif, rather than
   // under it in a second face. A death that costs nothing (no respawn - BAL4: an offline Legacy rise pays - or a purse under ten coins) keeps its words.
   const lossLine = screen.goldLoss > 0 ? (screen.goldLossLine || deathPenaltyLine(screen.goldLoss)) : '';
   const line = el('p', `dth-line${lossLine ? ' dth-lossline' : ''}`, lossLine || (online || screen.rises
@@ -179,7 +178,7 @@ export const DEATH_CSS = `
 .dth-band::before { top: 0; } .dth-band::after { bottom: 0; }
 @keyframes dth-band { from { clip-path: inset(50% 0 50% 0); } to { clip-path: inset(0 0 0 0); } }
 
-/* FONT3 (2026-10-02, Mac: "we need to ensure everything recieves our enhanced font"): the title and the line were the
+/* FONT3: the title and the line were the
    display serif, the one screen of the game's own words still in it; they are the pixel face, named outright. */
 .dth-title { margin: 0; font-family: ${PIXEL_STACK}; font-weight: 500;
   font-size: clamp(44px, 9vw, 104px); line-height: 1; text-transform: uppercase;

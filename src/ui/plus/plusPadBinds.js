@@ -1,4 +1,4 @@
-// PADPLUS10 (2026-09-26): THE CONTROLLER BINDINGS WINDOW - Enhanced Plus only.
+// PADPLUS10: THE CONTROLLER BINDINGS WINDOW - Enhanced Plus only.
 //
 // The player: "add the possibility to bind your controller buttons in a separate menu, Enhanced Plus UI only. Holding
 // d-pad left should also be the mount/cart/foot selection (T) ... make the left and right stick sensitivity
@@ -44,20 +44,19 @@ export const PLUS_BIND_ROWS = Object.freeze([
   { id: 'crouch', label: 'Crouch', sec: 'Crouch' },
   { id: 'transport', label: 'Transport', sec: 'Transport' },
   { id: 'charsheet', label: 'Character sheet', sec: 'CharacterSheet' },
-  // Mac: "make mouselook on and off (same button) and walk mode bindable on controller"
   { id: 'mouselook', label: 'Mouselook on / off', sec: 'FreeMouse' },   // one button: frees the mouse, and takes the look back
   { id: 'walk', label: 'Walk mode on / off', sec: 'WalkMode' },          // DFU's slow walk, held on until pressed again
   // PAD-BINDS (FIELD BUGS 2026-10-04e, Discord: "Overworld and Quick Dial are missing from the controller binding
   // options"): both ship with no pad button - the d-pad's tap and hold offer them too (ui/plus/plusPad.js DPAD_CHOICES)
   { id: 'quickdial', label: 'Quick dial', sec: 'QuickDial' },
   { id: 'overworld', label: 'Overworld', sec: 'TravelView' },
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): the weapon's technique - no pad button ships on it (every Plus button
+  // TECH1: the weapon's technique - no pad button ships on it (every Plus button
   // holds a row); a button chosen here holds to aim and lets go to loose, as the key does
   { id: 'technique', label: 'Weapon technique (hold to aim)', sec: 'WeaponTechnique' },
-  // SPYGLASS (bible/03-World/Captains-Sea.md): the captain's glass - no pad button ships on it; one chosen here raises it
+  // SPYGLASS: the captain's glass - no pad button ships on it; one chosen here raises it
   // aboard and lowers it
   { id: 'spyglass', label: 'Spyglass (aboard)', sec: 'Spyglass' },
-  // SHOT-KINDS (bible/03-World/Naval-Refit.md): the guns' load stepped on at the helm - no pad button ships on it
+  // SHOT-KINDS: the guns' load stepped on at the helm - no pad button ships on it
   { id: 'shot', label: 'Shot (aboard)', sec: 'ShotCycle' },
   // CARGO-ANYWHERE (AUDIT 2): the ship's hold from anywhere - no pad button ships on it; a pad player had the helm's Hold
   // and the Fleet page's alone

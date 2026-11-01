@@ -117,8 +117,7 @@ export function setOneShotObserver(fn) { _oneShotObserver = typeof fn === 'funct
  *  (s) - the arena's crowd bed's (systems/arena/arenaSound.js BED_FADE_S). */
 const BED_FADE_S = 0.4;
 
-/** GATE-MIX (2026-10-20, the owner: "in oblivion gates ... the game hitches, audio becomes super loud and even
- *  distorts"): THE LIMITER - the last stage before the speakers, every bus through it. Nothing stood there: the boss's
+/** GATE-MIX: THE LIMITER - the last stage before the speakers, every bus through it. Nothing stood there: the boss's
  *  clips peak at full scale in DAGGER.SND (his bark, his attack, a body's fall, the fire's cast - measured), his cues
  *  play them at up to 2.2 times that, several land in one frame, and the court's score is pressed to a decibel under
  *  the clip - so the sum went past 1 and the browser cut it square. Unity's mixer clips the same way; this is the
@@ -198,7 +197,7 @@ export class AudioEngine {
       this._reverbIn = this.ctx.createGain();
       this._master.connect(this._reverbIn);
       this._reverb = null;   // a new context is a new bus; the zone is re-armed by its next setReverb
-      // SOUND-LIVE (2026-10-23, travddm: "some sounds in the game which are not tied to any volume sliders"): the
+      // SOUND-LIVE: the
       // setting is read here, so a slider moved with nothing new playing - the Options page over a quiet world - left
       // every sound already going (the rain, the wind, a torch, the ride, a ship's loops) at the old level. The
       // master re-levels the moment the setting is written, as the music's does (music.js resyncGain).
@@ -274,7 +273,7 @@ export class AudioEngine {
   }
   get reverbPreset() { return this._reverb?.preset ?? null; }
 
-  /** EG-ZH (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 11.9): THE HALL'S
+  /** EG-ZH: THE HALL'S
    *  REVERB, HELD. setReverb builds a new ConvolverNode and synthesises its impulse on every call (Cave: 25-41 ms on a
    *  desktop, AUDIT EG II L4-21), so a place that changes its reverb as the player walks HOLDS the zone instead: Better
    *  Ambience (whose own wish re-asserts its preset against its `reverbOn` cache) yields while it is held, and its cache is
@@ -872,7 +871,7 @@ export class AudioEngine {
    *  AudioSource. The default profile is the DaggerfallAudioSource
    *  shape (min 1 / max 500, logarithmic - WebAudio 'inverse' is the
    *  analog); per-source callers override maxDistance, e.g. enemy
-   *  sources clamp at AttractRadius 16 (2026-08-14 audit AU2). */
+   *  sources clamp at AttractRadius 16. */
   /** AUDIT 24 (wave 41): `distanceModel` is a parameter now. DFU sets
    *  it per source and EnemySounds sets `LinearRolloff = true` with
    *  `maxDistance = AttractRadius` (:57-60), with its own reason -
@@ -882,7 +881,7 @@ export class AudioEngine {
    *  playbackRate), because every 3D combat voice DFU plays is
    *  pitch-lifted - EnemySounds.cs:172-175 raises the SOURCE's pitch
    *  around PlayOneShot and restores it after. */
-  /** DISC17-B (2026-09-24, Mac: "Sometimes thunder ends abruptly"): `far` - A SOUND FROM FAR OFF KEEPS ITS PLACE
+  /** DISC17-B: `far` - A SOUND FROM FAR OFF KEEPS ITS PLACE
    *  FROM THE EAR. A distant storm's thunder is kilometres away, and the hosts play it from a stand-in
    *  THUNDER_SOURCE_M from the ear at that one-shot's reference distance (systems/distantStorms.js), so it comes from
    *  the storm's side at the level its distance gave it. A panner stays where it was put and the ear does not: every
@@ -1262,7 +1261,7 @@ export class QuestAudioSource {
   }
 }
 
-/** QUIET-VENGEANCE (FIELD BUGS 2026-10-04b, Mac: "Reduce Lysandus VENGENANCE audio"): the quest sounds the port plays
+/** QUIET-VENGEANCE (FIELD BUGS 2026-10-04b): the quest sounds the port plays
  *  softer and sparser than DFU, by Quests-Sounds id. `386, vengence` is S0000977's `play sound vengence 5 0` - King
  *  Lysandus' ghost in Daggerfall at night, every five game minutes for as long as the player is there (about every 25
  *  real seconds at the classic time scale), at full volume and with no position. Here at 0.4 of it, and once a minute

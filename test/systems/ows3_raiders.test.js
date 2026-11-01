@@ -1,5 +1,4 @@
-// OWS3 (2026-09-28, the player's ask: "The pirate quest system should work like how we're changing enemies and nearby
-// dungeons. Like mount and blade, being able to see other players sailing in the overworld and other enemy ships") -
+// OWS3 -
 // WARM ASHES' RAIDERS, SEEN COMING. The mod's raid is a roll on a fast travel by sea the traveller never sees; on the
 // Overworld its raiders are ships on the open sea - a cell's sail a life, its course a function of its seed and the
 // shared clock, so every player sees the same sails - and one that sights a traveller at sea gives chase: outsailed it
@@ -30,7 +29,6 @@ import { TRAVEL_VIEW_TEXT } from '../../src/scenes/travelView.js';
 import { onBayOrEther, inEther } from '../../src/world/ethericSea.js';
 import { onWorldSea } from '../../src/scenes/naval/worldLanes.js';   // WW3: the sea's ground - the Bay's, the box's, and past the Bay where its land stands   // ETHER-OW: the raiders' ground, the host's own (AUDIT ETHER-OW C2-3: and the box, where a raider is the sea fight's alone)
 
-// PIN MOVED (AUDIT OW5 G2): the Overworld's own lines are said through tvSay - held at the scale they are said at
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const M = NATIVE_PIXEL / 819.2;   // native units a metre
 const all = () => true;
@@ -175,7 +173,7 @@ test('OWS3 Warm Ashes: a raider alongside makes the mod\'s own raid - armed as a
   assert.equal(boardPending(), false, 'the fast travel\'s own arm waits for its post-travel event');
   assert.deepEqual(h.variants, [['SHIPAA00.RMB', '_smallraid', ANY_LOCATION_KEY], ['SHIPAA01.RMB', '_smallraid', ANY_LOCATION_KEY]]);
   const wa = rd('src/systems/warmAshesShips.js');
-  assert.match(wa, /if \(travelShip\) return raidRefusal\(\) === 'busy' \? 'busy' : armRaid\(\);/, 'one home for the sailing arm');   // PIN MOVED (RAID-ASHORE): never armed over a raid still on
+  assert.match(wa, /if \(travelShip\) return raidRefusal\(\) === 'busy' \? 'busy' : armRaid\(\);/, 'one home for the sailing arm');
   assert.match(wa, /const armed = armRaid\(\);\n\s*onPostFastTravel\(\);\n\s*return armed;/);
   _resetWarmAshesShips();
 });
@@ -213,15 +211,11 @@ test('OWS3 readout: a raider is a ship in the cinnabar, "Pirates" under it in th
 
 test('OWS3 host wiring by source: the open sea a raider is born on, the shared clock, the chase begun only under the view and at sea, its contact the mod\'s raid, ashore every chase given up, a load ending them; the marks', () => {
   const w = rd('src/scenes/world.js');
-  // PIN MOVED (ETHER-OW, 2026-10-13): the raiders' ground is the Bay's map or the Eltheric Ocean's box (ethericSea.js
   // onBayOrEther) - the Bay's bounds as they were, the box beside them (test/systems/travel/ether_ow.test.js)
-  // PIN MOVED (AUDIT ETHER-OW C2-3): past the Veil a raider is the sea fight's ship alone (test/systems/travel/ether_ow.test.js)
-  // PIN MOVED (WW3, bible/03-World/World-Wide.md): the sea's ground is the world's (scenes/naval/worldLanes.js onWorldSea) - the Bay's and the box's as
   // they were, and the sea past the Bay where its land stands
   assert.match(w, /if \(!onWorldSea\(px, py, tamrielLand\) \|\| maps\.getClimateIndex\(px, py\) !== CLIMATES\.Ocean\) return false;[^\n]*\n\s*if \(inEther\(px, py\) && !navalRaidersOn\(\)\) return false;[^\n]*\n\s*for \(let dy = -1; dy <= 1; dy\+\+\) for \(let dx = -1; dx <= 1; dx\+\+\) if \(!tvWater\(px \+ dx, py \+ dy\)\) return false;/, 'the open sea: the ocean\'s, every pixel about it water');
   assert.match(w, /const raidNowMs = \(\) => Date\.now\(\) \+ _sharedOffsetMs;/);
   assert.match(w, /const ms = raidNowMs\(\), life = Math\.floor\(ms \/ RAIDER_LIFE_MS\);\n\s*if \(life !== tvRaid\.life\) \{\n\s*tvRaid\.life = life; for \(const id of tvRaid\.spent\) if \(!tvRaid\.chase\.has\(id\)\) tvRaid\.spent\.delete\(id\);[^\n]*\n[\s\S]{0,500}?\n\s*\}\n\s*tvRaid\.list = raidersNear\(\{ at: playerTravelPixel\(\), ms, open: tvRaidOpen, sea: tvRaidSea \}\);/, 'AUDIT OWS A3: a new life forgets the last life\'s spent sails (a chase still running kept)');
-  // PIN MOVED (AUDIT OW5 R1): a window or a death HOLDS the chase above the gate - it read as ashore (test/player/eyeOfTheBeholder/ow5_audit.test.js
   // mounts it); AUDIT OW5b S6: and a world being moved; S2: the quarry at sea on their own boat, its helm or its deck
   assert.match(w, /if \(playerEntity\.health <= 0 \|\| modes\?\.deathUp\?\.\(\) \|\| gamePaused\(\) \|\| worldMoveBusy\(\)\) return;\n\s*const at = warmAshesOn\(\) && isEnhanced\(\) && walkMode && playerSpawned && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && raidQuarry\(\);/, 'at sea on my own boat; held by a death, a window or a world moved (AUDIT OW5 R1, OW5b S2/S6)');
   assert.match(w, /if \(!at\) \{ for \(const id of tvRaid\.chase\.keys\(\)\) seaRaidSpend\(id\); tvRaid\.chase\.clear\(\); return; \}/);
@@ -233,9 +227,8 @@ test('OWS3 host wiring by source: the open sea a raider is born on, the shared c
   assert.match(w, /tvRaid\.chase\.clear\(\); tvRaid\.spent\.clear\(\); tvRaid\.list = \[\]; tvRaid\.at = -Infinity; tvRaid\.peer\.clear\(\); tvRaid\.spentAt\.length = 0;   \/\/ OWS3: no chase across a load/);
   assert.ok(w.indexOf('const tvRaid = {') < w.indexOf('tvRaid.chase.clear(); tvRaid.spent.clear();'), 'BOOT-TDZ: declared above the load that clears it');
   assert.match(w, /raidFrame\(dt\);[^\n]*\n\s*travelViewGovern\(dt\);/, 'each walking frame, before the cap');
-  // NAV-R (2026-09-28): a raider stood as a ship of the sea chases as her captain does - `chase` is the ship's word, or the
+  // NAV-R: a raider stood as a ship of the sea chases as her captain does - `chase` is the ship's word, or the
   // Overworld's own chase with no sea fight (test/systems/naval/nav_r_raiders.test.js pins which)
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
   const tvm = rd('src/scenes/travelViewMarks.js');
   assert.match(tvm, /marks\.push\(\{ key: `raid:\$\{r\.id\}`, at: tvSceneKept\(c \?\? r, at\.x, at\.z, 2, true\), label: RAIDER_LABEL, kind: chase \? 'raider ship chase' : 'raider ship', edge: chase \}\);/);
   assert.match(tvm, /if \(!chase && Math\.max\(Math\.abs\(px\.x - me\.x\), Math\.abs\(px\.y - me\.y\)\) > grid\) continue;/, 'the rest within the grid\'s reach');
@@ -259,7 +252,6 @@ const liftSea = () => {
     const end = w.slice(at, eol).trimEnd().endsWith('{') ? w.indexOf('\n  };\n', at) + 5 : eol;
     return w.slice(at, end);
   };
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js - lifted from there
   const tvm = rd('src/scenes/travelViewMarks.js');
   const a = tvm.indexOf('    // AUDIT OW5b S8: none drawn where none can come'), b = tvm.indexOf('\n    return marks;', a);
   assert.ok(a > 0 && b > a, 'the raiders\' marks lifted');
@@ -407,8 +399,7 @@ test('AUDIT OW5b S4 law: A RAIDER\'S LEG IS CHOSEN BY THE WHOLE LEG - through an
   assert.equal(overLand, 0, 'never over land');
 });
 
-// ── OW6 - THE RAIDERS' CHASE, SHARED (2026-09-29, the player: "Everything needs that persistence between players in the
-// overworld"). It was "the chased traveller's own ... nothing is sent" (bible, OWS3); it rides the cell foes frame now,
+// ── OW6 - THE RAIDERS' CHASE, SHARED. It was "the chased traveller's own ... nothing is sent" (bible, OWS3); it rides the cell foes frame now,
 // under the band word's own law. ─────────────────────────────────────────────────────────────────────────────────────
 
 test('OW6 law: the raider word is the band word\'s law with a raider\'s ids - its chases where they sail, then the spent, newest first, bounded; heard, a band\'s id is no raider\'s (nor a raider\'s a band\'s), a raider named twice once, a place off the map dropped; kept only for a raider that can be about me - this life\'s or the last, within the raiders\' reach (mutants: the ids crossed, the reach off, a life too many)', async () => {
@@ -419,7 +410,6 @@ test('OW6 law: the raider word is the band word\'s law with a raider\'s ids - it
   assert.deepEqual(raiderWordOf(chases, ['r3.4.30', 'r5.6.29']), [['r1.2.30', 10, 21, 1], ['r3.4.30', 0, 0, 2], ['r5.6.29', 0, 0, 2]]);
   const many = Array.from({ length: 12 }, (_, k) => `r${k}.1.30`);
   assert.equal(raiderWordOf(new Map(), many).length, RAIDERS_WIRE_MAX);
-  // PIN MOVED (ETHER-OW, 2026-10-13): a chaser's place is a pixel of the WORLD (net/wire.js worldPixelOk, TV-BEYOND's
   // law) - the raiders sail the Eltheric Ocean too, and a chase said there was dropped by every peer; past the world's
   // edge it is still dropped (it was a place a native unit west of the Bay)
   const P = NATIVE_PIXEL, ether = ['r833.-860.30', 5000 * P, (499 + 5160) * P, 1];

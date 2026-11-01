@@ -1,5 +1,4 @@
-// LOOT11 - A LINE OF LIGHT OVER EVERY FIND (2026-10-01; bible/06-Systems/Loot-Arc.md section 13, Mac: "Do you wanna
-// turn this into an arc and do all of the above?" - "tier beams on Rare+ drops"). The laws pinned here:
+// LOOT11 - A LINE OF LIGHT OVER EVERY FIND. The laws pinned here:
 //   - THE PICK: a find stands a line when its BEST is Rare or better, in that tier's colour; the nearest eight within
 //     40 m, nearest first; gone the moment its best is taken below Rare; off, none.
 //   - THE PASS: WBX3's line through the spoils' own renderer, out of the find's crown (a billboard is bottom-anchored).

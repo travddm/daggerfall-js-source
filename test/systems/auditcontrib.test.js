@@ -1,4 +1,4 @@
-// AUDIT CONTRIB (2026-09-23, Mac: "Integrate these please. My contributer made these for the codebase") - the drop's
+// AUDIT CONTRIB - the drop's
 // hotbar, player corpses, Resurrect, death screen and UI sounds, read by three lenses after the merge. Each finding
 // that could be driven is driven here; the host-only lines are pinned by source.
 import '../modsOff.js';

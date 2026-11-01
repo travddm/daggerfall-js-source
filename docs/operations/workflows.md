@@ -14,7 +14,6 @@ reads. Details of the deploys are in [deploying.md](deploying.md), of the deskto
 | `deploy.yml` | Push to `main`; manual | Verifies `main`'s head, builds the site, waits until the account service serves this build's `ACCOUNT_VERSION`, then publishes to GitHub Pages. | None (uses `pages: write`, `id-token: write`) |
 | `relay-deploy.yml` | Push to `main`; manual (`force`, `redeploy`) | Deploys `server/` only when `RELAY_VERSION` in `src/net/wire.js` differs from the live relay's `/health`. Runs `verify.yml` (500 sweep seeds) first. Drops every connected player. | `CLOUDFLARE_API_TOKEN` |
 | `account-deploy.yml` | Push to `main` that touches `server-account/**` or a file the account Worker imports; manual | Runs `verify.yml`, creates the D1 database and R2 bucket if missing, applies migrations, waits for the relay, deploys `server-account/`, mints missing keys, puts optional secrets, verifies the live service, registers Discord commands. | `CLOUDFLARE_API_TOKEN`; optional `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET`, `ANTHROPIC_API_KEY`, `DISCORD_BOT_TOKEN` |
-| `intro-quality.yml` | Push to branch `codex/cinematic-intro-overhaul`; pull requests that touch the intro's files | Runs the intro's 3 test files, then `tools/introAudioCheck.mjs`, `tools/introProbe.mjs` and `tools/introCapture.mjs` (Playwright and ffmpeg), and uploads the review video as an artifact. | None |
 
 ## Desktop release and patch notes
 

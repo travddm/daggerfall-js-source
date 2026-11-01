@@ -1,4 +1,4 @@
-// AUDIT WW (2026-10-24, bible/03-World/World-Wide.md "The audit"): the world-wide arc's review - its findings, each
+// AUDIT WW: the world-wide arc's review - its findings, each
 // pinned where it was fixed. F2, F3 and F6 (the lanes that stand, the spent word, a lane's pixel) are pinned in
 // ww2_gates.test.js beside the lanes' own law; F9 (a band's hideout in its own province) in ww1_world.test.js beside
 // the bands'.
@@ -107,7 +107,6 @@ test('AUDIT WW F7: THE LIVING WORLD\'S LANES ARE MADE AGAIN WHEN THE WORLD MOVES
   assert.deepEqual(lanes.from(bayA).map((l) => l.to.mapId), [bayB.mapId]);
   const book = lanes.berths(idFar);
   assert.equal(lanes.berths(idFar), book, 'kept while nothing moved');
-  // PIN MOVED (WW7-7, bible/03-World/World-Wide.md): a lane keeps to its side of the Bay's edge - the new list's lane
   // is the Bay's (bayC), and one to a port past the Bay is no Bay town's (WW3 lays none: the Bay's lanes join its ports)
   list = [...list, { key: 'ac', a: port(idA, 200, 100), b: port(idC, 400, 120) }, { key: 'af', a: port(idA, 200, 100), b: port(idFar, far.px, far.py) }];   // a new list
   assert.deepEqual(lanes.from(bayA).map((l) => l.to.mapId), [bayB.mapId, bayC.mapId], 'the new lane joins; the one over the edge none');

@@ -1,7 +1,6 @@
-// HOMES-SHED (2026-10-13, from play: the account database overloaded from 14:11 UTC - "servers are under really heavy
-// load. Fix whatever you can and quick"): the service's busiest route asks the database once where it asked twice, the
+// HOMES-SHED: the service's busiest route asks the database once where it asked twice, the
 // siege blackout's question answers a throw as every other route does, and a client whose town went unanswered backs
-// off instead of asking six times as often. bible/11-Multiplayer/Scale-Arc.md HOMES-SHED.
+// off instead of asking six times as often. HOMES-SHED.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../../accountDb.mjs';

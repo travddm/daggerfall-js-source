@@ -1,5 +1,5 @@
 // @ts-check
-// OW-FREE-STRAIGHT (moved out of scenes/world.js by GRANT3, HOST-SPLIT - bible/01-Overview/Host-Split.md): the planner
+// OW-FREE-STRAIGHT (moved out of scenes/world.js by GRANT3, HOST-SPLIT): the planner
 // walks the pixel grid (diagonal, then straight), so a FREE journey bent at a pixel middle on the way - toward the road
 // or a place - though the way ahead was clear. In FREE mode an all-open route is pulled taut: each stretch jumps to the
 // farthest pixel the line of sight reaches without water or a blocked (mountain) step. The host asks it only in FREE

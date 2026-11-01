@@ -1,6 +1,5 @@
 // @ts-check
-// CAPT-BOARD (2026-10-11, the owner: "giving a reason to players to experience it"; bible/03-World/Captains-Sea.md
-// CAPT-BOARD) - THE HARBOUR OFFICE: the harbourmaster's board, the contracts a captain holds, and the crown's favours a
+// CAPT-BOARD - THE HARBOUR OFFICE: the harbourmaster's board, the contracts a captain holds, and the crown's favours a
 // captain's rank buys, stood over the captain's ledger (systems/naval/captainLedger.js) for the world host. The yard's
 // window draws it as its Harbourmaster tab (ui/naval/navalYardWindow.js); the naval host tells it what happened at sea
 // (`event`) and asks it where the held contracts' waters are (`sites`); the world steps its clock (`tick`).
@@ -26,11 +25,11 @@
 //
 // CAPT-TRADE: THE EXCHANGE (systems/naval/tradeGoods.js) - the port's goods at the day's prices, bought into the hold of
 // the boat at the quay and sold out of it, as much as the exchange deals in today (the ledger keeps the day's dealing).
-// SEA-TRADE (bible/06-Systems/Town-Economy-Arc.md section 8): online, at its port town's economy's prices, every
+// SEA-TRADE: online, at its port town's economy's prices, every
 // dealing told to the town economy (a sea act of the players' share), and a good bought carrying what it cost and the
 // counter's mark (tradeModes.js markCounterBought: LAW-3; AUDIT LW-II-2 S1 - no patron takes it, as no shop buys it, B2).
 //
-// CREW-TRADE (bible/03-World/Captains-Sea.md CREW-TRADE): and the port's CREW, a row of its own - men signed on to the ship
+// CREW-TRADE (CREW-TRADE): and the port's CREW, a row of its own - men signed on to the ship
 // at the quay and signed off her by the head (systems/naval/crewTrade.js; her side scenes/naval/crewDeal.js, which the
 // shipwright's window's model carries as `crewDeal`), at the port's price for a man, a gold under the shipwright's at
 // most, as many as the exchange deals in today.

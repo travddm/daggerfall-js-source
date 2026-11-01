@@ -1,6 +1,5 @@
 // @ts-check
-// STAND-HORSE (2026-10-12, the owner: "Some models arent affected when morrowind is attached, like static NPCs, static
-// horses, etc" - bible/04-Characters/Morrowind-NPCs.md section 28): THE HORSES THAT STAND. COATS3D put every horse
+// STAND-HORSE: THE HORSES THAT STAND. COATS3D put every horse
 // the Morrowind lane MOVES in the 3D horse (world/horseRig.js) - the rider's, the peers', Horse Cart and Cargo's pool,
 // the road's teams - and left the ones that only stand as sprites: Daggerfall's own town horses (TEXTURE.201's two
 // horse records, an RMB block's or a World of Daggerfall site's flats) and the Stable's three. Each now stands as the
@@ -14,7 +13,7 @@
 //    stand and fall frame by frame - posing only the ones in the view; `draw` draws them
 //    in a character-sprite bind of their own (MWNPC2's one pass, as a population lane's draw opens its own). A horse no longer offered, out of the cut or under a new rig is let
 //    go through the rig that made it (AUDIT COATS3D A7) and its billboard drawn again.
-//  - HORSE-VIEW II (2026-10-21, bible/07-Rendering/Performance-Priority.md): POSED AS THE POOL'S ARE (world/horseView.js
+//  - HORSE-VIEW II: POSED AS THE POOL'S ARE (world/horseView.js
 //    poseWhereSeen). Every horse standing steps its idle's clock every frame; its pose is written and sent in the view
 //    alone (`end`'s camera, the one the frame draws through - the draw's own test, horseRig.js seen), on the peers'
 //    bodies' cadence by how far it looks from that camera (its eye `begin` names, over its lens). A horse that comes

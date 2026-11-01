@@ -1,8 +1,8 @@
-// REP1 + REP5 (2026-09-29, the reputation overhaul - systems/standing.js holds its law): THE WATCH'S STOP AND THE LAW'S
+// REP1 + REP5: THE WATCH'S STOP AND THE LAW'S
 // NOTICES, for the two street hosts (world.js, exterior.js). One home, so the hosts cannot disagree about when the watch
 // stops a known criminal or what a changed standing says.
 //
-// THE STOP (Mac: "Challenged on sight"). DFU's watch came for a hated name by a 5% roll every game minute - no guard
+// THE STOP. DFU's watch came for a hated name by a 5% roll every game minute - no guard
 // needed to be anywhere near. Here a wandering GUARD who can SEE the player (cityGuards.js guardSeesPlayer: the witness
 // arm's own eye, the line clear) stops a known criminal - a standing under -10 in the region, or a banishment standing
 // (standing.js knownCriminal) - at most once in two game hours per region and never inside the grace an answered law

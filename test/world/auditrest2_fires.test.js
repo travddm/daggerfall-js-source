@@ -1,5 +1,4 @@
-// AUDIT REST II - THE DUNGEON FIRES (2026-10-03, bible/06-Systems/Rest-Arc.md section 4 and its AUDIT REST /
-// AUDIT REST-PARTY as-built notes): REST3's placement law and the dungeon host's use of it, audited again.
+// AUDIT REST II - THE DUNGEON FIRES: REST3's placement law and the dungeon host's use of it, audited again.
 // F1: a joiner's rest asked the host for an encounter the host's 15 m ward then refused at every spot, and broke the
 // joiner's night for nothing - and an ask let the night run on to the hour's check, rolling again. F2: a palace stood
 // fires in its other blocks. F3: a fire stood ON a loot pile, a quest marker or the player's own entry. F4: a closed

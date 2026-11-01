@@ -1,6 +1,4 @@
-// PROFILE-MENU, PLUS-MENU, PLUS-SITE (2026-10-07, Mac: "I want to organize and detail the player profile (the top right
-// icon section), give the main menu the enhanced plus UI treatment and do the same thing for our website. A proper
-// detailed overhaul").
+// PROFILE-MENU, PLUS-MENU, PLUS-SITE.
 //
 //   - PROFILE-MENU: the account card the corner portrait opens is a PROFILE signed in - a plate (the portrait, the name
 //     with its Renown, the title and glyphs worn, the character), then the Record (a tile a deed, the duels' share won
@@ -11,7 +9,7 @@
 //   - PLUS-SITE: the website wears the kit's roles in the kit's tones, cut without a picture and injected at serve and
 //     build (ui/enhanced/enhancedFrame.js siteKitCss, scripts/landingHtml.mjs).
 //
-// The record: bible/10-UI/UI-Arc.md PROFILE-MENU / PLUS-MENU / PLUS-SITE, and its AUDIT (the pins it added say so).
+// The record: PROFILE-MENU / PLUS-MENU / PLUS-SITE, and its AUDIT (the pins it added say so).
 // Mutants: tools/mutants/plus_menu_site.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -183,7 +181,7 @@ test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn
   assert.doesNotMatch(js, /\.style\.|cssText|#[0-9a-fA-F]{6}/);
   // the door hands the card the mark's own character and face
   const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const save = profileCharacter\(\);\n  const card = accountCard\(document, acctFlow, \{/);   // PIN MOVED: AUDIT RECOVERY-SET B1 - the window's flow
+  assert.match(menu, /const save = profileCharacter\(\);\n  const card = accountCard\(document, acctFlow, \{/);
   assert.match(menu, /face: save \? loadFace\(save, \{ scale: 2, copy: true \}\) : null,\n    character: save \? `Playing \$\{characterLine\(save\)\}` : null,/);
 });
 

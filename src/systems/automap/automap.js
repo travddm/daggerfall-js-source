@@ -306,8 +306,7 @@ function dropsOf(list) {
 export function restoreAutomap(snap) {
   if (!snap) return;
   _dungeons = new Map();
-  // MAP-KEEP (2026-09-27, Flylighter on Discord: "Parts of the map previously filled out will randomly disappear from
-  // the 3D map"): THE STORE IS THE SAVE'S NOW, and nobody stands in any of its dungeons until the load enters one
+  // MAP-KEEP: THE STORE IS THE SAVE'S NOW, and nobody stands in any of its dungeons until the load enters one
   // (fromLoad). The world host restores the save BEFORE it tears the scene it is leaving down, and that teardown's
   // exit stamped the dungeon it left - in the SAVE's store - with the clock being left, and at "remember 0 dungeons"
   // cleared the whole store it had just restored.
@@ -992,7 +991,7 @@ export function hideAllAutomap(rec) {
 }
 
 /**
- * EM3-3D (2026-09-27, Mac: "it should only uncover parts on the dungeon map where you went in"): THE WALKED TRAIL.
+ * EM3-3D: THE WALKED TRAIL.
  * DFU's reveal is by MODEL - a row the scan hits is revealed whole - and a Daggerfall dungeon's models are big, so
  * one glance down a corridor inks rooms the player never set foot in. The held map's solid sheet draws only floor
  * within a short walk of where the player has STOOD, so it keeps its own record of that: the feet, on a one-metre
@@ -1159,8 +1158,7 @@ export function registerAutomapConsoleCommands() {
   }
 }
 
-// ---- PARTY-MAP (2026-09-30, Discord: "share map data between party members, possibly with a spell effect so that
-// maintaining some kind of buff for it becomes part of the dungeoneering loop"): SHARED CARTOGRAPHY's two automap
+// ---- PARTY-MAP: SHARED CARTOGRAPHY's two automap
 // halves. The port's own - DFU has no party and no shared map. The SENDER reads its live record's visitedThisRun (the
 // rows its OWN scan revealed this run - never the rows a mate sent it, so a share is never echoed back);
 // systems/party/partyMap.js batches them. The RECEIVER marks a mate's rows REVEALED and nothing else: not visitedThisRun (so

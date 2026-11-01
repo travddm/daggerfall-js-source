@@ -1,5 +1,5 @@
-// AUDIT TESA II, lane M (2026-10-25) - THE HELD MAP'S WINDOW PAST THE BAY, pinned where the audit found it wrong
-// (ui/heldMap.js; bible/03-World/Arena-Provinces.md TESA15, MAP-LINES; bible/10-UI/Held-Map-Arc.md):
+// AUDIT TESA II, lane M - THE HELD MAP'S WINDOW PAST THE BAY, pinned where the audit found it wrong
+// (ui/heldMap.js; TESA15, MAP-LINES):
 //   M2  the window's "paint it again" (the zones' borders landing, the web face landing) inks the sheet's kept parts too;
 //   M4  the zone's halls are inked over its fog;
 //   M5  offline the zone is drawn and none of its laws is said - its key, its press, its legend; Cyrodiil's travel law;
@@ -102,7 +102,6 @@ function withMap(fn) {
     }
   };
 }
-// PIN MOVED (TESA x AUDIT TESA II): the zones' borders were withdrawn (REGION-LINES 2, the owner: "Those are just random lines"), and
 // M2's half that waited on their landing with them - the face's half stands.
 test('AUDIT TESA II M2: the web face landing inks the sheet\'s kept parts again, the view unmoved - not at the next pan (mutants: the face\'s landing the window\'s key alone; the parts kept)', withMap(async () => {
   const { win } = openMap();
@@ -159,7 +158,7 @@ test('AUDIT TESA II M6 and K5: on the zone map each of Cyrodiil\'s cities is nam
   real.cities = fake.cities;
   try {
     const kinds = Object.fromEntries(win._zonePlaces().filter((z) => fake.cities.some((c) => c.name === z.name)).map((z) => [z.name, z.kind]));
-    assert.deepEqual(kinds, { Cap: 'city', Sta: 'city', Tow: 'hamlet', Vil: 'village' });   // PIN MOVED (TESA x AUDIT TESA II): REGION-LINES' kinds, the sheet's
+    assert.deepEqual(kinds, { Cap: 'city', Sta: 'city', Tow: 'hamlet', Vil: 'village' });
     win.filters.towns = true;
     assert.equal(win._zonePlaces().filter((z) => fake.cities.some((c) => c.name === z.name)).length, 0, 'AUDIT TESA II M7: under the map\'s filters');
   } finally { real.cities = saved; win.filters.towns = false; }

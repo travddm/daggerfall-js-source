@@ -1,4 +1,4 @@
-// AUDIT PASSAGE (2026-10-19; bible/01-Overview/audits/Audit-Passage-Batch-Salvage.md) - lane B's integration findings,
+// AUDIT PASSAGE - lane B's integration findings,
 // pinned: a booked ship is never the DFU bank ship's cabin, never a sailing cabin of mine; the world host counts a
 // boarding from her as aboard, holds her through a world's move, tells her master where a journey goes, and asks the
 // crossing law of a hull before her master offers her.

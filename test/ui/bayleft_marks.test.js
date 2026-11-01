@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/10-UI/Held-Map-Arc.md BAY-LEFT-MAPS) - THE HELD MAP'S MARKS AND THE MAP'S FLAGS PAST THE BAY.
+// BAY-LEFT-MAPS - THE HELD MAP'S MARKS AND THE MAP'S FLAGS PAST THE BAY.
 //
 // C1: the held map read its party, its travellers, the trader's coin, the serpent's ring (and the Super dungeon's),
 // the Motherlodes, the POIs, the raids and the stars against the Bay's 1000 x 500 (`this._size`,
@@ -75,7 +74,6 @@ const mkWin = (extra = {}) => new HeldMapWindow({
 /** What the poll kept, kind by kind. */
 const kept = (win) => ({
   party: win._party.map((m) => m.name), trav: win._trav.map((m) => m.name), vendor: win._vendor?.town ?? null,
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): WW5's Hollows are a list (`_sds`), read over the sheet's box
   serpent: win._serpent?.label ?? null, sd: win._sds?.[0]?.label ?? null,
   lodes: win._lodes.length, pois: win._pois.length, raids: win._raids.length, stars: win._stars.length,
   gates: win._gates.length, bounties: win._bounties.length, lairs: win._revenants.length, quests: win._quests.length,

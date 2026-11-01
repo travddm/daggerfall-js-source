@@ -1,13 +1,12 @@
 // @ts-check
-// TESA10c (bible/03-World/Arena-Provinces.md TESA10c) - FALINESTI'S LANDMARK: the Great Graht-Oak, the city's own tree
+// TESA10c (TESA10c) - FALINESTI'S LANDMARK: the Great Graht-Oak, the city's own tree
 // (world/capitalPlans.js FALINESTI) - its trunk of bark from its roots to its limbs, the buttress roots spreading over
 // the grounds at its foot, the great limbs reaching out over the city, the crown of leaves above every street, and the
 // timber platforms round its trunk - in metres, drawn as the map reads (+z south), its origin the tree's axis on its
 // ground. TESA-LORE: the city in its boughs - the walkway winding up the trunk from the ground to the highest platform,
 // hide houses on every platform and at every limb's fork. Shapes of the port's own in the spirit of the walking city.
 // No game data.
-// CAPITAL-TREES (bible/03-World/Arena-Provinces.md CAPITAL-TREES; KPbICA, forwarded by the owner: "The main trees in
-// Falinesti and Mournhold should get some love. They are too draftish for now"): THE OAK FINISHED, on the capitals'
+// CAPITAL-TREES (CAPITAL-TREES; KPbICA, forwarded by): THE OAK FINISHED, on the capitals'
 // trees' kit (world/capitalTrees.js - the forests' own graht-oaks' shapes, world/jungle/grahtOakMesh.js) - its trunk
 // fluted and twisting, its leader on into the crown; a dozen buttresses of living wood all round its foot, each under the
 // walkway climbing over it; living boughs carrying every platform, their leaves the crown's lower storeys; nine great

@@ -3,8 +3,7 @@
 // icons. After Climates & Calories' ItemTemplates.json (vendored at
 // vendor/climates-calories/, indices 530-540 verbatim in name and
 // texture, the prices retuned where the mod's were typos) plus the
-// port's own campfire at 541 (Mac: "a new campfire item players can
-// buy and place").
+// port's own campfire at 541.
 //
 // WHAT AN ITEM CARRIES. A food carries `foodStage` (food.js) and, once
 // spoiled past stale, its own world icon - the mod's spoiled pictures,
@@ -41,8 +40,7 @@ export const SURVIVAL_TEMPLATES = Object.freeze([
   { index: TEMPLATE.Apple, name: 'Apple', baseWeight: 0.1, hitPoints: 90, basePrice: 1, rarity: 3, worldTextureArchive: 213, worldTextureRecord: 1 },
   { index: TEMPLATE.Orange, name: 'Orange', baseWeight: 0.1, hitPoints: 90, basePrice: 2, rarity: 3, worldTextureArchive: 213, worldTextureRecord: 0 },
   { index: TEMPLATE.Bread, name: 'Bread', baseWeight: 1.5, hitPoints: 95, basePrice: 5, rarity: 3, worldTextureArchive: 211, worldTextureRecord: 31 },
-  // CRAFT-PAYS (2026-10-21, the Discord's #feature-feedback: "Food is too heavy. Especially meat... meat should reduce in
-  // weight once cooked becasue most of that weight will be water"; bible/06-Systems/Professions-Arc.md section 48): the
+  // CRAFT-PAYS: the
   // mod's raw meat and raw fish weighed two kilos a piece and kept it all through the fire. A cut is a kilo, and cooked it
   // is half that - the water gone - so a cooked Meat weighs a quarter of what it did and a Cooked Fish a third (AUDIT
   // CRAFT-WRITS T7: "a quarter" was the Meat's alone). The dishes stand on these rows
@@ -169,7 +167,7 @@ export function eatFood(item, collection, { entity = null, now = 0, rolls = Math
   if (!isFood(item)) return null;
   const list = Array.isArray(collection) ? collection : null;
   if (offMeal) {
-    // ENDLESS PROVISIONS (2026-10-04, Mac: "i can use and find all those without climates and calories"): with Climates
+    // ENDLESS PROVISIONS: with Climates
     // & Calories OFF there is no hunger to ask - the classic body is never hungry, and the sack answered "not hungry
     // enough" for ever. So an Off meal is always eaten (bar a putrid one), never sickens, and gives back stamina in
     // proportion to how filling it is (satiety / OFF_MEAL_FULL_MINUTES of the pool: rations 25%, bread 19%, an apple 6%).
@@ -294,7 +292,7 @@ export function startingProvisions(entity = null) {
   ];
 }
 
-/** REST2 (bible/06-Systems/Rest-Arc.md section 3): ONLINE THE CAMPFIRE IS THE REST'S, NOT THE ARC'S. A rest online is
+/** REST2: ONLINE THE CAMPFIRE IS THE REST'S, NOT THE ARC'S. A rest online is
  *  an act at a fire or a bed (systems/rest/restAct.js), so with the arc Off a General Store still stocks two to four, and a
  *  new character still sets out with one. */
 export function campfireStock(rolls = Math.random, lo = 2, hi = 4) {   // AUDIT REST: a Pawn Shop's 0-2 (Rest-Arc.md section 3)
@@ -303,8 +301,7 @@ export function campfireStock(rolls = Math.random, lo = 2, hi = 4) {   // AUDIT 
   return out.filter(Boolean);
 }
 export const startingCampfire = () => createSurvivalItem(TEMPLATE.Campfire);
-/** ENDLESS PROVISIONS (2026-10-04, Mac: "campfires should be unlimited, rations should be available in stores where it
- *  makes sense and unlimited as well"; "i can use and find all those without climates and calories"): a General
+/** ENDLESS PROVISIONS: a General
  *  Store's and a Pawn Shop's counter shelf always has a Campfire Kit and a full stack of Rations, Climates & Calories
  *  on or off - this tops a shelf up to one fresh kit and ENDLESS_RATIONS_STACK rations and answers the list. A kit is
  *  not stackable (its uses are its condition): a FRESH one is the shelf's, a worn one sold back is just a used kit. */

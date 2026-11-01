@@ -1,4 +1,4 @@
-// AUDIT FOES (2026-09-15) - "during online play, certain enemies cant be
+// AUDIT FOES - "during online play, certain enemies cant be
 // damaged", Mac, relaying players. Three adversarial lenses over the foe
 // damage path. FOE1 (the comment that ate the hit) is pinned where it broke,
 // in test/scenes/audit39_worldmodes.test.js; FOE2 (a refused blow waits) in
@@ -19,8 +19,7 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 /** The file's CODE - a law inside a comment is not a law (FOE1). */
 const code = (p) => read(p).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
 
-// AUDIT FOES FOE10 (2026-09-15, Mac: "I think another session broke other
-// players being able to attack enemies") - THE BLOW CROSSES, END TO END.
+// AUDIT FOES FOE10 - THE BLOW CROSSES, END TO END.
 //
 // AUDIT WORLD34 A1 drove two real sessions through the real relay Room and
 // held that the host's FOES fan to the joiner and the joiner's ACT fans back.

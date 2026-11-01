@@ -1,4 +1,4 @@
-// AUDIT CARDS-5 (2026-10-08) lane C's aside: two books are two keys on the hotbar (systems/quickslots.js quickslotKey -
+// AUDIT CARDS-5 lane C's aside: two books are two keys on the hotbar (systems/quickslots.js quickslotKey -
 // a book's own text), and a book slotted under the old bare key is found again by its title.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

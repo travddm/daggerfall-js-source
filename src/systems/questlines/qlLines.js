@@ -1,7 +1,5 @@
 // @ts-check
-// QL12-QL16 (2026-10-19, the owner: "New questlines tying into and introduced the oblivion gates, abyss dungeons, elite
-// dungeons and elite breaches. Staying true to Daggerfall's lore", "Tying all our newly integrated features into
-// quests", "One unified place to view questlines"; bible/06-Systems/Questlines-Arc.md section 4): THE QUESTLINES - each a
+// QL12-QL16: THE QUESTLINES - each a
 // story told in quests, step after step, each step a script on the machine (systems/questlines/quests/<QUEST>.txt, read
 // by the one loader - scenes/quest/questData.js) with its sheet (sheets/questlines.json) like any quest's.
 //
@@ -18,7 +16,7 @@
 //   THE INTRODUCTIONS (4.5) - a short line for each Tutorials group with a feature to go to: the crafts, the gear's own
 //     laws, the sea, the road, the tavern's tables, the Arena, the Bay's troubles, the Firmament. The Tutorials explain;
 //     an introduction gives a reason to go, and pays for it.
-//   THE THIRTEENTH OF FROSTFALL (STAR8, bible/11-Multiplayer/Starfall.md section 7) - the Starfall's, from a Wyrd Sister
+//   THE THIRTEENTH OF FROSTFALL (STAR8) - the Starfall's, from a Wyrd Sister
 //     of Glenmoril. Seasonal: it begins only while the Witches' Festival is staged (`opens.event`), and a step whose deed
 //     is a fallen star waits for the next one - set aside, fail-free, if the Festival ends under it (qlLineRunner.js
 //     keepSeason). Online: its witnesses are the stars' receipts.

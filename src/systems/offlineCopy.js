@@ -1,6 +1,6 @@
 // AUDIT LIVED1 E (S3/R5, and S5/U4's card): COPY TO OFFLINE CHANGES LANES, AND THE OFFLINE LANE HAS ONE CLOCK.
 //
-// An online save holds stamps on two clocks (LIVED1, bible/06-Systems/Lived-Time.md). The CHARACTER's - every
+// An online save holds stamps on two clocks (LIVED1). The CHARACTER's - every
 // personal marker: a room, a loan, a disease's day, a curse, the needs - sit on their own clock, which is the
 // envelope's `classicMinutes`. The WORLD's - a quest clock's last sample, a CreateFoe's last wave, a PlaySound's last
 // play, a guard's anchor, a quest's start and tombstone, the rumours' time limits, the spawned dungeons' ledger, a
@@ -18,7 +18,7 @@
 // clock the copy will play on). A snap with no `worldMinutes` (an offline save, or one from before LIVED1, whose two
 // clocks were one) is returned as a plain copy.
 //
-// TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): a quest's COUNTDOWNS left the world's clock for the character's -
+// TIME3 (6.3): a quest's COUNTDOWNS left the world's clock for the character's -
 // a Clock's sample, a sound's and a wave's last, a guard's arrival, a tombstone (quest/questStamps.js) - so a quest
 // envelope taken since then carries `ownSecondsAt` and its countdowns cross a door unmoved: the character's clock is
 // the one clock offline. The journal's dates stay the world's and move as before; an envelope taken before TIME3 moves
@@ -97,7 +97,7 @@ function rebaseWorldStamps(copy, delta, days, { questOwn = false } = {}) {
 }
 const daysBetween = (to, from) => Math.floor(Math.floor(to) / 1440) - Math.floor(Math.floor(from) / 1440);
 
-/** AUDIT WAITS B1 (BANISH-SKY, bible/06-Systems/Online-Waits.md WAIT4): A BANISHMENT'S END crosses a door as the days
+/** AUDIT WAITS B1 (BANISH-SKY, WAIT4): A BANISHMENT'S END crosses a door as the days
  *  the player was told. Online it is a stamp on the event clock whose days are the sky's calendar (standing.js
  *  banishmentEnd); offline it is a stamp on the one clock, which is the calendar. Neither door moved it - REP3 came
  *  after LIVED1's doors - so carried offline a term stood as far off as the world ran ahead of the character (a
@@ -133,7 +133,7 @@ export const BOUNTY_RECORD_VENDOR = 'bountyBoard';
 /** AUDIT CAPTAIN'S SEA L4: the captain's ledger's record (captainLedger.js CAPTAIN_SAVE_VENDOR - pinned equal,
  *  test/systems/naval/auditcaptsea.test.js; this module stays off the ledger's graph as it does off the board's). */
 export const CAPTAIN_RECORD_VENDOR = 'Captain';
-/** SEA-SEASON (bible/03-World/Eltheric-Ocean.md SEA-SEASON): THE SEA'S SEASON FIGURES ARE THE REALM'S ALONE - the
+/** SEA-SEASON (SEA-SEASON): THE SEA'S SEASON FIGURES ARE THE REALM'S ALONE - the
  *  captain's ledger's `ether.season` (the deepest voyage and the legends ended this season, the service's season boards
  *  read them off a judged checkpoint). Neither door carries them: an offline game's voyages are on its own clock, and
  *  a copy brought online starts the season's boards from nothing, as a new character does. */

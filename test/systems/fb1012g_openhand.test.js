@@ -5,7 +5,6 @@
 // him - so at the Gate Open Hand struck once. Its follow-up is owed now (systems/playerDoor.js) and the dungeon host's
 // claim to the relay carries it, one frame and one blow token; a player's body takes none (BAL8). The 80-90 a crit
 // against 100-130 is the lycanthrope's curse made the beast's alone (BAL6), in the same update - answered on the page.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

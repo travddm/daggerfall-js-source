@@ -1,5 +1,5 @@
 // @ts-check
-// LAIR-DOOR (FIELD BUGS 2026-10-22d, bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md report 4 - fogs on Zenako's behalf:
+// LAIR-DOOR (FIELD BUGS 2026-10-22d, report 4 - fogs on Zenako's behalf:
 // "the Revenant lair designated on the Revenants page is inaccessible -- there are no interactable doors, hatches or
 // openings to the marked dungeon ... The Stuvam Graveyard, south of Ceriburea ... approximate coordinates 565, 427"):
 // WHERE A REVENANT MAY GO TO GROUND - the world host's `lairHere` door (systems/playerDoor.js, RVN7 bible/12-Enhanced-AI/
@@ -18,14 +18,13 @@
 //
 // The answer is kept a pixel (and a model's, a model id), so a ring is laid once a session; nothing of a mesh is kept.
 //
-// LAIR-WORLD (2026-10-26, the owner: "with revenants and their lairs, this will work everywhere correct?"; asked, "Fix
-// both in this PR"): PAST THE BAY the dungeons are TESA8's lairs (world/tamrielDungeons.js), which no MAPS.BSA row holds -
+// LAIR-WORLD: PAST THE BAY the dungeons are TESA8's lairs (world/tamrielDungeons.js), which no MAPS.BSA row holds -
 // the index here held the Bay's alone, so a revenant's deed past the Bay found no dungeon in its ring and roamed, with no
 // hunt, rumour, map circle or trail, and the mend sought only the Bay's 1000 x 500. `pastBay` (scenes/tamrielPlacesHost.js
 // provinceQuestPlaces) answers there: the lair on a pixel (`lairAt`), its region, and its plan laid unstood
 // (`lairCloneAt`) for the same door test - a graveyard past the Bay is laid on a Bay template, and may place no door.
 //
-// Not a DFU member: revenants are the port's own (bible/12-Enhanced-AI/Feud-Arc.md 18.1, LAIR-DOOR).
+// Not a DFU member: revenants are the port's own (18.1, LAIR-DOOR).
 import { bountyDungeons } from '../systems/bounty/bountyBoard.js';
 import { RUMOR_PX } from '../systems/revenant/revenantFeud.js';
 import { meshHasDungeonEntrance } from '../systems/travel/travelDungeonModels.js';

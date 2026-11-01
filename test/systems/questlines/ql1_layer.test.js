@@ -1,4 +1,4 @@
-// QL1 (bible/06-Systems/Questlines-Arc.md): THE LAYER - the switch and the stamp a quest keeps for life, the bindings an
+// QL1: THE LAYER - the switch and the stamp a quest keeps for life, the bindings an
 // objective reads off the machine's own state, the latch, a shared copy's state, and the layer made by the quest bridge
 // over a real DFU quest (M0B00Y06, the Fighters Guild's wild beast) from its start to its reward.
 import { test } from 'node:test';
@@ -86,7 +86,6 @@ test('QL1 the state: written whole, read back field by field, and anything else 
 });
 
 test('QL1 a shared copy (decision 7): the party\'s progress travels, the holder\'s reward never does; a resync is monotonic', () => {
-  // PIN MOVED (AUDIT QUESTLINES REWARD-15): a state keeps no `offer` - a reward's choice waits in the layer's offers
   const sender = { ...freshState(), done: ['a'], choices: { fate: 'spare' }, outcome: null, paid: true, moved: true, acts: { k: 1 } };
   const got = receivedState(writeState(sender));
   assert.deepEqual(got.done, ['a']);
@@ -199,7 +198,6 @@ test('QL1 the latch: done stays done when the script clears its task, a branch\'
   assert.equal(fallbackOutcome(ended, sheet).id, 'failed');
   assert.equal(fallbackOutcome({ ...ended, questSuccess: true }, sheet).id, 'done', 'success: the outcome named done first');
   const unnamed = { outcomes: sheet.outcomes.filter((o) => o.id !== 'done' && o.id !== 'failed').concat([{ id: 'lost', on: { ended: true }, failure: true }]) };
-  // PIN MOVED (AUDIT QUESTLINES LAW-1): a success with no `done` is the sheet's own `success`, never a guess at the first
   assert.equal(fallbackOutcome({ ...ended, questSuccess: true }, unnamed), null, '...never the first that is no failure');
   assert.equal(fallbackOutcome({ ...ended, questSuccess: true }, { ...unnamed, success: 'mercy' }).id, 'mercy', '...but the one the sheet names');
   assert.equal(fallbackOutcome(ended, unnamed).id, 'lost', '...and a failure the first failure');
@@ -260,7 +258,7 @@ test('QL1/QL3 the bridge makes the layer: M0B00Y06 stamped at its start, its obj
   assert.equal(rewards.length, 1, 'the script\'s gold reward, through RW1\'s door');
   assert.equal(quest.ql.outcome, 'done', 'settled at its own `end quest` - not at the reward: a quest may pay before it ends (M0B00Y16)');
   assert.equal(offers.length, 1, 'one choice of gear, at the end');
-  // filed with the notebook's entry: how it ended - AUDIT QUESTLINES UI-5 (PIN MOVED): as the entry's side record, never a
+  // filed with the notebook's entry: how it ended - AUDIT QUESTLINES UI-5 (
   // line of DFU's classic logbook (the enhanced archive draws it)
   const entry = bridge.notebook.getFinishedQuests().at(-1);
   assert.equal(filedOutcome(entry), 'The beast is dead and the citizen\'s house is safe.');

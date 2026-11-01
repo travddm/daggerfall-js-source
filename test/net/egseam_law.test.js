@@ -1,5 +1,4 @@
-// EG-H3 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md sections 10.1, 13.1, 21 and
-// 31, EG3 and EG4): THE BOSS SEAM AND THE COURSE AS DATA, PINNED.
+// EG-H3: THE BOSS SEAM AND THE COURSE AS DATA, PINNED.
 //   THE GOLDEN FRAMES - the relay's own words in a gate's court, an Abyss Dungeon's realm and a serpent's cell, played
 //     through the real Room over fake objects on a seeded clock and a seeded die, hashed whole: the hashes were taken on
 //     the tree before the seam (4f0e71965) and stand unchanged after it - the three bosses re-plugged, frames byte for byte.
@@ -202,19 +201,15 @@ async function serpentGolden() {
 
 /** The hashes taken on the tree before the seam (4f0e71965), and how many words each heard. */
 const GOLDEN = Object.freeze({
-  // PIN MOVED (COURT-WATCH, bible/11-Multiplayer/World-Bosses.md section 24): the answer to an `in` that seats a fighter
   // says so (`me`) - the two answers here; every frame else word for word (`,"me":1` taken out, b834e08b... as before)
-  // PIN MOVED (WB14a, bible/11-Multiplayer/Breach-Portents.md section 3): the Warden's new arsenal - his Chains thrown at
   // the seeded fight's fortieth second (their cooldown run from his wake), naming the chained by peer id (`pk`); every frame
   // before it word for word as COURT-WATCH's (05991c48..., 192 frames)
   gate: Object.freeze({ n: 190, h: '3db1852e7b7c714a313ceb3f19790f9cfb0e6348f2599c0905f35c97bdfe9c35' }),
-  // PIN MOVED (WW5, bible/03-World/World-Wide.md WW5): the hub runs a director a lane - the Bay's and eight provinces' -
   // before the realm opens, so the seeded die stands elsewhere when the fight begins (b0019f8f..., 140 frames before). The
   // Remnant's frames are the same: with the die seeded afresh at the fight's first hello the realm says 148 frames hashed
   // 36cc80c3ccedd3eeef2d26a35633c6778389cbb984c13413f2d1ae383613befa on the tree before WW5 and after it alike
   sd: Object.freeze({ n: 146, h: '1e8fe66973b532178b65903095c99018a4532b20a13535c410c760f0eaa30daf' }),
   serpent: Object.freeze({ n: 232, h: '8569aebc4ba221743d3191c8d952bcca99e72e164b032cfd37f00eb613ce3ded' }),
-  // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS, net/superDungeon/sdBrain.js orreryRightsSnapped): a hand's lengthening is counted for
   // the Hollow, so past the snap Ann - ten long turns behind her - waits while Bo and the keepers turn (`w`, to her alone),
   // and her stone's share of the way is never turned; every frame up to her first turn past the snap word for word as the
   // seam's (2a803880..., 288 frames)
@@ -250,7 +245,7 @@ function courseRecord() {
     motes: L(sdMoteVertices()).length, moteAt: [0, 1, 2, 3].map((k) => sdMoteAt(k, 0.3, 0.6, 0.9, 12.5)),
   };
 }
-/** The hash of the record before the course was data (4f0e71965). PIN MOVED (EG removal): the Spire's pieces left the
+/** The hash of the record before the course was data (4f0e71965).
  *  record with the Spire's circles; every field that stays is made by code the removal left unchanged. */
 const COURSE_GOLDEN = '2540f4613ae3d06f5337b509f713994de3d924c1873f38152faeaf5640d82211';
 

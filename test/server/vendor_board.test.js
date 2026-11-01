@@ -1,5 +1,4 @@
-// VENDOR-BOARD (2026-10-19, the account database overloaded again: the region's traders the read most asked again in the
-// 18:05 overload; bible/11-Multiplayer/Scale-Arc.md VENDOR-BOARD; migration 0137) - A REGION'S TRADERS READ AS ONE ROW:
+// VENDOR-BOARD - A REGION'S TRADERS READ AS ONE ROW:
 // the board every caller reads alike is kept in `market_vendor_boards` at a version the database moves on every trader
 // listing, trader, trader's house and patron sale written, until its first listing runs out; the caller's own door (its
 // own house, its guild's, a room it rents) is read off its own rows.
@@ -29,7 +28,7 @@ const place = (station) => JSON.stringify({ pos: [1, 0, 1], rot: [0, 0, 0], scal
 const ITEM = JSON.stringify({ t: 1, n: 'Iron Longsword' });
 
 /** THE ORACLE: the board as it was read before VENDOR-BOARD - its two statements with the caller's door asked of every
- *  row (market.js marketVendors at the merge base), and the region's patron sales of the day. PIN MOVED (ACCOUNT-HOMES,
+ *  row (market.js marketVendors at the merge base), and the region's patron sales of the day.
  *  at its merge of main): the door is the account's - `mine` any house of the caller's account, `guildmate` a guild
  *  shared with any character of the owner's account, as ACCOUNT-HOMES' own statement asked them. */
 async function before(db, player, region, me, nowS) {
@@ -355,7 +354,6 @@ test('VENDOR-BOARD the writes that move a board are the database\'s own - every 
   assert.doesNotThrow(() => raw.prepare("UPDATE home_decor SET place = 'still not' WHERE id = 'bad'").run());
   assert.doesNotThrow(() => raw.prepare("DELETE FROM home_decor WHERE id = 'bad'").run());
   const files = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f > '0137');
-  // PIN MOVED (WW7-5): 0170 rebuilds market_listings for its region's CHECK - and makes its three triggers again in it
   const LISTING_TRIGGERS = ['vendor_board_listed', 'vendor_board_listing', 'vendor_board_unlisted'];
   for (const f of files) {
     const s = src(`server-account/migrations/${f}`);

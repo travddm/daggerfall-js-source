@@ -24,11 +24,10 @@ import {
 } from '../../src/systems/textureReplacement.js';
 import { getBool, setValue } from '../../src/systems/settings/settings.js';
 
-// ═══ SURV2 (2026-09-18): THE SURVIVAL ITEMS ═════════════════════════
+// ═══ SURV2: THE SURVIVAL ITEMS ═════════════════════════
 //
 // The mod's eleven templates as the port's own custom rows above DFU's
-// 288, plus the campfire kit (Mac: "a new campfire item players can
-// buy and place"); a waterskin that weighs its water; rations that
+// 288, plus the campfire kit; a waterskin that weighs its water; rations that
 // stack; food that spoils by stage and shows the mod's own spoiled
 // face; the use handlers on useItem's ladder; the general store's
 // provisions shelf; the starting kit; the corpse's meat.
@@ -185,7 +184,7 @@ test('SURV2: the camp gear hands itself to the host, the skillet explains itself
 test('SURV2: the general store shelves provisions (no horse or cart since MERCHANT-YARDS), and a new character sets out with the kit', () => {
   const items = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 10 }, { level: 1 }, { rolls: () => 0.5 });
   const idx = (t) => items.findIndex((i) => i.templateIndex === t);
-  assert.ok(idx(TEMPLATE.Rations) >= 0 && idx(94) === -1, 'rations on it; no horse');   // PIN MOVED (MERCHANT-YARDS, 2026-10-10): the horse and the cart are the town's Stable's and Wagon Yard's now - the provisions stand where they did, after DFU's draws
+  assert.ok(idx(TEMPLATE.Rations) >= 0 && idx(94) === -1, 'rations on it; no horse');
   for (const t of [TEMPLATE.Bread, TEMPLATE.Waterskin, TEMPLATE.Campfire, TEMPLATE.CampingEquipment, TEMPLATE.Skillet]) assert.ok(idx(t) >= 0, `a quality-10 store carries ${templateByIndex(t).name}`);
   assert.ok(items.find((i) => i.templateIndex === TEMPLATE.Waterskin).water === 0, 'sold empty');
   assert.ok(items.every((i) => i.name && i.value != null), 'every row minted with a name and a value');
@@ -193,7 +192,7 @@ test('SURV2: the general store shelves provisions (no horse or cart since MERCHA
   assert.ok(!poor.some((i) => i.templateIndex === TEMPLATE.CampingEquipment), 'a poor store on a bad roll has no camping gear');
   assert.equal(poor.filter((i) => i.templateIndex === TEMPLATE.Campfire).length, 4, 'but Campfires - REST2: two to four, the rest\'s own tool');
   const kit = startingProvisions();
-  // AUDIT C&C I7 (PIN MOVED): the mod's own start dresses the character - its Formal cloak and Shoes (a man's, with no
+  // AUDIT C&C I7 (
   // character handed) between the skin and the gear, as NewCharEffects adds them
   assert.deepEqual(kit.map((i) => i.templateIndex), [TEMPLATE.Rations, TEMPLATE.Waterskin, 155, 147, TEMPLATE.CampingEquipment, TEMPLATE.Campfire]);
   assert.equal(kit[0].stackCount, 2);
@@ -272,7 +271,7 @@ test('SURV2: the mod\'s sixteen icons are vendored, allow-listed, and ride the t
   clearVendorTextures();
 });
 
-// ═══ AUDIT VC6 (2026-09-18): THE DROP ROLLS ON THE POOL'S OWN STREAM ══
+// ═══ AUDIT VC6: THE DROP ROLLS ON THE POOL'S OWN STREAM ══
 // Chased down from a pin that failed one run in eight: the three pools
 // that raise a death (cityGuards, exteriorFoes, dungeonContext) handed
 // `raiseEnemyDeath` an entity and nothing else, so this handler - which
@@ -300,7 +299,7 @@ test('AUDIT VC6: the corpse\'s food rolls on the roll it is HANDED, and on the l
   // stays where its spawn loot's already is - but its luck is real.
   assert.match(src('src/scenes/cityGuards.js'), /raiseEnemyDeath\(g\.entity, \{ rolls: rand, luck: liveStat\(playerEntity, 'luck'\) \}\);/);
   assert.match(src('src/scenes/exteriorFoes.js'), /raiseEnemyDeath\(f\.entity, \{ rolls, luck: liveStat\(playerEntity, 'luck'\) \}\)/);
-  assert.match(src('src/scenes/dungeonContext.js'), /raiseEnemyDeath\(foe\.entity, \{ luck: liveStat\(playerEntity, 'luck'\), by: foe\._killedBy \?\? null \}\)/);   // PIN MOVED (EG-E3): and the striker the foes stream names - a joiner's kill is the joiner's find
+  assert.match(src('src/scenes/dungeonContext.js'), /raiseEnemyDeath\(foe\.entity, \{ luck: liveStat\(playerEntity, 'luck'\), by: foe\._killedBy \?\? null \}\)/);
   for (const f of ['src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js', 'src/scenes/dungeonContext.js']) {
     assert.doesNotMatch(src(f), /raiseEnemyDeath\([a-zA-Z.]+\);/, `${f}: no raiser hands an entity alone any more`);
   }

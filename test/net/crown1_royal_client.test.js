@@ -1,9 +1,9 @@
-// CROWN1 part two, the client (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): A ROYAL TOURNEY AS THIS
+// CROWN1 part two, the client: A ROYAL TOURNEY AS THIS
 // CLIENT FIGHTS IT - the fold and the HUD's words (net/royalLink.js), the session (net/royalSession.js: the pass and its
 // ring, the room, the card's Challenge as a challenge or an accept, the bout's one foe, the ring kept, the receipts),
 // the ring from the town (systems/siegeField.js royalRingWire), the bouts' carrier (net/siege/siegeClaims.js createRoyalClaims),
 // the socket's royal room (net/online.js), the Seat tab's doors (ui/seatTab.js) and the world's wiring.
-// bible/11-Multiplayer/Seats-Arc.md 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two, the client).
+// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two, the client).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

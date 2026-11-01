@@ -1,5 +1,4 @@
-// OL6 (2026-10-07, bible/06-Systems/Online-Waits.md WAIT1; Mac: "Take care of this", over the sweep of the waits still
-// long online): THE BANK, THE LIBRARY AND THE PALACE KEEP THE SHARED WORLD'S HOURS. OL4 gave storefronts the relief
+// OL6: THE BANK, THE LIBRARY AND THE PALACE KEEP THE SHARED WORLD'S HOURS. OL4 gave storefronts the relief
 // shift and OL5 the guild hall, for one reason: an online player cannot move the shared clock, so a classic schedule is
 // a real-time lockout. Read on the sky's hour (TIME1) and a one-hour sky day (SKY-SLOW), DFU's 8-15 shut the bank
 // forty-two and a half minutes of every real hour - deposits, loans, letters of credit, the Marks exchange, a ship's

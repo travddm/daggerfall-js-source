@@ -1,7 +1,7 @@
-// AUDIT SHIPYARDS (2026-10-11, Mac: "Audit everything") - THE PORT'S PLACES: what the audit's lanes found in the
+// AUDIT SHIPYARDS - THE PORT'S PLACES: what the audit's lanes found in the
 // shipyard's and the lighthouse's models, the port's pool, the lighthouse's gallery and stair, the piers and where the
 // places stand, each fix pinned on the producer's own output (the built model, the host's own frames - TEST THE SHAPE THE
-// PRODUCER MINTS). bible/03-World/Shipyards.md, AUDIT SHIPYARDS.
+// PRODUCER MINTS)., AUDIT SHIPYARDS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -230,7 +230,7 @@ test('AUDIT SHIPYARDS THE GALLERY HOLDS (L4-1), over the real collider and motor
     for (const [k, pat] of pats.entries()) for (const turn of [0, 0.5]) {
       for (let i = 0; i < 150; i++) { rig.step(1, pat(i), () => up.yaw + turn + k * 0.3); maxR = Math.max(maxR, rig.r()); minY = Math.min(minY, rig.body.pos[1]); }
     }
-    assert.ok(maxR < G.parapetR, `${who} (turned ${yaw}): kept inside the parapet - ${maxR.toFixed(2)} m off the axis`);   // PIN MOVED (BEACON-TOWER): the railing a parapet
+    assert.ok(maxR < G.parapetR, `${who} (turned ${yaw}): kept inside the parapet - ${maxR.toFixed(2)} m off the axis`);
     assert.ok(minY > GALLERY_Y - 0.1, `${who} (turned ${yaw}): never below the gallery's floor - ${minY.toFixed(2)}`);
     rig.host.activate('port:9:lighthouse|hatch', 'grab', 'down');
     const down = rig.climbs[1].at;
@@ -277,7 +277,7 @@ test('AUDIT SHIPYARDS THE WAY DOWN CLEAR OF THE STEP (L4-4): the hatch stands th
 
 test('AUDIT SHIPYARDS THE HOLLOW TOWER HOLDS NOBODY (L4-5): its collider is held back while a body is inside the tower up to half a metre under the gallery (it stopped at 2.5 m: a body levitating inside was sealed in) and inside the lantern up to its roof\'s point (else it rose into the lantern room\'s glass the tower had then, shut in with the lamp) - never on the gallery', () => {
   const site = { kind: 'lighthouse', yaw: 0 }, T = LIGHTHOUSE.tower, L = LIGHTHOUSE.lantern;
-  const top = GALLERY_Y + L.sillH + L.archH + L.cornice + L.roofH;   // PIN MOVED (BEACON-TOWER): the lantern's sills, arches, cornice and roof
+  const top = GALLERY_Y + L.sillH + L.archH + L.cornice + L.roofH;
   assert.equal(top, GALLERY_Y + LANTERN_H);
   assert.equal(feetInPort(site, [0, 0, 0], [T.x, 10, T.z]), true, 'inside the tower at 10 m');
   assert.equal(feetInPort(site, [0, 0, 0], [T.x + 2.4, GALLERY_Y - 0.6, T.z]), true, 'just under the gallery');

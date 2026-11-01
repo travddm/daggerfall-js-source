@@ -1,4 +1,4 @@
-// PROF2 (2026-09-28, Mac: "Go") - MINING AND QUARRYING'S LAWS, pinned against the record (bible/06-Systems/
+// PROF2 - MINING AND QUARRYING'S LAWS, pinned against the record (bible/06-Systems/
 // Professions-Arc.md, PROF0 4.1, 4.5, 4.6, 4.7, 5.2, 6, 11 and 23; SEAT0 4.3's kingdoms) and against DFU's own tables:
 // src/net/kingdomLaw.js, src/net/professionLaw.js, src/net/nodeLaw.js.
 import { test } from 'node:test';
@@ -34,7 +34,7 @@ test('PROF2 law: the kingdoms are SEAT0 4.3\'s, one home - three crowns, the Mar
   assert.deepEqual({ ...FREE_LANDS }, { balfiera: 9, orsinium: 26, wrothgarian: 16 });
   const all = [...Object.values(KINGDOMS).flatMap((k) => k.regions), ...K_MARCHES, ...Object.values(FREE_LANDS)];
   assert.equal(new Set(all).size, all.length, 'no region in two lands');
-  assert.equal(all.length, 51, 'the Bay\'s 44 (the eighteen left out hold no seat) and seven provinces\' crowns');   // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): High Rock's and Hammerfell's past the Bay no crown's
+  assert.equal(all.length, 51, 'the Bay\'s 44 (the eighteen left out hold no seat) and seven provinces\' crowns');
   assert.deepEqual([kingdomOf(17), kingdomOf(23), kingdomOf(0), kingdomOf(21), kingdomOf(9), kingdomOf(31)], ['daggerfall', 'wayrest', 'sentinel', null, null, null]);
   assert.deepEqual([isMarch(21), isMarch(17), isFreeLand(26), isFreeLand(17)], [true, false, true, false]);
   assert.equal(MARCH_REGIONS, K_MARCHES, 'the nodes\' Marches are the kingdoms\' own object');
@@ -84,7 +84,7 @@ test('PROF2 law: the act - 4 / 5 / 7 strikes by tier, the glint 1.2 s (2 s at Ma
   assert.deepEqual([1, 2, 3, 4, 5, 6].map(strikesFor), [4, 4, 5, 5, 7, 7]);
   assert.deepEqual([1, 3, 5].map(glintsMax), [2, 3, 4], 'every strike on the glint counts two');
   assert.deepEqual({ ...MINE_ACT }, { points: 5, glintS: 1.2, masterGlintS: 2.0, radiusDeg: 2.5, swingS: 0.45, spreadYawDeg: 7, spreadPitchDeg: 4 });
-  assert.deepEqual([GEM_CHANCE, PROSPECTOR_GEM, DEEP_DELVER_MULT, CUT_RATIO], [0.03, 1.1, 2, 2]);   // PIN MOVED (MINE-PERKS): the Deep Delver's x1.5 is x2
+  assert.deepEqual([GEM_CHANCE, PROSPECTOR_GEM, DEEP_DELVER_MULT, CUT_RATIO], [0.03, 1.1, 2, 2]);
   assert.equal(pickAxeBand({ intelligence: 70, agility: 50 }), actBand(60));
   assert.equal(pickAxeBand({ intelligence: 39, agility: 40 }), actBand(39), 'C#\'s integer average: 79 / 2 is 39');
 });
@@ -109,7 +109,7 @@ test('PROF2 law: the veins\' tables are PROF0 4.1\'s; a vein\'s tier is drawn ov
   assert.equal(drawFromTable(VEIN_TABLES[C.Mountain], 0.999, 0.999).tier, 5, 'the Mountain\'s highest');
   assert.equal(drawFromTable(VEIN_TABLES[C.Mountain], 0.999, 0.999, 2).tier, 1, 'held to 2: the Mountain has only Iron there');
   assert.deepEqual(NODE_TIER_WEIGHTS, [40, 25, 15, 10, 6, 4]);
-  // over many days, an unconfirmed Mountain pixel yields Iron and Silver - PIN MOVED (UNWITNESSED-ORE, FIELD BUGS
+  // over many days, an unconfirmed Mountain pixel yields Iron and Silver
   // 2026-10-09e: it yielded Iron alone, and the field read it as a bug); a confirmed one reaches tiers 3-5
   const seen = new Set(), seenC = new Set();
   for (let d = 0; d < 200; d++) {
@@ -124,7 +124,6 @@ test('PROF2 law: the veins\' tables are PROF0 4.1\'s; a vein\'s tier is drawn ov
 });
 
 test('PROF2 law: the signatures by kingdom (PROF0 4.7) - on a confirmed pixel, Daggerfall\'s Moonstone two veins, the others one, beside the climate\'s (AUDIT 29 A6); never unconfirmed', () => {
-  // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): a signature names the ore of each of its slots (`ores`) - a crown's
   // its one ore, Cyrodiil's every province's (test/world/worldWide/wwc1_ground.test.js)
   const signature = (r) => { const g = regionSignature(r); if (g) assert.deepEqual(g.ores, Array(g.slots).fill(g.ore), `${r}: one ore, each slot`); return g && { ore: g.ore, slots: g.slots }; };
   assert.deepEqual(signature(17), { ore: 'ore:moonstone', slots: 2 });
@@ -170,7 +169,6 @@ test('PROF2 law: the boulders - the climate\'s count a day, tier 1, Rough Stone;
   assert.ok(mats.has('ore:dwarven') && mats.has('ore:adamantium'), 'Dwarven Scrap and Adamantium are found here');
   assert.deepEqual([...DUNGEON_VEINS], ['metal:silver', 'metal:gold', 'ore:dwarven', 'metal:platinum', 'ore:adamantium']);
   assert.ok(dungeonVeinTable(C.Woodlands).includes('ore:moonstone') && dungeonVeinTable(C.HauntedWoodlands).includes('ore:moonstone'));
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): a dungeon nobody has vouched for
   // draws the deep veins' WHOLE table - it was held to tier 3, Silver - and never its climate's Moonstone, which waits on
   // the witnesses; where the climate adds no ore the draw is the confirmed dungeon's, vein for vein
   const unTiers = new Set(), unMats = new Set();
@@ -233,7 +231,7 @@ test('PROF2 law: smelting (PROF0 4.1) - two of a raw metal an ingot, Steel and B
     ['ingot:adamantium', 'ingot:adamantium', '2 ore:adamantium'],
     ['ingot:ebony', 'ingot:ebony', '2 ore:ebony'],
     ['ingot:orichalcum', 'ingot:orichalcum', '2 ore:orichalcum'],
-    ['ingot:daedric', 'ingot:daedric', '1 ingot:ebony + 1 part:daedra-heart'],   // PIN MOVED (DAEDRIC-SMELT, Professions-Arc.md section 53): PROF0 4.1's recipe, built
+    ['ingot:daedric', 'ingot:daedric', '1 ingot:ebony + 1 part:daedra-heart'],
   ]);
   assert.deepEqual([smeltRecipe('ingot:daedric').embers, smeltRecipe('ingot:daedric').inputs[1].catalyst], [1, true], 'PIN MOVED (DAEDRIC-SMELT): its Sigil Stone the account\'s ember, its heart a catalyst - where it waited on both');
   assert.deepEqual([SMELT_MAX, FORGE_FEE], [100, 50]);
@@ -242,10 +240,9 @@ test('PROF2 law: smelting (PROF0 4.1) - two of a raw metal an ingot, Steel and B
   assert.deepEqual(smeltOrigin(smeltRecipe('ingot:iron'), 5, [0]), { own: 5, bought: 0 });
   assert.deepEqual(smeltOrigin(smeltRecipe('ingot:iron'), 2, [99]), { own: 0, bought: 2 });
   assert.deepEqual(smeltOrigin(smeltRecipe('metal:brass'), 5, [1, 4]), { own: 1, bought: 4 }, 'the most any input\'s bought units reach');
-  // PIN MOVED (CRAFT3): the limit counts the five crafting TRACKS - Alchemy and Cooking are one track now (Provisioning), so the two others past Journeyman are Provisioning and Building
   assert.equal(craftXpCap('smithing', { provisioning: 60, building: 51 }), xpForRank(51) - 1, 'a third craft past Journeyman stops at 50');
-  assert.equal(craftXpCap('smithing', { provisioning: 60, building: 50, mining: 90 }), xpForRank(100), 'a gathering track is no craft; 50 is not past');   // PIN MOVED (CRAFT3): track ids
-  assert.equal(craftXpCap('smithing', { smithing: 70, provisioning: 60 }), xpForRank(100), 'its own rank is never counted against it');   // PIN MOVED (CRAFT3): track ids
+  assert.equal(craftXpCap('smithing', { provisioning: 60, building: 50, mining: 90 }), xpForRank(100), 'a gathering track is no craft; 50 is not past');
+  assert.equal(craftXpCap('smithing', { smithing: 70, provisioning: 60 }), xpForRank(100), 'its own rank is never counted against it');
   assert.equal(craftXpCap('jewelcrafting', { smithing: 70, provisioning: 60 }), xpForRank(100), 'a discipline is its craft\'s track: Smithing\'s own rank is Jewelcrafting\'s');   // PIN MOVED (CRAFT3): the profession asked maps through trackOf
 });
 

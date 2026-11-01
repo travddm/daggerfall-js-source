@@ -1,7 +1,4 @@
-// OVH1-OVH3 (2026-09-24, Mac: "A new option on the main menu that opens to show 3 large panels ... 1. Texture
-// Overhaul 2. Sound Overhaul 3. UI Overhaul ... These overhauls need to adapt to online with ease ... Our first
-// overhaul option will be the file attached" - GrimoireUI 1.2 - and then "Currently there are no texture packs, it
-// should be empty").
+// OVH1-OVH3.
 //
 // Driven through the real registry, the real shelf, the real pack index off the vendored listing, the real texture
 // door and the real text layout; the browser half (the three cards, browse vs wear, the reload) is

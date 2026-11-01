@@ -16,8 +16,7 @@ import { setModSetting, modSetting } from '../../src/systems/modSettings.js';
 
 // ═══ EOTB4: ONE WHEEL, ONE LADDER ═════════════════════════════════
 //
-// Mac, 2026-09-15: "instead of numpad being used to change views, I
-// want it scrollable like how we handle morrowind", and on why the
+// and on why the
 // port carries a second third-person system at all: "This is moreso
 // for those who opt out of using morrowind."
 //

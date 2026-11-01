@@ -1,4 +1,4 @@
-// SD9b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE HOURS BROKEN - the
+// SD9b: THE HOURS BROKEN - the
 // account service's claim of an `h1` (server-account/src/sds.js claimSd, migration 0088): one row a (slot, account), a
 // guest's fought and not counted, Hourbreaker and The Turning Hour rolled off the receipt's seed on the first write alone
 // and held for good on the row (`sd_honours`); the route behind a session, the count on the cards; the title held, worn
@@ -45,7 +45,7 @@ async function relayPair() {
  *  hold one many times over; a roll that can never grant it fails here rather than looping. */
 const seedFor = (title, aura) => { for (let c = 1; c <= 1000; c++) { const h = sdHonoursRoll(c); if (h.title === title && h.aura === aura) return c; } throw new Error(`no seed grants title ${title}, aura ${aura}`); };
 const settle = () => new Promise((r) => setImmediate(r));   // a tick's own offer, answered
-/** AUDIT SD III (R4, PIN MOVED): the claim rolls its own seed - a draw of four bytes from its `rand`; this one answers that
+/** AUDIT SD III (R4
  *  draw with `seed`, and every other ask (the nonce) at random. */
 const rolling = (seed) => (b) => (b.length === 4 ? (b.set([(seed >>> 24) & 255, (seed >>> 16) & 255, (seed >>> 8) & 255, seed & 255]), b) : rand(b));
 const hour = (s, d, key, { c = seedFor(false, false), x = 'dealt', l = 30, nowS = T0 } = {}) => mintSdReceipt({ d, s, c, x, l }, key, { subtle, nowS });
@@ -78,7 +78,7 @@ test('SD9b THE CLAIM: an `h1` the relay signed, naming the claiming account, is 
   const db = d1();
   const A = await member(db), B = await member(db);
   const { priv, pubKey } = await relayPair();
-  const ctx = { db, nowS: T0 + 60, subtle, rand: rolling(seedFor(false, false)) };   // AUDIT SD III (R4, PIN MOVED): the claim's draw rolls none
+  const ctx = { db, nowS: T0 + 60, subtle, rand: rolling(seedFor(false, false)) };   // AUDIT SD III (R4
   const r7 = await hour(A.id, 7, priv);
   assert.deepEqual(await claimSd(ctx, A, r7, pubKey), { recorded: true, slot: 7, title: false, aura: false, titleNew: false, auraNew: false, broken: 1 });
   assert.deepEqual(await claimSd(ctx, A, r7, pubKey), { recorded: false, why: 'claimed', broken: 1 }, 'once, whatever happens to it');
@@ -168,7 +168,7 @@ test('SD9b THE WORKER: /v1/sd/claim behind a session and never open - the sessio
   const { call } = await stand({ gateKey: pub });
   const me = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
   const them = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
-  const r = await hour(me.id, 7, priv, { c: seedFor(false, false) });   // AUDIT SD III (R4, PIN MOVED): its seed rolls none - the claim's own draw grants
+  const r = await hour(me.id, 7, priv, { c: seedFor(false, false) });   // AUDIT SD III (R4
   assert.deepEqual((await call('POST', '/v1/sd/claim', { receipt: r }, me.secret)).body, { recorded: false, why: 'guest', broken: 0 });
   assert.equal((await call('POST', '/v1/auth/register', { handle: 'HourBreaker1', password: 'correct horse battery', ...ACCEPTED }, me.secret)).status, 200);
   assert.equal((await call('POST', '/v1/sd/claim', { receipt: r })).status, 401, 'a stranger claims nothing');

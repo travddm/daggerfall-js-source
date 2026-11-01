@@ -1,4 +1,4 @@
-// DW-E2 (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2's SEAFLOOR DECORATIONS (jet082), PINNED: the catalog
+// DW-E2 - ILIAC PUDDLE NO MORE 1.2.2's SEAFLOOR DECORATIONS (jet082), PINNED: the catalog
 // (UnderwaterDecorationCatalog.cs), the placement and the work queue (UnderwaterDecorations.cs), the factory's three
 // ways of standing a decoration and its edge clean (UnderwaterDecorationBatchFactory.cs), and the decoration program
 // (DeepWaters/UnderwaterBillboardBatchUnlit, read back to GLSL). The expectations are the C#'s, spelled out here.

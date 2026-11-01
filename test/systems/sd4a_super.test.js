@@ -1,4 +1,4 @@
-// SD4a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 5): THE SUPER DUNGEON'S
+// SD4a: THE SUPER DUNGEON'S
 // DIFFICULTY (world/superDungeon/sdDungeon.js) - the port's hardest. A Hollow is a Super dungeon by its location's word
 // (systems/dungeon/dungeonTier.js), read once by the dungeon host: three foes at every enemy marker as an Elite's, each x4
 // health and x2.5 damage, its random foes rolled at the encounter tables' top band and a class foe built at the band's
@@ -144,15 +144,14 @@ test('SD4a the host by source: the tier read once by its one law before the fire
   const tier = DC.indexOf('const _superTier = ');
   const fires = DC.indexOf('  const firePlan = isGateArena(dfLocation)');
   assert.ok(tier > 0 && fires > tier, 'read before the fires');
-  assert.match(DC.slice(fires, fires + 1200), /\n {4}cold: _superTier(?: \|\| _sdRealm)?,[^\n]*\n {2}\}\);/);   // SD5a (PIN MOVED): and the Shattered Hour's
+  assert.match(DC.slice(fires, fires + 1200), /\n {4}cold: _superTier(?: \|\| _sdRealm)?,[^\n]*\n {2}\}\);/);   // SD5a (
   assert.match(DC, /playerLevel: _superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\),[^\n]*SOFTCAP2: a mentor's dungeon/, 'the layout\'s roll');
   assert.match(DC, /playerLevel: _superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\),[^\n]*SOFTCAP2: mentor mode/, 'the rest\'s roll');
   assert.match(DC, /D\.makeEnemyEntity\(e\.mobileType, basics, await D\.loadEnemyCareer\(e\.mobileType, D\.fetchBytes\), e\.level \?\? \(_superTier \? superFoeLevel\(effectiveLevel\(D\.playerEntity\)\) : effectiveLevel\(D\.playerEntity\)\)\);/, 'a class foe at the band (a revenant\'s or a bout\'s own level first)');
   assert.match(DC, /const enemies = dfLocation\?\.elite \|\| _superTier[^\n]*\n {4}\? expandEliteEnemies\(_layoutEnemies, \{\n {6}copies: ELITE_FOE_MULTIPLIER,/);
   assert.match(DC, /\n {2}if \(_superTier\) for \(const e of enemies\) e\.superTier = true;/);
   assert.ok(DC.indexOf('if (_superTier) for (const e of enemies) e.superTier = true;') < DC.indexOf('if (elitesAllowed({ onlinePage: isOnlinePage()'), 'marked before the pick and every build');
-  // PIN MOVED (AUDIT BAL, bible/05-Combat/Balance-Arc.md section 10): and offline the class foes' built level for ELITE-FLOOR
   assert.match(DC, /pickDungeonElites\(enemies, [^\n]*\{ elite: !!dfLocation\?\.elite, count: _superTier \? SUPER_ELITE_FOES : null, classLevel: _eliteOnline \? Infinity : [^\n]*\}\);/);
-  assert.match(DC, /generateLootItems\(lootKey, [^\n]*, rolls, _superTier \? \{ itemChanceScale: SUPER_LOOT_DROP_MULT \} : elite \? \{ itemChanceScale: ELITE_LOOT_DROP_MULT \} : \{\}\);/);   // PIN MOVED (PARTY-LOOT): on the roll's own dice - a room's base its seeded ones
+  assert.match(DC, /generateLootItems\(lootKey, [^\n]*, rolls, _superTier \? \{ itemChanceScale: SUPER_LOOT_DROP_MULT \} : elite \? \{ itemChanceScale: ELITE_LOOT_DROP_MULT \} : \{\}\);/);
   assert.match(DC, /qualityMult: _superTier \? SUPER_LOOT_QUALITY_MULT : elite \? ELITE_LOOT_QUALITY_MULT : 1,/);
 });

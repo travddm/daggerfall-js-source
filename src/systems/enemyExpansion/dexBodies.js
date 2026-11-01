@@ -1,10 +1,9 @@
-// DEX7 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 10; Mac, 2026-10-19: "We also need to ensure these
-// get proper morrowind model replacements if applicable") - DAGGERFALL ENEMY EXPANSION'S FIFTY, MATCHED TO MORROWIND'S.
+// DEX7 - DAGGERFALL ENEMY EXPANSION'S FIFTY, MATCHED TO MORROWIND'S.
 // The mod has no Morrowind half - DFU draws its sprites - so this is the port's own, by the law the classic table keeps
-// (characters/creatureBodies.js CREATURE_MATCH, bible/04-Characters/Morrowind-NPCs.md section 14b):
+// (characters/creatureBodies.js CREATURE_MATCH):
 //   - A MONSTER (256-290) is matched to the Morrowind creature that IS it and moves as it does - its CREA ids in order,
 //     the first the attached masters carry building its body - or is a DECLARED MISS with its reason, and its sprite
-//     stands. The ids are the records' own, read off the Elder Scrolls wiki's creature pages (2026-10-20), never
+//     stands. The ids are the records' own, read off the Elder Scrolls wiki's creature pages, never
 //     recalled: Morrowind.esm's, Tribunal's (goblin_grunt) and Bloodmoon's (the BM_ ids). Where a classic monster is the
 //     same creature, the row is the classic row's (the Skeletal Soldier the Skeletal Warrior's, a golem the classic
 //     atronach's, a ghoul the zombie's bonewalker, the wraith and the ghost the veiled ancestor ghost).

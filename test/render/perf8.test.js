@@ -1,4 +1,4 @@
-// PERF8 (2026-09-11). The grass placer's keep()/ground() found the pixel
+// PERF8. The grass placer's keep()/ground() found the pixel
 // under a blade by scanning every near pixel; the pixels are a grid, so
 // the one under a point is one floor from a reference. EXECUTES against
 // pieces laid as streamingWorld lays them; the host is pinned.
@@ -46,7 +46,7 @@ test('PERF8 pieceIndex: answers exactly what the scan answered, for every point 
   for (let i = 0; i < 500; i++) { const x = Math.random() * 6 * TS - TS, z = Math.random() * 6 * TS - TS; assert.equal(at2(x, z), at(x, z)); }
 });
 
-// GRASS4 (2026-09-18): THE KEY IS A NUMBER, and the whole point of it is
+// GRASS4: THE KEY IS A NUMBER, and the whole point of it is
 // that it allocates nothing. `pieceIndex` is asked once per blade
 // candidate - six thousand a cell, two cells a frame while the eye walks
 // - and it was minting a template string for every one of them, twelve

@@ -1,4 +1,4 @@
-// BUILD-RETRY (bible/06-Systems/Travel-View.md, BUILD-RETRY under LOAD-OWED; the bug-reports channel, 2026-10-14: "the
+// BUILD-RETRY (, BUILD-RETRY under LOAD-OWED; the bug-reports channel, 2026-10-14: "the
 // speed randomly drops and gets locked at 1x after traveling for a while"). LOAD-OWED let the Overworld's clock go when
 // a pixel's build threw; this is the build that threw. The sweep of the pixel build over the real map
 // (tools/pixelBuildSweep.mjs) found no pixel whose build throws on whole data - what throws is a READ that failed, and the
@@ -172,7 +172,6 @@ test('BUILD-RETRY, the host: the pump\'s catch lets a failed pixel go to the str
       built.set(k, { px, py });
       return built.get(k);
     };
-    // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers which pixel is ready (scenes/capitalPrebuild.js
     // firstReady) - none of the city's here, every pixel ready
     const s = { state, built, queue, buildPixel, destroyPixel: (px, py) => built.delete(`${px},${py}`), _wodArrival: { keys: new Set() }, console: { error() {} }, performance: { now: () => clock.t }, capitalPrebuild: { firstReady: () => true } };
     const frame = new Function('s', `let { state, built, queue, buildPixel, destroyPixel, _wodArrival, console, performance, capitalPrebuild } = s;

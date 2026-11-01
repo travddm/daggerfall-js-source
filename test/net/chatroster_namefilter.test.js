@@ -21,7 +21,6 @@ const rd = (p) => readFileSync(join(root, p), 'utf8');
 const session = (id, name, peers) => ({ id, name, peers: new Map(peers.map((p) => [p.id, p])) });
 
 test('CHAT-R1: the roster is alphabetical, case- and number-blind, and ME is in it rather than on top of it', () => {
-  // Mac: "showing all currently online players in alphabetical order".
   const r = rosterRows(session('me', 'Medora', [
     { id: 'a', name: 'zara' }, { id: 'b', name: 'Alfred' }, { id: 'c', name: 'Zara' },
     { id: 'd', name: 'Player10' }, { id: 'e', name: 'Player9' }, { id: 'f', name: 'edmund' },
@@ -142,7 +141,6 @@ test('CHAT-R1: a name the filter refuses never reaches the roster either', () =>
 // ═══ NAME-F1: THE FILTER ══════════════════════════════════════════
 
 test('NAME-F1: the words Mac reported are caught, however they are spelled', () => {
-  // Mac, 2026-09-16: "Im seeing a lot of names like 'Cum'".
   for (const [name, word] of [
     ['Cum', 'cum'], ['CUM', 'cum'], ['xXcumXx', 'cum'], ['TheCum', 'cum'], ['cuuuum', 'cum'],
     ['C0ck', 'cock'], ['cccoooock', 'cock'], ['D1CK', 'dick'], ['sh1t', 'shit'],
@@ -430,7 +428,7 @@ test('CHAT-R2: the roster column FILLS, in the model’s order, and scrolls on i
     'net/roster.js’s order, not the Map’s');
   assert.equal(one(root, 'dfchat-whohead').textContent, rosterTitle(3));
   assert.ok(rows.find((r) => String(r.className).includes('me')), 'my own row is marked');
-  // ROSTER-G (Mac: "the roster naming itself seems hardcoded"): the #tag is the tie-breaker for a SHARED name and
+  // ROSTER-G: the #tag is the tie-breaker for a SHARED name and
   // is drawn only there - a name nobody else has stands alone
   assert.equal(find(rows[0], 'dfchat-who-tag').length, 0, 'Alfred is the only Alfred: no tag');
 
@@ -463,7 +461,6 @@ test('CHAT-R2: an unchanged roster repaints NOTHING, because a pose arrives sixt
 });
 
 test('CHAT-R2: HIDE puts everything away, keeps the log running, and the open key stands down', async () => {
-  // Mac: "a hide chat button".
   const { panel, log, root, win } = await panelFor(() => ({ id: 'me', name: 'Me', peers: new Map() }));
   assert.equal(panel.isHidden(), false);
 

@@ -3,7 +3,6 @@
 // drawBillboards draws it in its blended phase, depth tested and never written, so the grass the frame drew after the
 // street's billboards met the ground's depth at the vortex's pixels and painted every blade behind it over it. The street's
 // blended flats are held back and drawn after the grass (RAIN-OVER-GRASS's fix for the rain, the same law).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

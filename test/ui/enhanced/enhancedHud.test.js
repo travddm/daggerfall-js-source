@@ -39,8 +39,7 @@ test('PX30 target: the blow you landed, and it FADES', () => {
   markFoeStruck(foe, { fromPlayer: false });
   assert.equal(foeTarget(), null, 'a foe hitting ANOTHER foe is not your target');
   markFoeStruck(foe, { fromPlayer: true });
-  // PIN MOVED (TELL9: the poise track rides the read - null for a foe with no brain, none drawn)
-  assert.deepEqual({ ...foeTarget(), fade: 1 }, { name: 'Grizzly Bear', health: 30, maxHealth: 50, fade: 1, poise: null, traits: [], rules: [], ward: 0 });   // PIN MOVED - AUDIT WORLD-EVENTS L5-6: the traits' rules beside their words   // BOSS-TRAITS (PIN MOVED): its traits' words and its ward - none here
+  assert.deepEqual({ ...foeTarget(), fade: 1 }, { name: 'Grizzly Bear', health: 30, maxHealth: 50, fade: 1, poise: null, traits: [], rules: [], ward: 0 });
   // It goes. A bar that never leaves is furniture.
   tickFoeTarget(FOE_TARGET_SECONDS - 1);
   assert.ok(foeTarget(), 'still there a second before its time');
@@ -61,7 +60,6 @@ test('AUDIT 39: every host that draws a HUD fills the two hands', () => {
   // display:none in the played game, which is a drawn door with a
   // stylesheet block behind it. Every host had both values one
   // argument over from the weaponSheathed it already passed.
-  // PIN MOVED (TWO-HANDS AUDIT): the plaque reads the rig's RESTING weapon - the lead's in a pair, never the off hand's
   // item for the length of its blow (playerWeapon.js restingWeapon); one hand's is its weapon, as before
   const hosts = {
     'src/scenes/world.js': 'weaponRig.playerWeapon.restingWeapon',

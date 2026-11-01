@@ -1,8 +1,7 @@
-// GROWTH (2026-10-17, the owner: "properly give the specialization its own UI for ease of player use and proper
-// descriptions instead of keeping players guessing" and "instead of having ascend in one place and the firmament trees in
+// GROWTH (2026-10-17, and "instead of having ascend in one place and the firmament trees in
 // another (including the new naval tree), I want to give the firmament, level up page, and specializations its own tab
 // within the pause menu"; asked: "Growth", the skies "drawn in the tab", the old doors moved, the classic skin let in;
-// bible/10-UI/Growth.md). Pinned here:
+// ). Pinned here:
 //   GROWTH1  the tab (PAUSE_TABS after Stats), its rail and its landings, what waits on each page, the moved doors
 //   GROWTH2  the Specialisations guide - every path's state on this character, what opens it, what it does, its Choose
 //   GROWTH3  the stage - a face kept across the window's redraws, full screen, a phone's door, the tab's Escape; the
@@ -170,7 +169,7 @@ test('GROWTH2 CHOOSE: an open path\'s Choose asks in the law\'s own box and comm
   assert.equal(family(specGuideModel(e), 'arcane').paths.find((p) => p.id === 'trickster').choose().ok, false, 'the law refuses a second');
 });
 
-// ── AUDIT GROWTH lane 1: the law and the model (bible/01-Overview/audits/Audit-Growth.md) ──────────────────────────
+// ── AUDIT GROWTH lane 1: the law and the model ──────────────────────────
 
 test('AUDIT GROWTH LANE1-1/4 THE SLOTS: a pair the slots left can never hold is no slot of its own - two minor schools, two majors with one major slot left - and it says so, apart from a skill the class can\'t master (mutants: the pair counted skill by skill; the slots read as the class; the shared line dropped)', () => {
   // two minor schools at 100, one minor slot: each alone reads ready, the pair never fits (pathPossible's own count)
@@ -474,7 +473,6 @@ test('GROWTH5 LEAVING ASKS FIRST: another page, another tab, the sheet\'s key an
 test('GROWTH4 THE ONE ASK\'S WORDS: on the enhanced skin the No and the several-open box name the Growth tab; the classic skin\'s the skill screen, whose rows open the same guide (mutants: the skins\' words swapped)', () => {
   assert.equal(AP.pathDeclinedGrowthText(), 'You can choose a specialization later on the Growth tab of the pause menu.');
   assert.equal(MP.martialDeclinedGrowthText(), 'You can choose a martial specialization later on the Growth tab of the pause menu.');
-  // PIN MOVED (SPEC-RESET, bible/10-UI/Growth.md section 10): the choice is undone only by the paid reset, and the box
   // names its price - on a row of its own (AUDIT SPEC-RESET L4-5)
   assert.equal(AP.pathsOpenRows([AP.PATH_BY_ID.warden], { growth: true }).at(-2), 'See them all and choose one on the Growth tab of the pause menu.');
   assert.equal(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger], { growth: true }).at(-2), 'See them all and choose one on the Growth tab of the pause menu.');
@@ -582,7 +580,7 @@ test('AUDIT GROWTH LANE3-9 / LANE5-6 THE YES/NO CARD AND THE MASTER SKILLS LINE,
     assert.equal(MP.chooseMartialPath(playerEntity, 'ranger').ok, true);
     assert.equal(AP.choosePath(playerEntity, 'warden').ok, true);
     open();
-    assert.equal(line(), 'Your specializations are on the Growth tab.');   // PIN MOVED (VOICE2): specialization (Voice.md rule 8)
+    assert.equal(line(), 'Your specializations are on the Growth tab.');
   } finally { menu?.unmount(); restore(); }
 });
 

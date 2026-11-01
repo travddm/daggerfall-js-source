@@ -1,6 +1,4 @@
-// MODS-ONLINE-2 (2026-09-22, Mac: "Is it possible to allow all mods to
-// be toggled on and off for online?" and then, of the first answer,
-// "So all mods can now be toggled?").
+// MODS-ONLINE-2.
 //
 // NOW THEY CAN. MODS-ONLINE freed eight mods and left eight forced
 // because they sounded like world state; this pin holds the reading
@@ -32,8 +30,7 @@
 // players who disagree stand on two floors along every road in the
 // Bay. `RiversAndStreams` did NOT: it paints tiles the smoother
 // never looks at, and the third test here MEASURES that rather than
-// asserting it. LANDFORM3 (2026-10-06, Mac: "Yes rivers should be
-// online") made it ground anyway - the landforms' kernel cuts every
+// asserting it. LANDFORM3 made it ground anyway - the landforms' kernel cuts every
 // painted river into the land (test/systems/landform.test.js measures that
 // half) - so it is the room's now too, and on.
 //
@@ -73,8 +70,7 @@ test('MODS-ONLINE-2: every vendored mod is classified, and the only keys the lan
   // a number invented here; the port's own default where it ships one
   // (WEAR-VANILLA: Roleplay Realism's equipDamage, which the mod ships on).
   // ONE KEY IS FORCED PAST ITS DEFAULT, BY NAME, and to a value the mod
-  // itself offers: LANDFORM3's rivers (Mac: "Yes rivers should be
-  // online") - the room holding the shipped off would have no rivers.
+  // itself offers: LANDFORM3's rivers - the room holding the shipped off would have no rivers.
   const PAST_DEFAULT = { 'roads-hazelnut': { RiversAndStreams: true } };
   for (const [vendor, keys] of Object.entries(ONLINE_ROOM_MOD_KEYS)) {
     for (const [key, value] of Object.entries(keys)) {
@@ -101,7 +97,7 @@ test('MODS-ONLINE-4: every mod switch is the player\'s online, except the forty-
   // number rather than as a player's complaint.
   const forced = Object.values(ONLINE_ROOM_MOD_KEYS).reduce((n, keys) => n + Object.keys(keys).length, 0);
   assert.equal(forced, 49, 'the lane forces forty-nine mod switches in the whole shelf');   // DEX0: Daggerfall Enemy Expansion's Enabled - the host's foes are the party's   // WOD-PEAKS: and World of Daggerfall's Mountains, off - the spires level the ground and stand rock   // LANDFORM3: Basic Roads' RiversAndStreams, the rivers cut into the land   // IT1: Immersive Travel's Enabled (its carriages stand at the gates) and its DisableNormalTravel held off (the map's trips stay walked)   // TRAVEL-ONLINE: Travel Options' Enabled and its two journey dials - no instant travel online; AUDIT T1: and its ports rule   // WD3: Beautiful Villages' and Beautiful Cities' Enabled - the towns themselves   // RAID2: World Events - Raiding Parties' Enabled, the world's raids   // OH-A: Ocean Holes' three - its switch, the pits' rate and the seafloor hole's size (the fifth floor)   // DW-D: Iliac Puddle No More's thirteen - the sea and its depth (the fourth floor), the deep's foes and loot, its swim and breath rules   // DS1: Detailed Ships' Enabled, the ships' shared deck   // MODS-ONLINE-5: one ruleset per room - RR's six combat overrides and its intensive training   // RRI1/RR1 (merged 2026-09-23): five of Roleplay & Realism: Items' (the items that change hands) and two of Roleplay & Realism's (the location, the host's foes)   // WOD1: World of Daggerfall's Enabled, the second floor
-  // MODS-ONLINE-4 (Mac: "What about player balance?"): the two GROUND
+  // MODS-ONLINE-4: the two GROUND
   // switches, and the three that spend somebody else's evening - the
   // host's dungeon foes (meaner monsters, the overhaul) and a roll that
   // leaves the roller's hands (unleveled loot). WOD1: and a third ground
@@ -195,7 +191,7 @@ test('MODS-ONLINE-2: a mod the player owns reaches no wire, no save and no roll'
   }
 });
 
-// ── MODS-ONLINE-3 (2026-09-22, Mac) ──────────────────────────────────
+// ── MODS-ONLINE-3 ──────────────────────────────────
 // "What part of mod toggle for online do you not understand?"
 //
 // The right question. MODS-ONLINE-2 freed the sixteen VENDORED mods and

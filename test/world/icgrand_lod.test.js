@@ -1,6 +1,6 @@
-// IC-GRAND (2026-10-26, the owner: "Lets do 20km"; the coordinator's brief: "only near blocks get full detail, with a far
+// IC-GRAND (2026-10-26,; the coordinator's brief: "only near blocks get full detail, with a far
 // LOD/impostor for the rest of the city (skyline, walls, tower), streaming budgets so arriving or crossing the city does not
-// hitch, and nothing that walks every location every frame"; bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL
+// hitch, and nothing that walks every location every frame"; IC-GRAND) - THE IMPERIAL
 // CITY NEAR AND FAR, pinned: its blocks and its fabric's models families made when first asked and kept a few hundred at a
 // time; a slice within a pixel of the player built near, the rest far (its skyline, no collider, no walker); the sweep that
 // builds a slice again when its view moves, walking only the built pixels and only when the player's pixel or the built set
@@ -165,7 +165,6 @@ test('IC-GRAND EVERY SLICE\'S ARRIVALS ON ITS CARRIER - its start markers editor
 });
 
 test('IC-GRAND THE SWEEP - on the frame, walked only when the player\'s pixel or the built set moves (the built pixels alone - never the city\'s slices): a slice whose view is not the one it was built in built again, the ones coming near first at the queue\'s head, the ones going far at its tail (mutants: walked every frame; near at the tail; the slack unread)', () => {
-  // PIN MOVED (IC-SWAP-BEHIND, scenes/swapBehind.js): each slice built again through the swap - marked (its carry alone taken,
   // its view standing until the one built behind it is swapped in) and owed a build behind; the sweep walks on a swap too
   // (a view swapped in moves no set's size), and leaves one owed a build behind to the view it is built in
   const built = new Map(), queue = [{ px: 900, py: 900 }], destroyed = [];
@@ -205,7 +204,6 @@ test('IC-GRAND THE SWEEP - on the frame, walked only when the player\'s pixel or
   assert.deepEqual(destroyed, ['102,100'], 'the player moved: walked');
 });
 
-// PIN MOVED (IC-GRAND x FAR-LANDMARK, at the merge of the streams' head): the city from afar was an impostor of IC-GRAND's own
 // on the far ring's pass (render/ringImpostors.js, its order a counting sort); stream B's FAR-LANDMARK hook draws a
 // silhouette a pixel in the ring's painter's order now (render/farLandmarks.js), and the city hands one in a slice.
 test('IC-GRAND THE CITY FROM AFAR - its silhouette a landmark a slice (render/farLandmarks.js FAR-LANDMARK): the centre\'s the tower to its spire in its pixel\'s middle; each slice\'s landmarks and its streets as a few masses (a key a cell - its neighbourhood\'s walls, roof and height - merged into rectangles), tens of triangles; in its pixel\'s frame, x east and z north from its south-west corner; none where nothing stands (mutants: the masses unmerged; the frame\'s z south)', () => {
@@ -324,7 +322,7 @@ test('IC-GRAND THE CITY ON THE HORIZON - the sweep hands the far ring one landma
   assert.deepEqual([r.groundAt(11, 19), r.groundAt(9, 21), r.groundAt(10, 20), r.groundAt(12, 20)], [2, 200, 101, null]);
 });
 
-// IC-TOWER-LOD (2026-10-26, the owner walking the city: "Weird pop in issues in the city when moving") - THE TOWER AND THE
+// IC-TOWER-LOD - THE TOWER AND THE
 // PALACE COARSE, THE HORIZON'S OWN: the far ring's silhouette and a far view's model are made of one list each
 // (world/imperialCity.js imperialTowerLod, imperialPalaceLod), so the stream taking the tower over from the horizon at its
 // edge changes nothing of its shape; a near view stands the whole.

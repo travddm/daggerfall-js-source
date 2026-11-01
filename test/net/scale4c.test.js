@@ -1,5 +1,4 @@
-// SCALE4c (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's "one heartbeat replacing the mail, beat and board
-// polls"; bible/11-Multiplayer/Scale-Arc.md SCALE4c): a tab's three clocks - the play beat, the letterbox, the board of
+// SCALE4c: a tab's three clocks - the play beat, the letterbox, the board of
 // the town it stands in - ride ONE request (src/net/heartbeat.js -> /v1/heartbeat, server-account/src/heartbeat.js),
 // each part answered exactly as its own route answers it and each clock at its own pace. The service's half over the
 // real Worker on node:sqlite (test/accountDb.mjs); the client's over fake clocks; the world host's wiring by its text.
@@ -45,7 +44,7 @@ const get = async (s, path, secret) => {
 test('SCALE4c A: /v1/heartbeat is a session\'s route, and each part it carries is answered EXACTLY as its own route answers it - the box as /v1/mail/inbox, a town\'s board as /v1/board/read, the knock as /v1/account/played - under one session, a guest\'s box refused in that route\'s word and its board and beat answered all the same (mutants: a part dropped, the guest\'s box opened, the board read for another town)', async () => {
   assert.ok(ROUTES.has('/v1/heartbeat'));
   assert.ok(!OPEN_ROUTES.has('/v1/heartbeat'), 'behind a session, as the three are');
-  assert.deepEqual([...HEARTBEAT_PARTS], ['beat', 'mail', 'board', 'post']);   // SERVER-POST: the server's post rides it too (PIN MOVED)
+  assert.deepEqual([...HEARTBEAT_PARTS], ['beat', 'mail', 'board', 'post']);   // SERVER-POST: the server's post rides it too (
   const s = await standService({ BOARD_OPEN: 'on' });
   const ann = await s.registered('Ann'), bob = await s.registered('Bob');
   const map = 4242;
@@ -235,7 +234,6 @@ test('SCALE4c B: the knock waits for a ride - after the page\'s first, which goe
   const p = solo.hb.beat();
   await flush(); await p;
   assert.deepEqual(solo.sent.map((x) => x.body), [{ beat: true }]);
-  // PIN MOVED (AUDIT SCALE B1): the page's first knock goes at once, a ride coming or not - nothing on the page says how
   // long ago the account last beat, so a wait could take the gap past the grace. The knocks after it wait.
   const r = rig({ answer: credited });
   const mail = every(r, 'mail', MAIL_POLL_MS);

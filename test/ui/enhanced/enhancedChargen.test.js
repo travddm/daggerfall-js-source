@@ -323,8 +323,7 @@ test('only a scrolled element is restored, and a changed tree starts fresh', asy
 });
 
 // ── CHAR1: THE ROLL'S TOTAL ──────────────────────────────────────
-// (2026-09-15, a player through Mac: "show the total dice rolls in the
-// enhanced character creator".) Eight attributes are rolled - a career
+// Eight attributes are rolled - a career
 // floor plus 0..10 each - and a bonus pool of 6..14 is rolled beside
 // them, and NEITHER screen ever added them up. "Is this a good roll?"
 // was eight numbers of mental arithmetic before every Reroll.

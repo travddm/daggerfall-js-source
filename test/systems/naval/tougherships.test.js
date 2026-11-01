@@ -1,12 +1,9 @@
-// TOUGHER-SHIPS, QUICK-REPAIRS, SALVAGE (2026-10-03, Mac: "For naval combat and such I want to buff health of ships,
-// allow for more streamlined repairs, allow sunken vessels to provide nessecary materials so you dont have to rely on
-// the port"): every ship stands SHIP_TOUGHNESS times the punishment - her hull, her canvas and her men (a ball's, a
+// TOUGHER-SHIPS, QUICK-REPAIRS, SALVAGE: every ship stands SHIP_TOUGHNESS times the punishment - her hull, her canvas and her men (a ball's, a
 // fire's) - with the yard's prices and a store's work moved so a wreck costs what it did, the casks afloat and a
 // pirate's run as long in seconds as they were, and a save on her first build's scale that every build reads right; her
 // hands spend her stores on their own once a fight is over (past the free mending, and a boat with no hand aboard only
 // under her captain's own) and the order MAKE REPAIRS works with an enemy near (DAMAGE CONTROL); a sunk ship leaves her
-// wreckage afloat - carpenter's stores and powder for whoever hauls it in. AUDIT TOUGHER-SHIPS (Mac: "Lets audit this.
-// Must be perfect") pinned each of the audit's findings here.
+// wreckage afloat - carpenter's stores and powder for whoever hauls it in. AUDIT TOUGHER-SHIPS pinned each of the audit's findings here.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -129,7 +126,6 @@ test('TOUGHER-SHIPS the save keeps a boat on her first build\'s scale - an older
   dmg.apply({ hull: 336, sail: 64, crew: 0 }, 0);
   const rec = savedRecord(dmg, HULL.SmallShip, 32);
   assert.deepEqual([rec.hull, rec.maxHull, rec.sail, rec.maxSail, rec.credit], [210, first.hullHp, 120, first.sailHp, 20], 'half her hull is 210 of 420 to an older build, as it always was');
-  // PIN MOVED (TOUGHER-SHIPS + HOLDINGS' merge of main's #574, FG-05): read on the whole she was saved on, `exact` - to the bit
   const { exact, ...plain } = rec;
   assert.deepEqual(exact, { maxHull: b.hullHp, maxSail: b.sailHp, hull: 336, sail: 192, credit: 32 });
   assert.deepEqual(savedHurts(rec, HULL.SmallShip, whole), { ...plain, hull: 336, sail: 192, credit: 32 }, 'and back, the same');
@@ -159,11 +155,9 @@ test('SALVAGE a sunk ship\'s wreckage: her stores SALVAGE_SHARE of her hull in a
   for (const c of SHIP_CLASSES) {
     const s = salvageOf(c);
     assert.equal(s.stores, Math.max(1, Math.round((c.hullHp * SALVAGE_SHARE) / STORE_POINTS)), c.id);
-    assert.equal(s.barrels, c.hull === HULL.Rowboat ? 0 : SALVAGE_BARRELS, `${c.id}: every class but a skiff carries guns`);   // PIN MOVED (FISH-BOATS): a Fishing Skiff is a rowboat - no gun, no powder
+    assert.equal(s.barrels, c.hull === HULL.Rowboat ? 0 : SALVAGE_BARRELS, `${c.id}: every class but a skiff carries guns`);
   }
-  // PIN MOVED (ETHER-LEGENDS, bible/03-World/Eltheric-Ocean.md): the Eltheric Ocean's six legends after the nine - their hulls
   // the heaviest at sea, their wreckage the richest
-  // PIN MOVED (FISH-BOATS): and the two fishing boats after the legends, a store's work each
   assert.deepEqual(SHIP_CLASSES.map((c) => salvageOf(c).stores), [2, 4, 4, 6, 1, 3, 5, 4, 5, 8, 13, 10, 8, 18, 20, 1, 1], 'a sloop 2, a brig or a cutter 4, a flagship 6');
   assert.deepEqual(salvageOf(null), { stores: 0, barrels: 0 });
   assert.equal(isSalvage(SALVAGE_LOT), true);

@@ -1,4 +1,4 @@
-// QUEST-PARTY phase 1 (2026-09-26, Mac: "Party shares them"). Online a quest stayed its player's own (Multiplayer.md's
+// QUEST-PARTY phase 1. Online a quest stayed its player's own (Multiplayer.md's
 // first lock): a party that shared one ran a copy each, and each copy stood its own foes no one else saw - two players on
 // the ship raid fought two raids. Now a quest SHARED with the party streams its foes to the party (the frame's `qf`), a
 // member stands them and fights them, and each member's own copy counts the injuries and the kills it sees; a receiver
@@ -43,7 +43,7 @@ test('QUEST-PARTY: a quest foe carries its quest\'s word only while the quest is
 });
 
 test('QUEST-PARTY: a receiver stands no wave while the member who shared the quest - still in its party - stands within reach (VERMIN-SHARED: and a foe of the sharer\'s of the wave\'s own Foe stands in this pool)', () => {
-  // VERMIN-SHARED (PIN MOVED, FIELD BUGS 2026-10-03b): the sharer near was the whole law, and its copy - another quest,
+  // VERMIN-SHARED (
   // its own wave clock and its own `pick one of` - stood nothing of this Foe; the pool's records are the word now
   const amys = { puppet: 'amy-0003', dead: false, _pupQuest: { q: 'WAQ_SHIP_SMALLRAID', s: 'pirate' } };
   const base = { questName: 'WAQ_SHIP_SMALLRAID', symbol: 'pirate', foes: [amys], sharerOf: (q) => (q === 'WAQ_SHIP_SMALLRAID' ? 'acct-amy' : undefined), inMyParty: (a) => a === 'acct-amy', accountOfPeer: (id) => (id === 'amy-0003' ? 'acct-amy' : 'acct-bob'), myFeet: [0, 0, 0] };

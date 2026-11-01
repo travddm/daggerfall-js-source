@@ -1,4 +1,4 @@
-// SRV-N/CI (2026-09-17): THE DEPLOY WORKFLOW, PINNED.
+// SRV-N/CI: THE DEPLOY WORKFLOW, PINNED.
 //
 // `.github/workflows/relay-deploy.yml` is the only thing in this tree that
 // can drop every connected player, and it is the only thing that cannot
@@ -143,7 +143,7 @@ test('SRV-N/CI: the token is the repo\'s, never a literal', () => {
 
 // ── AND THE PROSE MUST AGREE WITH THE TRIGGER ───────────────────────
 //
-// 2026-09-21, Mac: "I think the server claim is stale. It's auto".
+// 2026-09-21,.
 //
 // It was, and it had been for fifteen weeks. `server/wrangler.toml` still
 // said "It is manual on purpose", `src/net/wire.js` still said "the deploy
@@ -175,7 +175,7 @@ test('SRV-N/CI: the token is the repo\'s, never a literal', () => {
 // every connected player. A prose fix is not worth a player's dungeon
 // run, so the words in there are left for a slice that is redeploying
 // anyway - and `src/net/wire.js` does still carry the stale sentence as
-// this is written (2026-09-21), which is recorded here rather than
+// this is written, which is recorded here rather than
 // hidden.
 //
 // The exclusion is DERIVED from `RELAY_GRAPH`, not listed: if wire.js

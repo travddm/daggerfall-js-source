@@ -1,4 +1,4 @@
-// OH-D / OH-E (2026-09-26) - THE ABYSS (src/scenes/oceanHolesAbyss.js) against
+// OH-D / OH-E - THE ABYSS (src/scenes/oceanHolesAbyss.js) against
 // the assembly's OceanHoles dungeon half: TryEnterPit's gates and the save data
 // it writes, the GPS moved and renamed, OnSetDungeon's flood / rename / enemies
 // while the abyss builds, OnTransitionDungeonInterior's arrival (PrepareAbyssDungeon,
@@ -744,7 +744,7 @@ test('OH-E the loot events: EnemyEntity.OnLootSpawned carries the table key, the
   for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js', 'src/scenes/interiorContext.js']) assert.doesNotMatch(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'), /where: 'dungeon'/, `${f} is not the dungeon`);
 });
 
-// AUDIT OH-F B1/B2 (2026-09-26): DFU destroys the dungeon and builds it again on every load, then stands the saved
+// AUDIT OH-F B1/B2: DFU destroys the dungeon and builds it again on every load, then stands the saved
 // enemy set alone (SerializableStateManager.RestoreEnemyData) - before SaveLoadManager's mod loop reads it.
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 test('AUDIT OH-F B2 loadRebuilds: a load the abyss stands in - the live dungeon its own, or the save\'s record Active - is the world host\'s rebuild', async () => {

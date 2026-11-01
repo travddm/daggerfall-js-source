@@ -20,7 +20,7 @@
 // port is not the editor). `DaggerfallUnity.Settings.AssetInjection`
 // gates it all, as in the C#.
 //
-// RR3b (2026-09-23): ported for Roleplay & Realism's Master Armorer line -
+// RR3b: ported for Roleplay & Realism's Master Armorer line -
 // Northrock Fort (a new location in the Wrothgarian Mountains), its
 // RRFORT01.RMB, and the armorer's shop as the quest rebuilds it.
 import { getBool } from '../../systems/settings/settings.js';
@@ -214,7 +214,7 @@ export function _resetWorldDataReplacement({ assets = true } = {}) {
 }
 
 // ---- ARENA1: THE PORT'S OWN WORLD DATA - not a mod's, so behind no switch ----
-// The Arena of Daggerfall is not a layout mod and not a switch (bible/11-Multiplayer/Arena.md "How it is laid": "the
+// The Arena of Daggerfall is not a layout mod and not a switch ("How it is laid": "the
 // arena is not a switch, it is the city"), so its block and its edit of the city are served whatever AssetInjection,
 // a mod's switch or a save's pin says - and outside DFU's new-block sequence: a port block takes a FIXED index past
 // any BSA (world/gate/gateArena.js's made block is the precedent), so the first block a mod's file names still takes
@@ -234,7 +234,7 @@ export function registerPortBlockOf(name, make, index) {
   _portBlocks.set(name, { index, make, block: null });
   return true;
 }
-/** IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND): BLOCK FAMILIES - a run of the port's own blocks answered by one
+/** IC-GRAND (IC-GRAND): BLOCK FAMILIES - a run of the port's own blocks answered by one
  *  law: `indexOf(name)` its fixed index or -1, `nameOf(index)` its name or null, `make(name, blocksFile)` the block itself
  *  (or its JSON) - built when first read and kept a bounded number at a time (an LRU, `keep`), so the Imperial City's
  *  forty thousand cells register no block up front and hold only the ones near the player. Asked after the blocks
@@ -247,7 +247,7 @@ export function registerPortBlockFamily(f) {
   return true;
 }
 const familyIndex = (name) => { for (const f of _blockFamilies) { const i = f.indexOf(name); if (i >= 0) return i; } return -1; };
-/** IC-STUTTER (bible/03-World/Arena-Provinces.md IC-STUTTER): whether a family's block is made and kept - a read of it
+/** IC-STUTTER (IC-STUTTER): whether a family's block is made and kept - a read of it
  *  makes nothing (scenes/capitalPrebuild.js asks before a build). @param {string} name */
 export const portBlockFamilyHas = (name) => _blockFamilies.some((f) => f.cache.has(name));   // a family's cache holds its own names alone
 const familyName = (index) => { for (const f of _blockFamilies) { const n = f.nameOf(index); if (n) return n; } return null; };

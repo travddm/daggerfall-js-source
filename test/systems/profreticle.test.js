@@ -1,5 +1,4 @@
-// PROF-RETICLE (2026-10-01, Mac: "move away from the overcomplicated minigame visuals and instead use the mechanics on
-// something that doesnt cover the screen"; asked, "Around the crosshair"): THE ACT ON THE CROSSHAIR. No box, no title,
+// PROF-RETICLE: THE ACT ON THE CROSSHAIR. No box, no title,
 // no picture: the marks built once an act and moved every frame, round the crosshair's middle (ui/worldPlaque.js
 // reticleAnchor); the mine's points and the knife's line where they stand on the node, through the frame's own lens
 // (focal * tan of the angle off the look, one focal length both ways); the ring, the hold's arc, the glint, the float

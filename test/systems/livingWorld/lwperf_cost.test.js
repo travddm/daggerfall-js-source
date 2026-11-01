@@ -1,5 +1,4 @@
-// LW-PERF (2026-10-05, bible/06-Systems/Living-World.md "LW-PERF", Mac: "how is performance after we integrate this?" -
-// "Do it"): THE LIVING WORLD'S COST, MEASURED AND CUT. A great city's walks searched whole stood frames of 40-120 ms in
+// LW-PERF: THE LIVING WORLD'S COST, MEASURED AND CUT. A great city's walks searched whole stood frames of 40-120 ms in
 // its morning and 0.3-0.4 s on the way in; the roads' read of the parties near was 5-10 ms once a second; the deep's
 // readers, the day's plans and the town's places each paid their whole cost again on every read. Pinned here: the
 // search run in slices answers what the whole search answered (and what the search before LW-PERF did - its reference
@@ -180,7 +179,7 @@ function townAt(blocks, minute) {
 
 test('LW-PERF the town\'s frames: each frame\'s searching held to its cells - ARRIVAL_PATH_CELLS while the street is stood on the way in (ARRIVAL_SHOW_S), PATH_CELLS after - and the street still filled: every resident out of doors near the player by their day on it within 2.5 s of the afternoon\'s way in; the street\'s own walks asked before the census\'s; one whose walk still waits is wanted only once it is searched (mutants: the cells, the window, the soon, the run, the waiting wanted)', () => {
   assert.deepEqual([PATH_CELLS, ARRIVAL_PATH_CELLS, ARRIVAL_SHOW_S], [8000, 24000, 1.5]);
-  // LW-SPREAD: PIN MOVED - the way in at two in the afternoon: the morning's market is spread over three hours now, and at
+  // LW-SPREAD:
   // half past eight eight of the town were near, their walks searched inside PATH_CELLS; at two, sixteen
   const minute = 100 * DAY_MIN + 14 * 60, at = [200, 0, 120];
   const live = townAt(6, minute), truth = townAt(6, minute);
@@ -197,7 +196,7 @@ test('LW-PERF the town\'s frames: each frame\'s searching held to its cells - AR
     assert.ok(live.town._paths.spent() <= cap, `frame ${i}: ${live.town._paths.spent()} cells, its budget ${cap}`);
     if (firsts.includes(true)) streetAsked = true;
     if (tick && firsts.includes(false)) censusAsked = true;
-    // one whose walk still waits is wanted only once it is searched - every frame (LW-SPREAD: PIN MOVED - read at the
+    // one whose walk still waits is wanted only once it is searched - every frame (LW-SPREAD:
     // last frame alone: the morning's walks all searched by then, one wanted off its walk's start had stood out of the
     // street's reach in the frames before)
     for (const r of live.town.pool) {
@@ -219,7 +218,7 @@ test('LW-PERF the town\'s frames: each frame\'s searching held to its cells - AR
 });
 
 test('LW-PERF the arrival\'s window: in ARRIVAL_SHOW_S of the way in the street is stood as the day has it - a resident found then comes on where the player sees; after it, one whose walk came late comes on only unseen (beyond POP_VISIBLE_RANGE or behind the view) or out of a door (mutants: the window, its length)', () => {
-  const minute = 100 * DAY_MIN + 8 * 60, at = [300, 0, 300];   // LW-SPREAD: PIN MOVED - the street's morning at eight (its market from 07:30 to 10:30 now, a half-past-eight's comings few)
+  const minute = 100 * DAY_MIN + 8 * 60, at = [300, 0, 300];   // LW-SPREAD:
   const { town, clock } = townAt(8, minute);
   const was = new Map();
   let inViewInWindow = 0, after = 0;
@@ -246,7 +245,7 @@ test('LW-PERF the arrival\'s window: in ARRIVAL_SHOW_S of the way in the street 
 });
 
 /** THE FAVOURITES BEFORE LW-PERF (dayPlan.js as it stood): every door scanned and sorted, keys compared as text.
- *  LW-SPREAD: PIN MOVED - the law LW-SPREAD made (two social spots of the SOCIAL_NEAR nearest home, the town's corners
+ *  LW-SPREAD:
  *  among them, the square their own point and from anywhere for SQUARE_LIKE of the town; the market of the SOCIAL_NEAR
  *  shops' fronts and points of the square nearest home, the square their own point), written the slow way still. */
 function refFavourites(res, places, home) {
@@ -261,7 +260,7 @@ function refFavourites(res, places, home) {
   const s1 = places.square && rng() < SQUARE_LIKE ? sq : own(near(social, SOCIAL_NEAR));
   const s2 = own(near(social.filter((s) => own(s) !== s1), SOCIAL_NEAR)) ?? s1;
   const market = [...places.market, ...places.squares]; if (home) market.sort(by(home));
-  // LW-ERRANDS: PIN MOVED - their own guild's hall, the nearest of it to home (no draw: the market's draw is the guild's old)
+  // LW-ERRANDS:
   const hall = (test) => { const out = []; for (const [key, spot] of places.doors) if (places.types.get(key) === BUILDING_TYPES.GuildHall && test(places.factions.get(key))) out.push(spot); if (home) out.sort(by(home)); return out[0] ?? null; };
   const guildOf = () => {
     if (res.job === 'guildsman') return res.work != null ? places.doors.get(res.work) ?? null : null;
@@ -323,7 +322,7 @@ function refTownTrips(town, t, world, o) {
   const tripOf = (res, k) => { const trip = memoTrip(res, town, k, world, o); if (trip === undefined) pending = true; return trip ?? null; };
   const trips = [];
   for (const res of roster) {
-    if (!((TRIP_CHANCE[res.job] ?? ROAD_TRIP_CHANCE[res.job]) > 0)) continue;   // LW9: PIN MOVED - the road's new traffic's own chances
+    if (!((TRIP_CHANCE[res.job] ?? ROAD_TRIP_CHANCE[res.job]) > 0)) continue;   // LW9:
     const cyc = cycleOf(res, day, scale);
     for (const k of [cyc.k - 1, cyc.k]) {
       const holder = world.holderOf ? world.holderOf(res, k) : res;

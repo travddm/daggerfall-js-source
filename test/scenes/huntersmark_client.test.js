@@ -1,5 +1,4 @@
-// HUNTERS-MARK (2026-10-27; a player, handed on by the owner: "Add more horizontal progression please!";
-// bible/06-Systems/Bounty-Boards.md section 12): THE CLIENT'S HALF - the hunt's book over the real Worker (a paid
+// HUNTERS-MARK: THE CLIENT'S HALF - the hunt's book over the real Worker (a paid
 // bounty kept and reported, the service's word adopted, a final refusal let go, a lost answer kept across a reload),
 // the week's named mark headless (posted from the rung, taken, stood as one crowned elite, paid in gold and a trophy,
 // reported, lapsed at the week's end), the bounty host reporting a board's clear with its region, and the board's
@@ -330,7 +329,6 @@ test('HUNTERS-MARK THE BOARD\'S WINDOW: the rank under its title - the rung and 
   rows[0].onclick();
   const card = byClass(host, 'bounty-markcard')[0];
   assert.ok(card, 'its card');
-  // PIN MOVED (AUDIT HORIZONTAL G6): the traits named (the trait ids the law draws), listed in the reader's language
   assert.match(card.textContent, /Its traits: Flameproof and Warded\./);
   assert.match(card.textContent, /600 gold pieces/);
   byClass(card, 'bounty-take')[0].onclick({ stopPropagation() {}, preventDefault() {} });

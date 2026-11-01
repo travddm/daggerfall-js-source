@@ -1,6 +1,5 @@
 // @ts-check
-// QL11 (2026-10-19, the owner: "Tying all our newly integrated features into quests"; bible/06-Systems/Questlines-Arc.md
-// section 4.5): THE ACTS - what a player did in one of the game's features, said in one line where it happens
+// QL11: THE ACTS - what a player did in one of the game's features, said in one line where it happens
 // (`noteAct('fish-caught')`, as a system tells the Tutorials of a first use - tutorials.js noteFirstUse), and heard by every running stamped
 // quest (systems/questlines/qlLayer.js act). An objective may ask for one ({ "act": "fish-caught", "n": 3 }) and a
 // questline's script may wait on one (`ql act fish-caught 3`, qlActions.js QlAct).
@@ -54,7 +53,7 @@ let _sink = null;
 /** The bridge's registration: `fn(kind, n)` hears every act (the layer's act). Null unregisters. */
 export function setActSink(fn) { _sink = typeof fn === 'function' ? fn : null; }
 
-/** WITCH1 (bible/06-Systems/Witches-Festival.md): THE OTHER HEARERS - a feature that answers every act as it is said
+/** WITCH1: THE OTHER HEARERS - a feature that answers every act as it is said
  *  (the Witches' Festival's finds, systems/festival/festivalClient.js), beside the one sink, by name; null unregisters. A
  *  hearer moves no quest and is answered nothing: the count noteAct answers is still the quests'. */
 const _hearers = new Map();

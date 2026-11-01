@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE'S PASSIVE FISH - the species
+// DW-E3: ILIAC PUDDLE NO MORE'S PASSIVE FISH - the species
 // and the laws a fish lives by, as pure functions (jet082, 1.2.2):
 // PassiveFishSpecies.cs, PassiveFishSpeciesCatalog.cs, PassiveFishSchool
 // .cs, PassiveFishBehaviour.cs and the placement half of

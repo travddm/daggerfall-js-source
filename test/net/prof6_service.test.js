@@ -1,10 +1,10 @@
-// PROF6 (2026-09-29, Mac: "continue") - GUILD WRITS, THE GUILD STORES AND COMMISSIONS AS THE SERVICE KEEPS THEM: a
+// PROF6 - GUILD WRITS, THE GUILD STORES AND COMMISSIONS AS THE SERVICE KEEPS THEM: a
 // guild's writ posted from its Marks treasury by its Guildmaster, or an Officer within the week's budget; delivered from
 // anyone's Stores into the guild Stores, paid pro rata less the tax; withdrawn and expired, its escrow home; the guild
 // Stores' deposits and withdrawals and the own-again law; a guild keeping them refused its going; a commission naming a
 // crafter and a piece, filled with a piece of their own make, which reaches the poster's pack; withdrawn, declined and
 // expired; the repeats, the race, the report's escrow. Driven through the real Worker over node:sqlite with every
-// migration applied (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 7, 11, 28.
+// migration applied (test/accountDb.mjs). 7, 11, 28.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -37,7 +37,7 @@ async function stand(extra = {}) {
   const guildMarks = (g) => Number(raw.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').get(g)?.balance ?? 0);
   const guildHeld = (g, material) => Object.fromEntries(raw.prepare('SELECT dep_player, dep_char, qty FROM guild_prof_stores WHERE guild_id = ? AND material = ?')
     .all(g, material).map((r) => [r.dep_player ? `${r.dep_player}:${r.dep_char}` : 'guild', Number(r.qty)]));
-  /** A crafted piece this account owns and made (a `prof_crafts` row names it), as the anvil writes them. PIN MOVED (INT19,
+  /** A crafted piece this account owns and made (a `prof_crafts` row names it), as the anvil writes them.
    *  Integrity-Arc section 7): a commission's fill takes the piece out of the crafter's realm record, so a realm
    *  character's piece stands there too, whole. */
   const piece = (who, provenance, { recipe = 'longsword:mithril', quality = 3, made = true } = {}) => {
@@ -142,7 +142,7 @@ test('PROF6 DONE WHEN: a Guildmaster\'s writ for 100 Oak Logs at 3 Marks each in
   const moves = s.raw.prepare('SELECT delta, who FROM guild_store_ledger WHERE guild_id = ? ORDER BY seq').all(g.id).map((r) => [Number(r.delta), r.who]);
   assert.deepEqual(moves, [[40, 'Oswin'], [60, 'Bran'], [10, 'Bran'], [-100, 'Mara'], [-5, 'Mara'], [-5, 'Bran']], 'every movement on the ledger');
   // THE COMMISSION: a crafter's note with its button; a reader commissions through it; the crafter fills it
-  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann');   // PIN MOVED (INT19): the crafter a realm character - the piece leaves its record
+  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann');
   s.seedMarks(ann, 5_000);
   const note = await s.call('/v1/board/pin', { map: 1_000, subject: 'Blades made', body: 'Mithril, to order.', days: 7, button: 'commission', rid: rid() }, smith.secret);
   assert.equal(note.status, 200, JSON.stringify(note.body));
@@ -343,7 +343,7 @@ test('PROF6 service: a delivery asked twice is one; a post asked twice is one; a
 test('PROF6 service: a commission\'s refusals - oneself, no such crafter, arrows, a quality where none is taken, five open, the Marks; a fill by another, elsewhere, worn, the wrong piece, one bought not made, one listed; the fill asked twice is one', async () => {
   clock(T0);
   const s = await stand();
-  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann'), cid = await s.seated('Cid');   // PIN MOVED (INT19): the crafters realm characters
+  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann'), cid = await s.seated('Cid');
   s.seedMarks(ann, 5_000); s.seedMarks(cid, 5_000);
   assert.equal((await s.commission(ann, 'Ann')).body.error, 'commission-self');
   assert.equal((await s.commission(ann, 'Nobody')).body.error, 'commission-crafter');

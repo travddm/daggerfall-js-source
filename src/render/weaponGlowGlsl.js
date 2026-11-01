@@ -1,5 +1,5 @@
 // @ts-check
-// WEAPON-GLOW1 (2026-10-16; bible/05-Combat/Weapon-Glow.md): THE GLOW'S DRAWING - one design, two drawers. A leaf: the
+// WEAPON-GLOW1: THE GLOW'S DRAWING - one design, two drawers. A leaf: the
 // shaders' source and the numbers they are drawn by, no import (render/renderer.js builds the programs and issues the
 // draws; systems/weaponGlow.js decides what a weapon shows).
 //

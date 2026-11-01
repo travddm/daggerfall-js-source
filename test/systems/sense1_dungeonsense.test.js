@@ -5,7 +5,7 @@
 // read by scenes/dungeonContext.js at the ask). The secrets tier adds the walls and doors only a chain moves. And the
 // plaque itself stops calling those walls "Door": a special door is no DaggerfallActionDoor, and the mod asks the
 // action band first (systems/worldTooltips.js actionObjectName).
-// bible/03-World/Delve-Arc.md, SENSE1.
+// SENSE1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

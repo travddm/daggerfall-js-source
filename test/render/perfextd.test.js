@@ -1,6 +1,4 @@
-// PERF-EXT30 / PERF-EXT31 (2026-09-25; two players via Mac, "fps issues in the exterior but fine in the interior"
-// and "me too my friend.. don't know why. I got a RX6600"; Mac: "I am not getting another player to do the work that
-// youre suppose to do"). THE SHADERS STOP PAYING FOR WORK THEIR OUTPUT MULTIPLIES BY NOTHING.
+// PERF-EXT30 / PERF-EXT31. THE SHADERS STOP PAYING FOR WORK THEIR OUTPUT MULTIPLIES BY NOTHING.
 //
 //   - PERF-EXT30, the sky. Under the volumetric clouds (the default) both skies are told to stand their own clouds
 //     down, and both went on computing them to weight 0: Dynamic Skies (the default sky) blended two sheets at
@@ -15,7 +13,7 @@
 // the skies on the uniforms the real renderers upload - against the same text with the skip taken out (the gate
 // removed; the full pass), and the two must agree to the bit; and the skipping one must not read the texture (or call
 // the noise) it is there to skip. Real-GPU equivalence and the timings are the harnesses'
-// (bible/07-Rendering/Performance-Exterior.md, cluster D).
+// (, cluster D).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

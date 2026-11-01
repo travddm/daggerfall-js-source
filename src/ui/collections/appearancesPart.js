@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md, bible/10-UI/Collections.md section 9): THE APPEARANCES PART of
+// APPEARANCES: THE APPEARANCES PART of
 // the Collections page - every look there is (net/appearanceLaw.js ALL_LOOKS), grouped by kind as the Wardrobe matches
 // them, each group under its divider with its count and the kit's meter; a look collected in its picture and name, one not
 // yet collected dimmed (the wardrobe part's law). A row opened says how the look is had and where it is worn. The

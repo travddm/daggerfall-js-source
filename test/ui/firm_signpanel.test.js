@@ -1,4 +1,4 @@
-// FIRM-SIGNPANEL (2026-10-25): A BIRTHSIGN ACCEPTED OUTSIDE THE WINDOW IS NAMED IN IT. The open Firmament window hears the
+// FIRM-SIGNPANEL: A BIRTHSIGN ACCEPTED OUTSIDE THE WINDOW IS NAMED IN IT. The open Firmament window hears the
 // book's word (src/ui/firmamentWindow.js, the book's onChange) and starts its pending sky again from the tree that moved
 // under it. A sign-only change moves no star, so a reset that asked only for stars added or removed kept the old pending
 // sky, and the side panel said "No birthsign chosen" over a sign already in force (seen in-game verifying #1253).

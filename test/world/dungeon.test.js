@@ -487,8 +487,7 @@ test('dungeon: RDB corpus - teleporter destinations resolve (P10; 2 verbatim-dea
   // (N0000003/W0000003 @23676) target an ACTIONLESS model - DFU's
   // actionLinkDict only holds acting objects + editor flats, so DFU's
   // LinkActionNodes leaves their NextObject null and the delegate
-  // logs "can't teleport"; ours does exactly the same (2026-08-16
-  // audit finding, kept bug-for-bug).
+  // logs "can't teleport"; ours does exactly the same.
   const { blocks, getModel } = loadReal();
   let checked = 0, resolved = 0;
   const dead = [];

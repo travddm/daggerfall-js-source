@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES-II (2026-10-27; bible/04-Characters/Wardrobe.md section 4): THE PREVIEW - the character wearing a look on
+// APPEARANCES-II: THE PREVIEW - the character wearing a look on
 // the piece picked, before Wear is paid. It is the figure the pack shows on this skin: the Morrowind body on Enhanced
 // Plus where one stands for the player (ui/enhanced/enhancedInventory.js modelFigure), else the paper doll. Both are
 // drawn off a stand-in (systems/appearances.js previewWearer) through net/appearanceLaw.js drawnPiece, so the piece and

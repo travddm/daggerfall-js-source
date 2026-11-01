@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md): THE LANDS PAST THE BAY - the seven provinces' thirty-three zones (not
+// TESA-LANDS: THE LANDS PAST THE BAY - the seven provinces' thirty-three zones (not
 // Cyrodiil's, Valenwood's or Blackwood's) each their own land, read off the lore: GROUND its dress (groundDress.js),
 // BLADES whether the enhanced grass grows, FLORA Daggerfall's own nature flats of any climate in its own share of woods
 // (terrainNature.js layoutLands), PROPS its landmarks (world/lands/landProps.js). A zone the table does not name keeps
@@ -223,7 +223,7 @@ export const LANDS = deepFreeze({
   },
   // ══ HAMMERFELL ═══════════════════════════════════════════════════════════════════════════════════════════════════
   hammerfellAlikr: {
-    ground: null,   // the desert's own ground, Sands of the Alik'r's dunes (bible/07-Rendering/Sands-Of-The-Alikr.md - named for it, worn by default)
+    ground: null,   // the desert's own ground, Sands of the Alik'r's dunes (- named for it, worn by default)
     blades: false,
     flora: { woods: 0.02, treeRate: 0.25, coverRate: 0.3,
       trees: [[501, 12, 2], [501, 13, 2], [503, 13, 1]],

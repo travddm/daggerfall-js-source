@@ -350,8 +350,7 @@ export function rankNeedsLines(entity, guild, memberships, store, ctx = null) {
   const owed = standingOwedOf(guild.factionId);
   const next = t('guild.rankNeeds.next', 'Next rank: {title}', { title: getTitle({ rank: n.rank }, entity, guild) });
   // SEAT-LINE (FIELD BUGS 2026-10-15g: "I was Archmage and now I cant seem to ever get back past the Wizard rank... All
-  // the other guilds tell me what the next rank is and what I need but the Mages Guild does not"; Mac: "Explain the
-  // seat"): at the Roll's 7 the hall says that 8 and 9 are its chapters' seats and what a seat asks - the reputation
+  // the other guilds tell me what the next rank is and what I need but the Mages Guild does not"): at the Roll's 7 the hall says that 8 and 9 are its chapters' seats and what a seat asks - the reputation
   // (the Roll's seat line), then the Turning's Merit, the tenure and the account's age (npcChapterLaw.js
   // seatEligibleAt). A seat's own hall reads the book seated, and says nothing.
   if (n.seat) {
@@ -474,7 +473,7 @@ export const SERVICE_DESTINATION = Object.freeze({
 });
 export const serviceDestination = (service) => SERVICE_DESTINATION[service] ?? null;
 
-/** STATION-ROWS (2026-09-27, Discord - the crash box: "TypeError: m.rows.map is not a function"): A SERVICE'S ANSWER
+/** STATION-ROWS: A SERVICE'S ANSWER
  *  IS A BOX - text to stand on the popup that asked - only when its `rows` are a LIST. The spell maker is handed the
  *  host's TEXT.RSC reader as `rows` and keeps it, and the maker arms hand their window back: read as a box by
  *  `rows` being there at all, a home's Spellmaking station mapped the reader as a list and threw on every press, and

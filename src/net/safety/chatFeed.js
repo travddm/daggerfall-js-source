@@ -1,5 +1,5 @@
 // @ts-check
-// SAFE5 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 6): THE REVIEWER'S FEED -
+// SAFE5: THE REVIEWER'S FEED -
 // the public channels' lines, carried from the relay to the account service, which has the reviewer read them.
 //
 // THE RELAY HAD NO DOOR TO THE SERVICE (identityToken.js: "The relay never reads D1, never talks to the account

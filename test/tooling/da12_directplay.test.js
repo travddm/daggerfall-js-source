@@ -1,5 +1,4 @@
-// DA12 (2026-10-08, Mac: "is it possible to integrate the launcher inside the game? ... some game managers, like
-// PlayNite, don't reconigze the launcher as a game and also I can't control the Launcher with a controller").
+// DA12.
 //
 // THE SWITCH PAST THE FRONT DOOR, AND A PAD AT IT. The launcher was never a second program - it is the shell's
 // first window (DA8) - but a game manager starts a game and watches its process, and an update installed before

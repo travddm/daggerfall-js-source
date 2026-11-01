@@ -1,5 +1,4 @@
-// MEDIUM-DISTINCT (2026-10-08, Mac: "Medium dungeons just copy and paste 2 layouts together"; bible/03-World/Delve-Arc.md
-// DSIZE1, MEDIUM-DISTINCT). The medium size drew its two interior blocks by GetRandomBlock's law, with replacement,
+// MEDIUM-DISTINCT. The medium size drew its two interior blocks by GetRandomBlock's law, with replacement,
 // from a pool of two to four - a quarter to a half of them laid one block twice, side by side: one area and its copy.
 // An interior block that repeats one already laid takes the pool's next block round from it that is not laid, with no
 // draw of its own (world/smallerDungeons.js distinctInterior): the border rows, and every layout whose draws never

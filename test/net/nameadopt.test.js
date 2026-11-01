@@ -1,4 +1,4 @@
-// NAME-ADOPT (2026-09-22) — THE CLIENT LEARNS WHO IT IS FROM THE SERVICE.
+// NAME-ADOPT — THE CLIENT LEARNS WHO IT IS FROM THE SERVICE.
 //
 // Mac, the first hour the account arc was live:
 //   1. "The top right corner button doesnt update with name"

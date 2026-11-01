@@ -1,4 +1,4 @@
-// DEEP-OPEN (2026-10-25; bible/06-Systems/Professions-Arc.md section 53) - A DUNGEON'S DEEP VEINS ON ANYONE'S WORD. The
+// DEEP-OPEN - A DUNGEON'S DEEP VEINS ON ANYONE'S WORD. The
 // report (SaberGGaming): no Dwarven Scrap anywhere. Probed: over 32,249 dungeon-days a dungeon nobody had witnessed drew
 // Silver every time and Dwarven Scrap never - its veins were held to UNCONFIRMED_VEIN_TIER (3), and a dungeon is
 // confirmed only once three week-old accounts have worked it, which almost never happens. The owner's choice: "FULL ORE
