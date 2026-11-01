@@ -202,7 +202,7 @@ test('TECH-CARD the pack, executed: a technique piece\'s hover card and its deta
     withDom((dom) => {
       const host = dom.mk('div'); dom.body.append(host);
       const sword = withTech(120, 'leap', 15);
-      sword.sigil = { power: 6, party: 3, xp: 7420 };   // a sigil weapon: the order against the sigil's block is a real one
+      sword.sigil = { power: 3, party: 3, xp: 7420 };   // a sigil weapon: the order against the sigil's block is a real one
       const e = { name: 'Aelwyn', stats: { strength: 50, endurance: 48 }, items: [sword], goldPieces: 10 };
       const view = mountEnhancedInventory(host, { entity: e, items: () => e.items, onExit: () => {}, dropItem: () => {} });
       try {

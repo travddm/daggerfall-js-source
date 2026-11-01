@@ -80,8 +80,7 @@
 
 import { modSetting, modSettingIfDeclared } from '../systems/modSettings.js';
 import { liveStat } from '../systems/statMods.js';
-import { skillValue, SKILLS } from '../systems/skills.js';
-import { aimSkill } from '../systems/skillSoftcap.js';   // B1: a mastered weapon skill's aim stops 10 points past 100
+import { skillValue, aimSkill, SKILLS } from '../systems/skills.js';   // B1: a mastered weapon skill's aim stops 10 points past 100
 import { RACES } from '../systems/races.js';
 import { SPECIAL_ABILITY_BITS } from '../systems/specialAdvantages.js';
 import { WEAPONS, weaponMinDamage, weaponMaxDamage, weaponSkillUsed } from '../characters/weapons.js';

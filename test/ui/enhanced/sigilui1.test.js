@@ -16,7 +16,7 @@ import { ITEM_FRAME_CSS, PLUS_CSS } from '../../../src/ui/enhanced/enhancedPlusS
 import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const sword = (xp, extra = {}) => ({ name: 'Longsword', group: 'Weapons', templateIndex: 117, rarity: 'rare', affixes: [], isIdentified: true, sigil: { power: 6, party: 3, xp }, ...extra });
+const sword = (xp, extra = {}) => ({ name: 'Longsword', group: 'Weapons', templateIndex: 117, rarity: 'rare', affixes: [], isIdentified: true, sigil: { power: 3, party: 3, xp }, ...extra });
 const online = (renown) => { _resetSigilForTests(); setSigilOnline(true); setSigilRenown(renown); };
 const kids = (n, cls) => (n.children ?? []).flatMap((c) => [...(c.classList?.contains(cls) ? [c] : []), ...kids(c, cls)]);
 const one = (n, cls) => kids(n, cls)[0] ?? null;
@@ -25,9 +25,9 @@ test('SIGIL-UI the view: the stage it stands at in MY hand (the lower of its gro
   online(15);
   const v = sigilView(sword(7420));
   assert.deepEqual([v.rank, v.stage, v.dormant, v.held, v.name], [1, 1, false, false, 'Kindled']);
-  assert.deepEqual([v.from, v.to, v.next, v.full, v.party], [5000, 12500, 'Bright', 6, 3]);
+  assert.deepEqual([v.from, v.to, v.next, v.full, v.party], [5000, 12500, 'Bright', 3, 3]);
   assert.ok(Math.abs(v.frac - (7420 - 5000) / (12500 - 5000)) < 1e-9, 'measured from the stage it reached, not from zero');
-  assert.equal(v.pct, (6 * SIGIL_STAGES[1].share) / 100);
+  assert.equal(v.pct, (3 * SIGIL_STAGES[1].share) / 100);
   assert.equal(sigilProgressText(v), '7,420 / 12,500 to Bright');
   assert.deepEqual(v.stages.map((s) => [s.grown, s.awake]), [[true, true], [true, true], [false, false], [false, false], [false, false]]);
   const held = sigilView(sword(23900));
@@ -56,7 +56,7 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     assert.equal(one(box, 'sigil-rune').getAttribute('aria-hidden'), 'true');
     assert.equal(one(box, 'sigil-word').textContent, 'Sigil');
     assert.equal(one(box, 'sigil-stage').textContent, 'Kindled');
-    assert.equal(one(box, 'sigil-effect').textContent, '+2.4% damage now · +6% at Ascendant');
+    assert.equal(one(box, 'sigil-effect').textContent, '+1.2% damage now · +3% at Ascendant');
     const gems = kids(box, 'sigil-gem');
     assert.equal(gems.length, 5);
     assert.deepEqual(gems.map((g) => g.className), ['sigil-gem grown awake', 'sigil-gem grown awake', 'sigil-gem', 'sigil-gem', 'sigil-gem']);
@@ -84,7 +84,7 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     assert.equal(cg[2].dataset.fill, '32.3%');
     assert.equal(one(c, 'sigil-stages').getAttribute('role'), 'progressbar');
     assert.equal(one(c, 'sigil-stages').getAttribute('aria-valuenow'), '32');
-    assert.equal(one(c, 'sigil-effect').textContent, '+2.4% damage (up to +6%)');
+    assert.equal(one(c, 'sigil-effect').textContent, '+1.2% damage (up to +3%)');
     for (const cls of ['sigil-meter', 'sigil-party', 'sigil-note']) assert.equal(one(c, cls), null, `no ${cls} on the card`);
     const cheld = sigilCard(sword(23900));
     assert.equal(one(cheld, 'sigil-note').textContent, 'Renown limit: Bright at Renown 20');
@@ -93,8 +93,8 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     setSigilOnline(false);
     const dormant = sigilCard(sword(7420), { full: true });
     assert.equal(dormant.dataset.stage, 'dormant');
-    assert.equal(one(dormant, 'sigil-effect').textContent, 'Works online only: +6% damage at Ascendant');
-    assert.equal(one(sigilCard(sword(7420)), 'sigil-effect').textContent, 'Works online: up to +6% damage');
+    assert.equal(one(dormant, 'sigil-effect').textContent, 'Works online only: +3% damage at Ascendant');
+    assert.equal(one(sigilCard(sword(7420)), 'sigil-effect').textContent, 'Works online: up to +3% damage');
     assert.equal(sigilCard({ name: 'Mace' }), null);
     _resetSigilForTests();
   });

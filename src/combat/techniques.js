@@ -29,7 +29,8 @@
 
 import { techniqueById, techniqueMult, techniqueFamily, TECHNIQUE_MAX_SPEED, TECHNIQUES, TECHNIQUE_ACTION } from './technique/techniqueRoster.js';
 import { signatureFor, signatureById, SIGNATURE_IDS, SIGNATURE_TECHNIQUES } from '../systems/martialPaths.js';   // MARTIAL3: a martial path's signature - the key's answer when the weapon carries no line
-import { techniqueLineOf, techniquesOn, rarityKnown } from '../systems/loot/lootRarity.js';
+import { techniqueLineOf, rarityKnown } from '../systems/loot/lootRarity.js';
+import { techniquesOn } from '../systems/loot/techniquesOn.js';
 import { EQUIP_SLOTS } from '../systems/equip.js';
 import { sigilDueling } from '../systems/sigil/sigil.js';
 import { FATIGUE_MULTIPLIER } from '../systems/statMods.js';

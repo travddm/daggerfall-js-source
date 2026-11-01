@@ -93,9 +93,6 @@ export const LOOT_RARITY_KEY = 'lootRarity';
 /** The switch. Read at every seam, so a press takes effect on the next
  *  roll and the next fold. */
 export const lootRarityOn = () => !!getPref(LOOT_RARITY_KEY);
-export const WEAPON_TECHNIQUES_KEY = 'weaponTechniques';
-/** Weapon techniques: rolled on a drop and answered by the key only with their own switch AND the ladder on. */
-export const techniquesOn = () => lootRarityOn() && !!getPref(WEAPON_TECHNIQUES_KEY);
 
 // ── the tiers ───────────────────────────────────────────────────────
 export const RARITY_ORDER = Object.freeze(['common', 'magic', 'rare', 'legendary', 'aetheric', 'artifact', 'gilded']);
@@ -1603,7 +1600,7 @@ export function addTechniqueLine(item, rolls = Math.random, { id: chosen = null 
 }
 /** The chance, for a piece a door just minted: one roll, then the line. Answers the line, or null. */
 export function rollTechniqueLine(item, rolls = Math.random) {
-  if (!techniquesOn() || !techniqueEligible(item)) return null;
+  if (!lootRarityOn() || !getPref('weaponTechniques') || !techniqueEligible(item)) return null;
   const perMille = _techniquePerMille[item.rarity] ?? 0;
   if (!(perMille > 0)) return null;   // a tier with no chance costs the stream no draw (the socket pass's own rule)
   if (!(rolls() * 1000 < perMille)) return null;

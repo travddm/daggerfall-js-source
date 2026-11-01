@@ -26,8 +26,8 @@ import { rand } from '../formats/dfRandom.js';
 import { enchantChanceToHitMod, doItemEnchantmentPayloads, PAYLOAD, isEnchantedItem, entityImprovedAdrenalineRush } from '../systems/enchantments.js';   // E1: the enchantment channels + the Strikes payload; AUDIT 39: ImprovesTalents' adrenaline flag lives in the fold's bag   // the monster multi-attack reflex gate (F2)
 import { entityArmorMod, entityWeightMult, weaponDamageMods, weaponBlowMods } from '../systems/entityMods.js';   // RF1: one read per channel - DFU's enchantment channel and every enhancement fold, summed there
 import { liveStat } from '../systems/statMods.js';   // S14: fortify-aware stat reads
-import { skillValue, SKILLS } from '../systems/skills.js';
-import { noteSkillChallenge, aimSkill } from '../systems/skillSoftcap.js';   // SOFTCAP1: the foe a blow was traded with, for the real-use law
+import { skillValue, aimSkill, SKILLS } from '../systems/skills.js';
+import { noteSkillChallenge } from '../systems/skillSoftcap.js';   // SOFTCAP1: the foe a blow was traded with, for the real-use law
 import { mentorArmorValue, mentorGearScale, mentorDamageTakenMult } from '../systems/mentorMode.js';   // SOFTCAP1: mentor mode's overlay   // S3: real skills (enemies stay flat, verbatim)
 import { RACES } from '../systems/races.js';   // CalculateRacialModifiers reads the DFU-numbered race id
 import { SPECIAL_ABILITY_BITS, PROFICIENCY_BITS } from '../systems/specialAdvantages.js';   // AUDIT 21 F2: the Adrenaline Rush bit; CF1: the HandToHand expertise bit

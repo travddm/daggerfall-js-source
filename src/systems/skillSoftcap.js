@@ -99,9 +99,6 @@ export const EFFECTIVE_SKILL_MAX = effectiveSkill(SKILL_HARD_CAP);
  *  140 made a crit 20% harder and likelier; together +32% a blow on a bow. Past 100 a mastered skill now pays in damage
  *  (weaponMastery.js), not in aim: +10 here. */
 export const AIM_PAST_MAX = 10;
-/** The skill a to-hit or crit roll reads: `live`, held at 100 + AIM_PAST_MAX for a player whose own skill has climbed
- *  past 100. A skill at or under 100 (gear lines included) and every foe's skill read as they did. */
-export const aimSkill = (entity, id, live) => (entity?.isPlayer && (entity.skills?.[id] ?? 0) > SKILL_SOFT_CAP ? Math.min(live, SKILL_SOFT_CAP + AIM_PAST_MAX) : live);
 
 // CLIMB-PAST (FIELD BUGS 2026-10-01 #7, "Running jumping climbing dint work passed 100"). The run, the swim and the jump read the effective value in their own speed laws, so their
 // points past 100 move the body. Climbing drives one thing in Daggerfall - CalculateClimbingChance, which clamps the

@@ -85,7 +85,7 @@ test('AUDIT UPDATE L2: a found Magic piece imbued Rare stands at the Rare\'s law
     assert.ok(t[0].value >= TECHNIQUE_BANDS.rare[0] && t[0].value <= TECHNIQUE_BANDS.rare[1], `in the Rare's band: ${t[0].value}`);
   }
   assert.ok(n >= 40, `pieces imbued: ${n}`);
-  for (const power of [2, 3]) {
+  for (const power of [1, 2]) {
     const r = lcg(1000 + power);
     const w = foundMagic(r);
     w.sigil = { power, party: 1, xp: 0 };

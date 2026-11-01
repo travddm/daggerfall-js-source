@@ -102,7 +102,7 @@ test('SET-CATCHUP THE DRINK: a full Dagon\'s Brand at Radiant, a fresh helm swap
   drinkWorn(e, null, 1000);
   assert.equal(fresher.sigil.xp, XP[RADIANT] + 1500, 'caught up: the drink whole');
   assert.equal(recordedReach('dagon'), RADIANT);
-  const plain = Object.assign(createWeapon(120, 0), { rarity: 'rare', sigil: { power: 5, party: 1, xp: 0 } });
+  const plain = Object.assign(createWeapon(120, 0), { rarity: 'rare', sigil: { power: 3, party: 1, xp: 0 } });
   drinkWorn(e, plain, 1000);
   assert.equal(plain.sigil.xp, 1000, 'a plain sigil weapon: no set, no catch-up');
   const before = fresher.sigil.xp;

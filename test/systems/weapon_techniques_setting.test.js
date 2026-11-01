@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { setPref, getPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
+import { techniquesOn, WEAPON_TECHNIQUES_KEY } from '../../src/systems/loot/techniquesOn.js';
 import * as RO from '../../src/combat/technique/techniqueRoster.js';
 import * as T from '../../src/combat/techniques.js';
 import { FEATURES, FEATURE_PREF_DEFAULTS } from '../../src/systems/features.js';
@@ -123,14 +124,14 @@ test('B1 THE SWITCH: the preference defaults on, and the Features row declares i
   assert.equal(row.control.store, 'prefs');
   assert.equal(row.control.key, 'weaponTechniques');
   assert.equal(row.control.initial, true);
-  assert.equal(LR.WEAPON_TECHNIQUES_KEY, 'weaponTechniques');
+  assert.equal(WEAPON_TECHNIQUES_KEY, 'weaponTechniques');
   prefs();
-  assert.equal(LR.techniquesOn(), true, 'ladder on, switch at its default');
+  assert.equal(techniquesOn(), true, 'ladder on, switch at its default');
   setPref('weaponTechniques', false);
-  assert.equal(LR.techniquesOn(), false, 'ladder on, switch off');
+  assert.equal(techniquesOn(), false, 'ladder on, switch off');
   setPref('weaponTechniques', true);
   setPref('lootRarity', false);
-  assert.equal(LR.techniquesOn(), false, 'switch on, ladder off: techniques need both');
+  assert.equal(techniquesOn(), false, 'switch on, ladder off: techniques need both');
   reset();
 });
 
