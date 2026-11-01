@@ -3,10 +3,10 @@
 This page covers what you need to build, run and test DFO Online on your own machine, and where things live in the
 repository. Read it first; then read [architecture/](architecture/README.md).
 
-DFO Online is a browser RPG inspired by The Elder Scrolls II: Daggerfall. It reads the player's own copy of
+DFO Online is a browser RPG based on The Elder Scrolls II: Daggerfall. It reads the player's own copy of
 Daggerfall's data (ARENA2) at runtime and draws it with a hand-written WebGL2 renderer. Daggerfall Unity (MIT,
-Interkarma and contributors) is the reference for the data formats and much of the game logic, but the game is not a
-1:1 port.
+Interkarma and contributors) is the baseline for the data formats and the game logic. The game departs from it only for
+online play or for a written design that is better for play ([README.md](README.md#scope)).
 
 ## Prerequisites
 

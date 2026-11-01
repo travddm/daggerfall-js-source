@@ -92,7 +92,7 @@ Keep these lists current when you add one.
 
 ## Adding or changing a reader
 
-1. Read the DFU class first (see [mods-and-vendor.md](mods-and-vendor.md), "Daggerfall Unity as the reference").
+1. Read the DFU class first (see [mods-and-vendor.md](mods-and-vendor.md), "Daggerfall Unity as the baseline").
 2. Translate it; keep constants and quirks; list departures in the header.
 3. Add a test in `test/formats/` with a synthetic fixture and a real-data half gated on `ARENA2_PATH`.
 4. Add the file kind to `KEEP` in `src/scenes/dataSource.js` and bump `MANIFEST_V` if it is not already ingested.
