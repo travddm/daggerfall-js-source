@@ -431,18 +431,18 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   at(1000);
   assert.equal(hurtPlayer(e, 500), false);
   assert.equal(e.health, 1, 'left at 1');
-  assert.deepEqual(v.said, ['Unbroken! Damage cut by 14% for 4 s.']);   // WB13b
+  assert.deepEqual(v.said, ['Unbroken! Damage cut by 10% for 4 s.']);   // WB13b
   assert.deepEqual(v.sounds, ['unbroken']);
   e.health = 50;
   at(1001);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 42, '14% less: 86% of 10 is 8.6 - whole points, 8 land');
+  assert.equal(e.health, 41, '10% less: 90% of 10 is 9 - whole points, 9 land');
   hurtPlayer(e, 11);
-  assert.equal(e.health, 33, 'AUDIT L1: 86% of eleven is 9.46 - nine land, whole points, never a health of 32.54');
-  assert.equal(setDamageMod(e, 1), 0, 'a single point at 86% is none');
+  assert.equal(e.health, 32, 'AUDIT L1: 90% of eleven is 9.9 - nine land, whole points, never a health of 31.1');
+  assert.equal(setDamageMod(e, 1), 0, 'a single point at 90% is none');
   at(1004);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 23, 'four seconds at Faint, then whole');
+  assert.equal(e.health, 22, 'four seconds at Faint, then whole');
   at(1100);
   hurtPlayer(e, 500);
   assert.equal(e.health, 0, 'inside the recovery: a death');
@@ -470,7 +470,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   at(0);
   hurtPlayer(asc, 50);
   at(7.99);
-  assert.equal(setDamageMod(asc, 10), 8, 'eight seconds at Ascendant');
+  assert.equal(setDamageMod(asc, 10), 9, 'eight seconds at Ascendant');
   at(8);
   assert.equal(setDamageMod(asc, 10), 10);
   at(149);
@@ -484,7 +484,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   mute.health = 50;
   assert.equal(hurtPlayer(mute, 500), false, 'no death');
   assert.equal(mute.health, 1, 'saved, whatever the voice did');
-  assert.equal(setDamageMod(mute, 10), 8, 'and the 14% cut runs');
+  assert.equal(setDamageMod(mute, 10), 9, 'and the 10% cut runs');
 });
 
 test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30% to under it - never a killing blow, and AUDIT L3 never a fall\'s or a poison\'s hurt - bursts a Nova on every live foe within six metres of my feet through the door, said with the count and sounded, and my weapon blows deal more for ten seconds; it recovers in its time; AUDIT H1/M4/L7: the Nova spares my ally and a foe at peace, and never reaches a storey away, through a wall (the host\'s own ray) or a foe the fire cannot touch (mutants: a fall waking it; any blow under the line waking it; the Nova past its reach; the fury never ending; no recovery; a killing blow waking it; the Nova on an ally or a pacified foe; the Nova a storey up; the Nova through a wall; the Nova on a fire daedra)', () => {

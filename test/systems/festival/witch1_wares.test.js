@@ -54,7 +54,7 @@ test('WITCH1 THE SET\'S WORDS: Wyrd-Sight, Tallow-Ward, Soul Harvest - at their 
   assert.equal(words(0, 0), '+2 Willpower, +5 magic resistance');
   assert.equal(words(0, SET_STAGE_MAX), '+6 Willpower, +15 magic resistance');
   assert.equal(words(1, 0), 'Your weapon deals 4% more damage to the undead, the Daedra and the atronachs');
-  assert.equal(words(1, SET_STAGE_MAX), 'Your weapon deals 12% more damage to the undead, the Daedra and the atronachs');
+  assert.equal(words(1, SET_STAGE_MAX), 'Your weapon deals 10% more damage to the undead, the Daedra and the atronachs');
 });
 
 test('WITCH1 THE SET\'S POWERS through the real seam: Wyrd-Sight\'s Willpower, Tallow-Ward\'s bite on the dead and the summoned alone, Soul Harvest\'s health and magicka on a kill - said, sounded, and recovered', () => {

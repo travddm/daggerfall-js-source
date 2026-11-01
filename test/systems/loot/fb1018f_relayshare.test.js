@@ -3,12 +3,12 @@
 // +50% to foes under 25%"). A body the relay runs - the gate's Warden, his crystals and host, the Abyss Dungeon's Remnant,
 // its Echoes and Hearts, the sea serpent - is struck on this machine against a
 // stand-in whose health is a placeholder (world/gate/gateBoss.js bossStandIn, 1e9 of 1e9), and the power read it as
-// whole: never under a quarter, never +6%. Every screen in the fight holds the relay's word of that body's health (the
+// whole: never under a quarter, never +5%. Every screen in the fight holds the relay's word of that body's health (the
 // bar draws it). The laws pinned here, on the real modules:
 //   - THE ONE LAW (combat/healthShare.js healthShare): an entity's own share; a relay body's word through its stand-in's
 //     reader, clamped; null where none is heard.
 //   - THE REPORT: a Rare imprinted at the Reforge, worn, its blows through FormulaHelper's own weapon damage
-//     (combat/formulas.js weaponAttackDamage) - +6% on an ordinary foe under a quarter (as before) and now on the court's
+//     (combat/formulas.js weaponAttackDamage) - +5% on an ordinary foe under a quarter (as before) and now on the court's
 //     Warden under a quarter of the relay's word; never at a quarter or over.
 //   - EVERY OWNER HANDS ITS STAND-INS THE WORD: the court (the Warden, the crystals, the host), the Remnant (itself, an Echo, a Heart), the serpent's host and the world host's line.
 //   - THE FAMILY: Serpent's Kiss's double, the masteries' halves, Run Them Down and Gutting Lunge read the same word; the
@@ -92,7 +92,7 @@ function imprinted() {
   me.items.push(rare, welkyndShards(40));
   addGoldPieces(me, 10_000);
   assert.deepEqual(CX.imprintPiece(rare, 'night-mothers-embrace', me), { ok: true });
-  assert.equal(LR.imprintLine(rare), "Imprint: Sweet Mother's Kiss (of The Night Mother's Embrace) - +6% to foes under 25%", 'the line in the report');
+  assert.equal(LR.imprintLine(rare), "Imprint: Sweet Mother's Kiss (of The Night Mother's Embrace) - +5% to foes under 25%", 'the line in the report');
   equipItem(me, rare);
   assert.deepEqual(LP.wornPowers(me).map((p) => [p.id, p.power.kind]), [['night-mothers-embrace', 'execute']], 'worn, its power awake');
   return me;
@@ -131,26 +131,26 @@ test('RELAY-SHARE THE ONE LAW (combat/healthShare.js healthShare): an entity\'s 
   assert.deepEqual([wordShare(5, 0), wordShare(NaN, 100), wordShare(5, undefined), wordShare(undefined, 100)], [null, null, null, null]);
 });
 
-test('RELAY-SHARE THE REPORT: a Rare imprinted at the Reforge with Sweet Mother\'s Kiss, worn - its weapon blows through FormulaHelper\'s own damage deal +6% to an ordinary foe under a quarter (as they did) and now to the court\'s Warden under a quarter of the relay\'s word, a sword\'s and a bow\'s; never at a quarter or over (mutants: every owner\'s reader dropped; the loot\'s share its own copy again)', async () => {
+test('RELAY-SHARE THE REPORT: a Rare imprinted at the Reforge with Sweet Mother\'s Kiss, worn - its weapon blows through FormulaHelper\'s own damage deal +5% to an ordinary foe under a quarter (as they did) and now to the court\'s Warden under a quarter of the relay\'s word, a sword\'s and a bow\'s; never at a quarter or over (mutants: every owner\'s reader dropped; the loot\'s share its own copy again)', async () => {
   fresh();
   const me = imprinted();
   // an ordinary foe: its own entity's health - as it always was
   const orc = makeEnemyEntity(7, ENEMY_BASICS[7], null, 1, ROLL);
   const whole = weaponAttackDamage(me, orc, 0, sword(), ROLL);
   orc.health = Math.floor(orc.maxHealth * 0.2);
-  assert.equal(weaponAttackDamage(me, orc, 0, sword(), ROLL), whole + Math.floor(whole * 0.06), 'an orc under a quarter: +6%');
+  assert.equal(weaponAttackDamage(me, orc, 0, sword(), ROLL), whole + Math.floor(whole * 0.05), 'an orc under a quarter: +5%');
   // the gate's Warden: his stand-in's placeholder is whole (STAND_IN_WHOLE - 1e9 before STAND-IN-WHOLE); the relay's word (the bar's) says 200 of 1000
   const h = court(fight({ hp: 200, max: 1000 }));
   const warden = h.c.target().entity;
   assert.equal(warden.health, STAND_IN_WHOLE, 'his placeholder');
   const plain = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, sword(), ROLL);
-  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain * 0.06), 'the Warden under a quarter: +6%');
+  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain * 0.05), 'the Warden under a quarter: +5%');
   const shot = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, bow(), ROLL);
-  assert.equal(weaponAttackDamage(me, warden, 0, bow(), ROLL), shot + Math.floor(shot * 0.06), 'a shaft too');
+  assert.equal(weaponAttackDamage(me, warden, 0, bow(), ROLL), shot + Math.floor(shot * 0.05), 'a shaft too');
   h.link.st = fight({ hp: 250, max: 1000 });
   assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain, 'at a quarter: nothing');
   h.link.st = fight({ hp: 249, max: 1000 });
-  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain * 0.06), 'the word read at the blow, not at his first sight');
+  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain * 0.05), 'the word read at the blow, not at his first sight');
 });
 
 test('RELAY-SHARE EVERY BODY THE RELAY RUNS READS ITS WORD: the court\'s Warden (his `hp` of `max`), each crystal of a Reckoning (its own share), each of his host (its `h` of `m`); the Remnant (`h` of `m`), an Echo (its own) and a Heart (its health of the Reset\'s whole); the serpent\'s host (`hp` of `max` while its fight is mine) and the world host\'s stand-in reading it (mutants: each reader dropped; the host\'s whole read for its health)', async () => {
@@ -233,11 +233,11 @@ test('RELAY-SHARE THE FAMILY on a body the relay runs: Serpent\'s Kiss doubles u
   assert.deepEqual([at(axe, weapon(WEAPONS.War_Axe), relayBody(0.2)), at(axe, weapon(WEAPONS.War_Axe), relayBody(0.8))], [16, 0], 'the Axe under half of the word, x1.16; over it, nothing');
   assert.deepEqual([at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.2)), at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.8))], [0, 16], 'the hammer the other half');
   assert.equal(at(axe, weapon(WEAPONS.War_Axe), relayBody(null)), 8, 'no word: the halves\' mean (AUDIT MARTIAL L3 F2)');
-  // Run Them Down (the Thief-Taker's Garb, 4 - test/systems/raid4b_sets.test.js's rig): +1% under half at renown 1 (Faint; 3% Ascendant)
+  // Run Them Down (the Thief-Taker's Garb, 4 - test/systems/raid4b_sets.test.js's rig): +2% under half at renown 1 (Faint; 5% Ascendant)
   fresh(); setSigilOnline(true); setSigilRenown(1);
   const taker = player(); taker.armorValues = new Array(7).fill(100);
   for (const t of [107, 106, 105, 102]) { const it = mintCondition({ group: 'Armor', templateIndex: t, material: ARMOR_MATERIAL.Steel, flags: 0 }); Object.assign(it, { rarity: 'rare', sigil: { set: 'thieftaker', party: 1, xp: 0 } }); taker.items.push(it); equipItem(taker, it); }
-  assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.4)), 101, 'under half of the word');
+  assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.4)), 102, 'under half of the word');
   assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.6)), 100);
   assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(null)), 100, 'no word: whole, as before');
   // Gutting Lunge (the Bloodletter's): a second blow under a quarter - owed to a body the relay runs (it has no record)

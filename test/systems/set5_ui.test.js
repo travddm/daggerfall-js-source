@@ -228,7 +228,7 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     const rows = kids(card, 'set-tier');
     assert.deepEqual(rows.map((t) => t.classList.contains('awake')), [true, true, false]);
     assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 3 }));
-    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 3 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 6 })}`);
+    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 3 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 5 })}`);
     assert.equal(one(rows[2], 'set-tier-every'), null, 'no recovery, no tag');
     { const e2 = player(), m = piece(107, 'malacath', 0); wear(e2, m);
       const tag = one(kids(setCard(m, e2), 'set-tier')[2], 'set-tier-every');

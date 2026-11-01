@@ -69,7 +69,7 @@ export const RAMPAGE_SECONDS = 12;
 export const RAMPAGE_STACKS = 3;
 /** Malacath's Bulwark (6): Unbroken's half, the share it takes off every hurt while its window holds (POWER-CEILING
  *  names it so the guards' ceiling can count it). */
-export const UNBROKEN_LESS = 14;
+export const UNBROKEN_LESS = 10;
 /** Nocturnal's Shroud (6): Eventide's shadow is a Chameleon of whole magic rounds, and online a round is five seconds
  *  of the shared clock (net/wire.js: a classic minute every five real seconds). */
 export const ROUND_SECONDS = 5;
@@ -139,10 +139,10 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'ravager', 'Ravager', { strength: [2, 6], critical: [4, 12] },
         (v) => `+${v.strength} Strength, +${v.critical} Critical Strike`,
         (v) => `+${v.strength} Strength, +${v.critical} Critical Strike`),
-      tier(4, 'bloodfury', 'Bloodfury', { more: [2, 6] },
+      tier(4, 'bloodfury', 'Bloodfury', { more: [2, 5] },
         (v) => `Your weapon deals ${v.more}% more damage, or ${v.more * 2}% more while you are below half health`,
         (v) => `+${v.more}% damage, +${v.more * 2}% below half HP`),
-      tier(6, 'rampage', 'Rampage', { stack: [2, 4] },
+      tier(6, 'rampage', 'Rampage', { stack: [2, 3] },
         (v) => `Each kill adds ${v.stack}% weapon damage for ${RAMPAGE_SECONDS} s, up to ${RAMPAGE_STACKS} times`,
         (v) => `+${v.stack}% per kill, up to ${RAMPAGE_STACKS} (${RAMPAGE_SECONDS}s)`),
     ]),
@@ -154,7 +154,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'shadows-grace', "Shadow's Grace", { stealth: [4, 12], agility: [2, 6] },
         (v) => `+${v.stealth} Stealth, +${v.agility} Agility`,
         (v) => `+${v.stealth} Stealth, +${v.agility} Agility`),
-      tier(4, 'nightfall', 'Nightfall Strike', { more: [4, 12] },
+      tier(4, 'nightfall', 'Nightfall Strike', { more: [4, 10] },
         (v) => `Your weapon and arrows deal ${v.more}% more damage to enemies that have not noticed you`,
         (v) => `+${v.more}% vs unaware foes`),
       tier(6, 'eventide', 'Eventide', { rounds: [1, 3], recover: [30, 15] },
@@ -202,7 +202,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'watch-oath', 'Oath of the Watch', { armor: [1, 4], willpower: [2, 6] },
         (v) => `+${v.armor} armor on every part, +${v.willpower} Willpower`,
         (v) => `+${v.armor} armour, +${v.willpower} Willpower`),
-      tier(4, 'riposte', 'Riposte', { more: [4, 12] },
+      tier(4, 'riposte', 'Riposte', { more: [4, 10] },
         (v) => `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals ${v.more}% more damage`,
         (v) => `When hit: next hit +${v.more}% (${RIPOSTE_SECONDS}s)`),
       tier(6, 'hold-the-line', 'Hold the Line', { less: [4, 10] },
@@ -217,10 +217,10 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'keen-eyed', 'Keen-Eyed', { agility: [2, 6], archery: [4, 12] },
         (v) => `+${v.agility} Agility, +${v.archery} Archery`,
         (v) => `+${v.agility} Agility, +${v.archery} Archery`),
-      tier(4, 'run-them-down', 'Run Them Down', { more: [2, 6] },
+      tier(4, 'run-them-down', 'Run Them Down', { more: [2, 5] },
         (v) => `Your weapon and arrows deal ${v.more}% more damage to enemies below half health`,
         (v) => `+${v.more}% on foes below half HP`),
-      tier(6, 'no-escape', 'No Escape', { more: [4, 12] },
+      tier(6, 'no-escape', 'No Escape', { more: [4, 10] },
         (v) => `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals ${v.more}% more damage to it`,
         (v) => `Kill marks next foe: +${v.more}% (${MARK_SECONDS}s)`),
     ]),
@@ -269,7 +269,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'dwemer-brass', 'Dwemer Brass', { magic: [4, 10], shock: [4, 10] },
         (v) => `+${v.magic} magic resistance, +${v.shock} shock resistance`,
         (v) => `+${v.magic} magic, +${v.shock} shock resist`),
-      tier(4, 'gearward', 'Gearward', { lighter: [6, 12], recover: [18, 12] },
+      tier(4, 'gearward', 'Gearward', { lighter: [6, 10], recover: [18, 12] },
         (v) => `The next enemy hit on you deals ${v.lighter}% less damage. Recovers in ${v.recover} s`,
         (v) => `A foe's blow ${v.lighter}% lighter`),
       tier(6, 'hour-turns', 'The Hour Turns', { heal: [15, 25], recover: [90, 60] },
@@ -288,7 +288,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'wyrd-sight', 'Wyrd-Sight', { willpower: [2, 6], magic: [5, 15] },
         (v) => `+${v.willpower} Willpower, +${v.magic} magic resistance`,
         (v) => `+${v.willpower} Willpower, +${v.magic} magic resist`),
-      tier(4, 'tallow-ward', 'Tallow-Ward', { more: [4, 12] },
+      tier(4, 'tallow-ward', 'Tallow-Ward', { more: [4, 10] },
         (v) => `Your weapon deals ${v.more}% more damage to the undead, the Daedra and the atronachs`,
         (v) => `+${v.more}% vs undead and summoned`),
       tier(6, 'soul-harvest', 'Soul Harvest', { heal: [8, 20], recover: [40, 20] },
@@ -308,7 +308,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'spinners-thread', "Spinner's Thread", { poison: [10, 30], agility: [2, 6] },
         (v) => `+${v.poison} poison resistance, +${v.agility} Agility`,
         (v) => `+${v.poison} poison resist, +${v.agility} Agility`),
-      tier(4, 'bound-in-silk', 'Bound in Silk', { more: [8, 15] },
+      tier(4, 'bound-in-silk', 'Bound in Silk', { more: [6, 10] },
         (v) => `Every ${STRAND_HITS}th weapon hit on the same enemy deals ${v.more}% more damage. The count falls away ${STRAND_SECONDS} s after your last hit on it`,
         (v) => `Every ${STRAND_HITS}th hit on a foe +${v.more}%`),
       tier(6, 'mephalas-veil', "Mephala's Veil", { rounds: [2, 4], recover: [240, 120] },
@@ -328,7 +328,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'stormwrack', 'Stormwrack', { shock: [10, 30], speed: [2, 6] },
         (v) => `+${v.shock} shock resistance, +${v.speed} Speed`,
         (v) => `+${v.shock} shock resist, +${v.speed} Speed`),
-      tier(4, 'undertow', 'Undertow', { more: [4, 12] },
+      tier(4, 'undertow', 'Undertow', { more: [3, 9] },
         (v) => `Your weapon deals ${v.more}% more damage in the open ${ETHER_WORD} Ocean, and half of that anywhere else`,
         (v) => `+${v.more}% at sea, half ashore`),
       tier(6, 'captains-due', "The Captain's Due", { guns: [10, 30], hull: [10, 25] },

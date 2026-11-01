@@ -150,7 +150,7 @@ test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZON
   assert.equal(orcBane.health, 1, 'Unbroken: the killing blow leaves one, and the half begins');
   orcBane.health = 4000;   // over half: no Hold the Line, no Last Stand - the half alone
   now = 1;
-  assert.equal(struck(orcBane, 1000), 860, 'whole: 14% less');
+  assert.equal(struck(orcBane, 1000), 900, 'whole: 10% less');
   orcBane.health = 4000;
   assert.equal(struck(orcBane, 1000, [SIGIL_SETS_POWER, setDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();

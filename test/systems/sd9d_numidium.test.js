@@ -74,11 +74,11 @@ test('SD9d THE LAW: The Brass of Numidium after the serpent\'s - Aetheric, Kagre
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'numidium'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'dwemer-brass', 'Dwemer Brass', { magic: [4, 10], shock: [4, 10] }],
-    [4, 'gearward', 'Gearward', { lighter: [6, 12], recover: [18, 12] }],
+    [4, 'gearward', 'Gearward', { lighter: [6, 10], recover: [18, 12] }],
     [6, 'hour-turns', 'The Hour Turns', { heal: [15, 25], recover: [90, 60] }],
   ]);
   for (const t of s.tiers) for (let st = 0; st <= SET_STAGE_MAX; st++) { const b = t.brief(tierValues(t, st)); assert.ok(b.length <= BRIEF_MAX, `${t.key} at ${st}: "${b}"`); }
-  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 12% lighter', 'Death turned back, heal 25%']);
+  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 10% lighter', 'Death turned back, heal 25%']);
   assert.equal(s.tiers[1].text(tierValues(s.tiers[1], 0)), 'The next enemy hit on you deals 6% less damage. Recovers in 18 s');
 });
 
@@ -179,13 +179,13 @@ test('SD9d GEARWARD (4): while the gear is wound a foe\'s blow lands its share l
   door(asc);
   at(5);
   blow(asc, 50);
-  assert.equal(asc.health, 56, 'Ascendant: 12% of 50 is 6 - the blow lands 44');
+  assert.equal(asc.health, 55, 'Ascendant: 10% of 50 is 5 - the blow lands 45');
   at(16);
   blow(asc, 10);
-  assert.equal(asc.health, 46, 'wound at 17: whole');
+  assert.equal(asc.health, 45, 'wound at 17: whole');
   at(17);
   blow(asc, 10);
-  assert.equal(asc.health, 37, 'wound: 12% of 10 is 1.2, 1 turned');
+  assert.equal(asc.health, 36, 'wound: 10% of 10 is 1, 1 turned');
   fresh(); online(1);
   const three = wearSet(player(), 'numidium', 3);
   door(three);

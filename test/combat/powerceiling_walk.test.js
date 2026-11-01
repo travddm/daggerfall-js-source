@@ -36,7 +36,7 @@ const past = (where, item) => { const p = linesPastCeiling(item); assert.deepEqu
 
 /** THE LEGENDARY BAND'S TOPS, every kind - the ceiling of every line in the game. */
 const TOPS = Object.freeze({
-  damage: 40, armor: 20, stat: 15, resist: 50, skill: 30, weight: 50, elemental: 10, leech: 10, thorns: 10, focus: 10, slayer: 6,
+  damage: 40, armor: 20, stat: 15, resist: 50, skill: 30, weight: 50, elemental: 10, leech: 10, thorns: 10, focus: 10, slayer: 4,
   standing: 8, warmth: 10, dry: 50, castSpeed: 15, potency: 5, wellspring: 10, technique: 30,
 });
 
@@ -142,8 +142,8 @@ test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in ev
   // today's strongest of each role - a record past one moves it, and fails here with its name
   const STRONGEST = {
     // most frequent (lower is stronger)
-    above: 75, below: 33, blow: 15, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
-    gold: 5, guard: 12, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
+    above: 75, below: 33, blow: 10, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
+    gold: 5, guard: 10, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
     rounds: 4, seconds: 8, ship: 30, spell: 3, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
   holdRoles(powerNumbers(), 135, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
@@ -171,7 +171,7 @@ function holdRoles(numbers, least, strongest, lower, table) {
 test('POWER-CEILING THE PATHS AND THE SKY (AUDIT HORIZONTAL D8): every number of every martial and arcane path has a role, a line\'s under the Legendary band\'s top, every other at or under today\'s strongest path number of its role; every channel the sky can carry at or under today\'s cap - a new path, star or channel fails until it is measured (mutants: Prismatic Ward past 40; Opening Strike past 30; Absolution sooner; a path number with no role; a weapon channel raised; the blow\'s whole raised)', () => {
   // the paths keep their shares as fractions, so their strongest are their own (the loot's chance is 30, Prismatic Ward's 40)
   const PATH_STRONGEST = {
-    below: 0.5, blow: 5, blowStack: 1, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 6, heal: 25,
+    below: 0.5, blow: 5, blowStack: 1, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 4, heal: 25,
     killHeal: 5, killMana: 20, leech: 10, leechShare: 0.5, manaShare: 0.25, oneIn: 3, pace: 20, perMissing: 2, pierce: 20, reach: 8,
     recover: 120, refund: 1 / 3, regen: 2, rounds: 8, seconds: 30, shieldCap: 20, spell: 5, spellStack: 3, stacks: 5, times: 2,
   };

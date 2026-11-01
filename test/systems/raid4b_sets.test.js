@@ -100,10 +100,10 @@ test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (t
   assert.equal(SIGIL_SETS.ruhn.raid, undefined, 'the gate boss\'s own names no party');
   const words = (id, i, st) => { const t = SIGIL_SETS[id].tiers[i]; return t.text(tierValues(t, st)); };
   assert.equal(words('oath', 0, 0), '+1 armor on every part, +2 Willpower');
-  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 12% more damage`);
+  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 10% more damage`);
   assert.equal(words('oath', 2, 0), 'While you are below half health, you take 4% less damage');
   assert.equal(words('thieftaker', 1, 0), 'Your weapon and arrows deal 2% more damage to enemies below half health');
-  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 12% more damage to it`);
+  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 10% more damage to it`);
   assert.equal(words('orcsbane', 1, 0), `Each enemy hit on you adds 1% weapon damage for ${BLOOD_SECONDS} s, up to ${BLOOD_STACKS} times`);
   assert.equal(words('orcsbane', 2, 0), 'A kill gives you a ward that blocks the next 10 damage you take. Recovers in 60 s');
   assert.equal(words('orcsbane', 2, SET_STAGE_MAX), 'A kill gives you a ward that blocks the next 40 damage you take. Recovers in 30 s');
@@ -172,7 +172,7 @@ test('RAID4b Riposte (the Broken Oath, 4): a foe\'s blow that TAKES my health op
   fresh(); online(40);
   const asc = wearSet(player(), 'oath', 4, XP[4]);
   blow(asc, 10);
-  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 112, 'Ascendant: +12%');
+  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 110, 'Ascendant: +10%');
 });
 
 test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a foe UNDER half its health deal their per cent more, arrows too; never at half or above, never at a foe with no health to read (mutants: at half health; the attacker\'s health read)', () => {
@@ -187,7 +187,7 @@ test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a fo
   e.health = 10;
   assert.equal(weaponBlowMods(sword(), 100, e, { ...bandit, health: 90 }), 100, 'MY health is not the foe\'s');
   fresh(); online(40);
-  assert.equal(weaponBlowMods(sword(), 100, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 106, 'Ascendant: +6%');
+  assert.equal(weaponBlowMods(sword(), 100, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 105, 'Ascendant: +5%');
 });
 
 test('RAID4b No Escape (the Thief-Taker\'s Garb, 6): a kill marks the NEAREST other live foe within MARK_METRES of my feet for MARK_SECONDS - never the one killed, an ally, a foe at peace, one a storey away, one behind a wall or one past the reach - and my blows at it deal their per cent more, said and sounded; a kill with none to mark leaves the mark as it stood; the watch\'s death marks nothing (mutants: the last in reach marked; the killed foe marked; the reach ignored; a wall ignored; the mark never ending; four pieces marking)', () => {

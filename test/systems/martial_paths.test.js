@@ -146,8 +146,8 @@ test('MARTIAL1 THE LAW: fifteen pairs of the six weapon skills, whole and distin
     grit: { health: 1, fatigue: 2 }, windborne: { speed: 10, running: 15, jumping: 15 },
     thousandCuts: { share: 0.5 }, rallyingCleave: { pct: 2, seconds: 8 }, judgement: { heal: 4, foes: 3 }, huntersMark: { pct: 3, seconds: 12 },
     cyclone: { pace: 20, seconds: 6 }, guttingLunge: { below: 0.25 }, blackjack: { times: 2 }, vanishingStrike: { rounds: 4 },
-    phantomStrike: { oneIn: 3, seconds: 6 }, earthsplitter: { lighter: 5, seconds: 10 }, fellingStrike: { heal: 10 }, savageWhirl: { leech: 10, seconds: 8 },
-    hallowedStrike: { share: 0.5 }, knockout: { lighter: 6, seconds: 8 }, windstrike: { fatigue: 5, foes: 3 },
+    phantomStrike: { oneIn: 3, seconds: 6 }, earthsplitter: { lighter: 4, seconds: 10 }, fellingStrike: { heal: 10 }, savageWhirl: { leech: 10, seconds: 8 },
+    hallowedStrike: { share: 0.5 }, knockout: { lighter: 4, seconds: 8 }, windstrike: { fatigue: 5, foes: 3 },
   });
   assert.equal(POW.MARTIAL_BLOW_MOST, 6);
 });
@@ -538,11 +538,11 @@ test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions te
   used('phantomStrike', me);
   setStruck(foe(), me, 10); hurtPlayer(me, 10); assert.equal(me.health, 990, 'one in three: missed');
   _clock += 6.01; setStruck(foe(), me, 10); hurtPlayer(me, 10); assert.equal(me.health, 980, 'the window ends');
-  // Juggernaut: foes' blows 5% lighter for 10 s
+  // Juggernaut: foes' blows 4% lighter for 10 s
   reset(); me = pathFighter('juggernaut'); door([], me);
   used('earthsplitter', me);
   me.health = me.maxHealth = 1000;
-  setStruck(foe(), me, 100); hurtPlayer(me, 100); assert.equal(me.health, 905);
+  setStruck(foe(), me, 100); hurtPlayer(me, 100); assert.equal(me.health, 904);
   // Woodsman: a foe it fells restores 10% of my health - the kill's word (
   reset(); me = pathFighter('woodsman'); me.health = 100; door([], me);
   const tree = foe({ health: 10 });
@@ -556,12 +556,12 @@ test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions te
   reset(); me = pathFighter('crusader'); o = rec('o', foe({ careerIndex: 15 })); const man = rec('man', foe()); d = door([o, man], me);
   land('hallowedShot', o, 20); land('hallowedStrike', man, 20);
   assert.deepEqual(d.hurts, [['o', 10]]);
-  // Brawler: the foe it strikes hits me 6% lighter for 8 s
+  // Brawler: the foe it strikes hits me 4% lighter for 8 s
   reset(); me = pathFighter('brawler'); const thug = foe(); door([], me);
   land('knockout', rec('t', thug), 10);
   me.health = me.maxHealth = 1000;
-  setStruck(thug, me, 100); hurtPlayer(me, 100); assert.equal(me.health, 906);
-  setStruck(foe(), me, 100); hurtPlayer(me, 100); assert.equal(me.health, 806, 'another foe: whole');
+  setStruck(thug, me, 100); hurtPlayer(me, 100); assert.equal(me.health, 904);
+  setStruck(foe(), me, 100); hurtPlayer(me, 100); assert.equal(me.health, 804, 'another foe: whole');
   // Windrunner: 5% of my fatigue a foe, three at most
   reset(); me = pathFighter('windrunner'); me.fatigue = 0; door([], me);
   const u3 = {}; for (let i = 0; i < 4; i++) land('windVolley', rec(`f${i}`, foe()), 5, u3);

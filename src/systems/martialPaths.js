@@ -75,11 +75,11 @@ export const MARTIAL_NUMBERS = Object.freeze({
   blackjack: Object.freeze({ times: 2 }),
   vanishingStrike: Object.freeze({ rounds: 4 }),
   phantomStrike: Object.freeze({ oneIn: 3, seconds: 6 }),
-  earthsplitter: Object.freeze({ lighter: 5, seconds: 10 }),
+  earthsplitter: Object.freeze({ lighter: 4, seconds: 10 }),
   fellingStrike: Object.freeze({ heal: 10 }),
   savageWhirl: Object.freeze({ leech: 10, seconds: 8 }),
   hallowedStrike: Object.freeze({ share: 1 / 2 }),
-  knockout: Object.freeze({ lighter: 6, seconds: 8 }),
+  knockout: Object.freeze({ lighter: 4, seconds: 8 }),
   windstrike: Object.freeze({ fatigue: 5, foes: 3 }),
 });
 const N = MARTIAL_NUMBERS;

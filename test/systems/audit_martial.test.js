@@ -189,7 +189,7 @@ test('AUDIT MARTIAL L1 L3 / L1 L7: a signature\'s window opens AS THE PRESS GOES
   assert.equal(POW.martialPace({ entity: me }), MP.MARTIAL_NUMBERS.cyclone.pace, 'Cyclone\'s quickening');
   reset(); me = pressOf('juggernaut', weapon(WEAPONS.Warhammer));
   me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100);
-  assert.equal(me.health, 905, 'Earthsplitter 5% lighter, the swing a whiff');
+  assert.equal(me.health, 904, 'Earthsplitter 4% lighter, the swing a whiff');
   reset(); me = pressOf('berserker', weapon(WEAPONS.War_Axe));
   me.health = 100; POW.martialStrike(me, realFoe(ORC, { health: 1000, maxHealth: 1000 }), 50);
   assert.equal(me.health, 105, 'Savage Whirl\'s leech from the press on');
@@ -628,9 +628,9 @@ test('AUDIT MARTIAL L5 M1: EVERY LINE ON BOTH SIDES, EVERY WINDOW AT ITS END - S
   bz.health = 99; assert.equal(POW.martialPace({ entity: bz }), MP.MARTIAL_NUMBERS.frenzy.pace);
   const N = MP.MARTIAL_NUMBERS;
   const edge = (label, open, on, seconds) => { reset(); const t0 = _clock; const read = open(); _clock = t0 + seconds - 0.01; assert.ok(on(read), `${label}: on just before its end`); _clock = t0 + seconds + 0.01; assert.ok(!on(read), `${label}: off just after`); };
-  edge('Earthsplitter', () => { const me = pathFighter('juggernaut'); POW.martialUsed({ id: 'earthsplitter', entity: me }); door([], me); return me; }, (me) => { me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100); return me.health === 905; }, N.earthsplitter.seconds);
+  edge('Earthsplitter', () => { const me = pathFighter('juggernaut'); POW.martialUsed({ id: 'earthsplitter', entity: me }); door([], me); return me; }, (me) => { me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100); return me.health === 904; }, N.earthsplitter.seconds);
   edge('Savage Whirl', () => { const me = pathFighter('berserker'); POW.martialUsed({ id: 'savageWhirl', entity: me }); return me; }, (me) => { me.health = 100; POW.martialStrike(me, realFoe(ORC, { health: 1000, maxHealth: 1000 }), 50); return me.health === 105; }, N.savageWhirl.seconds);
-  edge('Knockout', () => { const me = pathFighter('brawler'); door([], me); const thug = realFoe(ORC); land('knockout', rec('t', thug), 10); return { me, thug }; }, ({ me, thug }) => { me.health = me.maxHealth = 1000; setStruck(thug, me, 100); hurtPlayer(me, 100); return me.health === 906; }, N.knockout.seconds);
+  edge('Knockout', () => { const me = pathFighter('brawler'); door([], me); const thug = realFoe(ORC); land('knockout', rec('t', thug), 10); return { me, thug }; }, ({ me, thug }) => { me.health = me.maxHealth = 1000; setStruck(thug, me, 100); hurtPlayer(me, 100); return me.health === 904; }, N.knockout.seconds);
   edge('Flowing Steel', () => { const me = pathFighter('blademaster'); POW.martialStrike(me, realFoe(ORC), 10); return me; }, (me) => POW.martialBlowPct(me, realFoe(ORC)) === N.flowingSteel.pct, N.flowingSteel.seconds);
   edge('War Rhythm', () => { const me = pathFighter('warblade'); door([], me); reportPlayerKill(realFoe(ORC)); return me; }, (me) => POW.martialPace({ entity: me }) === N.warRhythm.pct, N.warRhythm.seconds);
   edge('Rallying Cleave', () => { const me = pathFighter('warblade'); POW.martialUsed({ id: 'rallyingCleave', entity: me }); return me; }, (me) => POW.martialBlowPct(me, realFoe(ORC)) === N.rallyingCleave.pct, N.rallyingCleave.seconds);

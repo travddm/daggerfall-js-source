@@ -472,7 +472,7 @@ export const AFFIX_RANGES = Object.freeze({
   leech:     Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),     // % of a landed weapon blow, healed
   thorns:    Object.freeze({ magic: [1, 3], rare: [3, 6], legendary: [6, 10] }),     // back to a foe whose blow lands on you
   focus:     Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),     // % off a spell's magicka
-  slayer:    Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }), // % more weapon damage to one kind of foe
+  slayer:    Object.freeze({ magic: [1, 2], rare: [2, 3], legendary: [3, 4] }), // % more weapon damage to one kind of foe
   // LOOT14: the wardrobe's own
   standing:  Object.freeze({ magic: [2, 3], rare: [3, 5], legendary: [5, 8] }),     // standing with one social group
   warmth:    Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),    // degrees of clothing warmth
@@ -1173,12 +1173,12 @@ export const legendaryById = (id) => allLegendaries().find((l) => l.id === id) ?
  *  lootPowers.js does with it) and its numbers, fixed - a Legendary does not grow. Keyed by the record's id, so the
  *  records keep LR2's own shape; a mod's record may carry its own `power` (powerOf reads both). */
 export const LEGENDARY_POWERS = Object.freeze({
-  wyrmbane: Object.freeze({ name: 'Dragonsbane', kind: 'bane', foes: Object.freeze([34, 40, 16]), pct: 8,
-    brief: '+8% vs dragons and giants', text: 'This weapon deals 8% more damage to dragonlings and giants' }),
-  nightwhisper: Object.freeze({ name: 'Silent Death', kind: 'unaware', pct: 12,
-    brief: '+12% vs unaware foes', text: 'This weapon deals 12% more damage to enemies that have not noticed you' }),
-  graveward: Object.freeze({ name: 'Sanctified', kind: 'sanctified', group: 'undead', pct: 6, heal: 10,
-    brief: 'Undead: +6% damage, kills heal', text: 'This weapon deals 6% more damage to undead. While you wield it, each undead you kill heals you for 10% of your health' }),
+  wyrmbane: Object.freeze({ name: 'Dragonsbane', kind: 'bane', foes: Object.freeze([34, 40, 16]), pct: 6,
+    brief: '+6% vs dragons and giants', text: 'This weapon deals 6% more damage to dragonlings and giants' }),
+  nightwhisper: Object.freeze({ name: 'Silent Death', kind: 'unaware', pct: 9,
+    brief: '+9% vs unaware foes', text: 'This weapon deals 9% more damage to enemies that have not noticed you' }),
+  graveward: Object.freeze({ name: 'Sanctified', kind: 'sanctified', group: 'undead', pct: 5, heal: 10,
+    brief: 'Undead: +5% damage, kills heal', text: 'This weapon deals 5% more damage to undead. While you wield it, each undead you kill heals you for 10% of your health' }),
   stormcaller: Object.freeze({ name: 'Chain Lightning', kind: 'chain', metres: 6, share: 50,
     brief: 'Arrows jump 50% to a nearby foe', text: 'Each arrow that hits jumps to the nearest other enemy within 6 m, dealing 50% of its damage as shock' }),
   'anseis-edge': Object.freeze({ name: 'Way of the Sword', kind: 'flow', pct: 1, max: 5, seconds: 6,
@@ -1187,12 +1187,12 @@ export const LEGENDARY_POWERS = Object.freeze({
     brief: '+8 poison, x2 under half', text: 'Each hit adds 8 poison damage, doubled against enemies below half health. Enemies that resist poison take half, and immune ones take none' }),
   'orsiniums-anvil': Object.freeze({ name: 'Earthshaker', kind: 'quake', metres: 3, share: 25,
     brief: 'Hits splash 25% within 3 m', text: 'Each hit also deals 25% of its damage to every other enemy within 3 m' }),
-  'glenmoril-bow': Object.freeze({ name: "Hunter's Moon", kind: 'moon', pct: 6, beast: 6,
-    brief: 'At night: +6%, +12% vs animals', text: 'At night this weapon deals 6% more damage, or 12% more to animals' }),
+  'glenmoril-bow': Object.freeze({ name: "Hunter's Moon", kind: 'moon', pct: 4, beast: 4,
+    brief: 'At night: +4%, +8% vs animals', text: 'At night this weapon deals 4% more damage, or 8% more to animals' }),
   'direnni-staff': Object.freeze({ name: 'Arcane Conduit', kind: 'conduit', less: 20, mana: 3,
     brief: '-20% spell cost; hits give 3 MP', text: 'While you wield it, your spells cost 20% less magicka and each hit restores 3 magicka' }),
-  'gortwogs-cleaver': Object.freeze({ name: 'Orc Rage', kind: 'rage', heal: 10, below: 33, pct: 5,
-    brief: 'Kills heal 10%; +5% when low', text: 'While you wield it, each kill heals you for 10% of your health, and below 33% health its hits deal 5% more damage' }),
+  'gortwogs-cleaver': Object.freeze({ name: 'Orc Rage', kind: 'rage', heal: 10, below: 33, pct: 4,
+    brief: 'Kills heal 10%; +4% when low', text: 'While you wield it, each kill heals you for 10% of your health, and below 33% health its hits deal 4% more damage' }),
   'worms-tooth': Object.freeze({ name: 'Soul Siphon', kind: 'siphon', pct: 15,
     brief: 'Kills restore 15% magicka', text: 'While you wield it, each kill restores 15% of your magicka' }),
   'warp-edge': Object.freeze({ name: 'Many Endings', kind: 'echo', chance: 10,
@@ -1215,8 +1215,8 @@ export const LEGENDARY_POWERS = Object.freeze({
     brief: '-1% per hit taken, up to 5', text: 'Each enemy hit on you lowers the damage of later hits by 1% for 6 s, up to 5 times' }),
   'ravens-wings': Object.freeze({ name: "Raven's Evasion", kind: 'evade', chance: 15,
     brief: '15% chance to evade a hit', text: 'You have a 15% chance to evade each enemy hit completely' }),
-  'night-mothers-embrace': Object.freeze({ name: "Sweet Mother's Kiss", kind: 'execute', below: 25, pct: 6,
-    brief: '+6% to foes under 25%', text: 'Your weapon deals 6% more damage to enemies below 25% health' }),
+  'night-mothers-embrace': Object.freeze({ name: "Sweet Mother's Kiss", kind: 'execute', below: 25, pct: 5,
+    brief: '+5% to foes under 25%', text: 'Your weapon deals 5% more damage to enemies below 25% health' }),
   'wall-of-daggerfall': Object.freeze({ name: 'Bulwark', kind: 'bulwark', less: 5,
     brief: 'Blows on you: -5 damage', text: 'Each enemy hit on you deals 5 less damage, to a minimum of 1' }),
   foxglove: Object.freeze({ name: "Fortune's Favour", kind: 'fortune', mult: 1.5,
@@ -1229,8 +1229,8 @@ export const LEGENDARY_POWERS = Object.freeze({
     brief: 'Cheat death, heal 25% (180s)', text: 'A hit that would kill you leaves you alive and heals you for 25% of your health. Recovers in 180 s' }),
   'witch-sisters-ring': Object.freeze({ name: 'Hex', kind: 'hex', less: 4, seconds: 8,
     brief: 'Attackers deal 4% less (8s)', text: 'An enemy that hits you is hexed for 8 s and deals 4% less damage to you' }),
-  'duelists-vambrace': Object.freeze({ name: 'First Blood', kind: 'firstblood', pct: 8,
-    brief: '+8% on first hit per foe', text: 'Your first weapon hit on each enemy deals 8% more damage' }),
+  'duelists-vambrace': Object.freeze({ name: 'First Blood', kind: 'firstblood', pct: 6,
+    brief: '+6% on first hit per foe', text: 'Your first weapon hit on each enemy deals 6% more damage' }),
   // BAL7 (Balance-Arc.md section 13): halved - at 2% a round (4% under half) it was the kit's longest life, worth more
   // than any guard (without it the measured kit fell after 21 Ancient Liches, not 47)
   'mark-of-the-hist': Object.freeze({ name: 'Hist-Sap', kind: 'regen', pct: 1, low: 2,

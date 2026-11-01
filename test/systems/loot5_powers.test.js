@@ -75,7 +75,7 @@ test('LOOT5: thirty powers - one a record, named, briefed inside the card\'s 32,
   assert.equal(LR.powerOf('loot5-test-own').name, 'Own', 'a mod\'s record may carry its own');
   const w = legendary('wyrmbane');
   const lines = LR.rarityLines(w);
-  assert.ok(lines.includes('Dragonsbane: +8% vs dragons and giants'), 'the card says it');
+  assert.ok(lines.includes('Dragonsbane: +6% vs dragons and giants'), 'the card says it');
   assert.equal(lines.at(-1), LR.legendaryById('wyrmbane').lore, 'the lore still last');
 });
 
@@ -89,7 +89,7 @@ test('LOOT5: who - my worn pieces, one count a power, a weapon\'s on its own blo
   assert.equal(LP.wornPowers(me).length, 1, 'a power counts once');
   assert.deepEqual(LP.wornPowers({ ...me, peer: true }), [], 'never a peer');
   const zombie = foe(17);
-  assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: true }), 112, 'Silent Death on its own blow');
+  assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: true }), 109, 'Silent Death on its own blow');
   assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: false }), 100, 'a foe that has noticed me: nothing');
   const other = createWeapon(116, 0, () => 0.5);
   assert.equal(LP.lootBlow(other, 100, me, zombie, { unaware: true }), 100, 'another weapon\'s blow: not its power');
@@ -109,12 +109,12 @@ test('LOOT5: the blow - bane, unaware, sanctified, venom, moon, rage, execute, f
   fresh();
   const me = player();
   const w = wear(me, legendary('wyrmbane'));
-  assert.equal(LP.lootBlow(w, 100, me, foe(34), {}), 108, 'a dragonling');
-  assert.equal(LP.lootBlow(w, 100, me, foe(16), {}), 108, 'the giant');
+  assert.equal(LP.lootBlow(w, 100, me, foe(34), {}), 106, 'a dragonling');
+  assert.equal(LP.lootBlow(w, 100, me, foe(16), {}), 106, 'the giant');
   assert.equal(LP.lootBlow(w, 100, me, foe(16, { affinity: 'Human' }), {}), 100, 'a class foe whose career index is 16 is no giant');
   const g = legendary('graveward');
   const me2 = player(); wear(me2, g);
-  assert.equal(LP.lootBlow(g, 100, me2, foe(28), {}), 106, 'a vampire is undead');
+  assert.equal(LP.lootBlow(g, 100, me2, foe(28), {}), 105, 'a vampire is undead');
   assert.equal(LP.lootBlow(g, 100, me2, foe(7), {}), 100);
   const t = legendary('tsaesci-fang'); const me3 = player(); wear(me3, t);
   assert.equal(LP.lootBlow(t, 10, me3, foe(7), {}), 18, '8 poison');
@@ -124,19 +124,19 @@ test('LOOT5: the blow - bane, unaware, sanctified, venom, moon, rage, execute, f
   setWorldMinutes(12 * 60);
   assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 100, 'noon: nothing');
   setWorldMinutes(23 * 60);
-  assert.equal(LP.lootBlow(b, 100, me4, foe(7), {}), 106, 'night');
-  assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 112, 'night, and a beast');
+  assert.equal(LP.lootBlow(b, 100, me4, foe(7), {}), 104, 'night');
+  assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 108, 'night, and a beast');
   const c = legendary('gortwogs-cleaver'); const me5 = player(); wear(me5, c);
   assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 100);
   me5.health = 30;
-  assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 105, 'under a third');
+  assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 104, 'under a third');
   const nm = player(); wear(nm, legendary('night-mothers-embrace'));
   const sword = createWeapon(120, 0, () => 0.5);
-  assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 20 }), {}), 106, 'armour\'s power rides any blow: under a quarter');
+  assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 20 }), {}), 105, 'armour\'s power rides any blow: under a quarter');
   assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 30 }), {}), 100);
   const dv = player(); wear(dv, legendary('duelists-vambrace'));
   const orc = foe(7);
-  assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 108, 'First Blood');
+  assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 106, 'First Blood');
   LP.lootStrike(dv, orc, 160, sword);
   assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 100, 'once a foe');
   const ae = legendary('anseis-edge'); const fl = player(); wear(fl, ae);

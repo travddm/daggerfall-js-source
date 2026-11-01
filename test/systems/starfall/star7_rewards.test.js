@@ -91,7 +91,7 @@ test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala it
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'starspun'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'spinners-thread', "Spinner's Thread", { poison: [10, 30], agility: [2, 6] }],
-    [4, 'bound-in-silk', 'Bound in Silk', { more: [8, 15] }],
+    [4, 'bound-in-silk', 'Bound in Silk', { more: [6, 10] }],
     [6, 'mephalas-veil', "Mephala's Veil", { rounds: [2, 4], recover: [240, 120] }],
   ]);
   assert.deepEqual([STRAND_HITS, STRAND_SECONDS, VEIL_BELOW], [4, 8, 0.3]);
@@ -100,7 +100,7 @@ test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala it
     assert.ok(b.length <= BRIEF_MAX, `${t.key} at ${st}: "${b}" (${b.length})`);
     assert.ok(!/\S - \S/.test(t.text(tierValues(t, st))), `${t.key}: no dash aside`);
   }
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], 0)), 'Every 4th hit on a foe +8%');
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], 0)), 'Every 4th hit on a foe +6%');
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], SET_STAGE_MAX)), `Under 30%: Chameleon ${4 * ROUND_SECONDS}s`);
   assert.equal(s.tiers[2].text(tierValues(s.tiers[2], 0)), 'When a hit drops you below 30% health, the web hides you. Chameleon for 10 s. Recovers in 240 s');
 });
@@ -182,14 +182,14 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   door({ me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 108, 100, 100, 100, 108], 'every 4th: +8% at Faint');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 106, 100, 100, 100, 106], 'every 4th: +6% at Faint');
   assert.equal(strandsAt(RAT), 0, 'the held blow cut the count');
   swing(e, s, RAT); swing(e, s, RAT);
   assert.equal(swing(e, s, WOLF), 100, 'another foe: its own count');
   assert.equal(strandsAt(RAT), 2, 'the first keeps its own');
   assert.equal(strandCount(), 1, 'the states say the foe struck last');
   assert.equal(swing(e, s, RAT), 100);
-  assert.equal(swing(e, s, RAT), 108, 'its 4th');
+  assert.equal(swing(e, s, RAT), 106, 'its 4th');
   swing(e, s, RAT); swing(e, s, RAT); swing(e, s, RAT);
   at(10 + STRAND_SECONDS + 0.01);
   assert.equal(strandsAt(RAT), 0, 'fallen away past the window');
@@ -203,7 +203,7 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   fresh(); online(40);
   const asc = wearSet(player(), 'starspun', 4, XP[4]);
   door({ me: asc });
-  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 115], 'Ascendant: +15%');
+  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 110], 'Ascendant: +10%');
   fresh(); online(1);
   const three = wearSet(player(), 'starspun', 3);
   door({ me: three });
