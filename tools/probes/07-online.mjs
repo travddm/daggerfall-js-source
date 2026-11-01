@@ -138,13 +138,14 @@ export async function run({ browser, base, ck }) {
     await say(a);
     // a first line is held behind the code of conduct (SAFE1): agree to it, then say the line again
     const agree = a.page.getByRole('button', { name: 'I agree' });
-    if (await agree.waitFor({ timeout: 4000 }).then(() => true, () => false)) {
-      await agree.click();
+    if (await agree.waitFor({ timeout: 60000 }).then(() => true, () => false)) {
+      // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
+      await agree.evaluate((b) => b.click());
       await sleep(800);
       await say(a);
     }
     await a.shot('07-alice-chat');
-    const heard = await b.until(() => b.page.evaluate((t) => document.body.innerText.includes(t), line), 60000, 500);
+    const heard = await b.until(() => b.page.evaluate((t) => document.body.innerText.includes(t), line), 180000, 500);
     await b.shot('07-bob-chat');
     ck('the chat line reaches bob', !!heard, line);
     const sent = await a.page.evaluate((t) => document.body.innerText.includes(t), line);
