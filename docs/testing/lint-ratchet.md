@@ -6,15 +6,15 @@ figure. The record may only fall. The script is `tools/lintRatchet.mjs`; `npm ru
 
 ## The limits
 
-| Check | Limit (target) | Recorded figure, per |
-| --- | --- | --- |
-| `max-lines` | 1,000 lines a file | file: its line count |
-| `max-lines-per-function` | 150 lines a function (IIFEs included) | `file::Function 'name'#n`: its line count. Unnamed functions share one `file::(unnamed)` entry: the sum of their lines |
-| `complexity` | 20 | file: the summed excess over 20 of its functions |
-| `max-depth` | 4 nested blocks | file: the count of blocks nested deeper |
-| `no-unused-vars` | none (`_`-prefixed arguments and caught errors are allowed) | file: the count of reports |
-| `no-unused-private-class-members` | none | file: the count of reports |
-| `ts-check` | every file under `src/` starts with `// @ts-check` | file: `1` for a file without it |
+| Check                             | Limit (target)                                              | Recorded figure, per                                                                                                   |
+| --------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `max-lines`                       | 1,000 lines a file                                          | file: its line count                                                                                                   |
+| `max-lines-per-function`          | 150 lines a function (IIFEs included)                       | `file::Function 'name'#n`: its line count. Unnamed functions share one `file::(unnamed)` entry: the sum of their lines |
+| `complexity`                      | 20                                                          | file: the summed excess over 20 of its functions                                                                       |
+| `max-depth`                       | 4 nested blocks                                             | file: the count of blocks nested deeper                                                                                |
+| `no-unused-vars`                  | none (`_`-prefixed arguments and caught errors are allowed) | file: the count of reports                                                                                             |
+| `no-unused-private-class-members` | none                                                        | file: the count of reports                                                                                             |
+| `ts-check`                        | every file under `src/` starts with `// @ts-check`          | file: `1` for a file without it                                                                                        |
 
 The limits are in `LIMITS` in the script. Blank lines and comments count: the limits cap how much a reader must hold.
 

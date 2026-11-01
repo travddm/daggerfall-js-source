@@ -32,7 +32,10 @@ export const LIMITS = {
 
 const ESLINT_RULES = {
   'max-lines': ['error', { max: LIMITS['max-lines'], skipBlankLines: false, skipComments: false }],
-  'max-lines-per-function': ['error', { max: LIMITS['max-lines-per-function'], skipBlankLines: false, skipComments: false, IIFEs: true }],
+  'max-lines-per-function': [
+    'error',
+    { max: LIMITS['max-lines-per-function'], skipBlankLines: false, skipComments: false, IIFEs: true },
+  ],
   complexity: ['error', { max: LIMITS.complexity }],
   'max-depth': ['error', { max: LIMITS['max-depth'] }],
   'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
@@ -44,7 +47,15 @@ const ESLINT_RULES = {
  * max-lines the file's lines; complexity the summed excess over the limit; max-depth and the unused checks a count
  * of reports; ts-check 1 for a file without the comment.
  */
-export const CHECKS = ['max-lines', 'max-lines-per-function', 'complexity', 'max-depth', 'no-unused-vars', 'no-unused-private-class-members', 'ts-check'];
+export const CHECKS = [
+  'max-lines',
+  'max-lines-per-function',
+  'complexity',
+  'max-depth',
+  'no-unused-vars',
+  'no-unused-private-class-members',
+  'ts-check',
+];
 
 const toPosix = (p) => p.split(sep).join('/');
 
@@ -136,7 +147,9 @@ export function serialize(ratchet) {
 
 /** Compare a measurement to the ratchet: `grown` and `added` fail the check, `fallen` fails it under --strict. */
 export function compare(measured, ratchet) {
-  const grown = [], added = [], fallen = [];
+  const grown = [],
+    added = [],
+    fallen = [];
   for (const c of CHECKS) {
     for (const [k, v] of Object.entries(measured[c])) {
       const was = ratchet[c][k];
@@ -168,9 +181,11 @@ export function updated(measured, ratchet, allowNew) {
 const HOW = {
   'max-lines': (l) => `a file over ${l} lines: split it, or move the new code into a module of its own`,
   'max-lines-per-function': (l) => `a function over ${l} lines: extract the new code into a function of its own`,
-  complexity: (l) => `functions with complexity over ${l} (the figure is the summed excess): split the new branches into functions of their own`,
+  complexity: (l) =>
+    `functions with complexity over ${l} (the figure is the summed excess): split the new branches into functions of their own`,
   'max-depth': (l) => `blocks nested deeper than ${l}`,
-  'no-unused-vars': () => 'an unused variable, import or parameter: remove it, or name an unused parameter with a leading underscore',
+  'no-unused-vars': () =>
+    'an unused variable, import or parameter: remove it, or name an unused parameter with a leading underscore',
   'no-unused-private-class-members': () => 'an unused private class member: remove it',
   'ts-check': () => 'a file under src/ without `// @ts-check` on its first line: add it and run `npm run types`',
 };
@@ -192,7 +207,9 @@ async function main(argv) {
     const left = compare(measured, next);
     const bad = [...left.grown, ...left.added];
     if (bad.length) {
-      console.error(`lint ratchet: ${bad.length} figure(s) are over what the ratchet may record; --allow-new records them:`);
+      console.error(
+        `lint ratchet: ${bad.length} figure(s) are over what the ratchet may record; --allow-new records them:`,
+      );
       for (const c of bad) console.error(describe(c));
       return 1;
     }
@@ -208,12 +225,17 @@ async function main(argv) {
     if (failures.length > 50) console.error(`  ... and ${failures.length - 50} more`);
   }
   if (strict && fallen.length) {
-    console.error(`lint ratchet: ${fallen.length} recorded figure(s) have fallen; run \`npm run lint:ratchet -- --update\` and commit tools/lintRatchet.json:`);
+    console.error(
+      `lint ratchet: ${fallen.length} recorded figure(s) have fallen; run \`npm run lint:ratchet -- --update\` and commit tools/lintRatchet.json:`,
+    );
     for (const c of fallen.slice(0, 50)) console.error(`  ${c.check}: ${c.key} (${c.was} -> ${c.now})`);
     if (fallen.length > 50) console.error(`  ... and ${fallen.length - 50} more`);
   }
   if (failures.length || (strict && fallen.length)) return 1;
-  if (fallen.length) console.log(`lint ratchet: ok; ${fallen.length} figure(s) have fallen - \`npm run lint:ratchet -- --update\` records them`);
+  if (fallen.length)
+    console.log(
+      `lint ratchet: ok; ${fallen.length} figure(s) have fallen - \`npm run lint:ratchet -- --update\` records them`,
+    );
   return 0;
 }
 
@@ -228,5 +250,11 @@ function report(measured) {
 }
 
 if (isMain(import.meta.url)) {
-  main(process.argv.slice(2)).then((code) => process.exit(code), (e) => { console.error(e); process.exit(2); });
+  main(process.argv.slice(2)).then(
+    (code) => process.exit(code),
+    (e) => {
+      console.error(e);
+      process.exit(2);
+    },
+  );
 }

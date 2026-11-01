@@ -10,10 +10,22 @@ const with_ = (check, entries) => ({ ...empty(), [check]: entries });
 
 test('LINT-RATCHET: a recorded figure that grows, and a new offender, fail; one that falls only shows as fallen', () => {
   const ratchet = with_('max-lines', { 'src/a.js': 2000, 'src/b.js': 1500 });
-  const { grown, added, fallen } = compare(with_('max-lines', { 'src/a.js': 2001, 'src/b.js': 1400, 'src/c.js': 1001 }), ratchet);
-  assert.deepEqual(grown.map((g) => g.key), ['src/a.js']);
-  assert.deepEqual(added.map((g) => g.key), ['src/c.js']);
-  assert.deepEqual(fallen.map((g) => g.key), ['src/b.js']);
+  const { grown, added, fallen } = compare(
+    with_('max-lines', { 'src/a.js': 2001, 'src/b.js': 1400, 'src/c.js': 1001 }),
+    ratchet,
+  );
+  assert.deepEqual(
+    grown.map((g) => g.key),
+    ['src/a.js'],
+  );
+  assert.deepEqual(
+    added.map((g) => g.key),
+    ['src/c.js'],
+  );
+  assert.deepEqual(
+    fallen.map((g) => g.key),
+    ['src/b.js'],
+  );
 });
 
 test('LINT-RATCHET: a file that left the offenders (or was deleted) is fallen to zero', () => {
