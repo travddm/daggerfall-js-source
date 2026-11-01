@@ -27,6 +27,8 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
+/** The schema's own text for one index, table or trigger, as the database holds it. */
+const schemaSql = (db, name) => db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name)?.sql ?? '';
 function d1() {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys = ON');
@@ -91,8 +93,7 @@ test('INT8 the record: a duel\'s receipt is ONE row naming its winner - the winn
   // an account that is gone takes its duels with it (both ends cascade)
   db._raw.prepare('DELETE FROM players WHERE id = ?').run(E.id);
   assert.deepEqual(await duelRecordOf({ db }, D.id), { wins: 0, losses: 0 });
-  assert.match(src('server-account/migrations/0008_duels.sql'), /THERE ARE NO COUNTER COLUMNS/);
-  assert.match(src('server-account/migrations/0104_referee.sql'), /CREATE UNIQUE INDEX IF NOT EXISTS idx_duel_rk ON duel_results \(rk\) WHERE rk IS NOT NULL;/, 'once, by the bout\'s id');
+  assert.match(schemaSql(db, 'idx_duel_rk'), /CREATE UNIQUE INDEX idx_duel_rk ON duel_results \(rk\) WHERE rk IS NOT NULL/, 'once, by the bout\'s id');
 });
 
 test('AUDIT DUEL1 A1 - INT8: a record is between two REGISTERED accounts - a guest\'s bout is fought, not counted; one winner counts DUEL_WINNER_DAY_MAX a day from anyone (mutants: guests counted; the winner bound unread)', async () => {
@@ -109,7 +110,7 @@ test('AUDIT DUEL1 A1 - INT8: a record is between two REGISTERED accounts - a gue
   assert.equal(counted, DUEL_WINNER_DAY_MAX, 'one winner counts DUEL_WINNER_DAY_MAX a day, from anyone');
   assert.equal(last.why, 'winner');
   assert.deepEqual(await duelRecordOf({ db }, N.id), { wins: DUEL_WINNER_DAY_MAX, losses: 0 });
-  assert.match(src('server-account/migrations/0008_duels.sql'), /idx_duel_winner ON duel_results \(winner, at\)/, 'the winner bound reads its own index');
+  assert.match(schemaSql(db, 'idx_duel_winner'), /idx_duel_winner ON duel_results \(winner, at\)/, 'the winner bound reads its own index');
 });
 
 async function stand() {

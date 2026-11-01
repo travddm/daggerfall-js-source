@@ -253,7 +253,7 @@ test('ARENA4 the driver on a relay\'s ladder bout: the relay\'s fighter stood as
 test('ARENA4 the host\'s glue: the window queues in the hall, a call sends me to the sand on my side, my `in` is said once I stand in the bout\'s room (a ladder\'s with its tier, its bout, my level and my health), its receipt carried, my blows claimed (mutants: the `in` before the room; the rival\'s side as the first\'s; the receipt dropped; the ladder\'s step lost from its `in`)', async () => {
   const hallSent = [], boutSent = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const asked = [], entered = [], claimed = [];
   const bouts = { ask: (p) => asked.push(p), relayWord: () => true, dismiss() {}, holds: () => false };
   const board = { me: { ladder: arenaLadderOf([{ tier: 0, bout: 0 }]) } };

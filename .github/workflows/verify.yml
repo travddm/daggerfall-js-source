@@ -137,6 +137,8 @@ jobs:
           path: tools/testTimes.json
           key: ${{ needs.times.outputs.key }}
           fail-on-cache-miss: true
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
       - name: Test shard ${{ matrix.shard }} of 8
         run: node tools/testShards.mjs ${{ matrix.shard }}/8 --record "$RUNNER_TEMP/test-times.json"
       - name: Keep this shard's times
@@ -171,5 +173,7 @@ jobs:
       - name: Install dependencies
         if: steps.deps.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
       - name: Build
         run: npm run build

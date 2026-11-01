@@ -1,7 +1,7 @@
 # Staff roles
 
 Admin, Moderator and Owner belong to **accounts**. They are columns of the account's row in `players`
-(`staff_admin`, `staff_mod`, `staff_owner`; migration `0191`), not handle lists. A handle is free to whoever registers it
+(`staff_admin`, `staff_mod`, `staff_owner`; migration `0002`), not handle lists. A handle is free to whoever registers it
 first, so a role keyed on a name would pass to a stranger. No variable in `server-account/wrangler.toml` names a role.
 
 | Role | Can do | Set by |

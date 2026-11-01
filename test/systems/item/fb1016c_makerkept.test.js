@@ -10,7 +10,6 @@
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { itemFindings, lawfulItem, ITEM_LAW_VERSION } from '../../../src/systems/item/itemLaw.js';
 import { mintAetheric, REGALIA, RAID_SET_PIECES, SERPENT_SET_PIECES, NUMIDIUM_SET_PIECES } from '../../../src/systems/aetheric.js';
 import { applyEnchantments, itemMakerRefuses } from '../../../src/systems/enchanting.js';
@@ -78,11 +77,4 @@ test('MAKER-KEPT: what the law caught it still catches - a row no maker laid, th
   const thin = enchanted(plate, [enchantmentSettings('FeatherWeight', -1)]);
   const pauldron = enchanted(RAID_SET_PIECES.find((r) => r.id === 'oath-right-pauldron'), [enchantmentSettings('FeatherWeight', -1)]);
   assert.deepEqual([itemFindings(thin), itemFindings(pauldron)], [[], ['enchantments']], 'the maker\'s budget: 100 on Ruhn\'s plate fits, on a raider\'s pauldron (50) it does not');
-});
-
-test('MAKER-KEPT: migration 0123 reads the era\'s templates - exactly the templates its records stand on (mutant: a template dropped)', () => {
-  const sql = readFileSync(new URL('../../../server-account/migrations/0123_maker_kept.sql', import.meta.url), 'utf8');
-  const lists = [...sql.matchAll(/'\$\.t'\) IN \(([\d, ]+)\)/g)].map((m) => m[1].split(',').map(Number));
-  const want = [...new Set([...REGALIA, ...RAID_SET_PIECES].map((r) => r.templateIndex))].sort((a, b) => a - b);
-  assert.deepEqual(lists, [want, want], 'the lift\'s two statements, the same templates');
 });

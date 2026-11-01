@@ -20,7 +20,7 @@ import {
   LEVELING_FACE_ID, LEVELING_FACE_TEXT, levelingFaceOwner, releaseLevelingFace, _setLevelingFaceClockForTests,
 } from '../../src/ui/enhanced/enhancedLevelingChoice.js';
 import { _frameForTests, DRAW_FRAMES_UNDRAWN } from '../../src/ui/drawWatchdog.js';
-import { crossLeveling, LEVELING_CROSS_LINE, applyCustoms, customsLines } from '../../src/systems/realmCustoms.js';
+import { crossLeveling, LEVELING_SWITCHED_LINE } from '../../src/systems/realmLeveling.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const FONT = { fnt: { fixedHeight: 9, fixedWidth: 4, glyphWidth: () => 4 }, tex: 'tex:font', cols: 16, rows: 16, cw: 8, ch: 8 };
@@ -190,7 +190,7 @@ test('LEVEL-PLUS: the Plus sheet dresses the face, and a phone stacks the tiles'
   assert.match(css, /\.lvl-opts \{ display: grid; grid-template-columns: repeat\(auto-fit, minmax\(240px, 1fr\)\);/);
 });
 
-test('LEVEL-ONLINE-2: a character brought online is a NEW online character - it crosses onto Daggerfall\'s leveling at the start of its level, and is told first', () => {
+test('LEVEL-ONLINE-2: crossLeveling puts an Oblivion-levelling character onto Daggerfall\'s leveling at the start of its level', () => {
   // an Oblivion character switches: the bar dropped, the sum re-anchored so Daggerfall's law reads the level it has
   const virtue = { levelingSystem: LEVELING_VIRTUE, levelProgress: 40, levelRollUp: 3, level: 9, startingLevelUpSkillSum: 180, currentLevelUpSkillSum: 400 };
   assert.equal(crossLeveling(virtue), true);
@@ -215,13 +215,6 @@ test('LEVEL-ONLINE-2: a character brought online is a NEW online character - it 
     assert.equal(crossLeveling(snap), false);
     assert.deepEqual(snap, before);
   }
-  // customs' own report stays the gold and the deeds - the door says the leveling line itself, first
-  const snap = { level: 1, classicMinutes: 7, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [] };
-  assert.ok(!customsLines(applyCustoms(snap), { before: true }).includes(LEVELING_CROSS_LINE.before));
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const leveling = crossLeveling\(trial\);[^\n]*\n\s+const preview = \[\.\.\.\(leveling \? \[LEVELING_CROSS_LINE\.before\] : \[\]\), /, 'the Bring online question says it first');
-  assert.match(menu, /const leveling = crossLeveling\(copy\);[^\n]*\n\s+const report = applyCustoms\(copy\);/, 'customs switches the realm\'s COPY - the offline character keeps its own');
-  assert.match(menu, /lines: \[\.\.\.\(leveling \? \[LEVELING_CROSS_LINE\.after\] : \[\]\), \.\.\.customsLines\(report\)\]/, 'and the report after says it happened');
 });
 
 test('LEVEL-ONLINE-3: an Oblivion character already online is switched at its realm boot, before the save is restored, and told', () => {
@@ -230,8 +223,8 @@ test('LEVEL-ONLINE-3: an Oblivion character already online is switched at its re
   assert.ok(at > 0, 'the realm boot runs the crossing on the joined save');
   assert.ok(at > world.indexOf('if (realmBoot) { bootSnapRead = realmBoot.snap; realmBoot.snap = null; }'), 'on the one parse');
   assert.ok(at < world.indexOf('const empireFolded = realmBoot ? foldEmpireAccounts(bootSnapRead) : null;'), 'beside the boot\'s other realm laws, before the restore');
-  assert.match(world, /if \(releveled\) townTalk\.say\(LEVELING_CROSS_LINE\.switched\);/, 'and says it once the world stands');
-  assert.ok(LEVELING_CROSS_LINE.switched.includes('the classic way'));
+  assert.match(world, /if \(releveled\) townTalk\.say\(LEVELING_SWITCHED_LINE\);/, 'and says it once the world stands');
+  assert.ok(LEVELING_SWITCHED_LINE.includes('the classic way'));
   // a second boot of the switched save changes nothing
   const snap = { levelingSystem: LEVELING_VIRTUE, level: 6, startingLevelUpSkillSum: 50, currentLevelUpSkillSum: 300, levelProgress: 70 };
   assert.equal(crossLeveling(snap), true);

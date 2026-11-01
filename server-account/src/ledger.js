@@ -74,7 +74,7 @@ export const LEDGER_KEYS_MAX = 6000;
 /** STAFF-PANEL3-REALM (design doc weak spots, "Items, census and economy": "Staff-taken ids keep a 'seized' state, so a
  *  save that shows one again is charged as a copy"): an `escrow` row's `char_id` when staff took the piece (staffRealm.js
  *  - off the market, or out of a save) - in the service's hands, as escrow is, and no record's. No realm id is shaped
- *  like it (realm.js REALM_ID_RE), and 0096's CHECK on `state` stands as it is. Put back hands the row back - to the
+ *  like it (realm.js REALM_ID_RE), and the CHECK on `state` stands as it is. Put back hands the row back - to the
  *  market's hands, or to the record it was taken from (staffRealm.js evidence/return). */
 export const SEIZED = 'seized';
 
@@ -234,12 +234,12 @@ export async function ledgerStep(db, at, pieces, known = null) {
 }
 
 /** RPT1026-LEDGERLAW: THE ACCOUNT A CRAFTED PIECE'S RECORD NAMES, over `products` `p`: the one the service last handed it to
- *  (ledgerMoves - `handed_to`, migration 0178), or its owner where none came since the owner's (a market sale, an auction,
+ *  (ledgerMoves - `handed_to`), or its owner where none came since the owner's (a market sale, an auction,
  *  a commission clears it). */
 const CRAFT_RECORD_SQL = 'COALESCE(p.handed_to, p.owner)';
 
 /** @typedef {{ first: string | null, firstAt: number | null, claimant: string | null, claimAt: number | null, fp: string | null }} CopyWho */
-/** Copies written down: `keys`, each a copy `char` holds - STAFF-PANEL4-CENSUS: found as `kind` (migration 0154), and
+/** Copies written down: `keys`, each a copy `char` holds - STAFF-PANEL4-CENSUS: found as `kind`, and
  *  `whoOf(key)` the record the ledger had holding it first and the one that claimed it, each with its time, and its print. */
 const copyRows = (/** @type {any} */ db, /** @type {string[]} */ keys, /** @type {string} */ char, /** @type {number} */ nowS,
   /** @type {string | null} */ kind = null, /** @type {(k: string) => CopyWho | null} */ whoOf = () => null) =>

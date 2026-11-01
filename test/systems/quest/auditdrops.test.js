@@ -14,7 +14,7 @@ import { QuestMachine } from '../../../src/systems/quest/machine.js';
 import { loadQuestTables } from '../../../src/systems/quest/tables.js';
 import { receiveSharedQuest, prepareQuestShare, shapeMismatch, takeLocalItems, SHARE_REFUSAL_TEXT } from '../../../src/systems/quest/questShare.js';
 import { createTradeManager, TradeSession } from '../../../src/net/tradeSession.js';
-import { validTradeData, validPose, parseClient, relaySupportsTrade, questShareGate, questInGate, QUEST_HUB_MIN_MS, QUEST_SEND_MS, QUEST_FRAME_MAX, TRADE_FRAME_MAX, TRADE_ROOM_BYTES_PER_S, TRADE_HZ_MAX, RELAY_VERSION, inRange } from '../../../src/net/wire.js';
+import { validTradeData, validPose, parseClient, questShareGate, questInGate, QUEST_HUB_MIN_MS, QUEST_SEND_MS, QUEST_FRAME_MAX, TRADE_FRAME_MAX, TRADE_ROOM_BYTES_PER_S, TRADE_HZ_MAX, inRange } from '../../../src/net/wire.js';
 import { createTradePack } from '../../../src/systems/tradePack.js';
 import { RemotePlayers } from '../../../src/net/remotePlayers.js';
 import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
@@ -291,14 +291,13 @@ test('AUDIT DROPS E6: a swing sounds as the weapon IN HAND - the right-hand slot
 
 // ── F. the drop laws no pin held ────────────────────────────────────
 
-test('AUDIT DROPS F: the pose\'s fk is clamped 0-5, the quest frame has its own cap at the door, relaySupportsTrade reads the welcome\'s number, the real pack reserves and restores exactly, and the seat\'s reason has ONE home', () => {
+test('AUDIT DROPS F: the pose\'s fk is clamped 0-5, the quest frame has its own cap at the door, the real pack reserves and restores exactly, and the seat\'s reason has ONE home', () => {
   const base = { x: 1, y: 2, z: 3, yaw: 0.5, pitch: 0.1, mv: 1 };
   assert.equal(validPose({ ...base, fk: 3 }).fk, 3); assert.equal(validPose({ ...base, fk: 9 }).fk, 5); assert.equal(validPose({ ...base, fk: -1 }).fk, 0); assert.equal(validPose({ ...base, fk: 'x' }).fk, 0);
   const quest = (n) => JSON.stringify({ t: 'quest', quest: { questName: '__SH', displayName: 'x', data: { pad: 'x'.repeat(n) } } });
   assert.equal(parseClient(quest(QUEST_FRAME_MAX - 200), { hasHello: true }).t, 'quest', 'under the quest cap: in, though far over MAX_FRAME_BYTES');
   assert.deepEqual(parseClient(quest(QUEST_FRAME_MAX + 1), { hasHello: true }), { error: 'frame too large' });
   assert.deepEqual(parseClient(quest(10), { hasHello: false }), { error: 'quest before hello' });
-  assert.equal(relaySupportsTrade('world90'), false); assert.equal(relaySupportsTrade('world91'), true); assert.equal(relaySupportsTrade(RELAY_VERSION), true); assert.equal(relaySupportsTrade('junk'), false); assert.equal(relaySupportsTrade(null), false);
   assert.ok(JSON.stringify(validTradeData({ to: 'peer-0002', k: 'offer', s: 'abcdef1234', r: 1, g: 0, items: [{ pad: 'x'.repeat(TRADE_FRAME_MAX) }] })) === 'null', 'a trade frame over its cap is no frame');
   // the real pack over a real entity: a split stack, gold, the round trip
   const entity = { items: [{ name: 'Arrow', templateIndex: 131, group: 'Weapons', stackCount: 20 }, { name: 'Ring', templateIndex: 70, group: 'Jewellery', stackCount: 1 }], goldPieces: 100 };

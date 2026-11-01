@@ -298,7 +298,7 @@ test('AUDIT SCALE5a (lens C, pre-existing): a room let go takes its count with i
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1e6, presence: false });
   s.join(CHAT_WORLD_ROOM, null); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600, v: 'world189' });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600 });
   assert.equal(rosterRows(s).total, 600, 'the cut welcome\'s count');
   sockets[0].drop(4000, 'online in another tab, window or device');
   assert.equal(s.roomCount, null, 'superseded: the count goes with the room');

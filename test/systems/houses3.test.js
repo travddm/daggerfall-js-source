@@ -16,18 +16,17 @@ import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-/** Three deeds in Wayrest's region (17), the third come through customs. */
+/** Three deeds in Wayrest's region (17). */
 function wayrest() {
   const houses = createHouses(62);
   for (const key of [10, 20, 30]) allocateHouseToPlayer(houses, 17, { buildingKey: key, mapId: 1017, location: 'Wayrest' });
-  houses[17].more[1].crossed = true;
   return houses;
 }
 
-test('HOUSES-3 the readers past the bank read a region\'s three: the realm\'s gold counts each deed but a crossed one (realmGoldLaw.js deedsOf); the deeds the service holds are each one the realm gave (onlineHomes.js realmDeedsOf); the town map marks each house of the town (townMapMarks.js townHomeRows) (mutants: the first deed alone, at each)', () => {
+test('HOUSES-3 the readers past the bank read a region\'s three: the realm\'s gold counts each deed (realmGoldLaw.js deedsOf); the deeds the service holds are each one the realm gave (onlineHomes.js realmDeedsOf); the town map marks each house of the town (townMapMarks.js townHomeRows) (mutants: the first deed alone, at each)', () => {
   const houses = wayrest();
-  assert.deepEqual(deedsOf({ houses, sceneCache: { scenes: [] } }).map((d) => d.slot.buildingKey), [10, 20], 'every deed of the region, the crossed one none');
-  assert.deepEqual(realmDeedsOf(houses), [{ region: 17, mapId: 1017, buildingKey: 10 }, { region: 17, mapId: 1017, buildingKey: 20 }]);
+  assert.deepEqual(deedsOf({ houses, sceneCache: { scenes: [] } }).map((d) => d.slot.buildingKey), [10, 20, 30], 'every deed of the region');
+  assert.deepEqual(realmDeedsOf(houses), [{ region: 17, mapId: 1017, buildingKey: 10 }, { region: 17, mapId: 1017, buildingKey: 20 }, { region: 17, mapId: 1017, buildingKey: 30 }]);
   const rows = townHomeRows({ buildings: [{ buildingKey: 10 }, { buildingKey: 20 }, { buildingKey: 30 }, { buildingKey: 40 }], mapId: 1017, regionIndex: 17, houses });
   assert.deepEqual(rows.map((r) => [r.buildingKey, r.own]), [[10, true], [20, true], [30, true]], 'each of the town\'s three, a stranger\'s none');
   assert.deepEqual(townHomeRows({ buildings: [{ buildingKey: 10 }], mapId: 2017, regionIndex: 17, houses }), [], 'another town of the region: none');

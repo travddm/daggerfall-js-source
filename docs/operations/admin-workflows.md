@@ -18,8 +18,8 @@ awards, messages, and load readings. Run them from the repository's Actions tab,
 
 ## Repairs that rewind the database
 
-`realm-restore.yml` and `realm-revive.yml` read the past through D1 Time Travel. D1 can read its past only by
-restoring the whole database in place, so these workflows:
+`realm-revive.yml` reads the past through D1 Time Travel. D1 can read its past only by
+restoring the whole database in place, so this workflow:
 
 1. Hold the account service for maintenance: deploy it with `--var MAINTENANCE:1`. Every route except `/v1/health`
    and `/v1/pubkey` answers 503, and a playing client's checkpoint waits. Any write during the rewind would be lost.
@@ -37,7 +37,6 @@ finds the account and character before it holds anything, so a run that finds no
 
 | Workflow | Inputs | What it repairs | Tool |
 | --- | --- | --- | --- |
-| `realm-restore.yml` | `before` (RFC 3339, UTC), `apply` | Homes, decor, guild places and renown tracks that rows deleted since `before` took with them. It lists what each account gets back, what is held for a person to decide, and what another player holds now. Its default `before` and its table list were written for one past incident; check both before reuse. | `tools/realmRestore.mjs` (`test/net/realm_restore.test.js`) |
 | `realm-revive.yml` | `handle`, `character` (`r` + 20 hex, when several fell), `keep_homes`, `keep_guild`, `apply` | Undoes one realm character's death: guild seat, homes, held pieces, union. The death is stamped as taken back (`src/systems/legacy/revived.js`), so a device with an old copy cannot kill the character again. Needs a game build and account service that carry that rule. | `tools/reviveRealmCharacter.mjs` |
 
 ## Repairs without a rewind
@@ -75,5 +74,5 @@ A player who lost both the password and every recovery code has no self-service 
 - Default to a dry run, and write the plan to `$GITHUB_STEP_SUMMARY`.
 - Pass inputs through `env:`, and validate them in the tool.
 - Give it its own `concurrency` group with `cancel-in-progress: false`.
-- If it must read the past, copy the hold-and-rewind steps of `realm-restore.yml` exactly, including the step that
+- If it must read the past, copy the hold-and-rewind steps of `realm-revive.yml` exactly, including the step that
   puts the present back and the refusal to lift maintenance over a rewound database.

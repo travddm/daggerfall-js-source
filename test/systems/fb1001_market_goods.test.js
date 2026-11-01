@@ -12,8 +12,7 @@
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
 
 import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { seatRealm, layRecord } from '../realmSeat.mjs';
@@ -295,34 +294,6 @@ test('MARKET-ANY service: cancelled, expired or removed, the piece comes back to
   assert.equal((await s.collect(eve, l3.id)).status, 200);
   assert.equal(s.record(eve).save.items.length, 2, 'both pieces home, none twice');
   assert.equal(s.open(eve), 0);
-});
-
-test('MARKET-ANY migration: a listing, a sale and a delivery learn the pack\'s kind - every row, every report and every index kept (mutants: the reports lost; an index dropped)', () => {
-  const dir = new URL('../../server-account/migrations/', import.meta.url);
-  const files = readdirSync(dir).filter((f) => f.endsWith('.sql')).sort();
-  const db = new DatabaseSync(':memory:');
-  db.exec('PRAGMA foreign_keys = ON');
-  for (const f of files.filter((f) => f < '0044')) db.exec(readFileSync(new URL(f, dir), 'utf8'));
-  const cols = db.prepare('PRAGMA table_info(players)').all().filter((c) => c.name === 'id' || (c.notnull && c.dflt_value == null));
-  for (const id of ['p1', 'p2']) db.prepare(`INSERT INTO players (${cols.map((c) => c.name).join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...cols.map((c) => (c.name === 'id' ? id : c.type === 'INTEGER' ? 1 : `${c.name}-${id}`)));
-  db.exec(`INSERT INTO market_listings (id, seller, char_id, region, kind, material, units, own, price, fee, at, expires_at, rid, n) VALUES ('L1','p1','c1',17,'material','ore:iron',5,5,3,1,10,20,'r1','n1')`);
-  db.exec(`INSERT INTO market_listings (id, seller, char_id, region, kind, provenance, units, own, price, wear, fee, at, expires_at, rid, n) VALUES ('L2','p1','c1',17,'piece','0123456789abcdef',1,1,30,900,1,10,20,'r2','n2')`);
-  db.exec("INSERT INTO market_reports (listing, reporter, at) VALUES ('L1','p2',5), ('L2','p2',6)");
-  db.exec(`INSERT INTO market_sales (buyer, rid, char_id, listing, seller, kind, provenance, units, price, total, tax, from_region, to_region, arrives_at, at, day, n) VALUES ('p2','s1','c2','L2','p1','piece','0123456789abcdef',1,30,30,1,17,17,10,10,1,'n')`);
-  db.exec(`INSERT INTO market_deliveries (id, player, char_id, provenance, wear, why, arrives_at, at) VALUES ('D1','p2','c2','0123456789abcdef',900,'bought',10,10)`);
-  const tables = ['market_listings', 'market_reports', 'market_sales', 'market_deliveries'];
-  const rows = (t) => JSON.stringify(db.prepare(`SELECT * FROM ${t} ORDER BY 1`).all().map((r) => { const o = { ...r }; delete o.item; return o; }));
-  const indexes = () => db.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND name NOT LIKE 'sqlite_%' AND tbl_name IN ('market_listings', 'market_sales', 'market_deliveries', 'market_reports') ORDER BY name").all().map((r) => r.name);
-  const was = Object.fromEntries(tables.map((t) => [t, rows(t)]));
-  const idx = indexes();
-  db.exec(readFileSync(new URL('0044_market_goods.sql', dir), 'utf8'));
-  for (const t of tables) assert.equal(rows(t), was[t], `${t} kept`);
-  assert.deepEqual(indexes(), idx, 'every index made again');
-  assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(), []);
-  // the pack's kind: gold alone, its record whole
-  db.exec(`INSERT INTO market_listings (id, seller, char_id, region, kind, units, own, price, fee, at, expires_at, rid, n, currency, item) VALUES ('L3','p1','c1',17,'item',1,1,30,1,10,20,'r3','n3','gold','{}')`);
-  assert.throws(() => db.exec(`INSERT INTO market_listings (id, seller, char_id, region, kind, units, own, price, fee, at, expires_at, rid, n, currency, item) VALUES ('L4','p1','c1',17,'item',1,1,30,1,10,20,'r4','n4','marks','{}')`), /CHECK/);
-  assert.throws(() => db.exec(`INSERT INTO market_deliveries (id, player, char_id, why, arrives_at, at) VALUES ('D3','p2','c2','bought',10,10)`), /CHECK/);
 });
 
 // ─── THE CLIENT ──────────────────────────────────────────────────────

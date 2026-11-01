@@ -14,12 +14,8 @@
 // Every character carries an id now: minted at chargen (and for a
 // character read out of a classic DOS save), carried on the entity and
 // in the save envelope, written onto the slot card. A save's identity
-// is (characterId, saveName). A card written before this - no id - is
-// ADOPTED the first time its character is loaded: restorePlayer mints
-// the id and stamps every card of that name that has none, so the old
-// player's next QuickSave still overwrites their own slot and never a
-// new character's. A new character never matches a card without its
-// id, which is the whole fix.
+// is (characterId, saveName). A new character never matches a card
+// without its id, which is the whole fix.
 //
 // The three storage prefixes live here, the one module save.js and
 // saveSlots.js both import without importing each other.
@@ -40,23 +36,4 @@ export function characterIdOf(entity) {
   if (!entity) return null;
   if (typeof entity.characterId !== 'string' || !entity.characterId) entity.characterId = mintCharacterId();
   return entity.characterId;
-}
-
-/**
- * Stamp `characterId` onto every card of `characterName` that carries
- * none - the legacy cards of the character being loaded. Returns the
- * keys stamped. A card that will not parse is left alone.
- */
-export function adoptLegacyCards(storage, characterName, characterId) {
-  const stamped = [];
-  if (!storage || !characterId) return stamped;
-  const keys = [];
-  for (let i = 0; i < storage.length; i++) { const k = storage.key(i); if (k?.startsWith(SAVE_INFO_PREFIX)) keys.push(k); }
-  for (const k of keys) {
-    let info;
-    try { info = JSON.parse(storage.getItem(k) ?? 'null'); } catch { continue; }
-    if (!info || typeof info !== 'object' || info.characterId || (info.characterName ?? '') !== (characterName ?? '')) continue;
-    try { storage.setItem(k, JSON.stringify({ ...info, characterId })); stamped.push(k); } catch { /* quota: the card stays a legacy card and is adopted next time */ }
-  }
-  return stamped;
 }

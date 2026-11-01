@@ -3,7 +3,7 @@
 // sky's calendar, a day every real hour since SKY-SLOW, and a player told "banished for 28 more days" watched twenty-eight
 // days pass on it and was banished as long again. Online the term is thirty sky days, stamped (as every term) in the event
 // clock's minutes and measured with the sky's own law (AUDIT WAITS B4: exact across a change of the sky's rate), its days
-// said in the sky's and its length in real time; the doors between the lanes carry the days the player was told (AUDIT
+// said in the sky's and its length in real time; the offline copy carries the days the player was told (AUDIT
 // WAITS B1); offline DFU's one clock, REP3's term whole.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,7 +15,7 @@ import { createRegionConditions, snapshotRegionConditions } from '../../src/syst
 import { setSharedClock, worldSpanRealWords } from '../../src/systems/worldTick.js';
 import { sharedClassicMinutes, wallMsForClassicMinutes } from '../../src/net/wire.js';
 import { skyClassicMinutes, wallMsForSkyMinutes, SKY_SEGMENTS } from '../../src/net/skyLaw.js';
-import { offlineCopyOf, onlineCopyOf } from '../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../src/systems/offlineCopy.js';
 import { buildDonationFlow } from '../../src/ui/guildServiceWindows.js';
 import { lawRows } from '../../src/ui/enhanced/enhancedMenu.js';
 
@@ -130,7 +130,7 @@ test('BANISH-SKY: the temple says the calendar\'s days and, online, what they ar
   assert.equal(lawRows(q, 1000)[0].note, `banished, 30 days left (a pardon: ${PARDON_BASE_PRICE} gold)`);
 });
 
-test('BANISH-SKY (AUDIT WAITS B1): the doors between the lanes carry the days the player was told - an online banishment goes offline with its sky days left as days of the one clock, an offline one comes online with its days left as the sky\'s; an unstamped term stays unstamped', () => {
+test('BANISH-SKY (AUDIT WAITS B1): the offline copy carries the days the player was told - an online banishment goes offline with its sky days left as days of the one clock; an unstamped term stays unstamped', () => {
   const t = Date.UTC(2026, 9, 7, 12, 0, 0);
   const W = Math.floor(sharedClassicMinutes(t));
   const p = citizen();
@@ -141,12 +141,6 @@ test('BANISH-SKY (AUDIT WAITS B1): the doors between the lanes carry the days th
   const onlineSave = { classicMinutes: own, worldMinutes: W, regionConditions: snapshotRegionConditions(p.regionConditions) };
   const off = offlineCopyOf(onlineSave);
   assert.ok(Math.abs(off.regionConditions[4].b - (own + 30 * 1440)) < 1e-6, 'thirty days of the one clock offline - it read 215 before the door moved it');
-  // and the other way: twenty days left offline come online as twenty of the sky's
-  const offlineSave = { classicMinutes: 1_000_000, regionConditions: [...snapshotRegionConditions(createRegionConditions())] };
-  offlineSave.regionConditions[4] = { ...offlineSave.regionConditions[4], s: 1, b: 1_000_000 + 20 * 1440 };
-  const on = onlineCopyOf(offlineSave, W);
-  const back = skyClassicMinutes(wallMsForClassicMinutes(on.regionConditions[4].b)) - skyClassicMinutes(wallMsForClassicMinutes(W));
-  assert.ok(Math.abs(back - 20 * 1440) < 1e-6, 'twenty sky days on from the world\'s minute - it was lifted at the first read before');
   // an unstamped term (AUDIT REP F2) crosses unstamped
   const bare = { classicMinutes: own, worldMinutes: W, regionConditions: [{ v: [], f: '', g: '', p: 0, s: 1, t: 0 }] };
   assert.equal('b' in offlineCopyOf(bare).regionConditions[0], false);

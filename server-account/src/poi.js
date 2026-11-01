@@ -9,7 +9,7 @@
 // approver or an Admin account. A guest is neither. Read fresh at every call,
 // so a handle taken off a list loses the door at its next request.
 //
-// THE FLOW (migration 0116): a builder uploads assets (content-addressed: the bytes' sha256 is the name, checked here) and
+// THE FLOW: a builder uploads assets (content-addressed: the bytes' sha256 is the name, checked here) and
 // saves a DRAFT revision of a POI - one open draft per author per POI, saved over until it is SUBMITTED. An approver
 // APPROVES a submitted revision, as the approver saw it (it becomes the POI's live one, its assets readable by anyone
 // while a live revision names them) or REJECTS it with a word. Taking a POI out of the world is a submitted 'retire'
@@ -33,7 +33,7 @@ import { poiImageMetaOf, POI_IMAGE_LIMITS, POI_IMAGE_TYPES } from '../../src/poi
 import { isDeveloper, isOwner } from './titles.js';
 
 /** What this player may do with POIs - `{ builder, approver }`: an Admin builds, an Owner approves (and builds), both off
- *  the account's role (titles.js, migration 0191) - no name grants either. @param {any} player @param {any} env */
+ *  the account's role (titles.js, migration 0002) - no name grants either. @param {any} player @param {any} env */
 export function poiRolesOf(player, env) {
   const approver = isOwner(player, env);
   const builder = approver || isDeveloper(player, env);

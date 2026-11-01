@@ -1,5 +1,5 @@
 // LEGACY7: PROJECT LEGACY ONLINE, SERVICE SIDE - the REAL Worker over the REAL migrations
-// (test/accountDb.mjs): an account's lines (server-account/src/legacy.js, migration 0084), written only past their rev;
+// (test/accountDb.mjs): an account's lines (server-account/src/legacy.js, `lineages`), written only past their rev;
 // a realm character born as a living member of the account's own line, never one another played; and the tombstone - a
 // fallen character never joined, checkpointed or counted against the roster again.
 import { test } from 'node:test';

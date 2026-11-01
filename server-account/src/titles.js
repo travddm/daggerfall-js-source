@@ -15,7 +15,7 @@
 //             its row's first contact, or (FOUNDER4) the first contact of
 //             a row it shares a character with (`first_played_at`) - or
 //             (FOUNDER5) your handle is in the service's FOUNDER_HANDLES.
-//   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0191) - a column, never a name.
+//   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0002) - a column, never a name.
 //   SPROUT    your account is younger than SPROUT_S.
 //   DEV       the same role as the Developer title.
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
@@ -32,18 +32,18 @@
 //             refereed board, and its laurel, while they hold the top.
 //   GATEBREAKER (WB9g, 2026-09-30) - the ONE grant that is not derived
 //             but recorded: the title the Sigil Broker sells, held because
-//             the account bought it (the row's `insignia`, 0036). A sale is
+//             the account bought it (the row's `insignia`). A sale is
 //             a fact that happened, not a rule a row satisfies - and what
 //             is HELD is still read off the row at every ask, as the rest.
 //   HOURBREAKER (SD9b, 2026-10-07) - recorded the sale's way: a roll off
 //             a Brass Remnant's receipt on its kill's first write
 //             (sds.js claimSd) is a fact that happened, laid on the row
-//             (`sd_honours`, 0087) and held for good.
+//             (`sd_honours`) and held for good.
 //   I LOVE LAMP (LAMP-KEEPER II, 2026-10-14) - recorded the same way: the
 //             account's first word with a lamp keeper (lamp.js claimLamp),
-//             laid on the row (`lamp_title`, 0113) and held for good.
+//             laid on the row (`lamp_title`) and held for good.
 //   THE QUESTLINES' FIVE (QL12, 2026-10-19) - recorded the same way: a
-//             line's title, laid on the row (`ql_titles`, 0133 - a bit a
+//             line's title, laid on the row (`ql_titles` - a bit a
 //             line, questlineClaims.js qlTitleBit) by the claim that found
 //             its last witnessed step (questlines.js claimQl), held for good.
 //   THE MARKS OF MASTERY (HUNTERS-MARK, 2026-10-27) - derived: the hunt's
@@ -107,7 +107,7 @@ import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MAR
  *
  *  FOUNDER4: the SAME instant again, and when the account first
  *  played may now be proven by ANOTHER row - one it shares a character
- *  with (migration 0078 `first_played_at`): a guest in one browser who
+ *  with (`first_played_at`): a guest in one browser who
  *  registered in another place, the desktop app's own storage above all,
  *  first played when that guest did.
  *
@@ -196,7 +196,7 @@ export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'discip
 export const TIER_AURA = Object.freeze({});
 
 /** STAFF-PANEL2-FIX (design doc, Weak spots: "Cutting off a staff member misses most doors" - "A stored suspended flag is
- *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, migration 0156, staff.js
+ *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, staff.js
  *  /v1/staff/cut) holds no staff role while it stands - not a developer, not a moderator, and no title whose glyph opens
  *  the staff's commands (net/staffCommands.js STAFF_GLYPHS) - so the panel, the game's /v1/mod doors, Discord and the
  *  next token's glyphs all read it at once. @param {any} player */
@@ -210,7 +210,7 @@ export const holdsTier = (title, player, env) =>
   && !(staffSuspended(player) && STAFF_GLYPHS.includes(TIER_GLYPH[/** @type {keyof typeof TIER_GLYPH} */ (title)]))
   && (handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase()) || patreonTitlesOf(player, env).includes(title));
 
-/** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0191),
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0002),
  *  never a name's: a handle that a former staff member held grants nothing to whoever registers it. Read off the row at every
  *  ask, so an Admin revoked loses the title, the glyph and the doors on the next token and the next call. A guest holds no
  *  handle and so never is one. `env` is kept for the callers that pass it. */
@@ -218,14 +218,13 @@ export const isDeveloper = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
   && player.staff_admin === 1;
 
-/** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0191),
- *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs, as the lists'
- *  OWNER, REPORT_READER and APPROVER names did. */
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0002),
+ *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs. */
 export const isOwner = (player, env) => isDeveloper(player, env) && player.staff_owner === 1;
 
 /** MOD1: is this player a moderator? A guest cannot be, for the same reason a guest cannot be a developer. The role is
- *  the account's: `staff_mod` (migration 0144), added by an Admin from the staff panel or by the operator - so a rename
- *  keeps it and no registered name earns it. */
+ *  the account's `staff_mod`, added by an Admin from the staff panel or by the operator - so a rename keeps it and no
+ *  registered name earns it. */
 export const isModerator = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
   && player.staff_mod === 1;
@@ -241,10 +240,10 @@ export const canModerate = (player, env) => isModerator(player, env) || isDevelo
  *  name: a player here as a guest since before the cutoff who registered
  *  after it held nothing (Field-Bugs 2026-09-26b, report 3). `created_at`
  *  is stamped at a row's first contact, guest or not, and registering is
- *  an upgrade IN PLACE of that same row (0002), so it is still there. A
+ *  an upgrade IN PLACE of that same row, so it is still there. A
  *  row without one is judged by its registration, as before. FOUNDER4:
  *  AND `first_played_at` - the first contact of a row this one shares a
- *  character with, where it is earlier (migration 0078 says how a
+ *  character with, where it is earlier (founderLink.js says how a
  *  character is shared); a row without one is judged as before. */
 const firstPlayed = (player) => Math.min(
   player.registered_at,
@@ -270,7 +269,7 @@ export function titlesHeld(player, env) {
   if (!held.includes('founder') && isNamedFounder(player, env)) held.push('founder');   // FOUNDER5: or by name
   if (isDeveloper(player, env)) held.push('developer');
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) held.push(t);   // TITLE-N
-  // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row (0037). A
+  // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row. A
   // guest row cannot buy one (accounts.js buyInsignia refuses it), so none is ever read off one.
   for (const t of insigniaKeys(player?.insignia, 'title')) if (!held.includes(t)) held.push(t);
   // SEAT1c (Seats-Arc 7.4): AND A CHARTER'S - "Warden of <Town>", "Protector of <Kingdom>" - derived from the seats the
@@ -387,7 +386,7 @@ export function glyphsOf(player, env, nowS) {
 }
 
 /** GLYPH-WEAR: THE GLYPHS THIS
- *  PLAYER HAS TAKEN OFF - the stored choice (`glyphs_off`, 0068), read against what is true now, so a glyph that has
+ *  PLAYER HAS TAKEN OFF - the stored choice (`glyphs_off`), read against what is true now, so a glyph that has
  *  lapsed is not "hidden" and one granted later shows until it is taken off. In glyphsOf's order. */
 export function glyphsHidden(player, env, nowS) {
   const off = typeof player?.glyphs_off === 'string' ? player.glyphs_off.split(' ') : [];

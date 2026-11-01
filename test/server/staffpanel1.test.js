@@ -380,7 +380,8 @@ test('STAFF-PANEL1 (mob, 12:08Z, a review of the PR: "Audit log reads generate a
   assert.deepEqual(s.raw.prepare("SELECT at FROM staff_audit WHERE act = 'old'").all().map((r) => r.at), [real - STAFF_AUDIT_KEEP_S + 3 * 3600], 'the row past the month gone, the one inside it kept');
   assert.ok(s.raw.prepare('SELECT COUNT(*) AS n FROM staff_audit WHERE act != ?').get('old').n > 10, 'today\'s rows all kept');
   // the trigger's number is the month less an hour for the two clocks
-  assert.match(src('server-account/migrations/0144_staff_panel.sql'), new RegExp(`WHEN OLD\\.at > CAST\\(strftime\\('%s', 'now'\\) AS INTEGER\\) - ${STAFF_AUDIT_KEEP_S - 3600}\\n`));
+  const trigger = s.raw.prepare("SELECT sql FROM sqlite_master WHERE name = 'staff_audit_no_delete'").get()?.sql ?? '';
+  assert.match(trigger, new RegExp(`WHEN OLD\\.at > CAST\\(strftime\\('%s', 'now'\\) AS INTEGER\\) - ${STAFF_AUDIT_KEEP_S - 3600}\\n`));
   assert.equal(STAFF_AUDIT_KEEP_S, 30 * 24 * 3600, 'mob: "only keep for one month"');
 });
 

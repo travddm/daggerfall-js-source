@@ -3,7 +3,7 @@
 // the spell engine's edits, online integrity, the player's surface and its words, and the pins and the record. Every
 // finding the audit fixed is pinned here BY EXECUTION through the producers that mint the shapes in play - the real cast
 // engine (scenes/hostMagic.js createPlayerMagic: its release, its missiles, its doors), real foes (characters/
-// enemyEntity.js makeEnemyEntity over enemyBasics.js), the save (systems/save/save.js), the round (systems/worldTick.js
+// enemyEntity.js makeEnemyEntity over enemyBasics.js), the round (systems/worldTick.js
 // runMagicRoundsFor), the one ask (scenes/shared.js raisePlayerSkills), the classic sheet (ui/charsheet.js CharSheet)
 // and the enhanced pause window (ui/enhanced/enhancedMenu.js) - each number on both sides of its line, and each window just
 // before its end and just after.
@@ -31,7 +31,6 @@ import { setStruck, _resetSetPowersForTests } from '../../src/systems/sigil/sigi
 import { setSigilDueling } from '../../src/systems/sigil/sigil.js';
 import { setPlayerDoor, playerDoor } from '../../src/systems/playerDoor.js';
 import { _resetPlayerHealForTests } from '../../src/systems/playerHeal.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { seedCustomSpellIndex, mintCustomSpellIndex, _resetCustomIndexForTests, READY_MADE_INDEX_CEILING, isReadyMadeSpellIndex } from '../../src/systems/spell/spellMaker.js';
 import { RESURRECTION_SPELL_INDEX } from '../../src/systems/resurrect.js';
 import { SHARED_CARTOGRAPHY_SPELL_INDEX } from '../../src/systems/party/partyMap.js';
@@ -560,20 +559,6 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
 }));
 
 // ── online integrity (lane 3) ───────────────────────────────────────
-
-test('AUDIT SCHOOLS L3 F2: A SAVE AN OLDER BUILD CARRIED KEEPS ITS PATH - no `arcanePath` key, and the book\'s signature spell names one path whose schools are mastered: the path, already asked; two paths\' spells, a school unmastered, or a newer save\'s own `null` restore none (mutants: the witness unread; a `null` read as missing)', () => {
-  const p = pathMage('seer', 150);
-  p.pathPrompted = true;
-  p.spells = [signatureSpell('seer')];
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p)));
-  const { arcanePath: _a, pathPrompted: _b, ...older } = snap;
-  older.career = { ...older.career }; delete older.career.arcaneMirror;
-  const back = (s) => { const e = structuredClone(playerEntity); restorePlayer(e, s); return [e.arcanePath, e.pathPrompted]; };
-  assert.deepEqual(back(older), ['seer', true], 'the book bears witness');
-  assert.deepEqual(back({ ...older, spells: [signatureSpell('seer'), signatureSpell('necromancer')] }), [null, false], 'two paths\' spells');
-  assert.deepEqual(back({ ...older, masteredSkills: [ILL] }), [null, false], 'a school unmastered');
-  assert.deepEqual(back({ ...snap, arcanePath: null, pathPrompted: false }), [null, false], 'a newer save that chose none');
-});
 
 test('AUDIT SCHOOLS L3 F4 / F5 / L5 H5: THE READY-MADE BANDS ARE NOBODY\'S TO MINT, AND THE SIGNATURE RECORDS ARE LITERAL - a book holding Shared Cartography or a signature spell seeds no made spell into their bands; every ready-made index stands at the ceiling or below; each path\'s record (index, name, element, range, icon, every slot\'s numbers) is pinned whole - a bought copy carries its index for good (mutants: the seed steps into the band; the base moved; any slot number moved)', () => {
   _resetCustomIndexForTests();

@@ -1,4 +1,4 @@
-// SERPENT-SET: THE SERVICE'S HALF - a serpent's row says the embers its hoard paid (migration 0083), the insignia's
+// SERPENT-SET: THE SERVICE'S HALF - a serpent's row says the embers its hoard paid (`serpent_kills.stones`), the insignia's
 // purse and its sale count them with a breach's, and a serpent slain strikes its silver under the day's combat cap with
 // the gates and the raids. Driven through the real Worker over node:sqlite with every migration applied
 // (test/accountDb.mjs).; 10.5.
@@ -43,7 +43,7 @@ test('SERPENT-SET the law: a serpent strikes 40 silver, a ship that stood half; 
   assert.equal(SERPENT_EMBERS, 1);
 });
 
-test('SERPENT-SET the claim: a counted serpent\'s row says its embers (SERPENT_EMBERS, dealt or stood); a row from before migration 0083 says none - its hoard paid none (mutants: the embers unwritten; the default)', async () => {
+test('SERPENT-SET the claim: a counted serpent\'s row says its embers (SERPENT_EMBERS, dealt or stood); a row written without them says none - its hoard paid none (mutants: the embers unwritten; the default)', async () => {
   clock(T0);
   const s = await stand();
   const ann = await s.registered('Anna', { character: CH });
@@ -54,7 +54,7 @@ test('SERPENT-SET the claim: a counted serpent\'s row says its embers (SERPENT_E
   assert.deepEqual(rows.map((r) => r.stones), [SERPENT_EMBERS, SERPENT_EMBERS]);
   s.raw.prepare('INSERT INTO serpent_kills (day, account, boss, hull, char_id, xp, nonce, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(DAY - 2, ann.id, 'sethrakul', 4, CH, 0, 'n0', T0);
   assert.equal(s.raw.prepare('SELECT stones FROM serpent_kills WHERE day = ? AND account = ?').get(DAY - 2, ann.id).stones, 0, 'a serpent from before paid no ember');
-  assert.match(src('server-account/migrations/0083_serpent_embers.sql'), /^ALTER TABLE serpent_kills ADD COLUMN stones INTEGER NOT NULL DEFAULT 0;$/m);
+  assert.deepEqual({ ...s.raw.prepare("SELECT type, \"notnull\", dflt_value FROM pragma_table_info('serpent_kills') WHERE name = 'stones'").get() }, { type: 'INTEGER', notnull: 1, dflt_value: '0' });
 });
 
 test('AUDIT 625 P4: a serpent\'s row counts the embers the CLAIM says its build\'s hoard mints (`stones`, at most SERPENT_EMBERS) - a build from before them says none and is counted none, so the purse never holds an ember its pack was never given; the answer says the row\'s embers, as the gate\'s does (AUDIT WB12d A1), a repeat the row\'s own (mutants: the row\'s embers the law\'s whatever the claim says; the bound; the answer silent)', async () => {

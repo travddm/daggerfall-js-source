@@ -15,7 +15,7 @@ import { judgeGate, posAt, posAfter } from '../../src/net/bossRef.js';
 import { COURT_CENTRE, ATTACKS, profileOf, BRAIN_TICK_MS, HIT_KINDS, GATE_FIGHTERS_MAX, healRef } from '../../src/net/gate/gateBrain.js';
 import { gateTimes, gateRoomKey } from '../../src/net/gate/gateLaw.js';
 import {
-  GATE_BRAIN_V, GATE_HZ_MAX, SERPENT_HZ_MAX, SD_FIGHT_HZ, BODY_WORD_HZ_MAX, bodyWordGate, bodyWordRelayGate, RELAY_VERSION, BOSS_REF_RELAY_MIN,
+  GATE_BRAIN_V, GATE_HZ_MAX, SERPENT_HZ_MAX, SD_FIGHT_HZ, BODY_WORD_HZ_MAX, bodyWordGate, bodyWordRelayGate, RELAY_VERSION,
   PIXEL_UNITS, cellRoomOfWire, serpentFightId, worldRoom, CLOSE_REPLACED,
 } from '../../src/net/wire.js';
 import { serpentTimes, serpentSiteKey, SERPENT_BRAIN_V, SERPENT_NATIVE_PER_M } from '../../src/net/serpent/serpentLaw.js';
@@ -129,7 +129,7 @@ test('AUDIT INT15 THE BODY\'S WORD ON A BUCKET OF ITS OWN: BODY_WORD_HZ_MAX a se
   });
 });
 
-test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - sixteen gate frames, and sixteen of the Hour\'s, still go beside four of it - and only to a relay that counts, BY THE SOCKET IT LEAVES ON: a serpent\'s cell on a halo whose relay is older hears none though the primary\'s counts, and one whose relay counts hears it though the primary\'s does not; a halo promoted to primary, and the primary stepped down, each keep their own (mutants: the word on the gate\'s or the Hour\'s bucket; the halo sent on the primary\'s word; the halo\'s own word never kept; either side\'s word lost at the promotion)', () => {
+test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - sixteen gate frames, and sixteen of the Hour\'s, still go beside four of it - and a serpent\'s word down her cell\'s own socket: a halo\'s, never the primary\'s; a halo promoted to primary, and the primary stepped down, each still take it (mutants: the word on the gate\'s or the Hour\'s bucket; the word down the primary)', () => {
   const log = console.info; console.info = () => {};
   try {
     {
@@ -158,24 +158,24 @@ test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - 
     const ON = sat(0, 0);
     const PX = Math.floor(SX / PIXEL_UNITS), PY = 499 - Math.floor(SZ / PIXEL_UNITS);
     const mine = worldRoom(PX + 16, PY);
-    for (const [primary, halo, ok] of [[RELAY_VERSION, `world${BOSS_REF_RELAY_MIN - 1}`, false], [`world${BOSS_REF_RELAY_MIN - 1}`, RELAY_VERSION, true]]) {
+    {
       const { FakeWS, sockets } = fakeSocketClass();
       const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
       s.join(mine, ON);
       sockets[0].open();
-      sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: primary });
+      sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
       s.setHalo([CELL]);
       const h = sockets[1];
       h.open();
-      h.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: halo });
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), ok, `primary ${primary}, halo ${halo}`);
-      assert.equal(h.sent.filter((x) => JSON.parse(x).k === 'vt').length, ok ? 1 : 0, 'down the halo\'s own socket, or none');
+      h.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), true);
+      assert.equal(h.sent.filter((x) => JSON.parse(x).k === 'vt').length, 1, 'down the halo\'s own socket');
       assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).k === 'vt').length, 0, 'never the primary\'s');
-      // her cell crossed into: the halo promoted, the primary stepped down - each socket's word goes with it
+      // her cell crossed into: the halo promoted, the primary stepped down - each socket still takes the word
       s.join(CELL, ON);
       assert.equal(s.room, CELL);
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), ok, 'the promoted socket\'s own relay');
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, mine), !ok, 'the stepped-down socket\'s own relay');
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), true, 'the promoted socket');
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, mine), true, 'the stepped-down socket');
     }
   } finally { console.info = log; }
 });

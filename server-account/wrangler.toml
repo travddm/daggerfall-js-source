@@ -124,7 +124,7 @@ ACCOUNT_VERSION = "acct208"
 # The site that may call this. "*" while nothing is live; it is narrowed
 # to the real origin before a single account exists.
 ALLOWED_ORIGIN = "*"
-# STAFF ROLES (Admin, Owner, Moderator) ARE COLUMNS OF THE ACCOUNT, NOT HANDLE LISTS (server-account/migrations/0191, titles.js,
+# STAFF ROLES (Admin, Owner, Moderator) ARE COLUMNS OF THE ACCOUNT, NOT HANDLE LISTS (server-account/migrations/0002, titles.js,
 # staff.js). This file names no handle that holds a role: a name is free to whoever registers it first, so a name list was a way
 # in to bans, rollbacks and grants. An Owner sets the first Admin and Owner from a machine with deploy access, once:
 # docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, Admins add and

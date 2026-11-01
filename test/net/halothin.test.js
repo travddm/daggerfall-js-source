@@ -75,9 +75,13 @@ function cornerSession() {
   welcome(sockets[0]);
   quiet(() => s.setHalo(halos));
   for (let i = 1; i < sockets.length; i++) welcome(sockets[i]);
+  const haloWs = (room) => s._halo.get(room).ws;
+  // A player far across the last halo keeps the session from being alone, so lone sleep does not hold its poses;
+  // out of range, it leaves the halos thinned.
+  const far = { x: start.x - 5 * PIXEL_UNITS, y: 0, z: start.z, yaw: 0, pitch: 0, mv: 0, ts: 1 };
+  quiet(() => haloWs(halos[2]).receive({ t: 'pose', id: 'far-0001', p: far }));
   for (const ws of sockets) ws.sent.length = 0;
   const poses = (ws) => ws.sent.filter((t) => t.startsWith('{"t":"pose"')).map((t) => JSON.parse(t).p);
-  const haloWs = (room) => s._halo.get(room).ws;
   return { s, sockets, clock, start, halos, poses, haloWs, FakeWS };
 }
 
@@ -102,14 +106,16 @@ test('HALO-THIN the session: my own cell hears every pose; each halo its first, 
   s.sendPose({ ...pose, mv: 0 });
   for (const ws of sockets.slice(1)) { const h = poses(ws); assert.equal(h.length, 6); assert.equal(h[5].mv, 0, 'where I stopped'); }
   // HIBERNATE: standing with nobody anywhere - my cell or a halo - sends no heartbeat
+  quiet(() => sockets[3].receive({ t: 'leave', id: 'far-0001' }));
   clock.t += HEARTBEAT_MS;
   assert.equal(s.sendPose({ ...pose, mv: 0 }), false, 'alone, standing: no heartbeat');
   // standing with a peer in a halo (nobody in my own cell): the heartbeat, through every socket - the halo's player keeps me
   quiet(() => sockets[1].receive({ t: 'join', id: 'ann-0002', name: 'Ann' }));
+  assert.equal(poses(sockets[1]).length, 7, 'the join wakes the lone session: where I stand, at once');
   clock.t += HEARTBEAT_MS;
   s.sendPose({ ...pose, mv: 0 });
   for (const ws of sockets) assert.equal(poses(ws).at(-1).ts, poses(sockets[0]).at(-1).ts, 'the heartbeat, everywhere');
-  assert.equal(poses(sockets[1]).length, 7);
+  assert.equal(poses(sockets[1]).length, 8);
 });
 
 test('HALO-THIN standing and turning: my own cell hears each turn, a halo the place once - the session keeps the stop it sent (AUDIT C3; mutants: the halo\'s last recorded moving)', () => {

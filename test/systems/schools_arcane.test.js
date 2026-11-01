@@ -216,8 +216,7 @@ test('SCHOOLS1 THE SAVE: the path and its one ask round-trip; an id no table hol
   assert.equal(forged.arcanePath, null, 'no such path');
   const old = structuredClone(playerEntity);
   const { arcanePath: _a, pathPrompted: _b, ...before } = snap;
-  before.career = { ...before.career }; delete before.career.arcaneMirror;
-  restorePlayer(old, { ...before, spells: [] });   // and no book to bear witness (an older build's save with one: audit_schools)
+  restorePlayer(old, { ...before, spells: [] });
   assert.equal(old.arcanePath, null, 'a save from before the arc');
   assert.equal(old.pathPrompted, false);
 });

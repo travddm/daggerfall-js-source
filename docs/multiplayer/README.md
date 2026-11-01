@@ -7,7 +7,7 @@ The online game: the relay (`server/`), the wire protocol, the client's net laye
   alarms, deploy, tests.
 - [relay-scaling-and-cost.md](relay-scaling-and-cost.md) - the cell tree, hub shards and the hub poll, and what keeps
   Durable Objects awake and billed.
-- [wire-protocol.md](wire-protocol.md) - `src/net/wire.js`, frame types and limits, `RELAY_VERSION`, feature gates,
+- [wire-protocol.md](wire-protocol.md) - `src/net/wire.js`, frame types and limits, `RELAY_VERSION` and the one-version rule,
   and how to make a protocol change.
 - [client-net.md](client-net.md) - `OnlineSession`, reconnects, remote players, the account client, cloud saves.
 - [account-service.md](account-service.md) - the `daggerfall-accounts` Worker: bindings, routing, API surface, auth

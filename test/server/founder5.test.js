@@ -6,9 +6,9 @@
 //   - NO RECORD. A player whose play before it the service never recorded (a guest's storage cleared, a character never
 //     saved to the cloud) cannot be proven by any rule. FOUNDER_HANDLES names them: a list in config, the developers'
 //     law - case-folded, a registered account's alone, and it only adds.
-// And then, "I want to do this without my input": FOUNDER4's link (0078) ran once, so a character carried onto a new
+// And then, "I want to do this without my input": FOUNDER4's link ran once, so a character carried onto a new
 // account after its deploy linked nothing until a person re-ran it. server-account/src/founderLink.js writes the same
-// fact as a character ARRIVES - a cloud save's new slot, a customs - with nobody's hand on it.
+// fact as a character ARRIVES - a cloud save's new slot - with nobody's hand on it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -76,7 +76,7 @@ function d1() {
   for (const f of MIGRATIONS) db.exec(src(`server-account/migrations/${f}`));
   return {
     _raw: db,
-    // D1's batch: every statement in one transaction, all or none (customs writes in one)
+    // D1's batch: every statement in one transaction, all or none
     async batch(stmts) {
       db.exec('BEGIN');
       try { const out = []; for (const st of stmts) out.push(await st.run()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; }
@@ -142,19 +142,16 @@ test('FOUNDER5, end to end: an account first seen on the evening of the 24th in 
 
 // ── THE LINK, KEPT LIVE ─────────────────────────────────────────────
 
-test('FOUNDER5 the live link: the statement asks the four holdings 0078 asks that can be asked by character (renown_tracks left out, read whole by character), one hop, earlier only; 0087 indexes saves and realm characters by character', () => {
+test('FOUNDER5 the live link: the statement asks the cloud saves by character (renown_tracks left out, read whole by character), one hop, earlier only; saves are indexed by character', () => {
   const sources = [...LINK_SQL.matchAll(/SELECT (\w+) FROM (\w+) WHERE (\w+) = \?2/g)].map((m) => `${m[2]}.${m[3]}`);
-  assert.deepEqual(sources, ['realm_census.char_id', 'saves.character_id', 'realm_characters.origin_id', 'realm_passes.origin_id']);
+  assert.deepEqual(sources, ['saves.character_id']);
   assert.doesNotMatch(LINK_SQL, /renown_tracks/);
   assert.doesNotMatch(LINK_SQL, /o\.first_played_at/, 'one hop: another row\'s own link is never followed');
-  const migration = src('server-account/migrations/0087_founder_live.sql');
-  assert.match(migration, /^CREATE INDEX IF NOT EXISTS idx_saves_character ON saves \(character_id\);$/m);
-  assert.match(migration, /^CREATE INDEX IF NOT EXISTS idx_realm_characters_origin ON realm_characters \(origin_id\) WHERE origin_id IS NOT NULL;$/m);
   const db = new DatabaseSync(':memory:');
   for (const f of MIGRATIONS) db.exec(src(`server-account/migrations/${f}`));
+  assert.equal(db.prepare("SELECT sql FROM sqlite_master WHERE name = 'idx_saves_character'").get()?.sql, 'CREATE INDEX idx_saves_character ON saves (character_id)');
   const plan = (q) => db.prepare(`EXPLAIN QUERY PLAN ${q}`).all().map((r) => r.detail).join(' | ');
   assert.match(plan("SELECT player_id FROM saves WHERE character_id = 'x'"), /idx_saves_character/, 'a save asked by character reads the index');
-  assert.match(plan("SELECT player FROM realm_characters WHERE origin_id = 'x'"), /idx_realm_characters_origin/);
 });
 
 async function stand() {
@@ -184,14 +181,16 @@ async function stand() {
   };
   const titles = async (who) => (await call('GET', '/v1/account', undefined, who.secret)).body.wardrobe.titles;
   const card = (who, char, name = 'QuickSave') => call('PUT', `/v1/saves/${char}/${name}`, { characterName: 'Hero', gameTime: 1, realTime: 1, saveVersion: 1 }, who.secret);
-  return { call, raw, guest, account, titles, card };
+  /** A cloud save row of `char` held by `who`, written straight to the table: a guest cannot save to the cloud today. */
+  const held = (who, char) => raw.prepare("INSERT INTO saves (player_id, character_id, save_name, created_at, updated_at) VALUES (?, ?, 'QuickSave', 1, 1)").run(who.id, char);
+  return { call, raw, guest, account, titles, card, held };
 }
 
 test('FOUNDER5 the live link, a cloud save: an account registered long after the cutoff that backs up a character a guest from before it played holds Founder at once - no migration, no list; a character no earlier row holds links nothing; a later row never moves it', async () => {
   const s = await stand();
   const CHAR = '3f0c2a9e-1b7d-4c55-9a61-0d2f6e8b7c11';
-  const old = await s.guest(OLD_CUT - 5 * DAY);   // the browser's guest, before the cutoff - on the realm's census
-  s.raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(old.id, CHAR);
+  const old = await s.guest(OLD_CUT - 5 * DAY);   // a row from before the cutoff that holds a cloud save of the character
+  s.held(old, CHAR);
   const back = await s.account('Returning');   // registered today, in the desktop app
   assert.deepEqual(await s.titles(back), [], 'before the character arrives: none');
   assert.equal((await s.card(back, CHAR)).status, 200);
@@ -208,22 +207,9 @@ test('FOUNDER5 the live link, a cloud save: an account registered long after the
   // dated past the account's registration (now): OLD_CUT + 30 days was later only until 2026-10-25, when it became the
   // past and the link rightly recorded it (a date in the test, never the law)
   const late = await s.guest(Math.floor(Date.now() / 1000) + 30 * DAY);
-  s.raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(late.id, 'c0ffee00-1111-2222-3333-444455556666');
+  s.held(late, 'c0ffee00-1111-2222-3333-444455556666');
   const third = await s.account('Third');
   assert.equal((await s.card(third, 'c0ffee00-1111-2222-3333-444455556666')).status, 200);
   assert.deepEqual(await s.titles(third), [], 'linked to a row first seen after the cutoff: none');
   assert.equal(s.raw.prepare('SELECT first_played_at FROM players WHERE id = ?').get(third.id).first_played_at, null, 'and nothing written: a link to a LATER first play records nothing');
-});
-
-test('FOUNDER5 the live link, a customs: an account that brings in, on its pass, a character a guest from before the cutoff played holds Founder at once', async () => {
-  const s = await stand();
-  const CHAR = 'offline-early-hero-01';
-  const old = await s.guest(OLD_CUT - 9 * DAY);
-  s.raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(old.id, CHAR);
-  const back = await s.account('Customs');
-  s.raw.prepare('INSERT INTO realm_passes (player, granted_by, granted_at) VALUES (?, ?, ?)').run(back.id, 'dev', OLD_CUT + DAY);
-  assert.deepEqual(await s.titles(back), []);
-  const came = await s.call('POST', '/v1/realm/customs', { origin: CHAR, name: 'Hero' }, back.secret);
-  assert.equal(came.status, 200, JSON.stringify(came.body));
-  assert.deepEqual(await s.titles(back), ['founder'], 'brought in: Founder');
 });

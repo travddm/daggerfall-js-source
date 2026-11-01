@@ -1,6 +1,6 @@
 // NOTICE1: THE NOTICE BOARD - the law both ends read (src/net/boardLaw.js), the account service's notes,
 // reports and notices driven through the real Worker over node:sqlite with every migration applied
-// (server-account/src/board.js, 0026_board.sql), and the client's book, window and wiring.
+// (server-account/src/board.js), and the client's book, window and wiring.
 // 10.1, 10.6 and 10.7.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

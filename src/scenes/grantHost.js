@@ -36,7 +36,6 @@
 import {
   GRANT_ASK_ID_MAX, GRANT_KINDS, GRANT_WAIT_MS, GRANT_RENEW_LEAD_MS, GRANT_RENEW_MAX, GRANT_TALLY_MS, GRANT_TALLY_ROWS_MAX, GRANT_TALLY_COUNT_MAX,
   GRANT_FRAME_GRANTS_MAX, GRANT_SKEW_MS, GRANT_STANDDOWN_REASONS, validGrant, verifyGrant, grantRefusal, grantMarksAllow, wireGrant, grantDice,
-  grantPixelReadBack,
 } from '../net/grantLaw.js';
 import { isNight } from '../world/worldClock.js';
 import { isCellRoom, mapPixelOfWire } from '../net/wire.js';
@@ -158,10 +157,6 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
   /** GRANT6: a socket open whose welcome has not said the law yet (net/online.js: null) - a stand waits on it, so a cell
    *  crossed is never a moment of ungranted stands. */
   const unsaid = () => { const s = session(); return !!s && s.status === 'open' && s.grantMode == null && typeof s.sendGrant === 'function'; };
-  /** AUDIT TESA II Z6: does my cell's relay read a grant's pixel past the Bay (net/grantLaw.js relaySupportsGrantWorld) -
-   *  the session's word off its welcome: `gateLanesOk`, set by relaySupportsGateLanes, which IS the world-wide relay's one
-   *  test (net/wire.js relaySupportsWorldWide). An older relay's grant off the Bay's map is taken nowhere (grantPixelReadBack). */
-  const worldOk = () => !!session()?.gateLanesOk;
   /** An ask sent, its id - 0 when it did not go. */
   function send(body) {
     const s = open();
@@ -199,7 +194,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
     for (let at = 0; at < all.length; at += max) {
       const chunk = all.slice(at, at + max);
       ask({ k: 'mint', kind, n: chunk.length }).then((a) => {
-        if (a?.k === 'ok' && grantPixelReadBack(a.gr, worldOk())) { const gr = { ...a.gr, _members: 0 }; chunk.forEach((res, i) => res({ gr, i })); }   // AUDIT TESA II Z6: an older relay's grant off the Bay is no grant (it would junk its renewal)
+        if (a?.k === 'ok') { const gr = { ...a.gr, _members: 0 }; chunk.forEach((res, i) => res({ gr, i })); }
         else chunk.forEach((res) => res(a?.k === 'no' ? { refused: a.r } : null));
       });
     }
@@ -224,7 +219,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
   /** Foe `f` handed on to socket `to` - its member signed to the heir, then gone from me. */
   function handed(f, to) {
     const gr = f?._grant;
-    if (gr && !gr._dead && grantPixelReadBack(gr, worldOk()) && typeof to === 'string' && to) post('heir', { gr: wireGrant(gr), i: f._grantI, to });   // AUDIT TESA II Z6: never to a relay that cannot read it back
+    if (gr && !gr._dead && typeof to === 'string' && to) post('heir', { gr: wireGrant(gr), i: f._grantI, to });
     ended(f);
   }
   /** AUDIT GRANT A7: A TURN'S FREES AND HEIRS, ONE ASK EACH - a cull or a death ends a dozen grants at once, and every ask
@@ -255,7 +250,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
    *  answered (a timeout, an answer gone to a socket that is now a halo's) is carried again while I stand in a cell,
    *  GRANT_CARRY_TRIES times, then given up. */
   async function carry(room) {
-    const gs = [...live].filter((g) => !g._dead && g.q !== room && isCellRoom(g.q) && grantPixelReadBack(g, worldOk()));   // AUDIT TESA II Z6: as the renewal
+    const gs = [...live].filter((g) => !g._dead && g.q !== room && isCellRoom(g.q));
     if (!gs.length) return;
     carrying = true;
     let unanswered = false;
@@ -278,7 +273,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
       if (s.room !== lastRoom) { const from = lastRoom; lastRoom = s.room; carryTo = from && isCellRoom(s.room) ? s.room : null; carryTries = 0; }   // GRANT4: cell to cell - a world room's grants stay its own (carry: a cell's alone)
       if (carryTo && !carrying) { const to = carryTo; carryTo = null; if (to === s.room) void carry(to); }   // AUDIT GRANT A13: a crossing made while a carry was out is carried when it lands
       if (!renewing && !carrying) {
-        const due = [...live].filter((g) => !g._dead && g.q === s.room && g.x - t <= GRANT_RENEW_LEAD_MS && grantPixelReadBack(g, worldOk())).slice(0, GRANT_RENEW_MAX);   // AUDIT TESA II Z6: a relay that cannot read a grant back is never asked to renew it
+        const due = [...live].filter((g) => !g._dead && g.q === s.room && g.x - t <= GRANT_RENEW_LEAD_MS).slice(0, GRANT_RENEW_MAX);
         if (due.length) void renew(due);
       }
     }
@@ -461,8 +456,7 @@ export function createGrantHost({ session, climateAt = null, faunaAt = () => nul
   }
   function flushTally() {
     if (!tallies.size) return;
-    const said = session()?.grantStatsOk;   // FOE-BOUNDS: `stats` to a relay that knows the word (net/grantLaw.js relaySupportsGrantStats) - an older one refuses the whole tally
-    const rows = [...tallies].filter(([k]) => said || !k.endsWith('|stats')).sort((a, b) => b[1] - a[1]).slice(0, GRANT_TALLY_ROWS_MAX).map(([k, n]) => { const at = k.lastIndexOf('|'); return { o: k.slice(0, at), r: k.slice(at + 1), n }; });
+    const rows = [...tallies].sort((a, b) => b[1] - a[1]).slice(0, GRANT_TALLY_ROWS_MAX).map(([k, n]) => { const at = k.lastIndexOf('|'); return { o: k.slice(0, at), r: k.slice(at + 1), n }; });
     tallies.clear();
     if (rows.length) send({ k: 'tally', rows });
   }

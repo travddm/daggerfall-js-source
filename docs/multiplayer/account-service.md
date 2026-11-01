@@ -65,7 +65,7 @@ reads after its own writes.
 | --- | --- |
 | Accounts and auth | `/v1/auth/{guest,register,login,recover,logout,session,token}`, `/v1/account/*` (password, email, recovery codes, title, aura, icon, glyph, name, played), `/v1/heartbeat` |
 | Saves | `GET /v1/saves`; `PUT/GET/DELETE /v1/saves/<charId>/<name>` plus `/data`, `/shot` |
-| Realm characters | `/v1/realm` (list), `/v1/realm/{create,join,leave,delete,customs,trade,die,raise,undo,wed,lineage,lineages,unions}`, `/v1/realm/<id>/data` (checkpoints) |
+| Realm characters | `/v1/realm` (list), `/v1/realm/{create,join,leave,delete,trade,die,raise,wed,lineage,lineages,unions}`, `/v1/realm/<id>/data` (checkpoints) |
 | Economy | `/v1/market/*` (list, buy, cancel, order, fill, auction, bid, gold, collect), `/v1/marks/*`, `/v1/broker/settle`, `/v1/stores/*`, `/v1/writs/*`, `/v1/prof/*` |
 | Homes | `/v1/homes/*` (claim, release, transfer, entry, rooms, rent, decor, yards, layouts, vote, deed) |
 | Guilds | `/v1/guilds/*` (found, invite, ranks, vault, hall, castle, board, heraldry) |
@@ -93,7 +93,7 @@ reads after its own writes.
   public key.
 - **Orders.** The service signs short-lived orders (`ORDER_TTL_S`, 60 s) with the same key for the relay: bans,
   mutes, staff orders and home orders (`mint*Order`).
-- **Roles.** Staff roles are columns of the account's row (`staff_admin`, `staff_mod`, `staff_owner`; migration 0191),
+- **Roles.** Staff roles are columns of the account's row (`staff_admin`, `staff_mod`, `staff_owner`; migration 0002),
   read fresh on every request by `titles.js`, so taking one off removes it at once and no registered name earns one. Only
   the honorary titles still come from comma-separated handle lists in vars (`TIER_LISTS`, `handleList`). How a role is set:
   [Staff roles](../operations/staff-roles.md).
@@ -144,8 +144,8 @@ player requests for D1.
   never signs what the relay refuses; it gives up without deploying after about five and a half hours), deploys, and
   points Discord at the service.
 - **A service deploy drops nobody.** Sockets live on the relay, and requests are stateless.
-- Repair workflows (manual, same concurrency group `account-deploy`): `account-recovery.yml`, `realm-restore.yml`
-  and `realm-revive.yml` (D1 Time Travel restores), `realm-rollback.yml`, `guild-grant.yml`. `sd-clears.yml` and
+- Repair workflows (manual, same concurrency group `account-deploy`): `account-recovery.yml`,
+  `realm-revive.yml` (a D1 Time Travel restore), `realm-rollback.yml`, `guild-grant.yml`. `sd-clears.yml` and
   `d1-load.yml` only read.
 
 ## Running and testing

@@ -20,8 +20,8 @@
 // classic gem is an ingredient, an ingredient STACKS, and a Ruby renamed would merge into the Ruby already in the pack
 // and lose its name and its price. A custom row is no ingredient. SS1: the row STACKS with its own kind alone - it says `stackable`, as the rations' row does
 // (inventory.js isStackable), and a stack merges only with the same template, so a stone never joins a Ruby nor a Ruby
-// a stone - and it is BOUND (`bound`, systems/item/itemBound.js): a stone is never handed to another player. A pack saved
-// before it stacked is folded on load (restackStones). It wears the gems' own art, the Ruby's red, and no shelf stocks
+// a stone - and it is BOUND (`bound`, systems/item/itemBound.js): a stone is never handed to another player. It wears
+// the gems' own art, the Ruby's red, and no shelf stocks
 // it: it is in no group's enum a shelf draws from. Registered here, and scenes/shared.js imports this file so every host
 // has the row before a save carrying one loads.
 //
@@ -32,7 +32,6 @@ import { setItemFields, isAmmunition, mintCondition, registerCustomTemplates, te
 import { applyRarity, rarityChances, lastPass, socketPass, weaponSocketPass, techniquePass } from '../loot/lootRarity.js';   // GEM1: the sockets' passes, the spoils' last but the gems; TECH1: the technique pass, a door's last draw
 import { bossGems } from '../gems.js';   // GEM2: the Warden's gem
 import { rollRegalia } from '../aetheric.js';   // SET6: Ruhn's Regalia - the spoils' last roll
-import { stacksWith, addItem } from '../inventory.js';   // SS1: the fold of a pack saved before the stone stacked; PORTAL-GIFT: the gift joins the pack's stack
 import { wearableItem } from '../equip.js';   // RARITY-WEAR: a spoils piece is one a slot takes
 import { rollDragonfireOath } from '../gilded.js';   // GILDED2: the Dragonfire Oath - the spoils' very last draw
 
@@ -112,54 +111,12 @@ export const PORTAL_STONE_TEMPLATES = Object.freeze([{
 }]);
 registerCustomTemplates(PORTAL_STONE_TEMPLATES);
 export const isPortalStone = (item) => item?.templateIndex === PORTAL_STONE_TEMPLATE;
-/** PORTAL-GIFT: EVERY
- *  CHARACTER THAT ALREADY EXISTS IS GIVEN PORTAL_GIFT_STONES STONES, ONCE - LOAN-AMNESTY's shape (banking.js
- *  forgiveLoans). A character's `portalGift` says which gift it has had: a save written before the gift carries no mark
- *  (0), and every save written after carries the mark (save.js snapshotPlayer), so a character made after the gift is
- *  born past it, and a character given it is never given it again. Given as the save is restored (save.js
- *  restorePlayer - every load, offline and online, the realm's boot among them), onto the pack's own unlocked stack of
- *  stones (addItem: they stack), and said once the world stands (takePortalGiftNotice, world.js). Client only, as the
- *  amnesty is: a bound piece the realm's service never weighs (realmGoldLaw.js counts gold alone). Answers how many
- *  stones it gave (0: none - the mark already stood). */
-export const PORTAL_GIFT = 1;
-export const PORTAL_GIFT_STONES = 10;
-let _giftNotice = 0;
-export function givePortalGift(entity) {
-  if (!entity || typeof entity !== 'object') return 0;
-  if ((Number.isSafeInteger(entity.portalGift) ? entity.portalGift : 0) >= PORTAL_GIFT) return 0;
-  entity.portalGift = PORTAL_GIFT;
-  if (!Array.isArray(entity.items)) entity.items = [];
-  addItem(entity.items, portalStones(PORTAL_GIFT_STONES));
-  _giftNotice += PORTAL_GIFT_STONES;
-  return PORTAL_GIFT_STONES;
-}
-/** The stones given since the last ask (0: none), and the notice cleared - the host says it once. */
-export const takePortalGiftNotice = () => { const n = _giftNotice; _giftNotice = 0; return n; };
 /** `n` Portal Stones (at least one), one stack. */
 export function portalStones(n = 1) {
   const count = Math.max(1, Math.trunc(Number(n) || 1));
   return Object.assign(mintCondition(setItemFields({ group: 'UselessItems2', templateIndex: PORTAL_STONE_TEMPLATE })), { stackCount: count });
 }
 
-/** SS1: STONES WON BEFORE THEY STACKED ARE ONE STACK. A pack saved before the row stacked holds a record a stone; each
- *  goes into the first record before it that it stacks with (a locked stone into a locked one - inventory.js
- *  stacksWith), so the load shows the stack the next kill would have made. Runs where no index into the list is still
- *  to be read (systems/save/save.js, below its index-keyed relinks). Answers how many records it folded. */
-export function restackStones(list) {
-  if (!Array.isArray(list)) return 0;
-  let folded = 0;
-  for (let i = 0; i < list.length; i++) {
-    const it = list[i];
-    if (!isSigilStone(it)) continue;
-    const into = list.findIndex((held, j) => j < i && isSigilStone(held) && stacksWith(held, it));
-    if (into < 0) continue;
-    list[into].stackCount = (list[into].stackCount ?? 1) + (it.stackCount ?? 1);
-    list.splice(i, 1);
-    i--;
-    folded++;
-  }
-  return folded;
-}
 
 /** WB12a: THE EMBER'S NAME, GIVEN TO EVERY STONE. A stone's name is written into its record at the mint and kept by
  *  every save, so a stone won before the rename still said "Sigil Stone" - and a stack it heads keeps its name through

@@ -500,7 +500,7 @@ function planned(db) {
   return { rec, plans };
 }
 
-test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own (0154), never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
+test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own, never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
   const db = d1();
   const { rec, plans } = planned(db);
   const nowS = 1_800_000_000;

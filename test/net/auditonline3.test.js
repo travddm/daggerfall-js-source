@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { OnlineSession, steadyClock, steadyNow } from '../../src/net/online.js';
-import { CHAT_WORLD_ROOM } from '../../src/net/wire.js';
+import { CHAT_WORLD_ROOM, RELAY_VERSION } from '../../src/net/wire.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -63,7 +63,7 @@ test('AUDIT ONLINE 3 F2: a session built with no clock reads the page\'s steady 
   let w = 1_800_000_000_000;
   const { s, sockets } = session({ now: steadyClock(() => w), rand: () => 0 });
   s.join('interior:1', { ...STILL, mv: 1 });
-  const ws = sockets[0]; ws.open(); ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world200', now: w });
+  const ws = sockets[0]; ws.open(); ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION, now: w });
   const said = () => ws.sent.filter((x) => x.startsWith('{"t":"pose"') || x.startsWith('{"t":"ping"')).length;
   for (let i = 0; i < 50; i++) { w += 100; s.sendPose({ ...STILL, x: i, mv: 1 }); s.tick(); }
   const before = said();
@@ -80,26 +80,19 @@ test('AUDIT ONLINE 3 F2: a session built with no clock reads the page\'s steady 
 
 // ── F3: THE CROSSING DROPPED THE LOOK'S WORD ───────────────────────────────────────────────────────────────────
 
-test('AUDIT ONLINE 3 F3: a cell crossing that promotes a halo carries `lookOk` both ways - the cell left still hears my look change', async () => {
+test('AUDIT ONLINE 3 F3: a cell crossing that promotes a halo - the cell left still hears my look change', async () => {
   let t = 1e6;
   const { s, sockets } = session({ now: () => t });
-  s.join('world:10,10', STILL); const A = sockets[0]; await A.onopen(); A.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world201' });
-  s.setHalo(['world:11,10']); const B = sockets[1]; await B.onopen(); B.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world201' });
+  s.join('world:10,10', STILL); const A = sockets[0]; await A.onopen(); A.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
+  s.setHalo(['world:11,10']); const B = sockets[1]; await B.onopen(); B.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
   s.join('world:11,10', STILL);
   assert.equal(s._ws, B, 'B promoted');
   assert.equal(s._halo.get('world:10,10')?.ws, A, 'A stepped down');
-  assert.equal(s._halo.get('world:10,10').lookOk, true, 'A\'s own relay\'s word went with it');
   t += 10_000;
   s.setLook({ race: 'Nord', gender: 'female', faceIndex: 2, items: [] });
   const looks = (ws) => ws.sent.filter((x) => x.startsWith('{"t":"look"')).length;
   assert.equal(looks(B), 1);
   assert.equal(looks(A), 1, 'the cell left is told too (it was never told again)');
-  // and the promoted socket says for itself: a halo whose relay knows no look is not handed one when it is crossed into
-  const { s: s2, sockets: k2 } = session({ now: () => t });
-  s2.join('world:10,10', STILL); await k2[0].onopen(); k2[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world201' });
-  s2.setHalo(['world:11,10']); await k2[1].onopen(); k2[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world60' });
-  s2.join('world:11,10', STILL);
-  assert.equal(s2.lookOk, false, 'the crossed-into cell\'s own word, not the old primary\'s');
 });
 
 // ── F4: A SLOWER ROOM'S COPY RE-STOOD THE DEAD ─────────────────────────────────────────────────────────────────
@@ -160,7 +153,7 @@ test('AUDIT ONLINE 3 F6: a halo\'s mint that ends while a siege socket awaits it
 test('AUDIT ONLINE 3 F7: a leave forgets the room through _forgetRoom - a superseded World tab says nobody, and a room\'s inbound buckets do not pile up a room at a time', () => {
   const { s, sockets } = session({ now: () => 1e6, presence: false });
   s.join(CHAT_WORLD_ROOM, null); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600, v: 'world189' });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600, v: RELAY_VERSION });
   assert.equal(s.roomCount, 600);
   s.supersede();
   assert.equal(s.roomCount, null, 'no "Online - 600" over an empty list');
@@ -170,7 +163,7 @@ test('AUDIT ONLINE 3 F7: a leave forgets the room through _forgetRoom - a supers
   for (let i = 0; i < 20; i++) {
     s2.join(`town:m${1000 + i}`, STILL);
     const ws = k2.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], v: 'world189' });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], v: RELAY_VERSION });
     ws.receive({ t: 'chat', id: 'aaaa-0001', name: 'Alpha', text: 'hi', at: now });
     now += 1000;
   }

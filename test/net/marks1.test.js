@@ -1,7 +1,7 @@
 // MARKS1: MARKS, THE SERVER'S CURRENCY - the law both ends read
 // (src/net/marksLaw.js), the account service's balances, the one ledger that moves them, the first faucet (the gate's
 // receipts), the Bank's one-way exchange, a guild's Marks treasury and the developers' weekly report, driven through the
-// real Worker over node:sqlite with every migration applied (server-account/src/marks.js, 0025_marks.sql).
+// real Worker over node:sqlite with every migration applied (server-account/src/marks.js).
 // 10.5.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -122,8 +122,9 @@ test('MARKS1: GOLD NEVER BUYS MARKS - no kind, route, table or statement takes g
   // PROF1 built the second: a Court writ's pay, struck for units the service took out of the Stores (test/prof1_service)
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, way]) => way === 'mint').map(([k]) => k), ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the faucets built - each a witnessed act but SILVER-FINDS\' two (a gathering\'s find, a loot find), bounded by the service\'s dice and the day');   // PIN MOVED (AUDIT-SEATS): a siege's relay-signed Honours and an Incursion's agreed gate days, registered at last; PIN MOVED (SILVER-WAYS): a raid's receipt, a guild's deed, a Motherlode's Watch; PIN MOVED (DOMAIN2): a castle's refunds, given up and lost - silver home that its purchase burnt, never more (castles.js); PIN MOVED (DOMAIN3): a folded Charter's claim fee home, the strike's refund (seatTurning.js)
   assert.ok(![...ROUTES].some((r) => r.startsWith('/v1/marks/') && /buy|purchase|gold/i.test(r)), 'no route to buy Drakes');
-  assert.doesNotMatch(src('server-account/migrations/0025_marks.sql'), /'gold'/, 'the ledger has no gold end');
-  assert.match(src('server-account/migrations/0025_marks.sql'), /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild'\)\)/);
+  const ledger = d1()._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('marks_ledger').sql;
+  assert.doesNotMatch(ledger, /'gold'/, 'the ledger has no gold end');
+  assert.match(ledger, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
 });
 
 // ─── THE LEDGER MOVES THE BALANCES ───────────────────────────────────────────────────────────────────────────────────

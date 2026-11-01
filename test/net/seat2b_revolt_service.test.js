@@ -1,6 +1,6 @@
 // SEAT2b part two (c): A REVOLT IN THE ACCOUNT SERVICE - a
 // held seat whose Standing the Turning leaves at nought revolts at its holder's window the next week (a battle row of
-// kind 'revolt', migration 0064); the holder's members sign to defend it and enter on a revolt's pass; a defender's
+// kind 'revolt'); the holder's members sign to defend it and enter on a revolt's pass; a defender's
 // receipt settles it - put down, the Standing back to 20; standing, the Charter lapsed; none by the next Turning, the
 // Charter lapsed there (7.7, 6.3; server-account/src/seatTurning.js, seatSiege.js).
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). `06-Systems/

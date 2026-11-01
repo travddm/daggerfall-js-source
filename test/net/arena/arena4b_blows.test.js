@@ -60,7 +60,7 @@ test('ARENA4b a spell is one cast however many bodies its blast meets: three cas
 
 test('ARENA4b the client sends the sequence and the spell: a blow\'s claim carries its `q`, a spell its kind; a watcher\'s blow is no claim (mutants: the sequence dropped; a spell sent as a swing)', async () => {
   const sent = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { sent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { sent.push(w); return true; } };
   const deps = (link) => ({ now: () => 0, session: () => session, makeHall: () => link, bouts: { ask() {}, relayWord: () => true, dismiss() {}, holds: () => false, relay: () => null },
     account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: () => true });
   const A = createArenaOnline(deps(null));

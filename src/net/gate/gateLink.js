@@ -286,14 +286,14 @@ export const gateRefusalText = (word) => (word === 'the gate is closed' ? GATE_O
 
 /**
  * The link: the state, the falls by day, the receipts by day, and the words said.
- * @param {{now: () => number, say?: (text: string) => void, onFell?: (day: number, fell: {at: number, top: string[], n: number, c?: number, cs?: number}) => void, onReceipt?: (receipt: string) => void, onRefused?: (why: string) => void, place?: (s: Readonly<GateState>, now: number) => number[], watches?: () => boolean}} deps
+ * @param {{now: () => number, say?: (text: string) => void, onFell?: (day: number, fell: {at: number, top: string[], n: number, c?: number, cs?: number}) => void, onReceipt?: (receipt: string) => void, onRefused?: (why: string) => void, place?: (s: Readonly<GateState>, now: number) => number[]}} deps
  *   `onReceipt` is told every receipt the relay hands this socket - the same one again after a reconnect or from the hub
  *   (WB5b: net/gate/gateClaims.js carries it to the account service, and keeps one a day). AUDIT WB B5: `onRefused` is told
  *   the relay's refusal of my `in` (its word, net/wire.js GATE_NO_WORDS) - the court this player stands in is not theirs
  *   to fight in, and the host takes them out of it. GATE-COURTS: `onFell` is told each court's kill (`c` its court, `cs`
  *   the courts the night held then) and, where none was told, the night's.
  */
-export function createGateLink({ now, say = () => {}, onFell = () => {}, onReceipt = () => {}, onRefused = () => {}, place = bossAt, watches = () => true }) {
+export function createGateLink({ now, say = () => {}, onFell = () => {}, onReceipt = () => {}, onRefused = () => {}, place = bossAt }) {
   /** @type {Readonly<GateState>} */
   let state = GATE_STATE_EMPTY;
   const falls = new Map();     // day -> {at, top, n}
@@ -308,7 +308,7 @@ export function createGateLink({ now, say = () => {}, onFell = () => {}, onRecei
       if (!g) return;
       // COURT-WATCH: a full court keeps me as its watcher - its fight
       // heard and seen, never fought - until the answer to an `in` asked again (gateBrain.js COURT_WATCH_ASK_MS) gives me a seat
-      if (g.k === 'no' && WATCHED_NO[g.m] === true && watches()) { if (!watching) say(courtWatchText()); watching = true; return; }   // AUDIT PLAN-1000 G3: a relay that says `me` (relaySupportsCourtWatch)
+      if (g.k === 'no' && WATCHED_NO[g.m] === true) { if (!watching) say(courtWatchText()); watching = true; return; }   // AUDIT PLAN-1000 G3
       if (g.k === 'no') { say(gateRefusalText(g.m)); onRefused(g.m); return; }   // GATE-RELOAD: in what the word means
       if (g.k === 'st' && g.me === 1) watching = false;   // COURT-WATCH: my `in` answered - the seat mine
       if (g.k === 'rcpt') { const c = readReceipt(g.r); if (c) { receipts.set(c.d, g.r); onReceipt(g.r); } return; }   // one a day: the receipt says which

@@ -1,7 +1,7 @@
 // BASE-HIDE: what Daggerfall furnished a room with - its prop models and its flats - the room's owner
 // may TAKE OUT and put back, free. A furnishable room (an online home, anyone's; the player's house or ship) stands its
 // own furniture piece by piece so one piece can go (scenes/decor/decorBase.js); the list of what is out is the save's offline
-// and the account service's online (migration 0015), and a sale brings the furniture back. The law, the room's pool,
+// and the account service's online (`home_hidden`), and a sale brings the furniture back. The law, the room's pool,
 // the service over the real Worker and node:sqlite, the scene cache, the tool, the panel's "Built in" view, and the
 // build's and the host's wiring by source.
 import { test } from 'node:test';
@@ -187,8 +187,8 @@ test('BASE-HIDE the service: a home\'s list of what is out is read with its piec
   assert.equal(new URL(posts[0][0]).pathname, '/v1/homes/decor/hidden');
   assert.equal(posts[0][1].headers.authorization, 'Bearer sek', 'the one session, as every write');
   assert.deepEqual(JSON.parse(posts[0][1].body), { ...HOME, character: 'char-me', keys: ['m1:2'] }, 'only what the service reads');
-  const mig = src('server-account/migrations/0015_home_hidden.sql');
-  assert.match(mig, /FOREIGN KEY \(map_id, building_key\) REFERENCES homes\(map_id, building_key\) ON DELETE CASCADE/);
+  const fks = d1()._raw.prepare('PRAGMA foreign_key_list(home_hidden)').all().map((k) => [k.table, k.from, k.to, k.on_delete]);
+  assert.deepEqual(fks, [['homes', 'map_id', 'map_id', 'CASCADE'], ['homes', 'building_key', 'building_key', 'CASCADE']], 'the list goes with its home');
 });
 
 test('BASE-HIDE the save: an offline room\'s list rides its scene, and a sale brings the furniture back for its next owner', () => {

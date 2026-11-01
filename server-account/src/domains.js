@@ -21,7 +21,7 @@
 // a key the seats' registry confirms as a seat OF THAT REGION, the crown
 // in a crown's (domainLaw.js domainSeats). The same witnesses as a seat's:
 // a registered account a week old, never one the seats' law ignores, its
-// first answer standing. ITS OWN TABLE (migration 0169), kept small: an
+// first answer standing. ITS OWN TABLE, kept small: an
 // answer that agrees with the region's confirmation is written only while
 // fewer than DOMAIN_AGREEING_KEPT do (AUDIT DOMAINS S3: kept at the bare
 // three, one confirming witness lost - an account deleted, or one the

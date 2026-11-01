@@ -78,21 +78,18 @@ The format is `world<N>` (checked by `relayVersionOf` and by `test/net/relayvers
 - `.github/workflows/relay-deploy.yml`, which deploys when the source version differs from the live one;
 - `.github/workflows/account-deploy.yml`, which waits until the relay at the client's `DEFAULT_SERVER` serves this
   version (or a later one) before deploying the service, so the service never signs what the live relay refuses;
-- the client, which turns `v` into feature flags.
+- the client, which joins only a relay of its own version (below).
 
-### Feature gates
+### One version, client and relay
 
-The client and the relay deploy at different times: the client with the site, the relay only when its version
-changes. The client must work with an older relay for a while. Each feature that needs relay support has a minimum:
+The client and the relay ship as one pair, built from the same tree. There are no per-feature relay gates: the client
+sends every frame it knows to every relay it joins.
 
-```js
-export const BAN_RELAY_MIN = 215;
-export function relaySupportsBan(v) { /* parses world<N> and compares */ }
-```
-
-On `welcome`, `src/net/online.js` reads `v` and sets flags (for example `instanceOk`, `starOk`). A flag is false until
-a welcome arrives. Sends of a gated frame check the flag. An older relay closes a socket that sends a frame it does
-not know.
+On `welcome`, `src/net/online.js` compares `v` with its own `RELAY_VERSION` (`relayMatches` in `wire.js`). When they
+differ, or the welcome names no version, the session refuses the relay (`refuseVersion`): it leaves every room, sets
+`versionRefused`, and its status line asks the player to reload the page (`net.relayVersionMismatch`). A refused
+session never retries, rejoins or joins again; only a reload of the page, which loads the client that matches the
+deployed relay, brings it back. The presence session and every chat link apply the rule to their own welcomes.
 
 In the other direction, the hello carries law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the cell
 tree's `of`). The relay refuses an older client build with `CLOSE_POLICY` and a reason such as `old ground`.
@@ -113,12 +110,10 @@ list of files in the graph. So:
 1. Change the shared module (`src/net/wire.js` or the mode's `*Law.js`) and the relay handler in
    `server/src/index.js` or a module it calls.
 2. Bump `RELAY_VERSION` to the next `world<N>`.
-3. If the client sends something new, add `<NAME>_RELAY_MIN = N` and `relaySupports<Name>(v)` in `wire.js`, and gate
-   the client's sends on the flag set from the welcome.
-4. If the relay must refuse old clients, raise the matching hello law number and its refusal reason.
-5. Add the row `world<N>: '<sha256>'` to `test/net/relayversion.test.js` (add the row with a placeholder; the failing equality assertion shows the actual hash) and update
-   the expected graph if imports changed. Update tests that assert `*_RELAY_MIN` values.
-6. Merge. The relay deploys on the push to `main`, and every player reconnects.
+3. If the relay must refuse old clients, raise the matching hello law number and its refusal reason.
+4. Add the row `world<N>: '<sha256>'` to `test/net/relayversion.test.js` (add the row with a placeholder; the failing equality assertion shows the actual hash) and update
+   the expected graph if imports changed.
+5. Merge. The relay deploys on the push to `main`, and every player reconnects.
 
 Two open pull requests that both bump the version conflict: when one merges, the other takes the next number and
 recomputes its hash.

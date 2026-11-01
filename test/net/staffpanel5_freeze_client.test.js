@@ -88,7 +88,7 @@ test('STAFF-PANEL5-FREEZE the session: every hello says the build shows the free
   ws.open();
   await settle();
   assert.equal(JSON.parse(ws.sent.find((f) => JSON.parse(f).t === 'hello')).fv, 1, 'the hello says `fv` 1');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world245' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: RELAY_VERSION });
   assert.equal(s.sendChat('41', { ch: 'staff' }), false, 'no staff word heard yet: no nudge goes');
   s._leaseAskAt = now;
   ws.receive({ t: 'frozen', until: 1_800_003_600 });

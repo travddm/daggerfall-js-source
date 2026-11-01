@@ -20,19 +20,18 @@
 //
 // TIME3 (6.3): a quest's COUNTDOWNS left the world's clock for the character's -
 // a Clock's sample, a sound's and a wave's last, a guard's arrival, a tombstone (quest/questStamps.js) - so a quest
-// envelope taken since then carries `ownSecondsAt` and its countdowns cross a door unmoved: the character's clock is
-// the one clock offline. The journal's dates stay the world's and move as before; an envelope taken before TIME3 moves
-// whole, as LIVED1 moved it. Each door marks what it hands on as standing on the character's clock.
+// envelope taken since then carries `ownSecondsAt` and its countdowns cross unmoved: the character's clock is the one
+// clock offline. The journal's dates stay the world's and move as before; an envelope taken before TIME3 moves whole, as
+// LIVED1 moved it. The copy marks what it hands on as standing on the character's clock.
 //
 // Pure JSON in, JSON out - no module state read.
 
 import { QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, shiftQuestStamps, markOwnClock } from './quest/questStamps.js';
 import { LEGACY_VENDOR } from './legacy/family.js';
-import { skyOfEventLaw, eventOfSkyLaw } from './skyCalendar.js';   // AUDIT WAITS B1: a banishment's days are the sky's calendar's
-import { markRealmCopy } from './realmCopyMark.js';
+import { skyOfEventLaw } from './skyCalendar.js';   // AUDIT WAITS B1: a banishment's days are the sky's calendar's
 
 /** AUDIT LIVED1b F3 (S4): a save's clock - classic minutes, an unsigned count below 2^31 (4,000 years of the calendar;
- *  DFU's is a uint) - or null for anything else. The doors and the load (save.js restorePlayer) read the envelope's
+ *  DFU's is a uint) - or null for anything else. The copy and the load (save.js restorePlayer) read the envelope's
  *  clocks through it: a tampered 1e14 stood the character's clock still in play (a frame's minutes under half an ulp),
  *  2^53 froze the page in the calendar loop, a string or a null loaded an online character at minute 0. */
 export const SAVE_CLOCK_MAX = 2 ** 31;
@@ -54,8 +53,7 @@ const shiftStockDate = (d, days) => (Number.isFinite(d) && d > 1 ? stockDateOf(s
 
 /** Every WORLD-clock stamp in the envelope moved by `delta` classic minutes (in place); `days` is the distance between
  *  the two clocks' calendar days, for the stamps that are days. `questOwn` says which quest countdowns stood on the
- *  world's clock: 'legacy' (a copy leaving the world - those of envelopes taken before TIME3) or none (a copy joining
- *  it - offline every countdown is on the one clock, which is the character's). */
+ *  world's clock: 'legacy' (those of envelopes taken before TIME3) or none. */
 function rebaseWorldStamps(copy, delta, days, { questOwn = false } = {}) {
   if (!delta) return copy;
   if (copy.quest) shiftQuestStamps(copy.quest, delta * 60, { own: questOwn, world: true });
@@ -68,10 +66,8 @@ function rebaseWorldStamps(copy, delta, days, { questOwn = false } = {}) {
     if (c && Number.isFinite(c.placedAt)) c.placedAt += delta;
   }
   // AUDIT REST III D1: A HELD BOUNTY'S DAY is the world's online (bountyHost.js reads the shared clock) and the
-  // character's offline, so it moves with the lane as a camp's fire does - Bring online lapsed every bounty a ledger of
-  // this build held on its first online tick, kills and all (AUDIT REST II Q3's re-stamp is the older ledgers' alone,
-  // and the world runs months ahead of a new offline calendar); and the minute each was paid, which a mate's clear is
-  // read against (bountyClearPays). Never below the calendar's start.
+  // character's offline, so it moves with the lane as a camp's fire does; and the minute each was paid, which a mate's
+  // clear is read against (bountyClearPays). Never below the calendar's start.
   const ledger = copy.modData?.[BOUNTY_RECORD_VENDOR];
   for (const h of Array.isArray(ledger?.held) ? ledger.held : []) if (h && Number.isFinite(h.takenAt)) h.takenAt = Math.max(0, h.takenAt + delta);
   const paidAt = ledger?.paidAt && typeof ledger.paidAt === 'object' ? ledger.paidAt : {};
@@ -97,15 +93,13 @@ function rebaseWorldStamps(copy, delta, days, { questOwn = false } = {}) {
 }
 const daysBetween = (to, from) => Math.floor(Math.floor(to) / 1440) - Math.floor(Math.floor(from) / 1440);
 
-/** AUDIT WAITS B1 (BANISH-SKY, WAIT4): A BANISHMENT'S END crosses a door as the days
- *  the player was told. Online it is a stamp on the event clock whose days are the sky's calendar (standing.js
- *  banishmentEnd); offline it is a stamp on the one clock, which is the calendar. Neither door moved it - REP3 came
- *  after LIVED1's doors - so carried offline a term stood as far off as the world ran ahead of the character (a
- *  character two hundred days behind read 215 days left), and carried online it was read against the world's calendar -
- *  lifted at once for a character behind the world, held too long for one ahead of it. `toEnd` maps an end across; a
- *  term not yet stamped (AUDIT REP F2) stays so, and the first trusted read gives it its thirty days. The sky's law is
- *  read as the law has it (skyCalendar.js skyOfEventLaw / eventOfSkyLaw): an online save's stamps were taken under it,
- *  whatever this page has installed. */
+/** AUDIT WAITS B1 (BANISH-SKY, WAIT4): A BANISHMENT'S END is copied as the days the player was told. Online it is a
+ *  stamp on the event clock whose days are the sky's calendar (standing.js banishmentEnd); offline it is a stamp on the
+ *  one clock, which is the calendar. Unmoved, a term carried offline stood as far off as the world ran ahead of the
+ *  character (a character two hundred days behind read 215 days left). `toEnd` maps an end across; a term not yet
+ *  stamped (AUDIT REP F2) stays so, and the first trusted read gives it its thirty days. The sky's law is read as the
+ *  law has it (skyCalendar.js skyOfEventLaw): an online save's stamps were taken under it, whatever this page has
+ *  installed. */
 function moveBanishments(copy, toEnd) {
   for (const r of Array.isArray(copy.regionConditions) ? copy.regionConditions : []) {
     if (r && typeof r === 'object' && Number.isFinite(r.b)) r.b = toEnd(r.b);
@@ -119,11 +113,11 @@ function moveBanishments(copy, toEnd) {
  *  (the load hands a mod with no record its new one - modSaveData.js restoreModSaveRecords) and rolls its own. */
 export const RAID_RECORD_VENDOR = 'world-events-raiding-parties';
 
-/** AUDIT LEGACY II H1: A COPY BETWEEN THE LANES IS A NEW CHARACTER, AND A NEW CHARACTER IS OF NO HOUSE YET. Project
- *  Legacy's record (`modData.ProjectLegacy`) names the people of a line by their character ids; carried across, the
- *  copy (a new id) played as the ORIGINAL's person - its tolls aged them, its death or retirement wrote them dead in
- *  the store both lanes share in one browser, and the remains' purses came into the realm uncounted by customs. The
- *  copy founds its own house on its first load (legacyHost.js found). Both doors drop it, whatever the clocks say. */
+/** AUDIT LEGACY II H1: AN OFFLINE COPY IS A NEW CHARACTER, AND A NEW CHARACTER IS OF NO HOUSE YET. Project Legacy's
+ *  record (`modData.ProjectLegacy`) names the people of a line by their character ids; carried across, the copy (a new
+ *  id) played as the ORIGINAL's person - its tolls aged them, and its death or retirement wrote them dead in the store
+ *  both lanes share in one browser. The copy founds its own house on its first load (legacyHost.js found). The copy
+ *  drops it, whatever the clocks say. */
 function dropLineage(copy) {
   if (copy.modData && typeof copy.modData === 'object') delete copy.modData[LEGACY_VENDOR];
 }
@@ -135,12 +129,14 @@ export const BOUNTY_RECORD_VENDOR = 'bountyBoard';
 export const CAPTAIN_RECORD_VENDOR = 'Captain';
 /** SEA-SEASON (SEA-SEASON): THE SEA'S SEASON FIGURES ARE THE REALM'S ALONE - the
  *  captain's ledger's `ether.season` (the deepest voyage and the legends ended this season, the service's season boards
- *  read them off a judged checkpoint). Neither door carries them: an offline game's voyages are on its own clock, and
- *  a copy brought online starts the season's boards from nothing, as a new character does. */
+ *  read them off a judged checkpoint). The copy does not carry them: an offline game's voyages are on its own clock. */
 function dropSeason(copy) {
   const e = copy.modData?.[CAPTAIN_RECORD_VENDOR]?.ether;
   if (e && typeof e === 'object') e.season = null;
 }
+
+/** The save name Copy to offline gives the slot it writes (ui/enhanced/enhancedMenu.js copyToOffline). */
+export const REALM_COPY_SAVE_NAME = 'Copied from the realm';
 
 /** The copy an offline slot keeps: the world's stamps rebased onto the character's clock, `worldMinutes` dropped. */
 export function offlineCopyOf(snap) {
@@ -150,42 +146,12 @@ export function offlineCopyOf(snap) {
   dropSeason(copy);
   const own = saneSaveClock(copy.classicMinutes), world = saneSaveClock(copy.worldMinutes);
   delete copy.worldMinutes;
-  delete copy.joinFresh;
   delete copy.realmHeld;   // AUDIT RESCUE-SAVE A1: the realm's spoils records (systems/realmSaves.js REALM_HELD_FIELD) - a new character holds none
-  // The copy's new id was never counted by the realm, so customs can never let it in: the Online door reads the mark.
-  markRealmCopy(copy);
   if (own === null || world === null) return copy;
   if (copy.modData && typeof copy.modData === 'object') delete copy.modData[RAID_RECORD_VENDOR];   // AUDIT LIVED1b R1
   rebaseWorldStamps(copy, Math.floor(own) - Math.floor(world), daysBetween(own, world), { questOwn: 'legacy' });   // classic minutes: the character's clock less the world's
   // AUDIT WAITS B1: the sky's days a banishment has left become days of the one clock
   moveBanishments(copy, (b) => Math.floor(own) + (skyOfEventLaw(b) - skyOfEventLaw(Math.floor(world))));
   if (copy.quest) markOwnClock(copy.quest, Math.floor(own) * 60);   // TIME3: every countdown is on the character's clock now
-  return copy;
-}
-
-/** AUDIT LIVED1 G (R6, and the mirror of E): BRING ONLINE is the other door between the lanes. An offline envelope's
- *  world stamps sit on its one clock, which becomes the CHARACTER's; online they are read against the WORLD's, so they
- *  move by the distance to the world's minute now (`worldNow`, the shared clock's reading at customs). And the envelope
- *  says it left the world at that minute - it has never been away, so the first join's absence arm (TM-1's recovery,
- *  SURV7's fresh start) walks no span the character never lived, where a missing `worldMinutes` read the whole
- *  distance from the offline calendar to the world's as time away. */
-export function onlineCopyOf(snap, worldNow) {
-  const copy = JSON.parse(JSON.stringify(snap ?? null));
-  if (!copy || typeof copy !== 'object') return copy;
-  dropLineage(copy);
-  dropSeason(copy);
-  if (!Number.isFinite(worldNow)) return copy;
-  const own = saneSaveClock(copy.classicMinutes);
-  copy.worldMinutes = Math.floor(worldNow);
-  // AUDIT LIVED1b P2: ...and that is the minute THIS machine's clock said at the click - the menu has no relay to
-  // correct it by - so an OS clock set a year back at the menu bought a year of TM-1's recovery at the first join (a
-  // legal reputation of -80 came in at -41). The envelope says it joins fresh: its first load pays no absence at all
-  // (save.js), whatever the stamp, and the next save the realm keeps is composed without the flag.
-  copy.joinFresh = true;
-  if (own === null) return copy;
-  rebaseWorldStamps(copy, Math.floor(worldNow) - Math.floor(own), daysBetween(worldNow, own));   // TIME3: the countdowns stay - the one clock is the character's
-  // AUDIT WAITS B1: the one clock's days a banishment has left become the sky's, from the world's minute now
-  moveBanishments(copy, (b) => eventOfSkyLaw(skyOfEventLaw(Math.floor(worldNow)) + (b - Math.floor(own))));
-  if (copy.quest) markOwnClock(copy.quest, Math.floor(own) * 60);
   return copy;
 }

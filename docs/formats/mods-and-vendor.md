@@ -71,6 +71,48 @@ Mods (the folder README has the version, credits and permission):
 | `roads-hazelnut` | Basic Roads' road, track, river and stream bitmaps |
 | `vorbis-fsb-setups` | Vorbis setup headers for turning Unity audio clips into Ogg (`tools/lib/fsb5Vorbis.mjs`) |
 
+## Fetched folders (`tools/fetch-vendor.sh`)
+
+Four mods are published on GitHub under the MIT licence. Their published files are not committed:
+`sh tools/fetch-vendor.sh` downloads each repository at a pinned commit and copies the files the game and the tests
+read into `vendor/<folder>/`. `.gitignore` lists the fetched paths. Each folder's `README.md`, and every file that
+differs from the published repository or is missing from it, stay committed.
+
+| Folder | Repository | Fetched | Committed, and why |
+|---|---|---|---|
+| `better-ambience` | `joshcamas/daggerfall-unity-mods` | `Sound/` (the 29 clips the port plays) | `Scripts/`, the manifest, `modsettings.json`, `LICENSE`: the repository holds 0.1.3, the port follows the 0.1.4 bundle (six scripts, the manifest and the settings differ, and `InteriorAmbientSoundSource.cs` is 0.1.4 only) |
+| `immersive-footsteps` | `magicono43/DFU-Mod_Immersive-Footsteps` | `Audio/`, `Scripts/`, `modsettings.json`, the manifest (renamed from `ImmersiveFootsteps.dfmod.json`) | nothing but the README |
+| `meanerMonsters` | `Ralzar81/Meaner-Monsters` | `MeanerMonsters.dfmod.json` | `xml/`: the repository has no sprite records |
+| `unleveledLoot` | `Ralzar81/Unleveled-Loot` | `modsettings.json` | `UnleveledLoot.dfmod.json`: the repository's manifest is 1.1.1, the port follows 1.1.2 |
+
+- Run it once after cloning. `npm run dev`, `npm run build`, `npm test`, `npm run test:changed` and
+  `npm run test:shard` run it first (`predev`, `prebuild`, `pretest`, ...). CI runs it as a step before the tests and
+  the build.
+- A folder whose `.fetched-vendor` marker holds the pinned commit is skipped, so a second run needs no network.
+- `--list` prints each folder, its repository and its commit. `--dest <dir>` fills another vendor directory. Names
+  limit the run to those folders; an unknown name is refused before anything is downloaded.
+- The fetched JSON files have LF line endings where the bundles' copies had CRLF. The content is the same.
+- To move a pin, change the commit in `source_of`, run the script into an empty `--dest`, and compare the result with
+  the old files before you commit the new pin.
+
+## Attribution and permission (kept folders)
+
+These folders stay committed: no public download reproduces them. The folder README holds the full record.
+
+| Folder | Author | Mod and version | Source | Permission or licence | Licence files in the folder |
+|---|---|---|---|---|---|
+| `aquatic-sprites` | Cliffworms | Aquatic Sprites 1.0 | Nexus Mods, Daggerfall Unity mod 276 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_AquaticSprites.txt` (the author's readme) |
+| `detailed-ships` | Cliffworms | Detailed Ships 1.0.0 | Nexus Mods, Daggerfall Unity mod 307 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_DetailedShips.txt` (the author's readme) |
+| `project-legacy` | Lattymoy, Ghð§† and Positronico | Project Legacy 0.4.1 | The shipped archive, from Lattymoy | The owner's own mod; the bundle states no licence. The co-authors' consent is not recorded | none |
+| `raum-book` | Mac (Lattymoy) | project-raum's book and paper code | `github.com/Lattymoy/project-raum` (not public) | The owner's own work | none |
+| `readied-spellcasting-hands` | jefetienne | Readied Spellcasting Hands 1.3 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
+| `vorbis-fsb-setups` | vgmstream; the Xiph.org Foundation | Two Vorbis setup headers | vgmstream's `vorbis_codebooks_fsb.h`; libvorbis | vgmstream's licence; BSD-3-Clause for libvorbis | `COPYING.vgmstream`, `COPYING.libvorbis` |
+| `world-tooltips` | jefetienne | World Tooltips 1.1 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
+
+The other vendored mod folders (all but DFU's own `dfu-*` data and the fetched folders above) await a record of their
+authors' permission. Their READMEs say what is known; this page
+does not claim a permission that is not recorded.
+
 ## A mod's switches (`src/systems/modSettings.js`)
 
 - `MOD_SETTINGS[vendor]` declares each vendored mod that has switches: `title`, `author`, and `keys`. A key is

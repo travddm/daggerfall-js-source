@@ -126,7 +126,7 @@ test('HOTFIX 1003f a bout\'s stands are bodies: a spectator\'s welcome names the
 }));
 
 test('HOTFIX 1003f the client: a private session\'s Host and Join want an account held and my socket open - refused otherwise with the sign-in line, nothing entered; signed in and open, the floor is entered (mutants: the press never refused; signed out let through; a socket not open let through)', async () => {
-  const open = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const open = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const screen = (signedIn, S) => {
     const doors = [];
     const A = createArenaOnline({

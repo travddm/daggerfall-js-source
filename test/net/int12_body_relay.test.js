@@ -15,8 +15,8 @@ import { mintSdReceipt, readSdReceipt, sdReceiptValid } from '../../src/net/supe
 import { mintSerpentReceipt, readSerpentReceipt, serpentReceiptValid } from '../../src/net/serpent/serpentReceipt.js';
 import { gateTimes, gateRoomKey, PIXEL_M } from '../../src/net/gate/gateLaw.js';
 import {
-  GATE_BRAIN_V, GATE_KINDS, GATE_OUT_KINDS, SD_KINDS, SD_OUT_KINDS, SERPENT_KINDS, SERPENT_OUT_KINDS, BODY_WORD_MAX, BOSS_REF_RELAY_MIN,
-  relaySupportsBossRef, validGateIn, validGateOut, validSdIn, validSdOut, validSerpentIn, validSerpentOut, RELAY_VERSION, SOCIAL_ROOM, SD_KEY, worldRoom, PIXEL_UNITS,
+  GATE_BRAIN_V, GATE_KINDS, GATE_OUT_KINDS, SD_KINDS, SD_OUT_KINDS, SERPENT_KINDS, SERPENT_OUT_KINDS, BODY_WORD_MAX,
+  validGateIn, validGateOut, validSdIn, validSdOut, validSerpentIn, validSerpentOut, SOCIAL_ROOM, SD_KEY, worldRoom, PIXEL_UNITS,
   SD_BRAIN_V, cellRoomOfWire, serpentFightId,
 } from '../../src/net/wire.js';
 import { realmToDungeon, SD_ARENA } from '../../src/net/superDungeon/sdBrain.js';
@@ -29,9 +29,6 @@ import { standService } from '../accountDb.mjs';
 import { claimGate } from '../../server-account/src/accounts.js';
 import { reviewAct, bodiesMeasure, BODY_TABLES } from '../../server-account/src/review.js';
 import { reviewRequest } from '../../tools/realmReview.mjs';
-import { OnlineSession } from '../../src/net/online.js';
-import { fakeSocketClass } from '../fakeSocket.mjs';
-import { relayVersionAtLeast } from '../relayVersion.mjs';
 import { sdTestKey, sdOneParty } from './superDungeon/sdParty.mjs';   // SD-PARTY: the rig's one party's Hour
 
 sdOneParty();
@@ -43,7 +40,7 @@ const ENFORCE = JSON.stringify({ enforce: true });
 
 // ═══ THE WIRE ═══════════════════════════════════════════════════════════════════
 
-test('INT11 THE WIRE: a body\'s word (`vt`, thousandths of its whole) a new kind of the gate\'s, the Abyss Dungeon\'s and the serpent\'s, bounded; the count\'s fall (`bd`) a new kind back, with no fields of its own (the serpent\'s with its site); the client says it to a relay at BOSS_REF_RELAY_MIN or later, which this tree builds (mutants: a word past the whole; a fall carrying fields; an older relay told)', () => {
+test('INT11 THE WIRE: a body\'s word (`vt`, thousandths of its whole) a new kind of the gate\'s, the Abyss Dungeon\'s and the serpent\'s, bounded; the count\'s fall (`bd`) a new kind back, with no fields of its own (the serpent\'s with its site) (mutants: a word past the whole; a fall carrying fields)', () => {
   for (const kinds of [GATE_KINDS, SD_KINDS, SERPENT_KINDS]) assert.ok(kinds.includes('vt'));
   for (const kinds of [GATE_OUT_KINDS, SD_OUT_KINDS, SERPENT_OUT_KINDS]) assert.ok(kinds.includes('bd'));
   for (const valid of [validGateIn, validSdIn, validSerpentIn]) {
@@ -54,13 +51,6 @@ test('INT11 THE WIRE: a body\'s word (`vt`, thousandths of its whole) a new kind
   assert.deepEqual(validGateOut({ k: 'bd', h: 3 }), { k: 'bd' });
   assert.deepEqual(validSdOut({ k: 'bd', x: 1 }), { k: 'bd' });
   assert.deepEqual(validSerpentOut({ k: 'bd', sx: 10, sz: 20, q: 1 }), { k: 'bd', sx: 10, sz: 20 }, 'the serpent\'s with its site (the client folds its own - serpentHost wrecked)');
-  assert.equal(relaySupportsBossRef(`world${BOSS_REF_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsBossRef(`world${BOSS_REF_RELAY_MIN}`), true);
-  assert.equal(relaySupportsBossRef('nonsense'), false);
-  assert.ok(relayVersionAtLeast(BOSS_REF_RELAY_MIN), 'the relay this tree builds counts');
-  assert.equal(BOSS_REF_RELAY_MIN, 188, 'world188 the first that counts (world186 on its branch, renumbered at the merge of main)');
-  assert.equal(relaySupportsBossRef('world187'), false, 'the relay before it counts nothing - its gate words know no `vt`');
-  assert.equal(RELAY_VERSION, 'world280');
 });
 
 // ═══ THE GATE ═══════════════════════════════════════════════════════════════════
@@ -312,7 +302,7 @@ test('INT14 THE RECEIPTS: a gate\'s, an Hour\'s and a serpent\'s each carry the 
   }
 });
 
-test('INT14 THE SERVICE KEEPS IT, STAFF READ IT: each claim keeps its receipt\'s measure on its kill\'s row (`body`, migration 0105), none from a receipt without one; /v1/mod/realm-bodies answers each fight\'s receipts, the mends claimed a minute stood by quantile, how many claimed past the line, fell by the count, and would have lost their receipt - a developer\'s alone; tools/realmReview.mjs `bodies [days]` asks it (mutants: the measure not kept; the review open to anyone; a fight left out)', async () => {
+test('INT14 THE SERVICE KEEPS IT, STAFF READ IT: each claim keeps its receipt\'s measure on its kill\'s row (`body`), none from a receipt without one; /v1/mod/realm-bodies answers each fight\'s receipts, the mends claimed a minute stood by quantile, how many claimed past the line, fell by the count, and would have lost their receipt - a developer\'s alone; tools/realmReview.mjs `bodies [days]` asks it (mutants: the measure not kept; the review open to anyone; a fight left out)', async () => {
   const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const nowS = Math.floor(Date.now() / 1000);
@@ -353,18 +343,14 @@ test('INT14 THE SERVICE KEEPS IT, STAFF READ IT: each claim keeps its receipt\'s
 
 // ═══ THE CLIENT ═════════════════════════════════════════════════════════════════
 
-test('INT15 THE CLIENT: a session notes a relay that counts (`bossOk`, off its welcome\'s version); the court says my body through `sendBody` to such a relay alone, the Hour\'s fight through my realm\'s socket while it answered me, the serpent my hull through her cell; the count\'s fall (`bd`) is a death by the relay\'s word in the fight it came from - the zone referee\'s door - and a ship\'s wreck as her whole hull taken (mutants: said to an older relay; the fall turned aside by a death save; heard outside its fight)', () => {
-  const Sock = fakeSocketClass();
-  const s = new OnlineSession({ url: 'ws://x', WebSocketImpl: Sock });
-  assert.equal(s.bossOk, false, 'nothing said before a relay says it counts');
+test('INT15 THE CLIENT: the court says my body through `sendBody`, the Hour\'s fight through my realm\'s socket while it answered me, the serpent my hull through her cell; the count\'s fall (`bd`) is a death by the relay\'s word in the fight it came from - the zone referee\'s door - and a ship\'s wreck as her whole hull taken (mutants: the fall turned aside by a death save; heard outside its fight)', () => {
   const world = rd('src/scenes/world.js'), court = rd('src/scenes/gate/gateCourt.js'), host = rd('src/scenes/serpentHost.js'), online = rd('src/net/online.js');
-  assert.match(online, /if \(primary\) this\.bossOk = relaySupportsBossRef\(relayV\);/);
-  assert.match(world, /sendBody: \(v\) => !!online\?\.bossOk && !!online\?\.sendGate\?\.\(\{ k: 'vt', v \}\)/);
+  assert.match(world, /sendBody: \(v\) => !!online\?\.sendGate\?\.\(\{ k: 'vt', v \}\)/);
   assert.match(court, /if \(alive && healLive\(s\) && e\?\.maxHealth > 0\) sayBody\(e\.health \/ e\.maxHealth, t\);/);
-  assert.match(world, /if \(!sdFightLink \|\| modes\?\.sdRealmSlot\?\.\(\) == null \|\| !online\?\.bossOk\) return;\n    if \(playerEntity\.health > 0 && playerEntity\.maxHealth > 0 && sdFightLink\.joined\(\)\) _sdSayBody\(/);
+  assert.match(world, /if \(!sdFightLink \|\| modes\?\.sdRealmSlot\?\.\(\) == null \|\| !online\) return;\n    if \(playerEntity\.health > 0 && playerEntity\.maxHealth > 0 && sdFightLink\.joined\(\)\) _sdSayBody\(/);
   assert.match(world, /sdFightFrame\(\); sdBodyFrame\(\); sdVoiceFrame\(\);/, 'each frame of the Hour');
   assert.match(host, /const sayHull = bodySayer\(\(v\) => !!live && !!deps\.online\?\.send\?\.\(\{ k: 'vt', v \}/);
-  assert.match(online, /if \(w\.k === 'vt'\) return this\._bodySend\('serpent', w, ws, this\._mine\(cell\) \? this\.bossOk : !!halo\?\.bossOk\);/);
+  assert.match(online, /if \(w\.k === 'vt'\) return this\._bodySend\('serpent', w, ws\);/);
   assert.match(world, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);
   assert.match(world, /if \(w\?\.k === 'bd'\) \{ bossCountFell\(slot != null\); return; \}/);
   assert.match(world, /function bossCountFell\(inFight\) \{\n    if \(!inFight \|\| !\(playerEntity\.health > 0\)\) return;\n    setMidScreenText\(BOSS_COUNT_FELL_TEXT\);\n    forcePlayerDeath\(playerEntity\);/);

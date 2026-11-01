@@ -1,4 +1,4 @@
-// STAFF-ROLES-BY-ACCOUNT - Admin, Owner and Moderator are columns of the ACCOUNT (migration 0191), never a handle: a name the
+// STAFF-ROLES-BY-ACCOUNT - Admin, Owner and Moderator are columns of the ACCOUNT (migration 0002), never a handle: a name the
 // previous project's staff held grants nothing to whoever registers it, a role is granted and revoked by the roles above
 // it, and every door that used to ask a handle list asks the row. Driven through the real Worker on the node:sqlite
 // database every account pin stands on (test/accountDb.mjs).
@@ -105,12 +105,12 @@ test('STAFF-ROLES: each door that asked a handle list is refused without the rol
   assert.deepEqual((await s.call('/v1/mod/mute', { target: victim.id, minutes: 30 }, plain.secret)).body, { error: 'not-moderator' }, 'a player cannot mute');
   assert.equal((await s.call('/v1/mod/mute', { target: victim.id, minutes: 30 }, mod.secret)).status, 200, 'a Moderator can');
   assert.equal((await s.call('/v1/mod/mute', { target: troll.id, minutes: 30 }, adm.secret)).status, 200, 'an Admin can');
-  // the Admin's doors (market pull, the realm review, the customs pass: isDeveloper)
+  // the Admin's doors (market pull, the realm review, the realm holds: isDeveloper)
   assert.deepEqual((await s.call('/v1/market/remove', { listing: 'nothing' }, plain.secret)).body, { error: 'not-developer' });
   assert.deepEqual((await s.call('/v1/market/remove', { listing: 'nothing' }, mod.secret)).body, { error: 'not-developer' }, 'a Moderator is no Admin');
   assert.notEqual((await s.call('/v1/market/remove', { listing: 'nothing' }, adm.secret)).body?.error, 'not-developer', 'an Admin passes the gate');
-  assert.deepEqual((await s.call('/v1/mod/customs-pass', { name: 'Plain' }, plain.secret)).body, { error: 'not-developer' });
-  assert.notEqual((await s.call('/v1/mod/customs-pass', { name: 'Plain' }, adm.secret)).body?.error, 'not-developer');
+  assert.deepEqual((await s.call('/v1/mod/realm-holds', {}, plain.secret)).body, { error: 'not-developer' });
+  assert.notEqual((await s.call('/v1/mod/realm-holds', {}, adm.secret)).body?.error, 'not-developer');
   // the "dev" feature switch opens for Admins alone
   assert.deepEqual([festivalOpenFor(row('Plain'), s.env), festivalOpenFor(row('Heron'), s.env), festivalOpenFor(row('Kestrel'), s.env)], [false, false, true]);
   // the POI editor: an Admin builds, an Owner approves

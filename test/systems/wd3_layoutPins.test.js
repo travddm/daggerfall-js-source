@@ -260,19 +260,6 @@ test('WD3 the discoveries: a town\'s found buildings carry the layout they were 
   restoreDiscovery(null);
 });
 
-test('WD3 a deed customs gives back crosses WITH its town\'s layout (AUDIT WD3 S2) - its key names a building only in that layout; a slot the realm held keeps none of its own', async () => {
-  const { reclaimCustomsDeeds } = await import('../../src/systems/realmCustoms.js');
-  const { interiorSceneName } = await import('../../src/systems/sceneCache.js');
-  const name = interiorSceneName(1017, 5);
-  const realm = { houses: [{ regionIndex: 0, layout: 'beautiful-cities@0.5.0' }, {}], sceneCache: { permanentScenes: [name], scenes: [] } };
-  const offline = { houses: [{}, { regionIndex: 1, location: 'Wayrest', mapId: 1017, buildingKey: 5, layout: 'beautiful-villages@1.4.2' }], sceneCache: { scenes: [] } };
-  reclaimCustomsDeeds(realm, offline);
-  assert.equal(realm.houses[1].layout, 'beautiful-villages@1.4.2');
-  const classic = { houses: [{}, { layout: 'beautiful-cities@0.5.0' }], sceneCache: { permanentScenes: [name], scenes: [] } };
-  reclaimCustomsDeeds(classic, { houses: [{}, { location: 'Wayrest', mapId: 1017, buildingKey: 5 }], sceneCache: { scenes: [] } });
-  assert.equal('layout' in classic.houses[1], false, 'a deed made in Daggerfall\'s own town carries none');
-});
-
 test('WD3 a deed SLEEPS where its town stands in another layout (AUDIT WD3 H1) - no building is the player\'s by its key there (door, cupboards, bed, furniture, the bank\'s sale) until the town stands in its layout again; one whose town the host cannot place stands as Daggerfall read it; and the market never sells a house with no model of its own (H2)', async () => {
   const { isHouseOwned, deedStands, housesForSale } = await import('../../src/systems/banking.js');
   world();

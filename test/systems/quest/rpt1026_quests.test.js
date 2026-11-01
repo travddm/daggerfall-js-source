@@ -485,7 +485,7 @@ test('ARENA-ORDER: a ladder win the service has not counted yet holds the next F
   const track = (p) => { inflight++; return p.finally(() => { inflight--; }); };
   const settle = async () => { do await turns(); while (inflight > 0); await turns(); };
   const said = [], entered = [], attempts = [], asked = [], paid = [], sent = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { sent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { sent.push(w); return true; } };
   const A = createArenaOnline({
     now: () => t, session: () => session, say: (l) => said.push(l), guest: () => false, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }),
     bouts: { ask: (o) => asked.push(o), relayWord: () => true, dismiss() {}, holds: () => false, relay: () => null },

@@ -7,7 +7,7 @@
 //   add --local for the local D1 (wrangler dev), --print to show the SQL and run nothing
 //
 // Run from server-account/ (where wrangler finds wrangler.toml) by someone with deploy access to the Cloudflare account.
-// NO HTTP ROUTE GRANTS AN OWNER, and no handle does: a role is a column of the account's row (migration 0191), so the
+// NO HTTP ROUTE GRANTS AN OWNER, and no handle does: a role is a column of the account's row (migration 0002), so the
 // account id is what you pass. Find the id with `find`, and check that the account's registration time is the one you
 // expect - a name is free to whoever registers it first, so confirm the account is yours before you give it a role.
 // Docs: docs/operations/staff-roles.md.

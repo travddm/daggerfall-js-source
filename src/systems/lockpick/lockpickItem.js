@@ -41,10 +41,8 @@ registerLockpickArt(addVendorTextures);   // the import IS the registration
 
 /** The stack a General Store's or a Pawn Shop's counter keeps (ENDLESS-STOCK). */
 export const ENDLESS_LOCKPICK_STACK = 25;
-/** The picks a character whose class holds Lockpicking sets out with - and is given once, from before the lockpick. */
+/** The picks a character whose class holds Lockpicking sets out with. */
 export const LOCKPICK_KIT = 5;
-/** The gift's mark a save carries once its character has had it (the Wallet's shape, walletItem.js WALLET_GIFT). */
-export const LOCKPICK_GIFT = 1;
 /** A rogue's pockets: [mobile type, chance (0..1), the most picks] - a Burglar's and a Thief's trade, the rest's now
  *  and then. One to `most`, evenly. */
 export const ROGUE_LOCKPICKS = Object.freeze([
@@ -102,14 +100,6 @@ export function giveStartingLockpicks(/** @type {any} */ entity) {
   const stack = lockpicks(LOCKPICK_KIT);
   addItem(entity.items, stack);
   return stack;
-}
-/** The gift, the Wallet's shape (walletItem.js giveWalletGift): a character from before the lockpick (its save's mark short
- *  of LOCKPICK_GIFT) is marked, and given the kit if its class holds Lockpicking - once. Answers the picks given. */
-export function giveLockpickGift(/** @type {any} */ entity) {
-  if (!entity || typeof entity !== 'object') return 0;
-  if ((Number.isSafeInteger(entity.lockpickGift) ? entity.lockpickGift : 0) >= LOCKPICK_GIFT) return 0;
-  entity.lockpickGift = LOCKPICK_GIFT;
-  return giveStartingLockpicks(entity) ? LOCKPICK_KIT : 0;
 }
 
 /** A rogue's pockets (ROGUE_LOCKPICKS) for a foe's EnemyBasics row - its row, read by identity (the rows carry no id), so a

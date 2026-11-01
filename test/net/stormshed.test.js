@@ -7,7 +7,7 @@
 //   B. a Watch claim that failed was claimed again the frame after its answer (net/townSeatBook.js SEAT_WATCH_RETRY_MS);
 //   C. the reads those asks multiplied: every seat's witness rows read whole on each list, claim and report (one isolate
 //      keeps them SEAT_ROWS_KEPT_S - server-account/src/townSeats.js), and a character's harvests today read off every
-//      player's (migration 0085's index).
+//      player's (`idx_node_harvests_char_day`).
 // Each pin failed on the build before it. tools/mutants/stormshed.json.
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';

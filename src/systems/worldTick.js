@@ -578,9 +578,8 @@ function settleSaid(entity, regionIndex, say) {
 export function empireJoin({ entity, nowMinutes, say = () => {} } = {}) {
   const accounts = entity?.bankAccounts;
   if (!accounts?.length) return null;
-  // AUDIT REALM L3-F8: A LOAN DUE AT THE JOIN STANDS IN NO GOOD STANDING. Customs' unpaid call falls due at the save's own
-  // minute (realmCustoms.js), and the character's clock is restored at that minute (LIVED1) - due now, so the Empire kept it
-  // as its one loan in good standing when it fit the cap: no default, no reputation, "none for a newcomer" undone. A
+  // AUDIT REALM L3-F8: A LOAN DUE AT THE JOIN STANDS IN NO GOOD STANDING. A loan due at the save's own minute is due
+  // now, since the character's clock is restored at that minute (LIVED1), so the Empire kept it as its one loan in good standing when it fit the cap: no default, no reputation, "none for a newcomer" undone. A
   // loan already due is settled first, as the day's sweep settles an overdue one; the Empire keeps only one not yet due.
   const now = Math.floor(nowMinutes);
   for (let r = 0; r < accounts.length; r++) {

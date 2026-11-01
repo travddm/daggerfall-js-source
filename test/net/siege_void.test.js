@@ -2,7 +2,7 @@
 // "Moderators (MOD1) may **void a siege** (`/siege void`) - a history row, the holder keeping the seat - when a fight was
 // won by an exploit found after it". The seat's battle of this week void: before its result, as a Turning voids an
 // unfinished one (the Sellswords' escrow home) but the challenger's Right NOT carried; after a capture, the Charter back
-// to the guild that held it (its Standing, Tithe, Legacy and works as the result's `prior` kept them - migration 0067);
+// to the guild that held it (its Standing, Tithe, Legacy and works as the result's `prior` kept them);
 // after a hold, the holder's Standing and defence fifth struck and the challenger's bar lifted; after a Tourney, the
 // winner's Charter gone. A Chronicle row; Honours paid stand; a later receipt refused; idempotent. Driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the chat word parsed.
@@ -200,7 +200,7 @@ test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Sta
   assert.equal(s.holdOf().guild_id, sh.gid);
 });
 
-test('VOID AFTER A CAPTURE WHOSE RESULT KEPT NOTHING (written before migration 0067): the Charter back at Standing 50, from this week, no Tithe (mutants: the fallbacks)', async (t) => {
+test('VOID AFTER A CAPTURE WHOSE RESULT KEPT NOTHING (its `prior` NULL): the Charter back at Standing 50, from this week, no Tithe (mutants: the fallbacks)', async (t) => {
   const s = await siegeWeek(t);
   s.setNow(START + 1500);
   assert.equal((await s.claim(s.a1)).status, 200);

@@ -15,8 +15,8 @@ import {
 import { createLockpickAct, PIN } from '../../../src/systems/lockpick/lockpickAct.js';
 import { LOCKPICK_TEMPLATE, LOCKPICK_LAW_ROW } from '../../../src/systems/lockpick/lockpickRow.js';
 import {
-  LOCKPICK_ROW, ENDLESS_LOCKPICK_STACK, LOCKPICK_KIT, LOCKPICK_GIFT, ROGUE_LOCKPICKS, isLockpick, lockpicks, lockpickCount,
-  spendLockpick, careerPicksLocks, giveStartingLockpicks, giveLockpickGift, rogueLockpicks, ensureEndlessLockpicks, LOCKPICK_TEXT,
+  LOCKPICK_ROW, ENDLESS_LOCKPICK_STACK, LOCKPICK_KIT, ROGUE_LOCKPICKS, isLockpick, lockpicks, lockpickCount,
+  spendLockpick, careerPicksLocks, giveStartingLockpicks, rogueLockpicks, ensureEndlessLockpicks, LOCKPICK_TEXT,
 } from '../../../src/systems/lockpick/lockpickItem.js';
 import { LOCKPICK_ART, LOCKPICK_ARCHIVE, LOCKPICK_ART_SIZE, lockpickArt, lockpickTexel } from '../../../src/systems/lockpick/lockpickArt.js';
 import { LOCK_SFX, LOCK_SFX_FILES, LOCK_CUES, LOCK_CLASSIC_CUES, createLockEar } from '../../../src/systems/lockpick/lockpickSounds.js';
@@ -244,7 +244,7 @@ test('LOCKPICK item: counted across stacks, spent one at a time; the counter\'s 
   } finally { globalThis.location = was; }
 });
 
-test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a character from before is given them once', () => {
+test('LOCKPICK item: a class that holds Lockpicking sets out with its picks', () => {
   const thief = { items: [], career: { primarySkills: [SKILLS.Pickpocket], majorSkills: [SKILLS.Lockpicking], minorSkills: [] } };
   const minor = { items: [], career: { primarySkills: [], majorSkills: [], minorSkills: [SKILLS.Lockpicking] } };
   const knight = { items: [], career: { primarySkills: [SKILLS.LongBlade], majorSkills: [], minorSkills: [] } };
@@ -252,11 +252,6 @@ test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a c
   assert.equal(careerPicksLocks({}), false);
   assert.equal(giveStartingLockpicks(knight), null); assert.equal(knight.items.length, 0);
   assert.equal(giveStartingLockpicks(thief).stackCount, LOCKPICK_KIT); assert.equal(LOCKPICK_KIT, 5);
-  const old = { items: [], career: thief.career };
-  assert.equal(giveLockpickGift(old), 5); assert.equal(old.lockpickGift, LOCKPICK_GIFT); assert.equal(lockpickCount(old.items), 5);
-  assert.equal(giveLockpickGift(old), 0, 'once'); assert.equal(lockpickCount(old.items), 5);
-  const oldKnight = { items: [], career: knight.career };
-  assert.equal(giveLockpickGift(oldKnight), 0); assert.equal(oldKnight.lockpickGift, 1, 'marked all the same');
 });
 
 test('LOCKPICK item: a rogue\'s pockets - a Burglar or a Thief more often than not, the rest now and then, none else', () => {

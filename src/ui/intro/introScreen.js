@@ -1,10 +1,10 @@
-// INTRO2: gesture -> score-led cinematic -> held title -> menu.
+// INTRO2: gesture -> cinematic under Daggerfall's title song -> held title -> menu.
 // TITLE-DOOR: THE HELD TITLE
 // IS THE FRONT DOOR. Where it said Tap to continue, the menu's own doors stand on it - the film steps under the menu,
 // holds its last frame for the whole visit and is let go when a game is chosen (runCinematicFrontDoor). Skip intro and
 // Escape land on the title, not past it. The front door owns the audio session; the overlay owns its canvas, listeners
 // and animation frame.
-import { IntroTheme, MENU_THEME_GAIN } from '../../systems/introTheme.js';
+import { TitleMusic, MENU_MUSIC_LEVEL } from '../../systems/titleMusic.js';
 import { brandMark } from '../brandMark.js';
 import { createIntroLandscape } from './introLandscape.js';
 import { introFrameAt, INTRO_CREDITS, INTRO_NARRATION, TITLE_READY_TIME, MENU_FADE_SECONDS } from './introCue.js';
@@ -14,7 +14,7 @@ import { PIXELIFY_FIVE_FACE, PIXEL_FONT_CSS } from '../pixelifyFive.js';   // FO
 import { injectEnhancedFonts } from '../enhanced/enhancedStyle.js';   // FONT3: the one request, made when the film mounts
 import { t } from '../../systems/textManager.js';   // L10N4: the film's words in the player's language
 
-/** INTRO4: how long the gate waits for the film's city to be built (the score's own load is held to 15 s). */
+/** INTRO4: how long the gate waits for the film's city to be built. */
 export const CITY_WAIT_MS = 20000;
 /** TITLE-DOOR: the score time the landed title holds - the mark at rest, its impact spent, the map's words up. */
 export const TITLE_HELD_TIME = TITLE_READY_TIME + 1;
@@ -152,14 +152,15 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
   // small caps over it. `status` stays as a node because it is the live region
   // a screen reader is owed (and the only thing that says the tap enables
   // sound), but it is off the picture: read aloud, never drawn. The one
-  // message a player must SEE - the score failing to load - was never this
-  // line's, it is the footer's.
+  // message a player must SEE - a browser with no Web Audio to run the film's
+  // clock on - was never this line's, it is the footer's.
   const status = make(doc, 'p', 'intro-status', t('menu.intro.preparing', 'Preparing…')); status.setAttribute('role', 'status');
   gate.append(begin, status);
   const skip = make(doc, 'button', 'intro-skip', t('menu.intro.skip', 'Skip intro')); skip.type = 'button';
   // MAC: no wordmark in the letterbox - the logo says it, and says it better.
-  // The element stays because it is the FAILURE surface: if the score cannot
-  // load, beginPlayback writes its truthful card here. Empty until then.
+  // The element stays because it is the FAILURE surface: if there is no audio
+  // clock, beginPlayback writes its truthful card here. Empty until then. A
+  // missing title song is not a failure: the film then plays silently.
   const footer = make(doc, 'div', 'intro-footer');
   host.append(film, gate, skip, footer); doc.body.append(host);
   // Shared by the setup path and by a tap that beats it: a gesture given
@@ -175,7 +176,7 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
   let resolveDone;
   const done = new Promise((resolve) => { resolveDone = resolve; });
   const debugState = { phase, time: 0, frames: 0, impactTime: null, readyTime: null, landedTime: null };
-  if (debug) win.__intro = { theme, state: debugState, snapshot: () => ({ ...debugState, sourceRunning: !!theme.source, level: theme.level, audioState: theme.context?.state, time: theme.time() }) };
+  if (debug) win.__intro = { theme, state: debugState, snapshot: () => ({ ...debugState, started: theme.started, song: theme.song ?? null, level: theme.level, audioState: theme.context?.state, time: theme.time() }) };
   // DEV-only deterministic visual review. The shipping path always follows
   // the audio device. Seeking is available only with an explicit frozen cue.
   if (debug && freezeAt !== null) win.__intro.seek = (time) => {
@@ -189,7 +190,7 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
   };
   // TITLE-DOOR: a title the score carried in keeps it up while the player looks; their first press on the menu takes it
   // down to the menu's level, as the retired Tap to continue did
-  function duck() { stopDuck(); theme.setLevel(MENU_THEME_GAIN, MENU_FADE_SECONDS); }
+  function duck() { stopDuck(); theme.setLevel(MENU_MUSIC_LEVEL, MENU_FADE_SECONDS); }
   const stopDuck = () => { win.removeEventListener('pointerdown', duck, true); win.removeEventListener('keydown', duck, true); };
 
   /** Every exit's one teardown: the release (a game chosen) and a film that broke before it landed. */
@@ -213,16 +214,16 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
   // over it, inert while it fades in, its first door then given the focus the old Tap to continue had; every press from
   // here is the menu's. `how` says what brought the title in: 'carried' (the score - it ducks at the first press),
   // 'skipped' (Skip intro or Escape - the score starts at the menu's level, as the old Skip's menu did) or 'opened' (Skip
-  // start video, a score that failed to load, a film that could not be prepared - the film touches no audio).
+  // start video, no audio clock, a film that could not be prepared - the film touches no audio).
   const land = (how) => {
     if (over || phase === 'landed') return;
     if (how === 'skipped') {
       // Preserve the click's activation even if the player skips during loading.
       const unlocked = theme.unlock();
       void Promise.all([unlocked, theme.prepare()]).then(([ok, loaded]) => {
-        if (ok && loaded && !theme.disposed) { theme.setLevel(MENU_THEME_GAIN, MENU_FADE_SECONDS); theme.start(); }
+        if (ok && loaded && !theme.disposed) { theme.setLevel(MENU_MUSIC_LEVEL, MENU_FADE_SECONDS); theme.start(); }
       });
-      theme.setLevel(MENU_THEME_GAIN, MENU_FADE_SECONDS);
+      theme.setLevel(MENU_MUSIC_LEVEL, MENU_FADE_SECONDS);
     }
     phase = 'landed'; debugState.phase = phase; debugState.landedTime = freezeAt ?? theme.time?.() ?? null;
     gate.hidden = true; skip.hidden = true;
@@ -377,7 +378,7 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
       console.warn('[intro] stopping the film:', error.message);
       // a film that breaks before it lands is let go, the score at the menu's level and the menu on its own sky; a landed
       // title keeps the frame it has and draws no more
-      if (phase !== 'landed') { theme.setLevel(MENU_THEME_GAIN, MENU_FADE_SECONDS); finish(); }
+      if (phase !== 'landed') { theme.setLevel(MENU_MUSIC_LEVEL, MENU_FADE_SECONDS); finish(); }
       else { broken = true; win.removeEventListener('resize', requestDraw); landscape?.dispose(); landscape = null; }
     }
   }
@@ -385,8 +386,8 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
   frameId = win.requestAnimationFrame(draw);
 
   // Preparation must not delay the HANDOFF promise. A player can skip and
-  // choose a game while the score is still loading; ownership then closes
-  // the pending request immediately rather than holding boot for 15 seconds.
+  // choose a game while the film is still being prepared; ownership then
+  // lets it go at once rather than holding boot behind it.
   const prepare = async () => {
     // Let the gate paint before map generation. No music advances in setup.
     await new Promise((resolve) => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
@@ -398,7 +399,7 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
     // already stands on it
     landscape?.mapReady.then((ok) => { if (ok && !over) { mapShown = true; lastFrame = null; requestDraw(); } });
     // INTRO4: the city is built off this thread; the film opens on it, never on an empty lake - but a build that never
-    // answers (a worker that hangs without an error) holds the gate no longer than the score's own load may
+    // answers (a worker that hangs without an error) holds the gate no longer than CITY_WAIT_MS
     const built = landscape ? Promise.race([landscape.ready, new Promise((resolve) => win.setTimeout(() => resolve(false), CITY_WAIT_MS))]) : Promise.resolve(false);
     await Promise.all([musicReady, decoded, built]);
     debugState.landscapeReady = !!landscape && await built;
@@ -423,30 +424,31 @@ export async function runIntro({ theme, onReveal, doc = document, freezeAt = nul
  *
  * UXB1-A: `menuMusic` is the player's Skip start video (uiPrefs
  * skipStartVideo) - the film skipped, the menu's music kept. It is what the
- * film's own Skip intro button starts (land: the theme at MENU_THEME_GAIN),
+ * film's own Skip intro button starts (land: the title song at MENU_MUSIC_LEVEL),
  * held for the first gesture on the menu because a browser plays nothing
  * before one. TITLE-DOOR: and it still lands on the title - the film's last
  * frame with no film before it, the menu standing on it. ?nointro skips both
  * and opens the menu on its own sky, as it always has.
+ * `fetchBytes` reads the title song's archive (scenes/dataSource.js getBytes).
  * `theme` is the tests' seam; main.js never passes one. */
-export async function runCinematicFrontDoor(openMenu, { skip = false, menuMusic = false, doc = document, debug = false, freezeAt = null, theme = new IntroTheme() } = {}) {
+export async function runCinematicFrontDoor(openMenu, { skip = false, menuMusic = false, doc = document, debug = false, freezeAt = null, fetchBytes = null, theme = new TitleMusic({ fetchBytes }) } = {}) {
   let menu = null, release = null;
   const reveal = () => { menu ??= openMenu(); };
   const onVisibility = () => {
     if (doc.hidden) void theme.pause().catch(() => {});
-    else if (theme.source) void theme.unlock();
+    else if (theme.started) void theme.unlock();
   };
   let menuThemeAsked = false;
   const startMenuTheme = () => {
     if (menuThemeAsked || theme.disposed) return;
     menuThemeAsked = true;
     void Promise.all([theme.unlock(), theme.prepare()]).then(([ok, loaded]) => {
-      if (ok && loaded && !theme.disposed) { theme.setLevel(MENU_THEME_GAIN, 0); theme.start(); }
+      if (ok && loaded && !theme.disposed) { theme.setLevel(MENU_MUSIC_LEVEL, 0); theme.start(); }
     });
   };
   const onGesture = () => {
-    if (theme.source && theme.context?.state !== 'running') void theme.unlock();
-    else if (skip && menuMusic && !theme.source) startMenuTheme();
+    if (theme.started && theme.context?.state !== 'running') void theme.unlock();
+    else if (skip && menuMusic && !theme.started) startMenuTheme();
   };
   doc.addEventListener('visibilitychange', onVisibility);
   doc.addEventListener('pointerdown', onGesture);

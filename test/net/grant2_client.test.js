@@ -1,12 +1,12 @@
 // GRANT2: THE CLIENT'S ASKS -
-// net/online.js reads its cell's law off the welcome (`gm`, from world218), asks down its own cell's socket alone on the
+// net/online.js reads its cell's law off the welcome (`gm`), asks down its own cell's socket alone on the
 // relay's own bucket, and hears the answer; scenes/grantHost.js askGrant asks for the encounters and camps scenes/world.js
 // stands, never awaited.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { OnlineSession } from '../../src/net/online.js';
-import { cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
+import { cellRoomOfWire, PIXEL_UNITS, RELAY_VERSION } from '../../src/net/wire.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { GRANT_BURST_MAX } from '../../src/net/grantLaw.js';
 import { createGrantHost } from '../../src/scenes/grantHost.js';
@@ -24,16 +24,12 @@ function rig(room, welcome = {}) {
   quiet(() => s.join(room, { ...ON }));
   const ws = sockets[0];
   ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: 'world218', gm: 'measure', ...welcome }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION, gm: 'measure', ...welcome }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'grant');
   return { s, ws, heard, out, sockets, tick: (ms) => { t += ms; } };
 }
 
-test('GRANT2 THE SESSION: a cell\'s welcome from world218 says its law (GRANT4: a world room\'s too; GRANT6: unsaid until it comes); an older relay\'s, a town\'s or `off` asks nothing (an older relay closes the socket on one); an ask goes down my cell\'s socket whole, on the relay\'s own bucket; my cell\'s answer is heard, and its `off` stops the asks (mutants: the version unchecked; the bucket not kept)', () => {
-  const old = rig(CELL, { v: 'world217' });
-  assert.equal(old.s.grantMode, 'off');
-  assert.equal(old.s.sendGrant({ k: 'mint', id: 1, kind: 'enc', n: 1 }), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('GRANT2 THE SESSION: a cell\'s welcome says its law (GRANT4: a world room\'s too; GRANT6: unsaid until it comes); a town\'s or `off` asks nothing; an ask goes down my cell\'s socket whole, on the relay\'s own bucket; my cell\'s answer is heard, and its `off` stops the asks (mutant: the bucket not kept)', () => {
   assert.equal(rig('dungeon:m123456').s.grantMode, 'measure', 'GRANT4: a world room\'s own lane asks too');
   assert.equal(rig('town:m123456').s.grantMode, 'off', 'a room whose foes ride nothing asks nothing');
   const { FakeWS, sockets } = fakeSocketClass();

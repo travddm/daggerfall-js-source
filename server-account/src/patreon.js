@@ -19,8 +19,7 @@
 // ACC3's law holds: what a player HOLDS is read at every ask, never a
 // column somebody remembers to clear. What this stores is the one thing
 // that cannot be derived here - what Patreon last said about the
-// player's membership (`patreon_tiers`, `patreon_status`, migration
-// 0045), the way WB9g stores a sale. The title is read off that against
+// player's membership (`patreon_tiers`, `patreon_status`), the way WB9g stores a sale. The title is read off that against
 // PATREON_TIERS, the config's map of tier ids to titles, so a tier
 // remapped in the config moves every patron on their next token, and a
 // pledge Patreon says has ended stops being signed for on the next one.
@@ -70,7 +69,7 @@
 //
 // ═══ ONE PATREON ACCOUNT, ONE GAME ACCOUNT ═════════════════════════
 //
-// A pledge is one person's. `patreon_user` is UNIQUE (0045), and linking
+// A pledge is one person's. `patreon_user` is UNIQUE, and linking
 // a Patreon account that is already linked MOVES it - the confirm page
 // says from where - so a patron who made a new game account takes their
 // title with them, and one pledge never dresses two accounts.

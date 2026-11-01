@@ -83,7 +83,7 @@ test('FEUD WIRE THE LAW: `rb` a whole per mille from x1 to x4 (the writer\'s bou
   assert.deepEqual({ ...F.BLOWS_WIRE }, { PER: 1000, MIN: 1000, MAX: 4000 });
   assert.equal(Wire.FOE_BLOWS_MIN, F.BLOWS_WIRE.MIN);
   assert.equal(Wire.FOE_BLOWS_MAX, F.BLOWS_WIRE.MAX);
-  assert.equal(Wire.RELAY_VERSION, 'world280');
+  assert.equal(Wire.RELAY_VERSION, 'world282');
   const v = (extra) => Wire.validFoeRecord({ i: 4, ...extra });
   for (const rb of [1000, 1430, 4000]) assert.deepEqual(v({ rb }), { i: 4, rb });
   for (const rb of [999, 4001, 1430.5, '1430', null]) assert.equal(v({ rb }), null, `rb ${rb}`);

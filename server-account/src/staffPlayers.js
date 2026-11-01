@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL3-PLAYERS - THE PANEL'S PLAYERS: a search over every account, online or not, by handle or character name (mob,
 // 03:23Z); one account's profile, read tab by tab; its devices and Sign out everywhere; and the rename of an offensive
-// handle or character name (the last was done by hand, migration 0134). Admins alone: Moderators have no profile screen
+// handle or character name (the last was done by hand). Admins alone: Moderators have no profile screen
 // (mob, 03:03Z: Moderators get "only chat report notifications with Mute and Ban").
 //
 // NOTHING NEW IS JUDGED (design doc, "Built on the save judge").
@@ -21,10 +21,10 @@
 // a search, a tab, a device list - once in READ_ONCE_S a member, a player and a view. Every act with its outcome; a refused
 // or failed one `failed`, with its word.
 //
-// SERVER LOAD (design doc, "Server load"): the search reads by index - the handle's, a character's name's (migration
-// 0151) and the last play beat's (players.played_at) - a profile's facts are one batch, a save is opened once a write
+// SERVER LOAD (design doc, "Server load"): the search reads by index - the handle's, a character's name's,
+// and the last play beat's (players.played_at) - a profile's facts are one batch, a save is opened once a write
 // (`kept`: by its object's key, and every write is a new object, so a kept view never goes stale), the trades read by
-// migration 0151's indexes, and every list pages (`from`, answered `next`).
+// their indexes, and every list pages (`from`, answered `next`).
 import { displayName, devicesOf, closeAllSessions, handleRefusal, wornNameRefusal, isMuted } from './accounts.js';
 import { findAccount, strikesOf, isBanned } from './sanctions.js';
 import { canModerate, handleList } from './titles.js';
@@ -64,13 +64,13 @@ export const SAVES_KEPT = 8;
  *  the service's (the profession Stores, a guild vault's deposits, the market's escrow and deliveries, gold at the market).
  *  `letters` filters the letters of credit wherever they lie. */
 export const ITEM_PLACES = Object.freeze(['carried', 'bag', 'wagon', 'furnisher', 'repairer', 'home', 'other', 'stores', 'vault', 'escrow', 'deliveries', 'market-gold', 'letters']);
-/** MIGRATION 0134'S COPIES OF A HANDLE: every column that keeps an account's name as it was, which a rename writes anew
- *  (pinned to the migration's list by test/server/staffpanel3players.test.js). The moderation record (mod_*,
+/** THE COPIES OF A HANDLE: every column that keeps an account's name as it was, which a rename writes anew
+ *  (pinned to the schema's columns by test/server/staffpanel3players.test.js). The moderation record (mod_*,
  *  private_reports, players.muted_by) and the panel's own audit keep what was said and done as it was.
  *  STAFF-PANEL3-PLAYERS FIX (flaw review, "Handle rename rewrites other accounts' rows"): each is `[table, column, scope]`,
  *  `scope` the row's own account column (?3, the renamed account's id) wherever the table keeps one beside the name, so a
  *  copy is this account's and no other's. A copy with no scope keeps no account id beside the name; it holds only
- *  displayName (a handle, unique, or a guest's name, which a handle never matches). 0134 also named six columns that hold
+ *  displayName (a handle, unique, or a guest's name, which a handle never matches). Six more columns that hold
  *  no handle at all, left out here: renown_tracks.name (a character's name, as the client sends it), guild_writs and
  *  guild_contracts' closed_by (an account's id), guild_fealty's offered_by and broken_by and guild_pacts.offered_by (a
  *  guild's id). */
@@ -282,7 +282,7 @@ async function factsOf(db, p, chars, nowS) {
   const q = (/** @type {string} */ sql, /** @type {unknown[]} */ ...a) => db.prepare(sql).bind(...a);
   /** @type {[string, any][]} */
   const reads = [
-    // one open case a kind (migration 0156: a chat case and a spawn case may stand together)
+    // one open case a kind (a chat case and a spawn case may stand together)
     ['case', q("SELECT COUNT(*) AS n FROM mod_cases WHERE target = ?1 AND status = 'open'", p.id)],
     ['reported', q(`SELECT COUNT(DISTINCT x) AS n FROM (SELECT r.listing AS x FROM market_reports r JOIN market_listings l ON l.id = r.listing WHERE l.seller = ?1 AND l.state = 'open'
       UNION ALL SELECT r.auction FROM market_auction_reports r JOIN market_auctions a ON a.id = r.auction WHERE a.seller = ?1 AND a.state = 'open')`, p.id)],
@@ -353,7 +353,7 @@ async function tabOf(ctx, env, tab, p, chars, body, row) {
       db.prepare('SELECT m.char_id, m.rank, g.id, g.name, g.tag FROM guild_members m JOIN guilds g ON g.id = m.guild_id WHERE m.player = ?1').bind(p.id),
       db.prepare('SELECT char_id, xp FROM renown_tracks WHERE player = ?1').bind(p.id),
       db.prepare('SELECT COUNT(*) AS n FROM sessions WHERE player_id = ?1').bind(p.id),
-      // every open case - one a kind, a chat case and a spawn case at once (migration 0156)
+      // every open case - one a kind, a chat case and a spawn case at once
       db.prepare("SELECT id, kind, opened_at, reports, claimed_by FROM mod_cases WHERE target = ?1 AND status = 'open' ORDER BY kind").bind(p.id),
       row,
     ]), strikesOf(db, p.id, nowS)]);
@@ -452,7 +452,7 @@ async function tabOf(ctx, env, tab, p, chars, body, row) {
   }
 
   if (tab === 'trades') {
-    // both sides, by migration 0151's indexes; the service keeps a trade REALM_TRADE_KEEP_S (realmTrade.js), so this is the last week's
+    // both sides, by their indexes; the service keeps a trade REALM_TRADE_KEEP_S (realmTrade.js), so this is the last week's
     const from = fromOf(body.from);
     const [found] = await db.batch([db.prepare(`SELECT t.sid, t.created_at AS at, t.state, t.why, t.result, t.a_player, t.a_char, t.b_player, t.b_char,
         ca.name AS a_name, cb.name AS b_name, pa.handle AS a_handle, pb.handle AS b_handle
@@ -536,7 +536,7 @@ export async function staffPlayers(ctx, env, path, body, who, audit) {
     const after = typeof body.from === 'string' ? body.from.slice(0, 64) : '';
     const top = (/** @type {string} */ s) => `${s}\u{10FFFF}`;   // past every name the prefix starts
     const args = [after, PLAYERS_PAGE + 1, ...(q ? [q.toLowerCase(), top(q.toLowerCase()), q, top(q)] : [])];
-    // STAFF-BANNED: the banned read by migration 0164's index, as the online one is by the play beat's; the clock bound
+    // STAFF-BANNED: the banned read by the bans index, as the online one is by the play beat's; the clock bound
     // before the online filter's, whose clause reads the last bound
     const banSql = ban === 'banned' ? `AND id IN (SELECT id FROM players WHERE banned_until > ?${args.push(nowS)}) `
       : ban === 'not-banned' ? `AND (banned_until IS NULL OR banned_until <= ?${args.push(nowS)}) ` : '';
@@ -662,9 +662,9 @@ export async function staffPlayers(ctx, env, path, body, who, audit) {
   if (to === p.handle) return fail('rename-same', detail);
   if (canModerate(p, env) || listed.has(p.handle_lc) || listed.has(to.toLowerCase())) return fail('rename-listed', detail);
   if (await db.prepare('SELECT 1 AS taken FROM players WHERE handle_lc = ?1 AND id != ?2').bind(to.toLowerCase(), p.id).first()) return fail('rename-taken', detail);
-  // migration 0134's way, in one batch: the handle (the unique index the authority on a name taken), and every copy of it
+  // in one batch: the handle (the unique index the authority on a name taken), and every copy of it
   // matched on the old one - on this account's own rows wherever the table names the account (NAME_COPIES).
-  // shortcut: each copy is matched by a scan of its table, as 0134's were - a staff act done rarely; give a table an index
+  // shortcut: each copy is matched by a scan of its table - a staff act done rarely; give a table an index
   // on its name column if one grows past what a scan reads quickly.
   try {
     await db.batch([

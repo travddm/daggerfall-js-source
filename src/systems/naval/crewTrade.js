@@ -11,9 +11,7 @@
 //
 // WHO MAY LEAVE HER (`crewSpare`): men by the head, never a named hand carried over; never her last man (a ship with
 // nobody aboard strikes - crewHall.js releasePlan's law); never a named hand in the player's shore party, nor so many
-// that her deck stands no named hand aboard beside them; and none of a ship that came into the realm through customs
-// (fleet.js fleetCrossed - RESTORE's "Keep all, can't sell": her men are an offline save's). Men signed on raise her crew
-// to her whole at most (`crewRoom`).
+// that her deck stands no named hand aboard beside them. Men signed on raise her crew to her whole at most (`crewRoom`).
 //
 // WHICH NAMED HANDS GO WITH THEM (`signOffOrder`, AUDIT CREW-TRADE H1): the ones least worth losing first - a plain hand
 // before a post's holder, her First Mate last of all, a hand of the deck's own before a crew hall's recruit (his fee paid),
@@ -49,12 +47,10 @@ export function crewRowOf(port, day, { dealt = {}, edge = 0, town = null, discou
 
 /**
  * HOW MANY MEN MAY LEAVE HER: `crew` her crew now, `hands` her named hands (shipCrew.js), `away` the names of hers in the
- * player's shore party, `crossed` whether she came into the realm through customs. Answers `{ n, why }` - `why` the
- * reason none may, or null. Pure.
- * @param {{ hull: number, crew: number, hands?: readonly { name: string }[], away?: { has: (name: string) => boolean } | null, crossed?: boolean }} o
+ * player's shore party. Answers `{ n, why }` - `why` the reason none may, or null. Pure.
+ * @param {{ hull: number, crew: number, hands?: readonly { name: string }[], away?: { has: (name: string) => boolean } | null }} o
  */
-export function crewSpare({ hull, crew, hands = [], away = null, crossed = false }) {
-  if (crossed) return { n: 0, why: CREW_TRADE_TEXT.crossed };
+export function crewSpare({ hull, crew, hands = [], away = null }) {
   const now = Math.max(0, Math.floor(Number(crew) || 0));
   const party = hands.filter((h) => away?.has?.(h?.name));
   const need = party.length ? party.length + 1 : 0;   // the shore party's places, and one hand aboard beside them
@@ -90,7 +86,6 @@ export const CREW_TRADE_TEXT = Object.freeze({
   get noneWanted() { return t('sea.crew.noneWanted', 'The exchange will take no more crew today.'); },
   get full() { return t('sea.crew.full', 'The ship has her whole crew aboard.'); },
   get noCrew() { return t('sea.crew.noCrew', 'This ship carries no crew.'); },
-  get crossed() { return t('sea.crew.crossed', 'This ship came through customs with her crew. The exchange takes none of them.'); },
   ashore: (who) => t('sea.crew.ashore', '{who} is in your shore party. Send them back aboard first.', { who }),   // AUDIT CREW-TRADE H2: on deck at the helm, his place kept for the shore
   signedOn: (names) => t('sea.crew.signedOn', 'Signed on: {names}.', { names }),   // AUDIT CREW-TRADE H3
   paidOff: (names) => t('sea.crew.paidOff', 'Paid off: {names}.', { names }),   // AUDIT CREW-TRADE H1

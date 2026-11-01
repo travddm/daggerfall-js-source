@@ -127,27 +127,26 @@ export function createArenaOnline(deps) {
   const realm = () => (live() ? { banner: board?.me?.banner ?? null, laurel: board?.team?.laurel ?? null } : null);
   deps.bouts?.setRealm?.(realm);
 
-  /** Is the arena online here: a session on a relay that opens its rooms. AUDIT PRE-MERGE 1003 O4: decided by what STAYS
-   *  true while the session moves - the last welcome's word (`arenaOk`, net/online.js - kept across every door's room
+  /** Is the arena online here: a session a relay has welcomed. AUDIT PRE-MERGE 1003 O4: decided by what STAYS
+   *  true while the session moves - that a welcome came (`arenaHeard`, net/online.js - kept across every door's room
    *  change and every blip) and the seat still this tab's (O9: a seat lost - `superseded` - is offline) - never by the
    *  socket's status this frame: for the frames a door's reconnect took ('connecting'), every arena door ran the offline
    *  law - the house's seeded record settled an online wager, the Herald offered Fight off the save's ladder, the city's
    *  sand stood the local exhibition and the hour was never the relay's again. A door that needs a socket waits on that
    *  socket itself (the bout's `in` once its room is open, `hallWait` for the hall's). */
-  const live = () => { const s = deps.session?.(); return !!s && !!s.arenaOk && !s.superseded; };
+  const live = () => { const s = deps.session?.(); return !!s && !!s.arenaHeard && !s.superseded && !s.versionRefused; };   // a relay of another version: no arena link is made against it
   /** FIELD BUGS 2026-10-16b ARENA-WAIT: ON THE ONLINE LANE (`deps.lane` - a realm character) BEFORE THE RELAY HAS SAID
    *  whether its arena is open: no session yet (the host starts it once the player stands in the world), or a session no
    *  primary welcome has answered (`arenaHeard`). O4 kept the last welcome's word across a reconnect; the FIRST word after a
    *  load had none to keep, so for those seconds every door read `live()` false as offline - the Herald offered Fight off
    *  the save's ladder (the online climb never writes it), the local bout paid its purse, and the window drew the save's
    *  season and record over a Grand Champion's. Waiting, a door waits as it does for the board.
-   *  AUDIT: ON THE ONLINE LANE THE OFFLINE ARENA NEVER RUNS, but for one word: a relay that SAID it
-   *  opens no arena room (`arenaHeard`, `arenaOk` false - an older relay), the session neither superseded nor terminal.
+   *  AUDIT: ON THE ONLINE LANE THE OFFLINE ARENA NEVER RUNS.
    *  Every other state on the lane shuts the doors, each with its own why (`shut`): 'seat' - this tab's seat is another's
    *  (O9: a seat given up ran the save's ladder, its purses paid into the realm's save - 47,950 gold over 40 bouts - and the
    *  book settled an online wager by the house's record); 'gone' - a session no welcome can answer until a door joins again
    *  (terminal: a refused hello, no relay address - "Still loading" was said for ever); 'wait' - no session yet, or none
-   *  welcomed. Null: live (the account's arena), off the lane, or the relay's no (the save's). */
+   *  welcomed. Null: live (the account's arena), or off the lane (the save's). */
   const shut = () => {
     if (live() || !deps.lane?.()) return null;
     const s = deps.session?.();
@@ -364,9 +363,8 @@ export function createArenaOnline(deps) {
   }
 
   // ── ARENA4b: THE HOUR'S EXHIBITION, THE RELAY'S ──
-  /** Does the relay run the hour's exhibition here: the arena online, on a relay that opens its rooms - the exhibition's
-   *  room came in the relay version that opened the bouts' (world155, net/wire.js relaySupportsArena), so the one gate
-   *  serves both, and an older relay (or none) leaves every host its own seeded exhibition. */
+  /** Does the relay run the hour's exhibition here: the arena online - offline every host keeps its own seeded
+   *  exhibition. */
   const exhibitions = () => live();
   /** The bout the floor's instance watches the hour's exhibition by (goTo): its id, its room, the hour's exhibition. */
   const exhibitionBout = (ex) => ({ o: exhibitionBoutId(ex.hour), room: arenaExhibitionRoom(ex.hour), kind: 'watch', watchKind: 'ex', ex });

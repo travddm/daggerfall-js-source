@@ -8,9 +8,9 @@ import { readFileSync } from 'node:fs';
 import {
   ROLL_DICE_MAX, ROLL_SIDES_MAX, ROLL_MOD_MAX, ROLL_DEFAULT, validRollSpec, parseRollSpec, rollSpecText, rollDice, validRoll, rollText,
 } from '../../src/net/dice.js';
-import { parseClient, ROLL_HZ_MAX, rollGate, ROLL_RELAY_MIN, relaySupportsRoll, RELAY_VERSION, CHAT_WORLD_ROOM, SOCIAL_ROOM, CHAT_STRIKES_MAX, validRoll as wireValidRoll } from '../../src/net/wire.js';
+import { parseClient, ROLL_HZ_MAX, rollGate, RELAY_VERSION, CHAT_WORLD_ROOM, SOCIAL_ROOM, CHAT_STRIKES_MAX, validRoll as wireValidRoll } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
-import { ChatLog, ROLL_OLD_RELAY_TEXT } from '../../src/net/chat.js';
+import { ChatLog } from '../../src/net/chat.js';
 import { parseChatLine, HELP_LINES, badRollText } from '../../src/net/chatCommands.js';
 import { bubbleLineOk } from '../../src/ui/nameLayer.js';
 import { fakeRoom } from '../fakeRoom.mjs';
@@ -71,7 +71,7 @@ test('DICE1 the client\'s check: a roll it is told is n dice each 1..m and a tot
 
 // ─── THE WIRE ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('DICE1 wire: the ask is a spec and nothing else - the dice\'s bounds, after hello, a channel only the chat\'s law allows; world102 the first relay that rolls (world99 before the first merge, world101 before the sixth: main\'s world99, world100 and world101 roll nothing); one roll a second (mutants: the ask carrying a result; the bounds unchecked at the relay; an unknown channel admitted; the version gate one high)', () => {
+test('DICE1 wire: the ask is a spec and nothing else - the dice\'s bounds, after hello, a channel only the chat\'s law allows; one roll a second (mutants: the ask carrying a result; the bounds unchecked at the relay; an unknown channel admitted)', () => {
   const h = { hasHello: true };
   assert.deepEqual(parseClient(JSON.stringify({ t: 'roll', n: 2, m: 6, k: 3 }), h), { t: 'roll', n: 2, m: 6, k: 3 });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'roll', n: 2, m: 6, k: 3, dice: [6, 6], total: 15 }), h), { t: 'roll', n: 2, m: 6, k: 3 }, 'a result on the ask is read by nobody - the relay rolls');
@@ -80,10 +80,6 @@ test('DICE1 wire: the ask is a spec and nothing else - the dice\'s bounds, after
     assert.deepEqual(parseClient(JSON.stringify({ t: 'roll', ...bad }), h), { error: 'bad roll' }, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'roll', n: 1, m: 6, k: 0, ch: 'clan' }), h), { error: 'bad roll' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'roll', n: 1, m: 6, k: 0 })), { error: 'roll before hello' });
-  assert.equal(ROLL_RELAY_MIN, 102);
-  assert.equal(relaySupportsRoll('world101'), false, 'DISC12\'s relay (the last before the arc) answers a roll with "unknown message" and closes the socket');
-  assert.equal(relaySupportsRoll('world102'), true);
-  assert.ok(relaySupportsRoll(RELAY_VERSION));
   assert.equal(ROLL_HZ_MAX, 1);
   const a = rollGate(null, 0); assert.equal(a.pass, true);
   assert.equal(rollGate(a.bucket, 10).pass, false, 'the second in the same second');
@@ -158,25 +154,20 @@ test('DICE1 relay: one roll a second a socket, the rest dropped and struck like 
 // ─── THE SESSION, THE LOG, THE BUBBLE ───────────────────────────────────────────────────────────────────────────
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
-function link(relayV = RELAY_VERSION) {
+function link() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', presence: false, WebSocketImpl: FakeWS, now: () => t });
   const heard = []; s.onRoll = (x) => heard.push(x);
   quiet(() => s.join(SOCIAL_ROOM));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: null, world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: null, world: null, v: RELAY_VERSION }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'roll');
   return { s, ws, heard, out, tick: (ms) => { t += ms; } };
 }
 
-test('DICE1 session: a roll is asked only of a relay that rolls, as a spec, one a second, a party\'s only where the channels are; a roll told back is kept only when its numbers add up (mutants: the version door dropped; the gate dropped; a forged total believed)', () => {
-  const old = link('world100');
-  assert.equal(old.s.rollOk, false);
-  assert.equal(old.s.sendRoll({ n: 1, m: 20, k: 0 }), false, 'world100 would close the socket on it');
-  assert.equal(old.out().length, 0);
+test('DICE1 session: a roll is asked as a spec, one a second, a party\'s only where the channels are; a roll told back is kept only when its numbers add up (mutants: the gate dropped; a forged total believed)', () => {
   const { s, out, heard, ws, tick } = link();
-  assert.equal(s.rollOk, true);
   assert.equal(s.sendRoll({ n: 2, m: 6, k: 3 }), true);
   assert.deepEqual(out().at(-1), { t: 'roll', n: 2, m: 6, k: 3 });
   assert.equal(s.sendRoll({ n: 1, m: 20, k: 0 }), false, 'one a second');
@@ -219,18 +210,16 @@ test('DICE1 at the chat: /roll and /dice take the dice\'s grammar - a d20 with n
   assert.ok(HELP_LINES.some((l) => l.startsWith('/roll or /dice')), '/help says it');
 });
 
-test('DICE1 host by source: /roll is the parser\'s after the host\'s own, said on the active tab through that tab\'s own door (its session, an older relay said in words, a party that is not there), a roll lands where a line would - and Local\'s within earshot; the panel draws a roll in its own colour (mutants: a roll on the wrong tab; Local\'s rolls heard from anywhere)', () => {
+test('DICE1 host by source: /roll is the parser\'s after the host\'s own, said on the active tab through that tab\'s own door (its session, a party that is not there), a roll lands where a line would - and Local\'s within earshot; the panel draws a roll in its own colour (mutants: a roll on the wrong tab; Local\'s rolls heard from anywhere)', () => {
   const w = rd('src/scenes/world.js');
   const onSend = /onSend: \(tabId, text, opts = \{\}\) => \{([\s\S]*?)\n {6}\},/.exec(w)[1];
   assert.match(onSend, /if \(cmd\.kind === 'badroll'\) \{ note\(badRollText\(cmd\.name\)\); return false; \}/);
   assert.match(onSend, /if \(cmd\.kind === 'roll'\) return chatRoll\(tabId, cmd\.spec\);/);
   const door = w.slice(w.indexOf('const chatRoll = '), w.indexOf('const _regionHold'));
   assert.match(door, /const s = tabId === 'local' \? online : tabId === 'party' \|\| tabId === 'guild' \? socialLink\(\) : chatLinks\.get\(tabId\);/);   // GUILD1c: the Guild tab's door is the hub's too
-  assert.match(door, /if \(s\?\.status === 'open' && !s\.rollOk\) return why\(ROLL_OLD_RELAY_TEXT\);/);
   assert.match(door, /return s\?\.sendRoll\(spec, tabId === 'party' \|\| tabId === 'guild' \? \{ ch: tabId \} : \{\}\) \?\? false;/);
   assert.match(w, /link\.onRoll = \(line\) => chatLog\.push\(tab\.room === SOCIAL_ROOM && \(line\.ch === 'party' \|\| line\.ch === 'guild'\) \? line\.ch : tab\.id, line\);/);
   assert.match(w, /online\.onRoll = \(line\) => \{ if \(localLineHeard\(line, peersNear\(\), player\.feetAt\(\)\)\) chatLog\.push\('local', line\); \};/);
-  assert.match(ROLL_OLD_RELAY_TEXT, /server's next update/);
   const panel = rd('src/ui/chatPanel.js');
   assert.match(panel, /\$\{line\.kind === 'roll' \? ' roll' : ''\}/);
   assert.match(panel, /\.dfchat-line\.roll \.dfchat-text \{ color: #e7c46a; \}/);

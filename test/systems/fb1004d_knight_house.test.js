@@ -17,7 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
+import { d1, standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { seatRealm, realmAt } from '../realmSeat.mjs';
 import { createHouses, allocateHouseToPlayer, housesForSale, isHouseOwned } from '../../src/systems/banking.js';
 import { receiveHouseDecision, claimHouse, HOUSE_FLAG_MASK } from '../../src/systems/knightlyGifts.js';
@@ -69,7 +69,7 @@ async function stood(t) {
   return { S, arde, mara, RA, RM, k, hold, claim, goldOf, rowOf, tick: (s) => { now += s; } };
 }
 
-test('KNIGHT-HOUSE the door\'s law: the deed the realm gave names its building to its owner - this town\'s, the save\'s signed map id read unsigned - and nothing else: not a neighbour, not the same key in another town or region, never a deed customs carried in (HOME1: an offline house stays offline only), never one asleep in another layout (mutants: the crossed deed counted; the key unread; the map id read signed; a sleeping deed counted)', () => {
+test('KNIGHT-HOUSE the door\'s law: the deed the realm gave names its building to its owner - this town\'s, the save\'s signed map id read unsigned - and nothing else: not a neighbour, not the same key in another town or region, never one asleep in another layout (mutants: the key unread; the map id read signed; a sleeping deed counted)', () => {
   const { houses, key, house } = knightsHouse();
   assert.equal(isHouseOwned(houses, REGION, key), true, 'the producer\'s deed is Daggerfall\'s own house - the lock ladder opens it');
   assert.equal(houses[REGION].mapId, TOWN_SIGNED, 'the save keeps the signed map id the directory hands on');
@@ -84,12 +84,6 @@ test('KNIGHT-HOUSE the door\'s law: the deed the realm gave names its building t
   assert.equal(realmDeedAt(houses, REGION + 1, TOWN, key), false, 'another region\'s slot holds no deed here');
   assert.equal(realmDeedAt(null, REGION, TOWN, key), false);
   assert.deepEqual(realmDeedsOf(houses), [{ region: REGION, mapId: TOWN, buildingKey: key }], 'the one deed, its town unsigned');
-  // customs: an offline house stays HOME1's - the server's list decides it online
-  const crossed = structuredClone(houses);
-  crossed[REGION].crossed = true;
-  assert.equal(homeDeedOf(crossed, REGION, TOWN, key), null);
-  assert.equal(realmDeedAt(crossed, REGION, TOWN, key), false);
-  assert.deepEqual(realmDeedsOf(crossed), []);
   // a deed asleep (WD3 H1): its town stands in another layout now, so its key names another building
   try {
     configureLayoutPins({ vendorOn: (v) => v === 'beautiful-villages', vendorVersion: () => '1.4.2', locationKeyOfMapId: () => 1717 });
@@ -125,7 +119,7 @@ test('KNIGHT-HOUSE held: unheld, the knight\'s house was nobody\'s to the servic
   assert.ok(ROUTES.has('/v1/homes/deed'), 'a route of the service');
 });
 
-test('KNIGHT-HOUSE the hold reads the RECORD: no deed there to that building holds nothing - not saved yet, the house next door, another town or region, a deed customs carried in, another layout; a guest, a character no realm made, the arena\'s cell and a building already somebody\'s are refused (mutants: the record unread; the crossed deed held; the layout unasked)', async (t) => {
+test('KNIGHT-HOUSE the hold reads the RECORD: no deed there to that building holds nothing - not saved yet, the house next door, another town or region, another layout; a guest, a character no realm made, the arena\'s cell and a building already somebody\'s are refused (mutants: the record unread; the layout unasked)', async (t) => {
   const { S, arde, mara, RA, RM, k, hold, rowOf } = await stood(t);
   for (const [body, why] of [
     [{ buildingKey: k.key + 1 }, 'the house next door'],
@@ -137,9 +131,6 @@ test('KNIGHT-HOUSE the hold reads the RECORD: no deed there to that building hol
     assert.deepEqual([r.status, r.body?.error], [404, 'no-deed'], why);
   }
   assert.deepEqual([(await hold(mara, RM)).status, (await hold(mara, RM)).body?.error], [404, 'no-deed'], 'Mara\'s record holds no deed to it');
-  // customs: the same deed, carried in from offline, is no deed the realm gave
-  const R2 = await seatRealm(S.env, arde.secret, 'Arde2', { name: 'Arde', level: 30, goldPieces: 0, items: [], houses: k.houses.map((s, i) => (i === REGION ? { ...s, crossed: true } : s)) });
-  assert.equal((await hold(arde, R2)).body?.error, 'no-deed', 'an offline house stays offline only');
   assert.equal(rowOf(), null, 'nothing held');
   // the walls before the record
   const g = await S.guest();
@@ -308,9 +299,9 @@ test('KNIGHT-HOUSE the hosts, by source: the door never prices the knight\'s own
   assert.doesNotMatch(src('src/scenes/dungeonContext.js'), /onlineHomes|holdRealmDeed|guildServiceReceiveHouse/, 'a dungeon has no house door and no Seneschal');
 });
 
-test('KNIGHT-HOUSE the deploy: migration 0079 adds `homes.deed` (0 for every home before it); the route is the account\'s, behind the session wall; the service\'s version moved on with it, in the Worker and its config (mutants: the column unadded; the version unmoved)', () => {
-  const mig = src('server-account/migrations/0079_home_deed.sql');
-  assert.match(mig, /^ALTER TABLE homes ADD COLUMN deed INTEGER NOT NULL DEFAULT 0;$/m);
+test('KNIGHT-HOUSE the deploy: the schema holds `homes.deed` (0 for a home not yet a deed); the route is the account\'s, behind the session wall; the service\'s version moved on with it, in the Worker and its config (mutants: the column unadded; the version unmoved)', () => {
+  const deed = d1()._raw.prepare('PRAGMA table_info(homes)').all().find((c) => c.name === 'deed');
+  assert.deepEqual(deed && { type: deed.type, notnull: deed.notnull, dflt: deed.dflt_value }, { type: 'INTEGER', notnull: 1, dflt: '0' });
   assert.match(src('server-account/src/service.js'), /export const ACCOUNT_VERSION = 'acct208';/);
   assert.match(src('server-account/wrangler.toml'), /^ACCOUNT_VERSION = "acct208"$/m);
   const idx = src('server-account/src/index.js');

@@ -113,16 +113,16 @@ export function creditSave(/** @type {any} */ save, /** @type {number} */ amount
 }
 
 // ── AUDIT REALM2 S1: WHAT A SAVE HOLDS, MEASURED THE SAME AT BOTH ENDS ──
-// Customs (systems/realmCustoms.js) caps a copy at the allowance on the client, and the service now holds a character's
-// FIRST save to it (server-account/src/realm.js firstSaveRefusal) - so the measure and the numbers moved here, the law
-// the Worker bundles, and realmCustoms.js re-exports them: one home, one count. A service that counted less than the
-// client capped would let wealth hide where it does not look; one that counted more would refuse an honest customs.
+// The service holds a new character's FIRST save to the birth bound (server-account/src/realm.js firstSaveRefusal) and
+// judges every later save's wealth with the same measure, so the measure and the numbers live here, in the law the
+// Worker bundles: one home, one count.
 
-/** OPEN (Realm-Arc "Customs"): the liquid wealth a character brings in - a base, and this much a level. */
-export const CUSTOMS_WEALTH_BASE = 20_000;
-export const CUSTOMS_WEALTH_PER_LEVEL = 10_000;
-/** The allowance at a level. */
-export const customsAllowance = (/** @type {number} */ level) => CUSTOMS_WEALTH_BASE + CUSTOMS_WEALTH_PER_LEVEL * Math.max(1, Math.trunc(level) || 1);
+/** The liquid wealth a character of a level is expected to hold at most - a base, and this much a level. The service
+ *  flags a first judged save far past it for staff (server-account/src/verdict.js). */
+export const LEVEL_WEALTH_BASE = 20_000;
+export const LEVEL_WEALTH_PER_LEVEL = 10_000;
+/** The expected ceiling at a level. */
+export const levelWealthCeiling = (/** @type {number} */ level) => LEVEL_WEALTH_BASE + LEVEL_WEALTH_PER_LEVEL * Math.max(1, Math.trunc(level) || 1);
 /** A CHARACTER BORN ONLINE starts where chargen starts one: level 1, and the gold chargen hands it - 100
  *  (systems/startingGear.js STARTING_GOLD) and what its biography's answers add (BiogFile's GP lines, a handful a file).
  *  The bound is a first setting with room past both; OPEN, as every number of the realm is. */
@@ -152,8 +152,8 @@ export const REVENANT_VENDOR = 'Revenant';
  * pack and wagon, where gold and letters of credit lie as items: in each cached scene (sceneCache.js), a house's chests,
  * the piles dropped in a room or on a street, and the storage pieces' contents (DECOR1c `decorItems`, an online home's
  * too); and the piles the save's own host rides in its `world` bag - a dungeon's `droppedLoot`, the open air's `piles`.
- * Customs read the purse, the pack's letters, the wagon's gold and the banks alone, so letters stowed in the wagon, gold
- * in a house chest or a storage piece and a pile left on the floor all crossed uncapped.
+ * The measure once read the purse, the pack's letters, the wagon's gold and the banks alone, so letters stowed in the
+ * wagon, gold in a house chest or a storage piece and a pile left on the floor all went uncounted.
  *
  * AUDIT REALM2 T5: AND EVERY PILE AND CONTAINER BESIDE THEM. F2 left a treasure pile, a body and a shop's shelf to the
  * world, and a dungeon's `piles` (its treasure) with them - but the pack stores anything in any of them
@@ -161,15 +161,15 @@ export const REVENANT_VENDOR = 'Revenant';
  * (dungeonContext.js collectWorld) - so every container counts, both pile lists of the world bag whichever host wrote
  * it, and a dungeon's fallen (`foes` with `dead`: a body is a container; a living foe's purse is its own).
  * AUDIT REALM2 T2: AND A BOAT'S HOLD - each placed boat's `Items` and each packed boat's cargo (comeSailAway.js
- * getSaveData), the mod's record in the save: an ordinary container the pack fills, which customs never read.
+ * getSaveData), the mod's record in the save: an ordinary container the pack fills, which the measure never read.
  * AUDIT WK-P1: AND MY COMPANIONS' PACKS - each companion ashore carries a pack the player stores into (COMPANION-KIT's
  * storage, systems/naval/crewCompanions.js), saved with the party in the sea's record (navalHost.js getSaveData `party`,
- * each companion's `items`): a container like the hold beside it, which customs and the service's first save never
- * read - a million gold in his pack crossed whole while the same million in the hold was capped.
+ * each companion's `items`): a container like the hold beside it, which the measure and the service's first save never
+ * read - a million gold in his pack went uncounted while the same million in the hold was counted.
  * ITEM-WALK C: AND A SWORN REVENANT'S PACK - each sworn one's
  * `companion.items` in the feud's record (revenant.js getSaveData `list`), the storage the player fills as the crew's
  * (revenantCompanions.js packOf: "Its pack (the companion's storage), as the crew's is"). WK-P1 read the crew's packs
- * and not this one, so gold and letters in it crossed uncapped. Only a record the load keeps a pack for counts: sworn
+ * and not this one, so gold and letters in it went uncounted. Only a record the load keeps a pack for counts: sworn
  * and not defeated (revenant.js sanitize). What a revenant took is its own until it falls, and is never counted.
  * @param {any} snap
  */
@@ -193,17 +193,17 @@ export function stashedItemLists(snap) {
   for (const r of Array.isArray(feud) ? feud : []) if (r?.sworn && !r.defeated && r.companion?.gear && typeof r.companion.gear === 'object') out.push(...lists(Object.values(r.companion.gear).filter((it) => it && typeof it === 'object')));   // RVN-GEAR: and the kit it wears (revenantGear.js)
   return out;
 }
-/** Every list of the character's own things where liquid wealth can lie, in the order customs takes from them: the
- *  stashes, then the wagon, then the pack. (The banks and the purse are counts, not lists.) */
+/** Every list of the character's own things where liquid wealth can lie: the stashes, then the wagon, then the pack.
+ *  (The banks and the purse are counts, not lists.) */
 export const carriedItemLists = (/** @type {any} */ snap) => [...stashedItemLists(snap), ...lists(snap?.wagonItems), ...lists(snap?.bagItems), ...lists(snap?.items)];   // BAG1: the Materials Bag's, between the wagon and the pack
 
-/** OPEN (AUDIT REALM2 T3), as the allowance is: the price customs counts a Daggerfall house at. A save carries no measure
- *  of its house - the bank reads it off the building at its counter - so customs counts every deed at one figure.
+/** OPEN (AUDIT REALM2 T3): the price the wealth measure counts a Daggerfall house at. A save carries no measure of its
+ *  house - the bank reads it off the building at its counter - so the measure counts every deed at one figure.
  *  Daggerfall's own price (banking.js housePrice, the model's radius x 1280) runs from a few thousand to over 800,000
  *  (FIELD BUGS 2026-09-30b, 2026-10-03), and the realm's bank buys a deed back online at the deed share of the house's
  *  online price (net/homeLaw.js homeOnlinePrice, at most 212,500 - AUDIT HOME-PRICE C1, L4); 100,000 sits inside
  *  both. */
-export const CUSTOMS_HOUSE_PRICE = 100_000;
+export const DEED_HOUSE_PRICE = 100_000;
 /** The realm's bank's buy-back and where it files a ship's room, as the game has them - systems/banking.js DEED_SELL_MULT,
  *  SHIP_PRICES, shipSellPrice, ownedShipType, ownsShip and SHIP_INTERIOR_MAP_IDS, talkTopics.js BUILDING_KEY_0 (the
  *  no-key key both ship interiors are filed under) and sceneCache.js interiorSceneName. Pinned equal
@@ -218,24 +218,20 @@ const BUILDING_KEY_0 = 1 << 24;
 const interiorSceneName = (/** @type {number} */ mapId, /** @type {number} */ buildingKey) => `DaggerfallInterior [MapID=${mapId}, BuildingKey=${buildingKey}]`;
 
 /** AUDIT REALM2 T3: THE DEEDS THE REALM'S BANK BUYS BACK - the ship at shipSellPrice and each house at the deed's share
- *  of CUSTOMS_HOUSE_PRICE, each with what the pieces placed in its own room pay back (net/decorLaw.js decorSaleBack:
+ *  of DEED_HOUSE_PRICE, each with what the pieces placed in its own room pay back (net/decorLaw.js decorSaleBack:
  *  half of each one's `paid`, on its removal or the sale; the owner's own things cost nothing). A room no deed of the
- *  character's stands for pays nothing: nobody can take a piece out. (T3 sorted them dearest first, the order it took
- *  them in; RESTORE takes none, so no order is asked.)
- *  RESTORE: A DEED THAT CAME THROUGH CUSTOMS IS NONE OF THEM - its slot `crossed`, or the
- *  ship's `shipCrossed` (systems/realmCustoms.js crossDeeds): the realm's bank buys it back for nothing (banking.js
- *  sellHouse, sellShip), and the pieces bought for its room were set to pay nothing back as it crossed.
+ *  character's stands for pays nothing: nobody can take a piece out.
  *  @param {any} snap @returns {{ slot: any, room: any, value: number }[]} */
 export function deedsOf(snap) {
   const scenes = Array.isArray(snap?.sceneCache?.scenes) ? snap.sceneCache.scenes : [];
   const roomOf = (/** @type {string} */ name) => scenes.find((s) => s?.sceneName === name) ?? null;
   const deeds = [];
-  if (ownsShip(snap) && !snap.shipCrossed) {
+  if (ownsShip(snap)) {
     const ship = ownedShipType(snap);
     deeds.push({ slot: null, room: roomOf(interiorSceneName(SHIP_INTERIOR_MAP_IDS[ship], BUILDING_KEY_0)), value: shipSellPrice(ship) });
   }
   for (const slot of deedsOfHouses(snap?.houses)) {   // HOUSES-3: three a region
-    if (!slot.crossed) deeds.push({ slot, room: roomOf(interiorSceneName(slot.mapId, slot.buildingKey)), value: Math.trunc(CUSTOMS_HOUSE_PRICE * DEED_SELL_MULT) });
+    deeds.push({ slot, room: roomOf(interiorSceneName(slot.mapId, slot.buildingKey)), value: Math.trunc(DEED_HOUSE_PRICE * DEED_SELL_MULT) });
   }
   for (const d of deeds) d.value += decorSaleBack(d.room?.decor);
   return deeds;

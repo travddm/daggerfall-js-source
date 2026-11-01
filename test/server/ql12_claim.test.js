@@ -444,16 +444,17 @@ test('QL12 THE SWITCH THROUGH THE WORKER: at `dev` the developers claim and nobo
   assert.deepEqual(await Off.call('/v1/ql/claim', { line: 'burningDoors', step: 3, phase: 'open' }, anyone.secret), { status: 403, body: { error: 'ql-closed' } });
 });
 
-test('QL12 THE ROUTE (AUDIT FIVE-ASKS A1\'s lesson): /v1/ql/claim is listed, behind a session and never open; a stranger is refused; the header names it; the config opens it; the migration lays its table and columns', async (t) => {
+test('QL12 THE ROUTE (AUDIT FIVE-ASKS A1\'s lesson): /v1/ql/claim is listed, behind a session and never open; a stranger is refused; the header names it; the config opens it; its table and columns stand', async (t) => {
   assert.ok(ROUTES.has('/v1/ql/claim') && !OPEN_ROUTES.has('/v1/ql/claim'), 'a route the worker answers, behind a session');
   const { S } = await stood(t);
   assert.equal((await S.call('/v1/ql/claim', { line: 'burningDoors', step: 3 })).status, 401, 'a stranger claims nothing');
   assert.match(read('server-account/wrangler.toml'), /^QUESTLINES_OPEN = "on"$/m);
-  const sql = read('server-account/migrations/0133_questlines.sql');
-  assert.match(sql, /^CREATE TABLE IF NOT EXISTS ql_steps \(/m);
-  assert.match(sql, /^ {2}PRIMARY KEY \(account, line, step\),$/m);
-  assert.match(sql, /^ {2}seen_at {3}INTEGER,$/m, 'AUDIT QUESTLINES SERVICE-5: the receipt that witnessed a step, so no receipt witnesses two');
-  assert.match(sql, /^ALTER TABLE players ADD COLUMN ql_titles INTEGER NOT NULL DEFAULT 0;$/m);
+  const columns = (table) => S.env.DB._raw.prepare(`PRAGMA table_info(${table})`).all();
+  const steps = columns('ql_steps');
+  assert.deepEqual(steps.filter((c) => c.pk > 0).sort((a, b) => a.pk - b.pk).map((c) => c.name), ['account', 'line', 'step'], 'one row a step of a line an account');
+  assert.equal(steps.find((c) => c.name === 'seen_at')?.type, 'INTEGER', 'AUDIT QUESTLINES SERVICE-5: the receipt that witnessed a step, so no receipt witnesses two');
+  const titles = columns('players').find((c) => c.name === 'ql_titles');
+  assert.deepEqual([titles?.type, titles?.notnull, titles?.dflt_value], ['INTEGER', 1, '0']);
   assert.match(read('.github/workflows/account-deploy.yml'), /^ {6}- "src\/net\/questlineClaims\.js"$/m, 'the shared law deploys the service');
 });
 

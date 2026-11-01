@@ -13,9 +13,9 @@ import {
 } from '../../../src/net/gate/gateLaw.js';
 import { heraldOmenDue, gateSiteDayOk } from '../../../src/net/gate/gateHerald.js';
 import {
-  sharedClassicMinutes, wallMsForClassicMinutes, gateReceiptKey, gateLaneKey, gatePixelOk, gateLaneWire, relaySupportsGateLanes,
-  validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, GATE_LANES_RELAY_MIN, RELAY_VERSION, WORLD_PIXEL_BOUND,
-  gateLanePixelOk, WORLD_WIDE_RELAY_MIN,
+  sharedClassicMinutes, wallMsForClassicMinutes, gateReceiptKey, gateLaneKey, gatePixelOk, gateLaneWire,
+  validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, WORLD_PIXEL_BOUND,
+  gateLanePixelOk,
 } from '../../../src/net/wire.js';
 import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
 import { scanGatePixels, findGateSite, gateRegions, gateSeaPixel, politicClaimed, GATE_TOWN_MIN_PX, GATE_TOWN_MAX_PX } from '../../../src/systems/gate/gateSite.js';
@@ -181,7 +181,7 @@ test('WW2 the hub\'s records a lane: the Bay\'s keys the ones they always were, 
   assert.equal(gateSiteDayOk(gateNumber(bayNow, GATE_LANES), NOW), false, 'a lane the world has not');
 });
 
-test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it always was, and a pixel of the world on a lane past it - the site word, the rite\'s word in and out; the lanes ride a relay that keeps them (mutants: the Bay\'s last column, the world\'s pixel refused, the lanes\' relay)', () => {
+test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it always was, and a pixel of the world on a lane past it - the site word, the rite\'s word in and out (mutants: the Bay\'s last column, the world\'s pixel refused)', () => {
   const lane1 = gateNumber(900, 1);
   // pixel a lane's pixel, and no word heard on it
   const lane9 = gateNumber(900, 9);
@@ -206,15 +206,6 @@ test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it alw
     assert.equal(gateAdmits(d, gateTimes(d).openAt + 1), gateLaneOpen(lane), `admits on lane ${lane}`);
     assert.equal(gateHolds(d, gateTimes(d).openAt + 1), gateLaneOpen(lane), `holds on lane ${lane}`);
   }
-  // TESA-BIOME's world255), then 260 at the merge with main - and the literal pinned at 256 while main's world256-world259
-  // read no lane. One number now, the world-wide relay's (test/net/audittesa2z_worldwide.test.js ties it to its LAW row)
-  assert.equal(GATE_LANES_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
-  assert.equal(relaySupportsGateLanes(RELAY_VERSION), true, 'this relay keeps them');
-  assert.equal(relaySupportsGateLanes(`world${WORLD_WIDE_RELAY_MIN - 1}`), false, 'the relay before the world-wide one keeps no lane');
-  // WW-GATES-EVERYWHERE: and no relay before it at all (WW2-the-lanes-relay lived on world259, between WW2's own and this)
-  for (let v = 200; v < WORLD_WIDE_RELAY_MIN; v++) assert.equal(relaySupportsGateLanes(`world${v}`), false, `world${v} keeps no lane`);
-  assert.equal(relaySupportsGateLanes(`world${WORLD_WIDE_RELAY_MIN}`), true);
-  assert.equal(relaySupportsGateLanes(null), false);
 });
 
 // ─── the site past the Bay ───────────────────────────────────────────────────────────────────────
@@ -429,7 +420,7 @@ test('WW2 the host\'s gates: one omen a lane, each saying its own lines with its
   assert.equal(gates.cageSite().day, skyN);
   here = null;
   assert.equal(gates.nearCurrent().t.day, bayN, 'nowhere: the Bay\'s');
-  // the relay that does not keep the lanes: the Bay's alone
+  // no link to the relay: the Bay's alone
   ok = false;
   assert.deepEqual(gates.lanes(), [0]);
   assert.deepEqual(gates.currents().map((x) => x.lane), [0]);

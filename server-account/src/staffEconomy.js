@@ -36,7 +36,7 @@
 // span is STREAM_SPAN_DAYS at most and pages STREAM_PAGE rows; the economy reads ECON_DAYS_MAX days at most; node
 // activity is a day and a week. The heavy answers (economy, guilds, node activity, the Home watch, usual prices) are
 // kept in the isolate's memory ECON_KEEP_S (node activity HARVEST_KEEP_S), keyed by the database binding, and an answer
-// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index migration 0153 adds or
+// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index the schema holds or
 // one already there (test/server/staffpanel3econ.test.js asks EXPLAIN QUERY PLAN).
 //
 // ═══ WHAT THE SERVICE CANNOT SEE ═══
@@ -95,7 +95,7 @@ export const HARVEST_PAGE = 50;
 export const HARVEST_ONE_MAX = 500;
 /** The richest characters and guilds named. */
 export const RICHEST = 20;
-/** A character this wealthy or more is in the rich index (migration 0153 idx_realm_characters_rich, whose condition this
+/** A character this wealthy or more is in the rich index (idx_realm_characters_rich, whose condition this
  *  literal is - the statement must say it as the index does, or the index is not used). Below it, no list is needed. */
 export const RICH_FLOOR = 250_000;
 /** Guilds one ranked list holds; pages of GUILDS_PAGE. */
@@ -547,7 +547,7 @@ export function economy(db, nowS, days) {
         (SELECT COALESCE(SUM(CASE WHEN ${out} THEN m.rent_due ELSE 0 END), 0) FROM homes m ${OUT_JOIN('m')}) AS rent_out`),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s, COUNT(*) AS n FROM marks WHERE balance > 0'),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s FROM guild_marks'),
-      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on 0153's covering index
+      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on the covering index
       db.prepare(`SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS s
         FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`),
       db.prepare(`SELECT day, kind, CASE WHEN src_kind = 'mint' THEN 1 ELSE 0 END AS minted, SUM(amount) AS s FROM marks_ledger

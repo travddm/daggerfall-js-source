@@ -78,7 +78,7 @@ test('ARENA4b the relay holds a ladder fighter at the signed level\'s vitality: 
 
 test('ARENA4b the client\'s ladder `in`: the tier, the bout and my level - no health of mine is said (mutants: the health sent)', async () => {
   const boutSent = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const board = { me: { ladder: arenaLadderOf([{ tier: 0, bout: 0 }]) } };
   const entered = [];
   const A = createArenaOnline({ now: () => 0, session: () => session, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }), bouts: { ask() {}, relayWord: () => true, dismiss() {}, holds: () => false, relay: () => null },

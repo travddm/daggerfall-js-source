@@ -106,6 +106,14 @@ change applies at the next scene boot. Some features take the music first and sk
 the sea's songs (`src/systems/soundscape/seaScore.js`), boss and arena scores. They register songs made in code with
 `music.registerSong(name, song)`; a registered name answers before `MIDI.BSA`.
 
+The intro film and both main menus play Daggerfall Unity's title song, `5STRONG.HMI` (`song_5strong`, the setup
+wizard's `titleSongFile` in `DaggerfallUnitySetupGameWizard.cs`), with `03.HMI` as a stand-in for an archive without
+it (`src/systems/titleMusic.js` `TITLE_SONGS`). Daggerfall's own `MIDI.BSA` has no `5STRONG` record (Daggerfall
+Unity ships that song as a `.mid` file of its own), so with Daggerfall's data `03.HMI` plays. The front door does not ask for ARENA2, so on a first visit the intro
+plays silently. The film runs on the shared AudioContext's clock, not the song's: its cue sheet
+(`src/ui/intro/introCue.js`) has no beat in the title song to land on. The song plays at a lower level under the
+Enhanced menu (`MENU_MUSIC_LEVEL`) and fades out when a game is chosen. Daggerfall Unity plays it at one level.
+
 ### The music service (`src/systems/music.js`)
 
 `music` (`MusicService`) owns one player on the engine's context. A switch fades: the old song fades out over

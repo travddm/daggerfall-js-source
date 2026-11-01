@@ -105,6 +105,10 @@ jobs:
         run: npm ci
         working-directory: production
 
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
+        working-directory: production
+
       - name: Build production
         run: npm run build
         working-directory: production

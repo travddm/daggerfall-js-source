@@ -9,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  validParkData, cellRoomOfWire, relaySupportsPark, validPose, poseChanged, parseClient, PARK_CELL_MAX, PARK_ACCOUNT_MAX, PARK_TTL_MS, PIXEL_UNITS,
+  validParkData, cellRoomOfWire, validPose, poseChanged, parseClient, PARK_CELL_MAX, PARK_ACCOUNT_MAX, PARK_TTL_MS, PIXEL_UNITS,
   parkRegistryRoom, parkKeyOf, parkKey, POSE_RIDE,
   POSE_BOUND,
 } from '../../src/net/wire.js';
@@ -48,8 +48,6 @@ test('HCC-PARK wire: the frame names its CHARACTER; the anchor names the cell (M
   assert.deepEqual(parseClient(JSON.stringify({ t: 'park', data: { c: CA } }), { hasHello: true }), { t: 'park', data: { c: CA } });
   assert.equal(parseClient(JSON.stringify({ t: 'park', data: null }), { hasHello: true }).error, 'bad park', 'the old null word names no character');
   assert.equal(parseClient(JSON.stringify({ t: 'park', data: { c: CA } })).error, 'park before hello');
-  assert.equal(relaySupportsPark('world98'), false, 'an older relay closes the socket on the frame - never sent to it (world98 is SPELLFX1\'s, which has no park arm)');
-  assert.equal(relaySupportsPark('world102'), true);
   // the owner key: stable, per account AND character, opaque
   const k = await K('acct-ann1', CA);
   assert.match(k, /^[0-9a-f]{24}$/);

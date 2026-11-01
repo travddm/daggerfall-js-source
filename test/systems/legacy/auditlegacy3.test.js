@@ -436,7 +436,7 @@ test('AUDIT LEGACY III O5: A TOMBSTONE\'S ONLINE LIFE GOES WITH IT - its guild s
   const raw = S3.env.DB._raw;
   for (let i = 0; i < RENOWN_TRACKS_MAX; i++) {
     const id = `r${i.toString(16).padStart(20, '0')}`;
-    raw.prepare('INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, origin_id, created_at, updated_at, dead_at) VALUES (?, ?, ?, NULL, 0, 0, NULL, 0, NULL, 1, 1, 5)').run(id, A.g.id, `Dead ${i}`);
+    raw.prepare('INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, created_at, updated_at, dead_at) VALUES (?, ?, ?, NULL, 0, 0, NULL, 0, 1, 1, 5)').run(id, A.g.id, `Dead ${i}`);
     raw.prepare('INSERT INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, 10, 1, 1)').run(A.g.id, id, `Dead ${i}`);
   }
   const held = raw.prepare(`SELECT ${renownHeldSql('?1')} AS n`).get(A.g.id).n;
@@ -480,20 +480,14 @@ test('AUDIT LEGACY III O6: A RETIREMENT IS AN ENDURING LINE\'S ALONE, and the to
   assert.equal(why(), 'fell', 'never back');
 });
 
-test('AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED - nor undone: it is the realm\'s only word on a death, and its row the person\'s claim, so the person was born again once the line\'s record forgot the death', async () => {
+test('AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED: it is the realm\'s only word on a death, and its row the person\'s claim, so the person was born again once the line\'s record forgot the death', async () => {
   const S = await standService();
   const A = await accountOf(S, 'fam-o7-aaaaaa', 'Hlaalu', ysolde);
   await A.die(1);
-  for (const route of ['/v1/realm/delete', '/v1/realm/undo']) {
-    const r = await A.call(route, { id: A.chars[1].id });
-    assert.notEqual(r.status, 200, route);
-  }
   const del = await A.call('/v1/realm/delete', { id: A.chars[1].id });
   assert.deepEqual([del.status, del.body.error], [410, 'dead']);
-  // one brought in through customs (an origin to undo to) is no more undone than deleted
-  S.env.DB._raw.prepare('UPDATE realm_characters SET origin_id = ? WHERE id = ?').run('o-ysolde-offline', A.chars[1].id);
-  const undo = await A.call('/v1/realm/undo', { id: A.chars[1].id });
-  assert.deepEqual([undo.status, undo.body.error], [410, 'dead']);
+  const again = await A.call('/v1/realm/delete', { id: A.chars[1].id });
+  assert.deepEqual([again.status, again.body.error], [410, 'dead'], 'a retry is refused the same');
   assert.equal(S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?').get(A.chars[1].id).n, 1, 'the tombstone stands');
   // the record rewritten without the death: the person is still the played one's
   await A.write({ people: ysolde });

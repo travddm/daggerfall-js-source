@@ -30,7 +30,7 @@ test('AUDIT BOUNTY1 B3: the archive\'s words that no longer said the law - the r
 test('AUDIT BOUNTY1 B4: the relay pins in the tests that hold the relay version stand on the current version', () => {
   for (const f of ['test/net/soc1_hub.test.js', 'test/systems/allycast.test.js', 'test/net/guild1c.test.js', 'test/net/renown1.test.js']) {
     const t = read(f);
-    assert.ok(t.includes("RELAY_VERSION, 'world280'"), `${f}: the pin is on world280`);
+    assert.ok(t.includes("RELAY_VERSION, 'world282'"), `${f}: the pin is on world281`);
   }
 });
 

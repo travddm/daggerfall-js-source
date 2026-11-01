@@ -93,7 +93,7 @@ const CRAFTED_ACTS = new Set(['/v1/market/list', '/v1/market/auction', '/v1/writ
 
 /** STAFF-ROLES-BY-ACCOUNT: the handles a stood service SEATS with a role as they register - `SEAT_ADMINS`, `SEAT_MODERATORS` and
  *  `SEAT_OWNERS` in `extra`, comma lists. The service itself reads no list: the harness sets the account's role columns
- *  (migration 0191) on the row a listed handle registers, the way the operator sets them on a real one. An owner is an admin. */
+ *  (migration 0002) on the row a listed handle registers, the way the operator sets them on a real one. An owner is an admin. */
 const seatList = (/** @type {unknown} */ v) => new Set(String(v ?? '').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
 
 /** The Worker on a fresh database, with the gate's key pair - `env` extended by `extra`. */

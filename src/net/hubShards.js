@@ -205,10 +205,6 @@ export const HUB_UP_BURST = 32;
 export const shardKeeps = (s) => s.startsWith('{"t":"hello"') || s.startsWith('{"t":"ping"') || s.startsWith('{"t":"pose"') || s.startsWith('{"t":"lease"');   // LEASE1: and its lease - a hub shard mints one, a region's shard reads one (net/roomLease.js)
 /** The close a shard gives a socket that came to the wrong one (its `hub` frame names the right one). */
 export const CLOSE_HUB = 4001;
-/** The first relay with the shards (RELAY_VERSION's number). */
-export const HUB_SHARDS_RELAY_MIN = 192;
-/** Does the relay at version `v` keep the hub's shards? */
-export const hubShardsSupported = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= HUB_SHARDS_RELAY_MIN;
 
 /**
  * The hub's word on where a hub link belongs: `{ t: 'hub', key }`, a shard's key or the bus's. Null for anything else.

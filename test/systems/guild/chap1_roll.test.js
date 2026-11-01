@@ -2,16 +2,16 @@
 // factions' reputation and its memberships) kept by the account service.
 //
 // The law (src/net/npcChapterLaw.js) against literals; the leaf the service reads (src/systems/guild/guildFactions.js) as the
-// one home of DFU's ids; the service (server-account/src/npcRoll.js) over the real migrations - the switch, the seed
-// and its cap, the day's bound, a loss believed, a repeat, a lost race, the lease, the tenure, the delete; the playing
+// one home of DFU's ids; the service (server-account/src/npcRoll.js) over the real migrations - the switch, the seed,
+// the day's bound, a loss believed, a repeat, a lost race, the lease, the tenure, the delete; the playing
 // tab's tracker (src/net/npcRollTracker.js) against a fake door; and the host's wiring.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  ROLL_FACTIONS, isRollFaction, ROLL_GAIN_DAY_MAX, ROLL_CUSTOMS_CAP, ROLL_EPOCH_S, ROLL_DELTA_MAX, ROLL_CLAIM_MS, ROLL_RETRY_MS,
-  rollCredit, rollSeedCapOf, rollSeedOf, rollSeedOk, rollDeltasOk, rollDeltasOf, rollAdopt, rollMembersOf, rollMembersOk,
+  ROLL_FACTIONS, isRollFaction, ROLL_GAIN_DAY_MAX, ROLL_DELTA_MAX, ROLL_CLAIM_MS, ROLL_RETRY_MS,
+  rollCredit, rollSeedOf, rollSeedOk, rollDeltasOk, rollDeltasOf, rollAdopt, rollMembersOf, rollMembersOk,
   rollFactionOfGuild, chaptersSwitchOf, rollRidOf,
 } from '../../../src/net/npcChapterLaw.js';
 import { createRollTracker, rollValuesOf, rollRid } from '../../../src/net/npcRollTracker.js';
@@ -42,7 +42,7 @@ test('CHAP1 the twenty-two: the Roll keeps exactly DFU\'s four guilds, eight tem
 });
 
 test('CHAP1 the day\'s pace: a gain is credited what 15 a UTC day leaves and the rest owed, a new day opens it again, a loss is taken whole and gives its room back, both inside DFU\'s bounds (mutants: the bound, the rollover, a loss bounded, the clamp)', () => {
-  assert.deepEqual([ROLL_GAIN_DAY_MAX, ROLL_CUSTOMS_CAP, ROLL_DELTA_MAX, ROLL_EPOCH_S], [15, 40, 200, 1_791_417_600]);
+  assert.deepEqual([ROLL_GAIN_DAY_MAX, ROLL_DELTA_MAX], [15, 200]);
   assert.deepEqual(rollCredit({ rep: 10, gainedDay: 5, gained: 0 }, 10, 5), { rep: 20, gainedDay: 5, gained: 10, owed: 0, credited: 10 });
   assert.deepEqual(rollCredit({ rep: 20, gainedDay: 5, gained: 10 }, 10, 5), { rep: 25, gainedDay: 5, gained: 15, owed: 5, credited: 5 });
   assert.deepEqual(rollCredit({ rep: 25, gainedDay: 5, gained: 15 }, 10, 5), { rep: 25, gainedDay: 5, gained: 15, owed: 10, credited: 0 });
@@ -52,16 +52,10 @@ test('CHAP1 the day\'s pace: a gain is credited what 15 a UTC day leaves and the
   assert.deepEqual(rollCredit({ rep: -95, gainedDay: 5, gained: 2 }, -10, 5), { rep: -100, gainedDay: 5, gained: -3, owed: 0, credited: -5 });
 });
 
-test('CHAP1 the seed: a customs crossing from the epoch is capped at 40, one before it and a character born online are taken whole; every faction seeded, a missing one at 0 (mutants: the epoch\'s side, the cap)', () => {
-  assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: ROLL_EPOCH_S - 1 }), 100);
-  assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: ROLL_EPOCH_S }), 40);
-  assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: ROLL_EPOCH_S + DAY }), 40);
-  assert.equal(rollSeedCapOf({ origin: 'off-1', createdAt: null }), 40, 'a crossing of unknown age is never whole');
-  assert.equal(rollSeedCapOf({ origin: null, createdAt: ROLL_EPOCH_S + DAY }), 100, 'born online');
-  const seed = rollSeedOf({ 40: 90, 41: -120, 26: 12 }, 40);
+test('CHAP1 the seed: every faction taken whole inside DFU\'s bounds, a missing one at 0 (mutants: the clamp)', () => {
+  const seed = rollSeedOf({ 40: 90, 41: -120, 26: 12 });
   assert.deepEqual(Object.keys(seed).map(Number), [...ROLL_FACTIONS]);
-  assert.deepEqual([seed[40], seed[41], seed[26], seed[108]], [40, -100, 12, 0]);
-  assert.deepEqual(rollSeedOf({ 40: 90 }, 100)[40], 90);
+  assert.deepEqual([seed[40], seed[41], seed[26], seed[108]], [90, -100, 12, 0]);
 });
 
 test('CHAP1 the shapes: a seed, a claim and the memberships are refused out of their shape (mutants: a foreign id let in, a zero line let in, a rank past 9)', () => {
@@ -127,9 +121,7 @@ async function stand(open = 'on') {
   const who = await svc.registered('Rolla');
   const R = await seatRealm(svc.env, who.secret, 'Rolla');
   const raw = svc.env.DB._raw;
-  const born = (s, origin = 'off-rolla') => raw.prepare('UPDATE realm_characters SET created_at = ?, origin_id = ? WHERE id = ?').run(s, origin, R.id);
-  born(ROLL_EPOCH_S + DAY);
-  return { ...svc, who, R, raw, born };
+  return { ...svc, who, R, raw };
 }
 
 test('CHAP1 the switch: shut, the Roll answers chapters-closed (403) and the save keeps the standing; at dev, only a developer; on, everyone (mutants: the switch ignored, dev let anyone in)', async () => {
@@ -143,35 +135,24 @@ test('CHAP1 the switch: shut, the Roll answers chapters-closed (403) and the sav
   }
 });
 
-test('CHAP1 the first read: no seed, no Roll; the seed taken once, capped at 40 for a customs crossing since the epoch and whole for one before; a second seed never moves it (mutants: the cap skipped, a second seed taken)', async () => {
-  const { call, who, R, raw, born } = await stand();
+test('CHAP1 the first read: no seed, no Roll; the seed taken once and whole; a second seed never moves it (mutants: a second seed taken)', async () => {
+  const { call, who, R, raw } = await stand();
   assert.deepEqual((await call(ROLL, { character: R.id, lease: R.lease }, who.secret)).body, { roll: null });
   const seed = { factions: { 40: 90, 41: -60, 108: 75 }, members: [{ f: 40, rank: 6 }] };
   const first = await call(ROLL, { character: R.id, lease: R.lease, seed }, who.secret);
   assert.equal(first.status, 200);
   assert.equal(first.body.seeded, true);
-  assert.equal(first.body.roll.factions[40], 69, 'capped at 40 - but a member keeps its rank\'s band (AUDIT CHAP D1: rank 6 needs 60; PIN MOVED, AUDIT CHAP2 D3: up to rank 7\'s line less one, 69)');
+  assert.equal(first.body.roll.factions[40], 90);
   assert.equal(first.body.roll.factions[42], 0);
-  assert.equal(first.body.roll.factions[41], -60, 'a loss is never capped');
-  assert.equal(first.body.roll.factions[108], 40, 'no member: the cap');
+  assert.equal(first.body.roll.factions[41], -60);
+  assert.equal(first.body.roll.factions[108], 75);
   assert.equal(Object.keys(first.body.roll.factions).length, 22);
   assert.deepEqual(first.body.roll.members.map((m) => [m.f, m.rank]), [[40, 6]]);
+  assert.equal(raw.prepare('SELECT cap FROM npc_roll_heads WHERE char_id = ?').get(R.id).cap, 100);
   const again = await call(ROLL, { character: R.id, lease: R.lease, seed: { factions: { 40: 10 }, members: [] } }, who.secret);
   assert.equal(again.body.seeded, undefined);
-  assert.equal(again.body.roll.factions[40], 69, 'the Roll stands; a second seed is nothing');
-  // a character the realm made before CHAP1 arrived keeps what it earned online whole
-  raw.prepare('DELETE FROM npc_roll WHERE char_id = ?').run(R.id);
-  raw.prepare('DELETE FROM npc_roll_heads WHERE char_id = ?').run(R.id);
-  born(ROLL_EPOCH_S - 1);
-  const old = await call(ROLL, { character: R.id, lease: R.lease, seed }, who.secret);
-  assert.equal(old.body.roll.factions[40], 90);
-  assert.equal(raw.prepare('SELECT cap FROM npc_roll_heads WHERE char_id = ?').get(R.id).cap, 100);
+  assert.equal(again.body.roll.factions[40], 90, 'the Roll stands; a second seed is nothing');
   assert.equal((await call(ROLL, { character: R.id, lease: R.lease, seed: { factions: { 999: 1 }, members: [] } }, who.secret)).body.roll.factions[40], 90);
-  // and one born online after the epoch earned its standing online: whole
-  raw.prepare('DELETE FROM npc_roll WHERE char_id = ?').run(R.id);
-  raw.prepare('DELETE FROM npc_roll_heads WHERE char_id = ?').run(R.id);
-  born(ROLL_EPOCH_S + DAY, null);
-  assert.equal((await call(ROLL, { character: R.id, lease: R.lease, seed }, who.secret)).body.roll.factions[108], 75);
 });
 
 test('CHAP1 a malformed seed is refused whole (roll-seed, 400) and writes nothing', async () => {
@@ -276,7 +257,7 @@ function fakeDoor() {
       calls.push({ kind: 'read', character, lease, seed });
       if (door.refuse) return { ok: false, error: door.refuse };
       if (!roll) {
-        roll = { seq: 0, factions: rollSeedOf(seed.factions, 100), members: seed.members ?? [] };
+        roll = { seq: 0, factions: rollSeedOf(seed.factions), members: seed.members ?? [] };
         return { ok: true, data: { roll: view(), from: 0, seeded: true } };
       }
       return { ok: true, data: { roll: view(), from: roll.seq } };

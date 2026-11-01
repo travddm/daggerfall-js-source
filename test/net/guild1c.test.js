@@ -18,7 +18,7 @@ import {
   mintRenownOrder, mintOrder, ORDER_KINDS, ORDER_TTL_S, MAX_TTL_S,
 } from '../../src/net/identityToken.js';
 import {
-  parseClient, badged, readGuildTag, CHAT_LINE_CHANNELS, SOCIAL_ROOM, relaySupportsGuild, GUILD_RELAY_MIN, RELAY_VERSION,
+  parseClient, badged, readGuildTag, CHAT_LINE_CHANNELS, SOCIAL_ROOM, RELAY_VERSION,
   guildGate, GUILD_ORDER_HZ_MAX, GUILD_CHAT_ROOM_HZ_MAX,
 } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
@@ -26,7 +26,7 @@ import { withClock } from '../placeWidest.mjs';   // the relay's gates on a cloc
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession, GUILD_SEND_MS, GUILD_RESEND_MS } from '../../src/net/online.js';
 import { GuildBook, guildBadgeKey } from '../../src/net/guild/guildBook.js';
-import { CHAT_TABS, NO_GUILD_TEXT, GUILD_OLD_RELAY_TEXT } from '../../src/net/chat.js';
+import { CHAT_TABS, NO_GUILD_TEXT } from '../../src/net/chat.js';
 import { CHANNEL_COMMANDS, parseChatLine } from '../../src/net/chatCommands.js';
 import { guildRosterSource, rosterRows } from '../../src/net/roster.js';
 import { guildTagText } from '../../src/net/guild/guildLaw.js';
@@ -105,7 +105,7 @@ test('GUILD1c the orders: `guild` says the carrier\'s guild now (all three or no
   await assert.rejects(mintGuildOutOrder({ s: 'acct-0001' }, kp.privateKey, { subtle, nowS }), TypeError);
 });
 
-test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s; a line may name the guild channel; `badged` stamps the TAG alone - never the guild\'s id nor the member row - and `readGuildTag` reads back only the law\'s shape; world113 is the first relay that knows either (mutants: the tag unstamped; the id leaking onto a row; a guild line sent to world112)', () => {
+test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s; a line may name the guild channel; `badged` stamps the TAG alone - never the guild\'s id nor the member row - and `readGuildTag` reads back only the law\'s shape (mutants: the tag unstamped; the id leaking onto a row)', () => {
   assert.deepEqual(parseClient('{"t":"guild","order":"v1.a.b"}', { hasHello: true }), { t: 'guild', order: 'v1.a.b' });
   assert.deepEqual(parseClient('{"t":"guildout","order":"v1.a.b"}', { hasHello: true }), { t: 'guildout', order: 'v1.a.b' });
   assert.deepEqual(parseClient('{"t":"guild","order":"v1.a.b"}', { hasHello: false }), { error: 'guild before hello' });
@@ -120,16 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.equal(relaySupportsGuild('world120'), true, 'the merged relay still routes the guild');
-  assert.equal(relaySupportsGuild('world118'), true, 'a later relay still routes the guild');
-  assert.equal(relaySupportsGuild('world116'), true);
-  assert.equal(GUILD_RELAY_MIN, 115);
-  assert.equal(relaySupportsGuild('world115'), true);
-  assert.equal(relaySupportsGuild('world114'), false, 'the Enhanced Plus patch\'s relay routes no guild frame');
-  assert.equal(relaySupportsGuild('world113'), false, 'main\'s AUDIT WB relay routes no guild frame');
-  assert.equal(relaySupportsGuild('world112'), false);
-  assert.equal(relaySupportsGuild(null), false);
+  assert.equal(RELAY_VERSION, 'world282');
   const g1 = guildGate(null, 1000);
   assert.equal(GUILD_ORDER_HZ_MAX, 1);
   assert.equal(g1.pass, true);
@@ -392,14 +383,14 @@ test('GUILD1c the hub: a guild\'s line reaches every socket wearing the sender\'
 
 // ─── THE CLIENT ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('GUILD1c the session: a peer\'s tag off the welcome and a guild frame, which may take it off; mine off the service\'s answer and a room\'s echo, and a room taking MINE off tells the host to look again; `guildTagOf` and the chat\'s badge by id; a guild order is KEPT and goes down each socket ONCE its own welcome names world113, one guild frame a second a socket - a removal first - and a newer order replaces the held one (mutants: an order sent to world112; the gate unread, so the relay drops the second; the held order never replaced; my own tag taken off in silence)', () => {
+test('GUILD1c the session: a peer\'s tag off the welcome and a guild frame, which may take it off; mine off the service\'s answer and a room\'s echo, and a room taking MINE off tells the host to look again; `guildTagOf` and the chat\'s badge by id; a guild order is KEPT and goes down each socket ONCE its own welcome comes, one guild frame a second a socket - a removal first - and a newer order replaces the held one (mutants: the gate unread, so the relay drops the second; the held order never replaced; my own tag taken off in silence)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let clock = 1_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => clock });
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', gt: 'HND' }, { id: 'eve-0003', name: 'Eve', gt: '<b>' }], n: 3, v: 'world112' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', gt: 'HND' }, { id: 'eve-0003', name: 'Eve', gt: '<b>' }], n: 3 });
   assert.equal(s.guildTagOf('bob-0002'), 'HND');
   assert.equal(s.guildTagOf('eve-0003'), null, 'a tag the law does not admit is none');
   assert.deepEqual(s.badgeOf('bob-0002'), { title: null, glyphs: [], gt: 'HND' }, 'the chat line wears it too');
@@ -426,11 +417,8 @@ test('GUILD1c the session: a peer\'s tag off the welcome and a guild frame, whic
   assert.equal(gone, 1, 'a room took my guild off: the host looks again');
   // the carrier
   const guildSent = (w) => w.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'guild' || m.t === 'guildout');
-  assert.equal(s.sendGuildOrder('v1.join.a'), false, 'a world112 relay closes the socket on the frame');
-  assert.deepEqual(guildSent(ws), []);
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world115' });
-  assert.deepEqual(guildSent(ws), [{ t: 'guild', order: 'v1.join.a' }], 'kept, and gone on this socket\'s own welcome');
-  assert.equal(s.guildOk, true);
+  assert.equal(s.sendGuildOrder('v1.join.a'), true, 'a welcomed socket takes it at once');
+  assert.deepEqual(guildSent(ws), [{ t: 'guild', order: 'v1.join.a' }], 'kept, and gone on this socket');
   // a removal and a newer order at once: one frame a socket every GUILD_SEND_MS (wider than the relay's second), the
   // removal first
   assert.equal(GUILD_SEND_MS, 1500);
@@ -456,7 +444,7 @@ test('GUILD1c the session: a peer\'s tag off the welcome and a guild frame, whic
   s.setHalo(['world:3,12']);
   const halo = sockets[1];
   halo.open();
-  halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world115' });
+  halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1 });
   clock += 1500; s.tick();
   assert.deepEqual(guildSent(halo).map((m) => m.order), ['v1.out.b', 'v1.leave.c']);
   clock += 60_000; s.tick();
@@ -465,18 +453,15 @@ test('GUILD1c the session: a peer\'s tag off the welcome and a guild frame, whic
   assert.equal(s.sendGuildOrder('x'.repeat(1025)), false);
 });
 
-test('GUILD1c the guild line: said on the guild channel only to a relay that routes it (world115 - the World link\'s own word, never the party\'s world102), and a guild line coming in is gated on the guilds\' own budget, apart from the room\'s and the parties\' (mutants: the party\'s flag read for the guild; the guild line on the room\'s bucket)', () => {
+test('GUILD1c the guild line: said on the guild channel, and a guild line coming in is gated on the guilds\' own budget, apart from the room\'s and the parties\' (mutant: the guild line on the room\'s bucket)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let clock = 5_000_000;
   const link = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 's', WebSocketImpl: FakeWS, now: () => clock, presence: false });
   link.join(SOCIAL_ROOM);
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world112' });
-  assert.equal(link.chanOk, true);
-  assert.equal(link.sendChat('hail', { ch: 'guild' }), false, 'a world112 hub routes parties, not guilds');
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1 });
   assert.equal(link.sendChat('hail', { ch: 'party' }), true);
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world115' });
   clock += 2000;
   assert.equal(link.sendChat('hail', { ch: 'guild' }), true);
   assert.deepEqual(JSON.parse(ws.sent.at(-1)), { t: 'chat', text: 'hail', ch: 'guild' });
@@ -548,7 +533,6 @@ test('GUILD1c the chat: a Guild tab beside the Party tab - off the bar until the
   assert.deepEqual(rosterRows(src2).rows.map((r) => [r.name, r.gt, r.me]), [['Bob', 'HND', false], ['Mac', 'HND', true]], 'my own row wears my tag too');
   assert.equal(guildRosterSource(hub, null).peers.size, 0, 'no guild: a list of one');
   assert.equal(NO_GUILD_TEXT, 'You are not in a guild.');
-  assert.equal(GUILD_OLD_RELAY_TEXT, 'The guild channel needs the server\'s next update.');
 });
 
 test('GUILD1c the minter and the point: the mint\'s answer hands my guild\'s tag to the page (null for none, nothing from a service before acct13), and a peer\'s tag rides the name point both faces read (mutants: the minter dropping the tag; the point without it)', async () => {

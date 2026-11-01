@@ -6,13 +6,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validStaffDestination, validStaffTeleportIn, validStaffTeleportOut, notePlace } from '../../src/net/staffTeleport.js';
-import { parseClient, WORLD_PIXEL_BOUND, validOwIn, validOwOut, SOCIAL_ROOM, RELAY_VERSION, worldRoom, relaySupportsWorldWide } from '../../src/net/wire.js';
+import { parseClient, WORLD_PIXEL_BOUND, validOwIn, validOwOut, SOCIAL_ROOM, RELAY_VERSION, worldRoom } from '../../src/net/wire.js';
 import { CITIES } from '../../src/world/tamriel/tamrielGeography.js';
 import { pictureToBay, setTamrielFit, inBay } from '../../src/world/tamriel/tamrielFrame.js';
 import { setTamrielTrace } from '../../src/world/tamriel/tamrielLand.js';
 import { owFoldGraves, newOwLedger } from '../../src/net/overworldLaw.js';
 import { GRAVE_LOC_RE } from '../../src/scenes/searchPartyHost.js';
-import { OnlineSession, bayMapPixel } from '../../src/net/online.js';
+import { OnlineSession } from '../../src/net/online.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { createQuestWorld } from '../../src/scenes/questWorld.js';
 import { TopicTree, QUESTION_TYPE } from '../../src/systems/topicTree.js';
@@ -69,36 +69,29 @@ test('R2-3 a headstone past the Bay is owed to its cell and locked for the party
   for (const loc of ['g12345,0', 'g1.5,0', 'gx,0', 'g101,207,1']) assert.equal(GRAVE_LOC_RE.exec(loc), null, loc);
 });
 
-test('R2 THE OLDER RELAY: a word naming a pixel past the Bay goes only to a relay that reads one (relaySupportsWorldWide) - before it, the relay closes the socket on it: the staff answer says `unavailable`, the arch is refused before its key is staked, the headstone past the Bay is not said; a Bay pixel goes to both (mutants: the gate unasked, each door)', () => {
-  assert.equal(relaySupportsWorldWide('world259'), false);
-  assert.equal(relaySupportsWorldWide(RELAY_VERSION), true);
-  assert.deepEqual([bayMapPixel(0, 0), bayMapPixel(999, 499), bayMapPixel(1000, 0), bayMapPixel(0, -1), bayMapPixel(1.5, 0)], [true, true, false, false, false]);
+test('R2 a word naming a pixel past the Bay goes to the relay: the staff answer carries its destination, the headstone past the Bay is said; a Bay pixel goes too (mutants: each door refusing a pixel past the Bay)', () => {
   const BAY = { x: 207, y: 213 };
   const extAt = (pixel) => ({ kind: 'exterior', pixel, pos: [1, 2, 3], yaw: 0, pitch: 0 });
-  for (const [v, world] of [['world259', false], [RELAY_VERSION, true]]) {
-    // the hub: the staff answer
-    const { FakeWS, sockets } = fakeSocketClass();
-    const s = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', WebSocketImpl: FakeWS, presence: false });
-    s.join(SOCIAL_ROOM); const ws = sockets[0]; ws.open();
-    ws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v });
-    assert.equal(s.worldPixelsOk, world, v);
-    const sent = () => ws.sent.map((x) => JSON.parse(x));
-    assert.equal(s.sendStaffTeleport({ k: 'answer', ticket: 'tk-bay', dest: extAt(BAY) }), true);
-    assert.deepEqual(sent().at(-1), { t: 'stp', k: 'answer', ticket: 'tk-bay', dest: extAt(BAY) }, 'a Bay destination to every relay');
-    assert.equal(s.sendStaffTeleport({ k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) }), true);
-    assert.deepEqual(sent().at(-1), world ? { t: 'stp', k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) } : { t: 'stp', k: 'answer', ticket: 'tk-far', error: 'unavailable' }, `${v}: past the Bay`);
-    s.leave();
-    // the cell past the Bay: a headstone's row
-    const c = fakeSocketClass();
-    const cs = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', WebSocketImpl: c.FakeWS, presence: false });
-    const room = worldRoom(ALINOR.x, ALINOR.y);
-    cs.join(room); const cws = c.sockets[0]; cws.open();
-    cws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v });
-    assert.equal(cs.owGraveOk, true, `${v}: a relay that keeps the graves`);
-    assert.deepEqual(cs.sendOverworld('gr', [[ALINOR.x, ALINOR.y, 3]]), world ? [[ALINOR.x, ALINOR.y, 3]] : [], `${v}: a headstone past the Bay`);
-    assert.equal(c.sockets[0].sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'ow').length, world ? 1 : 0);
-    cs.leave();
-  }
+  // the hub: the staff answer
+  const { FakeWS, sockets } = fakeSocketClass();
+  const s = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', WebSocketImpl: FakeWS, presence: false });
+  s.join(SOCIAL_ROOM); const ws = sockets[0]; ws.open();
+  ws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v: RELAY_VERSION });
+  const sent = () => ws.sent.map((x) => JSON.parse(x));
+  assert.equal(s.sendStaffTeleport({ k: 'answer', ticket: 'tk-bay', dest: extAt(BAY) }), true);
+  assert.deepEqual(sent().at(-1), { t: 'stp', k: 'answer', ticket: 'tk-bay', dest: extAt(BAY) }, 'a Bay destination');
+  assert.equal(s.sendStaffTeleport({ k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) }), true);
+  assert.deepEqual(sent().at(-1), { t: 'stp', k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) }, 'past the Bay');
+  s.leave();
+  // the cell past the Bay: a headstone's row
+  const c = fakeSocketClass();
+  const cs = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', WebSocketImpl: c.FakeWS, presence: false });
+  const room = worldRoom(ALINOR.x, ALINOR.y);
+  cs.join(room); const cws = c.sockets[0]; cws.open();
+  cws.receive({ t: 'welcome', id: 'peer-bran', peers: [], n: 1, v: RELAY_VERSION });
+  assert.deepEqual(cs.sendOverworld('gr', [[ALINOR.x, ALINOR.y, 3]]), [[ALINOR.x, ALINOR.y, 3]], 'a headstone past the Bay');
+  assert.equal(c.sockets[0].sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'ow').length, 1);
+  cs.leave();
 });
 
 test('R2-4 the quest layer\'s region name past the Bay is its province\'s (WW-R): an NPC past the Bay knows a quest\'s place and person there - the site names the province (scenes/tamrielPlacesHost.js), and the region\'s name had been \'\' - and "Where am I?" in a lair names it; on the Bay the loaded region\'s, an empty region\'s \'\' as DFU\'s (mutants: the province unnamed; every region named)', () => {

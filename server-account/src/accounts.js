@@ -127,8 +127,7 @@ export function accountKind(row) {
 
 /**
  * NAME-AS: WHICH NAME THE ROOM READS - the account's (displayName, above) or the realm
- * character's the token is minted for (wornNameOf, below). The row stores the second alone (`name_as` 'character',
- * migration 0111), so a row that never chose reads as the account, as every player read before.
+ * character's the token is minted for (wornNameOf, below). The row stores the second alone (`name_as` 'character'), so a row that never chose reads as the account, as every player read before.
  */
 export const NAME_AS = Object.freeze(['account', 'character']);
 /** NAME-AS: the choice this row holds - 'character', or the account's for anything else (null, a word no build wrote). */
@@ -165,7 +164,7 @@ export function wornNameRefusal(name) {
  * word of the request (test/server/accountworker.test.js: a name in the body never reaches the token). None - no character
  * named, an offline one, another account's, a tombstone - is the account's, and silently: there is nothing to wear.
  *
- * AND NEVER ANOTHER ACCOUNT'S USERNAME. A handle is unique (0001's handle_lc index) and is how an account is found - a
+ * AND NEVER ANOTHER ACCOUNT'S USERNAME. A handle is unique (the handle_lc index) and is how an account is found - a
  * letter, an invitation, a commission are each addressed by username - and handleShape.js keeps the guests' generated
  * names out of that space by their shape alone. A character's name is chosen at chargen, so its shape promises nothing:
  * one that is another account's username would walk every room wearing that account's name. So it is asked here, ONE
@@ -268,8 +267,8 @@ export async function openSession({ db, subtle, rand, nowS }, playerId, deviceLa
 
 /** SCALE4a: THE SESSION'S COLUMNS, named, each read under a `s.` prefix
  *  no column of `players` can carry, so one row holds both without a name in common (`id`, `created_at`, `last_seen`).
- *  The table's own six (0001_accounts.sql; no migration has altered it) - test/server/scale4a.test.js holds this list to the
- *  migrations' table, so a column added there is a pin that fails until it is named here. */
+ *  The table's own six - test/server/scale4a.test.js holds this list to the
+ *  schema's table, so a column added there is a pin that fails until it is named here. */
 export const SESSION_COLUMNS = Object.freeze(['id', 'player_id', 'secret_hash', 'device_label', 'created_at', 'last_seen']);
 /** SCALE4a: the session by its hash and its player beside it, in ONE statement. LEFT, so a session whose player is gone
  *  still comes back (its player's columns NULL) and meets the same exits it met as two reads: the idle one is deleted
@@ -424,7 +423,7 @@ export async function muteAccount({ db, nowS }, actor, env, { target, minutes, a
   if (canModerate(row, env)) return { error: 'protected' };
   const until = minutes ? nowS + minutes * 60 : null;
   // STAFF-PANEL2-FIX (design doc, Weak spots: "A Moderator can lift an Admin's ban" - "Store who set each sanction;
-  // lifting an Admin's needs an Admin"): a mute an Admin set (`mute_admin`, 0156) is lifted or cut short by an Admin
+  // lifting an Admin's needs an Admin"): a mute an Admin set (`mute_admin`) is lifted or cut short by an Admin
   // alone, and stays the Admin's when another moderator lengthens it
   const adminHeld = row.mute_admin === 1 && isMuted(row, nowS);
   const admin = isDeveloper(actor, env);
@@ -570,12 +569,12 @@ export async function equipGlyph({ db, nowS }, player, env, glyph, on) {
   return { ok: true, ...wardrobeOf({ ...player, glyphs_off }, env, nowS) };
 }
 
-/** SERPENT-SET: every ember account ?1's kills paid, in SQL - its gates' rows' `stones` and (migration 0083) its serpents'
+/** SERPENT-SET: every ember account ?1's kills paid, in SQL - its gates' rows' `stones` and its serpents'
  *  (SERPENT_EMBERS a receipt): the gate's currency is a serpent's hoard's too, and the purse below counts both. */
 export const EMBERS_EARNED_SQL = '((SELECT COALESCE(SUM(stones), 0) FROM gate_kills WHERE account = ?1) + (SELECT COALESCE(SUM(stones), 0) FROM serpent_kills WHERE account = ?1))';
 /** WB9g: what the account's own closed gates could still pay for - one Sigil Stone a gate closed (gate_kills, WB5b),
  *  less what its insignia already cost (`insignia_spent`). Never below 0. WB12d: a row's own `stones` - two with the
- *  faithful's rite broken, one for the rite alone (migration 0066). SERPENT-SET: and a serpent's (EMBERS_EARNED_SQL). */
+ *  faithful's rite broken, one for the rite alone. SERPENT-SET: and a serpent's (EMBERS_EARNED_SQL). */
 export async function insigniaPurse({ db }, player) {
   const r = await db.prepare(`SELECT ${EMBERS_EARNED_SQL} AS n`).bind(player.id).first();
   const spent = Number.isSafeInteger(player?.insignia_spent) ? player.insignia_spent : 0;

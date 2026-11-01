@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRoom } from '../fakeRoom.mjs';
-import { parseClient, parkKeyOf, validCaravanData, relaySupportsCaravan, CARAVAN_DECOR_KEY, CARAVAN_RELAY_MIN, PARK_TTL_MS, RELAY_VERSION, CARAVAN_DOC_MIN_MS, ACT_SENDER_BYTES_PER_S, ACT_ROOM_BYTES_PER_S, PARK_REFRESH_MS } from '../../src/net/wire.js';
+import { parseClient, parkKeyOf, validCaravanData, CARAVAN_DECOR_KEY, PARK_TTL_MS, RELAY_VERSION, CARAVAN_DOC_MIN_MS, ACT_SENDER_BYTES_PER_S, ACT_ROOM_BYTES_PER_S, PARK_REFRESH_MS } from '../../src/net/wire.js';
 import { caravanRoomOf, privateInteriorPrefix, privateInteriorRoom } from '../../src/net/privateInterior.js';
 import { OnlineSession } from '../../src/net/online.js';
 
@@ -24,16 +24,13 @@ async function caravanRoom() {
   return { k, r, join, say };
 }
 
-test('WAGONS2-VISIT THE FRAME: `caravan` is `{ c, d }` - the park frame\'s character and a document (a plain object) or null - after a hello only; a relay before CARAVAN_RELAY_MIN closes the socket on it, so it is never sent there (mutant: any character\'s frame)', () => {
+test('WAGONS2-VISIT THE FRAME: `caravan` is `{ c, d }` - the park frame\'s character and a document (a plain object) or null - after a hello only (mutant: any character\'s frame)', () => {
   assert.deepEqual(validCaravanData({ c: CA, d: DOC }), { c: CA, d: DOC });
   assert.deepEqual(validCaravanData({ c: CA, d: null }), { c: CA, d: null });
   for (const bad of [null, [], { c: 'x', d: DOC }, { d: DOC }, { c: CA, d: [] }, { c: CA, d: 'doc' }, { c: CA }]) assert.equal(validCaravanData(bad), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'caravan', data: { c: CA, d: DOC } }), { hasHello: true }), { t: 'caravan', data: { c: CA, d: DOC } });
   assert.equal(parseClient(JSON.stringify({ t: 'caravan', data: { c: CA, d: DOC } })).error, 'caravan before hello');
   assert.equal(parseClient(JSON.stringify({ t: 'caravan', data: { c: CA, d: 7 } }), { hasHello: true }).error, 'bad caravan');
-  assert.equal(CARAVAN_RELAY_MIN, 187);
-  assert.equal(relaySupportsCaravan('world186'), false); assert.equal(relaySupportsCaravan('world189'), true); assert.equal(relaySupportsCaravan(RELAY_VERSION), true);
-  assert.equal(relaySupportsCaravan(null), false);
 });
 
 test('WAGONS2-VISIT THE ROOM KEEPS ITS OWNER\'S WORD: the owner\'s document is stored and fanned to everyone else here; another account naming the owner\'s character, or the owner\'s account naming another character, reaches nothing - junk; a joiner is handed the document after its welcome, whether the owner is there or not; null forgets it (mutants: anyone\'s word kept, the joiner handed nothing)', async () => {
@@ -111,7 +108,7 @@ function fakeSocketClass() {
 }
 const POSE = { x: 1000, y: 0, z: 1000, yaw: 0, pitch: 0, mv: 0 };
 
-test('WAGONS2-VISIT THE SESSION: my document goes down my primary socket only welcomed, in a caravan\'s room, at a relay that keeps one; the room\'s word is heard only from the caravan\'s room I stand in (mutants: said to an older relay, a cell\'s word taken for a caravan\'s)', async () => {
+test('WAGONS2-VISIT THE SESSION: my document goes down my primary socket only welcomed, in a caravan\'s room; the room\'s word is heard only from the caravan\'s room I stand in (mutants: a cell\'s word taken for a caravan\'s)', async () => {
   const k = await parkKeyOf('acct-ann1', CA);
   const room = caravanRoomOf(k);
   const { FakeWS, sockets } = fakeSocketClass();
@@ -122,11 +119,7 @@ test('WAGONS2-VISIT THE SESSION: my document goes down my primary socket only we
   s.join(room, POSE);
   sockets[0].open();
   assert.equal(s.sendCaravan({ c: CA, d: DOC }), false, 'not welcomed: nothing but the hello');
-  sockets[0].receive({ t: 'welcome', id: 'ann-0001', peers: [], v: 'world182' });
-  assert.equal(s.caravanOk, false);
-  assert.equal(s.sendCaravan({ c: CA, d: DOC }), false, 'an older relay would close the socket on it');
   sockets[0].receive({ t: 'welcome', id: 'ann-0001', peers: [], v: RELAY_VERSION });
-  assert.equal(s.caravanOk, true);
   assert.equal(s.sendCaravan({ c: 'x', d: DOC }), false, 'not a frame the relay takes');
   assert.equal(s.sendCaravan({ c: CA, d: DOC }), true);
   assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'caravan', data: { c: CA, d: DOC } });

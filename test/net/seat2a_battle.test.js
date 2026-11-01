@@ -14,7 +14,7 @@ import { mintSiegeOrder, verifyOrder, orderValid, siegePassValid, SIEGE_PASS_SPA
 import { mintSiegeReceipt, readSiegeReceipt, verifySiegeReceipt, siegeReceiptValid, SIEGE_RECEIPT_TTL_S, SIEGE_RESULTS } from '../../src/net/siege/siegeReceipt.js';
 import { mintWatchReceipt, verifyWatchReceipt } from '../../src/net/watchReceipt.js';
 import { verifyReceipt } from '../../src/net/gate/gateReceipt.js';
-import { parseClient, relayFightsBattles, SIEGE_BATTLE_RELAY_MIN } from '../../src/net/wire.js';
+import { parseClient } from '../../src/net/wire.js';
 
 const { subtle } = globalThis.crypto;
 const M = SIEGE_UNITS_PER_M;
@@ -225,8 +225,6 @@ test('SEAT2a THE PASS: the service\'s `siege` order - the account, the seat and 
   assert.deepEqual(parseClient(JSON.stringify({ ...hello, sp: 'not a pass' }), { hasHello: false }), { error: 'bad pass' });
   assert.deepEqual(parseClient(JSON.stringify({ ...hello, sp: 7 }), { hasHello: false }), { error: 'bad pass' });
   assert.equal('sp' in parseClient(JSON.stringify(hello), { hasHello: false }), false);
-  assert.equal(SIEGE_BATTLE_RELAY_MIN, 147);
-  assert.deepEqual(['world146', 'world148', 'world148', 'x141', null].map(relayFightsBattles), [false, true, true, false, false]);
 });
 
 test('SEAT2a THE RECEIPT: `s1` - the account, the seat and week, its side, the result, whether a banner was raised, its Honours - signed by the relay\'s key, verified rung for rung, read unsigned by the client; never the gate\'s, the raid\'s or the Watch\'s, nor they it (mutants: each field; the TTL; the version; the disjointness)', async () => {

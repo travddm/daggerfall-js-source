@@ -225,7 +225,7 @@ test('AUDIT PRE-MERGE 1003 S4: THE CLIENT PAYS NO PURSE ON A REUSED BOUT - the s
   const climbOf = (n) => arenaLadderOf(Array.from({ length: n }, (_, k) => ({ tier: Math.floor(k / 4), bout: k % 4 })));
   const board = { season: 5, day: 9, team: { standings: { red: 0, blue: 0 }, laurel: null }, hall: [], me: { ladder: climbOf(1), banner: null, left: null, leftSeason: null, points: 0 } };
   const said = [], asked = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let answer = null;
   const A = createArenaOnline({
     now: () => 0, session: () => session, makeHall: () => null, say: (l) => said.push(l), guest: () => false,

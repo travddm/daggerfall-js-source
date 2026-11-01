@@ -198,7 +198,7 @@ const pieceOf = (p, wear) => (p ? {
   provenance: p.provenance, recipe: p.recipe, quality: Number(p.quality), seed: Number(p.seed), maker: p.maker ?? null,
   marked: Number(p.marked) === 1, template: Number(p.template), material: Number(p.material), wear: Number(wear),
   ...(p.dye == null ? {} : { dye: Number(p.dye) }),   // PROF7: a garment is the colour it was sewn in
-  ...(p.hand == null ? {} : { hand: Number(p.hand) }),   // PROF9: a dish keeps its cook's hand (0069)
+  ...(p.hand == null ? {} : { hand: Number(p.hand) }),   // PROF9: a dish keeps its cook's hand
   ...mintVersionView(p.record),   // CRAFT-PROCS: a piece made before mints as it was
   ...(masterLinesOf(p.record) ? { lines: masterLinesOf(p.record) } : {}),   // MASTER-ART: a Master's work mints its chosen lines
 } : null);
@@ -532,7 +532,7 @@ export async function closeAuctions(ctx, read = null, env = null) {   // DOMAIN3
  * service's clock's (server-account/src/cron.js, each hour); the History view pruned first, nine writes on a read. AUDIT
  * SCALE A5: each table's delete takes `rows` at most, and the clock asks again while one took a full page - one
  * unbounded batch, a backlog's worth, could outrun D1's thirty seconds a batch, roll back, and only grow (the auctions'
- * delete walked every bid for each auction it took, until 0091 indexed market_bids by its auction). Answers
+ * delete walked every bid for each auction it took, until market_bids was indexed by its auction). Answers
  * `{ changed, full }`.
  * @param {any} db @param {number} nowS @param {number} rows
  */
@@ -2264,7 +2264,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
  * Every online client standing in a living town reads it each PATRON_READ_S (scenes/world.js livingPatronsRead), and its
  * lazy reckoning - up to PATRON_READ_STATEMENTS statements a read - backed the database's writes up until D1 refused as
  * overloaded. The hour's cron reckons the towns waiting longest; a trader opened (/vendor) and a seller's own page
- * (/myvendors) reckon their towns; this read tells what they sold. PATRON-LOAD II (migration 0107): AND BY THE LISTING'S
+ * (/myvendors) reckon their towns; this read tells what they sold. PATRON-LOAD II: AND BY THE LISTING'S
  * OWN REGION - a trader's listing carries its home's region (listGood), so `l.region = ?2` asks what `h.region = ?2`
  * asks, and idx_market_vendor_region answers it. AUDIT LW-II-2 W6: AND EVERY PUBLIC TRADER OF THE REGION its patrons may
  * buy of - each such house's newest piece, where the board's VENDOR_BOARD_SHOWN newest left the house out: the towns'
@@ -2414,7 +2414,7 @@ export const PATRON_TOLD_SQL = (/** @type {string} */ where) => `SELECT s.listin
   FROM market_patron_sales s JOIN market_listings l ON l.id = s.listing WHERE ${where} AND s.at > ?1 ORDER BY s.at DESC LIMIT ${VENDOR_BOARD_SHOWN}`;
 
 /** VENDOR-BOARD: a trader listing's columns as the board keeps them - the ones listingView reads (AUDIT LEAN-READS B7: its
- *  bookkeeping is none of the board's, and migration 0137's trigger moves the board on these alone) - and its trader's. */
+ *  bookkeeping is none of the board's, and the schema's trigger moves the board on these alone) - and its trader's. */
 const VENDOR_COLUMNS = `l.id, l.kind, l.region, l.material, l.item, l.own, l.bought, l.units, l.price, l.fee, l.wear, l.at, l.expires_at, l.state,
       l.currency, l.seller, d.map_id AS v_map, d.id AS v_id, h.building_key AS v_key, h.owner_name AS v_owner, h.player AS v_player,
       h.char_id AS v_char, h.entry AS v_entry`;

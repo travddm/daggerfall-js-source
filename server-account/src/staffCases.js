@@ -182,7 +182,7 @@ export async function staffCases(ctx, env, path, body, who, audit) {
   // file's /v1/staff/unban, the one the panel's case view sends. MOST URGENT FIRST: the ban that lifts soonest - the player
   // back in the game soonest - and the bans for good last; `sort: 'newest'` the switch back, the newest ban first (its
   // newest `ban` act, mod_actions_target). Paged by a cursor (`from`, answered `next`: the last row's key and id), so a ban
-  // laid or lifted between two pages skips no row and repeats none. On migration 0164's index: the bans alone are walked.
+  // laid or lifted between two pages skips no row and repeats none. On the bans index: the bans alone are walked.
   if (path === '/v1/staff/banned') {
     const sort = body.sort === 'newest' ? 'newest' : 'urgent';
     const at = typeof body.from === 'string' ? /^(\d{1,16}):([A-Za-z0-9_-]{4,40})$/.exec(body.from) : null;

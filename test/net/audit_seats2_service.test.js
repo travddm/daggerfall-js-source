@@ -5,7 +5,7 @@
 // feeding a seat its guild no longer holds or is pledged to (S6). Driven through the real Worker over node:sqlite with
 // every migration applied (test/accountDb.mjs), and the statements the batches carry where a Worker path cannot reach
 // the state (a Season's wear over a delivered project). 4.2, 7.2, 7.5, 7.7, 9.1, 16;
-// server-account/src/seatForts.js, seatSiege.js, seatTurning.js, townSeats.js, writs.js; migration 0051.
+// server-account/src/seatForts.js, seatSiege.js, seatTurning.js, townSeats.js, writs.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

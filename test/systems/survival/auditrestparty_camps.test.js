@@ -1,8 +1,8 @@
 // AUDIT REST-PARTY: the Campfire, the supplies and the act,
 // each finding pinned by execution where it can be. B1: a load out of a dungeon drops my fire (the save's pack is the
 // pack) where a leave packs it; B2: an offline night at my own Campfire keeps it lit and spends its charge; B3: my fire
-// leaves before the room's memory goes, and a cold fire whose owner left the room goes too; B4: customs keeps the
-// supplies offline and online none is used while their sources are shut; B5: an old save's kit fire is no Campfire to
+// leaves before the room's memory goes, and a cold fire whose owner left the room goes too; B4: online no
+// supply is used while their sources are shut; B5: an old save's kit fire is no Campfire to
 // pick up, and a kit is fed to its own cap; B6: the Salts one hour at a time; B7: the hotbar's Campfire is a fuelled
 // one. A3: a pressed bed prices as a bed; A4: a room that runs out mid-night is no whole night; A5: the channel asks the
 // point again; C1: the ward is online's.
@@ -18,7 +18,6 @@ import { setSharedClock, setWorldMinutes, setOwnMinutes, advanceOwnMinutes } fro
 import { createRestItem, REST_ITEM, REST_ITEM_TEXT, useSalts, _setRestItemsOnlineForTests } from '../../../src/systems/rest/restItems.js';
 import { itemUseHandler } from '../../../src/systems/item/itemTemplates.js';
 import { newSurvival } from '../../../src/systems/survival/needs.js';
-import { applyCustoms, customsLines } from '../../../src/systems/realmCustoms.js';
 import { createRestDeps } from '../../../src/scenes/shared.js';
 import { actAtChannelEnd, NIGHT_HOURS } from '../../../src/systems/rest/restAct.js';
 import { fireLayoutInputs } from '../../../src/world/dungeon/dungeonFires.js';
@@ -89,19 +88,12 @@ test('AUDIT REST-PARTY B3: a peer\'s fire gone cold whose owner is not in the ro
   assert.equal(p.sweepColdAbsent(null), 0, 'no roster read: nothing swept');
 });
 
-test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their sources are shut, and says so; online none is used, offline as ever (REST-LOOT: the switch\'s way back - open, they cross and are used online)', () => {
+test('AUDIT REST-PARTY B4: while the supplies\' sources are shut, online none is used, offline as ever (REST-LOOT: the switch\'s way back - open, they are used online)', () => {
   _resetForTests(); setPref('survival', true);
-  const sword = { templateIndex: 113, group: 'Weapons', value: 10 };
   const entity = { fatigue: 0, maxFatigue: 100, stats: { endurance: 50, strength: 50 }, survival: newSurvival(0) };
   const h = itemUseHandler(REST_ITEM.Tonic);
   _setRestItemsOnlineForTests(false);
   try {
-    const snap = { level: 1, goldPieces: 0, items: [createRestItem(REST_ITEM.Bedroll), sword, createRestItem(REST_ITEM.Tonic)], wagonItems: [], bankAccounts: [] };
-    const r = applyCustoms(snap);
-    assert.equal(r.restKept, 2);
-    assert.deepEqual(snap.items, [sword], 'the copy carries none of them');
-    assert.ok(customsLines(r).some((l) => /rest supplies stayed with your offline character/.test(l)));   // AUDIT REST II H13 (
-    assert.ok(customsLines(r, { before: true }).some((l) => /will stay/.test(l)));
     const tonic = createRestItem(REST_ITEM.Tonic);
     globalThis.location = { search: '?online' };
     assert.equal(h.usable(tonic), false, 'online: the card offers no Use');
@@ -111,11 +103,7 @@ test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their source
     assert.notEqual(h(tonic, [tonic], { entity }).text, REST_ITEM_TEXT.notOnline, 'offline it is drunk');
   } finally { _setRestItemsOnlineForTests(null); globalThis.location = { search: '' }; }
   for (const t of Object.values(REST_ITEM)) assert.equal(typeof itemUseHandler(t)?.usable, 'function', `${t} is gated`);
-  // REST-LOOT: the switch on - the character's own cross, nothing is said, and online the Tonic is drunk
-  const open = { level: 1, goldPieces: 0, items: [createRestItem(REST_ITEM.Bedroll), sword, createRestItem(REST_ITEM.Tonic)], wagonItems: [], bankAccounts: [] };
-  const r = applyCustoms(open);
-  assert.deepEqual([r.restKept, open.items.length], [0, 3], 'open: they cross with the character');
-  assert.equal(customsLines(r).some((l) => /rest supplies/.test(l)), false, 'and nothing is said');
+  // REST-LOOT: the switch on - online the Tonic is drunk
   const tonic = createRestItem(REST_ITEM.Tonic);
   globalThis.location = { search: '?online' };
   try {

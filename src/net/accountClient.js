@@ -420,7 +420,7 @@ const REFUSAL_WORDS = {
   'marks-rate': () => t('account.refusal.marksRate', 'You have moved too much silver this hour. Try again later.'),
   'bad-find': () => t('account.refusal.badFind', 'That find could not be read.'),   // SILVER-FINDS: a loot find of no kind the service knows
   'marks-young': () => t('account.refusal.marksYoung', 'Silver turns up in finds and gathering once your account is a week old.'),   // AUDIT 625 S1: the witnesses' own age
-  'not-developer': () => t('account.refusal.notDeveloper', 'Only a developer may do that.'),   // MARKS1's report, NOTICE1's notices, CUSTOMS-PASS's grant
+  'not-developer': () => t('account.refusal.notDeveloper', 'Only a developer may do that.'),   // MARKS1's report, NOTICE1's notices
   // SEAT1a: the seats' registry (server-account/src/townSeats.js)
   'seats-need-account': () => t('account.refusal.seatsNeedAccount', 'The seats are witnessed by registered accounts. Add a username to witness one.'),
   'seats-closed': () => t('account.refusal.seatsClosed', 'The seats are not open yet.'),
@@ -714,29 +714,20 @@ const REFUSAL_WORDS = {
   'commission-piece': () => t('account.refusal.commissionPiece', 'That piece is not what the commission asks.'),
   'commission-not-made': () => t('account.refusal.commissionNotMade', 'A commission must be filled with a piece you made.'),
   'commission-worn': () => t('account.refusal.commissionWorn', 'That piece is worn. A commission needs a new piece.'),
-  // HOME-CROSSED (FIELD BUGS 2026-09-30): a home customs carried in - RESTORE's words for a crossed deed
-  // (systems/online/onlineHomes.js HOME_CROSSED_LINES, pinned equal), and a realm act asked while the last is still out
-  'home-crossed': () => t('account.refusal.homeCrossed', 'That came into the realm through customs. The bank of the Empire does not buy it back. It stays your home.'),
+  // HOME-CROSSED: a home no realm record paid for, which the service never buys back (systems/online/onlineHomes.js
+  // HOME_CROSSED_LINES, pinned equal), and a realm act asked while the last is still out
+  'home-crossed': () => t('account.refusal.homeCrossed', 'No realm character paid for that home. The bank of the Empire does not buy it back. It stays your home.'),
   busy: () => t('account.refusal.busy', 'Your last dealing with the realm is still being settled. Try again in a moment.'),
   server: () => t('account.refusal.server', 'The account service had a problem. Try again.'),
   offline: () => t('account.refusal.offline', 'Could not reach the account service. Check your connection.'),
-  maintenance: () => t('account.refusal.maintenance', 'The account service is under maintenance for a minute. Try again shortly.'),   // RESTORE: the history restore's minute
+  maintenance: () => t('account.refusal.maintenance', 'The account service is under maintenance for a minute. Try again shortly.'),   // a history repair's minute
   // REALM P1: the realm's characters (server-account/src/realm.js) - an online character's save, held by the service.
   'too-many-characters': () => t('account.refusal.tooManyCharacters', 'You have as many online characters as an account may hold. Delete one to make room.'),
   'no-realm-character': () => t('account.refusal.noRealmCharacter', 'That online character is not on this account.'),
   lease: () => t('account.refusal.lease', 'This character is now being played in another tab or on another device.'),
   seq: () => t('account.refusal.seq', 'This character was saved from somewhere else in the meantime. Rejoin to carry on.'),
-  // CUSTOMS-CARRY: the census is every trace the realm has from before it began (migration 0022) - said as
-  // what counts, since "played online" read false to a player who had and never killed there
-  // CUSTOMS-PASS: and the one way past it, a developer's pass - named for the case it exists for, a character
-  // played online on an older version of the game after the realm opened (which the relay admitted until REALM-DOOR)
-  // CUSTOMS-ELSEWHERE (FIELD BUGS 2026-09-30): counted, but on the account it went online with
-  'customs-other-account': () => t('account.refusal.customsOtherAccount', 'This character belongs to another account, the one you played it online with. Sign in with that account to bring it in.'),
-  'customs-never-online': () => t('account.refusal.customsNeverOnline', 'The realm has no record of this character from before it opened (no Renown, online home, guild place, raid or cloud backup), so it cannot come in. Make a new online character instead. If you played it online on an older version of the game after the realm opened, ask the developers on Discord.'),
-  'customs-already': () => t('account.refusal.customsAlready', 'That character has already been brought into the realm.'),
-  // AUDIT REALM2 S1: a first save the realm reads - a new character's, or customs' own
+  // AUDIT REALM2 S1: a new character's first save, which the realm reads
   'realm-birth': () => t('account.refusal.realmBirth', 'The realm only accepts characters made in character creation. Delete this one and create it again.'),
-  'customs-allowance': () => t('account.refusal.customsAllowance', 'That character carries more gold than customs lets in. Bring it online again.'),
   // LEGACY7: Project Legacy online (server-account/src/legacy.js) - a fallen character's tombstone, and a member's birth
   dead: () => t('account.refusal.dead', 'That character has died for good. Their house carries on: play one of its living members.'),
   'no-lineage': () => t('account.refusal.noLineage', 'The realm does not hold that family yet. Save once, then try again.'),
@@ -766,8 +757,7 @@ const REFUSAL_WORDS = {
   'held': () => t('account.refusal.held', 'A trade or purchase is being settled. Try again in a moment.'),
   'left': () => t('account.refusal.left', 'You left the realm.'),
   'unknown': () => t('account.refusal.unknown', 'The realm did not answer. Join again to see how it ended.'),
-  // CUSTOMS-PASS: the developer's route (server-account/src/realm.js grantCustomsPass), said by tools/customsPass.mjs - its
-  // `not-developer` is MARKS1's one word above (MERGE 2: both sides wrote it; the one refusal says both routes)
+  // a name more than one account wears (server-account/src/sanctions.js, the staff routes)
   ambiguous: () => t('account.refusal.ambiguous', 'More than one account has that name. Use the account\'s id instead.'),
   // CHAP1: the Roll (server-account/src/npcRoll.js) - said only where a player would read one; the tracker keeps
   // the save's standing quietly while the Roll is shut (net/npcRollTracker.js)
@@ -830,7 +820,7 @@ const REFUSAL_WORDS = {
   'progress-play': () => t('account.refusal.progressPlay', 'You have earned all that your play so far allows. Keep playing and it comes back.'),
   'piece-dupe': () => t('account.refusal.pieceDupe', 'Copies of that piece were found in the realm. It cannot be traded, sold or stored for others.'),
   'piece-claimed': () => t('account.refusal.pieceClaimed', 'Another character in the realm shows that piece too. Wait a few minutes while the realm settles whose it is.'),
-  'piece-legacy': () => t('account.refusal.pieceLegacy', 'That came into the realm from a classic save through customs. It stays yours, and the realm does not trade it.'),
+  'piece-legacy': () => t('account.refusal.pieceLegacy', 'That came from a classic save. It stays yours, and the realm does not trade it.'),
   'service-moved': () => t('account.refusal.serviceMoved', 'That character\'s record changed after its last clean save, so it cannot be rolled back.'),   // INT6: staff's
   'no-clean': () => t('account.refusal.noClean', 'That character has no save the realm judged clean to roll back to.'),   // INT6: the review's rollback (tools/realmReview.mjs)
   // FIRM1: the Firmament's own (server-account/src/firmament.js)
