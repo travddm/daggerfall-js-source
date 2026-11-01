@@ -47,7 +47,6 @@ export const WARDROBE_SOURCES = Object.freeze([
   wordPair('account', () => t('coll.src.account', 'Your Account')),
   wordPair('patrons', () => t('coll.src.patrons', 'Patrons')),
   wordPair('staff', () => t('coll.src.staff', 'The Game’s Staff')),
-  wordPair('bestowed', () => t('coll.src.bestowed', 'Bestowed by Name')),
 ]);
 const SOURCE_IDS = WARDROBE_SOURCES.map(([id]) => id);
 /** A source's name, as a player reads it. */
@@ -60,13 +59,13 @@ export const sourceName = (/** @type {string} */ id) => WARDROBE_SOURCES.find(([
  *   ranked    held while on top of a board, and passed on
  *   seasonal  the Witches' Festival's     patron    a Patreon pledge's, held while it stands
  *   dormant   in the vocabulary, given out by nothing yet
- *   staff     the game's own people      bestowed  made for one player, granted by name
+ *   staff     the game's own people
  *   auto      given by itself, never earned (AUDIT COLLECTIONS-II, lane 3: the sprout, a new account's two weeks)
  *   closed    closed to newcomers, still claimed by those from before it closed (AUDIT COLLECTIONS-II, lane 1: Founder -
  *             a guest from before the cutoff earns it by registering, a character from before it brings it along)
  *   retired   given once and closed (a first company's name)
  */
-export const WARDROBE_AVAIL = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'offseason', 'patron', 'dormant', 'auto', 'staff', 'bestowed', 'closed', 'retired']);
+export const WARDROBE_AVAIL = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'offseason', 'patron', 'dormant', 'auto', 'staff', 'closed', 'retired']);
 /** The availabilities a player can act on now - the page's "Obtainable" filter. */
 export const AVAIL_NOW = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'patron']);
 /** Each availability's tag (a chip on the row), as a player reads it. */
@@ -80,7 +79,6 @@ export const AVAIL_TAG = Object.freeze({
   dormant: () => t('coll.avail.dormant', 'Not yet available'),
   auto: () => t('coll.avail.auto', 'Automatic'),
   staff: () => t('coll.avail.staff', 'Staff only'),
-  bestowed: () => t('coll.avail.bestowed', 'Bestowed'),
   closed: () => t('coll.avail.closed', 'Closed'),
   retired: () => t('coll.avail.retired', 'No longer obtainable'),
 });
@@ -95,7 +93,6 @@ export const AVAIL_LINE = Object.freeze({
   dormant: () => t('coll.availLine.dormant', 'Not open to players yet.'),
   auto: () => t('coll.availLine.auto', 'Given to every new account by itself - it cannot be earned later.'),
   staff: () => t('coll.availLine.staff', 'Held by the game’s staff alone.'),
-  bestowed: () => t('coll.availLine.bestowed', 'It cannot be earned.'),
   closed: () => t('coll.availLine.closed', 'Closed to newcomers: only someone who played before it closed can still bring it to an account.'),
   retired: () => t('coll.availLine.retired', 'It can no longer be obtained. Those who hold it keep it.'),
 });
@@ -107,7 +104,6 @@ export const REMNANT_ODDS = Object.freeze({ hourbreaker: 4, turninghour: 8 });
 export const SERPENT_ODDS = Object.freeze({ coilbreaker: 20, maelstrom: 50 });
 
 // ── the words of how ──────────────────────────────────────────────────────────────────────────────────────────────────
-const bestowed = () => t('coll.how.bestowed', 'Made for one player and granted to them by name.');
 const patron = (/** @type {string} */ tier) => () => t('coll.how.patron', 'Support DFO Online on Patreon at the {tier} tier, then link Patreon from your profile - or be granted it by name.', { tier: TITLE_TEXT[/** @type {keyof typeof TITLE_TEXT} */ (tier)] });
 /** Apostle: a Patreon tier's title no pledge maps yet (server-account/wrangler.toml PATREON_TIERS), held by name alone. */
 const apostle = () => t('coll.how.apostle', 'A Patreon reward with no tier to pledge yet - for now it is granted by name.');
@@ -166,7 +162,6 @@ export const WARDROBE = Object.freeze({
     disciple: E('patrons', 'patron', patron('disciple'), { with: ['glyph:disciple'] }),
     apostle: E('patrons', 'dormant', apostle, { with: ['glyph:apostle'] }),
     hierophant: E('patrons', 'patron', patron('hierophant'), { with: ['glyph:hierophant'] }),
-    shadowfang: E('bestowed', 'bestowed', bestowed, { with: ['aura:shadowcloak', 'glyph:shadowfang'] }),
     gatebreaker: E('broker', 'open', broker('title:gatebreaker')),
     herald: E('patrons', 'patron', patron('herald'), { with: ['glyph:herald'] }),
     // AUDIT COLLECTIONS-II (lane 1): a seat's title is worn on the guildmaster's character (the token's mint); Crowned and
@@ -206,7 +201,6 @@ export const WARDROBE = Object.freeze({
   }),
   aura: Object.freeze({
     dagonfire: E('broker', 'open', broker('aura:dagonfire'), { look: () => t('coll.look.dagonfire', 'A ring of Oblivion’s fire burning on the ground at your feet.') }),
-    shadowcloak: E('bestowed', 'bestowed', bestowed, { with: ['title:shadowfang', 'glyph:shadowfang'], look: () => t('coll.look.shadowcloak', 'A hooded cloak of shadow and crimson light.') }),
     seraphwings: E('staff', 'staff', developer, { with: ['title:developer', 'glyph:dev'], look: () => t('coll.look.seraphwings', 'Wings of flowing golden light.') }),
     turninghour: E('abyss', 'chance', remnant('turninghour'), { look: () => t('coll.look.turninghour', 'A turning wheel of brass gears and gold light.') }),
     firsthour: E('abyss', 'retired', hoursFirst, { with: ['title:hoursfirst'], look: () => t('coll.look.firsthour', 'The Turning Hour’s wheel in the light of the first dawn.') }),
@@ -227,7 +221,6 @@ export const WARDROBE = Object.freeze({
     disciple: E('patrons', 'patron', patron('disciple'), { with: ['title:disciple'] }),
     apostle: E('patrons', 'dormant', apostle, { with: ['title:apostle'] }),
     hierophant: E('patrons', 'patron', patron('hierophant'), { with: ['title:hierophant'] }),
-    shadowfang: E('bestowed', 'bestowed', bestowed, { with: ['title:shadowfang', 'aura:shadowcloak'] }),
     herald: E('patrons', 'patron', patron('herald'), { with: ['title:herald'] }),
     tower: E('seats', 'open', () => t('coll.how.tower', 'Belong to a guild that holds a town’s palace seat.'), PER_CHARACTER),
     crownDF: E('seats', 'open', crown, PER_CHARACTER),

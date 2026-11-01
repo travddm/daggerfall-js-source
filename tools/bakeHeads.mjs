@@ -49,7 +49,7 @@ import { objectTree, BOX_SLACK } from './bakeSteelPlate.mjs';
 
 /** The owner's exports, as committed - one per batch, as it came. */
 export const SOURCES = Object.freeze({
-  breton: 'src/assets/mw/source/Breton_Heads.fbx',     // daggerwind.fbx
+  breton: 'src/assets/mw/source/Breton_Heads.fbx',   // daggerwind.fbx
 });
 
 /** The paintings, as committed - each under its part's id, beside the name the export gives it. */

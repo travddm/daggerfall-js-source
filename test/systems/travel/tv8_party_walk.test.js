@@ -73,7 +73,7 @@ test('TV8 wire (world124): the leader\'s walk and a member\'s stop ride the part
   }
   assert.equal(validPartyPose({ ...base, ts: -1 }).ts, undefined);
   assert.equal(validPartyPose({ ...base, ts: 'x' }).ts, undefined);
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
   assert.equal(PARTY_WALK_RELAY_MIN, 124);
   assert.deepEqual(['world123', 'world124', 'world130', 'nope'].map(relaySupportsPartyWalk), [false, true, true, false]);
 });

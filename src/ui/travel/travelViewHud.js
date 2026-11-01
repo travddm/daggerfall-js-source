@@ -31,7 +31,7 @@
 // place line.
 // ═══════════════════════════════════════════════════════════════════
 import { injectEnhancedStyle, injectEnhancedFonts } from '../enhanced/enhancedStyle.js';
-import { titleBadge, glyphBadges, glyphDetails, cssRgba, GLYPH_STROKE, GLYPH_EDGE_W } from '../playerBadge.js';   // OVERWORLD NAMES: a player's name as it reads over their head in play
+import { titleBadge, glyphBadges, cssRgba, GLYPH_STROKE } from '../playerBadge.js';   // OVERWORLD NAMES: a player's name as it reads over their head in play
 import { PIXEL_STACK } from '../pixelifyFive.js';   // AUDIT NAMES N1-4: the in-play name face
 import { renownText } from '../../net/renown.js';
 import { guildTagText } from '../../net/guild/guildLaw.js';
@@ -1215,8 +1215,8 @@ function badgeSprite(doc, m, size, party, dpr, bk = badgeKey(m.badge)) {
     x.font = smallFont;
     const tx = (w - titleW) / 2;
     if (P.title.gradient && typeof x.createLinearGradient === 'function') {
-      // AUDIT NAMES N1-2: the DOM face's paint (titlePaint, AUDIT A4/A5) - no blurred shadow, which drowned the black
-      // half on dark ground ("Sh" unseen); an EDGE outside the letters instead, a pixel of the title's own colour right
+      // AUDIT NAMES N1-2: the DOM face's paint (titlePaint, AUDIT A4/A5) - no blurred shadow, which drowned a dark
+      // stop on dark ground; an EDGE outside the letters instead, a pixel of the title's own colour right
       // and below and a black one under that, and the gradient over them
       x.shadowBlur = 0; x.shadowOffsetY = 0;
       const edge = cssRgba(P.title.rgba) ?? N.name;
@@ -1269,15 +1269,8 @@ function badgeSprite(doc, m, size, party, dpr, bk = badgeKey(m.badge)) {
       const path = new globalThis.Path2D(g.path);
       x.save(); x.translate(cx, ry + (size - gs) / 2); x.scale(gs / 16, gs / 16);
       const col = g.rgba ? cssRgba(g.rgba) : N.name;
-      if (g.gradient && typeof x.createLinearGradient === 'function') {
-        const gr = x.createLinearGradient(0, 0, 16, 0);
-        g.gradient.forEach((st, i, all) => gr.addColorStop(all.length > 1 ? i / (all.length - 1) : 0, cssRgba(st)));
-        x.fillStyle = gr; x.fill(path); x.strokeStyle = col; x.lineWidth = GLYPH_EDGE_W; x.lineJoin = 'round'; x.stroke(path);
-      } else if (GLYPH_STROKE[g.key]) { x.strokeStyle = col; x.lineWidth = GLYPH_NAME_W; x.lineCap = 'round'; x.lineJoin = 'round'; x.stroke(path); }
+      if (GLYPH_STROKE[g.key]) { x.strokeStyle = col; x.lineWidth = GLYPH_NAME_W; x.lineCap = 'round'; x.lineJoin = 'round'; x.stroke(path); }
       else { x.fillStyle = col; x.fill(path); }
-      // N1-3: a glyph's DETAIL (the wolf's red eye) over it in its own colour, as the in-play drawing has it - WIKIMAID: each
-      // of them, in order (the WikiMaid's ears, lace and face)
-      for (const d of glyphDetails(g.detail)) { x.fillStyle = cssRgba(d.rgba) ?? col; x.fill(new globalThis.Path2D(d.path)); }
       x.restore();
       cx += gs + 2;
     }

@@ -71,7 +71,7 @@ test('DUEL1 the parser and the version: `duel` is its own arm (after the hello, 
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: d }), { hasHello: true }), { t: 'duel', data: d });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: d })), { error: 'duel before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'duel', data: { ...d, k: 'x' } }), { hasHello: true }), { error: 'bad duel' });
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
   assert.equal(DUEL_RELAY_MIN, 107);
   assert.equal(relaySupportsDuel('world107'), true);
   assert.equal(relaySupportsDuel('world106'), false, 'main\'s world106 closes the socket on a duel frame');

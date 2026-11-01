@@ -985,7 +985,7 @@ import { createSeatBanners } from './seatBanners.js';   // SEAT1a: a seat town's
 import { createFestivalStage } from './seatFestival.js';   // FESTIVAL-STAGE: a Festival's music, banners and lanterns
 import { drawBanner } from '../ui/heraldryArt.js';   // GUILD1d: ...its heraldry painted on it
 import { heraldryLookup } from '../ui/heraldrySwatch.js';   // HERALDRY-SHOWN: a guild's heraldry by its tag, off what this client holds
-import { AuraRingRenderer, auraWearers, auraLookOf, auraBeastStep, auraMotionStep, auraCapeStep, auraSpriteBones, auraSpritePosed, auraWingLights, CLOAK_BONES, AURA_KINDLE_S, AURA_FORGET_S } from '../render/auraRing.js'; import { peerBodyYaw } from '../net/peer/peerClimb.js'; import { compiledPass } from '../render/glProgram.js';   // WB9g: Dagon's Fire at a wearer's feet; SHADOW-CLOAK: a peer's facing, the cloak's front (on this line, so no cite below it moves); AURA-STALL: its pass built once its program is done
+import { AuraRingRenderer, auraWearers, auraLookOf, auraMotionStep, auraCapeStep, auraSpriteBones, auraSpritePosed, auraWingLights, CLOAK_BONES, AURA_KINDLE_S, AURA_FORGET_S } from '../render/auraRing.js'; import { peerBodyYaw } from '../net/peer/peerClimb.js'; import { compiledPass } from '../render/glProgram.js';   // WB9g: Dagon's Fire at a wearer's feet; a peer's facing, for a look on the body (on this line, so no cite below it moves); AURA-STALL: its pass built once its program is done
 import { duelAttackerOf, duelWeaponOf, duelSwingOf, resolveDuelStrike, duelWearDamage, duelStandIn } from '../combat/duelCombat.js';   // DUEL1: the blow between two duellists - INT8/INT9: the striker's half alone, the relay referees (AUDIT C&C H5: against the neutral stand-in)
 import { createPageWindow, pageView } from '../ui/pageWindow.js';   // JOURNAL1: a page another player holds out, read and kept
 import { PageOffers, pageOfferText, pageShownText, pageTooFarText, keptPageTokens, keptLetterTokens, letterOfPage, PAGE_UNSUPPORTED_TEXT, PAGE_NO_READERS_TEXT, PAGE_GONE_TEXT } from '../net/journalPage.js';   // JOURNAL1: a page of the journal shown, and one shown to me kept
@@ -18950,7 +18950,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   let peerRiders = null;   // RIDE: another player in the saddle, drawn as Eye Of The Beholder's mounted sprite (net/peer/peerRiders.js)
   /** COATS3D: a peer on a HORSE rides the 3D horse in their Morrowind body (net/peer/peerBodies.js) where this lane builds
    *  one, its rig is up and their body is not refused - the rider layer yields them (a beast stays the layer's). */
-  const peerRidesIn3d = (d) => !!peerBodies?.enabled() && horseRigFor(renderer).ready() && d.shown?.rd === POSE_RIDE.Horse && !d.shown?.wb && !peerBodies.failureOf(d.look, d.shown, d.glyphs);
+  const peerRidesIn3d = (d) => !!peerBodies?.enabled() && horseRigFor(renderer).ready() && d.shown?.rd === POSE_RIDE.Horse && !d.shown?.wb && !peerBodies.failureOf(d.look, d.shown);
   let peerWalkers = null;   // DISC23-B: another player on foot, drawn as the Eye Of The Beholder set they chose (net/peer/peerRiders.js)
   let online = null, remotePlayers = null, peerBodies = null, nameLayer = null, nameSight = null, _onlineLast = null, _onlineLastOn = null, _onlineKey = null, _onlineKeySince = 0, _onlineMovingUntil = 0, _onlineLookAt = -Infinity;
   let _hsLatch = false;   // AUDIT DISC7 B2: the motor's half-speed flag off the last frame that MOVED - a stop reads it true (standing), and the move hold must not send that as a slow trot
@@ -20306,7 +20306,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           say(moved ? 'You find your way free.' : 'There is nowhere to send you from out here.');
           return true;
         }
-        // STAFF1: /tp /god /fly /heal /pos /staff (net/staffCommands.js) - asked only of a player whose own
+        // STAFF1: the Developer's and the Dungeon Master's /tp /god /fly /heal /pos /staff (net/staffCommands.js) - asked only of a player whose own
         // glyphs are staff's, so to anyone else each is the chat's own "no such command". Each acts on the typer alone.
         const staffCmd = isStaffT(staffGlyphs()) ? parseStaffCommand(text.replace(/^\/godmode\b/i, '/god'), staffPowers()) : null;   // TESTBUILD: /godmode = /god
         if (staffCmd) { runStaffCommand(tabId, staffCmd); return 'error' in staffCmd ? false : true; }
@@ -27525,7 +27525,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  dungeon's lateWorldDraw, the building - added and fogged; never under the travel view, and a concealed peer's
    *  fire is concealed with them. */
   const _auraWearers = [], _auraDraw = [], _auraPool = new Map(), _auraLights = [];
-  const _auraSelf = { id: 'self', at: [0, 0, 0], aura: null, seed: 0.37, kindle: 1, since: 0, yaw: 0 };   // SHADOW-CLOAK: `yaw` the facing the cloak's opening faces
+  const _auraSelf = { id: 'self', at: [0, 0, 0], aura: null, seed: 0.37, kindle: 1, since: 0, yaw: 0 };   // `yaw` the facing a look on the body is placed about
   // AURA-STALL: built at the first wearer, the aura's program froze the game
   // 8.5-11 s on D3D11, and the travel view draws no aura, so it met a player on the frame the view came down near a crowd.
   // AURA-SPLIT (#1143): the pass compiles nothing of its own - each look's program is built at its own door once it is
@@ -27541,8 +27541,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (mine && playerSpawned) {
       const f = player.feetAt();
       if (_auraSelf.aura !== mine) _auraSelf.since = t;
-      _auraSelf.at[0] = f[0]; _auraSelf.at[1] = f[1]; _auraSelf.at[2] = f[2]; _auraSelf.aura = mine; _auraSelf.yaw = mwViewSpriteFacing()?.yaw ?? player.bodyYawFor(cam.yaw); auraBeastStep(_auraSelf, !!liveLycanthropy(playerEntity)?.isTransformed, t);   // SHADOW-CLOAK: the body's own facing, as its third person is drawn (SPRITE-FACE: a sprite's, as its picture faces); turned beast, the cloak torn
-      _auraSelf.kindle = Math.min(1, (t - _auraSelf.since) / AURA_KINDLE_S); _auraSelf.mounted = !!player.riding;   // SHADOW-CLOAK: a rider's cape folded away
+      _auraSelf.at[0] = f[0]; _auraSelf.at[1] = f[1]; _auraSelf.at[2] = f[2]; _auraSelf.aura = mine; _auraSelf.yaw = mwViewSpriteFacing()?.yaw ?? player.bodyYawFor(cam.yaw);   // the body's own facing, as its third person is drawn (SPRITE-FACE: a sprite's, as its picture faces)
+      _auraSelf.kindle = Math.min(1, (t - _auraSelf.since) / AURA_KINDLE_S); _auraSelf.mounted = !!player.riding;   // a rider's look on the body hangs over the saddle
       _auraWearers.push(_auraSelf);
     } else _auraSelf.aura = null;
     for (const d of seen) {
@@ -27552,8 +27552,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       let w = _auraPool.get(d.id);
       if (!w || w.aura !== au) { w = { id: d.id, at: [0, 0, 0], aura: au, seed: auraSeedOf(d.id), kindle: 0, since: t }; _auraPool.set(d.id, w); }
       const p = onlineToScene(d.shown);
-      w.at[0] = p[0]; w.at[1] = p[1]; w.at[2] = p[2]; w.yaw = (peerWalkers?.faceOf?.(d.id) ?? peerRiders?.faceOf?.(d.id))?.yaw ?? peerBodyYaw(d.shown) ?? 0; auraBeastStep(w, !!d.shown.wb, t);   // SHADOW-CLOAK: the peer's facing (to the wall on a climb) - SPRITE-FACE: a sprite's as its picture is drawn this frame (the layers synced above), so its wings' light stands where its wings do; turned beast (the pose's `wb`), the cloak torn
-      w.kindle = Math.min(1, (t - w.since) / AURA_KINDLE_S); w.seen = t; w.mounted = !!d.shown.rd;   // SHADOW-CLOAK: a rider's (a horse, a cart) cape folded away
+      w.at[0] = p[0]; w.at[1] = p[1]; w.at[2] = p[2]; w.yaw = (peerWalkers?.faceOf?.(d.id) ?? peerRiders?.faceOf?.(d.id))?.yaw ?? peerBodyYaw(d.shown) ?? 0;   // the peer's facing (to the wall on a climb) - SPRITE-FACE: a sprite's as its picture is drawn this frame (the layers synced above), so its wings' light stands where its wings do
+      w.kindle = Math.min(1, (t - w.since) / AURA_KINDLE_S); w.seen = t; w.mounted = !!d.shown.rd;   // a rider's (a horse, a cart) look on the body hangs over the saddle
       _auraWearers.push(w);
     }
     if (_auraPool.size) for (const [id, w] of _auraPool) if (t - w.seen > AURA_FORGET_S) _auraPool.delete(id);   // the gone forget their kindling - AUDIT 3: the gone, not the blinked (AURA_FORGET_S)
@@ -27563,7 +27563,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const proj = renderer._proj, view = renderer._view, eye = renderer._camPos;   // the frame's camera, the world's own
     if (proj && view && eye && auraWearers(_auraWearers, eye, _auraDraw).length) {
       const _auraPass = auraPassOf();   // AURA-STALL: null while its program compiles - the capes still hang and swing below
-      const auraNow = performance.now() / 1000; for (const w of _auraDraw) if (auraLookOf(w.aura).mesh) { auraCapeStep(w, w === _auraSelf ? { feet: player.bodyFeetAt(), yaw: mwViewSpriteFacing()?.yaw ?? player.bodyYawFor(cam.yaw), turn: mwViewSpriteFacing()?.turn, bones: mwViewBodyBones(CLOAK_BONES) ?? auraSpriteBones(mwViewSpriteFigure()) } : peerBodies?.bonesOf(w.id, CLOAK_BONES) ?? auraSpritePosed(w, peerWalkers?.figureOf(w.id) ?? peerRiders?.figureOf?.(w.id), peerWalkers?.faceOf?.(w.id) ?? peerRiders?.faceOf?.(w.id)), w === _auraSelf ? player.height / CAPSULE_HEIGHT : 1); auraMotionStep(w, auraNow); } _auraPass?.draw(_auraDraw, proj, view, eye, auraNow, { mode: renderer._fogMode, density: renderer._fogDensity, range: renderer._fogRange, camPos: renderer._camPos, focus: renderer._focus, haze: renderer._haze });   // SHADOW-CLOAK: each cape hung on its body as drawn this frame - its bones posed by now (mine, or a peer's), else at rest, crouched with a crouch - and swung by how it moves where it is drawn; SPRITE-FACE: a sprite's faced as its PICTURE is (the eight-way view drawn, mine after the mod's delayed repaint has landed - mwViewSpriteFacing, a peer's faceOf), in the saddle too, and swung by the way the body turns (`turn`)
+      const auraNow = performance.now() / 1000; for (const w of _auraDraw) if (auraLookOf(w.aura).mesh) { auraCapeStep(w, w === _auraSelf ? { feet: player.bodyFeetAt(), yaw: mwViewSpriteFacing()?.yaw ?? player.bodyYawFor(cam.yaw), turn: mwViewSpriteFacing()?.turn, bones: mwViewBodyBones(CLOAK_BONES) ?? auraSpriteBones(mwViewSpriteFigure()) } : peerBodies?.bonesOf(w.id, CLOAK_BONES) ?? auraSpritePosed(w, peerWalkers?.figureOf(w.id) ?? peerRiders?.figureOf?.(w.id), peerWalkers?.faceOf?.(w.id) ?? peerRiders?.faceOf?.(w.id)), w === _auraSelf ? player.height / CAPSULE_HEIGHT : 1); auraMotionStep(w, auraNow); } _auraPass?.draw(_auraDraw, proj, view, eye, auraNow, { mode: renderer._fogMode, density: renderer._fogDensity, range: renderer._fogRange, camPos: renderer._camPos, focus: renderer._focus, haze: renderer._haze });   // each look on the body hung on its body as drawn this frame - its bones posed by now (mine, or a peer's), else at rest, crouched with a crouch - and swung by how it moves where it is drawn; SPRITE-FACE: a sprite's faced as its PICTURE is (the eight-way view drawn, mine after the mod's delayed repaint has landed - mwViewSpriteFacing, a peer's faceOf), in the saddle too, and swung by the way the body turns (`turn`)
       if (_auraPass?.drawn) renderer.markForeignPass();
     }
     _auraWearers.length = 0;   // this frame's, drawn once: a frame that gathers none (the seat left, death, offline) draws none

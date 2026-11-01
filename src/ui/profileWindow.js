@@ -223,7 +223,7 @@ ${PIXELIFY_FIVE_FACE}
 .dfprofile-head { text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--iron, #2b323b); }
 .dfprofile-icon { display: block; margin: 0 auto 6px; width: 56px; height: 56px; }   /* WITCH1 */
 .dfprofile-title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4;
-  width: fit-content; max-width: 100%; margin-inline: auto; }   /* SHADOW-FANG (AUDIT A1): the word's own width - a gradient title's stops span the word, not the card */
+  width: fit-content; max-width: 100%; margin-inline: auto; }   /* AUDIT A1: the word's own width - a gradient title's stops span the word, not the card */
 /* PROFILE-UI: where the Renown, the name and the tag will not stand on one line, the line breaks BETWEEN them - the tag
    under the name, never the name in two */
 .dfprofile-name { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 6px; font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
@@ -310,7 +310,7 @@ export function createProfileWindow({ canOpen = () => true, onOpen = null, onClo
     const head = el('div', 'dfprofile-head');
     const icon = v.icon ? profileIconNode(doc, v.icon, 'dfprofile-icon', 56) : null;   // WITCH1: the icon they wear, over the name
     if (icon) head.append(icon);
-    if (v.title) head.append(paintTitle(el('div', 'dfprofile-title', v.title.text), v.title));   // SHADOW-FANG: its colour, or its gradient
+    if (v.title) head.append(paintTitle(el('div', 'dfprofile-title', v.title.text), v.title));   // its colour, or its gradient
     const nm = el('div', 'dfprofile-name');
     nm.id = 'dfprofile-name-node';
     if (v.level) { const lv = el('span', 'dfprofile-renown', v.level); if (v.levelTitle) lv.title = v.levelTitle; nm.append(lv); }   // RENOWN1: left of the name

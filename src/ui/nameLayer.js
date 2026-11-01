@@ -321,7 +321,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
     return { node, bubble, title, tag, lv, name, guild, glyphs, house, ribbon, worn: null, titled: null, inked: undefined, banded: '', armed: '',
       // PERF-NAMES1: what this tag's DOM was last told, kept here and compared here - a read of `style.x` or
       // `textContent` asks the browser to serialise the value back, a cost a frame for every label
-      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // SEASON1 part two: `banded`, the ribbon as written   // SHADOW-FANG: `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
+      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // SEASON1 part two: `banded`, the ribbon as written   // `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
   };
 
   /** ACC3: the glyph run, REBUILT ONLY WHEN IT CHANGES. A glyph set is
@@ -447,7 +447,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
           tag.guild.style.borderColor = arms ? heraldryColourOf(arms.border)?.hex ?? '' : '';
           tag.guild.style.backgroundImage = arms ? `url("${heraldrySwatchSrc(arms)}")` : '';
         }
-        // AUDIT A10 (SHADOW-FANG's audit, the title's own bug on the name): a browser reads a hex colour back as rgb(),
+        // AUDIT A10: a browser reads a hex colour back as rgb(),
         // so the diffing door rewrote a party mate's green every frame - written when it CHANGES, as the title is
         const ink = cssRgba(colorOf?.(p.id)) ?? '';
         if (tag.inked !== ink) { tag.inked = ink; tag.name.style.color = ink; }
@@ -468,7 +468,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
         // the distinction Mac asked for.
         const badge = titleBadge(p);
         put(tag, 'titleText', badge?.text ?? '', (v) => setText(tag.title, v));
-        // SHADOW-FANG: the title's whole paint - its colour, or a gradient clipped to its letters - written when
+        // the title's whole paint - its colour, or a gradient clipped to its letters - written when
         // the TITLE changes and not every frame: a browser reads a colour back normalised (#d3193c comes back
         // rgb(211, 25, 60)), so the diffing door would rewrite a gradient's keys on every frame for ever. Every
         // key is written, so the next title on this tag clears what this one set.

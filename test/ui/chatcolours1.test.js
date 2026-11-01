@@ -100,7 +100,7 @@ test('CHAT-LANG wire: one channel per language, keyed by its code under its own 
   assert.equal(LANG_RELAY_MIN, 196);   // world192 on its branch, renumbered past main's world192-world195 at the port
   assert.equal(relaySupportsLang('world195'), false);
   assert.equal(relaySupportsLang('world196'), true);
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
 });
 
 test('CHAT-LANG tab and commands: the Language tab rides a room of its own, off the bar until chosen; /lang lists, chooses and leaves; /lc says a line on it', () => {

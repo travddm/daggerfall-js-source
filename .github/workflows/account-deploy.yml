@@ -656,7 +656,7 @@ jobs:
       # `secret put` redeploys the Worker with the binding, so the
       # window is seconds long and nothing is using the service yet.
       #
-      # ═══ AUDIT B1 (SHADOW-FANG, 2026-09-26): AND THE RELAY GOES FIRST ══
+      # ═══ AUDIT B1: AND THE RELAY GOES FIRST ═══════════════════════════
       #
       # THE SERVICE SIGNS WHAT THE RELAY VERIFIES. identityToken.js is in
       # both Workers, and a claim the RUNNING relay does not know - a new

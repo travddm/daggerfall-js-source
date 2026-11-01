@@ -109,7 +109,7 @@ test('SERPENT1 wire: the client says five things - `in` with its day, law, level
   // no longer the first that keeps a fight (SERPENT1's world165) - it fought an older brain on a release day
   assert.equal(SERPENT_RELAY_MIN, 173);
   assert.ok(relayVersionAtLeast(SERPENT_RELAY_MIN), 'the relay this tree builds holds a serpent');
-  assert.equal(RELAY_VERSION, 'world279');
+  assert.equal(RELAY_VERSION, 'world280');
   assert.ok(relaySupportsSerpent('world173') && !relaySupportsSerpent('world172') && !relaySupportsSerpent('world165') && !relaySupportsSerpent(undefined));
   let b = null, pass = 0;
   for (let i = 0; i < 40; i++) { const g = serpentGate(b, 1000); b = g.bucket; if (g.pass) pass++; }

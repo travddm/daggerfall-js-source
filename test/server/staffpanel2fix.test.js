@@ -35,12 +35,12 @@ async function extensionKey() {
 }
 
 /** The Worker with the panel set up and the relay's door recorded (no other fetch leaves): SirMcMobdon (an Admin and the
- *  owner) and the Moderators Asynian and Tabbyvish signed in to the panel; Devvy (an Admin) and Fang (the Shadow Fang's
- *  title, which moderates) not; Troll and Sylvia, two players. `g` each one's game session. */
+ *  owner) and the Moderators Asynian and Tabbyvish signed in to the panel; Devvy (an Admin) and Fang (a Dungeon Master,
+ *  whose glyph opens the staff's commands) not; Troll and Sylvia, two players. `g` each one's game session. */
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'SirMcMobdon,Devvy', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'SirMcMobdon', SHADOW_FANG_HANDLES: 'Fang',
+    DEVELOPER_HANDLES: 'SirMcMobdon,Devvy', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'SirMcMobdon', DUNGEON_MASTER_HANDLES: 'Fang',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, MOD_AI: 'off',
     DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Tabbyvish,333333333333333333:SirMcMobdon',
   });
@@ -345,19 +345,17 @@ test('STAFF-PANEL2-FIX 8: CUTTING OFF A STAFF MEMBER holds at every door - the s
     const devvy = (await s.game('/v1/auth/login', { handle: 'Devvy', password: PASSWORD })).body.secret;
     assert.equal((await s.game('/v1/mod/cases', {}, devvy)).status, 403);
     assert.ok(!(await glyphs(devvy)).includes('dev'));
-    // the title that moderates, cut off: its glyph and its role gone
-    assert.ok((await glyphs(s.g.Fang.secret)).includes('shadowfang'));
-    assert.equal((await s.staff('/v1/staff/cut', { handle: 'Fang' }, s.mob.session)).status, 200);
-    const fang = (await s.game('/v1/auth/login', { handle: 'Fang', password: PASSWORD })).body.secret;
-    assert.equal((await s.game('/v1/mod/cases', {}, fang)).status, 403);
-    assert.ok(!(await glyphs(fang)).includes('shadowfang'));
+    // a Dungeon Master suspended: the dm glyph, which opens the staff's commands, gone with it
+    assert.ok((await glyphs(s.g.Fang.secret)).includes('dm'));
+    s.raw.prepare('UPDATE players SET staff_suspended = 1 WHERE handle = ?').run('Fang');
+    assert.ok(!(await glyphs(s.g.Fang.secret)).includes('dm'));
     // an owner's invite brings a member back
     const inv = await s.staff('/v1/staff/invite', { handle: 'Asynian' }, s.mob.session);
     assert.deepEqual([inv.status, inv.body.role], [200, 'moderator']);
     assert.equal(s.row(asyId).staff_suspended, 0);
     assert.ok(s.raw.prepare("SELECT 1 FROM staff_audit WHERE act = 'invite' AND target = ? AND detail LIKE '%\"restored\":true%'").get(asyId));
     assert.equal((await s.game('/v1/mod/cases', {}, back.body.secret)).status, 200);
-    assert.deepEqual(s.raw.prepare("SELECT act FROM staff_audit WHERE act = 'cut' ORDER BY id").all().map((x) => x.act), ['cut', 'cut', 'cut']);
+    assert.deepEqual(s.raw.prepare("SELECT act FROM staff_audit WHERE act = 'cut' ORDER BY id").all().map((x) => x.act), ['cut', 'cut']);
   } finally { s.restore(); }
 });
 
