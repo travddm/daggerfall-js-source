@@ -15,7 +15,7 @@
 // No game data here: the packs' records are carried whole in the vendored packs; the yards are the real service's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import zlib from 'node:zlib';
 
 import { ROW_CODECS } from '../../src/formats/worldData/worldDataPack.js';
@@ -32,7 +32,7 @@ import { createDecorPlacer, DECOR_WALL_CLIP } from '../../src/systems/decor/deco
 import { DECOR_SCALE_MIN } from '../../src/net/decorLaw.js';
 import { placedSolid, depthInside, TOUCH_M } from '../../tools/townSolidsSweep.mjs';
 import {
-  reseatSql, reseatPlace, reseatMove, reseatRestored, YARD_RESEATS, YARD_RESEAT_AT, YARD_RESEAT_FILE, YARD_RESEAT_MARK, STALL_BOX_WD3, STALL_BOX_NOW, OPEN_STALL_BOX_NOW,
+  reseatSql, reseatPlace, reseatMove, YARD_RESEATS, YARD_RESEAT_AT, YARD_RESEAT_FILE, YARD_RESEAT_MARK, STALL_BOX_WD3, STALL_BOX_NOW, OPEN_STALL_BOX_NOW,
   COUNTER_STALLS, OPEN_STALLS, ROCK_BOX_WD3, ROCK_BOX_NOW, ROCK_K, STALL_K,
 } from '../../tools/yardReseat.mjs';
 import { standService, T0 } from '../accountDb.mjs';
@@ -293,43 +293,4 @@ test('STALL-SHAPE: migration 0121 puts a yard\'s saved stalls and boulders back 
   assert.equal(after.junk, 'not json');
   raw.exec(SQL);
   assert.deepEqual(rows(), after, 'a second run moves nothing');
-});
-
-test('STALL-SHAPE AUDIT: a yard\'s piece brought back by the realm restore (tools/realmRestore.mjs, from a snapshot taken before 0121 ran) stands as 0121 leaves its neighbours - a WD3 stall or boulder re-seated by the same law, never a marked one twice, never a room\'s or another model\'s; one placed since by TEMPLE-STEPS\' open stall is written as held and said to the operator (mutants: the restore writes the snapshot\'s place, a marked place moved again)', async () => {
-  const { DatabaseSync } = await import('node:sqlite');
-  const { planRestore } = await import('../../tools/realmRestore.mjs');
-  const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-  const schema = () => { const d = new DatabaseSync(':memory:'); for (const f of MIGRATIONS) d.exec(readFileSync(new URL(`../../server-account/migrations/${f}`, import.meta.url), 'utf8')); return d; };
-  const then = schema(), now = schema();
-  for (const d of [then, now]) d.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES ('gary', 'A Guest', 1, 1)").run();
-  const house = (d) => d.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (4242, 1, 'gary', 'gary-o', 'Owner', 17, 'private', 40000, 1)").run();
-  house(then);
-  now.prepare("INSERT INTO realm_census (player, char_id, spent) VALUES ('gary', 'gary-o', 1)").run();
-  const place = (x, yaw, scale, extra = {}) => JSON.stringify({ pos: [x, 0.5, -3.25], rot: [yaw, 0, 0], scale, light: null, storage: false, paid: 90, ...extra });
-  const pieces = [
-    ['stall', 53104, place(4, 30, 1.2), YARD_RESEAT_AT - 3600, 1],
-    ['rock', 53037, place(-6, -75, 2.5), YARD_RESEAT_AT - 3600, 1],
-    ['marked', 53100, place(1, 0, 1, { reseat: YARD_RESEAT_MARK }), YARD_RESEAT_AT - 3600, 1],
-    ['room', 53100, place(2, 0, 1), YARD_RESEAT_AT - 3600, 0],
-    ['stool', 41000, place(3, 0, 1), YARD_RESEAT_AT - 3600, 1],
-    ['since', 53118, place(5, 45, 1), YARD_RESEAT_AT + 60, 1],
-  ];
-  for (const [id, model, pl, at, yard] of pieces) then.prepare('INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at, paid, yard) VALUES (4242, 1, ?, ?, ?, ?, 0, ?)').run(id, model, pl, at, yard);
-  // what 0121 leaves, the same rows in place: the law the restore must land on
-  const left = schema();
-  left.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES ('gary', 'A Guest', 1, 1)").run();
-  house(left);
-  for (const [id, model, pl, at, yard] of pieces) left.prepare("INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at, paid, yard) VALUES (4242, 1, ?, ?, ?, ?, 0, ?)").run(id, model, pl, at, yard);
-  left.exec(SQL);
-  const plan = planRestore({ then, now });
-  now.exec(plan.sql);
-  const back = Object.fromEntries(now.prepare('SELECT id, place FROM home_decor').all().map((r) => [r.id, JSON.parse(r.place)]));
-  const want = Object.fromEntries(left.prepare('SELECT id, place FROM home_decor').all().map((r) => [r.id, JSON.parse(r.place)]));
-  for (const id of ['stall', 'rock']) {
-    assert.equal(back[id].reseat, YARD_RESEAT_MARK, `${id} re-seated`);
-    assert.ok(back[id].pos.every((v, k) => near(v, want[id].pos[k], 0.0011)) && back[id].scale === want[id].scale, `${id}: ${JSON.stringify(back[id])} as 0121 left it ${JSON.stringify(want[id])}`);
-  }
-  for (const [id, , pl] of pieces.filter(([id]) => ['marked', 'room', 'stool', 'since'].includes(id))) assert.deepEqual(back[id], JSON.parse(pl), `${id}: the snapshot's place`);
-  assert.deepEqual(plan.notes.map((n) => /yard piece (\w+)/.exec(n)?.[1]), ['since'], 'the one the restore cannot know, said');
-  assert.deepEqual(reseatRestored({ yard: 1, model: 53104, place: 'not json', placed_at: 1 }).reseated, false, 'a place that is not JSON is passed over');
 });

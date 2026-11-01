@@ -101,7 +101,7 @@ test('HOME-PRICE the service holds the range: a claim at Daggerfall\'s price (a 
   assert.match(src('server-account/src/halls.js'), /if \(!homePriceOk\(price\)\) return \{ error: 'home-update' \};/);
 });
 
-test('HOME-PRICE the sale pays what was PAID, and the town tells it to the characters whose doors can sell - ACCOUNT-HOMES: every realm character of the account: its deed share of `paid` and the rent held on it; a carried-in home, and one from before the realm, nothing (crossed); another account\'s, no sum; a claim says its own (mutants: the refund off the price; the character unasked; a home from before the realm told; a crossed house refunded; a refund of nothing dropped; the rent unsaid; the claim\'s answer silent)', async () => {
+test('HOME-PRICE the sale pays what was PAID, and the town tells it to the characters whose doors can sell - ACCOUNT-HOMES: every realm character of the account: its deed share of `paid` and the rent held on it; a home no record paid for, and one from before the realm, nothing (crossed); another account\'s, no sum; a claim says its own (mutants: the refund off the price; the character unasked; a home from before the realm told; a crossed house refunded; a refund of nothing dropped; the rent unsaid; the claim\'s answer silent)', async () => {
   const s = await standService();
   const who = await s.registered('Aldric');
   const other = await s.registered('Mara');
@@ -111,7 +111,7 @@ test('HOME-PRICE the sale pays what was PAID, and the town tells it to the chara
   const row = (key, charId, price, paid, rentDue = 0) => raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at, paid, rent_due) VALUES (77, ?, ?, ?, 'Aldric', 17, 'private', ?, 1, ?, ?)")
     .run(key, who.id, charId, price, paid, rentDue);
   row(3, R.id, 706_000, 600_100, 240);   // AUDIT HOME-PRICE D2: a price and a payment that differ - the sale reads the payment
-  row(4, R.id, 600_100, 0);              // carried in through customs
+  row(4, R.id, 600_100, 0);              // a home no record paid for
   row(5, 'char-old', 42_000, 0);         // a home from before the realm
   row(6, R2.id, 120_000, 120_000);       // the account's other character's
   row(10, R.id, 1, 1);                   // AUDIT HOME-PRICE D6: a record that paid 1 under the old law - its share is nothing, and says so
@@ -121,7 +121,7 @@ test('HOME-PRICE the sale pays what was PAID, and the town tells it to the chara
   assert.deepEqual([3, 4, 5, 6, 10].map((k) => [mine[k].refund, mine[k].rentDue]), [
     [homeSaleRefund(600_100), 240], [undefined, undefined], [undefined, undefined], [homeSaleRefund(120_000), undefined], [0, undefined],
   ]);
-  assert.deepEqual([mine[4].crossed, mine[5].crossed], [true, true], 'carried in, or from before the realm: no record paid for either - no sale, the account\'s still');
+  assert.deepEqual([mine[4].crossed, mine[5].crossed], [true, true], 'unpaid, or from before the realm: no record paid for either - no sale, the account\'s still');
   assert.equal((await town(who, R2.id))[3].refund, homeSaleRefund(600_100), 'my other character\'s door can sell it too - its sum is said there');
   assert.equal((await town(who, R2.id))[6].refund, homeSaleRefund(120_000));
   assert.ok(Object.values(await town(other, null)).every((h) => !('refund' in h) && !('price' in h) && !('rentDue' in h)), 'another account learns nothing of what was paid');
@@ -132,7 +132,7 @@ test('HOME-PRICE the sale pays what was PAID, and the town tells it to the chara
   const sold = await s.call('/v1/homes/release', { mapId: 77, buildingKey: 3, realm: R.at() }, who.secret);
   assert.deepEqual([sold.status, sold.body?.refund, sold.body?.rent], [200, mine[3].refund, 240]);
   // AUDIT HOME-PRICE C2: a claim says what its sale pays - a fresh one its own share, one answered as mine already the
-  // first one's (a carried-in one: crossed)
+  // first one's (one no record paid for: crossed)
   const claim = (buildingKey, price) => s.call('/v1/homes/claim', { mapId: 77, buildingKey, region: 17, character: R.id, price, realm: R.at(), layout: null }, who.secret);
   const fresh = await claim(11, 45_000);
   assert.deepEqual([fresh.status, fresh.body?.refund, fresh.body?.crossed], [200, homeSaleRefund(45_000), undefined]);
@@ -152,7 +152,7 @@ test('HOME-PRICE the client: the registry keeps my own home\'s refund and held r
   await homes.ensure(77);
   assert.deepEqual([homes.homeAt(77, 3).refund, homes.homeAt(77, 3).rentDue, homes.homeAt(77, 4).refund, homes.homeAt(77, 5).refund], [510_085, 1_500, null, 0]);
   await homes.claim({ mapId: 77, buildingKey: 9, region: 17, price: 45_000 });
-  assert.deepEqual([homes.homeAt(77, 9).crossed, homes.homeAt(77, 9).refund], [true, null], 'a repeat on a carried-in home: crossed, no sum - never the share of its price');
+  assert.deepEqual([homes.homeAt(77, 9).crossed, homes.homeAt(77, 9).refund], [true, null], 'a repeat on a home no record paid for: crossed, no sum - never the share of its price');
   claimAnswer = { ok: true, data: { ok: true, repeat: true, home: { entry: 'private', price: 60_000 }, refund: 51_000 } };   // mine already, bought at 60,000
   await homes.claim({ mapId: 77, buildingKey: 12, region: 17, price: 45_000 });
   assert.deepEqual([homes.homeAt(77, 12).crossed, homes.homeAt(77, 12).refund], [false, 51_000], 'the service\'s sum - never the share of the price this claim named');
@@ -198,7 +198,7 @@ test('HOME-PRICE a knightly order\'s free house, online (AUDIT HOME-PRICE C1): t
   assert.equal(priced(true)({ modelIdNum: 456 }), homeRefund(99_000), 'online: 120 m2 in an 8 x 8 city, its share');
   assert.equal(priced(false)({ modelIdNum: 456 }), houseSellPrice(400), 'offline: Daggerfall\'s');
   assert.equal(priced(true)(null), 0);
-  assert.match(m, /houseOffers: \(\) => townHouses\(\)\.map\(\(\{ deed, summary \}\) => \(\{\n\s*price: deedSellPrice\(summary\),/);
+  assert.match(m, /houseOffers: \(\) => townHouses\(\)\.map\(\(\{ summary \}\) => \(\{ price: deedSellPrice\(summary\) \}\)\),/);
   assert.match(m, /found: owned !== null, price: deedSellPrice\(owned\), deed: offered\?\.deed \?\? null \}/);
   // the grant
   assert.match(m, /if \(homes && !homes\.known\(dir\?\.mapId \?\? 0\)\) \{\n\s*void homes\.ensure\(dir\?\.mapId \?\? 0\);/);

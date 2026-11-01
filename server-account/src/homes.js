@@ -195,7 +195,7 @@ export async function claimHome(ctx, player, body = {}) {
 // HELD, NOT BOUGHT. The knight's client asks for the building its deed names to be held, once the save holding the deed
 // is the record's (the grant's checkpoint landed; every boot asks again - a hold already made answers `repeat`). The
 // service reads the RECORD: the deed must stand in it, in the region's slot, to that town's building, in the layout the
-// hold says the town stands in - and never one customs carried in (an offline house stays offline only, HOME1). The row is
+// hold says the town stands in. The row is
 // a claim's, marked `deed` (migration 0079): nothing paid, outside the cap a character's claims count, written in the
 // town's one layout. No one else may claim the building (`home-taken`); to every other reader it is the knight's home,
 // shut; to the knight's own character it is left out of the town's answer (homesInTown) - its door, its storage and its
@@ -212,7 +212,7 @@ const deedStatement = (db, player, { mapId, buildingKey, region, character, layo
  * HOLD A DEED: the building a realm character's record holds Daggerfall's deed to, kept from anyone else's claim. Answers
  * `{ ok, home }`, `{ ok, repeat }` (the building is this character's already - held, or bought at its door), or
  * `{ error }`: `homes-need-account`, `bad-home`, `home-arena`, `realm-only`, `no-realm-character`, `home-taken`,
- * `no-deed` (the record holds no such deed: not saved yet, sold, carried in by customs, another layout), `home-layout`
+ * `no-deed` (the record holds no such deed: not saved yet, sold, another layout), `home-layout`
  * (with the town's), `home-rate`.
  * @param {{db: any, nowS: number, bucket?: any}} ctx
  * @param {any} player  the session's player row

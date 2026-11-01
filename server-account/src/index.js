@@ -73,8 +73,6 @@
 //   POST /v1/report/inbox { which? }           -> { which, reports: [{ ...head, from }], unread, open, max }   (a reader's)
 //   POST /v1/report/read { id }                -> { report: { ...head, from, body, context, closedAt } }   (a reader's)
 //   POST /v1/report/close { id, state }        -> { ok, id, state }   (a reader's: fixed | wontfix | duplicate | open)
-// CUSTOMS-PASS, a developer alone - one character of one account through customs (tools/customsPass.mjs):
-//   POST /v1/mod/customs-pass { name | account, revoke? } -> { ok, target, name, open, changed }
 //   POST /v1/mod/realm-holds | realm-findings { id } | realm-clear { id, note? } | realm-hold { id, note? }
 //        | realm-rollback { id, note? } | realm-budget { days?, set? }   INT6: the review of the judge's verdicts (review.js)
 //        | realm-bodies { days? }   INT14: the boss fights' count, measured (review.js bodiesMeasure)
@@ -147,7 +145,7 @@
 // CHAP1, THE ROLL (3): a realm character's standing with Daggerfall's own guilds -
 // the twenty-two guild factions' reputation and its memberships - kept here, under the playing tab's lease, while
 // CHAPTERS_OPEN lets the account in (npcRoll.js; the law src/net/npcChapterLaw.js):
-//   POST /v1/chapters/roll { character, lease, seed? } -> { roll, from, seeded? } | { roll: null }   (seeded once from the save - a customs crossing from the epoch capped; what is owed paid)
+//   POST /v1/chapters/roll { character, lease, seed? } -> { roll, from, seeded? } | { roll: null }   (seeded once from the save; what is owed paid)
 //   POST /v1/chapters/claim { character, lease, rid, deltas, members } -> { roll, credited } | { roll, repeat }   (a loss whole, a gain at the day's pace and the rest owed)
 //   POST /v1/chapters/witness { hall: { key, region, factions } } -> { ok, counted, why? }   (CHAP2a: a town's guild halls, witnessed as a seat is)
 //   POST /v1/chapters/halls { region } -> { region, towns: [{ key, state, region, factions, witnesses, audit }], ignored }   (AUDIT CHAP2 E1: a developer's audit list)
@@ -324,8 +322,8 @@ import { contractBoard, postContract, withdrawContract, contractPayStatements, c
 import { motherlodesRead, strikeMotherlode, isMotherlodeNode } from './motherlodes.js';   // PROF2b: the Motherlodes
 import { marketRead, marketList, marketBuy, marketCancel, marketOrder, marketFill, marketUnorder, marketCollect, marketReport, marketRemove, marketAuction, marketBid, marketGoldCollect, marketVendor, marketVendors, marketMyVendors, marketRoad } from './market.js';   // PROF5: the market; PROF5b: its auctions; GOLD-MARKET: gold held collected; RPT1026-MARKET: the road alone
 import {
-  listRealm, createRealm, customsRealm, joinRealm, checkpointRealm, getRealmBlob, leaveRealm, deleteRealm, undoRealm,
-  realmMintFacts, grantCustomsPass, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
+  listRealm, createRealm, joinRealm, checkpointRealm, getRealmBlob, leaveRealm, deleteRealm,
+  realmMintFacts, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
 } from './realm.js';   // REALM P1: the realm's characters; ARENA4b: the level on a realm character's tile, the token's `cl`
 import { grantSpoils, portentPieces } from './budget.js';   // INT5: a signed win's spoils fill the playing character's budget (AUDIT WB14 WIRE-6: a portent's pieces with them)
 import { reviewAct } from './review.js';   // INT6: the review of the judge's verdicts
@@ -417,7 +415,7 @@ const overloaded = (origin) => {
 };
 /** REALM P1: each realm refusal's status - a bad shape 400 (the default), a character that is not the caller's 404, a
  *  lease another tab holds or a sequence that is not the next 409 (the tab that lost it goes offline), the account's
- *  bound 409, customs refused 403/409, no storage 503. */
+ *  bound 409, no storage 503. */
 /** INT3/INT4 (the INTEGRITY arc): THE JUDGE'S REFUSALS, the same at every route that
  *  hands a realm character's value to another player - its trade held, its record unread since the judge shipped, a
  *  piece the id ledger marked a duplicate - each a conflict with what stands (realm.js holdRefusal, prepareRealmRecord). */
@@ -439,7 +437,7 @@ const POST_STATUS = Object.freeze({ 'no-post': 404, 'post-no-item': 409, 'post-c
 const REALM_STATUS = Object.freeze({
   ...JUDGE_STATUS,   // INT3/INT4
   'no-realm-character': 404, 'no-data': 404, lease: 409, seq: 409, 'too-many-characters': 409, auth: 401,   // SESSION-SIGN E3: a checkpoint's session gone
-  'customs-never-online': 403, 'customs-other-account': 403, 'customs-already': 409, 'no-storage': 503,   // CUSTOMS-ELSEWHERE: the other account's
+  'no-storage': 503,
   'trade-spent': 409,   // REALM P2.1: a trade's sid another pair settled
   'guild-master-leaves': 409,   // AUDIT REALM L1-F7: a guildmaster deleted hands the guild over first
   'guild-treasury': 409,   // AUDIT REALM2 S8: and a lone one empties the treasury first
@@ -449,16 +447,13 @@ const REALM_STATUS = Object.freeze({
   'realm-market-open': 409,   // PROF-DELETE: and one with market business open settles it first
   'home-tenants': 409, 'home-rent-due': 409,   // HOME-RENT: and one renting rooms out waits for its tenants and collects its rent
   'home-vendor-stocked': 409,   // HOME-VENDOR: and one whose trader still sells
-  'realm-birth': 403, 'customs-allowance': 403,   // AUDIT REALM2 S1: a first save the realm's law refuses
+  'realm-birth': 403,   // AUDIT REALM2 S1: a first save the realm's law refuses
   // LEGACY7 (legacy.js): a tombstone is gone for good; a line or person the birth cannot be; a line's model is its founder's
   dead: 410, 'no-lineage': 404, 'lineage-person': 409, 'lineage-played': 409, 'lineage-model': 409, 'too-many-lineages': 409,
   'wed-no-line': 409, 'wed-already': 409, 'wed-partner': 409, 'wed-spent': 409,   // LEGACY7 part three: a wedding the realm cannot make
   'lineage-too-large': 413,   // AUDIT LEGACY III O2/P1: a line's record past its bound - its own word, never a malformed body's
   'not-dead': 409, 'raise-late': 409, 'raise-no-line': 409,   // REZ-BLOODLINE AUDIT R1: a Resurrect the realm will not take
 });
-/** CUSTOMS-PASS: a pass's refusals - a bad shape 400 (the default), a caller who is no developer 403, no such account
- *  404, a guest's name two accounts wear 409. */
-const PASS_STATUS = Object.freeze({ 'not-developer': 403, 'no-player': 404, ambiguous: 409 });
 /** CHAP1: the Roll's refusals - a bad shape 400 (the default), the switch shut 403, no such character or none of its
  *  saves landed 404, a lease another tab took 409 (the tab stops), a Roll not yet read or a race lost 409 (the tab asks
  *  again - AUDIT CHAP R12: this said the lease was asked again too), a tombstone 410. */
@@ -794,8 +789,8 @@ const service = {
       return rk ? json({ rk }, 200, origin) : no('no-relay-key', 503, origin);
     }
 
-    // RESTORE: HELD FOR MAINTENANCE. The history restore
-    // (.github/workflows/realm-restore.yml) rewinds the database for a minute to read what was lost, and puts it back;
+    // HELD FOR MAINTENANCE. A history repair
+    // (.github/workflows/realm-revive.yml) rewinds the database for a minute to read what was lost, and puts it back;
     // anything written in between would vanish with the rewind. So the job deploys this Worker with MAINTENANCE = "1"
     // first, and every call but the two above is refused for that minute - 503, which a playing tab's checkpoint waits
     // out and sends again (systems/realmSaves.js), never a write that is silently lost. The job's own last step deploys
@@ -2231,13 +2226,6 @@ const service = {
         return r.error ? no(r.error, REVIEW_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
       }
 
-      if (path === '/v1/mod/customs-pass' && request.method === 'POST') {
-        // CUSTOMS-PASS: A DEVELOPER GRANTS ONE ACCOUNT ONE CHARACTER THROUGH CUSTOMS (realm.js). 403 for a
-        // caller who is not one - the credential is good, the right is not theirs, as the save wall reads it.
-        const r = await grantCustomsPass(ctx, who.player, env, { name: body.name, account: body.account, revoke: body.revoke });
-        return r.error ? no(r.error, PASS_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
-      }
-
       // STAFF-PANEL5-FREEZE (staffFreeze.js): THE PLAYER'S OWN STAFF CHAT THREAD - read, and a line of theirs in it
       if (STAFF_CHAT_ROUTES.includes(path)) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2503,7 +2491,7 @@ const service = {
 
       // ═══ REALM P1: THE REALM'S CHARACTERS (realm.js) ═════════════
       //
-      // An online character's truth, held here: listed, made (born online or brought in once through customs),
+      // An online character's truth, held here: listed, made (born online),
       // joined under a lease, checkpointed at the next sequence, left, deleted - and its save read back for a join's
       // load or a copy to offline. EVERY ACCOUNT, a guest's too: a guest plays online, and its characters are its
       // account's as its Renown is.
@@ -2568,7 +2556,6 @@ const service = {
         // so a new build before its service is deployed (or after one rolled back) sends the text it always sent
         const leased = (/** @type {any} */ r) => answer(r.error ? r : { ...r, gzip: true });
         if (path === '/v1/realm/create') return leased(await createRealm(rctx, me, { name: body.name, summary: body.summary, lineage: body.lineage, person: body.person }));   // LEGACY7: born as a person of the account's own line
-        if (path === '/v1/realm/customs') return leased(await customsRealm(rctx, me, { origin: body.origin, name: body.name, summary: body.summary }));   // AUDIT REALM L3-F2/F3: one guarded batch, and resumable
         if (path === '/v1/realm/join') return leased(await joinRealm(rctx, me, body.id));
         if (path === '/v1/realm/trade') {
           // REALM P2.1: a sequence refused says the service's own, as a checkpoint's does
@@ -2577,7 +2564,6 @@ const service = {
           return answer(r);
         }
         if (path === '/v1/realm/leave') return answer(await leaveRealm(rctx, me, { id: body.id, lease: body.lease }));
-        if (path === '/v1/realm/undo') return answer(await undoRealm(rctx, me, body.id));   // HOUSE-LOSS: a customs that never landed, undone
         // LEGACY7 (legacy.js): Project Legacy's lines - listed, written past their rev (a stale write answered with the
         // stored record, to merge into), and a fallen character's tombstone under its lease
         if (path === '/v1/realm/lineages') return json({ lineages: await listLineages(rctx, me) }, 200, origin);

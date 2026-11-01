@@ -127,28 +127,6 @@ export function reseatPlace(place, reseat) {
   return { ...place, pos, scale, reseat: YARD_RESEAT_MARK };
 }
 
-/**
- * STALL-SHAPE's audit: A YARD PIECE BROUGHT BACK FROM A SNAPSHOT (tools/realmRestore.mjs, a `home_decor` row as the dump
- * holds it) stands as this migration would have left it. One placed by WD3's stand-ins (before YARD_RESEAT_AT) with no
- * mark was never re-seated - by this law it is now. One placed since by TEMPLE-STEPS' open stall may have been placed by
- * STALL-SHAPE's instead (no record says which stand-in a piece was placed against, nor a snapshot whether 0121 had run):
- * it is written as the snapshot holds it, and `unsure` says so to the operator. Never moved twice: a marked place is kept.
- * @param {Record<string, any>} row
- * @returns {{ row: Record<string, any>, reseated: boolean, unsure: boolean }}
- */
-export function reseatRestored(row) {
-  const kept = { row, reseated: false, unsure: false };
-  if (row.yard !== 1) return kept;
-  let place;
-  try { place = JSON.parse(row.place); } catch { return kept; }
-  if (!place || typeof place !== 'object' || place.reseat != null || !Array.isArray(place.pos) || !Array.isArray(place.rot)) return kept;
-  const before = row.placed_at < YARD_RESEAT_AT;
-  const reseat = YARD_RESEATS.find((m) => m.model === row.model && m.before === before);
-  if (!reseat) return kept;
-  if (!before) return { row, reseated: false, unsure: true };
-  return { row: { ...row, place: JSON.stringify(reseatPlace(place, reseat)) }, reseated: true, unsure: false };
-}
-
 const num = (v) => String(round(v, 6));
 /** A Taylor series in Horner's form over `r2` (r squared): 1 - r2/d0 (1 - r2/d1 (1 - ...)), each d the next two terms'
  *  ratio - the cosine's 1*2, 3*4, ... 17*18 (to r^18), the sine's 2*3, ... 18*19 (to r^19, times r). */

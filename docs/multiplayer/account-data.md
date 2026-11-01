@@ -61,8 +61,9 @@ An online character's truth is the service's, not the client's (`server-account/
   account's other characters, so one account plays one character at a time. A checkpoint lands
   only under the current lease and only at `seq + 1` (headers `x-realm-lease`, `x-realm-seq`). An old tab, a second
   device, a restored backup or an edited copy cannot write the character again.
-- **Customs.** An offline character can be brought online once (`origin_id`, unique per account) if it qualifies
-  (`customsRealm`).
+- **Born online only.** A realm character is made by `createRealm`; no offline character is brought in. Its first
+  save must be a new character's (`firstSaveRefusal`: level 1 and no more than `REALM_BIRTH_WEALTH_MAX`). "Copy to
+  offline" still writes a realm save as a new offline character, and nothing played on the copy comes back.
 - Value moving between players (trades, market, mail) goes through `realm_trades` and the ledger. `holdRefusal`
   refuses any such move for a held character.
 

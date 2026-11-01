@@ -26,7 +26,7 @@ export const atLevelCap = (entity) => (entity?.level ?? 1) >= LEVEL_CAP;
 
 /**
  * AUDIT FB1026d C1/C2: A LEVEL LATCHED BEFORE THE CAP IS LET GO AT IT. A save from before the cap can hold a level owed
- * past it (`readyToLevelUp` rides the save), and so can an offline Oblivion character brought online (realmCustoms.js
+ * past it (`readyToLevelUp` rides the save), and so can an Oblivion character switched at the realm boot (realmLeveling.js
  * crossLeveling) - and the window it opened had no level to give: the virtue screen's Ascend never closed it, the
  * classic sheet handed out the pool with no level. So the latch is let go where it is read - the load, both checks, the
  * sheet's door and its rollout. The Oghma Infinium's latch (artifactEffects.js) is the book's: its points come at the

@@ -169,10 +169,6 @@ const ENTITY_FIELDS = [
   // every Legendary and Ruhn's Regalia whole, to look at; the mark rides every save of it, and the boot keeps such a
   // character offline (testRoomOnlineRefused). A save without it restores undefined: a character of the world.
   'testRoom',
-  // A copy of a realm character made by Copy to offline (systems/realmCopyMark.js). The mark rides every save of the copy,
-  // so the Online door can say on each of its tiles why the copy cannot be brought online. A save without it restores
-  // undefined: a character that is no such copy.
-  'realmCopy',
   // REST1: the last night's end on the character's own clock (systems/rest/restAct.js) - the night interval is a DIFFERENCE
   // against it, so a save that dropped it would let a reload pass a night at every rest. A save older than this field
   // restores undefined, which reads as "no night yet": the first rest is a night.
@@ -420,7 +416,6 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   snap.houses = (entity.houses ?? []).map(copyHouseSlot);   // HOUSES-3: a slot's own deed and the ones beside it (`more`)
   snap.ownedShip = entity.ownedShip ?? -1;
   snap.boatCabinLink = readBankCabinLink(entity.boatCabinLink);
-  if (entity.shipCrossed === true) snap.shipCrossed = true;   // RESTORE: a ship that came through customs, which the realm's bank never buys back (banking.js)
   snap.loanAmnesty = Number.isSafeInteger(entity.loanAmnesty) ? entity.loanAmnesty : LOAN_AMNESTY;
   snap.walletGift = Number.isSafeInteger(entity.walletGift) ? entity.walletGift : WALLET_GIFT;   // WALLET1: whether this character has been given its wallet - one never restored from an older save is born with it (its kit's)
   snap.lockpickGift = Number.isSafeInteger(entity.lockpickGift) ? entity.lockpickGift : LOCKPICK_GIFT;   // LOCKPICK: the Wallet's law - one never restored from an older save is born with its picks (its kit's)
@@ -681,10 +676,10 @@ const listsOf = (/** @type {any[]} */ ...ls) => ls.filter(Array.isArray);
 const arrayOf = (/** @type {any} */ x) => (Array.isArray(x) ? x : []);
 /**
  * ITEM-WALK A: EVERY OTHER LIST OF ITEMS A SAVE HOLDS - the lists
- * customs never reads, because no one's wealth lies in them (net/realm/realmGoldLaw.js stashedItemLists reads the rest):
+ * the wealth measure never reads, because no one's wealth lies in them (net/realm/realmGoldLaw.js stashedItemLists reads the rest):
  * in each cached scene, the owner's own things set out in a room (DECOR2a `decorOwn`, one item a piece) and a guild's
  * day's Buy shelves (GUILD-SHELF `guildShelves`); a living foe's kit and a guard's, in the world bag and in a
- * building's half of the save (`interior`; a dead foe's is a container customs reads); what a revenant took (the
+ * building's half of the save (`interior`; a dead foe's is a container the measure reads); what a revenant took (the
  * feud's `list[].took`, its own until it falls); each quest's item as its Item resource keeps it (quest/item.js
  * getSaveData `item`) and what a Foe resource will hand its spawns (quest/foe.js `itemQueue`); and Project Legacy's
  * bequests (each member's and the waiting Succession's) and remains (each list as it lies and as it was laid). Not its
@@ -716,7 +711,7 @@ function heldItemLists(snap) {
 }
 /**
  * ITEM-WALK A: EVERY LIST OF ITEMS A SAVE HOLDS, ONE WALK - the character's own five (`own`'s: the pack, the wagon, the
- * Materials Bag, the furnisher's deliveries and the repairer's shelf), every list customs reads (stashedItemLists) and
+ * Materials Bag, the furnisher's deliveries and the repairer's shelf), every list the wealth measure reads (stashedItemLists) and
  * every other (heldItemLists). The load passes the entity it restores as `own`: its copies are the ones the game plays.
  * @param {any} snap @param {any} [own]
  */
@@ -950,7 +945,7 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   entity.otherItems = (snap.otherItems ?? []).map((it) => setItemFields(it));   // R1: the in-repair collection (pre-R1 saves restore empty); JAN1: set on the way in
   // AUDIT PRE-MERGE 0929 D3: THE LOAD'S ITEM REPAIRS REACH EVERY LIST THE SAVE CARRIES - the pack, the wagon and the
   // repairer's, and every list of the character's own things outside them (net/realm/realmGoldLaw.js stashedItemLists, the
-  // one walk customs takes: a cached scene's chests, piles and storage pieces, the world's piles and dead foes' packs,
+  // wealth measure's one walk: a cached scene's chests, piles and storage pieces, the world's piles and dead foes' packs,
   // Come Sail Away's boats and cargoes), repaired in the save itself before the scene cache is restored from it and
   // before the world and the mods' data go back to their hosts. A piece kept in a house chest loaded with the name its
   // make had lost, and kept it once carried out - "pieces you already have are renamed when you load".
@@ -976,7 +971,6 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   entity.houses = snap.houses?.length ? padRegionTable(snap.houses.map(copyHouseSlot), blankHouse) : createHouses(entity.bankAccounts.length);   // JAN1: the same law for the house registry (H1 mints it beside the accounts)
   entity.ownedShip = snap.ownedShip ?? -1;
   entity.boatCabinLink = readBankCabinLink(snap.boatCabinLink);
-  if (snap.shipCrossed === true) entity.shipCrossed = true; else delete entity.shipCrossed;   // RESTORE: its customs mark, or none
   entity.loanAmnesty = Number.isSafeInteger(snap.loanAmnesty) ? snap.loanAmnesty : 0;   // LOAN-AMNESTY: a save from before the first amnesty has had none
   entity.portalGift = Number.isSafeInteger(snap.portalGift) ? snap.portalGift : 0;   // PORTAL-GIFT: a save from before the gift has had none
   entity.walletGift = Number.isSafeInteger(snap.walletGift) ? snap.walletGift : 0;   // WALLET1: a save from before the wallet has had none
@@ -1310,9 +1304,7 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
     // AUDIT LIVED1b F1: the reading re-anchors at now, not at its whole minute - the floor billed the first tick up to a
     // world minute of the absence (alignEntityClocks floors where it counts)
     const own = Math.floor(snap.classicMinutes ?? 0), at = worldMinutes();
-    // AUDIT LIVED1b P2: a copy Bring online made has no absence to pay - its stamp is this machine's clock at the click
-    // (the menu has no relay), and an OS clock set back there bought the whole distance back as TM-1's recovery
-    const left = snap.joinFresh ? null : Number.isFinite(snap.worldMinutes) ? Math.floor(snap.worldMinutes) : own;
+    const left = Number.isFinite(snap.worldMinutes) ? Math.floor(snap.worldMinutes) : own;
     setOwnMinutes(own);
     if (!Number.isFinite(snap.worldMinutes)) clampMarkersAheadOf(entity, own);   // AUDIT LIVED1 F: a save from before LIVED1
     alignEntityClocks(entity, at);
@@ -1323,12 +1315,10 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
     alignSurvival(entity, own, own);
     // AUDIT LIVED1b P4: THE ABSENCE WAITS FOR THE RELAY'S CLOCK - TM-1's recovery and SURV7's fresh start for a break past
     // the world's day, measured over [left, the corrected now) when the host hears it (worldTick hearSharedClock)
-    if (left !== null) {
-      payAbsenceWhenHeard(left, (now) => {
-        normalizeAcross(entity, left, now);
-        if (now - left > ALIGN_GRACE_MINUTES) alignSurvival(entity, Math.floor(ownMinutes()), null);
-      });
-    }
+    payAbsenceWhenHeard(left, (now) => {
+      normalizeAcross(entity, left, now);
+      if (now - left > ALIGN_GRACE_MINUTES) alignSurvival(entity, Math.floor(ownMinutes()), null);
+    });
   }
   // AUDIT 39: the three extras above ride back out too - a save from
   // before they were carried reads the same null/0 they used to.

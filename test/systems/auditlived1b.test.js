@@ -14,7 +14,7 @@ import {
 } from '../../src/systems/worldTick.js';
 import * as WT from '../../src/systems/worldTick.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
-import { offlineCopyOf, onlineCopyOf, saneSaveClock, SAVE_CLOCK_MAX, RAID_RECORD_VENDOR } from '../../src/systems/offlineCopy.js';
+import { offlineCopyOf, saneSaveClock, SAVE_CLOCK_MAX, RAID_RECORD_VENDOR } from '../../src/systems/offlineCopy.js';
 import { checkpointAllowed } from '../../src/systems/online/onlineCheckpoint.js';
 import { createQuestBridge, QUEST_CTX_CONTRACT } from '../../src/scenes/quest/questBridge.js';
 import { TrainPc } from '../../src/systems/quest/actions.js';
@@ -248,20 +248,6 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   assert.match(rd('src/scenes/world.js'), /online\.onClock = \(offsetMs\) => \{[^\n]*onlineArrival\(\); hearSharedClock\(\); \};/, 'the host hears it');
 });
 
-test('AUDIT LIVED1b P2: a copy Bring online made joins fresh - its stamp is this machine\'s clock at the click, and an OS clock set a year back there buys no pardon', () => {
-  const own = 400 * D, world = 5500 * D;
-  setSharedClock(null);
-  const offlineSave = { v: 1, classicMinutes: own, legalRep: [-80] };
-  const copy = onlineCopyOf(offlineSave, world - 365 * 12 * D);   // the menu's reading, a year back
-  assert.equal(copy.joinFresh, true);
-  setSharedClock(() => world);
-  const e = player();
-  restorePlayer(e, { ...JSON.parse(JSON.stringify(snapshotPlayer(player({ legalRep: [-80] }), { classicMinutes: own }))), worldMinutes: copy.worldMinutes, joinFresh: true });
-  hearSharedClock();
-  assert.equal(e.legalRep[0], -80, 'no absence paid for a character that was never away');
-  assert.equal(offlineCopyOf(copy).joinFresh, undefined, 'the flag is the first join\'s alone - the offline door drops it');
-});
-
 test('AUDIT LIVED1b F1: an online load re-anchors at the world\'s reading itself, not its whole minute - the first frame bills the play, not the absence\'s last minute', () => {
   setSharedClock(() => 1000);
   setOwnMinutes(432000);
@@ -341,17 +327,14 @@ test('AUDIT LIVED1b R1 (A2, O3, S3): Copy to offline leaves the world\'s raid sc
   assert.equal(offlineCopyOf(offlineEnv).modData[RAIDING_PARTIES_VENDOR].lastSelectedDay, 550, 'an offline envelope\'s is its own');
 });
 
-test('AUDIT LIVED1b R3 (O2): a journal step\'s date crosses both doors with its quest - %qdt stays two days after the start', () => {
+test('AUDIT LIVED1b R3 (O2): a journal step\'s date crosses to offline with its quest - %qdt stays two days after the start', () => {
   const env = { v: 1, classicMinutes: 911 * D, worldMinutes: 1063 * D, quest: { quests: [{ questStartTime: 1063 * D * 60, activeLogMessages: [{ stepID: 1, time: 1065 * D * 60 }, { stepID: 2, time: 0 }] }] } };
   const off = offlineCopyOf(env).quest.quests[0];
   assert.equal(off.activeLogMessages[0].time - off.questStartTime, 2 * D * 60, 'two days apart, as online');
   assert.equal(off.activeLogMessages[1].time, 0, 'a zero stays');
-  const on = onlineCopyOf({ v: 1, classicMinutes: 911 * D, quest: { quests: [off] } }, 563 * D).quest.quests[0];
-  assert.equal(on.activeLogMessages[0].time - on.questStartTime, 2 * D * 60);
-  assert.equal(on.questStartTime, 563 * D * 60, 'the quest on the world\'s clock, and its step with it');
 });
 
-test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross both doors by whole days - a shelf stocked today is stocked today on the new calendar, and restocks tomorrow', () => {
+test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross to offline by whole days - a shelf stocked today is stocked today on the new calendar, and restocks tomorrow', () => {
   const stock = (m) => createStockedDate(dateFromClassicMinutes(m));
   const own = 550 * D + 1400, world = 700 * D + 60;   // 23:20 on the character's day, 01:00 on the world's: whole days, not the minutes' round
   const env = { v: 1, classicMinutes: own, worldMinutes: world, sceneCache: { scenes: [{ sceneName: 'shop', lootContainers: [{ stockedDate: stock(world), openedOn: stock(world) }, { stockedDate: 0, openedOn: 0 }, { stockedDate: 1 }] }] } };
@@ -361,11 +344,11 @@ test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross both 
   assert.equal(needsRestock(shelf, stock(own)), false);
   assert.equal(needsRestock(shelf, stock(own + D)), true, 'and tomorrow it restocks');
   assert.deepEqual([never.stockedDate, owned.stockedDate], [0, 1], '"never stocked" and an owned house\'s latch stay');
-  // across a year's end, and back online
+  // across a year's end
   const late = 404 * 360 * D + 359 * D;   // the calendar's last day of a year
-  const env2 = { v: 1, classicMinutes: late, sceneCache: { scenes: [{ lootContainers: [{ stockedDate: stock(late) }] }] } };
-  const on = onlineCopyOf(env2, late + 2 * D);
-  assert.equal(on.sceneCache.scenes[0].lootContainers[0].stockedDate, stock(late + 2 * D), 'two days on, over the year\'s turn');
+  const env2 = { v: 1, classicMinutes: late + 2 * D, worldMinutes: late, sceneCache: { scenes: [{ lootContainers: [{ stockedDate: stock(late) }] }] } };
+  const moved = offlineCopyOf(env2);
+  assert.equal(moved.sceneCache.scenes[0].lootContainers[0].stockedDate, stock(late + 2 * D), 'two days on, over the year\'s turn');
 });
 
 test('AUDIT LIVED1b A3: a backward step of the world\'s clock re-rolls no raid day and restocks no bought-out guild shelf online; offline nothing reads differently', async () => {

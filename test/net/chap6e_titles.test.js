@@ -42,7 +42,7 @@ test('CHAP6e the vocabulary: a High Master and a Season\'s Master, last in the c
     assert.deepEqual(row.ts, [4017, 2], `${t}: stamped`);
     assert.deepEqual(readBadge({ title: t, ts: [4017, 2], glyphs: [] }).ts, [4017, 2], `${t}: read back`);
   }
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world281');
 });
 
 // ── THE WORDS ───────────────────────────────────────────────────────

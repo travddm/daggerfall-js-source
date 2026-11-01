@@ -117,7 +117,7 @@ test('AUDIT CRAFT-HOLD a held character with crafts at the account is not delete
   assert.equal((await s.call('/v1/realm/delete', { id: F.id }, eve.secret)).status, 200, 'held with no craft: deleted (a finding can be the law\'s mistake, and the slot is the player\'s)');
 });
 
-test('AUDIT CRAFT-HOLD the hold is a HOLD alone and the account\'s own: an unheld maker unjudged or dead refuses no sibling, another account\'s buyer of a held maker\'s piece is never refused, and a piece made before customs follows its customs character (mutants: record-unjudged refused; the account guard dropped; the origin unread)', async () => {
+test('AUDIT CRAFT-HOLD the hold is a HOLD alone and the account\'s own: an unheld maker unjudged or dead refuses no sibling, another account\'s buyer of a held maker\'s piece is never refused (mutants: record-unjudged refused; the account guard dropped)', async () => {
   const { s, raw, eve, E, piece, hold } = await stand();
   // asks it (index.js ROUTES), behind the progression gate (INT16), as the disenchant's own pin above asks it
   const disenchant = (who, character, provenance) => disenchantPiece({ db: s.env.DB, primary: s.env.DB, nowS: _now, rand: (b) => crypto.getRandomValues(b), bucket: s.env.SAVES },
@@ -134,11 +134,6 @@ test('AUDIT CRAFT-HOLD the hold is a HOLD alone and the account\'s own: an unhel
   hold('staff');
   const theirs = await disenchant(tom, tom.character, P(0xe2));
   assert.notEqual(theirs.error, 'trade-held', `another account's piece, its maker held: ${JSON.stringify(theirs)}`);
-  // a piece made before customs: its char_id the offline character the realm one came in as
-  raw.prepare('UPDATE realm_characters SET origin_id = ? WHERE id = ?').run('char-offline1', E.id);
-  piece(P(0xe3));
-  raw.prepare('UPDATE products SET char_id = ? WHERE provenance = ?').run('char-offline1', P(0xe3));
-  assert.equal((await disenchant(eve, 'char-anything', P(0xe3))).error, 'trade-held', 'its customs character held, it is held');
 });
 
 test('AUDIT CRAFT-HOLD a held character\'s Stores go into no guild\'s Stores and fill no guild\'s writ (mutants: the deposit unheld; the supply unheld)', async () => {

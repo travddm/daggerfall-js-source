@@ -63,7 +63,7 @@ test('ARENA4 the door and the wire: the Worker opens the hall and a bout\'s room
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 }), 2 * (21 + 6 + 20), 'a Daedric dai-katana, a critical\'s double');
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Spell }), 60);
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (41 + 20), 'ARENA5: a bare hand\'s most (DFU\'s past the softcap) and the modifiers\' room, doubled');
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world281');
   assert.equal(relaySupportsArena('world154'), false, 'main\'s FRIENDS-SYNC through BROKER-CAGE took world142-154 and open no arena room');
   assert.equal(relaySupportsArena('world142'), false);
   assert.equal(relaySupportsArena('world155'), true);

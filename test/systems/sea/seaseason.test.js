@@ -16,7 +16,7 @@ import { ETHER_BOX, etherDepthAt } from '../../../src/world/ethericSea.js';
 import { LEGENDS, LEGEND_RISE_DAYS } from '../../../src/systems/naval/etherShips.js';
 import { createCaptainLedger, CAPTAIN_SAVE_VERSION, CAPTAIN_SAVE_VENDOR, restoreSeason } from '../../../src/systems/naval/captainLedger.js';
 import { createEtherHost } from '../../../src/scenes/etherHost.js';
-import { offlineCopyOf, onlineCopyOf } from '../../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { createSeaSeason, SEA_SEASON_FRESH_MS } from '../../../src/scenes/seaSeasonHost.js';
 import { seasonText, etherOfficeText, mountNavalYardWindow } from '../../../src/ui/naval/navalYardWindow.js';
 import { accountSeaSeason, SESSION_KEY } from '../../../src/net/accountClient.js';
@@ -60,7 +60,7 @@ test('SEA-SEASON the season\'s law: its numbers each their source\'s; a world da
   assert.deepEqual([b.season, b.ends, b.deep.length, b.legends, b.mine, b.last.deep.length, b.last.legends], [2, 99, S.SEA_SEASON_ROWS, [{ name: 'kim', n: 0 }, { name: 'hal', n: 0 }], { deep: { rank: 3, n: 40 }, legends: null }, S.SEA_SEASON_LAST_ROWS, []]);
 });
 
-test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended kept for the season of the world\'s day - begun afresh in a new season, never by a day before it; kept by the save, read back within the law; the ether host hands it the day; neither copy door carries it (mutants: the season\'s mark, the reset, the count, the restore, the host\'s day, the doors)', () => {
+test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended kept for the season of the world\'s day - begun afresh in a new season, never by a day before it; kept by the save, read back within the law; the ether host hands it the day; the offline copy does not carry it (mutants: the season\'s mark, the reset, the count, the restore, the host\'s day, the copy)', () => {
   const L = createCaptainLedger();
   assert.equal(L.season(), null);
   L.deepest(12.7);
@@ -97,11 +97,10 @@ test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended
   day = d1 + 100;
   host.legendEnded(LEGENDS[0].id, 'sink');
   assert.equal(H.season().legends, 1);
-  // neither door carries them
+  // the offline copy does not carry them
   const snap = { classicMinutes: 600_000, worldMinutes: 600_000, modData: { Captain: { v: 1, ether: { charted: ['1,2'], season: { n: 1, deepest: 400, legends: 3 } } } } };
   const off = offlineCopyOf(snap);
   assert.deepEqual([off.modData.Captain.ether.season, off.modData.Captain.ether.charted], [null, ['1,2']], 'offline: the season\'s figures dropped, the rest kept');
-  assert.equal(onlineCopyOf(snap, 700_000).modData.Captain.ether.season, null, 'brought online: from nothing');
   assert.deepEqual(offlineCopyOf({ classicMinutes: 1, worldMinutes: 1 }).modData, undefined, 'a save with no ledger: nothing made');
 });
 

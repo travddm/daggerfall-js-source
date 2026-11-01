@@ -1,7 +1,6 @@
 // LOAN-AMNESTY: THE EMPIRE FORGIVES EVERY ONLINE LOAN, ONCE.
 // The law (systems/banking.js forgiveLoans, loanAmnestyLines, LOAN_AMNESTY), the mark the save carries
-// (systems/save/save.js), customs' mark (systems/realmCustoms.js applyCustoms) and the realm boot that applies it
-// (scenes/world.js).
+// (systems/save/save.js) and the realm boot that applies it (scenes/world.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,7 +10,6 @@ import {
   SHIP_TYPES,
 } from '../../src/systems/banking.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
-import { applyCustoms } from '../../src/systems/realmCustoms.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -82,13 +80,3 @@ test('LOAN-AMNESTY the mark rides the save: a save from before it restores unmar
   restorePlayer(after, again, new Map());
   assert.equal(after.loanAmnesty, LOAN_AMNESTY);
 });
-
-test('LOAN-AMNESTY customs: a character crossing online is marked as it crosses - its offline loans are called in, never forgiven (mutants: customs unmarked)', () => {
-  const copy = saveWith({ 3: { loanTotal: 5_000, loanDueDate: 999_999 } }, { classicMinutes: 100, level: 3, goldPieces: 0 });
-  applyCustoms(copy);
-  assert.equal(copy.loanAmnesty, LOAN_AMNESTY);
-  assert.equal(forgiveLoans(copy), null, 'nothing forgiven at its first boot');
-  assert.equal(copy.bankAccounts[3].loanTotal, 5_000, 'the loan customs called in stands, unpaid and due');
-  assert.equal(copy.bankAccounts[3].loanDueDate, 100);
-});
-
