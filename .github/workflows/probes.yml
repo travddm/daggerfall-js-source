@@ -68,14 +68,14 @@ jobs:
         id: arena
         uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/dfdata
+          path: ${{ runner.temp }}/arena-data
           key: arena2-freeware-v1
       - name: Fetch ARENA2 (freeware Daggerfall data, never in the repository)
         if: steps.arena.outputs.cache-hit != 'true'
-        run: sh tools/fetch-data.sh "$RUNNER_TEMP/dfdata"
+        run: sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
       - name: Probe ${{ matrix.probe }}
         env:
-          ARENA2_PATH: ${{ runner.temp }}/dfdata/arena2
+          ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
         run: npm run probes -- ${{ matrix.probe }}
       - name: Keep the screenshots
