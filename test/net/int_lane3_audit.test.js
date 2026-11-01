@@ -441,7 +441,7 @@ test('AUDIT INT11 THE BODIES READ ONCE A BEAT: the court\'s and the serpent\'s -
 });
 
 test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measure and the wealth\'s read a quantile by its rank alike - the nearest rank at or below it (two receipts\' median the lower) (mutants: the rank rounded the other way)', async () => {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const nowS = Math.floor(Date.now() / 1000);
   const ann = await s.registered('annika'), bo = await s.registered('boris');
   const claim = async (who, m) => s.call('/v1/gate/claim', { receipt: await mintReceipt({ d: 5, b: 'ruhn', s: who.id, c: 7, x: 'dealt', l: 10, m }, s.gatePriv, { subtle: globalThis.crypto.subtle, nowS }) }, who.secret);

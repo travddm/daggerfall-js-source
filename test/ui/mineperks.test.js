@@ -265,7 +265,7 @@ test('MINE-PERKS the Surveyor at the service: an unwitnessed Mountain pixel\'s v
   const now = utcDay(T0) * 86_400 + 4 * 3600;
   Date.now = () => now * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac,Sab' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac,Sab' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
     const sab = await s.seated('Sab');

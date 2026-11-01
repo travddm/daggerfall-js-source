@@ -173,8 +173,8 @@ test('RENOWN-CHAR the worker: the token\'s level is the NAMED character\'s own -
   assert.deepEqual(await call('POST', '/v1/guilds/found', { character: fresh.id, name: 'The Hound', tag: 'HND', realm: fresh.at() }, me.secret), { status: 403, body: { error: 'guild-renown' } }, 'a character that never earned is Renown 1 - whatever the account\'s best (Mara\'s 10)');
   env.DB._raw.prepare('INSERT INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, ?, 1, 1)').run(me.id, fresh.id, 'Fresh', renownXpFor(10));
   assert.equal((await call('POST', '/v1/guilds/found', { character: fresh.id, name: 'The Hound', tag: 'HND', realm: fresh.at() }, me.secret)).status, 200, 'at its own Renown 10, it founds');
-  assert.equal(ACCOUNT_VERSION, 'acct207', 'the live version: a deploy that changes the service moves it');
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.equal(ACCOUNT_VERSION, 'acct208', 'the live version: a deploy that changes the service moves it');
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
 });
 
 test('RENOWN-CHAR the raid: a town defended is paid to the character that FOUGHT it, at its own Renown - never the account\'s best - another character\'s track untouched; a claim naming no character is refused (mutants: the raid read at the account\'s best track)', async () => {

@@ -26,7 +26,7 @@ const arrows = (n) => ({ templateIndex: 131, group: 'Weapons', name: 'Arrow', va
 
 /** A service, and a guild founded by a realm character with gold enough, and a second realm character in it. */
 async function stand(extra = {}) {
-  const s = await standService({ MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...extra });
+  const s = await standService({ MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
   const raw = s.env.DB._raw;
   const gm = await s.registered('Aldric', { renown: 10 });
   gm.realm = await seatRealm(s.env, gm.secret, 'Aldric', { name: 'Aldric', level: 5, goldPieces: 20_000, items: [sword(), arrows(40)], bankAccounts: [{ accountGold: 0 }] });

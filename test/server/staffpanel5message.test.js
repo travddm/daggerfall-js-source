@@ -39,7 +39,7 @@ async function extensionKey() {
 async function stand(extra = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, ...extra,
   });
   const door = { pushed: [], say: [200, { ok: true, n: 1, old: 0 }] };

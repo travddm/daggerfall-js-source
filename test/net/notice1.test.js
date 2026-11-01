@@ -56,7 +56,7 @@ async function stand({ open = 'on', developers = 'Devra', moderators = 'Mora' } 
   const pkcs8 = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
   const env = {
     DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*',   // MERGE 2: SAVES, the realm's records
-    BOARD_OPEN: open, DEVELOPER_HANDLES: developers, MODERATOR_HANDLES: moderators,
+    BOARD_OPEN: open,
   };
   const call = async (path, body, bearer = null) => {
     const res = await worker.fetch(new Request(`https://accounts.invalid${path}`, {
@@ -70,6 +70,9 @@ async function stand({ open = 'on', developers = 'Devra', moderators = 'Mora' } 
   const registered = async (handle, { renown = 1 } = {}) => {
     const g = await guest();
     assert.equal((await call('/v1/auth/register', { handle, password: 'a good long one', ...ACCEPTED }, g.secret)).status, 200, `${handle} registers`);
+    // STAFF-ROLES-BY-ACCOUNT: Admin and Moderator are the account's roles, not lists
+    if (developers.split(',').includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(g.id);
+    if (moderators.split(',').includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_mod = 1 WHERE id = ?').run(g.id);
     const character = `char-${handle.toLowerCase()}`;
     if (renown > 1) {
       // RENOWN-CHAR: the character's own track again (MERGE 2 had seeded RENOWN-ACCOUNT's one track an account)
@@ -135,9 +138,9 @@ test('NOTICE1 the schema and the routes: a note\'s button and its hiding are CHE
   for (const r of ['/v1/board/read', '/v1/board/pin', '/v1/board/take-down', '/v1/board/report', '/v1/board/mod/remove', '/v1/board/mod/restore', '/v1/board/notice', '/v1/board/notice/remove']) {
     assert.ok(ROUTES.has(r), r);
   }
-  assert.equal(ACCOUNT_VERSION, 'acct207');
+  assert.equal(ACCOUNT_VERSION, 'acct208');
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /^ACCOUNT_VERSION = "acct207"$/m);
+  assert.match(toml, /^ACCOUNT_VERSION = "acct208"$/m);
   assert.match(toml, /^BOARD_OPEN = "on"$/m, 'BOARD-ON: shipped at dev, opened to everyone (Mac: "Board now, rest after fixes")');
   assert.deepEqual(['MARKS_OPEN', 'PROFESSIONS_OPEN'].map((k) => toml.match(new RegExp(`^${k} = "(\\w+)"$`, 'm'))?.[1]), ['on', 'on'], 'SWITCH-ON (Mac: "Fuck it lets switch everything on"): the Marks and the professions too, after PROF-SAVE and PROF-DELETE');
   assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/boardLaw\.js"/, 'the law the Worker bundles deploys it');

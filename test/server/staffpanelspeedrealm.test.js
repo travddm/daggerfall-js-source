@@ -110,7 +110,7 @@ function fill(raw, t) {
 async function stand() {
   for (const reset of [_forgetCensusForTests, _resetStatusForTests, _resetReactionsForTests]) reset();
   const mobKey = await extensionKey();
-  const s = await standService({ DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
+  const s = await standService({ SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body),

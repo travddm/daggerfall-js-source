@@ -104,7 +104,7 @@ const rid = () => `chap3a-${String(++_rid).padStart(6, '0')}`;
 async function stand({ open = 'on', factions = [41, 108, 368], members = [41], reps = { 41: 10, 368: 5, 108: 0 }, tenure = true } = {}) {
   clock(NOON);
   forgetChapters();
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra,Wit0,Wit1,Wit2,Ground' });
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra,Wit0,Wit1,Wit2,Ground' });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   for (let i = 0; i < 3; i++) {

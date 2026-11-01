@@ -29,7 +29,7 @@ const ROAD = roadPixels({ x: 207, y: 212 }, { x: 590, y: 166 });
 const P = (n) => n.toString(16).padStart(16, '0');
 
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', MODERATOR_HANDLES: 'Asynian', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac', SEAT_MODERATORS: 'Asynian', ...extra });
   const raw = s.env.DB._raw;
   const balance = (who) => Number(raw.prepare('SELECT balance FROM marks WHERE account = ?').get(who.id)?.balance ?? 0);
   const fund = (who, marks) => raw.prepare('INSERT INTO marks (account, balance) VALUES (?, ?) ON CONFLICT (account) DO UPDATE SET balance = excluded.balance').run(who.id, marks);

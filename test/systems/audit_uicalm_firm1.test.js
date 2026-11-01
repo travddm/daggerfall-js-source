@@ -75,7 +75,7 @@ function walk(start, ...targets) {
 const named = (name) => [...FIRM_NODES.values()].find((n) => n.name === name)?.key ?? assert.fail(`no star ${name}`);
 
 async function stand(env = { FIRMAMENT_OPEN: 'on' }) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...env });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...env });
   const raw = s.env.DB._raw;
   const state = (who) => s.call('/v1/firmament/state', { character: who.character }, who.secret);
   const set = (who, tree, id = rid()) => s.call('/v1/firmament/set', { character: who.character, tree: typeof tree === 'string' ? tree : packTree(tree), rid: id }, who.secret);

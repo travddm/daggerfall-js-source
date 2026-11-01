@@ -29,7 +29,7 @@ const HUBS = { [DF]: [207, 212], [WR]: [590, 166] };
 const ROAD = roadPixels({ x: 207, y: 212 }, { x: 590, y: 166 });
 
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', MODERATOR_HANDLES: 'Asynian', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac', SEAT_MODERATORS: 'Asynian', ...extra });
   const raw = s.env.DB._raw;
   const stores = (who, m, character = who.character) => raw.prepare('SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin')
     .all(who.id, character, m).map((r) => [r.origin, Number(r.qty)]);
