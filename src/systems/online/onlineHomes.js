@@ -48,7 +48,7 @@ import { homeSceneName } from '../../net/homeScene.js';   // HOME-POUR: the home
 import { ARENA_TEXT } from '../arena/arenaText.js';   // ARENA4b: the bank's letter for a home the arena displaced
 import { RENT_VERB, rentRowLabel, rentTenantLabel } from '../homeRent.js';   // HOME-RENT: the door's rows for a room to rent
 import { BUILDING_TYPES, isResidence } from '../../world/buildingNames.js';
-import { DEED_SELL_MULT, CROSSED_DEED_LINES, deedStands } from '../banking.js';   // FIELD BUGS 2026-10-04d KNIGHT-HOUSE: a deed names its building only where it stands
+import { DEED_SELL_MULT, deedStands } from '../banking.js';   // FIELD BUGS 2026-10-04d KNIGHT-HOUSE: a deed names its building only where it stands
 import { guildTagText, GUILD_MOVE_MAX } from '../../net/guild/guildLaw.js';   // GUILD1d: a hall's tag, as a name wears it; HALL-GOLD: a deposit's cap, said
 import { GUILD_HALL_ENTRIES, GUILD_HALL_ENTRY_WORDS, guildHallPrice } from '../../net/hallLaw.js';   // GUILD1d: a guild's hall
 import { heraldryOf } from '../../net/heraldryLaw.js';   // GUILD1d: a hall's heraldry, off the town's answer
@@ -452,9 +452,13 @@ export const homeEntryLine = (entry) => `Who may enter: ${HOME_ENTRY_WORDS[entry
 export const homeSaleLines = (refund, rentDue = 0) => [rentDue > 0 ? `Sell your home for ${gold(refund)} gold, and the ${gold(rentDue)} gold of rent you have not collected?` : `Sell your home for ${gold(refund)} gold?`,   // AUDIT HOME-PRICE C3: the held rent the sale pays with it
   `The gold goes to ${EMPIRE_ACCOUNT_WORDS}. Anything left inside is lost.`,
   'Its placed decorations are sold too, for half their cost. Your own items go back to your pack.'];   // DECOR1e; DECOR2a
-/** HOME-CROSSED (FIELD BUGS 2026-09-30): a home customs carried in is never bought back online - the bank's own words for
- *  a crossed deed (RESTORE), and that it stays a home. The door says them and asks no price. */
-export const HOME_CROSSED_LINES = Object.freeze([...CROSSED_DEED_LINES, 'It stays your home.']);
+/** A home no realm record paid for is never bought back online (the service refuses its sale, 'home-crossed'), so the
+ *  door says why and asks no price. */
+export const HOME_CROSSED_LINES = Object.freeze([
+  'No realm character paid for that home.',
+  'The bank of the Empire does not buy it back.',
+  'It stays your home.',
+]);
 /** The sale said: the home's share, and (DECOR1e) its pieces' half, both into the Empire's account (EMPIRE-ACCOUNT). */
 export const homeSoldLine = (refund, piecesBack = 0, rent = 0) => `You sold your home. ${gold(refund + piecesBack + rent)} gold went to ${EMPIRE_ACCOUNT_WORDS}`
   + ([piecesBack > 0 ? `${gold(piecesBack)} of it for its placed pieces` : null, rent > 0 ? `${gold(rent)} of it rent you had not collected` : null].filter(Boolean).map((t, i) => (i ? ` and ${t}` : `, ${t}`)).join('')) + '.';   // HOME-RENT: the held rent named
@@ -527,7 +531,7 @@ export function createOnlineHomes({ api, character = () => null, now = () => Dat
             buildingKey: h.buildingKey, owner: h.owner,
             entry: HOME_ENTRIES.includes(h.entry) ? h.entry : HOME_ENTRY_DEFAULT,
             mine: h.mine === true, character: typeof h.character === 'string' ? h.character : null,
-            crossed: h.crossed === true,   // HOME-CROSSED: mine, carried in through customs - no sale
+            crossed: h.crossed === true,   // HOME-CROSSED: mine, but no realm record paid for it - no sale
             refund: Number.isSafeInteger(h.refund) && h.refund >= 0 ? h.refund : null,   // HOME-PRICE: mine, what its sale pays back
             rentDue: Number.isSafeInteger(h.rentDue) && h.rentDue > 0 ? h.rentDue : 0,   // AUDIT HOME-PRICE C3: and the rent held on it
             // HOME-RENT: rooms free to rent (how many, from what a day), and the playing character's tenancy's end
@@ -680,7 +684,7 @@ export function createOnlineHomes({ api, character = () => null, now = () => Dat
     if (r?.ok) {
       const had = towns.get(id)?.homes.get(buildingKey);
       // HOME-PRICE: and what its sale pays back, as the service answers it (AUDIT HOME-PRICE C2: a claim answered as mine
-      // already says the first one's - or that customs carried it in, `crossed`); an older service's answer says neither,
+      // already says the first one's - or that no record paid for it, `crossed`); an older service's answer says neither,
       // and the price this claim named stands for it until the town is read again
       const crossed = r.data?.crossed === true;
       const refund = crossed ? null : Number.isSafeInteger(r.data?.refund) && r.data.refund >= 0 ? r.data.refund : homeRefund(price);
@@ -800,7 +804,7 @@ export function createOnlineHomes({ api, character = () => null, now = () => Dat
 // heard of it: the knight was offered their own house, and every other player the same - whose claim then took it. Online
 // the bank sells no house (HOME1), so a deed the realm gave is the order's gift. Now a building such a deed names is never
 // for sale to its owner (realmDeedAt, at the door), and the service holds it from everyone else (holdDeed - at the grant,
-// and at every boot for a deed from before). A deed customs carried in is an offline house and stays HOME1's.
+// and at every boot for a deed from before).
 
 /** Whether the character's own deed - one the realm gave (homeDeedOf), standing (banking.js deedStands: its town in the
  *  layout it was given in) - names this town's building: it is that character's house, never for sale to it. */

@@ -421,12 +421,11 @@ const service = () => {
 };
 const nowS = () => Math.floor(Date.now() / 1000);
 
-test('TERMS1: the migration adds what an agreement is - two versions and a moment, nothing else', () => {
-  const sql = read('server-account/migrations/0023_terms.sql');
-  const added = [...sql.matchAll(/^ALTER TABLE players ADD COLUMN (\w+) (\w+);$/gm)].map((m) => `${m[1]} ${m[2]}`);
-  assert.deepEqual(added, ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
-  assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), /DEFAULT|NOT NULL|UPDATE /i,
-    'every row made before it keeps NULL - those accounts were never asked, and no default invents that they were');
+test('TERMS1: a player\'s row holds what an agreement is - two versions and a moment', () => {
+  const cols = d1()._raw.prepare('PRAGMA table_info(players)').all().filter((c) => /^(terms_version|privacy_version|legal_accepted_at)$/.test(c.name));
+  assert.deepEqual(cols.map((c) => `${c.name} ${c.type}`), ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
+  assert.deepEqual(cols.map((c) => [c.notnull, c.dflt_value]), [[0, null], [0, null], [0, null]],
+    'a row nobody asked keeps NULL - no default invents an agreement');
 });
 
 test('TERMS1: the guest route opens NO row for a request that has not ticked the current documents (mutant: the guest route unasked)', async () => {

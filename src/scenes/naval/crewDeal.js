@@ -7,7 +7,6 @@
 // ═══════════════════════════════════════════════════════════════════
 import { crewSpare, crewRoom, signOffOrder } from '../../systems/naval/crewTrade.js';
 import { playerCrewCount } from '../../systems/naval/crewLife.js';
-import { fleetCrossed } from '../../systems/fleet.js';
 import { charterRecord } from '../../systems/naval/passage.js';   // AUDIT CREW-TRADE E1: a booked passage's boat
 
 /**
@@ -30,7 +29,7 @@ export function crewDealOf(boat, st, sync, companions) {
   function stands() {
     const crewed = !!boat?.crewed && d.maxCrew > 0;
     const hands = crewed ? sync(boat) : [];
-    const spare = crewSpare({ hull: boat.hull, crew: d.crew, hands, away: away(), crossed: !!boat.uid && fleetCrossed(boat.uid) });
+    const spare = crewSpare({ hull: boat.hull, crew: d.crew, hands, away: away() });
     return { crewed, charter: !!charterRecord(boat?.charter), crew: d.crew, maxCrew: d.maxCrew, fighting: !!st.inFight, room: crewRoom(d), spare: spare.n, why: spare.why };
   }
   return {

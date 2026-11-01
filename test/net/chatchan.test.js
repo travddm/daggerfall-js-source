@@ -11,13 +11,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  SOCIAL_ROOM, CHAT_ROOMS, CHAT_REGION_COUNT, CHAT_REGION_PREFIX, CHAT_LINE_CHANNELS, CHAN_RELAY_MIN, PARTY_CHAT_ROOM_HZ_MAX, CHAT_ROOM_HZ_MAX,
-  CHAT_HZ_MAX, CAST_BURST_MAX, chatRegionRoom, isChatRoom, isSocialRoom, relaySupportsChannels, parseClient, RELAY_VERSION, DROP_STRIKES_MAX,
+  SOCIAL_ROOM, CHAT_ROOMS, CHAT_REGION_COUNT, CHAT_REGION_PREFIX, CHAT_LINE_CHANNELS, PARTY_CHAT_ROOM_HZ_MAX, CHAT_ROOM_HZ_MAX,
+  CHAT_HZ_MAX, CAST_BURST_MAX, chatRegionRoom, isChatRoom, isSocialRoom, parseClient, RELAY_VERSION, DROP_STRIKES_MAX,
   PARTY_MAX, SEAT_ELSEWHERE,
 } from '../../src/net/wire.js';
 import {
   ChatLog, CHAT_TABS, CHAT_SAY_RANGE, CHAT_PEEK, CHAT_REGION_HOLD_MS, isOocText, oocText, inEarshot, localLineHeard, nextRegionRoom,
-  regionJoinedText, CHAN_OLD_RELAY_TEXT, partyNoteTab,
+  regionJoinedText, partyNoteTab,
 } from '../../src/net/chat.js';
 import { parseChatLine, CHANNEL_COMMANDS, HOST_COMMANDS, HELP_LINES, unknownCommandText, emptyCommandText, hostMisuseText } from '../../src/net/chatCommands.js';
 import { rosterRows, rosterTitle, partyRosterSource, localRosterSource } from '../../src/net/roster.js';
@@ -33,13 +33,13 @@ const quiet = (fn) => { const info = console.info, warn = console.warn; console.
 
 // ─── THE WIRE ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('CHAT-CHAN wire: one channel per politic region, whitelisted by enumeration; a line may name the party channel and nothing else; world102 is the first relay that routes either (world99 before the first merge, world101 before the sixth: main\'s world99, world100 and world101 route neither) (mutants: a region key off the end of the map; the whitelist a prefix test; an unknown channel falling through to the room; the version gate one high)', () => {
+test('CHAT-CHAN wire: one channel per politic region, whitelisted by enumeration; a line may name the party channel and nothing else (mutants: a region key off the end of the map; the whitelist a prefix test; an unknown channel falling through to the room)', () => {
   assert.equal(CHAT_REGION_COUNT, REGION_NAMES.length, 'the politic map\'s regions, all of them - the channel a player joins is PlayerGPS.CurrentRegionIndex\'s');
   assert.equal(CHAT_REGION_COUNT, 71);
   assert.equal(chatRegionRoom(0), `${CHAT_REGION_PREFIX}0`);
   assert.equal(chatRegionRoom(61), 'chat:region.61');
   for (const bad of [-1, 71, 1.5, NaN, null, undefined, '3']) assert.equal(chatRegionRoom(bad), null, `no region ${String(bad)}`);
-  assert.deepEqual([chatRegionRoom(64), chatRegionRoom(64, false), chatRegionRoom(61, false)], ['chat:region.64', null, 'chat:region.61']);
+  assert.equal(chatRegionRoom(64), 'chat:region.64');
   for (let i = 0; i < CHAT_REGION_COUNT; i++) assert.ok(isChatRoom(chatRegionRoom(i)), `region ${i}'s channel is one the relay opens`);
   assert.equal(CHAT_ROOMS.size, 1 + CHAT_REGION_COUNT + 16 + 62 * 4 + 15 + 2);
   for (const bad of ['chat:region.71', 'chat:region.-1', 'chat:region.01', 'chat:region.x', 'chat:party.q123']) assert.equal(isChatRoom(bad), false, `${bad}: a list, not a prefix (AUDIT CHAT A1)`);
@@ -51,14 +51,7 @@ test('CHAT-CHAN wire: one channel per politic region, whitelisted by enumeration
   assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: ' hi party ', ch: 'party' }), hello), { t: 'chat', text: 'hi party', ch: 'party' });
   for (const ch of ['clan', 'world', '', null, 7, ['party']]) assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: 'hi', ch }), hello), { error: 'bad chat' }, `ch ${JSON.stringify(ch)}: refused whole - never quietly the room's line`);
 
-  assert.equal(CHAN_RELAY_MIN, 102);
-  assert.equal(relaySupportsChannels('world101'), false, 'DISC12\'s relay (the last before the arc) projects `{t:\'chat\', text}` and would fan a party line to everyone');
-  assert.equal(relaySupportsChannels('world102'), true);
-  assert.equal(relaySupportsChannels('world120'), true);
-  for (const bad of [null, undefined, '', 'world', 'World102', 'world102x', 102]) assert.equal(relaySupportsChannels(bad), false);
-  assert.ok(relaySupportsChannels(RELAY_VERSION), 'this build\'s own relay routes them');
   assert.ok(PARTY_CHAT_ROOM_HZ_MAX >= CHAT_ROOM_HZ_MAX, 'the parties\' budget is at least the room\'s: many small fans, not one of everyone');
-  assert.match(CHAN_OLD_RELAY_TEXT, /server's next update/, 'a tab the relay cannot carry says why, in the player\'s words');
 });
 
 // ─── THE RELAY ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -161,27 +154,20 @@ test('CHAT-CHAN relay: the parties\' own budget HOLDS - three parties of eight s
 
 // ─── THE SESSION ────────────────────────────────────────────────────────────────────────────────────────────────
 
-function hubLink(relayV = RELAY_VERSION) {
+function hubLink() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', presence: false, WebSocketImpl: FakeWS, now: () => t });
   const heard = []; s.onChat = (line) => heard.push(line);
   quiet(() => s.join(SOCIAL_ROOM));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: null, world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: null, world: null, v: RELAY_VERSION }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'chat');
   return { s, ws, heard, out, tick: (ms) => { t += ms; } };
 }
 
-test('CHAT-CHAN session: a party line goes only to a relay that routes it (the welcome\'s version), names its channel on the wire, and a channel the wire does not know is refused at home; a line coming in carries the relay\'s channel word, or none (mutants: the gate on the version dropped; `ch` sent on a plain line; an unknown channel sent; a forged channel word believed)', () => {
-  const old = hubLink('world100');
-  assert.equal(old.s.chanOk, false);
-  assert.equal(old.s.sendChat('psst', { ch: 'party' }), false, 'world100 would fan it to everyone online');
-  assert.equal(old.out().length, 0, 'nothing on the wire');
-  assert.equal(old.s.sendChat('hello all'), true, 'the World line is untouched');
-
+test('CHAT-CHAN session: a party line names its channel on the wire, and a channel the wire does not know is refused at home; a line coming in carries the relay\'s channel word, or none (mutants: `ch` sent on a plain line; an unknown channel sent; a forged channel word believed)', () => {
   const { s, heard, out, ws } = hubLink();
-  assert.equal(s.chanOk, true);
   assert.equal(s.sendChat('  psst  ', { ch: 'party' }), true);
   assert.deepEqual(out().at(-1), { t: 'chat', text: 'psst', ch: 'party' }, 'sanitized, and the channel named');
   assert.equal(s.sendChat('clan line', { ch: 'clan' }), false, 'no such channel: refused at home, never sent for the relay to close on');

@@ -122,13 +122,11 @@ export function shipSalePrice(worth, skills) {
 /**
  * WHY A SHIP CANNOT BE SOLD HERE, or null: `where` where she is (scenes/fleetHost.js whereIs - 'sailing', 'here',
  * 'laidup', 'away', 'packed'), `hold` the goods in her hold (her laid-up or packed cargo, or her own), `ashore` the hands of
- * hers at the player's side, `fighting` whether she is in a fight, `aboard` another player standing on her, `crossed`
- * whether she came into the realm through customs (systems/fleet.js fleetCrossed - kept, never sold). Pure.
- * @param {{ where: string, hold?: number, ashore?: number, fighting?: boolean, aboard?: number, atPort?: boolean, crossed?: boolean }} o
+ * hers at the player's side, `fighting` whether she is in a fight, `aboard` another player standing on her. Pure.
+ * @param {{ where: string, hold?: number, ashore?: number, fighting?: boolean, aboard?: number, atPort?: boolean }} o
  */
-export function saleRefusal({ where, hold = 0, ashore = 0, fighting = false, aboard = 0, atPort = true, crossed = false }) {
+export function saleRefusal({ where, hold = 0, ashore = 0, fighting = false, aboard = 0, atPort = true }) {
   if (!atPort) return SHIPYARD_TEXT.notPort;
-  if (crossed) return SHIPYARD_TEXT.crossed;
   if (where === 'sailing') return 'Step away from the helm first.';
   if (where === 'away') return 'Bring the ship to this port first. The shipmaster buys only what he can see.';
   if (where !== 'here' && where !== 'laidup' && where !== 'packed') return 'No such ship of yours here.';
@@ -146,7 +144,6 @@ export const SHIPYARD_TEXT = Object.freeze({
   bought: (name, port) => `${name} is yours, laid up at ${port || 'this port'}. Press Bring here to have it brought to the quay.`,
   boughtParts: (name) => `${name} are in your pack. Use them by the water to launch the ship.`,
   heavy: (name) => `${name} weigh more than you can carry. Lighten your pack first.`,
-  crossed: 'This ship came in through customs, so the shipmaster won\'t buy it. It stays yours.',
   sold: (name, gold) => `The shipmaster buys ${name} for ${Math.round(gold).toLocaleString('en-US')} gold.`,
   short: (gold) => `The shipmaster asks ${Math.round(gold).toLocaleString('en-US')} gold. You don't have enough.`,
   notPort: 'The shipmaster deals in ships at his own yard.',

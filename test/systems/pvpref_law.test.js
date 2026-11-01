@@ -17,7 +17,7 @@ import { pcaaoDamageModifier } from '../../src/combat/pcaao.js';
 import { rrDamageModifierClassic } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { WEAPON_REACH, SWING_MODS } from '../../src/combat/playerWeapon.js';
 import { NATIVES_PER_M } from '../../src/net/duel/duelSession.js';
-import { validSiegeIn, SIEGE_KINDS, SIEGE_OUT_KINDS, SIEGE_DMG_WIRE_MAX, SIEGE_HZ_MAX, relaySupportsSiege, parseClient } from '../../src/net/wire.js';
+import { validSiegeIn, SIEGE_KINDS, SIEGE_OUT_KINDS, SIEGE_DMG_WIRE_MAX, SIEGE_HZ_MAX, parseClient } from '../../src/net/wire.js';
 import { RENOWN_MAX } from '../../src/net/identityToken.js';
 import { runSpeed } from '../../src/player/motor.js';
 import { MAX_STAT_VALUE } from '../../src/systems/statMods.js';
@@ -80,7 +80,6 @@ test('PVP-REF THE ROOM AND VITALITY: `siege:<seat>:<week>`; 300 + 2 x Renown, th
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'in' }), { hasHello: true }), { t: 'siege', k: 'in' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'in' })), { error: 'siege before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'heal' }), { hasHello: true }), { error: 'bad siege' });
-  assert.deepEqual([relaySupportsSiege('world145'), relaySupportsSiege('world148')], [false, true]);
 });
 
 test('PVP-REF THE BLOW: both standing, the weapon the look holds, its kind its own (a bow a shaft), the reach (2.5 m and 3 of slack; a shaft 60), four a second (one second deep, spent first), a fighter just risen untouched; the damage clipped to the bucket and the vitality left; a fall at none (mutants: each refusal; the clip; the fall; the rate\'s refill)', () => {

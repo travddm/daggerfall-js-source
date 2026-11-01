@@ -84,8 +84,6 @@ export const PORTAL_TEXT = Object.freeze({
   get event() { return t('portal.refused.event', 'A portal cannot open this close to an event\'s gate.'); },
   gone: `The ${PORTAL_STONE.name} is no longer where you kept it.`,
   opened: (name) => `A portal to ${name} tears open. Step through before it closes.`,
-  /** PORTAL-GIFT (gateSpoils.js givePortalGift): said once the world stands. */
-  gift: (n) => `You have been given ${n} ${PORTAL_STONE.name}s. Use one to open a portal to anywhere on the map.`,
 });
 
 /** THE HOLDS, in the ladder's order: what keeps a portal shut - for its opener at the door and at the pick, and for

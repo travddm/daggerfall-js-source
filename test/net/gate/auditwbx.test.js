@@ -13,7 +13,7 @@ import {
 } from '../../../src/net/gate/gateBrain.js';
 import { mintReceipt, readReceipt, receiptValid, RECEIPT_TTL_S } from '../../../src/net/gate/gateReceipt.js';
 import { gateTimes, gateRoomKey } from '../../../src/net/gate/gateLaw.js';
-import { SOCIAL_ROOM, GATE_BRAIN_V, gateReceiptKey, relaySupportsGateSpent, GATE_SPENT_RELAY_MIN, validGateIn } from '../../../src/net/wire.js';
+import { SOCIAL_ROOM, GATE_BRAIN_V, gateReceiptKey, validGateIn } from '../../../src/net/wire.js';
 import { foldGate, GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { bossPlace, bossStandIn, bossLookOf, STAND_IN_WHOLE } from '../../../src/world/gate/gateBoss.js';
 import { telegraphShape, telegraphField } from '../../../src/render/gate/gateTelegraph.js';
@@ -108,8 +108,6 @@ test('AUDIT WBX S1 a spent receipt is said to the hub, which forgets its kept co
     assert.ok(later.sent.some((m) => m.t === 'welcome'), 'in');
     assert.equal(rc(later).length, 0, 'the next device is handed nothing');
   } finally { Date.now = realNow; }
-  assert.equal(GATE_SPENT_RELAY_MIN, 116);   // world114 on its branch - main's Enhanced Plus patch and GUILD1c took 114 and 115, neither hears it
-  assert.ok(relaySupportsGateSpent('world116') && !relaySupportsGateSpent('world115') && !relaySupportsGateSpent('world114'), 'never said to a relay that would close the socket on it');
   assert.equal(validGateIn({ k: 'spent', d: 3 }).d, 3);
 });
 

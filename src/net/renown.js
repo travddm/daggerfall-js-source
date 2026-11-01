@@ -21,7 +21,7 @@
 // (server-account/src/renownTracks.js) and never in the save. RENOWN1
 // kept a track a character; RENOWN-ACCOUNT made it
 // the account's for a day; RENOWN-CHAR gave each character its own back -
-// migration 0035: each track at what it held when Renown became the
+// each track at what it held when Renown became the
 // account's, plus everything the account earned while it was (Mac's
 // choice, "Own + recent gains"), and a realm character with no track yet
 // at those gains alone. RENOWN-ACCOUNT's slower grind stays (below).

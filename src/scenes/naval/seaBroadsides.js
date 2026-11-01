@@ -4,8 +4,8 @@
 // to the naval host (scenes/naval/navalHost.js `pvp` - its seams: my ship as the referee is told of her, the referee's word
 // laid on her, her wreck). The relay referees every word (net/sea/seaRef.js); this module says them and lays its answers.
 //
-//   - OPEN: online, in the open zone at sea (past Veilhaven's peace - systems/wild/etherWild.js ETHER_KIND), at a relay
-//     that referees the sea's guns (online.js `seaPvpOk`): my balls meet a stranger captain's ship (never my party's or my
+//   - OPEN: online, in the open zone at sea (past Veilhaven's peace - systems/wild/etherWild.js ETHER_KIND), where the
+//     relay referees the sea's guns: my balls meet a stranger captain's ship (never my party's or my
 //     guild's - world.js wildIsStranger), and a peer's are seen to meet another's (seen only: her own game is told).
 //   - MY HELM, said to the referee (`helm`) every SEA_HELM_SAY_MS, and whenever my ship, her hull or her toughness changes
 //     (at most every SEA_HELM_MIN_MS) - and that I have left her when I do. Wrecked in my own game, she is said at none

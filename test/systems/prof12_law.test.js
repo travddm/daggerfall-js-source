@@ -23,6 +23,7 @@ import {
 } from '../../src/net/professionLaw.js';
 import { recipeById, cookXp, firstCraftPays } from '../../src/net/recipeLaw.js';
 import { GROUP_TEMPLATE_INDICES } from '../../src/systems/item/itemTemplatesData.js';
+import { d1 } from '../accountDb.mjs';
 
 const TEMPLATES = JSON.parse(readFileSync(new URL('../../src/characters/itemTemplates.json', import.meta.url), 'utf8'));
 const tpl = (i) => TEMPLATES.find((t) => t.index === i);
@@ -116,7 +117,7 @@ test('PROF12 law: THE BREW - its potions (CRAFT-PAYS: two below Journeyman, two 
   const counts = [0, 49, 50, 99, 100].flatMap((r) => [null, 'brewer', 'distiller'].flatMap((sp) => [brewCount(r, sp), ...POTIONS.map((p) => brewCount(r, sp, p))]));
   assert.equal(Math.max(...counts), 3);
   assert.equal(Math.min(...counts), 1);
-  assert.match(src('server-account/migrations/0070_alchemy.sql'), /count +INTEGER NOT NULL CHECK \(count BETWEEN 1 AND 3\)/);
+  assert.match(d1()._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('prof_brews').sql, /count +INTEGER NOT NULL CHECK \(count BETWEEN 1 AND 3\)/);
   assert.deepEqual(POTENT, { expert: 10, master: 20, expertRank: 75, unbruised: 5, distiller: 10, apothecary: 10, pct: 25, masterPct: 40 });
   assert.deepEqual([0, 74, 75, 99, 100].map((r) => potentChance(r)), [0, 0, 10, 10, 20]);
   assert.equal(potentChance(0, { unbruised: 3 }), 15);

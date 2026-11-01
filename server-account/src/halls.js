@@ -24,8 +24,8 @@
 // share back into that part - so a hall is never a road from gold a
 // client named to gold a record holds. Bought and sold, the treasury
 // moves in ONE batch with the hall's row, each guarded; both or
-// neither. The ledger names why (`hall`, `hall-sale` - migration
-// 0043's `moved_kind`).
+// neither. The ledger names why (`hall`, `hall-sale` - the ledger's
+// `moved_kind`).
 //
 // ═══ HERALDRY ══════════════════════════════════════════════════════
 //

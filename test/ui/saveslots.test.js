@@ -7,14 +7,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  enumerateSaves, migrateLegacyQuicksave, firstFreeKey, saveInfoOf,
+  enumerateSaves, firstFreeKey, saveInfoOf,
   saveKeysOfCharacter, characterNames, findSave, findMostRecentSave,
   saveSlot, loadSlot, restorableSlot, mostRecentRestorable,
   screenshotOf, deleteSave, renameSave,
   quickSaveSlot, hasQuickSave, quickLoadSlot,
   SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, QUICK_SAVE_NAME,
 } from '../../src/systems/save/saveSlots.js';
-import { SAVE_VERSION, QUICKSAVE_KEY } from '../../src/systems/save/save.js';
+import { SAVE_VERSION } from '../../src/systems/save/save.js';
 
 // localStorage's shape over a Map (length + key(i) drive the sweep).
 function mockStorage(entries = {}, { failSet = null } = {}) {
@@ -124,32 +124,6 @@ test('SAV4: mostRecentRestorable walks recency and the F2 version gate together'
   assert.equal(mostRecentRestorable(mockStorage()), null);
 });
 
-test('SAV4: legacy dagger.quicksave migrates - written, VERIFIED, then removed', () => {
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero', classicMinutes: 777 });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  assert.equal(migrateLegacyQuicksave(s), true);
-  assert.equal(s.getItem(QUICKSAVE_KEY), null, 'the legacy key is gone');
-  const key = findSave('Old Hero', QUICK_SAVE_NAME, s);
-  assert.ok(key !== -1);
-  assert.equal(loadSlot(key, s).classicMinutes, 777);
-  assert.equal(saveInfoOf(key, s).dateAndTime.realTime, 0, 'no real stamp survives the legacy key');
-  // Enumeration runs it implicitly too.
-  const s2 = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  const { characterSaves } = enumerateSaves(s2);
-  assert.ok(characterSaves.has('Old Hero'));
-});
-
-test('SAV4: a quota failure leaves the legacy quicksave standing; a corrupt one is dropped', () => {
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero' });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy }, { failSet: (k) => k.startsWith(SAVE_DATA_PREFIX) });
-  assert.equal(migrateLegacyQuicksave(s), false);
-  assert.equal(s.getItem(QUICKSAVE_KEY), legacy, 'the old save is untouched');
-
-  const s2 = mockStorage({ [QUICKSAVE_KEY]: 'not json {' });
-  assert.equal(migrateLegacyQuicksave(s2), false);
-  assert.equal(s2.getItem(QUICKSAVE_KEY), null, 'nothing worth keeping');
-});
-
 test('SAV4: a failed NEW save leaves no orphan; a failed overwrite keeps the old slot whole', () => {
   // Info write fails on a NEW slot: the data written before it is
   // swept so no orphan blocks the key forever.
@@ -178,17 +152,6 @@ test('SAV4: a realTime TIE keeps the first-enumerated key (FindMostRecentSave is
   saveSlot('Alaric', 'A', snapOf('Alaric'), { storage: s, now: 100 });
   saveSlot('Alaric', 'B', snapOf('Alaric'), { storage: s, now: 100 });
   assert.equal(findMostRecentSave(s), 0, 'the tie is not stolen by the later key');
-});
-
-test('SAV4: migration trusts NOTHING - a silently dropped write keeps the legacy key', () => {
-  // Some browsers fail localStorage writes without throwing (private
-  // windows); the verify readback is the only guard that catches it.
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero' });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  const origSet = s.setItem.bind(s);
-  s.setItem = (k, v) => { if (!k.startsWith(SAVE_DATA_PREFIX)) origSet(k, v); };   // the data write silently vanishes
-  assert.equal(migrateLegacyQuicksave(s), false);
-  assert.equal(s.getItem(QUICKSAVE_KEY), legacy, 'the legacy save survives the lie');
 });
 
 // ═══════════════════ SAV4: the save/load window behaviors ═══════════════════

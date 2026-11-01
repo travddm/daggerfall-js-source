@@ -1,12 +1,11 @@
 // OWN1. A WORLD room (a dungeon, a building) streamed its host's foes alone: a joiner's foes frame was junk and,
 // past DROP_STRIKES_MAX of them, closed the socket for good, and every hit went to the host whatever `to` said. The
 // `own` frame is the room's second lane: any hello'd socket streams its OWN foes beside the host's, fanned as a cell's
-// are, and a hit marked `own` goes to the owner its `to` names. A client uses either only through a relay at
-// OWN_RELAY_MIN - an older one would strike it out. These pins execute the relay's Room on the fake Durable Object and
-// the session on the fake socket.
+// are, and a hit marked `own` goes to the owner its `to` names. These pins execute the relay's Room on the fake
+// Durable Object and the session on the fake socket.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseClient, frameCap, OWN_PREFIX, FOES_FRAME_MAX, WORLD_FRAME_MAX, MAX_FRAME_BYTES, CELL_FRAME_RECORDS_MAX, PIXEL_UNITS, OWN_RELAY_MIN, relaySupportsOwn, RELAY_VERSION } from '../../src/net/wire.js';
+import { parseClient, frameCap, OWN_PREFIX, FOES_FRAME_MAX, WORLD_FRAME_MAX, MAX_FRAME_BYTES, CELL_FRAME_RECORDS_MAX, PIXEL_UNITS } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
@@ -15,7 +14,7 @@ const at = (px, pz) => ({ x: px * PIXEL_UNITS + 10, y: 0, z: pz * PIXEL_UNITS + 
 const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);
 const rec = (i) => ({ i, t: 0, x: 0, f: [10, 0, 10], y: 1, h: 5, d: 0, a: 0, m: 0 });
 
-test('OWN1: the wire - an own frame is an object from a hello\'d socket, capped as the foes frame is and told by its prefix; the relay that knows it is OWN_RELAY_MIN', () => {
+test('OWN1: the wire - an own frame is an object from a hello\'d socket, capped as the foes frame is and told by its prefix', () => {
   assert.equal(frameCap(OWN_PREFIX + '...'), FOES_FRAME_MAX, 'the prefix admits the foes frame\'s size');
   const data = { n: 1, full: 1, f: [rec(1)] };
   assert.deepEqual(parseClient(JSON.stringify({ t: 'own', data }), { hasHello: true }), { t: 'own', data });
@@ -25,9 +24,6 @@ test('OWN1: the wire - an own frame is an object from a hello\'d socket, capped 
   const smuggled = `{"t":"world","data":{"pad":"${'p'.repeat(FOES_FRAME_MAX)}"},"t":"own"}`;
   assert.ok(smuggled.length < WORLD_FRAME_MAX);
   assert.equal(parseClient(smuggled, { hasHello: true }).error, 'frame too large', 'a world frame\'s prefix that parses as own keeps the own frame\'s cap (AUDIT WORLD A2)');
-  assert.equal(relaySupportsOwn('world113'), false); assert.equal(relaySupportsOwn('world117'), false, 'main\'s last relay before the merge knows no own frame'); assert.equal(relaySupportsOwn(`world${OWN_RELAY_MIN}`), true); assert.equal(relaySupportsOwn('whatever'), false);
-  assert.equal(relaySupportsOwn(RELAY_VERSION), true, 'this relay carries it - world121 since ONE-SEAT\'s merge (the Sigil Sets branch\'s AUDIT SET at world119, then PARTY-BUFFS, REST-OPT and the batch\'s audit at world120)');
-  assert.equal(OWN_RELAY_MIN, 118, 'AUDIT (cross-cutting F7): the own lane\'s first relay stays world118 - the re-aim to relaySupportsOwn(RELAY_VERSION) alone let it drift to any later number');
 });
 
 test('OWN1: the Room - in a dungeon and a building ANY hello\'d socket streams its own foes to everyone else (no strike), a frame past the record bound is junk, a cell has no such lane; a hit marked `own` goes to the owner `to` names, a plain one still to the host', async () => {
@@ -71,7 +67,7 @@ test('OWN1: the Room - in a dungeon and a building ANY hello\'d socket streams i
   assert.equal(a.meters.junk, 2, 'and the frame is junk');
 });
 
-test('OWN1: the session - streams its own foes only in a world room and only through a relay that knows the lane; hears a roster peer\'s; strikes a peer\'s own foe through `to`; hears an own blow that names it, host or not', () => {
+test('OWN1: the session - streams its own foes only in a world room; hears a roster peer\'s; strikes a peer\'s own foe through `to`; hears an own blow that names it, host or not', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => now });
@@ -80,15 +76,10 @@ test('OWN1: the session - streams its own foes only in a world room and only thr
   const info = console.info; console.info = () => {};
   try {
     const bob = { id: 'bob-0002', name: 'Bob', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 } };
-    s.join('dungeon:m187', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
-    let ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'bob-0002', world: null, v: 'world113' });
     const mine = { n: 1, full: 1, f: [] };
-    assert.equal(s.sendOwnFoes(mine), false, 'a relay behind the lane: nothing sent (it would strike it out)');
-    assert.equal(s.sendHit({ own: 1, to: 'bob-0002', i: 1, dmg: 3, kind: 'melee' }), false, 'nor an own blow');
     s.join('dungeon:m188', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
-    ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'bob-0002', world: null, v: `world${OWN_RELAY_MIN}` });
+    let ws = sockets.at(-1); ws.open();
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'bob-0002', world: null });
     now += 1000;
     assert.equal(s.isHost(), false);
     assert.equal(s.sendOwnFoes(mine), true, 'a joiner streams its own foes');
@@ -105,7 +96,7 @@ test('OWN1: the session - streams its own foes only in a world room and only thr
     assert.deepEqual(hitsIn.map(([id, d]) => [id, d.to ?? null]), [['bob-0002', 'mac-0001']], 'an own blow naming me lands though I do not host; one naming another, or a plain one while I do not host, does not');
     s.join('world:3,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
     ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: null, world: null, v: `world${OWN_RELAY_MIN}` });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: null, world: null });
     now += 1000;
     assert.equal(s.sendOwnFoes(mine), false, 'a cell streams through its foes frame, not this');
   } finally { console.info = info; }
@@ -147,7 +138,7 @@ test('AUDIT pre-merge O3/O4: the Room fans a peer\'s frame only as the bytes its
   assert.equal(a.meters.junk, 2);
 });
 
-test('AUDIT pre-merge O2 + O5: the session - a new socket waits for ITS welcome before its own stream (a reconnect to a relay rolled back behind the lane was closed on it); a HOST hears an own blow that names it too', () => {
+test('AUDIT pre-merge O2 + O5: the session - a new socket waits for ITS welcome before its own stream; a HOST hears an own blow that names it too', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => now });
@@ -159,7 +150,7 @@ test('AUDIT pre-merge O2 + O5: the session - a new socket waits for ITS welcome 
     const mine = { n: 1, full: 1, f: [] };
     s.join('dungeon:m187', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
     let ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null, v: `world${OWN_RELAY_MIN}` });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null });
     now += 1000;
     assert.equal(s.isHost(), true);
     assert.equal(s.sendOwnFoes(mine), true, 'a host streams its own lane beside its stream');
@@ -168,9 +159,9 @@ test('AUDIT pre-merge O2 + O5: the session - a new socket waits for ITS welcome 
     s.join('dungeon:m188', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
     ws = sockets.at(-1); ws.open();
     assert.equal(s.status, 'open', 'the socket is open ...');
-    assert.equal(s.sendOwnFoes(mine), false, '... but no welcome has named its relay: nothing on the own lane');
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'bob-0002', world: null, v: `world${OWN_RELAY_MIN}` });
+    assert.equal(s.sendOwnFoes(mine), false, '... but not welcomed yet: nothing on the own lane');
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'bob-0002', world: null });
     now += 1000;
-    assert.equal(s.sendOwnFoes(mine), true, 'its welcome names a relay that knows it');
+    assert.equal(s.sendOwnFoes(mine), true, 'once welcomed');
   } finally { console.info = info; }
 });

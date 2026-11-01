@@ -1,19 +1,17 @@
-// INTRO2: score, session ownership, transition and independent asset identity.
+// INTRO2: the title song's session, transition and independent asset identity.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { IntroTheme, audibleContextTime, INTRO_THEME_GAIN, MENU_THEME_GAIN } from '../../src/systems/introTheme.js';
+import { TitleMusic, titleSongName, audibleContextTime, MENU_MUSIC_LEVEL, TITLE_SONGS } from '../../src/systems/titleMusic.js';
 import { introTitleAt, introFrameAt, introCameraAt, INTRO_CREDITS, TITLE_IMPACT_TIME, TITLE_ENTER_TIME, TITLE_READY_TIME, LANDSCAPE_HOLD_TIME, TITLE_DEPTH, TITLE_BLUR, CREST_TIME } from '../../src/ui/intro/introCue.js';
 import { introTerrainGrid, introGroundGrid } from '../../src/ui/intro/introLandscape.js';
 import { seaDistance, BALFIERA } from '../../src/ui/intro/introMap.js';
 import { brandMark } from '../../src/ui/brandMark.js';
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url));
-/** INTRO-REVERT II: systems/introTheme.js as INTRO2 left it, before INTRO3's #906 and THEME-BUFFER. */
-const INTRO2_THEME_SHA256 = '6954cf4c01f2a32e098a08c4ae4edb81b00823573076fd1c74c2f9c5ac24c8ec';
 
-test('INTRO2: supplied logo and Mac\u2019s remastered recording are byte-exact; timing cannot drift behind a replacement track', () => {
+test('INTRO2: the supplied logo is byte-exact', () => {
   // BR4 shipped Mac's earlier cut as he supplied it
   // (real alpha; INTRO2's JPEG had a black backing to screen away). BR5
   // his DFO Online logo, its 800 x 600 file cut to the 526 x 322
@@ -22,24 +20,6 @@ test('INTRO2: supplied logo and Mac\u2019s remastered recording are byte-exact; 
   // file cut to the 1680 x 1410 its paint covers, then scaled to 1232 x 1034
   // at his word (the same 56:47; 785 KB where the cut was 1.28 MB).
   assert.equal(createHash('sha256').update(read('src/assets/branding/dfo-online.png')).digest('hex'), 'bf7a6bca77b6f29f31738a85545cd7fb51c3e91dce4df985a93c7874804b57a7');
-  const track = read('src/assets/intro/theme.mp3');
-  assert.equal(createHash('sha256').update(track).digest('hex'), 'c8eb0eccf3265244c0f4424d26efee835d40cccf4e11a66744ec4b284d8392e3');
-
-  // BR1 forbids the old name on any shipped surface, and the supplied master
-  // carried it in its ID3 title. ONLY that title was rewritten: the tag is
-  // reassembled frame for frame and the MPEG payload behind it is Mac's file
-  // bit for bit, which is what this second hash exists to prove. A re-encode
-  // or a trim would move it, and the cue above is measured off this recording.
-  // BR4 retitled it the same way, and BR5 again, and this hash did not move.
-  const tag = 10 + ((track[6] & 0x7f) << 21 | (track[7] & 0x7f) << 14 | (track[8] & 0x7f) << 7 | (track[9] & 0x7f));
-  assert.equal(createHash('sha256').update(track.subarray(tag)).digest('hex'), '3a1bc066e12951a6450b04649a2ffaa0b614c0848b520d033c2448b155bf56d7');
-  const header = track.subarray(0, tag).toString('latin1');
-  assert.ok(header.includes('DFO Online Main Theme'), 'the track titles itself by the product\u2019s name');
-  // Spelled in parts, so this assertion is not itself a surface BR1 or BR4 must sweep.
-  const gone = ['Daggerfall', 'JS', 'JavaScript', 'Enhanced', 'Online'];
-  for (const name of [`${gone[0]} ${gone[1]}`, `${gone[0]}${gone[1]}`, `${gone[0]} ${gone[2]}`, `${gone[0]} ${gone[3]}`, `${gone[0]} ${gone[4]}`, gone[0]]) {
-    assert.ok(!header.includes(name), `the old name survives in the ID3 tag: ${name}`);
-  }
 });
 
 test('INTRO4: the 19 s beat (decoded sample 230016 / 12000) is the crest; the logo lands on bar 16 at sample 592128 / 12000, and one frame earlier it is still out in front', () => {
@@ -84,7 +64,7 @@ test('INTRO2b: the camera is already at rest before the logo starts moving, so t
   }
 });
 
-test('INTRO2: the final title never auto-dismisses, including after the entire recording loops', () => {
+test('INTRO2: the final title never auto-dismisses, however long the player stays on it', () => {
   for (const time of [TITLE_READY_TIME + 1, 60, 165, 600]) {
     const st = introFrameAt(time);
     assert.equal(st.title.opacity, 1); assert.equal(st.title.y, 0);
@@ -141,83 +121,103 @@ test('INTRO2: generated mesh indices remain within the grid; INTRO4: the city\u2
   assert.ok(seaDistance(BALFIERA.x, BALFIERA.y) > 0);
 });
 
-test('INTRO-REVERT II: the theme plays on the context it had before INTRO3 - interactive, as INTRO2 built it (THEME-BUFFER undone)', () => {
-  const made = [];
-  const had = globalThis.AudioContext;
-  globalThis.AudioContext = class { constructor(o) { made.push(o); } };
-  try { new IntroTheme({ subscribe: () => () => {} }).makeContext(); }
-  finally { if (had === undefined) delete globalThis.AudioContext; else globalThis.AudioContext = had; }
-  assert.deepEqual(made, [{ latencyHint: 'interactive' }]);
-});
-
 test('INTRO2: audible clock uses the device timestamp, with a latency-aware fallback', () => {
   assert.equal(audibleContextTime({ currentTime: 10.2, getOutputTimestamp: () => ({ contextTime: 10, performanceTime: 10000 }) }, 10016), 10.016);
   assert.equal(audibleContextTime({ currentTime: 10.2, outputLatency: 0.2 }, 10016), 10);
   assert.equal(audibleContextTime({ currentTime: 10.2, outputLatency: 0.2, getOutputTimestamp: () => ({ contextTime: 0, performanceTime: 0 }) }, 10016), 10);
 });
 
-function audioRig() {
-  const events = [], sources = [];
-  let volume = 0.5, listener = null;
-  const gain = {
-    value: 1,
-    cancelAndHoldAtTime(t) { events.push(['hold', t]); },
-    linearRampToValueAtTime(v, t) { events.push(['ramp', v, t]); this.value = v; },
-  };
+test('the title song is Daggerfall Unity\u2019s title screen song, with the classic theme standing in for an archive without it', () => {
+  assert.deepEqual(TITLE_SONGS, ['5STRONG.HMI', '03.HMI']);
+  const archive = (names) => ({ getSongIndex: (n) => names.indexOf(n) });
+  assert.equal(titleSongName(archive(['03.HMI', '5STRONG.HMI'])), '5STRONG.HMI');
+  assert.equal(titleSongName(archive(['03.HMI'])), '03.HMI');
+  assert.equal(titleSongName(archive([])), null);
+  assert.equal(titleSongName(null), null, 'no archive: no song');
+});
+
+/** The shared AudioContext and the music service, as far as the title song uses them. */
+function musicRig({ data = true, archive = { getSongIndex: (n) => (n === '5STRONG.HMI' ? 7 : -1) } } = {}) {
+  const events = [];
   const ctx = {
-    currentTime: 10, state: 'suspended', outputLatency: 0.1, destination: {},
-    createGain: () => ({ gain, connect: () => events.push(['connectGain']), disconnect: () => events.push(['disconnectGain']) }),
-    decodeAudioData: async () => ({ duration: 164.5 }),
+    currentTime: 10, state: 'suspended', outputLatency: 0.1,
     resume() { events.push(['resume']); this.state = 'running'; return Promise.resolve(); },
     suspend() { this.state = 'suspended'; return Promise.resolve(); },
-    close() { events.push(['close']); this.state = 'closed'; return Promise.resolve(); },
-    createBufferSource() {
-      const s = { loop: false, connect: () => {}, start: at => events.push(['start', at]), stop: () => events.push(['stop']), disconnect: () => events.push(['disconnectSource']) };
-      sources.push(s); return s;
-    },
   };
-  const theme = new IntroTheme({ makeContext: () => ctx, readVolume: () => volume, now: () => 10000,
-    fetcher: async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(1) }),
-    subscribe: f => { listener = f; return () => { listener = null; events.push(['unsubscribe']); }; },
-  });
-  return { theme, ctx, gain, events, sources, volume: (v) => { volume = v; listener?.('Controls', 'MusicVolume'); } };
+  const sound = {
+    ctx: null,
+    ensureContext() { this.ctx = ctx; return ctx; },
+    ensure() { events.push(['sound.ensure']); return Promise.resolve(); },
+  };
+  const songs = {
+    archive: null, enabled: false, current: null,
+    ensure() { events.push(['songs.ensure']); this.archive = archive; this.enabled = !!archive; return Promise.resolve(); },
+    playSong(name) { events.push(['play', name]); this.current = name; return true; },
+    fadeTo(level, seconds) { events.push(['fade', level, seconds]); },
+    fadeOut() { events.push(['fadeOut']); this.current = null; },
+  };
+  const fetchBytes = async (name) => {
+    events.push(['read', name]);
+    if (!data) throw new Error(name + ': 404');
+    return new Uint8Array(0);
+  };
+  const music = new TitleMusic({ fetchBytes, sound, songs, now: () => 10000 });
+  return { music, ctx, events, songs };
 }
 
-test('INTRO2: unlock is synchronous within the gesture, audio is scheduled once, and menu ducking never restarts it', async () => {
-  const r = audioRig();
-  const unlocked = r.theme.unlock();
-  assert.ok(r.events.some(e => e[0] === 'resume'), 'resume before the first await');
-  await unlocked; await r.theme.prepare();
-  assert.equal(r.theme.start(), true); assert.equal(r.theme.start(), true);
-  assert.equal(r.sources.length, 1); assert.equal(r.sources[0].loop, true);
-  assert.ok(Math.abs(r.gain.value - 0.5 * INTRO_THEME_GAIN) < 1e-9);
-  r.theme.setLevel(MENU_THEME_GAIN, 1.1);
-  assert.deepEqual(r.events.at(-1), ['ramp', 0.5 * MENU_THEME_GAIN, 11.1]);
-  assert.equal(r.sources.length, 1); assert.equal(r.events.filter(e => e[0] === 'start').length, 1);
-  r.volume(0.2); assert.ok(Math.abs(r.gain.value - 0.2 * MENU_THEME_GAIN) < 1e-9);
-  r.volume(0); assert.equal(r.gain.value, 0, 'mute remains mute');
-  await r.theme.dispose(); await r.theme.dispose();
-  for (const event of ['close', 'stop', 'disconnectSource', 'disconnectGain', 'unsubscribe']) assert.equal(r.events.filter(e => e[0] === event).length, 1, event);
-  assert.equal(r.theme.buffer, null); assert.equal(r.theme.source, null);
-  assert.doesNotThrow(() => r.theme.time());
+test('the title song plays through the game\u2019s music service once the gesture runs the context, and the menu ducks it without restarting it', async () => {
+  const r = musicRig();
+  const unlocked = r.music.unlock();
+  assert.ok(r.events.some((e) => e[0] === 'resume'), 'resume before the first await');
+  assert.equal(await unlocked, true);
+  assert.equal(await r.music.prepare(), true);
+  assert.equal(r.music.start(), true); assert.equal(r.music.start(), true);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(r.events.filter((e) => e[0] === 'play'), [['play', '5STRONG.HMI']], 'played once');
+  assert.equal(r.music.song, '5STRONG.HMI');
+  r.music.setLevel(MENU_MUSIC_LEVEL, 1.1);
+  assert.deepEqual(r.events.at(-1), ['fade', MENU_MUSIC_LEVEL, 1.1]);
+  assert.equal(r.events.filter((e) => e[0] === 'play').length, 1, 'the duck does not restart the song');
+  await r.music.dispose(); await r.music.dispose();
+  assert.equal(r.events.filter((e) => e[0] === 'fadeOut').length, 1, 'a game chosen fades the song out once');
+  assert.doesNotThrow(() => r.music.time());
+});
+
+test('with no ARENA2 data the film still has its clock, and it plays silently', async () => {
+  const r = musicRig({ data: false });
+  await r.music.unlock();
+  assert.equal(await r.music.prepare(), true, 'the film does not wait for a song');
+  assert.equal(r.music.start(), true);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(r.events.filter((e) => e[0] === 'play').length, 0);
+  assert.equal(r.music.song, null);
+  r.ctx.currentTime = 12;
+  assert.ok(r.music.time() > 0, 'the film\u2019s time moves on the context');
+  await r.music.dispose();
+  assert.equal(r.events.filter((e) => e[0] === 'fadeOut').length, 0, 'nothing of its own to fade');
+  assert.equal(r.events.filter((e) => e[0] === 'songs.ensure' || e[0] === 'sound.ensure').length, 0,
+    'neither service boots without data, so the game boots them once the player picks it');
 });
 
 test('INTRO2: suspension holds the picture; resume uses audio progress instead of elapsed wall time', async () => {
-  const r = audioRig(); await r.theme.unlock(); await r.theme.prepare(); r.theme.start();
-  r.ctx.currentTime = 15; const before = r.theme.time();
-  await r.theme.pause(); assert.equal(r.theme.time(999999), before);
-  await r.theme.unlock(); r.ctx.currentTime = 15.2;
-  assert.ok(Math.abs(r.theme.time() - before - 0.2) < 1e-8);
-  await r.theme.dispose();
+  const r = musicRig(); await r.music.unlock(); await r.music.prepare(); r.music.start();
+  r.ctx.currentTime = 15; const before = r.music.time();
+  await r.music.pause(); assert.equal(r.music.time(999999), before);
+  await r.music.unlock(); r.ctx.currentTime = 15.2;
+  assert.ok(Math.abs(r.music.time() - before - 0.2) < 1e-8);
+  await r.music.dispose();
 });
 
-test('INTRO2: disposing during fetch prevents late audio and releases the loading context', async () => {
-  const r = audioRig(); let finish;
-  r.theme.fetcher = () => new Promise(resolve => { finish = resolve; });
-  const loading = r.theme.prepare(); await r.theme.dispose();
-  finish({ ok: true, arrayBuffer: async () => new ArrayBuffer(1) });
-  assert.equal(await loading, false); assert.equal(r.theme.start(), false);
-  assert.equal(r.theme.buffer, null); assert.equal(r.sources.length, 0);
+test('a front door let go before its song is ready starts no song', async () => {
+  const r = musicRig();
+  let finish;
+  r.songs.ensure = () => new Promise((resolve) => { finish = () => { r.songs.archive = { getSongIndex: () => 0 }; resolve(); }; });
+  await r.music.unlock(); await r.music.prepare(); r.music.start();
+  await r.music.dispose();
+  finish();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(r.events.filter((e) => e[0] === 'play').length, 0);
+  assert.equal(r.music.start(), false);
 });
 
 test('INTRO2: the shared logo has accessible text and its exact natural aspect ratio', () => {

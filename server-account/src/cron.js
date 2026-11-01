@@ -253,7 +253,7 @@ export const HOUR_JOBS = Object.freeze([
   // own, and the reviewer's old daily counts
   ['safety-sweep', (ctx) => safetySweep(ctx)],
   // STAFF-PANEL1: the staff audit log's rows past STAFF_AUDIT_KEEP_S -
-  // its trigger refuses a delete of any newer (migration 0144)
+  // its trigger refuses a delete of any newer
   ['staff-audit', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM staff_audit WHERE id IN (SELECT id FROM staff_audit WHERE at < ?1 LIMIT ?2)', ctx.nowS - STAFF_AUDIT_KEEP_S), SWEEP_ROWS)],
   // STAFF-PANEL3-REALM (design doc "Remove items": "keeps the item for 30 days so it can be put back"): a removal past its

@@ -1,5 +1,5 @@
 // NAME-AS: THE SERVICE'S HALF. The room reads the token's `n` (ACC1g: no client writes
-// it), so the choice is the account row's (`name_as`, migration 0111) and the mint signs it - the account's name, or the
+// it), so the choice is the account row's (`name_as`) and the mint signs it - the account's name, or the
 // realm character's own the token is minted for, where the wire carries it as it stands and it is no other account's
 // username (accounts.js wornNameOf); otherwise the account's, and the answer says why. And the two places a name stood
 // in for an account - a friend's letter, a board note's duel - find the account itself (letters.js `toAccount`,

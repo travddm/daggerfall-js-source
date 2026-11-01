@@ -30,7 +30,6 @@ group, so a read never cancels a waiting deploy.
 
 | Workflow | Writes? | What it does |
 | --- | --- | --- |
-| `realm-restore.yml` | Yes (dry run first) | Restores rows deleted by a past bug from D1 Time Travel. Holds the service in maintenance during the rewind. |
 | `realm-revive.yml` | Yes (dry run first) | Undoes one realm character's death from D1 Time Travel. Holds the service in maintenance during the rewind. |
 | `realm-rollback.yml` | Yes (dry run first) | Rolls one realm character back to its last clean save, through the review's own rollback. |
 | `guild-grant.yml` | Yes (dry run first) | Awards gold to one guild's treasury. |

@@ -1,12 +1,11 @@
 // SERPENT5 - THE OLD COIL'S HONOURS: the title COILBREAKER one dealing ship's serpent kill in twenty
 // and the aura THE MAELSTROM one in fifty, rolled by the account service on the kill's first write off its own draw (the
-// Hour's law, server-account/src/sds.js), laid on the row (`serpent_honours`, migration 0119) and held for good; said and
+// Hour's law, server-account/src/sds.js), laid on the row (`serpent_honours`) and held for good; said and
 // popped by the claim's carrier (net/serpent/serpentClaims.js); worn as every aura is, and drawn by the aura pass's ninth look
 // (render/auraRing.js): a whirlpool of tide and foam at the feet, its arms drawn IN, a lip of breaking foam, a curl at the
 // lip and spray thrown off it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { d1, standService } from '../../accountDb.mjs';
 import { createGuest } from '../../../server-account/src/accounts.js';
@@ -29,7 +28,6 @@ import {
 } from '../../../src/render/auraRing.js';
 import { glslFunctions, GlslDiscard } from '../../glsl.mjs';
 
-const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 const T0 = 1_800_000_000;
@@ -107,7 +105,7 @@ test('SERPENT5 THE CLAIM: a dealing ship\'s first write rolls the grants off its
   assert.deepEqual([stood.recorded, stood.title, stood.aura, rowOf(db, C.id).serpent_honours], [true, false, false, 0], 'a ship that stood: none, whatever its draw');
   const guest = await claim(db, both, G, await receipt(G.id, DAY, priv), pubKey);
   assert.deepEqual([guest.why, guest.title, rowOf(db, G.id).serpent_honours], ['guest', undefined, 0], 'a guest: never counted, never granted');
-  assert.match(src('server-account/migrations/0119_serpent_honours.sql'), /^ALTER TABLE players ADD COLUMN serpent_honours INTEGER NOT NULL DEFAULT 0;$/m);
+  assert.deepEqual({ ...db._raw.prepare("SELECT type, \"notnull\", dflt_value FROM pragma_table_info('players') WHERE name = 'serpent_honours'").get() }, { type: 'INTEGER', notnull: 1, dflt_value: '0' });
 });
 
 test('SERPENT5 HELD: Coilbreaker off the row\'s first bit, The Maelstrom off its second - a registered account\'s alone, each off its own bit; worn through the title\'s and the aura\'s doors (mutants: held off any bit; held by a guest)', () => {

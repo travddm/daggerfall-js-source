@@ -480,6 +480,14 @@ export class AudioEngine {
     }
   }
 
+  /** The shared context alone, made without reading DAGGER.SND. The front door's film needs a clock before the player
+   *  has picked any game data, and a boot with no data would keep the sound off after they pick it. Null with no
+   *  Web Audio. */
+  ensureContext() {
+    this._ensureCtx();
+    return this.ctx;
+  }
+
   /** AUDIT 19: the context is NOT gated on `enabled`. `enabled` means
    *  DAGGER.SND loaded, which is what SOUND EFFECTS need - music and the
    *  video player need only a clock, and gating the context on a sound

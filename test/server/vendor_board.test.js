@@ -10,7 +10,6 @@
 // (AUDIT LEAN-READS B5) every answer off a kept row held whole to the answer read afresh at the same second.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
 
 import { d1, T0 } from '../accountDb.mjs';
 import { marketVendors, vendorBoard, vendorBoardOf, vendorSpan, VENDOR_BOARD_READ, VENDOR_BOARD_KEEP, VENDOR_BOARD_SHAPE, VENDOR_BOARD_KEPT_S, VENDOR_NEWEST_SQL, VENDOR_HOUSES_SQL,
@@ -18,7 +17,6 @@ import { marketVendors, vendorBoard, vendorBoardOf, vendorSpan, VENDOR_BOARD_REA
 import { shapeOf, keptFits, KEPT_BOARD_MAX_BYTES } from '../../server-account/src/keptBoard.js';
 import { VENDOR_STATION, VENDOR_BOARD_SHOWN } from '../../src/net/vendorLaw.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const lcg = (seed) => { let x = seed % 2147483647 || 1; return () => (x = (x * 48271) % 2147483647) / 2147483647; };
 const ENV = { PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' };
 const REGIONS = [17, 23];
@@ -343,24 +341,17 @@ test('VENDOR-BOARD AUDIT LEAN-READS: a row of another shape is no board (B1); a 
   assert.equal(keptFits('é'.repeat(KEPT_BOARD_MAX_BYTES / 2), 'test'), true);
 });
 
-test('VENDOR-BOARD the writes that move a board are the database\'s own - every listing, trader, house and patron write of the region, by any route, a cascade or a sweep - and stand after every migration (mutant: a trigger dropped)', () => {
+test('VENDOR-BOARD the writes that move a board are the database\'s own - every listing, trader, house and patron write of the region, by any route, a cascade or a sweep - and stand (mutant: a trigger dropped)', () => {
   const { raw } = world();
   const triggers = raw.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'vendor_board_%' ORDER BY name").all().map((t) => t.name);
   assert.deepEqual(triggers, ['vendor_board_house', 'vendor_board_house_gone', 'vendor_board_house_in', 'vendor_board_listed', 'vendor_board_listing', 'vendor_board_patron', 'vendor_board_trader', 'vendor_board_trader_in', 'vendor_board_trader_out', 'vendor_board_unlisted']);
-  assert.match(src('server-account/migrations/0137_vendor_board.sql'), new RegExp(`'\\$\\.station'\\) END = '${VENDOR_STATION}'`), 'the station the board reads');
+  const traderIn = raw.prepare("SELECT sql FROM sqlite_master WHERE name = 'vendor_board_trader_in'").get()?.sql ?? '';
+  assert.match(traderIn, new RegExp(`'\\$\\.station'\\) END = '${VENDOR_STATION}'`), 'the station the board reads');
   // a piece whose place is not JSON is no piece (decor.js) - its write is never refused by a trigger asking its station
   raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, price, bought_at) VALUES (5, 5, 'p-ana', 'c', 'Ana', 17, 1, 1)").run();
   assert.doesNotThrow(() => raw.prepare("INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at, paid, yard) VALUES (5, 5, 'bad', 1, 'not json', 1, 0, 0)").run());
   assert.doesNotThrow(() => raw.prepare("UPDATE home_decor SET place = 'still not' WHERE id = 'bad'").run());
   assert.doesNotThrow(() => raw.prepare("DELETE FROM home_decor WHERE id = 'bad'").run());
-  const files = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f > '0137');
-  const LISTING_TRIGGERS = ['vendor_board_listed', 'vendor_board_listing', 'vendor_board_unlisted'];
-  for (const f of files) {
-    const s = src(`server-account/migrations/${f}`);
-    for (const [, t] of s.matchAll(/DROP TABLE (market_listings|home_decor|homes|market_patron_sales)\b/g)) {
-      assert.ok(t === 'market_listings' && LISTING_TRIGGERS.every((n) => s.includes(`CREATE TRIGGER IF NOT EXISTS ${n} `)), `${f} rebuilds ${t}, a table the board's triggers stand on - make them again in it`);
-    }
-  }
   // AUDIT LEAN-READS 2 B1: EVERY WRITE THE BOARD READS, AND WHICH REGIONS IT MOVES - each by name, those no route makes
   // today too (a listing or a trader deleted outright, an heir's house): the random oracle meets them too seldom to hold
   // them alone. And (B3) a write moves its region's version row, never the kept board's.

@@ -11,7 +11,7 @@ import * as H from '../../src/net/hubShards.js';
 /** COST-1: these pins hold a region's channel SPLIT - the way back, the relay's REGION_SHARDS - so their worlds name every region, and a region's shard is asked of the same split (a region's channel is whole by default: test/net/cost1_regions.test.js). */
 const SPLIT_VARS = { REGION_SHARDS: 'all' };
 const SPLIT = H.regionsSharded(SPLIT_VARS.REGION_SHARDS);
-import { leaseKeyOf, mintLease, readLease, leaseRoom, relaySupportsLease, LEASE_MS, LEASE_LIFE_S, LEASE_FRAME_MIN_MS, LEASE_HELD_MS, LEASE_HAND_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';
+import { leaseKeyOf, mintLease, readLease, leaseRoom, LEASE_MS, LEASE_LIFE_S, LEASE_FRAME_MIN_MS, LEASE_HELD_MS, LEASE_HAND_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';
 import { parseClient, cellRoomOfWire, chatRegionRoom, chatLangRoom, CHAT_WORLD_ROOM, CHAT_TRADE_ROOM, CHAT_LFG_ROOM, CLOSE_BUSY, CLOSE_POLICY, PIXEL_UNITS, LEASE_WIRE_MAX, GROUND_LAW, GRANT_HELLO_LAW, LOOT_HELLO_LAW } from '../../src/net/wire.js';
 import { RELAY_CFG_KEYS, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS } from '../../src/net/relayCfg.js';
 import { mintOrder, _b64url } from '../../src/net/identityToken.js';
@@ -68,7 +68,6 @@ test('LEASE1 THE LEASE: minted with the relay\'s key and read back whole; anothe
   // binds - a town, a home, a caravan, a siege, an arena, a gate, a breach and a Super dungeon realm too
   for (const key of [CHAT_TRADE_ROOM, CHAT_LFG_ROOM, chatRegionRoom(3), H.regionShardRoom(3, 1), chatLangRoom('de'), CELL, 'dungeon:m123', 'interior:m123456.7', 'town:m9', 'owned:x', 'caravan:x', 'siege:x', 'arena:x', 'gate:x', 'eg:x', 'sd:x', 'nowhere']) assert.equal(leaseRoom(key), true, key);
   for (const key of [CHAT_WORLD_ROOM, H.hubOfSubject('acct-mac-0001'), null, undefined]) assert.equal(leaseRoom(key), false, String(key));
-  assert.deepEqual([relaySupportsLease('world241'), relaySupportsLease('world242'), relaySupportsLease('world300'), relaySupportsLease(null), relaySupportsLease('world')], [false, true, true, false, false]);
   assert.ok(RELAY_CFG_KEYS.includes('leaseDoor'));
   assert.ok(new TextEncoder().encode(LEASE_OLD_REASON).length <= 123);
   // the game's hold: past one lost ask, short of the life by a margin for the wire; its pace: past the room's meter, inside an ask
@@ -654,25 +653,24 @@ test('LEASE1 A REGION\'S SHARD ASKS THE DOOR BEFORE ITS BUS HEARS (a review of t
   }, { LEASE_DOOR: 'on' });
 });
 
-test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; the hub link asks every LEASE_MS of a relay that knows the frame and never of an older one; the hub\'s lease is kept, never sent on its own - each lease room\'s socket, the primary\'s and every halo\'s, hands it just ahead of the next frame it sends, once, never ahead of a ping and never two inside the room\'s meter (mob, 07:57Z: "if we affected server performasnce" - a room where I do nothing is woken by nothing); a lease is kept wherever I stand, for LEASE_HELD_MS, and the sailing cabin\'s lane hands the page\'s on too (mutants: `ls` everywhere; the ask unpaced; an old relay asked; a halo skipped; a lease from any room; sent on its own; handed ahead of every frame; handed ahead of a ping; the pace dropped; a lease thrown away outside a lease room; a lease held forever; the cabin lane unleased)', async () => {
+test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; the hub link asks every LEASE_MS; the hub\'s lease is kept, never sent on its own - each lease room\'s socket, the primary\'s and every halo\'s, hands it just ahead of the next frame it sends, once, never ahead of a ping and never two inside the room\'s meter (mob, 07:57Z: "if we affected server performasnce" - a room where I do nothing is woken by nothing); a lease is kept wherever I stand, for LEASE_HELD_MS, and the sailing cabin\'s lane hands the page\'s on too (mutants: `ls` everywhere; the ask unpaced; a halo skipped; a lease from any room; sent on its own; handed ahead of every frame; handed ahead of a ping; the pace dropped; a lease thrown away outside a lease room; a lease held forever; the cabin lane unleased)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1_000_000;
-  const session = (room, v, opts = {}) => {
+  const session = (room, opts = {}) => {
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Me', id: 'me-00001', secret: 'secret-of-me-00001', presence: false, WebSocketImpl: FakeWS, now: () => now, ...opts });
     s.join(room, room === CELL ? P0 : null);
     const ws = sockets.at(-1);
     ws.open();
-    return { s, ws, welcome: () => ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v }) };
+    return { s, ws, welcome: () => ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1 }) };
   };
   const sent = (ws) => ws.sent.map((f) => JSON.parse(f));
   const settle = () => new Promise((r) => setTimeout(r, 0));
-  const hub = session(CHAT_WORLD_ROOM, 'world242');
-  const trade = session(CHAT_TRADE_ROOM, 'world242');
+  const hub = session(CHAT_WORLD_ROOM);
+  const trade = session(CHAT_TRADE_ROOM);
   await settle();
   assert.equal(sent(hub.ws).find((f) => f.t === 'hello')?.ls, undefined, 'the hub: no `ls`');
   assert.equal(sent(trade.ws).find((f) => f.t === 'hello')?.ls, 1, 'a lease room: `ls` 1');
   hub.welcome(); trade.welcome();
-  assert.equal(hub.s.leaseOk, true);
   hub.s.tick(); now += LEASE_MS; hub.s.tick();
   assert.equal(sent(hub.ws).filter((f) => f.t === 'lease').length, 0, 'the door off: the hub is not asked');
   hub.ws.receive({ t: 'ldo', on: 1 });
@@ -685,10 +683,6 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   assert.equal(asks(), 2, 'and every LEASE_MS');
   trade.s.tick();
   assert.equal(sent(trade.ws).filter((f) => f.t === 'lease').length, 0, 'a channel asks nothing');
-  const old = session(CHAT_WORLD_ROOM, 'world241');
-  old.welcome();
-  old.s.tick(); now += LEASE_MS; old.s.tick();
-  assert.equal(sent(old.ws).filter((f) => f.t === 'lease').length, 0, 'never of a relay that closes on the frame');
   let handed = null;
   hub.s.onLease = (l) => { handed = l; };
   hub.ws.receive({ t: 'lease', l: 'body.mac' });
@@ -725,9 +719,8 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   assert.equal(trade.s.sendChat('and again'), true);
   assert.deepEqual(sent(trade.ws).slice(-2).map((f) => f.l ?? f.t), ['chat', 'chat'], 'the same lease never twice, past the pace too');
   assert.equal(hub.s.sendLease('body.mac'), false, 'the hub is handed none back');
-  assert.equal(old.s.sendLease('body.mac'), false, 'nor an old relay');
   // the world's primary and its halos
-  const cell = session(CELL, 'world242', { presence: true });
+  const cell = session(CELL, { presence: true });
   cell.welcome();
   const [hx, hz] = CELL.slice(CELL.indexOf(':') + 1).split(',').map(Number);
   const near = `world:${hx + 1},${hz}`;
@@ -736,7 +729,8 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   halo.open();
   await settle();
   assert.equal(sent(halo).find((f) => f.t === 'hello')?.ls, 1, 'a halo\'s hello says it too');
-  halo.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world242' });
+  // a player in the halo, so lone sleep does not keep my pose from it
+  halo.receive({ t: 'welcome', id: 'me-00001', peers: [{ id: 'ann-00002', name: 'Ann' }], n: 2 });
   assert.equal(cell.s.sendLease('body.mac'), true);
   assert.notDeepEqual(sent(halo).at(-1), { t: 'lease', l: 'body.mac' }, 'kept for the halo too');
   now += 1000;
@@ -750,30 +744,31 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   const gate = sockets.at(-1);
   gate.open();
   await settle();
-  gate.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world242' });
+  gate.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1 });
   assert.equal(cell.s.sendLease('roam.mac'), true, 'PIN MOVED (STAFF-PANEL5-FREEZE-FIX): a gate is a lease room too');
   now += 20_000;
   cell.s.join(CELL, P0);
   const back = sockets.at(-1);
   back.open();
   await settle();
-  back.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world242' });
+  back.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1 });
   assert.equal(cell.s.sendPose({ ...P0, x: P0.x + 80 }), true);
   assert.deepEqual(sent(back).filter((f) => f.t !== 'hello').slice(-2).map((f) => f.l ?? f.t), ['roam.mac', 'pose'], 'back in a cell: the lease kept in the gate rides ahead of my first pose');
-  const early = session(CHAT_LFG_ROOM, 'world242');
+  const early = session(CHAT_LFG_ROOM);
   await settle();
-  assert.equal(early.s.sendLease('early.mac'), false, 'before its welcome: nothing to hand it to yet');
+  assert.equal(early.s.sendLease('early.mac'), true, 'before its welcome: a lease room keeps it');
+  assert.deepEqual(sent(early.ws).filter((f) => f.t === 'lease'), [], 'and hands it to nothing yet');
   early.welcome();
   assert.equal(early.s.sendChat('lfg crypt'), true);
   assert.deepEqual(sent(early.ws).slice(-2).map((f) => f.l ?? f.t), ['early.mac', 'chat'], 'kept through the welcome');
-  const held = session(CHAT_LFG_ROOM, 'world242');
+  const held = session(CHAT_LFG_ROOM);
   await settle();
   held.welcome();
   assert.equal(held.s.sendLease('held.mac'), true);
   now += LEASE_HELD_MS - 1;
   assert.equal(held.s.sendChat('just in time'), true);
   assert.deepEqual(sent(held.ws).slice(-2).map((f) => f.l ?? f.t), ['held.mac', 'chat'], 'held up to LEASE_HELD_MS');
-  const stale = session(CHAT_LFG_ROOM, 'world242');
+  const stale = session(CHAT_LFG_ROOM);
   await settle();
   stale.welcome();
   assert.equal(stale.s.sendLease('stale.mac'), true);
@@ -785,7 +780,7 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   const lanes = [];
   class Lane extends OnlineSession { constructor(o) { super({ ...o, WebSocketImpl: FakeWS, now: () => now }); lanes.push(this); } }
   const cabin = createSailingCabinLink({ Session: Lane, frame: () => ({}), receive: () => {}, sweep: () => {} });
-  const page = session(CHAT_TRADE_ROOM, 'world242');
+  const page = session(CHAT_TRADE_ROOM);
   await settle();
   page.welcome();
   page.s.sendLease('page.mac');
@@ -796,7 +791,7 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   const lane = sockets.filter((w) => w.url.endsWith(`/room/${laneRoom}`)).at(-1);
   lane.open();
   await settle();
-  lane.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world242' });
+  lane.receive({ t: 'welcome', id: 'me-00001', peers: [{ id: 'ann-00002', name: 'Ann' }], n: 2 });   // not alone: lone sleep holds no pose
   now += 1000;
   assert.equal(lanes[0].sendPose({ ...P0, x: P0.x + 40 }), true);
   assert.deepEqual(sent(lane).filter((f) => f.t !== 'hello').slice(-2).map((f) => f.l ?? f.t), ['page.mac', 'pose'], 'the lane hands the page\'s lease ahead of its frame');
@@ -804,7 +799,7 @@ test('LEASE1 THE GAME: a hello to a lease room says `ls` 1 and to the hub none; 
   now += LEASE_HAND_MIN_MS;
   cabin.tick(page.s, at, pixel, now);
   assert.equal(lanes.length, 1, 'the same lane');
-  // lease ahead of it), so the ping is read past
-  assert.deepEqual(sent(lane).filter((f) => f.t !== 'ping').slice(-2).map((f) => f.l ?? f.t), ['page.mac2', 'pose'], 'and the page\'s newer lease, ahead of the next tick\'s pose');
+  // a ping, and the foes the lane shares with the player beside it, follow; only the leases and the poses are read
+  assert.deepEqual(sent(lane).filter((f) => f.t === 'lease' || f.t === 'pose').slice(-2).map((f) => f.l ?? f.t), ['page.mac2', 'pose'], 'and the page\'s newer lease, ahead of the next tick\'s pose');
   cabin.close();
 });

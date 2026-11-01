@@ -19,7 +19,7 @@ import {
   toWelcome,
 } from '../../src/net/overworldLaw.js';
 import {
-  parseClient, validOwIn, validOwOut, owGate, owRoomGate, relaySupportsOverworld, OW_RELAY_MIN, OW_HZ_MAX, OW_BURST_MAX,
+  parseClient, validOwIn, validOwOut, owGate, owRoomGate, OW_HZ_MAX, OW_BURST_MAX,
   OW_ROOM_HZ_MAX, OW_KINDS, OW_LEDGER_KEY, OW_BAND_ID_RE, OW_RAIDER_ID_RE, owWireRow, cellOfRoom, isCellRoom, RELAY_VERSION,
   worldRoom, WORLD_CELL, PIXEL_UNITS, DROP_STRIKES_MAX, sharedClassicMinutes, wallMsForClassicMinutes, ONLINE_MINUTES_PER_MS,
 } from '../../src/net/wire.js';
@@ -272,7 +272,7 @@ test('SPAWN-REBIRTH relay law: a row is kept until its spawn stands again and no
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════
 
-test('OW6L wire: the `ow` word - after a hello, projected by validOwIn, the whole word refused for one bad entry or past its bound; a cell\'s frames and welcome halves projected by validOwOut, cut at the cell\'s bounds; the frames\' own bucket; the relay that keeps the ledger is world127 and this build\'s (mutants: a bound off by one; the relay floor below or above 127; a bad entry let through)', () => {
+test('OW6L wire: the `ow` word - after a hello, projected by validOwIn, the whole word refused for one bad entry or past its bound; a cell\'s frames and welcome halves projected by validOwOut, cut at the cell\'s bounds; the frames\' own bucket (mutants: a bound off by one; a bad entry let through)', () => {
   assert.deepEqual(OW_KINDS, ['sp', 'dg', 'gr']);
   assert.equal(OW_WORD_IDS_MAX, 8); assert.equal(OW_WORD_ROWS_MAX, 8); assert.equal(OW_CELL_SPENT_MAX, 64); assert.equal(OW_CELL_ROWS_MAX, 512);
   const sp = { t: 'ow', k: 'sp', ids: [bandIn(0), raiderIn()] }, dg = { t: 'ow', k: 'dg', rows: [[...S1, M0], [...S2, M0 - 5, M0]] };
@@ -309,10 +309,7 @@ test('OW6L wire: the `ow` word - after a hello, projected by validOwIn, the whol
   let rb = null, rpass = 0;
   for (let i = 0; i < OW_ROOM_HZ_MAX + 3; i++) { const g = owRoomGate(rb, 1000); rb = g.bucket; if (g.pass) rpass++; }
   assert.equal(rpass, OW_ROOM_HZ_MAX);
-  assert.equal(OW_RELAY_MIN, 127, 'world125 (VOICE1, reverted) and world126 (DISCORD-GATES\' branch) are never reused');
-  assert.deepEqual(['world124', 'world125', 'world126', 'world127', 'world130', 'junk', null].map(relaySupportsOverworld), [false, false, false, true, true, false, false]);
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.ok(relaySupportsOverworld(RELAY_VERSION), 'this build\'s relay keeps the ledger');
+  assert.equal(RELAY_VERSION, 'world282');
   assert.equal(OW_LEDGER_KEY, 'ow:led'); assert.ok(!OW_LEDGER_KEY.startsWith('world:'), 'never under the prefix a cell\'s alarm sweeps');
 });
 
@@ -453,27 +450,22 @@ test('OW6L relay: A SPEAKER BEHIND THE LEDGER is answered alone with the cell\'s
 
 // ═══ THE SESSION ═════════════════════════════════════════════════════════════════════════════════
 
-function sessionRig(room, relayV = RELAY_VERSION, welcome = {}) {
+function sessionRig(room, welcome = {}) {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const got = []; s.onOverworld = (msg, r) => got.push({ msg, r });
   quiet(() => s.join(room, { x: ON.x, y: 0, z: ON.z, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: relayV, ...welcome }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, ...welcome }));
   const out = (w = ws) => w.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'ow');
   return { s, ws, got, out, sockets, tick: (ms) => { t += ms; } };
 }
 
-test('OW6L session: sendOverworld says a word down the PRIMARY cell\'s socket alone, at a relay that keeps the ledger, through the cell\'s own law at home (an entry the cell would strike is never sent) and its bucket - answering the entries that went; a cell\'s frames and its welcome\'s halves reach onOverworld, a halo\'s too, and nothing from any other room (mutants: an old relay sent the frame that closes its socket; a halo\'s room used; the margin not asked at home; the welcome unread; a halo\'s welcome dropped)', () => {
-  const old = sessionRig(CELL, 'world126');
-  assert.equal(old.s.owOk, false);
-  assert.deepEqual(old.s.sendOverworld('sp', [bandIn(0)]), []);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('OW6L session: sendOverworld says a word down the PRIMARY cell\'s socket alone, through the cell\'s own law at home (an entry the cell would strike is never sent) and its bucket - answering the entries that went; a cell\'s frames and its welcome\'s halves reach onOverworld, a halo\'s too, and nothing from any other room (mutants: a halo\'s room used; the margin not asked at home; the welcome unread; a halo\'s welcome dropped)', () => {
   const place = sessionRig('dungeon:m123456');
   assert.deepEqual(place.s.sendOverworld('sp', [bandIn(0)]), [], 'a cell\'s word, never a place\'s');
-  const { s, ws, got, out, sockets, tick } = sessionRig(CELL, RELAY_VERSION, { ow: { sp: [bandIn(0), 'junk'], dg: [[...S1, M0 - 5]] } });
-  assert.equal(s.owOk, true);
+  const { s, ws, got, out, sockets, tick } = sessionRig(CELL, { ow: { sp: [bandIn(0), 'junk'], dg: [[...S1, M0 - 5]] } });
   assert.deepEqual(got, [{ msg: { k: 'sp', ids: [bandIn(0)] }, r: CELL }, { msg: { k: 'dg', rows: [[...S1, M0 - 5]] }, r: CELL }], 'the welcome\'s ledger, half by half, projected');
   assert.deepEqual(s.sendOverworld('sp', [bandIn(1), `b30.150.${lifeB()}`, 'junk', bandIn(1)]), [bandIn(1)], 'what the cell would strike stays home');
   assert.deepEqual(out().at(-1), { t: 'ow', k: 'sp', ids: [bandIn(1)] });
@@ -541,13 +533,12 @@ test('OW6L spawn ledger: merge MIN-MERGES a heard row - a row never met is made,
   assert.deepEqual(validOwIn({ k: 'dg', rows: [L.wireRow('100,200')] }), { k: 'dg', rows: [[100, 200, 40, 65]] }, 'the wire takes what the ledger says');
 });
 
-test('OW6L by source: the relay\'s arm spends its own bucket before it asks for a cell, and its welcome reads the ledger before it is built; the session reads its word\'s relay off the primary\'s welcome; the worker\'s graph grows by the law alone', () => {
+test('OW6L by source: the relay\'s arm spends its own bucket before it asks for a cell, and its welcome reads the ledger before it is built; the worker\'s graph grows by the law alone', () => {
   const relay = rd('server/src/index.js');
   assert.match(relay, /if \(!this\._spend\(ws, now, owGate, 'owBucket', 'owDrops', 'too many overworld frames'\)\) return;\n\s+if \(!isCellRoom\(a\.key\)\) \{ this\._junk\(ws\); return; \}/);
   assert.match(relay, /const ow = isCellRoom\(a\.key\) \? await this\._owWelcome\(Date\.now\(\)\) : '';/);
   assert.match(relay, /"host":\$\{JSON\.stringify\(host\)\}\$\{ow\},"world":\$\{world \?\? 'null'\},"now":\$\{Date\.now\(\)\},"v":/, 'the field before the memory, the clock (stamped as the welcome is built) and the version, which close the frame as they always have');
   const online = rd('src/net/online.js');
-  assert.match(online, /if \(primary\) this\.owOk = relaySupportsOverworld\(relayV\);/);
   const law = rd('src/net/overworldLaw.js');
   const from = [...law.matchAll(/\bfrom\s+'([^']+)'/g)].map((m) => m[1]);
   assert.deepEqual(from, ['./wire.js', './gate/gateLaw.js', './raid/raidLaw.js', './cellTree.js'], 'the relay\'s own files alone - never a systems or world module');   // PIN MOVED (COST-2): and the cell tree's law, a coarse node's square
@@ -579,20 +570,17 @@ function ledgerHost({ online, clockMin = M0, ms = T0 } = {}) {
   return { d, ...h };
 }
 
-test('OW6L host run: WHAT I SPEND AND MY SPAWNS\' CLOCKS ARE OWED TO THE CELL until it takes them - a spent band or raider, a spawn\'s first sight (and never a sight already in my ledger), its clear; said a second apart at most, what the cell did not take said again, nothing said to a relay that keeps no ledger (and nothing lost); a spent id of a life gone and a row owed too long let go (mutants: the first sight unsaid, the rest dropped, an old relay spoken to)', () => {
+test('OW6L host run: WHAT I SPEND AND MY SPAWNS\' CLOCKS ARE OWED TO THE CELL until it takes them - a spent band or raider, a spawn\'s first sight (and never a sight already in my ledger), its clear; said a second apart at most, what the cell did not take said again; a spent id of a life gone and a row owed too long let go (mutants: the first sight unsaid, the rest dropped)', () => {
   const sent = [];
   let take = Infinity;
-  const online = { owOk: false, room: CELL, sendOverworld: (k, payload) => { const went = payload.slice(0, take); sent.push([k, went]); return went; } };
+  const online = { room: CELL, sendOverworld: (k, payload) => { const went = payload.slice(0, take); sent.push([k, went]); return went; } };
   const h = ledgerHost({ online });
   const key = `${S1[0]},${S1[1]}`;
   h._spawnSeen(key);
   h._spawnSeen(key);
   h.owSaySpent(bandIn(0)); h.owSaySpent(bandIn(1)); h.owSaySpent(raiderIn());
   assert.deepEqual(h.owed(), { sp: [bandIn(0), bandIn(1), raiderIn()], dg: [key] }, 'owed: the three spent, the one first sight');
-  h.overworldLedgerFrame(10_000);
-  assert.deepEqual(sent, [], 'a relay that keeps no ledger is told nothing');
-  assert.equal(h.owed().sp.length, 3, 'and nothing is lost');
-  online.owOk = true; take = 1;
+  take = 1;
   h.overworldLedgerFrame(20_000);
   assert.deepEqual(sent, [['sp', [bandIn(0)]], ['dg', [[...S1, M0]]]], 'said: the cell takes one of each');
   h.overworldLedgerFrame(20_000 + h.OW_SAY_MS - 1);
@@ -610,16 +598,15 @@ test('OW6L host run: WHAT I SPEND AND MY SPAWNS\' CLOCKS ARE OWED TO THE CELL un
   assert.deepEqual(sent.at(-1), ['dg', [[...S1, M0, M0 + 30]]]);
   // let go: a spent id two lives gone; a row owed past OW_SAY_KEEP_MS
   const gone = `b44.142.${lifeB() - 2}`;
-  online.owOk = false;
   h.owSaySpent(gone); h.d.t = 50_000; h.owSayRow(key);
-  online.owOk = true; take = 0;
+  take = 0;
   h.overworldLedgerFrame(50_000 + h.OW_SAY_KEEP_MS + 1);
   assert.deepEqual(h.owed(), { sp: [], dg: [] }, 'both let go');
 });
 
 test('AUDIT SPAWN-REBIRTH F1 host run: A FIRST ENTRY MADE UNDERGROUND REACHES THE CELL - owed while my socket stands in the dungeon\'s room, where nothing is said, it is never let go there however long the run, and is said from the cell I come out in; its keep counted from there (mutants: let go underground; the keep counted from the entry)', () => {
   const sent = [];
-  const online = { owOk: true, room: 'dungeon:m123456', sendOverworld: (k, payload) => { if (!isCellRoom(online.room)) return []; sent.push([k, payload]); return payload; } };
+  const online = { room: 'dungeon:m123456', sendOverworld: (k, payload) => { if (!isCellRoom(online.room)) return []; sent.push([k, payload]); return payload; } };
   const h = ledgerHost({ online });
   const key = `${S1[0]},${S1[1]}`;
   h.d.t = 1_000;
@@ -635,7 +622,7 @@ test('AUDIT SPAWN-REBIRTH F1 host run: A FIRST ENTRY MADE UNDERGROUND REACHES TH
 });
 
 test('OW6L host run: THE CELL\'S WORD HEARD - a spent band is spent here and its chase ends, a spent raider too; a row min-merged into my spawn ledger, the Overworld\'s dungeons read again only when it moved (mutants: a band unspent, a raider taken for a band, the list never re-read)', () => {
-  const h = ledgerHost({ online: { owOk: true, room: CELL, sendOverworld: () => [] } });
+  const h = ledgerHost({ online: { room: CELL, sendOverworld: () => [] } });
   h.d._bandChase.set(bandIn(0), {}); h.d._bandPeer.set(bandIn(0), {}); h.d.tvRaid.chase.set(raiderIn(), {});
   h.overworldLedgerHeard({ k: 'sp', ids: [bandIn(0), raiderIn()] });
   assert.ok(h.d._bandSpent.has(bandIn(0)) && !h.d._bandChase.has(bandIn(0)) && !h.d._bandPeer.has(bandIn(0)), 'the band: spent, its chase ended');
@@ -661,7 +648,7 @@ test('OW6L END TO END: A spends a band and first sees a spawn; the relay\'s cell
     const a = r.connect(), b = r.connect();
     await r.hello(a, 'peer-0001', ON); await r.hello(b, 'peer-0002', ON);
     const pending = [];
-    const bridge = { owOk: true, room: CELL, sendOverworld: (k, payload) => { pending.push(say(a, k === 'sp' ? { k, ids: payload } : { k, rows: payload })); return payload; } };
+    const bridge = { room: CELL, sendOverworld: (k, payload) => { pending.push(say(a, k === 'sp' ? { k, ids: payload } : { k, rows: payload })); return payload; } };
     const A = ledgerHost({ online: bridge }), B = ledgerHost({ online: bridge }), C = ledgerHost({ online: bridge });
     const key = `${S2[0]},${S2[1]}`;
     A._spawnSeen(key); A.owSaySpent(bandIn(3));

@@ -18,7 +18,7 @@ import { mintReceipt, verifyReceipt, importReceiptKey } from '../../../src/net/g
 import { mintRaidReceipt, verifyRaidReceipt } from '../../../src/net/raid/raidReceipt.js';
 import { importPublicKeyB64 } from '../../../src/net/identityToken.js';
 import {
-  parseClient, validSerpentIn, validSerpentOut, relaySupportsSerpent, serpentGate, SERPENT_RELAY_MIN, SERPENT_HZ_MAX, SERPENT_KINDS,
+  parseClient, validSerpentIn, validSerpentOut, serpentGate, SERPENT_HZ_MAX, SERPENT_KINDS,
   SERPENT_OUT_KINDS, SERPENT_NO_WORDS, SERPENT_LEGS_MAX, SERPENT_MODES_MAX, SERPENT_ATTACKS, SERPENT_MODES, SERPENT_CHART_MAX,
   SERPENT_RECEIPT_WIRE_MAX, SERPENT_DMG_WIRE_MAX, SERPENT_FIGHT_KEY, serpentFightId, SOCIAL_ROOM, RELAY_VERSION, cellRoomOfWire, PIXEL_UNITS,
 } from '../../../src/net/wire.js';
@@ -27,7 +27,6 @@ import {
   SERPENT_ATTACK_BY_ID, SERPENT_TICK_MS, SERPENT_OPENING_MS, SERPENT_CLOSE_MS, FAN_R, ADMIT_R, SHIP_REF, SERPENT_TTK_S, SERPENT_DAMAGE_CHART_MAX, serpentStateOf, ZONES,
 } from '../../../src/net/serpent/serpentBrain.js';
 import { LEGS_KEPT, MODES_KEPT, MODE_NAMES } from '../../../src/net/serpent/serpentBody.js';
-import { relayVersionAtLeast } from '../../relayVersion.mjs';
 import { fakeRooms } from '../../fakeRoom.mjs';
 import worker from '../../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../../server-account/src/signing.js';
@@ -83,7 +82,7 @@ test('SERPENT1 receipt: minted by the relay, verified by its public half - the d
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════
 
-test('SERPENT1 wire: the client says five things - `in` with its day, law, level, hull and site, `hit` with a damage and where it struck, `wr` its ship wrecked or afloat, the coiled ship\'s `held` and `esc` - projected field by field after a hello alone; the first relay that holds a serpent is SERPENT_RELAY_MIN (mutants: an extra field carried; a hull past the table; a damage past the wire\'s bound; a wreck word not 0 or 1)', () => {
+test('SERPENT1 wire: the client says five things - `in` with its day, law, level, hull and site, `hit` with a damage and where it struck, `wr` its ship wrecked or afloat, the coiled ship\'s `held` and `esc` - projected field by field after a hello alone (mutants: an extra field carried; a hull past the table; a damage past the wire\'s bound; a wreck word not 0 or 1)', () => {
   assert.deepEqual(SERPENT_KINDS, ['in', 'hit', 'held', 'esc', 'wr', 'site', 'vt'], 'PIN MOVED (INT13): and her hull\'s word, `vt`, to the cell (test/net/int12_body_relay.test.js); PIN MOVED (SERPENT2): and `site`, to the hub alone (test/net/serpent/serpent2_herald.test.js) - the cell takes these six');
   const IN = { k: 'in', d: 363, bv: 1, lv: 20, hl: 4, sx: 205.5 * PIXEL_UNITS, sz: 285.5 * PIXEL_UNITS };
   assert.deepEqual(validSerpentIn({ ...IN, extra: 1 }), IN);
@@ -105,12 +104,7 @@ test('SERPENT1 wire: the client says five things - `in` with its day, law, level
   assert.deepEqual(parseClient(JSON.stringify({ t: 'serpent', ...IN }), { hasHello: true }), { t: 'serpent', ...IN });
   assert.equal(parseClient(JSON.stringify({ t: 'serpent', ...IN }), { hasHello: false }).error, 'serpent before hello');
   assert.equal(parseClient(JSON.stringify({ t: 'serpent', k: 'hit', d: -1, z: 0 }), { hasHello: true }).error, 'bad serpent');
-  // world172 at the audit, renumbered past main's WATCH-FIX at the merge),
-  // no longer the first that keeps a fight (SERPENT1's world165) - it fought an older brain on a release day
-  assert.equal(SERPENT_RELAY_MIN, 173);
-  assert.ok(relayVersionAtLeast(SERPENT_RELAY_MIN), 'the relay this tree builds holds a serpent');
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.ok(relaySupportsSerpent('world173') && !relaySupportsSerpent('world172') && !relaySupportsSerpent('world165') && !relaySupportsSerpent(undefined));
+  assert.equal(RELAY_VERSION, 'world282');
   let b = null, pass = 0;
   for (let i = 0; i < 40; i++) { const g = serpentGate(b, 1000); b = g.bucket; if (g.pass) pass++; }
   assert.equal(pass, SERPENT_HZ_MAX, 'the frames\' own bucket');

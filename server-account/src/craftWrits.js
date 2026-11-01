@@ -47,7 +47,7 @@ const recipesOf = (/** @type {string} */ product) => {
 
 /** SQL: the potions of `potion` a character's brews made that no crafting writ it filled has taken yet - EVERY brew a
  *  station made for it, its cauldron's goods from wherever they came (ANY-GOODS, FIELD BUGS 2026-10-26, the owner:
- *  "Crafting writs should work with even store bought ingredients" - migration 0145's `witnessed` is no longer asked).
+ *  "Crafting writs should work with even store bought ingredients" - the `witnessed` column is no longer asked).
  *  `p`, `c` the player's and the character's SQL; `potion` the recipe's name's,
  *  `product` the writ's - BOUND, never a column: AUDIT CRAFT-WRITS S1 - written as `craft_writs.product` inside the
  *  decision's UPDATE, SQLite read it as the subquery's own row's, and every writ the character had filled, of any
@@ -58,7 +58,7 @@ export const brewedLeftSql = (p, c, potion, product) => `(COALESCE((SELECT SUM(c
 /** SQL: a crafted piece (`pv`, a provenance's SQL) that may fill a writ - the account's (a sold one is its buyer's), this
  *  character's make (`c` - a piece bought on the market keeps its maker's), of an answering recipe (`recipes`, a JSON
  *  array's SQL), on no listing, auction, road or home, nor on its way back - and never BOUGHT with gold since (a gold
- *  purchase's wall: `bought_with` 'gold' with `loose` 0, migration 0142). ANY-GOODS (FIELD BUGS 2026-10-26): a piece made
+ *  purchase's wall: `bought_with` 'gold' with `loose` 0). ANY-GOODS (FIELD BUGS 2026-10-26): a piece made
  *  of goods from the pack (looted, or bought with gold - AUDIT BAG-CRAFT A1's wall, `loose` 1) fills a writ as any other
  *  of its make. AUDIT CRAFT-WRITS T2: `bought_with` 'marks' is a piece made of goods bought for silver (AUDIT PROF-541 B7). */
 const pieceOkSql = (p, c, pv, recipes) => `EXISTS (SELECT 1 FROM products pk WHERE pk.provenance = ${pv} AND pk.owner = ${p} AND pk.char_id = ${c}

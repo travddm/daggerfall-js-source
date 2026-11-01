@@ -117,3 +117,12 @@ weapon-glow-probe/
 ._*
 Thumbs.db
 desktop.ini
+
+# The vendored mods' files their authors publish on GitHub. tools/fetch-vendor.sh fetches them at pinned commits.
+# Each folder's README.md and the files that differ from the published repository stay tracked.
+/vendor/*/.fetched-vendor
+/vendor/better-ambience/Sound/
+/vendor/immersive-footsteps/*
+!/vendor/immersive-footsteps/README.md
+/vendor/meanerMonsters/MeanerMonsters.dfmod.json
+/vendor/unleveledLoot/modsettings.json

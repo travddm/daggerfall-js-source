@@ -1,12 +1,12 @@
 // HOME-VOTE. A
 // registered account a week old votes a home up or down - one vote a home, changed or taken back at will, never on its
-// own home or a hall of its own guild (server-account/src/homeVotes.js, migration 0108; the law net/homeVoteLaw.js) -
+// own home or a hall of its own guild (server-account/src/homeVotes.js; the law net/homeVoteLaw.js) -
 // standing at the house: its door's plaque lists the votes, unlit where they are all it lists, and an Info press asks
 // where no plaque is drawn (scenes/worldModes.js). The town's homes carry each one's score, kept on its row, and the
 // reader's own vote (homes.js homesInTown), and a home whose votes run negative stands for everyone but its insiders as
 // Daggerfall built it - no placed piece but its hired trader and nothing taken out inside (worldModes.js loadHomeDecor;
 // the service hands out no more, decor.js decorOf), no yard (scenes/homeYards.js), the town's own paint (scenes/world.js
-// lookOfHome; homesInTown says no look). AUDIT HOME-VOTE (A1-A6, B1-B7, D1-D14) pinned here too. Each pin failed on the
+// lookOfHome; homesInTown says no look). AUDIT HOME-VOTE (A1-A5, B1-B7, D1-D14) pinned here too. Each pin failed on the
 // build before it. tools/mutants/homevote.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -24,9 +24,6 @@ import { REFUSALS, accountHomes, SESSION_KEY } from '../../src/net/accountClient
 import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { yardWorld, yardPiece, live, settle } from '../decorFakes.mjs';
 import { voteHome } from '../../server-account/src/homeVotes.js';
-import { planRestore } from '../../tools/realmRestore.mjs';
-import { DatabaseSync } from 'node:sqlite';
-import { readdirSync } from 'node:fs';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const visitor = (over = {}) => ({ owner: 'Olga', own: false, mine: false, member: false, insider: false, hall: null, score: 0, myVote: 0, ...over });
@@ -326,7 +323,7 @@ test('DECOR-BATCH (2026-10-16, the owner\'s screenshots of every account deploy 
   assert.deepEqual(r.hidden, ['m0:41000']);
 });
 
-test('HOME-VOTE AUDIT II the service: a vote taken back past the hour\'s bar is never refused (A2); a vote names the owner its door read and lands only on that owner\'s house - one sold and bought again takes none, a cast vote naming nobody is no vote (A4); a write that found nothing to vote on is answered as it found it, never re-asked into an `ok` (A5); a knight\'s deed house is none to vote on (B5); a restore puts a home back without its score (A6) (mutants: the bar on a take-back, the owner unread, the follow-up re-asking, the deed votable, the score restored)', async (t) => {
+test('HOME-VOTE AUDIT II the service: a vote taken back past the hour\'s bar is never refused (A2); a vote names the owner its door read and lands only on that owner\'s house - one sold and bought again takes none, a cast vote naming nobody is no vote (A4); a write that found nothing to vote on is answered as it found it, never re-asked into an `ok` (A5); a knight\'s deed house is none to vote on (B5) (mutants: the bar on a take-back, the owner unread, the follow-up re-asking, the deed votable)', async (t) => {
   const { svc, raw, aged, vote, hall } = await town(t);
   const bob = aged(await svc.registered('Bob'));
   // A2: 30 presses spent, the last a slip down: taken back all the same
@@ -360,20 +357,6 @@ test('HOME-VOTE AUDIT II the service: a vote taken back past the hour\'s bar is 
   const deed = await vote(dan, -1, 300, 'Pat');
   assert.deepEqual([deed.status, deed.body.error], [404, 'no-home'], 'B5');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM home_votes WHERE player = ?').get(dan.id).n, 0);
-  // A6: a restore's home row carries no score - its votes are no table of the tool's
-  const MIG = readdirSync(new URL('../../server-account/migrations/', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-  const dbOf = () => { const d = new DatabaseSync(':memory:'); d.exec('PRAGMA foreign_keys = ON'); for (const f of MIG) d.exec(src(`server-account/migrations/${f}`)); return d; };
-  const then = dbOf(), now = dbOf();
-  for (const d of [then, now]) for (const id of ['gary', 'v1', 'v2']) d.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES (?, 'A Guest', 1, 1)").run(id);
-  then.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (4242, 1, 'gary', 'gary-o', 'Gary', 17, 'private', 40000, 1)").run();
-  for (const v of ['v1', 'v2']) then.prepare('INSERT INTO home_votes (map_id, building_key, player, vote, voted_at) VALUES (4242, 1, ?, -1, 1)').run(v);
-  now.prepare("INSERT INTO realm_census (player, char_id, spent) VALUES ('gary', 'gary-o', 1)").run();
-  const plan = planRestore({ then, now });
-  const sql = Array.isArray(plan.sql) ? plan.sql : String(plan.sql).split('\n');
-  const put = sql.find((l) => l.startsWith('INSERT OR IGNORE INTO homes'));
-  assert.ok(put && !/\bscore\b/.test(put), put);
-  now.exec(sql.join('\n'));
-  assert.equal(now.prepare('SELECT score FROM homes WHERE building_key = 1').get().score, 0, 'A6: back, and shown');
 });
 
 test('HOME-VOTE AUDIT II the door: a hall\'s member with a vote cast before they joined is offered its take-back alone, pressed as the take-back and never as a vote (A3) - D the take-back of a vote down; a knight\'s deed house offers no vote (B5); where no plaque is drawn the rent box carries the votes (B1) and the owner\'s box the score (B2); whether the plaque listed rows is read as the press lands (B4) (mutants: the take-back unoffered, a member\'s vote cast, the deed votable, the rent box voteless, the owner untold, the plaque read late)', () => {

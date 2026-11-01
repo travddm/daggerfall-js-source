@@ -12,7 +12,7 @@ import { TITLES, GLYPHS, claimsValid, mintToken, verifyToken, importPublicKeyB64
 import { TITLE_TEXT, TITLE_RGBA, GLYPH_RGBA, GLYPH_MARK, GLYPH_PATH, GLYPH_STROKE, FONT_GLYPH_MIN, FONT_GLYPH_MAX, cssRgba, titleBadge, glyphBadges } from '../../src/ui/playerBadge.js';
 import { GLYPH_LABEL } from '../../src/ui/enhanced/enhancedAccount.js';
 import { titlesHeld, glyphsOf, equipRefusal, titleWorn, aurasHeld, auraWorn, canModerate, TIER_LISTS, TIER_GLYPH, FOUNDER_UNTIL } from '../../server-account/src/titles.js';
-import { parseClient, dmGate, redGate, DM_HZ_MAX, RED_HZ_MAX, DM_RELAY_MIN, relaySupportsDm, RELAY_VERSION, readBadge } from '../../src/net/wire.js';
+import { parseClient, dmGate, redGate, DM_HZ_MAX, RED_HZ_MAX, readBadge } from '../../src/net/wire.js';
 import { HOST_COMMANDS, parseChatLine } from '../../src/net/chatCommands.js';
 import { ChatLog } from '../../src/net/chat.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -207,15 +207,10 @@ test('TITLE-N relay: the Dungeon Master is rated on a bucket of its own - not ch
 
 // ── /dm AT HOME ─────────────────────────────────────────────────────
 
-test('TITLE-N session: /dm goes only to a relay that carries it (world104) as {t:\'narrate\'}, under its own gate; a {t:\'dm\'} in is handed on with no speaker (mutants: sent to an older relay; the frame named say; the line given an id)', () => {
-  assert.equal(DM_RELAY_MIN, 104);
-  assert.equal(relaySupportsDm('world103'), false, 'an older relay closes the socket on the frame');
-  assert.equal(relaySupportsDm(RELAY_VERSION), true, 'this relay carries it');
+test('TITLE-N session: /dm goes as {t:\'narrate\'}, under its own gate; a {t:\'dm\'} in is handed on with no speaker (mutants: the frame named say; the line given an id)', () => {
   const s = new OnlineSession({ url: 'wss://example.test', name: 'SquidKamer', id: 'peer-0001', secret: 'x'.repeat(32), presence: false });
   const out = [];
   s._send = (f) => { out.push(f); return true; };
-  assert.equal(s.sendDm('The door groans open.'), false, 'not before the welcome says the relay carries it');
-  s.dmOk = true;
   assert.equal(s.sendDm('The door groans open.'), true);
   assert.deepEqual(out, [{ t: 'narrate', text: 'The door groans open.' }]);
   assert.equal(s.sendDm('again'), false, 'the gate, run at home first');

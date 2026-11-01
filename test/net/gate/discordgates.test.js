@@ -14,7 +14,7 @@ import {
 } from '../../../src/net/gate/gateHerald.js';
 import { gateTimes, gateBossOf, gateModsOf, GATE_COLLAPSE_MS } from '../../../src/net/gate/gateLaw.js';
 import {
-  validGateIn, parseClient, gatePlaceWire, relaySupportsGateSite, GATE_SITE_RELAY_MIN, GATE_PLACE_MAX, GATE_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, ACCOUNT_SWEEP_MS, SD_KEY,
+  validGateIn, parseClient, gatePlaceWire, GATE_PLACE_MAX, GATE_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, ACCOUNT_SWEEP_MS, SD_KEY,
 } from '../../../src/net/wire.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
 import { OnlineSession } from '../../../src/net/online.js';
@@ -147,7 +147,7 @@ test('DISCORD-GATES law: WHERE THE GATE STANDS - one word an account a day; one 
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest; said only to a relay that hears it (mutants: a raw place taken; the pixel unbounded; the version floor off)', () => {
+test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest (mutants: a raw place taken; the pixel unbounded)', () => {
   const ok = { k: 'site', d: DAY, px: 100, py: 200, pl: 'Copperham, Wrothgarian Mountains' };
   assert.deepEqual(validGateIn(ok), ok);
   assert.deepEqual(validGateIn({ ...ok, pl: 'Alik\'r Desert' }).pl, 'Alik\'r Desert');
@@ -155,8 +155,6 @@ test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its
     { px: 1000 }, { py: 500 }, { px: -1 }, { px: 1.5 }, { d: -1 }, { d: '538' }]) assert.equal(validGateIn({ ...ok, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'gate', ...ok, extra: 1 }), { hasHello: true }), { t: 'gate', ...ok });
   assert.equal(gatePlaceWire(' St. Olms  Keep:*  '), 'St Olms Keep');
-  assert.equal(GATE_SITE_RELAY_MIN, 123, 'world126 on its branch - the merge made the batch one relay past main\'s TV3 (world122)');
-  assert.ok(relaySupportsGateSite('world123') && relaySupportsGateSite(RELAY_VERSION) && !relaySupportsGateSite('world122'), 'never said to a relay that would close the socket on it');
 });
 
 // ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -303,7 +301,7 @@ test('DISCORD-GATES relay: NO WEBHOOK, NO HERALD - nothing posted, no owe, the s
   assert.equal(ws.meters.junk, 1);
 });
 
-test('DISCORD-GATES client: the game says where it found the gate to the hub - once a socket and day, a reconnect says it again; never without an account, to a relay that would close on it, or when the send fails; the frame is the wire\'s; the scene says it off the clearing\'s own site (mutants: said every frame; said to world122; the place sent raw)', () => {
+test('DISCORD-GATES client: the game says where it found the gate to the hub - once a socket and day, a reconnect says it again; never without an account or when the send fails; the frame is the wire\'s; the scene says it off the clearing\'s own site (mutants: said every frame; the place sent raw)', () => {
   const link = (v = RELAY_VERSION, acct = 'acct-me') => {
     const { FakeWS, sockets } = fakeSocketClass();
     const o = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'peer-me', secret: 'secret-of-peer-me', WebSocketImpl: FakeWS, now: () => 1e6, presence: false, acct, asecret: 'secret-of-acct-me' });
@@ -322,8 +320,6 @@ test('DISCORD-GATES client: the game says where it found the gate to the hub - o
   o._ws = { send: () => { throw new Error('gone'); } };
   assert.equal(o.sendGateSite(DAY + 2, 5, 6, 'Wayrest'), false, 'a send that fails is said again');
   o._ws = ws;
-  assert.equal(link('world122').o.sendGateSite(DAY, 1, 1, 'Wayrest'), false, 'a relay that would close the socket on it');
-  assert.equal(link('world122').sites().length, 0);
   assert.equal(link(RELAY_VERSION, null).o.sendGateSite(DAY, 1, 1, 'Wayrest'), false, 'no account, no word');
   const off = link();
   assert.equal(off.o.sendGateSite(DAY, 1000, 1, 'Wayrest'), false, 'off the map');

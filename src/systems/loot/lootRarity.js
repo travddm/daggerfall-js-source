@@ -1367,75 +1367,17 @@ const ladderName = (item, tier) => (markNamed(item) ? ladderBase(item) : nameAro
 export function linesName(item, tier, was = item) {
   return ladderBuilt(was, was?.rarity, was?.name) ? ladderName(item, tier) : was?.name;
 }
-/** NAME-KEPT (AUDIT FB1025i A3): THE CRAFTED NAMES A SAVE KEPT. The reforge before NAME-KEPT built a crafted piece's name
- *  on its bare template - a jewel lost its metal and gem ("Silver Ring" to "Ring"), a Masterwork took the ladder's words
- *  its mark withholds ("Saber's Mule's Ring of Skill"). On load a Magic or Rare crafted piece whose name is a ladder build
- *  other than the one its base gives now takes the ladder's; a name of its own is left as it came, and a second load
- *  finds nothing to do. Never a found piece: a curse's line was added after its name (cursePiece), by design. In place;
- *  answers how many were renamed. */
-export function repairCraftedNames(items) {
-  let n = 0;
-  for (const it of Array.isArray(items) ? items : []) {
-    if (!it || typeof it !== 'object' || (it.rarity !== 'magic' && it.rarity !== 'rare') || !Array.isArray(it.affixes) || !recipeById(it.recipe) || !Object.isExtensible(it)) continue;
-    const name = linesName(it, it.rarity);
-    if (name === it.name) continue;
-    it.name = name;
-    n++;
-  }
-  return n;
-}
-
-/** DISC29-B: THE NAMES A SAVE KEPT. A Magic or Rare piece of Roleplay & Realism: Items armour rolled before the fix
- *  carries the name built from the bare template; on load it is given the word its mint wrote ("Sentinel's Helmet of
- *  the Bear" -> "Sentinel's Brigandine Helmet of the Bear"). Only a name that IS that old build moves - a piece whose
- *  make has no word (leather, the mod off) or whose name is anything else is left as it came - so a second load finds
- *  nothing to do. In place, as the save's other repairs are; answers how many were renamed. */
-export function repairRarityNames(items) {
-  let n = 0;
-  for (const it of Array.isArray(items) ? items : []) {
-    if (!it || typeof it !== 'object' || (it.rarity !== 'magic' && it.rarity !== 'rare') || !Array.isArray(it.affixes) || !Object.isExtensible(it)) continue;
-    const word = rriVariantWord(it);
-    const template = templateByIndex(it.templateIndex)?.name;
-    if (!word || template == null || it.name !== nameAround(template, it.rarity, it.affixes)) continue;
-    it.name = nameAround(word + template, it.rarity, it.affixes);
-    n++;
-  }
-  return n;
-}
-
 /** RARITY-WEAR (FIELD BUGS 2026-10-01): THE WEARABLE HOME of a rolled piece minted on a base no slot takes - a group's
  *  template of the same weight and condition that a slot does take: the Wand's (140, 0.25 kg, 800) is the Amulet's
  *  (133, 0.25 kg, 800). */
 export const RARITY_HOME = Object.freeze({ Jewellery: 133 });
-/** RARITY-WEAR: THE WANDS A SAVE KEPT. The Gate's spoils and a town's thanks minted one jewel in eight on the Wand before
- *  the fix (gateSpoils.js spoilsBase), and a King's Mark on one could never be worn. On load a Magic, Rare or Legendary
- *  piece on a base nothing can wear moves to its group's RARITY_HOME: a Legendary keeps its record's name, a Magic or
- *  Rare one built on the old base is named for the new (as the ladder names it), and the price moves by the two bases.
- *  DFU's own wands (MAGIC.DEF's, `magic`, their Use a cast) and a plain one are wands and stay so; a second load finds
- *  nothing. In place, as the save's other repairs are; answers how many moved. */
-export function repairRarityBases(items) {
-  let n = 0;
-  for (const it of Array.isArray(items) ? items : []) {
-    if (!it || typeof it !== 'object' || !ROLLED_TIERS.includes(it.rarity) || !Object.isExtensible(it)) continue;
-    const home = RARITY_HOME[it.group];
-    if (home == null || wearableItem(it)) continue;
-    const from = { ...it };
-    it.templateIndex = home;
-    if (it.rarity !== 'legendary' && Array.isArray(it.affixes) && it.name === rarityName(from, it.rarity, it.affixes)) it.name = rarityName(it, it.rarity, it.affixes);
-    if (Number.isFinite(it.value)) it.value += itemBaseValue(it) - itemBaseValue(from);
-    n++;
-  }
-  return n;
-}
-
-/** AUDIT FB1018f L1-1: THE BASES repairRarityBases MOVES FROM, by group - the group's templates no slot takes (the Wand;
- *  pinned against the table, fb1018f_heldbase.test.js). */
+/** AUDIT FB1018f L1-1: the bases a rolled piece goes home from, by group - the group's templates no slot takes (the
+ *  Wand; pinned against the table, fb1018f_heldbase.test.js). */
 export const RARITY_HOMED_FROM = Object.freeze({ Jewellery: Object.freeze([140]) });
-/** AUDIT FB1018f L1-1 (decided): WHETHER A LEDGER PRINT MOVED AS A LOAD'S REPAIR
- *  MOVES IT - `was` and `now` prints (`template:material`, server-account/src/judge.js ledgerPrintOf); true when `now`
- *  is `was`'s base gone home (RARITY_HOMED_FROM to RARITY_HOME), its material kept. The realm ledger takes it as the same
- *  piece (ledger.js ledgerStep): a rolled Wand the service held through RARITY-WEAR - a guild vault's, a market's - comes
- *  back on its old print, the taker's load moves it, and the next checkpoint read the honest piece as forged. */
+/** AUDIT FB1018f L1-1 (decided): whether a ledger print moved only by its base going home - `was` and `now` prints
+ *  (`template:material`, server-account/src/judge.js ledgerPrintOf); true when `now` is `was`'s base gone home
+ *  (RARITY_HOMED_FROM to RARITY_HOME), its material kept. The realm ledger takes such a print as the same piece
+ *  (ledger.js ledgerStep), so a rolled Wand moved to its Amulet is not read as a forgery at the next checkpoint. */
 export function rehomedPrint(was, now) {
   const [wt, wm] = String(was).split(':'), [nt, nm] = String(now).split(':');
   return wm === nm && Object.entries(RARITY_HOMED_FROM).some(([g, from]) => Number(nt) === RARITY_HOME[g] && from.includes(Number(wt)));

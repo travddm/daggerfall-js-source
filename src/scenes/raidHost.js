@@ -58,7 +58,7 @@ export function createRaidHost(host) {
     raidPuppets: () => exteriorFoes.foes.filter((f) => f.puppet && f._pupRaid),   // STAFF-EVENT THE REWARD: the fallen too - a puppet I fought that fell is my kill on the board
     ownRaidFoes: () => exteriorFoes.foes.filter((f) => !f.puppet && f.raidKey && !f.dead),
     // RAID3: the relay's arm - does it keep this world's raids, and my word to the town's cell
-    relayRaids: () => !!host.online?.raidOk,
+    relayRaids: () => !!host.online,
     sendRaid: (w, cell) => !!host.online?.sendRaid(w, cell),
     // WW6 (WW6): the towns past the Bay the lanes raid - the world's registry, as the boot keeps
     // it (net/staffPlaces.js keptPlaces: `gamePlaces(createWorldPlaces())`), TESA's places on it where the land stands; a

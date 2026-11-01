@@ -140,7 +140,7 @@ test('GATE-UX 4 the chart at the kill: every fighter with a part, most dealt fir
   assert.equal(rows[0].n, 'B0'); assert.equal(rows.at(-1).n, `B${DAMAGE_CHART_MAX - 1}`);
   assert.equal(DAMAGE_CHART_MAX, GATE_CHART_MAX, 'the wire\'s bound is the brain\'s');
   assert.ok(GATE_CHART_MAX <= GATE_FIGHTERS_MAX && GATE_CHART_MAX > GATE_TOP_MAX);
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 test('GATE-UX 4 the chart on the wire: each row a name and its whole numbers, most dealt first, at most GATE_CHART_MAX; names cleaned; anything malformed is no chart - and never costs the kill its word (mutants: a junk chart taken; the fall dropped with a bad chart)', () => {

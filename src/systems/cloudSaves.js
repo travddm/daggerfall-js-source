@@ -61,9 +61,8 @@ import { serviceBase, storedSession, forgetSession, accountRefusalText, forgetD1
  *  accountClient.js's one table - a second table for the same words is
  *  how a player meets two different sentences for one refusal. */
 export const CLOUD_REFUSALS = Object.freeze({
-  // CHARID1: a card written before characters had ids. It is adopted
-  // the first time its character is loaded (`adoptLegacyCards`), so
-  // this is a wait rather than a wall, and the sentence says so.
+  // CHARID1: a card with no character id. Every save writes one, so
+  // a load and a fresh save give the card its id.
   // SHORT ON PURPOSE (AUDIT-312 F2). It now has a surface - the tile's
   // own cloud line - and Mac's rule for a tile is facts and no prose:
   // "there's uneeded text explaining what an account is". What a player

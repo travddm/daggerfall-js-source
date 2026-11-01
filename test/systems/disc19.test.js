@@ -102,21 +102,6 @@ test('DISC19-A: an infection that has ticked survives a load - the bite is not c
   resetMagicRoundMarker(null);
 });
 
-test('DISC19-A: a save written before the fix - the curse with a null round count and no flag - gives the player the curse back', () => {
-  setWorldMinutes(T0); resetMagicRoundMarker(null);
-  const p = mortal();
-  createLycanthropyCurse(p, LYCANTHROPY_TYPES.Wereboar, { now: T0 });
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: T0 })));
-  const old = snap.activeEffects.find((a) => a.kind === 'racialOverride');
-  delete old.permanent;
-  old.roundsRemaining = null;   // what JSON made of the NaN
-  const q = { isPlayer: true };
-  restorePlayer(q, snap);
-  runMagicRoundsFor(q, T0, T0 + 3, {});
-  assert.equal(liveLycanthropy(q)?.infectionType, LYCANTHROPY_TYPES.Wereboar);
-  resetMagicRoundMarker(null);
-});
-
 test('DISC19-A: in the session itself the round clock never touches a curse or an infection, and an ended one leaves the list at the next round (forcedRoundsRemaining = 0)', () => {
   const lives = [
     ['werewolf', (p) => createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: T0 }), (p) => cureLycanthropy(p, { nowMinutes: T0 + 2 })],

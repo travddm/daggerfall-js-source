@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import {
   validStaffEvent, staffEventFault, validStaffEventIn, validStaffEventOut, validStaffEventTell, newStaffLedger, staffEventCap, staffBossCall,
   foldStaffWord, staffEventDone, staffLedgerState, staffEventTell, staffEventKey, staffEventIdOf, staffEventLapsed, isAreaEvent,
-  relaySupportsStaffEvents, staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
+  staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
   STAFF_EVENT_ACCOUNTS_MAX, STAFF_EVENT_PRESENT_MS, STAFF_BOSS_HP_MAX,
 } from '../../src/net/staffEvent/staffEventLaw.js';
 import { mintStaffEventOrder, verifyOrder, orderValid, ORDER_KINDS } from '../../src/net/identityToken.js';
@@ -37,7 +37,6 @@ test('STAFF-EVENT: an event is held to its bounds - kinds any monster but the tw
   assert.ok(staffEventLapsed({ ...EV, ue: EV.at + 1000 }, EV.at + 1000) && !staffEventLapsed(EV, EV.at * 2));
   assert.equal(staffEventIdOf(staffEventKey(EV.id)), EV.id);
   assert.equal(staffEventIdOf('raid:17:0:3'), null);
-  assert.ok(relaySupportsStaffEvents('world256') && !relaySupportsStaffEvents('world255') && !relaySupportsStaffEvents(null));
 });
 
 test('STAFF-EVENT: the words each way are projected - a player\'s word, the hub\'s book and end, a cell\'s ledger, a tell', () => {

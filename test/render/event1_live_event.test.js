@@ -17,7 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fakeRoom } from '../fakeRoom.mjs';
-import { parseClient, chatRegionRoom, LIVE_EVENTS, EVENT_KEY, EVENT_HZ_MAX, EVENT_RELAY_MIN, eventGate, relaySupportsEvent, validLiveEvent, RELAY_VERSION, CHAT_WORLD_ROOM } from '../../src/net/wire.js';
+import { parseClient, chatRegionRoom, LIVE_EVENTS, EVENT_KEY, EVENT_HZ_MAX, eventGate, validLiveEvent, RELAY_VERSION, CHAT_WORLD_ROOM } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { parseEventCommand, HOST_COMMANDS, HELP_LINES } from '../../src/net/chatCommands.js';
 import {
@@ -53,13 +53,8 @@ test('EVENT1 wire: `stage` is a known event word or "" (the end), after a hello 
   for (const bad of [null, undefined, 'dread', [], { kind: 'dread' }, { kind: 'nope', at: 1 }, { kind: 'dread', at: 0 }, { kind: 'dread', at: -5 }, { kind: 'dread', at: 1.5 }, { kind: 'dread', at: '1' }]) assert.equal(validLiveEvent(bad), false, JSON.stringify(bad));
 });
 
-test('EVENT1 wire: the frame is sent only to a relay that knows it (an older one CLOSES the socket on it), and this relay does; the stage is rated like the server line (mutants: the gate at world109; RELAY_VERSION not bumped; the rate below one)', () => {
-  assert.equal(EVENT_RELAY_MIN, 110);
-  assert.equal(relaySupportsEvent('world109'), false, 'world109 answers `stage` with unknown message and a close');
-  assert.equal(relaySupportsEvent('world110'), true);
-  assert.equal(relaySupportsEvent(RELAY_VERSION), true, 'the relay this build ships knows it');
+test('EVENT1 wire: the relay this build ships knows the frame; the stage is rated like the server line (mutants: RELAY_VERSION not bumped; the rate below one)', () => {
   assert.ok(relayVersionAtLeast(110), 'the relay-changing slice bumped the version');
-  for (const v of [null, '', 'world', 'worldx', 110]) assert.equal(relaySupportsEvent(v), false);
   assert.ok(EVENT_HZ_MAX >= 1, 'tokenGate cannot express a rate below one a second');
   const t0 = 1_000_000;
   const a = eventGate(null, t0);
@@ -192,7 +187,6 @@ test('EVENT1 session: the hub\'s welcome says the event WHOLE (not live), a fram
   const { s, heard } = session();
   s._receive(welcome({ ev: { kind: 'dread', at: 1234 } }));
   assert.deepEqual(heard, [[{ kind: 'dread', at: 1234 }, { live: false }]], 'a player who joins mid-event did not watch it come');
-  assert.equal(s.eventOk, true, 'this relay knows the frame');
   s._receive(welcome({ ev: { kind: 'dread', at: 1234 } }));
   assert.equal(heard.length, 1, 'a reconnect\'s same word says nothing');
   s._receive(JSON.stringify({ t: 'event', kind: '', at: 2000 }));
@@ -221,15 +215,10 @@ test('EVENT1 session: a room that is not the hub says nothing of events, a welco
   assert.deepEqual(h.heard, []);
 });
 
-test('EVENT1 session: /event is sent only to a relay that knows the frame and only on the hub, as {t:\'stage\', kind}, under its own gate (mutants: sent to an older relay; sent off the hub; the gate skipped; an unknown word sent)', () => {
+test('EVENT1 session: /event is sent only on the hub, as {t:\'stage\', kind}, under its own gate (mutants: sent off the hub; the gate skipped; an unknown word sent)', () => {
   const { s } = session();
   const out = [];
   s._send = (f) => { out.push(f); return true; };
-  assert.equal(s.sendStage('dread'), false, 'not before a welcome says the relay knows it');
-  s._receive(welcome({ v: 'world109' }));
-  assert.equal(s.eventOk, false, 'world109 would close the socket on it');
-  assert.equal(s.sendStage('dread'), false);
-  assert.equal(s.sendStage(''), false, 'nor the end - it is the FRAME world109 closes on (SUNBABY1: a word\'s own gate stands before the frame\'s for a word, so the end is what holds this pin)');
   s._receive(welcome());
   assert.equal(s.sendStage('plague'), false, 'no such event');
   assert.equal(s.sendStage('dread'), true);
@@ -237,8 +226,6 @@ test('EVENT1 session: /event is sent only to a relay that knows the frame and on
   assert.equal(s.sendStage(''), false, 'the gate, run at home first');
   const off = session();
   off.s.room = 'world:3,12';
-  off.s.eventOk = true;
-  off.s.eventV = RELAY_VERSION;   // SUNBABY1: and its words known, so only the hub check is left to refuse
   off.s._send = () => { throw new Error('sent off the hub'); };
   assert.equal(off.s.sendStage('dread'), false, 'only the hub');
 });
@@ -433,8 +420,7 @@ test('EVENT1 host: world.js hears the event from the HUB link alone, walks it ea
   assert.match(world, /dreadStorm\.tick\(\{ sharedMs: Date\.now\(\) \+ _sharedOffsetMs, eye: tvStand, weight: dreadW \}\)/, 'on the shared clock');   // AUDIT DEEP R-11: round the traveller under the travel view
   assert.match(world, /if \(isEnhanced\(\)\) for \(const s of ds\.strikes\) struckFar\.push\(\{ \.\.\.s, flashColor: DREAD_FLASH_COLOR \}\);/);
   assert.match(world, /flash: flash - 1, pos:/, 'the host\'s flash is the storm\'s alone');
-  const cmd = world.slice(world.indexOf('const staged = parseEventCommand(text);'), world.indexOf('return hub.sendStage(staged.kind);'));
-  assert.match(cmd, /if \(!hub\?\.eventOk\) return say\('The server cannot stage live events yet\.'\);/);
+  const cmd = world.slice(world.indexOf('const staged = parseEventCommand(text);'), world.indexOf('return !!hub?.sendStage(staged.kind);'));
   assert.doesNotMatch(cmd, /glyph|dev/, 'never guarded here - the relay asks the token');
   assert.ok(world.indexOf('const staged = parseEventCommand(text);') > world.indexOf("const red = /^\\/red"), 'parsed beside /red');
 });

@@ -43,7 +43,7 @@ export function lookSql(name) {
 
 /**
  * THE AWARD: the treasury and the part of it that buys a hall, both, on that one guild - with its mover, its moment and
- * its kind on the row, so the ledger's trigger (0046_guild_halls.sql) writes the line in the same statement. Never past
+ * its kind on the row, so the ledger's trigger writes the line in the same statement. Never past
  * the treasury's cap (the deposit's own bound, guilds.js). RETURNING names the row it changed, so the workflow can
  * refuse a run that changed none.
  * @param {string} name

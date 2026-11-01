@@ -16,6 +16,7 @@ online play or for a written design that is better for play ([README.md](README.
 | npm | the one that ships with Node | installs |
 | Git Bash, or any POSIX shell | - | `tools/fetch-data.sh` and the examples below |
 | `curl` and `unzip` | - | fetching ARENA2 |
+| `curl` and `tar` | - | `tools/fetch-vendor.sh` |
 | A browser with WebGL2 | Chrome, Edge, Firefox or Safari 15+ | running the game |
 | Playwright's browser (optional) | from `playwright` in devDependencies | the probe tools under `tools/` |
 
@@ -31,6 +32,19 @@ npm ci
 `npm ci` installs the root devDependencies only: Vite, ESLint, TypeScript, Playwright, esbuild, Rollup, acorn and
 pngjs. The client has no runtime npm dependencies. `server/` and `app/` each have their own `package.json`; run
 `npm ci` inside them only when you work on them.
+
+## Fetch the vendored mods' files
+
+Four vendored mods (`better-ambience`, `immersive-footsteps`, `meanerMonsters`, `unleveledLoot`) are fetched from
+their authors' GitHub repositories at pinned commits instead of being committed. Fetch them once:
+
+```sh
+sh tools/fetch-vendor.sh
+```
+
+`npm run dev`, `npm run build` and the `npm test` scripts run it first, and it does nothing for a folder that is already
+fetched. A plain `node --test <file>` does not run it. See
+[formats/mods-and-vendor.md](formats/mods-and-vendor.md#fetched-folders-toolsfetch-vendorsh).
 
 ## Fetch the game data (ARENA2)
 
@@ -65,7 +79,7 @@ The Elder Scrolls: Arena data is optional. The player attaches their own ARENA f
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Vite dev server with hot reload. The landing page is `/`, the game is `/play/`. |
-| `npm run build` | Production build into `dist/`. `prebuild` writes the commit into `src/buildTag.js`; `postbuild` restores the file. |
+| `npm run build` | Production build into `dist/`. `prebuild` fetches the vendored mods' files and writes the commit into `src/buildTag.js`; `postbuild` restores the file. |
 | `npm run preview` | Serves `dist/` for a check of the built site. |
 | `npm test` | Runs every `test/**/*.test.js` with `node --test`, in one shard (`tools/testShards.mjs 1/1`). |
 | `npm run test:changed` | Runs only the tests a change can affect (`tools/testChanged.mjs`). See below. |

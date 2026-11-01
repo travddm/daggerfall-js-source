@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // SEA-SEASON - THE ELTHERIC OCEAN'S SEASON BOARDS, the service's half: the deepest voyage and the
 // legends ended, each a season's (net/arena/arenaLaw.js arenaSeasonOf). The law is both ends' (src/net/sea/
-// seaSeasonLaw.js); the table migrations/0147_sea_season.sql's.
+// seaSeasonLaw.js); the table of the sea season.
 //
 //   THE FIGURES (seaSeasonSteps): a realm character's captain's ledger keeps its season's (`ether.season`); a CLEAN judged
 //     checkpoint (realm.js checkpointRealm - verdict.js's `clean`: nothing the law found, no copy) carries them here in its

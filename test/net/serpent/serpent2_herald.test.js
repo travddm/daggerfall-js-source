@@ -14,7 +14,7 @@ import {
 import { foldGateSite, HERALD_RETRY_MS, HERALD_FELL_KEEP_MS, GATE_SITE_SKEW_MS } from '../../../src/net/gate/gateHerald.js';
 import { serpentTimes, serpentAt, serpentPhase, SERPENT_DIVE_MS, SERPENT_EVERY_DAYS, SERPENT_SURFACE_MS } from '../../../src/net/serpent/serpentLaw.js';
 import {
-  validSerpentIn, parseClient, relaySupportsSerpentSite, SERPENT_SITE_RELAY_MIN, SERPENT_KINDS, SERPENT_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, POSE_BOUND, ACCOUNT_SWEEP_MS, SD_KEY,
+  validSerpentIn, parseClient, SERPENT_KINDS, SERPENT_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, POSE_BOUND, ACCOUNT_SWEEP_MS, SD_KEY,
 } from '../../../src/net/wire.js';
 import { createSerpentOmen } from '../../../src/systems/serpent/serpentOmen.js';
 import { eventTimerRows } from '../../../src/systems/eventTimers.js';
@@ -128,7 +128,7 @@ test('SERPENT2 law: WHERE IT LIES AND WHICH KILL - a word taken for the serpent 
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('SERPENT2 wire: the `site` word - its day, its native point to the whole unit and a port its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest; said only to a relay that hears it (mutants: a raw place taken; the point unbounded or fractional; the version floor off)', () => {
+test('SERPENT2 wire: the `site` word - its day, its native point to the whole unit and a port its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest (mutants: a raw place taken; the point unbounded or fractional)', () => {
   assert.ok(SERPENT_KINDS.includes('site'));
   const ok = { k: 'site', d: DAY, sx: SITE.sx, sz: SITE.sz, pl: 'Sentinel' };
   assert.deepEqual(validSerpentIn(ok), ok);
@@ -136,9 +136,7 @@ test('SERPENT2 wire: the `site` word - its day, its native point to the whole un
   for (const bad of [{ pl: 'Sentinel**' }, { pl: '<@&1> Sentinel' }, { pl: 'Sen  tinel' }, { pl: ' Sentinel' }, { pl: ', Sentinel' }, { pl: '' }, { pl: 'x'.repeat(65) }, { pl: 5 },
     { sx: POSE_BOUND + 1 }, { sz: -POSE_BOUND - 1 }, { sx: 1.5 }, { sz: '1' }, { d: -1 }, { d: '611' }, { d: 1.5 }]) assert.equal(validSerpentIn({ ...ok, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'serpent', ...ok, extra: 1 }), { hasHello: true }), { t: 'serpent', ...ok });
-  assert.equal(SERPENT_SITE_RELAY_MIN, 166);
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.ok(relaySupportsSerpentSite('world166') && relaySupportsSerpentSite(RELAY_VERSION) && !relaySupportsSerpentSite('world165') && !relaySupportsSerpentSite(null), 'never said to a relay that would close the socket on it');
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 // ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -313,7 +311,7 @@ test('SERPENT2 relay: NO WEBHOOK, NO HERALD - nothing posted, nothing kept of wh
 
 // ═══ THE CLIENT ══════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('SERPENT2 client: the game says where it found the serpent to the hub - once a socket and day, a reconnect says it again; its point to the whole unit and its port as the wire\'s law leaves it; never without an account, to a relay that would close on it, or when the send fails (mutants: said every frame; said to world165; the place sent raw)', () => {
+test('SERPENT2 client: the game says where it found the serpent to the hub - once a socket and day, a reconnect says it again; its point to the whole unit and its port as the wire\'s law leaves it; never without an account, or when the send fails (mutants: said every frame; the place sent raw)', () => {
   const link = (v = RELAY_VERSION, acct = 'acct-me') => {
     const { FakeWS, sockets } = fakeSocketClass();
     const o = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'peer-me', secret: 'secret-of-peer-me', WebSocketImpl: FakeWS, now: () => 1e6, presence: false, acct, asecret: 'secret-of-acct-me' });
@@ -332,8 +330,6 @@ test('SERPENT2 client: the game says where it found the serpent to the hub - onc
   o._ws = { send: () => { throw new Error('gone'); } };
   assert.equal(o.sendSerpentSite(DAY + 4, 5, 6, 'Wayrest'), false, 'a send that fails is said again');
   o._ws = ws;
-  assert.equal(link('world165').o.sendSerpentSite(DAY, 1, 1, 'Wayrest'), false, 'a relay that would close the socket on it');
-  assert.equal(link('world165').sites().length, 0);
   assert.equal(link(RELAY_VERSION, null).o.sendSerpentSite(DAY, 1, 1, 'Wayrest'), false, 'no account, no word');
   const off = link();
   assert.equal(off.o.sendSerpentSite(DAY, POSE_BOUND * 2, 1, 'Wayrest'), false, 'off the world');

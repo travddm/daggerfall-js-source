@@ -1,6 +1,6 @@
 // WEAPON-POOL: EVERY
-// WEAPON TYPE WEARS FROM ONE POOL - the Warhammer's 1,600 - through Daggerfall's material ladder, and a save's weapons
-// minted on their rows move to it on load. WEAPON-POOL; Ledger A, WEAPON-POOL.
+// WEAPON TYPE WEARS FROM ONE POOL - the Warhammer's 1,600 - through Daggerfall's material ladder, and a weapon minted on
+// its row moves to it before it wears (conditionRepair.js repoolWeapon). WEAPON-POOL; Ledger A, WEAPON-POOL.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,8 +11,7 @@ import { templateByIndex, registerCustomTemplates, registerTemplateOverrides, mi
 import { GROUP_TEMPLATE_INDICES } from '../../src/systems/item/itemTemplatesData.js';
 import { createWeapon, weaponOfMaterial, armorOfMaterial } from '../../src/combat/enemyEquipment.js';
 import { RRI_TEMPLATES, RRI_TEMPLATE_PATCHES } from '../../src/systems/roleplayRealismItems/rriItems.js';
-import { repoolWeaponConditions } from '../../src/systems/conditionRepair.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
+import { repoolWeapon } from '../../src/systems/conditionRepair.js';
 import { mintPiece } from '../../src/systems/smithItems.js';
 import { applyRarity, legendaryById } from '../../src/systems/loot/lootRarity.js';
 import { applyEnchantments } from '../../src/systems/enchanting.js';
@@ -112,33 +111,6 @@ test('WEAPON-POOL: the flat costs stop picking a type - a Worm\'s Tooth (the Leg
   assert.deepEqual([bow.maxCondition, bow.currentCondition], [1600, 1550], 'it broke at 25');
 });
 
-test('WEAPON-POOL: a save\'s weapons minted on their rows move to the one pool on load, their condition the same share - the pack, the wagon, the bag, the repairer\'s shelf and a pile in the world; a whole piece whole, a broken one broken; a magic item\'s uses, ammunition and a piece already on the pool untouched; a second load moves nothing (mutants: no move on load; the condition left behind; the maximum left behind)', () => {
-  const old = (template, material, max, cur) => ({ ...createWeapon(template, material, () => 0.5), maxCondition: max, currentCondition: cur });
-  const p = P();
-  p.items.push(
-    old(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, 50, 50),
-    old(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, 50, 25),
-    old(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, 50, 0),
-    old(WEAPONS.Long_Bow, WEAPON_MATERIALS.Ebony, 600, 450),
-    { ...old(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, 50, 50), magic: true },   // MAGIC.DEF's uses, at a dagger's number
-    createWeapon(WEAPONS.Arrow, 0, () => 0.5),
-    old(WEAPONS.Warhammer, WEAPON_MATERIALS.Iron, 1600, 900));
-  p.wagonItems = [old(WEAPONS.Staff, WEAPON_MATERIALS.Silver, 450, 300)];
-  p.bagItems = [old(WEAPONS.Shortsword, WEAPON_MATERIALS.Iron, 300, 150)];
-  p.otherItems = [old(WEAPONS.Katana, WEAPON_MATERIALS.Daedric, 4800, 1200)];
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: 100, world: { piles: [{ items: [old(WEAPONS.Saber, WEAPON_MATERIALS.Steel, 1050, 700)] }] } })));
-  const q = { isPlayer: true };
-  restorePlayer(q, snap);
-  const pairs = (list) => list.map((it) => [it.maxCondition, it.currentCondition]);
-  assert.deepEqual(pairs(q.items), [[1600, 1600], [1600, 800], [1600, 0], [9600, 7200], [50, 50], [1, 0], [1600, 900]]);
-  assert.deepEqual(pairs(q.wagonItems), [[2400, 1600]]);
-  assert.deepEqual(pairs(q.bagItems), [[1600, 800]]);
-  assert.deepEqual(pairs(q.otherItems), [[12800, 3200]]);
-  assert.deepEqual(pairs(snap.world.piles[0].items), [[2400, 1600]], 'a pile in the world, in the save itself');
-  // idempotent: every piece moved is on the pool, and the Warhammer was - a second load moves nothing
-  for (const list of [q.items, q.wagonItems, q.bagItems, q.otherItems, snap.world.piles[0].items]) assert.equal(repoolWeaponConditions(list), 0);
-});
-
 test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s row, a custom row and Roleplay & Realism: Items\' patch, through the ladder and a made piece\'s quality - and nothing else moves: armour, clothing, jewellery, a torch, a frozen record, a piece with no condition, a piece no mint gives; with the mod on, a classic row beside a different one (a Short Bow, a Wakizashi) moves too; the share rounds to the nearest point (mutants: each row source; the ladder\'s default; the quality\'s rounding; the share\'s rounding; each guard; the group test turned on armour alone; a neighbour\'s row read)', () => {
   const old = (template, material, max, cur, extra = {}) => ({ ...createWeapon(template, material, () => 0.5), maxCondition: max, currentCondition: cur, ...extra });
   // the mod's patch, with the mod off at the load: a Tanto at 40
@@ -169,7 +141,7 @@ test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s
   const unworn = old(WEAPONS.Dagger, WEAPON_MATERIALS.Iron, 50, undefined);
   const raised = old(WEAPONS.Dagger, WEAPON_MATERIALS.Steel, 50, 50);   // an enchanted piece the ocean mod raised a material: the iron pool it kept
   const stays = [cuirass, frozen, unworn, raised];
-  assert.equal(repoolWeaponConditions([null, ...moved, ...stays, ...others]), moved.length);
+  assert.equal([null, ...moved, ...stays, ...others].filter(repoolWeapon).length, moved.length);
   assert.deepEqual(moved.map((it) => [it.maxCondition, it.currentCondition]),
     [[1600, 400], [4800, 4800], [1600, 800], [1200, 1200], [2080, 416], [2400, 7], [2400, 2]]);
   assert.deepEqual(stays.map((it) => [it.maxCondition, it.currentCondition]), [[4096, 4096], [50, 50], [50, undefined], [50, 50]]);
@@ -182,10 +154,9 @@ test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s
     // not tell Daggerfall's own row from the one before it (a Short Bow's 50 beside a War Axe's 800, a Wakizashi's 200
     // beside a Shortsword's 300; the mod patches both to 80 and 150)
     const bow50 = old(WEAPONS.Short_Bow, WEAPON_MATERIALS.Iron, 50, 25), waki200 = old(WEAPONS.Wakazashi, WEAPON_MATERIALS.Iron, 200, 200);
-    assert.equal(repoolWeaponConditions([tanto50, bow50, waki200]), 3);
+    assert.equal([tanto50, bow50, waki200].filter(repoolWeapon).length, 3);
     assert.deepEqual([tanto50, bow50, waki200].map((it) => [it.maxCondition, it.currentCondition]), [[1600, 1600], [1600, 800], [1600, 1600]]);
   } finally {
     registerTemplateOverrides([]);
   }
-  assert.equal(repoolWeaponConditions(undefined), 0, 'no list, nothing to move');
 });

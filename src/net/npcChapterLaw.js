@@ -31,18 +31,9 @@
 //     So the ceiling is a PACE: a lie is paid no faster than an honest
 //     claim, and an honest reward arrives whole.
 //   - A SEED, ONCE. The first contact carries the character's standing as
-//     its save holds it - the client's word, like every claim. A
-//     character brought in through customs from ROLL_EPOCH_S is seeded
-//     with each faction capped at ROLL_CUSTOMS_CAP (CALL 3) - except a
-//     guild it is a member of, which keeps what its rank needs
-//     (RANK_REQ_REPUTATION; AUDIT CHAP D1: a cap that demoted the member
-//     at its next review took the rank the arc promised it keeps) and the
-//     band above it up to its next rank's line (AUDIT CHAP2 D3: seeded on
-//     the line, DFU's own 112-day drift demoted it at the review after),
-//     never past ROLL_SEAT_LINE - 1 (CALL 3: the grind buys no seat - a
-//     rank 8 or 9 crossing keeps 79, E6). Every
-//     other realm character - born online, or brought in before the epoch
-//     - earned its standing online, and is seeded whole (C3).
+//     its save holds it - the client's word, like every claim. Every realm
+//     character is born online and earned its standing there, so it is
+//     seeded whole (C3).
 // A seat (CHAP4) is decided by witnessed Merit (Seats-Arc law 3); what a
 // claim can reach is the gate before it - a membership, its tenure, a
 // standing - each bounded here.
@@ -81,10 +72,6 @@ export const isRollFaction = (/** @type {unknown} */ id) => typeof id === 'numbe
 
 /** The most a faction's reputation may RISE, net, in one UTC day for one character - three quests at DFU's +5. */
 export const ROLL_GAIN_DAY_MAX = 15;
-/** A character brought in through customs from the epoch is seeded capped here: rank 4's need (RANK_REQ_REPUTATION). */
-export const ROLL_CUSTOMS_CAP = 40;
-/** CHAP1's arrival, 2026-10-08 00:00 UTC: a customs crossing before it is seeded whole. Never moved once shipped. */
-export const ROLL_EPOCH_S = 1_791_417_600;
 /** The largest change one faction's line of a claim may carry - the whole span. */
 export const ROLL_DELTA_MAX = MAX_REPUTATION - MIN_REPUTATION;
 /** A rank as the Roll records it: Guild.cs's ten rows, 0 to 9. */
@@ -123,14 +110,6 @@ export function rollRankCapOf(/** @type {unknown} */ rep) {
   return rank;
 }
 
-/** THE CAP A SEED IS TAKEN UNDER, from the realm character's own row: `origin` the offline id customs brought it from
- *  (null for one born online), `createdAt` when the realm made it. Only a customs crossing from the epoch is capped. */
-export function rollSeedCapOf(/** @type {{ origin?: unknown, createdAt?: unknown }} */ row) {
-  const crossed = typeof row?.origin === 'string' && row.origin !== '';
-  const at = row?.createdAt;
-  return crossed && !(typeof at === 'number' && Number.isSafeInteger(at) && at < ROLL_EPOCH_S) ? ROLL_CUSTOMS_CAP : MAX_REPUTATION;
-}
-
 /** A map a claim or a seed may carry: a plain object, every key one of the twenty-two (as its decimal), every value a
  *  safe integer `ok` accepts, at most twenty-two lines. */
 function factionMapOk(/** @type {unknown} */ v, /** @type {(n: number) => boolean} */ ok, min = 0) {
@@ -153,24 +132,11 @@ export const rollDeltasOk = (/** @type {unknown} */ v) => factionMapOk(v, (x) =>
 /** THE SEAT'S LINE: the reputation rank 8 needs - CHAP4's seats begin here, and nothing the Roll takes on a client's word
  *  alone carries a member past the line below it (CALL 3). */
 export const ROLL_SEAT_LINE = RANK_REQ_REPUTATION[8];
-/** What a member's rank keeps through the seed's cap (AUDIT CHAP D1, AUDIT CHAP2 D3): its rank's band up to the next
- *  rank's line, so DFU's own drift does not demote it at the review after - and never past the seat's line less one
- *  (AUDIT CHAP2 E6): a rank 8 or 9 crossing keeps 79 and is reviewed to rank 7,
- *  as section 3.5 holds everyone at CHAP4 - an offline grind buys no seat's reputation (CALL 3). */
-export function rollRankKeepOf(/** @type {unknown} */ rank) {
-  const r = Math.min(ROLL_RANK_MAX, Math.max(0, whole(rank)));
-  const top = r < ROLL_RANK_MAX ? RANK_REQ_REPUTATION[r + 1] - 1 : MAX_REPUTATION;
-  return Math.min(ROLL_SEAT_LINE - 1, Math.max(RANK_REQ_REPUTATION[r], top));
-}
-/** THE SEED: every one of the twenty-two, as the save held it, under `cap` - and a guild the character is a member of
- *  (`ranks`, faction -> rank) keeps what its rank keeps (rollRankKeepOf). */
-export function rollSeedOf(/** @type {Record<string, number>} */ values, cap = MAX_REPUTATION, /** @type {Map<number, number>} */ ranks = new Map()) {
+/** THE SEED: every one of the twenty-two, as the save held it, inside DFU's bounds. */
+export function rollSeedOf(/** @type {Record<string, number>} */ values) {
   /** @type {Record<number, number>} */
   const out = {};
-  for (const f of ROLL_FACTIONS) {
-    const need = ranks.has(f) ? rollRankKeepOf(ranks.get(f)) : MIN_REPUTATION;
-    out[f] = rollRep(values?.[f], Math.max(cap, need));
-  }
+  for (const f of ROLL_FACTIONS) out[f] = rollRep(values?.[f]);
   return out;
 }
 

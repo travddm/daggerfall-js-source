@@ -1,7 +1,7 @@
 // STAFF-PANEL3-ECON - THE PANEL'S ECONOMY SCREENS
 // (server-account/src/staffEconomy.js), driven through the real Worker on the node:sqlite database every account pin
 // stands on (test/accountDb.mjs): the market and trades stream with its flags, node activity, the economy and the guilds -
-// an Admin's alone - the Home watch, and the indexes every statement stands on (migration 0153).
+// an Admin's alone - the Home watch, and the indexes every statement stands on.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, d1 } from '../accountDb.mjs';
@@ -626,7 +626,7 @@ test('STAFF-PANEL3-ECON: the Home watch names the market\'s worst of the day and
   assert.deepEqual(await HOME_WATCH.top(ctx, s.env, { role: 'moderator' }, 10), { items: [], high: 0, total: 0 });
 });
 
-test('STAFF-PANEL3-ECON: every statement stands on an index - no big table walked, the escrow\'s sum covered, the rich floor the index\'s own (migration 0153)', async () => {
+test('STAFF-PANEL3-ECON: every statement stands on an index - no big table walked, the escrow\'s sum covered, the rich floor the index\'s own', async () => {
   const db = d1();
   const t = 1_800_000_000;
   const fx = fixtures(db._raw, t);

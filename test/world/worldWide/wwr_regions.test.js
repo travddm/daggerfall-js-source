@@ -19,7 +19,7 @@ import { BANK_REGION_COUNT, createBankAccounts, createHouses, padRegionTable, bl
 import { createRelations } from '../../../src/systems/livingWorld/relations.js';
 import { CRIMES } from '../../../src/systems/court.js';
 import { regionOk, bayRegionOk } from '../../../src/net/nodeLaw.js';
-import { CHAT_REGION_COUNT, CHAT_BAY_REGIONS, chatRegionRoom, isChatRoom, SD_REGION_COUNT, relaySupportsProvinceRegions, PROVINCE_REGIONS_RELAY_MIN, RELAY_VERSION, WORLD_WIDE_RELAY_MIN } from '../../../src/net/wire.js';
+import { CHAT_REGION_COUNT, CHAT_BAY_REGIONS, chatRegionRoom, isChatRoom, SD_REGION_COUNT } from '../../../src/net/wire.js';
 import { REGION_CHANNELS, regionShardRoom, isRegionShard } from '../../../src/net/hubShards.js';
 import { navalWireRecord, validNavalRecord } from '../../../src/systems/naval/navalWire.js';
 import { politicClaimed } from '../../../src/systems/gate/gateSite.js';
@@ -146,7 +146,7 @@ test('WW-R the account service: a node\'s region any of the world\'s (a province
   }
 });
 
-test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit) where the relay keeps them (the world-wide relay, net/wire.js WORLD_WIDE_RELAY_MIN - world255 on its branch), a client on an older one keeps its region tab off past the Bay; the Abyss census every region\'s (WW5); the naval wire the Bay\'s regions alone (mutants: the channels\' count, the gate, the census, the wire)', () => {
+test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit); the Abyss census every region\'s (WW5); the naval wire the Bay\'s regions alone (mutants: the channels\' count, the census, the wire)', () => {
   assert.equal(CHAT_REGION_COUNT, REGION_NAMES.length, 'pinned equal (not imported: the relay\'s graph)');
   assert.equal(REGION_CHANNELS, CHAT_REGION_COUNT);
   assert.equal(CHAT_BAY_REGIONS, BAY_REGION_COUNT);
@@ -155,9 +155,7 @@ test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit) wher
     assert.equal(isChatRoom(chatRegionRoom(r)), true, `region ${r}`);
     for (let k = 0; k < 4; k++) assert.equal(isRegionShard(regionShardRoom(r, k)), r < 62);
   }
-  assert.deepEqual([chatRegionRoom(64), chatRegionRoom(64, false), chatRegionRoom(17, false), chatRegionRoom(71)], ['chat:region.64', null, 'chat:region.17', null]);
-  assert.equal(PROVINCE_REGIONS_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
-  assert.deepEqual([relaySupportsProvinceRegions(`world${WORLD_WIDE_RELAY_MIN - 1}`), relaySupportsProvinceRegions(`world${WORLD_WIDE_RELAY_MIN}`), relaySupportsProvinceRegions(RELAY_VERSION)], [false, true, true], 'the relay before the world-wide one opens no province\'s channel');
+  assert.deepEqual([chatRegionRoom(64), chatRegionRoom(17), chatRegionRoom(71)], ['chat:region.64', 'chat:region.17', null]);
   const ship = (region) => ({ n: 1, classId: 'merchantGalleon', variant: 0, pos: [0, 0, 0], yaw: 0, speed: 0, sails: 0, hull: 1, sail: 1, crew: 1, state: 'afloat', heel: 0, seed: 5, gen: 0, region });
   const word = navalWireRecord({ ships: [ship(64), ship(17)] });
   assert.deepEqual(word.s.map((w) => w.at(-1)), [-1, 17], 'a province\'s region never on the wire - an older build refuses the whole word');

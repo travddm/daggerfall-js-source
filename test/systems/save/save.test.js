@@ -93,29 +93,11 @@ test('AUDIT 22 F7/F8: the lit light source and the training clock survive a load
   assert.equal(e2.lightSource, e2.items[1]);
   assert.notEqual(e2.lightSource, torch, 'and it is the restored record, not the old object');
 
-  // E4 / THE ORDER: a PRE-E4 save carries the purse as a Currency
-  // stack INSIDE items, and lightSourceIndex indexes that list. The
-  // absorb must run after the relink, or dropping the stack slides the
-  // torch down one and the restored player carries an unlit torch (or
-  // whatever landed at the old index).
-  const legacy = snapshotPlayer({
-    name: 'B', stats: {}, skills: 30, skillUses: [], activeEffects: [], spells: [],
-    items: [{ group: 'Currency', name: 'Gold pieces', stackCount: 5 }, torch],
-    lightSource: torch,
-  }, {});
-  delete legacy.goldPieces;
-  const e5 = { items: [], stats: {}, activeEffects: [] };
-  restorePlayer(e5, legacy, null);
-  assert.equal(e5.goldPieces, 5, 'the stack was absorbed into the counter');
-  assert.deepEqual(e5.items.map((i) => i.name), ['Torch']);
-  assert.equal(e5.lightSource, e5.items[0], 'and the torch is still the one that is lit');
-
-  // ...and the migration is FOR THAT SAVE ONLY. DFU can put a Currency
-  // stack in PlayerEntity.Items through GivePc's notify/silently arms
-  // (GivePc.cs:179, :186), which call Items.AddItem with no currency
-  // check - unspendable there too, because GetGoldAmount reads
-  // `goldPieces`. A post-E4 save round-trips that quirk instead of
-  // laundering it into the purse.
+  // E4: DFU can put a Currency stack in PlayerEntity.Items through
+  // GivePc's notify/silently arms (GivePc.cs:179, :186), which call
+  // Items.AddItem with no currency check - unspendable there too,
+  // because GetGoldAmount reads `goldPieces`. A save round-trips that
+  // quirk instead of laundering it into the purse.
   const quirk = snapshotPlayer({
     name: 'B', stats: {}, skills: 30, skillUses: [], activeEffects: [], spells: [],
     goldPieces: 5,

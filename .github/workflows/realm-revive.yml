@@ -13,7 +13,7 @@ name: Realm revive (a realm character's death taken back)
 #      written - but the service IS held for its minute, because the past is read through a rewind.
 #   2. read it; then run again with apply on.
 #
-# WHAT A RUN DOES - realm-restore.yml's steps, each where it stands for the same reason:
+# WHAT A RUN DOES, each step where it stands for a reason:
 #   - finds the account by its handle and the character that fell (in the window 2026-10-12T12Z - 2026-10-14T12Z, or the
 #     one named) BEFORE anything is held, so a run that finds nothing holds nothing;
 #   - holds the service for maintenance, keeps the present (its bookmark and its counts), rewinds to two minutes before
@@ -134,7 +134,7 @@ jobs:
           echo "BEFORE=$(node -e 'process.stdout.write(new Date(Number(process.argv[1]) * 1000).toISOString())' "$before")" >> "$GITHUB_ENV"
           echo "BEFORE_S=$before" >> "$GITHUB_ENV"
 
-      # realm-restore.yml's hold, word for word: proven by content and by a write refused, five times running.
+      # The hold, proven by content and by a write refused, five times running.
       - name: Hold the service for maintenance
         working-directory: server-account
         run: |
@@ -146,7 +146,7 @@ jobs:
           ok=0
           for i in $(seq 1 36); do
             h=$(curl -fsS --max-time 10 "$base/v1/health" || true)
-            code=$(curl -sS --max-time 10 -o /tmp/g.json -w '%{http_code}' -X POST "$base/v1/realm/customs" -H 'content-type: application/json' -d '{}' || true)
+            code=$(curl -sS --max-time 10 -o /tmp/g.json -w '%{http_code}' -X POST "$base/v1/realm/create" -H 'content-type: application/json' -d '{}' || true)
             if printf '%s' "$h" | grep -q '"maintenance":true' && [ "$code" = "503" ] && grep -q '"maintenance"' /tmp/g.json; then ok=$((ok + 1)); else ok=0; fi
             echo "attempt $i: health ${h:-unreachable}, a write answered ${code:-nothing} ($ok running)"
             if [ "$ok" -ge 5 ]; then break; fi

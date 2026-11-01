@@ -107,7 +107,7 @@ export function createSearchParty(host) {
    *  graves (net/online.js sendOverworld 'gr'); what it took no longer owed. Underground (a dungeon's room) it waits. */
   function frame(now) {
     const online = host.online;
-    if (!owed.size || !online?.owGraveOk || now - saidAt < GRAVE_SAY_MS) return;
+    if (!owed.size || !online || now - saidAt < GRAVE_SAY_MS) return;
     saidAt = now;
     for (const [k, o] of [...owed]) if (now - o.since > GRAVE_OWED_KEEP_MS) owed.delete(k);
     if (!owed.size || !isCellRoom(online.room)) return;

@@ -10,7 +10,7 @@ import {
 import { calculatePlayerLevel, checkForLevelUp, applyLevelUp } from '../../src/systems/advancement.js';
 import { evenHpFloor } from '../../src/systems/levelEven.js';
 import { LEVEL_CAP } from '../../src/systems/levelCap.js';
-import { crossLeveling } from '../../src/systems/realmCustoms.js';
+import { crossLeveling } from '../../src/systems/realmLeveling.js';
 import { JUDGE_LEVEL_MAX, characterFindings } from '../../server-account/src/judge.js';
 import { REALM_LEVEL_CLAIM_MAX } from '../../server-account/src/realm.js';
 import { rollSkills, spendPoolLowest } from '../../src/systems/chargen.js';

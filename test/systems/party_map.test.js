@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  parseClient, validAmapFrame, amapBody, validAmapRow, validAmapDungeon, amapShareGate, relaySupportsPartyMap,
+  parseClient, validAmapFrame, amapBody, validAmapRow, validAmapDungeon, amapShareGate,
   AMAP_KEYS_MAX, AMAP_SEND_MS, AMAP_HUB_MIN_MS, CHAT_WORLD_ROOM, SOCIAL_ROOM, RELAY_VERSION,
 } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -55,7 +55,7 @@ test('PARTY-MAP wire: parseClient takes {t:\'amap\', k, r} after hello alone, 1.
   assert.deepEqual(amapBody({ k: K, r: ['1:1'] }), { k: K, r: ['1:1'] });
 });
 
-test('PARTY-MAP wire: validAmapFrame (the hub\'s frame, at home) wants the sender\'s account and the same body; the gate is a plain cooldown at half the client\'s floor; the relay floor is world134', () => {
+test('PARTY-MAP wire: validAmapFrame (the hub\'s frame, at home) wants the sender\'s account and the same body; the gate is a plain cooldown at half the client\'s floor', () => {
   assert.deepEqual(validAmapFrame({ t: 'amap', acct: 'acct-a', name: 'Ana', k: K, r: ['0:1'] }), { t: 'amap', acct: 'acct-a', name: 'Ana', k: K, r: ['0:1'] });
   assert.equal(validAmapFrame({ t: 'amap', acct: 'acct-a', name: null, k: K, r: ['0:1'] }).name, null);
   assert.equal(validAmapFrame({ t: 'amap', k: K, r: ['0:1'] }), null, 'no sender');
@@ -67,10 +67,6 @@ test('PARTY-MAP wire: validAmapFrame (the hub\'s frame, at home) wants the sende
   assert.equal(g1.pass, true);
   assert.equal(amapShareGate(g1.at, 1000 + AMAP_HUB_MIN_MS - 1).pass, false);
   assert.equal(amapShareGate(g1.at, 1000 + AMAP_HUB_MIN_MS).pass, true);
-  assert.equal(relaySupportsPartyMap('world133'), false, 'an older relay closes on the frame');
-  assert.equal(relaySupportsPartyMap('world134'), true);
-  assert.equal(relaySupportsPartyMap(RELAY_VERSION), true);
-  assert.equal(relaySupportsPartyMap(null), false);
 });
 
 // ─── the hub ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -116,9 +112,8 @@ const hubSession = (v = RELAY_VERSION) => {
   return { s, sockets, got, sent, clock };
 };
 
-test('PARTY-MAP session: shareAutomap sends a checked body at most once per AMAP_SEND_MS, and never to a relay that does not know the frame', () => quiet(() => {
+test('PARTY-MAP session: shareAutomap sends a checked body at most once per AMAP_SEND_MS', () => quiet(() => {
   const { s, sent, clock } = hubSession();
-  assert.equal(s.amapOk, true);
   assert.equal(s.shareAutomap(K, ['0:1', 'bad']), false, 'a bad row: nothing sent');
   assert.equal(s.shareAutomap(K, ['0:1']), true);
   assert.deepEqual(sent(), [{ t: 'amap', k: K, r: ['0:1'] }]);
@@ -126,10 +121,6 @@ test('PARTY-MAP session: shareAutomap sends a checked body at most once per AMAP
   assert.equal(s.shareAutomap(K, ['0:2']), false, 'inside the floor');
   clock.t += 1;
   assert.equal(s.shareAutomap(K, ['0:2']), true);
-  const old = hubSession('world133');
-  assert.equal(old.s.amapOk, false);
-  assert.equal(old.s.shareAutomap(K, ['0:1']), false, 'an older relay would close the socket on it');
-  assert.equal(old.sent().length, 0);
 }));
 
 test('PARTY-MAP session: a mate\'s frame is delivered through the wire\'s door - never my own account\'s, never a malformed one, and a sender flooding inside the hub\'s cooldown is held', () => quiet(() => {

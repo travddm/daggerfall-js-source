@@ -208,7 +208,6 @@ test('MARTIAL1 THE SAVE: the martial path and its one ask round-trip beside the 
   restorePlayer(forged, { ...snap, martialPath: 'samurai' });
   assert.equal(forged.martialPath, null);
   const { martialPath: _a, martialPrompted: _b, ...before } = snap;
-  before.career = { ...snap.career }; delete before.career.martialMirror;
   const old = structuredClone(playerEntity);
   restorePlayer(old, before);
   assert.equal(old.martialPath, null); assert.equal(old.martialPrompted, false);

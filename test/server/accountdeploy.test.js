@@ -15,8 +15,8 @@
 //
 // THE PINS THAT MATTER MOST ARE THE TWO DESTRUCTIVE ONES:
 //   - re-minting the signing pair invalidates every token in flight;
-//   - applying 0002 twice errors, because `ALTER TABLE ADD COLUMN` has
-//     no IF NOT EXISTS.
+//   - applying a migration that adds a column twice errors, because
+//     `ALTER TABLE ADD COLUMN` has no IF NOT EXISTS.
 // Both are now properties of a tool rather than warnings in a comment,
 // and both are asked here in the shape that would actually break.
 import { test } from 'node:test';
@@ -80,8 +80,7 @@ test('ACC1-CI: the database id is ONE fact in two files, and the substitution is
 });
 
 test('ACC1-CI: the migrations are applied by the tool that remembers, never enumerated', () => {
-  // THIS IS THE PIN 0002 PAID FOR. `ALTER TABLE ... ADD COLUMN` has no
-  // IF NOT EXISTS, so a second application errors - "apply each one
+  // `ALTER TABLE ... ADD COLUMN` has no IF NOT EXISTS, so a second application errors - "apply each one
   // exactly once, in order" has to be something a tool knows, not a
   // sentence in a comment that somebody reads once. wrangler's
   // `migrations apply` keeps a `d1_migrations` ledger in the database
@@ -91,7 +90,7 @@ test('ACC1-CI: the migrations are applied by the tool that remembers, never enum
 
   const dir = 'server-account/migrations';
   const files = readdirSync(join(root, dir)).filter((f) => f.endsWith('.sql')).sort();
-  assert.ok(files.length >= 2, 'the migration set shrank - this pin is about there being more than one');
+  assert.ok(files.length >= 1, 'no migration to apply');
 
   // DERIVED: no migration may be named in the workflow. A run that
   // lists them is a run that applies a new one only when somebody
@@ -113,8 +112,8 @@ test('ACC1-CI: the migrations are applied by the tool that remembers, never enum
   // controls carried copies of their own, proving only that two
   // throwaway literals still matched each other.
   const HAND_RUN = /^\s*[^#\n]*d1 execute[^\n]*--file/m;
-  const COMMENT = '      # whole reason it replaced two `d1 execute --file` lines: 0002 is';
-  const COMMAND = '          $WRANGLER d1 execute "$DB_NAME" --remote --file=migrations/0002_passwords.sql';
+  const COMMENT = '      # whole reason it replaced two `d1 execute --file` lines: a file that';
+  const COMMAND = '          $WRANGLER d1 execute "$DB_NAME" --remote --file=migrations/0001_schema.sql';
   assert.match(COMMAND, HAND_RUN, 'the pin cannot see a real hand-run migration');
   assert.doesNotMatch(COMMENT, HAND_RUN, 'the pin still fires on a comment about the old spelling');
   assert.doesNotMatch(wf, HAND_RUN, 'the deploy runs a migration file by hand again');
@@ -134,19 +133,13 @@ test('ACC1-CI: the migrations are applied by the tool that remembers, never enum
   assert.match(toml, /^binding\s*=\s*"DB"/m, 'the binding is no longer named DB, which is what src/index.js reads');
 });
 
-test('MIGRATION-PREFIX (the arena\'s third merge of main, 2026-10-03): every migration\'s four-digit prefix is its own, and each is the one before it plus one', () => {
-  // Two branches that each add migrations off the same main take the same
-  // next numbers, and git merges them without a word - the files' NAMES
-  // differ, so nothing conflicts. #547 shipped 0071_silver_ways.sql and
-  // 0072_motherlodes.sql while the arena branch held 0071_home_layout.sql,
-  // 0072_arena.sql and 0073_arena4b.sql; the naive merge of the two had two
-  // 0071s and two 0072s and every test green. The ledger keys a migration
-  // by its whole name, so both of a pair would apply - but in name order,
-  // not the order the arcs were written in, and the number is the name
-  // every note, pin and deploy line uses: a second 0071 is a branch that
-  // was never renumbered past main. A merge renumbers its side's migrations
-  // past main's (the arena's merges did, acct and migrations together);
-  // this is the pin that makes forgetting it red.
+test('MIGRATION-PREFIX: every migration\'s four-digit prefix is its own, and each is the one before it plus one', () => {
+  // Two branches that each add a migration off the same main take the same
+  // next number, and git merges them without a word - the files' NAMES
+  // differ, so nothing conflicts. The ledger keys a migration by its whole
+  // name, so both of a pair would apply, in name order rather than the order
+  // they were written in. A merge renumbers its side's migrations past
+  // main's; this is the pin that makes forgetting it red.
   const dir = 'server-account/migrations';
   const files = readdirSync(join(root, dir)).filter((f) => f.endsWith('.sql')).sort();
   assert.deepEqual(files.filter((f) => !/^\d{4}_[a-z0-9_]+\.sql$/.test(f)), [], 'a migration not named NNNN_name.sql');

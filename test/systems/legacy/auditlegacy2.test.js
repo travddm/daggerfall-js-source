@@ -15,7 +15,7 @@ import { layoutTree } from '../../../src/systems/legacy/tree.js';
 import { mintRemainsItem, isRemainsItem, REMAINS_LIST } from '../../../src/systems/legacy/heirloom.js';
 import { modSaveRecords, restoreModSaveRecords, _resetModSaveData } from '../../../src/systems/modSaveData.js';
 import { setModSetting, _resetModSettings } from '../../../src/systems/modSettings.js';
-import { offlineCopyOf, onlineCopyOf } from '../../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { planStore } from '../../../src/systems/item/itemTransfer.js';
 import { LivingTown, householdKeyOf } from '../../../src/systems/livingWorld/livingTown.js';
 import { ResidentWalker } from '../../../src/characters/residentWalker.js';
@@ -355,11 +355,10 @@ test('AUDIT LEGACY II A10: a remains row\'s list as laid is held to its shape - 
 
 // ---- lens H: heirlooms, the remains, the estate --------------------------------------------------------------------
 
-test('AUDIT LEGACY II H1: a copy between the lanes is a new character of no house - both doors drop the record, and a record with no person for the played lets go', () => {
+test('AUDIT LEGACY II H1: an offline copy is a new character of no house - the copy drops the record, and a record with no person for the played lets go', () => {
   const snap = { name: 'Y', characterId: 'c-y', classicMinutes: 1000, worldMinutes: 900, modData: { [LEGACY_VENDOR]: { v: 1 }, other: { x: 1 } } };
   assert.equal(offlineCopyOf(snap).modData[LEGACY_VENDOR], undefined, 'copy to offline');
-  assert.equal(onlineCopyOf(snap, 5000).modData[LEGACY_VENDOR], undefined, 'customs');
-  assert.deepEqual(onlineCopyOf(snap, 5000).modData.other, { x: 1 }, 'nothing else of the save touched');
+  assert.deepEqual(offlineCopyOf(snap).modData.other, { x: 1 }, 'nothing else of the save touched');
   assert.equal(offlineCopyOf({ ...snap, classicMinutes: undefined }).modData[LEGACY_VENDOR], undefined, 'whatever the clocks say');
   // a save carrying another character's record: the host lets it go, and the character founds its own house
   const w = world();

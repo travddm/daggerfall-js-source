@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { SOCIAL_ROOM, validWdunIn, validWdunOut, parseClient, SEA_FLEET_PERIOD_MS, seaFleetSailing, relaySupportsWdunSea } from '../../../src/net/wire.js';
+import { SOCIAL_ROOM, validWdunIn, validWdunOut, parseClient, SEA_FLEET_PERIOD_MS, seaFleetSailing } from '../../../src/net/wire.js';
 import * as L from '../../../src/net/wild/wildLaw.js';
 import * as E from '../../../src/systems/sea/seaEvents.js';
 import { BANDS, VEIL_X, LEAGUE_PX, veilhaven, etherBandAt, inEther, ETHER_GOODS } from '../../../src/world/ethericSea.js';
@@ -35,7 +35,6 @@ test('SEA-EVENTS the wire and the hub: a sailing scattered is `fk` in, `fd` out 
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'fd', fleets: [3, -1, 'x', 4, 5, 6, 7] }), { k: 'fd', fleets: [3, 4] });
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'st', day: 2, locks: [], crows: [], fleets: [9] }).fleets, [9]);
   assert.deepEqual(validWdunOut({ t: 'wdun', k: 'st', day: 2, locks: [], crows: [] }).fleets, [], 'an older hub\'s hello: none');
-  assert.ok(relaySupportsWdunSea('world246') && !relaySupportsWdunSea('world245'), 'one version with the vaults');
   // her said nothing yet) and a word late on its way - never "this sailing or the last" by the period alone
   const st = L.wdunEmpty(), now = P * 100 + E.FLEET_OFFSET_MS + 5000;
   assert.deepEqual(st.fleets, {});
@@ -288,7 +287,7 @@ test('SEA-EVENTS the flagship\'s spoils (treasureFleet.js ended): sunk or taken,
 function ventures(t) {
   const said = [], mids = [], credits = [], sent = [], fed = [], strikes = [];
   const naval = { fleet: (list, o) => fed.push([list, o]), stormStrike: (k) => { strikes.push(k); return t.hit ?? true; } };
-  const link = { wdunSeaOk: t.seaOk ?? true, status: 'open', sendWdun: (w) => { sent.push(w); return true; } };
+  const link = { status: 'open', sendWdun: (w) => { sent.push(w); return true; } };
   const sea = createSeaVentures({
     live: () => false, day: () => 0, pixel: () => t.px, locks: new Map(), crows: new Map(), mine: () => null,
     clock: () => t.now, naval: () => naval, state: STATE, link: () => link,
@@ -425,10 +424,6 @@ test('SEA-EVENTS the fleet at the host: fed to the naval host FLEET_FEED_MS apar
   assert.equal(v.sea.chartWord().fleet.sunk, true);
   v.sea.hubWord({ k: 'st', fleets: [] });
   assert.equal(v.sea.chartWord().fleet.sunk, true, 'D5: the hub\'s hello never puts my own sinking out');
-  const old = ventures({ ...t, seaOk: false });
-  old.sea.fleetEnded(f.n, 'sink');
-  assert.deepEqual(old.sent, [], 'an older relay is never asked');
-  assert.deepEqual(old.credits, [f.purse], 'her purse paid all the same');
 });
 
 test('SEA-EVENTS the chart\'s word and the harbourmaster\'s talk: the storm\'s eye and reach, the fleet\'s place, heading and route; a freeport\'s rumours - the fleet under way or the next to sail, the storm blowing or the next to gather, each its way and minutes (mutants: the word, the rumours)', () => {

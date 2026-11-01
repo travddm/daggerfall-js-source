@@ -122,7 +122,7 @@ function onlineRig() {
   };
   const board = onlineRigBoard();
   const on = createArenaOnline({
-    now: () => clock.t, session: () => ({ status: 'open', arenaOk: true, room: null }), makeHall,
+    now: () => clock.t, session: () => ({ status: 'open', arenaHeard: true, room: null }), makeHall,
     account: { board: async () => ({ ok: true, data: board }), claim: async () => ({ ok: true }), me: () => null },
     bouts: { setRealm() {}, relay: () => null, dismiss() {} }, enterFloor: () => true, say: () => {}, level: () => 5,
   });

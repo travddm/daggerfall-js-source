@@ -1,16 +1,13 @@
 // RENOWN-ACCOUNT: ONE RENOWN AN
 // ACCOUNT, AND A SLOWER GRIND - and RENOWN-CHAR took the
-// first half back the next day (test/server/renown_char.test.js holds a character's track again, and migration 0035). What
+// first half back the next day (test/server/renown_char.test.js holds a character's track again). What
 // stands here is RENOWN-ACCOUNT's own: the law (src/net/renown.js) - every source pays RENOWN_RATE_PCT, three quarters,
-// of its full rate, floored once (renownRate), the hour's bound 15,000, the curve unmoved; migration 0021 as it ran -
-// each account at its BEST character's total (MAX, never SUM), kept since as history 0035 reads its gains from; and
-// the relay untouched, the law never in its bundle.
+// of its full rate, floored once (renownRate), the hour's bound 15,000, the curve unmoved; and the relay untouched, the
+// law never in its bundle.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
 
-import { mintId } from '../../server-account/src/accounts.js';
 import {
   RENOWN_RATE_PCT, renownRate, renownKillXp, renownQuestXp, renownRaidXp, renownPartyXp, renownXpFor, renownForXp,
   RENOWN_KILL_XP_PER_LEVEL, RENOWN_KILL_LEVEL_MAX, RENOWN_QUEST_XP_BASE, RENOWN_QUEST_XP_PER_LEVEL, RENOWN_QUEST_LEVEL_MAX,
@@ -19,11 +16,6 @@ import {
 import { graph } from '../importGraph.mjs';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const rand = (b) => globalThis.crypto.getRandomValues(b);
-const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-const ACCOUNT_MIGRATION = '0021_renown_account.sql';
-const T0 = 1_800_000_000;
-const migrate = (db, files) => { for (const f of files) db.exec(src(`server-account/migrations/${f}`)); };
 
 // ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════
 
@@ -63,45 +55,6 @@ test('RENOWN-ACCOUNT the rate: every source pays RENOWN_RATE_PCT (75) of its ful
   assert.equal(RENOWN_XP_REPORT_MAX, 5_000, 'one report\'s bound stands');
   assert.equal(Math.ceil(RENOWN_XP_MAX / RENOWN_XP_HOUR_MAX), 155, 'a client that lies every hour takes 155 hours to the cap - it was 116');
   assert.equal(RENOWN_TRACKS_MAX, 60, 'RENOWN-CHAR: the tracks\' bound came back with the tracks (RENOWN-ACCOUNT had taken it)');
-});
-
-// ═══ THE MIGRATION ═══════════════════════════════════════════════════════════════════════════════
-
-test('RENOWN-ACCOUNT the migration (0021), as it ran: each account started at its BEST character\'s XP - the most any one track held, never the sum - with the last report its most recently earned track took; an account whose tracks held nothing got no row; the tracks stayed, and the census 0020 took of them; RENOWN-CHAR\'s 0035, after it, leaves every row as it stood - history its gains are read from (mutants: SUM for MAX; the empty account given a row; the oldest report\'s id kept)', () => {
-  const raw = new DatabaseSync(':memory:');
-  raw.exec('PRAGMA foreign_keys = ON');
-  const i20 = MIGRATIONS.findIndex((f) => f.startsWith('0020_'));
-  assert.equal(MIGRATIONS[i20 + 1], ACCOUNT_MIGRATION, '0021 follows 0020: the census is taken first');
-  migrate(raw, MIGRATIONS.slice(0, i20));
-  // accounts made before 0020 were written by the service as it was then - TERMS1's columns (migration 0023, after
-  // these) did not exist yet, so the guest row is the one it wrote before them
-  const before = () => { const id = mintId(rand); raw.prepare('INSERT INTO players (id, handle, handle_lc, guest_name, created_at, last_seen) VALUES (?, NULL, NULL, ?, ?, ?)').run(id, 'Guest', T0, T0); return { id }; };
-  const A = before(), B = before(), C = before(), D = before();
-  const track = raw.prepare('INSERT INTO renown_tracks (player, char_id, name, xp, last_rid, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
-  track.run(A.id, 'char-main', 'Main', 6000, 'aaaaaaaaaaaaaaaa', 100, 500);
-  track.run(A.id, 'char-alt1', 'Alt', 500, 'bbbbbbbbbbbbbbbb', 200, 900);   // the most recently earned
-  track.run(A.id, 'char-alt2', null, 300, null, 50, 400);
-  track.run(B.id, 'char-zero', null, 0, null, 10, 10);
-  track.run(C.id, 'char-capp', 'Old', RENOWN_XP_MAX, null, 10, 20);
-  track.run(C.id, 'char-newb', 'New', 10, 'cccccccccccccccc', 30, 40);
-  migrate(raw, MIGRATIONS.slice(i20, i20 + 2));   // 0020's census and 0021, as they ran
-  const accounts = () => raw.prepare('SELECT player, xp, last_rid, created_at, updated_at FROM renown_accounts ORDER BY xp').all().map((x) => ({ ...x }));
-  const ran = [
-    { player: A.id, xp: 6000, last_rid: 'bbbbbbbbbbbbbbbb', created_at: 50, updated_at: 900 },
-    { player: C.id, xp: RENOWN_XP_MAX, last_rid: 'cccccccccccccccc', created_at: 10, updated_at: 40 },
-  ];
-  assert.deepEqual(accounts(), ran, 'the best character\'s total (6,000, never 6,800); nothing for an account that earned nothing, or had no track');
-  assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM renown_tracks').get().n, 6, 'the characters\' tracks stayed');
-  assert.deepEqual(raw.prepare('SELECT char_id FROM realm_census WHERE player = ? ORDER BY char_id').all(A.id).map((x) => x.char_id), ['char-alt1', 'char-alt2', 'char-main'], 'the census, as 0020 took it');
-  assert.equal(accounts().some((x) => x.player === B.id || x.player === D.id), false, 'B\'s track held nothing, D had none: no row');
-  // every migration after it - RENOWN-CHAR's 0035 among them: the account's rows stand, history
-  migrate(raw, MIGRATIONS.slice(i20 + 2));
-  assert.deepEqual(accounts(), ran, 'RENOWN-CHAR leaves renown_accounts as it stood');
-  assert.deepEqual(raw.prepare('SELECT char_id, xp FROM renown_tracks WHERE player = ? ORDER BY char_id').all(A.id).map((x) => [x.char_id, x.xp]), [['char-alt1', 500], ['char-alt2', 300], ['char-main', 6000]], 'nothing earned while it was the account\'s: each track its own');
-  const sql = src(`server-account/migrations/${ACCOUNT_MIGRATION}`);
-  assert.match(sql, /player {5}TEXT PRIMARY KEY,/, 'one row an account, by its key');
-  assert.match(sql, /FOREIGN KEY \(player\) REFERENCES players\(id\) ON DELETE CASCADE/);
-  assert.match(sql, /WHY A TABLE OF ITS OWN/, 'the schema\'s choice, justified where it is made');
 });
 
 test('RENOWN-ACCOUNT the relay is untouched: the law is the account Worker\'s and the page\'s, never in the relay\'s bundle (test/net/relayversion.test.js holds that bundle\'s hash); the Worker bundles it and its deploy filter names it', () => {

@@ -31,8 +31,8 @@ export const skySecondsOfEvent = (eventSeconds) => (_on && Number.isFinite(event
 
 /** BANISH-SKY (WAIT4): the two directions as the LAW has them, whatever is installed -
  *  the sky's minute at the instant the event clock reads `eventMinutes`, and the event clock's minute at the instant the
- *  sky reads `skyMinutes`. Pure functions of the relay's clock, exact across every change of the sky's rate. The doors
- *  between the lanes (offlineCopy.js) read an online save's stamps with them: they were taken under the law, whatever
+ *  sky reads `skyMinutes`. Pure functions of the relay's clock, exact across every change of the sky's rate. Copy to
+ *  offline (offlineCopy.js) reads an online save's stamps with them: they were taken under the law, whatever
  *  this page has installed. */
 export const skyOfEventLaw = (eventMinutes) => skyClassicMinutes(wallMsForClassicMinutes(eventMinutes));
 export const eventOfSkyLaw = (skyMinutes) => sharedClassicMinutes(wallMsForSkyMinutes(skyMinutes));

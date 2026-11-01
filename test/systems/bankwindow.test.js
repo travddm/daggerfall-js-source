@@ -294,31 +294,28 @@ test('B2: the house and ship buttons refuse before opening anything (:417-472)',
   assert.equal(e.w.box, null);
   clickRect(e.w, 'sellShip');
   assert.equal(e.w.box, null);
-  // HOUSES-3: a town's houses offered in turn - No offers the next, Yes sells the one offered; one the bank does not buy
-  // back (customs' words) is passed by, and said only where it was all there was; Escape closes, offering nothing more
+  // HOUSES-3: a town's houses offered in turn - No offers the next, Yes sells the one offered; Escape closes, offering
+  // nothing more
   const sold = [];
-  const g = win({ hooks: { houseOffers: () => [{ price: 900, crossed: null }, { price: 0, crossed: ['kept'] }, { price: 700, crossed: null }], sellHouse: (i) => sold.push(i) } });
+  const g = win({ hooks: { houseOffers: () => [{ price: 900 }, { price: 700 }], sellHouse: (i) => sold.push(i) } });
   clickRect(g.w, 'sellHouse');
   assert.equal(idOf(g.w.box), R.SELL_HOUSE_OFFER);
   assert.equal(g.w.box.amount, 900);
-  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(1, 3));
+  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(1, 2));
   g.w.input('KeyN');
-  assert.equal(g.w.box.amount, 700, 'the next it buys back, past the crossed one');
-  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(3, 3));
+  assert.equal(g.w.box.amount, 700, 'the next it buys back');
+  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(2, 2));
   g.w.input('KeyY');
-  assert.deepEqual(sold, [2]);
+  assert.deepEqual(sold, [1]);
   clickRect(g.w, 'sellHouse');
   g.w.input('Escape');
   assert.equal(g.w.box, null, 'Escape offers no next house');
-  assert.deepEqual(sold, [2]);
-  const lone = win({ hooks: { houseOffers: () => [{ price: 500, crossed: null }], sellHouse: (i) => sold.push(i) } });
+  assert.deepEqual(sold, [1]);
+  const lone = win({ hooks: { houseOffers: () => [{ price: 500 }], sellHouse: (i) => sold.push(i) } });
   clickRect(lone.w, 'sellHouse');
   assert.equal(lone.w.box.rows.some((r) => r.text === houseOfferText(1, 1)), false, 'one house: no count');
   lone.w.input('KeyN');
   assert.equal(lone.w.box, null);
-  const kept = win({ hooks: { houseOffers: () => [{ price: 0, crossed: ['That came into the realm through customs.'] }] } });
-  clickRect(kept.w, 'sellHouse');
-  assert.deepEqual(kept.w.box.rows.map((r) => r.text), ['That came into the realm through customs.']);
   // owning one raises the offer carrying its price
   const f = win({ ownsShip: true, ownedShip: 0 });
   clickRect(f.w, 'sellShip');

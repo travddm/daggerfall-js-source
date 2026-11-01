@@ -83,16 +83,16 @@ export function introPage() {
   };
 }
 
-/** A theme that records what is asked of it - the IntroTheme calls the film and the front door make. */
+/** A theme that records what is asked of it - the TitleMusic calls the film and the front door make. */
 export function fakeTheme({ time = 0 } = {}) {
   const calls = [];
   return {
-    calls, source: null, disposed: false, context: null, level: 1, now: time,
+    calls, started: false, disposed: false, context: null, level: 1, now: time,
     time() { return this.now; },
     unlock() { calls.push('unlock'); return Promise.resolve(true); },
     prepare() { calls.push('prepare'); return Promise.resolve(true); },
     setLevel(level, seconds) { this.level = level; calls.push(['setLevel', level, seconds]); },
-    start() { calls.push('start'); this.source ??= {}; this.context = { state: 'running' }; return true; },
+    start() { calls.push('start'); this.started = true; this.context = { state: 'running' }; return true; },
     async pause() {},
     async dispose() { this.disposed = true; calls.push('dispose'); },
   };
