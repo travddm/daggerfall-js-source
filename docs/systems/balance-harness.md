@@ -92,15 +92,17 @@ level 1. Two numbers are compared with it:
 
 ## The player-power budget (B1)
 
-The default run measures typical gear, which never reaches the stacking caps. `+ceiling` measures the same character with every
-source at its cap. Before B1 that character was x20 to x54 a DFU character at level 45 (ARENA2 attributes, DFU's own foe
-row). The caps are now:
+The default run measures typical gear, which never reaches the stacking caps.
+`+ceiling` measures the same character with every source at its cap.
+Before B1 that character was x20 to x54 a DFU character at level 45 (ARENA2 attributes, DFU's own foe row).
+The caps are now:
 
 - a blow at most x1.75 (`BLOW_TOPS` in `powerCeiling.js`; was x119.95);
 - a hurt keeps at least 74% (`GUARD_TOPS`; was 10.71%);
 - a spell at most x1.25 (`SPELL_BUDGET_MOST`);
 - a mastered skill reads at most 110 to hit and to crit (`AIM_PAST_MAX`);
-- a point of a school or weapon past 100 pays 0.25% (was 1%); gear on a weapon skill pays 0.1% a point up to 5% (was 0.44% up to 320%);
+- a point of a school or weapon past 100 pays 0.25% (was 1%);
+- gear on a weapon skill pays 0.1% a point up to 5% (was 0.44% up to 320%);
 - a technique aims +5 to +10 and tops at x1.95 of a blow.
 
 `test/tooling/playerPowerBudget.test.js` holds the character-power bounds.
@@ -108,7 +110,8 @@ row). The caps are now:
 ## Not modelled
 
 The `power` layer gives a caster no spell line (potency, cast speed): a mage's gear line is a damage line on a staff it
-rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and the block roll,
-backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell effects other than damage,
-fatigue, and healing. A value from the harness is a comparison of rule sets on these builds, not a prediction of play.
+rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and
+the block roll, backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell
+effects other than damage, fatigue, and healing. A value from the harness is a comparison of rule sets on these
+builds, not a prediction of play.
 The audit's theoretical x119.95 blow stack is a cap; the `power` layer measures the gear a level typically wears.
