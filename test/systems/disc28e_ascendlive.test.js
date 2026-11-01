@@ -23,11 +23,8 @@ import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { LV2_CSS } from '../../src/ui/levelUp/levelUpStyle.js';
 import { registerEntityFold, computeEntityMods } from '../../src/systems/entityMods.js';
 import { codeHasOnce } from '../codeOnly.mjs';
-import { VirtueLevelUpScreen } from '../../src/ui/virtueLevelUp.js';
 import { rolloutRows, liveNote, liveTint, starLabel, viewOnlyScreen, raiseAt, focusAt, canAscend, ATTRIBUTE_BLURB } from '../../src/ui/levelUp/levelUpView.js';
 import { sheetModel } from '../../src/ui/enhanced/enhancedCharSheet.js';
-import { initVirtueLeveling, LEVELING_VIRTUE, levelingSettings, ORL_VENDOR } from '../../src/systems/oblivionLeveling.js';
-import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 
 const seq = (...v) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
 const career = {
@@ -118,18 +115,11 @@ test('ASCEND-LIVE: a point held at a FLOOR is flagged as one at the ceiling is -
 
 test('ASCEND-LIVE: the mod\'s lane and the view the Stats page opens read the same live values the Stats page draws', () => {
   const p = werewolf();
-  const view = viewOnlyScreen(p, false);
+  const view = viewOnlyScreen(p);
   assert.deepEqual(rolloutRows(view).map((r) => r.live), sheetModel(p).attributes.map((a) => a.value),
     'Ascend from the Stats page shows the Stats page\'s numbers');
   // A view has no points to place, so no star warns about one: the bonus is said, the press is not.
   assert.deepEqual([row(view, 'strength').capped, liveNote(row(view, 'strength'))], [false, '100 with its bonus']);
-  initVirtueLeveling(p, LEVELING_VIRTUE);
-  const reader = (k) => MOD_SETTINGS[ORL_VENDOR].keys[k].default;
-  const v = new VirtueLevelUpScreen(p, { settings: levelingSettings(reader), rolls: seq(0), fanfare: false });
-  assert.deepEqual([row(v, 'endurance').value, row(v, 'endurance').live], [58, 98]);
-  focusAt(v, 'endurance');
-  assert.ok(raiseAt(v, 'endurance'));
-  assert.ok(row(v, 'endurance').live > 98, 'the mod\'s delta moves the live value too');
 });
 
 test('ASCEND-LIVE: the live value folds the modifier channels too - a set\'s or an affix\'s strength is on the star as on the Stats page', () => {

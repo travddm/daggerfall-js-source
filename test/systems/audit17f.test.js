@@ -151,7 +151,7 @@ function walkChargen(onDone) {
   key('Enter');                       // U13: the reflex pick -> U16's summary
   key('Enter');                       // U16: the summary's OK -> the wizard's last screen
   // ORL1: ...and the LEVELING CHOICE, which the door puts up after the
-  // wizard and before `done` (chargenSession.withLevelingChoice). The
+  // wizard and before `done` (chargenSession.withChargenQuestions). The
   // cursor starts on Daggerfall's own system, so this Enter is the walk
   // taking the default - which is the character every pin below already
   // expected to get.

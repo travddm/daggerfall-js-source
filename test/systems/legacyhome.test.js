@@ -31,7 +31,7 @@ const rd = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
 const entity = (over = {}) => ({
   name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', raceId: 4, faceIndex: 3, careerIndex: 5,
   career: { name: 'Nightblade', primarySkills: [28, 22, 16], majorSkills: [19, 24, 13], minorSkills: [1, 2, 3, 4, 5, 6] },
-  level: 7, characterId: 'c-ysolde', chargenDone: true, levelingSystem: 'virtue',
+  level: 7, characterId: 'c-ysolde', chargenDone: true,
   stats: { strength: 60, intelligence: 72, willpower: 55, agility: 80, endurance: 50, personality: 40, speed: 70, luck: 50 },
   skills: Array.from({ length: 35 }, (_, i) => 10 + i),
   ...over,

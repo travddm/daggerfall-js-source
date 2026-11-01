@@ -27,19 +27,12 @@ import { damageModifier, magicResist } from '../../src/combat/formulas.js';
 import { FATIGUE_MULTIPLIER } from '../../src/systems/statMods.js';
 import { LevelUpScreen, MUST_DISTRIBUTE_BONUS_POINTS } from '../../src/ui/charsheet.js';
 import { paintLevelUpWait, RISEN_WAIT_TEXT, OGHMA_WAIT_TEXT, LEVELUP_WAIT_MS } from '../../src/ui/charSheetDoor.js';
-import { VirtueLevelUpScreen, REMAINING_POINTS_ERROR } from '../../src/ui/virtueLevelUp.js';
 import { OGHMA_BONUS_POOL } from '../../src/systems/artifactEffects.js';
-import {
-  levelingSettings, initVirtueLeveling, LEVELING_VIRTUE, LEVELUP_TOTAL,
-  attributeOffset, canRaiseAttribute, ATTRIBUTE_INCREASE_LIMIT,
-} from '../../src/systems/oblivionLeveling.js';
-import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
-import { ORL_VENDOR } from '../../src/systems/oblivionLeveling.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import { patchLocaleTable, setLocale, _resetTextManagerForTests } from '../../src/systems/textManager.js';   // AUDIT GROWTH LANE5-1
 import { crownTitle, askOne, askDone, askView, starHowto } from '../../src/ui/enhanced/enhancedLevelUp.js';   // AUDIT GROWTH LANE5-1
 import {
-  LANE_CLASSIC, LANE_OGHMA, LANE_VIRTUE, levelUpLane, rolloutRows, rolloutPool, poolLabel,
+  LANE_CLASSIC, LANE_OGHMA, levelUpLane, rolloutRows, rolloutPool, poolLabel,
   canAscend, refusalText, corneredHint, pressAt, raiseAt, lowerAt, focusAt, focusedKey, ascend,
   allMaxed, allMaxLine, levelUpFrame,
   levelUpCrown, levelProgress, levelSumRoles, riseRibbon, levelUpVitals, levelUpModel,
@@ -67,13 +60,6 @@ function player(over = {}) {
   p.readyToLevelUp = true; p.pendingLevel = (p.level ?? 1) + 1;
   return Object.assign(p, over);
 }
-const reader = (over = {}) => (k) => (k in over ? over[k] : MOD_SETTINGS[ORL_VENDOR].keys[k].default);
-const S = (over = {}) => levelingSettings(reader(over));
-function virtuePlayer(over = {}) {
-  const p = player();
-  initVirtueLeveling(p, LEVELING_VIRTUE);
-  return Object.assign(p, over);
-}
 
 // ── THE LANE ──────────────────────────────────────────────────────
 
@@ -83,17 +69,11 @@ test('LV1: the window reads WHICH LAW is live off the screen, not off a setting'
   const book = new LevelUpScreen(player({ oghmaLevelUp: true }), seq(0));
   assert.equal(levelUpLane(book), LANE_OGHMA);
   assert.equal(rolloutPool(book), OGHMA_BONUS_POOL, 'the book is a FIXED thirty (AUDIT 39), never a 4..6 roll');
-  const mod = new VirtueLevelUpScreen(virtuePlayer(), { settings: S(), rolls: seq(0) });
-  assert.equal(levelUpLane(mod), LANE_VIRTUE);
 });
 
-test('LV1: each lane is counted and refused IN ITS OWN WORDS, imported rather than typed', () => {
-  const classic = new LevelUpScreen(player(), seq(0));
-  const mod = new VirtueLevelUpScreen(virtuePlayer(), { settings: S(), rolls: seq(0) });
-  assert.equal(refusalText(classic), MUST_DISTRIBUTE_BONUS_POINTS, 'Internal_Strings.csv:110, through ui/charsheet.js');
-  assert.equal(refusalText(mod), REMAINING_POINTS_ERROR, 'l10n/en.yaml:34, through ui/virtueLevelUp.js');
-  assert.match(poolLabel(mod), /virtue/i);
-  assert.notEqual(poolLabel(classic), poolLabel(mod));
+test('LV1: the lane is refused IN ITS OWN WORDS, imported rather than typed', () => {
+  assert.equal(refusalText(), MUST_DISTRIBUTE_BONUS_POINTS, 'Internal_Strings.csv:110, through ui/charsheet.js');
+  assert.equal(poolLabel(), 'Bonus points left');
 });
 
 // ── THE ROWS ASK THE LAW ──────────────────────────────────────────
@@ -128,26 +108,6 @@ test('LV1: canRaise/canLower are the LAW\'s answer - asked, never restated', () 
   assert.ok(spent.every((r) => !r.canRaise), 'an empty pool raises nothing');
   assert.equal(spent[0].canLower, true, 'and the row that took them can give them back');
   assert.equal(spent[0].delta, rolled, 'every point went where it was aimed');
-});
-
-test('LV1: the mod\'s row carries the mod\'s PRICE and the mod\'s ceiling', () => {
-  const p = virtuePlayer();
-  for (const k of STAT_KEYS_ORDER) p.stats[k] = 50;
-  const w = new VirtueLevelUpScreen(p, { settings: S(), rolls: seq(0) });
-  const rows = rolloutRows(w);
-  const luck = rows.find((r) => r.key === 'luck');
-  assert.equal(luck.cost, attributeOffset('luck', S()), 'Luck is priced by the mod, not by the window');
-  assert.ok(luck.cost > 1, 'and it is not one - the window would have nothing to say otherwise');
-  assert.equal(rows.find((r) => r.key === 'strength').cost, 1);
-  // The +5 ceiling: five presses land, the sixth is refused BY THE
-  // PREDICATE, which is what the star reads to decide whether to light.
-  for (let i = 0; i < ATTRIBUTE_INCREASE_LIMIT; i++) raiseAt(w, 'strength');
-  assert.equal(rolloutRows(w).find((r) => r.key === 'strength').delta, ATTRIBUTE_INCREASE_LIMIT);
-  assert.equal(rolloutRows(w).find((r) => r.key === 'strength').canRaise, false);
-  assert.equal(
-    canRaiseAttribute('strength', p.stats, w.deltas, w.purse, w.s), false,
-    'the row and the law agree because the row IS the law',
-  );
 });
 
 // ── THE PRESS ─────────────────────────────────────────────────────
@@ -203,36 +163,9 @@ test('LV1: the commit is the screen\'s, and it is refused until the pool is spen
   );
 });
 
-test('LV1: IN A CORNER, the window names the control that still works - and the corner is REAL', () => {
-  // THE PIN THAT ASSERTED NOTHING. This read "if (w.purse > 0)" over a
-  // virtue character with every attribute at 100 - and `virtuePurse`
-  // clamps such a character's purse to ZERO (ORL1's own fix), so the
-  // body never ran and the hint was never checked. LV1's audit found
-  // it vacuous and replaced it with a corner a player can actually
-  // spend their way into.
+test('LV1: nothing is cornered before a point is spent', () => {
   const classic = new LevelUpScreen(player(), seq(0));
-  assert.equal(corneredHint(classic), null, 'nothing is cornered before a point is spent');
-
-  // A REAL CORNER, found by walking every reachable spend rather than
-  // assumed: a character at 98 across the board is minted a purse of
-  // twelve, and that purse IS fully spendable - but only through LUCK,
-  // whose four-a-point price is the only way to lay twelve on three
-  // rows that can take two points each. A player who spends the three
-  // CHEAP rows instead - which is the obvious move - lands on six
-  // virtues and nothing that will take them.
-  const p = virtuePlayer();
-  for (const k of STAT_KEYS_ORDER) p.stats[k] = MAX_STAT_VALUE - 2;
-  const w = new VirtueLevelUpScreen(p, { settings: S(), rolls: seq(0) });
-  assert.ok(w.purse > 0);
-  for (const k of ['endurance', 'personality', 'speed']) { raiseAt(w, k); raiseAt(w, k); }
-  const rows = rolloutRows(w);
-  const stuck = w.purse > 0 && rows.every((r) => !r.canRaise);
-  assert.ok(stuck, `a reachable corner: purse ${w.purse}, raisable ${rows.filter((r) => r.canRaise).map((r) => r.key)}`);
-  assert.match(corneredHint(w) ?? '', /take a point back/i, 'and the minus is what still works');
-  assert.equal(canAscend(w), false, 'a corner is not an exit - the mod\'s window refuses');
-  // ...and the way out the hint names really is one.
-  assert.equal(lowerAt(w, 'endurance'), true);
-  assert.equal(corneredHint(w), null, 'one point back re-opens the row it came from');
+  assert.equal(corneredHint(classic), null);
 });
 
 test('LV1: ALL-MAX IS THE OTHER TERM OF CheckIfDoneLeveling, and the first cut had only one', () => {
@@ -270,16 +203,6 @@ test('LV1: ALL-MAX IS THE OTHER TERM OF CheckIfDoneLeveling, and the first cut h
   assert.equal(canAscend(v), true, 'and the moment the room runs out, the leftover is voided');
   assert.equal(ascend(v), true);
   assert.equal(q.stats.luck, MAX_STAT_VALUE);
-
-  // THE MOD'S LANE NEEDS NO SUCH ARM: virtuePurse clamps an all-max
-  // character's purse to what a legal spend can pay for, which is
-  // nothing, so the first term answers on its own.
-  const m = virtuePlayer();
-  for (const k of STAT_KEYS_ORDER) m.stats[k] = MAX_STAT_VALUE;
-  const mw = new VirtueLevelUpScreen(m, { settings: S(), rolls: seq(0) });
-  assert.equal(mw.purse, 0, 'ORL1\'s clamp is the mod lane\'s answer to the same wall');
-  assert.equal(allMaxed(mw), false, 'and the window does not invent a branch the mod has not got');
-  assert.equal(canAscend(mw), true);
 });
 
 // ── THE CROWN AND THE BAR ─────────────────────────────────────────
@@ -296,16 +219,13 @@ test('LV1: the crown promises a level - except over the Oghma Infinium, which gr
   assert.equal(cb.to, cb.from, 'applyLevelUp\'s oghma arm takes no Level++ (AUDIT 39), so the window promises none');
 });
 
-test('LV1: the bar under the level is the LAW\'s remainder, in both lanes', () => {
+test('LV1: the bar under the level is the LAW\'s remainder', () => {
   const p = player({ startingLevelUpSkillSum: 100, currentLevelUpSkillSum: 119 });
   const g = levelProgress(p, new LevelUpScreen(p, seq(0)));
   // (119 - 100 + 28) = 47; 47 mod 15 = 2, and 47/15 floors to level 3.
   assert.equal(g.max, LEVELUP_SKILL_SUM_PER_LEVEL);
   assert.equal(g.now, 47 % LEVELUP_SKILL_SUM_PER_LEVEL);
   assert.equal(g.now, 2, 'the remainder, not the whole sum');
-  const vp = virtuePlayer({ levelProgress: 38, levelRollUp: 6 });
-  const vg = levelProgress(vp, new VirtueLevelUpScreen(vp, { settings: S(), rolls: seq(0) }));
-  assert.deepEqual([vg.now, vg.max, vg.carried], [38, LEVELUP_TOTAL, 6]);
 });
 
 // ── THE ONE THING THIS SCREEN TEACHES ─────────────────────────────
@@ -358,7 +278,7 @@ test('AUDIT GROWTH LANE5-1: the window\'s words are read in the player\'s langua
   // read, so a table patched after the import answers - and English comes back with the locale.
   const p = player();
   const w = new LevelUpScreen(p, seq(0));
-  const english = [ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(w), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
+  const english = [ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
     crownTitle({ lane: LANE_OGHMA }), crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }), levelProgress(p, w).label, levelUpVitals(p)[0].label];
   assert.deepEqual(english, ['Helps you hit and avoid hits, as Agility does, and improves your loot.', 'Doesn\'t count toward your next level.', 'Luck',
     'Bonus points left', 'Every attribute is at its maximum. Leftover points can\'t be spent.', 'Spend your points', 'All points spent', 'Your attributes',
@@ -370,17 +290,12 @@ test('AUDIT GROWTH LANE5-1: the window\'s words are read in the player\'s langua
       ['levelup.ask.done', 'Points dépensés'], ['levelup.ask.view', 'Vos attributs'], ['levelup.howto', 'Cliquez'], ['levelup.crown.oghma', 'L\'Oghma Infinium'],
       ['levelup.crown.levelUp', 'Niveau {from} → {to}'], ['levelup.progress.classic', 'Progrès'], ['levelup.vital.health', 'Santé']]);
     setLocale('fr');
-    assert.deepEqual([ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(w), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
+    assert.deepEqual([ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
       crownTitle({ lane: LANE_OGHMA }), crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }), levelProgress(p, w).label, levelUpVitals(p)[0].label],
     ['Chance', 'Ne compte pas', 'Chance (attribut)', 'Points restants', 'Tout est au maximum.', 'Dépensez vos points', 'Points dépensés', 'Vos attributs', 'Cliquez',
       'L\'Oghma Infinium', 'Niveau 3 → 4', 'Progrès', 'Santé']);
-    // ...and the mod's purse, its author's English (ui/virtueLevelUp.js REMAINING_POINTS_LABEL) read the same way
-    const mod = new VirtueLevelUpScreen(virtuePlayer(), { settings: S(), rolls: seq(0) });
-    patchLocaleTable('fr', 'Port_Strings', [['levelup.pool.virtue', 'Vertus restantes']]);
-    assert.equal(poolLabel(mod), 'Vertus restantes');
     setLocale('en');
     assert.equal(ATTRIBUTE_BLURB.luck, english[0], 'and English again with the locale');
-    assert.equal(poolLabel(mod), 'Virtues left');
   } finally { _resetTextManagerForTests(); }
 });
 
@@ -453,11 +368,10 @@ test('LV1: a star\'s brightness is its VALUE, against the same ceiling the rollo
 
 // ── THE WHOLE READING ─────────────────────────────────────────────
 
-test('LV1: levelUpModel is the whole window, and it holds together in every lane', () => {
+test('LV1: levelUpModel is the whole window, and it holds together in both lanes', () => {
   for (const [lane, mk] of [
     [LANE_CLASSIC, () => { const p = player(); return [p, new LevelUpScreen(p, seq(0))]; }],
     [LANE_OGHMA, () => { const p = player({ oghmaLevelUp: true, pendingLevel: null }); return [p, new LevelUpScreen(p, seq(0))]; }],
-    [LANE_VIRTUE, () => { const p = virtuePlayer(); return [p, new VirtueLevelUpScreen(p, { settings: S(), rolls: seq(0) })]; }],
   ]) {
     const [p, w] = mk();
     const m = levelUpModel(p, w);
@@ -468,7 +382,7 @@ test('LV1: levelUpModel is the whole window, and it holds together in every lane
     assert.equal(m.vitals.length, 3, 'health, fatigue and magicka - the sheet\'s own three');
     assert.ok(m.vitals.every((v) => Number.isFinite(v.now) && Number.isFinite(v.max)));
     assert.equal(m.canAscend, m.pool === 0);
-    assert.equal(m.poolLabel, poolLabel(w));
+    assert.equal(m.poolLabel, poolLabel());
   }
   // The classic rollout has NO refusal latch of its own, so the window
   // carries that half and hands it in - without this arm the enhanced

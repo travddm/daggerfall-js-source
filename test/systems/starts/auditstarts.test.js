@@ -26,9 +26,9 @@ import { drawStartChoiceFace, releaseStartChoiceFace, startChoiceFaceOwner, _set
 import { _frameForTests, DRAW_FRAMES_UNDRAWN } from '../../../src/ui/drawWatchdog.js';
 import { createChargenWindow } from '../../../src/systems/chargenSession.js';
 import { ChargenFlow } from '../../../src/ui/chargen.js';
-import { LevelingChoiceScreen } from '../../../src/ui/levelingChoice.js';
+import { ChoiceScreen } from '../../../src/ui/choiceScreen.js';
 import { SKILLS } from '../../../src/systems/skills.js';
-import { ORL_VENDOR } from '../../../src/systems/oblivionLeveling.js';
+import { LEGACY_MOD } from '../../../src/systems/legacy/family.js';
 import { setModSetting } from '../../../src/systems/modSettings.js';
 import { entryTarget, targetWords, WHERE_TEXT } from '../../../src/ui/quest/questLens.js';
 import { canFindPlace } from '../../../src/ui/travel/travelMapWindow.js';
@@ -365,23 +365,23 @@ function madeTo(startChoice, race = 0) {
   return { w, result: () => result };
 }
 
-test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made - a Nord\'s homeland, Skyrim, first and the answer of a page torn down - and asks it after the leveling question (mutants: the race unread, the page asked first)', () => {
+test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made - a Nord\'s homeland, Skyrim, first and the answer of a page torn down - and asks it after the Project Legacy question (mutants: the race unread, the page asked first)', () => {
   const nord = madeTo({ open: () => true }, 2);
-  assert.ok(nord.w.levelingPrompt instanceof StartChoiceScreen, 'the page, the only question with the mod off');
-  assert.equal(nord.w.levelingPrompt.options[nord.w.levelingPrompt.cursor].id, 'Skyrim', 'the Nord\'s homeland');
+  assert.ok(nord.w.questionPrompt instanceof StartChoiceScreen, 'the page, the only question with Project Legacy off');
+  assert.equal(nord.w.questionPrompt.options[nord.w.questionPrompt.cursor].id, 'Skyrim', 'the Nord\'s homeland');
   nord.w.dispose();
   assert.equal(nord.result().startKey, 'Skyrim', 'torn down: the homeland\'s');
-  setModSetting(ORL_VENDOR, 'Enabled', true);
+  setModSetting(LEGACY_MOD, 'Enabled', true);
   try {
     const both = madeTo({ open: () => true }, 2);
-    assert.ok(both.w.levelingPrompt instanceof LevelingChoiceScreen, 'the leveling question first');
+    assert.ok(both.w.questionPrompt instanceof ChoiceScreen, 'the Project Legacy question first');
     both.w.input('Enter');
-    for (let i = 0; i < 3 && !(both.w.levelingPrompt instanceof StartChoiceScreen); i++) both.w.input('Enter');
-    assert.ok(both.w.levelingPrompt instanceof StartChoiceScreen, 'the page after it, last');
+    for (let i = 0; i < 3 && !(both.w.questionPrompt instanceof StartChoiceScreen); i++) both.w.input('Enter');
+    assert.ok(both.w.questionPrompt instanceof StartChoiceScreen, 'the page after it, last');
     both.w.input('Enter');
     assert.equal(both.result().startKey, 'Skyrim');
-    assert.ok(both.result().levelingSystem);
-  } finally { setModSetting(ORL_VENDOR, 'Enabled', false); }
+    assert.ok(both.result().legacyModel);
+  } finally { setModSetting(LEGACY_MOD, 'Enabled', false); }
 });
 
 // ── the start host ───────────────────────────────────────────────

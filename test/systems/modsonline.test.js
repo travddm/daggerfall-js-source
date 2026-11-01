@@ -19,8 +19,7 @@
 //   - a blow is mitigated where it LANDS - damageShieldPool inside
 //     damageFoe for a foe, inside hurtPlayer for me - so the Shield
 //     Widget's block is always the defender's own;
-//   - Oblivion leveling is written into a character at creation,
-//     Handheld Torches is an item in my save with a light on my
+//   - Handheld Torches is an item in my save with a light on my
 //     screen, Travel Options is my own journey.
 //
 // ONE THING IS NOT A RULE - IT IS THE FLOOR. Basic Roads rewrites
@@ -177,7 +176,6 @@ test('MODS-ONLINE-2: a mod the player owns reaches no wire, no save and no roll'
     'immersive-footsteps': ['src/systems/immersiveFootsteps.js'],
     'better-ambience': ['src/systems/betterAmbience.js'],
     'shield-widget': ['src/combat/shieldWidget.js'],
-    'oblivion-remaster-leveling': ['src/systems/oblivionLeveling.js'],
     'handheld-torches': ['src/systems/handheldTorches.js'],
   };
   const BANNED = /\bsendWorld\b|\bsendAct\b|from '(?:\.\.\/)+net\/|getSaveData|restoreSaveData|snapshotPlayer/;   // AUDIT TIDY TEST-5: net/ at any depth

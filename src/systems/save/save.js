@@ -98,22 +98,6 @@ const ENTITY_FIELDS = [
   // pool that did not survive the save would be re-rolled by a save
   // and a load, which is the same exploit through a slower door.
   'readyToLevelUp', 'pendingLevel', 'pendingBonusPool', 'chargenDone',
-  // ORL1: WHICH LEVELING SYSTEM THIS CHARACTER LEVELS BY,
-  // and the mod's bar. `levelingSystem` is answered ONCE, at chargen,
-  // and is a property of the CHARACTER rather than of the install -
-  // which is why it rides here and not in modSettings beside the mod's
-  // sliders. The Mods pane switch decides whether a new character is
-  // ASKED; this decides what an existing one plays.
-  //
-  // A SAVE WRITTEN BEFORE THIS SLICE carries none of the three. The
-  // reader leaves them undefined, `usesVirtueLeveling` reads undefined
-  // as classic, and the two bar fields default to 0 at their only
-  // readers - so an old save loads as exactly the character it was.
-  // The mod's own save does the same with one value (player.lua:707-716
-  // persists `skillPointRollUp` alone and nothing else); the port
-  // carries the bar too, because Daggerfall has no engine-side level
-  // progress counter for it to live in the way Morrowind does.
-  'levelingSystem', 'levelProgress', 'levelRollUp',
   // LEGACY-CHOICE: Project Legacy's answer, the same kind of fact - asked ONCE, at chargen, and the character's own: a
   // model, or no lineage (systems/legacy/family.js NO_LINEAGE), which keeps them out of the system for good. A save
   // written before it carries none, and reads as a character who was never asked.

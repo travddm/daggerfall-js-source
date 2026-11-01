@@ -2,8 +2,7 @@
 // LV1 — THE ASCENSION, drawn. The enhanced skin's level-up window.
 //
 // The reading is ui/levelUp/levelUpView.js's and the LAW is the live rollout
-// screen's (ui/charsheet.js's LevelUpScreen, or ui/virtueLevelUp.js's
-// under the vendored mod). This file owns pixels, keys and pointers,
+// screen's (ui/charsheet.js's LevelUpScreen). This file owns pixels, keys and pointers,
 // and writes nothing a player could not undo with the same two
 // buttons.
 //
@@ -35,8 +34,7 @@
 //
 // ── THE ONE WAY OUT ───────────────────────────────────────────────
 // DFU's sheet refuses to close while bonus points are unspent
-// (CheckIfDoneLeveling, DaggerfallCharacterSheetWindow.cs:433-455) and
-// the mod's window refuses the same way (player.lua:532-552). So does
+// (CheckIfDoneLeveling, DaggerfallCharacterSheetWindow.cs:433-455). So does
 // this one, and it refuses in every vocabulary a player has: the OK
 // button, Escape, and PX28's Tab. A refusal SAYS SO - the plate is a
 // live region and the refusal is written into it - because a control
@@ -235,7 +233,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
 
   /** One star per attribute, positioned in the SAME coordinates the
    *  lines are drawn in - the picture and its hit target are one
-   *  element, which is ui/levelingChoice.js's law obeyed by
+   *  element, which is ui/choiceScreen.js's law obeyed by
    *  construction rather than by a second table. */
   const stars = STAT_KEYS_ORDER.map((key) => {
     const b = el('button', 'lv-star');
@@ -433,8 +431,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     levelJump.textContent = crownTitle(m.crown);
     levelFill.style.width = `${m.progress.max > 0 ? Math.max(0, Math.min(100, (m.progress.now / m.progress.max) * 100)) : 0}%`;
     levelNote.textContent = m.progress.cap ? m.progress.label   // AUDIT FB1026d II C3: "Highest level reached", never its 1/1
-      : t('levelup.progress.bar', '{label}: {now}/{max}', { label: m.progress.label, now: m.progress.now, max: m.progress.max })
-      + (m.progress.carried > 0 ? ` · ${t('levelup.progress.carried', '{n} carried over', { n: m.progress.carried })}` : '');
+      : t('levelup.progress.bar', '{label}: {now}/{max}', { label: m.progress.label, now: m.progress.now, max: m.progress.max });
 
     plateCount.textContent = String(m.pool);
     plateKey.textContent = m.poolLabel;
@@ -483,10 +480,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     ask.textContent = m.crown.viewOnly ? askView() : (m.pool > 0 ? askOne() : askDone());
     pickN.textContent = row.label;
     pickF.textContent = row.delta > 0 ? `${row.base} → ${row.value}` : String(row.value);
-    // THE PRICE, only where there is one. Daggerfall's pool is a point
-    // a point; the mod prices Luck differently from the rest
-    // (attributeOffset), and a window that hid that would be lying
-    // about what the next press costs.
+    // THE PRICE, only where there is one (Daggerfall's pool is a point a point).
     pickC.textContent = row.cost > 1 ? t('levelup.pick.cost', 'Costs {n} per point', { n: row.cost }) : '';
     for (const [k, a] of about) {
       const r = rows.get(k);
@@ -512,7 +506,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     // keyboard user taking it at its word - will not press, so the
     // refusal behind it is unreachable again. It carries the REASON
     // instead, where a pointer and an assistive tech both find it.
-    ok.title = m.canAscend ? '' : refusalText(screen);
+    ok.title = m.canAscend ? '' : refusalText();
     // ...and the button CLOSES rather than ascends, so it says so. The
     // Oghma arm beside it is the same rule for the same reason: the
     // word on the button is what the press does.

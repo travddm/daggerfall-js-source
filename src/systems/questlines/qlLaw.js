@@ -10,7 +10,7 @@
 //
 // THE STAMP (decision 1). A quest is stamped when it STARTS (machine.js startQuestImmediate asks deps.questlinesStamp)
 // and keeps the stamp for life in its own save (quest.js `ql`): a quest begun with the switch off is DFU's to its end,
-// one begun with it on is the layer's to its end, whatever the switch says later - oblivionLeveling.js's law, decided
+// one begun with it on is the layer's to its end, whatever the switch says later - decided
 // at birth and never on load. Online the lane forces the switch on (features.js row `questlines`, online: true).
 //
 // LATCHED (section 2.2). What the layer has once seen stays seen: an objective done, a choice taken, an outcome reached

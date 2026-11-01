@@ -170,7 +170,6 @@ import { createPlayerMagic, CAST_PRESS, flightStop } from './hostMagic.js';   //
 import { tallySkill, skillValue, SKILLS } from '../systems/skills.js';
 import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_HEIGHT, EYE_HEIGHT, startRestGroundedCheck } from '../player/motor.js';   // the rest gate's grounded input, one home
 import { applyLevelUp } from '../systems/advancement.js';
-import { initVirtueLeveling, LEVELING_CLASSIC } from '../systems/oblivionLeveling.js';   // ORL1: the font-less creation path answers the question it could not ask
 import { tickPlayerMinutes, claimMagicRounds, runMagicRoundsFor, playerWeaponHitEntity } from '../systems/worldTick.js';   // AUDIT 18: the player tick every host shares; DISC10-D H1: OnWeaponHitEntity's one dispatcher
 import { mintSharedStamp, hitPoisonOf, hitSpellOf, hitSpellFields, HIT_ARROWS_MAX, wallMsForClassicMinutes, validFoeRecord, validSharedFoe, FOE_HEALTH_MAX, FOES_FRAME_MAX, CELL_FRAME_RECORDS_MAX } from '../net/wire.js';   // AUDIT ONCRASH1 B4a/A3: the stream's door and the memory's, which this host had neither of   // WORLD8: the hour's respawn - DUNGEON-RESPAWN: the dungeon's own pace now (its respawnDue below), the wire's hour not imported (MAC-L1b: nothing shadowed)   // AUDIT WORLD6a B7: the memory's stamp, from the wire's one mint
 import { spendPoolLowest } from '../systems/chargen.js';
@@ -3794,15 +3793,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     };
     createCharacter(playerEntity, r.career, r.careerIndex);
     applyCreationExtras(playerEntity, r, spellsByIndex);
-    // ORL1: THE THIRD APPLY PATH, and the one the one-seam note above
-    // is a warning about - it does not reach finishChargen, so it does
-    // not reach the leveling anchor's twin either. A character made
-    // here was never ASKED the question (there is no font to draw it
-    // with), so the answer is the port's own law, set explicitly rather
-    // than left undefined: `usesVirtueLeveling` would read an absent
-    // field the same way, but a creation path that mints a complete
-    // entity everywhere else should not leave two fields blank here.
-    initVirtueLeveling(playerEntity, LEVELING_CLASSIC);
     surfacePlayer();
     chargenFlow = null;
     chargenWindow = null;
@@ -10095,11 +10085,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         // the headless roll; a pending level-up applies headlessly;
         // anything else just closes. All loud.
         if (activeOverlay === chargenWindow) { chargenInputFallback(); }
-        // ORL1: the mod's window first, because its purse is not a DFU
-        // bonus pool - spending it with spendPoolLowest would ignore
-        // the mod's three-attribute cap, its +5 ceiling and Luck's
-        // price. The window spends its own purse by its own rules and
-        // commits through the same door a player's Enter uses.
         // LV1: THE ENHANCED WINDOW IS A DOM DIV, so this arm is not
         // only about the pool - `activeOverlay = null` below would
         // leave the window ON THE SCREEN with nothing owning it, over
@@ -10109,11 +10094,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         // takes its own DOM away (ui/charSheetDoor.js's
         // enhancedLevelUpOverlay).
         else if (activeOverlay?.isEnhancedLevelUp) {
-          console.warn('[levelup] FONT art unavailable; applying headlessly');
-          activeOverlay.spendRemainingHeadless();
-          surfacePlayer();
-        }
-        else if (activeOverlay?.isVirtueLevelUp) {
           console.warn('[levelup] FONT art unavailable; applying headlessly');
           activeOverlay.spendRemainingHeadless();
           surfacePlayer();

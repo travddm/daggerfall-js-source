@@ -15,7 +15,6 @@ import { SKILLS, levelUpSkillSum } from '../../src/systems/skills.js';
 import { raiseSkills, calculatePlayerLevel, SKILL_RAISE_CHECK_INTERVAL } from '../../src/systems/advancement.js';
 import { SKILL_SWAP_GOLD, swapSkill, swapInChoices, swapShortfall } from '../../src/systems/skillSwap.js';
 import { specGuideModel } from '../../src/ui/growth/specGuide.js';
-import { LEVELING_VIRTUE } from '../../src/systems/oblivionLeveling.js';
 import { onlineLevelFor } from '../../src/systems/levelClimb.js';   // LEVEL-45: the online level
 
 const S = SKILLS;
@@ -128,7 +127,7 @@ test('SWAP-CYCLE CAUGHT UP: points the class\'s skills hold that no raise stored
   assert.deepEqual(sums(p), { starting: before.starting, current: before.current + 4, level: before.level });
 });
 
-test('SWAP-CYCLE THE FORM\'S NUMBER: the model\'s shortfall is the ground a swap would leave, none where it leaves none, and none on Oblivion\'s bar (the sum levels nothing there) (mutant: the bar\'s lane unread)', () => {
+test('SWAP-CYCLE THE FORM\'S NUMBER: the model\'s shortfall is the ground a swap would leave, none where it leaves none', () => {
   const p = made();
   const [ls] = PRIMARY;
   train(p, ls, 100);
@@ -136,6 +135,4 @@ test('SWAP-CYCLE THE FORM\'S NUMBER: the model\'s shortfall is the ground a swap
   assert.equal(sw.shortfall(ls, S.Mercantile), 100 - p.skills[S.Mercantile]);
   train(p, S.Mysticism, 100);
   assert.equal(sw.shortfall(ls, S.Mysticism), 0, 'an equal skill in: no ground');
-  p.levelingSystem = LEVELING_VIRTUE;
-  assert.equal(specGuideModel(p).swap.shortfall(ls, S.Mercantile), 0);
 });

@@ -1,9 +1,7 @@
-// LEVEL-PCT. GrimoireUI is the classic skin under an art pack, so its
-// Level box is the classic sheet's (ui/charsheet.js _showLevel), and that box always printed DFU's skill-sum fraction.
-// A character ORL1's bar levels (the mod's law, chosen at creation) still has that sum kept (advancement.js
-// raiseSkills) but it levels nothing: the Ascension's crown read the bar (12/100), the box the sum (93%). The box now
-// reads the character's own law. And its DFU arithmetic is DFU's precision: `float currentLevel` is a single, and in
-// a double two spans in fifteen read a point off what DFU's box reads.
+// LEVEL-PCT. GrimoireUI is the classic skin under an art pack, so its Level box is the classic sheet's
+// (ui/charsheet.js _showLevel), and that box prints DFU's skill-sum fraction in DFU's own precision: `float currentLevel`
+// is a single, and in a double two spans in fifteen read a point off what DFU's box reads. The Ascension's crown reads
+// the same sum.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -12,7 +10,6 @@ import { CharSheet, CHARSHEET_RECTS, levelProgressPercent } from '../../src/ui/c
 import { levelProgress, viewOnlyScreen, levelUpFrame, LANE_OGHMA } from '../../src/ui/levelUp/levelUpView.js';
 import { createCharSheetWindow } from '../../src/ui/charSheetDoor.js';
 import { SPECIAL_ARTIFACT_HANDLERS, ARTIFACTS } from '../../src/systems/artifactEffects.js';
-import { initVirtueLeveling, LEVELING_VIRTUE, LEVELING_CLASSIC, LEVELUP_TOTAL } from '../../src/systems/oblivionLeveling.js';
 import { createCharacter } from '../../src/systems/chargen.js';
 import { raiseSkills, skillUsesForAdvancement, SKILL_ADVANCEMENT_MULTIPLIER } from '../../src/systems/advancement.js';
 import { SKILLS } from '../../src/systems/skills.js';
@@ -28,13 +25,11 @@ const career = {
   majorSkills: [SKILLS.BluntWeapon, SKILLS.Dodging, SKILLS.Jumping],
   minorSkills: [SKILLS.ShortBlade, SKILLS.Archery, SKILLS.Running, SKILLS.Swimming, SKILLS.Climbing, SKILLS.Medical],
 };
-// The report's own history through the port's own producers: a character minted, its law answered, then one skill
-// pass raising a primary (the bar +8, the sum +1) and two misc skills (the bar +2 each, the sum untouched) - the bar
-// at 12 and the sum one past its anchor, which DFU's arithmetic reads as 93%.
-function played(system) {
+// A character minted, then one skill pass raising a primary (the sum +1) and two misc skills (the sum untouched): the
+// sum one past its anchor, which DFU's arithmetic reads as 93%.
+function played() {
   const p = { isPlayer: true, reflexes: 2, items: [] };
   createCharacter(p, career, 16, { rolls: seq(0) });
-  initVirtueLeveling(p, system);
   const skills = [SKILLS.Etiquette, SKILLS.Backstabbing, SKILLS.LongBlade];
   for (const s of skills) p.skillUses[s] = skillUsesForAdvancement(p.skills[s], SKILL_ADVANCEMENT_MULTIPLIER[s], 1.0, p.level);
   assert.deepEqual(raiseSkills(p, T0 + 361, seq(0), () => {}), skills, 'one pass raises all three');
@@ -47,43 +42,19 @@ const box = (entity) => {
   return w.child.lines;
 };
 
-test('LEVEL-PCT: the report - a character the bar levels reads the bar on the classic Level box, as the Ascension does', () => {
-  const v = played(LEVELING_VIRTUE);
-  assert.equal(v.currentLevelUpSkillSum - v.startingLevelUpSkillSum, 1, 'the sum moved one, as it does for everyone');
-  assert.equal(v.levelProgress, 12, 'the bar took 8 + 2 + 2');
-  assert.deepEqual(levelProgress(v, viewOnlyScreen(v, true)), { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });
-  assert.deepEqual(box(v), ['Progress made to the next level: 12%'], 'the box reads the law that levels this character (was 93%)');
-  // The same history on DFU's law: the bar never moved, and both screens read the sum - 93% and 14 of 15.
-  const c = played(LEVELING_CLASSIC);
-  assert.equal(c.levelProgress, 0);
+test('LEVEL-PCT: the sum moves one for a pass that raises a primary and two misc skills, and the box and the Ascension both read it', () => {
+  const c = played();
+  assert.equal(c.currentLevelUpSkillSum - c.startingLevelUpSkillSum, 1);
   assert.deepEqual(box(c), ['Progress made to the next level: 93%']);
-  assert.deepEqual(levelProgress(c, viewOnlyScreen(c, false)), { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });
+  assert.deepEqual(levelProgress(c, viewOnlyScreen(c)), { now: 14, max: 15, label: 'Skill progress to next level' });
 });
 
-test('LEVEL-PCT: the Oghma Infinium\'s window reads the bar too - the crown asks the character\'s law, not the screen\'s lane', () => {
-  // AUDIT 28e (the level lane): the book mounts the CLASSIC rollout for a character the mod's bar levels
-  // (charSheetDoor: an Oghma level-up is never the mod's window), and its crown read the skill sum - 14 of 15 beside
-  // the box's 12%, LEVEL-PCT's own mismatch inside Enhanced Plus.
-  const v = played(LEVELING_VIRTUE);
-  SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.OghmaInfinium).used({ entity: v, ctx: {} });
-  const w = createCharSheetWindow({ entity: v });
-  const frame = levelUpFrame(v, w);
-  assert.equal(frame.lane, LANE_OGHMA, 'the book\'s own window');
-  assert.deepEqual(frame.progress, { now: 12, max: LEVELUP_TOTAL, carried: 0, label: 'Progress to next level' });
-  assert.deepEqual(box(v), ['Progress made to the next level: 12%'], 'the box and the crown, one number');
-  // The same book on DFU's law reads the sum, as before.
-  const c = played(LEVELING_CLASSIC);
+test('LEVEL-PCT: the Oghma Infinium window reads the sum too', () => {
+  const c = played();
   SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.OghmaInfinium).used({ entity: c, ctx: {} });
-  assert.deepEqual(levelUpFrame(c, createCharSheetWindow({ entity: c })).progress, { now: 14, max: 15, carried: 0, label: 'Skill progress to next level' });
-});
-
-test('LEVEL-PCT: the bar reads the same on both screens at its ends - held to 0..100, a full bar 100%', () => {
-  const v = played(LEVELING_VIRTUE);
-  for (const [bar, pct] of [[0, 0], [99, 99], [LEVELUP_TOTAL, 100], [LEVELUP_TOTAL + 40, 100], [-5, 0]]) {
-    v.levelProgress = bar;
-    assert.equal(levelProgressPercent(v), pct, `bar ${bar}`);
-    assert.equal(levelProgress(v, viewOnlyScreen(v, true)).now, pct, `the crown's bar ${bar}`);
-  }
+  const frame = levelUpFrame(c, createCharSheetWindow({ entity: c }));
+  assert.equal(frame.lane, LANE_OGHMA, 'the book window');
+  assert.deepEqual(frame.progress, { now: 14, max: 15, label: 'Skill progress to next level' });
 });
 
 test('LEVEL-PCT: the classic box is LevelButton_OnMouseClick in DFU\'s own precision (`float currentLevel`, a single)', () => {

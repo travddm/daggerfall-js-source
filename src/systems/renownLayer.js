@@ -7,7 +7,7 @@
 // health, the lycanthrope's limiter, the spell points off live intelligence, the enchantments' and the magery's
 // modifier. So every heal, rest, potion, bar and clamp that reads `maxHealth` or `maxMagicka` reads the online value
 // with no second door, and nothing that WRITES either one touches the layer:
-//   - a level-up adds to `rawMaxHealth` (advancement.js, oblivionLeveling.js) - the stored value, without the layer;
+//   - a level-up adds to `rawMaxHealth` (advancement.js) - the stored value, without the layer;
 //   - the magic round rewrites `maxMagickaModifier` every game minute (passiveSpecials.js, enchantments.js) - a
 //     different term of the sum.
 //
