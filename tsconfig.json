@@ -31,7 +31,12 @@
     "strict": false,
     "noImplicitAny": false,
     "skipLibCheck": true,
+    // Node runs a .ts file by stripping its types, so a .ts file may use only syntax that erases to nothing: no enum,
+    // no namespace, no parameter property (docs/coding-standards.md, "TypeScript").
+    "erasableSyntaxOnly": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
-  "include": ["src/**/*.js"]
+  "include": ["src/**/*.js", "src/**/*.ts"]
 }
