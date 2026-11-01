@@ -90,6 +90,38 @@ The repository moves to TypeScript one module at a time.
   first candidate. Generated output is never edited by hand, and the change that adds a generator records a benchmark
   before and after. Without a measurement, write the code by hand.
 
+## Approved libraries
+
+A runtime dependency needs a permissive licence (MIT, Apache-2.0, BSD, ISC or zlib), first-class TypeScript types, and
+a clear gain in speed or in maintained code. Any other dependency needs the owner's approval in a pull request.
+
+A library is adopted inside the pull request that extracts or rebuilds the area it serves, never as a codebase-wide
+sweep. A library that claims speed comes with a benchmark before and after.
+
+Licences and versions were checked on npm on 2026-11-01.
+
+| Library                                                                     | Version | Licence                       | Replaces                                                                                                                                                                        |
+| --------------------------------------------------------------------------- | ------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Valibot](https://valibot.dev)                                              | 1.5     | MIT                           | Hand-written validation of wire messages, saves and account requests. One schema gives the validator and the type, shared by client and relay. No `eval`, which Workers forbid. |
+| [Hono](https://hono.dev)                                                    | 4.13    | MIT                           | The account service's router and the relay's HTTP routes                                                                                                                        |
+| [Drizzle ORM](https://orm.drizzle.team)                                     | 0.45    | Apache-2.0                    | Hand-written D1 queries: a typed schema, typed queries and generated migrations on top of `0001_schema.sql`                                                                     |
+| [recast-navigation-js](https://github.com/isaac-mason/recast-navigation-js) | 0.44    | MIT (Recast and Detour: zlib) | The hand-written navmesh bake. Mods supply geometry before the bake.                                                                                                            |
+| [ses](https://github.com/endojs/endo/tree/master/packages/ses)              | 2.3     | Apache-2.0                    | The mod sandbox                                                                                                                                                                 |
+| [gl-matrix](https://glmatrix.net)                                           | 3.4     | MIT                           | Matrix and vector math, when renderer and collision code is extracted                                                                                                           |
+| [Preact](https://preactjs.com)                                              | 11.1    | MIT                           | New or rebuilt UI only: the mod manager, character modes, rebuilt windows                                                                                                       |
+
+Only when the need arises:
+
+- [fflate](https://github.com/101arrowz/fflate) 0.8 (MIT): archive decompression.
+- [msgpackr](https://github.com/kriszyp/msgpackr) 2.1 (MIT): binary wire encoding.
+
+Not used:
+
+- three.js and Babylon.js: they would rewrite a working renderer.
+- Rapier and other physics engines: they change the movement feel against Daggerfall Unity.
+- Zod: it is larger and slower than Valibot. TypeBox's compiler is out too, because it needs `eval`.
+- General utility libraries: the standard library covers them.
+
 ## Documentation
 
 Write for a maintainer who will change the code. Prefer short sentences in the active voice, one term for one
