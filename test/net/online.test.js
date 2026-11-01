@@ -22,7 +22,7 @@ import {
   POSE_HZ, HEARTBEAT_MS, WORLD_CELL, PEER_TIMEOUT_MS, BACKOFF_MIN_MS, BACKOFF_MAX_MS, DEFAULT_SERVER, SNAP_WORLD_UNITS, SNAP_SCENE_UNITS,
   slug, worldRoom, roomKeyFor, poseChanged, lerpPose, peerId, peerSecret, OnlineSession,
 } from '../../src/net/online.js';
-import { WORLD_CELL as WIRE_CELL, RANGE_PIXELS, PIXEL_UNITS, POSE_BOUND, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, roomOf, validPose, relayUrl, POSE_TS_MOD, GROUND_LAW, GRANT_HELLO_LAW, CELL_HELLO_LAW, LOOT_HELLO_LAW } from '../../src/net/wire.js';
+import { WORLD_CELL as WIRE_CELL, RANGE_PIXELS, PIXEL_UNITS, POSE_BOUND, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, roomOf, validPose, relayUrl, POSE_TS_MOD, GROUND_LAW, GRANT_HELLO_LAW, CELL_HELLO_LAW, LOOT_HELLO_LAW, RELAY_VERSION } from '../../src/net/wire.js';
 import * as relay from '../../server/src/relay.js';
 import { composeLook, lookKey, peerStubEntity, alphaBounds, cropRgba, LOOK_ITEM_FIELDS, LOOK_GROUPS, PEER_ARCHIVE, PEER_HEIGHT, DOLLS_MAX, DOLL_RETRY_MS, RemotePlayers } from '../../src/net/remotePlayers.js';
 import { LOOK_GROUPS as WIRE_GROUPS, LOOK_ITEM_FIELDS as WIRE_FIELDS } from '../../src/net/wire.js';
@@ -113,18 +113,20 @@ test('ONLINE1: the session over a fake socket, on its own clock - hello on open,
   assert.equal(s.status, 'open'); assert.equal(s.statusLine(), null);
   assert.deepEqual(sockets[0].sent[0], { t: 'hello', id: 'mac-0001', secret: 'shh-shh-shh-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, pose: { ...pose(1), ts: now % POSE_TS_MOD }, gl: GROUND_LAW, gv: GRANT_HELLO_LAW, cv: CELL_HELLO_LAW, ll: LOOT_HELLO_LAW, ls: 1, fv: 1 }, 'PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: and, to a loot room, the loot it reads - test/net/lootdoor.test.js); PIN MOVED (COST-2 part two: and, to a cell, the cell law it stands on - test/net/cellrepartition.test.js); PIN MOVED (STAFF-PANEL5-FREEZE: and that it shows the freeze screen); PIN MOVED (LEASE1, net/roomLease.js: and that it hands its hub\'s lease on, to a lease room); PIN MOVED (GRANT-DOOR, Spawn-Grants section 20: and the spawn grants it stands on, to a room whose foes ride): the hello carries the id, its secret and the latest pose - stamped with when it is said (SCALE2b) - and, to a cell, the ground this build stands on (PIN MOVED: GROUND-GATE, Field-Bugs-2026-10-17f)');
   assert.equal(s.sendPose(pose(2)), false, 'SD-HELLO (PIN MOVED): nothing past the hello until the room welcomes the socket');
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (
+  // Ann, far off in the cell, keeps the session from being alone, so lone sleep holds none of these poses
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0001', name: 'Ann', look: {}, pose: pose(40 * PIXEL_UNITS) }], v: RELAY_VERSION });   // SD-HELLO (
   assert.equal(s.sendPose(pose(2)), true); now += 20; assert.equal(s.sendPose(pose(3)), false, 'twenty ms later: throttled');
   now += 100; assert.equal(s.sendPose(pose(3)), true, 'a tenth of a second: sent'); now += 100; assert.equal(s.sendPose(pose(3)), false, 'unmoved: not sent');
   assert.equal(sockets[0].sent.filter((m) => m.t === 'pose').length, 2); assert.equal(POSE_HZ, 10);
+  sockets[0].receive({ t: 'leave', id: 'ann-0001', n: 1 });
   now += HEARTBEAT_MS; assert.equal(s.sendPose(pose(3)), false, 'alone in a cell: an unmoved heartbeat wakes nobody');
   assert.equal(s.stats.poses, 2);
   sockets[0].receive({ t: 'join', id: 'nye-0001', name: 'Nye', n: 2 });
-  assert.equal(s.sendPose(pose(3)), true, 'someone joined: the standing pose goes at once');
+  assert.equal(s.stats.poses, 3, 'someone joined: the lone session wakes and says its standing pose at once');
   sockets[0].receive({ t: 'leave', id: 'nye-0001', n: 1 });
   // the roster, a join, a pose, easing, a leave - all on the session's clock, ticked with NO argument
   const far = pose(20 * PIXEL_UNITS);   // twenty pixels off: in the roster, past the relay's range
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(10) }, { id: 'zed-0001', name: 'Zed', look: {}, pose: far }, { id: 'mac-0001', name: 'me' }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(10) }, { id: 'zed-0001', name: 'Zed', look: {}, pose: far }, { id: 'mac-0001', name: 'me' }], v: RELAY_VERSION });
   assert.equal(s.peers.size, 2, 'myself left out');
   assert.deepEqual(s.drawable().map((p) => p.id), ['bob-0001'], `a peer past RANGE_PIXELS (${RANGE_PIXELS}) is known but not drawn`);
   sockets[0].receive({ t: 'join', id: 'eve-0001', name: 'Eve', look: {}, pose: null });
@@ -145,14 +147,14 @@ test('ONLINE1: the session over a fake socket, on its own clock - hello on open,
   now += 30; s.tick();
   const drawn = s.peers.get('bob-0001').shown.x;
   assert.ok(drawn > 21 && drawn < 22, `part way from 21 to 22 (${drawn})`);
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(30) }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(30) }], v: RELAY_VERSION });
   // SLAM14 (AUDIT SLAM FINAL B2): Zed, not in the roster, is UNCONFIRMED - the roster names the nearest, not the present
   assert.equal(s.peers.size, 2, 'Zed, not in the roster, is kept'); assert.deepEqual(Object.keys(s.peers.get('zed-0001').unconfirmed), [s.room], 'stamped unconfirmed for this room');
   assert.equal(s.peers.get('bob-0001').from.x, drawn, 'Bob eases from where he was drawn');
   now = s.peers.get('zed-0001').seenAt + PEER_TIMEOUT_MS + 1; s.tick();
   assert.equal(s.peers.size, 1, 'and Zed, unconfirmed and silent past the timeout, is gone');
   // the relay's frames are checked by the wire's own law
-  sockets[0].receive({ t: 'welcome', peers: 5 }); assert.equal(s.peers.size, 1, 'a roster that is not a list: nobody named, no throw - and (SLAM14) nobody dropped for it');
+  sockets[0].receive({ t: 'welcome', peers: 5, v: RELAY_VERSION }); assert.equal(s.peers.size, 1, 'a roster that is not a list: nobody named, no throw - and (SLAM14) nobody dropped for it');
   assert.ok(s.peers.get('bob-0001').unconfirmed, 'Bob is unconfirmed by it, as by any roster that does not name him');
   sockets[0].receive({ t: 'leave', id: 'bob-0001' }); assert.equal(s.peers.size, 0, 'a leave takes him at once');
   sockets[0].receive({ t: 'join', id: 'bob-0001', name: '<b>Bob☃</b>', look: null, pose: { x: 'NaN-town' } });
@@ -183,7 +185,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   let now = 1_700_000_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'shh-shh-shh-0001', WebSocketImpl: FakeWS, now: () => now });
   s.join('world:25,15', pose(0)); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(1) }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(1) }], v: RELAY_VERSION });
   // a room change: the socket closes, a new one opens on the new room; the old socket's late events do nothing
   s.join('dungeon:m77', pose(0));
   assert.equal(sockets[0].closed.code, 1000); assert.equal(sockets.length, 2); assert.equal(sockets[1].url, 'wss://relay.test/room/dungeon:m77');
@@ -209,7 +211,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   now = s._retryAt + 1; s.tick(); assert.equal(sockets.length, 5);
   assert.ok(BACKOFF_MAX_MS >= BACKOFF_MIN_MS * 4);
   sockets[4].open(); assert.notEqual(s._backoff, BACKOFF_MIN_MS, 'SLAM12: an open alone resets nothing - CLOSE_BUSY arrives after it');
-  sockets[4].receive({ t: 'welcome', id: 'mac-0001', peers: [] }); assert.equal(s._backoff, BACKOFF_MIN_MS, 'the WELCOME resets it - the relay said yes');
+  sockets[4].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION }); assert.equal(s._backoff, BACKOFF_MIN_MS, 'the WELCOME resets it - the relay said yes');
   // the relay's error frame, then its policy close: terminal - no storm
   sockets[4].receive({ t: 'error', m: 'bad pose' }); assert.equal(s.status, 'error'); assert.equal(s.error, 'bad pose');
   sockets[4].drop(CLOSE_POLICY); assert.equal(s.terminal, true); assert.equal(s.statusLine(), 'online: bad pose');

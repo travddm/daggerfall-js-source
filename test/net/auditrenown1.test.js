@@ -32,7 +32,7 @@ import {
 } from '../../src/net/renown.js';
 import { mintRenownOrder, ORDER_TTL_S } from '../../src/net/identityToken.js';
 import {
-  RENOWN_ROOM_HZ_MAX, RENOWN_RESEND_MS, RENOWN_ORDER_KEEP_MS, renownRoomGate, CHAT_WORLD_ROOM,
+  RENOWN_ROOM_HZ_MAX, RENOWN_RESEND_MS, RENOWN_ORDER_KEEP_MS, renownRoomGate, CHAT_WORLD_ROOM, RELAY_VERSION,
 } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { withClock } from '../placeWidest.mjs';
@@ -170,7 +170,7 @@ test('AUDIT RENOWN1 DATA-4/GAME-9: a report is ONE transaction under its own id 
   const before = windowOf(db, me.id).xp;
   await assert.rejects(reportRenownXp({ db, nowS: T0 + 20 }, me, { character: 'char-boom', xp: 500, rid: '1111111111111111' }));
   assert.equal(windowOf(db, me.id).xp, before, 'the hour is as it was: the report is one transaction');
-  assert.match(src('server-account/migrations/0009_renown.sql'), /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
+  assert.match(db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('renown_tracks').sql, /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
 });
 
 test('AUDIT RENOWN1 DATA-5: reports racing near the cap are decided against the track as it stands INSIDE the transaction - the hour is charged what the track took, and only one says it rose (mutants: what the track can take read before the write)', async () => {
@@ -286,17 +286,12 @@ const cell = () => {
 };
 const renownSent = (w) => w.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'renown');
 
-test('AUDIT RENOWN1 WIRE-3: each socket is sent a renown order on ITS OWN welcome\'s word - a halo whose relay is a version behind is sent none while the primary\'s is sent it; a halo promoted to the primary keeps its own state; the order goes nowhere past its keeping (mutants: a session-wide flag; a socket\'s state lost on promotion)', () => {
+test('AUDIT RENOWN1 WIRE-3: a welcomed socket is sent a renown order, and once its room answers it the order goes no more (mutants: the order resent after its answer)', () => {
   const { s, sockets, clock } = cell();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world111' });
-  s.setHalo(['world:3,12']);
-  sockets[1].open();
-  sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world110' });   // a relay mid-deploy
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: RELAY_VERSION });
   assert.equal(s.sendRenownOrder('v1.a.b', 7), true);
   assert.deepEqual(renownSent(sockets[0]), [{ t: 'renown', order: 'v1.a.b' }]);
-  assert.deepEqual(renownSent(sockets[1]), [], 'the world110 socket would be closed by the frame');
   clock.t += 5000; s.tick();
-  assert.deepEqual(renownSent(sockets[1]), [], 'and it stays unsent however long it waits');
   sockets[0].receive({ t: 'renown', id: 'mac-0001', lv: 7 });
   const went = renownSent(sockets[0]).length;
   clock.t += 5000; s.tick();

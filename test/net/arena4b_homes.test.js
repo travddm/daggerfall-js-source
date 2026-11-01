@@ -59,7 +59,7 @@ test('ARENA4b the arena\'s cell is one law at both ends: Daggerfall\'s map id an
   assert.equal(homeInArenaCell(DF, OLD + 2 ** 32), false, 'a key whose low bits name the cell is still out of shape');
   const S = await standService();
   const cols = S.env.DB._raw.prepare('PRAGMA table_info(homes)').all().map((c) => c.name).filter((c) => !['map_id', 'building_key', 'guild_id', 'score'].includes(c));
-  assert.deepEqual([...HOME_MOVE_CARRIED].sort(), cols.sort(), 'every column of a home\'s row is carried (the key moves, the guild is set after)');   // PIN MOVED: AUDIT HOME-VOTE A2 - the score the database keeps with the votes, which go with the old row (migration 0107)
+  assert.deepEqual([...HOME_MOVE_CARRIED].sort(), cols.sort(), 'every column of a home\'s row is carried (the key moves, the guild is set after)');   // PIN MOVED: AUDIT HOME-VOTE A2 - the score the database keeps with the votes, which go with the old row
 });
 
 test('ARENA4b a home MOVED: the row whole at the new key, the old gone; the catalogue\'s and the yard\'s pieces refunded WHOLE onto the record\'s Daggerfall account in the move\'s batch; every piece, the furniture\'s list and the offered rooms gone; a running tenancy carried unlisted and pointless; once (mutants: the old row deleted before the tenancy moves; the refund halved; an item piece refunded; a column not carried; the tenancy kept listed)', async (t) => {

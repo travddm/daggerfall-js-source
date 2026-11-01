@@ -1,5 +1,5 @@
 // WITCH1: THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
-// the REAL migrations (test/accountDb.mjs, migration 0140): the finds the service's own die decides and a day caps, the
+// the REAL migrations (test/accountDb.mjs): the finds the service's own die decides and a day caps, the
 // sales under a request id, the Hearth Offerings set out, filled, taken from once a day and taken in, an orphan's cakes
 // sent home, and the festival's wardrobe - the titles, the aura and the profile icon, held only as the rows say.
 import { test, mock } from 'node:test';

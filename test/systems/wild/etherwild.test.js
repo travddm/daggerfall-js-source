@@ -126,7 +126,7 @@ test('ETHER-WILD: an isle\'s ruin is read by its band at its own pixel, through 
 test('ETHER-WILD: the hosts\' seams - the frame stands the sea beside the mountains, online, on its ground; no pace cap at sea; the rise, the teleports, the maps\' hiding, the packs and an isle\'s ruin read the sea', () => {
   const w = src('src/scenes/world.js');
   const frame = w.slice(w.indexOf('const wildFrame = () => {'), w.indexOf('// WILD-LINE-HOLD (2026-10-08'));
-  assert.match(frame, /const seaRing = _onlineWorldSession\(\) && !!online\?\.wildOk && etherSea && playerSpawned \? etherWildRingAt\(/, 'online, past a relay that raises the zone, with the sea standing');
+  assert.match(frame, /const seaRing = _onlineWorldSession\(\) && !!online && etherSea && playerSpawned \? etherWildRingAt\(/, 'online, with the sea standing');
   assert.match(frame, /const here = seaRing > 0 \|\| \(/, 'the sea is the zone beside the mountains');
   assert.match(frame, /ring = seaRing \|\| wildRingAt\(/, 'the sea\'s band is the ring');
   assert.match(frame, /setWildHere\(here, ring, seaRing \? ETHER_KIND : undefined\)/, 'the ground on the flag');
@@ -167,7 +167,7 @@ test('ETHER-WILD: the crossing says what lies past the peace, online alone; at s
   assert.deepEqual(questionRows('abcdefgh ij', 5), ['abcdefgh', 'ij'], 'a word past the width stands alone');
   assert.deepEqual(questionRows('  '), []);
   assert.deepEqual(crossingRows('home', { pvp: true }), crossingRows('home'), 'the way home warns of nothing');
-  assert.match(src('src/scenes/world.js'), /rows: crossingRows\(way, \{ pvp: _onlineWorldSession\(\) && !!online\?\.wildOk \}\)/, 'online, past a relay that raises the zone');
+  assert.match(src('src/scenes/world.js'), /rows: crossingRows\(way, \{ pvp: _onlineWorldSession\(\) && !!online \}\)/, 'online');
   // aboard at sea; his pack is storage no death takes now, and he is sent back aboard from either ground
   assert.ok(!src('src/systems/naval/crewCompanions.js').includes('heldAtSide'), 'no ground holds him');
 });

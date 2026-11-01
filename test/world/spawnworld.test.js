@@ -16,7 +16,7 @@ import {
 import { worldLaneMapId, worldLaneOf, isWorldLaneMapId, worldLanePixel, ABYSS_WORLD_LANE, SPAWN_WORLD_LANE, WORLD_LANE_RUN } from '../../src/world/worldWide/worldLanes.js';
 import { WORLD_PIXEL_SPAN } from '../../src/world/worldWide/worldGrid.js';
 import { setArenaRoads, beyondKey } from '../../src/world/arenaRoads.js';
-import { spawnedHallMapId, isHallMapId, WORLD_PIXEL_BOUND, isWorldRoom, wdunHallOfRoom, seaRoomOf, owWireRow, validOwIn, validOwOut, worldRoom, OW_WORLD_RELAY_MIN, relaySupportsOwWorld, roomOf } from '../../src/net/wire.js';
+import { spawnedHallMapId, isHallMapId, WORLD_PIXEL_BOUND, isWorldRoom, wdunHallOfRoom, seaRoomOf, owWireRow, validOwIn, validOwOut, worldRoom, roomOf } from '../../src/net/wire.js';
 import { owRowSane, owRowFits, owRowInCell, owSpawnsDungeon } from '../../src/net/overworldLaw.js';
 import { instanceRoomOf, instanceOf } from '../../src/net/instanceRoom.js';
 import { roomKeyFor } from '../../src/net/online.js';
@@ -166,7 +166,7 @@ test('SPAWN-WORLD the stand past the Bay (scenes/spawnStandHost.js, run): online
   assert.equal(stand({ online: false })._locationToBuild(sx, sy), null, 'offline the land past the Bay stands no spawn');
 });
 
-test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cell\'s - the ledger says it, the relay\'s law reads it (the roll its own copy, the cell its square), a client says it to the relay that reads it alone (mutants: the ledger\'s spelling, the relay\'s bound, the client\'s gate)', () => {
+test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cell\'s - the ledger says it, the relay\'s law reads it (the roll its own copy, the cell its square), a client says it (mutants: the ledger\'s spelling, the relay\'s bound)', () => {
   const [sx, sy] = rolledAt(2200, -371);
   const L = createSpawnLedger();
   L.note(`${sx},${sy}`, 100);
@@ -188,12 +188,8 @@ test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cel
   assert.equal(owRowSane([nx, ny, 100]), false, 'a pixel the roll stands none on is junk');
   assert.equal(owRowInCell(row, worldRoom(sx, sy)), true, 'in its own cell, west and north of the Bay\'s corner');
   assert.deepEqual(validOwOut(validOwIn({ k: 'dg', rows: [row] })), { k: 'dg', rows: [row] }, 'the word round-trips');
-  assert.equal(OW_WORLD_RELAY_MIN, 276);
-  assert.deepEqual([relaySupportsOwWorld('world276'), relaySupportsOwWorld('world275'), relaySupportsOwWorld('x')], [true, false, false], 'world275 refuses the word whole - and closes the socket');
   const online = rd('src/net/online.js');
-  assert.match(online, /k === 'dg' \? validOwIn\(\{ k, rows: payload\.filter\(\(r\) => owRowSane\(r\) && owRowInCell\(r, room\) && \(this\.owWorldOk \|\| bayMapPixel\(r\?\.\[0\], r\?\.\[1\]\)\)\)/, 'a row past the Bay to the relay that reads it alone');
-  assert.match(online, /if \(primary\) this\.owWorldOk = relaySupportsOwWorld\(relayV\);/);
-  assert.match(online, /old\.owWorldOk = this\.owWorldOk; this\.owWorldOk = !!h\.owWorldOk;/, 'and its word moves with the cell a crossing makes mine');
+  assert.match(online, /k === 'dg' \? validOwIn\(\{ k, rows: payload\.filter\(\(r\) => owRowSane\(r\) && owRowInCell\(r, room\)\)/, 'a row past the Bay said as the Bay\'s is');
 });
 
 test('SPAWN-WORLD the room, the discovered places and the docks: a spawn past the Bay entered is a world room the relay keeps - public and instanced - and no hall\'s nor the sea\'s; found, it is filed by its whole id and finds no Bay place; it is no dock (mutants: the lane\'s flag)', () => {

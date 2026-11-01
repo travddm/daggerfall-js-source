@@ -81,8 +81,8 @@ export const conditionMultipliersByMaterial = Object.freeze([4, 6, 6, 8, 12, 16,
  *  carried its power for a few blows or none: Worm's Tooth (a Dagger or a Tanto) its strike for five, Nightwhisper on
  *  a Dagger or a Tanto its held Chameleon not past the equip, at that cost. Ammunition keeps its row's:
  *  CreateWeapon's arrow arm runs no material pass. The rows stay Daggerfall's - itemTemplates.js mintCondition reads
- *  this in their place, and conditionRepair.js repoolWeapon moves a piece minted on its row, at a load or before
- *  its first wear. A departure
+ *  this in their place, and conditionRepair.js repoolWeapon moves a piece minted on its row before its first
+ *  wear. A departure
  *  (Ledger A, WEAPON-POOL). */
 export const WEAPON_CONDITION_POOL = 1600;
 

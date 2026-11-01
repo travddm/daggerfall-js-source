@@ -48,12 +48,11 @@ const PUBLIC_ALLOWLIST = new Map([
   ['public/icons/icon-512.png', 'TI2: home-screen icon, drawn by scripts/makeIcons.mjs from the skin\'s tokens'],
   ['public/icons/icon-512-maskable.png', 'TI2: home-screen icon (maskable), drawn by scripts/makeIcons.mjs from the skin\'s tokens'],
   // INTRO2: restored at Mac's explicit request. The credit
-  // marks and score are the identical U65 assets, not ARENA2-derived data.
+  // marks are the identical U65 assets, not ARENA2-derived data.
   // Credit marks identify their respective projects; no new rights claimed.
-  // INTRO-REVERT: the recording is back with its row.
+  // The intro's music is Daggerfall's own title song, read from ARENA2.
   ['src/assets/intro/interkarma.webp', 'U65 credit artwork identifying Interkarma / Daggerfall Unity; recovered unchanged'],
   ['src/assets/intro/nexus.webp', 'U65 credit artwork identifying Nexus Mods; recovered unchanged'],
-  ['src/assets/intro/theme.mp3', 'U65 original theme recording; recovered unchanged at Mac\'s request'],
   ['src/assets/branding/dfo-online.png', 'BR6: Mac\'s supplied DFO Online dragon logo, 2026-10-26 (BR5\'s mark before it), his own file with alpha, cut to its painted bounds and scaled to 1232 x 1034 at his word; no ARENA2 data'],
   // THE SITE'S PICTURES (U60c) WERE RETIRED with the DA site cleanup
   // (Mac, 2026-08-31): the landing page carries no raster at all now -

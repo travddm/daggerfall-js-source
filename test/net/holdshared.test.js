@@ -110,11 +110,10 @@ test('HOLD-SHARED: in the Hold a Local line goes to the room, two party members 
   const end = W.indexOf('\n  };\n', at);
   assert.ok(at > 0 && end > at, 'chatSend');
   const sent = [];
-  const ok = new Function('online', 'chatLog', 'chanOld', 'guildOld', 'socialLink', 'chatLinks', 'social', 'myGuildTag',
-    'CHAN_OLD_RELAY_TEXT', 'GUILD_OLD_RELAY_TEXT', 'EMOTE_OLD_RELAY_TEXT', 'NO_PARTY_TEXT', 'NO_GUILD_TEXT',
+  const ok = new Function('online', 'chatLog', 'socialLink', 'chatLinks', 'social', 'myGuildTag', 'NO_PARTY_TEXT', 'NO_GUILD_TEXT',
     `${W.slice(at, end + 5)} return chatSend('local', 'hello');`)(
-    { status: 'open', emoteOk: true, sendChat: (t) => { sent.push(t); return true; } }, { push: () => assert.fail('nothing said in its stead'), tab: () => null },
-    () => false, () => false, () => null, new Map(), null, () => null, 'old', 'old', 'old', 'no party', 'no guild');
+    { status: 'open', sendChat: (t) => { sent.push(t); return true; } }, { push: () => assert.fail('nothing said in its stead'), tab: () => null },
+    () => null, new Map(), null, () => null, 'no party', 'no guild');
   assert.deepEqual({ ok, sent }, { ok: true, sent: ['hello'] }, 'the room hears it');
   assert.equal('SOLO_LOCAL_TEXT' in chat, false);
   const inHold = { px: 109, py: 158, in: 1, loc: "Privateer's Hold" };

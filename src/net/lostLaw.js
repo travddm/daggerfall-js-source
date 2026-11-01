@@ -59,7 +59,7 @@ export function lostKillOf(day) {
   return slot != null ? { kind: 'sd', slot, key: `sd-${slot}` } : null;
 }
 
-/** A piece's batch: its kill and its place - one a piece an account (0093's ux_server_post_batch). */
+/** A piece's batch: its kill and its place - one a piece an account (ux_server_post_batch). */
 export const lostBatchOf = (/** @type {{ key: string }} */ kill, /** @type {number} */ i) => `${LOST_BATCH}${kill.key}-${i}`;
 /** Whether a batch is the Lost and Found's. */
 export const isLostBatch = (/** @type {unknown} */ batch) => typeof batch === 'string' && batch.startsWith(LOST_BATCH);

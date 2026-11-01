@@ -28,9 +28,6 @@
 // for minutes, and nothing there takes a seat by silence. Not a DFU member (DFU has no rooms).
 import { FOES_FULL_MS, FOES_STALE_MS, FOES_PREFIX, OWN_PREFIX, WORLD_PREFIX, isWorldRoom } from './wire.js';
 
-/** The relay that keeps a dungeon room's seat by liveness - a page asks only that one for the seat (`seatAskDue`). */
-export const SEAT_RELAY_MIN = 220;
-export const relaySupportsSeatLive = (/** @type {any} */ v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= SEAT_RELAY_MIN;
 /** A pose's and a hello's first bytes, as the session writes them (`{ t: 'pose', p }`, `{ t: 'hello', ... }` - net/hubShards.js
  *  shardKeeps reads the same). */
 export const POSE_PREFIX = '{"t":"pose"';
@@ -84,7 +81,6 @@ export function createSeatClock(staleMs = FOES_STALE_MS) {
     live(/** @type {number} */ now) { return now - heardAt < staleMs; },
   };
 }
-/** Whether the page asks the relay for the seat now (net/online.js `_askSeat`): a dungeon room at a seat-live relay, its
- *  socket open, another named host, whose stream has not come for FOES_STALE_MS, and no ask for FOES_FULL_MS. */
-export const seatAskDue = (/** @type {{ streams: boolean, ok: boolean, open: boolean, host: any, mine: boolean, heardAt: number, askedAt: number, now: number }} */ s) =>
-  !!(s.streams && s.ok && s.open && s.host && !s.mine && s.now - s.heardAt >= FOES_STALE_MS && s.now - s.askedAt >= FOES_FULL_MS);
+/** Whether the page asks the relay for the seat now (net/online.js `_askSeat`): a dungeon room, its socket open, another named host, whose stream has not come for FOES_STALE_MS, and no ask for FOES_FULL_MS. */
+export const seatAskDue = (/** @type {{ streams: boolean, open: boolean, host: any, mine: boolean, heardAt: number, askedAt: number, now: number }} */ s) =>
+  !!(s.streams && s.open && s.host && !s.mine && s.now - s.heardAt >= FOES_STALE_MS && s.now - s.askedAt >= FOES_FULL_MS);

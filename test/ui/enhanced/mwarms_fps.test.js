@@ -114,7 +114,7 @@ test('MWA1 pins: the hosts build at every door a made character arrives through 
   const w = read('src/scenes/world.js');
   assert.equal((w.match(/autoBuildArms\(playerEntity\);/g) ?? []).length, 5, 'world: the rig, the wizard, the load, the classic load, a family member\'s birth (LEGACY1)');
   assert.match(w, /questInitAtGameStart\(r\.startKey\);\s+\/\/ Q4-v: OnStartGame for the new character[^\n]*\n\s+autoBuildArms\(playerEntity\);/, 'after the wizard');
-  assert.match(w, /if \(!extras\) \{ townTalk\.say\('Save version mismatch\.'\); return; \}\n\s+autoBuildArms\(playerEntity\);/, 'after the restore');
+  assert.match(w, /if \(!extras\) \{ townTalk\.say\(saveVersionRefusal\(\)\); return; \}\n\s+autoBuildArms\(playerEntity\);/, 'after the restore');
   assert.match(read('src/scenes/exterior.js'), /\n  \}\);\n  autoBuildArms\(playerEntity\);/, 'exterior: after its rig');
   const menu = read('src/ui/enhanced/enhancedMenu.js');
   assert.doesNotMatch(menu, /mwArms'/, 'MWA4: nothing on the card writes a switch');

@@ -3,8 +3,7 @@
 //               (court.js payUndoable: the coins, else the letters and then the coins, online the Empire's account after),
 //               refused short of it or with nothing held; the masteries, the other family and the spellbook untouched; its
 //               one ask stays made, and the mods fold at once
-//   the save    a reset path saves as none and loads as none - and stays none across an older build's carry (the arcane
-//               mirror, AUDIT SPEC-RESET L2-1)
+//   the save    a reset path saves as none and loads as none
 //   the guide   the chosen path's Reset (ui/growth/specGuide.js): its ask, what it leaves, its refusals, driven in the
 //               pause window over the fake document (last: its globals stand for the rest of the file)
 import '../../modsOff.js';
@@ -182,45 +181,16 @@ test('AUDIT SPEC-RESET L1-3 THE MODS NOW: a passive\'s stats leave with the rese
   assert.equal(entityStatMod(asked, 'personality'), glamour, 'the ask\'s Yes folds at once');
 });
 
-test('SPEC-RESET THE SAVE: a reset path saves as none and loads as none - the martial mirror goes with it, the arcane mirror says none, and the old signature spell in the book is no witness to a newer save\'s own null (mutants: the mirror kept; the witness read)', () => {
+test('SPEC-RESET THE SAVE: a reset path saves as none and loads as none, and the old signature spell in the book is no witness to a save\'s own null (mutants: the witness read)', () => {
   const e = held(400000);
   e.spells = [signatureSpell('warden')];
   assert.equal(resetSpec(e, 'arcane').ok, true);
   assert.equal(resetSpec(e, 'martial').ok, true);
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(e)));
   assert.deepEqual([snap.arcanePath, snap.martialPath, snap.goldPieces], [null, null, 0]);
-  assert.equal(snap.career.martialMirror, undefined, 'no mirror of a path given up');
-  assert.deepEqual(snap.career.arcaneMirror, { path: null, prompted: true, of: snap.characterId });
   const back = structuredClone(playerEntity);
   restorePlayer(back, snap);
   assert.deepEqual([back.arcanePath, back.martialPath], [null, null]);
-  assert.equal(back.career.arcaneMirror, undefined, 'the mirror is the save\'s, never the live career\'s');
-});
-
-test('AUDIT SPEC-RESET L2-1 AN OLDER BUILD\'S CARRY: a save that lost its `arcanePath` key is read by the career\'s arcane mirror, never the book - a path given up stays given up, a newer choice stays chosen; a mirror another character wrote, or a path its schools no longer back, is no mirror, and the book is read as before (mutants: the mirror unwritten; unread; read past the book\'s witness; the character\'s id unread)', () => {
-  const carried = (e) => { const s = JSON.parse(JSON.stringify(snapshotPlayer(e))); delete s.arcanePath; delete s.pathPrompted; return s; };
-  const load = (s) => { const b = structuredClone(playerEntity); restorePlayer(b, s); return b; };
-  // reset, carried: none - the 200,000 is not paid for nothing
-  const e = held(450000);
-  e.spells = [signatureSpell('warden')];
-  assert.equal(resetSpec(e, 'arcane').ok, true);
-  const a = load(carried(e));
-  assert.deepEqual([a.arcanePath, a.pathPrompted, a.goldPieces], [null, true, 250000]);
-  // reset, a newer path chosen without its spell, carried: the newer path - never the old one back for free
-  const n = held(250000, { mastered: [LB, AR, RES, ALT, MYS] });
-  n.spells = [signatureSpell('warden')];
-  assert.equal(resetSpec(n, 'arcane').ok, true);
-  assert.equal(AP.choosePath(n, 'necromancer').ok, true);
-  assert.equal(load(carried(n)).arcanePath, 'necromancer');
-  // another character's mirror (an heir's inherited career): the book is read, as AUDIT SCHOOLS L3 F2 reads it
-  const heir = carried(e);
-  heir.career.arcaneMirror.of = 'someone-else';
-  assert.equal(load(heir).arcanePath, 'warden', 'no mirror of its own: the witness');
-  // a mirror whose path its schools no longer back (the judge's pathFindings): no mirror
-  const bare = carried(n);
-  bare.masteredSkills = bare.masteredSkills.filter((s) => s !== MYS);
-  bare.spells = [];
-  assert.equal(load(bare).arcanePath, null);
 });
 
 // ── the guide ───────────────────────────────────────────────────────────────────────────────────────────────────────

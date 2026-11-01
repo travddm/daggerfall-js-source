@@ -189,16 +189,15 @@ test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchas
   } finally { globalThis.location = saved; }
 });
 
-test('AUDIT LOCKPICK B8: the gift through the real save - a picking class from before the Lockpick given five once, never again through five saves and loads; a new one\'s kit never doubled; a class that never picks given none (mutants: the mark unsaved; the gift every load; the gift to any class)', async () => {
+test('AUDIT LOCKPICK B8: the kit through the real save - a new one\'s kit never doubled; a class that never picks given none, through five saves and loads (mutants: picks given at a load)', async () => {
   const { snapshotPlayer, restorePlayer } = await import('../../../src/systems/save/save.js');
   const { giveStartingLockpicks, lockpickCount, LOCKPICK_KIT } = await import('../../../src/systems/lockpick/lockpickItem.js');
   const { SKILLS } = await import('../../../src/systems/skills.js');
   const careerOf = (picks) => ({ primarySkills: [SKILLS.ShortBlade, 0, 1], majorSkills: picks ? [SKILLS.Lockpicking, 2, 3] : [2, 3, 4], minorSkills: [5, 6, 7, 8, 9, 10], luck: 50 });
   const mk = (picks) => ({ isPlayer: true, level: 3, gender: 'male', activeEffects: [], health: 60, maxHealth: 60, items: [], spells: [], stats: {}, skills: {}, career: careerOf(picks) });
   const quiet = (fn) => { const k = [console.info, console.log, console.warn]; console.info = console.log = console.warn = () => {}; try { return fn(); } finally { [console.info, console.log, console.warn] = k; } };
-  const cycles = (entity, { old = false } = {}) => {
+  const cycles = (entity) => {
     let snap = JSON.parse(JSON.stringify(snapshotPlayer(entity, { classicMinutes: 100 })));
-    if (old) delete snap.lockpickGift;
     const counts = [];
     for (let k = 0; k < 5; k++) {
       const loaded = { isPlayer: true };
@@ -211,8 +210,6 @@ test('AUDIT LOCKPICK B8: the gift through the real save - a picking class from b
   const five = Array(5).fill(LOCKPICK_KIT);
   const thief = mk(true); giveStartingLockpicks(thief);
   assert.deepEqual(cycles(thief), five, 'a new Thief: the kit, never doubled');
-  assert.deepEqual(cycles(mk(true), { old: true }), five, 'a Thief from before: five, once');
-  assert.deepEqual(cycles(mk(false), { old: true }), [0, 0, 0, 0, 0], 'a Knight from before: none');
   assert.deepEqual(cycles(mk(false)), [0, 0, 0, 0, 0], 'a new Knight: none');
 });
 

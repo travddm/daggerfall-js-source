@@ -236,6 +236,6 @@ test('RED1: the host parses /red and NEVER guards it - the authority is the rela
 test('RED1: the wire version moved, because this is a relay change', () => {
   // SLAM8's law reaches this slice like any other: a `say` frame the
   // old relay does not know is a different deployed worker.
-  assert.equal(RELAY_VERSION, 'world280');
+  assert.equal(RELAY_VERSION, 'world282');
   assert.match(rd('test/net/relayversion.test.js'), /world89: '[0-9a-f]{64}'/, 'and its law is recorded');
 });

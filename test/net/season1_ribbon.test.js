@@ -157,7 +157,7 @@ test('SEASON1 THE BANNER RIBBON ON THE PAGE: the mint\'s answer hands mine to th
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', rb: [0, 2] }, { id: 'eve-0003', name: 'Eve', rb: [5, 5] }], n: 3, v: 'world149' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', rb: [0, 2] }, { id: 'eve-0003', name: 'Eve', rb: [5, 5] }], n: 3 });
   assert.deepEqual([s.ribbonOf('bob-0002'), s.ribbonOf('eve-0003'), s.ribbonOf(null)], [[0, 2], null, null], 'two of the same colour is none');
   ws.receive({ t: 'join', id: 'bob-0002', name: 'Bob' });
   assert.equal(s.ribbonOf('bob-0002'), null, 'the newest hello\'s, including none');

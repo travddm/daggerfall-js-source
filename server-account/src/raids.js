@@ -33,7 +33,7 @@
 // receipt and DEVICE - and the relay hands an account's receipt to every
 // socket it has, so a second browser rolled them again. The first claim
 // of a (raid, account), a guest's too, writes the thanks' row with its
-// device's claim id (`cid`, migration 0017); a claim is answered
+// device's claim id (`cid`); a claim is answered
 // `spoils: true` only when that row is its own.
 //
 // ═══ ONE TRANSACTION ═══════════════════════════════════════════════

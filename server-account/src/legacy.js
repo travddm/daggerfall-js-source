@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // LEGACY7 - PROJECT LEGACY ONLINE, SERVICE SIDE..
 //
-// THE LINE (`lineages`, migration 0084): a family an account founded online, its record the client's JSON - the family
+// THE LINE (`lineages`): a family an account founded online, its record the client's JSON - the family
 // law is the client's (src/systems/legacy/), and the service keeps the copy every device reads. A write lands only on
 // the copy it was made from (`base`, the stored rev the device last read - AUDIT LEGACY III A2, the realm's half) and
 // past it; a stale one is answered with the stored record, which the client merges its facts into (store.js
@@ -22,7 +22,7 @@
 //
 // A FALL HELD FOR A PARTY'S RESURRECT (FIELD BUGS 2026-10-16b REZ-BLOODLINE, AUDIT R1): the playing tab's death door
 // stamps the tombstone at once, `hold` - `dead_at`, so no door joins, checkpoints or trades the character from there, and
-// its lease kept aside (`rez_lease`, migration 0122) - and for REZ_HOLD_S that lease alone may take the death back, once
+// its lease kept aside (`rez_lease`) - and for REZ_HOLD_S that lease alone may take the death back, once
 // (realmRaise: the tombstone cleared, the lease handed back, the line's copy stamped with the death taken back - the
 // REVIVE law, src/systems/legacy/revived.js). What a tombstone takes with it (afterTomb) waits on the window's close: the
 // tab's own word that it went on (realmDie without `hold`), or the minute's clock for a tab that never said (settleHolds).

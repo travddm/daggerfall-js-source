@@ -274,7 +274,7 @@ export async function strikeHall({ db, nowS }, dev, env, { key } = {}) {
     db.prepare('INSERT OR IGNORE INTO npc_hall_strikes (map_id, by, at) VALUES (?, ?, ?)').bind(key, dev.handle ?? null, nowS),
     // AUDIT CHAP3 S3/S5: the regions its reports named told first, while the reports stand to name them
     bumpRegions(db, 'key LIKE ?1', `%:${key}`, nowS),
-    // LEAN-WITNESS: the town's rows and its confirmation go (0135's triggers take the key's row with its last answer)
+    // LEAN-WITNESS: the town's rows and its confirmation go (the schema's triggers take the key's row with its last answer)
     ...strikeWitness(db, HALL_WITNESS_KIND, 'key LIKE ?1', `%:${key}`),
   ]);
   forgetChapters();

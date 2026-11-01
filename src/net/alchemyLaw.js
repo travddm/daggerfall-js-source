@@ -103,7 +103,7 @@ export const BREWER = 'brewer', DISTILLER = 'distiller', MASTER_ALCHEMIST = 'mas
  *  CRAFT-PAYS: TWO BELOW JOURNEYMAN, not one. A Novice's brew was one potion for the station's fee and
  *  a cauldron of herbs - a loss against the drop it competed with, on the very rungs a brewer climbs by brewing. The rungs
  *  above stand (two at Journeyman, a Brewer's three, three at Master): `prof_brews.count` is CHECKed 1 to 3
- *  (migration 0070), so a fourth is a table's rebuild, not a number's change. The counter's goods still brew one. */
+ * , so a fourth is a table's rebuild, not a number's change. The counter's goods still brew one. */
 export function brewCount(rank, spec50 = null, potion = null) {
   if (potion && !brewFirstPays(potion)) return 1;
   if (rank >= PROF_RANK_MAX) return 3;

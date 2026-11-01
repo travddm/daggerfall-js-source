@@ -2,7 +2,7 @@
 // marketVendors, /v1/market/vendors - every online client in a living town each PATRON_READ_S) was 4.2 billion of the
 // day's 5.66 billion rows: its two statements walked every open listing in the market and, for each, every piece in its
 // town (~720,000 rows a statement, ~860 ms), and the region was asked last. PATRON-LOAD (acct109) had taken the patrons'
-// reckoning out of that read; the read itself was the weight. Migration 0107 indexes a trader's piece by its town and its
+// reckoning out of that read; the read itself was the weight. An index finds a trader's piece by its town and its
 // id, and a region's open trader listings by their age; the read asks by the listing's own region (a trader's listing
 // carries its home's - homevendor_service.test.js pins "in the home's region whatever the client says").
 // Each pin failed on the build before it. tools/mutants/patronload2.json.

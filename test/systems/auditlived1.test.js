@@ -25,10 +25,7 @@ import { QuestMachine } from '../../src/systems/quest/machine.js';
 import { TrainPc } from '../../src/systems/quest/actions.js';
 import { Clock } from '../../src/systems/quest/clock.js';
 import { SKILLS } from '../../src/systems/skills.js';
-import { snapshotPlayer, restorePlayer, clampMarkersAheadOf } from '../../src/systems/save/save.js';
-import { offlineCopyOf, onlineCopyOf, QUEST_WORLD_SECOND_KEYS, QUEST_OWN_SECOND_KEYS } from '../../src/systems/offlineCopy.js';
-import { startDisease, DISEASES } from '../../src/systems/diseases.js';
-import { NORMALIZE_INTERVAL_MINUTES } from '../../src/systems/court.js';
+import { offlineCopyOf, QUEST_WORLD_SECOND_KEYS, QUEST_OWN_SECOND_KEYS } from '../../src/systems/offlineCopy.js';
 import { bankingStatusRows } from '../../src/systems/banking.js';
 import { repairReadyLine } from '../../src/ui/enhanced/enhancedTrade.js';
 import { restClockLine } from '../../src/ui/restWindow.js';
@@ -164,7 +161,7 @@ test('AUDIT LIVED1 B (P1/S2/R1) + D (R2/P5): a quest\'s disease and a quest\'s t
   }
 });
 
-test('AUDIT LIVED1 E (S3/R5, S5/U4) + G (R6): the doors between the lanes rebase the WORLD\'s stamps onto the clock they will be read on', () => {
+test('AUDIT LIVED1 E (S3/R5, S5/U4): the offline copy rebases the WORLD\'s stamps onto the clock they will be read on', () => {
   const own = 50 * D, world = 230 * D, delta = own - world;
   const clock = new Clock({ nowSeconds: () => world * 60 });
   Object.assign(clock, { clockEnabled: true, startingTimeInSeconds: 3 * D * 60, remainingTimeInSeconds: 3 * D * 60 });
@@ -192,41 +189,6 @@ test('AUDIT LIVED1 E (S3/R5, S5/U4) + G (R6): the doors between the lanes rebase
   offClock.restoreSaveData(off.quest.quests[0].resources[0].clock);
   offClock.tick({ nowSeconds: () => (own + 60) * 60, questClockStepMax: () => Infinity });
   assert.equal(offClock.remainingTimeInSeconds, (3 * D - 60) * 60, 'an hour offline is an hour off the clock - not the half year between the clocks');
-  // BRING ONLINE, the mirror: the offline stamps onto the world's clock, and the join says it left the world just now
-  const worldNow = 400 * D + 17;
-  const on = onlineCopyOf({ classicMinutes: own, spawns: [['k', own - 100]], world: { camps: [{ litUntil: own + 480 }] } }, worldNow);
-  assert.equal(on.worldMinutes, Math.floor(worldNow));
-  assert.deepEqual([on.spawns[0][1], on.world.camps[0].litUntil], [Math.floor(worldNow) - 100, Math.floor(worldNow) + 480]);
-  // ...so the first join pays no absence the character never had (TM-1's recovery, SURV7's fresh start)
-  const N = NORMALIZE_INTERVAL_MINUTES;
-  const offlineSave = { classicMinutes: 2 * N + 100, legalRep: { 0: -15 }, items: [], stats: {} };
-  const joined = onlineCopyOf(JSON.parse(JSON.stringify(snapshotPlayer({ ...player({ factionRep: null }), legalRep: [-15] }, { classicMinutes: offlineSave.classicMinutes }))), 5 * N + 100);
-  setSharedClock(() => 5 * N + 130);
-  const back = player({ factionRep: null });
-  restorePlayer(back, joined);
-  assert.equal(back.legalRep[0], -15, 'three of the world\'s boundaries lay between the calendars, and none of them was an absence');
-});
-
-test('AUDIT LIVED1 F (K3/S4): a save from before LIVED1 whose disease day sat ahead of its clock is brought back to it - no day given back and rolled again', () => {
-  const own = 700 * D + 600;
-  const live = player({ factionRep: null });
-  const entry = startDisease(live, DISEASES.CalironsCurse, 701, () => 0.5);   // the RESTX2 rest crossed a simulated midnight
-  const left0 = entry.daysOfSymptomsLeft;
-  setSharedClock(() => own);
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(live, { classicMinutes: own })));
-  delete snap.worldMinutes;   // written before LIVED1
-  setSharedClock(null);
-  const t = { clock: own + 5 };
-  setSharedClock(() => t.clock);
-  const back = player({ factionRep: null });
-  restorePlayer(back, snap);
-  const d = back.activeEffects.find((a) => a.kind === 'disease');
-  assert.equal(d.lastDay, 700, 'the day ahead of the clock is brought back to it');
-  resetMagicRoundMarker(own);
-  const ticker = createPlayerTicker(back);
-  t.clock += 5; ticker.tick(1 / 60);
-  assert.equal(d.daysOfSymptomsLeft, left0, 'no day given back');
-  assert.equal(clampMarkersAheadOf({ activeEffects: [{ kind: 'poison', lastMinute: 100 }, { racial: 'lycanthropy', lastUrgeNotify: 90 }] }, 80), 2, 'a poison\'s minute and a curse\'s too');
 });
 
 test('AUDIT LIVED1 J (K6): an hour raised from INSIDE a tick is a bare move of the character\'s clock - no nested tick runs its rounds ahead of the window in hand', () => {

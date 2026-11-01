@@ -6,9 +6,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sanitizeChat, parseClient, CHAT_MAX, EMOTE_RELAY_MIN, relaySupportsEmote, RELAY_VERSION, CHAT_WORLD_ROOM, SOCIAL_ROOM } from '../../src/net/wire.js';
+import { sanitizeChat, parseClient, CHAT_MAX, RELAY_VERSION, CHAT_WORLD_ROOM, SOCIAL_ROOM } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
-import { ChatLog, EMOTE_OLD_RELAY_TEXT } from '../../src/net/chat.js';
+import { ChatLog } from '../../src/net/chat.js';
 import { parseChatLine, EMOTES, emoteText, SHORTCODES, SHORTCODE_LIST, expandShortcodes, EMOTE_LINES, HELP_LINES } from '../../src/net/chatCommands.js';
 import { bubbleText, bubbleLineOk, graphemeCut, BUBBLE_CHARS, BUBBLE_ELLIPSIS } from '../../src/ui/nameLayer.js';
 import { createChatPanel, CHAT_CSS, CHAT_WIDTH_MIN } from '../../src/ui/chatPanel.js';
@@ -52,13 +52,11 @@ test('EMOTE1 the joiner: kept between two pictographs - a family, a profession, 
 
 // ─── THE ACTION LINE ────────────────────────────────────────────────────────────────────────────────────────────
 
-test('EMOTE1 the action on the wire: `me: true` and nothing else - a truthy junk value refused, never read as an action; world102 the first relay that carries it (world99 before the first merge, world101 before the sixth: main\'s world99, world100 and world101 carry no action) (mutants: any truthy `me` admitted; the flag dropped at the relay; the version door one high)', async () => {
+test('EMOTE1 the action on the wire: `me: true` and nothing else - a truthy junk value refused, never read as an action (mutants: any truthy `me` admitted; the flag dropped at the relay)', async () => {
   const h = { hasHello: true };
   assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: 'waves.', me: true }), h), { t: 'chat', text: 'waves.', me: true });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: 'waves.', me: true, ch: 'party' }), h), { t: 'chat', text: 'waves.', ch: 'party', me: true });
   for (const me of [1, 'true', false, null, {}]) assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: 'x', me }), h), { error: 'bad chat' }, JSON.stringify(me));
-  assert.equal(EMOTE_RELAY_MIN, 102);
-  assert.equal(relaySupportsEmote('world101'), false); assert.equal(relaySupportsEmote('world102'), true); assert.ok(relaySupportsEmote(RELAY_VERSION));
   // the real Room: the flag rides the fanned line, the asker's echo included; a plain line carries none
   const r = fakeRoom(CHAT_WORLD_ROOM);
   const realNow = Date.now; let clock = 1e12; Date.now = () => clock;
@@ -74,7 +72,7 @@ test('EMOTE1 the action on the wire: `me: true` and nothing else - a truthy junk
   } finally { Date.now = realNow; }
 });
 
-test('EMOTE1 the action at the client: asked only of a relay that carries it, the flag believed only as `true`, drawn as kind "me" - never a system line, never an aside, never bubbled (mutants: the door dropped; the kind lost; an action bubbled)', () => {
+test('EMOTE1 the action at the client: the flag believed only as `true`, drawn as kind "me" - never a system line, never an aside, never bubbled (mutants: the kind lost; an action bubbled)', () => {
   const rig = (v) => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', presence: false, WebSocketImpl: FakeWS, now: () => 1_000_000 });
@@ -83,9 +81,6 @@ test('EMOTE1 the action at the client: asked only of a relay that carries it, th
     quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: null, world: null, v }));
     return { s, ws: sockets[0], heard, out: () => sockets[0].sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'chat') };
   };
-  const old = rig('world100');
-  assert.equal(old.s.sendChat('waves.', { me: true }), false, 'world100 (DISC7\'s, the last before the arc) would say "waves." bare');
-  assert.equal(old.out().length, 0);
   const { s, ws, heard, out } = rig(RELAY_VERSION);
   assert.equal(s.sendChat('  waves.  ', { me: true }), true);
   assert.deepEqual(out().at(-1), { t: 'chat', text: 'waves.', me: true });
@@ -99,7 +94,6 @@ test('EMOTE1 the action at the client: asked only of a relay that carries it, th
   assert.equal(log.push('local', heard[1]).kind, '');
   assert.equal(log.pushAll({ text: 'a notice', me: true }).kind, '', 'a line the game said is never an action');
   assert.equal(bubbleLineOk(act), false, 'done, not said: no bubble');
-  assert.match(EMOTE_OLD_RELAY_TEXT, /server's next update/);
 });
 
 // ─── THE GESTURES AND THE SHORTCODES ────────────────────────────────────────────────────────────────────────────

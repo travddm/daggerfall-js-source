@@ -10,8 +10,7 @@
 // before the realm - a tab left open, or the desktop app's portable exe and macOS copies, which never update themselves -
 // went on playing online exactly as before, a character made after the census froze included, and nothing told its
 // player until a realm-era peer refused a trade ("They are playing an older version."). Everything that character did
-// online lives in a local slot the realm cannot admit: the census is frozen at the realm's start (AUDIT REALM L1-F5),
-// so customs answers `customs-never-online`, as the census law says it must.
+// online lives in a local slot the realm cannot admit.
 //
 // THE FIX. The door asks the realm. The service signs whether the character a mint names is one of the account's realm
 // characters (`rc`: 1, else 0 - net/identityToken.js), and the relay refuses a hello whose token says 0 with
@@ -20,8 +19,8 @@
 // is admitted as it was. A realm-era tab names the realm character it joined, and one the door refuses anyway (its
 // character deleted, its account changed under it) goes to the Online door with the realm's word.
 //
-// The real account Worker over the real migrations (node:sqlite behind a D1-shaped face, as test/server/fb0929_customs.test.js
-// drives it) and the real relay Room (test/fakeRoom.mjs), under ONE key pair: the tokens the relay reads are the ones the
+// The real account Worker over the real migrations (node:sqlite behind a D1-shaped face, as test/accountDb.mjs drives
+// it) and the real relay Room (test/fakeRoom.mjs), under ONE key pair: the tokens the relay reads are the ones the
 // service minted.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -111,7 +110,7 @@ async function stand() {
 /** A relay room holding the service's public key - the deploy's own check keeps the two halves one pair. */
 const roomOf = (s, key) => { const r = fakeRoom(key); r.env.IDENTITY_PUBLIC_KEY = s.publicKey; return r; };
 
-test('REALM-DOOR, the field reproduced: a build from before the realm names its offline character at the mint, and the relay no longer takes it online - refused in every room with words that build prints, nothing written; the character itself customs still refuses (the census stands, L1-F5)', async () => {
+test('REALM-DOOR, the field reproduced: a build from before the realm names its offline character at the mint, and the relay no longer takes it online - refused in every room with words that build prints, nothing written', async () => {
   const s = await stand();
   const gryphoth = await s.account();
   // the old build's mint: RENOWN1 onward names the character it brings online, and asks for the guild (GUILD1c)
@@ -126,9 +125,6 @@ test('REALM-DOOR, the field reproduced: a build from before the realm names its 
     assert.equal(r.store.has('secret:pgryphoth001'), false, `${key}: and nothing written - no secret held for the id`);
     assert.equal(r.store.has('look:pgryphoth001'), false, `${key}: nor a look`);
   }
-  // after the update: the character is an offline one, and the realm never saw it before it began - customs' own answer
-  const came = await s.call('/v1/realm/customs', { origin: OFFLINE_ID, name: 'Gryphoth', summary: { level: 3 } }, gryphoth.secret);
-  assert.deepEqual([came.status, came.body], [403, { error: 'customs-never-online' }], 'the census is frozen at the realm\'s start - its law, unchanged');
 });
 
 test('REALM-DOOR, the service: a mint signs `rc` 1 only for a realm character of the caller\'s own account - an offline id, a realm id of another account\'s, one nobody holds, one deleted, and no character at all are 0 (mutants: rc for any realm-shaped id; rc for another account\'s character; rc left off a mint)', async () => {

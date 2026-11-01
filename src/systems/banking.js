@@ -266,7 +266,7 @@ export function isHouseOwned(houses, regionIndex, buildingKey, mapId = null) {
 /**
  * WD3 (AUDIT WD3 H1): A DEED NAMES ITS BUILDING ONLY IN THE LAYOUT IT WAS BOUGHT IN. Where its town stands in another
  * now (offline, a town mod's pack that could not be loaded for it - Replace Game Artwork off, the network; online, a
- * deed that came through customs from before the mods, which no home of the service's pins) the key names a
+ * deed from before the mods, which no home of the service's pins) the key names a
  * stranger's house, a shop, a temple or nothing, so the deed SLEEPS: no building is the player's by it - its door, its
  * cupboards, its bed, its furniture, its sale - until its town stands in its layout again. A deed whose town the host
  * cannot place stands as Daggerfall always read it.
@@ -297,7 +297,6 @@ export function allocateHouseToPlayer(houses, regionIndex, { buildingKey, mapId,
   slot.location = location;
   slot.mapId = mapId;
   slot.buildingKey = buildingKey;
-  delete slot.crossed;   // RESTORE: a house bought is the buyer's own, whatever crossed customs in this slot before
   stampLayout(slot, layoutStampOfMapId(mapId));   // WD3: the layout the town stands in, which a load keeps it in (systems/layoutPins.js)
   discoverBuilding?.(buildingKey, `${playerName}'s residence`);
   addPermanentScene?.(mapId, buildingKey);
@@ -370,7 +369,6 @@ export function sellHouse(accounts, houses, regionIndex, { meshRadius = 0, found
   // HOUSES-3: `deed` the one of the region's deeds sold (the bank's pick in this town), else the region's first
   const slot = deed ?? houses[regionIndex];
   if (!(slot?.buildingKey > 0) || !regionDeeds(houses, regionIndex).includes(slot)) return { kind: 'none' };
-  if (online && slot.crossed) return { kind: 'crossed' };   // RESTORE: what came through customs is never bought back online
   if (!found) return { kind: 'none' };   // :454-456 falls to :464 - the miss arm has no effects at all
   // AUDIT HOME-PRICE C1: `price` is GetHouseSellPrice's own unless the caller names another - online the host names the
   // deed share of the house's online price (scenes/worldModes.js deedSellPrice)
@@ -423,7 +421,6 @@ export const shipCameraDist = (ship) => (ship >= 0 ? SHIP_CAMERA_DIST[ship] : 0)
 export function assignShipToPlayer(player, shipType, { addPermanentScene = null } = {}) {
   if (player.ownedShip !== shipType) delete player.boatCabinLink;
   player.ownedShip = shipType;
-  delete player.shipCrossed;   // RESTORE: a ship bought is the buyer's own, whatever crossed customs before it
   if (shipType !== SHIP_TYPES.None) addPermanentScene?.(shipType);
   return shipType;
 }
@@ -431,7 +428,7 @@ export function assignShipToPlayer(player, shipType, { addPermanentScene = null 
 /** ResetShip (:128) - `ownedShip = ShipType.None` and nothing else: the
  *  permanent scenes stay listed, as they do in DFU. WA1: Warm Ashes -
  *  Ships takes back the ship it lends with this. */
-export function resetShip(player) { player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink; delete player.shipCrossed; }
+export function resetShip(player) { player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink; }
 
 /**
  * PurchaseShip (:467-486). The ladder is PurchaseHouse's, with one
@@ -467,12 +464,10 @@ export function purchaseShip(accounts, regionIndex, shipType, player, purse, hoo
 export function sellShip(accounts, regionIndex, player, { removePermanentScene = null, online = isOnlinePage() } = {}) {
   const ship = ownedShipType(player);
   if (ship === SHIP_TYPES.None) return { kind: 'none' };
-  if (online && player.shipCrossed) return { kind: 'crossed' };   // RESTORE: what came through customs is never bought back online
   const price = shipSellPrice(ship);
   accounts[goldRegion(accounts, regionIndex, online)].accountGold += price;   // EMPIRE-ACCOUNT: online, into the Empire's account
   removePermanentScene?.(ship);
   player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink;
-  delete player.shipCrossed;
   return { kind: 'sold', price };
 }
 
@@ -645,27 +640,6 @@ export const calculateMaxBankLoan = (level, online = isOnlinePage()) => {
  *  .1)`, a FLOAT sum truncated once at the end. */
 export const calculateBankLoanRepayment = (amount) => Math.trunc(amount + amount * 0.1);
 
-// ── RESTORE: what came through customs is never bought back online ──
-
-/** RESTORE: CUSTOMS KEEPS EVERY DEED AND MARKS IT - a house's slot `crossed`, the ship's
- *  `shipCrossed` (systems/realmCustoms.js crossDeeds) - and, online, the bank of the Empire buys none of them back, so a
- *  deed carries no gold into the realm past the allowance and customs has no reason to take one. (AUDIT REALM2 T3 took
- *  them off the copy instead - a house and every piece in its room, for an excess the purse could often pay.) A house
- *  or ship bought in the realm is the buyer's own and sells (allocateHouseToPlayer, assignShipToPlayer clear the mark);
- *  offline, a copy is an offline character's, and every deed of it sells. */
-export const CROSSED_DEED_LINES = Object.freeze([
-  'That came into the realm through customs.',
-  'The bank of the Empire does not buy it back.',
-]);
-/** The words the bank says for a sale it will not make here, or null: a crossed house in this region (HOUSES-3: `deed`, the
- *  one offered; else the region's first), a crossed ship. */
-export function crossedDeedLines(kind, { houses = null, regionIndex = 0, player = null, online = isOnlinePage(), deed = null } = {}) {
-  if (!online) return null;
-  const slot = deed ?? houses?.[regionIndex];
-  const crossed = kind === 'ship' ? ownsShip(player) && !!player?.shipCrossed : slot?.buildingKey > 0 && !!slot.crossed;
-  return crossed ? CROSSED_DEED_LINES : null;
-}
-
 // ── REALM P0.3: online, the Empire is one lender ───────────────────
 /** REALM P0.3. Daggerfall lends region by region: sixty-two
  *  lenders, each blind to the rest, and a default costs one region's reputation. ONLINE THE EMPIRE IS ONE LENDER:
@@ -752,43 +726,6 @@ export function callInEmpireDebt(accounts, player, { cap = 0, nowMinutes = 0, on
   return out;
 }
 
-/**
- * LOAN-AMNESTY: THE EMPIRE FORGIVES EVERY LOAN ONCE. A save's `loanAmnesty` says which amnesty it has had;
- * one older than LOAN_AMNESTY has every loan struck off - the debt, its due date and the mark of a default, so the
- * Empire lends again and nothing is garnished - and is marked with it. The gold borrowed stays where it is; what was
- * already repaid, garnished or drawn stays paid; the reputation a default cost stays lost (it recovers as reputation
- * does). A save written before the amnesty carries no mark (0); every save written after it carries the mark (save.js),
- * so a character made after it, and a loan taken after it, are never forgiven. Applied to an online character's save as
- * it boots, before it is restored and before the Empire's join settles a loan (scenes/world.js); a character crossing
- * customs is marked as it crosses (realmCustoms.js) - an offline loan is never forgiven by walking it online.
- * Answers `{ forgiven, defaulted }` (the gold owed that was struck off, and the regions that had defaulted), or null
- * when the save had nothing to forgive or had its amnesty already.
- */
-export const LOAN_AMNESTY = 1;
-export function forgiveLoans(snap) {
-  if (!snap || typeof snap !== 'object') return null;
-  if ((Number.isSafeInteger(snap.loanAmnesty) ? snap.loanAmnesty : 0) >= LOAN_AMNESTY) return null;
-  snap.loanAmnesty = LOAN_AMNESTY;
-  let forgiven = 0, defaulted = 0;
-  for (const a of Array.isArray(snap.bankAccounts) ? snap.bankAccounts : []) {
-    if (!a || typeof a !== 'object') continue;
-    if (!(a.loanTotal > 0) && a.hasDefaulted !== true && !a.loanDueDate) continue;
-    if (a.loanTotal > 0) forgiven += Math.trunc(a.loanTotal);
-    if (a.hasDefaulted === true) defaulted++;
-    a.loanTotal = 0;
-    a.loanDueDate = 0;
-    a.hasDefaulted = false;
-  }
-  return forgiven > 0 || defaulted > 0 ? { forgiven, defaulted } : null;
-}
-/** What the character is told when its loans are forgiven, once the world stands. */
-export function loanAmnestyLines(r) {
-  if (!r) return [];
-  return [r.forgiven > 0
-    ? `The Bank of the Empire has forgiven your loan of ${r.forgiven.toLocaleString('en-US')} gold.`
-    : 'The Bank of the Empire has forgiven your debt.',
-  'Its branches will lend to you again.'];
-}
 /** The join's words: what the Empire called in, and what stands unpaid. */
 export function empireCallInLines({ called, owed }) {
   if (!(called > 0)) return [];

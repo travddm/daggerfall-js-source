@@ -66,22 +66,6 @@ export function markOwnClock(node, ownSeconds) {
 }
 
 /**
- * TIME3: a save's quest block on the clock it is loaded on. An online envelope (`worldMinutes` beside the character's
- * `classicMinutes`) whose quests were taken before TIME3 kept their countdowns on the world's clock; they move onto
- * the character's by the distance between the two at the save, once - a quest's three days stay three days - and are
- * marked. A TIME3 envelope, and any offline one (one clock), is already there. A copy; the snap is untouched.
- * @param {{ quest?: any, classicMinutes?: number, worldMinutes?: number } | null} snap
- */
-export function questBlockOnOwnClock(snap) {
-  const block = snap?.quest ?? null;
-  const own = snap?.classicMinutes, world = snap?.worldMinutes;
-  if (!block || typeof block !== 'object' || !Number.isFinite(own) || !Number.isFinite(world)) return block;
-  const copy = JSON.parse(JSON.stringify(block));
-  shiftQuestStamps(copy, (Math.floor(Number(own)) - Math.floor(Number(world))) * 60, { own: 'legacy' });
-  return markOwnClock(copy, Math.floor(Number(own)) * 60);
-}
-
-/**
  * TIME3: one quest envelope from another holder (a party member's share or resync, quest/machine.js) on this
  * machine's clocks. Its countdowns stood on the sender's own clock - `ownSecondsAt` when it was taken - or, from a
  * build before TIME3, on the event clock the party shares; they move onto this character's by the distance, so a

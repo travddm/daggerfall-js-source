@@ -31,7 +31,7 @@ const boardOf = (me = {}, extra = {}) => ({ season: 5, day: 9, team: { standings
 /** The arena online over a fake session and a fake account service whose answers the test sets. */
 function onlineOf({ board = boardOf(), guest = false, team = null } = {}) {
   const svc = { board, boardCalls: 0, teamCalls: [], claimAnswer: null, claims: [], boardHold: null, claimHold: null };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const said = [];
   const asked = [];
   let t = 0;

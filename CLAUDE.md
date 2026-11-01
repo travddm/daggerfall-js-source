@@ -6,6 +6,9 @@ The docs are in `docs/`. Start at `docs/README.md`, and read `docs/architecture/
   when it is a written, agreed design that is better for play. Name each departure where you make it, and say which of
   the two it is. A departure that makes play or progression feel worse than DFU is a defect: revert it
   (`docs/README.md`, "Scope").
+- **Coding standards**: naming, tests, TypeScript, formatting and the changed-files checks are in
+  `docs/coding-standards.md`. They apply to new and touched files only. New files are `.ts`; run `npm run format:fix`,
+  `npm run markdown` and `npm run spell` on what you changed.
 - **Comments and tests**: a comment says why, in plain sentences. A test imports the code and runs it
   (`docs/README.md`, "Code comments"; `docs/testing/writing-tests.md`).
 - **ARENA2 is freeware**: `sh tools/fetch-data.sh <dir>` puts Daggerfall's own data at `<dir>/arena2` (~150 MB, never

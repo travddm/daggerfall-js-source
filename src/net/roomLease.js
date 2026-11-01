@@ -52,10 +52,6 @@ export const LEASE_INFO = 'dfo-room-lease:v1';
 /** The close reason of a hello the lease door refuses (a WebSocket close's reason is at most 123 bytes); the words ride
  *  the error frame before it, GROUND-GATE's own (server/src/index.js GROUND_OLD_WORDS: update the game). */
 export const LEASE_OLD_REASON = 'old lease';
-/** The first relay that knows the frame (RELAY_VERSION's number). */
-export const LEASE_RELAY_MIN = 242;
-/** Does the relay at version `v` know the lease frame? An older one closes a socket on a frame type it does not know. */
-export const relaySupportsLease = (v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= LEASE_RELAY_MIN;
 /** A room a lease binds: EVERY ROOM BUT THE HUB'S (and its shards), which hands leases out - a channel (Trade, LFG, a
  *  language's, a region's and its shards), a cell or world room, and every place a player acts in besides: a home, a
  *  caravan, a boat, a siege or a Royal Tourney, an arena's hall and floors, a gate's court, an Elite Breach, a Super

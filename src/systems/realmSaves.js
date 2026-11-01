@@ -44,7 +44,7 @@
 // REALM-GZIP: IT RIDES PACKED (net/realm/realmSaveCodec.js). A long life's
 // JSON grew past the request's 4 MiB and every checkpoint was refused
 // for good; a put packs the text when the service said it opens a packed
-// save (`gzip` on the join, create and customs answers), and a read asks
+// save (`gzip` on the join and create answers), and a read asks
 // for the save as stored and opens it here.
 // ═══════════════════════════════════════════════════════════════════
 
@@ -161,8 +161,6 @@ export const realmUnions = async (/** @type {any} */ io) => {
   const r = await realmAsk(io, '/v1/realm/unions', { method: 'POST', json: {} });
   return r.ok ? { ok: true, unions: Array.isArray(r.data?.unions) ? r.data.unions : [] } : r;
 };
-/** An offline character brought in through customs, once: `{ ok, data: { id, lease, seq, gzip } }`. */
-export const realmCustoms = (/** @type {any} */ io, /** @type {string} */ origin, /** @type {string} */ name, /** @type {any} */ summary = null) => realmAsk(io, '/v1/realm/customs', { method: 'POST', json: { origin, name, summary } });
 /** A join: a new lease - `{ ok, data: { id, lease, seq, bytes, gzip } }`. */
 export const realmJoin = (/** @type {any} */ io, /** @type {string} */ id) => realmAsk(io, '/v1/realm/join', { method: 'POST', json: { id } });
 /** A leave: the lease given up. `keepalive` for the page's going. */
@@ -173,9 +171,6 @@ export const realmDelete = async (/** @type {any} */ io, /** @type {string} */ i
   if (r.ok) dropUnsent(io?.storage, id);
   return r;
 };
-/** HOUSE-LOSS: a customs whose first save never landed, undone - its home, guild place and customs given back to the
- *  offline character (server-account/src/realm.js undoRealm). Its own route: an older service answers `not-found`. */
-export const realmUndo = (/** @type {any} */ io, /** @type {string} */ id) => realmAsk(io, '/v1/realm/undo', { method: 'POST', json: { id } });
 /** The save as it stands: `{ ok, text, seq }` - a join's load, or a copy to offline. REALM-GZIP: asked for as stored
  *  when this tab can open a packed save (a service from before answers the text either way), and opened here; bytes
  *  that will not open are `no-data`, as a save that is not there. */
@@ -189,8 +184,8 @@ export const realmFetch = async (/** @type {any} */ io, /** @type {string} */ id
  *  whose class name the player typed as Łowca, Маг, an emoji or a smart apostrophe failed every checkpoint as
  *  'offline', for good. Every character past ASCII rides as its JSON escape, which the service's JSON.parse reads back. */
 const headerJson = (/** @type {any} */ v) => JSON.stringify(v).replace(/[\u007f-\uffff]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
-/** REALM-GZIP: the save as it rides - packed when the service said it opens a packed save (`gzip`, off its join, create
- *  or customs answer) and this runtime can pack; the text otherwise, as every save rode before. */
+/** REALM-GZIP: the save as it rides - packed when the service said it opens a packed save (`gzip`, off its join or create
+ *  answer) and this runtime can pack; the text otherwise, as every save rode before. */
 async function realmBodyOf(/** @type {string} */ text, /** @type {boolean} */ gzip) {
   if (!gzip || !canGzip()) return text;
   try { return await gzipText(text); } catch { return text; }
@@ -899,7 +894,7 @@ export function realmRowAsSave(row, { dateText = () => null } = {}) {
     level: Number.isInteger(s.level) ? s.level : null,
     when: row?.playing ? 'Playing now' : (Number.isFinite(row?.updatedAt) ? dateText(row.updatedAt) : null),
     hour: null,
-    saveName: row?.customs ? 'Brought in' : 'Online',
+    saveName: 'Online',
     unfinished: !(row?.bytes > 0),
     house: houseLine(row?.house) ?? null,   // LEGACY7: the house the realm reads off its line - "☠ Ysolde II of House Hlaalu"
   };
@@ -907,9 +902,8 @@ export function realmRowAsSave(row, { dateText = () => null } = {}) {
 
 /**
  * THE BOOT'S JOIN: a new lease on the character, then its save read from the service - never a local slot - and
- * parsed as a slot load parses. The character's id in the save is the realm's (a customs character's save still names
- * the offline id it came from). Answers `{ ok, snap, lease, seq, origin, gzip }` - `origin` the offline id a customs
- * character came from, from the join (RESTORE); `gzip` the join's word that the service opens a packed save
+ * parsed as a slot load parses. The character's id in the save is the realm's. Answers `{ ok, snap, lease, seq, gzip }` -
+ * `gzip` the join's word that the service opens a packed save
  * (REALM-GZIP), for the session's checkpoints - or `{ ok: false, error }`. RESCUE-SAVE: `restored: true` when the
  * save is the device's copy of one the service never took, played in place of the service's older one (`missed`: a
  * put of it was refused or unanswered - AUDIT A8, the only restore the world says). STRANDED: `stranded: true` when a
@@ -936,7 +930,7 @@ async function joinRealmBoot(/** @type {{ io: any, id: string }} */ { io, id }) 
     if (joined.error === 'no-realm-character') dropUnsent(io.storage, id);   // AUDIT RESCUE-SAVE A2: deleted elsewhere - its copy goes too
     return { ok: false, error: joined.error };
   }
-  const { lease, seq, bytes, origin = null } = joined.data ?? {};
+  const { lease, seq, bytes } = joined.data ?? {};
   if (!(bytes > 0)) return { ok: false, error: 'no-data' };
   claimUnsent(io.storage, id, lease);   // AUDIT RESCUE-SAVE A4: this join is the device's last - an older tab writes nothing
   // RESCUE-SAVE: the device's copy follows the sequence the record still stands at - nothing landed after it - so it is
@@ -944,7 +938,7 @@ async function joinRealmBoot(/** @type {{ io: any, id: string }} */ { io, id }) 
   const kept = readUnsent(io.storage, id);
   if (kept && kept.seq === seq) {
     const snap = parseSave(kept.packed ? await unpackUnsent(kept.packed) : kept.text);   // RESCUE-PACK: opened first
-    if (snap) { snap.characterId = id; return { ok: true, snap, lease, seq, origin: typeof origin === 'string' ? origin : null, restored: true, missed: kept.missed, gzip: joined.data?.gzip === true }; }
+    if (snap) { snap.characterId = id; return { ok: true, snap, lease, seq, restored: true, missed: kept.missed, gzip: joined.data?.gzip === true }; }
     forgetUnsent(io.storage, id);   // a copy that will not open is dropped
   }
   const got = await realmFetch(io, id);
@@ -954,7 +948,7 @@ async function joinRealmBoot(/** @type {{ io: any, id: string }} */ { io, id }) 
   const snap = parseSave(got.text);
   if (!snap) return { ok: false, error: 'no-data' };
   snap.characterId = id;
-  return { ok: true, snap, lease, seq: got.seq ?? seq, origin: typeof origin === 'string' ? origin : null, gzip: joined.data?.gzip === true, ...(stranded ? { stranded: true } : {}) };   // RESTORE: the offline id it came from
+  return { ok: true, snap, lease, seq: got.seq ?? seq, gzip: joined.data?.gzip === true, ...(stranded ? { stranded: true } : {}) };
 }
 /** A save's text as the snapshot a slot load reads, or null. */
 function parseSave(/** @type {string | null} */ text) {
@@ -1015,13 +1009,10 @@ export function sayRealmSave(/** @type {any} */ outcome, /** @type {(text: strin
 /** A realm refusal in the Online door's words: the two this side names itself, the service's own through its table. */
 export function realmRefusalText(/** @type {string} */ error) {
   if (error === 'signed-out') return 'Sign in, or continue as a guest, to play online.';
-  // HOUSE-LOSS: "Delete it and make it again" was said of a character brought in too, and its delete took the home
-  // customs had carried. One brought in is finished from its offline tile, or undone - never made again.
-  if (error === 'no-data') return 'That online character was never saved. If you brought it in, press Bring online on it again or undo it. If you made it online, delete it and make it again.';
+  if (error === 'no-data') return 'That online character was never saved. Delete it and make it again.';
   if (error === 'left') return 'You left the realm.';
   if (error === 'held') return 'A trade or purchase is being settled. The save will follow.';   // AUDIT REALM2 C2: F9 mid-transaction
   if (error === 'too-large') return 'This character\'s save is too big for the realm. The realm keeps the last save it accepted.';   // AUDIT REALM2 C8
-  if (error === 'customs-load-once') return 'Load this character once offline, then it can be brought online.';
   if (error === 'test-room') return 'A Test Room character plays offline only.';
   if (error === 'no-room') return 'This device has no room for another save. Delete one, then copy again.';
   if (error === 'unknown') return 'The realm did not answer about a trade in progress. Join again to see how it ended.';   // REALM P2.1

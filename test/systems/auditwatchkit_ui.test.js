@@ -3,7 +3,7 @@
 //
 //   U - the cards and the bars on real Chromium: what a heal and a blow say on his card, through a window and a door;
 //       a screen reader's tree; contrast over snow and on the plate; the phone held sideways; the icons' fit.
-//   P - the packs and the presses: realm customs and the account service's first save, the tap's lock indoors and
+//   P - the packs and the presses: the account service's first save, the tap's lock indoors and
 //       underground, how far his pack opens from.
 //
 // Every finding was re-run before it was fixed and is pinned here by a test that FAILS on the code as it stood, for the
@@ -27,8 +27,7 @@ import * as NH from '../../src/ui/naval/navalHud.js';   // a namespace: a new ex
 import { fitIcon } from '../../src/ui/iconFit.js';
 import { partyFxAbbrev } from '../../src/net/partyBuffs.js';
 import { SocialState } from '../../src/net/social.js';
-import { liquidWealthOf, liquidWorthOf, stashedItemLists, customsAllowance } from '../../src/net/realm/realmGoldLaw.js';
-import { applyCustoms } from '../../src/systems/realmCustoms.js';
+import { liquidWealthOf, liquidWorthOf, stashedItemLists } from '../../src/net/realm/realmGoldLaw.js';
 import { firstSaveRefusal } from '../../server-account/src/realm.js';
 import { NAVAL_SAVE_VENDOR } from '../../src/scenes/naval/navalHost.js';
 import { COME_SAIL_AWAY_VENDOR } from '../../src/systems/comeSailAway/comeSailAway.js';
@@ -296,7 +295,7 @@ test('AUDIT WK-U9 (nit): a debuff on his bar is ringed in the party card\'s own 
 
 // ── P: the packs and the presses ────────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT WK-P1 (major): realm customs and the account service\'s first save count my companions\' packs - each companion\'s `items` in the sea\'s record (navalHost.js getSaveData `party`) is a container like the hold beside it: a million gold in his pack crossed whole and passed the first-save gate, while the hold\'s million was capped. Driven through the REAL host and keyed by its NAVAL_SAVE_VENDOR - the law\'s own name for it pinned equal, the twin of the hold\'s (AUDIT REALM2 T2) (mutants: the packs unread, the vendor misspelt, the resting read as the party, a malformed party thrown on)', async () => {
+test('AUDIT WK-P1 (major): the account service\'s first save counts my companions\' packs - each companion\'s `items` in the sea\'s record (navalHost.js getSaveData `party`) is a container like the hold beside it: a million gold in his pack passed the first-save gate uncounted, while the hold\'s million was counted. Driven through the REAL host and keyed by its NAVAL_SAVE_VENDOR - the law\'s own name for it pinned equal, the twin of the hold\'s (AUDIT REALM2 T2) (mutants: the packs unread, the vendor misspelt, the resting read as the party, a malformed party thrown on)', async () => {
   const h = await sea({ hull: HULL.SmallShip });
   // world.js's codec for the packs (COMPANION-KIT: "saved as the cargo's are")
   h.deps.packedItems = { serialize: (items) => (items ?? []).map((it) => ({ ...it })), deserialize: (records) => (records ?? []).map((it) => setItemFields({ ...it })) };
@@ -310,16 +309,13 @@ test('AUDIT WK-P1 (major): realm customs and the account service\'s first save c
   const save = () => ({ level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], houses: [], modData: { [NAVAL_SAVE_VENDOR]: JSON.parse(JSON.stringify(h.host.getSaveData())) } });
   const snap = save();
   const pack = snap.modData[NAVAL_SAVE_VENDOR].party.party[0].items;
-  assert.ok(stashedItemLists(snap).includes(pack), 'his pack is a stash customs reads');
+  assert.ok(stashedItemLists(snap).includes(pack), 'his pack is a stash the wealth measure reads');
   assert.equal(liquidWealthOf(snap), 1_050_000);
-  const r = applyCustoms(snap);
-  assert.deepEqual([r.wealth, r.taken, liquidWealthOf(snap)], [1_050_000, 1_050_000 - customsAllowance(1), customsAllowance(1)], 'capped at the allowance');
-  assert.deepEqual(pack.map(liquidWorthOf), [customsAllowance(1)], 'his coin went first, then his letter down to the allowance');
-  // the service's first save: a customs character's, and one born online - and what customs let through passes
-  const row = { origin_id: 'offline-1', summary: JSON.stringify({ level: 1 }) };
-  assert.deepEqual(firstSaveRefusal(JSON.stringify(save()), row), { error: 'customs-allowance' });
-  assert.deepEqual(firstSaveRefusal(JSON.stringify(save()), { origin_id: null }), { error: 'realm-birth' });
-  assert.equal(firstSaveRefusal(JSON.stringify(snap), row), null);
+  assert.deepEqual(pack.map(liquidWorthOf), [1_000_000, 50_000]);
+  // the service's first save: refused with his pack full, and passed once it is empty
+  assert.deepEqual(firstSaveRefusal(JSON.stringify(save())), { error: 'realm-birth' });
+  pack.length = 0;
+  assert.equal(firstSaveRefusal(JSON.stringify(snap)), null);
   // the twin it is (AUDIT REALM2 T2): the hold's million, counted alike
   const hold = { level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], modData: { [COME_SAIL_AWAY_VENDOR]: { placedBoats: [{ UID: 42, Items: [goldStack(1_000_000)] }] } } };
   assert.equal(liquidWealthOf(hold), 1_000_000);

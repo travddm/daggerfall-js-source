@@ -80,7 +80,6 @@ test('SCALE5c the law: sixteen shards beside the bus, each a channel the Worker 
   assert.equal(H.hubHopOf({ t: 'hub', key: 'chat:world.3' }), 'chat:world.3');
   assert.equal(H.hubHopOf({ t: 'hub', key: SOCIAL_ROOM }), SOCIAL_ROOM);
   for (const bad of [{ t: 'hub', key: 'chat:region.71' }, { t: 'hub', key: 'world:1,2' }, { t: 'hub' }, { t: 'x', key: 'chat:world.3' }, null]) assert.equal(H.hubHopOf(bad), null);   // part two: a region's channel and its shards are hops too
-  assert.equal(H.hubShardsSupported('world191'), false); assert.equal(H.hubShardsSupported('world192'), true);
   const look = { race: 'Nord', gender: 'male', faceIndex: 0, items: [] };
   const hello = (hs) => parseClient(JSON.stringify({ t: 'hello', id: 'peer-0001', secret: 'secret-of-peer-0001', name: 'x', look, pose: null, hs }));
   assert.equal(hello(1).hs, 1);
@@ -272,7 +271,7 @@ test('SCALE5c the session: a hub link offers the shards in its hello, goes where
     assert.equal(s.room, 'chat:world.7', 'the bus sent it to its shard');
     assert.equal(sockets[0].closed?.code, 1000);
     sockets[1].open();
-    sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 400, v: 'world192', now: t });
+    sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 400, now: t });
     assert.equal(s.roomCount, 400);
     sockets[1].receive({ t: 'n', n: 512 });
     assert.equal(s.roomCount, 512, 'the hub\'s count moved by another shard');
@@ -310,7 +309,7 @@ test('CHAT-FIND-HUB the session: the search box asks the hub while this link kno
     const ws = sockets[0];
     const finds = () => ws.sent.map((x) => JSON.parse(x)).filter((f) => f.t === 'find' && f.q !== undefined);
     assert.equal(s.askFind('ald'), false, 'not before the welcome');
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'peer-0003', name: 'Borgrim' }], n: 2, v: 'world192', now: t });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'peer-0003', name: 'Borgrim' }], n: 2, now: t });
     assert.equal(s.askFind('ald'), false, 'everyone online is known here: the box filters them');
     ws.receive({ t: 'n', n: 600 });
     let lines = 0;
@@ -417,7 +416,7 @@ test('SCALE5c the World tab\'s search and the Guild tab\'s list: `/find` and `/w
     s.join('chat:world.3');
     sockets[0].open();
     assert.equal(s.sendGuildWho(), false, 'never before the welcome');
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'p-near', name: 'Near', sub: 'acct-near', gt: 'HND' }], n: 2, v: 'world192', now: t });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'p-near', name: 'Near', sub: 'acct-near', gt: 'HND' }], n: 2, now: t });
     assert.equal(s.sendGuildWho(), true);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'find', g: 1 });
     assert.equal(s.sendGuildWho(), false, 'once each HUB_GUILD_WHO_MS');
@@ -496,7 +495,7 @@ test('SCALE5c the World tab while the hub is small (Mac\'s decision 2): a shard\
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => t, rand: () => 0, presence: false });
     s.join('chat:world.3');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'p-near', name: 'Near', sub: 'acct-near' }], n: 3, v: 'world192', now: t });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'p-near', name: 'Near', sub: 'acct-near' }], n: 3, now: t });
     assert.equal(s.sendHubWho(), true);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'find', all: 1 });
     assert.equal(s.sendHubWho(), false, 'once each HUB_WHO_MS');

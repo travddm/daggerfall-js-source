@@ -1,41 +1,42 @@
 # Account service data
 
-This page covers the account service's stored data: the D1 schema and how migrations work, saves and realm characters
+This page covers the account service's stored data: the D1 schema and how it changes, saves and realm characters
 in R2, the market and its duplication guards, homes and decor, and the integrity checks on online characters. The
 service itself is in [account-service.md](account-service.md).
 
-## Migrations
+## Schema and migrations
 
-- Schema lives in `server-account/migrations/NNNN_name.sql` (four-digit sequence, snake_case name), applied in name
-  order. Each file starts with a comment on what it adds.
+- The whole schema is one file, `server-account/migrations/0001_schema.sql`: every table, index and trigger, grouped
+  by area, with a one-line comment on what each table holds. It also seeds the three version counters the service
+  reads and raises but never inserts (`arena_board_ver`, `homes_gen`, `poi_feed`). The database starts empty; no data is migrated into it.
+- A later schema change is a new file with the next number (`0002_<what>.sql`, `0003_...`), snake_case name, applied
+  in name order. Never edit a file that was applied, `0001_schema.sql` included: the ledger does not run it again.
 - The deploy (`.github/workflows/account-deploy.yml`, step "Apply migrations") runs
   `wrangler d1 migrations apply daggerfall-accounts --remote`. Wrangler records applied files in the `d1_migrations`
   table, so each file runs once.
 - Before it applies, the deploy records a D1 Time Travel bookmark in the job summary. Restoring that bookmark
-  (`wrangler d1 time-travel restore`) is the only undo: some migrations cannot be reversed by another migration.
-- A failure with "CPU time limit" or "was reset" stops the deploy without retry. Keep each migration small; split a
-  large backfill.
-- Patterns: `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE ... ADD COLUMN`, and table rebuilds (`*_new`, copy, drop,
+  (`wrangler d1 time-travel restore`) is the only undo: a migration cannot always be reversed by another one.
+- A failure with "CPU time limit" or "was reset" stops the deploy without retry. Keep each migration small.
+- Patterns for a later file: `CREATE TABLE`, `ALTER TABLE ... ADD COLUMN`, and table rebuilds (`*_new`, copy, drop,
   rename) to change a constraint. SQLite cannot alter a `CHECK` in place.
-- Tests build their database from the same files: `test/accountDb.mjs` runs every `.sql` file in name order. A broken
-  migration fails the test suite.
-- Never edit an applied migration. Add a new file with the next number.
+- Tests build their database from the same files: `test/accountDb.mjs` runs every `.sql` file in name order, and
+  `test/server/schema.test.js` checks that they apply cleanly and hold every table and column the service's SQL names.
 
 ## Main tables
 
-| Area | Tables (migration) |
+| Area | Tables |
 | --- | --- |
-| Accounts | `players` (0001; also mutes, bans, freeze, staff flags, titles in later files), `sessions` (0001), passwords (0002) |
-| Cloud saves | `saves` (0003) |
-| Realm characters | `realm_characters` (0018), `realm_trades` (0019), audit columns (0020), integrity (0096) |
-| Homes | `homes` (0010) and later home files (rooms, look, yard, layout, deed, vendors, transfer) |
-| Decor | `home_decor` (0011) and later decor files (items, batch, access, use, hold) |
-| Currency | `marks_ledger` with balance triggers (0025, rebuilt in 0032) |
-| Market | `market_listings`, `market_sales`, `market_deliveries`, `market_orders`, `market_fills`, `market_prices`, `market_reports`, `products` (0032); auctions (0033); gold market (0041); `piece_escrow` (0128) |
-| Guilds | `guilds` (0013) and later guild files (halls, board, overhaul, castles) |
-| Group content | `gate_kills` (0014), `arena_*` (0074 onward), `serpent_kills` (0081), `sd_kills` (0090), `wild_falls` (0104), `eg_*` (0124), `wild_escrow` (0118) |
-| Professions and towns | professions, mining, smithing and other crafts; town seats (0048 onward); town economy |
-| Moderation and staff | `mod_cases`, `mod_reports`, `mod_case_lines`, `mod_actions` (0126), `private_reports` (0129), staff tables |
+| Accounts | `players` (also mutes, bans, freeze, staff flags, titles), `sessions` |
+| Cloud saves | `saves` |
+| Realm characters | `realm_characters` (with its audit and integrity columns), `realm_trades`, `realm_findings` |
+| Homes | `homes`, `home_rooms`, `home_yards`, `home_moves`, `home_offers` and the other `home_*` tables |
+| Decor | `home_decor` and the `decor_*` tables (bins, batch receipts, access, holds) |
+| Currency | `marks`, `marks_ledger` with balance triggers |
+| Market | `market_listings`, `market_sales`, `market_deliveries`, `market_orders`, `market_fills`, `market_prices`, `market_reports`, `products`, `market_auctions`, `market_bids`, `market_gold`, `piece_escrow` |
+| Guilds | `guilds` and the `guild_*` tables (members, notes, vault, castles, writs) |
+| Group content | `gate_kills`, `arena_*`, `serpent_kills`, `sd_kills`, `wild_falls`, `wild_escrow`, `sea_*` |
+| Professions and towns | the `prof_*` tables, `node_harvests`, `motherlodes`; town seats (`town_seat_*`); town economy (`town_econ_*`) |
+| Moderation and staff | `mod_cases`, `mod_reports`, `mod_case_lines`, `mod_actions`, `private_reports`, the `staff_*` tables |
 
 Deleting a `players` row cascades to most of an account's rows. `products` deliberately does not cascade: a crafted
 piece outlives its maker's account.
@@ -49,7 +50,7 @@ version history of offline slots.
 
 ## Realm characters
 
-An online character's truth is the service's, not the client's (`server-account/src/realm.js`, `0018`).
+An online character's truth is the service's, not the client's (`server-account/src/realm.js`).
 
 - One `realm_characters` row per character (up to `REALM_CHARACTERS_MAX`). The service mints the id
   (`r` + 20 hex); a client id proves nothing.
@@ -61,8 +62,9 @@ An online character's truth is the service's, not the client's (`server-account/
   account's other characters, so one account plays one character at a time. A checkpoint lands
   only under the current lease and only at `seq + 1` (headers `x-realm-lease`, `x-realm-seq`). An old tab, a second
   device, a restored backup or an edited copy cannot write the character again.
-- **Customs.** An offline character can be brought online once (`origin_id`, unique per account) if it qualifies
-  (`customsRealm`).
+- **Born online only.** A realm character is made by `createRealm`; no offline character is brought in. Its first
+  save must be a new character's (`firstSaveRefusal`: level 1 and no more than `REALM_BIRTH_WEALTH_MAX`). "Copy to
+  offline" still writes a realm save as a new offline character, and nothing played on the copy comes back.
 - Value moving between players (trades, market, mail) goes through `realm_trades` and the ledger. `holdRefusal`
   refuses any such move for a held character.
 
@@ -110,7 +112,7 @@ same way instead of paying twice. Listings and auctions are unique on `(seller, 
 ## Integrity checks
 
 Online characters are checked on every checkpoint and by the hourly sweeps (`server-account/src/judge.js`,
-`review.js`, `realm.js`; columns and tables from `0096_integrity.sql`).
+`review.js`, `realm.js`).
 
 | Check | What it detects | Result |
 | --- | --- | --- |

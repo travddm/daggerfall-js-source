@@ -950,12 +950,6 @@
   },
   {
    "file": "src/ui/enhanced/enhancedMenu.js",
-   "has": "const copy = onlineCopyOf(snap, sharedClassicMinutes(Date.now()));",
-   "clock": "event",
-   "why": "the event minute a character joins at"
-  },
-  {
-   "file": "src/ui/enhanced/enhancedMenu.js",
    "has": "const d = dateFromClassicMinutes(Math.floor(skyMinutes()));",
    "clock": "sky",
    "why": "the menu's date and time"

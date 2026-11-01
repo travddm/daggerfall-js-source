@@ -17,7 +17,6 @@ import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 import { provisionsStock } from '../../src/systems/survival/items.js';
 import { createRestItem, REST_ITEM, REST_ITEM_TEXT, litCandle, snuffCandle, _setRestItemsOnlineForTests } from '../../src/systems/rest/restItems.js';
 import { itemUseHandler } from '../../src/systems/item/itemTemplates.js';
-import { applyCustoms, customsLines } from '../../src/systems/realmCustoms.js';
 import { newSurvival, survivalMinute } from '../../src/systems/survival/needs.js';
 import { restItemLines, restItemsStock } from '../../src/systems/rest/restItems.js';
 
@@ -188,22 +187,6 @@ test('AUDIT REST II H8: a General Store sells two to four Campfires, on the coun
   for (const quality of [1, 4, 10]) assert.deepEqual(run(quality, false), run(quality, true), `quality ${quality}`);
 });
 
-test('AUDIT REST II H9: "Bring online" keeps a supply left with a repairer offline too - the counter\'s list crosses with the character (save.js otherItems), so customs strips it there as from the pack, the wagon and the stashes (mutant: the counter unread)', () => {
-  _resetForTests(); setPref('survival', true);
-  const sword = { templateIndex: 113, group: 'Weapons', value: 10 };
-  // REST-LOOT: the sources are open, so this is the switch's way back - pinned with the switch shut
-  _setRestItemsOnlineForTests(false);
-  try {
-    const snap = { level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], otherItems: [createRestItem(REST_ITEM.Bedroll), sword] };
-    const r = applyCustoms(snap);
-    assert.deepEqual(snap.otherItems, [sword], 'the copy\'s counter holds none');
-    assert.equal(r.restKept, 1, 'and the realm says it stayed');
-  } finally { _setRestItemsOnlineForTests(null); }
-  const open = { level: 1, goldPieces: 0, items: [], wagonItems: [], bankAccounts: [], otherItems: [createRestItem(REST_ITEM.Bedroll), sword] };
-  assert.equal(applyCustoms(open).restKept, 0, 'REST-LOOT: open, the counter\'s supply crosses with the character');
-  assert.equal(open.otherItems.length, 2);
-});
-
 test('AUDIT REST II H10: a Meditation Candle lights from the pack alone - one used from the wagon is refused with words, never "lit" with no kneel after it (mutants: the pack unasked; the ladder\'s entity dropped)', () => {
   _resetForTests(); setPref('survival', true);
   const h = itemUseHandler(REST_ITEM.Candle);
@@ -258,12 +241,11 @@ test('AUDIT REST II H12: online a cold camp offers no Rest - it is no rest point
   assert.equal((c.match(/campMenu\(/g) ?? []).length, 3);
 });
 
-test('AUDIT REST II H13: the words agree - "Campfire" as the item names it in every camp line, Firewood\'s card in the notes\' words, the customs line\'s "rest supplies" (Tonics and Salts are no camping gear), and an Ember Jar\'s fire hovers as what it is, with no fuel to count (mutant: the jar titled a Campfire)', () => {
+test('AUDIT REST II H13: the words agree - "Campfire" as the item names it in every camp line, Firewood\'s card in the notes\' words, and an Ember Jar\'s fire hovers as what it is, with no fuel to count (mutant: the jar titled a Campfire)', () => {
   assert.deepEqual([CAMP_TEXT.menuPickUp, CAMP_TEXT.pickedUp, CAMP_TEXT.noFuel, CAMP_TEXT.outOfFuel, CAMP_TEXT.carriedOut],
     ['Pick up the Campfire', 'You pick up your Campfire.', 'Your Campfire has no fuel left.', 'Your Campfire burns the last of its fuel.', 'You take your Campfire with you.']);
   assert.ok(!Object.values(CAMP_TEXT).some((v) => typeof v === 'string' && /\byour campfire\b/.test(v)), 'yours is the item, named as the item - "a campfire" stays any fire');
   assert.deepEqual(restItemLines(createRestItem(REST_ITEM.Firewood)), ['Adds 3 nights of fuel to a Campfire.']);
-  assert.ok(customsLines({ called: 0, owed: 0, wealth: 0, allowance: 0, taken: 0, restKept: 1 }).some((l) => /^Your rest supplies stayed with your offline character/.test(l)));
   _resetForTests(); setPref('survival', true); setWorldMinutes(1000);
   const jar = createRestItem(REST_ITEM.EmberJar);
   const entity = { items: [jar] };

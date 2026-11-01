@@ -49,12 +49,9 @@ test('SLOTS1: the pick seams hand a key and a name over once (mutant: a pick tak
   assert.match(menu, /export function takePickedSaveName\(\) \{ const n = _pickedSaveName; _pickedSaveName = null; return n; \}/);
   // the panes set them beside the verb the census pins
   const online = menu.slice(menu.indexOf('function paneOnline(body)'), menu.indexOf('function paneLoad(body)'));
-  assert.match(online, /const saves = savedGames\(\);/);
-  // TILE2: a TILE per slot now, in one grid. The
-  // pressed one is still the character brought in.
-  // REALM P1.5: the pressed slot is brought in through customs now (bringOnline) - a local slot never boots online
-  assert.match(online, /body\.append\(tileGrid\(saves,[\s\S]*?onClick: \(\) => \{ if \(!realmBusy\) bringOnline\(save\); \},/,
-    'a tile per slot, the pressed one is the character brought in - once, through customs');
+  // An online character is made online only: the pane lists the realm's characters and offers no local slot.
+  assert.match(online, /body\.append\(realmCard\(who\)\);/);
+  assert.doesNotMatch(online, /savedGames\(\)|tileGrid\(saves|bringOnline/, 'no offline character is brought in from this pane');
   // ACC1g MOVED THE GUARD OFF THIS BUTTON, and the reason is the whole
   // slice: NAME-F2's check was about a name the player TYPED into this
   // pane, and there is no such name any more. The account service
@@ -69,7 +66,7 @@ test('SLOTS1: the pick seams hand a key and a name over once (mutant: a pick tak
   // to send a player into a refusal it can already see.
   const latch = online.indexOf("_pickedRealmId = row.id; onAction('online');");   // REALM P1.3: the pick is the realm character's
   assert.ok(latch > 0, 'the pick is still latched by the press');
-  assert.match(online, /disabled: !who(?: \|\| button\.offlineOnly)?,/, 'signed out is a dead Play online button (AUDIT SET D4: and a Test Room character\'s, and a realm copy\'s)');
+  assert.match(menu, /function realmCard\(who\) \{[\s\S]*?if \(!who\) return box;/, 'signed out, the realm card lists no character to play');
   assert.match(online, /const who = storedSession\(appStorage\(\)\);/,
     'and `who` is the session on this device - a storage read, no network, so the pane opens on a train');
   assert.doesNotMatch(online, /entryVerdict|onlineName/,
@@ -95,12 +92,11 @@ test('SLOTS1: the pick seams hand a key and a name over once (mutant: a pick tak
   // its signature would have held the drift in place.
   assert.doesNotMatch(menu, /function slotCard\(/, 'the old per-pane card is gone');
   assert.match(menu, /function tileGrid\(saves, forSave\) \{/, 'and one grid builds them');
-  // ...and ALL THREE panes that list slots draw them, sliced to the
+  // ...and both panes that list slots draw them (the Online pane lists the realm's characters, no slot), sliced to the
   // pane rather than searched across the file, so a pane that stopped
   // reddens here.
   const paneText = (from, to) => menu.slice(menu.indexOf(from), menu.indexOf(to));
   for (const [name, from, to] of [
-    ['Online', 'function paneOnline(body)', 'function paneLoad(body)'],
     ['Load', 'function paneLoad(body)', '// ── SAVE GAME'],
     ['Save', 'function paneSave(body)', '// ── EXIT (pause only)'],
   ]) assert.match(paneText(from, to), /tileGrid\(/, `the ${name} pane draws tiles`);

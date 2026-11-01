@@ -34,11 +34,6 @@ export const INSTANCE_OWNER_HEX = 16;
 export const INSTANCE_EPOCH_HEX = 8;
 /** The instance tag's spelling, ONE home: net/wire.js composes WORLD_ROOM from it. */
 export const INSTANCE_TAG_SOURCE = '\\.i[0-9a-f]{16}\\.[0-9a-f]{8}';
-/** DOMAIN2: the relay that admits a guild's own instance - a castle's (instanceAdmission's `guild` arm): an older one
- *  refuses every member but staff, so no page offers a castle's instance until its relay says this. */
-export const GUILD_INSTANCE_RELAY_MIN = 276;   // world276 (the eighth merge of main into #1184, 2026-10-28: past main's world275, SD-PARTY, already live); world275 (the seventh merge of main into #1184, 2026-10-28: past main's world274, LADDER-CUT); world274 (the fourth merge of main into #1184, 2026-10-27: past main's world272 and world273); world272 (the third merge of main into #1184, 2026-10-27: past MASTER-THREE's world271, main's); world271 (the second merge of main into #1184, 2026-10-27: past CHAT-POST's world270, main's); world270 (the merge of main into TESA, 2026-10-27: #1184's world269 folded into its world270 past BOW-TOPS's world269, main's): the merged release's (world256 on TESA's, renumbered past main's world256 to world259 at the merge, then world260 past main's world260 to world268 at the next)
-/** Does the relay whose welcome said `v` admit a guild's instance? */
-export const relaySupportsGuildInstances = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= GUILD_INSTANCE_RELAY_MIN; };
 /** DOMAIN2 (AUDIT DOMAINS R2): THE ROOMS A GUILD MAY OWN - the castles', each a crown city's own dungeon whole (its key the
  *  crown seat's, the city's own location: Sentinel's, Wayrest's and Daggerfall's - world/dungeon/dungeonTextures.js
  *  MAIN_STORY_DUNGEON_IDS, measured on the freeware's MAPS.BSA). The `guild` arm admits these alone: it admitted any room
@@ -50,11 +45,6 @@ export const BAY_CASTLE_MAP_IDS = Object.freeze([6634853, 630439035, 1291010263]
 export const PROVINCE_CASTLE_MAP_IDS = Object.freeze([1, 2, 3, 4, 5, 6].map((k) => ((0x341 << 20) | 0x80000 | k) >>> 0));
 export const CASTLE_MAP_IDS = Object.freeze([...BAY_CASTLE_MAP_IDS, ...PROVINCE_CASTLE_MAP_IDS]);
 const GUILD_ROOMS = new Set(CASTLE_MAP_IDS.map((k) => `dungeon:m${k}`));
-/** The relay that admits an instance (net/wire.js RELAY_VERSION world208 - world206 then world207 on its branch, renumbered past SERPENT5's and ONE-BODY's at the merges): an older one keeps no memory for the key, gates
- *  nobody out of it, and drops the party pose's `ins` - so no page offers an instance until its relay says this. */
-export const INSTANCE_RELAY_MIN = 208;
-/** Does the relay whose welcome said `v` admit instances? */
-export const relaySupportsInstances = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= INSTANCE_RELAY_MIN; };
 
 /** The hub's internal door a place room asks whether an account's party holds an instance's owner (partyHoldsOwner). */
 export const INSTANCE_INTERNAL_KIN = '/internal/instance/kin';

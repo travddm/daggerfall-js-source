@@ -43,7 +43,7 @@ test('SAFE2 + SAFE4 + SAFE6 THE SESSION: a line\'s stamp is carried as the relay
   s.join(CHAT_WORLD_ROOM);
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world215' });   // AUDIT SAFE RELAY-3: a relay that knows the ban frame
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1 });
   ws.receive({ t: 'chat', id: 'bob-0002', name: 'Bob', text: 'hi', at: 1, sub: 'acct-bob', sg: SG });
   ws.receive({ t: 'chat', id: 'bob-0002', name: 'Bob', text: 'yo', at: 2, sub: 'acct-bob', sg: 'short' });
   assert.equal(heard[0].sg, SG);
@@ -417,12 +417,12 @@ const signedIn = () => {
 };
 const answer = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 /** An OnlineSession in `room`, opened and welcomed by a relay of version `v`. */
-function welcomedSession(FakeWS, sockets, room, { v = 'world215', now = () => 1_000_000, id = 'me-00001' } = {}) {
+function welcomedSession(FakeWS, sockets, room, { now = () => 1_000_000, id = 'me-00001' } = {}) {
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Me', id, secret: `secret-of-${id}`, presence: false, WebSocketImpl: FakeWS, now });
   s.join(room);
   const ws = sockets.at(-1);
   ws.open();
-  ws.receive({ t: 'welcome', id, peers: [], n: 1, ...(v ? { v } : {}) });
+  ws.receive({ t: 'welcome', id, peers: [], n: 1 });
   return { s, ws };
 }
 
@@ -467,22 +467,21 @@ test('AUDIT SAFE CLIENT-2 THE SESSION STAYS OUT: a socket the relay closed 1008 
   assert.equal(onlineNs.tokenRetryable('server'), true);
 });
 
-test('AUDIT SAFE CLIENT-2 + RELAY-3 THE PAGE IS BANNED: the hub says the ban\'s order first - carried to every room whose relay knows the frame, never to one before world215 (it closes on it - the WIKIMAID relay world214 among them) - then `banned`: every room left and latched, the token the minter holds let go, the ban said once however many sockets say it, nothing back on the rejoin\'s clock; a ban lifted opens the way (mutants: a ban that latches nothing; the minter\'s token kept; a ban order to a relay before world214)', async () => {
+test('AUDIT SAFE CLIENT-2 + RELAY-3 THE PAGE IS BANNED: the hub says the ban\'s order first - carried to every room - then `banned`: every room left and latched, the token the minter holds let go, the ban said once however many sockets say it, nothing back on the rejoin\'s clock; a ban lifted opens the way (mutants: a ban that latches nothing; the minter\'s token kept)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let clock = 1_000_000;
   const now = () => clock;
-  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { now }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { now }), old = welcomedSession(FakeWS, sockets, 'chat:lfg', { now, v: 'world214' });   // WIKIMAID's relay: no ban frame
+  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { now }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { now });
   const log = new ChatLog({ now });
   let forgot = 0;
-  const host = createChatSafetyHost({ log: () => log, links: () => [hub.s, trade.s, old.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow(), minter: () => ({ forget() { forgot++; } }), now });
+  const host = createChatSafetyHost({ log: () => log, links: () => [hub.s, trade.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow(), minter: () => ({ forget() { forgot++; } }), now });
   await host.start();
   const until = Math.floor(clock / 1000) + 86400;
   const order = orderOf({ o: 'ban', s: 'acct-me', bn: until, i: 1, e: until });
   hub.ws.receive({ t: 'law', order });
   hub.ws.receive({ t: 'banned', until });
   assert.deepEqual(JSON.parse(trade.ws.sent.at(-1)), { t: 'ban', order }, 'the order carried before the page left');
-  assert.equal(old.ws.sent.some((f) => JSON.parse(f).t === 'ban'), false, 'never to a relay that closes the socket on the frame');
-  assert.deepEqual([hub.s.barred, trade.s.barred, old.s.barred], [true, true, true]);
+  assert.deepEqual([hub.s.barred, trade.s.barred], [true, true]);
   assert.equal(forgot, 1, 'the token minted before the ban let go');
   hub.s.onBanned({ until });   // another hub socket's word on the same ban
   assert.equal(log.tab(log.active).messages.filter((l) => /This account is banned/.test(l.text)).length, 1, 'said once');
@@ -709,7 +708,7 @@ test('AUDIT SAFE CLIENT-8 A BLOCK LIST THAT COULD NOT BE READ IS READ AGAIN - af
   const { s, ws } = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM);
   let welcomed = 0;
   s.onWelcomed = () => welcomed++;
-  ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world215' });
+  ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1 });
   assert.equal(welcomed, 1);
 });
 
@@ -876,18 +875,17 @@ test('AUDIT SAFE DOC-4 THE REPORTS REACH A MODERATOR IN THE GAME: /cases lists t
   for (const c of ['/mute', '/ban', '/strikes', '/cases', '/case', '/dismiss']) assert.ok(lines().some((l) => l.startsWith(c)), `/modhelp names ${c}`);
 });
 
-test('LEASE1 THE PAGE HANDS ITS HUB\'S LEASE TO EVERY ROOM IT HOLDS (net/roomLease.js): the hub\'s `lease` goes to each lease room whose relay knows the frame, ahead of the next frame the page sends there - never back to the hub, never to a relay before world242, which closes on it (mutants: the lease kept; handed to an old relay)', async () => {
+test('LEASE1 THE PAGE HANDS ITS HUB\'S LEASE TO EVERY ROOM IT HOLDS (net/roomLease.js): the hub\'s `lease` goes to each lease room, ahead of the next frame the page sends there - never back to the hub (mutant: the lease kept)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
-  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { v: 'world242' }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { v: 'world242' }), old = welcomedSession(FakeWS, sockets, 'chat:lfg', { v: 'world241' });
-  const host = createChatSafetyHost({ log: () => new ChatLog(), links: () => [hub.s, trade.s, old.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow() });
+  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM), trade = welcomedSession(FakeWS, sockets, 'chat:trade');
+  const host = createChatSafetyHost({ log: () => new ChatLog(), links: () => [hub.s, trade.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow() });
   await host.start();
   const leases = (ws) => ws.sent.map((f) => JSON.parse(f)).filter((f) => f.t === 'lease' && f.l);
   hub.ws.receive({ t: 'lease', l: 'body.mac' });
   await settle();
-  for (const l of [hub, trade, old]) l.s.sendChat('anyone selling iron?');
+  for (const l of [hub, trade]) l.s.sendChat('anyone selling iron?');
   assert.deepEqual(leases(trade.ws), [{ t: 'lease', l: 'body.mac' }]);
   assert.deepEqual(leases(hub.ws), [], 'the hub is handed none back');
-  assert.deepEqual(leases(old.ws), [], 'nor a relay that closes on the frame');
 });
 
 test('ROSTER-STAFF rosterActions (mob, 2026-10-24: "need to add follor to find a player in chat as well", over the chat\'s Find a player list): a roster row\'s staff acts are the line menu\'s, for the player the row names by socket - their account as a room here holds it, or the hub\'s lists (everyone online, a search\'s answer); none for a player, for a row no list names an account for, or for an id that is no id (mutants: the hub\'s list unread, the search unread, a player given the acts)', async () => {

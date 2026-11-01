@@ -33,14 +33,14 @@
 //   clock() -> ms           the shared clock (world.js raidNowMs - the relay's, offline this machine's)
 //   naval() -> host | null  the naval host (fleet, stormStrike), when the sea fight runs
 //   state                   the streaming world's state (localFromWorld - a map pixel in the scene)
-//   link() -> OnlineSession | null   the social socket (sendWdun, wdunSeaOk)
+//   link() -> OnlineSession | null   the social socket (sendWdun)
 //   ether                   the ether host (scenes/etherHost.js): credit(n), mid(text, s), say(text, s)
 //   session, checkpoint, wallet, character, region   SEA-BOUNTY's (scenes/seaBountyHost.js): the realm session, its
 //                           checkpoint, the record's wallet, the realm character (its own - systems/characterId.js
 //                           characterIdOf, when none is given), the region stood in
 //   bountyDoor?             the bounty board's service door (its own, when none is given)
 //   seasonDoor?             the season boards' service door (its own, when none is given)
-//   cell() -> OnlineSession | null   SHIP-PVP's: my cell's socket (sendWild, `id`, `acct`, `seaPvpOk`, a peer's name)
+//   cell() -> OnlineSession | null   SHIP-PVP's: my cell's socket (sendWild, `id`, `acct`, a peer's name)
 //   foe(id) -> bool         SHIP-PVP's: a peer outside my party and guild (world.js wildIsStranger)
 //   name?(id) -> string     SHIP-PVP's: a peer's name, as shown (its own - the socket's peer's, when none is given)
 // }
@@ -171,7 +171,7 @@ export function createSeaVentures(deps) {
   /** A sailing's flagship down: the hub's word, mine, or my ledger's (AUDIT SEA VENTURES D4: a reload stood her again). */
   const down = (n) => sunk.has(n) || mine.has(n) || !!deps.ether?.fleetDone?.(n);
   /** My word to the hub that a sailing's flagship went down (online, at a relay that reads it) - whether it left. */
-  const tellHub = (n) => { const link = deps.link?.(); return !!link?.wdunSeaOk && link.status === 'open' && link.sendWdun({ k: 'fk', n }) === true; };
+  const tellHub = (n) => { const link = deps.link?.(); return link?.status === 'open' && link.sendWdun({ k: 'fk', n }) === true; };
   let fkAt = -Infinity;
   let fedAt = -Infinity, heardStorm = null, heardFleet = null, inStorm = null, strikesSeen = null;
   /** The way from the player's pixel to a point, in words ("west-north-west"), or '' where they stand on it. */
@@ -267,7 +267,7 @@ export function createSeaVentures(deps) {
   // ── SHIP-PVP ───────────────────────────────────────────────────────────────────────────────────────────────────────
   const wrecks = createSeaWreckHost({ session: deps.session, checkpoint: deps.checkpoint, character, me: () => deps.cell?.()?.acct ?? null, naval: deps.naval, say: (text, s) => say(text, s) });
   const broadsides = createSeaBroadsides({
-    live: () => live() && !!deps.cell?.()?.seaPvpOk && wildHere() && wildZoneKind() === ETHER_KIND,
+    live: () => live() && !!deps.cell?.() && wildHere() && wildZoneKind() === ETHER_KIND,
     naval: deps.naval, send: (d, o) => deps.cell?.()?.sendWild?.(d, o) === true, me: () => deps.cell?.()?.id ?? null,
     stranger: (id) => !!deps.foe?.(id), name: (id) => (deps.name ? deps.name(id) : deps.cell?.()?.peers?.get?.(id)?.name) || '', receipt: (rc) => wrecks.receipt(rc),
     say: (text, s) => say(text, s), mid: (text, s) => mid(text, s),

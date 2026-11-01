@@ -1,5 +1,5 @@
 // SD9b: THE HOURS BROKEN - the
-// account service's claim of an `h1` (server-account/src/sds.js claimSd, migration 0088): one row a (slot, account), a
+// account service's claim of an `h1` (server-account/src/sds.js claimSd, `sd_kills`): one row a (slot, account), a
 // guest's fought and not counted, Hourbreaker and The Turning Hour rolled off the receipt's seed on the first write alone
 // and held for good on the row (`sd_honours`); the route behind a session, the count on the cards; the title held, worn
 // and signed; the client's call and the device's book (net/superDungeon/sdClaims.js); the world host's seams.

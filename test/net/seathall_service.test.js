@@ -1,5 +1,5 @@
 // SEAT-HALL: A PALACE'S CHARTER ROOM, AS THE
-// SERVICE KEEPS IT - its own table (`seat_hall_decor`, migration 0065), written through DECOR's own routes with `seat`
+// SERVICE KEEPS IT - its own table (`seat_hall_decor`), written through DECOR's own routes with `seat`
 // named, by an Officer of the guild holding the palace seat, at most a hundred pieces over the seat, DECOR's gold a
 // placement; cleared whenever the seat changes hands or lapses (7.2;
 // server-account/src/decor.js SEAT_STORE). Driven through the real Worker over node:sqlite with every migration applied
@@ -139,7 +139,7 @@ test('SEAT-HALL AT MOST A HUNDRED over the seat (7.2), whichever building the ke
   assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM seat_hall_decor WHERE map_id = ?').get(PALACE.key).n, 100);
 });
 
-test('SEAT-HALL THE ROOM FALLS WITH THE CHARTER (migration 0065): the seat taken by another guild clears its pieces, a Charter lapsed clears them, nothing given back; another seat\'s stand; a standing or tithe changed, or the holder written again, clears nothing (mutants: either trigger; its WHEN)', async (t) => {
+test('SEAT-HALL THE ROOM FALLS WITH THE CHARTER: the seat taken by another guild clears its pieces, a Charter lapsed clears them, nothing given back; another seat\'s stand; a standing or tithe changed, or the holder written again, clears nothing (mutants: either trigger; its WHEN)', async (t) => {
   const s = await held(t);
   assert.equal((await s.place(s.officer)).status, 200);
   s.raw.prepare(`INSERT INTO seat_hall_decor (map_id, building_key, id, model, flat_archive, flat_record, place, placed_at, item, paid, yard)

@@ -1,0 +1,16 @@
+# Generated, vendored or data files. Prettier never rewrites them.
+node_modules/
+dist/
+dist-gun/
+dist-pistol/
+app/release/
+vendor/
+public/
+locales/
+package-lock.json
+server/package-lock.json
+tools/testTimes.json
+tools/lintRatchet.json
+src/buildTag.js
+*.html
+*.png

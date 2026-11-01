@@ -1,5 +1,5 @@
 // SEAT2b part two (b): A SIEGE'S WORKS ON ITS PASS - frozen at
-// the battle's first pass (`town_seat_battles.works`, migration 0063): each work's tier then, a palace's Gatehouse or
+// the battle's first pass (`town_seat_battles.works`): each work's tier then, a palace's Gatehouse or
 // none, the camp's Rams where a gate stands, a Siegewright on the attacking roster; every later pass carries the same
 // though a work stands between them (6.2, 7.5; server-account/src/seatSiege.js
 // siegePass). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), on

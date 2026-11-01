@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // SEAT2b: A SEAT'S FORTIFICATIONS AS THE SERVICE KEEPS THEM (7.5; the law
-// src/net/fortLaw.js; migration 0061).
+// src/net/fortLaw.js).
 //
 // THE SEAT'S, NOT THE GUILD'S: a work's tier stands at the seat whoever holds it. A PROJECT is one tier of one work,
 // begun by the holder's Guildmaster or an Officer at the board - its Marks burnt from the treasury then - and supplied

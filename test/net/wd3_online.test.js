@@ -1,7 +1,7 @@
 // WD3 -
 // ONLINE, THE TOWNS ARE THE ROOM'S. Beautiful Villages and Beautiful Cities are the room's switches
 // (systems/online/onlineLane.js), and a home is a building KEY, which names a building only in one layout of its town: the
-// account service keeps the layout each home's town was bought in (migration 0073 - 0046 on its branch, 0069 at the first merge onto main, 0071 past PROF9's and PROF12's 0069_cooking and 0070_alchemy at the second, 0073 past SILVER-WAYS' 0071_silver_ways and PROF2b's 0072_motherlodes at the third - homes.js), a town's later homes
+// account service keeps the layout each home's town was bought in (homes.js), a town's later homes
 // take its first home's, and every client reads the towns holding homes at its online boot and keeps each in its layout
 // (scenes/world.js, systems/layoutPins.js).
 //
@@ -12,7 +12,6 @@
 // and retries, and the room's switches.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { standService, d1, T0 } from '../accountDb.mjs';
 import { realmJoinAt, seatRealm } from '../realmSeat.mjs';
@@ -22,17 +21,13 @@ import { ONLINE_ROOM_MOD_KEYS } from '../../src/systems/online/onlineLane.js';
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 import { LAYOUT_MODS } from '../../src/systems/layoutPins.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const BV = 'beautiful-villages@1.4.2', BOTH = 'beautiful-cities@0.5.0+beautiful-villages@1.4.2';
 const TOWN = 1291010263, CLASSIC_TOWN = 1291010999;
 
-test('WD3 online, the record: migration 0073 adds `homes.layout` (NULL - Daggerfall\'s own town, every home before it) and the town-age index the claim and the read ask; the law\'s bounds', () => {
-  const m = src('server-account/migrations/0073_home_layout.sql');
-  assert.match(m, /^ALTER TABLE homes ADD COLUMN layout TEXT;$/m);
-  assert.match(m, /^CREATE INDEX IF NOT EXISTS idx_homes_town_age ON homes \(map_id, bought_at, building_key\);$/m);
+test('WD3 online, the record: `homes.layout` (NULL - Daggerfall\'s own town, every home before it) and the town-age index the claim and the read ask; the law\'s bounds', () => {
   const db = d1()._raw;
   assert.ok(db.prepare('PRAGMA table_info(homes)').all().some((c) => c.name === 'layout' && c.type === 'TEXT' && c.dflt_value === null));
-  assert.ok(db.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'idx_homes_town_age'").get());
+  assert.deepEqual(db.prepare('PRAGMA index_info(idx_homes_town_age)').all().map((c) => c.name), ['map_id', 'bought_at', 'building_key']);
   assert.equal(HOME_LAYOUT_MAX, 96); assert.equal(HOME_LAYOUTS_MAX, 20000);
   assert.deepEqual(HOME_LAYOUT_MODS, LAYOUT_MODS);
   assert.ok(ROUTES.has('/v1/homes/layouts') && !OPEN_ROUTES.has('/v1/homes/layouts'), 'behind a session - any session');

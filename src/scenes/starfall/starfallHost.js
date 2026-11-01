@@ -197,8 +197,8 @@ export function createStarfallHost(host) {
     generation: () => (host.worldPlaces ?? keptPlaces())?.generation?.() ?? 0, land: () => (host.landVersion ?? tamrielLandVersion)(),
     idle: host.idle !== undefined ? host.idle : undefined,
   });
-  /** WW5: whether this session's relay keeps a province's stars (net/wire.js WW5_RELAY_MIN) - an older one refuses its word */
-  const lanesOk = () => !!session()?.ww5Ok;
+  /** WW5: a province's stars fall online alone - offline the Bay's are the night's */
+  const lanesOk = () => !!session();
   /** WW5: the theatre this player stands in, as its lane (the Bay's at sea and in Cyrodiil, which stands no coven night) */
   const myLane = () => { const t = theatreOfRegion(regionAt()); return t > 0 && siteEventLaneOpen(t) ? t : 0; };
   /** starHeldKey -> the star's own record on this screen (made as it comes into its omen, let go when it is gone) */
@@ -519,7 +519,7 @@ export function createStarfallHost(host) {
         mark(S, f);
         made(f);
       };
-      Promise.resolve(foes.spawnFoe(career, [x, at.y, z], { yaw: yaw ?? 0, gender: covenFemale(career) ? 'female' : null, placed: true, groundAlign: { hitDist: at.hitDist }, site, transient: true, eliteFoe: elite, grantKind: session()?.starGrantOk ? 'star' : undefined }))   // STAR-TUNE: a grant of the star's own kind - a wave of any size its law gives, one ask; AUDIT STAR-TUNE F1: of a relay that mints it (an older one's own kind, its waves nine at most)
+      Promise.resolve(foes.spawnFoe(career, [x, at.y, z], { yaw: yaw ?? 0, gender: covenFemale(career) ? 'female' : null, placed: true, groundAlign: { hitDist: at.hitDist }, site, transient: true, eliteFoe: elite, grantKind: session() ? 'star' : undefined }))   // STAR-TUNE: a grant of the star's own kind - a wave of any size its law gives, one ask
         .then(landed, () => landed(null));
     });
   }

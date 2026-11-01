@@ -10,6 +10,5 @@
 // Pure. Not a DFU member. Ledger A (SERPENT1).
 
 /** The Deadlands Embers a serpent's receipt pays - one, to a ship that dealt and one that stood alike (the gate's own law:
- *  an ember a receipt, WB5b). The hoard mints them, and the service writes them on the kill's row (`serpent_kills.stones`,
- *  migration 0083), so the insignia's purse counts a serpent's embers as a breach's. */
+ *  an ember a receipt, WB5b). The hoard mints them, and the service writes them on the kill's row (`serpent_kills.stones`), so the insignia's purse counts a serpent's embers as a breach's. */
 export const SERPENT_EMBERS = 1;

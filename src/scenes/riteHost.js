@@ -545,8 +545,8 @@ export function createRiteHost({
     },
     /** Whether the hub said the rite at this circle broken (systems/gate/gateOmen.js: its order is not said then). */
     isBroken: (day, px, py) => brokenWords.has(circleKey(day, px, py)),
-    /** BROKER-CAGE: whether every one of the circle's faithful fell - the hub's word, or (`ownEyes`: a relay before the
-     *  one that says it - net/wire.js relaySupportsCage) this character's own eyes, the Summoner's fall the hub's broken
+    /** BROKER-CAGE: whether every one of the circle's faithful fell - the hub's word, or (`ownEyes`: offline, with no hub
+     *  to say it) this character's own eyes, the Summoner's fall the hub's broken
      *  word counting as seen (AUDIT BROKER-CAGE C1): the Broker's cage open. AUDIT BROKER-CAGE C6: where the relay says
      *  it, its word alone - a screen that freed her on its own eyes while the relay never heard them (the last of them
      *  felled 60 m out, the breach opening before its killer came back) sold where every other screen saw her caged. */

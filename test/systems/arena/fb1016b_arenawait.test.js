@@ -15,7 +15,7 @@ import { createArenaOnline } from '../../../src/scenes/arena/arenaOnline.js';
 import { createArenaGate } from '../../../src/scenes/arena/arenaGate.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
 import { arenaSeasonOf, arenaSeasonDay, arenaLadderOf } from '../../../src/net/arena/arenaLaw.js';
-import { ARENA_RELAY_MIN } from '../../../src/net/wire.js';
+import { RELAY_VERSION } from '../../../src/net/wire.js';
 import { exhibitionFor } from '../../../src/systems/arena/arenaLadder.js';
 import * as BK from '../../../src/systems/arena/arenaBook.js';
 import { fighterIdentity } from '../../../src/systems/arena/arenaFighters.js';
@@ -72,7 +72,7 @@ test('ARENA-WAIT: on the online lane before the relay\'s word, the Herald offers
       session.join('world:0:0', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 });
       sockets[0].open();
       assert.equal(session.status, 'open', 'the socket open, no welcome yet');
-      assert.deepEqual([session.arenaOk, session.arenaHeard], [false, false], 'the session minted: nothing said');
+      assert.equal(session.arenaHeard, false, 'the session minted: nothing said');
     }
     assert.deepEqual([A.live(), A.waiting()], [false, true], `${phase}: neither online nor offline - waiting`);
     const ch = gate.heraldChoice({ cityBout: null, healthShare: 1, league: null });
@@ -108,8 +108,8 @@ test('ARENA-WAIT: on the online lane before the relay\'s word, the Herald offers
   assert.equal(P.arenaLeague.book.wagers[0].status, 'open', 'the wager waits for the relay\'s verdict');
 
   // THE WELCOME: a relay with the arena's rooms - online, the account's climb
-  sockets[0].receive({ t: 'welcome', id: 'spar-0001', peers: [], host: 'spar-0001', now: Date.now(), v: `world${ARENA_RELAY_MIN}` });
-  assert.deepEqual([session.arenaOk, session.arenaHeard], [true, true]);
+  sockets[0].receive({ t: 'welcome', id: 'spar-0001', peers: [], host: 'spar-0001', now: Date.now(), v: RELAY_VERSION });
+  assert.equal(session.arenaHeard, true);
   assert.deepEqual([A.live(), A.waiting()], [true, false]);
   await A.fetchBoard();
   const ch = gate.heraldChoice({ cityBout: null, healthShare: 1, league: null });
@@ -118,7 +118,7 @@ test('ARENA-WAIT: on the online lane before the relay\'s word, the Herald offers
   assert.equal(P.arenaLadder, null, 'the save\'s ladder never touched');
 });
 
-test('ARENA-WAIT: what is not waiting - off the online lane the save\'s arena as ever (Fight offered); a relay that said no (an older one) is the lane\'s ONE offline (a seat given up is shut - AUDIT A4, the next test); and the host wires the lane, its three doors through the online arm', () => {
+test('ARENA-WAIT: what is not waiting - off the online lane the save\'s arena as ever (Fight offered); a seat given up is shut (AUDIT A4, the next test); and the host wires the lane, its three doors through the online arm', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let session = null;
   let lane = false;
@@ -133,11 +133,8 @@ test('ARENA-WAIT: what is not waiting - off the online lane the save\'s arena as
   session.join('world:0:0', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 });
   sockets[0].open();
   assert.equal(A.waiting(), true);
-  sockets[0].receive({ t: 'welcome', id: 'alva-0001', peers: [], host: 'alva-0001', now: Date.now(), v: `world${ARENA_RELAY_MIN - 1}` });
-  assert.deepEqual([session.arenaOk, session.arenaHeard, A.live(), A.waiting()], [false, true, false, false], 'a relay without the arena said so: offline');
-  assert.ok(gate.heraldChoice({ cityBout: null, healthShare: 1, league: null }).options.some((o) => o.act === 'fight'));
   // realm's save; on the online lane its doors are shut now, in the seat's own words (the next test)
-  session = { arenaOk: false, arenaHeard: false, superseded: true, terminal: true };
+  session = { arenaHeard: false, superseded: true, terminal: true };
   assert.deepEqual([A.waiting(), A.shutText(O.climbWait)], [true, SEAT_NOTICE], 'a seat given up is shut, never offline');
 });
 
@@ -174,7 +171,7 @@ test('ARENA-WAIT AUDIT A1: before the account\'s climb is in - the lane waiting,
   assert.ok(offCard.opponents && offCard.purse > 0, 'offline: the save\'s next bout and its purse');
   lane = true;
   assertNobodys(gate.board(), O.climbWait, 'the lane waiting, no session');
-  session = { arenaOk: true, arenaHeard: true, status: 'open', room: 'world:1,1', sendArena: () => true };
+  session = { arenaHeard: true, status: 'open', room: 'world:1,1', sendArena: () => true };
   assert.equal(A.live(), true);
   assertNobodys(gate.board(), O.climbWait, 'live, the board still asked');
   // the window draws it - no tier the climb's, nobody's state, no pip, no titles block - and the climb when it comes
@@ -205,7 +202,7 @@ test('ARENA-WAIT AUDIT A1: before the account\'s climb is in - the lane waiting,
   });
 });
 
-test('ARENA-WAIT AUDIT A3/A4: on the online lane the offline arena runs for ONE word - a relay that said it opens no arena room; a seat given up (O9) and a session no welcome can answer (terminal) SHUT the doors, each saying why - the seat elsewhere in ONE-SEAT\'s words, the server gone - never the save\'s Fight, purse or house-settled book, never "Still loading" for ever (mutants: superseded offline; terminal waiting silently; the seat\'s words unsaid; the server\'s unsaid; the relay\'s no shut; terminal after a no offline)', async () => {
+test('ARENA-WAIT AUDIT A3/A4: on the online lane a seat given up (O9) and a session no welcome can answer (terminal) SHUT the doors, each saying why - the seat elsewhere in ONE-SEAT\'s words, the server gone - never the save\'s Fight, purse or house-settled book, never "Still loading" for ever (mutants: superseded offline; terminal waiting silently; the seat\'s words unsaid; the server\'s unsaid)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   const said = [];
   /** @type {any} */
@@ -260,31 +257,16 @@ test('ARENA-WAIT AUDIT A3/A4: on the online lane the offline arena runs for ONE 
 
   // A4: a seat given up (world.js leaveSeat: online.supersede()) - it ran the save's ladder and settled the book offline
   session = fresh();
-  sockets.at(-1).receive({ t: 'welcome', id: session.id, peers: [], host: session.id, now: Date.now(), v: `world${ARENA_RELAY_MIN}` });
+  sockets.at(-1).receive({ t: 'welcome', id: session.id, peers: [], host: session.id, now: Date.now(), v: RELAY_VERSION });
   assert.equal(A.live(), true);
   const EX = exhibitionFor(gm);
   const house = BK.houseOutcome(EX);
   assert.equal(gate.wager(EX.hour, house === 0 ? 1 : 0, 100).ok, true, 'a wager online');
   session.supersede();
-  assert.deepEqual([session.superseded, session.arenaOk], [true, true], 'the relay\'s word kept, the seat gone');
+  assert.deepEqual([session.superseded, session.arenaHeard], [true, true], 'the relay\'s word kept, the seat gone');
   await shutWith(SEAT_NOTICE, 'superseded');
   gm = NOON + 70;
   gate.settle();
   assert.equal(P.arenaLeague.book.wagers[0].status, 'open', 'the book settles nothing by the house\'s record - it waits for the relay\'s verdict');
-  gm = NOON + 2;
-
-  // the relay's no - the lane's ONE offline: ARENA3's arena, Fight off the save's ladder
-  session = fresh();
-  sockets.at(-1).receive({ t: 'welcome', id: session.id, peers: [], host: session.id, now: Date.now(), v: `world${ARENA_RELAY_MIN - 1}` });
-  assert.deepEqual([session.arenaHeard, session.arenaOk, A.live(), A.waiting()], [true, false, false, false], 'a relay that said no: offline');
-  assert.ok(gate.heraldChoice({ cityBout: null, healthShare: 1, league: null }).options.some((o) => o.act === 'fight'), 'the save\'s Fight');
-  // ...but not once terminal, nor with the seat given up
-  sockets.at(-1).onclose?.({ code: CLOSE_POLICY, reason: 'policy' });
-  assert.equal(session.terminal, true);
-  assert.deepEqual([A.waiting(), A.fightLadder().text], [true, O.noServer], 'terminal after the no: shut');
-  session.join('world:0:1', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 });
-  assert.deepEqual([session.terminal, A.waiting()], [false, false], 'a door joined: the relay\'s no stands - offline');
-  session.supersede();
-  assert.deepEqual([A.waiting(), A.fightLadder().text], [true, SEAT_NOTICE], 'a seat given up after the no: shut');
   assert.notEqual(O.noServer, O.climbWait);
 });

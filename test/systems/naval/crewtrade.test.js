@@ -1,8 +1,7 @@
 // CREW-TRADE -
 // crew is a row of every port's exchange: a port has sailors to spare, is short of them or neither, a man is priced as
 // a good by that stand and the day's drift, and the exchange signs men on to the ship at the quay and takes them off her
-// by the head. Never above the shipwright's price for a man, never her last man, never a hand ashore's place, never a
-// crossed ship's crew. The office and the window driven over the REAL sea fight's yard model (test/navalSea.mjs - TEST
+// by the head. Never above the shipwright's price for a man, never her last man, never a hand ashore's place. The office and the window driven over the REAL sea fight's yard model (test/navalSea.mjs - TEST
 // THE SHAPE THE PRODUCER MINTS). tools/mutants/crewtrade.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -19,7 +18,6 @@ import { CREW_HALL_TEXT } from '../../../src/systems/crewHall.js';
 import { playerCrewCount } from '../../../src/systems/naval/crewLife.js';
 import { exchangeText } from '../../../src/ui/naval/navalYardWindow.js';
 import { townExchangeFactors } from '../../../src/net/townEconLaw.js';
-import { restoreFleetSaveData, _resetFleetForTests } from '../../../src/systems/fleet.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const SMALL_SHIP = 2, LARGE_BOAT = 1;
@@ -83,7 +81,7 @@ test('CREW-TRADE NO MAN FETCHES THE SHIPWRIGHT\'S PRICE: at every discount a ran
   assert.ok(capped > 0, 'the cap is what holds a short port\'s price at a high rank');
 });
 
-test('CREW-TRADE WHO MAY LEAVE HER: men by the head, never her last; never so many that her deck stands no named hand aboard beside the shore party (PIN MOVED, AUDIT CREW-TRADE H1: by the party\'s count, its hands never signed off - not by the last one\'s roster place); none of a ship come through customs - and the room she has for more (mutants: the last man, the shore party, the hand beside it, the customs, the room)', () => {
+test('CREW-TRADE WHO MAY LEAVE HER: men by the head, never her last; never so many that her deck stands no named hand aboard beside the shore party (PIN MOVED, AUDIT CREW-TRADE H1: by the party\'s count, its hands never signed off - not by the last one\'s roster place) - and the room she has for more (mutants: the last man, the shore party, the hand beside it, the room)', () => {
   assert.equal(CREW_LEAST, 1);
   const hands = ['A', 'B', 'C', 'D'].map((name) => ({ name }));
   assert.deepEqual(crewSpare({ hull: SMALL_SHIP, crew: 24, hands }), { n: 23, why: null }, 'all but her last');
@@ -98,7 +96,6 @@ test('CREW-TRADE WHO MAY LEAVE HER: men by the head, never her last; never so ma
   assert.equal(crewSpare({ hull: SMALL_SHIP, crew: 24, hands, away: new Set(['B', 'C']) }).n, 24 - 15);
   assert.deepEqual(crewSpare({ hull: SMALL_SHIP, crew: 15, hands: hands.slice(0, 3), away: new Set(['B', 'C']) }), { n: 0, why: CREW_TRADE_TEXT.ashore('C') }, 'the shore party\'s words (AUDIT CREW-TRADE H2)');
   assert.match(CREW_TRADE_TEXT.ashore('C'), /^C is in your shore party\. /);
-  assert.deepEqual(crewSpare({ hull: SMALL_SHIP, crew: 24, hands, crossed: true }), { n: 0, why: CREW_TRADE_TEXT.crossed });
   assert.deepEqual([crewRoom({ crew: 10, maxCrew: 24 }), crewRoom({ crew: 24, maxCrew: 24 }), crewRoom({ crew: 30, maxCrew: 24 })], [14, 0, 0]);
 });
 
@@ -186,7 +183,7 @@ test('CREW-TRADE SIGNED OFF: men sold out of her crew at the port\'s price - nev
   assert.deepEqual(spare.x().sell('crew', 1), { ok: false, text: CREW_TRADE_TEXT.noneWanted });
 });
 
-test('CREW-TRADE REFUSED: never in a fight; never a hand of the shore party, nor her last hand aboard beside it (PIN MOVED, AUDIT CREW-TRADE H1/H2 - the party\'s words); never a ship come into the realm through customs (her crew an offline save\'s) - though men may still sign on to her (mutants: the fight, the shore party, the customs read)', async () => {
+test('CREW-TRADE REFUSED: never in a fight; never a hand of the shore party, nor her last hand aboard beside it (PIN MOVED, AUDIT CREW-TRADE H1/H2 - the party\'s words) (mutants: the fight, the shore party)', async () => {
   const f = await quay(SMALL_SHIP, 12);
   f.st.inFight = true;
   assert.deepEqual(f.x().buy('crew', 1), { ok: false, text: CREW_TRADE_TEXT.fighting });
@@ -204,12 +201,6 @@ test('CREW-TRADE REFUSED: never in a fight; never a hand of the shore party, nor
   assert.deepEqual(left.map((h) => h.name).sort(), [hs[2].name, hs.find((h) => h.role === FIRST_MATE).name].sort(), 'he is still hers, and her First Mate beside him');
   assert.ok(!off.text.includes(hs[2].name), 'never named among the paid off');
   assert.deepEqual(a.x().sell('crew', 1), { ok: false, text: CREW_TRADE_TEXT.ashore(hs[2].name) });
-  const c = await quay(SMALL_SHIP, 12, { port: portStanding('wants') });
-  restoreFleetSaveData({ v: 1, ships: [], crossed: [42] });
-  assert.deepEqual(c.x().sell('crew', 1), { ok: false, text: CREW_TRADE_TEXT.crossed });
-  assert.equal(c.x().buy('crew', 2).ok, true, 'men signed on to her all the same');
-  assert.equal(c.model.ship().crew, 14);
-  _resetFleetForTests();
 });
 
 test('CREW-TRADE THE YARD\'S PRICE IS THE CAPTAIN\'S: the exchange holds a man under what this captain\'s shipwright asks at this port - his rank\'s discount read where the shipwright reads it (perksHere) (mutants: the discount unread)', async () => {

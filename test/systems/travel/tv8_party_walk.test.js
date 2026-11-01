@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as PW from '../../../src/systems/party/partyWalk.js';
 import { walkOf, memberWalkStep, leaderMustHalt, PARTY_WALK_TS_SKEW_MS, PARTY_WALK_RADIUS_M, PARTY_WALK_ASK_MS, PARTY_WALK_GRACE_MS, PARTY_WALK_HALT_MS, NO_WALK_ANSWER, WALK_BALKS, walkBegin, leaderWalkStep, walkHeard, memberAnswer, memberFollowing, memberStopOf, walkAskStands, sameWalkDest, walkHaltLapsed } from '../../../src/systems/party/partyWalk.js';
-import { validPartyPose, PARTY_WALK_RELAY_MIN, relaySupportsPartyWalk, RELAY_VERSION, WORLD_PIXEL_BOUND } from '../../../src/net/wire.js';
+import { validPartyPose, RELAY_VERSION, WORLD_PIXEL_BOUND } from '../../../src/net/wire.js';
 import { createTravelOptions, readTravelOptionsSettings } from '../../../src/systems/travel/travelOptions.js';
 import { mapPixelWorldOrigin } from '../../../src/systems/travel/travelPaths.js';
 import { rectOf } from '../../../src/systems/travel/travelAutopilot.js';
@@ -73,18 +73,15 @@ test('TV8 wire (world124): the leader\'s walk and a member\'s stop ride the part
   }
   assert.equal(validPartyPose({ ...base, ts: -1 }).ts, undefined);
   assert.equal(validPartyPose({ ...base, ts: 'x' }).ts, undefined);
-  assert.equal(RELAY_VERSION, 'world280');
-  assert.equal(PARTY_WALK_RELAY_MIN, 124);
-  assert.deepEqual(['world123', 'world124', 'world130', 'nope'].map(relaySupportsPartyWalk), [false, true, true, false]);
+  assert.equal(RELAY_VERSION, 'world282');
 });
 
 test('TV8 host: the leader\'s walk begins with an Overworld journey (a gathered member, a hub that carries it) and runs on the law\'s own steps (AUDIT OW3: leaderWalkStep, halted through the panel); a member hears it with a grace, is asked only when free, walks the same journey on a yes, halts with the party through the panel, publishes only their own stops', () => {
-  const w = rd('src/scenes/world.js'), on = rd('src/net/online.js');
-  assert.match(on, /if \(primary\) this\.partyWalkOk = relaySupportsPartyWalk\(relayV\);/, 'the hub that carries it');
-  assert.match(w, /\.\.\.\(_walkLead && socialLink\(\)\?\.partyWalkOk \? \{ tw: _walkLead \} : \{\}\),/);
-  assert.match(w, /\.\.\.\(_walkTs != null && socialLink\(\)\?\.partyWalkOk \? \{ ts: _walkTs \} : \{\}\),/);
+  const w = rd('src/scenes/world.js');
+  assert.match(w, /\.\.\.\(_walkLead && socialLink\(\) \? \{ tw: _walkLead \} : \{\}\),/);
+  assert.match(w, /\.\.\.\(_walkTs != null && socialLink\(\) \? \{ ts: _walkTs \} : \{\}\),/);
   // the begin: AUDIT OW3 P2 - the old walk cleared FIRST; P9 - the law decides a new round or the halted walk set out again
-  assert.match(w, /function partyWalkBegin\(dest\) \{\n\s*const prev = _walkLead;\n\s*_walkLead = null;[^\n]*\n\s*if \(!social\?\.party \|\| !social\.leads\?\.\(\) \|\| !socialLink\(\)\?\.partyWalkOk\) return;\n\s*const gathered = social\.others\(\)\.filter\(\(m\) => memberPresent\(m\) && distanceToPartyAccount\(m\.acct\) <= PARTY_WALK_RADIUS_M\);\n\s*_walkLead = walkBegin\(prev, dest, walkNow\(\), gathered\.length\);\n\s*_walkCleared = travelOptions\?\.cleared \?\? 0;/, 'the walk begins with a member gathered - or the halted one sets out again');
+  assert.match(w, /function partyWalkBegin\(dest\) \{\n\s*const prev = _walkLead;\n\s*_walkLead = null;[^\n]*\n\s*if \(!social\?\.party \|\| !social\.leads\?\.\(\) \|\| !socialLink\(\)\) return;\n\s*const gathered = social\.others\(\)\.filter\(\(m\) => memberPresent\(m\) && distanceToPartyAccount\(m\.acct\) <= PARTY_WALK_RADIUS_M\);\n\s*_walkLead = walkBegin\(prev, dest, walkNow\(\), gathered\.length\);\n\s*_walkCleared = travelOptions\?\.cleared \?\? 0;/, 'the walk begins with a member gathered - or the halted one sets out again');
   assert.match(w, /partyWalkBegin\(\{ pixel: summary\.pixel \}\);/, 'a place\'s journey');
   assert.match(w, /partyWalkBegin\(\{ pixel: pix, point: \{ x: n\.x, z: n\.z \} \}\);/, 'a spot\'s');
   // AUDIT OW3 P1: MOVING is the panel AND an autopilot; P5: an END is Travel Options' own count moving
@@ -377,8 +374,8 @@ const WORLD = rd('src/scenes/world.js');
 const lift = (re, what) => { const m = re.exec(WORLD); assert.ok(m, `lifted from scenes/world.js: ${what}`); return m[1]; };
 const HOST_STATE = lift(/\n {2}(let _walkLead = null;[^\n]*\n(?: {2}let _walk[^\n]*\n)+)/, 'the TV8 state');
 const HOST_BLOCK = lift(/\n {2}(const walkNow = [\s\S]*?\n {2}function partyWalkFrame\(nowMs\) \{\n[\s\S]*?\n {2}\})\n/, 'the TV8 block');
-const POSE_TW = lift(/\n\s*(\.\.\.\(_walkLead && socialLink\(\)\?\.partyWalkOk \? \{ tw: _walkLead \} : \{\}\),)/, 'the pose\'s walk');
-const POSE_TS = lift(/\n\s*(\.\.\.\(_walkTs != null && socialLink\(\)\?\.partyWalkOk \? \{ ts: _walkTs \} : \{\}\),)/, 'the pose\'s stop');
+const POSE_TW = lift(/\n\s*(\.\.\.\(_walkLead && socialLink\(\) \? \{ tw: _walkLead \} : \{\}\),)/, 'the pose\'s walk');
+const POSE_TS = lift(/\n\s*(\.\.\.\(_walkTs != null && socialLink\(\) \? \{ ts: _walkTs \} : \{\}\),)/, 'the pose\'s stop');
 const STOP_WHY = lift(/\n\s*(if \(report\?\.stopped\) [^\n;]*;)/, 'the travel frame\'s word on why a journey stopped');
 const LAW = lift(/\nimport \{ ([^}]*) \} from '\.\.\/systems\/party\/partyWalk\.js';/, 'the law the host imports').split(',').map((s) => s.trim());
 const AROUND = ['social', 'socialLink', 'travelOptions', 'modes', 'playerSpawned', 'playerEntity', 'townTalk', 'gamePaused', 'pointerSurfaces',
@@ -410,7 +407,7 @@ function walkHost(world, acct, over = {}) {
       others: () => world.clients.filter((o) => o !== c).map((o) => ({ acct: o.acct, name: o.acct, online: true, p: world.nopose.has(o.acct) ? null : o.host.pose() })),
       now: () => world.now,
     },
-    socialLink: () => ({ partyWalkOk: true }),
+    socialLink: () => ({}),
     travelOptions: c.to,
     modes: { mode: 'exterior', deathUp: () => false, modalWindowUp: () => false },
     playerSpawned: true, playerEntity: c.entity, townTalk: c.tt,
@@ -799,5 +796,5 @@ test('PARTY-TRUCE (FIELD BUGS 2026-10-09b): a party\'s walk that ends in the ope
   assert.deepEqual(M.box.rows, ['L leads the party to Ripwych.', WILD_TEXT.walkInto, 'Travel with them?']);
   assert.match(WILD_TEXT.walkInto, /open PvP zone\. Other players may kill you there and take what you carry/);
   const w8 = rd('src/scenes/world.js');
-  assert.match(w8, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online\?\.wildOk \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/, 'the host asks the zone\'s mask, its band included');
+  assert.match(w8, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/, 'the host asks the zone\'s mask, its band included');
 });

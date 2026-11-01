@@ -23,7 +23,6 @@ import { LYCANTHROPY_TYPES } from '../../src/systems/infection.js';
 import { isFullMoonFromMinutes, MINUTES_PER_DAY, CLASSIC_GAME_START_TIME } from '../../src/systems/gameDate.js';
 import { liveStat } from '../../src/systems/statMods.js';
 import { skillValue, SKILLS } from '../../src/systems/skills.js';
-import { clampMarkersAheadOf } from '../../src/systems/save/save.js';
 import { WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { pcaaoModules, pcaaoAttackDamage, pcaaoHandToHandAttackDamage } from '../../src/combat/pcaao.js';
 import { calculateAttackDamage, handToHandAttackDamage } from '../../src/combat/formulas.js';
@@ -113,10 +112,6 @@ test('BAL6: one change a day heals - the change in heals, the change back inside
   assert.equal(morphHeals({ lastMorphHeal: 100 }, 100 + MINUTES_PER_DAY), false);
   assert.equal(morphHeals({ lastMorphHeal: 100 }, 101 + MINUTES_PER_DAY), true);
   assert.equal(morphHeals({}, 0), true, 'a curse from before BAL6 carries no stamp: its next change heals');
-  // the stamp is a curse clock's marker: a save written ahead of its own clock brings it back (save.js)
-  const ahead = { activeEffects: [{ kind: 'racialOverride', lastMorphHeal: 5000 }] };
-  assert.equal(clampMarkersAheadOf(ahead, 4000), 1);
-  assert.equal(ahead.activeEffects[0].lastMorphHeal, 4000);
 });
 
 const OVERHAUL = { Enabled: true, equipmentDamageEnhanced: false, fadingEnchantedItems: false, fixedStrengthDamageModifier: true, armorHitFormulaRedone: true, criticalStrikesIncreaseDamage: true, conditionBasedEffectiveness: true, softMaterialRequirements: true };

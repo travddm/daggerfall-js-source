@@ -184,21 +184,6 @@ export function songKit(song) {
   for (const [key, o] of Object.entries(k)) { const n = Number(key), s = held(o, KIT_RANGE); if (Number.isInteger(n) && n >= 0 && n <= 127 && s) out.set(n, s); }
   return out.size ? out : null;
 }
-/** INTRO3c: A SONG'S OWN TONE - `tone`, the shape of the whole mix between the fader and the master: `bands`, up to four
- *  peaking resonances [Hz, dB, Q] (heldBody's ranges), and a shelf each end, `low` and `high` [Hz, dB] - a mix's match
- *  to a reference, measured band by band and applied once to the sum (the intro's: systems/introScore.js INTRO_TONE,
- *  the recording's third-octave curve against the render's). Null for a song that names none, or nothing usable. */
-export function songTone(song) {
-  const t = song?.tone;
-  if (!t || typeof t !== 'object') return null;
-  const shelf = (v) => (Array.isArray(v) && v.length >= 2 && Number.isFinite(v[0]) && Number.isFinite(v[1]) ? [Math.min(16000, Math.max(20, v[0])), Math.min(24, Math.max(-24, v[1]))] : null);
-  const out = {};
-  const bands = heldBody(t.bands), low = shelf(t.low), high = shelf(t.high);
-  if (bands) out.bands = bands;
-  if (low) out.low = low;
-  if (high) out.high = high;
-  return Object.keys(out).length ? out : null;
-}
 /** EG-ROAR: THE FLOOR under a song with its own voices (Hz - SongPlayer._routePress). */
 export const SONG_FLOOR_HZ = 30;
 /** EG-ROAR: the cents each of a unison's `n` copies is set off the note by - `cents` either side, spread evenly, the
@@ -378,7 +363,6 @@ export class SongPlayer {
     this._fader = null;   // DISC20-B: built with the master
     this._level = null;   // WBX9: built with the master
     this._press = null;   // WB10a: built the first time a song asks for one
-    this._tone = null;   // INTRO3c: the song's tone chain, fader to master, for the songs that carry one
     this._levelTo = null;   // WB10a: where the level runs - the fader, or the press
     this._destination = destination;
   }
@@ -396,26 +380,6 @@ export class SongPlayer {
     this._level.gain.value = 1;
     this._level.connect(this._fader);
     this._levelTo = this._fader;
-  }
-
-  /** INTRO3c: THE TONE - the fader through the song's tone (songTone) into the master, or straight in: the low shelf,
-   *  the bands in turn, the high shelf. Touched only for a song that names one and the song after it (which plays through
-   *  the graph it always did); a context with no filter plays the song untoned. */
-  _routeTone(tone) {
-    if (!this._fader || !this._master || (!tone && !this._tone)) return;
-    for (const f of this._tone ?? []) { try { f.disconnect(); } catch { /* gone */ } }
-    this._tone = null;
-    this._fader.disconnect();
-    if (!tone || typeof this.ctx.createBiquadFilter !== 'function') { this._fader.connect(this._master); return; }
-    const chain = [];
-    const add = (type, hz, db, q) => { const f = this.ctx.createBiquadFilter(); f.type = type; f.frequency.value = hz; f.gain.value = db; if (q) f.Q.value = q; chain.push(f); };
-    if (tone.low) add('lowshelf', tone.low[0], tone.low[1]);
-    for (const [hz, db, q] of tone.bands ?? []) add('peaking', hz, db, q);
-    if (tone.high) add('highshelf', tone.high[0], tone.high[1]);
-    let node = this._fader;
-    for (const f of chain) { node.connect(f); node = f; }
-    node.connect(this._master);
-    this._tone = chain;
   }
 
   /** WB10a: the level through the song's press (songPress), or straight to the fader - rewired only when that changes,
@@ -489,7 +453,6 @@ export class SongPlayer {
     if (this._songVoices || this._voicedChains) this._dropChannelChains();   // INTRO3c: a voiced song's channels play through their own body and ensemble - built for this song, not the last
     this._voicedChains = !!this._songVoices;
     this._routePress(songPress(song));   // WB10a: and its press - none for every song but the ones that carry one
-    this._routeTone(songTone(song));   // INTRO3c: and its tone - none for every song but the ones that carry one
     this.song = song;
     // Computed once per song, not per window: the pedal map is a pure
     // function of the event list and the scheduler re-enters constantly.

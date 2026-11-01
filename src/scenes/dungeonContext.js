@@ -217,7 +217,7 @@ import { assignEnemySpells, enemySpellIndices, SPELL_CAST_SOUND } from '../syste
 import { revenantArtFrame } from '../systems/revenant/revenantArts.js';   // RVN-ARTS: a revenant's art - the open world's law (scenes/exteriorFoes.js artFrame)
 import { ARENA_PUPPET_OWNER } from '../net/arena/arenaLaw.js';   // ARENA4: the relay's fighters' puppets - a blow on one is the referee's
 import { calculateCastCost } from '../systems/spellcost.js';
-import { snapshotPlayer, restorePlayer, composeSessionState, restoreSessionState , copyEffectEntry } from '../systems/save/save.js';   // B4: the ONE quest+talk composer
+import { snapshotPlayer, restorePlayer, composeSessionState, restoreSessionState , copyEffectEntry, saveVersionRefusal } from '../systems/save/save.js';   // B4: the ONE quest+talk composer
 import { saveSlot, loadSlot, quickLoadSlot, QUICK_SAVE_NAME, requestScreenshot, slotLoaded } from '../systems/save/saveSlots.js';   // SAV4: the quicksave is a SLOT named QuickSave; SS1: the shot arms here, the HOST loop delivers it
 import { bindQuestFoeHost, placeFoeEnv, entityOccupancy, partyOnlyQuestShare } from './quest/questFoeHost.js';   // QUEST-OWNER: a quest's foe underground is its owner's party's alone
 import { puppetLead } from './puppetLead.js';   // DESYNC-ZERO: a moving puppet leads its last word
@@ -9575,7 +9575,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       this.discardBeneathDeath();   // AUDIT DUPE-LOAD: what waits under the death screen goes before the save is read
       opts.modStartLoad?.();   // CSA-J (the audit): SaveLoadManager.OnStartLoad ahead of the save's player (:1378)
       const extras = restorePlayer(playerEntity, snap, spellsByIndex);
-      if (!extras) { hudText.add('Save version mismatch.'); return; }
+      if (!extras) { hudText.add(saveVersionRefusal()); return; }
       // AUDIT DISC28 (27h's DIAL-LOAD read, recorded there): SaveLoadManager's OnStartLoad reaches the HOST's hands too -
       // CameraRecoiler's own (ResetRecoil: the incoming character inherits no reel). The world's load resets the world's
       // reel and the standalone host wraps this door to reset its own, but a world-hosted dungeon's own load (F12, the

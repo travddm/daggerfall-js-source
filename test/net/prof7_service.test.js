@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { standService, T0 } from '../accountDb.mjs';
+import { standService, d1, T0 } from '../accountDb.mjs';
 import { holdPieces } from '../realmSeat.mjs';   // INT19: a crafted piece lists out of its seller's realm record
 import { bodyKey } from '../../src/net/nodeLaw.js';
 import { xpForRank, harvestXp, HIGH_HIDES_PER_DAY } from '../../src/net/professionLaw.js';
@@ -243,34 +243,22 @@ test('PROF7 service: the market carries a garment\'s dye - a dyed shirt listed i
   assert.equal(crafted.body.rows.find((x) => x.piece?.provenance === provenance)?.piece?.dye, 8);
 });
 
-// ─── THE MIGRATION (0036) ────────────────────────────────────────────
+// ─── THE SCHEMA ──────────────────────────────────────────────────────
 
-test('PROF7 service: the day\'s harvests rebuilt for a body\'s hide keep every row that stood - its tier 0, its second find one - and a craft and a piece before it undyed (0036_hunting.sql over PROF4\'s tables)', async () => {
-  const { DatabaseSync } = await import('node:sqlite');
-  const { readdirSync, readFileSync } = await import('node:fs');
-  const dir = new URL('../../server-account/migrations/', import.meta.url);
-  const db = new DatabaseSync(':memory:');
-  db.exec('PRAGMA foreign_keys = ON');
-  for (const f of readdirSync(dir).filter((x) => x.endsWith('.sql')).sort()) {
-    if (f === '0036_hunting.sql') {
-      db.exec(`INSERT INTO players (id, handle, handle_lc, guest_name, created_at, last_seen) VALUES ('p1', 'Ann', 'ann', 'A b', 1, 1)`);
-      db.exec(`INSERT INTO node_harvests (day, node, kind, player, char_id, profession, material, qty, xp, gem, at, rid, n, deep_unconfirmed, extra)
-        VALUES (20000, 'tree:1:2:20000:0', 'logs', 'p1', 'c1', 'logging', 'log:oak', 3, 30, NULL, 5, 'rid00001', 'n1', 0, 'wood:resin')`);
-      db.exec(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
-        VALUES ('0123456789abcdef', 'p1', 'c1', NULL, 'table-small:oak', 226, 0, 1, 7, 'p1.x.', 5)`);
-    }
-    db.exec(readFileSync(new URL(f, dir), 'utf8'));
-  }
-  assert.deepEqual({ ...db.prepare('SELECT node, extra, tier, extra_qty FROM node_harvests').get() }, { node: 'tree:1:2:20000:0', extra: 'wood:resin', tier: 0, extra_qty: 1 });
+test('PROF7 service: the day\'s harvests take a body\'s hide - its tier and its second find\'s count bounded - and a craft and a piece carry a dye, one of the ten', () => {
+  const db = d1()._raw;
+  db.exec(`INSERT INTO players (id, handle, handle_lc, guest_name, created_at, last_seen) VALUES ('p1', 'Ann', 'ann', 'A b', 1, 1)`);
+  db.exec(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
+    VALUES ('0123456789abcdef', 'p1', 'c1', NULL, 'table-small:oak', 226, 0, 1, 7, 'p1.x.', 5)`);
   db.exec(`INSERT INTO node_harvests (day, node, kind, player, char_id, profession, material, qty, xp, gem, at, rid, n, deep_unconfirmed, extra, tier, extra_qty)
     VALUES (20000, 'body:20000:0123456789ab', 'hide', 'p1', 'c1', 'hunting', 'hide:bear', 1, 30, NULL, 5, 'rid00002', 'n2', 0, 'food:meat', 2, 2)`);
-  // PROF8 (0042_fishing.sql) took `fish` since: a kind no profession gathers is still refused
+  // `fish` is PROF8's: a kind no profession gathers is still refused
   assert.throws(() => db.exec(`INSERT INTO node_harvests (day, node, kind, player, char_id, profession, material, qty, xp, at, rid, n) VALUES (1, 'x', 'net', 'p1', 'c1', 'fishing', 'm', 1, 0, 1, 'rid00003', 'n')`), /CHECK/);
   assert.throws(() => db.exec(`UPDATE node_harvests SET tier = 8 WHERE rid = 'rid00002'`), /CHECK/);
   assert.throws(() => db.exec(`UPDATE node_harvests SET extra_qty = 0 WHERE rid = 'rid00002'`), /CHECK/);
   assert.deepEqual(db.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'node_harvests' AND name LIKE 'idx_%' ORDER BY name").all().map((r) => r.name),
-    ['idx_node_harvests_account', 'idx_node_harvests_carry_day', 'idx_node_harvests_char_day', 'idx_node_harvests_day', 'idx_node_harvests_today']);   // SCALE1 (0043_scale_indexes.sql): and the sweep's day
-  assert.equal(db.prepare('SELECT dye FROM products').get().dye, null, 'a piece before it undyed');
+    ['idx_node_harvests_account', 'idx_node_harvests_carry_day', 'idx_node_harvests_char_day', 'idx_node_harvests_day', 'idx_node_harvests_today']);   // SCALE1: and the sweep's day
+  assert.equal(db.prepare('SELECT dye FROM products').get().dye, null, 'a piece made undyed');
   db.exec(`UPDATE products SET dye = 9`);
   assert.throws(() => db.exec(`UPDATE products SET dye = 10`), /CHECK/, 'a dye is one of the ten');
   assert.deepEqual(db.prepare("SELECT name FROM pragma_table_info('prof_crafts') WHERE name = 'dye'").all().map((r) => r.name), ['dye']);

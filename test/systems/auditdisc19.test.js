@@ -33,7 +33,6 @@ import { ArrowFlight } from '../../src/combat/arrowFlight.js';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { setValue } from '../../src/systems/settings/settings.js';
 import { INFECTION, startInfection, liveInfection } from '../../src/systems/infection.js';
-import { runMagicRoundsFor, resetMagicRoundMarker, setWorldMinutes } from '../../src/systems/worldTick.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { MINUTES_PER_DAY } from '../../src/systems/gameDate.js';
 import { reviveForPlay, respawnHealth } from '../../src/systems/deathRespawn.js';
@@ -453,21 +452,6 @@ test('AUDIT DISC19 S2: a save taken under the vampire\'s death video brings the 
   assert.equal(r.infection, INFECTION.Vampirism);
   assert.equal(r.deathScheduled, false, 'pushed again at the next round past the day');
   assert.equal(r.dreamPlayed, true, 'the dream it had is not had again');
-});
-
-test('AUDIT DISC19: an old save\'s INFECTION - no flag, the null round count - is repaired too, and lives on through the rounds', () => {
-  setWorldMinutes(T0); resetMagicRoundMarker(null);
-  const p = mortal();
-  startInfection(p, INFECTION.Werewolf, { day: Math.floor(T0 / MINUTES_PER_DAY) });
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: T0 })));
-  const old = snap.activeEffects.find((a) => a.infection);
-  delete old.permanent;
-  old.roundsRemaining = null;
-  const q = { isPlayer: true };
-  restorePlayer(q, snap);
-  runMagicRoundsFor(q, T0, T0 + 3, {});
-  assert.equal(liveInfection(q)?.infection, INFECTION.Werewolf);
-  resetMagicRoundMarker(null);
 });
 
 const memStorage = () => {

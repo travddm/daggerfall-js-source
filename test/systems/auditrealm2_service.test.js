@@ -11,8 +11,7 @@ import { webcrypto } from 'node:crypto';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { r2, layRecord, freshSave, realmAt } from '../realmSeat.mjs';
-import { REALM_BIRTH_LEVEL, REALM_BIRTH_WEALTH_MAX, customsAllowance, liquidWealthOf, stashedItemLists, deedsOf, CUSTOMS_HOUSE_PRICE } from '../../src/net/realm/realmGoldLaw.js';
-import * as customs from '../../src/systems/realmCustoms.js';
+import { REALM_BIRTH_LEVEL, REALM_BIRTH_WEALTH_MAX, liquidWealthOf, deedsOf, DEED_HOUSE_PRICE } from '../../src/net/realm/realmGoldLaw.js';
 import { STARTING_GOLD } from '../../src/systems/startingGear.js';
 import { LETTER_OF_CREDIT_TEMPLATE, goldStack, isGoldPieces } from '../../src/systems/inventory.js';
 import { LOOT_CONTAINER_TYPES, interiorSceneName } from '../../src/systems/sceneCache.js';
@@ -100,8 +99,7 @@ async function stand() {
   };
   const rows = (sql, ...a) => env.DB._raw.prepare(sql).all(...a).map((r) => ({ ...r }));
   const exec = (sql, ...a) => env.DB._raw.prepare(sql).run(...a);
-  /** A character's Renown track - what the census counted, customs carries and (RENOWN-CHAR: the character's own again)
-   *  the service gates a founding on. */
+  /** A character's Renown track - what (RENOWN-CHAR: the character's own) the service gates a founding on. */
   const renown = (who, charId, level = GUILD_FOUND_RENOWN) => {
     exec('INSERT OR REPLACE INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, ?, 1, 1)', who.id, charId, 'x', renownXpFor(level));
   };
@@ -113,7 +111,7 @@ const letter = (value) => ({ group: 'MiscItems', templateIndex: LETTER_OF_CREDIT
 
 // ---- S1: THE FIRST SAVE IS READ ----------------------------------------------------------------------------------------
 
-test('AUDIT REALM2 S1: a character born online starts where chargen starts one - its first save at level 1 and within a new character\'s purse, read before a byte lands; an offline save, a level past the first or wealth anywhere customs counts is refused, and the row waits unsaved', async () => {
+test('AUDIT REALM2 S1: a character born online starts where chargen starts one - its first save at level 1 and within a new character\'s purse, read before a byte lands; an offline save, a level past the first or wealth anywhere the wealth measure counts is refused, and the row waits unsaved', async () => {
   assert.equal(REALM_BIRTH_LEVEL, 1);
   assert.ok(REALM_BIRTH_WEALTH_MAX > STARTING_GOLD, 'chargen\'s own hundred, and a biography\'s gold, fit inside');
   const s = await stand();
@@ -133,7 +131,7 @@ test('AUDIT REALM2 S1: a character born online starts where chargen starts one -
     ['a bank account', freshSave({ goldPieces: 0, bankAccounts: [{ accountGold: 0 }, { accountGold: over }] })],
     ['a letter of credit in the pack', freshSave({ goldPieces: 0, items: [letter(over)] })],
     ['gold in the wagon', freshSave({ goldPieces: 0, wagonItems: [goldStack(over)] })],
-    ['a letter in a house chest - customs\' own count', freshSave({ goldPieces: 0, ...houseChest([letter(over)]) })],
+    ['a letter in a house chest - the wealth measure\'s own count', freshSave({ goldPieces: 0, ...houseChest([letter(over)]) })],
     ['a purse that is no number', freshSave({ goldPieces: { v: 1 } })],
     ['no JSON', 'save one'],
     ['a list', [freshSave()]],
@@ -146,43 +144,14 @@ test('AUDIT REALM2 S1: a character born online starts where chargen starts one -
   assert.equal((await s.put(made.id, JSON.stringify({ level: 2, goldPieces: REALM_BIRTH_WEALTH_MAX * 2 }), P.secret, { lease: made.lease, seq: 2 })).status, 200);
 });
 
-test('AUDIT REALM2 S1: a customs character\'s first save carries no more than the allowance at the level customs was asked at - never the save\'s own word of its level; the capped copy lands', async () => {
-  const s = await stand();
-  const P = await s.account(false);
-  const origin = 'offline-legacy-03';
-  s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin);
-  const c = (await s.call('/v1/realm/customs', { origin, name: 'Legacy', summary: { level: 3 } }, P.secret)).body;
-  const allowance = customsAllowance(3);
-  assert.equal(allowance, 50_000);
-  const first = (save) => s.put(c.id, JSON.stringify(save), P.secret, { lease: c.lease, seq: 1 });
-  for (const [why, save] of [
-    ['one past the allowance', { name: 'Legacy', level: 3, goldPieces: allowance + 1 }],
-    ['fifty million', { name: 'Legacy', level: 3, goldPieces: 50_000_000 }],
-    ['its own word of a higher level', { name: 'Legacy', level: 60, goldPieces: customsAllowance(60) }],
-    ['in the bank', { name: 'Legacy', level: 3, goldPieces: 0, bankAccounts: [{ accountGold: allowance + 1 }] }],
-    ['no JSON', 'not a save'],
-  ]) assert.deepEqual(Object.values(typeof save === 'string' ? await s.put(c.id, save, P.secret, { lease: c.lease, seq: 1 }) : await first(save)), [403, { error: 'customs-allowance' }], why);
-  assert.equal(s.env.SAVES._map.size, 0);
-  assert.deepEqual(Object.values(await first({ name: 'Legacy', level: 3, goldPieces: allowance })), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }], 'the copy customs capped');   // INT2 (
-  // a customs asked with no level is held to a first level's allowance
-  const origin2 = 'offline-legacy-04';
-  s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin2);
-  const d = (await s.call('/v1/realm/customs', { origin: origin2, name: 'Quiet' }, P.secret)).body;
-  assert.equal((await s.put(d.id, JSON.stringify({ level: 9, goldPieces: customsAllowance(1) + 1 }), P.secret, { lease: d.lease, seq: 1 })).body.error, 'customs-allowance');
-});
-
-test('AUDIT REALM2 S1: the service measures a save as customs does - ONE law (net/realm/realmGoldLaw.js, re-exported by systems/realmCustoms.js): the purse, the banks, gold and letters in the pack, the wagon and every container (AUDIT REALM2 T5), and each deed at what the realm\'s bank pays (T3); its constants are the game\'s', () => {
-  assert.equal(customs.liquidWealthOf, liquidWealthOf, 'the client caps with the very function the service reads with');
-  assert.equal(customs.stashedItemLists, stashedItemLists);
-  assert.equal(customs.customsAllowance, customsAllowance);
-  assert.equal(customs.deedsOf, deedsOf);
+test('AUDIT REALM2 S1: the service measures a save with ONE law (net/realm/realmGoldLaw.js): the purse, the banks, gold and letters in the pack, the wagon and every container (AUDIT REALM2 T5), and each deed at what the realm\'s bank pays (T3); its constants are the game\'s', () => {
   assert.ok(isGoldPieces(goldStack(5)), 'the game\'s gold pile');
   const scene = (containerType) => ({ sceneCache: { scenes: [{ lootContainers: [{ containerType, items: [goldStack(7), letter(11)] }] }] } });
   const T = LOOT_CONTAINER_TYPES;
   assert.deepEqual([T.DroppedLoot, T.HouseContainers, T.ShopShelves, T.RandomTreasure, T.CorpseMarker].map((t) => liquidWealthOf(scene(t))), [18, 18, 18, 18, 18],
     'AUDIT REALM2 T5: the pack fills any container, so every one counts');
   // the deeds' numbers are the game's (the Worker bundles no systems/): each ship at shipSellPrice, filed where the game
-  // files its room, and a house at the deed's share of CUSTOMS_HOUSE_PRICE
+  // files its room, and a house at the deed's share of DEED_HOUSE_PRICE
   const piece = { paid: 400 };   // half back on its sale (decorSaleBack)
   for (const ship of [SHIP_TYPES.Small, SHIP_TYPES.Large]) {
     const room = { sceneName: interiorSceneName(SHIP_INTERIOR_MAP_IDS[ship], BUILDING_KEY_0), decor: [piece] };
@@ -191,14 +160,14 @@ test('AUDIT REALM2 S1: the service measures a save as customs does - ONE law (ne
   assert.deepEqual(deedsOf({ ownedShip: SHIP_TYPES.None }), []);
   const house = { mapId: 42, buildingKey: 7 };
   const room = { sceneName: interiorSceneName(house.mapId, house.buildingKey), decor: [piece] };
-  assert.deepEqual(deedsOf({ houses: [house], sceneCache: { scenes: [room] } }).map((d) => d.value), [Math.trunc(CUSTOMS_HOUSE_PRICE * DEED_SELL_MULT) + 200]);
+  assert.deepEqual(deedsOf({ houses: [house], sceneCache: { scenes: [room] } }).map((d) => d.value), [Math.trunc(DEED_HOUSE_PRICE * DEED_SELL_MULT) + 200]);
   assert.equal(liquidWealthOf({ goldPieces: 1, bankAccounts: [{ accountGold: 2 }], items: [goldStack(3), letter(4), { templateIndex: 120 }], wagonItems: [goldStack(5)] }), 15);
   assert.equal(liquidWealthOf({ items: [{ group: 'MiscItems', templateIndex: goldStack(1).templateIndex, stackCount: 99 }] }), 0, 'gold is the Currency row\'s alone, as isGoldPieces reads it');
 });
 
 // ---- S2: A HOUSE, A PIECE AND A FOUNDING ARE A REALM CHARACTER'S --------------------------------------------------------
 
-test('AUDIT REALM2 S2: a house, a piece and a founding are a realm character\'s - any other id is refused and writes nothing (no building squatted at a price of 1, no free station, no free guild); customs carries the census\'s Renown track in - and, since CUSTOMS-CARRY (Mac 2026-09-29: "Carry them"), its home and its guild place from before the realm; a realm character claims, places and founds on its record', async () => {
+test('AUDIT REALM2 S2: a house, a piece and a founding are a realm character\'s - any other id is refused and writes nothing (no building squatted at a price of 1, no free station, no free guild); a realm character claims, places and founds on its record', async () => {
   const s = await stand();
   const P = await s.account();
   const house = { mapId: 12345, buildingKey: 777, region: 17, layout: null };
@@ -206,10 +175,8 @@ test('AUDIT REALM2 S2: a house, a piece and a founding are a realm character\'s 
   assert.deepEqual(Object.values(await s.call('/v1/homes/claim', { ...house, character: 'madeUpId01', price: HOME_PRICE_MIN }, P.secret)), [400, { error: 'realm-only' }]);
   for (let k = 1; k <= 3; k++) assert.equal((await s.call('/v1/homes/claim', { ...house, buildingKey: 1000 + k, character: `fake${k}0000`, price: HOME_PRICE_MIN }, P.secret)).body.error, 'realm-only');
   assert.deepEqual(s.rows('SELECT COUNT(*) AS n FROM homes'), [{ n: 0 }], 'no building taken');
-  // an offline character that played online before the realm: census'd, its home and its guild from before the realm
+  // a home and a guild place filed under an id no realm character holds
   const origin = 'offline-0001';
-  s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin);
-  s.renown(P, origin, 12);
   s.exec("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (999, 42, ?, ?, 'Old', 3, 'private', 1, 1)", P.id, origin);
   s.exec("INSERT INTO guilds (id, name, name_key, tag, ranks, treasury, founded_at) VALUES ('gold1', 'The Old Order', 'the old order', 'OLD', '[]', 0, 1)");
   s.exec("INSERT INTO guild_members (player, char_id, guild_id, rank, name, joined_at) VALUES (?, ?, 'gold1', 0, 'Old', 1)", P.id, origin);
@@ -217,11 +184,6 @@ test('AUDIT REALM2 S2: a house, a piece and a founding are a realm character\'s 
   assert.deepEqual(Object.values(await s.call('/v1/homes/decor/place', { mapId: 999, buildingKey: 42, character: origin, piece: station }, P.secret)), [400, { error: 'realm-only' }], 'no 200,000-gold station for nothing');
   assert.deepEqual(Object.values(await s.call('/v1/guilds/found', { character: origin, name: 'Free Founders', tag: 'FREE' }, P.secret)), [400, { error: 'realm-only' }], 'no guild with no fee');
   assert.deepEqual([s.rows('SELECT COUNT(*) AS n FROM home_decor')[0].n, s.rows('SELECT COUNT(*) AS n FROM guilds')[0].n], [0, 1]);
-  const came = await s.call('/v1/realm/customs', { origin, name: 'Carried' }, P.secret);
-  assert.equal(came.status, 200);
-  assert.deepEqual(s.rows('SELECT char_id, xp FROM renown_tracks WHERE player = ?', P.id), [{ char_id: came.body.id, xp: renownXpFor(12) }], 'its Renown comes in');
-  assert.deepEqual(s.rows('SELECT char_id FROM homes'), [{ char_id: came.body.id }], 'CUSTOMS-CARRY: its house from before the realm comes in');
-  assert.deepEqual(s.rows('SELECT char_id, rank FROM guild_members'), [{ char_id: came.body.id, rank: 0 }], 'and its guild place');
   // a realm character does all three on its record
   const R = await s.character(P, 'Realmer', { name: 'Realmer', level: 5, goldPieces: 100_000, items: [] });
   s.renown(P, R.id);
@@ -323,41 +285,6 @@ test('AUDIT REALM2 S5: a character leaves one trade half waiting - each new half
   assert.deepEqual(waiting(), [{ sid: 'fill40000', a_char: c.id }, { sid: 'otherside1', a_char: q.id }], 'one a character: its last, and the other\'s');
   assert.deepEqual((await half(c, 'fill00000')).body, { state: 'waiting' }, 'a replaced half asked again waits anew');
   assert.deepEqual(waiting().map((r) => r.sid), ['fill00000', 'otherside1']);
-});
-
-// ---- S6: CUSTOMS CARRIES IN ITS OWN BATCH, AND AGAIN ON A RESUME --------------------------------------------------------
-
-test('AUDIT REALM2 S6: customs carries the track in the census\'s own batch - a failure after it strands nothing - and a resume carries again what was left under the offline id; a batch that committed and lost its answer is taken up again', async () => {
-  const s = await stand();
-  const P = await s.account(false);
-  const origin = 'offline-legacy-01';
-  s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin);
-  s.renown(P, origin, 20);
-  let fail = true;
-  s.hooks.onRun = (sql) => { if (fail && /SET lease = NULL WHERE player = \? AND id != \?/.test(sql)) { fail = false; throw new Error('D1_ERROR: transient'); } };
-  assert.equal((await s.call('/v1/realm/customs', { origin, name: 'Legacy' }, P.secret)).status, 500, 'D1 fails once after the batch');
-  s.hooks.onRun = null;
-  const [row] = s.rows('SELECT id FROM realm_characters');
-  assert.deepEqual(s.rows('SELECT char_id FROM renown_tracks'), [{ char_id: row.id }], 'the track came in with the census spent');
-  // a track left under the offline id (a report filed for it since) is carried by the resume
-  s.exec('UPDATE renown_tracks SET char_id = ? WHERE char_id = ?', origin, row.id);
-  const again = await s.call('/v1/realm/customs', { origin, name: 'Legacy' }, P.secret);
-  assert.deepEqual([again.status, again.body.id, again.body.resumed], [200, row.id, true]);
-  assert.deepEqual(s.rows('SELECT char_id FROM renown_tracks'), [{ char_id: row.id }], 'carried again');
-  // a track the realm's id already holds is never written over
-  s.renown(P, origin, 3);
-  assert.equal((await s.call('/v1/realm/customs', { origin, name: 'Legacy' }, P.secret)).status, 200);
-  assert.deepEqual(s.rows('SELECT char_id, xp FROM renown_tracks ORDER BY xp'), [{ char_id: origin, xp: renownXpFor(3) }, { char_id: row.id, xp: renownXpFor(20) }]);
-  // the batch that committed and lost its answer: the track is in, and the retry takes the row up again
-  const origin2 = 'offline-legacy-02';
-  s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin2);
-  s.renown(P, origin2, 7);
-  s.hooks.afterCommit = true;
-  assert.equal((await s.call('/v1/realm/customs', { origin: origin2, name: 'Second' }, P.secret)).body.error, 'customs-already');
-  const second = s.rows('SELECT id FROM realm_characters WHERE origin_id = ?', origin2)[0];
-  assert.deepEqual(s.rows('SELECT char_id FROM renown_tracks WHERE xp = ?', renownXpFor(7)), [{ char_id: second.id }]);
-  const retried = await s.call('/v1/realm/customs', { origin: origin2, name: 'Second' }, P.secret);
-  assert.deepEqual([retried.body.id, retried.body.resumed], [second.id, true]);
 });
 
 // ---- S7: TWO CHECKPOINTS UNDER ONE LEASE ------------------------------------------------------------------------------

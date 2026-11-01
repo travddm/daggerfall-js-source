@@ -250,10 +250,10 @@ test('WB3b the seams, by source: the dungeon host enters the court through its o
   assert.deepEqual(['automap', 'rest', 'save', 'mark'].map((r) => madeLevelSays('court', r)), [COURT_TEXT.noMap, COURT_TEXT.noRest, COURT_TEXT.noSave, COURT_TEXT.noMark], 'in the court\'s own words');
   assert.deepEqual(['automap', 'rest', 'save'].map((r) => madeLevelRule('court', r)), ['off', 'refused', 'refused'], 'the court keeps no map, no rest, no save');
   const w = read('src/scenes/world.js');
-  assert.match(w, /ready: \(\) => !!online\?\.gateOk,/);
+  assert.match(w, /ready: \(\) => !!online,   \/\/ WB3b: online, the relay runs a gate's boss room/);
   assert.match(w, /enter: \(g\) => \{ modes\?\.enterGateArena\?\.\(g\); \},/);
   assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'gate'\) key = \(gateLink\?\.room \?\? gateRoomKey\)\(modes\?\.roomIdentity\?\.\(\)\?\.day\);/);
-  assert.match(w, /if \(gateLink && online\.gateOk && isGateRoom\(online\.room\) && \(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in', lv: Math\.max\(1, playerEntity\.level \| 0\), bv: GATE_BRAIN_V \}\)\) _gateInFor = online\.welcomes;/);
+  assert.match(w, /if \(gateLink && isGateRoom\(online\.room\) && \(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in', lv: Math\.max\(1, playerEntity\.level \| 0\), bv: GATE_BRAIN_V \}\)\) _gateInFor = online\.welcomes;/);
   assert.match(w, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);
   assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onGate = \(g\) => gateLink\?\.word\(g\);/);
   // WB9b: the three courts' floor, as far as the walkways are laid - one arena, its crossings and clock refilled each frame

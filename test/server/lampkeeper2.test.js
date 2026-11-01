@@ -4,7 +4,6 @@
 // and the wiring - the interior's stand, the press, the hover's name, the host's door.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import {
   LAMP_KEEPER_ODDS, LAMP_KEEPER_ARCHIVE, LAMP_KEEPER_RECORDS, LAMP_CLASSIC, LAMP_ARCHIVE, LAMP_TITLE, isLampCandidate, isLampKeeper,
   LAMP_LINES, lampLines, LAMP_TEXT, createLampTitle,
@@ -24,7 +23,6 @@ import { ACCEPTED } from '../../src/net/legalLaw.js';
 import { buildInteriorContext } from '../../src/scenes/interiorContext.js';
 import { accountLamp, SESSION_KEY } from '../../src/net/accountClient.js';
 
-const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const keeper = (record = 2, position = 77) => ({ textureArchive: 182, textureRecord: record, position });
 const shop = BUILDING_TYPES.GeneralStore;
 
@@ -143,7 +141,8 @@ test('LAMP-KEEPER II THE ACCOUNT SERVICE: the first word lays I Love Lamp on the
   assert.deepEqual([...TITLE_RGBA.ilovelamp], [1, 0.698, 0.376, 1], 'lamplight');
   const e = honourEntry({ kind: 'title', key: 'ilovelamp' });
   assert.deepEqual([e.name, e.kicker, e.honour.rgba], ['I Love Lamp', 'New Title', TITLE_RGBA.ilovelamp], 'its loot banner');
-  assert.match(read('server-account/migrations/0113_lamp_title.sql'), /^ALTER TABLE players ADD COLUMN lamp_title INTEGER NOT NULL DEFAULT 0;$/m);
+  const lamp = d1()._raw.prepare('PRAGMA table_info(players)').all().find((c) => c.name === 'lamp_title');
+  assert.deepEqual([lamp?.type, lamp?.notnull, lamp?.dflt_value], ['INTEGER', 1, '0'], 'players.lamp_title: an integer, never NULL, 0 until granted');
 });
 
 test('LAMP-KEEPER II THE WORKER (AUDIT FIVE-ASKS A1): /v1/lamp/claim is a route, behind a session and never open - a guest\'s word writes nothing, the first registered word grants, the next is held, a stranger is refused; the title on the wardrobe and worn', async () => {

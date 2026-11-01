@@ -95,21 +95,21 @@ test('SCALE5d the session: a join asks for its party\'s layer, a reconnect for i
     s.join('world:10,10', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 });
     assert.match(sockets[0].url, /\/room\/world:10,10\?ly=3$/, 'my party\'s layer asked first');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192', ly: 5 });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, ly: 5 });
     assert.equal(s.layer, 5, 'the layer the Worker found');
     s.layerHint = 0;
     sockets[0].drop(1006);
     t += 5000; s.tick();
     assert.match(sockets.at(-1).url, /\/room\/world:10,10\?ly=5$/, 'a reconnect asks for its own layer again');
     sockets.at(-1).open();
-    sockets.at(-1).receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192' });
+    sockets.at(-1).receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t });
     assert.equal(s.layer, 0, 'a welcome that says none is the place itself');
     // a halo's layer is kept with it, and a crossing carries it
     s.setHalo(['world:11,10']);
     const halo = sockets.at(-1);
     assert.match(halo.url, /\/room\/world:11,10(\?of=[^&]*)?$/, 'a halo asks for the place itself (COST-2: its `of` naming the rooms its page holds, no layer) - the Worker walks on past a full one');
     halo.open();
-    halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192', ly: 2 });
+    halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, ly: 2 });
     s.join('world:11,10', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 });
     assert.equal(s.room, 'world:11,10');
     assert.equal(s.layer, 2, 'the promoted halo\'s layer is mine now');

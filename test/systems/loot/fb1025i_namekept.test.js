@@ -7,7 +7,7 @@
 // which stands (AUDIT FB1025i A1-A5: the first law parsed a name by the lines it had, and kept a curse's or an unset
 // gem's word stale, an older reforge's damage, a partial rename's word). Every piece from its real producer (TEST THE
 // SHAPE THE PRODUCER MINTS): the jeweller's mint, the Item Maker's window, the loot ladder, the curse, the questline's
-// named reward, the Imbue, the save's load.
+// named reward, the Imbue.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -23,7 +23,6 @@ import { welkyndShards } from '../../../src/systems/gate/gateSpoils.js';
 import { mintCondition } from '../../../src/systems/item/itemTemplates.js';
 import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 import { rollRewardChoice } from '../../../src/systems/questlines/qlRewards.js';
-import { repairItemLists } from '../../../src/systems/save/save.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 
 const on = () => { _resetForTests(); setPref('lootRarity', true); };
@@ -165,7 +164,7 @@ test('NAME-KEPT (AUDIT FB1025i A2): a name an older reforge built with a set gem
   } finally { LR._setSocketForTests(null); }
 });
 
-test('NAME-KEPT (AUDIT FB1025i A3): a crafted name an older reforge broke - the report\'s Masterwork with the ladder\'s words, a jewel without its metal - is its own base\'s again: at the next reforge, and on load (repairCraftedNames, once)', () => {
+test('NAME-KEPT (AUDIT FB1025i A3): a crafted name an older reforge broke - the report\'s Masterwork with the ladder\'s words - is its own base\'s again at the next reforge', () => {
   on();
   const oldLaw = (it) => { it.name = LR.rarityName(it, it.rarity, it.affixes.filter((a) => a.gem == null)); return it; };   // the reforge before NAME-KEPT
   const master = oldLaw(mule());
@@ -173,23 +172,6 @@ test('NAME-KEPT (AUDIT FB1025i A3): a crafted name an older reforge broke - the 
   const again = structuredClone(master);
   assert.ok(RF.reforgePiece(again, 0, { items: [again, welkyndShards(99)], goldPieces: 999_999 }, seededRng(3)).ok);
   assert.equal(itemLongName(again), "Saber's Silver Ring", 'a reforge: the mark\'s name again');
-  const superior = oldLaw(ring(3, 2));
-  assert.ok(!superior.name.includes('Silver'));
-  const found = Object.assign(LR.applyRarity(mintCondition({ group: 'Jewellery', templateIndex: 135, name: 'Ring', flags: 0 }), 'magic', seededRng(4)), { isIdentified: true });
-  const own = Object.assign(ring(3, 5), { name: 'Ward of the Wanderer' });
-  let cursed = null;   // a found piece whose curse's line names no part of its name - by design, never repaired
-  for (let s = 1; s < 3000 && !cursed; s++) {
-    const it = Object.assign(LR.applyRarity(mintCondition({ group: 'Jewellery', templateIndex: 135, name: 'Ring', flags: 0 }), 'rare', seededRng(s)), { isIdentified: true });
-    if (words(it).pre == null && LR.cursePiece(it, seededRng(s + 7)) && words(it).pre != null) cursed = it;
-  }
-  const list = [master, superior, found, own, cursed];
-  const [foundName, cursedName] = [found.name, cursed.name];
-  assert.notEqual(cursedName, LR.rarityName(cursed, 'rare', cursed.affixes));
-  assert.equal(LR.repairCraftedNames(structuredClone(list)), 2, 'the two crafted names the old law built');
-  repairItemLists([list]);   // the save's load (save.js) - every repair, this one among them
-  assert.deepEqual([itemLongName(master), superior.name, found.name, own.name, cursed.name],
-    ["Saber's Silver Ring", [words(superior).pre, 'Silver Ring', words(superior).suf].filter((x) => x != null).join(' '), foundName, 'Ward of the Wanderer', cursedName]);
-  assert.equal(LR.repairCraftedNames(list), 0, 'a second load finds nothing to do');
 });
 
 test('NAME-KEPT (AUDIT FB1025i A5, A6): a rename that keeps a word of the ladder\'s ("Porter\'s Pride", "Porter\'s", "Porter\'sRing") is the player\'s own and stands', () => {

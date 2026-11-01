@@ -1,7 +1,7 @@
 // AUDIT FB1024 - THE BROKER'S SALES BY THEIR REQUEST IDS.
 //
 // A press of the Broker's insignia (accounts.js buyInsignia) may carry a
-// request id (`rid`, src/net/insignia.js BROKER_RID_RE). The sale writes `broker_sales` (migration 0174) in its own
+// request id (`rid`, src/net/insignia.js BROKER_RID_RE). The sale writes `broker_sales` in its own
 // batch, only where its write took, and refuses a `rid` this account has a row of: a FENCE (`fenced`), or the same press
 // asked again (the sale's own answer, `again`). A client whose answer was lost asks `/v1/broker/settle` by the `rid`
 // (settleBrokerSale): the row it wrote answers the sale - `held`, and which ask came first (`by`, the first ask's nonce:

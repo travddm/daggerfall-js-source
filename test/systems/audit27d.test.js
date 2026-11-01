@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spellAbsorptionChance } from '../../src/systems/absorption.js';
 import { cureAllOfKind } from '../../src/systems/effects.js';
-import { REST_OPT_RELAY_MIN, relaySupportsRestOpt, TRADE_REV_MAX } from '../../src/net/wire.js';
+import { TRADE_REV_MAX } from '../../src/net/wire.js';
 import { restsApart, REST_APART_TEXT, restsAlone, restAloneText } from '../../src/systems/party/partyRestLaw.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -58,13 +58,8 @@ test('AUDIT SPELL-GIFT B1 + B7: the receiver refuses my duel opponent\'s gift wh
 
 // ─── REST-OPT / COMPASS-PARTY (agent C) ────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT REST-OPT C1: the switch is honoured only through a hub that carries `nr` (world120) - through an older one the party counted the member a voter to gather while the member\'s own client refused every rest; the link reads it off the hub\'s welcome, and the pose, the vote\'s words and the party\'s gate all read the switch as the party can hear it (mutants: the switch read raw; the welcome\'s word never kept)', () => {
-  assert.equal(REST_OPT_RELAY_MIN, 120);
-  assert.deepEqual(['world119', 'world120', 'world122', 'world123', 'nope', null].map(relaySupportsRestOpt), [false, true, true, true, false, false]);
-  const O = src('src/net/online.js');
-  assert.match(O, /this\.restOptOk = false;/);
-  assert.match(O, /if \(primary\) this\.restOptOk = relaySupportsRestOpt\(relayV\);/);
-  assert.match(W, /const restsWithParty = \(\) => getPref\('restWithParty'\) !== false \|\| !socialLink\(\)\?\.restOptOk;/);
+test('AUDIT REST-OPT C1: the switch is honoured only while a hub carries `nr` - with no social link the party cannot hear it; the pose, the vote\'s words and the party\'s gate all read the switch as the party can hear it (mutants: the switch read raw)', () => {
+  assert.match(W, /const restsWithParty = \(\) => getPref\('restWithParty'\) !== false \|\| !socialLink\(\);/);
   assert.equal((W.match(/getPref\('restWithParty'\)/g) ?? []).length, 1, 'read raw in that one place alone');
 });
 

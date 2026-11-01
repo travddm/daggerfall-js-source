@@ -1,5 +1,9 @@
+// The film's cue sheet, in seconds of the film's clock (systems/titleMusic.js).
+// The landmarks below were measured off a recorded theme that no longer ships:
+// the film now plays under Daggerfall's own title song, which has no beat on
+// these times, and the cuts keep the timing they had.
+//
 // INTRO2. Seconds in the DECODED recording, not an approximate tempo grid.
-// tools/introAudioCheck.mjs reproduces these landmarks from the shipped MP3.
 // There is no capture correction or arbitrary lead.
 //
 // INTRO2b. The first cut landed on 20.533333s,
@@ -16,7 +20,7 @@
 // analysis hop earlier than the old master's, and the cue moved with it.
 //
 // INTRO4. THE FILM IS LONGER, ON THE SAME RECORDING. Its
-// bars measured off the decoded master (tools/introAudioCheck.mjs, the same flux): 1.888 s a bar from the 19 s beat,
+// bars measured off the decoded master: 1.888 s a bar from the 19 s beat,
 // phrases of eight - so the film cuts on the recording's own downbeats. Pre-dawn over Lake Rumare under the credits; the
 // mist breaks on 11.712 and the camera cranes over Talos Bridge's gate and up the White-Gold Tower; on the 19 s beat it
 // crests the Tower as the sun clears it (INTRO2b's beat, now CREST_TIME); an orbit of the wheel; on bar 4 a dive over
@@ -26,7 +30,7 @@
 import { t } from '../../systems/textManager.js';   // L10N4: the credits' captions in the player's language
 import { tamrielCentre, tamrielSpan } from './introTamriel.js';
 
-/** The recording's landmarks (decoded sample / 12000 Hz - tools/introAudioCheck.mjs measures each). */
+/** The recording's landmarks (decoded sample / 12000 Hz). */
 export const CLOUD_REVEAL_TIME = 11.712;
 /** INTRO2b's 19 s beat: INTRO2's logo landed here; INTRO4's camera crests the White-Gold Tower on it. */
 export const CREST_TIME = 230016 / 12000;

@@ -14,7 +14,7 @@
 //    the panel at its next click. An Admin may also add and remove Moderators from the panel: `players.staff_mod`, bound to the account, beside MODERATOR_HANDLES - the
 //    config's own stay the config's, and the panel removes only the ones it added.
 // A key is bound to the account AND the handle it was registered under, so a rename that hands a listed handle to
-// another account (0134) hands it no way in. A key forgotten or cut is REVOKED, never deleted: its row stays, so it never
+// another account hands it no way in. A key forgotten or cut is REVOKED, never deleted: its row stays, so it never
 // signs in again and its spent seconds stay spent - an owner's config key too, which the config cannot bring back.
 // THE EXTENSION'S CONTRACT: each sign-in signs a second later than the key's last (one a second at most), so a retry is a
 // new signature, never the same one twice.
@@ -91,7 +91,7 @@ export const STAFF_RATE_MAX = 120;
 /** Audit rows one read returns at most. */
 export const STAFF_AUDIT_PAGE = 100;
 /** How long the audit log keeps a row - past it the hourly job deletes it
- *  (cron.js staff-audit); inside it nobody can (migration 0144's trigger, an hour short of this for the two clocks). */
+ *  (cron.js staff-audit); inside it nobody can (the schema's trigger, an hour short of this for the two clocks). */
 export const STAFF_AUDIT_KEEP_S = 30 * 24 * 60 * 60;
 /** A read of the audit log, the team or the moderators is written once in this, a member and a view, whatever its page
  *  (a review of the PR: every read, and every page of one, was a row). */

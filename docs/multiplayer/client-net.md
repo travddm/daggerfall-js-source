@@ -14,7 +14,7 @@ cloud saves. The frames themselves are in [wire-protocol.md](wire-protocol.md).
 | `src/net/identityToken.js` | Token and order format (Ed25519), shared with both services |
 | `src/net/backoff.js`, `src/net/reconnectWave.js` | Retry jitter; spreading reconnects after a relay deploy |
 | `src/systems/cloudSaves.js` | Cloud save slots |
-| `src/net/updateNotice.js` | "Server updated" notices from the relay version and the site build |
+| `src/net/updateNotice.js` | "New version" notice from the site build |
 | `src/scenes/world.js` | Creates the sessions (`onlineStart`) and wires them into the game |
 
 ## OnlineSession
@@ -38,14 +38,17 @@ new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintTo
   (POST `/v1/auth/token`). Sockets that open together share one mint in flight, and a token is handed to other rooms
   asked within `TOKEN_REUSE_MS` (60 s) under the same session and character, so a reconnect wave does not flood the
   service. The relay refuses a hello without a token. The name shown to others comes from the token, not from the client.
-- **Welcome.** `_receive` handles `welcome`: it reads `v` with `relayVersionOf` and sets the feature flags from the
-  `relaySupports*` functions, then calls `onWelcomed`.
+- **Welcome.** `_receive` handles `welcome`: it first checks `v` with `relayMatches`. A relay of another version, or
+  one that names none, is refused (`refuseVersion`, see Reconnect); otherwise the socket is welcomed and `onWelcomed`
+  is called.
 - **Heartbeat.** The session resends its pose every `HEARTBEAT_MS` (20 s) even when still, and pings an idle socket
   every `PING_MS`. A peer silent for `PEER_TIMEOUT_MS` (4 heartbeats) is hidden, not removed. Only the room's leave
   removes a peer.
 - **Reconnect.** `_scheduleRetry` uses jittered exponential backoff between `BACKOFF_MIN_MS` (1 s) and
   `BACKOFF_MAX_MS` (8 s). `CLOSE_BUSY` starts at half the maximum. `CLOSE_REPARTITION` retries almost at once.
   `CLOSE_POLICY` with a retryable token reason waits for a fresh token. `bar()` latches every room shut after a ban.
+  `refuseVersion()` latches every room shut when a welcome names another `RELAY_VERSION`: no retry, rejoin or join
+  until the page is reloaded, and `statusLine` asks the player to reload.
 - **Deploy waves.** `reconnectWave` detects two or more drops within `WAVE_WINDOW_MS` (2 s) while the browser is
   online, and holds each socket's first retry to a shared random offset of up to `WAVE_SPREAD_MAX_MS` (40 s), scaled
   by the number of players online. This stops a relay deploy from causing a reconnect storm.

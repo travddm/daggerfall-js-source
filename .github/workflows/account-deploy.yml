@@ -543,14 +543,14 @@ jobs:
       #
       # `migrations apply` keeps a `d1_migrations` table in the database
       # itself and runs only what is missing, in order. That is the
-      # whole reason it replaced two `d1 execute --file` lines: 0002 is
-      # NOT idempotent - `ALTER TABLE ADD COLUMN` has no IF NOT EXISTS -
+      # whole reason it replaced two `d1 execute --file` lines: a file that
+      # adds a column is NOT idempotent - `ALTER TABLE ADD COLUMN` has no IF NOT EXISTS -
       # so "apply each one exactly once" has to be something a tool
       # knows, not something a comment asks for.
       # SCALE1 (2026-09-30, the scaling audit): THE DATABASE AS IT STOOD
       # BEFORE THEM, written where a person will look. Some migrations are
       # not idempotent and none can be undone by another; D1 Time Travel
-      # can put the whole database back to this bookmark (realm-restore.yml
+      # can put the whole database back to this bookmark (realm-revive.yml
       # reads it the same way). A bookmark that cannot be read is a warning,
       # not a stop - a restore by timestamp still works without it.
       - name: Record the database's bookmark before the migrations
@@ -1286,7 +1286,7 @@ jobs:
           kept() { timeout 60 $WRANGLER d1 execute "$DB_NAME" --remote --command "$1" --json 2>/dev/null | jq -r '.[0].results[0].n // 0' 2>/dev/null || echo 0; }
           n=$(kept "SELECT (SELECT COUNT(*) FROM home_yards_ver) = 0 OR EXISTS (SELECT 1 FROM home_yards y JOIN home_yards_ver v ON v.map_id = y.map_id WHERE y.built = v.ver AND y.shape IS NOT NULL) AS n")
           if [ "$n" != "1" ]; then
-            echo "::error::no town's yards stand built in a shape on D1 - migration 0136's build did not run there"; exit 1
+            echo "::error::no town's yards stand built in a shape on D1 - the yards' build did not run there"; exit 1
           fi
           # AUDIT LEAN-READS 2 D5: a town that stands yards, so the read answers off a row D1 itself built (a town with
           # none answers before it reads any)

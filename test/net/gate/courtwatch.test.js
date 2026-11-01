@@ -13,7 +13,6 @@ import { COURT_CENTRE, GATE_FIGHTERS_MAX, HIT_KINDS, ATTACKS, HOST, COURT_WATCH_
 import { createGateLink, GATE_STATE_EMPTY, courtWatchText, GATE_NO_TEXT } from '../../../src/net/gate/gateLink.js';
 import { createGateCourt } from '../../../src/scenes/gate/gateCourt.js';
 import { GATE_COURTS_MAX, GATE_COURT_FIGHTERS, bookNew } from '../../../src/net/gate/gateCourts.js';   // GATE-COURTS: a night's courts
-import { relaySupportsCourtWatch } from '../../../src/net/wire.js';
 import * as TM from '../../../src/systems/textManager.js';
 import { courtToDungeon, ARRIVE_Z } from '../../../src/world/gate/gateArena.js';
 
@@ -166,7 +165,7 @@ test('COURT-WATCH a watcher holds no fighter\'s part: a mate\'s heal owed it is 
   assert.deepEqual(run(true), [], 'a watcher none');
 });
 
-test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter standing in it and never a watcher (G1); a watcher breaks no crystal (G11), is owed no heal - none said once seated (G6) - and asks for no seat once he has fallen or his Wrath is on the court (G4); the ask\'s cadence is the brain\'s fifteen seconds, its clock let go once seated (G11); a full court keeps a watcher only on a relay that says `me` (G3); and the watcher\'s line is the player\'s language\'s (F4) (mutants: the ground biting watchers; a crystal broken; a heal owed; the ask after the fall; the cadence; the ask clock kept; watching on an old relay; the line\'s key)', () => {
+test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter standing in it and never a watcher (G1); a watcher breaks no crystal (G11), is owed no heal - none said once seated (G6) - and asks for no seat once he has fallen or his Wrath is on the court (G4); the ask\'s cadence is the brain\'s fifteen seconds, its clock let go once seated (G11); and the watcher\'s line is the player\'s language\'s (F4) (mutants: the ground biting watchers; a crystal broken; a heal owed; the ask after the fall; the cadence; the ask clock kept; the line\'s key)', () => {
   // G1: the burning ground
   const burnt = (watching) => {
     const link = { st: GATE_STATE_EMPTY, state() { return this.st; }, watching: () => watching };
@@ -224,12 +223,6 @@ test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter
   h.clock.t = 80_000 + COURT_WATCH_ASK_MS; assert.equal(h.c.askAgain(), true);
   h.link.word({ ...st, fell: { at: 1, top: [], n: 3 } });
   h.clock.t = 80_000 + 3 * COURT_WATCH_ASK_MS; assert.equal(h.c.askAgain(), false, 'fallen: no seat to ask for');
-  // G3: a relay that says `me`, or a refusal as before
-  assert.deepEqual(['world221', 'world222', 'world300', null].map(relaySupportsCourtWatch), [false, true, true, false]);
-  const refused = [];
-  const old = createGateLink({ now: () => 0, watches: () => false, onRefused: (m) => refused.push(m) });
-  old.word({ k: 'no', m: 'the court is full' });
-  assert.deepEqual([old.watching(), refused], [false, ['the court is full']], 'an older relay: refused as it was, never left watching');
   // F4: the line in the player's language, at say-time
   // A fixture row stands in for a German translation; the subject is the line read at say-time.
   const german = 'Der Brennende Hof ist voll.';

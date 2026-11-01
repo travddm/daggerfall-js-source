@@ -225,7 +225,7 @@ const DELIVERY_T = "COALESCE(p.template, CAST(json_extract(d.item, '$.templateIn
 const DELIVERY_N = "SUM(CASE WHEN d.item IS NULL THEN 1 ELSE MAX(1, COALESCE(json_extract(d.item, '$.stackCount'), 1)) END)";
 const DELIVERIES = 'FROM market_deliveries d LEFT JOIN products p ON p.provenance = d.provenance WHERE d.collected = 0';
 /** Marks the market holds: the ledger's escrow end, what went in less what came out - open orders' and standing bids'
- *  alike (marks.js marksReport's measure, the economy screen's, on 0153's covering index). */
+ *  alike (marks.js marksReport's measure, the economy screen's, on the covering index). */
 const MARKS_ESCROW = `SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS n
   FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`;
 
@@ -337,7 +337,7 @@ const recordOf = (/** @type {any} */ d, /** @type {string} */ p, /** @type {unkn
   : null);
 
 /** A listed row: a death's dropped piece (`drop`) is the ledger's own bookkeeping, never listed - and in none of the
- *  list's indexes (0154 item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
+ *  list's indexes (item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
 const LISTED = "(d.kind IS NULL OR d.kind != 'drop')";
 /** Unchecked contested pieces on the copy holder's character - the count that makes a row high (item_dupes_open). */
 const OPEN_SQL = "(SELECT COUNT(*) FROM item_dupes x WHERE x.char_id = d.char_id AND x.trail_at IS NULL AND (x.kind IS NULL OR x.kind != 'drop'))";

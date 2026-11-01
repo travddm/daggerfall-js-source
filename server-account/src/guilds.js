@@ -40,7 +40,7 @@
 // A join lands only while the guild holds fewer than its cap and the
 // invitation still stands (one INSERT ... WHERE), a treasury moves only
 // by what it holds (one UPDATE ... WHERE treasury >= n), and the ledger
-// line is the schema's own trigger on that UPDATE (0013_guilds.sql) - so
+// line is the schema's own trigger on that UPDATE - so
 // two members racing never overdraw it, no line is written for gold that
 // did not move, and no gold moves without one. A rank is changed only
 // from the rank it was read at, so two officers racing move a member
@@ -201,7 +201,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
       .bind(guildId, nowS - GUILD_INVITE_TTL_S).all()
     : { results: [] };
   const ledger = await db.prepare('SELECT at, who, kind, amount, balance FROM guild_ledger WHERE guild_id = ? ORDER BY seq DESC LIMIT ?').bind(guildId, GUILD_LEDGER_SHOWN).all();
-  // MARKS1: the Marks treasury beside the gold one, and its latest lines (0025_marks.sql - the one ledger)
+  // MARKS1: the Marks treasury beside the gold one, and its latest lines (the one ledger)
   const marks = marksOpen ? await db.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').bind(guildId).first() : null;
   const marksLines = marksOpen ? await db.prepare(`SELECT at, who, kind, amount, src_kind, src_id FROM marks_ledger
     WHERE (dst_kind = 'guild' AND dst_id = ?1) OR (src_kind = 'guild' AND src_id = ?1) ORDER BY seq DESC LIMIT ?2`).bind(guildId, MARKS_LEDGER_SHOWN).all() : null;
@@ -209,8 +209,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
   try { ranks = guildRankNamesOf(JSON.parse(g.ranks)) ?? GUILD_RANK_NAMES; } catch { /* the defaults */ }
   return {
     id: g.id, name: g.name, tag: g.tag, ranks: [...ranks], treasury: g.treasury, foundedAt: g.founded_at, rank: me.rank,
-    // HALL-GOLD (FIELD BUGS 2026-10-03): what of the treasury buys a hall - the gold realm characters put in (`realm_gold`,
-    // 0020_realm_audit.sql), the one the hall's buy spends (halls.js buyHall) - never shown, so a guild could not tell
+    // HALL-GOLD (FIELD BUGS 2026-10-03): what of the treasury buys a hall - the gold realm characters put in (`realm_gold`), the one the hall's buy spends (halls.js buyHall) - never shown, so a guild could not tell
     // why a treasury that held the price was refused
     hallGold: Number(g.realm_gold ?? 0),
     // GUILD1d (Seats-Arc 8): the hall (null for none) and the heraldry (null until chosen), every member's to read
@@ -670,7 +669,7 @@ async function moveTreasury(db, me, who, kind, gold, nowS) {
  *  wallet's own order, `region`'s account last) or is paid (a withdrawal, to the purse - GUILD-LETTER: or, `letter`, as
  *  a letter of credit), and the treasury moves by what it holds, each guarded; both or neither. Answers the balance and
  *  the record's new sequence.
- *  AUDIT REALM L1-F3: A RECORD IS PAID ONLY WHAT RECORDS PAID IN. `realm_gold` (migration 0020) is the part of the
+ *  AUDIT REALM L1-F3: A RECORD IS PAID ONLY WHAT RECORDS PAID IN. `realm_gold` is the part of the
  *  treasury realm records deposited, and a realm withdrawal takes from it alone: the rest came in on a client's word -
  *  before the realm, or through the old lane any other character still has (a million deposited by a character no
  *  record stands behind, then taken out by the guildmaster's record, was a million made). */

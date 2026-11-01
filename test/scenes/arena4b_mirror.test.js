@@ -128,7 +128,7 @@ test('ARENA4b the city\'s socket: online the hour\'s bout is the relay\'s room w
   const sent = [], links = [], asked = [], dismissed = [];
   let relay = null;
   const bouts = { ask: (p) => { asked.push(p); relay = { o: p.relayEx.o, me: '', kind: 'ex' }; }, relay: () => relay, dismiss: () => { dismissed.push(1); relay = null; }, exhibitionWord: (w) => { bouts.words.push(w); return true; }, words: [], holds: () => false };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let t = 0;
   const A = createArenaOnline({ now: () => t, session: () => session, makeHall: () => { const l = fakeLink(sent); links.push(l); return l; }, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: () => true });
   assert.equal(A.exhibitions(), true);
@@ -162,7 +162,7 @@ test('ARENA4b the verdict asked: a wager\'s hour this screen did not see to its 
   const sent = [], links = [];
   let heard = 0;
   const bouts = { ask() {}, relay: () => null, dismiss() {}, exhibitionWord: () => true, holds: () => false };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let t = 0;
   const A = createArenaOnline({ now: () => t, session: () => session, makeHall: () => { const l = fakeLink(sent); links.push(l); return l; }, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: () => true, verdictHeard: () => { heard++; } });
   assert.equal(A.exhibitionVerdict(EX.hour, NOON + 61), null, 'not known yet');
@@ -193,7 +193,7 @@ test('ARENA4b the verdict asked: a wager\'s hour this screen did not see to its 
 test('ARENA4b the Herald\'s Watch and the window\'s list: the hour\'s exhibition on the hall\'s list named off its hour (the Red\'s against the Blue\'s, titled the hour\'s); Watch takes the floor\'s instance as its room and says one `in` from the stands; the stands strike nobody (mutants: the exhibition entered as a bout\'s room; a watcher\'s blow sent)', async () => {
   const hallSent = [], boutSent = [], entered = [], asked = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const bouts = { ask: (p) => asked.push(p), relay: () => null, dismiss() {}, exhibitionWord: () => true, relayWord: () => true, holds: () => false };
   const A = createArenaOnline({ now: () => 0, session: () => session, makeHall: () => hallLink, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: (k, o) => { entered.push([k, o]); return true; } });
   A.model();

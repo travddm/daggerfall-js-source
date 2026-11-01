@@ -8,8 +8,7 @@
 //     integer key (CreateNewSavePath's `while (ContainsKey(key))
 //     key++`), so deleted indexes recycle;
 //   - THE QUICKSAVE IS JUST A SLOT named "QuickSave" for the current
-//     character (QuickSave() = Save(name, quickSaveName)), which is
-//     what finally retires the port's single dagger.quicksave key;
+//     character (QuickSave() = Save(name, quickSaveName));
 //   - a slot is only real WITH its SaveInfo (EnumerateSaveFolders
 //     admits a folder only if SaveInfo.txt exists) - an orphaned data
 //     blob does not enumerate;
@@ -36,18 +35,14 @@
 //     host's frame loop, and a save without one shows the empty panel
 //     exactly as DFU's GetSaveScreenshot -> null does.
 //   - dfuVersion carries the port's BUILD_TAG.
-//
-// MIGRATION: the legacy dagger.quicksave key becomes a "QuickSave"
-// slot on first enumeration - written and VERIFIED before the legacy
-// key is removed, so a quota failure leaves the old save untouched.
 
-import { SAVE_VERSION, QUICKSAVE_KEY } from './save.js';
-import { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, characterIdOf, adoptLegacyCards, mintCharacterId } from '../characterId.js';   // CHARID1: the prefixes and the id, the one module save.js and this both read
+import { SAVE_VERSION } from './save.js';
+import { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, characterIdOf, mintCharacterId } from '../characterId.js';   // CHARID1: the prefixes and the id, the one module save.js and this both read
 import { BUILD_TAG } from '../../buildTag.js';
 import { appStorage } from '../appStorage.js';   // DA1: localStorage in a browser, real save files in the desktop shell
 
 // SaveLoadManager's names (:42-44), as storage-key prefixes.
-export { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, characterIdOf, adoptLegacyCards, mintCharacterId };   // CHARID1: still this module's words to every caller
+export { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, characterIdOf, mintCharacterId };   // CHARID1: still this module's words to every caller
 export const QUICK_SAVE_NAME = 'QuickSave';
 
 const store = () => appStorage();
@@ -71,7 +66,7 @@ const store = () => appStorage();
  * @property {string} [characterName]
  * @property {{gameTime?: number, realTime?: number}} [dateAndTime]  gameTime in CLASSIC MINUTES, realTime in Date.now() ms - both compare-and-display, never arithmetic
  * @property {string} [dfuVersion]   the port's BUILD_TAG
- * @property {string} [characterId]  CHARID1: the character's id - a card without one is a legacy card, adopted on its character's next load
+ * @property {string} [characterId]  CHARID1: the character's id
  */
 
 // HARD3: ONE reader, TWO shapes. `parse` was handed both the slot CARD
@@ -92,7 +87,6 @@ export function enumerateSaves(storage = store()) {
   const info = new Map();
   const characterSaves = new Map();
   if (!storage) return { info, characterSaves };
-  migrateLegacyQuicksave(storage);
   for (let i = 0; i < storage.length; i++) {
     const k = storage.key(i);
     if (!k?.startsWith(SAVE_INFO_PREFIX)) continue;
@@ -106,35 +100,6 @@ export function enumerateSaves(storage = store()) {
     characterSaves.get(name).push(key);
   }
   return { info, characterSaves };
-}
-
-/** The one-time legacy migration. Write first, VERIFY, then remove -
- *  a failed write (quota) leaves dagger.quicksave standing and the
- *  next enumeration tries again. */
-export function migrateLegacyQuicksave(storage = store()) {
-  if (!storage) return false;
-  const raw = storage.getItem(QUICKSAVE_KEY);
-  if (!raw) return false;
-  const snap = parseSnap(raw);
-  if (!snap) { storage.removeItem(QUICKSAVE_KEY); return false; }   // corrupt legacy blob: nothing to keep
-  const key = firstFreeKey(storage);
-  const saveInfo = {
-    saveVersion: snap.v ?? 0,
-    saveName: QUICK_SAVE_NAME,
-    characterName: snap.name ?? '',
-    dateAndTime: { gameTime: snap.classicMinutes ?? 0, realTime: 0 },   // no real stamp survives the legacy key
-    dfuVersion: BUILD_TAG,
-  };
-  try {
-    storage.setItem(SAVE_DATA_PREFIX + key, raw);
-    storage.setItem(SAVE_INFO_PREFIX + key, JSON.stringify(saveInfo));
-  } catch (err) {
-    console.warn('[saveSlots] legacy quicksave migration failed:', err?.name ?? err);
-    return false;
-  }
-  if (storage.getItem(SAVE_DATA_PREFIX + key) !== raw) return false;   // verify before the point of no return
-  storage.removeItem(QUICKSAVE_KEY);
-  return true;
 }
 
 /** CreateNewSavePath's key walk: the first free integer from 0. */
@@ -225,7 +190,7 @@ export function saveSlot(characterName, saveName, snap, { screenshot = null, sto
   let key = findSave(characterName, saveName, storage, characterId);
   if (key === -1) key = firstFreeKey(storage);
   const saveInfo = {
-    saveVersion: snap.v ?? SAVE_VERSION,
+    saveVersion: SAVE_VERSION,
     saveName,
     characterName,
     characterId,
