@@ -16,7 +16,7 @@ import { LAW_HOLD_S } from '../../../server-account/src/verdict.js';
 const ring = () => ({ templateIndex: 135, group: 'Jewellery', value: 80, hand: 1 });   // 'crafted': a hand on a ring no craft made
 
 test('RING-HOLD: the third hold stands once the ring is gone - and the answer says when it lifts (AUTO-HOLD: a week, on its own; it said staff\'s), never "until it is gone"', async () => {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const who = await s.registered('ann'); const R = await seatRealm(s.env, who.secret, 'ann');
   const put = async (save) => {
     const at = R.at();

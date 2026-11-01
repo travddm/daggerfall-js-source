@@ -98,9 +98,11 @@ function over(env, dir, { dry, before } = {}) {
  * purse of 25,000; then the counter's wrapped sale - the claymores gone, the purse millions below nothing - and a
  * payment the letters covered, the purse still below nothing. `after` lays more checkpoints past the wrap.
  */
-async function wrapped({ developers = 'mac', after = [] } = {}) {
-  const s = await standService({ DEVELOPER_HANDLES: developers });
+async function wrapped({ after = [] } = {}) {
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
+  await s.registered('mac');   // the run's actor: an account whose Admin role is its row's, as the harness seated it
+  await s.registered('rando');   // an account with no role
   const kura = await s.seated('Kurasawa');
   const put = async (save) => {
     _now += 300;
@@ -134,7 +136,7 @@ test('PURSE-BACK: a purse the counter wrapped below nothing - the dry run is the
     const before = { row: k.row(), findings: k.findings(), objects: k.objects() };
     // THE DRY RUN: the act whole, its every write held
     const dry = over(k.s.env, dir, { dry: true });
-    const seen = await rollbackPurse(dry.ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac', run: '77' });
+    const seen = await rollbackPurse(dry.ctx, { handle: 'Kurasawa', by: 'mac', run: '77' });
     assert.equal(seen.refusal, null, REFUSALS[seen.refusal]);
     assert.deepEqual(seen.answer, { ok: true, seq: before.row.seq + 1 }, 'the review\'s rollback answers yes');
     assert.deepEqual([seen.character.id, seen.character.reach.first, seen.character.reach.clean], [k.kura.character, k.wrapSeq, k.cleanSeq]);
@@ -149,7 +151,7 @@ test('PURSE-BACK: a purse the counter wrapped below nothing - the dry run is the
     assert.ok(!dry.held.some((h) => h.startsWith('r2') && page.includes(h.split('/').slice(1).join('/'))), 'nor a save\'s key');
     // THE APPLY
     const live = over(k.s.env, dir, { dry: false });
-    const done = await rollbackPurse(live.ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac', run: '78' });
+    const done = await rollbackPurse(live.ctx, { handle: 'Kurasawa', by: 'mac', run: '78' });
     assert.equal(done.refusal, null, REFUSALS[done.refusal]);
     assert.deepEqual(recordOf(k.s.env, k.kura.character), k.clean, 'the record is the clean save: three claymores, both letters, the purse of 25,000');
     const row = k.row();
@@ -163,7 +165,7 @@ test('PURSE-BACK: a purse the counter wrapped below nothing - the dry run is the
     assert.match(rollbackReport(done, { apply: true }), /\*\*Rolled back\.\*\* Kurasawa is save \d+ again, at sequence \d+[^\n]*\n\nRead back: sequence \d+, held by nothing\./);
     // run again, it refuses: the clean save now is the record itself, after the purse's finding - and the staff rollback
     // says why
-    const again = await rollbackPurse(over(k.s.env, dir, { dry: false }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac' });
+    const again = await rollbackPurse(over(k.s.env, dir, { dry: false }).ctx, { handle: 'Kurasawa', by: 'mac' });
     assert.equal(again.refusal, 'rolled-back', 'a second run rolls nothing back');
     assert.equal(k.findings().filter((f) => f.kind === 'staff').length, 1);
   } finally {
@@ -179,7 +181,7 @@ test('PURSE-BACK THE CHECK: a purse set at nothing after the wrap makes a later 
     assert.ok(k.row().clean_seq > k.wrapSeq, 'and the clean save is from after the wrap');
     const before = { row: k.row(), findings: k.findings(), objects: k.objects() };
     for (const dry of [true, false]) {
-      const r = await rollbackPurse(over(k.s.env, dir, { dry }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac' });
+      const r = await rollbackPurse(over(k.s.env, dir, { dry }).ctx, { handle: 'Kurasawa', by: 'mac' });
       assert.equal(r.refusal, 'clean-after');
       assert.equal(r.answer, null, 'the act is never asked');
       assert.match(rollbackReport(r, { apply: !dry }), /\*\*Refused - clean-after\.\*\* the last clean save is from AFTER the purse first went below nothing/);
@@ -190,7 +192,7 @@ test('PURSE-BACK THE CHECK: a purse set at nothing after the wrap makes a later 
   }
 });
 
-test('PURSE-BACK: the act\'s own refusals, said by the dry run before anything is written - a service move after the clean save, a run by someone off the developers\' list - and a guarded write that moved nothing answered as the act answers it, read from SQLite\'s own count (mutant: the count assumed)', async () => {
+test('PURSE-BACK: the act\'s own refusals, said by the dry run before anything is written - a service move after the clean save, a run by an account with no Admin role - and a guarded write that moved nothing answered as the act answers it, read from SQLite\'s own count (mutant: the count assumed)', async () => {
   const dir = tmp();
   try {
     // the service moved the held record after its clean save: the act's own 'service-moved', in the dry run already
@@ -198,15 +200,15 @@ test('PURSE-BACK: the act\'s own refusals, said by the dry run before anything i
     const credit = await prepareRealmRecord({ db: k.s.env.DB, bucket: k.s.env.SAVES, rand: (b) => globalThis.crypto.getRandomValues(b), nowS: _now }, k.kura.id, k.kura.at(), (save) => (creditSave(save, 5) ? null : 'bad'));
     await k.s.env.DB.batch(credit.steps);
     const moved = { row: k.row(), findings: k.findings(), objects: k.objects() };
-    const sm = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac' });
+    const sm = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac' });
     assert.equal(sm.refusal, 'service-moved');
     assert.deepEqual({ row: k.row(), findings: k.findings(), objects: k.objects() }, moved);
-    // off the developers' list: the review's own gate, before any read of the account
-    const k2 = await wrapped({ developers: 'mac' });
+    // an account with no Admin role: the review's own gate, before any read of the account named
+    const k2 = await wrapped();
     const gate = over(k2.s.env, dir, { dry: false });
-    const off = await rollbackPurse(gate.ctx, { handle: 'Kurasawa', by: 'rando', developers: 'mac' });
+    const off = await rollbackPurse(gate.ctx, { handle: 'Kurasawa', by: 'rando' });
     assert.equal(off.refusal, 'not-developer');
-    assert.deepEqual(gate.calls, [], 'nothing asked of the database or the bucket');
+    assert.deepEqual(gate.calls.map((c) => c.at(-1)), ["SELECT * FROM players WHERE handle_lc = 'rando'"], 'only the actor row asked of the database, and nothing of the bucket');
     // a checkpoint landing between the act's read and its write: the guarded UPDATE moves nothing, the act says no-clean
     // and writes no finding - SQLite's count, read in the write's own command
     const k3 = await wrapped();
@@ -214,7 +216,7 @@ test('PURSE-BACK: the act\'s own refusals, said by the dry run before anything i
       dry: false,
       before: (sql) => { if (/^UPDATE realm_characters SET seq = seq \+ 1, obj = clean_obj/.test(sql)) k3.raw.prepare('UPDATE realm_characters SET seq = seq + 1 WHERE id = ?').run(k3.kura.character); },
     });
-    const raced = await rollbackPurse(race.ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac' });
+    const raced = await rollbackPurse(race.ctx, { handle: 'Kurasawa', by: 'mac' });
     assert.equal(raced.refusal, 'no-clean');
     assert.deepEqual(k3.findings().filter((f) => f.kind === 'staff'), [], 'no staff finding for a rollback that did not land');
     assert.notEqual(k3.row().obj, k3.row().clean_obj, 'the record is not the clean save');
@@ -239,22 +241,22 @@ test('PURSE-BACK the pick: the one character whose purse went below nothing; two
     };
     await put({ name: 'Kura Two', level: 5, goldPieces: 10, items: [claymore(4)] });
     await put({ name: 'Kura Two', level: 5, goldPieces: WRAPPED, items: [] });
-    const which = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac' });
+    const which = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac' });
     assert.equal(which.refusal, 'which');
     assert.deepEqual(which.characters.map((c) => [c.name, c.reach.ok]), [['Kurasawa', true], ['Kura Two', true]]);
     assert.match(rollbackReport(which, { apply: false }), new RegExp(`\\| Kura Two \\| ${second.id} \\|`), 'the page lists each with the id to name');
-    const named = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac', character: second.id });
+    const named = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', character: second.id });
     assert.deepEqual([named.refusal, named.character.id], [null, second.id]);
     // another account's character, named: never
     const other = await wrapped();
-    const theirs = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', developers: 'mac', character: other.kura.character });
+    const theirs = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Kurasawa', by: 'mac', character: other.kura.character });
     assert.equal(theirs.refusal, 'not-theirs');
     // an account whose purses never went below nothing
     const clean = await k.s.seated('Clean');
     assert.ok(clean.character);
-    const none = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Clean', by: 'mac', developers: 'mac' });
+    const none = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Clean', by: 'mac' });
     assert.equal(none.refusal, 'no-purse-finding');
-    const nobody = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Nobody', by: 'mac', developers: 'mac' });
+    const nobody = await rollbackPurse(over(k.s.env, dir, { dry: true }).ctx, { handle: 'Nobody', by: 'mac' });
     assert.equal(nobody.refusal, 'no-player');
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -325,8 +327,9 @@ test('PURSE-BACK the bindings: a statement\'s binds written as literals outside 
   }
 });
 
-test('PURSE-BACK the config and the workflow: the database, the bucket and the developers\' list read off the service\'s own wrangler.toml; the workflow by hand, a dry run by default, its inputs as environment, its actor the act\'s, in the deploy\'s queue, the page written whatever the act answers (mutants: apply by default; an input spliced; the actor typed)', () => {
-  assert.deepEqual(CONFIG, { database: 'daggerfall-accounts', bucket: 'daggerfall-saves', developers: /^DEVELOPER_HANDLES = "([^"]*)"$/m.exec(src('server-account/wrangler.toml'))[1] });
+test('PURSE-BACK the config and the workflow: the database, the bucket read off the service\'s own wrangler.toml; the workflow by hand, a dry run by default, its inputs as environment, its actor the act\'s, in the deploy\'s queue, the page written whatever the act answers (mutants: apply by default; an input spliced; the actor typed)', () => {
+  assert.deepEqual(CONFIG, { database: 'daggerfall-accounts', bucket: 'daggerfall-saves' });
+  assert.doesNotMatch(src('server-account/wrangler.toml'), /^(DEVELOPER|SEAT_ADMINS)/m, 'the Admin role is on the account, listed in no config');
   const wf = src('.github/workflows/realm-rollback.yml');
   assert.match(wf, /on:\n  workflow_dispatch:/);
   assert.match(wf, /      apply:\n        description: [^\n]*\n        required: true\n        default: false/);

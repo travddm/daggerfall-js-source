@@ -216,7 +216,7 @@ test('GUILD1c the service: the mint signs the NAMED character\'s guild in - its 
   const bare = await mint({});
   assert.equal((await tokenOf(bare)).gi, undefined, 'a mint naming no character (an older build) carries none');
   assert.equal(bare.guild, null);
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
 });
 
 test('GUILD1c the service: every act that moves a membership answers a SIGNED order - founding, a join, a leave and the look say the actor\'s guild now (none after leaving), a removal an out order naming the member and its guild, a disbanding the guildmaster\'s none and an out order naming the guild; a declined invitation, a rank moved, a handover and the treasury answer none (mutants: a join answering none; a removal naming the remover; a disbanding naming one member; an order for an act that moved nobody)', async () => {

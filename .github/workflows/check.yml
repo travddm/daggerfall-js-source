@@ -44,3 +44,33 @@ jobs:
             exit 1
           fi
           echo "lint, types, every test shard and the build passed"
+
+  # Formatting of the files this pull request adds, and Markdown and spelling of the ones it changes
+  # (docs/coding-standards.md). A job of its
+  # own: `check` stays the lint, types, tests and build, and a branch rule may require this one too.
+  standards:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Formatting of the added files
+        run: node tools/check-changed.mjs format-check --added
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+      - name: Markdown of the changed files
+        run: npm run markdown
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+      - name: Spelling of the changed files
+        run: npm run spell
+        env:
+          BASE_REF: origin/${{ github.base_ref }}

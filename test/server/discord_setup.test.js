@@ -149,8 +149,9 @@ test('DISCORD-CODE: what the cards need and the bot lacks in the moderators\' ch
 });
 
 test('DISCORD-CODE: every declared command and subcommand reaches a handler in the service - none answers with the router\'s "nothing to do" or its command\'s usage, which is built from the declaration', async () => {
-  const s = await standService({ MODERATOR_HANDLES: 'Asynian', DISCORD_MODERATORS: '111111111111111111:Asynian', DISCORD_MOD_CHANNEL: CHANNEL, DISCORD_BOT_TOKEN: 'bot', DISCORD_PUBLIC_KEY: '' });
+  const s = await standService({ SEAT_MODERATORS: 'Asynian', DISCORD_MOD_CHANNEL: CHANNEL, DISCORD_BOT_TOKEN: 'bot', DISCORD_PUBLIC_KEY: '' });
   await s.registered('Asynian');
+  s.env.DB._raw.prepare("INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES ('111111111111111111', (SELECT id FROM players WHERE handle_lc = 'asynian'), 0)").run();
   const troll = await s.registered('Troll');
   const ctx = { db: s.env.DB, nowS: Math.floor(Date.now() / 1000), rand: (b) => { globalThis.crypto.getRandomValues(b); }, subtle: globalThis.crypto.subtle };
   const io = { fetchFn: async () => Response.json({ ok: true }), later: (p) => { p.catch(() => {}); } };

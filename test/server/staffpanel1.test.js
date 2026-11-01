@@ -42,8 +42,8 @@ async function extensionKey() {
 async function stand(extra = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Fangy',
-    OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Fangy',
+    SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
     ...extra,
   });
   /** A staff door, as the panel asks it: POST, JSON, the staff header, an address. */
@@ -76,7 +76,7 @@ async function stand(extra = {}) {
 
 test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is behind the game\'s session', async () => {
   for (const r of STAFF_ROUTES) assert.ok(ROUTES.has(r), r);
-  assert.deepEqual([...STAFF_ROUTES].sort(), ['/v1/staff/audit', '/v1/staff/cut', '/v1/staff/enroll', '/v1/staff/invite', '/v1/staff/key/forget',
+  assert.deepEqual([...STAFF_ROUTES].sort(), ['/v1/staff/admin/add', '/v1/staff/admin/remove', '/v1/staff/audit', '/v1/staff/cut', '/v1/staff/enroll', '/v1/staff/invite', '/v1/staff/key/forget',
     '/v1/staff/keys', '/v1/staff/login', '/v1/staff/logout', '/v1/staff/me', '/v1/staff/mod/add', '/v1/staff/mod/remove', '/v1/staff/mods', '/v1/staff/team',
     // STAFF-PANEL2: the reports (staffCases.js)
     '/v1/staff/ban', '/v1/staff/case', '/v1/staff/cases', '/v1/staff/claim', '/v1/staff/dismiss', '/v1/staff/mute', '/v1/staff/release', '/v1/staff/strikes', '/v1/staff/unban',
@@ -113,15 +113,14 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
     // STAFF-PANEL5-FREEZE: freeze and the staff chat (staffFreeze.js)
     '/v1/staff/freeze', '/v1/staff/unfreeze', '/v1/staff/freezes', '/v1/staff/freeze-push', '/v1/staff/talk', '/v1/staff/chat', '/v1/staff/chat-send',
     '/v1/staff/chat-close', '/v1/staff/chats'].sort());
-  // no secret to set anywhere: the config holds the lists and a public key, and nothing else of the panel's
+  // no secret to set anywhere: the config holds an owner's public key, and no list of who holds a role
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /^OWNER_HANDLES = "Lattymoy,SirMcMobdon"$/m);
+  for (const list of ['DEVELOPER_HANDLES', 'MODERATOR_HANDLES', 'OWNER_HANDLES', 'DISCORD_MODERATORS']) assert.doesNotMatch(toml, new RegExp(`^${list} =`, 'm'), `${list} is gone: a role is a column of the account`);
   // mob pasted the key his panel showed: that pair alone, and every key named a raw 32-byte Ed25519 public key
   assert.match(toml, /^OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"$/m);
   for (const k of ownerKeys({ OWNER_KEYS: toml.match(/^OWNER_KEYS = "([^"]*)"$/m)?.[1] }).values()) {
     await crypto.subtle.importKey('raw', Buffer.from(k, 'base64url'), { name: 'Ed25519' }, false, ['verify']);
   }
-  assert.match(toml, /^DEVELOPER_HANDLES = "[^"]*,SirMcMobdon,kpblca_1"$/m);
 });
 
 test('STAFF-PANEL1: unconfigured is shut - with no owner key named, nobody can sign in', async () => {
@@ -139,10 +138,9 @@ test('STAFF-PANEL1: three locks - the password, the extension\'s key and the lis
   const me = await s.mobIn();
   assert.deepEqual([me.role, me.owner, me.handle], ['admin', true, 'SirMcMobdon']);
   assert.equal(typeof me.session, 'string');
-  // Admin is the Developers list alone, and OWNER_HANDLES opens nothing by itself (mutants: an owner as Admin; an owner as staff)
-  const sir = { handle: 'SirMcMobdon' };
-  const none = { ...s.env, DEVELOPER_HANDLES: 'Lattymoy' };
-  assert.deepEqual([staffRole(sir, none), isOwner(sir, none)], [null, false], 'an owner off every role list');
+  // Admin is the account's staff_admin alone, and staff_owner opens nothing by itself (mutants: an owner as Admin; an owner as staff)
+  const sir = { handle: 'SirMcMobdon', staff_owner: 1, staff_admin: 0, staff_mod: 0 };
+  assert.deepEqual([staffRole(sir, s.env), isOwner(sir, s.env)], [null, false], 'an owner column with no admin column');
   const wrongKey = { proof: async (what, handle) => {
     const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
     const ts = nowS();
@@ -249,11 +247,11 @@ test('STAFF-PANEL1: off the list, banned or renamed away is off the panel at the
   const asy = await s.registered('Asynian');
   const me = await s.mobIn();
   const mod = await s.invited('Asynian', me);
-  s.env.MODERATOR_HANDLES = '';
+  s.setStaff('Asynian', 'none');
   assert.equal((await s.staff('/v1/staff/me', {}, { token: mod.session })).status, 401, 'off the list');
   assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM staff_sessions WHERE player_id = ?').get(asy.id).n, 0, 'and the dead session deleted');
   assert.equal((await s.login('Asynian', mod.key)).status, 401, 'and no sign-in');
-  s.env.MODERATOR_HANDLES = 'Asynian';
+  s.setStaff('Asynian', 'moderator');
   const back = await s.login('Asynian', mod.key);
   assert.equal(back.status, 200, 'back on the list, the same extension works');
   s.raw.prepare('UPDATE players SET banned_until = ? WHERE id = ?').run(nowS() + 3600, asy.id);
@@ -478,8 +476,8 @@ test('AUDIT STAFF-PANEL1: renamed onto another listed handle, a key opens nothin
   assert.equal((await s.login('Fangy', mod.key)).status, 401, 'Fangy is listed, but this key was registered as Asynian');
 });
 
-test('STAFF-PANEL1: an Admin adds and removes Moderators from the panel (mob, 07:42Z: "add it so admins can add or remove moderatoers") - the account\'s, so a rename keeps it; the config\'s own stay the config\'s; a Moderator may not; removed is off the panel at once, keys and all; each change written ok (mutants: a mod added read failed; a mod removed read failed)', async () => {
-  const s = await stand({ DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon,Roderic' });
+test('STAFF-PANEL1: an Admin adds and removes Moderators from the panel (mob, 07:42Z: "add it so admins can add or remove moderatoers") - the account\'s, so a rename keeps it; an Admin\'s role is not this door\'s; a Moderator may not; removed is off the panel at once, keys and all; each change written ok (mutants: a mod added read failed; a mod removed read failed)', async () => {
+  const s = await stand({ SEAT_ADMINS: 'Lattymoy,SirMcMobdon,Roderic' });
   await s.registered('SirMcMobdon');
   await s.registered('Roderic');
   await s.registered('Asynian');
@@ -500,8 +498,8 @@ test('STAFF-PANEL1: an Admin adds and removes Moderators from the panel (mob, 07
   s.raw.prepare('UPDATE players SET banned_until = ? WHERE id = ?').run(nowS() + 3600, b1.id);
   assert.equal((await as('/v1/staff/mod/add', { handle: 'Banned1' })).body.error, 'staff-banned');
   const list = await as('/v1/staff/mods');
-  assert.deepEqual(list.body.mods.map((m) => m.handle), ['Player1']);
-  assert.ok(list.body.config.includes('asynian') && !list.body.config.includes('roderic'), 'the config\'s Moderators named apart, its Admins not among them');
+  assert.deepEqual(list.body.mods.map((m) => m.handle), ['Asynian', 'Player1'], 'every Moderator, an Admin not among them');
+  assert.equal('config' in list.body, false, 'no handle list is left to name apart');
   const team = await s.staff('/v1/staff/team', {}, { token: me.session });
   assert.equal(team.body.team.find((m) => m.handle === 'Player1')?.role, 'moderator', 'the owners\' team shows them');
   // the account's, not the handle's: a rename keeps it, and the handle it left gives nothing to its next holder
@@ -518,11 +516,11 @@ test('STAFF-PANEL1: an Admin adds and removes Moderators from the panel (mob, 07
     const r = await as(path, { handle: 'Player1' }, mod);
     assert.deepEqual([r.status, r.body.error], [403, 'staff-admin'], `a Moderator may not: ${path}`);
   }
-  // the config's own are the config's to remove
-  assert.deepEqual([(await as('/v1/staff/mod/remove', { handle: 'Asynian' })).body.error, (await as('/v1/staff/mod/remove', { handle: 'Roderic' })).body.error, (await as('/v1/staff/mod/remove', { handle: 'Banned1' })).body.error], ['staff-config', 'staff-config', 'no-staff']);
-  s.env.MODERATOR_HANDLES = 'Asynian,Player1';
-  assert.equal((await as('/v1/staff/mod/remove', { handle: 'Player1' })).body.error, 'staff-config', 'listed as well: the config holds them still');
-  s.env.MODERATOR_HANDLES = 'Asynian';
+  // an Admin is that role's to remove, and a Moderator who is an Admin as well keeps the Admin role
+  assert.deepEqual([(await as('/v1/staff/mod/remove', { handle: 'Roderic' })).body.error, (await as('/v1/staff/mod/remove', { handle: 'Banned1' })).body.error], ['staff-config', 'no-staff']);
+  s.raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(p1.id);
+  assert.equal((await as('/v1/staff/mod/remove', { handle: 'Player1' })).body.error, 'staff-config', 'an Admin as well: another role holds them still');
+  s.raw.prepare('UPDATE players SET staff_admin = 0 WHERE id = ?').run(p1.id);
   // removed: off at once, its keys, sessions and invites with it
   assert.deepEqual((await as('/v1/staff/mod/remove', { handle: 'Player1' })).body, { ok: true, handle: 'Player1' });
   assert.deepEqual([canModerate(row(), s.env), row().staff_mod], [false, 0]);

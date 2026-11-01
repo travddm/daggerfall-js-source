@@ -62,7 +62,7 @@ test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is m
   const now = utcDay(T0) * 86_400 + 4 * 3600;
   Date.now = () => now * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
     raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'mining', ?, NULL, NULL, ?)`)

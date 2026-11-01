@@ -105,7 +105,7 @@ test('QL12 THE LAW: every step the service pays is witnessable - by a kind this 
   assert.deepEqual({ ...QL_PURSES }, { thirteenthFrostfall: 30 });
   assert.equal(QL_STARWARDEN_CAKES, 30);
   assert.deepEqual([qlSwitchOf('on'), qlSwitchOf('dev'), qlSwitchOf('off'), qlSwitchOf(undefined), qlSwitchOf('yes')], ['on', 'dev', 'off', 'off', 'off']);
-  const dev = { handle: 'Mac' }, env = (v) => ({ QUESTLINES_OPEN: v, DEVELOPER_HANDLES: 'Mac' });
+  const dev = { handle: 'Mac', staff_admin: 1 }, env = (v) => ({ QUESTLINES_OPEN: v });
   assert.deepEqual([questlinesOpenFor(dev, env('on')), questlinesOpenFor({ handle: 'Ann' }, env('on'))], [true, true]);
   assert.deepEqual([questlinesOpenFor(dev, env('dev')), questlinesOpenFor({ handle: 'Ann' }, env('dev'))], [true, false], 'dev: the developers alone');
   assert.deepEqual([questlinesOpenFor(dev, env('off')), questlinesOpenFor(dev, {})], [false, false], 'off, and off by default');
@@ -413,7 +413,7 @@ test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burnin
 });
 
 test('QL12 THE REFUSALS: a guest\'s opening is written and its end refused, paying nothing; a bad body - a phase missing among them - is 400; a step the service pays nothing is `unpaid` at its end, and opened (its line\'s window); the switch shut is 403 for everyone, at `dev` for all but the developers (mutants: the guest; the phase; the switch; qlStepClaimed)', async (t) => {
-  const { S, raw, open, ql } = await stood(t, { DEVELOPER_HANDLES: 'DevOne' });
+  const { S, raw, open, ql } = await stood(t, { SEAT_ADMINS: 'DevOne' });
   const g = await S.guest();
   assert.deepEqual(await ql(g, 'burningDoors', 3), { status: 200, body: { why: 'guest' } });
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM ql_steps').get().n, 0, 'a guest\'s end writes nothing');
@@ -428,13 +428,13 @@ test('QL12 THE REFUSALS: a guest\'s opening is written and its end refused, payi
   assert.deepEqual(await open(me, 'burningDoors', 0), { status: 200, body: { opened: true } }, 'SERVICE-2: the letter\'s opening is the line\'s - its first letter opens the witness\'s window');
   // the switch, read as FIRMAMENT_OPEN is
   const ctx = { db: S.env.DB };
-  const dev = { id: 'x', handle: 'DevOne' }, plain = { id: 'y', handle: 'Plain' };
+  const dev = { id: 'x', handle: 'DevOne', staff_admin: 1 }, plain = { id: 'y', handle: 'Plain' };
   for (const env of [{}, { QUESTLINES_OPEN: 'off' }]) assert.deepEqual(await claimQl({ ...ctx, env }, dev, { line: 'burningDoors', step: 3, phase: 'open' }, T0), { error: 'ql-closed' });
-  assert.deepEqual(await claimQl({ ...ctx, env: { QUESTLINES_OPEN: 'dev', DEVELOPER_HANDLES: 'DevOne' } }, plain, { line: 'burningDoors', step: 3, phase: 'open' }, T0), { error: 'ql-closed' });
+  assert.deepEqual(await claimQl({ ...ctx, env: { QUESTLINES_OPEN: 'dev' } }, plain, { line: 'burningDoors', step: 3, phase: 'open' }, T0), { error: 'ql-closed' });
 });
 
 test('QL12 THE SWITCH THROUGH THE WORKER: at `dev` the developers claim and nobody else; `off` is 403 for everyone (mutants: the switch; dev open to all)', async (t) => {
-  const D = await stood(t, { QUESTLINES_OPEN: 'dev', DEVELOPER_HANDLES: 'DevOne' });
+  const D = await stood(t, { QUESTLINES_OPEN: 'dev', SEAT_ADMINS: 'DevOne' });
   const devAcct = await D.S.registered('DevOne'), other = await D.S.registered('NotDev');
   assert.deepEqual(await D.open(other, 'burningDoors', 3), { status: 403, body: { error: 'ql-closed' } });
   assert.deepEqual(await D.open(devAcct, 'burningDoors', 3), { status: 200, body: { opened: true } });

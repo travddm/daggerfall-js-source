@@ -38,7 +38,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY,
   });
   const real = globalThis.fetch;

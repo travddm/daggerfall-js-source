@@ -36,7 +36,7 @@ const forged = () => ({ ...sword(), affixes: [{ id: 'damage', value: 40 }] });
 const classic = () => ({ ...sword(), enchantments: [{ type: T.PotentVs, param: 3 }, ...Array.from({ length: 9 }, () => ({ type: T.None, param: -1 }))] });
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const record = (who) => {
     const row = raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(who.character);
@@ -130,7 +130,7 @@ test('INT6 review: a rollback never past a move the service made since the clean
 });
 
 test('INT1 stock (its audit): a piece put in a guild\'s vault before the law read vaults is taken by nobody - it waits for staff; rollback with no clean save kept answers its word (409)', async () => {
-  const s = await standService({ MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ MARKS_OPEN: 'on', SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const gm = await s.registered('Aldric', { renown: 10 });
   gm.realm = await seatRealm(s.env, gm.secret, 'Aldric', { name: 'Aldric', level: 5, goldPieces: 20_000, items: [sword()], bankAccounts: [{ accountGold: 0 }] });

@@ -88,6 +88,9 @@ const intOrNull = (/** @type {any} */ v) => (Number.isSafeInteger(v) ? v : null)
  */
 export async function mintPass(key, who, secret, nowS, subtle) {
   const p = who.player;
+  // A staff role is the account's row, read fresh (titles.js), and a pass carries no role: a staff account is handed none, so
+  // every request of it takes the full lookup and a role taken off applies at once, not when the pass ends.
+  if (p.staff_admin === 1 || p.staff_mod === 1 || p.staff_owner === 1) return null;
   const claims = { p: p.id, s: who.session?.id ?? null, h: typeof p.handle === 'string' ? p.handle : null, r: intOrNull(p.registered_at),
     m: intOrNull(p.muted_until), x: nowS + PASS_TTL_S };
   const body = _b64url.encode(new TextEncoder().encode(JSON.stringify(claims)));

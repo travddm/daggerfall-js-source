@@ -2124,7 +2124,7 @@ export async function marketReport(ctx, player, env, { listing: id } = {}) {
 /** REMOVE: `{ listing }` - a developer's: the listing off every board, its goods returned on its seller's next read.
  *  PROF5b: an auction likewise - its standing bid voided (its escrow back on its bidder's read), its piece returned.
  *  STAFF-PANEL2-FIX (design doc "DFO Staff Panel: design", Weak spots: "/v1/mod/ acts are limited to in-game mute and
- *  ban, and Market Pull is Admin only"): a Moderator no longer pulls a listing - an Admin (DEVELOPER_HANDLES) does.
+ *  ban, and Market Pull is Admin only"): a Moderator no longer pulls a listing - an Admin does.
  *  STAFF-PANEL3-REALM (design doc "Remove items": "Remove from market: the listing ends and the item does not go back"):
  *  `keep` - the staff panel's removal: the same end, and the goods marked returned in the statement that ends it (`rn` the
  *  removal's nonce), so its seller's settle never hands them back; `also(nonce, table)` the panel's own statements for the

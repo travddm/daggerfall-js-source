@@ -46,7 +46,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
   });
   const raw = s.env.DB._raw;
   const staff = async (path, body = {}, token = null) => {

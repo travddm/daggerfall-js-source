@@ -154,7 +154,7 @@ function secondAt(from, want) {
 test('ANY-HOUR: the service answers a harvest at any hour of the shared clock - a boulder\'s stone at 02:00, 21:00 and noon, each its own; Hunting and the dungeon veins never kept hours (mutants: the night refused again)', async () => {
   const realNow = Date.now;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
     const mac = await s.seated('Mac');
     let n = 0;
     for (const [i, want] of [2, 21, 12].entries()) {

@@ -1,0 +1,7 @@
+{
+  // The .ts files that run under Node (tools and tests). They are checked apart from tsconfig.json because Node's types
+  // redeclare globals the browser code uses, such as `fetch`, and would change what that config reports.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": ["node"], "lib": ["ES2023"] },
+  "include": ["tools/**/*.ts", "test/**/*.ts"]
+}

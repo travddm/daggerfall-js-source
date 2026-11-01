@@ -21,7 +21,7 @@ test('CHAPTERS-ON: under production\'s own vars a non-developer\'s board carries
   Date.now = () => now * 1000;
   try {
     forgetChapters();
-    const s = await standService(Object.fromEntries(['CHAPTERS_OPEN', 'PROFESSIONS_OPEN', 'MARKS_OPEN', 'DEVELOPER_HANDLES'].map((k) => [k, v(k)])));
+    const s = await standService(Object.fromEntries(['CHAPTERS_OPEN', 'PROFESSIONS_OPEN', 'MARKS_OPEN'].map((k) => [k, v(k)])));
     const raw = s.env.DB._raw;
     const age = (w) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(now - 8 * DAY, w.id);
     for (const h of ['Alice', 'Bob', 'Cara']) {

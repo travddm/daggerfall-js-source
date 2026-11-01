@@ -8,7 +8,7 @@ recorded times and the game data that some tests need.
 The suite uses Node's built-in runner, `node:test`, with `node:assert/strict`. There is no Jest, Mocha or Vitest.
 Every file named `*.test.js` anywhere under `test/` is a test file. Each file runs in its own process.
 
-Node must be `^20.19.0 || >=22.12.0` (`package.json` `engines`). CI uses Node 22.
+Node must be `>=22.18.0` (`package.json` `engines`), the first 22 release that runs `.ts` files. CI uses Node 22.
 
 All lists of test files go through one function, `runTests` in `tools/testShards.mjs`. It does three things:
 

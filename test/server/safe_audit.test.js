@@ -22,7 +22,7 @@ import { ACCEPTED } from '../../src/net/legalLaw.js';
 const subtle = globalThis.crypto.subtle;
 const RELAY = 'https://relay.example' + SAFE_LAW_PATH;
 const nowS = () => Math.floor(Date.now() / 1000);
-const ON = Object.freeze({ MOD_AI: 'on', ANTHROPIC_API_KEY: 'sk-test', MODERATOR_HANDLES: 'Asynian', RELAY_LAW_URL: RELAY, DISCORD_MOD_CHANNEL: '123456789012345678', DISCORD_BOT_TOKEN: 'bot-token', DISCORD_PUBLIC_KEY: '' });
+const ON = Object.freeze({ MOD_AI: 'on', ANTHROPIC_API_KEY: 'sk-test', SEAT_MODERATORS: 'Asynian', RELAY_LAW_URL: RELAY, DISCORD_MOD_CHANNEL: '123456789012345678', DISCORD_BOT_TOKEN: 'bot-token', DISCORD_PUBLIC_KEY: '' });
 
 /**
  * The outside world, scripted: the Messages API answers `ai` in turn (a verdict object, 'down' a 529, 'config' a 401,
@@ -62,6 +62,8 @@ const ctxOf = (s, extra = {}) => ({ db: s.env.DB, nowS: nowS(), rand: (b) => { g
 const heard = async (s, who, text, { tab = 'world', at = Date.now() } = {}) => { const l = { tab, sub: who.id, name: who.handle ?? 'Guest', at, text }; return { ...l, sg: await mintStamp(l, s.gatePriv, { subtle }) }; };
 const season = (s, who) => s.env.DB._raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, who.id);
 const raw = (s) => s.env.DB._raw;
+/** The operator's link (docs/operations/staff-roles.md): a Discord user id bound to a registered account. */
+const linkDiscord = (s, discordId, handle) => raw(s).prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
 const regulars = async (s, n, tag = 'Regular') => { const out = []; for (let i = 0; i < n; i++) { const r = await s.registered(`${tag}${i}`); season(s, r); out.push(r); } return out; };
 /** The relay's door, as the service's own fetch sees it, recorded. */
 function relayDoor() {
@@ -261,8 +263,9 @@ test('AUDIT SAFE AI-11 + AI-12: a case that keeps growing still posts within REV
 /* ═══ DISCORD - the moderators' queue ═══ */
 
 test('AUDIT SAFE DISCORD-1: /mod names an account by its id FIRST - a decoy whose handle is the reported player\'s id takes nothing (mutant: the name first)', async () => {
-  const s = await standService({ ...ON, DISCORD_MODERATORS: '111111111111111111:Asynian' });
+  const s = await standService(ON);
   await s.registered('Asynian');
+  linkDiscord(s, '111111111111111111', 'Asynian');
   const troll = await s.registered('Troll');
   const decoy = await s.registered('Decoy');
   raw(s).prepare('UPDATE players SET handle = ?, handle_lc = ? WHERE id = ?').run(troll.id, troll.id.toLowerCase(), decoy.id);
@@ -294,9 +297,11 @@ test('AUDIT SAFE DISCORD-2: one card Discord will not take never holds the queue
 });
 
 test('AUDIT SAFE DISCORD-3 + DISCORD-4 + DOC-17: a press acts once - a second press inside the claim is shown the card; a press answers before the relay\'s door is waited on (the push handed to `later`); a resolved case\'s card pressed again acts nothing (mutants: no claim; the push awaited)', async () => {
-  const s = await standService({ ...ON, MOD_AI: 'off', MODERATOR_HANDLES: 'Asynian,Mira', DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Mira' });
+  const s = await standService({ ...ON, MOD_AI: 'off', SEAT_MODERATORS: 'Asynian,Mira' });
   await s.registered('Asynian');
   await s.registered('Mira');
+  linkDiscord(s, '111111111111111111', 'Asynian');
+  linkDiscord(s, '222222222222222222', 'Mira');
   const sylvia = await s.registered('Sylvia');
   const troll = await s.registered('Troll');
   const caseId = (await s.call('/v1/safety/report', { target: troll.id, reason: 'hate', lines: [await heard(s, troll, 'x')] }, sylvia.secret)).body.case;
@@ -317,8 +322,9 @@ test('AUDIT SAFE DISCORD-3 + DISCORD-4 + DOC-17: a press acts once - a second pr
 });
 
 test('AUDIT SAFE DISCORD-5: a button never shortens what stands - "Ban 30 days" on a ban for good, "Mute 30 min" on a week\'s mute - and the card says what stands now (mutants: the ban overwritten; the mute overwritten)', async () => {
-  const s = await standService({ ...ON, MOD_AI: 'off', DISCORD_MODERATORS: '111111111111111111:Asynian' });
+  const s = await standService({ ...ON, MOD_AI: 'off' });
   await s.registered('Asynian');
+  linkDiscord(s, '111111111111111111', 'Asynian');
   const sylvia = await s.registered('Sylvia');
   const forever = await s.registered('Forever');
   const week = await s.registered('Week');
@@ -368,8 +374,9 @@ test('AUDIT SAFE DISCORD-9 + DISCORD-13: names and the reviewer\'s reason outsid
   assert.equal(md('<@123> @everyone'), '\\<\\@123\\> \\@everyone');
   assert.deepEqual(MOD_COMMAND.contexts, [0]);
   assert.equal('dm_permission' in MOD_COMMAND, false);
-  const s = await standService({ ...ON, DISCORD_MODERATORS: '111111111111111111:Asynian' });
+  const s = await standService(ON);
   await s.registered('Asynian');
+  linkDiscord(s, '111111111111111111', 'Asynian');
   const troll = await s.registered('Troll');
   for (let i = 0; i < 30; i++) raw(s).prepare("INSERT INTO mod_actions (target, kind, until, reason, actor, actor_name, at) VALUES (?, 'mute', ?, ?, 'x', 'Asynian', ?)").run(troll.id, nowS() + 60, 'r'.repeat(150), nowS() - i);
   const r = await discordInteraction(ctxOf(s), s.env, command('lookup', { player: 'Troll' }), { fetchFn: outside().fetchFn });
@@ -378,8 +385,9 @@ test('AUDIT SAFE DISCORD-9 + DISCORD-13: names and the reviewer\'s reason outsid
 });
 
 test('AUDIT SAFE DISCORD-11: a moderator\'s /mod mute or ban closes the account\'s open case, its card redrawn; the clock\'s expiry of a posted case redraws its card too (mutants: the case left open; the expired card left with its buttons)', async () => {
-  const s = await standService({ ...ON, MOD_AI: 'off', DISCORD_MODERATORS: '111111111111111111:Asynian' });
+  const s = await standService({ ...ON, MOD_AI: 'off' });
   await s.registered('Asynian');
+  linkDiscord(s, '111111111111111111', 'Asynian');
   const sylvia = await s.registered('Sylvia');
   const troll = await s.registered('Troll');
   const caseId = (await s.call('/v1/safety/report', { target: troll.id, reason: 'spam', lines: [await heard(s, troll, 'x')] }, sylvia.secret)).body.case;

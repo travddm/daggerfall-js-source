@@ -48,7 +48,7 @@ test('GRANT2 THE WINDOW\'S LAW: an ask folded per account and kind - its asks, m
 });
 
 test('GRANT2 THE DOOR: a window under the relay\'s key is kept, once; another key\'s is 401, a stale one 400, a misshapen one 400; a developer reads the measure - per kind, the windows, asks, members, refusals and an account\'s asks an hour - and the cells\' most live beside the ceiling; anyone else is refused (mutants: the signature unchecked; a batch kept twice)', async () => {
-  const s = await standService({ DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Mac' });
   assert.ok(ROUTES.has(GRANT_FEED_PATH) && ROUTES.has('/v1/mod/realm-grants'));
   const now = Date.now();
   const b = window(now);

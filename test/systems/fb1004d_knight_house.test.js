@@ -302,8 +302,8 @@ test('KNIGHT-HOUSE the hosts, by source: the door never prices the knight\'s own
 test('KNIGHT-HOUSE the deploy: the schema holds `homes.deed` (0 for a home not yet a deed); the route is the account\'s, behind the session wall; the service\'s version moved on with it, in the Worker and its config (mutants: the column unadded; the version unmoved)', () => {
   const deed = d1()._raw.prepare('PRAGMA table_info(homes)').all().find((c) => c.name === 'deed');
   assert.deepEqual(deed && { type: deed.type, notnull: deed.notnull, dflt: deed.dflt_value }, { type: 'INTEGER', notnull: 1, dflt: '0' });
-  assert.match(src('server-account/src/service.js'), /export const ACCOUNT_VERSION = 'acct207';/);
-  assert.match(src('server-account/wrangler.toml'), /^ACCOUNT_VERSION = "acct207"$/m);
+  assert.match(src('server-account/src/service.js'), /export const ACCOUNT_VERSION = 'acct208';/);
+  assert.match(src('server-account/wrangler.toml'), /^ACCOUNT_VERSION = "acct208"$/m);
   const idx = src('server-account/src/index.js');
   assert.ok(idx.indexOf("if (path === '/v1/homes/deed') {") > idx.indexOf("if (accountKind(who.player) !== 'linked') return no('homes-need-account', 403, origin);"), 'behind the account wall');
 });

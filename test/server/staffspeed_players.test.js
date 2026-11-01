@@ -22,7 +22,7 @@ const b64url = (bytes) => Buffer.from(bytes).toString('base64url');
 async function stand() {
   const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = b64url(new Uint8Array(await subtle.exportKey('raw', pair.publicKey)));
-  const s = await standService({ DEVELOPER_HANDLES: 'SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
+  const s = await standService({ SEAT_ADMINS: 'SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
   await s.registered('SirMcMobdon');
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

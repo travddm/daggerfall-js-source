@@ -158,7 +158,7 @@ async function steered(b, fn) {
 test('DEX-HIDES: the account service skins the mod\'s animals - a Wolf\'s Wolf Pelt with its Big Tooth and Raw Meat, a Bat\'s Bat Leather, a Land Dreugh\'s Dreugh Shell counted among the day\'s rare hides - and refuses a Hell Hound\'s body as it refuses any no knife skins', async () => {
   const now = utcDay(T0) * DAY + 12 * 3600;
   Date.now = () => now * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
   raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'hunting', ?, NULL, NULL, ?)`).run(mac.id, mac.character, xpForRank(55), now);

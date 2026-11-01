@@ -238,7 +238,7 @@ test('RENOWN1 the worker: /v1/renown/xp behind a session, the account the sessio
   const acct = (await call('GET', '/v1/account', undefined, me.secret)).body.account;
   assert.deepEqual(acct.renown.map((x) => [x.character, x.name, x.xp, x.level]), [[A, 'Mara', 5001, 9]]);
   assert.equal(RENOWN_CARD_TRACKS, 5);
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
   assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/renown\.js"/, 'the Worker bundles the curve, so a change to it deploys');
 });
 
