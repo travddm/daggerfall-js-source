@@ -7,7 +7,7 @@
 //     and a foe's spell on me (BAL9a).
 //   - THE SCHOOL PAST 100 BOUGHT ONLY ITS PRICE. Online SPELL-COST-PAST prices those points at 100 / skill while the same
 //     mastery raises the foes (a Destruction at 200: x0.58 the price, a Crypt's foes x1.30 health). Each effective point
-//     past 100 is 1% more damage now, to x1.4 - CLIMB-PAST's law (BAL9b).
+//     past 100 is a quarter of a per cent more damage now (B1; it was 1%), to x1.10 - CLIMB-PAST's law (BAL9b).
 //   - THE LADDER PAID A CASTER ONLY IN PRICE AND TEMPO. The potency and wellspring lines, and the arcane three, capped as
 //     every line is (BAL9c).
 // Pinned by execution through the real cast engine's doors (scenes/hostMagic.js), the real applySpell (systems/
@@ -123,15 +123,15 @@ test('BAL9a A SPELL ANSWERS ITS FOE: my spell that reaches a foe, and a foe\'s t
   assert.equal(p._skillChallenge?.tier, 135, 'the Lich that burned me is the fight\'s');
 });
 
-test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 1% a point of Destruction\'s climb past 100 to x1.4, instant and per round; offline, at a player, a peer\'s or a foe\'s cast, a resisted spell, a worn line, while mentoring - nothing more (mutants: offline too; 2% a point; at a player; a peer\'s; the seam skipped; a resisted spell made one; the worn line strikes; while mentoring)', () => {
+test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 0.25% a point of Destruction\'s climb past 100 to x1.10, instant and per round; offline, at a player, a peer\'s or a foe\'s cast, a resisted spell, a worn line, while mentoring - nothing more (mutants: offline too; 1% a point; at a player; a peer\'s; the seam skipped; a resisted spell made one; the worn line strikes; while mentoring)', () => {
   off();
   const at = (raw, online, sp = BOLT(50), target = foe()) => page(online, () => lands(sp, mage(raw), target));
   // DFU's own to 100, and offline where Daggerfall's price term already pays the points past it
   assert.deepEqual([100, 150, 200].map((r) => at(r, false)), [50, 50, 50]);
   assert.deepEqual([100, 150, 200].map((r) => page(true, () => skillValue(mage(r), D))), [100, 117, 140]);
-  assert.deepEqual([100, 150, 200].map((r) => at(r, true)), [50, 59, 70], 'x1, x1.17, x1.4');
-  assert.deepEqual([100, 150, 200].map((r) => page(true, () => SP.schoolPotency(mage(r)))), [1, 1.17, 1.4]);
-  assert.equal(at(200, true, BURN(50)), 70, 'a damage over time\'s first round too (the round\'s own door)');
+  assert.deepEqual([100, 150, 200].map((r) => at(r, true)), [50, 52, 55], 'x1, x1.0425, x1.10');
+  assert.deepEqual([100, 150, 200].map((r) => page(true, () => SP.schoolPotency(mage(r)))), [1, 1.0425, 1.1]);
+  assert.equal(at(200, true, BURN(50)), 55, 'a damage over time\'s first round too (the round\'s own door)');
   // never at a player (a refereed fight's stand-in is one), never a peer's stand-in, never a foe's spell
   assert.equal(at(200, true, BOLT(50), foe({ isPlayer: true, peer: true })), 50, 'a duel\'s stand-in');
   assert.equal(page(true, () => lands(BOLT(50), { ...mage(200), peer: true })), 50, 'a peer\'s');
@@ -148,7 +148,7 @@ test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 1% a point of Destructio
   const capped = mage(200);
   wear(capped, legendary('eye-of-magnus'));
   assert.equal(page(true, () => skillValue(capped, D)), 165);
-  assert.equal(page(true, () => lands(BOLT(100), capped)), 140, 'x1.4, whatever is worn');
+  assert.equal(page(true, () => lands(BOLT(100), capped)), 110, 'x1.10, whatever is worn');
   off();
   // MENTOR2: mentoring reads the MENTORED climb (spell/spellPower.js fightingClimb) - none beside a level 5, where the edge reads none
   const m200 = mage(200);
@@ -204,15 +204,15 @@ test('BAL9c POTENCY: what I wear, summed under 30, the loot\'s all under 50, thr
   wear(me, ring([{ id: 'potency', value: 15 }], 136));
   assert.equal(LP.POTENCY_CAP, 30);
   assert.equal(LP.lootSpellPower(me, foe()), 30, 'the lines, never past their cap');
-  assert.equal(lands(BOLT(100), me), 130);
+  assert.equal(lands(BOLT(100), me), 125, 'the lines sum to 30, and the spell power is held at SPELL_POWER_MOST x1.25 (B1)');
   // Shalidor's Brand wielded: +25 while my magicka stands above three quarters - and the loot's whole is at most 50
   wear(me, legendary('shalidors-brand'));
   me.magicka = 160;
   assert.equal(LP.SPELL_POWER_MOST, 50);
   assert.equal(LP.lootSpellPower(me, foe()), 50);
-  assert.equal(lands(BOLT(100), me), 150);
+  assert.equal(lands(BOLT(100), me), 125, 'the loot power of 50 is held at x1.25 (B1)');
   me.magicka = 150;   // three quarters exactly: not above
-  assert.equal(lands(BOLT(100), me), 130);
+  assert.equal(lands(BOLT(100), me), 125, '30 of loot, held at x1.25 (B1)');
   // never at a player, never a peer's, nothing with the switch off
   assert.equal(lands(BOLT(100), me, foe({ isPlayer: true, peer: true })), 100);
   assert.equal(LP.lootSpellPower({ ...me, peer: true }, foe()), 0);

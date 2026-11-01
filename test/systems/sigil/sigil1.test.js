@@ -86,7 +86,7 @@ test('SIGIL1 the law: a sigil\'s power is a per cent of damage at its full rank,
   }
 });
 
-test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its per cent of the whole blow at a foe, the fraction carried on the weapon (Faint 2.4% on blows of 10 lands a point on the 5th and the 9th); offline, or online before my Renown is known, nothing; never a duel\'s blow, a peer\'s, a foe\'s, a blow at a player, a hand without a sigil; FormulaHelper\'s weapon damage reads it at its tail (mutants: the online gate, the Renown cap, the carry, the duel\'s stub or a player target taken, the registration or the tail dropped)', () => {
+test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its per cent of the whole blow at a foe, the fraction carried on the weapon (Faint 2.4%, cut to the sigil top of 2%, on blows of 10 lands a point on the 5th and the 10th); offline, or online before my Renown is known, nothing; never a duel\'s blow, a peer\'s, a foe\'s, a blow at a player, a hand without a sigil; FormulaHelper\'s weapon damage reads it at its tail (mutants: the online gate, the Renown cap, the carry, the duel\'s stub or a player target taken, the registration or the tail dropped)', () => {
   _resetSigilForTests();
   const me = { isPlayer: true };
   const rat = { careerIndex: 0 };
@@ -99,12 +99,12 @@ test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its
   assert.equal(sigilBlow(held(37500), 100, me, rat), 100, 'online, before my Renown is known: dormant');
   setSigilRenown(1);
   const faint = held(0);
-  assert.deepEqual(Array.from({ length: 10 }, () => (sigilBlow(faint, 10, me, rat, { estimate: true }), sigilBlow(faint, 10, me, rat))), [10, 10, 10, 10, 11, 10, 10, 10, 11, 10], 'Faint 2.4% of 10, carried - the Stats page\'s reading between blows carrying nothing (PIN ADDED, AUDIT MARTIAL L2 F7)');
+  assert.deepEqual(Array.from({ length: 10 }, () => (sigilBlow(faint, 10, me, rat, { estimate: true }), sigilBlow(faint, 10, me, rat))), [10, 10, 10, 10, 11, 10, 10, 10, 10, 11], 'Faint 2.4% of 10 asked, cut to the sigil blow top of 2% (B1): 0.2 a blow, carried - the Stats page\'s reading between blows carrying nothing (PIN ADDED, AUDIT MARTIAL L2 F7)');
   assert.equal(sigilBlow(held(0), 10, me, rat), 10, 'a second weapon carries its own');
   setSigilRenown(40);
-  assert.equal(sigilBlow(held(37500), 100, me, rat), 112, 'Ascendant in a Renown 40 hand: the whole power');
+  assert.equal(sigilBlow(held(37500), 100, me, rat), 102, 'Ascendant in a Renown 40 hand: the whole power (12) asked, cut to the sigil blow top of 2% (B1)');
   setSigilRenown(12);
-  assert.equal(sigilBlow(held(37500), 100, me, rat), 104, 'held at Kindled by Renown 12: 4.8 of 100');
+  assert.equal(sigilBlow(held(37500), 100, me, rat), 102, 'held at Kindled by Renown 12: 4.8 of 100 asked, cut to the sigil blow top of 2% (B1)');
   setSigilRenown(40);
   assert.equal(sigilBlow(held(37500), 100, { isPlayer: true, peer: true }, rat), 100, 'a peer\'s blow resolved here - the duel\'s stub');
   assert.equal(sigilBlow(held(37500), 100, me, { isPlayer: true }), 100, 'a blow at a player');
@@ -114,14 +114,14 @@ test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its
   assert.equal(sigilBlow(null, 100, me, rat), 100, 'the bare hand');
   assert.equal(sigilBlow(held(37500), 100, me, null), 100);
   assert.equal(sigilBlow(held(37500), 0, me, rat), 0, 'a miss stays a miss');
-  assert.equal(weaponBlowMods(held(37500), 100, me, rat), 112, 'registered with the entity\'s blow modifiers');
+  assert.equal(weaponBlowMods(held(37500), 100, me, rat), 102, 'registered with the entity\'s blow modifiers');
   // FormulaHelper's weapon damage, whole: a player's longsword at a rat
   const player = { isPlayer: true, level: 1, stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, activeEffects: [], items: [] };
   const w = createWeapon(120, 0, () => 0.5);
   const base = weaponAttackDamage(player, rat, 42, w, () => 0.5);   // a swing's modifier big enough that a tenth is whole
   assert.equal(base, 50, 'the longsword\'s 8 and the swing\'s 42');
   w.sigil = { power: 10, party: 1, xp: 37500 };
-  assert.equal(weaponAttackDamage(player, rat, 42, w, () => 0.5), 55, 'the sigil over the whole blow');
+  assert.equal(weaponAttackDamage(player, rat, 42, w, () => 0.5), 51, 'the sigil over the whole blow: 10 asked, cut to the sigil blow top of 2% (B1)');
   setSigilOnline(false);
   assert.equal(sigilRenown(), null, 'going offline forgets the Renown');
   assert.equal(weaponAttackDamage(player, rat, 42, w, () => 0.5), 50, 'offline: the blow as Daggerfall rolls it');

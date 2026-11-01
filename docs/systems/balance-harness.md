@@ -56,6 +56,7 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | `techniques` | The best weapon technique the gear tier can roll. |
 | `swing` | The port's own swing and cast speed curve. |
 | `virtue` | Oblivion-style levelling, 12 attribute points a level (off by default). |
+| `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-meaner,-scaling`). |
 
 The default is the game as an online room runs it.
 
@@ -88,6 +89,21 @@ level 1. Two numbers are compared with it:
   than DFU's by more than the character is stronger.
 
 `Character / target` is how far each level is from the target: 1.00 is on target.
+
+## The player-power budget (B1)
+
+The default run measures typical gear, which never reaches the stacking caps. `+ceiling` measures the same character with every
+source at its cap. Before B1 that character was x20 to x54 a DFU character at level 45 (ARENA2 attributes, DFU's own foe
+row). The caps are now:
+
+- a blow at most x1.75 (`BLOW_TOPS` in `powerCeiling.js`; was x119.95);
+- a hurt keeps at least 74% (`GUARD_TOPS`; was 10.71%);
+- a spell at most x1.25 (`SPELL_POWER_MOST`);
+- a mastered skill reads at most 110 to hit and to crit (`AIM_PAST_MAX`);
+- a point of a school or weapon past 100 pays 0.25% (was 1%); gear on a weapon skill pays 0.1% a point up to 5% (was 0.44% up to 320%);
+- a technique aims +5 to +10 and tops at x1.95 of a blow.
+
+`test/tooling/playerPowerBudget.test.js` holds the character-power bounds.
 
 ## Not modelled
 

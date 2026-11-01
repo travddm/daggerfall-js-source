@@ -111,7 +111,7 @@ test('BAL-ARCHERY: a shaft is 35% faster; a spell stays on MISSILE_SPEED; the bo
   assert.equal(CLASSIC_UPDATE_INTERVAL, 0.0625);
 });
 
-test('BAL-ARCHERY: mastery is +1% of the blow per effective point past 100, and never against a player', () => {
+test('BAL-ARCHERY: mastery is +0.25% of the blow per effective point past 100 (B1; was 1%), and never against a player', () => {
   const loc = globalThis.location;
   globalThis.location = { search: '?online' };
   try {
@@ -119,9 +119,9 @@ test('BAL-ARCHERY: mastery is +1% of the blow per effective point past 100, and 
     const bowW = bow();
     assert.equal(weaponPastPct(bowW, player(100), foe), 0);
     assert.equal(weaponPastPct(blade(), player(100), foe), 0);
-    assert.equal(weaponPastPct(bowW, player(200), foe), 40);
-    assert.equal(weaponPastPct(blade(), player(200), foe), 40);
-    assert.equal(weaponMasteryBlow(bowW, 100, player(200), foe), 140);
+    assert.equal(weaponPastPct(bowW, player(200), foe), 10);
+    assert.equal(weaponPastPct(blade(), player(200), foe), 10);
+    assert.equal(weaponMasteryBlow(bowW, 100, player(200), foe), 110);
     assert.equal(weaponMasteryBlow(bowW, 100, player(200), { isPlayer: true }), 100, 'a player target takes the blow as struck');
     assert.equal(weaponMasteryBlow(bowW, 100, player(200), { ...foe, warded: true }), 100);
   } finally {
@@ -196,7 +196,7 @@ test('BAL-ARCHERY: sustained damage of a Daedric Long Bow and a Daedric Longswor
     _resetWeaponMasteryForTests();
     const hard = mean(player(200), foe, b, SWING_MODS.StrikeDown.damage);
     const sword = mean(player(200), foe, s, clickSwing);
-    assert.ok(Math.abs(hard / bowHit - 1.4) < 0.02, `mastery ${hard}`);
+    assert.ok(Math.abs(hard / bowHit - 1.1) < 0.02, `mastery ${hard}`);
     assert.ok(Math.abs((hard / bowGap) / (sword / bladeGap) - bowDps / bladeDps) < 0.02, 'skill 200 scales both, so the ratio holds');
   } finally {
     globalThis.location = loc;

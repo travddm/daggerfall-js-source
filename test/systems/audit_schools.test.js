@@ -204,7 +204,7 @@ test('AUDIT SCHOOLS L1 M3: FORESIGHT IS ASKED BEFORE ANY MODIFIER - a foreseen b
   } finally { registerPlayerDamageMod('auditSchoolsProbe', null); }
 }));
 
-test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 7-point blows a fifth lighter take 6, 6 and 5 (17 of 21, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
+test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 35-point blows 4% lighter (the Warden guard of 20% cut to the arcane top, B1) take 34, 34 and 33 (101 of 105, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
   let now = 10;
   POW._setArcanePowersClockForTests(() => now);
   const wa = pathMage('warden', 100);
@@ -216,8 +216,8 @@ test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CAR
   wa.health = 1000;
   const orc = realFoe(MT.knight);
   const took = [];
-  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 7); hurtPlayer(wa, 7); took.push(b - wa.health); }
-  assert.deepEqual(took, [6, 6, 5], '1.4 owed: 1 off; 1.8: 1 off; 2.2: 2 off - 4 of the 4.2 owed');   // 7 x 20% = 1.4 a blow
+  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 35); hurtPlayer(wa, 35); took.push(b - wa.health); }
+  assert.deepEqual(took, [34, 34, 33], '1.4 owed: 1 off; 2.8: 1 off; 4.2: 2 off - 4 of the 4.2 owed');   // 35 x 4% = 1.4 a blow (the 20% guard is cut to GUARD_TOPS.arcane, 4)
   assert.ok(Number.isInteger(wa.health), 'whole');
   now = 10 + 29.9;
   let b = wa.health; setStruck(orc, wa, 100); hurtPlayer(wa, 100);
@@ -486,10 +486,10 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.deepEqual(t200.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [50], 'the item\'s own 50');
   const own = mage([THA], 200);
   page(true, () => applySpell(SELF(eff(21, 255, { durationBase: 5, chanceBase: 50 })), 20, own, {}, () => 0.5, { entity: own }));
-  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [70], 'my own cast: x1.4');
+  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [55], 'my own cast: x1.10');
   const heal = SELF(eff(10, 8, { magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }, { reflectedCount: 1 }).healed), 50, 'turned back at me');
-  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 70, 'my own');
+  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 55, 'my own');
   // Troll's Blood held: a Regenerate's rounds read no school
   const worn = mage([RES], 200);
   let got = 0;
@@ -503,14 +503,14 @@ test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damag
   const sinks = { heal: (n) => { r200.health += n; }, hurt() {}, say() {} };
   page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 10, magnitudeBaseHigh: 10 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
   const round = (k) => { const b = r200.health; page(true, () => runMagicRoundsFor(r200, k, k + 1, { sinks, rolls: () => 0.5 })); return r200.health - b; };
-  assert.equal(round(0), 14, 'x1.4');
+  assert.equal(round(0), 11, 'x1.10');
   assert.equal(refreshMentor(r200, [5, 5]), 'on', 'a party of level 5s: mentoring');
   assert.equal(round(1), 10, 'mentoring');
   assert.equal(refreshMentor(r200, []), 'off');
   setSigilDueling(true);
   assert.equal(round(2), 10, 'a refereed fight');
   setSigilDueling(false);
-  assert.equal(round(3), 14, 'back');
+  assert.equal(round(3), 11, 'back');
 }));
 
 test('AUDIT SCHOOLS L2 F5: MENTORING LEAVES A SIGNATURE SPELL IN ITS PATH\'S SCHOOLS - priced, trained and sold by the pair (pathHeld), the powers awake at the mentor\'s share (pathAwake - MENTOR2: they had slept); a Necromancer\'s Siphon Life never turns into the Destruction they never chose (mutants: the cast school through pathAwake; the shelf through pathAwake)', () => clean(() => {
@@ -549,7 +549,7 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
       assert.ok(a, `${kind} landed (${p.activeEffects.map((x) => x.kind)})`);
       return a.roundsRemaining + 1;
     };
-    assert.deepEqual([rounds(100), rounds(200)], [10, 14], `${kind}: 10 rounds, x1.4`);
+    assert.deepEqual([rounds(100), rounds(200)], [10, 11], `${kind}: 10 rounds, x1.10`);
   }
   const m200 = mage([MYS, THA], 200);   // Comprehend Languages is Mysticism's (spellcost.js '44,255')
   page(true, () => applySpell(SELF(eff(44, 255, { durationBase: 5, chanceBase: 50 })), 20, m200, {}, () => 0.5, { entity: m200 }));

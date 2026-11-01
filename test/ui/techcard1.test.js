@@ -24,7 +24,7 @@ import { actionKeyWord } from '../../src/ui/quickslotTags.js';
 const lcg = (seed) => { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; };
 const on = () => { _resetForTests(); setPref('lootRarity', true); LR._setTechniqueForTests(null); _resetSigilForTests(); };
 /** A piece of `template` at `tier` with a chosen technique line at `value`, known. */
-const withTech = (template, id, value = 23, tier = 'rare') => {
+const withTech = (template, id, value = 15, tier = 'rare') => {
   const it = LR.applyRarity(createWeapon(template, 1), tier, lcg(7));
   LR.addTechniqueLine(it, () => 0.5, { id });
   LR.techniqueLineOf(it).value = value;
@@ -39,7 +39,7 @@ const text = (n) => String(n.textContent ?? '') + (n.children ?? []).map(text).j
 test('TECH-CARD the parts: what a press does, its multiplier, its price and whether it aims - and the classic line is the same parts in one line; the key\'s action lives in the leaf (mutants: every technique aims; the line off its parts)', () => {
   const AIMS = ['volley', 'pierce', 'leap', 'shadowstep', 'lunge', 'kick'];
   for (const id of RO.TECHNIQUE_IDS) {
-    for (const value of [0, 23, 50]) {
+    for (const value of [0, 15, 30]) {
       const t = RO.TECHNIQUES[id];
       const p = RO.techniqueParts(id, value);
       assert.equal(p.mult, RO.techniqueMult(t.base, value), id);
@@ -47,8 +47,8 @@ test('TECH-CARD the parts: what a press does, its multiplier, its price and whet
       assert.equal(RO.techniqueBrief(id, value), `${p.what}. ${p.fatigue} fatigue, ${p.cooldown}s`, id);
     }
   }
-  assert.deepEqual(RO.techniqueParts('leap', 23), { what: 'Aim: leap 9 m, strike all in 2.5 m, 172%', mult: 1.4 * 1.23, fatigue: 5, cooldown: 12, aims: true });
-  assert.equal(RO.techniqueParts('whirlwind', 23).aims, false, 'a technique that does not aim goes on the press');
+  assert.deepEqual(RO.techniqueParts('leap', 15), { what: 'Aim: leap 9 m, strike all in 2.5 m, 150%', mult: 1.3 * 1.15, fatigue: 5, cooldown: 12, aims: true });
+  assert.equal(RO.techniqueParts('whirlwind', 15).aims, false, 'a technique that does not aim goes on the press');
   assert.equal(RO.techniqueParts('nonesuch', 10), null);
   assert.equal(RO.techniqueBrief('nonesuch', 10), '');
   assert.equal(RO.TECHNIQUE_ACTION, 'WeaponTechnique');
@@ -57,10 +57,10 @@ test('TECH-CARD the parts: what a press does, its multiplier, its price and whet
 
 test('TECH-CARD the view: the line techniqueLineOf answers with its roll, its band (a gem\'s line after it or none) and its parts - none where the tier list says nothing of it: the ladder off, a Common, a piece not yet known, or no line (mutants: the unknown piece told; the ladder off told; a Common told; the band off another line; the band off the last line)', () => {
   on();
-  const sword = withTech(120, 'leap', 23);
+  const sword = withTech(120, 'leap', 15);
   const v = LR.techniqueCardView(sword);
-  assert.deepEqual(v, { id: 'leap', name: 'Leap Strike', value: 23, band: [15, 30], base: 1.4, what: 'Aim: leap 9 m, strike all in 2.5 m, 172%', mult: 1.4 * 1.23, fatigue: 5, cooldown: 12, aims: true });
-  assert.deepEqual(LR.techniqueCardView(withTech(120, 'leap', 41, 'legendary')).band, [30, 50], 'a Legendary\'s line reads its band');
+  assert.deepEqual(v, { id: 'leap', name: 'Leap Strike', value: 15, band: [10, 20], base: 1.3, what: 'Aim: leap 9 m, strike all in 2.5 m, 150%', mult: 1.3 * 1.15, fatigue: 5, cooldown: 12, aims: true });
+  assert.deepEqual(LR.techniqueCardView(withTech(120, 'leap', 25, 'legendary')).band, [20, 30], 'a Legendary\'s line reads its band');
   // FINAL AUDIT: a set gem's line stands after the technique's (LOOT20) - the band is the technique line's own, not the last line's
   const gemmed = LR.applyRarity(createWeapon(120, 1), 'rare', lcg(7));
   gemmed.sockets = ['empty'];
@@ -68,7 +68,7 @@ test('TECH-CARD the view: the line techniqueLineOf answers with its roll, its ba
   LR.addTechniqueLine(gemmed, () => 0.5, { id: 'leap' });
   gemmed.isIdentified = true;
   assert.ok(LR.isTechniqueAffix(gemmed.affixes.at(-2)) && gemmed.affixes.at(-1).gem != null, 'the gem\'s line last');
-  assert.deepEqual(LR.techniqueCardView(gemmed).band, [15, 30]);
+  assert.deepEqual(LR.techniqueCardView(gemmed).band, [10, 20]);
   sword.isIdentified = false;
   assert.equal(LR.techniqueCardView(sword), null, 'a piece not yet identified hides it, as its "Unidentified" hides every line');
   sword.isIdentified = true;
@@ -82,11 +82,11 @@ test('TECH-CARD the view: the line techniqueLineOf answers with its roll, its ba
 
 test('TECH-CARD the tier list: `technique: false` leaves out exactly the line the block draws and what a press does - every other line where it was; the default keeps them, for the classic tooltip, the Reforge and the trade strip (mutants: every affix dropped; a held line dropped)', () => {
   on();
-  const bow = withTech(130, 'volley', 22);
+  const bow = withTech(130, 'volley', 16);
   const all = LR.rarityLines(bow);
-  const at = all.indexOf('Volley +22% [15-30]');
+  const at = all.indexOf('Volley +16% [10-20]');
   assert.ok(at > 0, all.join(' | '));
-  assert.equal(all[at + 1], 'Aim: 6 arrows rain down within 3.5 m, 61% each. 6 fatigue, 16s');
+  assert.equal(all[at + 1], 'Aim: 6 arrows rain down within 3.5 m, 58% each. 6 fatigue, 16s');
   assert.deepEqual(LR.rarityLines(bow, { technique: false }), [...all.slice(0, at), ...all.slice(at + 2)]);
   const plain = LR.applyRarity(createWeapon(130, 1), 'rare', lcg(7));
   plain.isIdentified = true;
@@ -106,7 +106,7 @@ test('TECH-CARD the block: the card\'s dress one row at the head - the glyph, th
   assert.equal(TECH_UNBOUND, 'no key bound');
   assert.equal(TECH_DUEL_NOTE, "Doesn't work in a duel or against players.");
   withDom(() => {
-    const sword = withTech(120, 'leap', 23);
+    const sword = withTech(120, 'leap', 15);
     const box = techniqueCard(sword, { keyWord: 'MOUSE3' });
     assert.equal(box.tagName, 'SECTION');
     assert.equal(box.className, 'techbox compact');
@@ -115,9 +115,9 @@ test('TECH-CARD the block: the card\'s dress one row at the head - the glyph, th
     assert.deepEqual(one(box, 'tech-head').children.map((c) => c.className), ['tech-glyph', 'tech-name', 'tech-roll'], 'FINAL AUDIT: one row - the glyph says what it is, as the chip does');
     assert.equal(one(box, 'tech-word'), null, 'the word is the Info box\'s');
     assert.equal(one(box, 'tech-name').textContent, 'Leap Strike');
-    assert.equal(text(one(box, 'tech-roll')), '+23% [15-30]');
-    assert.equal(one(box, 'tech-roll').title, 'Rolled in 15-30');
-    assert.equal(one(box, 'tech-effect').textContent, 'Aim: leap 9 m, strike all in 2.5 m, 172%', 'whole, never cut by the price');
+    assert.equal(text(one(box, 'tech-roll')), '+15% [10-20]');
+    assert.equal(one(box, 'tech-roll').title, 'Rolled in 10-20');
+    assert.equal(one(box, 'tech-effect').textContent, 'Aim: leap 9 m, strike all in 2.5 m, 150%', 'whole, never cut by the price');
     assert.deepEqual(one(box, 'tech-foot').children.map((c) => [c.className, text(c)]), [
       ['tech-key', 'MOUSE3'], ['tech-how', 'hold to aim'], ['tech-price', '5 fatigue12s'],
     ]);
@@ -130,13 +130,13 @@ test('TECH-CARD the block: the card\'s dress one row at the head - the glyph, th
     assert.equal(full.className, 'techbox');
     assert.deepEqual(one(full, 'tech-head').children.map((c) => c.className), ['tech-glyph', 'tech-word', 'tech-roll', 'tech-name'], 'the word and the roll on one row, the name the whole width under them (the sheet\'s grid areas)');
     assert.equal(one(full, 'tech-word').textContent, 'Technique');
-    assert.equal(one(full, 'tech-power').textContent, '+23% rolled (15-30) on its 140% base hit: 172% of a normal hit.');
+    assert.equal(one(full, 'tech-power').textContent, '+15% rolled (10-20) on its 130% base hit: 150% of a normal hit.');
     assert.equal(one(full, 'tech-press').textContent, "Hold MOUSE3 to aim and release to strike. Tap it to strike where you're looking.");
     // a technique that does not aim goes on the press
     const spin = techniqueCard(withTech(120, 'whirlwind', 15), { full: true, keyWord: 'G' });
     assert.equal(one(spin, 'tech-how').textContent, 'press');
     assert.equal(one(spin, 'tech-press').textContent, 'Press G to strike.');
-    assert.equal(one(spin, 'tech-power').textContent, '+15% rolled (15-30) on its 100% base hit: 115% of a normal hit.');
+    assert.equal(one(spin, 'tech-power').textContent, '+15% rolled (10-20) on its 100% base hit: 115% of a normal hit.');
     // nothing bound: the foot says so, and the Info box says where to bind it
     const loose = techniqueCard(sword, { full: true });
     assert.equal(one(loose, 'tech-key').className, 'tech-key unbound');
@@ -155,7 +155,7 @@ test('TECH-CARD the block: the card\'s dress one row at the head - the glyph, th
     sword.isIdentified = false;
     assert.equal(techniqueCard(sword), null);
   });
-  assert.equal(techniqueCard(withTech(120, 'leap', 23)), null, 'no document, no block');
+  assert.equal(techniqueCard(withTech(120, 'leap', 15)), null, 'no document, no block');
   _resetForTests(); _resetSigilForTests();
 });
 
@@ -188,9 +188,9 @@ test('TECH-CARD the glyph: its own pixels on the 16px grid - not the sigil\'s ru
   globalThis.document = { createElement: (t) => mkEl(t) };
   try {
     on();
-    const box = techniqueCard(withTech(120, 'leap', 23), { keyWord: 'MOUSE3' });
+    const box = techniqueCard(withTech(120, 'leap', 15), { keyWord: 'MOUSE3' });
     assert.equal(find(box, 'tech-glyph').innerHTML, TECHNIQUE_GLYPH_SVG, 'the block wears the glyph');
-    assert.equal(find(techniqueCard(withTech(120, 'leap', 23), { full: true }), 'tech-glyph').innerHTML, TECHNIQUE_GLYPH_SVG, 'both dresses');
+    assert.equal(find(techniqueCard(withTech(120, 'leap', 15), { full: true }), 'tech-glyph').innerHTML, TECHNIQUE_GLYPH_SVG, 'both dresses');
   } finally { globalThis.document = prev; _resetForTests(); }
 });
 
@@ -201,7 +201,7 @@ test('TECH-CARD the pack, executed: a technique piece\'s hover card and its deta
   try {
     withDom((dom) => {
       const host = dom.mk('div'); dom.body.append(host);
-      const sword = withTech(120, 'leap', 23);
+      const sword = withTech(120, 'leap', 15);
       sword.sigil = { power: 6, party: 3, xp: 7420 };   // a sigil weapon: the order against the sigil's block is a real one
       const e = { name: 'Aelwyn', stats: { strength: 50, endurance: 48 }, items: [sword], goldPieces: 10 };
       const view = mountEnhancedInventory(host, { entity: e, items: () => e.items, onExit: () => {}, dropItem: () => {} });
@@ -216,7 +216,7 @@ test('TECH-CARD the pack, executed: a technique piece\'s hover card and its deta
           assert.ok(tb > 0 && order[tb - 1] === 'rarity', `${what}: the block right under the tier list - ${order.join(' | ')}`);
           assert.ok(order.indexOf('sigilbox compact') > tb, `${what}: before the sigil's block - ${order.join(' | ')}`);
           const lines = kids(parent, 'rarity')[0].children.map((li) => li.textContent);
-          assert.ok(lines[0] === 'Rare' && !lines.includes('Leap Strike +23% [15-30]') && !lines.some((l) => l.startsWith('Aim: leap')), `${what}: the list leaves the technique to its block - ${lines.join(' | ')}`);
+          assert.ok(lines[0] === 'Rare' && !lines.includes('Leap Strike +15% [10-20]') && !lines.some((l) => l.startsWith('Aim: leap')), `${what}: the list leaves the technique to its block - ${lines.join(' | ')}`);
           const box = parent.children[tb];
           assert.equal(one(box, 'tech-name').textContent, 'Leap Strike');
           assert.equal(one(box, 'tech-key').textContent, 'MOUSE3', `${what}: the key the live bindings name`);
@@ -248,7 +248,7 @@ test('TECH-CARD the pack, executed: a technique piece\'s hover card and its deta
         assert.equal(one(full, 'tech-press').textContent, "Hold MOUSE3 to aim and release to strike. Tap it to strike where you're looking.");
         const said = kids(box2, 'inv-info-box').flatMap((b) => b.children.map((p) => p.textContent));
         assert.ok(said.includes('Rare'), said.join(' | '));
-        assert.ok(!said.includes('Leap Strike +23% [15-30]') && !said.some((l) => l.startsWith('Aim: leap')), 'said once, in the block');
+        assert.ok(!said.includes('Leap Strike +15% [10-20]') && !said.some((l) => l.startsWith('Aim: leap')), 'said once, in the block');
       } finally { view.unmount(); }
     });
   } finally { globalThis.location = prev; _resetForTests(); }

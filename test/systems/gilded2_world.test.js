@@ -236,7 +236,7 @@ test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s -
   assert.deepEqual(LP.wornPowers(me).map((p) => p.id), ['the-sunken-sovereign']);
   const a = foe(ORC), b = foe(ORC);
   const land = (f) => { const d = LP.lootBlow(sov, 100, me, f, {}); LP.lootStrike(me, f, d, sov); return d; };
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 110, 120, 130, 140, 150, 150], 'ten a blow before it, never past fifty');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 110, 120, 120, 120, 120, 120], 'ten a blow before it, cut to the loot blow top of 20% (B1; was never past fifty)');
   assert.equal(land(b), 100, 'another foe starts at nought');
   LP.lootBlow(sov, 100, me, b, {}); LP.lootBlow(sov, 100, me, b, {});
   assert.equal(land(b), 110, 'blows asked and never landed count nothing');
@@ -247,10 +247,10 @@ test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s -
   // TWO-HANDS (AUDIT 2): a landed blow that does not count whole (an off-hand blow's share of the time - formulas.js
   // `blow`) drags nothing deeper
   LP.lootStrike(me, b, 100, sov, { blow: false });
-  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 130, 'no stack from a blow that does not count whole (the three landed before it, its +30%)');
+  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 120, 'no stack from a blow that does not count whole (the three landed before it, its +30% asked, cut to the loot blow top of 20% (B1))');
   // B4: the tide lets go - six seconds from the last landed blow on it, the foe is at nought again
   T = 5.9;
-  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 150, 'held while the tide holds');
+  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 120, 'held while the tide holds (the stacked +50% cut to the loot blow top of 20%, B1)');
   T = 6.1;
   assert.equal(LP.lootBlow(sov, 100, me, a, {}), 100, 'let go past it');
   assert.equal(land(a), 100, 'and it starts again from nought');

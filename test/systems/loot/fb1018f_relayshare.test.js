@@ -138,19 +138,19 @@ test('RELAY-SHARE THE REPORT: a Rare imprinted at the Reforge with Sweet Mother\
   const orc = makeEnemyEntity(7, ENEMY_BASICS[7], null, 1, ROLL);
   const whole = weaponAttackDamage(me, orc, 0, sword(), ROLL);
   orc.health = Math.floor(orc.maxHealth * 0.2);
-  assert.equal(weaponAttackDamage(me, orc, 0, sword(), ROLL), whole + Math.floor(whole / 2), 'an orc under a quarter: +50%');
+  assert.equal(weaponAttackDamage(me, orc, 0, sword(), ROLL), whole + Math.floor(whole / 5), 'an orc under a quarter: the +50% is cut to the loot blow top of +20 (B1 BLOW_TOPS.loot)');
   // the gate's Warden: his stand-in's placeholder is whole (STAND_IN_WHOLE - 1e9 before STAND-IN-WHOLE); the relay's word (the bar's) says 200 of 1000
   const h = court(fight({ hp: 200, max: 1000 }));
   const warden = h.c.target().entity;
   assert.equal(warden.health, STAND_IN_WHOLE, 'his placeholder');
   const plain = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, sword(), ROLL);
-  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain / 2), 'the Warden under a quarter: +50%');
+  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain / 5), 'the Warden under a quarter: the +50% is cut to +20');
   const shot = weaponAttackDamage(me, bossStandIn({ mobile: 31 }, 'unread'), 0, bow(), ROLL);
-  assert.equal(weaponAttackDamage(me, warden, 0, bow(), ROLL), shot + Math.floor(shot / 2), 'a shaft too');
+  assert.equal(weaponAttackDamage(me, warden, 0, bow(), ROLL), shot + Math.floor(shot / 5), 'a shaft too');
   h.link.st = fight({ hp: 250, max: 1000 });
   assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain, 'at a quarter: nothing');
   h.link.st = fight({ hp: 249, max: 1000 });
-  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain / 2), 'the word read at the blow, not at his first sight');
+  assert.equal(weaponAttackDamage(me, warden, 0, sword(), ROLL), plain + Math.floor(plain / 5), 'the word read at the blow, not at his first sight');
 });
 
 test('RELAY-SHARE EVERY BODY THE RELAY RUNS READS ITS WORD: the court\'s Warden (his `hp` of `max`), each crystal of a Reckoning (its own share), each of his host (its `h` of `m`); the Remnant (`h` of `m`), an Echo (its own) and a Heart (its health of the Reset\'s whole); the serpent\'s host (`hp` of `max` while its fight is mine) and the world host\'s stand-in reading it (mutants: each reader dropped; the host\'s whole read for its health)', async () => {
@@ -206,7 +206,7 @@ test('RELAY-SHARE EVERY BODY THE RELAY RUNS READS ITS WORD: the court\'s Warden 
   assert.ok(Math.abs(sh.healthShare() - 0.2) < 1e-9, `its word: ${sh.healthShare()}`);
 });
 
-test('RELAY-SHARE THE FAMILY on a body the relay runs: Serpent\'s Kiss doubles under half the word; the Axe past 100 pays its own half there (x1.8 under half, the hammer nothing) and the halves\' mean only where no word is heard; Run Them Down under half the word; Gutting Lunge under a quarter of it, its second blow owed to the claim (mutants: each reader its own copy again)', () => {
+test('RELAY-SHARE THE FAMILY on a body the relay runs: Serpent\'s Kiss doubles under half the word; the Axe past 100 pays its own half there (x1.2 under half, the hammer nothing) and the halves\' mean only where no word is heard; Run Them Down under half the word; Gutting Lunge under a quarter of it, its second blow owed to the claim (mutants: each reader its own copy again)', () => {
   fresh();
   // Serpent's Kiss (the Tsaesci Fang): 8 poison, twice under half - a Legendary's own power, as the imprint's
   const fangRec = LR.legendaryById('tsaesci-fang');
@@ -230,14 +230,14 @@ test('RELAY-SHARE THE FAMILY on a body the relay runs: Serpent\'s Kiss doubles u
   const weapon = (t) => mintCondition(setItemFields({ group: 'Weapons', templateIndex: t, material: 0 }));
   const axe = fighter([SKILLS.Axe]), hammer = fighter([SKILLS.BluntWeapon]);
   const at = (p, w, foe) => WM.weaponPastPct(w, p, foe, { online: true });
-  assert.deepEqual([at(axe, weapon(WEAPONS.War_Axe), relayBody(0.2)), at(axe, weapon(WEAPONS.War_Axe), relayBody(0.8))], [80, 0], 'the Axe under half of the word, x1.8; over it, nothing');
-  assert.deepEqual([at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.2)), at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.8))], [0, 80], 'the hammer the other half');
-  assert.equal(at(axe, weapon(WEAPONS.War_Axe), relayBody(null)), 40, 'no word: the halves\' mean (AUDIT MARTIAL L3 F2)');
+  assert.deepEqual([at(axe, weapon(WEAPONS.War_Axe), relayBody(0.2)), at(axe, weapon(WEAPONS.War_Axe), relayBody(0.8))], [20, 0], 'the Axe under half of the word, x1.2 (half rate 0.5% a point over 40); over it, nothing');
+  assert.deepEqual([at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.2)), at(hammer, weapon(WEAPONS.Warhammer), relayBody(0.8))], [0, 20], 'the hammer the other half');
+  assert.equal(at(axe, weapon(WEAPONS.War_Axe), relayBody(null)), 10, 'no word: the halves\' mean (AUDIT MARTIAL L3 F2)');
   // Run Them Down (the Thief-Taker's Garb, 4 - test/systems/raid4b_sets.test.js's rig): +8% under half
   fresh(); setSigilOnline(true); setSigilRenown(1);
   const taker = player(); taker.armorValues = new Array(7).fill(100);
   for (const t of [107, 106, 105, 102]) { const it = mintCondition({ group: 'Armor', templateIndex: t, material: ARMOR_MATERIAL.Steel, flags: 0 }); Object.assign(it, { rarity: 'rare', sigil: { set: 'thieftaker', party: 1, xp: 0 } }); taker.items.push(it); equipItem(taker, it); }
-  assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.4)), 108, 'under half of the word');
+  assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.4)), 106, 'under half of the word: the +8% is cut to the sets blow top of +6 (B1 BLOW_TOPS.sets)');
   assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(0.6)), 100);
   assert.equal(weaponBlowMods(sword(), 100, taker, relayBody(null)), 100, 'no word: whole, as before');
   // Gutting Lunge (the Bloodletter's): a second blow under a quarter - owed to a body the relay runs (it has no record)

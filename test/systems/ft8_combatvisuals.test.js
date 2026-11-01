@@ -36,5 +36,5 @@ test('FT8: the registry row - Enhanced, over the pref, on by default, taking eff
 test('FT8/FT12: the Enhanced category emptied into the home and then left the settings rail; its test door is the Test Room\'s', () => {
   assert.equal(CATEGORIES.find((c) => c.id === 'enhanced'), undefined, 'gone from the category map');
   // the home holds every switch the category ever drew
-  assert.deepEqual(featureCounts(FEATURES).enhanced, 66);
+  assert.deepEqual(featureCounts(FEATURES).enhanced, 67);
 });

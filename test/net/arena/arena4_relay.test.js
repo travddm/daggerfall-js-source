@@ -63,7 +63,7 @@ test('ARENA4 the door and the wire: the Worker opens the hall and a bout\'s room
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 }), 2 * (21 + 6 + 20), 'a Daedric dai-katana, a critical\'s double');
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Spell }), 60);
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (41 + 20), 'ARENA5: a bare hand\'s most (DFU\'s past the softcap) and the modifiers\' room, doubled');
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
 });
 
 test('ARENA4 the hall: two registered fighters queued are offered one bout, both say yes and are sent to its room on their sides; a guest is not queued; the band widens with the wait (mutants: the guest queued; the offer to one alone; the sides swapped; the band\'s widening or the offer\'s clock changed; paired youngest first, past the narrower band, short of the nearest, or with themselves)', async () => onClock(async ({ step }) => {

@@ -1,9 +1,10 @@
 // POWER-CEILING: THE COMPOSITE CEILINGS. A blow's powers multiply across six registries
 // and a hurt's guards compose across five; BAL7 (Balance-Arc.md section 13) recorded both with no ceiling. Each is held
-// now to the product of today's registry tops (src/systems/powerCeiling.js), measured from the records the code reads
-// (tools/powerCeiling.mjs) - pinned here by the measurement, by execution through the real registries and runners with
-// the strongest kits minted by their own producers, and by a sweep of the source: every blow modifier and every guard
-// asks for its room.
+// now to the product of the registries' budget tops (src/systems/powerCeiling.js). B1 (tame player power) made the tops
+// a BUDGET: what the records can reach (tools/powerCeiling.mjs measures it from the records the code reads) is more, and
+// the registry is cut to its share. Pinned here by the budget, by the measurement of what the records still reach, by
+// execution through the real registries and runners with the strongest kits minted by their own producers, and by a sweep
+// of the source: every blow modifier and every guard asks for its room.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -80,17 +81,23 @@ function nightwhisperExalted() {
   throw new Error('no seed exalts a slayer at the top');
 }
 
-test('POWER-CEILING THE TOPS, MEASURED: each registry\'s own most from the records and laws it reads - the blow\'s +12 / +200 / +240 / +50 / +80 / +40, the guards\' 55 / 50 / 15 / 30 / 20 off - and the law\'s tables are those numbers (mutants: a top in the law raised; Bound in Silk at 150; Last Stand at 30)', () => {
-  assert.deepEqual(BLOW_TOPS, { sigil: 12, sets: 200, loot: 240, firmament: 50, mastery: 400, martial: 40 }, RULE);
-  assert.deepEqual(GUARD_TOPS, { loot: 55, sets: 50, firmament: 15, martial: 30, arcane: 20 }, RULE);
-  assert.deepEqual(measureBlowTops(), BLOW_TOPS, `a record moved a registry's top onto one blow - ${RULE}`);
+test('POWER-CEILING THE TOPS: the budget (B1) is the blow\'s +2 / +6 / +20 / +3 / +25 / +5 and the guards\' 8 / 8 / 3 / 6 / 4 off, each registry\'s share under it; the records still reach more (the blow\'s +12 / +200 / +240 / +50 / +25 / +40, the guards\' 55 / 50 / 15 / 30 / 20 off) and are cut to it (mutants: a top in the law raised; a record cut below its budget; Bound in Silk at 150; Last Stand at 30)', () => {
+  assert.deepEqual(BLOW_TOPS, { sigil: 2, sets: 6, loot: 20, firmament: 3, mastery: 25, martial: 5 }, RULE);
+  assert.deepEqual(GUARD_TOPS, { loot: 8, sets: 8, firmament: 3, martial: 6, arcane: 4 }, RULE);
+  const RECORD_BLOW = { sigil: 12, sets: 200, loot: 240, firmament: 50, mastery: 25, martial: 40 };
+  assert.deepEqual(measureBlowTops(), RECORD_BLOW, `a record moved a registry's reach onto one blow - ${RULE}`);
   const keeps = measureGuardKeeps();
   assert.deepEqual(Object.keys(keeps), Object.keys(GUARD_TOPS));
-  for (const [k, v] of Object.entries(keeps)) close((1 - v) * 100, GUARD_TOPS[k], `${k}'s guards - ${RULE}`);
-  close(BLOW_MOST, 119.952, 'the blow\'s product');   // PIN MOVED: WEAPON-GEAR, x43.18272 before it
-  close(productOf(measureBlowTops()), BLOW_MOST, 'the measured product is the law\'s');
-  close(GUARD_LEAST, 0.1071, 'the guards\' share kept');
-  close(keepOf(keeps), GUARD_LEAST, 'the measured share is the law\'s');
+  const RECORD_GUARD = { loot: 55, sets: 50, firmament: 15, martial: 30, arcane: 20 };
+  for (const [k, v] of Object.entries(keeps)) close((1 - v) * 100, RECORD_GUARD[k], `${k}'s guards - ${RULE}`);
+  for (const k of Object.keys(BLOW_TOPS)) assert.ok(BLOW_TOPS[k] <= RECORD_BLOW[k], `${k}: the budget is never above what its records reach (so every registry is held to a real share)`);
+  for (const k of Object.keys(GUARD_TOPS)) assert.ok(GUARD_TOPS[k] <= RECORD_GUARD[k], `${k}: the guards' budget is never above what its records reach`);
+  close(BLOW_MOST, 1.7539767, 'the blow\'s product (x119.952 before B1)');
+  close(productOf(BLOW_TOPS), BLOW_MOST, 'the product of the budget tops is the law\'s');
+  close(GUARD_LEAST, 0.7408776192, 'the guards\' share kept (10.71% before B1)');
+  close(keepOf(Object.fromEntries(Object.entries(GUARD_TOPS).map(([k, v]) => [k, 1 - v / 100]))), GUARD_LEAST, 'the product of the budget guards is the law\'s');
+  close(productOf(measureBlowTops()), 1.12 * 3 * 3.4 * 1.5 * 1.25 * 1.4, 'the records, uncut, still multiply to x29.99 (x119.95 before WEAPON-GEAR was cut): the cut is the budget\'s, not a change to the records');
+  close(keepOf(keeps), 0.5 * 0.45 * 0.85 * 0.7 * 0.8, 'and keep 10.71% of a hurt');
   assert.deepEqual(setsBlowTop().kit, ['nocturnal 4', 'starspun 4'], 'the sets\' top: Nightfall and Bound in Silk');
   assert.deepEqual(setsGuardKeep().kit, ['malacath 6'], 'the sets\' guards: Unbroken');
   assert.deepEqual(lootBlowTop().kit, ['nightwhisper', 'night-mothers-embrace', 'duelists-vambrace', 'slayer 30', 'fresh']);
@@ -114,19 +121,19 @@ test('POWER-CEILING THE ROOM: a power alone has its own; inside a runner the pro
   close(blowRoom(1e9), (BLOW_MOST - 1) * 100, 'alone, the whole product');
   assert.equal(blowRoom(40), 40);
   const was = openBlowCeiling();
-  assert.equal(blowRoom(200), 200);
-  close(blowRoom(1e9), (BLOW_MOST / 3 - 1) * 100, 'what is left after +200%');
+  assert.equal(blowRoom(50), 50);
+  close(blowRoom(1e9), (BLOW_MOST / 1.5 - 1) * 100, 'what is left after +50%');
   assert.equal(blowRoom(5), 0, 'nothing left');
   assert.equal(blowRoom(-20), -20, 'a price taken whole');
   close(blowRoom(1e9), 25, 'and it makes room');
   const inner = openBlowCeiling();
-  assert.equal(blowRoom(300), 300, 'a nested blow has its own');
+  assert.equal(blowRoom(50), 50, 'a nested blow has its own');
   closeBlowCeiling(inner);
   assert.equal(blowRoom(1), 0, 'and the outer is as it was');
   closeBlowCeiling(was);
   const g = openGuardCeiling();
-  assert.equal(guardRoom(50), 50);
-  close(guardRoom(99), (1 - GUARD_LEAST / 0.5) * 100, 'the rest of the share');
+  assert.equal(guardRoom(10), 10);
+  close(guardRoom(99), (1 - GUARD_LEAST / 0.9) * 100, 'the rest of the share');
   assert.equal(guardRoom(1), 0);
   assert.equal(guardRoom(-10), -10, 'more damage taken: a price, whole');
   closeGuardCeiling(g);
@@ -135,7 +142,7 @@ test('POWER-CEILING THE ROOM: a power alone has its own; inside a runner the pro
   assert.equal(guardRoom(Infinity), 0);
 });
 
-test('POWER-CEILING THE BLOW, BY EXECUTION: the sigil\'s +12%, the sets\' +200% (Nightfall on an unaware foe, Bound in Silk\'s fourth blow) and the loot\'s +240% (Silent Death, the Night Mother\'s execution, First Blood, a slayer\'s 30) reach their tops through the real registries, multiply whole in the runner (x11.42 - nothing a player has is cut) and a power past the product is cut to BLOW_MOST (mutants: a registry not asking its room; the runner not opening the product)', () => {
+test('POWER-CEILING THE BLOW, BY EXECUTION: the sigil\'s +12%, the sets\' +200% (Nightfall on an unaware foe, Bound in Silk\'s fourth blow) and the loot\'s +240% (Silent Death, the Night Mother\'s execution, First Blood, a slayer\'s 30) are cut through the real registries to their budget (+2, +6, +20), multiply in the runner (x1.30) and a power past the product is cut to BLOW_MOST (mutants: a registry not asking its room; the runner not opening the product)', () => {
   fresh();
   const me = player();
   const nw = ascendant(nightwhisperExalted(), 'nocturnal', 12);
@@ -145,10 +152,11 @@ test('POWER-CEILING THE BLOW, BY EXECUTION: the sigil\'s +12%, the sets\' +200% 
   const foe = { affinity: 'Human', careerIndex: 0, career: {}, health: 10, maxHealth: 100, level: 10 };
   for (let i = 0; i < 3; i++) setStrike(me, foe, 10, nw, {});   // three strands laid: the web holds the fourth
   const unaware = { unaware: true };
-  assert.equal(sigilBlow(nw, 1000, me, foe, unaware), 1120, 'the sigil at Ascendant: +12%');
-  assert.equal(setBlow(nw, 1000, me, foe, unaware), 3000, 'the sets: +60% and +140%');
-  assert.equal(LP.lootBlow(nw, 1000, me, foe, unaware), 3400, 'the loot: +100%, +50%, +60%, +30%');
-  assert.equal(weaponBlowMods(nw, 1000, me, foe, unaware), 11424, 'together, whole: 1.12 x 3 x 3.4');
+  const WHOLE = 1297;
+  assert.equal(sigilBlow(nw, 1000, me, foe, unaware), 1020, 'the sigil at Ascendant: +12% cut to its budget of +2%');
+  assert.equal(setBlow(nw, 1000, me, foe, unaware), 1060, 'the sets: +60% and +140% cut to their budget of +6%');
+  assert.equal(LP.lootBlow(nw, 1000, me, foe, unaware), 1200, 'the loot: +100%, +50%, +60%, +30% cut to its budget of +20%');
+  assert.equal(weaponBlowMods(nw, 1000, me, foe, unaware), WHOLE, 'together, each at its budget: 1.02 x 1.06 x 1.2');
   assert.deepEqual(ceilingProducts(), { blow: null, guard: null }, 'the runner closes its product');
   registerWeaponBlowMod('powerceiling-test', (w, d) => d + Math.floor((d * blowRoom(1e6)) / 100));
   try {
@@ -184,14 +192,14 @@ test('POWER-CEILING THE SETS\' TOP IS A BLOW IN PLAY: Nightfall and Bound in Sil
     tick();
   }
   assert.equal(foeUnaware(foe), true, 'struck three times, still blind to me');
-  assert.equal(setBlow(nw, 1000, me, entity, { unaware: foeUnaware(foe) }), 3000, 'the fourth blow: Nightfall\'s +60% and the web\'s +140%');
+  assert.equal(setBlow(nw, 1000, me, entity, { unaware: foeUnaware(foe) }), 1060, 'the fourth blow: Nightfall\'s +60% and the web\'s +140%, cut to the sets\' budget of +6%');
   me.activeEffects = [{ kind: 'invisNormal', roundsRemaining: 30 }];
   handleAttackFromSource(me);
   tick();
   assert.equal(foeUnaware(foe), false, 'a Normal invisibility ends with the blow, and the foe sees me');
 });
 
-test('POWER-CEILING THE GUARDS, BY EXECUTION: the loot\'s three (a hexed foe, Bedrock\'s five stacks, the Last Stand) leave 45 of a hundred and Unbroken half of that, through the real door - 225 of 1000, whole - and a guard past the share is held at GUARD_LEAST (mutants: a guard not asking its room; the runner not opening the share)', () => {
+test('POWER-CEILING THE GUARDS, BY EXECUTION: the loot\'s three (a hexed foe, Bedrock\'s five stacks, the Last Stand) would leave 45 of a hundred and Unbroken half of that; through the real door each registry is cut to its budget (8 off each) - 846 of 1000 - and a guard past the share is held at GUARD_LEAST (mutants: a guard not asking its room; the runner not opening the share)', () => {
   fresh();
   const me = player();
   const kit = [ascendant(legendary('the-warden', 102), 'malacath'), ascendant(legendary('mountains-root'), 'malacath'),
@@ -206,7 +214,7 @@ test('POWER-CEILING THE GUARDS, BY EXECUTION: the loot\'s three (a hexed foe, Be
   assert.equal(me.health, 1);
   me.health = 2000;   // under a quarter: the Last Stand
   blow(1000);
-  assert.equal(2000 - me.health, 225, '1000 x 0.75 x 0.8 x 0.75 x 0.5');
+  assert.equal(2000 - me.health, 846, '1000 x 0.92 (the loot, cut to 8 off) x 0.92 (Unbroken, cut to 8 off)');
   assert.deepEqual(ceilingProducts(), { blow: null, guard: null }, 'the door closes its share');
   registerPlayerDamageMod('powerceiling-test', (_e, d) => Math.round(d * (1 - guardRoom(99) / 100)));
   try {
@@ -216,7 +224,7 @@ test('POWER-CEILING THE GUARDS, BY EXECUTION: the loot\'s three (a hexed foe, Be
   } finally { registerPlayerDamageMod('powerceiling-test', null); }
   me.health = 2000;
   blow(1000);
-  assert.equal(2000 - me.health, 225, 'and every guard as it was without it');
+  assert.equal(2000 - me.health, 846, 'and every guard as it was without it');
   const g = openGuardCeiling();
   guardRoom(99.9);   // the share already spent
   const d = LP.lootDamageMod(me, 1000);
@@ -231,11 +239,11 @@ test('POWER-CEILING THE SETS\' OTHER GUARDS: Hold the Line and Gearward take the
   const orc = { careerIndex: 7, career: {}, health: 100, maxHealth: 100, level: 10 };
   const blow = (n) => { const was = me.health; setStruck(orc, me, n); hurtPlayer(me, n); return was - me.health; };
   me.health = 4000;   // under half: the Line holds
-  assert.equal(blow(1000), 750, 'Hold the Line at Ascendant: a quarter off');
+  assert.equal(blow(1000), 920, 'Hold the Line at Ascendant: a quarter off, cut to the sets\' budget of 8 off');
   const brass = wear(player(), ...NUMIDIUM_SET_PIECES.filter((r) => r.group === 'Armor').slice(0, 4).map((r) => ascendant(mintAetheric(r), 'numidium')));
   const gear = (n) => { const was = brass.health; setStruck(orc, brass, n); hurtPlayer(brass, n); return was - brass.health; };
   brass.health = 4000;
-  assert.equal(gear(1000), 700, 'Gearward at Ascendant: the wound blow 30% lighter');
+  assert.equal(gear(1000), 920, 'Gearward at Ascendant: the wound blow 30% lighter, cut to the sets\' budget of 8 off');
   // a guard before them spends the whole share: they take nothing more
   registerPlayerDamageMod('powerceiling-spend', (_e, d) => { guardRoom(100); return d; });
   registerPlayerDamageMod(SIGIL_SETS_POWER, null);
@@ -332,23 +340,23 @@ test('POWER-CEILING THE CUT LANDS WHERE THE POWER GREW (AUDIT HORIZONTAL D4): a 
     const was = openBlowCeiling();
     const got = Object.fromEntries(order.map((k) => [k, blowRoom(k === 'loot' ? 340 : BLOW_TOPS[k], k)]));
     closeBlowCeiling(was);
-    assert.deepEqual(got, { ...BLOW_TOPS }, `${order.join(' ')}: the loot cut at its 240, every other whole - ${RULE}`);
+    for (const k of WORLD) close(got[k], BLOW_TOPS[k], `${order.join(' ')}: ${k} at its top (the loot asked 340, and is cut to its 20; every other whole) - ${RULE}`);
   }
   const was = openBlowCeiling();
-  assert.equal(blowRoom(30, 'sets'), 30);
-  close(blowRoom(200, 'sets'), (3 / 1.3 - 1) * 100, 'a registry asked twice: its own product kept, x3 in all');
+  assert.equal(blowRoom(3, 'sets'), 3);
+  close(blowRoom(200, 'sets'), (1.06 / 1.03 - 1) * 100, 'a registry asked twice: its own product kept, x1.06 in all');
   closeBlowCeiling(was);
-  close(blowRoom(1e9, 'sigil'), 12, 'alone, at its own top');
+  close(blowRoom(1e9, 'sigil'), 2, 'alone, at its own top');
   assert.equal(blowRoom(5, 'nobody'), 0, 'a registry with no measured top has no room');
   for (const order of [['loot', 'sets', 'firmament', 'martial', 'arcane'], ['arcane', 'martial', 'firmament', 'sets', 'loot']]) {
     const g = openGuardCeiling();
     const got = {};
     for (const k of order) {
-      got[k] = k === 'loot' ? [25, 20, 25, 10].map((l) => +guardRoom(l, 'loot').toFixed(9)) : guardRoom(GUARD_TOPS[k], k);
+      got[k] = k === 'loot' ? [3, 3, 3, 3].map((l) => guardRoom(l, 'loot')) : guardRoom(GUARD_TOPS[k], k);
     }
     closeGuardCeiling(g);
-    assert.deepEqual(got.loot, [25, 20, 25, 0], `${order.join(' ')}: the Hex, Bedrock and the Last Stand whole, a fourth share past the loot's 55 cut`);
+    got.loot.forEach((v, i) => close(v, [3, 3, (1 - 0.92 / 0.9409) * 100, 0][i], `${order.join(' ')}: three shares of 3 off, the third cut by the loot's budget of 8, the fourth nothing`));
     for (const k of order.filter((x) => x !== 'loot')) assert.equal(got[k], GUARD_TOPS[k], `${order.join(' ')}: ${k} whole - ${RULE}`);
   }
-  close(guardRoom(99, 'arcane'), 20, 'alone, at its own top');
+  close(guardRoom(99, 'arcane'), 4, 'alone, at its own top');
 });

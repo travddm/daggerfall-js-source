@@ -68,7 +68,7 @@ test('INSPECT1 wire: a card frame is an ASK or an ANSWER, never both; the card w
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002', ask: true } })), { error: 'card before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002' } }), { hasHello: true }), { error: 'bad card' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'card', data: { to: 'peer-0002', card: CARD, pad: 'x'.repeat(CARD_FRAME_MAX) } }), { hasHello: true }), { error: 'frame too large' });
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
   // a full card of 27 worn items of the widest fields fits the frame
   const wide = { templateIndex: 65535, group: 'WomensClothing', material: 4095, dye: 4095, variant: 4095 };
   const full = { ...CARD, level: CARD_LEVEL_MAX, attrs: Array(8).fill(CARD_STAT_MAX), vitals: [CARD_VITAL_MAX, CARD_VITAL_MAX, CARD_VITAL_MAX], look: { ...LOOK, items: Array.from({ length: 27 }, (_, i) => ({ ...wide, equipSlot: i })) } };

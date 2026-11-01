@@ -247,14 +247,14 @@ test('SCHOOLS3 THE SHELF AND THE PRICE: the Buy Spells shelf offers my awake pat
   assert.ok(priced(asleep) > priced(offP), 'asleep, Destruction\'s 20 prices it again');
 });
 
-test('SCHOOLS2 THE SCHOOLS PAST 100: online, each school\'s climb past 100 is 1% a point of what it does, to x1.4 - Restoration\'s heals, Alteration\'s Shield, Illusion\'s concealments and Thaumaturgy\'s wards on me, Mysticism\'s chances at a foe; never offline, while mentoring, on another or in a refereed fight (mutants: offline too; on another; in a duel; a heal unscaled; the shield unscaled; the rounds unscaled; the ward\'s chance unscaled; Silence\'s chance unscaled)', () => {
+test('SCHOOLS2 THE SCHOOLS PAST 100: online, each school\'s climb past 100 is 0.25% a point of what it does, to x1.10 - Restoration\'s heals, Alteration\'s Shield, Illusion\'s concealments and Thaumaturgy\'s wards on me, Mysticism\'s chances at a foe; never offline, while mentoring, on another or in a refereed fight (mutants: offline too; on another; in a duel; a heal unscaled; the shield unscaled; the rounds unscaled; the ward\'s chance unscaled; Silence\'s chance unscaled)', () => {
   reset();
   const at = (raw) => mage([RES, ALT, ILL, MYS, THA].slice(0, 2), raw);
   // the law itself: any school, the same ladder as BAL9b's Destruction
   const r200 = mage([RES], 200);
-  assert.deepEqual([100, 150, 200].map((v) => page(true, () => schoolPotency(mage([RES], v), { school: RES }))), [1, 1.17, 1.4]);
+  assert.deepEqual([100, 150, 200].map((v) => page(true, () => schoolPotency(mage([RES], v), { school: RES }))), [1, 1.0425, 1.1]);
   assert.equal(page(false, () => schoolPotency(r200, { school: RES })), 1, 'offline: none');
-  assert.equal(page(true, () => schoolMult(r200, r200, RES, { self: true })), 1.4);
+  assert.equal(page(true, () => schoolMult(r200, r200, RES, { self: true })), 1.1);
   assert.equal(page(true, () => schoolMult(r200, { ...r200 }, RES, { self: true })), 1, 'another body');
   setSigilDueling(true);
   assert.equal(page(true, () => schoolMult(r200, r200, RES, { self: true })), 1, 'a refereed fight');
@@ -263,7 +263,7 @@ test('SCHOOLS2 THE SCHOOLS PAST 100: online, each school\'s climb past 100 is 1%
   // Restoration: Heal Health on myself
   const heal = SELF(eff(10, 8, { magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   const healed = (who, online, target = who) => page(online, () => applySpell(heal, 20, target, { heal() {} }, () => 0.5, { entity: who }).healed);
-  assert.equal(healed(r200, true), 70, 'x1.4');
+  assert.equal(healed(r200, true), 55, 'x1.10');
   assert.equal(healed(r200, false), 50, 'offline');
   assert.equal(healed(mage([RES], 100), true), 50, 'at 100');
   assert.equal(healed({ ...r200, _mentor: mentorProfile(r200, [4]) }, true), 50, 'mentoring a level-4 group: the mentored Restoration stops under 100 (MENTOR2 fightingClimb)');
@@ -272,42 +272,42 @@ test('SCHOOLS2 THE SCHOOLS PAST 100: online, each school\'s climb past 100 is 1%
   const regen = SELF(eff(18, 255, { durationBase: 3, magnitudeBaseLow: 10, magnitudeBaseHigh: 10 }));
   let got = 0;
   page(true, () => applySpell(regen, 20, r200, { heal: (n) => { got += n; }, say() {} }, () => 0.5, { entity: r200 }));
-  assert.equal(got, 14, 'the first round x1.4');
+  assert.equal(got, 11, 'the first round x1.10');
   assert.equal(r200.activeEffects.find((a) => a.kind === 'regenerate').school, RES, 'its school, read each round (AUDIT SCHOOLS L2 F3)');
   // Alteration: the Shield's pool
   const a200 = mage([ALT], 200);
   const shield = SELF(eff(35, 255, { durationBase: 5, magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   page(true, () => applySpell(shield, 20, a200, {}, () => 0.5, { entity: a200 }));
-  assert.equal(a200.activeEffects.find((a) => a.kind === 'shield').startingShield, 70);
+  assert.equal(a200.activeEffects.find((a) => a.kind === 'shield').startingShield, 55);
   const a100 = mage([ALT], 100);
   page(true, () => applySpell(shield, 20, a100, {}, () => 0.5, { entity: a100 }));
   assert.equal(a100.activeEffects.find((a) => a.kind === 'shield').startingShield, 50);
   // Illusion: a concealment's rounds on me
   const i200 = mage([ILL], 200);
   page(true, () => applySpell(SELF(eff(13, 0, { durationBase: 10 })), 20, i200, {}, () => 0.5, { entity: i200 }));
-  assert.equal(i200.activeEffects.find((a) => a.kind === 'invisNormal').roundsRemaining + 1, 14, '10 rounds x1.4');
+  assert.equal(i200.activeEffects.find((a) => a.kind === 'invisNormal').roundsRemaining + 1, 11, '10 rounds x1.10');
   const i100 = mage([ILL], 100);
   page(true, () => applySpell(SELF(eff(13, 0, { durationBase: 10 })), 20, i100, {}, () => 0.5, { entity: i100 }));
   assert.equal(i100.activeEffects.find((a) => a.kind === 'invisNormal').roundsRemaining + 1, 10);
   // Thaumaturgy: a ward's chance on me
   const t200 = mage([THA], 200);
   page(true, () => applySpell(SELF(eff(21, 255, { durationBase: 5, chanceBase: 50 })), 20, t200, {}, () => 0.5, { entity: t200 }));
-  assert.equal(t200.activeEffects.find((a) => a.kind === 'spellReflection').chance, 70);
+  assert.equal(t200.activeEffects.find((a) => a.kind === 'spellReflection').chance, 55);
   const t200r = mage([THA], 200);
-  page(true, () => applySpell(SELF(eff(22, 255, { durationBase: 5, chanceBase: 80 })), 20, t200r, {}, () => 0.5, { entity: t200r }));
+  page(true, () => applySpell(SELF(eff(22, 255, { durationBase: 5, chanceBase: 95 })), 20, t200r, {}, () => 0.5, { entity: t200r }));
   assert.equal(t200r.activeEffects.find((a) => a.kind === 'spellResistance').chance, 100, 'never past 100');
   // Mysticism: a chance at a foe - Silence lands at a roll Mysticism 100 misses
   const silence = AT(eff(19, 255, { durationBase: 5, chanceBase: 50 }));
-  const silenced = (who) => { const f = foeEnt(); page(true, () => applySpell(silence, 20, f, {}, () => 0.6, { entity: who }, { bypassSavingThrows: true })); return f.activeEffects.some((a) => a.kind === 'silenced'); };
-  assert.equal(silenced(mage([MYS], 200)), true, '70 against a roll of 60');
-  assert.equal(silenced(mage([MYS], 100)), false, '50 against 60');
+  const silenced = (who) => { const f = foeEnt(); page(true, () => applySpell(silence, 20, f, {}, () => 0.52, { entity: who }, { bypassSavingThrows: true })); return f.activeEffects.some((a) => a.kind === 'silenced'); };
+  assert.equal(silenced(mage([MYS], 200)), true, '55 against a roll of 52');
+  assert.equal(silenced(mage([MYS], 100)), false, '50 against 52');
   // Soul Trap's chance, and Dispel's sweep
   const m200 = mage([MYS], 200);
   const f = foeEnt({ mobileType: 3 });   // a monster: a trap holds on no humanoid (SoulTrap.cs BecomeIncumbent)
   page(true, () => applySpell(AT(eff(12, 255, { durationBase: 5, chanceBase: 50 })), 20, f, {}, () => 0.999, { entity: m200 }));
-  assert.equal(f.activeEffects.find((a) => a.kind === 'soulTrap').chance, 70);
+  assert.equal(f.activeEffects.find((a) => a.kind === 'soulTrap').chance, 55);
   const dispel = page(true, () => applySpell(SELF(eff(6, 1, { chanceBase: 50 })), 20, m200, {}, () => 0.5, { entity: m200 }));
-  assert.equal(dispel.dispel.chance, 70);
+  assert.equal(dispel.dispel.chance, 55);
 });
 
 test('SCHOOLS3 A SIGNATURE SPELL\'S POTENCY READS ITS CAST SCHOOL: a Necromancer\'s Siphon Life strikes harder with Restoration past 100, and a spell of no path reads Destruction (mutants: the school dropped)', () => {
@@ -317,7 +317,7 @@ test('SCHOOLS3 A SIGNATURE SPELL\'S POTENCY READS ITS CAST SCHOOL: a Necromancer
   const sp = signatureSpell('necromancer');
   const landed = (spell) => { let d = 0; page(true, () => applySpell(spell, 20, foeEnt(), { hurt: (n) => { d += n; } }, () => 0.999, { entity: p })); return d; };
   const plainBolt = { ...sp, path: undefined };
-  assert.equal(landed(sp), Math.max(1, Math.round(landed(plainBolt) * 1.4)), 'Restoration\'s 140 strikes');
+  assert.equal(landed(sp), Math.max(1, Math.round(landed(plainBolt) * 1.1)), 'Restoration\'s 140 strikes');
 });
 
 test('SCHOOLS3 THE RIDERS, through the cast engine\'s landing door: each signature spell of MY awake path that lands on a foe does its own - and none for a plain spell, another path\'s, a peer\'s or asleep (mutants: Siphon Life heals nothing; the half; Rift Lance reaches far; Chain Lightning a third foe; Blood Boil above the line; the Seer\'s mark forgotten; the refund dropped; a rider asleep)', () => {
@@ -483,7 +483,7 @@ test('SCHOOLS3 THE RIDERS THAT WRAP ME: Aegis Bolt\'s Shield of twice what it la
   if (shielded) shielded.shieldRemaining = 0;   // the pool aside: the guard alone
   const before = wa.health;
   setStruck(orc, wa, 100); hurtPlayer(wa, 100);
-  assert.equal(before - wa.health, 80, '20% lighter');
+  assert.equal(before - wa.health, 96, 'the Warden guard of 20% is cut to the arcane guard top of 4% off (B1 GUARD_TOPS.arcane)');
   const b2 = wa.health;
   hurtPlayer(wa, 100);
   assert.equal(b2 - wa.health, 100, 'a fall is no blow');

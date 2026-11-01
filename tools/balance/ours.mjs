@@ -19,9 +19,11 @@ import { getMeleeWeaponAnimTime, getBowCooldownTime, CLASSIC_UPDATE_INTERVAL } f
 import { WEAPON_TYPES } from '../../src/combat/fpsWeapon.js';
 import { weaponMasteryBlow, weaponMasteryPace, WEAPON_MASTERY } from '../../src/systems/weaponMastery.js';
 import { registerWeaponBlowMod } from '../../src/systems/entityMods.js';
+import { blowRoom, guardRoom } from '../../src/systems/powerCeiling.js';
+import { registerSpellPowerMod } from '../../src/systems/spell/spellPower.js';
 import { registerSwingPaceMod } from '../../src/characters/weaponStates.js';
 import { evenHpFloor } from '../../src/systems/levelEven.js';
-import { playerDamageMods } from '../../src/characters/playerEntity.js';
+import { playerDamageMods, registerPlayerDamageMod } from '../../src/characters/playerEntity.js';
 import { liveStat } from '../../src/systems/statMods.js';
 import { mintKit, wearKit } from './gear.mjs';
 import { WEAPON_TEMPLATES } from './builds.mjs';
@@ -39,16 +41,20 @@ export const LAYERS = Object.freeze({
   power: 'Loot-ladder gear: a damage line on the weapon, an armour line on each piece (systems/loot/lootRarity.js)',
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
   swing: 'Swing law: the port\'s own swing speed curve (characters/weaponStates.js swingFrameSeconds)',
+  ceiling: 'Every stacking source at its cap: the blow takes the rest of the room up to BLOW_MOST and the hurt the rest of the share down to GUARD_LEAST (systems/powerCeiling.js). The maxed character; not in the default set',
   virtue: 'Oblivion-style levelling: 12 attribute points a level instead of 5 (mod oblivion-remaster-leveling)',
 });
 export const LAYER_NAMES = Object.freeze(Object.keys(LAYERS));
-/** `virtue` is a per-character choice offline and is off in the room, so the default set leaves it out. */
-export const DEFAULT_LAYERS = Object.freeze(LAYER_NAMES.filter((name) => name !== 'virtue'));
+/** `virtue` is a per-character choice offline and is off in the room; `ceiling` is the maxed character, a scenario and not the
+ *  room as played. The default set leaves both out. */
+const OUT_OF_DEFAULT = new Set(['virtue', 'ceiling']);
+export const DEFAULT_LAYERS = Object.freeze(LAYER_NAMES.filter((name) => !OUT_OF_DEFAULT.has(name)));
 
 const DEFAULT_CAREER = Object.freeze({
   strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50,
   attackModifierFlags: 0, hitPointsPerLevel: 8,
 });
+const CEILING_MOD = 'harness-ceiling';
 export const MC_DEFAULT_SWINGS = 4000;
 const NEUTRAL_BLOW_REFLEXES = 2;
 const UNBREAKABLE = 1e9;
@@ -86,8 +92,13 @@ export function applyLayers(layers) {
   }
   setModSetting('meanerMonsters', 'Enabled', layers.has('meaner'));
   setPref('lootRarity', layers.has('power'));
+  setPref('weaponTechniques', layers.has('techniques'));
   const online = layers.has('online');
   registerWeaponBlowMod(WEAPON_MASTERY, online ? (...args) => whileOnlinePage(() => weaponMasteryBlow(...args)) : weaponMasteryBlow);
+  // Registered after every game registry, so it takes only the room they left: what a character with every source at its top gets.
+  registerWeaponBlowMod(CEILING_MOD, layers.has('ceiling') ? (_weapon, damage) => damage + Math.floor((damage * blowRoom(1e9)) / 100) : null);
+  registerSpellPowerMod(CEILING_MOD, layers.has('ceiling') ? () => 1e6 : null);   // far past SPELL_POWER_MOST, which holds it
+  registerPlayerDamageMod(CEILING_MOD, layers.has('ceiling') ? (_entity, damage) => damage * (1 - guardRoom(100) / 100) : null);
   registerSwingPaceMod(WEAPON_MASTERY, online ? (...args) => whileOnlinePage(() => weaponMasteryPace(...args)) : weaponMasteryPace);
 }
 

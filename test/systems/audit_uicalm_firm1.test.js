@@ -49,6 +49,7 @@ import { harvestXp, xpForRank } from '../../src/net/professionLaw.js';
 import { craftXp } from '../../src/net/recipeLaw.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { sharedClassicMinutes } from '../../src/net/wire.js';
+import { BLOW_TOPS, GUARD_TOPS } from '../../src/systems/powerCeiling.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const DAY = 86_400;
@@ -186,7 +187,9 @@ test('AUDIT UICALM-FIRM1 L1 M2: THE GAINS ARE CAPPED, THEN THE PRICE IS PAID - p
   const dagger = { templateIndex: 113 };
   setFirmamentOnline(true);
   const hundred = (t) => { setFirmamentTree(t); _resetFirmamentPowersForTests(); let n = 0; for (let i = 0; i < 100; i++) n += weaponBlowMods(dagger, 100, me, foe, { unaware: false }); return n; };
-  assert.equal(hundred(nm), hundred(without) - 500);
+  // B1: both kits ask 25% or more at the blow, and the firmament's blow top (3%) cuts both to the same blow, so the 5-point price shows in the stats above and no longer in the landed blow
+  assert.equal(hundred(without), 100 * (100 + BLOW_TOPS.firmament), 'the 30% kit is cut to the firmament blow top');
+  assert.equal(hundred(nm), 100 * (100 + BLOW_TOPS.firmament), 'the 25% kit is cut to the same top');
   // and the price's own reader: a channel with no price reads as it did (a hand-made sheet has none)
   assert.equal(castCostPct({ castCost: 30 }), 25);
 });
@@ -203,7 +206,7 @@ test('AUDIT UICALM-FIRM1 L1 M4: one damage-taken carry a channel - Atronach\'s P
     setStruck(foe, me, 10); let h = me.health; hurtPlayer(me, 10); blows += h - me.health;
     h = me.health; hurtPlayer(me, 10); spells += h - me.health; me.health = 1000;
   }
-  assert.deepEqual([blows, spells], [1000 + 10 * c.blowTaken * 10 / 10, 1000 + 10 * c.spellTaken * 10 / 10]);
+  assert.deepEqual([blows, spells], [1000 + 10 * c.blowTaken * 10 / 10, 1000 - 10 * GUARD_TOPS.firmament]);   // B1: Spell Turning's 4% less asked, cut to the firmament guard top (3%)
 });
 
 test('AUDIT UICALM-FIRM1 L1 L1: the sail\'s star moves her under the Classic helm too, by the same share', () => {

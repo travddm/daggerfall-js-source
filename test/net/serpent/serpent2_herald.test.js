@@ -136,7 +136,7 @@ test('SERPENT2 wire: the `site` word - its day, its native point to the whole un
   for (const bad of [{ pl: 'Sentinel**' }, { pl: '<@&1> Sentinel' }, { pl: 'Sen  tinel' }, { pl: ' Sentinel' }, { pl: ', Sentinel' }, { pl: '' }, { pl: 'x'.repeat(65) }, { pl: 5 },
     { sx: POSE_BOUND + 1 }, { sz: -POSE_BOUND - 1 }, { sx: 1.5 }, { sz: '1' }, { d: -1 }, { d: '611' }, { d: 1.5 }]) assert.equal(validSerpentIn({ ...ok, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'serpent', ...ok, extra: 1 }), { hasHello: true }), { t: 'serpent', ...ok });
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
 });
 
 // ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════

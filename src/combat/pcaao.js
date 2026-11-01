@@ -81,6 +81,7 @@
 import { modSetting, modSettingIfDeclared } from '../systems/modSettings.js';
 import { liveStat } from '../systems/statMods.js';
 import { skillValue, SKILLS } from '../systems/skills.js';
+import { aimSkill } from '../systems/skillSoftcap.js';   // B1: a mastered weapon skill's aim stops 10 points past 100
 import { RACES } from '../systems/races.js';
 import { SPECIAL_ABILITY_BITS } from '../systems/specialAdvantages.js';
 import { WEAPONS, weaponMinDamage, weaponMaxDamage, weaponSkillUsed } from '../characters/weapons.js';
@@ -371,7 +372,7 @@ export function pcaaoStatDiffsToHit(attacker, target) {
 export function pcaaoSkillsToHit(attacker, target, rolls, modules, notes = null) {
   let mod = -int(skill(target, SKILLS.Dodging) / 2);
   if (!modules.criticalStrikesIncreaseDamage) {
-    const crit = skill(attacker, SKILLS.CriticalStrike);
+    const crit = aimSkill(attacker, SKILLS.CriticalStrike, skill(attacker, SKILLS.CriticalStrike));
     if (dice100(int(crit / 3), rolls())) { mod += int(crit / 3); if (notes) notes.critical = true; }   // BAL2: every striker's
   }
   return mod;
@@ -438,7 +439,7 @@ export function pcaaoBackstabDamage(damage, backstabbingLevel, rolls, say) {
  *  a foe's Critical Strike is the same skill as the player's and lands as often. */
 export function pcaaoCriticalStrike(attacker, rolls) {
   const luckTerm = Math.floor(F((stat(attacker, 'luck') - 50) / 25));
-  const crit = skill(attacker, SKILLS.CriticalStrike);
+  const crit = aimSkill(attacker, SKILLS.CriticalStrike, skill(attacker, SKILLS.CriticalStrike));
   return dice100(int(crit / (4 - luckTerm)), rolls());   // BAL2: one roll for every striker
 }
 
@@ -1089,11 +1090,11 @@ export function pcaaoAttackDamage(attacker, target, {
   // half times its aim; a foe's Long Blade and Critical Strike are the same skills as the player's and are read the same
   // way now (a duel was always both players'). The armour term is NOT made one rule: the player's flat 100 is the mod's
   // premise (armour reduces damage, never the chance to be hit), and every even version of it eases the fight.
-  chanceToHitMod = Math.ceil(F(skill(attacker, skillID) * F(1.5)));
+  chanceToHitMod = Math.ceil(F(aimSkill(attacker, skillID, skill(attacker, skillID)) * F(1.5)));
   if (modules.criticalStrikesIncreaseDamage) {
     critSuccess = pcaaoCriticalStrike(attacker, rolls);
     if (critSuccess) {
-      const crit = skill(attacker, SKILLS.CriticalStrike);
+      const crit = aimSkill(attacker, SKILLS.CriticalStrike, skill(attacker, SKILLS.CriticalStrike));
       critDamMulti = F(F(int(crit / 5) * F(0.05)) + 1);
       critHitAddi = int(crit / 4);
       chanceToHitMod += critHitAddi;

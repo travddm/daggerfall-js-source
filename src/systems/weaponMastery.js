@@ -10,18 +10,18 @@
 // skill's CLIMB past 100 (skillSoftcap.js climbedSkill - the climb the foes' edge reads, so the climb that raises them is
 // the climb that pays) is worth this, to effective 140 at 200:
 //
-//   Long Blade    every blow 1% harder (x1.4)                                   the WEAPON BLOW modifier
-//   Archery       every arrow 1% harder (x1.4)                                  the WEAPON BLOW modifier
-//   Axe           a blow at a foe under half its health 2% harder (x1.8):        the WEAPON BLOW modifier
+//   Long Blade    every blow 0.25% harder (x1.10)                               the WEAPON BLOW modifier
+//   Archery       every arrow 0.25% harder (x1.10)                              the WEAPON BLOW modifier
+//   Axe           a blow at a foe under half its health 0.5% harder (x1.20):     the WEAPON BLOW modifier
 //                 the axe finishes
-//   Blunt Weapon  a blow at a foe at half its health or more 2% harder (x1.8):   the WEAPON BLOW modifier
+//   Blunt Weapon  a blow at a foe at half its health or more 0.5% harder (x1.20): the WEAPON BLOW modifier
 //                 the hammer opens
-//   Short Blade   every swing 1% quicker (x1.4 the swings) - never past the      the SWING PACE (characters/weaponStates.js)
+//   Short Blade   every swing 0.25% quicker (x1.10 the swings) - never past the  the SWING PACE (characters/weaponStates.js)
 //                 swing law's floor of 0.45 s a swing (SWING_FRAME_MIN)
 //   Hand-to-Hand  nothing more - its formula reads the climb in its damage already
 //
 // The two halves of a fight read as one: a foe killed from full health by a blow of one size takes its first half at x1
-// and its second at x1.8 (the Axe) - x1.29 over the fight - so the heavy two-handers, which lead the six raw (a War Axe
+// and its second at x1.2 (the Axe) - x1.1 over the fight - so the heavy two-handers, which lead the six raw (a War Axe
 // 15.2 a second at Strength 80, a Warhammer 15.7, a Longsword 12.6), climb a little less than the sword does.
 //
 // Online alone, as BAL9b and SCHOOLS2: offline the game is Daggerfall's, and so is the weapon past 100. MY blow (a
@@ -33,7 +33,7 @@ import { SKILLS, skillModOf } from './skills.js';
 import { SKILL_SOFT_CAP } from './skillSoftcap.js';
 import { isOnlinePage } from './online/onlineLane.js';
 import { sigilDueling } from './sigil/sigil.js';
-import { SCHOOL_POTENCY_PER_POINT, fightingClimb } from './spell/spellPower.js';   // CLIMB-PAST's one number: a point past 100 is 1%; MENTOR2: the climb fought with
+import { SCHOOL_POTENCY_PER_POINT, fightingClimb } from './spell/spellPower.js';   // CLIMB-PAST's one number: a point past 100 is a quarter of a per cent (B1); MENTOR2: the climb fought with
 import { registerWeaponBlowMod } from './entityMods.js';
 import { blowRoom } from './powerCeiling.js';   // POWER-CEILING: the blow's one product
 import { registerSwingPaceMod } from '../characters/weaponStates.js';
@@ -47,11 +47,11 @@ export const WEAPON_POTENCY_PER_POINT = SCHOOL_POTENCY_PER_POINT;
 export const WEAPON_HALF_PER_POINT = 2 * WEAPON_POTENCY_PER_POINT;
 /** The line between the two halves: a share of the foe's health. */
 export const WEAPON_HALF_LINE = 0.5;
-/** WEAPON-GEAR: the percent each point of gear on a weapon skill adds to its blow (0.44: a sheet of 872, trained 200
- *  and 672 on it, is the climb's 40 + 296 = x4.36, the top mob was shown). */
-export const WEAPON_GEAR_PER_POINT = 0.44;
-/** WEAPON-GEAR: the most percent gear adds (727 points) - with the axe's 80, the ceiling's mastery top of 400. */
-export const WEAPON_GEAR_PCT_MOST = 320;
+/** WEAPON-GEAR: the percent each point of gear on a weapon skill adds to its blow. B1 (tame player power): 0.1, was 0.44,
+ *  which paid +296% for 672 points of gear and was the largest single term of the blow stack. */
+export const WEAPON_GEAR_PER_POINT = 0.1;
+/** WEAPON-GEAR: the most percent gear adds (50 points) - with the axe's 20, the ceiling's mastery top of 25 (B1; was 320). */
+export const WEAPON_GEAR_PCT_MOST = 5;
 
 /** The skill a blow is struck with, by its family (combat/technique/techniqueRoster.js techniqueFamily - an RRI class's
  *  own included): the bare hand Hand-to-Hand. Null for anything else. */
@@ -78,7 +78,7 @@ export function weaponClimb(entity, skill, { online = isOnlinePage() } = {}) {
 const shareOf = healthShare;
 /** WEAPON-GEAR: the climb above reads the
  *  trained skill, so gear bought a weapon no damage while the fists' roll read it whole. So each point of gear on a
- *  weapon skill adds 0.44% to its blow, from the first point (GEAR-ADDS,, "help the begingin"): the percent here, 0 to 320. Online, mine, never the fists. */
+ *  weapon skill adds 0.1% to its blow, from the first point (GEAR-ADDS,, "help the begingin"): the percent here, 0 to 5. Online, mine, never the fists. */
 export function weaponGearPct(entity, skill, { online = isOnlinePage() } = {}) {
   if (!online || !entity?.isPlayer || entity.peer || entity._mentor || entity.isInBeastForm || !Number.isInteger(skill) || skill === SKILLS.HandToHand) return 0;
   const gear = skillModOf(entity, skill);
@@ -100,7 +100,7 @@ function climbPastPct(skill, attacker, target, opts) {
     case SKILLS.LongBlade: case SKILLS.Archery: return climb * (WEAPON_POTENCY_PER_POINT * 100);
     case SKILLS.Axe: case SKILLS.BluntWeapon: {
       const share = shareOf(target);
-      if (share === null) return climb * (WEAPON_POTENCY_PER_POINT * 100);   // the line unread: the halves' mean (x1.4), the sword's own
+      if (share === null) return climb * (WEAPON_POTENCY_PER_POINT * 100);   // the line unread: the halves' mean (x1.1), the sword's own
       return (skill === SKILLS.Axe ? share < WEAPON_HALF_LINE : share >= WEAPON_HALF_LINE) ? climb * (WEAPON_HALF_PER_POINT * 100) : 0;
     }
     default: return 0;
@@ -121,7 +121,7 @@ export function weaponMasteryBlow(weapon, damage, attacker, target, info = null)
   return damage + more;
 }
 
-/** THE PACE: a short blade's swing, its skill past 100 - 1% quicker a point. `w` the swing reader's answer
+/** THE PACE: a short blade's swing, its skill past 100 - 0.25% quicker a point. `w` the swing reader's answer
  *  (combat/swingLaw.js readSwing), read here only once a climb would pay (AUDIT MARTIAL L2 F3). */
 export function weaponMasteryPace(ctx, w) {
   if (sigilDueling()) return 0;

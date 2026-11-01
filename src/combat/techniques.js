@@ -29,7 +29,7 @@
 
 import { techniqueById, techniqueMult, techniqueFamily, TECHNIQUE_MAX_SPEED, TECHNIQUES, TECHNIQUE_ACTION } from './technique/techniqueRoster.js';
 import { signatureFor, signatureById, SIGNATURE_IDS, SIGNATURE_TECHNIQUES } from '../systems/martialPaths.js';   // MARTIAL3: a martial path's signature - the key's answer when the weapon carries no line
-import { techniqueLineOf, lootRarityOn, rarityKnown } from '../systems/loot/lootRarity.js';
+import { techniqueLineOf, techniquesOn, rarityKnown } from '../systems/loot/lootRarity.js';
 import { EQUIP_SLOTS } from '../systems/equip.js';
 import { sigilDueling } from '../systems/sigil/sigil.js';
 import { FATIGUE_MULTIPLIER } from '../systems/statMods.js';
@@ -58,7 +58,7 @@ const SWING_GIVE_UP_S = 3;
 
 // ── the words ───────────────────────────────────────────────────────
 export const NO_TECHNIQUE_TEXT = 'This weapon has no technique.';
-export const LADDER_OFF_TEXT = 'Weapon techniques need Loot rarity turned on.';
+export const LADDER_OFF_TEXT = 'Weapon techniques are turned off (they need Loot rarity and Weapon techniques on).';
 export const DUEL_TEXT = "Techniques can't be used in a duel.";
 export const TIRED_TEXT = 'You are too tired.';
 export const SHEATHED_TEXT = 'Draw your weapon first.';
@@ -129,7 +129,7 @@ export function techniqueInHand(entity, pw) {
   if (!tech) return signatureInHand(entity, pw, item);
   // AUDIT MARTIAL L4 L6: a found line SLEEPS with the ladder off (Loot-II law 6), so the key is free - a held path's
   // signature answers it; with none, the line's own refusal says why
-  if (!lootRarityOn()) { const sig = signatureInHand(entity, pw, item); if (sig) return sig; }
+  if (!techniquesOn()) { const sig = signatureInHand(entity, pw, item); if (sig) return sig; }
   const known = rarityKnown(item), h = _handMemo;
   if (h && h.item === item && h.line === line && h.id === line.param && h.value === line.value && h.known === known) return h.hand;
   const hand = { id: line.param, value: line.value, tech, item, known };
@@ -466,7 +466,7 @@ export function refusal(hand, ctx) {
   const pw = ctx.pw;
   if (pw?.weapon?.werecreatureClaws) return BEAST_TEXT;
   if (!hand) return pw?.weapon && techniqueLineOf(ctx.entity?.equip?.slots?.[EQUIP_SLOTS.Gloves]) ? GAUNTLETS_TEXT : NO_TECHNIQUE_TEXT;   // AUDIT TECH1: the gauntlets' line sleeps while a weapon is drawn - say so
-  if (!hand.signature && !lootRarityOn()) return LADDER_OFF_TEXT;   // Loot-II law 6: off is DFU exactly - a found line sleeps (MARTIAL3: a path's signature is no found line)
+  if (!hand.signature && !techniquesOn()) return LADDER_OFF_TEXT;   // Loot-II law 6: off is DFU exactly - a found line sleeps (MARTIAL3: a path's signature is no found line)
   if (sigilDueling()) return DUEL_TEXT;   // TECH law 3: never at a player - every power that sleeps in a duel, or a bout between players, sleeps
   if (pw.sheathed) return SHEATHED_TEXT;
   if (_s.act) return true;   // one at a time
@@ -722,7 +722,7 @@ let _chipSecs = -1, _chipSecsText = '';
  *  @param {any} entity @param {any} pw @param {string | (() => string)} [keyName] */
 export function techniqueHudChips(entity, pw, keyName = '') {
   const hand = techniqueInHand(entity, pw);
-  if (!hand || (!hand.signature && !lootRarityOn())) return NONE;   // TECH-FX: no technique in hand - the frozen empty list, never a new one a frame (MARTIAL3: a signature needs no ladder)
+  if (!hand || (!hand.signature && !techniquesOn())) return NONE;   // TECH-FX: no technique in hand - the frozen empty list, never a new one a frame (MARTIAL3: a signature needs no ladder)
   if (sigilDueling()) return NONE;   // FINAL AUDIT: nor while a duel sleeps the key (law 3) - the set powers' chips' law, none while they sleep; the card's block says why
   const left = techniqueWait(hand.id);
   _chip.name = techniqueName(hand);

@@ -23,6 +23,7 @@ import { castRate } from '../../src/systems/castSpeed.js';
 import { setSigilDueling, _resetSigilForTests } from '../../src/systems/sigil/sigil.js';
 import { setRenownLayer, renownHpOf } from '../../src/systems/renownLayer.js';
 import { createHerbAct } from '../../src/systems/herbAct.js';
+import { BLOW_TOPS } from '../../src/systems/powerCeiling.js';
 import { createFishAct } from '../../src/systems/fishAct.js';
 import { HERB_ACT, tugWindow } from '../../src/net/professionLaw.js';
 
@@ -169,7 +170,7 @@ test('FIRM1 powers: A BLOW - my fists at a foe the law\'s percent more (the frac
   const pct = blowPct(treeStats(t), { skill: 'HandToHand', group: 'humanoid' });
   assert.ok(pct > 0);
   const hits = Array.from({ length: 10 }, () => weaponBlowMods(null, 10, p, FOE, { unaware: false }));
-  assert.equal(hits.reduce((a, b) => a + b, 0), 100 + Math.floor(pct), 'ten blows of 10 carry the percent whole');
+  assert.equal(hits.reduce((a, b) => a + b, 0), 100 + Math.min(Math.floor(pct), BLOW_TOPS.firmament), `ten blows of 10 carry the percent whole: ${pct}% asked, cut to the firmament blow top of ${BLOW_TOPS.firmament}% (B1)`);
   assert.equal(weaponBlowMods(null, 10, p, { ...FOE, isPlayer: true }, {}), 10, 'a player struck: nothing');
   setSigilDueling(true);
   assert.equal(weaponBlowMods(null, 10, p, FOE, {}), 10, 'a duel: nothing');
@@ -202,8 +203,8 @@ test('FIRM1 powers: WHAT LANDS ON ME - a spell\'s damage by its channel, and the
   setRenownLayer(p, null);
   assert.equal(renownHpOf(p), 0, 'offline, the whole layer goes - nothing of it in a save');
   // a spell's damage (no blow pending) by `spellTaken`; none asleep
-  setFirmamentTree(walk('rt.start', named('Spell Turning')));   // 4% less
-  assert.equal(firmamentDamage(p, 100), 96);
+  setFirmamentTree(walk('rt.start', named('Spell Turning')));   // 4% less asked (3% under the firmament top)
+  assert.equal(firmamentDamage(p, 100), 97, 'Spell Turning 4% less asked, cut to the firmament guard top of 3% (B1)');
   setSigilDueling(true);
   assert.equal(firmamentDamage(p, 100), 100);
 });

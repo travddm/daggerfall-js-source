@@ -5,13 +5,18 @@
 // alone cut whichever registry the import graph asked last (a loot power past 240 took a martial path from 40 to 8), so
 // the registry past its own top is the one cut. The runners (entityMods.js, playerEntity.js) and registries import it.
 
-/** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent), measured from today's records and laws. */
-export const BLOW_TOPS = Object.freeze({ sigil: 12, sets: 200, loot: 240, firmament: 50, mastery: 400, martial: 40 });   // WEAPON-GEAR: mastery's top the axe's climb 80 + its gear's 320 (weaponMastery.js), was the climb's +80%
-/** THE GUARDS' TOPS: each registry's most off one hurt (per cent), its guards multiplied. */
-export const GUARD_TOPS = Object.freeze({ loot: 55, sets: 50, firmament: 15, martial: 30, arcane: 20 });
-/** A blow is at most this many times what its powers were handed (x119.95; x43.18 before WEAPON-GEAR). */
+/** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent). B1 (tame player power): these are the budget, not
+ *  what the records can reach. The records still say more (sets +200, loot +240, ..., tools/powerCeiling.mjs measures them)
+ *  and are cut to their share here. Before B1 the tops were the records' own, 12 / 200 / 240 / 50 / 400 / 40, and their
+ *  product x119.95; now the whole stack is about x1.75. Every source keeps a share, so a path or a set is never starved by
+ *  the one asked first. */
+export const BLOW_TOPS = Object.freeze({ sigil: 2, sets: 6, loot: 20, firmament: 3, mastery: 25, martial: 5 });
+/** THE GUARDS' TOPS: each registry's most off one hurt (per cent), its guards multiplied. B1: the budget, as BLOW_TOPS (was
+ *  55 / 50 / 15 / 30 / 20, the records' own, a hurt kept at 10.71%; now it keeps about 74%). */
+export const GUARD_TOPS = Object.freeze({ loot: 8, sets: 8, firmament: 3, martial: 6, arcane: 4 });
+/** A blow is at most this many times what its powers were handed (x1.75; x119.95 before B1). */
 export const BLOW_MOST = Object.values(BLOW_TOPS).reduce((k, p) => k * (1 + p / 100), 1);
-/** A hurt keeps at least this share of what reached the guards (10.71%). Points (Bulwark, a ward, a Shield's pool), a
+/** A hurt keeps at least this share of what reached the guards (74%; 10.71% before B1). Points (Bulwark, a ward, a Shield's pool), a
  *  hit capped by health (Unyielding) and a blow turned aside whole are no share, and stand outside it. */
 export const GUARD_LEAST = Object.values(GUARD_TOPS).reduce((k, p) => k * (1 - p / 100), 1);
 /** Rounding's slack: a product taken in another order differs in its last bits, and that is no stacking. */
