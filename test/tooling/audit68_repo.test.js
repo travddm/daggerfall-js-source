@@ -152,8 +152,8 @@ test('AUDIT 68 X2-npm-test-glob: npm test runs the test files, not the helpers b
   // FAST-SUITE: `npm test` is `tools/testShards.mjs 1/1` now - its list is testFiles(), which must be exactly the glob's
   assert.equal(JSON.parse(read('package.json')).scripts.test, 'node tools/testShards.mjs 1/1');
   const listed = testFiles(root);
-  assert.ok(listed.length > 0 && listed.every((f) => /^test\/(?:[\w-]+\/)*[^/]+\.test\.js$/.test(f)), 'testFiles lists test/**/*.test.js and nothing else');
-  assert.deepEqual(listed, readdirSync(join(root, 'test'), { recursive: true }).filter((f) => f.endsWith('.test.js')).sort().map((f) => `test/${f}`), 'and every one of them, in every folder');
+  assert.ok(listed.length > 0 && listed.every((f) => /^test\/(?:[\w-]+\/)*[^/]+\.test\.(?:js|ts)$/.test(f)), 'testFiles lists test/**/*.test.js and *.test.ts and nothing else');
+  assert.deepEqual(listed, readdirSync(join(root, 'test'), { recursive: true }).filter((f) => /\.test\.(?:js|ts)$/.test(f)).sort().map((f) => `test/${f}`), 'and every one of them, in every folder');
   const stray = tracked('*.js').concat(tracked('*.mjs'), tracked('*.cjs'))
     .filter((f) => /\.test\.[cm]?js$/.test(f) && !/^test\/(?:[\w-]+\/)*[^/]+\.test\.js$/.test(f));
   assert.deepEqual(stray, [], 'every test file sits where the glob looks');
