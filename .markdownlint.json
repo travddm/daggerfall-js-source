@@ -4,6 +4,7 @@
   "no-hard-tabs": false,
   "first-line-heading": false,
   "no-inline-html": false,
+  "no-bare-urls": false,
   "line-length": {
     "line_length": 120,
     "tables": false,

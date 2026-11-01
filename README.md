@@ -15,7 +15,7 @@ the repository, the live domain, the servers and the desktop app's identifier
 still carry the old `daggerfall` spellings - renaming those is a move outside
 this tree (BR1, BR5).
 
-Play it: <https://daggerfalljs.dev/>
+Play it: https://daggerfalljs.dev/
 
 The site is `index.html` (what it is, how to play, credits); the game is
 `play/index.html`, served at `/play/`. Both deploy from `main` to GitHub
