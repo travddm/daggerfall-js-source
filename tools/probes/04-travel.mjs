@@ -55,7 +55,9 @@ export async function run({ browser, base, ck }) {
         const j = await g.J(() => JSON.stringify(window.__journeyState()));
         return Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1;
       },
-      240000,
+      // the journey walks the player a frame at a time: three map pixels took over 240 s in software GL (measured: two pixels
+      // in 240 s with Edge on SwiftShader), and CI's runners are slower still
+      900000,
       1000,
     );
     await g.until(() => g.page.evaluate(() => window.__streamIdle?.() === true), 240000);

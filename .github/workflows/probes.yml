@@ -36,7 +36,7 @@ jobs:
   probe:
     name: probe ${{ matrix.probe }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     strategy:
       # every probe reports, so one red run shows every broken part
       fail-fast: false
