@@ -30,7 +30,7 @@ const START = Math.floor(siegeStartMs(W + 1, 0, 20) / 1000);   // Wednesday 20:0
 async function siegeWeek(t) {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', MODERATOR_HANDLES: 'Mora', DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_MODERATORS: 'Mora', SEAT_ADMINS: 'Devra' });
   const raw = svc.env.DB._raw;
   const witnesses = [await svc.guest(), await svc.guest(), await svc.guest()];
   for (const seat of [ANTICLERE, ASHFIELD]) for (const w of witnesses) raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(seat.key), w.id, seatReportText(seat), seat.region, T0 - DAY);

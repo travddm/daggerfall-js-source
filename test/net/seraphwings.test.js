@@ -2,8 +2,8 @@
 //
 // The owner, sending a painted angel whose wings are long ribbons of golden light: "So I want to build an aura for the
 // developers. These are based off this image above. Golden Angel wings that flow". The developers are
-// DEVELOPER_HANDLES (the developer title and glyph's list), so the wings are held while the handle is listed
-// (titles.js DEVELOPER_AURA) and gone on the next token once it is not. They are the aura pass's fifth look
+// Admins (the account's `staff_admin` role, which also gives the developer title and glyph), so the wings are held
+// while the account has the role (titles.js DEVELOPER_AURA) and gone on the next token once it does not. They are the aura pass's fifth look
 // (render/auraRing.js AURA_LOOK): wings of light ON THE BODY - plumes fanned from the upper back, each a broad strand
 // of light and two fine ones, waves running out along them so they flow, motes of gold drifting off them, a faint
 // pool of gold beneath - hung from the body's shoulders as the cape is and swung by its motion. Added whole: light,
@@ -35,14 +35,14 @@ import { glslFunctions, GlslDiscard } from '../glsl.mjs';
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const { subtle } = webcrypto;
 const toml = rd('server-account/wrangler.toml');
-const v = (k) => new RegExp(`^${k} = "([^"]*)"$`, 'm').exec(toml)?.[1];
 const ENV = Object.fromEntries([...toml.matchAll(/^([A-Z_]+_HANDLES) = "([^"]*)"$/gm)].map((m) => [m[1], m[2]]));
 const AFTER = 1_900_000_000;
 const LATER = AFTER + 30 * 86_400;
 const row = (handle, over = {}) => ({ handle, created_at: AFTER, registered_at: AFTER, ...over });
 const lum = (c) => c[0] + c[1] + c[2];
 const TAU = 2 * Math.PI;
-const DEVS = (v('DEVELOPER_HANDLES') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+const DEVS = ['Lattymoy'];   // a handle only names the account; the Admin role is the row's `staff_admin`
+const admin = (handle, over = {}) => row(handle, { staff_admin: 1, ...over });
 
 // ── THE VOCABULARY, THE GRANT, THE WIRE ─────────────────────────────
 
@@ -59,35 +59,33 @@ test('SERAPH-WINGS vocabulary: the wings join AURAS last, "Seraph Wings" in word
   assert.ok(lum(WING_RGB.core) > lum(WING_RGB.gold) && lum(WING_RGB.gold) > lum(WING_RGB.amber) && WING_RGB.core[2] > 0.8, 'white-hot at the heart, gold through it, amber at the edge');
 });
 
-test('SERAPH-WINGS grant: every developer holds the wings, case-folded, read off the config alone; worn while held; off the list they go; a guest, the other lists\' holders and everyone else hold none of them; a developer on another list holds that list\'s aura first (mutants: the grant, the list)', () => {
-  assert.ok(DEVS.length >= 1, 'DEVELOPER_HANDLES names the developers');
-  assert.equal(DEVELOPER_AURA, 'seraphwings');
+test('SERAPH-WINGS grant: every Admin account holds the wings, whatever its handle; worn while held; role taken off, they go; a guest, the other lists\' holders and everyone else hold none of them; a developer on another list holds that list\'s aura first (mutants: the grant, the list)', () => {
+    assert.equal(DEVELOPER_AURA, 'seraphwings');
   for (const h of DEVS) for (const hh of [h, h.toLowerCase(), h.toUpperCase()]) {
-    const p = row(hh);
+    const p = admin(hh);
     assert.ok(isDeveloper(p, ENV), `${hh}: a developer`);
     assert.ok(aurasHeld(p, ENV).includes('seraphwings'), `${hh}: holds the wings`);
     assert.equal(auraRefusal('seraphwings', p, ENV), null);
   }
-  const dev = row(DEVS[0], { aura: 'seraphwings' });
+  const dev = admin(DEVS[0], { aura: 'seraphwings' });
   assert.equal(auraWorn(dev, ENV), 'seraphwings');
-  assert.equal(auraWorn(dev), undefined, 'without the config, the Broker\'s alone - the wings are the list\'s');
-  assert.deepEqual(aurasHeld(row(DEVS[0], { insignia: 'aura:dagonfire' }), ENV), ['seraphwings', 'dagonfire'], 'the wings, then what the Broker sold');
+  assert.deepEqual(aurasHeld(admin(DEVS[0], { insignia: 'aura:dagonfire' }), ENV), ['seraphwings', 'dagonfire'], 'the wings, then what the Broker sold');
   const w = wardrobeOf(dev, ENV, LATER);
   assert.ok(w.auras.includes('seraphwings') && w.aura === 'seraphwings' && titlesHeld(dev, ENV).includes('developer'), 'the account card\'s answer: the wings beside the developer title');
-  const off = { ...ENV, DEVELOPER_HANDLES: '' };
-  assert.deepEqual(aurasHeld(dev, off), [], 'off the list, the wings go');
-  assert.equal(auraWorn(dev, off), undefined);
-  assert.equal(auraRefusal('seraphwings', dev, off), 'not-held');
+  const off = { ...dev, staff_admin: 0 };
+  assert.deepEqual(aurasHeld(off, ENV), [], 'role taken off, the wings go');
+  assert.equal(auraWorn(off, ENV), undefined);
+  assert.equal(auraRefusal('seraphwings', off, ENV), 'not-held');
   assert.deepEqual(aurasHeld({ ...dev, handle: null }, ENV), [], 'a guest holds none');
   for (const [h, theirs] of [['Asynian', []], ['SquidKamer', []], ['Stranger', []]]) {
     assert.deepEqual(aurasHeld(row(h), ENV), theirs, `${h}: their own and not the wings`);
     assert.equal(auraRefusal('seraphwings', row(h), ENV), 'not-held');
   }
-  for (const h of DEVS) assert.deepEqual(aurasHeld(row(h), ENV), ['seraphwings'], `${h}: a developer holds the wings`);
+  for (const h of DEVS) assert.deepEqual(aurasHeld(admin(h), ENV), ['seraphwings'], `${h}: a developer holds the wings`);
 });
 
-test('SERAPH-WINGS the service end to end: a developer registers and holds the wings; wears them through the aura door; the token signs them; a stranger is refused them; off the list the next token carries none', async () => {
-  const { env, call, registered, identityPublic } = await standService({ DEVELOPER_HANDLES: 'Lattymoy' });
+test('SERAPH-WINGS the service end to end: a developer registers and holds the wings; wears them through the aura door; the token signs them; a stranger is refused them; role taken off, the next token carries none', async () => {
+  const { call, registered, identityPublic, setStaff } = await standService({ SEAT_ADMINS: 'Lattymoy' });
   const me = await registered('Lattymoy');
   const mint = async () => {
     const r = await call('/v1/auth/token', {}, me.secret);
@@ -106,9 +104,9 @@ test('SERAPH-WINGS the service end to end: a developer registers and holds the w
   const other = await registered('Stranger');
   r = await call('/v1/account/aura', { aura: 'seraphwings' }, other.secret);
   assert.equal(r.body.error, 'not-held', 'a stranger is refused the wings');
-  env.DEVELOPER_HANDLES = '';
+  setStaff('Lattymoy', 'none');
   m = await mint();
-  assert.equal('au' in m.claims, false, 'off the list: the next token carries no wings');
+  assert.equal('au' in m.claims, false, 'role taken off: the next token carries no wings');
 });
 
 test('SERAPH-WINGS the account card: wearing the wings, the card says their name', async () => {

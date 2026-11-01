@@ -62,7 +62,7 @@ function d1(hooks) {
   };
 }
 
-async function stand(vars = {}) {
+async function stand({ admins = [], ...vars } = {}) {
   _resetKeyForTests();
   const kp = await webcrypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pkcs8 = Buffer.from(new Uint8Array(await webcrypto.subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
@@ -85,6 +85,7 @@ async function stand(vars = {}) {
   const account = async (handle = `settler${++n}x`) => {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
     assert.equal((await call('/v1/auth/register', { secret: g.secret, handle, password: 'a good long one', ...ACCEPTED }, g.secret)).status, 200);
+    if (admins.includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(g.id);   // STAFF-ROLES-BY-ACCOUNT: the Admin role is the account's
     return { id: g.id, secret: g.secret };
   };
   const rows = (sql, ...a) => env.DB._raw.prepare(sql).all(...a).map((r) => ({ ...r }));
@@ -169,7 +170,7 @@ test('HOUSE-LOSS 1: the door\'s undo is its own route - it undoes a customs that
 });
 
 test('HOUSE-LOSS 1 / CUSTOMS-PASS: an undo gives back everything customs spent - on every account a copy of the character was counted on, and a developer\'s pass, whose census row goes with it, so the pass brings the character in again; an account granted another since keeps one open pass, never two', async () => {
-  const s = await stand({ DEVELOPER_HANDLES: 'StaffDev' });
+  const s = await stand({ admins: ['StaffDev'] });
   const dev = await s.account('StaffDev'), a = await s.account('PassHolder'), b = await s.account();
   const grant = async () => assert.deepEqual((await s.call('/v1/mod/customs-pass', { name: 'PassHolder' }, dev.secret)).body?.open, true);
   const passes = () => s.rows('SELECT origin_id, spent_at IS NOT NULL AS spent FROM realm_passes WHERE player = ? ORDER BY id', a.id);

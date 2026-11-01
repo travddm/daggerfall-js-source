@@ -1,7 +1,7 @@
 // PRIVATE-REPORT: THE
 // SERVICE'S SIDE - migration 0129 (private_reports), server-account/src/reports.js and its five routes, the reader's
 // count on the post box and the heartbeat's post part. A report is a registered player's to the readers
-// REPORT_READER_HANDLES names, and nobody else lists or opens one.
+// SEAT_OWNERS names, and nobody else lists or opens one.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -39,7 +39,7 @@ test('PRIVATE-REPORT the table and the doors: 0129 lays private_reports - one re
     assert.equal(typeof REFUSALS[w], 'string', w);
   }
   // AUDIT PRIVATE-REPORT TEST-16: the readers by name - who reads an unfixed exploit is a change a pin moves on purpose
-  assert.match(src('server-account/wrangler.toml'), /^REPORT_READER_HANDLES = "Lattymoy"$/m, 'the readers are named in config');
+  assert.doesNotMatch(src('server-account/wrangler.toml'), /^REPORT_READER_HANDLES/m, 'the readers are Owner accounts, named in no config');
 
   const svc = await standService();
   const g = await svc.guest();
@@ -106,7 +106,7 @@ test('PRIVATE-REPORT the bounds: REPORT_SEND_MAX an hour an account (report-rate
 });
 
 test('PRIVATE-REPORT a reporter\'s own: newest first, heads alone - never the words, never another\'s; read and closed as a reader leaves them (mutants: the list unscoped; the rows answered raw)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob'), mac = await svc.registered('Mac');
   const a1 = (await svc.call('/v1/report/send', words({ subject: 'First one', body: 'The secret steps, one.' }), ann.secret)).body.id;
   const a2 = (await svc.call('/v1/report/send', words({ kind: 'bug', subject: 'Second one' }), ann.secret)).body.id;
@@ -127,7 +127,7 @@ test('PRIVATE-REPORT a reporter\'s own: newest first, heads alone - never the wo
 });
 
 test('PRIVATE-REPORT THE READERS ALONE: a developer, a moderator or anybody the list does not name refused (not-report-reader, 403); a reader\'s inbox unopened first then newest, with who sent each; one opened - its words and its context - and stamped read; closed, moved to the closed list, and opened again (mutants: the reader check gone; read never stamped; the close unscoped to its id)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac', DEVELOPER_HANDLES: 'Kestrel', MODERATOR_HANDLES: 'Heron' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac', SEAT_ADMINS: 'Kestrel', SEAT_MODERATORS: 'Heron' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const dev = await svc.registered('Kestrel'), mod = await svc.registered('Heron');
   const old = (await svc.call('/v1/report/send', words({ subject: 'Old one', context: { build: 'abcdef1' } }), ann.secret)).body.id;
@@ -138,8 +138,8 @@ test('PRIVATE-REPORT THE READERS ALONE: a developer, a moderator or anybody the 
       assert.deepEqual(await svc.call(r, b, who.secret), { status: 403, body: { error: 'not-report-reader' } }, `${who.handle} ${r}`);
     }
   }
-  assert.equal(isReportReader(rowOf(svc, mac), { REPORT_READER_HANDLES: ' mac ,Other' }), true, 'case and spaces as every list');
-  assert.equal(isReportReader({ handle: null }, { REPORT_READER_HANDLES: 'Mac' }), false, 'a guest never');
+  assert.equal(isReportReader(rowOf(svc, mac), {}), true, 'an Owner account reads');
+  assert.equal(isReportReader({ handle: null, staff_owner: 1, staff_admin: 1 }, {}), false, 'a guest never');
 
   // AUDIT PRIVATE-REPORT TEST-3: read the NEW one - the unopened OLD one leads: unread first, never newest first
   assert.equal((await svc.call('/v1/report/read', { id: neu }, mac.secret)).status, 200);
@@ -174,7 +174,7 @@ test('PRIVATE-REPORT THE READERS ALONE: a developer, a moderator or anybody the 
 });
 
 test('PRIVATE-REPORT A READER\'S BOX SAYS ONE CAME: the post box and the heartbeat\'s post part carry `reports` - open and unopened - for a reader alone; nobody else\'s box carries the key, nor asks the table (mutants: the counts for everyone; the heartbeat without the config)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const box = async (who) => (await svc.fetch('https://accounts.invalid/v1/post/box', { method: 'GET', headers: { authorization: `Bearer ${who.secret}` } })).json();
   assert.deepEqual((await box(mac)).reports, { unread: 0, open: 0 });
@@ -185,8 +185,8 @@ test('PRIVATE-REPORT A READER\'S BOX SAYS ONE CAME: the post box and the heartbe
   assert.deepEqual((await svc.call('/v1/heartbeat', { post: true }, mac.secret)).body.post.reports, { unread: 1, open: 2 }, 'the heartbeat\'s part the same');
   assert.equal('reports' in (await box(ann)), false, 'a reporter\'s box says nothing of anybody\'s reports');
   assert.equal('reports' in (await svc.call('/v1/heartbeat', { post: true }, ann.secret)).body.post, false);
-  // and a box asked with no config at all (an older caller) is the box as it was
-  assert.equal('reports' in (await postBoxOf({ db: svc.env.DB }, rowOf(svc, mac))), false);
+  // and the role is the row's, so a box asked with no config at all still carries it for an Owner
+  assert.equal('reports' in (await postBoxOf({ db: svc.env.DB }, rowOf(svc, mac))), true);
 });
 
 test('PRIVATE-REPORT the functions refuse alone what the routes would: a reader read and closed with no list; the reporter\'s list empty before any (mutants: a missing env read as everyone\'s)', async () => {
@@ -196,7 +196,7 @@ test('PRIVATE-REPORT the functions refuse alone what the routes would: a reader 
   const row = rowOf(svc, mac);
   assert.deepEqual(await reportInbox(ctx, row, {}), { error: 'not-report-reader' });
   assert.deepEqual(await readReport(ctx, row, undefined, 'x'.repeat(24)), { error: 'not-report-reader' });
-  assert.deepEqual(await closeReport(ctx, row, { REPORT_READER_HANDLES: '' }, { id: 'x'.repeat(24), state: 'fixed' }), { error: 'not-report-reader' });
+  assert.deepEqual(await closeReport(ctx, { ...row, staff_owner: 0 }, {}, { id: 'x'.repeat(24), state: 'fixed' }), { error: 'not-report-reader' });
   assert.deepEqual(await myReports(ctx, row), { reports: [], max: 20 });
 });
 
@@ -257,7 +257,7 @@ test('AUDIT PRIVATE-REPORT SVC-3 TEST-2 TEST-11: the hour\'s bound is an ACCOUNT
 });
 
 test('AUDIT PRIVATE-REPORT TEST-3 TEST-7 TEST-8 TEST-9 SVC-4 SVC-6 TEST-15: the inbox unopened first then newest; the closed list every closed state, the last closed first; the first reader\'s stamps kept by a second, a close by the reader who closed; the counts after a close; a report opened again unread stays unread; past a hundred, a next page; the reporter\'s list twenty (mutants: newest first alone; the closed list fixed alone; the closed list oldest first; a second reader\'s read stamped over the first\'s; a close\'s read over the first; the counts counting closed; the reopen reading; no next page; the limits gone)', async () => {
-  const env = { REPORT_READER_HANDLES: 'Mac,Lat' };
+  const env = { SEAT_OWNERS: 'Mac,Lat' };
   const svc = await standService(env);
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob'), mac = await svc.registered('Mac'), lat = await svc.registered('Lat');
   const at = (n) => ({ db: svc.env.DB, nowS: T0 + n });
@@ -300,7 +300,7 @@ test('AUDIT PRIVATE-REPORT TEST-3 TEST-7 TEST-8 TEST-9 SVC-4 SVC-6 TEST-15: the 
 });
 
 test('AUDIT PRIVATE-REPORT SVC-5: NOBODY ELSE\'S BOX ASKS THE TABLE - a reporter\'s post box and heartbeat run no statement naming private_reports; a reader\'s does (mutants: the counts asked for every box)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const said = [];
   const prepare = svc.env.DB.prepare.bind(svc.env.DB);

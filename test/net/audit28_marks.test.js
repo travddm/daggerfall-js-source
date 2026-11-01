@@ -159,7 +159,7 @@ test('AUDIT 28 M4: the gate\'s row and its Marks are one transaction - a strike 
 
 test('AUDIT 28 M5: the guild view shows Marks only where they are the viewer\'s, and a switch the guildmaster cannot pass locks nothing', async (t) => {
   t.mock.method(Date, 'now', () => T0 * 1000);
-  const svc = await standService({ MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra' });
   const g = await svc.registered('Gild', { renown: GUILD_FOUND_RENOWN });
   const d = await svc.registered('Devra');
   const { guild } = (await svc.found(g, { name: 'Open Hands', tag: 'OPH' })).body;
@@ -236,7 +236,7 @@ test('AUDIT 28 M9: "Sold today" moves with the sale', async (t) => {
 test('AUDIT 28 M10: the weekly report counts the ACCOUNTS at a cap, once each, with the account-days beside them', async (t) => {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra' });
   const d = await svc.registered('Devra');
   const a = await svc.registered('Anna');
   await svc.claim(a, 700, now); await svc.claim(a, 701, now); await svc.claim(a, 704, now);

@@ -172,7 +172,7 @@ test('AUTO-HOLD service: three copied pieces in one record are one incident - ea
 });
 
 test('AUTO-HOLD service: a row still held \'dupe\' lifts at its next checkpoint; staff\'s clear and rollback forget the timed hold and its count; staff\'s reads show it', async () => {
-  const s = await stand({ DEVELOPER_HANDLES: 'mac' });
+  const s = await stand({ SEAT_ADMINS: 'mac' });
   try {
     const A = await s.seat('old');
     s.raw.prepare("UPDATE realm_characters SET held = 'dupe', held_at = 1 WHERE id = ?").run(A.R.id);

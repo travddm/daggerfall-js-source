@@ -40,7 +40,7 @@ const harvestBody = (who, p, extra = {}) => ({
   climate: WOODS, region: ANTICLERE, act: { clean: false, bruised: false }, at: NOON - 2, rid: rid(), ...extra,
 });
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const rows = (table) => (who, material) => raw.prepare(`SELECT origin, qty FROM ${table} WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin`)
     .all(who.id, who.character, material).map((r) => [r.origin, Number(r.qty)]);

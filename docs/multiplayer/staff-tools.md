@@ -8,13 +8,16 @@ in [chat-safety.md](chat-safety.md).
 
 | Role | Source | Checked by |
 | --- | --- | --- |
-| Admin | `DEVELOPER_HANDLES` | `isDeveloper`; `staffRole` returns `admin` |
-| Moderator | `MODERATOR_HANDLES`, `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
-| Owner | `OWNER_HANDLES` (and staff) | `isOwner` |
-| Report reader | `REPORT_READER_HANDLES` | `isReportReader` |
+| Admin | `players.staff_admin` | `isDeveloper`; `staffRole` returns `admin` |
+| Moderator | `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
+| Owner | `players.staff_owner` (and Admin) | `isOwner` |
+| Report reader, POI approver | an Owner | `isReportReader`, `poiRolesOf` |
+| POI builder | an Admin | `poiRolesOf` |
 
-All lists are in `server-account/wrangler.toml` and read fresh on every request (`handleList`,
-`server-account/src/titles.js`).
+A role belongs to the account, never to a handle: registering a name grants nothing. The columns are read fresh on every
+request. An Owner is set only by the operator (`tools/staffRole.mjs`); an Owner adds and removes Admins
+(`/v1/staff/admin/add`, `/admin/remove`); an Admin adds and removes Moderators (`/v1/staff/mod/add`, `/mod/remove`). A
+Moderator changes no role. See [Staff roles](../operations/staff-roles.md).
 
 In game, the relay sees roles only as **glyphs** in the identity token (`glyphsOf`). `isStaff`
 (`src/net/staffCommands.js`) accepts `STAFF_GLYPHS` (`dev`, `dm`). The `mod` glyph is not in that list;

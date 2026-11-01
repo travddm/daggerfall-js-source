@@ -122,9 +122,9 @@ test('WB5b the worker: /v1/gate/claim behind a session and never open - the sess
   t.mock.method(Date, 'now', () => clock);
   const { priv, pub } = await gatePair();
   assert.ok(ROUTES.has('/v1/gate/claim') && !OPEN_ROUTES.has('/v1/gate/claim'));
-  assert.equal(ACCOUNT_VERSION, 'acct207');
+  assert.equal(ACCOUNT_VERSION, 'acct208');
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /ACCOUNT_VERSION = "acct207"/);
+  assert.match(toml, /ACCOUNT_VERSION = "acct208"/);
   // GATE-KEYS: the public half is a Worker SECRET the account deploy puts (account-deploy.yml, "Mint the gate receipt
   // pair") - a var of the name would be rewritten by every deploy and would refuse the secret its binding
   assert.doesNotMatch(toml, /^\s*GATE_PUBLIC_KEY\s*=/m, 'no var of the public half - the deploy puts it as a secret');

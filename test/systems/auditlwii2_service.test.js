@@ -251,7 +251,7 @@ test('AUDIT LW-II-2 S2: A PATRON\'S SALE TELLS THE INT4 LEDGER - a rare piece (i
 test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID - shut (or its developers\' alone) thirty hours, the hour\'s cron marks the traders\' hours as they pass, and opening it pays none of them (its first firing after paid every shut hour); a developer\'s read behind `dev` reckons nobody\'s town; the migration reckons every open trader listing to the hour before it runs, never a board\'s (mutants: the cron marks, a read asks the switch, the backfill\'s hour, its traders alone)', async () => {
   for (const marks of ['off', 'dev']) {
     _now = T0;
-    const s = await rawStand({ MARKS_OPEN: marks, DEVELOPER_HANDLES: 'Dev' });
+    const s = await rawStand({ MARKS_OPEN: marks, SEAT_ADMINS: 'Dev' });
     const eve = await s.registered('Eve');
     const v = s.home(eve, 8001, 10);
     for (const it of loot(20)) s.list(eve, v, it);
@@ -266,7 +266,7 @@ test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID
   }
   // behind `dev`, a developer's region read: nobody's town reckoned
   _now = T0;
-  const d = await rawStand({ MARKS_OPEN: 'dev', DEVELOPER_HANDLES: 'Dev' });
+  const d = await rawStand({ MARKS_OPEN: 'dev', SEAT_ADMINS: 'Dev' });
   const ann = await d.registered('Ann'), dev = await d.registered('Dev');
   const dv = d.home(ann, 8101, 10);
   for (const it of loot(20)) d.list(ann, dv, it);
@@ -381,7 +381,7 @@ test('AUDIT LW-II-2 S5: A HELD SELLER CROWDS NO TOWN - four traders the judge ho
 
 test('AUDIT LW-II-2 S6: THE PATRONS\' GOLD WHERE THE WEALTH MEASURE COUNTS IT - /v1/mod/realm-budget names the service\'s own faucets over its window (every FAUCET_KINDS kind, the patron\'s gold and payments - nothing read realm_faucets), an hour older than the window not counted; tools/realmReview.mjs says it (mutants: the faucets answered, the window, the tool)', async () => {
   _now = T0;
-  const s = await rawStand({ DEVELOPER_HANDLES: 'Dev' });
+  const s = await rawStand({ SEAT_ADMINS: 'Dev' });
   const eve = await s.registered('Eve'), dev = await s.registered('Dev');
   const v = s.home(eve, 8301, 10);
   for (const it of loot(20)) s.list(eve, v, it);

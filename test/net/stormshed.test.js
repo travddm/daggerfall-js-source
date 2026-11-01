@@ -249,7 +249,7 @@ test('STORM-SHED B: a Watch claim that failed waits SEAT_WATCH_RETRY_MS before t
 
 // ═══ C. THE READS THE ASKS MULTIPLIED ════════════════════════════════════════════════════════════════════════════════
 
-const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
+const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
 const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
@@ -274,7 +274,7 @@ async function seatsDb() {
   return { svc, db, c, gate };
 }
 const PLAYER = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * DAY };
-const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY };
+const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY, staff_admin: 1 };
 
 test('STORM-SHED C: the seats\' witness rows are read once in SEAT_ROWS_KEPT_S by one isolate for a player\'s list and a Watch claim, every ask of one moment sharing the read; a developer\'s list and every other act read the table as it stands (mutants: the kept answer; the shared ask; the developer kept; the claim unkept)', async () => {
   const { db, c } = await seatsDb();

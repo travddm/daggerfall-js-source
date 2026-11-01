@@ -74,25 +74,26 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   assert.equal(v('APOSTLE_HANDLES'), '', 'SirMcMobdon is no longer an Apostle');
   assert.deepEqual(titlesHeld({ handle: 'sirmcmobdon', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }), [], 'SirMcMobdon holds no Apostle title');
   assert.deepEqual(glyphsOf({ handle: 'SirMcMobdon', created_at: 0 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }, 10 ** 10), [], 'and no Apostle glyph');
-  assert.equal(v('DEVELOPER_HANDLES'), 'Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1', 'DEV2, Mac: "Give trashBattery, LostMyLeg the developer title/glyph"; DEV3: "grant Tabby the developer title/glyph"; DEV4, the owner: "Also add RookieG(Dev) as developer", then "Change RookieG(Dev) to RookieG"; DEV5, Mac: "Remove trashBattery ingame as a dev"; DEV6, Mac: "Give roderic the developer access ingame (title/glyph)"; STAFF-PANEL1: SirMcMobdon; then \"kpblca_1 needs added to them as welll\"');
+  // STAFF-ROLES-BY-ACCOUNT: Admin and Moderator are columns of the account's row, listed in no config
+  assert.doesNotMatch(toml, /^(DEVELOPER|MODERATOR)_HANDLES/m, 'the wrangler.toml carries no role lists');
   // DEV6: Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
   for (const h of ['LOSTMYLEG', 'tabby', 'RookieG', 'rookieg', 'ROOKIEG', 'roderic', 'Roderic', 'RODERIC']) {
-    const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };   // FOUNDER3: first played after the cutoff too, so no Founder
-    const denv = { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') };
+    const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, staff_admin: 1 };   // FOUNDER3: first played after the cutoff too, so no Founder
+    const denv = {};
     assert.deepEqual(titlesHeld(dev, denv), ['developer'], `${h}: the Developer title, case-folded`);
     assert.deepEqual(glyphsOf(dev, denv, 1_900_000_000), ['dev'], `${h}: the dev glyph`);
     assert.ok(aurasHeld(dev, denv).includes('seraphwings'), `${h}: the Seraph Wings`);
     assert.equal(canModerate(dev, denv), true, `${h}: /mute`);
   }
-  // DEV6: a near name of Roderic's is no developer either
+  // DEV6: a near name of Roderic's is no developer either: the role is the row's, a name earns none
   for (const h of ['Roderick', 'Roderi', 'Roderic_', 'Rod']) {
-    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
+    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, {}), [], `${h}: not a developer`);
   }
-  // DEV5: off the list in any case, and the whole set with it -
+  // DEV5: the Admin role taken off the account, in any case of the handle, and the whole set with it -
   // the title, the glyph, the wings, the moderating; and the title and wings a row still stores are no longer worn
   for (const h of ['trashBattery', 'trashbattery', 'TRASHBATTERY']) {
-    const was = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, title: 'developer', aura: 'seraphwings' };
-    const denv = { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') };
+    const was = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, title: 'developer', aura: 'seraphwings', staff_admin: 0 };
+    const denv = {};
     assert.deepEqual(titlesHeld(was, denv), [], `${h}: no Developer title`);
     assert.deepEqual(glyphsOf(was, denv, 1_900_000_000), [], `${h}: no dev glyph`);
     assert.ok(!aurasHeld(was, denv).includes('seraphwings'), `${h}: no Seraph Wings`);
@@ -103,13 +104,12 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   // DEV4: the handle whole - "RookieG(Dev)" (a handle may carry brackets) is another account, and a near name is no
   // developer either: none of them holds its rights
   for (const h of ['RookieG(Dev)', 'RookieGDev', 'Rookie', 'RookieGG', 'RookieG_']) {
-    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
+    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, {}), [], `${h}: not a developer`);
   }
-  // MOD2: the moderator list, case-folded
-  assert.equal(v('MODERATOR_HANDLES'), 'Asynian,tabbyvish,Starempire42', 'MOD1: Asynian; MOD2: tabbyvish; MOD3 (Mac: "Also add Starempire42 as a moderator"): Starempire42');
+  // MOD2: the Moderator role on the account
   for (const h of ['asynian', 'TabbyVish', 'starempire42']) {
-    const mod = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };
-    assert.deepEqual(glyphsOf(mod, { MODERATOR_HANDLES: v('MODERATOR_HANDLES') }, 1_900_000_000), ['mod'], `${h}: the mod shield`);
+    const mod = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, staff_mod: 1 };
+    assert.deepEqual(glyphsOf(mod, {}, 1_900_000_000), ['mod'], `${h}: the mod shield`);
   }
   assert.equal(v('HIEROPHANT_HANDLES'), '', 'nobody yet');
   // AUDIT B8: the whole list, not a prefix of it - and every list's title and glyph IN the token's closed

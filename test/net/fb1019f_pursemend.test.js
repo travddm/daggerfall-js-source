@@ -84,7 +84,7 @@ function wrapped(purse = 12_345, factionRep = null) {
 const ring = () => ({ templateIndex: 135, group: 'Jewellery', value: 80, hand: 1 });
 
 async function stand() {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const mac = await s.registered('mac');
   /** A seller seated in the realm, its first save a fresh one. */

@@ -40,7 +40,7 @@ test('BAY-LEFT-SEA THE AUDIT\'S ORDER LAW: the rank the Bay\'s, a capital\'s, an
 
 test('BAY-LEFT-SEA (the real Worker): a province\'s audit lists its capitals, then its places, then its countryside, 400 a page with the word for the next; a Bay region\'s as it ever was; a page past them none and a bad page refused - the client\'s word for a page and its line (mutants: ordered by location again; the page unread; `more` never said; the witnesses the region\'s first)', async () => {
   Date.now = () => T0 * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devi' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Devi' });
   const raw = s.env.DB._raw;
   const dev = await s.registered('Devi');
   const towns = skyrimTowns(420);

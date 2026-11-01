@@ -5,8 +5,8 @@
 // asked how a POI reaches players, "I need to be able to approve changes"; asked who uses it, "Developers +
 // Builders".
 //
-// THE ROLES, DERIVED AS EVERY GRANT HERE IS (titles.js): an APPROVER is a handle in APPROVER_HANDLES; a BUILDER is an
-// approver, a developer (DEVELOPER_HANDLES) or a handle in BUILDER_HANDLES. A guest is neither. Read fresh at every call,
+// THE ROLES, DERIVED AS EVERY GRANT HERE IS (titles.js): an APPROVER is an Owner account; a BUILDER is an
+// approver or an Admin account. A guest is neither. Read fresh at every call,
 // so a handle taken off a list loses the door at its next request.
 //
 // THE FLOW (migration 0116): a builder uploads assets (content-addressed: the bytes' sha256 is the name, checked here) and
@@ -30,20 +30,13 @@
 import { poiDocProblems, poiShelfProblems, poiAssetProblems, poiAssetsOf, POI_ID_RE, POI_SHELF_ID_RE, POI_SHA_RE, POI_LIMITS } from '../../src/poi/poiLaw.js';
 import { decodePoiMesh, poiMeshFacts, POI_MESH_LIMITS } from '../../src/poi/poiMesh.js';
 import { poiImageMetaOf, POI_IMAGE_LIMITS, POI_IMAGE_TYPES } from '../../src/poi/poiImage.js';
-import { developerHandles } from './titles.js';
+import { isDeveloper, isOwner } from './titles.js';
 
-/** A handle list from the config, as titles.js reads its own - trimmed, case-folded, empty ones dropped. */
-function handleList(raw) {
-  if (typeof raw !== 'string' || !raw) return new Set();
-  return new Set(raw.split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
-}
-
-/** What this player may do with POIs - `{ builder, approver }`. @param {any} player @param {any} env */
+/** What this player may do with POIs - `{ builder, approver }`: an Admin builds, an Owner approves (and builds), both off
+ *  the account's role (titles.js, migration 0191) - no name grants either. @param {any} player @param {any} env */
 export function poiRolesOf(player, env) {
-  const h = typeof player?.handle === 'string' && player.handle ? player.handle.toLowerCase() : null;
-  if (!h) return { builder: false, approver: false };
-  const approver = handleList(env?.APPROVER_HANDLES).has(h);
-  const builder = approver || developerHandles(env).has(h) || handleList(env?.BUILDER_HANDLES).has(h);
+  const approver = isOwner(player, env);
+  const builder = approver || isDeveloper(player, env);
   return { builder, approver };
 }
 

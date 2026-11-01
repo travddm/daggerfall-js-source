@@ -135,8 +135,8 @@ test('DUEL1 the worker - INT8: /v1/duel/claim and /v1/duel/record behind a sessi
   const me = await S.registered('DuelMe'), them = await S.registered('DuelThem'), other = await S.registered('DuelOther');
   assert.ok(ROUTES.has('/v1/duel/claim') && ROUTES.has('/v1/duel/record') && ROUTES.has('/v1/duel/loss'));
   assert.ok(!OPEN_ROUTES.has('/v1/duel/claim') && !OPEN_ROUTES.has('/v1/duel/record') && !OPEN_ROUTES.has('/v1/duel/loss'));
-  assert.equal(ACCOUNT_VERSION, 'acct207');
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.equal(ACCOUNT_VERSION, 'acct208');
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
   const rc = await mintDuelReceipt({ f: [me.id, them.id], w: 1, n: 'abcdef012345' }, S.gatePriv, { subtle, nowS: T0 });
   assert.equal((await S.call('/v1/duel/claim', { receipt: rc })).status, 401, 'a stranger carries nothing');
   assert.equal((await S.call('/v1/duel/record', { id: them.id })).status, 401);

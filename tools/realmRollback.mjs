@@ -27,8 +27,8 @@
 //   node tools/realmRollback.mjs --handle <account> --by <developer> [--character <realm id>] [--run <run id>] [--apply]
 //                                [--summary <file>] [--local]
 //
-// Run where wrangler finds server-account's wrangler.toml: the database, the bucket and the developers' list are read
-// from it, the deployed config's own words. `--by` must be on that list - the review's gate is the act's own. --local
+// Run where wrangler finds server-account's wrangler.toml: the database and the bucket are read
+// from it, the deployed config's own words. `--by` must be an Admin account in that database - the review's gate is the act's own. --local
 // reads and writes wrangler's local D1 and R2 (a probe's), never the workflow's.
 // ═══════════════════════════════════════════════════════════════════
 
@@ -49,7 +49,7 @@ export const USAGE = [
 
 /** Each refusal in the run page's words - the act's own and the check's. */
 export const REFUSALS = Object.freeze({
-  'not-developer': "the run was asked by someone not on the developers' list (server-account/wrangler.toml DEVELOPER_HANDLES)",
+  'not-developer': "the run was asked by an account that is not an Admin (the account's staff_admin role, docs/operations/staff-roles.md)",
   body: 'that is no account name',
   'no-player': 'no account has that name',
   'not-theirs': "the character named is not one of this account's",
@@ -65,7 +65,7 @@ export const REFUSALS = Object.freeze({
 
 /**
  * What the run reads of server-account's wrangler.toml: the database and the bucket the service binds (DB, SAVES) and
- * the developers' list its review gate reads.
+ * (the review gate reads the actor's Admin role off the account's row in that database).
  * @param {string} toml
  */
 export function configOf(toml) {
@@ -75,7 +75,6 @@ export function configOf(toml) {
   return {
     database: value(bound('[[d1_databases]]', 'DB'), 'database_name'),
     bucket: value(bound('[[r2_buckets]]', 'SAVES'), 'bucket_name'),
-    developers: value(sections.find((s) => s.startsWith('[vars]')) ?? '', 'DEVELOPER_HANDLES'),
   };
 }
 
@@ -136,11 +135,12 @@ export const noteFor = (/** @type {{ first: number | null }} */ reach, /** @type
  * when its check holds, the review's own rollback asked of it. `ctx` is the act's own `{ db, bucket, nowS }`, live or dry.
  * Answers the run whole, `refusal` the act's word or the check's (REFUSALS) when it stopped.
  * @param {any} ctx
- * @param {{ handle: string, by: string, character?: string | null, developers: string | null, run?: string | null }} o
+ * @param {{ handle: string, by: string, character?: string | null, run?: string | null }} o
  */
-export async function rollbackPurse(ctx, { handle, by, character = null, developers, run = null }) {
-  const player = { handle: by };
-  const env = { DEVELOPER_HANDLES: developers };
+export async function rollbackPurse(ctx, { handle, by, character = null, run = null }) {
+  // the actor is the ACCOUNT `by` names, read as the service reads it: its Admin role is a column of its row, not a name on a list
+  const player = (await ctx.db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(String(by).toLowerCase()).first()) ?? { handle: by };
+  const env = {};
   /** @type {any} */
   const result = { handle, by, account: null, characters: [], character: null, now: null, back: null, answer: null, refusal: null };
   const stop = (/** @type {string} */ refusal) => Object.assign(result, { refusal });
@@ -223,7 +223,7 @@ async function main() {
   try {
     const db = wranglerD1({ database: config.database, exec, where, dry: !apply, held });
     const ctx = { db, bucket: wranglerR2({ bucket: config.bucket, exec, dir, where, dry: !apply, held }), nowS: Math.floor(Date.now() / 1000) };
-    const result = await rollbackPurse(ctx, { handle, by, character: arg('character') || null, developers: config.developers, run: arg('run') || null });
+    const result = await rollbackPurse(ctx, { handle, by, character: arg('character') || null, run: arg('run') || null });
     if (process.env.GITHUB_ACTIONS && result.account?.id) process.stdout.write(`::add-mask::${result.account.id}\n`);   // never on the page
     if (apply && !result.refusal) result.after = await db.prepare('SELECT seq, held FROM realm_characters WHERE id = ?').bind(result.character.id).first();
     say(rollbackReport(result, { apply, held }));

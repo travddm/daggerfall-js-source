@@ -193,7 +193,7 @@ async function stand(open = 'on') {
   forgetChapters();
   // the witnesses are developers too, so a town is witnessed at `dev` as at `on`
   const devs = ['Devra', ...Array.from({ length: 40 }, (_, i) => `Wit${i}`)].join(',');
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: devs });
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: devs });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const give = (who, character, m, qty) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)

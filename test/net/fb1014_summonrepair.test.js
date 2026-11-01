@@ -36,7 +36,7 @@ function deviceOf(who) {
 }
 
 async function stand() {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const mac = await s.registered('mac');
   const sucean = await s.registered('sucean');

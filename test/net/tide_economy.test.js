@@ -52,7 +52,7 @@ test('SEASON1 THE ECONOMY\'S TIDES, THE LAW: a Harvest a quarter more on the lan
 });
 
 async function stand(zero) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...(zero != null ? { SEASON_ZERO_WEEK: String(zero) } : {}) });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac', ...(zero != null ? { SEASON_ZERO_WEEK: String(zero) } : {}) });
   const raw = s.env.DB._raw;
   const confirm = async (x, y, climate, region) => {
     for (const h of ['WitA', 'WitB', 'WitC']) {

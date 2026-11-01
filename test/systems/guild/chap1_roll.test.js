@@ -123,7 +123,7 @@ const ROLL = '/v1/chapters/roll';
 const CLAIM = '/v1/chapters/claim';
 
 async function stand(open = 'on') {
-  const svc = await standService({ CHAPTERS_OPEN: open, DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ CHAPTERS_OPEN: open, SEAT_ADMINS: 'Devra' });
   const who = await svc.registered('Rolla');
   const R = await seatRealm(svc.env, who.secret, 'Rolla');
   const raw = svc.env.DB._raw;
@@ -134,7 +134,7 @@ async function stand(open = 'on') {
 
 test('CHAP1 the switch: shut, the Roll answers chapters-closed (403) and the save keeps the standing; at dev, only a developer; on, everyone (mutants: the switch ignored, dev let anyone in)', async () => {
   for (const [open, handle, status] of [['off', 'Rolla', 403], ['dev', 'Rolla', 403], ['dev', 'Devra', 200], ['on', 'Rolla', 200]]) {
-    const svc = await standService({ CHAPTERS_OPEN: open, DEVELOPER_HANDLES: 'Devra' });
+    const svc = await standService({ CHAPTERS_OPEN: open, SEAT_ADMINS: 'Devra' });
     const who = await svc.registered(handle);
     const R = await seatRealm(svc.env, who.secret, handle);
     const r = await svc.call(ROLL, { character: R.id, lease: R.lease }, who.secret);

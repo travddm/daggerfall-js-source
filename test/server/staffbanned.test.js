@@ -37,7 +37,7 @@ async function extensionKey() {
  *  lays an account in by hand (a handle, or a guest's name with `handle: null`), its ban among `cols`. */
 async function stand() {
   const mobKey = await extensionKey();
-  const s = await standService({ DEVELOPER_HANDLES: 'SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
+  const s = await standService({ SEAT_ADMINS: 'SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body),

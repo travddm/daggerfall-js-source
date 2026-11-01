@@ -94,7 +94,7 @@ let _rid = 0;
 const rid = () => `deep-${String(++_rid).padStart(6, '0')}`;
 const REGION = 6;
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const setXp = (who, xp) => raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'mining', ?, NULL, NULL, ?)
     ON CONFLICT (player, char_id, profession) DO UPDATE SET xp = excluded.xp`).run(who.id, who.character, xp, _now);

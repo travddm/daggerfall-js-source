@@ -20,7 +20,7 @@ const hex16 = () => [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.
 const ENC_ALLOW = Math.ceil(GRANT_KINDS.enc.cap + GRANT_KINDS.enc.rate * GRANT_RATE_SPAN_MIN_S);
 
 async function rig() {
-  const s = await standService({ DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const aged = async (handle) => { const p = await s.registered(handle); raw.prepare('UPDATE players SET created_at = created_at - ?1 WHERE id = ?2').run(60 * 86400, p.id); return p.id; };
   /** One cell's window: tallies [reader, sender, reason, n, evidence?], asks [account, kind, how many]. */

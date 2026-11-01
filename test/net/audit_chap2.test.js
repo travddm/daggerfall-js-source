@@ -382,7 +382,7 @@ async function stand(open = 'on') {
   clock(NOON);
   forgetChapters();
   const devs = ['Devra', ...Array.from({ length: 60 }, (_, i) => `Wit${i}`)].join(',');
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: devs });
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: devs });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const give = (who, character, m, qty) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
@@ -441,8 +441,8 @@ test('AUDIT CHAP2 E1/S4: the halls\' moderation - a developer reads a region\'s 
   assert.deepEqual(await regionChapters(s.env.DB, ANTICLERE, _now * 1000), [], 'the chapters went with it');
   const again = await s.witness({ key: 4242, region: ANTICLERE, factions: [40] });
   assert.deepEqual([again.r.status, again.r.body.error], [409, 'hall-struck']);
-  assert.deepEqual(await strikeHall({ db: s.env.DB, nowS: _now }, { handle: 'Mac' }, { DEVELOPER_HANDLES: 'Devra' }, { key: 1 }), { error: 'not-developer' });
-  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra' }, { DEVELOPER_HANDLES: 'Devra' }, { region: 71 }), { error: 'bad-region' });
+  assert.deepEqual(await strikeHall({ db: s.env.DB, nowS: _now }, { handle: 'Mac' }, {}, { key: 1 }), { error: 'not-developer' });
+  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra', staff_admin: 1 }, {}, { region: 71 }), { error: 'bad-region' });
 });
 
 test('AUDIT CHAP2 E1: an account whose answers three times in a week stand alone against confirmed towns is ignored - its reports count for nothing, and its own report is answered so (mutants: the ignored set unread)', async () => {

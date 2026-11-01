@@ -31,8 +31,8 @@
 // author until a moderator either removes it (the row goes) or restores
 // it (reports no longer hide it). Its author still sees it, marked, and
 // may take it down (AUDIT 28 N2: hidden from them too, it held one of
-// their places for up to a week with nothing to take down). Moderators - MODERATOR_HANDLES
-// and DEVELOPER_HANDLES, titles.js canModerate - see hidden notes, with
+// their places for up to a week with nothing to take down). Moderators - the Moderator role
+// and Admins, titles.js canModerate - see hidden notes, with
 // their count, and may remove any note. The developers post the server's
 // notices (the red seal), on every board.
 //

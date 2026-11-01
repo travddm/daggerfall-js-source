@@ -12,7 +12,7 @@ const WAYREST = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown', pixel: 
 
 /** The service, the seats open (or `seats`), and accounts: `aged(handle)` a week and a day registered - a witness. */
 async function stood({ seats = 'on' } = {}) {
-  const svc = await standService({ ...(seats ? { SEATS_OPEN: seats } : {}), DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ ...(seats ? { SEATS_OPEN: seats } : {}), SEAT_ADMINS: 'Devra' });
   const raw = svc.env.DB._raw;
   const aged = async (handle) => {
     const who = await svc.registered(handle);

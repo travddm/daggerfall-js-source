@@ -158,7 +158,7 @@ test('POI-1 PATHS: the store\'s paths matched as a save slot is - and nothing th
 
 async function theStore() {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw, headers = {} } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
@@ -178,7 +178,7 @@ async function theStore() {
 }
 
 test('POI-1 STORE: the roles - a guest and a player build nothing; a developer and a listed builder build; only the listed approver decides; the lists read fresh (mutants: a developer not a builder; a builder an approver)', async () => {
-  const { req, mac, dev, mapper, player, guest, env } = await theStore();
+  const { req, mac, dev, mapper, player, guest, env, setStaff } = await theStore();
   const g = await guest();
   assert.deepEqual((await req('GET', '/v1/poi/me', { who: { secret: g.secret } })).json, { handle: null, builder: false, approver: false });
   assert.deepEqual((await req('GET', '/v1/poi/me', { who: player })).json, { handle: 'Player', builder: false, approver: false });
@@ -189,7 +189,7 @@ test('POI-1 STORE: the roles - a guest and a player build nothing; a developer a
   assert.equal((await req('GET', '/v1/poi/queue', { who: dev })).status, 403);
   assert.equal((await req('GET', '/v1/poi/queue', { who: mac })).status, 200);
   assert.equal((await req('GET', '/v1/poi/me')).status, 401, 'no session, no answer');
-  env.BUILDER_HANDLES = '';
+  setStaff('Mapper', 'none');
   assert.equal((await req('GET', '/v1/poi/me', { who: mapper })).json.builder, false, 'a handle taken off the list is refused at its next call');
 });
 
@@ -335,8 +335,7 @@ test('POI-1 STORE: the feed kept in the isolate - asked again inside its keep, n
 test('POI-1 RECORDS: the store is in the migrations, the roles in the config, its shared law in the account deploy\'s filter', () => {
   assert.match(src('server-account/migrations/0116_poi.sql'), /CREATE TABLE IF NOT EXISTS poi_revs/);
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /^APPROVER_HANDLES = "Lattymoy"$/m);
-  assert.match(toml, /^BUILDER_HANDLES = ""$/m);
+  assert.doesNotMatch(toml, /^(APPROVER|BUILDER)_HANDLES/m, 'no role is named in config');
   const wf = src('.github/workflows/account-deploy.yml');
   for (const f of ['src/poi/poiLaw.js', 'src/poi/poiMesh.js', 'src/poi/poiImage.js']) assert.ok(wf.includes(`- "${f}"`), `${f} is not in the deploy's filter`);
 });

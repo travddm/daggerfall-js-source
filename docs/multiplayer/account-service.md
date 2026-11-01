@@ -93,9 +93,10 @@ reads after its own writes.
   public key.
 - **Orders.** The service signs short-lived orders (`ORDER_TTL_S`, 60 s) with the same key for the relay: bans,
   mutes, staff orders and home orders (`mint*Order`).
-- **Roles.** `titles.js` reads comma-separated handle lists from vars (`DEVELOPER_HANDLES`, `MODERATOR_HANDLES`,
-  `OWNER_HANDLES`, tier lists in `TIER_LISTS`) through `handleList`, fresh on every request. Removing a handle removes
-  the role at once. `players.staff_mod` also grants moderator.
+- **Roles.** Staff roles are columns of the account's row (`staff_admin`, `staff_mod`, `staff_owner`; migration 0191),
+  read fresh on every request by `titles.js`, so taking one off removes it at once and no registered name earns one. Only
+  the honorary titles still come from comma-separated handle lists in vars (`TIER_LISTS`, `handleList`). How a role is set:
+  [Staff roles](../operations/staff-roles.md).
 
 ### AdmitGate
 

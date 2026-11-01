@@ -56,7 +56,7 @@ lists, with normalisation and an allow-list for innocent words. The service runs
   account for 30 minutes (`autoMute`, actor `auto:reports`). Moderators and already sanctioned accounts are exempt
   (`autoMutable`).
 - Private reports (bugs, exploits, security) are a separate desk: `src/net/privateReport.js`,
-  `server-account/src/reports.js`, table `private_reports`, routes `/v1/report/*`, read by `REPORT_READER_HANDLES`.
+  `server-account/src/reports.js`, table `private_reports`, routes `/v1/report/*`, read by Owner accounts (`isReportReader`).
 
 ## Sanctions
 
@@ -76,8 +76,8 @@ lists, with normalisation and an allow-list for innocent words. The service runs
 
 ### Who may moderate
 
-`canModerate` (`server-account/src/titles.js`) is true for accounts on `MODERATOR_HANDLES`, with
-`players.staff_mod = 1`, or on `DEVELOPER_HANDLES`. Lists are read on every request.
+`canModerate` (`server-account/src/titles.js`) is true for accounts with `players.staff_mod = 1` or
+`players.staff_admin = 1`. The row is read on every request.
 Accounts that can moderate cannot be muted or banned through these paths.
 
 ### How orders reach the relay
@@ -110,8 +110,8 @@ The bot is an **interactions endpoint** on the account service, not a gateway bo
   `DISCORD_PUBLIC_KEY`.
 - Commands are declared in `server-account/src/discordCommands.js` (`DISCORD_COMMANDS`): `/mod lookup`, `/mod mute`,
   `/mod unmute`, `/mod ban`, `/mod unban`. Guild-only and hidden from members without Manage Messages.
-- `actorOf` maps the Discord user to a game account through `DISCORD_MODERATORS` (`<discord id>:<handle>` pairs). The
-  account must pass `canModerate`. A Discord role grants nothing by itself.
+- `actorOf` maps the Discord user to a game account through the `staff_discord` table (Discord user id to account id,
+  set by the operator with `tools/staffRole.mjs discord`). The account must pass `canModerate`. A Discord role grants nothing by itself.
 - **Case cards.** `postCards` (minute cron) posts one card per case to `DISCORD_MOD_CHANNEL` (`caseCard`): the
   reported lines, reasons, reviewer verdict, strikes and next ladder step. Buttons (`safe:<act>:<caseId>`): mute 30
   minutes, 1 day, 7 days, ban 30 days, dismiss. A press claims the case for 60 s, acts through `modAct`, and redraws

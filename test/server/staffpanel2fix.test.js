@@ -40,9 +40,8 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'SirMcMobdon,Devvy', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'SirMcMobdon', DUNGEON_MASTER_HANDLES: 'Fang',
+    SEAT_ADMINS: 'SirMcMobdon,Devvy', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'SirMcMobdon', DUNGEON_MASTER_HANDLES: 'Fang',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, MOD_AI: 'off',
-    DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Tabbyvish,333333333333333333:SirMcMobdon',
   });
   const pushed = [];
   const real = globalThis.fetch;
@@ -62,6 +61,10 @@ async function stand() {
   const troll = await s.registered('Troll');
   const sylvia = await s.registered('Sylvia');
   const raw = s.env.DB._raw;
+  // the operator's link (docs/operations/staff-roles.md): a Discord user id bound to the moderator's ACCOUNT
+  for (const [discordId, handle] of [['111111111111111111', 'Asynian'], ['222222222222222222', 'Tabbyvish'], ['333333333333333333', 'SirMcMobdon']]) {
+    raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
+  }
   raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, sylvia.id);   // old enough to count
   const mob = (await staff('/v1/staff/login', { handle: 'SirMcMobdon', password: PASSWORD, ...(await mobKey.proof('login', 'SirMcMobdon')) })).body;
   const enrol = async (handle) => {
@@ -432,8 +435,8 @@ test('STAFF-PANEL2-FIX 8: A NEW PASSWORD ENDS THE STAFF PANEL\'S SESSIONS - chan
     assert.equal((await s.staff('/v1/staff/me', {}, s.asy.session)).status, 200, 'another member\'s untouched');
     // recovered: a code from registering
     const g = await s.guest();
-    s.env.MODERATOR_HANDLES += ',Ravenna';
     const reg = await s.game('/v1/auth/register', { handle: 'Ravenna', password: PASSWORD, ...ACCEPTED, set: true }, g.secret);
+    s.setStaff('Ravenna', 'moderator');
     const code = reg.body.recoveryCodes?.[0] ?? reg.body.recoveryCode;
     assert.ok(code, `registering answers a recovery code: ${JSON.stringify(reg)}`);
     const inv = await s.staff('/v1/staff/invite', { handle: 'Ravenna' }, s.mob.session);

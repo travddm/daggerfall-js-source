@@ -11,3 +11,5 @@ and their configuration, the desktop app release, and the manual workflows that 
   updates, and patch notes.
 - [admin-workflows.md](admin-workflows.md) - restore, revive, rollback, guild grants, recovery codes, server post,
   and the load readings.
+- [staff-roles.md](staff-roles.md) - Admin, Moderator and Owner are account roles: who sets them, and how the
+  operator sets the first Owner and links Discord moderators.

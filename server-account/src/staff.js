@@ -9,10 +9,11 @@
 //    private half never leaves it; the service keeps the public half (staff_keys) and checks a signature over the
 //    handle and the second it was made (staffWords). A signature works once (`last_ts`) and only within STAFF_SIG_S
 //    of the service's clock.
-// 3. The role lists the service already keeps, asked fresh on every request (titles.js): Admin is DEVELOPER_HANDLES,
-//    Moderator anyone canModerate lets in. A handle off a list is off
-//    the panel at its next click. An Admin may also add and remove Moderators from the panel: `players.staff_mod`, bound to the account, beside MODERATOR_HANDLES - the
-//    config's own stay the config's, and the panel removes only the ones it added.
+// 3. The account's role, asked fresh on every request (titles.js): Admin is `players.staff_admin`, Moderator `staff_mod`,
+//    Owner `staff_owner` (an Admin too) - columns on the ACCOUNT, never a handle (migration 0191), so a name a former staff
+//    member held grants nothing to whoever registers it. A role taken off is off the panel at its next click. An Admin adds
+//    and removes Moderators from the panel; an Owner adds and removes Admins. An Owner is set only by the operator
+//    (tools/staffRole.mjs, docs/operations/staff-roles.md): no HTTP route grants one.
 // A key is bound to the account AND the handle it was registered under, so a rename that hands a listed handle to
 // another account (0134) hands it no way in. A key forgotten or cut is REVOKED, never deleted: its row stays, so it never
 // signs in again and its spent seconds stay spent - an owner's config key too, which the config cannot bring back.
@@ -27,7 +28,7 @@
 //
 // ═══ HOW A KEY IS REGISTERED ═══════════════════════════════════════
 //
-// An owner (OWNER_HANDLES, mob and Latty) mints a one-time invite (24 h) for a staff member; the member's extension
+// An owner (`staff_owner`, set by the operator) mints a one-time invite (24 h) for a staff member; the member's extension
 // signs in with the password and the invite and registers its key, proving it holds the private half. An owner's own
 // first key is named in the config (OWNER_KEYS) - a public key, safe in a public repository - so the first owner needs
 // nobody to invite them and nobody has to set a secret in Cloudflare. With OWNER_KEYS empty nobody can sign in at all: unconfigured is shut, never open.
@@ -42,7 +43,7 @@
 // write than a wrong one - a clock to guess a password by, from as many addresses as an attacker holds.
 import { verifyPassword, mintRecoveryCode, canonicalCode } from './password.js';
 import { mintId, mintSecret, hashSecret, displayName, overRate, clearRate, overAccountRate } from './accounts.js';
-import { isDeveloper, canModerate, handleList, developerHandles, moderatorHandles, staffSuspended } from './titles.js';
+import { isDeveloper, canModerate, staffSuspended, isOwner as holdsOwner } from './titles.js';
 import { isBanned, pushLaw, staffCutOrder } from './sanctions.js';
 import { staffCases, CASE_ROUTES } from './staffCases.js';
 import { staffDesk, DESK_ROUTES } from './staffDesk.js';   // STAFF-PANEL3-DESK: notes, the watchlist, your settings, and the Admins' notice, scorecard and reported notes
@@ -154,10 +155,11 @@ export function staffRole(player, env) {
   if (isDeveloper(player, env)) return 'admin';
   return canModerate(player, env) ? 'moderator' : null;
 }
-/** An owner: staff, and on OWNER_HANDLES. @param {any} player @param {any} env */
-export const isOwner = (player, env) => !!staffRole(player, env) && handleList(env?.OWNER_HANDLES).has(String(player.handle).toLowerCase());
+/** An owner: staff, and the account's `staff_owner` is set. @param {any} player @param {any} env */
+export const isOwner = (player, env) => holdsOwner(player, env);
 
-/** OWNER_KEYS, read: `handle:publicKey` pairs, the key raw Ed25519 in base64url. @param {any} env */
+/** OWNER_KEYS, read: `handle:publicKey` pairs, the key raw Ed25519 in base64url. A pair names no role: it says which key
+ *  an Owner account may sign in with first (configKey), and the account must already be an Owner. @param {any} env */
 export function ownerKeys(env) {
   const out = new Map();
   for (const pair of String(env?.OWNER_KEYS ?? '').split(',')) {
@@ -168,12 +170,6 @@ export function ownerKeys(env) {
 }
 /** Whether `pub` is this owner's key in the config - the only way a config key stands. @param {any} player @param {any} env @param {unknown} pub */
 export const configKey = (player, env, pub) => typeof pub === 'string' && isOwner(player, env) && ownerKeys(env).get(String(player.handle).toLowerCase()) === pub;
-
-/** Every handle a role list names - the team an owner manages. @param {any} env */
-function staffHandles(env) {
-  const all = new Set([...developerHandles(env), ...moderatorHandles(env)]);
-  return [...all];
-}
 
 /** ONE AUDIT ROW, as a statement for the batch it belongs to. `detail` is a small object, kept as JSON. `outcome` ok,
  *  denied (a role's door refused it) or failed (it changed nothing) - a review of the PR: a failed act read as done. `okIf`
@@ -190,7 +186,7 @@ export const auditStatement = (db, nowS, { actor = null, role = null, act, targe
       ...(okIf ? okIf.args : [outcome]), ...(onceIn ? [actor?.id ?? null, act, target, said, nowS - onceIn] : []));
 };
 
-/** The handle a body names, folded as the lists fold it. @param {unknown} h */
+/** The handle a body names, folded as handles are (handle_lc). @param {unknown} h */
 const handleLc = (h) => (typeof h === 'string' ? h.trim().toLowerCase().slice(0, 64) : '');
 
 /**
@@ -434,14 +430,14 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
 
   // ═══ THE ADMINS' DOORS: THE PANEL'S MODERATORS ═══
   // /v1/staff/mods lists them; /v1/staff/mod/add and /mod/remove { handle } - a registered account, not banned, not staff
-  // already. One the config names (MODERATOR_HANDLES, a moderating title, an Admin) is the config's to remove, never the
-  // panel's. Removed, a member holding no other role loses every key, session and invite, as a cut does.
+  // already. One who holds another role (an Admin) is that role's to remove, never this door's. Removed, a member holding
+  // no other role loses every key, session and invite, as a cut does.
   if (path === '/v1/staff/mods' || path === '/v1/staff/mod/add' || path === '/v1/staff/mod/remove') {
     if (who.role !== 'admin') return denied('staff-admin');
     if (path === '/v1/staff/mods') {
       // STAFF-PANEL-SPEED: the read and its audit row in one trip, one transaction - never shown without its row
       const [r] = await db.batch([db.prepare('SELECT id, handle FROM players WHERE staff_mod = 1 ORDER BY handle_lc LIMIT 500'), audit('mods-read', null, null, { onceIn: STAFF_READ_ROW_S })]);
-      return { mods: (r.results ?? []).map((p) => ({ id: p.id, handle: p.handle })), config: staffHandles(env).filter((h) => !developerHandles(env).has(h)) };
+      return { mods: (r.results ?? []).map((p) => ({ id: p.id, handle: p.handle })) };
     }
     const lc = handleLc(body.handle);
     const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
@@ -457,7 +453,7 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
       return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
     }
     if (target.staff_mod !== 1) return { error: staffRole(target, env) ? 'staff-config' : 'no-staff' };
-    if (staffRole({ ...target, staff_mod: 0 }, env)) return { error: 'staff-config' };   // the config holds them still
+    if (staffRole({ ...target, staff_mod: 0 }, env)) return { error: 'staff-config' };   // another role holds them still
     const hashes = await sessionHashes(db, target.id);
     await db.batch([
       audit('mod-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_mod = 1)', args: [target.id] } }),
@@ -474,19 +470,53 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
   // ═══ THE OWNERS' DOORS ═══
   if (!who.owner) return denied('staff-owner');
   if (path === '/v1/staff/team') {
-    const handles = staffHandles(env).slice(0, 90);   // D1 binds 100 at most; the lists name a dozen
     const [r] = await db.batch([db.prepare(`SELECT p.*,
         (SELECT COUNT(*) FROM staff_keys k WHERE k.player_id = p.id AND k.handle_lc = p.handle_lc AND k.revoked_at IS NULL) AS keys,
         (SELECT COUNT(*) FROM staff_sessions s WHERE s.player_id = p.id AND s.expires_at > ?1 AND s.last_act > ?2) AS live,
         (SELECT MAX(expires_at) FROM staff_invites i WHERE i.player_id = p.id AND i.expires_at > ?1) AS invite_until
-      FROM players p WHERE p.staff_mod = 1 OR p.handle_lc IN (${['NULL', ...handles.map((_, i) => `?${i + 3}`)].join(', ')})`)
-      .bind(nowS, nowS - STAFF_IDLE_S, ...handles), audit('team-read', null, null, { onceIn: STAFF_READ_ROW_S })]);   // STAFF-PANEL-SPEED: one trip, its row with it
+      FROM players p WHERE p.staff_mod = 1 OR p.staff_admin = 1 OR p.staff_owner = 1 ORDER BY p.handle_lc LIMIT 500`)
+      .bind(nowS, nowS - STAFF_IDLE_S), audit('team-read', null, null, { onceIn: STAFF_READ_ROW_S })]);   // STAFF-PANEL-SPEED: one trip, its row with it
     return {
       team: (r.results ?? []).map((p) => ({
         id: p.id, handle: p.handle, role: staffRole({ ...p, staff_suspended: 0 }, env), owner: isOwner(p, env), keys: p.keys, sessions: p.live, inviteUntil: p.invite_until ?? null,
-        suspended: staffSuspended(p),   // STAFF-PANEL2-FIX: cut off - the role their lists give, held by nobody until an invite
+        suspended: staffSuspended(p),   // STAFF-PANEL2-FIX: cut off - the role their row gives, held by nobody until an invite
       })),
     };
+  }
+  // ═══ THE OWNERS' DOORS: THE ADMINS ═══
+  // /v1/staff/admin/add and /admin/remove { handle } - a registered account, not banned, not cut. An Owner is the operator's
+  // alone (no door here makes or unmakes one), and an Owner cannot take its own Admin. A removed Admin who holds no other
+  // role loses every key, session and invite, as a cut does; a new Admin enrols a key with an Owner's invite
+  // (/v1/staff/invite) like any member.
+  if (path === '/v1/staff/admin/add' || path === '/v1/staff/admin/remove') {
+    const lc = handleLc(body.handle);
+    const target = lc ? await db.prepare('SELECT * FROM players WHERE handle_lc = ?').bind(lc).first() : null;
+    if (!target?.handle) return { error: 'no-player' };
+    if (path === '/v1/staff/admin/add') {
+      if (target.staff_admin === 1) return { error: 'staff-already' };
+      if (staffSuspended(target)) return { error: 'staff-suspended' };
+      if (isBanned(target, nowS)) return { error: 'staff-banned' };
+      const [, set] = await db.batch([
+        audit('admin-add', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 0)', args: [target.id] } }),
+        db.prepare('UPDATE players SET staff_admin = 1 WHERE id = ? AND staff_admin = 0').bind(target.id),
+      ]);
+      return set.meta.changes ? { ok: true, handle: target.handle } : { error: 'staff-already' };
+    }
+    if (target.id === me.id) return { error: 'staff-self' };
+    if (target.staff_admin !== 1) return { error: 'no-staff' };
+    if (target.staff_owner === 1) return { error: 'staff-owner' };   // an Owner is unmade by the operator only
+    const left = !!staffRole({ ...target, staff_admin: 0 }, env);   // a Moderator still, so its keys and sessions stay
+    const hashes = await sessionHashes(db, target.id);
+    await db.batch([
+      audit('admin-remove', target.id, { handle: target.handle }, { okIf: { sql: 'EXISTS (SELECT 1 FROM players WHERE id = ? AND staff_admin = 1 AND staff_owner = 0)', args: [target.id] } }),
+      db.prepare('UPDATE players SET staff_admin = 0 WHERE id = ? AND staff_owner = 0').bind(target.id),
+      ...(left ? [] : [
+        db.prepare('UPDATE staff_keys SET revoked_at = ? WHERE player_id = ? AND revoked_at IS NULL').bind(nowS, target.id),
+        ...['staff_sessions', 'staff_invites'].map((t) => db.prepare(`DELETE FROM ${t} WHERE player_id = ?`).bind(target.id)),
+      ]),
+    ]);
+    await cutPush(ctx, env, target.id, hashes, false);
+    return { ok: true, handle: target.handle };
   }
   if (path === '/v1/staff/invite' || path === '/v1/staff/cut') {
     const lc = handleLc(body.handle);

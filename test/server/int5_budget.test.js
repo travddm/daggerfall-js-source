@@ -55,7 +55,7 @@ async function stand() {
   let now = T0;
   const realNow = Date.now;
   Date.now = () => now * 1000;
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const who = await s.registered('eve');
   const R = await seatRealm(s.env, who.secret, 'eve');

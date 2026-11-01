@@ -101,7 +101,7 @@ test.after(() => { Date.now = realNow; });
 test('JUNGLE-WOODS service: a jungle tree past the climate\'s twelve is felled - its Pine, on ground nobody confirmed; the jungle\'s 49th and a Woodlands pixel\'s 13th are no node (mutants: the service\'s slots the climate\'s)', async () => {
   const now = utcDay(T0) * DAY + 12 * 3600;
   Date.now = () => now * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
   raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, ?, ?, NULL, NULL, ?)

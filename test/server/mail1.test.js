@@ -154,7 +154,7 @@ test('MAIL1 law: a letter past its bound is REFUSED, never cut - one word each (
 
 test('MAIL1 service: four routes behind a session, none open; acct6; a GUEST can neither read nor write (mail-needs-account, 403) and cannot be written to; the wrong method is refused (mutants: the wall dropped; a route opened to strangers)', async () => {
   for (const r of ['/v1/mail/inbox', '/v1/mail/send', '/v1/mail/read', '/v1/mail/delete']) { assert.ok(ROUTES.has(r), r); assert.ok(!OPEN_ROUTES.has(r)); }
-  assert.equal(ACCOUNT_VERSION, 'acct207');
+  assert.equal(ACCOUNT_VERSION, 'acct208');
   const svc = await service();
   const ann = await svc.player('p_ann_0000000001', 'Ann');
   const guest = await svc.player('p_gst_0000000001', null);
@@ -173,8 +173,9 @@ test('MAIL1 service: four routes behind a session, none open; acct6; a GUEST can
 });
 
 test('MAIL1 service: a letter goes registered to registered BY HANDLE (any case), cleaned, from the sender\'s own name - and lands in the reader\'s box as a head (no body), newest first, unread, with the sender\'s badge as the service would sign it now (mutants: the name taken from the frame; the body in the list; the order)', async () => {
-  const svc = await service({ env: { DEVELOPER_HANDLES: 'Ann' } });
+  const svc = await service();
   const ann = await svc.player('p_ann_0000000001', 'Ann');
+  svc.db._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(ann.id);   // STAFF-ROLES-BY-ACCOUNT: Ann is an Admin
   const bob = await svc.player('p_bob_0000000001', 'Bob');
   const old = await svc.player('p_cid_0000000001', 'Cid', { created: Math.floor(Date.now() / 1000) - 40 * 86400 });
   const r1 = await svc.call(ann, '/v1/mail/send', { to: 'bOB', subject: '  A\u202e contract ', body: 'Line one\n\n\n\nLine two', from: 'Mallory' });

@@ -158,7 +158,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[placement] region` | Runs the Worker near the D1 primary. |
 | `[triggers] crons` | The service's own clock (`server-account/src/cron.js` `runCron`): sweeps and retention. |
 | `[vars] ACCOUNT_VERSION` | Must equal `ACCOUNT_VERSION` in `server-account/src/service.js`. |
-| `[vars] *_HANDLES`, `OWNER_KEYS`, `DISCORD_MODERATORS` | Role lists: comma-separated account handles for developers, moderators, owners and honorary titles. Changing one is a code change and a deploy. |
+| `[vars] *_HANDLES`, `OWNER_KEYS` | `*_HANDLES`: comma-separated account handles for honorary titles only. `OWNER_KEYS`: the public key an Owner account signs in with first. Staff roles are not vars: see [Staff roles](staff-roles.md). |
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
 | `[vars] DISCORD_MOD_CHANNEL`, `DISCORD_PUBLIC_KEY`, `DISCORD_INVITE_URL` | The moderation bot's channel and interaction key. |

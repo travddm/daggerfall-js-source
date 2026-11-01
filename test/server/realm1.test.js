@@ -98,8 +98,8 @@ test('REALM P1: the routes are the service\'s, behind a session and never open -
   assert.deepEqual(realmPathOf('/v1/realm/r0123456789abcdef0123/data'), { id: 'r0123456789abcdef0123' });
   assert.equal(realmPathOf('/v1/realm/c0ffee00-1111/data'), null, 'a client\'s id is no realm id');
   assert.equal(realmPathOf('/v1/realm/r0123456789abcdef0123/shot'), null);
-  assert.equal(ACCOUNT_VERSION, 'acct207');
-  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct207"/);
+  assert.equal(ACCOUNT_VERSION, 'acct208');
+  assert.match(src('server-account/wrangler.toml'), /ACCOUNT_VERSION = "acct208"/);
   const { call, guest } = await stand();
   assert.equal((await call('GET', '/v1/realm')).status, 401, 'no secret, no characters');
   const g = await guest();

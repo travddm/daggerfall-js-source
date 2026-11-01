@@ -34,7 +34,7 @@ async function stand() {
   _resetKeyForTests();
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
   });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

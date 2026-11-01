@@ -313,7 +313,7 @@ test('INT14 THE RECEIPTS: a gate\'s, an Hour\'s and a serpent\'s each carry the 
 });
 
 test('INT14 THE SERVICE KEEPS IT, STAFF READ IT: each claim keeps its receipt\'s measure on its kill\'s row (`body`, migration 0105), none from a receipt without one; /v1/mod/realm-bodies answers each fight\'s receipts, the mends claimed a minute stood by quantile, how many claimed past the line, fell by the count, and would have lost their receipt - a developer\'s alone; tools/realmReview.mjs `bodies [days]` asks it (mutants: the measure not kept; the review open to anyone; a fight left out)', async () => {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const nowS = Math.floor(Date.now() / 1000);
   const ann = await s.registered('annika'), bo = await s.registered('boris'), carla = await s.registered('carla'), mac = await s.registered('mac');

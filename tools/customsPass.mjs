@@ -6,7 +6,7 @@
 //   node tools/customsPass.mjs --account <id>      grant, by the account's id (two guests wearing one name)
 //   node tools/customsPass.mjs <name> --revoke     take back a pass not yet spent
 //
-// Signed in as YOU - a developer, your handle in the service's DEVELOPER_HANDLES: DAGGER_HANDLE and DAGGER_PASSWORD sign
+// Signed in as YOU - a developer, your account holds the Admin role: DAGGER_HANDLE and DAGGER_PASSWORD sign
 // in for this one call and sign out after it; DAGGER_SECRET, a session secret you already hold, is used as it is and left
 // signed in. DAGGER_ACCOUNT_SERVICE points at another service (a local one); the live one by default.
 //

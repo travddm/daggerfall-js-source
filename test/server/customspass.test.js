@@ -59,7 +59,7 @@ async function stand() {
   _resetKeyForTests();
   const kp = await webcrypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pkcs8 = Buffer.from(new Uint8Array(await webcrypto.subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
-  const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', DEVELOPER_HANDLES: 'MacDev' };
+  const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*' };
   const call = async (path, body, secret) => {
     const res = await worker.fetch(new Request(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` }, body: JSON.stringify(body),
@@ -77,6 +77,7 @@ async function stand() {
   const registered = async (handle) => {
     const g = await guest();
     assert.equal((await call('/v1/auth/register', { secret: g.secret, handle, password: 'a good long one', ...ACCEPTED }, g.secret)).status, 200, handle);
+    if (handle === 'MacDev') env.DB._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run(g.id);   // STAFF-ROLES-BY-ACCOUNT: the Admin role is the account's
     return { id: g.id, secret: g.secret, handle };
   };
   const rows = (sql, ...a) => env.DB._raw.prepare(sql).all(...a).map((r) => ({ ...r }));
@@ -162,7 +163,7 @@ test('CUSTOMS-PASS, who grants and to whom: a developer alone; a handle, a guest
   const g1 = await s.guest(), g2 = await s.guest(), g3 = await s.guest();
   s.exec('UPDATE players SET guest_name = ? WHERE id IN (?, ?)', 'Twin Name', g1.id, g2.id);
   s.exec('UPDATE players SET guest_name = ? WHERE id = ?', 'Only Once', g3.id);
-  s.env.MODERATOR_HANDLES = 'Plainplayer';
+  s.exec('UPDATE players SET staff_mod = 1 WHERE id = ?', plain.id);
   assert.deepEqual([(await s.pass(plain, { name: 'MacDev' })).status, (await s.pass(plain, { name: 'MacDev' })).body], [403, { error: 'not-developer' }], 'a moderator is no developer: a pass admits a character, which is the realm\'s economy');
   assert.deepEqual((await s.pass(g3, { name: 'Plainplayer' })).body, { error: 'not-developer' }, 'nor a guest');
   assert.deepEqual([(await s.pass(dev, { name: 'Nobodyholds' })).status, (await s.pass(dev, { name: 'Nobodyholds' })).body], [404, { error: 'no-player' }]);
