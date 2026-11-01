@@ -2,8 +2,8 @@
 // the other move, and one chat line arrives.
 //
 // The services stand as tools/loadHarness.mjs stands them (a throwaway signing pair, every migration, both Workers). Each
-// player is a guest with a realm character whose first save is one offline boot at Knightstale, composed by the world
-// host; both boot `?world&online&realm=<id>&load&server=ws://127.0.0.1:<relay>` into that town, so both are in its room.
+// player is a guest with a realm character whose first save is one offline boot at the classic start, composed by the world
+// host; both boot `?world&online&realm=<id>&load&server=ws://127.0.0.1:<relay>` into that dungeon, so both are in its room.
 //
 // Three probe-only edits of the served source (tools/onlineFrameProbe.mjs ONLINE_PROBE_EDITS, the repository untouched):
 // the account base may be the local service, `?shot` survives an online boot (it installs the `__` hooks), and the save
@@ -22,7 +22,10 @@ import { ACCEPTED } from '../../src/net/legalLaw.js';
 export const name = 'online';
 
 const SVC_PORT = Number(process.env.PROBE_SVC_PORT || 8872);
-const TOWN = '/play/?world&region=Wayrest&loc=Knightstale&class=1&novideo&shot&play&tod=15:00';
+// the classic start, inside the starting dungeon: software GL cannot stream a town in minutes, and a dungeon is the cheap place
+// two clients can meet (tools/partyLootProbe.mjs does the same)
+const START = '/play/?world&classic&class=1&novideo&shot&play';
+const standing = () => window.__probeSaveText && window.__foes?.() != null && (window.__frame | 0) > 30;
 
 /** The peers the session draws, beside the composer's hook: id, name and the pose the relay last gave. */
 const PEERS_EDIT = [
@@ -43,12 +46,12 @@ export async function run({ browser, base, ck }) {
   const state = mkdtempSync(join(tmpdir(), 'game-probe-online-'));
   const players = [];
   try {
-    // the first save, an offline boot of the town composed by the world host, is made while the services start
+    // the first save, an offline boot of the classic start composed by the world host, is made while the services start
     const composeSave = async () => {
-      const compose = new Game(browser, base, { viewport: { width: 480, height: 270 } });
+      const compose = new Game(browser, base, {});
       try {
-        await compose.open(TOWN, { wait: 'frame' });
-        await compose.until(() => compose.page.evaluate(() => window.__shotReady === true), 600000);
+        await compose.open(START, { wait: 'frame' });
+        await compose.until(() => compose.page.evaluate(standing), 900000);
         await compose.waitFrames(3);
         return await compose.page.evaluate(() => window.__probeSaveText());
       } finally {
@@ -73,7 +76,7 @@ export async function run({ browser, base, ck }) {
       const rs = createRealmSession({ io: pio, id: c.data.id, lease: c.data.lease, seq: c.data.seq ?? 0, gzip: c.data.gzip === true, hidden: () => false, watchHidden: () => {} });
       const first = await rs.checkpoint(saveText);
       if (!first?.ok) throw new Error(`${label}'s first save did not land (${first?.error})`);
-      const g = new Game(browser, base, { viewport: { width: 640, height: 400 } });
+      const g = new Game(browser, base, {});
       players.push(g);
       g.label = label;
       g.accountName = made.name;
@@ -86,7 +89,7 @@ export async function run({ browser, base, ck }) {
           arg: { sk: SESSION_KEY, sv: SERVICE_KEY, sess: JSON.stringify({ secret: made.secret, id: made.id, name: made.name }), base: `http://127.0.0.1:${svc.accountPort}` },
         },
       });
-      await g.until(() => g.page.evaluate(() => window.__shotReady === true), 600000);
+      await g.until(() => g.page.evaluate(standing), 900000);
       return g;
     };
 
@@ -105,7 +108,7 @@ export async function run({ browser, base, ck }) {
       const before = (await peersOf(watcher))[0]?.pose;
       await mover.page.evaluate((d) => {
         const p = window.__player.pos;
-        window.__pose(p[0] + d, p[1], p[2] + d, 1.5, 0);
+        window.__warpTo([p[0] + d, p[1], p[2] + d], 1.5);
       }, d);
       const seen = await watcher.until(async () => {
         const now = (await peersOf(watcher))[0]?.pose;
@@ -120,6 +123,10 @@ export async function run({ browser, base, ck }) {
 
     // one chat line: typed in alice's chat field (Enter focuses it, Enter sends), read from bob's chat log
     const line = `probe line ${Math.random().toString(36).slice(2, 8)}`;
+    // the opening story page of the classic start holds the keys: put it away first, as a player does
+    for (const g of [a, b]) {
+      for (let i = 0; i < 12 && await g.overlayKind(); i++) { await g.page.waitForTimeout(600); await g.key(i % 2 ? 'Escape' : 'Enter'); }
+    }
     const say = async (g) => {
       await g.page.keyboard.press('Enter');
       await sleep(500);

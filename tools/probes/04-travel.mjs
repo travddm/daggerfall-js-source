@@ -7,7 +7,7 @@
 // window's "until fully healed" choice. Each half boots the town afresh, and the journey goes first: a journey that
 // starts after a night's rest has stalled.
 import { Game } from './lib/harness.mjs';
-import { TOWN_URL, enterTown, buildingsOfTown, openInnkeeper, rentRoom } from './lib/town.mjs';
+import { TOWN_URL, enterTown, nativeClick, buildingsOfTown, openInnkeeper, rentRoom } from './lib/town.mjs';
 
 export const name = 'travel';
 
@@ -36,10 +36,10 @@ export async function run({ browser, base, ck }) {
     await g.key('v');
     const opened = await travelMap();
     ck('the travel map opens', !!opened);
-    if (!opened?.identifying) await g.page.mouse.click(25 * 4, 191 * 4);
+    if (!opened?.identifying) await nativeClick(g, 25, 191);
     await g.key('Enter', 1);
     let s = await travelMap();
-    if (!s?.regionSelected) { await g.page.mouse.click(25 * 4, 191 * 4); await g.key('Enter', 1); s = await travelMap(); }
+    if (!s?.regionSelected) { await nativeClick(g, 25, 191); await g.key('Enter', 1); s = await travelMap(); }
     ck('the region page opens', !!s?.regionSelected);
     await g.key('f', 1);
     for (const c of dest.name) {

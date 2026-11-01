@@ -13,6 +13,9 @@ export const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 export const SHOTS = process.env.SHOT_DIR || join(ROOT, 'scratch', 'probe-shots');
 export const sleep = (ms) => new Promise((r) => { setTimeout(r, ms); });
 
+/** The probes read state, not pixels, and software GL costs by the pixel: a small window keeps CI's frames affordable. PROBE_W/PROBE_H change it. */
+const VIEWPORT = { width: Number(process.env.PROBE_W || 640), height: Number(process.env.PROBE_H || 400) };
+
 const SWIFTSHADER_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
 /** Starts a Vite dev server on `port`. HMR and the watcher are off: a reload under a probe destroys its page. */
@@ -28,7 +31,9 @@ export async function serve({ port, plugins = [] }) {
 /** PW_CHANNEL=msedge uses the installed Edge (local runs); unset uses Playwright's Chromium on SwiftShader (CI). */
 export function launchBrowser() {
   const channel = process.env.PW_CHANNEL;
-  const args = ['--autoplay-policy=no-user-gesture-required', ...(channel ? [] : SWIFTSHADER_ARGS)];
+  // PROBE_SOFTGL=1 renders on SwiftShader through the installed browser too: it reproduces CI's speed on a machine with a GPU
+  const soft = !channel || process.env.PROBE_SOFTGL === '1';
+  const args = ['--autoplay-policy=no-user-gesture-required', ...(soft ? SWIFTSHADER_ARGS : [])];
   return chromium.launch({ headless: true, args, ...(channel ? { channel } : {}) });
 }
 
@@ -53,7 +58,7 @@ export function ledger(name) {
  * HTTP errors from a local origin) are collected; `noErrors()` checks them against ALLOWED_ERRORS.
  */
 export class Game {
-  constructor(browser, base, { viewport = { width: 1280, height: 800 }, ...ctxOpts } = {}) {
+  constructor(browser, base, { viewport = VIEWPORT, ...ctxOpts } = {}) {
     this.browser = browser;
     this.base = base;
     this.viewport = viewport;
@@ -78,10 +83,12 @@ export class Game {
       this.page.on('dialog', (d) => { d.accept().catch(() => {}); });
       this.page.on('pageerror', (e) => this.errors.push(`[pageerror] ${e.message}`));
       this.page.on('console', (m) => { if (m.type() === 'error' && (!m.location().url || isLocal(m.location().url))) this.errors.push(`[console] ${m.text()} ${m.location().url ?? ''}`.trim()); });
-      this.page.on('requestfailed', (r) => isLocal(r.url()) && this.errors.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText ?? ''}`));
+      // ERR_ABORTED is the page cancelling its own fetch (a slow frame, a reload), not a failure of the service
+      this.page.on('requestfailed', (r) => isLocal(r.url()) && r.failure()?.errorText !== 'net::ERR_ABORTED' && this.errors.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText ?? ''}`));
       this.page.on('response', (r) => { if (r.status() >= 400 && isLocal(r.url())) this.errors.push(`[http ${r.status()}] ${r.url()}`); });
     }
-    await this.page.goto(`${this.base}${path}`);
+    // 'commit': software GL keeps the main thread busy, so the load event can be minutes away; the waits below read the game itself
+    await this.page.goto(`${this.base}${path}`, { waitUntil: 'commit', timeout: 120000 });
     if (wait === 'frame') return this.until(() => this.page.evaluate(() => (window.__frame ?? 0) > 3), timeout);
     if (wait === 'mode') return this.until(() => this.page.evaluate(() => (window.__mode ? window.__mode() : null)), timeout);
     return true;

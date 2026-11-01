@@ -13,7 +13,7 @@ these probes catch what breaks in the wiring when a host file (`src/scenes/world
 | `travel` | Fast travel through the travel map (the journey ends at the place asked for, the clock runs); a rest in a rented room heals and advances the clock. |
 | `save` | Save, load in the page, then reload the page and load again: position, gold, inventory and level match. |
 | `pause` | Every tab and side row of the pause menu opens and draws. |
-| `online` | The real relay and account service in local workerd; two clients join one room, each sees the other move, one chat line arrives. |
+| `online` | The real relay and account service in local workerd; two clients join one room (the starting dungeon, which software GL can boot), each sees the other move, one chat line arrives. |
 
 ## Running
 
@@ -26,6 +26,8 @@ npm run probes -- save pause     # the named probes
 
 - `PW_CHANNEL=msedge` drives the installed Edge on the GPU (the way to run locally on Windows). Without it
   Playwright's Chromium runs on SwiftShader, which is what CI uses and is several times slower.
+- `PROBE_SOFTGL=1` with `PW_CHANNEL` renders on SwiftShader through the installed browser: it reproduces CI's speed.
+  The window is 640x400 (`PROBE_W`, `PROBE_H`): software GL costs by the pixel.
 - `online` needs the relay's tools: `npm ci --prefix server`. It uses ports 8872 and 8873 (`PROBE_SVC_PORT`).
 - `PROBE_PORT` moves the first Vite port (default 5260). `SHOT_DIR` sets where screenshots go (default
   `scratch/probe-shots/`, ignored by git).

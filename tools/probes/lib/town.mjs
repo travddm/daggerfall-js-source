@@ -89,3 +89,15 @@ export async function rentRoom(g) {
   const rooms = await g.page.evaluate(() => (window.__playerEntity.rentedRooms ?? []).length);
   return { quoted, before, after: (await g.entity()).gold, rooms };
 }
+
+/** Clicks a point of the game's native 320x200 screen, at the scale and letterbox the live canvas has. */
+export async function nativeClick(g, vx, vy) {
+  const pt = await g.page.evaluate(([x, y]) => {
+    const c = document.querySelector('canvas');
+    const sc = Math.max(1, Math.floor(Math.min(c.width / 320, c.height / 200)));
+    const ox = Math.floor((c.width - 320 * sc) / 2), oy = Math.floor((c.height - 200 * sc) / 2);
+    const r = c.getBoundingClientRect();
+    return { x: r.left + (ox + x * sc) * (r.width / c.width), y: r.top + (oy + y * sc) * (r.height / c.height) };
+  }, [vx, vy]);
+  await g.page.mouse.click(pt.x, pt.y);
+}

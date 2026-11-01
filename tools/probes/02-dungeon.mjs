@@ -77,9 +77,9 @@ export async function run({ browser, base, ck }) {
       const corpsed = await g.until(async () => (await g.J(() => window.__foes()))[target.i]?.corpse, 30000);
       ck('the dead foe leaves a corpse', !!corpsed);
 
-      const targets = await g.J(() => window.__lootTargets());
       const corpseKey = `corpse:${target.i}`;
-      console.log('   targets:', JSON.stringify(targets), JSON.stringify(foes[target.i]), JSON.stringify((await g.J(() => window.__foes()))[target.i]));
+      // the corpse becomes a loot target once its sprite has loaded
+      const targets = await g.until(async () => { const t = await g.J(() => window.__lootTargets()); return (t ?? []).includes(corpseKey) ? t : null; }, 60000) ?? await g.J(() => window.__lootTargets());
       ck('the corpse is a loot target', (targets ?? []).includes(corpseKey), `${(targets ?? []).length} target(s)`);
       const before = await g.entity();
       const held = await g.page.evaluate((k) => window.__takeLoot(k), corpseKey);
