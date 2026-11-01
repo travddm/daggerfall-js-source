@@ -13,6 +13,9 @@ handed the shipped zip over on 2026-09-12 to integrate 1:1.
 
 ## What is here
 
+`MeanerMonsters.dfmod.json` is not committed: `sh tools/fetch-vendor.sh` copies it from the author's repository at a
+pinned commit. The repository has no `xml/` records, so they stay committed here.
+
 - `MeanerMonsters.dfmod.json` - the shipped bundle's manifest (title,
   version 1.5.2, author, contact, DFUnity 1.0.0, GUID, the forty-seven
   files it was built from, one optional dependency: Unleveled Mobs).

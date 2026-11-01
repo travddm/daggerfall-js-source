@@ -29,6 +29,9 @@ here - the earlier mod records carry theirs in this line.]**
 
 ## What is here
 
+Only this note is committed: `sh tools/fetch-vendor.sh` copies every file below from the author's repository at a
+pinned commit. The repository names the manifest `ImmersiveFootsteps.dfmod.json`; the script renames it.
+
 - `immersive-footsteps.dfmod.json` - the shipped bundle's manifest,
   verbatim (title `ImmersiveFootsteps`, version 1.01, author, DFUnity
   1.0.0, GUID `8c75cd21-ca71-4841-b637-7728433c99f1`, an optional

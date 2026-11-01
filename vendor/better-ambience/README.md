@@ -26,6 +26,9 @@ here - the earlier mod records carry theirs in this line.]**
 
 ## What is here
 
+`Sound/` is not committed: `sh tools/fetch-vendor.sh` copies the 29 clips from the author's repository at a pinned
+commit. The repository holds 0.1.3, so the 0.1.4 scripts, manifest and settings stay committed here.
+
 - `better-ambience.dfmod.json` - the shipped bundle's manifest,
   verbatim (title, version 0.1.4, author, DFUnity 0.13, GUID
   `d5655077-ba38-4dbc-a41f-2b358cb1d680` - the GUID Immersive
