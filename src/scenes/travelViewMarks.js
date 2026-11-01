@@ -45,7 +45,7 @@ export function createTravelViewMarks(host) {
   const {
     TV_PLACE_LIFT, _bandChase, _bandSpent, _hiddenPeers, _lodesSensed, _peerMapPoses, _townOfMapId, _tvBountyHold,
     _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, bandMake, bandNowMs,
-    bandPlace, cam, carriageTown, csaOn, exteriorFoes, livingHideoutsHostOf, lodeSense, lodeWords, motherlodeBook,
+    bandPlace, cam, carriageTown, csaOn, livingHideoutsHostOf, lodeSense, lodeWords, motherlodeBook,
     myGuildTag, owForecast, params, player, playerTravelPixel, questPixel, seaRaidPeerChase, townEcon, state, travelViewBands, tvPlaceRect, tvPlaceSummary,
     travelViewCamps, travelViewDungeons, travelViewFarPlaces, travelViewPlaces, travelViewRaiders, travellerBook,
     tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys

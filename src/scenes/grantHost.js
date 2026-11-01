@@ -38,7 +38,7 @@ import {
   GRANT_FRAME_GRANTS_MAX, GRANT_SKEW_MS, GRANT_STANDDOWN_REASONS, validGrant, verifyGrant, grantRefusal, grantMarksAllow, wireGrant, grantDice,
 } from '../net/grantLaw.js';
 import { isNight } from '../world/worldClock.js';
-import { isCellRoom, mapPixelOfWire } from '../net/wire.js';
+import { isCellRoom } from '../net/wire.js';
 import { staffBossBound } from '../systems/staffEvents.js';   // BOSS-BOUND: a staff event's mini boss, past a plain elite's bound
 import { foeStatsRefusal } from '../net/foeBounds.js';   // FOE-BOUNDS: the most health a streamed foe can legally have
 import { KNIGHT_CITYWATCH_ID } from '../characters/enemy/enemyEntity.js';

@@ -211,7 +211,6 @@ import { AmbientEffects, DUNGEON_AMBIENT_WAITS } from '../systems/ambientEffects
 import { enemyWeightClassicUnits, weaponKnockbackSpeed, weaponKnockbackApplies, reportPlayerAttack } from '../combat/formulas.js';   // C15: + knockback; WB4b: a spell's number on the court's boss pops as a blow's does
 import { HIT_KINDS } from '../net/gate/gateBrain.js';   // WB4b: a blow on the court's boss says its kind
 import { bossReach } from '../world/gate/gateBoss.js';   // WB4b: a swing meets the court's boss at his skin
-import { playerMeleeCanHit } from '../combat/playerWeapon.js';   // PVPDUNGEON
 import { assignEnemySpells, enemySpellIndices, SPELL_CAST_SOUND } from '../systems/enemySpells.js';
 import { revenantArtFrame } from '../systems/revenant/revenantArts.js';   // RVN-ARTS: a revenant's art - the open world's law (scenes/exteriorFoes.js artFrame)
 import { ARENA_PUPPET_OWNER } from '../net/arena/arenaLaw.js';   // ARENA4: the relay's fighters' puppets - a blow on one is the referee's
