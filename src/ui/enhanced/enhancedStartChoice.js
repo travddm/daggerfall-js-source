@@ -1,7 +1,7 @@
 // START2 - THE START-CHOICE PAGE'S ENHANCED PLUS FACE.
 //
 // The question itself - its starts, its cursor, its one answer - stays ui/startChoice.js's StartChoiceScreen. This is
-// its FACE on the Enhanced Plus skin, in the leveling question's own shell (ui/enhanced/enhancedLevelingChoice.js: the
+// its FACE on the Enhanced Plus skin, in the leveling question's own shell (ui/enhanced/enhancedChoiceFace.js: the
 // rest window's `px-home px-over`, a `px-win` with its four gems, one `.card` - its eyebrow, heading, lead and hint):
 // the eight starts as a list down the left, and the chosen one's story on the right - where it begins and why
 // (stacked on a phone). DRAWN, NOT OWNED - the yes/no card's law: the screen's draw() calls drawStartChoiceFace each

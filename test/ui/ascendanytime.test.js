@@ -61,10 +61,9 @@ test('ASCEND-ANYTIME: the crown promises no level, and the window says so', () =
   assert.equal(crownTitle(levelUpCrown(e, { pool: 3, base: e.stats, working: e.stats })), 'Level 7 → 8');
 });
 
-test('ASCEND-ANYTIME: a mod-law character\'s view reads the mod\'s bar, a classic one the skill-sum bar', () => {
+test('ASCEND-ANYTIME: the view reads the skill-sum bar', () => {
   const e = hero();
-  assert.equal(levelProgress(e, viewOnlyScreen(e, false)).label, 'Skill progress to next level');
-  assert.equal(levelProgress(e, viewOnlyScreen(e, true)).label, 'Progress to next level');
+  assert.equal(levelProgress(e, viewOnlyScreen(e)).label, 'Skill progress to next level');
 });
 
 test('ASCEND-ANYTIME the door\'s rollout (levelUpScreenFor): none with nothing owed (the page draws the view); a level owed the rollout - and its bonus points the SAME on a second open, so a level-up left and come back to is no re-roll', async () => {
@@ -74,9 +73,9 @@ test('ASCEND-ANYTIME the door\'s rollout (levelUpScreenFor): none with nothing o
   const e = { isPlayer: true, level: 4, pendingLevel: 5, readyToLevelUp: false, stats: { ...stats }, skills: new Array(35).fill(30), career: { primarySkills: [], majorSkills: [], minorSkills: [] }, maxHealth: 40, health: 40 };
   assert.equal(levelUpScreenFor(e), null, 'nothing owed: no rollout');
   e.readyToLevelUp = true;
-  const first = levelUpScreenFor(e, false);
+  const first = levelUpScreenFor(e);
   assert.ok(first instanceof LevelUpScreen, 'DFU\'s own rollout');
-  const again = levelUpScreenFor(e, false);
+  const again = levelUpScreenFor(e);
   assert.equal(again.pool, first.pool, 'the bonus pool remembered on the character (advancement.js bonusPoolFor): leaving the tab re-rolls nothing');
   // AUDIT GROWTH LANE5-18: ...and read off the character, not equal by chance (two draws of 4-6 match one time in three)
   assert.equal(typeof e.pendingBonusPool, 'number', 'drawn once onto the character');

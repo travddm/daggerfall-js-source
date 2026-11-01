@@ -38,11 +38,6 @@ import { attachFactionRep } from './faction/factionRep.js';   // S25
 import { createRegionConditions } from './region/regionConditions.js';
 import { clearWorldDataVariants } from './worldDataVariants.js';   // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
 import { bootstrapRegionPower } from './region/regionPower.js';   // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
-// ORL1: the leveling choice - its screen, and the two names the
-// answer is spelled with.
-import { LevelingChoiceScreen } from '../ui/levelingChoice.js';
-import { oblivionLevelingEnabled, initVirtueLeveling, LEVELING_CLASSIC, newCharacterLevelingSystem } from './oblivionLeveling.js';
-import { isOnlinePage } from './online/onlineLane.js';   // LEVEL-ONLINE-2: Oblivion's leveling is offline-only for a new character
 import { legacyOn } from './legacy/settings.js';   // LEGACY2: Project Legacy's question - the family's model
 import { legacyModelScreen } from '../ui/legacy/legacyModelChoice.js';
 import { StartChoiceScreen } from '../ui/startChoice.js';   // START2: where the story begins, the last question
@@ -160,13 +155,6 @@ export async function applyHeadlessChargen(playerEntity, classIndex, { fetchByte
   clearWorldDataVariants();   // AUDIT-RR F39: PlayerEntity.Reset (:818) - a new game starts with no variant set
   // AUDIT 26 F107: InitializeRegionData's own tail (:2211-2217).
   bootstrapRegionPower(playerEntity.factionRep, { regionConditions: playerEntity.regionConditions });
-  // ORL1: THE SKIP IS NOT A CHOICE, so it takes the port's own law.
-  // `?class=` exists to get past the wizard without a player - a probe,
-  // a test, a headless run - and a question nobody is there to answer
-  // must not be asked and must not be guessed at. Daggerfall's leveling
-  // is what every ?class= character has always had.
-  // LEVEL-ONLINE-2: ...and online too - Oblivion's is offline-only (newCharacterLevelingSystem).
-  initVirtueLeveling(playerEntity, newCharacterLevelingSystem(LEVELING_CLASSIC, { online: isOnlinePage() }));
   console.log(`[chargen] ${CLASS_CAREERS[classIndex]}: HP ${playerEntity.maxHealth}, spells ${playerEntity.spells.length}`);
   return playerEntity;
 }
@@ -286,17 +274,7 @@ export function finishChargen(playerEntity, result, spellsByIndex = null, { roll
   // first raiseSkills raise jumped the character straight to level 3.
   playerEntity.currentLevelUpSkillSum = levelUpSkillSum(playerEntity);
   playerEntity.startingLevelUpSkillSum = playerEntity.currentLevelUpSkillSum;
-  // ORL1: ...and THE LEVELING ANCHOR'S TWIN is taken in the same
-  // breath, for the same reason - whichever system this character
-  // answered for, its starting state is set once, here, where the DFU
-  // anchor is set. `result.levelingSystem` is the answer the door's
-  // question wrote (createChargenWindow); a result that carries none -
-  // a test's literal, a caller that built a flow by hand - is a classic
-  // character, which is the port's own law and the safe default.
-  // LEVEL-ONLINE-2: an online character is born on Daggerfall's leveling whatever a result carries - the question offers
-  // Oblivion's only offline, and this is the law's own door, not the screen's (a hand-built result goes through it too).
-  initVirtueLeveling(playerEntity, newCharacterLevelingSystem(result.levelingSystem ?? LEVELING_CLASSIC, { online: isOnlinePage() }));
-  // LEGACY-CHOICE: AND PROJECT LEGACY'S ANSWER, kept on the character as the leveling one is - a model, or no lineage,
+  // LEGACY-CHOICE: AND PROJECT LEGACY'S ANSWER, kept on the character - a model, or no lineage,
   // which keeps them out of the system for good (legacyHost.js found). A result the question was not put to carries none.
   if (isLegacyChoice(result.legacyModel)) playerEntity.legacyChoice = result.legacyModel;
   return playerEntity;
@@ -378,24 +356,17 @@ export async function createChargenFlow(fetchBytes, { rolls = Math.random } = {}
 /** START2: `startChoice` - `{ open(start), why(start) }`, a host that stands the land past the Bay asks where the story begins
  *  (ui/startChoice.js): the world host alone; every other host's new character wakes where its boot put them. */
 export function createChargenWindow(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
-  // ORL1: ...AND THE LEVELING CHOICE RIDES THIS DOOR.
+  // THE FOUR HOSTS RULE, answered here rather than three times over. Three hosts run a new game and all three build
+  // their wizard through this function - world.js:"came from hosts wiring these", exterior.js:"AUDIT 17i: ONE construction",
+  // dungeonContext.js:"const missing = (targetEntity.maxHealth ?? 0)"."questPoolOps.removeFoe(f);" - so a question put after the
+  // wizard is asked once, in the seam, and not one of them learns a new word. THE FOURTH HOST, scenes/worldModes.js,
+  // IS ACCOUNTED FOR AND ASKS NOTHING: a new game never begins inside a building, that host runs no chargen at all
+  // (it has no createChargenFlow call), and so it has no new-game moment to ask at.
   //
-  // THE FOUR HOSTS RULE, answered here rather than three times over.
-  // Three hosts run a new game and all three build their wizard
-  // through this function - world.js:"came from hosts wiring these", exterior.js:"AUDIT 17i: ONE construction",
-  // dungeonContext.js:"const missing = (targetEntity.maxHealth ?? 0)".."questPoolOps.removeFoe(f);" - so the question is asked once, in the
-  // seam, and not one of them learns a new word. THE FOURTH HOST,
-  // scenes/worldModes.js, IS ACCOUNTED FOR AND ASKS NOTHING: a new game
-  // never begins inside a building, that host runs no chargen at all
-  // (it has no createChargenFlow call), and so it has no new-game
-  // moment to ask at. It does LEVEL a character, and both of its
-  // level-up arms were wired for this slice.
-  //
-  // (The reserved word for an unwired host is deliberately not used
-  // here: this file's own pin, test/ui/enhanced/enhancedChargen.test.js's "the FOUR
-  // HOSTS are each named at the seam", holds that the SKIN fork has no
-  // host outside it, and that guard must keep meaning what it says.)
-  return withLevelingChoice(flow, { onDone, onCancel, hudScale, startChoice });
+  // (The reserved word for an unwired host is deliberately not used here: this file's own pin,
+  // test/ui/enhanced/enhancedChargen.test.js's "the FOUR HOSTS are each named at the seam", holds that the SKIN fork has
+  // no host outside it, and that guard must keep meaning what it says.)
+  return withChargenQuestions(flow, { onDone, onCancel, hudScale, startChoice });
 }
 
 /** The wizard this skin wears - the fork createChargenWindow used to
@@ -413,35 +384,23 @@ function chargenWizard(flow, { onDone, onCancel, hudScale = 2 } = {}) {
 }
 
 /**
- * THE WIZARD, THEN THE QUESTION, IN ONE OVERLAY.
+ * THE WIZARD, THEN ITS QUESTIONS, IN ONE OVERLAY.
  *
- * The hosts hold ONE overlay slot, so the choice cannot be a second
- * window pushed beside the wizard - it is a second STAGE of the same
- * one. `done` stays false until the question is answered, which is
- * what keeps the host from tearing the slot down in between; every
- * other arm is forwarded to whichever stage is live.
+ * The hosts hold ONE overlay slot, so a question cannot be a second window pushed beside the wizard - it is a further
+ * STAGE of the same one. `done` stays false until the last question is answered, which is what keeps the host from
+ * tearing the slot down in between; every other arm is forwarded to whichever stage is live.
  *
- * `isChoiceWindow` is a GETTER for the same reason: the wizard wants
- * raw key codes and the question wants the shared overlayAction names,
- * and the hosts read that flag at routing time (townTalk.js:"if (overlay.isChoiceWindow)",
- * worldModes.js's overlayIsNative), so one object can want both in
- * turn.
+ * `isChoiceWindow` is a GETTER for the same reason: the wizard wants raw key codes and a question wants the shared
+ * overlayAction names, and the hosts read that flag at routing time (townTalk.js:"if (overlay.isChoiceWindow)",
+ * worldModes.js's overlayIsNative), so one object can want both in turn.
  *
- * WITH THE MOD OFF there is no question and no wrapper stage: the
- * wizard's own answer goes straight out, carrying the classic system.
- * The same is true of every path that never builds a window at all -
- * applyHeadlessChargen (the `?class=` skip) sets it there.
+ * With no question to put there is no wrapper stage: the wizard's own answer goes straight out.
  */
-function withLevelingChoice(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
-  // LEVEL-ONLINE: online the question is ALWAYS put, mod or no mod - Oblivion's option shown and shut (LEVEL-ONLINE-2),
-  // Daggerfall's the answer - so the player reads which system they are getting before the world, rather than finding
-  // out at their first level. Offline with the mod off, nothing changed: no question, Daggerfall's law.
-  const online = isOnlinePage();
-  // LEGACY2: ...AND PROJECT LEGACY'S QUESTION AFTER IT - the family's model,
+function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
+  // LEGACY2: PROJECT LEGACY'S QUESTION - the family's model,
   // Bloodline or Enduring, asked of the character who founds a house (legacyModelScreen). The same door, the same one
   // overlay slot: the questions are STAGES of one window, put in turn, each answered once; the answers ride the result.
   const asks = [];
-  if (oblivionLevelingEnabled() || online) asks.push((answer) => new LevelingChoiceScreen((id) => answer({ levelingSystem: id }), { online }));
   if (legacyOn()) asks.push((answer) => legacyModelScreen((model) => answer({ legacyModel: model })));
   // START2: ...AND, LAST, WHERE THE STORY BEGINS - put by a host that
   // can stand a start past the Bay (`startChoice`), once one is open there (one start open is no choice); the new
@@ -449,16 +408,15 @@ function withLevelingChoice(flow, { onDone, onCancel, hudScale = 2, startChoice 
   if (startChoice && STARTS.some((s) => s !== BAY_START && startChoice.open(s))) {
     asks.push((answer, made) => new StartChoiceScreen((key) => answer({ startKey: key }), { race: made?.race ?? null, open: startChoice.open, why: startChoice.why }));
   }
-  const unasked = { levelingSystem: LEVELING_CLASSIC };
   if (!asks.length) {
     return chargenWizard(flow, {
-      onCancel, hudScale, onDone: (r) => onDone?.({ ...r, ...unasked }),
+      onCancel, hudScale, onDone,
     });
   }
   let fired = false;
   let prompt = null;
   let stage = 0;
-  let answers = { ...unasked };
+  let answers = {};
   let result = null;
   const next = () => {
     if (stage >= asks.length) { prompt = null; fired = true; onDone?.({ ...result, ...answers }); return; }
@@ -480,9 +438,9 @@ function withLevelingChoice(flow, { onDone, onCancel, hudScale = 2, startChoice 
     get flow() { return flow; },
     get isChoiceWindow() { return prompt ? false : !!inner.isChoiceWindow; },
     get done() { return fired; },
-    get levelingPrompt() { return prompt; },   // what a pin reads to know the stage
+    get questionPrompt() { return prompt; },   // what a pin reads to know the stage
     input(code, ev) { if (prompt) prompt.input(code, ev); else inner.input(code, ev); },
-    // ORL1 (review): the pointer reaches the QUESTION too. It used to be
+    // The pointer reaches the QUESTION too. It used to be
     // swallowed here, which dead-ended anyone creating a character with
     // the mouse - the wizard is completable that way by design (U8b).
     click(vx, vy) { if (prompt) prompt.click(vx, vy); else inner.click?.(vx, vy); },
@@ -503,7 +461,7 @@ function withLevelingChoice(flow, { onDone, onCancel, hudScale = 2, startChoice 
       // the finished character with it, so each question still up falls
       // back to its default - the same law every unasked path takes.
       // `fired` makes this a no-op on every normal close and on cancel.
-      // LEVEL-ONLINE: the first OPEN answer - Daggerfall's, offline and online (LEVEL-ONLINE-2: Oblivion's is shut there).
+      // The first OPEN answer of the question.
       while (prompt && !fired) prompt.answer(prompt.defaultId);
       inner.dispose?.();
     },

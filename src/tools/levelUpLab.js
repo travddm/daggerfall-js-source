@@ -10,11 +10,9 @@
 // entity, and tools/levelUpProbe.mjs drives exactly this.
 //
 // Everything below the entity is the SHIPPING code: ui/charsheet.js's
-// LevelUpScreen and ui/virtueLevelUp.js's VirtueLevelUpScreen are the
-// real laws, and the window is the real window.
+// LevelUpScreen is the real law, and the window is the real window.
 
 import { LevelUpScreen } from '../ui/charsheet.js';
-import { VirtueLevelUpScreen } from '../ui/virtueLevelUp.js';
 // LV1's audit: the DOOR lane drives ui/charSheetDoor.js itself - the
 // skin fork, the overlay the hosts are handed, the lazy chunk and the
 // wait in front of it - rather than the view alone. It is the only way
@@ -45,7 +43,6 @@ import { drawEnhancedHud } from '../ui/enhanced/enhancedHud.js';
 // namespace object as surely as a dynamic import is.
 import { announceLevelUp, announceSkillRaise, announceMastery, drawLevelNotices } from '../ui/levelUp/levelNotice.js';
 import { SKILLS } from '../systems/skills.js';
-import { LEVELUP_TOTAL } from '../systems/oblivionLeveling.js';
 
 /** A character who has just earned a level. Every field is one a real
  *  entity carries; the numbers are invented, which is the only thing
@@ -86,7 +83,6 @@ export function labEntity() {
     fatigue: 64 * 104,
     startingLevelUpSkillSum: 180,
     currentLevelUpSkillSum: 254,
-    levelProgress: 38, levelRollUp: 6,
     equipment: {}, items: [],
   };
 }
@@ -103,7 +99,6 @@ export async function mount(lane = 'classic') {
   view?.destroy?.();
   entity = labEntity();
   if (lane === 'oghma') { entity.oghmaLevelUp = true; entity.pendingLevel = null; }
-  if (lane === 'virtue') entity.levelingSystem = 'virtue';
   // LV1's AUDIT: the character the window could not let go of. Every
   // attribute at the ceiling means `statUp` refuses every press, so
   // the pool never reaches zero - and the first cut's only exit tested
@@ -159,7 +154,7 @@ export async function mount(lane = 'classic') {
   // "never blank" against a gap that had been closed by the lab
   // itself.
   const { mountEnhancedLevelUp } = await import('../ui/enhanced/enhancedLevelUp.js');
-  const screen = lane === 'virtue' ? new VirtueLevelUpScreen(entity) : new LevelUpScreen(entity);
+  const screen = new LevelUpScreen(entity);
   // THE DOOR'S OWN onExit IS A CLOSE (ui/charSheetDoor.js's
   // enhancedLevelUpOverlay), so the lab's must be too - the first
   // version only printed the result and left the window standing over
@@ -181,7 +176,7 @@ function done(lane) {
     + 'background:#07080d;color:#d8cfae;font:16px system-ui,sans-serif;text-align:center;padding:24px';
   note.textContent = `Ascended. Level ${entity.level}, `
     + `stats ${Object.entries(entity.stats).map(([k, v]) => `${k.slice(0, 3)} ${v}`).join(' ')}`
-    + `, bar ${entity.levelProgress ?? 0}/${LEVELUP_TOTAL} (${lane}).`;
+    + ` (${lane}).`;
   host.append(note);
   globalThis.__lvDone = { level: entity.level, stats: { ...entity.stats }, maxHealth: entity.maxHealth, lane };
 }
@@ -189,7 +184,7 @@ function done(lane) {
 // The lane picker. Kept out of the window's own tree so nothing on
 // screen belongs to the lab except this one strip.
 const bar = document.getElementById('lanes');
-for (const lane of ['classic', 'oghma', 'virtue', 'allmax', 'door', 'notice']) {
+for (const lane of ['classic', 'oghma', 'allmax', 'door', 'notice']) {
   const b = document.createElement('button');
   b.textContent = lane;
   b.dataset.lane = lane;

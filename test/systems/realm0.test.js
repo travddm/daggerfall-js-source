@@ -2,7 +2,7 @@
 //   P0.1 - the URL's powers stay offline: an online boot drops ?shot (and window.__addGold with it), ?fly, ?nofoes and
 //          the rest before anything reads them.
 //   P0.2 - the balance mods are the room's whole online: every key of Meaner Monsters, PCAAO, Unleveled Loot,
-//          Roleplay & Realism (its two cosmetic keys aside), RR: Items and Oblivion leveling's dials reads its shipped
+//          Roleplay & Realism (its two cosmetic keys aside), and RR: Items reads its shipped
 //          default, where only their Enable switch was forced before.
 //   P0.3 - the Empire is one lender: one loan a character online, a default anywhere shuts every branch, the Empire
 //          takes from every account and every deposit, and a character joining with more debt than the Empire would
@@ -75,11 +75,9 @@ test('REALM P0.2: online, every key of a balance mod reads its shipped default -
       if (!room && !own.includes(key)) whole++;
     }
   }
-  assert.equal(whole, 65, 'sixty-five dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
+  assert.equal(whole, 57, 'fifty-seven dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
   assert.equal(onlineWholeModKey('dynamic-skies', 'Enabled', '?online=1'), false, 'a looks mod is not the room\'s');
   assert.equal(onlineWholeModKey('roleplay-realism', 'variantNpcs', '?online=1'), false, 'who stands behind a counter is looks');
-  assert.equal(onlineWholeModKey('oblivion-remaster-leveling', 'Enabled', '?online=1'), false, 'which leveling a character uses stays its own');
-  assert.equal(onlineWholeModKey('oblivion-remaster-leveling', 'attributePoints', '?online=1'), true, 'the points a level are the room\'s');
 });
 
 test('REALM P0.2: the holes the research found are closed - Iron as Daedric, the strength bonus, the loan dial, sale prices and forty points a level', () => {
@@ -89,18 +87,15 @@ test('REALM P0.2: the holes the research found are closed - Iron as Daedric, the
     setModSetting('pcaao', 'fixedStrengthDamageModifier', false);
     setModSetting('roleplay-realism', 'loanAmountPerLevel', 0);
     setModSetting('roleplay-realism-items', 'conditionBasedPrices', false);
-    setModSetting('oblivion-remaster-leveling', 'attributePoints', 60);
     setModSetting('roleplay-realism', 'variantNpcs', false);
     onPage('', () => {
       assert.equal(modSetting('unleveledLoot', 'Iron'), 9, 'offline the player\'s own shelf stands');
-      assert.equal(modSetting('oblivion-remaster-leveling', 'attributePoints'), 60);
     });
     onPage('?online=1', () => {
       assert.equal(modSetting('unleveledLoot', 'Iron'), MOD_SETTINGS.unleveledLoot.keys.Iron.default, 'Iron is Iron online');
       assert.equal(modSetting('pcaao', 'fixedStrengthDamageModifier'), true);
       assert.equal(modSetting('roleplay-realism', 'loanAmountPerLevel'), MOD_SETTINGS['roleplay-realism'].keys.loanAmountPerLevel.default, 'the loan dial EMPIRE-BANK reads');
       assert.equal(modSetting('roleplay-realism-items', 'conditionBasedPrices'), true);
-      assert.equal(modSetting('oblivion-remaster-leveling', 'attributePoints'), 12, 'the mod\'s own twelve');
       assert.equal(modSetting('roleplay-realism', 'variantNpcs'), false, 'a cosmetic key stays the player\'s');
     });
   } finally { _resetModSettings(); }

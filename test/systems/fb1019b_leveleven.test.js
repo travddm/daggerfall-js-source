@@ -9,8 +9,6 @@ import { evenHpFloor, evenHpOf, averageLevelHp, ONLINE_BONUS_POOL } from '../../
 import { setRenownLayer, setOnlineLayerExtra, refreshOnlineLayer, offlineVitals, renownHpOf } from '../../src/systems/renownLayer.js';
 import { defineLiveMaxHealth, rollMaxHealthLevel1 } from '../../src/systems/chargen.js';
 import { applyLevelUp, bonusPoolFor } from '../../src/systems/advancement.js';
-import { commitVirtueLevelUp } from '../../src/systems/oblivionLeveling.js';
-import { levelingOptions } from '../../src/ui/levelingChoice.js';
 
 const fixed = (v) => () => v;
 const counted = (v) => { const g = () => { g.n++; return v; }; g.n = 0; return g; };
@@ -66,7 +64,7 @@ test('LEVEL-EVEN: the floor is retroactive - Endurance raised later pays every l
   assert.equal(renownHpOf(e), 0);
 });
 
-test('LEVEL-EVEN: online a level-up reads the floor again over its new maximum, Daggerfall\'s way and Oblivion Remastered\'s; and every online level hands out 5 points from no draw, offline 4-6 as BonusPool (mutants: the refresh dropped from either lane, the pool\'s 5, the online gate)', () => {
+test('LEVEL-EVEN: online a level-up reads the floor again over its new maximum; and every online level hands out 5 points from no draw, offline 4-6 as BonusPool (mutants: the refresh dropped from either lane, the pool\'s 5, the online gate)', () => {
   online(() => {
     const e = hero({ level: 9, raw: 150 });
     e.readyToLevelUp = true;
@@ -79,23 +77,10 @@ test('LEVEL-EVEN: online a level-up reads the floor again over its new maximum, 
     assert.equal(e.rawMaxHealth, 150 + 15 + 0, 'the level\'s own roll, stored');
     assert.equal(e.maxHealth, Math.floor(55 + 9 * 22.5), 'the floor at the new level at once');
     assert.equal(g.n, 1, 'the HP roll alone - the pool drew nothing');
-    const v = hero({ level: 9, raw: 150 });
-    v.readyToLevelUp = true;
-    setRenownLayer(v, 1);
-    commitVirtueLevelUp(v, {}, 0, { attributePoints: 0, maxUpdatableAttribute: 3 }, fixed(0));
-    assert.equal(v.level, 10);
-    assert.equal(v.maxHealth, Math.floor(55 + 9 * 22.5), 'the virtue lane\'s level reads it too');
   });
   assert.equal(bonusPoolFor({}, fixed(0), { online: false }), 4);
   assert.equal(bonusPoolFor({}, fixed(0.999), { online: false }), 6);
   assert.equal(bonusPoolFor({}, fixed(0.999), { online: true }), 5);
-});
-
-test('LEVEL-EVEN: the leveling screen says the five online and the roll offline', () => {
-  const on = levelingOptions(null, { online: true })[0].lines.join(' ');
-  const off = levelingOptions(null, { online: false })[0].lines.join(' ');
-  assert.match(on, /Each level gives 5 attribute points\./);
-  assert.match(off, /Each level rolls 4 to 6 attribute points\./);
 });
 
 test('LEVEL-EVEN: the Firmament\'s Endurance reaches the floor through its own layer round - a star that lifts Endurance across a tenth lifts every level; asleep it lifts none (mutant: the round hands no Endurance)', async () => {

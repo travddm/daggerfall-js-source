@@ -78,10 +78,7 @@ export const GROUPS = Object.freeze({
   world: Object.freeze({ get label() { return t('features.group.world', 'The world'); } }),
   loot: Object.freeze({ get label() { return t('features.group.loot', 'Loot & items'); } }),
   combat: Object.freeze({ get label() { return t('features.group.combat', 'Combat'); } }),
-  // ORL1: the fifth group. A leveling system is not what
-  // you see, where you are, what you carry or how you fight - it is
-  // what you BECOME, and filing it under any of the four would have
-  // been filing it under the nearest one rather than the right one.
+  // The fifth group: not what you see, where you are, what you carry or how you fight, but what you BECOME.
   character: Object.freeze({ get label() { return t('features.group.character', 'Your character'); } }),
   // FT18: two more, because
   // Sight had grown to sixteen tiles and a third of them were not things you see in the world - the HUD's quick slots,
@@ -160,7 +157,7 @@ const OFF = () => localizedText('off', 'Off');
  *  actually move (46 of the 125 then), and the rest keep the values the
  *  mod ships.
  *
- *  ORL1 RE-COUNTED RATHER THAN RE-WORDED: thirteen mods,
+ *  A later count, RE-COUNTED RATHER THAN RE-WORDED: thirteen mods,
  *  227 keys, 65 shown. The ratio held as the list grew, which is the
  *  only thing the paragraph above was ever claiming - but a count in
  *  prose is a claim like any other, and leaving the old one standing
@@ -298,16 +295,6 @@ export const MOD_CURATED = Object.freeze({
   // no setting on the mod's tile could hold a spell's shake down): and the camera
   // shake's ceiling, the most one hit or landing spell can shake the view (betterAmbience.weaponKick).
   'better-ambience': Object.freeze(['Better Footsteps.enable', 'Dungeon Reverb.level', 'Dungeon Lighting.dungeonDarkness', 'Camera Shake.maxShake']),
-  // ORL1: the mod ships SEVEN knobs and `primarySkillsImpact` is the
-  // port's own eighth (Daggerfall has a tier of chosen skills Morrowind
-  // does not). All eight are on the tile - the
-  // same call Ambient Text's row made, and for the same reason. These
-  // are not presentation dials a player sets once; they are the rules
-  // of the leveling system, and hiding four of them would leave a
-  // player unable to see why their bar fills at the rate it does.
-  'oblivion-remaster-leveling': Object.freeze(['attributePoints', 'maxUpdatableAttribute',
-    'allowLuckIncrease', 'luckIncreaseCost', 'primarySkillsImpact', 'majorSkillsImpact',
-    'minorSkillsImpact', 'miscSkillsImpact']),
 });
 
 /** The `Modules.` keys a vendor ships, in the mod's own order - the
@@ -1357,15 +1344,6 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'mwModelDetail', initial: 'pixel', online: 'player', tiers: Object.freeze([tier('pixel', () => t('features.mwModelDetail.pixel', 'Pixelated')), tier('sharp', () => t('features.mwModelDetail.sharp', 'Sharp'))]) }),
   }),
-  // ORL1: OBLIVION-REMASTER-LIKE LEVELING - the first
-  // Morrowind mod, and the only row whose effect line has to say NEXT
-  // CHARACTER. Every other mod's switch lands on the running game; this
-  // one decides whether a character is ASKED the question at creation,
-  // and the answer then rides that character's save. Turning it off
-  // does not convert a character who is already levelling by virtues,
-  // and saying so on the tile is the honest line - the alternative is a
-  // player flipping the switch mid-game and wondering why nothing moved.
-  modFeature('oblivion-remaster-leveling', () => t('features.mod.oblivionRemasterLeveling.effect', 'Takes effect on the next character you make; a character keeps the system they were created with.'), 'character'),
   // LEGACY1: PROJECT LEGACY - Mac's own mod. A family is founded around
   // the character played when the mod is on (at creation, or at the first load of a character made before it), and its
   // model is the family's for good - so the switch lands at once for the tree and the key, and a family keeps its model.

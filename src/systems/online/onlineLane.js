@@ -454,7 +454,6 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   // switch reach another player?", moving three of them back.
   'shield-widget',               // the block is the DEFENDER's - damageShieldPool runs where the blow lands
   'handheld-torches',            // an item in my save with a light on my screen
-  'oblivion-remaster-leveling',  // written into a character at creation and kept by that character
   'diverse-weapons',        // DW1: the first-person weapon's and the icons' art - drawn on your own screen and nowhere else
   'horse-cart-and-cargo',   // HCC: whose horse and wagon stand where is the player's own; the others only SEE them (the online half rides the pose and the cell's frame, never a switch of the room's ground)
   'warm-ashes-ships',       // WA1: my own voyage's ambush - my quest, my crew and pirates (a spawner's foes, WORLD2: a peer on the same deck sees them fight), my lent ship; the pirate vessels are my blocks' variant and stand 40-140 m off in open water, where a peer without them sees sea
@@ -495,7 +494,6 @@ export const ONLINE_WHOLE_MODS = Object.freeze({
   unleveledLoot: Object.freeze([]),
   'roleplay-realism-items': Object.freeze([]),
   'roleplay-realism': Object.freeze(['variantNpcs', 'variantResidents']),   // who stands behind a counter and in a house: looks
-  'oblivion-remaster-leveling': Object.freeze(['Enabled']),                 // which leveling a character uses stays its own; the dials are the room's
   // IT1: a driver's fare is the price of fast travel over land online - a fee of 0, a dungeon on his list or the region
   // lock off would be a free or a wider teleport a dial away, so every rule is the room's at the mod's own value. Only
   // the map's looks stay the player's: the dots' sizes, the roads drawn on the page, a captain's map showing docks alone.

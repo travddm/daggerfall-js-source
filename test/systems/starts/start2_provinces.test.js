@@ -528,7 +528,7 @@ test('START2 the start page (ui/startChoice.js): the eight starts in their order
   assert.deepEqual(wrapToWidth('a bb ccc dddd', 7, (t) => t.length), ['a bb', 'ccc', 'dddd']);
 });
 
-/** A character made through the wizard to its summary (test/systems/orl1_leveling.test.js's walk). */
+/** A character made through the wizard to its summary (test/systems/audit17f.test.js's walk). */
 const career = {
   name: 'W', hitPointsPerLevel: 12, advancementMultiplier: 1.0, strength: 60, intelligence: 40, willpower: 45, agility: 55, endurance: 60, personality: 40, speed: 50, luck: 50,
   primarySkills: [SKILLS.LongBlade, SKILLS.Axe, SKILLS.CriticalStrike], majorSkills: [SKILLS.BluntWeapon, SKILLS.Dodging, SKILLS.Jumping],
@@ -551,10 +551,10 @@ function madeTo(startChoice) {
 
 test('START2 the chargen door asks where the story begins LAST, after every other question, in the one overlay - and only a host that can stand a start past the Bay asks; one start open is no choice (mutants: the question unasked, asked first, asked of a host with the Bay alone)', () => {
   const { w, result } = madeTo({ open: () => true });
-  for (let i = 0; i < 4 && !(w.levelingPrompt instanceof StartChoiceScreen); i++) w.input('Enter');   // the leveling and the lineage questions, where they are put
-  assert.ok(w.levelingPrompt instanceof StartChoiceScreen, 'the start page, last');
+  for (let i = 0; i < 4 && !(w.questionPrompt instanceof StartChoiceScreen); i++) w.input('Enter');   // the leveling and the lineage questions, where they are put
+  assert.ok(w.questionPrompt instanceof StartChoiceScreen, 'the start page, last');
   assert.equal(w.done, false);
-  assert.equal(w.levelingPrompt.options[w.levelingPrompt.cursor].id, 'IliacBay', 'the walk\'s Breton: the Bay first');
+  assert.equal(w.questionPrompt.options[w.questionPrompt.cursor].id, 'IliacBay', 'the walk\'s Breton: the Bay first');
   w.input('char:4');
   assert.equal(w.done, true);
   assert.equal(result().startKey, 'Imperial', 'the answer rides the result');
@@ -562,7 +562,7 @@ test('START2 the chargen door asks where the story begins LAST, after every othe
   for (const startChoice of [null, { open: () => false }]) {
     const other = madeTo(startChoice);
     for (let i = 0; i < 4 && !other.w.done; i++) {
-      assert.ok(!(other.w.levelingPrompt instanceof StartChoiceScreen));
+      assert.ok(!(other.w.questionPrompt instanceof StartChoiceScreen));
       other.w.input('Enter');
     }
     assert.equal(other.w.done, true);
@@ -570,7 +570,7 @@ test('START2 the chargen door asks where the story begins LAST, after every othe
   }
   // torn down mid-question: the homeland's start, as every question's default
   const torn = madeTo({ open: () => true });
-  for (let i = 0; i < 4 && !(torn.w.levelingPrompt instanceof StartChoiceScreen); i++) torn.w.input('Enter');
+  for (let i = 0; i < 4 && !(torn.w.questionPrompt instanceof StartChoiceScreen); i++) torn.w.input('Enter');
   torn.w.dispose();
   assert.equal(torn.result().startKey, 'IliacBay');
 });

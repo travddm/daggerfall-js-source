@@ -45,9 +45,7 @@ import { revenantStarsOver } from './firmamentOver.js';   // RVN-STARS: a sworn 
 import { pauseMenuHooks, pauseMenuAct, openPauseFlow } from './pauseDoor.js';   // F5-QUESTS: the pause window's own hooks and act - a cycle (pauseDoor imports this door), read only at call time
 import { CharSheet, LevelUpScreen, charSheetArtLoaded } from './charsheet.js';
 import { charSheetHooks } from './charSheetNav.js';
-import { VirtueLevelUpScreen } from './virtueLevelUp.js';   // ORL1
 import { levelNotices } from './levelUp/levelNotice.js';   // LV2: who already played the fanfare
-import { usesVirtueLeveling } from '../systems/oblivionLeveling.js';   // ORL1
 import { releaseCapLatch } from '../systems/levelCap.js';   // AUDIT FB1026d C1: F5 at the cap opens the sheet, never a level-up with no level
 import { spendPoolLowest } from '../systems/chargen.js';   // LV1: the headless pool policy, for the font-less escape
 import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
@@ -105,12 +103,12 @@ export function charSheetDoorReady() {
 const fanfared = new WeakMap();
 /**
  * GROWTH1: THE LEVEL-UP'S ROLLOUT for `entity`, one home - the screen a level OWED wants
- * (ORL1's Virtue screen for a mod-law character, DFU's own for any other; the fanfare only while the notice still owes
+ * (DFU's own rollout; the fanfare only while the notice still owes
  * it - LV2), or null with nothing owed (the view of the stars is the lazy chunk's - levelUp/levelUpView.js viewOnlyScreen,
  * never this boot door's import). This door's own level-up and the pause window's Growth tab (its Level page draws the
- * Ascension in its pane) both build it here. `virtue` the caller's own read of the law, when it made one.
+ * Ascension in its pane) both build it here.
  */
-export function levelUpScreenFor(entity, virtue = !entity?.oghmaLevelUp && usesVirtueLeveling(entity)) {
+export function levelUpScreenFor(entity) {
   releaseCapLatch(entity);   // LEVEL-45 (AUDIT FB1026d C1)
   if (!entity?.readyToLevelUp) return null;
   // LV2: ...and whether the WINDOW still owes the fanfare. On the
@@ -124,7 +122,7 @@ export function levelUpScreenFor(entity, virtue = !entity?.oghmaLevelUp && usesV
   const level = `${entity.pendingLevel ?? 'oghma'}:${entity.level ?? 0}`;
   const fanfare = levelNotices.fanfareOwed(entity.pendingLevel ?? null) && fanfared.get(entity) !== level;
   if (fanfare) fanfared.set(entity, level);
-  return virtue ? new VirtueLevelUpScreen(entity, { fanfare }) : new LevelUpScreen(entity, undefined, { fanfare });
+  return new LevelUpScreen(entity, undefined, { fanfare });
 }
 
 /**
@@ -151,37 +149,18 @@ export function createCharSheetWindow(deps = {}) {
   // points, and the skills pages behind it still work while it does.
   // LevelUpScreen stays as the ENHANCED skin's door, which has no
   // native panel to mount a rollout onto.
-  // ORL1: ...AND BEFORE EITHER LANE'S OWN ROLLOUT, the mod's window.
-  // A character created under Oblivion-Remaster-Like Leveling levels by
-  // the mod's law in BOTH skins, because the mod's window is the mod's
-  // window - the fork above is about which SHEET a skin wears, and this
-  // is not a sheet. The Oghma Infinium is excluded on purpose: that
-  // artefact is Daggerfall's own and its thirty points are DFU's law -
-  // a book the mod has never heard of - so it falls through to the
-  // port's own rollout below, in whichever lane. (The reason this used
-  // to give, that thirty points cannot be spent under the mod's
-  // three-attribute cap, is FALSE at the mod's own defaults: three rows
-  // at five apiece with Luck at four is exactly thirty. ORL1's deep
-  // audit.)
   //
-  // LV1: AND
-  // THE ENHANCED SKIN HAS A FACE FOR BOTH LAWS NOW. Until this slice
-  // the skin fork stopped at the sheet: a level-up in the enhanced skin
-  // mounted the CLASSIC LevelUpScreen - eight drawText rows on the
-  // canvas - because there was nothing else to mount. The window that
-  // replaced it (ui/enhanced/enhancedLevelUp.js) is a FACE, not a third rollout:
-  // it drives whichever of these two screens this character's law
-  // wants, through that screen's own `input`, so the Level++, the
-  // health roll and the mod's caps stay exactly where a11 and ORL1 put
-  // them.
+  // LV1: THE ENHANCED SKIN HAS A FACE TOO. The window that replaced the
+  // canvas rollout (ui/enhanced/enhancedLevelUp.js) is a FACE, not a
+  // second rollout: it drives LevelUpScreen through that screen's own
+  // `input`, so the Level++ and the health roll stay exactly where a11
+  // put them.
   releaseCapLatch(deps.entity);   // LEVEL-45 (AUDIT FB1026d C1): a level latched past the cap opens nothing
   if (deps.entity?.readyToLevelUp) {
-    const virtue = !deps.entity?.oghmaLevelUp && usesVirtueLeveling(deps.entity);
-    const rollout = () => levelUpScreenFor(deps.entity, virtue);   // GROWTH1: the screen's one home (LV2's fanfare with it)
+    const rollout = () => levelUpScreenFor(deps.entity);   // GROWTH1: the screen's one home (LV2's fanfare with it)
     // `document` for the reason this file's other fork gives: node
     // drives these hosts headless and keeps the canvas windows.
     if (isEnhanced() && typeof document !== 'undefined') return enhancedLevelUpOverlay(rollout(), deps.entity);
-    if (virtue) return new VirtueLevelUpScreen(deps.entity);
     if (isEnhanced()) return new LevelUpScreen(deps.entity);
     // ...and the CLASSIC lane falls through to the sheet, which mounts
     // DFU's own rollout on itself (AUDIT 44 / a11). Unchanged.
@@ -507,7 +486,7 @@ function enhancedLevelUpOverlay(screen, entity) {
   });
   return {
     /** The duck type the font-less escape asks for, in this file's own
-     *  idiom (`isVirtueLevelUp`, `isRestWindow`): a scene must not
+     *  idiom (`isRestWindow`): a scene must not
      *  import a UI class for a type test. */
     isEnhancedLevelUp: true,
     isChoiceWindow: true,
@@ -519,18 +498,13 @@ function enhancedLevelUpOverlay(screen, entity) {
     tick() { /* the sky owns its own clock */ },
     draw() { /* DOM, not canvas */ },
     /**
-     * THE FONT-LESS ESCAPE, per lane. The mod's purse is not a DFU
-     * bonus pool - spending it with spendPoolLowest would ignore the
-     * three-attribute cap, the +5 ceiling and Luck's price - so its own
-     * planner runs and commits through the same `confirm` a player's
-     * Enter uses. The classic pool takes the policy every other
+     * THE FONT-LESS ESCAPE. The pool takes the policy every other
      * headless path takes (systems/chargen.js's spendPoolLowest), which
      * is what scenes/dungeonContext.js's `.leveling` arm already does
      * to the sheet's rollout; the shape is the same because the state
      * is the same.
      */
     spendRemainingHeadless() {
-      if (screen?.isVirtueLevelUp) { screen.spendRemainingHeadless(); close(); return true; }
       if (screen?.working) {
         spendPoolLowest(screen.working, Object.keys(screen.working), screen.pool ?? 0);
         screen.pool = 0;
