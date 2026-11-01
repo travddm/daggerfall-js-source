@@ -7,9 +7,9 @@
 // top at once. The runners (entityMods.js, playerEntity.js) and registries import this leaf.
 
 /** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent), measured from today's records and laws. B1 (tame
- *  player power) rescaled the records themselves (the sets from +200 to +15, the loot's powers from +240 to +32, the sigil
+ *  player power) rescaled the records themselves (the sets from +200 to +27, the loot's powers from +240 to +32, the sigil
  *  from 12 to 4, the paths from 40 to 6), so no printed number is cut. The Firmament tree (+50) is untouched: B5 retunes it. */
-export const BLOW_TOPS = Object.freeze({ sigil: 4, sets: 15, loot: 32, firmament: 50, mastery: 21, martial: 6 });
+export const BLOW_TOPS = Object.freeze({ sigil: 4, sets: 27, loot: 32, firmament: 50, mastery: 21, martial: 6 });
 /** THE GUARDS' TOPS: each registry's most off one hurt (per cent), its guards multiplied; measured as the blow's are. */
 export const GUARD_TOPS = Object.freeze({ loot: 12.448, sets: 14, firmament: 15, martial: 6, arcane: 4 });
 /** THE BLOW NET: the most all the registries add together, per cent. The registries' tops sum to 101; a kit with all six

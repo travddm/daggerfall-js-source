@@ -53,8 +53,8 @@ test('WITCH1 THE SET\'S WORDS: Wyrd-Sight, Tallow-Ward, Soul Harvest - at their 
   const words = (i, st) => { const t = set.tiers[i]; return t.text(tierValues(t, st)); };
   assert.equal(words(0, 0), '+2 Willpower, +5 magic resistance');
   assert.equal(words(0, SET_STAGE_MAX), '+6 Willpower, +15 magic resistance');
-  assert.equal(words(1, 0), 'Your weapon deals 2% more damage to the undead, the Daedra and the atronachs');
-  assert.equal(words(1, SET_STAGE_MAX), 'Your weapon deals 5% more damage to the undead, the Daedra and the atronachs');
+  assert.equal(words(1, 0), 'Your weapon deals 4% more damage to the undead, the Daedra and the atronachs');
+  assert.equal(words(1, SET_STAGE_MAX), 'Your weapon deals 12% more damage to the undead, the Daedra and the atronachs');
 });
 
 test('WITCH1 THE SET\'S POWERS through the real seam: Wyrd-Sight\'s Willpower, Tallow-Ward\'s bite on the dead and the summoned alone, Soul Harvest\'s health and magicka on a kill - said, sounded, and recovered', () => {
@@ -72,8 +72,8 @@ test('WITCH1 THE SET\'S POWERS through the real seam: Wyrd-Sight\'s Willpower, T
   const sword = createWeapon(120, 0, () => 0.5);
   const skeleton = { mobileType: MOBILE_TYPES.SkeletalWarrior };
   const rat = { mobileType: MOBILE_TYPES.Rat };
-  assert.equal(setBlow(sword, 100, e, skeleton, {}), 102, 'the dead: +2%');
-  assert.equal(setBlow(sword, 100, e, { mobileType: MOBILE_TYPES.FireAtronach }, {}), 102, 'the summoned too');
+  assert.equal(setBlow(sword, 100, e, skeleton, {}), 104, 'the dead: +4%');
+  assert.equal(setBlow(sword, 100, e, { mobileType: MOBILE_TYPES.FireAtronach }, {}), 104, 'the summoned too');
   assert.equal(setBlow(sword, 100, e, rat, {}), 100, 'a rat is neither');
   T = 100;
   reportPlayerKill(rat);

@@ -167,8 +167,8 @@ test('SET1 the stage: the lowest worn piece\'s rank capped by the Renown\'s stag
   assert.equal(st.heldRenown, false);
   assert.deepEqual(st.tiers.map((t) => t.awake), [true, true, false], 'four pieces: the 2 and the 4');
   assert.deepEqual(st.tiers[0].values, { strength: 3, critical: 6 }, 'Kindled\'s numbers');
-  assert.equal(st.tiers[1].text, 'Your weapon deals 2% more damage, or 4% more while you are below half health');
-  assert.equal(st.tiers[1].full, 'Your weapon deals 3% more damage, or 6% more while you are below half health', 'and what it is at Ascendant');
+  assert.equal(st.tiers[1].text, 'Your weapon deals 3% more damage, or 6% more while you are below half health');
+  assert.equal(st.tiers[1].full, 'Your weapon deals 6% more damage, or 12% more while you are below half health', 'and what it is at Ascendant');
   // Renown 9 opens only Faint: the Renown holds it
   st = setState('dagon', pieces, 9, true);
   assert.equal(st.stage, 0);
@@ -220,7 +220,7 @@ test('SET1 the session and the powers\' one question: awake online with my Renow
     setSigilRenown(40);
     assert.equal(setsAwake(), true);
     assert.deepEqual(awakeTier(e, 'dagon', 0), { strength: 6, critical: 12 });
-    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 3 });
+    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 6 });
     assert.equal(awakeTier(e, 'dagon', 2), null, 'four pieces: the third sleeps');
     assert.equal(awakeTier(e, 'mora', 0), null, 'a set not worn');
     setSetsDueling(true);

@@ -106,7 +106,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
   assert.deepEqual([0, 1, 2].map((p) => raidSetOf(p)?.id), ['oath', 'thieftaker', 'orcsbane'], 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'sea-scale', 'Sea-Scale', { frost: [10, 30], endurance: [2, 6] }],
-    [4, 'constrict', 'Constrict', { stack: [1, 1] }],
+    [4, 'constrict', 'Constrict', { stack: [1, 2] }],
     [6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] }],
   ]);
   assert.deepEqual([COIL_STACKS, COIL_SECONDS, SHED_BELOW], [5, 6, 0.35]);
@@ -117,7 +117,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
     }
   }
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], 0)), 'Under 35%: shed skin, heal 10%');
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+1% per hit on a foe, up to 5');
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+2% per hit on a foe, up to 5');
 });
 
 test('SERPENT-SET the records: nine in the places\' order - the seven body pieces, a kite shield and a ONE-HANDED Katana (so all nine are worn at once) - Ebony, the set\'s own; every affix at the Legendary band\'s middle (over a town\'s thanks, under the Warden), the blow the band\'s middle too; never a frost resistance and one resistance of an element at most; AETHERIC_RECORDS the Regalia, the raids\' and then these (mutants: a number off the middle; a frost piece; the make; the order)', () => {
@@ -276,7 +276,7 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   fresh(); online(40);
   const asc = wearSet(player(), 'coilscale', 4, XP[4]);
   door([], { me: asc });
-  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 101, 102], 'Ascendant: one a stack (the tier is [1, 1])');
+  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 102, 104], 'Ascendant: two a stack (the tier is [1, 2])');
   fresh();
   const off = wearSet(player(), 'coilscale', 4);
   swing(off, s, RAT); swing(off, s, RAT);

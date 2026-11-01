@@ -100,10 +100,10 @@ test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (t
   assert.equal(SIGIL_SETS.ruhn.raid, undefined, 'the gate boss\'s own names no party');
   const words = (id, i, st) => { const t = SIGIL_SETS[id].tiers[i]; return t.text(tierValues(t, st)); };
   assert.equal(words('oath', 0, 0), '+1 armor on every part, +2 Willpower');
-  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 5% more damage`);
-  assert.equal(words('oath', 2, 0), 'While you are below half health, you take 2% less damage');
-  assert.equal(words('thieftaker', 1, 0), 'Your weapon and arrows deal 1% more damage to enemies below half health');
-  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 5% more damage to it`);
+  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 12% more damage`);
+  assert.equal(words('oath', 2, 0), 'While you are below half health, you take 4% less damage');
+  assert.equal(words('thieftaker', 1, 0), 'Your weapon and arrows deal 2% more damage to enemies below half health');
+  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 12% more damage to it`);
   assert.equal(words('orcsbane', 1, 0), `Each enemy hit on you adds 1% weapon damage for ${BLOOD_SECONDS} s, up to ${BLOOD_STACKS} times`);
   assert.equal(words('orcsbane', 2, 0), 'A kill gives you a ward that blocks the next 10 damage you take. Recovers in 60 s');
   assert.equal(words('orcsbane', 2, SET_STAGE_MAX), 'A kill gives you a ward that blocks the next 40 damage you take. Recovers in 30 s');
@@ -144,12 +144,12 @@ test('RAID4b Riposte (the Broken Oath, 4): a foe\'s blow that TAKES my health op
   blow(e, 10);
   assert.equal(e.health, 90);
   assert.equal(weaponBlowMods(s, 0, e, RAT), 0, 'a miss');
-  assert.equal(weaponBlowMods(s, 100, e, RAT, { unaware: false, estimate: true }), 102, 'the Stats page reads it...');   // PIN ADDED (AUDIT MARTIAL L2 F7)
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'the next blow that lands: +2% at Faint - the page\'s reading spent nothing');
+  assert.equal(weaponBlowMods(s, 100, e, RAT, { unaware: false, estimate: true }), 104, 'the Stats page reads it...');   // PIN ADDED (AUDIT MARTIAL L2 F7)
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'the next blow that lands: +4% at Faint - the page\'s reading spent nothing');
   assert.equal(weaponBlowMods(s, 100, e, RAT), 100, 'spent by it');
   blow(e, 10);
   at(10 + RIPOSTE_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(bow(), 100, e, RAT), 102, 'inside the window - an arrow too');
+  assert.equal(weaponBlowMods(bow(), 100, e, RAT), 104, 'inside the window - an arrow too');
   blow(e, 10);
   at(T + RIPOSTE_SECONDS);
   assert.equal(weaponBlowMods(s, 100, e, RAT), 100, 'the window closed');
@@ -172,7 +172,7 @@ test('RAID4b Riposte (the Broken Oath, 4): a foe\'s blow that TAKES my health op
   fresh(); online(40);
   const asc = wearSet(player(), 'oath', 4, XP[4]);
   blow(asc, 10);
-  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 105, 'Ascendant: +5%');
+  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 112, 'Ascendant: +12%');
 });
 
 test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a foe UNDER half its health deal their per cent more, arrows too; never at half or above, never at a foe with no health to read (mutants: at half health; the attacker\'s health read)', () => {
@@ -181,13 +181,13 @@ test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a fo
   const bandit = { name: 'bandit', health: 50, maxHealth: 100 };
   assert.equal(weaponBlowMods(sword(), 100, e, bandit), 100, 'at half: not under it');
   bandit.health = 49;
-  assert.equal(weaponBlowMods(sword(), 100, e, bandit), 101, 'under half: +1% at Faint');
-  assert.equal(weaponBlowMods(bow(), 100, e, bandit), 101, 'an arrow too');
+  assert.equal(weaponBlowMods(sword(), 100, e, bandit), 102, 'under half: +2% at Faint');
+  assert.equal(weaponBlowMods(bow(), 100, e, bandit), 102, 'an arrow too');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 100, 'no health to read');
   e.health = 10;
   assert.equal(weaponBlowMods(sword(), 100, e, { ...bandit, health: 90 }), 100, 'MY health is not the foe\'s');
   fresh(); online(40);
-  assert.equal(weaponBlowMods(sword(), 100, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 103, 'Ascendant: +3%');
+  assert.equal(weaponBlowMods(sword(), 100, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 106, 'Ascendant: +6%');
 });
 
 test('RAID4b No Escape (the Thief-Taker\'s Garb, 6): a kill marks the NEAREST other live foe within MARK_METRES of my feet for MARK_SECONDS - never the one killed, an ally, a foe at peace, one a storey away, one behind a wall or one past the reach - and my blows at it deal their per cent more, said and sounded; a kill with none to mark leaves the mark as it stood; the watch\'s death marks nothing (mutants: the last in reach marked; the killed foe marked; the reach ignored; a wall ignored; the mark never ending; four pieces marking)', () => {
@@ -204,10 +204,10 @@ test('RAID4b No Escape (the Thief-Taker\'s Garb, 6): a kill marks the NEAREST ot
   assert.equal(markedFoe(), near.entity, 'the nearest, not the last in reach: never the one killed, the ally, the calmed foe, or one a storey up');
   assert.deepEqual(v.said, ['No Escape! The nearest enemy is marked.']);
   assert.deepEqual(v.sounds, ['mark']);
-  assert.equal(weaponBlowMods(s, 100, e, near.entity), 102, '+2% at Faint on the marked foe');
+  assert.equal(weaponBlowMods(s, 100, e, near.entity), 104, '+4% at Faint on the marked foe');
   assert.equal(weaponBlowMods(s, 100, e, far.entity), 100, 'no other');
   at(50 + MARK_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(bow(), 100, e, near.entity), 102, 'an arrow too, inside the mark');
+  assert.equal(weaponBlowMods(bow(), 100, e, near.entity), 104, 'an arrow too, inside the mark');
   at(50 + MARK_SECONDS);
   assert.equal(markedFoe(), null, 'the mark ran out');
   assert.equal(weaponBlowMods(s, 100, e, near.entity), 100);
@@ -248,7 +248,7 @@ test('RAID4b Blood for Blood (Orcsbane Harness, 4): each foe\'s blow that takes 
   fresh(); online(40);
   const asc = wearSet(player(), 'orcsbane', 4, XP[4]);
   blow(asc, 2); blow(asc, 2);
-  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 102, 'Ascendant: +1% a stack');
+  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 104, 'Ascendant: +2% a stack');
 });
 
 test('RAID4b Hold the Line (the Broken Oath, 6): while I stand UNDER half health every hurt my door takes is its per cent less, in whole points with the fraction carried to the next hurt; never at half or above (mutants: at half health; the fraction dropped)', () => {
@@ -257,15 +257,15 @@ test('RAID4b Hold the Line (the Broken Oath, 6): while I stand UNDER half health
   e.health = 50;
   assert.equal(setDamageMod(e, 100), 100, 'at half: not under it');
   e.health = 49;
-  assert.equal(setDamageMod(e, 100), 98, '2% less at Faint');
-  assert.deepEqual([10, 10, 10, 10, 10].map((n) => setDamageMod(e, n)), [10, 10, 10, 10, 9], 'two tenths of a point a hurt, carried: the fifth takes the whole point');
+  assert.equal(setDamageMod(e, 100), 96, '4% less at Faint');
+  assert.deepEqual([5, 5, 5, 5, 5].map((n) => setDamageMod(e, n)), [5, 5, 5, 5, 4], 'two tenths of a point (4% of 5) a hurt, carried: the fifth takes the whole point');
   e.maxHealth = 1000; e.health = 499;
-  for (let i = 0; i < 5; i++) hurtPlayer(e, 10);
-  assert.equal(e.health, 450, 'through my door: fifty less the one point that two tenths of a hurt carried to');
+  for (let i = 0; i < 5; i++) hurtPlayer(e, 5);
+  assert.equal(e.health, 475, 'through my door: twenty-five less the one point that two tenths of a hurt carried to');
   fresh(); online(40);
   const asc = wearSet(player(), 'oath', 6, XP[4]);
   asc.health = 10;
-  assert.equal(setDamageMod(asc, 100), 95, 'Ascendant: 5% less');
+  assert.equal(setDamageMod(asc, 100), 90, 'Ascendant: 10% less');
   fresh(); online(1);
   const four = wearSet(player(), 'oath', 4);
   four.health = 10;

@@ -107,8 +107,8 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   assert.deepEqual(setLines(a), [
     "Dagon's Brand: 3 of 9 worn (sets only work online)",
     `2 pieces - Ravager: ${SIGIL_SETS.dagon.tiers[0].brief({ strength: 2, critical: 4 })} (inactive)`,   // CARD-FIT: each tier by its brief
-    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 1 })} (1 more)`,
-    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 1 })} (3 more)`,
+    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 2 })} (1 more)`,
+    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 2 })} (3 more)`,
   ]);
   online(1);
   const lines = setLines(a);
@@ -227,8 +227,8 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');
     const rows = kids(card, 'set-tier');
     assert.deepEqual(rows.map((t) => t.classList.contains('awake')), [true, true, false]);
-    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 2 }));
-    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 2 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 3 })}`);
+    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 3 }));
+    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 3 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 6 })}`);
     assert.equal(one(rows[2], 'set-tier-every'), null, 'no recovery, no tag');
     { const e2 = player(), m = piece(107, 'malacath', 0); wear(e2, m);
       const tag = one(kids(setCard(m, e2), 'set-tier')[2], 'set-tier-every');
