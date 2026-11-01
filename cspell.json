@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en,en-GB",
+  "import": ["./cspell.words.json"],
+  "files": ["*.{md,txt,yaml,yml}", "docs/**/*.{md,txt,yaml,yml}", ".github/**/*.{md,yaml,yml}"],
+  "useGitignore": true,
+  "cache": {
+    "useCache": true,
+    "cacheLocation": "node_modules/.cache/cspell/.cspellcache",
+    "cacheStrategy": "content"
+  },
+  "ignorePaths": [
+    "node_modules/**",
+    "vendor/**",
+    "public/**",
+    "locales/**",
+    "package-lock.json",
+    "tools/testTimes.json"
+  ],
+  "ignoreRegExpList": ["/`[^`\\n]+`/g", "/```[\\s\\S]*?```/g", "/https?:\\/\\/\\S+/g", "/\\b[0-9a-f]{7,40}\\b/g"]
+}

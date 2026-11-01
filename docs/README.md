@@ -3,7 +3,8 @@
 DFO Online is a browser RPG based on The Elder Scrolls II: Daggerfall, with an online world. These pages are for
 the people who maintain it. The code is the authority: when a page and the code disagree, fix the page.
 
-Start with [getting-started.md](getting-started.md), then [architecture/](architecture/README.md).
+Start with [getting-started.md](getting-started.md), then [architecture/](architecture/README.md). The rules for new and
+touched code are in [coding-standards.md](coding-standards.md).
 
 | Folder | What it covers |
 | --- | --- |
