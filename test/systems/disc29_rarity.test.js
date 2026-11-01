@@ -6,19 +6,18 @@
 // port's part was the name. The mint wrote "Brigandine Helmet" (the class's CurrentVariant setter), and the Loot Rarity
 // ladder then built its "Sentinel's Helmet of the Bear" again from the bare TEMPLATE's name - so the list said "Iron
 // Sentinel's Helmet" and the leather refusal read as a bug. rarityName now reads the same word (rriItems.js
-// rriVariantWord), a save's names are given it back on load, and the two footstep mods read the class's
+// rriVariantWord), and the two footstep mods read the class's
 // NativeMaterialValue as their C# does (the raw material rattled a brigandine jerkin like plate).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { setItemFields } from '../../src/systems/item/itemTemplates.js';
-import { applyRarity, rarityName, repairRarityNames } from '../../src/systems/loot/lootRarity.js';
+import { applyRarity, rarityName } from '../../src/systems/loot/lootRarity.js';
 import { rriVariantWord, rriNativeMaterialValue, RRI_VENDOR, RRI_TEXT } from '../../src/systems/roleplayRealismItems/rriItems.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
 import { isForbiddenEquip } from '../../src/systems/equip.js';
 import { itemLongName } from '../../src/systems/item/itemInfo.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { hasArmor } from '../../src/systems/betterAmbience.js';
 import { equipTableOf } from '../../src/systems/equip.js';
 import { EQUIP_SLOTS } from '../../src/characters/paperdoll/paperdoll.js';
@@ -89,61 +88,6 @@ test('DISC29-B: rriVariantWord - the class\'s own rule, and nothing while the mo
     setModSetting(RRI_VENDOR, 'newArmor', false);
     assert.equal(rriVariantWord({ group: 'Armor', templateIndex: 522, material: ARMOR_MATERIAL.Iron }), '', 'the class unregistered');
   } finally { _resetModSettings(); }
-});
-
-test('DISC29-B: repairRarityNames gives a save\'s old names the word, once, and touches nothing else', () => {
-  _resetModSettings();
-  const piece = mint(522, ARMOR_MATERIAL.Iron);
-  applyRarity(piece, 'rare', stream(0.1, 0.6, 0.3, 0.8, 0.5));
-  const fixed = piece.name;
-  const old = fixed.replace('Brigandine Helmet', 'Helmet');   // the bare template's build, as the ladder wrote it before
-  const stale = { ...piece, name: old };
-  const renamed = { ...piece, name: 'My Lucky Helmet' };
-  const leather = mint(522, ARMOR_MATERIAL.Leather);
-  applyRarity(leather, 'magic', stream(0.3, 0.3, 0.3));
-  const legendary = { ...piece, rarity: 'legendary', name: old };
-  const plain = mint(522, ARMOR_MATERIAL.Iron);
-  const odd = { ...piece, name: old, affixes: [null, { id: 'no-such-affix' }, ...piece.affixes] };   // a save's list is data: no throw
-  const list = [stale, renamed, { ...leather }, legendary, plain, null, odd];
-  assert.equal(repairRarityNames(list), 2);
-  assert.equal(stale.name, fixed);
-  assert.equal(odd.name, fixed, 'the words are the valid affixes\', as the mint\'s were');
-  assert.equal(renamed.name, 'My Lucky Helmet', 'a name that is not the old build is not ours to move');
-  assert.equal(list[2].name, leather.name, 'a make with no word');
-  assert.equal(legendary.name, old, 'a Legendary is its record\'s name');
-  assert.equal(plain.name, 'Brigandine Helmet', 'a common piece kept its mint\'s name all along');
-  assert.equal(repairRarityNames(list), 0, 'idempotent');
-  assert.equal(repairRarityNames(undefined), 0);
-});
-
-test('DISC29-B: across a load - a save\'s pack and wagon come back with the word', () => {
-  _resetModSettings();
-  const piece = mint(520, ARMOR_MATERIAL.Steel);
-  applyRarity(piece, 'magic', stream(0.9, 0.2, 0.4));
-  const fixed = piece.name;
-  const old = fixed.replace('Brigandine Jerkin', 'Jerkin');
-  assert.notEqual(old, fixed);
-  const entity = {
-    name: 'Julian', gender: 'male', careerIndex: 0, level: 5, reflexes: 2, health: 30, maxHealth: 30, magicka: 0, maxMagicka: 0,
-    startingLevelUpSkillSum: 90, currentLevelUpSkillSum: 120, readyToLevelUp: false, pendingLevel: null, chargenDone: true,
-    stats: { strength: 55, luck: 50 }, skills: [30, 28], skillUses: [0, 0], career: { name: 'Warrior', hitPointsPerLevel: 8 },
-    items: [{ ...piece, name: old }], wagonItems: [{ ...piece, name: old, UID: 2 }], spells: [], activeEffects: [],
-  };
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(entity, { position: [0, 0, 0], classicMinutes: 0, locationKey: 'world' })));
-  // AUDIT PRE-MERGE 0929 D3: and the pieces kept outside the pack - a house chest, a pile dropped in a room, a dead
-  // foe's pack, a boat's hold (net/realm/realmGoldLaw.js stashedItemLists) - loaded with the name their make had lost
-  snap.sceneCache = { scenes: [{ sceneName: 'DaggerfallInterior [MapID=1, BuildingKey=2]', lootContainers: [{ items: [{ ...piece, name: old, UID: 3 }] }], droppedPiles: [{ pos: [1, 0, 1], items: [{ ...piece, name: old, UID: 4 }] }] }] };
-  snap.world = { piles: [], droppedLoot: [], foes: [{ dead: true, items: [{ ...piece, name: old, UID: 5 }] }] };
-  snap.modData = { 'come-sail-away': { placedBoats: [{ Items: [{ ...piece, name: old, UID: 6 }] }], packedCargoes: {} } };
-  const loaded = {};
-  const extras = restorePlayer(loaded, snap, new Map());
-  assert.equal(loaded.items[0].name, fixed);
-  assert.equal(loaded.wagonItems[0].name, fixed);
-  const kept = loaded.sceneCache.scenes.get('DaggerfallInterior [MapID=1, BuildingKey=2]');
-  assert.equal(kept.lootContainers[0].items[0].name, fixed, 'a house chest\'s piece, as the restored cache holds it');
-  assert.equal(kept.droppedPiles[0].items[0].name, fixed, 'a dropped pile\'s piece, as the restored cache holds it');
-  assert.equal(extras.world.foes[0].items[0].name, fixed, 'a dead foe\'s piece, handed back to the world as repaired');
-  assert.equal(extras.modData['come-sail-away'].placedBoats[0].Items[0].name, fixed, 'a boat\'s piece');
 });
 
 test('DISC29-B: Better Footsteps\' HasArmor reads the class\'s NativeMaterialValue - an iron brigandine jerkin walks quiet, a mail hauberk clanks', () => {

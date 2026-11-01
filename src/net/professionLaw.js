@@ -268,7 +268,7 @@ export const specOf = (profession, rank, specId) => SPECIALISATIONS[trackOf(prof
  * The specialisations a track stands under at `nowS`: the chosen ones, a paid change taking the place of its rank's
  * choice once its week is out. `row` is the service's track row (spec50, spec100, respec_rank, respec_to, respec_at).
  * PERK-TRIAL: a change is written at once now (`respec_to` stays empty, `respec_at` the lock's end) - the fold is for a
- * change made before it, which migration 0173 folds too. AUDIT PERK-TRIAL P8: a change written as waiting stands AT ONCE,
+ * change made before it, which it folds too. AUDIT PERK-TRIAL P8: a change written as waiting stands AT ONCE,
  * whatever its `respec_at` (now the lock): the older service, serving between the migration and the new one's deploy,
  * still wrote changes to wait their week, and they would have waited it.
  * @returns {{ 50: string|null, 100: string|null }}
@@ -695,7 +695,7 @@ export const SCHOOL_FISH = Object.freeze({ plain: 1, netter: 2 });
  *  hauls bound it, and CAP-OFF lifted that bound from the hauls and never from the school: every haul of a lying client
  *  claimed one, the act's report moving the yield by +117% (a Netter's +183%) past 5.1's +50%. Forty schools an account a
  *  day - twenty pixels' worth, two a pixel - and the hauls themselves uncapped. AUDIT LOCKPICK D2: the schools that counted
- *  are counted (the harvest row's `school`, migration 0176), never every haul - an honest angler's first school after forty
+ *  are counted (the harvest row's `school`), never every haul - an honest angler's first school after forty
  *  plain hauls was refused its fish. */
 export const SCHOOL_HAULS_DAY = 40;
 /** The finds, a haul each (5.2): at sea, on ground the witnesses confirmed, a Pearl 1 in 50 (a Pearl Diver's x3, a

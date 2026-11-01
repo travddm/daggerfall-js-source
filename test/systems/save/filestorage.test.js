@@ -22,9 +22,7 @@ import { createRequire } from 'node:module';
 import {
   SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX,
   saveSlot, enumerateSaves, loadSlot, deleteSave, findSave, screenshotOf,
-  QUICK_SAVE_NAME,
 } from '../../../src/systems/save/saveSlots.js';
-import { QUICKSAVE_KEY } from '../../../src/systems/save/save.js';
 import { appStorage } from '../../../src/systems/appStorage.js';
 
 const require = createRequire(import.meta.url);
@@ -305,26 +303,6 @@ test('an image MIME with no honest extension stays verbatim - never webp bytes w
     assert.ok(!fs.existsSync(path.join(root, 'Saves', 'SAVE2', 'Screenshot.jpg')));
     assert.ok(fs.existsSync(path.join(root, 'Saves', 'SAVE2', 'Screenshot.dataurl')));
   } finally { rm(root); }
-});
-
-test('the legacy quicksave migration holds over files: write, VERIFY, then remove', () => {
-  const prevShell = globalThis.daggerShell;
-  const root = tmp();
-  try {
-    const seed = fileStorage.createFileStorage(root);
-    seed.setItem(QUICKSAVE_KEY, JSON.stringify({ v: 1, name: 'Old Hand', classicMinutes: 777 }));
-    globalThis.daggerShell = { storage: bridgeOver(fileStorage.createFileStorage(root)) };
-    const storage = appStorage();
-    const { info } = enumerateSaves(storage);   // migration runs inside the sweep
-    const migrated = [...info.values()].find((i) => i.saveName === QUICK_SAVE_NAME);
-    assert.ok(migrated, 'legacy quicksave did not become a slot');
-    assert.equal(migrated.characterName, 'Old Hand');
-    assert.equal(storage.getItem(QUICKSAVE_KEY), null, 'legacy key must be removed after the verified write');
-    assert.ok(fs.existsSync(path.join(root, 'Saves', 'SAVE0', 'SaveData.txt')));
-  } finally {
-    if (prevShell === undefined) delete globalThis.daggerShell; else globalThis.daggerShell = prevShell;
-    rm(root);
-  }
 });
 
 // ---- AUDIT DA: the two drift pins -----------------------------------

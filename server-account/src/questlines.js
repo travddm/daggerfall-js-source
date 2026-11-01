@@ -9,7 +9,7 @@
 // step the service pays nothing is answered `unpaid` (qlStepClaimed).
 //
 // A STEP IS CLAIMED TWICE (the client's line runner, systems/questlines/qlLineRunner.js), each claim saying its PHASE:
-//   - `open`, when the step starts: one `ql_steps` row (migration 0133), `opened_at` the service's clock - `{ opened:
+//   - `open`, when the step starts: one `ql_steps` row, `opened_at` the service's clock - `{ opened:
 //     true }`. INSERT OR IGNORE, so an opening asked twice opens once. An opening pays nothing and reads nothing, so a
 //     guest's is written too (SERVICE-1: the guest who registers mid-line keeps the line's opening - the same id).
 //   - `end`, when the step ended well: it reads the step's WITNESS (QL_WITNESS_SQL) - the endgame place's own receipt

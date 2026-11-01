@@ -170,7 +170,7 @@ test('AUDIT RENOWN1 DATA-4/GAME-9: a report is ONE transaction under its own id 
   const before = windowOf(db, me.id).xp;
   await assert.rejects(reportRenownXp({ db, nowS: T0 + 20 }, me, { character: 'char-boom', xp: 500, rid: '1111111111111111' }));
   assert.equal(windowOf(db, me.id).xp, before, 'the hour is as it was: the report is one transaction');
-  assert.match(src('server-account/migrations/0009_renown.sql'), /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
+  assert.match(db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('renown_tracks').sql, /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
 });
 
 test('AUDIT RENOWN1 DATA-5: reports racing near the cap are decided against the track as it stands INSIDE the transaction - the hour is charged what the track took, and only one says it rose (mutants: what the track can take read before the write)', async () => {

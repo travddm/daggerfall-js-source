@@ -85,7 +85,7 @@ export const CARRIED_MAX = STORES_MAX;
 export const CARRIED_ROW_DAYS = 30;
 /** One deposit, at most - a withdrawal's own bound (professionLaw.js WITHDRAW_MAX). */
 export const DEPOSIT_MAX = WITHDRAW_MAX;
-/** The origins a carried count keeps - the Stores' three (0041_gold_market.sql). */
+/** The origins a carried count keeps - the Stores' three. */
 export const CARRIED_ORIGINS = Object.freeze(['own', 'bought', 'gold']);
 /** THE ORDER A COUNT IS CUT DOWN TO WHAT THE PACK HOLDS: gold's first, bought, then own - the order a withdrawal fills
  *  the pack in (professions.js withdrawStores), so the goods walled from every Marks act go first and a character's
@@ -108,7 +108,7 @@ export const looseOrder = (o) => o === 'work';
  *  bought: as bought it went to a writ, the guild Stores, a Drakes listing or fill, and a withdrawal counted it carried
  *  (every door law 3 walls), a `work` put-in being no station's act but a request any client may send. A station alone
  *  spends it (STATION_ORIGINS); everything else reads `own` and `bought` (WRIT_ORIGINS); a withdrawal gives it back to
- *  the pack uncounted. GOLD-MARKET's wall turned the other way (migration 0097_loose_origin.sql). */
+ *  the pack uncounted. GOLD-MARKET's wall turned the other way (the `loose` origin). */
 export const LOOSE_ORIGIN = 'loose';
 /** AUDIT BAG-CRAFT A1: what a writ, the guild Stores and the market's Drakes side spend of the Stores - never gold's
  *  (GOLD-MARKET), never loose (the stations' wall). */

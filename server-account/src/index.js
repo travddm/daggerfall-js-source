@@ -964,7 +964,7 @@ const service = {
 
         if (path === '/v1/auth/guest') {
           // TERMS1: NO ROW WITHOUT THE DOCUMENTS TICKED. A guest row IS an
-          // account (0001's own words), and the Create account form opens
+          // account (the schema's own words), and the Create account form opens
           // one only after its player ticked the Terms of Service and the
           // Privacy Policy - so the service asks the same, before it writes.
           const refused = legalRefusal(body);

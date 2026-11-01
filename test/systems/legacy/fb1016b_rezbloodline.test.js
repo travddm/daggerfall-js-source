@@ -25,7 +25,7 @@ import * as acorn from 'acorn';
 import worker from '../../../server-account/src/index.js';
 import { REZ_SETTLE_MAX, settleHolds } from '../../../server-account/src/legacy.js';
 import { MINUTE_JOBS, CRON_MINUTE } from '../../../server-account/src/cron.js';
-import { standService } from '../../accountDb.mjs';
+import { d1, standService } from '../../accountDb.mjs';
 import { seatRealm, freshSave } from '../../realmSeat.mjs';
 import { SESSION_KEY } from '../../../src/net/accountClient.js';
 import { realmIo, createRealmSession, whenPageGoes } from '../../../src/systems/realmSaves.js';
@@ -787,5 +787,7 @@ test('REZ-BLOODLINE AUDIT R2 the online death screen counts the wall clock, as t
   assert.equal(REZ_HOLD_S, Math.max(ONLINE_RESPAWN_SECONDS, WILD_DEATH_HOLD_S) + 30);
   assert.equal(REZ_HOLD_MS, REZ_HOLD_S * 1000);
   assert.ok(REZ_SETTLE_MAX >= 1);
-  assert.match(rd('server-account/migrations/0122_rez_hold.sql'), /ALTER TABLE realm_characters ADD COLUMN rez_lease TEXT;\nCREATE INDEX IF NOT EXISTS realm_characters_rez_hold ON realm_characters \(dead_at\) WHERE rez_lease IS NOT NULL;/);
+  const raw = d1()._raw;
+  assert.equal(raw.prepare('PRAGMA table_info(realm_characters)').all().find((c) => c.name === 'rez_lease')?.type, 'TEXT');
+  assert.match(raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('realm_characters_rez_hold')?.sql ?? '', /^CREATE INDEX realm_characters_rez_hold ON realm_characters \(dead_at\) WHERE rez_lease IS NOT NULL$/);
 });

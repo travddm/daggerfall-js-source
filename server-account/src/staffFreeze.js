@@ -5,7 +5,7 @@
 //
 // A FREEZE IS A SANCTION OF ITS OWN, beside the mute and the ban: an Admin's
 // act with a reason and a duration, Admins alone both ways, kept on the account's row with who made it
-// (`players.frozen_until`, `frozen_reason`, `frozen_by` - migration 0160). Every relay token minted while it stands carries
+// (`players.frozen_until`, `frozen_reason`, `frozen_by`). Every relay token minted while it stands carries
 // it (`fz`, identityToken.js), so a reload never sheds it (Weak spots: "A reload sheds a freeze"); its own order kind
 // (`freeze`, mintFreezeOrder) goes to the relay's law door, where the hub keeps it in a stored book of its own, as a ban's
 // (server/src/staffFreeze.js), and every room learns it from the lease (net/roomLease.js) or the token.

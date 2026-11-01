@@ -17,7 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
+import { d1, standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { seatRealm, realmAt } from '../realmSeat.mjs';
 import { createHouses, allocateHouseToPlayer, housesForSale, isHouseOwned } from '../../src/systems/banking.js';
 import { receiveHouseDecision, claimHouse, HOUSE_FLAG_MASK } from '../../src/systems/knightlyGifts.js';
@@ -299,9 +299,9 @@ test('KNIGHT-HOUSE the hosts, by source: the door never prices the knight\'s own
   assert.doesNotMatch(src('src/scenes/dungeonContext.js'), /onlineHomes|holdRealmDeed|guildServiceReceiveHouse/, 'a dungeon has no house door and no Seneschal');
 });
 
-test('KNIGHT-HOUSE the deploy: migration 0079 adds `homes.deed` (0 for every home before it); the route is the account\'s, behind the session wall; the service\'s version moved on with it, in the Worker and its config (mutants: the column unadded; the version unmoved)', () => {
-  const mig = src('server-account/migrations/0079_home_deed.sql');
-  assert.match(mig, /^ALTER TABLE homes ADD COLUMN deed INTEGER NOT NULL DEFAULT 0;$/m);
+test('KNIGHT-HOUSE the deploy: the schema holds `homes.deed` (0 for a home not yet a deed); the route is the account\'s, behind the session wall; the service\'s version moved on with it, in the Worker and its config (mutants: the column unadded; the version unmoved)', () => {
+  const deed = d1()._raw.prepare('PRAGMA table_info(homes)').all().find((c) => c.name === 'deed');
+  assert.deepEqual(deed && { type: deed.type, notnull: deed.notnull, dflt: deed.dflt_value }, { type: 'INTEGER', notnull: 1, dflt: '0' });
   assert.match(src('server-account/src/service.js'), /export const ACCOUNT_VERSION = 'acct207';/);
   assert.match(src('server-account/wrangler.toml'), /^ACCOUNT_VERSION = "acct207"$/m);
   const idx = src('server-account/src/index.js');

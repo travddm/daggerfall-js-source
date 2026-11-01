@@ -1582,8 +1582,8 @@ function transferCard(count) {
 // opaque div over the whole canvas, so a save that left the door open
 // would put its own confirmation underneath itself.
 //
-// THE CARD SHOWS WHAT IS ABOUT TO BE OVERWRITTEN. There is ONE slot
-// (systems/save/save.js, `dagger.quicksave`), so every save is an
+// THE CARD SHOWS WHAT IS ABOUT TO BE OVERWRITTEN. The QuickSave is
+// one slot per character (systems/save/saveSlots.js), so every save is an
 // overwrite. Classic does not confirm one and neither does F9, so
 // neither does this - but a player who can read the name and the date
 // they are writing over has been told, which is the part classic

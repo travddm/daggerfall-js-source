@@ -1,6 +1,6 @@
 // @ts-check
 // HUNTERS-MARK and MARKS-OF-MASTERY - THE HUNT'S LEDGER, as the service keeps it, and the titles
-// read off what it witnessed. The law is both ends' (src/net/huntLaw.js); the table migrations/0181_hunt_ledger.sql's.
+// read off what it witnessed. The law is both ends' (src/net/huntLaw.js); the table `hunt_ledger`'s.
 // A CLEAR IS THE CLIENT'S WORD. The world runs on the player's machine and nothing here saw the beasts fall, so a clear
 // is BOUNDED, as Renown's report is (renownTracks.js): a bounty's own shape, its day inside the event clock's window, its
 // level within reach of the level the realm trusts, one row a character a notice (or a mark's week), and the account's

@@ -83,7 +83,7 @@ const realmSaleOf = (row) => (Number(row.paid) > 0 ? { refund: homeSaleRefund(Nu
 
 /** THE CLAIM'S ONE WRITE: the house the character's, while it is nobody's and the character holds fewer than its cap in
  *  the home's region (HOUSES-3, net/homeLaw.js HOME_CAP).
- *  `paid` (AUDIT REALM L1-F3, migration 0020): the gold a realm record paid for it - the price, for a realm character's
+ *  `paid` (AUDIT REALM L1-F3): the gold a realm record paid for it - the price, for a realm character's
  *  claim; nothing for any other character's, whose client paid (or did not) out of a save the service never sees. */
 // WD3 (AUDIT WD3 R5): a town's homes in ONE layout, in the write itself (townLayout.js - AUDIT PRE-MERGE 1003 WD1: a
 // guild's hall is written with the same SQL)
@@ -196,7 +196,7 @@ export async function claimHome(ctx, player, body = {}) {
 // is the record's (the grant's checkpoint landed; every boot asks again - a hold already made answers `repeat`). The
 // service reads the RECORD: the deed must stand in it, in the region's slot, to that town's building, in the layout the
 // hold says the town stands in. The row is
-// a claim's, marked `deed` (migration 0079): nothing paid, outside the cap a character's claims count, written in the
+// a claim's, marked `deed`: nothing paid, outside the cap a character's claims count, written in the
 // town's one layout. No one else may claim the building (`home-taken`); to every other reader it is the knight's home,
 // shut; to the knight's own character it is left out of the town's answer (homesInTown) - its door, its storage and its
 // bed are Daggerfall's, off the deed in its save. It goes when the deed is sold at the bank (releaseHome, `deed`). THE
@@ -290,7 +290,7 @@ const realmDecorBackStatement = (db, mapId, buildingKey) => db.prepare(`SELECT C
  * AUDIT REALM L1-F3: ONLY WHAT A RECORD PAID FOR IT. The sale read any house of the account and credited its
  * client-named price - a claim at the ten-million cap by a character no record stands behind, sold by the realm
  * character's record, made 8,500,000; a house customs carried in from before the realm, the same. What comes back is the
- * deed share of `paid` (migration 0020) and half of what records paid for its pieces: a house no record paid for comes
+ * deed share of `paid` and half of what records paid for its pieces: a house no record paid for comes
  * back as a house, never as gold (HOME-CROSSED). The answer says what the record got (`refund`), which the client takes -
  * never its own sum of a price. ACCOUNT-HOMES: the house is the ACCOUNT's, so any of its realm characters
  * sells it, the gold into that character's record - L1-F3's other guard, "the house must be this character's", is
@@ -585,7 +585,7 @@ export async function homeLayouts({ db }) {
  *  MOVED. The answer is every caller's alike, read at every online boot - a guest's too - and asked again every 24 s
  *  while it is not heard (world.js askHomeLayoutsAgain), and each read scanned every home with a NOT EXISTS beside each; while the
  *  database was overloaded no client heard it, so no yard or room was asked, and players reloaded into another boot's
- *  asks. `homes_gen` (migration 0086) is moved by the database itself - its triggers, on every home made, gone, or moved
+ *  asks. `homes_gen` is moved by the database itself - its triggers, on every home made, gone, or moved
  *  to another town, building, purchase time or layout - so this isolate keeps the answer of the generation it read, and
  *  an ask is that one row: never a minute behind a claim, and none of the writes that move a town's homes - a claim, a
  *  deed held, a hall, an arena move, a sale, a character's or an account's deletion (its cascade fires them too) - has
@@ -613,7 +613,7 @@ export async function homeLayoutsKept(ctx) {
 // home of the town holds left out) - because this service holds no town's records (the doctrine: no ARENA2 in the tree).
 // THE SAME TRUST AS A CLAIM (claimHome): the service cannot see that the key names a house, any more than it sees a
 // claim's; it checks what it can - the old key a home of the caller's in the arena's cell, the new one in the same town,
-// outside the cell, a key's shape, and nobody's - and the move once (`home_moves`, migration 0075 - 0071 before the second merge onto main, 0073 before the third).
+// outside the cell, a key's shape, and nobody's - and the move once (`home_moves`).
 //
 // WHAT MOVES IS THE OFFLINE LAW'S (arenaMove.js emptyArenaScene): the furniture's places are the old building's frame and
 // fit no other, so the room is emptied, never carried. The ROW goes whole - every column (HOME_MOVE_CARRIED) - with its

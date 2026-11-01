@@ -25,7 +25,7 @@
 //    and in the record's pack loose; their rows go with them.
 //  - ANY-GOODS (FIELD BUGS 2026-10-26): WHATEVER THE GOODS. A brew or a piece made of goods from the pack - looted, or bought with gold at a shop
 //    (AUDIT BAG-CRAFT A1's loose units) - fills a writ as one of gathered or silver-bought goods does: the make is the
-//    service's act, and what it was made of no longer asked. Before, migration 0145's `witnessed` and the gold wall kept
+//    service's act, and what it was made of no longer asked. Before, the `witnessed` column and the gold wall kept
 //    them out, and the card said "0 brewed by you" over a brew that had paid its XP.
 //  - Never a potion wholly of the Apothecaries' goods (Water Breathing, Levitation - alchemyLaw brewFirstPays): silver
 //    bought at the counter and brewed would come back as more silver with no hand's work between.
@@ -149,7 +149,7 @@ export function craftWritBaseQty(/** @type {{ kind: string, tier: number }} */ p
  *  count first. */
 export const craftWorth = (/** @type {{ kind: 'potion'|'dish'|'kit', tier: number, cost: number, bought?: number }} */ p, /** @type {number} */ qty) =>
   Math.max(CRAFT_PAY_FLOOR * p.tier, Math.ceil((qty * ((p.cost - (p.bought ?? 0)) * CRAFT_PAY_PCT + (p.bought ?? 0) * 100)) / (100 * NOVICE_YIELD[p.kind])));
-/** The most a writ asks of one product - the table's own CHECK (migration 0145, `qty` 1 to 20). */
+/** The most a writ asks of one product - the table's own CHECK (`qty` 1 to 20). */
 export const CRAFT_WRIT_QTY_MAX = 20;
 /** A crafting writ's XP: twice its pay, to the craft's track (the Court writ's law, professionLaw writXp). */
 export const craftWritXp = (/** @type {number} */ pay) => 2 * pay;

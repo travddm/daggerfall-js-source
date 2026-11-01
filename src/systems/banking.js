@@ -726,42 +726,6 @@ export function callInEmpireDebt(accounts, player, { cap = 0, nowMinutes = 0, on
   return out;
 }
 
-/**
- * LOAN-AMNESTY: THE EMPIRE FORGIVES EVERY LOAN ONCE. A save's `loanAmnesty` says which amnesty it has had;
- * one older than LOAN_AMNESTY has every loan struck off - the debt, its due date and the mark of a default, so the
- * Empire lends again and nothing is garnished - and is marked with it. The gold borrowed stays where it is; what was
- * already repaid, garnished or drawn stays paid; the reputation a default cost stays lost (it recovers as reputation
- * does). A save written before the amnesty carries no mark (0); every save written after it carries the mark (save.js),
- * so a character made after it, and a loan taken after it, are never forgiven. Applied to an online character's save as
- * it boots, before it is restored and before the Empire's join settles a loan (scenes/world.js).
- * Answers `{ forgiven, defaulted }` (the gold owed that was struck off, and the regions that had defaulted), or null
- * when the save had nothing to forgive or had its amnesty already.
- */
-export const LOAN_AMNESTY = 1;
-export function forgiveLoans(snap) {
-  if (!snap || typeof snap !== 'object') return null;
-  if ((Number.isSafeInteger(snap.loanAmnesty) ? snap.loanAmnesty : 0) >= LOAN_AMNESTY) return null;
-  snap.loanAmnesty = LOAN_AMNESTY;
-  let forgiven = 0, defaulted = 0;
-  for (const a of Array.isArray(snap.bankAccounts) ? snap.bankAccounts : []) {
-    if (!a || typeof a !== 'object') continue;
-    if (!(a.loanTotal > 0) && a.hasDefaulted !== true && !a.loanDueDate) continue;
-    if (a.loanTotal > 0) forgiven += Math.trunc(a.loanTotal);
-    if (a.hasDefaulted === true) defaulted++;
-    a.loanTotal = 0;
-    a.loanDueDate = 0;
-    a.hasDefaulted = false;
-  }
-  return forgiven > 0 || defaulted > 0 ? { forgiven, defaulted } : null;
-}
-/** What the character is told when its loans are forgiven, once the world stands. */
-export function loanAmnestyLines(r) {
-  if (!r) return [];
-  return [r.forgiven > 0
-    ? `The Bank of the Empire has forgiven your loan of ${r.forgiven.toLocaleString('en-US')} gold.`
-    : 'The Bank of the Empire has forgiven your debt.',
-  'Its branches will lend to you again.'];
-}
 /** The join's words: what the Empire called in, and what stands unpaid. */
 export function empireCallInLines({ called, owed }) {
   if (!(called > 0)) return [];

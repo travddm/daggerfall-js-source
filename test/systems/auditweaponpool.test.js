@@ -7,8 +7,7 @@ import { readFileSync } from 'node:fs';
 
 import { WEAPONS, WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { createWeapon, weaponOfMaterial } from '../../src/combat/enemyEquipment.js';
-import { repoolWeapon, repoolWeaponConditions } from '../../src/systems/conditionRepair.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
+import { repoolWeapon } from '../../src/systems/conditionRepair.js';
 import { addPileLootExtras } from '../../src/systems/loot/loot.js';
 import { saleConditionPercentage } from '../../src/systems/tradeModes.js';
 import { damageEquipment } from '../../src/combat/formulas.js';
@@ -31,7 +30,7 @@ test('AUDIT WEAPON-POOL P1: SELL-AS-FOUND\'s mark moves by the same share - a pi
   onRow(found, 50, 25, { foundCondition: 25 });
   const mended = onRow({ ...found }, 50, 50, { foundCondition: 25 });
   assert.equal(saleConditionPercentage(found, { online: true }), 50, 'before the move: half');
-  assert.equal(repoolWeaponConditions([found, mended]), 2);
+  assert.deepEqual([repoolWeapon(found), repoolWeapon(mended)], [true, true]);
   assert.deepEqual([found.maxCondition, found.currentCondition, found.foundCondition], [1600, 800, 800]);
   assert.deepEqual([mended.maxCondition, mended.currentCondition, mended.foundCondition], [1600, 1600, 800]);
   assert.equal(saleConditionPercentage(found, { online: true }), 50, 'as found: still half');
@@ -59,16 +58,12 @@ test('AUDIT WEAPON-POOL P2: a weapon still on its row\'s pool moves before it we
   assert.ok(wearer.items.includes(held));
 });
 
-test('AUDIT WEAPON-POOL P3: a piece at a smith keeps the job it was booked for - the load leaves it, a drop-off beside it never re-derives it from the one pool\'s points (13 times as long), and once collected whole it moves at its first wear (mutants: the guard dropped)', () => {
+test('AUDIT WEAPON-POOL P3: a piece at a smith keeps the job it was booked for - the repool leaves it, a drop-off beside it never re-derives it from the one pool\'s points (13 times as long), and once collected whole it moves at its first wear (mutants: the guard dropped)', () => {
   // a Daedric dagger broken on its row's 400, booked at a smith for a day (Instant Repairs off)
   const booked = onRow(createWeapon(WEAPONS.Dagger, WEAPON_MATERIALS.Daedric, at(0.5)), 400, 0, { repairData: { buildingKey: 7, timeStarted: 0, repairTime: 1440 } });
-  const p = P();
-  p.otherItems = [booked];
-  const q = { isPlayer: true };
-  restorePlayer(q, JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: 100 }))));
-  const job = q.otherItems[0];
-  assert.deepEqual([job.maxCondition, job.currentCondition], [400, 0], 'the load leaves a booked piece');
+  const job = booked;
   assert.equal(repoolWeapon(job), false);
+  assert.deepEqual([job.maxCondition, job.currentCondition], [400, 0], 'a booked piece stays on its row');
   // another piece left at the same smith: the pass re-derives every unfinished job from its missing points
   const another = createWeapon(WEAPONS.Mace, WEAPON_MATERIALS.Iron, at(0.5));
   another.currentCondition = 800;
@@ -89,7 +84,7 @@ test('AUDIT WEAPON-POOL P4: a classic save\'s artifact keeps its uses - the impo
   const classic = (flags) => classicItemFromRecord({ parsedData: { group: 3, index: 0, name: 'Dagger', material: WEAPON_MATERIALS.Daedric, value: 1, flags, currentCondition: 300, maxCondition: 400, typeDependentData: 0, enchantmentPoints: 0, message: 0, magic: [] } });
   const artifact = classic(ITEM_ARTIFACT_MASK), plain = classic(0);
   assert.deepEqual([artifact.group, artifact.templateIndex, artifact.artifact, artifact.magic], ['Weapons', WEAPONS.Dagger, true, undefined]);
-  assert.equal(repoolWeaponConditions([artifact, plain]), 1);
+  assert.deepEqual([repoolWeapon(artifact), repoolWeapon(plain)], [false, true]);
   assert.deepEqual([artifact.maxCondition, artifact.currentCondition], [400, 300], 'its uses');
   assert.deepEqual([plain.maxCondition, plain.currentCondition], [12800, 9600], 'a plain classic dagger on the pool');
 });

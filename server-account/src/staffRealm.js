@@ -22,7 +22,7 @@
 //     doc "Server load").
 //   - Remove from a player takes the piece on a path of its own (realm.js prepareRealmRecord `take`): the repair path
 //     refuses copied pieces, which are what staff remove. The record moves one save on with its seat taken, so the
-//     player's game's next save is refused; the piece goes to the 30-day store (staff_evidence, migration 0152) and its
+//     player's game's next save is refused; the piece goes to the 30-day store (staff_evidence) and its
 //     ledger row is marked taken by staff (ledger.js SEIZED), so a save that shows it again is charged as a copy. A piece
 //     the ledger contests (another holds it, or copies are known) needs `trail: true` - the design's "require a trail
 //     check before Remove" - and the preview names the trail; a copy written down on the character itself needs its
@@ -328,7 +328,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
   if (path === '/v1/staff/trade-holds') {
     const sort = body.sort === 'newest' ? 'newest' : 'urgent';
     const from = fromOf(body.from);
-    // STAFF-PANEL-SPEED: the read and its audit row in one batch; 0162's index walks the holds newest first, a tie as its old scan gave it
+    // STAFF-PANEL-SPEED: the read and its audit row in one batch; the holds index walks the holds newest first, a tie as its old scan gave it
     const [read] = await db.batch([db.prepare(`SELECT c.id, c.name, c.player, p.handle, p.guest_name, c.held, c.held_at, c.held_until, c.strikes, c.law_holds, c.dupes, c.review,
         c.wealth, c.allowance, c.lease, c.lease_at, c.dead_at,
         (SELECT json_object('kind', f.kind, 'at', f.at, 'detail', json(f.detail)) FROM realm_findings f WHERE f.char_id = c.id AND f.kind != 'staff' ORDER BY f.id DESC LIMIT 1) AS finding,

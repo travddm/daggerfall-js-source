@@ -363,7 +363,7 @@ export async function strikeSeat({ db, nowS }, dev, env, { key } = {}) {
     db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND state = 'proclaimed'").bind(key),
     db.prepare("UPDATE town_seat_battles SET state = 'void' WHERE key = ? AND week >= ? AND state = 'scheduled'").bind(key, week),
     db.prepare('DELETE FROM town_seat_holds WHERE key = ?').bind(key),
-    ...strikeWitness(db, 'seat', 'key = ?1', String(key)),   // LEAN-WITNESS: its rows and its confirmation (0135's triggers take the key's row with its last answer)
+    ...strikeWitness(db, 'seat', 'key = ?1', String(key)),   // LEAN-WITNESS: its rows and its confirmation (the schema's triggers take the key's row with its last answer)
     db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
       SELECT ?1, ?2, 'strike', json_set(?3, '$.refund', COALESCE((SELECT amount FROM marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4`)
       .bind(key, week, JSON.stringify({ by: dev.handle ?? null, ...(h ? { guild: { name: h.name ?? '', tag: h.tag ?? '' } } : {}) }), nowS, rid),

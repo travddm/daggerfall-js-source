@@ -29,7 +29,6 @@ import { setSigilDueling } from '../../src/systems/sigil/sigil.js';
 import { setPlayerDoor, oweFoe, takeOwed } from '../../src/systems/playerDoor.js';
 import { _resetPlayerHealForTests } from '../../src/systems/playerHeal.js';
 import { reportPlayerKill } from '../../src/systems/playerKills.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { maxFatigue } from '../../src/systems/statMods.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
@@ -260,26 +259,6 @@ test('AUDIT MARTIAL L1 L6 / L2 F2: a signature\'s HUD chip makes nothing a frame
   assert.equal(r.name, 'Mark of the Hunt', 'the measure ran with the signature in hand');
   assert.ok(r.out.control >= 40, `the control made ${r.out.control.toFixed(2)} bytes a frame - the measure is blind`);
   assert.ok(r.out.signature < 2, `a signature in hand: ${r.out.signature.toFixed(2)} bytes a frame`);
-}));
-
-test('AUDIT MARTIAL L3 F1: an OLDER BUILD\'s save keeps the permanent choice - the career\'s mirror (a record every build carries whole) gives the path back, already asked; a mirror another character wrote (an heir\'s inherited career) gives nothing; the live career never holds it (mutants: no mirror written; the mirror read from a newer save; the character\'s id unread)', () => clean(() => {
-  const p = pathFighter('cutthroat'); p.martialPrompted = true;
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p)));
-  assert.deepEqual(snap.career.martialMirror, { path: 'cutthroat', of: snap.characterId });
-  const older = { ...snap }; delete older.martialPath; delete older.martialPrompted;   // what an older build saves again
-  const back = structuredClone(playerEntity);
-  restorePlayer(back, older);
-  assert.equal(back.martialPath, 'cutthroat'); assert.equal(back.martialPrompted, true, 'never asked again - no second choice');
-  assert.equal(back.career.martialMirror, undefined, 'the mirror is the save\'s');
-  assert.deepEqual(MP.martialChoices(back), []);
-  const heir = { ...older, career: { ...snap.career, martialMirror: { path: 'cutthroat', of: 'someone-else' } } };
-  const child = structuredClone(playerEntity);
-  restorePlayer(child, heir);
-  assert.equal(child.martialPath, null, 'another character\'s choice is not this one\'s');
-  const chose = { ...snap, martialPath: null, martialPrompted: false };
-  const none = structuredClone(playerEntity);
-  restorePlayer(none, chose);
-  assert.equal(none.martialPath, null, 'a newer save says null for none - the mirror is never asked');
 }));
 
 test('AUDIT MARTIAL L3 F2 / L2 F1: a body the relay runs reads no half line - its health a placeholder - so the Axe and the Blunt Weapon past 100 each pay the plain potency there (x1.4 at 200, the halves\' mean); an ordinary foe keeps its halves (mutants: the placeholder read as full)', () => clean(() => {

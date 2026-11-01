@@ -31,7 +31,7 @@
 // reads) - so a poll every ten seconds costs the session's read and, at most, the fast part's one batch. Only a part's
 // answer is kept, never a pending one: a Worker cannot hand one request's I/O to another.
 //
-// ═══ LIMITS (staff_limits, migration 0155) ═══
+// ═══ LIMITS (staff_limits) ═══
 //
 // Per metric (STATUS_METRICS), an amber and a red line, either or both: a value AT OR PAST a line takes its colour. Every
 // staff member may read them; only an Admin sets one, written down in the audit log in the same batch, with what it was.
@@ -215,7 +215,7 @@ async function slowPart(/** @type {any} */ ctx, /** @type {any} */ env) {
 }
 
 /** The activity part (STATUS_ACTIVITY_S): the last hour's, in one statement. Sales and Marks are read through their
- *  tables' `day` index (today's rows, and yesterday's while the hour spans midnight), the guild moves through 0155's. */
+ *  tables' `day` index (today's rows, and yesterday's while the hour spans midnight), the guild moves through their indexes. */
 async function activityPart(/** @type {any} */ ctx) {
   const { db, nowS } = ctx;
   const cut = nowS - 3600;

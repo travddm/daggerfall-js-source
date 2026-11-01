@@ -156,12 +156,9 @@ export function addSurvivalProvisions(entity, added = []) {
   if (survivalOn()) for (const it of startingProvisions(entity)) { addItem(entity.items, it); added.push(it); }   // AUDIT C&C I7: the character's own wardrobe for the start's shoes and cloak
   // REST2: online the Campfire is the rest's - a character set out with the arc Off still carries one
   else if (sharedClockOn()) { const it = startingCampfire(); if (it) { addItem(entity.items, it); added.push(it); } }
-  // WALLET1: and the wallet, whatever the switches (systems/walletItem.js) - the kit a new character sets out with holds
-  // one, as a character from before the wallet is given one ONCE as its save is restored (save.js restorePlayer, the
-  // save's `walletGift` mark - PORTAL-GIFT's shape; AUDIT 625 W4: not every load, nor any character that has none)
+  // WALLET1: and the wallet, whatever the switches (systems/walletItem.js) - the kit a new character sets out with holds one
   if (giveWallet(entity)) added.push(entity.items.find(isWalletItem));
-  // LOCKPICK: and a class that holds Lockpicking sets out with its picks - a
-  // lock needs one now - as a character from before the lockpick is given them once (save.js restorePlayer, its gift)
+  // LOCKPICK: and a class that holds Lockpicking sets out with its picks - a lock needs one now
   const picks = giveStartingLockpicks(entity);
   if (picks) added.push(picks);
   return added;

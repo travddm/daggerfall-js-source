@@ -11,8 +11,7 @@ export const VARIANT_NAMES = Object.freeze(['I', 'II', 'III', 'IV', 'V', 'VI', '
  *  what a hull's parts weigh packed - the table's, and never more than the Large Boat's. The three ships' rows (2,400 to
  *  240,000 kg) were never an item's in the mod, whose ships were never packed: in the pack they would hold the bearer
  *  under the water, sink any boat she sailed ("You're going to need a bigger boat") and take nothing more aboard.
- *  PARTS-WEIGHT (FIELD BUGS 2026-10-18e): and all a packed boat's parts ever weigh - her hold rides them no more. Here in
- *  the leaf so the save's item repair (comeSailAwayItems.js repairPartsWeights) reads it without the boat's renderer. */
+ *  PARTS-WEIGHT (FIELD BUGS 2026-10-18e): and all a packed boat's parts ever weigh - her hold rides them no more. */
 export const PACKED_WEIGHT_MAX = HULL_WEIGHTS[1];
 export const packedHullWeight = (hull) => Math.min(HULL_WEIGHTS[hull], PACKED_WEIGHT_MAX);
 /** GetHullFromMessage: the item's `message` is hull * 10 + variant (its pair, GetVariantFromMessage, comeSailAway.js). */

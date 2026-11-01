@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  WALLET_TEMPLATE, WALLET_ROW, WALLET_HOLDS, WALLET_CARD_LINES, WALLET_GIFT, isWalletItem, hasWallet, walletHolds, mintWallet,
-  giveWallet, giveWalletGift, setWalletSilver, walletSilver, refreshWalletSilver, walletContents, walletLines, _resetWalletForTests,
+  WALLET_TEMPLATE, WALLET_ROW, WALLET_HOLDS, WALLET_CARD_LINES, isWalletItem, hasWallet, walletHolds, mintWallet,
+  giveWallet, setWalletSilver, walletSilver, refreshWalletSilver, walletContents, walletLines, _resetWalletForTests,
 } from '../../src/systems/walletItem.js';
 import { assignStartingGear, addSurvivalProvisions } from '../../src/systems/startingGear.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
@@ -72,7 +72,7 @@ test('WALLET1 the piece: template 580 on its own row - DFU\'s Small Sack\'s pict
   assert.equal(isBound(w), true);
 });
 
-test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\'s alike, the port\'s own tail; a character from before the wallet is given one as its save is restored, ONCE (PORTAL-GIFT\'s mark), and a round trip gives none (mutants: given twice; the mark unread; the kit ungiven)', () => {
+test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\'s alike, the port\'s own tail, and a load gives none (mutants: the load gives one; the kit ungiven)', () => {
   const e = { items: [] };
   assert.equal(giveWallet(e), 1);
   assert.equal(giveWallet(e), 0, 'one is carried');
@@ -86,19 +86,10 @@ test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\
   const modKid = { items: [] };
   addSurvivalProvisions(modKid);
   assert.equal(modKid.items.filter(isWalletItem).length, 1, 'the port\'s tail, which a mod\'s kit rides');
-  // a save from before the wallet: given once; a round trip after: none
-  const old = snapshotPlayer({ items: [], stats: {}, skills: [] });
-  delete old.walletGift;
-  const back = {};
-  restorePlayer(back, old);
-  assert.deepEqual([back.items.filter(isWalletItem).length, back.walletGift], [1, WALLET_GIFT], 'given, and marked');
-  const again = {};
-  restorePlayer(again, snapshotPlayer(back));
-  assert.equal(again.items.filter(isWalletItem).length, 1, 'never given twice');
+  // the kit holds the wallet; a load gives none
   const born = {};
   restorePlayer(born, snapshotPlayer({ items: [], stats: {}, skills: [] }));
-  assert.deepEqual([born.items.length, born.walletGift], [0, WALLET_GIFT], 'a character born after the wallet has its kit\'s - the load gives none');
-  assert.equal(giveWalletGift({ walletGift: WALLET_GIFT, items: [] }), 0);
+  assert.equal(born.items.length, 0, 'a load gives no wallet');
 });
 
 test('WALLET1 it never leaves the pack: bound - never dropped, traded or sold - and pack-only: not the wagon nor the player\'s own storage, where a bound ember still goes; the realm\'s service binds its row too; both skins refuse it in its own words (mutants: the pack-only unread; the service blind; either skin\'s refusal unsaid)', () => {

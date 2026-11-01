@@ -114,13 +114,13 @@ test('STAR7 THE DAY\'S BOUND AND THE CAP: nine stars counted on the day they fel
   assert.equal(s.balance(bo), 0, 'no row, no silver');
 });
 
-test('STAR7 THE MIGRATION AND THE DEPLOY: stars_held and star_spoils, one row a (star, account), cascading with their account; the route declared beside the raid\'s; the account Worker\'s deploy watches the star\'s law and receipt (mutants: the key; the cascade)', async () => {
-  const sql = src('server-account/migrations/0141_stars_held.sql');
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS stars_held \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
-  assert.match(sql, /\n {2}cid {5}TEXT,\n {2}PRIMARY KEY \(star, account\)/, 'AUDIT STARFALL B3: the claim id that wrote the row');
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS star_spoils \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
+test('STAR7 THE SCHEMA AND THE DEPLOY: stars_held and star_spoils, one row a (star, account), cascading with their account; the route declared beside the raid\'s; the account Worker\'s deploy watches the star\'s law and receipt (mutants: the key; the cascade)', async () => {
   clock(T0);
   const s = await stand();
+  const sqlOf = (name) => s.raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
+  assert.match(sqlOf('stars_held'), /CREATE TABLE stars_held \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
+  assert.match(sqlOf('stars_held'), /\n {2}cid {5}TEXT,\n {2}PRIMARY KEY \(star, account\)/, 'AUDIT STARFALL B3: the claim id that wrote the row');
+  assert.match(sqlOf('star_spoils'), /CREATE TABLE star_spoils \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
   const ann = await s.registered('Anna', { character: CH });
   await s.star(ann, [N, 0], { cid: CID });
   s.raw.prepare('DELETE FROM players WHERE id = ?').run(ann.id);

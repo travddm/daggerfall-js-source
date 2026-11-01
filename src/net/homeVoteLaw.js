@@ -19,7 +19,7 @@
 //
 // Cast at the house itself - its door's plaque (scenes/worldModes.js), so
 // a vote is the word of somebody standing at it; kept on the account
-// service (server-account/src/homeVotes.js, migration 0108), which reads it
+// service (server-account/src/homeVotes.js), which reads it
 // out with the town's homes. Pure: no clock, no DOM, no network.
 // ═══════════════════════════════════════════════════════════════════
 import { WITNESS } from './nodeLaw.js';   // AUDIT HOME-VOTE A1: an account a week registered, as a witness is

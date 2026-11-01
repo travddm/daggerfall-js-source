@@ -5930,6 +5930,7 @@ saddle.note.rickety,"The {wagon} is rickety. A repair kit or a Wagon Yard will m
 saddle.note.starving,"Starving. Feed your horse"
 saddle.note.starvingGallop,"Starving. It will not gallop until it eats"
 saddle.note.winded,"Winded. Ease off and let it breathe"
+save.versionRefused,"This save was made for a different version of the game and cannot be loaded."
 schools.about.title,"{name} - {a} and {b}"
 schools.battlemage.name,"Battlemage"
 schools.battlemage.passive,"Spellsteel"

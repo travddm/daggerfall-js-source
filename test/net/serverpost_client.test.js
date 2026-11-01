@@ -16,7 +16,9 @@ import { HELP_LINES, HOST_COMMANDS } from '../../src/net/chatCommands.js';
 import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { REFUSALS } from '../../src/net/accountClient.js';
 import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
-import { HOURS_FIRST_RECORD } from '../../tools/sendServerPost.mjs';
+
+/** A gift whose item, the Hourlock (template 560), has left the game. */
+const HOURLOCK_RECORD = '{"group":"Weapons","templateIndex":560,"material":4,"flags":0,"variant":0,"message":0,"stackCount":1,"name":"The Hourlock","value":39740,"maxCondition":4800,"currentCondition":4800,"rarity":"gilded","gilded":"the-hourlock","affixes":[{"id":"damage","value":40},{"id":"stat","param":"agility","value":15},{"id":"skill","param":33,"value":30},{"id":"elemental","param":"shock","value":10}],"isIdentified":true}';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const send = (env, who, { batch, subject = 'A gift', body = 'For you.', item = null, at = T0 } = {}) => {
@@ -129,10 +131,10 @@ test('SERVER-POST THE CLAIM, from the client: the realm\'s act asks the service 
   assert.deepEqual(abandoned, ['unknown'], 'abandoned - never a pack short of what the record holds');
   assert.equal(pack.length, 1, 'nothing forged into the pack');
 
-  // THE OLD HOURS-FIRST GIFT (migration 0094, frozen as HOURS_FIRST_RECORD): the Hourlock's template (560) left the game
+  // A gift whose item left the game (HOURLOCK_RECORD): the Hourlock's template (560) left
   // with the guns, so the service reads the piece as holding no item (post.js recordOf) - the claim is refused before
   // anything is written, the session stands, nothing lands in the pack and nothing throws
-  const hourlockId = send(svc.env, ann, { batch: 'hours-first-hourlock', subject: "Hour's First", item: JSON.parse(HOURS_FIRST_RECORD) });
+  const hourlockId = send(svc.env, ann, { batch: 'hours-first-hourlock', subject: "Hour's First", item: JSON.parse(HOURLOCK_RECORD) });
   const oldGiftAbandoned = [];
   const oldGift = new PostBox({ ioOf: ioFor(svc, ann), character: () => R.id, realm: realmOf(R, oldGiftAbandoned), pack: { add: (rec) => pack.push(rec), changed() {} } });
   await oldGift.refresh();

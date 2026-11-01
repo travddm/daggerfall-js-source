@@ -2,17 +2,16 @@
 // 'bought with gold'"; ESSENCE-LOOSE). A piece crafted at a station with
 // any unit the service never handed out - a looted, traded or shop-bought stack, put in LOOSE by the station's own put-in
 // (AUDIT BAG-CRAFT A1, bagLaw.js LOOSE_ORIGIN) - is walled to gold on its products row (`bought_with` 'gold': it lists
-// for gold alone, as a pack's piece does). The disenchant read that column as the piece's last purchase (migration 0041's
-// word for it) and put the piece's Arcane Essence into the Stores as GOLD's: "21 bought with gold" on the Stores page,
+// for gold alone, as a pack's piece does). The disenchant read that column as the piece's last purchase
+// and put the piece's Arcane Essence into the Stores as GOLD's: "21 bought with gold" on the Stores page,
 // "Bought with gold. It can go to your pack..." under it, and the Reforge with Essence - a station - refused it. Now the
-// piece says what walled it (`products.loose`, migration 0142), its Essence is LOOSE - a station's, as a smelt's products
+// piece says what walled it (`products.loose`), its Essence is LOOSE - a station's, as a smelt's products
 // of loose goods are - and the Reforge spends it as a station spends, loose first. A piece bought with gold still gives
 // gold's Essence (Professions-Arc 10.8's wall and section 37's law). Driven through the real Worker over node:sqlite
 // with every migration applied (test/accountDb.mjs), the client's own book over it, and the Stores page it draws.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import '../../src/systems/professions/profTemplates.js';
 import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
@@ -41,7 +40,6 @@ const ESS = ARCANE_ESSENCE.key;
 const RING = 'ring:gold:ruby';   // 2,160 points: 21 Arcane Essence (prof12_service's ring)
 const DF = 17;
 const HUBS = { [DF]: [207, 212] };
-const migration = () => readFileSync(new URL('../../server-account/migrations/0142_essence_loose.sql', import.meta.url), 'utf8');
 
 async function stand() {
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' });
@@ -269,53 +267,4 @@ test('FB1020h ESSENCE-LOOSE the client: the book hears the loose Essence and the
     assert.deepEqual([P.storesSplit({ material: 'metal:iron', own: 0, bought: 0, loose: 3 }), P.storesSplit({ material: ESS, own: 1, bought: 0, loose: 3 })],
       ['3 from your pack', '1 own · 3 made from pack goods']);
   } finally { P.setProfessionsPages(null); P.resetProfPages(); root?.remove(); }
-});
-
-// ─── THE MIGRATION ───────────────────────────────────────────────────
-
-test('FB1020h ESSENCE-LOOSE migration 0142 over the rows the old service wrote: a piece walled by its goods marked so and a gold-bought one not; a disenchant already made of a walled piece named loose, a gold-bought one\'s gold; the misnamed Essence moved to loose as far as the Stores still hold gold\'s, the rest of gold\'s kept; another character untouched (mutants: the pieces unmarked; a disenchant left gold; the Essence left gold; more moved than held)', async () => {
-  const s = await stand();
-  const ann = await s.seated('Ann');
-  const mac = await s.seated('Mac', 100_000);
-  const eve = await s.seated('Eve');
-  for (const who of [ann, mac, eve]) s.rank(who, 'smithing', 25);
-  // the live database's rows, minted by the real routes: Mac's ring of a loose Gold Bar (taken apart, and one standing),
-  // a ring Mac bought with gold (taken apart), and Eve's ring of a loose Gold Bar taken apart, 15 of its Essence since
-  // sold for gold (gold's Essence leaves the Stores by a gold listing alone)
-  const macWalled = await s.craft(mac, RING, { 'metal:gold': 1 });
-  const macStanding = await s.craft(mac, RING, { 'metal:gold': 1 });
-  const annRing = await s.craft(ann, RING);
-  await s.soldForGold(ann, mac, annRing);
-  const annKept = await s.craft(ann, RING, { 'metal:gold': 1 });   // walled by Ann's goods, then bought by Mac with gold: kept
-  await s.soldForGold(ann, mac, annKept);
-  await s.disenchant(mac, macWalled);
-  await s.disenchant(mac, annRing);
-  const eveWalled = await s.craft(eve, RING, { 'metal:gold': 1 });
-  await s.disenchant(eve, eveWalled);
-  // ...as the service before acct166 wrote them: no `loose` column, a disenchant's origin gold, its Essence gold's
-  const raw = s.raw;
-  raw.exec(`ALTER TABLE products DROP COLUMN loose;
-    CREATE TABLE prof_disenchants_old AS SELECT * FROM prof_disenchants; DROP TABLE prof_disenchants;
-    CREATE TABLE prof_disenchants (player TEXT NOT NULL, rid TEXT NOT NULL, char_id TEXT NOT NULL, provenance TEXT NOT NULL UNIQUE CHECK (length(provenance) = 16),
-      recipe TEXT NOT NULL, points INTEGER NOT NULL CHECK (points >= 0), essence INTEGER NOT NULL CHECK (essence >= 1),
-      origin TEXT NOT NULL CHECK (origin IN ('own', 'bought', 'gold')), xp INTEGER NOT NULL CHECK (xp >= 0), at INTEGER NOT NULL, n TEXT NOT NULL,
-      PRIMARY KEY (player, rid), FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE);
-    INSERT INTO prof_disenchants SELECT player, rid, char_id, provenance, recipe, points, essence, CASE origin WHEN 'loose' THEN 'gold' ELSE origin END, xp, at, n FROM prof_disenchants_old;
-    DROP TABLE prof_disenchants_old;
-    DELETE FROM prof_stores WHERE material = '${ESS}';`);
-  raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, '${ESS}', 'gold', 42), (?, ?, '${ESS}', 'gold', 6), (?, ?, '${ESS}', 'own', 3)`)
-    .run(mac.id, mac.character, eve.id, eve.character, eve.id, eve.character);
-  raw.exec(migration());   // as the deploy applies it, once
-  assert.deepEqual([s.product(macStanding), s.product(annKept), s.product(annRing), s.product(eveWalled)],
-    [{ owner: mac.id, bought_with: 'gold', loose: 1 }, { owner: mac.id, bought_with: 'gold', loose: 0 }, null, null], 'the standing walled ring marked, the one bought with gold not; the others taken apart');
-  const origins = Object.fromEntries(raw.prepare('SELECT provenance, origin FROM prof_disenchants').all().map((r) => [r.provenance, r.origin]));
-  assert.deepEqual([origins[macWalled], origins[annRing], origins[eveWalled]], ['loose', 'gold', 'loose']);
-  assert.deepEqual(s.stores(mac), [['gold', 21], ['loose', 21]], 'Mac: the walled ring\'s 21 loose, the bought ring\'s 21 gold\'s');
-  assert.deepEqual(s.stores(eve), [['loose', 6], ['own', 3]], 'Eve: 21 misnamed, 6 still held - those move, and nothing more');
-  assert.deepEqual(s.stores(ann), []);
-  // and the service reads what it wrote: Mac's loose Essence reforges, the gold's stays walled
-  s.rank(mac, 'enchanting', 50);
-  assert.equal((await s.reforge(mac, 'rare')).status, 200);
-  assert.deepEqual(s.stores(mac), [['gold', 21], ['loose', 16]]);
-  assert.equal((await s.disenchant(mac, macStanding)).body.origin, 'loose', 'the standing ring, once taken apart, loose');
 });

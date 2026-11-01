@@ -27,8 +27,6 @@ import { SIGIL_STONE, SIGIL_STONE_TEMPLATE, sigilStone, nameEmbers, isSigilStone
 import { stonesText, BROKER_REFUSALS, DISMANTLED } from '../../../src/systems/sigil/sigilBroker.js';
 import { recoverSpoils, SPOILS_RECORD_V } from '../../../src/scenes/spoilsPool.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { addItem } from '../../../src/systems/inventory.js';
-import { restorePlayer, snapshotPlayer } from '../../../src/systems/save/save.js';
 import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const ROOT = new URL('../../../', import.meta.url).pathname;
@@ -131,31 +129,6 @@ test('WB12a the repair: every record of the template under another name takes th
   assert.equal(nameEmbers(list), 0, 'again: nothing left to rename');
   assert.equal(nameEmbers(null), 0);
   assert.ok(list.filter(isSigilStone).every((i) => i.templateIndex === 570), 'only the name moved');
-});
-
-const makeEntity = (over = {}) => ({
-  name: 'Tester', race: 'Breton', gender: 'male', level: 3,
-  stats: { strength: 50, endurance: 40, agility: 30, speed: 30, willpower: 30, intelligence: 30, luck: 30, personality: 30 },
-  skills: new Array(35).fill(10), skillUses: new Array(35).fill(0),
-  items: [], wagonItems: [], activeEffects: [], spells: [],
-  health: 30, fatigue: 100, magicka: 10, gold: 0,
-  ...over,
-});
-
-test('WB12a a save from before: the stones it kept as Sigil Stones load as Deadlands Embers - in the pack, the wagon and the other things - and a stone won after joins one stack under one name (mutants: the load never repairs)', () => {
-  const e = makeEntity({ items: [oldStone(4), ruby()], wagonItems: [oldStone(2)], otherItems: [oldStone(1)] });
-  const snap = snapshotPlayer(e, {});
-  assert.equal(snap.items[0].name, 'Sigil Stone', 'the save holds the old name');
-  const t = makeEntity();
-  const info = console.info, lines = [];
-  console.info = (s) => lines.push(String(s));
-  try { restorePlayer(t, snap); } finally { console.info = info; }
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 4]]);
-  assert.deepEqual(t.wagonItems.map((i) => i.name), ['Deadlands Ember']);
-  assert.deepEqual((t.otherItems ?? []).filter(isSigilStone).map((i) => i.name), ['Deadlands Ember']);
-  assert.ok(lines.some((l) => l.includes('WB12a') && l.includes('named Deadlands Embers')), 'said, in the console');
-  addItem(t.items, sigilStone());
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 5]], 'one stack, one name');
 });
 
 test('WB12a the crash\'s door: a stone a crash record kept under its old name is handed over as a Deadlands Ember (mutants: the record\'s name kept)', () => {

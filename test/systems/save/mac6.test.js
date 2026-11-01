@@ -10,8 +10,7 @@
 // GetLocation, StartDungeonInterior) then RestorePosition
 // (SerializablePlayer.cs:441-454) - off worldPosX/worldPosZ saved
 // beside insideDungeon (:215-217). THE ARM EXECUTES: the envelope
-// carries `dungeon` (the pixel and map id) and hands it back; a save
-// from before it did is found by its id across the locations; the
+// carries `dungeon` (the pixel and map id) and hands it back; the
 // dungeon host's load arm is split so the world host can hand it an
 // envelope it already restored, without a second session restore; the
 // mode machine forwards with the key route's own position applier;
@@ -19,7 +18,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { snapshotPlayer, restorePlayer, dungeonPixelFor } from '../../../src/systems/save/save.js';
+import { snapshotPlayer, restorePlayer } from '../../../src/systems/save/save.js';
 
 const rd = (p) => readFileSync(new URL('../../../' + p, import.meta.url), 'utf8');
 
@@ -34,7 +33,7 @@ const mkEntity = () => ({
   items: [], spells: [], activeEffects: [],
 });
 
-test('MAC6 #1: the envelope carries where the dungeon stands - `dungeon` {pixel, mapId} rides snapshotPlayer beside the interior half and comes back out of restorePlayer; a save from before it reads null; the finder resolves an old save by its dungeon id across the locations, through the host\'s pixel law, and answers null for anything else', () => {
+test('MAC6 #1: the envelope carries where the dungeon stands - `dungeon` {pixel, mapId} rides snapshotPlayer beside the interior half and comes back out of restorePlayer; an envelope without it reads null', () => {
   const dungeon = { pixel: { x: 109, y: 158 }, mapId: 187 };
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(mkEntity(), { position: [1, 2, 3], locationKey: 'dungeon:1234', dungeon })));
   assert.deepEqual(snap.dungeon, dungeon, 'PlayerPositionData_v1.worldPosX/worldPosZ beside insideDungeon (SerializablePlayer.cs:215-217)');
@@ -42,21 +41,7 @@ test('MAC6 #1: the envelope carries where the dungeon stands - `dungeon` {pixel,
   assert.deepEqual(extras.dungeon, dungeon, 'and the boot load reads it back');
   assert.equal(extras.locationKey, 'dungeon:1234');
   const old = JSON.parse(JSON.stringify(snap)); delete old.dungeon;
-  assert.equal(restorePlayer(mkEntity(), old, null).dungeon, null, 'a save from before the field: null, never undefined');
+  assert.equal(restorePlayer(mkEntity(), old, null).dungeon, null, 'an envelope without the field: null, never undefined');
   assert.equal(snapshotPlayer(mkEntity(), { locationKey: 'world' }).dungeon, null, 'anywhere but a dungeon: null');
-  // the finder, for the old save: the dungeon's own record id, the host's pixel law injected
-  const loc = (id, longitude, latitude, hasDungeon = true) => ({ hasDungeon, dungeon: { recordElement: { header: { locationId: id } } }, mapTableData: { longitude, latitude } });
-  const toPixel = (mt) => ({ x: mt.longitude, y: mt.latitude });
-  const locations = [loc(7, 1, 2), loc(1234, 5, 6, false), { hasDungeon: true, dungeon: null, mapTableData: { longitude: 0, latitude: 0 } }, { ...loc(1234, 3, 4), mapTableData: null }, loc(1234, 109, 158)];   // AUDIT WORLD D5: the decoys sit BEFORE the match, so every guard is walked
-  assert.deepEqual(dungeonPixelFor('dungeon:1234', locations, toPixel), { x: 109, y: 158 }, 'found by id, a location with no dungeon skipped');
-  assert.equal(dungeonPixelFor('dungeon:99', locations, toPixel), null, 'no such dungeon');
-  assert.equal(dungeonPixelFor('world', locations, toPixel), null, 'not a dungeon key');
-  assert.equal(dungeonPixelFor('dungeon:probe', locations, toPixel), null, 'the probe\'s key names no id');
-  assert.equal(dungeonPixelFor(null, locations, toPixel), null);
-  assert.equal(dungeonPixelFor('dungeon:1234', null, toPixel), null, 'no locations to walk');
-  let walked = 0;
-  const lazy = { *[Symbol.iterator]() { walked++; yield loc(1234, 3, 4); walked++; yield loc(5, 9, 9); } };
-  assert.deepEqual(dungeonPixelFor('dungeon:1234', lazy, toPixel), { x: 3, y: 4 });
-  assert.equal(walked, 1, 'any iterable, and the walk stops at the first match');
 });
 
