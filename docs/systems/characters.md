@@ -9,20 +9,20 @@ The rules are Daggerfall Unity's (DFU, MIT, Daggerfall Workshop), ported from `P
 
 ## Where it lives
 
-| Concern | Files |
-| --- | --- |
-| The player entity (shared singleton) | `src/characters/playerEntity.js` |
-| Races | `src/systems/races.js`, `src/systems/racialLive.js` |
-| Skills model | `src/systems/skills.js`, `src/systems/skillSoftcap.js`, `src/systems/masterSkills.js` |
-| Attribute modifiers (fortify, drain) | `src/systems/statMods.js` (`liveStat`) |
-| Class files | `src/formats/classFile.js` (CLASSnn.CFG reader), `src/systems/stockClasses.js` |
-| Custom class builder | `src/systems/customClass.js` (laws), `src/ui/chargenArt.js` (window) |
-| Class questionnaire | `src/systems/classQuestions.js` |
-| Creation | `src/systems/chargen.js`, `src/systems/chargenSession.js`, `src/ui/chargen.js`, `src/systems/startingGear.js` |
-| Biography | `src/formats/biogFile.js`, `src/systems/biography.js` |
-| Advancement and levelling | `src/systems/advancement.js`, `levelCap.js`, `levelClimb.js`, `levelEven.js`, `skillSwap.js` (all in `src/systems/`) |
-| Equip slots and paperdoll | `src/characters/paperdoll/`, `src/characters/equipRules.js`, `src/characters/equipTable.js`, `src/systems/equip.js` |
-| Enemy entities | `src/characters/enemy/enemyEntity.js`, `src/characters/enemy/enemyBasics.js` |
+| Concern                              | Files                                                                                                                |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| The player entity (shared singleton) | `src/characters/playerEntity.js`                                                                                     |
+| Races                                | `src/systems/races.js`, `src/systems/racialLive.js`                                                                  |
+| Skills model                         | `src/systems/skills.js`, `src/systems/skillSoftcap.js`, `src/systems/masterSkills.js`                                |
+| Attribute modifiers (fortify, drain) | `src/systems/statMods.js` (`liveStat`)                                                                               |
+| Class files                          | `src/formats/classFile.js` (CLASSnn.CFG reader), `src/systems/stockClasses.js`                                       |
+| Custom class builder                 | `src/systems/customClass.js` (laws), `src/ui/chargenArt.js` (window)                                                 |
+| Class questionnaire                  | `src/systems/classQuestions.js`                                                                                      |
+| Creation                             | `src/systems/chargen.js`, `src/systems/chargenSession.js`, `src/ui/chargen.js`, `src/systems/startingGear.js`        |
+| Biography                            | `src/formats/biogFile.js`, `src/systems/biography.js`                                                                |
+| Advancement and levelling            | `src/systems/advancement.js`, `levelCap.js`, `levelClimb.js`, `levelEven.js`, `skillSwap.js` (all in `src/systems/`) |
+| Equip slots and paperdoll            | `src/characters/paperdoll/`, `src/characters/equipRules.js`, `src/characters/equipTable.js`, `src/systems/equip.js`  |
+| Enemy entities                       | `src/characters/enemy/enemyEntity.js`, `src/characters/enemy/enemyBasics.js`                                         |
 
 ## Races
 
@@ -45,7 +45,8 @@ is undead without an import cycle.
   drain effects. Never read `entity.stats` directly in a formula.
 - 35 skills (`SKILLS`, `SKILL_NAMES`, `SKILL_COUNT` in `skills.js`). `tallySkill` counts a use into
   `entity.skillUses`.
-- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill` (`skillSoftcap.js`), not
+- Values above 100 exist only with Master Skills (below). Formulas read `skillValue`, which applies `effectiveSkill`
+  (`skillSoftcap.js`), not
   the raw value: past 100 a point is worth a quarter (`OVERCAP_POINT_WEIGHT`), plus milestone bonuses at 125, 150,
   175 and 200 (`SKILL_MILESTONES`). A raw 200 reads as 140. Screens print the raw value (`displaySkillValue`).
 
@@ -109,16 +110,16 @@ the player spends by hand (headless: `spendPoolLowest`). Level-1 health is `roll
 `hitPointsPerLevel`), magicka `spellPoints(intelligence, multiplier)`, fatigue `(strength + endurance) *
 FATIGUE_MULTIPLIER`. `applyCharacter` assigns onto the shared `playerEntity` object (it does not make a new one):
 
-| Field | Meaning |
-| --- | --- |
-| `name`, `gender`, `race`, `raceId`, `faceIndex` | identity, read by the paperdoll and race tables |
-| `career`, `careerIndex` | the career object (saved whole) and its stock index |
-| `level`, `stats`, `skills` | level 1, the eight attributes, the 35 skills |
-| `maxHealth` / `rawMaxHealth`, `health` | `maxHealth` is a getter (see below) |
-| `maxMagicka`, `magicka`, `fatigue` | derived pools |
-| `skillUses`, `skillsRecentlyRaised`, `lastSkillCheckTime` | advancement counters |
-| `startingLevelUpSkillSum`, `currentLevelUpSkillSum` | the level sums |
-| `chargenDone`, `characterId` | creation complete; the save slot identity |
+| Field                                                     | Meaning                                             |
+| --------------------------------------------------------- | --------------------------------------------------- |
+| `name`, `gender`, `race`, `raceId`, `faceIndex`           | identity, read by the paperdoll and race tables     |
+| `career`, `careerIndex`                                   | the career object (saved whole) and its stock index |
+| `level`, `stats`, `skills`                                | level 1, the eight attributes, the 35 skills        |
+| `maxHealth` / `rawMaxHealth`, `health`                    | `maxHealth` is a getter (see below)                 |
+| `maxMagicka`, `magicka`, `fatigue`                        | derived pools                                       |
+| `skillUses`, `skillsRecentlyRaised`, `lastSkillCheckTime` | advancement counters                                |
+| `startingLevelUpSkillSum`, `currentLevelUpSkillSum`       | the level sums                                      |
+| `chargenDone`, `characterId`                              | creation complete; the save slot identity           |
 
 `defineLiveMaxHealth` makes `maxHealth` an accessor: the stored value, capped by `maxHealthLimiter` (lycanthropy),
 plus online-only layers (Renown health and similar) that are never saved. Any path that builds an entity calls it and
@@ -181,7 +182,8 @@ The firmament is a passive skill tree that applies online only. Offline the char
 - **Equip slots.** `src/characters/paperdoll/paperdoll.js` holds `EQUIP_SLOTS` (DFU's 27-slot table) and the 288 item templates
   (`src/characters/itemTemplates.json`, DFU's ItemTemplates.txt). `equipRules.js` is generated from DFU's
   `ItemEquipTable` (do not hand-edit); `equipTable.js` assigns slots. `src/systems/equip.js` is the runtime API.
-- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE archives, by race
+- **Classic paperdoll.** `src/characters/paperdoll/paperdollArt.js` resolves worn-item art from ARENA2 TEXTURE
+  archives, by race
   morphology, with dyes applied as palette band swaps (`src/characters/dyes.js`).
 - **Morrowind bodies (enhanced skin).** The player, peers, NPCs and foes can stand in Morrowind NIF bodies read from
   the player's own Morrowind data (`src/formats/morrowind/`). `src/combat/fpArm.js` builds the rig;
@@ -192,7 +194,8 @@ The firmament is a passive skill tree that applies online only. Offline the char
   ships that Morrowind lacks; `src/systems/ownMwAssets.js` serves them.
 - **Classic sprites.** Without a Morrowind body, foes and NPCs are DFU's billboards (`enemyBasics.js` textures,
   `src/characters/staticNpc.js`, `src/characters/mobile/`).
-- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`) is parked;
+- The voxel neutral rig (`neutralBody.js`, `raceCharacter.js`, `clothing.js`, `armorSet.js`, `src/characters/pieces/`)
+  is parked;
   it is reachable only behind `?voxelfolk` in `src/scenes/interiorContext.js` and the paperdoll tools.
 
 ## The player entity and the player folder

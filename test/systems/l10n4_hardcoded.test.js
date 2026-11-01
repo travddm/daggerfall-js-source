@@ -774,28 +774,46 @@ const HARDCODED = {
 
 test('L10N4 the ratchet: no file holds more hard-coded English than it did - route a new sentence through t(key, en, args); when a count falls, write the map down again', () => {
   const now = hardcodedCounts();
-  const rose = Object.entries(now).filter(([f, n]) => n > (HARDCODED[f] ?? 0)).map(([f, n]) => `${f}: ${HARDCODED[f] ?? 0} -> ${n}`);
-  assert.deepEqual(rose, [], 'new hard-coded English - a player reads it in English whatever language they chose (tools/l10nHardcoded.mjs <file> lists it)');
-  assert.deepEqual(now, HARDCODED, 'a count fell (words routed, or removed): write the map down again (node tools/l10nHardcoded.mjs)');
+  const rose = Object.entries(now)
+    .filter(([f, n]) => n > (HARDCODED[f] ?? 0))
+    .map(([f, n]) => `${f}: ${HARDCODED[f] ?? 0} -> ${n}`);
+  assert.deepEqual(
+    rose,
+    [],
+    'new hard-coded English - a player reads it in English whatever language they chose (tools/l10nHardcoded.mjs <file> lists it)',
+  );
+  assert.deepEqual(
+    now,
+    HARDCODED,
+    'a count fell (words routed, or removed): write the map down again (node tools/l10nHardcoded.mjs)',
+  );
 });
 
-test('L10N4 the scan itself: prose counted; the text core\'s arguments, console lines, thrown errors, keys, imports, CSS and identifiers not', () => {
+test("L10N4 the scan itself: prose counted; the text core's arguments, console lines, thrown errors, keys, imports, CSS and identifiers not", () => {
   const root = mkdtempSync(join(tmpdir(), 'l10nhard-'));
   try {
     mkdirSync(join(root, 'src/ui'), { recursive: true });
-    writeFileSync(join(root, 'src/ui/a.js'), [
-      "import { t } from '../systems/textManager.js';",   // a fixture's own src/ui/a.js (AUDIT TIDY MERGE-3: re-based by the move, put back)
-      "export const A = 'You have no gold left.';",
-      "export const B = t('ui.gold.none', 'You have no gold left.');",
-      "export function f(n) { console.log('this is a log line'); if (!n) throw new Error('this never shows'); return `${n} coins in the purse`; }",
-      "export const C = { 'Some key here': 1, style: 'margin: 4px 2px', border: '1px solid black', cls: 'hb-slot hb-empty', id: 'fooBar bazQux' };",
-      "export const D = 'Resume';",
-    ].join('\n'));
-    assert.deepEqual(hardcodedStrings(root).map((s) => [s.line, s.text]), [
-      [2, 'You have no gold left.'],
-      [4, ' {}  coins in the purse'],
-    ]);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+    writeFileSync(
+      join(root, 'src/ui/a.js'),
+      [
+        "import { t } from '../systems/textManager.js';", // a fixture's own src/ui/a.js (AUDIT TIDY MERGE-3: re-based by the move, put back)
+        "export const A = 'You have no gold left.';",
+        "export const B = t('ui.gold.none', 'You have no gold left.');",
+        "export function f(n) { console.log('this is a log line'); if (!n) throw new Error('this never shows'); return `${n} coins in the purse`; }",
+        "export const C = { 'Some key here': 1, style: 'margin: 4px 2px', border: '1px solid black', cls: 'hb-slot hb-empty', id: 'fooBar bazQux' };",
+        "export const D = 'Resume';",
+      ].join('\n'),
+    );
+    assert.deepEqual(
+      hardcodedStrings(root).map((s) => [s.line, s.text]),
+      [
+        [2, 'You have no gold left.'],
+        [4, ' {}  coins in the purse'],
+      ],
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
   assert.equal(isProse('The Bank of'), true);
   assert.equal(isProse('Resume'), false, 'one word is not counted (a known gap of the heuristic: a one-word label)');
   assert.equal(isProse('rgba(0, 0, 0, 0.5) solid'), false);
@@ -805,12 +823,19 @@ test('L10N4 the scan itself: prose counted; the text core\'s arguments, console 
   assert.equal(isProse('body .dfiliac button[data-kind="warn"]'), false, 'a kit role naming an attribute');
   assert.equal(isProse('#wp-menu input.wpm-name'), false, 'an id');
   assert.equal(isProse(':scope > .px-tabs button'), false, 'a pseudo-class and a child combinator');
-  assert.equal(isProse('press #1 to win'), true, 'every word could be a selector\'s - but it reads as English');
+  assert.equal(isProse('press #1 to win'), true, "every word could be a selector's - but it reads as English");
   assert.equal(isProse('Warning: gate shut'), true, 'a colon, and no selector in it');
   assert.equal(isProse('click #menu .open to see the map'), true, 'a class and an id among English words');
   // AUDIT CARDS-PLUS D1: no stopword to give them away, and still English - no class in them, or a digit where a name
   // starts (`#1`, `#2` are no ids)
-  for (const s of ['rank #1 player wins', 'press [E] when ready', '[locked] needs more gold', 'item:sword equipped', '#general chat only', 'pay #2 .gold-coins now']) {
+  for (const s of [
+    'rank #1 player wins',
+    'press [E] when ready',
+    '[locked] needs more gold',
+    'item:sword equipped',
+    '#general chat only',
+    'pay #2 .gold-coins now',
+  ]) {
     assert.equal(isProse(s), true, `${s} is English`);
   }
 });

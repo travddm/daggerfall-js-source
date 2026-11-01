@@ -7,16 +7,63 @@ import { STARTING_GOLD } from '../../src/systems/startingGear.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  familyRng, foundFamily, addChild, rollSiblings, recordDeath, successors, newbornAllowed, readFamily,
-  inheritCareer, inheritRace, bloodOf, hearthOf, estateOf, bornValues, heirAnswer, surnameOf, givenOf, writePlayer,
-  siblingsOf, isCustomCareer, MODELS, NO_LINEAGE, DESCENDANTS, SIBLINGS_MAX_DEFAULT, SIBLINGS_CHANCE_DEFAULT, ESTATE_MAX,
-  RACE_INHERIT_CHANCE, CAREER_INHERIT_CHANCE, BLOOD_MAX, HEARTH_MAX, personOf,
+  familyRng,
+  foundFamily,
+  addChild,
+  rollSiblings,
+  recordDeath,
+  successors,
+  newbornAllowed,
+  readFamily,
+  inheritCareer,
+  inheritRace,
+  bloodOf,
+  hearthOf,
+  estateOf,
+  bornValues,
+  heirAnswer,
+  surnameOf,
+  givenOf,
+  writePlayer,
+  siblingsOf,
+  isCustomCareer,
+  MODELS,
+  NO_LINEAGE,
+  DESCENDANTS,
+  SIBLINGS_MAX_DEFAULT,
+  SIBLINGS_CHANCE_DEFAULT,
+  ESTATE_MAX,
+  RACE_INHERIT_CHANCE,
+  CAREER_INHERIT_CHANCE,
+  BLOOD_MAX,
+  HEARTH_MAX,
+  personOf,
 } from '../../src/systems/legacy/family.js';
-import { ageOf, payToll, tollLine, spanOf, startAgeOf, tollYears, isElder, isSpent, YEAR_MINUTES, SPANS } from '../../src/systems/legacy/age.js';
-import { createVampirismCurse, cureVampirism } from '../../src/systems/vampirism.js';   // AGELESS-CURSE: the curses as their producers mint them
+import {
+  ageOf,
+  payToll,
+  tollLine,
+  spanOf,
+  startAgeOf,
+  tollYears,
+  isElder,
+  isSpent,
+  YEAR_MINUTES,
+  SPANS,
+} from '../../src/systems/legacy/age.js';
+import { createVampirismCurse, cureVampirism } from '../../src/systems/vampirism.js'; // AGELESS-CURSE: the curses as their producers mint them
 import { createLycanthropyCurse, cureLycanthropy } from '../../src/systems/lycanthropy.js';
 import { LYCANTHROPY_TYPES, VAMPIRE_CLANS } from '../../src/systems/infection.js';
-import { loadFamily, storeFamily, leaveBirth, readBirth, clearBirth, listFamilies, newestSaveOf, BIRTH_MAX_AGE_MS } from '../../src/systems/legacy/store.js';
+import {
+  loadFamily,
+  storeFamily,
+  leaveBirth,
+  readBirth,
+  clearBirth,
+  listFamilies,
+  newestSaveOf,
+  BIRTH_MAX_AGE_MS,
+} from '../../src/systems/legacy/store.js';
 import { birthSearch, loadSearch, nearestTown, townAt } from '../../src/systems/legacy/places.js';
 import { layoutTree } from '../../src/systems/legacy/tree.js';
 import { createLegacyHost } from '../../src/scenes/legacyHost.js';
@@ -33,19 +80,55 @@ const rd = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
 
 /** A played character as the port's entity carries one (chargen.applyCharacter's fields). */
 const entity = (over = {}) => ({
-  name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', raceId: 4, faceIndex: 3, careerIndex: 5,
-  career: { name: 'Nightblade', primarySkills: [28, 22, 16], majorSkills: [19, 24, 13], minorSkills: [1, 2, 3, 4, 5, 6] },
-  level: 7, characterId: 'c-ysolde', chargenDone: true,
-  stats: { strength: 60, intelligence: 72, willpower: 55, agility: 80, endurance: 50, personality: 40, speed: 70, luck: 50 },
+  name: 'Ysolde Hlaalu',
+  gender: 'female',
+  race: 'DarkElf',
+  raceId: 4,
+  faceIndex: 3,
+  careerIndex: 5,
+  career: {
+    name: 'Nightblade',
+    primarySkills: [28, 22, 16],
+    majorSkills: [19, 24, 13],
+    minorSkills: [1, 2, 3, 4, 5, 6],
+  },
+  level: 7,
+  characterId: 'c-ysolde',
+  chargenDone: true,
+  stats: {
+    strength: 60,
+    intelligence: 72,
+    willpower: 55,
+    agility: 80,
+    endurance: 50,
+    personality: 40,
+    speed: 70,
+    luck: 50,
+  },
   skills: Array.from({ length: 35 }, (_, i) => 10 + i),
   ...over,
 });
 /** A [0,1) stream that answers the listed values in turn, then 0.5. */
-const seq = (...v) => { let i = 0; return () => (i < v.length ? v[i++] : 0.5); };
+const seq = (...v) => {
+  let i = 0;
+  return () => (i < v.length ? v[i++] : 0.5);
+};
 /** An in-memory Storage. */
 const memStore = () => {
   const m = new Map();
-  return { get length() { return m.size; }, key: (i) => [...m.keys()][i] ?? null, getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); } };
+  return {
+    get length() {
+      return m.size;
+    },
+    key: (i) => [...m.keys()][i] ?? null,
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => {
+      m.set(k, String(v));
+    },
+    removeItem: (k) => {
+      m.delete(k);
+    },
+  };
 };
 
 test('LEGACY1 B5: the career is drawn by index over all eighteen - Mage (0) reachable, None never', () => {
@@ -55,18 +138,28 @@ test('LEGACY1 B5: the career is drawn by index over all eighteen - Mage (0) reac
   assert.deepEqual(inheritCareer(null, seq(0.9999)), { careerIndex: 17, className: 'Knight', career: null });
   const seen = new Set();
   for (let i = 0; i < 18; i++) seen.add(inheritCareer(null, seq((i + 0.5) / 18)).careerIndex);
-  assert.deepEqual([...seen].sort((a, b) => a - b), CLASS_CAREERS.map((_, i) => i));
+  assert.deepEqual(
+    [...seen].sort((a, b) => a - b),
+    CLASS_CAREERS.map((_, i) => i),
+  );
   // the parent's career at CAREER_INHERIT_CHANCE - a custom career whole, a stock one read fresh at the birth
   const parent = writePlayer(foundFamily(entity()).people[0], entity());
   assert.equal(CAREER_INHERIT_CHANCE, 0.5);
   assert.deepEqual(inheritCareer(parent, seq(0.49)), { careerIndex: 5, className: 'Nightblade', career: null });
-  const custom = writePlayer(foundFamily(entity()).people[0], entity({ career: { name: 'Spellthief', primarySkills: [13], majorSkills: [], minorSkills: [] } }));
+  const custom = writePlayer(
+    foundFamily(entity()).people[0],
+    entity({ career: { name: 'Spellthief', primarySkills: [13], majorSkills: [], minorSkills: [] } }),
+  );
   assert.equal(isCustomCareer(custom), true);
-  assert.equal(inheritCareer(custom, seq(0.1)).career.name, 'Spellthief', 'a custom career is inherited as itself (S2)');
+  assert.equal(
+    inheritCareer(custom, seq(0.1)).career.name,
+    'Spellthief',
+    'a custom career is inherited as itself (S2)',
+  );
   assert.equal(inheritCareer(parent, seq(0.5, 0)).careerIndex, 0, 'the roll past the chance draws from the eighteen');
 });
 
-test('LEGACY1 B4: the parent\'s race is the 70% roll\'s, not a certainty', () => {
+test("LEGACY1 B4: the parent's race is the 70% roll's, not a certainty", () => {
   const p = { race: 'Nord' };
   assert.equal(RACE_INHERIT_CHANCE, 0.7);
   assert.equal(inheritRace(p, null, seq(0.69)), 'Nord');
@@ -78,27 +171,69 @@ test('LEGACY1 B4: the parent\'s race is the 70% roll\'s, not a certainty', () =>
 test('LEGACY1 B3: the blood and the hearth - the parent hands something down, within bounds', () => {
   assert.equal(BLOOD_MAX, 3);
   assert.equal(HEARTH_MAX, 3);
-  const b = bloodOf({ stats: { strength: 85, intelligence: 50, willpower: 64, agility: 100, endurance: 20, personality: 55, speed: 66, luck: 45 } });
-  assert.deepEqual(b, { strength: 3, intelligence: 0, willpower: 1, agility: 3, endurance: 0, personality: 1, speed: 2, luck: 0 });
+  const b = bloodOf({
+    stats: {
+      strength: 85,
+      intelligence: 50,
+      willpower: 64,
+      agility: 100,
+      endurance: 20,
+      personality: 55,
+      speed: 66,
+      luck: 45,
+    },
+  });
+  assert.deepEqual(b, {
+    strength: 3,
+    intelligence: 0,
+    willpower: 1,
+    agility: 3,
+    endurance: 0,
+    personality: 1,
+    speed: 2,
+    luck: 0,
+  });
   // the better of two parents
   assert.equal(bloodOf({ stats: { strength: 50 } }, { stats: { strength: 72 } }).strength, 2);
-  const parent = writePlayer(foundFamily(entity()).people[0], entity({ skills: Array.from({ length: 35 }, (_, i) => (i === 28 ? 95 : i === 19 ? 40 : 10)) }));
+  const parent = writePlayer(
+    foundFamily(entity()).people[0],
+    entity({ skills: Array.from({ length: 35 }, (_, i) => (i === 28 ? 95 : i === 19 ? 40 : 10)) }),
+  );
   const h = hearthOf(parent);
   assert.equal(h[28], 3, 'a primary at 95: floor(95/20)=4, held to 3');
   assert.equal(h[19], 2, 'a major at 40: 2');
   assert.equal(h[1], undefined, 'a minor hands down nothing');
   // and they land on DFU's own roll, never past 100
-  const v = bornValues({ blood: { strength: 3, luck: 1 }, hearth: { 28: 3 } }, { stats: { strength: 99, intelligence: 40, willpower: 40, agility: 40, endurance: 40, personality: 40, speed: 40, luck: 40 }, skills: Array.from({ length: 35 }, () => 30) });
+  const v = bornValues(
+    { blood: { strength: 3, luck: 1 }, hearth: { 28: 3 } },
+    {
+      stats: {
+        strength: 99,
+        intelligence: 40,
+        willpower: 40,
+        agility: 40,
+        endurance: 40,
+        personality: 40,
+        speed: 40,
+        luck: 40,
+      },
+      skills: Array.from({ length: 35 }, () => 30),
+    },
+  );
   assert.equal(v.stats.strength, 100);
   assert.equal(v.stats.luck, 41);
   assert.equal(v.skills[28], 33);
   assert.equal(v.skills[27], 30);
 });
 
-test('LEGACY1: the estate is a quarter of the purse, held to the online birth\'s liquid ceiling', () => {
+test("LEGACY1: the estate is a quarter of the purse, held to the online birth's liquid ceiling", () => {
   // AUDIT LEGACY H7: what fits UNDER the realm's birth ceiling beside the gold every birth carries - the ceiling itself
   // gave a born heir 10,100 of liquid wealth, over the law it claimed to meet
-  assert.equal(ESTATE_MAX + STARTING_GOLD, REALM_BIRTH_WEALTH_MAX, 'the restated ceiling is the realm law\'s, less the starting purse');
+  assert.equal(
+    ESTATE_MAX + STARTING_GOLD,
+    REALM_BIRTH_WEALTH_MAX,
+    "the restated ceiling is the realm law's, less the starting purse",
+  );
   assert.equal(estateOf(1000), 250);
   assert.equal(estateOf(1003), 250);
   assert.equal(estateOf(100_000), ESTATE_MAX);
@@ -125,10 +260,25 @@ test('LEGACY1 B14: siblings appear on a fresh install - the settings ship 2 and 
   // the founder's siblings are parentless members of generation 0
   const sibs = rollSiblings(f, 1, { rng: seq(0.2, 0.99), settings: { maxSiblings: 2, siblingChance: 50 } });
   assert.equal(sibs.length, 2);
-  for (const s of sibs) { assert.equal(s.gen, 0); assert.deepEqual(s.parents, []); assert.equal(s.surname, 'Hlaalu'); }
-  assert.deepEqual(siblingsOf(f, f.people[0]).map((p) => p.id), sibs.map((p) => p.id));
-  assert.deepEqual(rollSiblings(f, 1, { rng: seq(0.5), settings: { maxSiblings: 2, siblingChance: 50 } }), [], 'a roll at the probability fails');
-  assert.deepEqual(rollSiblings(f, 1, { rng: seq(0), settings: { maxSiblings: 0, siblingChance: 100 } }), [], 'the mod\'s 0 is honoured as none');
+  for (const s of sibs) {
+    assert.equal(s.gen, 0);
+    assert.deepEqual(s.parents, []);
+    assert.equal(s.surname, 'Hlaalu');
+  }
+  assert.deepEqual(
+    siblingsOf(f, f.people[0]).map((p) => p.id),
+    sibs.map((p) => p.id),
+  );
+  assert.deepEqual(
+    rollSiblings(f, 1, { rng: seq(0.5), settings: { maxSiblings: 2, siblingChance: 50 } }),
+    [],
+    'a roll at the probability fails',
+  );
+  assert.deepEqual(
+    rollSiblings(f, 1, { rng: seq(0), settings: { maxSiblings: 0, siblingChance: 100 } }),
+    [],
+    "the mod's 0 is honoured as none",
+  );
 });
 
 test('LEGACY1 B6/D3/D5: a child is generation +1 in one place, born with a face of their own, linked both ways', () => {
@@ -138,18 +288,25 @@ test('LEGACY1 B6/D3/D5: a child is generation +1 in one place, born with a face 
   assert.deepEqual(c.parents, [1]);
   assert.ok(f.people[0].children.includes(c.id));
   assert.ok(c.face >= 0 && c.face < 10);
-  assert.equal(c.id, 2, 'ids from the record\'s own counter');
+  assert.equal(c.id, 2, "ids from the record's own counter");
   assert.equal(f.nextId, 3);
   assert.equal(c.startAge, startAgeOf(c.race));
 });
 
-test('LEGACY1: the lore surname change - the family\'s name nine times in ten, a new one the tenth', () => {
+test("LEGACY1: the lore surname change - the family's name nine times in ten, a new one the tenth", () => {
   const f = foundFamily(entity(), { id: 'fam-s' });
   // addChild's draws: gender, race, face, career (x1 or x2), then the bank seed, then the keep roll
-  let keeps = 0, changes = 0;
+  let keeps = 0,
+    changes = 0;
   for (let i = 0; i < 200; i++) {
     const { person, changed } = addChild(f, 1, { rng: familyRng(1000 + i) });
-    if (changed) { changes++; assert.notEqual(person.surname, 'Hlaalu'); } else { keeps++; assert.equal(person.surname, 'Hlaalu'); }
+    if (changed) {
+      changes++;
+      assert.notEqual(person.surname, 'Hlaalu');
+    } else {
+      keeps++;
+      assert.equal(person.surname, 'Hlaalu');
+    }
   }
   assert.ok(keeps > 150 && changes > 5, `kept ${keeps}, changed ${changes}`);
   assert.equal(surnameOf('Ysolde Hlaalu'), 'Hlaalu');
@@ -159,7 +316,7 @@ test('LEGACY1: the lore surname change - the family\'s name nine times in ten, a
 
 test('LEGACY1 D6: the record keeps the PERMANENT stats and skills, never a live bonus', () => {
   const e = entity();
-  e.statMods = { strength: 40 };   // a Fortify riding beside the permanent value (systems/statMods.js)
+  e.statMods = { strength: 40 }; // a Fortify riding beside the permanent value (systems/statMods.js)
   const p = writePlayer(foundFamily(e).people[0], e);
   assert.equal(p.stats.strength, 60);
   assert.equal(p.skills.length, 35);
@@ -183,15 +340,31 @@ test('LEGACY1: who may carry the line - the living of the blood, not the one pla
   const { person: kid } = addChild(f, 1, { rng: familyRng(1) });
   f.people.push({ ...personOf(f, 2), id: 9, kind: 'resident', parents: [], children: [] });
   f.nextId = 10;
-  assert.deepEqual(successors(f).map((p) => p.id), [kid.id], 'the one played, alive, never succeeds themself');
+  assert.deepEqual(
+    successors(f).map((p) => p.id),
+    [kid.id],
+    'the one played, alive, never succeeds themself',
+  );
   recordDeath(f, 1, { at: 1 });
-  assert.deepEqual(successors(f).map((p) => p.id), [kid.id]);
+  assert.deepEqual(
+    successors(f).map((p) => p.id),
+    [kid.id],
+  );
   recordDeath(f, kid.id, { at: 2 });
   assert.deepEqual(successors(f), []);
 });
 
-test('LEGACY2: the span and Arkay\'s toll - an Enduring death costs years, and the span spent makes the next the last', () => {
-  assert.deepEqual(SPANS, { Breton: 90, Nord: 90, Redguard: 80, Khajiit: 85, Argonian: 85, WoodElf: 150, DarkElf: 180, HighElf: 200 });
+test("LEGACY2: the span and Arkay's toll - an Enduring death costs years, and the span spent makes the next the last", () => {
+  assert.deepEqual(SPANS, {
+    Breton: 90,
+    Nord: 90,
+    Redguard: 80,
+    Khajiit: 85,
+    Argonian: 85,
+    WoodElf: 150,
+    DarkElf: 180,
+    HighElf: 200,
+  });
   assert.equal(YEAR_MINUTES, 360 * 1440);
   const p = { race: 'Breton', startAge: startAgeOf('Breton'), toll: 0 };
   assert.equal(p.startAge, 23);
@@ -203,31 +376,45 @@ test('LEGACY2: the span and Arkay\'s toll - an Enduring death costs years, and t
   assert.deepEqual(first, { final: false, years: 5, age: 28, spent: false });
   assert.equal(p.toll, 5);
   assert.equal(isElder(p, 0), false);
-  p.toll = 45;   // 68 = the elder's three quarters of 90 (67.5 -> 68)
+  p.toll = 45; // 68 = the elder's three quarters of 90 (67.5 -> 68)
   assert.equal(isElder(p, 0), true);
-  p.toll = 63;   // 86: one more toll spends it
+  p.toll = 63; // 86: one more toll spends it
   const last = payToll(p, 0.06, 0);
   assert.equal(last.final, false, 'the death that spends the span still rises');
   assert.equal(last.spent, true);
   assert.equal(isSpent(p, 0), true);
   assert.deepEqual(payToll(p, 0.06, 0), { final: true, years: 0, age: 91, spent: true }, 'and the next is final');
-  assert.equal(spanOf('Imperial'), 90, 'an unknown race reads as a Breton\'s span');
+  assert.equal(spanOf('Imperial'), 90, "an unknown race reads as a Breton's span");
 });
 
-test('AGELESS-CURSE the law: the curse in the blood holds Arkay\'s hand - no years taken, no span spent, the cursed always rise, even with the span spent; cured, the toll is theirs again; the rise says why (mutants: the toll taken from the cursed; a spent vampire dies of years; the line the toll\'s)', () => {
+test("AGELESS-CURSE the law: the curse in the blood holds Arkay's hand - no years taken, no span spent, the cursed always rise, even with the span spent; cured, the toll is theirs again; the rise says why (mutants: the toll taken from the cursed; a spent vampire dies of years; the line the toll's)", () => {
   const p = { race: 'Breton', startAge: startAgeOf('Breton'), toll: 10 };
-  assert.deepEqual(payToll(p, 0.06, 0, { ageless: true }), { final: false, years: 0, age: 33, spent: false, ageless: true });
+  assert.deepEqual(payToll(p, 0.06, 0, { ageless: true }), {
+    final: false,
+    years: 0,
+    age: 33,
+    spent: false,
+    ageless: true,
+  });
   assert.equal(p.toll, 10, 'no years taken');
-  p.toll = 80;   // 103 of a Breton's 90: spent
+  p.toll = 80; // 103 of a Breton's 90: spent
   assert.equal(isSpent(p, 0), true);
   assert.equal(payToll(p, 0.06, 0, { ageless: true }).final, false, 'a spent vampire still rises');
   assert.equal(payToll(p, 0.06, 0).final, true, 'cured, the spent die of their years');
-  assert.equal(tollLine('Ysolde', { years: 0, age: 33, spent: false, ageless: true }), 'The curse in Ysolde\'s blood keeps Arkay at bay. No years are taken.');
-  assert.equal(tollLine('Ysolde', { years: 5, age: 28, spent: false }), 'Arkay takes 5 years for the road back. Ysolde is 28.', 'the uncursed line unchanged');
+  assert.equal(
+    tollLine('Ysolde', { years: 0, age: 33, spent: false, ageless: true }),
+    "The curse in Ysolde's blood keeps Arkay at bay. No years are taken.",
+  );
+  assert.equal(
+    tollLine('Ysolde', { years: 5, age: 28, spent: false }),
+    'Arkay takes 5 years for the road back. Ysolde is 28.',
+    'the uncursed line unchanged',
+  );
 });
 
 test('LEGACY1: the store keeps the newer copy, and a birth waits across the reload for its own person until the born member is saved', () => {
-  const s = memStore(), tab = memStore();
+  const s = memStore(),
+    tab = memStore();
   const f = foundFamily(entity(), { id: 'fam-st' });
   assert.equal(storeFamily(s, f), true);
   const stored = loadFamily(s, 'fam-st');
@@ -239,16 +426,27 @@ test('LEGACY1: the store keeps the newer copy, and a birth waits across the relo
   assert.ok(loadFamily(s, 'fam-st').people[0].died, 'the death the store held stands');
   assert.equal(loadFamily(s, 'fam-st').rev, 10, 'one past both');
   assert.ok(older.people[0].died, 'and the older copy plays on knowing it');
-  assert.deepEqual(listFamilies(s).map((x) => x.id), ['fam-st']);
+  assert.deepEqual(
+    listFamilies(s).map((x) => x.id),
+    ['fam-st'],
+  );
   leaveBirth(tab, { familyId: 'fam-st', personId: 4, region: 'Daggerfall', loc: 'Gothway Garden', estate: 0 }, 1000);
-  assert.equal(readBirth(tab, 5, 1001), null, 'another person\'s address births nobody');
+  assert.equal(readBirth(tab, 5, 1001), null, "another person's address births nobody");
   assert.equal(readBirth(tab, 4, 1000 + BIRTH_MAX_AGE_MS + 1), null, 'a stale handoff is never read');
   const born = { familyId: 'fam-st', personId: 4, region: 'Daggerfall', loc: 'Gothway Garden', estate: 0 };
   assert.deepEqual(readBirth(tab, 4, 2000), born);
-  assert.deepEqual(readBirth(tab, 4, 2000), born, 'AUDIT LEGACY B7: read, not taken - a birth whose boot failed is there to retry');
+  assert.deepEqual(
+    readBirth(tab, 4, 2000),
+    born,
+    'AUDIT LEGACY B7: read, not taken - a birth whose boot failed is there to retry',
+  );
   clearBirth(tab);
   assert.equal(readBirth(tab, 4, 2000), null, 'the born member saved, the handoff is answered');
-  const info = new Map([[3, { characterId: 'a', dateAndTime: { realTime: 5 } }], [7, { characterId: 'a', dateAndTime: { realTime: 9 } }], [8, { characterId: 'b', dateAndTime: { realTime: 99 } }]]);
+  const info = new Map([
+    [3, { characterId: 'a', dateAndTime: { realTime: 5 } }],
+    [7, { characterId: 'a', dateAndTime: { realTime: 9 } }],
+    [8, { characterId: 'b', dateAndTime: { realTime: 99 } }],
+  ]);
   assert.equal(newestSaveOf(info, 'a'), 7);
   assert.equal(newestSaveOf(info, 'z'), -1);
 });
@@ -266,7 +464,9 @@ test('LEGACY1 B11: the heir is born in a TOWN by name, never a coordinate pair',
   assert.equal(near.loc, 'Ashbury');
   assert.equal(townAt(region, 'Daggerfall', near.pixel)?.loc, 'Ashbury');
   assert.equal(townAt(region, 'Daggerfall', { x: 1, y: 1 }), null);
-  const q = new URLSearchParams(birthSearch('?world&load&loadkey=3&classic', 4, { region: 'Daggerfall', loc: 'Ashbury' }));
+  const q = new URLSearchParams(
+    birthSearch('?world&load&loadkey=3&classic', 4, { region: 'Daggerfall', loc: 'Ashbury' }),
+  );
   assert.equal(q.get('legacyborn'), '4');
   assert.equal(q.get('loc'), 'Ashbury');
   for (const k of ['load', 'loadkey', 'classic']) assert.equal(q.has(k), false, `${k} never rides into a birth`);
@@ -275,15 +475,15 @@ test('LEGACY1 B11: the heir is born in a TOWN by name, never a coordinate pair',
   assert.equal(new URLSearchParams(birthSearch('?online=1', 4, null)).get('world'), '1');
   const l = new URLSearchParams(loadSearch('?legacyborn=4&region=X&loc=Y', 12));
   assert.equal(l.get('world'), '1');
-  assert.equal(l.get('load'), '1', 'the menu\'s Load door, as main.js sets it');
-  assert.equal(l.get('classic'), '1', 'over the classic start, as the menu\'s Load');
+  assert.equal(l.get('load'), '1', "the menu's Load door, as main.js sets it");
+  assert.equal(l.get('classic'), '1', "over the classic start, as the menu's Load");
   assert.equal(l.get('loadkey'), '12');
   for (const k of ['legacyborn', 'region', 'loc']) assert.equal(l.has(k), false, `${k} never rides into a load`);
 });
 
 test('LEGACY3 U5: the tree is a pure layout of the record - generations as rows, children under their parent', () => {
   const f = foundFamily(entity(), { id: 'fam-t' });
-  rollSiblings(f, 1, { rng: seq(0, 0.99), settings: { maxSiblings: 1, siblingChance: 100 } });   // one founder-sibling
+  rollSiblings(f, 1, { rng: seq(0, 0.99), settings: { maxSiblings: 1, siblingChance: 100 } }); // one founder-sibling
   const a = addChild(f, 1, { rng: familyRng(2) }).person;
   const b = addChild(f, 1, { rng: familyRng(3) }).person;
   const g = addChild(f, a.id, { rng: familyRng(4) }).person;
@@ -293,7 +493,10 @@ test('LEGACY3 U5: the tree is a pure layout of the record - generations as rows,
   assert.equal(at.get(1).y, 0);
   assert.equal(at.get(a.id).y, 1);
   assert.equal(at.get(g.id).y, 2);
-  assert.ok(at.get(1).x >= at.get(a.id).x && at.get(1).x <= at.get(b.id).x, 'the parent sits over the span of their children');
+  assert.ok(
+    at.get(1).x >= at.get(a.id).x && at.get(1).x <= at.get(b.id).x,
+    'the parent sits over the span of their children',
+  );
   assert.deepEqual(t.families.find((x) => x.parents[0] === 1).children, [a.id, b.id]);
   assert.equal(t.depth, 3);
   assert.deepEqual(layoutTree(f), t, 'the same record lays out the same tree (no static root)');
@@ -302,9 +505,10 @@ test('LEGACY3 U5: the tree is a pure layout of the record - generations as rows,
 test('LEGACY3 U1: the wheel zooms about the pointer - the point under it stays under it', () => {
   const v = { zoom: 1, x: 40, y: 20 };
   const z = zoomAbout(v, 1.5, 200, 100);
-  const worldX = (200 - v.x) / v.zoom, worldY = (100 - v.y) / v.zoom;
-  assert.ok(Math.abs((z.x + worldX * z.zoom) - 200) < 1e-9);
-  assert.ok(Math.abs((z.y + worldY * z.zoom) - 100) < 1e-9);
+  const worldX = (200 - v.x) / v.zoom,
+    worldY = (100 - v.y) / v.zoom;
+  assert.ok(Math.abs(z.x + worldX * z.zoom - 200) < 1e-9);
+  assert.ok(Math.abs(z.y + worldY * z.zoom - 100) < 1e-9);
   assert.equal(zoomAbout({ zoom: 1.6, x: 0, y: 0 }, 2, 0, 0).zoom, 1.6, 'held to the range');
   const c = centreOn({ x: 2, y: 1 }, 500, 300, 1);
   assert.deepEqual(c, { x: 250 - (200 + 39), y: 150 - (136 + 48) });
@@ -313,55 +517,110 @@ test('LEGACY3 U1: the wheel zooms about the pointer - the point under it stays u
 test('LEGACY3 U2: the dead, the played and the not-yet-played each wear their own word', () => {
   const f = foundFamily(entity(), { id: 'fam-c' });
   const k = addChild(f, 1, { rng: familyRng(5) }).person;
-  assert.deepEqual(personChips(f, f.people[0], 0).map((c) => c.text), ['Played']);
-  assert.deepEqual(personChips(f, k, 0).map((c) => c.text), ['Not yet played']);
+  assert.deepEqual(
+    personChips(f, f.people[0], 0).map((c) => c.text),
+    ['Played'],
+  );
+  assert.deepEqual(
+    personChips(f, k, 0).map((c) => c.text),
+    ['Not yet played'],
+  );
   recordDeath(f, k.id, { at: 1, cause: 'years' });
-  assert.deepEqual(personChips(f, k, 0).map((c) => c.text), ['Died of years']);
+  assert.deepEqual(
+    personChips(f, k, 0).map((c) => c.text),
+    ['Died of years'],
+  );
 });
 
 test('LEGACY2: the model question offers Enduring first - Enter without reading never costs a character', () => {
   const o = legacyModelOptions({ online: false, tollShare: 0.06 });
-  assert.deepEqual(o.map((x) => x.id), [MODELS.enduring, MODELS.bloodline]);
+  assert.deepEqual(
+    o.map((x) => x.id),
+    [MODELS.enduring, MODELS.bloodline],
+  );
   assert.ok(o.every((x) => !x.locked));
   assert.match(o[0].lines[1], /Arkay takes 6% of a lifespan/);
-  assert.match(legacyModelOptions({ online: false, tollShare: 0.1 })[0].lines[1], /Arkay takes 10% of a lifespan/, 'AUDIT LEGACY U7: the toll a death will charge, not the Standard\'s');
+  assert.match(
+    legacyModelOptions({ online: false, tollShare: 0.1 })[0].lines[1],
+    /Arkay takes 10% of a lifespan/,
+    "AUDIT LEGACY U7: the toll a death will charge, not the Standard's",
+  );
   const on = legacyModelOptions({ online: true, tollShare: 0.06 });
-  assert.deepEqual(on.map((x) => [x.id, x.locked]), [[MODELS.enduring, false], [MODELS.bloodline, false], [NO_LINEAGE, false]], 'LEGACY7: online Bloodline is open - the realm holds the line');
-  assert.deepEqual([on[1].lines[3], o[1].lines[3]], ['With no one left, the line ends.', 'With no one left, the line ends.']);
+  assert.deepEqual(
+    on.map((x) => [x.id, x.locked]),
+    [
+      [MODELS.enduring, false],
+      [MODELS.bloodline, false],
+      [NO_LINEAGE, false],
+    ],
+    'LEGACY7: online Bloodline is open - the realm holds the line',
+  );
+  assert.deepEqual(
+    [on[1].lines[3], o[1].lines[3]],
+    ['With no one left, the line ends.', 'With no one left, the line ends.'],
+  );
   assert.match(on[1].lines[4], /^Online, a death is final on every device\.$/);
   assert.equal(o[1].lines.length, 4, 'offline, the four lines as before');
 });
 
-test('LEGACY-KEY: the family tree is its own action with a free default, and the mod\'s keys are the registry\'s', () => {
+test("LEGACY-KEY: the family tree is its own action with a free default, and the mod's keys are the registry's", () => {
   const owner = new Map(DEFAULT_BINDINGS.map(([c, a]) => [a, c]));
   assert.equal(owner.get('LegacyFamily'), 'NumpadDivide');
-  assert.deepEqual(MOD_ACTIONS['project-legacy'].map((r) => r.action), ['LegacyFamily']);
+  assert.deepEqual(
+    MOD_ACTIONS['project-legacy'].map((r) => r.action),
+    ['LegacyFamily'],
+  );
 });
 
 // ---- the host, headless ------------------------------------------------------------------------------------------
 
 function hostWorld({ model = MODELS.bloodline, gold = 1000, online = false } = {}) {
   _resetModSaveData();
-  const storage = memStore(), tab = memStore();
+  const storage = memStore(),
+    tab = memStore();
   const said = [];
   const booted = [];
   const loads = [];
   const world = { own: 0, now: 100, fight: false };
   const e = entity();
   const host = createLegacyHost({
-    entity: e, storage: () => storage, tab: () => tab, on: () => true, online: () => online,
-    now: () => world.now, own: () => world.own,
-    here: () => ({ pixel: { x: 10, y: 20 }, region: 'Daggerfall', mode: 'exterior', loc: 'Gothway Garden', locationType: LOCATION_TYPES.TownCity }),
-    town: (h) => ({ region: h.region, loc: h.loc }), nearestTown: () => ({ region: 'Daggerfall', loc: 'Gothway Garden' }),
-    gold: () => gold, say: (l) => said.push(l), boot: (s) => booted.push(s), search: () => '?world',
-    loadCharacter: (cid) => { loads.push(cid); return true; }, saveNow: () => { said.push('saved'); return true; },
-    inFight: () => world.fight, payEstate: (n) => said.push(`estate ${n}`), rng: familyRng(99),
+    entity: e,
+    storage: () => storage,
+    tab: () => tab,
+    on: () => true,
+    online: () => online,
+    now: () => world.now,
+    own: () => world.own,
+    here: () => ({
+      pixel: { x: 10, y: 20 },
+      region: 'Daggerfall',
+      mode: 'exterior',
+      loc: 'Gothway Garden',
+      locationType: LOCATION_TYPES.TownCity,
+    }),
+    town: (h) => ({ region: h.region, loc: h.loc }),
+    nearestTown: () => ({ region: 'Daggerfall', loc: 'Gothway Garden' }),
+    gold: () => gold,
+    say: (l) => said.push(l),
+    boot: (s) => booted.push(s),
+    search: () => '?world',
+    loadCharacter: (cid) => {
+      loads.push(cid);
+      return true;
+    },
+    saveNow: () => {
+      said.push('saved');
+      return true;
+    },
+    inFight: () => world.fight,
+    payEstate: (n) => said.push(`estate ${n}`),
+    rng: familyRng(99),
   });
   host.found(model);
   return { host, storage, tab, said, booted, loads, world, e };
 }
 
-test('LEGACY1: a Bloodline death falls - written dead, the estate set aside, the Succession\'s choices answered', () => {
+test("LEGACY1: a Bloodline death falls - written dead, the estate set aside, the Succession's choices answered", () => {
   const w = hostWorld();
   const fam = w.host.family;
   assert.equal(fam.model, MODELS.bloodline);
@@ -371,8 +630,16 @@ test('LEGACY1: a Bloodline death falls - written dead, the estate set aside, the
   assert.equal(out.estate, 250);
   assert.ok(fam.people[0].died, 'B13: the fallen is written dead');
   assert.equal(loadFamily(w.storage, fam.id).people[0].died.cause, 'fell', 'and the store knows it');
-  assert.equal(loadFamily(w.storage, fam.id).pending.estate, 250, 'AUDIT LEGACY A4: the Succession waits ON THE RECORD');
-  assert.equal(w.host.deathOutcome().kind, 'fall', 'a second reset presents the waiting Succession again - never the classic end over a line that goes on');
+  assert.equal(
+    loadFamily(w.storage, fam.id).pending.estate,
+    250,
+    'AUDIT LEGACY A4: the Succession waits ON THE RECORD',
+  );
+  assert.equal(
+    w.host.deathOutcome().kind,
+    'fall',
+    'a second reset presents the waiting Succession again - never the classic end over a line that goes on',
+  );
   // a newborn heir of the fallen: a child, the estate on them, the boot asked with their birth
   assert.equal(w.host.succeed({ newborn: true }), true);
   assert.equal(fam.pending.estate, 250, 'the estate waits on the record until the heir is born');
@@ -416,11 +683,19 @@ test('LEGACY2: an Enduring death rises with the toll, until the span is spent', 
   assert.equal(last.newborn, p.heir === true);
 });
 
-test('AGELESS-CURSE at the death door: an Enduring vampire, werewolf or wereboar rises with no toll - their span spent or not - and cured, pays it again and dies of their years (mutants: the host asks no curse; the vampire\'s curse forgotten; the lycanthrope\'s forgotten)', () => {
+test("AGELESS-CURSE at the death door: an Enduring vampire, werewolf or wereboar rises with no toll - their span spent or not - and cured, pays it again and dies of their years (mutants: the host asks no curse; the vampire's curse forgotten; the lycanthrope's forgotten)", () => {
   const curses = [
     ['vampire', (e) => createVampirismCurse(e, VAMPIRE_CLANS.Lyrezi), (e) => cureVampirism(e)],
-    ['werewolf', (e) => createLycanthropyCurse(e, LYCANTHROPY_TYPES.Werewolf, { rolls: () => 0 }), (e) => cureLycanthropy(e)],
-    ['wereboar', (e) => createLycanthropyCurse(e, LYCANTHROPY_TYPES.Wereboar, { rolls: () => 0 }), (e) => cureLycanthropy(e)],
+    [
+      'werewolf',
+      (e) => createLycanthropyCurse(e, LYCANTHROPY_TYPES.Werewolf, { rolls: () => 0 }),
+      (e) => cureLycanthropy(e),
+    ],
+    [
+      'wereboar',
+      (e) => createLycanthropyCurse(e, LYCANTHROPY_TYPES.Wereboar, { rolls: () => 0 }),
+      (e) => cureLycanthropy(e),
+    ],
   ];
   for (const [kind, curse, cure] of curses) {
     const w = hostWorld({ model: MODELS.enduring });
@@ -428,7 +703,11 @@ test('AGELESS-CURSE at the death door: an Enduring vampire, werewolf or wereboar
     assert.ok(curse(w.e), `${kind}: the producer's curse`);
     const out = w.host.deathOutcome();
     assert.equal(out.kind, 'rise', `${kind}: rises`);
-    assert.equal(out.line, 'The curse in Ysolde\'s blood keeps Arkay at bay. No years are taken.', `${kind}: and says why`);
+    assert.equal(
+      out.line,
+      "The curse in Ysolde's blood keeps Arkay at bay. No years are taken.",
+      `${kind}: and says why`,
+    );
     assert.equal(p.toll | 0, 0, `${kind}: no years taken`);
     p.toll = 500;
     assert.equal(w.host.deathOutcome().kind, 'rise', `${kind}: the span spent, still rises`);
@@ -462,9 +741,8 @@ test('LEGACY1: the save carries the family and a newer store copy wins at the lo
   // the store moves on (the member dies), then the older save is loaded
   w.host.deathOutcome();
   restoreModSaveRecords({ ProjectLegacy: rec });
-  assert.ok(w.host.family.people[0].died, 'the store\'s newer copy stands over the save\'s');
+  assert.ok(w.host.family.people[0].died, "the store's newer copy stands over the save's");
   const said = w.host.tick();
-  assert.equal(said?.past?.id, 1, 'and the dead member\'s save is answered as the past');
-  assert.equal(said.fall?.kind, 'fall', '...with the line\'s waiting Succession');
+  assert.equal(said?.past?.id, 1, "and the dead member's save is answered as the past");
+  assert.equal(said.fall?.kind, 'fall', "...with the line's waiting Succession");
 });
-

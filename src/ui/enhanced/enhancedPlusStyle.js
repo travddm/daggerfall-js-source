@@ -9,30 +9,35 @@
 // dress, which the refresh wrote INTO the enhanced sheet, moved here whole. The kit goes LAST, as it always did.
 import { FRAME_CSS, LAYOUT_CSS, PLUS_THEMES, DEFAULT_PLUS_THEME, FRAME_TONES } from './enhancedFrame.js';
 import { getPref, setPref } from '../../systems/uiPrefs.js';
-import { PIXEL_STACK, PIXEL_FONT_CSS, PIXEL_FACE_CSS } from '../pixelifyFive.js';   // PLUS7; PLUS-DRESS: the whole trio for the sheets that forgot it
+import { PIXEL_STACK, PIXEL_FONT_CSS, PIXEL_FACE_CSS } from '../pixelifyFive.js'; // PLUS7; PLUS-DRESS: the whole trio for the sheets that forgot it
 import { DIALOG_CSS } from './enhancedDialogStyle.js';
 import { PORT_CSS } from './enhancedPortStyle.js';
 import { LV2_CSS } from '../levelUp/levelUpStyle.js';
 import { MOTION_CSS } from '../windowMotion.js';
-import { CURSOR_CSS } from '../plus/plusCursor.js';   // PLUS7: the gauntlet pointer
-import { SIGIL_RUNE_TILE_URL } from '../sigilRune.js';   // SIGIL-UI: the rune in a sigil weapon's tile corner (AUDIT MERGE-PLUS D5: a picture, its outline drawn in)
-import { PROF_ACT_CSS } from '../professions/profActStyle.js';   // PROF-RETICLE: the acts on the crosshair, dressed
-import { PROF_STATION_CSS } from '../professions/profStationStyle.js';   // PROF-STATIONS: the stations' acts, dressed
-import { plusDress, GRIMOIRE_DRESS, mountGrimoireDress } from '../grimoireDress.js';   // GRIM1: the DFO Grimoire dress over the kit
-import { mountTextFont } from '../textFont.js';   // TEXT-FONT: the words' face and the names'
+import { CURSOR_CSS } from '../plus/plusCursor.js'; // PLUS7: the gauntlet pointer
+import { SIGIL_RUNE_TILE_URL } from '../sigilRune.js'; // SIGIL-UI: the rune in a sigil weapon's tile corner (AUDIT MERGE-PLUS D5: a picture, its outline drawn in)
+import { PROF_ACT_CSS } from '../professions/profActStyle.js'; // PROF-RETICLE: the acts on the crosshair, dressed
+import { PROF_STATION_CSS } from '../professions/profStationStyle.js'; // PROF-STATIONS: the stations' acts, dressed
+import { plusDress, GRIMOIRE_DRESS, mountGrimoireDress } from '../grimoireDress.js'; // GRIM1: the DFO Grimoire dress over the kit
+import { mountTextFont } from '../textFont.js'; // TEXT-FONT: the words' face and the names'
 
 export const PLUS_STYLE_ID = 'enhanced-plus-style';
 
 /** PLUS2: the colour in effect - the stored one if it is a theme, else Slate. */
-export const plusTheme = () => (Object.hasOwn(PLUS_THEMES, getPref('plusTheme')) ? getPref('plusTheme') : DEFAULT_PLUS_THEME);
+export const plusTheme = () =>
+  Object.hasOwn(PLUS_THEMES, getPref('plusTheme')) ? getPref('plusTheme') : DEFAULT_PLUS_THEME;
 /** Wear the stored colour on the page (the theme rules key on the root's data-plus-theme). GRIM1: under the DFO
  *  Grimoire dress (ui/grimoireDress.js) the colour stands at Slate - the bare kit the dress repaints - and the dress is
  *  laid; the player's own colour stays on the shelf for when they wear Enhanced Plus again. */
 export function applyPlusTheme(doc = globalThis.document) {
   const root = doc?.documentElement;
   if (!root?.dataset) return;
-  mountTextFont(doc);   // TEXT-FONT: under either look
-  if (plusDress() === GRIMOIRE_DRESS) { root.dataset.plusTheme = DEFAULT_PLUS_THEME; mountGrimoireDress(doc); return; }
+  mountTextFont(doc); // TEXT-FONT: under either look
+  if (plusDress() === GRIMOIRE_DRESS) {
+    root.dataset.plusTheme = DEFAULT_PLUS_THEME;
+    mountGrimoireDress(doc);
+    return;
+  }
   root.dataset.plusTheme = plusTheme();
 }
 /** Choose a colour: stored, and worn at once - no reload, the rules are already on the page. */
@@ -572,7 +577,6 @@ body.draglock .pack-shell .wornsock { touch-action: none; }
 @media (max-width: 640px) { .pack-shell .shelflabel { letter-spacing: 0; } }   /* AUDIT FONT3 L6: after the rule it narrows - AMULETS and CRYSTALS whole in a 52px group (BRACELETS was cut before FONT3 too) */
 `;
 
-
 /** PLUS8: THE JOURNEY BAR (ui/enhanced/enhancedTravelControl.js), dressed for Enhanced Plus. It was plain
  *  Enhanced's slim brass-lined strip - the display serif, a hairline border, flat blue-grey buttons - and it stood
  *  at top 14px, which is ON the compass (the HUD's top block starts at 18), so the compass's points showed through
@@ -799,14 +803,17 @@ const RARITY_VARS = Object.freeze({
   legendary: `--rar: #e07a2e; --rar-hi: #f7b684; --rar-lo: #8e4518; --rar-rgb: 224,122,46; --rar-pips: '\\25c6\\25c6\\25c6';`,
   aetheric: `--rar: #bfe8ff; --rar-hi: #f0faff; --rar-lo: #4d7fa3; --rar-rgb: 191,232,255; --rar-pips: '\\25c8';`,
   artifact: `--rar: #b57bee; --rar-hi: #dcbcf8; --rar-lo: #683a9c; --rar-rgb: 181,123,238; --rar-pips: '\\2726';`,
-  gilded: `--rar: #ff3b4a; --rar-hi: #ff7480; --rar-lo: #8e1622; --rar-rgb: 255,59,74; --rar-pips: ${GILDED_CROWN_URL};`,   // GILDED-RED: crimson (its light short of pink, so the bevel reads red), the crown for pips
+  gilded: `--rar: #ff3b4a; --rar-hi: #ff7480; --rar-lo: #8e1622; --rar-rgb: 255,59,74; --rar-pips: ${GILDED_CROWN_URL};`, // GILDED-RED: crimson (its light short of pink, so the bevel reads red), the crown for pips
 });
 /** LOOT2: an EXALTED Legendary's pips - its three diamonds and a star. */
 export const EXALTED_PIPS = `--rar-pips: '\\25c6\\25c6\\25c6\\2605';`;
 /** The tiers' custom properties as rules - under `scope` (a descendant selector with its space) or everywhere. LOOT2: and
  *  the Exalted's pips after them, so its rule outranks the Legendary's at the same weight. */
-export const rarityVarsCss = (scope = '') => [...Object.entries(RARITY_VARS).map(([k, v]) => `${scope}[data-rarity="${k}"] { ${v} }`),
-  `${scope}[data-rarity="legendary"][data-exalted] { ${EXALTED_PIPS} }`].join('\n');
+export const rarityVarsCss = (scope = '') =>
+  [
+    ...Object.entries(RARITY_VARS).map(([k, v]) => `${scope}[data-rarity="${k}"] { ${v} }`),
+    `${scope}[data-rarity="legendary"][data-exalted] { ${EXALTED_PIPS} }`,
+  ].join('\n');
 /** SIGIL-UI: the sigil's colours, as custom properties. */
 export const SIGIL_VARS_CSS = `:root { --sigil: #72f0d8; --sigil-mid: #2fb8a2; --sigil-lo: #0f5048; --sigil-rgb: 114,240,216; }`;
 /** SIGIL-UI: the rune's breath. */
@@ -2427,7 +2434,8 @@ export const STONE_RED = '#ffc4bb';
 /** PLUS-DRESS: the words over the world - a one-pixel outline and the HUD's drop, never a blur. */
 const OUTLINED = '-1px 0 0 #050608, 1px 0 0 #050608, 0 -1px 0 #050608, 0 1px 0 #050608, 2px 2px 0 rgba(0,0,0,0.7)';
 /** PLUS-DRESS: a brass clasp at each end of a bar, the vitals' own (VITALS_CSS .hud-vital::before). */
-const CLASP = 'linear-gradient(180deg, #f3cf86 0 2px, transparent 2px), linear-gradient(90deg, #e2b064 0 2px, #c08a3e 2px 4px, #7a5424 4px 6px)';
+const CLASP =
+  'linear-gradient(180deg, #f3cf86 0 2px, transparent 2px), linear-gradient(90deg, #e2b064 0 2px, #c08a3e 2px 4px, #7a5424 4px 6px)';
 
 /** PLUS-DRESS:
  *  the online lane's newer screens, dressed. Most of it is the kit's by ROLE (ui/enhanced/enhancedFrame.js FRAME_ROLES - the

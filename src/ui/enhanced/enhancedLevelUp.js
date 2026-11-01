@@ -44,14 +44,28 @@
 
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
 import { drawPixelGround } from '../pixelGround.js';
-import { registerOverlay } from './enhancedOverlays.js';   // PX28: Tab, which this screen refuses while a point is unspent
+import { registerOverlay } from './enhancedOverlays.js'; // PX28: Tab, which this screen refuses while a point is unspent
 import { overlayAction } from '../input.js';
 import { STAT_KEYS_ORDER } from '../../systems/chargen.js';
-import { t } from '../../systems/textManager.js';   // AUDIT GROWTH LANE5-1: the window's own words, read in the player's language when drawn
+import { t } from '../../systems/textManager.js'; // AUDIT GROWTH LANE5-1: the window's own words, read in the player's language when drawn
 import {
-  STAR_FIGURE, ATTRIBUTE_BLURB, attributeLabel, levelUpModel, levelUpFrame, levelUpVitals,
-  focusAt, raiseAt, lowerAt, ascend, focusedKey, starBrightness, refusalText,
-  LANE_OGHMA, liveNote, liveTint, starLabel,
+  STAR_FIGURE,
+  ATTRIBUTE_BLURB,
+  attributeLabel,
+  levelUpModel,
+  levelUpFrame,
+  levelUpVitals,
+  focusAt,
+  raiseAt,
+  lowerAt,
+  ascend,
+  focusedKey,
+  starBrightness,
+  refusalText,
+  LANE_OGHMA,
+  liveNote,
+  liveTint,
+  starLabel,
 } from '../levelUp/levelUpView.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -85,7 +99,8 @@ export function crownTitle(crown) {
  *  AUDIT GROWTH LANE5-1: each read in the player's language when drawn, and said plainly. */
 export const askOne = () => t('levelup.ask.one', 'Spend your points');
 /** LV2: how the stars take a click, under the ask. */
-export const starHowto = () => t('levelup.howto', 'Click a star to choose it, click again to add a point, right-click to take one back');
+export const starHowto = () =>
+  t('levelup.howto', 'Click a star to choose it, click again to add a point, right-click to take one back');
 export const askDone = () => t('levelup.ask.done', 'All points spent');
 /** ASCEND-ANYTIME: ...and what it asks when it is asking nothing. The
  *  window is a VIEW here - the player opened their own sky to look at
@@ -147,7 +162,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
 
   const embed = d.embed === true;
   const root = el('div', 'px-home lv-sky');
-  if (embed) root.classList.add('lv-embed');   // GROWTH3
+  if (embed) root.classList.add('lv-embed'); // GROWTH3
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-modal', embed ? 'false' : 'true');
   root.setAttribute('aria-label', t('levelup.aria', 'Level up'));
@@ -157,11 +172,11 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
   // animates at, and nothing at all under prefers-reduced-motion.
   const ground = document.createElement('canvas');
   ground.className = 'px-ground';
-  const vw = () => (embed && root.clientWidth) || (globalThis.innerWidth ?? 1280);   // GROWTH3: the stage's, in the tab
+  const vw = () => (embed && root.clientWidth) || (globalThis.innerWidth ?? 1280); // GROWTH3: the stage's, in the tab
   const vh = () => (embed && root.clientHeight) || (globalThis.innerHeight ?? 720);
   drawPixelGround(ground, vw(), vh(), 0);
-  const still = typeof globalThis.matchMedia === 'function'
-    && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const still =
+    typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!still) {
     const t0 = Date.now();
     groundTimer = setInterval(() => drawPixelGround(ground, vw(), vh(), (Date.now() - t0) / 1000), 125);
@@ -210,7 +225,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
   plate.append(plateCount, plateKey, plateRefuse, plateHint);
   // LV2: how the stars take a click - said once, beside the pool, where it
   // takes no room from the figure (positioned out of the band's flow)
-  if (!screen?.viewOnly) plate.append(el('p', 'lv-howto', starHowto()));   // PLUS1
+  if (!screen?.viewOnly) plate.append(el('p', 'lv-howto', starHowto())); // PLUS1
   root.append(plate);
 
   // ── THE FIGURE ───────────────────────────────────────────────
@@ -254,7 +269,10 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     // own raiseAt / lowerAt, exactly as the + and - presses do.
     // PLUS1: the select-then-spend stars (plain Enhanced's click-raises-at-once went with it, PLUS-DEAD)
     b.onclick = () => starPress(key, 1);
-    b.oncontextmenu = (e) => { e.preventDefault(); starPress(key, -1); };
+    b.oncontextmenu = (e) => {
+      e.preventDefault();
+      starPress(key, -1);
+    };
     b.title = t('levelup.star.title', 'Click to choose, click again to add a point, right-click to take one back');
     figure.append(b);
     return { key, node: b, val, delta, gem };
@@ -267,9 +285,15 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     focusAt(screen, key);
     let fx = 'no';
     if (dir < 0) {
-      if (lowerAt(screen, key)) { refused = false; fx = 'down'; }
+      if (lowerAt(screen, key)) {
+        refused = false;
+        fx = 'down';
+      }
     } else if (!chosen) fx = 'pick';
-    else if (raiseAt(screen, key)) { refused = false; fx = 'up'; }
+    else if (raiseAt(screen, key)) {
+      refused = false;
+      fx = 'up';
+    }
     paint();
     starFx(key, fx);
   }
@@ -284,7 +308,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     if (!s) return;
     const n = s.node;
     for (const c of ['fx-pick', 'fx-up', 'fx-down', 'fx-no']) n.classList.remove(c);
-    void n.offsetWidth;   // restart the animation on a repeat press
+    void n.offsetWidth; // restart the animation on a repeat press
     n.classList.add(`fx-${kind}`);
     if (kind === 'up' || kind === 'down') {
       const pop = el('span', `lv-pop ${kind}`, kind === 'up' ? '+1' : '\u22121');
@@ -330,13 +354,15 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
   // the pointer; and Luck's second blurb line at 800x600 lifted its own star from under the pointer between the tap
   // that chose it and the tap that spent on it.
   const blurb = el('div', 'lv-blurb');
-  const about = new Map(STAT_KEYS_ORDER.map((k) => {
-    const item = el('div', 'lv-about');
-    const line = el('div', 'lv-live');
-    item.append(line, el('p', null, ATTRIBUTE_BLURB[k] ?? ''));
-    blurb.append(item);
-    return [k, { item, line }];
-  }));
+  const about = new Map(
+    STAT_KEYS_ORDER.map((k) => {
+      const item = el('div', 'lv-about');
+      const line = el('div', 'lv-live');
+      item.append(line, el('p', null, ATTRIBUTE_BLURB[k] ?? ''));
+      blurb.append(item);
+      return [k, { item, line }];
+    }),
+  );
   choice.append(ask, pick, blurb);
   root.append(choice);
 
@@ -354,13 +380,29 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
   };
   const focusStar = () => {
     const at = stars.find((s) => s.key === focusedKey(screen));
-    try { at?.node?.focus?.({ preventScroll: true }); } catch { /* no layout yet */ }
+    try {
+      at?.node?.focus?.({ preventScroll: true });
+    } catch {
+      /* no layout yet */
+    }
   };
   prev.onclick = () => step(-1);
   next.onclick = () => step(1);
   // LV2: the two presses leave the same mark on the chosen star as a click on it would
-  plus.onclick = () => { const k = focusedKey(screen); const ok = raiseAt(screen, k); if (ok) refused = false; paint(); starFx(k, ok ? 'up' : 'no'); };
-  minus.onclick = () => { const k = focusedKey(screen); const ok = lowerAt(screen, k); if (ok) refused = false; paint(); starFx(k, ok ? 'down' : 'no'); };
+  plus.onclick = () => {
+    const k = focusedKey(screen);
+    const ok = raiseAt(screen, k);
+    if (ok) refused = false;
+    paint();
+    starFx(k, ok ? 'up' : 'no');
+  };
+  minus.onclick = () => {
+    const k = focusedKey(screen);
+    const ok = lowerAt(screen, k);
+    if (ok) refused = false;
+    paint();
+    starFx(k, ok ? 'down' : 'no');
+  };
 
   // ── THE RIBBON ───────────────────────────────────────────────
   const ribbonWrap = el('div', 'lv-ribbonwrap');
@@ -373,7 +415,10 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     const v = el('span', 'v', String(row.value));
     b.append(n, v);
     if (row.risen) b.append(el('span', 'lv-up', '▲'));
-    b.onclick = () => { ribbonAt = i; paint(); };
+    b.onclick = () => {
+      ribbonAt = i;
+      paint();
+    };
     ribbon.append(b);
     return b;
   });
@@ -401,8 +446,11 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
    *  line rather than doing nothing, and the window stays up: there is
    *  no other way out of a level-up, in either lane. */
   function confirm() {
-    if (dead || (embed && screen?.viewOnly)) return false;   // LANE3-7: nothing to close in the tab
-    if (ascend(screen)) { onExit(); return true; }
+    if (dead || (embed && screen?.viewOnly)) return false; // LANE3-7: nothing to close in the tab
+    if (ascend(screen)) {
+      onExit();
+      return true;
+    }
     refused = true;
     paint();
     return false;
@@ -430,8 +478,13 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     raceName.textContent = [m.crown.race, m.crown.career].filter(Boolean).join(' ');
     levelJump.textContent = crownTitle(m.crown);
     levelFill.style.width = `${m.progress.max > 0 ? Math.max(0, Math.min(100, (m.progress.now / m.progress.max) * 100)) : 0}%`;
-    levelNote.textContent = m.progress.cap ? m.progress.label   // AUDIT FB1026d II C3: "Highest level reached", never its 1/1
-      : t('levelup.progress.bar', '{label}: {now}/{max}', { label: m.progress.label, now: m.progress.now, max: m.progress.max });
+    levelNote.textContent = m.progress.cap
+      ? m.progress.label // AUDIT FB1026d II C3: "Highest level reached", never its 1/1
+      : t('levelup.progress.bar', '{label}: {now}/{max}', {
+          label: m.progress.label,
+          now: m.progress.now,
+          max: m.progress.max,
+        });
 
     plateCount.textContent = String(m.pool);
     plateKey.textContent = m.poolLabel;
@@ -477,7 +530,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     // a finished LEVEL-UP says, and saying it to a player who never had
     // points to spend would be the window congratulating them for
     // nothing.
-    ask.textContent = m.crown.viewOnly ? askView() : (m.pool > 0 ? askOne() : askDone());
+    ask.textContent = m.crown.viewOnly ? askView() : m.pool > 0 ? askOne() : askDone();
     pickN.textContent = row.label;
     pickF.textContent = row.delta > 0 ? `${row.base} → ${row.value}` : String(row.value);
     // THE PRICE, only where there is one (Daggerfall's pool is a point a point).
@@ -510,7 +563,11 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
     // ...and the button CLOSES rather than ascends, so it says so. The
     // Oghma arm beside it is the same rule for the same reason: the
     // word on the button is what the press does.
-    ok.textContent = m.crown.viewOnly ? t('levelup.ok.close', 'Close') : (m.lane === LANE_OGHMA ? t('levelup.ok.oghma', 'Continue') : t('levelup.ok.ascend', 'Ascend'));
+    ok.textContent = m.crown.viewOnly
+      ? t('levelup.ok.close', 'Close')
+      : m.lane === LANE_OGHMA
+        ? t('levelup.ok.oghma', 'Continue')
+        : t('levelup.ok.ascend', 'Ascend');
 
     if (ribbonNodes.length) {
       ribbonAt = Math.max(0, Math.min(ribbonRows.length - 1, ribbonAt));
@@ -518,7 +575,7 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
       const sk = ribbonRows[ribbonAt];
       const g = el('span', 'g', sk.group);
       skRole.textContent = '';
-      skRole.append(g, document.createTextNode(sk.note ? ` · ${sk.note}` : ''));   // AUDIT FB1026d II C3: no note at the cap
+      skRole.append(g, document.createTextNode(sk.note ? ` · ${sk.note}` : '')); // AUDIT FB1026d II C3: no note at the cap
     } else {
       skRole.textContent = '';
     }
@@ -531,34 +588,66 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
   function centreRibbon() {
     const n = ribbonNodes[ribbonAt];
     if (!n?.scrollIntoView) return;
-    try { n.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch { /* no layout yet */ }
+    try {
+      n.scrollIntoView({ block: 'nearest', inline: 'center' });
+    } catch {
+      /* no layout yet */
+    }
   }
 
   function onKey(e) {
     if (dead || e.metaKey || e.ctrlKey || e.altKey) return;
-    if (embed && !root.isConnected) return;   // GROWTH3: a stage between two draws of its page hears nothing
-    if (embed && root.closest?.('[inert]')) return;   // AUDIT GROWTH LANE2-1: and nothing while a window over the pause window holds it inert (the account window's fields)
-    const tgt = e.target;   // AUDIT GROWTH LANE5-1: not `t`, which is the text core's
+    if (embed && !root.isConnected) return; // GROWTH3: a stage between two draws of its page hears nothing
+    if (embed && root.closest?.('[inert]')) return; // AUDIT GROWTH LANE2-1: and nothing while a window over the pause window holds it inert (the account window's fields)
+    const tgt = e.target; // AUDIT GROWTH LANE5-1: not `t`, which is the text core's
     if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.isContentEditable)) return;
     const key = focusedKey(screen);
     let used = true;
     switch (e.code) {
-      case 'ArrowLeft': step(-1); break;
-      case 'ArrowRight': step(1); break;
+      case 'ArrowLeft':
+        step(-1);
+        break;
+      case 'ArrowRight':
+        step(1);
+        break;
       // UP AND DOWN WALK THE RIBBON, not the figure. The figure is two
       // dimensional and a vertical walk of it would have to invent an
       // order the picture does not have; the ribbon IS a list and has
       // one. Left/right is the figure's own order - STAT_KEYS_ORDER,
       // which is DFCareer.Stats' order, the same walk the classic
       // rollout's up/down makes.
-      case 'ArrowUp': ribbonAt -= 1; paint(); centreRibbon(); break;
-      case 'ArrowDown': ribbonAt += 1; paint(); centreRibbon(); break;
-      case 'Equal': case 'NumpadAdd': if (raiseAt(screen, key)) refused = false; paint(); break;
-      case 'Minus': case 'NumpadSubtract': if (lowerAt(screen, key)) refused = false; paint(); break;
+      case 'ArrowUp':
+        ribbonAt -= 1;
+        paint();
+        centreRibbon();
+        break;
+      case 'ArrowDown':
+        ribbonAt += 1;
+        paint();
+        centreRibbon();
+        break;
+      case 'Equal':
+      case 'NumpadAdd':
+        if (raiseAt(screen, key)) refused = false;
+        paint();
+        break;
+      case 'Minus':
+      case 'NumpadSubtract':
+        if (lowerAt(screen, key)) refused = false;
+        paint();
+        break;
       // AUDIT GROWTH LANE3-3: in the tab a focused button's Enter is the button's - the window's tabs, its rail and Full
       // screen stand beside the face (Enter on the Stats tab pressed Ascend), as the Firmament's and the sky's keep it
-      case 'Enter': case 'NumpadEnter': if (embed && tgt?.tagName === 'BUTTON') { used = false; break; } confirm(); break;
-      default: used = false;
+      case 'Enter':
+      case 'NumpadEnter':
+        if (embed && tgt?.tagName === 'BUTTON') {
+          used = false;
+          break;
+        }
+        confirm();
+        break;
+      default:
+        used = false;
     }
     if (!used) {
       // Escape is the only other key this screen answers, and it
@@ -581,13 +670,21 @@ export function mountEnhancedLevelUp(hostEl, d = {}) {
    *  prefers-reduced-motion there IS no interval, and the canvas kept
    *  the old viewport's backing store stretched over the new one
    *  (LV1's audit). One listener, owned by the teardown below. */
-  const onResize = () => { if (!dead) drawPixelGround(ground, vw(), vh(), 0); };
+  const onResize = () => {
+    if (!dead) drawPixelGround(ground, vw(), vh(), 0);
+  };
   if (still) globalThis.addEventListener?.('resize', onResize);
   globalThis.addEventListener?.('keydown', onKey, true);
-  if (!embed) unregister = registerOverlay(closeArm);   // GROWTH3: in the tab the pause window is the overlay
+  if (!embed) unregister = registerOverlay(closeArm); // GROWTH3: in the tab the pause window is the overlay
   // GROWTH3: in the tab the stage moves under it - the sky redrawn to its size
   let watch = null;
-  if (embed) try { watch = new globalThis.ResizeObserver(onResize); watch.observe(root); } catch { watch = null; }
+  if (embed)
+    try {
+      watch = new globalThis.ResizeObserver(onResize);
+      watch.observe(root);
+    } catch {
+      watch = null;
+    }
   paint();
   // The first focus goes to the figure, not the document: this screen
   // is reachable by keyboard alone from the moment it opens.

@@ -17,10 +17,10 @@ import { pathChoices } from '../../systems/arcanePaths.js';
 import { martialChoices } from '../../systems/martialPaths.js';
 import { drawStage, dropStage, stageBack, stageAsks, stageLive, STAGE_CSS } from './growthStage.js';
 import { firmamentBook } from '../../net/firmament/firmamentBook.js';
-import { pointsLeft } from '../../net/firmament/firmamentLaw.js';   // FIRM-STARS: the stars not yet placed, on the rail
+import { pointsLeft } from '../../net/firmament/firmamentLaw.js'; // FIRM-STARS: the stars not yet placed, on the rail
 import { t } from '../../systems/textManager.js';
-import { atLevelCap, LEVEL_CAP } from '../../systems/levelCap.js';   // LEVEL-45 (AUDIT FB1026d II C3): the Level page at the cap
-import { GROWTH_PAGE_SECTIONS, SPEC_LANDINGS, growthPageAt } from './growthPages.js';   // the leaf the boot doors read
+import { atLevelCap, LEVEL_CAP } from '../../systems/levelCap.js'; // LEVEL-45 (AUDIT FB1026d II C3): the Level page at the cap
+import { GROWTH_PAGE_SECTIONS, SPEC_LANDINGS, growthPageAt } from './growthPages.js'; // the leaf the boot doors read
 
 export { GROWTH_PAGE_SECTIONS, growthPageAt };
 
@@ -29,7 +29,7 @@ const LABEL = Object.freeze({
   level: () => t('growth.rail.level', 'Level'),
   specs: () => t('growth.rail.specs', 'Specializations'),
   firmament: () => t('growth.rail.firmament', 'Firmament'),
-  captain: () => t('growth.rail.captain', 'Captain\'s Stars'),
+  captain: () => t('growth.rail.captain', "Captain's Stars"),
 });
 /** GROWTH-BOOK: each page's one line under its name on the rail. */
 const SUB = Object.freeze({
@@ -42,22 +42,33 @@ const SUB = Object.freeze({
 let sec = 'level';
 /** A new visit (the window mounted): its landing's page, the guide fresh, no face up. */
 export function resetGrowthTab(at = null) {
-  const fam = Object.hasOwn(SPEC_LANDINGS, at ?? '') ? SPEC_LANDINGS[at] : null;   // GROWTH4: a family's guide by name
+  const fam = Object.hasOwn(SPEC_LANDINGS, at ?? '') ? SPEC_LANDINGS[at] : null; // GROWTH4: a family's guide by name
   sec = fam ? 'specs' : GROWTH_PAGE_SECTIONS.some(([id]) => id === at) ? at : 'level';
   resetSpecGuide(fam);
   dropStage();
 }
 
 /** The tab or the window left: the face goes (its pending stars with it - its own Escape asked first). */
-export function releaseGrowthTab() { dropStage(); }
+export function releaseGrowthTab() {
+  dropStage();
+}
 /** The page standing now. */
 export const growthSection = () => sec;
 /** Go to a page of the rail (another tab's door into it - the Master Skills page's to the guide). */
-export function setGrowthSection(id) { if (GROWTH_PAGE_SECTIONS.some(([x]) => x === id)) { if (sec !== id) dropStage(); sec = id; } }
+export function setGrowthSection(id) {
+  if (GROWTH_PAGE_SECTIONS.some(([x]) => x === id)) {
+    if (sec !== id) dropStage();
+    sec = id;
+  }
+}
 /** The window's Escape, ahead of its own back stack (growthStage.js stageBack): whether the tab took it. */
-export function growthBack() { return stageBack(); }
+export function growthBack() {
+  return stageBack();
+}
 /** GROWTH5: a press that leaves the face (another tab, the sheet's or the QuickDial's key) asks it first (stageAsks). */
-export function growthAsks() { return stageAsks(); }
+export function growthAsks() {
+  return stageAsks();
+}
 
 /** The pages drawn for this host: the Captain's Stars where the host hands a captain's sky over (the world host, Come
  *  Sail Away on), every other always - a page with nothing to show says why. */
@@ -75,7 +86,10 @@ export function growthDue(ctx) {
   // FIRM-STARS: the Firmament's stars not yet placed, as the book last said its purses (the HUD's tile beside the Renown bar
   // says the same number)
   const fb = firmamentBook()?.state;
-  if (fb?.open === true) { const left = pointsLeft(fb.sending?.keys ?? fb.tree?.keys ?? [], Number(fb.stars) || 0, Number(fb.craft) || 0); due.firmament = Math.max(0, left.stars | 0) + Math.max(0, left.craft | 0); }
+  if (fb?.open === true) {
+    const left = pointsLeft(fb.sending?.keys ?? fb.tree?.keys ?? [], Number(fb.stars) || 0, Number(fb.craft) || 0);
+    due.firmament = Math.max(0, left.stars | 0) + Math.max(0, left.craft | 0);
+  }
   const s = ctx?.captain?.model?.()?.stars;
   if (s) due.captain = Math.max(0, (s.points ?? 0) - (s.set ?? 0));
   return due;
@@ -104,7 +118,12 @@ export function drawGrowthTab(body, ctx) {
     words.append(el('span', 'gr-railname', LABEL[id]()), el('span', 'gr-railsub', SUB[id]()));
     b.append(el('span', 'px-c', '◆'), words);
     if (due[id]) b.append(el('span', 'gr-due', id === 'level' ? '!' : String(due[id])));
-    b.onclick = () => { if (sec !== id && stageAsks()) return; if (sec !== id) dropStage(); sec = id; ctx.render(); };   // GROWTH5: unaccepted stars asked about once
+    b.onclick = () => {
+      if (sec !== id && stageAsks()) return;
+      if (sec !== id) dropStage();
+      sec = id;
+      ctx.render();
+    }; // GROWTH5: unaccepted stars asked about once
     rail.append(b);
   }
   wrap.append(rail);
@@ -118,8 +137,10 @@ export function drawGrowthTab(body, ctx) {
 
 /** The stage's words. */
 const stageWords = () => ({
-  full: t('growth.stage.full', 'Full screen'), leave: t('growth.stage.leave', 'Leave full screen'),
-  loading: t('growth.stage.loading', 'Loading...'), failed: t('growth.stage.failed', 'This page could not be loaded. Close the menu and try again.'),
+  full: t('growth.stage.full', 'Full screen'),
+  leave: t('growth.stage.leave', 'Leave full screen'),
+  loading: t('growth.stage.loading', 'Loading...'),
+  failed: t('growth.stage.failed', 'This page could not be loaded. Close the menu and try again.'),
   open: t('growth.stage.open', 'Open'),
 });
 
@@ -131,7 +152,9 @@ const stageWords = () => ({
  *  off a 1024x600 pane). Elsewhere the page is its line and the phone's door: the face full screen, laid out as it is
  *  over the world. */
 const LEVEL_PANE_MIN_H = 1000;
-const levelDoor = () => (globalThis.innerHeight ?? 720) < LEVEL_PANE_MIN_H || globalThis.document?.documentElement?.getAttribute?.('data-plus-dress') === 'grimoire';
+const levelDoor = () =>
+  (globalThis.innerHeight ?? 720) < LEVEL_PANE_MIN_H ||
+  globalThis.document?.documentElement?.getAttribute?.('data-plus-dress') === 'grimoire';
 
 function levelPage(detail, ctx) {
   const { el, divider, entity, hooks } = ctx;
@@ -139,25 +162,68 @@ function levelPage(detail, ctx) {
   // (or nothing owed) draws the view of the stars - the lazy chunk's own (levelUp/levelUpView.js viewOnlyScreen)
   const open = typeof hooks?.ascendScreen === 'function' ? hooks.ascendScreen : null;
   const owed = !!entity?.readyToLevelUp && !!open;
-  if (!entity) { dropStage(); detail.append(divider(t('growth.level.title', 'Level')), el('p', 'px-note', t('growth.level.none', 'Your level isn\'t available here.'))); return; }
+  if (!entity) {
+    dropStage();
+    detail.append(
+      divider(t('growth.level.title', 'Level')),
+      el('p', 'px-note', t('growth.level.none', "Your level isn't available here.")),
+    );
+    return;
+  }
   detail.append(divider(t('growth.level.title', 'Level')));
-  drawStage(detail, `level:${owed ? 'owed' : 'view'}:${entity.level ?? 0}`, (host) => import('../enhanced/enhancedLevelUp.js').then(({ mountEnhancedLevelUp, viewOnlyScreen }) =>
-    mountEnhancedLevelUp(host, { screen: (owed && open()) || viewOnlyScreen(entity), entity, embed: true, onExit: () => { dropStage(); ctx.render(); } })), {
-    el, ...stageWords(),
-    door: levelDoor(),
-    badge: String(entity.level ?? 1),
-    heading: owed ? t('growth.level.owedHead', 'A level up is waiting') : t('growth.level.viewHead', 'Level {n}', { n: entity.level ?? 1 }),
-    lead: owed ? t('growth.level.owed', 'You have a level up waiting. Place your points, then press {ascend}. If you leave first, the points stay unspent.', { ascend: t('levelup.ok.ascend', 'Ascend') })   // AUDIT GROWTH LANE5-2: the button's own word, in every language
-      : atLevelCap(entity) ? t('charsheet.levelCap', 'The highest level is {level, number}: no more levels are gained.', { level: LEVEL_CAP })   // AUDIT FB1026d II C3: no next level at the cap - the sheet's own words
-      : t('growth.level.view', 'Your attributes, skills and progress to the next level. When you level up, you spend your points here.'),
-  });
+  drawStage(
+    detail,
+    `level:${owed ? 'owed' : 'view'}:${entity.level ?? 0}`,
+    (host) =>
+      import('../enhanced/enhancedLevelUp.js').then(({ mountEnhancedLevelUp, viewOnlyScreen }) =>
+        mountEnhancedLevelUp(host, {
+          screen: (owed && open()) || viewOnlyScreen(entity),
+          entity,
+          embed: true,
+          onExit: () => {
+            dropStage();
+            ctx.render();
+          },
+        }),
+      ),
+    {
+      el,
+      ...stageWords(),
+      door: levelDoor(),
+      badge: String(entity.level ?? 1),
+      heading: owed
+        ? t('growth.level.owedHead', 'A level up is waiting')
+        : t('growth.level.viewHead', 'Level {n}', { n: entity.level ?? 1 }),
+      lead: owed
+        ? t(
+            'growth.level.owed',
+            'You have a level up waiting. Place your points, then press {ascend}. If you leave first, the points stay unspent.',
+            { ascend: t('levelup.ok.ascend', 'Ascend') },
+          ) // AUDIT GROWTH LANE5-2: the button's own word, in every language
+        : atLevelCap(entity)
+          ? t('charsheet.levelCap', 'The highest level is {level, number}: no more levels are gained.', {
+              level: LEVEL_CAP,
+            }) // AUDIT FB1026d II C3: no next level at the cap - the sheet's own words
+          : t(
+              'growth.level.view',
+              'Your attributes, skills and progress to the next level. When you level up, you spend your points here.',
+            ),
+    },
+  );
 }
 
 // ── Specialisations ─────────────────────────────────────────────────
 
 function specsPage(detail, ctx) {
   dropStage();
-  drawSpecGuide(detail, ctx.render, { el: ctx.el, divider: ctx.divider, skillMeter: ctx.skillMeter, askCard: ctx.askCard, entity: ctx.entity, openMaster: ctx.openMaster });
+  drawSpecGuide(detail, ctx.render, {
+    el: ctx.el,
+    divider: ctx.divider,
+    skillMeter: ctx.skillMeter,
+    askCard: ctx.askCard,
+    entity: ctx.entity,
+    openMaster: ctx.openMaster,
+  });
 }
 
 // ── Firmament ───────────────────────────────────────────────────────
@@ -166,12 +232,35 @@ function firmamentPage(detail, ctx) {
   const { el, divider } = ctx;
   if (!firmamentBook()) {
     dropStage();
-    detail.append(divider(t('growth.firm.title', 'Firmament')), el('p', 'gr-lead', t('growth.firm.offline', 'The Firmament is a tree of passive bonuses, online only. Choose a birthsign, then spend the stars you earn from Renown.')));
+    detail.append(
+      divider(t('growth.firm.title', 'Firmament')),
+      el(
+        'p',
+        'gr-lead',
+        t(
+          'growth.firm.offline',
+          'The Firmament is a tree of passive bonuses, online only. Choose a birthsign, then spend the stars you earn from Renown.',
+        ),
+      ),
+    );
     return;
   }
   detail.append(divider(t('growth.firm.title', 'Firmament')));
-  drawStage(detail, 'firmament', (host) => import('../firmamentWindow.js').then(({ mountFirmamentWindow }) =>
-    mountFirmamentWindow(host, { embed: true })), { el, ...stageWords(), lead: t('growth.firm.lead', 'Passive bonuses for online play, bought with the stars you earn. Press {accept} to keep your changes.', { accept: t('firmament.accept', 'Accept') }) });
+  drawStage(
+    detail,
+    'firmament',
+    (host) =>
+      import('../firmamentWindow.js').then(({ mountFirmamentWindow }) => mountFirmamentWindow(host, { embed: true })),
+    {
+      el,
+      ...stageWords(),
+      lead: t(
+        'growth.firm.lead',
+        'Passive bonuses for online play, bought with the stars you earn. Press {accept} to keep your changes.',
+        { accept: t('firmament.accept', 'Accept') },
+      ),
+    },
+  );
 }
 
 // ── Captain's Stars ─────────────────────────────────────────────────
@@ -179,13 +268,31 @@ function firmamentPage(detail, ctx) {
 function captainPage(detail, ctx) {
   const { el, divider, captain } = ctx;
   const deps = captain?.stars?.() ?? null;
-  if (!deps?.ledger) { dropStage(); detail.append(divider(t('growth.captain.title', 'Captain\'s Stars')), el('p', 'px-note', t('growth.captain.none', 'Your captain\'s stars aren\'t available here.'))); return; }
-  detail.append(divider(t('growth.captain.title', 'Captain\'s Stars')));
-  drawStage(detail, 'captain', (host) => import('../captainTreeWindow.js').then(({ mountCaptainTreeWindow }) =>
-    mountCaptainTreeWindow(host, { ledger: deps.ledger, changed: deps.changed, embed: true })), {
-    el, ...stageWords(),
-    lead: t('growth.captain.lead', 'Master stars improve sailing, cargo and trade. Commander stars improve guns and boarding.'),
-  });
+  if (!deps?.ledger) {
+    dropStage();
+    detail.append(
+      divider(t('growth.captain.title', "Captain's Stars")),
+      el('p', 'px-note', t('growth.captain.none', "Your captain's stars aren't available here.")),
+    );
+    return;
+  }
+  detail.append(divider(t('growth.captain.title', "Captain's Stars")));
+  drawStage(
+    detail,
+    'captain',
+    (host) =>
+      import('../captainTreeWindow.js').then(({ mountCaptainTreeWindow }) =>
+        mountCaptainTreeWindow(host, { ledger: deps.ledger, changed: deps.changed, embed: true }),
+      ),
+    {
+      el,
+      ...stageWords(),
+      lead: t(
+        'growth.captain.lead',
+        'Master stars improve sailing, cargo and trade. Commander stars improve guns and boarding.',
+      ),
+    },
+  );
 }
 
 // ── the dress ───────────────────────────────────────────────────────

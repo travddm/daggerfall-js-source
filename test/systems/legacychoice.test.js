@@ -12,9 +12,27 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { legacyModelOptions, legacyModelScreen, LEGACY_CHOICE_FACE, LEGACY_CHOICE_TEXT, LEGACY_MODEL_FACE, LEGACY_MODEL_TAGS } from '../../src/ui/legacy/legacyModelChoice.js';
-import { stackedTops, choiceAtNative, choiceHeight, choiceKeysWord, CHOICE_STACK_GAP, CHOICE_TOP } from '../../src/ui/choiceScreen.js';
-import { CHOICE_FACE_ID, choiceFaceOwner, _setChoiceFaceClockForTests } from '../../src/ui/enhanced/enhancedChoiceFace.js';
+import {
+  legacyModelOptions,
+  legacyModelScreen,
+  LEGACY_CHOICE_FACE,
+  LEGACY_CHOICE_TEXT,
+  LEGACY_MODEL_FACE,
+  LEGACY_MODEL_TAGS,
+} from '../../src/ui/legacy/legacyModelChoice.js';
+import {
+  stackedTops,
+  choiceAtNative,
+  choiceHeight,
+  choiceKeysWord,
+  CHOICE_STACK_GAP,
+  CHOICE_TOP,
+} from '../../src/ui/choiceScreen.js';
+import {
+  CHOICE_FACE_ID,
+  choiceFaceOwner,
+  _setChoiceFaceClockForTests,
+} from '../../src/ui/enhanced/enhancedChoiceFace.js';
 import { MODELS, NO_LINEAGE, isLegacyChoice, familyRng, LEGACY_MOD } from '../../src/systems/legacy/family.js';
 import { createLegacyHost } from '../../src/scenes/legacyHost.js';
 import { loadFamily, listFamilies } from '../../src/systems/legacy/store.js';
@@ -27,23 +45,76 @@ import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.
 import { _resetModSaveData } from '../../src/systems/modSaveData.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const FONT = { fnt: { fixedHeight: 9, fixedWidth: 4, glyphWidth: () => 4 }, tex: 'tex:font', cols: 16, rows: 16, cw: 8, ch: 8 };
+const FONT = {
+  fnt: { fixedHeight: 9, fixedWidth: 4, glyphWidth: () => 4 },
+  tex: 'tex:font',
+  cols: 16,
+  rows: 16,
+  cw: 8,
+  ch: 8,
+};
 const CANVAS = { width: 640, height: 400 };
-const recorder = () => ({ quads: 0, drawScreenQuad() { this.quads++; } });
-const mem = () => { const m = new Map(); return { map: m, get length() { return m.size; }, key: (i) => [...m.keys()][i] ?? null, getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); } }; };
+const recorder = () => ({
+  quads: 0,
+  drawScreenQuad() {
+    this.quads++;
+  },
+});
+const mem = () => {
+  const m = new Map();
+  return {
+    map: m,
+    get length() {
+      return m.size;
+    },
+    key: (i) => [...m.keys()][i] ?? null,
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => {
+      m.set(k, String(v));
+    },
+    removeItem: (k) => {
+      m.delete(k);
+    },
+  };
+};
 
 function fakeNode(tag) {
   const n = {
-    tagName: tag.toUpperCase(), children: [], parent: null, className: '', textContent: '', id: '', type: '',
-    style: {}, attrs: {}, dataset: {}, onclick: null, onpointerenter: null, disabled: false,
-    append(...cs) { for (const c of cs) { c.parent = n; n.children.push(c); } },
-    setAttribute(k, v) { n.attrs[k] = v; },
-    remove() { if (n.parent) { n.parent.children.splice(n.parent.children.indexOf(n), 1); n.parent = null; } n.removed = true; },
+    tagName: tag.toUpperCase(),
+    children: [],
+    parent: null,
+    className: '',
+    textContent: '',
+    id: '',
+    type: '',
+    style: {},
+    attrs: {},
+    dataset: {},
+    onclick: null,
+    onpointerenter: null,
+    disabled: false,
+    append(...cs) {
+      for (const c of cs) {
+        c.parent = n;
+        n.children.push(c);
+      }
+    },
+    setAttribute(k, v) {
+      n.attrs[k] = v;
+    },
+    remove() {
+      if (n.parent) {
+        n.parent.children.splice(n.parent.children.indexOf(n), 1);
+        n.parent = null;
+      }
+      n.removed = true;
+    },
   };
   n.classList = {
     toggle(c, on) {
       const set = new Set(n.className.split(/\s+/).filter(Boolean));
-      if (on) set.add(c); else set.delete(c);
+      if (on) set.add(c);
+      else set.delete(c);
       n.className = [...set].join(' ');
     },
   };
@@ -51,39 +122,92 @@ function fakeNode(tag) {
 }
 function fakeDocument() {
   const doc = { createElement: (t) => fakeNode(t) };
-  doc.head = fakeNode('head'); doc.body = fakeNode('body'); doc.documentElement = fakeNode('html');
-  const byId = (n, id) => { if (n.id === id) return n; for (const c of n.children) { const f = byId(c, id); if (f) return f; } return null; };
+  doc.head = fakeNode('head');
+  doc.body = fakeNode('body');
+  doc.documentElement = fakeNode('html');
+  const byId = (n, id) => {
+    if (n.id === id) return n;
+    for (const c of n.children) {
+      const f = byId(c, id);
+      if (f) return f;
+    }
+    return null;
+  };
   doc.getElementById = (id) => byId(doc.head, id) ?? byId(doc.body, id);
   return doc;
 }
-const find = (n, cls, out = []) => { if (typeof n.className === 'string' && n.className.split(/\s+/).includes(cls)) out.push(n); for (const c of n.children ?? []) find(c, cls, out); return out; };
+const find = (n, cls, out = []) => {
+  if (typeof n.className === 'string' && n.className.split(/\s+/).includes(cls)) out.push(n);
+  for (const c of n.children ?? []) find(c, cls, out);
+  return out;
+};
 function withPage(search, fn, { doc = false } = {}) {
   const hadLoc = Object.hasOwn(globalThis, 'location') ? globalThis.location : undefined;
   const hadDoc = Object.hasOwn(globalThis, 'document') ? globalThis.document : undefined;
   globalThis.location = { search };
   const d = doc ? fakeDocument() : null;
   if (d) globalThis.document = d;
-  try { return fn(d); } finally {
-    if (hadLoc === undefined) delete globalThis.location; else globalThis.location = hadLoc;
-    if (hadDoc === undefined) delete globalThis.document; else globalThis.document = hadDoc;
+  try {
+    return fn(d);
+  } finally {
+    if (hadLoc === undefined) delete globalThis.location;
+    else globalThis.location = hadLoc;
+    if (hadDoc === undefined) delete globalThis.document;
+    else globalThis.document = hadDoc;
   }
 }
 
 const ent = (cid, over = {}) => ({
-  name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', faceIndex: 3, careerIndex: 5, career: { name: 'Nightblade', primarySkills: [28], majorSkills: [], minorSkills: [] },
-  level: 1, characterId: cid, chargenDone: true, health: 40, maxHealth: 40, items: [], wagonItems: [],
-  stats: { strength: 60, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 },
-  skills: Array.from({ length: 35 }, (_, i) => (i === 28 ? 80 : 20)), ...over,
+  name: 'Ysolde Hlaalu',
+  gender: 'female',
+  race: 'DarkElf',
+  faceIndex: 3,
+  careerIndex: 5,
+  career: { name: 'Nightblade', primarySkills: [28], majorSkills: [], minorSkills: [] },
+  level: 1,
+  characterId: cid,
+  chargenDone: true,
+  health: 40,
+  maxHealth: 40,
+  items: [],
+  wagonItems: [],
+  stats: {
+    strength: 60,
+    intelligence: 50,
+    willpower: 50,
+    agility: 50,
+    endurance: 50,
+    personality: 50,
+    speed: 50,
+    luck: 50,
+  },
+  skills: Array.from({ length: 35 }, (_, i) => (i === 28 ? 80 : 20)),
+  ...over,
 });
 /** The real host over one storage, online or off, with the Features tile's model `tile`. */
 function host(entity, { online, storage = mem(), tile = 0 } = {}) {
   _resetModSaveData();
   _resetModSettings();
-  setModSetting(LEGACY_MOD, 'Legacy.Model', tile);   // 0 Enduring, 1 Bloodline
+  setModSetting(LEGACY_MOD, 'Legacy.Model', tile); // 0 Enduring, 1 Bloodline
   return createLegacyHost({
-    entity, storage: () => storage, tab: () => mem(), on: () => true, online: () => online, now: () => 0, own: () => 0,
-    here: () => null, town: () => null, nearestTown: () => null, gold: () => 0, say: () => {}, boot: () => {}, search: () => '', loadCharacter: () => false,
-    saveNow: () => true, inFight: () => false, rng: familyRng(1),
+    entity,
+    storage: () => storage,
+    tab: () => mem(),
+    on: () => true,
+    online: () => online,
+    now: () => 0,
+    own: () => 0,
+    here: () => null,
+    town: () => null,
+    nearestTown: () => null,
+    gold: () => 0,
+    say: () => {},
+    boot: () => {},
+    search: () => '',
+    loadCharacter: () => false,
+    saveNow: () => true,
+    inFight: () => false,
+    rng: familyRng(1),
   });
 }
 
@@ -91,26 +215,47 @@ function host(entity, { online, storage = mem(), tile = 0 } = {}) {
 
 test('LEGACY-CHOICE the question: online three answers - Enduring first, Bloodline, no lineage - each its own tag and words; offline its two', () => {
   const on = legacyModelOptions({ online: true, tollShare: 0.06 });
-  assert.deepEqual(on.map((o) => o.id), [MODELS.enduring, MODELS.bloodline, NO_LINEAGE], 'Enter without reading still never costs a character');
+  assert.deepEqual(
+    on.map((o) => o.id),
+    [MODELS.enduring, MODELS.bloodline, NO_LINEAGE],
+    'Enter without reading still never costs a character',
+  );
   assert.ok(on.every((o) => !o.locked));
   assert.equal(on[2].title, 'No lineage');
   assert.match(on[2].lines.join(' '), /No house, no heirs/);
-  assert.deepEqual([LEGACY_MODEL_TAGS[MODELS.enduring], LEGACY_MODEL_TAGS[MODELS.bloodline], LEGACY_MODEL_TAGS[NO_LINEAGE]], ['Not permadeath', 'Permadeath', 'Classic']);
-  assert.deepEqual(legacyModelOptions({ online: false, tollShare: 0.06 }).map((o) => o.id), [MODELS.enduring, MODELS.bloodline], 'offline its two');
-  assert.ok(isLegacyChoice(NO_LINEAGE) && isLegacyChoice(MODELS.bloodline) && !isLegacyChoice('nobody') && !isLegacyChoice(undefined));
+  assert.deepEqual(
+    [LEGACY_MODEL_TAGS[MODELS.enduring], LEGACY_MODEL_TAGS[MODELS.bloodline], LEGACY_MODEL_TAGS[NO_LINEAGE]],
+    ['Not permadeath', 'Permadeath', 'Classic'],
+  );
+  assert.deepEqual(
+    legacyModelOptions({ online: false, tollShare: 0.06 }).map((o) => o.id),
+    [MODELS.enduring, MODELS.bloodline],
+    'offline its two',
+  );
+  assert.ok(
+    isLegacyChoice(NO_LINEAGE) &&
+      isLegacyChoice(MODELS.bloodline) &&
+      !isLegacyChoice('nobody') &&
+      !isLegacyChoice(undefined),
+  );
   // the classic face: the three stacked by their own heights, every block clear of the next, the footer on the screen
   const tops = stackedTops(on);
   assert.equal(tops[0], CHOICE_TOP);
   for (let i = 0; i < on.length; i++) assert.equal(tops[i + 1], tops[i] + choiceHeight(on[i]) + CHOICE_STACK_GAP);
   assert.ok(tops[on.length] + 10 <= 200, `the footer is on the screen: ${tops[on.length]}`);
-  for (const o of on) for (const line of o.lines) assert.ok(line.length <= 50, `a line the classic face's width holds: ${line}`);
+  for (const o of on)
+    for (const line of o.lines) assert.ok(line.length <= 50, `a line the classic face's width holds: ${line}`);
   assert.equal(choiceKeysWord(3), '1, 2 or 3');
   assert.equal(choiceKeysWord(2), '1 or 2');
 });
 
 test('LEGACY-CHOICE the screen: keys 1, 2 and 3 answer their own, up and down are directions over three, a click lands on its own stacked block; a screen of two has no third', () => {
   withPage('?online', () => {
-    for (const [key, want] of [['Digit1', MODELS.enduring], ['char:2', MODELS.bloodline], ['Numpad3', NO_LINEAGE]]) {
+    for (const [key, want] of [
+      ['Digit1', MODELS.enduring],
+      ['char:2', MODELS.bloodline],
+      ['Numpad3', NO_LINEAGE],
+    ]) {
       const got = [];
       const q = legacyModelScreen((m) => got.push(m));
       q.input(key);
@@ -119,10 +264,14 @@ test('LEGACY-CHOICE the screen: keys 1, 2 and 3 answer their own, up and down ar
     const got = [];
     const q = legacyModelScreen((m) => got.push(m));
     assert.equal(q.cursor, 0, 'the cursor starts on Enduring');
-    q.input('ArrowDown'); assert.equal(q.cursor, 1);
-    q.input('down'); assert.equal(q.cursor, 2);
-    q.input('ArrowDown'); assert.equal(q.cursor, 0, 'down wraps');
-    q.input('ArrowUp'); assert.equal(q.cursor, 2, 'up goes back');
+    q.input('ArrowDown');
+    assert.equal(q.cursor, 1);
+    q.input('down');
+    assert.equal(q.cursor, 2);
+    q.input('ArrowDown');
+    assert.equal(q.cursor, 0, 'down wraps');
+    q.input('ArrowUp');
+    assert.equal(q.cursor, 2, 'up goes back');
     q.input('Enter');
     assert.deepEqual(got, [NO_LINEAGE]);
     // a click in each block answers that block, on the screen's own stacked table
@@ -148,88 +297,124 @@ test('LEGACY-CHOICE the screen: keys 1, 2 and 3 answer their own, up and down ar
     assert.equal(q.tops, null, 'the fixed pitch');
     q.input('Digit3');
     assert.deepEqual(got, [], 'no third answer offline');
-    q.input('ArrowUp'); assert.equal(q.cursor, 1, 'with two, either direction moves between them');
-    q.input('ArrowDown'); assert.equal(q.cursor, 0);
+    q.input('ArrowUp');
+    assert.equal(q.cursor, 1, 'with two, either direction moves between them');
+    q.input('ArrowDown');
+    assert.equal(q.cursor, 0);
   });
 });
 
 test('LEGACY-CHOICE the popup: on Enhanced Plus the online question wears the Plus window - three tiles in one wide row, their tags, the third answering no lineage', () => {
-  _setChoiceFaceClockForTests(() => null, () => {});
-  withPage('?skin=enhanced&online', (doc) => {
-    const got = [];
-    const q = legacyModelScreen((m) => got.push(m));
-    q.draw(recorder(), CANVAS, FONT);
-    const root = doc.getElementById(CHOICE_FACE_ID);
-    assert.ok(root, 'the popup is on the page');
-    assert.equal(choiceFaceOwner(), q);
-    const win = find(root, 'px-win')[0];
-    assert.ok(win.className.split(' ').includes('lvl-three'), 'the wide window for three');
-    assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_CHOICE_FACE.title);
-    assert.equal(find(root, 'lvl-hint')[0].textContent, LEGACY_CHOICE_FACE.hint);
-    assert.match(LEGACY_CHOICE_FACE.hint, /1, 2 or 3/);
-    const tiles = find(root, 'lvl-opt');
-    assert.deepEqual(tiles.map((t) => find(t, 'lvl-tag')[0].textContent), ['Not permadeath', 'Permadeath', 'Classic']);
-    assert.ok(tiles[0].className.includes('is-on'), 'Enduring chosen first');
-    tiles[2].onclick();
-    assert.deepEqual(got, [NO_LINEAGE]);
-    assert.equal(choiceFaceOwner(), null, 'the popup goes with the answer');
-  }, { doc: true });
-  withPage('?skin=enhanced', (doc) => {
-    const q = legacyModelScreen(() => {});
-    q.draw(recorder(), CANVAS, FONT);
-    const root = doc.getElementById(CHOICE_FACE_ID);
-    assert.ok(!find(root, 'px-win')[0].className.split(' ').includes('lvl-three'), 'offline two, the window as ever');
-    assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_MODEL_FACE.title);
-    q.answer(q.defaultId);
-  }, { doc: true });
-  assert.equal(LEGACY_CHOICE_TEXT.lines.length, 2, 'the classic face\'s two lines over the options');
+  _setChoiceFaceClockForTests(
+    () => null,
+    () => {},
+  );
+  withPage(
+    '?skin=enhanced&online',
+    (doc) => {
+      const got = [];
+      const q = legacyModelScreen((m) => got.push(m));
+      q.draw(recorder(), CANVAS, FONT);
+      const root = doc.getElementById(CHOICE_FACE_ID);
+      assert.ok(root, 'the popup is on the page');
+      assert.equal(choiceFaceOwner(), q);
+      const win = find(root, 'px-win')[0];
+      assert.ok(win.className.split(' ').includes('lvl-three'), 'the wide window for three');
+      assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_CHOICE_FACE.title);
+      assert.equal(find(root, 'lvl-hint')[0].textContent, LEGACY_CHOICE_FACE.hint);
+      assert.match(LEGACY_CHOICE_FACE.hint, /1, 2 or 3/);
+      const tiles = find(root, 'lvl-opt');
+      assert.deepEqual(
+        tiles.map((t) => find(t, 'lvl-tag')[0].textContent),
+        ['Not permadeath', 'Permadeath', 'Classic'],
+      );
+      assert.ok(tiles[0].className.includes('is-on'), 'Enduring chosen first');
+      tiles[2].onclick();
+      assert.deepEqual(got, [NO_LINEAGE]);
+      assert.equal(choiceFaceOwner(), null, 'the popup goes with the answer');
+    },
+    { doc: true },
+  );
+  withPage(
+    '?skin=enhanced',
+    (doc) => {
+      const q = legacyModelScreen(() => {});
+      q.draw(recorder(), CANVAS, FONT);
+      const root = doc.getElementById(CHOICE_FACE_ID);
+      assert.ok(!find(root, 'px-win')[0].className.split(' ').includes('lvl-three'), 'offline two, the window as ever');
+      assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_MODEL_FACE.title);
+      q.answer(q.defaultId);
+    },
+    { doc: true },
+  );
+  assert.equal(LEGACY_CHOICE_TEXT.lines.length, 2, "the classic face's two lines over the options");
 });
 
 test('LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down switches between the options instead of letting you hover and select"): while the Plus face is up its tiles own the pointer - the canvas seam the hosts route every mousemove and click through moves nothing and answers nothing', () => {
-  _setChoiceFaceClockForTests(() => null, () => {});
+  _setChoiceFaceClockForTests(
+    () => null,
+    () => {},
+  );
   // the hosts' mousemove listener is on the WINDOW (world.js, exterior.js), so it fires over the popup too and hands the
   // screen the pointer in the CANVAS face's native units - rows the popup does not draw (its tiles stand side by side)
-  withPage('?skin=enhanced&online', (doc) => {
-    const got = [];
-    const q = legacyModelScreen((m) => got.push(m));
-    q.draw(recorder(), CANVAS, FONT);
-    assert.equal(choiceFaceOwner(), q, 'the popup is up');
-    const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
-    tiles[2].onpointerenter();
-    assert.equal(q.cursor, 2, 'the tile under the pointer is the one chosen');
-    for (let i = 0; i < 3; i++) {
-      q.hover(160, q.tops[i] + 2);
-      assert.equal(q.cursor, 2, `a move over the canvas face's row ${i} leaves the popup's choice alone`);
-    }
-    q.draw(recorder(), CANVAS, FONT);
-    assert.ok(tiles[2].className.includes('is-on') && !tiles[0].className.includes('is-on') && !tiles[1].className.includes('is-on'), 'and the popup shows the tile the pointer is on');
-    assert.equal(q.click(160, q.tops[0] + 2), false, 'a canvas press answers nothing while the popup is up');
-    assert.deepEqual(got, []);
-    tiles[2].onclick();
-    assert.deepEqual(got, [NO_LINEAGE], 'the tile pressed is the answer');
-  }, { doc: true });
+  withPage(
+    '?skin=enhanced&online',
+    (doc) => {
+      const got = [];
+      const q = legacyModelScreen((m) => got.push(m));
+      q.draw(recorder(), CANVAS, FONT);
+      assert.equal(choiceFaceOwner(), q, 'the popup is up');
+      const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
+      tiles[2].onpointerenter();
+      assert.equal(q.cursor, 2, 'the tile under the pointer is the one chosen');
+      for (let i = 0; i < 3; i++) {
+        q.hover(160, q.tops[i] + 2);
+        assert.equal(q.cursor, 2, `a move over the canvas face's row ${i} leaves the popup's choice alone`);
+      }
+      q.draw(recorder(), CANVAS, FONT);
+      assert.ok(
+        tiles[2].className.includes('is-on') &&
+          !tiles[0].className.includes('is-on') &&
+          !tiles[1].className.includes('is-on'),
+        'and the popup shows the tile the pointer is on',
+      );
+      assert.equal(q.click(160, q.tops[0] + 2), false, 'a canvas press answers nothing while the popup is up');
+      assert.deepEqual(got, []);
+      tiles[2].onclick();
+      assert.deepEqual(got, [NO_LINEAGE], 'the tile pressed is the answer');
+    },
+    { doc: true },
+  );
   // the offline question wears the same face, and the same seam
-  withPage('?skin=enhanced', (doc) => {
-    const q = legacyModelScreen(() => {}, { online: false });
-    q.draw(recorder(), CANVAS, FONT);
-    const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
-    tiles[1].onpointerenter();
-    q.hover(160, q.topOf(0) + 2);
-    assert.equal(q.cursor, 1, 'the offline popup too');
-    q.answer(q.defaultId);
-  }, { doc: true });
+  withPage(
+    '?skin=enhanced',
+    (doc) => {
+      const q = legacyModelScreen(() => {}, { online: false });
+      q.draw(recorder(), CANVAS, FONT);
+      const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
+      tiles[1].onpointerenter();
+      q.hover(160, q.topOf(0) + 2);
+      assert.equal(q.cursor, 1, 'the offline popup too');
+      q.answer(q.defaultId);
+    },
+    { doc: true },
+  );
   // the face is the LAST FRAME's: a question that comes back to the canvas (the skin switched under it) takes the canvas
   // pointer again
-  withPage('?skin=enhanced&online', () => {
-    const q = legacyModelScreen(() => {});
-    q.draw(recorder(), CANVAS, FONT);
-    assert.equal(choiceFaceOwner(), q);
-    globalThis.location = { search: '?skin=classic&online' };
-    q.draw(recorder(), CANVAS, FONT);
-    q.hover(160, q.tops[2] + 2);
-    assert.equal(q.cursor, 2, 'the canvas face drew last, so its rows are the pointer\'s');
-    q.answer(q.defaultId);
-  }, { doc: true });
+  withPage(
+    '?skin=enhanced&online',
+    () => {
+      const q = legacyModelScreen(() => {});
+      q.draw(recorder(), CANVAS, FONT);
+      assert.equal(choiceFaceOwner(), q);
+      globalThis.location = { search: '?skin=classic&online' };
+      q.draw(recorder(), CANVAS, FONT);
+      q.hover(160, q.tops[2] + 2);
+      assert.equal(q.cursor, 2, "the canvas face drew last, so its rows are the pointer's");
+      q.answer(q.defaultId);
+    },
+    { doc: true },
+  );
   // the classic skin draws the canvas face, and the canvas seam is its pointer, as ever
   withPage('?skin=classic&online', () => {
     const got = [];
@@ -245,28 +430,55 @@ test('LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down switc
 // ---- the answer, kept --------------------------------------------------------------------------------------------
 
 const career = {
-  name: 'W', hitPointsPerLevel: 12, advancementMultiplier: 1.0,
-  strength: 60, intelligence: 40, willpower: 45, agility: 55,
-  endurance: 60, personality: 40, speed: 50, luck: 50,
+  name: 'W',
+  hitPointsPerLevel: 12,
+  advancementMultiplier: 1.0,
+  strength: 60,
+  intelligence: 40,
+  willpower: 45,
+  agility: 55,
+  endurance: 60,
+  personality: 40,
+  speed: 50,
+  luck: 50,
   primarySkills: [SKILLS.LongBlade, SKILLS.Axe, SKILLS.CriticalStrike],
   majorSkills: [SKILLS.BluntWeapon, SKILLS.Dodging, SKILLS.Jumping],
   minorSkills: [SKILLS.ShortBlade, SKILLS.Archery, SKILLS.Running, SKILLS.Swimming, SKILLS.Climbing, SKILLS.Medical],
 };
 
-test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts the three-way one, and the answer rides the result onto the character and its save', () => {
+test("LEGACY-CHOICE the answer is the character's: the chargen door online puts the three-way one, and the answer rides the result onto the character and its save", () => {
   let result = null;
   withPage('?online', () => {
-    const w = createChargenWindow(new ChargenFlow([{ name: 'Warrior', career }], () => 0), { onDone: (r) => { result = r; } });
-    const key = (code, n = 1) => { for (let i = 0; i < n; i++) w.input(code); };
-    key('Enter'); key('KeyM'); key('Enter'); key('Enter');
+    const w = createChargenWindow(new ChargenFlow([{ name: 'Warrior', career }], () => 0), {
+      onDone: (r) => {
+        result = r;
+      },
+    });
+    const key = (code, n = 1) => {
+      for (let i = 0; i < n; i++) w.input(code);
+    };
+    key('Enter');
+    key('KeyM');
+    key('Enter');
+    key('Enter');
     for (const c of 'KeyM KeyA KeyC'.split(' ')) w.input(c);
-    key('Enter'); key('Enter');
-    key('Equal', 6); key('Enter');
-    key('Equal', 6); key('ArrowDown', 3);
-    key('Equal', 6); key('ArrowDown', 3);
-    key('Equal', 6); key('Enter');
-    key('Enter'); key('Enter');   // reflexes, summary -> Project Legacy's question (online: on)
-    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline, NO_LINEAGE], 'then Project Legacy\'s, three ways');
+    key('Enter');
+    key('Enter');
+    key('Equal', 6);
+    key('Enter');
+    key('Equal', 6);
+    key('ArrowDown', 3);
+    key('Equal', 6);
+    key('ArrowDown', 3);
+    key('Equal', 6);
+    key('Enter');
+    key('Enter');
+    key('Enter'); // reflexes, summary -> Project Legacy's question (online: on)
+    assert.deepEqual(
+      w.questionPrompt?.options?.map((o) => o.id),
+      [MODELS.enduring, MODELS.bloodline, NO_LINEAGE],
+      "then Project Legacy's, three ways",
+    );
     w.input('char:3');
     assert.equal(w.done, true);
     assert.equal(result.legacyModel, NO_LINEAGE);
@@ -291,7 +503,8 @@ test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts
   const back = ent('c-save');
   restorePlayer(back, snap);
   assert.equal(back.legacyChoice, NO_LINEAGE);
-  const old = { ...snap }; delete old.legacyChoice;
+  const old = { ...snap };
+  delete old.legacyChoice;
   const oldBack = ent('c-save');
   restorePlayer(oldBack, old);
   assert.equal(oldBack.legacyChoice, undefined);
@@ -323,9 +536,21 @@ test('LEGACY-CHOICE the law: no lineage founds no house - at the birth, at any l
   assert.equal(again.afterBoot()?.id, fam.id, 'its own house, found');
   // offline: the older character founded at its first load - its own answer over the tile's, the tile's with none;
   // no lineage, never
-  assert.equal(host(ent('c-own', { legacyChoice: MODELS.bloodline }), { online: false, tile: 0 }).afterBoot().model, MODELS.bloodline, 'its own answer');
-  assert.equal(host(ent('c-tile'), { online: false, tile: 1 }).afterBoot().model, MODELS.bloodline, 'its Features tile\'s (D9)');
-  assert.equal(host(ent('c-none', { legacyChoice: NO_LINEAGE }), { online: false, tile: 1 }).afterBoot(), null, 'no lineage offline too (a character copied out keeps it)');
+  assert.equal(
+    host(ent('c-own', { legacyChoice: MODELS.bloodline }), { online: false, tile: 0 }).afterBoot().model,
+    MODELS.bloodline,
+    'its own answer',
+  );
+  assert.equal(
+    host(ent('c-tile'), { online: false, tile: 1 }).afterBoot().model,
+    MODELS.bloodline,
+    "its Features tile's (D9)",
+  );
+  assert.equal(
+    host(ent('c-none', { legacyChoice: NO_LINEAGE }), { online: false, tile: 1 }).afterBoot(),
+    null,
+    'no lineage offline too (a character copied out keeps it)',
+  );
   // a birth no question was put to (the headless door): online's safe Enduring, offline the tile's
   assert.equal(host(ent('r-headless'), { online: true, tile: 1 }).onCharacterMade().model, MODELS.enduring);
   assert.equal(host(ent('c-headless'), { online: false, tile: 1 }).onCharacterMade().model, MODELS.bloodline);
@@ -335,10 +560,19 @@ test('LEGACY-CHOICE the law: no lineage founds no house - at the birth, at any l
 
 test('LEGACY-CHOICE the Family tab says why there is no house: no lineage chosen, or online one loaded with none - a new character founds one', () => {
   const prov = (over) => ({ on: () => true, ...over });
-  assert.match(noFamilyLine(prov({ choice: () => NO_LINEAGE, online: () => true })), /chose to live without a house\. Make a new character to found one\./);
+  assert.match(
+    noFamilyLine(prov({ choice: () => NO_LINEAGE, online: () => true })),
+    /chose to live without a house\. Make a new character to found one\./,
+  );
   assert.match(noFamilyLine(prov({ choice: () => NO_LINEAGE, online: () => false })), /chose to live without a house/);
-  assert.match(noFamilyLine(prov({ choice: () => null, online: () => true })), /Online, a house is founded only when a character is made\. Make a new character to found one\./);
-  assert.match(noFamilyLine(prov({ choice: () => null, online: () => false })), /founded when your character is made, or the first time an older character is loaded/);
+  assert.match(
+    noFamilyLine(prov({ choice: () => null, online: () => true })),
+    /Online, a house is founded only when a character is made\. Make a new character to found one\./,
+  );
+  assert.match(
+    noFamilyLine(prov({ choice: () => null, online: () => false })),
+    /founded when your character is made, or the first time an older character is loaded/,
+  );
   assert.match(noFamilyLine({ on: () => false }), /Turn on Project Legacy/);
   assert.match(noFamilyLine(null), /Open this from a game to see your family\./);
 });

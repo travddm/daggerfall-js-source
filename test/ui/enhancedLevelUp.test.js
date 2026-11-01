@@ -21,34 +21,79 @@ import { fileURLToPath } from 'node:url';
 import { STAT_KEYS_ORDER, createCharacter } from '../../src/systems/chargen.js';
 import { MAX_STAT_VALUE } from '../../src/ui/chargen.js';
 import { SKILLS, SKILL_NAMES, setSkillRecentlyIncreased } from '../../src/systems/skills.js';
-import { levelUpSkillSum, LEVELUP_SKILL_SUM_PER_LEVEL, LEVELUP_BONUS_POOL_MIN, LEVELUP_BONUS_POOL_MAX } from '../../src/systems/advancement.js';
+import {
+  levelUpSkillSum,
+  LEVELUP_SKILL_SUM_PER_LEVEL,
+  LEVELUP_BONUS_POOL_MIN,
+  LEVELUP_BONUS_POOL_MAX,
+} from '../../src/systems/advancement.js';
 import { sheetModel } from '../../src/ui/enhanced/enhancedCharSheet.js';
 import { damageModifier, magicResist } from '../../src/combat/formulas.js';
 import { FATIGUE_MULTIPLIER } from '../../src/systems/statMods.js';
 import { LevelUpScreen, MUST_DISTRIBUTE_BONUS_POINTS } from '../../src/ui/charsheet.js';
 import { paintLevelUpWait, RISEN_WAIT_TEXT, OGHMA_WAIT_TEXT, LEVELUP_WAIT_MS } from '../../src/ui/charSheetDoor.js';
 import { OGHMA_BONUS_POOL } from '../../src/systems/artifactEffects.js';
-import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
-import { patchLocaleTable, setLocale, _resetTextManagerForTests } from '../../src/systems/textManager.js';   // AUDIT GROWTH LANE5-1
-import { crownTitle, askOne, askDone, askView, starHowto } from '../../src/ui/enhanced/enhancedLevelUp.js';   // AUDIT GROWTH LANE5-1
+import { hostText } from '../hostText.mjs'; // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+import { patchLocaleTable, setLocale, _resetTextManagerForTests } from '../../src/systems/textManager.js'; // AUDIT GROWTH LANE5-1
+import { crownTitle, askOne, askDone, askView, starHowto } from '../../src/ui/enhanced/enhancedLevelUp.js'; // AUDIT GROWTH LANE5-1
 import {
-  LANE_CLASSIC, LANE_OGHMA, levelUpLane, rolloutRows, rolloutPool, poolLabel,
-  canAscend, refusalText, corneredHint, pressAt, raiseAt, lowerAt, focusAt, focusedKey, ascend,
-  allMaxed, allMaxLine, levelUpFrame,
-  levelUpCrown, levelProgress, levelSumRoles, riseRibbon, levelUpVitals, levelUpModel,
-  STAR_FIGURE, STAR_MIN_APART_X, STAR_MIN_APART_Y, crowdedStarPairs,
-  ATTRIBUTE_BLURB, attributeLabel, starBrightness,
-  ROLE_COUNTS, ROLE_DROPPED, ROLE_BEST, ROLE_IDLE, ROLE_NOTE,
+  LANE_CLASSIC,
+  LANE_OGHMA,
+  levelUpLane,
+  rolloutRows,
+  rolloutPool,
+  poolLabel,
+  canAscend,
+  refusalText,
+  corneredHint,
+  pressAt,
+  raiseAt,
+  lowerAt,
+  focusAt,
+  focusedKey,
+  ascend,
+  allMaxed,
+  allMaxLine,
+  levelUpFrame,
+  levelUpCrown,
+  levelProgress,
+  levelSumRoles,
+  riseRibbon,
+  levelUpVitals,
+  levelUpModel,
+  STAR_FIGURE,
+  STAR_MIN_APART_X,
+  STAR_MIN_APART_Y,
+  crowdedStarPairs,
+  ATTRIBUTE_BLURB,
+  attributeLabel,
+  starBrightness,
+  ROLE_COUNTS,
+  ROLE_DROPPED,
+  ROLE_BEST,
+  ROLE_IDLE,
+  ROLE_NOTE,
 } from '../../src/ui/levelUp/levelUpView.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => hostText(f);
-const seq = (...v) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
+const seq = (...v) => {
+  let i = 0;
+  return () => v[Math.min(i++, v.length - 1)];
+};
 
 const career = {
-  name: 'W', hitPointsPerLevel: 12, advancementMultiplier: 1.0,
-  strength: 60, intelligence: 40, willpower: 45, agility: 55,
-  endurance: 60, personality: 40, speed: 50, luck: 50,
+  name: 'W',
+  hitPointsPerLevel: 12,
+  advancementMultiplier: 1.0,
+  strength: 60,
+  intelligence: 40,
+  willpower: 45,
+  agility: 55,
+  endurance: 60,
+  personality: 40,
+  speed: 50,
+  luck: 50,
   primarySkills: [SKILLS.LongBlade, SKILLS.Axe, SKILLS.CriticalStrike],
   majorSkills: [SKILLS.BluntWeapon, SKILLS.Dodging, SKILLS.Jumping],
   minorSkills: [SKILLS.ShortBlade, SKILLS.Archery, SKILLS.Running, SKILLS.Swimming, SKILLS.Climbing, SKILLS.Medical],
@@ -56,8 +101,10 @@ const career = {
 function player(over = {}) {
   const p = { isPlayer: true, reflexes: 2, items: [] };
   createCharacter(p, career, 16, { rolls: seq(0) });
-  p.name = 'Toshley'; p.race = 'Nord';
-  p.readyToLevelUp = true; p.pendingLevel = (p.level ?? 1) + 1;
+  p.name = 'Toshley';
+  p.race = 'Nord';
+  p.readyToLevelUp = true;
+  p.pendingLevel = (p.level ?? 1) + 1;
   return Object.assign(p, over);
 }
 
@@ -78,15 +125,21 @@ test('LV1: the lane is refused IN ITS OWN WORDS, imported rather than typed', ()
 
 // ── THE ROWS ASK THE LAW ──────────────────────────────────────────
 
-test('LV1: canRaise/canLower are the LAW\'s answer - asked, never restated', () => {
+test("LV1: canRaise/canLower are the LAW's answer - asked, never restated", () => {
   const p = player();
   const w = new LevelUpScreen(p, seq(0));
   const pool = w.pool;
   assert.ok(pool >= LEVELUP_BONUS_POOL_MIN && pool <= LEVELUP_BONUS_POOL_MAX);
   let rows = rolloutRows(w);
   assert.equal(rows.length, 8);
-  assert.ok(rows.every((r) => r.canRaise), 'with a pool, every row can take a point');
-  assert.ok(rows.every((r) => !r.canLower), 'and none can give one back before one is spent');
+  assert.ok(
+    rows.every((r) => r.canRaise),
+    'with a pool, every row can take a point',
+  );
+  assert.ok(
+    rows.every((r) => !r.canLower),
+    'and none can give one back before one is spent',
+  );
 
   // A row AT THE CEILING refuses even with a pool - statUp's own clamp
   // (MAX_STAT_VALUE), which a `pool > 0` restatement would have missed.
@@ -102,10 +155,13 @@ test('LV1: canRaise/canLower are the LAW\'s answer - asked, never restated', () 
   // is spending, so it stops half way - which is how this pin first
   // failed, on the test's arithmetic rather than the window's.
   const rolled = w2.pool;
-  for (let i = 0; i < rolled; i++) w2.input('plus');   // all into the cursor's row
+  for (let i = 0; i < rolled; i++) w2.input('plus'); // all into the cursor's row
   const spent = rolloutRows(w2);
   assert.equal(rolloutPool(w2), 0);
-  assert.ok(spent.every((r) => !r.canRaise), 'an empty pool raises nothing');
+  assert.ok(
+    spent.every((r) => !r.canRaise),
+    'an empty pool raises nothing',
+  );
   assert.equal(spent[0].canLower, true, 'and the row that took them can give them back');
   assert.equal(spent[0].delta, rolled, 'every point went where it was aimed');
 });
@@ -129,36 +185,53 @@ test('LV1: a press lands on the attribute it was aimed at, however the cursor wa
   assert.equal(pressAt(w, 'nonsense', 'plus'), false);
 });
 
-test('LV1: every press goes through the SCREEN\'s own input - one door, both lanes', () => {
+test("LV1: every press goes through the SCREEN's own input - one door, both lanes", () => {
   const calls = [];
-  const fake = { cursor: 0, pool: 3, base: {}, working: {}, input: (a) => { calls.push([fake.cursor, a]); } };
+  const fake = {
+    cursor: 0,
+    pool: 3,
+    base: {},
+    working: {},
+    input: (a) => {
+      calls.push([fake.cursor, a]);
+    },
+  };
   focusAt(fake, 'endurance');
   assert.equal(fake.cursor, STAT_KEYS_ORDER.indexOf('endurance'));
   raiseAt(fake, 'speed');
   lowerAt(fake, 'speed');
-  assert.deepEqual(calls, [
-    [STAT_KEYS_ORDER.indexOf('speed'), 'plus'],
-    [STAT_KEYS_ORDER.indexOf('speed'), 'minus'],
-  ], 'select, then press - the two moves the keyboard makes');
+  assert.deepEqual(
+    calls,
+    [
+      [STAT_KEYS_ORDER.indexOf('speed'), 'plus'],
+      [STAT_KEYS_ORDER.indexOf('speed'), 'minus'],
+    ],
+    'select, then press - the two moves the keyboard makes',
+  );
 });
 
-test('LV1: the commit is the screen\'s, and it is refused until the pool is spent', () => {
+test("LV1: the commit is the screen's, and it is refused until the pool is spent", () => {
   const p = player();
   const w = new LevelUpScreen(p, seq(0));
-  const level = p.level, hp = p.maxHealth;
+  const level = p.level,
+    hp = p.maxHealth;
   assert.equal(canAscend(w), false);
-  assert.equal(ascend(w), false, 'DFU\'s CheckIfDoneLeveling refuses while a point is owed');
+  assert.equal(ascend(w), false, "DFU's CheckIfDoneLeveling refuses while a point is owed");
   assert.equal(p.level, level, 'and nothing moved');
   const base = { ...p.stats };
   const pool = w.pool;
-  for (let i = 0; i < pool; i++) { focusAt(w, STAT_KEYS_ORDER[i % 8]); raiseAt(w, STAT_KEYS_ORDER[i % 8]); }
+  for (let i = 0; i < pool; i++) {
+    focusAt(w, STAT_KEYS_ORDER[i % 8]);
+    raiseAt(w, STAT_KEYS_ORDER[i % 8]);
+  }
   assert.equal(canAscend(w), true);
   assert.equal(ascend(w), true);
   assert.equal(p.level, level + 1, 'ONE level, never a jump (the L-slice law)');
   assert.ok(p.maxHealth > hp, 'the health roll landed');
   assert.equal(p.readyToLevelUp, false);
   assert.equal(
-    STAT_KEYS_ORDER.reduce((a, k) => a + p.stats[k] - base[k], 0), pool,
+    STAT_KEYS_ORDER.reduce((a, k) => a + p.stats[k] - base[k], 0),
+    pool,
     'exactly the pool the law rolled went into the stats',
   );
 });
@@ -180,15 +253,21 @@ test('LV1: ALL-MAX IS THE OTHER TERM OF CheckIfDoneLeveling, and the first cut h
   for (const k of STAT_KEYS_ORDER) p.stats[k] = MAX_STAT_VALUE;
   const w = new LevelUpScreen(p, seq(0));
   assert.ok(w.pool > 0, 'the pool is still rolled');
-  assert.ok(rolloutRows(w).every((r) => !r.canRaise), 'and nothing can take a point of it');
+  assert.ok(
+    rolloutRows(w).every((r) => !r.canRaise),
+    'and nothing can take a point of it',
+  );
   assert.equal(allMaxed(w), true);
   assert.equal(canAscend(w), true, 'so the way out is open');
   assert.equal(corneredHint(w), allMaxLine(), 'and it says THAT, not "take a point back" - there is no elsewhere');
-  assert.equal(allMaxLine(), 'Every attribute is at its maximum. Leftover points can\'t be spent.');
+  assert.equal(allMaxLine(), "Every attribute is at its maximum. Leftover points can't be spent.");
   const level = p.level;
   assert.equal(ascend(w), true);
   assert.equal(p.level, level + 1, 'the level still lands');
-  assert.ok(STAT_KEYS_ORDER.every((k) => p.stats[k] === MAX_STAT_VALUE), 'and nothing went past the ceiling');
+  assert.ok(
+    STAT_KEYS_ORDER.every((k) => p.stats[k] === MAX_STAT_VALUE),
+    'and nothing went past the ceiling',
+  );
 
   // LESS ROOM THAN POOL, which is the same wall one step in: seven at
   // the ceiling and one at 98 against a roll of four or more.
@@ -198,7 +277,8 @@ test('LV1: ALL-MAX IS THE OTHER TERM OF CheckIfDoneLeveling, and the first cut h
   const v = new LevelUpScreen(q, seq(0));
   const pool = v.pool;
   assert.equal(canAscend(v), false, 'while a row can still take one, the pool must be spent');
-  raiseAt(v, 'luck'); raiseAt(v, 'luck');
+  raiseAt(v, 'luck');
+  raiseAt(v, 'luck');
   assert.equal(rolloutPool(v), pool - 2);
   assert.equal(canAscend(v), true, 'and the moment the room runs out, the leftover is voided');
   assert.equal(ascend(v), true);
@@ -216,10 +296,10 @@ test('LV1: the crown promises a level - except over the Oghma Infinium, which gr
   const b = player({ oghmaLevelUp: true, pendingLevel: null });
   const cb = levelUpCrown(b, new LevelUpScreen(b, seq(0)));
   assert.equal(cb.lane, LANE_OGHMA);
-  assert.equal(cb.to, cb.from, 'applyLevelUp\'s oghma arm takes no Level++ (AUDIT 39), so the window promises none');
+  assert.equal(cb.to, cb.from, "applyLevelUp's oghma arm takes no Level++ (AUDIT 39), so the window promises none");
 });
 
-test('LV1: the bar under the level is the LAW\'s remainder', () => {
+test("LV1: the bar under the level is the LAW's remainder", () => {
   const p = player({ startingLevelUpSkillSum: 100, currentLevelUpSkillSum: 119 });
   const g = levelProgress(p, new LevelUpScreen(p, seq(0)));
   // (119 - 100 + 28) = 47; 47 mod 15 = 2, and 47/15 floors to level 3.
@@ -230,7 +310,7 @@ test('LV1: the bar under the level is the LAW\'s remainder', () => {
 
 // ── THE ONE THING THIS SCREEN TEACHES ─────────────────────────────
 
-test('LV1: the ribbon\'s roles RECONSTRUCT levelUpSkillSum exactly, over every shape of career', () => {
+test("LV1: the ribbon's roles RECONSTRUCT levelUpSkillSum exactly, over every shape of career", () => {
   // THE PIN THAT MATTERS. The window tells a player which of their
   // skills count toward the next level - a rule Daggerfall never
   // states anywhere - and that sentence is a SECOND reading of
@@ -265,55 +345,132 @@ test('LV1: the ribbon\'s roles RECONSTRUCT levelUpSkillSum exactly, over every s
   // reading the ribbon is reading four distinct facts.
   assert.equal(new Set(Object.values(ROLE_NOTE)).size, 4);
   // the window never defines - so each role is held to the skill it names and what that skill does for the level
-  assert.deepEqual({ ...ROLE_NOTE }, {
-    [ROLE_COUNTS]: 'Every point counts toward your next level.',
-    [ROLE_DROPPED]: 'Your lowest major skill. It doesn\'t count toward your next level.',
-    [ROLE_BEST]: 'Your highest minor skill, the only minor skill that counts toward your next level.',
-    [ROLE_IDLE]: 'Doesn\'t count toward your next level.',
-  });
+  assert.deepEqual(
+    { ...ROLE_NOTE },
+    {
+      [ROLE_COUNTS]: 'Every point counts toward your next level.',
+      [ROLE_DROPPED]: "Your lowest major skill. It doesn't count toward your next level.",
+      [ROLE_BEST]: 'Your highest minor skill, the only minor skill that counts toward your next level.',
+      [ROLE_IDLE]: "Doesn't count toward your next level.",
+    },
+  );
 });
 
-test('AUDIT GROWTH LANE5-1: the window\'s words are read in the player\'s language when they are drawn, never fixed at load', () => {
+test("AUDIT GROWTH LANE5-1: the window's words are read in the player's language when they are drawn, never fixed at load", () => {
   // A word captured at module load stays English whatever the player chose: each of these is asked again on every
   // read, so a table patched after the import answers - and English comes back with the locale.
   const p = player();
   const w = new LevelUpScreen(p, seq(0));
-  const english = [ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
-    crownTitle({ lane: LANE_OGHMA }), crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }), levelProgress(p, w).label, levelUpVitals(p)[0].label];
-  assert.deepEqual(english, ['Helps you hit and avoid hits, as Agility does, and improves your loot.', 'Doesn\'t count toward your next level.', 'Luck',
-    'Bonus points left', 'Every attribute is at its maximum. Leftover points can\'t be spent.', 'Spend your points', 'All points spent', 'Your attributes',
-    'Click a star to choose it, click again to add a point, right-click to take one back', 'The Oghma Infinium', 'Level 3 → 4',
-    'Skill progress to next level', 'Health']);
+  const english = [
+    ATTRIBUTE_BLURB.luck,
+    ROLE_NOTE[ROLE_IDLE],
+    attributeLabel('luck'),
+    poolLabel(),
+    allMaxLine(),
+    askOne(),
+    askDone(),
+    askView(),
+    starHowto(),
+    crownTitle({ lane: LANE_OGHMA }),
+    crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }),
+    levelProgress(p, w).label,
+    levelUpVitals(p)[0].label,
+  ];
+  assert.deepEqual(english, [
+    'Helps you hit and avoid hits, as Agility does, and improves your loot.',
+    "Doesn't count toward your next level.",
+    'Luck',
+    'Bonus points left',
+    "Every attribute is at its maximum. Leftover points can't be spent.",
+    'Spend your points',
+    'All points spent',
+    'Your attributes',
+    'Click a star to choose it, click again to add a point, right-click to take one back',
+    'The Oghma Infinium',
+    'Level 3 → 4',
+    'Skill progress to next level',
+    'Health',
+  ]);
   try {
-    patchLocaleTable('fr', 'Port_Strings', [['levelup.blurb.luck', 'Chance'], ['levelup.role.idle', 'Ne compte pas'], ['levelup.attr.luck', 'Chance (attribut)'],
-      ['levelup.pool.bonus', 'Points restants'], ['levelup.allMax', 'Tout est au maximum.'], ['levelup.ask.one', 'Dépensez vos points'],
-      ['levelup.ask.done', 'Points dépensés'], ['levelup.ask.view', 'Vos attributs'], ['levelup.howto', 'Cliquez'], ['levelup.crown.oghma', 'L\'Oghma Infinium'],
-      ['levelup.crown.levelUp', 'Niveau {from} → {to}'], ['levelup.progress.classic', 'Progrès'], ['levelup.vital.health', 'Santé']]);
+    patchLocaleTable('fr', 'Port_Strings', [
+      ['levelup.blurb.luck', 'Chance'],
+      ['levelup.role.idle', 'Ne compte pas'],
+      ['levelup.attr.luck', 'Chance (attribut)'],
+      ['levelup.pool.bonus', 'Points restants'],
+      ['levelup.allMax', 'Tout est au maximum.'],
+      ['levelup.ask.one', 'Dépensez vos points'],
+      ['levelup.ask.done', 'Points dépensés'],
+      ['levelup.ask.view', 'Vos attributs'],
+      ['levelup.howto', 'Cliquez'],
+      ['levelup.crown.oghma', "L'Oghma Infinium"],
+      ['levelup.crown.levelUp', 'Niveau {from} → {to}'],
+      ['levelup.progress.classic', 'Progrès'],
+      ['levelup.vital.health', 'Santé'],
+    ]);
     setLocale('fr');
-    assert.deepEqual([ATTRIBUTE_BLURB.luck, ROLE_NOTE[ROLE_IDLE], attributeLabel('luck'), poolLabel(), allMaxLine(), askOne(), askDone(), askView(), starHowto(),
-      crownTitle({ lane: LANE_OGHMA }), crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }), levelProgress(p, w).label, levelUpVitals(p)[0].label],
-    ['Chance', 'Ne compte pas', 'Chance (attribut)', 'Points restants', 'Tout est au maximum.', 'Dépensez vos points', 'Points dépensés', 'Vos attributs', 'Cliquez',
-      'L\'Oghma Infinium', 'Niveau 3 → 4', 'Progrès', 'Santé']);
+    assert.deepEqual(
+      [
+        ATTRIBUTE_BLURB.luck,
+        ROLE_NOTE[ROLE_IDLE],
+        attributeLabel('luck'),
+        poolLabel(),
+        allMaxLine(),
+        askOne(),
+        askDone(),
+        askView(),
+        starHowto(),
+        crownTitle({ lane: LANE_OGHMA }),
+        crownTitle({ lane: LANE_CLASSIC, from: 3, to: 4 }),
+        levelProgress(p, w).label,
+        levelUpVitals(p)[0].label,
+      ],
+      [
+        'Chance',
+        'Ne compte pas',
+        'Chance (attribut)',
+        'Points restants',
+        'Tout est au maximum.',
+        'Dépensez vos points',
+        'Points dépensés',
+        'Vos attributs',
+        'Cliquez',
+        "L'Oghma Infinium",
+        'Niveau 3 → 4',
+        'Progrès',
+        'Santé',
+      ],
+    );
     setLocale('en');
     assert.equal(ATTRIBUTE_BLURB.luck, english[0], 'and English again with the locale');
-  } finally { _resetTextManagerForTests(); }
+  } finally {
+    _resetTextManagerForTests();
+  }
 });
 
 test('LV1: the ribbon leads with what rose, and is never empty', () => {
   const p = player();
-  setSkillRecentlyIncreased(p, SKILLS.Archery);      // a MAJOR skill, id 33 - the second mask word
-  setSkillRecentlyIncreased(p, SKILLS.Lockpicking);  // MISCELLANEOUS - in no career group
+  setSkillRecentlyIncreased(p, SKILLS.Archery); // a MAJOR skill, id 33 - the second mask word
+  setSkillRecentlyIncreased(p, SKILLS.Lockpicking); // MISCELLANEOUS - in no career group
   const ribbon = riseRibbon(p);
-  assert.ok(ribbon.length >= 12, 'the career\'s own twelve are always there');
-  assert.ok(ribbon.slice(0, 2).every((r) => r.risen), 'what rose leads');
-  assert.deepEqual(new Set(ribbon.slice(0, 2).map((r) => r.name)),
-    new Set([SKILL_NAMES[SKILLS.Archery], SKILL_NAMES[SKILLS.Lockpicking]]));
+  assert.ok(ribbon.length >= 12, "the career's own twelve are always there");
+  assert.ok(
+    ribbon.slice(0, 2).every((r) => r.risen),
+    'what rose leads',
+  );
+  assert.deepEqual(
+    new Set(ribbon.slice(0, 2).map((r) => r.name)),
+    new Set([SKILL_NAMES[SKILLS.Archery], SKILL_NAMES[SKILLS.Lockpicking]]),
+  );
   const lock = ribbon.find((r) => r.name === SKILL_NAMES[SKILLS.Lockpicking]);
   assert.equal(lock.group, 'Miscellaneous');
   assert.equal(lock.role, ROLE_IDLE, 'a misc skill is not in the sum, and the ribbon says so rather than hiding it');
   // The mask is DFU's uint[2] and the word index is the trap: Archery
   // is skill 33, so a naive `1 << 33` marks Etiquette instead.
-  assert.equal(riseRibbon(player()).some((r) => r.risen), false, 'nothing rose on a fresh character');
+  assert.equal(
+    riseRibbon(player()).some((r) => r.risen),
+    false,
+    'nothing rose on a fresh character',
+  );
   // A character with no career at all is a strip of nothing rather
   // than a crash - the Oghma can open this window on any save.
   assert.deepEqual(riseRibbon({}), []);
@@ -322,8 +479,11 @@ test('LV1: the ribbon leads with what rose, and is never empty', () => {
 // ── THE FIGURE ────────────────────────────────────────────────────
 
 test('LV1: the asterism is eight stars, one per attribute, inside its own box', () => {
-  assert.deepEqual(Object.keys(STAR_FIGURE.stars).sort(), [...STAT_KEYS_ORDER].sort(),
-    'every attribute has a star and no star has no attribute');
+  assert.deepEqual(
+    Object.keys(STAR_FIGURE.stars).sort(),
+    [...STAT_KEYS_ORDER].sort(),
+    'every attribute has a star and no star has no attribute',
+  );
   for (const [k, p] of Object.entries(STAR_FIGURE.stars)) {
     assert.ok(p.x >= 0 && p.x <= STAR_FIGURE.box.w, `${k} x`);
     assert.ok(p.y >= 0 && p.y <= STAR_FIGURE.box.h, `${k} y`);
@@ -355,7 +515,7 @@ test('LV1: no two stars can be drawn on top of each other', () => {
   assert.ok(STAR_MIN_APART_X > 0 && STAR_MIN_APART_Y > 0);
 });
 
-test('LV1: a star\'s brightness is its VALUE, against the same ceiling the rollout clamps to', () => {
+test("LV1: a star's brightness is its VALUE, against the same ceiling the rollout clamps to", () => {
   assert.equal(starBrightness(0), 0);
   assert.equal(starBrightness(MAX_STAT_VALUE), 1);
   assert.equal(starBrightness(MAX_STAT_VALUE * 2), 1, 'a drained-then-fortified stat cannot overflow the star');
@@ -370,8 +530,20 @@ test('LV1: a star\'s brightness is its VALUE, against the same ceiling the rollo
 
 test('LV1: levelUpModel is the whole window, and it holds together in both lanes', () => {
   for (const [lane, mk] of [
-    [LANE_CLASSIC, () => { const p = player(); return [p, new LevelUpScreen(p, seq(0))]; }],
-    [LANE_OGHMA, () => { const p = player({ oghmaLevelUp: true, pendingLevel: null }); return [p, new LevelUpScreen(p, seq(0))]; }],
+    [
+      LANE_CLASSIC,
+      () => {
+        const p = player();
+        return [p, new LevelUpScreen(p, seq(0))];
+      },
+    ],
+    [
+      LANE_OGHMA,
+      () => {
+        const p = player({ oghmaLevelUp: true, pendingLevel: null });
+        return [p, new LevelUpScreen(p, seq(0))];
+      },
+    ],
   ]) {
     const [p, w] = mk();
     const m = levelUpModel(p, w);
@@ -379,7 +551,7 @@ test('LV1: levelUpModel is the whole window, and it holds together in both lanes
     assert.equal(m.rows.length, 8);
     assert.equal(m.focus, STAT_KEYS_ORDER[0]);
     assert.equal(m.refusal, null, 'nothing has been refused yet');
-    assert.equal(m.vitals.length, 3, 'health, fatigue and magicka - the sheet\'s own three');
+    assert.equal(m.vitals.length, 3, "health, fatigue and magicka - the sheet's own three");
     assert.ok(m.vitals.every((v) => Number.isFinite(v.now) && Number.isFinite(v.max)));
     assert.equal(m.canAscend, m.pool === 0);
     assert.equal(m.poolLabel, poolLabel());
@@ -390,10 +562,10 @@ test('LV1: levelUpModel is the whole window, and it holds together in both lanes
   const p = player();
   const w = new LevelUpScreen(p, seq(0));
   assert.equal(levelUpModel(p, w, true).refusal, MUST_DISTRIBUTE_BONUS_POINTS);
-  assert.equal(w.refused, undefined, 'the latch is the window\'s, not a new field on the law');
+  assert.equal(w.refused, undefined, "the latch is the window's, not a new field on the law");
 });
 
-test('LV1: the vitals are the SHEET\'s numbers, read from the SHEET\'s own model', () => {
+test("LV1: the vitals are the SHEET's numbers, read from the SHEET's own model", () => {
   // The first cut restated maxFatigue's arithmetic here, which is a
   // pin that cannot fail: it agreed with itself. The claim the file
   // makes is that this window and the pause window's Stats page read
@@ -401,14 +573,23 @@ test('LV1: the vitals are the SHEET\'s numbers, read from the SHEET\'s own model
   const p = player();
   const v = levelUpVitals(p);
   const sheet = sheetModel(p);
-  assert.deepEqual(v.map((r) => r.label), ['Health', 'Fatigue', 'Magicka']);
-  assert.deepEqual(v.map((r) => [r.now, r.max]), [
-    [sheet.health.now, sheet.health.max],
-    [sheet.fatigue.now, sheet.fatigue.max],
-    [sheet.magicka.now, sheet.magicka.max],
-  ], 'field for field, the sheet\'s');
-  assert.ok(sheet.fatigue.max * FATIGUE_MULTIPLIER === (p.stats.strength + p.stats.endurance) * FATIGUE_MULTIPLIER,
-    'and the sheet is the one that owns the /64 display divisor');
+  assert.deepEqual(
+    v.map((r) => r.label),
+    ['Health', 'Fatigue', 'Magicka'],
+  );
+  assert.deepEqual(
+    v.map((r) => [r.now, r.max]),
+    [
+      [sheet.health.now, sheet.health.max],
+      [sheet.fatigue.now, sheet.fatigue.max],
+      [sheet.magicka.now, sheet.magicka.max],
+    ],
+    "field for field, the sheet's",
+  );
+  assert.ok(
+    sheet.fatigue.max * FATIGUE_MULTIPLIER === (p.stats.strength + p.stats.endurance) * FATIGUE_MULTIPLIER,
+    'and the sheet is the one that owns the /64 display divisor',
+  );
 });
 
 test('LV1: a repaint reads the FRAME, and the frame carries nothing a repaint does not use', () => {
@@ -423,7 +604,10 @@ test('LV1: a repaint reads the FRAME, and the frame carries nothing a repaint do
   const model = levelUpModel(p, w);
   assert.equal('ribbon' in frame, false);
   assert.equal('vitals' in frame, false);
-  assert.deepEqual(Object.keys(model).filter((k) => !(k in frame)), ['ribbon', 'vitals']);
+  assert.deepEqual(
+    Object.keys(model).filter((k) => !(k in frame)),
+    ['ribbon', 'vitals'],
+  );
   for (const k of Object.keys(frame)) assert.deepEqual(model[k], frame[k], `${k} agrees`);
 });
 
@@ -444,7 +628,13 @@ test('LV1b: the pause in front of the window is never blank, and never flashes e
   // INLINE STYLE ONLY - paintChunkNotice's doctrine, for its reason:
   // the thing that is still loading must not be a thing this needs.
   const made = [];
-  const doc = { createElement: () => { const n = { style: {}, append() {}, remove() {} }; made.push(n); return n; } };
+  const doc = {
+    createElement: () => {
+      const n = { style: {}, append() {}, remove() {} };
+      made.push(n);
+      return n;
+    },
+  };
   const host = { ownerDocument: doc, append() {} };
   const risen = paintLevelUpWait(host, {});
   assert.equal(risen.textContent, RISEN_WAIT_TEXT);
@@ -459,6 +649,4 @@ test('LV1b: the pause in front of the window is never blank, and never flashes e
   // paintChunkNotice carries.
   assert.equal(paintLevelUpWait(null), null);
   assert.equal(paintLevelUpWait({}), null);
-
 });
-

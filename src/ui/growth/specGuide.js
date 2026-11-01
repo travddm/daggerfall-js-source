@@ -12,20 +12,59 @@
 // The model is pure (specGuideModel - the laws' tables and this entity, nothing drawn); the page draws it with the menu's
 // kit. The words are the laws' own (their passives, riders and choice boxes) and this page's in growth.spec.*.
 
-import { PATHS, pathOf, pathChoices, pathPossible, pathSchoolsText, choosePath, pathChoiceRows, isSignatureSpell, SPEC_RESET_GOLD } from '../../systems/arcanePaths.js';
-import { MARTIAL_PATHS, MARTIAL_SKILLS, MARTIAL_FAMILY, martialPathOf, martialChoices, martialPossible, martialSkillsText, chooseMartialPath, martialChoiceRows, signatureById } from '../../systems/martialPaths.js';
+import {
+  PATHS,
+  pathOf,
+  pathChoices,
+  pathPossible,
+  pathSchoolsText,
+  choosePath,
+  pathChoiceRows,
+  isSignatureSpell,
+  SPEC_RESET_GOLD,
+} from '../../systems/arcanePaths.js';
+import {
+  MARTIAL_PATHS,
+  MARTIAL_SKILLS,
+  MARTIAL_FAMILY,
+  martialPathOf,
+  martialChoices,
+  martialPossible,
+  martialSkillsText,
+  chooseMartialPath,
+  martialChoiceRows,
+  signatureById,
+} from '../../systems/martialPaths.js';
 import { MAGIC_SKILLS, SKILL_NAMES } from '../../systems/skills.js';
-import { masterSkillsActive, masterSkillsSwitchable, isMasteredSkill, careerGroupOf, masterySlots, masterableCount, masterCappedSkill } from '../../systems/masterSkills.js';
+import {
+  masterSkillsActive,
+  masterSkillsSwitchable,
+  isMasteredSkill,
+  careerGroupOf,
+  masterySlots,
+  masterableCount,
+  masterCappedSkill,
+} from '../../systems/masterSkills.js';
 import { signatureSpell } from '../../systems/signatureSpells.js';
-import { specResetRefusal, resetSpec, resetField } from '../../systems/specReset.js';   // SPEC-RESET: a held path given up, for gold
-import { SKILL_SWAP_GOLD, swapOutChoices, swapInChoices, skillSwapRefusal, swapGroupOf, swapSkill, swappedCareer, swapOpens, swapShortfall } from '../../systems/skillSwap.js';   // SKILL-SWAP: a class skill given up for another, for gold
-import { alreadyMasteredASkill } from '../../systems/advancement.js';   // AUDIT SUGGESTIONS-1019 L5-2: the 95 lock a swap moves
-import { computeEntityMods } from '../../systems/entityMods.js';   // AUDIT SPEC-RESET L1-3: a chosen path's stats now
+import { specResetRefusal, resetSpec, resetField } from '../../systems/specReset.js'; // SPEC-RESET: a held path given up, for gold
+import {
+  SKILL_SWAP_GOLD,
+  swapOutChoices,
+  swapInChoices,
+  skillSwapRefusal,
+  swapGroupOf,
+  swapSkill,
+  swappedCareer,
+  swapOpens,
+  swapShortfall,
+} from '../../systems/skillSwap.js'; // SKILL-SWAP: a class skill given up for another, for gold
+import { alreadyMasteredASkill } from '../../systems/advancement.js'; // AUDIT SUGGESTIONS-1019 L5-2: the 95 lock a swap moves
+import { computeEntityMods } from '../../systems/entityMods.js'; // AUDIT SPEC-RESET L1-3: a chosen path's stats now
 import { sigilDueling } from '../../systems/sigil/sigil.js';
 import { lootRarityOn } from '../../systems/loot/lootRarity.js';
-import { effectWords, spellFrame } from '../enhanced/enhancedSpellbook.js';   // the spellbook's own reading of an effect (SB-FX)
+import { effectWords, spellFrame } from '../enhanced/enhancedSpellbook.js'; // the spellbook's own reading of an effect (SB-FX)
 import { t } from '../../systems/textManager.js';
-import { mentorPowerScale } from '../../systems/mentorMode.js';   // MENTOR2: a held path's share while mentoring
+import { mentorPowerScale } from '../../systems/mentorMode.js'; // MENTOR2: a held path's share while mentoring
 import { pathMentoringText } from '../../systems/mentorText.js';
 
 /** The two families, in the page's order. */
@@ -42,21 +81,47 @@ export function skillStand(entity, id) {
   const value = Math.max(0, Math.round(masterCappedSkill(entity, entity?.skills?.[id] ?? 0, id)));
   const group = careerGroupOf(entity, id);
   const mastered = isMasteredSkill(entity, id);
-  const state = mastered ? 'mastered' : !group ? 'misc' : masterySlots(entity, group).left <= 0 ? 'full' : value >= 100 ? 'ready' : 'climb';
+  const state = mastered
+    ? 'mastered'
+    : !group
+      ? 'misc'
+      : masterySlots(entity, group).left <= 0
+        ? 'full'
+        : value >= 100
+          ? 'ready'
+          : 'climb';
   return { id, name: SKILL_NAMES[id], value, group, mastered, state };
 }
 
 /** The skill's state in words, as the guide's checklist says it. */
 export function skillStandText(s) {
   switch (s.state) {
-    case 'mastered': return t('growth.spec.skill.mastered', '{skill}: mastered ({value})', { skill: s.name, value: s.value });
-    case 'ready': return t('growth.spec.skill.ready', '{skill}: {value} - ready to master in Master Skills', { skill: s.name, value: s.value });
-    case 'climb': return t('growth.spec.skill.climb', '{skill}: {value} of 100, then master it', { skill: s.name, value: s.value });
-    case 'full': return t('growth.spec.skill.full', '{skill}: no {group} mastery slots left', { skill: s.name, group: groupWord(s.group) });
-    default: return t('growth.spec.skill.misc', '{skill}: not one of your class skills, so it can\'t be mastered', { skill: s.name });
+    case 'mastered':
+      return t('growth.spec.skill.mastered', '{skill}: mastered ({value})', { skill: s.name, value: s.value });
+    case 'ready':
+      return t('growth.spec.skill.ready', '{skill}: {value} - ready to master in Master Skills', {
+        skill: s.name,
+        value: s.value,
+      });
+    case 'climb':
+      return t('growth.spec.skill.climb', '{skill}: {value} of 100, then master it', { skill: s.name, value: s.value });
+    case 'full':
+      return t('growth.spec.skill.full', '{skill}: no {group} mastery slots left', {
+        skill: s.name,
+        group: groupWord(s.group),
+      });
+    default:
+      return t('growth.spec.skill.misc', "{skill}: not one of your class skills, so it can't be mastered", {
+        skill: s.name,
+      });
   }
 }
-const groupWord = (g) => (g === 'primary' ? t('growth.spec.group.primary', 'primary') : g === 'major' ? t('growth.spec.group.major', 'major') : t('growth.spec.group.minor', 'minor'));
+const groupWord = (g) =>
+  g === 'primary'
+    ? t('growth.spec.group.primary', 'primary')
+    : g === 'major'
+      ? t('growth.spec.group.major', 'major')
+      : t('growth.spec.group.minor', 'minor');
 
 /** A signature spell in the spellbook's words: what it is cast at, its element, and each effect's line. Pure. */
 export function spellLines(pathId) {
@@ -67,7 +132,7 @@ export function spellLines(pathId) {
   const head = [fr.target, fr.element].filter(Boolean).join(' - ');
   if (head) out.push(head);
   for (const e of sp.effects ?? []) {
-    if (!e || e.type < 0) continue;   // an empty slot of the maker's three
+    if (!e || e.type < 0) continue; // an empty slot of the maker's three
     const w = effectWords(e);
     if (!w) continue;
     const name = [w.group, w.subgroup].filter(Boolean).join(' ');
@@ -78,11 +143,15 @@ export function spellLines(pathId) {
 
 /** A weapon in the technique texts' own words ("Bow:", "Bare hands:" - AUDIT GROWTH LANE5-12: the form lines said "With
  *  Archery:" right under them). */
-const weaponWord = (family, skill) => (({
-  longBlade: () => t('growth.spec.weapon.longBlade', 'Long blade'), shortBlade: () => t('growth.spec.weapon.shortBlade', 'Short blade'),
-  axe: () => t('growth.spec.weapon.axe', 'Axe'), blunt: () => t('growth.spec.weapon.blunt', 'Blunt weapon'),
-  archery: () => t('growth.spec.weapon.archery', 'Bow'), handToHand: () => t('growth.spec.weapon.handToHand', 'Bare hands'),
-})[family]?.() ?? SKILL_NAMES[skill]);
+const weaponWord = (family, skill) =>
+  ({
+    longBlade: () => t('growth.spec.weapon.longBlade', 'Long blade'),
+    shortBlade: () => t('growth.spec.weapon.shortBlade', 'Short blade'),
+    axe: () => t('growth.spec.weapon.axe', 'Axe'),
+    blunt: () => t('growth.spec.weapon.blunt', 'Blunt weapon'),
+    archery: () => t('growth.spec.weapon.archery', 'Bow'),
+    handToHand: () => t('growth.spec.weapon.handToHand', 'Bare hands'),
+  })[family]?.() ?? SKILL_NAMES[skill];
 
 /** A martial signature's forms: which of the path's weapons wield it, its cooldown and its fatigue. Pure. */
 export function techniqueLines(path) {
@@ -91,7 +160,13 @@ export function techniqueLines(path) {
     const f = signatureById(formId);
     if (!f) continue;
     const skill = Number(Object.keys(MARTIAL_FAMILY).find((k) => MARTIAL_FAMILY[k] === family));
-    out.push(t('growth.spec.form', '{weapon}: {seconds}-second cooldown, {fatigue} fatigue.', { weapon: weaponWord(family, skill), seconds: f.cooldown, fatigue: f.fatigue }));
+    out.push(
+      t('growth.spec.form', '{weapon}: {seconds}-second cooldown, {fatigue} fatigue.', {
+        weapon: weaponWord(family, skill),
+        seconds: f.cooldown,
+        fatigue: f.fatigue,
+      }),
+    );
   }
   return out;
 }
@@ -99,14 +174,33 @@ export function techniqueLines(path) {
 /** One family's law, uniformly: its skills, its paths and its doors. */
 const FAMILY_LAW = Object.freeze({
   arcane: {
-    skills: MAGIC_SKILLS, paths: () => PATHS, held: pathOf, choices: pathChoices, possible: pathPossible,
-    pair: (p) => p.schools, pairText: pathSchoolsText, ask: (e, id) => pathChoiceRows(e, id), choose: choosePath,
+    skills: MAGIC_SKILLS,
+    paths: () => PATHS,
+    held: pathOf,
+    choices: pathChoices,
+    possible: pathPossible,
+    pair: (p) => p.schools,
+    pairText: pathSchoolsText,
+    ask: (e, id) => pathChoiceRows(e, id),
+    choose: choosePath,
     signature: (p) => ({ kind: 'spell', name: p.spell.name, text: p.rider, lines: spellLines(p.id) }),
   },
   martial: {
-    skills: MARTIAL_SKILLS, paths: () => MARTIAL_PATHS, held: martialPathOf, choices: martialChoices, possible: martialPossible,
-    pair: (p) => p.skills, pairText: martialSkillsText, ask: (e, id) => martialChoiceRows(e, id), choose: chooseMartialPath,
-    signature: (p) => ({ kind: 'technique', name: p.technique.name, text: `${p.technique.text} ${p.rider}`, lines: techniqueLines(p) }),
+    skills: MARTIAL_SKILLS,
+    paths: () => MARTIAL_PATHS,
+    held: martialPathOf,
+    choices: martialChoices,
+    possible: martialPossible,
+    pair: (p) => p.skills,
+    pairText: martialSkillsText,
+    ask: (e, id) => martialChoiceRows(e, id),
+    choose: chooseMartialPath,
+    signature: (p) => ({
+      kind: 'technique',
+      name: p.technique.name,
+      text: `${p.technique.text} ${p.rider}`,
+      lines: techniqueLines(p),
+    }),
   },
 });
 
@@ -126,7 +220,10 @@ function pathState(entity, law, p, held, open, on) {
   if (held?.id === p.id) return 'chosen';
   // AUDIT SPEC-RESET L3-1: closed only where a reset could open it - a pair the class can never master, or whose slots are
   // spent, says so whatever is held (the masteries are permanent; a reset frees no slot)
-  if (held) { const free = pathState(entity, law, p, null, [], on); return free === 'never' || free === 'slots' ? free : 'closed'; }
+  if (held) {
+    const free = pathState(entity, law, p, null, [], on);
+    return free === 'never' || free === 'slots' ? free : 'closed';
+  }
   if (open.some((o) => o.id === p.id)) return 'open';
   const st = law.pair(p).map((id) => skillStand(entity, id).state);
   if (st.includes('misc')) return 'never';
@@ -171,20 +268,36 @@ function resetModel(entity, id, law, held, on) {
   const after = afterReset(entity, id, law, held, on);
   // AUDIT SPEC-RESET L3-1: the reset that can never help says so first - short of the gold too, or the player saves
   // 200,000 for it
-  const refusal = (after.others ? null
-    : t('growth.spec.reset.only', 'No other {family} path can open for you, so a reset would only let you choose {name} again.', { family: famWord(id), name: held.name }))
-    ?? specResetRefusal(entity, id);
+  const refusal =
+    (after.others
+      ? null
+      : t(
+          'growth.spec.reset.only',
+          'No other {family} path can open for you, so a reset would only let you choose {name} again.',
+          { family: famWord(id), name: held.name },
+        )) ?? specResetRefusal(entity, id);
   const rows = () => [
     t('growth.spec.reset.ask', 'Reset {name} for {gold, number} gold?', { name: held.name, gold: SPEC_RESET_GOLD }),
     '',
-    id !== 'arcane' ? t('growth.spec.reset.loseTechnique', 'You lose its passive and its signature technique.')
-      : (entity?.spells ?? []).some((sp) => isSignatureSpell(sp) && sp.path === held.id) ? t('growth.spec.reset.loseSpell', 'You lose its passive. Its signature spell stays in your spellbook as an ordinary spell.')
-        : t('growth.spec.reset.loseUnbought', 'You lose its passive, and its signature spell is no longer sold to you.'),
+    id !== 'arcane'
+      ? t('growth.spec.reset.loseTechnique', 'You lose its passive and its signature technique.')
+      : (entity?.spells ?? []).some((sp) => isSignatureSpell(sp) && sp.path === held.id)
+        ? t(
+            'growth.spec.reset.loseSpell',
+            'You lose its passive. Its signature spell stays in your spellbook as an ordinary spell.',
+          )
+        : t(
+            'growth.spec.reset.loseUnbought',
+            'You lose its passive, and its signature spell is no longer sold to you.',
+          ),
     t('growth.spec.reset.keep', 'Your mastered skills stay mastered.'),
     '',
-    ...(!on ? [t('growth.spec.reset.off', 'Master Skills is off. Turn it on to choose a specialization again.')]
-      : [t('growth.spec.reset.then', 'Open to you after the reset: {names}.', { names: after.open.join(', ') }),
-        ...(after.later ? [t('growth.spec.reset.later', 'More paths unlock as you master more skills.')] : [])]),
+    ...(!on
+      ? [t('growth.spec.reset.off', 'Master Skills is off. Turn it on to choose a specialization again.')]
+      : [
+          t('growth.spec.reset.then', 'Open to you after the reset: {names}.', { names: after.open.join(', ') }),
+          ...(after.later ? [t('growth.spec.reset.later', 'More paths unlock as you master more skills.')] : []),
+        ]),
   ];
   return { refusal, rows, go: () => resetSpec(entity, id) };
 }
@@ -203,56 +316,82 @@ export function specGuideModel(entity) {
     const law = FAMILY_LAW[id];
     const held = law.held(entity);
     const open = law.choices(entity);
-    const paths = law.paths().map((p, order) => ({
-      id: p.id, order, name: p.name, pairText: law.pairText(p),
-      pair: law.pair(p).map((s) => skillStand(entity, s)),
-      state: pathState(entity, law, p, held, open, on),
-      passive: p.passive,
-      signature: law.signature(p),
-    })).sort((a, b) => SPEC_STATES.indexOf(a.state) - SPEC_STATES.indexOf(b.state) || owed(a) - owed(b) || a.order - b.order);
+    const paths = law
+      .paths()
+      .map((p, order) => ({
+        id: p.id,
+        order,
+        name: p.name,
+        pairText: law.pairText(p),
+        pair: law.pair(p).map((s) => skillStand(entity, s)),
+        state: pathState(entity, law, p, held, open, on),
+        passive: p.passive,
+        signature: law.signature(p),
+      }))
+      .sort(
+        (a, b) => SPEC_STATES.indexOf(a.state) - SPEC_STATES.indexOf(b.state) || owed(a) - owed(b) || a.order - b.order,
+      );
     return {
-      id, held: held ? { id: held.id, name: held.name } : null, asleep: held ? pathAsleep(entity, id, on) : null, share: mentorPowerScale(entity),
-      possible: law.possible(entity), classPossible: law.possible({ career: entity?.career }),
-      skills: law.skills.map((s) => skillStand(entity, s)), open: open.length,
+      id,
+      held: held ? { id: held.id, name: held.name } : null,
+      asleep: held ? pathAsleep(entity, id, on) : null,
+      share: mentorPowerScale(entity),
+      possible: law.possible(entity),
+      classPossible: law.possible({ career: entity?.career }),
+      skills: law.skills.map((s) => skillStand(entity, s)),
+      open: open.length,
       paths: paths.map((p) => ({ ...p, ask: () => law.ask(entity, p.id), choose: () => chooseNow(entity, law, p.id) })),
       reset: held ? resetModel(entity, id, law, held, on) : null,
       swapOpens: false,
     };
   });
   // SKILL-SWAP (systems/skillSwap.js): the class skill given up for one outside it - the choices, and the law's words
-  const swap = entity?.career ? {
-    out: swapOutChoices(entity), in: swapInChoices(entity),
-    refusal: (out, inn) => skillSwapRefusal(entity, out, inn), group: (out) => swapGroupOf(entity, out), go: (out, inn) => swapSkill(entity, out, inn),
-    // AUDIT SUGGESTIONS-1019 L5-1: the group's mastery slots left - none, and what comes in can never be mastered
-    slotsLeft: (out) => masterySlots(entity, swapGroupOf(entity, out)).left,
-    // AUDIT SUGGESTIONS-1019 L5-2: offline with Master Skills off, whether the swap starts ('on') or ends ('off') DFU's 95 lock
-    lockTurn: (out, inn) => {
-      if (masterSkillsActive(entity)) return null;
-      const before = alreadyMasteredASkill(entity), after = alreadyMasteredASkill({ ...entity, career: swappedCareer(entity, out, inn) });
-      return before === after ? null : after ? 'on' : 'off';
-    },
-    // SWAP-CYCLE: the points the class's skills make up before the next level comes closer
-    shortfall: (out, inn) => swapShortfall(entity, out, inn),
-  } : null;
+  const swap = entity?.career
+    ? {
+        out: swapOutChoices(entity),
+        in: swapInChoices(entity),
+        refusal: (out, inn) => skillSwapRefusal(entity, out, inn),
+        group: (out) => swapGroupOf(entity, out),
+        go: (out, inn) => swapSkill(entity, out, inn),
+        // AUDIT SUGGESTIONS-1019 L5-1: the group's mastery slots left - none, and what comes in can never be mastered
+        slotsLeft: (out) => masterySlots(entity, swapGroupOf(entity, out)).left,
+        // AUDIT SUGGESTIONS-1019 L5-2: offline with Master Skills off, whether the swap starts ('on') or ends ('off') DFU's 95 lock
+        lockTurn: (out, inn) => {
+          if (masterSkillsActive(entity)) return null;
+          const before = alreadyMasteredASkill(entity),
+            after = alreadyMasteredASkill({ ...entity, career: swappedCareer(entity, out, inn) });
+          return before === after ? null : after ? 'on' : 'off';
+        },
+        // SWAP-CYCLE: the points the class's skills make up before the next level comes closer
+        shortfall: (out, inn) => swapShortfall(entity, out, inn),
+      }
+    : null;
   // AUDIT SUGGESTIONS-1019 L5-1: a family's hint only where ONE swap would open a path, the masteries and slots as they stand
   for (const f of families) {
     const law = FAMILY_LAW[f.id];
-    f.swapOpens = !!swap && !f.possible && swap.out.some((out) => law.skills.some((inn) => swap.in.includes(inn) && swapOpens(entity, out, inn, law.possible)));
+    f.swapOpens =
+      !!swap &&
+      !f.possible &&
+      swap.out.some((out) =>
+        law.skills.some((inn) => swap.in.includes(inn) && swapOpens(entity, out, inn, law.possible)),
+      );
   }
   return { masterOn: on, switchable: masterSkillsSwitchable(entity), families, swap };
 }
 
 /** A state's tag on the row. */
 export function stateTag(state) {
-  return ({
-    chosen: t('growth.spec.state.chosen', 'Chosen'),
-    open: t('growth.spec.state.open', 'Available'),
-    ready: t('growth.spec.state.ready', 'Needs mastering'),
-    reach: t('growth.spec.state.reach', 'Not yet'),
-    closed: t('growth.spec.state.closed', 'Closed'),
-    slots: t('growth.spec.state.slots', 'No slots left'),
-    never: t('growth.spec.state.never', 'Not for your class'),
-  })[state] ?? '';
+  return (
+    {
+      chosen: t('growth.spec.state.chosen', 'Chosen'),
+      open: t('growth.spec.state.open', 'Available'),
+      ready: t('growth.spec.state.ready', 'Needs mastering'),
+      reach: t('growth.spec.state.reach', 'Not yet'),
+      closed: t('growth.spec.state.closed', 'Closed'),
+      slots: t('growth.spec.state.slots', 'No slots left'),
+      never: t('growth.spec.state.never', 'Not for your class'),
+    }[state] ?? ''
+  );
 }
 
 /** What a path's state means, under its name in the detail - naming the skill when only one still needs it (AUDIT
@@ -261,28 +400,55 @@ export function stateLine(fam, p, on) {
   const need = p.pair.filter((s) => !s.mastered);
   const climb = need.filter((s) => s.state === 'climb');
   switch (p.state) {
-    case 'chosen': return chosenLine(fam.asleep, fam.share);
-    case 'open': return t('growth.spec.why.open', 'Both skills are mastered. You can choose it now.');
-    case 'ready': return need.length === 1 ? t('growth.spec.why.readyOne', 'Master {skill} on the Master Skills page to unlock this path.', { skill: need[0].name })
-      : t('growth.spec.why.ready', 'Both skills are at 100. Master them on the Master Skills page to unlock this path.');
+    case 'chosen':
+      return chosenLine(fam.asleep, fam.share);
+    case 'open':
+      return t('growth.spec.why.open', 'Both skills are mastered. You can choose it now.');
+    case 'ready':
+      return need.length === 1
+        ? t('growth.spec.why.readyOne', 'Master {skill} on the Master Skills page to unlock this path.', {
+            skill: need[0].name,
+          })
+        : t(
+            'growth.spec.why.ready',
+            'Both skills are at 100. Master them on the Master Skills page to unlock this path.',
+          );
     case 'reach':
       if (!on && !climb.length) return t('growth.spec.why.off', 'Turn Master Skills on to unlock this path.');
-      if (climb.length < need.length) return t('growth.spec.why.reachThen', 'Raise {skill} to 100, then master both skills to unlock this path.', { skill: climb[0].name });
-      return need.length === 1 ? t('growth.spec.why.reachOne', 'Raise {skill} to 100 and master it to unlock this path.', { skill: need[0].name })
+      if (climb.length < need.length)
+        return t('growth.spec.why.reachThen', 'Raise {skill} to 100, then master both skills to unlock this path.', {
+          skill: climb[0].name,
+        });
+      return need.length === 1
+        ? t('growth.spec.why.reachOne', 'Raise {skill} to 100 and master it to unlock this path.', {
+            skill: need[0].name,
+          })
         : t('growth.spec.why.reach', 'Raise both skills to 100 and master them to unlock this path.');
-    case 'closed': return t('growth.spec.why.closed', 'You already chose {name}. You can have only one path of each kind; reset {name} to choose another.', { name: fam.held?.name ?? '' });
-    case 'slots': return t('growth.spec.why.slots', 'You don\'t have enough mastery slots left to master both of these skills.');
-    default: return t('growth.spec.why.never', 'Your class can\'t master both of these skills.');
+    case 'closed':
+      return t(
+        'growth.spec.why.closed',
+        'You already chose {name}. You can have only one path of each kind; reset {name} to choose another.',
+        { name: fam.held?.name ?? '' },
+      );
+    case 'slots':
+      return t('growth.spec.why.slots', "You don't have enough mastery slots left to master both of these skills.");
+    default:
+      return t('growth.spec.why.never', "Your class can't master both of these skills.");
   }
 }
 /** The chosen path's line: it works, or why it does nothing right now (pathAsleep), or its share while mentoring. */
 function chosenLine(asleep, share = 1) {
   switch (asleep) {
-    case 'off': return t('growth.spec.why.chosenOff', 'Your specialization. Its powers are off while Master Skills is off.');
-    case 'mentor': return pathMentoringText(share);
-    case 'duel': return t('growth.spec.why.chosenDuel', 'Your specialization. Its powers are off during a duel.');
-    case 'beast': return t('growth.spec.why.chosenBeast', 'Your specialization. Its powers are off in beast form.');
-    default: return t('growth.spec.why.chosen', 'Your specialization.');
+    case 'off':
+      return t('growth.spec.why.chosenOff', 'Your specialization. Its powers are off while Master Skills is off.');
+    case 'mentor':
+      return pathMentoringText(share);
+    case 'duel':
+      return t('growth.spec.why.chosenDuel', 'Your specialization. Its powers are off during a duel.');
+    case 'beast':
+      return t('growth.spec.why.chosenBeast', 'Your specialization. Its powers are off in beast form.');
+    default:
+      return t('growth.spec.why.chosen', 'Your specialization.');
   }
 }
 
@@ -300,20 +466,53 @@ let _swapOut = /** @type {number|null} */ (null);
 let _swapIn = /** @type {number|null} */ (null);
 /** A new visit: the page starts on `fam` (a door's - the classic sheet's S or W row), else the family this character
  *  can reach; nothing open. */
-export function resetSpecGuide(fam = null) { _fam = fam === 'arcane' || fam === 'martial' ? fam : null; _open = null; _all = false; _note = null; _noteFresh = false; _swapOut = null; _swapIn = null; }
+export function resetSpecGuide(fam = null) {
+  _fam = fam === 'arcane' || fam === 'martial' ? fam : null;
+  _open = null;
+  _all = false;
+  _note = null;
+  _noteFresh = false;
+  _swapOut = null;
+  _swapIn = null;
+}
 
 /**
  * THE PAGE into `detail` (the Growth rail's detail pane). `kit` the menu's makers: `{ el, divider, skillMeter, askCard,
  * entity, openMaster }` - `skillMeter(value, mastered)` the Stats page's skill bar (its gold climb past 100 a mastery's),
  * `askCard(rows, onYes)` its Yes/No card, `openMaster()` (optional) the Master Skills page.
  */
-export function drawSpecGuide(detail, rerender, { el, divider, skillMeter = null, askCard, entity, openMaster = null }) {
+export function drawSpecGuide(
+  detail,
+  rerender,
+  { el, divider, skillMeter = null, askCard, entity, openMaster = null },
+) {
   const m = specGuideModel(entity);
   detail.append(divider(t('growth.spec.title', 'Specializations')));
-  detail.append(el('p', 'gr-lead', t('growth.spec.lead', 'Master two schools of magic or two weapon skills to unlock a specialization: a passive bonus plus a signature spell or technique. You can have one arcane and one martial specialization. Resetting one costs {gold, number} gold.', { gold: SPEC_RESET_GOLD })));
+  detail.append(
+    el(
+      'p',
+      'gr-lead',
+      t(
+        'growth.spec.lead',
+        'Master two schools of magic or two weapon skills to unlock a specialization: a passive bonus plus a signature spell or technique. You can have one arcane and one martial specialization. Resetting one costs {gold, number} gold.',
+        { gold: SPEC_RESET_GOLD },
+      ),
+    ),
+  );
   if (!m.masterOn) {
     const off = el('div', 'gr-warn');
-    off.append(el('span', null, m.switchable ? t('growth.spec.masterOff', 'Master Skills is turned off, so no specialization can be unlocked. Turn it on in Master Skills.') : t('growth.spec.masterOffLocked', 'Master Skills is off.')));
+    off.append(
+      el(
+        'span',
+        null,
+        m.switchable
+          ? t(
+              'growth.spec.masterOff',
+              'Master Skills is turned off, so no specialization can be unlocked. Turn it on in Master Skills.',
+            )
+          : t('growth.spec.masterOffLocked', 'Master Skills is off.'),
+      ),
+    );
     detail.append(off);
   }
   if (_note) {
@@ -325,7 +524,11 @@ export function drawSpecGuide(detail, rerender, { el, divider, skillMeter = null
     if (_noteFresh) {
       _noteFresh = false;
       note.tabIndex = -1;
-      Promise.resolve().then(() => { if (!note.isConnected) return; note.scrollIntoView?.({ block: 'nearest' }); note.focus?.({ preventScroll: true }); });
+      Promise.resolve().then(() => {
+        if (!note.isConnected) return;
+        note.scrollIntoView?.({ block: 'nearest' });
+        note.focus?.({ preventScroll: true });
+      });
     }
   }
   if (!_fam) _fam = firstFamily(m);
@@ -336,9 +539,17 @@ export function drawSpecGuide(detail, rerender, { el, divider, skillMeter = null
     const b = el('button', `gr-fam${f.id === _fam ? ' on' : ''}`);
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-selected', f.id === _fam ? 'true' : 'false');
-    b.append(document.createTextNode(f.id === 'arcane' ? t('growth.spec.arcane', 'Arcane') : t('growth.spec.martial', 'Martial')));
+    b.append(
+      document.createTextNode(
+        f.id === 'arcane' ? t('growth.spec.arcane', 'Arcane') : t('growth.spec.martial', 'Martial'),
+      ),
+    );
     if (f.open) b.append(el('span', 'gr-count', String(f.open)));
-    b.onclick = () => { _fam = f.id; _open = null; rerender(); };
+    b.onclick = () => {
+      _fam = f.id;
+      _open = null;
+      rerender();
+    };
     sw.append(b);
   }
   detail.append(sw);
@@ -347,7 +558,16 @@ export function drawSpecGuide(detail, rerender, { el, divider, skillMeter = null
   const head = el('section', 'px-mgroup gr-head');
   head.append(el('div', 'gr-headline', familyLine(fam)));
   // SKILL-SWAP: a class that can never meet a path is told the one way it now can
-  if (fam.swapOpens) head.append(el('p', 'gr-fine', fam.id === 'arcane' ? t('growth.swap.hintArcane', 'You can change one of your class skills for a school of magic below.') : t('growth.swap.hintMartial', 'You can change one of your class skills for a weapon skill below.')));
+  if (fam.swapOpens)
+    head.append(
+      el(
+        'p',
+        'gr-fine',
+        fam.id === 'arcane'
+          ? t('growth.swap.hintArcane', 'You can change one of your class skills for a school of magic below.')
+          : t('growth.swap.hintMartial', 'You can change one of your class skills for a weapon skill below.'),
+      ),
+    );
   const grid = el('div', 'gr-skills');
   for (const s of fam.skills) {
     const cell = el('div', 'gr-skill');
@@ -382,16 +602,30 @@ export function drawSpecGuide(detail, rerender, { el, divider, skillMeter = null
     const tag = el('span', 'px-mtag gr-tag', stateTag(p.state));
     tag.classList.add(`is-${p.state}`);
     if (p.state === 'chosen') tag.classList.add('gold');
-    bar.append(el('span', 'gr-pathname', `${p.state === 'chosen' ? '◆ ' : ''}${p.name}`), el('span', 'gr-pathpair', p.pairText), tag);
-    bar.onclick = () => { _open = open ? null : p.id; rerender(); };
+    bar.append(
+      el('span', 'gr-pathname', `${p.state === 'chosen' ? '◆ ' : ''}${p.name}`),
+      el('span', 'gr-pathpair', p.pairText),
+      tag,
+    );
+    bar.onclick = () => {
+      _open = open ? null : p.id;
+      rerender();
+    };
     row.append(bar);
     if (open) row.append(pathDetail(el, fam, p, rerender, askCard, m.masterOn));
     list.append(row);
   }
   detail.append(list);
   if (reachable.length < fam.paths.length) {
-    const more = el('button', 'act gr-more', _all ? t('growth.spec.showReach', 'Show only paths you can get') : t('growth.spec.showAll', 'Show all 15 paths'));
-    more.onclick = () => { _all = !_all; rerender(); };
+    const more = el(
+      'button',
+      'act gr-more',
+      _all ? t('growth.spec.showReach', 'Show only paths you can get') : t('growth.spec.showAll', 'Show all 15 paths'),
+    );
+    more.onclick = () => {
+      _all = !_all;
+      rerender();
+    };
     detail.append(more);
   }
   if (m.swap?.out.length && m.swap.in.length) drawSkillSwap(detail, rerender, { el, divider, askCard }, m.swap);
@@ -403,26 +637,87 @@ function drawSkillSwap(detail, rerender, { el, divider, askCard }, sw) {
   if (!sw.out.includes(_swapOut)) _swapOut = sw.out[0];
   if (!sw.in.includes(_swapIn)) _swapIn = sw.in[0];
   detail.append(divider(t('growth.swap.title', 'Change a class skill')));
-  detail.append(el('p', 'gr-lead', t('growth.swap.lead', 'Give up a class skill you have not mastered, and take a skill from outside your class in its place, in the same group. It costs {gold, number} gold. Your level and your skills\' values do not change.', { gold: SKILL_SWAP_GOLD })));
+  detail.append(
+    el(
+      'p',
+      'gr-lead',
+      t(
+        'growth.swap.lead',
+        "Give up a class skill you have not mastered, and take a skill from outside your class in its place, in the same group. It costs {gold, number} gold. Your level and your skills' values do not change.",
+        { gold: SKILL_SWAP_GOLD },
+      ),
+    ),
+  );
   const box = el('section', 'px-mgroup gr-swap');
   const pick = (label, ids, value, onPick) => {
     const s = el('select', 'act');
     s.setAttribute('aria-label', label);
-    for (const id of ids) { const o = el('option', null, SKILL_NAMES[id] ?? String(id)); o.value = String(id); if (id === value) o.selected = true; s.append(o); }
-    s.onchange = () => { onPick(Number(s.value)); rerender(); };
+    for (const id of ids) {
+      const o = el('option', null, SKILL_NAMES[id] ?? String(id));
+      o.value = String(id);
+      if (id === value) o.selected = true;
+      s.append(o);
+    }
+    s.onchange = () => {
+      onPick(Number(s.value));
+      rerender();
+    };
     return s;
   };
-  box.append(el('div', 'gr-skilltop', t('growth.swap.out', 'Give up')), pick(t('growth.swap.out', 'Give up'), sw.out, _swapOut, (v) => { _swapOut = v; }));
-  box.append(el('div', 'gr-skilltop', t('growth.swap.in', 'Take instead')), pick(t('growth.swap.in', 'Take instead'), sw.in, _swapIn, (v) => { _swapIn = v; }));
-  const out = _swapOut, inn = _swapIn, refusal = sw.refusal(out, inn);
-  const words = { out: SKILL_NAMES[out], inn: SKILL_NAMES[inn], gold: SKILL_SWAP_GOLD, group: groupWord(sw.group(out)) };
+  box.append(
+    el('div', 'gr-skilltop', t('growth.swap.out', 'Give up')),
+    pick(t('growth.swap.out', 'Give up'), sw.out, _swapOut, (v) => {
+      _swapOut = v;
+    }),
+  );
+  box.append(
+    el('div', 'gr-skilltop', t('growth.swap.in', 'Take instead')),
+    pick(t('growth.swap.in', 'Take instead'), sw.in, _swapIn, (v) => {
+      _swapIn = v;
+    }),
+  );
+  const out = _swapOut,
+    inn = _swapIn,
+    refusal = sw.refusal(out, inn);
+  const words = {
+    out: SKILL_NAMES[out],
+    inn: SKILL_NAMES[inn],
+    gold: SKILL_SWAP_GOLD,
+    group: groupWord(sw.group(out)),
+  };
   // AUDIT SUGGESTIONS-1019 L5-1/L5-2 and SWAP-CYCLE: what the swap costs beyond the gold, said beside the picks and again in the ask
-  const lock = sw.lockTurn(out, inn), short = Math.ceil(sw.shortfall(out, inn));
+  const lock = sw.lockTurn(out, inn),
+    short = Math.ceil(sw.shortfall(out, inn));
   const warns = [
-    ...(short > 0 ? [t('growth.swap.ground', 'Your level stays, but your class skills then earn nothing toward your next level until they make up {n, plural, one {# point} other {# points}}.', { n: short })] : []),
-    ...(sw.slotsLeft(out) === 0 ? [t('growth.swap.noSlots', 'Your {group} mastery slots are spent, so {inn} could never be mastered.', words)] : []),
-    ...(lock === 'on' ? [t('growth.swap.lockOn', 'With Master Skills off, {inn} at 100 as a primary skill holds your other skills at 95.', words)]
-      : lock === 'off' ? [t('growth.swap.lockOff', 'With Master Skills off, your other skills are no longer held at 95 once {out} leaves your primary skills.', words)] : []),
+    ...(short > 0
+      ? [
+          t(
+            'growth.swap.ground',
+            'Your level stays, but your class skills then earn nothing toward your next level until they make up {n, plural, one {# point} other {# points}}.',
+            { n: short },
+          ),
+        ]
+      : []),
+    ...(sw.slotsLeft(out) === 0
+      ? [t('growth.swap.noSlots', 'Your {group} mastery slots are spent, so {inn} could never be mastered.', words)]
+      : []),
+    ...(lock === 'on'
+      ? [
+          t(
+            'growth.swap.lockOn',
+            'With Master Skills off, {inn} at 100 as a primary skill holds your other skills at 95.',
+            words,
+          ),
+        ]
+      : lock === 'off'
+        ? [
+            t(
+              'growth.swap.lockOff',
+              'With Master Skills off, your other skills are no longer held at 95 once {out} leaves your primary skills.',
+              words,
+            ),
+          ]
+        : []),
   ];
   for (const w of warns) box.append(el('p', 'gr-fine gr-swap-warn', w));
   const acts = el('div', 'gr-acts');
@@ -430,11 +725,22 @@ function drawSkillSwap(detail, rerender, { el, divider, askCard }, sw) {
   b.disabled = !!refusal;
   b.onclick = () => {
     if (refusal) return;
-    askCard([
-      t('growth.swap.ask', 'Give up {out} for {inn} for {gold, number} gold?', words),
-      t('growth.swap.askGroup', '{inn} becomes one of your {group} skills. {out} becomes a miscellaneous skill: it keeps its value but can no longer be mastered.', words),
-      ...warns,
-    ], () => { _note = sw.go(out, inn).text; _noteFresh = true; rerender(); });
+    askCard(
+      [
+        t('growth.swap.ask', 'Give up {out} for {inn} for {gold, number} gold?', words),
+        t(
+          'growth.swap.askGroup',
+          '{inn} becomes one of your {group} skills. {out} becomes a miscellaneous skill: it keeps its value but can no longer be mastered.',
+          words,
+        ),
+        ...warns,
+      ],
+      () => {
+        _note = sw.go(out, inn).text;
+        _noteFresh = true;
+        rerender();
+      },
+    );
   };
   acts.append(b);
   box.append(acts);
@@ -450,30 +756,61 @@ function drawSkillSwap(detail, rerender, { el, divider, askCard }, sw) {
 /** The family the page opens on: one with a choice waiting, then the one held, then one this class can reach (AUDIT
  *  GROWTH LANE1-9 - a held arcane path hid the martial paths waiting). */
 export function firstFamily(m) {
-  return m.families.find((f) => f.open)?.id ?? m.families.find((f) => f.held)?.id ?? m.families.find((f) => f.possible)?.id ?? 'arcane';
+  return (
+    m.families.find((f) => f.open)?.id ??
+    m.families.find((f) => f.held)?.id ??
+    m.families.find((f) => f.possible)?.id ??
+    'arcane'
+  );
 }
 
 /** A family's headline: the path held, how many are open, why none can be (the class, or the slots the player's own
  *  masteries spent - LANE1-4), or how one opens. */
 export function familyLine(fam) {
   const arc = fam.id === 'arcane';
-  if (fam.held) return t('growth.spec.heldLine', 'Your {family} specialization: {name}.', { family: famWord(fam.id), name: fam.held.name });
-  if (fam.open) return t('growth.spec.openLine', '{n, plural, one {# path is available. Choose it below.} other {# paths are available. Choose one below.}}', { n: fam.open });
-  if (!fam.possible && !fam.classPossible) return arc ? t('growth.spec.arcaneNever', 'Your class can\'t master two schools of magic, so no arcane path is available.') : t('growth.spec.martialNever', 'Your class can\'t master two weapon skills, so no martial path is available.');
-  if (!fam.possible) return arc ? t('growth.spec.arcaneSpent', 'Your mastery slots left can\'t hold two schools of magic, so no arcane path is available.') : t('growth.spec.martialSpent', 'Your mastery slots left can\'t hold two weapon skills, so no martial path is available.');
-  return arc ? t('growth.spec.arcaneHow', 'Master any two schools of magic to unlock the path for that pair.') : t('growth.spec.martialHow', 'Master any two weapon skills to unlock the path for that pair.');
+  if (fam.held)
+    return t('growth.spec.heldLine', 'Your {family} specialization: {name}.', {
+      family: famWord(fam.id),
+      name: fam.held.name,
+    });
+  if (fam.open)
+    return t(
+      'growth.spec.openLine',
+      '{n, plural, one {# path is available. Choose it below.} other {# paths are available. Choose one below.}}',
+      { n: fam.open },
+    );
+  if (!fam.possible && !fam.classPossible)
+    return arc
+      ? t('growth.spec.arcaneNever', "Your class can't master two schools of magic, so no arcane path is available.")
+      : t('growth.spec.martialNever', "Your class can't master two weapon skills, so no martial path is available.");
+  if (!fam.possible)
+    return arc
+      ? t(
+          'growth.spec.arcaneSpent',
+          "Your mastery slots left can't hold two schools of magic, so no arcane path is available.",
+        )
+      : t(
+          'growth.spec.martialSpent',
+          "Your mastery slots left can't hold two weapon skills, so no martial path is available.",
+        );
+  return arc
+    ? t('growth.spec.arcaneHow', 'Master any two schools of magic to unlock the path for that pair.')
+    : t('growth.spec.martialHow', 'Master any two weapon skills to unlock the path for that pair.');
 }
 
-const famWord = (id) => (id === 'arcane' ? t('growth.spec.arcaneWord', 'arcane') : t('growth.spec.martialWord', 'martial'));
+const famWord = (id) =>
+  id === 'arcane' ? t('growth.spec.arcaneWord', 'arcane') : t('growth.spec.martialWord', 'martial');
 /** A skill's state, short, under its meter. */
 function skillWord(s) {
-  return ({
-    mastered: t('growth.spec.cell.mastered', 'Mastered'),
-    ready: t('growth.spec.cell.ready', 'Ready to master'),
-    climb: t('growth.spec.cell.climb', '{n} to 100', { n: 100 - s.value }),
-    full: t('growth.spec.cell.full', 'No {group} slots left', { group: groupWord(s.group) }),
-    misc: t('growth.spec.cell.misc', 'Cannot be mastered'),
-  })[s.state] ?? '';
+  return (
+    {
+      mastered: t('growth.spec.cell.mastered', 'Mastered'),
+      ready: t('growth.spec.cell.ready', 'Ready to master'),
+      climb: t('growth.spec.cell.climb', '{n} to 100', { n: 100 - s.value }),
+      full: t('growth.spec.cell.full', 'No {group} slots left', { group: groupWord(s.group) }),
+      misc: t('growth.spec.cell.misc', 'Cannot be mastered'),
+    }[s.state] ?? ''
+  );
 }
 
 /** A path's Requirements: each skill of its pair in its words, `[state, text]` - and, when one slot is left for two
@@ -482,7 +819,14 @@ export function pathSteps(p) {
   const out = p.pair.map((s) => [s.state, skillStandText(s)]);
   if (p.state === 'slots' && !p.pair.some((s) => s.state === 'full')) {
     const [a, b] = p.pair;
-    out.push(['full', t('growth.spec.skill.shared', '{a} and {b} are both {group} skills, and you can master only one more {group} skill.', { a: a.name, b: b.name, group: groupWord(a.group) })]);
+    out.push([
+      'full',
+      t(
+        'growth.spec.skill.shared',
+        '{a} and {b} are both {group} skills, and you can master only one more {group} skill.',
+        { a: a.name, b: b.name, group: groupWord(a.group) },
+      ),
+    ]);
   }
   return out;
 }
@@ -491,9 +835,17 @@ export function pathSteps(p) {
  *  worldModes.js signatureOffers); a found technique wins the key only while the loot ladder is on
  *  (combat/techniques.js techniqueInHand). */
 export function useLine(kind) {
-  if (kind === 'spell') return t('growth.spec.useSpell', 'Once chosen, buy it wherever spells are sold and cast it like any other spell.');
-  return lootRarityOn() ? t('growth.spec.useTechniqueOwn', 'Once chosen, press your Weapon Technique key while fighting with one of its two skills. A weapon with a technique of its own uses that instead.')
-    : t('growth.spec.useTechnique', 'Once chosen, press your Weapon Technique key while fighting with one of its two skills.');
+  if (kind === 'spell')
+    return t('growth.spec.useSpell', 'Once chosen, buy it wherever spells are sold and cast it like any other spell.');
+  return lootRarityOn()
+    ? t(
+        'growth.spec.useTechniqueOwn',
+        'Once chosen, press your Weapon Technique key while fighting with one of its two skills. A weapon with a technique of its own uses that instead.',
+      )
+    : t(
+        'growth.spec.useTechnique',
+        'Once chosen, press your Weapon Technique key while fighting with one of its two skills.',
+      );
 }
 
 /** A path's detail: its state, what opens it, its passive, its signature, how it is used - and its Choose. */
@@ -511,14 +863,28 @@ function pathDetail(el, fam, p, rerender, askCard, on) {
   box.append(el('div', 'gr-sub', t('growth.spec.passive', 'Passive: {name}', { name: p.passive.name })));
   box.append(el('p', 'gr-text', p.passive.text));
   const sig = p.signature;
-  box.append(el('div', 'gr-sub', sig.kind === 'spell' ? t('growth.spec.spell', 'Signature spell: {name}', { name: sig.name }) : t('growth.spec.technique', 'Signature technique: {name}', { name: sig.name })));
+  box.append(
+    el(
+      'div',
+      'gr-sub',
+      sig.kind === 'spell'
+        ? t('growth.spec.spell', 'Signature spell: {name}', { name: sig.name })
+        : t('growth.spec.technique', 'Signature technique: {name}', { name: sig.name }),
+    ),
+  );
   box.append(el('p', 'gr-text', sig.text));
   for (const line of sig.lines) box.append(el('p', 'gr-fine', line));
   box.append(el('p', 'gr-fine gr-use', useLine(sig.kind)));
   if (p.state === 'open') {
     const acts = el('div', 'gr-acts');
     const b = el('button', 'act primary', t('growth.spec.choose', 'Choose {name}', { name: p.name }));
-    b.onclick = () => askCard(p.ask(), () => { _note = p.choose().text; _noteFresh = true; _open = p.id; rerender(); });
+    b.onclick = () =>
+      askCard(p.ask(), () => {
+        _note = p.choose().text;
+        _noteFresh = true;
+        _open = p.id;
+        rerender();
+      });
     acts.append(b);
     box.append(acts);
   }
@@ -528,15 +894,27 @@ function pathDetail(el, fam, p, rerender, askCard, on) {
     const r = fam.reset;
     const acts = el('div', 'gr-acts');
     // AUDIT SPEC-RESET L3-7: never a line that starts with the "·" - it binds to the word before it, in every language
-    const b = el('button', 'act', t('growth.spec.reset.btn', 'Reset · {gold, number} gold', { gold: SPEC_RESET_GOLD }).replace(/ ·/g, '\u00a0·'));
+    const b = el(
+      'button',
+      'act',
+      t('growth.spec.reset.btn', 'Reset · {gold, number} gold', { gold: SPEC_RESET_GOLD }).replace(/ ·/g, '\u00a0·'),
+    );
     b.disabled = !!r.refusal;
-    b.onclick = () => { if (!r.refusal) askCard(r.rows(), () => { _note = r.go().text; _noteFresh = true; _open = null; rerender(); }); };
+    b.onclick = () => {
+      if (!r.refusal)
+        askCard(r.rows(), () => {
+          _note = r.go().text;
+          _noteFresh = true;
+          _open = null;
+          rerender();
+        });
+    };
     acts.append(b);
     box.append(acts);
     if (r.refusal) {
       const why = el('p', 'gr-fine gr-reset-why', r.refusal);
       why.id = `gr-reset-why-${fam.id}`;
-      b.setAttribute('aria-describedby', why.id);   // AUDIT SPEC-RESET L3-5: the disabled press's reason, read with it
+      b.setAttribute('aria-describedby', why.id); // AUDIT SPEC-RESET L3-5: the disabled press's reason, read with it
       box.append(why);
     }
   }

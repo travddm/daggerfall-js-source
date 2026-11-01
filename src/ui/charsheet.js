@@ -25,46 +25,85 @@
 // The level-up screen stays on the text idiom (its retrofit rides
 // a later U8 slice).
 
-import { statUp, statDown, allStatsMax } from './chargen.js';   // LV1's audit: DaggerfallStats.IsAllMax has ONE home now (and MAX_STAT_VALUE left with the copy that used it - this file's last reader was that copy)
-import { codeMeans } from '../systems/inputActions.js';   // MAC-C: the sheet's toggle key is the registry's; UXB1-S: shared or not
+import { statUp, statDown, allStatsMax } from './chargen.js'; // LV1's audit: DaggerfallStats.IsAllMax has ONE home now (and MAX_STAT_VALUE left with the copy that used it - this file's last reader was that copy)
+import { codeMeans } from '../systems/inputActions.js'; // MAC-C: the sheet's toggle key is the registry's; UXB1-S: shared or not
 import { bindings } from './input.js';
-import { carriedWeight } from '../systems/inventory.js';   // AUDIT 17e F30; E4: PlayerEntity.CarriedWeight, one home
-import { totalGoldAmount } from '../systems/court.js';   // PlayerEntity.GetGoldAmount - coins plus letters of credit
-import { entityMaxEncumbrance, handToHandMinDamage, handToHandMaxDamage } from '../combat/formulas.js';   // U10; AUDIT 63 F34: CalculateHandToHandMin/MaxDamage
+import { carriedWeight } from '../systems/inventory.js'; // AUDIT 17e F30; E4: PlayerEntity.CarriedWeight, one home
+import { totalGoldAmount } from '../systems/court.js'; // PlayerEntity.GetGoldAmount - coins plus letters of credit
+import { entityMaxEncumbrance, handToHandMinDamage, handToHandMaxDamage } from '../combat/formulas.js'; // U10; AUDIT 63 F34: CalculateHandToHandMin/MaxDamage
 import { STAT_KEYS_ORDER } from '../systems/chargen.js';
-import { statDescriptionRows } from '../systems/talk/talkMacros.js';   // ATTRMACRO1: SetTextTokens' macro pass over TEXT.RSC records 0..7
-import { SKILLS, SKILL_NAMES, skillValue, skillValueText, getSkillRecentlyIncreased, resetSkillsRecentlyRaised } from '../systems/skills.js';
+import { statDescriptionRows } from '../systems/talk/talkMacros.js'; // ATTRMACRO1: SetTextTokens' macro pass over TEXT.RSC records 0..7
+import {
+  SKILLS,
+  SKILL_NAMES,
+  skillValue,
+  skillValueText,
+  getSkillRecentlyIncreased,
+  resetSkillsRecentlyRaised,
+} from '../systems/skills.js';
 import { applyLevelUp, bonusPoolFor, LEVELUP_SKILL_SUM_PER_LEVEL } from '../systems/advancement.js';
-import { onlineLevelFraction } from '../systems/levelClimb.js';   // LEVEL-45
-import { refreshOnlineLayer } from '../systems/renownLayer.js';   // AUDIT LEVEL-EVEN L2-2: the rollout's points reach the online floor
-import { LEVEL_CAP, atLevelCap, releaseCapLatch } from '../systems/levelCap.js';   // LEVEL-45: the Level box at the cap
-import { ActionTextBox } from './actionText.js';   // the mustDistributeBonusPoints refusal, ClickAnywhereToClose
-import { OGHMA_BONUS_POOL } from '../systems/artifactEffects.js';   // AUDIT 39: the sheet's oghmaBonusPool (:44)
+import { onlineLevelFraction } from '../systems/levelClimb.js'; // LEVEL-45
+import { refreshOnlineLayer } from '../systems/renownLayer.js'; // AUDIT LEVEL-EVEN L2-2: the rollout's points reach the online floor
+import { LEVEL_CAP, atLevelCap, releaseCapLatch } from '../systems/levelCap.js'; // LEVEL-45: the Level box at the cap
+import { ActionTextBox } from './actionText.js'; // the mustDistributeBonusPoints refusal, ClickAnywhereToClose
+import { OGHMA_BONUS_POOL } from '../systems/artifactEffects.js'; // AUDIT 39: the sheet's oghmaBonusPool (:44)
 import { drawText, measureText } from './text.js';
 import { loadImg, nativeMetrics, drawImg, drawRect, shadowText } from './native/nativePanel.js';
 import { drawScreenDimBackdrop } from './chargenArt.js';
 import { drawPaperDoll, refreshPaperDoll, PAPERDOLL_ORIGIN } from './paperDoll.js';
-import { maxFatigue, liveStat, FATIGUE_MULTIPLIER } from '../systems/statMods.js';   // U52: the /64 display divisor has a name and one home
+import { maxFatigue, liveStat, FATIGUE_MULTIPLIER } from '../systems/statMods.js'; // U52: the /64 display divisor has a name and one home
 import { templateByIndex } from '../systems/item/itemTemplates.js';
 import { audio } from '../systems/audio.js';
 import { SOUND } from '../systems/soundClips.js';
-import { bankingStatusRows } from '../systems/banking.js';   // AUDIT 64 F28: CreateBankingStatusBox's rows
-import { ownTimeLeftShort } from '../systems/worldTick.js';   // AUDIT LIVED1 Q: online, a loan's due as the time left on the character's clock
-import { REGION_NAMES } from '../formats/mapsFile.js';       // GetLocalizedRegionName
-import { InputMessageBoxWindow } from './inputMessageBox.js';   // CM4: the Name button's DaggerfallInputMessageBox
-import { enterNewNameLabel } from './item/itemMakerWindow.js';       // CM4: Internal_Strings.enterNewName, homed with its first reader
-import { localizedText, formatText, processGrammar, t } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language; L10N3g: the race label's grammar
-import { healthStatusRows } from '../systems/healthStatus.js';   // CM4: CreateHealthStatusBox's rows
-import { affiliations } from '../systems/affiliations.js';   // CM4: ShowAffiliationsDialog's book - GUILD-REP: one model, both skins
-import { firstHotkey } from '../systems/dialogShortcuts.js';   // CM4: the four buttons' DaggerfallShortcut bindings
-import { YesNoBoxWindow } from './yesNoBox.js';   // SOFTCAP3: the Master Skills switch asks in DFU's own Yes/No box
-import { masterSkillsActive, masterSkillsSwitchable, masterSkillsBlockReason, masterSkillsStatusText, setMasterSkills, MASTER_SKILLS_OFFER_ROWS, MASTER_SKILLS_INFO_ROWS, MASTERY_GROUP_NAMES, masterySlots, masteryCandidates, masteryChoiceRows, masterSkill, isMasteredSkill, careerGroupOf } from '../systems/masterSkills.js';   // SOFTCAP3/4
-import { pathOf, pathChoices, pathChoiceRows, pathAboutRows, choosePath, pathPossible } from '../systems/arcanePaths.js';   // SCHOOLS1: the specialisation row
-import { martialPathOf, martialChoices, martialChoiceRows, martialAboutRows, chooseMartialPath, martialPossible } from '../systems/martialPaths.js';   // MARTIAL1: and the martial one
-import { computeEntityMods } from '../systems/entityMods.js';   // AUDIT SPEC-RESET L1-3: a chosen path's stats now, not at the next round
-import { liveRaceTemplate, liveRaceName } from '../systems/vampirism.js';   // DISC10-D V5: the live race the sheet names
+import { bankingStatusRows } from '../systems/banking.js'; // AUDIT 64 F28: CreateBankingStatusBox's rows
+import { ownTimeLeftShort } from '../systems/worldTick.js'; // AUDIT LIVED1 Q: online, a loan's due as the time left on the character's clock
+import { REGION_NAMES } from '../formats/mapsFile.js'; // GetLocalizedRegionName
+import { InputMessageBoxWindow } from './inputMessageBox.js'; // CM4: the Name button's DaggerfallInputMessageBox
+import { enterNewNameLabel } from './item/itemMakerWindow.js'; // CM4: Internal_Strings.enterNewName, homed with its first reader
+import { localizedText, formatText, processGrammar, t } from '../systems/textManager.js'; // L10N3d: DFU's Internal_Strings, read in the player's language; L10N3g: the race label's grammar
+import { healthStatusRows } from '../systems/healthStatus.js'; // CM4: CreateHealthStatusBox's rows
+import { affiliations } from '../systems/affiliations.js'; // CM4: ShowAffiliationsDialog's book - GUILD-REP: one model, both skins
+import { firstHotkey } from '../systems/dialogShortcuts.js'; // CM4: the four buttons' DaggerfallShortcut bindings
+import { YesNoBoxWindow } from './yesNoBox.js'; // SOFTCAP3: the Master Skills switch asks in DFU's own Yes/No box
+import {
+  masterSkillsActive,
+  masterSkillsSwitchable,
+  masterSkillsBlockReason,
+  masterSkillsStatusText,
+  setMasterSkills,
+  MASTER_SKILLS_OFFER_ROWS,
+  MASTER_SKILLS_INFO_ROWS,
+  MASTERY_GROUP_NAMES,
+  masterySlots,
+  masteryCandidates,
+  masteryChoiceRows,
+  masterSkill,
+  isMasteredSkill,
+  careerGroupOf,
+} from '../systems/masterSkills.js'; // SOFTCAP3/4
+import {
+  pathOf,
+  pathChoices,
+  pathChoiceRows,
+  pathAboutRows,
+  choosePath,
+  pathPossible,
+} from '../systems/arcanePaths.js'; // SCHOOLS1: the specialisation row
+import {
+  martialPathOf,
+  martialChoices,
+  martialChoiceRows,
+  martialAboutRows,
+  chooseMartialPath,
+  martialPossible,
+} from '../systems/martialPaths.js'; // MARTIAL1: and the martial one
+import { computeEntityMods } from '../systems/entityMods.js'; // AUDIT SPEC-RESET L1-3: a chosen path's stats now, not at the next round
+import { liveRaceTemplate, liveRaceName } from '../systems/vampirism.js'; // DISC10-D V5: the live race the sheet names
 /** AUDIT LIVED1 Q: the sheet's due column online - "in 359 days" / "due now"; null offline, where DFU's date stands. */
-const loanDueShort = (due) => { const s = ownTimeLeftShort(due); return s == null ? null : s === 'now' ? 'due now' : `in ${s}`; };
+const loanDueShort = (due) => {
+  const s = ownTimeLeftShort(due);
+  return s == null ? null : s === 'now' ? 'due now' : `in ${s}`;
+};
 
 // U8a: the module-level art cache - hosts preload once at boot; a
 // failed load leaves the text fallback in charge.
@@ -75,12 +114,18 @@ let _art = null;
 let _spinnerArt = null;
 export async function preloadCharSheetArt(deps) {
   if (!_spinnerArt) {
-    try { _spinnerArt = await loadImg(deps, 'CHAR02I1.IMG'); }
-    catch { _spinnerArt = null; }
+    try {
+      _spinnerArt = await loadImg(deps, 'CHAR02I1.IMG');
+    } catch {
+      _spinnerArt = null;
+    }
   }
   if (_art) return;
-  try { _art = await loadImg(deps, 'INFO00I0.IMG'); }
-  catch { console.warn('[charsheet] INFO00I0.IMG unavailable; the text sheet stands in'); }
+  try {
+    _art = await loadImg(deps, 'INFO00I0.IMG');
+  } catch {
+    console.warn('[charsheet] INFO00I0.IMG unavailable; the text sheet stands in');
+  }
 }
 export const charSheetArtLoaded = () => !!_art;
 
@@ -115,7 +160,7 @@ export class LevelUpScreen {
    * default.
    */
   constructor(entity, rolls = Math.random, { fanfare = true } = {}) {
-    if (fanfare) audio.playOneShot(SOUND.LevelUp, 1);   // UpdatePlayerValues (:373) - the level-up fanfare
+    if (fanfare) audio.playOneShot(SOUND.LevelUp, 1); // UpdatePlayerValues (:373) - the level-up fanfare
     this.entity = entity;
     // Roll the pool NOW so the screen can show it; the base stats are
     // the floors (statDown returns points only above them).
@@ -145,13 +190,20 @@ export class LevelUpScreen {
 
   /** DaggerfallStats.IsAllMax over the working stats - the same law
    *  the sheet's rollout reads, from the same home. */
-  allMax() { return allStatsMax(this.working); }
+  allMax() {
+    return allStatsMax(this.working);
+  }
 
   input(action) {
     const key = STAT_KEYS_ORDER[this.cursor];
     if (action === 'up') this.cursor = (this.cursor + 7) % 8;
     else if (action === 'down') this.cursor = (this.cursor + 1) % 8;
-    else if (action === 'plus') { audio.playOneShot(SOUND.ButtonClick, 1); const r = statUp(this.working[key], this.pool); this.working[key] = r.working; this.pool = r.pool; }   // freeEdit spinner (StatsRollout.cs:255)
+    else if (action === 'plus') {
+      audio.playOneShot(SOUND.ButtonClick, 1);
+      const r = statUp(this.working[key], this.pool);
+      this.working[key] = r.working;
+      this.pool = r.pool;
+    } // freeEdit spinner (StatsRollout.cs:255)
     // AUDIT 58 (f3/input): + 'char:-'. This screen carries no
     // isChoiceWindow, so both hosts hand it overlayAction's answer
     // (scenes/townTalk.js's keyed arm and ui/input.js:"did and ui/charsheet.js's") - and
@@ -163,7 +215,12 @@ export class LevelUpScreen {
     // back, under a screen that prints '+/- assign' at :143 - and
     // LevelUpScreen has no click of its own to fall back on.
     // StatsRollout.cs:255's down-spinner is the same door.
-    else if (action === 'minus' || action === 'char:-') { audio.playOneShot(SOUND.ButtonClick, 1); const r = statDown(this.working[key], this.base[key], this.pool); this.working[key] = r.working; this.pool = r.pool; }
+    else if (action === 'minus' || action === 'char:-') {
+      audio.playOneShot(SOUND.ButtonClick, 1);
+      const r = statDown(this.working[key], this.base[key], this.pool);
+      this.working[key] = r.working;
+      this.pool = r.pool;
+    }
     // LV1's audit: `|| this.allMax()`. CheckIfDoneLeveling's refusal
     // has TWO terms (:437-443) and this screen only ever carried one,
     // so a character at 100 across the board could not leave it: every
@@ -183,21 +240,40 @@ export class LevelUpScreen {
   }
 
   draw(renderer, canvas, font, s) {
-    const W = canvas.width, H = canvas.height;
+    const W = canvas.width,
+      H = canvas.height;
     renderer.drawScreenQuad(null, { x: 0, y: 0, w: W, h: H }, undefined, [0.04, 0.03, 0.02, 0.92]);
-    const gold = [0.85, 0.72, 0.35, 1], white = [0.9, 0.9, 0.85, 1], hot = [1, 0.95, 0.6, 1], dim = [0.5, 0.5, 0.45, 1];
+    const gold = [0.85, 0.72, 0.35, 1],
+      white = [0.9, 0.9, 0.85, 1],
+      hot = [1, 0.95, 0.6, 1],
+      dim = [0.5, 0.5, 0.45, 1];
     // The oghma arm raises no level, so it has no pendingLevel to show
     // (DFU's sheet prints the level it already has).
     const t = `LEVEL ${this.entity.pendingLevel ?? this.entity.level}!  POOL: ${this.pool}`;
     drawText(renderer, font, t, (W - measureText(font.fnt, t) * s) / 2, 24 * s, s, gold);
-    STAT_KEYS_ORDER.forEach((k, i) => drawText(renderer, font,
-      `${i === this.cursor ? '> ' : '  '}${k.slice(0, 3).toUpperCase()}  ${this.working[k]}`,
-      40 * s, (56 + i * 12) * s, s, i === this.cursor ? hot : white));
+    STAT_KEYS_ORDER.forEach((k, i) =>
+      drawText(
+        renderer,
+        font,
+        `${i === this.cursor ? '> ' : '  '}${k.slice(0, 3).toUpperCase()}  ${this.working[k]}`,
+        40 * s,
+        (56 + i * 12) * s,
+        s,
+        i === this.cursor ? hot : white,
+      ),
+    );
     // ...and the foot says which of CheckIfDoneLeveling's two terms is
     // open, because at the ceiling "ENTER when pool 0" is an
     // instruction this screen will never honour (LV1's audit).
-    drawText(renderer, font, this.allMax() ? 'every attribute is at its maximum   ENTER to continue'
-      : '+/- assign   ENTER when pool 0', 40 * s, (56 + 10 * 12) * s, s, dim);
+    drawText(
+      renderer,
+      font,
+      this.allMax() ? 'every attribute is at its maximum   ENTER to continue' : '+/- assign   ENTER when pool 0',
+      40 * s,
+      (56 + 10 * 12) * s,
+      s,
+      dim,
+    );
   }
 }
 
@@ -248,9 +324,16 @@ export const STAT_MODIFIED_COLOR = Object.freeze([0, 1, 0, 1]);
  *  the overlayAction names (ui/input.js:"Shift, and this press") and the raw e.code a
  *  "native" window is handed. */
 const ROLLOUT_ACTIONS = Object.freeze({
-  up: 'up', ArrowUp: 'up', down: 'down', ArrowDown: 'down',
-  plus: 'plus', Equal: 'plus', NumpadAdd: 'plus',
-  minus: 'minus', Minus: 'minus', NumpadSubtract: 'minus',
+  up: 'up',
+  ArrowUp: 'up',
+  down: 'down',
+  ArrowDown: 'down',
+  plus: 'plus',
+  Equal: 'plus',
+  NumpadAdd: 'plus',
+  minus: 'minus',
+  Minus: 'minus',
+  NumpadSubtract: 'minus',
 });
 
 /** AUDIT 58: GetStatDescriptionTextID (TextProvider.cs:582-604) - the
@@ -264,7 +347,8 @@ export const statDescriptionTextId = (i) => (i >= 0 && i < STAT_KEYS_ORDER.lengt
 /** Internal_Strings.csv:110 - CheckIfDoneLeveling's refusal (:437-443). */
 export const MUST_DISTRIBUTE_BONUS_POINTS = 'You must distribute all bonus points.';
 /** L10N3d: ...in the player's language, read where each levelling screen refuses. */
-export const mustDistributeBonusPointsText = () => localizedText('mustDistributeBonusPoints', MUST_DISTRIBUTE_BONUS_POINTS);
+export const mustDistributeBonusPointsText = () =>
+  localizedText('mustDistributeBonusPoints', MUST_DISTRIBUTE_BONUS_POINTS);
 /** DaggerfallUI.DaggerfallHighlightTextColor (DaggerfallUI.cs:54),
  *  Color32(219,130,40,255) - MultiFormatTextLabel's DEFAULT
  *  HighlightColor, what it paints a TextHighlight token with (:363)
@@ -298,10 +382,14 @@ export const NO_AFFILIATIONS_TEXT_ID = 19;
  *  40%, and 39/15's is 0.6000... and it read 60% where DFU's reads 59% -
  *  two of the fifteen a level spans, AUDIT 28e). */
 export function levelProgressPercent(entity) {
-  if (atLevelCap(entity)) return 100;   // LEVEL-45 (systems/levelCap.js): no next level - the box reads it whole
-  if (entity?._online === true) return Math.trunc(onlineLevelFraction(entity.startingLevelUpSkillSum ?? 0, entity.currentLevelUpSkillSum ?? 0) * 100);   // LEVEL-45: the online law's bar (systems/levelClimb.js)
-  const current = Math.fround(((entity?.currentLevelUpSkillSum ?? 0)
-    - (entity?.startingLevelUpSkillSum ?? 0) + 28) / LEVELUP_SKILL_SUM_PER_LEVEL);
+  if (atLevelCap(entity)) return 100; // LEVEL-45 (systems/levelCap.js): no next level - the box reads it whole
+  if (entity?._online === true)
+    return Math.trunc(
+      onlineLevelFraction(entity.startingLevelUpSkillSum ?? 0, entity.currentLevelUpSkillSum ?? 0) * 100,
+    ); // LEVEL-45: the online law's bar (systems/levelClimb.js)
+  const current = Math.fround(
+    ((entity?.currentLevelUpSkillSum ?? 0) - (entity?.startingLevelUpSkillSum ?? 0) + 28) / LEVELUP_SKILL_SUM_PER_LEVEL,
+  );
   return Math.trunc((current % 1) * 100);
 }
 
@@ -317,13 +405,29 @@ export function affiliationRows(entity, rows = null) {
   const book = affiliations(entity);
   if (!book.length) return noAffiliations();
   return [
-    { cells: [{ text: localizedText('affiliation', 'Affiliation'), x: 0 }, { text: localizedText('rank', 'Rank'), x: 125 }], highlight: true },
-    ...book.map((a) => ({ cells: [{ text: a.affiliation, x: 0 }, { text: formatText(localizedText('affiliationFormatString', '{0} (rep:{1})'), a.title, a.rep), x: 125 }] })),
+    {
+      cells: [
+        { text: localizedText('affiliation', 'Affiliation'), x: 0 },
+        { text: localizedText('rank', 'Rank'), x: 125 },
+      ],
+      highlight: true,
+    },
+    ...book.map((a) => ({
+      cells: [
+        { text: a.affiliation, x: 0 },
+        { text: formatText(localizedText('affiliationFormatString', '{0} (rep:{1})'), a.title, a.rep), x: 125 },
+      ],
+    })),
   ];
 }
 
 /** The four buttons' DaggerfallShortcut names, in the sheet's setup order. */
-const MODAL_HOTKEYS = Object.freeze(['CharacterSheetName', 'CharacterSheetLevel', 'CharacterSheetHealth', 'CharacterSheetAffiliations']);
+const MODAL_HOTKEYS = Object.freeze([
+  'CharacterSheetName',
+  'CharacterSheetLevel',
+  'CharacterSheetHealth',
+  'CharacterSheetAffiliations',
+]);
 
 /** AUDIT 26 F164 - UpdatePlayerValues' stat colours
  *  (DaggerfallCharacterSheetWindow.cs:414-419), verbatim from
@@ -374,21 +478,23 @@ export class CharSheet {
    *  window that host cannot open, and the sheet SAYS SO rather than
    *  eating the click - which is what it did for all four until now. */
   constructor(entity, hooks = {}, rolls = Math.random) {
-    this.entity = entity; this.done = false; this.page = 0;
+    this.entity = entity;
+    this.done = false;
+    this.page = 0;
     this.hooks = hooks;
-    this.child = null;      // the pushed window, or null
-    this.notice = null;     // why a button did nothing, when it could not
-    this.isChoiceWindow = true;   // U8a: receive RAW codes through townTalk (digit pages + F5 toggle)
+    this.child = null; // the pushed window, or null
+    this.notice = null; // why a button did nothing, when it could not
+    this.isChoiceWindow = true; // U8a: receive RAW codes through townTalk (digit pages + F5 toggle)
     // The rollout's state, mounted only while levelling.
     this.leveling = false;
     this.oghma = false;
     this.pool = 0;
-    this.base = null;       // StatsRollout.StartingStats
-    this.working = null;    // StatsRollout.WorkingStats
-    this.cursor = 0;        // StatsRollout.selectedStat
+    this.base = null; // StatsRollout.StartingStats
+    this.working = null; // StatsRollout.WorkingStats
+    this.cursor = 0; // StatsRollout.selectedStat
     this._rolls = rolls;
     this._mountStatsRollout(rolls);
-    refreshPaperDoll(entity);     // compose fresh on open, as the inventory does
+    refreshPaperDoll(entity); // compose fresh on open, as the inventory does
   }
 
   /** AUDIT GROWTH LANE3-11: a host that drops the sheet drops what it pushed - the Growth window's DOM and its keys
@@ -396,7 +502,11 @@ export class CharSheet {
   dispose() {
     const c = this.child;
     this.child = null;
-    try { c?.dispose?.(); } catch { /* already gone */ }
+    try {
+      c?.dispose?.();
+    } catch {
+      /* already gone */
+    }
   }
 
   /** UpdatePlayerValues :369-394, verbatim order: the fanfare, the
@@ -412,10 +522,10 @@ export class CharSheet {
    *  PlayerEntity.Stats at CLOSE (:448), not at mount. */
   _mountStatsRollout(rolls) {
     const e = this.entity;
-    releaseCapLatch(e);   // LEVEL-45 (AUDIT FB1026d C2): no pool handed out with no level to go with it
+    releaseCapLatch(e); // LEVEL-45 (AUDIT FB1026d C2): no pool handed out with no level to go with it
     if (!e?.readyToLevelUp) return;
     this.leveling = true;
-    audio.playOneShot(SOUND.LevelUp, 1);   // levelUpSound (:46, :373)
+    audio.playOneShot(SOUND.LevelUp, 1); // levelUpSound (:46, :373)
     this.oghma = !!e.oghmaLevelUp;
     // The same one home. This rollout commits at mount (applyLevelUp
     // below), so it never re-opened on an unspent level - but the draw
@@ -446,8 +556,8 @@ export class CharSheet {
         return false;
       }
       this.leveling = false;
-      Object.assign(this.entity.stats, this.working);   // PlayerEntity.Stats = statsRollout.WorkingStats (:448)
-      refreshOnlineLayer(this.entity, { keepHealth: true });   // AUDIT LEVEL-EVEN L2-2: the rollout's Endurance reaches the online floor now
+      Object.assign(this.entity.stats, this.working); // PlayerEntity.Stats = statsRollout.WorkingStats (:448)
+      refreshOnlineLayer(this.entity, { keepHealth: true }); // AUDIT LEVEL-EVEN L2-2: the rollout's Endurance reaches the online floor now
       return true;
     }
     if (this.entity) resetSkillsRecentlyRaised(this.entity);
@@ -466,7 +576,10 @@ export class CharSheet {
   _open(which) {
     this.notice = null;
     const w = this.hooks[which]?.();
-    if (!w) { this.notice = NO_WINDOW_HERE[which]; return false; }
+    if (!w) {
+      this.notice = NO_WINDOW_HERE[which];
+      return false;
+    }
     this.child = w;
     return true;
   }
@@ -481,7 +594,9 @@ export class CharSheet {
     this.child = new InputMessageBoxWindow({
       label: enterNewNameLabel(),
       value: this.entity?.name ?? '',
-      onSubmit: (input) => { if (input.length > 0 && this.entity) this.entity.name = input; },
+      onSubmit: (input) => {
+        if (input.length > 0 && this.entity) this.entity.name = input;
+      },
     });
   }
 
@@ -489,14 +604,24 @@ export class CharSheet {
   _showLevel() {
     audio.playOneShot(SOUND.ButtonClick, 1);
     // LEVEL-45 (systems/levelCap.js): at the cap there is no next level to measure - the box says the cap
-    this.child = new ActionTextBox([atLevelCap(this.entity) ? t('charsheet.levelCap', 'The highest level is {level, number}: no more levels are gained.', { level: LEVEL_CAP })
-      : formatText(localizedText('levelProgress', 'Progress made to the next level: {0}%'), levelProgressPercent(this.entity))]);
+    this.child = new ActionTextBox([
+      atLevelCap(this.entity)
+        ? t('charsheet.levelCap', 'The highest level is {level, number}: no more levels are gained.', {
+            level: LEVEL_CAP,
+          })
+        : formatText(
+            localizedText('levelProgress', 'Progress made to the next level: {0}%'),
+            levelProgressPercent(this.entity),
+          ),
+    ]);
   }
 
   /** HealthButton_OnMouseClick (:801-806) -> CreateHealthStatusBox. */
   _showHealth() {
     audio.playOneShot(SOUND.ButtonClick, 1);
-    const rows = this.hooks.rows ? healthStatusRows(this.entity, this.hooks.rows) : [{ text: 'You are healthy.', center: true }];
+    const rows = this.hooks.rows
+      ? healthStatusRows(this.entity, this.hooks.rows)
+      : [{ text: 'You are healthy.', center: true }];
     this.child = new ActionTextBox(rows);
   }
 
@@ -506,8 +631,20 @@ export class CharSheet {
     this.child = new ActionTextBox(affiliationRows(this.entity, this.hooks.rows));
   }
 
-  tick(dt) { if (this.child) { this.child.tick?.(dt); this._stepChild(); } }
-  wheel(dir) { if (this.child) { this.child.wheel?.(dir); this._stepChild(); return true; } return false; }
+  tick(dt) {
+    if (this.child) {
+      this.child.tick?.(dt);
+      this._stepChild();
+    }
+  }
+  wheel(dir) {
+    if (this.child) {
+      this.child.wheel?.(dir);
+      this._stepChild();
+      return true;
+    }
+    return false;
+  }
 
   /** U42: the sheet forwarded tick, wheel, input and click to a
    *  pushed window and NOT hover, so every hover-driven behaviour a
@@ -530,17 +667,34 @@ export class CharSheet {
 
   input(action, e = null) {
     // A pushed window owns the keyboard until it closes.
-    if (this.child) { this.child.input?.(action, e); this._stepChild(); return; }
-    this.notice = null; this.noticeOk = false;
+    if (this.child) {
+      this.child.input?.(action, e);
+      this._stepChild();
+      return;
+    }
+    this.notice = null;
+    this.noticeOk = false;
     // CM4: the four residual buttons' DaggerfallShortcut bindings
     // (CharacterSheetName N, CharacterSheetLevel V, CharacterSheetHealth,
     // CharacterSheetAffiliations), ahead of the page digits and the
     // toggle, as DFU's Hotkey assignments sit on the buttons themselves.
     const modal = firstHotkey(MODAL_HOTKEYS, action, e);
-    if (modal === 'CharacterSheetName') { this._showName(); return; }
-    if (modal === 'CharacterSheetLevel') { this._showLevel(); return; }
-    if (modal === 'CharacterSheetHealth') { this._showHealth(); return; }
-    if (modal === 'CharacterSheetAffiliations') { this._showAffiliations(); return; }
+    if (modal === 'CharacterSheetName') {
+      this._showName();
+      return;
+    }
+    if (modal === 'CharacterSheetLevel') {
+      this._showLevel();
+      return;
+    }
+    if (modal === 'CharacterSheetHealth') {
+      this._showHealth();
+      return;
+    }
+    if (modal === 'CharacterSheetAffiliations') {
+      this._showAffiliations();
+      return;
+    }
     // Both vocabularies: input.js actions (dungeon routing) and raw
     // codes (the exterior hosts' overlay seam).
     // The mounted rollout owns the spinner keys. StatButton_OnMouseClick
@@ -553,18 +707,49 @@ export class CharSheet {
       // dungeon's routeKey hands it an overlayAction name.
       const spin = ROLLOUT_ACTIONS[action];
       const key = STAT_KEYS_ORDER[this.cursor];
-      if (spin === 'up') { this.cursor = (this.cursor + 7) % 8; return; }
-      if (spin === 'down') { this.cursor = (this.cursor + 1) % 8; return; }
-      if (spin === 'plus') { const r = statUp(this.working[key], this.pool); this.working[key] = r.working; this.pool = r.pool; return; }
-      if (spin === 'minus') { const r = statDown(this.working[key], this.base[key], this.pool); this.working[key] = r.working; this.pool = r.pool; return; }
+      if (spin === 'up') {
+        this.cursor = (this.cursor + 7) % 8;
+        return;
+      }
+      if (spin === 'down') {
+        this.cursor = (this.cursor + 1) % 8;
+        return;
+      }
+      if (spin === 'plus') {
+        const r = statUp(this.working[key], this.pool);
+        this.working[key] = r.working;
+        this.pool = r.pool;
+        return;
+      }
+      if (spin === 'minus') {
+        const r = statDown(this.working[key], this.base[key], this.pool);
+        this.working[key] = r.working;
+        this.pool = r.pool;
+        return;
+      }
     }
     const pages = { 1: 1, 2: 2, 3: 3, 4: 4, Digit1: 1, Digit2: 2, Digit3: 3, Digit4: 4 };
     const p = pages[action];
-    if (p) { this.page = this.page === p ? 0 : p; return; }
-    if (this.page && (action === 'KeyM' || action === 'm')) { this._masterSkillsPrompt(); return; }   // SOFTCAP3: the skill page's Master Skills row
-    if (this.page && this._pathRow && (action === 'KeyS' || action === 's')) { this._pathPrompt(); return; }   // SCHOOLS1: and its Specialisation row
-    if (this.page && this._martialRow && (action === 'KeyW' || action === 'w')) { this._martialPrompt(); return; }   // MARTIAL1: and its Martial row
-    if (this.page && (action === 'back' || action === 'Escape')) { this.page = 0; return; }
+    if (p) {
+      this.page = this.page === p ? 0 : p;
+      return;
+    }
+    if (this.page && (action === 'KeyM' || action === 'm')) {
+      this._masterSkillsPrompt();
+      return;
+    } // SOFTCAP3: the skill page's Master Skills row
+    if (this.page && this._pathRow && (action === 'KeyS' || action === 's')) {
+      this._pathPrompt();
+      return;
+    } // SCHOOLS1: and its Specialisation row
+    if (this.page && this._martialRow && (action === 'KeyW' || action === 'w')) {
+      this._martialPrompt();
+      return;
+    } // MARTIAL1: and its Martial row
+    if (this.page && (action === 'back' || action === 'Escape')) {
+      this.page = 0;
+      return;
+    }
     // MAC-C: the toggle key is the REGISTRY's, not the literal 'F5'.
     // This window takes RAW codes (isChoiceWindow), so the code is
     // resolved here the way every host ladder resolves one - a player
@@ -575,13 +760,20 @@ export class CharSheet {
     // is the same law the enhanced sheet takes (ui/charSheetDoor.js).
     // The hook is the sheet's own Items button; no hook, no key.
     if (bound('Inventory') && this.hooks?.inventory) {
-      if (!this._checkIfDoneLeveling()) return;   // the same gate the exit takes: no leaving with points owed
+      if (!this._checkIfDoneLeveling()) return; // the same gate the exit takes: no leaving with points owed
       this.done = true;
       this.hooks.inventory();
       return;
     }
-    if (action === 'confirm' || action === 'back' || action === 'sheet'
-      || action === 'Enter' || action === 'Escape' || bound('CharacterSheet') || action === 'KeyE') {
+    if (
+      action === 'confirm' ||
+      action === 'back' ||
+      action === 'sheet' ||
+      action === 'Enter' ||
+      action === 'Escape' ||
+      bound('CharacterSheet') ||
+      action === 'KeyE'
+    ) {
       // CancelWindow / the toggle key / the exit button all run the
       // same gate (:241, :259, :944) - the sheet does not close while
       // bonus points are owed.
@@ -614,21 +806,46 @@ export class CharSheet {
     // reached the four skill buttons and the nav row under the old
     // sheet-anchored plate. One click, and the dialog is gone.
     // SOFTCAP3: ...except its own last row, the Master Skills switch - a click there asks, as M does
-    if (this.page && this._masterRow && inRect(this._masterRow, vx, vy)) { audio.playOneShot(SOUND.ButtonClick, 1); this._masterSkillsPrompt(); return true; }
-    if (this.page && this._pathRow && inRect(this._pathRow, vx, vy)) { audio.playOneShot(SOUND.ButtonClick, 1); this._pathPrompt(); return true; }   // SCHOOLS1
-    if (this.page && this._martialRow && inRect(this._martialRow, vx, vy)) { audio.playOneShot(SOUND.ButtonClick, 1); this._martialPrompt(); return true; }   // MARTIAL1
-    if (this.page) { this.page = 0; return true; }
+    if (this.page && this._masterRow && inRect(this._masterRow, vx, vy)) {
+      audio.playOneShot(SOUND.ButtonClick, 1);
+      this._masterSkillsPrompt();
+      return true;
+    }
+    if (this.page && this._pathRow && inRect(this._pathRow, vx, vy)) {
+      audio.playOneShot(SOUND.ButtonClick, 1);
+      this._pathPrompt();
+      return true;
+    } // SCHOOLS1
+    if (this.page && this._martialRow && inRect(this._martialRow, vx, vy)) {
+      audio.playOneShot(SOUND.ButtonClick, 1);
+      this._martialPrompt();
+      return true;
+    } // MARTIAL1
+    if (this.page) {
+      this.page = 0;
+      return true;
+    }
     const R = CHARSHEET_RECTS;
     // The rollout's own hit rects, while it is mounted: the eight stat
     // select buttons (StatsRollout.cs:110-131) and the spinner's two
     // halves (UpDownSpinner.cs:100-111).
     if (this.leveling) {
-      const sp = STATS_ROLLOUT_SPINNER, se = STATS_ROLLOUT_SELECT;
+      const sp = STATS_ROLLOUT_SPINNER,
+        se = STATS_ROLLOUT_SELECT;
       const spY = sp.y + sp.step * this.cursor;
-      if (inRect([sp.x, spY, sp.w, 7], vx, vy)) { this.input('plus'); return true; }
-      if (inRect([sp.x, spY + 13, sp.w, 7], vx, vy)) { this.input('minus'); return true; }
+      if (inRect([sp.x, spY, sp.w, 7], vx, vy)) {
+        this.input('plus');
+        return true;
+      }
+      if (inRect([sp.x, spY + 13, sp.w, 7], vx, vy)) {
+        this.input('minus');
+        return true;
+      }
       for (let i = 0; i < STAT_KEYS_ORDER.length; i++) {
-        if (inRect([se.x, se.y + se.step * i, se.w, se.h], vx, vy)) { this.cursor = i; return true; }
+        if (inRect([se.x, se.y + se.step * i, se.w, se.h], vx, vy)) {
+          this.cursor = i;
+          return true;
+        }
       }
     }
     // AUDIT 58: THE EIGHT ATTRIBUTE POPUP BUTTONS' OTHER ARM.
@@ -674,34 +891,57 @@ export class CharSheet {
     if (inRect(R.gold, vx, vy)) {
       audio.playOneShot(SOUND.ButtonClick, 1);
       this.child = new ActionTextBox(
-        bankingStatusRows(this.entity?.bankAccounts, { regionName: (i) => REGION_NAMES[i] ?? '', dueText: loanDueShort }),   // AUDIT LIVED1 Q
+        bankingStatusRows(this.entity?.bankAccounts, {
+          regionName: (i) => REGION_NAMES[i] ?? '',
+          dueText: loanDueShort,
+        }), // AUDIT LIVED1 Q
         // SetHighlightColor(DaggerfallUnityStatDrainedTextColor) (:523)
         { highlightColor: STAT_DRAINED_COLOR },
       );
       return true;
     }
     if (inRect(R.exit, vx, vy)) {
-      audio.playOneShot(SOUND.ButtonClick, 1);   // ExitButton_OnMouseClick :943
+      audio.playOneShot(SOUND.ButtonClick, 1); // ExitButton_OnMouseClick :943
       if (this._checkIfDoneLeveling()) this.done = true;
       return true;
     }
     const skills = [R.primarySkills, R.majorSkills, R.minorSkills, R.miscSkills];
     for (let i = 0; i < skills.length; i++) {
-      if (inRect(skills[i], vx, vy)) { audio.playOneShot(SOUND.ButtonClick, 1); this.input(i + 1); return true; }
+      if (inRect(skills[i], vx, vy)) {
+        audio.playOneShot(SOUND.ButtonClick, 1);
+        this.input(i + 1);
+        return true;
+      }
     }
     // U32: THE FOUR NAVIGATION BUTTONS. These were hit-tested,
     // consumed, and did NOTHING - the reported bug. Each one pushes its
     // window now, and two of them (inventory, spellbook) were built and
     // working the whole time with no caller.
     for (const which of NAV_BUTTONS) {
-      if (inRect(R[which], vx, vy)) { audio.playOneShot(SOUND.ButtonClick, 1); this._open(which); return true; }
+      if (inRect(R[which], vx, vy)) {
+        audio.playOneShot(SOUND.ButtonClick, 1);
+        this._open(which);
+        return true;
+      }
     }
     // CM4: the four residual buttons (:772-855). U32 left these
     // consumed as no-ops; each pushes its DFU popup now.
-    if (inRect(R.name, vx, vy)) { this._showName(); return true; }
-    if (inRect(R.level, vx, vy)) { this._showLevel(); return true; }
-    if (inRect(R.health, vx, vy)) { this._showHealth(); return true; }
-    if (inRect(R.affiliations, vx, vy)) { this._showAffiliations(); return true; }
+    if (inRect(R.name, vx, vy)) {
+      this._showName();
+      return true;
+    }
+    if (inRect(R.level, vx, vy)) {
+      this._showLevel();
+      return true;
+    }
+    if (inRect(R.health, vx, vy)) {
+      this._showHealth();
+      return true;
+    }
+    if (inRect(R.affiliations, vx, vy)) {
+      this._showAffiliations();
+      return true;
+    }
     // Any other drawn rect still CLICKS and is consumed, so a press on
     // the sheet never escapes to the host - every
     // DaggerfallCharacterSheetWindow button assigns ButtonClick
@@ -738,9 +978,9 @@ export class CharSheet {
     const label = (text, x, y, opts) => shadowText(renderer, font, String(text), m, x, y, opts);
     // U32: why a button did nothing, when it could not. Drawn over the
     // sheet's own art, cleared by the next key or click.
-    if (this.notice) label(this.notice, 8, 190, { color: this.noticeOk ? [0.9, 0.9, 0.85, 1] : [1, 0.5, 0.4, 1] });   // SOFTCAP3: a switch that moved says so in white
+    if (this.notice) label(this.notice, 8, 190, { color: this.noticeOk ? [0.9, 0.9, 0.85, 1] : [1, 0.5, 0.4, 1] }); // SOFTCAP3: a switch that moved says so in white
     label(e.name ?? '', 41, 4);
-    label(processGrammar(liveRaceName(e) || 'Breton'), 41, 14);   // DISC10-D V5: PlayerEntity.RaceTemplate.Name (DaggerfallCharacterSheetWindow.cs:398) - the compound race; L10N3g: through the grammar there, so a translation's {male/female} race word takes the hero's gender
+    label(processGrammar(liveRaceName(e) || 'Breton'), 41, 14); // DISC10-D V5: PlayerEntity.RaceTemplate.Name (DaggerfallCharacterSheetWindow.cs:398) - the compound race; L10N3g: through the grammar there, so a translation's {male/female} race word takes the hero's gender
     label(e.career?.name ?? '', 46, 24);
     label(e.level ?? 1, 45, 34);
     // DaggerfallCharacterSheetWindow.cs:401 is
@@ -749,9 +989,13 @@ export class CharSheet {
     // every letter of credit in the pack - the coin stack alone
     // under-reports a banked player by the whole letter.
     label(totalGoldAmount(e), 39, 44);
-    label(`${Math.trunc((e.fatigue ?? maxFatigue(e)) / FATIGUE_MULTIPLIER)}/${Math.trunc(maxFatigue(e) / FATIGUE_MULTIPLIER)}`, 57, 54);
+    label(
+      `${Math.trunc((e.fatigue ?? maxFatigue(e)) / FATIGUE_MULTIPLIER)}/${Math.trunc(maxFatigue(e) / FATIGUE_MULTIPLIER)}`,
+      57,
+      54,
+    );
     label(`${e.health}/${e.maxHealth}`, 52, 64);
-    label(`${Math.trunc(carriedWeight(e))}/${entityMaxEncumbrance(e)}`, 90, 74);   // DaggerfallCharacterSheetWindow.cs:404 reads PlayerEntity.MaxEncumbrance
+    label(`${Math.trunc(carriedWeight(e))}/${entityMaxEncumbrance(e)}`, 90, 74); // DaggerfallCharacterSheetWindow.cs:404 reads PlayerEntity.MaxEncumbrance
     // AUDIT 26 F164: UpdatePlayerValues colours each stat label by the
     // live value against the PERMANENT one (:414-419) - drained below,
     // increased above, default when they agree. The port drew all
@@ -764,13 +1008,16 @@ export class CharSheet {
       // values, green where they have moved (StatsRollout.UpdateStatLabels
       // :198-208).
       if (this.leveling) {
-        label(this.working[k], 141, 17 + i * 24, { align: 'center', w: 28, color: this.working[k] !== this.base[k] ? STAT_MODIFIED_COLOR : undefined });
+        label(this.working[k], 141, 17 + i * 24, {
+          align: 'center',
+          w: 28,
+          color: this.working[k] !== this.base[k] ? STAT_MODIFIED_COLOR : undefined,
+        });
         return;
       }
       const live = liveStat(e, k);
       const permanent = e.stats?.[k] ?? 0;
-      const color = live < permanent ? STAT_DRAINED_COLOR
-        : live > permanent ? STAT_INCREASED_COLOR : undefined;
+      const color = live < permanent ? STAT_DRAINED_COLOR : live > permanent ? STAT_INCREASED_COLOR : undefined;
       label(live, 141, 17 + i * 24, { align: 'center', w: 28, color });
     });
     if (this.leveling) this._drawSpinner(renderer, font, m);
@@ -787,7 +1034,7 @@ export class CharSheet {
     const sp = STATS_ROLLOUT_SPINNER;
     const y = sp.y + sp.step * this.cursor;
     if (_spinnerArt) drawImg(renderer, _spinnerArt, m, sp.x, y);
-    else drawRect(renderer, m, sp.x, y, sp.w, sp.h, [0.12, 0.10, 0.07, 0.9]);
+    else drawRect(renderer, m, sp.x, y, sp.w, sp.h, [0.12, 0.1, 0.07, 0.9]);
     shadowText(renderer, font, String(this.pool), m, sp.x, y + 7, { align: 'center', w: sp.w });
   }
 
@@ -830,9 +1077,13 @@ export class CharSheet {
     const names = ['Primary', 'Major', 'Minor', 'Miscellaneous'];
     const career = [e.career?.primarySkills ?? [], e.career?.majorSkills ?? [], e.career?.minorSkills ?? []];
     const inCareer = new Set(career.flat());
-    const ids = this.page <= 3 ? career[this.page - 1]
-      : Object.keys(SKILL_NAMES).map(Number).filter((id) => !inCareer.has(id));
-    const twoColumn = this.page === 4;   // :835 is the only caller that passes true
+    const ids =
+      this.page <= 3
+        ? career[this.page - 1]
+        : Object.keys(SKILL_NAMES)
+            .map(Number)
+            .filter((id) => !inCareer.has(id));
+    const twoColumn = this.page === 4; // :835 is the only caller that passes true
     const showHth = ids.includes(SKILLS.HandToHand);
     const lines = (twoColumn ? Math.ceil(ids.length / 2) : ids.length) + (showHth ? 1 : 0);
     // SCHOOLS1: the Specialisation row under it, while Master Skills is in force and a path is chosen or open
@@ -841,17 +1092,27 @@ export class CharSheet {
     // AUDIT GROWTH LANE3-2: never while the rollout stands (_growth); LANE3-12: a chosen path's row only while it is in
     // force - asleep (Master Skills off), the guide's row says so
     const guide = typeof this.hooks?.growth === 'function' && !this.leveling;
-    const pathText = pathOf(e) && masterSkillsActive(e) ? t('schools.sheet.chosen', '{name}  (S)', { name: pathOf(e).name })
-      : masterSkillsActive(e) && pathChoices(e).length ? t('schools.sheet.choose', 'Specialise  (S)')
-        : guide && pathPossible(e) ? t('schools.sheet.guide', 'Arcane paths  (S)') : null;
+    const pathText =
+      pathOf(e) && masterSkillsActive(e)
+        ? t('schools.sheet.chosen', '{name}  (S)', { name: pathOf(e).name })
+        : masterSkillsActive(e) && pathChoices(e).length
+          ? t('schools.sheet.choose', 'Specialise  (S)')
+          : guide && pathPossible(e)
+            ? t('schools.sheet.guide', 'Arcane paths  (S)')
+            : null;
     // MARTIAL1: and the Martial row under that, the same way - the weapons' specialisation (W)
-    const martialText = martialPathOf(e) && masterSkillsActive(e) ? t('martial.sheet.chosen', '{name}  (W)', { name: martialPathOf(e).name })
-      : masterSkillsActive(e) && martialChoices(e).length ? t('martial.sheet.choose', 'Martial specialization  (W)')
-        : guide && martialPossible(e) ? t('martial.sheet.guide', 'Martial paths  (W)') : null;
-    const h = (lines + 1 + (pathText ? 1 : 0) + (martialText ? 1 : 0)) * 9 + 14;   // SOFTCAP3: + the Master Skills row under the skills
+    const martialText =
+      martialPathOf(e) && masterSkillsActive(e)
+        ? t('martial.sheet.chosen', '{name}  (W)', { name: martialPathOf(e).name })
+        : masterSkillsActive(e) && martialChoices(e).length
+          ? t('martial.sheet.choose', 'Martial specialization  (W)')
+          : guide && martialPossible(e)
+            ? t('martial.sheet.guide', 'Martial paths  (W)')
+            : null;
+    const h = (lines + 1 + (pathText ? 1 : 0) + (martialText ? 1 : 0)) * 9 + 14; // SOFTCAP3: + the Master Skills row under the skills
     const w = twoColumn ? 246 : 130;
     const x = twoColumn ? Math.floor((320 - w) / 2) : 8;
-    const y = twoColumn ? Math.floor((200 - h) / 2) : Math.min(100, 198 - h);   // AUDIT MARTIAL L4 L1: never past the screen's foot (Minor, Hand-to-Hand among them, both specialisation rows: 204 of 200)
+    const y = twoColumn ? Math.floor((200 - h) / 2) : Math.min(100, 198 - h); // AUDIT MARTIAL L4 L1: never past the screen's foot (Minor, Hand-to-Hand among them, both specialisation rows: 204 of 200)
     drawRect(renderer, m, x, y, w, h, [0.05, 0.05, 0.09, 0.95]);
     shadowText(renderer, font, `${names[this.page - 1]} skills`, m, x + 4, y + 3);
     // TextProvider.GetSkillSummary (:490-496): a skill raised since
@@ -864,14 +1125,38 @@ export class CharSheet {
     // recently-raised row is pale BLUE here rather than the orange
     // DaggerfallHighlightTextColor (:54) this used to draw.
     ids.forEach((id, i) =>
-      shadowText(renderer, font, `${SKILL_NAMES[id]} ${skillValueText(e, id)}%`,   // AUDIT 65 CV-1: GetSkillSummary's value token is GetLiveSkillValue (TextProvider.cs:503), not the permanent array
-        m, x + 4 + (twoColumn && i % 2 ? 136 : 0), y + 13 + (twoColumn ? Math.floor(i / 2) : i) * 9,
-        { color: getSkillRecentlyIncreased(e, id) ? SKILL_DIALOG_HIGHLIGHT_COLOR : isMasteredSkill(e, id) ? [0.95, 0.84, 0.48, 1] : [0.9, 0.9, 0.85, 1] }));   // SOFTCAP4: a mastered skill in gold
+      shadowText(
+        renderer,
+        font,
+        `${SKILL_NAMES[id]} ${skillValueText(e, id)}%`, // AUDIT 65 CV-1: GetSkillSummary's value token is GetLiveSkillValue (TextProvider.cs:503), not the permanent array
+        m,
+        x + 4 + (twoColumn && i % 2 ? 136 : 0),
+        y + 13 + (twoColumn ? Math.floor(i / 2) : i) * 9,
+        {
+          color: getSkillRecentlyIncreased(e, id)
+            ? SKILL_DIALOG_HIGHLIGHT_COLOR
+            : isMasteredSkill(e, id)
+              ? [0.95, 0.84, 0.48, 1]
+              : [0.9, 0.9, 0.85, 1],
+        },
+      ),
+    ); // SOFTCAP4: a mastered skill in gold
     if (showHth) {
       const v = skillValue(e, SKILLS.HandToHand);
-      shadowText(renderer, font,
-        formatText(localizedText('hthDamageFormatString', '{0} dmg: {1}-{2}'), SKILL_NAMES[SKILLS.HandToHand], handToHandMinDamage(v), handToHandMaxDamage(v)),
-        m, x + 4, y + 13 + (lines - 1) * 9, { color: [0.9, 0.9, 0.85, 1] });
+      shadowText(
+        renderer,
+        font,
+        formatText(
+          localizedText('hthDamageFormatString', '{0} dmg: {1}-{2}'),
+          SKILL_NAMES[SKILLS.HandToHand],
+          handToHandMinDamage(v),
+          handToHandMaxDamage(v),
+        ),
+        m,
+        x + 4,
+        y + 13 + (lines - 1) * 9,
+        { color: [0.9, 0.9, 0.85, 1] },
+      );
     }
     // SOFTCAP3: THE MASTER SKILLS ROW - its state and its key, in the dialog's highlight gold; a click on it or M
     // asks in DFU's Yes/No box (the rest of the plate still closes on a click, as ShowSkillsDialog's box does)
@@ -879,7 +1164,15 @@ export class CharSheet {
     const my = y + 13 + lines * 9;
     const grp = ['primary', 'major', 'minor'][this.page - 1] ?? null;
     const slots = grp && masterSkillsActive(e) ? masterySlots(e, grp) : null;
-    shadowText(renderer, font, slots ? `Mastered ${slots.used}/${slots.max}  (M)` : `${masterSkillsStatusText(e)}  (M)`, m, x + 4, my, { color: [0.86, 0.73, 0.35, 1] });
+    shadowText(
+      renderer,
+      font,
+      slots ? `Mastered ${slots.used}/${slots.max}  (M)` : `${masterSkillsStatusText(e)}  (M)`,
+      m,
+      x + 4,
+      my,
+      { color: [0.86, 0.73, 0.35, 1] },
+    );
     this._masterRow = [x, my - 1, w, 9];
     // SCHOOLS1: THE SPECIALISATION ROW - the path chosen (S tells what it does) or "Choose a specialisation" (S asks)
     this._pathRow = null;
@@ -916,17 +1209,46 @@ export class CharSheet {
    *  box - chosen on Yes (given up only by SPEC-RESET); No, then W, offers the next (the plate stays behind the box, AUDIT
    *  SCHOOLS L4 H1). */
   _martialPrompt() {
-    if (this._growth('specs:martial')) return;   // GROWTH4: the guide, where it opens
+    if (this._growth('specs:martial')) return; // GROWTH4: the guide, where it opens
     const e = this.entity;
     const chosen = martialPathOf(e);
-    if (chosen) { this.page = 0; this.child = new YesNoBoxWindow({ okOnly: true, rows: [...martialAboutRows(chosen), '', t('martial.sheet.key', 'Use your Weapon Technique key while holding one of its weapons. A weapon with its own technique uses that instead.')] }); return; }
+    if (chosen) {
+      this.page = 0;
+      this.child = new YesNoBoxWindow({
+        okOnly: true,
+        rows: [
+          ...martialAboutRows(chosen),
+          '',
+          t(
+            'martial.sheet.key',
+            'Use your Weapon Technique key while holding one of its weapons. A weapon with its own technique uses that instead.',
+          ),
+        ],
+      });
+      return;
+    }
     const pool = martialChoices(e);
     if (!pool.length) return;
-    const p = pool[(this._martialPick = ((this._martialPick ?? -1) + 1)) % pool.length];
-    const more = pool.length > 1 ? ['', t('martial.sheet.next', '{n, plural, one {# martial specialization is open. Choose No, then press W to see the next.} other {# martial specializations are open. Choose No, then press W to see the next.}}', { n: pool.length })] : [];
+    const p = pool[(this._martialPick = (this._martialPick ?? -1) + 1) % pool.length];
+    const more =
+      pool.length > 1
+        ? [
+            '',
+            t(
+              'martial.sheet.next',
+              '{n, plural, one {# martial specialization is open. Choose No, then press W to see the next.} other {# martial specializations are open. Choose No, then press W to see the next.}}',
+              { n: pool.length },
+            ),
+          ]
+        : [];
     this.child = new YesNoBoxWindow({
       rows: [...martialChoiceRows(e, p.id, { others: false }), ...more],
-      onYes: () => { const r = chooseMartialPath(e, p.id); if (r.ok) computeEntityMods(e); this.notice = r.text; this.noticeOk = r.ok; },
+      onYes: () => {
+        const r = chooseMartialPath(e, p.id);
+        if (r.ok) computeEntityMods(e);
+        this.notice = r.text;
+        this.noticeOk = r.ok;
+      },
     });
   }
 
@@ -934,18 +1256,44 @@ export class CharSheet {
    *  DFU's OK box says what it does. None yet: each open path is asked about in DFU's Yes/No box - chosen on Yes (given
    *  up only by SPEC-RESET); No, then S, offers the next. */
   _pathPrompt() {
-    if (this._growth('specs:arcane')) return;   // GROWTH4: the guide, where it opens
+    if (this._growth('specs:arcane')) return; // GROWTH4: the guide, where it opens
     const e = this.entity;
     const chosen = pathOf(e);
     // AUDIT SCHOOLS L4 H1: the plate stays behind a choosing box, so "No, then S" reaches the next path
-    if (chosen) { this.page = 0; this.child = new YesNoBoxWindow({ okOnly: true, rows: [...pathAboutRows(chosen), '', t('schools.sheet.sold', 'Its signature spell is sold to you at the Mages Guild.')] }); return; }
+    if (chosen) {
+      this.page = 0;
+      this.child = new YesNoBoxWindow({
+        okOnly: true,
+        rows: [
+          ...pathAboutRows(chosen),
+          '',
+          t('schools.sheet.sold', 'Its signature spell is sold to you at the Mages Guild.'),
+        ],
+      });
+      return;
+    }
     const pool = pathChoices(e);
     if (!pool.length) return;
-    const p = pool[(this._pathPick = ((this._pathPick ?? -1) + 1)) % pool.length];
-    const more = pool.length > 1 ? ['', t('schools.sheet.next', '{n, plural, one {# specialization is open. Choose No, then press S to see the next.} other {# specializations are open. Choose No, then press S to see the next.}}', { n: pool.length })] : [];
+    const p = pool[(this._pathPick = (this._pathPick ?? -1) + 1) % pool.length];
+    const more =
+      pool.length > 1
+        ? [
+            '',
+            t(
+              'schools.sheet.next',
+              '{n, plural, one {# specialization is open. Choose No, then press S to see the next.} other {# specializations are open. Choose No, then press S to see the next.}}',
+              { n: pool.length },
+            ),
+          ]
+        : [];
     this.child = new YesNoBoxWindow({
       rows: [...pathChoiceRows(e, p.id, { others: false }), ...more],
-      onYes: () => { const r = choosePath(e, p.id); if (r.ok) computeEntityMods(e); this.notice = r.text; this.noticeOk = r.ok; },
+      onYes: () => {
+        const r = choosePath(e, p.id);
+        if (r.ok) computeEntityMods(e);
+        this.notice = r.text;
+        this.noticeOk = r.ok;
+      },
     });
   }
 
@@ -965,16 +1313,28 @@ export class CharSheet {
       if (!pool.length) {
         this.page = 0;
         const sl = masterySlots(e, grp);
-        this.child = new YesNoBoxWindow({ okOnly: true, rows: [
-          `${MASTERY_GROUP_NAMES[grp]} skills: ${sl.used} of ${sl.max} mastered.`, '',
-          'A skill can be mastered once it reaches 100.', 'A mastered skill can climb past 100,', 'up to 200. This cannot be undone.'] });
+        this.child = new YesNoBoxWindow({
+          okOnly: true,
+          rows: [
+            `${MASTERY_GROUP_NAMES[grp]} skills: ${sl.used} of ${sl.max} mastered.`,
+            '',
+            'A skill can be mastered once it reaches 100.',
+            'A mastered skill can climb past 100,',
+            'up to 200. This cannot be undone.',
+          ],
+        });
         return;
       }
-      const id = pool[(this._masteryPick = ((this._masteryPick ?? -1) + 1)) % pool.length];
-      const more = pool.length > 1 ? ['', `${pool.length} skills are ready. Choose No, then press M to see the next.`] : [];   // SOFTCAP6
+      const id = pool[(this._masteryPick = (this._masteryPick ?? -1) + 1) % pool.length];
+      const more =
+        pool.length > 1 ? ['', `${pool.length} skills are ready. Choose No, then press M to see the next.`] : []; // SOFTCAP6
       this.child = new YesNoBoxWindow({
         rows: [...masteryChoiceRows(e, id, SKILL_NAMES), ...more],
-        onYes: () => { const r = masterSkill(e, id, SKILL_NAMES); this.notice = r.text; this.noticeOk = r.ok; },
+        onYes: () => {
+          const r = masterSkill(e, id, SKILL_NAMES);
+          this.notice = r.text;
+          this.noticeOk = r.ok;
+        },
       });
       return;
     }
@@ -984,43 +1344,88 @@ export class CharSheet {
       return;
     }
     const reason = masterSkillsBlockReason(e);
-    if (reason) { this.notice = reason; this.noticeOk = false; return; }
+    if (reason) {
+      this.notice = reason;
+      this.noticeOk = false;
+      return;
+    }
     const on = masterSkillsActive(e);
     const rows = on
-      ? ['Turn off Master Skills?', '', 'Skills above 100 will read as 100', 'until you turn it back on.', 'Your progress is kept.', 'Dungeons return to normal.']
+      ? [
+          'Turn off Master Skills?',
+          '',
+          'Skills above 100 will read as 100',
+          'until you turn it back on.',
+          'Your progress is kept.',
+          'Dungeons return to normal.',
+        ]
       : MASTER_SKILLS_OFFER_ROWS.slice(1);
     const answer = (yes) => () => {
       if (!yes) return;
       const r = setMasterSkills(e, !on);
-      this.notice = r.text; this.noticeOk = r.ok;
+      this.notice = r.text;
+      this.noticeOk = r.ok;
     };
     this.page = 0;
     this.child = new YesNoBoxWindow({ rows, onYes: answer(true), onNo: answer(false) });
   }
 
   _drawFallback(renderer, canvas, font, s) {
-    const e = this.entity, W = canvas.width, H = canvas.height;
+    const e = this.entity,
+      W = canvas.width,
+      H = canvas.height;
     renderer.drawScreenQuad(null, { x: 0, y: 0, w: W, h: H }, undefined, [0.04, 0.03, 0.02, 0.92]);
-    const gold = [0.85, 0.72, 0.35, 1], white = [0.9, 0.9, 0.85, 1], dim = [0.6, 0.6, 0.55, 1];
+    const gold = [0.85, 0.72, 0.35, 1],
+      white = [0.9, 0.9, 0.85, 1],
+      dim = [0.6, 0.6, 0.55, 1];
     drawText(renderer, font, `${e.name ?? '?'}  ${e.career?.name ?? ''}  LVL ${e.level}`, 20 * s, 16 * s, s, gold);
-    drawText(renderer, font, `HP ${e.health}/${e.maxHealth}   MP ${e.magicka}/${e.maxMagicka}`, 20 * s, 30 * s, s, white);
+    drawText(
+      renderer,
+      font,
+      `HP ${e.health}/${e.maxHealth}   MP ${e.magicka}/${e.maxMagicka}`,
+      20 * s,
+      30 * s,
+      s,
+      white,
+    );
     // The art-less sheet still LEVELS - it has to, because the close
     // gate refuses while points are owed and a player who cannot see
     // the pool cannot spend it.
     if (this.leveling) {
       drawText(renderer, font, `POOL: ${this.pool}   +/- assign`, 20 * s, 40 * s, s, gold);
-      STAT_KEYS_ORDER.forEach((k, i) => drawText(renderer, font,
-        `${i === this.cursor ? '>' : ' '} ${k.slice(0, 3).toUpperCase()} ${this.working[k]}`,
-        20 * s, (48 + i * 10) * s, s, this.working[k] !== this.base[k] ? STAT_MODIFIED_COLOR : white));
+      STAT_KEYS_ORDER.forEach((k, i) =>
+        drawText(
+          renderer,
+          font,
+          `${i === this.cursor ? '>' : ' '} ${k.slice(0, 3).toUpperCase()} ${this.working[k]}`,
+          20 * s,
+          (48 + i * 10) * s,
+          s,
+          this.working[k] !== this.base[k] ? STAT_MODIFIED_COLOR : white,
+        ),
+      );
     } else {
-      STAT_KEYS_ORDER.forEach((k, i) => drawText(renderer, font,
-        `${k.slice(0, 3).toUpperCase()} ${e.stats[k]}`, 20 * s, (48 + i * 10) * s, s, white));
+      STAT_KEYS_ORDER.forEach((k, i) =>
+        drawText(renderer, font, `${k.slice(0, 3).toUpperCase()} ${e.stats[k]}`, 20 * s, (48 + i * 10) * s, s, white),
+      );
     }
-    const groups = [['P', e.career?.primarySkills ?? []], ['M', e.career?.majorSkills ?? []], ['m', e.career?.minorSkills ?? []]];
+    const groups = [
+      ['P', e.career?.primarySkills ?? []],
+      ['M', e.career?.majorSkills ?? []],
+      ['m', e.career?.minorSkills ?? []],
+    ];
     let row = 0;
     for (const [tag, ids] of groups) {
       for (const id of ids) {
-        drawText(renderer, font, `${tag} ${SKILL_NAMES[id]} ${e.skills?.[id] ?? ''}`, 100 * s, (48 + row * 10) * s, s, dim);
+        drawText(
+          renderer,
+          font,
+          `${tag} ${SKILL_NAMES[id]} ${e.skills?.[id] ?? ''}`,
+          100 * s,
+          (48 + row * 10) * s,
+          s,
+          dim,
+        );
         row++;
       }
     }

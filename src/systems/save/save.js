@@ -13,58 +13,75 @@
 // travel-on-load. Versioned envelope; a mismatch refuses loudly.
 
 import { readBankCabinLink } from '../../net/boatIdentity.js';
-import { clampLegalReputations } from '../court.js';   // AUDIT 23 (C4)
-import { releaseCapLatch } from '../levelCap.js';   // AUDIT FB1026d C1: a level a save owes past the cap let go at the load
-import { defineLiveMaxMagicka, defineLiveMaxHealth } from '../chargen.js';   // AUDIT 39: the live MaxMagicka accessor, on the LOAD arm too; DISC10-E L4: and MaxHealth's
-import { rebuildEquipState, isEquipped, unequipSlot } from '../equip.js';   // AUDIT 17e C1   // AUDIT 63 F28: RemoveItem takes an EQUIPPED item off the doll on its way out
-import { templateByIndex } from '../item/itemTemplates.js';   // AUDIT 63r F28: `shortName` is SetItem's template read, not an optional override
-import { heldOutOf } from '../item/heldOut.js';   // RPT1026-ITEMS HELD-OUT: a counter's staged lot is still the player's
-import { restartHeldEnchantments } from '../enchantments.js';   // E2: the held bundles' restore half
-import { snapshotWeather, restoreWeather, rollClimateWeathersForDay } from '../weather/weatherSim.js';   // W1: playerPosition.weather (SerializablePlayer.cs:225) - one value, every host; AUDIT WORLD5 C4: the shared day's sky over a loaded one
+import { clampLegalReputations } from '../court.js'; // AUDIT 23 (C4)
+import { releaseCapLatch } from '../levelCap.js'; // AUDIT FB1026d C1: a level a save owes past the cap let go at the load
+import { defineLiveMaxMagicka, defineLiveMaxHealth } from '../chargen.js'; // AUDIT 39: the live MaxMagicka accessor, on the LOAD arm too; DISC10-E L4: and MaxHealth's
+import { rebuildEquipState, isEquipped, unequipSlot } from '../equip.js'; // AUDIT 17e C1   // AUDIT 63 F28: RemoveItem takes an EQUIPPED item off the doll on its way out
+import { templateByIndex } from '../item/itemTemplates.js'; // AUDIT 63r F28: `shortName` is SetItem's template read, not an optional override
+import { heldOutOf } from '../item/heldOut.js'; // RPT1026-ITEMS HELD-OUT: a counter's staged lot is still the player's
+import { restartHeldEnchantments } from '../enchantments.js'; // E2: the held bundles' restore half
+import { snapshotWeather, restoreWeather, rollClimateWeathersForDay } from '../weather/weatherSim.js'; // W1: playerPosition.weather (SerializablePlayer.cs:225) - one value, every host; AUDIT WORLD5 C4: the shared day's sky over a loaded one
 import { snapshotRegionConditions, restoreRegionConditions } from '../region/regionConditions.js';
 import { arenaLadderSnapshot, arenaLadderRestore } from '../arena/arenaLadder.js';
-import { arenaLeagueSnapshot, arenaLeagueRestore } from '../arena/arenaLeague.js';   // ARENA3: the banners, the season, the Records page, the book
-import { arenaReplaysSnapshot, arenaReplaysRestore } from '../arena/arenaReplay.js';   // ARENA5: your ladder replays
-import { snapshotStanding, restoreStanding } from '../standing.js';   // REP: the standing book   // S42: the CONDITION half of RegionDataRecord
-import { snapshotDiscovery, restoreDiscovery } from '../discovery.js';   // T4
-import { getWorldVariationSaveData, restoreWorldVariationData, clearWorldDataVariants } from '../worldDataVariants.js';   // RR3b: the world-data variants ride the save
-import { snapshotAutomap, restoreAutomap } from '../automap/automap.js';   // A1: dictAutomapDungeonsDiscoveryState rides SaveData_v1
-import { createSceneCache, snapshotSceneCache, restoreSceneCache } from '../sceneCache.js';   // P1
-import { seedCustomSpellIndex } from '../spell/spellMaker.js';   // S1: made spells carry their own record
-import { isPathId } from '../arcanePaths.js';   // SCHOOLS1: the specialisation's id, read through its own table
-import { isMartialPathId } from '../martialPaths.js';   // MARTIAL1: the martial specialisation's id, read through its own table
-import { seedBundleSeq, effectKindLoaded } from '../effects.js';   // X10: the live-bundle counter's restore half; AUDIT PRE-MERGE 0928 S3: a mod's effect restores only while its mod is loaded
-import { foldStrayFaces } from '../festival/soulCake.js';   // WITCH1: and the Witches' Festival's, the same law
-import '../professions/profTemplates.js';   // PROF2: the ores, ingots and stone a pack may hold, known to every scene a save loads in
-import '../rest/restItems.js';   // REST6: the seven rest supplies (1700-1706), known to every scene a save loads in
-import { SOCIAL_GROUPS } from '../../formats/factionFile.js';   // AUDIT 24
-import { travelMapSaveData, restoreTravelMapSaveData } from '../travel/travelMapState.js';   // U41: TravelMapSaveData
-import { getEscortFacesSaveData, restoreEscortFacesSaveData } from '../../ui/hud/hudEscortFaces.js';   // FE1: SaveData_v1.escortingFaces
-import { quickslotSaveData, restoreQuickslotSaveData } from '../quickslots.js';   // QS1: the quickslot diamond rides the one composer
-import { resetMagicRoundMarker, sharedClockOn, worldMinutes, alignEntityClocks, setOwnMinutes, ownMinutes, normalizeAcross, payAbsenceWhenHeard, worldMinutesToSave } from '../worldTick.js';   // EntityEffectBroker.InitMagicRoundTimer, on the LOAD arm (:230-233); AUDIT WORLD5 C4: a load online is an arrival; AUDIT LIVED1b P4: its absence on the relay's clock
-import { alignSurvival, ALIGN_GRACE_MINUTES, savedNotes } from '../survival/needs.js';   // SURV7: the needs' markers on the load arm; AUDIT SURV-BOONS C3: the boons said; AUDIT C&C N6: and the stages
-import { saneSaveClock } from '../offlineCopy.js';   // AUDIT LIVED1b F3: the envelope's clocks, read once - the doors' law too
-import { isMembershipStore } from '../guild/guilds.js';   // V2e: the two-book membership store rides the save whole
-import { createBankAccounts, createHouses, padRegionTable, blankAccount, blankHouse, allDeeds, copyHouseSlot } from '../banking.js';   // JAN1: a save with no accounts restores the full table - an EMPTY one is truthy and the host's `??=` never minted it
-import { setItemFields } from '../item/itemTemplates.js';   // JAN1: an item saved before MAC-N1 (no value) is set on the way in, so the trade strip never sums NaN
-import { restoreKnightlyOrderFlags } from '../knightlyGifts.js';   // D9: KnightlyOrder.RestoreGuildData's armour-bit back-fill
-import { GUILD_GROUPS } from '../../formats/factionFile.js';   // the membership book's key IS the guild group
-import { normalTribute } from '../../world/lefayMonument.js';   // LEFAY1: the flowers a character laid at Julian LeFay's monument
-import { normalPracticeHeld } from '../masterSkills.js';   // AUDIT RPT1026 F1: the practice Master Skills switched off holds aside
-import { characterIdOf, mintCharacterId } from '../characterId.js';   // CHARID1: a character is an id, not a name
-import { isOnlinePage } from '../online/onlineLane.js';   // ONLINE-DEATH-FIX: the page is online
-import { STREAMING_TERRAIN_SCALE, GROUND_FRAME_LAW } from '../../world/terrain/terrainSampler.js';   // TERRAIN-SCALE1: the scale every saved exterior height stands on; BAY-LEFT-GROUND: and its frame's law
-import { reviveForPlay } from '../deathRespawn.js';   // ONLINE-DEATH-FIX: the SAME half-health an online respawn leaves
-import { setLightSource } from '../lightSource.js';   // DISC7: the light in hand's one door
-import { renownHpOf, onlineMpOf, offlineVitals } from '../renownLayer.js';   // RENOWN1: the online layer never reaches a save (EG15: nor the folds' magicka)
-import { stashedItemLists } from '../../net/realm/realmGoldLaw.js';   // AUDIT PRE-MERGE 0929 D3: every list of the character's own things a save carries
-import { DEPOSIT_MAX, depositOrderOk } from '../../net/bagLaw.js';   // AUDIT2 BAG1: a deposit's stamp, kept to a deposit's bounds
-import { resetBlowEffects } from '../blowEffects.js';   // AUDIT TELL L2: a load forgets the last game's landings
+import { arenaLeagueSnapshot, arenaLeagueRestore } from '../arena/arenaLeague.js'; // ARENA3: the banners, the season, the Records page, the book
+import { arenaReplaysSnapshot, arenaReplaysRestore } from '../arena/arenaReplay.js'; // ARENA5: your ladder replays
+import { snapshotStanding, restoreStanding } from '../standing.js'; // REP: the standing book   // S42: the CONDITION half of RegionDataRecord
+import { snapshotDiscovery, restoreDiscovery } from '../discovery.js'; // T4
+import { getWorldVariationSaveData, restoreWorldVariationData, clearWorldDataVariants } from '../worldDataVariants.js'; // RR3b: the world-data variants ride the save
+import { snapshotAutomap, restoreAutomap } from '../automap/automap.js'; // A1: dictAutomapDungeonsDiscoveryState rides SaveData_v1
+import { createSceneCache, snapshotSceneCache, restoreSceneCache } from '../sceneCache.js'; // P1
+import { seedCustomSpellIndex } from '../spell/spellMaker.js'; // S1: made spells carry their own record
+import { isPathId } from '../arcanePaths.js'; // SCHOOLS1: the specialisation's id, read through its own table
+import { isMartialPathId } from '../martialPaths.js'; // MARTIAL1: the martial specialisation's id, read through its own table
+import { seedBundleSeq, effectKindLoaded } from '../effects.js'; // X10: the live-bundle counter's restore half; AUDIT PRE-MERGE 0928 S3: a mod's effect restores only while its mod is loaded
+import { foldStrayFaces } from '../festival/soulCake.js'; // WITCH1: and the Witches' Festival's, the same law
+import '../professions/profTemplates.js'; // PROF2: the ores, ingots and stone a pack may hold, known to every scene a save loads in
+import '../rest/restItems.js'; // REST6: the seven rest supplies (1700-1706), known to every scene a save loads in
+import { SOCIAL_GROUPS } from '../../formats/factionFile.js'; // AUDIT 24
+import { travelMapSaveData, restoreTravelMapSaveData } from '../travel/travelMapState.js'; // U41: TravelMapSaveData
+import { getEscortFacesSaveData, restoreEscortFacesSaveData } from '../../ui/hud/hudEscortFaces.js'; // FE1: SaveData_v1.escortingFaces
+import { quickslotSaveData, restoreQuickslotSaveData } from '../quickslots.js'; // QS1: the quickslot diamond rides the one composer
+import {
+  resetMagicRoundMarker,
+  sharedClockOn,
+  worldMinutes,
+  alignEntityClocks,
+  setOwnMinutes,
+  ownMinutes,
+  normalizeAcross,
+  payAbsenceWhenHeard,
+  worldMinutesToSave,
+} from '../worldTick.js'; // EntityEffectBroker.InitMagicRoundTimer, on the LOAD arm (:230-233); AUDIT WORLD5 C4: a load online is an arrival; AUDIT LIVED1b P4: its absence on the relay's clock
+import { alignSurvival, ALIGN_GRACE_MINUTES, savedNotes } from '../survival/needs.js'; // SURV7: the needs' markers on the load arm; AUDIT SURV-BOONS C3: the boons said; AUDIT C&C N6: and the stages
+import { saneSaveClock } from '../offlineCopy.js'; // AUDIT LIVED1b F3: the envelope's clocks, read once - the doors' law too
+import { isMembershipStore } from '../guild/guilds.js'; // V2e: the two-book membership store rides the save whole
+import {
+  createBankAccounts,
+  createHouses,
+  padRegionTable,
+  blankAccount,
+  blankHouse,
+  allDeeds,
+  copyHouseSlot,
+} from '../banking.js'; // JAN1: a save with no accounts restores the full table - an EMPTY one is truthy and the host's `??=` never minted it
+import { setItemFields } from '../item/itemTemplates.js'; // JAN1: an item saved before MAC-N1 (no value) is set on the way in, so the trade strip never sums NaN
+import { restoreKnightlyOrderFlags } from '../knightlyGifts.js'; // D9: KnightlyOrder.RestoreGuildData's armour-bit back-fill
+import { GUILD_GROUPS } from '../../formats/factionFile.js'; // the membership book's key IS the guild group
+import { normalTribute } from '../../world/lefayMonument.js'; // LEFAY1: the flowers a character laid at Julian LeFay's monument
+import { normalPracticeHeld } from '../masterSkills.js'; // AUDIT RPT1026 F1: the practice Master Skills switched off holds aside
+import { characterIdOf, mintCharacterId } from '../characterId.js'; // CHARID1: a character is an id, not a name
+import { isOnlinePage } from '../online/onlineLane.js'; // ONLINE-DEATH-FIX: the page is online
+import { STREAMING_TERRAIN_SCALE, GROUND_FRAME_LAW } from '../../world/terrain/terrainSampler.js'; // TERRAIN-SCALE1: the scale every saved exterior height stands on; BAY-LEFT-GROUND: and its frame's law
+import { reviveForPlay } from '../deathRespawn.js'; // ONLINE-DEATH-FIX: the SAME half-health an online respawn leaves
+import { setLightSource } from '../lightSource.js'; // DISC7: the light in hand's one door
+import { renownHpOf, onlineMpOf, offlineVitals } from '../renownLayer.js'; // RENOWN1: the online layer never reaches a save (EG15: nor the folds' magicka)
+import { stashedItemLists } from '../../net/realm/realmGoldLaw.js'; // AUDIT PRE-MERGE 0929 D3: every list of the character's own things a save carries
+import { DEPOSIT_MAX, depositOrderOk } from '../../net/bagLaw.js'; // AUDIT2 BAG1: a deposit's stamp, kept to a deposit's bounds
+import { resetBlowEffects } from '../blowEffects.js'; // AUDIT TELL L2: a load forgets the last game's landings
 import { t } from '../textManager.js';
 
 /** One membership book, rows copied (GuildMembership_v1's shape). */
-const copyMembershipBook = (book) => Object.fromEntries(
-  Object.entries(book ?? {}).map(([k, m]) => [k, { ...m }]));
+const copyMembershipBook = (book) => Object.fromEntries(Object.entries(book ?? {}).map(([k, m]) => [k, { ...m }]));
 
 /** D9: the LOAD side is not a plain copy - GuildManager
  *  .RestoreMembershipData rebuilds each guild object and hands it
@@ -84,20 +101,35 @@ const restoreMembershipBook = (book) => {
  *  upgrade path from another format, so a save with any other version is refused before any of it is read. */
 export const SAVE_VERSION = 1;
 /** The line a player is shown when a load is refused for its version. */
-export const saveVersionRefusal = () => t('save.versionRefused', 'This save was made for a different version of the game and cannot be loaded.');
+export const saveVersionRefusal = () =>
+  t('save.versionRefused', 'This save was made for a different version of the game and cannot be loaded.');
 
 const ENTITY_FIELDS = [
-  'name', 'gender', 'race', 'raceId', 'faceIndex',   // S3c/U9: the identity rides the save
-  'characterId',   // CHARID1: and the id that IS the identity - minted at chargen, adopted onto a legacy character at its load
-  'careerIndex', 'level', 'reflexes',
-  'health', 'maxHealth', 'magicka', 'maxMagicka', 'fatigue',
-  'currentBreath',   // P12 (SerializablePlayer carries it; missing = 0/surfaced on old saves)
-  'startingLevelUpSkillSum', 'currentLevelUpSkillSum',
+  'name',
+  'gender',
+  'race',
+  'raceId',
+  'faceIndex', // S3c/U9: the identity rides the save
+  'characterId', // CHARID1: and the id that IS the identity - minted at chargen, adopted onto a legacy character at its load
+  'careerIndex',
+  'level',
+  'reflexes',
+  'health',
+  'maxHealth',
+  'magicka',
+  'maxMagicka',
+  'fatigue',
+  'currentBreath', // P12 (SerializablePlayer carries it; missing = 0/surfaced on old saves)
+  'startingLevelUpSkillSum',
+  'currentLevelUpSkillSum',
   // `pendingBonusPool` rides beside `pendingLevel` for the reason the
   // roll was moved onto the entity at all (AUDIT LV2, reopened): a
   // pool that did not survive the save would be re-rolled by a save
   // and a load, which is the same exploit through a slower door.
-  'readyToLevelUp', 'pendingLevel', 'pendingBonusPool', 'chargenDone',
+  'readyToLevelUp',
+  'pendingLevel',
+  'pendingBonusPool',
+  'chargenDone',
   // LEGACY-CHOICE: Project Legacy's answer, the same kind of fact - asked ONCE, at chargen, and the character's own: a
   // model, or no lineage (systems/legacy/family.js NO_LINEAGE), which keeps them out of the system for good. A save
   // written before it carries none, and reads as a character who was never asked.
@@ -105,8 +137,12 @@ const ENTITY_FIELDS = [
   // AUDIT 17h F1: the six BIOGRAPHY modifiers, which DFU persists
   // one-for-one (SerializablePlayer.cs:136-141, :305-310). Without
   // them a load reset every biography answer's lasting effect.
-  'biographyResistDiseaseMod', 'biographyResistMagicMod', 'biographyAvoidHitMod',
-  'biographyResistPoisonMod', 'biographyFatigueMod', 'biographyReactionMod',
+  'biographyResistDiseaseMod',
+  'biographyResistMagicMod',
+  'biographyAvoidHitMod',
+  'biographyResistPoisonMod',
+  'biographyFatigueMod',
+  'biographyReactionMod',
   // AUDIT 22 F8: the guild TRAINING cooldown. DFU persists it one for
   // one (SerializablePlayer.cs:126, :294) and the gate is a DIFFERENCE
   // against it, so a save that dropped it reset the clock to 0 and a
@@ -118,7 +154,7 @@ const ENTITY_FIELDS = [
   // it a backward load left a FUTURE marker that froze all skill-raise
   // checks until the clock re-passed it.
   'lastSkillCheckTime',
-  'foragingWait',   // FORAGE4: an online Foraging wait's { seconds, label } left - a relog reopens the page with them (scenes/foragingWait.js); null or absent: none
+  'foragingWait', // FORAGE4: an online Foraging wait's { seconds, label } left - a relog reopens the page with them (scenes/foragingWait.js); null or absent: none
   // AUDIT 26 F219/F100: the coven's daedra-of-the-day. DFU persists
   // DaedraSummonDay and DaedraSummonIndex one for one
   // (SerializablePlayer.cs:164-165, restored :332-333);
@@ -126,7 +162,8 @@ const ENTITY_FIELDS = [
   // them, so a reload from a fresh boot re-rolled the prince - a
   // save-scum until the one you want answers - and a backward load
   // kept the post-save roll instead of the saved one.
-  'daedraSummonDay', 'daedraSummonIndex',
+  'daedraSummonDay',
+  'daedraSummonIndex',
   // U39: the tavern's hunger clock (SerializablePlayer.cs:147, :316).
   // DoFoodAndDrink's gate is a DIFFERENCE against it, so a save that
   // dropped it would let a player eat every four in-game hours OR
@@ -203,8 +240,8 @@ export const copyEffectEntry = (a) => {
   const c = { ...a };
   if (a.effect) c.effect = { ...a.effect };
   if (a.statMods) c.statMods = { ...a.statMods };
-  if (a.statMaxMods) c.statMaxMods = { ...a.statMaxMods };   // MACE-MAX: the max mods, saved with their effect as DFU's effectData.statMaxMods is (EntityEffectManager.cs:2269)
-  if (a.skillMods) c.skillMods = { ...a.skillMods };   // V2a: the racial override's second map
+  if (a.statMaxMods) c.statMaxMods = { ...a.statMaxMods }; // MACE-MAX: the max mods, saved with their effect as DFU's effectData.statMaxMods is (EntityEffectManager.cs:2269)
+  if (a.skillMods) c.skillMods = { ...a.skillMods }; // V2a: the racial override's second map
 
   // AUDIT 24 (wave 31): the continuous-damage entries carry their CASTER
   // (IEntityEffect.Caster - HandleAttackFromSource needs it to break the
@@ -225,14 +262,42 @@ export function bagTakesSaved(raw) {
   const out = {};
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   for (const [id, t] of Object.entries(raw)) {
-    if (id.length > 64 || !t || typeof t.material !== 'string' || !Number.isSafeInteger(t.qty) || t.qty < 1 || t.qty > DEPOSIT_MAX) continue;
+    if (
+      id.length > 64 ||
+      !t ||
+      typeof t.material !== 'string' ||
+      !Number.isSafeInteger(t.qty) ||
+      t.qty < 1 ||
+      t.qty > DEPOSIT_MAX
+    )
+      continue;
     out[id] = { material: t.material, qty: t.qty, ...(depositOrderOk(t.order) ? { order: t.order } : {}) };
   }
   return out;
 }
 
 /** A plain-object snapshot of the player + scene extras. */
-export function snapshotPlayer(entity, { position = null, pose = null, classicMinutes = 0, readiedSpellIndex = null, world = null, locationKey = null, quest = null, talk = null, interior = null, dungeon = null, travelMap = null, escortingFaces = null, quickslots = null, spawns = null, smallerDungeonsState = 0, modData = null } = {}) {
+export function snapshotPlayer(
+  entity,
+  {
+    position = null,
+    pose = null,
+    classicMinutes = 0,
+    readiedSpellIndex = null,
+    world = null,
+    locationKey = null,
+    quest = null,
+    talk = null,
+    interior = null,
+    dungeon = null,
+    travelMap = null,
+    escortingFaces = null,
+    quickslots = null,
+    spawns = null,
+    smallerDungeonsState = 0,
+    modData = null,
+  } = {},
+) {
   // Q4-v: `quest` is the bridge's whole envelope (machine + notebook +
   // the one-time list) - opaque here, exactly like `world`.
   // TK-i: `talk` is TalkManager's SaveDataConversation (the rumor
@@ -291,7 +356,27 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // does not move, and an older build ignores the field.
   // BAY-LEFT-GROUND (, D5): and the law of their frame (`groundFrame`, terrainSampler.js
   // GROUND_FRAME_LAW) - DFU's frame past the Bay too; a save without it stood the shaped ground there. Additive, as the scale's.
-  const snap = { v: SAVE_VERSION, position, pose, classicMinutes, readiedSpellIndex, world, locationKey, quest, talk, interior, dungeon, travelMap, escortingFaces, quickslots, spawns, smallerDungeonsState, modData, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW };
+  const snap = {
+    v: SAVE_VERSION,
+    position,
+    pose,
+    classicMinutes,
+    readiedSpellIndex,
+    world,
+    locationKey,
+    quest,
+    talk,
+    interior,
+    dungeon,
+    travelMap,
+    escortingFaces,
+    quickslots,
+    spawns,
+    smallerDungeonsState,
+    modData,
+    terrainScale: STREAMING_TERRAIN_SCALE,
+    groundFrame: GROUND_FRAME_LAW,
+  };
   // LIVED1: `classicMinutes` is the CHARACTER's clock - the hosts hand their own (worldTick.ownMinutes): offline the
   // one clock, online theirs, and every marker the envelope holds is on it. Online the WORLD's minute rides beside it,
   // the minute the character left the world at, which is what the arrival's one arm for an absence measures (AUDIT
@@ -303,7 +388,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // is a module singleton, so the envelope reads it here and every
   // host's save carries it without a host edit.
   snap.weather = snapshotWeather();
-  characterIdOf(entity);   // CHARID1: a character that reached a save without an id (born before this) gets one here, before the copy
+  characterIdOf(entity); // CHARID1: a character that reached a save without an id (born before this) gets one here, before the copy
   for (const k of ENTITY_FIELDS) snap[k] = entity[k];
   // DISC10-E L4: `data.playerEntity.maxHealth = entity.RawMaxHealth`
   // (SerializablePlayer.cs:118) - the LIMITED MaxHealth is a lycanthrope's
@@ -313,7 +398,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // RENOWN1: AND NOTHING OF THE ONLINE LAYER. Renown's health and magicka sit on top of the live maximums
   // while online (systems/renownLayer.js); a save keeps the vitals as they would stand without it, each at the same
   // fraction of its maximum, so a save written online is the one the character would have written offline.
-  if (renownHpOf(entity) || onlineMpOf(entity)) Object.assign(snap, offlineVitals(entity));   // EG15: and the Battlemage's Bearing, a set's magicka (at Renown 1, with no layer)
+  if (renownHpOf(entity) || onlineMpOf(entity)) Object.assign(snap, offlineVitals(entity)); // EG15: and the Battlemage's Bearing, a set's magicka (at Renown 1, with no layer)
   snap.stats = { ...entity.stats };
   // SURV1: the needs record (survival/needs.js) - its markers are classic
   // minutes and its counters plain numbers; the note throttles are not
@@ -334,18 +419,18 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // is automatic and recomputed from the party.
   snap.skillUseFrac = Array.isArray(entity.skillUseFrac) ? [...entity.skillUseFrac] : null;
   snap.skillProgress = Array.isArray(entity.skillProgress) ? [...entity.skillProgress] : null;
-  snap.masterSkills = entity.masterSkills === true;   // SOFTCAP3: the Master Skills switch
-  snap.masterSkillsAsked = !!entity.masterSkillsAsked;   // SOFTCAP3: the one-time offline offer, made
-  snap.masterSkillsInfoSeen = !!entity.masterSkillsInfoSeen;   // SOFTCAP3: the one-time online explanation, shown
-  snap.masterPracticeHeld = normalPracticeHeld(entity.masterPracticeHeld);   // AUDIT RPT1026 F1: the tough-foe practice held while the switch is off
-  snap.lefayTribute = normalTribute(entity.lefayTribute);   // LEFAY1: the flowers laid at Julian LeFay's monument - how many, and the newest where they lay
-  snap.masteredSkills = Array.isArray(entity.masteredSkills) ? [...entity.masteredSkills] : [];   // SOFTCAP4: the permanent 3/2/1 masteries (MASTER-THREE)
-  snap.masteryPrompted = Array.isArray(entity.masteryPrompted) ? [...entity.masteryPrompted] : [];   // SOFTCAP4: the skills already asked about
-  snap.arcanePath = isPathId(entity.arcanePath) ? entity.arcanePath : null;   // SCHOOLS1: the specialisation (systems/arcanePaths.js; given up only by systems/specReset.js)
-  snap.pathPrompted = entity.pathPrompted === true;   // SCHOOLS1: the one ask, made
-  snap.martialPath = isMartialPathId(entity.martialPath) ? entity.martialPath : null;   // MARTIAL1: the martial specialisation (systems/martialPaths.js; given up only by systems/specReset.js)
-  snap.martialPrompted = entity.martialPrompted === true;   // MARTIAL1: its one ask, made
-  snap.career = entity.career ? { ...entity.career } : null;   // plain CFG data
+  snap.masterSkills = entity.masterSkills === true; // SOFTCAP3: the Master Skills switch
+  snap.masterSkillsAsked = !!entity.masterSkillsAsked; // SOFTCAP3: the one-time offline offer, made
+  snap.masterSkillsInfoSeen = !!entity.masterSkillsInfoSeen; // SOFTCAP3: the one-time online explanation, shown
+  snap.masterPracticeHeld = normalPracticeHeld(entity.masterPracticeHeld); // AUDIT RPT1026 F1: the tough-foe practice held while the switch is off
+  snap.lefayTribute = normalTribute(entity.lefayTribute); // LEFAY1: the flowers laid at Julian LeFay's monument - how many, and the newest where they lay
+  snap.masteredSkills = Array.isArray(entity.masteredSkills) ? [...entity.masteredSkills] : []; // SOFTCAP4: the permanent 3/2/1 masteries (MASTER-THREE)
+  snap.masteryPrompted = Array.isArray(entity.masteryPrompted) ? [...entity.masteryPrompted] : []; // SOFTCAP4: the skills already asked about
+  snap.arcanePath = isPathId(entity.arcanePath) ? entity.arcanePath : null; // SCHOOLS1: the specialisation (systems/arcanePaths.js; given up only by systems/specReset.js)
+  snap.pathPrompted = entity.pathPrompted === true; // SCHOOLS1: the one ask, made
+  snap.martialPath = isMartialPathId(entity.martialPath) ? entity.martialPath : null; // MARTIAL1: the martial specialisation (systems/martialPaths.js; given up only by systems/specReset.js)
+  snap.martialPrompted = entity.martialPrompted === true; // MARTIAL1: its one ask, made
+  snap.career = entity.career ? { ...entity.career } : null; // plain CFG data
   // RPT1026-ITEMS HELD-OUT (systems/item/heldOut.js): and the goods a counter holds out of the pack while it stands - an
   // Identify's lot, a sale's - at the pack's end; a save written under the window lost them for good
   snap.items = [...(entity.items ?? []), ...heldOutOf(entity)].map((it) => ({ ...it }));
@@ -379,7 +464,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // Without these a quicksave/load cleared every account and every
   // outstanding loan, which is a rather generous bug.
   snap.bankAccounts = (entity.bankAccounts ?? []).map((a) => ({ ...a }));
-  snap.houses = (entity.houses ?? []).map(copyHouseSlot);   // HOUSES-3: a slot's own deed and the ones beside it (`more`)
+  snap.houses = (entity.houses ?? []).map(copyHouseSlot); // HOUSES-3: a slot's own deed and the ones beside it (`more`)
   snap.ownedShip = entity.ownedShip ?? -1;
   snap.boatCabinLink = readBankCabinLink(entity.boatCabinLink);
   // TR4: SerializablePlayer.cs:180 - the BOARDING MEMORY is saved
@@ -407,7 +492,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // back out UNCHANGED beside them. Without this the holding in
   // `restorePlayer` would only postpone the loss by one save.
   snap.spells = [
-    ...(entity.spells ?? []).map((sp) => ((sp?.custom || sp?.rri) ? JSON.parse(JSON.stringify(sp)) : sp.index)),   // AUDIT-RR F9: a mod's spell (RRI's nine, past SPELLS.STD) is serialised whole, as DFU serialises every EffectBundleSettings - an index no file answers would be held forever
+    ...(entity.spells ?? []).map((sp) => (sp?.custom || sp?.rri ? JSON.parse(JSON.stringify(sp)) : sp.index)), // AUDIT-RR F9: a mod's spell (RRI's nine, past SPELLS.STD) is serialised whole, as DFU serialises every EffectBundleSettings - an index no file answers would be held forever
     ...(entity.spellsPending ?? []),
   ];
   // E2: ITEM-PINNED entries (held enchantments) are NOT serialized -
@@ -416,7 +501,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // the bundle with its item's UID and discards one that cannot
   // resolve (:2240/:2312); the port re-instantiates from the worn set
   // at restore (restartHeldEnchantments), the same outcome.
-  snap.activeEffects = (entity.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).map(copyEffectEntry);   // AUDIT DUEL1 B4: a duel opponent's spell is the duel's, and the duel ends with the page - never saved
+  snap.activeEffects = (entity.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).map(copyEffectEntry); // AUDIT DUEL1 B4: a duel opponent's spell is the duel's, and the duel ends with the page - never saved
   for (const k of REP_ARRAYS) snap[k] = entity[k] ? [...entity[k]] : null;
   // AUDIT 18 F3: the CRIME/LEGAL state DFU writes out one field at a
   // time - crimeCommitted and haveShownSurrenderToGuardsDialogue
@@ -441,7 +526,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // legalRep is a region-keyed object here, not DFU's 62-entry array;
   // it must be COPIED or the snapshot aliases live state.
   snap.legalRep = entity.legalRep ? { ...entity.legalRep } : null;
-  snap.standing = snapshotStanding(entity);   // REP: the watch's clocks and the prices paid, per region
+  snap.standing = snapshotStanding(entity); // REP: the watch's clocks and the prices paid, per region
   // ARENA2: THE LADDER (systems/arena/arenaLadder.js) - the tier, the bouts won in it, the champions beaten, the Grand
   // Champion and the record, versioned inside its own shape (`v`); additive, so SAVE_VERSION does not move
   snap.arena = arenaLadderSnapshot(entity.arenaLadder ?? null);
@@ -484,26 +569,26 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // approximate - snap.items is written and restored in order - and
   // it is the same shape rebuildEquipState already uses to relink the
   // equip table after a restore.
-  snap.lightSourceIndex = entity.lightSource
-    ? (entity.items ?? []).indexOf(entity.lightSource) : -1;
+  snap.lightSourceIndex = entity.lightSource ? (entity.items ?? []).indexOf(entity.lightSource) : -1;
 
   // AUDIT 23 C1 (save-load lane + guilds lane, two finders): a store
   // restored into a store-less entity is STASHED (below), and the
   // stash must survive a re-save - writing null here erased every
   // faction reputation in the file the first time a menu-loaded
   // session pressed F9 before anything attached the store.
-  snap.factionRep = entity.factionRep
-    ? snapshotFactionRep(entity.factionRep)
-    : (entity.savedFactionRep ?? null);
+  snap.factionRep = entity.factionRep ? snapshotFactionRep(entity.factionRep) : (entity.savedFactionRep ?? null);
   // GuildMembership_v1, keyed by guild GROUP exactly as DFU keys it.
   // V2e: the field is the TWO-BOOK store now (mortal + vampire, both
   // serialized - GetMembershipData(bool vampire), GuildManager
   // :313-320); a legacy plain object still snaps as the mortal book
   // it means.
   snap.guildMemberships = entity.guildMemberships
-    ? (isMembershipStore(entity.guildMemberships)
-      ? { mortal: copyMembershipBook(entity.guildMemberships.mortal), vampire: copyMembershipBook(entity.guildMemberships.vampire) }
-      : copyMembershipBook(entity.guildMemberships))
+    ? isMembershipStore(entity.guildMemberships)
+      ? {
+          mortal: copyMembershipBook(entity.guildMemberships.mortal),
+          vampire: copyMembershipBook(entity.guildMemberships.vampire),
+        }
+      : copyMembershipBook(entity.guildMemberships)
     : null;
   // T4: the building-discovery store (PlayerGPS discoveredLocations -
   // DFU serialises it in SaveData_v1). Module-level world state, so
@@ -521,7 +606,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // (SerializablePlayer.cs:168); without it every load rerolled the
   // 750..1250 band and shifted all shop prices mid-session.
   snap.regionPrices = entity.regionPrices ? { ...entity.regionPrices } : null;
-  snap.regionConditions = snapshotRegionConditions(entity.regionConditions);   // S42
+  snap.regionConditions = snapshotRegionConditions(entity.regionConditions); // S42
   // A4 (Road to 1:1) - THE ENVELOPE STRAGGLERS. Three more members
   // PlayerEntityData_v1 writes out one at a time and this envelope did
   // not carry. Each is a COPY or a scalar; each has a live consumer
@@ -533,8 +618,7 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // (TextProvider.cs:492), clearing them as it goes. A mask that does
   // not survive a save is a mask that only ever reports the raises of
   // one sitting.
-  snap.skillsRecentlyRaised = entity.skillsRecentlyRaised
-    ? [...entity.skillsRecentlyRaised] : null;
+  snap.skillsRecentlyRaised = entity.skillsRecentlyRaised ? [...entity.skillsRecentlyRaised] : null;
   // previousVampireClan (:163): CureVampirism stamps the clan the
   // player USED to belong to (VampirismEffect.cs:309) - the one piece
   // of a cured vampire's identity that outlives the curse. DFU itself
@@ -566,19 +650,30 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
  *  enemy to end it, and sank every faction's power walk (the shipped
  *  file's rulerPowerBonus is 0 by construction). */
 export const FACTION_RELATION_COLUMNS = Object.freeze([
-  'ally1', 'ally2', 'ally3', 'enemy1', 'enemy2', 'enemy3',
-  'ruler', 'rulerPowerBonus', 'rulerNameSeed',
+  'ally1',
+  'ally2',
+  'ally3',
+  'enemy1',
+  'enemy2',
+  'enemy3',
+  'ruler',
+  'rulerPowerBonus',
+  'rulerNameSeed',
 ]);
 
 /** The store's mutable columns, id-sorted so the arrays line up. */
 export function snapshotFactionRep(store) {
   const ids = [...store.dict.keys()].sort((a, b) => a - b);
-  const rep = [], flags = [], power = [];
+  const rep = [],
+    flags = [],
+    power = [];
   const out = { ids, rep, flags, power };
   for (const k of FACTION_RELATION_COLUMNS) out[k] = [];
   for (const id of ids) {
     const f = store.dict.get(id);
-    rep.push(f.rep); flags.push(f.flags); power.push(f.power);
+    rep.push(f.rep);
+    flags.push(f.flags);
+    power.push(f.power);
     for (const k of FACTION_RELATION_COLUMNS) out[k].push(f[k]);
   }
   return out;
@@ -592,7 +687,9 @@ export function restoreFactionRep(store, snap) {
   for (let i = 0; i < snap.ids.length; i++) {
     const f = store.dict.get(snap.ids[i]);
     if (!f) continue;
-    f.rep = snap.rep[i]; f.flags = snap.flags[i]; f.power = snap.power[i];
+    f.rep = snap.rep[i];
+    f.flags = snap.flags[i];
+    f.power = snap.power[i];
     // AUDIT 39: presence is tested per COLUMN, so a save written before
     // the relations travelled leaves the FACTION.TXT values standing -
     // the additive-field shape the rest of the envelope uses.
@@ -622,7 +719,10 @@ export function resolvePendingSpells(entity, spellsByIndex) {
   let got = 0;
   for (const s of pending) {
     const found = spellsByIndex.get(s);
-    if (found) { (entity.spells ??= []).push(found); got++; } else still.push(s);
+    if (found) {
+      (entity.spells ??= []).push(found);
+      got++;
+    } else still.push(s);
   }
   entity.spellsPending = still;
   if (got) seedCustomSpellIndex(entity.spells);
@@ -677,9 +777,11 @@ function heldItemLists(snap) {
  * every other (heldItemLists). The load passes the entity it restores as `own`: its copies are the ones the game plays.
  * @param {any} snap @param {any} [own]
  */
-export const savedItemLists = (snap, own = snap) => [...listsOf(own?.items, own?.wagonItems, own?.bagItems, own?.furnishings, own?.otherItems), ...stashedItemLists(snap), ...heldItemLists(snap)];
-
-
+export const savedItemLists = (snap, own = snap) => [
+  ...listsOf(own?.items, own?.wagonItems, own?.bagItems, own?.furnishings, own?.otherItems),
+  ...stashedItemLists(snap),
+  ...heldItemLists(snap),
+];
 
 /** PORTAL1 (AUDIT PORTAL1 U9): how many saves this page has restored - every load, whichever host runs it, passes the one
  *  door below, so a host that must end something at EVERY load (scenes/world.js: the portals standing) asks this count
@@ -691,7 +793,7 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
     console.warn(`[save] version mismatch (got ${snap?.v}, want ${SAVE_VERSION}); refusing`);
     return null;
   }
-  _restores++;   // PORTAL1: a load that lands - the world host ends its portals on the count's move
+  _restores++; // PORTAL1: a load that lands - the world host ends its portals on the count's move
   // AUDIT LIVED1b F3 (S4): THE ENVELOPE'S CLOCKS ARE READ ONCE, HERE. A clock is an unsigned minute count (DFU's
   // ToClassicDaggerfallTime answers a uint), and nothing legitimate writes another - but a tampered or corrupted one
   // reached every reader raw: at 2^53 the calendar loop's `i++` stands still and the page froze for good, a
@@ -699,8 +801,15 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // round again that session), and null loaded an online character at minute 0. A clock out of range is none: the
   // character's takes the clock that stands (the host's offline, the world's online - the one a save from before LIVED1
   // has), and the world's stamp is absent (the save's path from before LIVED1).
-  if (saneSaveClock(snap.classicMinutes) === null || (snap.worldMinutes != null && saneSaveClock(snap.worldMinutes) === null)) {
-    snap = { ...snap, classicMinutes: saneSaveClock(snap.classicMinutes) ?? Math.floor(worldMinutes()), worldMinutes: saneSaveClock(snap.worldMinutes) ?? undefined };
+  if (
+    saneSaveClock(snap.classicMinutes) === null ||
+    (snap.worldMinutes != null && saneSaveClock(snap.worldMinutes) === null)
+  ) {
+    snap = {
+      ...snap,
+      classicMinutes: saneSaveClock(snap.classicMinutes) ?? Math.floor(worldMinutes()),
+      worldMinutes: saneSaveClock(snap.worldMinutes) ?? undefined,
+    };
   }
   // AUDIT 39: MaxMagicka is a getter for the life of the entity
   // (DaggerfallEntity.cs:264) - it cannot be lost on load. The
@@ -709,11 +818,11 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // (which never walks chargen) freezes the ceiling at the saved
   // number, orphaning every maxMagickaModifier producer. Idempotent.
   defineLiveMaxMagicka(entity);
-  defineLiveMaxHealth(entity);   // DISC10-E L4: the same law for MaxHealth - the setter below writes the RAW value
+  defineLiveMaxHealth(entity); // DISC10-E L4: the same law for MaxHealth - the setter below writes the RAW value
   for (const k of ENTITY_FIELDS) entity[k] = snap[k];
-  resetBlowEffects(entity);   // AUDIT TELL L2: the last game's landings - a bleed, a knockdown, a push queued - are nobody's in this one
-  entity.oghmaLevelUp = false;   // AUDIT FB1026d II C2: the Oghma Infinium's latch is never saved - a load ends it, as a fresh entity's; restored in place, the last game's turned this game's next level into the book's thirty points, the book back in the pack
-  releaseCapLatch(entity);   // LEVEL-45 (AUDIT FB1026d C1): a level owed past the cap, saved before it, is no window to open
+  resetBlowEffects(entity); // AUDIT TELL L2: the last game's landings - a bleed, a knockdown, a push queued - are nobody's in this one
+  entity.oghmaLevelUp = false; // AUDIT FB1026d II C2: the Oghma Infinium's latch is never saved - a load ends it, as a fresh entity's; restored in place, the last game's turned this game's next level into the book's thirty points, the book back in the pack
+  releaseCapLatch(entity); // LEVEL-45 (AUDIT FB1026d C1): a level owed past the cap, saved before it, is no window to open
   // CHARID1: an envelope with no id (a hand-edited or damaged one) still loads as a character of its own
   if (typeof snap.characterId !== 'string' || !snap.characterId) entity.characterId = mintCharacterId();
   // ONLINE-DEATH-FIX: NEVER LOAD DEAD ONLINE. hurtPlayer fires the death only on the alive->0 TRANSITION, so a
@@ -730,64 +839,76 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // the player loaded at half health, still poisoned, and died again.
   const loadDeadOnline = isOnlinePage() && !((entity.health ?? 0) > 0);
   entity.stats = { ...snap.stats };
-  entity.survival = snap.survival && typeof snap.survival === 'object' ? { ...snap.survival, notes: savedNotes(snap.survival) } : null;   // SURV1: a pre-SURV save starts fresh at the host's first tick; AUDIT SURV-BOONS C3: the notes are dropped but the boons it carries, said already - a well-kept body said every boon again at every load; AUDIT C&C N6: and every stage it stands at (five lines in the first minute after a load)
+  entity.survival =
+    snap.survival && typeof snap.survival === 'object' ? { ...snap.survival, notes: savedNotes(snap.survival) } : null; // SURV1: a pre-SURV save starts fresh at the host's first tick; AUDIT SURV-BOONS C3: the notes are dropped but the boons it carries, said already - a well-kept body said every boon again at every load; AUDIT C&C N6: and every stage it stands at (five lines in the first minute after a load)
   // Pre-S15 saves carry no fatigue: default to rested (MaxFatigue =
   // (Str + End) x 64) - the additive-field shape DFU's serializer
   // gives missing members, so the envelope version holds at 1.
   if (entity.fatigue == null) entity.fatigue = ((snap.stats?.strength ?? 0) + (snap.stats?.endurance ?? 0)) * 64;
-  entity.skills = Array.isArray(snap.skills) ? [...snap.skills] : snap.skills;   // AUDIT 17e: pre-chargen skills is a flat number
+  entity.skills = Array.isArray(snap.skills) ? [...snap.skills] : snap.skills; // AUDIT 17e: pre-chargen skills is a flat number
   entity.skillUses = [...snap.skillUses];
-  entity.skillUseFrac = Array.isArray(snap.skillUseFrac) ? [...snap.skillUseFrac] : null;   // SOFTCAP1
-  entity.skillProgress = Array.isArray(snap.skillProgress) ? [...snap.skillProgress] : null;   // SOFTCAP1
-  entity.masterSkills = snap.masterSkills === true;   // SOFTCAP3
-  entity.masterSkillsAsked = snap.masterSkillsAsked === true;   // SOFTCAP3
-  entity.masterSkillsInfoSeen = snap.masterSkillsInfoSeen === true;   // SOFTCAP3
-  entity.masterPracticeHeld = normalPracticeHeld(snap.masterPracticeHeld);   // AUDIT RPT1026 F1: a save from before it held none
-  entity.lefayTribute = normalTribute(snap.lefayTribute);   // LEFAY1: a save from before it laid none
-  entity.masteredSkills = Array.isArray(snap.masteredSkills) ? snap.masteredSkills.filter(Number.isInteger) : [];   // SOFTCAP4
-  entity.masteryPrompted = Array.isArray(snap.masteryPrompted) ? snap.masteryPrompted.filter(Number.isInteger) : [];   // SOFTCAP4
-  entity.arcanePath = isPathId(snap.arcanePath) ? snap.arcanePath : null;   // SCHOOLS1: an id no table holds reads as none
-  entity.pathPrompted = snap.pathPrompted === true;   // SCHOOLS1
-  entity.martialPath = isMartialPathId(snap.martialPath) ? snap.martialPath : null;   // MARTIAL1: an id no table holds reads as none
-  entity.martialPrompted = snap.martialPrompted === true;   // MARTIAL1
-  entity._mentor = null;   // SOFTCAP1: recomputed by the party frame, never restored
-  entity._pupil = null;   // MENTOR2: the pupil's side too
+  entity.skillUseFrac = Array.isArray(snap.skillUseFrac) ? [...snap.skillUseFrac] : null; // SOFTCAP1
+  entity.skillProgress = Array.isArray(snap.skillProgress) ? [...snap.skillProgress] : null; // SOFTCAP1
+  entity.masterSkills = snap.masterSkills === true; // SOFTCAP3
+  entity.masterSkillsAsked = snap.masterSkillsAsked === true; // SOFTCAP3
+  entity.masterSkillsInfoSeen = snap.masterSkillsInfoSeen === true; // SOFTCAP3
+  entity.masterPracticeHeld = normalPracticeHeld(snap.masterPracticeHeld); // AUDIT RPT1026 F1: a save from before it held none
+  entity.lefayTribute = normalTribute(snap.lefayTribute); // LEFAY1: a save from before it laid none
+  entity.masteredSkills = Array.isArray(snap.masteredSkills) ? snap.masteredSkills.filter(Number.isInteger) : []; // SOFTCAP4
+  entity.masteryPrompted = Array.isArray(snap.masteryPrompted) ? snap.masteryPrompted.filter(Number.isInteger) : []; // SOFTCAP4
+  entity.arcanePath = isPathId(snap.arcanePath) ? snap.arcanePath : null; // SCHOOLS1: an id no table holds reads as none
+  entity.pathPrompted = snap.pathPrompted === true; // SCHOOLS1
+  entity.martialPath = isMartialPathId(snap.martialPath) ? snap.martialPath : null; // MARTIAL1: an id no table holds reads as none
+  entity.martialPrompted = snap.martialPrompted === true; // MARTIAL1
+  entity._mentor = null; // SOFTCAP1: recomputed by the party frame, never restored
+  entity._pupil = null; // MENTOR2: the pupil's side too
   entity._pupilFrac = null;
   entity.career = snap.career ? { ...snap.career } : entity.career;
-  entity.items = snap.items.map((it) => setItemFields(it));   // JAN1: SetItem's two writes on every item in (a copy, as before)
-  entity.wagonItems = (snap.wagonItems ?? []).map((it) => setItemFields(it));   // W-slice (pre-W saves restore empty); JAN1: set on the way in
-  entity.bagItems = (snap.bagItems ?? []).map((it) => setItemFields(it));   // BAG1: a save written before holds none
-  entity.bagTakes = bagTakesSaved(snap.bagTakes);   // AUDIT2 BAG1: the deposits' stamps - a save written before holds none
-  entity.furnishings = (snap.furnishings ?? []).map((it) => setItemFields(it));   // DECOR2b: a save written before holds none
-  entity.otherItems = (snap.otherItems ?? []).map((it) => setItemFields(it));   // R1: the in-repair collection (pre-R1 saves restore empty); JAN1: set on the way in
+  entity.items = snap.items.map((it) => setItemFields(it)); // JAN1: SetItem's two writes on every item in (a copy, as before)
+  entity.wagonItems = (snap.wagonItems ?? []).map((it) => setItemFields(it)); // W-slice (pre-W saves restore empty); JAN1: set on the way in
+  entity.bagItems = (snap.bagItems ?? []).map((it) => setItemFields(it)); // BAG1: a save written before holds none
+  entity.bagTakes = bagTakesSaved(snap.bagTakes); // AUDIT2 BAG1: the deposits' stamps - a save written before holds none
+  entity.furnishings = (snap.furnishings ?? []).map((it) => setItemFields(it)); // DECOR2b: a save written before holds none
+  entity.otherItems = (snap.otherItems ?? []).map((it) => setItemFields(it)); // R1: the in-repair collection (pre-R1 saves restore empty); JAN1: set on the way in
   // FIELD BUGS 2026-10-19f KEY-FACE: a festival face in any list the save holds but the pack (the wagon, a storage piece,
   // a ship's hold, a companion's pack, a body) or set out in a room (`decorOwn`) is folded away here, before the scene
   // cache is restored from the save
-  const strayLists = savedItemLists(snap, entity).filter((l) => l !== entity.items), strayRooms = arrayOf(snap.sceneCache?.scenes).map((s) => s?.decorOwn);
-  const strayFaces = foldStrayFaces(strayLists, strayRooms);   // WITCH1: and the festival's Soul Cakes and Hearth Offerings, the same law
-  if (strayFaces) console.info(`[save] KEY-FACE: ${strayFaces} festival face(s) outside the pack folded away - the account holds them`);
-  entity.rentedRooms = (snap.rentedRooms ?? []).map((r) => ({ ...r }));   // U39: the rented rooms (pre-U39 saves restore empty)
+  const strayLists = savedItemLists(snap, entity).filter((l) => l !== entity.items),
+    strayRooms = arrayOf(snap.sceneCache?.scenes).map((s) => s?.decorOwn);
+  const strayFaces = foldStrayFaces(strayLists, strayRooms); // WITCH1: and the festival's Soul Cakes and Hearth Offerings, the same law
+  if (strayFaces)
+    console.info(
+      `[save] KEY-FACE: ${strayFaces} festival face(s) outside the pack folded away - the account holds them`,
+    );
+  entity.rentedRooms = (snap.rentedRooms ?? []).map((r) => ({ ...r })); // U39: the rented rooms (pre-U39 saves restore empty)
   // JAN1: a pre-B1 save
   // restored an EMPTY table, which is truthy, so worldModes' `??= createBankAccounts` never minted one and every bank
   // reader threw by DFU's own ValidateRegion law. No accounts saved is no accounts opened: the full table, as a new game.
-  entity.bankAccounts = snap.bankAccounts?.length ? padRegionTable(snap.bankAccounts.map((a) => ({ ...a })), blankAccount) : createBankAccounts();   // B1; WW-R: a save's 62 padded to the provinces' regions
-  entity.sceneCache = restoreSceneCache(createSceneCache(), snap.sceneCache);   // P1
-  entity.houses = snap.houses?.length ? padRegionTable(snap.houses.map(copyHouseSlot), blankHouse) : createHouses(entity.bankAccounts.length);   // JAN1: the same law for the house registry (H1 mints it beside the accounts)
+  entity.bankAccounts = snap.bankAccounts?.length
+    ? padRegionTable(
+        snap.bankAccounts.map((a) => ({ ...a })),
+        blankAccount,
+      )
+    : createBankAccounts(); // B1; WW-R: a save's 62 padded to the provinces' regions
+  entity.sceneCache = restoreSceneCache(createSceneCache(), snap.sceneCache); // P1
+  entity.houses = snap.houses?.length
+    ? padRegionTable(snap.houses.map(copyHouseSlot), blankHouse)
+    : createHouses(entity.bankAccounts.length); // JAN1: the same law for the house registry (H1 mints it beside the accounts)
   entity.ownedShip = snap.ownedShip ?? -1;
   entity.boatCabinLink = readBankCabinLink(snap.boatCabinLink);
-  entity.boardShipPosition = snap.boardShipPosition ?? null;   // TR4 (:425)
-  entity.anchorPosition = snap.anchorPosition ? { ...snap.anchorPosition } : null;   // TP-slice
+  entity.boardShipPosition = snap.boardShipPosition ?? null; // TR4 (:425)
+  entity.anchorPosition = snap.anchorPosition ? { ...snap.anchorPosition } : null; // TP-slice
   // A4: the three stragglers' restore arms (see the snapshot side).
   // SerializablePlayer.cs:292 is the ONLY one of the three DFU guards -
   // `(data...skillsRecentlyRaised != null ? it : new uint[2])` - and a
   // guard is needed because the value is an ARRAY the raise pass
   // indexes into; the two scalars restore straight (:315, :331) onto
   // C#'s own type defaults, 0 and VampireClans.None (which IS 0).
-  entity.skillsRecentlyRaised = snap.skillsRecentlyRaised != null
-    ? [...snap.skillsRecentlyRaised] : newSkillsRecentlyRaised();
+  entity.skillsRecentlyRaised =
+    snap.skillsRecentlyRaised != null ? [...snap.skillsRecentlyRaised] : newSkillsRecentlyRaised();
   entity.previousVampireClan = snap.previousVampireClan ?? 0;
   entity.timeToBecomeVampireOrWerebeast = snap.timeToBecomeVampireOrWerebeast ?? 0;
-  entity.racialOverridePending = snap.racialOverridePending ? { ...snap.racialOverridePending } : null;   // V1
+  entity.racialOverridePending = snap.racialOverridePending ? { ...snap.racialOverridePending } : null; // V1
   // E4: `entity.GoldPieces = data.playerEntity.goldPieces`
   // (SerializablePlayer.cs:302).
   entity.goldPieces = snap.goldPieces ?? 0;
@@ -801,8 +922,11 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // into an items array that was just replaced. A snapshot older than
   // this field carries none, which reads as "nothing lit".
   const li = snap.lightSourceIndex ?? -1;
-  setLightSource(entity, li >= 0 ? (entity.items[li] ?? null) : null);   // DISC7: the one door
-  entity.activeEffects = (snap.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).filter((a) => effectKindLoaded(a.kind)).map(copyEffectEntry);   // E2: a stale pin in an old snapshot cannot re-link - drop it (DFU :2312); AUDIT DUEL1 B4: nor a duel's spell a save from before the filter kept; AUDIT PRE-MERGE 0928 S3: nor an effect of a mod not loaded (Come Sail Away's water walk)
+  setLightSource(entity, li >= 0 ? (entity.items[li] ?? null) : null); // DISC7: the one door
+  entity.activeEffects = (snap.activeEffects ?? [])
+    .filter((a) => !a.heldItem && !a.bundleDuel)
+    .filter((a) => effectKindLoaded(a.kind))
+    .map(copyEffectEntry); // E2: a stale pin in an old snapshot cannot re-link - drop it (DFU :2312); AUDIT DUEL1 B4: nor a duel's spell a save from before the filter kept; AUDIT PRE-MERGE 0928 S3: nor an effect of a mod not loaded (Come Sail Away's water walk)
   // DISC10-D/E V11: THE DREAM'S PUSH IS NOT SAVED. CustomSaveData_v1 keeps
   // the two PLAYED flags and the day (VampirismInfection.cs:221-251,
   // LycanthropyInfection.cs:143-149); warningDreamVideoScheduled restores
@@ -821,7 +945,8 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // CURE-ENDS (AUDIT 2026-10-01 part four): a drain a cure zeroed and left (the guild's stat reset before this, and a
   // vampire's or a werewolf's turn since part four) stood on the HUD as a debuff that did nothing, for good - it ends here,
   // at the same door (guildServiceFlow.js cureAllAttributes ends what it cures now)
-  for (const a of entity.activeEffects) if ((a.kind === 'drainAttribute' || a.kind === 'transferAttribute') && !(a.magnitude > 0)) a.ended = true;
+  for (const a of entity.activeEffects)
+    if ((a.kind === 'drainAttribute' || a.kind === 'transferAttribute') && !(a.magnitude > 0)) a.ended = true;
   // V2a: the racial override MARKER is a live reference into the list
   // just restored - rebuilt here, never serialized on its own, so the
   // marker and the entry can never disagree (the gates - a second
@@ -891,10 +1016,10 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   entity.timeForThievesGuildLetter = snap.timeForThievesGuildLetter ?? 0;
   entity.timeForDarkBrotherhoodLetter = snap.timeForDarkBrotherhoodLetter ?? 0;
   entity.legalRep = snap.legalRep ? { ...snap.legalRep } : {};
-  restoreStanding(entity, snap.standing);   // REP: a pre-REP save restores an empty book
-  entity.arenaLadder = arenaLadderRestore(snap.arena);   // ARENA2: a save from before the ladder climbs from tier 1
-  entity.arenaReplays = arenaReplaysRestore(snap.arena?.replays);   // ARENA5: a save from before the replays keeps none
-  entity.arenaLeague = arenaLeagueRestore(snap.arenaLeague);   // ARENA3: a save from before the banners wears none
+  restoreStanding(entity, snap.standing); // REP: a pre-REP save restores an empty book
+  entity.arenaLadder = arenaLadderRestore(snap.arena); // ARENA2: a save from before the ladder climbs from tier 1
+  entity.arenaReplays = arenaReplaysRestore(snap.arena?.replays); // ARENA5: a save from before the replays keeps none
+  entity.arenaLeague = arenaLeagueRestore(snap.arenaLeague); // ARENA3: a save from before the banners wears none
   // AUDIT 23 (C4/guilds-4): DFU clamps every region's LegalRep right
   // after restoring it (SerializablePlayer -> ClampLegalReputations) -
   // a save carrying a beyond-band value loads back into the band.
@@ -929,9 +1054,12 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // V2e: both books restore; a pre-V2e snap is a plain object and
   // stays one - activeMemberships reads it as the mortal book.
   entity.guildMemberships = snap.guildMemberships
-    ? (isMembershipStore(snap.guildMemberships)
-      ? { mortal: restoreMembershipBook(snap.guildMemberships.mortal), vampire: restoreMembershipBook(snap.guildMemberships.vampire) }
-      : restoreMembershipBook(snap.guildMemberships))
+    ? isMembershipStore(snap.guildMemberships)
+      ? {
+          mortal: restoreMembershipBook(snap.guildMemberships.mortal),
+          vampire: restoreMembershipBook(snap.guildMemberships.vampire),
+        }
+      : restoreMembershipBook(snap.guildMemberships)
     : {};
   // S1: made spells restore from their own carried record (and re-seed
   // the index mint below the lowest one, so a spell made after this
@@ -965,22 +1093,30 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // by the time the filter runs - and the cost of confusing them here
   // is a player's spellbook.
   const _pending = [];
-  entity.spells = (snap.spells ?? []).map((s) => {
-    if (typeof s === 'object' && s !== null) return s;
-    const found = spellsByIndex ? spellsByIndex.get(s) : null;
-    if (!found) { _pending.push(s); return null; }
-    return found;
-  }).filter(Boolean);
+  entity.spells = (snap.spells ?? [])
+    .map((s) => {
+      if (typeof s === 'object' && s !== null) return s;
+      const found = spellsByIndex ? spellsByIndex.get(s) : null;
+      if (!found) {
+        _pending.push(s);
+        return null;
+      }
+      return found;
+    })
+    .filter(Boolean);
   entity.spellsPending = _pending;
   if (_pending.length) {
-    console.warn(`[save] ${_pending.length} spell(s) could not be resolved`
-      + `${spellsByIndex ? '' : ' (SPELLS.STD not loaded yet)'} - HELD, not dropped:`, _pending);
+    console.warn(
+      `[save] ${_pending.length} spell(s) could not be resolved` +
+        `${spellsByIndex ? '' : ' (SPELLS.STD not loaded yet)'} - HELD, not dropped:`,
+      _pending,
+    );
   }
   seedCustomSpellIndex(entity.spells);
   // T4: a load replaces the discovery store; a pre-T4 save carries no
   // field and restores an empty one (nothing was discoverable then).
   // BAY-LEFT-MAPS (C7 = E2): with the deeds restored above - a house past the Bay keeps its residence in its own town's book
-  restoreDiscovery(snap.discovery, { houses: allDeeds(entity.houses) });   // HOUSES-3: every region's three
+  restoreDiscovery(snap.discovery, { houses: allDeeds(entity.houses) }); // HOUSES-3: every region's three
   // RR3b: WorldDataVariants.RestoreWorldVariationData (SaveLoadManager.cs:1465-1466); a save without the field restores nothing, as the C#'s null does
   clearWorldDataVariants();
   restoreWorldVariationData(snap.worldVariation ?? null);
@@ -1032,7 +1168,8 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   if (sharedClockOn()) {
     // AUDIT LIVED1b F1: the reading re-anchors at now, not at its whole minute - the floor billed the first tick up to a
     // world minute of the absence (alignEntityClocks floors where it counts)
-    const own = Math.floor(snap.classicMinutes ?? 0), at = worldMinutes();
+    const own = Math.floor(snap.classicMinutes ?? 0),
+      at = worldMinutes();
     const left = Number.isFinite(snap.worldMinutes) ? Math.floor(snap.worldMinutes) : own;
     setOwnMinutes(own);
     alignEntityClocks(entity, at);
@@ -1049,7 +1186,26 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
     });
   }
   // AUDIT 39: the three extras above ride back out too.
-  return { position: snap.position, pose: snap.pose ?? null, classicMinutes: snap.classicMinutes, readiedSpellIndex: snap.readiedSpellIndex, world: snap.world ?? null, locationKey: snap.locationKey ?? null, quest: snap.quest ?? null, talk: snap.talk ?? null, interior: snap.interior ?? null, dungeon: snap.dungeon ?? null, travelMap: snap.travelMap ?? null, escortingFaces: snap.escortingFaces ?? null, quickslots: snap.quickslots ?? null, spawns: snap.spawns ?? null, smallerDungeonsState: snap.smallerDungeonsState ?? 0, modData: snap.modData ?? null, terrainScale: snap.terrainScale ?? null, groundFrame: snap.groundFrame ?? null };   // TERRAIN-SCALE1: null - written before the stamp, on the prefab's 1.5; BAY-LEFT-GROUND: null - before the frame's law moved
+  return {
+    position: snap.position,
+    pose: snap.pose ?? null,
+    classicMinutes: snap.classicMinutes,
+    readiedSpellIndex: snap.readiedSpellIndex,
+    world: snap.world ?? null,
+    locationKey: snap.locationKey ?? null,
+    quest: snap.quest ?? null,
+    talk: snap.talk ?? null,
+    interior: snap.interior ?? null,
+    dungeon: snap.dungeon ?? null,
+    travelMap: snap.travelMap ?? null,
+    escortingFaces: snap.escortingFaces ?? null,
+    quickslots: snap.quickslots ?? null,
+    spawns: snap.spawns ?? null,
+    smallerDungeonsState: snap.smallerDungeonsState ?? 0,
+    modData: snap.modData ?? null,
+    terrainScale: snap.terrainScale ?? null,
+    groundFrame: snap.groundFrame ?? null,
+  }; // TERRAIN-SCALE1: null - written before the stamp, on the prefab's 1.5; BAY-LEFT-GROUND: null - before the frame's law moved
 }
 
 /** CASTLE1 (2026-09-22, the same report's "(different dungeon - world
@@ -1073,7 +1229,10 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
 export function dungeonStartDoorFor(doors, site, locationKey = null) {
   const id = /^dungeon:(\d+)$/.exec(String(locationKey ?? ''))?.[1] ?? null;
   const list = doors ?? [];
-  const own = id != null ? list.find((e) => String(e?.dfLocation?.dungeon?.recordElement?.header?.locationId ?? '') === id) : null;
+  const own =
+    id != null
+      ? list.find((e) => String(e?.dfLocation?.dungeon?.recordElement?.header?.locationId ?? '') === id)
+      : null;
   if (own) return own;
   const here = site?.group != null ? list.find((e) => e?.group === site.group) : null;
   // AUDIT SD II (L1 F8): and NEVER a neighbour's - a pixel with no dungeon of its own enters nothing (DFU's
@@ -1182,7 +1341,7 @@ export function removeAllOrphanedItems(entity, getQuest) {
   let count = 0;
   count += removeOrphanedItems(entity, entity.items, getQuest);
   count += removeOrphanedItems(entity, entity.wagonItems, getQuest);
-  count += removeOrphanedItems(entity, entity.bagItems ?? [], getQuest);   // BAG1: the port's own list, beside DFU's three
+  count += removeOrphanedItems(entity, entity.bagItems ?? [], getQuest); // BAG1: the port's own list, beside DFU's three
   count += removeOrphanedItems(entity, entity.otherItems, getQuest);
   if (count > 0) console.log(`Removed ${count} orphaned items.`);
   return count;
@@ -1195,7 +1354,10 @@ export function removeAllOrphanedItems(entity, getQuest) {
  *  standing on a pre-TK save (world.js quickLoad, recorded there).
  *  Returns whether a quest envelope was present, for the world host's
  *  _questStarted latch. */
-export function restoreSessionState(extras, { questBridge = null, talk = null, entity = null, spawnLedger = null } = {}) {
+export function restoreSessionState(
+  extras,
+  { questBridge = null, talk = null, entity = null, spawnLedger = null } = {},
+) {
   // restore(null) is a no-op and the live machine stands (Q4-v law).
   questBridge?.restore(extras?.quest ?? null);
   // U41: SetTravelMapFromSaveData(null) is DFU's own arm for a save
@@ -1218,7 +1380,7 @@ export function restoreSessionState(extras, { questBridge = null, talk = null, e
   spawnLedger?.load(extras?.spawns ?? null);
   if (extras?.talk && talk) {
     talk.mill.restoreSaveData(extras.talk);
-    talk.tree.restoreSaveData(extras.talk);   // the orphan sweep + relink + TellMeAbout tail run inside
+    talk.tree.restoreSaveData(extras.talk); // the orphan sweep + relink + TellMeAbout tail run inside
     talk.session.restoreSaveData(extras.talk);
     // RestoreConversationData's mill-orphan sweep (:2522-2533)
     talk.mill.removeOrphanedQuestRumors((id) => !!questBridge?.machine.getQuest(id));
