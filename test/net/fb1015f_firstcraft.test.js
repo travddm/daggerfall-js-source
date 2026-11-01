@@ -22,9 +22,7 @@ import { craftXpLine, craftXpText } from '../../src/ui/craftXpWords.js';
 import { setProfessionsPages, drawStoresPage, resetProfPages } from '../../src/ui/professions/profPages.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { utcDay } from '../../src/net/marksLaw.js';
-import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-const src = (p) => hostText(p);
 const noWait = () => Promise.resolve();
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 const NOON = utcDay(T0) * 86_400 + 12 * 3600;
@@ -92,16 +90,18 @@ test('CRAFT-FIRST-SHOWN the craft\'s word, from the real Worker\'s answer throug
   assert.deepEqual(await word('garment-149:linen'), [531, true, '(+531 Outfitting experience, with the first-time bonus)']);
   assert.deepEqual(await word('garment-149:linen'), [20, false, '(+20 Outfitting experience)'], 'once');
   assert.deepEqual(await word('garment-141:linen'), [20, true, '(+20 Outfitting experience. Cloth bought with silver earns no first-time bonus, so this piece\'s is still yours to earn)'], 'PIN MOVED (WOVEN-PAYS): the bought cloth\'s second - the first laid on none, so the pattern is not made and its first is still owed');
-  // in the player's language: the drafts, read when said
+  // in the player's language, read when said: fixture rows stand in for a translation
   const tm = await import('../../src/systems/textManager.js');
-  const rows = tm.loadStringTableCsv(src('locales/fr/Port_Strings.csv'));
+  const rows = [
+    ['prof.craft.xpFirstBought', '(+{xp} {profession}, tissu acheté avec de l’argent)'],
+    ['prof.page.craft.xpFirst', '{xp} XP ({profession}), {more} au premier'],
+  ];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   const fr = new Map(rows);
   try {
     tm.setLocale('fr');
     const shop = craftXpText(recipeById('garment-141:linen'), { xp: 20, first: true, firstPaid: false }, 'Outfitting');
-    assert.equal(shop, tm.formatMessage(fr.get('prof.craft.xpFirstBought'), { xp: 20, profession: 'Outfitting' }));
-    assert.match(shop, /acheté avec de l’argent/);
+    assert.equal(shop, '(+20 Outfitting, tissu acheté avec de l’argent)');
     assert.equal(craftXpLine(recipeById('garment-149:linen'), 0, 'Outfitting'), tm.formatMessage(fr.get('prof.page.craft.xpFirst'), { xp: 20, more: 511, profession: 'Outfitting' }));
   } finally {
     tm.setLocale('en');

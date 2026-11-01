@@ -52,7 +52,11 @@ test('L10N6 a language\'s row: Claude\'s drafts said to be drafts, the people wh
 });
 
 test('L10N6 the translators reach the language\'s record: `locales/<tag>/translators.json` read by the loader, names only, none for English; a bundled pack beside them; the row in the language itself', async () => {
-  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv'), '../../locales/de/Port_Strings.csv': async () => rd('locales/de/Port_Strings.csv') }, {
+  // Fixture tables stand in for the languages: French carries the terms row with its own space before the colon, so
+  // the credit is shown to be read in the language.
+  const frTable = 'Key,Value\ncredits.l10n.terms,"{license} : {terms}"\n';
+  const deTable = 'Key,Value\nmenu.rail.new,"Neues Spiel"\n';
+  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => frTable, '../../locales/de/Port_Strings.csv': async () => deTable }, {
     meta: { '../../locales/fr/pack/PACK.json': PACK },
     translators: {
       '../../locales/fr/translators.json': ['  Chloé ', '', 7, 'Didier'],
@@ -72,7 +76,7 @@ test('L10N6 the translators reach the language\'s record: `locales/<tag>/transla
   assert.equal(fr.title, 'Français');
   assert.equal(fr.link, 'https://example.org/fr');
   assert.match(fr.author, /^A\. Traducteur, B\. Relecteur, Chloé et Didier$/, 'listed as French lists names');
-  assert.equal(fr.terms, 'CC-BY-4.0\u00a0: bundling allowed with credit (2026-10-01)', 'the pattern in French - its space before the colon (L10N6: the French drafts hold the row)');
+  assert.equal(fr.terms, 'CC-BY-4.0\u00a0: bundling allowed with credit (2026-10-01)', 'the pattern in French - its space before the colon');
 });
 
 test('L10N6 the tree: every `locales/<tag>/translators.json` is a list of names, in a language folder the catalog drafts', () => {

@@ -61,13 +61,31 @@ any game fact it needs.
 `?lang=qps-ploc` shows every routed string accented and lengthened. Text that stays plain English was never routed;
 text that overflows its box has no room to grow. Use it to check a UI change.
 
+## Which translations ship
+
+The repository ships English and translations a person has reviewed. It ships no machine drafts: a machine-written
+language is not accepted, because nobody has checked that it reads well. `locales/` holds only `en/` until a reviewed
+translation is added.
+
+To add a reviewed language:
+
+1. Create `locales/<tag>/Port_Strings.csv` (`tools/l10nReview.mjs --export <tag>` writes a sheet to fill; see
+   `locales/README.md`). Add the tag to `LOCALE_CATALOG` in `src/systems/localeCatalog.js` if it is not there.
+2. A person writes or checks every row. `tools/l10nReview.mjs --import` records each fix as a person's row
+   (`"by": "human"` in `Port_Strings.meta.json`). Do not commit rows drafted by `tools/translate.mjs` or
+   `tools/l10nInSession.mjs`.
+3. Name the reviewers in `locales/<tag>/translators.json`, and run `node tools/l10nCoverage.mjs`: every row must be a
+   person's, and the language must cover the English catalog exactly.
+
+The picker offers each language in `LOCALE_CATALOG` that has files in `locales/`, so a folder plus its catalog entry is the whole change.
+
 ## The `locales/` tree
 
 ```text
 locales/
   README.md                     translator guide
   en/Port_Strings.csv           the English catalog: GENERATED, never edited by hand
-  <tag>/Port_Strings.csv        a language's rows
+  <tag>/Port_Strings.csv        a reviewed language's rows (none ships yet)
   <tag>/Port_Strings.meta.json  per key: hash of the English read, hash of the text written, and who wrote it ("by")
   <tag>/glossary.json           { "English": "translation" }, names kept consistent across a run
   <tag>/translators.json        names credited in the About pane (optional)
@@ -99,10 +117,8 @@ otherwise it is reported as stale for review. The Language row and About pane sa
 2. Run `node tools/l10nExtract.mjs` to regenerate `locales/en/Port_Strings.csv`, and commit it with the change.
    `--check` exits 1 when the file on disk differs from the source; the suite runs the same check
    (`test/systems/l10n1b.test.js`, `test/tooling/l10n4_routing.test.js`).
-3. New or changed keys need rows in the other languages: draft them with `tools/translate.mjs` (Claude API; needs
-   `ANTHROPIC_API_KEY`) or bring drafts in through `tools/l10nInSession.mjs`, which writes the rows and their
-   `meta.json` entries. Every non-drafting language must cover the English catalog exactly
-   (`test/systems/l10n1b.test.js`).
+3. A new or changed key needs a row in each reviewed language that ships: a person writes it (see "Which translations
+   ship"). Every language folder must cover the English catalog exactly (`test/systems/l10n1b.test.js`).
 4. `test/systems/l10n4_hardcoded.test.js` holds a per-file count of English literals that look like prose
    (`tools/l10nHardcoded.mjs`). A file's count may fall, never rise.
 

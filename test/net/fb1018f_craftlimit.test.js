@@ -13,7 +13,6 @@
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { standService, T0, sessionStorageOf, d1 } from '../accountDb.mjs';
 import { craftCapSql } from '../../server-account/src/professions.js';   // AUDIT FB1018f L5-1: the decisions' ceiling, in SQL
@@ -605,10 +604,18 @@ test('AUDIT FB1018f L5-6 the Firmament\'s hand at the fire, the alchemy station 
 
 test('AUDIT FB1018f L5-8 the limit\'s rows in the player\'s language: German\'s and Russian\'s crafts joined with their own "und" and "и", the rule\'s two arms (Russian\'s named crafts at two past, its before-the-choice arm at one), the tab\'s ceiling and Master\'s word - each the table\'s row as formatMessage reads it (mutants: the crafts joined in English; Russian\'s arms swapped)', () => {
   const two = law.craftLimit('smithing', { building: 60, provisioning: 55 }, HELD);
+  // Fixture rows stand in for each language's table. They keep the English's arguments and the rule's two arms, so
+  // the list join and the arm the code picks show in the result.
+  const rows = [
+    ['prof.page.craft.xpLimit', '{room, plural, =0 {0 {profession}} other {# {profession}}}: {crafts} / {rank}'],
+    ['prof.craft.xpLimit', '(+{xp} {profession}: {crafts} / {rank})'],
+    ['prof.page.limit.rule', '{max}{full, select, yes { NAMED {crafts} / {rank}} other { BEFORE {max} / {rank}}}'],
+    ['prof.craft.xpTop', '(+{xp} {profession} TOP)'],
+    ['prof.page.xpHeld', '{xp, number} / {cap, number} HELD {rank}'],
+  ];
+  const row = new Map(rows);
   try {
     for (const [lang, joined] of [['de', 'Building und Provisioning'], ['ru', 'Building и Provisioning']]) {
-      const rows = tm.parseStringTableCsv(readFileSync(new URL(`../../locales/${lang}/Port_Strings.csv`, import.meta.url), 'utf8'));
-      const row = new Map(rows);
       tm.patchLocaleTable(lang, 'Port_Strings', rows);
       tm.setLocale(lang);
       const say = (key, args) => tm.formatMessage(row.get(key), args);
@@ -620,7 +627,7 @@ test('AUDIT FB1018f L5-8 the limit\'s rows in the player\'s language: German\'s 
       assert.equal(words.craftXpText(recipeById('dagger:iron'), { xp: 0, first: true }, 'Smithing', law.craftLimit('smithing', { smithing: 100 }, PROF_XP_MAX)), say('prof.craft.xpTop', { xp: 0, profession: 'Smithing' }), `${lang}: Master's word`);
       assert.equal(pages.xpLine({ xp: HELD, rank: 50 }, two), say('prof.page.xpHeld', { xp: HELD, cap: HELD, rank: 50 }), `${lang}: the tab's ceiling`);
     }
-    assert.match(words.limitRuleLine(['building', 'provisioning']), /^Выше Подмастерья могут подняться только 2 ремесла\. Ваши — Building и Provisioning, поэтому остальные ваши ремёсла/);   // PLAIN-SWEEP: the row redrafted from the plain English
-    assert.match(words.limitRuleLine(['building']), /только 2 ремесла\. Как только 2 из ваших пройдут ранг 50/);
+    assert.equal(words.limitRuleLine(['building', 'provisioning']), '2 NAMED Building и Provisioning / 50', 'the named arm at two past');
+    assert.equal(words.limitRuleLine(['building']), '2 BEFORE 2 / 50', 'the before-the-choice arm at one');
   } finally { tm.setLocale('en'); }
 });

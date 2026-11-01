@@ -6,7 +6,6 @@
 // PACK.json is no pack (nothing credits it, so nothing loads it); English has none.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import * as tm from '../../src/systems/textManager.js';
 import { PACK_KIND } from '../../src/systems/translationPacks.js';
 import * as store from '../../src/scenes/translationStore.js';
@@ -14,8 +13,9 @@ import * as data from '../../src/scenes/localeData.js';
 import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { memoryIdb } from '../memoryIdb.mjs';
 
-const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
-const DRAFTS = { '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv') };
+// A fixture machine draft for French: the subject is the drafts < bundled < installed order, not a shipped language.
+const FR_DRAFT = 'Key,Value\nmenu.rail.new,"Nouvelle partie"\nmenu.rail.load,"Charger une partie"\nmenu.rail.about,"À propos"\n';
+const DRAFTS = { '../../locales/fr/Port_Strings.csv': async () => FR_DRAFT };
 const META = { name: 'Fichiers français', authors: ['A. Traducteur'], source: 'https://example.org/fr', license: 'CC-BY-4.0', terms: 'bundling allowed with credit (2026-10-01)' };
 const BUNDLED = {
   text: {
@@ -62,7 +62,7 @@ test('L10N6 what the tree bundles: a pack by its PACK.json, each file by the fol
 });
 
 test('L10N6 drafts < bundled < installed: the bundled pack over the machine drafts, the player\'s pack over both, its documents too; the player\'s removed, the bundled pack stands again; a bundled language with no drafts loads its pack', async () => {
-  const draft = new Map(tm.parseStringTableCsv(rd('locales/fr/Port_Strings.csv')));
+  const draft = new Map(tm.parseStringTableCsv(FR_DRAFT));
   const fetched = [], wasFetch = globalThis.fetch;
   globalThis.fetch = async (url) => { fetched.push(url); return { arrayBuffer: async () => new ArrayBuffer(4) }; };
   try { await data.initLocale(new URLSearchParams('lang=fr'), { languages: [] }); } finally { globalThis.fetch = wasFetch; }

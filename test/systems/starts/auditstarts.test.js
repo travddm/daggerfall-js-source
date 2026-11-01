@@ -7,7 +7,7 @@
 // goto's glide (P9), the doorstep (P10), the quest layer's start seam (P11), the main quest's first look (Q2), and the
 // sea lanes' corner, helm, wide box, landfall and no-ladder laws (P5, V4, V5, V6). Where ARENA2_PATH names the game's
 // data, the freeware's own Tamriel: Daggerfall to every port past the Bay, every port's open water to Daggerfall, and
-// the classic rows' widths in every language the page is drafted in.
+// the classic rows' widths in English.
 import '../../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -445,15 +445,6 @@ test('AUDIT STARTS Q5 the machine counts its restores - what a start on its way 
   assert.equal(p.m.restores, before + 1);
 });
 
-test('AUDIT STARTS U6/U7 the drafted words: French says a ship\'s own name bare, as its passage family does ("The Gilded Cog", "Le navire" carry their own article); Bulgarian keeps Daggerfall, the Iliac Bay and Sentinel in Latin, as its catalog and the quests do', () => {
-  const csv = (lang) => { const out = new Map(); for (const line of rd(`locales/${lang}/Port_Strings.csv`).split(/\r?\n/)) { const m = /^([^,]+),"((?:[^"]|"")*)"$/.exec(line); if (m) out.set(m[1], m[2].replace(/""/g, '"')); } return out; };
-  const fr = csv('fr');
-  for (const k of ['passage.booked', 'passage.bookedWrit']) assert.doesNotMatch(fr.get(k), /\b(Le|La|Les) \{ship\}/, k);
-  const bg = csv('bg');
-  for (const [k, v] of bg) if (k.startsWith('start.')) assert.doesNotMatch(v, /Даггерфол|Илиак|Сентинел/, k);
-  assert.match(bg.get('start.IliacBay.title'), /^Iliac Bay$/);
-});
-
 test('AUDIT STARTS P2 the bridge starts the start it is handed: the commission in hand\'s with the curse, and a name no start has is the Bay\'s (mutants: the start unpassed)', () => {
   loadTables();
   const started = [];
@@ -715,20 +706,18 @@ test('AUDIT STARTS V4/V7 on the freeware\'s Tamriel: from the nearest open water
   } finally { setArenaStanding(false); t.reset(); }
 });
 
-test('AUDIT STARTS U8/W2 on the freeware: in FONT0003 the passage list\'s writ row stays inside the picker\'s art for every wind in every language the classic face draws it in, and online the Imperial Province\'s shut row fits the page\'s list (mutants: the row\'s words)', { skip: skipReal }, async () => {
+test('AUDIT STARTS U8/W2 on the freeware: in FONT0003 the passage list\'s writ row stays inside the picker\'s art for every wind in English, and online the Imperial Province\'s shut row fits the page\'s list (mutants: the row\'s words)', { skip: skipReal }, async () => {
   const { FntFile } = await import('../../../src/formats/fntFile.js');
   const { measureText } = await import('../../../src/ui/text.js');
   const { START_X1 } = await import('../../../src/ui/startChoice.js');
   const fnt = new FntFile(); fnt.load(new Uint8Array(readFileSync(join(ARENA2, 'FONT0003.FNT'))));
   const csv = (lang) => { const out = new Map(); for (const line of rd(`locales/${lang}/Port_Strings.csv`).split(/\r?\n/)) { const m = /^([^,]+),"((?:[^"]|"")*)"$/.exec(line); if (m) out.set(m[1], m[2].replace(/""/g, '"')); } return out; };
   const WINDS = ['north', 'northEast', 'east', 'southEast', 'south', 'southWest', 'west', 'northWest'];
-  for (const lang of ['en', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'nb', 'pt-BR', 'ro']) {
-    const r = csv(lang);
-    for (const w of WINDS) {
-      const row = r.get('passage.rowWrit').replace('{port}', 'Daggerfall').replace('{wind}', r.get(`passage.wind.${w}`));
-      assert.ok(measureText(fnt, row) <= 174, `${lang} ${w}: "${row}" ${measureText(fnt, row)} px of the list's 174 inside the art (ui/listPicker.js: x 26 of 200)`);
-    }
-    const shut = `> 4. ${r.get('start.Imperial.title')} - ${r.get('start.openZone')}`;
-    assert.ok(START_X0 + measureText(fnt, shut) <= START_X1, `${lang}: "${shut}"`);
+  const r = csv('en');
+  for (const w of WINDS) {
+    const row = r.get('passage.rowWrit').replace('{port}', 'Daggerfall').replace('{wind}', r.get(`passage.wind.${w}`));
+    assert.ok(measureText(fnt, row) <= 174, `${w}: "${row}" ${measureText(fnt, row)} px of the list's 174 inside the art (ui/listPicker.js: x 26 of 200)`);
   }
+  const shut = `> 4. ${r.get('start.Imperial.title')} - ${r.get('start.openZone')}`;
+  assert.ok(START_X0 + measureText(fnt, shut) <= START_X1, `"${shut}"`);
 });

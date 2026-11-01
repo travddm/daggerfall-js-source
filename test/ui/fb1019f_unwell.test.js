@@ -180,7 +180,8 @@ test('DISEASE-UNWELL IN THE PLAYER\'S LANGUAGE: the tile\'s word and the box\'s 
   const en = new Map(tm.parseStringTableCsv(rd('locales/en/Port_Strings.csv')));
   assert.equal(en.get('hud.status.unwell'), UNWELL_TILE_TEXT);
   assert.equal(en.get('status.health.unwell'), UNWELL_LINE_TEXT);
-  const fr = tm.loadStringTableCsv(rd('locales/fr/Port_Strings.csv'));
+  // Fixture rows stand in for a French translation; the subject is the words read when they are drawn.
+  const fr = [['hud.status.unwell', 'Souffrant'], ['status.health.unwell', 'Vous vous sentez souffrant.']];
   tm.patchLocaleTable('fr', 'Port_Strings', fr);
   const frm = new Map(fr);
   const me = { activeEffects: [{ kind: 'disease', disease: DISEASES.Plague, incubationOver: false, statMods: {} }] };

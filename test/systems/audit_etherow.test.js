@@ -8,7 +8,6 @@
 // nav_r_raiders, oh_host).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { hostText } from '../hostText.mjs';
 
 import { standService, T0 } from '../accountDb.mjs';
@@ -25,7 +24,6 @@ import { inBay } from '../../src/world/tamriel/tamrielFrame.js';   // BAY-LEFT-M
 import { shipTransition } from '../../src/systems/ship.js';
 import { SHIP_TYPES } from '../../src/systems/banking.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const run = (env, body) => { const names = Object.keys(env); return new Function(...names, body)(...names.map((k) => env[k])); };
 
 const H = ES.veilhaven();
@@ -117,7 +115,19 @@ test('AUDIT ETHER-OW, the merge with main\'s L10N: the Eltheric chart\'s own wor
   const english = M.chartModel(word, { cx: H.px, cy: H.py, zoom: 2 }, 400, 300);
   assert.deepEqual([english.title, english.sub], [`A chart of ${ES.ETHER_SEA_NAME}`, '2 isles charted - deepest 3 leagues past the Veil - 1 crossing']);
   assert.deepEqual([M.wayWords({ px: 0, py: 0 }, { px: 0, py: 0 }), M.scaleBar(4).words, M.RULER_WORDS.veil[1], M.CHART_KEY[2][1]], ['here', '1 league', 'THE VEIL', 'Wild isle']);
-  const rows = tm.loadStringTableCsv(src('locales/fr/Port_Strings.csv'));
+  // Fixture rows stand in for a French translation; the subject is the chart's words read when they are drawn.
+  const rows = [
+    ['sea.chart.title', 'Carte de {sea}'],
+    ['sea.chart.stats', '{charted, plural, one {# île cartographiée} other {# îles cartographiées}} - au plus loin à {deepest} lieues - {crossings, plural, one {# traversée} other {# traversées}}'],
+    ['sea.chart.here', 'ici'],
+    ['sea.chart.scale', '{n, plural, one {# lieue} other {# lieues}}'],
+    ['sea.chart.way', '{n, plural, one {# lieue} other {# lieues}} {point}'],
+    ['sea.chart.isleLine', '{name} - {kind} - {way}'],
+    ['sea.chart.ruler.veil', 'LE VOILE'],
+    ['sea.chart.key.wild', 'Île sauvage'],
+    ['sea.chart.hauntNight', 'Terrain de chasse - la nuit'],
+    ['sea.chart.hauntSunk', 'Coulé - reviendra'],
+  ];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   const fr = new Map(rows);
   try {

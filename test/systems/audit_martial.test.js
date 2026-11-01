@@ -9,7 +9,6 @@
 import { modsOff } from '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -58,7 +57,7 @@ import { pathTo } from '../../src/net/firmament/firmamentLaw.js';
 import { setFirmamentTree, setFirmamentOnline, _resetFirmamentLiveForTests } from '../../src/systems/firmamentLive.js';
 import { _resetFirmamentPowersForTests } from '../../src/systems/firmamentPowers.js';
 import { CharSheet } from '../../src/ui/charsheet.js';
-import { patchLocaleTable, parseStringTableCsv, setLocale } from '../../src/systems/textManager.js';
+import { patchLocaleTable, setLocale } from '../../src/systems/textManager.js';
 import { registerWeaponBlowMod } from '../../src/systems/entityMods.js';
 import { pcaaoAttackDamage } from '../../src/combat/pcaao.js';
 import { PlayerWeapon } from '../../src/combat/playerWeapon.js';
@@ -80,7 +79,6 @@ import { raisePlayerSkills } from '../../src/scenes/shared.js';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const { LongBlade: LB, ShortBlade: SB, Axe: AX, BluntWeapon: BL, Archery: AR, HandToHand: HH } = SKILLS;
-const src = (p) => readFileSync(join(ROOT, p), 'utf8');
 const STATS = { strength: 70, intelligence: 50, willpower: 50, agility: 60, endurance: 60, personality: 50, speed: 50, luck: 50 };
 const career = buildCustomCareer({ name: 'Fighter', hp: 12, stats: STATS,
   skills: [LB, SB, AX, BL, AR, HH, SKILLS.Dodging, SKILLS.CriticalStrike, SKILLS.Running, SKILLS.Jumping, SKILLS.Climbing, SKILLS.Swimming] });
@@ -421,22 +419,17 @@ test('AUDIT MARTIAL L2 F9 / L2 F11: each skill notable keeps every stat it had b
 const UNITS = 'ffiljnmehihlehefifhikijjjjeegjhinjjjkkkjkfekinljjkkjklkmkkjgffjkgijijiijkfekfnkijjihgkjmliifffj';
 const classicPx = (s) => [...s.normalize('NFD')].filter((c) => !/\p{M}/u.test(c)).reduce((w, c) => { const i = c.codePointAt(0) - 32; return w + (i >= 0 && i < UNITS.length ? UNITS.charCodeAt(i) - 97 : 13) / 2; }, 0);
 
-test('AUDIT MARTIAL L4 M1: the line a choice says - martial and arcane - fits the classic screen\'s 312 px from the sheet\'s notice to its edge, unwrapped, for every path in English and every whole Latin language (the frozen martial line ran ~100 characters, and the arcane spell\'s sentence past the screen too) (mutants: the technique\'s sentence back)', () => clean(() => {
-  const langs = ['en', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'nb', 'pt-BR', 'ro'];
+test('AUDIT MARTIAL L4 M1: the line a choice says - martial and arcane - fits the classic screen\'s 312 px from the sheet\'s notice to its edge, unwrapped, for every path in English (the frozen martial line ran ~100 characters, and the arcane spell\'s sentence past the screen too) (mutants: the technique\'s sentence back)', () => clean(() => {
   const mage = buildCustomCareer({ name: 'Mage', hp: 10, stats: STATS, skills: [SKILLS.Destruction, SKILLS.Restoration, SKILLS.Alteration, SKILLS.Mysticism, SKILLS.Illusion, SKILLS.Thaumaturgy, SB, AR, SKILLS.Medical, SKILLS.Etiquette, SKILLS.Streetwise, SKILLS.Lockpicking] });
-  for (const lang of langs) {
-    if (lang !== 'en') patchLocaleTable(lang, 'Port_Strings', parseStringTableCsv(src(`locales/${lang}/Port_Strings.csv`)));
-    setLocale(lang);
-    for (const p of MP.MARTIAL_PATHS) {
-      const r = MP.chooseMartialPath(fighter(p.skills, 100), p.id);
-      assert.ok(r.ok && classicPx(r.text) <= 312, `${lang} ${p.id}: "${r.text}" ${classicPx(r.text)} px`);
-    }
-    for (const p of AP.PATHS) {
-      const m = fighter([], 100, mage);
-      for (const s of p.schools) { m.skills[s] = 100; masterSkill(m, s); }
-      const r = AP.choosePath(m, p.id);
-      assert.ok(r.ok && classicPx(r.text) <= 312, `${lang} ${p.id}: "${r.text}" ${classicPx(r.text)} px`);
-    }
+  for (const p of MP.MARTIAL_PATHS) {
+    const r = MP.chooseMartialPath(fighter(p.skills, 100), p.id);
+    assert.ok(r.ok && classicPx(r.text) <= 312, `${p.id}: "${r.text}" ${classicPx(r.text)} px`);
+  }
+  for (const p of AP.PATHS) {
+    const m = fighter([], 100, mage);
+    for (const s of p.schools) { m.skills[s] = 100; masterSkill(m, s); }
+    const r = AP.choosePath(m, p.id);
+    assert.ok(r.ok && classicPx(r.text) <= 312, `${p.id}: "${r.text}" ${classicPx(r.text)} px`);
   }
 }));
 

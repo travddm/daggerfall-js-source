@@ -1,6 +1,6 @@
 // L10N1b: THE LANGUAGE SETTING. The
 // catalog of languages the port offers and its pure laws (the saved choice resolved, the browser's own list matched,
-// a build path read), the English catalog read off the source and in step with it, every language's draft file held
+// a build path read), the English catalog read off the source and in step with it, any language's file held
 // to the English one (DFU's format, every key, every argument, every pattern readable), the rail's English unchanged
 // through `t`, the boot's language laws run over files fed off the disk (scenes/localeData.js), and the boot's order,
 // the menu's language row and the first-run offer by source (tools/languageProbe.mjs drives them in a browser).
@@ -82,25 +82,29 @@ test('L10N1b the English catalog is read off the source and in step with it: eve
   assert.equal(strings.get('lang.offer').en, 'Play in English?', 'tIn\'s key is read too');
 });
 
-test('L10N1b every language\'s file: DFU\'s format as the port writes it, the English catalog\'s keys exactly, every value a readable pattern naming the English\'s arguments - and every visible catalog language has one, and no folder is outside the catalog', () => {
+test('L10N1b every language\'s file: DFU\'s format as the port writes it, the English catalog\'s keys exactly, every value a readable pattern naming the English\'s arguments - the English catalog\'s own patterns readable, and no folder is outside the catalog', () => {
   const en = new Map(tm.parseStringTableCsv(rd(CATALOG_PATH)));
+  assert.ok(en.size >= 20, 'the English catalog parses');
+  for (const [k, v] of en) assert.doesNotThrow(() => tm.parseMessage(v), `en ${k} is not a readable pattern`);
   const dirs = readdirSync(new URL('../../locales/', import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
   for (const d of dirs) assert.ok(catalogLocale(d), `locales/${d} is not a catalog language`);
-  for (const l of LOCALE_CATALOG.filter((x) => x.source === 'machine')) {
-    const path = `locales/${l.code}/Port_Strings.csv`;
-    assert.ok(exists(path), `${l.code} has no ${path}`);
+  // Only reviewed translations ship, so this loop can find no folder at all. It stays so that the first language
+  // added is held to the English catalog when it lands.
+  for (const code of dirs.filter((d) => d !== tm.BASE_LOCALE)) {
+    const path = `locales/${code}/Port_Strings.csv`;
+    assert.ok(exists(path), `${code} has no ${path}`);
     const text = rd(path);
     const rows = tm.parseStringTableCsv(text);
     assert.equal(tm.formatStringTableCsv(rows), text, `${path} is in the port's own form (the writer's)`);
     const map = new Map(rows);
-    // L10N6 (the first batch, 2026-10-13): a language still `drafting` holds part of the catalog and is not offered on
-    // it (test below); every other language holds the catalog exactly
-    if (l.drafting) assert.deepEqual([...map.keys()].filter((k) => !en.has(k)), [], `${l.code}'s part-drafts name only catalog keys`);
-    else assert.deepEqual([...map.keys()].sort(), [...en.keys()].sort(), `${l.code} covers the catalog`);
+    // a language still `drafting` holds part of the catalog and is not offered on it (test below); every other
+    // language holds the catalog exactly
+    if (catalogLocale(code).drafting) assert.deepEqual([...map.keys()].filter((k) => !en.has(k)), [], `${code}'s part-drafts name only catalog keys`);
+    else assert.deepEqual([...map.keys()].sort(), [...en.keys()].sort(), `${code} covers the catalog`);
     for (const [k, v] of map) {
-      assert.ok(v.trim(), `${l.code} ${k} is empty`);
-      assert.doesNotThrow(() => tm.parseMessage(v), `${l.code} ${k} is not a readable pattern`);
-      assert.deepEqual(argNames(v), argNames(en.get(k)), `${l.code} ${k} names other arguments than the English`);
+      assert.ok(v.trim(), `${code} ${k} is empty`);
+      assert.doesNotThrow(() => tm.parseMessage(v), `${code} ${k} is not a readable pattern`);
+      assert.deepEqual(argNames(v), argNames(en.get(k)), `${code} ${k} names other arguments than the English`);
     }
   }
 });
@@ -125,8 +129,9 @@ test('L10N6 the first batch: a language still drafting is not offered on its par
 });
 
 test('L10N1b executed: a language\'s file patched in speaks through t(); tIn asks in another language while English stands; the rail\'s English reads back as itself', () => {
-  tm.patchLocaleTable('fr', 'Port_Strings', tm.loadStringTableCsv(rd('locales/fr/Port_Strings.csv')));
-  tm.patchLocaleTable('ja', 'Port_Strings', tm.loadStringTableCsv(rd('locales/ja/Port_Strings.csv')));
+  // Fixture rows stand in for a translation: the subject is t() and tIn, not a shipped language.
+  tm.patchLocaleTable('fr', 'Port_Strings', tm.loadStringTableCsv('Key,Value\nmenu.rail.new,"Nouvelle partie"\nsettings.language.name,"Langue"\n'));
+  tm.patchLocaleTable('ja', 'Port_Strings', tm.loadStringTableCsv('Key,Value\nlang.offer,"日本語でプレイしますか？"\n'));
   assert.equal(tm.t('menu.rail.new', 'New Game'), 'New Game', 'English stands');
   assert.equal(tm.tIn('ja', 'lang.offer', 'Play in English?'), '日本語でプレイしますか？', 'the offer, in the language it offers');
   tm.setLocale('fr');
@@ -151,8 +156,8 @@ test('L10N1b the boot, run: the saved choice, ?lang= for one visit, only the cho
   const calls = [];
   let koFails = false;
   const glob = {
-    '../../locales/fr/Port_Strings.csv': async () => { calls.push('fr'); return rd('locales/fr/Port_Strings.csv'); },
-    '../../locales/ko/Port_Strings.csv': async () => { calls.push('ko'); if (koFails) throw new Error('offline'); return rd('locales/ko/Port_Strings.csv'); },
+    '../../locales/fr/Port_Strings.csv': async () => { calls.push('fr'); return 'Key,Value\nmenu.rail.new,"Nouvelle partie"\n'; },
+    '../../locales/ko/Port_Strings.csv': async () => { calls.push('ko'); if (koFails) throw new Error('offline'); return 'Key,Value\nlang.offer,"한국어로 플레이하시겠습니까?"\n'; },
     '../../locales/pt-BR/Port_Strings.csv': async () => { calls.push('pt-BR'); return 'Key,Value\nmenu.rail.new,"Novo jogo"\n'; },
     '../../locales/pt/Port_Strings.csv': async () => { calls.push('pt'); return 'Key,Value\nmenu.rail.new,"Jogo novo"\nmenu.rail.load,"Carregar jogo"\n'; },
     '../../locales/en/Port_Strings.csv': async () => { calls.push('en'); throw new Error('English is the code\'s'); },
