@@ -39,7 +39,7 @@ const TABLES = [
   'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves',
   'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_bounties', 'sea_bounty_owed', 'sea_kills',
   'sea_prizes', 'sea_season', 'sea_wrecks', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
-  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence',
+  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_discord', 'staff_events', 'staff_evidence',
   'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches',
   'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held',
   'town_domain_witness', 'town_econ_acts', 'town_econ_days', 'town_econ_kept', 'town_econ_seen', 'town_econ_struck',
@@ -61,7 +61,7 @@ const PLAYER_COLUMNS = [
   'insignia', 'insignia_spent', 'lamp_title', 'last_seen', 'legal_accepted_at', 'mute_admin', 'muted_by',
   'muted_until', 'name_as', 'password', 'patreon_at', 'patreon_status', 'patreon_tiers', 'patreon_user', 'played_at',
   'played_s', 'privacy_version', 'ql_titles', 'recovery_hash', 'registered_at', 'renown_hour', 'renown_hour_xp',
-  'renown_last_credit', 'sd_honours', 'serpent_honours', 'staff_hide', 'staff_hide_on', 'staff_mod', 'staff_suspended',
+  'renown_last_credit', 'sd_honours', 'serpent_honours', 'staff_admin', 'staff_hide', 'staff_hide_on', 'staff_mod', 'staff_owner', 'staff_suspended',
   'terms_version', 'title',
 ];
 

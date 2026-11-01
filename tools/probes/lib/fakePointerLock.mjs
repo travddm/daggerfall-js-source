@@ -16,7 +16,13 @@ const inPage = () => {
     held = null;
     queueMicrotask(changed);
   };
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && held) document.exitPointerLock(); }, true);
+  window.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'Escape' && held) document.exitPointerLock();
+    },
+    true,
+  );
 };
 
 /** Installs the stand-in on every page `context` opens from now on. */

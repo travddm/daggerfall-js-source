@@ -25,7 +25,7 @@ const DF = 17, WR = 23;
 const HUBS = { [DF]: [207, 212], [WR]: [590, 166] };
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const stores = (who, m, character = who.character) => raw.prepare('SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin')
     .all(who.id, character, m).map((r) => [r.origin, Number(r.qty)]);

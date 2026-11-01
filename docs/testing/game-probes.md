@@ -5,15 +5,15 @@ these probes catch what breaks in the wiring when a host file (`src/scenes/world
 `Room`) changes. Each probe reads game state through the `?shot` hooks, not pixels, and fails on any console error that
 `tools/probes/lib/allowedErrors.mjs` does not name.
 
-| Probe | What it drives |
-| --- | --- |
-| `boot` | The front door and the main menu draw with no errors. |
-| `dungeon` | The real chargen wizard to a character, the starting dungeon, a move, a kill, the loot, the way out. |
-| `town` | A town exterior; a shop (buy, then sell back: gold and inventory change); a tavern room. |
-| `travel` | Fast travel through the travel map (the journey ends at the place asked for, the clock runs); a rest in a rented room heals and advances the clock. |
-| `save` | Save, load in the page, then reload the page and load again: position, gold, inventory and level match. |
-| `pause` | Every tab and side row of the pause menu opens and draws. |
-| `online` | The real relay and account service in local workerd; two clients join one room (the starting dungeon, which software GL can boot), each sees the other move, one chat line arrives. |
+| Probe     | What it drives                                                                                                                                                                      |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `boot`    | The front door and the main menu draw with no errors.                                                                                                                               |
+| `dungeon` | The real chargen wizard to a character, the starting dungeon, a move, a kill, the loot, the way out.                                                                                |
+| `town`    | A town exterior; a shop (buy, then sell back: gold and inventory change); a tavern room.                                                                                            |
+| `travel`  | Fast travel through the travel map (the journey ends at the place asked for, the clock runs); a rest in a rented room heals and advances the clock.                                 |
+| `save`    | Save, load in the page, then reload the page and load again: position, gold, inventory and level match.                                                                             |
+| `pause`   | Every tab and side row of the pause menu opens and draws.                                                                                                                           |
+| `online`  | The real relay and account service in local workerd; two clients join one room (the starting dungeon, which software GL can boot), each sees the other move, one chat line arrives. |
 
 ## Running
 

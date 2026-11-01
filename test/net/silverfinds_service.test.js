@@ -271,7 +271,7 @@ test('SILVER-FINDS the loot find\'s hour: each find is one of the Marks acts an 
 });
 
 test('AUDIT 625 S6: the weekly report counts the accounts at SILVER-FINDS\' two caps (the gathering\'s 30 a day, the loot\'s 20) beside the combat\'s and the Bank\'s, the account-days beside them - the two faucets the day alone bounds are the ones a scripted client shows at (mutants: a faucet uncounted; its cap read as the other\'s)', async () => {
-  const s = await stand({ DEVELOPER_HANDLES: 'Devra' });
+  const s = await stand({ SEAT_ADMINS: 'Devra' });
   const d = await s.seated('Devra');
   const [a, b] = [await s.seated('Anna'), await s.seated('Bjorn')];
   s.seed(a, 'gather', MARKS_FAUCETS.gather.perDay);

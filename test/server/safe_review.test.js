@@ -13,7 +13,7 @@ import { conductRules } from '../../src/net/safety/conduct.js';
 import { SAFE_LAW_PATH } from '../../src/net/wire.js';
 import { reviewLines, reviewPayload, flagsOf, reviewerPrompt, modAiOn, modAiModeOf, flagActs, VERDICT_SCHEMA, MESSAGES_URL, MOD_AI_MODEL_DEFAULT } from '../../server-account/src/modAi.js';
 import { safetyMinute, safetySweep, FEED_KEEP_S, CASE_OPEN_MAX_S } from '../../server-account/src/safetyClock.js';
-import { caseCard, discordModerators, discordOn, interactionsOn, CARD_ACTS, DISCORD_API } from '../../server-account/src/discord.js';
+import { caseCard, discordOn, interactionsOn, CARD_ACTS, DISCORD_API } from '../../server-account/src/discord.js';
 import { SPROUT_S } from '../../server-account/src/titles.js';
 
 const subtle = globalThis.crypto.subtle;
@@ -40,7 +40,7 @@ function outside(verdicts = []) {
   };
   return { asked, fetchFn };
 }
-const ON = Object.freeze({ MOD_AI: 'on', ANTHROPIC_API_KEY: 'sk-test', MODERATOR_HANDLES: 'Asynian', RELAY_LAW_URL: RELAY, DISCORD_MOD_CHANNEL: '123456789012345678', DISCORD_BOT_TOKEN: 'bot-token' });
+const ON = Object.freeze({ MOD_AI: 'on', ANTHROPIC_API_KEY: 'sk-test', SEAT_MODERATORS: 'Asynian', RELAY_LAW_URL: RELAY, DISCORD_MOD_CHANNEL: '123456789012345678', DISCORD_BOT_TOKEN: 'bot-token' });
 const ctxOf = (s) => ({ db: s.env.DB, nowS: nowS(), rand: (b) => { globalThis.crypto.getRandomValues(b); } });
 const heard = async (s, who, text, tab = 'world', at = Date.now()) => { const l = { tab, sub: who.id, name: who.handle ?? 'Guest', at, text }; return { ...l, sg: await mintStamp(l, s.gatePriv, { subtle }) }; };
 
@@ -174,11 +174,12 @@ async function discordSigner() {
   return { hex, sign };
 }
 
-test('SAFE8 DISCORD\'S INTERACTIONS: unsigned or old ones refused; a ping answered; a press by a Discord user DISCORD_MODERATORS pairs with a game moderator mutes the case\'s account (MOD1\'s law), keeps the act in the record, pushes the order, resolves the case and redraws its card without its buttons; a stranger\'s press does nothing; /mod lookup says the account\'s standing (mutants: the signature unchecked; a Discord user who is not a moderator in the game acting)', async () => {
+test('SAFE8 DISCORD\'S INTERACTIONS: unsigned or old ones refused; a ping answered; a press by a Discord user the staff_discord table links to a game moderator\'s account mutes the case\'s account (MOD1\'s law), keeps the act in the record, pushes the order, resolves the case and redraws its card without its buttons; a stranger\'s press does nothing; /mod lookup says the account\'s standing (mutants: the signature unchecked; a Discord user who is not a moderator in the game acting)', async () => {
   const d = await discordSigner();
-  const s = await standService({ ...ON, MOD_AI: 'off', DISCORD_PUBLIC_KEY: d.hex, DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Sylvia' });
+  const s = await standService({ ...ON, MOD_AI: 'off', DISCORD_PUBLIC_KEY: d.hex });
   const mod = await s.registered('Asynian');
   const sylvia = await s.registered('Sylvia');
+  for (const [discordId, id] of [['111111111111111111', mod.id], ['222222222222222222', sylvia.id]]) s.env.DB._raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, ?, ?)').run(discordId, id, nowS());
   const troll = await s.registered('Troll');
   const filed = await s.call('/v1/safety/report', { target: troll.id, reason: 'harassment', lines: [await heard(s, troll, 'quit the game, nobody likes you')] }, sylvia.secret);
   const relayed = [];
@@ -199,7 +200,7 @@ test('SAFE8 DISCORD\'S INTERACTIONS: unsigned or old ones refused; a ping answer
     assert.equal(stranger.body.type, 4);
     assert.equal(stranger.body.data.flags, 64);
     const notMod = await knock(press('222222222222222222'));
-    assert.match(notMod.body.data.content, /Only the game's moderators/, 'paired with a handle that is no moderator in the game');
+    assert.match(notMod.body.data.content, /Only the game's moderators/, 'linked to an account that is no moderator in the game');
     assert.equal(s.env.DB._raw.prepare('SELECT muted_until FROM players WHERE id = ?').get(troll.id).muted_until, null);
     const done = await knock(press('111111111111111111'));
     assert.equal(done.body.type, 7);
@@ -215,12 +216,11 @@ test('SAFE8 DISCORD\'S INTERACTIONS: unsigned or old ones refused; a ping answer
   } finally { globalThis.fetch = real; }
 });
 
-test('SAFE8 THE CARD, PURE: the reported account\'s lines marked, a player\'s code fence defused, the reviewer\'s shadow said, and the switches read from config alone (mutants: a fence left live; a Discord moderator taken without a handle)', () => {
+test('SAFE8 THE CARD, PURE: the reported account\'s lines marked, a player\'s code fence defused, the reviewer\'s shadow said, and the switches read from config alone (mutant: a fence left live)', () => {
   const card = caseCard({ c: { id: '0011223344556677', target: 'p_troll', source: 'report', status: 'open', reports: 2, credible: 1, ai_state: 'done', ai_category: 'hate', ai_severity: 3, ai_confidence: 0.9, ai_reason: 'Slur.', ai_mode: 'shadow', auto: null }, name: 'Troll', lines: [{ sub: 'p_sylvia', tab: 'world', name: 'Sylvia', text: 'hi' }, { sub: 'p_troll', tab: 'world', name: 'Troll', text: '```@everyone```' }], reasons: ['hate', 'hate'], strikes: 3 });
   assert.equal(card.embeds[0].description, "```\n  [world] Sylvia: hi\n> [world] Troll: '''@everyone'''\n```");
   assert.match(JSON.stringify(card.embeds[0].fields), /next: a ban/);
   assert.match(JSON.stringify(card.embeds[0].fields), /SHADOW/);
-  assert.deepEqual([...discordModerators({ DISCORD_MODERATORS: '111111111111111111:Asynian, bad, 22:x, 333333333333333333:' })], [['111111111111111111', 'asynian']]);
   assert.equal(discordOn({ DISCORD_MOD_CHANNEL: '123456789012345678' }), false, 'no token, no posts');
   assert.equal(interactionsOn({ DISCORD_PUBLIC_KEY: 'zz' }), false);
 });

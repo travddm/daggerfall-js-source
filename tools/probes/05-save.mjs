@@ -8,22 +8,30 @@ import { TOWN_URL, enterTown } from './lib/town.mjs';
 
 export const name = 'save';
 
-const snapshot = (g) => g.page.evaluate(() => {
-  const p = window.__playerEntity;
-  const items = p.items ?? [];
-  return {
-    name: p.name, level: p.level ?? null, health: p.health, maxHealth: p.maxHealth,
-    gold: JSON.parse(window.__travelProbe()).gold,
-    items: items.filter((i) => i.group !== 'Currency').map((i) => `${i.name}x${i.stackCount ?? 1}`).sort(),
-    pixel: window.__currentPixel(),
-    pos: window.__player.pos.map((v) => Math.round(v * 10) / 10),
-    mode: window.__mode(),
-  };
-});
+const snapshot = (g) =>
+  g.page.evaluate(() => {
+    const p = window.__playerEntity;
+    const items = p.items ?? [];
+    return {
+      name: p.name,
+      level: p.level ?? null,
+      health: p.health,
+      maxHealth: p.maxHealth,
+      gold: JSON.parse(window.__travelProbe()).gold,
+      items: items
+        .filter((i) => i.group !== 'Currency')
+        .map((i) => `${i.name}x${i.stackCount ?? 1}`)
+        .sort(),
+      pixel: window.__currentPixel(),
+      pos: window.__player.pos.map((v) => Math.round(v * 10) / 10),
+      mode: window.__mode(),
+    };
+  });
 
 const sameAs = (a, b) => {
   const d = [];
-  for (const k of ['name', 'level', 'gold', 'pixel', 'mode', 'maxHealth']) if (a[k] !== b[k]) d.push(`${k}: ${a[k]} vs ${b[k]}`);
+  for (const k of ['name', 'level', 'gold', 'pixel', 'mode', 'maxHealth'])
+    if (a[k] !== b[k]) d.push(`${k}: ${a[k]} vs ${b[k]}`);
   if (a.items.join('|') !== b.items.join('|')) d.push(`items: ${a.items.length} vs ${b.items.length}`);
   const off = Math.hypot(a.pos[0] - b.pos[0], a.pos[2] - b.pos[2]);
   if (off > 1) d.push(`position off by ${off.toFixed(1)}`);
@@ -36,13 +44,19 @@ export async function run({ browser, base, ck }) {
     await enterTown(g, TOWN_URL);
     const doors = await g.page.evaluate(() => window.__doors());
     const d = doors[Math.min(5, doors.length - 1)];
-    await g.page.evaluate(([x, y, z, yaw]) => window.__pose(x, y, z, yaw, 0),
-      [d.pos[0] + d.normal[0] * 4, d.pos[1] - 1.2, d.pos[2] + d.normal[2] * 4, 1.0]);
+    await g.page.evaluate(
+      ([x, y, z, yaw]) => window.__pose(x, y, z, yaw, 0),
+      [d.pos[0] + d.normal[0] * 4, d.pos[1] - 1.2, d.pos[2] + d.normal[2] * 4, 1.0],
+    );
     await g.waitFrames(6);
     await g.page.evaluate(() => window.__addGold(777));
     await g.waitFrames(3);
     const saved = await snapshot(g);
-    ck('the character has something to lose', saved.gold >= 777 && saved.items.length > 0, `${saved.gold}g, ${saved.items.length} items, level ${saved.level}`);
+    ck(
+      'the character has something to lose',
+      saved.gold >= 777 && saved.items.length > 0,
+      `${saved.gold}g, ${saved.items.length} items, level ${saved.level}`,
+    );
 
     const ok = await g.page.evaluate(() => window.__quickSave('probe-save'));
     ck('the game saves', !!ok, String(ok));
@@ -51,7 +65,10 @@ export async function run({ browser, base, ck }) {
 
     // change the character, then load it back in the same page
     await g.page.evaluate(() => window.__addGold(5000));
-    await g.page.evaluate(([x, y, z]) => window.__pose(x, y, z, 0, 0), [d.pos[0] - d.normal[0] * 20, d.pos[1] - 1.2, d.pos[2] - d.normal[2] * 20]);
+    await g.page.evaluate(
+      ([x, y, z]) => window.__pose(x, y, z, 0, 0),
+      [d.pos[0] - d.normal[0] * 20, d.pos[1] - 1.2, d.pos[2] - d.normal[2] * 20],
+    );
     await g.waitFrames(4);
     const moved = await snapshot(g);
     ck('the character changed after the save', moved.gold !== saved.gold, `${moved.gold}g`);
@@ -71,7 +88,11 @@ export async function run({ browser, base, ck }) {
     await g.waitFrames(6);
     const after = await snapshot(g);
     const diff2 = sameAs(before, after);
-    ck('a reload and a load restore position, gold, inventory and level', diff2.length === 0, diff2.join('; ') || `${after.gold}g, ${after.items.length} items, level ${after.level}`);
+    ck(
+      'a reload and a load restore position, gold, inventory and level',
+      diff2.length === 0,
+      diff2.join('; ') || `${after.gold}g, ${after.items.length} items, level ${after.level}`,
+    );
     g.noErrors(ck, 'save and load');
   } finally {
     await g.close();

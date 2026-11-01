@@ -13,7 +13,7 @@
 //
 // A GUILD COMMAND, not a global one: it appears in the project's own Discord server at once and nowhere else, and it is
 // hidden from everyone but those holding Manage Messages (`default_member_permissions`) - a door's look, never its lock:
-// whether a press does anything is the game's question (DISCORD_MODERATORS, MODERATOR_HANDLES).
+// whether a press does anything is the game's question (the staff_discord link and the account's staff role).
 // ═══════════════════════════════════════════════════════════════════
 
 /** The command, as Discord's API takes it: /mod lookup|mute|unmute|ban|unban, each naming a player by name or account id. */

@@ -47,7 +47,7 @@ const harvestBody = (who, p, extra = {}) => ({
   climate: p.climate ?? WOODS, region: ANTICLERE, act: { clean: false, bruised: false }, at: _now - 2, rid: rid(), ...extra,
 });
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const stores = (who, material) => raw.prepare("SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin").all(who.id, who.character, material)

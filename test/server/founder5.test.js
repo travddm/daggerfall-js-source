@@ -48,7 +48,7 @@ test('FOUNDER5 the clock: the cutoff is the end of 24 September at UTC-12, 2026-
 
 test('FOUNDER5 the names: a handle in FOUNDER_HANDLES holds Founder whenever it first played, case-folded and spaced as the other lists; a guest none; unlisted, the date decides (mutants: the list ignored; the list grants guests)', () => {
   const env = { FOUNDER_HANDLES: ' Wanderer , lateone' };
-  assert.deepEqual([...founderHandles(env)], ['wanderer', 'lateone'], 'one reading of a comma list, as DEVELOPER_HANDLES');
+  assert.deepEqual([...founderHandles(env)], ['wanderer', 'lateone'], 'one reading of a comma list, as the other lists');
   const late = { handle: 'wanderer', created_at: OLD_CUT + 20 * DAY, registered_at: OLD_CUT + 20 * DAY, title: null };
   assert.deepEqual(titlesHeld(late, {}), [], 'no record of play before the 25th: none by the date');
   assert.deepEqual(titlesHeld(late, env), ['founder'], 'named: held');
@@ -62,7 +62,7 @@ test('FOUNDER5 the names: a handle in FOUNDER_HANDLES holds Founder whenever it 
   assert.equal(isNamedFounder({ handle: '' }, { FOUNDER_HANDLES: ',' }), false, 'an empty handle is nobody');
   assert.deepEqual(titlesHeld({ handle: 'Early', created_at: 1, registered_at: 1 }, env), ['founder'], 'a founder by the date holds it unlisted');
   assert.deepEqual(titlesHeld({ handle: 'wanderer', created_at: 1, registered_at: 1 }, env), ['founder'], 'held once, never twice, by the date and the name both');
-  assert.deepEqual(titlesHeld(late, { ...env, DEVELOPER_HANDLES: 'wanderer' }), ['founder', 'developer'], 'founder first, in its place among the titles');
+  assert.deepEqual(titlesHeld({ ...late, staff_admin: 1 }, env), ['founder', 'developer'], 'founder first, in its place among the titles');
   assert.deepEqual(wardrobeOf(late, env, OLD_CUT + 21 * DAY).titles, ['founder'], 'the account card shows it');
 });
 

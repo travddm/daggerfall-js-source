@@ -208,7 +208,7 @@ async function stand() {
   let now = 1_800_000_000;
   const realNow = Date.now;
   Date.now = () => now * 1000;
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const put = async (who, R, save) => {
     const at = R.at();

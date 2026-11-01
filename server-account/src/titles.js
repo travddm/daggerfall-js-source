@@ -15,9 +15,9 @@
 //             its row's first contact, or (FOUNDER4) the first contact of
 //             a row it shares a character with (`first_played_at`) - or
 //             (FOUNDER5) your handle is in the service's FOUNDER_HANDLES.
-//   DEVELOPER your handle is in the service's DEVELOPER_HANDLES.
+//   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0002) - a column, never a name.
 //   SPROUT    your account is younger than SPROUT_S.
-//   DEV       the same list as the Developer title.
+//   DEV       the same role as the Developer title.
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
 //             your handle is in that title's own list in the config;
 //             each list grants the title AND its glyph. PATREON-LINK
@@ -154,22 +154,6 @@ export const HOURS_FIRST_AURA = 'firsthour';
  *  check it against the sentence Mac wrote. */
 export const SPROUT_S = 14 * 24 * 60 * 60;
 
-/** The developers, off the service's own config. A LIST IN CONFIG and
- *  not a column, because granting one is a thing a person does by
- *  editing a file that is reviewed and deployed - not by reaching into
- *  a live database at three in the morning. Case-folded on the way in,
- *  because `handle_lc` is what uniqueness is really on. */
-export function developerHandles(env) {
-  return handleList(env?.DEVELOPER_HANDLES);
-}
-
-/** MOD1: the moderators, the same way and for the same reason. Mac
- *  names them; a deploy grants them; taking a handle off revokes the
- *  glyph and the commands on that player's next token and next call. */
-export function moderatorHandles(env) {
-  return handleList(env?.MODERATOR_HANDLES);
-}
-
 /** One reading of a comma list of handles, so the two lists cannot
  *  come to disagree about case or spaces. PRIVATE-REPORT: exported, the
  *  readers' list (reports.js) read the same way. */
@@ -226,19 +210,24 @@ export const holdsTier = (title, player, env) =>
   && !(staffSuspended(player) && STAFF_GLYPHS.includes(TIER_GLYPH[/** @type {keyof typeof TIER_GLYPH} */ (title)]))
   && (handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase()) || patreonTitlesOf(player, env).includes(title));
 
-/** Is this player one of them? A handle a guest does not have cannot
- *  be in any list, so a guest is never a developer - which is right:
- *  the list names people, and a guest row is a device. */
-export const isDeveloper = (player, env) =>
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0002),
+ *  never a name's: a handle that a former staff member held grants nothing to whoever registers it. Read off the row at every
+ *  ask, so an Admin revoked loses the title, the glyph and the doors on the next token and the next call. A guest holds no
+ *  handle and so never is one. `env` is kept for the callers that pass it. */
+export const isDeveloper = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
-  && developerHandles(env).has(player.handle.toLowerCase());
+  && player.staff_admin === 1;
 
-/** MOD1: is this player a moderator? A guest cannot be, for the same
- *  reason a guest cannot be a developer. STAFF-PANEL1: listed, or added by an Admin from the staff panel
- *  (`staff_mod`) - the account's, so a rename keeps it and a listed handle is never needed. */
-export const isModerator = (player, env) =>
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0002),
+ *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs. */
+export const isOwner = (player, env) => isDeveloper(player, env) && player.staff_owner === 1;
+
+/** MOD1: is this player a moderator? A guest cannot be, for the same reason a guest cannot be a developer. The role is
+ *  the account's `staff_mod`, added by an Admin from the staff panel or by the operator - so a rename keeps it and no
+ *  registered name earns it. */
+export const isModerator = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
-  && (moderatorHandles(env).has(player.handle.toLowerCase()) || player.staff_mod === 1);
+  && player.staff_mod === 1;
 
 /** MOD1: MAY THIS PLAYER MODERATE? A moderator may, and so may a
  *  developer - the people who can already speak as the server are not
@@ -328,7 +317,7 @@ export const HEARTHKEEPER_TITLE = 'hearthkeeper';
 const festivalKeys = (/** @type {any} */ player, /** @type {string} */ kind) => festivalWaresHeld(player?.fest_wares).filter((id) => id.startsWith(`${kind}:`)).map((id) => id.slice(kind.length + 1));
 
 /** SERAPH-WINGS: THE
- *  DEVELOPERS' AURA - held while the handle is in DEVELOPER_HANDLES, as the developer title and glyph are, and gone on
+ *  DEVELOPERS' AURA - held while the account is an Admin, as the developer title and glyph are, and gone on
  *  the next token once it is not. */
 export const DEVELOPER_AURA = 'seraphwings';
 /** WB9g: THE AURAS THIS PLAYER HOLDS - the Broker's, bought (the row's `insignia`), in the offers' order. AEGIS: and,

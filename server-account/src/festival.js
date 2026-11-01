@@ -50,7 +50,7 @@ import {
 export const FEST_OPS_MAX = 900;
 export const FEST_OPS_WINDOW_S = 3600;
 
-/** FESTIVAL_OPEN: 'off', 'dev' (the DEVELOPER_HANDLES alone) or 'on'; anything else is off. */
+/** FESTIVAL_OPEN: 'off', 'dev' (the Admins alone) or 'on'; anything else is off. */
 export const festivalSwitchOf = (/** @type {unknown} */ v) => (v === 'on' || v === 'dev' ? v : 'off');
 export function festivalOpenFor(/** @type {any} */ player, /** @type {any} */ env) {
   const s = festivalSwitchOf(env?.FESTIVAL_OPEN);

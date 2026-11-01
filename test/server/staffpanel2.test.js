@@ -38,8 +38,8 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
-    OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Tabbyvish',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
+    OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY,
   });
   const pushed = [];
   const real = globalThis.fetch;
@@ -54,6 +54,10 @@ async function stand() {
   const troll = await s.registered('Troll');
   const sylvia = await s.registered('Sylvia');
   const raw = s.env.DB._raw;
+  // the operator's link (docs/operations/staff-roles.md): a Discord user id bound to the moderator's ACCOUNT
+  for (const [discordId, handle] of [['111111111111111111', 'Asynian'], ['222222222222222222', 'Tabbyvish']]) {
+    raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
+  }
   raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, sylvia.id);   // old enough to count
   const mob = (await staff('/v1/staff/login', { handle: 'SirMcMobdon', password: PASSWORD, ...(await mobKey.proof('login', 'SirMcMobdon')) })).body;
   const enrol = async (handle) => {

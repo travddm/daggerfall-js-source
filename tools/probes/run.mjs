@@ -13,11 +13,15 @@ import { serve, launchBrowser, ledger } from './lib/harness.mjs';
 const DIR = fileURLToPath(new URL('.', import.meta.url));
 const PORT = Number(process.env.PROBE_PORT || 5260);
 
-const files = readdirSync(DIR).filter((f) => /^\d\d-.+\.mjs$/.test(f)).sort();
+const files = readdirSync(DIR)
+  .filter((f) => /^\d\d-.+\.mjs$/.test(f))
+  .sort();
 const wanted = process.argv.slice(2);
 const chosen = files.filter((f) => !wanted.length || wanted.includes(f.replace(/^\d\d-/, '').replace(/\.mjs$/, '')));
 if (wanted.length && chosen.length !== wanted.length) {
-  console.error(`unknown probe in [${wanted.join(', ')}]; known: ${files.map((f) => f.replace(/^\d\d-|\.mjs$/g, '')).join(', ')}`);
+  console.error(
+    `unknown probe in [${wanted.join(', ')}]; known: ${files.map((f) => f.replace(/^\d\d-|\.mjs$/g, '')).join(', ')}`,
+  );
   process.exit(2);
 }
 
@@ -27,10 +31,26 @@ let browser = null;
 const results = [];
 
 const cleanup = async () => {
-  try { await browser?.close(); } catch { /* gone */ }
-  for (const c of closers) { try { await c(); } catch { /* gone */ } }
+  try {
+    await browser?.close();
+  } catch {
+    /* gone */
+  }
+  for (const c of closers) {
+    try {
+      await c();
+    } catch {
+      /* gone */
+    }
+  }
 };
-for (const [sig, code] of [['SIGINT', 130], ['SIGTERM', 143]]) process.on(sig, () => { cleanup().finally(() => process.exit(code)); });
+for (const [sig, code] of [
+  ['SIGINT', 130],
+  ['SIGTERM', 143],
+])
+  process.on(sig, () => {
+    cleanup().finally(() => process.exit(code));
+  });
 
 try {
   browser = await launchBrowser();
@@ -60,7 +80,11 @@ try {
 }
 
 console.log(`\n${'='.repeat(60)}`);
-for (const r of results) console.log(`${r.failed.length ? 'FAIL' : 'PASS'}  ${r.name}  ${r.total - r.failed.length}/${r.total} checks  ${r.secs}s`);
+for (const r of results)
+  console.log(
+    `${r.failed.length ? 'FAIL' : 'PASS'}  ${r.name}  ${r.total - r.failed.length}/${r.total} checks  ${r.secs}s`,
+  );
 const bad = results.filter((r) => r.failed.length);
-for (const r of bad) for (const f of r.failed) console.log(`  [${r.name}] ${f.label}${f.detail ? ` - ${f.detail}` : ''}`);
+for (const r of bad)
+  for (const f of r.failed) console.log(`  [${r.name}] ${f.label}${f.detail ? ` - ${f.detail}` : ''}`);
 process.exit(bad.length ? 1 : 0);

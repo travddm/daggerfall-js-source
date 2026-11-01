@@ -20,7 +20,7 @@ const RELAY = 'https://relay.example' + SAFE_LAW_PATH;
 
 /** The service, with a moderator handle and the relay's door; the relay's door's posts recorded. */
 async function stand(extra = {}) {
-  const s = await standService({ MODERATOR_HANDLES: 'Asynian', RELAY_LAW_URL: RELAY, ...extra });
+  const s = await standService({ SEAT_MODERATORS: 'Asynian', RELAY_LAW_URL: RELAY, ...extra });
   const pushed = [];
   const real = globalThis.fetch;
   globalThis.fetch = async (url, init) => { if (String(url) === RELAY) { pushed.push(JSON.parse(init.body).order); return new Response('{"ok":true}'); } return real(url, init); };

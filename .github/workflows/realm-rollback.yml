@@ -12,7 +12,7 @@ name: Realm rollback (a purse below nothing)
 #      what its record holds now and what it would hold back, and what the act would write. Nothing is written.
 #   2. read it; then run again with apply on.
 #
-# Who runs it must be on the developers' list (server-account/wrangler.toml DEVELOPER_HANDLES): the review's gate is the
+# Who runs it must be an Admin account (docs/operations/staff-roles.md): the review's gate is the
 # act's own, asked with the run's actor, and the act's staff finding names them and this run. No maintenance hold and no
 # rewind: the act is one guarded statement over the row as it read it, as the review's route runs it live - a tab playing
 # the character loses its seat to it. Nothing of an account reaches the page but its handle and its characters.

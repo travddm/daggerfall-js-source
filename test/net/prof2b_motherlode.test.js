@@ -79,7 +79,7 @@ test('PROF2b the law: the day\'s three on distinct witnessed pixels, the same fo
 // ─── THE SERVICE ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
   const raw = s.env.DB._raw;
   const witnesses = [await s.seated('Wita'), await s.seated('Witb'), await s.seated('Witc')];
   /** `n` pixels of `climate` confirmed by three witnesses before day `day` began. */

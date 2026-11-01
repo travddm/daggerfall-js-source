@@ -18,7 +18,7 @@ export async function run({ browser, base, ck }) {
   try {
     await enterTown(g, URL);
     // a quest box at the start swallows Escape; put it away first
-    for (let i = 0; i < 8 && await g.overlayKind(); i++) await g.key('Escape', 3);
+    for (let i = 0; i < 8 && (await g.overlayKind()); i++) await g.key('Escape', 3);
     const up = () => g.page.evaluate(() => !!document.getElementById('enhanced-pause'));
     const labelsOf = (sel) => g.page.$$eval(sel, (ns) => ns.map((n) => n.textContent));
     const TABS = '#enhanced-pause button:not(.px-qrow):not(.act):not(.px-profile)';
@@ -30,7 +30,12 @@ export async function run({ browser, base, ck }) {
       return g.page.evaluate(() => {
         const root = document.getElementById('enhanced-pause');
         const r = root?.getBoundingClientRect();
-        return { up: !!root, text: (root?.innerText ?? '').replace(/\s+/g, ' ').length, w: Math.round(r?.width ?? 0), h: Math.round(r?.height ?? 0) };
+        return {
+          up: !!root,
+          text: (root?.innerText ?? '').replace(/\s+/g, ' ').length,
+          w: Math.round(r?.width ?? 0),
+          h: Math.round(r?.height ?? 0),
+        };
       });
     };
     const drawn = (p) => p.up && p.text > 40 && p.w > 100 && p.h > 100;
@@ -49,7 +54,10 @@ export async function run({ browser, base, ck }) {
       panes++;
       const rows = (await labelsOf(ROWS)).map(clean);
       // the Tutorials tab alone has dozens of rows: the first three, the middle one and the last two stand for them
-      const picked = rows.length > 8 ? [0, 1, 2, Math.floor(rows.length / 2), rows.length - 2, rows.length - 1] : rows.map((_, r) => r);
+      const picked =
+        rows.length > 8
+          ? [0, 1, 2, Math.floor(rows.length / 2), rows.length - 2, rows.length - 1]
+          : rows.map((_, r) => r);
       for (const r of picked) {
         if (LEAVES_THE_GAME.test(rows[r])) continue;
         const q = await open(ROWS, r);
@@ -62,7 +70,11 @@ export async function run({ browser, base, ck }) {
     await g.key('Escape', 6);
     ck('Escape closes the pause menu', !(await up()));
     const e = await g.entity();
-    ck('the game resumes with the character alive', e.health > 0 && (await g.mode()) === 'exterior', `${await g.mode()}, hp ${e.health}`);
+    ck(
+      'the game resumes with the character alive',
+      e.health > 0 && (await g.mode()) === 'exterior',
+      `${await g.mode()}, hp ${e.health}`,
+    );
     const f0 = await g.frame();
     await g.waitFrames(10);
     ck('the frame loop runs again', (await g.frame()) > f0);

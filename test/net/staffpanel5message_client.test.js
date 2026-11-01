@@ -300,7 +300,7 @@ async function panelOverRelay() {
   const owner = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = Buffer.from(new Uint8Array(await subtle.exportKey('raw', owner.publicKey))).toString('base64url');
   const RELAY = `https://relay.example${SAFE_LAW_PATH}`;
-  const s = await standService({ IDENTITY_PRIVATE_KEY: pkcs8, DEVELOPER_HANDLES: 'SirMcMobdon', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}`, RELAY_LAW_URL: RELAY });
+  const s = await standService({ IDENTITY_PRIVATE_KEY: pkcs8, SEAT_ADMINS: 'SirMcMobdon', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}`, RELAY_LAW_URL: RELAY });
   const real = globalThis.fetch;
   globalThis.fetch = async (url, init) => (String(url) === RELAY ? worker.fetch(new Request(url, init), env) : real(url, init));
   await s.registered('SirMcMobdon');
