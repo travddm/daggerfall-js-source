@@ -26,8 +26,21 @@ export const toPart = (record) => ({
 });
 
 const SLOTS = [
-  'head', 'hair', 'neck', 'chest', 'groin', 'hand', 'wrist', 'forearm', 'upperarm', 'foot', 'ankle', 'knee',
-  'upperleg', 'clavicle', 'tail',
+  'head',
+  'hair',
+  'neck',
+  'chest',
+  'groin',
+  'hand',
+  'wrist',
+  'forearm',
+  'upperarm',
+  'foot',
+  'ankle',
+  'knee',
+  'upperleg',
+  'clavicle',
+  'tail',
 ];
 const SYNTHETIC_RACES = ['alpha', 'beta'];
 const SYNTHETIC_LISTS = 400;

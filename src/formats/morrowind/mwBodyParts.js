@@ -1,62 +1,136 @@
 // @ts-check
-// Body-part resolution for the Morrowind layer: which BODY record fills each slot of an actor of a race and sex.
+// Picks, for one race, sex and view, the body-part record that skins each body slot of a Morrowind actor.
+//
+// Record layout (UESP, Tes3Mod:File Format, BODY): BYDT holds the part (slot), a flags byte (Female = 1,
+// NotPlayable = 2) and the MeshType (Skin = 0). BODY ids that end in `1st` name the first-person variant of a
+// part. A record is a candidate when it is a playable skin of the wanted race, in a slot the sweep maps.
+//
+// Records are visited in load order. A record that matches the wanted sex and view exactly always takes the slot,
+// so a later plugin overrides an earlier one. A record that only approximates the request is a fallback and may
+// take a slot only under the tier rules in `fallbackTier`.
 
-/** MW-D32: sBodyPartMap's slot list (npcanimation.cpp:1187-1197) - the
- *  mesh parts the skin sweep maps to visible slots. NO head, NO hair
- *  (those come off the actor's own record - the chargen face law), NO
- *  clavicle (deliberately never mapped to any PRT slot). */
+/** The slots whose skin the sweep maps. Head, hair and clavicle are placed by other code. */
 export const SKIN_SWEEP_SLOTS = Object.freeze([
-  'neck', 'chest', 'groin', 'hand', 'wrist', 'forearm', 'upperarm',
-  'foot', 'ankle', 'knee', 'upperleg', 'tail',
+  'neck',
+  'chest',
+  'groin',
+  'hand',
+  'wrist',
+  'forearm',
+  'upperarm',
+  'foot',
+  'ankle',
+  'knee',
+  'upperleg',
+  'tail',
 ]);
 
-const ARM_SLOT_SET = new Set(['hand', 'wrist', 'forearm', 'upperarm']);
+/** Slots that a first-person view may fill from a third-person mesh when no first-person record exists. */
+const ARM_SLOTS = new Set(['hand', 'wrist', 'forearm', 'upperarm']);
+const SWEEP_SLOT_SET = new Set(SKIN_SWEEP_SLOTS);
 
 /**
- * MW-D32: GETBODYPARTS, WHOLE (npcanimation.cpp:1167-1297). One record
- * sweep in LOAD ORDER over the sBodyPartMap slots, with the reference's
- * exact ladder:
- *  - BPF_NotPlayable skipped, MT_Skin only, race matched - and NO
- *    vampire filter: the sweep never had one (vampire heads live on the
- *    actor's own record path, and head/hair are not in the map at all)
- *  - a first-person HAND slot missing its .1st record falls back to
- *    third-person skins (:1232-1254): same gender fills, same gender
- *    upgrades an other-gender fallback, male fills for a female
- *  - every other slot takes parts of ITS view only (:1258)
- *  - male parts fall back for females: fill when empty, and a male
- *    .1st upgrades a 3P hand fallback (:1261-1280)
- *  - a PROPER match (right view, right gender) OVERWRITES - the LAST
- *    record in load order wins (:1286-1293), which is how an expansion
- *    overrides a base-game body
- * @returns {Map} slot -> chosen record (absent: no record for the slot)
+ * The fields of a BODY record that the resolution reads.
+ * @typedef {object} BodyPartRecord
+ * @property {string} id
+ * @property {string} slot
+ * @property {string} race Lowercase race id from FNAM.
+ * @property {boolean} female BYDT flag Female.
+ * @property {boolean} skin BYDT MeshType is Skin.
+ * @property {boolean} playable BYDT flag NotPlayable is clear.
+ * @property {boolean} firstPerson The id marks a first-person mesh.
+ */
+
+/**
+ * How a record relates to the request.
+ * - `exact`: the wanted sex and the wanted view.
+ * - `otherSex`: a male record standing in for a female actor, in the wanted view.
+ * - `otherView`: the wanted sex, third-person mesh for a first-person view.
+ * - `otherBoth`: a male third-person mesh for a female first-person view.
+ * @typedef {'exact' | 'otherSex' | 'otherView' | 'otherBoth'} MatchKind
+ */
+
+/**
+ * @typedef {object} Choice
+ * @property {BodyPartRecord} part
+ * @property {MatchKind} kind
+ * @property {number} tier Higher tiers replace lower ones; a fallback never replaces an exact match.
+ */
+
+/**
+ * Whether a record is a candidate at all, before sex and view are compared.
+ * @param {BodyPartRecord} part
+ * @param {string} race
+ */
+function isCandidate(part, race) {
+  return Boolean(part.playable && part.skin && part.race === race && SWEEP_SLOT_SET.has(part.slot));
+}
+
+/**
+ * Classify a candidate against the request, or return null when it can never be used for it.
+ * A male actor never uses female records. A female actor uses male records when no female one exists.
+ * A first-person view uses third-person meshes only on the arm slots, which are the ones drawn in view.
+ * @param {BodyPartRecord} part
+ * @param {boolean} female
+ * @param {boolean} firstPerson
+ * @returns {MatchKind | null}
+ */
+function classify(part, female, firstPerson) {
+  if (!female && part.female) return null;
+  const sameSex = part.female === female;
+  const sameView = part.firstPerson === firstPerson;
+  if (sameSex && sameView) return 'exact';
+  if (sameView) return 'otherSex';
+  if (!firstPerson || !ARM_SLOTS.has(part.slot)) return null;
+  return sameSex ? 'otherView' : 'otherBoth';
+}
+
+/**
+ * The tier of a fallback. A female first-person arm has three kinds: the female third-person mesh and the male
+ * first-person mesh rank equally (the later one of a different kind wins), and the male third-person mesh ranks below
+ * both. Every other request has at most one fallback kind in play.
+ * @param {MatchKind} kind
+ * @param {BodyPartRecord} part
+ * @param {boolean} female
+ */
+function fallbackTier(kind, part, female) {
+  if (kind === 'exact') return 3;
+  const femaleArmView = female && ARM_SLOTS.has(part.slot);
+  if (!femaleArmView) return 1;
+  return kind === 'otherBoth' ? 1 : 2;
+}
+
+/**
+ * Whether a candidate takes a slot that already holds `current`.
+ * @param {Choice | undefined} current
+ * @param {Choice} next
+ */
+function replaces(current, next) {
+  if (!current || next.kind === 'exact') return true;
+  if (next.tier !== current.tier) return next.tier > current.tier;
+  return next.tier === 2 && next.kind !== current.kind;
+}
+
+/**
+ * Choose the body part that skins each slot.
+ * @param {BodyPartRecord[] | null | undefined} parts BODY records in load order.
+ * @param {string | undefined} race Race id, any case.
+ * @param {unknown} female
+ * @param {{ firstPerson?: unknown }} [options] `firstPerson` selects the first-person meshes.
+ * @returns {Map<string, BodyPartRecord>} Slot to record, in the order the slots were first filled.
  */
 export function resolveBodyParts(parts, race, female, { firstPerson = false } = {}) {
-  const want = String(race || '').toLowerCase();
-  const isF = !!female;
-  const out = new Map();
-  for (const p of parts ?? []) {
-    if (!p.playable || !p.skin) continue;
-    if (p.race !== want) continue;
-    const slot = p.slot;
-    if (!SKIN_SWEEP_SLOTS.includes(slot)) continue;
-    const isHand = ARM_SLOT_SET.has(slot);
-    const sameGender = !!p.female === isF;
-    if (firstPerson && isHand && !p.firstPerson) {
-      const cur = out.get(slot);
-      if (!cur && sameGender) out.set(slot, p);
-      else if (cur && sameGender && !!cur.female !== isF) out.set(slot, p);
-      else if (!cur && isF) out.set(slot, p);
-      continue;
-    }
-    if (!!p.firstPerson !== !!firstPerson) continue;
-    if (isF && !p.female) {
-      const cur = out.get(slot);
-      if (!cur) out.set(slot, p);
-      else if (isHand && !cur.firstPerson && p.firstPerson) out.set(slot, p);
-      continue;
-    }
-    if (isF !== !!p.female) continue;
-    out.set(slot, p);   // proper match: LAST in load order wins
+  const wantedRace = String(race || '').toLowerCase();
+  const wantFemale = Boolean(female);
+  const wantFirstPerson = Boolean(firstPerson);
+  /** @type {Map<string, Choice>} */
+  const chosen = new Map();
+  for (const part of parts || []) {
+    if (!isCandidate(part, wantedRace)) continue;
+    const kind = classify(part, wantFemale, wantFirstPerson);
+    if (!kind) continue;
+    const next = { part, kind, tier: fallbackTier(kind, part, wantFemale) };
+    if (replaces(chosen.get(part.slot), next)) chosen.set(part.slot, next);
   }
-  return out;
+  return new Map([...chosen].map(([slot, choice]) => [slot, choice.part]));
 }

@@ -914,10 +914,8 @@ export function pickWeaponRecord(records, type, material = null, { has = null, s
  *  back to. Answers are about the PLAYER'S data, never about ours. */
 export function armReport(parts, race, female) {
   const want = String(race || '').toLowerCase();
-  // MW-D32: the PICKS come from the one reference-whole resolver
-  // (getBodyParts, npcanimation.cpp:1167-1297) - the report keeps its
-  // verdict shape for the card, but no longer carries a second, subtly
-  // different copy of the ladder.
+  // The picks come from resolveBodyParts, the one resolver; the report only
+  // adds the verdict shape the card shows.
   const fpResolved = resolveBodyParts(parts, race, female, { firstPerson: true });
   const tpResolved = resolveBodyParts(parts, race, female, { firstPerson: false });
   const rows = [];
@@ -1035,10 +1033,9 @@ export function curatedAnswersFace(pools, race, female, faceIndex, faceTable = F
 
 export function playerBodyRows(parts, race, female, { beast = false, faceIndex = 0, faceTable = FACE_TABLE, faceMatch = null, vampire = false, walk = null, has = null, ownHeads = false } = {}) {   // MWNPC14: `vampire` the race's vampire head; MWNPC17: `walk` an NPC's { head, hair }; AUDIT MW-HEADS1: `has` the archives' (facePools); MW-HEADS2: `ownHeads` a player's - the port's own heads
   const want = String(race || '').toLowerCase();
-  // MW-D32: the sweep slots resolve through getBodyParts-whole
-  // (npcanimation.cpp:1167-1297 - LAST proper match wins, male-for-
-  // female fallback fills, no vampire filter, playable filtered), and
-  // clavicle is OUT: sBodyPartMap never maps it to a slot.
+  // The sweep slots resolve through resolveBodyParts (mwBodyParts.js): the last
+  // matching record in load order wins, a male record fills a female's empty
+  // slot, there is no vampire filter, and clavicle is not a sweep slot.
   const resolved = resolveBodyParts(parts, race, female, { firstPerson: false });
   const rows = [];
   for (const slot of SKIN_SWEEP_SLOTS) {
@@ -1053,9 +1050,8 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
       counts: { all: forSlot.length },
     });
   }
-  // Head and hair are NOT in the skin sweep (sBodyPartMap has no
-  // MP_Head/MP_Hair rows): the actor's own record names them, and the
-  // player's stand-in is the chargen face law below.
+  // Head and hair are not sweep slots: the actor's own record names them,
+  // and the player's stand-in is the chargen face law below.
   //
   // MW-D33 (parallel arc): THE CURATION TABLE. Mac's report: the
   // derived head and hair do not match the portrait - the modulo walk
