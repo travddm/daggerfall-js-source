@@ -1478,7 +1478,7 @@
     "src/world/terrain/terrainGen.js": 74,
     "src/world/terrain/terrainGenWorker.js": 35,
     "src/world/terrain/terrainNature.js": 12,
-    "src/world/terrain/terrainTiles.js": 24,
+    "src/world/terrain/terrainTiles.js": 21,
     "src/world/townGates.js": 5,
     "src/world/townOutline.js": 6,
     "src/world/townStandIns.js": 18,
