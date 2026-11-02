@@ -574,7 +574,7 @@ test('SCHOOLS4 THE PASSIVES, each through its own seam: Spellsteel, Unseen Strik
   computeEntityMods(en); computeEntityMods(plainEn);
   assert.equal(skillValue(en, SKILLS.Etiquette) - skillValue(plainEn, SKILLS.Etiquette), 15);
   assert.equal(skillValue(en, SKILLS.Streetwise) - skillValue(plainEn, SKILLS.Streetwise), 15);
-  assert.equal(liveStat(en, 'personality') - liveStat(plainEn, 'personality'), 10);
+  assert.equal(liveStat(en, 'personality') - liveStat(plainEn, 'personality'), 9);
   // Foresight: one foe blow in eight, to nothing - a blow, never a fall
   reset();
   const se = pathMage('seer', 100);

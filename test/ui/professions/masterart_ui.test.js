@@ -80,7 +80,7 @@ test('MASTER-ART THE BOX at the anvil, Smithing at Master: three line pickers of
     assert.equal(picks().length, 3);
     const opts = picks()[0].querySelectorAll('option');
     assert.equal(opts.length, 1 + masterOptions(recipeById(SWORD)).length, 'a blank, then every line the sword may carry');
-    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+20 to 40% damage');
+    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+12 to 24% damage');
     assert.equal([...a.box().querySelectorAll('.prof-master-cat')].map((c) => c.textContent).join(' | '),
       'wood:heartwood 2 / 2 (Logging\'s rarest find) | gem:pearl 3 / 3 (nets hauled at sea) | essence:arcane 10 / 10 (Enchanting)');
     assert.match(a.box().textContent, /One Master's work a day\./);
@@ -132,7 +132,7 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
     resetProfPages();
   }
   assert.deepEqual(masterNeeds(() => 3).find((c) => c.key === PEARL.key), { key: PEARL.key, need: 3, have: 3, pursuit: 'sea' });
-  assert.equal(masterOptionWords({ id: 'focus' }), '-7 to 10% spell cost');
+  assert.equal(masterOptionWords({ id: 'focus' }), '-4 to 6% spell cost');
   resetMasterBoxes();
   const p1 = masterPicks('anvil', recipeById(SWORD));
   p1[0] = 'damage';

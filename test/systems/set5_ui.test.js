@@ -79,7 +79,7 @@ test('SET5 the view of a set for a wearer: which of the nine places its pieces f
   assert.equal(v.heldPiece, shield, 'the fresh Gate-Shield, the first of the lowest');
   assert.equal(v.renownNext, null, 'the Renown opens Kindled: not what holds it');
   assert.deepEqual(v.tiers.map((t) => t.awake), [true, true, false], 'four pieces: two tiers');
-  assert.equal(v.tiers[0].text, SIGIL_SETS.ruhn.tiers[0].text({ fire: 15, sear: 2 }), 'the numbers at the set\'s stage');
+  assert.equal(v.tiers[0].text, SIGIL_SETS.ruhn.tiers[0].text({ fire: 10, sear: 2 }), 'the numbers at the set\'s stage');
   const packed = piece(103, 'ruhn', 0);
   e.items.push(packed);
   assert.equal(setCardView(packed, e).worn, false, 'a piece in the pack is not one of the four');

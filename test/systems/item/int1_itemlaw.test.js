@@ -232,7 +232,7 @@ test('INT1 (its audit): a piece\'s worth is never under what it IS - its base an
   assert.equal(classicPiece({ ...dagger, enchantments: classicSlots }), true);
   assert.equal(classicPiece({ ...dagger, magic: true, enchantments: classicSlots }), false, 'DFU\'s own magic is the table\'s');
   assert.equal(classicPiece(rare), false);
-  const forged = { ...dagger, affixes: [{ id: 'damage', value: 40 }] };
+  const forged = { ...dagger, affixes: [{ id: 'damage', value: 20 }] };   // PIN MOVED: B4 rescale, 40 is past the band now and the wire would refuse the whole list; 20 is in band, so only the law refuses the piece
   const list = validLootList([dagger, forged, rare]);
   assert.equal(list.length, 2, 'the forged piece goes, the honest two stay (AUDIT INT: one cost the whole chest, "from a newer version")');
   assert.equal(validLootList([dagger, { name: 'no template' }]), null, 'a record of no shape is still a list this build cannot read');

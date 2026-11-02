@@ -181,7 +181,7 @@ export const SIGIL_SETS = Object.freeze({
     id: 'ruhn', name: "Ruhn's Regalia", prince: 'Mehrunes Dagon', colour: '#ffae45', aetheric: true,
     role: 'The Warden of the Burning Gate, worn',
     tiers: Object.freeze([
-      tier(2, 'burning-gate', 'The Burning Gate', { fire: [15, 45], sear: [2, 6] },
+      tier(2, 'burning-gate', 'The Burning Gate', { fire: [10, 30], sear: [2, 6] },
         (v) => `+${v.fire} fire resistance, and your weapon hits deal ${v.sear} extra fire damage`,
         (v) => `+${v.fire} fire resist, +${v.sear} fire a blow`),
       tier(4, 'cleave', 'Cleave', { share: [25, 60] },

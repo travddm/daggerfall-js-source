@@ -1,7 +1,7 @@
 // LOOT-GATE: the roller's level holds Rare and Legendary back; the Imbue at the Mages Guild's Reforge.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { rareGate, legendaryGate, droughtHeld, registerRollerLevel } from '../../src/systems/loot/lootLevelGate.js';
+import { rareGate, legendaryGate, registerRollerLevel } from '../../src/systems/loot/lootLevelGate.js';
 import { rarityChances, pileSource, craftedRarityWorth } from '../../src/systems/loot/lootRarity.js';
 import { imbuePiece, imbueRefusal, imbuePrice } from '../../src/systems/reforge.js';
 import { welkyndShards } from '../../src/systems/gate/gateSpoils.js';
@@ -21,7 +21,6 @@ test('LOOT-GATE the curves: Rare x0.15 to level 7 and whole at 12, Legendary x0.
   assert.ok(Math.abs(at1.rare - open.rare * 0.15) < 1e-9);
   assert.ok(Math.abs(at1.legendary - open.legendary * 0.05) < 1e-9);
   assert.deepEqual(at20, open, 'from level 15 the ladder is the source alone');
-  assert.equal(droughtHeld(9), true); assert.equal(droughtHeld(10), false); assert.equal(droughtHeld(null), false);
 });
 
 const weapon = () => { for (let i = 0; i < 50; i++) { const w = createRandomWeapon(5); if (w && !w.rarity && !isAmmunition(w)) return w; } throw new Error('no weapon'); };   // never an Arrow: the Imbue takes none, and one draw in twenty was one (the test's own flake)

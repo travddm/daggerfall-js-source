@@ -77,7 +77,7 @@ test('GEM1: a weapon holds its size\'s sockets - a short blade one, a one-handed
   // the list, in order: set in a well, unset from the middle - the gems' lines always last, in the sockets' order
   const bow = holes(weapon(130));
   const own = bow.affixes.length;
-  assert.deepEqual(LR.setGem(bow, 'flawless-ruby', 2), { id: 'elemental', param: 'fire', value: 4, gem: 'flawless-ruby' });
+  assert.deepEqual(LR.setGem(bow, 'flawless-ruby', 2), { id: 'elemental', param: 'fire', value: 3, gem: 'flawless-ruby' });
   LR.setGem(bow, 'chipped-emerald');
   assert.deepEqual(bow.sockets, ['chipped-emerald', LR.SOCKET_EMPTY, 'flawless-ruby']);
   assert.deepEqual(bow.affixes.slice(own).map((a) => a.gem), ['chipped-emerald', 'flawless-ruby'], 'the sockets\' order');
@@ -113,42 +113,42 @@ test('GEM1: a weapon holds its size\'s sockets - a short blade one, a one-handed
 
 test('GEM1 law 6: a piece\'s gems of one kind read at most one Rare line - the fold, the blow, the damage and the compare read the held sum; the card says each line\'s own number and when the cap bites; the piece\'s own lines never held', () => {
   on();
-  assert.deepEqual(['elemental', 'leech', 'damage', 'stat', 'resist'].map(LR.gemPieceCap), [6, 7, 25, 10, 35]);
+  assert.deepEqual(['elemental', 'leech', 'damage', 'stat', 'resist'].map(LR.gemPieceCap), [4, 4, 15, 6, 21]);   // PIN MOVED: B4 rescale, the Rare tops
   const blade = holes(weapon(122));
-  blade.affixes = [{ id: 'damage', value: 30 }];
+  blade.affixes = [{ id: 'damage', value: 20 }];
   LR.setGem(blade, 'perfect-ruby'); LR.setGem(blade, 'flawless-ruby'); LR.setGem(blade, 'perfect-diamond');
-  assert.deepEqual(LR.readLines(blade).map((a) => a.value), [30, 6, 0, 12], 'the second ruby has nothing left of fire\'s six');
-  assert.deepEqual(blade.affixes.map((a) => a.value), [30, 6, 4, 12], 'and the piece still carries every line as set');
-  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 6]], 'the blow (lootPowers.js)');
-  assert.equal(LR.affixWeaponDamage(blade, 100), 142, 'its own 30 whole, the diamond\'s 12');
-  assert.equal(LR.gemCapLine(blade), 'Gems: +6 Fire damage at most');
-  assert.ok(LR.rarityLines(blade).includes('Gems: +6 Fire damage at most'));
-  assert.ok(LR.rarityLines(blade).includes('Flawless Ruby: +4 Fire damage'), 'each line its own number');
-  // two kinds fill side by side; a flawed and a flawless ruby are four and two - six, whole
+  assert.deepEqual(LR.readLines(blade).map((a) => a.value), [20, 4, 0, 12], 'the perfect ruby held to fire four, the second ruby has nothing left');
+  assert.deepEqual(blade.affixes.map((a) => a.value), [20, 4, 3, 12], 'and the piece still carries every line as set');
+  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 4]], 'the blow (lootPowers.js)');
+  assert.equal(LR.affixWeaponDamage(blade, 100), 132, 'its own 20 whole, the diamond\'s 12');
+  assert.equal(LR.gemCapLine(blade), 'Gems: +4 Fire damage at most');
+  assert.ok(LR.rarityLines(blade).includes('Gems: +4 Fire damage at most'));
+  assert.ok(LR.rarityLines(blade).includes('Flawless Ruby: +3 Fire damage'), 'each line its own number');
+  // two kinds fill side by side; two flawed rubies are one and one, a sapphire two - whole
   const two = holes(weapon(126));
   two.affixes = [];
-  LR.setGem(two, 'flawless-ruby'); LR.setGem(two, 'flawed-ruby'); LR.setGem(two, 'perfect-sapphire');
-  assert.deepEqual(LR.readLines(two).map((a) => a.value), [4, 2, 6]);
+  LR.setGem(two, 'flawed-ruby'); LR.setGem(two, 'flawed-ruby'); LR.setGem(two, 'sapphire');
+  assert.deepEqual(LR.readLines(two).map((a) => a.value), [1, 1, 2]);
   assert.equal(LR.gemCapLine(two), null, 'held at nothing: no word');
-  // three diamonds: twelve, twelve and one - the damage line's Rare top
+  // three diamonds: twelve, three and none - the damage line's Rare top, fifteen
   const d = holes(weapon(126));
   d.affixes = [];
   for (let i = 0; i < 3; i++) LR.setGem(d, 'perfect-diamond');
-  assert.equal(LR.affixWeaponDamage(d, 100), 125);
-  // the stats fold held too: two perfect malachites on a worn blade, strength ten
+  assert.equal(LR.affixWeaponDamage(d, 1000), 1150);
+  // the stats fold held too: two perfect malachites on a worn blade, strength six
   const e = player();
   const m = holes(weapon(122));
   m.affixes = [];
   LR.setGem(m, 'perfect-malachite'); LR.setGem(m, 'perfect-malachite');
   e.items.push(m);
   equipItem(e, m);
-  assert.equal(LR.affixFold(e).stats.strength, 10, 'eight and two');
+  assert.equal(LR.affixFold(e).stats.strength, 6, 'the Rare top: six and none left');
   // the compare reads what the piece gives
   const worn = holes(weapon(122));
   worn.affixes = [];
   LR.setGem(worn, 'chipped-ruby');
   const rows = LR.lineComparison({ equip: { slots: [] }, items: [] }, blade, [worn]).rows;
-  assert.ok(rows.some((r) => r.text === '+6 Fire damage' && r.delta === 5), JSON.stringify(rows));
+  assert.ok(rows.some((r) => r.text === '+4 Fire damage' && r.delta === 3), JSON.stringify(rows));
   off();
 });
 test('GEM1 the weapons\' own pass: a Magic weapon a socket 120 in a thousand and never two, a Rare\'s first 250 and each more 300, a Legendary\'s 400 and 450, never past its size; after every draw the door made (the late finds\' too), a body\'s kit too; off nothing', () => {
@@ -252,14 +252,14 @@ test('GEM2 the graded gems: thirty-two rows of the port\'s own at 1900-1931, eac
   assert.ok(isStackable(a) && stacksWith(a, b), 'a row stacks with its own');
   assert.ok(!stacksWith(a, plain) && !stacksWith(a, G.mintGem('perfect-ruby')), 'never a Ruby of another grade');
   assert.deepEqual(JSON.parse(JSON.stringify(LR.GEM_GRADE_LINES)), {
-    ruby: { weapon: { id: 'elemental', param: 'fire', values: [1, 2, 3, 4, 6] }, other: { id: 'resist', param: 'fire', values: [4, 7, 10, 15, 20] } },
-    emerald: { weapon: { id: 'leech', param: null, values: [1, 2, 3, 5, 7] }, other: { id: 'resist', param: 'poison', values: [4, 7, 10, 15, 20] } },
-    sapphire: { weapon: { id: 'elemental', param: 'frost', values: [1, 2, 3, 4, 6] }, other: { id: 'resist', param: 'frost', values: [4, 7, 10, 15, 20] } },
+    ruby: { weapon: { id: 'elemental', param: 'fire', values: [1, 1, 2, 3, 4] }, other: { id: 'resist', param: 'fire', values: [4, 7, 10, 15, 20] } },
+    emerald: { weapon: { id: 'leech', param: null, values: [1, 1, 2, 3, 4] }, other: { id: 'resist', param: 'poison', values: [4, 7, 10, 15, 20] } },
+    sapphire: { weapon: { id: 'elemental', param: 'frost', values: [1, 1, 2, 3, 4] }, other: { id: 'resist', param: 'frost', values: [4, 7, 10, 15, 20] } },
     diamond: { weapon: { id: 'damage', param: null, values: [2, 4, 6, 9, 12] }, other: { id: 'resist', param: 'magic', values: [4, 7, 10, 15, 20] } },
-    jade: { weapon: { id: 'stat', param: 'willpower', values: [1, 2, 4, 6, 8] }, other: { id: 'stat', param: 'willpower', values: [1, 2, 4, 6, 8] } },
-    turquoise: { weapon: { id: 'stat', param: 'agility', values: [1, 2, 4, 6, 8] }, other: { id: 'stat', param: 'personality', values: [1, 2, 4, 6, 8] } },
-    malachite: { weapon: { id: 'stat', param: 'strength', values: [1, 2, 4, 6, 8] }, other: { id: 'stat', param: 'endurance', values: [1, 2, 4, 6, 8] } },
-    amber: { weapon: { id: 'stat', param: 'speed', values: [1, 2, 4, 6, 8] }, other: { id: 'stat', param: 'luck', values: [1, 2, 3, 4, 6] } },
+    jade: { weapon: { id: 'stat', param: 'willpower', values: [1, 1, 2, 4, 6] }, other: { id: 'stat', param: 'willpower', values: [1, 1, 2, 4, 6] } },
+    turquoise: { weapon: { id: 'stat', param: 'agility', values: [1, 1, 2, 4, 6] }, other: { id: 'stat', param: 'personality', values: [1, 1, 2, 4, 6] } },
+    malachite: { weapon: { id: 'stat', param: 'strength', values: [1, 1, 2, 4, 6] }, other: { id: 'stat', param: 'endurance', values: [1, 1, 2, 4, 6] } },
+    amber: { weapon: { id: 'stat', param: 'speed', values: [1, 1, 2, 4, 6] }, other: { id: 'stat', param: 'luck', values: [1, 2, 3, 4, 6] } },
   });
   for (const kind of LR.GEM_IDS) {
     assert.deepEqual(LR.gemLine(weapon(120), kind), { ...LR.GEM_LINES[kind].weapon, gem: kind }, `${kind}: the plain grade is LOOT20's`);
@@ -389,7 +389,7 @@ test('GEM3 the wells, the chooser and the pips - and in the pack: an empty well 
     const ws = kids(wells, 'sock-well');
     assert.deepEqual(ws.map((w) => [w.className, w.dataset.socket, w.dataset.gem ?? null, w.dataset.gemGrade ?? null]), [
       ['sock-well empty press', '0', null, null], ['sock-well set press', '1', 'perfect-ruby', 'perfect'], ['sock-well empty press', '2', null, null]]);
-    assert.equal(ws[1].getAttribute('title'), 'Perfect Ruby: +6 Fire damage. Click again to shatter it');
+    assert.equal(ws[1].getAttribute('title'), 'Perfect Ruby: +4 Fire damage. Click again to shatter it');
     assert.equal(ws[0].getAttribute('title'), 'Empty socket');
     assert.ok('asking' in ws[1].dataset && 'open' in ws[0].dataset && !('open' in ws[2].dataset));
     ws[2].onclick({ stopPropagation() {} });
@@ -401,7 +401,7 @@ test('GEM3 the wells, the chooser and the pips - and in the pack: an empty well 
     const picks = [];
     const ch = socketChooser(bow, [{ id: 'ruby', count: 2 }, { id: 'flawless-diamond', count: 1 }], (id) => picks.push(id));
     const bs = kids(ch, 'sock-pick');
-    assert.deepEqual(bs.map((b) => textOf(b)), ['Ruby (2)+3 Fire damage', 'Flawless Diamond+9% damage']);
+    assert.deepEqual(bs.map((b) => textOf(b)), ['Ruby (2)+2 Fire damage', 'Flawless Diamond+9% damage']);
     bs[1].onclick({ stopPropagation() {} });
     assert.deepEqual(picks, ['flawless-diamond']);
     assert.ok(socketChooser(bow, [], () => {}).className.includes('sock-none'));

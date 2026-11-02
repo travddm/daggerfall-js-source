@@ -153,8 +153,44 @@ level 45 attributes. The maxed character (`+ceiling`) rises with it:
 
 Even with no blow bonus at all, a Speed-100 warrior at level 45 is roughly 1.6 (estimated from the dps and survival
 ratios) against DFU's level-31 character, so the swing law alone puts the maxed melee builds over 1.5. The remaining
-distance is the gear and the Firmament tree (B4, B5). `test/tooling/playerPowerBudget.test.js` holds the new bounds;
+distance is the gear (B4) and the Firmament tree (B5). `test/tooling/playerPowerBudget.test.js` holds the new bounds;
 they are higher than B1's for the swinging builds.
+
+## Loot and economy (B4)
+
+B4 tamed the loot affixes toward Daggerfall's enchantment strength and put the economy near DFU's. Each departure from
+DFU that stays is named here.
+
+- **Affix bands** (`AFFIX_RANGES`, the Legendary records and the Gilded and Regalia lines): about 0.6 of the first
+  ladder for damage, armor, stat, resist, skill, and about 0.6 for the lines that act (elemental, leech, thorns, focus,
+  slayer, casting speed, potency, wellspring). Legendary stays at least 1.4 times Rare in the middle of its band. The
+  numbers are rescaled at the source: nothing new is cut by a cap, and a card prints what applies. The carrying-capacity
+  line (DFU's 25% and 50% allowance), the techniques and the survival lines are unchanged. The Legendary powers were
+  rescaled in B1 and are unchanged.
+- **Drought and foe cap**: the bad-luck drought is removed. The three-piece cap on a plain foe's body is removed; the
+  plain ladder, the kit roll and the bare summon stay. The level gate stays.
+- **Kill gold** (`kill-gold.ts`): the table's range times `1 + 1.5 ln(level)`: 1 at level 1, 4.5 at 10, 5.5 at 20,
+  6.7 at 45. DFU multiplies by the level (45 at level 45); Unleveled Loot made it flat.
+- **Healing potions**: a looting foe carries one 0.35 times in 100 and a deep pile 0.45 (DFU's random potion gives
+  about 0.15 and 0.2), at most 2.8 times DFU at the highest Renown online. The alchemist's shelf is unchanged.
+- **Repair cost, the Daedric sale and the soul value**: repair costs DFU's price (it was a third); a counter pays
+  Daedric gear its whole value; the general-spawn Dragonling binds at DFU's 0 (it had been -5000, a gift of budget).
+
+Character power, ARENA2 attributes, DFU's own foe row, before -> after (typical gear):
+
+| Build | L1 | L10 | L20 | L30 | L45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 0.87 -> 0.87 | 0.69 -> 0.66 | 0.96 -> 0.94 | 0.97 -> 0.93 | 1.47 -> 1.36 |
+| Thief | 1.14 -> 1.14 | 0.95 -> 0.94 | 1.04 -> 1.03 | 1.11 -> 1.08 | 1.32 -> 1.26 |
+| Mage | 0.88 -> 0.88 | 0.88 -> 0.88 | 0.94 -> 0.93 | 1.17 -> 1.17 | 1.52 -> 1.52 |
+| Spellsword | 0.91 -> 0.91 | 0.86 -> 0.83 | 1.06 -> 1.05 | 1.22 -> 1.21 | 1.52 -> 1.48 |
+| Archer | 0.99 -> 0.99 | 0.95 -> 0.93 | 1.11 -> 1.09 | 1.23 -> 1.18 | 1.40 -> 1.31 |
+
+Maxed (`+ceiling`), level 45: warrior 2.16 -> 2.00, thief 2.01 -> 1.92, spellsword 1.96 -> 1.90, mage 1.93 -> 1.92,
+archer 2.06 -> 1.92. Loot lowers a maxed melee or archer build by 0.05 to 0.16 and a mage by almost nothing: the
+rest of the excess is the swing law, the other registries' tops (the Firmament tree, the sets, mastery) and the online
+health floor, which B5 takes. `MAXED_POWER_MOST` in `test/tooling/playerPowerBudget.test.js` is 2.08 / 2.13 / 2.00 /
+1.96 / 2.20 (no ARENA2), down from B3's 2.25 / 2.31 / 2.17 / 2.02 / 2.36.
 
 ## Not modelled
 

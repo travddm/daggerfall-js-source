@@ -58,7 +58,7 @@ test('LOOT12: the rolled lines count to 45 an element - two Rares at +25 are 45 
   } finally { on(); }
 });
 
-test('LOOT12: every Legendary record\'s own resistance line is whole on its own; an Exalted line at the band\'s top is held to the cap', () => {
+test('LOOT12: every Legendary record\'s own resistance line is whole on its own; an Exalted line at the band\'s top is whole, under the cap', () => {
   on();
   let seen = 0;
   for (const rec of LR.LEGENDARIES) {
@@ -77,10 +77,11 @@ test('LOOT12: every Legendary record\'s own resistance line is whole on its own;
     }
   }
   assert.ok(seen >= 8, `every record with a resistance line read (${seen})`);
-  // an Exalted Legendary's extra line is the top half of the Legendary band (35-50): at 50 alone it is held to 45
-  const ex = jewel(133, 'legendary', [{ id: 'stat', param: 'willpower', value: 12 }, fire(50)]);
+  // PIN MOVED: B4 rescale. An Exalted Legendary's extra line is the top half of the Legendary band (21-30): at 30 alone it
+  // is whole, under the cap (one line can no longer reach 45; the cap now binds across pieces only, as the first test pins)
+  const ex = jewel(133, 'legendary', [{ id: 'stat', param: 'willpower', value: 9 }, fire(30)]);
   ex.exalted = true;
-  assert.equal(entityResistMod(wear(entityOf(), ex), ['fire']), 45);
+  assert.equal(entityResistMod(wear(entityOf(), ex), ['fire']), 30);
 });
 
 test('LOOT12: through the real saving throw - two Rares at +25 no longer turn every cast away (three in four whole, the rest land), and a spell\'s own resistance is untouched', () => {

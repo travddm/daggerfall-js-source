@@ -34,7 +34,12 @@
 // was 8 to 12), its Restore Power 1 to 3 (3 to 9); a deep pile's healing potion 6 to 10 (15 to 21), its Restore Power 2
 // to 6 (5 to 15). DFU's own random potion (3 a foe, 4 a pile) and the counter's shelf are untouched.
 //
-// A departure (Ledger A, POTION-COMMON; POT-THIN its numbers).
+// B4 (tame loot and economy): DFU's own random potion makes a Potion of Healing in about 0.15 foes in 100 and 0.2 piles
+// in 100 (3% and 4% of a potion, a twentieth of them healing). The extras above were 27 and 40 times that. They are
+// 0.35 and 0.45 now (2.3 and 2.25 times DFU's) and top out at 2.8 and 2.75 times at Renown 40 online, so the drop stays
+// a windfall and the alchemist's shelf is the supply. The Restore Power potion, which DFU also rolls inside its random potion, is halved to 1 and 2.
+//
+// A departure (Ledger A, POTION-COMMON; POT-THIN and B4 its numbers).
 import { createPotion, registerTabledLootHandler, registerEnemyLootExtra, CLASSIC_RECIPE_KEYS } from './loot/loot.js';
 import { BUILDING_TYPES } from '../world/buildingNames.js';
 import { renownLootQuarters, lootEased } from './renownLoot.js';   // RENOWN-LOOT: the chances by the roller's Renown
@@ -43,21 +48,21 @@ import { renownLootQuarters, lootEased } from './renownLoot.js';   // RENOWN-LOO
  *  ONE EXPORT (AUDIT ECON: the key was a second literal of loot.js's). */
 export const HEALING_RECIPE_KEY = CLASSIC_RECIPE_KEYS[2];
 /** A looting foe's chance in 100 of carrying one (POT-THIN: 10 until 2026-10-21). */
-export const HEALING_ENEMY_CHANCE = 4;
+export const HEALING_ENEMY_CHANCE = 0.35;
 /** A J-O pile's chance in 100 of holding one (POT-THIN: 18). */
-export const HEALING_PILE_CHANCE = 8;
+export const HEALING_PILE_CHANCE = 0.45;
 /** MAGICKA-COMMON: PotionRecipe "restorePower" (Heal Spell Points) - classicRecipeKeys[4]. */
 export const MAGICKA_RECIPE_KEY = CLASSIC_RECIPE_KEYS[4];
 /** MAGICKA-COMMON: a looting foe's chance in 100 of carrying a Potion of Restore Power (POT-THIN: 6). */
-export const MAGICKA_ENEMY_CHANCE = 2;
+export const MAGICKA_ENEMY_CHANCE = 1;
 /** MAGICKA-COMMON: a J-O pile's chance in 100 of holding one (POT-THIN: 10). */
-export const MAGICKA_PILE_CHANCE = 4;
+export const MAGICKA_PILE_CHANCE = 2;
 /** Where RENOWN-LOOT's step starts: a foe's healing potion 2 in 100 and a pile's 4; no Restore Power of their own at
  *  all. POT-THIN: the live game's before LOOT-EASE had been 6 and 12, and the step began there - "BEFORE" names the
  *  step's start now, an invented one below the live game's (AUDIT CRAFT-WRITS E5: the names kept, so every pin and
  *  record reads them as they stood). Offline takes LOOT-EASE's buff whole - this file's 4 and 2 - so it is cut as well. */
-export const HEALING_ENEMY_CHANCE_BEFORE = 2;
-export const HEALING_PILE_CHANCE_BEFORE = 4;
+export const HEALING_ENEMY_CHANCE_BEFORE = 0.2;
+export const HEALING_PILE_CHANCE_BEFORE = 0.25;
 /** RENOWN-LOOT: the four chances at `quarters` of LOOT-EASE's buff (systems/renownLoot.js) - the ones above offline and
  *  at Renown 20. */
 export function healingSupplyChances(quarters = renownLootQuarters()) {

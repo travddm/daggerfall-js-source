@@ -72,7 +72,7 @@ export const PATH_NUMBERS = Object.freeze({
   conflux: Object.freeze({ pct: 3, stacks: 5, seconds: 10 }),
   foresight: Object.freeze({ oneIn: 8 }),
   dawnsWard: Object.freeze({ pct: 4 }),
-  glamour: Object.freeze({ personality: 10, etiquette: 15, streetwise: 15 }),
+  glamour: Object.freeze({ personality: 9, etiquette: 15, streetwise: 15 }),
   deathsDue: Object.freeze({ health: 5, magicka: 5 }),
   soulWell: Object.freeze({ magicka: 10, trapped: 20 }),
   absolution: Object.freeze({ below: 0.3, heal: 25, recover: 180 }),

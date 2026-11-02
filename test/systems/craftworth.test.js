@@ -65,7 +65,7 @@ test('AUDIT CRAFT-WORTH a FOUND piece tempered keeps its patron worth (a temper 
   for (const k of ['provenance', 'quality', 'recipe']) delete found[k];
   applyRarity(found, 'rare', () => 0.5);
   const before = patronWorth(found, itemWorth);
-  assert.ok(before > 1000, `a found Rare's patron worth (${before})`);
+  assert.ok(before > 500, `a found Rare's patron worth (${before})`);   // PIN MOVED: B4 rescale, the lines are worth less (903 here, was over 1000)
   assert.equal(temperItem(found, { quality: 2 }), true, 'tempered to Fine, by the real producer');
   assert.equal(found.quality, 2);
   assert.deepEqual(itemFindings(found), [], 'a lawful piece');

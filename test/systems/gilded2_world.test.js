@@ -52,7 +52,7 @@ const lines = (r) => r.affixes.map((a) => [a.id, a.param ?? null, a.value]);
 
 // ── the records ───────────────────────────────────────────────────────
 
-test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +40% damage, +15 Strength, +30 Long Blade, +15 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +40% damage, +15 Agility, +30 Long Blade, 10% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
+test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +24% damage, +9 Strength, +18 Long Blade, +9 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +24% damage, +9 Agility, +18 Long Blade, 6% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
   assert.deepEqual(GILDED_RECORDS, [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]);
   assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-dragonfire-oath', 'the-sunken-sovereign']);
   assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 2, 'two ids');
@@ -70,9 +70,10 @@ test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +4
     assert.ok(r.lore && r.hint, 'its lore and its own hint');
   }
   assert.deepEqual([DRAGONFIRE_OATH.name, DRAGONFIRE_OATH.templateIndex, DRAGONFIRE_OATH.material], ['The Dragonfire Oath', WEAPONS.Dai_Katana, WEAPON_MATERIALS.Daedric]);
-  assert.deepEqual(lines(DRAGONFIRE_OATH), [['damage', null, 40], ['stat', 'strength', 15], ['skill', SKILLS.LongBlade, 30], ['stat', 'endurance', 15]]);
+  // PIN MOVED (B4 rescale): the Legendary band's tops, damage 24, stat 9, skill 18, leech 6 (were 40, 15, 30, 10).
+  assert.deepEqual(lines(DRAGONFIRE_OATH), [['damage', null, 24], ['stat', 'strength', 9], ['skill', SKILLS.LongBlade, 18], ['stat', 'endurance', 9]]);
   assert.deepEqual([SUNKEN_SOVEREIGN.name, SUNKEN_SOVEREIGN.templateIndex, SUNKEN_SOVEREIGN.material], ['The Sunken Sovereign', WEAPONS.Saber, WEAPON_MATERIALS.Ebony]);
-  assert.deepEqual(lines(SUNKEN_SOVEREIGN), [['damage', null, 40], ['stat', 'agility', 15], ['skill', SKILLS.LongBlade, 30], ['leech', null, 10]]);
+  assert.deepEqual(lines(SUNKEN_SOVEREIGN), [['damage', null, 24], ['stat', 'agility', 9], ['skill', SKILLS.LongBlade, 18], ['leech', null, 6]]);
   assert.equal(DRAGONFIRE_OATH.power, DRAGONFIRE);
   assert.deepEqual({ kind: DRAGONFIRE.kind, group: DRAGONFIRE.group, share: DRAGONFIRE.share, metres: DRAGONFIRE.metres }, { kind: 'dragonfire', group: 'daedra', share: 33, metres: 3 });
   assert.equal(SUNKEN_SOVEREIGN.power, UNDERTOW);

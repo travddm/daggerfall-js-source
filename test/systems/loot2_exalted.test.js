@@ -64,11 +64,11 @@ test('LOOT2: Perfect - a Rare whose every line is at its band\'s top, once it is
   const m = top(LR.applyRarity(sword(), 'magic', lcg(7)));
   assert.equal(LR.isPerfect(m), false, 'a Magic is never Perfect');
   assert.equal(LR.tierLabel(m), 'Magic');
-  // how rare: over 20,000 seeded Rares, a few at most
+  // how rare: over 20,000 seeded Rares, a few at most. PIN MOVED: B4 rescale narrowed the bands, so Perfect is about one Rare in 400 (50 of 20,000 here) where it was under 1 in 500; the ceiling is 100
   const rolls = lcg(99);
   let n = 0;
   for (let i = 0; i < 20000; i++) { const it = LR.applyRarity(sword(), 'rare', rolls); if (LR.isPerfect(it)) n++; }
-  assert.ok(n < 40, `one Rare in a few thousand or rarer (${n} of 20,000)`);
+  assert.ok(n < 100, `one Rare in a few hundred or rarer (${n} of 20,000)`);
 });
 
 test('LOOT2: exalting a Legendary - one line more, a kind its record does not carry, the top half of the band, once', () => {

@@ -71,10 +71,10 @@ test('BAL7 THE LEECH: a weapon\'s lines and gems summed, at most 10% of the blow
   assert.equal(LP.LEECH_CAP, 10);
   const me = player();
   me.maxHealth = 1000; me.health = 100;
-  const w = sword([{ id: 'leech', value: 10 }, { id: 'leech', value: 7, gem: 'perfect-emerald' }]);
-  assert.deepEqual(LP.linesOf(w, 'leech').map((a) => a.value), [10, 7], 'both lines are read, the gem at its own piece cap');
+  const w = sword([{ id: 'leech', value: 6 }, { id: 'leech', value: 4, gem: 'perfect-emerald' }]);   // PIN MOVED: B4 rescale, an Exalted line tops at 6 and a gem's piece cap is the Rare 4: 10 is now the most one weapon reads, so the cap meets it and no longer clips
+  assert.deepEqual(LP.linesOf(w, 'leech').map((a) => a.value), [6, 4], 'both lines are read, the gem at its own piece cap');
   LP.lootStrike(me, { careerIndex: 7, career: {}, health: 50, maxHealth: 50 }, 100, w);
-  assert.equal(me.health, 110, 'ten of a hundred, not seventeen');
+  assert.equal(me.health, 110, 'ten of a hundred (the most one weapon can read now)');
   const under = sword([{ id: 'leech', value: 5 }]);
   LP.lootStrike(me, { careerIndex: 7, career: {}, health: 50, maxHealth: 50 }, 100, under);
   assert.equal(me.health, 115, 'a line under the cap heals its own share');

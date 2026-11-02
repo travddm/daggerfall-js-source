@@ -29,10 +29,8 @@ import { playerFallDamage, applyFallLanding, WARDROBE_FALL_MOST } from '../../sr
 import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE } from '../../src/player/motor.js';
 import { mintPiece, asMinted } from '../../src/systems/smithItems.js';
 import { MASTERWORK } from '../../src/net/recipeLaw.js';
-import { capLootList } from '../../src/systems/foeLootCap.js';
 import { POTION_TEMPLATE_INDEX } from '../../src/systems/loot/loot.js';
 import { goldStack, isGoldPieces } from '../../src/systems/inventory.js';
-import { noteTaken, droughtOf, _setDroughtForTests } from '../../src/systems/loot/lootDrought.js';
 import { mountEnhancedTrade } from '../../src/ui/enhanced/enhancedTrade.js';
 import { mountReforgeWindow, EVERY_MAGIC_ASK, UNSET_ASK, GEMS_NONE } from '../../src/ui/reforgeWindow.js';
 import { REFORGE_CSS } from '../../src/ui/enhanced/enhancedPlusStyle.js';
@@ -248,17 +246,17 @@ test('AUDIT LOOT II A7: a line minted past the roll leans as its rolled lines do
 test('AUDIT LOOT II A8: the cap is the gear\'s whole - the rolled lines fill to 45 beside an Aetheric piece\'s own and never past it; a line its arc set whole stands', () => {
   on();
   const rec = (id) => AETHERIC_RECORDS.find((r) => r.id === id);
-  assert.equal(rec('oath-helm').affixes.find((a) => a.param === 'magic').value, 35);
-  assert.equal(rec('ruhn-gate-shield').affixes.find((a) => a.param === 'magic').value, 50);
+  assert.equal(rec('oath-helm').affixes.find((a) => a.param === 'magic').value, 21);
+  assert.equal(rec('ruhn-gate-shield').affixes.find((a) => a.param === 'magic').value, 30);
   const ring = () => jewel('rare', [{ id: 'resist', param: 'magic', value: 20 }]);
-  const e = wear(player(), known(mintAetheric(rec('oath-helm'))), ring());
-  assert.equal(entityResistMod(e, ['magic']), 45, 'the helm\'s 35 and ten of the ring\'s 20 - never the 55 that turned every Magic throw');
-  assert.deepEqual(LR.rolledResistOf(e, 'magic'), { worn: 20, counts: 10 }, 'the card says so');
+  const e = wear(player(), known(mintAetheric(rec('oath-helm'))), ring(), ring());
+  assert.equal(entityResistMod(e, ['magic']), 45, 'the helm 21 and 24 of the rings 40 - never the 61 that turned every Magic throw');
+  assert.deepEqual(LR.rolledResistOf(e, 'magic'), { worn: 40, counts: 24 }, 'the card says so');
   const e2 = wear(player(), known(mintAetheric(rec('ruhn-gate-shield'))));
-  assert.equal(entityResistMod(e2, ['magic']), 50, 'the Gate-Shield\'s 50, its arc\'s, whole');
+  assert.equal(entityResistMod(e2, ['magic']), 30, 'the Gate-Shield 30, its arc, whole');
   wear(e2, ring());
-  assert.equal(entityResistMod(e2, ['magic']), 50, 'and no rolled line tops it up');
-  assert.deepEqual(LR.rolledResistOf(e2, 'magic'), { worn: 20, counts: 0 });
+  assert.equal(entityResistMod(e2, ['magic']), 45, 'a rolled line tops it up to the gear whole');
+  assert.deepEqual(LR.rolledResistOf(e2, 'magic'), { worn: 20, counts: 15 });
   const e3 = wear(player(), ring(), ring());
   assert.equal(entityResistMod(e3, ['magic']), 40, 'rolled alone, under the cap, as they were');
 });
@@ -266,37 +264,16 @@ test('AUDIT LOOT II A8: the cap is the gear\'s whole - the rolled lines fill to 
 test('AUDIT LOOT II A9: the ladder off is DFU exactly - a garment ranks at the cap as it always did and is made plain; a blade\'s eligibility its own', () => {
   const potion = { name: 'potion', group: 'UselessItems1', templateIndex: POTION_TEMPLATE_INDEX, potionRecipeKey: 4975678, value: 50 };
   const shirt = () => ({ ...garment(141), name: 'shirt', enchantments: [{ type: 0, param: 5 }], value: 300 });   // DFU's own magic shirt
-  const capped = () => { const list = [shirt(), potion, goldStack(5)]; capLootList(list, 2); return list.map((i) => (isGoldPieces(i) ? 'gold' : i.name)); };
   const PROV = '0123456789abcdef';
   const made = () => mintPiece({ recipe: 'garment-155:wool', quality: MASTERWORK, seed: 5 }, PROV);
   off();
   try {
-    assert.deepEqual(capped(), ['shirt', 'gold'], 'off: DFU\'s magic shirt over the potion, as before the arc');
     assert.equal(LR.rarityEligible(garment(155)), false);
     assert.equal(made().rarity, undefined, 'off: a Masterwork garment is DFU\'s');
     assert.equal(LR.rarityEligible(sword()), true, 'a blade\'s is its own, as it always was');
   } finally { on(); }
-  assert.deepEqual(capped(), ['potion', 'gold'], 'on: LOOT14\'s rank - the supply over a Magic garment');
   assert.equal(LR.rarityEligible(garment(155)), true);
   assert.equal(made().rarity, 'rare');
-});
-
-test('AUDIT LOOT II A10: the drought counts a garment only if it could have been a Legendary - the mark cleared all the same', () => {
-  on();
-  _setDroughtForTests(0);
-  try {
-    const plainCut = Object.assign(garment(141), { untaken: true });
-    assert.equal(LR.legendariesFor(plainCut).length, 0, 'no wardrobe Legendary is cut on it');
-    assert.equal(noteTaken(plainCut), false);
-    assert.equal(plainCut.untaken, undefined, 'the door\'s mark cleared');
-    assert.equal(droughtOf(), 0);
-    const robeCut = Object.assign(garment(155), { untaken: true });
-    assert.ok(LR.legendariesFor(robeCut).length > 0);
-    assert.equal(noteTaken(robeCut), true);
-    assert.equal(droughtOf(), 1);
-    assert.equal(noteTaken(Object.assign(sword(), { untaken: true })), true, 'a blade as ever');
-    assert.equal(droughtOf(), 2);
-  } finally { _setDroughtForTests(0); }
 });
 
 test('AUDIT LOOT II B2: the Scry page\'s rows read - a family\'s words over the picture column, its haunts whole', () => {

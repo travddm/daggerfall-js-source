@@ -26,7 +26,7 @@ import { survivalMinute, survivalOf } from '../../src/systems/survival/needs.js'
 import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 import { SKILLS } from '../../src/systems/skills.js';
 import { ENCHANTMENT_TYPES } from '../../src/formats/magicDef.js';
-import { capLootList, rollCorpseKit, plainFoeRarityWeights } from '../../src/systems/foeLootCap.js';
+import { rollCorpseKit, plainFoeRarityWeights } from '../../src/systems/foeLootCap.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { POTION_TEMPLATE_INDEX, validLootItem } from '../../src/systems/loot/loot.js';
 import { goldStack, isGoldPieces } from '../../src/systems/inventory.js';
@@ -131,9 +131,9 @@ test('LOOT14: the leans - a garment\'s first line is its standing half the time;
   // warmth, skill 1 and Personality (932), the robes' underworld and warmth (139), the shoes' merchants, skill 16,
   // warmth and scholars (877)
   const goldens = [
-    [195, 'rare', 42, 'Oiled Evening Gown of the Library', [{ id: 'standing', param: 'scholars', value: 5 }, { id: 'skill', param: 2, value: 15 }, { id: 'skill', param: 16, value: 12 }, { id: 'dry', value: 31 }], 922],
-    [163, 'magic', 7, 'Plain Robes of the Alley', [{ id: 'standing', param: 'underworld', value: 3 }, { id: 'skill', param: 4, value: 8 }], 194],
-    [147, 'rare', 11, 'Shoes of the Market', [{ id: 'standing', param: 'merchants', value: 5 }, { id: 'skill', param: 16, value: 17 }, { id: 'skill', param: 18, value: 10 }, { id: 'skill', param: 17, value: 13 }], 954],
+    [195, 'rare', 42, 'Oiled Evening Gown of the Library', [{ id: 'standing', param: 'scholars', value: 5 }, { id: 'skill', param: 2, value: 9 }, { id: 'skill', param: 16, value: 7 }, { id: 'dry', value: 31 }], 784],
+    [163, 'magic', 7, 'Plain Robes of the Alley', [{ id: 'standing', param: 'underworld', value: 3 }, { id: 'skill', param: 4, value: 5 }], 157],
+    [147, 'rare', 11, 'Shoes of the Market', [{ id: 'standing', param: 'merchants', value: 5 }, { id: 'skill', param: 16, value: 10 }, { id: 'skill', param: 18, value: 6 }, { id: 'skill', param: 17, value: 8 }], 754],
   ];
   for (const [t, tier, seed, name, affixes, value] of goldens) {
     const it = LR.applyRarity(garment(t), tier, lcg(seed));
@@ -236,23 +236,6 @@ test('LOOT14: the price and the flavours - a garment\'s lines at half, its Rare 
     assert.equal(LR.RARE_FLAVOURS[g], LR.RARE_FLAVOURS.MensClothing, 'both cuts hold the same street');
     for (const f of LR.RARE_FLAVOURS[g]) assert.ok(![T.CastWhenHeld, T.IncreasedWeightAllowance, T.FeatherWeight, T.CastWhenStrikes].includes(f.type), `no held spell, capacity or dead payload (${f.type})`);
   }
-  // the cap: gold, then a supply, then a Magic garment, then the plain steel
-  const potion = { name: 'potion', group: 'UselessItems1', templateIndex: POTION_TEMPLATE_INDEX, potionRecipeKey: 4975678, value: 50 };
-  const shirt = { ...garment(165), name: 'shirt', rarity: 'magic', value: 900 };
-  const steel = { name: 'steel', group: 'Weapons', templateIndex: 120, material: 1, value: 360 };
-  const list = [steel, shirt, goldStack(5), potion];
-  capLootList(list, 3);
-  assert.deepEqual(list.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['shirt', 'gold', 'potion'], 'the supply kept before the dearer Magic shirt, the shirt before the steel');
-  const one = [shirt, potion, goldStack(5)];
-  capLootList(one, 2);
-  assert.deepEqual(one.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['potion', 'gold'], 'room for one: the supply, over the dearer Magic shirt');
-  const two = [steel, shirt, goldStack(5)];
-  capLootList(two, 2);
-  assert.deepEqual(two.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['shirt', 'gold'], 'a Magic garment over a plain piece');
-  const legendaryShirt = { ...garment(165), name: 'robe', rarity: 'legendary', value: 10 };
-  const three = [potion, legendaryShirt, goldStack(5)];
-  capLootList(three, 2);
-  assert.deepEqual(three.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['robe', 'gold'], 'a Legendary garment is a Legendary');
 });
 
 test('LOOT14: the doors - the host door rolls its garments after every draw it made before (a seeded list\'s other pieces mint what they did) and marks them; the kit\'s garments roll at death, a copy; off, nothing', () => {

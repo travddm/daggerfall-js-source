@@ -56,11 +56,11 @@ test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted
   assert.ok(isEnchanted(plate) && plate.foundCondition === 15564 && plate.currentCondition === 15564);
   online(() => {
     assert.equal(quote('SellMagic', plate), quote('Sell', plate), 'fenced as it sells');
-    assert.equal(quote('SellMagic', plate), 11175);
-    assert.equal(quote('SellMagic', { ...plate, foundCondition: undefined }), 23776, 'unmarked: DFU\'s whole fence');   // PIN MOVED (DAEDRIC-SALE): 47,553
+    assert.equal(quote('SellMagic', plate), 22350);
+    assert.equal(quote('SellMagic', { ...plate, foundCondition: undefined }), 47553, 'unmarked: DFU\'s whole fence');   // PIN MOVED (B4: the Daedric sale rule is gone)
   });
   assert.equal(quote('SellMagic', plate), quote('SellMagic', { ...plate, foundCondition: undefined }), 'offline: the mark unread');
-  assert.equal(quote('SellMagic', plate), 67200, 'offline: DFU\'s whole fence, its haggle uncapped');   // PIN MOVED (DAEDRIC-SALE): 134,400
+  assert.equal(quote('SellMagic', plate), 134400, 'offline: DFU\'s whole fence, its haggle uncapped');   // PIN MOVED (B4: the Daedric sale rule is gone)
 });
 
 test('AUDIT MEND-THIRD L3-2: a foe\'s worn kit is marked as it is worn - PLAIN-LOOT\'s rejects, and PARTY-LOOT\'s personal bonus cloned from them, hand nothing over worn and unmarked over 1,600 class bodies (it was 133 rejects and 43 bonus pieces of 3,200; mutant: the kit\'s mark dropped)', () => {

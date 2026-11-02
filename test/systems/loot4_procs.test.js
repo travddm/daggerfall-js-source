@@ -73,7 +73,7 @@ test('LOOT4: the kinds - five that do things, banded, worded, valid; never in th
   assert.equal(LR.validAffix({ id: 'slayer', param: 'dragon', value: 4 }), false, 'a kind of foe it does not know');
   assert.equal(LR.validAffix({ id: 'leech', param: 'fire', value: 3 }), false, 'a param a kind without one');
   assert.equal(LR.affixLabel({ id: 'elemental', param: 'fire', value: 5 }), '+5 Fire damage');
-  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 4 }), '+4% damage vs the undead');
+  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 2 }), '+2% damage vs the undead');   // PIN MOVED: B4 rescale, a slayer line tops at 3
   assert.equal(LR.affixLabel({ id: 'leech', value: 5 }), '5% life leech on this weapon\'s own blows');   // PIN MOVED: FIELD BUGS 2026-10-14 LEECH-HAND
   assert.equal(LR.affixLabel({ id: 'thorns', value: 4 }), '4 thorns');
   assert.equal(LR.affixLabel({ id: 'focus', value: 6 }), '-6% spell cost');
@@ -182,7 +182,7 @@ test('LOOT4: the seeded doors keep their earlier draws - the gate\'s and a town\
 test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, its own kind, none on the immune, half on the resisting', () => {
   on();
   const me = player();
-  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 4 }]);
+  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 2 }]);
   const zombie = foeOf(17), orc = foeOf(7), fireDaedra = foeOf(26, { immunityFlags: EFFECT_FLAGS.Fire }), resists = foeOf(15, { resistanceFlags: EFFECT_FLAGS.Fire });
   assert.equal(LP.foeGroup(zombie), 'undead');
   assert.equal(LP.foeGroup(orc), 'humanoid');
@@ -190,17 +190,17 @@ test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, 
   assert.equal(LP.foeGroup(foeOf(28)), 'undead', 'a vampire');
   assert.equal(LP.foeGroup(foeOf(34)), 'animal', 'a dragonling, DFU\'s own grouping');
   assert.equal(LP.foeGroup(foeOf(35)), null, 'an atronach is none');
-  assert.equal(LP.lootBlow(w, 100, me, zombie, {}), 100 + 4 + 5, 'the undead: 4% and the fire');
+  assert.equal(LP.lootBlow(w, 100, me, zombie, {}), 100 + 2 + 5, 'the undead: 2% and the fire');
   assert.equal(LP.lootBlow(w, 100, me, orc, {}), 105, 'an orc: the fire alone');
   assert.equal(LP.lootBlow(w, 100, me, fireDaedra, {}), 100, 'fire-proof: none of it');
-  assert.equal(LP.lootBlow(w, 100, me, resists, {}), 100 + 4 + 2, 'a resisting skeleton: half the fire, floored');
-  assert.equal(weaponBlowMods(w, 100, me, zombie, { unaware: false }), 109, 'registered: the blow modifier reads it');
-  // the fraction carried: five blows of 10 at +4% land 50 whole and 2 more
+  assert.equal(LP.lootBlow(w, 100, me, resists, {}), 100 + 2 + 2, 'a resisting skeleton: half the fire, floored');
+  assert.equal(weaponBlowMods(w, 100, me, zombie, { unaware: false }), 107, 'registered: the blow modifier reads it');
+  // the fraction carried: five blows of 10 at +2% land 50 whole and 1 more
   LP._resetLootPowersForTests();
-  const w2 = sword([{ id: 'slayer', param: 'animal', value: 4 }]);
+  const w2 = sword([{ id: 'slayer', param: 'animal', value: 2 }]);
   let total = 0;
   for (let i = 0; i < 5; i++) total += LP.lootBlow(w2, 10, me, foeOf(0), {});
-  assert.equal(total, 50 + 2, 'four per cent of every 10, carried: two whole points over five blows');
+  assert.equal(total, 50 + 1, 'two per cent of every 10, carried: one whole point over five blows');
   // PIN ADDED (AUDIT MARTIAL L2 F7): the Stats page's reading before each blow carries nothing - blow for blow the same
   const blows = (read) => { LP._resetLootPowersForTests(); return Array.from({ length: 5 }, () => { if (read) LP.lootBlow(w2, 10, me, foeOf(0), { estimate: true }); return LP.lootBlow(w2, 10, me, foeOf(0), {}); }); };
   assert.deepEqual(blows(true), blows(false), 'the page read between blows');
@@ -251,7 +251,7 @@ test('LOOT4: the thorns - back to the foe whose blow took my health, through the
   hurtPlayer(me, 3);
   assert.equal(d.hurts.length, 1, 'a fall, a poison - no blow, no thorns');
   // the cap
-  for (const t of [104, 105, 106, 108, 103]) wear(me, plate(t, [{ id: 'thorns', value: 10 }]));
+  for (const t of [104, 105, 106, 108, 103]) wear(me, plate(t, [{ id: 'thorns', value: 6 }]));   // PIN MOVED: B4, a thorns line tops at 6
   setStruck(orc, me, 5); hurtPlayer(me, 5);
   assert.deepEqual(d.hurts.at(-1), ['orc', LP.THORNS_CAP], 'never past the cap');
   // a blow that took nothing answers nothing
@@ -277,7 +277,7 @@ test('LOOT4: the focus - my spells cost less, all I wear under the cap; register
   on();
   assert.ok(plain > 10, `a real price (${plain})`);
   assert.equal(priced, Math.max(1, Math.round((plain * 90) / 100)), 'the registered modifier takes its ten in a hundred off the real price');
-  for (const t of [133, 135, 136, 137, 138, 134]) wear(me, Object.assign(mintCondition({ group: 'Jewellery', templateIndex: t, flags: 0 }), { rarity: 'rare', affixes: [{ id: 'focus', value: 10 }] }));
+  for (const t of [133, 135, 136, 137, 138, 134]) wear(me, Object.assign(mintCondition({ group: 'Jewellery', templateIndex: t, flags: 0 }), { rarity: 'rare', affixes: [{ id: 'focus', value: 6 }] }));   // PIN MOVED: B4, a focus line tops at 6
   assert.equal(LP.lootCastCost(me, 100), 100 - LP.FOCUS_CAP, 'never past the cap');
 });
 

@@ -461,27 +461,27 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** The value bands per rolled tier: [min, max] inclusive. */
 export const AFFIX_RANGES = Object.freeze({
-  damage: Object.freeze({ magic: [5, 12],  rare: [10, 25], legendary: [20, 40] }),   // % on the weapon's own roll
-  armor:  Object.freeze({ magic: [3, 6],   rare: [6, 12],  legendary: [12, 20] }),   // points off every blow's chance to land
-  stat:   Object.freeze({ magic: [2, 5],   rare: [5, 10],  legendary: [10, 15] }),   // on one attribute
-  resist: Object.freeze({ magic: [10, 20], rare: [20, 35], legendary: [35, 50] }),   // on the saving throw against one element
-  skill:  Object.freeze({ magic: [5, 10],  rare: [10, 20], legendary: [20, 30] }),   // on one skill
+  damage: Object.freeze({ magic: [3, 7],   rare: [6, 15],  legendary: [12, 24] }),   // % on the weapon's own roll
+  armor:  Object.freeze({ magic: [2, 4],   rare: [4, 7],   legendary: [7, 12] }),   // points off every blow's chance to land
+  stat:   Object.freeze({ magic: [1, 3],   rare: [3, 6],   legendary: [6, 9] }),   // on one attribute
+  resist: Object.freeze({ magic: [6, 12],  rare: [12, 21], legendary: [21, 30] }),   // on the saving throw against one element
+  skill:  Object.freeze({ magic: [3, 6],   rare: [6, 12],  legendary: [12, 18] }),   // on one skill
   weight: Object.freeze({ magic: [10, 20], rare: [20, 35], legendary: [35, 50] }),   // % carrying capacity
   // LOOT4: the five that DO something - systems/loot/lootPowers.js does it
-  elemental: Object.freeze({ magic: [1, 3], rare: [3, 6], legendary: [6, 10] }),     // that much of its element a weapon blow
-  leech:     Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),     // % of a landed weapon blow, healed
-  thorns:    Object.freeze({ magic: [1, 3], rare: [3, 6], legendary: [6, 10] }),     // back to a foe whose blow lands on you
-  focus:     Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),     // % off a spell's magicka
-  slayer:    Object.freeze({ magic: [1, 2], rare: [2, 3], legendary: [3, 4] }), // % more weapon damage to one kind of foe
+  elemental: Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),     // that much of its element a weapon blow
+  leech:     Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),     // % of a landed weapon blow, healed
+  thorns:    Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),     // back to a foe whose blow lands on you
+  focus:     Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),     // % off a spell's magicka
+  slayer:    Object.freeze({ magic: [1, 1], rare: [1, 2], legendary: [2, 3] }), // % more weapon damage to one kind of foe
   // LOOT14: the wardrobe's own
   standing:  Object.freeze({ magic: [2, 3], rare: [3, 5], legendary: [5, 8] }),     // standing with one social group
   warmth:    Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),    // degrees of clothing warmth
   dry:       Object.freeze({ magic: [10, 20], rare: [20, 35], legendary: [35, 50] }), // % less of the weather's soaking
   // CAST-SPEED: the casting hands' own
-  castSpeed: Object.freeze({ magic: [3, 6], rare: [6, 10], legendary: [10, 15] }),  // % faster a cast's hands (systems/castSpeed.js)
+  castSpeed: Object.freeze({ magic: [2, 4], rare: [4, 6], legendary: [6, 9] }),  // % faster a cast's hands (systems/castSpeed.js)
   // BAL9c: the caster's damage and its magicka (systems/spell/spellPower.js, systems/loot/lootPowers.js)
-  potency:    Object.freeze({ magic: [1, 2], rare: [2, 3], legendary: [3, 5] }),  // % more of a damage spell's landing
-  wellspring: Object.freeze({ magic: [2, 4], rare: [4, 7], legendary: [7, 10] }),    // % of my magicka back on a kill
+  potency:    Object.freeze({ magic: [1, 1], rare: [1, 2], legendary: [2, 3] }),  // % more of a damage spell's landing
+  wellspring: Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),    // % of my magicka back on a kill
   // TECH1: a technique's power - +% on its own multiplier (combat/technique/techniqueRoster.js TECHNIQUE_BANDS, one band for all)
   technique: TECHNIQUE_BANDS,
 });
@@ -962,43 +962,43 @@ export const RARE_FLAVOURS = Object.freeze({
  *  land on any of the group. */
 export const LEGENDARIES = Object.freeze([
   { id: 'wyrmbane', name: 'Wyrmbane', group: 'Weapons',
-    affixes: [{ id: 'damage', value: 35 }, { id: 'stat', param: 'strength', value: 12 }, { id: 'skill', param: 34, value: 20 }],
+    affixes: [{ id: 'damage', value: 21 }, { id: 'stat', param: 'strength', value: 7 }, { id: 'skill', param: 34, value: 12 }],
     enchantment: { type: T.CastWhenStrikes, param: 25 },   // Fire Storm
     lore: 'Forged for a dragon hunt no chronicle finished.' },
   { id: 'nightwhisper', name: 'Nightwhisper', group: 'Weapons', templates: [113, 114, 116, 117],   // Dagger, Tanto, Shortsword, Wakizashi
-    affixes: [{ id: 'damage', value: 25 }, { id: 'stat', param: 'agility', value: 12 }, { id: 'stat', param: 'speed', value: 10 }, { id: 'skill', param: 16, value: 25 }],
+    affixes: [{ id: 'damage', value: 15 }, { id: 'stat', param: 'agility', value: 7 }, { id: 'stat', param: 'speed', value: 6 }, { id: 'skill', param: 16, value: 15 }],
     enchantment: { type: T.CastWhenHeld, param: 44 },   // Chameleon
     lore: 'A blade the Dark Brotherhood swears it never lost.' },
   { id: 'graveward', name: 'Graveward', group: 'Weapons', templates: [124, 125, 126, 127, 128],   // Mace, Flail, Warhammer, Battle Axe, War Axe
-    affixes: [{ id: 'damage', value: 30 }, { id: 'stat', param: 'endurance', value: 10 }, { id: 'skill', param: 34, value: 25 }],
+    affixes: [{ id: 'damage', value: 18 }, { id: 'stat', param: 'endurance', value: 6 }, { id: 'skill', param: 34, value: 15 }],
     enchantment: { type: T.PotentVs, param: 0 },   // Undead
     lore: 'The Order of the Hour buried it with its bearer. It did not stay buried.' },
   { id: 'stormcaller', name: "Stormcaller's Bow", group: 'Weapons', templates: [129, 130],   // Short Bow, Long Bow
-    affixes: [{ id: 'damage', value: 30 }, { id: 'stat', param: 'agility', value: 10 }, { id: 'skill', param: 33, value: 25 }],
+    affixes: [{ id: 'damage', value: 18 }, { id: 'stat', param: 'agility', value: 6 }, { id: 'skill', param: 33, value: 15 }],
     enchantment: { type: T.CastWhenStrikes, param: 20 },   // Ice Storm
     lore: 'Strung with a hair of the Ebonarm, or so the archer said.' },
   { id: 'the-warden', name: 'The Warden', group: 'Armor', templates: [102, 103, 104, 105, 106, 107, 108],   // the body pieces
-    affixes: [{ id: 'armor', value: 15 }, { id: 'stat', param: 'endurance', value: 12 }, { id: 'resist', param: 'magic', value: 40 }],
+    affixes: [{ id: 'armor', value: 9 }, { id: 'stat', param: 'endurance', value: 7 }, { id: 'resist', param: 'magic', value: 24 }],
     enchantment: { type: T.RegensHealth, param: 0 },   // all the time
     lore: 'Worn by the last warden of a keep that no longer stands.' },
   { id: 'titanheart', name: 'Titanheart', group: 'Armor', templates: [102, 103, 104, 105, 106, 107, 108],
-    affixes: [{ id: 'armor', value: 12 }, { id: 'stat', param: 'strength', value: 15 }, { id: 'weight', value: 40 }],
+    affixes: [{ id: 'armor', value: 7 }, { id: 'stat', param: 'strength', value: 9 }, { id: 'weight', value: 40 }],
     enchantment: { type: T.AbsorbsSpells, param: -1 },
     lore: 'Its plates are said to have been beaten from a giant\'s own heart.' },
   { id: 'aegis-of-dawn', name: 'Aegis of Dawn', group: 'Armor', templates: [109, 110, 111, 112],   // the four shields
-    affixes: [{ id: 'armor', value: 18 }, { id: 'resist', param: 'fire', value: 45 }, { id: 'stat', param: 'willpower', value: 10 }],
+    affixes: [{ id: 'armor', value: 11 }, { id: 'resist', param: 'fire', value: 27 }, { id: 'stat', param: 'willpower', value: 6 }],
     enchantment: { type: T.CastWhenHeld, param: 39 },   // Spell Resistance
     lore: 'Raised against the Underking\'s host at the dawn of the second era.' },
   { id: 'foxglove', name: 'Foxglove', group: 'Jewellery',
-    affixes: [{ id: 'stat', param: 'luck', value: 15 }, { id: 'stat', param: 'speed', value: 10 }, { id: 'resist', param: 'poison', value: 35 }],
+    affixes: [{ id: 'stat', param: 'luck', value: 9 }, { id: 'stat', param: 'speed', value: 6 }, { id: 'resist', param: 'poison', value: 21 }],
     enchantment: { type: T.ImprovesTalents, param: 1 },   // Athleticism
     lore: 'Pretty, and poisonous to those who would take it from you.' },
   { id: 'kings-mark', name: "King's Mark", group: 'Jewellery',
-    affixes: [{ id: 'stat', param: 'personality', value: 15 }, { id: 'skill', param: 1, value: 25 }, { id: 'weight', value: 35 }],
+    affixes: [{ id: 'stat', param: 'personality', value: 9 }, { id: 'skill', param: 1, value: 15 }, { id: 'weight', value: 35 }],
     enchantment: { type: T.GoodRepWith, param: 3 },   // Nobility
     lore: 'Whoever wears it is received at court; whoever loses it is not.' },
   { id: 'archmages-loop', name: "Archmage's Loop", group: 'Jewellery',
-    affixes: [{ id: 'stat', param: 'intelligence', value: 15 }, { id: 'stat', param: 'willpower', value: 12 }, { id: 'resist', param: 'shock', value: 40 }],
+    affixes: [{ id: 'stat', param: 'intelligence', value: 9 }, { id: 'stat', param: 'willpower', value: 7 }, { id: 'resist', param: 'shock', value: 24 }],
     enchantment: { type: T.ExtraSpellPts, param: 8 },   // Near Daedra
     lore: 'One of the rings the Mages Guild does not admit to having made.' },
   // ── LOOT3 (the Loot arc): TWENTY MORE - every weapon family, every armour
@@ -1007,83 +1007,83 @@ export const LEGENDARIES = Object.freeze([
   // enchantment priced by DFU's own table (never an item-maker-only payload; a held spell a cheap one, since DFU bills
   // its casting cost in condition at the first equip - LR4's watch item 9), a base it can land on, a line of lore.
   { id: 'anseis-edge', name: "Ansei's Edge", group: 'Weapons', templates: [118, 119, 120, 121, 122, 123],   // the long blades
-    affixes: [{ id: 'damage', value: 30 }, { id: 'stat', param: 'agility', value: 12 }, { id: 'skill', param: 29, value: 25 }],
+    affixes: [{ id: 'damage', value: 18 }, { id: 'stat', param: 'agility', value: 7 }, { id: 'skill', param: 29, value: 15 }],
     enchantment: { type: T.PotentVs, param: 2 },   // Humanoid
     lore: 'Carried out of drowned Yokuda by a sword-singer who never sang again.' },
   { id: 'tsaesci-fang', name: 'Tsaesci Fang', group: 'Weapons', templates: [114, 117, 121, 123],   // Tanto, Wakizashi, Katana, Dai-katana
-    affixes: [{ id: 'damage', value: 28 }, { id: 'stat', param: 'speed', value: 12 }, { id: 'skill', param: 34, value: 25 }],
+    affixes: [{ id: 'damage', value: 17 }, { id: 'stat', param: 'speed', value: 7 }, { id: 'skill', param: 34, value: 15 }],
     enchantment: { type: T.CastWhenStrikes, param: 56 },   // Hand of Decay
     lore: 'Akaviri steel, folded by the serpent-folk who came to take Tamriel and stayed to serve it.' },
   { id: 'orsiniums-anvil', name: "Orsinium's Anvil", group: 'Weapons', templates: [124, 125, 126],   // Mace, Flail, Warhammer
-    affixes: [{ id: 'damage', value: 32 }, { id: 'stat', param: 'strength', value: 12 }, { id: 'skill', param: 32, value: 25 }],
+    affixes: [{ id: 'damage', value: 19 }, { id: 'stat', param: 'strength', value: 7 }, { id: 'skill', param: 32, value: 15 }],
     enchantment: { type: T.PotentVs, param: 1 },   // Daedra
     lore: 'Beaten on the anvil that raised Orsinium again, and every bit as hard to put down.' },
   { id: 'glenmoril-bow', name: 'The Glenmoril Bow', group: 'Weapons', templates: [129, 130],   // Short Bow, Long Bow
-    affixes: [{ id: 'damage', value: 28 }, { id: 'stat', param: 'agility', value: 10 }, { id: 'skill', param: 33, value: 22 }],
+    affixes: [{ id: 'damage', value: 17 }, { id: 'stat', param: 'agility', value: 6 }, { id: 'skill', param: 33, value: 13 }],
     enchantment: { type: T.PotentVs, param: 3 },   // Animals
     lore: 'Strung by the witches of Glenmoril for a hunt that Hircine himself had called.' },
   { id: 'direnni-staff', name: 'The Direnni Staff', group: 'Weapons', templates: [115],   // Staff
-    affixes: [{ id: 'damage', value: 20 }, { id: 'stat', param: 'intelligence', value: 15 }, { id: 'skill', param: 22, value: 25 }, { id: 'stat', param: 'willpower', value: 10 }],
+    affixes: [{ id: 'damage', value: 12 }, { id: 'stat', param: 'intelligence', value: 9 }, { id: 'skill', param: 22, value: 15 }, { id: 'stat', param: 'willpower', value: 6 }],
     enchantment: { type: T.CastWhenStrikes, param: 54 },   // Magicka Leech
     lore: 'From the Adamantine Tower, when the Direnni still ruled High Rock and thought they always would.' },
   { id: 'gortwogs-cleaver', name: "Gortwog's Cleaver", group: 'Weapons', templates: [127, 128],   // Battle Axe, War Axe
-    affixes: [{ id: 'damage', value: 36 }, { id: 'stat', param: 'strength', value: 10 }, { id: 'skill', param: 31, value: 25 }],
+    affixes: [{ id: 'damage', value: 22 }, { id: 'stat', param: 'strength', value: 6 }, { id: 'skill', param: 31, value: 15 }],
     enchantment: { type: T.VampiricEffect, param: 1 },   // when strikes
     lore: 'King Gortwog\'s own, before the crown made him sit down; he still asks after it.' },
   { id: 'worms-tooth', name: "Worm's Tooth", group: 'Weapons', templates: [113, 114],   // Dagger, Tanto
-    affixes: [{ id: 'damage', value: 24 }, { id: 'stat', param: 'intelligence', value: 12 }, { id: 'skill', param: 27, value: 22 }, { id: 'skill', param: 19, value: 20 }],
+    affixes: [{ id: 'damage', value: 14 }, { id: 'stat', param: 'intelligence', value: 7 }, { id: 'skill', param: 27, value: 13 }, { id: 'skill', param: 19, value: 12 }],
     enchantment: { type: T.CastWhenStrikes, param: 67 },   // Energy Leech
     lore: 'A necromancer\'s knife, cut from the King of Worms\' own tooth - or so his acolytes swear.' },
   { id: 'warp-edge', name: 'Warp-Edge', group: 'Weapons', templates: [118, 122, 123],   // Broadsword, Claymore, Dai-katana
-    affixes: [{ id: 'damage', value: 38 }, { id: 'stat', param: 'luck', value: 12 }, { id: 'skill', param: 34, value: 22 }],
+    affixes: [{ id: 'damage', value: 23 }, { id: 'stat', param: 'luck', value: 7 }, { id: 'skill', param: 34, value: 13 }],
     enchantment: { type: T.CastWhenStrikes, param: 55 },   // Sphere of Negation
     lore: 'Forged in the hour the West warped and every ending happened at once. It remembers all of them.' },
   { id: 'lysandus-visor', name: 'The Visor of King Lysandus', group: 'Armor', templates: [107],   // Helm
-    affixes: [{ id: 'armor', value: 16 }, { id: 'stat', param: 'willpower', value: 12 }, { id: 'resist', param: 'magic', value: 40 }, { id: 'stat', param: 'personality', value: 10 }],
+    affixes: [{ id: 'armor', value: 10 }, { id: 'stat', param: 'willpower', value: 7 }, { id: 'resist', param: 'magic', value: 24 }, { id: 'stat', param: 'personality', value: 6 }],
     enchantment: { type: T.RegensHealth, param: 2 },   // in darkness
     lore: 'The ghost-king\'s own. It still sees Cryngaine Field, and the arrow that ended him.' },
   { id: 'wayrest-treads', name: "The Wayrest Courier's Treads", group: 'Armor', templates: [108],   // Boots
-    affixes: [{ id: 'armor', value: 12 }, { id: 'stat', param: 'speed', value: 15 }, { id: 'skill', param: 21, value: 25 }],
+    affixes: [{ id: 'armor', value: 7 }, { id: 'stat', param: 'speed', value: 9 }, { id: 'skill', param: 21, value: 15 }],
     enchantment: { type: T.ImprovesTalents, param: 1 },   // Athleticism
     lore: 'Worn thin on the road between Wayrest and Daggerfall by a courier who was never once late.' },
   { id: 'gauntlets-of-the-rose', name: 'Gauntlets of the Rose', group: 'Armor', templates: [103],   // Gauntlets
-    affixes: [{ id: 'armor', value: 14 }, { id: 'stat', param: 'strength', value: 12 }, { id: 'skill', param: 30, value: 25 }],
+    affixes: [{ id: 'armor', value: 8 }, { id: 'stat', param: 'strength', value: 7 }, { id: 'skill', param: 30, value: 15 }],
     enchantment: { type: T.StrengthensArmor, param: -1 },
     lore: 'Of Wayrest\'s Knights of the Rose, sworn to strike with an open hand - and then with a closed one.' },
   { id: 'mountains-root', name: "The Mountain's Root", group: 'Armor', templates: [104],   // Greaves
-    affixes: [{ id: 'armor', value: 16 }, { id: 'stat', param: 'endurance', value: 12 }, { id: 'weight', value: 40 }],
+    affixes: [{ id: 'armor', value: 10 }, { id: 'stat', param: 'endurance', value: 7 }, { id: 'weight', value: 40 }],
     enchantment: { type: T.IncreasedWeightAllowance, param: 1 },   // 50% additional
     lore: 'Dwemer-wrought for a foreman of the deep halls who never once lost his footing.' },
   { id: 'ravens-wings', name: "The Raven's Wings", group: 'Armor', templates: [105, 106],   // the Pauldrons
-    affixes: [{ id: 'armor', value: 14 }, { id: 'stat', param: 'agility', value: 12 }, { id: 'skill', param: 20, value: 25 }],
+    affixes: [{ id: 'armor', value: 8 }, { id: 'stat', param: 'agility', value: 7 }, { id: 'skill', param: 20, value: 15 }],
     enchantment: { type: T.CastWhenHeld, param: 37 },   // Slowfalling
     lore: 'Of Camlorn\'s Order of the Raven, whose knights drop from the walls and land standing.' },
   { id: 'night-mothers-embrace', name: "The Night Mother's Embrace", group: 'Armor', templates: [102],   // Cuirass
-    affixes: [{ id: 'armor', value: 14 }, { id: 'stat', param: 'agility', value: 10 }, { id: 'skill', param: 19, value: 25 }, { id: 'skill', param: 16, value: 20 }],
+    affixes: [{ id: 'armor', value: 8 }, { id: 'stat', param: 'agility', value: 6 }, { id: 'skill', param: 19, value: 15 }, { id: 'skill', param: 16, value: 12 }],
     enchantment: { type: T.CastWhenHeld, param: 45 },   // Shadow Form
     lore: 'Sweet Mother, sweet Mother, send your child unto me - and she sent this instead.' },
   { id: 'wall-of-daggerfall', name: 'The Wall of Daggerfall', group: 'Armor', templates: [111, 112],   // Kite Shield, Tower Shield
-    affixes: [{ id: 'armor', value: 18 }, { id: 'stat', param: 'endurance', value: 12 }, { id: 'resist', param: 'shock', value: 40 }],
+    affixes: [{ id: 'armor', value: 11 }, { id: 'stat', param: 'endurance', value: 7 }, { id: 'resist', param: 'shock', value: 24 }],
     enchantment: { type: T.RepairsObjects, param: -1 },
     lore: 'Hewn from the gate the city was named for. The gate fell; this did not.' },
   { id: 'amulet-of-the-nine', name: 'The Amulet of the Nine', group: 'Jewellery', templates: [133, 139],   // Amulet, Cloth Amulet
-    affixes: [{ id: 'stat', param: 'willpower', value: 12 }, { id: 'skill', param: 23, value: 25 }, { id: 'resist', param: 'magic', value: 40 }],
+    affixes: [{ id: 'stat', param: 'willpower', value: 7 }, { id: 'skill', param: 23, value: 15 }, { id: 'resist', param: 'magic', value: 24 }],
     enchantment: { type: T.RegensHealth, param: 1 },   // in sunlight
     lore: 'Blessed at each of the Nine\'s altars in turn, and a tenth time by someone who would not give a name.' },
   { id: 'witch-sisters-ring', name: "The Witch-Sisters' Ring", group: 'Jewellery', templates: [135],   // Ring
-    affixes: [{ id: 'stat', param: 'intelligence', value: 12 }, { id: 'skill', param: 24, value: 25 }, { id: 'resist', param: 'frost', value: 40 }],
+    affixes: [{ id: 'stat', param: 'intelligence', value: 7 }, { id: 'skill', param: 24, value: 15 }, { id: 'resist', param: 'frost', value: 24 }],
     enchantment: { type: T.ExtraSpellPts, param: 6 },   // During New Moon
     lore: 'Passed hand to hand through a Glenmoril coven; each sister added a curse, and none took one off.' },
   { id: 'duelists-vambrace', name: "The Duelist's Vambrace", group: 'Jewellery', templates: [134, 136],   // Bracer, Bracelet
-    affixes: [{ id: 'stat', param: 'agility', value: 12 }, { id: 'stat', param: 'speed', value: 10 }, { id: 'skill', param: 34, value: 25 }],
+    affixes: [{ id: 'stat', param: 'agility', value: 7 }, { id: 'stat', param: 'speed', value: 6 }, { id: 'skill', param: 34, value: 15 }],
     enchantment: { type: T.ImprovesTalents, param: 2 },   // Adrenaline Rush
     lore: 'Worn through a hundred Sentinel duels. Its owner lost one, and has not been seen since.' },
   { id: 'mark-of-the-hist', name: 'The Mark of the Hist', group: 'Jewellery', templates: [137],   // Mark
-    affixes: [{ id: 'stat', param: 'endurance', value: 12 }, { id: 'resist', param: 'poison', value: 45 }, { id: 'skill', param: 17, value: 25 }],
+    affixes: [{ id: 'stat', param: 'endurance', value: 7 }, { id: 'resist', param: 'poison', value: 27 }, { id: 'skill', param: 17, value: 15 }],
     enchantment: { type: T.CastWhenHeld, param: 42 },   // Water Breathing
     lore: 'Hist-sap hardened in the shape of a hand. The Argonians call it a gift; the Hist does not say.' },
   { id: 'reachmans-torc', name: "The Reachman's Torc", group: 'Jewellery', templates: [138],   // Torc
-    affixes: [{ id: 'stat', param: 'strength', value: 12 }, { id: 'stat', param: 'willpower', value: 10 }, { id: 'resist', param: 'shock', value: 40 }],
+    affixes: [{ id: 'stat', param: 'strength', value: 7 }, { id: 'stat', param: 'willpower', value: 6 }, { id: 'resist', param: 'shock', value: 24 }],
     enchantment: { type: T.ExtraSpellPts, param: 9 },   // Near Humanoids
     lore: 'Briar-bound and hagraven-blessed, taken off a Reach chieftain who had no more use for it.' },
 ]);
@@ -1096,46 +1096,46 @@ export const LEGENDARIES = Object.freeze([
  *  first arc's thirty (and every pin and seed that reads them - the Broker, the spoils) stand as they were. */
 export const WARDROBE_LEGENDARIES = Object.freeze([
   Object.freeze({ id: 'alikr-robes', name: "The Alik'r Wayfarer's Robes", group: GARMENT_RECORD_GROUP, templates: Object.freeze([163, 200]),   // Plain Robes - hooded
-    affixes: Object.freeze([{ id: 'dry', value: 45 }, { id: 'skill', param: 21, value: 25 }, { id: 'standing', param: 'commoners', value: 6 }]),
+    affixes: Object.freeze([{ id: 'dry', value: 45 }, { id: 'skill', param: 21, value: 15 }, { id: 'standing', param: 'commoners', value: 6 }]),
     enchantment: Object.freeze({ type: T.ImprovesTalents, param: 1 }),   // Athleticism
     found: 'beast',
     power: Object.freeze({ name: 'Desert-Born', kind: 'climate', heat: 20, survival: true,
       brief: 'Feel the heat 20 degrees less', text: 'You feel the heat 20 degrees less' }),
     lore: "Worn across the Alik'r by a caravan-master who crossed it forty times and drank at every well on the way twice." }),
   Object.freeze({ id: 'wrothgar-mantle', name: 'The Wrothgar Pass Mantle', group: GARMENT_RECORD_GROUP, templates: Object.freeze([155, 192]),   // Formal Cloak
-    affixes: Object.freeze([{ id: 'warmth', value: 10 }, { id: 'dry', value: 40 }, { id: 'skill', param: 18, value: 25 }]),
+    affixes: Object.freeze([{ id: 'warmth', value: 10 }, { id: 'dry', value: 40 }, { id: 'skill', param: 18, value: 15 }]),
     enchantment: Object.freeze({ type: T.ExtraSpellPts, param: 0 }),   // During Winter
     found: 'brute',
     power: Object.freeze({ name: 'Mountain-Born', kind: 'climate', cold: 20, survival: true,
       brief: 'Feel the cold 20 degrees less', text: 'You feel the cold 20 degrees less' }),
     lore: "Orsinium's sentries hold the Wrothgar passes in these. The one that came down without its sentry has never said where he went." }),
   Object.freeze({ id: 'stendarr-vestments', name: 'The Vestments of Stendarr', group: GARMENT_RECORD_GROUP, templates: Object.freeze([164, 201]),   // Priest Robes, Priestess Robes
-    affixes: Object.freeze([{ id: 'skill', param: 23, value: 25 }, { id: 'standing', param: 'scholars', value: 6 }, { id: 'stat', param: 'personality', value: 12 }]),
+    affixes: Object.freeze([{ id: 'skill', param: 23, value: 15 }, { id: 'standing', param: 'scholars', value: 6 }, { id: 'stat', param: 'personality', value: 7 }]),
     enchantment: Object.freeze({ type: T.ExtraSpellPts, param: 7 }),   // Near Undead
     found: 'daedra',
     power: Object.freeze({ name: "Stendarr's Mercy", kind: 'school', school: 23, less: 25,
       brief: 'Restoration costs 25% less', text: 'Your Restoration spells cost 25% less magicka' }),
     lore: "Stendarr's vigilants wore these into the Desecrated Temples. Some of the vigilants came back; all of the robes did." }),
   Object.freeze({ id: 'pilgrims-sandals', name: "The Pilgrim's Sandals", group: GARMENT_RECORD_GROUP, templates: Object.freeze([150, 189, 147, 186]),   // Sandals, Shoes
-    affixes: Object.freeze([{ id: 'skill', param: 21, value: 25 }, { id: 'skill', param: 3, value: 22 }, { id: 'stat', param: 'personality', value: 10 }]),
+    affixes: Object.freeze([{ id: 'skill', param: 21, value: 15 }, { id: 'skill', param: 3, value: 13 }, { id: 'stat', param: 'personality', value: 6 }]),
     enchantment: Object.freeze({ type: T.RegensHealth, param: 1 }),   // in sunlight
     found: 'undead',
     power: Object.freeze({ name: 'The Long Road', kind: 'longroad', fatigue: 25, fall: 50,
       brief: 'Tire 25% slower; falls hurt half', text: 'You tire 25% slower when traveling, and falls deal half damage' }),
     lore: 'Worn to every shrine of the Nine in turn, and on to a tenth that no map in the Bay will show.' }),
   Object.freeze({ id: 'barenziah-silks', name: 'The Silks of Queen Barenziah', group: GARMENT_RECORD_GROUP, templates: Object.freeze([195, 196, 194, 159, 160, 143]),   // Evening Gown, Day Gown, Formal Eodoric; Formal Tunic, Toga, Kimono
-    affixes: Object.freeze([{ id: 'standing', param: 'nobility', value: 8 }, { id: 'stat', param: 'personality', value: 15 }, { id: 'skill', param: 1, value: 25 }]),
+    affixes: Object.freeze([{ id: 'standing', param: 'nobility', value: 8 }, { id: 'stat', param: 'personality', value: 9 }, { id: 'skill', param: 1, value: 15 }]),
     enchantment: Object.freeze({ type: T.GoodRepWith, param: 1 }),   // Merchants
     found: 'caster',
     power: Object.freeze({ name: 'Royal Bearing', kind: 'bearing', standing: 5,
       brief: '+5 standing with every group', text: '+5 standing with every social group' }),
     lore: "Barenziah wore them to Eadwyre's court at Wayrest. They were stolen twice in the year after, and returned once." }),
   Object.freeze({ id: 'shades-cowl', name: "The Shade's Cowl", group: GARMENT_RECORD_GROUP, templates: Object.freeze([154, 191]),   // Casual Cloak - hooded
-    affixes: Object.freeze([{ id: 'standing', param: 'underworld', value: 8 }, { id: 'skill', param: 16, value: 25 }, { id: 'skill', param: 15, value: 22 }]),
+    affixes: Object.freeze([{ id: 'standing', param: 'underworld', value: 8 }, { id: 'skill', param: 16, value: 15 }, { id: 'skill', param: 15, value: 13 }]),
     enchantment: Object.freeze({ type: T.EnhancesSkill, param: 13 }),   // Lockpicking
     found: 'rogue',
-    power: Object.freeze({ name: 'Unseen', kind: 'hood', skill: 16, more: 25,
-      brief: '+25 Stealth while hooded', text: 'While its hood is up, you have +25 Stealth' }),
+    power: Object.freeze({ name: 'Unseen', kind: 'hood', skill: 16, more: 18,
+      brief: '+18 Stealth while hooded', text: 'While its hood is up, you have +18 Stealth' }),
     lore: 'Made for a Daggerfall cutpurse who was never once seen. Nobody can say what she looked like - only that the cowl was gray.' }),
 ]);
 /** BAL9c: THE ARCANE THREE - a caster's Legendaries, the first
@@ -1146,21 +1146,21 @@ export const WARDROBE_LEGENDARIES = Object.freeze([
  *  the Broker, which reads the thirty) stand as they were - a jewel's and a blade's pick lands in a pool one wider. */
 export const ARCANE_LEGENDARIES = Object.freeze([
   Object.freeze({ id: 'eye-of-magnus', name: 'The Eye of Magnus', group: 'Jewellery', templates: Object.freeze([133, 139]),   // Amulet, Cloth Amulet
-    affixes: Object.freeze([{ id: 'stat', param: 'intelligence', value: 15 }, { id: 'skill', param: 22, value: 25 }, { id: 'resist', param: 'magic', value: 40 }]),
+    affixes: Object.freeze([{ id: 'stat', param: 'intelligence', value: 9 }, { id: 'skill', param: 22, value: 15 }, { id: 'resist', param: 'magic', value: 24 }]),
     enchantment: Object.freeze({ type: T.ExtraSpellPts, param: 2 }),   // During Summer
     found: 'caster',
     power: Object.freeze({ name: "Magnus's Gaze", kind: 'pierce', points: 15,
       brief: 'Spells pierce 15 resistance', text: 'Enemies\' saving throws against your Destruction spells are 15 lower. Enemies immune to the element stay immune' }),
     lore: 'Ground from a shard of the sun the Mages Guild swears it never kept. Look through it at noon and you will not look again.' }),
   Object.freeze({ id: 'ring-of-artaeum', name: 'The Ring of Artaeum', group: 'Jewellery', templates: Object.freeze([135]),   // Ring
-    affixes: Object.freeze([{ id: 'stat', param: 'willpower', value: 12 }, { id: 'skill', param: 27, value: 25 }, { id: 'resist', param: 'fire', value: 40 }]),
+    affixes: Object.freeze([{ id: 'stat', param: 'willpower', value: 7 }, { id: 'skill', param: 27, value: 15 }, { id: 'resist', param: 'fire', value: 24 }]),
     enchantment: Object.freeze({ type: T.ExtraSpellPts, param: 5 }),   // During Half Moon
     found: 'caster',
     power: Object.freeze({ name: 'Wellspring of Artaeum', kind: 'attune', pct: 1, low: 2,
       brief: 'Regain 1% magicka a round', text: 'Each round you regain 1% of your magicka, or 2% while below half' }),
     lore: 'A Psijic novice\'s ring, left behind when the isle was. The Order has not asked for it back; the Order rarely asks.' }),
   Object.freeze({ id: 'shalidors-brand', name: "Shalidor's Brand", group: 'Weapons', templates: Object.freeze([118, 119, 120]),   // Broadsword, Saber, Longsword
-    affixes: Object.freeze([{ id: 'damage', value: 24 }, { id: 'stat', param: 'intelligence', value: 12 }, { id: 'skill', param: 22, value: 22 }]),
+    affixes: Object.freeze([{ id: 'damage', value: 14 }, { id: 'stat', param: 'intelligence', value: 7 }, { id: 'skill', param: 22, value: 13 }]),
     enchantment: Object.freeze({ type: T.CastWhenStrikes, param: 7 }),   // Wizard's Fire
     found: 'caster',
     power: Object.freeze({ name: 'Arcane Surge', kind: 'surge', pct: 3, above: 75,
@@ -1891,14 +1891,14 @@ export const SOCKET_VALUES = Object.freeze([SOCKET_EMPTY, ...ALL_GEM_IDS]);
  *  band, the most a kind reads on one piece (gemPieceCap) - fire's, frost's and the leech's stand at it. */
 const graded = (id, param, values) => Object.freeze({ id, param, values: Object.freeze(values) });
 export const GEM_GRADE_LINES = Object.freeze({
-  ruby: Object.freeze({ weapon: graded('elemental', 'fire', [1, 2, 3, 4, 6]), other: graded('resist', 'fire', [4, 7, 10, 15, 20]) }),
-  emerald: Object.freeze({ weapon: graded('leech', null, [1, 2, 3, 5, 7]), other: graded('resist', 'poison', [4, 7, 10, 15, 20]) }),
-  sapphire: Object.freeze({ weapon: graded('elemental', 'frost', [1, 2, 3, 4, 6]), other: graded('resist', 'frost', [4, 7, 10, 15, 20]) }),
+  ruby: Object.freeze({ weapon: graded('elemental', 'fire', [1, 1, 2, 3, 4]), other: graded('resist', 'fire', [4, 7, 10, 15, 20]) }),
+  emerald: Object.freeze({ weapon: graded('leech', null, [1, 1, 2, 3, 4]), other: graded('resist', 'poison', [4, 7, 10, 15, 20]) }),
+  sapphire: Object.freeze({ weapon: graded('elemental', 'frost', [1, 1, 2, 3, 4]), other: graded('resist', 'frost', [4, 7, 10, 15, 20]) }),
   diamond: Object.freeze({ weapon: graded('damage', null, [2, 4, 6, 9, 12]), other: graded('resist', 'magic', [4, 7, 10, 15, 20]) }),
-  jade: Object.freeze({ weapon: graded('stat', 'willpower', [1, 2, 4, 6, 8]), other: graded('stat', 'willpower', [1, 2, 4, 6, 8]) }),
-  turquoise: Object.freeze({ weapon: graded('stat', 'agility', [1, 2, 4, 6, 8]), other: graded('stat', 'personality', [1, 2, 4, 6, 8]) }),
-  malachite: Object.freeze({ weapon: graded('stat', 'strength', [1, 2, 4, 6, 8]), other: graded('stat', 'endurance', [1, 2, 4, 6, 8]) }),
-  amber: Object.freeze({ weapon: graded('stat', 'speed', [1, 2, 4, 6, 8]), other: graded('stat', 'luck', [1, 2, 3, 4, 6]) }),
+  jade: Object.freeze({ weapon: graded('stat', 'willpower', [1, 1, 2, 4, 6]), other: graded('stat', 'willpower', [1, 1, 2, 4, 6]) }),
+  turquoise: Object.freeze({ weapon: graded('stat', 'agility', [1, 1, 2, 4, 6]), other: graded('stat', 'personality', [1, 1, 2, 4, 6]) }),
+  malachite: Object.freeze({ weapon: graded('stat', 'strength', [1, 1, 2, 4, 6]), other: graded('stat', 'endurance', [1, 1, 2, 4, 6]) }),
+  amber: Object.freeze({ weapon: graded('stat', 'speed', [1, 1, 2, 4, 6]), other: graded('stat', 'luck', [1, 2, 3, 4, 6]) }),
 });
 /** One graded line at a grade, as a line: its kind, its param (none for a kind without), its value. */
 const gradeLine = (row, grade) => ({ id: row.id, ...(row.param ? { param: row.param } : {}), value: row.values[GEM_GRADES.indexOf(grade)] });

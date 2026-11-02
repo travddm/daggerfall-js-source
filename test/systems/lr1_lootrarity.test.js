@@ -190,7 +190,7 @@ test('LR2: the affix kinds - six, each banded per tier, each with a word for the
   assert.equal(LR.affixLabel({ id: 'weight', value: 25 }), '+25% carrying capacity');
   assert.equal(LR.affixLabel({ id: 'armor', value: 6 }), '+6 armor');
   assert.equal(LR.affixWord({ id: 'stat', param: 'strength', value: 3 }, 'magic'), 'of the Ox');
-  assert.equal(LR.affixWord({ id: 'stat', param: 'strength', value: 12 }, 'legendary'), 'of the Titan');
+  assert.equal(LR.affixWord({ id: 'stat', param: 'strength', value: 9 }, 'legendary'), 'of the Titan');   // PIN MOVED: B4 rescale, a stat line tops at 9
   assert.equal(LR.affixWord({ id: 'stat', param: 'strength' }, 'magic'), '', 'LR4: a record with no value is malformed and names nothing');
 });
 
@@ -584,7 +584,7 @@ test('LR4: the audit - the corpse door rolls the loot and never the worn kit, a 
   const forged = { ...ring(), affixes: [{ id: 'armor', value: 1e9 }, { id: 'stat', value: 3 }, null, { id: 'stat', param: 'luck', value: 5 }] };
   e.items.push(forged); equipItem(e, forged);
   assert.equal(liveStat(e, 'luck'), 55, 'the one sound record folds; the three malformed fold nothing and throw nothing');
-  assert.deepEqual(LR.rarityLines({ ...forged, rarity: 'magic' }).filter(Boolean), ['Magic', '+5 Luck [2-5]'], 'LOOT2: a rolled line says its band');
+  assert.deepEqual(LR.rarityLines({ ...forged, rarity: 'magic' }).filter(Boolean), ['Magic', '+5 Luck [1-3]'], 'LOOT2: a rolled line says its band');
   // (3) THE FLAVOURS: every one fires on a worn or wielded drop - never an Enchanted-only payload (FeatherWeight, ExtraWeight fire at the item maker alone).
   for (const list of Object.values(LR.RARE_FLAVOURS)) for (const f of list) assert.ok(![ENCHANTMENT_TYPES.FeatherWeight, ENCHANTMENT_TYPES.ExtraWeight].includes(f.type), `${typeKey(f.type)} is a dead line on a drop`);
   for (const rec of LR.LEGENDARIES) assert.ok(![ENCHANTMENT_TYPES.FeatherWeight, ENCHANTMENT_TYPES.ExtraWeight].includes(rec.enchantment.type));

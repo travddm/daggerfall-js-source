@@ -1,10 +1,11 @@
-// REPAIR-RATE and KIT-CEILING. A repair costs a third of Daggerfall's price (REPAIR-EASE had two thirds); no kit - a
+// B4 and KIT-CEILING. A repair costs what Daggerfall asks (REPAIR-RATE had cut it to a third); no kit - a
 // field kit or a smith's - mends a piece past three quarters of its condition, and a kit that has nothing below them
 // to mend says a smith can do the rest.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { calculateItemRepairCost, dfuItemRepairCost, REPAIR_COST_SCALE } from '../../src/systems/repairService.js';
+import * as repairService from '../../src/systems/repairService.js';
+import { calculateItemRepairCost, dfuItemRepairCost } from '../../src/systems/repairService.js';
 import { _resetModSettings, setModSetting } from '../../src/systems/modSettings.js';
 import {
   mintFieldRepairKit, mintPiece, useRepairKit, repairKitUse, repairKitTargets, kitCeiling, KIT_CEILING_TEXT, installSmithing,
@@ -23,27 +24,22 @@ const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const at = (item, pct) => { item.currentCondition = Math.round(item.maxCondition * pct / 100); return item; };
 const pct = (item) => Math.round(item.currentCondition / item.maxCondition * 100);
 
-test('REPAIR-RATE: a repair is a third of Daggerfall\'s price - a broken Daedric longsword 9,216 at a quality-10 smith, a fifth of its asking price; DFU\'s flat tenth a third too (mutants: the scale back at two thirds)', () => {
-  assert.equal(REPAIR_COST_SCALE, 1 / 3);
+test('B4: a repair costs what Daggerfall asks, the port turning InstantRepairs off for the price (mutants: a scale back on the price)', () => {
+  assert.equal('REPAIR_COST_SCALE' in repairService, false, 'the cut is gone');
   _resetModSettings();
   // Roleplay & Realism: Items' damage-scaled price (on as shipped): 0.6 of the value for a broken piece, through CalculateCost
-  assert.equal(dfuItemRepairCost(23040, 10, 0, 6400, { instantRepairs: false }), 27648);
-  assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 9216);
-  assert.equal(calculateItemRepairCost(23040, 10, 3200, 6400), 4608, 'half the damage, half the price');
-  // the mod off: DFU's own flat tenth, a third of it
+  assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 27648);
+  assert.equal(calculateItemRepairCost(23040, 10, 3200, 6400), 13824, 'half the damage, half the price');
+  // the mod off: DFU's own flat tenth
   setModSetting('roleplay-realism-items', 'conditionBasedPrices', false);
   try {
-    assert.equal(calculateItemRepairCost(23040, 10, 6000, 6400), Math.round(dfuItemRepairCost(23040, 10, 6000, 6400, { instantRepairs: false }) / 3));
+    assert.equal(calculateItemRepairCost(23040, 10, 6000, 6400), dfuItemRepairCost(23040, 10, 6000, 6400, { instantRepairs: false }));
   } finally { _resetModSettings(); }
-  assert.equal(calculateItemRepairCost(1, 1, 99, 100), 1, 'Daggerfall\'s least, 2: a third of it rounds to 1');
+  assert.equal(calculateItemRepairCost(1, 1, 99, 100), 2, 'Daggerfall least, 2');
   assert.equal(calculateItemRepairCost(300, 10, 1000, 1000), 0, 'nothing at full condition');
-  // AUDIT ECON R4: the guild's discount comes BEFORE the third, and the floor holds under it
   const fg = (rank) => (p) => reducedRepairCost(GUILDS.FightersGuild, { rank }, p);
-  assert.equal(dfuItemRepairCost(1, 1, 99, 100, { instantRepairs: false, reducedRepairCost: fg(5) }), 1, 'a rank-5 member\'s Daggerfall price: 1');
-  assert.equal(calculateItemRepairCost(1, 1, 99, 100, { reducedRepairCost: fg(5) }), 1, '...a third of which rounds to nothing - and a repair costs a gold piece at least');
-  const discounted = dfuItemRepairCost(1000, 10, 0, 6400, { instantRepairs: false, reducedRepairCost: fg(3) });
-  assert.equal(discounted, 839);
-  assert.equal(calculateItemRepairCost(1000, 10, 0, 6400, { reducedRepairCost: fg(3) }), 280, 'a third of the discounted 839 - never the discount of a third (279)');
+  assert.equal(calculateItemRepairCost(1, 1, 99, 100, { reducedRepairCost: fg(5) }), 1, 'a rank-5 member Daggerfall price: 1');
+  assert.equal(calculateItemRepairCost(1000, 10, 0, 6400, { reducedRepairCost: fg(3) }), 839, 'the guild discount, whole');
 });
 
 test('KIT-CEILING: no kit mends a piece past three quarters - 60% to 75%, 70% to 75%, 50% to 65%; a piece at three quarters or more is no kit\'s, and the refusal says a smith can do the rest (mutants: the ceiling at whole; the targets unfiltered; the cap dropped; the refusal dropped)', () => {

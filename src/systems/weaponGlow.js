@@ -47,7 +47,7 @@ export const GLOW_LOOKS = Object.freeze(['none', 'fire', 'frost', 'shock', 'arca
 export const GLOW_CODE = Object.freeze(Object.fromEntries(GLOW_LOOKS.map((k, i) => [k, i])));
 
 /** Law 3: the strength a total reads at - the elemental bands' own edges (lootRarity.js AFFIX_RANGES.elemental). */
-export const GLOW_LEVEL_EDGES = Object.freeze([3, 6]);
+export const GLOW_LEVEL_EDGES = Object.freeze([2, 4]);
 export const glowLevel = (total) => (total <= GLOW_LEVEL_EDGES[0] ? 1 : total <= GLOW_LEVEL_EDGES[1] ? 2 : 3);
 
 /** Law 1 and 2 as the hot path asks them - every frame, for the held weapon and every peer's - so no object is built:

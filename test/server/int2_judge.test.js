@@ -63,8 +63,9 @@ test('INT2: the character law - a level the realm reads, a tile that claims the 
 
 test('INT2: judgeSave - every item the character HOLDS judged where it lies, never the world\'s shelves (AUDIT INT: a piece sold online stood on the shop\'s shelf, and its finding with it); the wealth what it holds and laid on the ground: the purse, the banks less their loans (no further than the Empire lends), its own lists and storage, its piles - a bound or a quest\'s piece worth nothing', () => {
   const sword = rareDagger();
-  const forged = { ...dagger(), affixes: [{ id: 'damage', value: 40 }] };
-  const shelved = { ...dagger(), affixes: [{ id: 'damage', value: 40 }] };
+  // PIN MOVED (B4 rescale): the forged line is 24, the Legendary damage top (was 40); a value past the top would add a 'shape' finding
+  const forged = { ...dagger(), affixes: [{ id: 'damage', value: 24 }] };
+  const shelved = { ...dagger(), affixes: [{ id: 'damage', value: 24 }] };
   const hung = rareDagger(), dropped = dagger(), rentedChest = dagger();
   const room = 'DaggerfallInterior [MapID=11, BuildingKey=22]';
   const save = freshSave({
@@ -104,7 +105,7 @@ test('INT2/INT3: a lawless checkpoint is STORED and its character held - said in
   const { who, R } = await s.seat('ann');
   assert.deepEqual(s.row(R.id).held, null);
   assert.equal(s.row(R.id).judged_seq, 1, 'the first save judged');
-  const forged = freshSave({ name: 'ann', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 40 }] }] });
+  const forged = freshSave({ name: 'ann', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 24 }] }] });
   const r = await s.put(who, R, forged, { summary: { level: 1 } });
   assert.deepEqual([r.status, r.body], [200, { ok: true, seq: 2, tradeHeld: 'law', tradeHeldWhy: { code: 'rarity', t: 113 }, locked: [] }], 'stored, held, and the piece named');
   assert.deepEqual([s.row(R.id).seq, s.row(R.id).held, s.row(R.id).strikes], [2, 'law', 1]);
@@ -166,12 +167,12 @@ test('INT2/INT6: a staff hold landing between a checkpoint\'s read and its write
   assert.deepEqual([r.status, r.body.tradeHeld, s.row(R.id).held], [200, 'staff', 'staff'], 'the save landed, and staff\'s hold stands');
   assert.equal((await s.call('/v1/mod/realm-clear', { id: R.id }, mac.secret)).status, 200);
   // a finding staff judge wrong: cleared once, excused after
-  const odd = freshSave({ name: 'ivo', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 40 }] }] });
+  const odd = freshSave({ name: 'ivo', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 24 }] }] });
   assert.equal((await s.put(who, R, odd)).body.tradeHeld, 'law');
   assert.equal((await s.call('/v1/mod/realm-clear', { id: R.id, note: 'the law is wrong here' }, mac.secret)).status, 200);
   assert.equal((await s.put(who, R, odd)).body.tradeHeld, null, 'excused');
   assert.equal(s.row(R.id).law_excused, s.row(R.id).law_sig);
-  const other = freshSave({ name: 'ivo', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 40 }] }, { ...dagger(), group: 'Gems' }] });
+  const other = freshSave({ name: 'ivo', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 24 }] }, { ...dagger(), group: 'Gems' }] });
   assert.equal((await s.put(who, R, other)).body.tradeHeld, 'law', 'a new finding holds');
 });
 

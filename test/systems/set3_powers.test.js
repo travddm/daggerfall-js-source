@@ -122,7 +122,7 @@ test('SET3 the 2-piece stat tiers: one fold over RF1\'s channels for MY entity w
   for (const s of MAGIC_SKILLS) assert.equal(entitySkillMod(mor, s), 2, `school ${s}`);
   assert.equal(entitySkillMod(mor, SKILLS.Stealth), 0, 'only the schools');
   const ruhn = wearSet(player(), 'ruhn', 2);
-  assert.equal(entityResistMod(ruhn, ['fire']), 15);
+  assert.equal(entityResistMod(ruhn, ['fire']), 10);
   assert.equal(entityResistMod(ruhn, ['frost', 'shock', 'poison', 'magic']), 0, 'fire alone');
   assert.equal(entityStatMod(ruhn, 'endurance'), 0, 'a set\'s tier is its own');
 });

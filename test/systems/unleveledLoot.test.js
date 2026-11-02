@@ -1,4 +1,5 @@
 // UL1 - UNLEVELED LOOT 1.1.2 (Ralzar), THE MOD, 1:1.
+import { killGoldFromRange } from '../../src/systems/loot/kill-gold.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -128,7 +129,7 @@ test('UL1: the corpse - a Daedra Lord\'s roll over 70 drops daedric (a weapon ov
   const dagger = lord.items[1];
   assert.equal(dagger.group, 'Weapons'); assert.equal(dagger.templateIndex, 113); assert.equal(dagger.material, 9, 'daedric');
   assert.equal(dagger.currentCondition, Math.trunc(Math.fround(Math.fround(0.3) * dagger.maxCondition)), '30% of its own max');
-  assert.equal(lord.items[0].stackCount, 25, '250 / level 10, x Range(1, 6) = 1');
+  assert.equal(lord.items[0].stackCount, killGoldFromRange(25, 10), '250 / level 10, on the log curve (B4), x Range(1, 6) = 1');
   // the armour arm: Range(0,100)=0 (not > 50) -> CreateRandomArmor: piece Range(0,11)=0, then the registry's RandomArmorMaterial (the mod's own): Range(0,92), Range(1,91)... then rangeFloat
   const lord2 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5));
   lord2.items = [goldStack(7)];
@@ -157,7 +158,7 @@ test('UL1: the corpse - a Daedra Lord\'s roll over 70 drops daedric (a weapon ov
   // daedricDrops off: the Lord keeps his gold division and drops nothing
   const lord3 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord3.items = [goldStack(100)];
   unlevelDroppedLoot(lord3, { rolls: seq(0.999, 0), r: (k) => (k === 'Daedric' ? 5 : k === 'Orcish' ? 8 : 0) });
-  assert.equal(lord3.items.length, 1); assert.equal(lord3.items[0].stackCount, 50, '100 / 10, x Range(1, 6) at 0.999 = 5 - the first roll is the gold\'s, no daedric roll was drawn');
+  assert.equal(lord3.items.length, 1); assert.equal(lord3.items[0].stackCount, killGoldFromRange(10, 10) * 5, '100 / 10, on the log curve (B4), x Range(1, 6) at 0.999 = 5 - the first roll is the gold\'s, no daedric roll was drawn');
   _resetUnleveledLoot();
 });
 
@@ -188,7 +189,7 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   // the death handler through the seam
   const lord = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord.items = [goldStack(100)];
   raiseEnemyDeath(lord, { rolls: seq(0, 0) });
-  assert.equal(lord.items[0].stackCount, 20, '100 / level 5, x Range(1,6) at 0 = 1');
+  assert.equal(lord.items[0].stackCount, killGoldFromRange(20, 5), '100 / level 5, on the log curve (B4), x Range(1,6) at 0 = 1');
   on = false;
   const lord2 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord2.items = [goldStack(100)];
   raiseEnemyDeath(lord2, { rolls: seq(0, 0) });

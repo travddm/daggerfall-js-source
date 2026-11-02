@@ -107,10 +107,10 @@ test('CAST-SPEED: the rig reads the caster\'s rate once a cast and hands it to b
     assert.ok(Math.abs(released - 0.16) < 0.002 && Math.abs(t - 0.224) < 0.002, `the classic hands at the same rate (${released}, ${t})`);
     // the castSpeed loot line reaches the same door
     on();
-    wear(me, ring([{ id: 'castSpeed', value: 15 }]));
+    wear(me, ring([{ id: 'castSpeed', value: 9 }]));   // PIN MOVED: B4 rescale, a castSpeed line tops at 9
     asked.length = 0;
     r.castSpellAnim(2, 0, null);
-    assert.deepEqual(asked, [[2, 1.4]], 'Speed 100 and fifteen in a hundred');
+    assert.deepEqual(asked, [[2, 1.34]], 'Speed 100 and nine in a hundred');
   } finally {
     Object.assign(fpArm, saved);
     for (let i = 0; i < 200; i++) fpsSpellCasting.tick(0.05);
@@ -177,11 +177,11 @@ test('CAST-SPEED: the loot line - casting speed, a line that does something on j
   assert.deepEqual(k.groups, ['Jewellery', 'Weapons']);
   assert.equal(k.proc, true);
   assert.equal(k.params, null);
-  assert.deepEqual(LR.AFFIX_RANGES.castSpeed, { magic: [3, 6], rare: [6, 10], legendary: [10, 15] });
+  assert.deepEqual(LR.AFFIX_RANGES.castSpeed, { magic: [2, 4], rare: [4, 6], legendary: [6, 9] });
   assert.equal(LR.AFFIX_WORTH.castSpeed, 60);
   assert.equal(LR.affixLabel({ id: 'castSpeed', value: 8 }), '+8% casting speed');
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'castSpeed', value: 3 }, t)), ['of Quickening', 'of Alacrity', 'of the Swift Hand']);
-  assert.equal(LR.validAffix({ id: 'castSpeed', value: 16 }), false, 'past its ceiling');
+  assert.equal(LR.validAffix({ id: 'castSpeed', value: 10 }), false, 'past its ceiling');
   assert.equal(LR.validAffix({ id: 'castSpeed', param: 'fire', value: 5 }), false, 'it takes no param');
   // a door's last pass may land it on a ring or a sword, never on armour
   // proc kind (a roll of 0.999); potency follows it on both and wellspring on a jewel, so it is the second of a jewel's
@@ -196,12 +196,12 @@ test('CAST-SPEED: the loot line - casting speed, a line that does something on j
   // the sum
   const me = caster(50);
   assert.equal(LP.lootCastSpeed(me), 0);
-  wear(me, ring([{ id: 'castSpeed', value: 10 }], 135));
+  wear(me, ring([{ id: 'castSpeed', value: 6 }], 135));
   wear(me, Object.assign(createWeapon(120, 1), { rarity: 'rare', affixes: [{ id: 'castSpeed', value: 6 }] }));
-  assert.equal(LP.lootCastSpeed(me), 16);
-  assert.equal(CS.castRate(me), 1.16, 'registered: the rate reads it');
+  assert.equal(LP.lootCastSpeed(me), 12);
+  assert.equal(CS.castRate(me), 1.12, 'registered: the rate reads it');
   assert.equal(LP.lootCastSpeed({ ...me, peer: true }), 0, 'a peer\'s cast is its own');
-  for (const t of [133, 136, 137, 138]) wear(me, ring([{ id: 'castSpeed', value: 15 }], t));
+  for (const t of [133, 136, 137, 138]) wear(me, ring([{ id: 'castSpeed', value: 9 }], t));
   assert.equal(LP.CAST_SPEED_CAP, 30);
   assert.equal(LP.lootCastSpeed(me), LP.CAST_SPEED_CAP, 'never past the cap');
   off();

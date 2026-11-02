@@ -141,9 +141,9 @@ test('MARTIAL1 THE LAW: fifteen pairs of the six weapon skills, whole and distin
   assert.equal(MP.SIGNATURE_TECHNIQUES.windKick.airborne, true, 'the Windrunner kicks from the air, as the Flying Kick does');
   assert.deepEqual(JSON.parse(JSON.stringify(MP.MARTIAL_NUMBERS)), {
     flowingSteel: { pct: 1, stacks: 5, seconds: 4 }, warRhythm: { pct: 15, seconds: 10 }, ironDiscipline: { lighter: 3 }, huntersInstinct: { pct: 3 },
-    dancersStep: { oneIn: 10 }, bloodlust: { health: 5 }, cheapShot: { pct: 4 }, openingStrike: { pct: 5 }, lightStep: { agility: 10, dodging: 15 },
+    dancersStep: { oneIn: 10 }, bloodlust: { health: 5 }, cheapShot: { pct: 4 }, openingStrike: { pct: 5 }, lightStep: { agility: 9, dodging: 15 },
     standFirm: { below: 0.3, heal: 20, recover: 180 }, tireless: { fatigue: 15 }, frenzy: { below: 0.5, pct: 3, pace: 10 }, purge: { pct: 3 },
-    grit: { health: 1, fatigue: 2 }, windborne: { speed: 10, running: 15, jumping: 15 },
+    grit: { health: 1, fatigue: 2 }, windborne: { speed: 9, running: 15, jumping: 15 },
     thousandCuts: { share: 0.5 }, rallyingCleave: { pct: 2, seconds: 8 }, judgement: { heal: 4, foes: 3 }, huntersMark: { pct: 3, seconds: 12 },
     cyclone: { pace: 20, seconds: 6 }, guttingLunge: { below: 0.25 }, blackjack: { times: 2 }, vanishingStrike: { rounds: 4 },
     phantomStrike: { oneIn: 3, seconds: 6 }, earthsplitter: { lighter: 4, seconds: 10 }, fellingStrike: { heal: 10 }, savageWhirl: { leech: 10, seconds: 8 },
@@ -449,11 +449,11 @@ test('MARTIAL4 THE PASSIVES: each through its own seam, on both sides of its lin
   reset();
   const sd = pathFighter('shadowdancer');
   const m1 = computeEntityMods(sd);
-  assert.deepEqual([m1.stats.agility, m1.skills[SKILLS.Dodging]], [10, 15]);
+  assert.deepEqual([m1.stats.agility, m1.skills[SKILLS.Dodging]], [9, 15]);
   const wr = pathFighter('windrunner');
   const m2 = computeEntityMods(wr);
-  assert.deepEqual([m2.stats.speed, m2.skills[SKILLS.Running], m2.skills[SKILLS.Jumping]], [10, 15, 15]);
-  assert.equal(liveStat(wr, 'speed'), wr.stats.speed + 10);
+  assert.deepEqual([m2.stats.speed, m2.skills[SKILLS.Running], m2.skills[SKILLS.Jumping]], [9, 15, 15]);
+  assert.equal(liveStat(wr, 'speed'), wr.stats.speed + 9);
   // Juggernaut: a hurt across 30% heals 20%, ready again after 3 minutes; one already under crosses nothing
   reset();
   const jg = pathFighter('juggernaut'); jg.health = jg.maxHealth = 100; door([], jg);

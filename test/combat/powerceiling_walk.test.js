@@ -36,8 +36,8 @@ const past = (where, item) => { const p = linesPastCeiling(item); assert.deepEqu
 
 /** THE LEGENDARY BAND'S TOPS, every kind - the ceiling of every line in the game. */
 const TOPS = Object.freeze({
-  damage: 40, armor: 20, stat: 15, resist: 50, skill: 30, weight: 50, elemental: 10, leech: 10, thorns: 10, focus: 10, slayer: 4,
-  standing: 8, warmth: 10, dry: 50, castSpeed: 15, potency: 5, wellspring: 10, technique: 30,
+  damage: 24, armor: 12, stat: 9, resist: 30, skill: 18, weight: 50, elemental: 6, leech: 6, thorns: 6, focus: 6, slayer: 3,
+  standing: 8, warmth: 10, dry: 50, castSpeed: 9, potency: 3, wellspring: 6, technique: 30,
 });
 
 test('POWER-CEILING THE LADDER: seven rungs in their order, three rolled bands and none above the Legendary, the Legendary band\'s tops and the sigil\'s, all literal (mutants: a rung added; a top raised; a band above the Legendary)', () => {

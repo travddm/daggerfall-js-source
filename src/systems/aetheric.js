@@ -96,7 +96,7 @@ export const REGALIA_SET = 'ruhn';
 /** The top of the Legendary band, per affix kind - every Regalia number is one, but the gate's fire. */
 const top = (id) => AFFIX_RANGES[id].legendary[1];
 /** AUDIT FINAL: THE GATE'S FIRE, +10 A PIECE - not the band's top. At +50 an armour piece, any
- *  two worn made a fire saving throw of 100 (spellcast.js: total immunity), and the Burning Gate tier's own +15 to +45
+ *  two worn made a fire saving throw of 100 (spellcast.js: total immunity), and the Burning Gate tier's own +10 to +30
  *  meant nothing. Eight pieces now carry +80, and the tier's fire is what takes a full Regalia past immunity. */
 export const REGALIA_FIRE_RESIST = 10;
 const armor = () => ({ id: 'armor', value: top('armor') });
