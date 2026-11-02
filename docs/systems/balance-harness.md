@@ -19,7 +19,7 @@ Each is printed for DFU, for this game, and as the ratio ours / DFU.
 
 ```bash
 node tools/balance/run.mjs --build warrior,mage --levels 1,12,30,45
-node tools/balance/run.mjs --layers -hero,-scaling --md out.md --json out.json
+node tools/balance/run.mjs --layers -hero,-stats --md out.md --json out.json
 node tools/balance/run.mjs --ablate --levels 1,10,20,30,45
 ```
 
@@ -46,17 +46,16 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | Layer | What it switches |
 | --- | --- |
 | `pcaao` | Physical Combat And Armor Overhaul (`installPcaao`). |
-| `meaner` | Meaner Monsters rows, read when the foe is built. |
+| `stats` | The classic monster rows under Enemy Expansion and MUDEX, with the stat pass, read when the foe is built. |
 | `master` | Master Skills: mastered skills climb to 200 and read up to 140. |
 | `online` | Online-only rules: the level law, the weapon skill's blow and pace past 100, school potency and spell cost past 100. |
 | `onlineHealth` | The online health floor (`evenHpFloor`). |
-| `scaling` | Place and mastery scaling of foes (`progressionScaling`). |
-| `hero` | Hero's threat: foes grow with player level past 10 (`heroThreat`). |
+| `hero` | Hero's threat: plain foes grow with player level past 30 (`heroThreat`). |
 | `power` | Loot-ladder gear: a damage line on the weapon, an armour line on each piece, at the tier the level wears. |
 | `techniques` | The best weapon technique the gear tier can roll. |
 | `swing` | The port's own swing and cast speed curve. |
 | `virtue` | Oblivion-style levelling, 12 attribute points a level (off by default). |
-| `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-meaner,-scaling`). |
+| `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-stats`). |
 
 The default is the game as an online room runs it.
 
@@ -75,7 +74,7 @@ Stated in `builds.mjs` and `progression.mjs`; none comes from a save.
   material `RandomMaterial` gives at the gear percentile. Same gear in both rule sets. No shields.
 - Foes: DFU's encounter-table band for the level (`RandomEncounters.ChooseRandomEnemy`), ranked by health x damage a
   swing. Weak, average and strong are its 10th, 50th and 90th percentile. Health is the row mean. Elite is the strong
-  foe at x5 health and x3 damage; boss is the elite dungeon's x7 and x4.
+  foe at the elite tier (x2 health, x1.3 damage); boss is an elite in an Elite Dungeon (x7 and x4).
 - Casters cast the Lightning spell (SPELLS.STD 31) while magicka lasts, then swing, over a 30-second horizon.
 
 ## How to read it
@@ -84,7 +83,7 @@ The target (from the owner) is a maxed character at about 1.5x a DFU character, 
 level 1. Two numbers are compared with it:
 
 - **Character power**: the geometric mean of dps ratio and dies-s ratio when this game's character meets **DFU's own foe
-  row** (the foe layers `meaner`, `scaling` and `hero` are switched off for it). It isolates the character.
+  row** (the foe layers `stats` and `hero` are switched off for it). It isolates the character.
 - **Fight power**: the same mean when the character meets this game's foe. A value under 1 means the foes are harder
   than DFU's by more than the character is stronger.
 
@@ -116,3 +115,19 @@ the block roll, backstab, saving throws and elemental tolerance, class foes, Ene
 effects other than damage, fatigue, and healing. A value from the harness is a comparison of rule sets on these
 builds, not a prediction of play.
 The audit's theoretical x119.95 blow stack is a cap; the `power` layer measures the gear a level typically wears.
+
+## The foe-side budget (B2)
+
+B2 tamed the foes to match the tamed player. The foe layers are `stats` and `hero`:
+
+- `stats`: the 29 classic monsters that Enemy Expansion and MUDEX rewrite stand at the numbers in
+  `src/systems/enemyExpansion/classic-stat-pass.ts`, each field within 30% of DFU's row. The test for that file holds
+  the bound.
+- `hero`: a plain foe is DFU's row up to level 30. From level 31 to 45 its blows grow 3.6% a level and its health 1.8%
+  (about 1.7 and 1.3 at level 45, 1.5 in fight power). A promoted foe, an ally and a tuned stage take none.
+- Elites (x2 health, x1.3 damage) and champions (x1.4, x1.15) stand at 1% and 2% of eligible foes. Neither takes
+  another foe layer.
+
+Place threat, the Master Skills veteran layer and its climb layer, and the Renown threat no longer exist.
+Fight power is the same measure as character power with this game's foe; a foe on target keeps the ratio of fight
+power to character power between 0.7 and 1.35 at every level, and near 1 at level 45.

@@ -451,25 +451,6 @@ export const MOD_SETTINGS = Object.freeze({
       'Debug.ShowValues': Object.freeze({ default: false, get description() { return t('mods.comeSailAway.Debug.ShowValues.description', 'Shows the boat’s speed, the speed it’s heading for and the wind’s strength on screen.'); } }),
     }),
   }),
-  // MM1: MEANER MONSTERS 1.5.2 (Ralzar). No modsettings of its own -
-  // `Enabled` alone (DFU enables a mod by listing it). Listed BEFORE
-  // the overhaul because the overhaul names it as a dependency and so
-  // Awakes after it in DFU.
-  'meanerMonsters': Object.freeze({
-    title: 'Meaner Monsters',
-    author: 'Ralzar',
-    keys: Object.freeze({
-      Enabled: Object.freeze({
-        default: true,
-        get description() {
-          return t('mods.meanerMonsters.Enabled.description', 'Many monsters hit harder and take more to kill, while rats, bats and zombies are weaker. 20 monsters '
-            + 'are changed, and werebeasts and the dragonling are bigger. With Physical Combat And Armor Overhaul '
-            + 'also on, that mod’s version of these changes is used. With Daggerfall Enemy Expansion on, MUDEX, the '
-            + 'author’s version made for it, is used instead.');
-        },
-      }),
-    }),
-  }),
   // PCO1: PHYSICAL COMBAT AND ARMOR OVERHAUL 1.44 (Kirk.O). Its seven
   // Modules keys, names and descriptions as modsettings.json ships them
   // (all seven on, as shipped), plus the port's `Enabled` (DFU enables

@@ -15,7 +15,7 @@ overrides. Every departure the game makes is named below.
 | Concern | Files |
 | --- | --- |
 | Formulas (to-hit, damage, armour, wear) | `src/combat/formulas.js` |
-| Physical Combat and Armor Overhaul (PCAAO) | `src/combat/pcaao.js`, `src/combat/pcaaoMeanerMonsters.js` |
+| Physical Combat and Armor Overhaul (PCAAO) | `src/combat/pcaao.js` |
 | Player melee | `src/combat/playerWeapon.js` (`PlayerWeapon`, `resolveHit`) |
 | Swing timing and state machine | `src/characters/weaponStates.js`, `src/combat/swingLaw.js` |
 | Weapon tables | `src/characters/weapons.js` |
@@ -112,8 +112,8 @@ In a pair the lead hand opens; a strike within `FLURRY_WINDOW` (0.75 s) of the l
 one frame in. The off hand's blow (`DUAL`, `OFF_HAND_BLOW`) deals 0.8 of the rolled damage, takes -5 to hit at
 Agility 50 (range -10..0), feels its weapon 1.5x heavier (paid as held ticks), and counts as 0.8 of a blow for
 per-blow effects. Fists keep DFU's numbers. `H` swaps hands or picks the lead. Drawing:
-`src/combat/twoHands/twoHands.js` (sprite lane), `src/combat/twoHands/mirrorRig.js` (Morrowind arm). A readied spell in the free hand is on
-[magic.md](magic.md).
+`src/combat/twoHands/twoHands.js` (sprite lane), `src/combat/twoHands/mirrorRig.js` (Morrowind arm).
+A readied spell in the free hand is on [magic.md](magic.md).
 
 ## Ranged
 
@@ -156,17 +156,19 @@ paths (one per pair of weapon skills). A path adds passives, riders and a signat
 
 - **Base stats:** `enemyEntity.js` (see [characters.md](characters.md)). Equipment: `assignEnemyStartingEquipment`;
   Roleplay Realism Items' realistic equipment (`rriEnemyEquipment.js`) replaces it while its switch is on (default
-  on). Meaner Monsters (`src/characters/meanerMonsters.js`, default on) retunes about 20 monsters; with PCAAO on its
-  PCAAO edit (`pcaaoMeanerMonsters.js`) is used.
-- **Place threat:** `skillSoftcap.js` `placeVeteran(tier)` grades a place by the loot ladder's dungeon tier (4 =
-  none, 18 = full; wilderness 5 by day, 7 by night). At full share a foe has x2 health, x1.25 damage, +10 skill.
-  `enemyEntity.js` `applyProgressionScaling` is the one writer. Towns and interiors never scale.
-- **Elites** (`eliteFoes.js`): x5 health, x3 damage, 1.25x size, a glow, better loot; x7/x4 in an Elite Dungeon and
-  x9/x4.5 in the super dungeon. 5% of overworld foes; in a plain dungeon one, one time in five; three or four in an
-  Elite Dungeon. Never under level 3, never the watch, an ally or a quest foe. Online always; offline only while the
-  loot ladder is on. Each elite carries one boss trait.
-- **Champions** (`champions.js`): 70 per mille, level 3+, x2 health, x1.25 damage, and one trait from
-  `CHAMPION_TRAITS` (Mighty, Stalwart, Swift, Vampiric, Thorned).
+  on). With Daggerfall Enemy Expansion loaded, MUDEX also loads and rewrites about 30 classic monsters.
+  `systems/enemyExpansion/classic-stat-pass.ts` holds the numbers those monsters stand at: every field within 30% of
+  Daggerfall Unity's row (armor within 30% or 2 points).
+- **Hero's threat** (`heroThreat.js`): the only scaling of an ordinary foe. Each level past 30, up to 45, multiplies
+  its blows by 1.036 and its health by 1.018 (about 1.7 and 1.3 at level 45). A promoted foe, an ally, the watch and
+  a tuned stage take none. `enemyEntity.js` `applyHeroThreat` is the one writer.
+- **Promoted foes** (`foe-promotion.ts`): one hash roll for each foe lands on an elite (1%), a champion (2%) or neither;
+  the same hash marks the same records on every client. A promoted foe takes no hero's threat. Never under level 3,
+  never the watch, an ally or a quest foe. Online always; offline only while the loot ladder is on.
+- **Elites** (`eliteFoes.js`): x2 health, x1.3 damage, 1.25x size, a glow, better loot, one boss trait. An Elite
+  Dungeon holds three or four, at x7 health and x4 damage; the super dungeon's are x9 and x4.5.
+- **Champions** (`champions.js`): x1.4 health, x1.15 damage, and one trait from `CHAMPION_TRAITS` (Mighty, Stalwart,
+  Swift, Vampiric, Thorned).
 - **Boss traits** (`bossTraits.js`): `warded` (a ward of 30% health that regrows), five element proofs (a spell of
   that element lands 25%), `bladeturning` (blades and arrows land 50%), `stoneskin` (blunt and fists land 50%),
   `curbing` (no blow over 5% of health), `wrathful` (x1.6 damage 75 s into a fight), `thorned` (20% of weapon damage

@@ -93,7 +93,7 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("combat", "Combat", [
     sec("enemies", "Enemies", [
-      "feat:enhanced-ai", "Enhancements/EnhancedCombatAI", "feat:mod-meanermonsters", "feat:mod-daggerfall-enemy-expansion", "feat:enemy-infighting", "Enhancements/EnemyInfighting"]),
+      "feat:enhanced-ai", "Enhancements/EnhancedCombatAI", "feat:mod-daggerfall-enemy-expansion", "feat:enemy-infighting", "Enhancements/EnemyInfighting"]),
     sec("rules", "Rules & armour", [
       "feat:mod-pcaao", "MeleeAttacks/MeleeAttackFriendlyProtection", "MeleeAttacks/MeleeAttackDetection"]),
     sec("weapons", "Weapons in hand", [

@@ -9,11 +9,11 @@ import { installPcaao, uninstallPcaao } from '../../src/combat/pcaao.js';
 import { calculateAttackDamage } from '../../src/combat/formulas.js';
 import { MOD_SETTINGS, setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
-import { makeEnemyEntity, applyProgressionScaling } from '../../src/characters/enemy/enemyEntity.js';
+import { makeEnemyEntity, applyHeroThreat } from '../../src/characters/enemy/enemyEntity.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { heroThreat } from '../../src/systems/heroThreat.js';
-import { progressionScaling, combatStanding, dungeonShare, foeShare, placeVeteran } from '../../src/systems/skillSoftcap.js';
-import { DUNGEON_RARITY_TIER, AFFIX_RANGES } from '../../src/systems/loot/lootRarity.js';
+import { dexClassicRow } from '../../src/systems/enemyExpansion/dexInstall.js';
+import { AFFIX_RANGES } from '../../src/systems/loot/lootRarity.js';
 import { promoteEliteFoe } from '../../src/systems/eliteFoes.js';
 import { getMeleeWeaponAnimTime, getBowCooldownTime, CLASSIC_UPDATE_INTERVAL } from '../../src/characters/weaponStates.js';
 import { WEAPON_TYPES } from '../../src/combat/fpsWeapon.js';
@@ -33,12 +33,11 @@ import { progressionOf, VIRTUE_POINTS_PER_LEVEL } from './progression.mjs';
 /** The rule layers, each with the game switch it flips. `default` is the game as an online room runs it. */
 export const LAYERS = Object.freeze({
   pcaao: 'Physical Combat And Armor Overhaul: armour reduces damage, skill counts x1.5 to hit, crits multiply (mod setting pcaao Enabled)',
-  meaner: 'Meaner Monsters rows (mod setting meanerMonsters Enabled)',
+  stats: 'Classic monster stat rows under Enemy Expansion and MUDEX, with the stat pass (systems/enemyExpansion/classic-stat-pass.ts)',
   master: 'Master Skills: mastered skills climb to 200 and read up to 140 (entity.masterSkills)',
   online: 'Online-only rules: the level law (systems/levelClimb.js), the blow and pace of a weapon skill past 100 (systems/weaponMastery.js), school potency and spell cost past 100',
   onlineHealth: 'Online health floor: Endurance repays every earlier level (systems/levelEven.js evenHpFloor)',
-  scaling: 'Place and mastery scaling of foes (systems/skillSoftcap.js progressionScaling)',
-  hero: "Hero's threat: foes grow with player level past 10 (systems/heroThreat.js)",
+  hero: "Hero's threat: foes grow with player level past 30 (systems/heroThreat.js)",
   power: 'Loot-ladder gear: a damage line on the weapon, an armour line on each piece (systems/loot/lootRarity.js)',
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
   swing: 'Swing law: the port\'s own swing speed curve (characters/weaponStates.js swingFrameSeconds)',
@@ -93,7 +92,6 @@ export function applyLayers(layers) {
   } else {
     uninstallPcaao();
   }
-  setModSetting('meanerMonsters', 'Enabled', layers.has('meaner'));
   setPref('lootRarity', layers.has('power'));
   setPref('weaponTechniques', layers.has('techniques'));
   const online = layers.has('online');
@@ -162,20 +160,15 @@ export function oursCharacter(build, level, layers, { gearPercentile, override =
 }
 
 /** Build a foe the way the game does, then apply the scaling layers. Health is the row's mean, not a roll. */
-export function oursFoe(id, character, layers, { career = DEFAULT_CAREER, dungeonType = 1, kind = 'plain' } = {}) {
+export function oursFoe(id, character, layers, { career = DEFAULT_CAREER, kind = 'plain' } = {}) {
   const playerLevel = character.entity.level;
-  const foe = makeEnemyEntity(id, ENEMY_BASICS[id], career, playerLevel, () => 0.5);
+  const row = layers.has('stats') ? dexClassicRow(id, ENEMY_BASICS[id], { mudex: true }) : ENEMY_BASICS[id];
+  const foe = makeEnemyEntity(id, row, career, playerLevel, () => 0.5);
   foe.maxHealth = (foe.basics.minHealth + foe.basics.maxHealth) / 2;
   foe.health = foe.maxHealth;
   if (kind !== 'plain') promoteEliteFoe(foe, { eliteDungeon: kind === 'boss' });
-  if (layers.has('scaling') || layers.has('hero')) {
-    const hero = layers.has('hero') ? heroThreat(playerLevel, null) : null;
-    const standing = layers.has('scaling') ? combatStanding(character.entity) : { veteran: 0, edge: 0 };
-    const place = layers.has('scaling') ? placeVeteran(DUNGEON_RARITY_TIER[dungeonType]) : 0;
-    const share = layers.has('scaling') ? dungeonShare(dungeonType) : 0;
-    const scaling = progressionScaling(standing, share, foeShare(foe.basics.level, false), place, hero);
-    applyProgressionScaling(foe, scaling);
-  }
+  // a promoted foe takes no hero's threat (systems/heroThreat.js)
+  if (kind === 'plain' && layers.has('hero')) applyHeroThreat(foe, heroThreat(playerLevel));
   return foe;
 }
 

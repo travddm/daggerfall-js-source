@@ -9,7 +9,7 @@ export const DEFAULT_LEVELS = Object.freeze([1, 5, 10, 15, 20, 25, 30, 35, 40, 4
 export const TARGET_TOP_RATIO = 1.5;
 export const TOP_LEVEL = 45;
 /** The layers that act on the foe. Switched off, the character keeps its layers and meets DFU's own foe row. */
-export const FOE_LAYERS = Object.freeze(['meaner', 'scaling', 'hero']);
+export const FOE_LAYERS = Object.freeze(['stats', 'hero']);
 export const FOE_KINDS = Object.freeze(['weak', 'average', 'strong', 'elite', 'boss']);
 
 /** The owner's target: a maxed character is about 1.5x a DFU character; the path from 1.0 at level 1 is a straight line. */

@@ -2,14 +2,14 @@
 //
 // AN ELITE IS ONE FOE, NOT A PLACE. The Elite DUNGEON (world/spawnedDungeons.js) stands three foes at each marker at
 // double strength; an ELITE FOE is a single champion among them - or one of a roaming band, a camp, a wild encounter -
-// at five times its rolled health and three times its blows and spells, a quarter larger, glowing, with a gear drop of
+// at twice its rolled health and 1.3 times its blows and spells, a quarter larger, glowing, with a gear drop of
 // its own. The field on the entity is `eliteFoe` (`elite` is already the Elite Dungeon's word on every foe there, and
 // `champion` LOOT7's trait - systems/champions.js; a foe is one or the other, never both).
 //
 // SHARED ONLINE WITH NOTHING NEW TO AGREE ON:
-//   - in a dungeon every client builds the same foe list (the foe frame's index law), so the champions are a pure pick
-//     over that list, seeded by the dungeon's own location id - every client marks the same records;
-//   - outdoors the foe's owner rolls the 5% and the foe record carries it (`z`, net/wire.js), so a puppet stands as the
+//   - in a dungeon every client builds the same foe list (the foe frame's index law), so the promotions are a pure hash
+//     of the dungeon's own location id and the record's place (systems/foe-promotion.ts) - every client marks the same records;
+//   - outdoors the foe's owner rolls the 1% and the foe record carries it (`z`, net/wire.js), so a puppet stands as the
 //     same elite: the size, the glow and the blows it lands at me (its owner's maximum health rides `k` already).
 //
 // RENOWN-GATE: ONLINE, AN ELITE OF MY OWN WAITS FOR RENOWN 5 -
@@ -26,30 +26,28 @@ import { isAmmunition } from './item/itemTemplates.js';
 import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';   // ELITE-FLOOR: the watch is never an elite
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';   // ELITE-FLOOR: a kind's own level, the same on every client
 import { WEAPON_MATERIALS } from '../characters/weapons.js';   // BOSS-HARD: Silver, the Troll's floor
+import { PROMOTION, markPromotions, scalePromoted } from './foe-promotion.ts';
+import { CHAMPION_TRAITS } from './champions.js';   // the tier's numbers and the one scaling path
 import { renownOpens } from './sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
 import { markUnquiet } from './revenant/unquietMark.js';   // UNQUIET (Revenants.md section 46): one elite in four carries the mark - its own, never a puppet's
 
-/** Health and damage, times the foe's own (rolled, before any Elite Dungeon doubling - an elite is 5x, not 10x). */
-export const ELITE_FOE_HEALTH_MULT = 5;
-export const ELITE_FOE_DAMAGE_MULT = 3;
-/** ...and in an Elite Dungeon, where every foe is already doubled: a partial stack, not 10x / 6x. */
+/** Health and damage, times the foe's own (rolled, before any Elite Dungeon doubling). */
+export const ELITE_FOE_HEALTH_MULT = PROMOTION.elite.health;
+export const ELITE_FOE_DAMAGE_MULT = PROMOTION.elite.damage;
+/** ...and in an Elite Dungeon, where every foe is already doubled. Standalone numbers, left for the Abyss retune. */
 export const ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT = 7;
 export const ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT = 4;
-/** SD4a: ...and in a Super dungeon, where every foe is x4 / x2.5
- *  already - the Elite Dungeon's stack read the same way: the health the dungeon's and the elite's added (2 + 5 = 7
- *  there, 4 + 5 = 9 here), the damage the dungeon's and the elite's extra over a plain blow (2 + 2 = 4 there, 2.5 + 2 =
- *  4.5 here). */
+/** ...and in a Super dungeon, where every foe is x4 health and x2.5 damage already. Standalone numbers, left for the
+ *  Abyss retune. */
 export const ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT = 9;
 export const ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT = 4.5;
 /** How much larger the sprite is drawn. */
 export const ELITE_FOE_SIZE = 1.25;
-/** The chance a foe in the open world stands as an elite. ELITE-RATES: one in twenty again, no gate - ELITE-RARITY's one in fifty past a 180-minute gap undone. */
-export const ELITE_FOE_OVERWORLD_CHANCE = 0.05;
+/** The chance a foe in the open world stands as an elite. */
+export const ELITE_FOE_OVERWORLD_CHANCE = PROMOTION.elite.perMille / 1000;
 /** How many elites an Elite Dungeon holds: 3 or 4 (fewer only if it has fewer foes). */
 export const ELITE_FOE_DUNGEON_MIN = 3;
 export const ELITE_FOE_DUNGEON_MAX = 4;
-/** A normal (not Elite) dungeon holds at most one elite, and only this often (ELITE-RATES: one in five again). */
-export const ELITE_FOE_NORMAL_DUNGEON_CHANCE = 0.2;
 /** The elite's extra drop - better loot than its kind carries. */
 export const ELITE_FOE_LOOT = Object.freeze({ magic: 2, common: 1, legendaryChance: 0.06, goldPerLevel: [20, 60] });   // ELITE-RARE: the Rare's chance is eliteRareChance's, by level
 /** ELITE-RARE: the elite's extra Rare roll, at a
@@ -66,9 +64,9 @@ export function eliteRareChance(level = 1) {
 export const ELITE_FOE_PREFIX = 'Elite ';
 /** ELITE-FLOOR: an elite is a foe of this level or more - LOOT7's champion floor (systems/champions.js
  *  CHAMPION_MIN_LEVEL), so a new character's first road is never a five-times foe that hits three times as hard. */
-export const ELITE_FOE_MIN_LEVEL = 3;
+export const ELITE_FOE_MIN_LEVEL = PROMOTION.minLevel;
 /** RENOWN-GATE: ONLINE, AN ELITE OF MY OWN WAITS FOR THIS RENOWN -
- *  the open world's roll (rollOverworldElite) and a search's (searchables.js rollSearchElite), each a foe its roller
+ *  the open world's roll (exteriorFoes.js, from rollStreetPromotion) and a search's (searchables.js rollSearchElite), each a foe its roller
  *  stands as its own, so the roller's Renown is the word (a street puppet reads it off `z`). Not a shared dungeon's pick
  *  (pickDungeonElites): every client builds that alike and the room's memory carries no word of an elite (wire.js
  *  validSharedFoe), so one client's Renown would split the room - it stays the room's, as ELITE-FLOOR's class level
@@ -106,14 +104,11 @@ export function promoteEliteFoe(entity, { own = true, eliteDungeon = false, supe
   entity.eliteFoe = true;
   // the hosts promote BEFORE any other scaling (and in place of the Elite Dungeon's doubling), so this is the foe's own
   // roll: an elite is 5x, not 10x
-  if (own) {
-    const hm = superDungeon ? ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT : ELITE_FOE_HEALTH_MULT;   // SD4a: a Super dungeon's
-    entity.maxHealth = Math.max(1, Math.round((entity.maxHealth || 1) * hm));
-    entity.health = entity.maxHealth;
-    entity.healthMult = (entity.healthMult ?? 1) * hm;   // TELL1: what was stood on the kind's own health (ai/tells.js kindHealth - its poise)
-  }
-  const prior = Number.isFinite(entity.damageScale) && entity.damageScale > 0 ? entity.damageScale : 1;
-  entity.damageScale = prior * (superDungeon ? ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT : ELITE_FOE_DAMAGE_MULT);   // SD4a: a Super dungeon's
+  scalePromoted(entity, {
+    health: superDungeon ? ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT : ELITE_FOE_HEALTH_MULT,
+    damage: superDungeon ? ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT : ELITE_FOE_DAMAGE_MULT,
+    ownHealth: own,
+  });
   if (own) markUnquiet(entity);   // UNQUIET: the mark that lets it rise, drawn on its own
   return true;
 }
@@ -148,11 +143,11 @@ export function eliteRng(seed) {
  */
 export function pickDungeonElites(enemies, key, { elite = true, count = null, classLevel = Infinity } = {}) {
   if (!Array.isArray(enemies) || !enemies.length) return 0;
+  if (!elite && !Number.isInteger(count)) return 0;   // an ordinary dungeon's elites come from the per-foe roll (systems/foe-promotion.ts markPromotions)
   const rng = eliteRng(eliteHash(elite ? 'elite-dungeon' : 'normal-dungeon', key));
-  // an Elite Dungeon: 3 or 4; a normal one: at most 1, one time in five; SD4a: a Super dungeon its own `count` (six)
-  const want = Number.isInteger(count) ? Math.max(0, count) : elite
-    ? ELITE_FOE_DUNGEON_MIN + Math.floor(rng() * (ELITE_FOE_DUNGEON_MAX - ELITE_FOE_DUNGEON_MIN + 1))
-    : (rng() < ELITE_FOE_NORMAL_DUNGEON_CHANCE ? 1 : 0);
+  // an Elite Dungeon: 3 or 4; SD4a: a Super dungeon its own `count` (six)
+  const want = Number.isInteger(count) ? Math.max(0, count)
+    : ELITE_FOE_DUNGEON_MIN + Math.floor(rng() * (ELITE_FOE_DUNGEON_MAX - ELITE_FOE_DUNGEON_MIN + 1));
   const pool = [];
   // ELITE-FLOOR, the same on every client: a kind under the floor by its OWN level never stands as one (a class foe's
   // level is the party's, built per client, so the floor is the pick's here and promoteEliteFoe is told not to re-ask).
@@ -172,9 +167,17 @@ export function pickDungeonElites(enemies, key, { elite = true, count = null, cl
   return n;
 }
 
-/** THE OPEN WORLD'S ROLL: is this new foe an elite? RENOWN-GATE: the roll drawn first, then the Renown's word - the
- *  same draw either way. */
-export const rollOverworldElite = (rolls = Math.random) => rolls() < ELITE_FOE_OVERWORLD_CHANCE && eliteRenownOpen();
+/** THE DUNGEON'S PROMOTIONS: one roll for each foe record of the dungeon's list marks it an elite, a champion or neither
+ *  (systems/foe-promotion.ts markPromotions), the same on every client. `eliteOpen` false for a dungeon whose elites are
+ *  placed by count (pickDungeonElites). `classLevel`: as pickDungeonElites has it. Answers how many were marked. */
+export function markDungeonPromotions(enemies, key, { eliteOpen = true, classLevel = Infinity } = {}) {
+  if (!lootRarityOn()) return 0;
+  return markPromotions(enemies, key, {
+    eliteOpen, championOpen: true, traits: CHAMPION_TRAITS.length,
+    kindLevel: (t) => (isClassEnemyId(t) ? classLevel : (ENEMY_BASICS[t]?.level ?? 0)),
+    eliteSeed: (i) => eliteHash('elite-trait', key, i),   // BOSS-TRAITS: its trait's draw, every client's alike (systems/bossTraits.js eliteTraits)
+  });
+}
 
 function gearPiece(level, rolls) {
   for (let tries = 0; tries < 6; tries++) {

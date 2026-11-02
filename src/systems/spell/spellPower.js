@@ -3,11 +3,8 @@
 // GetMagnitude); the school's skill prices the spell and moves nothing else. Two things here are the port's:
 //
 //   THE SCHOOL PAST 100 IS ITS POTENCY. Online a mastered school reads past 100 (SOFTCAP1, effective 140 at 200) and
-//   SPELL-COST-PAST prices those points at 100 / skill - every one still cheaper, none free - while the same mastery
-//   raises the foes (skillSoftcap.js combatEdge): a Destruction mastered to 200 paid x0.58 for a Crypt's foes at x1.30
-//   health. CLIMB-PAST's law, for the school whose formula stops paying at 100: each effective point past it is 1% more
-//   damage, to the effective cap (x1.08 at 140 since B1; it was 1% a point, x1.4). The CLIMB alone (skillSoftcap.js climbedSkill) - what the foes' edge
-//   reads, so the climb that raises them is the climb that pays: a worn Destruction line already pays in price (the
+//   SPELL-COST-PAST prices those points at 100 / skill - every one still cheaper, none free. CLIMB-PAST's law, for the school whose formula stops paying at 100: each effective point past it is 1% more
+//   damage, to the effective cap (x1.08 at 140 since B1; it was 1% a point, x1.4). The CLIMB alone: a worn Destruction line already pays in price (the
 //   live value SPELL-COST-PAST reads) and strikes no harder. Mentoring: the mentored climb (MENTOR2). Offline
 //   Daggerfall's price term stands (to nothing at 110), and so does Daggerfall's damage.
 //
@@ -50,8 +47,7 @@ export const ownSpellAt = (caster, target) => !!caster?.isPlayer && !caster.peer
 export const ownSpellOnSelf = (caster, target) => !!caster?.isPlayer && !caster.peer && caster === target && !sigilDueling();
 
 /** MENTOR2: the climb a character FIGHTS with - the mentored value while mentoring (mentorMode.js mentoredSkill), else
- *  skillSoftcap.js climbedSkill's. What a school's potency and a weapon past 100 pay on; the foes' edge reads the real
- *  climb, and none while mentoring (combatEdge). */
+ *  the real climb's. What a school's potency and a weapon past 100 pay on. */
 export const fightingClimb = (entity, id) => effectiveSkill(mentoredSkill(entity, masterCappedSkill(entity, entity?.skills?.[id] ?? 0, id)));
 
 /** The school past 100: 1 to 100, then 0.2% a point of the school's CLIMB (effective 140 at most: x1.08) - Destruction's

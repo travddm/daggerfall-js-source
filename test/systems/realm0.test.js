@@ -1,7 +1,7 @@
 // REALM phase 0: the hotfixes that need no migration (, "Phases").
 //   P0.1 - the URL's powers stay offline: an online boot drops ?shot (and window.__addGold with it), ?fly, ?nofoes and
 //          the rest before anything reads them.
-//   P0.2 - the balance mods are the room's whole online: every key of Meaner Monsters, PCAAO, Unleveled Loot,
+//   P0.2 - the balance mods are the room's whole online: every key of PCAAO, Unleveled Loot,
 //          Roleplay & Realism (its two cosmetic keys aside), and RR: Items reads its shipped
 //          default, where only their Enable switch was forced before.
 //   P0.3 - the Empire is one lender: one loan a character online, a default anywhere shuts every branch, the Empire

@@ -15,8 +15,7 @@
 //
 // The port has no loose files to read, so a vendored mod REGISTERS its
 // xml table here, with a live predicate for its switch; rmbFlats'
-// billboardSize applies whatever answers. Meaner Monsters is the first
-// registrant (characters/meanerMonsters.js). A later registration for
+// billboardSize applies whatever answers. A later registration for
 // the same record wins, as a later-loaded mod's file does in DFU.
 // A LEAF: no imports.
 // ═══════════════════════════════════════════════════════════════════

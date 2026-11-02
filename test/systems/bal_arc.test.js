@@ -4,35 +4,28 @@
 // mod's own wear module - the port ships it off, so the edge was every fight's; the worn bands stand whatever the wear.
 // BAL2: one rule for every striker - a foe's weapon skill counts x1.5 to hit and its Critical Strike rolls, multiplies
 // and aims as the player's; the armour term stays the mod's.
-// BAL3: the place sets the threat - the veteran layer reads the loot ladder's grading of the place a foe stands in (a
-// town's 4 nothing, a Dragon's Den's 18 the whole row), Master Skills' own layers kept beside it, the ladder's switch
-// its gate.
 // BAL4: the offline defaults - elites wherever the ladder stands, the Enhanced AI on (an unstamped shelf adopting it),
 // and an offline Project Legacy rise paying the online respawn's tenth, stated on its death screen.
 //
-// Pinned by execution through the real blow (pcaaoAttackDamage), the stats card, the scaling and the open world's own
-// spawn pool; the dungeon's seam by its source, beside the arena and the hosts' own pins of the same lines.
+// Pinned by execution through the real blow (pcaaoAttackDamage), the stats card and the open world's own spawn pool.
+// BAL3's place scaling is gone; the hero's threat that replaced it is pinned in bal11_hero.test.js.
 
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import {
   pcaaoModules, pcaaoAttackDamage, pcaaoAlterDamageBasedOnWepCondition, pcaaoAlterArmorReducBasedOnItemCondition,
 } from '../../src/combat/pcaao.js';
 import { computeCombatStats } from '../../src/combat/combatStats.js';
-import { makeEnemyEntity, applyProgressionScaling } from '../../src/characters/enemy/enemyEntity.js';
+import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintCondition } from '../../src/systems/item/itemTemplates.js';
 import { EQUIP_SLOTS, equipTableOf, _wearScaleForTests } from '../../src/systems/equip.js';
 import { SKILLS } from '../../src/systems/skills.js';
-import {
-  PLACE_THREAT, placeVeteran, wildernessThreat, progressionScaling, ENEMY_SCALING, DUNGEON_SHARE,
-} from '../../src/systems/skillSoftcap.js';
-import { DUNGEON_RARITY_TIER, dungeonRarityTier } from '../../src/systems/loot/lootRarity.js';
 import { elitesAllowed, isEliteFoe } from '../../src/systems/eliteFoes.js';
+import { _resetStreetChampionsForTests } from '../../src/systems/champions.js';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
 import { PREF_DEFAULTS, getPref } from '../../src/systems/uiPrefs.js';
 import { FEATURES } from '../../src/systems/features.js';
@@ -44,18 +37,11 @@ import { stateDeathLoss, statedDeathLoss, applyDeathPenalty } from '../../src/sy
 import { drawEnhancedDeath, removeEnhancedDeath } from '../../src/ui/enhanced/enhancedDeath.js';
 import { pickDungeonElites, ELITE_FOE_MIN_LEVEL } from '../../src/systems/eliteFoes.js';
 import { rollSearchElite } from '../../src/systems/searchables.js';
-import { combatStanding, foeShare } from '../../src/systems/skillSoftcap.js';
-import { lootRarityOn } from '../../src/systems/loot/lootRarity.js';
-import { heroThreatOf } from '../../src/systems/heroThreat.js';   // BAL11: the dungeon seam's reader, mounted below
-import { isGateArena, GATE_ARENA_LOCATION_ID } from '../../src/world/gate/gateArena.js';
-import { isArenaFloor, ARENA_FLOOR_LOCATION_ID } from '../../src/world/arena/arenaFloor.js';
 import { withDom } from '../invdrag.mjs';
-import * as acorn from 'acorn';
 import { ROOM_LOOT_OFF } from '../roomLootOff.mjs';   // PARTY-LOOT: the room's seams with no room
 
 _wearScaleForTests(1);   // the mod's wear verbatim (BALANCE1's scale is test/systems/balance1.test.js's)
 
-const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const ladder = (on) => { _resetForTests(); setPref('lootRarity', on); };
 const OVERHAUL = { Enabled: true, equipmentDamageEnhanced: false, fadingEnchantedItems: false, fixedStrengthDamageModifier: true, armorHitFormulaRedone: true, criticalStrikesIncreaseDamage: true, conditionBasedEffectiveness: true, softMaterialRequirements: true };
 const modsOf = (over = {}) => pcaaoModules((k) => ({ ...OVERHAUL, ...over })[k], () => undefined);
@@ -176,65 +162,6 @@ test('BAL2 one rule for every striker: a foe\'s weapon skill counts x1.5 to hit,
   assert.equal(landedOn(100), 25, 'crit / 4 = +25 to hit on every crit');
 });
 
-// ── BAL3 ──────────────────────────────────────────────────────────
-
-test('BAL3 the place\'s veteran: nothing at a town\'s 4, the whole row at a Dragon\'s Den\'s 18, linear between; the wilds at 5 by day and 7 at night; every dungeon kind at its ladder tier', () => {
-  assert.deepEqual({ ...PLACE_THREAT, wilderness: { ...PLACE_THREAT.wilderness } }, { from: 4, full: 18, wilderness: { day: 5, night: 7 } });
-  assert.ok(Object.isFrozen(PLACE_THREAT) && Object.isFrozen(PLACE_THREAT.wilderness));
-  assert.deepEqual([0, 3, 4, 11, 18, 21].map(placeVeteran), [0, 0, 0, 0.5, 1, 1]);
-  assert.equal(placeVeteran(5), 1 / 14);
-  assert.deepEqual([undefined, null, NaN, 'x'].map(placeVeteran), [0, 0, 0, 0], 'no tier, no threat');
-  assert.deepEqual([wildernessThreat(false), wildernessThreat(true)], [5, 7]);
-  // the design page's table (section 5), at a full-share foe and a player with no Master Skills
-  const row = (tier) => { const s = progressionScaling({ veteran: 0, edge: 0 }, 0, 1, placeVeteran(tier)); return s && [+s.healthMult.toFixed(2), +s.damageMult.toFixed(2), +s.skillGain.toFixed(1)]; };
-  assert.equal(row(4), null, 'a town: DFU\'s own foe');
-  assert.deepEqual([5, 7, 9, 11, 14, 15, 18].map(row), [
-    [1.07, 1.02, 0.7], [1.21, 1.05, 2.1], [1.36, 1.09, 3.6], [1.5, 1.13, 5], [1.71, 1.18, 7.1], [1.79, 1.2, 7.9], [2, 1.25, 10],
-  ]);
-  // every dungeon kind reads its own ladder tier - the grading the loot already reads
-  const DEN = 14, CEMETERY = 18, MINE = 5, CRYPT = 0;
-  assert.equal(placeVeteran(dungeonRarityTier(DEN)), 1, 'a Dragon\'s Den: the whole row');
-  assert.equal(placeVeteran(dungeonRarityTier(CEMETERY)), 0, 'a Cemetery (3): none');
-  assert.equal(placeVeteran(dungeonRarityTier(MINE)), 0, 'a mine (4): none');
-  assert.equal(placeVeteran(dungeonRarityTier(CRYPT)), 5 / 14, 'a Crypt (9)');
-  assert.equal(placeVeteran(dungeonRarityTier(undefined)), 0, 'no dungeon');
-  assert.equal(DUNGEON_RARITY_TIER.length, DUNGEON_SHARE.length, 'one grade per kind, both tables');
-  assert.equal(Math.max(...DUNGEON_RARITY_TIER), PLACE_THREAT.full, 'the deepest kind is the full row');
-});
-
-test('BAL3 progressionScaling: the place\'s veteran times the foe\'s share, or the player\'s veteran in this kind of place, whichever is more; the overcap the climb\'s alone; three arguments SOFTCAP2\'s own', () => {
-  const V = ENEMY_SCALING.veteran, O = ENEMY_SCALING.overcap;
-  const none = { veteran: 0, edge: 0 };
-  // a rat stays a rat: the foe's share scales the place
-  assert.equal(progressionScaling(none, 0, 0, 1), null, 'a share-0 foe in a Dragon\'s Den: none');
-  const half = progressionScaling(none, 0, 0.5, 1);
-  assert.deepEqual([half.healthMult, half.damageMult, half.skillGain, half.challengeLevels], [1 + V.health / 2, 1 + V.damage / 2, V.skill / 2, 3]);
-  assert.equal(half.place, 1); assert.equal(half.share, 0, 'the Master Skills share is its own');
-  assert.equal(progressionScaling(none, 0, 1, 3).healthMult, 1 + V.health, 'a place past whole reads whole');
-  assert.equal(progressionScaling(none, 0, 1, -1), null, 'and under none, none');
-  // Master Skills' veteran a floor beside the place: whichever is more
-  const vet = { veteran: 1, edge: 0 };
-  assert.equal(progressionScaling(vet, 1, 1, 0.5).healthMult, 1 + V.health, 'the player\'s veteran over a lesser place');
-  assert.equal(progressionScaling(vet, 0.22, 1, 0.5).healthMult, 1 + V.health * 0.5, 'the place over a lesser veteran');
-  assert.equal(progressionScaling(vet, 0.22, 1, 0).healthMult, 1 + V.health * 0.22, 'no place: SOFTCAP2 exactly');
-  // the overcap adds on top, at the Master Skills share
-  const climb = progressionScaling({ veteran: 0, edge: 40 }, 0.5, 1, 1);
-  assert.equal(climb.skillGain, V.skill + O.skill * 0.5);
-  assert.equal(climb.healthMult, 1 + V.health + O.health * 0.5);
-  assert.equal(climb.damageMult, 1 + V.damage + O.damage * 0.5);
-  // three arguments: SOFTCAP2's numbers, unmoved
-  const old = progressionScaling({ veteran: 0.5, edge: 20 }, 0.88, 1);
-  assert.equal(old.healthMult, 1 + 0.88 * (V.health * 0.5 + O.health * 0.5));
-  assert.equal(old.place, 0);
-  assert.equal(progressionScaling({ veteran: 1, edge: 40 }, 0, 1), null, 'no share, no place: none');
-  // the one writer records the place beside the player's
-  const e = monster(24);
-  const hp = e.maxHealth;
-  applyProgressionScaling(e, progressionScaling(none, 0, 1, placeVeteran(18)));
-  assert.equal(e.maxHealth, Math.max(1, Math.round(hp * 2)));
-  assert.equal(e.progression.place, 1);
-});
-
 // the open world's pool, on a crafted MONSTER.BSA (test/scenes/world6bii.test.js's rig): an Orc Warlord (base level 16, a
 // full share) spawned in the wilds - `inLocation` false - at midnight
 function craftCfg() {
@@ -266,21 +193,6 @@ const wildsPool = (inLocation = () => false) => createExteriorFoes({
 });
 const withRandom = async (v, fn) => { const old = Math.random; Math.random = () => v; try { return await fn(); } finally { Math.random = old; } };
 
-test('BAL3 the wilds by execution: a full-share foe spawned in the open at night stands at the harpy nest\'s 7 while the ladder does; the ladder off, or on a location\'s ground, DFU\'s own', async () => {
-  const spawn = async (on, inLocation) => { ladder(on); const f = await withRandom(0.5, () => wildsPool(inLocation).spawnFoe(24, [10, 0, 10], { feetGiven: true, eliteFoe: false, champion: null })); return f.entity; };   // no elite, no champion: the place alone (the hit points' roll is Math.random's)
-  const plain = await spawn(false);
-  assert.equal(plain.progression, undefined, 'the ladder off: no scaling offline (Master Skills off)');
-  const wild = await spawn(true);
-  const p = placeVeteran(wildernessThreat(true));
-  assert.equal(wild.progression.place, p, 'night: tier 7');
-  assert.equal(wild.maxHealth, Math.max(1, Math.round(plain.maxHealth * (1 + ENEMY_SCALING.veteran.health * p))));
-  assert.equal(wild.damageScale, (Number.isFinite(plain.damageScale) ? plain.damageScale : 1) * (1 + ENEMY_SCALING.veteran.damage * p));
-  const town = await spawn(true, () => true);
-  assert.equal(town.progression, undefined, 'a location\'s ground never scales');
-  assert.equal(town.maxHealth, plain.maxHealth);
-  ladder(true);
-});
-
 // ── BAL4 ──────────────────────────────────────────────────────────
 
 test('BAL4 elites offline: wherever the loot ladder stands - online always, offline with the ladder, never with it off; the wilds\' own roll by execution', async () => {
@@ -291,11 +203,19 @@ test('BAL4 elites offline: wherever the loot ladder stands - online always, offl
   assert.equal(elitesAllowed(), false, 'the ladder off: DFU\'s lane, no elite');
   assert.equal(elitesAllowed({ onlinePage: true }), true, 'online stands whatever the shelf says');
   assert.equal(elitesAllowed({ inRoom: true }), true);
-  // the open world's one-in-twenty, off Math.random (the encounter's own dice unmoved)
-  const spawn = async (on, r) => { ladder(on); return (await withRandom(r, () => wildsPool().spawnFoe(24, [10, 0, 10], { feetGiven: true, champion: null }))).entity; };
-  assert.equal(isEliteFoe(await spawn(true, 0.01)), true, 'offline, the ladder on: 0.01 < 0.05 stands as an elite');
-  assert.equal(isEliteFoe(await spawn(true, 0.06)), false, 'and 0.06 does not');
-  assert.equal(isEliteFoe(await spawn(false, 0.01)), false, 'the ladder off: never');
+  // the open world's hash draw (systems/foe-promotion.ts): the foe's count decides, so find the first elite, then replay it
+  const stand = async (on, inLocation) => { ladder(on); return (await withRandom(0.5, () => wildsPool(inLocation).spawnFoe(24, [10, 0, 10], { feetGiven: true, champion: null }))).entity; };
+  _resetStreetChampionsForTests();
+  let nth = 0;
+  while (nth < 3000 && !isEliteFoe(await stand(true))) nth++;
+  assert.ok(nth < 3000, 'offline, the ladder on: a foe stands as an elite');
+  _resetStreetChampionsForTests();
+  for (let i = 0; i < nth; i++) assert.equal(isEliteFoe(await stand(true)), false, `foe ${i} before it is no elite`);
+  assert.equal(isEliteFoe(await stand(true)), true, 'and the same count lands on it again');
+  _resetStreetChampionsForTests();
+  for (let i = 0; i <= nth; i++) assert.equal(isEliteFoe(await stand(false)), false, 'the ladder off: never');
+  _resetStreetChampionsForTests();
+  for (let i = 0; i <= nth; i++) assert.equal(isEliteFoe(await stand(true, () => true)), false, "a location's ground: never");
   ladder(true);
 });
 
@@ -349,38 +269,13 @@ test('BAL4 a real cost for dying offline: a death Project Legacy will raise stat
   assert.deepEqual(deathKeys('ENTER end   F11 load', true, true).map((k) => k.word), ['Rise now']);
 });
 
-// ── AUDIT BAL ──────────────
-// the dungeon context's own functions, mounted over a scope of their free names (test/systems/quest/fb1004d_cratefree.test.js's harness)
-function sliced(path) {
-  const S = rd(path);
-  const AST = acorn.parse(S, { ecmaVersion: 'latest', sourceType: 'module' });
-  const find = (pred) => {
-    let hit = null;
-    (function walk(n) {
-      if (!n || typeof n.type !== 'string' || hit) return;
-      if (pred(n)) { hit = n; return; }
-      for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); }
-    })(AST);
-    return hit;
-  };
-  return {
-    fnSrc: (name) => { const n = find((x) => x.type === 'FunctionDeclaration' && x.id?.name === name); assert.ok(n, `${path} has function ${name}`); return S.slice(n.start, n.end); },
-    declSrc: (name) => { const n = find((x) => x.type === 'VariableDeclaration' && x.declarations.some((d) => d.id?.name === name)); assert.ok(n, `${path} declares ${name}`); return S.slice(n.start, n.end); },
-  };
-}
-const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(new Proxy(state, {
-  has: (t, k) => k !== '__s',
-  get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])),
-  set: (t, k, v) => { t[k] = v; return true; },
-}));
-
 test('AUDIT BAL elites at their floor and their doors: offline a class foe stands as one only at the floor\'s level (online the pick stays every client\'s); a search wakes one only where elites stand, its roll drawn either way; and never on a location\'s ground', async () => {
-  // the dungeon's pick: a list of class foes alone, keyed so the one-in-five lands
-  let key = 0; while (pickDungeonElites([{ mobileType: 128 + 9 }], `k${key}`, { elite: false }) === 0) key++;
+  // the Elite Dungeon's pick over a list of class foes alone
+  const key = 'k';
   const list = () => [{ mobileType: 128 + 9 }, { mobileType: 128 + 2 }];
-  assert.equal(pickDungeonElites(list(), `k${key}`, { elite: false }), 1, 'online (Infinity): the class foe may stand');
-  assert.equal(pickDungeonElites(list(), `k${key}`, { elite: false, classLevel: ELITE_FOE_MIN_LEVEL - 1 }), 0, 'offline, a level-2 party: no class elite');
-  assert.equal(pickDungeonElites(list(), `k${key}`, { elite: false, classLevel: ELITE_FOE_MIN_LEVEL }), 1, 'at the floor: one');
+  assert.equal(pickDungeonElites(list(), key, { elite: true }), 2, 'online (Infinity): the class foes may stand');
+  assert.equal(pickDungeonElites(list(), key, { elite: true, classLevel: ELITE_FOE_MIN_LEVEL - 1 }), 0, 'offline, a level-2 party: no class elite');
+  assert.equal(pickDungeonElites(list(), key, { elite: true, classLevel: ELITE_FOE_MIN_LEVEL }), 2, 'at the floor: both');
   // a search's elite: its roll first, then where elites stand
   let draws = 0; const roll0 = () => { draws++; return 0; };
   ladder(true); assert.equal(rollSearchElite(roll0), true);

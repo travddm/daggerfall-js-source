@@ -35,10 +35,8 @@
 //                                exactly as InitMod decides
 //   + Roleplay Realism's archery (AdjustWeaponHitChanceMod /
 //     AdjustWeaponAttackDamage), registered when THAT mod's
-//     advancedArchery switch is on; and Ralzar's Meaner Monsters
-//     (Kirk.O's edit), applied when that mod is loaded -
-//     pcaaoMeanerMonsters.js. The port has no mod list, so both read
-//     those mods' own switches on the Mods pane (MM1).
+//     advancedArchery switch is on. The port has no mod list, so it
+//     reads that mod's own switch on the Mods pane.
 //
 // ── HOW IT LANDS HERE ───────────────────────────────────────────
 //
@@ -102,10 +100,7 @@ import {
   damageEquipment,   // WEAR-VANILLA: DFU's DamageEquipment, the core's wear while the wear module is off
   silverDoubles,     // RVN2: a Silver-scarred revenant's double gone, in this core as in the stock's
 } from './formulas.js';
-import { meanerMonstersOn } from './pcaaoMeanerMonsters.js';
 import { RR_VENDOR, rrAdjustWeaponHitChanceMod, rrAdjustWeaponAttackDamage } from '../systems/roleplayRealism/rrRealism.js';   // AUDIT 68 S08-pcaao-archery-duplicate: RR's two archery members, one export
-
-export { MEANER_MONSTERS, meanerMonstersRow, meanerMonstersOn } from './pcaaoMeanerMonsters.js';
 
 // ── the vendor key, the manifest's own names ──────────────────────
 export const PCAAO_VENDOR = 'pcaao';
@@ -148,17 +143,15 @@ export function pcaaoModules(read = (k) => modSetting(PCAAO_VENDOR, k), other = 
     criticalStrikesIncreaseDamage: armorHitFormulaRedone && on('criticalStrikesIncreaseDamage'),
     conditionBasedEffectiveness: armorHitFormulaRedone && on('conditionBasedEffectiveness'),
     softMaterialRequirements: armorHitFormulaRedone && on('softMaterialRequirements'),
-    // MM1 (Mac: no compatibility switches between mods): the two arms
-    // Awake derives from OTHER mods - `GetMod("RoleplayRealism")` and
-    // its `advancedArchery`, `GetMod("Meaner Monsters")` - read those
-    // mods' own switches through `other`; a mod the port has not
+    // The archery arm Awake derives from another mod -
+    // `GetMod("RoleplayRealism")` and its `advancedArchery` - reads that
+    // mod's own switches through `other`; a mod the port has not
     // vendored answers undefined, as one DFU has not loaded does.
     // AUDIT 68 S08-pcaao-rr-archery-dead-vendor-key: RR is vendored as
     // RR_VENDOR ('roleplay-realism'); the old 'roleplayRealism' key was
     // never declared, so the arm was dead. Loaded (Enabled) first, then
     // its switch, as Awake reads them.
     rolePlayRealismArchery: enabled && !!other(RR_VENDOR, 'Enabled') && !!other(RR_VENDOR, 'advancedArchery'),
-    meanerMonsters: enabled && meanerMonstersOn(read, other),
   });
 }
 
