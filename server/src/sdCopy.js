@@ -7,6 +7,7 @@
 import { SD_KEY, sdReceiptKey, SOCIAL_ROOM, SD_TELL_RETRY_MS, tokenGate } from '../../src/net/wire.js';
 import { sdOwnerOfRoom, sdRoomKey, sdPubOwner, isSdPubOwner, SD_NO_FALLEN, SD_PUB_SEATS, SD_PUB_MAX } from '../../src/net/superDungeon/sdLaw.js';
 import { instanceOwnerOf } from '../../src/net/instanceRoom.js';
+import { verifyToken } from '../../src/net/identityToken.js';
 import { ROOM_CALL_MS } from './relayScale.js';
 
 /** The door's refusals, said by the realm as its others are: a copy of the Hour is its party's alone, and an account
@@ -103,30 +104,53 @@ export async function sdSeatsInternal(room, request) {
 export const SD_OPEN_PATH = '/sd/open';
 export const SD_INTERNAL_SEATS = '/internal/sd/seats';
 
-/** The walk is anonymous (the game asks it before any socket), so a client address gets this many walks a second, and a
- *  burst of SD_OPEN_BURST: one walk is up to SD_PUB_MAX calls into room objects. A bucket per address, kept per isolate and
- *  bounded; an address that is not stated shares one bucket (the Worker is behind Cloudflare, which always states it). */
-export const SD_OPEN_HZ = 1;
-export const SD_OPEN_BURST = 4;
+/** The walk asks for a signed identity token (the game has one for every hello), and is limited two ways. Per ACCOUNT: a
+ *  burst of SD_OPEN_ACCT_BURST walks, then one every 1 / SD_OPEN_ACCT_HZ seconds - one walk is up to SD_PUB_MAX calls into
+ *  room objects, and a player opens a Hollow once in a long while, so a whole party opening Hollows in a row, each on their
+ *  own account, never meets it. Per ADDRESS, a flood backstop only: far above what a household, a campus or a carrier's
+ *  shared address can honestly send, and spent BEFORE the token is checked, so a flood of bad tokens costs no signature
+ *  check. A call with no address (none is stated) shares the backstop bucket '', and the account's limit applies to it
+ *  as to any other. Buckets live per isolate and are bounded. */
+export const SD_OPEN_ACCT_HZ = 0.5;
+export const SD_OPEN_ACCT_BURST = 12;
+export const SD_OPEN_ADDR_HZ = 20;
+export const SD_OPEN_ADDR_BURST = 200;
 export const SD_OPEN_CLIENTS_MAX = 4096;
-const openBuckets = new Map();
-/** Whether the address `ip` may walk now; spends one of its tokens. @param {string} ip @param {number} now */
-export function sdOpenGate(ip, now) {
-  const gate = tokenGate(openBuckets.get(ip), now, SD_OPEN_HZ, SD_OPEN_BURST);
-  openBuckets.delete(ip);
-  if (openBuckets.size >= SD_OPEN_CLIENTS_MAX) openBuckets.delete(/** @type {string} */ (openBuckets.keys().next().value));
-  openBuckets.set(ip, gate.bucket);
+const acctBuckets = new Map();
+const addrBuckets = new Map();
+/** @param {Map<string, any>} buckets @param {string} id @param {number} now @param {number} hz @param {number} burst */
+function spendBucket(buckets, id, now, hz, burst) {
+  const gate = tokenGate(buckets.get(id), now, hz, burst);
+  buckets.delete(id);
+  if (buckets.size >= SD_OPEN_CLIENTS_MAX) buckets.delete(/** @type {string} */ (buckets.keys().next().value));
+  buckets.set(id, gate.bucket);
   return gate.pass;
 }
+/** Whether the address `ip` is under the flood backstop; spends one token. @param {string} ip @param {number} now */
+export const sdOpenAddrGate = (ip, now) => spendBucket(addrBuckets, ip, now, SD_OPEN_ADDR_HZ, SD_OPEN_ADDR_BURST);
+/** Whether the account `acct` may walk now; spends one token. @param {string} acct @param {number} now */
+export const sdOpenAcctGate = (acct, now) => spendBucket(acctBuckets, acct, now, SD_OPEN_ACCT_HZ, SD_OPEN_ACCT_BURST);
 
-/** SD-SOLO: THE WORKER'S WALK of a Hollow's shared Hours - the first that holds me, else the first open, as `{ n }`
- *  (`n` null: none answered, or all SD_PUB_MAX full). They open in order, so the one I am in comes first.
- *  @param {any} env @param {URL} url @param {string} [ip] the client's address, for sdOpenGate; none (a test) is not gated */
-export async function sdOpenDoor(env, url, ip = '') {
+/** SD-SOLO: THE WORKER'S WALK of a Hollow's shared Hours - the first that holds me, else the first open - as `{ n }`
+ *  (`n` null: none answered, or all SD_PUB_MAX full). They open in order, so the one I am in comes first. Answers 429
+ *  past a limit and 401 for a token that does not verify.
+ *  @param {any} env @param {URL} url
+ *  @param {{ ip?: string, tok?: string|null, key?: CryptoKey|null }} [who] the caller's address, signed token and the key that checks it */
+export async function sdOpenDoor(env, url, who = {}) {
   const s = Number(url.searchParams.get('s')), o = String(url.searchParams.get('o') ?? '');
   const head = { 'content-type': 'application/json', 'access-control-allow-origin': '*' };
-  if (ip && !sdOpenGate(ip, Date.now())) return new Response(JSON.stringify({ n: null }), { status: 429, headers: head });
-  if (!sdRoomKey(s, o) || isSdPubOwner(o) || !env?.ROOMS?.idFromName) return new Response(JSON.stringify({ n: null }), { status: 400, headers: head });
+  const no = (status) => new Response(JSON.stringify({ n: null }), { status, headers: head });
+  const now = Date.now();
+  if (!sdOpenAddrGate(who.ip ?? '', now)) return no(429);
+  const r = who.key && who.tok ? await verifyToken(who.tok, who.key, { subtle: crypto.subtle, nowS: Math.floor(now / 1000) }) : null;
+  if (!r?.ok) return no(401);
+  if (!sdOpenAcctGate(r.claims.s, now)) return no(429);
+  if (!sdRoomKey(s, o) || isSdPubOwner(o) || !env?.ROOMS?.idFromName) return no(400);
+  return new Response(JSON.stringify({ n: await sdWalk(env, s, o) }), { headers: head });
+}
+
+/** The walk itself: the first shared Hour (0..SD_PUB_MAX) that holds owner digest `o` or is open, else null. */
+async function sdWalk(env, s, o) {
   for (let n = 0; n < SD_PUB_MAX; n++) {
     const key = /** @type {string} */ (sdRoomKey(s, /** @type {string} */ (sdPubOwner(n))));
     let r = null;
@@ -135,7 +159,15 @@ export async function sdOpenDoor(env, url, ip = '') {
       r = res?.ok ? await res.json() : null;
     } catch (e) { console.warn('[sd] seats', e?.message ?? e); }
     if (!r) break;
-    if (r.has || r.open) return new Response(JSON.stringify({ n }), { headers: head });
+    if (r.has || r.open) return n;
   }
-  return new Response(JSON.stringify({ n: null }), { headers: head });
+  return null;
+}
+
+/** SD-SOLO: the walk's route - a signed token in `authorization`, the preflight that header needs, and the caller's address.
+ *  @param {Request} request @param {any} env @param {URL} url @param {CryptoKey|null} key the key that checks the token */
+export async function sdOpenRoute(request, env, url, key) {
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization', 'access-control-max-age': '86400' } });
+  const bearer = /^Bearer (\S+)$/.exec(request.headers.get('authorization') ?? '');
+  return sdOpenDoor(env, url, { ip: request.headers.get('cf-connecting-ip') ?? '', tok: bearer?.[1] ?? null, key });
 }

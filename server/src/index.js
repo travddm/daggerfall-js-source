@@ -188,7 +188,7 @@ import { privateInteriorOf, privateInteriorAdmits, caravanKeyOf } from '../../sr
 import { isInstanceRoom, instanceOf, instanceAdmission, partyHoldsOwner, INSTANCE_INTERNAL_KIN, INSTANCE_KIN_KEEP_MS, INSTANCE_DOOR_WORD } from '../../src/net/instanceRoom.js';   // INSTANCES: an instance's room, its door and the hub's party answer
 import { isStaff } from '../../src/net/staffCommands.js';
 import { preTokenGate, placeGate } from './helloGate.js';   // a room's hello gate: before the token, or (battles, floors, realms, instances, cells, worlds) after it
-import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenDoor, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
+import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenRoute, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
 import { RELAY_CFG_TTL_MS, RELAY_INTERNAL_CFG, mayRelayCfg, relayCfgValue } from '../../src/net/relayCfg.js';   // SCALE5b: the relay's settings, at run time
 import { leaseKeyOf, mintLease, readLease, leaseRoom, LEASE_FRAME_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';   // LEASE1: the hub's word on every socket, in every room
 /** LEASE1 (the fourth review of the PR): a frame of a build that hands on no lease asks the hub's door at most this often -
@@ -550,7 +550,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/health') return json({ ok: true, service: 'daggerfall-online', version: RELAY_VERSION, t: Date.now() });
-    if (url.pathname === SD_OPEN_PATH) return sdOpenDoor(env, url, request.headers.get('cf-connecting-ip') ?? '');   // SD-SOLO: which shared Hour a player in no party goes to
+    if (url.pathname === SD_OPEN_PATH) return sdOpenRoute(request, env, url, await lawKeyOf(env));   // SD-SOLO: which shared Hour a player in no party goes to
     if (url.pathname === SAFE_LAW_PATH) return lawDoor(request, env);   // SAFE4: a mute or ban the account service pushed, for the hub
     const key = roomOf(url.pathname);
     if (!key || (key.startsWith('chat:') && !isChatRoom(key))) return json({ error: 'no such room' }, 404);   // AUDIT CHAT A1: no object is minted for a channel the port does not run
