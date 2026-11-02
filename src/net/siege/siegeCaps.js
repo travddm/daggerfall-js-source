@@ -9,7 +9,8 @@ export const SIEGE_MAGICKA = Object.freeze({ depth: 600, regenPerS: 12 });
 
 /** The points of magicka the fighter `f` has at `now` (whole points). @param {any} f @param {number} now */
 export function magickaRoom(f, now) {
-  const refilled = (f.mana ?? SIEGE_MAGICKA.depth) + (Math.max(0, now - (f.manaAt ?? now)) / 1000) * SIEGE_MAGICKA.regenPerS;
+  const refilled =
+    (f.mana ?? SIEGE_MAGICKA.depth) + (Math.max(0, now - (f.manaAt ?? now)) / 1000) * SIEGE_MAGICKA.regenPerS;
   return Math.floor(Math.min(SIEGE_MAGICKA.depth, refilled));
 }
 /** Spends `cost` points of the fighter's magicka at `now` (never past what it has). @param {any} f @param {number} cost @param {number} now */
@@ -33,7 +34,9 @@ export function spendMagicka(f, cost, now) {
  */
 export function siegeGround(fighters) {
   const ys = [];
-  for (const f of fighters) if (!f.down && f.pose && f.here && (f.side === 'attack' || f.side === 'defend') && Number.isFinite(f.pose.y)) ys.push(f.pose.y);
+  for (const f of fighters)
+    if (!f.down && f.pose && f.here && (f.side === 'attack' || f.side === 'defend') && Number.isFinite(f.pose.y))
+      ys.push(f.pose.y);
   if (!ys.length) return null;
   ys.sort((p, q) => p - q);
   const h = ys.length >> 1;
@@ -52,5 +55,8 @@ export const SIEGE_GROUND_DRIFT_UNITS = 160;
 export function anchoredGround(b, median) {
   if (median == null) return null;
   if (!Number.isFinite(b.groundAnchor)) b.groundAnchor = median;
-  return Math.max(b.groundAnchor - SIEGE_GROUND_DRIFT_UNITS, Math.min(b.groundAnchor + SIEGE_GROUND_DRIFT_UNITS, median));
+  return Math.max(
+    b.groundAnchor - SIEGE_GROUND_DRIFT_UNITS,
+    Math.min(b.groundAnchor + SIEGE_GROUND_DRIFT_UNITS, median),
+  );
 }

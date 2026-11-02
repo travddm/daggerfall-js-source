@@ -3,8 +3,18 @@
 // holds, how often it strikes and casts, how far its blow reaches, and the magicka its spells draw on. Each answers from
 // the room's own state; none reads the claimed damage.
 import {
-  ARENA_HIT, ARENA_HIT_HZ_MAX, ARENA_SPELLS_IN, ARENA_SPELL_WINDOW_MS, ARENA_MELEE_REACH, ARENA_POSE_SLACK, ARENA_BOW_REACH, ARENA_SPELL_REACH,
-  ARENA_MAGICKA_DEPTH, ARENA_MAGICKA_REGEN, arenaArmsOk, arenaHeld,
+  ARENA_HIT,
+  ARENA_HIT_HZ_MAX,
+  ARENA_SPELLS_IN,
+  ARENA_SPELL_WINDOW_MS,
+  ARENA_MELEE_REACH,
+  ARENA_POSE_SLACK,
+  ARENA_BOW_REACH,
+  ARENA_SPELL_REACH,
+  ARENA_MAGICKA_DEPTH,
+  ARENA_MAGICKA_REGEN,
+  arenaArmsOk,
+  arenaHeld,
 } from './arenaLaw.js';
 
 /** Whether the weapon a blow names is the striker's: a spell names none, a weapon blow the one in its hand (arenaHeld).
@@ -39,14 +49,15 @@ export function rateSpent(M, r, q, now) {
 export function reachVerdict(r, gap, wa) {
   if (r === ARENA_HIT.Melee) return gap > ARENA_MELEE_REACH + ARENA_POSE_SLACK ? 'miss' : null;
   if (r === ARENA_HIT.Spell) return gap > ARENA_SPELL_REACH + ARENA_POSE_SLACK ? 'none' : null;
-  return gap > ARENA_BOW_REACH || (arenaArmsOk(wa) && wa[1] !== 1) ? 'none' : null;   // INT7: a shaft a signed bow's
+  return gap > ARENA_BOW_REACH || (arenaArmsOk(wa) && wa[1] !== 1) ? 'none' : null; // INT7: a shaft a signed bow's
 }
 
 /** The points of magicka the fighter's record \`M\` has at \`now\`; a blow that is no spell draws on none (no limit).
  *  @param {any} M @param {number} r @param {number} now */
 export function magickaFor(M, r, now) {
   if (r !== ARENA_HIT.Spell) return Infinity;
-  const refilled = (M.magicka ?? ARENA_MAGICKA_DEPTH) + (Math.max(0, now - (M.magickaAt ?? now)) / 1000) * ARENA_MAGICKA_REGEN;
+  const refilled =
+    (M.magicka ?? ARENA_MAGICKA_DEPTH) + (Math.max(0, now - (M.magickaAt ?? now)) / 1000) * ARENA_MAGICKA_REGEN;
   return Math.floor(Math.min(ARENA_MAGICKA_DEPTH, refilled));
 }
 /** Spends a spell's \`cost\` of the fighter's magicka. @param {any} M @param {number} r @param {number} cost @param {number} now */

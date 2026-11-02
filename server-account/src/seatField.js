@@ -22,15 +22,40 @@ import { confirmedSeats } from './townSeats.js';
 export async function settleBattleField({ db, nowS }, { b, week, key, side, field, playerId }) {
   if (side !== 'watch') {
     const seat = (await confirmedSeats(db, nowS)).get(key);
-    if (!siegeFieldValid(field, b.tier) || !fieldShapeOk(field, b.tier) || (seat && !fieldInPixel(field, seat.pixel))) return { error: 'field-bad' };
-    await db.prepare(`INSERT INTO town_seat_fields (week, key, account, side, field, at) VALUES (?, ?, ?, ?, ?, ?)
-      ON CONFLICT (week, key, account) DO UPDATE SET field = excluded.field, at = excluded.at`)
-      .bind(week, key, playerId, side, JSON.stringify(field), nowS).run();
+    if (!siegeFieldValid(field, b.tier) || !fieldShapeOk(field, b.tier) || (seat && !fieldInPixel(field, seat.pixel)))
+      return { error: 'field-bad' };
+    await db
+      .prepare(
+        `INSERT INTO town_seat_fields (week, key, account, side, field, at) VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT (week, key, account) DO UPDATE SET field = excluded.field, at = excluded.at`,
+      )
+      .bind(week, key, playerId, side, JSON.stringify(field), nowS)
+      .run();
   }
-  const { results: rows = [] } = await db.prepare('SELECT side, field, at FROM town_seat_fields WHERE week = ? AND key = ? ORDER BY at, rowid').bind(week, key).all();
-  const { results: aged = [] } = await db.prepare('SELECT f.field, f.account, f.at FROM town_seat_fields f JOIN players p ON p.id = f.account WHERE f.key = ? AND p.registered_at <= ?').bind(key, nowS - WITNESS.ageS).all();
-  const settled = witnessedField(aged) ?? settleField(rows.map((r) => ({ side: r.side, field: r.field, at: Number(r.at) })), nowS >= b.starts_at, b.kind);   // a revolt's first defender's
+  const { results: rows = [] } = await db
+    .prepare('SELECT side, field, at FROM town_seat_fields WHERE week = ? AND key = ? ORDER BY at, rowid')
+    .bind(week, key)
+    .all();
+  const { results: aged = [] } = await db
+    .prepare(
+      'SELECT f.field, f.account, f.at FROM town_seat_fields f JOIN players p ON p.id = f.account WHERE f.key = ? AND p.registered_at <= ?',
+    )
+    .bind(key, nowS - WITNESS.ageS)
+    .all();
+  const settled =
+    witnessedField(aged) ??
+    settleField(
+      rows.map((r) => ({ side: r.side, field: r.field, at: Number(r.at) })),
+      nowS >= b.starts_at,
+      b.kind,
+    ); // a revolt's first defender's
   if (!settled) return { error: 'field-unsettled' };
-  await db.prepare('UPDATE town_seat_battles SET field = ? WHERE week = ? AND key = ? AND field IS NULL').bind(settled, week, key).run();
-  return (await db.prepare('SELECT field FROM town_seat_battles WHERE week = ? AND key = ?').bind(week, key).first())?.field ?? settled;
+  await db
+    .prepare('UPDATE town_seat_battles SET field = ? WHERE week = ? AND key = ? AND field IS NULL')
+    .bind(settled, week, key)
+    .run();
+  return (
+    (await db.prepare('SELECT field FROM town_seat_battles WHERE week = ? AND key = ?').bind(week, key).first())
+      ?.field ?? settled
+  );
 }

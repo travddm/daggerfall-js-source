@@ -31,6 +31,7 @@ import { moveArenaHomes } from '../../../src/systems/online/onlineHomes.js';
 import { HOME_ARENA_MAP_ID } from '../../../src/net/homeLaw.js';
 import * as acorn from 'acorn';
 import { SEAT_NOTICE } from '../../../src/net/oneSeat.js';   // ARENA-WAIT AUDIT A4: a seat given up shuts the lane's doors in its words
+const DAI = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const { subtle } = globalThis.crypto;
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -97,8 +98,8 @@ test('AUDIT PRE-MERGE 1003 O1 the healers on a relay\'s sand: a players\' bout r
     const W = fakeRooms();
     const H = W.room(ARENA_HALL);
     const hA = H.connect(), hB = H.connect();
-    await H.hello(hA, 'peer-alva', null, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', ar: 1000 });
-    await H.hello(hB, 'peer-brann', null, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', ar: 1040 });
+    await H.hello(hA, 'peer-alva', null, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', look: DAI, ar: 1000 });
+    await H.hello(hB, 'peer-brann', null, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', look: DAI, ar: 1040 });
     await word(H, hA, { k: 'q', lv: 20 }); await word(H, hB, { k: 'q', lv: 30 });
     step(1000); await H.fire();
     const o = lastOf(hA, 'of').o;
@@ -107,7 +108,7 @@ test('AUDIT PRE-MERGE 1003 O1 the healers on a relay\'s sand: a players\' bout r
     const R = W.room(arenaBoutRoom(go.o));
     R.env.GATE_SIGNING_KEY = await signingKey();
     const b = R.connect();
-    await R.hello(b, 'fight-brann', { x: C[0] + 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30 });
+    await R.hello(b, 'fight-brann', { x: C[0] + 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', look: DAI, lv: 30 });
     await word(R, b, { k: 'in', r: 'f' });
     // Alva's screen: the real driver on the floor's instance and the host's glue, world.js's own hooks - the healers to
     // the whole, my health the relay's, a blow flashed and voiced
@@ -116,7 +117,7 @@ test('AUDIT PRE-MERGE 1003 O1 the healers on a relay\'s sand: a players\' bout r
     const D = createArenaBouts({ now, playerEntity: P, say() {}, notice() {}, drawHud() {}, heal: () => { P.health = P.maxHealth; }, pay() {} });
     D.setStage(floorStage());
     const a = R.connect();
-    await R.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 20 });
+    await R.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', look: DAI, lv: 20 });
     const S = clientSocket(R, a, 'world:1,1');
     const hall = { status: 'open', join() {}, leave() {}, sendArena: () => true };
     const A = createArenaOnline({ now, session: () => S, makeHall: () => hall, bouts: D, account: noAccount('acct-alva'), enterFloor: () => true, inBout: () => D.holds(), level: () => 20,
