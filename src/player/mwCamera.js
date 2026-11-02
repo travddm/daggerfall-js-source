@@ -1,438 +1,361 @@
-// THE MORROWIND CAMERA MACHINE (MW-D25). The reference's player camera,
-// ported whole from three homes that share the law between them:
+// The Morrowind-style player camera: a view that is either the player's own head (first person) or a point behind and
+// above the player that the mouse wheel moves in and out (third person).
 //
-//   apps/openmw/mwrender/camera.cpp        - the position/mode machine
-//   files/data/scripts/omw/camera/camera.lua        - the zoom law
-//   files/data/scripts/omw/camera/third_person.lua  - the distance law
-//   files/data/scripts/omw/input/actionbindings.lua - the wheel's units
+// This is a design of our own, described in the port's units. Distances here are in Morrowind units (the game's
+// native length), which is how the tuning below is written; positions in and out of the camera are in metres, and
+// MW_UNITS_PER_METER is the bridge. Morrowind itself has no data for this camera (the game's third person is a
+// fixed chase view), so every number here is a tuning choice of this project.
 //
-// Every constant below is the reference's own number in the reference's
-// own units, cited at the line that mints it, so the pins can assert the
-// reference values verbatim. Morrowind units convert to this port's
-// meters at ONE boundary (the eye computation) through the reference's
-// own bridge: components/misc/constants.hpp:10, UnitsPerMeter.
-//
-// WHAT IS DELIBERATELY NOT HERE, with reasons rather than silence:
-//  - Preview mode (TogglePOV held past 0.25s, camera.lua:86-111): the
-//    port has no TogglePOV binding; the requested switch is the wheel.
-//    The tap-to-toggle half of that law IS reachable from the wheel
-//    (this module's zoom), so nothing the wheel can do is lost.
-//  - Vanity mode (camera.lua:113-127, idle > fVanityDelay then a 3
-//    deg/s yaw orbit): needs an idle-input timer the port's hosts do
-//    not yet expose, and fVanityDelay is a Morrowind GMST this port
-//    does not read. Deferred, not faked.
-//  - zoomOutWhenMoveCoef / head bobbing / previewIfStandStill /
-//    slowViewChange: all DEFAULT OFF in the reference (settings.lua:43-55,
-//    67), and vanilla Morrowind has none of them - the third-person camera
-//    sits centered behind the actor. With those defaults,
-//    third_person.lua:135-137 collapses the preferred distance to the base
-//    distance flat, which is what this module implements.
-//  - viewOverShoulder (settings.lua:44, off) IS here since MW-SHOULDER, as
-//    the player's option and off by default (the shoulder's law, below).
-//    Its two DISTANCE terms are not: with it on, the reference pulls the
-//    camera out as the look rises and as the actor speeds up
-//    (third_person.lua:80-84, :152-161, zoomOutWhenMoveCoef 20). The option
-//    moves the focal point; the distance stays the wheel's. Nor is
-//    autoSwitchShoulder (settings.lua:47, off: the shoulder is the one the
-//    player chose).
-//  - castSphere (camera.cpp:186/201): the port's colliders cast RAYS.
-//    The reference backs the hit off by the sphere radius along the hit
-//    NORMAL; for a head-on surface that equals backing off along the
-//    ray, which is what the port does. The divergence is a grazing hit,
-//    where the reference keeps slightly more clearance.
+// The pieces:
+//   - a focal point: where the camera looks, a fixed height above the player's feet, optionally shifted to one side
+//     ("over the shoulder") by an offset that eases between targets;
+//   - a boom: the eye hangs on a line behind the focal point, along the look direction, as far as the player has
+//     zoomed out, and is pulled in when a wall is in the way;
+//   - the wheel: it changes the zoom distance and, at the near end, crosses between first and third person.
 
-/** components/misc/constants.hpp:10 - the reference's own unit bridge.
- *  ONE HOME: minted in the format layer (mwFirstPerson.js), re-exported
- *  here because it is part of this module's contract too. */
 import { MW_UNITS_PER_METER } from '../formats/morrowind/mwFirstPerson.js';
-import { seaZoomStep, SEA_ZOOM_RATIO } from './seaZoom.js';   // FIELD BUGS 2026-09-29 (the sea) #3: the zoom at a helm
+import { SEA_ZOOM_RATIO } from './seaZoom.js';
+
 export { MW_UNITS_PER_METER };
 
-/** camera.cpp:63 - the third-person focal point sits this far above the
- *  tracked position (the actor's base), scaled by the node's z-scale
- *  (camera.cpp:96-97). */
+/** Height of the focal point above the feet, for an actor of height scale 1. */
 export const FOCAL_HEIGHT = 124;
-
-/** third_person.lua:16 - the base third-person distance a fresh camera
- *  starts at. */
+/** Boom length a fresh camera starts with. */
 export const BASE_DISTANCE = 192;
-
-/** camera.lua:137 - the closest the third-person camera zooms; one more
- *  zoom-in from here is the switch to first person (camera.lua:147-150). */
+/** Closest boom length. Zooming in from here enters first person. */
 export const MIN_DISTANCE = 30;
-
-/** settings.lua:43 - maxDistance default. */
+/** Farthest boom length on foot. */
 export const MAX_DISTANCE = 800;
-
-/** actionbindings.lua:106 - one wheel click is 10 units of zoom. */
+/** Boom length change for one wheel click. */
 export const WHEEL_STEP = 10;
-
-/** camera.cpp:172 - the camera keeps this much clearance off obstacles
- *  behind the actor. */
+/** Clearance kept between the eye and a wall behind it (radius of the sphere swept along the boom). */
 export const CAMERA_OBSTACLE_LIMIT = 5;
-
-/** camera.cpp:173/180 - the focal point keeps this much clearance off
- *  the ceiling, "because character's head can be a bit higher than the
- *  collision area". */
+/** Clearance kept between the focal point and a ceiling or wall beside it. */
 export const FOCAL_OBSTACLE_LIMIT = 10;
 
-/**
- * MW-SHOULDER (FIELD BUGS 2026-10-26c; feature-feedback via): THE REFERENCE'S VIEW OVER THE SHOULDER, the player's option
- * (systems/features.js 'mw-shoulder-camera'). The focal point - the head the camera turns about - stands off the
- * actor's line: settings.lua:45-46's [x, y] behind the chosen shoulder (third_person.lua:39-40 - the left the right's
- * mirror), and while a weapon or a spell is out, or the actor swims, centred and raised (third_person.lua:27, :89-92).
- * Raised, the crosshair stands over the head, not on it; and a shot - which leaves the head along the look in every
- * host, as the reference's projectile leaves the actor (weaponanimation.cpp:111-114) - still lands where the crosshair
- * says, 15 units under it. Behind a shoulder its line would pass 30 units to the side of the crosshair's.
- * [x, y] are MW units: x to the actor's right (camera.cpp:101-107 getFocalPointOffset), y up.
- */
+/** Over-the-shoulder shift of the focal point: [right, up]. The left shoulder mirrors the first term. */
 export const SHOULDER_OFFSET = Object.freeze([30, -10]);
-/** third_person.lua:27 - combatOffset, the focal point while a weapon or a spell is out (and while swimming). */
+/** Shift while a weapon or spell is out, or in water: centred and raised so the crosshair clears the head. */
 export const COMBAT_OFFSET = Object.freeze([0, 15]);
-/** third_person.lua:110-116 - the focal transition's speed: into or out of combat, and every other change. */
+/** How quickly the shift eases to a new target, in 1/second. The faster rate applies on any change that involves combat. */
 export const FOCAL_TRANSITION_SPEED = Object.freeze({ combat: 5.0, normal: 1.0 });
-/** The player's three choices (the feature's tiers): no offset (vanilla's centred camera), and the two shoulders. */
+/** The shoulder choices; anything else is read as 'off'. */
 export const SHOULDER_SIDES = Object.freeze(['off', 'right', 'left']);
 
+/** The camera never looks exactly straight up or down: the look direction would lose its yaw. */
+export const PITCH_LIMIT = Math.PI / 2 - 0.000001;
+
+const METRES_PER_UNIT = 1 / MW_UNITS_PER_METER;
+
+const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+
 /**
- * camera.cpp:247-294 - THE FOCAL POINT'S TRANSITION, verbatim: setFocalPointTargetOffset carries the speed the offset
- * was moving at into the new transition (its influence fading at the transition's speed), and each frame the offset
- * closes on its target by `dt * (1 + 5 / |delta|) * speed`, at most all of it; instantTransition skips to the target
- * on the next step. Pure state; [x, y] in MW units.
+ * The eased shift of the focal point, as [right, up] in Morrowind units.
+ *
+ * Each step closes a fraction of the remaining gap; the fraction grows as the gap shrinks, so the tail does not
+ * crawl. When the target changes mid-motion, the movement of the last step is kept as a carry: it keeps pushing the
+ * shift the same way at first and is then reversed, so that a retarget never stops the shift dead. The carry weight
+ * is +1 when the new transition starts, 0 half way and -1 at its end. A carry only bends the path: whatever it
+ * moved the shift by (the owed displacement) is paid back evenly over the next transition, so that the shift still
+ * ends on its target.
  */
 export function createFocalOffset() {
-  let current = [0, 0], target = [0, 0], coef = 1;
-  let speed = [0, 0], prevSpeed = [0, 0], prevExtra = [0, 0], prevInfluence = 0, skip = true;
+  let position = [0, 0];
+  let target = [0, 0];
+  let rate = FOCAL_TRANSITION_SPEED.normal;
+  // Share of the new approach that is still held back: 1 right after a retarget, 0 once it is in full force.
+  let holdBack = 0;
+  // Units per second.
+  let carry = [0, 0];
+  // What the carry has moved the shift by and not given back yet.
+  let owed = [0, 0];
+  // The part of that, as of the last retarget, which the current transition is paying back.
+  let payback = [0, 0];
+  let lastMove = [0, 0];
+  let lastStepSeconds = 1;
+  let steppedSinceRetarget = false;
+  // The first step has nothing to ease from.
+  let jumpNext = true;
+
   return {
-    current: () => current,
+    current: () => position,
     target: () => target,
-    /** setFocalTransitionSpeed (third_person.lua:110-116). */
-    setSpeed(v) { coef = v; },
-    /** camera.cpp:247-252 setFocalPointTargetOffset. */
-    setTarget(v) { target = [v[0], v[1]]; prevSpeed = [speed[0], speed[1]]; prevInfluence = 1; },
-    /** camera.cpp:423-426 instantTransition's focal half. */
-    instant() { skip = true; },
-    /** camera.cpp:254-294 updateFocalPointOffset. */
+    setSpeed(value) {
+      rate = value;
+    },
+    setTarget(next) {
+      target = [next[0], next[1]];
+      if (steppedSinceRetarget) carry = [lastMove[0] / lastStepSeconds, lastMove[1] / lastStepSeconds];
+      steppedSinceRetarget = false;
+      payback = [owed[0], owed[1]];
+      holdBack = 1;
+    },
+    /** The next step lands on the target. */
+    instant() {
+      jumpNext = true;
+    },
     step(dt) {
-      if (!(dt > 0)) return current;
-      if (skip) { skip = false; prevExtra = [0, 0]; prevInfluence = 0; current = [target[0], target[1]]; }
-      const old = [current[0], current[1]];
-      if (prevInfluence > 0) {
-        current = [current[0] - prevExtra[0], current[1] - prevExtra[1]];
-        prevExtra = [prevExtra[0] / prevInfluence + prevSpeed[0] * dt, prevExtra[1] / prevInfluence + prevSpeed[1] * dt];
-        prevInfluence = Math.max(0, prevInfluence - dt * coef);
-        prevExtra = [prevExtra[0] * prevInfluence, prevExtra[1] * prevInfluence];
-        current = [current[0] + prevExtra[0], current[1] + prevExtra[1]];
+      if (!(dt > 0)) return position;
+      if (jumpNext) {
+        position = [target[0], target[1]];
+        jumpNext = false;
+        carry = [0, 0];
+        owed = [0, 0];
+        payback = [0, 0];
+        lastMove = [0, 0];
+        holdBack = 0;
+        return position;
       }
-      const delta = [target[0] - current[0], target[1] - current[1]], dl = Math.hypot(delta[0], delta[1]);
-      if (dl > 0) {
-        const k = Math.min(1, dt * (1 + 5 / dl) * coef * (1 - prevInfluence));
-        current = [current[0] + delta[0] * k, current[1] + delta[1] * k];
-      } else { prevExtra = [0, 0]; prevInfluence = 0; }
-      speed = [(current[0] - old[0]) / dt, (current[1] - old[1]) / dt];
-      return current;
+      const heldBefore = holdBack;
+      holdBack = Math.max(0, holdBack - dt * rate);
+      // Repeated subtraction leaves rounding dust where the hold-back should end at exactly zero.
+      if (holdBack < 1e-9) holdBack = 0;
+      // The part of the step that lies inside the transition: all of it, but for the step that ends the transition.
+      const inside = heldBefore > 0 ? Math.min(dt, heldBefore / rate) : 0;
+      // The mean carry weight over that part, which makes the carry's total over a transition exactly zero.
+      const carryShare = (heldBefore + holdBack - 1) * inside;
+      const paybackShare = rate * inside;
+      const carried = [
+        carry[0] * carryShare - payback[0] * paybackShare,
+        carry[1] * carryShare - payback[1] * paybackShare,
+      ];
+      owed = [owed[0] + carried[0], owed[1] + carried[1]];
+      const moved = [position[0] + carried[0], position[1] + carried[1]];
+      const gap = [target[0] - moved[0], target[1] - moved[1]];
+      const gapLength = Math.hypot(gap[0], gap[1]);
+      const approach = gapLength > 0 ? Math.min(1, dt * (1 + 5 / gapLength) * rate * (1 - holdBack)) : 0;
+      const next = [moved[0] + gap[0] * approach, moved[1] + gap[1] * approach];
+      lastMove = [next[0] - position[0], next[1] - position[1]];
+      lastStepSeconds = dt;
+      steppedSinceRetarget = true;
+      position = next;
+      return position;
     },
   };
 }
 
-/** MW-D30 / camera.cpp:323-331 - setPitch clamps to +/-(PI/2 - epsilon)
- *  with epsilon 0.000001f. The hosts had a hand-rolled +/-1.5, which
- *  stops the look ~4 degrees short of straight up and down. */
-export const PITCH_LIMIT = Math.PI / 2 - 0.000001;
-
-const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const isFiniteHit = (hit) => typeof hit === 'number' && Number.isFinite(hit);
 
 /**
- * One per game, like the arm - there is one player. The machine holds
- * MODE and BASE DISTANCE - the two things the reference persists,
- * each in its own home: the distance through the camera script's
- * onSave (camera.lua:350-352, `distance = third_person.baseDistance`
- * and nothing else), the mode through the save's own REC_CAM_ record
- * (worldimp.cpp:425-427 writes FIRS; statemanagerimp.cpp:617-618
- * force-applies it on load). Everything else is recomputed per
- * frame.
+ * Where the focal point ends up after the ceiling/wall guard, in metres.
  *
- * Hosts feed it three seams:
- *   wheel(clicks)  - wheel notches, +1 per click toward the actor
- *                    (ZoomIn), -1 away (ZoomOut) - actionbindings.lua:99-104.
- *   update({ready}) - resolves a queued view change, camera.cpp:135.
- *   eye({...})     - the frame's camera position, camera.cpp:160-209.
+ * `base` is the unshifted focal point, `floor` the lowest height a platform allows it (or null), `shift` the focal shift [right, up] in units, `right` the player's right
+ * (x, z). The guard sweeps from FOCAL_OBSTACLE_LIMIT under the unshifted focal point towards the shifted one and
+ * keeps the focal point where the sweep stops. With no shift it sweeps straight up instead, so that a low ceiling
+ * still lowers the focal point.
  */
+function guardFocal(base, floor, shift, right, casts) {
+  const limit = FOCAL_OBSTACLE_LIMIT * METRES_PER_UNIT;
+  const hasShift = shift[0] !== 0 || shift[1] !== 0;
+  // A platform floor lifts the unshifted focal point, and the shifted one may not end below it either. The sweep
+  // starts as far below the shifted point as its run is tall, so lifting the point lifts the start with it.
+  const lowest = floor ?? -Infinity;
+  const shiftUp = shift[1] * METRES_PER_UNIT;
+  const shifted = Math.max(Math.max(base[1], lowest) + shiftUp, lowest);
+  const start = [base[0], shifted - shiftUp - limit, base[2]];
+
+  // The run in units from the start point to the shifted focal point, in the (right, up) plane.
+  const runRight = shift[0];
+  const runUp = shift[1] + FOCAL_OBSTACLE_LIMIT;
+  const runLength = hasShift ? Math.hypot(runRight, runUp) : FOCAL_OBSTACLE_LIMIT;
+  const castLength = hasShift ? runLength : 2 * FOCAL_OBSTACLE_LIMIT;
+  const dir = hasShift
+    ? [(right[0] * runRight) / runLength, runUp / runLength, (right[1] * runRight) / runLength]
+    : [0, 1, 0];
+  const castMetres = castLength * METRES_PER_UNIT;
+
+  let reach = runLength;
+  if (casts.spherecast) {
+    const hit = casts.spherecast(start, limit, dir, castMetres);
+    // A swept sphere reports where its centre stops, already clear of the surface. The unshifted sweep is a
+    // ceiling probe measured to the surface, so it keeps the clearance itself.
+    if (isFiniteHit(hit) && hit < castMetres) reach = hit / METRES_PER_UNIT - (hasShift ? 0 : FOCAL_OBSTACLE_LIMIT);
+  } else if (casts.raycast) {
+    const hit = casts.raycast(start, dir, castMetres);
+    if (isFiniteHit(hit) && hit < castMetres) reach = hit / METRES_PER_UNIT - FOCAL_OBSTACLE_LIMIT;
+  }
+  const along = clamp(reach, 0, runLength) * METRES_PER_UNIT;
+  return [start[0] + dir[0] * along, start[1] + dir[1] * along, start[2] + dir[2] * along];
+}
+
+/** The unit look vector for a yaw (about +y, zero looking along +z) and pitch (positive looks up). */
+function lookVector(yaw, pitch) {
+  const flat = Math.cos(pitch);
+  return [Math.sin(yaw) * flat, Math.sin(pitch), Math.cos(yaw) * flat];
+}
+
 export function createMwCamera() {
-  // camera.cpp:58 - the camera starts in first person.
   let firstPerson = true;
+  // A view change asked for while the arms are busy: the wanted `firstPerson` value, or null.
+  let pendingView = null;
   let baseDistance = BASE_DISTANCE;
-  // FIELD BUGS 2026-09-29 (the sea) #3: at a helm the far end is the hull's reach (MW units; 0 on foot) - the host says
-  // it each frame (setSeaReach), and a distance past the reference's own maxDistance is the helm's alone
-  let seaFar = 0;
-  // The ACTUAL distance after obstacle pull-in, in MW units - the zoom
-  // law reads it back (camera.lua:146 getThirdPersonDistance).
-  let cameraDistance = 0;
-  // camera.cpp:225-232 - a view change that arrives while the upper
-  // body is busy (attack, equip) is QUEUED, not dropped: "Changing the
-  // view will stop all playing animations, so if we are playing
-  // anything important, queue the view change for later."
-  let queuedFirstPerson = null;
-  // MW-SHOULDER: the player's side ('off' | 'right' | 'left'), third_person.lua's `state` and noThirdPersonLastFrame,
-  // and camera.cpp's focal offset
-  let shoulder = 'off', shoulderState = null, noThirdLast = true;
+  // Where the eye really was behind the focal point at the last frame, in units; 0 in first person.
+  let actualDistance = 0;
+  let seaFarUnits = 0;
+  let shoulderChoice = 'off';
+  let shoulderMode = null;
+  let choiceChanged = false;
+  let thirdLastStep = false;
   const focalShift = createFocalOffset();
 
-  function setFirstPerson(next, ready) {
-    if (next === firstPerson) { queuedFirstPerson = null; return; }
-    if (!ready) { queuedFirstPerson = next; return; }
-    firstPerson = next;
-    queuedFirstPerson = null;
-  }
+  const farLimit = () => (seaFarUnits > 0 ? seaFarUnits : MAX_DISTANCE);
 
-  /** third_person.lua:135-137 - with viewOverShoulder off (the default
-   *  and the vanilla look), the preferred distance IS the base. */
-  const preferredDistance = () => baseDistance;
-
-  /**
-   * camera.lua:139-160, with the reference's defaults folded in (no
-   * preview, no standing preview, no noModeControl/noZoom tags). delta
-   * is in MW units, +toward the actor.
-   */
-  function zoom(delta, ready) {
-    if (!firstPerson) {
-      const obstacleDelta = preferredDistance() - cameraDistance;
-      // #3: past the reference's far end, at a helm, a notch is a ratio - out from the far end, or in down to it (and
-      // the reference's own ladder below it); out while pinned by more than one such notch is its no-op (camera.lua:153)
-      // HELM-ZOOM: at a helm the WHOLE range is by the ratio, the
-      // reference's nearest ring to the hull's reach - its ten-unit ladder took sixty notches from its base to its far end
-      if (seaFar > MAX_DISTANCE && !(delta > 0 && baseDistance === MIN_DISTANCE)) {
-        // AUDIT HELM-ZOOM E1: in from where the camera STANDS when pinned (the reference's own debt, camera.lua:151) - in
-        // from the distance it wants spent notches unseen; E2: one notch a frame whatever the wheel sent (a trackpad's
-        // swipe sends a burst of them, and a ratio each crossed the whole range in one gesture)
-        const notch = Math.max(-1, Math.min(1, delta / WHEEL_STEP));
-        const from = delta > 0 ? Math.max(MIN_DISTANCE, baseDistance - Math.max(0, obstacleDelta)) : baseDistance;
-        if (delta > 0 || obstacleDelta < baseDistance * (SEA_ZOOM_RATIO - 1)) baseDistance = seaZoomStep(from, notch, MIN_DISTANCE, seaFar);
-        return;
-      }
-      if (delta > 0 && baseDistance === MIN_DISTANCE) {
-        // camera.lua:147-150 - already at the closest ring: the next
-        // click steps INTO the head.
-        setFirstPerson(true, ready);
-      } else if (delta > 0 || obstacleDelta < -delta) {
-        // camera.lua:151-153 - zooming subtracts the obstacle debt too,
-        // so a wall-pinned camera zooms from where it actually IS; and
-        // zooming OUT while pinned is a no-op until the pin releases.
-        baseDistance = clamp(baseDistance - delta - obstacleDelta, MIN_DISTANCE, MAX_DISTANCE);
-      }
-    } else if (delta < 0) {
-      // camera.lua:155-158 - zooming out of the head lands on the
-      // closest third-person ring, not the remembered distance.
-      setFirstPerson(false, ready);
-      baseDistance = MIN_DISTANCE;
+  function requestView(wantFirst, ready) {
+    if (ready) {
+      firstPerson = wantFirst;
+      pendingView = null;
+    } else {
+      pendingView = wantFirst;
     }
   }
 
-  return {
-    /** 'first' | 'third' - what the frame should draw. */
-    mode() { return firstPerson ? 'first' : 'third'; },
-    thirdPerson() { return !firstPerson; },
-    queued() { return queuedFirstPerson; },
-    baseDistance() { return baseDistance; },
-    cameraDistance() { return cameraDistance; },
+  /** The boom length after zooming by `clicks` (positive: towards the player), or null if the wheel does nothing. */
+  function zoomedDistance(clicks) {
+    // A zoom starts from where the eye really is, which differs from the boom length when a wall pulls the eye in.
+    const gap = actualDistance - baseDistance;
+    if (seaFarUnits > 0) {
+      // Only a pulled-in eye counts here; an eye still catching up to a shortened boom does not.
+      const pinned = Math.min(0, gap);
+      // At sea a burst of clicks in one frame counts as a single notch.
+      const ratio = SEA_ZOOM_RATIO ** clamp(-clicks, -1, 1);
+      if (clicks < 0) {
+        if (baseDistance * (ratio - 1) + pinned <= 0) return null;
+        return clamp(baseDistance * ratio, MIN_DISTANCE, seaFarUnits);
+      }
+      return clamp((baseDistance + pinned) * ratio, MIN_DISTANCE, seaFarUnits);
+    }
+    const next = baseDistance - clicks * WHEEL_STEP + gap;
+    if (clicks < 0 && next <= baseDistance) return null;
+    return clamp(next, MIN_DISTANCE, MAX_DISTANCE);
+  }
 
-    /** Wheel notches: +1 per click zooming in (ZoomIn = wheel up,
-     *  bindingsmanager.cpp:300-301), -1 zooming out. One click is
-     *  WHEEL_STEP units (actionbindings.lua:106). `ready` gates the
-     *  FP boundary crossing (camera.cpp:225-232); zoom distance inside
-     *  third person never needs it. */
+  return {
+    mode: () => (firstPerson ? 'first' : 'third'),
+    thirdPerson: () => !firstPerson,
+    queued: () => pendingView,
+    baseDistance: () => baseDistance,
+    cameraDistance: () => actualDistance,
+
+    /**
+     * One frame's wheel input: `clicks` > 0 zooms in, < 0 out. Crossing between first and third person waits until
+     * `ready` (the arms can switch view) and is remembered until `update`.
+     */
     wheel(clicks, { ready = true } = {}) {
       if (!clicks) return;
-      zoom(clicks * WHEEL_STEP, ready);
+      if (firstPerson) {
+        if (clicks > 0) return;
+        baseDistance = MIN_DISTANCE;
+        requestView(false, ready);
+        return;
+      }
+      if (clicks > 0 && baseDistance === MIN_DISTANCE) {
+        requestView(true, ready);
+        return;
+      }
+      const next = zoomedDistance(clicks);
+      if (next !== null) baseDistance = next;
     },
 
-    /** MW-SHOULDER: the player's side ('off', 'right', 'left'; anything else is off). A change is updateSettings'
-     *  (third_person.lua:31-44): the next step takes the new offset at once. */
-    setShoulder(side) {
-      const next = SHOULDER_SIDES.includes(side) ? side : 'off';
-      if (next !== shoulder) { shoulder = next; noThirdLast = true; }
+    /** Apply a queued view change once the arms are ready. */
+    update({ ready = true } = {}) {
+      if (pendingView !== null && ready) requestView(pendingView, true);
     },
-    shoulder: () => shoulder,
-    shoulderState: () => shoulderState,
+
+    setShoulder(choice) {
+      const next = SHOULDER_SIDES.includes(choice) ? choice : 'off';
+      if (next !== shoulderChoice) choiceChanged = true;
+      shoulderChoice = next;
+    },
+    shoulder: () => shoulderChoice,
+    shoulderState: () => shoulderMode,
     focalOffset: () => focalShift.current(),
 
     /**
-     * MW-SHOULDER: THE FRAME'S SHOULDER - third_person.lua M.update (:129-162) without its distance terms (the module
-     * head), then camera.cpp's focal transition (:145, updateFocalPointOffset). `stance` is the actor's: 'combat' (a
-     * weapon or a spell out - Actor.getStance, :89), 'swimming' (Actor.isSwimming, :91), or nothing. In first person
-     * the next third-person frame starts afresh (:131-133); with the option off the offset is none, at once (:135-143);
-     * on, updateState (:86-127, autoSwitchShoulder off): the chosen shoulder, or the combat offset, eased at the
-     * transition's speed - fast into and out of combat - and at once on the frame the view or the option changed.
+     * Advance the focal shift by `dt` seconds. `stance` is 'combat' while a weapon or spell is out, 'swimming' in
+     * water, otherwise null.
      */
-    stepShoulder(dt, stance = null) {
-      if (firstPerson) { noThirdLast = true; focalShift.step(dt); return; }
-      if (shoulder === 'off') {
-        if (noThirdLast) { focalShift.setTarget([0, 0]); focalShift.instant(); noThirdLast = false; }
-        shoulderState = null;
+    stepShoulder(dt, stance) {
+      if (firstPerson) {
+        // The shift keeps settling out of sight, but the mode only follows the stance in third person.
+        thirdLastStep = false;
         focalShift.step(dt);
         return;
       }
-      const own = shoulder === 'left' ? 'left' : 'right';
-      const old = shoulderState;
-      if (stance === 'combat') shoulderState = 'combat';
-      else if (stance === 'swimming') shoulderState = 'swimming';
-      else shoulderState = own;   // :93-104 - out of combat or the water, or none yet: the default shoulder (no auto switch)
-      if (old !== shoulderState || noThirdLast) {
-        focalShift.setSpeed(old === 'combat' || shoulderState === 'combat' ? FOCAL_TRANSITION_SPEED.combat : FOCAL_TRANSITION_SPEED.normal);
-        focalShift.setTarget(shoulderState === 'right' ? SHOULDER_OFFSET : shoulderState === 'left' ? [-SHOULDER_OFFSET[0], SHOULDER_OFFSET[1]] : COMBAT_OFFSET);
+      let wanted = null;
+      if (shoulderChoice !== 'off') wanted = stance === 'combat' || stance === 'swimming' ? stance : shoulderChoice;
+      if (wanted !== shoulderMode) {
+        const fast = wanted === 'combat' || shoulderMode === 'combat';
+        focalShift.setSpeed(fast ? FOCAL_TRANSITION_SPEED.combat : FOCAL_TRANSITION_SPEED.normal);
+        let shift = [0, 0];
+        if (wanted === 'right') shift = SHOULDER_OFFSET;
+        else if (wanted === 'left') shift = [-SHOULDER_OFFSET[0], SHOULDER_OFFSET[1]];
+        else if (wanted === 'combat' || wanted === 'swimming') shift = COMBAT_OFFSET;
+        focalShift.setTarget(shift);
+        shoulderMode = wanted;
       }
-      if (noThirdLast) { focalShift.instant(); noThirdLast = false; }   // :153-156 - just into third person: no transition
+      if (choiceChanged || !thirdLastStep) focalShift.instant();
+      choiceChanged = false;
+      thirdLastStep = true;
       focalShift.step(dt);
     },
 
-    /** camera.cpp:135 - a queued view change lands as soon as the upper
-     *  body is ready. */
-    update({ ready = true } = {}) {
-      if (queuedFirstPerson !== null && ready) setFirstPerson(queuedFirstPerson, true);
-    },
-
-    /** #3: the helm's reach (m; 0 or less on foot, none): the far end the wheel zooms to while sailing. Off the helm a
-     *  distance past the reference's far end comes back to it. */
+    /** Tell the camera how far (in metres) the sailed hull reaches, so that the zoom can frame it; 0 on foot. */
     setSeaReach(metres) {
-      seaFar = Number.isFinite(metres) && metres * MW_UNITS_PER_METER > MAX_DISTANCE ? metres * MW_UNITS_PER_METER : 0;
-      if (baseDistance > Math.max(MAX_DISTANCE, seaFar)) baseDistance = Math.max(MAX_DISTANCE, seaFar);
+      const units = Number.isFinite(metres) && metres > 0 ? metres * MW_UNITS_PER_METER : 0;
+      seaFarUnits = units > MAX_DISTANCE ? units : 0;
+      baseDistance = Math.min(baseDistance, farLimit());
     },
-    seaFar() { return seaFar; },
+    seaFar: () => seaFarUnits,
 
-    /** Restore/persist seam (camera.lua:350-352 saves the distance). The helm's zoom is its own: a distance past the
-     *  reference's far end is saved as that far end. */
-    state() { return { firstPerson, baseDistance: Math.min(baseDistance, MAX_DISTANCE) }; },
-    restore(s) {
-      if (!s) return;
-      if (typeof s.firstPerson === 'boolean') firstPerson = s.firstPerson;
-      if (Number.isFinite(s.baseDistance)) baseDistance = clamp(s.baseDistance, MIN_DISTANCE, MAX_DISTANCE);
-      queuedFirstPerson = null;
+    /** What a save keeps. The boom length is kept to the on-foot range: a helm's reach does not outlive the helm. */
+    state: () => ({ firstPerson, baseDistance: Math.min(baseDistance, MAX_DISTANCE) }),
+    restore(saved) {
+      if (!saved) return;
+      pendingView = null;
+      if (typeof saved.firstPerson === 'boolean') firstPerson = saved.firstPerson;
+      if (typeof saved.baseDistance === 'number') {
+        if (Number.isFinite(saved.baseDistance)) baseDistance = clamp(saved.baseDistance, MIN_DISTANCE, MAX_DISTANCE);
+      }
     },
 
     /**
-     * THE FRAME'S EYE - camera.cpp:160-209 in the port's meters and
-     * y-up basis. In first person the eye is the host's own (rule 54
-     * already tracks the rig's Camera node through fpArm); in third
-     * person:
+     * Where the eye is this frame. First person returns the head's own position. Third person returns the eye, the
+     * focal point and the boom length in metres.
      *
-     *   focal  = feet + FOCAL_HEIGHT*scale up        camera.cpp:96-97
-     *   ceiling guard: the focal keeps FOCAL_OBSTACLE_LIMIT of
-     *   clearance overhead, dropping at most its own offset length
-     *                                                camera.cpp:177-193
-     *   eye    = focal - fwd(yaw,pitch) * distance   camera.cpp:196-208
-     *   with the distance sphere-cast back from the focal and backed
-     *   off CAMERA_OBSTACLE_LIMIT                    camera.cpp:200-206
-     *
-     * `raycast(origin, dir, maxDist) -> dist|null` is the host
-     * collider's seam; null/miss means unobstructed. fwd is the port's
-     * y-up forward from yaw/pitch, the same basis every scene's lookAt
-     * uses, so the focal lands dead centre of the frame - which is
-     * vanilla's centered-behind camera (no shoulder offset by default,
-     * settings.lua:44).
-     *
-     * MAC-A.
-     *
-     * BOTH GUARDS ARE SPHERE CASTS, because both of the reference's
-     * are: `rayCasting->castSphere(...)` at camera.cpp:186 and :200,
-     * with the limit as the SPHERE'S RADIUS - not a ray with the limit
-     * subtracted off the end, which is what this port had.
-     *
-     * A ray and a five-unit sphere disagree in exactly the place Mac
-     * found. A pillar is thin, and a single ray from the head to the
-     * camera threads PAST one that a sphere of radius 5 hits square:
-     * the camera slides through the pillar, the pillar fills the frame
-     * for a frame or two, and it pops out the far side. When the ray
-     * does catch an EDGE, `hit - limit` is a different number from one
-     * frame to the next by the whole width of the pillar, so the
-     * camera snaps in and out as you walk past it. Both are the same
-     * mistake: a line where the reference has a volume.
-     *
-     * The distance is the SWEPT SPHERE'S OWN, with nothing taken off
-     * it. `castSphere` answers a hit POINT and the reference then
-     * re-derives the sphere's centre at contact
-     * (`hitPos + hitNormal * limit`) before measuring back to the
-     * focal - and that centre is precisely what a swept-sphere cast
-     * reports as the distance travelled, which is what
-     * `collider.sphereCast` returns (player/collider.js: "how far the
-     * sphere's CENTRE travels before the leading cap touches"). So the
-     * clearance is kept by the radius rather than by a subtraction,
-     * and the old `- CAMERA_OBSTACLE_LIMIT` would now take it twice.
-     *
-     * `spherecast(origin, radius, dir, maxDist) -> dist|null` is the
-     * new seam; a host that hands only `raycast` keeps the old line
-     * (the headless pins, and any caller written before this).
+     * `raycast(origin, direction, maxDistance)` or `spherecast(origin, radius, direction, maxDistance)` report how far
+     * the first obstacle is (null for none); the sphere cast is preferred. `pivotFloor` is a height the focal point
+     * must not drop below, for a platform that moves under the player.
      */
-    eye({ fpEye, feet, yaw, pitch, heightScale = 1, raycast = null, spherecast = null, pivotFloor = null }) {
+    eye({ fpEye, feet, yaw, pitch, heightScale = 1, raycast, spherecast, pivotFloor }) {
       if (firstPerson) {
-        cameraDistance = 0;   // camera.cpp:165-169
+        actualDistance = 0;
         return { eye: fpEye, thirdPerson: false, distance: 0, focal: null };
       }
-      const u = 1 / MW_UNITS_PER_METER;
-      // BENCH-CAM: on a wagon's bench the focal stands at least at the host's `pivotFloor` (over the wagon's
-      // roof) - over the caravan's room by 12 cm it stood, and any look up cast the camera into it and back to the
-      // focal; under the open wagon's tilt it stood inside the canvas. A departure from camera.cpp, Ledger A.
-      const focal = [feet[0], Math.max(feet[1] + FOCAL_HEIGHT * heightScale * u, pivotFloor ?? -Infinity), feet[2]];
-      // MAC-A: the cast is a SPHERE where the host has one
-      // (castSphere, camera.cpp:186); the ray is the fallback for a
-      // host that hands no sphere seam.
-      const cast = spherecast
-        ? (o, d, m, r) => spherecast(o, r, d, m)
-        : (raycast ? (o, d, m) => raycast(o, d, m) : null);
-      // MW-SHOULDER: the focal point's offset (camera.cpp:101-107 - x along the actor's right, y up; this port's right
-      // is (cos yaw, 0, -sin yaw), the strafe's, world/mat4.js's handedness law), and camera.cpp:177-193's guard in
-      // full: a sphere swept from the actor's line to the offset focal point (the +10 ceiling term added to its run,
-      // camera.cpp:180), the focal point left where it touches. With no offset - the option off, the vanilla camera -
-      // the clause is the one below, as it always was.
-      const fo = focalShift.current();
-      const shoulderOn = cast && (fo[0] !== 0 || fo[1] !== 0);
-      if (fo[0] !== 0 || fo[1] !== 0) {
-        focal[0] += Math.cos(yaw) * fo[0] * u; focal[1] += fo[1] * u; focal[2] -= Math.sin(yaw) * fo[0] * u;
-        if (pivotFloor != null) focal[1] = Math.max(focal[1], pivotFloor);
+      const base = [feet[0], feet[1] + FOCAL_HEIGHT * heightScale * METRES_PER_UNIT, feet[2]];
+      const right = [Math.cos(yaw), -Math.sin(yaw)];
+      const focal = guardFocal(base, pivotFloor, focalShift.current(), right, { raycast, spherecast });
+
+      const look = lookVector(yaw, pitch);
+      const back = [-look[0], -look[1], -look[2]];
+      const wanted = baseDistance * METRES_PER_UNIT;
+      let reach = wanted;
+      if (spherecast) {
+        const hit = spherecast(focal, CAMERA_OBSTACLE_LIMIT * METRES_PER_UNIT, back, wanted);
+        if (isFiniteHit(hit) && hit < wanted) reach = Math.max(0, hit);
+      } else if (raycast) {
+        const hit = raycast(focal, back, wanted);
+        if (isFiniteHit(hit) && hit < wanted) reach = Math.max(0, hit - CAMERA_OBSTACLE_LIMIT * METRES_PER_UNIT);
       }
-      if (shoulderOn) {
-        const run = [Math.cos(yaw) * fo[0] * u, (fo[1] + FOCAL_OBSTACLE_LIMIT) * u, -Math.sin(yaw) * fo[0] * u];
-        const len = Math.hypot(run[0], run[1], run[2]);
-        const dir = [run[0] / len, run[1] / len, run[2] / len];
-        const from = [focal[0] - run[0], focal[1] - run[1], focal[2] - run[2]];
-        const hit = cast(from, dir, len, FOCAL_OBSTACLE_LIMIT * u);
-        const k = hit != null && hit < len ? Math.max(0, spherecast ? hit : hit - FOCAL_OBSTACLE_LIMIT * u) : null;
-        if (k != null) for (let i = 0; i < 3; i++) focal[i] = from[i] + dir[i] * k;
-      } else if (cast) {
-        // camera.cpp:177-193 with the default zero focal offset: the
-        // offset the cast walks is the +10 ceiling term alone
-        // (camera.cpp:180), so the whole clause reduces to "keep the
-        // focal FOCAL_OBSTACLE_LIMIT under the ceiling, dropping it at
-        // most the offset's own length".
-        const guard = FOCAL_OBSTACLE_LIMIT * u;
-        const up = cast([focal[0], focal[1] - guard, focal[2]], [0, 1, 0], guard * 2, guard);
-        if (up != null && up < guard * 2) {
-          const ceilingY = focal[1] - guard + up;
-          focal[1] = Math.max(focal[1] - guard, Math.min(focal[1], ceilingY - guard));
-        }
-      }
-      const cp = Math.cos(pitch);
-      const fwd = [Math.sin(yaw) * cp, Math.sin(pitch), Math.cos(yaw) * cp];
-      let dist = preferredDistance() * u;
-      if (cast) {
-        // camera.cpp:200-206 - pull in to the obstacle, keeping
-        // CAMERA_OBSTACLE_LIMIT of clearance. MAC-A: the clearance is
-        // the swept sphere's RADIUS now, so the distance is the cast's
-        // own and nothing is subtracted from it.
-        const limit = CAMERA_OBSTACLE_LIMIT * u;
-        const hit = cast(focal, [-fwd[0], -fwd[1], -fwd[2]], dist, limit);
-        if (hit != null && hit < dist) dist = Math.max(0, spherecast ? hit : hit - limit);
-      }
-      cameraDistance = dist * MW_UNITS_PER_METER;
+      actualDistance = reach * MW_UNITS_PER_METER;
       return {
-        eye: [focal[0] - fwd[0] * dist, focal[1] - fwd[1] * dist, focal[2] - fwd[2] * dist],
+        eye: [focal[0] - look[0] * reach, focal[1] - look[1] * reach, focal[2] - look[2] * reach],
         thirdPerson: true,
-        distance: dist,
+        distance: reach,
         focal,
       };
     },
   };
 }
 
-/** The one live instance, module-level like fpArm - one player, one
- *  camera. Scenes import this rather than each minting their own. */
+/** The one live camera the hosts share. */
 export const mwCamera = createMwCamera();

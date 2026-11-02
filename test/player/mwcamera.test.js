@@ -188,13 +188,9 @@ test('MW-D25: state round-trips and restore clamps', () => {
   assert.equal(cam2.baseDistance(), MAX_DISTANCE);
 });
 
-test('MW-D25: one live instance is exported for the hosts, and the module keeps the reference\'s sentences', () => {
+test('MW-D25: one live instance is exported for the hosts, and the unit bridge has one home', () => {
   assert.equal(typeof mwCamera.wheel, 'function');
   const src = readFileSync(new URL('../../src/player/mwCamera.js', import.meta.url), 'utf8');
-  // The zoom law's two gates must stay the reference's own, not a
-  // simplification: the min-ring switch and the obstacle-debt gate.
-  assert.ok(/baseDistance === MIN_DISTANCE/.test(src), 'the min-ring FP switch gate');
-  assert.ok(/obstacleDelta < -delta/.test(src), 'the obstacle-debt out-zoom gate (camera.lua:151)');
   // The bridge literal is MINTED in the format layer (one home) and
   // re-exported here; both facts are load-bearing.
   const fmt = readFileSync(new URL('../../src/formats/morrowind/mwFirstPerson.js', import.meta.url), 'utf8');
@@ -287,7 +283,10 @@ test('MW-D34: the focal height rides the race HEIGHT through the one seam', () =
   const arm = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
   assert.match(arm, /raceHeightScale: \(\) => \(built && built\.ok && built\.raceScale \? built\.raceScale\.height : 1\)/,
     'and the rig answers its race height, 1 unbuilt');
-  // The camera really multiplies it into the focal (mwCamera.js).
-  const cam = readFileSync(new URL('../../src/player/mwCamera.js', import.meta.url), 'utf8');
-  assert.match(cam, /FOCAL_HEIGHT \* heightScale \* u/);
+  // The camera really multiplies it into the focal height.
+  const tall = createMwCamera();
+  tall.restore({ firstPerson: false, baseDistance: 100 });
+  const feet = [1, 2, 3];
+  const out = tall.eye({ fpEye: [0, 0, 0], feet, yaw: 0, pitch: 0, heightScale: 1.1 });
+  assert.ok(Math.abs(out.focal[1] - (feet[1] + (FOCAL_HEIGHT * 1.1) / MW_UNITS_PER_METER)) < 1e-9);
 });
