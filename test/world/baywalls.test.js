@@ -138,7 +138,7 @@ test('TS7 with ARENA2: a town past the Bay\'s yards on its own ground - every ya
   for (const kind of ['city-state', 'town']) {
     for (let j = 0; j < T[kind].length; j += 6) {
       const t = T[kind][j], mapId = ((0xa7 << 20) | (500000 + j + (kind === 'town' ? 5000 : 0))) >>> 0;
-      const loc = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId } }, io);
+      const loc = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId }, arena: { kind } }, io);
       if (loc.outline?.walled) standTownWall(loc, t.exterior.exteriorData.blockNames, io, townOutlineBlockJson);
       const yl = layoutLocation(loc, maps, blocks), ed = loc.exterior.exteriorData;
       const shape = locationShapeField(loc, (bx, by) => { const nm = ed.blockNames[by * ed.width + bx]; return isWallCarrier(nm) ? null : blocks.getBlockByName(nm)?.rmbBlock ?? null; });

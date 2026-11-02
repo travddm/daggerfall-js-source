@@ -1,8 +1,7 @@
 // AUDIT TESA III lane E1: the pins of the findings fixed in the lane's own files.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { TOWN_OUTLINE_BLOCK, townOutlineBlockJson } from '../../src/world/townOutline.js';
 import { townWallCellsOf, wallOnTownMap, wallLaidBytes, registerTownWall, townWallBlockName, WALL_BYTE } from '../../src/world/townWalls.js';
 import { installWorldDataReplacement } from '../../src/formats/worldData/worldDataReplacement.js';
@@ -10,8 +9,6 @@ import { CityNavigation } from '../../src/world/city/cityNavigation.js';
 import { rectsLookup, rectsFingerprint, bakeCacheKey, BAKE_GENERATOR_VERSION } from '../../src/world/deepWater/deepWatersBakeCache.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const ARENA2 = process.env.ARENA2_PATH;
-const skipReal = !ARENA2 || !existsSync(join(ARENA2 ?? '', 'BLOCKS.BSA')) ? 'ARENA2_PATH not set or missing - real-data validation skipped' : false;
 const RING = ['WALLAA02.RMB', 'WALLAA10.RMB', 'WALLAA03.RMB', 'WALLAA07.RMB', 'H.RMB', 'WALLAA05.RMB', 'WALLAA00.RMB', 'WALLAA08.RMB', 'WALLAA01.RMB'];
 const city = (names, mapId) => ({ name: 'Bayton', mapTableData: { mapId }, exterior: { buildings: [], exteriorData: { width: 3, height: 3, blockNames: names.slice() } } });
 /** A walk grid off a city's blocks' bytes, as the bench builds its own (scenes/exterior.js: each block's bytes, a ground of
@@ -66,36 +63,3 @@ test('AUDIT TESA III E1-4 THE DEEP WATERS BAKE BLENDS A TOWN AS THE STREAMED BUI
   assert.match(bakeCacheKey({ woodsHash: 1, rectsHash: 2 }), /^dwbake:v2:1:2$/);
 });
 
-test('AUDIT TESA III E1-4 with ARENA2: Antelibuton and Aldwall Rock - the bake\'s water test over the row Deep Waters is handed is the streamed build\'s ground, sample for sample; the rect alone (the bake before) called thousands of their sea samples land (mutant: the outline left off the row)', { skip: skipReal }, async () => {
-  const { BlocksFile } = await import('../../src/formats/blocksFile.js');
-  const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../src/formats/mapsFile.js');
-  const { WoodsFile } = await import('../../src/formats/woodsFile.js');
-  const TT = await import('../../src/world/terrain/terrainTiles.js');
-  const { generateSamples } = await import('../../src/world/terrain/terrainSampler.js');
-  const { deepWatersLocationRects } = await import('../../src/world/deepWater/deepWatersClient.js');
-  const { pixelWaterSampler, WATER_THRESHOLD } = await import('../../src/world/deepWater/deepWatersBake.js');
-  const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
-  const blocks = new BlocksFile(); blocks.load(bytes('BLOCKS.BSA'));
-  const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK')); maps.autoDiscard = false;
-  const woods = new WoodsFile(); woods.load(bytes('WOODS.WLD'));
-  const HD = 129, got = new Map();
-  for (let r = 0; r < 62; r++) {
-    const reg = maps.getRegion(r);
-    if (!reg) continue;
-    for (let l = 0; l < reg.locationCount; l++) {
-      const loc = maps.getLocation(r, l);
-      if (!loc || !['Antelibuton', 'Aldwall Rock'].includes(loc.name)) continue;
-      const p = longitudeLatitudeToMapPixel(loc.mapTableData.longitude, loc.mapTableData.latitude);
-      const [row] = deepWatersLocationRects(woods, [[p.x, p.y, loc]], maps, blocks);
-      assert.ok(row?.[5] instanceof Uint8Array, `${loc.name}: its row carries its outline`);
-      // the streamed build's ground (terrainGen.js: the outline's blend, the sea read on DFU's own samples)
-      const S = generateSamples(woods, p.x, p.y), [avg] = TT.calcAvgMaxHeight(S);
-      TT.blendLocationTerrain(S, avg, TT.setLocationTiles(loc, maps, blocks, new Uint8Array(128 * 128)), HD, Float32Array.from(S));
-      const off = (rect) => { const w = pixelWaterSampler(woods, p.x, p.y, rect); let n = 0; for (let x = 0; x < HD; x++) for (let y = 0; y < HD; y++) if (w.water(x, y) !== (S[x * HD + y] <= WATER_THRESHOLD)) n++; return n; };
-      assert.equal(off(rectsLookup([row])(p.x, p.y)), 0, `${loc.name}: the bake's water the ground's`);
-      got.set(loc.name, off(rectsLookup([row.slice(0, 5)])(p.x, p.y)));
-    }
-  }
-  assert.deepEqual([...got.keys()].sort(), ['Aldwall Rock', 'Antelibuton']);
-  for (const [name, n] of got) assert.ok(n > 1000, `${name}: the rect alone called ${n} samples otherwise`);
-});

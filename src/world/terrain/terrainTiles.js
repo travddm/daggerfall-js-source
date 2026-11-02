@@ -288,7 +288,7 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
       blockAt.push(blockIndex === -1 ? null : blocksFile.getBlock(blockIndex));
     }
   }
-  // TOWN-SHAPES (departure from TerrainHelper.SetLocationTiles): only the tiles of the
+  // TOWN-SHAPES (departure from TerrainHelper.SetLocationTiles, past the Bay only): only the tiles of the
   // town's own outline are stamped - the rest of its blocks' ground is the land's
   const shape = locationShapeField(dfLocation, (bx, by) => (isWallCarrier(blockAt[by * width + bx]?.name) ? null : blockAt[by * width + bx]?.rmbBlock ?? null), tilePos);   // TS4: a wall's carrier shapes none
   for (let blockY = 0; blockY < height; blockY++) {
@@ -344,8 +344,8 @@ const SHAPE_PAD = Math.ceil(TOWN_SHAPE.margin + TOWN_SHAPE.wander) + 1;
  * TOWN-SHAPES: A LOCATION'S OUTLINE over its pixel's 128 x 128 tiles - world/townShape.js
  * townShapeField over its grid (world/townShape.js townTiles: each block's town-map bytes, its misc models and flats -
  * `rmbOf(bx, by)` a block's RMB half, or null), laid at its tile origin - TS4: a walled city past the Bay's over its
- * round, its apron its own - or null for a location the port stands whole: a capital (its own plan's,
- * world/tamrielCapitals.js), a grid with no block read.
+ * round, its apron its own - or null for a location the port stands whole: a location of Daggerfall's own map, a capital
+ * (its own plan's, world/tamrielCapitals.js), a grid with no block read.
  * @param {any} dfLocation @param {(bx: number, by: number) => any} rmbOf @param {{x: number, y: number}} [tilePos]
  * @returns {?Uint8Array} townShapeField's codes in the pixel's tiles (index x + y * 128), 0 outside
  */
@@ -361,6 +361,19 @@ export function locationShapeField(dfLocation, rmbOf, tilePos = getLocationTerra
 }
 
 /**
+ * Whether the port made this location rather than reading it from Daggerfall's map: a town or lair past the Bay
+ * (world/arenaLocations.js, world/tamrielCountry.js, world/tamrielDungeons.js), an isle's place past the Veil
+ * (world/etherPlaces.js) or a spawned dungeon (world/spawnedDungeons.js). Only these get an outline. A location of
+ * Daggerfall's own map keeps DFU's ground (TerrainHelper.SetLocationTiles and BlendLocationTerrainJob): every ground tile
+ * of its grid stamped and a square plateau. The outline there stood coastal towns on sheer walls over the sea and let
+ * trees grow inside DFU's clearing.
+ * @param {any} dfLocation
+ */
+export const isPortMadeLocation = (dfLocation) => !!(dfLocation.arena || dfLocation.country || dfLocation.ether || dfLocation.spawned);
+/** A capital stands on its own plan's ground (world/tamrielCapitals.js), so it takes no outline either. @param {any} dfLocation */
+const takesOutline = (dfLocation) => !!dfLocation?.exterior?.exteriorData && !dfLocation.capital && isPortMadeLocation(dfLocation);
+
+/**
  * AUDIT TESA III E1-4: AN OUTLINE'S BASIS - what locationShapeField draws its outline from before its seed: the grid's
  * occupied tiles (townTiles) on the outline's padded box (SHAPE_PAD tiles each side - its margin wanders out past the
  * blocks' squares), whether it stands on a walled round (TS4), and where the box lies in the pixel's tiles; and what
@@ -370,7 +383,7 @@ export function locationShapeField(dfLocation, rmbOf, tilePos = getLocationTerra
  * @returns {?{ padded: Uint8Array, stamp: Uint8Array, PW: number, PH: number, walled: boolean, x0: number, y0: number, clear: number }}
  */
 export function locationOutlineBasis(dfLocation, rmbOf, tilePos = getLocationTerrainTileOrigin(dfLocation)) {
-  if (!dfLocation?.exterior?.exteriorData || dfLocation.capital) return null;
+  if (!takesOutline(dfLocation)) return null;
   const { width, height } = dfLocation.exterior.exteriorData;
   const T = RMB_TILES_PER_BLOCK, W = width * T, H = height * T;
   const blockAt = [];

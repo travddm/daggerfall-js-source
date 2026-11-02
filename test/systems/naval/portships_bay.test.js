@@ -1,17 +1,18 @@
 // PORT-SHIPS - EVERY PORT OF THE BAY ON THE FREEWARE: the port
 // law's 106 towns sounded through the harbour book as the world host hands it (the ground over the sea's top) on the ground the game builds (test/portShipsWorld.mjs), measured as portships_real.test.js
-// measures the ports past the Bay. Sounded off the water alone, four ships at three of them stood a side on a bank.
+// measures the ports past the Bay. On Daggerfall Unity's town ground no ship stands on a bank even sounded off the water
+// alone; on the outline ground four ships at three ports did.
 import '../../modsOff.js';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { portShipsWorld, HAS_PORT_WORLD, measurePorts } from '../../portShipsWorld.mjs';
 
 const skip = HAS_PORT_WORLD ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)';
-/** The Bay's ports with a ship on a bank, sounded off the water alone. */
-const BAY_BEFORE = Object.freeze({ Chestertower: ['land'], Pilliweyn: ['land'], Wadijerareg: ['land', 'land'] });
+/** The Bay's ports with a ship on a bank, sounded off the water alone: none on DFU's town ground. */
+const BAY_BEFORE = Object.freeze({});
 after(async () => { (await portShipsWorld())?.done(); });
 
-test('PORT-SHIPS (ARENA2): EVERY PORT OF THE BAY - the port law\'s 106 towns sounded as the host hands them: every berth stands on the ground, every port keeps as many berths as it had, and no Bay city keeps a wall of the port\'s round its harbour; sounded off the water alone, four ships at three ports stood a side on a bank, Chestertower\'s 28 m up (mutants: the ground unhanded)', { skip }, async () => {
+test('PORT-SHIPS (ARENA2): EVERY PORT OF THE BAY - the port law\'s 106 towns sounded as the host hands them: every berth stands on the ground, every port keeps as many berths as it had, and no Bay city keeps a wall of the port\'s round its harbour; sounded off the water alone, none on a bank either (mutants: the ground unhanded)', { skip }, async () => {
   const w = await portShipsWorld();
   assert.equal(w.bay.length, 106, 'the port law\'s 106');
   const before = measurePorts(w, w.bay, false), now = measurePorts(w, w.bay, true);

@@ -4307,7 +4307,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // - its places' rects read off the isles' templates once, as the Bay's are off its locations: a template's rect is
     // its blocks' alone, read as a clone reads them (the isles' region and an isle's own index - WD3 names the town
     // whose blocks come next, and no variant names a clone)
-    ether: etherSea ? etherPlaceRects(_etherTemplates, locationRectReader(maps, blocks, { regionIndex: ETHER_REGION, locationIndex: -1000 })) : null,   // AUDIT ETHER-OW C1-4: one tilemap for the walk; BOOT-RECTS: and each block parsed once (terrainTiles.js locationRectReader)
+    ether: etherSea ? etherPlaceRects(_etherTemplates, locationRectReader(maps, blocks, { regionIndex: ETHER_REGION, locationIndex: -1000, ether: true })) : null,   // AUDIT ETHER-OW C1-4: one tilemap for the walk; BOOT-RECTS: and each block parsed once (terrainTiles.js locationRectReader)
   }) : null;
   /** OH-B: THERE'S A HOLE IN THE BOTTOM OF THE OCEAN 1.1.0 (jet082, vendor/ocean-holes/) - made below, after the decorations its
    *  pits keep out; the sea's floor builds are late-bound to it (a promote lands only after the world is up). */
