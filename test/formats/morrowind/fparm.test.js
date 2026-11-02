@@ -1221,7 +1221,7 @@ import {
 } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { animVelocity } from '../../../src/formats/morrowind/mwAnim.js';
 
-test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2085, 2297-2330)', () => {
+test('MW-D26: the movestate ladder: sneak over run over walk, a 2:1 strafe test, turns in third person only', () => {
   // sneak beats run beats walk, exactly as the ternaries order them
   assert.equal(movementAnimState({ forward: 1 }), 'walkforward');
   assert.equal(movementAnimState({ forward: 1, running: true }), 'runforward');
@@ -1232,7 +1232,7 @@ test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2
   assert.equal(movementAnimState({ forward: 0.4, strafe: 1 }), 'walkright');
   assert.equal(movementAnimState({ forward: 0.5, strafe: 1 }), 'walkforward', 'exactly 2:1 is NOT strafing (strict >)');
   assert.equal(movementAnimState({ strafe: -1, running: true }), 'runleft');
-  // turning: third person only, never sneaking (character.cpp:2321-2329)
+  // turning: third person only, never sneaking
   assert.equal(movementAnimState({ turning: 1, thirdPerson: true }), 'turnright');
   assert.equal(movementAnimState({ turning: -1, thirdPerson: true }), 'turnleft');
   assert.equal(movementAnimState({ turning: 1, thirdPerson: false }), null, 'no turn anims in first person');
@@ -1242,8 +1242,7 @@ test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2
 
 test('MW-D26: the movement group composes the weapon suffix through the ONE ladder, then run->walk', () => {
   // suffix ladder = composeStanceGroup's (asked short, 2c/1h fallback,
-  // bare base - character.cpp:674-693); then the run->walk swap
-  // (:697-699); then null, never a substitute (:701-707).
+  // bare base); then the run->walk swap; then null, never a substitute.
   const has = (set) => (n) => set.has(n);
   const T = MW_WEAPON_TYPE.LongBladeOneHand;
   assert.deepEqual(composeMovementGroup('runforward', T, has(new Set(['runforward1h']))),
@@ -1254,7 +1253,7 @@ test('MW-D26: the movement group composes the weapon suffix through the ONE ladd
     { group: 'walkforward', walked: true }, 'the run->walk swap');
   assert.deepEqual(composeMovementGroup('runforward', T, has(new Set(['idle']))),
     { group: null, walked: false }, 'nothing serves: RESET, never a wrong clip');
-  // no weapon: no suffix step at all (character.cpp:674's gate)
+  // no weapon: no suffix step at all
   assert.deepEqual(composeMovementGroup('walkforward', MW_WEAPON_TYPE.None, has(new Set(['walkforward']))),
     { group: 'walkforward', walked: false });
 });
@@ -1281,8 +1280,7 @@ test('MW-D26: animVelocity is calcAnimVelocity - last keys in reverse, horizonta
   assert.equal(animVelocity(keys, track, 'runforward'), 0, 'an absent group has no velocity');
 });
 
-test('MW-D26: the reference\'s own fallback speeds and caps', () => {
-  // character.cpp:750-752, :2403, :2396
+test('MW-D26: the fallback speeds and caps', () => {
   assert.deepEqual(MOVEMENT_FALLBACK_SPEED, { sneak: 33.5452, run: 222.857, walk: 154.064 });
   assert.equal(MOVEMENT_SPEED_CAP, 10);
   assert.ok(Math.abs(turnAnimSpeed(Math.PI) - 1) < 1e-12, '|rot|/dt/pi');
@@ -2913,14 +2911,14 @@ test('MAC-S1: ONE flush, called from every exit out of `busy`', () => {
 import { jumpAnimState } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { resetClip, advanceClip } from '../../../src/formats/morrowind/mwAnim.js';
 
-test('MW-D39: the jump state is update()\'s own derivation (character.cpp:2195-2296)', () => {
+test('MW-D39: the jump state: in the air, takeoff, landing, and none while swimming or levitating', () => {
   // In the air, not swimming, not levitating: InAir, movement gated.
   assert.deepEqual(jumpAnimState({ grounded: false }), { jump: 'inair', inJump: true });
-  // THE TAKEOFF FRAME (:2224-2227): the jump latch fires while still
+  // THE TAKEOFF FRAME: the jump latch fires while still
   // grounded - movement gates off, but nothing plays yet.
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true }), { jump: null, inJump: true });
   // THE LANDING FRAME: the motor's latch is not yet cleared, but the
-  // prior state was InAir - the reference's mJumpState guard keeps it
+  // prior state was InAir - that guard keeps it
   // from reading as a fresh takeoff, and the still-playing clip makes
   // it Landing (:2292-2293).
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true, priorInAir: true, jumpPlaying: true }),
@@ -2929,8 +2927,7 @@ test('MW-D39: the jump state is update()\'s own derivation (character.cpp:2195-2
   assert.deepEqual(jumpAnimState({ grounded: true, jumpPlaying: true }), { jump: 'landing', inJump: false });
   // The landing clip finished: nothing plays, nothing gates.
   assert.deepEqual(jumpAnimState({ grounded: true }), { jump: null, inJump: false });
-  // Swimming and levitation refuse the whole family (:2206 - the
-  // reference's !inwater && !flying gate), airborne or not.
+  // Swimming and levitation refuse the whole family, airborne or not.
   assert.deepEqual(jumpAnimState({ grounded: false, swimming: true }), { jump: null, inJump: false });
   assert.deepEqual(jumpAnimState({ grounded: false, levitating: true }), { jump: null, inJump: false });
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true, levitating: true }), { jump: null, inJump: false });
