@@ -1052,13 +1052,11 @@ test('MW-D27: the face is DERIVED - classic faceIndex picks the head and hair, a
     return { head: m.get('head'), hair: m.get('hair'), chest: m.get('chest') };
   };
   // The walk, sorted: heads 01,02,03 then wraps; hairs 01,02 then
-  // wraps. The CHEST stays 01 - the fixture lists it LAST, and the
-  // reference's sweep OVERWRITES on every proper match, so the last
-  // record in load order wins (getBodyParts, npcanimation.cpp:1286-1293
-  // - how an expansion overrides a base-game body). The parity audit
-  // caught this pin asserting first-wins; the face law (MW-A F2's
-  // id-sort + index) is untouched, because head and hair are not in
-  // the sweep at all.
+  // wraps. The CHEST stays 01 - the fixture lists it LAST, and the sweep
+  // overwrites on every proper match, so the last record in load order wins
+  // (how an expansion overrides a base-game body). The face law (MW-A F2's
+  // id-sort + index) is untouched, because head and hair are not in the
+  // sweep at all.
   assert.deepEqual(at(0), { head: 'b_head_01', hair: 'b_hair_01', chest: 'b_chest_01' });
   assert.deepEqual(at(1), { head: 'b_head_02', hair: 'b_hair_02', chest: 'b_chest_01' });
   assert.deepEqual(at(2), { head: 'b_head_03', hair: 'b_hair_01', chest: 'b_chest_01' });
@@ -2196,42 +2194,41 @@ test('MW-D31 rule 13: the mirror reads the RESOLVED node\'s own name, case-sensi
   assert.equal(asm2.pieces.find((p) => p.kind === 'rigid').mirrored, true, 'the real "Left Hand" node mirrors');
 });
 
-// ── MW-D32: BODY-PART RESOLUTION BROUGHT TO GETBODYPARTS-WHOLE ──────
+// ── MW-D32: BODY-PART RESOLUTION ────────────────────────────────────
 
 import { resolveBodyParts, raceRecords } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { indexSkins, assembleNpc } from '../../../src/formats/morrowind/mwNpc.js';
 import { resolveWeaponParts } from '../../../src/combat/fpArm.js';
 
-test('MW-D32: the sweep is getBodyParts whole - last wins, filters exact, FP hand ladder', () => {
+test('MW-D32: the sweep - last wins, filters exact, FP hand ladder', () => {
   const P = (id, slot, o = {}) => ({ id, slot, race: 'fprace', female: false, skin: true,
     playable: true, firstPerson: /1st$/.test(id), model: `f/${id}.nif`, ...o });
   const parts = [
     P('b_chest_base', 'chest'),
-    P('b_chest_expansion', 'chest'),          // LAST in load order WINS (:1286-1293)
-    P('b_chest_np', 'chest', { playable: false }),   // BPF_NotPlayable skipped (:1208)
-    P('b_chest_cloth', 'chest', { skin: false }),    // MT_Skin only (:1210)
+    P('b_chest_expansion', 'chest'),          // LAST in load order WINS
+    P('b_chest_np', 'chest', { playable: false }),   // NotPlayable skipped
+    P('b_chest_cloth', 'chest', { skin: false }),    // MeshType Skin only
     P('b_neck_m', 'neck'),
-    P('b_clav', 'clavicle'),                   // sBodyPartMap never maps it
+    P('b_clav', 'clavicle'),                   // not a sweep slot
     P('b_hand_m3p', 'hand'),
     P('b_hand_f3p', 'hand', { female: true }),
   ];
   const tp = resolveBodyParts(parts, 'fprace', false, { firstPerson: false });
   assert.equal(tp.get('chest').id, 'b_chest_expansion', 'the LAST proper record wins - expansions override');
   assert.equal(tp.get('clavicle'), undefined, 'clavicle never resolves');
-  // female: her record wins where it exists, male fills where not (:1261-1280)
+  // female: her record wins where it exists, male fills where not
   const tpF = resolveBodyParts(parts, 'fprace', true, { firstPerson: false });
   assert.equal(tpF.get('hand').id, 'b_hand_f3p');
   assert.equal(tpF.get('neck').id, 'b_neck_m', 'male fallback fills an empty female slot');
   // FIRST PERSON: a hand slot without a .1st record falls back to the
-  // 3P skin (:1232-1254); a NON-hand slot does not (:1258).
+  // 3P skin; a NON-hand slot does not.
   const fp = resolveBodyParts(parts, 'fprace', false, { firstPerson: true });
   assert.equal(fp.get('hand').id, 'b_hand_m3p', 'the arm slots fall back to third-person skins');
   assert.equal(fp.get('chest'), undefined, 'a non-hand slot takes its own view only');
 });
 
-test('MW-D32: indexSkins filters playable, NOT vampire - the reference sweep never had a vampire test', () => {
-  // getBodyParts (npcanimation.cpp:1206-1214) filters BPF_NotPlayable
-  // and MT_Skin; there is no vampire condition in the sweep.
+test('MW-D32: indexSkins filters playable, NOT vampire - the sweep has no vampire test', () => {
+  // The sweep filters NotPlayable and MeshType Skin; it has no vampire condition.
   const B = (id, part, o = {}) => [id, { id, kind: 0, vampire: 0, part, female: false, playable: true, race: 'r', model: `${id}.nif`, ...o }];
   const bodies = new Map([
     B('chest_vamp', 3, { vampire: 1 }),

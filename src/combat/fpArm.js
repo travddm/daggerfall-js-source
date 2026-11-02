@@ -2815,13 +2815,9 @@ export async function buildFpArm({
     // WEREWOLF1: no race rows - getBodyParts answers nothing for a werewolf, in first person too
     const rows = werewolf ? [] : armReport(parts, race, female);
     const wanted = armMeshPaths(rows);
-    // MW-D32: updateParts sweeps EVERY slot in first person too
-    // (npcanimation.cpp:682, PRT_Neck..PRT_Count with
-    // getBodyParts(firstPerson=true)) - non-hand slots take .1st
-    // records only (:1258), which retail does not carry, so on vanilla
-    // data this adds nothing; a mod's .1st neck now appears exactly as
-    // the reference shows it. A missing non-arm slot is NOT noted -
-    // the reference leaves those null silently.
+    // Every sweep slot resolves in first person too: non-hand slots take .1st
+    // records only, which retail does not carry, so on vanilla data this adds
+    // nothing; a mod's .1st neck appears. A missing non-arm slot is not noted.
     const fpAll = werewolf ? new Map() : resolveBodyParts(parts, race, female, { firstPerson: true });
     for (const [slot, rec] of fpAll) {
       if (ARM_PARTS.includes(slot)) continue;
