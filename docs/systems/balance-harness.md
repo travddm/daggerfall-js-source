@@ -195,8 +195,8 @@ health floor, which B5 takes. `MAXED_POWER_MOST` in `test/tooling/playerPowerBud
 
 ## Online health (B5)
 
-Online, a body is the stored health, the Endurance floor (`levelEven.js` `evenHpFloor`), and the layer that rides above it
-(`renownLayer.js`). DFU has the stored health alone: each level's roll (`CalculateHitPointsPerLevelUp`, with
+Online, a body is the stored health, the Endurance floor (`levelEven.js` `evenHpFloor`), and the layer that rides
+above it (`renownLayer.js`). DFU has the stored health alone: each level's roll (`CalculateHitPointsPerLevelUp`, with
 `HitPointsModifier`, Endurance / 10 - 5) added once and never repaid. Decisions (the owner's):
 
 - **Endurance floor: kept.** A departure from DFU, online: a character never sits under the average-roll body of its class,
