@@ -101,7 +101,8 @@ B1 rescaled the numbers on the sources, so a card prints what a blow gets and no
 - each registry's records reach exactly its top (`BLOW_TOPS`, `GUARD_TOPS` in `powerCeiling.js`), held equal by
   `test/combat/powerceiling.test.js`;
 - blow percents add (the runner sums them; they multiplied before);
-- the net (`BLOW_MOST` and `GUARD_LEAST`) was +75.4% and 74% at B1, above a normal kit and below the tops summed; B5 made it the tops summed (+34.5%, 86.35%);
+- the net (`BLOW_MOST` and `GUARD_LEAST`) was +75.4% and 74% at B1, above a normal kit and below the tops summed;
+  B5 made it the tops summed (+34.5%, 86.35%);
 - a skill past 100 pays 0.2% a point, gear on a weapon skill 0.1% a point up to 5%, and a mastered skill reads at most 110
   to hit and to crit (`AIM_PAST_MAX`);
 - a technique aims +5 to +10 and tops at x1.95 of a blow. The Firmament tree is left to B5.
