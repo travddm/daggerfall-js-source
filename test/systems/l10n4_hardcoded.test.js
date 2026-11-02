@@ -701,7 +701,6 @@ const HARDCODED = {
   'src/ui/superDungeon/sdMarksView.js': 19,
   'src/ui/superDungeon/sdRemnantBar.js': 11,
   'src/ui/superDungeon/sdTitleCard.js': 1,
-  'src/ui/supportAsks.js': 2,
   'src/ui/tamrielInk.js': 4,
   'src/ui/tavernWindow.js': 2,
   'src/ui/techniqueCard.js': 8,
