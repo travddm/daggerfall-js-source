@@ -167,11 +167,38 @@ test('SWING-LAW: the real rig - an average fighter about a second a blow, the qu
       const dagger = blowTime(fighter({ speed: 70, strength: 50 }, WEAPONS.Dagger));
       const claymore = blowTime(fighter({ speed: 70, strength: 50 }, WEAPONS.Claymore));
       assert.ok(claymore > dagger * 1.2, `mods ${mods ? 'on' : 'off'}: a claymore (${claymore.toFixed(3)}s) is slower than a dagger (${dagger.toFixed(3)}s)`);
-      const strong = blowTime(fighter({ speed: 70, strength: 95 }, WEAPONS.Claymore));
-      assert.ok(strong < claymore, `mods ${mods ? 'on' : 'off'}: a strong arm swings it quicker (${strong.toFixed(3)}s)`);
+      // the rig steps a blow in whole ticks, which hides a heft of a few per cent: the strong arm is read from the law's own time
+      const frameOf = (strength) => {
+        const e = fighter({ speed: 70, strength }, WEAPONS.Claymore);
+        return getMeleeWeaponAnimTime(70, { entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true });
+      };
+      assert.ok(frameOf(95) < frameOf(30), `mods ${mods ? 'on' : 'off'}: a strong arm swings it quicker (${frameOf(95).toFixed(4)}s a frame against ${frameOf(30).toFixed(4)}s)`);
       const slow = blowTime(fighter({ speed: 20, strength: 50 }, WEAPONS.Longsword));
       assert.ok(slow > avg * 1.15 && slow <= 5 * SWING_FRAME_MAX + 5 * DT, `mods ${mods ? 'on' : 'off'}: a slow fighter is slower (${slow.toFixed(3)}s), never past two seconds`);
     } finally { _resetModSettings(); }
   }
 });
 
+test("SWING-LAW: with Roleplay & Realism's weaponSpeed or Items' weaponBalance on, a fast build still keeps 85% of DFU's swing rate", () => {
+  installSwingLaw();
+  installRoleplayRealismItems({ fetchBytes: () => { throw new Error('no art in this pin'); } });
+  installRoleplayRealism();
+  const kinds = [[WEAPONS.Dagger, WEAPON_TYPES.Dagger], [WEAPONS.Longsword, WEAPON_TYPES.LongBlade], [WEAPONS.Claymore, WEAPON_TYPES.LongBlade], [WEAPONS.Warhammer, WEAPON_TYPES.Warhammer], [WEAPONS.Battle_Axe, WEAPON_TYPES.Battleaxe]];
+  try {
+    for (const [balance, speedMod] of [[true, false], [false, true]]) {
+      _resetModSettings();
+      setModSetting('roleplay-realism-items', 'weaponBalance', balance);
+      setModSetting('roleplay-realism', 'weaponSpeed', speedMod);
+      for (const speed of [75, 100]) {
+        for (const strength of [30, 50, 70, 100]) {
+          for (const [template, weaponType] of kinds) {
+            const e = fighter({ speed, strength }, template);
+            const frame = getMeleeWeaponAnimTime(speed, { entity: e, weaponType, usingRightHand: true });
+            const rate = dfu(speed) / frame;
+            assert.ok(rate >= 0.85, `weaponBalance ${balance}, weaponSpeed ${speedMod}, Speed ${speed}, Strength ${strength}, weapon ${template}: ${(rate * 100).toFixed(1)}% of DFU's rate`);
+          }
+        }
+      }
+    }
+  } finally { _resetModSettings(); }
+});

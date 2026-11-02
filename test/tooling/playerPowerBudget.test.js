@@ -19,7 +19,7 @@ const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'ave
  *  health and the Firmament tree, the spell magnitudes) lower toward 1.5 and never raise. The owner accepted these higher
  *  values for B3: B4 (loot affixes) and B5 (health) rescale the remaining stacks at their source to bring maxed builds
  *  back near 1.5. */
-const MAXED_POWER_MOST = Object.freeze({ warrior: 2.33, archer: 2.31, spellsword: 2.17, mage: 2.02, thief: 2.36 });
+const MAXED_POWER_MOST = Object.freeze({ warrior: 2.25, archer: 2.31, spellsword: 2.17, mage: 2.02, thief: 2.36 });
 
 test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%) and sit above a normal kit', () => {
   assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
@@ -43,7 +43,7 @@ test('budget: a level-45 character with every stacking source at its cap stays i
 });
 
 test("budget: inside DFU's level range the default character, against DFU's own foe, is where B3 left it (within 0.05 of power)", () => {
-  const AT_B3 = { warrior: 1.017, mage: 1.188, archer: 1.369 };
+  const AT_B3 = { warrior: 0.992, mage: 1.188, archer: 1.369 };
   const rows = averageRows(
     buildReport({ builds: Object.keys(AT_B3), levels: [30], swings: SWINGS, layers: parseLayers('default,-hero,-stats') }),
   );

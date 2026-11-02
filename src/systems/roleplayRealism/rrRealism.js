@@ -19,7 +19,7 @@
 import { modSetting } from '../modSettings.js';
 import { WEAPONS, weaponMaterialModifier } from '../../characters/weapons.js';
 import { MOBILE_TYPES } from '../../characters/mobile/mobileTypes.js';
-import { swingFrameSeconds, swingHandling, swingHeft } from '../../characters/weaponStates.js';   // SWING-LAW: the port's swing law answers the mod's Speed
+import { swingFrameSeconds, swingHandling, swingHeft, modHeft } from '../../characters/weaponStates.js';   // SWING-LAW: the port's swing law answers the mod's Speed
 
 export const RR_VENDOR = 'roleplay-realism';
 export const RR_MOD = Object.freeze({ title: 'RoleplayRealism', version: '1.8', guid: 'd828b782-46e9-40e7-8ae6-19cde308032e' });
@@ -98,16 +98,10 @@ export function rrClimbingChance(base, { climbing = 0, luck = 0, khajiit = false
  *  ItemHands ('Both' for a two-hander); `weaponType` DFU's WeaponTypes
  *  (Dagger 4, Dagger_Magic 5, Melee 15). Registered only when Roleplay &
  *  Realism: Items' weaponBalance is off (:171).
- *  SWING-LAW: the blend is the
- *  Speed the swing is read at, and the port's law turns it into time -
- *  its bounded curve and the weapon's handling (characters/weaponStates.js
- *  swingFrameSeconds) - where the mod's `3 * (115 - blend)` over the
- *  classic frame update ran a quick blend at four swings a second.
- *  AUDIT PRE-MERGE 0929 S3: AND THE WEAPON'S WEIGHT - its heft (swingHeft, the port's own: the base weight against the
- *  Strength). The blend has no weight in it, and "their weight law replaces the port's heft" was true of Items'
- *  weaponBalance alone: with this module answering, a 2 kg shortsword, a 4.5 kg longsword and a 5 kg broadsword all
- *  swung at 0.995 s - heavy blades QUICKER than with no mod at all. `weight` is the template's base weight (the
- *  swing law's reader, combat/swingLaw.js readSwing; 0 bare-handed).
+ *  SWING-LAW: the swing is read at the live Speed, and the blend's cost over it is a heft (characters/weaponStates.js
+ *  modHeft, at most the port's own heft bound): the blend as the Speed fed to DFU's steep line cost a Speed-100 build half
+ *  of DFU's swing rate. The weapon's weight is the port's swingHeft (the blend has no weight in it); the larger of the two
+ *  applies. `weight` is the template's base weight (the swing law's reader, combat/swingLaw.js readSwing; 0 bare-handed).
  *  BAL10: `shortBlade` - the weapon swings with Short Blade (the reader's word): the dagger's handling, whatever draws it. */
 export function rrMeleeWeaponAnimTime({ liveSpeed, liveStrength, weaponType = -1, hands = 'One', weight = 0, shortBlade = false }) {
   let spdRatio = 0.8, strRatio = 0.2, capRatio = 0.08;
@@ -117,7 +111,8 @@ export function rrMeleeWeaponAnimTime({ liveSpeed, liveStrength, weaponType = -1
   if (liveSpeed > 70) spdRatio -= capRatio;
   if (liveStrength > 70) strRatio -= capRatio;
   const blend = (liveSpeed * spdRatio) + (liveStrength * strRatio);
-  return swingFrameSeconds(blend, { heft: swingHeft(weight, liveStrength), handling: swingHandling(weaponType, hands === 'Both', shortBlade) });
+  const heft = Math.max(swingHeft(weight, liveStrength), modHeft(liveSpeed, blend));   // the blend's cost as a heft, not as a Speed: the law's line is steep at the top
+  return swingFrameSeconds(liveSpeed, { heft, handling: swingHandling(weaponType, hands === 'Both', shortBlade) });
 }
 
 // ---- weaponMaterials (:389-392) -------------------------------------------

@@ -121,7 +121,11 @@ code next to it.
 - **Swing** (`weaponStates.js`): the frame time is DFU's `3 * (115 - Speed) / 980` with Speed held to 0..100, times
   the weapon's heft (at most +8%) and handling (0.9 to 1.04, two-handers x1.03). The slowest weapon costs 13.6% of
   DFU's swing rate. Before B3 the port flattened the line (1.4 at Speed 0 to 0.6 at 100) and added up to +35% heft and
-  +12% handling, so a Speed-100 build swung at 0.42 of DFU's rate.
+  +12% handling, so a Speed-100 build swung at 0.42 of DFU's rate. Roleplay & Realism's weaponSpeed and Items'
+  weaponBalance (the game ships weaponBalance on) read weight and Strength against Speed. Their cost is folded into the
+  heft (`modHeft`: a quarter of the time they would cost, at most 8%) and is no longer fed to the law as a lower Speed,
+  which cost a Speed-100 build half its swing rate in the running game. The harness's `swing` layer raises
+  weaponBalance's swing answer, so it matches the game; the maxed numbers below come from that corrected model.
 - **Bows**: the strength term is taken once, as DFU does (BAL-ARCHERY doubled it). The +1 on the damage span stays, as
   does the random shield armour (not touched here).
 
@@ -129,10 +133,10 @@ Effect on the budget (ARENA2 attributes, DFU's own foe row, character power, bas
 
 | Typical gear (default run) | Level 1 | 10 | 20 | 30 | 45 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Warrior | 0.82 -> 0.85 | 0.63 -> 0.69 | 0.88 -> 0.96 | 0.84 -> 1.01 | 0.89 -> 1.47 |
-| Thief | 1.00 -> 1.14 | 0.77 -> 0.96 | 0.75 -> 1.05 | 0.72 -> 1.17 | 0.85 -> 1.34 |
+| Warrior | 0.82 -> 0.85 | 0.63 -> 0.68 | 0.88 -> 0.94 | 0.84 -> 0.99 | 0.89 -> 1.41 |
+| Thief | 1.00 -> 1.14 | 0.77 -> 0.95 | 0.75 -> 1.04 | 0.72 -> 1.14 | 0.85 -> 1.34 |
 | Mage | 0.84 -> 0.90 | 0.84 -> 0.89 | 0.85 -> 0.94 | 1.10 -> 1.17 | 1.39 -> 1.50 |
-| Spellsword | 0.89 -> 0.91 | 0.83 -> 0.87 | 1.00 -> 1.05 | 1.16 -> 1.22 | 1.38 -> 1.52 |
+| Spellsword | 0.89 -> 0.91 | 0.83 -> 0.86 | 1.00 -> 1.04 | 1.16 -> 1.21 | 1.38 -> 1.51 |
 | Archer | 1.00 -> 0.99 | 0.98 -> 0.97 | 1.18 -> 1.11 | 1.32 -> 1.23 | 1.50 -> 1.40 |
 
 The target line runs from 1.0 at level 1 to 1.5 at level 45. A character at Speed 100 swings 2.1 times as often as one
@@ -141,10 +145,10 @@ level 45 attributes. The maxed character (`+ceiling`) rises with it:
 
 | Maxed (`+ceiling`), level 45 | B1 | B3 |
 | --- | ---: | ---: |
-| Warrior | 1.32 | 2.16 |
+| Warrior | 1.32 | 2.08 |
 | Thief | 1.29 | 2.04 |
-| Spellsword | 1.77 | 1.96 |
-| Mage | 1.74 | 1.91 |
+| Spellsword | 1.77 | 1.95 |
+| Mage | 1.74 | 1.90 |
 | Archer | 2.21 | 2.06 |
 
 Even with no blow bonus at all, a Speed-100 warrior at level 45 is roughly 1.6 (estimated from the dps and survival

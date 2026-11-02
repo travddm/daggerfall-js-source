@@ -63,6 +63,17 @@ export function swingHeft(weightKg, strength) {
   const load = (w * (150 - str)) / 100;
   return 1 + Math.min(SWING_HEFT_MAX, Math.max(0, (load - SWING_HEFT_FREE_KG) * SWING_HEFT_PER_KG));
 }
+/** The weight-and-Strength term of Roleplay & Realism's weaponSpeed and Items' weaponBalance, as a heft. Each mod turns the
+ *  live Speed into a slower effective Speed (a blend with Strength, or a cut by the weapon's weight). Read through DFU's
+ *  hyperbolic line a few points of Speed at the top cost a half of the swing rate, so the mods' effective Speed is not fed
+ *  to the law. Their meaning (weight and Strength matter a little) is kept as a share of the time they would cost, at most
+ *  SWING_HEFT_MAX, the same bound as the port's own heft. A mod that would speed the swing adds nothing. */
+export const MOD_HEFT_SHARE = 0.25;
+export function modHeft(liveSpeed, modSpeed) {
+  const clamp = (v) => Math.max(0, Math.min(100, Number.isFinite(v) ? v : 50));
+  const ratio = (115 - clamp(modSpeed)) / (115 - clamp(liveSpeed));
+  return 1 + Math.min(SWING_HEFT_MAX, Math.max(0, (ratio - 1) * MOD_HEFT_SHARE));
+}
 /** THE HANDLING: each weapon's own tempo apart from its weight, by DFU's WeaponTypes (combat/fpsWeapon.js WEAPON_TYPES -
  *  pinned equal; this module is a leaf): a dagger, bare hands and a beast's claws are quick; a sword is the measure; a
  *  mace, a flail, an axe and a warhammer come round a little slower; a staff sweeps quicker than the other two-handers
