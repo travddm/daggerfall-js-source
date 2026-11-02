@@ -30,7 +30,6 @@ import { FATIGUE_LOSS, FATIGUE_DRAIN_SCALE, killIfAnyLiveStatZero } from './stat
 import { decayEnemyAlert } from './encounters.js';   // PlayerEntity.Update:380-384, the 8-hour alert decay
 import { dice100, setPlayerStruckHook } from '../combat/formulas.js';
 import { installPcaao } from '../combat/pcaao.js';   // PCO1: the mod's RegisterOverride, once, for every host
-import { installMeanerMonsters } from '../characters/meanerMonsters.js';   // MM1: its xml billboard scales join the registry, once
 import { installUnleveledLoot } from './unleveledLoot.js';   // UL1: its two material overrides and its death handler, once
 import { onLycanthropeHit } from './lycanthropy.js';
 import { onVampireHit } from './vampirism.js';
@@ -96,7 +95,6 @@ setRacialCurseDeployer((entity, { now }) => {
 setPlayerStruckHook((attacker, target, damage) => onPlayerStruckByEnemy(attacker, target, damage));
 // PCO1: Physical Combat And Armor Overhaul's three overrides - each
 // reads its module switch live and declines when off.
-installMeanerMonsters();   // MM1: before the overhaul, as DFU Awakes the dependency first
 installPcaao();
 installUnleveledLoot();   // UL1: after everything it would override (its manifest orders it after Roleplay Realism)
 installSurvivalIcons();   // SURV2: the mod's spoiled-food and waterskin icons ride the texture pipeline as the port's own art

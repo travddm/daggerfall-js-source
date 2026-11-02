@@ -101,11 +101,11 @@ test('GRANT4 THE KINDS: a stand\'s kind is its caller\'s word or its own shape -
   assert.deepEqual([{ allied: true, questBehaviour: 1 }, { questBehaviour: 1, revenant: {} }, { zoneGiant: 3 }, { revenant: {} }, { revenant: {}, managed: true }, { kept: true, managed: true }, { revenant: {}, kept: true }, { managed: true, loose: true }, { loose: true }, { replacing: true }, { site: 's', placed: true }, { placed: true }, {}].map(grantKindOf),
     ['ally', 'quest', 'giant', 'rev', 'rev', 'kept', 'rev', 'managed', 'loose', 'loose', 'site', 'site', 'band']);
   assert.deepEqual(GRANT_MARKLESS, ['quest', 'ally', 'rev', 'watch', 'kept']);
-  for (const k of GRANT_MARKLESS) assert.deepEqual(grantMarksFor(k, 58, 4, 7), { e: 0, c: [-1, -1, -1, -1] });
+  for (const k of GRANT_MARKLESS) assert.deepEqual(grantMarksFor(k, 434429, 4, 7), { e: 0, c: [-1, -1, -1, -1] });
   const g = { k: 'kept', e: 0, c: [-1, -1] };
   assert.ok(grantMarksAllow(g, 0, { z: 1 }) && grantMarksAllow({ ...g, k: 'rev' }, 1, { cp: 3 }), 'a markless kind\'s marks its own law\'s');
   assert.ok(!grantMarksAllow({ ...g, k: 'enc' }, 0, { z: 1 }) && !grantMarksAllow({ ...g, k: 'loose' }, 1, { cp: 3 }), 'any other\'s only as its grant\'s');
-  assert.notDeepEqual(grantMarksFor('enc', 58, 4, 7), { e: 0, c: [-1, -1, -1, -1] }, 'seed 58 rolls an elite and a champion for an encounter');
+  assert.notDeepEqual(grantMarksFor('enc', 434429, 4, 7), { e: 0, c: [-1, -1, -1, -1] }, 'seed 434429 rolls an elite and a champion for an encounter');
   assert.ok(grantSpeciesOf(231).has(0) && !grantSpeciesOf(232).has(0), 'a rat in 231\'s tables, none in 232\'s');
   assert.equal(grantSpeciesOf(-5), null);
 });

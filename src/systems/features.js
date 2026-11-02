@@ -1129,7 +1129,6 @@ export const FEATURES = Object.freeze([
   // while it is on. AUDIT 28 F4: the pack is read once, when the quest lists
   // are built (questLists.js) - so the row says the two halves apart.
   modFeature('foraging', () => t('features.mod.foraging.effect', 'Takes effect at once; its quests when the game next loads.'), 'world'),
-  modFeature('meanerMonsters', () => t('features.mod.meanerMonsters.effect', 'Takes effect on monsters that appear after the change. With Daggerfall Enemy Expansion on, it takes effect when the game next loads.'), 'combat'),
   // DEX0: DAGGERFALL ENEMY EXPANSION - `combat`, beside the other bestiary mod. Loaded for the game or not, as DFU loads
   // a mod (its rows, its tables and its hooks written at its install - modSettings.js latchModLoaded), so a switch
   // flipped mid-game waits for the next load, as Roleplay & Realism's enemy appearance does.

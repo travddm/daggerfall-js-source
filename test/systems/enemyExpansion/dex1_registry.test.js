@@ -1,7 +1,7 @@
 // DEX1 - DAGGERFALL ENEMY EXPANSION: THE ENEMY
 // REGISTRY. BestiaryMod.Start's reading (systems/enemyExpansion/dexTables.js) of the shipped tables, and what the install
 // (dexInstall.js) makes of it in the port: the fifty enemies in the table, their careers resolving, DFU's entity type
-// and career index for an id past MobileTypes, the classic rows edited in DFU's order over Meaner Monsters', the names,
+// and career index for an id past MobileTypes, the classic rows edited in DFU's order, the names,
 // the quest foes added only where the Foes table lacks the name - each pinned against the C#'s own law, and each with a
 // mutation it must fail under.
 import test from 'node:test';
@@ -20,8 +20,6 @@ import { customCareerTemplate, clearCustomEnemies } from '../../../src/character
 import { makeEnemyEntity, loadEnemyCareer, _resetMintRowEditors } from '../../../src/characters/enemy/enemyEntity.js';
 import { careerTolerance } from '../../../src/systems/spellcast.js';
 import { careerAttackModifier } from '../../../src/combat/formulas.js';
-import { applyMeanerMonsters, MEANER_MONSTERS_EDIT } from '../../../src/characters/meanerMonsters.js';
-import { meanerMonstersRow as pcaaoMeanerMonstersRow, meanerMonstersOn } from '../../../src/combat/pcaaoMeanerMonsters.js';
 import { loadQuestTables, foesTable, addIntoQuestTables, _resetExtraQuestRows } from '../../../src/systems/quest/tables.js';
 import { adaptBlowClass } from '../../../src/systems/revenant/revenantFeud.js';   // AUDIT DEX A2
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
@@ -220,20 +218,15 @@ test('AUDIT DEX A5 the reading\'s reachable arms: a caster that shoots keeps bot
   assert.equal(adaptBlowClass({ isPlayer: true }, null, 'melee'), 'h2h');
 });
 
-test('DEX1 loaded: the classic rows written in the table, and at a foe\'s mint - Meaner Monsters standing aside beside it, its author\'s form of it for this mod being MUDEX (MUDEX1, mudex1.test.js)', (t) => {
+test("DEX1 loaded: the classic rows written in the table, and at a foe's mint - the mod's own lines alone here (MUDEX over them is MUDEX1, mudex1.test.js)", (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
   const before = structuredClone(ENEMY_BASICS[9]);
-  installEnemyExpansion({ on: true, meaner: false, log: silent });   // the mod's own lines alone: no MUDEX
+  installEnemyExpansion({ on: true, mudex: false, log: silent });   // the mod's own lines alone: no MUDEX
   assert.deepEqual([ENEMY_BASICS[4].maleTexture, ENEMY_BASICS[143].maleTexture, ENEMY_BASICS[140].femaleTexture], [457, 1507, 1520]);
   assert.equal(ENEMY_BASICS[9].maxDamage, 16, 'the werewolf as the mod restats it');
   assert.equal(ENEMY_BASICS[9].maxHealth, before.maxHealth, 'a field the line leaves is the row\'s');
-  // Meaner Monsters writes the werewolf too (MM1), and the two disagree; beside the mod its rows stand aside, switch on or
-  // not (MUDEX1: Meaner Monsters' own Init asks the player to swap it for MUDEX here, and the port makes the swap)
-  assert.ok(MEANER_MONSTERS_EDIT[9]?.maxDamage !== undefined && MEANER_MONSTERS_EDIT[9].maxDamage !== 16, 'the two mods disagree on the werewolf\'s damage');
   const wolf = makeEnemyEntity(9, ENEMY_BASICS[9], null, 1, () => 0.5);
   assert.equal(wolf.basics.maxDamage, 16, 'the mod\'s');
-  assert.equal(applyMeanerMonsters(9, ENEMY_BASICS[9]), ENEMY_BASICS[9], 'Meaner Monsters\' own rows stand aside beside the mod');
-  assert.equal(pcaaoMeanerMonstersRow(9, ENEMY_BASICS[9], meanerMonstersOn(() => true, () => true)), ENEMY_BASICS[9], '...and so does the overhaul\'s edit of them, both switches on');
   assert.equal(wolf.basics.maxHealth, ENEMY_BASICS[9].maxHealth, 'the table\'s row where the mod names nothing');
   assert.equal(dexProperties(143).hasRangedAttack, true);
   // the table's line is the read's own (the relay's bounds are held to dexClassicRow), and the vanilla rows never move
@@ -244,7 +237,7 @@ test('DEX1 loaded: the classic rows written in the table, and at a foe\'s mint -
 
 test('DEX1 a mod\'s monster and a mod\'s class are built on DFU\'s two arms (EnemyEntity.SetEnemyCareer :251-274)', async (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });   // the mod's own rows: MUDEX restats the Goblin
+  installEnemyExpansion({ on: true, mudex: false, log: silent });   // the mod's own rows: MUDEX restats the Goblin
   const fetchBytes = async () => { throw new Error('a new career reads no file'); };
   const goblinCareer = await loadEnemyCareer(256, fetchBytes);
   assert.equal(goblinCareer.name, 'Goblin');
@@ -290,7 +283,7 @@ test('DEX1 the quest foes: the new names as id, name - and only where the Foes t
 
 test('DEX1 the read is idempotent: one read, one install', (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });
+  installEnemyExpansion({ on: true, mudex: false, log: silent });
   assert.equal(dexRead(), dexRead());
   assert.deepEqual(installEnemyExpansion({ on: false, log: silent }), { loaded: true, mudex: false, enemies: 50 }, 'a second call answers the first load');
 });

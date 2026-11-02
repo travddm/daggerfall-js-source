@@ -37,8 +37,8 @@ import { installSmithing } from '../../src/systems/smithItems.js';
 import { installHealingSupply } from '../../src/systems/healingSupply.js';
 import { installRestItemLoot, isDeepPileKey } from '../../src/systems/rest/restItems.js';
 import { installSurvivalLoot } from '../../src/systems/survival/loot.js';
-import { grantEliteLoot, promoteEliteFoe } from '../../src/systems/eliteFoes.js';
-import { markDungeonChampions, applyChampion, championTraitFor, CHAMPION_MIN_LEVEL } from '../../src/systems/champions.js';   // CHAMP-BASE: the layout's champions, as the build marks and stands them
+import { grantEliteLoot, promoteEliteFoe, markDungeonPromotions } from '../../src/systems/eliteFoes.js';
+import { applyChampion, championTraitFor, CHAMPION_MIN_LEVEL } from '../../src/systems/champions.js';   // CHAMP-BASE: the layout's champions, as the build marks and stands them
 import { ClassFile } from '../../src/formats/classFile.js';   // CHAMP-BASE: a class foe's career, through the real reader
 import { seaPileMore } from '../../src/systems/sea/seaSpoils.js';
 import { markRoomCarried } from '../../src/systems/loot/roomCarriedList.js';
@@ -121,7 +121,7 @@ const ROOM = `dungeon:${ROOM_ID}`;
 const DUNGEON_TYPE = 12;   // a Natural Cave's piles: key DUNGEON_LOOT_KEYS[12], one of the deep J-O keys (the potions, the rest supplies)
 const ORC = 7;             // a humanoid foe with a table ('A'), a kit and PLAIN-LOOT's keep
 const NIGHTBLADE = 133;    // CHAMP-BASE: a class foe - built at its builder's level (SetEnemyCareer), table 'U'
-const CHAMP_ROOM_ID = 150; // CHAMP-BASE: a LocationId whose champions' hash marks two of the six (pinned in its test)
+const CHAMP_ROOM_ID = 5745; // CHAMP-BASE: a LocationId whose promotion hash marks the third of the six an elite (ELITE_FOE) and the fourth a champion (pinned in its test)
 /** CHAMP-BASE: a class foe's career - a 74-byte CLASS*.CFG record read by the real ClassFile reader, as the build's
  *  loadEnemyCareer reads the player's own (test/characters/enemy/enemyentity.test.js crafts its records the same way). */
 function classCareer() {
@@ -221,7 +221,7 @@ function peer(net, { id, level, luck, renown, seed, host, foraging, partners, ch
   // THE BUILD, as dungeonContext builds it: the pile loop's own lines and buildFoeAt's chain, each on THIS peer's dice -
   // CHAMP-BASE: the layout's champions marked by the dungeon's LocationId and stood by the build's own arm, before the loot
   const records = Array.from({ length: FOES }, () => ({ mobileType: kind }));
-  markDungeonChampions(records, location);
+  markDungeonPromotions(records, location);
   as(() => {
     for (let i = 0; i < PILES; i++) state.lootPiles.push({ pos: [i, 0, 0], record: 0, items: h.buildPile(), isFixed: false, batch: {}, half: [0.5, 0.5] });
     for (let i = 0; i < FOES; i++) {
@@ -698,13 +698,14 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
   const marked = (p) => p.state.foes.flatMap((f, i) => (f.src.champion != null ? [i] : []));
   const champs = (p) => p.state.foes.map((f) => f.entity.champion ?? null);
   const caps = (p) => p.state.foes.map((f) => f.entity.lootCap ?? null);
-  // AUDIT UPDATE L1's elite stands on one of the two marks: a promoted elite is never a champion, so one champion is left
+  // the layout's one roll for a record lands an elite or a champion, never both: the elite at ELITE_FOE leaves one champion
   const champions = (p) => marked(p).filter((i) => !p.state.foes[i].src.eliteFoe);
-  assert.deepEqual(marked(r.A), [2, 4], 'the layout marks two of the six');
-  assert.deepEqual(marked(r.B), marked(r.A), 'the same two on the joiner');
-  assert.deepEqual(champions(r.A), [4], 'the layout\'s elite is one of them (ELITE_FOE)');
+  assert.deepEqual(marked(r.A), [3], 'the layout marks one of the six a champion');
+  assert.equal(r.A.state.foes[ELITE_FOE].src.eliteFoe, true, 'and the layout\'s elite is the third (ELITE_FOE)');
+  assert.deepEqual(marked(r.B), marked(r.A), 'the same one on the joiner');
+  assert.deepEqual(champions(r.A), [3]);
   const hostChamps = champs(r.A);
-  assert.ok(champions(r.A).every((i) => hostChamps[i]), 'the level-30 host stands the other as a champion');
+  assert.ok(champions(r.A).every((i) => hostChamps[i]), 'the level-30 host stands the marked one as a champion');
   assert.equal(hostChamps[ELITE_FOE], null, 'and its elite as no champion, as the build promotes it');
   assert.deepEqual(champs(r.B), Array(FOES).fill(null), 'the level-2 joiner stands none - CHAMPION_MIN_LEVEL at its own level, its fight its own');
   assert.ok(RL.roomBaseLevel(30, [2]) >= CHAMPION_MIN_LEVEL, 'the room\'s level is a champion\'s');
@@ -718,6 +719,7 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
     for (let i = 0; i < FOES; i++) {
       const cap = p.host.bases.get(`corpse:${i}`)?.lootCap;
       if (marked(p).includes(i)) assert.equal(cap, null, `${p.id} corpse:${i}: a champion's base`);
+      else if (i === ELITE_FOE) assert.equal(cap, null, `${p.id} corpse:${i}: the elite's base`);
       else assert.ok(Number.isInteger(cap), `${p.id} corpse:${i}: a plain body's base`);
     }
   }

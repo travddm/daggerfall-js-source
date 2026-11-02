@@ -7,8 +7,7 @@
 // handToHandMinDamage / MaxDamage: 11-21 at 100, 15-29 at effective 140). The schools' climb had paid in price alone
 // until BAL9b and SCHOOLS2 made it pay in each school's own dimension; the owner chose the same for the weapons ("Past-100
 // perk per weapon"). So, BAL9b's law for every weapon whose formula stops paying at 100 - each effective point of the
-// skill's CLIMB past 100 (skillSoftcap.js climbedSkill - the climb the foes' edge reads, so the climb that raises them is
-// the climb that pays) is worth this, to effective 140 at 200:
+// skill's CLIMB past 100 is worth this, to effective 140 at 200:
 //
 //   Long Blade    every blow 0.2% harder (x1.08)                                the WEAPON BLOW modifier
 //   Archery       every arrow 0.2% harder (x1.08)                               the WEAPON BLOW modifier

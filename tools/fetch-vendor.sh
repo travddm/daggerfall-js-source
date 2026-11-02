@@ -14,14 +14,13 @@ set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DEST="$ROOT/vendor"
 MARKER=.fetched-vendor
-ALL="better-ambience immersive-footsteps meanerMonsters unleveledLoot"
+ALL="better-ambience immersive-footsteps unleveledLoot"
 
 # The pinned source of each folder: "<owner/repo> <commit>".
 source_of() {
   case "$1" in
     better-ambience) echo "joshcamas/daggerfall-unity-mods c59e2aa9085734df3aefd19b5dd8c0b49cfcaade" ;;
     immersive-footsteps) echo "magicono43/DFU-Mod_Immersive-Footsteps ac03581ca5b336eac0802af654b35c90af534290" ;;
-    meanerMonsters) echo "Ralzar81/Meaner-Monsters 4ebf302cc4e806f107faef441eb8894b26adf906" ;;
     unleveledLoot) echo "Ralzar81/Unleveled-Loot 3b5b2127fb3837aaf85c4cd2d339bfa5399fa031" ;;
     *) return 1 ;;
   esac
@@ -73,11 +72,6 @@ place_immersive_footsteps() {
   put "$1/ImmersiveFootsteps.dfmod.json" "$2/immersive-footsteps.dfmod.json"
 }
 
-# The repository has no xml/ sprite records, so they stay tracked.
-place_meaner_monsters() {
-  put "$1/MeanerMonsters.dfmod.json" "$2/MeanerMonsters.dfmod.json"
-}
-
 # The repository's manifest is 1.1.1 and the port follows 1.1.2, so the manifest stays tracked.
 place_unleveled_loot() {
   put "$1/Unleveled Loot/modsettings.json" "$2/modsettings.json"
@@ -109,7 +103,6 @@ fetch_one() {
   case "$folder" in
     better-ambience) place_better_ambience "$src" "$target" ;;
     immersive-footsteps) place_immersive_footsteps "$src" "$target" ;;
-    meanerMonsters) place_meaner_monsters "$src" "$target" ;;
     unleveledLoot) place_unleveled_loot "$src" "$target" ;;
   esac
   rm -rf "$tmp"

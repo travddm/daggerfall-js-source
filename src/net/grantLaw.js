@@ -23,7 +23,7 @@
 //     (its version and a '.') verifies as a grant, nor a grant as one.
 //   THE MARKS (section 4.2, `e` and `c`) - rolled by the relay from the seed alone, so a mint asked again rolls the same.
 //     Three draws a member, always: the elite's, the champion's chance, its trait. RENOWN-GATE as the street has it
-//     (systems/eliteFoes.js rollOverworldElite): the elite's draw is made first, then the Renown's word. An elite is
+//     (systems/eliteFoes.js eliteRenownOpen): the elite's draw is made first, then the Renown's word. An elite is
 //     never a champion (scenes/exteriorFoes.js: `!entity.eliteFoe` before applyChampion).
 //   THE DICE (section 4.4) - one seeded stream per die (GRANT_DICE), never one stream in an order: chooseRandomEnemy
 //     draws a variable count (its short-list guard), and a stream shared with the next die would shift it.
@@ -54,11 +54,11 @@ export const GRANT_SKEW_MS = 60 * 1000;
 /** THE PINNED RATES (section 4.2): the relay cannot import the modules that hold them (they reach the loot tables), so
  *  each is a copy here, held equal to its home by test/net/grant1_law.test.js. */
 /** systems/eliteFoes.js ELITE_FOE_OVERWORLD_CHANCE. */
-export const GRANT_ELITE_CHANCE = 0.05;
+export const GRANT_ELITE_CHANCE = 0.01;
 /** systems/eliteFoes.js ELITE_FOE_MIN_RENOWN - an elite stands for an owner of this Renown or more. */
 export const GRANT_ELITE_MIN_RENOWN = 5;
 /** systems/champions.js CHAMPION_PER_MILLE. */
-export const GRANT_CHAMPION_PER_MILLE = 70;
+export const GRANT_CHAMPION_PER_MILLE = 20;
 /** systems/champions.js CHAMPION_TRAITS.length - `c` holds an index into them. */
 export const GRANT_CHAMPION_TRAITS = 5;
 

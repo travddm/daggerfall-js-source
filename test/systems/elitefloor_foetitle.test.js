@@ -3,9 +3,8 @@
 //     refused promotion leaves the foe as it was built, and the dungeon's build arm falls through to its plain path.
 //   - FOE-TITLE: one home names a special foe on every surface - a revenant by its own name, a champion by its trait,
 //     an elite as "Elite" - the target bar, the hover (at peace only, HOVER-PLAIN), the death line and the body's title alike.
-//   - ELITE-RATES: ELITE-RARITY undone - one foe in
-//     twenty in the open world with no gate (any number standing, no gap, a loose stand too); a normal dungeon one time
-//     in five. The Elite Dungeon keeps its 3 or 4 (Mac's own number).
+//   - ELITE-RATES: one foe in a hundred in the open world with no gate on how many stand or how soon; an ordinary
+//     dungeon marks its elites by the per-foe roll (markDungeonPromotions), none by count. The Elite Dungeon keeps its 3 or 4.
 
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -13,9 +12,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { foeTitle } from '../../src/systems/foeTitle.js';
 import * as eliteFoes from '../../src/systems/eliteFoes.js';
-import { promoteEliteFoe, eliteEligible, ELITE_FOE_MIN_LEVEL, ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT, grantEliteLoot, pickDungeonElites, rollOverworldElite, ELITE_FOE_OVERWORLD_CHANCE, ELITE_FOE_NORMAL_DUNGEON_CHANCE, ELITE_FOE_DUNGEON_MIN, ELITE_FOE_DUNGEON_MAX } from '../../src/systems/eliteFoes.js';
+import { promoteEliteFoe, eliteEligible, ELITE_FOE_MIN_LEVEL, ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT, grantEliteLoot, pickDungeonElites, markDungeonPromotions, ELITE_FOE_OVERWORLD_CHANCE, ELITE_FOE_DUNGEON_MIN, ELITE_FOE_DUNGEON_MAX } from '../../src/systems/eliteFoes.js';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
-import { championName } from '../../src/systems/champions.js';
+import { championName, rollStreetPromotion, _resetStreetChampionsForTests } from '../../src/systems/champions.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
 import { liveEntityName } from '../../src/systems/worldTooltips.js';
 import { markFoeStruck, foeTarget, clearFoeTarget } from '../../src/ui/hud/hudFoeTarget.js';
 import { KNIGHT_CITY_WATCH } from '../../src/characters/mobile/mobileTypes.js';
@@ -65,29 +65,48 @@ test('FOE-TITLE: a revenant by its name, a champion by its trait, an elite as El
   }
 });
 
-test('ELITE-RATES: the open world\'s odds - one in twenty again, and no gate left to ask (mutant: ELITE-RARITY\'s one in fifty)', () => {
-  assert.equal(ELITE_FOE_OVERWORLD_CHANCE, 0.05, 'one in twenty (ELITE-RARITY\'s one in fifty undone)');
-  assert.equal(rollOverworldElite(() => 0.0499), true);
-  assert.equal(rollOverworldElite(() => 0.05), false, 'strict');
+test('ELITE-RATES: the open world\'s odds - one in a hundred, and no gate left to ask', () => {
+  assert.equal(ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'one in a hundred');
+  assert.equal(eliteFoes.rollOverworldElite, undefined, 'the elite is the street hash\'s band, not a roll of its own');
   assert.equal(eliteFoes.overworldEliteAllowed, undefined, 'the gate is gone');
   assert.equal(eliteFoes.ELITE_FOE_OVERWORLD_GAP_MINUTES, undefined, 'and its gap');
 });
 
-test('ELITE-RATES: the dungeons - a normal one holds one about one time in five, an Elite Dungeon still 3 or 4 (mutants: ELITE-RARITY\'s one in ten; the Elite Dungeon thinned)', () => {
-  assert.equal(ELITE_FOE_NORMAL_DUNGEON_CHANCE, 0.2);
+test('ELITE-RATES: the dungeons - an ordinary one places none by count and marks about one foe in a hundred by the per-foe roll, an Elite Dungeon still 3 or 4 (mutant: the Elite Dungeon thinned)', () => {
+  setPref('lootRarity', true);
+  assert.equal(eliteFoes.ELITE_FOE_NORMAL_DUNGEON_CHANCE, undefined, 'the per-dungeon chance is gone');
   assert.deepEqual([ELITE_FOE_DUNGEON_MIN, ELITE_FOE_DUNGEON_MAX], [3, 4], 'Mac\'s own "3 - 4 times in Elite Dungeons"');
   const list = () => Array.from({ length: 40 }, () => ({ mobileType: 7 }));
-  let normal = 0;
+  let normal = 0, marked = 0;
   const N = 4000;
-  for (let i = 0; i < N; i++) normal += pickDungeonElites(list(), `loc${i}`, { elite: false });
-  assert.ok(normal / N > 0.17 && normal / N < 0.23, `about one in five (${normal}/${N})`);
+  for (let i = 0; i < N; i++) {
+    const records = list();
+    normal += pickDungeonElites(records, `loc${i}`, { elite: false });
+    markDungeonPromotions(records, `loc${i}`);
+    marked += records.filter((e) => e.eliteFoe).length;
+  }
+  assert.equal(normal, 0, 'none placed by count');
+  assert.ok(marked / (N * 40) > 0.008 && marked / (N * 40) < 0.012, `about one in a hundred (${marked}/${N * 40})`);
   for (let i = 0; i < 200; i++) {
     const n = pickDungeonElites(list(), `loc${i}`, { elite: true });
     assert.ok(n >= 3 && n <= 4, `an Elite Dungeon: ${n}`);
   }
 });
 
-test('ELITE-RATES: the open world\'s pool, online - a camp that wins every roll stands every one elite, the next at once one too, a loose stand too; a returning revenant stands as what it was, never a fresh roll (mutants: the one-standing gate back; the loose stand refused; the revenant rolled)', async () => {
+test('ELITE-RATES: the open world\'s pool, online - a camp whose stands all roll elite stands every one elite, the next at once one too; a returning revenant stands as what it was, never a fresh roll (mutants: the one-standing gate back; the revenant rolled)', async () => {
+  setPref('lootRarity', true);
+  // The street roll is a hash of the spot and the pool's count of stands, so each stand is put on a spot that rolls elite at its count.
+  const tierAt = (feet, count) => {
+    _resetStreetChampionsForTests();
+    for (let k = 1; k < count; k++) rollStreetPromotion([0, 0, 0], 0);
+    return rollStreetPromotion(feet, 2)?.tier ?? null;
+  };
+  const eliteSpot = (count) => {
+    for (let i = 0; i < 5000; i++) { const feet = [i * 3, 0, count * 1000]; if (tierAt(feet, count) === 'elite') return feet; }
+    throw new Error('no elite spot for count ' + count);
+  };
+  const spots = [1, 2, 3, 4, 5].map(eliteSpot);
+  _resetStreetChampionsForTests();
   const careers = (() => {
     const b = new Uint8Array(74); const v = new DataView(b.buffer);
     b[10] = 0x08; v.setUint16(52, 4, true);
@@ -111,18 +130,15 @@ test('ELITE-RATES: the open world\'s pool, online - a camp that wins every roll 
     audio: null, onPlayerHurt: () => {}, rolls: () => 0.5, rand: () => 0.9, say: () => {},
   });
   pool.setNet({ room: () => 'r' });   // online: a host in a room
-  const real = Math.random;
-  Math.random = () => 0;   // every roll won
   try {
-    const camp = await Promise.all([0, 1, 2, 3].map((i) => pool.spawnFoe(2, [i * 3, 0, 0], { feetGiven: true, level: 5 })));
-    assert.equal(camp.filter((f) => f?.entity.eliteFoe).length, 4, 'a camp of four that wins every roll: four elites, none gated by another standing');
-    const soon = await pool.spawnFoe(2, [0, 0, 20], { feetGiven: true, level: 5 });
+    const camp = [];
+    for (const feet of spots.slice(0, 4)) camp.push(await pool.spawnFoe(2, feet, { feetGiven: true, level: 5 }));
+    assert.equal(camp.filter((f) => f?.entity.eliteFoe).length, 4, 'a camp of four that rolls elite: four elites, none gated by another standing');
+    const soon = await pool.spawnFoe(2, spots[4], { feetGiven: true, level: 5 });
     assert.equal(soon.entity.eliteFoe, true, 'the same minute, four standing: one more - no gap');
-    const loose = await pool.spawnFoe(2, [0, 0, 30], { feetGiven: true, level: 5, loose: true });
-    assert.equal(loose.entity.eliteFoe, true, 'a loose stand (a summoning\'s squad) rolls too');
     const nem = await pool.spawnFoe(2, [0, 0, 50], { feetGiven: true, level: 5, revenant: { id: 'n1', name: 'Grushnak the Butcher', rank: 1, elite: true, trait: null, returns: 0, history: [] } });
     assert.equal(nem.entity.eliteFoe, true, 'an elite revenant stands as one');
     const plain = await pool.spawnFoe(2, [0, 0, 60], { feetGiven: true, level: 5, revenant: { id: 'n2', name: 'Vesk the Quiet', rank: 1, elite: false, trait: null, returns: 0, history: [] } });
     assert.equal(!!plain.entity.eliteFoe, false, 'a plain revenant stays plain, the roll that would win never asked');
-  } finally { Math.random = real; pool.destroy?.(); }
+  } finally { pool.destroy?.(); }
 });

@@ -114,7 +114,7 @@ export function techniqueGain(weapon, perSwing, swingSeconds, tier) {
   return best;
 }
 
-/** This game's cell under a layer set. `kind`: 'plain', 'elite' (x5/x3) or 'boss' (the elite dungeon's x7/x4). */
+/** This game's cell under a layer set. `kind`: 'plain', 'elite' (the elite tier) or 'boss' (an elite in an Elite Dungeon). */
 export function oursCell(build, buildName, level, foeId, layers, { career, swings, gearPercentile, dungeonType, kind = 'plain' } = {}) {
   const character = ours.oursCharacter(build, level, layers, { gearPercentile });
   const { entity } = character;

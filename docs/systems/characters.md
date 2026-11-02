@@ -216,7 +216,7 @@ skills, 50 health); never treat those values as real. Its damage door is `hurtPl
 `ENEMY_BASICS`, careers from ENEMYnnn.CFG in MONSTER.BSA, and armour values of `ArmorValue * 5`. Class enemies (ids
 128+) take `CLASSnn.CFG` (index = id - 128), the player's level (city watch +3 to +6), and health of 10 plus one
 `Range(1, hitPointsPerLevel + 1)` roll per level. Every enemy skill is `min(100, 5 * level + 30)` (`skillsLevel`).
-`applyProgressionScaling` is the one writer of place and Master Skills scaling. `customEnemies.js` registers ids
+`applyHeroThreat` is the one writer of the hero's threat. `customEnemies.js` registers ids
 beyond DFU's ranges for vendored enemy mods. Stats, elites and boss traits are on [combat.md](combat.md).
 
 ## Tests

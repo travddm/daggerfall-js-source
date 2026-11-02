@@ -190,11 +190,11 @@ test('WEAR-VANILLA: through the core, an armed Knight\'s blow on an iron-clad pl
   const lost = () => pieces.reduce((n, p) => n + p.maxCondition - p.currentCondition, 0);
   let seed = 23; const rolls = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 100000) / 100000; };
   const dfRand = () => Math.floor(rolls() * 32768);
-  const foeOf = (id) => { const e = makeEnemyEntity(id, ENEMY_BASICS[id], { ...stats, attackModifierFlags: 0 }, 10, rolls); e.items = []; e.activeEffects = []; equipEnemy(e, id, 10, rolls); return e; };
+  const foeOf = (id, row = ENEMY_BASICS[id]) => { const e = makeEnemyEntity(id, row, { ...stats, attackModifierFlags: 0 }, 10, rolls); e.items = []; e.activeEffects = []; equipEnemy(e, id, 10, rolls); return e; };
   const slot = formulaOverride('applyConditionDamageThroughPhysicalHit');
   const seen = [];
   registerFormulaOverride('applyConditionDamageThroughPhysicalHit', (item, owner, damage, opts) => { seen.push({ item, damage }); return slot ? slot(item, owner, damage, opts) : false; });
-  const knight = foeOf(145), orc = foeOf(7);   // the spawns draw off Math.random of their own (a weapon's poison roll)
+  const knight = foeOf(145), orc = foeOf(7, { ...ENEMY_BASICS[7], minDamage: 6, maxDamage: 13 });   // a row that out-hits the sabre (no mod row is loaded here); the spawns draw off Math.random of their own (a weapon's poison roll)
   const random = Math.random;
   Math.random = () => { throw new Error('a draw off the rolls the core was handed'); };
   try {

@@ -1,45 +1,40 @@
 // @ts-check
-// FOE-BOUNDS: THE MOST HEALTH A STREAMED
-// FOE CAN LEGALLY HAVE. Every stage that builds a foe's maximum rounds once and never lowers it (`Math.max(1,
-// Math.round(prev * mult))`), so the highest base and every highest multiplier, in the builders' own order and with their
-// rounding, is the exact legal maximum - for the inputs a reader cannot see taken at their worst: the owner's dice, its
-// combat standing and hero level, a revenant's rank, wrath and the Dread, a Rite's Summoner. What the
-// record says of itself only ever RAISES the bound (`z` an elite, `cp` a champion's trait, `nm` a revenant's name), so a record claiming none of them is held to the ordinary chain. A record over its bound is PROVABLY
-// impossible: it is refused, never rescaled (the spec's own word). Pure, and the relay's too (GRANT9's strip).
+// FOE-BOUNDS: THE MOST HEALTH A STREAMED FOE CAN LEGALLY HAVE. Every stage that builds a foe's maximum rounds once and
+// never lowers it (`Math.max(1, Math.round(prev * mult))`), so the highest base and every highest multiplier, in the
+// builders' own order and with their rounding, is the exact legal maximum, for the inputs a reader cannot see taken at
+// their worst: the owner's dice, its hero level, a revenant's rank, wrath and the Dread, a Rite's Summoner. What the
+// record says of itself only ever RAISES the bound (`z` an elite, `cp` a champion's trait, `nm` a revenant's name), so a
+// record claiming none of them is held to the ordinary chain. A record over its bound is PROVABLY impossible: it is
+// refused, never rescaled. Pure, and the relay's too.
 //
-// THE TWO CHAINS (the hand-off map, 2026-10-19):
-//   - a street's or a building's foe (scenes/exteriorFoes.js spawnFoe): its base - an elite x5 (`z`) - progression
-//     (systems/skillSoftcap.js progressionScaling, the wilderness by night at its worst, the hero at its worst) - a
-//     champion's 2 x its trait (`cp`, never with `z`) - a revenant's rank, wrath and the Dread (`nm`) - a Rite's Summoner x3 (a class foe in a camp - the rite's faithful are
-//     one, the frame's `cz` - scenes/riteHost.js riteFoe), or a fallen star's coven x2 (any foe in a camp - a star's are
-//     one - scenes/starfall/starfallHost.js toughen; STAR-TUNE); and
-//     the City Watch's own (scenes/cityGuards.js: its class roll);
-//   - a dungeon's foe (scenes/dungeonContext.js buildFoeAt): its base - a Super dungeon's x4 and a Stalwart champion's x3
-//     (more than any elite's x9) - progression at a Dragon's Den's worst. The record carries no
-//     `z`, `cp` or `nm` there (dungeonContext.js roomRecord), so the worst is taken; a revenant's lair stand is under it
-//     (_spawnEncounter's record has no tier and no champion - dungeonContext.js marks the layout's alone - so its rank,
-//     wrath and the Dread, x5.85 after the same progression, never reach the layout's x12).
+// THE TWO CHAINS:
+//   - a street's or a building's foe (scenes/exteriorFoes.js spawnFoe): its base, then one of an elite (`z`), a champion's
+//     factor and trait (`cp`), or the hero's threat at its worst (a promoted foe takes no hero's threat), then a revenant's
+//     rank, wrath and the Dread (`nm`), then a Rite's Summoner x3 (a class foe in a camp) or a fallen star's coven x2 (any
+//     foe in a camp), and the City Watch's own (scenes/cityGuards.js: its class roll);
+//   - a dungeon's foe (scenes/dungeonContext.js buildFoeAt): the most of a Super dungeon's x4 with the hero's threat or a
+//     champion's factor and trait, and a Super dungeon's elite. The record carries no `z`, `cp` or `nm` there, so the worst
+//     is taken.
 // A class foe's base is DFU's roll at its worst: 10 + its level x the most hit points a level any class gives
-// (CreateCharCustomClass.cs's slider, systems/customClass.js HP_MAX). A monster's is the most of its row over the
-// profiles a game can build with (vanilla, Meaner Monsters, Meaner Monsters with PCAAO's edit - online forces the last,
-// systems/online/onlineLane.js ONLINE_ROOM_MOD_KEYS - and, DEX1, each of the three under Daggerfall Enemy Expansion's
-// classic lines, a room's switch; and, MUDEX1, the mod's lines with MUDEX's after them - Meaner Monsters beside the mod,
-// its own rows standing aside; the most of the seven, so a game that somehow built with them off is never refused).
-// UNVERIFIED - no bound, never refused: a type with no row (the horse, 39; an unknown id; DEX1, a mod's own kind, 256 and
-// up, whose career the relay does not hold), an ally, a companion or a crewman (the frame's own lists, which the caller
-// leaves out), a boss's relay-kept body (not on this stream). The constants each builder owns are copied here, as net/grantLaw.js copies the elite's and the champion's -
-// the relay cannot import the modules that hold them - and test/net/foebounds_law.test.js holds each equal to its home.
-import { progressionScaling, foeShare, wildernessShare, placeVeteran, wildernessThreat, DUNGEON_SHARE } from '../systems/skillSoftcap.js';
+// (CreateCharCustomClass.cs's slider, systems/customClass.js HP_MAX). A monster's is the most of its row in Daggerfall
+// Unity's table and in the Enemy Expansion rows with this game's stat pass over them (FOE_BOUND_ROWS), so a game with
+// the mod off is never refused.
+// UNVERIFIED - no bound, never refused: a type with no row (the horse, 39; an unknown id; a mod's own kind, 256 and up,
+// whose career the relay does not hold), an ally, a companion or a crewman (the frame's own lists, which the caller leaves
+// out), a boss's relay-kept body (not on this stream). The constants each builder owns are copied here, as
+// net/grantLaw.js copies the elite's and the champion's: the relay cannot import the modules that hold them, and
+// test/net/foebounds_law.test.js holds each equal to its home.
 
 /** The builders' multipliers, each from its home (held equal by the test). */
 export const FOE_BOUND = Object.freeze({
   classBase: 10,            // characters/enemy/enemyEntity.js rollEnemyClassMaxHealth's `let maxHealth = baseHealth` (10)
   classHpPerLevel: 30,      // systems/customClass.js HP_MAX (CreateCharCustomClass.cs maxHpPerLevel)
-  elite: 5,                 // systems/eliteFoes.js ELITE_FOE_HEALTH_MULT
+  elite: 2,                 // systems/foe-promotion.ts PROMOTION.elite.health
+  superElite: 9,            // systems/eliteFoes.js ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT
   superFoe: 4,              // world/superDungeon/sdDungeon.js SUPER_HEALTH_SCALE
-  champion: 2,              // systems/champions.js CHAMPION_HEALTH
-  championTraits: Object.freeze([1, 1.5, 1, 1, 1]),   // systems/champions.js CHAMPION_TRAITS' `health` (1 where none), in the wire's order
-  championMinLevel: 3,      // systems/champions.js CHAMPION_MIN_LEVEL
+  champion: 1.4,            // systems/foe-promotion.ts PROMOTION.champion.health
+  championTraits: Object.freeze([1, 1.2, 1, 1, 1]),   // systems/champions.js CHAMPION_TRAITS' `health` (1 where none), in the wire's order
+  championMinLevel: 3,      // systems/foe-promotion.ts PROMOTION.minLevel
   revenantPerRank: 0.4,     // systems/revenant/revenant.js REVENANT_HEALTH_PER_RANK
   revenantRankMax: 5,       // systems/revenant/revenant.js REVENANT_MAX_RANK
   festerHealth: 0.1,        // systems/revenant/revenantFeud.js FESTER.HEALTH
@@ -48,42 +43,22 @@ export const FOE_BOUND = Object.freeze({
   rite: 3,                  // net/gate/gateRite.js RITE_SUMMONER_HEALTH
   star: 2,                  // net/starfall/starfallLaw.js STAR_FOE_HEALTH
   watch: 146,               // characters/mobile/mobileTypes.js KNIGHT_CITY_WATCH
-  hero: Object.freeze({     // systems/heroThreat.js HERO_THREAT's health
-    level: Object.freeze({ from: 10, to: 30, health: 1.04 }),
-    renown: Object.freeze({ from: 15, to: 50, health: 1.005 }),
-  }),
+  hero: Object.freeze({ from: 30, to: 45, health: 1.018 }),   // systems/heroThreat.js HERO_THREAT
 });
 
-/** The hero's worst health factor: every level and every Renown that pays (systems/heroThreat.js heroThreat's top). */
-export const FOE_HERO_HEALTH_MAX = FOE_BOUND.hero.level.health ** (FOE_BOUND.hero.level.to - FOE_BOUND.hero.level.from)
-  * FOE_BOUND.hero.renown.health ** (FOE_BOUND.hero.renown.to - FOE_BOUND.hero.renown.from);
+/** The hero's worst health factor: every level that pays (systems/heroThreat.js heroThreat's top). */
+export const FOE_HERO_HEALTH_MAX = FOE_BOUND.hero.health ** (FOE_BOUND.hero.to - FOE_BOUND.hero.from);
 
-/** Each monster's row at its most over the seven profiles - [type, max health, level, share level] - held equal by the
- *  test to enemyBasics.js, the Meaner Monsters folds (characters/meanerMonsters.js applyMeanerMonsters, combat/
- *  pcaaoMeanerMonsters.js meanerMonstersRow) and DEX1's Daggerfall Enemy Expansion lines over each of the three
- *  (systems/enemyExpansion/dexInstall.js dexClassicRow: the mod writes its classic rows at its Start, after their Init -
- *  the Dragonling's 42 health its 146, the Werewolf's level 6 its 9), and MUDEX1's, the mod's lines with MUDEX's after
- *  them (`dexClassicRow(t, row, { mudex: true })` - the Flesh Atronach's 300 health, the Ice Atronach's level 21, both
- *  written into the table and so share levels too). The SHARE LEVEL is the level the builders' progression
- *  share reads (`foeShare(basics.level)`: the table's row, vanilla or the mod's - never a mint's fold), at its most; the
- *  relay reads it here, not the table, so the bound is the same on every machine whatever it has loaded. The horse (39)
+/** Each monster's row at its most, in Daggerfall Unity's table and under the Enemy Expansion rows with the stat pass
+ *  (systems/enemyExpansion/classic-stat-pass.ts) - [type, max health, level] - held equal by the test. The horse (39)
  *  has none. */
 export const FOE_BOUND_ROWS = Object.freeze(new Map([
-  [0, [35, 1, 1]], [1, [20, 2, 2]], [2, [40, 3, 3]], [3, [26, 3, 3]], [4, [110, 4, 4]], [5, [80, 4, 4]],
-  [6, [50, 4, 4]], [7, [70, 6, 6]], [8, [65, 5, 5]], [9, [66, 9, 9]], [10, [50, 6, 6]], [11, [50, 7, 7]],
-  [12, [100, 9, 9]], [13, [85, 8, 8]], [14, [120, 11, 11]], [15, [66, 9, 9]], [16, [200, 10, 10]], [17, [125, 10, 10]],
-  [18, [66, 11, 11]], [19, [190, 15, 15]], [20, [74, 12, 12]], [21, [110, 15, 15]], [22, [100, 14, 14]],
-  [23, [90, 15, 15]], [24, [150, 19, 19]], [25, [160, 17, 17]], [26, [138, 17, 17]], [27, [146, 18, 18]],
-  [28, [154, 19, 19]], [29, [146, 19, 19]], [30, [200, 20, 20]], [31, [285, 21, 21]], [32, [200, 20, 20]],
-  [33, [210, 21, 21]], [34, [146, 18, 18]], [35, [130, 21, 16]], [36, [155, 21, 16]], [37, [300, 16, 16]],
-  [38, [130, 21, 21]], [40, [250, 21, 16]], [41, [90, 16, 16]], [42, [74, 16, 16]],
+  [0, [20, 1]], [1, [18, 2]], [2, [26, 3]], [3, [26, 3]], [4, [44, 4]], [5, [44, 4]], [6, [44, 4]], [7, [44, 6]], [8, [46, 5]], [9, [66, 7]], [10, [50, 6]], [11, [50, 7]], [12, [65, 9]], [13, [85, 8]], [14, [85, 8]], [15, [66, 9]], [16, [96, 10]], [17, [85, 10]], [18, [66, 11]], [19, [85, 14]], [20, [74, 12]], [21, [96, 15]], [22, [82, 14]], [23, [90, 15]], [24, [117, 19]], [25, [130, 17]], [26, [138, 17]], [27, [146, 18]], [28, [154, 19]], [29, [146, 19]], [30, [200, 20]], [31, [240, 21]], [32, [200, 20]], [33, [210, 21]], [34, [54, 18]], [35, [130, 16]], [36, [130, 16]], [37, [169, 16]], [38, [130, 20]], [40, [42, 16]], [41, [44, 16]], [42, [74, 16]]
 ]));
 
 const isClass = (t) => t >= 128 && t <= 146;
 /** One builder's stage: its multiplier, rounded once, never under 1. */
 const stage = (v, m) => Math.max(1, Math.round(v * m));
-/** A stage of progression at its worst for this foe, the place's worst handed in (pure: skillSoftcap's own formula). */
-const worstProgression = (t, dShare, place) => progressionScaling({ veteran: 1, edge: Number.MAX_SAFE_INTEGER }, dShare, foeShare(FOE_BOUND_ROWS.get(t)?.[2], isClass(t)), place, { health: FOE_HERO_HEALTH_MAX, damage: 1 })?.healthMult ?? 1;
 const revenantStages = (v) => stage(stage(stage(v, 1 + FOE_BOUND.revenantPerRank * FOE_BOUND.revenantRankMax), 1 + FOE_BOUND.festerHealth * FOE_BOUND.wrathMax), FOE_BOUND.dread);
 
 /** A record's base: a class foe's roll at its level's worst, a monster's row - or null (no row: unverified). */
@@ -96,8 +71,8 @@ function baseOf(r) {
 function streetBound(r, base, camp) {
   let v = base;
   if (r.z === 1) v = stage(v, FOE_BOUND.elite);
-  v = stage(v, worstProgression(r.t, wildernessShare(true), placeVeteran(wildernessThreat(true))));
-  if (r.z !== 1 && Number.isInteger(r.cp)) v = stage(v, FOE_BOUND.champion * (FOE_BOUND.championTraits[r.cp] ?? 1));
+  else if (Number.isInteger(r.cp)) v = stage(v, FOE_BOUND.champion * (FOE_BOUND.championTraits[r.cp] ?? 1));
+  else v = stage(v, FOE_HERO_HEALTH_MAX);
   if (typeof r.nm === 'string' && r.nm) v = revenantStages(v);
   if (camp) v = stage(v, isClass(r.t) ? Math.max(FOE_BOUND.rite, FOE_BOUND.star) : FOE_BOUND.star);   // STAR-TUNE: a fallen star's coven, any kind
   return r.t === FOE_BOUND.watch ? Math.max(v, base) : v;
@@ -105,7 +80,12 @@ function streetBound(r, base, camp) {
 
 /** The dungeon's chain (buildFoeAt's order): a layout foe's worst, which a revenant's lair stand never reaches. */
 function dungeonBound(r, base) {
-  return stage(stage(stage(base, FOE_BOUND.superFoe), FOE_BOUND.champion * Math.max(...FOE_BOUND.championTraits)), worstProgression(r.t, Math.max(...DUNGEON_SHARE), 1));
+  const superFoe = stage(base, FOE_BOUND.superFoe);
+  return Math.max(
+    stage(superFoe, FOE_HERO_HEALTH_MAX),
+    stage(superFoe, FOE_BOUND.champion * Math.max(...FOE_BOUND.championTraits)),
+    stage(base, FOE_BOUND.superElite),
+  );
 }
 
 /**

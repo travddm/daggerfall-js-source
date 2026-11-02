@@ -15,10 +15,7 @@
 // Unity Random.Range slots are uniform rolls, as in DFU itself.
 // Equipment (SetEnemyEquipment) and loot generation: E3b/E4.
 
-import { effectiveSkill, rawSkillForEffective } from '../../systems/skillSoftcap.js';   // SOFTCAP2: a leaf
 import { KNIGHT_CITY_WATCH as KNIGHT_CITYWATCH_ID } from '../mobile/mobileTypes.js';
-import { meanerMonstersRow as pcaaoMeanerMonstersRow } from '../../combat/pcaaoMeanerMonsters.js';   // PCO1: Kirk.O's Meaner Monsters edit, when both mods are on
-import { applyMeanerMonsters } from '../meanerMonsters.js';   // MM1: Ralzar's Meaner Monsters, when its switch is on
 import { enemyEntityType, enemyCareerIndex } from './enemyBasics.js';   // DEX1: SetupDemoEnemy's entity type and SetEnemyCareer's careerIndex, one home
 import { customCareerTemplate } from './customEnemies.js';   // DEX1: DaggerfallEntity.CustomCareerTemplates
 
@@ -77,7 +74,7 @@ export async function loadEnemyCareer(mobileType, fetchBytes) {
 
 /** DEX1: A MOD'S EDIT OF A ROW, AT THE MINT. DFU runs every mod's Init before any MonoBehaviour's Start, so a mod that
  *  edits EnemyBasics.Enemies in its Start (Daggerfall Enemy Expansion's BestiaryMod.Start) edits the rows the Inits left -
- *  Meaner Monsters' and the overhaul's among them, which the port lays over a row here, at the mint. So a Start-time
+ *  which the port lays over a row here, at the mint. So a Start-time
  *  editor registers here and runs after them: `fn(mobileType, row)` answers the row as it leaves it (a copy, never the
  *  table's own), or the row unchanged. */
 const _mintRowEditors = [];
@@ -104,34 +101,18 @@ export function skillsLevel(level) {
 }
 
 /**
- * SOFTCAP2 - TOUGHER ENEMIES, applied to a built foe (after makeEnemyEntity
- * and the elite pass, so the DFU build is the one underneath). `scaling`
- * is skillSoftcap.js progressionScaling's answer; null changes nothing.
- * Four channels, each once:
- *   skills       + scaling.skillGain effective points - the raw flat number
- *                  is set so effectiveSkill reads the target (it may pass 100)
- *   health       x scaling.healthMult (max and current)
- *   damageScale  x scaling.damageMult - blows AND spells (the elite channel)
- *   challengeLevel = level + scaling.challengeLevels - what the foe TEACHES
- *                  (the real-use law); `level` itself is left alone, so the
- *                  foe's spell magnitudes, loot and gear are not scaled a
- *                  second time through it.
- * `skillOverrides` (a caster's pinned magic skills) are left alone.
- * BAL11: the hero's threat rides the same two channels (its share is in
- * healthMult and damageMult), and its health is stood on `healthMult` too - what ai/tells.js kindHealth divides out, so
- * a high level's foe staggers as its kind does.
+ * Stand a built foe at the hero's threat (systems/heroThreat.js heroThreatOf's answer; null changes nothing): its health
+ * and its blows and spells (damageScale) multiplied. The health is also written on healthMult, which ai/tells.js
+ * kindHealth divides out, so a high level's foe staggers as its kind does.
  */
-export function applyProgressionScaling(entity, scaling) {
-  if (!entity || !scaling) return entity;
-  if (typeof entity.skills === 'number') {
-    entity.skills = rawSkillForEffective(effectiveSkill(entity.skills) + scaling.skillGain);
+export function applyHeroThreat(entity, hero) {
+  if (!entity || !hero) return entity;
+  if (hero.health > 1) {
+    entity.maxHealth = Math.max(1, Math.round(entity.maxHealth * hero.health));
+    entity.health = entity.maxHealth;
+    entity.healthMult = (entity.healthMult ?? 1) * hero.health;
   }
-  entity.maxHealth = Math.max(1, Math.round(entity.maxHealth * scaling.healthMult));
-  entity.health = entity.maxHealth;
-  if (scaling.heroHealth > 1) entity.healthMult = (entity.healthMult ?? 1) * scaling.heroHealth;   // BAL11: TELL1's poise reads the kind's own health
-  entity.damageScale = (Number.isFinite(entity.damageScale) ? entity.damageScale : 1) * scaling.damageMult;
-  entity.challengeLevel = (entity.level ?? 1) + scaling.challengeLevels;
-  entity.progression = { share: scaling.share, veteran: scaling.veteran, place: scaling.place ?? 0, edge: scaling.edge, hero: { damage: scaling.heroDamage ?? 1, health: scaling.heroHealth ?? 1 } };   // for a HUD or a debugger; nothing reads it as law (BAL3: the place's veteran beside the player's; BAL11: the hero's threat)
+  if (hero.damage > 1) entity.damageScale = (Number.isFinite(entity.damageScale) ? entity.damageScale : 1) * hero.damage;
   return entity;
 }
 
@@ -146,13 +127,8 @@ export function makeEnemyEntity(mobileType, basicsIn, career, playerLevel, rollF
   // and is levelled by its row, a mod's class (384-398) by the player; a custom one of either takes DFU's same arm
   // (EnemyEntity.cs:251-274: "Default like a monster" / "like a class enemy" - and no watchman's bonus, its id not 146)
   const isClass = enemyEntityType(mobileType) === 'class';
-  // MM1 + PCO1: EnemyBasics.Enemies[i] as the two Awakes left it -
-  // Ralzar's Meaner Monsters row over the base row when that mod is on,
-  // then Kirk.O's edit over THAT when the overhaul is on too (PCAAO
-  // lists Meaner Monsters as a dependency, so it Awakes after it and
-  // its values win where both write); the base row when neither.
-  // DEX1: and a mod's Start-time edit over both (registerMintRowEditor) - Enemy Expansion's classic lines, DFU's order
-  const basics = editAtMint(mobileType, pcaaoMeanerMonstersRow(mobileType, applyMeanerMonsters(mobileType, basicsIn)));
+  // EnemyBasics.Enemies[i], then a mod's Start-time edit over it (registerMintRowEditor): Enemy Expansion's classic lines
+  const basics = editAtMint(mobileType, basicsIn);
   const stats = career
     ? {
         strength: career.strength, intelligence: career.intelligence,

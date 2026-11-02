@@ -70,6 +70,8 @@ export class Game {
     this.viewport = viewport;
     this.ctxOpts = ctxOpts;
     this.errors = [];
+    /** Console lines and the local requests that failed or answered 4xx/5xx, for `diagnostics()`. */
+    this.trace = [];
   }
 
   /** Opens `path` (relative to the server) and waits until `wait` is true: 'frame' (the frame counter runs) or 'mode'. */
@@ -102,6 +104,7 @@ export class Game {
       });
       this.page.on('pageerror', (e) => this.errors.push(`[pageerror] ${e.message}`));
       this.page.on('console', (m) => {
+        this.note(`[console.${m.type()}] ${m.text()}`);
         if (m.type() === 'error' && (!m.location().url || isLocal(m.location().url)))
           this.errors.push(`[console] ${m.text()} ${m.location().url ?? ''}`.trim());
       });
@@ -111,10 +114,13 @@ export class Game {
         (r) =>
           isLocal(r.url()) &&
           r.failure()?.errorText !== 'net::ERR_ABORTED' &&
-          this.errors.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText ?? ''}`),
+          (this.note(`[requestfailed] ${r.method()} ${r.url()} ${r.failure()?.errorText ?? ''}`),
+          this.errors.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText ?? ''}`)),
       );
       this.page.on('response', (r) => {
         if (r.status() >= 400 && isLocal(r.url())) this.errors.push(`[http ${r.status()}] ${r.url()}`);
+        if (r.status() >= 400 || r.url().includes('/v1/safety/'))
+          this.note(`[http ${r.status()}] ${r.request().method()} ${r.url()}`);
       });
     }
     // 'commit': software GL keeps the main thread busy, so the load event can be minutes away; the waits below read the game itself
@@ -123,6 +129,18 @@ export class Game {
     if (wait === 'mode')
       return this.until(() => this.page.evaluate(() => (window.__mode ? window.__mode() : null)), timeout);
     return true;
+  }
+
+  /** One timestamped line of the page's trace. */
+  note(text) {
+    this.trace.push(`${new Date().toISOString().slice(11, 23)} ${text.slice(0, 400)}`);
+    if (this.trace.length > 600) this.trace.shift();
+  }
+
+  /** Prints the tail of the page's trace: what tells a failed check from a slow machine. */
+  diagnostics(what, tail = 80) {
+    console.log(`  --- ${what}: the last ${Math.min(tail, this.trace.length)} of ${this.trace.length} page trace lines`);
+    for (const l of this.trace.slice(-tail)) console.log(`      ${l}`);
   }
 
   /** Errors the run has not allowed (see lib/allowedErrors.mjs). */

@@ -90,8 +90,8 @@ test('GRANT1 THE RELAY\'S SIGNATURE: every field signed in one fixed order behin
 
 test('GRANT1 THE MARKS: rolled from the seed alone - the same seed, the same marks; three draws a member, so a member\'s marks are its own whatever the count; an elite only for an owner of Renown 5 or more, its draw made either way; an elite never a champion; near the street\'s rates over many seeds (mutants: the Renown\'s gate dropped; a draw skipped for an elite; the champion\'s rate moved)', () => {
   assert.deepEqual(grantMarks(0xdeadbeef, 4, 7), grantMarks(0xdeadbeef, 4, 7));
-  assert.deepEqual(grantMarks(58, 4, 7), { e: 0b0010, c: [1, -1, -1, -1] }, 'seed 58: a Stalwart champion first, an elite second');
-  assert.deepEqual(grantMarks(58, 4, 4), { e: 0, c: [1, 3, -1, -1] }, 'the same seed below the Renown: the second its own champion draw\'s, a Vampiric one');
+  assert.deepEqual(grantMarks(434429, 4, 7), { e: 0b0010, c: [4, -1, -1, -1] }, 'seed 434429: a Thorned champion first, an elite second');
+  assert.deepEqual(grantMarks(434429, 4, 4), { e: 0, c: [4, 4, -1, -1] }, 'the same seed below the Renown: the second its own champion draw\'s, a Thorned one');
   let elites = 0, champs = 0, plain = 0, low = 0;
   for (let s = 0; s < 4000; s++) {
     const m8 = grantMarks(s, 8, 9), m3 = grantMarks(s, 3, 9);

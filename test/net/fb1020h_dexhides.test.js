@@ -117,7 +117,7 @@ const NOW = TODAY * DAY_MS + 3_600_000;
 
 test('DEX-HIDES: the mod\'s Wolf, Bat and Mudcrab stood by the street\'s pool and felled by the player\'s own blow are stamped at the kill and lie as bodies, each its hide and tier; the knife\'s plan names the foe and its rank; the Tracker marks a living Boar', async (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); _resetExtraQuestRows(); registerPlayerKillListener('dexhides', null); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });
+  installEnemyExpansion({ on: true, mudex: false, log: silent });
   const stamps = createBodyStamps({ nowMs: () => NOW });
   registerPlayerKillListener('dexhides', (e) => { stamps.stamp(e); });
   const street = pool();

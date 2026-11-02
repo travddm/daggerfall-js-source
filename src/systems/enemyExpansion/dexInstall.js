@@ -12,14 +12,14 @@
 //     reaches it (no table rolls it, no quest names it, no hook of the mod's runs), so the save loads and the world is
 //     DFU's.
 //   WHILE LOADED: the sixteen classic rows and the two classic classes edited (written into the table, and again at a
-//     foe's mint over Meaner Monsters' and the overhaul's - DFU's order: their Init, then this Start), and the quest
+//     foe's mint), and the quest
 //     foes added, its encounter tables picked (DEX3), its spells and spellbooks (DEX4a), its combat hooks and forced
 //     gender (DEX4b), the troll's corpse prefab and its save record (DEX5), its equipment delegate (DEX6).
 
+import { CLASSIC_STAT_PASS } from './classic-stat-pass.ts';
 import { DEX_TABLE_TEXT } from './dexTableText.js';
-import { MUDEX_TABLE_TEXT } from './mudexTableText.js';   // MUDEX1: Meaner Monsters' form beside this mod, read after it
+import { MUDEX_TABLE_TEXT } from './mudexTableText.js';   // the stat rows and tables read after this mod's own
 import { DEX_VENDOR, MUDEX_VENDOR, dexLoaded, mudexLoaded } from './dexSwitches.js';
-import { meanerMonstersEnabled } from '../../characters/meanerMonsters.js';
 import { classicCareers, readCareerTable, readEnemyTables, careerFromSpec, writeEnemyLine, readEncounterTables, addDefaultEncounterTables } from './dexTables.js';
 import { createDexEncounterSelector } from './dexEncounters.js';   // DEX3: the tables as the mod picks them
 import { ENCOUNTER_TABLES } from '../../characters/encounterTables.js';   // DEX3: DFU's own, the defaults' source
@@ -86,7 +86,7 @@ function readMod(mudex, log) {
   });
   // DEX3: the encounter tables (ParseEncounterTables, Start) and the first Update's defaults from DFU's own tables
   const encounters = addDefaultEncounterTables(readEncounterTables(dbAssets('.tdb.csv', mudex), log), (i) => ENCOUNTER_TABLES[i], log);
-  return { careers, ...enemies, encounters };
+  return { careers, ...enemies, encounters, mudex };
 }
 
 /** BestiaryMod.GetCustomProperties (:68-78): a classic id's properties (only while the mod is loaded - its edits are
@@ -115,6 +115,10 @@ function careerLoader(spec) {
   };
 }
 
+/** The row with this game's stat numbers for the monster written over the mods' (classic-stat-pass.ts); the pass is
+ *  numbers for the rows MUDEX leaves, so a read without MUDEX has none. */
+const withStatPass = (id, row) => (CLASSIC_STAT_PASS[id] ? { ...row, ...CLASSIC_STAT_PASS[id] } : row);
+
 /** A classic row as the mod's line leaves it, over `row` as it stands (a fresh copy; the line's cells re-read, so the
  *  writes that read the row - CastsMagic, RangedAttackAnimFrames - read THIS one). */
 function editedClassicRow(id, row, read) {
@@ -128,7 +132,7 @@ function editedClassicRow(id, row, read) {
     delete copy.id;
     out = copy;
   }
-  return out;
+  return read.mudex ? withStatPass(id, out) : out;
 }
 
 /** A classic row as the mod's lines leave it, whatever the switch - the read alone (the relay's bounds are held to it:
@@ -138,12 +142,12 @@ export const dexClassicRow = (id, row, { mudex = false } = {}) => editedClassicR
 
 let _installed = false;
 let _dropNameText = null;
-/** BestiaryMod.Start, once per page. `on` is the switch as this load reads it, `meaner` Meaner Monsters' (the test
- *  seams): both on, MUDEX loads beside the mod (MUDEX1). Answers what loaded. */
-export function installEnemyExpansion({ on = modSetting(DEX_VENDOR, 'Enabled') === true, meaner = meanerMonstersEnabled(), log = consoleLog } = {}) {
+/** BestiaryMod.Start, once per page. `on` is the switch as this load reads it (a test seam);
+ *  `mudex` false (a test seam) loads the mod without MUDEX. Answers what loaded. */
+export function installEnemyExpansion({ on = modSetting(DEX_VENDOR, 'Enabled') === true, mudex: withMudex = true, log = consoleLog } = {}) {
   if (_installed) return { loaded: dexLoaded(), mudex: mudexLoaded(), enemies: _read?.enemies.size ?? 0 };
   _installed = true;
-  const mudex = latchModLoaded(MUDEX_VENDOR, !!on && !!meaner);   // MUDEX1: loaded for the game with the mod it depends on
+  const mudex = latchModLoaded(MUDEX_VENDOR, !!on && withMudex);   // MUDEX loads with the mod it depends on; `mudex: false` is the test seam for the mod's own rows
   const read = dexRead({ log, mudex });
   _read = read;
   // ALWAYS: the fifty, their careers, their names (BestiaryTextProvider.GetCustomEnemyName answers the mod's own only)
@@ -168,11 +172,11 @@ export function installEnemyExpansion({ on = modSetting(DEX_VENDOR, 'Enabled') =
       const target = ENEMY_BASICS[id];
       _classicOriginals.set(id, structuredClone(target));
       for (const k of Object.keys(target)) delete target[k];
-      const row = { ...c.row };
+      const row = read.mudex ? withStatPass(id, { ...c.row }) : { ...c.row };
       delete row.id;
       Object.assign(target, row);
     }
-    // and at a foe's mint, over Meaner Monsters' and the overhaul's rows (their Init, then this Start)
+    // and at a foe's mint
     registerMintRowEditor((mobileType, row) => (read.classic.get(mobileType)?.row ? editedClassicRow(mobileType, row, read) : row));
     // EnemyEntity.OnLootSpawned's Transparent arm (:1394-1402): the ghost shader on a non-spectral enemy the mod marks
     registerFoeGhost((id) => dexProperties(id)?.isTransparent === true);
