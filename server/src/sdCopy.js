@@ -4,7 +4,7 @@
 // word, _instanceKinOf); the hub silent is busy. The hub keeps one life and one win an account a Hollow across copies:
 // a realm asks it before a newcomer and tells it each death, kept with the copy it was in - SD-BACK: that copy takes the
 // dead back, no other does. SD-SOLO: a shared Hour (`p<n>`) admits anyone to SD_PUB_SEATS; the Worker finds the open one.
-import { SD_KEY, sdReceiptKey, SOCIAL_ROOM, SD_TELL_RETRY_MS } from '../../src/net/wire.js';
+import { SD_KEY, sdReceiptKey, SOCIAL_ROOM, SD_TELL_RETRY_MS, tokenGate } from '../../src/net/wire.js';
 import { sdOwnerOfRoom, sdRoomKey, sdPubOwner, isSdPubOwner, SD_NO_FALLEN, SD_PUB_SEATS, SD_PUB_MAX } from '../../src/net/superDungeon/sdLaw.js';
 import { instanceOwnerOf } from '../../src/net/instanceRoom.js';
 import { ROOM_CALL_MS } from './relayScale.js';
@@ -103,12 +103,29 @@ export async function sdSeatsInternal(room, request) {
 export const SD_OPEN_PATH = '/sd/open';
 export const SD_INTERNAL_SEATS = '/internal/sd/seats';
 
+/** The walk is anonymous (the game asks it before any socket), so a client address gets this many walks a second, and a
+ *  burst of SD_OPEN_BURST: one walk is up to SD_PUB_MAX calls into room objects. A bucket per address, kept per isolate and
+ *  bounded; an address that is not stated shares one bucket (the Worker is behind Cloudflare, which always states it). */
+export const SD_OPEN_HZ = 1;
+export const SD_OPEN_BURST = 4;
+export const SD_OPEN_CLIENTS_MAX = 4096;
+const openBuckets = new Map();
+/** Whether the address `ip` may walk now; spends one of its tokens. @param {string} ip @param {number} now */
+export function sdOpenGate(ip, now) {
+  const gate = tokenGate(openBuckets.get(ip), now, SD_OPEN_HZ, SD_OPEN_BURST);
+  openBuckets.delete(ip);
+  if (openBuckets.size >= SD_OPEN_CLIENTS_MAX) openBuckets.delete(/** @type {string} */ (openBuckets.keys().next().value));
+  openBuckets.set(ip, gate.bucket);
+  return gate.pass;
+}
+
 /** SD-SOLO: THE WORKER'S WALK of a Hollow's shared Hours - the first that holds me, else the first open, as `{ n }`
  *  (`n` null: none answered, or all SD_PUB_MAX full). They open in order, so the one I am in comes first.
- *  @param {any} env @param {URL} url */
-export async function sdOpenDoor(env, url) {
+ *  @param {any} env @param {URL} url @param {string} [ip] the client's address, for sdOpenGate */
+export async function sdOpenDoor(env, url, ip = '') {
   const s = Number(url.searchParams.get('s')), o = String(url.searchParams.get('o') ?? '');
   const head = { 'content-type': 'application/json', 'access-control-allow-origin': '*' };
+  if (!sdOpenGate(ip, Date.now())) return new Response(JSON.stringify({ n: null }), { status: 429, headers: head });
   if (!sdRoomKey(s, o) || isSdPubOwner(o) || !env?.ROOMS?.idFromName) return new Response(JSON.stringify({ n: null }), { status: 400, headers: head });
   for (let n = 0; n < SD_PUB_MAX; n++) {
     const key = /** @type {string} */ (sdRoomKey(s, /** @type {string} */ (sdPubOwner(n))));

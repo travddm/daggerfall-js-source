@@ -359,6 +359,12 @@ export const ARENA_HIT = Object.freeze({ Melee: 0, Shaft: 1, Spell: 2 });
 export const ARENA_SPELLS_IN = 3;
 export const ARENA_SPELL_WINDOW_MS = 5000;
 export const ARENA_SPELL_MAX = 60;
+/** A damaging spell reaches as far as a shaft. */
+export const ARENA_SPELL_REACH = ARENA_BOW_REACH;
+/** The relay's own magicka for a fighter's casts: it knows no spell book, so each damaging cast costs the damage it
+ *  lands from a pool that refills at a fixed rate. The pool holds the spell window's full count of casts. */
+export const ARENA_MAGICKA_DEPTH = ARENA_SPELLS_IN * ARENA_SPELL_MAX;
+export const ARENA_MAGICKA_REGEN = 24;
 /** The fastest a fighter moves (Seats-Arc 6.1's starting ceiling) and the slack: a pose further than this from the last
  *  good one is not believed (the referee measures reach from the last good pose). */
 export const ARENA_SPEED_MAX = 12.5;
@@ -387,8 +393,27 @@ export function arenaBlowCap({ r, w = -1, m = 0, wa = null }) {
   if (r === ARENA_HIT.Spell) return ARENA_SPELL_MAX;
   const wmax = ARENA_WEAPON_MAX[/** @type {any} */ (w)];
   const mat = Number.isInteger(m) && m >= 0 && m < ARENA_MATERIAL_MOD.length ? ARENA_MATERIAL_MOD[m] : 0;
-  const reach = wmax != null ? (arenaArmsOk(wa) ? Math.min(wmax + mat, wa[0]) : wmax + mat) : ARENA_HAND_MAX;
+  const signed = arenaArmsOk(wa);
+  // A blow that names no weapon is never worth more than one that does: a fist is held to the best weapon's reach, or to
+  // a weaker signed pack's. Only a fist-only pack (wa [0, 0]) keeps the hand's own most.
+  const fist = signed && wa[0] === 0 ? ARENA_HAND_MAX : Math.min(ARENA_HAND_MAX, signed ? wa[0] : ARENA_ARMS_TOP_MAX);
+  const reach = wmax != null ? (signed ? Math.min(wmax + mat, wa[0]) : wmax + mat) : fist;
   return 2 * (reach + ARENA_MOD_MAX);
+}
+
+/** The look's two hand slots a weapon is wielded from (net/siege/siegeRef.js SIEGE_HAND_SLOTS, pinned equal). */
+export const ARENA_HAND_SLOTS = Object.freeze([19, 21]);
+/**
+ * THE WEAPON A FIGHTER HOLDS, off its look (net/wire.js validLook's items), for a blow that claims weapon `w` of material
+ * `m`: a claim of no weapon is refused (null) where a weapon is in a hand, and a claimed weapon must be one in a hand. A
+ * fighter with no look on record is taken at its word. Pure.
+ * @param {any} look
+ */
+export function arenaHeld(look, w = -1, m = 0) {
+  if (!look || !Array.isArray(look.items)) return { w, m };
+  const inHand = look.items.filter((i) => i?.group === 'Weapons' && ARENA_HAND_SLOTS.includes(i.equipSlot));
+  if (w === -1) return inHand.length ? null : { w: -1, m: 0 };
+  return inHand.some((i) => i.templateIndex === w && (i.material ?? 0) === m) ? { w, m } : null;
 }
 
 // ── THE FLOOR ─────────────────────────────────────────────────────────────────────────────────

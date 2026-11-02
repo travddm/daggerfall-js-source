@@ -24,12 +24,13 @@ import {
   newBout, boutTick, boutHit, boutMiss, boutFell, boutYield, boutPos, boutAtMarks, takeBoutEvents, boutLive, boutFighter, boutOver,
 } from '../../systems/arena/arenaBout.js';
 import {
-  ARENA_FLOOR_CENTRE, ARENA_RING_R, ARENA_PVP_MARKS, ARENA_HIT, ARENA_HIT_HZ_MAX, ARENA_BUCKET_RATE, ARENA_BUCKET_DEPTH, ARENA_MELEE_REACH,
-  ARENA_POSE_SLACK, ARENA_BOW_REACH, ARENA_SPELLS_IN, ARENA_SPELL_WINDOW_MS, ARENA_SPEED_MAX, ARENA_SPEED_SLACK, ARENA_JOIN_WAIT_MS,
-  ARENA_GONE_MS, arenaBlowCap, arenaArmsOk, pvpVitality, ladderVitality, arenaLadderBout, ARENA_SPECTATORS_MAX, ARENA_CHEER_MS, arenaFoeStats, bannerClaim, ARENA_EX_BANNERS,
+  ARENA_FLOOR_CENTRE, ARENA_RING_R, ARENA_PVP_MARKS, ARENA_BUCKET_RATE, ARENA_BUCKET_DEPTH,
+  ARENA_POSE_SLACK, ARENA_SPEED_MAX, ARENA_SPEED_SLACK, ARENA_JOIN_WAIT_MS,
+  ARENA_GONE_MS, arenaBlowCap, pvpVitality, ladderVitality, arenaLadderBout, ARENA_SPECTATORS_MAX, ARENA_CHEER_MS, arenaFoeStats, bannerClaim, ARENA_EX_BANNERS,
   ARENA_PRIVATE_VITALITY, ARENA_PRIVATE_MEMBERS_MAX, ARENA_PRIVATE_HIST_MAX, ARENA_PRIVATE_KICKED_MAX, ARENA_MEMBER_ID_RE,   // ARENA6: a private session
   ARENA_BLOW_TIER_LEVEL, ARENA_BLOW_CHANCE, ARENA_BLOW_COOLDOWN_MIN_MS, ARENA_BLOW_COOLDOWN_MAX_MS, LADDER_JUDGES_SHARE, ARENA_TICKET_RE,   // AUDIT ARENA-LADDER
 } from './arenaLaw.js';
+import { blowHeld, rateSpent, reachVerdict, magickaFor, magickaSpent } from './arenaBlowChecks.js';
 import { BLOW, blowShapesOf, inBlow } from '../../ai/blowShapes.js';   // AUDIT ARENA-LADDER: the foes' shapes - a leaf, the relay's to read
 
 /** A fighter of a bout between players stands on its mark once it says `in`; an AI fighter stands on its own. */
@@ -221,37 +222,26 @@ export function hpWord(st) {
  * believed) and what landed (`got`). INT7: `wa` the striker's signed arms (its socket's token - null: a token from before
  * them) - the weapon's maximum never past their reach (arenaBlowCap), and a shaft only where they hold a bow.
  */
-export function refBlow(st, id, { i: to, d, r, w = -1, m = 0, q = null }, now, wa = null) {
+export function refBlow(st, id, { i: to, d, r, w = -1, m = 0, q = null }, now, wa = null, look = null) {
   const out = { words: [], got: 0 };
-  if (!st.b || !boutLive(st.b) || id === to) return out;
+  if (!st.b || !boutLive(st.b) || id === to || !blowHeld(look, r, w, m)) return out;
   const a = hpOf(st, id), t = hpOf(st, to);
   if (!a || !t || a.out || t.out || a.side === t.side) return out;
   const M = st.ref[id];
-  // THE RATE: the blows of the last second, one blow by its sequence however many bodies it met
-  M.hits = M.hits.filter((x) => now - x < 1000);
-  const same = q != null && q === M.q && now - M.qAt < 250;
-  if (!same) {
-    if (M.hits.length >= ARENA_HIT_HZ_MAX) return out;
-    // THE SPELL'S COUNT - ARENA4b: a cast once, by its sequence, however many bodies its blast met
-    if (r === ARENA_HIT.Spell) {
-      M.spells = M.spells.filter((x) => now - x < ARENA_SPELL_WINDOW_MS);
-      if (M.spells.length >= ARENA_SPELLS_IN) return out;
-      M.spells.push(now);
-    }
-    M.hits.push(now); M.q = q ?? -1; M.qAt = now;
-  }
+  if (!rateSpent(M, r, q, now)) return out;   // THE RATE, AND THE SPELL'S COUNT - ARENA4b: a cast once, by its sequence, however many bodies its blast met
   // THE REACH, from the striker's own last good pose to where the struck stands
   const from = whereIs(st, id, now), at = whereIs(st, to, now);
   if (!from || !at) return out;
-  const gap = Math.hypot(from[0] - at[0], from[1] - at[1]);
-  if (r === ARENA_HIT.Melee && gap > ARENA_MELEE_REACH + ARENA_POSE_SLACK) { boutMiss(st.b, { from: id, now }); return { words: takeWords(st), got: 0 }; }
-  if (r === ARENA_HIT.Shaft && (gap > ARENA_BOW_REACH || (arenaArmsOk(wa) && wa[1] !== 1))) return out;   // INT7: a shaft a signed bow's
-  // THE CAP AND THE BUCKET
+  const reach = reachVerdict(r, Math.hypot(from[0] - at[0], from[1] - at[1]), wa);
+  if (reach === 'miss') { boutMiss(st.b, { from: id, now }); return { words: takeWords(st), got: 0 }; }
+  if (reach) return out;
+  // THE CAP, THE BUCKET AND, FOR A SPELL, THE MAGICKA
   M.bucket = Math.min(ARENA_BUCKET_DEPTH, M.bucket + (Math.max(0, now - M.bucketAt) / 1000) * ARENA_BUCKET_RATE);
   M.bucketAt = now;
   const want = Math.max(0, Number(d) || 0);
-  const got = Math.max(0, Math.floor(Math.min(want, arenaBlowCap({ r, w, m, wa }), M.bucket)));
+  const got = Math.max(0, Math.floor(Math.min(want, arenaBlowCap({ r, w, m, wa }), M.bucket, magickaFor(M, r, now))));
   M.bucket -= got;
+  magickaSpent(M, r, got, now);
   if (!(got > 0)) { boutMiss(st.b, { from: id, now }); return { words: takeWords(st), got: 0 }; }
   land(st, id, to, got, now, got >= t.maxHealth * 0.15);
   return { words: takeWords(st), got };

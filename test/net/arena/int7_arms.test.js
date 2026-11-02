@@ -11,7 +11,7 @@ import {
   armsTop, armsOf, armsOk, ARMS_TOP_MAX, siegeBlowMax, refereeBlow, newFighter, SIEGE_HIT, SIEGE_WEAPON_MAX,
   SIEGE_BONUS_MAX, SIEGE_CRIT_MAX, siegeRoomKey, SIEGE_UNITS_PER_M,
 } from '../../../src/net/siege/siegeRef.js';
-import { arenaBlowCap, arenaArmsOk, ARENA_ARMS_TOP_MAX, ARENA_HIT, ARENA_MOD_MAX, ARENA_TICK_MS, ARENA_FLOOR_CENTRE } from '../../../src/net/arena/arenaLaw.js';
+import { arenaBlowCap, arenaArmsOk, ARENA_ARMS_TOP_MAX, ARENA_HAND_MAX, ARENA_HIT, ARENA_MOD_MAX, ARENA_TICK_MS, ARENA_FLOOR_CENTRE } from '../../../src/net/arena/arenaLaw.js';
 import { TOKEN_ARMS_TOP_MAX, armsIssuable, claimsValid, verifyToken } from '../../../src/net/identityToken.js';
 import { openBout, joinBout, stepBout, poseOf, refBlow } from '../../../src/net/arena/arenaBrain.js';
 import { boutLive } from '../../../src/systems/arena/arenaBout.js';
@@ -58,7 +58,10 @@ test('INT7 THE CLIPS: a siege\'s blow and an arena\'s never past the striker\'s 
   assert.equal(siegeBlowMax(-1, 0, [0, 0]), siegeBlowMax(-1, 0), 'a fist is every character\'s');
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9, wa: [16, 0] }), 2 * (16 + ARENA_MOD_MAX));
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 }), 2 * (27 + ARENA_MOD_MAX), 'no claim: as before');
-  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1, wa: [0, 0] }), arenaBlowCap({ r: ARENA_HIT.Melee, w: -1 }), 'a fist');
+  // PIN MOVED (kept-PvP security): leaving the weapon out no longer buys more than the best weapon (94): a fist is held to the pack's reach, and only a fist-only pack keeps the hand's own most
+  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1, wa: [0, 0] }), 2 * (ARENA_HAND_MAX + ARENA_MOD_MAX), 'a fist-only pack');
+  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1 }), 2 * (27 + ARENA_MOD_MAX), "no weapon named, no claim: the best weapon's");
+  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1, wa: [16, 0] }), 2 * (16 + ARENA_MOD_MAX), "no weapon named from a Longsword's pack");
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Spell, wa: [0, 0] }), arenaBlowCap({ r: ARENA_HIT.Spell }), 'a spell is no weapon\'s');
   // the siege's referee: the shaft a bow's - a signed one
   const M = SIEGE_UNITS_PER_M;

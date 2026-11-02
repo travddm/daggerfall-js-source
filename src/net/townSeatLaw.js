@@ -1252,25 +1252,7 @@ export const SIGN_WHY = Object.freeze({
 // ─── SEAT2a (part three): THE PASS, THE FIELD, THE RESULT AND HONOURS (SEAT0 6.2, 6.5-6.8) ───
 // The relay fights the battle (net/siege/siegeRef.js); the service signs who may enter it and settles what it gave.
 
-/** The field a client derives from the town, settled for a battle (DECIDED, part three): the first one an attacker and a
- *  defender submitted alike (two sides whose interests differ agreeing on it), else - once the battle is joined, a side
- *  absent - the one most submitted, the earliest first. `rows` `[{ side, field, at }]` (`field` its JSON), oldest
- *  first. Null while nothing settles it. SEAT2b part two (c): a revolt (`kind`) has the holder's side alone - its first
- *  defender's field settles it (DECIDED: no other side's interest to weigh it against; the rising is the relay's). */
-export function settleField(rows, joined, kind = 'siege') {
-  const seen = new Map();
-  for (const r of rows ?? []) {
-    const k = String(r.field);
-    let v = seen.get(k);
-    if (!v) seen.set(k, v = { field: k, attack: false, defend: false, n: 0, at: r.at });
-    if (r.side === 'attack') v.attack = true; else if (r.side === 'defend') v.defend = true;
-    v.n++;
-    if (v.attack && v.defend) return k;
-    if (kind === 'revolt' && v.defend) return k;   // SEAT2b part two (c): a revolt has one side - its first defender's
-  }
-  if (!joined || !seen.size) return null;
-  return [...seen.values()].sort((a, b) => b.n - a.n || a.at - b.at)[0].field;
-}
+export { settleField, witnessedField, fieldInPixel, SIEGE_FIELD_MARGIN } from './siegeFieldLaw.js';   // the battlefield a pass carries: how its field is settled and bounded
 /** The room's window on a pass (`se`): the battle's block - two hours, a crown siege's one (battleSpanMs). */
 export const passWindowEnds = (b) => b.starts_at + battleSpanMs({ kind: b.kind, tier: b.tier }) / 1000;
 /** The pass's door opens as the rosters close (SIGN_CLOSES_MS before the start - net/siege/siegeRef.js SIEGE_OPENS_MS). */
