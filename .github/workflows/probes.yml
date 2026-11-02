@@ -40,7 +40,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: probes-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: probes-${{ github.event_name }}-${{ inputs.probe }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
