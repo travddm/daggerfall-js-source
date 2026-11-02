@@ -95,21 +95,21 @@ test('SD4a the list: a Super dungeon\'s layout rolled at the band, three at ever
 
 test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health x9, its damage x4.5 - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
   // The dungeon stacks are their own numbers: they stay put when the open world's elite multiples (ELITE_FOE_HEALTH_MULT) move.
-  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [9, 4.5]);
-  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [7, 4], 'the Elite\'s own');
+  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [9, 3]);   // PIN MOVED: B6 (the blows 4.5 -> 3)
+  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [7, 2.6], 'the Elite\'s own');
   assert.ok(ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT > SUPER_HEALTH_SCALE && ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT > ELITE_HEALTH_SCALE, 'each above the dungeon\'s own doubling');
   const s = foe();
   assert.ok(promoteEliteFoe(s, { eliteDungeon: true, superDungeon: true, checkLevel: false }));
-  assert.deepEqual([s.maxHealth, s.damageScale], [540, 4.5]);
+  assert.deepEqual([s.maxHealth, s.damageScale], [540, 3]);   // PIN MOVED: B6 (4.5 -> 3)
   const el = foe();
   promoteEliteFoe(el, { eliteDungeon: true, checkLevel: false });
-  assert.deepEqual([el.maxHealth, el.damageScale], [420, 4]);
+  assert.deepEqual([el.maxHealth, el.damageScale], [420, 2.6]);   // PIN MOVED: B6 (4 -> 2.6)
   const plain = foe();
   promoteEliteFoe(plain);
   assert.deepEqual([plain.maxHealth, plain.damageScale], [60 * ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT]);
   const pup = foe({ damageScale: 1 });
   promoteEliteFoe(pup, { own: false, superDungeon: true });
-  assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 4.5], 'a puppet: its owner\'s maximum, the Super\'s blows');
+  assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 3], 'a puppet: its owner\'s maximum, the Super\'s blows');
 });
 
 test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the Elite mark, its elite x9 / x4.5, its body +50% - an Elite record and a plain one as they were (mutants: the Super\'s scale lost; the Elite\'s doubling in a Super; the loot the Elite\'s)', () => {
@@ -119,7 +119,7 @@ test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the El
   assert.deepEqual([sup.maxHealth, sup.damageScale, sup.elite, sup.healthMult], [240, 2.5, true, 4]);
   const supElite = foe();
   applyEliteScaling(supElite, { elite: true, superTier: true, eliteFoe: true });
-  assert.deepEqual([supElite.maxHealth, supElite.damageScale, supElite.eliteFoe, supElite.elite], [540, 4.5, true, true]);
+  assert.deepEqual([supElite.maxHealth, supElite.damageScale, supElite.eliteFoe, supElite.elite], [540, 3, true, true]);
   const refused = foe({ team: 'PlayerAlly' });
   applyEliteScaling(refused, { elite: true, superTier: true, eliteFoe: true });
   assert.deepEqual([refused.maxHealth, refused.damageScale, !!refused.eliteFoe], [240, 2.5, false], 'a refused promotion falls through to the Super\'s scale');

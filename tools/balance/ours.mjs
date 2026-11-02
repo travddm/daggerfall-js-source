@@ -15,6 +15,8 @@ import { heroThreat } from '../../src/systems/heroThreat.js';
 import { dexClassicRow } from '../../src/systems/enemyExpansion/dexInstall.js';
 import { AFFIX_RANGES } from '../../src/systems/loot/lootRarity.js';
 import { promoteEliteFoe } from '../../src/systems/eliteFoes.js';
+import { scalePromoted } from '../../src/systems/foe-promotion.ts';
+import { CONTENT_TIERS } from './tiers.mjs';
 import { getMeleeWeaponAnimTime, getBowCooldownTime, CLASSIC_UPDATE_INTERVAL, registerMeleeWeaponAnimTime } from '../../src/characters/weaponStates.js';
 import { rriAnimTimeOverride } from '../../src/systems/roleplayRealismItems/rriKits.js';
 import { WEAPON_TYPES } from '../../src/combat/fpsWeapon.js';
@@ -175,7 +177,8 @@ export function oursFoe(id, character, layers, { career = DEFAULT_CAREER, kind =
   const foe = makeEnemyEntity(id, row, career, playerLevel, () => 0.5);
   foe.maxHealth = (foe.basics.minHealth + foe.basics.maxHealth) / 2;
   foe.health = foe.maxHealth;
-  if (kind !== 'plain') promoteEliteFoe(foe, { eliteDungeon: kind === 'boss' });
+  if (kind in CONTENT_TIERS) scalePromoted(foe, CONTENT_TIERS[kind]);
+  else if (kind !== 'plain') promoteEliteFoe(foe, { eliteDungeon: kind === 'boss' });
   // a promoted foe takes no hero's threat (systems/heroThreat.js)
   if (kind === 'plain' && layers.has('hero')) applyHeroThreat(foe, heroThreat(playerLevel));
   return foe;
@@ -215,12 +218,14 @@ function blows(attacker, target, options, swings, seed, afterBlow = (damage) => 
   const dfRand = dfRandFrom(rolls);
   let total = 0;
   let hits = 0;
+  let most = 0;
   for (let i = 0; i < swings; i++) {
     const damage = afterBlow(calculateAttackDamage(attacker, target, { ...options, rolls, dfRand }));
     total += damage;
+    if (damage > most) most = damage;
     if (damage > 0) hits++;
   }
-  return { perBlow: total / swings, hitRate: hits / swings };
+  return { perBlow: total / swings, hitRate: hits / swings, most };
 }
 
 /** One fight cell: what the character deals and takes against a foe. */
@@ -233,6 +238,6 @@ export function oursFight(character, foe, layers, { swings = MC_DEFAULT_SWINGS, 
   return {
     hitChance: dealt.hitRate, perSwing: dealt.perBlow, swingSeconds: oursSwingSeconds(character, layers),
     foeHealth: foe.maxHealth, foeLevel: foe.level,
-    perAttack: taken.perBlow, foeHitRate: taken.hitRate,
+    perAttack: taken.perBlow, foeHitRate: taken.hitRate, perAttackMost: taken.most,
   };
 }
