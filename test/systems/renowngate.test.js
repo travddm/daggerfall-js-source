@@ -23,6 +23,7 @@ const N = await import('../../src/systems/revenant/revenant.js');
 const { ambitionOf, AMBITION } = await import('../../src/systems/revenant/revenantUnquiet.js');   // UNQUIET: the return's share by its ambition
 const P = await import('../../src/ui/revenant/revenantPage.js');
 const E = await import('../../src/systems/eliteFoes.js');
+const CH = await import('../../src/systems/champions.js');
 const { rollSearchElite } = await import('../../src/systems/searchables.js');
 const { setSigilOnline, setSigilRenown, renownOpens, _resetSigilForTests } = await import('../../src/systems/sigil/sigil.js');
 const { setPref, _resetForTests } = await import('../../src/systems/uiPrefs.js');
@@ -57,7 +58,7 @@ beforeEach(() => {
 test('RENOWN-GATE THE NUMBERS: elites at Renown 5, revenants at 10, a due revenant on two encounter rolls in five (mutants: any number moved)', () => {
   assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 10, 0.4]);
   assert.ok(N.REVENANT_MIN_RENOWN >= E.ELITE_FOE_MIN_RENOWN, 'a returning elite always finds elites standing');
-  assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.05, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
+  assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
 });
 
 test('RENOWN-GATE THE DOOR: offline always open; online open from the Renown on, never before the page knows it - injected and through the page\'s own door (mutants: offline shut; unknown open; the Renown itself shut)', () => {
@@ -79,22 +80,22 @@ test('RENOWN-GATE THE DOOR: offline always open; online open from the Renown on,
   offline(); assert.deepEqual(both(), [true, false], 'offline again: the door forgets the Renown, and nothing is held');
 });
 
-test('RENOWN-GATE THE OPEN WORLD\'S ROLL: one in twenty from Renown 5 online, as ever offline - the roll drawn either way (mutants: the gate dropped; the gate before the draw; the revenants\' Renown read)', () => {
-  let draws = 0;
-  const at = (v) => () => { draws++; return v; };
-  assert.equal(E.rollOverworldElite(at(0)), true, 'offline');
+test('RENOWN-GATE THE OPEN WORLD\'S ROLL: the street roll is the same dice at every Renown - the gate is asked after it, from Renown 5 online and always offline (mutants: the gate before the draw; the revenants\' Renown read)', () => {
+  const spot = eliteSpot(24);
+  const tiers = [];
+  const ask = () => { CH._resetStreetChampionsForTests(); tiers.push(CH.rollStreetPromotion(spot, 24)?.tier ?? null); return E.eliteRenownOpen(); };
+  assert.equal(ask(), true, 'offline');
   online(4);
-  assert.equal(E.rollOverworldElite(at(0)), false, 'online under Renown 5: none');
+  assert.equal(ask(), false, 'online under Renown 5: none');
   online(null);
-  assert.equal(E.rollOverworldElite(at(0)), false, 'online, not known yet: none');
+  assert.equal(ask(), false, 'online, not known yet: none');
   online(5);
-  assert.equal(E.rollOverworldElite(at(0.0499)), true, 'Renown 5: the one in twenty');
-  assert.equal(E.rollOverworldElite(at(0.05)), false, 'strict');
-  assert.equal(draws, 5, 'every ask draws once, held or not - the same dice either way');
+  assert.equal(ask(), true, 'Renown 5');
+  assert.deepEqual(tiers, ['elite', 'elite', 'elite', 'elite'], 'the roll lands the same whether or not the gate is open');
 });
 
 // the open world's pool on a crafted MONSTER.BSA (test/systems/bal_arc.test.js's rig): an Orc Warlord (base level 16 - past
-// ELITE-FLOOR) built in the wilds, `inLocation` false, with Math.random low enough for the one in twenty
+// ELITE-FLOOR) built in the wilds, `inLocation` false, on a spot whose street roll lands elite
 function craftCfg() {
   const b = new Uint8Array(74); const v = new DataView(b.buffer);
   b[10] = 0x08; v.setUint16(52, 4, true);
@@ -124,7 +125,17 @@ const wildsPool = () => createExteriorFoes({
   inLocation: () => false,
 });
 const withRandom = async (v, fn) => { const old = Math.random; Math.random = () => v; try { return await fn(); } finally { Math.random = old; } };
-const stand = (opts = {}) => withRandom(0.01, () => wildsPool().spawnFoe(24, [10, 0, 10], { feetGiven: true, champion: null, ...opts }));
+/** A spot whose street roll (a hash of the spot, the kind and the pool's count) lands an elite at the pool's first stand. */
+function eliteSpot(mobileType) {
+  setPref('lootRarity', true);
+  for (let i = 0; i < 20000; i++) {
+    const feet = [10 + i * 0.5, 0, 10];
+    CH._resetStreetChampionsForTests();
+    if (CH.rollStreetPromotion(feet, mobileType)?.tier === 'elite') { CH._resetStreetChampionsForTests(); return feet; }
+  }
+  throw new Error('no elite spot');
+}
+const stand = (opts = {}) => withRandom(0.01, () => wildsPool().spawnFoe(24, eliteSpot(24), { feetGiven: true, champion: null, ...opts }));
 
 test('RENOWN-GATE THE OPEN WORLD BY EXECUTION: the real spawn pool stands an elite offline and from Renown 5 online, a plain foe under it and before the Renown is known; a saved foe\'s word stands whatever the Renown (mutants: the gate dropped; a saved elite re-rolled)', async () => {
   const off = await stand();
@@ -133,11 +144,11 @@ test('RENOWN-GATE THE OPEN WORLD BY EXECUTION: the real spawn pool stands an eli
   const under = await stand();
   assert.ok(under?.entity, 'the foe stands');
   assert.equal(!!under.entity.eliteFoe, false, 'online under Renown 5: plain');
-  // the wilds' place scales both after the promotion and rounds, so the health is read off what was stood on the kind's
-  // own (TELL1's healthMult - the place never writes it) and the blows off the ratio
-  assert.equal(off.entity.healthMult ?? 1, E.ELITE_FOE_HEALTH_MULT * (under.entity.healthMult ?? 1), 'the five times not stood');
+  // the health is read off what was stood on the kind's own (TELL1's healthMult) and the blows off the ratio, so the
+  // hero's threat on the plain foe cancels out
+  assert.equal(off.entity.healthMult ?? 1, E.ELITE_FOE_HEALTH_MULT * (under.entity.healthMult ?? 1), 'the elite\'s health multiple not stood');
   const blows = (f) => (Number.isFinite(f.entity.damageScale) ? f.entity.damageScale : 1);
-  assert.ok(Math.abs(blows(off) / blows(under) - E.ELITE_FOE_DAMAGE_MULT) < 1e-9, 'nor the three times');
+  assert.ok(Math.abs(blows(off) / blows(under) - E.ELITE_FOE_DAMAGE_MULT) < 1e-9, 'nor its damage multiple');
   online(null);
   assert.equal(!!(await stand()).entity.eliteFoe, false, 'online, the Renown not known yet: plain');
   online(5);

@@ -206,8 +206,7 @@ export function onlineForcedPref(key, search) {
  *     without recomputing (dungeonContext applyHit: "The number is a
  *     peer's word and the host trusts it"), so PCAAO's formulas were
  *     never shared - each machine already rolls its own;
- *   - a foe's stats are minted where it SPAWNS (meanerMonsters edits
- *     makeEnemyEntity) and a peer sees a puppet the owner steps, so a
+ *   - a foe's stats are minted where it SPAWNS (makeEnemyEntity) and a peer sees a puppet the owner steps, so a
  *     joiner already fights the host's foes under the host's numbers,
  *     whatever the joiner's shelf says;
  *   - a corpse's loot is rolled and granted by the owner's word
@@ -269,9 +268,9 @@ export function onlineForcedPref(key, search) {
  *
  *   THE HOST OWNS THE DUNGEON'S FOES. A world room's layout foes are
  *   streamed by its host and stood as puppets by everyone else
- *   (WORLD2), so the host's Meaner Monsters and PCAAO are not "the
- *   host's own game" - they are what the whole party fights. A host
- *   with either off runs a softer dungeon for four other people who
+ *   (WORLD2), so the host's PCAAO is not "the
+ *   host's own game" - it is what the whole party fights. A host
+ *   with it off runs a softer dungeon for four other people who
  *   never chose that, and none of them can see why.
  *
  *   ITEMS CHANGE HANDS. A corpse's pile is granted to peers
@@ -385,7 +384,6 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
   // darkness - are each player's own.
   'ocean-holes': Object.freeze({ Enabled: true, 'General.PitSpawnRate': 0.5, 'General.SeafloorHoleSize': 0.5 }),
   // MODS-ONLINE-4: the host's foes are the party's foes.
-  meanerMonsters: Object.freeze({ Enabled: true }),
   pcaao: Object.freeze({ Enabled: true }),
   // DEX0: the same reading for Daggerfall Enemy Expansion - which enemy stands is the table's at its spawn, and a peer
   // fights the owner's foes; a player with it off would face Goblins and Trolls they could not see standing in a room.
@@ -488,7 +486,6 @@ export const ONLINE_PLAYERS_OWN_MODS = [
  * are forced off whatever they ship as).
  */
 export const ONLINE_WHOLE_MODS = Object.freeze({
-  meanerMonsters: Object.freeze([]),
   pcaao: Object.freeze([]),
   'daggerfall-enemy-expansion': Object.freeze([]),   // DEX0: the troll's getting back up is the room's too - online it does, the mod's shipped way
   unleveledLoot: Object.freeze([]),

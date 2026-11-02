@@ -84,7 +84,7 @@ const memberSrc = (name, mark = '') => {
 };
 const scoped = (state) => new Proxy(state, {
   has: (t, k) => k !== '__s',
-  get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : k === 'effectiveLevel' ? effectiveLevel : k === 'applyProgressionScalingTo' ? () => {} : globalThis[k])),   // SOFTCAP2: the host's own import
+  get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : k === 'effectiveLevel' ? effectiveLevel : k === 'applyHeroThreatTo' ? () => {} : globalThis[k])),   // SOFTCAP2: the host's own import
   set: (t, k, v) => { t[k] = v; return true; },
 });
 /** Run `body` (source text ending in a `return {...}`) with `state` as its free variables. */

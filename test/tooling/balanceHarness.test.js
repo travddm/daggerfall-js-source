@@ -148,9 +148,10 @@ test('ours: the same seed gives the same number, and the overhaul moves a level-
   near(stock.hitChance, 0.27, 0.03, 'stock hit chance');
   near(overhaul.hitChance, 0.46, 0.03, 'overhaul hit chance');
   assert.ok(overhaul.perSwing > stock.perSwing * 1.3, 'the overhaul lands more damage a swing');
-  const meaner = cell(['pcaao', 'meaner']);
-  assert.ok(meaner.foeHealth > overhaul.foeHealth, 'Meaner Monsters raises the Warlord');
-  assert.equal(meaner.foeLevel, 19, 'Meaner Monsters raises the Warlord to level 19');
+  const stats = cell(['pcaao', 'stats']);
+  assert.ok(stats.foeHealth > overhaul.foeHealth, 'the stat pass raises the Warlord');
+  assert.ok(stats.foeHealth <= overhaul.foeHealth * 1.3 + 1, 'and no more than 30%');
+  assert.equal(stats.foeLevel, 19, 'the stat pass raises the Warlord to level 19');
 });
 
 test('report: layers, the target line, the table and the ablation', () => {

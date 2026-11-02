@@ -11,7 +11,7 @@ const SCRIPT = join(ROOT, 'tools', 'fetch-vendor.sh');
 
 const run = (...args) => spawnSync('sh', [SCRIPT, ...args], { cwd: ROOT, encoding: 'utf8' });
 
-const FOLDERS = ['better-ambience', 'immersive-footsteps', 'meanerMonsters', 'unleveledLoot'];
+const FOLDERS = ['better-ambience', 'immersive-footsteps', 'unleveledLoot'];
 
 test('fetch-vendor --list prints each folder with its repository and a full commit hash', () => {
   const result = run('--list');

@@ -26,7 +26,7 @@ test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%)
 });
 
 test('budget: a level-45 character with every stacking source at its cap stays inside the power budget', () => {
-  const layers = parseLayers('+ceiling,-hero,-meaner,-scaling');
+  const layers = parseLayers('+ceiling,-hero,-stats');
   const rows = averageRows(buildReport({ levels: [45], layers, swings: SWINGS }));
   assert.equal(rows.length, Object.keys(MAXED_POWER_MOST).length);
   for (const row of rows) {
@@ -37,16 +37,16 @@ test('budget: a level-45 character with every stacking source at its cap stays i
   }
 });
 
-test("budget: inside DFU's level range the default character is where it was before B1 (within 0.05 of power)", () => {
-  const BEFORE_B1 = { warrior: 0.851, mage: 0.841, archer: 1.512 };
+test("budget: inside DFU's level range the default character, against DFU's own foe, is where B1 left it (within 0.05 of power)", () => {
+  const BEFORE_B1 = { warrior: 0.797, mage: 1.12, archer: 1.394 };
   const rows = averageRows(
-    buildReport({ builds: Object.keys(BEFORE_B1), levels: [30], swings: SWINGS, layers: parseLayers('default') }),
+    buildReport({ builds: Object.keys(BEFORE_B1), levels: [30], swings: SWINGS, layers: parseLayers('default,-hero,-stats') }),
   );
   assert.equal(rows.length, 3);
   for (const row of rows) {
     assert.ok(
       Math.abs(row.ratios.power - BEFORE_B1[row.build]) <= 0.05,
-      `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${BEFORE_B1[row.build]} before B1`,
+      `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${BEFORE_B1[row.build]} at B1`,
     );
   }
 });

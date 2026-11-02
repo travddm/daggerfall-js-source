@@ -35,7 +35,7 @@ pngjs. The client has no runtime npm dependencies. `server/` and `app/` each hav
 
 ## Fetch the vendored mods' files
 
-Four vendored mods (`better-ambience`, `immersive-footsteps`, `meanerMonsters`, `unleveledLoot`) are fetched from
+Three vendored mods (`better-ambience`, `immersive-footsteps`, `unleveledLoot`) are fetched from
 their authors' GitHub repositories at pinned commits instead of being committed. Fetch them once:
 
 ```sh

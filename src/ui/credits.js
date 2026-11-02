@@ -101,16 +101,6 @@ export const CREDITS = Object.freeze({
   ]),
   mods: Object.freeze([
     Object.freeze({
-      title: 'Meaner Monsters',
-      version: '1.5.2',
-      author: 'Ralzar',
-      get what() { return t('credits.meanerMonsters.what', 'Twenty monsters made tougher, with new damage, health, level and armor. Rats, bats and zombies are gentler. Werewolves and wereboars are a fifth larger, and the dragonling is two and a half times its size. Based on version 1.5.2. With the combat overhaul on, Kirk.O\u2019s version of these numbers is used instead.'); },
-      get terms() { return t('credits.meanerMonsters.terms', 'Used with permission under its MIT License (Copyright (C) 2020 Ralzar; Author: Hazelnut & Ralzar).'); },
-      get contact() { return t('credits.contact.manifest', '{contact}', { contact: 'forums.dfworkshop.com' }); },
-      vendor: Object.freeze(['meanerMonsters']),
-      link: 'https://github.com/Ralzar81/Meaner-Monsters',
-    }),
-    Object.freeze({
       title: 'Unleveled Loot',
       version: '1.1.2',
       author: 'Ralzar',

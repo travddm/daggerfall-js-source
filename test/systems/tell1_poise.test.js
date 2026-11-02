@@ -93,7 +93,7 @@ test('TELL1: poise - the kind\'s own health by its weight, by what it is (an eli
 test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite, an Elite Dungeon\'s elite, a champion, a revenant, the dungeon\'s doubling, a rite\'s summoner, a sworn one (mutants: a site that forgets it)', async () => {
   const e = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   assert.equal(promoteEliteFoe(e, { checkLevel: false }), true);
-  assert.equal(e.healthMult, 5); assert.equal(kindHealth(e), 40);
+  assert.equal(e.healthMult, 2); assert.equal(kindHealth(e), 40);
   const ed = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   promoteEliteFoe(ed, { checkLevel: false, eliteDungeon: true });
   assert.equal(ed.healthMult, 7);
@@ -101,9 +101,9 @@ test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite
   promoteEliteFoe(puppet, { own: false });
   assert.equal(puppet.healthMult, undefined, 'a puppet\'s maximum is its owner\'s word - nothing stood here');
   setPref('lootRarity', true);
-  const c = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
+  const c = { maxHealth: 50, health: 50, level: 12, mobileType: M.Orc };   // 50 stands the Stalwart's 1.68 on a whole number, so the kind's own health reads back exact
   assert.equal(applyChampion(c, 1), true, 'Stalwart');
-  assert.equal(c.healthMult, 3); assert.equal(kindHealth(c), 40);
+  assert.equal(c.healthMult, 1.4 * 1.2); assert.equal(kindHealth(c), 50);
   setPref('lootRarity', false);
   const rv = await import('../../src/systems/revenant/revenant.js');
   const r = { id: 'x', name: 'Grushnak the Butcher', rank: 2, returns: 0, history: [] };

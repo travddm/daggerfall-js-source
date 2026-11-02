@@ -39,7 +39,6 @@
 //   their motion tallies count the ground actually covered instead
 //   (movementTallyWeight, below).
 
-import { masterSkillsActive, masterCappedSkill } from './masterSkills.js';   // SOFTCAP3: a leaf
 
 export const SKILL_SOFT_CAP = 100;
 export const SKILL_HARD_CAP = 200;
@@ -133,7 +132,7 @@ export const SPAM_FREE_BURST = Object.freeze({ combat: 40, magic: 10, utility: 6
 
 /** A foe's tier on the skill scale - SetEnemyCareer's 5L+30, unclamped. */
 export function challengeTier(foe) {
-  const lv = Number(foe?.challengeLevel ?? foe?.level);   // SOFTCAP2: a scaled foe teaches at its challenge level
+  const lv = Number(foe?.level);
   return Number.isFinite(lv) && lv > 0 ? lv * 5 + 30 : 0;
 }
 
@@ -242,191 +241,9 @@ export function movementTallyWeight(entity, skillId, amount, skill) {
   return w;
 }
 
-// ---- tougher enemies (SOFTCAP2) -----------------------------------------
-//
-// WHEN IT STARTS. The moment ANY combat or magic skill passes 100 - it is
-// not a switch at some threshold, it grows with you point by point. What
-// is measured is your COMBAT EDGE: the mean of your three best combat or
-// magic skills' EFFECTIVE gain over 100 (0..40), real values only (no
-// potions, no worn Fortify, and 0 while mentoring). Three, because a fight
-// is fought with a weapon, a defence and a school or a crit - one lone
-// 200 in Archery is an edge of 13, three of them an edge of 40.
-//
-// WHERE. Only in dungeons, and only as much as the DUNGEON KIND says - a
-// designed table (Mac, 2026-09-29), one share per kind of the nineteen
-// (formats/mapsFile.js DUNGEON_TYPES), DUNGEON_SHARE below:
-//   Mine, Natural Cave                                           11%
-//   Human Stronghold, Ruined Castle, Spider Nest, Cemetery       22%
-//   Harpy Nest, Prison, Scorpion Nest                            44%
-//   Crypt, Orc Stronghold, Giant Stronghold                      88%
-//   Laboratory, Barbarian Stronghold, Coven, Vampire Haunt,
-//   Desecrated Temple, Dragon's Den, Volcanic Caves             100%
-// A dungeon of no known kind (NoDungeon, a bad index) scales nothing.
-// SOFTCAP5: the WILDERNESS scales the same way - 22% by day, 44% at night
-// (WILDERNESS_SHARE); towns, cities and other locations' grounds never.
-// And only as much as the FOE is a real one: a monster's own base level
-// decides (a rat in a vampire haunt stays a rat); a class enemy (bandit,
-// knight, sorcerer) is built at your level already and counts in full -
-// but in a low-tier dungeon the dungeon's 0 keeps it as it was.
-//     foeShare = class ? 1 : clamp((baseLevel - 4) / 8, 0, 1)
-//
-// HOW MUCH - TWO LAYERS. Both need Master
-// Skills in force (always online; offline the player's switch) and neither
-// runs while mentoring. Every number lives in ENEMY_SCALING below.
-// BAL3 (the place's threat, below progressionScaling's header): the VETERAN
-// row also stands by the PLACE alone - without Master Skills, while
-// mentoring, offline, in a dungeon by its ladder tier and in the wilds -
-// and these player-read layers sit beside it, the more of the two.
-//
-//  1. VETERAN - the answer to Daggerfall's own endgame, where a foe's skills
-//     stop at 100 by level 14 and a monster's health never grows. It ramps in
-//     as your three best combat/magic skills climb from 75 and is whole at
-//     100: `veteran` 0..1, the mean of clamp((min(skill, 100) - 75) / 25).
-//  2. OVERCAP - the climb past 100: your combat edge (0..40, see above); the
-//     foe's skills recover 65% of it, and its health and damage grow on.
-//
-// At full share (a full-tier foe in a 100% dungeon):
-//   your best skills   foe hit/dodge   foe health   foe damage
-//        80               +2              x1.2         x1.05
-//        90               +6              x1.6         x1.15
-//       100              +10              x2.0         x1.25
-//       150              +21              x2.6         x1.40
-//       200              +36              x3.4         x1.60
-// Every bonus is multiplied by dungeonShare * foeShare - a mine's 11% makes
-// the 200 row x1.26 health, a crypt's 88% x3.1. The foe's real level is left
-// alone (its spells, loot and gear are not scaled a second time); what it
-// TEACHES rises with its skills (challengeLevel = level + skill bonus / 2).
-
-/** The skills a fight is fought with: the combat set and the six schools. */
-export const EDGE_SKILL_IDS = Object.freeze([...COMBAT_SKILL_IDS, ...MAGIC_SKILL_IDS]);
-export const EDGE_TOP_N = 3;
-/** The share of the player's edge a fully scaled foe wins back. */
-/** THE TUNING TABLE - every enemy-strength number in one place. Bonuses are at full share: `veteran` at veteran 1
- *  (best skills at 100), `overcap` added on top at edge 40 (best skills at 200), linear between. `skill` is effective
- *  skill points; `health` / `damage` are added to a x1 multiplier. */
-export const ENEMY_SCALING = Object.freeze({
-  veteranFrom: 75,
-  veteran: Object.freeze({ skill: 10, health: 1.0, damage: 0.25 }),
-  overcap: Object.freeze({ skill: 26, health: 1.4, damage: 0.35 }),
-});
-/** The share of the scaling each dungeon kind carries, by DFRegion.DungeonTypes index (formats/mapsFile.js). */
-export const DUNGEON_SHARE = Object.freeze([
-  0.88,   //  0 Crypt
-  0.88,   //  1 Orc Stronghold
-  0.22,   //  2 Human Stronghold
-  0.44,   //  3 Prison
-  1.00,   //  4 Desecrated Temple
-  0.11,   //  5 Mine
-  0.11,   //  6 Natural Cave
-  1.00,   //  7 Coven
-  1.00,   //  8 Vampire Haunt
-  1.00,   //  9 Laboratory
-  0.44,   // 10 Harpy Nest
-  0.22,   // 11 Ruined Castle
-  0.22,   // 12 Spider Nest
-  0.88,   // 13 Giant Stronghold
-  1.00,   // 14 Dragon's Den
-  1.00,   // 15 Barbarian Stronghold
-  1.00,   // 16 Volcanic Caves
-  0.44,   // 17 Scorpion Nest
-  0.22,   // 18 Cemetery
-]);
-export const FOE_SHARE_FLOOR = 4;
-export const FOE_SHARE_SPAN = 8;
-export const CHALLENGE_LEVELS_PER_SKILL = 0.5;
-
-const clamp01 = (x) => Math.max(0, Math.min(1, x));
-
-/** The combat edge, 0..EFFECTIVE_SKILL_MAX-100: the mean effective gain over
- *  100 of the three best combat/magic skills (REAL permanent values). */
-/** BAL9b: A SKILL'S CLIMB - its permanent value as a formula reads it (past
- *  100 a mastered skill alone - SOFTCAP4 - at a quarter a point and the milestones), without what is worn or cast on it.
- *  What the foes' edge reads below, and what a school's potency reads (systems/spell/spellPower.js schoolPotency): the climb
- *  that raises the foes is the climb that pays the caster. */
-export const climbedSkill = (entity, id) => effectiveSkill(masterCappedSkill(entity, entity?.skills?.[id] ?? 0, id));
-
-export function combatEdge(entity) {
-  // SOFTCAP3: no edge while mentoring, and none while Master Skills is off (or offline) - the climb is opt-in
-  if (!Array.isArray(entity?.skills) || entity._mentor || !masterSkillsActive(entity)) return 0;
-  const gains = EDGE_SKILL_IDS.map((id) => Math.max(0, climbedSkill(entity, id) - SKILL_SOFT_CAP))   // SOFTCAP4: mastered skills only; BAL9b: the climb's one home
-    .sort((a, b) => b - a).slice(0, EDGE_TOP_N);
-  return gains.reduce((a, g) => a + g, 0) / EDGE_TOP_N;
-}
-
-/** SOFTCAP5: THE WILDERNESS is an area too - by day like a
- *  cemetery or a ruined castle (22%), at night like a prison or a harpy nest (44%), when night's worse things walk.
- *  Towns, cities and every other location's own ground stay unscaled (the host says where the player stands). */
-export const WILDERNESS_SHARE = Object.freeze({ day: 0.22, night: 0.44 });
-export const wildernessShare = (night) => (night ? WILDERNESS_SHARE.night : WILDERNESS_SHARE.day);
-
-/** 0..1 for a dungeon kind (its DungeonTypes index); 0 for none or an unknown one. */
-export const dungeonShare = (dungeonType) => (Number.isInteger(dungeonType) ? DUNGEON_SHARE[dungeonType] ?? 0 : 0);
-/** 0..1 from the foe itself. */
-export const foeShare = (baseLevel, isClass) => (isClass ? 1 : clamp01(((baseLevel ?? 0) - FOE_SHARE_FLOOR) / FOE_SHARE_SPAN));
-
 /** The inverse of effectiveSkill: the smallest raw value that reads `target`. */
 export function rawSkillForEffective(target) {
   if (!(target > SKILL_SOFT_CAP)) return Math.max(0, Math.round(target));
   for (let v = SKILL_SOFT_CAP; v <= SKILL_HARD_CAP; v++) if (effectiveSkill(v) >= target) return v;
   return SKILL_HARD_CAP;
-}
-
-/** VETERAN, 0..1: how far the three best combat/magic skills stand from 75 toward 100 (real values, capped at 100;
- *  0 while mentoring or while Master Skills is not in force). */
-export function veteranProgress(entity) {
-  if (!Array.isArray(entity?.skills) || entity._mentor || !masterSkillsActive(entity)) return 0;
-  const from = ENEMY_SCALING.veteranFrom, span = SKILL_SOFT_CAP - from;
-  const parts = EDGE_SKILL_IDS.map((id) => clamp01((Math.min(SKILL_SOFT_CAP, entity.skills[id] ?? 0) - from) / span))
-    .sort((a, b) => b - a).slice(0, EDGE_TOP_N);
-  return parts.reduce((a, g) => a + g, 0) / EDGE_TOP_N;
-}
-
-/** Both layers of one player, for the spawn door. */
-export const combatStanding = (entity) => ({ veteran: veteranProgress(entity), edge: combatEdge(entity) });
-
-// ---- the place's threat (BAL3) ---------------------------------------
-//
-// BAL3 (;, of "let
-// the place set the threat, the way the source already sets loot"): THE PLACE SETS THE THREAT, NEVER THE PLAYER. The
-// loot ladder grades every place a foe stands in (lootRarity.js DUNGEON_RARITY_TIER: a Cemetery 3, a mine or a cave 4,
-// a Crypt 9, a Vampire Haunt 14, a Dragon's Den 18), and a corpse's or a pile's odds are that place's. The veteran
-// layer above answered the PLAYER instead - their own best skills, and only with Master Skills in force (offline:
-// never by default) - so the deepest dungeon in the game fielded DFU's own foes to every player who had not opted in.
-// Now the veteran layer reads the PLACE: from PLACE_THREAT.from (a town's 4 - DFU's own foes) to PLACE_THREAT.full (a
-// Dragon's Den's 18 - the whole veteran row, +10 skill, x2 health, x1.25 damage), linear between, times the foe's own
-// share (a rat stays a rat). The wilderness stands as the dungeons it reads like (SOFTCAP5's own equivalence: by day
-// between a cemetery's 3 and a ruined castle's 6, so 5; at night a harpy nest's 7). Master Skills' veteran is kept as
-// a floor beside it (the player's veteran in this kind of place, whichever is more), and the overcap stays the climb's
-// alone. Pure numbers: the host hands the place's veteran in, and hands 0 with the loot ladder off - the grading is
-// the ladder's, so with it off the place is DFU's again, as the ladder's champions and elites are.
-export const PLACE_THREAT = Object.freeze({ from: 4, full: 18, wilderness: Object.freeze({ day: 5, night: 7 }) });
-/** The place's veteran, 0..1, from its tier (0..21): none at a town's 4 or under, whole at a Dragon's Den's 18. */
-export const placeVeteran = (tier) => (Number.isFinite(tier) ? clamp01((tier - PLACE_THREAT.from) / (PLACE_THREAT.full - PLACE_THREAT.from)) : 0);
-/** The wilderness's tier by the hour. */
-export const wildernessThreat = (night) => (night ? PLACE_THREAT.wilderness.night : PLACE_THREAT.wilderness.day);
-
-/** The whole scaling for one foe (pure). `standing` is combatStanding's { veteran, edge }; `place` the place's veteran
- *  (placeVeteran, 0..1 - BAL3). The veteran layer is the place's, or the player's veteran in this kind of place
- *  (dShare), whichever is more; the overcap is the player's climb, in this kind of place. `hero` (BAL11,
- *  systems/heroThreat.js heroThreatOf - the host hands it in, as it hands the place) multiplies onto both: its own
- *  `damage` and `health`, whatever the foe's share - every kind answers the hero. null = none. */
-export function progressionScaling(standing, dShare, fShare, place = 0, hero = null) {
-  const share = clamp01(dShare) * clamp01(fShare);
-  const v = clamp01(standing?.veteran ?? 0);
-  const p = clamp01(place);
-  const o = clamp01((standing?.edge ?? 0) / (EFFECTIVE_SKILL_MAX - SKILL_SOFT_CAP));
-  const vet = Math.max(clamp01(fShare) * p, share * v);   // BAL3: the place's veteran, the foe's share of it - Master Skills' a floor beside it
-  const over = share * o;
-  const hd = hero?.damage > 1 ? hero.damage : 1, hh = hero?.health > 1 ? hero.health : 1;   // BAL11: never under 1
-  if (!(vet > 0 || over > 0 || hd > 1 || hh > 1)) return null;
-  const { veteran: V, overcap: O } = ENEMY_SCALING;
-  const skillGain = V.skill * vet + O.skill * over;
-  return {
-    share, veteran: v, place: p, edge: standing?.edge ?? 0,
-    skillGain,
-    healthMult: (1 + V.health * vet + O.health * over) * hh,
-    damageMult: (1 + V.damage * vet + O.damage * over) * hd,
-    heroHealth: hh, heroDamage: hd,
-    challengeLevels: Math.round(skillGain * CHALLENGE_LEVELS_PER_SKILL),
-  };
 }

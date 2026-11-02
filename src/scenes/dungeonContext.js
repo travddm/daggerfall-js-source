@@ -15,7 +15,6 @@ import { IIL_LIGHT_ARCHIVE } from '../systems/improvedInteriorLighting.js';   //
 import { YesNoBoxWindow } from '../ui/yesNoBox.js';   // SOFTCAP3: the Master Skills offer
 import { FlatAnimator, armFlatAnim, MISSILE_FPS } from '../render/flatAnimation.js';   // FA1: the flats that move
 import { markFoeStruck, markHostStruck } from '../ui/hud/hudFoeTarget.js';   // STAND-IN-BAR (AUDIT KETCH II): an event's host struck takes the target bar
-import { combatStanding, dungeonShare, foeShare, progressionScaling, placeVeteran } from '../systems/skillSoftcap.js';   // SOFTCAP2: tougher foes, by dungeon tier; BAL3: and by the place's own threat
 import { effectiveLevel } from '../systems/mentorMode.js';   // SOFTCAP1
 import { heroThreatOf } from '../systems/heroThreat.js';   // BAL11: the hero's threat
 import { quickslotHand } from '../ui/quickslotTags.js';   // DISC21-C: an empty quickslot press reads the hand   // PX30
@@ -247,13 +246,13 @@ import { trs, multiply, identity, UP_Y } from '../world/mat4.js';
 import { StaticBatchBuilder, keyResolver, SHADOW_CELL_SIZE } from '../render/staticBatch.js';   // PERF5: the level's static models as one mesh; LA-AUDIT A1: with its shadow cells
 import { Collider } from '../player/collider.js';
 import { ActionSystem } from '../world/actionSystem.js';
-import { collectDungeonEnemies, dungeonPlace, expandEliteEnemies, enemyHierarchyOrder } from '../characters/dungeonEnemies.js'; import { markDungeonChampions, applyChampion, championName } from '../systems/champions.js'; import { lootCrown } from './lootLines.js';   // LOOT7: the layout's champions; LOOT11: a find's line of light
+import { collectDungeonEnemies, dungeonPlace, expandEliteEnemies, enemyHierarchyOrder } from '../characters/dungeonEnemies.js'; import { applyChampion, championName } from '../systems/champions.js'; import { lootCrown } from './lootLines.js';   // LOOT7: the layout's champions; LOOT11: a find's line of light
 import { isOnlinePage } from '../systems/online/onlineLane.js';   // ELITE FOES: online play only
 import { vaultFoes } from '../systems/sea/vaultFoes.js';   // SEA-VAULTS: a vault hall's high tiers
 import { oceanBandDifficulty, scaleGoldPieces } from '../systems/sea/oceanBandDifficulty.js';   // the deeper sea's harder dungeons
 import { etherRingAtPlace } from '../systems/sea/etherRings.js';
 import { seaPileMore } from '../systems/sea/seaSpoils.js';   // SEA-SET: the deep's Tidemail, a ruin's pile's last roll
-import { elitesAllowed, pickDungeonElites, promoteEliteFoe, grantEliteLoot, eliteGlow, setBatchEliteGlow, eliteSize, isEliteCorpse, markEliteCorpseBatch, eliteCorpseSize } from '../systems/eliteFoes.js';   // ELITE FOES: 3-4 champions in an Elite Dungeon
+import { elitesAllowed, markDungeonPromotions, pickDungeonElites, promoteEliteFoe, grantEliteLoot, eliteGlow, setBatchEliteGlow, eliteSize, isEliteCorpse, markEliteCorpseBatch, eliteCorpseSize } from '../systems/eliteFoes.js';   // ELITE FOES: 3-4 champions in an Elite Dungeon
 import { ELITE_FOE_MULTIPLIER, ELITE_HEALTH_SCALE, ELITE_DAMAGE_SCALE, ELITE_LOOT_DROP_MULT, ELITE_LOOT_QUALITY_MULT } from '../world/spawnedDungeons.js';   // ELITE: an elite spawn's foe count and strength
 import { superFoeLevel, scaleSuperFoe, SUPER_ELITE_FOES, SUPER_LOOT_OPTS, SUPER_LOOT_DROP_MULT, SUPER_LOOT_QUALITY_MULT, sdEndMarks, sdRiftPlace, sdReturnPlace, sdLandingPlace } from '../world/superDungeon/sdDungeon.js';   // SD4a: a Super dungeon's difficulty; SD4b: its end's place
 import { reachableEndOf, LAIR_WALK_WAIT_MS } from '../world/dungeon/dungeonEnd.js';   // SD4b: RVN7d's lair law, lifted - the lair's stand and a Super dungeon's end read one law
@@ -328,7 +327,7 @@ const REMOTE_KILL = Object.freeze({ kind: 'remote' });
  *  the Burning clip, as it was. */
 const GATE_STRIKE_CAST = Object.freeze({ frost: SPELL_CAST_SOUND[1], poison: SPELL_CAST_SOUND[2], shock: SPELL_CAST_SOUND[3], magic: SPELL_CAST_SOUND[4] });   // SD18b: the Underking's Ending strikes in magic
 import { lootPile } from '../player/lootStack.js';   // LOOT-STACK: the pile under the reticle, as the loot window's tabs
-import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons, lootRarityOn } from '../systems/loot/lootRarity.js';   // LR1: the item ladder over every list this host mints (a foe's through hostCombat.spawnEnemyLoot, RF2); BAL3: its switch, the place's threat's
+import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons } from '../systems/loot/lootRarity.js';   // LR1: the item ladder over every list this host mints (a foe's through hostCombat.spawnEnemyLoot, RF2); BAL3: its switch, the place's threat's
 import { foeHitFlash, setBatchHitFlash, puppetHurtStep, setBatchGlint, prefersReducedMotion } from '../systems/hitFlash.js';   // HITFLASH1; TELL2: a wind-up's glint
 import { localizedText, getLocalizedLocationName, getLocalizedRegionName } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language; L10N3e: and the place names shown
 import { createCoverIndex, isCoverFlat, coverProxy } from '../ai/cover.js';   // TACT1: billboards are cover
@@ -1176,15 +1175,16 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     })
     : (_hallBeasts ? [..._hallBeasts, ...deepFoesOf(_layoutEnemies, _undercroftHall.deep)] : _layoutEnemies);   // UNDERCROFT-DEEP: and the deep cellars' foes, past the hall's reach
   if (_superTier) for (const e of enemies) e.superTier = true;   // SD4a: each record says so - its own scale and loot (applyEliteScaling, eliteLootOpts), on every client alike
-  if (!_undercroftHall) markDungeonChampions(enemies, dfLocation.dungeon.recordElement.header.locationId);   // ARENA-FIX 4: no champion among the chained beasts   // LOOT7: the layout's champions, a hash of the place and the marker - every client the same, no wire word
+  const _eliteOnline = isOnlinePage() || opts.selfId?.() != null;
+  const _eliteClassLevel = _eliteOnline ? Infinity : (_superTier ? superFoeLevel(effectiveLevel(playerEntity)) : effectiveLevel(playerEntity));
+  if (!_undercroftHall) markDungeonPromotions(enemies, dfLocation.dungeon.recordElement.header.locationId, { eliteOpen: elitesAllowed({ onlinePage: isOnlinePage(), inRoom: opts.selfId?.() != null }) && !dfLocation?.elite && !_superTier, classLevel: _eliteClassLevel });   // ARENA-FIX 4: no champion among the chained beasts   // LOOT7: the layout's champions, a hash of the place and the marker - every client the same, no wire word
   // ELITE FOES: an Elite Dungeon holds 3 or 4 champions among its foes - a pure pick over the list every client builds,
   // seeded by the dungeon's own id, so every client marks the same records (systems/eliteFoes.js)
   // ...and a normal dungeon at most one, one time in five
   // BAL4: online always, and offline wherever the loot ladder stands - elitesAllowed (the room's id is read straight off opts - onlineRoom() is declared below)
   // (ARENA-FIX 4: the undercroft's chained beasts stand passive, which the pick never takes)
   // AUDIT BAL (Balance-Arc.md section 10): offline, ELITE-FLOOR reads the level this dungeon's class foes are built at
-  const _eliteOnline = isOnlinePage() || opts.selfId?.() != null;
-  if (elitesAllowed({ onlinePage: isOnlinePage(), inRoom: opts.selfId?.() != null })) pickDungeonElites(enemies, dfLocation?.dungeon?.recordElement?.header?.locationId ?? dfLocation?.name ?? '', { elite: !!dfLocation?.elite, count: _superTier ? SUPER_ELITE_FOES : null, classLevel: _eliteOnline ? Infinity : (_superTier ? superFoeLevel(effectiveLevel(playerEntity)) : effectiveLevel(playerEntity)) });   // SD4a: a Super dungeon's six
+  if (elitesAllowed({ onlinePage: isOnlinePage(), inRoom: opts.selfId?.() != null })) pickDungeonElites(enemies, dfLocation?.dungeon?.recordElement?.header?.locationId ?? dfLocation?.name ?? '', { elite: !!dfLocation?.elite, count: _superTier ? SUPER_ELITE_FOES : null, classLevel: _eliteClassLevel });   // SD4a: a Super dungeon's six
   hearEliteFoesIn(dfLocation);   // QL11: an elite foe slain by my blow in an ELITE-tier dungeon - the condition the act's own module's (systems/questlines/qlEliteFoe.js; AUDIT QUESTLINES ACTS-8: HOST-SPLIT)
   // C8 E1 (?foes): CLASS enemies (mobileType > 43, human morphology)
   // spawn as canonical rigs instead of their C3 billboards - one rig
@@ -1226,7 +1226,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     // at a name only in THIS block's scope - caught in review, hoisted).
     // AUDIT 68 S04-v-dungeon-dead-rig-deps: the rig's engineRig/raceCharacter imports and the BODY00I0 ramp derive
     // fed foeDeps keys nothing read (class enemies are sprite mobiles since C17), and a failure in them cost the dungeon its class enemies.
-    const [{ EnemyAI, withinYaw, isBackFacing, openDoorsStep }, { EnemyAttack }, { makeEnemyEntity, loadEnemyCareer, applyProgressionScaling }, { EnemyCaster, castEnemySpell: castShared, hasMagickaToCast },
+    const [{ EnemyAI, withinYaw, isBackFacing, openDoorsStep }, { EnemyAttack }, { makeEnemyEntity, loadEnemyCareer, applyHeroThreat }, { EnemyCaster, castEnemySpell: castShared, hasMagickaToCast },
       { runTargetMachine, boutGate, isPlayerTarget, isLocalPlayerTarget, PLAYER_TARGET, PEER_CAST_TARGET, resetAllyTeamOnPlayerAttack, targetAimPoint, enemyArrowOrigin, enemyTransformPoint, arrowAimDirection, bumpAtkCount, inBout, playerBoutOf }] = await Promise.all([
       import('../characters/enemy/enemyMotor.js'), import('../characters/enemy/enemyAttack.js'),
       import('../characters/enemy/enemyEntity.js'), import('../characters/enemy/enemyCasting.js'),
@@ -1255,7 +1255,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       MELEE_HIT_YAW_DEG: formulas.MELEE_HIT_YAW_DEG,
       withinYaw,
       fetchBytes,
-      floorLanding, EnemyAI, EnhancedEnemyAI, makeNavWorld, EnemyAttack, makeEnemyEntity, applyProgressionScaling, loadEnemyCareer, EnemyCaster, playerEntity,   // floorLanding/playerEntity/fetchBytes/generateItems ride the STATIC imports (audits 06c-06e); DEX1: one career door for both arms
+      floorLanding, EnemyAI, EnhancedEnemyAI, makeNavWorld, EnemyAttack, makeEnemyEntity, applyHeroThreat, loadEnemyCareer, EnemyCaster, playerEntity,   // floorLanding/playerEntity/fetchBytes/generateItems ride the STATIC imports (audits 06c-06e); DEX1: one career door for both arms
       castEnemySpell: castShared,   // X3: the ONE cast executor (characters/enemy/enemyCasting.js)
       hasMagickaToCast,   // D9: GetDestination's `entity.CurrentMagicka > 0` (the stand-off band reads the caster's SelectedSpell instead)
       // MT-iv: the target machine. Every consumer below the lazy block
@@ -1400,12 +1400,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   function applySpawnAlliance(entity, e) {
     if (e?.allied && entity) { entity.team = 'PlayerAlly'; entity.mobileTeam = 'PlayerAlly'; }
   }
-  /** SOFTCAP2: TOUGHER FOES, by where you are. The dungeon KIND gives the
-   *  place's share (skillSoftcap.js DUNGEON_SHARE - 11% in a mine or a cave,
-   *  100% in a vampire haunt or a Daedra's temple); the foe's own base level gives its share (a
-   *  class foe counts in full); the player's standing - veteran (75..100) and
-   *  edge (past 100), both 0 while mentoring - gives the size. skillSoftcap.js has the whole law and its numbers. */
-  const _dungeonShare = dungeonShare(dfLocation.mapTableData?.dungeonType);
   /** The deeper sea's harder dungeons (systems/sea/oceanBandDifficulty.js), online only as the open zone's scaling was: a
    *  day's vault by the ring the host set on it, an isle's ruin by its band. Read once, at the build. */
   const _isVault = !!dfLocation?.elite && dfLocation?.wildRing > 0;
@@ -1415,25 +1409,14 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   const _respawnMs = dungeonRespawnMs({ elite: !!dfLocation?.elite, superTier: _superTier });
   // (the wire's respawnDue in its place: the hour at this dungeon's own pace for every call below - MAC-L1b: the wire's is not imported, nothing shadowed)
   const respawnDue = (stamp, now) => dungeonRespawnDue(stamp, now, _respawnMs);
-  // BAL3: THE PLACE SETS THE THREAT - this dungeon's own tier (the loot
-  // ladder's grading of its kind, lootRarity.js DUNGEON_RARITY_TIER), read once at the build, every client alike; it
-  // stands while the ladder does (read at each spawn) - the ladder off, DFU's own foes, as its champions and elites go
-  // AUDIT BAL: never the port's own stages that wear a Crypt's type for want of one (the arena's floor, the gate's court,
-  // the Shattered Hour - world/arena/arenaFloor.js, gateArena.js, sdRealm.js) - their fights are tuned, and their health the relay's
-  const _placeVeteran = isGateArena(dfLocation) || isArenaFloor(dfLocation) || _sdRealm ? 0 : placeVeteran(dungeonRarityTier(dfLocation.mapTableData?.dungeonType));
   // BAL11 (Balance-Arc.md section 17): THE HERO'S THREAT stands on no tuned stage - a made level (the court, the Hour) or the arena's floor
   const _heroStage = _made != null || isArenaFloor(dfLocation);
-  /** `puppet`: AUDIT BAL - another client's foe stands at this place too. The place is every client's (its tier, the
-   *  ladder forced on online), so a puppet takes it - its blows on me as hard as on its owner; the owner's own standing
-   *  (Master Skills) is the owner's, and the puppet's health the owner's record's (`k`, `h`).
-   *  BAL11: and the hero's threat - mine on every foe I build, a puppet's blows alone (at me); never an ally's (`ally`). */
-  function applyProgressionScalingTo(entity, basics, { puppet = false, ally = false } = {}) {
-    const place = lootRarityOn() ? _placeVeteran : 0;
-    const share = puppet ? 0 : _dungeonShare;
-    const hero = ally || _heroStage ? null : heroThreatOf(foeDeps.playerEntity, { puppet });
-    if (!(share > 0) && !(place > 0) && !hero) return;
-    const scaling = progressionScaling(puppet ? null : combatStanding(foeDeps.playerEntity), share, foeShare(basics?.level ?? entity.level, entity.isClass), place, hero);
-    foeDeps.applyProgressionScaling?.(entity, scaling);   // lazily loaded beside makeEnemyEntity; the dungeon's own deps (the import used `D`, which only the spawn builders below bind)
+  /** The hero's threat on a foe built here (systems/heroThreat.js). `puppet`: another client's foe - its blows on me carry
+   *  my threat, and its health is its owner's word. Never an ally, and never a promoted foe or an Elite Dungeon's, which
+   *  have stats of their own. */
+  function applyHeroThreatTo(entity, basics, { puppet = false, ally = false } = {}) {
+    if (ally || _heroStage || entity.eliteFoe || entity.elite || entity.champion) return;
+    foeDeps.applyHeroThreat?.(entity, heroThreatOf(foeDeps.playerEntity, { puppet }));
   }
   function applyEliteScaling(entity, e) {
     if (e?.eliteFoe && entity && promoteEliteFoe(entity, { eliteDungeon: !!e.elite, superDungeon: !!e.superTier, checkLevel: false })) { if (e.elite) entity.elite = true; eliteTraits(entity, e.eliteSeed); return; }   // BOSS-TRAITS: its trait off the pick's own seed - every client the same   // ELITE-FLOOR: the pick's own (by the kind's level, every client alike)   // ELITE FOES: 5x health, 3x damage - 7x / 4x in an Elite Dungeon, in place of its doubling
@@ -1536,8 +1519,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // E3a: the real entity - career from CLASS{ID-128}.CFG (DEX1: or a mod's), level = player level, HP/skills/LiveSpeed verbatim (SetEnemyCareer)
       const entity = D.makeEnemyEntity(e.mobileType, basics, await D.loadEnemyCareer(e.mobileType, D.fetchBytes), e.level ?? (_superTier ? superFoeLevel(effectiveLevel(D.playerEntity)) : effectiveLevel(D.playerEntity)));   // SOFTCAP1: a mentor's dungeon is built at the group's level; ARENA2: a bout fighter at its tier's; SD4a: a Super dungeon's class foe at its band
       applyEliteScaling(entity, e); if (puppet) entity.unquiet = false;   // ELITE: double health, double damage; AUDIT UNQUIET: a puppet's mark is its owner's (each client drew its own)
-      if (!puppet && e.level == null) applyProgressionScalingTo(entity, basics, { ally: !!e.allied });   // SOFTCAP1: tougher high-tier foes against skills past 100 (a puppet is its owner's build); ARENA2: never a bout fighter (the ladder is a fixed mountain)
-      else if (puppet && e.level == null) applyProgressionScalingTo(entity, basics, { puppet: true, ally: !!e.allied });   // AUDIT BAL: a puppet stands at this place too - its blows on me as on its owner (BAL3)
+      if (!puppet && e.level == null) applyHeroThreatTo(entity, basics, { ally: !!e.allied });   // ARENA2: a bout fighter is never scaled (the ladder is a fixed mountain)
+      else if (puppet && e.level == null) applyHeroThreatTo(entity, basics, { puppet: true, ally: !!e.allied });   // a puppet: its blows on me carry my threat
       applySpawnAlliance(entity, e);   // MT-ii / AUDIT OH-F C4
       entity._feudPlace = 'dungeon';   // RVN1 (Feud-Arc.md 12): where a fight with it is fought, for its ledger
       if (e.revenant && !puppet) applyRevenant(entity, e.revenant, { turned: !!e.turned });   // RVN7d (Feud-Arc.md 18.4): a revenant stood here - its name and rank, before its loot; RVN11c: a betrayer's turning is no return
@@ -1628,8 +1611,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       const career = await D.loadEnemyCareer(e.mobileType, D.fetchBytes);
       const entity = D.makeEnemyEntity(e.mobileType, basics, career, e.level ?? effectiveLevel(D.playerEntity));   // SOFTCAP1: a mentor's dungeon is built at the group's level; ARENA2: a bout fighter at its tier's
       applyEliteScaling(entity, e); if (puppet) entity.unquiet = false;   // ELITE: double health, double damage; AUDIT UNQUIET: a puppet's mark is its owner's (each client drew its own)
-      if (!puppet && e.level == null) applyProgressionScalingTo(entity, basics, { ally: !!e.allied });   // SOFTCAP1: tougher high-tier foes against skills past 100 (a puppet is its owner's build); ARENA2: never a bout fighter
-      else if (puppet && e.level == null) applyProgressionScalingTo(entity, basics, { puppet: true, ally: !!e.allied });   // AUDIT BAL: a puppet stands at this place too - its blows on me as on its owner (BAL3)
+      if (!puppet && e.level == null) applyHeroThreatTo(entity, basics, { ally: !!e.allied });   // ARENA2: a bout fighter is never scaled (the ladder is a fixed mountain)
+      else if (puppet && e.level == null) applyHeroThreatTo(entity, basics, { puppet: true, ally: !!e.allied });   // a puppet: its blows on me carry my threat
       applySpawnAlliance(entity, e);   // MT-ii / AUDIT OH-F C4
       entity._feudPlace = 'dungeon';   // RVN1 (Feud-Arc.md 12): where a fight with it is fought, for its ledger
       if (e.revenant && !puppet) applyRevenant(entity, e.revenant, { turned: !!e.turned });   // RVN7d (Feud-Arc.md 18.4): a revenant stood here - its name and rank, before its loot; RVN11c: a betrayer's turning is no return

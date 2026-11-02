@@ -60,7 +60,7 @@ Mods (the folder README has the version, credits and permission):
 | `climates-calories`, `foraging`, `roleplay-realism`, `roleplay-realism-items`, `travel-options` | Item templates, mod data CSVs, textures, quests |
 | `come-sail-away`, `eye-of-the-beholder`, `heat-haze`, `horse-cart-and-cargo`, `iliac-puddle-no-more`, `ocean-holes`, `physical-items`, `project-legacy`, `snowfall`, `windfall`, `world-events-raiding-parties` | Assembly and IL (code ported off the IL), plus any art, sounds and shaders |
 | `daggerfall-arena`, `windmills-kamer`, `low-poly-trees` | Models and placements (tree atlases are rebuilt from the player's data) |
-| `daggerfall-enemy-expansion`, `meanerMonsters`, `mudex`, `unleveledLoot`, `pcaao` | Monster, class and loot tables; settings |
+| `daggerfall-enemy-expansion`, `mudex`, `unleveledLoot`, `pcaao` | Monster, class and loot tables; settings |
 | `diverse-weapons`, `seasons-iliac-bay`, `vanilla-enhanced` | Manifests and settings; the textures come from a bundle (the player's, or for Vanilla Enhanced a pack the port ships) |
 | `dynamic-skies`, `handheld-torches`, `shield-widget`, `weapon-widget` | Settings, textures, shaders |
 | `grimoire-ui` | UI art listing (`systems/uiPack.js`) |
@@ -81,7 +81,6 @@ differs from the published repository or is missing from it, stay committed.
 | --- | --- | --- | --- |
 | `better-ambience` | `joshcamas/daggerfall-unity-mods` | `Sound/` (the 29 clips the port plays) | `Scripts/`, the manifest, `modsettings.json`, `LICENSE`: the repository holds 0.1.3, the port follows the 0.1.4 bundle (six scripts, the manifest and the settings differ, and `InteriorAmbientSoundSource.cs` is 0.1.4 only) |
 | `immersive-footsteps` | `magicono43/DFU-Mod_Immersive-Footsteps` | `Audio/`, `Scripts/`, `modsettings.json`, the manifest (renamed from `ImmersiveFootsteps.dfmod.json`) | nothing but the README |
-| `meanerMonsters` | `Ralzar81/Meaner-Monsters` | `MeanerMonsters.dfmod.json` | `xml/`: the repository has no sprite records |
 | `unleveledLoot` | `Ralzar81/Unleveled-Loot` | `modsettings.json` | `UnleveledLoot.dfmod.json`: the repository's manifest is 1.1.1, the port follows 1.1.2 |
 
 - Run it once after cloning. `npm run dev`, `npm run build`, `npm test`, `npm run test:changed` and
