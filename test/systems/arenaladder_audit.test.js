@@ -279,10 +279,10 @@ test('AUDIT ARENA-LADDER L2: EVERY TIER\'S CHAMPION FIGHTS AS AN ELITE - offline
   assert.match(rd('src/scenes/arena/arenaBouts.js'), /stage\.spawn\(f\.spec\.mobile, feet, \{ level: f\.spec\.level, elite: !!f\.spec\.elite,/);
   assert.deepEqual([ARENA_ELITE_HP_MULT, ARENA_ELITE_DMG_MULT], [ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT], 'the relay\'s elite is the world\'s');
   const plain = arenaFoeStats(M.Knight, 5), el = arenaFoeStats(M.Knight, 5, { elite: true });
-  assert.equal(el.hp, plain.hp * 5);
-  assert.deepEqual(el.dmg, plain.dmg.map((d) => d * 3));
+  assert.equal(el.hp, plain.hp * 2);
+  assert.deepEqual(el.dmg, plain.dmg.map((d) => d * 1.3));
   const beast = arenaFoeStats(M.GrizzlyBear, null), eb = arenaFoeStats(M.GrizzlyBear, null, { elite: true });
-  assert.equal(eb.hp, beast.hp * 5);
+  assert.equal(eb.hp, beast.hp * 2);
   for (let tier = 0; tier < 10; tier++) {
     assert.ok(arenaLadderBout(tier, 3).foes.every((f) => f.elite), `tier ${tier}'s champion`);
     for (let b = 0; b < 3; b++) assert.ok(arenaLadderBout(tier, b).foes.every((f) => !f.elite), `tier ${tier} bout ${b}`);

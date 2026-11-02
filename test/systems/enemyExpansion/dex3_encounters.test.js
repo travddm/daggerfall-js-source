@@ -400,7 +400,7 @@ test('DEX3 the install: loaded, the mod\'s tables on the door and its handlers o
   readPlayerGps({ climateIndex: CLIMATES.Woodlands, inLocationRect: false });
   assert.equal(encounterTable(33, { local: true }), ENCOUNTER_TABLES[33]);
   reset();
-  installEnemyExpansion({ on: true, log: silent });
+  installEnemyExpansion({ on: true, mudex: false, log: silent });   // the mod's own tables: MUDEX's join them in mudex1.test.js
   assert.deepEqual(encounterTableChoices(9), read.byIndex.get(9).map((tb) => tb.enemyIds));
   assert.equal(encounterTable(33, { local: true }), ENCOUNTER_TABLES[33], 'before any event: DFU\'s, as EncounterTables stands before the mod writes it');
   readPlayerGps({ climateIndex: CLIMATES.Woodlands, inLocationRect: false });

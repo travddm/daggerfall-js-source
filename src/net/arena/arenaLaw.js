@@ -217,8 +217,8 @@ export const ARENA_CLASS_SPEED = 5.0;
 export const ARENA_BEAST_SPEED = 6.0;
 /** AUDIT ARENA-LADDER (the owner's call, "Elite champions"): A TIER'S CHAMPION IS AN ELITE FOE - systems/eliteFoes.js
  *  ELITE_FOE_HEALTH_MULT and ELITE_FOE_DAMAGE_MULT on its body, pinned equal (this law imports nothing). */
-export const ARENA_ELITE_HP_MULT = 5;
-export const ARENA_ELITE_DMG_MULT = 3;
+export const ARENA_ELITE_HP_MULT = 2;
+export const ARENA_ELITE_DMG_MULT = 1.3;
 /** One AI fighter's body as the relay runs it; `elite` a tier champion's. Pure. */
 export function arenaFoeStats(mobile, level, { elite = false } = {}) {
   const beast = ARENA_BEASTS[mobile] ?? null;

@@ -9,7 +9,6 @@
 //   - Daggerfall's 95 lock is lifted (PlayerEntity.RaiseSkills'
 //     AlreadyMasteredASkill gate: once a PRIMARY skill is mastered no other
 //     skill at 95+ may rise), so every skill can reach 100 and go on;
-//   - dangerous dungeons answer with tougher foes (skillSoftcap.js combatEdge).
 // Below 100 nothing is different either way.
 //
 // WHO DECIDES:

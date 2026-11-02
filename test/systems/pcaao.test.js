@@ -9,7 +9,7 @@
 // reduction tables through float32 and half-to-even; the monsters'
 // hides; the shield block and the shield-versus-under-armour test; the
 // registry (a declined override leaves DFU's formula standing, an
-// accepted one replaces it); the Meaner Monsters row; and the seams
+// accepted one replaces it); and the seams
 // (the bow's draw timer, the arrow's hand-off, worldTick's install,
 // the Mods pane entry, the credit).
 import { test } from 'node:test';
@@ -27,7 +27,7 @@ import {
   pcaaoPercentageReductionCalculationForMonsters, SPECIAL_WEAPON_MONSTERS, MONSTER_WEAPON, pcaaoMonsterWeaponAssign,
   pcaaoShieldBlockChanceCalculation, pcaaoCompareShieldToUnderArmor, pcaaoNaturalDamageResistance, pcaaoAttackDamage,
   pcaaoProficiencyModifiers, pcaaoRacialModifiers, installPcaao, uninstallPcaao, SILVER_DOUBLED_CAREERS, PCAAO_REDUCTION_ROWS,
-  MEANER_MONSTERS, meanerMonstersRow, _shieldBlockSuccess,
+  _shieldBlockSuccess,
   pcaaoFades,
 } from '../../src/combat/pcaao.js';
 import { calculateAttackDamage, damageModifier, damageEquipment, formulaOverride, registerFormulaOverride, adjustWeaponHitChanceMod, adjustWeaponAttackDamage, weaponAttackDamage } from '../../src/combat/formulas.js';
@@ -35,7 +35,7 @@ import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
 import { weaponOfMaterial, armorOfMaterial } from '../../src/combat/enemyEquipment.js';   // TWO-HANDS-SHIELD: the pieces as the builder mints them
 import { EQUIP_SLOTS, equipTableOf, _wearScaleForTests } from '../../src/systems/equip.js';
-import { MOD_SETTINGS, setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
+import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 import { RR_VENDOR, rrAdjustWeaponHitChanceMod, rrAdjustWeaponAttackDamage } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { CREDITS } from '../../src/ui/credits.js';
 import { SKILLS } from '../../src/systems/skills.js';
@@ -60,18 +60,17 @@ const fixed = (v) => () => v;
 const wear = (item, table, slot) => { table[slot] = item; return item; };
 
 test('PCO1: InitMod\'s ladder - the dependent modules stand down with their parent, and nothing stands with Enabled off', () => {
-  assert.deepEqual({ ...M }, { enabled: true, equipmentDamageEnhanced: true, fadingEnchantedItems: true, fixedStrengthDamageModifier: true, armorHitFormulaRedone: true, criticalStrikesIncreaseDamage: true, conditionBasedEffectiveness: true, softMaterialRequirements: true, rolePlayRealismArchery: false, meanerMonsters: false });
+  assert.deepEqual({ ...M }, { enabled: true, equipmentDamageEnhanced: true, fadingEnchantedItems: true, fixedStrengthDamageModifier: true, armorHitFormulaRedone: true, criticalStrikesIncreaseDamage: true, conditionBasedEffectiveness: true, softMaterialRequirements: true, rolePlayRealismArchery: false });
   const noArmor = modsOf({ armorHitFormulaRedone: false });
   assert.equal(noArmor.criticalStrikesIncreaseDamage, false); assert.equal(noArmor.conditionBasedEffectiveness, false); assert.equal(noArmor.softMaterialRequirements, false);
   assert.equal(noArmor.equipmentDamageEnhanced, true, 'the wear module is independent');
   assert.equal(modsOf({ equipmentDamageEnhanced: false }).fadingEnchantedItems, false, 'fading rides enhanced wear');
   const off = modsOf({ Enabled: false });
   assert.ok(Object.entries(off).every(([k, v]) => v === false), `nothing on: ${JSON.stringify(off)}`);
-  // MM1: the two arms Awake derives from OTHER mods read those mods' own switches - no compatibility switch of this mod's
-  assert.equal(modsOf({}, others({ 'meanerMonsters/Enabled': true })).meanerMonsters, true, 'Meaner Monsters on: the edit arm');
+  // MM1: the archery arm Awake derives from ANOTHER mod reads that mod's own switches - no compatibility switch of this mod's
   assert.equal(modsOf({}, others({ 'roleplay-realism/Enabled': true, 'roleplay-realism/advancedArchery': true })).rolePlayRealismArchery, true, 'Roleplay Realism with advancedArchery: the archery arm');
   assert.equal(modsOf({}, others({ 'roleplay-realism/advancedArchery': true })).rolePlayRealismArchery, false, 'AUDIT 68: the switch of a mod that is not loaded is not read');
-  assert.equal(modsOf({ Enabled: false }, others({ 'meanerMonsters/Enabled': true, 'roleplay-realism/Enabled': true, 'roleplay-realism/advancedArchery': true })).meanerMonsters, false, 'the overhaul off: neither');
+  assert.equal(modsOf({ Enabled: false }, others({ 'roleplay-realism/Enabled': true, 'roleplay-realism/advancedArchery': true })).rolePlayRealismArchery, false, 'the overhaul off: not the archery arm either');
 });
 
 test('PCO1: Mathf.Round rounds half to EVEN, and a float32 half lands where the C#\'s lands', () => {
@@ -474,28 +473,6 @@ test('PCO1: the registry - installed, each override reads its switch live; decli
   registerFormulaOverride('damageModifier', null);
 });
 
-test('PCO1: the Meaner Monsters edit rides the row a foe is minted from, only under its switch', () => {
-  assert.equal(Object.keys(MEANER_MONSTERS).length, 42);
-  assert.deepEqual(MEANER_MONSTERS[31], { minDamage: 26, maxDamage: 42, minHealth: 170, maxHealth: 285, level: 21, armorValue: -9 }, 'the Daedra Lord');
-  assert.deepEqual(MEANER_MONSTERS[4], { minDamage: 4, maxDamage: 8, minDamage2: 6, maxDamage2: 8, minDamage3: 6, maxDamage3: 10, minHealth: 55, maxHealth: 110, level: 4, armorValue: 8 }, 'the Grizzly Bear\'s three pairs');
-  const base = ENEMY_BASICS[0];
-  assert.equal(meanerMonstersRow(0, base, false), base, 'off: the base row itself');
-  const on = meanerMonstersRow(0, base, true);
-  assert.equal(on.minHealth, 15); assert.equal(on.maxHealth, 35); assert.equal(on.armorValue, 6); assert.equal(on.maleTexture, base.maleTexture, 'the rest is the base row\'s');
-  assert.equal(meanerMonstersRow(128 + 17, ENEMY_BASICS[128 + 17], true), ENEMY_BASICS[128 + 17], 'a class enemy is untouched');
-  _resetModSettings();
-  setModSetting('pcaao', 'Enabled', true); setModSetting('meanerMonsters', 'Enabled', true);   // MM1: the other mod's OWN switch is the arm's condition
-  const rat = makeEnemyEntity(0, ENEMY_BASICS[0], career(), 5, () => 0.5);
-  assert.equal(rat.basics.minHealth, 15, 'a minted rat carries the edit');
-  assert.equal(rat.basics.maxHealth, 35, 'the overhaul\'s 35 over Ralzar\'s 25 - PCAAO Awakes after its dependency');
-  assert.equal(rat.maxHealth, 25, 'Range(15, 36) at a half roll');
-  setModSetting('meanerMonsters', 'Enabled', false);
-  assert.equal(makeEnemyEntity(0, ENEMY_BASICS[0], career(), 5, () => 0.5).basics.maxHealth, ENEMY_BASICS[0].maxHealth, 'Meaner Monsters off: the overhaul\'s edit has no mod to edit');
-  _resetModSettings(); setModSetting('meanerMonsters', 'Enabled', false); setModSetting('pcaao', 'Enabled', false);   // MO1: both on by default now - "plain" is both off
-  const plain = makeEnemyEntity(0, ENEMY_BASICS[0], career(), 5, () => 0.5);
-  assert.equal(plain.basics.minHealth, ENEMY_BASICS[0].minHealth);
-});
-
 test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worldTick\'s install, the bow\'s draw timer', () => {
   const m = MOD_SETTINGS.pcaao;
   const manifest = JSON.parse(rd('vendor/pcaao/physicalcombatandarmoroverhaul.dfmod.json'));
@@ -518,7 +495,7 @@ test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worl
     assert.equal(m.keys[k.Name].description, PLAIN[k.Name] ?? k.Description, `${k.Name}'s description is the mod's own, or its plain rewording`);
   }
   assert.equal(m.keys.Enabled.default, true, 'MO1 (Mac, 2026-09-12): every mod is on by default; the Mods pane is where it is turned off');
-  assert.equal(m.keys.rolePlayRealismArchery, undefined, 'MM1: no compatibility switches between mods (Mac)'); assert.equal(m.keys.meanerMonsters, undefined);
+  assert.equal(m.keys.rolePlayRealismArchery, undefined, 'MM1: no compatibility switches between mods (Mac)');
   const credit = CREDITS.mods.find((c) => c.title === 'Physical Combat And Armor Overhaul');
   assert.ok(credit); assert.equal(credit.author, 'Kirk.O'); assert.deepEqual([...credit.vendor], ['pcaao']); assert.equal(credit.version, '1.44');
   assert.match(rd('vendor/pcaao/README.md'), /Kirk\.O/);

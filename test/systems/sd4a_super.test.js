@@ -93,9 +93,11 @@ test('SD4a the list: a Super dungeon\'s layout rolled at the band, three at ever
   assert.equal(pickDungeonElites([foe(), foe()], 1, { count: 0 }), 0);
 });
 
-test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health the dungeon\'s and the elite\'s added (x9), its damage the dungeon\'s and the elite\'s extra (x4.5) - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
-  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [SUPER_HEALTH_SCALE + ELITE_FOE_HEALTH_MULT, SUPER_DAMAGE_SCALE + (ELITE_FOE_DAMAGE_MULT - 1)]);
-  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [ELITE_HEALTH_SCALE + ELITE_FOE_HEALTH_MULT, ELITE_DAMAGE_SCALE + (ELITE_FOE_DAMAGE_MULT - 1)], 'the Elite\'s own, read the same way');
+test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health x9, its damage x4.5 - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
+  // The dungeon stacks are their own numbers: they stay put when the open world's elite multiples (ELITE_FOE_HEALTH_MULT) move.
+  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [9, 4.5]);
+  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [7, 4], 'the Elite\'s own');
+  assert.ok(ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT > SUPER_HEALTH_SCALE && ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT > ELITE_HEALTH_SCALE, 'each above the dungeon\'s own doubling');
   const s = foe();
   assert.ok(promoteEliteFoe(s, { eliteDungeon: true, superDungeon: true, checkLevel: false }));
   assert.deepEqual([s.maxHealth, s.damageScale], [540, 4.5]);
@@ -104,7 +106,7 @@ test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack re
   assert.deepEqual([el.maxHealth, el.damageScale], [420, 4]);
   const plain = foe();
   promoteEliteFoe(plain);
-  assert.deepEqual([plain.maxHealth, plain.damageScale], [300, 3]);
+  assert.deepEqual([plain.maxHealth, plain.damageScale], [60 * ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT]);
   const pup = foe({ damageScale: 1 });
   promoteEliteFoe(pup, { own: false, superDungeon: true });
   assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 4.5], 'a puppet: its owner\'s maximum, the Super\'s blows');
@@ -151,7 +153,9 @@ test('SD4a the host by source: the tier read once by its one law before the fire
   assert.match(DC, /const enemies = dfLocation\?\.elite \|\| _superTier[^\n]*\n {4}\? expandEliteEnemies\(_layoutEnemies, \{\n {6}copies: ELITE_FOE_MULTIPLIER,/);
   assert.match(DC, /\n {2}if \(_superTier\) for \(const e of enemies\) e\.superTier = true;/);
   assert.ok(DC.indexOf('if (_superTier) for (const e of enemies) e.superTier = true;') < DC.indexOf('if (elitesAllowed({ onlinePage: isOnlinePage()'), 'marked before the pick and every build');
-  assert.match(DC, /pickDungeonElites\(enemies, [^\n]*\{ elite: !!dfLocation\?\.elite, count: _superTier \? SUPER_ELITE_FOES : null, classLevel: _eliteOnline \? Infinity : [^\n]*\}\);/);
+  assert.match(DC, /pickDungeonElites\(enemies, [^\n]*\{ elite: !!dfLocation\?\.elite, count: _superTier \? SUPER_ELITE_FOES : null, classLevel: _eliteClassLevel \}\);/);
+  assert.match(DC, /\n {2}const _eliteClassLevel = _eliteOnline \? Infinity : \(_superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\)\);\n/, 'the class foes\' level, one reading for the pick and the roll');
+  assert.match(DC, /markDungeonPromotions\(enemies, [^\n]*\{ eliteOpen: [^\n]*&& !dfLocation\?\.elite && !_superTier, classLevel: _eliteClassLevel \}\);/, 'an ordinary dungeon rolls its elites and champions per foe; an Elite or Super dungeon places its elites by count');
   assert.match(DC, /generateLootItems\(lootKey, [^\n]*, rolls, _superTier \? \{ itemChanceScale: SUPER_LOOT_DROP_MULT \} : elite \? \{ itemChanceScale: ELITE_LOOT_DROP_MULT \} : \{\}\);/);
   assert.match(DC, /qualityMult: _superTier \? SUPER_LOOT_QUALITY_MULT : elite \? ELITE_LOOT_QUALITY_MULT : 1,/);
 });

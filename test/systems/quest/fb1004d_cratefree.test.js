@@ -189,7 +189,7 @@ const DC = sliced('src/scenes/dungeonContext.js');
 const WM = sliced('src/scenes/worldModes.js');
 const scoped = (state) => new Proxy(state, {
   has: (t, k) => k !== '__s',
-  get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : k === 'effectiveLevel' ? effectiveLevel : k === 'applyProgressionScalingTo' ? () => {} : globalThis[k])),
+  get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : k === 'effectiveLevel' ? effectiveLevel : k === 'applyHeroThreatTo' ? () => {} : globalThis[k])),
   set: (t, k, v) => { t[k] = v; return true; },
 });
 const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(scoped(state));

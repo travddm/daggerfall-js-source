@@ -93,7 +93,7 @@ test('SOUL-LAW: every creature a soul gem can hold - DFU\'s 62 and the mod\'s fi
   // spell, which fills the Star first (SoulTrap.cs:126-134)
   assert.deepEqual(refused(() => createArtifact(MAGIC, 9)), [], 'Azura\'s Star');
   // the install's registry is exactly these: no creature the game fields that the sweep did not ask
-  installEnemyExpansion({ on: true, meaner: false, log: () => {} });
+  installEnemyExpansion({ on: true, mudex: false, log: () => {} });
   assert.deepEqual(Object.keys(ENEMY_BASICS).map(Number).sort(byId), [...CLASSIC, ...MOD]);
   assert.equal(itemNameParts(filled(createEmptySoulTrap(), OGRE)).name, 'Soul Trap (Ogre)', 'ItemHelper.ResolveItemLongName\'s soul tail (ItemHelper.cs:352-368)');
 });

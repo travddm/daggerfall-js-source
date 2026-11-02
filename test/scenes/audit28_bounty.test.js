@@ -219,5 +219,5 @@ test('AUDIT 28 the wire: a bounty row carries `k`, `a` and a cleared row\'s `t` 
   const base = { px: 1, py: 1, in: 0, loc: '', h: 1, hm: 1, f: 1, fm: 1, m: 1, mm: 1 };
   const out = validPartyPose({ ...base, bq: [{ i: '900.300.200.1.5', k: 3, a: 1, t: 50 }, { i: '900.300.200.2.5', c: 1, t: 1296060 }, { i: '900.300.200.3.5', k: -1, a: 2 }] });
   assert.deepEqual(out.bq, [{ i: '900.300.200.1.5', k: 3, a: 1 }, { i: '900.300.200.2.5', c: 1, t: 1296060 }, { i: '900.300.200.3.5' }], 'a held row\'s `t` and every value out of its law dropped');
-  assert.equal(RELAY_VERSION, 'world284');
+  assert.equal(RELAY_VERSION, 'world285');
 });
