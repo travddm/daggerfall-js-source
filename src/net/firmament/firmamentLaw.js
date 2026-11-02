@@ -167,6 +167,12 @@ const SKILL_PCT_DEF = Object.freeze({
 });
 /** The raw points a share of `base` comes to: whole, toward nothing. */
 export const pctOf = (base, pct) => (Number.isFinite(base) && base > 0 && pct > 0 ? Math.floor((base * pct) / 100) : 0);
+/** The Health the sky gives a body of `body` (the stored maximum with the online floor in it): the key stars' raw points and the
+ *  small stars' share together. `c` is the tree's capped totals (`treeStats`). Whole. */
+export function firmamentHealth(c, body) {
+  const d = statDef('hp');
+  return Math.max(d.min, Math.min(d.max, (c.hp ?? 0) + pctOf(body, c.hpPct ?? 0)));
+}
 const profName = (p) => cap1(p);
 const SKILL_DEF = Object.freeze({
   combat: Object.freeze(Object.fromEntries(COMBAT_SKILLS.map((n) => [n, def('combat', 15, (v) => `${signed(v)} ${SKILL_WORDS(n)}`)]))),
