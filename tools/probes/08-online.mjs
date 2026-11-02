@@ -64,7 +64,18 @@ export async function run({ browser, base, ck }) {
         await compose.close();
       }
     };
-    const [svc, saveText] = await Promise.all([standServices({ port: SVC_PORT }, state), composeSave()]);
+    // wrangler's dev server now and then dies while it boots (seen on CI: the account service never answered, 188 s in);
+    // a second start from the same state directory is a fresh process on the same ledger
+    const standOnce = async () => {
+      try {
+        return await standServices({ port: SVC_PORT }, state);
+      } catch (e) {
+        console.log(`   the services did not start, once more: ${String(e?.message).slice(0, 200)}`);
+        stopAll();
+        return standServices({ port: SVC_PORT }, state);
+      }
+    };
+    const [svc, saveText] = await Promise.all([standOnce(), composeSave()]);
     lap('services up and first save composed');
     const io = { fetch: localFetch({ port: svc.accountPort, ip: '10.9.9.9' }) };
     ck('the world host composes a first save', !!saveText, `${((saveText?.length ?? 0) / 1024).toFixed(0)} KB`);
@@ -216,12 +227,13 @@ export async function run({ browser, base, ck }) {
       // the line stands in the sender's log, or the card has come up and the next attempt agrees
       await a.until(async () => (await inLog(a)) || (await agreeShown()), 60000, 250);
     }
+    // the chat panel fades after a send, so the sender's own log is read now, while bob's wait below takes minutes
+    const sent = await inLog(a);
     lap(`chat line sent (conduct agreed: ${agreed})`);
     await a.shot('07-alice-chat');
     const heard = await b.until(() => b.page.evaluate((t) => document.body.innerText.includes(t), line), 180000, 500);
     await b.shot('07-bob-chat');
     ck('the chat line reaches bob', !!heard, line);
-    const sent = await a.page.evaluate((t) => document.body.innerText.includes(t), line);
     ck("and stands in alice's own log", sent, line);
     if (!heard || !sent) {
       for (const g of [a, b]) {
