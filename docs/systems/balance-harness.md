@@ -235,9 +235,12 @@ out of reach before the Renown that buys its stars.
 
 ## The finished budget (B5)
 
-The owner's target (decision 41): a maxed character about x1.6 a DFU one in melee and about x1.75 for the casters, typical gear
-at or under x1.5. Loot (B4) could not take the maxed builds lower, because typical gear sat under its target. So B5 took the
-rest from the other sources, each rescaled at its records. A card, a sheet and a tooltip print what applies. The net is the tops
+The owner's target (decision 41): a maxed character about x1.6 a DFU one in melee and about x1.75 for the casters,
+typical gear
+at or under x1.5. Loot (B4) could not take the maxed builds lower, because typical gear sat under its target. So B5 took
+the
+rest from the other sources, each rescaled at its records. A card, a sheet and a tooltip print what applies. The net is
+the tops
 summed, so it is met only by a kit with every registry at its top, and it cuts nothing a card prints.
 
 | Source | Blow, at its best (was -> now) | Where |
@@ -250,10 +253,13 @@ summed, so it is met only by a kit with every registry at its top, and it cuts n
 | Paths (martial) | +6 -> +4 | `martialPaths.js` |
 | **Net** | **+75.4 -> +34.5** | `powerCeiling.js` |
 
-Guards (share off a hurt, at their best): loot 12.4 -> 4.4, sets 10 -> 3, Firmament 15 -> 3, martial and arcane paths 4 -> 2. The
-net keeps 86.35% (was 74.1%). Spell potency: the loot's cap 9 -> 4 (worn potency 6 -> 3), the Firmament's spell stars x0.2 (cap 6).
+Guards (share off a hurt, at their best): loot 12.4 -> 4.4, sets 10 -> 3, Firmament 15 -> 3, martial and arcane paths 4
+-> 2. The
+net keeps 86.35% (was 74.1%). Spell potency: the loot's cap 9 -> 4 (worn potency 6 -> 3), the Firmament's spell stars
+x0.2 (cap 6).
 Techniques keep their own setting and aim at +5 to +10 (B1). The swing is not a lever: heft is already at the 15% bound
-(`swinglaw.test.js`), so it stays. Technique and swing numbers are unchanged. A Firmament damage star is at least half a per
+(`swinglaw.test.js`), so it stays. Technique and swing numbers are unchanged. A Firmament damage star is at least half a
+per
 cent. The Firmament's Health is in the health section above.
 
 Character power (ARENA2 attributes, DFU's own foe row), before -> after. Typical gear (default run, B4 numbers before):
@@ -276,9 +282,11 @@ Maxed (`+ceiling,+skyHealth`: every source at its top and the online health at i
 | Spellsword | 1.68 -> 1.35 | 1.38 -> 1.13 | 1.59 -> 1.33 | 1.68 -> 1.49 | 2.00 -> 1.75 |
 | Archer | 1.83 -> 1.48 | 1.57 -> 1.27 | 1.77 -> 1.43 | 1.90 -> 1.54 | 2.02 -> 1.63 |
 
-The casters stay higher than the melee builds because they sit at x1.54 to x1.57 with no stacking source at all: the level-45
+The casters stay higher than the melee builds because they sit at x1.54 to x1.57 with no stacking source at all: the
+level-45
 spell magnitude, Master school potency and the health floor are not stacking sources. `MAXED_POWER_MOST` in
-`test/tooling/playerPowerBudget.test.js` is 1.77 / 1.82 / 1.85 / 1.84 / 1.84 (warrior, archer, spellsword, mage, thief; no
+`test/tooling/playerPowerBudget.test.js` is 1.77 / 1.82 / 1.85 / 1.84 / 1.84 (warrior, archer, spellsword, mage, thief;
+no
 ARENA2, with the online health), down from B4's 2.08 / 2.13 / 2.0 / 1.96 / 2.2.
 
 ## Not modelled
