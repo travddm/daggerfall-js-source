@@ -80,6 +80,8 @@ export async function run({ browser, base, ck }) {
     let movedAt = t0;
     let lastLine = 0;
     let lastState = null;
+    let idleSince = 0;
+    let dumped = false;
     const landed = await g.until(
       async () => {
         const t = await travelState();
@@ -93,6 +95,15 @@ export async function run({ browser, base, ck }) {
         if (Date.now() - lastLine > 60000) {
           lastLine = Date.now();
           console.log(`   [${Math.round((Date.now() - t0) / 1000)}s] pixel ${pixel}, frame ${await g.frame()}, journey ${JSON.stringify(j)}`);
+        }
+        // A trip that is back at x1 short of its place was stopped (a foe, a box): say what stood in its way, once
+        idleSince = j.scale === 1 ? idleSince || Date.now() : 0;
+        if (!dumped && idleSince && Date.now() - idleSince > 90000) {
+          dumped = true;
+          const world = await g.page.evaluate(() => JSON.stringify({ overworld: window.__overworld?.(), mode: window.__mode?.(), overlay: window.__overlayKind?.() }));
+          console.log(`   [stopped short at ${pixel}] ${world}`);
+          await g.shot('travel-stopped');
+          g.diagnostics('travel stopped short', 40);
         }
         if (Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1) return true;
         return Date.now() - movedAt > STALL_MS || Date.now() - t0 > ABSOLUTE_MS ? 'gave up' : false;

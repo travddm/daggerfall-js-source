@@ -14,7 +14,7 @@
     "src/combat/pcaao.js": 1258,
     "src/combat/weapon/weaponRig.js": 2001,
     "src/formats/blocksFile.js": 1008,
-    "src/formats/morrowind/mwFirstPerson.js": 3504,
+    "src/formats/morrowind/mwFirstPerson.js": 2869,
     "src/formats/morrowind/mwNifFile.js": 1138,
     "src/net/accountClient.js": 2340,
     "src/net/gate/gateBrain.js": 2315,
