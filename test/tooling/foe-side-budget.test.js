@@ -8,19 +8,11 @@ import { parseLayers } from '../../tools/balance/run.mjs';
 import { heroThreat } from '../../src/systems/heroThreat.js';
 import { PROMOTION } from '../../src/systems/foe-promotion.ts';
 
-type Row = {
-  build: string;
-  level: number;
-  foeKind: string;
-  ratios: { power: number };
-  characterRatios: { power: number };
-};
-
 const LEVELS = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45];
-const report = buildReport({ levels: LEVELS, swings: 1500, layers: parseLayers('default') }) as { rows: Row[] };
+const report = buildReport({ levels: LEVELS, swings: 1500, layers: parseLayers('default') });
 /** How much harder the fight is than the character alone says: fight power over character power. Under 1 the foe is
  *  stronger than DFU's own foe would be, over 1 weaker. */
-const foeRatio = (row: Row): number => row.ratios.power / row.characterRatios.power;
+const foeRatio = (row) => row.ratios.power / row.characterRatios.power;
 const averageRows = report.rows.filter((row) => row.foeKind === 'average');
 
 test('at every level a foe is within a band of what DFU gives the same character', () => {
@@ -40,12 +32,8 @@ test("at level 45 the hero's threat brings the fight back near DFU's", () => {
 
 test("an elite stands at its tier's health over its plain kind, which carries the hero's threat and the elite does not", () => {
   for (const row of report.rows.filter((r) => r.foeKind === 'elite' && r.level >= 10)) {
-    const plain = report.rows.find(
-      (r) => r.foeKind === 'strong' && r.build === row.build && r.level === row.level,
-    ) as unknown as {
-      ours: { foeHealth: number };
-    };
-    const elite = row as unknown as { ours: { foeHealth: number } };
+    const plain = report.rows.find((r) => r.foeKind === 'strong' && r.build === row.build && r.level === row.level);
+    const elite = row;
     const step = elite.ours.foeHealth / plain.ours.foeHealth;
     const expected = PROMOTION.elite.health / heroThreat(row.level).health;
     assert.ok(
