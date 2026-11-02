@@ -1,76 +1,89 @@
 // @ts-check
-// BOW-AIM (FIELD BUGS 2026-10-26c, feature-feedback via;
-// ) - THE THIRD-PERSON BODY AIMS A RANGED WEAPON WHERE ITS OWNER LOOKS.
+// Third-person aim for ranged weapons: while a bow, crossbow or thrown weapon is being used, the body's spine tips
+// forward or back with the player's look, so the arms and head point where the player aims.
 //
-// The reference's law, ported whole (, the three [C] rules from "The ranged aim pitch
-// is TWO RotateControllers"): in third person (VM_Normal) "bip01 spine1" and "bip01 spine2" each carry a
-// RotateController (addControllers), and every frame both are given HALF of the actor's pitch times the pitch factor
-// about -X, in the actor root's space (configureControllers - both weaponanimation.cpp:175-211; the controller itself,
-// rotatecontroller.cpp:41-60). spine2 hangs off spine1, so the two halves compose and the chest, the arms and the
-// bow carry the whole pitch, curved through two joints. The factor is 0 unless a Ranged or Thrown weapon is in its
-// wind-up, its release or its follow (or a cast, `> WeaponEquipped`) - eased in over the wind-up's pre-section and out
-// over the follow, a crossbow's in its first tenth (character.cpp:1868-1895).
+// The tip is spread over the two spine bones that carry the chest (each takes half), measured about the actor's
+// own sideways axis, and scaled by a weight between 0 and 1 that follows the attack animation: the body leans into
+// the aim as the weapon is drawn, holds it through the release and relaxes while the weapon is lowered again.
 //
-// The port had none of it: the body stood level however the player looked (fpArm.js MW-D24 - right of the neck, which
-// IS a first-person law, and not of these), so a drawn bow pointed where Morrowind's clip holds it whatever the aim -
-// and a player looking down at their target from behind the body saw it aimed over the target's head. The arrow was
-// never wrong: it flies along the look, as the reference's does (weaponanimation.cpp:111-114).
-//
-// The argument is the reference's: rot[0] + getBodyPitchRadians() - the actor's pitch, + DOWNWARD (the body's swimming
-// pitch is 0 here: the port has no swimming body). This port's cam.pitch counts UPWARD, so the caller negates it, as it
-// does for the first-person neck (fpArm.js `neckPitch`). A peer's body and a townsperson's stand at pitch 0
-// (net/peer/peerBodies.js: the wire carries no look), so their drawn bows keep the clip's own angle.
+// Written from the retail skeleton's bone names and from watching the third-person body shoot. The attack
+// animation's own timing keys (wind-up start, minimum attack) arrive as plain times from the caller.
 
-import { MW_WEAPON_TYPE, MW_WEAPON_CLASS, weaponClass, rotNegX, applyRotateController } from '../formats/morrowind/mwFirstPerson.js';
+import {
+  MW_WEAPON_TYPE,
+  MW_WEAPON_CLASS,
+  weaponClass,
+  rotNegX,
+  applyRotateController,
+} from '../formats/morrowind/mwFirstPerson.js';
 
-/** addControllers' two bones (weaponanimation.cpp:175-211), spine1 first - the second hangs off it. */
+/** The two spine bones the tip is spread over, lowest first. Names are lower case, as the skeleton indexes them. */
 export const SPINE_AIM_BONES = Object.freeze(['bip01 spine1', 'bip01 spine2']);
 
-/** isRandomAttackAnimation (character.cpp:2934-2938): the groups with no pre-wind-up section to ease in over. */
-export const RANDOM_ATTACK_GROUPS = Object.freeze(new Set(['attack1', 'attack2', 'attack3', 'swimattack1', 'swimattack2', 'swimattack3']));
+/** Attack groups that play as one piece, with no wind-up phase before the release. */
+export const RANDOM_ATTACK_GROUPS = Object.freeze(
+  new Set(['attack1', 'attack2', 'attack3', 'swimattack1', 'swimattack2', 'swimattack3']),
+);
 
-/** UpperBodyState above WeaponEquipped (character.hpp:107-117), by the names combat/fpArm.js UPPER_BODY_NAME gives them. */
+/** The upper-body states in which a ranged weapon aims. Every other state leaves the spine alone. */
 export const AIMING_STATES = Object.freeze(new Set(['AttackWindUp', 'AttackRelease', 'AttackEnd', 'Casting']));
 
+/** A crossbow is reloaded by the same animation that lowers it, which is quick, so it relaxes in a tenth of it. */
+const CROSSBOW_RELAX_SHARE = 0.1;
+
 /**
- * setPitchFactor's law, verbatim (character.cpp:1868-1895). `upper` the upper body's state name, `weaponType` the stance's
- * MW_WEAPON_TYPE (mWeaponType), `group` the weapon group (mCurrentWeapon), `time` its playhead (-1 when it is not
- * playing), `startTime` and `minAttackTime` the "<type> start" and "<type> min attack" keys' times (-1 when absent -
- * getTextKeyTime's own answer, and the reference's guard reads it as it is), `completion` the playing section's
- * (AnimState::getCompletion). Pure.
- * @param {{ upper?: string, weaponType?: number, group?: string | null, time?: number, startTime?: number, minAttackTime?: number, completion?: number }} s
+ * How much of the look's pitch the spine takes, from 0 (none) to 1 (all of it).
+ *
+ * @param {object} [input]
+ * @param {string} [input.upper] Upper-body state name.
+ * @param {number} [input.weaponType] An MW_WEAPON_TYPE value.
+ * @param {string | null} [input.group] Name of the attack animation group that is playing.
+ * @param {number} [input.time] Playhead of that animation, in seconds.
+ * @param {number} [input.startTime] Time of the animation's wind-up start key, or -1.
+ * @param {number} [input.minAttackTime] Time at which the attack can be released, or -1 when the animation has none.
+ * @param {number} [input.completion] How far the follow-through has played, from 0 to 1.
+ * @returns {number}
  */
-export function spinePitchFactor({ upper = 'None', weaponType = MW_WEAPON_TYPE.None, group = null, time = -1, startTime = -1, minAttackTime = -1, completion = 0 } = {}) {
-  const cls = weaponClass(weaponType);
-  if (!AIMING_STATES.has(upper) || (cls !== MW_WEAPON_CLASS.Ranged && cls !== MW_WEAPON_CLASS.Thrown)) return 0;
-  if (upper === 'AttackWindUp' && !RANDOM_ATTACK_GROUPS.has(group ?? '')) {
-    // "A smooth transition can be provided if a pre-wind-up section is defined"
-    if (startTime <= time && time < minAttackTime) return (time - startTime) / (minAttackTime - startTime);
-    return 1;
-  }
+export function spinePitchFactor({
+  upper = 'None',
+  weaponType = MW_WEAPON_TYPE.None,
+  group = null,
+  time = -1,
+  startTime = -1,
+  minAttackTime = -1,
+  completion = 0,
+} = {}) {
+  if (!AIMING_STATES.has(upper)) return 0;
+  const kind = weaponClass(weaponType);
+  if (kind !== MW_WEAPON_CLASS.Ranged && kind !== MW_WEAPON_CLASS.Thrown) return 0;
+
   if (upper === 'AttackEnd') {
-    // "technically we do not need a pitch for crossbow reload animation, but we should avoid abrupt repositioning"
-    return weaponType === MW_WEAPON_TYPE.MarksmanCrossbow ? Math.max(0, 1 - completion * 10) : 1 - completion;
+    if (weaponType === MW_WEAPON_TYPE.MarksmanCrossbow) return Math.max(0, 1 - completion / CROSSBOW_RELAX_SHARE);
+    return 1 - completion;
   }
+
+  const drawing = upper === 'AttackWindUp' && !RANDOM_ATTACK_GROUPS.has(group ?? '');
+  const drawKeysKnown = minAttackTime >= 0 && time >= startTime && time < minAttackTime;
+  if (drawing && drawKeysKnown) return (time - startTime) / (minAttackTime - startTime);
   return 1;
 }
 
 /**
- * configureControllers (weaponanimation.cpp:175-211) on a posed skeleton: `pitch` (radians, + down: the actor's pitch
- * times the factor) laid as HALF about -X in the root's space on each spine bone in turn, spine1 first, so spine2's
- * frame is read under spine1's new turn - the order the reference's update callbacks run in. A zero pitch, or either
- * factor zero, leaves the clip's pose untouched (`mPitchFactor == 0.f || characterPitchRadians == 0.f`). A skeleton
- * missing a bone pitches the one it has (each controller slot is its own). Answers how many bones it turned.
+ * Tip the two spine bones by `pitch` radians (positive: the look is down). Each bone is turned about the actor's
+ * sideways axis, so the chest and everything above it carry the whole pitch. Returns how many bones were turned.
  */
 export function applySpineAim(skeleton, pose, rootRef, skelMats, pitch) {
-  if (!pitch || !skeleton?.byName) return 0;
+  if (!pitch) return 0;
   const half = rotNegX(pitch / 2);
   let turned = 0;
-  for (const name of SPINE_AIM_BONES) if (applyRotateController(skeleton, pose, rootRef, skelMats, skeleton.byName.get(name), half)) turned++;
+  for (const name of SPINE_AIM_BONES) {
+    if (applyRotateController(skeleton, pose, rootRef, skelMats, skeleton.byName.get(name), half)) turned++;
+  }
   return turned;
 }
 
-/** The slot poseAssembly runs (its `aim`) for a frame's pitch: null where there is nothing to lay. */
+/** A pose step for the assembly: tips the spine by `pitch`, or nothing (null) when the pitch is zero or not a number. */
 export function spineAimSlot(pitch) {
-  return pitch ? (skeleton, pose, rootRef, skelMats) => applySpineAim(skeleton, pose, rootRef, skelMats, pitch) : null;
+  if (!pitch) return null;
+  return (skeleton, pose, rootRef, skelMats) => applySpineAim(skeleton, pose, rootRef, skelMats, pitch);
 }
