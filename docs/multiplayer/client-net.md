@@ -93,7 +93,7 @@ call(io, path, body)   // io = { fetch, base, secret }
   `accountRefusalText` turns refusals into player text.
 - Main calls: `openGuest`, `register`, `login`, `recover`, `logout`, `readAccount`, `changePassword`, `mintIdentity`,
   `beatPlay`, the equip calls (title, aura, icon, glyph, name), safety and moderation calls, and groups for homes,
-  realm, professions, market, guilds, arena, wild zone, reward claims, staff chat and duels.
+  realm, professions, market, guilds, arena, reward claims, staff chat and duels.
 
 ## Cloud saves
 

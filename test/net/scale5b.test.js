@@ -615,24 +615,21 @@ test('SCALE5b the client: a session sends a relay setting only on the hub\'s lin
 
 // ═══ PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO ═════════════════════════════════════════════════════════
 
-test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, the Wild zone, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
-  const { newWildRef } = await import('../../src/net/wild/wildRef.js');
+test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
   await cell(async ({ R, w2, w2b, old, said, speak, rnd }) => {
     const rf = (ws) => ws.sent.filter((f) => f.t === 'rf');
     await speak(said[0], drawn(rnd));
     assert.equal(rf(w2).length, 0, 'nothing to say while nothing judges');
-    R.room._wildRef = newWildRef();
-    R.room._wildRef.fighters.set('acct-nobody', { id: 'nobody' });
+    R.room._serpents = new Map([['s0', { players: {} }]]);
     await speak(said[0], drawn(rnd));
     await speak(said[1], drawn(rnd));
     for (const ws of [w2, w2b]) assert.deepEqual(rf(ws), [{ t: 'rf', on: 1 }], 'said once, as it began');
     assert.deepEqual(rf(old), [], 'never to the first wire');
     const ws = R.connect(); await R.hello(ws, 'late-0001', drawn(rnd), { w2: 1 });
     assert.equal(ws.sent.find((f) => f.t === 'welcome').rf, 1, 'a newcomer\'s welcome says it');
-    R.room._wildRef.fighters.clear();
     R.room._serpents = new Map([['s1', { players: {} }]]);
     await speak(said[2], drawn(rnd));
-    assert.equal(rf(w2).length, 1, 'a serpent\'s fight judges as the zone did - nothing moved');
+    assert.equal(rf(w2).length, 1, 'a serpent\'s fight judges the same - nothing moved');
     R.room._serpents = new Map();
     await speak(said[2], drawn(rnd));
     assert.deepEqual(rf(w2).at(-1), { t: 'rf', on: 0 }, 'and said as it ended');

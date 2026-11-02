@@ -39,7 +39,7 @@ test('RVN13 THE MASK AND THE INDEX: a bit for each adaptation, read back in its 
   assert.equal(Wire.FOE_ADAPT_MASK_MAX, 2 ** F.ADAPTATIONS.length - 1);
   assert.equal(Wire.FOE_ADAPT_MAX, F.ADAPT_MAX);
   assert.equal(Wire.FOE_WEAK_MAX, F.WEAKNESSES.length - 1);
-  assert.equal(Wire.RELAY_VERSION, 'world282');
+  assert.equal(Wire.RELAY_VERSION, 'world283');
 });
 
 test('RVN13 THE RECORD\'S LAW: `ad` a mask of one to three, `wq` an index, `p2` 1, `rt` a foe\'s number - each refused whole outside its law; none when none (mutants: each bound dropped)', () => {

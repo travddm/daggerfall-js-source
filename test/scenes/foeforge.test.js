@@ -1,9 +1,9 @@
 // FOE-FORGE. A cell's foes are their owner's word - each socket streams its own, the relay reads none of it - so a
 // modified client could stand foes of any kind at every reader near it: each of the reader's allowances was its own (a
 // forged frame filled all of them), a foe taken over left its owner's count (records naming the reader heir stood foes
-// without end), and a record's `z`, `gg` and `nm` stood any foe as an elite, a Greater Giant or a revenant, at three to
+// without end), and a record's `z` and `nm` stood any foe as an elite or a revenant, at three to
 // four times its blows. The reader now holds one owner to PEER_PUPPETS_TOTAL_MAX in all, the foes it took of theirs
-// counted, and to an owner's honest number of elites, revenants and Greater Giants. Driven over two real encounter
+// counted, and to an owner's honest number of elites and revenants. Driven over two real encounter
 // pools - an owner and a reader (DEEP-SHARE's rig); the forged frames are what a modified client sends, the honest
 // ones the producer's own (foesFrame, handOverFrame).
 import '../modsOff.js';
@@ -13,7 +13,6 @@ import { readFileSync } from 'node:fs';
 import { CELL_FRAME_RECORDS_MAX } from '../../src/net/wire.js';
 import { REVENANT_MAX } from '../../src/systems/revenant/revenant.js';
 import { REVENANT_RETINUE_MAX } from '../../src/systems/revenant/revenantCompanions.js';
-import { WILD_GIANT } from '../../src/systems/wild/wildZone.js';
 import { createExteriorFoes, ENCOUNTER_PUPPETS_MAX, DEEP_PUPPETS_MAX, PEER_PUPPETS_TOTAL_MAX, PEER_ELITE_PUPPETS_MAX, PEER_REVENANT_PUPPETS_MAX } from '../../src/scenes/exteriorFoes.js';
 import { RAID_PUPPETS_MAX } from '../../src/world/raidShared.js';
 
@@ -36,7 +35,7 @@ function craftMonsterBsa(records) {
   for (const [name, bytes] of records) { for (let i = 0; i < name.length; i++) out[pos + i] = name.charCodeAt(i); v.setInt32(pos + NAME_FIELD, bytes.length, true); pos += ENTRY; }
   return out;
 }
-const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(WILD_GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
+const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()]]);
 const stubTex = { getSize: () => ({ width: 64, height: 100 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 8, getFrameCount: () => 1 };
 const settle = async () => { for (let i = 0; i < 6; i++) await new Promise((r) => setTimeout(r, 0)); };
 const playerEntity = () => ({ level: 1, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: { strength: 50, agility: 50, luck: 50, speed: 50, endurance: 50 }, armorValues: new Array(7).fill(60) });
@@ -158,16 +157,5 @@ test('FOE-FORGE executed: a peer\'s revenants - a forged frame naming twenty sta
   assert.equal(revs.length, PEER_REVENANT_PUPPETS_MAX);
   assert.ok(revs.every((f) => f.entity.damageScale > 4), 'a believed revenant strikes as its record says (x4, its second phase x1.2)');
   assert.ok(stood.filter((f) => !f.entity.revenant).every((f) => !(f.entity.damageScale > 1)), 'the rest strike as their plain kind');
-});
-
-test('FOE-FORGE executed: a Greater Giant is a giant, and one of each to an owner - `gg` on any other kind is not believed, and a second giant naming the same index is a giant of the ordinary kind', async () => {
-  const reader = pool(READER);
-  await send(reader, FORGER, { f: [rec(0, { gg: 0 }), rec(1, { t: WILD_GIANT, gg: 1 }), rec(2, { t: WILD_GIANT, gg: 1 }), rec(3, { t: WILD_GIANT, gg: 2 })] });
-  const by = (i) => reader.foes.find((f) => f.puppet === FORGER && f.seq === i);
-  assert.equal(by(0).entity.zoneGiant, undefined, 'not a giant: no Greater Giant');
-  assert.ok(!(by(0).entity.damageScale > 1), 'and none of its blows');
-  assert.equal(by(1).entity.zoneGiant, 1, 'the first giant naming an index is it');
-  assert.equal(by(2).entity.zoneGiant, undefined, 'a second naming it is not');
-  assert.equal(by(3).entity.zoneGiant, 2, 'another index is another Greater Giant');
 });
 

@@ -8,25 +8,18 @@ import * as tamrielInk from '../../src/ui/tamrielInk.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-test('REGION-LINES and ZONE-OFFLINE, ZONE-NAMES, by source: the provinces\' borders over the roads\' web on a halo, and no biome zone\'s border drawn; the open zone on the map online and off, painted under the continent\'s names; the zone map naming Cyrodiil\'s places and answering past the Bay (mutants: the borders unstroked; the zone online alone; the names under the fog)', () => {
+test('REGION-LINES, by source: the provinces\' borders over the roads\' web on a halo, and no biome zone\'s border drawn (mutant: the borders unstroked)', () => {
   const ink = rd('src/ui/tamrielInk.js');
   const tiles = ink.indexOf('if (opts.tiles) opts.tiles.draw(');
   const borders = ink.indexOf('provinceLines(ctx, view, paperW, paperH, ink.borders);');
   assert.ok(tiles > 0 && borders > tiles, 'the provinces\' borders after the roads\' tiles');
   assert.ok(!/stroke\(ink\.borders, 1, PEN\.soft, \[4, 3\]\);/.test(ink), 'the old border under the web gone');
-  assert.ok(ink.indexOf('opts.under?.();') > borders && ink.indexOf('opts.under?.();') < ink.indexOf('const named = [], marks = [];', borders), 'the window\'s under: over the borders, under the cities');
   // WITHDRAWN: no biome zone's border on the sheet, nor its making
   assert.equal(tamrielInk.zoneChains, undefined);
   assert.equal(tamrielInk.stepZoneInk, undefined);
   assert.ok(!/tamrielZoneChains|biomeAtPicture/.test(ink), 'no zone raster');
   const held = rd('src/ui/heldMap.js');
   assert.ok(!/stepZoneInk|biomeStamp/.test(held), 'no zone borders to step or key');
-  assert.match(held, /part: 'over', under: paintZone, nameless: zoneMask \? \(c\) => wildInside\(zoneMask, c\.x, c\.y\) : null \}\);\n\s+if \(!zoneDone\) paintZone\(\);/);
-  assert.match(held, /const past = \(this\._model \? tamrielInkFor\(this\._model\)\?\.cities \?\? \[\] : \[\]\)\.filter\(\(c\) => wildInside\(mask, c\.x, c\.y\) && tamrielCityBucket\(c, this\.filters\) >= 0\)/);
-  assert.match(held, /return bay\.concat\(past\);/, 'the zone map\'s places Cyrodiil\'s too');
-  assert.match(held, /const past = \(this\._tamriel \|\| this\._zoneMap\) \? this\._pastBayHover\(mx, my\) : null;/);
-  assert.match(rd('src/scenes/world.js'), /wildMask: \(\) => cyrodiilMask\(\),/, 'the map\'s zone online and off');
-  assert.match(rd('src/scenes/world.js'), /const wildMapMask = \(\) => \(_onlineWorldSession\(\) \? cyrodiilMask\(\) : null\);/, 'its rules online\'s');
 });
 
 // ── REGION-LINES 2 ──────────────────────────────────────────────────────────────────────
@@ -83,7 +76,6 @@ test('REGION-LINES 2 the icons standardized: out on the continent the Bay inks n
   assert.match(rd('src/ui/ink/inkMap.js'), /if \(!opts\.continent\) stroke\(model\.borders, 1, PEN\.soft, \[4, 3\]\);/);
   assert.deepEqual({ ...tamrielInk.ARENA_KIND_GLYPHS }, { 'city-state': 'city', town: 'hamlet', village: 'village' });
   const held = rd('src/ui/heldMap.js');
-  assert.match(held, /const kindOf = \(c\) => \(c\.capital \? 'city' : ARENA_KIND_GLYPHS\[c\.kind\] \?\? 'hamlet'\);/, 'the zone map\'s kinds the same');   // PIN MOVED (TESA x AUDIT TESA II): a place of no kind the hamlet, as the sheet's bucket
   assert.match(held, /continent: this\._tamriel && onContinent\(env\.view\.scale, this\._bayFit\(\)\),   \/\/ REGION-LINES/, 'the marks layer told it is on the continent');
 });
 

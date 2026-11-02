@@ -3,24 +3,22 @@
 // FOE CAN LEGALLY HAVE. Every stage that builds a foe's maximum rounds once and never lowers it (`Math.max(1,
 // Math.round(prev * mult))`), so the highest base and every highest multiplier, in the builders' own order and with their
 // rounding, is the exact legal maximum - for the inputs a reader cannot see taken at their worst: the owner's dice, its
-// combat standing and hero level, a revenant's rank, wrath and the Dread, the wild ring, a Rite's Summoner. What the
-// record says of itself only ever RAISES the bound (`z` an elite, `cp` a champion's trait, `nm` a revenant's name, `gg` a
-// Greater Giant), so a record claiming none of them is held to the ordinary chain. A record over its bound is PROVABLY
+// combat standing and hero level, a revenant's rank, wrath and the Dread, a Rite's Summoner. What the
+// record says of itself only ever RAISES the bound (`z` an elite, `cp` a champion's trait, `nm` a revenant's name), so a record claiming none of them is held to the ordinary chain. A record over its bound is PROVABLY
 // impossible: it is refused, never rescaled (the spec's own word). Pure, and the relay's too (GRANT9's strip).
 //
 // THE TWO CHAINS (the hand-off map, 2026-10-19):
 //   - a street's or a building's foe (scenes/exteriorFoes.js spawnFoe): its base - an elite x5 (`z`) - progression
 //     (systems/skillSoftcap.js progressionScaling, the wilderness by night at its worst, the hero at its worst) - a
-//     champion's 2 x its trait (`cp`, never with `z`) - a revenant's rank, wrath and the Dread (`nm`) - the wild zone's 4 x
-//     its heart ring - a Greater Giant x10 (`gg`) - a Rite's Summoner x3 (a class foe in a camp - the rite's faithful are
+//     champion's 2 x its trait (`cp`, never with `z`) - a revenant's rank, wrath and the Dread (`nm`) - a Rite's Summoner x3 (a class foe in a camp - the rite's faithful are
 //     one, the frame's `cz` - scenes/riteHost.js riteFoe), or a fallen star's coven x2 (any foe in a camp - a star's are
 //     one - scenes/starfall/starfallHost.js toughen; STAR-TUNE); and
-//     the City Watch's own (scenes/cityGuards.js: its class roll, the open zone's x10);
+//     the City Watch's own (scenes/cityGuards.js: its class roll);
 //   - a dungeon's foe (scenes/dungeonContext.js buildFoeAt): its base - a Super dungeon's x4 and a Stalwart champion's x3
-//     (more than any elite's x9) - progression at a Dragon's Den's worst - the wild dungeon's 4 x 2. The record carries no
+//     (more than any elite's x9) - progression at a Dragon's Den's worst. The record carries no
 //     `z`, `cp` or `nm` there (dungeonContext.js roomRecord), so the worst is taken; a revenant's lair stand is under it
 //     (_spawnEncounter's record has no tier and no champion - dungeonContext.js marks the layout's alone - so its rank,
-//     wrath and the Dread, x5.85 after the same progression and zone, never reach the layout's x12).
+//     wrath and the Dread, x5.85 after the same progression, never reach the layout's x12).
 // A class foe's base is DFU's roll at its worst: 10 + its level x the most hit points a level any class gives
 // (CreateCharCustomClass.cs's slider, systems/customClass.js HP_MAX). A monster's is the most of its row over the
 // profiles a game can build with (vanilla, Meaner Monsters, Meaner Monsters with PCAAO's edit - online forces the last,
@@ -47,11 +45,6 @@ export const FOE_BOUND = Object.freeze({
   festerHealth: 0.1,        // systems/revenant/revenantFeud.js FESTER.HEALTH
   wrathMax: 3,              // systems/revenant/revenantFeud.js WRATH_MAX
   dread: 1.5,               // systems/revenant/revenantUnquiet.js DREAD.HEALTH
-  wild: 4,                  // systems/wild/wildZone.js WILD_FOE_HEALTH_MULT
-  wildRingTop: 2,           // systems/wild/wildZone.js WILD_RING_LOOT's heart
-  giant: 10,                // systems/wild/wildZone.js WILD_GIANT_HEALTH_MULT
-  giantType: 16,            // systems/wild/wildZone.js WILD_GIANT
-  zoneWatch: 10,            // systems/wild/wildZone.js ZONE_WATCH_SCALE (scenes/world.js guardScale)
   rite: 3,                  // net/gate/gateRite.js RITE_SUMMONER_HEALTH
   star: 2,                  // net/starfall/starfallLaw.js STAR_FOE_HEALTH
   watch: 146,               // characters/mobile/mobileTypes.js KNIGHT_CITY_WATCH
@@ -99,42 +92,37 @@ function baseOf(r) {
   return FOE_BOUND_ROWS.get(r.t)?.[0] ?? null;
 }
 
-/** The street's chain (spawnFoe's order) for record `r`; `wild` whether the open zone may be about it, `camp` whether it
- *  stands in a camp (a Rite's faithful do). */
-function streetBound(r, base, wild, camp) {
+/** The street's chain (spawnFoe's order) for record `r`; `camp` whether it stands in a camp (a Rite's faithful do). */
+function streetBound(r, base, camp) {
   let v = base;
   if (r.z === 1) v = stage(v, FOE_BOUND.elite);
   v = stage(v, worstProgression(r.t, wildernessShare(true), placeVeteran(wildernessThreat(true))));
   if (r.z !== 1 && Number.isInteger(r.cp)) v = stage(v, FOE_BOUND.champion * (FOE_BOUND.championTraits[r.cp] ?? 1));
   if (typeof r.nm === 'string' && r.nm) v = revenantStages(v);
-  if (wild) v = stage(v, FOE_BOUND.wild * FOE_BOUND.wildRingTop);
-  if (Number.isInteger(r.gg) && r.t === FOE_BOUND.giantType) v = stage(v, FOE_BOUND.giant);
   if (camp) v = stage(v, isClass(r.t) ? Math.max(FOE_BOUND.rite, FOE_BOUND.star) : FOE_BOUND.star);   // STAR-TUNE: a fallen star's coven, any kind
-  return r.t === FOE_BOUND.watch ? Math.max(v, wild ? stage(base, FOE_BOUND.zoneWatch) : base) : v;
+  return r.t === FOE_BOUND.watch ? Math.max(v, base) : v;
 }
 
 /** The dungeon's chain (buildFoeAt's order): a layout foe's worst, which a revenant's lair stand never reaches. */
-function dungeonBound(r, base, wild) {
-  const v = stage(stage(stage(base, FOE_BOUND.superFoe), FOE_BOUND.champion * Math.max(...FOE_BOUND.championTraits)), worstProgression(r.t, Math.max(...DUNGEON_SHARE), 1));
-  return wild ? stage(v, FOE_BOUND.wild * FOE_BOUND.wildRingTop) : v;
+function dungeonBound(r, base) {
+  return stage(stage(stage(base, FOE_BOUND.superFoe), FOE_BOUND.champion * Math.max(...FOE_BOUND.championTraits)), worstProgression(r.t, Math.max(...DUNGEON_SHARE), 1));
 }
 
 /**
  * THE MOST HEALTH record `r` can legally stand with - its lane's chain (`street`: a cell's or a building's pool;
- * `dungeon`: a dungeon's host or own lane; `any`: the larger, the relay's word for a world room's own lane), `wild`
- * whether the open zone may be about it, `camp` whether its frame tags it a camp's (unknown: true, each) - or null where
+ * `dungeon`: a dungeon's host or own lane; `any`: the larger, the relay's word for a world room's own lane), `camp` whether its frame tags it a camp's (unknown: true, each) - or null where
  * it is unverified. Pure.
  * @param {any} r a foe record (net/wire.js validFoeRecord's shape)
- * @param {{ lane?: 'street'|'dungeon'|'any', wild?: boolean, camp?: boolean }} [o]
+ * @param {{ lane?: 'street'|'dungeon'|'any', camp?: boolean }} [o]
  * @returns {number|null}
  */
-export function foeHealthBound(r, { lane = 'street', wild = true, camp = true } = {}) {
+export function foeHealthBound(r, { lane = 'street', camp = true } = {}) {
   if (!r || !Number.isInteger(r.t)) return null;
   const base = baseOf(r);
   if (base == null) return null;
-  if (lane === 'dungeon') return dungeonBound(r, base, wild);
-  if (lane === 'any') return Math.max(streetBound(r, base, wild, camp), dungeonBound(r, base, wild));
-  return streetBound(r, base, wild, camp);
+  if (lane === 'dungeon') return dungeonBound(r, base);
+  if (lane === 'any') return Math.max(streetBound(r, base, camp), dungeonBound(r, base));
+  return streetBound(r, base, camp);
 }
 
 /**
@@ -142,7 +130,7 @@ export function foeHealthBound(r, { lane = 'street', wild = true, camp = true } 
  * (the City Watch never an elite or a champion; a champion never under CHAMPION_MIN_LEVEL - systems/eliteFoes.js
  * eliteEligible, systems/champions.js applyChampion). Null when it stands; else what it claimed against what it may
  * (`{ t, k, mx }`: its type, its claimed maximum or health, the bound) - the evidence a case keeps. Pure.
- * @param {any} r @param {{ lane?: 'street'|'dungeon'|'any', wild?: boolean, camp?: boolean }} [o]
+ * @param {any} r @param {{ lane?: 'street'|'dungeon'|'any', camp?: boolean }} [o]
  * @returns {{ t: number, k: number, mx: number }|null}
  */
 export function foeStatsRefusal(r, o = {}) {

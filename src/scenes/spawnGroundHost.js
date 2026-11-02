@@ -3,7 +3,6 @@
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 import { createSpawnGroundPlace } from '../world/spawnGroundPlace.js';
-import { cyrodiilMask } from '../systems/wild/cyrodiilZone.js';
 import { getWorldClimateSettings, REGION_NAMES } from '../formats/mapsFile.js';
 import { inEtherLaw } from '../world/ethericSea.js';
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';   // BAY-LEFT-GROUND (D5): the lift's Bay
@@ -48,7 +47,6 @@ export function createSpawnGroundHost(host) {
     terrainGen,
     cloneAt: _spawnCloneAt,
     spawnGone: tvSpawnGone,
-    zoneMask: cyrodiilMask,   // AUDIT RELEASE R3-7: the open zone Cyrodiil's (WW-C2), as spawnedDungeonAt reads it
     placeAt: (x, y) => !!provinceQuestPlaces?.placeOnPixel(x, y),   // SPAWN-WORLD: past the Bay a place stands first (scenes/tamrielPlacesHost.js)
   });
   /** AUDIT OW4 D4: WHAT spawnedDungeonAt WOULD STAND on a pixel it has not built - its own gates (the sea, a path across

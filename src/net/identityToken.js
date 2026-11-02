@@ -119,7 +119,7 @@
 // is the first module in src/net/ to need it.
 
 import { validStaffEvent, STAFF_EVENT_ID_RE } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT: a staff event order's event
-import { sanitizeName, NAME_MAX, streamsFoes } from './wire.js';
+import { sanitizeName, NAME_MAX } from './wire.js';
 import { GUILD_ID_RE, GUILD_TAG_RE, GUILD_MEMBER_RE } from './guild/guildLaw.js';   // GUILD1c: a guild rides the token - the law's own three shapes
 import { ribbonClaimOk } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon - heraldryLaw.js imports nothing, so the worker's graph stays flat
 import { worksOf } from './siege/siegeRef.js';   // SEAT2b part two (b): a siege's works on its pass - siegeRef.js imports nothing
@@ -598,7 +598,7 @@ async function openSealed(token, publicKey, { subtle, nowS, skewS, valid }) {
  *  second: 'renown', a character's Renown that ROSE while its player was
  *  already in a room, carried in by that player's own client (the token
  *  that let them in said the Renown they had then). */
-export const ORDER_KINDS = Object.freeze(['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);   // STAFF-PANEL5-MESSAGE: a staff message stored for account `s` (`mi` its id) - the hub nudges that account's own sockets   // SAFE4: a ban - its end, the service's word that the account may no longer play   // QUEST-HOME: a town's homes moved, the service's word for every page online   // INT9: a fall's drop, the service's word on what it took   // CARDS10: a ranked seat's deck, vouched for   // GUILD1c: a character's guild now, and a member or a guild gone   // SEAT2a: a battle's pass   // STAFF-PANEL2-FIX: a staff member cut off, the service's word that the account's sockets close   // STAFF-PANEL5-HIDDEN: a hidden staff subject's mark ended (Show myself, the staff session's end) - its sockets closed, never shown   // STAFF-PANEL5-FREEZE: a staff freeze - its end, the service's word that the account may only look around - and a staff line's nudge, the service's word that a staff chat thread has a new line
+export const ORDER_KINDS = Object.freeze(['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);   // STAFF-PANEL5-MESSAGE: a staff message stored for account `s` (`mi` its id) - the hub nudges that account's own sockets   // SAFE4: a ban - its end, the service's word that the account may no longer play   // QUEST-HOME: a town's homes moved, the service's word for every page online   // INT9: a fall's drop, the service's word on what it took   // CARDS10: a ranked seat's deck, vouched for   // GUILD1c: a character's guild now, and a member or a guild gone   // SEAT2a: a battle's pass   // STAFF-PANEL2-FIX: a staff member cut off, the service's word that the account's sockets close   // STAFF-PANEL5-HIDDEN: a hidden staff subject's mark ended (Show myself, the staff session's end) - its sockets closed, never shown   // STAFF-PANEL5-FREEZE: a staff freeze - its end, the service's word that the account may only look around - and a staff line's nudge, the service's word that a staff chat thread has a new line
 /** An order lives a minute - long enough to be carried to every room
  *  the moderator holds, short enough that a leaked one is stale before
  *  anyone could use it for anything but what it already said. */
@@ -635,22 +635,18 @@ export function orderValid(c) {
   // CARDS10: a deck order carries its digest and no other kind's fields; no other kind carries a digest
   if (c.o !== 'deck' && c.dh !== undefined) return false;
   if (c.o === 'deck' && (typeof c.dh !== 'string' || !DECK_DIGEST_RE.test(c.dh) || c.mu !== undefined || c.lv !== undefined || !noGuild || !noSiege || !noStake)) return false;
-  // INT9: a remains order carries its own fields and no other kind's; no other kind carries a remains'
-  const noRemains = REMAINS_FIELDS.every((f) => c[f] === undefined);
-  if (c.o !== 'remains' && !noRemains) return false;
-  if (c.o === 'remains' && (!remainsOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake)) return false;
   // QUEST-HOME: a home order carries its own fields and no other kind's; no other kind carries a home's
   const noHome = HOME_ORDER_FIELDS.every((f) => c[f] === undefined);
   if (c.o !== 'home' && !noHome) return false;
-  if (c.o === 'home' && (!homeOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains)) return false;
+  if (c.o === 'home' && (!homeOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake)) return false;
   // SAFE4: a ban carries its end (`bn`, epoch seconds - 0 lifted) and no other kind's fields; no other kind carries a ban's
   if (c.o !== 'ban' && c.bn !== undefined) return false;
-  if (c.o === 'ban' && (!Number.isSafeInteger(c.bn) || c.bn < 0 || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome)) return false;
+  if (c.o === 'ban' && (!Number.isSafeInteger(c.bn) || c.bn < 0 || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL5-MESSAGE: a staff message's order carries its id (`mi`) and no other kind's fields; no other kind carries a `mi`
   if (c.o !== 'smsg' && c.mi !== undefined) return false;
-  if (c.o === 'smsg' && (typeof c.mi !== 'string' || !ID_RE.test(c.mi) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || c.bn !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome)) return false;
+  if (c.o === 'smsg' && (typeof c.mi !== 'string' || !ID_RE.test(c.mi) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || c.bn !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL2-FIX: a staff cut names its account and carries nothing else
-  if (c.o === 'staffcut' && (c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome)) return false;
+  if (c.o === 'staffcut' && (c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL5-HIDDEN: a hide order is `{o:'hide', s, hd: 0, i, e}` - the hidden subject `s` hidden no longer - and carries
   // nothing else; no other kind carries an `hd`
   if (c.o !== 'hide' && c.hd !== undefined) return false;
@@ -752,50 +748,6 @@ export async function verifyStakeOrderAnyAge(token, publicKey, { subtle }) {
   try { i = raw ? JSON.parse(dec.decode(raw))?.i : null; } catch { i = null; }
   if (!Number.isSafeInteger(i)) return { ok: false, why: 'shape' };
   return openSealed(token, publicKey, { subtle, nowS: i, skewS: 0, valid: (c) => orderValid(c) && c.o === 'stake' });
-}
-
-/* ═══ INT9: THE REMAINS ORDER (lane 2) ════════════════════════════════════════════
- *
- * A death in the open zone drops what the ACCOUNT SERVICE took off the fallen character's judged record
- * (server-account/src/wild.js), never what the fallen's own game hands over. The relay has no door to the service, so the
- * service hands the depositor ITS WORD on the drop, an order the room checks with the key it already holds:
- * `{o:'remains', s, wr, wh, wn, wm, wk?, wi?, wg?, we?, i, e}` - account `s`'s fall left remains `wr` holding `wn` records whose
- * list (JSON, as the service answered it) digests to `wh` (hex SHA-256), to be laid in room `wm` alone (AUDIT INT9: an
- * order named no room, so one fall was laid in two); `wk` the killer whose worn piece is the list's record `wi`, theirs
- * alone to take; `wg` the fallen's guild, whose members take nothing of it (PVPDUNGEONS - whoever lays it). The room keeps
- * a deposit only whose records digest to `wh` (net/wild/wildLaw.js), and opens it to takes only then. MAC'S DECISION
- * `we` 1 - the killer's piece is held by the service in ESCROW (server-account/src/
- * wild.js), never the room's to hand: the killer's take is a COLLECT the room signs (net/wild/wildReceipt.js `g1`), and the
- * service commits the piece to the killer's record against it.
- */
-/** A remains order's fields - no other order kind carries one. */
-export const REMAINS_FIELDS = Object.freeze(['wr', 'wh', 'wn', 'wm', 'wk', 'wi', 'wg', 'we']);
-/** A remains' id (the relay's twelve hex, or the service's for a death no receipt names), and the most records a
- *  remains holds (net/wire.js WILD_REMAINS_ITEMS_MAX, pinned equal). */
-export const REMAINS_ID_RE = /^[0-9a-f]{12}$/;
-export const REMAINS_RECORDS_MAX = 96;
-/** Whether a claim set's remains fields are a remains'. */
-export function remainsOrderValid(c) {
-  if (typeof c.wr !== 'string' || !REMAINS_ID_RE.test(c.wr) || typeof c.wh !== 'string' || !DECK_DIGEST_RE.test(c.wh)) return false;
-  if (!Number.isSafeInteger(c.wn) || c.wn < 0 || c.wn > REMAINS_RECORDS_MAX) return false;
-  if (typeof c.wm !== 'string' || c.wm.length > 64 || !streamsFoes(c.wm)) return false;
-  if (c.wg !== undefined && !(typeof c.wg === 'string' && GUILD_ID_RE.test(c.wg))) return false;
-  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;   // MAC: an escrow is the killer's piece's
-  if (c.we !== undefined && c.we !== 1) return false;
-  return typeof c.wk === 'string' && ID_RE.test(c.wk) && c.wk !== c.s && Number.isSafeInteger(c.wi) && c.wi >= 0 && c.wi < c.wn;
-}
-/** INT9: MINT A REMAINS ORDER - the service's word that account `s`'s fall left remains `wr` of `wn` records digesting to
- *  `wh`, for room `wm` (`wk`, `wi`: the killer's worn piece, theirs alone; `wg`: the fallen's guild). */
-export async function mintRemainsOrder({ s, wr, wh, wn, wm, wk = undefined, wi = undefined, wg = undefined, we = undefined }, privateKey, { subtle, nowS, ttlS = ORDER_TTL_S }) {
-  if (!Number.isSafeInteger(nowS)) throw new TypeError('mintRemainsOrder needs an integer epoch-seconds clock');
-  const claims = { o: 'remains', s, wr, wh, wn, wm, ...(wk !== undefined ? { wk, wi } : {}), ...(wg !== undefined ? { wg } : {}), ...(we !== undefined ? { we } : {}), i: nowS, e: nowS + ttlS };
-  if (!orderValid(claims)) throw new TypeError('mintRemainsOrder refused an order it could not verify');
-  return sealClaims(claims, privateKey, subtle);
-}
-/** INT9: a remains' records' digest - hex SHA-256 of their JSON, as the service answers them and the room keeps them. */
-export async function remainsDigest(/** @type {any[]} */ records, { subtle }) {
-  const d = new Uint8Array(await subtle.digest('SHA-256', enc.encode(JSON.stringify(records))));
-  return [...d].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /* ═══ CARDS10: THE DECK ORDER ═════════════════════════════════════

@@ -21,8 +21,7 @@
 // a frozen account is answered `frozen` on every door behind a session but a short list - signing out, its own account,
 // the realm doors that load the character it looks around as, the relay token and the staff chat (`freezeRefusal`). The
 // checkpoint asks the freeze in its own read and the beat in its own write (realm.js checkpointRealm, accounts.js
-// creditPlay), since a hot route believes a pass minted before the freeze. A fall that names a frozen account is refused
-// (wild.js wildFall: a killer filing the fall of a frozen player), and a market buy or bid on a frozen seller's goods
+// creditPlay), since a hot route believes a pass minted before the freeze. A market buy or bid on a frozen seller's goods
 // (market.js) - a frozen account's listings sell nothing (Weak spots: "A banned, frozen or held player's market listings
 // keep selling").
 //

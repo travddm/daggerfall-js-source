@@ -104,8 +104,8 @@ const ON_TRAVEL = grab(/buildTravelMapWindow\(\{ \.\.\.travelTown\(\), onTravel:
 const ON_COORDS = grab(/\n\s*onTravelToCoords: (\(pick, opts\) => \{ [^\n]*? \}),/, 'the map\'s onTravelToCoords');
 const HOST = [
   lineSource('const TV_SEA_EPS_M = '), lineSource('const tvQuiet = '), lineSource('const tvTrip = '), lineSource('const tvWater = '),
-  lineSource('let _tvRouteGround = null;'), lineSource('let _tvRocksFrom = null, _tvRocksRoads = null, _tvRocks = null;'), lineSource('let _tvRocksMask = null;'), fnSource('tvWodRocks'),
-  lineSource('const tvWildFree = '), lineSource('let _tvGroundWild = false;'), constBlock('tvRouteGround'), lineSource('const tvLegMid = '),   // WILD1: the ground's open zone (none here: wildMapMask null) - its block, re-read as the zone comes or goes
+  lineSource('let _tvRouteGround = null;'), lineSource('let _tvRocksFrom = null, _tvRocksRoads = null, _tvRocks = null;'), fnSource('tvWodRocks'),
+  constBlock('tvRouteGround'), lineSource('const tvLegMid = '),
   lineSource('const _tvTownRects = new Map();'), fnSource('tvTownRects'), fnSource('tvRingAt'),   // OW-WOD-PATH, OW-TOWN-RING: the host's own (no World of Daggerfall list here; no location on the way)
   constBlock('travelViewAllowed'),
   fnSource('tvOwnsJourneys'), fnSource('tvRoutesJourneys'), fnSource('tvMapForcesRoads'), fnSource('travelViewResume'), fnSource('beginAcceleratedTravel'),

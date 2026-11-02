@@ -22,7 +22,7 @@ import { scanTheatreGate, theatreGateScanner, findTheatreGateSite, theatreGateAr
 import { gateArenaLocation } from '../../../src/world/gate/gateArena.js';
 import { createWorldPlaces } from '../../../src/world/worldWide/worldPlaces.js';
 import { theatreAt, areaAt, THEATRE_KEYS } from '../../../src/world/worldWide/worldGrid.js';
-import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
+import { IMPERIAL_ID } from '../../../src/world/tamriel/tamrielLand.js';
 import { CITIES } from '../../../src/world/tamriel/tamrielGeography.js';
 import { pictureToBay, inBay, setTamrielFit } from '../../../src/world/tamriel/tamrielFrame.js';
 import { setTamrielTrace } from '../../../src/world/tamriel/tamrielLand.js';
@@ -39,17 +39,17 @@ const subtle = webcrypto.subtle;
 const ARENA2 = process.env.ARENA2_PATH ?? '';
 const HAVE = !!ARENA2 && existsSync(join(ARENA2, 'MAPS.BSA'));
 const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.url), 'utf8'));
-const PROVINCES = [1, 2, 3, 4, 5, 6, 7, 8];
+const PROVINCES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const quiet = (fn) => { const warn = console.warn; console.warn = () => {}; return Promise.resolve().then(fn).finally(() => { console.warn = warn; }); };
 
 // ─── the lanes that stand ───────────────────────────────────────────────────────────────────────
 
 test('WW-GATES-EVERYWHERE THE LANES THAT STAND: the Bay\'s and the eight provinces\' (1 to 8), Cyrodiil\'s never - each province\'s gate admitted, held, its number and its world pixel taken on the wire, its spent word heard; the open zone\'s refused at every door (mutants: a province\'s lane shut; Cyrodiil\'s opened)', () => {
   assert.deepEqual(GATE_LANES_OPEN, [0, ...PROVINCES]);
-  assert.equal(CYRODIIL_THEATRE, 9);
+  assert.equal(IMPERIAL_ID, 9);
   const day = 900;
-  for (const lane of [...PROVINCES, CYRODIIL_THEATRE]) {
-    const n = gateNumber(day, lane), t = gateTimes(n), open = lane !== CYRODIIL_THEATRE;
+  for (const lane of [...PROVINCES, IMPERIAL_ID]) {
+    const n = gateNumber(day, lane), t = gateTimes(n), open = true;
     assert.deepEqual([gateLaneOpen(lane), gateNumberOk(n), gateAdmits(n, t.openAt + 1), gateHolds(n, t.sealAt + 1), gatePixelOk(n, -1200, 300),
       !!validGateIn({ k: 'site', d: n, px: -1200, py: 300, pl: 'Solitude, Skyrim' }), !!validGateIn({ k: 'spent', d: n }), !!validRiteIn({ d: n, px: -1200, py: 300, s: 0, f: 0 })],
     Array(8).fill(open), `lane ${lane}`);
@@ -65,7 +65,7 @@ test('WW-GATES-EVERYWHERE A2b: A PROVINCE\'S GATE\'S KILL NAMES ITS OWN PROVINCE
   for (const lane of PROVINCES) {
     const n = gateNumber(day, lane);
     assert.deepEqual([gateSeatRegion(n, null), gateClaimWaits(n, null), gateRegionOk(n, gateSeatRegion(n, null))], [61 + lane, false, true], `lane ${lane}`);
-    assert.equal(REGION_NAMES[gateSeatRegion(n, null)], ['High Rock', 'Hammerfell', 'Skyrim', 'Morrowind', 'Sumurset Isle', 'Valenwood', 'Elsweyr', 'Black Marsh'][lane - 1]);
+    assert.equal(REGION_NAMES[gateSeatRegion(n, null)], ['High Rock', 'Hammerfell', 'Skyrim', 'Morrowind', 'Sumurset Isle', 'Valenwood', 'Elsweyr', 'Black Marsh', 'Cyrodiil'][lane - 1]);
   }
   // the Bay's lane: its scan's region, and a wait while it is not done
   const scan = { byRegion: new Map([[17, Int32Array.from(Array.from({ length: 30 }, (_, i) => 300 * 1000 + 200 + i))]]), towns: [{ name: 'Daggerfall', px: 207, py: 213, region: 17 }], townAt: new Int32Array(1000 * 500).fill(0) };
@@ -113,16 +113,16 @@ test('WW-GATES-EVERYWHERE THE RELAY: a Skyrim gate\'s court is minted at its ope
   const lane = THEATRE_KEYS.indexOf('Skyrim'), DAY = 538, n = gateNumber(DAY, lane), TT = gateTimes(n);
   const realNow = Date.now;
   try {
-    // THE WINDOW: the Worker mints the province's court at its opening, never the open zone's
+    // THE WINDOW: the Worker mints the province's court at its opening, Cyrodiil's too
     let minted = 0;
     const env = { ROOMS: { idFromName: () => { minted++; return 'id'; }, get: () => ({ fetch: async () => new Response('ok') }) } };
     const upgrade = (key) => new Request(`https://relay.test/room/${key}`, { headers: { Upgrade: 'websocket' } });
     Date.now = () => TT.openAt;
     assert.equal((await worker.fetch(upgrade(gateRoomKey(n)), env)).status, 200, 'Skyrim\'s court');
-    const zone = gateNumber(DAY, CYRODIIL_THEATRE);
+    const zone = gateNumber(DAY, IMPERIAL_ID);
     Date.now = () => gateTimes(zone).openAt;
-    assert.equal((await worker.fetch(upgrade(gateRoomKey(zone)), env)).status, 404, 'the open zone stands no gate');
-    assert.equal(minted, 1);
+    assert.equal((await worker.fetch(upgrade(gateRoomKey(zone)), env)).status, 200, 'Cyrodiil court is minted like any province court');
+    assert.equal(minted, 2);
     // THE FIGHT: in, the Warden down, the receipt
     let clock = TT.openAt + 1000;
     Date.now = () => clock;
@@ -331,7 +331,7 @@ test('WW-GATES-EVERYWHERE (ARENA2) A GATE STANDS IN EVERY PROVINCE: over the reg
     const wet = (x, y) => gateSeaPixel(tamrielClimateAt(x, y), ground.getHeightMapValue(x, y));
     const t0 = performance.now();
     const scans = createTheatreGateScans({ places, wet, land: tamrielLandVersion, idle: null });
-    assert.deepEqual(scans.theatres(), PROVINCES, 'ground for a gate in all eight provinces, none in the open zone');
+    assert.deepEqual(scans.theatres(), PROVINCES, 'ground for a gate in all nine provinces');
     const atOnce = performance.now() - t0;
     const day = 900;
     for (const lane of PROVINCES) {

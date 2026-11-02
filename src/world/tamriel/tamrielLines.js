@@ -14,10 +14,9 @@
 // crossings' middle) - but three whose twice-held label lies on a diagonal the law's middle holds are two lines past
 // each other, each cutting its own corner. A square of four picture centres all one label holds no line (the law's bound, tamrielLand.js SMOOTH-LAND),
 // so the whole continent's walk visits only the map squares in the picture's squares of mixed centres; and a square is
-// made the first time anything asks it (`square`) - Cyrodiil's zone asks its own outline's alone.
+// made the first time anything asks it (`square`).
 //
-// THE ONE LINE: the held map's coasts and borders (ui/tamrielInk.js tracedChains), Cyrodiil's zone and its red line
-// (systems/wild/cyrodiilZone.js zoneLineOf: the same squares, the same crossings, the same middles) - and a map pixel is
+// THE ONE LINE: the held map's coasts and borders (ui/tamrielInk.js tracedChains) - and a map pixel is
 // on a line's side exactly as its centre's label says, the law's own.
 // ═══════════════════════════════════════════════════════════════════
 import { landLaw, landLabelAt, landSideAt, provinceLeadAt } from './tamrielLand.js';
@@ -37,9 +36,8 @@ export const squareEnds = (/** @type {number} */ bx, /** @type {number} */ by) =
 };
 
 /** @typedef {{ x: number, y: number }} Pt */
-/** @typedef {{ a: number, b: number, kind: 'coast'|'border'|'water', pair: number, side: number[] }} Seg - its ends' ids (a
- *  crossing's edge, or a square's meeting point), what it divides (NIBEN-SEA: 'water' a zone's dam across one label's
- *  water, systems/wild/cyrodiilZone.js zoneLineSteps), the pair of labels (low * 16 + high; 0 for the zone's own), and
+/** @typedef {{ a: number, b: number, kind: 'coast'|'border', pair: number, side: number[] }} Seg - its ends' ids (a
+ *  crossing's edge, or a square's meeting point), what it divides, the pair of labels (low * 16 + high), and
  *  two map pixels it divides (`[x, y, qx, qy]`, one of each label) */
 /** @typedef {{ bx: number, by: number, l: number[], segs: Seg[] }} Square */
 

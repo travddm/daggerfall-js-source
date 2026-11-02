@@ -89,16 +89,16 @@ test('WW5 THE LAW: a star\'s number names its lane - lane t\'s three are 3t + 0.
   assert.equal(STAR_LANES, THEATRE_COUNT, 'a lane a theatre');
   assert.equal(STAR_LANES_WIRE, STAR_LANES, 'the wire\'s copy, pinned equal');
   assert.equal(STAR_STARS_MAX, STAR_PER_NIGHT);
-  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8], 'the Bay and the eight provinces; Cyrodiil\'s open zone stands no site-bound event');
+  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'the Bay and the nine provinces');
   for (let lane = 0; lane < STAR_LANES; lane++) for (let j = 0; j < STAR_PER_NIGHT; j++) {
     const k = starOfLane(lane, j);
     assert.equal(k, lane * 3 + j);
     assert.equal(starLaneOf(k), lane); assert.equal(starIndexOf(k), j);
-    assert.equal(starOk(N, k), lane <= 8, `lane ${lane}`);
+    assert.equal(starOk(N, k), lane <= 9, `lane ${lane}`);
     assert.deepEqual(starTimes(N, k), starTimes(N, j), 'one sky: every lane\'s star j falls at the Bay\'s star j\'s instants');
     assert.equal(starMasterOf(3, k).id, starMasterOf(3, j).id, 'its master its place\'s');
   }
-  assert.ok(!starOk(N, 27) && !starOk(N, 30) && !starOk(N, -1) && !starOk(0, 0));
+  assert.ok(!starOk(N, 30) && !starOk(N, -1) && !starOk(0, 0));
   for (let k = 0; k < 3; k++) assert.equal(starTimes(N, k).fallAt, oldFallAt(N, k), 'the Bay\'s instants, the law before WW5');
   assert.notEqual(starRoll(N, 3, 1), starRoll(N, 0, 1), 'a lane\'s rolls its own');
   assert.notDeepEqual(starSpotLocal(N, 3), starSpotLocal(N, 0));
@@ -120,8 +120,8 @@ test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'
   assert.equal(starWireOk(0, ...BAY_PX) && starWireOk(2, 999, 499) && starWireOk(0, 0, 0), true);
   for (const [k, px, py] of [[0, 1000, 10], [1, -1, 5], [3, ...BAY_PX], [26, 10, 10]]) assert.equal(starWireOk(k, px, py), false, `${k} @${px},${py}`);
   for (const [k, px, py] of [[3, ...PAST_PX], [5, 1000, 0], [26, -400, 1800]]) assert.equal(starWireOk(k, px, py), true, `${k} @${px},${py}`);
-  for (const [k, px, py] of [[27, ...PAST_PX], [30, ...PAST_PX], [3, WORLD_PIXEL_BOUND, 0], [3.5, ...PAST_PX], [-1, ...PAST_PX]]) assert.equal(starWireOk(k, px, py), false, `${k}`);
-  assert.equal(siteEventLaneOpen(9), false); assert.equal(siteEventPixelOk(9, ...PAST_PX), false);
+  for (const [k, px, py] of [[30, ...PAST_PX], [3, WORLD_PIXEL_BOUND, 0], [3.5, ...PAST_PX], [-1, ...PAST_PX]]) assert.equal(starWireOk(k, px, py), false, `${k}`);
+  assert.equal(siteEventLaneOpen(9), true); assert.equal(siteEventPixelOk(9, ...PAST_PX), true);
   const bay = { n: N, k: 1, px: 300, py: 200, lv: 12, s: 1, o: 0, kw: 2, kn: 3, wc: 1, hb: 40, mf: 0 };
   assert.deepEqual(validStarIn({ ...bay, junk: 1 }), bay, 'the Bay\'s word, projected as it always was');
   assert.deepEqual(validStarIn({ ...bay, k: 10, px: 1600, py: -120 }), { ...bay, k: 10, px: 1600, py: -120 });
@@ -134,7 +134,7 @@ test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'
   assert.equal(STAR_HELD_MAX, 9 * 3 * 2 + 6, 'a night\'s and the night before\'s three in every lane, and room');
   const base = { sf: [N, 13], s: 'acct_1234', c: 1, l: 5, i: 100, e: 160 };
   assert.ok(starReceiptValid(base), 'a province\'s star\'s receipt - the relay mints it, the account service reads it (both bundle the law)');
-  assert.ok(!starReceiptValid({ ...base, sf: [N, 27] }));
+  assert.ok(starReceiptValid({ ...base, sf: [N, 27] }));
 });
 
 test('WW5 A HALO SAYS FOR ITSELF: a province\'s star word and a province\'s find go down a halo only once the halo\'s own relay has welcomed it; the primary\'s welcome is the primary\'s (AUDIT RAID R8b\'s law, WW5\'s finish; mutants: the halo sent on the primary\'s welcome, for a star and for a find; the halo never told)', () => {
@@ -246,7 +246,7 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   const queue = [];
   let gen = 1;
   const T = createEventTheatres({ scans: () => scans, generation: () => gen, land: () => 7, idle: (fn) => queue.push(fn) });
-  assert.deepEqual([...PROVINCE_EVENT_LANES], [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual([...PROVINCE_EVENT_LANES], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
   assert.deepEqual(T.warmLanes(), [], 'none warm yet');
   assert.equal(made.length, 0, 'nothing scanned on the asking frame');
   assert.equal(queue.length, 1, 'one idle moment asked');
@@ -254,10 +254,10 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   assert.deepEqual(made, [1], 'one theatre an idle moment');
   assert.equal(queue.length, 1);
   while (queue.length) queue.shift()();
-  assert.deepEqual(made, [1, 2, 3, 4, 5, 6, 7, 8]);
-  assert.deepEqual(T.warmLanes().map(([t]) => t), [1, 2, 3, 4, 5, 6, 7, 8]);
-  assert.equal(T.scanOf(9), null, 'the open zone: none');
-  assert.equal(queue.length, 0, 'and never owed an idle moment');
+  assert.deepEqual(made, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(T.warmLanes().map(([t]) => t), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(T.scanOf(9), { theatre: 9, byArea: new Map(), towns: [], townOf: new Map() }, "Cyrodiil is warmed like a province");
+  assert.equal(queue.length, 0, "and never owed an idle moment once warm");
   gen = 2;
   assert.equal(T.scanOf(3), null, 'a new generation: warmed again');
   assert.equal(T.ready(3), false);
@@ -304,9 +304,9 @@ test('WW5 THE HOST: every theatre\'s stars stand - the Bay\'s and a province\'s,
     w.region = 64;   // Skyrim
     const rows = host.timerRows();
     assert.ok(rows.length > 0 && rows.every((r) => /^star:\d+\.(9|10|11)$/.test(r.id)), `in Skyrim: Skyrim's rows alone (${rows.map((r) => r.id)})`);
-    w.region = 70;   // Cyrodiil: the Bay's, as they were
+    w.region = 70;   // Cyrodiil: its own lane now
     const cy = host.timerRows();
-    assert.ok(cy.length > 0 && cy.every((r) => /^star:\d+\.[0-2]$/.test(r.id)), 'in Cyrodiil: the Bay\'s rows');
+    assert.ok(cy.every((r) => /^star:\d+\.(27|28|29)$/.test(r.id)), `in Cyrodiil: its own rows alone (${cy.map((r) => r.id)})`);
     // a hold past the Bay: said where it stands
     w.t = starTimes(N, 0).fallAt + 1000; host.frame();
     w.region = 17; w.said.length = 0;

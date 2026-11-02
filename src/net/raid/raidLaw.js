@@ -272,9 +272,6 @@ export const RAID_REGION_COUNT = 71;
 export const RAID_BAY_REGIONS = 62;
 /** The lanes: the Bay's, then the nine provinces' (world/worldWide/worldGrid.js THEATRE_COUNT - pinned equal). */
 export const RAID_LANES = 10;
-/** The open zone's lane - Cyrodiil (systems/wild/wildZone.js WILD_REGION 70, its theatre 9): it stands no raid, the gates'
- *  recorded law (the open zone stands no site-bound world event - PVPDUNGEONS). */
-export const RAID_ZONE_LANE = 9;
 /** A region's lane: 0 for a Bay region, a province's theatre past it, -1 for none. @param {unknown} r */
 export const raidLaneOfRegion = (r) => {
   if (!Number.isInteger(r)) return -1;
@@ -283,8 +280,8 @@ export const raidLaneOfRegion = (r) => {
 };
 /** A key's lane, or -1. @param {unknown} key */
 export const raidLaneOfKey = (key) => (typeof key === 'string' && RAID_KEY_RE.test(key) ? raidLaneOfRegion(Number(key.slice(0, key.indexOf(':')))) : -1);
-/** Does a lane stand raids - the Bay's, and every province's but the open zone's? @param {unknown} lane */
-export const raidLaneOpen = (lane) => Number.isInteger(lane) && /** @type {number} */ (lane) >= 0 && /** @type {number} */ (lane) < RAID_LANES && lane !== RAID_ZONE_LANE;
+/** Does a lane stand raids - the Bay's, and every province's, Cyrodiil's included? @param {unknown} lane */
+export const raidLaneOpen = (lane) => Number.isInteger(lane) && /** @type {number} */ (lane) >= 0 && /** @type {number} */ (lane) < RAID_LANES;
 /** The lanes past the Bay that stand raids, ascending. */
 export const RAID_LANES_BEYOND = Object.freeze(Array.from({ length: RAID_LANES - 1 }, (_, i) => i + 1).filter(raidLaneOpen));
 /** WW6: the world's pixel, as the wire bounds it (net/wire.js WORLD_PIXEL_BOUND - pinned equal). */
@@ -311,11 +308,11 @@ export function raidSideOk(w) {
  * (systems/tamrielFauna.js ROSTERS and TOWN_ROSTERS - pinned equal). Black Marsh stands no orc (its Recorded choice 4), so no
  * orc war band raids it; the Wrothgarian Mountains' Orsinium and Malabal Tor's Wood Orcs do. The relay draws a lane's slots
  * by the same table, with no game data. By lane: the Bay, High Rock, Hammerfell, Skyrim, Morrowind, Summerset, Valenwood,
- * Elsweyr, Black Marsh, Cyrodiil (the open zone: none).
+ * Elsweyr, Black Marsh, Cyrodiil.
  */
-export const RAID_LANE_PARTIES = Object.freeze([[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], []].map((l) => Object.freeze(l)));
+export const RAID_LANE_PARTIES = Object.freeze([[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], [0, 1]].map((l) => Object.freeze(l)));
 /** A lane's parties ([] for none). @param {number} lane */
-export const raidLaneParties = (lane) => RAID_LANE_PARTIES[lane] ?? RAID_LANE_PARTIES[RAID_ZONE_LANE];
+export const raidLaneParties = (lane) => RAID_LANE_PARTIES[lane] ?? [];
 
 /**
  * SelectRaids' roll [IL_0cda-IL_0dc5] - the ONE copy (systems/raidingParties.js rollRaids speaks it): `count` raids,

@@ -24,8 +24,7 @@ import { RANGE_PIXELS as TV_BODY_RANGE } from '../net/wire.js';
 import { TV_DUNGEON_TYPES } from '../systems/travel/travelDungeons.js';
 import { vendorWaypoint } from '../systems/vendorWaypoint.js';
 import { warmAshesOn } from '../systems/warmAshesShips.js';
-import { WILD_MARK } from '../systems/wild/wildAlert.js';
-import { WILD_TEXT } from '../systems/wild/wildZone.js';
+import { WILD_MARK } from '../systems/wild/wildAlert.js';   // WILD-ALERT (not the zone's: the wilderness noticing a fast traveller)
 
 /** OW-QUEST: a quest mark's words on the Overworld - the first quest's title (the followed one first, questMapMarks'
  *  order) with how many more stand at the place, and under it the distance and the first quest's time left (AUDIT
@@ -45,11 +44,11 @@ export function questMarkWords(q, distance) {
 export function createTravelViewMarks(host) {
   const {
     TV_PLACE_LIFT, _bandChase, _bandSpent, _hiddenPeers, _lodesSensed, _peerMapPoses, _townOfMapId, _tvBountyHold,
-    _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, _wildStrangerIds, bandMake, bandNowMs,
-    bandPlace, cam, carriageTown, csaOn, exteriorFoes, livingHideoutsHostOf, lodeSense, lodeWords, motherlodeBook,
+    _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, bandMake, bandNowMs,
+    bandPlace, cam, carriageTown, csaOn, livingHideoutsHostOf, lodeSense, lodeWords, motherlodeBook,
     myGuildTag, owForecast, params, player, playerTravelPixel, questPixel, seaRaidPeerChase, townEcon, state, travelViewBands, tvPlaceRect, tvPlaceSummary,
     travelViewCamps, travelViewDungeons, travelViewFarPlaces, travelViewPlaces, travelViewRaiders, travellerBook,
-    tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys, wildHidesPlayer
+    tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys
   } = host;
   /** OVERWORLD NAMES: a player's badge as their name wears it in play - the relay's stamps, never a frame's own words. */
   const tvBadgeOf = (p) => ({ title: p.title ?? null, glyphs: Array.isArray(p.glyphs) ? p.glyphs : [], lv: p.lv ?? null, gt: p.gt ?? null, rb: p.rb ?? null });   // AUDIT-SEATS: and a Season's banner ribbon
@@ -242,23 +241,14 @@ export function createTravelViewMarks(host) {
     const myGt = myGuildTag();   // OW-KIN: asked once a frame, not once a player
     // the room's drawable peers, as this frame's onlineFrame sifted them (it runs before the readout): the concealed
     // (`_hiddenPeers`) and the veiled (`_veils`) are never marked
-    // PVPGIANT: the zone's roaming giants on the Overworld, as the enemies they are (never more than two stand)
-    for (const gf of exteriorFoes.foes) { if (gf.entity?.wildGiant && !(gf.entity.health <= 0) && gf.ai?.feet) marks.push({ key: `giant:${gf.id ?? gf.entity.name ?? marks.length}`, at: [gf.ai.feet[0], gf.ai.feet[1] + 8, gf.ai.feet[2]], label: 'Giant', kind: 'stranger', edge: true }); }
     for (const d of host.online?.drawable?.() ?? []) {
       if (!d?.shown || _hiddenPeers.has(d.id) || _veils.has(d.id)) continue;
       const f = host.onlineToScene(_peerMapPoses.get(d.id) ?? d.shown);
-      // WILD3: in the open zone a stranger within WILD_STRANGER_M stands as an enemy
-      if (_wildStrangerIds.has(d.id)) {
-        near.add(d.id);
-        marks.push({ key: `peer:${d.id}`, at: [f[0], f[1] + TV_PEER_HEAD_M, f[2]], label: WILD_TEXT.stranger, kind: 'stranger', edge: true });
-        continue;
-      }
       // AUDIT NAMES N2-2: THE SWITCH HOLDS - a player who shares nothing with the region ("Show me to travellers" off)
       // and is not of my party is named only as close as play names them (NAME_RANGE from where I stand) and never held
       // at the edge; my party, and a player whose mark the region already has, are named wherever they stand
       const party = !!host.social?.isPartyPeer(d.id), t = sharing.get(d.id);
       if (!party && !t && Math.hypot(f[0] - player.pos[0], f[2] - player.pos[2]) > NAME_RANGE) continue;
-      if (wildHidesPlayer({ kin: travellerKin({ friend: !!host.social?.isFriendPeer(d.id), gt: d.gt }, myGt), wire: [d.shown.x, 0, d.shown.z], party })) continue;   // WILD1: in or near the open zone, my party and my guild alone
       const h = host.peerRiders.heightOf(d.id) || host.peerBodies.heightOf(d.id) || host.peerWalkers.heightOf(d.id) || TV_PEER_HEAD_M;
       near.add(d.id);
       // AUDIT NAMES: and one on a journey (their region mark's `tv`) keeps the arrow they wore from afar
@@ -274,7 +264,6 @@ export function createTravelViewMarks(host) {
       // AUDIT TV C3: the peer's id, asked of the party's seats (a token's subject is another id space) - AUDIT NAMES N1-10:
       // as play's names ask it (colorOf), so my own other tab is never my party's green
       const kind = host.social?.isPartyPeer(t.id) ? 'party' : 'traveller';
-      if (wildHidesPlayer({ kin: travellerKin({ friend: !!host.social?.isFriendPeer(t.id), gt: t.gt }, myGt), wire: [w.x, 0, w.z], party: kind === 'party' })) continue;   // WILD1: in or near the open zone, my party and my guild alone
       const ship = isShipMark(t.p);   // OWS1: at sea, a ship - riding the sea's top
       marks.push({ key: `trav:${t.id}`, at: tvSceneKept(t, w.x, w.z, 2, ship), label: t.name, kind: `${kind}${ship ? ' ship' : ''}${t.p.tv ? ' journey' : ''}`, edge: true, badge: tvBadgeOf(t),
         kin: travellerKin({ friend: !!host.social?.isFriendPeer(t.id), gt: t.gt }, myGt), lv: t.lv ?? null });   // OW-KIN / OW-WHO

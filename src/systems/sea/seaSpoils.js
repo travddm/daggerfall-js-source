@@ -21,7 +21,7 @@ export function seaPlaceBand(loc) {
 }
 
 /** The source a place's pile rolls as: a vault of the deep's (SEA-VAULTS - an isle's place entered as today's vault wears
- *  the hall's ring the door stamps, scenes/worldModes.js `wildRing`) or a ruin's. */
+ *  the ring the door stamps, scenes/worldModes.js `wildRing`) or a ruin's. */
 export const seaPileSource = (loc) => (loc?.ether && loc.wildRing > 0 ? 'vault' : 'ruin');
 
 /**

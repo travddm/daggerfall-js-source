@@ -39,9 +39,6 @@ import {
   SURFACE_MIASMA_HEIGHT, OCEAN_HOLES_VENDOR,
   pitPixelOk,   // PITS-WORLD: IsValidMapPixel's hold - the world's grid, where an abyss has an id (ETHER-DEEP held it to the Bay's map)
 } from '../world/oceanHoles.js';
-import { cyrodiilMask } from '../systems/wild/cyrodiilZone.js';   // PITS-WORLD: the open zone stands no pit
-import { wildInside } from '../systems/wild/wildZone.js';
-import { isOnlinePage } from '../systems/online/onlineLane.js';
 import { sampleMeshLocalY, TILE_WORLD_SIZE_F32 } from '../world/deepWater/deepWaterFloor.js';   // AUDIT PRE-MERGE 0928 H4: terrainData.size, a float
 import { modSetting, modSettingsGeneration } from '../systems/modSettings.js';
 import { OCEAN_CLIMATE } from '../world/terrain/terrainHelper.js';   // worldClimate 223: the unverified placement's own check
@@ -73,17 +70,6 @@ export function oceanHolesSettings() {
 export const PIT_REFRESH_KEYS = Object.freeze(['SurfaceHoleSize', 'SeafloorHoleSize', 'PitSpawnRate', 'MiasmaParticleCount', 'MiasmaHeight']);
 const snapshotOf = (s) => `${s.surfaceHoleRadius}|${s.seafloorHoleScale}|${s.pitSpawnRate}|${s.miasmaParticleCount}|${s.miasmaHeight}`;
 
-/** PITS-WORLD (the owner's call taken, 2026-10-26: site-bound things stand nowhere in the open PvP zone): IS A PIXEL THE OPEN
- *  ZONE'S - online, Cyrodiil's mask (systems/wild/cyrodiilZone.js, the world host's wildMapMask: the province whole and the
- *  water it encloses, Lake Rumare and the Niben among it). The zone stands its tier's halls and no other dungeon
- *  (PVPDUNGEONS - the spawner's own gate, scenes/spawnStandHost.js), and a pit is a dungeon's door. Offline there is no
- *  zone. */
-export function openZoneAtNow(mapX, mapY) {
-  if (!isOnlinePage()) return false;
-  const m = cyrodiilMask();
-  return !!m && wildInside(m, mapX, mapY);
-}
-
 function roundHalfEven(v) {   // Mathf.RoundToInt
   const f = Math.floor(v);
   return v - f === 0.5 ? (f % 2 === 0 ? f : f + 1) : Math.round(v);
@@ -102,12 +88,10 @@ function roundHalfEven(v) {   // Mathf.RoundToInt
  * @param {() => number} [deps.now] - Time.time
  * @param {() => object} [deps.settings]
  * @param {() => boolean} [deps.inside] - PlayerEnterExit.IsPlayerInside: DisableAllParents has the ExteriorParent off
- * @param {(mapX: number, mapY: number) => boolean} [deps.openZoneAt] - PITS-WORLD: whether a pixel is the open PvP zone's
- *   (online, Cyrodiil's mask - openZoneAt below), where no pit is cut
  */
 export function createOceanHoles({ deepWaters, decor = null, built, pixelTranslation, hasLocation, worldClimateOf,
   pits = null, onEnterPit = () => {}, now = () => performance.now() / 1000, settings = oceanHolesSettings, warn = (m) => console.warn(m),
-  inside = () => false, openZoneAt = openZoneAtNow }) {
+  inside = () => false }) {
   const pendingTerrains = [];            // Queue<DaggerfallTerrain>
   const queuedTerrains = new Set();      // HashSet<DaggerfallTerrain>
   const states = new WeakMap();          // entry -> OceanPitTileState
@@ -291,7 +275,6 @@ export function createOceanHoles({ deepWaters, decor = null, built, pixelTransla
     if (!pitPixelOk(st.mapX, st.mapY)) { markTerrainProcessed(st, v, 'rejected:off-the-map'); return; }
     if (!isPitPixel(st.mapX, st.mapY, s.pitSpawnRate)) { markTerrainProcessed(st, v, 'rejected:not-selected'); return; }
     if (hasLocation(entry)) { markTerrainProcessed(st, v, 'rejected:has-location'); return; }
-    if (openZoneAt(st.mapX, st.mapY)) { markTerrainProcessed(st, v, 'rejected:open-zone'); return; }   // PITS-WORLD: the open zone stands no pit
     const flag = !!deepWaters.tryGetSeafloor(entry);   // TryGetFloorCollider
     if (!flag || !deepWaters.isSeafloorCurrent(entry)) {
       const text = flag ? 'stale-seafloor' : 'missing-seafloor';

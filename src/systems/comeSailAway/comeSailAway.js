@@ -149,7 +149,6 @@
 
 import { Boat, setLights, HULL_NAMES, HULL_PRICES, packedHullWeight, CARGO_CONTAINER_IMAGE, TRIGGER_MODEL, goModelName, meshLocalBounds, colliderBounds, animatorOf, nodeOf, AUDIO_CLIPS, SAIL_ANIMATION_SPEED } from './comeSailAwayBoat.js';
 import { hullFromMessage } from './comeSailAwayHulls.js';
-import { seaHoldShut, seaHoldShutText } from '../naval/seaHoldGuard.js';   // AUDIT SEA VENTURES B3: a wrecked ship's hold, shut while she may be boarded   // PARTS-WEIGHT: GetHullFromMessage, the leaf's
 import { firmStat } from '../firmamentLive.js';   // FIRM1: the Firmament's helmsman (sailSpeed)
 import { constantCurve, twoConstantsCurve, SPACE } from '../../world/unityParticles.js';
 import { quatEuler } from '../../world/unityAnimator.js';
@@ -1981,7 +1980,6 @@ export function createComeSailAwayRuntime(deps) {
    */
   function PackBoat(boat, item = false, lost = false) {
     if (item && boat?.charter) return false;   // PASSAGE (the port's own): a booked ship is her master's, never parts in my pack
-    if (!lost && seaHoldShut(boat?.uid)) { deps.messageBox?.(seaHoldShutText()); return false; }   // AUDIT SEA VENTURES B3: never packed while her wreck may be boarded
     if (item) {
       const deed = boat.crewed && boat.uid ? deedInPack(boat.uid) : null;
       if (boat.crewed && boat.uid && deed == null) return false;
@@ -2041,7 +2039,7 @@ export function createComeSailAwayRuntime(deps) {
     return canHoldAmount(1, packedHullWeight(boat.hull), most, 0) <= 0;
   }
   /** OpenCargo (6521-6525): the inventory over the boat's cargo, as a loot target. */
-  function OpenCargo(boat) { if (seaHoldShut(boat?.uid)) { deps.messageBox?.(seaHoldShutText()); return; } deps.openCargo?.(boat.Cargo); }   // AUDIT SEA VENTURES B3: shut while she may be boarded
+  function OpenCargo(boat) { deps.openCargo?.(boat.Cargo); }
   /** OpenBoatCargo (5575-5587): the boat the box hangs under, its cargo opened - OpenCargo(null) throws there when
    *  none is (kept: the box is always a boat's). */
   function OpenBoatCargo(hit) { OpenCargo(boatOfHit(hit)); }
@@ -2466,7 +2464,6 @@ export function createComeSailAwayRuntime(deps) {
    */
   function LayUpBoat(boat) {
     if (!boat?.uid || boat === state.CurrentBoat || (deps.passengersAboard?.(boat) ?? 0) > 0) return false;
-    if (seaHoldShut(boat.uid)) { deps.messageBox?.(seaHoldShutText()); return false; }   // AUDIT SEA VENTURES B3: nor laid up
     if (boat.Cargo.Items.length > 0) {
       const key = cargoKey(boat.uid);
       const kept = state.PackedCargoes.get(key) ?? [];

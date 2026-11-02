@@ -208,7 +208,7 @@ const GOLDEN = Object.freeze({
   // before the realm opens, so the seeded die stands elsewhere when the fight begins (b0019f8f..., 140 frames before). The
   // Remnant's frames are the same: with the die seeded afresh at the fight's first hello the realm says 148 frames hashed
   // 36cc80c3ccedd3eeef2d26a35633c6778389cbb984c13413f2d1ae383613befa on the tree before WW5 and after it alike
-  sd: Object.freeze({ n: 146, h: '1e8fe66973b532178b65903095c99018a4532b20a13535c410c760f0eaa30daf' }),
+  sd: Object.freeze({ n: 144, h: 'a7ae6b4ae7e2a1d5e700fee2105b4e158a48a6a2d60472c2d55aa1a095883021' }),   // PIN MOVED (lane 9 opened): one more lane director draws from the seeded die at the hub, so the fight's die lands one draw later and the realm says 144 frames, not 146
   serpent: Object.freeze({ n: 232, h: '8569aebc4ba221743d3191c8d952bcca99e72e164b032cfd37f00eb613ce3ded' }),
   // the Hollow, so past the snap Ann - ten long turns behind her - waits while Bo and the keepers turn (`w`, to her alone),
   // and her stone's share of the way is never turned; every frame up to her first turn past the snap word for word as the

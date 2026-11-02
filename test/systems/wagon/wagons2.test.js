@@ -671,7 +671,7 @@ test('WAGONS2 (FINAL AUDIT) A RIDER\'S WAYS OUT, AND THE WAIT THAT IS THEIRS: a 
 test('WAGONS2 (FINAL AUDIT) A SEATED RIDER SETS OUT ON NO JOURNEY OF THEIR OWN, AND RIDERS GO ONLY WITH THE WAGON: the classic arm of a journey (First-Person Travel off the roads, the classic skin) and a fast travel of the rider\'s own (a map\'s, a ship\'s passage) refuse a seated rider - the Overworld alone did; an owner whose wagon stays (parked, or a following team left at the departure) gives up the seats before leaving rather than sending riders after it; a seat lost to another tab clears the book (mutants: each gate, the release, the clear)', () => {
   const w = src('scenes/world.js');
   assert.match(w, /if \(climbingNow\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.climbing\); return true; \}\n(?:\s*\/\/[^\n]*\n)+\s*if \(wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); return true; \}\n\s*if \(coords\) travelOptions\.beginTravelToCoords/);
-  assert.match(w, /if \(typeof pick\.besideAt !== 'function' && wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); hudFade\.clearFade\(\); return false; \}\n\s*const wildTrip = wildTravelGate/);
+  assert.match(w, /if \(typeof pick\.besideAt !== 'function' && wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); hudFade\.clearFade\(\); return false; \}\n\s*if \(!travelGate\(pick\.pixel\)\.ok\)/);
   assert.match(w, /if \(!partyArrival && !hccRuntimeOn\(\)\?\.wagonGoesOnJourney\?\.\(\) && wagonRiders\?\.release\(\)\) _hccDirty = true;\n\s*if \(!partyArrival && wagonRiders\?\.announce\(pick\.pixel\)\)/);
   assert.match(w, /wagonRiders\?\.clear\(\);[^\n]*\n\s*caravanVisitLink\.close\(\);[^\n]*\n\s*seatLock\?\.release\(\);/);
   const hc = src('systems/horse/horseCart.js');

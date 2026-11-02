@@ -23,7 +23,6 @@ import { authoredHeightByte, tamrielHeightByte, tamrielClimateAt, dropGroundCach
 import { tamrielBiomeAt } from '../../src/world/tamriel/tamrielBiomes.js';   // TESA-BIOME: the zones the climate reads
 import { rasterizeTamriel, PROVINCE_NONE } from '../../src/world/tamriel/tamrielRaster.js';
 import { tracedChains, placeCity, buildTamrielInk, tamrielInkFor, CITY_SNAP_PX } from '../../src/ui/tamrielInk.js';
-import { zoneLineOf } from '../../src/systems/wild/cyrodiilZone.js';   // ZONE-LINE: the Imperial Province's line
 import { RACE_TEMPLATES } from '../../src/systems/races.js';
 import { TerrainGenClient } from '../../src/world/terrain/terrainGenClient.js';
 import { tamrielTraceOn } from '../../src/scenes/shared.js';
@@ -298,17 +297,13 @@ test('TAMRIEL3 ink: tracedChains links the land mask\'s pixel edges into coast c
   setTamrielTrace(trace);
   setTamrielFit({ ox: 50 * 18, oy: 40 * 18, ppu: 18 });
   const ch = tracedChains(trace);
-  // line - the continent's coast (Breton, the Imperial Province, Nord and Redguard joined) in two pieces ending on the
-  // province's corners, the line's two coast runs (its north and south shores), two lakes, the pond
-  assert.equal(ch.coast.length, 7, `${ch.coast.length} coast chains: the continent's two pieces, the Imperial Province's two shores, two lakes, the pond`);
-  const zone = zoneLineOf(trace);
-  assert.equal(zone.coast.length, 2);
-  for (const run of zone.coast) assert.ok(ch.coast.includes(run), 'the zone\'s shore the ink\'s');
+  // the continent's coast (Breton, the Imperial Province, Nord and Redguard joined) in one chain, two lakes, the pond
+  assert.equal(ch.coast.length, 4, `${ch.coast.length} coast chains: the continent's one (its provinces' shores joined), two lakes, the pond`);
   for (const c of ch.coast) for (const p of c) {
     const [px, py] = bayToPicture(p.x, p.y);
     assert.ok(px >= 39 && px <= 281 && py >= 29 && py <= 151, 'every coast point on the lands\' outline');
   }
-  assert.ok(ch.borders.length >= 1 && ch.borders.length <= 3, `${ch.borders.length} border chains: Breton|Redguard, Breton|Imperial, Imperial|Nord, meeting at one point`);
+  assert.ok(ch.borders.length >= 1 && ch.borders.length <= 4, `${ch.borders.length} border chains: Breton|Redguard, Breton|Imperial, Imperial|Nord, meeting at one point`);
   const online = (p) => { const [px, py] = bayToPicture(p.x, p.y); return Math.abs(py - 90) < 1.5 || Math.abs(px - 140) < 1.5 || Math.abs(px - 180) < 1.5; };
   for (const c of ch.borders) for (const p of c) assert.ok(online(p), 'every border point on one of the three province changes - a land-land edge within a province is no border');
   const bpts = ch.borders.flat().map((p) => bayToPicture(p.x, p.y));
@@ -317,9 +312,9 @@ test('TAMRIEL3 ink: tracedChains links the land mask\'s pixel edges into coast c
   assert.deepEqual(ch.labels.map((l) => l.key).sort(), ['Hammerfell', 'HighRock', 'Imperial', 'Skyrim']);
   const hr = ch.labels.find((l) => l.key === 'HighRock');
   assert.ok(hr.px > 60 && hr.px < 120 && hr.py > 40 && hr.py < 80, 'the label deep in its land');
-  // a straight run thinned to its ends, a corner a curve of its points (the zone's own runs whole)
+  // a straight run thinned to its ends, a corner a curve of its points
   const pts = ch.coast.reduce((n, c) => n + c.length, 0);
-  assert.ok(pts > 200 && pts < 2500, `${pts} points: the rectangles' runs thinned, their corners curves`);
+  assert.ok(pts > 100 && pts < 2500, `${pts} points: the rectangles' runs thinned, their corners curves`);
   const run = ch.coast.flat().filter((p) => { const [px, py] = bayToPicture(p.x, p.y); return Math.abs(py - 30) < 0.01 && px > 60 && px < 120; });
   assert.ok(run.length <= 2, `the north coast's straight run between its ends (${run.length} points on it)`);
 });

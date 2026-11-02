@@ -329,11 +329,11 @@ test('AUDIT SAFE RELAY-13c: THE STAMP\'S AND THE FEED\'S TAGS ARE WORDS OF THEIR
   assert.equal(FEED_V, 'chat-feed1');
   assert.ok(new TextDecoder().decode(stampBytes({ tab: 'world', sub: 'acct-x', name: 'X', at: 1, text: 'hi' })).startsWith('chat-stamp1\n'));
   const tags = [];
-  const files = ['src/net/wild/wildReceipt.js', 'src/net/gate/gateReceipt.js', 'src/net/identityToken.js', 'src/net/raid/raidReceipt.js', 'src/net/duel/duelReceipt.js',
+  const files = ['src/net/gate/gateReceipt.js', 'src/net/identityToken.js', 'src/net/raid/raidReceipt.js', 'src/net/duel/duelReceipt.js',
     'src/net/arena/arenaReceipt.js', 'src/net/siege/siegeReceipt.js', 'src/net/serpent/serpentReceipt.js', 'src/net/superDungeon/sdReceipt.js',
     'src/net/watchReceipt.js', 'src/net/productRecord.js', 'src/net/safety/chatStamp.js', 'src/net/safety/chatFeed.js'];
   for (const f of files) for (const m of rd(f).matchAll(/export const [A-Z_]+_V = '([^']+)'/g)) tags.push(m[1]);
-  assert.ok(tags.includes('f1'), 'the receipts\' tags were read');
+  assert.ok(tags.includes('d1'), 'the receipts\' tags were read');
   assert.equal(tags.filter((t) => t === STAMP_V).length, 1, 'the stamp\'s tag is its own');
   assert.equal(tags.filter((t) => t === FEED_V).length, 1, 'the feed\'s tag is its own');
   assert.deepEqual(tags.filter((t) => t !== STAMP_V && t !== FEED_V && (t.startsWith('chat-') || STAMP_V.startsWith(t) || FEED_V.startsWith(t))), [], 'and none begins as either');

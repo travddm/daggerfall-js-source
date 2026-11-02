@@ -13,7 +13,6 @@ import { relayQuestOnline, repairActiveQuests, questElsewhereLine } from '../../
 import { questsAtSite, openerQuestOf, questMountsHere, questDungeonWhole, partnerInstances, instanceOffer, questInstanceEpoch } from '../../../src/systems/instancePlaces.js';
 import { createInstanceDoor, INSTANCE_TEXT, dungeonSite, buildingSite, siteBase } from '../../../src/scenes/instanceDoor.js';
 import { instanceRoomOf, instanceWord, INSTANCE_DOOR_WORD } from '../../../src/net/instanceRoom.js';
-import { wdunRoomKey } from '../../../src/net/wire.js';
 import { makeAnchor, WORLD_CONTEXT } from '../../../src/systems/teleportAnchor.js';
 import { dungeonSizeFor, smallerDungeonsStateNow, SMALLER_DUNGEONS_STATE, ONLINE_DUNGEONS_STATE, onlineDungeonSize } from '../../../src/world/smallerDungeons.js';
 import { isPrivateersHold, HOLD_ONCE_TEXT } from '../../../src/systems/startDungeon.js';
@@ -259,9 +258,9 @@ test('INSTANCES every other way in (entryFor): NEVER a popup - a quest\'s place 
   assert.deepEqual((await door({ quest: false }).d.entryFor(d.dungeonSite(HOLD))).instance, { owner: ME, epoch: hex('instance:epoch:char_alice:hold', 4) }, 'the Hold: mine');
   assert.deepEqual(await door({ quest: false, instanceOk: false }).d.entryFor(d.dungeonSite(HOLD)), { instance: null, whole: false }, 'the Hold at an older relay: its public room (HOLD-ONCE refuses it)');
   assert.deepEqual(await door({ online: false }).d.entryFor(site), { instance: null, whole: false }, 'offline: DFU\'s');
-  const zone = door({ wild: true });
-  assert.deepEqual(await zone.d.choose(site), { instance: null, whole: true }, 'the open zone: nothing keeps an instance (its dungeons sealed, its halls refused) - no popup ahead of the seal');
-  assert.equal(zone.shown.length, 0);
+  const sea = door({ wild: true });
+  assert.deepEqual(await sea.d.choose(site), { instance: null, whole: true }, 'the open sea: nothing keeps an instance (the relay refuses one) - no popup ahead of it');
+  assert.equal(sea.shown.length, 0);
   // recorded
   const word = instanceWord(mine.instance);
   assert.deepEqual(await d.entryFor(site, { ins: word }), { instance: mine.instance, whole: true }, 'my quest\'s room, while it runs');
@@ -273,8 +272,6 @@ test('INSTANCES every other way in (entryFor): NEVER a popup - a quest\'s place 
   assert.deepEqual(await d.entryFor(site, { ins: annWord, staff: true }), { instance: { owner: ANN, epoch: '89abcdef' }, whole: true }, 'a staff landing: the player\'s room (the relay admits staff)');
   assert.deepEqual(await d.entryFor(site, {}), { instance: null, whole: false }, 'recorded public');
   assert.deepEqual(await d.entryFor(site, { whole: true }), { instance: null, whole: true }, 'recorded public, whole');
-  const hall = { siteType: SITE_TYPES.Dungeon, mapId: Number(wdunRoomKey('210,99').slice(9)), buildingKey: 0, layout: null, isHold: false, home: false, name: '' };
-  assert.deepEqual(await d.entryFor(hall, { ins: word, staff: true }), { instance: null, whole: true }, 'a zone hall keeps none (the relay refuses one)');
 });
 
 test('QUEST-ELSEWHERE (FIELD BUGS 2026-10-16c, MD-Geist: "the Objective just did not want to spawn (I tried the dungeon in \'Public\' mode) even after \'Quest Repair\'"): a quest\'s dungeon the world lays smaller in public says so in the popup, before Public is chosen; a repair in that room says where its things are, never "nothing was missing" (mutants: relaid never read; the line never laid; the repair\'s word dropped)', async () => {

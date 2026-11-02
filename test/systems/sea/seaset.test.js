@@ -15,8 +15,7 @@ import {
   aethericMaterial, mintAetheric, validSetMarks, AETHERIC,
 } from '../../../src/systems/aetheric.js';
 import { seaPlaceBand, seaPileSource, seaPileMore } from '../../../src/systems/sea/seaSpoils.js';
-import { setWildHere } from '../../../src/systems/wild/wildZone.js';
-import { ETHER_KIND } from '../../../src/systems/wild/etherWild.js';
+import { setSeaGround } from '../../../src/systems/sea/etherRings.js';
 import { _resetPlayerHealForTests } from '../../../src/systems/playerHeal.js';
 import { setPlayerDoor } from '../../../src/systems/playerDoor.js';
 import { equipItem } from '../../../src/systems/equip.js';
@@ -53,7 +52,7 @@ const RAT = Object.freeze({ name: 'rat' });
 let T = 0;
 _setSetPowersClockForTests(() => T);
 function fresh() {
-  _resetSigilForTests(); _resetSigilSetsForTests(); _resetSetPowersForTests(); _resetPlayerHealForTests(); setPlayerDoor(null); T = 0; setWildHere(false);
+  _resetSigilForTests(); _resetSigilSetsForTests(); _resetSetPowersForTests(); _resetPlayerHealForTests(); setPlayerDoor(null); T = 0; setSeaGround(false);
   setSetPowersVoice({ say: () => {}, sound: () => {} });
 }
 const online = (renown = 1) => { setSigilOnline(true); setSigilRenown(renown); };
@@ -186,16 +185,16 @@ test('SEA-SET STORMWRACK (2): one fold - shock resistance and Speed, Faint to As
   assert.equal(setFold(wearSet(player(), 'eltheric', 1)).resist?.shock ?? 0, 0, 'one piece wakes nothing');
 });
 
-test('SEA-SET UNDERTOW (4): my weapon blow its share more while I stand in the open Eltheric Ocean - the zone\'s live flag on the sea\'s ground - and half of it anywhere else (the mountains\' zone too); never asleep, never with three pieces, never a bare-handed blow (mutants: the share at sea; the half ashore; the ground)', () => {
+test('SEA-SET UNDERTOW (4): my weapon blow its share more while I stand in the open Eltheric Ocean - the sea ground flag the world host sets - and half of it anywhere else; never asleep, never with three pieces, never a bare-handed blow (mutants: the share at sea; the half ashore; the ground)', () => {
   fresh(); online();
   const e = wearSet(player(), 'eltheric', 4), w = sword();
   assert.equal(setBlow(w, 100, e, RAT, {}), 107, 'ashore: half of 15, carried');
   assert.equal(setBlow(w, 100, e, RAT, {}), 108, 'the half carried');
-  setWildHere(true, 4, ETHER_KIND);
+  setSeaGround(true);
   assert.equal(setBlow(w, 100, e, RAT, {}), 115, 'at sea: the whole');
-  setWildHere(true, 4);
-  assert.equal(setBlow(sword(), 100, e, RAT, {}), 107, 'the mountains are no sea');
-  setWildHere(true, 2, ETHER_KIND);
+  setSeaGround(false);
+  assert.equal(setBlow(sword(), 100, e, RAT, {}), 107, 'off the sea: the half');
+  setSeaGround(true);
   online(40);
   const asc = wearSet(player(), 'eltheric', 4, XP[4]);
   assert.equal(setBlow(sword(), 100, asc, RAT, {}), 140, 'Ascendant at sea');
@@ -205,7 +204,7 @@ test('SEA-SET UNDERTOW (4): my weapon blow its share more while I stand in the o
   assert.equal(setBlow(sword(), 100, wearSet(player(), 'eltheric', 4), RAT, {}), 115, 'Faint again');
   setSigilOnline(false);
   assert.equal(setBlow(sword(), 100, e, RAT, {}), 100, 'asleep');
-  setWildHere(false);
+  setSeaGround(false);
 });
 
 test('SEA-SET THE CAPTAIN\'S DUE (6): the ship\'s door - my ship\'s balls\' harm and her hull\'s hurts off the player the door names, Faint to Ascendant; 1 and 1 with five pieces, asleep, or no player (mutants: the guns; the hull; the door)', () => {
@@ -232,9 +231,9 @@ test('SEA-SET THE SEAMS by source: the naval host\'s every ball of mine over her
   assert.match(src('src/scenes/naval/navalSeaSet.js'), /if \(!\(Number\(paid\) > 0\)\) return null;\n  const piece = rollElthericPiece\(mulberry32\(\(\(seed >>> 0\) \^ TIDEMAIL_SALT\) >>> 0\), elthericChance\('legend', legend\.band\)\);\n  if \(!piece\) return null;\n  give\(\[piece\]\);/);
   const d = src('src/scenes/dungeonContext.js');
   assert.match(d, /if \(!onlineRoom\(\)\) seaPileMore\(items, dfLocation\);/);
-  assert.match(d, /wildPileMore\(p\.items, rollPileItems, _wildRing\); seaPileMore\(p\.items, dfLocation\); settleLootFlat\(i\);/);
+  assert.match(d, /p\.items = rollPileItems\(\); seaPileMore\(p\.items, dfLocation\); settleLootFlat\(i\);/);
   assert.match(d, /\n    dfLocation,   \/\/ SEA-SET: the place/);
-  assert.match(src('src/scenes/roomLootHost.js'), /if \(_wildDungeon\) wildPileMore\(items, \(\) => rollPileItems\(t\), _wildRing, rolls\);\n    seaPileMore\(items, dfLocation, rolls\);/);
+  assert.match(src('src/scenes/roomLootHost.js'), /const items = rollPileItems\(t\);\n    seaPileMore\(items, dfLocation, rolls\);/);
   // a legend of the Abyss carries one every time - which one is her seed's own
   const seed = 0x1234567;
   const want = ELTHERIC_SET_PIECES[Math.floor(mulberry32(((seed >>> 0) ^ TIDEMAIL_SALT) >>> 0)() * 9)].id;

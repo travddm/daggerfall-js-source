@@ -148,7 +148,7 @@ async function withHerald(fn, { env = { GATE_DISCORD_WEBHOOK: HOOK, GATE_DISCORD
   let clock = T0;
   r.store.set(SD_KEY, rec ?? { s: 0, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 60_000 });
   // province named, are test/world/worldWide/ww5_hollows.test.js's)
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 365 * 86_400_000 });
+  for (let lane = 1; lane <= 9; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 365 * 86_400_000 });
   if (herald) r.store.set('sdherald', herald);
   const posts = [];
   const discord = { answer: () => ({ ok: true, status: 204 }) };

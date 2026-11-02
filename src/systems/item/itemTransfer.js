@@ -78,8 +78,7 @@ export const cannotCarryText = () => localizedText('cannotCarryAnymore', CANNOT_
 /** KEEP-SPELLBOOK: the port's own - DFU lets the
  *  spellbook go like any MiscItems piece. The character's spellbook (MiscItems 132, not a quest's) leaves the pack for
  *  nowhere but the character's own wagon: never the ground, a pile, a body, a chest, a companion's pack, or a
- *  counter's sale (ui/native/nativeTrade.js, ui/enhanced/enhancedTrade.js). A death in the zone already keeps it
- *  (systems/wild/wildDeath.js wildCanLose). One reading, one sentence, for every door that asks. */
+ *  counter's sale (ui/native/nativeTrade.js, ui/enhanced/enhancedTrade.js). One reading, one sentence, for every door that asks. */
 export const isKeptSpellbook = (item) => isSpellbook(item) && item.group === 'MiscItems' && !item.questItem;
 export const SPELLBOOK_KEPT_TEXT = 'Your spellbook never leaves you.';
 

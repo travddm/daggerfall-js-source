@@ -9,7 +9,6 @@
 //   R1-5  double13 counted every full layer the Worker's walk passed, not the sockets refused `room full`
 //   R3-3  any page had a private empty layer on demand (`?ly=`), and a layer stood its own serpent and raid ledger
 //   R3-8  a team parked in a layer was never dropped from it
-//   R3-9  the hub's wipe of a zone hall reached the place alone
 //   R3-3 (c) the law made one - a layer holds no event state: a layer stood its own rite and its own overworld ledger
 //   D-8   the batches' numbers the record states (POSE_BATCH_MS, ROSTER_BATCH_MS) had no pin
 // tools/mutants/auditscale2_relay.json.
@@ -24,10 +23,9 @@ import { layerWalk } from '../../server/src/relayScale.js';
 import {
   validPose, slimPose, PIXEL_UNITS, POSE_HZ_MAX, POSE_BATCH_MS, ROSTER_BATCH_MS, RELAY_VERSION, SOCKETS_MAX, LAYERS_MAX,
   LAYER_HEADER, layerName, cellRoomOfWire, serpentFightId,
-  SOCIAL_ROOM, parkKeyOf, parkKey, parkRegistryRoom, wdunRoomKey, worldRoom, wallMsForClassicMinutes, raidLedgerKey,
+  SOCIAL_ROOM, parkKeyOf, parkKey, parkRegistryRoom, worldRoom, wallMsForClassicMinutes, raidLedgerKey,
 } from '../../src/net/wire.js';
 import { RELAY_CFG_TTL_MS } from '../../src/net/relayCfg.js';
-import { newWildRef } from '../../src/net/wild/wildRef.js';
 import * as SL from '../../src/net/serpent/serpentLaw.js';
 import { raidDaySlots, raidLedgerId, RAID_DAY_MINUTES } from '../../src/net/raid/raidLaw.js';
 import * as wire from '../../src/net/wire.js';
@@ -82,9 +80,8 @@ test('AUDIT SCALE II R1-1 a hello\'s welcome tells its own socket alone: a refer
     const speak = async (ws) => { tick(Math.ceil(1000 / POSE_HZ_MAX) + 1); await R.pose(ws, standing(40)); };
     await speak(fighter);
     assert.deepEqual(rf(halo), [], 'nothing judges yet');
-    // a referee begins here (the Wild zone's fighters - the scale5b pin's own way of standing one up) ...
-    R.room._wildRef = newWildRef();
-    R.room._wildRef.fighters.set('acct-duel-000a', { id: 'duel-000a' });
+    // a referee begins here (a serpent's fight - the scale5b pin's own way of standing one up) ...
+    R.room._serpents = new Map([['s1', { players: {} }]]);
     // ... and before anyone poses again, someone says hello (a walker's halo opening, a reconnect)
     const late = await join('late-0001', { w2: 1 });
     assert.equal(late.sent.find((f) => f.t === 'welcome').rf, 1, 'the newcomer\'s welcome says it');
@@ -94,7 +91,7 @@ test('AUDIT SCALE II R1-1 a hello\'s welcome tells its own socket alone: a refer
     for (let i = 0; i < 6; i++) { await speak(fighter); await speak(halo); }
     assert.deepEqual(rf(halo), [{ t: 'rf', on: 1 }], 'said once');
     // its end, the same way
-    R.room._wildRef.fighters.clear();
+    R.room._serpents = new Map();
     const late2 = await join('late-0002', { w2: 1 });
     assert.equal(late2.sent.find((f) => f.t === 'welcome').rf, undefined);
     assert.deepEqual(rf(halo), [{ t: 'rf', on: 1 }, { t: 'rf', on: 0 }], 'its end said at the hello too');
@@ -372,27 +369,6 @@ test('AUDIT SCALE II R3-8 the park registry keeps the layer a team is kept in: p
     const cidY = await join(Y, 'cid1');
     await cidPark(Y, cidY, YX);
     assert.equal(w.room(X).store.has(parkKey(k2)), false, 'the old record\'s place dropped');
-  });
-});
-
-// ═══ R3-9: A HALL WIPED IN EVERY LAYER ═══════════════════════════════════════════════════════════════════════════════
-
-test('AUDIT SCALE II R3-9 the hub\'s wipe of a zone hall reaches every layer: each one nobody stands in forgets its memory, a layer someone stands in keeps its own and answers the hall occupied (mutants: the place alone; an occupied layer answered wiped)', async () => {
-  await quiet(async () => {
-    const h = '120,80', key = wdunRoomKey(h);
-    const W = fakeRooms();
-    const hub = W.room(SOCIAL_ROOM);
-    const layers = Array.from({ length: LAYERS_MAX }, (_, ly) => W.room(layerName(key, ly)));
-    for (const R of [layers[0], layers[2], layers[LAYERS_MAX - 1]]) { await R.state.storage.put('world:meta', { at: 1, by: 'x' }); await R.state.storage.put('world:0', '{"piles":"looted"}'); }
-    const memory = (R) => [...R.store.keys()].filter((k) => k.startsWith('world:'));
-    const p2 = layers[2].connect(); p2.att.key = key; p2.att.ly = 2; await layers[2].hello(p2, 'peer-0001', null);
-    assert.equal(await hub.room._wdunWipe(h), false, 'a layer someone stands in: the hall is occupied');
-    assert.deepEqual(memory(layers[0]), [], 'the place, empty, wiped');
-    assert.deepEqual(memory(layers[LAYERS_MAX - 1]), [], 'and the last layer');
-    assert.deepEqual(memory(layers[2]).sort(), ['world:0', 'world:meta'], 'the occupied layer keeps its own');
-    await layers[2].drop(p2);
-    assert.equal(await hub.room._wdunWipe(h), true, 'nobody in any layer: wiped whole');
-    assert.deepEqual(memory(layers[2]), []);
   });
 });
 

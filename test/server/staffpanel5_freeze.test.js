@@ -16,8 +16,7 @@ import {
 import { ROUTES, STAFF_ROUTES, OPEN_ROUTES, PATREON_OPEN_ROUTES, SAFE_OPEN_ROUTES } from '../../server-account/src/service.js';
 import { MINUTE_JOBS, HOUR_JOBS, runCron, CRON_MINUTE } from '../../server-account/src/cron.js';
 import { verifyOrder, tokenBodyOf } from '../../src/net/identityToken.js';
-import { mintWildReceipt } from '../../src/net/wild/wildReceipt.js';
-import { SAFE_LAW_PATH, worldRoom } from '../../src/net/wire.js';
+import { SAFE_LAW_PATH } from '../../src/net/wire.js';
 import { SESSION_PASS_HEADER } from '../../src/net/sessionPassLaw.js';
 
 const { subtle } = globalThis.crypto;
@@ -34,7 +33,6 @@ const b64url = (bytes) => Buffer.from(bytes).toString('base64url');
 const DF = 17;
 const HUBS = { [DF]: [207, 212] };
 const PV = 'f5f5f5f5f5f5f5f0';
-const CELL = worldRoom(400, 120);
 let _rid = 0;
 const rid = () => `sp5fz-${String(++_rid).padStart(10, '0')}`;
 
@@ -204,7 +202,7 @@ test('STAFF-PANEL5-FREEZE: ONE GATE - A MODDED CLIENT that ignores the freeze sc
     const selfProving = new Set([...OPEN_ROUTES, ...PATREON_OPEN_ROUTES, ...SAFE_OPEN_ROUTES, '/v1/auth/register', '/v1/pubkey', '/v1/relaykey', '/v1/mod/grant-feed', '/v1/mod/reaction-feed', '/v1/mod/hidden-seen', '/v1/homes/yards', '/v1/seats/sieges/live']);
     const shut = [...ROUTES].filter((r) => !r.startsWith('/v1/staff/') && !selfProving.has(r) && !FREEZE_ALLOWED.includes(r));
     assert.ok(shut.length > 100, `every game door (${shut.length})`);
-    for (const r of ['/v1/market/buy', '/v1/market/list', '/v1/market/bid', '/v1/realm/trade', '/v1/realm/die', '/v1/wild/fall', '/v1/heartbeat', '/v1/account/played']) assert.ok(shut.includes(r), r);
+    for (const r of ['/v1/market/buy', '/v1/market/list', '/v1/market/bid', '/v1/realm/trade', '/v1/realm/die', '/v1/heartbeat', '/v1/account/played']) assert.ok(shut.includes(r), r);
     const leaks = [];
     for (const r of shut) {
       const res = await s.ask('POST', r, s.troll.secret, { character: R.id, rid: rid() });
@@ -293,21 +291,6 @@ test('STAFF-PANEL5-FREEZE: A FROZEN ACCOUNT\'S GOODS SELL NOTHING - a buy of its
     const sold = await buy();
     assert.equal(sold.status, 200, JSON.stringify(sold.body));
     assert.equal((await bid()).status, 200);
-  } finally { s.restore(); }
-});
-
-test('STAFF-PANEL5-FREEZE: A FALL THAT NAMES A FROZEN ACCOUNT IS REFUSED - a killer filing the fall of a frozen player takes nothing; unfrozen, the filing goes on (mutant: the fallen\'s freeze unread)', async () => {
-  const s = await stand();
-  try {
-    const R = await seatRealm(s.env, s.troll.secret, 'Troll', freshSave({ name: 'Troll', level: 9 }));
-    const receipt = await mintWildReceipt({ f: s.troll.id, c: R.id, k: s.sylvia.id, r: '0123456789ab', w: 1 }, s.gatePriv, { subtle, nowS: nowS() - 60 });
-    await s.freeze(s.troll);
-    const fall = () => s.call('/v1/wild/fall', { receipt, room: CELL }, s.sylvia.secret);
-    const r = await fall();
-    assert.deepEqual([r.status, r.body], [409, { error: 'fallen-frozen' }]);
-    assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM wild_falls').get().n, 0, 'no fall recorded');
-    await s.staff('/v1/staff/unfreeze', { target: s.troll.id }, s.mob.session);
-    assert.notEqual((await fall()).body?.error, 'fallen-frozen', 'unfrozen: the filing is the fall\'s own law\'s again');
   } finally { s.restore(); }
 });
 

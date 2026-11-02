@@ -192,7 +192,7 @@ export function countryStandsAt({ rates, templates, climateAt, heightAt, ground 
 }
 /** AUDIT TESA II Z7/Z9: MAY the countryside stand on (px, py) - countryStandsAt without its dry plateau (the dear part,
  *  a kernel's sum): every pixel it stands on, and the few it would where its plateau lies under the beach. A neighbour's
- *  test (scenes/zoneHallsHost.js: a hall never beside a place) asks this, so a hall's ground costs no farm's plateau.
+ *  test (scenes/tamrielPlacesHost.js countryNear) asks this, so its search costs no farm's plateau.
  *  @param {{ rates: any, templates: any, climateAt: (x: number, y: number) => number, heightAt: (x: number, y: number) => number }} roll */
 export function countryMayStandAt({ rates, templates, climateAt, heightAt }, px, py) {
   return !!countryPick(rates, templates, climateAt(px, py), px, py) && heightAt(px, py) > WATER_BYTE;

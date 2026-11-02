@@ -146,17 +146,17 @@ test('GATE-CROWD the host\'s crowd: where the count does not cut every peer, the
 
 // ── the host: the crowd's cut in the online frame ─────────────────────────────────────────────────────────────────
 
-test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are kept and before a cast, a light or a body is drawn - at the card\'s count, nearest to where I stand; CROWD-WIDE: everywhere, in a court wherever it stands (in the zone, in a battle), and never in the open zone, a siege\'s or a tourney\'s battle, an arena\'s room or under the travel view; AUDIT CROWD-WIDE A2: never cut - my party, my duel\'s opponent, my trade\'s partner, those I ride or sail with and a duel\'s two fighters; with no social state; a stored value that is no tier reads as everyone (mutants: cut only in a court; cut in the zone, a battle, an arena or overhead; the court\'s own cut lost; the count unread; the tier unread; the party, the duel, the trade, the ride, the boat or the ring unasked; my place unread; social assumed)', () => {
+test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are kept and before a cast, a light or a body is drawn - at the card\'s count, nearest to where I stand; CROWD-WIDE: everywhere, in a court wherever it stands (in a battle), and never in the open zone, a siege\'s or a tourney\'s battle, an arena\'s room or under the travel view; AUDIT CROWD-WIDE A2: never cut - my party, my duel\'s opponent, my trade\'s partner, those I ride or sail with and a duel\'s two fighters; with no social state; a stored value that is no tier reads as everyone (mutants: cut only in a court; cut in the zone, a battle, an arena or overhead; the court\'s own cut lost; the count unread; the tier unread; the party, the duel, the trade, the ride, the boat or the ring unasked; my place unread; social assumed)', () => {
   const m = lift(/\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), [^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, (\{ on: [^\n]*?\})\);[^\n]*\n\s*peerCastVisuals\(visiblePeers\);/, 'the crowd\'s cut');   // PIN MOVED (PEER-RANGE): the court's crowd is cut from the players within the draw distance (test/systems/peerrange.test.js)
   assert.match(WORLD, /const gateCrowd = createGateCrowd\(\);/);
   // the cut's question, evaluated as the frame asks it
-  const ask = new Function('d', `const { modes, player, onlineToScene, gateCrowdMax, getPref, social, travelView, wildHere, siegeSession, royalSession, duelMgr, crowdKept, tradeMgr, wagonRiders, csaAboard, _duelRings } = d; return ${m[1]};`);
+  const ask = new Function('d', `const { modes, player, onlineToScene, gateCrowdMax, getPref, social, travelView, siegeSession, royalSession, duelMgr, crowdKept, tradeMgr, wagonRiders, csaAboard, _duelRings } = d; return ${m[1]};`);
   const prefs = { gateCrowd: 12 };
   const ME2 = [517, 3, -260];
-  const host = (day, { zone = false, siege = false, royal = false, room = 'dungeon', overhead = false, opponent = null, social = { partyPeers: () => new Set(['m1']) }, trade = null, riding = [], sailing = [], rings = [] } = {}) => ({
+  const host = (day, { siege = false, royal = false, room = 'dungeon', overhead = false, opponent = null, social = { partyPeers: () => new Set(['m1']) }, trade = null, riding = [], sailing = [], rings = [] } = {}) => ({
     modes: { gateArenaDay: () => day, roomIdentity: () => (room ? { kind: room } : null) }, player: { pos: ME2 }, onlineToScene: (p) => [p.x, p.y, p.z], gateCrowdMax,
     getPref: (k) => prefs[k], social, travelView: overhead ? { active: true } : { active: false },
-    wildHere: () => zone, siegeSession: { active: () => siege }, royalSession: { active: () => royal }, duelMgr: { opponent },
+    siegeSession: { active: () => siege }, royalSession: { active: () => royal }, duelMgr: { opponent },
     crowdKept, tradeMgr: { session: trade ? { peer: trade } : null }, wagonRiders: { ridingWithMe: () => riding }, csaAboard: { shipmates: () => sailing }, _duelRings: new Map(rings.map((id) => [id, {}])),
   });
   // nineteen strangers within 19 m east of me, my party mate and five others past them - and two standing at the scene's
@@ -177,12 +177,11 @@ test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are
   assert.equal(court.length, 12, 'in the court: twelve');
   assert.ok(has(court, 'm1'), 'my party mate across the court among them');
   // never where a stranger can fight me, nor under the travel view
-  assert.equal(cutAt(host(null, { zone: true })), crowd, 'the open zone: never cut');
   assert.equal(cutAt(host(null, { siege: true })), crowd, 'entered in a siege: never cut');
   assert.equal(cutAt(host(null, { royal: true })), crowd, 'entered in a Royal Tourney: never cut');
   assert.equal(cutAt(host(null, { room: 'arena' })), crowd, 'an arena\'s room: never cut');
   assert.equal(cutAt(host(null, { overhead: true })), crowd, 'under the travel view: never cut');
-  for (const o of [{ zone: true }, { siege: true }, { royal: true }]) assert.equal(cutAt(host(7, o)).length, 12, `a court is cut wherever its gate stands, and whatever I am entered in (${Object.keys(o)[0]}) - nobody fights anybody there but him`);
+  for (const o of [{ siege: true }, { royal: true }]) assert.equal(cutAt(host(7, o)).length, 12, `a court is cut wherever its gate stands, and whatever I am entered in (${Object.keys(o)[0]}) - nobody fights anybody there but him`);
   // AUDIT CROWD-WIDE A2: those I fight, trade, ride or sail with, and a duel's two fighters, past the twelfth, drawn and counted
   const kept = cutAt(host(null, { opponent: 'foe', trade: 'trader', riding: ['driver'], sailing: ['captain'], rings: ['duelist'] }));
   assert.equal(kept.length, 12);

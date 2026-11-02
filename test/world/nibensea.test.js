@@ -2,15 +2,14 @@
 // openNiben), the Imperial City's Waterfront cut through to its lake's arm at the Bay's scale (world/tamriel/tamrielLand.js
 // waterfrontCanal), its harbour a port of the sea named for the city (world/tamrielCapitals.js, world/pastBayRows.js,
 // world/worldWide/worldPorts.js), its packets' reach its own and their way off the canal (systems/naval/seaLanes.js,
-// scenes/naval/worldLanes.js), and the Cyrodiil zone's rings kept by the province's own water (systems/wild/
-// cyrodiilZone.js). Pinned on synthetic pictures, and on the player's own files where ARENA2_PATH names them.
+// scenes/naval/worldLanes.js). Pinned on synthetic pictures, and on the player's own files where ARENA2_PATH names them.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { NIBEN_COURSE, NIBEN_JOINS, nibenCells, openNiben, pieces } from '../../src/ui/tamrielTrace.js';
 import { setTamrielTrace, waterfrontCanal, canalAt, provinceKeyAt, provinceKeyBeyondBay, IMPERIAL_ID } from '../../src/world/tamriel/tamrielLand.js';
-import { setTamrielFit, bayToPicture, pictureToBay } from '../../src/world/tamriel/tamrielFrame.js';
+import { setTamrielFit, bayToPicture } from '../../src/world/tamriel/tamrielFrame.js';
 import { WATERFRONT_CANAL, CITIES } from '../../src/world/tamriel/tamrielGeography.js';
 import { IMPERIAL_SPAN } from '../../src/world/imperialCity.js';
 import { CAPITALS, capitalHarbourSlice, capitalCanalOpen, capitalCentre, capitalCentrePixel } from '../../src/world/tamrielCapitals.js';
@@ -19,9 +18,6 @@ import { laneNetwork } from '../../src/systems/naval/seaLanes.js';
 import { beyondLaneWay, beyondPathPx, BEYOND_LANE_MAX_PX, BEYOND_LANE_PATH_PX } from '../../src/scenes/naval/worldLanes.js';
 import { beyondPorts, CANAL_PORT_REACH_PX } from '../../src/world/worldWide/worldPorts.js';
 import { createWorldPlaces } from '../../src/world/worldWide/worldPlaces.js';
-import { provinceWaterAt, PROVINCE_WATER_REACH, cyrodiilMask, zoneLineOf } from '../../src/systems/wild/cyrodiilZone.js';
-import { wildInside } from '../../src/systems/wild/wildZone.js';
-import { tracedChains } from '../../src/ui/tamrielInk.js';
 import { CLIMATES, LOCATION_TYPES } from '../../src/formats/mapsFile.js';
 import { NATIVE_PIXEL } from '../../src/systems/seaRaiders.js';
 
@@ -166,65 +162,6 @@ test('NIBEN-SEA A WAY OFF THE CANAL: a roadstead on the canal (land on the pictu
   assert.deepEqual([Math.round(first.x / NATIVE_PIXEL * 2) / 2, Math.round((500 - first.z / NATIVE_PIXEL) * 2) / 2], [2069.5, 672.5], 'from the roadstead itself');
   assert.equal(beyondLaneWay(lane, (x, y) => native(x, y) && !canalAt(Math.floor(x / NATIVE_PIXEL), 499 - Math.floor(y / NATIVE_PIXEL))), null, 'the canal dry: no way');
   assert.equal(beyondLaneWay({ a: { road: { x: 2080, y: 672 } }, b: lane.b }, native), null, 'a roadstead off both');
-});
-
-test('NIBEN-SEA THE ZONE\'S WATER: a water pixel with the Imperial Province\'s land its nearest on both sides of a row or a column is the province\'s; one with another province\'s on a side, or none within reach, is not; the canal is (mutants: one bank enough; another province\'s bank the province\'s)', () => {
-  const w = 320, h = 200, land = new Uint8Array(w * h).fill(1), province = new Uint8Array(w * h).fill(IMPERIAL_ID);
-  const wet = (x, y) => { land[y * w + x] = 0; province[y * w + x] = 0; };
-  for (let y = 120; y < 130; y++) wet(150, y);   // a river between the province's banks
-  for (let y = 120; y < h; y++) { wet(200, y); province[y * w + 199] = 7; }   // one between Elsweyr's and the province's, out to the picture's edge
-  for (let y = 30; y < 70; y++) for (let x = 40; x < 80; x++) wet(x, y);   // a sea wider than the reach every way
-  setTamrielTrace({ w, h, land, province });
-  setTamrielFit(FIT);
-  const at = (px, py) => pictureToBay(px + 0.5, py + 0.5).map(Math.floor);
-  assert.equal(provinceWaterAt(...at(150, 125)), true, 'the river');
-  assert.equal(provinceWaterAt(...at(200, 125)), false, 'the border river');
-  assert.ok(20 > PROVINCE_WATER_REACH);
-  assert.equal(provinceWaterAt(...at(60, 50)), false, 'the open sea');
-  assert.equal(provinceWaterAt(...at(150, 100)), false, 'land is no water');
-});
-
-test('NIBEN-SEA THE ZONE\'S LINE ACROSS ITS WATER: where the zone\'s own water meets the sea\'s (a river leaving the province\'s banks) the outline crosses it - every chain closed, a pixel the zone\'s exactly when its middle lies inside the line, the dam the red line\'s alone (never the held map\'s coast or border, never a piece the ink leaves off) (mutants: the dam unbuilt; the dam\'s squares the law\'s)', () => {
-  // the province's land with a river down its middle (column 5), its banks the province's for three rows and Elsweyr's
-  // for two, out to the sea
-  const rows = ['............', '.9999999999.', '.9999.99999.', '.9999.99999.', '.9999.99999.', '.7777.77777.', '.7777.77777.', '............'];
-  const w = rows[0].length, h = rows.length, land = new Uint8Array(w * h), province = new Uint8Array(w * h);
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const c = rows[y][x]; if (c !== '.') { land[y * w + x] = 1; province[y * w + x] = Number(c); } }
-  const trace = { w, h, land, province };
-  setTamrielFit({ ox: -2000, oy: 0, ppu: 16 });   // the picture east of the Bay
-  setTamrielTrace(trace);
-  const m = /** @type {any} */ (cyrodiilMask());
-  const at = (px, py) => pictureToBay(px + 0.5, py + 0.5).map(Math.floor);
-  assert.equal(wildInside(m, ...at(5, 3)), true, 'the river between the province\'s banks the zone\'s');
-  assert.equal(wildInside(m, ...at(5, 6)), false, 'between Elsweyr\'s, not');
-  const line = zoneLineOf(trace, m);
-  assert.ok(line.chains.length >= 1);
-  for (const c of line.chains) assert.deepEqual(c[0], c.at(-1), 'closed');
-  // the centre rule over the zone's box: inside the line (even-odd, a row at a pixel's middle) exactly when the zone's
-  const rowsAt = new Map();
-  for (const c of line.chains) for (let i = 0; i + 1 < c.length; i++) {
-    const p = c[i], q = c[i + 1];
-    if (p.y === q.y) continue;
-    const lo = Math.min(p.y, q.y), hi = Math.max(p.y, q.y);
-    for (let y = Math.ceil(lo - 0.5); y + 0.5 < hi; y++) if (y + 0.5 >= lo) (rowsAt.get(y) ?? rowsAt.set(y, []).get(y)).push(p.x + ((q.x - p.x) * (y + 0.5 - p.y)) / (q.y - p.y));
-  }
-  const [x0, y0] = pictureToBay(0, 0), [x1, y1] = pictureToBay(w, h);
-  let off = 0, zone = 0;
-  for (let y = Math.floor(y0); y < Math.ceil(y1); y++) {
-    const xs = (rowsAt.get(y) ?? []).sort((a, b) => a - b);
-    let k = 0;
-    for (let x = Math.floor(x0); x < Math.ceil(x1); x++) { while (k < xs.length && xs[k] <= x + 0.5) k++; const v = wildInside(m, x, y); zone += v ? 1 : 0; if ((k % 2 === 1) !== v) off++; }
-  }
-  assert.ok(zone > 0);
-  assert.equal(off, 0, 'a pixel the zone\'s exactly when its middle lies inside the line');
-  // the dam the red line's alone: the held map's coast and borders hold every run of the outline's coast and borders, and
-  // the ink leaves nothing off for it
-  const ink = tracedChains(trace);
-  for (const run of line.coast) assert.ok(ink.coast.includes(run));
-  for (const run of line.borders) assert.ok(ink.borders.includes(run));
-  const drawn = (c) => c.reduce((n, p, i) => n + (i ? Math.hypot(p.x - c[i - 1].x, p.y - c[i - 1].y) : 0), 0);
-  const red = line.chains.reduce((n, c) => n + drawn(c), 0), runs = [...line.coast, ...line.borders].reduce((n, c) => n + drawn(c), 0);
-  assert.ok(red - runs > 10 && red - runs < 20, `the dam across the river, a picture pixel wide (${(red - runs).toFixed(1)} map pixels)`);
 });
 
 test('NIBEN-SEA (ARENA2): on the player\'s own picture the Niben joins Lake Rumare to the Topal Bay - Hammerfell\'s two lakes the only ones left, the painting\'s own coasts never kept by the boot (mutant: the bake\'s trace kept); the Imperial City\'s Waterfront a port of the sea named for it, with a lane down the Niben to Senchal and a voyage from the Topal Bay landing at it', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

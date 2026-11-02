@@ -17,7 +17,7 @@ import {
   validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, WORLD_PIXEL_BOUND,
   gateLanePixelOk,
 } from '../../../src/net/wire.js';
-import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
+import { IMPERIAL_ID } from '../../../src/world/tamriel/tamrielLand.js';
 import { scanGatePixels, findGateSite, gateRegions, gateSeaPixel, politicClaimed, GATE_TOWN_MIN_PX, GATE_TOWN_MAX_PX } from '../../../src/systems/gate/gateSite.js';
 import { scanTheatreGate, findTheatreGateSite, theatreGateAreas } from '../../../src/systems/gate/theatreGateSite.js';
 import { createGateLanes, createTheatreGateScans } from '../../../src/scenes/gate/gateLanes.js';
@@ -196,9 +196,9 @@ test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it alw
     assert.equal(!!validRiteIn({ d, px, py, s: 0, f: 0 }), heard);
     assert.equal(!!validRiteOut({ k: 'cl', d, px, py, at: 5 }), heard);
   }
-  // AUDIT WW F2, F3: the lanes that stand - the Bay's; Cyrodiil's never (the open zone stands no gate); a spent word on
+  // AUDIT WW F2, F3: the lanes that stand - the Bay's and every province's, Cyrodiil's among them; a spent word on
   // no lane that stands names no receipt
-  assert.ok(GATE_LANES_OPEN.includes(0) && !GATE_LANES_OPEN.includes(CYRODIIL_THEATRE));
+  assert.ok(GATE_LANES_OPEN.includes(0) && GATE_LANES_OPEN.includes(IMPERIAL_ID));
   assert.ok(GATE_LANES_OPEN.every((l) => Number.isSafeInteger(l) && l >= 0 && l < GATE_LANES));
   for (const lane of [0, 1, 8, 9, 10, 4000]) {
     const d = gateNumber(900, lane);

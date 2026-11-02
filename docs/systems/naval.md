@@ -14,7 +14,7 @@ project's own design.
 | Sea fight | Ships, guns, damage, AI captains, boarding, law, plunder | `src/systems/naval/` (pure), `src/scenes/naval/` (host) |
 | Pirate quests | Port of **Warm Ashes - Ships 1.1** (Kamer): ship encounters on sea travel and the pirate quest | `src/systems/warmAshesShips.js`, `src/systems/seaRaiders.js` |
 | Swimming | Port of **Iliac Puddle No More** (jet082): its player API lets a boat suppress the outdoor swim | `src/systems/deepWater/`, `vendor/iliac-puddle-no-more/` |
-| Eltheric Ocean | A procedural sea past "the Veil", with its own events, vaults and open PvP | `src/systems/naval/etherCrossing.js`, `etherShips.js`, `src/systems/sea/`, `src/world/ethericSea.js` |
+| Eltheric Ocean | A procedural sea past "the Veil", with its own events and vaults | `src/systems/naval/etherCrossing.js`, `etherShips.js`, `src/systems/sea/`, `src/world/ethericSea.js` |
 
 Almost every module under `src/systems/naval/` is pure: the host passes positions, a water test, the wind and the
 clock, and gets numbers or events back. Keep it that way; the tests depend on it.
@@ -27,7 +27,7 @@ clock, and gets numbers or events back. Keep it that way; the tests depend on it
 - **Naval host**: `createNavalHost` in `src/scenes/naval/navalHost.js`, built by `src/scenes/world.js`. It stands the
   sea's ships, runs the director, captains, guns and boarding each exterior frame, and draws through
   `src/render/navalRender.js`. The other files in `src/scenes/naval/` are modules it wires (rams, flames, crew, passage,
-  fishing fleet, PvP seams). New behaviour goes into such a module, not into `createNavalHost` or
+  fishing fleet). New behaviour goes into such a module, not into `createNavalHost` or
   `createComeSailAwayRuntime` themselves.
 - **Only the streaming world has a sea.** Interiors and dungeons (`src/scenes/worldModes.js`,
   `src/scenes/dungeonContext.js`) have none, and every transition, teleport and load empties the sea. The `?exterior`
@@ -124,8 +124,7 @@ contacts.
   captain and enough of the muster and she is a prize.
 - `navalPlunder.js`: the hold is lots drawn from DFU's loot tables by trade-specific keys, seeded by the ship. The
   captor picks Repair, Powder or Press, then scuttles, sets adrift or claims her as a new boat. A sunk ship drops casks.
-  `navalTransfer.js` applies carry rules to plunder. `seaHoldGuard.js` keeps a wreck's hold shut while she can be
-  boarded.
+  `navalTransfer.js` applies carry rules to plunder.
 - `navalLaw.js`: at sea DFU's region is a coast with no court, so crimes go to the nearest crown (`crownOf`). The
   first hit on a lawful ship is DFU's `Piracy` crime through `lowerRepForCrime`. Notoriety (0-100 per crown) decays
   daily; past thresholds that crown's navy fights on sight and sends hunters.
@@ -173,8 +172,7 @@ buys crew headcount at the exchange. `treasureCharts.js` turns a pirate's chart 
 `etherCrossing.js` offers the crossing at a helm in the open Abecean (`crossingWaters` in `src/world/ethericSea.js`)
 and takes `CROSS_DAYS`. `etherShips.js` holds its traffic and six legends. `src/systems/sea/seaEvents.js` (Aether
 Storm, treasure fleet on a shared clock), `seaVaults.js` and `seaSpoils.js` are its activities;
-`src/scenes/seaVenturesHost.js` wires them. Past Veilhaven's peace, player ships can fight each other
-(`src/scenes/naval/navalPvp.js`, `seaBroadsides.js`, `src/systems/wild/etherWild.js`), refereed by the relay.
+`src/scenes/seaVenturesHost.js` wires them.
 
 ## Online
 

@@ -188,7 +188,7 @@ export async function layerWalk(rooms, key, request, start) {
   const page = Object.fromEntries(request.headers);
   delete page[LAYER_ASK_HEADER]; delete page[LAYER_LAST_HEADER];
   // AUDIT SCALE II R3-3: AN ASKED LAYER IS THE PAGE'S ONLY WHILE SOMEONE STANDS IN IT. Every `?ly=` was honoured, so any
-  // page had a private empty copy of any place on demand (in the Wild zone, a hiding place from its fights). The ask
+  // page had a private empty copy of any place on demand. The ask
   // rides the first try alone; an asked layer that holds no socket answers LAYER_EMPTY_HEADER, and the walk starts again
   // at the place, as a page that asked nothing is walked - the empty layer is admitted only when the walk reaches it in
   // turn. A party's layer holds the party; a reconnect's own holds the socket it replaces while the runtime lists it -

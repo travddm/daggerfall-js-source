@@ -1,4 +1,3 @@
-// AUDIT TESA II, lane P - THE HOSTS PAST THE BAY: the build's hall in the open zone (P1), the zone's halls
 // off the places and the rolls and their ground's cost (Z7, Z9), the world's nearest town wired where the rise and
 // /unstuck read it (P2, P3), the journey's door (P4), the living world held to the Bay (P7), the lanes past the Bay at
 // their own reach and scale (P7), the trace's door (P9) and Arena's nearest port (K15) - each lifted off its host and run,
@@ -7,15 +6,12 @@ import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createZoneHalls } from '../../src/scenes/zoneHallsHost.js';
 import { createWorldPlaces } from '../../src/world/worldWide/worldPlaces.js';
 import { createLivingLanes } from '../../src/scenes/livingWorld/livingLanes.js';
 import { livingSide, LIVING_SIDES } from '../../src/scenes/livingWorld/livingIndex.js';
 import { portIdOf } from '../../src/world/worldWide/worldPorts.js';
 import { createWorldLanes, beyondLaneWay, worldLaneWater, BEYOND_LANE_MAX_PX, BEYOND_LANE_PATH_PX, LANE_NEAR_PX } from '../../src/scenes/naval/worldLanes.js';
 import { laneNetwork, LANE_PATH_PX, LANE_MAX_PX, LANE_STRAIGHT_STEPS } from '../../src/systems/naval/seaLanes.js';
-import { cyrodiilMask } from '../../src/systems/wild/cyrodiilZone.js';
-import { wildInside, maskWorldBox } from '../../src/systems/wild/wildZone.js';
 import { plateauDry, spawnGroundDry } from '../../src/world/spawnedDungeons.js';
 import { tamrielTraceOn } from '../../src/scenes/shared.js';
 import { setTamrielTrace } from '../../src/world/tamriel/tamrielLand.js';
@@ -56,138 +52,6 @@ test('AUDIT TESA II K15 ARENA\'S NEAREST PORT: of the ports within a pixel, the 
   const c = { x: 9, y: 19, name: 'Corner' }, d = { x: 10, y: 21, name: 'South' };   // the corner first, the nearer later
   assert.equal(near([c, d])(10, 20), d, 'the nearer, though the scan meets the farther first');
   assert.equal(near([])(10, 20), null);
-});
-
-test('AUDIT TESA II P1 THE BUILD PAST THE BAY: online, a pixel of the open zone stands the zone\'s hall of the day before any place past the Bay; else the places as before - and offline, or on the Bay, the hall is never asked there (mutants: the hall\'s ask dropped; asked offline; asked after the places)', () => {
-  const asked = [];
-  const make = (search) => new Function('URLSearchParams', `
-    const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
-    const _arenaTemplates = {}, _countryTemplates = {}, _capitalBase = {}, params = new URLSearchParams(${JSON.stringify(search)});
-    const MASK = { zone: true }, cyrodiilMask = () => MASK, asked = arguments[1];
-    const zoneHalls = { standIn: (mask, px, py) => { asked.push(['hall', px, py]); return mask === MASK && px === 2069 && py === 700 ? { name: 'Elite Hall' } : null; } };
-    const capitalLocationAt = (px, py) => (px === 2069 && py === 700 ? { name: 'A capital slice' } : null);
-    const arenaLocationAt = (px) => (px === 2100 ? { name: 'Bravil' } : null), countryLocationAt = () => null, lairLocationAt = () => null;
-    const locationIndex = new Map([['5,5', { name: 'Daggerfall' }]]);
-    const _spawnLedger = { expired: () => false }, _spawnClock = () => 0, _insideSpawn = () => false, spawnedDungeonAt = () => null;
-    let _locIndexGen = 0;
-    const host = { get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; }, _spawnClock, capitalLocationAt, arenaLocationAt, countryLocationAt, lairLocationAt };
-    ${lift(STAND, '  function _locationToBuild(px, py) {')}
-    return _locationToBuild;`)(URLSearchParams, asked);
-  const online = make('online');
-  assert.equal(online(2069, 700).name, 'Elite Hall', 'the zone\'s hall first, where a capital\'s slice would stand');
-  assert.equal(online(2100, 700).name, 'Bravil', 'no hall there: the places');
-  assert.equal(online(5, 5).name, 'Daggerfall', 'the Bay its own');
-  assert.deepEqual(asked, [['hall', 2069, 700], ['hall', 2100, 700]], 'never asked on the Bay (its spawns ask it there)');
-  asked.length = 0;
-  assert.equal(make('')(2069, 700).name, 'A capital slice', 'offline no zone');
-  assert.deepEqual(asked, []);
-});
-
-test('AUDIT TESA II Z7 THE ZONE\'S HALLS KEEP OFF THE PLACES: never on or beside a pixel the countryside or a lair may roll (the rolls the places host hands); picked again when the registry\'s places move and when the rolls are handed; a hall never stands over an index entry it did not make; the build\'s hall the zone\'s alone (mutants: the rolls unread; the cache kept past the places; the entry overwritten; standIn outside the mask)', () => {
-  const m = cyrodiilMask();
-  const places = createWorldPlaces();
-  const index = new Map();
-  index.set('500,250', { name: 'Old Keep', hasDungeon: true, dungeon: { blocks: [{}] }, exterior: { exteriorData: { width: 1, height: 1 } }, mapTableData: { mapId: 1234, locationType: 7, dungeonType: 0 }, regionIndex: 17 });
-  const bayMaps = { getClimateIndex: () => CLIMATES.Ocean, getRegionIndexAt: () => 0, getPoliticIndex: () => 128 };
-  const zh = createZoneHalls({ maps: bayMaps, woods: new BayWoods(), places, locationIndex: index, isMainStory: () => false, dayNow: () => 20500, indexMoved: () => {} });
-  const halls = zh.activeOf(m);
-  const h = halls[0];
-  assert.equal(zh.activeOf(m), halls, 'kept while nothing moves');
-  // the rolls: a farm may stand beside the hall
-  zh.standsToo((x, y) => x === h.x + 1 && y === h.y);
-  assert.equal(zh.free(h.x, h.y), false, 'beside a roll: never');
-  const again = zh.activeOf(m);
-  assert.notEqual(again, halls, 'picked again once the rolls are handed');
-  assert.ok(!again.some((g) => Math.abs(g.x - (h.x + 1)) <= 1 && Math.abs(g.y - h.y) <= 1), 'no hall on or beside the roll');
-  // the registry's places move: a town past the Bay lands on the next hall
-  const g0 = again[0];
-  places.register('tesa', [{ mapId: (0x341 << 20) | 0x80000, name: 'A town', px: g0.x, py: g0.y, type: LOCATION_TYPES.TownCity }]);
-  const third = zh.activeOf(m);
-  assert.notEqual(third, again, 'picked again when the places move');
-  assert.ok(!third.some((g) => Math.abs(g.x - g0.x) <= 1 && Math.abs(g.y - g0.y) <= 1), 'none on or beside the town');
-  // an index entry it did not make: kept
-  const t = third[0], farm = { name: 'The Ulfgar Farmstead', country: { px: t.x, py: t.y } };
-  index.set(`${t.x},${t.y}`, farm);
-  assert.equal(zh.standOf(m, t.x, t.y), null, 'no hall over it');
-  assert.equal(index.get(`${t.x},${t.y}`), farm, 'its entry kept');
-  index.delete(`${t.x},${t.y}`);
-  const loc = zh.standIn(m, t.x, t.y);
-  assert.ok(loc?.wildHall, 'the build\'s hall: the zone\'s on its pixel');
-  assert.equal(zh.standIn(m, t.x, t.y), loc, 'stood once a day');
-  assert.equal(zh.standIn(null, t.x, t.y), null, 'no zone, no hall');
-  const B = maskWorldBox(m);
-  let outside = null;
-  for (let x = B.x0 - 5; x <= B.x1 + 5 && !outside; x++) if (!wildInside(m, x, B.y0 - 3)) outside = [x, B.y0 - 3];
-  assert.equal(zh.standIn(m, outside[0], outside[1]), null, 'outside the zone none');
-});
-
-test('AUDIT TESA II Z7/Z9 (ARENA2) THE DAY\'S HALLS ON THE FREEWARE\'S WORLD: through the host over the registry (the Bay\'s rows and the places past the Bay) and the rolls - none on or beside a place over three days; the ground\'s dry plateau by plateauDry is spawnGroundDry\'s answer on every pixel asked, each pixel read once; a roll\'s "may stand" holds wherever it stands (mutants: the early-out\'s bound; the memo; a roll\'s pick tightened)', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
-  const { DFPalette } = await import('../../src/formats/dfPalette.js');
-  const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');
-  const { WoodsFile } = await import('../../src/formats/woodsFile.js');
-  const { groundWoods, groundMaps } = await import('../../src/world/tamriel/tamrielGround.js');
-  const { isWaterPixel } = await import('../../src/ui/overworldModel.js');
-  const { isMainStoryDungeon } = await import('../../src/world/dungeon/dungeonTextures.js');
-  const C = await import('../../src/world/tamrielCountry.js');
-  const D = await import('../../src/world/tamrielDungeons.js');
-  const { arenaTemplates, arenaTemplateOf } = await import('../../src/world/arenaLocations.js');
-  const { arenaPixels } = await import('../../src/world/arenaPlaces.js');
-  const { bayPlaceRows, BAY_SOURCE } = await import('../../src/world/worldWide/bayPlaces.js');
-  const { pastBayPlaceRows, PAST_BAY_SOURCE } = await import('../../src/world/pastBayRows.js');
-  const pal = new DFPalette(); pal.load(bytes('ART_PAL.COL'), 'ART_PAL.COL');
-  setTamrielTrace(await preloadTamrielTrace({ fetchBytes: async (n) => bytes(n), palette: pal }));
-  setTamrielFit({ ox: 38 * 15.5, oy: 57 * 15.5, ppu: 15.5 });
-  const woods = new WoodsFile(); woods.load(bytes('WOODS.WLD'));
-  const ground = groundWoods(woods);
-  const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK'));
-  const rows = [];
-  for (let r = 0; r < maps.regionCount; r++) { if (!maps.getRegion(r)) continue; for (let l = 0; l < maps.baseLocationCount(r); l++) { const loc = maps.getLocation(r, l); if (loc) rows.push(loc); } }
-  const bayClimate = (x, y) => maps.getClimateIndex(x, y);
-  const bayLand = C.bayLand(bayClimate, (x, y, c) => isWaterPixel(c, woods.getHeightMapValue(x, y)));
-  const cT = C.countryTemplates(rows, isMainStoryDungeon), lT = D.lairTemplates(rows, isMainStoryDungeon), aT = arenaTemplates(rows, isMainStoryDungeon);
-  groundMaps(maps);
-  const at = { climateAt: (x, y) => maps.getClimateIndex(x, y), heightAt: (x, y) => ground.getHeightMapValue(x, y), ground: C.createCountryGround(ground) };
-  const country = { ...at, rates: C.countryRates(C.countryCounts(cT, bayClimate), bayLand), templates: cT };
-  const lair = { ...at, rates: C.countryRates(C.countryCounts(lT, bayClimate), bayLand, D.LAIR_TYPES), templates: lT };
-  const places = createWorldPlaces();
-  places.register(BAY_SOURCE, bayPlaceRows(rows.filter((l) => l?.exterior?.exteriorData)));
-  places.registerLive(PAST_BAY_SOURCE, { stamp: () => [arenaPixels()], rows: () => pastBayPlaceRows({ pixels: arenaPixels(), templateOf: (p) => arenaTemplateOf(aT, p), capitals: true }) });
-  // the ground as the host reads it, every read counted
-  const reads = new Map();
-  const counted = Object.create(ground);
-  counted.isTamrielGround = true;
-  let pixel = null;
-  counted.getHeightMapValuesRange1Dim = function (...a) { if (pixel) reads.set(pixel, (reads.get(pixel) ?? 0) + 1); return ground.getHeightMapValuesRange1Dim(...a); };
-  let day = 3;
-  const zh = createZoneHalls({ maps, woods: counted, places, locationIndex: new Map(), isMainStory: () => false, dayNow: () => day, indexMoved: () => {} });
-  zh.standsToo((x, y) => C.countryMayStandAt(country, x, y) || D.lairMayStandAt(lair, x, y));
-  const m = cyrodiilMask();
-  const free = zh.free;
-  const asked = [];
-  const zfree = (x, y) => { pixel = `${x},${y}`; asked.push([x, y]); const ok = free(x, y); pixel = null; return ok; };
-  let bad = 0, halls = 0;
-  for (const d of [3, 4, 5]) {
-    day = d;
-    for (const h of zh.activeOf(m)) {
-      halls++;
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (places.at(h.x + dx, h.y + dy) || C.countryStandsAt(country, h.x + dx, h.y + dy) || D.lairStandsAt(lair, h.x + dx, h.y + dy)) bad++;
-    }
-  }
-  assert.ok(halls > 60, `${halls} halls`);
-  assert.equal(bad, 0, 'no hall on or beside a place');
-  // the ground: plateauDry's word is spawnGroundDry's, a pixel read once (the host's memo)
-  const { wildHallPicks } = await import('../../src/systems/wild/wildDungeons.js');
-  wildHallPicks(m, zfree, 6);
-  let same = 0;
-  for (const [x, y] of asked) {
-    if (C.countryStandsAt(country, x, y)) assert.ok(C.countryMayStandAt(country, x, y), `a farm at ${x},${y} its roll's "may"`);
-    if (D.lairStandsAt(lair, x, y)) assert.ok(D.lairMayStandAt(lair, x, y), `a lair at ${x},${y} its roll's "may"`);
-    if (plateauDry(ground, x, y) === spawnGroundDry(ground, x, y)) same++;
-  }
-  assert.ok(asked.length > 300, `${asked.length} asked`);
-  assert.equal(same, asked.length, 'the same plateau law to the bit');
-  for (const [x, y] of [...asked]) zfree(x, y);   // asked again: the memo's
-  assert.ok([...reads.values()].every((n) => n <= 1), 'a pixel\'s plateau read once a session');
 });
 
 // for ships."): P7 held the living world to the Bay until WW7; WW7-7 lifts it - each trip keeps to its own side of the Bay's
@@ -328,13 +192,16 @@ test('AUDIT TESA II P7 THE GATES PAST THE BAY UNSCANNED WHILE THEIR LANES ARE SH
   places.register('tesa', rows('Imperial', 50_000));
   const asked = [];
   const counted = { ...places, inTheatre: (t) => { asked.push(t); return places.inTheatre(t); }, theatres: places.theatres, generation: places.generation, at: places.at };
-  assert.deepEqual(GATE_LANES_OPEN, [0, 1, 2, 3, 4, 5, 6, 7, 8], 'the Bay\'s and the eight provinces\' lanes stand; Cyrodiil\'s never');
-  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [], 'no lane in the open zone');
-  assert.deepEqual(asked, [], 'and its theatre never scanned for one');
+  assert.deepEqual(GATE_LANES_OPEN, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'the Bay\'s and every province\'s lane stand, Cyrodiil\'s with them');
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [cyrodiil], 'Cyrodiil\'s lane stands: its theatre scanned');
+  assert.deepEqual(asked, [cyrodiil], 'and asked for');
+  asked.length = 0;
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: (lane) => lane !== cyrodiil }).theatres(), [], 'a shut lane stands no scan');
+  assert.deepEqual(asked, [], 'and its theatre is never scanned for one');
   places.register('tesa2', rows('Skyrim', 60_000));
-  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres(), [skyrim], 'a province\'s lane: its theatre scanned');
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: (lane) => lane !== cyrodiil }).theatres(), [skyrim], 'a province\'s lane: its theatre scanned');
   assert.deepEqual(asked, [skyrim], 'Skyrim\'s alone');
-  assert.equal(createTheatreGateScans({ places: counted, wet: () => false, idle: null, open: () => true }).theatres().length, 1, 'opened, the zone\'s theatre is scanned (and the open zone\'s areas stand no gate - theatreGateSite.js)');
+  assert.deepEqual(createTheatreGateScans({ places: counted, wet: () => false, idle: null }).theatres().sort((a, b) => a - b), [cyrodiil, skyrim].sort((a, b) => a - b), 'every lane open: both theatres scanned');
   assert.ok(asked.includes(cyrodiil));
 });
 
@@ -344,17 +211,10 @@ test('AUDIT TESA II P9 THE TRACE\'S DOOR is offline alone, as the land\'s others
   assert.equal(tamrielTraceOn(''), true);
 });
 
-test('AUDIT TESA II P2/P3/P4 THE WIRING: the world\'s nearest town (scenes/tamrielPlacesHost.js nearestTownOf) read by the rise past the Bay, the open zone\'s rise and /unstuck - one law; the places past the Bay registered live and the rolls handed to the zone\'s halls; every journey asked of the door past the Bay (systems/travel/pastBayTravel.js) after the zone\'s own (mutants: each read put back on MAPS.BSA; the door unasked)', () => {
+test('AUDIT TESA II P2/P3/P4 THE WIRING: the world\'s nearest town (scenes/tamrielPlacesHost.js nearestTownOf) read by the rise past the Bay - one law; the places past the Bay registered live (mutants: each read put back on MAPS.BSA)', () => {
   const P = rd('src/scenes/tamrielPlacesHost.js');
   assert.match(P, /const nearestTownOf = \([^\n]*\) => nearestSafePlace\(\[worldPlaces\?\.all\(\) \?\? \[\], countryTowns\(\)\], px, accept\);/);
   assert.match(P, /if \(worldPlaces && \(_arenaTemplates \|\| _capitalBase\)\) \{\n\s+worldPlaces\.registerLive\(PAST_BAY_SOURCE, \{\n\s+stamp: \(\) => \[_arenaTemplates \? arenaPixels\(\) : null, tamrielFit\(\), tamrielLandVersion\(\)\],\n\s+rows: \(\) => pastBayPlaceRows\(\{ pixels: _arenaTemplates \? arenaPixels\(\) : null, templateOf: \(p\) => arenaTemplateOf\(_arenaTemplates, p\), capitals: !!_capitalBase \}\),/);
-  assert.match(P, /if \(_countryTemplates\) zoneHalls\?\.standsToo\(pastBayRolledAt\);/);
-  assert.match(W, /for \(const pick of wildRisePicks\(cyrodiilMask\(\), px, \{ inDungeon, kill \}\)\) \{ const at = nearestTownOf\(px, pick\); if \(at\) return at; \}/, 'the zone\'s rise');
-  assert.match(W, /const town = etherSea && inEther\(px\.x, px\.y\) \? wildRiseSite\(px\) : nearestTownOf\(px, \(hit\) => hit\.kind === 'city' && !\(_zm && wildNear\(_zm, hit\.mapPixel\.x, hit\.mapPixel\.y\)\)\);/, '/unstuck');
   assert.match(W, /const town = nearestTownOf\(px\);\n\s+if \(town\) land = town\.mapPixel;/, 'the rise past the Bay');
   assert.doesNotMatch(W, /nearestTownPastTheBay|TOWN_RISE_REACH|nearestSafeLocationAnywhere\(maps, px, \(hit\)/, 'no second law');
-  // pastBayJourney unless a teleport hands its own (pastBayTravel.js teleportJourney: teleportTo, Recall, a stone's pick and step)
-  assert.match(W, /const wildTravelGate = \(to, spoken = 0, law = pastBayJourney\) => \{/, 'every journey\'s gate: the journey\'s law unless told');
-  assert.match(W, /const j = law\(playerTravelPixel\(\), to, online \? wildMapMask\(\) : null, wildJourney\(\{/, 'asked after the zone\'s own');
-  assert.ok(W.indexOf('const zoneHalls = createZoneHalls(') < W.indexOf('createTamrielPlaces('), 'the halls stand before the places host hands them the rolls (BOOT-TDZ)');
 });

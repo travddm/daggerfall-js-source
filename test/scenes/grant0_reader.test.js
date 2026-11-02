@@ -8,7 +8,8 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { WILD_GIANT } from '../../src/systems/wild/wildZone.js';
+import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
+const GIANT = MOBILE_TYPES.Giant;   // a plain Giant: the pool's tallest ordinary foe
 import { createExteriorFoes, ENCOUNTER_PUPPETS_MAX, PEER_ELITE_PUPPETS_MAX, PEER_REVENANT_PUPPETS_MAX, PEER_CHAMPION_PUPPETS_MAX } from '../../src/scenes/exteriorFoes.js';
 import { enemySpellIndices, assignEnemySpells, MONSTER_SPELL_LISTS } from '../../src/systems/enemySpells.js';
 import { puppetBlow, WIRE_SIG } from '../../src/ai/puppetBlows.js';
@@ -35,7 +36,7 @@ function craftMonsterBsa(records) {
   for (const [name, bytes] of records) { for (let i = 0; i < name.length; i++) out[pos + i] = name.charCodeAt(i); v.setInt32(pos + NAME_FIELD, bytes.length, true); pos += ENTRY; }
   return out;
 }
-const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(WILD_GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
+const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
 const stubTex = { getSize: () => ({ width: 64, height: 100 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 8, getFrameCount: () => 1 };
 const settle = async () => { for (let i = 0; i < 6; i++) await new Promise((r) => setTimeout(r, 0)); };
 const playerEntity = () => ({ level: 1, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: { strength: 50, agility: 50, luck: 50, speed: 50, endurance: 50 }, armorValues: new Array(7).fill(100) });
@@ -110,7 +111,7 @@ test('GRANT0 executed: champions - an honest owner\'s stand as champions; a forg
   lootOn();
   try {
     const owner = pool('aaa-0001'), reader = pool(READER);
-    for (let i = 0; i < 4; i++) await owner.spawnFoe(WILD_GIANT, [100 + i, 0, 100], { feetGiven: true, loose: true, transient: true, champion: i });
+    for (let i = 0; i < 4; i++) await owner.spawnFoe(GIANT, [100 + i, 0, 100], { feetGiven: true, loose: true, transient: true, champion: i });
     const honest = owner.foesFrame(true);
     assert.equal(honest.f.filter((r) => Number.isInteger(r.cp)).length, 4, 'the producer writes `cp`');
     reader.applyFoes('aaa-0001', honest);
@@ -118,7 +119,7 @@ test('GRANT0 executed: champions - an honest owner\'s stand as champions; a forg
     assert.equal(reader.foes.filter((f) => f.puppet === 'aaa-0001' && !f.dead && f.entity.champion).length, 4, 'an honest owner\'s champions are champions here');
 
     const r2 = pool(READER);
-    await send(r2, FORGER, { f: seqs(0, 40).map((i) => rec(i, { t: WILD_GIANT, cp: 2 })) });   // one frame: every build in flight at once
+    await send(r2, FORGER, { f: seqs(0, 40).map((i) => rec(i, { t: GIANT, cp: 2 })) });   // one frame: every build in flight at once
     const stood = r2.foes.filter((f) => f.puppet === FORGER && !f.dead);
     assert.equal(stood.length, ENCOUNTER_PUPPETS_MAX);
     assert.equal(stood.filter((f) => f.entity.champion).length, PEER_CHAMPION_PUPPETS_MAX, 'seventeen champions, never thirty-two');
@@ -126,7 +127,7 @@ test('GRANT0 executed: champions - an honest owner\'s stand as champions; a forg
     assert.ok(!(plainScale > 1), 'the rest strike as their plain kind');
     // the champions fall: the next frame's traits are believed again, up to the bound
     for (const f of stood.filter((x) => x.entity.champion)) f.dead = true;
-    await send(r2, FORGER, { f: seqs(500, 10).map((i) => rec(i, { t: WILD_GIANT, cp: 2 })) });
+    await send(r2, FORGER, { f: seqs(500, 10).map((i) => rec(i, { t: GIANT, cp: 2 })) });
     assert.equal(r2.foes.filter((f) => f.puppet === FORGER && !f.dead && f.entity.champion).length, 10, 'room given back as they fall');
   } finally { _resetForTests(); }
 });

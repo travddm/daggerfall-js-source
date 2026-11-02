@@ -1265,21 +1265,9 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   }
   // the off hand's terms reach every blow between players (AUDIT): each melee arm hands the STRIKING rig's off flag on
   const world = rd('src/scenes/world.js');
-  assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 3, 'the duel, the battle and the wild zone');
+  assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 2, 'the duel and the battle');
   assert.match(world, /\.\.\.\(weaponRig\.playerWeapon\.offStrike \? \{ off: true \} : \{\}\) \}, duelStandIn\(playerEntity\)\);$/m, 'and the siege\'s works');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the stand-in struck by me
-  assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 3, 'each strike-out hands it to the roll');
-  assert.match(rd('src/scenes/dungeonContext.js'), /opts\.wildStrike\(best, playerWeapon\.strikingWeapon, playerWeapon\.machine\?\.state, \{ off: playerWeapon\.offStrike \}\)/, 'the dungeon\'s own rig too');
-  // AUDIT 2: AND THE RELAY BETWEEN THEM - the streamed world's dungeon (worldModes.js builds its context, the only live
-  // builder) hands the dungeon's `{ off }` on to the host's door, which had dropped it: the arrows' own source, chained
-  // as the game chains them
-  const relayText = rd('src/scenes/worldModes.js').match(/wildStrike: (\([^)]*\) => !!host\.wildStrike\?\.\([^)]*\)),/)?.[1];
-  const doorText = rd('src/scenes/world.js').match(/wildStrike: (\(id, weapon, swing, o\) => wildStrikeOut\(id, 'melee', weapon, swing, 0, o\)),/)?.[1];
-  assert.ok(relayText && doorText, 'the relay and the door, found');
-  const sent = [];
-  const door = new Function('wildStrikeOut', `return ${doorText};`)((to, by, weapon, swing, drawMs = 0, { off = false } = {}) => { sent.push(off); return true; });
-  const relay = new Function('host', `return ${relayText};`)({ wildStrike: door });
-  assert.equal(relay('peer', null, 'StrikeDown', { off: true }), true);
-  assert.deepEqual(sent, [true], `the off-hand blow reaches the host's door as the off hand's (${relayText})`);
+  assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 2, 'each strike-out hands it to the roll (the duel and the siege; the open zone one is gone)');
   // the classic sprite's placement is FPSWeapon's, shared by the second hand
   const fps = rd('src/combat/fpsWeapon.js');
   // the record rides the quad (WEAPON-GLOW1's outline is measured in its own pixels), the draw's two lines main's own

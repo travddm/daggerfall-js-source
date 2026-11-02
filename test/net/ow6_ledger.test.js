@@ -309,7 +309,7 @@ test('OW6L wire: the `ow` word - after a hello, projected by validOwIn, the whol
   let rb = null, rpass = 0;
   for (let i = 0; i < OW_ROOM_HZ_MAX + 3; i++) { const g = owRoomGate(rb, 1000); rb = g.bucket; if (g.pass) rpass++; }
   assert.equal(rpass, OW_ROOM_HZ_MAX);
-  assert.equal(RELAY_VERSION, 'world282');
+  assert.equal(RELAY_VERSION, 'world283');
   assert.equal(OW_LEDGER_KEY, 'ow:led'); assert.ok(!OW_LEDGER_KEY.startsWith('world:'), 'never under the prefix a cell\'s alarm sweeps');
 });
 
