@@ -197,7 +197,8 @@ only the general rule. Tests: `test/systems/lootgate1.test.js`.
 
 **Around the ladder:**
 
-- `taken-mark.js`: the first take of a rolled piece clears its `untaken` mark, which the kit roll reads. The bad-luck drought that once rode on this listener is gone (B4).
+- `taken-mark.js`: the first take of a rolled piece clears its `untaken` mark, which the kit roll reads. The
+  bad-luck drought that once rode on this listener is gone (B4).
 - `lootCodex.js`: a collection log of every Legendary and Aetheric taken. It also imprints a Legendary's power on a
   Rare.
 - `lootCurse.js`: some Rare and Legendary finds are cursed: one extra line and one drawback. A temple lifts it.
