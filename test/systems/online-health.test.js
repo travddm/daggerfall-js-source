@@ -43,8 +43,10 @@ test('B5 the Endurance floor stays: a class at level 45 stands above its stored 
 });
 
 test('B5 survival: the online layer at its most adds about a tenth at most to a level-45 body, and Renown none', () => {
-  const rows = (layers) => buildReport({ builds: ['warrior', 'mage'], levels: [45], swings: SWINGS, layers: parseLayers(layers) })
-    .rows.filter((row) => row.foeKind === 'average');
+  const rows = (layers) =>
+    buildReport({ builds: ['warrior', 'mage'], levels: [45], swings: SWINGS, layers: parseLayers(layers) }).rows.filter(
+      (row) => row.foeKind === 'average',
+    );
   const plain = rows('default,-hero,-stats');
   const sky = rows('default,+skyHealth,-hero,-stats');
   for (const [i, row] of sky.entries()) {
