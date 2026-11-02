@@ -5144,6 +5144,7 @@ export class Room {
       // here, or a stale place would read as fresh and the next real move as a run too fast to believe
       const r = refBlow(st, cur.afid, m, now, cur.wa ?? null, this._looks.get(a.id) ?? null);   // INT7: the striker's signed arms, off this room's own token
       this._boutFan(r.words);
+      this._metrics.c.magickaDry += +(r.dry === true);
       return;
     }
     if (m.k === 'yd') {
@@ -5779,6 +5780,7 @@ export class Room {
     const res = m.k === 'cast'
       ? refereeCast(by, to, { from: by.pose, at: to.pose, d: m.d, heal }, now)
       : refereeBlow(by, to, { from: by.pose, at: to.pose, held: siegeHeld(look, m.w, m.m), d: m.d, r: m.r, wa: a.wa ?? null }, now);   // INT7: clipped to the striker's signed arms
+    this._metrics.c.magickaDry += +(res.dry === true);   // the magicka pool cut a cast short
     if (!res.ok || !res.dealt) return;
     const frames = [{ k: 'hp', id: m.to, h: to.hp, m: to.max }];
     if (res.fell && b?.kind === 'royal') { this._siegeFan(frames); await this._royalBoutEnd(s, b, royalEnd(b, a.sub, now), now); return; }   // CROWN1 part two: a fall ends the bout
@@ -5840,6 +5842,7 @@ export class Room {
     const res = m.k === 'cast'
       ? refereeCast(by, n, { from: by.pose, at, d: m.d }, now)
       : refereeBlow(by, n, { from: by.pose, at, held: siegeHeld(look, m.w, m.m), d: m.d, r: m.r, wa: a.wa ?? null }, now);   // INT7
+    this._metrics.c.magickaDry += +(res.dry === true);   // the magicka pool cut a cast short
     if (!res.ok || !res.dealt) return;
     if (res.fell) {
       siegeNpcFell(b, n, now);

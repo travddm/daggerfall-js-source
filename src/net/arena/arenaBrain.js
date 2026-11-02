@@ -239,12 +239,14 @@ export function refBlow(st, id, { i: to, d, r, w = -1, m = 0, q = null }, now, w
   M.bucket = Math.min(ARENA_BUCKET_DEPTH, M.bucket + (Math.max(0, now - M.bucketAt) / 1000) * ARENA_BUCKET_RATE);
   M.bucketAt = now;
   const want = Math.max(0, Number(d) || 0);
-  const got = Math.max(0, Math.floor(Math.min(want, arenaBlowCap({ r, w, m, wa }), M.bucket, magickaFor(M, r, now))));
+  const cap = Math.min(want, arenaBlowCap({ r, w, m, wa }), M.bucket), pool = magickaFor(M, r, now);
+  const got = Math.max(0, Math.floor(Math.min(cap, pool)));
+  const dry = pool < cap;   // the magicka pool was what cut the cast short: the relay counts it
   M.bucket -= got;
   magickaSpent(M, r, got, now);
-  if (!(got > 0)) { boutMiss(st.b, { from: id, now }); return { words: takeWords(st), got: 0 }; }
+  if (!(got > 0)) { boutMiss(st.b, { from: id, now }); return { words: takeWords(st), got: 0, dry }; }
   land(st, id, to, got, now, got >= t.maxHealth * 0.15);
-  return { words: takeWords(st), got };
+  return { words: takeWords(st), got, dry };
 }
 
 /** A blow lands: the struck's health down by it, the law told; a blow that would take them under 1 holds them at it, and

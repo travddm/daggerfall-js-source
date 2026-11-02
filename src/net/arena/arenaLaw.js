@@ -362,9 +362,12 @@ export const ARENA_SPELL_MAX = 60;
 /** A damaging spell reaches as far as a shaft. */
 export const ARENA_SPELL_REACH = ARENA_BOW_REACH;
 /** The relay's own magicka for a fighter's casts: it knows no spell book, so each damaging cast costs the damage it
- *  lands from a pool that refills at a fixed rate. The pool holds the spell window's full count of casts. */
-export const ARENA_MAGICKA_DEPTH = ARENA_SPELLS_IN * ARENA_SPELL_MAX;
-export const ARENA_MAGICKA_REGEN = 24;
+ *  lands from a pool that refills at a fixed rate. DFU's most magicka is Intelligence 100 x the class's 3.0 = 300
+ *  (combat/formulas.js spellPointsFor, systems/chargen.js SPELL_POINT_MULTIPLIERS); the pool is twice that for the
+ *  gear, Renown and folds that add to it, and its refill is slower than the cast count's own ceiling. A refusal is
+ *  counted (the relay's `magickaDry` metric) so a false one shows. */
+export const ARENA_MAGICKA_DEPTH = 600;
+export const ARENA_MAGICKA_REGEN = 12;
 /** The fastest a fighter moves (Seats-Arc 6.1's starting ceiling) and the slack: a pose further than this from the last
  *  good one is not believed (the referee measures reach from the last good pose). */
 export const ARENA_SPEED_MAX = 12.5;
@@ -393,11 +396,9 @@ export function arenaBlowCap({ r, w = -1, m = 0, wa = null }) {
   if (r === ARENA_HIT.Spell) return ARENA_SPELL_MAX;
   const wmax = ARENA_WEAPON_MAX[/** @type {any} */ (w)];
   const mat = Number.isInteger(m) && m >= 0 && m < ARENA_MATERIAL_MOD.length ? ARENA_MATERIAL_MOD[m] : 0;
-  const signed = arenaArmsOk(wa);
-  // A blow that names no weapon is never worth more than one that does: a fist is held to the best weapon's reach, or to
-  // a weaker signed pack's. Only a fist-only pack (wa [0, 0]) keeps the hand's own most.
-  const fist = signed && wa[0] === 0 ? ARENA_HAND_MAX : Math.min(ARENA_HAND_MAX, signed ? wa[0] : ARENA_ARMS_TOP_MAX);
-  const reach = wmax != null ? (signed ? Math.min(wmax + mat, wa[0]) : wmax + mat) : fist;
+  // A blow that names no weapon (or a template no table names) is a fist's: DFU's hand-to-hand most. The referee refuses
+  // that claim while a weapon is in the striker's hand (arenaHeld), so leaving the weapon out buys an armed fighter nothing.
+  const reach = wmax != null ? (arenaArmsOk(wa) ? Math.min(wmax + mat, wa[0]) : wmax + mat) : ARENA_HAND_MAX;
   return 2 * (reach + ARENA_MOD_MAX);
 }
 

@@ -261,17 +261,18 @@ export function refereeCast(by, to, { from = null, at = null, d = 0, heal = fals
     by.heals = (by.heals ?? []).filter((t) => now - t < SIEGE_CASTS.windowMs);
     if (by.heals.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
     by.heals.push(now);
-    const got = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp, magickaRoom(by, now));
+    const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp), got = Math.min(wanted, room);
     spendMagicka(by, got, now);
     to.hp += got;
-    return { ok: true, dealt: -got, fell: false, why: null };
+    return { ok: true, dealt: -got, fell: false, why: null, dry: room < wanted };
   }
   if (by === to) return { ok: false, dealt: 0, fell: false, why: 'no-fighter' };
   by.casts = by.casts.filter((t) => now - t < SIEGE_CASTS.windowMs);
   if (by.casts.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
   by.casts.push(now);
   if (now < to.safeTo) return { ok: false, dealt: 0, fell: false, why: 'protected' };
-  const got = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now), magickaRoom(by, now));   // BAL8: the blows' and the casts' one ceiling; and the pool's
+  const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now));   // BAL8: the blows' and the casts' one ceiling
+  const got = Math.min(wanted, room);   // and the magicka pool's
   spendMagicka(by, got, now);
   spendHarm(by, now, got);
   by.clipped += want - got;
@@ -279,7 +280,7 @@ export function refereeCast(by, to, { from = null, at = null, d = 0, heal = fals
   to.hp -= got;
   const fell = to.hp <= 0;
   if (fell) to.down = true;
-  return { ok: true, dealt: got, fell, why: null };
+  return { ok: true, dealt: got, fell, why: null, dry: room < wanted };
 }
 
 /** AUDIT-SEATS R2: the longest a step's allowance runs - a second's run and the slack, however long the silence before. */

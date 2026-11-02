@@ -1252,7 +1252,7 @@ export const SIGN_WHY = Object.freeze({
 // ─── SEAT2a (part three): THE PASS, THE FIELD, THE RESULT AND HONOURS (SEAT0 6.2, 6.5-6.8) ───
 // The relay fights the battle (net/siege/siegeRef.js); the service signs who may enter it and settles what it gave.
 
-export { settleField, witnessedField, fieldInPixel, SIEGE_FIELD_MARGIN } from './siegeFieldLaw.js';   // the battlefield a pass carries: how its field is settled and bounded
+export { settleField, witnessedField, fieldInPixel, fieldShapeOk, SIEGE_FIELD_MARGIN } from './siegeFieldLaw.js';   // the battlefield a pass carries: how its field is settled and bounded
 /** The room's window on a pass (`se`): the battle's block - two hours, a crown siege's one (battleSpanMs). */
 export const passWindowEnds = (b) => b.starts_at + battleSpanMs({ kind: b.kind, tier: b.tier }) / 1000;
 /** The pass's door opens as the rosters close (SIGN_CLOSES_MS before the start - net/siege/siegeRef.js SIEGE_OPENS_MS). */

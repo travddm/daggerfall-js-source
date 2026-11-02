@@ -3,9 +3,9 @@
 // and the field's ground. siegeRef.js re-exports these; this leaf imports nothing.
 
 /** The relay's own magicka for a fighter's casts and heals: it knows no spell book, so a cast costs the points it lands
- *  (a heal, the points it restores) from a pool that holds a window's full casts and refills at a fixed rate. The depth
- *  is SIEGE_CASTS.max x SIEGE_CASTS.damageMax (siegeRef.js, pinned equal by test). */
-export const SIEGE_MAGICKA = Object.freeze({ depth: 180, regenPerS: 24 });
+ *  (a heal, the points it restores). The pool and its refill are the arena's (net/arena/arenaLaw.js ARENA_MAGICKA_DEPTH,
+ *  ARENA_MAGICKA_REGEN - pinned equal by test; DFU's most magicka is 300 and the pool twice that). */
+export const SIEGE_MAGICKA = Object.freeze({ depth: 600, regenPerS: 12 });
 
 /** The points of magicka the fighter `f` has at `now` (whole points). @param {any} f @param {number} now */
 export function magickaRoom(f, now) {

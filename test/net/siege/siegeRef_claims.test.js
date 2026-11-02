@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import {
   newFighter, refereeWorkBlow, refereeCast, SIEGE_HIT, SIEGE_UNITS_PER_M, SIEGE_HARM, SIEGE_CASTS, SIEGE_MAGICKA, SIEGE_GROUND_DRIFT_UNITS, SIEGE_HEIGHT_M, anchoredGround,
 } from '../../../src/net/siege/siegeRef.js';
-import { settleField, witnessedField, fieldInPixel } from '../../../src/net/townSeatLaw.js';
+import { settleField, witnessedField, fieldInPixel, fieldShapeOk } from '../../../src/net/townSeatLaw.js';
+import { ARENA_MAGICKA_DEPTH, ARENA_MAGICKA_REGEN } from '../../../src/net/arena/arenaLaw.js';
 import { PIXEL_UNITS } from '../../../src/net/wire.js';
 
 const M = SIEGE_UNITS_PER_M;
@@ -26,7 +27,7 @@ test('blows on the Ram are held to the striker\'s harm ceiling, as blows on a fi
 });
 
 test('casts and heals draw on a magicka pool', () => {
-  assert.equal(SIEGE_MAGICKA.depth, SIEGE_CASTS.max * SIEGE_CASTS.damageMax, 'the pool holds a window of casts');
+  assert.deepEqual([SIEGE_MAGICKA.depth, SIEGE_MAGICKA.regenPerS], [ARENA_MAGICKA_DEPTH, ARENA_MAGICKA_REGEN], 'the arena pool');
   assert.equal(SIEGE_GROUND_DRIFT_UNITS, (SIEGE_HEIGHT_M / 2) * M, 'half a point sphere');
   const by = newFighter(10, 0), to = newFighter(10, 0);
   const near = { x: 0, y: 0, z: 0 }, there = at(5);
@@ -75,4 +76,16 @@ test('a field lies in or near the seat\'s pixel', () => {
   assert.equal(fieldInPixel([...inside, [x0 + 5 * PIXEL_UNITS, z0]], pixel), false, 'a point five pixels away');
   assert.equal(fieldInPixel([...inside, [x0, z0 - 3 * PIXEL_UNITS]], pixel), false);
   assert.equal(fieldInPixel(null, pixel), false);
+});
+
+test('a field keeps the offsets an honest town has: camps off the banners, the defenders\' camp by the Throne', () => {
+  const honest = [[0, 100], [30, 50], [-30, 50], [0, 0], [0, 120], [0, 10.5]].map(([x, z]) => [x * M, z * M]);
+  assert.equal(fieldShapeOk(honest, 'palace'), true);
+  const move = (i, p) => honest.map((q, j) => (j === i ? [p[0] * M, p[1] * M] : q));
+  assert.equal(fieldShapeOk(move(4, [0, 101]), 'palace'), false, 'the attackers\' camp on the Gate banner');
+  assert.equal(fieldShapeOk(move(5, [0, 80]), 'palace'), false, 'the defenders\' camp far from the Throne');
+  assert.equal(fieldShapeOk(move(1, [0, 120]), 'palace'), false, 'a banner in the attackers\' camp');
+  assert.equal(fieldShapeOk(honest, 'crown'), false, 'a palace\'s six points are not a crown\'s seven');
+  const crown = [...honest.slice(0, 3), [0, 18.5 * M], ...honest.slice(3)];
+  assert.equal(fieldShapeOk(crown, 'crown'), true, 'a crown\'s Palace square 18.5 m from the Throne');
 });

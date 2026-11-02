@@ -52,3 +52,24 @@ export function fieldInPixel(sf, pixel) {
   const x0 = pixel[0] * PIXEL_UNITS, z0 = (499 - pixel[1]) * PIXEL_UNITS;
   return sf.every((p) => p[0] >= x0 - SIEGE_FIELD_MARGIN && p[0] <= x0 + PIXEL_UNITS + SIEGE_FIELD_MARGIN && p[1] >= z0 - SIEGE_FIELD_MARGIN && p[1] <= z0 + PIXEL_UNITS + SIEGE_FIELD_MARGIN);
 }
+/** The offsets siegeFieldOf (systems/siegeField.js SIEGE_FIELD) fixes between a town's points, metres: the defenders' camp
+ *  lies defendCampM - thronePaceM = 10.5 from the Throne, the attackers' camp 20 from the Gate banner (6 m in from the gate
+ *  and 14 out, or 40 and 60 from the town's middle), a crown's Palace square 18.5 from the Throne; and the attackers' camp
+ *  is never inside a banner's radius (8 m) or the Throne's. */
+export const SIEGE_FIELD_OFFSETS = Object.freeze({ defendFromThrone: 10.5, attackFromGate: 20, squareFromThrone: 18.5, campClearM: 8, slackUnits: 3 });
+/**
+ * Whether a pass's field `sf` (siegeFieldValid's shape: the banners, the Throne, the attackers' camp, the defenders') keeps
+ * the offsets every honest town's field has (SIEGE_FIELD_OFFSETS). A field a client made up to put the camp on the
+ * banners or the banners on the Throne is not one. `unitsPerM` the room's units a metre (siegeRef.js SIEGE_UNITS_PER_M).
+ */
+export function fieldShapeOk(sf, tier, unitsPerM = 40) {
+  const n = tier === 'crown' ? 4 : 3;
+  if (!Array.isArray(sf) || sf.length !== n + 3) return false;
+  const o = SIEGE_FIELD_OFFSETS, slack = o.slackUnits;
+  const apart = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+  const near = (p, q, metres) => Math.abs(apart(p, q) - metres * unitsPerM) <= slack;
+  const banners = sf.slice(0, n), [throne, attack, defend] = sf.slice(n);
+  return near(throne, defend, o.defendFromThrone) && near(banners[0], attack, o.attackFromGate)
+    && (n === 3 || near(banners[3], throne, o.squareFromThrone))
+    && [...banners, throne].every((p) => apart(p, attack) > o.campClearM * unitsPerM);
+}

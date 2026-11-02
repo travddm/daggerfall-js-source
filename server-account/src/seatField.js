@@ -5,9 +5,10 @@
 //   2. the one an attacker and a defender submitted alike;
 //   3. once the battle is joined and only one side ever submitted, that side's most-submitted.
 // Two sides that never agree settle nothing: a count would hand the field to the bigger side's own geometry. Every
-// submitted field must also lie in or near the seat's pixel.
+// submitted field must also keep the offsets an honest town's field has (siegeFieldLaw.js fieldShapeOk) and lie in or
+// near the seat's pixel.
 import { siegeFieldValid } from '../../src/net/identityToken.js';
-import { settleField, witnessedField, fieldInPixel } from '../../src/net/townSeatLaw.js';
+import { settleField, witnessedField, fieldInPixel, fieldShapeOk } from '../../src/net/townSeatLaw.js';
 import { WITNESS } from '../../src/net/nodeLaw.js';
 import { confirmedSeats } from './townSeats.js';
 
@@ -21,7 +22,7 @@ import { confirmedSeats } from './townSeats.js';
 export async function settleBattleField({ db, nowS }, { b, week, key, side, field, playerId }) {
   if (side !== 'watch') {
     const seat = (await confirmedSeats(db, nowS)).get(key);
-    if (!siegeFieldValid(field, b.tier) || (seat && !fieldInPixel(field, seat.pixel))) return { error: 'field-bad' };
+    if (!siegeFieldValid(field, b.tier) || !fieldShapeOk(field, b.tier) || (seat && !fieldInPixel(field, seat.pixel))) return { error: 'field-bad' };
     await db.prepare(`INSERT INTO town_seat_fields (week, key, account, side, field, at) VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT (week, key, account) DO UPDATE SET field = excluded.field, at = excluded.at`)
       .bind(week, key, playerId, side, JSON.stringify(field), nowS).run();

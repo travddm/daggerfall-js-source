@@ -63,7 +63,7 @@ test('ARENA4 the door and the wire: the Worker opens the hall and a bout\'s room
   assert.equal(validArenaOut({ k: 'st', o: 'x' }), null);
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 }), 2 * (21 + 6 + 20), 'a Daedric dai-katana, a critical\'s double');
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Spell }), 60);
-  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (27 + 20), "a blow that names no weapon is worth the best weapon's (only a fist-only pack keeps DFU's 41: int7_arms)");   // PIN MOVED (kept-PvP security): was a bare hand's 122
+  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (41 + 20), "ARENA5: a bare hand's most (DFU's past the softcap) and the modifiers' room, doubled");
   assert.equal(RELAY_VERSION, 'world285');
 });
 

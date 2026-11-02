@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { openBout, joinBout, stepBout, poseOf, refBlow } from '../../../src/net/arena/arenaBrain.js';
-import { ARENA_HIT, ARENA_TICK_MS, ARENA_FLOOR_CENTRE, ARENA_SPELL_REACH, ARENA_MAGICKA_DEPTH, ARENA_SPELL_MAX, ARENA_SPELLS_IN, arenaBlowCap, arenaHeld } from '../../../src/net/arena/arenaLaw.js';
+import { ARENA_HIT, ARENA_TICK_MS, ARENA_FLOOR_CENTRE, ARENA_SPELL_REACH, ARENA_MAGICKA_DEPTH, ARENA_MAGICKA_REGEN, ARENA_SPELL_MAX, ARENA_SPELLS_IN, arenaBlowCap, arenaHeld } from '../../../src/net/arena/arenaLaw.js';
 import { boutLive } from '../../../src/systems/arena/arenaBout.js';
 
 const C = ARENA_FLOOR_CENTRE;
@@ -21,12 +21,11 @@ function fight(awayM = 1) {
   return { st, foe: st.ai[0].id, now: () => now, step: (ms) => { now += ms; } };
 }
 
-test('a fist claim is worth no more than the best weapon, and a fist-only pack keeps the hand\'s own most', () => {
+test("a fist keeps DFU's hand-to-hand most, and cannot be claimed by a fighter holding a weapon", () => {
   const best = arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 });
-  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), best, 'no weapon named, no signed arms');
-  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 9999 }), best, 'a template no table names');
-  assert.ok(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1, wa: [0, 0] }) > best, 'a pack of fists only');
-  assert.ok(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1, wa: [12, 0] }) < best, 'a weaker pack');
+  assert.ok(arenaBlowCap({ r: ARENA_HIT.Melee, w: -1 }) > best, 'an unarmed build is not cut below what DFU allows');
+  assert.equal(arenaHeld(DAI_LOOK, -1), null, 'but a swordsman leaving the weapon out is refused');
+  assert.equal(arenaHeld(DAI_LOOK, 9999, 0), null, 'and so is a template it does not hold');
 });
 
 test('a blow names the weapon in the striker\'s hand: a claim its look does not carry is refused, a fist only while no weapon is in hand', () => {
