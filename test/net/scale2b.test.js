@@ -169,7 +169,7 @@ test('SCALE2b metrics: a room writes ONE point a window - its kind and the relay
   await r.drop(a); await r.drop(b);
   assert.equal(points.length, 1, 'the drain writes the window\'s one point');
   const p = points[0];
-  assert.deepEqual(p.indexes, ['world']); assert.deepEqual(p.blobs, ['world', RELAY_VERSION, '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '0']);
+  assert.deepEqual(p.indexes, ['world']); assert.deepEqual(p.blobs, ['world', RELAY_VERSION, '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '0', '0']);
   assert.equal(p.doubles.length, 20);
   const [, sockets, hellos, busy, frames, bytesIn, poses, sends, bytesOut, reads, writes, refusals] = p.doubles;
   assert.equal(hellos, 2); assert.equal(busy, 0); assert.equal(poses, 5); assert.equal(refusals, 0);

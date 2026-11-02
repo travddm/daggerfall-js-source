@@ -283,7 +283,7 @@ test('COST-2 part two A MOVE ITS ROWS BLOCK IS NOT MADE: a departing layer that 
     assert.equal(dir.room._cellDir.cool[NODE], now + MOVE_COOLDOWN_MS, 'left alone');
     assert.deepEqual(parksIn(W, KIDS[0]), [], 'nothing sent');
     assert.equal(socks[0].closed, null, 'no socket closed');
-    assert.deepEqual(points.at(-1).blobs.slice(11), ['0', '1'], 'blob13: one move blocked');
+    assert.deepEqual(points.at(-1).blobs.slice(11), ['0', '1', '0'], 'blob13: one move blocked; blob14: no cast cut short');
     // a child that never takes
     const F = await splitPlanned();
     const get = F.W.ROOMS.get;
@@ -490,5 +490,5 @@ test('COST-2 part two THE NODE COUNT BY LEVEL IS READ BACK: the relay-load workf
   const m = new RoomMetrics(0);
   Object.assign(m.c, { frames: 1, cellMoves: 2, cellBlocked: 3 });
   m.flush({ writeDataPoint: (x) => { p = x; } }, 'cells', 0, 'v', 1000, true);
-  assert.deepEqual(p.blobs.slice(10), ['', '2', '3']);
+  assert.deepEqual(p.blobs.slice(10), ['', '2', '3', '0']);
 });

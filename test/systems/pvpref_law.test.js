@@ -141,7 +141,7 @@ test('PVP-REF THE CAST AND THE STEP: three damaging casts a 5 s, each to 60; a h
   now += SIEGE_CASTS.windowMs;
   assert.equal(cast({}).ok, true, 'the window passed');
   assert.equal(b.hp, 302 - 240);
-  assert.deepEqual(cast({ heal: true }), { ok: true, dealt: -40, fell: false, why: null }, 'a heal, 40 at most');
+  assert.deepEqual(cast({ heal: true }), { ok: true, dealt: -40, fell: false, why: null, dry: false }, 'a heal, 40 at most');
   assert.equal(b.hp, 102);
   a.hp = 290;
   assert.equal(refereeCast(a, a, { from: at(0), at: at(0), d: 100, heal: true }, now).dealt, -12, 'never past whole, on oneself');

@@ -42,12 +42,12 @@ async function onClock(fn) {
 async function session(W, who = []) {
   const R = W.room(ROOM);
   const host = R.connect();
-  await R.hello(host, 'peer-hela', { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela' });
+  await R.hello(host, 'peer-hela', { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela', look: DAI });
   await ps(R, host, 'open');
   const out = { R, host };
   for (const [id, name, linked, extra = {}] of who) {
     const ws = R.connect();
-    await R.hello(ws, `peer-${id}`, { x: C[0] + 1, y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${id}`, ...extra });
+    await R.hello(ws, `peer-${id}`, { x: C[0] + 1, y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${id}`, look: DAI, ...extra });
     out[id] = ws;
   }
   return out;
@@ -255,7 +255,7 @@ test('ARENA6 void, kick and the session\'s ends: the host\'s void ends the bout 
   step(ARENA_PRIVATE_HOST_GONE_MS - 60_000); await R.fire();
   assert.ok(await R.room._sessionOf(), 'fourteen minutes: still open');
   const host2 = R.connect();
-  await R.hello(host2, 'peer-hela', null, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela', secret: 'secret-of-peer-hela' });
+  await R.hello(host2, 'peer-hela', null, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela', look: DAI, secret: 'secret-of-peer-hela' });
   await ps(R, host2, 'open');
   const back = readArenaOut(last(host2, 'pss'));
   assert.deepEqual([back.h, back.me, back.m.find((x) => x[1] === 'Gull')?.[0]], [1, 'm1', mG], 'the host is the host again - the same session, its members kept');
@@ -305,7 +305,7 @@ test('ARENA6 the seats: a session holds ARENA_PRIVATE_MEMBERS_MAX (the stands\' 
   }
   assert.equal(Object.keys((await R.room._sessionOf()).members).length, ARENA_PRIVATE_MEMBERS_MAX);
   const late = R.connect();
-  await R.hello(late, 'peer-late', null, { name: 'Late', kind: 'linked', tokenSub: 'acct-late' });
+  await R.hello(late, 'peer-late', null, { name: 'Late', kind: 'linked', tokenSub: 'acct-late', look: DAI });
   await ps(R, late, 'join');
   assert.equal(last(late, 'no').m, 'session full', 'every one of them here');
   await R.drop(socks[5]); step(10);
@@ -320,7 +320,7 @@ test('ARENA6 the seats: a session holds ARENA_PRIVATE_MEMBERS_MAX (the stands\' 
   const S0 = await R.room._sessionOf();
   await ps(R, host, 'pick', { r: S0.members['acct-n0'].id, b: S0.members['acct-n1'].id });
   const stranger = R.connect();
-  await R.hello(stranger, 'peer-str', null, { name: 'Stranger', kind: 'linked', tokenSub: 'acct-str' });
+  await R.hello(stranger, 'peer-str', null, { name: 'Stranger', kind: 'linked', tokenSub: 'acct-str', look: DAI });
   await word(R, stranger, { k: 'in', r: 'f', tier: 0, bout: 0, lv: 5 });
   assert.equal(last(stranger, 'no').m, 'not member');
   // AUDIT ARENA-LADDER 2 (
@@ -367,6 +367,7 @@ import { createArenaOnline } from '../../../src/scenes/arena/arenaOnline.js';
 import { createArenaBouts } from '../../../src/scenes/arena/arenaBouts.js';
 import { sessionCard, arenaBoard } from '../../../src/systems/arena/arenaBoard.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
+const DAI = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const settled = () => new Promise((r) => setTimeout(r, 0));
 /** A client's presence socket in a real Room, as net/online.js's session is to the arena (test/systems/arena/audit1003_online.test.js's
@@ -405,8 +406,8 @@ test('ARENA6 THE CLIENT, END TO END on the real Room: Host a session enters the 
     const W = fakeRooms();
     const R = W.room(arenaPrivateRoom('AAAAAA'));
     const hw = R.connect(), bw = R.connect();
-    await R.hello(hw, 'peer-hela', { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela' });
-    await R.hello(bw, 'peer-brann', { x: C[0] + 1, y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann' });
+    await R.hello(hw, 'peer-hela', { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela', look: DAI });
+    await R.hello(bw, 'peer-brann', { x: C[0] + 1, y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', look: DAI });
     const H = screen(R, hw, 'Hela'), B = screen(R, bw, 'Brann');
     // the host's press: the instance entered as the session's room, the session opened there
     assert.deepEqual(H.A.act('privHost'), { ok: true, text: '' });
@@ -488,7 +489,7 @@ test('ARENA6 the client\'s refusals and the card out of a session: a guest\'s Ho
   // ARENA6: the floor's door refused (a screen indoors, or down) - the press SAYS so and nothing is held; it said only
   // "To the arena" and fell silent, and a host on a stream saw nothing happen
   const iw = R.connect();
-  await R.hello(iw, 'peer-ida', null, { name: 'Ida', kind: 'linked', tokenSub: 'acct-ida' });
+  await R.hello(iw, 'peer-ida', null, { name: 'Ida', kind: 'linked', tokenSub: 'acct-ida', look: DAI });
   const I = screen(R, iw, 'Ida', { outdoors: false });
   assert.equal(I.A.act('privHost').ok, true);
   await settled();
