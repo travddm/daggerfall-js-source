@@ -13,6 +13,7 @@ import { createArenaBouts } from '../../../src/scenes/arena/arenaBouts.js';
 import { callMs, COUNT_MS } from '../../../src/systems/arena/arenaBout.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
 import { sessionCard, onlineCards, arenaBoard } from '../../../src/systems/arena/arenaBoard.js';
+const DAI = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const C = ARENA_FLOOR_CENTRE;
 const O = ARENA_TEXT.online;
@@ -64,7 +65,7 @@ function screen(R, ws, name, { guest = false, banner = null } = {}) {
 const last = (ws, k) => ws.sent.filter((m) => m.t === 'arena' && m.k === k).at(-1) ?? null;
 async function mk(R, name, linked = true, opts = {}) {
   const ws = R.connect();
-  await R.hello(ws, `peer-${name.toLowerCase()}`, { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${name.toLowerCase()}` });
+  await R.hello(ws, `peer-${name.toLowerCase()}`, { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${name.toLowerCase()}`, look: DAI });
   return screen(R, ws, name, { guest: !linked, ...opts });
 }
 /** Hela hosts `AAAAAA` on a fresh room; `who` join it (`[name, linked = true, opts]`). Answers the room and the screens. */

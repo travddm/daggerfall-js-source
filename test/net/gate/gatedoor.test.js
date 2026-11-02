@@ -48,7 +48,7 @@ test('GATE-DOOR the court\'s door: a court admits GATE_HELLO_HZ_MAX hellos in on
     for (let i = 0; i < HELLO_HZ_MAX; i++) { const ws = R.connect(); await R.hello(ws, `peer-${String(i).padStart(4, '0')}`, null); assert.equal(ws.closed, null, `the cell's ${i}`); }
     const over = R.connect();
     await R.hello(over, 'peer-9999', null);
-    assert.deepEqual(over.closed, { code: CLOSE_BUSY, reason: BUSY_TOKEN_UNREAD }, 'a cell keeps its own door');
+    assert.deepEqual(over.closed, { code: CLOSE_BUSY, reason: 'busy' }, 'a cell keeps its own door (spent after the token now: the close no longer says the token is unspent)');
   });
   // AUDIT PLAN-1000 B3: A COPY'S OWN DOOR is the court's rate - its object is another, its key the court's (`ly` its layer)
   await onClock(gateTimes(DAY).openAt + 1000, async () => {

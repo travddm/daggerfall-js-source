@@ -30,6 +30,7 @@ import { COUNT_MS, callMs } from '../../../src/systems/arena/arenaBout.js';
 import { _resetArenaCache } from '../../../server-account/src/arena.js';
 import { createArenaOnline } from '../../../src/scenes/arena/arenaOnline.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
+const ARMED = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 120, group: 'Weapons', equipSlot: 19, material: 1 }, { templateIndex: 123, group: 'Weapons', equipSlot: 21, material: 9 }] };   // the weapons the bouts' blows name: the referee holds a claim to the look
 
 const { subtle } = globalThis.crypto;
 const C = ARENA_FLOOR_CENTRE;
@@ -74,8 +75,8 @@ async function matchedOn(W, step, { casual = false, lvA = 20, lvB = 30 } = {}) {
   const R = W.room(arenaBoutRoom(o));
   R.env.GATE_SIGNING_KEY = await relayKey();
   const a = R.connect(), b = R.connect();
-  await R.hello(a, 'fight-alva', at(C[0] - 6), { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: lvA });
-  await R.hello(b, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: lvB });
+  await R.hello(a, 'fight-alva', at(C[0] - 6), { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: lvA, look: ARMED });
+  await R.hello(b, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: lvB, look: ARMED });
   await word(R, a, { k: 'in', r: 'f' }); await word(R, b, { k: 'in', r: 'f' });
   return { H, A, B, R, a, b, o, of };
 }
@@ -144,7 +145,7 @@ test('AUDIT PRE-MERGE 1003 S2: THE SIGNED LEVEL IS CAPPED - a token\'s `cl` is t
   const W = fakeRooms();
   const R = W.room(arenaBoutRoom('00000000000010a2'));
   const p = R.connect();
-  await R.hello(p, 'fight-ceryn', at(C[0] - 6), { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn', charLevel: 1000 });
+  await R.hello(p, 'fight-ceryn', at(C[0] - 6), { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn', charLevel: 1000, look: ARMED });
   await word(R, p, { k: 'in', r: 'f', tier: 0, bout: 0, lv: 1, z: 'feedc0de00000001' });
   assert.equal(R.room._attach(p).cl, 1000, 'the signed thousand carried onto the socket');
   assert.equal(last(p, 'st').f.find((f) => f[0] === 'p0')[4], ladderVitalityAt(ladderLevelCap(0)), 'the Pit\'s cap, not two thousand');
@@ -161,8 +162,8 @@ test('AUDIT PRE-MERGE 1003 S3: A RATED BOUT\'S VITALITY IS THE TOKEN\'S - a queu
   const o = last(A, 'go').o;
   const R = W.room(arenaBoutRoom(o));
   const a = R.connect(), b = R.connect();
-  await R.hello(a, 'fight-alva', at(C[0] - 6), { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 1 });
-  await R.hello(b, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 1 });
+  await R.hello(a, 'fight-alva', at(C[0] - 6), { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 1, look: ARMED });
+  await R.hello(b, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 1, look: ARMED });
   await word(R, a, { k: 'in', r: 'f' }); await word(R, b, { k: 'in', r: 'f' });
   const st = last(a, 'st');
   assert.equal(st.u, undefined, 'a rated bout');
@@ -254,7 +255,7 @@ test('AUDIT PRE-MERGE 1003 S5: A LADDER WIN SURVIVES A BLIP - a fighter whose so
   const o = '0000000000001005';
   const R = W.room(arenaBoutRoom(o));
   R.env.GATE_SIGNING_KEY = await relayKey();
-  const who = { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn', charLevel: 5 };
+  const who = { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn', charLevel: 5, look: ARMED };
   const p = R.connect();
   await R.hello(p, 'fight-ceryn', at(C[0] - 6), who);
   await word(R, p, { k: 'in', r: 'f', tier: 0, bout: 0, z: 'feedc0de00000001' });
@@ -264,7 +265,7 @@ test('AUDIT PRE-MERGE 1003 S5: A LADDER WIN SURVIVES A BLIP - a fighter whose so
     step(300); await R.pose(p, at(C[0] - 6)); await R.fire();
     const st = await R.room._boutOf();
     if (st.b?.phase !== 'fight') continue;
-    await word(R, p, { k: 'hit', i: 'a0', d: 40, r: 0, w: 116, m: 1, q: 1000 + i });
+    await word(R, p, { k: 'hit', i: 'a0', d: 40, r: 0, w: 120, m: 1, q: 1000 + i });
     fell = !!st.b.fighters.find((f) => f.id === 'a0').out;
   }
   assert.ok(fell, 'the Pit\'s first fighter fell');
@@ -306,7 +307,7 @@ test('AUDIT PRE-MERGE 1003 S5: A FORFEITED FIGHTER BACK SEES ITS END - gone mid-
     assert.equal(st.res.how, 'forfeit');
     assert.ok(27_000 > ARENA_GONE_MS);
     const back = R.connect();
-    await R.hello(back, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30 });
+    await R.hello(back, 'fight-brann', at(C[0] + 6), { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30, look: ARMED });
     await word(R, back, { k: 'in', r: 'f' });
     assert.equal(last(back, 'no'), null, `${casual ? 'casual' : 'rated'}: not "no bout"`);
     const s = last(back, 'st');

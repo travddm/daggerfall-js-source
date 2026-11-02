@@ -7,6 +7,7 @@ import { fakeRooms } from '../../fakeRoom.mjs';
 import { ARENA_FLOOR_CENTRE, ARENA_TICK_MS, ARENA_GONE_MS, ARENA_PRIVATE_KEEP_MS, arenaPrivateRoom } from '../../../src/net/arena/arenaLaw.js';
 import { readArenaOut } from '../../../src/net/wire.js';
 import { callMs, COUNT_MS } from '../../../src/systems/arena/arenaBout.js';
+const ARMED = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const C = ARENA_FLOOR_CENTRE;
 const ROOM = arenaPrivateRoom('K7PX2M');
@@ -27,12 +28,12 @@ async function onClock(fn) {
 async function session(W, who = []) {
   const R = W.room(ROOM);
   const host = R.connect();
-  await R.hello(host, 'peer-hela', { ...at, x: C[0] }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela' });
+  await R.hello(host, 'peer-hela', { ...at, x: C[0] }, { name: 'Hela', kind: 'linked', tokenSub: 'acct-hela', look: ARMED });
   await ps(R, host, 'open');
   const out = { R, host };
   for (const [id, name, linked] of who) {
     const ws = R.connect();
-    await R.hello(ws, `peer-${id}`, at, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${id}` });
+    await R.hello(ws, `peer-${id}`, at, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${id}`, look: ARMED });
     await ps(R, ws, 'join');
     out[id] = ws;
   }

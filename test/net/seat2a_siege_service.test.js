@@ -22,7 +22,7 @@ const turning = (w) => Math.floor(seatWeekStartMs(w + 1) / 1000);
 const AFTER = (w) => turning(w) + 3 * 3600;
 const S = (ms) => Math.floor(ms / 1000);
 const START = S(siegeStartMs(W + 1, 0, 20));   // Wednesday 20:00 - the default window, and a Tourney's
-const F = [[0, 40], [40, 0], [-40, 0], [0, -40], [0, 80], [0, -60]].map(([x, z]) => [x * SIEGE_UNITS_PER_M, z * SIEGE_UNITS_PER_M]);
+const F = [[0, 100], [30, 50], [-30, 50], [0, 0], [0, 120], [0, 10.5]].map(([x, z]) => [x * SIEGE_UNITS_PER_M + 402 * 32768 + 16384, z * SIEGE_UNITS_PER_M + (499 - 151) * 32768 + 16384]);   // in Anticlere's pixel: the service holds a field to its seat's
 const F2 = F.map(([x, z]) => [x + 1, z]);
 
 async function battleWeek(t) {

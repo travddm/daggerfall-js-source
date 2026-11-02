@@ -196,5 +196,5 @@ test('INSTANCES at the relay (the audit): the hello gate is BY ACCOUNT, after th
   const pub = fakeRoom('dungeon:m187853213');
   for (let i = 0; i < 30; i++) { const junk = pub.connect(); await pub.hello(junk, `junk${i}`, null, { tok: null }); }
   const carol = pub.connect(); await pub.hello(carol, 'carol');
-  assert.equal(refusal(carol), 'busy', 'a public room\'s bucket is the room\'s, as it was');
+  assert.ok(welcomed(carol), 'a public room gate is by account too: junk at the door spends nobody gate');
 });
