@@ -8,7 +8,8 @@ import { registerTakeListener } from '../inventory.js';
 export const TAKEN_MARK = 'lootTakenMark';
 
 /** A take: drop the `untaken` mark. Answers whether the piece carried it. */
-export function clearUntaken(item: { untaken?: boolean } | null | undefined): boolean {
+/** @param {{ untaken?: boolean } | null | undefined} item */
+export function clearUntaken(item) {
   if (!item || item.untaken !== true) return false;
   delete item.untaken;
   return true;

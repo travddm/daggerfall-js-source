@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { clearUntaken } from '../../../src/systems/loot/taken-mark.ts';
+import { clearUntaken } from '../../../src/systems/loot/taken-mark.js';
 
 test('a take clears the untaken mark once and says whether the piece carried it', () => {
-  const piece: { untaken?: boolean } = { untaken: true };
+  const piece = { untaken: true };
   assert.equal(clearUntaken(piece), true);
   assert.equal('untaken' in piece, false);
   assert.equal(clearUntaken(piece), false, 'a piece taken again carries no mark');

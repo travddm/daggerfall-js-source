@@ -23,7 +23,7 @@ top of DFU's loot tables.
 | Physical items | `src/systems/physicalItems.js`, `src/scenes/physicalItemsLayer.js`, `src/scenes/droppedLoot.js` |
 | Loot tables | `src/systems/loot/loot.js`, `src/systems/loot/lootDataTables.js`, `src/systems/loot/lootThemes.js` |
 | Rarity ladder | `src/systems/loot/lootRarity.js`, `src/systems/loot/lootPowers.js`, `src/systems/loot/lootLevelGate.js` |
-| Loot extras | `taken-mark.ts`, `lootCodex.js`, `lootCurse.js`, `lootScry.js` (all in `src/systems/loot/`), `src/systems/reforge.js` |
+| Loot extras | `taken-mark.js`, `lootCodex.js`, `lootCurse.js`, `lootScry.js` (all in `src/systems/loot/`), `src/systems/reforge.js` |
 | Drop shaping | `src/systems/unleveledLoot.js`, `src/systems/loot/kill-gold.ts`, `src/systems/foeLootCap.js`, `src/systems/renownLoot.js` |
 | Gems | `src/systems/gems.js`, `src/systems/loot/gemGrades.js`, `src/ui/socketWells.js` |
 | Quick loot | `src/systems/quickLoot.js` |
@@ -197,7 +197,7 @@ only the general rule. Tests: `test/systems/lootgate1.test.js`.
 
 **Around the ladder:**
 
-- `taken-mark.ts`: the first take of a rolled piece clears its `untaken` mark, which the kit roll reads. The bad-luck drought that once rode on this listener is gone (B4).
+- `taken-mark.js`: the first take of a rolled piece clears its `untaken` mark, which the kit roll reads. The bad-luck drought that once rode on this listener is gone (B4).
 - `lootCodex.js`: a collection log of every Legendary and Aetheric taken. It also imprints a Legendary's power on a
   Rare.
 - `lootCurse.js`: some Rare and Legendary finds are cursed: one extra line and one drawback. A temple lifts it.
