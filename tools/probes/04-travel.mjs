@@ -46,20 +46,61 @@ export async function run({ browser, base, ck }) {
       const x = await travelMap();
       return x?.top === 'confirm' || x?.popUp;
     }, 60000);
+    let lastPress = 0;
+    // Each key waits for the window it belongs to: a frame takes seconds in software GL, and a key pressed before its window
+    // is up is swallowed (the CI runs where the trip never began and the player stood where it started).
     if ((await travelMap())?.top === 'confirm') await g.key('y', 1);
-    await g.key('b', 8);
-    await g.until(async () => (await travelMap()) === null, 90000);
+    const popUp = await g.until(async () => (await travelMap())?.popUp, 120000, 500);
+    console.log(`   travel pop-up: ${JSON.stringify({ up: !!popUp, map: await travelMap() })}`.slice(0, 600));
+    // 'b' begins the trip; press it again while the pop-up still stands (a press the window had not yet read)
+    let pressed = 0;
+    await g.until(
+      async () => {
+        const m = await travelMap();
+        if (m === null) return true;
+        if (pressed === 0 || Date.now() - lastPress > 30000) {
+          pressed++;
+          lastPress = Date.now();
+          await g.key('b', 2);
+        }
+        return false;
+      },
+      300000,
+      500,
+    );
+    console.log(`   'b' pressed ${pressed} time(s)`);
+    // The journey walks the player a frame at a time, and software GL on a CI runner decides how many frames a minute
+    // gives: a trip took 525 s to 785 s whole on most runners and over 1400 s on a slow one. So the wait is on progress,
+    // not on a clock: it ends on arrival, or when the pixel has not changed for STALL_MS (a journey held by streaming
+    // shows in the state lines below), with ABSOLUTE_MS as the job's own bound.
+    const STALL_MS = 600000;
+    const ABSOLUTE_MS = 1500000;
+    const t0 = Date.now();
+    let lastPixel = '';
+    let movedAt = t0;
+    let lastLine = 0;
+    let lastState = null;
     const landed = await g.until(
       async () => {
         const t = await travelState();
         const j = await g.J(() => JSON.stringify(window.__journeyState()));
-        return Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1;
+        lastState = j;
+        const pixel = `${t.pixel.x},${t.pixel.y}`;
+        if (pixel !== lastPixel) {
+          lastPixel = pixel;
+          movedAt = Date.now();
+        }
+        if (Date.now() - lastLine > 60000) {
+          lastLine = Date.now();
+          console.log(`   [${Math.round((Date.now() - t0) / 1000)}s] pixel ${pixel}, frame ${await g.frame()}, journey ${JSON.stringify(j)}`);
+        }
+        if (Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1) return true;
+        return Date.now() - movedAt > STALL_MS || Date.now() - t0 > ABSOLUTE_MS ? 'gave up' : false;
       },
-      // the journey walks the player a frame at a time: three map pixels took over 240 s in software GL (measured: two pixels
-      // in 240 s with Edge on SwiftShader), and CI's runners are slower still
-      900000,
+      ABSOLUTE_MS + 60000,
       1000,
     );
+    if (landed === 'gave up') console.log(`  --- the journey stopped moving; last state ${JSON.stringify(lastState)}`);
     await g.until(() => g.page.evaluate(() => window.__streamIdle?.() === true), 240000);
     const after = await travelState();
     ck(
@@ -69,7 +110,7 @@ export async function run({ browser, base, ck }) {
     );
     ck(
       'the journey ends at the place that was asked for',
-      !!landed,
+      landed === true,
       `wanted ${dest.pixel.x},${dest.pixel.y}, stands at ${after.pixel.x},${after.pixel.y}`,
     );
     ck(

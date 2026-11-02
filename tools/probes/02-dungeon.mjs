@@ -91,8 +91,12 @@ export async function run({ browser, base, ck }) {
     const dungeon = await g.J(() => window.__dungeon());
     ck('the dungeon has a way out', (dungeon?.exits?.length ?? 0) > 0, `${dungeon?.exits?.length ?? 0} exit(s)`);
     const foes = await g.J(() => window.__foes());
-    const target = (foes ?? []).find((f) => !f.dead && f.pos);
+    // an enemy's loot is rolled when it spawns, so the kill is of a foe that already carries some: the corpse then holds
+    // loot by construction, and the check below can stay strict
+    const live = (foes ?? []).filter((f) => !f.dead && f.pos);
+    const target = live.find((f) => f.loot > 0) ?? live[0];
     ck('the dungeon holds a live foe', !!target, `${foes?.length ?? 0} foes`);
+    ck('a live foe carries loot', (target?.loot ?? 0) > 0, `${live.filter((f) => f.loot > 0).length} of ${live.length} live foes`);
 
     // move: through the motor, to a point on the line between the player and the foe
     if (target) {

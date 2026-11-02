@@ -11,7 +11,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Game, sleep } from './lib/harness.mjs';
+import { Game } from './lib/harness.mjs';
 import { editsPlugin } from '../frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from '../onlineFrameProbe.mjs';
 import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
@@ -64,7 +64,18 @@ export async function run({ browser, base, ck }) {
         await compose.close();
       }
     };
-    const [svc, saveText] = await Promise.all([standServices({ port: SVC_PORT }, state), composeSave()]);
+    // wrangler's dev server now and then dies while it boots (seen on CI: the account service never answered, 188 s in);
+    // a second start from the same state directory is a fresh process on the same ledger
+    const standOnce = async () => {
+      try {
+        return await standServices({ port: SVC_PORT }, state);
+      } catch (e) {
+        console.log(`   the services did not start, once more: ${String(e?.message).slice(0, 200)}`);
+        stopAll();
+        return standServices({ port: SVC_PORT }, state);
+      }
+    };
+    const [svc, saveText] = await Promise.all([standOnce(), composeSave()]);
     lap('services up and first save composed');
     const io = { fetch: localFetch({ port: svc.accountPort, ip: '10.9.9.9' }) };
     ck('the world host composes a first save', !!saveText, `${((saveText?.length ?? 0) / 1024).toFixed(0)} KB`);
@@ -168,45 +179,70 @@ export async function run({ browser, base, ck }) {
 
     // one chat line: typed in alice's chat field (Enter focuses it, Enter sends), read from bob's chat log
     const line = `probe line ${Math.random().toString(36).slice(2, 8)}`;
-    // the opening story page of the classic start holds the keys: put it away first, as a player does
+    // the opening story page of the classic start holds the keys: put it away first, as a player does. A frame takes seconds
+    // in software GL, so press until the game says no overlay is up, not a counted number of times.
     for (const g of [a, b]) {
-      for (let i = 0; i < 12 && (await g.overlayKind()); i++) {
-        await g.page.waitForTimeout(600);
-        await g.key(i % 2 ? 'Escape' : 'Enter');
-      }
-    }
-    const say = async (g) => {
-      await g.page.keyboard.press('Enter');
-      // the key is handled on a frame, and a frame takes seconds in software GL: type only once the field has the focus,
-      // or the letters fall on the key bindings (the journal opens)
-      await g.until(
-        () => g.page.evaluate(() => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)),
-        120000,
-        250,
+      let n = 0;
+      const gone = await g.until(
+        async () => {
+          if (!(await g.overlayKind())) return true;
+          await g.key(n++ % 2 ? 'Escape' : 'Enter');
+          return false;
+        },
+        300000,
+        600,
       );
-      await g.page.keyboard.type(line, { delay: 20 });
-      await g.page.keyboard.press('Enter');
-    };
-    await say(a);
-    // a first line is held behind the code of conduct (SAFE1): agree to it, then say the line again
-    const agree = a.page.getByRole('button', { name: 'I agree' });
-    if (
-      await agree.waitFor({ timeout: 60000 }).then(
-        () => true,
-        () => false,
-      )
-    ) {
-      // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
-      await agree.evaluate((b) => b.click());
-      await sleep(800);
-      await say(a);
+      lap(`${g.label}: overlay put away: ${!!gone}`);
     }
+    // Enter focuses the chat field; the key is handled on a frame, and a frame takes seconds in software GL. Each step waits
+    // on the game's state (the field has the focus, the conduct card is up, the line stands in the log), never on a time:
+    // typing before the field has the focus drops the letters on the key bindings (the journal opens).
+    const agree = a.page.getByRole('button', { name: 'I agree' });
+    const inLog = (g) => g.page.evaluate((t) => document.body.innerText.includes(t), line);
+    const fieldFocused = (g) =>
+      g.page.evaluate(() => !!document.activeElement?.classList.contains('dfchat-input'));
+    const agreeShown = () => agree.isVisible().catch(() => false);
+    const field = a.page.locator('.dfchat-input');
+    let agreed = false;
+    for (let attempt = 1; attempt <= 8 && !(await inLog(a)); attempt++) {
+      let got = (await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null;
+      if (!got) {
+        await a.page.keyboard.press('Enter');
+        // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
+        got = await a.until(async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null), 120000, 250);
+      }
+      lap(`chat attempt ${attempt}: ${got}`);
+      if (got === 'card') {
+        // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
+        await agree.evaluate((btn) => btn.click());
+        agreed = true;
+        await a.until(async () => !(await agreeShown()), 60000, 250);
+        await a.waitFrames(4);
+        continue;
+      }
+      if (got !== 'field') continue;
+      // the line that waited behind the card stays in the field: set it rather than type it over itself
+      await field.fill(line);
+      await a.page.keyboard.press('Enter');
+      // the line stands in the sender's log, or the card has come up and the next attempt agrees
+      await a.until(async () => (await inLog(a)) || (await agreeShown()), 60000, 250);
+    }
+    // the chat panel fades after a send, so the sender's own log is read now, while bob's wait below takes minutes
+    const sent = await inLog(a);
+    lap(`chat line sent (conduct agreed: ${agreed})`);
     await a.shot('07-alice-chat');
     const heard = await b.until(() => b.page.evaluate((t) => document.body.innerText.includes(t), line), 180000, 500);
     await b.shot('07-bob-chat');
     ck('the chat line reaches bob', !!heard, line);
-    const sent = await a.page.evaluate((t) => document.body.innerText.includes(t), line);
     ck("and stands in alice's own log", sent, line);
+    if (!heard || !sent) {
+      for (const g of [a, b]) {
+        g.diagnostics(`${g.label}'s page`, 60);
+        console.log(`      ${g.label}'s text: ${(await g.page.evaluate(() => document.body.innerText)).replace(/s+/g, ' ').slice(-500)}`);
+      }
+      console.log(`  --- account service log tail
+${svc.account.log.slice(-2500)}`);
+    }
 
     for (const g of players) g.noErrors(ck, `${g.label}'s page`);
   } finally {

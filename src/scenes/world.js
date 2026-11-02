@@ -584,7 +584,7 @@ import { createDroppedLoot, droppedLootHooks, containerDropPos } from './dropped
 import { CONTAINER_IMAGES } from '../ui/targetIconPanel.js';   // DW-E3: a fish's DaggerfallLoot keeps the field's default picture (Chest) under its icon
 import { preloadPaperDollArt } from '../ui/paperDoll.js';   // U8f: the avatar base
 import { seedStartingEquipment } from '../systems/equip.js';   // U8h: the worn-weapon binding
-import { createChargenFlow, createChargenWindow, finishChargen, loadSpellIndex, applyHeadlessChargen, handHeroGenderToGrammar } from '../systems/chargenSession.js';   // S3c/U9; L10N3g: the hero's gender to the grammar
+import { createChargenFlow, createChargenWindow, finishChargen, loadSpellIndex, applyHeadlessChargen, headlessChargenWanted, handHeroGenderToGrammar } from '../systems/chargenSession.js';   // S3c/U9; L10N3g: the hero's gender to the grammar
 import { testEntryById, applyTestCharacter, seedTestMount, seedTestLoot, testRoomOnlineRefused, TEST_ROOM_OFFLINE_TEXT, TEST_SEA, TEST_SEA_TEXT, enableTestSea } from '../systems/testRoom.js';   // TR3: the Test Room's one home; TSR4: the ride; AUDIT SET D4: its character's online refusal
 import { publishBootParams, refuseOnlinePowerFlags, BOOT_DOOR_KEYS } from '../systems/online/onlineLane.js';   // AUDIT SET D4: a refused Test Room boot drops `online` from the URL the lane reads; REALM P0.1: the URL's powers stay offline
 import { preloadChargenArt } from '../ui/chargenArt.js';   // U10
@@ -6633,7 +6633,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       const key = newestSaveOf(enumerateSaves().info, String(playerEntity.characterId ?? ''));
       if (key >= 0) { try { globalThis.history.replaceState(globalThis.history.state, '', `${location.pathname}${loadSearch(location.search, key)}`); } catch { /* a page that refuses keeps its address; the menu's Load still finds them */ } }
     }).catch((e) => legacyBirthFailed(e?.message ?? String(e)));
-  } else if (!playerEntity.chargenDone && params.has('class')) {
+  } else if (headlessChargenWanted(playerEntity, params)) {
     // AUDIT 17f: ?class=N is the headless skip - parsed here for the
     // DUNGEON the host might build, but never honoured for the host's
     // own chargen, so a town boot had no way past the overlay.

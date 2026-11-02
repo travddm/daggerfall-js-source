@@ -117,6 +117,14 @@ export async function loadCareers(fetchBytes) {
  *  town) had no way past the overlay, which is how S3c broke the
  *  U8d/U8e/U8g probes without a gate noticing. One implementation,
  *  three hosts. */
+/** Whether a boot runs the headless chargen of `?class=N`. Never with `&load`: the save arrives after the boot walk, and the
+ *  chargen is async (it fetches the spell index), so on a slow machine it finished AFTER the load and replaced the loaded
+ *  pack with a fresh class kit and added a fresh start purse (found by the save probe, 1 of 10 CI runs failed). The
+ *  `legacyborn` branch and the wizard branch of world.js carry the same exclusion. */
+export function headlessChargenWanted(playerEntity, params) {
+  return !playerEntity.chargenDone && params.has('class') && !params.has('load');
+}
+
 export async function applyHeadlessChargen(playerEntity, classIndex, { fetchBytes, spellsByIndex = null } = {}) {
   const cf = new ClassFile();
   cf.load(await fetchBytes(`CLASS${String(classIndex).padStart(2, '0')}.CFG`));

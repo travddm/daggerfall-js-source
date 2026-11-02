@@ -64,3 +64,11 @@ boot, and two read hooks. The repository is not changed. Every other probe runs 
 `.github/workflows/probes.yml` runs on pull requests that touch `src/`, `server/`, `server-account/` or the probes, one
 runner per probe, so the slowest probe (`online`) sets the wall time. It is not part of the `check` job. ARENA2 is
 downloaded once and cached.
+
+To tell a flaky probe from a real fault, run one probe many times on CI (each run is its own runner):
+
+```bash
+gh workflow run probes --ref <branch> -f probe=save -f repeat=10
+```
+
+A failed check prints the page's trace (console lines, failed requests) and, for `save`, the pack item by item.
