@@ -122,8 +122,8 @@ FATIGUE_MULTIPLIER`. `applyCharacter` assigns onto the shared `playerEntity` obj
 | `chargenDone`, `characterId` | creation complete; the save slot identity |
 
 `defineLiveMaxHealth` makes `maxHealth` an accessor: the stored value, capped by `maxHealthLimiter` (lycanthropy),
-plus online-only layers (the Endurance floor and the Firmament's Health; Renown adds magicka and no health) that are never saved. Any path that builds an entity calls it and
-`defineLiveMaxMagicka` (the save loader does).
+plus online-only layers (the Endurance floor and the Firmament's Health; Renown adds magicka and no health) that are
+never saved. Any path that builds an entity calls it and `defineLiveMaxMagicka` (the save loader does).
 
 ## Advancement and levelling
 
