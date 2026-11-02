@@ -19,3 +19,4 @@ test/fixtures/mw/spineAimParity.json
 test/fixtures/mw/mwWeaponAnimParity.json
 test/fixtures/mw/mwBodyPartsParity.json
 test/fixtures/mw/mwAnimSourcesParity.json
+test/fixtures/mw/mwHeadViewParity.json

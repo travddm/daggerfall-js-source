@@ -216,7 +216,7 @@ test('MW-D10: the neck takes 0.75 of the look, and the port pitches the OTHER WA
   // product; in this port's column convention it is localRot * W^T *
   // rotate * W (mwFirstPerson.js rootSpaceTurn), the letters' copy turned
   // retail's neck the other way - MW-D20 below works it by hand.
-  const src2 = rd('src/formats/morrowind/mwFirstPerson.js');
+  const src2 = rd('src/formats/morrowind/mwHeadView.js');
   assert.match(src2, /mat33Mul\(mat33Mul\(mat33Mul\(local, transpose33\(w\)\), rotate\), w\)/,
     'localRot * W^T * rotate * W - OSG\'s row-vector line in this port\'s column convention');
   assert.match(src2, /const rotation = rootSpaceTurn\(local\.rotation, w, rotate\);/, 'and the neck turns through it');
